@@ -83,6 +83,42 @@ that a rename would have to chase down, and nothing about this fix
 required touching history to be correct — it only had to stop the
 gap from growing.
 
+## Update (`tsk-1ne`): `fgos edit` re-validates the WHOLE object, so a legacy-invalid item became permanently un-editable for ANY field
+
+The "left alone" framing above was true for the read/replay path, but
+`fgos edit`'s own write path (`editWork` → `patch` →
+`validateWorkShape`) turned out to re-validate the *entire* work object
+on every call, not just the field being patched — a gap this doc's own
+"two write paths" framing didn't fully account for.
+
+Found while backfilling an unrelated item's `description` gap: 65 of 112
+items being edited could not be edited **at all**, for **any** field —
+not because the field being changed was invalid, but because each item
+already carried a pre-existing invalid shape unrelated to what was being
+patched. The breakdown: 61 items with `stage: compound-learn` (not in
+the current 3-value stage enum), and 4 items with legacy ids over this
+very `MAX_ID_LENGTH` guard — the exact long-id cluster this doc
+describes. Confirmed against real command output: `fgos edit <id>
+--description ...` against every one of the 65 returned `work.stage must
+be one of [clarify,decompose,executing] when present, got:
+compound-learn` or `work.id must be at most 30 characters`, regardless
+of the fact that neither `stage` nor `id` was the field the call was
+trying to change.
+
+This directly contradicts what "existing long ids were left alone" above
+implied — replaying and functioning normally isn't the same guarantee as
+*editable*. A legacy item with an id over the cap (or any other
+pre-existing shape violation, like the unrelated `compound-learn` stage
+value) is now permanently locked out of `fgos edit` for every field,
+until one of: the stage enum gains an allowance for the legacy value,
+the affected items get their invalid field migrated to a valid value, or
+`editWork`'s validation changes to check only the fields actually being
+patched instead of re-validating the whole object. None of these were
+resolved by this item — it exists to document and quantify the gap,
+which was recorded as a decision (`tsk-535`, event seq 8202) with the
+full id list and error breakdown, not to fix the underlying validation
+scope itself.
+
 ## What this means for the next person adding a new id-touching write path
 
 `fgos submit`'s id generation and `fgos add`'s id validation are two

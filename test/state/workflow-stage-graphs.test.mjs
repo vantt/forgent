@@ -2,8 +2,9 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DOMAINS, DEFAULT_DOMAIN, resolveDomainName, getDomain, stageForStep, skillForStage, parkReasonForStatus } from '../../src/state/workflow-stage-graphs.mjs';
+import { DOMAINS, DEFAULT_DOMAIN, resolveDomainName, getDomain, stageForStep, skillForStage, parkReasonForStatus, effectiveStage, classificationVocabulary } from '../../src/state/workflow-stage-graphs.mjs';
 import { rebuildView } from '../../src/state/replay.mjs';
+import { RISK_DISCOUNTS } from '../../src/state/priority-formula.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FIXTURE_PATH = path.join(__dirname, '..', 'fixtures', 'phase1-events.jsonl');
@@ -33,24 +34,30 @@ test('DOMAINS.triage (tsk-3xo regression fixture) maps Clarify/Divide/Execute un
   assert.equal(stageForStep(DOMAINS.triage, 'Execute'), 'assembling');
 });
 
-test('DOMAINS.coding.stages is the pre-retrofit work.mjs STAGES value — compound-learn retired (D11)', () => {
-  assert.deepEqual(DOMAINS.coding.stages, ['clarify', 'decompose', 'executing']);
+test('DOMAINS.coding.stages adds "discovery" and "exploring" between clarify and decompose (tsk-1w7 D10) — compound-learn stays retired (D11)', () => {
+  assert.deepEqual(DOMAINS.coding.stages, ['clarify', 'discovery', 'exploring', 'decompose', 'executing']);
 });
 
-test('DOMAINS.coding.transitions is the pre-retrofit stage-fsm.mjs STAGE_TRANSITIONS value — the executing->compound-learn edge is retired (D11)', () => {
+test('DOMAINS.coding.transitions keeps the three pre-existing edges byte-for-byte (discovery.mjs/decompose.mjs are untouched by tsk-1w7, still fire them) and adds the three new D10 edges, plus tsk-puz D12\'s direct clarify->exploring migration jump', () => {
   assert.deepEqual(DOMAINS.coding.transitions, [
     { from: 'clarify', to: 'executing' },
     { from: 'clarify', to: 'decompose' },
     { from: 'decompose', to: 'executing' },
+    { from: 'clarify', to: 'discovery' },
+    { from: 'discovery', to: 'exploring' },
+    { from: 'exploring', to: 'decompose' },
+    { from: 'clarify', to: 'exploring' },
   ]);
 });
 
-test('DOMAINS.coding.stepMap maps every stage to a base-workflow step (vision §2 vocabulary) — compound-learn retired (D11)', () => {
+test('DOMAINS.coding.stepMap maps every stage to a base-workflow step (vision §2 vocabulary) — compound-learn retired (D11); discovery/exploring carry NO step entry (tsk-1w7 D10, same "outside the 5-step vocabulary" treatment Init/Compound-learn already get)', () => {
   assert.deepEqual(DOMAINS.coding.stepMap, {
     clarify: 'Clarify',
     decompose: 'Divide',
     executing: 'Execute',
   });
+  assert.equal('discovery' in DOMAINS.coding.stepMap, false);
+  assert.equal('exploring' in DOMAINS.coding.stepMap, false);
 });
 
 test('DOMAINS is deeply frozen: the registry, each domain entry, and each nested array/object reject mutation', () => {
@@ -72,7 +79,12 @@ test('DOMAINS.coding.skillMap has an entry for every stage in DOMAINS.coding.sta
 });
 
 test('DOMAINS.coding.skillMap maps every stage, including executing, to its skill', () => {
-  assert.equal(DOMAINS.coding.skillMap.clarify, 'fgos-exploring');
+  // tsk-1w7 D10/D13: clarify now runs the NEW lightweight self-judging
+  // skill; the OLD deep Socratic-lock skill (still named fgos-exploring,
+  // unchanged file) moves to the NEW `exploring` stage instead.
+  assert.equal(DOMAINS.coding.skillMap.clarify, 'fgos-clarifying');
+  assert.equal(DOMAINS.coding.skillMap.discovery, 'fgos-researching');
+  assert.equal(DOMAINS.coding.skillMap.exploring, 'fgos-exploring');
   assert.equal(DOMAINS.coding.skillMap.decompose, 'fgos-planning');
   assert.equal(DOMAINS.coding.skillMap.executing, 'fgos-code-implement');
   // fgos-compounding no longer has a stage entry (D11) — it triggers on
@@ -145,7 +157,9 @@ test('parkReasonForStatus never throws on a null/undefined domain', () => {
 });
 
 test('skillForStage resolves each of coding\'s mapped stages to its skill name', () => {
-  assert.equal(skillForStage(DOMAINS.coding, 'clarify'), 'fgos-exploring');
+  assert.equal(skillForStage(DOMAINS.coding, 'clarify'), 'fgos-clarifying');
+  assert.equal(skillForStage(DOMAINS.coding, 'discovery'), 'fgos-researching');
+  assert.equal(skillForStage(DOMAINS.coding, 'exploring'), 'fgos-exploring');
   assert.equal(skillForStage(DOMAINS.coding, 'decompose'), 'fgos-planning');
   // compound-learn is retired (D11) — no longer a stage, resolves to null
   // like any other stage absent from skillMap.
@@ -186,7 +200,7 @@ test('DOMAINS.synthetic is deeply frozen: the entry and its nested array/object 
 });
 
 test('adding "synthetic" leaves DOMAINS.coding unchanged', () => {
-  assert.deepEqual(DOMAINS.coding.stages, ['clarify', 'decompose', 'executing']);
+  assert.deepEqual(DOMAINS.coding.stages, ['clarify', 'discovery', 'exploring', 'decompose', 'executing']);
   assert.deepEqual(DOMAINS.coding.stepMap, {
     clarify: 'Clarify',
     decompose: 'Divide',
@@ -196,6 +210,10 @@ test('adding "synthetic" leaves DOMAINS.coding unchanged', () => {
     { from: 'clarify', to: 'executing' },
     { from: 'clarify', to: 'decompose' },
     { from: 'decompose', to: 'executing' },
+    { from: 'clarify', to: 'discovery' },
+    { from: 'discovery', to: 'exploring' },
+    { from: 'exploring', to: 'decompose' },
+    { from: 'clarify', to: 'exploring' },
   ]);
 });
 
@@ -274,6 +292,18 @@ test('stageForStep returns undefined for a step the domain never declares (Init 
   assert.equal(stageForStep(DOMAINS.coding, 'Compound-learn'), undefined);
 });
 
+// --- effectiveStage (tsk-4zj D1/D4) ---
+
+test('effectiveStage returns the explicit stage as-is when present', () => {
+  assert.equal(effectiveStage({ stage: 'clarify' }, DOMAINS.coding), 'clarify');
+  assert.equal(effectiveStage({ stage: 'decompose' }, DOMAINS.coding), 'decompose');
+});
+
+test('effectiveStage defaults to the domain\'s Execute-mapped stage when stage is absent', () => {
+  assert.equal(effectiveStage({}, DOMAINS.coding), 'executing');
+  assert.equal(effectiveStage({}, DOMAINS.synthetic), 'assembling');
+});
+
 // --- rebuild-determinism (must_have): replaying an event log with zero
 // "domain" events must still produce the exact pre-retrofit view — this
 // retrofit never stamps a domain value onto anything, and every item reads
@@ -322,4 +352,28 @@ test('rebuild-determinism (domain retrofit): the fixture log (zero domain events
   for (const item of Object.values(view.work)) {
     assert.equal('domain' in item, false);
   }
+});
+
+// --- classification vocabulary (per-domain kind/risk enum) ---
+
+test('coding declares a classification vocabulary for both kind and risk', () => {
+  assert.deepEqual(classificationVocabulary(DOMAINS.coding, 'kind'), ['bug', 'chore', 'design', 'docs', 'feature', 'task']);
+  assert.deepEqual(classificationVocabulary(DOMAINS.coding, 'risk'), ['light', 'standard', 'heavy']);
+});
+
+// The whole point of pinning risk to light/standard/heavy: two live consumers
+// read exactly these values, and neither would fail loudly on a different
+// vocabulary -- decompose.mjs's gate would just stop firing, and
+// priority-formula.mjs would silently fall back to its `standard` discount.
+test("coding's risk vocabulary covers every value decompose's heavy-risk gate and priority-formula's discount table read", () => {
+  const risks = classificationVocabulary(DOMAINS.coding, 'risk');
+  assert.ok(risks.includes('heavy'), "decompose.mjs's HEAVY_RISK gate value must stay sayable");
+  assert.deepEqual([...risks].sort(), Object.keys(RISK_DISCOUNTS).sort());
+});
+
+test('a domain that declares no classification vocabulary imposes none (undefined, never a throw)', () => {
+  assert.equal(classificationVocabulary(DOMAINS.synthetic, 'kind'), undefined);
+  assert.equal(classificationVocabulary(DOMAINS.triage, 'risk'), undefined);
+  assert.equal(classificationVocabulary(undefined, 'kind'), undefined);
+  assert.equal(classificationVocabulary(DOMAINS.coding, 'nonesuch'), undefined);
 });

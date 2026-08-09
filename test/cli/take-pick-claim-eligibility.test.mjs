@@ -76,7 +76,7 @@ test('take --id claims a status:todo item at stage decompose — matches pick, n
     status: 'todo',
     stage: 'decompose',
     deps: [],
-    risk: 'low',
+    risk: 'light',
     refs: [],
     verify: 'true',
   });
@@ -89,7 +89,7 @@ test('take --id claims a status:todo item at stage decompose — matches pick, n
 test('take --id on a clarify-stage item with an unmet dep is still rejected — the stage relaxation never dropped the deps guard', () => {
   const cwd = initGitCwd();
   const dir = path.join(cwd, '.fgos');
-  addWork(dir, { id: 'unmet-dep-source', title: 'Dep', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true' });
+  addWork(dir, { id: 'unmet-dep-source', title: 'Dep', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
   addWork(dir, {
     id: 'clarify-with-unmet-dep',
     title: 'Clarify item blocked on a dep',
@@ -97,7 +97,7 @@ test('take --id on a clarify-stage item with an unmet dep is still rejected — 
     status: 'todo',
     stage: 'clarify',
     deps: ['unmet-dep-source'],
-    risk: 'low',
+    risk: 'light',
     refs: [],
     verify: 'true',
   });
@@ -116,14 +116,14 @@ test('take --id on a clarify-stage item with an unmet dep is still rejected — 
 test('take --id on an item anchored by an open decomposed child is still rejected — the stage relaxation never dropped the lineage guard', () => {
   const cwd = initGitCwd();
   const dir = path.join(cwd, '.fgos');
-  addWork(dir, { id: 'lineage-root', title: 'Root', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true' });
+  addWork(dir, { id: 'lineage-root', title: 'Root', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
   addWork(dir, {
     id: 'lineage-open-child',
     title: 'Child still open',
     kind: 'task',
     status: 'todo',
     deps: [],
-    risk: 'low',
+    risk: 'light',
     refs: [],
     verify: 'true',
     parent: 'lineage-root',
@@ -157,7 +157,7 @@ test('take with no --id still only opens the frontier head — the relaxation ap
 test('take --id claims an item whose dep is status:delivered — RESOLVED_STATUSES parity with frontier(), not a literal done check', () => {
   const cwd = initGitCwd();
   const dir = path.join(cwd, '.fgos');
-  addWork(dir, { id: 'delivered-dep', title: 'Dep already merged, not yet done', kind: 'task', status: 'delivered', deps: [], risk: 'low', refs: [], verify: 'true' });
+  addWork(dir, { id: 'delivered-dep', title: 'Dep already merged, not yet done', kind: 'task', status: 'delivered', deps: [], risk: 'light', refs: [], verify: 'true' });
   addWork(dir, {
     id: 'dependent-on-delivered',
     title: 'Item blocked only by a resolved-but-not-done dep',
@@ -165,7 +165,7 @@ test('take --id claims an item whose dep is status:delivered — RESOLVED_STATUS
     status: 'todo',
     stage: 'clarify',
     deps: ['delivered-dep'],
-    risk: 'low',
+    risk: 'light',
     refs: [],
     verify: 'true',
   });
@@ -178,7 +178,7 @@ test('take --id claims an item whose dep is status:delivered — RESOLVED_STATUS
 test('take --id claims an item whose dep is status:wontfix — RESOLVED_STATUSES parity, not a single delivered-only special case', () => {
   const cwd = initGitCwd();
   const dir = path.join(cwd, '.fgos');
-  addWork(dir, { id: 'wontfix-dep', title: 'Dep deliberately closed without being built', kind: 'task', status: 'wontfix', deps: [], risk: 'low', refs: [], verify: 'true' });
+  addWork(dir, { id: 'wontfix-dep', title: 'Dep deliberately closed without being built', kind: 'task', status: 'wontfix', deps: [], risk: 'light', refs: [], verify: 'true' });
   addWork(dir, {
     id: 'dependent-on-wontfix',
     title: 'Item blocked only by a wontfix dep',
@@ -186,7 +186,7 @@ test('take --id claims an item whose dep is status:wontfix — RESOLVED_STATUSES
     status: 'todo',
     stage: 'clarify',
     deps: ['wontfix-dep'],
-    risk: 'low',
+    risk: 'light',
     refs: [],
     verify: 'true',
   });

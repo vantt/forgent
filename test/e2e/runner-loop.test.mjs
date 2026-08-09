@@ -55,7 +55,7 @@ function add(cwd, id, extra = {}) {
   const flags = [
     '--title', extra.title ?? `Title ${id}`,
     '--kind', extra.kind ?? 'task',
-    '--risk', extra.risk ?? 'low',
+    '--risk', extra.risk ?? 'light',
     '--verify', extra.verify ?? 'test -f output.txt',
     // tsk-535: --description is required at add's CLI layer.
     '--description', extra.description ?? `Title ${id}`,
@@ -108,14 +108,32 @@ function events(cwd) {
 }
 
 function writeRunnerConfig(repoRoot, executorScript) {
+  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
   fs.writeFileSync(
-    path.join(repoRoot, '.fgos-runner.json'),
+    path.join(repoRoot, '.fgos', 'config.json'),
+    JSON.stringify({
+      runner: {
+        executor: { command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'] },
+        models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+        timeoutMs: 15000,
+      },
+    }),
+  );
+}
+
+/** For the explicit `--config <path>` tests below (independent of the
+ * shared `.fgos/config.json` -- `--config` names an arbitrary file). */
+function writeExplicitRunnerConfigFile(repoRoot, executorScript) {
+  const configPath = path.join(repoRoot, 'runner-config.json');
+  fs.writeFileSync(
+    configPath,
     JSON.stringify({
       executor: { command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'] },
       models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
       timeoutMs: 15000,
     }),
   );
+  return configPath;
 }
 
 function branchLog(repoRoot, branch) {
@@ -215,143 +233,90 @@ process.exit(1);
   return scriptPath;
 }
 
-/** A discovery-aware executor (stage-clarify D4/D5/D13; extended by
- * stage-decompose D2/cell 3): the runner spawns the SAME configured executor
- * for THREE call sites — the context-discovery verdict call
- * (`discovery.mjs`'s own prompt, which always starts with "# Context-
- * discovery"), the chia-việc verdict call (`decompose.mjs`'s own prompt,
- * "# Chia-việc (decompose)" — a clear-discovery item now lands on stage
- * `decompose` next, per D2, so this call site fires in the SAME sweep pass;
- * answered pass-through here so a simple item still chains straight through
- * to executing), and the worker dispatch call (`dispatch.mjs`'s
- * `buildPrompt`, which always starts with "# Goal"). This script tells the
- * three apart by their fixed prefixes: on a worker prompt it behaves exactly
- * like `writeCommittingExecutor` (writes+commits the proof file). One real
- * process serves all three calls — nothing here stubs `resolveDiscovery`/
- * `resolveDecompose` themselves. */
-function writeClearDiscoveryExecutor(scriptDir, { verify, produce = 'output.txt' }) {
-  const scriptPath = path.join(scriptDir, 'clear-discovery-executor.mjs');
+// tsk-1x3 D1/D9/D16 (docs/history/fanout-and-delegation-rubric/CONTEXT.md):
+// the runner sweep no longer spawns a judge subprocess for clarify/decompose
+// -- a role='runner' `--once` call on either stage now safely no-ops. The
+// three executor builders that used to answer that subprocess's
+// "# Context-discovery"/"# Chia-việc (decompose)" prompts
+// (writeClearDiscoveryExecutor, writeUnclearDiscoveryExecutor,
+// writeGarbageDiscoveryExecutor, writeDecomposeAwareExecutor) are retired
+// along with it -- every test below now drives clarify/decompose explicitly
+// via `fgos discover/decompose --verdict ...`, the only live door left, and
+// the executor these builders wrote is only ever reached for its ORIGINAL
+// worker-dispatch branch. writeAdaptiveWorkerExecutor below is that one
+// surviving branch, unbundled from the retired judge-prompt-answering code.
+
+/** Worker-dispatch executor: pulls the file its own dispatched item's
+ * `verify` checks for straight out of the prompt's "Expected proof" section
+ * (`test -f <file>`), so one script can produce whatever a root OR any of
+ * its generated children need without hardcoding an id — real proof per
+ * item, never a single shared stub. */
+function writeAdaptiveWorkerExecutor(scriptDir) {
+  const scriptPath = path.join(scriptDir, 'adaptive-worker-executor.mjs');
   fs.writeFileSync(
     scriptPath,
     `
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 const prompt = process.argv[2] ?? '';
-if (prompt.includes('Kiểm tra độc lập một lệnh verify')) {
-  // tsk-5q5-1: judgeVerifySemanticCorrectness's own second-pass call.
-  process.stdout.write(JSON.stringify({ agrees: true }));
-} else if (prompt.includes('# Context-discovery')) {
-  process.stdout.write(JSON.stringify({ clear: true, verify: ${JSON.stringify(verify)} }));
-} else if (prompt.includes('# Chia-việc (decompose)')) {
-  process.stdout.write(JSON.stringify({ verdict: 'pass-through' }));
-} else {
-  fs.writeFileSync(${JSON.stringify(produce)}, 'produced by worker\\n');
-  execFileSync('git', ['add', ${JSON.stringify(produce)}]);
-  execFileSync('git', ['commit', '-q', '-m', ${JSON.stringify(`worker: ${produce}`)}]);
-}
+const match = prompt.match(/test -f (\\S+)/);
+const file = match ? match[1] : 'output.txt';
+fs.writeFileSync(file, 'produced by worker\\n');
+execFileSync('git', ['add', file]);
+execFileSync('git', ['commit', '-q', '-m', \`worker: \${file}\`]);
 `,
   );
   return scriptPath;
 }
 
-/** Always reports an unclear verdict with a fixed question — a work item
- * whose executor is this script never leaves clarify, so it never reaches
- * the worker-prompt call site at all. */
-function writeUnclearDiscoveryExecutor(scriptDir, question) {
-  const scriptPath = path.join(scriptDir, 'unclear-discovery-executor.mjs');
-  fs.writeFileSync(
-    scriptPath,
-    `process.stdout.write(JSON.stringify({ clear: false, question: ${JSON.stringify(question)} }));`,
-  );
-  return scriptPath;
-}
+// --- stage-clarify/stage-decompose e2e (tsk-1x3 D1/D9/D16 retarget): the
+// old scenarios here (stage-clarify-4, stage-decompose-3) proved the RUNNER
+// SWEEP autonomously resolving clarify/decompose via a scripted subprocess
+// judge -- exactly the mechanism this item retires (CONTEXT.md D16: "the
+// runner has never dispatched a real worker for this stage in this repo's
+// history"). The garbage-verdict fail-safe scenario
+// (judgeDiscovery's own unparsable-stdout handling) has nothing left to
+// prove at all -- the runner sweep no longer spawns a subprocess for
+// clarify/decompose, so there is no stdout to be garbage. What survives,
+// rewritten to drive clarify/decompose explicitly (the only live door
+// left) and to prove the runner sweep now safely no-ops on either stage
+// instead of guessing: -------------------------------------------------
 
-/** Simulates a misbehaving real model call: stdout that is not JSON at all.
- * `judgeDiscovery`'s fail-safe (D4) must fold this into "not clear" without
- * throwing past it — never a crash, never a silent stall. */
-function writeGarbageDiscoveryExecutor(scriptDir) {
-  const scriptPath = path.join(scriptDir, 'garbage-discovery-executor.mjs');
-  fs.writeFileSync(
-    scriptPath,
-    `process.stdout.write('not json at all, definitely garbage output from a misbehaving model call');`,
-  );
-  return scriptPath;
-}
-
-/** A chia-việc-aware executor (stage-decompose D2/D3, mirroring
- * writeClearDiscoveryExecutor one stage over): the SAME configured executor
- * serves THREE call sites — context-discovery ("# Context-discovery"),
- * chia-việc ("# Chia-việc (decompose)", decompose.mjs's own fixed prompt
- * prefix), and the worker dispatch ("# Goal", dispatch.mjs's buildPrompt) —
- * told apart by their fixed prefixes. The worker branch is ADAPTIVE: it
- * pulls the file its own dispatched item's `verify` checks for straight out
- * of the prompt's "Expected proof" section (`test -f <file>`), so one script
- * can produce whatever a root OR any of its generated children need without
- * hardcoding an id — real proof per item, never a single shared stub. */
-function writeDecomposeAwareExecutor(scriptDir, { discoveryVerify, decomposeVerdict }) {
-  const scriptPath = path.join(scriptDir, 'decompose-aware-executor.mjs');
-  fs.writeFileSync(
-    scriptPath,
-    `
-import fs from 'node:fs';
-import { execFileSync } from 'node:child_process';
-const prompt = process.argv[2] ?? '';
-if (prompt.includes('Kiểm tra độc lập một lệnh verify')) {
-  // tsk-5q5-1: judgeVerifySemanticCorrectness's own second-pass call.
-  process.stdout.write(JSON.stringify({ agrees: true }));
-} else if (prompt.includes('# Context-discovery')) {
-  process.stdout.write(JSON.stringify({ clear: true, verify: ${JSON.stringify(discoveryVerify)} }));
-} else if (prompt.includes('# Chia-việc (decompose)')) {
-  process.stdout.write(JSON.stringify(${JSON.stringify(decomposeVerdict)}));
-} else {
-  const match = prompt.match(/test -f (\\S+)/);
-  const file = match ? match[1] : 'output.txt';
-  fs.writeFileSync(file, 'produced by worker\\n');
-  execFileSync('git', ['add', file]);
-  execFileSync('git', ['commit', '-q', '-m', \`worker: \${file}\`]);
-}
-`,
-  );
-  return scriptPath;
-}
-
-// --- stage-clarify e2e: 3 verdict scenarios through real fgos + fgos-runner
-// binaries (stage-clarify-4, per plan.md Risk Map "verdict parse phi tất
-// định" HIGH row) -------------------------------------------------------
-
-test('e2e stage-clarify (a) clear verdict: submit -> --once takes the item stage clarify->executing with the model-proposed verify replacing the submit sentinel, and the same run dispatches it on to proposed', () => {
+test('e2e stage-clarify+stage-decompose (a) clear+pass-through: --once safely no-ops on a fresh clarify item (D16); explicit discover/decompose --verdict calls advance it to executing, then --once dispatches it', () => {
   const repoRoot = initTempRepo();
   const scriptDir = mkTempDir('fgos-runner-e2e-discovery-');
 
   assert.equal(fgos(repoRoot, ['init']).status, 0);
-  writeRunnerConfig(
-    repoRoot,
-    writeClearDiscoveryExecutor(scriptDir, { verify: 'test -f output.txt && echo VERIFY_OK' }),
-  );
+  writeRunnerConfig(repoRoot, writeAdaptiveWorkerExecutor(scriptDir));
 
   const submitted = submit(repoRoot, 'Investigate the sluggish overview page');
   assert.equal(submitted.stage, 'clarify');
   assert.equal(submitted.verify, 'chưa xác định — P15 bổ sung', 'submit sentinel before discovery runs (D5 fgos.mjs)');
 
-  const first = runner(repoRoot, ['--once']);
-  assert.equal(first.status, 0, `--once failed: ${first.stderr}`);
+  const noop = runner(repoRoot, ['--once']);
+  assert.equal(noop.status, 0, `--once failed: ${noop.stderr}`);
+  assert.equal(stateView(repoRoot).work[submitted.id].stage, 'clarify', 'a runner sweep never advances clarify/decompose on its own now (D16)');
 
-  const afterFirst = stateView(repoRoot);
-  const item = afterFirst.work[submitted.id];
-  assert.equal(item.stage, 'executing', 'a clear verdict moves the item out of clarify (D1/D12)');
-  assert.equal(item.verify, 'test -f output.txt && echo VERIFY_OK', 'the verdict verify replaced the submit sentinel, one event (D10)');
+  const discovered = fgos(repoRoot, ['discover', submitted.id, '--verdict', 'clear', '--verify', 'test -f output.txt && echo VERIFY_OK']);
+  assert.equal(discovered.status, 0, `discover failed: ${discovered.stderr}`);
+  assert.equal(stateView(repoRoot).work[submitted.id].stage, 'decompose');
 
-  // sweep runs before the frontier is computed (loop.mjs), so this item —
-  // still status:todo the whole time — became the frontier head in the same
-  // tick and was dispatched to proposed via the SAME scripted executor's
-  // worker-prompt branch, all within this one --once call.
-  assert.equal(item.status, 'awaiting-approval');
+  const decomposed = fgos(repoRoot, ['decompose', submitted.id, '--verdict', 'pass-through', '--reason', 'single cohesive change']);
+  assert.equal(decomposed.status, 0, `decompose failed: ${decomposed.stderr}`);
+
+  const afterAdvance = stateView(repoRoot);
+  const item = afterAdvance.work[submitted.id];
+  assert.equal(item.stage, 'executing');
+  assert.equal(item.verify, 'test -f output.txt && echo VERIFY_OK', 'the caller-supplied verify replaced the submit sentinel');
+  assert.equal(item.status, 'todo', 'a caller-supplied pass-through never dispatches -- the item is only now a frontier head');
+
+  const dispatched = runner(repoRoot, ['--once']);
+  assert.equal(dispatched.status, 0, `--once failed: ${dispatched.stderr}`);
+
+  const afterDispatch = stateView(repoRoot);
+  assert.equal(afterDispatch.work[submitted.id].status, 'awaiting-approval');
   assert.equal(branchExists(repoRoot, `fgw/${submitted.id}`), true);
   assert.match(branchLog(repoRoot, `fgw/${submitted.id}`), /worker: output\.txt/);
-
-  const discovery = afterFirst.discovery[submitted.id];
-  assert.equal(discovery.length, 1);
-  assert.equal(discovery[0].clear, true);
 
   // `fgos list` (the public read surface) confirms the same facts.
   const list = envelopeData(fgos(repoRoot, ['list']).stdout);
@@ -359,22 +324,24 @@ test('e2e stage-clarify (a) clear verdict: submit -> --once takes the item stage
   assert.equal(list.work[submitted.id].verify, 'test -f output.txt && echo VERIFY_OK');
 });
 
-test('e2e stage-clarify (b) unclear verdict: submit -> --once parks the item in awaiting-human with the exact question (still stage clarify); answering it and running --once again resweeps discovery', () => {
+test('e2e stage-clarify (b) unclear verdict: an explicit discover --verdict unclear parks the item in awaiting-human with the exact question; answering resumes it to todo, and --once still never re-judges clarify on its own (D16)', () => {
   const repoRoot = initTempRepo();
-  const scriptDir = mkTempDir('fgos-runner-e2e-discovery-');
   const question = 'Bạn muốn ưu tiên hiệu năng hay độ chính xác?';
 
   assert.equal(fgos(repoRoot, ['init']).status, 0);
-  writeRunnerConfig(repoRoot, writeUnclearDiscoveryExecutor(scriptDir, question));
 
   const submitted = submit(repoRoot, 'Do the ambiguous work');
 
-  const first = runner(repoRoot, ['--once']);
-  assert.equal(first.status, 0, `--once failed: ${first.stderr}`);
+  const noop = runner(repoRoot, ['--once']);
+  assert.equal(noop.status, 0, `--once failed: ${noop.stderr}`);
+  assert.equal(stateView(repoRoot).work[submitted.id].stage, 'clarify', 'a runner sweep never advances clarify on its own now (D16)');
+
+  const discovered = fgos(repoRoot, ['discover', submitted.id, '--verdict', 'unclear', '--question', question]);
+  assert.equal(discovered.status, 0, `discover failed: ${discovered.stderr}`);
 
   let view = stateView(repoRoot);
   assert.equal(view.work[submitted.id].status, 'awaiting-human');
-  assert.equal(view.work[submitted.id].stage, 'clarify', 'an unclear verdict never advances stage (D7)');
+  assert.equal(view.work[submitted.id].stage, 'clarify');
   assert.equal(view.gates[submitted.id].ask, question);
   assert.equal(view.discovery[submitted.id].length, 1);
   assert.equal(view.discovery[submitted.id][0].clear, false);
@@ -383,142 +350,57 @@ test('e2e stage-clarify (b) unclear verdict: submit -> --once parks the item in 
 
   const answered = fgos(repoRoot, ['answer', submitted.id, '--text', 'Ưu tiên độ chính xác.']);
   assert.equal(answered.status, 0, `answer failed: ${answered.stderr}`);
-  assert.equal(stateView(repoRoot).work[submitted.id].status, 'todo', 'answering resumes to todo, still stage clarify (D7)');
+  assert.equal(stateView(repoRoot).work[submitted.id].status, 'todo', 'answering resumes to todo, still stage clarify');
 
-  const second = runner(repoRoot, ['--once']);
-  assert.equal(second.status, 0, `second --once failed: ${second.stderr}`);
-
+  const secondNoop = runner(repoRoot, ['--once']);
+  assert.equal(secondNoop.status, 0, `second --once failed: ${secondNoop.stderr}`);
   view = stateView(repoRoot);
-  assert.equal(view.discovery[submitted.id].length, 2, 'the clarify loop reran context-discovery after the answer (D7)');
-  assert.equal(view.work[submitted.id].status, 'awaiting-human', 'the same scripted executor still returns unclear — parked again');
-  assert.equal(view.gates[submitted.id].ask, question);
+  assert.equal(view.work[submitted.id].status, 'todo', 'the runner sweep still never re-judges clarify on its own (D16) -- a human must call discover again');
+  assert.equal(view.discovery[submitted.id].length, 1, 'no second discovery entry was auto-generated');
 });
 
-test('e2e stage-clarify (c) garbage verdict: an executor that prints non-JSON stdout on the discovery call never crashes --once — the runner still exits 0 and the item lands in awaiting-human with the fixed fail-safe question', () => {
-  const repoRoot = initTempRepo();
-  const scriptDir = mkTempDir('fgos-runner-e2e-discovery-');
-
-  assert.equal(fgos(repoRoot, ['init']).status, 0);
-  writeRunnerConfig(repoRoot, writeGarbageDiscoveryExecutor(scriptDir));
-
-  const submitted = submit(repoRoot, 'Investigate the sluggish overview page');
-
-  const result = runner(repoRoot, ['--once']);
-  assert.equal(result.status, 0, `unparsable discovery stdout must not crash the runner: ${result.stderr}`);
-  assert.equal(result.signal, null);
-
-  const view = stateView(repoRoot);
-  assert.equal(view.work[submitted.id].status, 'awaiting-human', 'an unparsable verdict folds into "not clear", never a silent drop (D4)');
-  assert.equal(view.work[submitted.id].stage, 'clarify');
-  assert.equal(view.gates[submitted.id].ask, 'Không phán được rõ ràng — cần người xác nhận thủ công.');
-  assert.equal(view.discovery[submitted.id].length, 1);
-  assert.equal(view.discovery[submitted.id][0].clear, false);
-});
-
-// --- stage-decompose e2e: 3 verdict scenarios through real fgos +
-// fgos-runner binaries (stage-decompose-3, mẫu stage-clarify cell 4) -------
-
-test('e2e stage-decompose (a) simple item pass-through: submit -> --once chains clarify->decompose->executing in one sweep pass and dispatches it on to proposed the same run; the clarify-pass settlement (cell 1 re-guard) still fires even though clarify itself now targets decompose', () => {
+test('e2e stage-decompose (b) complex item: an explicit decompose --verdict decompose --children writes 2 children (real parent+deps+verify); the root is frontier-blocked until both children reach done, then it lots frontier and runs its OWN verify -> awaiting-approval', () => {
   const repoRoot = initTempRepo();
   const scriptDir = mkTempDir('fgos-runner-e2e-decompose-');
 
   assert.equal(fgos(repoRoot, ['init']).status, 0);
-  writeRunnerConfig(
-    repoRoot,
-    writeDecomposeAwareExecutor(scriptDir, {
-      discoveryVerify: 'test -f simple-done.txt && echo SIMPLE_OK',
-      decomposeVerdict: { verdict: 'pass-through' },
-    }),
-  );
-
-  const submitted = submit(repoRoot, 'Rename a single config key');
-  assert.equal(submitted.stage, 'clarify');
-
-  const first = runner(repoRoot, ['--once']);
-  assert.equal(first.status, 0, `--once failed: ${first.stderr}`);
-
-  const view = stateView(repoRoot);
-  const item = view.work[submitted.id];
-  assert.equal(item.stage, 'executing', 'clarify->decompose->executing chained within one sweep pass (D2)');
-  assert.equal(item.status, 'awaiting-approval', 'pass-through leaves the item dispatchable in the same tick');
-  assert.equal(item.verify, 'test -f simple-done.txt && echo SIMPLE_OK');
-  assert.equal(branchExists(repoRoot, `fgw/${submitted.id}`), true);
-  assert.match(branchLog(repoRoot, `fgw/${submitted.id}`), /worker: simple-done\.txt/);
-
-  // must_haves truth 4: the clarify-pass settlement (cell 1's re-guard on
-  // from === 'clarify') still fires even though clarify's own destination is
-  // now `decompose`, not `executing`.
-  assert.equal(view.settlements[submitted.id].length, 1);
-  assert.equal(view.settlements[submitted.id][0].kind, 'clarify-pass');
-  assert.equal(view.settlements[submitted.id][0].role, 'runner');
-
-  // a pass-through verdict writes no lineage at all.
-  assert.equal(Object.values(view.work).some((w) => w.parent === submitted.id), false);
-});
-
-test('e2e stage-decompose (b) complex item: decompose sweep writes 2 children (real parent+deps+verify), the root is frontier-blocked until both children reach done, then it lots frontier and runs its OWN verify -> awaiting-approval', () => {
-  const repoRoot = initTempRepo();
-  const scriptDir = mkTempDir('fgos-runner-e2e-decompose-');
-
-  assert.equal(fgos(repoRoot, ['init']).status, 0);
-  writeRunnerConfig(
-    repoRoot,
-    writeDecomposeAwareExecutor(scriptDir, {
-      discoveryVerify: 'test -f root-done.txt && echo ROOT_OK',
-      decomposeVerdict: {
-        verdict: 'decompose',
-        reason: 'Two independent surfaces, no shared state',
-        children: [
-          {
-            title: 'Build the base module',
-            verify: 'test -f child-a.txt',
-            action: 'tsk-3xd fixture: build the base module.',
-            kind: 'task',
-            risk: 'low',
-            refs: [],
-            deps: [],
-          },
-          {
-            title: 'Wire the base module in',
-            verify: 'test -f child-b.txt',
-            action: 'tsk-3xd fixture: wire the base module in.',
-            kind: 'task',
-            risk: 'low',
-            refs: [],
-            deps: [0],
-          },
-        ],
-      },
-    }),
-  );
+  writeRunnerConfig(repoRoot, writeAdaptiveWorkerExecutor(scriptDir));
 
   const submitted = submit(repoRoot, 'Rebuild the whole intake pipeline');
+  assert.equal(fgos(repoRoot, ['discover', submitted.id, '--verdict', 'clear', '--verify', 'test -f root-done.txt && echo ROOT_OK']).status, 0);
 
-  // --once #1: clarify sweep + decompose sweep write the 2 children and move
-  // the root straight to executing (D4 note: the STAGE never blocks it, the
-  // frontier's lineage filter does); childA (no deps) is the frontier head
-  // this same tick and gets dispatched.
-  const first = runner(repoRoot, ['--once']);
-  assert.equal(first.status, 0, `first --once failed: ${first.stderr}`);
+  const children = JSON.stringify([
+    { title: 'Build the base module', verify: 'test -f child-a.txt', action: 'tsk-3xd fixture: build the base module.', kind: 'task', risk: 'light' },
+    { title: 'Wire the base module in', verify: 'test -f child-b.txt', action: 'tsk-3xd fixture: wire the base module in.', kind: 'task', risk: 'light', deps: [0] },
+  ]);
+  const decomposed = fgos(repoRoot, ['decompose', submitted.id, '--verdict', 'decompose', '--reason', 'Two independent surfaces, no shared state', '--children', children]);
+  assert.equal(decomposed.status, 0, `decompose failed: ${decomposed.stderr}`);
 
+  // clarify/decompose->executing chained via two explicit CLI calls (D1/D9/
+  // D16 replace the old single-sweep judge-driven chain); childA (no deps)
+  // becomes the frontier head for the FIRST --once dispatch below.
   let view = stateView(repoRoot);
   const root = view.work[submitted.id];
   assert.equal(root.stage, 'executing');
   assert.equal(root.status, 'todo', 'the root itself was never dispatched — its descendants are still open (D4/D5 lineage filter)');
 
-  const children = Object.values(view.work)
+  const kids = Object.values(view.work)
     .filter((w) => w.parent === submitted.id)
     .sort((x, y) => x.deps.length - y.deps.length);
-  assert.equal(children.length, 2, 'two children written with real parent lineage (D5)');
-  const [childA, childB] = children;
+  assert.equal(kids.length, 2, 'two children written with real parent lineage (D5)');
+  const [childA, childB] = kids;
   assert.equal(childA.deps.length, 0);
-  assert.deepEqual(childB.deps, [childA.id], 'sibling dep resolved from the model-supplied index to a real id');
+  assert.deepEqual(childB.deps, [childA.id], 'sibling dep resolved from the caller-supplied index to a real id');
   assert.equal(childA.stage, 'executing');
   assert.equal(childB.stage, 'executing');
   assert.equal(childA.verify, 'test -f child-a.txt');
   assert.equal(childB.verify, 'test -f child-b.txt');
-  assert.equal(childA.status, 'awaiting-approval', 'childA (no deps) was the frontier head this same tick and got dispatched');
-  assert.equal(childB.status, 'todo', 'childB is blocked on childA, which is only proposed (not done) yet');
+
+  const first = runner(repoRoot, ['--once']);
+  assert.equal(first.status, 0, `first --once failed: ${first.stderr}`);
+  view = stateView(repoRoot);
+  assert.equal(view.work[childA.id].status, 'awaiting-approval', 'childA (no deps) was the frontier head this same tick and got dispatched');
+  assert.equal(view.work[childB.id].status, 'todo', 'childB is blocked on childA, which is only proposed (not done) yet');
 
   // Accept childA into the tree (human close via the normal `done` door) —
   // walk the sequential delivered->retrospective->cleanup->done chain
@@ -553,28 +435,21 @@ test('e2e stage-decompose (b) complex item: decompose sweep writes 2 children (r
   assert.equal(view.work[childB.id].status, 'done');
 });
 
-test('e2e stage-decompose (c) ambiguous verdict: decompose sweep parks the item in awaiting-human carrying the chia-việc proposal (still stage decompose, no children written); answering resumes it to todo and a resweep re-parks under the still-ambiguous verdict', () => {
+test('e2e stage-decompose (c) ambiguous verdict: an explicit decompose --verdict need-human parks the item in awaiting-human carrying the reason (still stage decompose, no children written); answering resumes it to todo, and --once still never re-judges decompose on its own (D16)', () => {
   const repoRoot = initTempRepo();
-  const scriptDir = mkTempDir('fgos-runner-e2e-decompose-');
   const reason = 'Không rõ nên tách theo domain hay theo tầng kỹ thuật.';
 
   assert.equal(fgos(repoRoot, ['init']).status, 0);
-  writeRunnerConfig(
-    repoRoot,
-    writeDecomposeAwareExecutor(scriptDir, {
-      discoveryVerify: 'test -f ambiguous-done.txt',
-      decomposeVerdict: { verdict: 'need-human', reason },
-    }),
-  );
 
   const submitted = submit(repoRoot, 'Restructure the whole thing, somehow');
+  assert.equal(fgos(repoRoot, ['discover', submitted.id, '--verdict', 'clear', '--verify', 'test -f ambiguous-done.txt']).status, 0);
 
-  const first = runner(repoRoot, ['--once']);
-  assert.equal(first.status, 0, `--once failed: ${first.stderr}`);
+  const decomposed = fgos(repoRoot, ['decompose', submitted.id, '--verdict', 'need-human', '--reason', reason]);
+  assert.equal(decomposed.status, 0, `decompose failed: ${decomposed.stderr}`);
 
   let view = stateView(repoRoot);
   assert.equal(view.work[submitted.id].status, 'awaiting-human');
-  assert.equal(view.work[submitted.id].stage, 'decompose', 'need-human never advances stage past decompose (mirrors D7 for clarify)');
+  assert.equal(view.work[submitted.id].stage, 'decompose', 'need-human never advances stage past decompose');
   assert.ok(view.gates[submitted.id].ask.includes(reason));
   assert.equal(Object.values(view.work).some((w) => w.parent === submitted.id), false, 'need-human writes nothing to the queue yet (Terms: đề xuất chia)');
   assert.equal(branchExists(repoRoot, `fgw/${submitted.id}`), false);
@@ -583,13 +458,82 @@ test('e2e stage-decompose (c) ambiguous verdict: decompose sweep parks the item 
   assert.equal(answered.status, 0, `answer failed: ${answered.stderr}`);
   assert.equal(stateView(repoRoot).work[submitted.id].status, 'todo');
 
-  const second = runner(repoRoot, ['--once']);
-  assert.equal(second.status, 0, `second --once failed: ${second.stderr}`);
-
+  const noop = runner(repoRoot, ['--once']);
+  assert.equal(noop.status, 0, `--once failed: ${noop.stderr}`);
   view = stateView(repoRoot);
-  assert.equal(view.work[submitted.id].status, 'awaiting-human', 'the same scripted executor still returns need-human — parked again');
+  assert.equal(view.work[submitted.id].status, 'todo', 'the runner sweep still never re-judges decompose on its own (D16) -- a human must call decompose again');
   assert.equal(view.work[submitted.id].stage, 'decompose');
-  assert.ok(view.gates[submitted.id].ask.includes(reason));
+});
+
+// --- stage-discovery e2e (tsk-5mj D1/D6/D7): the runner dispatches a
+// stage:discovery item to a real worker running fgos-researching, via the
+// same spawnWorker/createDispatchWorktree pair stage:executing already
+// uses. No verdict to gate this — discovery is a pure machine-alone pass
+// (D3); the item unconditionally advances discovery -> exploring once
+// dispatch settles. -----------------------------------------------------
+
+/** A fake research worker: writes RESEARCH.md under the item's own feature
+ * dir and commits it on the dispatch branch -- proves the runner actually
+ * checked the worker out on an isolated worktree/branch (same discipline
+ * writeCommittingExecutor already proves for stage:executing), never that
+ * fgos-researching's own real content shape is followed (out of this
+ * item's scope -- that skill's own job). */
+function writeResearchWorkerExecutor(scriptDir, featureDir) {
+  const scriptPath = path.join(scriptDir, 'research-worker-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
+fs.mkdirSync(${JSON.stringify(featureDir)}, { recursive: true });
+fs.writeFileSync(${JSON.stringify(path.posix.join(featureDir, 'RESEARCH.md'))}, '## Round 1\\n\\nFound: nothing blocking.\\n');
+execFileSync('git', ['add', ${JSON.stringify(path.posix.join(featureDir, 'RESEARCH.md'))}]);
+execFileSync('git', ['commit', '-q', '-m', 'research: round 1']);
+`,
+  );
+  return scriptPath;
+}
+
+test('e2e stage-discovery: --once dispatches a stage:discovery item to a real worker (isolated worktree/branch), which writes+commits RESEARCH.md; the item advances discovery -> exploring, status stays todo (never claimed/proposed)', () => {
+  const repoRoot = initTempRepo();
+  const scriptDir = mkTempDir('fgos-runner-e2e-discovery-dispatch-');
+  const featureDir = 'docs/history/discovery-dispatch-item';
+
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+  writeRunnerConfig(repoRoot, writeResearchWorkerExecutor(scriptDir, featureDir));
+
+  add(repoRoot, 'item-research', { stage: 'discovery', verify: 'test -f later.txt' });
+  assert.equal(stateView(repoRoot).work['item-research'].stage, 'discovery');
+
+  const result = runner(repoRoot, ['--once']);
+  assert.equal(result.status, 0, `--once failed: ${result.stderr}`);
+
+  const view = stateView(repoRoot);
+  const item = view.work['item-research'];
+  assert.equal(item.stage, 'exploring', 'the item advanced discovery -> exploring once the research worker finished');
+  assert.equal(item.status, 'todo', 'discovery dispatch never claims/proposes -- exploring is the next stop, not a terminal one');
+  assert.equal(branchExists(repoRoot, 'fgw/item-research'), true, 'the worker ran on its own real dispatch branch');
+  assert.match(branchLog(repoRoot, 'fgw/item-research'), /research: round 1/);
+});
+
+test('e2e stage-discovery fail-safe: a worker that crashes leaves the item at stage:discovery, status:todo for the next sweep to retry -- never stuck, never silently advanced', () => {
+  const repoRoot = initTempRepo();
+  const scriptDir = mkTempDir('fgos-runner-e2e-discovery-dispatch-crash-');
+  const crashingScript = path.join(scriptDir, 'crashing-executor.mjs');
+  fs.writeFileSync(crashingScript, `process.exit(1);`);
+
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+  writeRunnerConfig(repoRoot, crashingScript);
+
+  add(repoRoot, 'item-research-crash', { stage: 'discovery', verify: 'test -f later.txt' });
+
+  const result = runner(repoRoot, ['--once']);
+  assert.equal(result.status, 0, `--once must still exit 0 -- one item's failed research dispatch never halts the whole tick: ${result.stderr}`);
+
+  const view = stateView(repoRoot);
+  const item = view.work['item-research-crash'];
+  assert.equal(item.stage, 'discovery', 'left exactly where it was for the next sweep to retry');
+  assert.equal(item.status, 'todo');
 });
 
 // --- stage-decompose S2-pull e2e: cửa pull take/return through real fgos +
@@ -609,28 +553,23 @@ test('e2e S2-pull: submit pass-throughs 2 stages via discover, a human takes the
   execFileSync('git', ['commit', '-q', '-m', 'gitignore'], { cwd: repoRoot });
 
   assert.equal(fgos(repoRoot, ['init']).status, 0);
-  writeRunnerConfig(
-    repoRoot,
-    writeDecomposeAwareExecutor(scriptDir, {
-      discoveryVerify: 'test -f pull-done.txt && echo PULL_OK',
-      decomposeVerdict: { verdict: 'pass-through' },
-    }),
-  );
+  writeRunnerConfig(repoRoot, writeAdaptiveWorkerExecutor(scriptDir));
 
   const submitted = submit(repoRoot, 'Rename a single config key, take by hand');
   assert.equal(submitted.stage, 'clarify');
 
   // Pass-through both stages via the SYNC session-role `discover`/`decompose`
-  // verbs (tsk-2b0 D1: hard split, no fallback — mirrors the equivalent CLI
-  // test) — this never touches the runner's own dispatch loop, so once the
-  // item reaches stage executing it is left sitting at status todo: the
-  // exact frontier head a human `take` picks up next, never auto-dispatched
-  // to a worker.
-  const firstDiscover = fgos(repoRoot, ['discover', submitted.id]);
+  // verbs, each supplying an explicit --verdict (tsk-1x3 D1/D9/D16: a
+  // session-role caller with nothing to go on now refuses loudly instead of
+  // spawning a blind judge) — this never touches the runner's own dispatch
+  // loop, so once the item reaches stage executing it is left sitting at
+  // status todo: the exact frontier head a human `take` picks up next,
+  // never auto-dispatched to a worker.
+  const firstDiscover = fgos(repoRoot, ['discover', submitted.id, '--verdict', 'clear', '--verify', 'test -f pull-done.txt && echo PULL_OK']);
   assert.equal(firstDiscover.status, 0, `first discover failed: ${firstDiscover.stderr}`);
   assert.equal(stateView(repoRoot).work[submitted.id].stage, 'decompose');
 
-  const decomposed = fgos(repoRoot, ['decompose', submitted.id]);
+  const decomposed = fgos(repoRoot, ['decompose', submitted.id, '--verdict', 'pass-through', '--reason', 'single cohesive change']);
   assert.equal(decomposed.status, 0, `decompose failed: ${decomposed.stderr}`);
   let view = stateView(repoRoot);
   assert.equal(view.work[submitted.id].stage, 'executing', 'clarify->decompose->executing chained via discover then decompose');
@@ -857,14 +796,14 @@ test('e2e crash-idempotency: runner killed mid-item (after doing, before propose
 
   assert.equal(fgos(repoRoot, ['init']).status, 0);
   add(repoRoot, 'item-crash', { verify: 'test -f output.txt' });
-  writeRunnerConfig(repoRoot, writeParentKillingExecutor(scriptDir, 'output.txt'));
+  const configPath = writeExplicitRunnerConfigFile(repoRoot, writeParentKillingExecutor(scriptDir, 'output.txt'));
 
   // First --once: the worker commits, then SIGKILLs its own parent (the
   // runner) before the runner can write `proposed`. The runner process
   // dies mid-dispatch — its own worktree teardown (in a `finally`) never
   // runs, so `fgw/item-crash` is left checked out at whatever path the
   // runner allocated for this attempt.
-  const first = runner(repoRoot, ['--once', '--config', path.join(repoRoot, '.fgos-runner.json')]);
+  const first = runner(repoRoot, ['--once', '--config', configPath]);
   // Killed by SIGKILL: no graceful exit code, no controlled stdout.
   assert.equal(first.status, null);
   assert.equal(first.signal, 'SIGKILL');
@@ -878,14 +817,14 @@ test('e2e crash-idempotency: runner killed mid-item (after doing, before propose
   // Second --once: the killed runner left its runner.lock behind, so this
   // run cleans the stale lock and yields busy (exit 6) — the reclaimer
   // never acquires on the path it just deleted (clean-and-yield).
-  const second = runner(repoRoot, ['--once', '--config', path.join(repoRoot, '.fgos-runner.json')]);
+  const second = runner(repoRoot, ['--once', '--config', configPath]);
   assert.equal(second.status, 6, `expected busy (stale lock cleaned): ${second.stderr}`);
   assert.equal(fs.existsSync(path.join(repoRoot, '.fgos', 'runner.lock')), false);
 
   // Third --once: acquires a clean lock; startup reap resolves the stale
   // `doing` item to a defined state (proposed, since the branch's commit
   // passes verify) — crash recovery lands within two ticks.
-  const third = runner(repoRoot, ['--once', '--config', path.join(repoRoot, '.fgos-runner.json')]);
+  const third = runner(repoRoot, ['--once', '--config', configPath]);
   assert.equal(third.status, 0, `post-clean --once did not recover cleanly: ${third.stderr}`);
 
   const finalStatus = stateView(repoRoot).work['item-crash'].status;

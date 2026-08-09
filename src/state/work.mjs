@@ -9,7 +9,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { DOMAINS, DEFAULT_DOMAIN } from './workflow-stage-graphs.mjs';
+import { DOMAINS, DEFAULT_DOMAIN, getDomain, classificationVocabulary } from './workflow-stage-graphs.mjs';
 
 /** Error raised by this module. `category` is the CLI exit-code contract (R4). */
 export class WorkValidationError extends Error {
@@ -219,6 +219,30 @@ function requireArray(work, field) {
 }
 
 /**
+ * Hold `work[field]` (`kind` or `risk`) to the vocabulary this item's own
+ * domain declares — the per-domain half of what `TIERS` already does globally
+ * for `tier`. A domain that declares no vocabulary for the field imposes
+ * nothing, so this is a no-op for every domain but `coding` today and the
+ * pre-existing non-empty-string rule remains the only constraint.
+ *
+ * Domain resolution swallows the unrecognized-name warning on purpose: an
+ * invalid `work.domain` is `touched('domain')`'s own error to raise a few
+ * lines below, with a message naming the real problem. Warning here first
+ * would just add noise ahead of it.
+ */
+function requireDeclaredClassification(work, field) {
+  const domain = getDomain(work.domain, { onUnrecognized: () => {} });
+  const allowed = classificationVocabulary(domain, field);
+  if (!allowed) return;
+  if (!allowed.includes(work[field])) {
+    throw new WorkValidationError(
+      `work.${field} must be one of ${JSON.stringify(allowed)} for domain `
+        + `"${work.domain ?? DEFAULT_DOMAIN}", got: ${JSON.stringify(work[field])}`,
+    );
+  }
+}
+
+/**
  * Validate the shape of a single work item: required fields, id format, and
  * that deps is an array of non-empty strings with no self-reference. Does
  * NOT check that deps point at ids that actually exist — that is
@@ -258,7 +282,10 @@ export function validateWorkShape(work, touchedFields) {
     }
   }
   if (touched('title')) requireNonEmptyString(work, 'title');
-  if (touched('kind')) requireNonEmptyString(work, 'kind');
+  if (touched('kind')) {
+    requireNonEmptyString(work, 'kind');
+    requireDeclaredClassification(work, 'kind');
+  }
   if (touched('status')) {
     requireNonEmptyString(work, 'status');
     if (!STATUSES.includes(work.status)) {
@@ -331,7 +358,10 @@ export function validateWorkShape(work, touchedFields) {
       }
     }
   }
-  if (touched('risk')) requireNonEmptyString(work, 'risk');
+  if (touched('risk')) {
+    requireNonEmptyString(work, 'risk');
+    requireDeclaredClassification(work, 'risk');
+  }
   if (touched('refs')) requireArray(work, 'refs');
   if (touched('verify')) requireNonEmptyString(work, 'verify');
   if (touched('learn') && work.learn !== undefined && work.learn !== null && typeof work.learn !== 'string') {

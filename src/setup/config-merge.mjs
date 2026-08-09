@@ -2,9 +2,9 @@
 // (per str87-fgos-setup-doctor D3): patches keys present in a default config
 // but absent from a user's existing config, without ever touching a value
 // the user already has. Designed for reuse by any config shape (not
-// hardcoded to `.fgos-runner.json`'s own fields) — today's one caller is
-// `runner/dispatch.mjs`'s `ensureRunnerConfig`, a future caller may be a
-// user-level config file.
+// hardcoded to the runner config's own fields) — today's one caller is
+// `runner/dispatch.mjs`'s `ensureRunnerConfigForDir`, a future caller may be
+// a user-level config file.
 //
 // PURE: no fs import, no I/O of any kind — callers own reading/writing.
 //

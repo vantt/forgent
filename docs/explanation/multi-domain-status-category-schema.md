@@ -349,6 +349,19 @@ blocked and awaiting-human items as "in process."
 > test suite fails loudly if a future change swaps to a bare
 > `statusCategory` filter (the naive, incorrect 'fix')."
 
+`tsk-1hb`, the item that actually implemented D4's combined-predicate fix
+above, needed a `--force` override past its own second-pass verify judge
+during clarify — the same override mechanism `tsk-5cf` added for exactly
+this shape of failure. The judge's objections were internally
+contradictory round to round: round 3 wanted a `grep`-based proof, round
+4 then demanded the `cargo test` command itself somehow prove exhaustive
+`parkReason`-value coverage and complete literal-match removal — an
+open-ended bar no single shell command can express, the same
+"contradictory round-to-round criteria" pattern already documented and
+accepted an override for. `tsk-1hb`'s own D2/D3 already deterministically
+specified the required behavior; the judge's escalating demands were
+re-litigating settled scope, not surfacing a real gap.
+
 The lesson generalizes beyond this one crate: `statusCategory` is a
 lossy compression by design (see "Frozen at write time" above) — collapsing
 three distinct front-segment statuses into one category was an accepted,

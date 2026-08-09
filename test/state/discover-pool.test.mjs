@@ -5,7 +5,7 @@ import { pickNextDiscoverItem } from '../../src/state/discover-pool.mjs';
 // Pure lib — every view here is a literal; no fs, no mkdtemp, no `.fgos/`
 // writes anywhere in this file (same convention as frontier.test.mjs).
 function item(id, stage, status, extra = {}) {
-  return { id, title: id, kind: 'task', stage, status, deps: [], risk: 'low', refs: [], verify: 'true', ...extra };
+  return { id, title: id, kind: 'task', stage, status, deps: [], risk: 'light', refs: [], verify: 'true', ...extra };
 }
 
 test('pickNextDiscoverItem on an empty view returns null', () => {
@@ -98,4 +98,42 @@ test('decompose pool ties (both absent priority): FIFO (declaration order) wins'
     },
   };
   assert.deepEqual(pickNextDiscoverItem(view), { id: 'first', stage: 'decompose' });
+});
+
+// --- tsk-1w7 D10: 'discovery'/'exploring' join the clarify-shaped pool ----
+
+test('a stage:discovery item is picked into the clarify-shaped pool, with its own real stage returned', () => {
+  const view = { work: { a: item('a', 'discovery', 'todo') } };
+  assert.deepEqual(pickNextDiscoverItem(view), { id: 'a', stage: 'discovery' });
+});
+
+test('a stage:exploring item is picked into the clarify-shaped pool, with its own real stage returned', () => {
+  const view = { work: { a: item('a', 'exploring', 'todo') } };
+  assert.deepEqual(pickNextDiscoverItem(view), { id: 'a', stage: 'exploring' });
+});
+
+test('clarify/discovery/exploring items share ONE pool, ordered by blocks like any other clarify-shaped candidate — never three separate buckets', () => {
+  const view = {
+    work: {
+      clarifyItem: item('clarifyItem', 'clarify', 'todo'),
+      discoveryItem: item('discoveryItem', 'discovery', 'todo', { deps: [] }),
+      exploringItem: item('exploringItem', 'exploring', 'todo'),
+      dependent: item('dependent', 'executing', 'todo', { deps: ['discoveryItem'] }),
+    },
+  };
+  // discoveryItem blocks 1 open item (dependent) via rankImpact; the other
+  // two block nothing — same "picked into the pool, ordered by blocks"
+  // discipline the pre-existing clarify-only tests above already prove,
+  // now covering all three clarify-shaped stages at once.
+  assert.deepEqual(pickNextDiscoverItem(view), { id: 'discoveryItem', stage: 'discovery' });
+});
+
+test('the clarify-shaped pool (clarify/discovery/exploring) still wins over the decompose pool regardless of which of the three stages the candidate is at', () => {
+  const view = {
+    work: {
+      decomposeItem: item('decomposeItem', 'decompose', 'todo', { priority: 1 }),
+      exploringItem: item('exploringItem', 'exploring', 'todo'),
+    },
+  };
+  assert.deepEqual(pickNextDiscoverItem(view), { id: 'exploringItem', stage: 'exploring' });
 });

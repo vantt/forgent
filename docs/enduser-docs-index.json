@@ -212,7 +212,7 @@
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md",
-    "title": "0026 — Native-First Dispatch Doctrine: orchestrator/rootTask/capacity",
+    "title": "0026 — Native-First Dispatch Doctrine: launcher/rootTask/capacity",
     "sourceCaptureId": null
   },
   {
@@ -1126,6 +1126,14 @@
     "docPath": "docs/reference/fgos-choke-point-ranked-priority.md",
     "title": "fgOS choke-point survey — ranked priority table",
     "sourceCaptureId": "tsk-1ab-2"
+  },
+  {
+    "quadrant": "reference",
+    "purpose": "Describe the machinery accurately and completely for lookup.",
+    "audience": "A user who needs precise facts about a specific field/command/API.",
+    "docPath": "docs/reference/fgos-participant-contract.md",
+    "title": "fgOS participant contract — what it takes to be a full participant in any language",
+    "sourceCaptureId": null
   },
   {
     "quadrant": "reference",

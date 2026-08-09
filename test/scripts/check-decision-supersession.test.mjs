@@ -66,6 +66,36 @@ test('a superseded record with both pointers present reports zero findings', () 
   assert.deepEqual(findSupersessionFindings(records, indexContent), []);
 });
 
+test('a record superseded twice, with superseded_by as a list containing both, reports zero missing-frontmatter-pointer findings', () => {
+  const records = [
+    { id: '0026', meta: { superseded_by: ['0028', '0029'] } },
+    { id: '0028', meta: { supersedes: ['0026'] } },
+    { id: '0029', meta: { supersedes: ['0026'] } },
+  ];
+  const indexContent =
+    '| [0026](0026-x.md) | superseded boi 0028, 0029 |\n' +
+    '| [0028](0028-x.md) | ... |\n' +
+    '| [0029](0029-x.md) | ... |\n';
+
+  const findings = findSupersessionFindings(records, indexContent);
+
+  assert.ok(!findings.some((f) => f.kind === 'missing-frontmatter-pointer'));
+});
+
+test('a record superseded once, with superseded_by as a list missing the required id, still reports missing-frontmatter-pointer', () => {
+  const records = [
+    { id: '0026', meta: { superseded_by: ['0028'] } },
+    { id: '0029', meta: { supersedes: ['0026'] } },
+  ];
+  const indexContent = '| [0026](0026-x.md) | ... |\n| [0029](0029-x.md) | ... |\n';
+
+  const findings = findSupersessionFindings(records, indexContent);
+
+  assert.ok(
+    findings.some((f) => f.kind === 'missing-frontmatter-pointer' && f.id === '0026'),
+  );
+});
+
 test('supersedes naming an id with no matching record reports "unknown-target"', () => {
   const records = [{ id: '0012', meta: { supersedes: ['9999'] } }];
   const findings = findSupersessionFindings(records, '');

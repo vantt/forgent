@@ -100,6 +100,51 @@ This guard covers `git reset --hard` on the main checkout specifically
 `git clean -f`, `checkout --force`, etc. was left open rather than
 locked as in-scope here.
 
+## Update (`tsk-5iv`): the guard could target the WRONG tree entirely when run bare from a worktree
+
+An independent round-3 review (4 parallel agents, real-command verified)
+found a real gap in the guard this doc describes, not just a docs gap:
+`repoRoot` inside `main-checkout-reset` is computed as
+`path.dirname(dir)`, where `dir` defaults to
+`resolveFgosDir(process.cwd(), {strict: true})` — and `strict: true`
+returns `process.cwd()` as-is, **never git-resolved** to the shared main
+checkout. This directly contradicts what "Why this exists" above used to
+claim ("repoRoot is derived from `--dir`, never `process.cwd()`, so the
+verb behaves identically whether invoked from the main checkout or from
+a worktree's cwd") — that claim held only when `--dir` was passed
+explicitly; the verb's own *default* path, with no `--dir`, still fell
+through to `process.cwd()`.
+
+**The practical consequence, reproduced end-to-end in a scratch repo**:
+running `fgos main-checkout-reset` bare (no `--dir`) from inside a
+linked worktree resolves `repoRoot` to the *worktree's own* root, not the
+shared main checkout — yet the guard's own printed status still says
+`"Full git status (main checkout, whole repo)"`, and with `--confirm` the
+`git reset --hard <sha>` actually runs against the worktree tree while
+labeling itself as operating on the main checkout. In the reproduction,
+the worktree's `HEAD` was reset while the real main checkout's `HEAD`
+stayed untouched — the exact wrong-tree class this whole safety net
+exists to prevent, occurring inside the safety net itself.
+
+This matters specifically because `AGENTS.md` tells every session to use
+this verb *instead of* a raw `git reset --hard` precisely to avoid
+destroying another session's work — and ADR0020's worktree-resident
+session is the *default* configuration this repo runs sessions in, not
+an edge case.
+
+**The fix**: resolve `repoRoot` via `git rev-parse --git-common-dir`
+(the same non-strict resolution `resolveRepoRoot` already uses
+elsewhere), instead of `path.dirname(dir)`, so the guard resolves the
+real shared main checkout regardless of which directory the caller's
+`process.cwd()` happens to be. Also added `main-checkout-reset` to
+`STORE_MISSING_WARNING_VERBS` as defense in depth — though note per the
+review: that warning alone is **not sufficient**, since `fgos session
+start` symlinks `.fgos` into the worktree, which makes
+`fs.existsSync(dir)` return `true` even while `repoRoot` is still
+pointed at the wrong tree; the warning fires only for a genuinely
+missing store, not for a store that exists but resolves to the wrong
+location.
+
 ## Related
 
 - `docs/history/main-checkout-destructive-git-safety-net/CONTEXT.md` —

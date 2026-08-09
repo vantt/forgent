@@ -17,6 +17,19 @@ import { spawn } from 'node:child_process';
 // timeout->status:null behavior already gave every caller (runOnce's
 // startupReap/processItem, merge.mjs's mergeRunnerItem, bin/fgos.mjs's
 // return/approve verbs) — none of them expect runGoalCheck to ever reject.
+//
+// tsk-53o: a timeout and a genuine verify FAILURE were both indistinguishable
+// statusless outcomes (`{passed:false, status:null}`) — the same shape a
+// spawn failure (the shell itself missing) already produced too. A caller
+// under real load (~15 parallel sessions sharing one machine) could not tell
+// "this item is actually broken" from "the check itself ran out of time" and
+// parked the item `blocked` on a false negative, quoting a misleading
+// `(exit null)`. `timedOut` is now always present on the resolved object
+// (`true` on the timeout branch below, `false` on every other branch,
+// including the spawn-failure branch) — additive only, load-bearing exactly
+// like the rest of this contract: `passed`/`status`/`output` keep their
+// existing meaning unchanged, and every caller must now read `timedOut`
+// before treating a `!passed` result as proof the item's own verify failed.
 export function runGoalCheck(item, cwd, timeoutMs) {
   const maxBuffer = 10 * 1024 * 1024;
   return new Promise((resolve) => {
@@ -62,7 +75,7 @@ export function runGoalCheck(item, cwd, timeoutMs) {
     // that: never reject, resolve as a failed, statusless check.
     child.on('error', () => {
       finish(() => {
-        resolve({ passed: false, status: null, output: `${stdout}${stderr}` });
+        resolve({ passed: false, status: null, timedOut: false, output: `${stdout}${stderr}` });
       });
     });
 
@@ -84,6 +97,7 @@ export function runGoalCheck(item, cwd, timeoutMs) {
         resolve({
           passed: !timedOut && code === 0,
           status: timedOut ? null : code,
+          timedOut,
           output: `${stdout}${stderr}`,
         });
       });

@@ -1,5 +1,17 @@
 # Close out a decomposed root item after all its children are done
 
+**Update (tsk-580):** step 3's own verify command, when it needs to check
+that every child actually resolved, no longer has to be hand-written —
+`fgos edit <root-id> --verify-from-children` generates a `jq` check
+against every item whose `parent === <root-id>` automatically (the same
+resolved-status set — `delivered`/`retrospective`/`cleanup`/`done` — the
+sibling milestone how-to's own "don't wait out cleanup's TTL" lesson
+settled on), resolving the repo root itself and refusing outright if no
+child is found (rather than writing a vacuously-true `jq` `all()` over an
+empty list). Mutually exclusive with `--verify-from-targets` (the
+milestone/MVP shortcut in the sibling doc) — pick whichever matches
+whether this item's own scope is `children` or `targets`.
+
 **Update (tsk-3bn, docs/history/tsk-3bn-merge-conductor-harness-v2/):** the
 manual `git merge --no-ff` workaround this doc originally had to invent for
 the "Trap" section below is now a real, supported verb —
@@ -173,3 +185,44 @@ item's own branch first — the same operation this how-to's own earlier
 "Trap" section describes for re-syncing `main`, just run one level lower,
 against whichever branch the children's `fgos approve` output actually
 named as `target`.
+
+## Bug (tsk-1ia): `--verify-from-children`'s generated `jq` was vacuously true
+
+The `jq` check `fgos edit --verify-from-children`/`--verify-from-targets`
+generates (step 1's tsk-580 update above) originally read:
+
+```
+all(["delivered","retrospective","cleanup","done"] | index(.) != null)
+```
+
+This is always `true`, regardless of the actual child status being
+checked. The bug is precedence: `index(.)` inside `all(...)` binds `.` to
+the array literal on its own left (`["delivered",...] | index(.)`, i.e.
+"does this array contain itself"), never to the individual status string
+`all()` is iterating over. Confirmed by running it directly:
+
+```
+echo '["todo","doing"]' | jq 'all(["delivered","retrospective","cleanup","done"] | index(.) != null)'
+# => true   (wrong — neither "todo" nor "doing" is a resolved status)
+```
+
+Fix — bind the iterated value to a named variable first, so `index($s)`
+resolves against the actual status being checked, not the array literal:
+
+```
+all(. as $s | ["delivered","retrospective","cleanup","done"] | index($s) != null)
+```
+
+This is the same pattern `tsk-2jc` already used correctly elsewhere
+(`.data.work[id].status as $s | [...] | index($s) != null`) — worth
+matching from the start rather than re-deriving it.
+
+**Watch out for: a `grep`-based test on the generated `jq` string can pass
+while the underlying `jq` logic is still broken.** The original test
+coverage only checked that the generated verify command contained the
+right substrings, never executed it. The fix required a test that actually
+spawns `jq` (e.g. via `spawnSync`) against a real fixture array of
+unresolved statuses and asserts the real boolean result — a test that
+only inspects the generated command text as a string cannot catch a
+precedence bug like this one, since the wrong expression still "looks
+right" as text.

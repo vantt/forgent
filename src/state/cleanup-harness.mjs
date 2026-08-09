@@ -40,6 +40,20 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { resolveRoot } from '../runner/root-affinity.mjs';
 
+/**
+ * tsk-59x D1: which TTL applies to `id` — the leaf value when `id` has a
+ * real parent (`resolveRoot(view, id) !== id`, same leaf test
+ * `checkMergeStillResolves` above already uses), the root value otherwise.
+ * `leafTtlDays` omitted entirely falls back to `ttlDays` for every item,
+ * root or leaf — keeps every existing caller that doesn't pass it
+ * byte-identical to pre-tsk-59x behavior.
+ */
+export function resolveTtlDaysForItem(view, id, { ttlDays, leafTtlDays } = {}) {
+  if (leafTtlDays === undefined) return ttlDays;
+  const isLeaf = resolveRoot(view, id) !== id;
+  return isLeaf ? leafTtlDays : ttlDays;
+}
+
 function git(repoRoot, args) {
   return execFileSync('git', args, {
     cwd: repoRoot,
@@ -96,8 +110,33 @@ function git(repoRoot, args) {
  * detection or auto-recovery for this). The `ok:false` detail just points
  * at `git reflog show <targetRef>` as the next diagnostic step -- the
  * exact tool that resolved tsk-47e's case in that investigation.
+ *
+ * DECOMPOSED-PARENT FALLBACK (tsk-psb): an item that went through
+ * decompose-into-children never itself merges `fgw/<id>` into anything --
+ * its children's own branches merge directly into the same resolved root
+ * ref instead, and `work.branchHeadAtReturn` for a decomposed item only
+ * ever records a sync-back merge (main into `fgw/<id>`), the wrong
+ * direction for this ancestry check. So a decomposed item's own recorded
+ * sha is structurally never a valid signal once it has real children --
+ * unlike the ref-missing case above (sometimes right, sometimes not,
+ * depending on prune timing), there is no case where trusting it first is
+ * correct. When `view`/`id` are supplied and `id` has at least one item in
+ * `view.work` with `parent === id`, this function never reads `id`'s own
+ * sha at all -- it recurses into each child's own check instead (each
+ * child resolves the SAME target ref via `resolveRoot`'s own multi-level
+ * walk, so a grandchild -- a child that was itself decomposed further --
+ * composes correctly with zero extra logic). `ok:true` only when every
+ * child passes; the first failing child's own detail is surfaced by id, so
+ * a genuine loss still names a real, checkable reason instead of an
+ * inferred content match.
  */
 export function checkMergeStillResolves(repoRoot, work, { view, id } = {}) {
+  if (view && id) {
+    const children = Object.entries(view.work ?? {}).filter(([, item]) => item.parent === id);
+    if (children.length > 0) {
+      return checkChildrenResolve(repoRoot, view, children);
+    }
+  }
   const sha = work?.branchHeadAtReturn ?? work?.headAtReturn ?? work?.branchHeadAtTake ?? work?.headAtTake;
   if (!sha) {
     return { ok: true, detail: 'no recorded commit to verify — nothing to check' };
@@ -109,6 +148,22 @@ export function checkMergeStillResolves(repoRoot, work, { view, id } = {}) {
     return checkAncestry(repoRoot, sha, 'HEAD', `${namedRef} no longer exists (pruned)`);
   }
   return checkAncestry(repoRoot, sha, namedRef ?? 'HEAD');
+}
+
+function checkChildrenResolve(repoRoot, view, children) {
+  for (const [childId, childWork] of children) {
+    const result = checkMergeStillResolves(repoRoot, childWork, { view, id: childId });
+    if (!result.ok) {
+      return {
+        ok: false,
+        detail: `decomposed parent: child "${childId}" failed its own merge check — ${result.detail}`,
+      };
+    }
+  }
+  return {
+    ok: true,
+    detail: `decomposed parent: all ${children.length} child item(s) (${children.map(([childId]) => childId).join(', ')}) resolve as ancestors of their own target ref`,
+  };
 }
 
 function refExists(repoRoot, ref) {
@@ -210,12 +265,18 @@ export function checkCleanupTTLElapsed(rawEvents, id, { ttlDays, now = Date.now(
  * `failed` holds every D8 gate-check failure detail (never just the
  * first), so a `cleanup -> blocked` park still carries a complete
  * `reason` when `failed` is non-empty.
+ *
+ * tsk-59x D1: `leafTtlDays`, when supplied alongside `ttlDays`, resolves
+ * per-item via `resolveTtlDaysForItem` before the TTL check runs — a leaf
+ * item gets `leafTtlDays`, a root item keeps `ttlDays`. Omitted entirely,
+ * behavior is byte-identical to before this item.
  */
-export function assessCleanupReadiness({ view, rawEvents, id, repoRoot, worktreeBacked, ttlDays, now }) {
+export function assessCleanupReadiness({ view, rawEvents, id, repoRoot, worktreeBacked, ttlDays, leafTtlDays, now }) {
   const notReadyYet = [];
   const failed = [];
 
-  const ttl = checkCleanupTTLElapsed(rawEvents, id, { ttlDays, now });
+  const resolvedTtlDays = resolveTtlDaysForItem(view, id, { ttlDays, leafTtlDays });
+  const ttl = checkCleanupTTLElapsed(rawEvents, id, { ttlDays: resolvedTtlDays, now });
   if (!ttl.ok) notReadyYet.push(ttl.detail);
 
   const content = checkRetrospectiveContent(view, id, repoRoot);

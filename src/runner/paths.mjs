@@ -55,6 +55,35 @@ export function resolveRepoRoot(cwd = process.cwd(), { strict = false } = {}) {
   return repoRoot;
 }
 
+/** Resolve the MAIN CHECKOUT root — never a linked worktree's own root,
+ * unlike `resolveRepoRoot` above (`--show-toplevel`, which returns
+ * whichever checkout `cwd` sits in). Via `--git-common-dir`, which always
+ * points at the main checkout's `.git` regardless of which worktree `cwd`
+ * is inside (same resolution `scripts/fgos-shell-integration.sh`'s `fgos`
+ * shell function already uses). Returns `null`, never throws, when `cwd`
+ * is not inside a git checkout at all — the one real caller of this
+ * distinction (tsk-5hv, extracted from `src/setup/registrations.mjs`'s
+ * own `resolveMainCheckout`, now delegating here instead of duplicating
+ * the git shell-out) needs a graceful "nothing to resolve" path, not a
+ * thrown validation error. `.fgos/` is unconditionally wiped from every
+ * freshly-created worktree (ADR0020) — any caller that needs the real
+ * `.fgos/config.json` (not a worktree-local phantom) must resolve through
+ * this function, never `resolveRepoRoot`. */
+export function resolveMainCheckoutRoot(cwd = process.cwd()) {
+  let commonDir;
+  try {
+    commonDir = execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], {
+      cwd,
+      encoding: 'utf8',
+      shell: false,
+      stdio: ['ignore', 'pipe', 'pipe'],
+    }).trim();
+  } catch {
+    return null;
+  }
+  return commonDir ? path.dirname(commonDir) : null;
+}
+
 /** Join an already-resolved repo root onto `.fgos` — the single place that
  * join happens, so every caller that already has a root (however it got
  * resolved) produces the identical path. */

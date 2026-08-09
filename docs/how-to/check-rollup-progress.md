@@ -37,6 +37,11 @@ overall?" without manually filtering `fgos list` and counting by hand.
      "totalCount": <number of direct children>,
      "children": [
        { "id": "...", "title": "...", "status": "..." }
+     ],
+     "targetDoneCount": <number of targets with status "done">,
+     "targetTotalCount": <number of targets>,
+     "targets": [
+       { "id": "...", "title": "...", "status": "..." }
      ]
    }
    ```
@@ -46,9 +51,15 @@ overall?" without manually filtering `fgos list` and counting by hand.
    you can see exactly which ones are still open without opening `fgos list`
    and filtering yourself.
 
-4. If the item has no children yet, you get a `0/0` result rather than an
-   error — that's expected, not a failure. Only a genuinely unknown id fails,
-   with a clear `validation` error.
+4. If the item is a `goalTier` milestone/MVP, read `targetDoneCount`/
+   `targetTotalCount` instead — that is the same "k/n done" answer over the
+   item's `targets` list. See "Two memberships, two counts" below for why
+   these are a separate pair rather than folded into `doneCount`.
+
+5. If the item has no children yet, you get a `0/0` result rather than an
+   error — that's expected, not a failure. The same holds for an item with
+   no `targets`. Only a genuinely unknown id fails, with a clear
+   `validation` error.
 
 ## Example: real output from the live store
 
@@ -64,14 +75,77 @@ itself and, at the time of writing, has no children recorded against it yet:
     "status": "done",
     "doneCount": 0,
     "totalCount": 0,
-    "children": []
+    "children": [],
+    "targetDoneCount": 0,
+    "targetTotalCount": 0,
+    "targets": []
   }
 }
 ```
 
 That `0/0` with an empty `children` array is exactly the "no children yet"
-case described in Step 4 — you can tell at a glance that this item was never
-decomposed, rather than wondering whether the command silently failed.
+case described in Step 5 — you can tell at a glance that this item was never
+decomposed, rather than wondering whether the command silently failed. The
+`target*` fields read `0/0` for the same reason: this item is not a
+`goalTier` milestone, so it has no `targets` either.
+
+## Example: a real milestone, counted by its targets
+
+Same command against a real `goalTier: milestone` item (`tsk-u9k`), which
+has no children at all — every one of its members is a `target`:
+
+```json
+{
+  "data": {
+    "id": "tsk-u9k",
+    "title": "Milestone: judge scout output persists and is reused across judgeDiscovery/judgeDecompose calls (no",
+    "status": "done",
+    "doneCount": 0,
+    "totalCount": 0,
+    "children": [],
+    "targetDoneCount": 2,
+    "targetTotalCount": 2,
+    "targets": [
+      {
+        "id": "tsk-62v",
+        "title": "Generalize dispatch.mjs's executor resolution to be capacity-aware, not just tier-aware, and add a",
+        "status": "done"
+      },
+      {
+        "id": "tsk-g18",
+        "title": "Persist judgeDiscovery/judgeDecompose's autonomous scout output (Bash(rg:*) results) across",
+        "status": "done"
+      }
+    ]
+  }
+}
+```
+
+`0/0` on the children pair beside `2/2` on the target pair is the normal
+reading for a milestone — not a bug, and not a sign the milestone is empty.
+
+## Two memberships, two counts
+
+A root item's `children` and a milestone's `targets` are two genuinely
+different relationships, so `fgos rollup` counts them separately instead of
+adding them together:
+
+- **`children`** (`parent` field, written by decompose) fork from and merge
+  back into their root's own `fgw/<root-id>` branch. The root is the merge
+  unit.
+- **`targets`** (`targets` field, `goalTier` milestone/MVP) never go through
+  `resolveRoot` — each one keeps its own root and merges independently onto
+  `main`. The milestone is a grouping, not a merge unit.
+
+Keeping two count pairs means a number never silently mixes the two, and
+`doneCount`/`totalCount` still mean exactly what they meant before targets
+were reported at all.
+
+A target id that matches no work item is still listed, as a row with
+`"title": null, "status": null`. It counts toward `targetTotalCount` and
+never toward `targetDoneCount` — `targets` entries are not validated at
+write time, so a typo'd id is reachable, and showing it beats letting a
+milestone read as complete when one of its targets does not exist.
 
 ## Scope: one level only
 
@@ -92,6 +166,11 @@ children, `fgos rollup <root-id>` still reports that child as one entry in
 `children` — it does not recurse into that child's own children to fold
 them into the root's `doneCount`/`totalCount`. Use `fgos rollup <child-id>`
 directly on that child if you need its own sub-progress.
+
+`targets` work the same way: an MVP's targets are milestones, and each one
+is reported as a single row with its own status — `fgos rollup` does not
+recurse into that milestone's own targets to fold them into the MVP's
+`targetDoneCount`. Run `fgos rollup <milestone-id>` for that level.
 
 ## Why this exists
 

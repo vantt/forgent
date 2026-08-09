@@ -21,6 +21,7 @@ import { rankImpact } from './impact.mjs';
 import { footprintOverlapAmong } from './graph-metrics.mjs';
 import { isResolvedStatus } from './frontier.mjs';
 import { resolveRoot } from '../runner/root-affinity.mjs';
+import { effectiveStage, getDomain } from './workflow-stage-graphs.mjs';
 
 /**
  * Rank `proposed` items by merge-readiness.
@@ -208,6 +209,19 @@ export function mergeReadiness(view, opts = {}) {
     mergeTier[item.id] = item.parent ? 'leaf-to-root' : 'root-to-main';
   }
 
+  // tsk-4zj D6: `ready`/`waiting`/`blockedOnSync`/`supersededOut`/
+  // `mergeSets`/`mergeTier` above are all id-referencing, never full item
+  // objects (unlike this function's own internal `candidates`/`syncClear`
+  // locals, which never reach the return) — so, same as `graphMetrics`'s
+  // own `stageByItem` (graph-metrics.mjs), this adds one flat side-map
+  // rather than changing any existing id-array shape to an object-array.
+  // Covers every id in `work`, not just ids already surfaced in one of the
+  // buckets above, so a reader never has to guess which sub-shape an id
+  // came from before looking its stage up here.
+  const stageByItem = Object.fromEntries(
+    Object.keys(work).map((id) => [id, effectiveStage(work[id], getDomain(work[id].domain))]),
+  );
+
   return {
     ready,
     waiting,
@@ -220,5 +234,6 @@ export function mergeReadiness(view, opts = {}) {
     blockedOnSync: orderByRank(blockedOnSync),
     mergeTier,
     supersededOut,
+    stageByItem,
   };
 }

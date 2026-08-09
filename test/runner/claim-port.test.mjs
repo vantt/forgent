@@ -29,7 +29,7 @@ function setup() {
   const repoRoot = initTempRepo();
   const dir = path.join(repoRoot, '.fgos');
   initStore(dir);
-  addWork(dir, { id: 'item-a', title: 'Item A', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true' });
+  addWork(dir, { id: 'item-a', title: 'Item A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
   return { repoRoot, dir };
 }
 
@@ -155,9 +155,9 @@ test('claimWork isolates a leaf whose dep is "wontfix" without throwing deps-not
   const repoRoot = initTempRepo();
   const dir = path.join(repoRoot, '.fgos');
   initStore(dir);
-  addWork(dir, { id: 'root-x', title: 'Root', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true' });
-  addWork(dir, { id: 'dep-x', title: 'Dep', kind: 'task', status: 'wontfix', deps: [], risk: 'low', refs: [], verify: 'true' });
-  addWork(dir, { id: 'leaf-x', title: 'Leaf', kind: 'task', status: 'todo', deps: ['dep-x'], risk: 'low', refs: [], verify: 'true', parent: 'root-x' });
+  addWork(dir, { id: 'root-x', title: 'Root', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  addWork(dir, { id: 'dep-x', title: 'Dep', kind: 'task', status: 'wontfix', deps: [], risk: 'light', refs: [], verify: 'true' });
+  addWork(dir, { id: 'leaf-x', title: 'Leaf', kind: 'task', status: 'todo', deps: ['dep-x'], risk: 'light', refs: [], verify: 'true', parent: 'root-x' });
 
   const claim = claimWork(dir, { id: 'leaf-x', actor: 'session', isolate: true, repoRoot });
 
@@ -169,9 +169,9 @@ test('claimWork still refuses to isolate a leaf whose dep is only "blocked" (D1 
   const repoRoot = initTempRepo();
   const dir = path.join(repoRoot, '.fgos');
   initStore(dir);
-  addWork(dir, { id: 'root-y', title: 'Root', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true' });
-  addWork(dir, { id: 'dep-y', title: 'Dep', kind: 'task', status: 'blocked', deps: [], risk: 'low', refs: [], verify: 'true' });
-  addWork(dir, { id: 'leaf-y', title: 'Leaf', kind: 'task', status: 'todo', deps: ['dep-y'], risk: 'low', refs: [], verify: 'true', parent: 'root-y' });
+  addWork(dir, { id: 'root-y', title: 'Root', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  addWork(dir, { id: 'dep-y', title: 'Dep', kind: 'task', status: 'blocked', deps: [], risk: 'light', refs: [], verify: 'true' });
+  addWork(dir, { id: 'leaf-y', title: 'Leaf', kind: 'task', status: 'todo', deps: ['dep-y'], risk: 'light', refs: [], verify: 'true', parent: 'root-y' });
 
   assert.throws(
     () => claimWork(dir, { id: 'leaf-y', actor: 'session', isolate: true, repoRoot }),

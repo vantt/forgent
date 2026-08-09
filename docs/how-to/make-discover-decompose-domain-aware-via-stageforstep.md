@@ -96,3 +96,68 @@ A merge-conflict friction also occurred at merge time (`git merge --no-commit
 resolved through the normal conflict-resolution path before the item
 reached `delivered`; ordinary rebase/merge conflict handling, not specific
 to this domain-aware-stage change.
+
+## Variant: a NEW child item created from a PARENT item's context (`addWork`)
+
+The steps above cover a `moveStage`-style check comparing an EXISTING
+item's own stage against a literal. A second, distinct shape of the same
+bug exists wherever code creates a brand-new item derived from an existing
+one via `addWork(dir, {...})` and stamps a stage literal onto it without
+also carrying the parent's `domain` forward. Both parts of the bug matter
+together: the hardcoded stage literal may not even exist in the child's
+real domain's stage graph once the domain is fixed separately, so fixing
+one half without the other still produces a broken child.
+
+Found by grepping `rg -n "addWork\(dir" src` (confirmed exhaustive: only
+the `addWork` definition plus the affected call sites matched — no
+call site was missed):
+
+- `src/intake/decompose.mjs` — child `addWork` call when a
+  `verdict.kind === 'decompose'` split creates children: had
+  `stage: 'executing'` hardcoded, no `domain` key at all, even though the
+  parent's `domain` was already resolved one line away in the same
+  function (`stageForStep(domain, 'Execute')` was already in use on the
+  very next `moveStage` call — the fix pattern was proven one line below
+  the bug).
+- `src/runner/loop.mjs` — discovered-from `addWork` call, where the
+  runner creates a new item from a worker's own discovery report: had
+  `stage: 'clarify'` hardcoded, no `domain` key.
+
+Fix shape, same substitution as above but applied at item-creation time
+rather than a stage-comparison time:
+
+```js
+// before
+addWork(dir, { ...fields, stage: 'executing' });
+
+// after
+const domain = getDomain(work.domain);
+addWork(dir, { ...fields, domain: work.domain, stage: stageForStep(domain, 'Execute') });
+```
+
+Zero behavior change for `domain: coding` items, same reasoning as step 4
+above — `stageForStep` resolves to the identical literal string when the
+domain is `coding` or absent.
+
+Test proof must exercise a REAL decompose-split verdict (not a
+pass-through fixture) for a non-`coding` domain, asserting the produced
+children carry both the correct `domain` and the correct (non-literal)
+stage — an existing pass-through-only fixture will pass before AND after
+the fix, proving nothing. Name both new assertions explicitly in the
+item's `verify` command (e.g. via `--test-name-pattern`) and require
+`pass >= 2`, so a fix that only covers one of the two call sites (the
+`decompose.mjs` child-creation path or the `loop.mjs` discovered-from
+path) can't pass silently by covering just one.
+
+### Watch out for: Node's TAP summary line format changed across versions
+
+A `verify` command written against `node --test` output as
+`grep -qE "^# pass [1-9]"` will silently stop matching on newer Node —
+this repo's Node v24.18.0 prints `ℹ pass N` / `ℹ fail N`, not the older
+`# pass N` / `# fail N` TAP summary format. A narrow `[2-9]` single-digit
+sanity check on top of that is a second, separate trap: it fails on any
+real two-digit-or-higher pass count (e.g. `12`). This was caught by
+`fgos return`'s own real disposable-worktree spawn under `/bin/sh`, not by
+eyeballing raw test output by hand — the corrected form parses `ℹ pass N`
+and `ℹ fail N` with plain numeric `-ge`/`-eq` checks and no digit-class
+sanity check at all.

@@ -7,11 +7,58 @@ source_capture_ids: [tsk-u9k]
 ---
 # How to close out a goalTier milestone/MVP item once all its targets are done
 
+**Update (tsk-580):** step 2's manual `jq` command below is now a real,
+supported shortcut — `fgos edit <milestone-id> --verify-from-targets`
+generates the exact same check automatically, reading the item's own
+`targets` array and resolving the repo root itself, so neither the
+`--dir <repo-root>` gotcha nor the id-list typing below has to be done by
+hand. It refuses outright if `targets` is empty, rather than writing a
+`jq`  `all()` over an empty array (which is vacuously always `true`), and
+it accepts the same resolved-status set (`delivered`/`retrospective`/
+`cleanup`/`done`) the "target sitting in `cleanup`" lesson below already
+settled on — not the stricter literal `done` the original manual recipe
+used. The manual command stays below as what the flag actually generates,
+and as the fallback for a milestone whose real condition needs more than
+a status check (the content-assertion lesson further down, which the flag
+does not attempt to replace).
+
 Use this when a `goalTier: "milestone"` (or `"mvp"`) item's `targets` array
 are all `status: "done"`, but the milestone item itself still sits at
 `status: "todo"` and never shows up in `fgos merge list`'s `ready` array —
-`fgos rollup` does not read the `targets` field at all, so a goalTier item
-never closes itself just because its targets finished.
+nothing closes a goalTier item just because its targets finished; that
+remains a deliberate manual step, the one this page walks through.
+
+`fgos rollup <milestone-id>` now *reports* the targets (a `targets` array
+plus a `targetDoneCount`/`targetTotalCount` pair — see
+[check-rollup-progress](check-rollup-progress.md)), which is the fastest way
+to confirm they really are all `done` before starting. Reporting is all it
+does: `rollup` is read-only and still moves nothing.
+
+## Watch out for: `rollup`'s plain `doneCount`/`totalCount` reads `0/0` for a targets-based milestone — that's not the field to check
+
+`tsk-4bc` (a 4-milestone MVP tracked via `targets`, not `children`) flagged
+this as a real tooling trap: `fgos rollup <id>` prints **two** separate
+progress pairs in the same JSON — `doneCount`/`totalCount` (computed from
+the item's `children` array) and `targetDoneCount`/`targetTotalCount`
+(computed from `targets`). For a `goalTier` milestone tracked purely via
+`targets`, `children` is genuinely empty, so `doneCount`/`totalCount`
+always reads `0/0` — that's correct, not a bug, but it's easy to misread
+as "rollup isn't seeing my targets at all" if you're only looking at the
+first pair. The real progress signal is `targetDoneCount`/
+`targetTotalCount` (and the `targets` array itself, each entry carrying
+its own live `status`) — always check those fields specifically for a
+targets-based milestone, not the children-based pair.
+
+A second, related trap: `targetDoneCount` counts only the literal
+`status: "done"` — it does **not** apply the "a target sitting in
+`cleanup`/`retrospective`/`delivered` has already delivered" resolved-
+status reasoning the lesson further down this page locks. A milestone
+whose targets have all genuinely landed but haven't finished their TTL
+sweep to `done` yet will show `targetDoneCount: 0` even though every
+target's real work is complete — read each target's individual `status`
+in the `targets` array, not just whether `targetDoneCount ==
+targetTotalCount`, to judge real readiness the same way the resolved-
+status lesson below already recommends for the milestone's own `verify`.
 
 ## If the milestone was created via `fgos submit` instead of `fgos add`
 
@@ -45,7 +92,15 @@ retrofit it onto an existing item, submitted or added, at any time.
 
 ## Steps
 
-1. Confirm every target is actually done:
+1. Confirm every target is actually done — one command reads all of them:
+   ```
+   fgos rollup <milestone-id>        # targetDoneCount == targetTotalCount?
+   ```
+   A target row printed with `"status": null` is an id in `targets` that
+   matches no work item at all (entries are not validated at write time) —
+   fix the id before going further, rather than reading it as pending.
+
+   The longer per-target walk still works if you want it:
    ```
    fgos show <milestone-id> --json   # read .data.work.targets
    fgos list --id <target-id> --json # for each target, check .status

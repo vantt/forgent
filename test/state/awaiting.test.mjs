@@ -22,7 +22,7 @@ function addSampleWork(dir, overrides = {}) {
     kind: 'feature',
     status: 'todo',
     deps: [],
-    risk: 'low',
+    risk: 'light',
     refs: [],
     verify: 'npm test',
     ...overrides,

@@ -1,6 +1,6 @@
 # Research Report: Nâng cấp schema work-item (status branch, type hierarchy, nested domain fields, per-domain status flow)
 
-**Thời điểm nghiên cứu:** 2026-07-30 09:31 (Asia/Saigon), cập nhật 10:10, 10:35 (chốt kiến trúc round 4), 15:10 (milestone `tsk-3w3`), 2026-08-01 09:58 (round 11 — file `tsk-38t`, sửa lỗi `goalTier`), 14:47 (round 12 — re-audit `tsk-2rp`: phát hiện verb `catchup` bị bỏ sót, 9 call site không phải 8)
+**Thời điểm nghiên cứu:** 2026-07-30 09:31 (Asia/Saigon), cập nhật 10:10, 10:35 (chốt kiến trúc round 4), 15:10 (milestone `tsk-3w3`), 2026-08-01 09:58 (round 11 — file `tsk-38t`, sửa lỗi `goalTier`), 14:47 (round 12 — re-audit `tsk-2rp`: phát hiện verb `catchup` bị bỏ sót, 9 call site không phải 8), 2026-08-07 17:31 (round 13 — scan lại codebase: `tsk-38t` đã ship qua decision `0027`, `tsk-2rp`/`tsk-3p1` đóng `wontfix`), 2026-08-09 14:15-14:46 (file `tsk-5wr`/`tsk-3m6` cho status `backlog` + pre-submit domain classify; round 14 — nhánh `epic` của ask #2 đã giải qua `goalTier`+`targets`, decision `D4`/`tsk-umc`, vá xong qua `tsk-1ug`)
 
 **Task chính quản lý cụm này:** `tsk-3w3` (`deps: [tsk-2rp, tsk-3p1, tsk-38t]`) —
 coi là đạt khi cả 3 dep xong: `tsk-2rp` (Phase 1, `verifyKind`), `tsk-3p1`
@@ -205,6 +205,21 @@ Industry precedent (GitHub Projects, Linear): "Backlog" là 1 cột status riên
   consumer đọc `STATUSES`/`fsm.mjs` (không chỉ frontier).
 
 ### 2. Type hierarchy: mvp > milestone > task > bug (+ epic?)
+
+**CẬP NHẬT (round 14, 2026-08-09) — nhánh `epic` của mục này ĐÃ QUYẾT + ĐÃ
+SHIP, độc lập với report này, tìm ra lúc quét lại codebase:**
+`docs/history/execution-fanout/DISCUSSION.md` (tsk-umc, round 8, decision
+`D4`, `fgos decision` seq `8919`, 2026-08-07) — câu hỏi "cụm component/epic
+quản lý/triển khai thế nào" — chốt: dùng **`goalTier` + `targets` đã có
+sẵn** (không đẻ field/cạnh mới): `targets` không đi qua `resolveRoot` ⇒ mỗi
+target giữ root riêng ⇒ merge độc lập lên main, đúng shape "epic gồm nhiều
+item độc lập, mỗi cái tự merge". Lỗ hổng duy nhất tìm ra lúc đó (`fgos
+rollup` chỉ hiểu `parent`, không hiểu `targets`) đã vá — `tsk-1ug` ("fgos
+rollup hiểu targets, không chỉ parent"), status `cleanup` (ship thật).
+Khớp hướng round 1 dưới đây ("epic không cần field mới") nhưng khác cơ chế
+thật: là `goalTier`+`targets`, không phải `parent`/`deps` như round 1 đoán.
+**Phần `kind` enum (task/bug) của mục này VẪN CHƯA GIẢI** — không tìm thấy
+commit/decision nào liên quan, xem câu hỏi #3 cập nhật dưới.
 
 Search ngoài xác nhận: Jira/Linear/GitHub xếp **epic là CHA** của
 story/task/bug — 3 loại này là PEER cùng cấp dưới epic, KHÔNG phải một mắt
@@ -556,13 +571,23 @@ lên.
 
 ## Đề xuất tổng hợp
 
-| # | Việc | Làm hay không | Risk |
-|---|---|---|---|
-| 1 | Backlog status trước todo | Làm, NHƯNG như 1 **category** chung (`backlog`), không phải giá trị phẳng nhét cạnh `wontfix`/`awaiting-approval` | MEDIUM |
-| 2 | Type hierarchy | Tách `kind`(task/bug/epic-nhãn) khỏi `goalTier`(mvp/milestone) đã có; đừng chain tuyến tính; nếu enum hóa `kind`, áp category/label như status | LOW (nếu tách đúng trục) |
-| 3 | Nested domain fields | Làm — nhất quán `DOMAINS` registry pattern sẵn có, `domainFields` optional-additive, ghi đè toàn object mỗi lần edit | LOW-MEDIUM |
-| 4 | Status flow theo domain | **CHỐT (round 4):** LÀM — domain sở hữu bảng transition riêng (full fidelity, không lủng); `statusCategory` KHÔNG dùng để validate move, chỉ phục vụ cơ chế domain-agnostic (mục 6) | HIGH — supersede thật D1-D3, cần decision record + audit toàn bộ consumer `fsm.mjs` |
-| 6 mới | Tách `status` (label, domain sở hữu, dùng validate move) khỏi `statusCategory` (foundation, dùng cho compound-learn/frontier/rollup/outcome...) | Nên làm cùng đợt với #4 — 2 field bổ trợ nhau, không tách rời được nữa sau round 4 | MEDIUM-HIGH (đổi mọi consumer domain-agnostic sang đọc category, xem danh sách mục 6) |
+**STATUS THẬT — sau khi scan lại codebase (round 13, 2026-08-07), xem chi
+tiết ở mục "Kết quả thật" cuối report:** `tsk-38t` (#3/#4/#6 dưới) ĐÃ SHIP,
+merged, decision record `0027` viết xong (thu hẹp đúng phạm vi so với round 4
+dưới đây). `tsk-2rp` (`verifyKind`, không có số # riêng — nằm ở mục "Chưa bàn
+tới #1") BỊ BÁC, thay bằng thiết kế attestation-artifact. `tsk-3p1` (nằm ở
+mục "Việc liên quan phát hiện thêm") đóng `wontfix`, câu hỏi gốc (mở
+dependent sớm) CHƯA rõ đã giải hay bị bỏ rơi. Bảng dưới giữ nguyên NGUYÊN VĂN
+lúc quyết (round 1-4) để lịch sử không mất — đọc cột mới nhất ở mục "Kết quả
+thật" cho tình trạng hiện tại.
+
+| # | Việc | Làm hay không (lúc quyết, round 1-4) | Risk | Kết quả thật (round 13) |
+|---|---|---|---|---|
+| 1 | Backlog status trước todo | Làm, NHƯNG như 1 **category** chung (`backlog`), không phải giá trị phẳng nhét cạnh `wontfix`/`awaiting-approval` | MEDIUM | KHÔNG làm đúng vậy — `statusCategory` thật (0027) không có category `backlog`; 6 status đoạn đầu map vào `todo/in-progress/review/canceled`, không có nhóm `backlog` riêng |
+| 2 | Type hierarchy | Tách `kind`(task/bug/epic-nhãn) khỏi `goalTier`(mvp/milestone) đã có; đừng chain tuyến tính; nếu enum hóa `kind`, áp category/label như status | LOW (nếu tách đúng trục) | CHƯA làm — `kind` vẫn free text, ngoài phạm vi `0027` |
+| 3 | Nested domain fields | Làm — nhất quán `DOMAINS` registry pattern sẵn có, `domainFields` optional-additive, ghi đè toàn object mỗi lần edit | LOW-MEDIUM | **ĐÃ SHIP** — `tsk-38t-6`, field `domainFields` đúng shape đề xuất |
+| 4 | Status flow theo domain | **CHỐT (round 4):** LÀM — domain sở hữu bảng transition riêng (full fidelity, không lủng); `statusCategory` KHÔNG dùng để validate move, chỉ phục vụ cơ chế domain-agnostic (mục 6) | HIGH — supersede thật D1-D3, cần decision record + audit toàn bộ consumer `fsm.mjs` | **ĐÃ SHIP, NHƯNG THU HẸP HƠN round-4 ĐỀ XUẤT** — domain KHÔNG sở hữu bảng transition (`TRANSITIONS` vẫn 1 bảng CHUNG, DISCUSSION.md §1/§6 tự nhận đã BÁC khung round-4 gốc); domain chỉ sở hữu `statusLabels` (map 6 status đầu → `statusCategory`, KHÔNG phải literal status/cạnh chuyển). 4 status đoạn đuôi (`delivered/retrospective/cleanup/done`) là chuỗi phổ quát MỚI, report round 1-12 chưa từng nghĩ tới — xem `0027` |
+| 6 mới | Tách `status` (label, domain sở hữu, dùng validate move) khỏi `statusCategory` (foundation, dùng cho compound-learn/frontier/rollup/outcome...) | Nên làm cùng đợt với #4 — 2 field bổ trợ nhau, không tách rời được nữa sau round 4 | MEDIUM-HIGH (đổi mọi consumer domain-agnostic sang đọc category, xem danh sách mục 6) | **ĐÃ SHIP** — `tsk-38t-2`/`tsk-38t-4`, `statusCategory` đóng băng lúc ghi, không dùng validate move (đúng thiết kế), domain thật thứ 2 `fixture-marketing` chứng minh end-to-end (`tsk-38t-7`) |
 
 **Về câu hỏi riêng "skill fgos-planning coi lại việc dùng harness ghi task
 cho đúng quan hệ/type":** phụ thuộc kết quả quyết định mục 2 (type hierarchy)
@@ -786,7 +811,9 @@ compound-learn xong", RUL50 gate cả 2 lối vào `done` bằng compound-learn)
    riêng cho phân loại cứng (task/bug/epic-label)? Ảnh hưởng: mọi item cũ
    đang có `kind` free-text tùy ý.
 3. Quan hệ giữa các type (khi xét sau) — DAG kiểu Jira (epic→{story,task,bug}
-   peer) hay hình dạng khác fgOS tự chọn?
+   peer) hay hình dạng khác fgOS tự chọn? **Nhánh `epic` ĐÃ GIẢI (round
+   14)** — dùng `goalTier`+`targets`, xem mục 2 ở trên. Còn lại thuần
+   `task`/`bug` (kind enum), chưa ai chạm.
 4. `domainFields`/`fieldSchema` per-domain: có cần migrate field hiện đang
    nằm top-level (nếu có field nào chỉ dùng cho `coding`) vào namespace mới,
    hay chỉ áp cho field MỚI thêm từ nay?
@@ -831,6 +858,99 @@ compound-learn xong", RUL50 gate cả 2 lối vào `done` bằng compound-learn)
     hơn `add` có chủ đích)? Ngoài phạm vi 4 đề xuất gốc nhưng cùng họ vấn đề
     (field vắng mặt vĩnh viễn không sửa được) — nên hỏi riêng, không lẫn vào
     quyết định status/kind.
+15. (round 13, phát hiện lúc scan lại codebase) `tsk-3p1` đóng `wontfix`
+    không lý do — sau `0027` tách `delivered`/`done`, `RUL12` vẫn đợi
+    `done` thật (sau cả `retrospective`/`cleanup`) mới mở dependent. Đây có
+    còn là vấn đề thật cần giải (độ trễ mở-dependent) hay `retrospective`/
+    `cleanup` đủ nhanh/mechanical nên không đáng lo? Chưa ai đo/quyết.
+
+## Kết quả thật (round 13, scan codebase 2026-08-07)
+
+6 ngày trôi qua kể từ round 12 — scan lại git log + `.fgos` state thật (không
+suy đoán từ report cũ) để verify vấn đề còn relevant không.
+
+### `tsk-38t` (Phase 2) — ĐÃ SHIP
+
+`git log --oneline | grep tsk-38t` → 8 sub-task merged (`tsk-38t-1`..`8`),
+mỗi cái có doc `retrospective synthesis` riêng, merge commit
+`a2c0017 Merge branch 'fgw/tsk-38t'`. `.fgos` state: `status: cleanup` (đã
+qua `retrospective`, chờ dọn TTL). Decision record thật:
+`docs/decisions/0027-domain-so-huu-status-doan-truoc-delivered-supersede-base-workflow-model-d1-d3.md`
+(2026-08-04) — trích thẳng report này làm nguồn ("bản thân report nguồn
+... round 4 ban đầu kết luận 'domain sở hữu TOÀN BỘ bảng transition' — một
+khung RỘNG HƠN record này thật sự chốt").
+
+**Khác biệt thật so với round 4 (đáng ghi nhớ, không phải lỗi round 4 — là
+kết quả của phiên `fgos-exploring` THU HẸP phạm vi đúng lúc):**
+
+- 10 status hôm nay (không phải 7): `todo/doing/blocked/awaiting-human/
+  awaiting-approval/wontfix` (**6 status ĐẦU**) cộng `delivered/retrospective/
+  cleanup/done` (**4 status ĐUÔI — chuỗi tuyến tính PHỔ QUÁT, KHÔNG domain
+  nào relabel** — khái niệm hoàn toàn mới, round 1-12 của report này chưa
+  từng nghĩ tới).
+- **SỬA LẠI (đọc sai lúc viết round 13 lần đầu, phát hiện lúc file task
+  `backlog`):** domain KHÔNG sở hữu bảng TRANSITION, kể cả 6 status đầu.
+  Đọc thẳng `workflow-stage-graphs.mjs` (comment trong entry
+  `fixture-marketing`) xác nhận: *"`status-fsm.mjs`'s TRANSITIONS is ONE
+  shared flat table for every domain (0027's own 'Quyết định' section...) —
+  no domain can introduce a genuinely new status literal... only D1-D3's
+  original 'domain sở hữu TOÀN BỘ bảng transition' framing, explicitly
+  REJECTED in DISCUSSION.md §1/§6, would have allowed that."* Cái domain
+  THẬT SỰ sở hữu chỉ là **`statusLabels`** — bảng map 6 status đầu →
+  `statusCategory` (vd `fixture-marketing` map `blocked→canceled` thay vì
+  `blocked→in-progress` của coding) — KHÔNG phải literal status value, KHÔNG
+  phải cạnh chuyển hợp lệ. 10 status + cạnh chuyển vẫn 1 bảng CHUNG cho mọi
+  domain (`status-fsm.mjs`'s `TRANSITIONS`, `work.mjs`'s `STATUSES`). Hệ quả
+  trực tiếp: muốn thêm 1 status MỚI (vd `backlog`) phải sửa 2 file GLOBAL
+  này — không có đường "domain tự khai status riêng".
+- `statusCategory` implement ĐÚNG thiết kế round 3-4: field riêng đóng băng
+  lúc ghi, KHÔNG dùng validate move (đúng lỗ hổng `blocked→awaiting-human`
+  round 4 tự tìm ra — `status-fsm.mjs` vẫn giữ bảng transition đầy đủ mịn
+  riêng, dùng chung mọi domain).
+- `domainFields` ship đúng shape đề xuất mục 3 (`tsk-38t-6`).
+- Domain thật thứ 2 để test: `fixture-marketing`
+  (`src/state/workflow-stage-graphs.mjs` dòng ~300) — đóng đúng gap tự flag
+  ở "Chưa bàn tới #6" (chưa có kế hoạch test domain-2 thật).
+- `resolveDiscovery`/`resolveDecompose` hardcode tên stage coding ("Chưa bàn
+  tới #2") — cũng đã dịch chuyển: domain `coding` giờ có 5 stage
+  (`clarify/discovery/exploring/decompose/executing`, không phải 4), cho
+  thấy khu vực này tiếp tục được sửa độc lập, không nằm trong `tsk-38t`.
+
+### `tsk-2rp` (Phase 1, `verifyKind`) — BỊ BÁC, đóng `wontfix`
+
+KHÔNG có commit code nào (`git log | grep tsk-2rp` rỗng) — chưa từng vào
+`executing`. Quyết định ghi lại nguyên văn trên chính item (`fgos show
+tsk-2rp` → `decisions`): *"Bác cơ chế verifyKind. `runGoalCheck` giữ nguyên
+một bản logic duy nhất và hợp đồng 'luôn spawn một lệnh thật, phân xử bằng
+exit status'. Nếu một domain non-coding cần xác nhận thủ công, nó thể hiện
+bằng một attestation artifact đọc bởi một verify shell bình thường (vd
+`fgos attest-check <id>`), không phải một nhánh bên trong `runGoalCheck`."*
+
+Đây là thiết kế SẠCH hơn đề xuất của report — né được đúng 2 lỗ hổng round 12
+tự đào ra (self-report vòng tròn ở `return`, không-ai-để-`approve` ở
+`catchup` chạy `role: 'runner'`) vì nó không thêm nhánh mới vào core trust
+mechanism — verify vẫn LUÔN là 1 shell command thật.
+
+### `tsk-3p1` (marker RUL12) — đóng `wontfix`, KHÔNG có decision/reason ghi lại
+
+Không commit code. Vấn đề gốc ("`done` trả lời 2 câu hỏi cùng lúc: code ship
+xong VÀ ceremony xong") đã được giải QUA ĐƯỜNG KHÁC — tách hẳn `delivered`
+khỏi `done` (0027) làm `done` hết mơ hồ. NHƯNG ý gốc cụ thể của `tsk-3p1` —
+mở dependent SỚM (ngay lúc delivered, không đợi hết ceremony) — chưa thấy
+implement: `docs/specs/work-state.md` RUL12 vẫn đọc "dep chỉ mở khi thật
+`done`", mà `done` giờ đứng SAU CẢ `retrospective`/`cleanup` — độ trễ mở-
+dependent có thể còn DÀI hơn trước 0027, chưa rõ có ai coi đây là vấn đề cần
+giải tiếp không. **Câu hỏi mở mới, chưa có câu trả lời — xem mục câu hỏi
+chưa giải quyết #15.**
+
+### Kết luận relevant
+
+Vấn đề GỐC (schema work-item coding-bias, cần tổng quát hóa cho domain thứ
+2) — ĐÚNG, đã giải THẬT qua `0027`/`tsk-38t`, không còn là vấn đề mở. Giải
+pháp `verifyKind` report đề xuất — SAI hướng, đã bị thay bằng attestation-
+artifact (không cần làm gì thêm, đã có quyết định). Giải pháp marker RUL12 —
+CHƯA RÕ đã giải hay bị bỏ rơi, đáng đào lại riêng nếu độ trễ mở-dependent
+vẫn còn là vấn đề thật với người dùng.
 
 ## Nguồn
 

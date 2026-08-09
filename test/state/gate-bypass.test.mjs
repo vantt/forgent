@@ -15,6 +15,7 @@ import {
   isTierCovered,
   hasOpenItems,
   canAutoApprove,
+  canAutoApproveValidate,
 } from '../../src/state/gate-bypass.mjs';
 
 function tmpDir() {
@@ -210,4 +211,51 @@ test('canAutoApprove: D4 floor — hard-gate keyword in description blocks appro
 test('canAutoApprove: no hard-gate keyword + everything else clear at level heavy -> true', () => {
   const item = { title: 'Rename a helper function', description: 'pure refactor, no behavior change', tier: 'heavy' };
   assert.equal(canAutoApprove(item, CLEAR_ARTIFACT, 'heavy'), true);
+});
+
+// ─── canAutoApproveValidate (D6, docs/history/gate-bypass/CONTEXT.md) ─────
+// Same shape as canAutoApprove above, but the third axis is fgos-validating's
+// own reality-gate verdict instead of an artifact completeness scan.
+
+test('canAutoApproveValidate: verdict READY + covered tier + no hard-gate hit -> true', () => {
+  const item = { title: 'Add a config toggle', description: 'small ui tweak', tier: 'light' };
+  assert.equal(canAutoApproveValidate(item, 'READY', 'standard'), true);
+});
+
+test('canAutoApproveValidate: verdict READY WITH CONSTRAINTS never approves, regardless of level/tier', () => {
+  const item = { title: 'Add a config toggle', description: 'small ui tweak', tier: 'light' };
+  assert.equal(canAutoApproveValidate(item, 'READY WITH CONSTRAINTS', 'heavy'), false);
+});
+
+test('canAutoApproveValidate: verdict NOT READY never approves', () => {
+  const item = { title: 'Add a config toggle', description: 'small ui tweak', tier: 'light' };
+  assert.equal(canAutoApproveValidate(item, 'NOT READY', 'heavy'), false);
+});
+
+test('canAutoApproveValidate: level off never approves, even with verdict READY', () => {
+  const item = { title: 'Add a config toggle', description: 'small ui tweak', tier: 'light' };
+  assert.equal(canAutoApproveValidate(item, 'READY', 'off'), false);
+});
+
+test('canAutoApproveValidate: tier not covered by level never approves', () => {
+  const item = { title: 'Add a config toggle', description: 'small ui tweak', tier: 'heavy' };
+  assert.equal(canAutoApproveValidate(item, 'READY', 'light'), false);
+});
+
+// D4 floor — same single-most-important-case shape as canAutoApprove's own
+// D4 test: a hard-gate keyword hit must never be skippable, even with
+// verdict READY at the highest level.
+test('canAutoApproveValidate: D4 floor — hard-gate keyword in title blocks approval at level heavy, verdict READY', () => {
+  const item = { title: 'Add auth bypass for internal service', description: 'small change', tier: 'light' };
+  assert.equal(canAutoApproveValidate(item, 'READY', 'heavy'), false);
+});
+
+test('canAutoApproveValidate: D4 floor — hard-gate keyword in description blocks approval at level heavy, verdict READY', () => {
+  const item = { title: 'Small cleanup', description: 'this also touches payment processing', tier: 'light' };
+  assert.equal(canAutoApproveValidate(item, 'READY', 'heavy'), false);
+});
+
+test('canAutoApproveValidate: no hard-gate keyword + verdict READY + tier covered at level heavy -> true', () => {
+  const item = { title: 'Rename a helper function', description: 'pure refactor, no behavior change', tier: 'heavy' };
+  assert.equal(canAutoApproveValidate(item, 'READY', 'heavy'), true);
 });

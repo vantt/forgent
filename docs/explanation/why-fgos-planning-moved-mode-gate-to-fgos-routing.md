@@ -92,7 +92,126 @@ Gate step. The broader four-skill audit and the fuller `/ck:plan`+`/ck:cook`
 comparison the item originally asked for stayed explicitly deferred — not
 forgotten, just judged non-material to landing these two evidenced fixes.
 
+## Follow-up (`tsk-da1`): four real gaps left by the D1/D2 move
+
+An independent code review after `tsk-3uz`/`tsk-5ay` merged found the
+mode-gate move above had left the skill docs themselves in a state that
+didn't fully hold up:
+
+1. **The Decide-the-split example command failed if actually run.** The
+   worked example in that step used the item's title as `fgos add`'s
+   positional id argument and was missing 4 other required fields — it
+   read as a real example but would fail on a real terminal. Fixed to a
+   command that actually runs (`fgos add --title ...`).
+2. **Stale step-number references survived the renumbering.**
+   Moving the mode gate out of `fgos-planning/SKILL.md` renumbered its
+   remaining steps, but `fgos-validating/SKILL.md` and
+   `fgos-coding-shaping/SKILL.md` still pointed at the *old* step numbers
+   ("step 3"/"step 5") for cross-references into `fgos-planning` — a
+   classic renumbering-leaves-stale-external-references gap, since the
+   grep-verified fixes in the original D1/D2 work only checked
+   `fgos-planning`'s own file, not every other skill referencing it by
+   number.
+3. **No fallback lane when entered directly, bypassing `fgos-routing`.**
+   D1's whole premise was "decide the lane in `fgos-routing`, before the
+   heavy skill loads" — but `fgos-planning` can also be entered directly
+   from `fgos-exploring`/`fgos-validating` without ever passing through
+   `fgos-routing`'s own mode gate first, and nothing computed a lane in
+   that case. Fixed by adding a fallback that computes the lane locally
+   when no hand-off lane was received, rather than assuming
+   `fgos-routing` is always the entry point.
+4. **The "saves load" framing overstated what actually landed.** D1's own
+   stated benefit was that `fgos-routing` could skip loading
+   `fgos-planning` entirely for lanes that don't need it — but
+   `fgos-routing` still unconditionally routes every decompose-shaping
+   item into `fgos-planning` regardless of lane, so that savings claim
+   was aspirational, not yet real. The docs were reworded to state this
+   plainly rather than imply an optimization that hadn't actually
+   shipped.
+
+Applied to both dual-root skill copies (`.claude/skills/` and
+`.agents/skills/`), per this repo's dual-root convention. Verified with
+real greps against the actual file contents, not just review — including
+a negative check that the fallback-lane addition didn't accidentally
+reintroduce the old inline mode-gate text D1 had deliberately removed.
+
+## Second follow-up (`tsk-59a`): the mode→lane rename left a real regression, not just a docs gap
+
+A second independent review round, after `tsk-da1` merged, found five
+more issues — the first a genuine functional regression, not just a
+prose gap:
+
+1. **Real regression: a literal-token match broke silently.**
+   `decompose.mjs:675`'s regex needs the literal token `Mode:` present in
+   `plan.md` to skip an unnecessary model call for a `tiny`/`small` item
+   — a cheap mechanical shortcut. `fgos-planning`'s own Bootstrap step,
+   after the mode→lane terminology rename (the D1 move this doc already
+   describes), had stopped instructing sessions to write that literal
+   `Mode:` line at all — it now wrote lane information under different
+   wording. Measured against the real corpus: 25 of 153 real `plan.md`
+   files that should have matched no longer did, silently falling through
+   to the more expensive model-call path every time. This is the kind of
+   regression that costs real money/latency per occurrence without ever
+   throwing an error — nothing crashes, it just gets slower on every
+   affected item. Fixed by restoring the instruction to write the exact
+   literal `Mode: <lane>` line, keeping the mode→lane terminology rename
+   everywhere else.
+2. **The same broken `fgos add` example from `tsk-da1` existed
+   untouched in a second skill file.** `fgos-exploring/SKILL.md:196` had
+   the identical broken-command bug `tsk-da1` had just fixed in
+   `fgos-planning`'s own copy — nobody had checked whether the same
+   pattern was duplicated elsewhere. Fixed the same way: a command that
+   actually runs.
+3. **`tsk-da1`'s own fallback-lane addition (D1-follow-up gap 3 above)
+   quietly dropped real logic while claiming to be "the exact same
+   rule."** The fallback computed the lane locally when entered directly,
+   but left out the tie-breaker and the enumeration hard-gate flags that
+   `fgos-routing`'s real Mode-gate section actually has — a lossy
+   restatement, not a faithful mirror. Fixed by pointing the fallback
+   directly at `fgos-routing`'s own Mode-gate section instead of
+   re-describing it inline, so there's one canonical copy of the real
+   rule rather than two that can drift.
+4. **A stale attribution survived the D1 move.** `fgos-validating`
+   still referred to "`fgos-planning`'s flag count" — after D1 moved the
+   mode gate (and its flag-counting logic) to `fgos-routing`, that
+   attribution should have moved with it. Fixed to name the right owner.
+5. **A worked example referenced a variable before it was assigned.**
+   The split-step example command used `--dir "$root"`, but `$root` was
+   only actually assigned in the separate Gate block further down the
+   same file — a reader following the split-step example literally would
+   hit an undefined variable. Fixed by assigning `$root` directly inside
+   the example that uses it.
+
+Applied to both dual-root skill copies (`.claude/skills/` and
+`.agents/skills/`), matching this repo's existing dual-root convention.
+Verified with real greps plus a real test run
+(`node --test test/intake/decompose.test.mjs`), not just review — the
+regression in particular was confirmed by measuring the real corpus
+match rate, not just re-reading the regex.
+
+---
+
+## Third follow-up (`tsk-5iv`): the same undefined-`$root` bug, in the sibling `fgos-exploring` skill
+
+A round-3 independent review found the exact same undefined-`$root`
+defect gap 5 above described fixing in `fgos-planning/SKILL.md` also
+existed, untouched, in `fgos-exploring/SKILL.md`'s own `fgos add`
+example — the same commit (`d3ae2cb`, `tsk-59a`) that fixed
+`fgos-planning`'s copy had never checked whether the identical example
+was duplicated in the sibling skill. Verified directly: the only real
+`root=` assignments in the file sat at unrelated lines 112/231, nowhere
+near the broken example. Fixed with the identical assignment line
+(`root=$(git rev-parse --path-format=absolute --git-common-dir | xargs
+dirname)`) placed before the example, applied to both dual-root copies
+(`.claude/skills/` and `.agents/skills/`), keeping them byte-identical
+per this repo's convention.
+
 ---
 
 **Source:** `docs/history/fgos-planning-mode-gate-and-gate-traceability/CONTEXT.md`
-(tsk-5ay, D1-D2); work-item capture via `fgos check tsk-5ay`.
+(tsk-5ay, D1-D2); work-item capture via `fgos check tsk-5ay`. Follow-up
+fixes: `tsk-da1` (`fgos check tsk-da1`), filed as an independent code
+review after `tsk-3uz`/`tsk-5ay` merged; `tsk-59a` (`fgos check tsk-59a`),
+a second independent review round after `tsk-da1` merged; `tsk-5iv`
+(`docs/history/round3-review-fixes-2026-08-06/`), a round-3 independent
+review after `tsk-59a` merged.

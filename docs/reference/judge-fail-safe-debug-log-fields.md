@@ -78,3 +78,50 @@ the 900000ms `timeoutMs`) returned the generic unclear fallback with no
 real model judgement. `tsk-sq9`'s own record carries no `docsRef`.
 
 Full decision record: `docs/history/judge-fail-safe-debug-log/CONTEXT.md`.
+
+## Related fix (`tsk-wo5`): a graceful signal before the caller's own timeout kills the process
+
+The fail-safe branches above cover what gets logged once a judge call
+*finishes* (successfully or via a fail-safe fold). `tsk-wo5` addressed a
+different, earlier failure mode in the same shared layer: `spawnAttempt`
+(`judge-executor.mjs`) calls the nested `claude -p` judge subprocess via
+`spawnSync` — fully blocking, zero output reaches the invoking CLI
+process until that subprocess exits. Reproduced twice on `tsk-j7y`:
+`fgos discover tsk-j7y --verdict clear --verify ...` was killed at 120s
+by an external caller's own wall-clock budget (an interactive session's
+default Bash tool timeout), then a retry of the *exact same call*
+succeeded in under 4 minutes with no code/state change in between — the
+underlying judgment logic was correct and eventually fast, but the CLI
+gave the external caller zero signal that it was still doing real work.
+
+This exposure wasn't limited to a full `judgeDiscovery` call: even the
+caller-supplied-verdict path (`fgos discover --verdict clear --verify
+...`, which skips `judgeDiscovery` entirely) still calls
+`judgeVerifySemanticCorrectness` whenever `verify` is non-empty — the
+exact call the `tsk-j7y` repro hit.
+
+**Fix scope**: all three callers (`judgeDiscovery`,
+`judgeVerifySemanticCorrectness`, `judgeDecompose`) share this same
+`runJudgeExecutor`/`spawnAttempt` layer already, so the fix landed once
+at the shared layer rather than patched per caller — the same "fix the
+shared primitive, not each call site" shape the fail-safe logging above
+already followed.
+
+**What "fixed" means here, deliberately**: the acceptance criterion is
+graceful degradation, not eliminating the underlying latency. The CLI
+must never silently block past a bounded window without emitting *some*
+signal back to the caller — root-causing why the nested `claude -p`/
+model-provider connection is sometimes slow to respond was explicitly
+ruled out of scope, since that latency plausibly lives outside this
+repo's own control. `src/runner/dispatch.mjs`'s `runWorkerProcess`
+already had an async `spawn` + `onChunk` teeing pattern solving the same
+"caller needs to see it's still alive" problem for worker processes —
+cited as existing precedent for planning to evaluate, not a mandated
+exact shape.
+
+Verified against a deterministically-slowed *fake* judge executor (a
+`cfg.executor.command` pointed at a script that sleeps before
+responding, extending the same fake-executor pattern
+`judge-executor.test.mjs` already used) — not an attempt to force the
+real intermittent cold-start latency to reproduce on demand, since that
+latency is inherently non-deterministic.

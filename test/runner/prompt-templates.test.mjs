@@ -11,7 +11,7 @@ import {
 // --- selectTemplate: mechanical table lookup, no LLM ---------------------
 
 test('selectTemplate resolves a coding-domain input to the skill-pointer template, for any kind/tier (mechanical table lookup, keyed on domain)', () => {
-  assert.equal(selectTemplate({ kind: 'behavior_change', tier: 'light', domain: 'coding' }), 'worker-prompt-skill-pointer.txt');
+  assert.equal(selectTemplate({ kind: 'feature', tier: 'light', domain: 'coding' }), 'worker-prompt-skill-pointer.txt');
   assert.equal(selectTemplate({ kind: 'bug', tier: 'heavy', domain: 'coding' }), 'worker-prompt-skill-pointer.txt');
   assert.equal(selectTemplate({ kind: 'chore', tier: 'standard', domain: undefined }), 'worker-prompt-skill-pointer.txt');
 });
@@ -26,7 +26,21 @@ test('selectTemplate folds an unrecognized domain string to "coding" too (same f
 });
 
 test('selectTemplate still resolves a real registered non-coding domain ("synthetic") to the default template — the wildcard fallback survives for domains that exist but are not "coding"', () => {
-  assert.equal(selectTemplate({ kind: 'behavior_change', tier: 'light', domain: 'synthetic' }), 'worker-prompt-default.txt');
+  assert.equal(selectTemplate({ kind: 'feature', tier: 'light', domain: 'synthetic' }), 'worker-prompt-default.txt');
+});
+
+// --- tsk-5mj D1/D6/D7: stage-aware selection (discovery dispatch) --------
+
+test('selectTemplate resolves a coding-domain, stage:"discovery" input to the discovery template instead of the skill-pointer one', () => {
+  assert.equal(selectTemplate({ kind: 'feature', tier: 'standard', domain: 'coding', stage: 'discovery' }), 'worker-prompt-discovery.txt');
+});
+
+test('selectTemplate omitting stage entirely (every pre-tsk-5mj call site) still resolves to the skill-pointer template, byte-identical to before', () => {
+  assert.equal(selectTemplate({ kind: 'feature', tier: 'standard', domain: 'coding' }), 'worker-prompt-skill-pointer.txt');
+});
+
+test('selectTemplate with stage:"discovery" on a non-coding domain still falls through to that domain\'s own rule (stage only narrows the coding rule)', () => {
+  assert.equal(selectTemplate({ kind: 'feature', tier: 'standard', domain: 'synthetic', stage: 'discovery' }), 'worker-prompt-default.txt');
 });
 
 // --- loadTemplate / renderTemplate: golden-file render --------------------
@@ -51,7 +65,7 @@ test('loadTemplate reads worker-prompt-default.txt from TEMPLATE_DIR and it cont
 test('renderTemplate(worker-prompt-default.txt, ...) golden output — no-feedback shape, byte-for-byte', () => {
   const rendered = renderTemplate('worker-prompt-default.txt', {
     title: 'Add the widget',
-    kind: 'behavior_change',
+    kind: 'feature',
     description: '(không có)',
     feedbackSection: '',
     action: '(không có)',
@@ -61,7 +75,7 @@ test('renderTemplate(worker-prompt-default.txt, ...) golden output — no-feedba
   });
 
   const golden = `# Goal
-Add the widget (kind: behavior_change)
+Add the widget (kind: feature)
 
 # Description
 (không có)
@@ -111,7 +125,7 @@ test('renderTemplate golden output — with-feedback shape includes the Human fe
   const feedbackSection = '\n# Human feedback\nHuman answer (binding decision):\nCHỐT (a): do X.\n\nLatest human rejection/park reason (fix THIS before anything else):\nMissing test Y.\n';
   const rendered = renderTemplate('worker-prompt-default.txt', {
     title: 'Add the widget',
-    kind: 'behavior_change',
+    kind: 'feature',
     description: '(không có)',
     feedbackSection,
     refs: '(none)',
@@ -127,7 +141,7 @@ test('renderTemplate golden output — with-feedback shape includes the Human fe
 test('renderTemplate(worker-prompt-skill-pointer.txt, ...) golden output — no-feedback shape, byte-for-byte', () => {
   const rendered = renderTemplate('worker-prompt-skill-pointer.txt', {
     title: 'Add the widget',
-    kind: 'behavior_change',
+    kind: 'feature',
     description: '(không có)',
     feedbackSection: '',
     action: '(không có)',
@@ -139,7 +153,7 @@ test('renderTemplate(worker-prompt-skill-pointer.txt, ...) golden output — no-
   });
 
   const golden = `# Goal
-Add the widget (kind: behavior_change)
+Add the widget (kind: feature)
 
 # Agent skill
 You are a fgOS agent for domain coding at the executing stage. Before doing

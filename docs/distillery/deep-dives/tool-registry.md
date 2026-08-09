@@ -1,11 +1,13 @@
 ---
 topic: tool-registry
 date: 2026-07-30
-based_on: [repository-harness@9cc306d, beads@777d24b87, symphony@2f0b257, compound-engineering-plugin@32fae6c]
+based_on: [repository-harness@0a79bbe, beads@777d24b87, symphony@2f0b257, compound-engineering-plugin@32fae6c]
 entries: [repository-harness:tool-registry-capability, repository-harness:doctor-preflight, beads:capability-gated-storage-interface, symphony:optional-provider-degrade-ladder, compound-engineering-plugin:bundled-skill-scripts]
 ---
 
 # Deep-dive: tool-registry
+
+> stale vs repository-harness@0a79bbe (9cc306d→0a79bbe, 2026-08-07) — một health-check THỨ HAI, tách biệt, xuất hiện: crate Rust `harness` mới (khác `harness-cli` được cite ở `doctor-preflight`) tự có `doctor()` riêng (7 check: transaction pending, resolution pending, merge-tool availability, provenance hợp lệ, path-safety từng file quản lý) cho CHÍNH installer/updater engine, không phải cho project-registered tool. Không đụng đến outbound/inbound registry pattern đã cite (đó vẫn là `harness-cli`'s registry) — nhưng nếu re-dive, đáng đối chiếu 2 kiểu "doctor" trong cùng 1 dự án: một cái self-check-cho-chính-harness, một cái registry-cho-tool-ngoài.
 
 **Bottom Line:** repository-harness tách rạch ròi hai chiều — *outbound* (harness's own compiled commands, luôn có) vs *inbound* (project tự đăng ký extra tool: gitnexus/c3/linter — optional, may absent). Cơ chế injection KHÔNG nằm trong code: registry chỉ trả **fact** (`status: present/missing/unknown`), chính **agent** (qua prose contract trong AGENTS.md/doc, không phải compiled logic) đọc fact đó và áp policy. Symphony chứng minh điều này portable — nó KHÔNG viết lại registry, chỉ viết lại policy prose (3-nấc degrade ladder) tái dùng registry của harness. Với fgOS: port một `fgos tool` verb-group tối thiểu (register/check/query, one-door-write qua event-log, không cần SQL riêng), rồi sửa PROSE của fgos-planning/fgos-validating/fgos-code-implement để hỏi capability `impact-analysis` thay vì hardcode tên "GitNexus" — đúng nguyên tắc cốt lõi "core consults capabilities, never tools" (US-027). Đây fix thẳng tsk-1e4: hiện CLAUDE.md bắt cứng MUST chạy GitNexus bất kể máy có cài hay không; thiếu registry nên không phân biệt được "chưa từng đăng ký" (skip sạch) với "đăng ký rồi mà hỏng" (gap thật, cảnh báo).
 

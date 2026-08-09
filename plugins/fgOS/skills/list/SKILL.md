@@ -25,13 +25,31 @@ never appends an event).
 2. **Read the work list.** Run:
 
    ```
-   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs list --json
+   # fgos CLI fallback (tsk-1no D3)
+   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
+   if [ -f "$FGOS_BIN" ]; then
+     node "$FGOS_BIN" list --json
+   elif command -v fgos >/dev/null 2>&1; then
+     fgos list --json
+   else
+     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
+     exit 1
+   fi
    ```
 
    — or, when step 1 found `--all`, add that flag to the same call:
 
    ```
-   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs list --all --json
+   # fgos CLI fallback (tsk-1no D3)
+   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
+   if [ -f "$FGOS_BIN" ]; then
+     node "$FGOS_BIN" list --all --json
+   elif command -v fgos >/dev/null 2>&1; then
+     fgos list --all --json
+   else
+     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
+     exit 1
+   fi
    ```
 
    Always use the literal `${CLAUDE_PROJECT_DIR}` substitution shown above,

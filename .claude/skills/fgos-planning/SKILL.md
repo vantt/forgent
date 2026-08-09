@@ -170,6 +170,24 @@ stage values — the same way `fgos-routing` describes it.
    a depth matching the mode; a `tiny` item does not need the same sketch a
    `high-risk` one does.
 
+   End `plan.md` with a section using this exact heading (nothing appended
+   on that line), body `None` when nothing is outstanding, or a real list
+   otherwise:
+
+   ```markdown
+   ## Outstanding questions
+
+   None
+   ```
+
+   Same convention `fgos-exploring`
+   already writes into `CONTEXT.md`, read by the same `hasOpenItems` check
+   at this skill's own Gate below
+   (`docs/history/gate-bypass-artifact-convention/CONTEXT.md` D2). In the
+   common case this reads `None`: step 6 below already routes any
+   newly-discovered *material* question back into `CONTEXT.md` before this
+   section is ever written, so a real item here should be rare.
+
 4. **Decide the split, if any.** Some items are one honest piece of work;
    others need to become several independently workable ones first. When
    more than one candidate piece could go first, run

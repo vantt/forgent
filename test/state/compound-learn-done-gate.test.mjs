@@ -30,7 +30,7 @@ function addCoding(dir, id) {
     kind: 'task',
     status: 'todo',
     deps: [],
-    risk: 'low',
+    risk: 'light',
     refs: [],
     verify: 'npm test',
   });
@@ -43,7 +43,7 @@ function addSynthetic(dir, id) {
     kind: 'task',
     status: 'todo',
     deps: [],
-    risk: 'low',
+    risk: 'light',
     refs: [],
     verify: 'npm test',
     domain: 'synthetic',

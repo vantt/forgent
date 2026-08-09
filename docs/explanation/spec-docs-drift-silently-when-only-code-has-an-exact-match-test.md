@@ -56,3 +56,35 @@ trusting a spec's claim about an exact set, check whether that set has a
 name a real test somewhere actually asserts against; if the answer is
 "only in code," treat the doc's version as a snapshot that could already
 be stale, not a live source of truth.
+
+## The gap this item left open got a real guard, later
+
+`tsk-4y2` closed the specific instance of this gap named above: no test
+existed comparing `registerCheck`/`registerFit`'s real registered ids
+(`src/setup/registrations.mjs`) against `docs/specs/distribution.md`'s
+Data Dictionary #7/#7b rows — confirmed by grepping `test/` for
+`distribution.md`, which returned nothing. Without that guard, the same
+drift this document describes was already primed to repeat: `tsk-2jc`
+(which had just locked the #7/#7b contract) was about to close, and the
+next check/fix added the way `tsk-4xg`'s `claude-plugin-marketplace` was
+(new registry entry, spec left untouched) would drift the doc again with
+nothing to catch it.
+
+The fix landed in `test/setup/registrations.test.mjs`, alongside the
+registry it checks against — two tests, one per direction: "Data
+Dictionary #7 names exactly the registered doctor checks" and the
+equivalent for #7b's registered fixes. Proven fail-first, not just
+asserted: reproducing the exact old drift (removing
+`claude-plugin-marketplace` from #7's list) turned the test red and named
+the missing entry specifically; adding an unregistered id
+(`a-check-that-was-deleted`) turned it red in the opposite direction.
+Restoring the spec brought the full suite back to green (2576 tests, 0
+failures at the time).
+
+This is the same kind of two-way exact-match guard `checks.test.mjs`
+already gave the code side (see above) — now extended to cover the doc
+side too, for this one spec row. The general shape described above still
+holds for any other enumerable spec claim that has no equivalent test;
+this item only closes it for the Data Dictionary #7/#7b row specifically,
+not as a general mechanism for every future enumerable claim a spec might
+make.

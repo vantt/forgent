@@ -1,12 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { frontier, FRONTIER_ORDER_VERSION, isResolvedStatus } from '../../src/state/frontier.mjs';
+import { frontier, frontierAcrossSteps, FRONTIER_ORDER_VERSION, isResolvedStatus } from '../../src/state/frontier.mjs';
 
 // Pure lib — every view here is a literal or built via foldEvents in
 // replay.test.mjs's style; no fs, no mkdtemp, no `.fgos/` writes anywhere in
 // this file.
 function item(id, status, deps = []) {
-  return { id, title: id, kind: 'task', status, deps, risk: 'low', refs: [], verify: 'true' };
+  return { id, title: id, kind: 'task', status, deps, risk: 'light', refs: [], verify: 'true' };
 }
 
 test('frontier on an empty view is empty', () => {
@@ -429,6 +429,56 @@ test('frontier(view, {step}) for a step the item\'s domain never maps excludes e
   assert.deepEqual(frontier(view, { step: 'Divide' }), []);
   // Execute (the mapped step) still works unchanged.
   assert.deepEqual(frontier(view).map((i) => i.id), ['synthetic']);
+});
+
+// --- `frontierAcrossSteps` (tsk-4so D1, docs/history/execution-fanout/
+// CONTEXT-tsk-4so.md): union of `frontier(view, {step})` across steps,
+// closing the gap where a single-step advisory is blind to two items at
+// DIFFERENT steps sharing a footprint ------------------------------------
+
+test('frontierAcrossSteps: items at different steps are all included (the real gap this exists to close)', () => {
+  const view = {
+    work: {
+      atClarify: { ...item('atClarify', 'todo'), stage: 'clarify' },
+      atDecompose: { ...item('atDecompose', 'todo'), stage: 'decompose' },
+      atExecuting: { ...item('atExecuting', 'todo'), stage: 'executing' },
+    },
+  };
+  assert.deepEqual(frontierAcrossSteps(view).map((i) => i.id).sort(), ['atClarify', 'atDecompose', 'atExecuting']);
+});
+
+test('frontierAcrossSteps: an item is never duplicated even though a missing `stage` field matches every step', () => {
+  const view = { work: { noStage: item('noStage', 'todo') } };
+  const out = frontierAcrossSteps(view);
+  assert.equal(out.length, 1);
+  assert.equal(out[0].id, 'noStage');
+});
+
+test('frontierAcrossSteps: default steps are Clarify+Divide+Execute; a narrower explicit list only unions those', () => {
+  const view = {
+    work: {
+      atClarify: { ...item('atClarify', 'todo'), stage: 'clarify' },
+      atExecuting: { ...item('atExecuting', 'todo'), stage: 'executing' },
+    },
+  };
+  assert.deepEqual(frontierAcrossSteps(view, ['Execute']).map((i) => i.id), ['atExecuting']);
+});
+
+test('frontierAcrossSteps: empty view yields an empty array, no error', () => {
+  assert.deepEqual(frontierAcrossSteps({ work: {} }), []);
+});
+
+test('frontierAcrossSteps re-sorts the unioned set by FRONTIER_ORDER_VERSION\'s own tie-break, not by step-array concatenation order', () => {
+  const view = {
+    work: {
+      // Declared executing first but with a WORSE priority than the
+      // clarify-stage item -- a naive concat of already-sorted per-step
+      // arrays would keep 'atExecuting' first; a correct re-sort must not.
+      atExecuting: { ...item('atExecuting', 'todo'), stage: 'executing', priority: 20 },
+      atClarify: { ...item('atClarify', 'todo'), stage: 'clarify', priority: 10 },
+    },
+  };
+  assert.deepEqual(frontierAcrossSteps(view).map((i) => i.id), ['atClarify', 'atExecuting']);
 });
 
 // --- tsk-38t-4 (decision record 0027, D1/D2/D3): isResolvedStatus ---------

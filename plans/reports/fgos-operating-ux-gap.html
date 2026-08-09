@@ -1,0 +1,554 @@
+<title>fgOS — Viễn cảnh vận hành vs thực trạng</title>
+<style>
+:root{
+  --ground:#F5F7F7; --surface:#FFFFFF; --surface-2:#EDF1F1;
+  --ink:#10181A; --ink-2:#33474A; --muted:#5A6A6D;
+  --rule:#D8E0E0; --rule-2:#C2CFCF;
+  --accent:#186E71; --accent-soft:#DDEDED;
+  --ok:#3B7A4B; --ok-soft:#E0EDE2;
+  --warn:#8E6318; --warn-soft:#F2E9D8;
+  --crit:#9E3A30; --crit-soft:#F5E2DF;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  --serif:Charter,"Bitstream Charter","Iowan Old Style","Source Serif Pro",Georgia,serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0C1214; --surface:#131B1D; --surface-2:#1A2427;
+    --ink:#E3EAE9; --ink-2:#B4C3C3; --muted:#889B9C;
+    --rule:#243032; --rule-2:#31403F;
+    --accent:#54B2B4; --accent-soft:#152C2D;
+    --ok:#6FAE79; --ok-soft:#16261A;
+    --warn:#C79749; --warn-soft:#2A2113;
+    --crit:#D3766C; --crit-soft:#2B1815;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0C1214; --surface:#131B1D; --surface-2:#1A2427;
+  --ink:#E3EAE9; --ink-2:#B4C3C3; --muted:#889B9C;
+  --rule:#243032; --rule-2:#31403F;
+  --accent:#54B2B4; --accent-soft:#152C2D;
+  --ok:#6FAE79; --ok-soft:#16261A;
+  --warn:#C79749; --warn-soft:#2A2113;
+  --crit:#D3766C; --crit-soft:#2B1815;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:var(--serif); font-size:17px; line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px 96px}
+.col{max-width:68ch}
+
+/* ---- masthead ---- */
+header.mast{border-bottom:2px solid var(--ink);margin-bottom:40px;padding:56px 0 20px}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:0 0 18px}
+h1{font-family:var(--mono);font-weight:600;font-size:clamp(28px,4.4vw,44px);line-height:1.12;letter-spacing:-.02em;margin:0 0 16px;text-wrap:balance}
+.dek{font-size:19px;line-height:1.55;color:var(--ink-2);margin:0;max-width:60ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:24px;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.meta b{color:var(--ink-2);font-weight:600}
+
+/* ---- verdict ---- */
+.verdict{background:var(--surface);border:1px solid var(--rule);border-left:3px solid var(--accent);padding:24px 26px;margin:0 0 44px}
+.verdict p{margin:0;font-size:20px;line-height:1.5}
+.verdict p+p{margin-top:14px;font-size:16.5px;color:var(--ink-2)}
+
+/* ---- sections ---- */
+section{margin:0 0 60px;scroll-margin-top:24px}
+h2{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);
+   margin:0 0 6px;padding-bottom:8px;border-bottom:1px solid var(--rule)}
+h3{font-family:var(--mono);font-size:17px;font-weight:600;letter-spacing:-.01em;margin:34px 0 10px;line-height:1.35}
+h4{font-family:var(--mono);font-size:14px;font-weight:600;margin:26px 0 8px;color:var(--ink-2)}
+p{margin:0 0 15px}
+a{color:var(--accent)}
+code{font-family:var(--mono);font-size:.855em;background:var(--surface-2);padding:1px 5px;border-radius:2px;color:var(--ink)}
+strong{font-weight:700}
+
+/* ---- metric strip ---- */
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);margin:26px 0 8px}
+.cell{background:var(--surface);padding:16px 16px 15px}
+.cell .n{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:27px;font-weight:600;line-height:1.05;letter-spacing:-.02em;display:block}
+.cell .l{font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);display:block;margin-top:7px;line-height:1.45}
+.cell.good .n{color:var(--ok)} .cell.bad .n{color:var(--crit)} .cell.mid .n{color:var(--warn)}
+
+/* ---- cycle bar ---- */
+.chart{background:var(--surface);border:1px solid var(--rule);padding:22px 24px 18px;margin:26px 0}
+.chart .cap{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 16px}
+.bar{display:flex;height:38px;border:1px solid var(--rule-2);overflow:hidden}
+.bar span{display:block;position:relative;min-width:4px}
+.bar .s1{background:var(--accent-soft);border-right:1px solid var(--rule-2)}
+.bar .s2{background:var(--ok);border-right:1px solid var(--rule-2)}
+.bar .s3{background:var(--ok);opacity:.5;border-right:1px solid var(--rule-2)}
+.bar .s4{background:var(--crit)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 22px;margin-top:14px;font-family:var(--mono);font-size:11.5px;color:var(--ink-2)}
+.legend i{display:inline-block;width:9px;height:9px;margin-right:7px;vertical-align:baseline;border:1px solid var(--rule-2)}
+.legend b{font-variant-numeric:tabular-nums;color:var(--ink);font-weight:600}
+
+/* ---- tables ---- */
+.scroll{overflow-x:auto;margin:22px 0;border:1px solid var(--rule);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-family:var(--mono);font-size:13.5px}
+th{text-align:left;font-weight:600;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
+   padding:11px 14px;border-bottom:1px solid var(--rule-2);white-space:nowrap;background:var(--surface-2)}
+td{padding:11px 14px;border-bottom:1px solid var(--rule);vertical-align:top;font-variant-numeric:tabular-nums}
+tr:last-child td{border-bottom:none}
+td.num{text-align:right;font-weight:600;white-space:nowrap}
+
+/* ---- pipeline ---- */
+.pipe{display:flex;flex-direction:column;gap:1px;background:var(--rule);border:1px solid var(--rule);margin:24px 0}
+.step{background:var(--surface);padding:14px 18px;display:grid;grid-template-columns:34px 1fr auto;gap:16px;align-items:baseline}
+.step .k{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
+.step .t{font-family:var(--mono);font-size:14px;font-weight:600;margin-bottom:3px}
+.step .d{font-size:14.5px;color:var(--ink-2);line-height:1.5}
+.step.human{background:var(--warn-soft)}
+.step.human .k{color:var(--warn)}
+
+/* ---- chips ---- */
+.chip{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+      padding:3px 8px;border:1px solid currentColor;white-space:nowrap;font-weight:600}
+.chip.auto{color:var(--ok)} .chip.man{color:var(--warn)} .chip.gate{color:var(--crit)}
+
+/* ---- gap cards ---- */
+.gap{background:var(--surface);border:1px solid var(--rule);border-left:3px solid var(--muted);padding:18px 22px;margin:16px 0}
+.gap.crit{border-left-color:var(--crit)} .gap.warn{border-left-color:var(--warn)} .gap.info{border-left-color:var(--accent)}
+.gap h4{margin:0 0 8px;font-size:15px;color:var(--ink)}
+.gap p{margin:0 0 10px;font-size:15.5px;line-height:1.55}
+.gap p:last-child{margin-bottom:0}
+.ev{font-family:var(--mono);font-size:12.5px;color:var(--ink-2);background:var(--surface-2);padding:9px 12px;margin:10px 0;line-height:1.55}
+
+/* ---- causal chain ---- */
+.chain{display:flex;flex-direction:column;margin:26px 0;max-width:62ch}
+.link{background:var(--surface);border:1px solid var(--rule);border-left:3px solid var(--rule-2);padding:13px 18px}
+.link+.link{margin-top:22px;position:relative}
+.link+.link::before{content:"";position:absolute;left:26px;top:-19px;width:1px;height:16px;background:var(--rule-2)}
+.link+.link::after{content:"";position:absolute;left:22px;top:-8px;width:9px;height:9px;
+  border-right:1px solid var(--rule-2);border-bottom:1px solid var(--rule-2);transform:rotate(45deg)}
+.link.root{border-left-color:var(--crit);background:var(--crit-soft)}
+.link b{font-family:var(--mono);font-size:14.5px;display:block;margin-bottom:3px}
+.link span{font-size:14.5px;color:var(--ink-2);line-height:1.5;display:block}
+
+/* ---- pull ---- */
+.pull{border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);padding:22px 0;margin:32px 0;
+      font-family:var(--mono);font-size:19px;line-height:1.45;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+
+/* ---- action list ---- */
+.act{counter-reset:a;list-style:none;padding:0;margin:20px 0;display:flex;flex-direction:column;gap:1px;background:var(--rule);border:1px solid var(--rule)}
+.act li{background:var(--surface);padding:15px 18px;counter-increment:a;display:grid;grid-template-columns:30px 1fr;gap:14px}
+.act li::before{content:counter(a);font-family:var(--mono);font-size:12px;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums}
+.act b{font-family:var(--mono);font-size:14.5px;display:block;margin-bottom:4px}
+.act span{font-size:15px;color:var(--ink-2);line-height:1.5}
+.grp{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:26px 0 0}
+
+ul.plain{padding-left:20px;margin:14px 0}
+ul.plain li{margin-bottom:9px}
+footer{border-top:1px solid var(--rule);margin-top:60px;padding-top:22px;font-family:var(--mono);font-size:12px;color:var(--muted);line-height:1.7}
+@media (max-width:620px){
+  body{font-size:16px}
+  .step{grid-template-columns:26px 1fr;gap:10px}
+  .step .chip{grid-column:2}
+}
+</style>
+
+<div class="wrap">
+
+<header class="mast">
+  <p class="kicker">Quét toàn hệ · Vision × Code × State thật</p>
+  <h1>fgOS: hệ đã tự động hoá việc khó,<br>nhưng chưa biết cách gọi người quay lại</h1>
+  <p class="dek">Luồng xuyên suốt từ lúc một người có ý tưởng đến lúc việc xong — đối chiếu viễn cảnh trong tài liệu với những gì event log thật sự ghi lại.</p>
+  <div class="meta">
+    <span><b>2026-08-08</b></span>
+    <span>9.693 event</span>
+    <span>445 work item</span>
+    <span>2.638 test</span>
+    <span>23 ngày vận hành</span>
+  </div>
+</header>
+
+<div class="verdict col">
+  <p>Hệ được xây để người khỏi ngồi canh — nhưng chưa có cách nào báo cho người biết khi nào được rời đi, và khi nó có hỏi thì câu hỏi không trả lời được.</p>
+  <p>Nên người ở lại canh. Và vì đã ngồi đó, họ lái tay thay vì để hệ tự chạy. Toàn bộ những gì trông như "tắc nghẽn vận hành" chảy ra từ hai mắt xích thiếu — một về <strong>bề rộng</strong> (không gọi được người), một về <strong>chất lượng</strong> (64% lượt hỏi không phải quyết định sản phẩm mà là hai judge cãi nhau một pattern <code>grep</code>).</p>
+  <p>Hai cái đó nhân nhau: xây kênh gọi người trước khi sửa câu hỏi = đẩy 23 thông báo về <code>grep</code> lên điện thoại.</p>
+</div>
+
+<div class="gap crit" style="margin:0 0 44px">
+  <h4>Cần vá trước mọi việc tăng tốc</h4>
+  <p><code>reclaimOrphanedCheckout</code> force-xoá bất kỳ worktree nào <strong>mà không kiểm đó có phải phiên đang sống hay không</strong>. Đã có sự cố dogfood xác nhận: một root worktree đang chạy bị xoá im lặng giữa phiên. Backlog xếp hạng CRITICAL, vẫn <code>proposed</code>.</p>
+  <p class="ev">"A crash-recovery helper that destroys user work silently is worse than no recovery at all — it creates a false sense of safety." — journal của chính tác giả</p>
+  <p>Nó nằm trên đường mà mọi item đều đi qua. Tăng tốc một hệ có thể xoá mất việc của người chỉ làm tăng tần suất gặp nó.</p>
+</div>
+
+<section>
+<h2>0 · Đo trước, kết luận sau</h2>
+
+<div class="strip">
+  <div class="cell good"><span class="n">0,3h</span><span class="l">Build thật<br>doing → awaiting-approval</span></div>
+  <div class="cell good"><span class="n">0,1h</span><span class="l">Merge<br>approval → delivered</span></div>
+  <div class="cell mid"><span class="n">1,1h</span><span class="l">Chờ queue<br>submit → doing</span></div>
+  <div class="cell bad"><span class="n">64,9h</span><span class="l">Đuôi hậu-merge<br>delivered → done</span></div>
+  <div class="cell bad"><span class="n">27,2h</span><span class="l">Tổng<br>submit → done</span></div>
+</div>
+
+<div class="chart">
+  <p class="cap">Một item điển hình đi hết vòng đời — theo tỉ lệ thời gian thật (median, n=223)</p>
+  <div class="bar" role="img" aria-label="Chờ queue 1,1 giờ; build 0,3 giờ; merge 0,1 giờ; đuôi hậu-merge 64,9 giờ chiếm gần toàn bộ">
+    <span class="s1" style="flex:1.1"></span>
+    <span class="s2" style="flex:0.3"></span>
+    <span class="s3" style="flex:0.1"></span>
+    <span class="s4" style="flex:64.9"></span>
+  </div>
+  <div class="legend">
+    <span><i style="background:var(--accent-soft)"></i>Chờ queue <b>1,1h</b></span>
+    <span><i style="background:var(--ok)"></i>Build <b>0,3h</b></span>
+    <span><i style="background:var(--ok);opacity:.5"></i>Merge <b>0,1h</b></span>
+    <span><i style="background:var(--crit)"></i>Hậu-merge <b>64,9h</b></span>
+  </div>
+</div>
+
+<div class="col">
+<p>Máy làm việc trong 18 phút. Rồi item nằm đó gần ba ngày. Toàn bộ báo cáo này là đi tìm xem ba ngày đó đi đâu — và câu trả lời không phải cái ai cũng đoán.</p>
+</div>
+</section>
+
+<section>
+<h2>1 · Viễn cảnh mong muốn</h2>
+<div class="col">
+
+<p>fgOS <strong>không phải</strong> runner headless không người. Tài liệu nền tảng định nghĩa nó là <strong>pipeline bán-tự-động</strong>: tự động là mặc định, người xen vào ở những cổng có điều kiện, và mức người-tham-gia thay đổi theo giai đoạn.</p>
+
+<p>Khác biệt cốt tử được nêu tường minh — và đây là câu đáng nhớ nhất trong toàn bộ tài liệu:</p>
+</div>
+
+<p class="pull col">bee chặn phiên chat ở mỗi gate; fgOS biến gate thành checkpoint bất đồng bộ mà hệ đậu lại và chờ người quay lại. Người không phải lúc nào cũng ngồi đợi.</p>
+
+<div class="col">
+<h3>Ba tiêu chí, thứ tự cố định</h3>
+<p>Bậc dưới không ghi đè bậc trên:</p>
+<ul class="plain">
+<li><strong>Ship Faster</strong> — giao nhanh hơn, không đoán mò, giảm friction, ít chờ đợi.</li>
+<li><strong>DoD</strong> — kết quả kiểm chứng lại được + tài liệu có dẫn bằng chứng.</li>
+<li><strong>Polish sau DoD</strong> — hoàn thiện sau ngưỡng, không mở scope.</li>
+</ul>
+
+<p>Điều làm rõ ngày 2026-08-05 hay bị hiểu sai: thước đo là <strong>tốc độ của project đang DÙNG fgOS</strong>, không phải tốc độ team fgOS build tính năng của chính fgOS. Một lựa chọn rẻ cho fgOS nhưng làm dev dùng fgOS chậm hơn là sai theo tiêu chí, dù nó rẻ.</p>
+
+<h3>Trải nghiệm mong muốn, kể như một ngày</h3>
+<p><strong>8:00</strong> — Người gõ một câu tiếng Việt vào terminal. Không cần biết schema, không chọn tier, không biết item nào đang chạy. Hệ tự phân loại, tự đặt id, tự viết ra bằng chứng thế nào là xong.</p>
+<p><strong>8:01</strong> — Người đóng laptop, đi làm việc khác. <em>Đây là điểm cốt tử.</em></p>
+<p><strong>Trong ngày</strong> — Hệ tự làm rõ đề bài; mơ hồ thì tự tra trước; vẫn mơ hồ thì đậu lại với đúng một câu hỏi rồi chuyển sang item khác chứ không đứng im. Việc rõ thì tự lập kế hoạch, tự đối chiếu với repo thật, tự tách thành n item con và chạy song song.</p>
+<p><strong>17:00</strong> — Người mở máy, thấy một danh sách ngắn: ba việc xong chờ duyệt, một việc cần trả lời câu này. Không bãi log. Không phải đi tìm chuyện gì đã xảy ra.</p>
+<p><strong>17:05</strong> — Duyệt. Hệ merge, tự viết tài liệu người-dùng-cuối từ chính cái vừa làm, tự dọn branch.</p>
+
+<p>Người chỉ làm hai việc: <strong>nói mình muốn gì</strong>, và <strong>duyệt cái đã xong</strong>.</p>
+</div>
+</section>
+
+<section>
+<h2>2 · Quy trình mong muốn, từng khâu</h2>
+<div class="col"><p>Tám khâu, với chỗ người bắt buộc được đánh dấu. Chỉ hai khâu cần người — và một khâu chỉ bật khi thật sự mơ hồ.</p></div>
+
+<div class="pipe">
+  <div class="step human"><span class="k">1</span><div><span class="t">Intake</span><span class="d"><code>fgos submit "&lt;văn xuôi tự do&gt;"</code> — skill tự suy luận tier/kind/risk, tự derive title, tự sinh id không đụng độ.</span></div><span class="chip man">Người khởi tạo</span></div>
+  <div class="step"><span class="k">2</span><div><span class="t">Clarify</span><span class="d">Chạy im lặng theo mặc định, chỉ nói khi thật sự không hiểu đề bài. Gặp khái niệm lạ thì tự tra trước, không hỏi người.</span></div><span class="chip auto">Tự động</span></div>
+  <div class="step"><span class="k">3</span><div><span class="t">Decompose</span><span class="d">Viết kế hoạch nhỏ nhất trung thực, rồi đối chiếu kế hoạch với repo thật. Tách thành n item con độc lập, dependency rõ.</span></div><span class="chip auto">Tự động</span></div>
+  <div class="step"><span class="k">4</span><div><span class="t">Execute</span><span class="d">Claim + dựng worktree cô lập <code>fgw/&lt;id&gt;</code>. Viết code, tự chạy verify của chính item. Nhiều con thì bắn tối đa 5 agent mỗi wave.</span></div><span class="chip auto">Tự động</span></div>
+  <div class="step human"><span class="k">5</span><div><span class="t">Review</span><span class="d">Xem diff + trace, hoặc mở PR thật. <strong>Cổng người tuyệt đối</strong> — hard rule cấm tự duyệt, không ngoại lệ.</span></div><span class="chip gate">Cổng người</span></div>
+  <div class="step"><span class="k">6</span><div><span class="t">Merge</span><span class="d">Chọn item xếp hạng cao nhất trong số đã hết dep chờ và không đụng footprint.</span></div><span class="chip auto">Tự động</span></div>
+  <div class="step"><span class="k">7</span><div><span class="t">Compound-learn</span><span class="d">Đọc capture thật, phân loại Diataxis, viết tài liệu người-dùng-cuối có trích bằng chứng, sinh lại index.</span></div><span class="chip auto">Tự động</span></div>
+  <div class="step"><span class="k">8</span><div><span class="t">Cleanup</span><span class="d">Kiểm TTL đã trôi, retrospective có nội dung thật, merge còn resolve — rồi xoá branch, đóng <code>done</code>.</span></div><span class="chip auto">Tự động</span></div>
+</div>
+
+<div class="col">
+<p>Xuyên suốt bốn luật giữ hệ không rối: <strong>mọi ghi qua đúng một cửa</strong> kể cả đường thất bại; <strong>event log là sự thật, state chỉ là view</strong> dựng lại được; <strong>người là participant có hợp đồng riêng</strong>; và mọi output mang cùng một envelope có <code>data_hash</code>.</p>
+</div>
+</section>
+
+<section>
+<h2>3 · Đã làm được</h2>
+<div class="col"><p>Phần này mạnh hơn nhiều so với cảm nhận thông thường về một dự án 23 ngày tuổi.</p></div>
+
+<div class="strip">
+  <div class="cell good"><span class="n">~40</span><span class="l">Item return mỗi ngày<br>duy trì một tuần</span></div>
+  <div class="cell good"><span class="n">~35</span><span class="l">Item merge mỗi ngày</span></div>
+  <div class="cell good"><span class="n">2.633</span><span class="l">Test pass / 2.638<br>0 fail</span></div>
+  <div class="cell good"><span class="n">151</span><span class="l">Doc người-dùng-cuối<br>tự sinh</span></div>
+  <div class="cell good"><span class="n">88%</span><span class="l">Discovery tự hiểu<br>đề bài, không hỏi</span></div>
+</div>
+
+<div class="col">
+<h3>Nền tảng state — vững, không phải demo</h3>
+<p>445 work item thật, event log 4MB, state view 3,4MB. Status FSM đầy đủ với precondition và CAS. Stage FSM riêng một tầng trên, domain-aware — domain lạ fold về mặc định kèm cảnh báo, không bao giờ throw.</p>
+
+<h3>Bề mặt CLI — hơn 40 verb, tự mô tả</h3>
+<p>Mỗi verb khai rõ <code>[read]</code> / <code>[write]</code> / <code>[external]</code>, nên người đọc biết trước cái gì đụng đĩa.</p>
+
+<h3>Cô lập và an toàn đồng thời</h3>
+<p>Worktree riêng mỗi item. Lock chống hai writer, kèm trạng thái free/live/stale/ambiguous và <strong>từ chối force-delete</strong> khi phiên khác đang giữ thật. Đường <code>git reset --hard</code> an toàn từ chối khi cây bẩn cho tới khi người đọc hết status toàn repo. Executor spawn bằng argv array, không nối chuỗi vào shell.</p>
+
+<h3>Vòng compound-learning — chạy thật</h3>
+<p>362 nửa dự đoán / 335 nửa thực tế, 223 learning đã seal, 298 thư mục capture ngữ cảnh. Friction phân loại 5 tầng, tự quy tội. Đây là bằng chứng bậc F4 <em>đang vận hành</em>, không chỉ được tuyên bố.</p>
+
+<h3>Capacity dispatch — chọn model theo tier</h3>
+<p>light → haiku, standard → sonnet, heavy → opus. Có capacity riêng cho judge, và bước phân loại lúc submit chạy <strong>cross-provider</strong> sang Gemini Flash — đúng tinh thần rẻ nhất đủ chất lượng.</p>
+</div>
+</section>
+
+<section>
+<h2>4 · Chưa làm được</h2>
+<div class="col"><p>Xếp theo mức đánh vào tiêu chí 1. Điểm chung của ba cái đầu: tất cả đều là <em>vận hành</em>, không phải <em>năng lực</em>.</p></div>
+
+<div class="gap crit">
+  <h4>Đuôi hậu-merge 65h — không phải thiết kế, là chưa ai quét</h4>
+  <p>Giả thuyết ban đầu là "TTL soak 7 ngày cho root, đúng thiết kế". Đào vào từng item thì <strong>sai</strong>:</p>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Nhóm</th><th class="num">Số lượng</th><th>TTL</th><th>Trạng thái</th></tr></thead>
+    <tbody>
+      <tr><td>Leaf</td><td class="num" style="color:var(--crit)">112</td><td>0 ngày</td><td>Sẵn sàng đóng ngay</td></tr>
+      <tr><td>Root</td><td class="num">16</td><td>7 ngày</td><td>Còn chờ TTL, đúng thiết kế</td></tr>
+      <tr><td>Root hết TTL chưa quét</td><td class="num">0</td><td>—</td><td>—</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p><strong>112 trên 128 item chỉ chờ một lần chạy loop.</strong> Không item nào bị chặn bởi thiết kế. Người nhìn bảng thấy 128 việc chưa xong, trong khi 112 cái đó code đã merge từ lâu và chỉ chờ bút ký cơ học.</p>
+</div>
+
+<div class="gap crit">
+  <h4>Clarify tắc 91% frontier — nguyên nhân đã xác định</h4>
+  <p>51 trên 56 item <code>todo</code> đang kẹt ở stage clarify. Đào nguyên nhân:</p>
+  <p class="ev">46/51 item không bị dep nào chặn — tự do chạy ngay<br>0/51 item từng có discovery entry — chưa cái nào được chạy lần nào</p>
+  <p>Nút cổ chai <strong>không do thiết kế gate cần người</strong>, mà do chưa ai chạy loop làm rõ. Củng cố thêm: đo 314 lần đậu vào <code>awaiting-human</code> theo stage — clarify 265 (84%), decompose 40, executing 9. Gánh nặng người dồn gần hết vào khâu đầu.</p>
+</div>
+
+<div class="gap crit">
+  <h4>Chế độ async — thiếu kênh gọi người quay lại</h4>
+  <p>301 item chạy <code>sync</code>, chỉ <strong>4 item</strong> chạy <code>async</code>. Toàn bộ luận điểm phân biệt fgOS với bee nằm ở chế độ này.</p>
+  <p><code>ask</code>/<code>answer</code> và trạng thái đậu đã có — đó là chỗ <em>đậu</em>. Cái thiếu là chỗ <em>gọi dậy</em>. Item đậu im lặng vô thời hạn: <strong>không timeout, không auto-resolve, không nhắc lại ở bất kỳ đâu</strong>. Loop coi một lần đậu là "chuyển sang item kế tiếp", không bao giờ quay lại.</p>
+  <p>Đây không phải khoảng cách năng lực ở lớp thực thi — là <strong>một hệ con chưa xây</strong>, nằm ngoài core theo kiến trúc đã chốt.</p>
+</div>
+
+<div class="gap crit">
+  <h4>Chất lượng câu hỏi — hỏi sai thứ, sai người, và hỏi lại mãi</h4>
+  <p>Mặt thứ hai của cùng một vấn đề. Không có kênh gọi người là chuyện <strong>bề rộng</strong>. Đây là chuyện <strong>chất lượng</strong>: khi hệ có hỏi, câu hỏi thường không trả lời được.</p>
+
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Đo trên 314 lượt hỏi người thật</th><th class="num">Giá trị</th></tr></thead>
+    <tbody>
+      <tr><td>Lượt hỏi là <strong>tranh chấp verify máy-vs-máy</strong></td><td class="num" style="color:var(--crit)">202 / 314 · 64%</td></tr>
+      <tr><td>Câu hỏi có phương án rõ ràng (a)/(b)</td><td class="num" style="color:var(--crit)">32 / 152 · 21%</td></tr>
+      <tr><td>Câu hỏi tự nhắc lại item đang bàn</td><td class="num" style="color:var(--warn)">68 / 152 · 45%</td></tr>
+      <tr><td>Câu hỏi hỏi về một lệnh shell</td><td class="num">57 / 152 · 38%</td></tr>
+      <tr><td>Item bị hỏi ≥3 lần</td><td class="num">34</td></tr>
+      <tr><td>Số lần hỏi nhiều nhất trên một item</td><td class="num" style="color:var(--crit)">23</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p><strong>Hỏi sai người.</strong> 64% lượt hỏi mang cùng một khuôn — hai judge tự động bất đồng về việc một pattern <code>grep</code> có chặt đủ không, rồi đẩy người lên làm trọng tài:</p>
+  <p class="ev">"Đề xuất verify bị nghi ngờ — vòng 1 đề xuất: <code>grep -q '\.parkReason' test/cli/fgos.test.mjs &amp;&amp; node --test ...</code> — vòng 2 (kiểm tra độc lập) không đồng ý: Pin quá lỏng và trùng tên với thứ đã hoạt động sẵn…"</p>
+  <p>Đây không phải quyết định sản phẩm. Người không có lợi thế thông tin nào ở đây — đó là thứ máy kiểm được bằng cách chạy thử lệnh, không phải thứ cần phán đoán con người.</p>
+
+  <p><strong>Người bị dùng làm vòng retry.</strong> Một item bị hỏi <strong>23 lần</strong>, mỗi lần là một biến thể <code>grep</code> hơi khác. Người không được hỏi <em>một quyết định</em> — người bị hỏi lại cho tới khi máy tự mò ra lệnh đúng. Hai item khác mỗi cái 10 lần.</p>
+
+  <p><strong>Câu hỏi không tự mang bối cảnh.</strong> Chỉ 45% nhắc lại được item đang nói về việc gì; hơn nửa buộc người phải tra cứu mới hiểu đang bàn cái gì. 13% bắt tra chéo ≥2 task id khác. Có câu hỏi về nội dung một file <strong>không tồn tại trong checkout hiện tại</strong> — người về mặt vật lý không mở được thứ đang được hỏi.</p>
+
+  <p><strong>Làm tốt được, và đã có mẫu.</strong> 21% còn lại chứng minh điều đó — 222 ký tự, hai phương án đặt tên rõ, mỗi cái nói kèm nó giống cái gì đã có, trả lời được trong 10 giây không cần mở file nào:</p>
+  <p class="ev">"Should fgOS worktrees use the lock-in-tree strategy (symlink <code>.fgos/</code> to shared store, matching <code>session.mjs</code>) or the isolated-tree strategy (bootstrap-copy <code>.fgos/</code> per worktree with union-merge at merge-back, matching beegog)?"</p>
+
+  <p><strong>Hệ quả về thứ tự ưu tiên.</strong> Xây kênh chú-ý mà chưa sửa chất lượng câu hỏi thì thứ được đẩy lên điện thoại người ta chính là <strong>23 thông báo về pattern <code>grep</code> trên một item</strong>. Kênh chú-ý khuếch đại chất lượng câu hỏi — tốt lẫn xấu. Sửa cái này trước.</p>
+</div>
+
+<div class="gap crit">
+  <h4>Mốc MVP2 chưa đạt — dù record mang status "accepted"</h4>
+  <p>Mốc yêu cầu chứng minh vòng lõi đạt kết cục <strong>tương đương</strong> khi khởi động headless, không cú bấm tay nào. Item xác minh vẫn <code>proposed</code>:</p>
+  <p class="ev">Ca tương tác — verify xanh + commit thật, nhưng kẹt ở đậu-chờ-người do <code>return</code> kiểm sai branch HEAD<br>Ca headless — <strong>chưa từng chạy thật lần nào</strong>: runner resolve repoRoot không có cờ override, testbed không phải git repo riêng, nên gọi thật sẽ dispatch thẳng vào state production 445 item</p>
+  <p>Ghi nguyên văn trong backlog: <em>"confirmed unsafe twice, never invoked for real."</em> "Accepted" mô tả phát biểu mốc, không phải hệ đã chứng minh.</p>
+</div>
+
+<div class="gap warn">
+  <h4>Đường thành công cũng có nhánh thất bại câm</h4>
+  <p>Ba lời gọi chuyển sang <code>delivered</code> trên đường thành công của <code>approve</code> không được bọc. Nếu write đó throw — ví dụ lock-timeout lúc tranh chấp — tác dụng bên dưới (một merge thật, hoặc một verify đã xác nhận xanh) <strong>đã vĩnh viễn</strong>, nhưng status không tiến và <strong>không friction record nào được ghi</strong>.</p>
+  <p>Nghịch với chính luật của hệ, vốn khẳng định đường thất bại cũng đi qua đúng một cửa. Có một nhánh lọt lưới.</p>
+</div>
+
+<div class="gap warn">
+  <h4>Song song hẹp hơn nhiều so với tưởng</h4>
+  <p>Bảng caller của chính skill điều phối ghi rõ: <strong>4 trên 5 caller không được nối hợp đồng fan-out</strong>. Chỉ đường <code>cook</code> có. Một item claim thẳng bằng <code>pick</code> mà neo vào con đang mở thì chỉ báo neo rồi dừng — người phải pick từng con bằng tay.</p>
+  <p>Năng lực "5 agent mỗi wave" chỉ đúng trên đúng một đường vào.</p>
+</div>
+
+<div class="gap warn">
+  <h4>Lớp quyết định native-vs-spawn còn thiếu — đang đốt việc</h4>
+  <p>Doctrine đã khoá 4 luật chọn cách dispatch, nhưng <strong>chưa lớp nào áp dụng chúng tự động</strong>. Bằng chứng sống: bước judge <strong>luôn spawn một tiến trình agent mới toanh</strong> kể cả khi caller đã là một phiên sống cùng provider có ngữ cảnh tốt hơn — lẽ ra trúng luật "dùng cơ chế native" nhưng im lặng rơi xuống spawn, vì không có cơ chế phát hiện "mình đang được gọi từ một phiên sống".</p>
+  <p>Hệ quả thẳng lên tiêu chí 1: một judge mù suy diễn lại từ đầu phán đoán mà phiên sống đã có sẵn. Đúng hai thứ Ship Faster cấm — chờ đợi và trôi lệch.</p>
+</div>
+
+<div class="gap warn">
+  <h4>Đồ thị công việc rất phẳng — không đòn bẩy nào lớn</h4>
+  <p>445 node nhưng <strong>236 connected component</strong>, 188 là item cô lập một mình, component lớn nhất 29. Xếp hạng 72 item mở nhưng <strong>chỉ số chặn cao nhất bằng 1</strong>. Chỉ 6 item pick được ngay.</p>
+  <p>Không item nào là nút mở khoá lớn. Vừa tốt (song song được) vừa xấu: không thứ tự ưu tiên tự nhiên nào nổi lên, và verb xếp hạng mất phần lớn giá trị khi mọi thứ đều chặn đúng 1.</p>
+</div>
+
+<div class="gap warn">
+  <h4>Hai lớp theo dõi, lớp chiến lược có 0 item done</h4>
+  <p>Backlog chiến lược là hệ riêng — 31 dòng PBI, đếm được <strong>30 proposed, 1 in-flight, 0 done</strong>, và đã xác minh bảng không lọc bỏ dòng done, nên số 0 là tín hiệu thật.</p>
+  <p><strong>223 item done ở lớp thi hành, 0 PBI done ở lớp chiến lược.</strong> Chưa ai đối chiếu hai lớp. Kết hợp với ghi nhận rằng <code>done</code> lật theo FSM chạm trạng thái cuối chứ không theo kiểm từng mệnh đề nghiệm thu — con số 223 nên đọc là "FSM đã tới terminal", không phải "mọi điều kiện đã kiểm độc lập".</p>
+</div>
+
+<div class="gap warn">
+  <h4>verify-miss là friction đắt nhất</h4>
+  <p>Trên 141 friction event:</p>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Loại lỗi</th><th class="num">Số lần</th><th class="num">Tỉ lệ</th></tr></thead>
+    <tbody>
+      <tr><td>verify-miss</td><td class="num">87</td><td class="num" style="color:var(--crit)">62%</td></tr>
+      <tr><td>merge-conflict</td><td class="num">42</td><td class="num">30%</td></tr>
+      <tr><td>merge-failed-unclassified</td><td class="num">7</td><td class="num">5%</td></tr>
+      <tr><td>fgos-write-blocked</td><td class="num">4</td><td class="num">3%</td></tr>
+      <tr><td>worker-timeout</td><td class="num">1</td><td class="num">1%</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p><code>verify</code> là hợp đồng "thế nào là xong" của từng item — và nó hỏng nhiều nhất. Mỗi lần miss là một vòng làm lại, đánh thẳng vào "không đoán mò".</p>
+</div>
+
+<div class="gap warn">
+  <h4>40% item vẫn kéo người vào hỏi-đáp</h4>
+  <p>142 trên 359 item có settlement <code>answer/human</code>. Con số 88% discovery báo <code>clear</code> chỉ nói "hiểu được đề bài", <strong>không</strong> nói "không cần người ở khúc sau". Đo trên toàn vòng đời, cứ 5 item thì 2 lôi người vào.</p>
+</div>
+
+<div class="gap warn">
+  <h4>Trường <code>risk</code> không có enum — dữ liệu lẫn hai bộ từ vựng</h4>
+  <p>Chỉ validate "chuỗi không rỗng". Kết quả trên 445 item thật: <code>standard</code> 205, <code>light</code> 125, <code>heavy</code> 63, <code>medium</code> 24, <code>low</code> 14, <code>high</code> 14.</p>
+  <p>Hai bộ từ vựng trộn trên cùng một field — <code>light/standard/heavy</code> mượn của tier, <code>low/medium/high</code> mượn của urgency. Ai đọc bảng cũng phải tự đoán <code>light</code> với <code>low</code> có khác nhau không. Đúng thứ "đoán mò" mà tiêu chí 1 cấm.</p>
+</div>
+
+<div class="gap info">
+  <h4>PR lifecycle — có code, có test, chưa từng chạy thật</h4>
+  <p>Quét toàn bộ 9.693 event: <strong>không có event PR nào</strong>. 22 lần xuất hiện chữ github đều nằm trong mô tả item, không phải dấu vết chạy. Bước 9–11 của tầm nhìn chưa được chứng minh end-to-end. Merge hiện tại là merge local.</p>
+</div>
+
+<div class="gap info">
+  <h4>Đa domain — mới có khung, chỉ coding sống</h4>
+  <p>Registry domain đã dựng và fold an toàn, nhưng chỉ <code>coding</code> có stage graph thật. Tầm nhìn nói "một base, nhiều domain-extension" với marketing/HR/finance. Hiện là một base, một extension.</p>
+</div>
+</section>
+
+<section>
+<h2>5 · Chẩn đoán — chuỗi nhân quả</h2>
+
+<div class="col">
+<p>Quan sát ban đầu là "ba nút tắc, chưa ai bấm nút". Sau khi quét lớp hợp đồng I/O, nguyên nhân gốc nằm cao hơn một bậc — và nó là <strong>một quyết định cố ý</strong>.</p>
+</div>
+
+<div class="chain">
+  <div class="link root"><b>Chưa có kênh chú-ý</b><span>Mô hình pull đồng bộ thuần tuý: gọi verb, nhận envelope. Kênh push thật chưa khởi động, và đang chờ có chủ đích.</span></div>
+  <div class="link"><b>Async không gọi được người quay lại</b><span>Chỗ đậu đã có. Chỗ gọi dậy thì không. Item đậu im lặng vô thời hạn — không timeout, không nhắc lại.</span></div>
+  <div class="link"><b>Mọi người chạy sync</b><span>301 trên 305 item.</span></div>
+  <div class="link"><b>Người dù sao cũng ngồi đó</b><span>Nên lái tay thay vì để hệ tự chạy.</span></div>
+  <div class="link"><b>Loop không chạy</b><span>Clarify dồn 51, cleanup dồn 128.</span></div>
+</div>
+
+<div class="col">
+<p>Quyết định hoãn được ghi thẳng trong tài liệu, nguyên văn:</p>
+</div>
+
+<p class="pull col">Poll bắt đầu khó chịu là tín hiệu kênh chú-ý đến lượt.</p>
+
+<div class="col">
+<p>Nhưng chính tiêu chí 1 đứng về phía làm nó sớm hơn: hoãn kênh chú-ý <em>rẻ cho fgOS</em> nhưng làm <em>người vận hành fgOS chậm hơn</em> — và khi hai vế xung đột, quyết định đã chốt là chọn vế người vận hành.</p>
+
+<h3>Mắt xích thứ hai, chạy song song</h3>
+<p>Kênh chú-ý là vấn đề <strong>bề rộng</strong> — không có cách gọi người. Nhưng có một chuỗi thứ hai về <strong>chất lượng</strong>: khi hệ có hỏi, câu hỏi không trả lời được.</p>
+</div>
+
+<div class="chain">
+  <div class="link root"><b>Verify sinh ra kém lúc submit/clarify</b><span>Cùng gốc với 87 verify-miss ở mục trên.</span></div>
+  <div class="link"><b>Hai judge bất đồng về lệnh verify</b><span>Một pattern grep có chặt đủ không.</span></div>
+  <div class="link"><b>Escalate cho người làm trọng tài</b><span>202 trên 314 lượt hỏi — 64%.</span></div>
+  <div class="link"><b>Người không có lợi thế thông tin nào</b><span>Phán một pattern grep không phải việc của người. Máy chạy thử là biết.</span></div>
+  <div class="link"><b>Trả lời qua loa, hoặc bỏ đó → hỏi lại</b><span>34 item bị hỏi ≥3 lần. Cao nhất: 23 lần trên một item.</span></div>
+</div>
+
+<div class="col">
+<p><strong>Hai mắt xích này nhân nhau, không cộng.</strong> Xây kênh chú-ý mà chưa sửa chất lượng câu hỏi thì thứ được đẩy lên điện thoại là 23 thông báo về <code>grep</code> trên một item — kênh chú-ý khuếch đại đúng thứ cần giảm.</p>
+</div>
+
+<p class="pull col">Thứ tự đúng: sửa chất lượng câu hỏi trước hoặc đồng thời. Không bao giờ sau.</p>
+
+<div class="scroll">
+<table>
+  <thead><tr><th>Nút tắc</th><th class="num">Số lượng</th><th>Nguyên nhân đã xác minh</th><th>Cách gỡ</th></tr></thead>
+  <tbody>
+    <tr><td>Clarify</td><td class="num">51</td><td>46 tự do chạy, 0 từng qua discovery</td><td>một lệnh loop</td></tr>
+    <tr><td>Cleanup</td><td class="num">128</td><td>112 là leaf TTL 0 ngày, sẵn sàng đóng</td><td>một lệnh loop</td></tr>
+    <tr><td>Async</td><td class="num">4 / 305</td><td>không có kênh gọi người quay lại</td><td>xây hệ con còn thiếu</td></tr>
+    <tr><td>Chất lượng câu hỏi</td><td class="num">64%</td><td>lượt hỏi là tranh chấp máy-vs-máy, không phải quyết định</td><td>chặn escalate + bắt câu hỏi mang bối cảnh</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="col">
+<p>Hai cái đầu gỡ được bằng một lệnh. Hai cái sau <strong>không</strong> — và cái thứ tư phải làm trước cái thứ ba.</p>
+
+<h3>Tin tốt, và một cảnh báo về nó</h3>
+<p><strong>Tiêu chí 2 (DoD) đang được giữ tốt</strong>: test xanh 2.633 trên 2.638, 371 trên 445 item có verify thật, 151 tài liệu có trích dẫn bằng chứng. Bậc dưới không hỏng, chỉ bậc trên chưa chạm tới.</p>
+<p>Nhưng đọc con số <strong>223 done</strong> cho đúng: một item backlog đang in-flight ghi nhận rằng <code>done</code> lật theo <em>FSM chạm trạng thái cuối</em>, không theo <em>kiểm từng mệnh đề nghiệm thu đã giao đủ chưa</em>. 223 nghĩa là "FSM đã tới terminal", không phải "mọi điều kiện đã được kiểm độc lập".</p>
+</div>
+</section>
+
+<section>
+<h2>6 · Việc tạo đòn bẩy</h2>
+<div class="col"><p>Xếp theo tỉ lệ giảm-chờ-đợi trên công-bỏ-ra.</p></div>
+
+<p class="grp">Nhóm 0 · vá trước khi tăng tốc</p>
+<ol class="act">
+  <li><b>Vá đường force-xoá worktree</b><span>Kiểm phiên sống và công việc chưa commit trước khi xoá. Rủi ro mất dữ liệu đã có sự cố xác nhận, nằm trên đường mọi item đều đi qua.</span></li>
+</ol>
+
+<p class="grp">Nhóm A · cơ học, làm được ngay, không viết code</p>
+<ol class="act" start="2">
+  <li><b>Chạy loop dọn cleanup</b><span>Đóng ngay 112 item. Bảng công việc giảm 25%, đuôi 65h biến mất cho phần lớn item. Công bỏ ra: một lệnh.</span></li>
+  <li><b>Chạy loop làm rõ clarify</b><span>Khơi 46 item đang tự do. Frontier mở lại. Công bỏ ra: một lệnh.</span></li>
+</ol>
+<div class="col"><p>Hai việc này gỡ hai trên ba nút tắc mà không viết một dòng code — nhưng chúng là triệu chứng, không phải bệnh.</p></div>
+
+<p class="grp">Nhóm B · xây cái còn thiếu — thứ thay đổi bản chất trải nghiệm</p>
+<ol class="act" start="4">
+  <li><b>Chặn escalate tranh chấp verify lên người, bắt câu hỏi mang bối cảnh</b><span>Làm <strong>trước</strong> việc kế tiếp, không sau. Ba luật, tất cả đều cơ học: (1) hai judge bất đồng về một lệnh verify là việc của máy — chạy thử rồi phán; chỉ escalate khi bất đồng về <em>mục tiêu</em>, không bao giờ về <em>pattern</em>. (2) Trần số lần hỏi lại — cùng một item hỏi lần thứ ba là bug của bên hỏi, chuyển sang blocked kèm chẩn đoán thay vì hỏi lần 23. (3) Mỗi câu hỏi phải tự đứng được: nhắc lại item đang bàn, nêu phương án rõ ràng, không trỏ vào file không tồn tại trong checkout.</span></li>
+  <li><b>Xây kênh chú-ý</b><span>Mắt xích gốc của chuỗi thứ nhất. Không có nó thì async không dùng được. Không cần đủ daemon ngay — nâng pane notification của cockpit thành hợp đồng thật thay vì chrome tuỳ chọn đã đủ cắt mắt xích. <strong>Nhưng phải sau việc trên</strong>: đẩy câu hỏi hiện tại lên điện thoại người ta là khuếch đại đúng thứ cần giảm.</span></li>
+  <li><b>Tự động hoá chính hai loop ở nhóm A</b><span>Nếu nhóm A phải làm tay mỗi lần thì tắc nghẽn quay lại ngay tuần sau. Runner đã có chế độ watch; cần nối nó tới pool clarify và cleanup.</span></li>
+  <li><b>Nối fan-out vào bốn đường vào còn lại</b><span>Hiện chỉ một đường có. Rẻ, và mở song song thật cho phần còn lại.</span></li>
+  <li><b>Dựng lớp quyết định native-vs-spawn</b><span>Chặn việc judge mù suy diễn lại phán đoán mà phiên sống đã có. Kế hoạch 5 phase đã nộp thành item thật có dependency rõ.</span></li>
+</ol>
+
+<p class="grp">Nhóm C · chất lượng — đánh vào "không đoán mò"</p>
+<ol class="act" start="9">
+  <li><b>Đóng verify-miss</b><span>62% toàn bộ friction, và <em>cùng gốc</em> với 64% tranh chấp câu hỏi ở việc 4 — verify sinh kém vừa hỏng lúc chạy vừa gây cãi lúc thẩm định. Sửa gốc đánh trúng cả hai. Đòn bẩy đơn lẻ lớn nhất trong báo cáo này.</span></li>
+  <li><b>Khoá enum risk, làm rõ cặp status × stage</b><span>Rẻ, cơ học, gỡ trực tiếp gánh nặng đọc. Item nêu vấn đề này đã mở sẵn.</span></li>
+</ol>
+
+<p class="grp">Nhóm D · chứng minh còn thiếu</p>
+<ol class="act" start="11">
+  <li><b>Đóng mốc MVP2</b><span>Trước hết cho runner một cờ override repoRoot để chạy được trên testbed mà không đụng state production, rồi vá đường return kiểm sai branch HEAD. Không có hai cái đó thì ca headless không thể chạy an toàn lần nào.</span></li>
+  <li><b>Chạy end-to-end một item qua đường PR thật</b><span>Có code, có test đơn vị, nhưng 0 dấu vết chạy. Chưa chứng minh thì chưa tính là có.</span></li>
+</ol>
+</section>
+
+<section>
+<h2>7 · Câu hỏi chưa giải đáp</h2>
+<div class="col">
+<p>Sáu trên bảy câu hỏi mở ban đầu đã trả lời được. Câu <em>"tại sao 40% item cần người trả lời trong khi 88% discovery báo rõ"</em> nay đã có đáp án: <strong>64% lượt hỏi không phải quyết định sản phẩm</strong> — là tranh chấp verify máy-vs-máy. Còn lại hai:</p>
+<ul class="plain">
+<li><strong>Lớp PBI chỉ trễ nhịp, hay đã tách rời cấu trúc khỏi lớp thi hành?</strong> 0 done so với 223 done. Item backlog chạm đúng vấn đề này đang in-flight. Câu trả lời quyết định con số 223 đọc được bao nhiêu phần trăm theo nghĩa đen.</li>
+<li><strong>Ngưỡng nào thì tuyên bố bậc cuối của thang trưởng thành?</strong> Định nghĩa là "cải tiến có outcome đo được". Hệ đã xếp hạng candidate từ friction, nhưng chưa thấy vòng nào đóng trọn từ friction đến cải tiến đến outcome tốt hơn đo được. Đây là thứ duy nhất còn nằm giữa bậc đã claim và đích.</li>
+</ul>
+</div>
+</section>
+
+<footer>
+Nguồn bằng chứng: <code>.fgos/events.jsonl</code> (9.693 event) · <code>.fgos/state.json</code> (445 work item) · <code>npm test</code> (2.638 test, 0 fail) · docs/decisions · docs/specs · skill definitions.<br>
+Mọi con số trong trang này đo trực tiếp từ state thật, không lấy từ tài liệu mô tả.
+</footer>
+
+</div>

@@ -17,7 +17,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fork } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { addWork, editWork, moveWork, moveStage, addOutcome, addFriction, recordGateApprove, listWork, readRawEvents, setFocus, StoreError } from '../../src/state/store.mjs';
+import { addWork, editWork, moveWork, moveStage, addOutcome, addFriction, addDecision, recordGateApprove, listWork, readRawEvents, setFocus, StoreError } from '../../src/state/store.mjs';
 import { appendEvent } from '../../src/state/events.mjs';
 import { REGISTRY, ENV, PID, UNRESOLVED } from "../../src/runner/session-identity.mjs";
 import { MAX_TITLE_LENGTH } from '../../src/state/work.mjs';
@@ -84,12 +84,35 @@ function addSampleWork(dir, id, overrides = {}) {
     kind: 'task',
     status: 'todo',
     deps: [],
-    risk: 'low',
+    risk: 'light',
     refs: [],
     verify: 'npm test',
     ...overrides,
   });
 }
+
+// --- addDecision kind field (tsk-1ud D7 step 1): separates engine
+// bookkeeping records from real design decisions without matching on
+// `text` prefixes. Mirrors the existing `source` default-to-'session'
+// coverage right next to it. ---
+
+test('addDecision defaults kind to "design" when the caller omits it', () => {
+  const dir = tmpDir();
+  addDecision(dir, { text: 'a real design decision', rationale: 'because reasons, cited at file.mjs:1' });
+
+  const view = listWork(dir);
+  const last = view.decisions.at(-1);
+  assert.equal(last.kind, 'design');
+});
+
+test('addDecision keeps an explicit kind (e.g. "engine") unchanged', () => {
+  const dir = tmpDir();
+  addDecision(dir, { text: 'discovery caller-supplied: clear=true', source: 'resolveDiscovery', kind: 'engine', rationale: 'engine bookkeeping' });
+
+  const view = listWork(dir);
+  const last = view.decisions.at(-1);
+  assert.equal(last.kind, 'engine');
+});
 
 test('moveWork doing->done composes a learning record reflecting the item\'s actual outcome, friction (by layer), and settlement (by kind/role)', () => {
   const dir = tmpDir();
@@ -350,7 +373,7 @@ test('a docType-tagged outcome AND friction survive an independent rebuild of th
 test('addWork still rejects a self-loop (defense-in-depth: caught by shape validation before the cycle guard runs, and the guard is wired at the same site regardless)', () => {
   const dir = tmpDir();
   assert.throws(
-    () => addWork(dir, { id: 'self-loop', title: 'Self Loop', kind: 'task', status: 'todo', deps: ['self-loop'], risk: 'low', refs: [], verify: 'npm test' }),
+    () => addWork(dir, { id: 'self-loop', title: 'Self Loop', kind: 'task', status: 'todo', deps: ['self-loop'], risk: 'light', refs: [], verify: 'npm test' }),
     /cannot list itself as a dep/,
   );
   assert.equal(listWork(dir).work['self-loop'], undefined);
@@ -360,7 +383,7 @@ test('addWork accepts a forward-only chain built up one item at a time — no fa
   const dir = tmpDir();
   addSampleWork(dir, 'cyc-a', { deps: [] });
   addSampleWork(dir, 'cyc-b', { deps: ['cyc-a'] });
-  addWork(dir, { id: 'cyc-c', title: 'Cyc C', kind: 'task', status: 'todo', deps: ['cyc-b'], risk: 'low', refs: [], verify: 'npm test' });
+  addWork(dir, { id: 'cyc-c', title: 'Cyc C', kind: 'task', status: 'todo', deps: ['cyc-b'], risk: 'light', refs: [], verify: 'npm test' });
   assert.ok(listWork(dir).work['cyc-c']);
 });
 
@@ -368,7 +391,7 @@ test('a direct 2-node A<->B cycle is rejected once the second half is written �
   const dir = tmpDir();
   addSampleWork(dir, 'cyc-x', { deps: [] });
   // cyc-x has no deps yet, so cyc-y -> cyc-x is a plain forward edge, not a cycle: accepted.
-  addWork(dir, { id: 'cyc-y', title: 'Cyc Y', kind: 'task', status: 'todo', deps: ['cyc-x'], risk: 'low', refs: [], verify: 'npm test' });
+  addWork(dir, { id: 'cyc-y', title: 'Cyc Y', kind: 'task', status: 'todo', deps: ['cyc-x'], risk: 'light', refs: [], verify: 'npm test' });
   assert.ok(listWork(dir).work['cyc-y']);
 
   // now closing it the other way (cyc-x -> cyc-y) would form A<->B: rejected.
@@ -394,7 +417,7 @@ test('editWork patch introducing an A<->B cycle is rejected — the live gap thi
 test('a valid DAG add and a valid DAG edit are still accepted unchanged through the write door', () => {
   const dir = tmpDir();
   addSampleWork(dir, 'dag-a', { deps: [] });
-  addWork(dir, { id: 'dag-b', title: 'Dag B', kind: 'task', status: 'todo', deps: ['dag-a'], risk: 'low', refs: [], verify: 'npm test' });
+  addWork(dir, { id: 'dag-b', title: 'Dag B', kind: 'task', status: 'todo', deps: ['dag-a'], risk: 'light', refs: [], verify: 'npm test' });
   assert.ok(listWork(dir).work['dag-b']);
 
   addSampleWork(dir, 'dag-c', { deps: [] });
@@ -405,7 +428,7 @@ test('a valid DAG add and a valid DAG edit are still accepted unchanged through 
 test('a dep to an unknown id is still rejected by the existing existence check first, before the cycle guard runs', () => {
   const dir = tmpDir();
   assert.throws(
-    () => addWork(dir, { id: 'ghost-dep', title: 'Ghost Dep', kind: 'task', status: 'todo', deps: ['no-such-id'], risk: 'low', refs: [], verify: 'npm test' }),
+    () => addWork(dir, { id: 'ghost-dep', title: 'Ghost Dep', kind: 'task', status: 'todo', deps: ['no-such-id'], risk: 'light', refs: [], verify: 'npm test' }),
     /depends on unknown id/,
   );
 
@@ -437,7 +460,7 @@ test('a MIXED cycle (deps edge + parent-child edge) is rejected at addWork — i
   // graph sees. The deps-only guard walks mix-b -> mix-a and stops (mix-a has
   // no deps back), so before S2a this add went straight through.
   assert.throws(
-    () => addWork(dir, { id: 'mix-b', title: 'Mix B', kind: 'task', status: 'todo', parent: 'mix-a', deps: ['mix-a'], risk: 'low', refs: [], verify: 'npm test' }),
+    () => addWork(dir, { id: 'mix-b', title: 'Mix B', kind: 'task', status: 'todo', parent: 'mix-a', deps: ['mix-a'], risk: 'light', refs: [], verify: 'npm test' }),
     /would close a graph cycle/,
   );
   assert.equal(listWork(dir).work['mix-b'], undefined, 'the rejected add never landed');
@@ -448,7 +471,7 @@ test('a MIXED cycle closed by an editWork patch is rejected — the parent edge 
   addSampleWork(dir, 'edit-mix-a', { deps: [] });
   // edit-mix-b's parent is edit-mix-a -> edge edit-mix-a -> edit-mix-b. No
   // cycle yet (a child pointing at its parent is a plain forward edge).
-  addWork(dir, { id: 'edit-mix-b', title: 'Edit Mix B', kind: 'task', status: 'todo', parent: 'edit-mix-a', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+  addWork(dir, { id: 'edit-mix-b', title: 'Edit Mix B', kind: 'task', status: 'todo', parent: 'edit-mix-a', deps: [], risk: 'light', refs: [], verify: 'npm test' });
   assert.ok(listWork(dir).work['edit-mix-b']);
 
   // Patching edit-mix-b.deps = [edit-mix-a] adds edge edit-mix-b -> edit-mix-a,
@@ -469,13 +492,13 @@ test('a PURE parent-child cycle is rejected — reachable TODAY via a dangling f
   // pc-a names pc-b as its parent before pc-b exists. `validateDeps` checks
   // deps existence only; nothing checks parent existence, so this dangling
   // forward parent is accepted (edge pc-b -> pc-a is recorded, walkable).
-  addWork(dir, { id: 'pc-a', title: 'PC A', kind: 'task', status: 'todo', parent: 'pc-b', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+  addWork(dir, { id: 'pc-a', title: 'PC A', kind: 'task', status: 'todo', parent: 'pc-b', deps: [], risk: 'light', refs: [], verify: 'npm test' });
   assert.ok(listWork(dir).work['pc-a'], 'a dangling forward parent is allowed on add');
 
   // Now pc-b names pc-a as ITS parent -> edge pc-a -> pc-b, closing
   // pc-a -> pc-b -> pc-a with zero deps anywhere. Rejected at pc-b's add.
   assert.throws(
-    () => addWork(dir, { id: 'pc-b', title: 'PC B', kind: 'task', status: 'todo', parent: 'pc-a', deps: [], risk: 'low', refs: [], verify: 'npm test' }),
+    () => addWork(dir, { id: 'pc-b', title: 'PC B', kind: 'task', status: 'todo', parent: 'pc-a', deps: [], risk: 'light', refs: [], verify: 'npm test' }),
     /would close a graph cycle/,
   );
   assert.equal(listWork(dir).work['pc-b'], undefined, 'the rejected add never landed');
@@ -484,8 +507,8 @@ test('a PURE parent-child cycle is rejected — reachable TODAY via a dangling f
 test('a valid parent chain (no cycle) is still accepted — the unified guard has no false positive on a DAG with parent edges', () => {
   const dir = tmpDir();
   addSampleWork(dir, 'tree-root', { deps: [] });
-  addWork(dir, { id: 'tree-child', title: 'Tree Child', kind: 'task', status: 'todo', parent: 'tree-root', deps: [], risk: 'low', refs: [], verify: 'npm test' });
-  addWork(dir, { id: 'tree-grandchild', title: 'Tree Grandchild', kind: 'task', status: 'todo', parent: 'tree-child', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+  addWork(dir, { id: 'tree-child', title: 'Tree Child', kind: 'task', status: 'todo', parent: 'tree-root', deps: [], risk: 'light', refs: [], verify: 'npm test' });
+  addWork(dir, { id: 'tree-grandchild', title: 'Tree Grandchild', kind: 'task', status: 'todo', parent: 'tree-child', deps: [], risk: 'light', refs: [], verify: 'npm test' });
   assert.ok(listWork(dir).work['tree-grandchild'], 'a plain parent chain is a DAG, not a cycle');
 });
 
@@ -500,7 +523,7 @@ test('a MIXED cycle closed by an editWork patch that changes ONLY parent (no dep
   const dir = tmpDir();
   addSampleWork(dir, 'pmix-a', { deps: [] });
   // pmix-b's parent is pmix-a -> edge pmix-a -> pmix-b. No cycle yet.
-  addWork(dir, { id: 'pmix-b', title: 'Parent Mix B', kind: 'task', status: 'todo', parent: 'pmix-a', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+  addWork(dir, { id: 'pmix-b', title: 'Parent Mix B', kind: 'task', status: 'todo', parent: 'pmix-a', deps: [], risk: 'light', refs: [], verify: 'npm test' });
   assert.ok(listWork(dir).work['pmix-b']);
 
   // Before D1 this patch was rejected outright ("parent" not in
@@ -527,7 +550,7 @@ test('editWork can set parent on an item that had none — accepted when it intr
 test('editWork patch { parent: null } clears an existing parent (edit --parent "" clear semantics, D2)', () => {
   const dir = tmpDir();
   addSampleWork(dir, 'pclear-root', { deps: [] });
-  addWork(dir, { id: 'pclear-child', title: 'Clear Child', kind: 'task', status: 'todo', parent: 'pclear-root', deps: [], risk: 'low', refs: [], verify: 'npm test' });
+  addWork(dir, { id: 'pclear-child', title: 'Clear Child', kind: 'task', status: 'todo', parent: 'pclear-root', deps: [], risk: 'light', refs: [], verify: 'npm test' });
   assert.equal(listWork(dir).work['pclear-child'].parent, 'pclear-root');
 
   editWork(dir, { id: 'pclear-child', patch: { parent: null } });
@@ -547,7 +570,7 @@ test('addWork under concurrent OS processes racing the SAME id: exactly one succ
 
   const results = await raceAcrossProcesses(
     dir,
-    `addWork(dir, { id: 'race-add', title: 'Race Add', kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'npm test' });`,
+    `addWork(dir, { id: 'race-add', title: 'Race Add', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'npm test' });`,
     N,
   );
 
@@ -869,7 +892,7 @@ function addLegacyWork(dir, id, overrides = {}) {
       kind: 'task',
       status: 'todo',
       deps: [],
-      risk: 'low',
+      risk: 'light',
       refs: [],
       verify: 'npm test',
       tier: 'standard',

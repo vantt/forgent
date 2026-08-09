@@ -36,9 +36,11 @@ source /path/to/forgent/scripts/fgos-shell-integration.sh
 `fgos setup` wires the shell-integration source line into every shell
 profile you actually have (bash and/or zsh) and brings your local
 `.fgos/config.json` up to date with the current default keys, without
-ever touching a setting you already customized. It always does the work
-and reports exactly what changed — running it again with nothing new to
-do says so plainly instead of repeating itself.
+ever touching a setting you already customized. It does the same for your
+global `~/.fgos/config.json` (optional, shared across every project — a
+value set there is used wherever a project doesn't set its own). It always
+does the work and reports exactly what changed — running it again with
+nothing new to do says so plainly instead of repeating itself.
 
 ```bash
 fgos setup

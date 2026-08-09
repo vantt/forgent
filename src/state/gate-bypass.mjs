@@ -37,10 +37,9 @@ const CONFIG_FILE_NAME = 'gate-bypass.json';
  * registry entry, `registrations.mjs`); `readSharedConfig` takes the repo
  * root (`.fgos`'s parent), not `.fgos` itself, so that's resolved here via
  * `path.dirname(dir)`. Falls back to the legacy standalone
- * `<dir>/gate-bypass.json` (never deleted, same "read the old file until a
- * real migration writes the new one" discipline `readSharedConfig` itself
- * already applies to `.fgos-runner.json`) when the shared file has no valid
- * `gateBypass` entry yet.
+ * `<dir>/gate-bypass.json` (never deleted, a "read the old file until a real
+ * migration writes the new one" discipline) when the shared file has no
+ * valid `gateBypass` entry yet.
  *
  * Fails closed to `DEFAULT_LEVEL` on a missing file, invalid JSON, or a
  * shape/value that isn't a recognized level, at either layer — never
@@ -135,5 +134,25 @@ export function canAutoApprove(item, artifactText, level) {
 
   if (!isTierCovered(item?.tier, level)) return false;
   if (hasOpenItems(artifactText)) return false;
+  return true;
+}
+
+/**
+ * D6's bypass axis for `fgos-validating`'s `validateApprove` gate
+ * (`docs/history/gate-bypass/CONTEXT.md` D6). Reuses `canAutoApprove`'s
+ * first two checks verbatim (D4's hard-gate floor, D5's tier-coverage
+ * axis) and swaps the third axis: instead of `hasOpenItems` scanning an
+ * artifact's text, this reads `fgos-validating`'s own already-computed
+ * reality-gate verdict directly. `verdict` is self-reported by the skill
+ * that just computed it, per D6 — a `READY WITH CONSTRAINTS`/`NOT READY`
+ * verdict is treated the same as "has open items": never skippable.
+ */
+export function canAutoApproveValidate(item, verdict, level) {
+  const haystack = `${item?.title ?? ''}\n${item?.description ?? ''}`.toLowerCase();
+  const hardGateHit = HEAVY_KEYWORDS.some((keyword) => haystack.includes(keyword.toLowerCase()));
+  if (hardGateHit) return false;
+
+  if (!isTierCovered(item?.tier, level)) return false;
+  if (verdict !== 'READY') return false;
   return true;
 }

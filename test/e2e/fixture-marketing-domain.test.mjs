@@ -80,7 +80,7 @@ function add(cwd, id, extra = {}) {
   const flags = [
     '--title', extra.title ?? `Title ${id}`,
     '--kind', extra.kind ?? 'task',
-    '--risk', extra.risk ?? 'low',
+    '--risk', extra.risk ?? 'light',
     '--verify', extra.verify ?? 'true',
     // tsk-535: --description is required at add's CLI layer.
     '--description', extra.description ?? `Title ${id}`,
@@ -144,7 +144,7 @@ test("DOMAINS['fixture-marketing'] declares its OWN statusLabels/skillMap.retros
 });
 
 test('adding "fixture-marketing" leaves DOMAINS.coding completely unchanged (RUL11 — purely additive)', () => {
-  assert.deepEqual(DOMAINS.coding.stages, ['clarify', 'decompose', 'executing']);
+  assert.deepEqual(DOMAINS.coding.stages, ['clarify', 'discovery', 'exploring', 'decompose', 'executing']);
   assert.deepEqual(DOMAINS.coding.statusLabels, {
     todo: 'todo',
     doing: 'in-progress',

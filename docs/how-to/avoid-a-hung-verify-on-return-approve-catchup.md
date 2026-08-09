@@ -24,9 +24,8 @@ specifically need one of them to run an unbounded `verify` on purpose.
 Omitting `--timeout` entirely no longer means unbounded. It now falls back
 to the runner config's own `timeoutMs` — the same value and the same
 `runGoalCheck` call the runner loop itself already uses. That config lives
-at `.fgos/config.json`'s `runner` section (tsk-5vf; the legacy
-`.fgos-runner.json` still works as a fallback for a repo that hasn't run
-`fgos setup` since the move). If neither sets one yet,
+at `.fgos/config.json`'s `runner` section (tsk-5vf; the sole config source
+since tsk-5hv D1 retired the legacy fallback). If it doesn't set one yet,
 `ensureRunnerConfigForDir` bootstraps the default (`900000`, 15 minutes)
 the first time any of these verbs runs.
 
@@ -85,10 +84,10 @@ another writer to act while the stuck verify was technically still
 ## Real example
 
 Item `tsk-3vo` (this change itself) proved the fix with a real hung-verify
-scenario: a `.fgos-runner.json` configured with a 200ms `timeoutMs`, and a
+scenario: a runner config with a 200ms `timeoutMs`, and a
 `verify` command that busy-waits 1.5s before exiting.
 
-> `"return omitting --timeout falls back to .fgos-runner.json's timeoutMs,
+> `"return omitting --timeout falls back to the runner config's timeoutMs,
 > blocking a verify that outlives it"` — checked out against the commit
 > just before this fix landed, the same test genuinely failed:
 > `AssertionError: the 200ms fallback timeout should have killed the 1.5s
@@ -102,6 +101,59 @@ With the fix in place, the same scenario resolves cleanly:
 > — `return` on `tsk-3vo`'s own (fast) `verify: npm test` closed clean once
 > the fallback-timeout logic was implemented and its own dedicated test
 > suite passed.
+
+## Follow-up (`tsk-53o`): a killed timeout looks identical to a real verify failure
+
+The fix above ensures a hung `verify` actually gets killed instead of
+freezing the session — but `tsk-53o` found that once the kill fires, the
+*result* it reports is indistinguishable from a genuine test failure.
+`runGoalCheck` (`src/runner/goal-check.mjs`) knows internally whether the
+process was killed by the timeout (`timedOut`), but never surfaces that
+fact to its caller — the caller only ever receives `{passed: false,
+status: null}`, the exact same shape a spawn failure already produces.
+No caller anywhere in the codebase can tell "the verify command actually
+ran and failed" apart from "the machine was just too busy to finish in
+time."
+
+**Real repro, not hypothetical**: `tsk-puz` (2026-08-07) hit this live.
+`fgos return` reported `{to: "blocked", passed: false, exitStatus:
+null}` with truncated output and no failing-test line anywhere in it.
+Running the exact same `npm test` by hand immediately afterward, on the
+identical tree: `2600/2600` passed, in 199s — genuinely green. The root
+cause: `.fgos-runner.json`'s default `timeoutMs` (900000ms / 15 minutes)
+was being silently exceeded because roughly 15 concurrent Claude
+sessions were competing for machine resources at the time — nothing
+about the test suite itself was broken.
+
+**The real cost of this ambiguity**: every time it happens, the only
+available recovery is re-claiming the item (`blocked` → `doing`) and
+running `fgos return` again — another full `npm test` cycle
+(161-370s observed), spent entirely re-proving something that was
+already true. A timeout kill and a real failure both currently cost the
+same recovery cycle, even though only one of them actually needs a code
+fix.
+
+**Fix direction locked, without breaking the existing contract**: a new
+field (e.g. `timedOut: true`) surfaces the real fact out of
+`runGoalCheck`, while `passed`/`status`/`output` keep their exact
+existing meanings — this repo's own convention treats this contract as
+load-bearing, and every caller currently depends on `runGoalCheck`
+*resolving*, never rejecting/throwing. Each real call site (`bin/fgos.mjs`'s
+`return`/`approve`, `src/runner/merge.mjs`, `src/runner/loop.mjs`) then
+gets to decide what a timeout should mean for its own park state — a
+timeout is neither proof an item is broken nor proof it's fine, so it
+should never silently become `passed: true` (that would weaken the
+check itself), but it can carry its own distinct reason when parking, so
+a person reads "this timed out, try again" instead of a truncated
+test-output that reads like a real failure.
+
+**Explicitly rejected fixes**, named to close off the easy-looking wrong
+answers: raising the default `timeoutMs` (papers over the symptom rather
+than fixing the ambiguity — an even slower machine would just hit the
+same wall at a higher number), letting a timeout pass through as
+`passed: true` (weakens the check for everyone, defeats its purpose),
+and changing `runGoalCheck` to reject/throw on timeout instead of
+resolving (breaks the contract every existing caller already depends on).
 
 ## Related
 

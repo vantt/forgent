@@ -81,6 +81,32 @@ explicitly ruled out of scope (D3):
 Only rewire a call site once you've confirmed it wants exactly one item,
 not a scan over the open set.
 
+## Update (`tsk-2u9`): "scoped to one item" meant `work`, not every section
+
+Step 3's original implementation only narrowed `singleView.work` to the
+requested id — every other section of the response
+(`decisions`/`discovery`/`gates`/`settlements`/`outcomes`/`frictions`/
+`learnings`/`decisionsById`) stayed unfiltered against the *entire*
+backlog. Confirmed with a real repro: `list --id tsk-2aa --json`
+correctly returned `work: {}` scoped to 1 entry, but the same response
+carried 1334 unscoped `decisions` entries, 201 `discovery` keys, and 138
+`gates` keys — a 2.2MB response for what was supposed to be a single-item
+lookup.
+
+This directly contradicted the skill docs that motivated this whole
+feature: `pick/SKILL.md` step 3 documents the call as "filtered to just
+this item so the call never dumps the whole backlog," and
+`fgos-exploring/SKILL.md` step 1 implies scoped access to
+`view.discovery["<item-id>"]`. The behavior these docs promised was never
+actually shipped for anything past `work` itself.
+
+Fixed by scoping every one of those sections to the requested id the same
+way `work` already was — a genuine single-item response, not a
+single-item `work` field bolted onto a full-backlog dump for everything
+else. The lesson for the next narrowing flag added this way: "scoped to
+one item" has to mean every section of the response, not just the field
+that happened to be the original bug report's own repro.
+
 ## 6. Test both the bypass behavior and the not-found shape
 
 Three cases proved this feature, not just the happy path:

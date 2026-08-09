@@ -62,7 +62,7 @@ function add(cwd, id, extra = {}) {
   const flags = [
     '--title', extra.title ?? `Title ${id}`,
     '--kind', extra.kind ?? 'task',
-    '--risk', extra.risk ?? 'low',
+    '--risk', extra.risk ?? 'light',
     '--verify', extra.verify ?? 'test -f output.txt',
     // tsk-535: --description is required at add's CLI layer.
     '--description', extra.description ?? `Title ${id}`,
@@ -102,12 +102,15 @@ function events(cwd) {
 }
 
 function writeRunnerConfig(repoRoot, executorScript) {
+  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
   fs.writeFileSync(
-    path.join(repoRoot, '.fgos-runner.json'),
+    path.join(repoRoot, '.fgos', 'config.json'),
     JSON.stringify({
-      executor: { command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'] },
-      models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
-      timeoutMs: 15000,
+      runner: {
+        executor: { command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'] },
+        models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+        timeoutMs: 15000,
+      },
     }),
   );
 }

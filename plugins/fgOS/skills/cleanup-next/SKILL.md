@@ -42,14 +42,15 @@ boundary).
      import('./src/state/cleanup-pool.mjs'),
      import('./src/config/shared-config-file.mjs'),
      import('./src/setup/registrations.mjs'),
-   ]).then(([{ listWork, readRawEvents }, { pickNextCleanupItem }, { readSharedConfig }, { DEFAULT_CLEANUP_TTL_DAYS }]) => {
+   ]).then(([{ listWork, readRawEvents }, { pickNextCleanupItem }, { readSharedConfig }, { DEFAULT_CLEANUP_TTL_DAYS, DEFAULT_CLEANUP_LEAF_TTL_DAYS }]) => {
      const repoRoot = process.argv[1];
      const fgosDir = repoRoot + '/.fgos';
      const view = listWork(fgosDir);
      const rawEvents = readRawEvents(fgosDir);
      const sharedConfig = readSharedConfig(repoRoot);
      const ttlDays = sharedConfig?.cleanup?.ttlDays ?? DEFAULT_CLEANUP_TTL_DAYS;
-     console.log(JSON.stringify(pickNextCleanupItem(view, rawEvents, { ttlDays })));
+     const leafTtlDays = sharedConfig?.cleanup?.leafTtlDays ?? DEFAULT_CLEANUP_LEAF_TTL_DAYS;
+     console.log(JSON.stringify(pickNextCleanupItem(view, rawEvents, { ttlDays, leafTtlDays })));
    });
    " -- "$root"
    ```
@@ -57,11 +58,13 @@ boundary).
    run with `cwd` at `${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}`
    — always that literal substitution, never a relative path, since an
    installed plugin's files run from a copied cache location, not from
-   this repo checkout. `ttlDays` is read the exact same way
-   `bin/fgos.mjs`'s own `case 'cleanup'` reads it
-   (`sharedConfig?.cleanup?.ttlDays ?? DEFAULT_CLEANUP_TTL_DAYS`) so the
-   picker's TTL window always matches what the verb itself is about to
-   check — never a second, drifting source of truth for the same number.
+   this repo checkout. `ttlDays`/`leafTtlDays` are read the exact same way
+   `bin/fgos.mjs`'s own `case 'cleanup'` reads them
+   (`sharedConfig?.cleanup?.ttlDays ?? DEFAULT_CLEANUP_TTL_DAYS`,
+   `sharedConfig?.cleanup?.leafTtlDays ?? DEFAULT_CLEANUP_LEAF_TTL_DAYS`,
+   tsk-59x D2) so the picker's TTL window always matches what the verb
+   itself is about to check — never a second, drifting source of truth for
+   the same numbers.
 
 3. **Pool empty — stop.** If the command printed `null`, report "pool
    empty — nothing to clean up" and stop. This is `/fgOS:cleanup-loop`'s
@@ -70,7 +73,16 @@ boundary).
 4. **Run the verb.** Otherwise the output is `{"id": "<id>"}`. Run:
 
    ```
-   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs cleanup <id> --dir "$root"
+   # fgos CLI fallback (tsk-1no D3)
+   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
+   if [ -f "$FGOS_BIN" ]; then
+     node "$FGOS_BIN" cleanup <id> --dir "$root"
+   elif command -v fgos >/dev/null 2>&1; then
+     fgos cleanup <id> --dir "$root"
+   else
+     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
+     exit 1
+   fi
    ```
 
    substituting `<id>` from step 2's output. Capture both the command's

@@ -14,6 +14,7 @@
 import { buildUnifiedEdges } from './dep-graph.mjs';
 import { FRONTIER_ORDER_VERSION, frontier, isResolvedStatus } from './frontier.mjs';
 import { viewRevision } from './replay.mjs';
+import { effectiveStage, getDomain } from './workflow-stage-graphs.mjs';
 
 /**
  * Connected components of the UNDIRECTED unified graph (blocks + parent-child
@@ -405,7 +406,14 @@ export function whatIf(view, id) {
     if (item.status !== 'todo') return false;
     return (Array.isArray(item.deps) ? item.deps : []).every((d) => d === id || isResolvedStatus(work[d]));
   });
-  return { id, exists: true, unblocksTransitive: downstream.size, newlyReady };
+  // tsk-4zj D6: `newlyReady` entries are `status: 'todo'`, which spans
+  // every stage — same reasoning as `graphMetrics`'s own `stageByItem`,
+  // scoped here to just `id` itself plus `newlyReady`'s members rather
+  // than the whole work map (this answer is already single-id-scoped).
+  const stageByItem = Object.fromEntries(
+    [id, ...newlyReady].map((itemId) => [itemId, effectiveStage(work[itemId], getDomain(work[itemId].domain))]),
+  );
+  return { id, exists: true, unblocksTransitive: downstream.size, newlyReady, stageByItem };
 }
 
 // Default node ceiling above which the expensive greedy (topUnblock) is
@@ -445,6 +453,7 @@ export function metricsFrame(view, { maxNodesForGreedy = DEFAULT_MAX_NODES_FOR_G
 export function graphMetrics(view, opts = {}) {
   const { componentCount, components } = connectedComponents(view);
   const frame = metricsFrame(view, opts);
+  const work = view?.work ?? {};
   return {
     order_version: FRONTIER_ORDER_VERSION,
     frame,
@@ -453,6 +462,16 @@ export function graphMetrics(view, opts = {}) {
     criticalPath: criticalPath(view),
     staleBlocked: staleBlocked(view),
     topUnblock: frame.skipped.includes('topUnblock') ? [] : greedyTopUnblock(view),
+    // tsk-4zj D6: `components[].items`/`criticalPath`/`topUnblock` are
+    // arrays of bare id strings, `staleBlocked` entries reference ids too
+    // — none of them carry `stage` today. Rather than changing any of
+    // those id-array shapes to object-arrays (a real breaking change,
+    // per CONTEXT.md's Scout evidence on the existing `assert.deepEqual`
+    // coverage of `components[0].items`), this adds one flat side-map a
+    // reader cross-references any id in the output against.
+    stageByItem: Object.fromEntries(
+      Object.keys(work).map((id) => [id, effectiveStage(work[id], getDomain(work[id].domain))]),
+    ),
   };
 }
 
@@ -676,32 +695,47 @@ export function detectCycles(view) {
 
 /**
  * COMPUTED-PARALLEL-WAVE-SCHEDULE (tsk-3c7, D1/D2 of docs/history/
- * parallel-decomposition-footprint-avoidance/CONTEXT.md): dispatch-time
- * query answering "which frontier items can run in parallel right now,
- * and which must wait for a footprint-conflicting sibling to finish
- * first" — a DIFFERENT question from `footprintOverlap`'s pairwise
- * advisory (which only flags conflicting pairs, never orders them) and
- * from `graph-harness.mjs`'s `mergeReadiness` (which orders `proposed`
- * items for MERGE, a different lifecycle point — D2 deliberately does not
- * reuse that connected-component logic here: dispatch needs a COUNT of
- * how many can start now, merge only needs a relative ORDER).
+ * parallel-decomposition-footprint-avoidance/CONTEXT.md; tsk-ik3 widened
+ * it to accept an optional CANDIDATE SET, docs/history/execution-fanout/
+ * CONTEXT.md/plan.md): dispatch-time query answering "which frontier
+ * items can run in parallel right now, and which must wait for a
+ * footprint-conflicting sibling to finish first" — a DIFFERENT question
+ * from `footprintOverlap`'s pairwise advisory (which only flags
+ * conflicting pairs, never orders them) and from `graph-harness.mjs`'s
+ * `mergeReadiness` (which orders `proposed` items for MERGE, a different
+ * lifecycle point — D2 deliberately does not reuse that connected-
+ * component logic here: dispatch needs a COUNT of how many can start now,
+ * merge only needs a relative ORDER).
  *
- * Kahn-style greedy layering over `frontier(view)` (already in its own
- * priority/intent/FIFO order, `frontier.mjs`'s `FRONTIER_ORDER_VERSION`):
- * walk the frontier in that order, packing each item into the earliest
- * wave that has no footprint conflict with what is already placed in it
- * (`footprintOverlapAmong`, reused unchanged). A conflicting item is
- * DEFERRED to a later wave, never refused — mirrors `footprintOverlapAmong`'s
- * own "advisory, never blocking" stance. An item with no declared
- * footprint never conflicts with anything (same semantics
- * `footprintOverlapAmong` already gives it), so it packs into the
- * earliest wave with room. Returns `{ waves }` — `waves` is an array of
- * arrays of item ids, in frontier order within each wave; `waves[0]` is
- * everything dispatchable in parallel right now. PURE: reads only
+ * `candidateIds`, when given, SCOPES which frontier items are even
+ * eligible to be packed into a wave — a caller wave-scheduling a fan-out
+ * (children of one parent, or the targets of one milestone) never wants a
+ * ready item OUTSIDE that set stealing a wave-0 slot from one inside it,
+ * since footprint packing runs on whatever it's handed and would
+ * otherwise place waves that are correct for the whole frontier but wrong
+ * for the caller's actual candidate set. Scoping happens BEFORE packing
+ * (filtering the already-packed waves after the fact would keep the wrong
+ * wave placement, only hiding it — docs/history/execution-fanout/plan.md
+ * "Đường nhỏ hơn đã xét"). Omitting `candidateIds` preserves today's
+ * behavior exactly: every frontier item is a candidate, unchanged.
+ *
+ * Kahn-style greedy layering over the (optionally scoped) frontier, in
+ * its own priority/intent/FIFO order (`frontier.mjs`'s
+ * `FRONTIER_ORDER_VERSION`): walk it in that order, packing each item
+ * into the earliest wave that has no footprint conflict with what is
+ * already placed in it (`footprintOverlapAmong`, reused unchanged). A
+ * conflicting item is DEFERRED to a later wave, never refused — mirrors
+ * `footprintOverlapAmong`'s own "advisory, never blocking" stance. An
+ * item with no declared footprint never conflicts with anything (same
+ * semantics `footprintOverlapAmong` already gives it), so it packs into
+ * the earliest wave with room. Returns `{ waves }` — `waves` is an array
+ * of arrays of item ids, in frontier order within each wave; `waves[0]`
+ * is everything dispatchable in parallel right now. PURE: reads only
  * `view.work` via `frontier`/`footprintOverlapAmong`.
  */
-export function computeSchedule(view) {
-  const candidates = frontier(view);
+export function computeSchedule(view, candidateIds) {
+  const scope = candidateIds ? new Set(candidateIds) : null;
+  const candidates = scope ? frontier(view).filter((item) => scope.has(item.id)) : frontier(view);
   const conflicts = footprintOverlapAmong(candidates);
   const conflictsOf = new Map();
   for (const { a, b } of conflicts) {

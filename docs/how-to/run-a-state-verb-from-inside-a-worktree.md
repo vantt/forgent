@@ -145,6 +145,105 @@ resolutions in the same handler is exactly how a fix like `--dir` support
 stops covering the whole handler. Full evidence and the locked decisions:
 `docs/history/docs-index-repo-root-fix/CONTEXT.md` (D1).
 
+## A fourth case: `STORE_MISSING_WARNING_VERBS` missing an entry can silently return the WRONG safety answer, not just an empty one
+
+The "read verbs warn" set in step 3 above isn't fixed forever — a verb
+missing from `STORE_MISSING_WARNING_VERBS` doesn't always fail safe with
+an empty-looking view. `tsk-3u2` first found `fgos schedule` itself
+missing from the set (fixed there, and in
+`docs/how-to/compute-a-parallel-dispatch-wave-schedule.md`'s own
+"Update (tsk-3u2)" section). A follow-up review (`tsk-3g5`, filed right
+after `tsk-3u2` merged) found three more verbs with the same gap —
+`gate-bypass`, `doc-sources`, `lock-status` — and one of them is a
+materially worse failure shape than the original:
+
+- **`gate-bypass` from a worktree with no `.fgos/` silently returned
+  `level: "off"`** — while the real main checkout's actual level was
+  `"standard"`. This is not an honest-looking empty result the way a
+  missing store normally reads; it is a **silently wrong safety answer**,
+  confirmed by running the command directly and comparing outputs. A
+  caller trusting the worktree's own answer would believe gate-bypass
+  was disabled when it genuinely was not.
+- **`doc-sources` silently returned `count: 0`** from a worktree — reads
+  exactly like "no other captures are linked to this doc path," the same
+  empty-but-plausible-looking failure shape `docs-index`'s bug (the third
+  case above) already showed.
+- **`lock-status` always reported `"free"`** from a worktree, regardless
+  of the real lock state in the main checkout — another case where the
+  wrong answer looks like a normal, safe-sounding one instead of an
+  obvious error.
+
+All three are `requiresExistingStore: false` verbs (so they don't refuse
+outright like the `requiresExistingStore: true` category above) but were
+simply missing from `STORE_MISSING_WARNING_VERBS`, unlike the already-
+covered read verbs. Fixed by adding all three to that set — the same
+`--dir <mainRoot>` fix already described above applies. The generalized
+lesson: any verb reading state without `requiresExistingStore: true`
+needs a deliberate check that it's either in `STORE_MISSING_WARNING_VERBS`
+or has some other honest way of signaling "this may not be the real
+answer" — omission from that set is not a neutral default, since some
+verbs' own empty/off/free-looking defaults are indistinguishable from a
+genuine, confidently wrong answer.
+
+## A fifth round: `evolve` and `docs-index` still missing, and a proposed structural fix
+
+A round-3 independent review (`tsk-5iv`), after `tsk-3g5` merged, found
+`STORE_MISSING_WARNING_VERBS` still missing two more verbs — `evolve`
+and `docs-index` — both `requiresExistingStore: false`, both silently
+returning an empty/stale result from a `.fgos/`-less worktree with zero
+stderr warning. Verified concretely: `fgos evolve` returned `[]` from a
+worktree versus 26 real candidates from main, no warning either way —
+the identical silent-empty-result failure class the fourth case above
+already described for `doc-sources`. Fixed by adding both to the set.
+
+**This is the third separate round widening the same hand-maintained
+`Set`** (`tsk-3u2`, `tsk-3g5`, now this one) — the review noted, without
+committing to it as in-scope here, that deriving the set automatically
+from the command registry's own `requiresExistingStore: false` flag
+(minus an explicit opt-out list for verbs that legitimately create or
+manage the store themselves — `init`/`setup`/`uninstall`/`doctor`/
+`session`) would close this whole class of gap structurally instead of
+requiring a fourth, fifth, or sixth manual widening whenever a new verb
+is added. Left as a documented option for a future item, not implemented
+here — the immediate real gap (two more silently-wrong-answer verbs) was
+fixed directly instead.
+
+## A sixth case: a non-verb *script* resolving the wrong root, cosmetic but still worth fixing
+
+`tsk-5ma` found the same `resolveRepoRoot()`-vs-main-checkout mistake in
+a place that isn't a CLI verb at all: `scripts/fgos-session-start-hook.mjs`
+— the hook that prints "fgOS canonical paths" context when a session
+starts. Line 16 called `resolveRepoRoot()` (`git rev-parse
+--show-toplevel`, which returns whichever checkout `cwd` is currently
+in) instead of `resolveMainCheckoutRoot()`, then derived the storage
+path from that. Confirmed live from inside a linked worktree:
+`resolveRepoRoot()` returned the worktree's own path
+(`.claude/worktrees/tsk-5hv-P9OLdR`); `resolveMainCheckoutRoot()`
+correctly returned the real main checkout. Since `.fgos/` is
+unconditionally wiped from every freshly-created worktree (ADR0020), the
+wrong root silently produces a path to a directory that simply doesn't
+exist.
+
+Found while fixing 8 other instances of the exact same bug class during
+`tsk-5hv`'s `.fgos-runner.json` retirement — this was the one remaining
+real instance, confirmed by auditing every other `resolveRepoRoot()`
+caller in the codebase. Two other callers were checked and confirmed
+**not** the same bug: `bin/fgos-runner.mjs`'s and `loop.mjs`'s own uses
+are intentional per the runner's documented contract (operate on
+whichever checkout it's invoked from); `git-hooks.mjs`'s
+`resolvesToGithooks` genuinely needs the worktree's own root, since
+`core.hooksPath` wiring has to resolve correctly from *any* worktree,
+not just the main checkout.
+
+**Impact stayed narrow, by the hook's own design**: its own header
+comment states it "NEVER THROWS, ALWAYS EXITS 0... path injection is
+pure convenience, never load-bearing" — so this bug never broke
+anything functionally. It only misled whoever read the printed
+"canonical paths" context at the start of a session that happened to
+start fresh with `cwd` already inside a `.claude/worktrees/*` directory
+— not the common `/fgOS:pick` mid-session-switch case, which runs this
+hook only once, before the switch, and was never affected.
+
 ## Related
 
 - `docs/decisions/0020-chan-fgos-khoi-worktree-worker.md` — why a linked
@@ -160,3 +259,10 @@ stops covering the whole handler. Full evidence and the locked decisions:
   writes a real file, so it now flags the case.
 - `docs/history/docs-index-repo-root-fix/CONTEXT.md` — the full D1-D4
   decision trail behind the third case above.
+- `docs/how-to/compute-a-parallel-dispatch-wave-schedule.md` — the
+  `fgos schedule` instance of the `STORE_MISSING_WARNING_VERBS` gap that
+  the fourth case above generalizes from.
+- `docs/how-to/safely-reset-the-main-checkout.md` — a related but
+  distinct failure shape found in the same `tsk-5iv` review round: a
+  worktree-resolution bug where the resolved root was silently *wrong*
+  (not just an empty warning-worthy result).

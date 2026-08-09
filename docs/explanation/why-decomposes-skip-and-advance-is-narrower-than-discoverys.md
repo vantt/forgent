@@ -99,3 +99,40 @@ retry) also reads and reuses `planApproveVerify` on its own
 already-decomposed path — the real-verify fix isn't scoped only to the
 new skip branch; it closes the gap consistently across every stage-move
 this function performs.
+
+## Follow-up (`tsk-3ev`): the code is correct, but nothing warned a hand-driving session about it
+
+`releaseClaimOnExecuting()`, called on every path above that advances an
+item to `executing` (`decompose.mjs:488-494`, `claim-lock` §3b), is
+genuinely correct behavior — it releases the claim back to `todo` so the
+item is real again in `fgos-coding-driving`'s own loop, which does
+check a fresh claim status before invoking the `executing`-stage skill,
+exactly per its own hard rule. `tsk-3ev` found the gap wasn't in this
+code at all: **a session driving stage-by-stage by hand** — calling
+`fgos-code-implement` directly instead of returning to
+`fgos-coding-driving`'s loop after `decompose --verdict pass-through` —
+has no signal that its own claim was just silently released.
+
+**Real repro, on the same item this doc's own citation, `tsk-19j`,
+belongs to the same family as**: `tsk-vms` (2026-08-07). After `fgos
+decompose tsk-vms --verdict pass-through`, the item's status returned to
+`todo` while the session kept writing its own script/report and
+committing — with no active claim. The gap only surfaced later, at
+`fgos return`, which refused with `"is todo, not doing"`. Recovery
+required re-claiming (`fgos pick tsk-vms` again — the same branch/
+worktree was safely reused) before `return` could succeed. Named as a
+**process gap, not a code bug**: if a different session had picked the
+same item while it briefly sat unclaimed at `todo`/stage `executing` (a
+real, legitimate frontier candidate in that state), a genuine worktree/
+branch conflict could have resulted.
+
+**The fix**: an explicit warning line added to `fgos-validating/
+SKILL.md`'s own Handoff section (and `fgos-code-implement/SKILL.md`'s
+Orient step, both dual-root copies) — any driving path that does **not**
+go through `fgos-coding-driving`'s own loop must re-check the item's
+live status itself (it may already be back at `todo`) and re-claim
+before Implementing, rather than assuming the original `pick`'s claim
+stays valid across the whole `clarify → decompose → executing` span.
+This closes the gap at the documentation/process layer, since the
+underlying release-on-executing behavior itself is correct and stays
+unchanged.

@@ -164,6 +164,6 @@ Not applicable — no screen; this is a command-line/chat interaction surface.
 ## Pointers (implementation)
 
 - `repo/plugins/fgOS/.claude-plugin/plugin.json` — plugin manifest (name, description, version).
-- `repo/plugins/fgOS/skills/<verb>/SKILL.md` — one skill per verb (`submit`, `pick`, `move`, `return`, `ask`, `answer`, `ready`, `stale`, `rollup`, `check`, `graph`, `conflicts`); each wraps `node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs <verb> ...`.
+- `repo/plugins/fgOS/skills/<verb>/SKILL.md` — one skill per verb (`submit`, `pick`, `move`, `return`, `ask`, `answer`, `ready`, `stale`, `rollup`, `check`, `graph`, `conflicts`); each wraps `fgos <verb> ...`, resolved via the project-local `bin/fgos.mjs` when present, else a global PATH install of `fgos`, else a clear stated error (tsk-1no) — never a raw Node "Cannot find module".
 - `repo/bin/fgos.mjs` — the underlying CLI every wrapper shells out to; owns argument validation and all lifecycle enforcement.
 - `docs/specs/work-state.md` — the lifecycle/FSM meaning behind `move`/`return`/`ask`/`answer` and every other verb's business rules.

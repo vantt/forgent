@@ -36,10 +36,10 @@ function seedItem(dir, overrides = {}) {
   addWork(dir, {
     id: 'item-x',
     title: 'Produce the output file',
-    kind: 'behavior_change',
+    kind: 'feature',
     status: 'todo',
     deps: [],
-    risk: 'low',
+    risk: 'light',
     refs: [],
     verify: 'test -f output.txt',
     ...overrides,

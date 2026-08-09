@@ -67,6 +67,82 @@ themselves, and then "red" would just mean "the old tests still pass
 against old code," which proves nothing about whether the new
 implementation is what makes the new tests pass.
 
+## Watch out for: running `classifyIronLaw` before committing gives a false "not required" negative
+
+`tsk-2l0` found a real timing bug in `fgos-code-implement`'s own Execute-
+stage step 4: the skill instructed running the Iron Law check, but never
+said this had to happen *after* `git add`/`git commit` — and
+`classifyIronLaw`'s own `changedFiles()` reads the real committed diff.
+Reproduced live on `tsk-5cf`: running the check right after writing code
+but *before* committing returned `{"required": false, "matchedFlags":
+[], "matchedModules": []}`, because `changedFiles` came back empty —
+nothing had been committed yet on the branch beyond the parent's own
+`plan.md`-only commit. `fgos return` then proceeded with no Iron Law
+evidence doc at all.
+
+The false negative didn't stay hidden — `approve`'s own separate gate in
+`bin/fgos.mjs` re-runs `classifyIronLaw` against the real committed diff
+at merge time, and correctly reported `{"required": true,
+"matchedModules": [...]}`, refusing to merge without
+`--acknowledge-iron-law`. But by then the evidence-production window
+(step 2 above, get honestly to red before implementing) had already
+closed — the implementation was already committed and green, so
+producing real failing-test-first evidence meant a retroactive scramble:
+stashing the already-committed implementation to reconstruct the "red"
+state after the fact, exactly what happened on `tsk-5cf`. Worse, in a
+less careful session, this gap could tempt passing
+`--acknowledge-iron-law` with no real evidence backing it at all — a
+bare, unverified assertion silently defeating the whole failing-test-
+first proof requirement this gate exists to enforce.
+
+**The fix**: `fgos-code-implement`'s step 4 now says explicitly to run
+`classifyIronLaw` *after* `git add`/`git commit` (or otherwise ensure
+`changedFiles()` reflects the real diff), never right after writing code
+and before it's committed. Run the check too early in your own session
+and you'll get the same silent, plausible-looking false negative — worth
+double-checking `matchedModules`/`matchedFlags` are non-empty against
+your own knowledge of which files you touched, not just trusting an
+empty result at face value if you touched a module on
+`src/evolve/iron-law.mjs`'s `MODULE_RULES` list.
+
+## Watch out for: a guard test scoped by `git ls-files` silently skips its own uncommitted files
+
+`tsk-2cw` (renaming the pinned term "orchestrator" to "launcher") hit a
+different false-pass shape, this time in the guard test itself rather than
+in `classifyIronLaw`. `test/docs/launcher-vocabulary-guard.test.mjs`
+enumerates the files it scans via `git ls-files` — deliberately, so it only
+checks tracked prose, not scratch/build output. But `git ls-files` only
+sees what's already committed. On the first local run, two files the item
+itself had just created were still uncommitted: the new decision record
+(`docs/decisions/0028-doi-ten-orchestrator-thanh-launcher.md`) and the
+guard test file itself — and the guard test's own filename and prose
+*contain* the word "orchestrator" (it's a test *about* that word), so
+neither file had been added to the test's allowlist yet. `git ls-files`
+skipped both silently, so the NEGATIVE check passed — a false green, not a
+real one.
+
+The gap surfaced the moment those files were committed: `fgos return`'s
+goal-check failed on the branch (`"goal-check failed on branch
+\"fgw/tsk-2cw\" (exit 1)"`), and a retry later failed again on the staged
+merge (`"goal-check failed on staged merge (exit 1); merge aborted, main
+unchanged"`) — both real friction entries on the item's own capture,
+`errorClass: "verify-miss"`. Once committed, `git ls-files` now saw both
+files, the guard test correctly flagged "orchestrator" appearing in
+content it hadn't allowlisted, and the fix
+(`1538a6e`) was two lines: add both paths to the guard test's own
+allowlist, with the real reason recorded in the commit message ("git
+ls-files only sees tracked files, so the first, uncommitted test run
+silently skipped both").
+
+**The lesson**: any guard/vocabulary test that scopes itself via
+`git ls-files` (or an equivalent tracked-files-only listing) will not see
+files the current diff just created until they're committed — including,
+easy to miss, the guard test's own file if its own name or prose contains
+the very term it's checking for. Run the guard test *after* `git add`/
+`git commit`, the same ordering `classifyIronLaw`'s own false-negative
+lesson above already establishes, and treat a fully-green first local run
+as suspect (not proof) if the diff added any new tracked-prose files.
+
 ## Why this survives review even without re-running it
 
 A reviewer (human or a later session) reading `iron-law-evidence.md` gets

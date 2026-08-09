@@ -42,8 +42,9 @@ of it).
 | 3 | Distribution file allowlist | The exact set of paths shipped to anyone installing the package — everything else in the source repo is excluded | `bin`, `src`, `README.md`, `LICENSE`, plus the end-user documentation subset: the how-to guides directory, the design-rationale (explanation) directory, and the read-by-tag documentation index file | yes | — |
 | 4 | CLI entry points | The commands exposed once installed | `fgos` → runs `bin/fgos.mjs`; `fgos-runner` → runs `bin/fgos-runner.mjs` (the autonomous-loop runner, see spec Runner) | yes | — |
 | 5 | Dev checkout shell helper | An opt-in file, sourced from a contributor's own shell profile, exposing the same two CLI entry points from inside a checkout of the source repository — no install, no package fetch | one file, both commands | no (contributor's own choice) | not sourced automatically anywhere |
-| 6 | Local config staleness | Whether the local config file already has every setting the current default schema defines | up to date / missing one or more default settings | yes (computed, not stored) | — |
-| 7 | Doctor check | One named diagnostic `fgos doctor` reports on | not a fixed list — an extensible registry (`src/setup/registrations.mjs`'s `registerCheck`); any module can add its own check independently of registering a config-default or a fix (tsk-2cs D2). Today's registered checks: `node-version-and-git`, `shell-integration-sourced`, `config-not-stale`, `main-checkout-hook-wired`, `tool-registry-configured`, `root-drift`, `config-awareness`, `dependencies-installed`, `gate-bypass-configured`, `claude-plugin-marketplace`. The registry is open, but this list is not a snapshot — it names every registered check, and a module adding one updates this row in the same change | yes | — |
+| 5b | Global config file | `~/.fgos/config.json` — same schema as the project-local shared config file, initialized/kept current by `fgos setup` (tsk-1ri) the same way it already handles the project-local file; project always wins any key present in both (`mergeWithGlobalConfig`, `src/config/global-config.mjs`) | one file, home-dir-relative | no (optional; a missing file is not an error, resolves to `{}`) | not created by anything except `fgos setup` |
+| 6 | Config staleness | Whether a config file (project-local or global — same computation, tsk-1ri) already has every setting the current default schema defines | up to date / missing one or more default settings | yes (computed, not stored) | — |
+| 7 | Doctor check | One named diagnostic `fgos doctor` reports on | not a fixed list — an extensible registry (`src/setup/registrations.mjs`'s `registerCheck`); any module can add its own check independently of registering a config-default or a fix (tsk-2cs D2). Today's registered checks: `node-version-and-git`, `shell-integration-sourced`, `config-not-stale`, `main-checkout-hook-wired`, `tool-registry-configured`, `root-drift`, `config-awareness`, `dependencies-installed`, `gate-bypass-configured`, `claude-plugin-marketplace`, `plugin-skill-cli-reachable`, `changelog-unreleased-stale`, `work-classification-vocabulary`. The registry is open, but this list is not a snapshot — it names every registered check, and a module adding one updates this row in the same change | yes | — |
 | 7b | Doctor fix | One named repair `fgos doctor --fix` can run before re-reporting checks | not a fixed list — an extensible registry (`registerFix`), independent of `registerCheck`/`registerConfigDefault` (tsk-2cs D2). Today's registered fixes: `gate-bypass-configured` (tsk-2qz, the registry's first entry to register all three capabilities at once), `claude-plugin-marketplace` (tsk-4xg). Same rule as #7: the registry is open, but this list names every registered fix and a module adding one updates this row in the same change | yes | — |
 | 8 | Output rendering mode | How `fgos setup`/`fgos doctor` present their result | enveloped JSON (every other verb's shape, unchanged) / colored plain text (`--pretty`) | yes | enveloped JSON |
 
@@ -123,18 +124,27 @@ of it).
 - **What changes:** for every shell profile the caller actually has (bash's
   and/or zsh's, whichever exist), the shell helper's source line is added
   if not already present — never duplicated on a repeat run. The local
-  config file is also brought up to date: any setting present in the
-  current default schema but missing from the caller's file is added,
+  project config file is also brought up to date: any setting present in
+  the current default schema but missing from the caller's file is added,
   without ever changing a setting the caller already customized; a config
-  file that already has every current default is left untouched.
-- **Side effects:** the caller's own shell profile file(s) and local config
-  file may be modified; nothing outside the caller's own environment is
-  touched, and no network access happens.
+  file that already has every current default is left untouched. The same
+  fill-missing-only treatment is applied to the **global** config file
+  (`~/.fgos/config.json`, tsk-1ri) — `fgos setup` initializes it with the
+  same default schema the project-local file gets, or fills in any missing
+  key, every time it runs, regardless of which project it's run from;
+  a value the caller already customized at the global level is never
+  overwritten.
+- **Side effects:** the caller's own shell profile file(s), local project
+  config file, and global config file (`~/.fgos/config.json`) may be
+  modified; nothing outside the caller's own environment is touched, and
+  no network access happens.
 - **Afterwards:** the caller sees exactly what changed — which profile
-  file(s) gained the source line (or already had it), and which config
-  settings were newly added (or that none were needed). Nothing is done
-  silently; running `fgos setup` again when everything is already current
-  reports that plainly, without repeating any change.
+  file(s) gained the source line (or already had it), which project config
+  settings were newly added (or that none were needed), and which global
+  config settings were newly added (or that none were needed, or that the
+  global file was just created). Nothing is done silently; running `fgos
+  setup` again when everything is already current reports that plainly,
+  without repeating any change.
 
 ### Doctor
 
