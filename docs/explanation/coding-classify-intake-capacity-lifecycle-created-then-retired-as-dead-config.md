@@ -2,7 +2,7 @@
 type: explanation
 title: The coding-classify-intake capacity's full lifecycle — created, never wired, retired as dead config
 tags: []
-source_capture_ids: [tsk-3fj]
+source_capture_ids: [tsk-3fj, tsk-4fk]
 ---
 # The coding-classify-intake capacity's full lifecycle — created, never wired, retired as dead config
 
@@ -37,6 +37,38 @@ The rename itself deliberately deferred fixing the one real consumer that
 still referenced the capacity by its old name
 (`.claude/skills/fgos-submit-assist/SKILL.md`'s classify step) to a
 sibling item, rather than trying to land both in the same change.
+
+## Step 1a (`tsk-4fk`): the rename itself left one test assertion stale
+
+Despite `tsk-3fj`'s own plan declaring `test/runner/dispatch.test.mjs` as
+part of its footprint, the rename commit (`a61651d`) landed with the
+test's capacity-name assertion unfixed — line 643 still asserted
+`cfg.capacities['submit-assist-classify']`, a key the same commit had
+just renamed out of `.fgos/config.json`:
+
+> "commit a61651d renamed the .fgos/config.json runner capacity from
+> submit-assist-classify to coding-classify-intake, but never updated
+> this test file's assertion, which still checks
+> cfg.capacities['submit-assist-classify']. Confirmed live: main's
+> committed .fgos/config.json has capacities keys judge-discovery,
+> judge-decompose, coding-classify-intake (no submit-assist-classify) --
+> the test asserts on a name that no longer exists."
+> — real work item description, id `tsk-4fk`
+
+This was found as a side effect of an unrelated operation
+(`fgos sync-root tsk-19y`, resyncing a different root branch for
+`tsk-4n7`'s own close-out) — the same "discovered while doing something
+else, confirmed as a real pre-existing red rather than assumed" shape
+`tsk-2uo`'s launcher-vocabulary-guard fix and `tsk-53n`'s narrowed verify
+both hit independently around the same time
+(`docs/how-to/allowlist-a-historical-mention-in-launcher-vocabulary-guard.md`,
+`docs/how-to/fix-fgos-write-rejected-merge-block.md`'s `tsk-53n` example).
+The fix updated the test's assertion (and its literal capacity-name
+comments) to check `coding-classify-intake` instead, keeping the same
+field-shape assertions the original test already had (`kind: cli`,
+`adapter: cli-spawn`, `tier: light`, `allowCrossProvider: true`, args
+template) — a same-day self-correction, not a separate discovery further
+down the capacity's life.
 
 ## Step 2 (`tsk-4ns`): the deferred consumer fix became a removal instead
 
