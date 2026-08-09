@@ -63,6 +63,7 @@ site.
 | 8 call sites in discovery.mjs/decompose.mjs | Low — one literal field added per call, no signature change | Existing `test/intake/discovery.test.mjs` + `test/intake/decompose.test.mjs` (already assert decision-trail shape per decompose.test.mjs's own tsk-6b6 comment) |
 | `runner/loop.mjs`'s `runWatch` — flagged HIGH by `impact()` as a depth-2 upstream caller (via `resolveDiscovery`/`resolveDecompose`), **not** in the item's declared footprint | Low, argued not tested: grepped `runner/loop.mjs` for any `decision`/`kind` handling — the only `decision`/`kind` identifiers there belong to an unrelated claim-arbitration concept (`claimRoot`'s `decision.action`), not the decision-log payload. `runWatch` treats `resolveDiscovery`/`resolveDecompose` as black boxes. | No new test needed; existing `test/runner/loop.test.mjs` stays green as a smoke check since the two functions it calls keep their same signature |
 | Citation-check regex (file:line / seq / measurement) | Medium — a hand-rolled heuristic can over/under-match | Dry-ran against the real `.fgos/state.json`: 596/665 (90%) post-2026-08-01 design decisions have no detectable citation under this regex — see Decision below for why this is reporting-only, not a blocking gate |
+| Verify script's own `.fgos/state.json` path | **Confirmed broken as originally written (fgos-validating found this, round 1)** — `fgos return` runs verify inside a disposable, detached worktree (`bin/fgos.mjs:2434-2453`, `runGoalCheck`, `src/runner/goal-check.mjs:33-36`), which never carries its own `.fgos/` (ADR0020). A relative `.fgos/state.json` read throws `ENOENT` there regardless of the actual `kind`/citation logic — reproduced directly: running the item's own originally-submitted verify snippet from inside this worktree throws exactly that. Fixed by resolving the real path via `git rev-parse --path-format=absolute --git-common-dir` inside the script itself, then reading `<that-dir's-parent>/.fgos/state.json` — re-ran the fixed script from this same worktree and it correctly reads state.json and reports counts (no ENOENT). | Command actually run twice: once reproducing the ENOENT, once confirming the git-common-dir-resolved fix reads real data and reports `1410` decisions post-2026-08-01, `0` currently carrying `kind` (expected — the field doesn't exist in shipped code yet, so this is the correct RED-before-GREEN state) |
 
 **Decision (made in this planning pass, confirmed with the product owner):**
 the "rationale must cite verifiable evidence" requirement is implemented as
@@ -114,12 +115,22 @@ item if warranted — never silently dropped, recorded here so it is not lost.
    non-blocking citation count from the Decision above:
 
    ```bash
-   node --test test/state/store.test.mjs test/intake/discovery.test.mjs test/intake/decompose.test.mjs && node -e "import(\"./src/state/store.mjs\").then(async()=>{const fs=await import(\"node:fs\");const s=JSON.parse(fs.readFileSync(\".fgos/state.json\",\"utf8\"));const CITATION=/([\\w.\\/-]+\\.(mjs|js|ts|md|json):\\d+)|(\\bseq\\b[^a-zA-Z]{0,3}\\d+)|(\\d+(\\.\\d+)?\\s?%)|(\\b\\d+[\\d,.]*\\s*(files?|records?|b[aả]n|tokens?|d[oò]ng|k[yý]\\s?t[uự]))/i;const d=s.decisions.filter(x=>x.ts>\"2026-08-01\");const noKind=d.filter(x=>!x.kind);const uncited=d.filter(x=>x.kind!==\"engine\"&&!CITATION.test(x.rationale||\"\"));console.log(\"post-2026-08-01: \"+d.length+\" decisions, \"+uncited.length+\" design decision(s) without a detectable citation (reporting only, not blocking)\");if(noKind.length)throw new Error(noKind.length+\" decision sau 2026-08-01 thieu truong kind\")})"
+   node --test test/state/store.test.mjs test/intake/discovery.test.mjs test/intake/decompose.test.mjs && node -e "const cp=require('child_process');const fs=require('fs');const path=require('path');const gitCommonDir=cp.execSync('git rev-parse --path-format=absolute --git-common-dir',{encoding:'utf8'}).trim();const stateFile=path.join(path.dirname(gitCommonDir),'.fgos','state.json');const s=JSON.parse(fs.readFileSync(stateFile,'utf8'));const CITATION=/([\\w.\\/-]+\\.(mjs|js|ts|md|json):\\d+)|(\\bseq\\b[^a-zA-Z]{0,3}\\d+)|(\\d+(\\.\\d+)?\\s?%)|(\\b\\d+[\\d,.]*\\s*(files?|records?|b[aả]n|tokens?|d[oò]ng|k[yý]\\s?t[uự]))/i;const d=s.decisions.filter(x=>x.ts>'2026-08-01');const noKind=d.filter(x=>!x.kind);const uncited=d.filter(x=>x.kind!=='engine'&&!CITATION.test(x.rationale||''));console.log('post-2026-08-01: '+d.length+' decisions, '+uncited.length+' design decision(s) without a detectable citation (reporting only, not blocking)');if(noKind.length)throw new Error(noKind.length+' decision sau 2026-08-01 thieu truong kind')"
    ```
 
-   Only the `noKind` check throws — byte-identical failure condition and
-   error message to the item's own originally-submitted `verify`. The
-   citation count is a `console.log`, never a throw.
+   **Round-2 fix (fgos-validating found this):** the item's own
+   originally-submitted verify read `.fgos/state.json` via a bare relative
+   path. `fgos return` runs verify inside a disposable, detached worktree
+   (`bin/fgos.mjs:2434-2453`'s `runGoalCheck`,
+   `src/runner/goal-check.mjs:33-36`) that never carries its own `.fgos/`
+   (ADR0020) — reproduced directly: the original snippet throws `ENOENT`
+   when actually run from a worktree. The script above instead resolves the
+   real path via `git rev-parse --path-format=absolute --git-common-dir`
+   first — re-ran from this item's own worktree and confirmed it reads
+   state.json correctly (no ENOENT) and reports real counts. The `noKind`
+   check still throws with the same message/condition as originally
+   submitted; only the path resolution changed. The citation count is a
+   `console.log`, never a throw.
 
 **No split.** Single cohesive piece: one field, 8 call-site edits, 2 new
 unit tests, one expanded verify command. Splitting would just add
