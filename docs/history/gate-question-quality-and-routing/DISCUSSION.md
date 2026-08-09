@@ -604,6 +604,70 @@ vẫn lọt — tất cả đều **không khai `source`**, và có cả D-ID th
 `store.mjs:835` `appendEvent({type:'decision'})` không cưỡng chế, nên bất cứ ai gọi thẳng store
 facade đều lách được validation của CLI.
 
+### K. S4 và S6 đo lại (vòng 12b) — S4 mất một nửa, S6 co lại còn 11%
+
+**S4 gồm HAI vế, và chỉ một vế chết.** Vòng 2 phát biểu:
+
+> *"Không có liên kết câu hỏi ↔ câu trả lời — hai ô độc lập trên cùng object, không id, không con
+> trỏ. **(a)** … Hỏi đè trước khi người kịp trả lời ⇒ câu trả lời gắn vào câu hỏi mới trong khi
+> người đang đọc câu cũ **(b)**."*
+
+**S4(b) — race — chưa từng xảy ra. Chết.**
+
+Đo trên toàn bộ 314 lượt hỏi: **0 lần** một `ask` ghi đè khi chưa có `answer`. Không phải may —
+**status FSM đã chặn sẵn**:
+
+```
+todo/doing --ask--> awaiting-human --answer--> todo/doing
+```
+
+Item đang `awaiting-human` **rời khỏi frontier**; không session nào pick lên để hỏi đè. Muốn hỏi
+lần hai phải về `doing`, mà đường duy nhất về là **qua một câu trả lời**.
+
+S4(b) là mối nguy lý thuyết **đã được chặn ở tầng khác** (status FSM, không phải lược đồ gate). Nó
+được ghi thành vấn đề ở vòng 2 vì đọc code fold (`replay.mjs:202,215` — hai ô độc lập, không id
+liên kết) mà **không kiểm FSM có cho phép kịch bản đó không**. Cùng mô-típ "phát biểu trước, kiểm
+sau" đã lặp nhiều lần trong phiên.
+
+**S4(a) — thiếu liên kết — vẫn đúng, nhưng hệ quả nhẹ hơn nhiều.**
+
+`gates[id]` vẫn không nối `ask` với `answer`: nhìn vào `tsk-48i` (23 câu hỏi trong `askHistory`,
+một ô `answer`) thì không biết câu trả lời đang trả lời câu nào.
+
+Nhưng vì luồng chạy **tuần tự nghiêm ngặt** (chính FSM ép vậy), **vị trí ngụ ý cặp đôi** — câu trả
+lời ngay sau một câu hỏi là trả lời câu đó, ghép lại được từ event log bằng thứ tự `seq`.
+
+Nên S4(a) không phải *"mất thông tin"* mà là *"bản chiếu làm rơi thứ log đang có"* — **cùng loại
+với S3 và S8**, thuộc nhóm hạ tầng cho UI chưa vẽ, không phải nhóm đau hôm nay.
+
+**Tự sửa (vòng 12b):** lượt đầu tôi kết luận *"gỡ S4, còn 9 vấn đề"* — **quá mạnh**. Tôi giết cả
+vế (a) trong khi chỉ chứng minh được vế (b) sai. Vẫn **10 vấn đề**; S4 mất một nửa và nửa còn lại
+đổi nhóm.
+
+**S6 — đúng, nhưng phạm vi co lại còn ~11%.**
+
+`ask` vẫn là văn xuôi tự do không có trường `kind`, và mọi hệ quả dây chuyền vẫn đúng. Nhưng **D4
+đã đổi mẫu số**:
+
+| Kênh | Lượt (sau khi gỡ judge) | S6 áp dụng? |
+|---|---|---|
+| `gate-approve` | **48** | ❌ yes/no **theo cấu trúc** — không có gì để "gõ kiểu" |
+| `ask` | **6** | ✅ đúng chỗ S6 nói |
+
+S6 nhắm **6/54 = 11%** gánh nặng, không phải toàn bộ như vòng 2 giả định.
+
+**Phân loại S1–S10 sau hai phép đo này:**
+
+| Nhóm | Thành viên |
+|---|---|
+| **Đau hôm nay** | **S2, S5** — và cả hai sửa được **không** đụng lược đồ event |
+| Hạ tầng cho UI chưa vẽ | S3, S8, S9, S10 |
+| Đã co lại | S1, S7, **S6** (xuống 11%) |
+| ~~Chỉ đau khi có consumer~~ | ~~S4~~ → **đã bị FSM chặn, gỡ khỏi danh sách** |
+
+**Còn 9 vấn đề, không phải 10.** Q8 = hoãn càng vững: trong 9 cái còn lại chỉ 2 đau hôm nay, và cả
+hai không cần chạm lược đồ event append-only.
+
 ### Chưa rõ — cần bàn
 
 | # | Câu hỏi mở | Vì sao chưa quyết được |
@@ -1434,26 +1498,38 @@ hiện nó đã được sửa. Chi tiết §3 "Bị lật ở vòng 6".
 - **Dùng ngược làm công cụ:** vẽ màn hình trước, không code — bản vẽ sinh ra đặc tả cho tầng 0.
 - **Chưa submit** — chờ tầng 0.
 
-### ⭐ Chưa có item · Làm sạch vùng máy (D7 bước 1–4) {#task-clean-machine-zone}
+### ⭐ `tsk-1ud` · Làm sạch vùng máy (D7 bước 1+3) {#task-clean-machine-zone}
 
 - **Mục tiêu:** đưa `state.decisions` đủ sạch để skill đọc thay `CONTEXT.md`. Bốn luật ở §6
   "Hợp đồng hai vùng".
 - **D-ID áp dụng:** **D7** (seq 10187).
 - **Số đo nền:** 1.711 bản · 592 (35%) ghi-sổ máy móc · 130/1.119 (12%) thiếu `rationale` ·
   median 288 ký tự (~82 token) — kích thước **đã đúng**, chỉ cần lọc tạp và siết bằng chứng.
-- **Lỗ hổng cưỡng chế phải vá:** `store.mjs:835` `appendEvent({type:'decision'})` không cưỡng chế
-  `rationale`; CLI khai bắt buộc nhưng gọi thẳng store facade thì lách được.
-- **Là CỔNG cho:** `#task-wire-machine-zone` bên dưới. Không xong thì không được nối.
-- **Chưa submit.**
+- **⚠️ ĐÍNH CHÍNH (seq 10223):** rationale của D7 nói *"`store.mjs:835` không cưỡng chế
+  `rationale`"* — **sai**. `addDecision` (`store.mjs:826-838`) **có** validate, throw
+  `StoreError('validation')` khi `text`/`rationale` rỗng, và tự set `source: 'session'`. Grep toàn
+  repo: `type:'decision'` xuất hiện **đúng một chỗ**. 130 bản thiếu `rationale` đều từ 2026-07-16
+  → 07-29, **zero sau 2026-08-01** ⇒ di sản, không phải lỗ hổng đang mở.
+  **Hệ quả: bước 2 của D7 không còn việc gì phải làm** — item chỉ còn bước 1 và 3.
+- **Là CỔNG cho:** `tsk-3uw` bên dưới. Không xong thì không được nối.
+- **Bẫy phải tránh:** tách engine bằng **khớp-prefix-chuỗi** chính là lỗi S2 mà cụm này đang phê
+  phán (`gate.ask.includes(<literal>)`, `decompose.mjs:638,646`). Dùng một trường thật.
+- **Nguồn ghi engine:** `discovery.mjs:151,166,274` · `decompose.mjs:141,552`.
+- **✅ Đã submit `tsk-1ud`** — mô tả 4.293 ký tự, footprint 3 file.
 
-### Chưa có item · Nối skill vào vùng máy (D7 bước 5–6) {#task-wire-machine-zone}
+### `tsk-3uw` · Nối skill vào vùng máy (D7 bước 5+6) {#task-wire-machine-zone}
 
 - **Mục tiêu:** `fgos-planning`/`fgos-validating` đọc quyết định từ `state.decisions` thay vì parse
   `CONTEXT.md`. Cắt ~1.900 token mỗi lượt.
 - **Phụ thuộc CỨNG:** `#task-clean-machine-zone` phải xanh trước. Nối sớm = agent nhận 35% nhiễu.
 - **Kéo theo:** `CONTEXT.md` được giải phóng — viết narrative, thoáng, markdown đầy đủ, dài tuỳ nội
   dung, mở dần theo tiến trình. Đây là thứ web UI render sau này, không cần xây thêm gì.
-- **Chưa submit.**
+- **Rủi ro phải xử lý:** nếu `state.decisions` thiếu một quyết định mà `CONTEXT.md` có, skill mất
+  thông tin **im lặng**. Cần đối chiếu: mỗi D-ID trong `CONTEXT.md` phải có một bản ghi decision.
+  `fgos-coding-shaping` §4 đã yêu cầu điều này (*"never deferred to the terminal handoff"*) nhưng
+  **chưa ai kiểm**.
+- **✅ Đã submit `tsk-3uw`** — mô tả 3.698 ký tự, `deps: [tsk-1ud]` (phụ thuộc **cứng**, đã khai
+  thành dữ liệu chứ không phải văn xuôi — đúng bài học từ ca #1/#7 ở §3-E).
 
 ### Chưa có item · Lược đồ gate — tầng 0 {#task-gate-schema}
 
