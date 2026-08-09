@@ -108,6 +108,11 @@ không mở lại những quyết định các item khác đã khoá.
 | 38 | 11 capability của hn xếp đâu | **Đề nghị** (vòng 11) | **T4 phía cung**, không ngang `gather`/`judge` (thuộc tính của nhà cung cấp, không của một lần dispatch). Cũng **không ngang `gitnexus`**: cả 11 tả **chính cái sổ**, do harness CLI tự khai qua `query.contract`. Ô tương ứng của fgOS — *sổ tự khai năng lực + dải schema* — **đang trống**, latent thật vì global/project install có thể lệch version. §6.5 |
 | 34 | Ô "mục tiêu ngoài sổ" đã có tên | **Đang hội tụ** (vòng 10) | **`errand`** — quét sạch 0 hit ở `src/`, `docs/`, `upstreams/`. Bác `cell` (false friend: bee's cell CÓ claim/reservation/registry) và `packet` (kéo theo khung *"orthogonal axes"* D1 đã bác). Bốn phép thử ở §6.3, sắc nhất: **không sở hữu branch/merge riêng**. Vẫn gated `tsk-2t6` |
 | 35 | `capacity` rút về một nghĩa | **CHỐT → D8** (vòng 18; bản P1 vòng 10 đã bị thay bởi P1′ vòng 15) | Một nghĩa = **năng lực có tên của fgOS**, cặp *behavior-promise / functional-helper* (= D2 + D1 đọc thành định nghĩa). `capacities.<id>` là **bản khai**, không phải bản thân nó; `binding` là **cạnh** T3→T4. Bản P1 đầu sai vì bỏ mất lời hứa hành vi mà không cất vào đâu. `0026` **làm rõ**, không lật |
+| 49 | `provider` xếp sai | **Rõ, ĐÃ SỬA** (vòng 19) | Là **chrome** (nhãn log), không phải danh tính T4 — cổng cross-provider **cố ý không đọc** nó (`dispatch.mjs:570`), nó đọc `executor.command`. Và mang **hai nghĩa**: nhãn hiển thị vs `{providers}` của `tool query`. Bệnh cũ lần thứ **sáu**. §6.14 |
+| 50 | Status token của bee | **Đề nghị: LẤY** (vòng 19) | Là hợp đồng trả về của **`errand`**, không phải của `work`: `work` báo bằng đổi state vì **có sổ**; `errand` **không có sổ** nên buộc phải trả về. Khép kín đối xứng T2. §6.14 |
+| 51 | `digest` bắt buộc `file:line` anchor | **Đề nghị: LẤY** (vòng 19) | Không phải chữ mới — **siết hợp đồng `digest`** của D2. Đi kèm `tsk-2ie5`. Quét: 1 hit prose duy nhất |
+| 52 | Degrade ladder Inactive/Degraded/Full | **Đề nghị: LẤY** (vòng 19) | 0 hit trong code, chỉ prose `CLAUDE.md`. **D6 làm nó bắt buộc**: `needs: X` ⇒ resolver phải trả lời "mấy provider của X present" — đúng ba mức. Xếp **TG**, gộp theo capability không theo tên tool |
+| 53 | `lane` của hn | **Đề nghị: KHÔNG LẤY** (vòng 19) | fgOS đã có trục nghi thức trong `tier`; `tsk-503` **cố ý** Path B. Lấy `lane` = mở lại quyết định đã khoá mà **không có áp lực sống** nào đòi |
 | 46 | Ranh giới ngoài cùng của tầng dispatch | **Đề nghị** (vòng 17) | Phép thử: **input đã nằm trong context bên gọi chưa**. Rồi ⇒ **không phải dispatch**, là suy nghĩ của chính session. Cổng chính thức: bốn lý do hợp lệ (`_shared/capacity-dispatch-fallback.md`); trượt cả bốn thì ở lại inline. §6.13 |
 | 47 | Phân loại có phụ thuộc domain không | **Rõ** (vòng 17) | **Tách hai**: trục (to cỡ nào / loại gì / sai thì sao) **agnostic**; rubric + từ vựng **domain sở hữu**. Cùng khuôn `0027` D2/D3 (`statusCategory` agnostic + `DOMAINS[domain].statusLabels`). Lỗ hổng: `DOMAINS` không khai từ vựng phân loại ⇒ `TIERS` enum global cứng, `kind`/`risk` thả tự do. **Ba ca sống** ghi ở §6.13 |
 | 48 | Hai item đã mở | **Rõ** (vòng 17) | `tsk-5wz` (tối ưu intake, dời soul-pass về sau clarify, trả phân loại cho domain) và `tsk-2ie5` (đưa gather vào cơ chế capacity — mẫu vật cross-provider thật). Cả hai `deps: tsk-5td`; `tsk-5wz` mang `mergeAfter: tsk-2ie5` để bước rút dispatch không land trước khi có thứ thay thế |
@@ -747,6 +752,20 @@ functional-helper* là người dùng chọn — và nó chính là D2 + D1 đ�
 
 **Bước 5 được mở khoá:** D7 và D8 cùng sửa một mục định nghĩa của `0026` ⇒
 **một** decision doc supersede, không phải hai. Tiền lệ `0028`.
+
+### Vòng 19 — 2026-08-09 — rà nốt kho, và bắt một chỗ tự xếp sai
+
+Bốn món cuối trong kho bee/hn, cộng chữ `provider` vốn được đánh dấu là chỗ
+mỏng nhất bảng 23 chữ. Hoá ra không mỏng mà **sai**: `provider` là **chrome**
+(nhãn log), và cổng cross-provider **cố ý không đọc nó**. Bệnh
+một-chuỗi-hai-nghĩa lần thứ **sáu**.
+
+Món đáng giá nhất: **status token lấp đúng ô hợp đồng trả về của `errand`**.
+Lý do rơi ra khi xếp: `work` **có sổ** nên báo bằng đổi state; `errand`
+**không có sổ** nên **buộc** phải trả về một cái gì. D2 trước nay chỉ cho
+nhánh helper hợp đồng trả về; giờ đối xứng T2 khép kín.
+
+Chi tiết cả năm ở §6.14.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -1503,6 +1522,79 @@ tự do**. Vừa quá cứng vừa quá lỏng.
 Ba lần liên tiếp, không ai chặn. Đây là lỗ đang chảy, không phải rủi ro lý
 thuyết.
 
+### 6.14 Rà kho bee/hn — bốn món cuối, và một chỗ xếp sai [ĐỀ NGHỊ — vòng 19]
+
+#### `provider` — xếp sai ở bản trước, sửa
+
+Bảng §6.10 hàng 11 từng ghi *"`provider` = vendor, dùng cho luật
+cross-provider"*. **Sai.** `dispatch.mjs:570` tự khai:
+
+> gating checked on the resolved `command` (**never** on `capacity.kind` alone,
+> and **never on `provider`**) … `provider` is a **freely-overridable display
+> alias**, not the command actually spawned
+
+`:777` — `provider: executor.provider ?? executor.command` — chỉ để in log
+(`loop.mjs:742`: `capacityId — provider — model`).
+
+⇒ `provider` là **chrome**, không phải danh tính phía cung. Và là **lần thứ
+sáu** của bệnh một-chuỗi-hai-nghĩa:
+
+| chỗ | nghĩa |
+|---|---|
+| `capacities.<id>.provider` | nhãn hiển thị, tự do ghi đè, **không ai kiểm** |
+| `fgos tool query` → `{providers: [...]}` | tool **đã đăng ký** thoả một capability — danh tính thật |
+
+**Phép thử `provider` vs `tool`:** `tool` **probe được sự tồn tại**;
+`provider` (nghĩa 1) chỉ là chuỗi in ra màn hình — ghi sai cũng không ai biết.
+
+#### Status token — **LẤY**, và nó lấp đúng ô hợp đồng trả về của `errand`
+
+D2 mới cho hợp đồng trả về của **nhánh helper**. Nhánh mục-tiêu đang trống, và
+lý do lộ ra ngay khi xếp:
+
+| T2 | trả về gì |
+|---|---|
+| `work` | **không trả gì** — báo bằng cách **đổi state của chính nó**; nó **có sổ** để đọc |
+| `errand` | **buộc phải trả về** — nó **không có dòng nào** trong `events.jsonl`, không ai đọc state được |
+| `gather` | `digest` |
+| `judge` | `verdict` |
+
+⇒ **`[DONE]`/`[BLOCKED]`/`[HANDOFF]`/`[NOOP]` là hợp đồng trả về của
+`errand`**, không phải của `work`. Đối xứng T2 khép kín. bee dùng token cho
+execution worker vì worker cũng không phải backlog item — **cùng một lý do**.
+
+#### `digest` bắt buộc có `file:line` anchor — **LẤY**, không phải khái niệm mới
+
+Quét: **1 hit duy nhất**, `fgos-researching/SKILL.md`. Prose một chỗ, chưa
+thành cơ chế. Nó là **siết hợp đồng `digest`** mà D2 đã đặt, không phải chữ
+mới. Xếp: đi kèm `tsk-2ie5` khi gather vào cơ chế — digest không anchor =
+digest hỏng, cùng cách bee xử (*"missing delimiters or an empty digest is a
+failed run, surfaced loudly, never accepted as a silent green"*).
+
+#### Degrade ladder Inactive/Degraded/Full — **LẤY**, và D6 vừa làm nó bắt buộc
+
+Quét: **0 hit trong code**; chỉ sống ở prose `CLAUDE.md`.
+
+Trước D6 nó là lời khuyên cho agent đọc. **Sau D6 nó thành giá trị trả về của
+resolver**: bên cầu khai `needs: X` thì resolver **buộc** phải trả lời *"có mấy
+provider của X đang present"*, và câu trả lời có đúng ba mức:
+
+| | |
+|---|---|
+| **Inactive** | 0 provider đăng ký ⇒ skip sạch, **không phải drift** |
+| **Degraded** | có đăng ký nhưng không present, hoặc present mà `stale` ⇒ chạy tiếp, cờ proof yếu |
+| **Full** | present, vừa kiểm ⇒ luật áp đúng như viết |
+
+Xếp: **TG (cổng gác)** — nó là **tên của kết quả** cổng presence trả về, gộp
+theo **capability**, không theo tên tool.
+
+#### `lane` của hn — **KHÔNG LẤY**
+
+hn dùng `lane` cho *nấc nghi thức, scale bằng cấu trúc file*. fgOS đã có trục
+đó trong `tier`, và `tsk-503` **cố ý** chọn Path B (giữ hai nghĩa, không tách
+field). Lấy `lane` = mở lại một quyết định đã khoá **mà không có áp lực sống
+nào đòi**. Ghi rõ lý do không lấy, không phải bỏ qua im lặng.
+
 ### 6.10 Toàn bộ 23 chữ, đã xếp
 
 | # | Chữ | Tầng | Nghĩa một dòng | Phép thử phân biệt |
@@ -1519,7 +1611,7 @@ thuyết.
 | 8 | `capacity` | **T3** | **năng lực có tên của fgOS** — *behavior-promise / functional-helper* | có **tên** và **tái dùng được**; một instance sinh lúc chạy thì không |
 | 9 | `capability` | T4 | **lời hứa** của phía cung | nhiều tool cùng hứa được một capability |
 | 10 | `tool` | T4 | một nhà cung cấp đã đăng ký | có bản ghi trong registry |
-| 11 | `provider` | T4 | **vendor** (claude/agy) | đổi provider mà lớp T2 không đổi |
+| 11 | `provider` | **chrome** (không phải T4) | **nhãn hiển thị** trong log — `executor.provider ?? executor.command`, tự do ghi đè | cổng cross-provider **cố ý KHÔNG đọc** nó (`dispatch.mjs:570`); nó đọc `executor.command`. ⚠ chuỗi này còn mang nghĩa thứ hai ở `tool query` → `{providers}` = tool đã đăng ký (danh tính thật) |
 | 12 | `kind` | T4 | **loại nhà cung cấp** — nó nằm ở đâu | quyết định cách probe |
 | 13 | `executor` | T4 | thứ thật sự chạy = cổng + tải | — |
 | 14 | `adapter` | T4 | **cổng** bắc sang nhà cung cấp ngoài | một cổng phục vụ nhiều `kind` |
