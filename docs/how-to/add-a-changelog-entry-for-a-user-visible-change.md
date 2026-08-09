@@ -2,7 +2,7 @@
 type: how-to
 title: How to add a CHANGELOG.md entry for a user-visible change
 tags: []
-source_capture_ids: [tsk-469]
+source_capture_ids: [tsk-469, tsk-3ip]
 ---
 # How to add a CHANGELOG.md entry for a user-visible change
 
@@ -61,6 +61,38 @@ gets forgotten; it does not replace the step itself.
 5. **Do not bump the version or cut a release.** Moving entries out of
    `## [Unreleased]` into a new version heading (e.g. `## [0.2.0]`) is a
    separate, manual release-cut step, out of scope for adding an entry.
+
+## How you'll be reminded if you forget
+
+Nothing blocks a merge for a missing changelog entry, and nothing decides
+*for* you whether a change deserved one — but a real observe/remind
+mechanism now exists so a forgotten entry doesn't go unnoticed forever:
+
+- **`fgos doctor`** runs a `changelog-unreleased-stale` check: passes
+  when `## [Unreleased]` has at least one real `- ` bullet, and when
+  `CHANGELOG.md` doesn't exist at all (a project that hasn't adopted a
+  changelog yet is a normal state, never an error). It fails — reminder
+  only — when the section is present but empty:
+
+  > "## [Unreleased] has no pending entries -- reminder only: add a line
+  > here when your next user-visible change merges (never blocks merge)"
+  > — real check message, `changelog-unreleased-stale`,
+  > `src/setup/registrations.mjs`
+
+- **`fgos check`** surfaces the same read as a `changelogNag` field
+  (`{fileExists, hasEntries, deliveredCount}`), and appends one data
+  point per check run to `.fgos/changelog-nag-history.jsonl` — a real,
+  accumulating counter, not a per-merge popup. At roughly 25 items
+  reaching `delivered` per day (measured against `.fgos/events.jsonl`,
+  2026-08-01 through 2026-08-08), a nag that fired per merge would be
+  ~176 interruptions a week; this mechanism deliberately counts instead
+  of nagging on every single merge.
+
+This mechanism is structural only: it checks for the presence of a
+bullet line, never whether a given change actually deserved one, never
+writes the entry's content, and never blocks anything. Judging
+changelog-worthiness and generating entry text both stay explicitly
+undecided, tracked separately from this observe/remind step.
 
 ## What's out of scope here
 
