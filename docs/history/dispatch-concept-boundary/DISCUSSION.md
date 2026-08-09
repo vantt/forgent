@@ -27,6 +27,26 @@ tách rõ *cái gì tự xếp được* khỏi *cái gì chỉ người quyết
 > chỉ cần khi muốn nguyên văn Q&A một vòng cụ thể. §6 ghi rõ độ chín từng mục
 > ([KHOÁ] / [HỘI TỤ] / [HỞ]) vì phần lớn nội dung ở đó **chưa mint**.
 
+**Bàn giao đã lắp xong (vòng 27).** Bảy item đều mang `refs` trỏ **thẳng vào
+anchor §7 của riêng nó**, không trỏ cả file — nên một session lạnh `/fgOS:pick`
+bất kỳ item nào là rơi đúng vào phần nó cần đọc:
+
+| Item | Anchor | Trạng thái |
+|---|---|---|
+| `tsk-5wf` | `#task-decision-doc-0026` | todo |
+| `tsk-1o7` | `#task-demand-declares` | todo — **heavy/high**, ba chỗ sửa cùng lúc |
+| `tsk-592` | `#task-gate-predicate-and-rename` | todo |
+| `tsk-15d` | `#task-doc-fixes` | todo |
+| `tsk-2ie5` | `#task-gather-specimen` | todo |
+| `tsk-5wz` | `#task-intake` | todo |
+| `tsk-33w` | `#task-audit-command` | **doing** |
+| `tsk-4eu` | `#task-dead-config` | **delivered** (+ `tsk-5ge` cho nửa config) |
+
+**Việc còn lại của `tsk-5td` không thuộc phiên này làm.** Skill
+`fgos-coding-shaping` **cấm tự áp stage move**, nên item vẫn ở `doing`/`clarify`.
+Một session **không chạy skill này** đưa nó tiếp: `fgos discover tsk-5td` (hoặc
+`fgos return`) — bằng chứng là chính file này cộng 18 D-ID trong event log.
+
 Đường đi tám vòng:
 
 | Vòng | Việc | Kết quả |
