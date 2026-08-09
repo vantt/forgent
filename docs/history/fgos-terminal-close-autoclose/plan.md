@@ -74,7 +74,7 @@ work a delay would protect. The durable record of what happened
 (`.fgos/events.jsonl`, readable anytime via `fgos show <id>`) is
 unaffected by the pane closing — raw pane scrollback was never the source
 of truth this feature needs to preserve, so there is nothing a delay
-would let a person or the orchestrator "catch" that isn't already durable
+would let a person or the launcher "catch" that isn't already durable
 without one. Capturing raw pane output before close (e.g. `herdr pane
 read` to a log) is explicitly out of scope for this item — a different
 decision the user chose not to open here.
