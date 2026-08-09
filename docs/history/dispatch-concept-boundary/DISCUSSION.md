@@ -144,6 +144,7 @@ không mở lại những quyết định các item khác đã khoá.
 | **D12** | **Ranh giới ngoài cùng**: **input đã nằm trong context bên gọi ⇒ KHÔNG phải một lần dispatch**, mà là **suy nghĩ của chính session**. Cổng chính thức: bốn lý do hợp lệ (model rẻ hơn · provider khác · cách ly tài nguyên · chạy song song); trượt cả bốn thì ở lại inline. Bảy tầng tả *một lần dispatch* nhưng không tả thứ nằm **ngoài** nó, nên việc không-phải-dispatch bị ép vào tầng dispatch rồi đẻ ra mẫu vật mỏng (`submit-assist-classify`). `fgos-clarifying` đã tự viết luật này ở dạng khoá. Hệ quả: soul work của intake **không có T2 unit nào, không có capacity nào** | 17 → 22 |
 | **D13** | **mechanism = nhà cung cấp ở TRONG hay NGOÀI (A3)**, và presence/cross-provider gate phải gác theo **đúng vị từ đó — `kind !== 'task'`, không phải `kind === 'cli'` (A4)**. Sáu suy dẫn độc lập hội tụ (§6.6). A4 **rơi ra miễn phí** từ A3 vì cùng vị từ — dấu hiệu khung đúng. Hôm nay `dispatch.mjs:603`/`:630` gác `kind==='cli'` nên capacity `mcp`/`skill`/`http`/`binary` dispatch với **zero** presence check và **zero** cross-provider check (latent). **Chốt vị từ ở đây; sửa code là item riêng** | 6 → 22 |
 | **D14** | **Phép thử thứ ba của D2 — AI SỞ HỮU TIÊU CHÍ**: `gather` = tiêu chí ở **bên gọi**, tự áp lên dữ liệu nhận được · `judge` = tiêu chí ở **bên được gọi**, bên gọi **TUÂN**. Kèm khái niệm **verdict giả** — nhãn phán do nhà cung cấp tính sẵn nhưng bên gọi đối xử như **bằng chứng**. Hai phép thử đầu không phân được response mang cả hai; ca thử thật `impact()` của gitnexus (caller-list + `risk`) phân được nhờ chính `CLAUDE.md` bắt **cross-check trước khi tin** = không tuân ⇒ **gather**. Kiểm ngược: `judge-discovery` bên gọi tuân ⇒ judge thật | 11b → 22 |
+| **D15** | **`capacity` khai BA thứ, không phải hai** — `for` (lớp T2) + `needs` (capability) + **`carries`** (lớp **nội dung** nó được phép nhận). `carries` **phải có tập giá trị khai rõ, không bao giờ chuỗi tự do**, và **chỉ ship cùng lúc với thứ đọc nó** (gate ở TG). **Supersede D7** của `agent-executor-submit-assist-classify`. Hình: D8 đã đặt `capacity` là năng lực tự khai mình **LÀ** gì và **CẦN** gì ⇒ khai luôn mình được nhận **NỘI DUNG** loại nào là cùng một hình. Cụm ba mảnh: `allowCrossProvider` = *có được ra không* · `carries` = *cái gì được ra* · D9 = *đã ra tới đâu*. Tập khởi điểm (`tsk-2ie5` chốt lại trên nội dung gather thật): `user-text` · `repo-content`; `secrets`/credentials **không bao giờ** là giá trị hợp lệ. D7 **không sai, bị sự kiện vượt qua**: entry nó nhắm sắp bị dời (`tsk-5wz`), điều kiện YAGNI của chính nó (*"until a second, riskier cross-provider capacity exists"*) thoả bởi `tsk-2ie5`, và **metadata không ai đọc là pattern đã biết là xấu** — hai ca sống cùng phiên: `executors.judge` nằm chết, và chính `sensitiveData` biến mất dù đã khoá | 21 → 23 |
 | **D2** | **Nhánh không-authority tách làm hai lớp: `gather` (trả `digest`) và `judge` (trả `verdict`)** — không phải một. Lý do tách: hai loại lỗi khác nhau ⇒ hai cách sửa khác nhau (digest sai vì *đọc thiếu* → đọc lại/rộng hơn; verdict sai vì *phán sai* → cần người hoặc đổi tiêu chí); trộn lại thì mất tín hiệu sửa lỗi. Tên **không phát minh mới** — cả hai cặp `<lớp> → <cái nó trả về>` đã sống sẵn trong repo (§5 vòng 2). Bee cũng tách đúng chỗ này, gọi review-class là *"neither class"* | 1 → 3 |
 
 ## 5. Q&A log
@@ -803,6 +804,24 @@ không giành. P4 (đổi tên giá trị mechanism) — độ chắc *vừa* v�
 trả về ⇒ item riêng. Bảng 23 chữ — **sản phẩm dẫn xuất** của D10, không phải
 quyết định riêng.
 
+### Vòng 23 — 2026-08-09 — `carries`, và supersede D7
+
+**Người dùng chọn đường C.** Mint **D15**: `capacity` khai **ba** thứ —
+`for` · `needs` · **`carries`**.
+
+Lập luận quyết định không phải là "governance thì tốt", mà là **bài học repo
+vừa dạy hai lần trong đúng phiên này**: `executors.judge` khai đúng shape nhưng
+không ai đọc ⇒ nằm chết, judge chạy không có `Read`; và chính `sensitiveData`
+— một quyết định **đã khoá**, người dùng **đã xác nhận tường minh** — biến mất
+không dấu vết. **Config khai mà không ai đọc thì mục im lặng.** Nên ràng buộc
+cứng của D15 là *chỉ ship `carries` cùng lúc với gate đọc nó*.
+
+D7 **không sai, bị sự kiện vượt qua** — supersede tường minh để nó thôi là một
+quyết định khoá đang bị vi phạm im lặng.
+
+Cụm governance giờ đủ ba mảnh, và **không đẻ item mới**: `carries` gộp vào
+`tsk-2ie5` (desc 7210 ký tự, 10 dòng verify), D9 đã ở `tsk-33w`.
+
 ## 6. Thiết kế đã chốt {#design}
 
 > **Regenerate lần 3 — bản sau vòng 10.** Vòng 10 đổi hình dạng thật (T2 thành
@@ -1170,6 +1189,7 @@ trong kho hn) **là một việc nhìn từ hai đầu**.
 |---|---|---|---|
 | **`needs:`** = capability (US-027) | tôi cần **năng lực** gì | **provider nào** | `impact-analysis` · `classification` |
 | **`for:`** = purpose (P2, bee) | lần dispatch này thuộc **lớp T2** nào | **lane / nghi thức nào** | `gather` · `judge` |
+| **`carries:`** = lớp nội dung (D15) | tôi được phép **nhận nội dung** loại nào | **cổng gác cho/chặn** | `user-text` · `repo-content` |
 
 Chúng phân biệt ở chỗ khác nhau: hỏi `gitnexus` thì `for` **luôn** là `gather`,
 `needs` mới là thứ phân biệt; với helper thì `needs` gần như hằng số (*"chạy một
@@ -1491,6 +1511,7 @@ worker, một worker có thể không mang `work` nào.
 
 | Cổng | Hỏi gì | Trạng thái |
 |---|---|---|
+| **`carries`** [KHOÁ — D15] | **cái gì** được phép rời khỏi đây | **chưa có** — ra đời cùng `tsk-2ie5`. Cụm ba mảnh: `allowCrossProvider` *có được ra không* · `carries` *cái gì được ra* · D9 *đã ra tới đâu* |
 | presence — `registered`/`present`/`missing`/`unknown`/`stale` | phía cung có thật trên **máy này** không | file local, gitignored. `present` chỉ nghĩa *đã cài*, không bao giờ nghĩa *index còn tươi* (`tsk-j7y`) |
 | `allowCrossProvider` | cho phép chạy backend khác vendor không | per-capacity |
 | `forceCliSpawn` | ép ra ngoài dù có thể chạy trong | per-capacity |
