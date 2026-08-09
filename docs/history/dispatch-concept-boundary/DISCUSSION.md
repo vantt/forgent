@@ -107,7 +107,7 @@ không mở lại những quyết định các item khác đã khoá.
 | 39 | Phép thử thứ ba của D2: **ai sở hữu tiêu chí** | **Đề nghị** (vòng 11) | Dùng khi một response mang cả digest lẫn nhãn phán. `gather` = tiêu chí ở **bên gọi** · `judge` = tiêu chí ở **bên được gọi**, bên gọi **tuân**. Ca thử: `impact()` của gitnexus trả cả caller-list lẫn `risk` — nhưng `CLAUDE.md` bắt **cross-check trước khi tin** ⇒ không tuân ⇒ **gather**, `risk` là *verdict giả*. Kiểm ngược: `judge-discovery` bên gọi tuân ⇒ judge thật. §6.3 |
 | 38 | 11 capability của hn xếp đâu | **Đề nghị** (vòng 11) | **T4 phía cung**, không ngang `gather`/`judge` (thuộc tính của nhà cung cấp, không của một lần dispatch). Cũng **không ngang `gitnexus`**: cả 11 tả **chính cái sổ**, do harness CLI tự khai qua `query.contract`. Ô tương ứng của fgOS — *sổ tự khai năng lực + dải schema* — **đang trống**, latent thật vì global/project install có thể lệch version. §6.5 |
 | 34 | Ô "mục tiêu ngoài sổ" đã có tên | **Đang hội tụ** (vòng 10) | **`errand`** — quét sạch 0 hit ở `src/`, `docs/`, `upstreams/`. Bác `cell` (false friend: bee's cell CÓ claim/reservation/registry) và `packet` (kéo theo khung *"orthogonal axes"* D1 đã bác). Bốn phép thử ở §6.3, sắc nhất: **không sở hữu branch/merge riêng**. Vẫn gated `tsk-2t6` |
-| 35 | `capacity` rút về một nghĩa | **Đề nghị P1′** (vòng 15; bản P1 vòng 10 **đã bị thay**) | Một nghĩa = **năng lực có tên của fgOS**, cặp *behavior-promise / functional-helper* (= D2 + D1 đọc thành định nghĩa). `capacities.<id>` là **bản khai**, không phải bản thân nó; `binding` là **cạnh** T3→T4. Bản P1 đầu sai vì bỏ mất lời hứa hành vi mà không cất vào đâu. `0026` **làm rõ**, không lật |
+| 35 | `capacity` rút về một nghĩa | **CHỐT → D8** (vòng 18; bản P1 vòng 10 đã bị thay bởi P1′ vòng 15) | Một nghĩa = **năng lực có tên của fgOS**, cặp *behavior-promise / functional-helper* (= D2 + D1 đọc thành định nghĩa). `capacities.<id>` là **bản khai**, không phải bản thân nó; `binding` là **cạnh** T3→T4. Bản P1 đầu sai vì bỏ mất lời hứa hành vi mà không cất vào đâu. `0026` **làm rõ**, không lật |
 | 46 | Ranh giới ngoài cùng của tầng dispatch | **Đề nghị** (vòng 17) | Phép thử: **input đã nằm trong context bên gọi chưa**. Rồi ⇒ **không phải dispatch**, là suy nghĩ của chính session. Cổng chính thức: bốn lý do hợp lệ (`_shared/capacity-dispatch-fallback.md`); trượt cả bốn thì ở lại inline. §6.13 |
 | 47 | Phân loại có phụ thuộc domain không | **Rõ** (vòng 17) | **Tách hai**: trục (to cỡ nào / loại gì / sai thì sao) **agnostic**; rubric + từ vựng **domain sở hữu**. Cùng khuôn `0027` D2/D3 (`statusCategory` agnostic + `DOMAINS[domain].statusLabels`). Lỗ hổng: `DOMAINS` không khai từ vựng phân loại ⇒ `TIERS` enum global cứng, `kind`/`risk` thả tự do. **Ba ca sống** ghi ở §6.13 |
 | 48 | Hai item đã mở | **Rõ** (vòng 17) | `tsk-5wz` (tối ưu intake, dời soul-pass về sau clarify, trả phân loại cho domain) và `tsk-2ie5` (đưa gather vào cơ chế capacity — mẫu vật cross-provider thật). Cả hai `deps: tsk-5td`; `tsk-5wz` mang `mergeAfter: tsk-2ie5` để bước rút dispatch không land trước khi có thứ thay thế |
@@ -132,6 +132,7 @@ không mở lại những quyết định các item khác đã khoá.
 | **D5** | **fgOS nhận luật US-027 — binding khớp bằng *lời hứa năng lực*, không bao giờ bằng *tên tool*.** ⇒ **A2 trở thành khiếm khuyết đã biết, phải mở item sửa.** Ba lý do: (i) fgOS **tự viết** luật này lúc port registry (`deep-dives/tool-registry.md:27`) và đã dán nó vào `CLAUDE.md` gate — không nhận thì phải đi gỡ một lời hứa đang treo; (ii) giá di trú đang thấp nhất nó từng có — đúng **một** capacity bị ảnh hưởng (`submit-assist-classify`); (iii) nhận thì mở được ô `gather`, vốn **không phải "chưa làm" mà là BẤT KHẢ** với khoá tên — một prompt sinh lúc chạy không bao giờ có tên để khớp | 6 → 13 |
 | **D6** | **Phía CẦU khai HAI field: `needs` (capability → chọn *provider nào*) và `for` (purpose `gather`\|`judge` → chọn *lane/nghi thức nào*).** Binding khớp bằng hai thứ đó, không bằng tên. Lý do hai chứ không một: hỏi `gitnexus` thì `for` **luôn** là `gather` và `needs` mới phân biệt; với helper thì `needs` gần như hằng số (*"chạy một prompt, trả text"*) và `for` mới phân biệt — thiếu một là mất một chiều. Phạm vi phiên từ vựng: **chỉ vị từ**; sửa code / đổi config schema / di trú là **item riêng** | 12 → 13 |
 | **D7** | **Bỏ `rootTask` và `subTask` khỏi từ vựng dispatch** — dùng `work` (T2) + vai trò bên gọi (T1) cho cái thứ nhất, `child work` cho cái thứ hai. **Supersede phần từ vựng của `0026`.** Cả hai có **0 identifier trong code**; `0026` tự gọi `rootTask` là *vai trò* (*"công việc gốc **đang làm** … **Vai trò này** có tính ĐỆ QUY/fractal"*) và tự gọi `subTask` là *tên gọi **tương đối, nhìn từ góc của bên kích hoạt***. Phép thử: `tsk-5td` nằm backlog là `work`; một launcher đứng nó lên thì **cùng dòng, cùng id, state không đổi một byte** mà đổi tên gọi ⇒ từ vai trò, không phải từ phân lớp. `subTask` còn đội hai nghĩa khác tập: (a) work con do decompose, **được lưu** ⇒ `child work` (D4); (b) target của một lần dispatch đệ quy, **thoáng qua** ⇒ chỉ là một `work`/`errand` khác. **D7 chỉ đổi NHÃN trên sơ đồ D1** (nhánh CÓ: `rootTask`→`work`); **tiêu chí D1 không đổi một chữ** | 10 → 14 |
+| **D8** | **`capacity` = một NĂNG LỰC CÓ TÊN của chính fgOS — cặp *behavior-promise / functional-helper*.** `capacities.<id>` là **bản khai** của nó, không phải bản thân nó; `binding` là **CẠNH** T3→T4, không phải tên tầng; T3 đổi tên **BINDING → NĂNG LỰC CÓ TÊN**. Cặp chữ là **D2 + D1 đọc thành một định nghĩa**: *behavior-promise* = nó **hứa** gì (`digest` hay `verdict`, D2) · *functional-helper* = nó **là** gì (hẹp, không authority, phục vụ mục tiêu người khác, D1). Một mình `functional-helper` thì hụt hợp đồng — đúng lý do `0026` trôi sang tiêu chí cấu trúc mà D1 đã bác; một mình `behavior-promise` thì không phân biệt được với `tool`. Bằng chứng từ D6: **một dòng config vô hồn không đi khai *nó cần gì*** — chỉ thứ có lời hứa riêng mới khai được `for`/`needs`. **A1 chết** (giờ đúng một nghĩa). **Không breaking**: config key và code giữ nguyên. `0026` chỉ **làm rõ** một mệnh đề (tiêu chí phân định → authority + state effects, D1 đã làm), **không lật** | 10 → 18 |
 | **D2** | **Nhánh không-authority tách làm hai lớp: `gather` (trả `digest`) và `judge` (trả `verdict`)** — không phải một. Lý do tách: hai loại lỗi khác nhau ⇒ hai cách sửa khác nhau (digest sai vì *đọc thiếu* → đọc lại/rộng hơn; verdict sai vì *phán sai* → cần người hoặc đổi tiêu chí); trộn lại thì mất tín hiệu sửa lỗi. Tên **không phát minh mới** — cả hai cặp `<lớp> → <cái nó trả về>` đã sống sẵn trong repo (§5 vòng 2). Bee cũng tách đúng chỗ này, gọi review-class là *"neither class"* | 1 → 3 |
 
 ## 5. Q&A log
@@ -733,6 +734,20 @@ clarify (agnostic) viết lại → rồi resolve classifier **của chính doma
 **Hai item đã mở**, chi tiết đầy đủ nằm trong chính item, không chép lại đây:
 `tsk-5wz` · `tsk-2ie5` (xem §3 hàng 48).
 
+### Vòng 18 — 2026-08-09 — chốt P1′
+
+**Người dùng:** *"chấp nhận"*. Mint **D8**.
+
+Đường đi của quyết định này đáng ghi lại vì nó là lần **tự sửa lớn nhất** của
+phiên: đề xuất vòng 10 (P1) bị chính người dùng bác ở vòng 15 vì nó **bỏ mất
+lời hứa hành vi và không cất vào đâu cả**; bản thay (P1′) giữ lời hứa, và hoá
+ra **giữ đúng tinh thần `0026`** chứ không lật nó. Cặp chữ *behavior-promise /
+functional-helper* là người dùng chọn — và nó chính là D2 + D1 đọc thành một
+định nghĩa.
+
+**Bước 5 được mở khoá:** D7 và D8 cùng sửa một mục định nghĩa của `0026` ⇒
+**một** decision doc supersede, không phải hai. Tiền lệ `0028`.
+
 ## 6. Thiết kế đã chốt {#design}
 
 > **Regenerate lần 3 — bản sau vòng 10.** Vòng 10 đổi hình dạng thật (T2 thành
@@ -940,7 +955,7 @@ việc đổi `orchestrator`→`launcher`. **Bước 5 phải mở một decisio
 supersede phần từ vựng của `0026` — và nếu P1 cũng qua thì gộp chung một doc,
 vì cả hai cùng sửa đúng mục định nghĩa đó.
 
-### 6.4 T3 · NĂNG LỰC CÓ TÊN — `capacity` [ĐỀ NGHỊ P1′ — vòng 15]
+### 6.4 T3 · NĂNG LỰC CÓ TÊN — `capacity` [KHOÁ — D8]
 
 > **P1 bản đầu (vòng 10) SAI, đã thay.** Bản đó nói `capacity` = *bản ghi
 > binding*, tức chỉ còn là một dòng config. Nó bỏ mất **lời hứa hành vi** —
@@ -1533,7 +1548,7 @@ thuyết.
 
 | | Đề nghị | Độ chắc | Đụng |
 |---|---|---|---|
-| ~~P1~~ → **P1′** | `capacity` = **năng lực có tên**, cặp *behavior-promise / functional-helper*; `capacities.<id>` là **bản khai** của nó; `binding` là **cạnh** T3→T4 | **cao** | `0026` **làm rõ**, không lật; nhãn sơ đồ D1 (nhánh KHÔNG: `capacity` → thẳng `gather`/`judge`) |
+| ~~P1~~ → ~~P1′~~ | `capacity` = **năng lực có tên**, cặp *behavior-promise / functional-helper* | **đã khoá → D8** | `0026` **làm rõ**, không lật; nhãn sơ đồ D1 (nhánh KHÔNG: `capacity` → thẳng `gather`/`judge`). **Bước 5: gộp chung MỘT decision doc với D7** — cùng sửa một mục định nghĩa của `0026` |
 | ~~**P2**~~ | Binding khoá theo **mục đích** | **đã khoá → D6** | sửa code = item riêng (`resolveExecutorConfig`, CRITICAL) |
 | ~~**P3**~~ | Bỏ `rootTask`/`subTask` khỏi từ vựng | **đã khoá → D7** | supersede `0026` (Bước 5: mở decision doc); chỉ đổi **nhãn** trên sơ đồ D1 |
 | **P4** | mechanism → `in-session`/`out-of-session` | vừa | đổi chuỗi code trả về ⇒ item riêng |
