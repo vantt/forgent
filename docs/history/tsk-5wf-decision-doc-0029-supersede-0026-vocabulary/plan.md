@@ -174,3 +174,17 @@ Two deviations from this plan, both user-confirmed at implementation time:
    footprint. **This pre-existing debt is not fixed by tsk-5wf** — a
    separate item should re-run the full `launcher-vocabulary-guard.test.mjs`
    NEGATIVE test and either allowlist or reword those 5 files.
+3. **`fgos approve` (post-merge re-verify) failed a third time, exit 1.**
+   Root cause: the verify command's `rg` exclusion matched
+   `src/runner/dispatch.mjs`'s two `subTask` comment lines by hardcoded line
+   number (`:649|654:`) — accurate against this branch's own base
+   (`branchHeadAtTake: 51ddb258`), but `main` had moved 5 commits ahead by
+   approve time and an unrelated merge shifted those same two comments to
+   lines 707/712. Fixed by matching the file path alone
+   (`^src/runner/dispatch\.mjs:`, no line-number anchor) — verified only 2
+   hits remain in that file (still lines 707/712, same content, confirmed
+   by direct read) before broadening the exclusion. Lesson: a verify
+   command embedding a specific line number from a file this item does not
+   own is fragile against concurrent, unrelated edits to that file between
+   `return` and `approve`; match by path when the item isn't the one
+   authoring the file's content.
