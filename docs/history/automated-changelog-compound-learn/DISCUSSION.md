@@ -2,14 +2,18 @@
 
 ## 1. Trạng thái hiện tại
 
-Vòng 3. A/B/C giữ nguyên qua vòng 2→3 không đổi — đã mint D-ID
-(D-tsk12m-A/B/C, §4), ghi qua `fgos decision --id tsk-12m` thật. D: chủ
-sản phẩm chốt D2 (session tự phán đoán, cùng kỷ luật chọn quadrant) ngay
-vòng 3 — mới chạm lần đầu, CHƯA mint (chờ giữ nguyên qua vòng 4). Điểm E
-(tầm nhìn đa-audience) tách ra thành discussion RIÊNG theo yêu cầu chủ sản
-phẩm — xem `docs/history/compound-learn-artifact-registry/DISCUSSION.md`
-(mở 2026-08-07). `tsk-12m` tạm dừng ở đây chờ discussion registry hội tụ,
-vì D-tsk12m-B đã ghi rõ phụ thuộc vào hình dạng registry đó.
+Vòng 4. D-tsk12m-A/B/C đã mint từ vòng 3 (§4). Câu D (session tự phán đoán
+"user-visible", không heuristic file-touched) giữ nguyên qua vòng 3→4,
+**đủ điều kiện mint nhưng chưa mint** — chờ chốt cùng lượt với lộ trình
+dưới. Điểm E (tầm nhìn đa-audience) đã tách sang
+`docs/history/compound-learn-artifact-registry/DISCUSSION.md`.
+
+Vòng 4 mở một trục MỚI, không có trong 3 vòng trước: **lộ trình đưa
+changelog vào đời — thủ công trước, cơ giới hoá sau** — và tìm ra một
+ranh giới cho phép làm việc thật NGAY BÂY GIỜ mà không cần chờ discussion
+registry hội tụ (ranh giới quan-sát/nhắc vs quyết/viết/chặn, §6). Đây là
+thay đổi trạng thái quan trọng: `tsk-12m` **không còn bị chặn hoàn toàn**
+bởi `tsk-28x` như vòng 3 ghi.
 
 ## 2. Mục tiêu & đề bài
 
@@ -40,6 +44,9 @@ thuộc phạm vi thảo luận này.
 | C | Version heading cho entry mới | **D-tsk12m-C** | `## Unreleased`, cắt-release là bước thủ công riêng, ngoài phạm vi `tsk-12m` |
 | D | "User-visible" định nghĩa bằng gì | TRẢ LỜI V3 (chưa D-ID, chờ vòng 4) | Chốt D2: session tự phán đoán có bằng chứng ngay lúc retrospective, cùng kỷ luật chọn quadrant (không mặc định, không coin-flip) — hệ quả tự nhiên của D-tsk12m-B |
 | E | Tầm nhìn compound-learn đa-audience | TÁCH RA | Chuyển sang discussion riêng `docs/history/compound-learn-artifact-registry/DISCUSSION.md` (yêu cầu chủ sản phẩm, 2026-08-07 vòng 3) — không còn theo dõi ở đây |
+| F | **Ranh giới: cơ chế nào làm được TRƯỚC khi chốt phương án tổng thể** | RÕ (vòng 4) | Không phải chia theo "chặng", mà theo **cơ chế đó LÀM GÌ**. Loại **quan sát/nhắc** (nag, doctor check, bộ đếm) không quyết gì, không viết gì, không chặn ai → độc lập hoàn toàn với câu hỏi phương án của `tsk-28x`. Loại **quyết/viết/chặn** (phán đoán changelog-worthy, sinh nội dung entry, chặn merge khi thiếu entry) → kẹt sau nó. Xem §6 |
+| G | Chặng 1 (ghi tay) tự nó KHÔNG sinh số đo | RÕ (vòng 4, tự sửa lỗi) | Vòng 4 ban đầu tuyên bố "chặng 1 là chặng ĐO". Sai: ghi tay không ghi lại gì đo được — ba con số cần (tần suất user-visible, tỉ lệ suy-ra-cơ-học-được, **tỉ lệ quên**) sẽ chỉ là cảm giác. Chính lỗi "không ai nhớ" lặp ở tầng trên. Cần chặng 2 (bộ đếm) mới đo thật được |
+| H | Số đo của changelog KHÔNG mở khoá nửa storytelling | RÕ (vòng 4) | Câu hỏi phương án (`tsk-28x` §6.4) phủ CẢ changelog lẫn marketing-storytelling. Chặng 1+2 chỉ sinh bằng chứng cho nửa changelog. Nửa storytelling cần phép thử RIÊNG (Cách 1 — mặt đọc trên vỉa ask/tranh cãi). Hai phép thử ĐỘC LẬP, chạy song song được — không phải một chuỗi tuần tự. Nhất quán với lỗi 3 của `tsk-28x` vòng 4 (gộp nhầm artifact cơ học với artifact phán đoán) |
 
 ## 4. Quyết định đã chốt
 
@@ -78,9 +85,115 @@ thuộc phạm vi thảo luận này.
   một feature một file). `tsk-12m` tạm dừng chờ discussion đó hội tụ vì
   D-tsk12m-B phụ thuộc hình dạng registry.
 
+- **2026-08-09 (vòng 4)** — Chủ sản phẩm hỏi lại cách làm `CHANGELOG.md`
+  thủ công cụ thể và dự định tiếp theo cho hoàn chỉnh. Session trình bày
+  lộ trình 3 chặng, trong đó tuyên bố "chặng 2 phụ thuộc câu hỏi phương
+  án của `tsk-28x`, không có bước cơ giới hoá nào trung thực làm được
+  trước đó" và "chặng 1 là chặng ĐO".
+
+  Chủ sản phẩm hỏi tiếp: "nếu có cơ chế thì nó sẽ fit vào chặng nào sau
+  này". Câu hỏi này lộ **hai lỗi trong chính lộ trình vừa trình bày**:
+
+  1. **"Chặng 1 là chặng đo" — sai.** Ghi tay không sinh ra số đo nào.
+     Ba con số hứa đo (tần suất, tỉ lệ suy-ra-cơ-học-được, tỉ lệ quên)
+     sẽ chỉ là cảm giác. Chặng 2 không bao giờ có bằng chứng, câu hỏi
+     phương án treo mãi. Đúng lỗi "không ai nhớ" lặp ở tầng trên.
+  2. **"Không cơ chế nào làm được trước khi chốt phương án" — cũng sai.**
+     Ranh giới thật không nằm ở chặng, mà ở **cơ chế đó LÀM GÌ** (§3
+     dòng F, §6).
+
+  Scout xác nhận hai tiền lệ có thật trong repo, không phải ý tưởng
+  suông: `collectMissingOutcomeNag` (`bin/fgos.mjs:620` — khuôn nag đã
+  chạy, hiện ra qua `fgos check`) và `registerCheck({id, description,
+  check})` (`src/setup/registrations.mjs:65` — registry doctor đang chạy;
+  hơn nữa gate install/setup/doctor trong `AGENTS.md` **bắt buộc** năng
+  lực mới phải đăng ký vào đó, nên doctor check không phải lựa chọn mà là
+  nghĩa vụ).
+
+  Số liệu mặt công khai đo lúc này: **49 verb CLI**, 2 bin entry
+  (`fgos`, `fgos-runner`), `version: 0.1.0`, `private: true` — không một
+  dòng changelog nào cho toàn bộ mặt đó. Ghi chú trung thực: `private:
+  true` chặn `npm publish`, người dùng cài bằng `npm install -g
+  github:vantt/forgent` tức lấy thẳng HEAD, **không ghim version** — nên
+  SemVer lúc này là kỷ luật tài liệu, chưa phải cơ chế.
+
+  Chủ sản phẩm hỏi cuối vòng: "như vậy phải làm 1 và 2 trước rồi mới tính
+  tiếp?" — trả lời ở §6.4, kèm một đính chính: đúng cho nửa changelog,
+  KHÔNG đúng cho nửa storytelling (§3 dòng H).
+
 ## 6. Thiết kế đã chốt {#design}
 
-(chưa viết — chờ §3's câu hỏi mở được trả lời trước khi tổng hợp)
+**Bản đầu (vòng 4).** D-tsk12m-A/B/C đã chốt (§4); phần dưới là lộ trình
+đưa changelog vào đời, chưa mint D-ID. Viết cho người đọc không có lịch
+sử hội thoại.
+
+### 6.1 Ranh giới cho phép làm việc ngay, không chờ
+
+Câu hỏi lớn còn treo (`tsk-28x` §6.4: chọn phương án nào cho toàn bộ
+compound-learn) **không chặn mọi thứ**. Ranh giới thật không phải "chặng
+nào", mà là **cơ chế đó làm gì**:
+
+| Loại | Ví dụ | Có đụng vùng đang tranh luận? |
+|---|---|---|
+| **Quan sát / nhắc** | nag qua `fgos check`; doctor check `changelog-unreleased-stale`; bộ đếm tỉ lệ quên; doctor so version đã cài với version repo | **Không** — không quyết gì, không viết tài liệu nào, không chặn ai |
+| **Quyết / viết / chặn** | phán đoán một thay đổi có đáng changelog không; sinh nội dung dòng entry; chặn merge khi thiếu entry | **Có** — đúng vùng D-tsk12m-B + câu hỏi phương án; riêng "chặn merge" còn vi phạm ràng buộc R2 của `tsk-28x` (quyền quyết định của người phải đạt được không bằng cửa chặn) |
+
+Tính chất đáng giá: **loại quan sát/nhắc sống sót qua mọi câu trả lời của
+câu hỏi phương án.** Dù phương án nào thắng, việc "quan sát xem có ai ghi
+không" vẫn cần. Không phải việc vứt đi.
+
+### 6.2 Cách làm thủ công — 4 bước
+
+1. **Tạo `CHANGELOG.md` ở repo root** (D-tsk12m-A), chuẩn Keep a
+   Changelog, có sẵn khối `## [Unreleased]` với bốn mục Added / Changed /
+   Fixed / Removed.
+2. **Backfill tới đâu — cắt `0.1.0` = "mặt hiện có tính tới hôm nay"**:
+   kể tên câu chuyện install/setup/doctor/uninstall, hai bin entry, CLI
+   49 verb; **không liệt kê lịch sử từng item**. Backfill chi tiết từ 166
+   item `done` bị loại vì nó **tự vi phạm luật đang lập** — phần lớn item
+   là nội bộ, không user-visible.
+3. **Luật cập nhật**: điểm ghi là **lúc merge/approve** (`awaiting-
+   approval` → `delivered`) — lúc thay đổi thành thật với người dùng.
+   Gia cố rẻ nhất không viết code: thêm một câu vào gate đã có sẵn trong
+   `AGENTS.md` ("Install/setup/doctor gate"), cùng dạng câu hỏi bắt buộc
+   đang có — "thay đổi này người dùng có thấy không? nếu có, thêm một
+   dòng vào `## [Unreleased]`". Tái dùng cơ chế đang chạy, chi phí bằng
+   không.
+4. **Bump version** khi có một cụm thay đổi đáng gọi là bản phát hành.
+
+### 6.3 Điểm yếu cố hữu của bản thủ công
+
+Phải có ai đó *nhớ*. Chính cái quên đó tạo ra lỗ hổng này ngay từ đầu, và
+bước 3 chỉ làm nó bớt quên chứ không loại bỏ. Đây là lý do chặng 2 tồn
+tại — không phải để tự động hoá việc ghi, mà để **đo xem việc quên xảy ra
+bao nhiêu**.
+
+### 6.4 Lộ trình
+
+| Chặng | Nội dung | Chờ câu hỏi phương án? |
+|---|---|---|
+| 1 | File + baseline `0.1.0` + dòng gate `AGENTS.md` | Không |
+| 2 | Nag + doctor check + bộ đếm (loại quan sát/nhắc) | Không — **và chính nó sinh bằng chứng** để trả lời |
+| 3 | Quyết + viết tự động, theo phương án được chọn | Có |
+
+**Chặng 2 là thứ biến chặng 1 thành chặng đo thật.** Sau N lần merge sẽ
+biết ba thứ hiện đang đoán: tần suất thay đổi user-visible (hiếm thì tự
+động hoá là lãng phí); bao nhiêu phần một entry suy ra được cơ học; và
+**tỉ lệ quên** — con số duy nhất biện minh được cho việc tự động hoá.
+
+**Rủi ro phải phòng ngay khi thiết kế chặng 2:** nag bắn mỗi lần merge
+rồi bị bỏ qua sẽ thành nhiễu. Nag phải **đếm, đừng mắng** — và chính con
+số đếm đó là số đo. 5% quên sau 20 merge nghĩa là tự động hoá lãng phí;
+70% nghĩa là câu hỏi phương án có căn cứ thật để chọn.
+
+### 6.5 Giới hạn của lộ trình này
+
+Chặng 1+2 chỉ mở khoá **nửa changelog** của câu hỏi phương án. Nửa
+marketing-storytelling cần phép thử riêng (`tsk-28x` §6.4 Cách 1 — mặt
+đọc trên vỉa ask/tranh cãi). Hai phép thử **độc lập, chạy song song
+được** — không phải một chuỗi tuần tự. Nhất quán với lỗi 3 mà `tsk-28x`
+vòng 4 tự tìm ra: artifact cơ học và artifact phán đoán không dùng chung
+một đường.
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
