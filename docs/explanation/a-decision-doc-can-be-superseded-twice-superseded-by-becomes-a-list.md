@@ -49,6 +49,49 @@ three actual corrections (dropping `rootTask`/`subTask`, redefining
 declares `supersedes: [0026]` and cites exactly which of 0026's original
 claims each correction replaces.
 
+## The list broke a checker that assumed a scalar (`tsk-18t`)
+
+`0026` becoming the repo's first twice-superseded document exposed a real
+bug in `scripts/check-decision-supersession.mjs`, which nobody had
+exercised against a list value before:
+
+> `scripts/check-decision-supersession.mjs:77`
+> `if (target.meta.superseded_by !== record.id) { ...missing-frontmatter-pointer... }`
+> — strict scalar comparison. `[0028, 0029] !== '0029'` is always true,
+> so the checker reported BOTH superseding documents as missing their
+> frontmatter pointer, even `0028` which had been correctly recorded all
+> along.
+
+Real observed output before the fix:
+
+> "0026: superseded by 0028 but its own frontmatter has no
+> superseded_by: 0028" / "0026: superseded by 0029 but its own
+> frontmatter has no superseded_by: 0029"
+> — real `check-decision-supersession.mjs` run, 2026-08-09, after
+> `tsk-5wf` landed
+
+`tsk-5wf`'s own description had already flagged this exact risk in
+advance — "kiểm xem có code/script nào đọc field này không" (check
+whether any code/script reads this field) — but that verification step
+hadn't actually been done before choosing the list shape. The list value
+itself was correct (as this doc's own resolution above establishes); the
+checker's strict-equality read of it was the bug, not the data.
+
+**Fix**: normalize `superseded_by` to an array on read (scalar values get
+wrapped in a single-element array) and check membership with `.includes()`
+instead of `!==`, so both the pre-existing scalar convention and the new
+list convention validate correctly through the same code path — no
+special-casing which shape a given document uses. New tests cover all
+three cases: a list value that validates clean, a scalar value that still
+validates clean, and a list value that's missing a required id (still
+correctly flagged).
+
+This is a general lesson beyond this one checker: introducing a new valid
+shape for an existing frontmatter field (scalar → scalar-or-list) is a
+breaking change for any code that reads that field with strict equality,
+not just an additive data change — the field's readers need auditing
+alongside the field's writers.
+
 ## Related
 
 - `docs/how-to/resolve-a-decision-id-collision-merge-conflict-on-approve.md`

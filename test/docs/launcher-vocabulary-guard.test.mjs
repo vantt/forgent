@@ -96,6 +96,8 @@ const ALLOWED_FILES = new Map([
   ['docs/explanation/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md', 'cites the orchestrator->launcher rename as a real example while explaining decision-doc superseding -- same historical-example reasoning as 0028/0029\'s own allowlist entries'],
   ['docs/history/automated-changelog-compound-learn/iron-law-evidence.md', 'another item\'s meta-citation of this guard test\'s own pre-existing-failure report, same shape as tsk-33w/tsk-4eu/tsk-2uo\'s own entries above'],
   ['docs/history/automated-changelog-compound-learn/iron-law-evidence-tsk-3ip.md', 'tsk-3ip\'s own Iron Law evidence in that same feature dir -- quotes this guard test\'s own NAME (which contains the pinned term) while reporting it as a pre-existing failure, identical reasoning to the sibling iron-law-evidence.md entry directly above'],
+  ['docs/how-to/allowlist-a-historical-mention-in-launcher-vocabulary-guard.md', 'tsk-2uo\'s own how-to guide for allowlisting a historical mention in THIS exact guard test -- necessarily quotes the pinned term throughout as its own worked examples while documenting the allowlist mechanism, same self-referential reasoning as this file\'s own entry above'],
+  ['docs/how-to/fix-fgos-write-rejected-merge-block.md', 'quotes a real work.decision capture (tsk-53n) that names this guard test\'s own "orchestrator" leak as a worked example of a pre-existing, unrelated failure a merge-block fix needs to recognize and exclude -- same meta-citation reasoning as the tsk-33w/tsk-4eu/tsk-2uo iron-law-evidence.md entries above'],
 ]);
 
 const BINARY_EXT = /\.(png|jpe?g|gif|ico|woff2?|ttf|eot|pdf)$/i;

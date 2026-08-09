@@ -187,6 +187,56 @@ real code: `need_answer_survives_missing_stage` and
 `last_error_first_error_wins` (`herdr-plugin/src/fgos.rs`), plus a real
 `cargo build --release`.
 
+## Origin (`tsk-4n7`): the bug report behind `tsk-3wl`/`tsk-bvh`
+
+The keyboard/mouse work below (`tsk-3wl`, `tsk-bvh`) traces back to one
+bug report naming three separate real problems: `Tab` only toggled
+between the Work Items/In Process panels while the 3 right-side boxes had
+no focusable variant at all; the status-column `Tab` enum
+(`TODO`/`DOING`/`REVIEW`/`DONE`, rotated by `]`/`[`) shared a name with
+the `Tab` key despite using different keys, causing confusion; and mouse
+handling was scoped to `detail_modal` only, so the pre-existing on-screen
+hint claiming "mouse works" was misleading outside the modal:
+
+> "Tab chỉ toggle giữa 2 panel (WorkItems/InProcess), 3 box khác
+> (need-answer, merge-list, after-deliver) không có Panel variant nên
+> không focus được bằng bàn phím. Tab enum (cột trạng thái
+> TODO/DOING/REVIEW/DONE) rotate bằng phím ']'/'[' chứ không phải phím
+> Tab — trùng tên gây nhầm lẫn. Mouse chỉ bắt sự kiện trong detail_modal
+> ... ngoài modal click vô hiệu."
+> — real work item description, id `tsk-4n7`
+
+The report itself proposed splitting into two child pieces during
+planning — `tsk-3wl` (keyboard-focus-expansion) and `tsk-bvh`
+(mouse-click-to-focus) below are exactly that split, not an independent
+design choice made later.
+
+The discovery gate's own second-pass verify check (see
+`docs/explanation/judge-verdict-second-pass-semantic-check.md`) disputed
+this item's first two proposed `verify` commands before accepting a
+third — the first was undetermined ("chưa xác định"), the second merely
+asserted the existing suite stayed green without targeting the claimed
+UX change at all:
+
+> "Lệnh `cargo test --manifest-path herdr-plugin/Cargo.toml` chỉ verify
+> test hiện tại pass, không nhắm keyboard/mouse UX thay đổi mà item mô tả
+> ... verify 'code compile + existing test green', không verify 'UX
+> interaction hoạt động đúng theo claim item'."
+> — real second-pass dispute, id `tsk-4n7`
+
+The accepted third round pinned the exact test names both children's
+implementations below were later confirmed against
+(`focus_cycle`, `mouse_click_to_focus`) — the specific assertions each
+name had to cover were spelled out at this same round, not left for the
+implementer to invent:
+
+> "Implementation phải thêm unit test tên chứa 'focus_cycle' (assert
+> Tab/Shift+Tab đi qua đủ 5 box + wrap, ]/[ vẫn rotate Tab enum không
+> đổi) và tên chứa 'mouse_click_to_focus' (assert click vào box area set
+> đúng focused panel, click item trong WorkItems/InProcess set đúng
+> selected index, click trong 3 box còn lại không set selection theo D1)."
+> — real human answer resolving the verify dispute, id `tsk-4n7`
+
 ## Implementation (`tsk-3wl`): keyboard/mouse focus across all 5 boxes
 
 Resolves the key-binding question left open below. `Tab`/`Shift+Tab`
