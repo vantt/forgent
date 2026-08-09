@@ -103,7 +103,7 @@ không mở lại những quyết định các item khác đã khoá.
 | 29 | `adapter` — suy dẫn thứ 5 cho A3 | **Rõ** (vòng 8) | `EXECUTOR_ADAPTERS` đúng 1 key, `DEFAULT_ADAPTER = 'cli-spawn'` — **trùng chuỗi** với giá trị mechanism #3 (dẫn xuất). Hai tầng khác nhau đội chung một chuỗi, hôm nay không phân biệt được vì chỉ có một adapter. Ngày `rpc`/`app-server` (đã deferred, cùng doc comment) được đăng ký: nhà cung cấp vẫn **ngoài** nhưng adapter là `rpc` ⇒ tên `cli-spawn` cho **mechanism** thành sai. Xác nhận A3 từ hướng hoàn toàn khác |
 | 30 | #1 gộp hai câu hỏi | **Đang hội tụ** (vòng 8) — **đụng `tsk-2cw`, chờ người dùng** | `0028` (accepted, supersedes 0026) đã lập luận sẵn hai tính chất độc lập: **arity** (1 vs N) và **có ở lại không** (bước ra vs giữ liên hệ liên tục). Bảng: (1,buông)=`launcher` · (1,ở lại)=`driver` · (N,ở lại)=`orchestrator` · (N,buông)=**trống**. `0026`: *"Vai trò launcher KHÔNG CẦN soul ... THUẦN CƠ HỌC"* ⇒ nhu-cầu-phán-đoán bám theo **cột**, không theo arity |
 | 31 | `orchestrator` là tầng trên, không phải ô thứ ba | **Đang hội tụ** (vòng 8) | `fgos-fanout` spawn N Agent, **mỗi Agent chạy `/fgOS:pick` end-to-end** ⇒ mỗi cái là một `driver`. Nên orchestrator = **hợp thành** (N lần dấn thân con), không phải anh em ngang hàng. Đề xuất: #1 rút về **2 giá trị**, `orchestrator` ra khỏi enum lên tầng hợp thành — đúng chỗ `tsk-2cw` đang chừa |
-| 40 | Nhận luật US-027 hay không (P5) | **Đề nghị: NHẬN** (vòng 12) — treo từ vòng 6 | Name-keying là **hệ quả tất yếu** của phía cầu câm, không phải lười. Nhận luật = bắt phía cầu tự khai ⇒ **gộp** với "món to nhất" của kho hn. Bên cầu phải khai **hai** field: `needs` (capability → chọn provider) + `for` (purpose → chọn lane). Hai cửa hôm nay: prose tuân, máy không. §6.4 |
+| 40 | Nhận luật US-027 hay không | **CHỐT → D5 + D6** (vòng 13) — treo từ vòng 6 | Name-keying là **hệ quả tất yếu** của phía cầu câm, không phải lười. Nhận luật = bắt phía cầu tự khai ⇒ **gộp** với "món to nhất" của kho hn. Bên cầu phải khai **hai** field: `needs` (capability → chọn provider) + `for` (purpose → chọn lane). Hai cửa hôm nay: prose tuân, máy không. §6.4 |
 | 39 | Phép thử thứ ba của D2: **ai sở hữu tiêu chí** | **Đề nghị** (vòng 11) | Dùng khi một response mang cả digest lẫn nhãn phán. `gather` = tiêu chí ở **bên gọi** · `judge` = tiêu chí ở **bên được gọi**, bên gọi **tuân**. Ca thử: `impact()` của gitnexus trả cả caller-list lẫn `risk` — nhưng `CLAUDE.md` bắt **cross-check trước khi tin** ⇒ không tuân ⇒ **gather**, `risk` là *verdict giả*. Kiểm ngược: `judge-discovery` bên gọi tuân ⇒ judge thật. §6.3 |
 | 38 | 11 capability của hn xếp đâu | **Đề nghị** (vòng 11) | **T4 phía cung**, không ngang `gather`/`judge` (thuộc tính của nhà cung cấp, không của một lần dispatch). Cũng **không ngang `gitnexus`**: cả 11 tả **chính cái sổ**, do harness CLI tự khai qua `query.contract`. Ô tương ứng của fgOS — *sổ tự khai năng lực + dải schema* — **đang trống**, latent thật vì global/project install có thể lệch version. §6.5 |
 | 34 | Ô "mục tiêu ngoài sổ" đã có tên | **Đang hội tụ** (vòng 10) | **`errand`** — quét sạch 0 hit ở `src/`, `docs/`, `upstreams/`. Bác `cell` (false friend: bee's cell CÓ claim/reservation/registry) và `packet` (kéo theo khung *"orthogonal axes"* D1 đã bác). Bốn phép thử ở §6.3, sắc nhất: **không sở hữu branch/merge riêng**. Vẫn gated `tsk-2t6` |
@@ -121,6 +121,8 @@ không mở lại những quyết định các item khác đã khoá.
 | **D1** | **Tiêu chí phân lớp đơn vị việc là *authority + state effects*, không phải *vòng đời đầy đủ*** — mượn thẳng tiêu chí bee (`routing-and-contracts.md:342`: *"distinguished by authority and state effects, not by task size"*). Hệ quả hình dạng: đây **không** phải chiều thứ hai vuông góc với trục A, mà là **cây hai tầng** — tầng 1 hỏi *có authority + state effects không*, tầng 2 (chỉ nhánh KHÔNG) hỏi *trả về cái gì*. Lý do bác "vuông góc": một `rootTask` không bao giờ có thể là gather, nên hai chiều không độc lập. Lý do tiêu chí này sắc hơn: vòng đời (claim/reserve/verify/merge) tồn tại **chính vì** có state effects cần bảo vệ — trục A cũ lấy *hệ quả* làm tiêu chí, bee lấy *nguyên nhân* | 1 → 3 |
 | **D3** | **`kind` = loại nhà cung cấp (*provider kind*) — *nhà cung cấp nằm ở đâu*, không phải transport, cũng không phải protocol.** Giết "transport": `mcp` và `skill` chung một nhánh probe nhưng transport ngược hẳn nhau (JSON-RPC qua stdio vs file markdown nạp thẳng vào session gọi). Giết "protocol": `cli` và `binary` là hai giá trị cho một protocol (argv vào, stdout ra). Cả hai consumer của `kind` đều hỏi cùng một câu — `probeTool` chọn cách đi tìm (PATH / đĩa / TCP), `dispatch` chỉ so `kind==='task'` và `kind==='cli'`. Hệ quả: mechanism là **phép chiếu thô của `kind` xuống trong/ngoài** ⇒ suy dẫn thứ sáu cho A3 | 9 → 11 |
 | **D4** | **`work` con sinh ra bởi decompose gọi là `child work` — là CẠNH giữa hai `work`, không phải lớp thứ năm trên trục phía cầu.** Chữ `child` đã sống trong code (`decompose.mjs` 83 hit, `bin/fgos.mjs` 44, `frontier`/`dep-graph`/`graph-metrics`), field lưu thật là `work.parent` (`work.mjs:414`), và `0012` đã đặt nó thành cạnh `parent-child` trong đồ thị acyclic chung với `deps`. Phép thử: một `child work` khác `work` cha **đúng một field** — cùng FSM, tự claim, tự worktree, tự verify, tự merge. **Không** mint chữ `subTask` cho nghĩa này: `0026` đã chiếm chuỗi đó cho một nghĩa khác (vai trò thoáng qua, nhìn từ bên kích hoạt), và hai nghĩa **khác tập hợp cả hai chiều** | 10 → 11 |
+| **D5** | **fgOS nhận luật US-027 — binding khớp bằng *lời hứa năng lực*, không bao giờ bằng *tên tool*.** ⇒ **A2 trở thành khiếm khuyết đã biết, phải mở item sửa.** Ba lý do: (i) fgOS **tự viết** luật này lúc port registry (`deep-dives/tool-registry.md:27`) và đã dán nó vào `CLAUDE.md` gate — không nhận thì phải đi gỡ một lời hứa đang treo; (ii) giá di trú đang thấp nhất nó từng có — đúng **một** capacity bị ảnh hưởng (`submit-assist-classify`); (iii) nhận thì mở được ô `gather`, vốn **không phải "chưa làm" mà là BẤT KHẢ** với khoá tên — một prompt sinh lúc chạy không bao giờ có tên để khớp | 6 → 13 |
+| **D6** | **Phía CẦU khai HAI field: `needs` (capability → chọn *provider nào*) và `for` (purpose `gather`\|`judge` → chọn *lane/nghi thức nào*).** Binding khớp bằng hai thứ đó, không bằng tên. Lý do hai chứ không một: hỏi `gitnexus` thì `for` **luôn** là `gather` và `needs` mới phân biệt; với helper thì `needs` gần như hằng số (*"chạy một prompt, trả text"*) và `for` mới phân biệt — thiếu một là mất một chiều. Phạm vi phiên từ vựng: **chỉ vị từ**; sửa code / đổi config schema / di trú là **item riêng** | 12 → 13 |
 | **D2** | **Nhánh không-authority tách làm hai lớp: `gather` (trả `digest`) và `judge` (trả `verdict`)** — không phải một. Lý do tách: hai loại lỗi khác nhau ⇒ hai cách sửa khác nhau (digest sai vì *đọc thiếu* → đọc lại/rộng hơn; verdict sai vì *phán sai* → cần người hoặc đổi tiêu chí); trộn lại thì mất tín hiệu sửa lỗi. Tên **không phát minh mới** — cả hai cặp `<lớp> → <cái nó trả về>` đã sống sẵn trong repo (§5 vòng 2). Bee cũng tách đúng chỗ này, gọi review-class là *"neither class"* | 1 → 3 |
 
 ## 5. Q&A log
@@ -609,6 +611,18 @@ Kèm bảng "hai cửa" (prose tuân luật, máy không) và ca cắn cụ th�
 hai cho việc phân loại **buộc phải mang tên `submit-assist-classify`** ⇒ không
 thể. Chi tiết + P5 ở §6.4.
 
+### Vòng 13 — 2026-08-09 — chốt `needs`/`for`
+
+**Người dùng:** *"đồng ý need/for"*.
+
+Một câu gật đóng luôn hai thứ, vì chúng là hai nửa của cùng một hình: `needs`
+là nội dung của luật US-027 (phía cầu khai **năng lực** nó cần), `for` là nội
+dung của P2 (phía cầu khai **mục đích** lần dispatch). Mint **D5** (nhận luật)
+và **D6** (hai field). P2 bị D6 hấp thụ.
+
+Hệ quả bắt buộc, không được quên ở Bước 5: **A2 chính thức là khiếm khuyết đã
+biết** — phải có item sửa, không được để im như một đặc điểm.
+
 ## 6. Thiết kế đã chốt {#design}
 
 > **Regenerate lần 3 — bản sau vòng 10.** Vòng 10 đổi hình dạng thật (T2 thành
@@ -933,21 +947,19 @@ local thay `agy`), đúng luật thì đăng ký tool mới với `capability:
 `tools[capacityId]` — tên đã có chủ ⇒ **không thể**. Đường duy nhất: đẻ capacity
 id mới và sửa mọi chỗ gọi. Đó là A2, phát biểu bằng hệ quả đo được.
 
-**[ĐỀ NGHỊ P5 — nhận luật US-027]**, ba lý do: (i) fgOS **đã dán luật đó vào
+**[KHOÁ — D5]** fgOS **nhận** luật US-027, ba lý do: (i) fgOS **đã dán luật đó vào
 `CLAUDE.md`**, không nhận thì phải đi gỡ một lời hứa đang treo (*"GitNexus là
 provider đầu tiên, không phải provider duy nhất gate này có thể nhận"* — đúng
 với prose, **sai với dispatch**); (ii) giá di trú đang thấp nhất nó từng có —
 đúng **một** capacity bị ảnh hưởng; (iii) nhận thì mở được ô `gather`, vốn
 không phải *chưa làm* mà là **bất khả** với khoá tên.
 
-Phạm vi chốt trong phiên từ vựng: **chỉ vị từ** — *bên cầu khai `needs` +
-`for`; binding khớp bằng hai thứ đó, không bằng tên*. Sửa code, đổi config
+**[KHOÁ — D6]** Bên cầu khai `needs` + `for`; binding khớp bằng hai thứ đó,
+không bằng tên. Phạm vi phiên từ vựng: **chỉ vị từ**. Sửa code, đổi config
 schema, di trú: **item riêng**, mở ở Bước 5.
 
-**Nếu BÁC P5** thì phải tuyên bố tường minh ba câu, nếu không lần sau lại có
-người đi vá: (1) `capability` **chỉ** dùng cho cửa prose, không bao giờ cho
-dispatch; (2) một capability **cố ý** chỉ có một provider; (3) sửa câu tự hứa
-trong `CLAUDE.md` cho khỏi hứa hão.
+⇒ **P2 bị D6 hấp thụ** (`for` chính là nó), và **A2 giờ là khiếm khuyết đã
+biết** theo D5 — Bước 5 **bắt buộc** mở item cho nó, không được để im.
 
 ### 6.5 T4 · CUNG — ai làm được, ở đâu, chạy bằng gì
 
@@ -1204,7 +1216,7 @@ check. Latent: chưa capacity nào thuộc bốn kind đó.
 | | Nội dung | Trạng thái sau vòng 10 |
 |---|---|---|
 | **A1** | `capacity` mang hai nghĩa (lớp việc / bản ghi binding), khác tập hợp | **được giải bằng P1** — hai chữ, hai tầng |
-| **A2** | Binding nối bằng `name` chứ không `capability` ⇒ provider thứ hai không bao giờ dùng được | **SỐNG** — P2 nhắm vào đây |
+| **A2** | Binding nối bằng `name` chứ không `capability` ⇒ provider thứ hai không bao giờ dùng được | **SỐNG, và giờ là khiếm khuyết ĐÃ BIẾT** theo D5 ⇒ Bước 5 bắt buộc mở item |
 | **A3** | mechanism = *nhà cung cấp ở trong hay ngoài*; `native`/`cli-spawn` chỉ đặt tên cho vỏ | sáu suy dẫn hội tụ (6.6) |
 | **A4** | presence gác theo vận chuyển, đáng lẽ gác theo *có ở ngoài không* | latent (6.9) |
 | **A5** | `capacities.<id>` và `tools.<name>` tả cùng backend, **không so khớp** | latent |
@@ -1212,7 +1224,7 @@ check. Latent: chưa capacity nào thuộc bốn kind đó.
 | | Đề nghị | Độ chắc | Đụng |
 |---|---|---|---|
 | **P1** | `capacity` chỉ còn nghĩa T3 (binding) | **cao** | supersede định nghĩa `capacity` của `0026`; nhãn trên sơ đồ D1 |
-| **P2** | Binding nhánh không-mục-tiêu khoá theo **mục đích**, không theo tên | **cao** | sửa code = item riêng (`resolveExecutorConfig`, CRITICAL) |
+| ~~**P2**~~ | Binding khoá theo **mục đích** | **đã khoá → D6** | sửa code = item riêng (`resolveExecutorConfig`, CRITICAL) |
 | **P3** | Bỏ `rootTask`/`subTask` khỏi từ vựng | **cao** | supersede `0026`; nhãn trên sơ đồ D1 |
 | **P4** | mechanism → `in-session`/`out-of-session` | vừa | đổi chuỗi code trả về ⇒ item riêng |
 
