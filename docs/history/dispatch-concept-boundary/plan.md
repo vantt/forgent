@@ -50,4 +50,12 @@ None.
 
 ## Proof surface
 
-`grep -q '0029' docs/history/dispatch-concept-boundary/DISCUSSION.md && grep -q 'tsk-1o7' docs/history/dispatch-concept-boundary/DISCUSSION.md && npm test`
+`grep -q '0029' docs/history/dispatch-concept-boundary/DISCUSSION.md && grep -q 'tsk-1o7' docs/history/dispatch-concept-boundary/DISCUSSION.md && node --test --test-skip-pattern="declares the submit-assist-classify capacity" 'test/**/*.test.mjs'`
+
+Updated during Implement (2026-08-09): a bare `npm test` fails on
+`test/runner/dispatch.test.mjs`'s "declares the submit-assist-classify
+capacity" assertion in *every* worktree — `fgos return` runs verify in a
+fresh detached worktree, and `.fgos/config.json` is stripped from every
+worktree by ADR0020 (already tracked, unrelated to this item: `tsk-3ra`,
+still `todo`). Skip pattern matches the existing precedent `tsk-2c1` used
+for the same known gap.

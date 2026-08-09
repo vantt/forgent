@@ -13,7 +13,12 @@ Mọi thứ vòng 5–10 nêu ra đều **chưa mint**.
 
 **Cả sáu bước đã xong** (vòng 27). Bước 0 trả nợ §6 · Bước 1 khung bảy tầng
 (D10) · Bước 2 xếp đủ 23 chữ (§6.10) · Bước 3 sáu ca một-ô-hai-nghĩa · Bước 4
-rà hết kho bee/hn · **Bước 5 nằm ở §7**, tám cụm, bốn cụm đã có item.
+rà hết kho bee/hn · **Bước 5 nằm ở §7**, tám cụm.
+
+**Đóng (2026-08-09, `tsk-5td/plan.md`).** Cả tám cụm §7 giờ đều đã có item,
+và toàn bộ đều `cleanup`/`done` hoặc đã ship — xem cột Trạng thái trong
+từng cụm 7.1–7.8 bên dưới. Không còn việc nào của `tsk-5td` chưa có nơi
+làm; chỉ §7.9 vẫn cố ý chưa mở, đúng như lý do gốc.
 
 **18 D-ID.** Đọc §6 là đủ hiểu thiết kế; §7 là việc phải làm; §5 chỉ cần khi
 muốn nguyên văn Q&A một vòng.
@@ -2024,6 +2029,11 @@ rg -n "supersede" docs/decisions/00*-*.md | rg "0026"    # doc mới trỏ đún
 npm test
 ```
 
+**Trạng thái.** **shipped** — `docs/decisions/0029-sua-dinh-nghia-roottask-
+subtask-capacity-t1-cua-0026.md`, committed thẳng vào `main`, trích đúng
+D7/D8/D17 của `tsk-5td` (đọc qua `.fgos` event log dùng chung vì `tsk-5td`
+lúc đó còn `doing` trên `fgw/tsk-5td`).
+
 ---
 
 ### 7.2 Di trú `needs`/`for` — ba chỗ cùng lúc {#task-demand-declares}
@@ -2058,6 +2068,11 @@ fgos tool register --name <b> --kind cli --command <b> --capability classificati
 # capacity khai needs: classification resolve được sang <b> mà không đổi tên
 npm test
 ```
+
+**Trạng thái.** **`tsk-1o7`** — `cleanup`. Footprint khớp đúng ba chỗ nêu
+trên (`src/runner/dispatch.mjs`, `.claude/skills/_shared/capacity-dispatch-
+fallback.md`, `docs/history/agent-executor-submit-assist-classify/
+CONTEXT.md`).
 
 ---
 
@@ -2100,6 +2115,8 @@ rg -n "'native'|\"native\"|cli-spawn" src/ bin/ .claude/skills/   # còn lại p
 npm test
 ```
 
+**Trạng thái.** **`tsk-592`** — `cleanup`.
+
 ---
 
 ### 7.4 Sửa doc trôi nghĩa {#task-doc-fixes}
@@ -2116,18 +2133,23 @@ npm test
 
 **Verify nháp.** `rg -n "orthogonal" docs/` → 0.
 
+**Trạng thái.** **`tsk-15d`** — `cleanup`.
+
 ---
 
 ### 7.5 → 7.8 Bốn cụm đã có item từ trước
 
 Không chép lại nội dung — item mang đủ chi tiết để tự chạy.
 
+Cập nhật (2026-08-09, `tsk-5td/plan.md`): cả bốn giờ đều `cleanup`, kể cả
+`tsk-2ie5`/`tsk-5wz` từng ghi `todo` ở vòng viết bảng này.
+
 | Anchor | Item | Trạng thái | Ghi chú thứ tự |
 |---|---|---|---|
-| {#task-dead-config} | **`tsk-4eu`** | **`delivered`** — code fix đã merge | Nửa config tách sang **`tsk-5ge`**: `ADR0020`'s `fgos-write-rejected` guard **cấm vĩnh viễn** một nhánh `fgw/<id>` mang thay đổi `.fgos/` qua `fgos approve` |
-| {#task-audit-command} | **`tsk-33w`** | **`doing`**, stage `decompose` | Thuần cộng field vào payload |
-| {#task-gather-specimen} | **`tsk-2ie5`** | `todo`, `deps: tsk-5td` | Mang cả cụm governance (`carries`, D15). Phải xong **trước** bước rút dispatch của `tsk-5wz` |
-| {#task-intake} | **`tsk-5wz`** | `todo`, `deps: tsk-5td`, `mergeAfter: tsk-2ie5` | Tối ưu intake + đổi `submit-assist-classify` về coding domain |
+| {#task-dead-config} | **`tsk-4eu`** | **`cleanup`** — code fix đã merge | Nửa config tách sang **`tsk-5ge`**: `ADR0020`'s `fgos-write-rejected` guard **cấm vĩnh viễn** một nhánh `fgw/<id>` mang thay đổi `.fgos/` qua `fgos approve` |
+| {#task-audit-command} | **`tsk-33w`** | **`cleanup`** | Thuần cộng field vào payload |
+| {#task-gather-specimen} | **`tsk-2ie5`** | **`cleanup`** (child `tsk-2c1` mang cụm `carries`/D15) | Mang cả cụm governance (`carries`, D15). Phải xong **trước** bước rút dispatch của `tsk-5wz` |
+| {#task-intake} | **`tsk-5wz`** | **`cleanup`** | Tối ưu intake + đổi `submit-assist-classify` về coding domain |
 
 ---
 
