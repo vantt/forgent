@@ -229,6 +229,47 @@ above actually needs it now.)
   site's own test, never silently coerce, so the grep-all-callers step in
   the risk map is not skippable.
 
+## Validating findings (fgos-validating pass, real evidence)
+
+Two commands originally written into this plan were wrong and have been
+corrected on the live items (`fgos edit`) before this gate:
+- `tsk-3fj`'s verify referenced `.fgos/config.json` and ran `fgos doctor` —
+  both fail structurally in `fgos return`'s detached re-verify worktree,
+  which never carries `.fgos/` (ADR0020, confirmed by reading
+  `docs/how-to/fix-fgos-write-rejected-merge-block.md`'s own tsk-n4i-1/
+  tsk-5vf fix examples). Narrowed to `npm test`, matching both precedents'
+  own post-fix verify exactly.
+- `tsk-5wz`'s own pre-existing verify point 7 asserted `fgos doctor` green
+  after the rename — same structural problem, and now stale besides (the
+  rename moved to `tsk-3fj`). Reworded to point at the sibling item instead
+  of re-asserting an unprovable claim on this item's own branch.
+
+Real evidence gathered for the highest-risk row (`work.mjs` kind/risk enum
+enforcement), by grepping every `--kind`/`--risk` call site across
+`.claude/skills/`, `plugins/fgOS/skills/`, `test/`, `bin/fgos.mjs`:
+- Real `kind` values in use today: `bug`, `chore`, `design`, `feature`,
+  `task` — `design` is NOT one of `classify.mjs`'s own `KIND_KEYWORDS`
+  candidates (`bug`/`feature`/`chore`/`docs`); any new enum must include it
+  or the call site that uses it breaks.
+- Real `risk` values in use today: `low`/`medium`/`high` (the sane
+  vocabulary) AND `heavy`/`light` (the TIER vocabulary bleeding through) —
+  confirmed at two live sites, not hypothetical:
+  - `test/cli/fgos.test.mjs:3407` — an EXISTING, PASSING test titled
+    `submit --tier heavy --kind bug --risk heavy overrides all three
+    fields regardless of classify(text)`, asserting `risk: "heavy"` is
+    accepted today. This item's OWN verify point 2 already anticipates
+    exactly this ("risk khong nhan duoc gia tri thuoc tu vung tier ...
+    phai bi tu choi hoac normalize") — this test's assertion is the bug
+    being fixed, so it is expected to change, not a plan gap. Named here
+    so `fgos-code-implement` updates this exact test rather than
+    discovering the conflict mid-implementation.
+  - `.claude/skills/fgos-planning/SKILL.md`'s own `fgos add` worked
+    example (line 211) uses `--risk light` — the SAME skill this plan was
+    just written with conflates tier/risk vocabulary in its own canonical
+    example. Not in the item's original file list; added here as a real
+    finding — fix this example alongside the enum change so it does not
+    keep teaching the exact anti-pattern this item removes.
+
 ## Outstanding questions
 
 None
