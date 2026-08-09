@@ -44,9 +44,15 @@ promptly.
 | Test rewrite (existence → absence) | low — same file, same helper, inverted one assertion | `node --test test/runner/dispatch.test.mjs` → 179/179 pass on `fgw/tsk-49u` against live main config |
 | Brief main-red window before merge | low, temporary, precedented (see above) | none needed — same accepted tradeoff `tsk-3fj` documented |
 
-Impact-analysis posture: `inactive` — no code symbol is renamed or moved,
-only a JSON config key and one test's assertion polarity; GitNexus's
-call graph has nothing to say about either.
+Impact-analysis posture: `degraded` — `fgos tool query --capability
+impact-analysis --status present` returns GitNexus as `present` (not
+`inactive`), but its own hook output this session reports its index stale
+at `4ce7a96`, well behind current HEAD. Not a blocker here regardless:
+neither change touches a code symbol (a JSON config key deletion, and a
+self-contained `test()` callback with no upstream callers), so no row in
+this plan's risk map leans on call-graph blast-radius evidence in the
+first place — the posture is recorded honestly rather than assumed
+`inactive`, but nothing in this plan needed it to be `full`.
 
 ## Outstanding questions
 
