@@ -40,6 +40,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- The standalone `fgos-submit-assist` skill. Its own steps had no reason
+  left to exist on their own: title derivation always lived in the
+  `submit` verb itself, and its tier/kind/risk classification is now done
+  automatically — on cleaner, post-clarify text — by `/fgOS:submit`'s own
+  step 6 for any live session. Use `/fgOS:submit` directly; it now does
+  strictly more than this skill did.
+
 ## [0.1.0]
 
 Baseline snapshot of the public surface as of this entry.

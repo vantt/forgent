@@ -581,7 +581,11 @@ fn draw_after_deliver_box(frame: &mut Frame, app: &App, area: Rect) {
 /// dimmed — never hidden, so the layout never shifts — when the item's
 /// `stage != "clarify"`, since `/fgOS:discover` only applies there).
 fn draw_detail_modal(frame: &mut Frame, app: &mut App, item: &crate::app::WorkItem) {
-    let area = centered_rect(60, 40, frame.area());
+    // tsk-2x9: bumped from 40% to 70% height -- 8 detail lines (was 4) plus
+    // the block's own 2 border rows plus the fixed 3-row button strip need
+    // 13 rows minimum; 40% of a typical terminal clipped the new lines
+    // silently (Paragraph has no scrollback here).
+    let area = centered_rect(60, 70, frame.area());
     frame.render_widget(Clear, area);
 
     let sections = Layout::default()
@@ -589,11 +593,24 @@ fn draw_detail_modal(frame: &mut Frame, app: &mut App, item: &crate::app::WorkIt
         .constraints([Constraint::Min(0), Constraint::Length(3)])
         .split(area);
 
+    let priority_text = item
+        .priority
+        .map(|p| p.to_string())
+        .unwrap_or_else(|| "-".into());
+    let blocked_by_text = if item.blocked_by.is_empty() {
+        "-".to_string()
+    } else {
+        item.blocked_by.join(", ")
+    };
     let detail = Paragraph::new(vec![
         Line::from(format!("ID: {}", item.id)),
         Line::from(format!("Title: {}", item.title)),
         Line::from(format!("Goal tier: {}", item.goal_tier)),
         Line::from(format!("Stage: {}", item.stage)),
+        Line::from(format!("Status: {}", item.status)),
+        Line::from(format!("Priority: {}", priority_text)),
+        Line::from(format!("Blocked by: {}", blocked_by_text)),
+        Line::from(format!("Blocks: {}", item.blocks)),
     ])
     .block(
         Block::default()
@@ -761,7 +778,7 @@ mod tests {
     }
 
     fn render_modal_buffer(stage: &str) -> ratatui::buffer::Buffer {
-        let item = WorkItem {
+        render_modal_buffer_with_item(WorkItem {
             id: "tsk-a".into(),
             title: "A".into(),
             goal_tier: "mvp".into(),
@@ -770,7 +787,16 @@ mod tests {
             blocked_by: Vec::new(),
             blocks: 0,
             priority: None,
-        };
+        })
+    }
+
+    /// tsk-2x9: sibling of `render_modal_buffer` that renders a caller-built
+    /// `WorkItem` verbatim, so a test can control fields (`status`,
+    /// `priority`, `blocked_by`, `blocks`) `render_modal_buffer`'s own
+    /// fixed defaults don't vary — added rather than widening
+    /// `render_modal_buffer`'s signature, to leave its 3 existing call
+    /// sites untouched.
+    fn render_modal_buffer_with_item(item: WorkItem) -> ratatui::buffer::Buffer {
         let mut app = App::empty();
         let backend = TestBackend::new(80, 24);
         let mut terminal = Terminal::new(backend).expect("terminal init");
@@ -792,6 +818,55 @@ mod tests {
             content.contains("Discover"),
             "modal must render a Discover button: {content}"
         );
+    }
+
+    /// tsk-2x9: the modal used to show only ID/Title/Goal tier/Stage — now
+    /// also surfaces the `WorkItem` fields already fetched from
+    /// `fgos triage --json` but previously unused in this view.
+    #[test]
+    fn detail_modal_renders_status_priority_blocked_by_and_blocks() {
+        let buffer = render_modal_buffer_with_item(WorkItem {
+            id: "tsk-a".into(),
+            title: "A".into(),
+            goal_tier: "mvp".into(),
+            stage: "executing".into(),
+            status: "doing".into(),
+            blocked_by: vec!["tsk-b".into(), "tsk-c".into()],
+            blocks: 2,
+            priority: Some(150),
+        });
+        let content: String = buffer.content().iter().map(|cell| cell.symbol()).collect();
+        assert!(content.contains("Status: doing"), "modal must render status: {content}");
+        assert!(content.contains("Priority: 150"), "modal must render priority: {content}");
+        assert!(
+            content.contains("Blocked by: tsk-b, tsk-c"),
+            "modal must render blocked-by ids: {content}"
+        );
+        assert!(content.contains("Blocks: 2"), "modal must render blocks count: {content}");
+    }
+
+    /// tsk-2x9: an item with no `blocked_by` and no computed `priority`
+    /// (e.g. still `todo`, pre-`discover`) must render placeholders, not
+    /// an empty string, a stray comma, or the literal `None`.
+    #[test]
+    fn detail_modal_renders_placeholders_for_empty_blocked_by_and_no_priority() {
+        let buffer = render_modal_buffer_with_item(WorkItem {
+            id: "tsk-a".into(),
+            title: "A".into(),
+            goal_tier: "mvp".into(),
+            stage: "clarify".into(),
+            status: "todo".into(),
+            blocked_by: Vec::new(),
+            blocks: 0,
+            priority: None,
+        });
+        let content: String = buffer.content().iter().map(|cell| cell.symbol()).collect();
+        assert!(content.contains("Priority: -"), "empty priority must render as '-': {content}");
+        assert!(
+            content.contains("Blocked by: -"),
+            "empty blocked-by must render as '-': {content}"
+        );
+        assert!(!content.contains("None"), "must never render the literal 'None': {content}");
     }
 
     /// tsk-1e3 D4 / tsk-jo1 D1: Discover renders `Color::DarkGray` (never
