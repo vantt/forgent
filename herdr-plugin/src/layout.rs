@@ -9,12 +9,20 @@ use serde::Deserialize;
 /// CONTEXT.md feature boundary: a 2×2 corner grid).
 const MAX_PANES_PER_TAB: usize = 4;
 
+/// Max `fg:agents-N` tabs before pane placement refuses "no room" instead
+/// of creating a 3rd (tsk-5lr CONTEXT.md feature boundary item 1).
+const MAX_AGENT_TABS: usize = 2;
+
 #[derive(Debug)]
 pub enum LayoutError {
     Io(io::Error),
     ExitStatus(String),
     Parse(serde_json::Error),
     NoUsablePaneInResponse(String),
+    /// Both `fg:agents-1..fg:agents-MAX_AGENT_TABS` are full (tsk-5lr
+    /// CONTEXT.md feature boundary item 1) — never a queue, never an
+    /// auto-created 3rd tab.
+    NoRoomForAgentTabs,
 }
 
 impl std::fmt::Display for LayoutError {
@@ -26,6 +34,10 @@ impl std::fmt::Display for LayoutError {
             LayoutError::NoUsablePaneInResponse(raw) => {
                 write!(f, "herdr response had no usable pane: {raw}")
             }
+            LayoutError::NoRoomForAgentTabs => write!(
+                f,
+                "no room: fg:agents-1..fg:agents-{MAX_AGENT_TABS} are full"
+            ),
         }
     }
 }
@@ -144,6 +156,13 @@ struct LayoutPane {
 #[derive(Debug, Deserialize)]
 struct Rect {
     height: u32,
+    /// tsk-5lr CONTEXT.md D2: pane identity inside `fg:operation` is
+    /// decided by geometry — smallest `x` is the left/merge-loop slot.
+    x: u32,
+    /// CONTEXT.md D2 extends `Rect` with `width` alongside `x`; unread by
+    /// this item's own left/right-by-`x` decision, kept for parse parity.
+    #[allow(dead_code)]
+    width: u32,
 }
 
 /// Extracts the trailing `<N>` from a `fg:agents-<N>` label (tsk-1q3
@@ -190,19 +209,46 @@ pub fn find_agents_tab_with_room(
         .collect();
     agent_tabs.sort_by_key(|(index, _)| *index);
 
+    match decide_agent_tab_placement(&agent_tabs) {
+        AgentTabPlacement::ExistingTabWithRoom(tab) => {
+            let pane_id = find_any_pane_in_tab(herdr_bin, workspace_id, &tab.tab_id)?;
+            Ok((tab.tab_id.clone(), pane_id, tab.pane_count as usize))
+        }
+        AgentTabPlacement::NoRoom => Err(LayoutError::NoRoomForAgentTabs),
+        AgentTabPlacement::CreateNextTab(next_index) => {
+            let label = format!("fg:agents-{next_index}");
+            let stdout =
+                run_herdr(herdr_bin, &tab_create_argv(workspace_id, &label, project_root))?;
+            let (tab_id, pane_id) = parse_tab_create(&stdout).map_err(LayoutError::Parse)?;
+            Ok((tab_id, pane_id, 1))
+        }
+    }
+}
+
+/// Pure decision `find_agents_tab_with_room` dispatches on, given the
+/// `fg:agents-N` tabs already sorted by index: reuse an existing tab with
+/// room, create the next tab, or refuse once `MAX_AGENT_TABS` tabs are
+/// already full (tsk-5lr CONTEXT.md feature boundary item 1). Kept
+/// separate from the live herdr calls for the same unit-testability
+/// `find_other_cockpit_tab` already gets.
+enum AgentTabPlacement<'a> {
+    ExistingTabWithRoom(&'a TabRow),
+    CreateNextTab(u32),
+    NoRoom,
+}
+
+fn decide_agent_tab_placement(agent_tabs: &[(u32, TabRow)]) -> AgentTabPlacement<'_> {
     if let Some((_, tab)) = agent_tabs
         .iter()
         .find(|(_, tab)| (tab.pane_count as usize) < MAX_PANES_PER_TAB)
     {
-        let pane_id = find_any_pane_in_tab(herdr_bin, workspace_id, &tab.tab_id)?;
-        return Ok((tab.tab_id.clone(), pane_id, tab.pane_count as usize));
+        return AgentTabPlacement::ExistingTabWithRoom(tab);
     }
-
+    if agent_tabs.len() >= MAX_AGENT_TABS {
+        return AgentTabPlacement::NoRoom;
+    }
     let next_index = agent_tabs.last().map(|(index, _)| index + 1).unwrap_or(1);
-    let label = format!("fg:agents-{next_index}");
-    let stdout = run_herdr(herdr_bin, &tab_create_argv(workspace_id, &label, project_root))?;
-    let (tab_id, pane_id) = parse_tab_create(&stdout).map_err(LayoutError::Parse)?;
-    Ok((tab_id, pane_id, 1))
+    AgentTabPlacement::CreateNextTab(next_index)
 }
 
 /// argv for the `tab create` call above, kept pure so a test can assert
@@ -359,6 +405,74 @@ fn find_other_cockpit_tab(tabs: &[TabRow], own_tab_id: &str) -> Option<String> {
         .map(|tab| tab.tab_id.clone())
 }
 
+/// Pure decision `ensure_operation_tab` dispatches on: the `tab_id` of the
+/// singular, un-numbered `fg:operation` tab (tsk-5lr CONTEXT.md pinned
+/// term), if one already exists. Same unit-testable separation as
+/// `find_other_cockpit_tab`.
+fn find_operation_tab(tabs: &[TabRow]) -> Option<String> {
+    tabs.iter()
+        .find(|tab| tab.label.as_deref() == Some("fg:operation"))
+        .map(|tab| tab.tab_id.clone())
+}
+
+/// Pure decision: given the `fg:operation` tab's own pane layout, resolves
+/// `(left_pane_id, right_pane_id)` — smallest `x` is the left/merge-loop
+/// slot, the other is the right/retro-cleanup slot (CONTEXT.md D2: pane
+/// identity by geometry, never creation order). Errors when the tab does
+/// not have exactly 2 panes — the pinned "unsupported/error state" for a
+/// manually-edited `fg:operation` tab CONTEXT.md's own pinned assumption
+/// describes.
+fn left_right_panes(layout: &TabLayout) -> Result<(String, String), LayoutError> {
+    let [a, b] = layout.panes.as_slice() else {
+        return Err(LayoutError::NoUsablePaneInResponse(format!(
+            "fg:operation tab has {} panes, expected exactly 2",
+            layout.panes.len()
+        )));
+    };
+    if a.rect.x <= b.rect.x {
+        Ok((a.pane_id.clone(), b.pane_id.clone()))
+    } else {
+        Ok((b.pane_id.clone(), a.pane_id.clone()))
+    }
+}
+
+/// Finds (or creates) the fixed `fg:operation` tab and returns its 2 fixed
+/// panes as `(left_pane_id, right_pane_id)` (tsk-5lr CONTEXT.md D1/D2) —
+/// left is always the merge-loop slot, right always the retro/cleanup
+/// slot. Created eagerly, at herdr-plugin startup, the same find-or-
+/// create-by-label shape `ensure_cockpit_tab` already uses for
+/// `fg:cockpit` (D1). This function only locates the tab/panes — it never
+/// renders pane content or decides which loop launches where (tsk-417 and
+/// tsk-2xt's own scope, respectively).
+pub fn ensure_operation_tab(
+    herdr_bin: &str,
+    workspace_id: &str,
+    project_root: &Path,
+) -> Result<(String, String), LayoutError> {
+    let stdout = run_herdr(herdr_bin, &["tab", "list", "--workspace", workspace_id])?;
+    let tabs = parse_tab_list(&stdout).map_err(LayoutError::Parse)?;
+
+    let any_pane_id = match find_operation_tab(&tabs) {
+        Some(tab_id) => find_any_pane_in_tab(herdr_bin, workspace_id, &tab_id)?,
+        None => {
+            let stdout = run_herdr(
+                herdr_bin,
+                &tab_create_argv(workspace_id, "fg:operation", project_root),
+            )?;
+            let (_tab_id, first_pane_id) = parse_tab_create(&stdout).map_err(LayoutError::Parse)?;
+            run_herdr(
+                herdr_bin,
+                &pane_split_argv(&first_pane_id, "right", project_root),
+            )?;
+            first_pane_id
+        }
+    };
+
+    let stdout = run_herdr(herdr_bin, &["pane", "layout", "--pane", &any_pane_id])?;
+    let envelope: PaneLayoutEnvelope = serde_json::from_str(&stdout).map_err(LayoutError::Parse)?;
+    left_right_panes(&envelope.result.layout)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -420,6 +534,13 @@ mod tests {
     const TAB_LIST_WITH_COCKPIT_FIXTURE: &str = r#"{"id":"cli:tab:list","result":{"tabs":[
         {"agent_status":"idle","focused":false,"label":"workers-3","number":8,"pane_count":3,"tab_id":"wS:t8","workspace_id":"wS"},
         {"agent_status":"idle","focused":false,"label":"fg:cockpit","number":9,"pane_count":4,"tab_id":"wS:tC","workspace_id":"wS"}
+    ],"type":"tab_list"}}"#;
+
+    // Same shape as TAB_LIST_FIXTURE, plus a tab already labeled
+    // `fg:operation` -- a prior herdr-plugin startup's own tab.
+    const TAB_LIST_WITH_OPERATION_FIXTURE: &str = r#"{"id":"cli:tab:list","result":{"tabs":[
+        {"agent_status":"idle","focused":false,"label":"workers-3","number":8,"pane_count":3,"tab_id":"wS:t8","workspace_id":"wS"},
+        {"agent_status":"idle","focused":false,"label":"fg:operation","number":10,"pane_count":2,"tab_id":"wS:tOp","workspace_id":"wS"}
     ],"type":"tab_list"}}"#;
 
     // Captured live this session: `herdr tab create --workspace wS
@@ -541,5 +662,103 @@ mod tests {
             .find(|pane| pane.rect.height == layout.area.height)
             .expect("one pane should still be full height");
         assert_eq!(full_height.pane_id, "wS:p3");
+    }
+
+    #[test]
+    fn agent_tabs_under_cap_still_creates_the_next_tab() {
+        let agent_tabs = vec![(
+            1,
+            TabRow {
+                tab_id: "wS:tD".into(),
+                label: Some("fg:agents-1".into()),
+                pane_count: 4,
+            },
+        )];
+        assert!(matches!(
+            decide_agent_tab_placement(&agent_tabs),
+            AgentTabPlacement::CreateNextTab(2)
+        ));
+    }
+
+    #[test]
+    fn agent_tabs_at_cap_refuse_a_third_tab() {
+        let agent_tabs = vec![
+            (
+                1,
+                TabRow {
+                    tab_id: "wS:tD".into(),
+                    label: Some("fg:agents-1".into()),
+                    pane_count: 4,
+                },
+            ),
+            (
+                2,
+                TabRow {
+                    tab_id: "wS:tE".into(),
+                    label: Some("fg:agents-2".into()),
+                    pane_count: 4,
+                },
+            ),
+        ];
+        assert!(matches!(
+            decide_agent_tab_placement(&agent_tabs),
+            AgentTabPlacement::NoRoom
+        ));
+    }
+
+    #[test]
+    fn agent_tabs_at_cap_but_one_has_room_is_not_refused() {
+        let agent_tabs = vec![
+            (
+                1,
+                TabRow {
+                    tab_id: "wS:tD".into(),
+                    label: Some("fg:agents-1".into()),
+                    pane_count: 2,
+                },
+            ),
+            (
+                2,
+                TabRow {
+                    tab_id: "wS:tE".into(),
+                    label: Some("fg:agents-2".into()),
+                    pane_count: 4,
+                },
+            ),
+        ];
+        assert!(matches!(
+            decide_agent_tab_placement(&agent_tabs),
+            AgentTabPlacement::ExistingTabWithRoom(tab) if tab.tab_id == "wS:tD"
+        ));
+    }
+
+    #[test]
+    fn find_operation_tab_finds_the_labeled_one() {
+        let tabs = parse_tab_list(TAB_LIST_WITH_OPERATION_FIXTURE).expect("fixture should parse");
+        assert_eq!(find_operation_tab(&tabs), Some("wS:tOp".to_string()));
+    }
+
+    #[test]
+    fn find_operation_tab_returns_none_when_absent() {
+        let tabs = parse_tab_list(TAB_LIST_FIXTURE).expect("fixture should parse");
+        assert_eq!(find_operation_tab(&tabs), None);
+    }
+
+    #[test]
+    fn left_right_panes_picks_smallest_x_as_left() {
+        let envelope: PaneLayoutEnvelope =
+            serde_json::from_str(PANE_LAYOUT_TWO_FIXTURE).expect("fixture should parse");
+        // wS:p1H is at x=36, wS:p1G is at x=153 -- p1H is the left/merge slot.
+        let (left, right) =
+            left_right_panes(&envelope.result.layout).expect("exactly 2 panes should resolve");
+        assert_eq!(left, "wS:p1H");
+        assert_eq!(right, "wS:p1G");
+    }
+
+    #[test]
+    fn left_right_panes_errors_when_not_exactly_two() {
+        let envelope: PaneLayoutEnvelope =
+            serde_json::from_str(PANE_LAYOUT_THREE_FIXTURE).expect("fixture should parse");
+        assert!(left_right_panes(&envelope.result.layout).is_err());
     }
 }
