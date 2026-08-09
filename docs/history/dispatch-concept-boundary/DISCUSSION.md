@@ -108,6 +108,9 @@ không mở lại những quyết định các item khác đã khoá.
 | 38 | 11 capability của hn xếp đâu | **Đề nghị** (vòng 11) | **T4 phía cung**, không ngang `gather`/`judge` (thuộc tính của nhà cung cấp, không của một lần dispatch). Cũng **không ngang `gitnexus`**: cả 11 tả **chính cái sổ**, do harness CLI tự khai qua `query.contract`. Ô tương ứng của fgOS — *sổ tự khai năng lực + dải schema* — **đang trống**, latent thật vì global/project install có thể lệch version. §6.5 |
 | 34 | Ô "mục tiêu ngoài sổ" đã có tên | **Đang hội tụ** (vòng 10) | **`errand`** — quét sạch 0 hit ở `src/`, `docs/`, `upstreams/`. Bác `cell` (false friend: bee's cell CÓ claim/reservation/registry) và `packet` (kéo theo khung *"orthogonal axes"* D1 đã bác). Bốn phép thử ở §6.3, sắc nhất: **không sở hữu branch/merge riêng**. Vẫn gated `tsk-2t6` |
 | 35 | `capacity` rút về một nghĩa | **Đề nghị P1′** (vòng 15; bản P1 vòng 10 **đã bị thay**) | Một nghĩa = **năng lực có tên của fgOS**, cặp *behavior-promise / functional-helper* (= D2 + D1 đọc thành định nghĩa). `capacities.<id>` là **bản khai**, không phải bản thân nó; `binding` là **cạnh** T3→T4. Bản P1 đầu sai vì bỏ mất lời hứa hành vi mà không cất vào đâu. `0026` **làm rõ**, không lật |
+| 46 | Ranh giới ngoài cùng của tầng dispatch | **Đề nghị** (vòng 17) | Phép thử: **input đã nằm trong context bên gọi chưa**. Rồi ⇒ **không phải dispatch**, là suy nghĩ của chính session. Cổng chính thức: bốn lý do hợp lệ (`_shared/capacity-dispatch-fallback.md`); trượt cả bốn thì ở lại inline. §6.13 |
+| 47 | Phân loại có phụ thuộc domain không | **Rõ** (vòng 17) | **Tách hai**: trục (to cỡ nào / loại gì / sai thì sao) **agnostic**; rubric + từ vựng **domain sở hữu**. Cùng khuôn `0027` D2/D3 (`statusCategory` agnostic + `DOMAINS[domain].statusLabels`). Lỗ hổng: `DOMAINS` không khai từ vựng phân loại ⇒ `TIERS` enum global cứng, `kind`/`risk` thả tự do. **Ba ca sống** ghi ở §6.13 |
+| 48 | Hai item đã mở | **Rõ** (vòng 17) | `tsk-5wz` (tối ưu intake, dời soul-pass về sau clarify, trả phân loại cho domain) và `tsk-2ie5` (đưa gather vào cơ chế capacity — mẫu vật cross-provider thật). Cả hai `deps: tsk-5td`; `tsk-5wz` mang `mergeAfter: tsk-2ie5` để bước rút dispatch không land trước khi có thứ thay thế |
 | 42 | `submit-assist-classify` vướng gì | **Rõ** (vòng 16) | (a) dispatch bằng **prose**, 0 hit trong code ⇒ fgOS có hai đường dispatch song song · (b) biến trùng-tên ngẫu nhiên thành thứ **chịu lực**: làm đúng D5 thì presence query trả rỗng và skill **âm thầm** rơi về inline · (c) capacity `kind:"cli"` **duy nhất** ⇒ gánh một mình cả ba cổng gác lẫn A2 · (d) `tier:"light"` nhưng `capacity.model` đè ⇒ ca sống của hai-nghĩa-`tier`. §6.4 |
 | 44 | Nguồn gốc của trùng-tên ba chiều | **Rõ, sửa lại vòng 5** (vòng 16) | **Không** ngẫu nhiên: `CONTEXT.md` của `agent-executor-submit-assist-classify` **D3 (locked)** ghi cứng `--capability submit-assist-classify` như thể `resolveExecutorConfig` cần nó, trong khi thông báo lỗi của chính code (`dispatch.mjs:607`) nói rõ chỉ `--name` mới bắt buộc khớp, `--capability <label>` là placeholder tự do. ⇒ di trú D5 phải **supersede D3** đó, không chỉ sửa registry + skill fragment |
 | 45 | `sensitiveData` — khoá nhưng chưa ship | **Rõ, là LỖ HỔNG** (vòng 16) | Cùng CONTEXT.md, **D7 (locked, người dùng xác nhận tường minh)**: thêm `sensitiveData: false` vào capacity entry **ngay**. Kiểm: 0 hit ở `.fgos/config.json` **và** ở `src/`+`bin/`. Là mảnh từ vựng governance **duy nhất** cho cross-provider; hôm nay chỉ còn `allowCrossProvider` — boolean nói *được phép ra*, không nói *cái gì được ra*. **Bước 5 mở item** |
@@ -699,6 +702,36 @@ nên nó pass rồi bị nuốt im. Hệ quả thật: `judge-decompose` khi ph�
 chạy bằng global executor, **không có `Read`**. Và nó là **bằng chứng độc lập
 cho D6** — có người đã muốn lane theo *mục đích* và viết vào config trước khi
 khái niệm `for:` có tên.
+
+### Vòng 17 — 2026-08-09 — ranh giới ngoài cùng, và hai item mở ra
+
+Ba câu của người dùng nối thành một mạch: *"nên thay bằng cái gì hợp lý hơn"*
+→ *"cân nhắc kết hợp với `fgos-clarifying`, hai thứ này support intake"* →
+*"hiểu ý viết lại thì domain-agnostic, còn phân loại có phụ thuộc domain
+không?"*
+
+**Thu hoạch từ vựng — cái mà bảy tầng còn thiếu: RANH GIỚI NGOÀI CÙNG.** Bảy
+tầng tả một lần dispatch nhưng không tả thứ nằm ngoài nó, nên người ta ép việc
+không-phải-dispatch vào tầng dispatch. Phép thử: **input đã nằm trong context
+bên gọi chưa** — rồi thì đó là **suy nghĩ của chính session**, không phải
+dispatch. §6.13.
+
+**Phân loại: không phải "có" hay "không" mà tách hai** — trục agnostic, thước
+đo domain sở hữu, đúng khuôn `0027` D2/D3 đã khoá cho `status`. Và `DOMAINS`
+đang thiếu đúng chỗ đó: `TIERS` enum global cứng, `kind`/`risk` thả tự do.
+
+**Ba ca sống rơi vào tay ngay trong phiên** (`tsk-5ui`, `tsk-5wz`, `tsk-2ie5`):
+bộ phân loại cơ học nhét giá trị **tier** vào field **risk** cả ba lần, và một
+lần ghi `kind: "docs"` — ngoài mọi từ vựng. Không ai chặn.
+
+**Sửa lại đề nghị vòng 16b của chính tôi:** *"gộp phân loại vào
+`fgos-clarifying`"* là **sai** — `clarify` agnostic, nhét rubric coding vào đó
+là hardcode một domain vào xương sống, đúng thứ `0027` D5 cấm. Hình đúng:
+clarify (agnostic) viết lại → rồi resolve classifier **của chính domain item
+đó**, cùng pattern `/fgOS:retro-next` dùng.
+
+**Hai item đã mở**, chi tiết đầy đủ nằm trong chính item, không chép lại đây:
+`tsk-5wz` · `tsk-2ie5` (xem §3 hàng 48).
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -1397,6 +1430,63 @@ minh.
 (`kind !== 'task'`) — **đúng vị từ của A3**. Capacity `mcp`/`skill`/`http`/
 `binary` hôm nay dispatch với **zero** presence check và **zero** cross-provider
 check. Latent: chưa capacity nào thuộc bốn kind đó.
+
+### 6.13 Ranh giới ngoài cùng: cái gì KHÔNG phải một lần dispatch [ĐỀ NGHỊ — vòng 17]
+
+Bảy tầng tả **một lần dispatch**. Chúng không tả thứ nằm **ngoài** nó — và
+thiếu ranh giới đó thì người ta ép việc không-phải-dispatch vào tầng dispatch,
+rồi đẻ ra mẫu vật mỏng. Ca sống: `submit-assist-classify`.
+
+**Phép thử ngoài cùng: input đã nằm trong context của bên gọi chưa?**
+
+| | |
+|---|---|
+| **Chưa** — phải đi đọc/tìm thứ session chưa có | **là một lần dispatch**. Digest có giá trị vì nó thay cho việc caller tự đọc |
+| **Rồi** — caller vừa đọc chính đoạn đó | **KHÔNG phải dispatch. Là suy nghĩ của chính session.** Giao đi = soul mù re-derive thứ soul sống đã có (`tsk-1ni`), cộng thêm độ trễ |
+
+Cổng chính thức đã có sẵn và chỉ có **bốn** lý do hợp lệ để giao đi
+(`_shared/capacity-dispatch-fallback.md`): model rẻ hơn · provider khác · cách
+ly tài nguyên · **chạy song song cho nhanh**. Trượt cả bốn thì ở lại inline.
+
+`fgos-clarifying` đã tự viết luật này ở dạng khoá, cho đúng loại việc đó:
+
+> Never delegate this judgment to the Agent/Task tool … a live, same-provider
+> soul already holds full context … spawning a subagent to re-derive it from
+> less context is **pure overhead**
+
+⇒ Soul work của intake (hiểu ý, viết lại cho tường minh, phân loại) **không có
+T2 unit nào, không có capacity nào** — nó chưa bao giờ thuộc tầng dispatch.
+Ép nó thành capacity chính là cách `submit-assist-classify` ra đời mỏng.
+
+#### Phân loại: trục agnostic, thước đo domain sở hữu
+
+| field | trục (agnostic) | rubric / từ vựng (domain) |
+|---|---|---|
+| `tier` | *việc này to cỡ nào* | ranh giới *"typo, rename, doc fix"* vs *"multi-system, public contract, new architecture"* — **thuần coding** |
+| `kind` | *đây là loại việc gì* | `bug`/`feature`/`chore`/`task` — **thuần phần mềm** |
+| `risk` | *sai thì hậu quả bao nhiêu × đảo ngược được không* — **agnostic hoàn toàn** | hiệu chuẩn *"auth/payments/data-integrity"* — **coding** |
+
+fgOS **đã có sẵn đúng khuôn này** ở chỗ khác: `0027` D2/D3 — `statusCategory`
+là tập agnostic cố định, `DOMAINS[domain].statusLabels` là nhãn do domain đặt.
+Phân loại phải theo, không cần phát minh.
+
+**Lỗ hổng đo được:** `DOMAINS[domain]`
+(`src/state/workflow-stage-graphs.mjs:51`) khai `stages`/`stepMap`/
+`transitions`/`statusLabels` — **không khai từ vựng phân loại**. Hệ quả ở hai
+field cạnh nhau: `TIERS` (`work.mjs:145`) là enum **global cứng** cho mọi
+domain, còn `kind`/`risk` (`:261`, `:334`) chỉ `requireNonEmptyString` — **thả
+tự do**. Vừa quá cứng vừa quá lỏng.
+
+**Ba ca sống, thu được ngay trong phiên này (2026-08-09):**
+
+| item | máy gán | sai chỗ nào |
+|---|---|---|
+| `tsk-5ui` | `risk: "standard"` | giá trị **tier** nằm trong field **risk** |
+| `tsk-5wz` | `kind: "bug"` · `risk: "heavy"` | sai loại · lại giá trị tier trong risk |
+| `tsk-2ie5` | `kind: "docs"` · `risk: "light"` | **`docs` không thuộc từ vựng nào** · lại giá trị tier trong risk |
+
+Ba lần liên tiếp, không ai chặn. Đây là lỗ đang chảy, không phải rủi ro lý
+thuyết.
 
 ### 6.10 Toàn bộ 23 chữ, đã xếp
 
