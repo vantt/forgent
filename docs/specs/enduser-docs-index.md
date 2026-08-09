@@ -219,10 +219,15 @@ duy nhất của linkage vẫn là nhật ký capture, tra qua `fgos doc-sources
   `QUADRANT_DIR_ALIASES` (khai vị trí thay thế mỗi ngăn — R10; hiện `explanation` ->
   `['decisions']`), `findSourceCaptureId` (gom một, cho chỉ mục), `findSourceCaptureIds`
   (gom mọi capture của một đường dẫn, cho `doc-sources` — R9), `buildEnduserIndex`.
-- I/O + verb: nhánh `docs-index` trong `repo/bin/fgos.mjs` (quét thư mục ngăn CHÍNH và
-  mọi vị trí thay thế trong `QUADRANT_DIR_ALIASES`, rút tiêu đề H1 đầu, fold nhật ký qua
-  bề mặt đọc-thuần `listWork`, ghi manifest); nhánh `doc-sources` cùng tệp (gom nguồn
-  của một đường dẫn qua `findSourceCaptureIds` + `listWork`); đăng ký cả hai verb ở
+- I/O + sinh chỉ mục: `repo/src/report/enduser-index-generate.mjs` (tsk-1m0) — quét thư
+  mục ngăn CHÍNH và mọi vị trí thay thế trong `QUADRANT_DIR_ALIASES`, rút tiêu đề H1 đầu,
+  fold nhật ký qua bề mặt đọc-thuần `listWork`, và (chỉ ở `generateEnduserDocsIndex`) ghi
+  manifest — đây là MỘT đường sinh duy nhất mà cả nhánh `docs-index` trong
+  `repo/bin/fgos.mjs` lẫn doctor check/fix `enduser-docs-index-stale`
+  (`repo/src/setup/registrations.mjs`) cùng gọi, không bên nào lặp lại logic của bên kia.
+  `computeEnduserDocsIndex` là nửa đọc-thuần (không ghi) mà doctor check dùng để tính độ
+  lệch mà không đụng đĩa. Nhánh `doc-sources` vẫn ở `repo/bin/fgos.mjs` (gom nguồn của một
+  đường dẫn qua `findSourceCaptureIds` + `listWork`); đăng ký cả hai verb ở
   `repo/src/cli/command-registry.mjs` với quyền `read`.
 - Bộ đọc/ghi đầu-mô-tả (không I/O, không phụ thuộc thư viện ngoài): `repo/src/report/frontmatter.mjs`
   — `parseFrontmatter`/`renderFrontmatter`; đây là cơ chế đọc/ghi khối mô tả riêng của
