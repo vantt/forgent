@@ -1864,12 +1864,12 @@ D-ID chống lưng.
 
 | # | Cụm | Item | D-ID chống lưng |
 |---|---|---|---|
-| 1 | Decision doc supersede `0026` | **chưa mở** | D7 · D8 · D17 |
-| 2 | Di trú `needs`/`for` (ba chỗ cùng lúc) | **chưa mở** | D5 · D6 |
-| 3 | Vị từ gác + đổi tên mechanism | **chưa mở** | D13 · D16 |
-| 4 | Sửa doc trôi nghĩa | **chưa mở** | D1 · D3 |
-| 5 | `executors` chết + judge thiếu `Read` | `tsk-4eu` ✅ | — (lỗi độc lập) |
-| 6 | Audit ghi cả `command` | `tsk-33w` ✅ | D9 |
+| 1 | Decision doc supersede `0026` | **`tsk-5wf`** ✅ | D7 · D8 · D17 |
+| 2 | Di trú `needs`/`for` (ba chỗ cùng lúc) | **`tsk-1o7`** ✅ | D5 · D6 |
+| 3 | Vị từ gác + đổi tên mechanism | **`tsk-592`** ✅ | D13 · D16 |
+| 4 | Sửa doc trôi nghĩa | **`tsk-15d`** ✅ | D1 · D3 |
+| 5 | `executors` chết + judge thiếu `Read` | `tsk-4eu` — **đã `delivered`**; nửa config tách sang **`tsk-5ge`** (ADR0020 chặn `fgw/<id>` mang thay đổi `.fgos/`) | — (lỗi độc lập) |
+| 6 | Audit ghi cả `command` | `tsk-33w` — **đang `doing`** | D9 |
 | 7 | Gather thành mẫu vật + `carries` | `tsk-2ie5` ✅ | D6 · D13 · D15 |
 | 8 | Tối ưu intake | `tsk-5wz` ✅ | D12 · D15 |
 
@@ -1967,6 +1967,15 @@ npm test
 | Vị từ cổng presence + cross-provider (`dispatch.mjs:603`, `:630`) | `kind === 'cli'` | **`kind !== 'task'`** |
 | Giá trị mechanism trả về | `native` / `cli-spawn` | **`in-process` / `out-of-process`** |
 
+**Trigger sống cho D16, không phải giả định.** `tsk-49o` đang định thêm
+**adapter thứ hai** (`sandboxed-cli-spawn`) vào `EXECUTOR_ADAPTERS`. Hôm nay
+map đó có **đúng một** key và chuỗi `'cli-spawn'` của nó **trùng** với giá trị
+mechanism — hai tầng khác nhau đội chung một chuỗi, chưa ai phân biệt được vì
+chỉ có một adapter. **Ngày `tsk-49o` land là lúc chỗ nhập nhằng đó thành lỗi
+thật.** Liên quan: `tsk-6db` (cho `agy` được nhận diện cơ chế native riêng) —
+nếu land thì `native` còn tệ hơn nữa, vì phải hỏi *"native của provider nào"*,
+trong khi `in-process` vẫn đúng.
+
 **Hệ quả của vị từ mới.** Capacity `mcp`/`skill`/`http`/`binary` **bắt đầu** bị
 gác — hôm nay chúng dispatch với **zero** presence check và **zero**
 cross-provider check. Latent hôm nay (chưa capacity nào thuộc bốn kind đó),
@@ -2001,14 +2010,14 @@ npm test
 
 ---
 
-### 7.5 → 7.8 Bốn cụm đã có item
+### 7.5 → 7.8 Bốn cụm đã có item từ trước
 
 Không chép lại nội dung — item mang đủ chi tiết để tự chạy.
 
 | Anchor | Item | Trạng thái | Ghi chú thứ tự |
 |---|---|---|---|
-| {#task-dead-config} | **`tsk-4eu`** | `todo`, **không dep** | **Chạy được ngay.** Lỗi đang chảy: `judge-decompose` cli-spawn chạy **không có `Read`** |
-| {#task-audit-command} | **`tsk-33w`** | `todo`, `deps: tsk-4eu` | Thuần cộng field vào payload; chung file với `tsk-4eu` nên nối tiếp |
+| {#task-dead-config} | **`tsk-4eu`** | **`delivered`** — code fix đã merge | Nửa config tách sang **`tsk-5ge`**: `ADR0020`'s `fgos-write-rejected` guard **cấm vĩnh viễn** một nhánh `fgw/<id>` mang thay đổi `.fgos/` qua `fgos approve` |
+| {#task-audit-command} | **`tsk-33w`** | **`doing`**, stage `decompose` | Thuần cộng field vào payload |
 | {#task-gather-specimen} | **`tsk-2ie5`** | `todo`, `deps: tsk-5td` | Mang cả cụm governance (`carries`, D15). Phải xong **trước** bước rút dispatch của `tsk-5wz` |
 | {#task-intake} | **`tsk-5wz`** | `todo`, `deps: tsk-5td`, `mergeAfter: tsk-2ie5` | Tối ưu intake + đổi `submit-assist-classify` về coding domain |
 
