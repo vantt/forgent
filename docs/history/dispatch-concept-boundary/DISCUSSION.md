@@ -11,13 +11,16 @@ Vòng 10 (2026-08-09). **D1 và D2 vẫn là hai D-ID duy nhất đã mint** —
 giữ qua chín vòng không bị lật, và vòng 6 lẫn vòng 10 đều củng cố thêm.
 Mọi thứ vòng 5–10 nêu ra đều **chưa mint**.
 
-§6 đã **regenerate lần 3**, đổi xương sống từ "năm chiều" sang **bảy tầng** —
-tức Bước 0 xong, và Bước 1 (chốt tầng) + Bước 2 (xếp 23 chữ) đã có **bản đề
-nghị đầy đủ** trong §6.1 và §6.10, chờ người dùng bác chỗ nào sai. Bốn đề nghị
-P1–P4 ở §6.11 là thứ cần gật/bác trước khi đi tiếp.
+**Cả sáu bước đã xong** (vòng 27). Bước 0 trả nợ §6 · Bước 1 khung bảy tầng
+(D10) · Bước 2 xếp đủ 23 chữ (§6.10) · Bước 3 sáu ca một-ô-hai-nghĩa · Bước 4
+rà hết kho bee/hn · **Bước 5 nằm ở §7**, tám cụm, bốn cụm đã có item.
 
-Vòng 10 cũng đổi cách làm việc theo yêu cầu người dùng: **tổng hợp và đề nghị,
-không hỏi từng câu một**.
+**18 D-ID.** Đọc §6 là đủ hiểu thiết kế; §7 là việc phải làm; §5 chỉ cần khi
+muốn nguyên văn Q&A một vòng.
+
+Cách làm việc từ vòng 10 trở đi, theo yêu cầu người dùng: **tổng hợp và đề
+nghị, không hỏi từng câu một** — và từ vòng 21, mỗi lần cần người quyết thì
+tách rõ *cái gì tự xếp được* khỏi *cái gì chỉ người quyết được*.
 
 > ✅ **§6 đã regenerate (lần 2, bản sau vòng 8)** — vòng 5–8 đã gấp vào, kể cả
 > phần "phía cung" trước đây thiếu hẳn. Đọc **§6 là đủ** để hiểu thiết kế; §5
@@ -1855,4 +1858,170 @@ gì"*. P1+P2 vá gốc thì cả cụm rơi ra cùng lúc.
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-*(chưa có — §7 chỉ điền khi §6 đã đủ cụ thể để chia việc)*
+**Bước 5 của kế hoạch sáu bước.** Tám cụm. Bốn cụm **đã có item**, bốn cụm
+**chưa mở**. Không cụm nào cần thêm thảo luận từ vựng — mọi thứ dưới đây đã có
+D-ID chống lưng.
+
+| # | Cụm | Item | D-ID chống lưng |
+|---|---|---|---|
+| 1 | Decision doc supersede `0026` | **chưa mở** | D7 · D8 · D17 |
+| 2 | Di trú `needs`/`for` (ba chỗ cùng lúc) | **chưa mở** | D5 · D6 |
+| 3 | Vị từ gác + đổi tên mechanism | **chưa mở** | D13 · D16 |
+| 4 | Sửa doc trôi nghĩa | **chưa mở** | D1 · D3 |
+| 5 | `executors` chết + judge thiếu `Read` | `tsk-4eu` ✅ | — (lỗi độc lập) |
+| 6 | Audit ghi cả `command` | `tsk-33w` ✅ | D9 |
+| 7 | Gather thành mẫu vật + `carries` | `tsk-2ie5` ✅ | D6 · D13 · D15 |
+| 8 | Tối ưu intake | `tsk-5wz` ✅ | D12 · D15 |
+
+**Đổi tên gì** — gộp lại một chỗ cho dễ tra:
+
+| Cũ | Mới | D-ID | Ở đâu |
+|---|---|---|---|
+| `rootTask` | `work` + vai trò T1 | D7 | prose (0 identifier trong code) |
+| `subTask` | `child work` · hoặc "một `work`/`exec packet` khác" | D4 · D7 | prose |
+| `capacity` = lớp việc | `capacity` = **năng lực có tên** | D8 | định nghĩa, không đổi key |
+| `kind` "(transport)" | `kind` = **loại nhà cung cấp** | D3 | nhãn tài liệu |
+| `native` / `cli-spawn` | `in-process` / `out-of-process` | D16 | **chuỗi code trả về** |
+| `errand` | `exec packet` | D18 | chỉ tồn tại trong phiên này |
+| T3 "BINDING" | T3 **"NĂNG LỰC CÓ TÊN"** | D8 | nhãn tầng |
+
+---
+
+### 7.1 Decision doc supersede `0026` {#task-decision-doc-0026}
+
+**Mục tiêu.** Một decision doc mới supersede **phần từ vựng** của `0026`, gộp
+ba thay đổi cùng chạm đúng một mục định nghĩa. Tiền lệ: `0028` đã supersede
+`0026` một lần cho việc đổi tên `orchestrator`→`launcher`.
+
+**Trích §6 nó dựa vào.** §6.3 (bỏ `rootTask`/`subTask`) · §6.4 (`capacity` =
+năng lực có tên) · §6.7 (T1 hai giá trị, `orchestrator` lên T0).
+
+**D-ID áp dụng.** **D7** · **D8** · **D17**.
+
+**Ba mệnh đề phải sửa trong `0026`:**
+
+| `0026` viết | Sửa thành | D-ID |
+|---|---|---|
+| `rootTask`/`subTask` là hai chữ của từ vựng dispatch | **bỏ cả hai** — `rootTask` là *vai trò*, `subTask` là *tên gọi tương đối* (chính `0026` tự khai vậy) | D7 |
+| `capacity` = *"đơn vị functional/helper hẹp … không tự mang vòng đời 1 rootTask đầy đủ"* | bản chất **giữ**, nâng thành cặp **behavior-promise / functional-helper**; **tiêu chí phân định** đổi sang *authority + state effects* (D1 đã làm) | D8 |
+| vai trò bên gọi gồm cả `orchestrator` | T1 **hai** giá trị (`launcher`/`driver`); `orchestrator` = **tầng hợp thành T0** — điền vào chỗ `tsk-2cw` cố ý chừa | D17 |
+
+**Quan hệ.** Không chặn item nào. Nên làm **trước** cụm 7.2 để di trú có doc
+chống lưng, nhưng không bắt buộc.
+
+**Verify nháp.**
+```
+rg -n "rootTask|subTask" docs/decisions/ src/ bin/      # còn lại phải là 0
+rg -n "supersede" docs/decisions/00*-*.md | rg "0026"    # doc mới trỏ đúng 0026
+npm test
+```
+
+---
+
+### 7.2 Di trú `needs`/`for` — ba chỗ cùng lúc {#task-demand-declares}
+
+**Mục tiêu.** Cho phía cầu tự khai `needs` (capability) và `for` (purpose), và
+đổi khoá khớp của binding từ **tên** sang **hai field đó**.
+
+**Trích §6.** §6.4 — *"name-keying là **hệ quả tất yếu** của việc phía cầu câm:
+phía cung khai `capability`, phía cầu không khai gì, nên code buộc rơi về cái
+tên duy nhất còn lại"*.
+
+**D-ID.** **D5** (nhận US-027) · **D6** (hai field).
+
+**⚠ Ba chỗ phải sửa CÙNG LÚC — sửa thiếu một chỗ là hỏng IM LẶNG:**
+
+| # | Chỗ | Vì sao không tách được |
+|---|---|---|
+| 1 | Registry — đăng ký lại `capability` cho đúng luật | nếu chỉ làm cái này thì `tool query --capability <id>` trả rỗng |
+| 2 | `.claude/skills/_shared/capacity-dispatch-fallback.md` Step B | nó đang query bằng `--capability <CAPACITY_ID>`, tức **dựa vào sự trùng tên**; registry đổi mà đây không đổi ⇒ skill in *"backend isn't available"* rồi **âm thầm** rơi về inline, **không lỗi** |
+| 3 | **Supersede D3** của `docs/history/agent-executor-submit-assist-classify/CONTEXT.md` | D3 ghi cứng `--capability submit-assist-classify` **như thể resolver cần nó**; thông báo lỗi của chính code (`dispatch.mjs:607`) nói rõ chỉ `--name` mới bắt buộc |
+
+**Blast radius.** `resolveExecutorConfig` — **CRITICAL**, 8 upstream symbol,
+7 execution flow. `tsk-3ik` đã **cố tình né** nó một lần.
+
+**Quan hệ.** `tsk-5wz` mục 4 chạm cùng entry (`submit-assist-classify`) ⇒
+**phải phối hợp thứ tự**, không chạy song song.
+
+**Verify nháp.**
+```
+# provider thứ hai của cùng một capability phải dùng được
+fgos tool register --name <b> --kind cli --command <b> --capability classification
+# capacity khai needs: classification resolve được sang <b> mà không đổi tên
+npm test
+```
+
+---
+
+### 7.3 Vị từ gác + đổi tên mechanism {#task-gate-predicate-and-rename}
+
+**Mục tiêu.** Hai việc cùng chạm khái niệm mechanism và cùng nằm trong
+`dispatch.mjs` ⇒ một item, một lần đọc code.
+
+**Trích §6.** §6.6 (mechanism = trong/ngoài, sáu suy dẫn) · §6.9 (A4).
+
+**D-ID.** **D13** (vị từ) · **D16** (tên).
+
+| Việc | Trước | Sau |
+|---|---|---|
+| Vị từ cổng presence + cross-provider (`dispatch.mjs:603`, `:630`) | `kind === 'cli'` | **`kind !== 'task'`** |
+| Giá trị mechanism trả về | `native` / `cli-spawn` | **`in-process` / `out-of-process`** |
+
+**Hệ quả của vị từ mới.** Capacity `mcp`/`skill`/`http`/`binary` **bắt đầu** bị
+gác — hôm nay chúng dispatch với **zero** presence check và **zero**
+cross-provider check. Latent hôm nay (chưa capacity nào thuộc bốn kind đó),
+nhưng `tsk-2ie5` có thể tạo ra cái đầu tiên ⇒ **làm trước hoặc cùng** `tsk-2ie5`.
+
+**⚠ Đổi chuỗi trả về là breaking cho consumer.** Phải grep mọi chỗ so sánh
+chuỗi `'native'`/`'cli-spawn'` — gồm cả `dispatch.mjs decide` CLI (skill đang
+đọc JSON `{"mechanism": ...}`) và `_shared/capacity-dispatch-fallback.md`
+Step B.5, vốn phân nhánh theo đúng hai chuỗi đó.
+
+**Verify nháp.**
+```
+rg -n "'native'|\"native\"|cli-spawn" src/ bin/ .claude/skills/   # còn lại phải là 0
+npm test
+```
+
+---
+
+### 7.4 Sửa doc trôi nghĩa {#task-doc-fixes}
+
+**Mục tiêu.** Ba dòng doc đang nói ngược với D-ID đã khoá.
+
+**D-ID.** **D1** · **D3**.
+
+| Chỗ | Đang nói | Phải sửa vì |
+|---|---|---|
+| `docs/explanation/why-fgos-dispatch-splits-into-gather-packets-and-a-gated-exec-packet.md:64` | *"along **two orthogonal axes**"* | **D1 đã bác thẳng** hình vuông góc — nó là **cây hai tầng** |
+| chỗ nào còn gắn nhãn `kind` = *transport* | transport | **D3**: `kind` = **loại nhà cung cấp** |
+| `docs/specs/system-overview.md:31` | *"Đơn vị việc **duy nhất**"* | **hết nợ** sau D7/D8 — `work` lại là giá trị T2 duy nhất được lưu. **Không cần sửa**, ghi ở đây để người sau khỏi đi sửa nhầm |
+
+**Verify nháp.** `rg -n "orthogonal" docs/` → 0.
+
+---
+
+### 7.5 → 7.8 Bốn cụm đã có item
+
+Không chép lại nội dung — item mang đủ chi tiết để tự chạy.
+
+| Anchor | Item | Trạng thái | Ghi chú thứ tự |
+|---|---|---|---|
+| {#task-dead-config} | **`tsk-4eu`** | `todo`, **không dep** | **Chạy được ngay.** Lỗi đang chảy: `judge-decompose` cli-spawn chạy **không có `Read`** |
+| {#task-audit-command} | **`tsk-33w`** | `todo`, `deps: tsk-4eu` | Thuần cộng field vào payload; chung file với `tsk-4eu` nên nối tiếp |
+| {#task-gather-specimen} | **`tsk-2ie5`** | `todo`, `deps: tsk-5td` | Mang cả cụm governance (`carries`, D15). Phải xong **trước** bước rút dispatch của `tsk-5wz` |
+| {#task-intake} | **`tsk-5wz`** | `todo`, `deps: tsk-5td`, `mergeAfter: tsk-2ie5` | Tối ưu intake + đổi `submit-assist-classify` về coding domain |
+
+---
+
+### 7.9 Ô chưa xếp — **không** mở item {#task-not-yet}
+
+Cả ba thiếu **ca sống**, không thiếu suy nghĩ. Mở item bây giờ chỉ sinh ra suy
+đoán — đúng cái phiên này đã từ chối làm với `transform`.
+
+| Ô | Điều kiện để mở |
+|---|---|
+| `cli` vs `binary` — hai giá trị, **zero khác biệt cơ học** | một ca thật cần phân biệt chúng |
+| `transform` — lớp thứ ba của nhánh helper | **một** ca sống bất kỳ |
+| `exec packet` mở cổng | **≥2 ca thật** (`tsk-2t6` D4/D9); hôm nay **0** |
+| **A5** — `capacities.<id>` và `tools.<name>` tả cùng backend, không đối chiếu | **tự hết** khi 7.2 xong; không cần item riêng |
