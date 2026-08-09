@@ -111,14 +111,15 @@ function checkPluginSkillCliReachable(cwd) {
   if (fs.existsSync(localBin)) {
     return { passed: true, message: `local bin/fgos.mjs found at ${localBin}` };
   }
-  const onPath = which('fgos'); // mirrors checkNodeAndGit's existing PATH-lookup helper
-  if (onPath) {
+  try {
+    const onPath = execFileSync('sh', ['-c', 'command -v fgos'], { encoding: 'utf8' }).trim();
     return { passed: true, message: `fgos resolved from PATH at ${onPath}` };
+  } catch {
+    return {
+      passed: false,
+      message: `no bin/fgos.mjs at ${cwd} and no global fgos install on PATH -- every /fgOS:* slash command will fail on first use (run: npm install -g github:vantt/forgent)`,
+    };
   }
-  return {
-    passed: false,
-    message: `no bin/fgos.mjs at ${cwd} and no global fgos install on PATH -- every /fgOS:* slash command will fail on first use (run: npm install -g github:vantt/forgent)`,
-  };
 }
 
 registerCheck({
@@ -128,11 +129,15 @@ registerCheck({
 });
 ```
 
-Exact PATH-lookup call reuses whatever helper `checkNodeAndGit` already
-uses for `git`/`node` presence in this same file — `fgos-code-implement`
-reads that helper directly rather than this plan re-describing it, so the
-new check's PATH branch matches the codebase's own existing convention
-instead of introducing a second one.
+FIXED at fgos-validating (reality-gate repo-fit check, tsk-1no): the
+earlier draft claimed this mirrors "checkNodeAndGit's existing PATH-lookup
+helper" — false, verified by reading `registrations.mjs:228-239` directly.
+`checkNodeAndGit` has no reusable PATH-lookup helper; it only wraps
+`execFileSync('git', ['--version'])` in its own try/catch, specific to
+`git`. The corrected code above follows that SAME try/catch shape
+(`execFileSync` + catch, no shared helper invented), applied to `sh -c
+"command -v fgos"` instead — same convention, not a new one, but no
+helper to "reuse" because none exists.
 
 Add a matching unit test to `test/setup/registrations.test.mjs`
 (mirroring `checkShellIntegrationSourced`'s or `checkNodeAndGit`'s own
