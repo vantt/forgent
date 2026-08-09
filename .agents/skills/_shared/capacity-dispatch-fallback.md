@@ -1,11 +1,14 @@
 # Shared fragment: capacity-dispatch-with-fallback
 
-tsk-53h: extracted from `fgos-submit-assist/SKILL.md`'s own classify step
-(`tsk-5l2-3`), the first and — until a second consumer exists — only real
-wiring of this pattern. Generalized here so a second in-session skill with
-an inline-reasoning step can gain the same optional dispatch-to-a-capacity
-path without copy-pasting this branch logic into its own `SKILL.md` (DRY —
-independent copies drift the next time this logic changes,
+tsk-53h: extracted from the standalone submit-assist skill's own classify
+step (`tsk-5l2-3`), the first and — until a second consumer exists — only
+real wiring of this pattern. That skill has since been retired in full
+(tsk-6ar) — its dispatch to this pattern was already gone before then
+(tsk-4ns, see Precedent below). Generalized here so a second in-session
+skill with an inline-reasoning step can gain the same optional
+dispatch-to-a-capacity path without copy-pasting this branch logic into
+its own `SKILL.md` (DRY — independent copies drift the next time this
+logic changes,
 `docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md` D2).
 
 Point at this file from a consumer `SKILL.md` by relative path (e.g.
@@ -317,11 +320,12 @@ scarcity signal needs the full denominator, not just the misses.
   the reference for config-entry/registration steps (1–3 there), which
   this fragment does not repeat.
 - No live consumer of this fragment's own Steps A-D remains today (tsk-4ns
-  retired `fgos-submit-assist/SKILL.md`'s own dispatch to
+  retired the standalone submit-assist skill's own dispatch to
   `submit-assist-classify` — its classify step never had a real reason to
   dispatch per the "Valid reasons to dispatch" list above: the input was
   already in the caller's own context, and spawning added latency at the
-  exact moment a person is waiting, `AGENTS.md`'s priority #1). This
+  exact moment a person is waiting, `AGENTS.md`'s priority #1; that skill
+  has since been retired in full, tsk-6ar). This
   fragment stays in place: six other stage skills
   (`fgos-validating`/`fgos-code-implement`/`fgos-fanout`/`fgos-planning`/
   `fgos-exploring`/`fgos-researching`) cite its "Valid reasons to dispatch"
