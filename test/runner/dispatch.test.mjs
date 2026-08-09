@@ -640,10 +640,10 @@ test('the committed .fgos/config.json runner section grants the worker exactly a
   assert.ok(!args.includes('--dangerously-skip-permissions'));
 });
 
-test('the committed .fgos/config.json runner section declares the submit-assist-classify capacity per CONTEXT.md D1/D7 (tsk-5l2-2): kind cli, adapter cli-spawn, tier light, allowCrossProvider true (tsk-32n D1 -- supersedes the earlier sensitiveData field name, which had inverted polarity against the restrictive-by-default requirement), and its args are a well-formed {prompt}/{model} template', () => {
+test('the committed .fgos/config.json runner section declares the coding-classify-intake capacity (renamed from submit-assist-classify into coding-domain ownership, tsk-3fj) per CONTEXT.md D1/D7 (tsk-5l2-2): kind cli, adapter cli-spawn, tier light, allowCrossProvider true (tsk-32n D1 -- supersedes the earlier sensitiveData field name, which had inverted polarity against the restrictive-by-default requirement), and its args are a well-formed {prompt}/{model} template', () => {
   const cfg = committedRunnerConfig();
-  const capacity = cfg.capacities?.['submit-assist-classify'];
-  assert.ok(capacity, 'capacities.submit-assist-classify must exist');
+  const capacity = cfg.capacities?.['coding-classify-intake'];
+  assert.ok(capacity, 'capacities.coding-classify-intake must exist');
   assert.equal(capacity.kind, 'cli');
   assert.equal(capacity.adapter, 'cli-spawn');
   assert.equal(capacity.tier, 'light');
