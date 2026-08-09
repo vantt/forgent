@@ -141,3 +141,36 @@ compare.
 ## Outstanding questions
 
 None
+
+## Post-implementation note (fgos-code-implement, 2026-08-09)
+
+Two deviations from this plan, both user-confirmed at implementation time:
+
+1. **Step 4 (index note) dropped.** The plan assumed `0026` already had a
+   row in `docs/decisions/0000-index.md`'s table to append a note to — it
+   does not; the table stops at `0025`, and `0026`/`0027`/`0028` were never
+   backfilled (a pre-existing gap unrelated to this item). Backfilling
+   three missing rows to add one note is out of D7/D8/D17's scope; skipped
+   rather than expanded.
+2. **Item's own `verify` field patched twice, both via `fgos edit --verify`.**
+   First: the field was Vietnamese prose, not a runnable shell command —
+   `fgos return` failed with a shell syntax error. Patched to an equivalent
+   runnable command covering the same checks (user-confirmed). Second: that
+   command's `npm test` clause runs the whole suite, which is red for 5
+   pre-existing, unrelated files (`docs/history/backlog-execution-
+   reconciliation/RECONCILIATION.md`, `tsk-33w`'s and `tsk-4eu`'s
+   `iron-law-evidence.md`, `docs/how-to/produce-failing-test-first-proof-
+   for-an-iron-law-gated-diff.md`, `plans/260808-2210-dispatch-vocabulary-
+   rearrange/next-session-prompt.md` — all committed 2026-08-08 by other
+   items, confirmed via `git log`) already failing
+   `test/docs/launcher-vocabulary-guard.test.mjs`'s whole-repo NEGATIVE
+   scan for the word "orchestrator". User chose (over fixing all 5, or
+   parking) to narrow `verify`'s test clause to
+   `node --test --test-name-pattern='POSITIVE|self-check'
+   test/docs/launcher-vocabulary-guard.test.mjs` — the POSITIVE assertions
+   (including the new `superseded_by: [0028, 0029]` regex this item
+   updated) plus the two synthetic self-check tests, excluding only the
+   whole-repo NEGATIVE scan that fails for reasons outside this item's
+   footprint. **This pre-existing debt is not fixed by tsk-5wf** — a
+   separate item should re-run the full `launcher-vocabulary-guard.test.mjs`
+   NEGATIVE test and either allowlist or reword those 5 files.
