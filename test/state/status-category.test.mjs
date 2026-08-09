@@ -34,7 +34,7 @@ function addSampleWork(dir, id, overrides = {}) {
     kind: 'task',
     status: 'todo',
     deps: [],
-    risk: 'low',
+    risk: 'light',
     refs: [],
     verify: 'npm test',
     ...overrides,
@@ -158,7 +158,7 @@ test('addWork stamps statusCategory for the initial status ("todo" -> "todo") on
     kind: 'task',
     status: 'todo',
     deps: [],
-    risk: 'low',
+    risk: 'light',
     refs: [],
     verify: 'npm test',
   });
@@ -177,7 +177,7 @@ test('foldEvents replays a pre-statusCategory work.add + work.move without throw
       seq: 1,
       ts: '2026-07-14T00:00:00.000Z',
       type: 'work.add',
-      payload: { id: 'legacy-a', title: 'Legacy A', status: 'todo', kind: 'task', deps: [], risk: 'low', refs: [], verify: 'npm test' },
+      payload: { id: 'legacy-a', title: 'Legacy A', status: 'todo', kind: 'task', deps: [], risk: 'light', refs: [], verify: 'npm test' },
     },
     {
       seq: 2,

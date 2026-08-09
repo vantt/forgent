@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { deriveTitle, classify, generateId } from '../../src/intake/classify.mjs';
 import { MAX_TITLE_LENGTH } from '../../src/state/work.mjs';
+import { DOMAINS, classificationVocabulary } from '../../src/state/workflow-stage-graphs.mjs';
 
 // Mirrors work.mjs's (unexported) ID_PATTERN: kebab-case, letter-start.
 const ID_PATTERN = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
@@ -122,6 +123,26 @@ test('classify sets risk to mirror the tier signal', () => {
   assert.equal(heavy.risk, heavy.tier);
   const standard = classify('an ordinary request');
   assert.equal(standard.risk, standard.tier);
+});
+
+// The verb feeds addWork directly, so anything classify() can emit has to be
+// sayable under the domain's own declared vocabulary -- otherwise `fgos
+// submit` would reject its own mechanical output. This is what makes "risk
+// mirrors tier" above safe rather than a vocabulary leak: both fields draw
+// from the same three values BY DESIGN, and the enum now says so out loud.
+test('every kind/risk classify() can emit is inside coding\'s declared vocabulary', () => {
+  const kinds = classificationVocabulary(DOMAINS.coding, 'kind');
+  const risks = classificationVocabulary(DOMAINS.coding, 'risk');
+  const samples = [
+    '', 'an ordinary request', 'fix the crash', 'add a new feature',
+    'refactor and cleanup the module', 'update the readme docs',
+    'rename a variable', 'run a production migration on the auth table',
+  ];
+  for (const text of samples) {
+    const { kind, risk } = classify(text);
+    assert.ok(kinds.includes(kind), `kind ${JSON.stringify(kind)} from ${JSON.stringify(text)} must be declared`);
+    assert.ok(risks.includes(risk), `risk ${JSON.stringify(risk)} from ${JSON.stringify(text)} must be declared`);
+  }
 });
 
 test('generateId always returns an id matching ID_PATTERN', () => {

@@ -13,7 +13,7 @@ import { WorkValidationError } from '../../src/state/work.mjs';
 // as view.work (frontier.test.mjs's style); no fs, no mkdtemp, no `.fgos/`
 // writes anywhere in this file.
 function item(id, deps = [], parent = undefined, mergeAfter = undefined) {
-  const built = { id, title: id, kind: 'task', status: 'todo', deps, risk: 'low', refs: [], verify: 'true' };
+  const built = { id, title: id, kind: 'task', status: 'todo', deps, risk: 'light', refs: [], verify: 'true' };
   if (parent !== undefined) built.parent = parent;
   if (mergeAfter !== undefined) built.mergeAfter = mergeAfter;
   return built;

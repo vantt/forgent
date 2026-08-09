@@ -54,7 +54,7 @@ function sampleWork(overrides = {}) {
     kind: 'feature',
     status: 'todo',
     deps: [],
-    risk: 'low',
+    risk: 'light',
     refs: [],
     // tsk-1ni D2: the real submit-time sentinel (bin/fgos.mjs's own
     // SUBMIT_VERIFY_SENTINEL carries this exact string), not an arbitrary

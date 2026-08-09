@@ -9,9 +9,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Work-item `kind` and `risk` now have a per-domain vocabulary, declared by
+  the domain itself (`DOMAINS.<domain>.classification`) and enforced at the
+  write door alongside the existing `tier` enum. Coding declares
+  `kind: bug|chore|design|docs|feature|task` and
+  `risk: light|standard|heavy`. A domain that declares no vocabulary is
+  unaffected — any non-empty string still passes, exactly as before.
+
 ### Changed
 
+- `/fgOS:submit` run from a live session now continues into the item's
+  `discovery` stage in the same session: it clarifies the title/description
+  first, then judges `tier`/`kind`/`risk` against the cleaned-up text
+  instead of the raw ask. Any question it needs to ask is asked while you
+  are still in the conversation, rather than days later at a discovery
+  sweep. The `fgos submit` verb itself is unchanged — still mechanical,
+  still no model call — so a bare shell, cron, another agent, or the
+  dogfood fixture replay all behave exactly as before.
+
 ### Fixed
+
+- Items could be stored with a `risk` value nothing in the system reads
+  (`low`/`medium`/`high`), which silently disabled two behaviors rather
+  than failing: the human-confirmation gate that fires before a
+  `risk: heavy` root is split, and the risk discount in the priority
+  formula (which fell back to its `standard` weighting). Such a value is
+  now rejected when written. Items already stored with one keep replaying
+  and stay editable; only a write that actually touches the field is held
+  to the vocabulary.
 
 ### Removed
 

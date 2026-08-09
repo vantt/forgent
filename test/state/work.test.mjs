@@ -20,6 +20,7 @@ import {
   DEFAULTS,
   SCHEMA_VERSION,
 } from '../../src/state/work.mjs';
+import { DOMAINS, classificationVocabulary } from '../../src/state/workflow-stage-graphs.mjs';
 
 function mkRepoRoot() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-work-repo-'));
@@ -32,7 +33,7 @@ function baseWork(overrides = {}) {
     kind: 'chore',
     status: 'todo',
     deps: [],
-    risk: 'low',
+    risk: 'light',
     refs: [],
     verify: 'npm test',
     ...overrides,
@@ -398,6 +399,62 @@ test('validateWork rejects a tier outside the TIERS domain', () => {
   assert.throws(
     () => validateWork(baseWork({ tier: 'ultra-heavy' })),
     (err) => err instanceof WorkValidationError && /tier/.test(err.message),
+  );
+});
+
+// --- per-domain kind/risk vocabulary (DOMAINS.coding's `classification`) ---
+
+test('validateWork accepts every kind and risk in coding\'s declared vocabulary', () => {
+  for (const kind of classificationVocabulary(DOMAINS.coding, 'kind')) {
+    assert.doesNotThrow(() => validateWork(baseWork({ kind })));
+  }
+  for (const risk of classificationVocabulary(DOMAINS.coding, 'risk')) {
+    assert.doesNotThrow(() => validateWork(baseWork({ risk })));
+  }
+});
+
+test('validateWork rejects a kind outside the coding vocabulary, naming the field', () => {
+  for (const kind of ['feat', 'documentation', 'behavior_change', 'discovery']) {
+    assert.throws(
+      () => validateWork(baseWork({ kind })),
+      (err) => err instanceof WorkValidationError && /work\.kind must be one of/.test(err.message),
+      `kind "${kind}" must be rejected`,
+    );
+  }
+});
+
+// tsk-5wz's own live evidence, inverted: `low`/`medium`/`high` are the values
+// that were silently degrading (decompose.mjs's heavy-risk gate never fired
+// for them; priority-formula.mjs scored them all at its `standard` fallback).
+// They now fail loudly at the write door instead.
+test('validateWork rejects a risk outside the coding vocabulary, including the low/medium/high set', () => {
+  for (const risk of ['low', 'medium', 'high', 'critical']) {
+    assert.throws(
+      () => validateWork(baseWork({ risk })),
+      (err) => err instanceof WorkValidationError && /work\.risk must be one of/.test(err.message),
+      `risk "${risk}" must be rejected`,
+    );
+  }
+});
+
+test('a domain declaring no classification vocabulary keeps the old any-non-empty-string rule', () => {
+  assert.doesNotThrow(() => validateWork(baseWork({ domain: 'synthetic', kind: 'whatever', risk: 'anything' })));
+  assert.throws(
+    () => validateWork(baseWork({ domain: 'synthetic', risk: '' })),
+    (err) => err instanceof WorkValidationError && /risk/.test(err.message),
+  );
+});
+
+// tsk-1ne D1/D2 grandfathering: an item already stored with a now-invalid
+// value stays editable, so long as the edit does not touch that field. This
+// is what lets the 68 live items carrying low/medium/high keep moving without
+// a data migration.
+test('an untouched legacy kind/risk is grandfathered on edit, but a touched one is held to the vocabulary', () => {
+  const legacy = baseWork({ risk: 'medium', kind: 'documentation' });
+  assert.doesNotThrow(() => validateWork(legacy, [], new Set(['title'])));
+  assert.throws(
+    () => validateWork(legacy, [], new Set(['risk'])),
+    (err) => err instanceof WorkValidationError && /work\.risk must be one of/.test(err.message),
   );
 });
 

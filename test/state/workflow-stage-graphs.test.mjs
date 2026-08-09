@@ -2,8 +2,9 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DOMAINS, DEFAULT_DOMAIN, resolveDomainName, getDomain, stageForStep, skillForStage, parkReasonForStatus, effectiveStage } from '../../src/state/workflow-stage-graphs.mjs';
+import { DOMAINS, DEFAULT_DOMAIN, resolveDomainName, getDomain, stageForStep, skillForStage, parkReasonForStatus, effectiveStage, classificationVocabulary } from '../../src/state/workflow-stage-graphs.mjs';
 import { rebuildView } from '../../src/state/replay.mjs';
+import { RISK_DISCOUNTS } from '../../src/state/priority-formula.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FIXTURE_PATH = path.join(__dirname, '..', 'fixtures', 'phase1-events.jsonl');
@@ -351,4 +352,28 @@ test('rebuild-determinism (domain retrofit): the fixture log (zero domain events
   for (const item of Object.values(view.work)) {
     assert.equal('domain' in item, false);
   }
+});
+
+// --- classification vocabulary (per-domain kind/risk enum) ---
+
+test('coding declares a classification vocabulary for both kind and risk', () => {
+  assert.deepEqual(classificationVocabulary(DOMAINS.coding, 'kind'), ['bug', 'chore', 'design', 'docs', 'feature', 'task']);
+  assert.deepEqual(classificationVocabulary(DOMAINS.coding, 'risk'), ['light', 'standard', 'heavy']);
+});
+
+// The whole point of pinning risk to light/standard/heavy: two live consumers
+// read exactly these values, and neither would fail loudly on a different
+// vocabulary -- decompose.mjs's gate would just stop firing, and
+// priority-formula.mjs would silently fall back to its `standard` discount.
+test("coding's risk vocabulary covers every value decompose's heavy-risk gate and priority-formula's discount table read", () => {
+  const risks = classificationVocabulary(DOMAINS.coding, 'risk');
+  assert.ok(risks.includes('heavy'), "decompose.mjs's HEAVY_RISK gate value must stay sayable");
+  assert.deepEqual([...risks].sort(), Object.keys(RISK_DISCOUNTS).sort());
+});
+
+test('a domain that declares no classification vocabulary imposes none (undefined, never a throw)', () => {
+  assert.equal(classificationVocabulary(DOMAINS.synthetic, 'kind'), undefined);
+  assert.equal(classificationVocabulary(DOMAINS.triage, 'risk'), undefined);
+  assert.equal(classificationVocabulary(undefined, 'kind'), undefined);
+  assert.equal(classificationVocabulary(DOMAINS.coding, 'nonesuch'), undefined);
 });

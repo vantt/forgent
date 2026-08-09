@@ -95,6 +95,7 @@ const ALLOWED_FILES = new Map([
   ['docs/history/tsk-2uo-launcher-vocabulary-guard-allowlist/iron-law-evidence.md', 'this item\'s own Iron Law evidence -- quotes the pinned term inside a real failing-before test transcript excerpt, same reasoning as launcher-vocabulary-rename/iron-law-evidence.md\'s own allowlist entry above'],
   ['docs/explanation/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md', 'cites the orchestrator->launcher rename as a real example while explaining decision-doc superseding -- same historical-example reasoning as 0028/0029\'s own allowlist entries'],
   ['docs/history/automated-changelog-compound-learn/iron-law-evidence.md', 'another item\'s meta-citation of this guard test\'s own pre-existing-failure report, same shape as tsk-33w/tsk-4eu/tsk-2uo\'s own entries above'],
+  ['docs/history/automated-changelog-compound-learn/iron-law-evidence-tsk-3ip.md', 'tsk-3ip\'s own Iron Law evidence in that same feature dir -- quotes this guard test\'s own NAME (which contains the pinned term) while reporting it as a pre-existing failure, identical reasoning to the sibling iron-law-evidence.md entry directly above'],
 ]);
 
 const BINARY_EXT = /\.(png|jpe?g|gif|ico|woff2?|ttf|eot|pdf)$/i;

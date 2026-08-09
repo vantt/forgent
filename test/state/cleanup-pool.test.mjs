@@ -6,7 +6,7 @@ import { pickNextCleanupItem } from '../../src/state/cleanup-pool.mjs';
 // `.fgos/` writes anywhere in this file (same convention as
 // discover-pool.test.mjs).
 function item(id, status, extra = {}) {
-  return { id, title: id, kind: 'task', stage: 'executing', status, deps: [], risk: 'low', refs: [], verify: 'true', ...extra };
+  return { id, title: id, kind: 'task', stage: 'executing', status, deps: [], risk: 'light', refs: [], verify: 'true', ...extra };
 }
 
 function cleanupEntry(id, ts) {

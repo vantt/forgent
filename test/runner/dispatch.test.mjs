@@ -142,10 +142,10 @@ function sampleWork(overrides = {}) {
   return {
     id: 'sample-work',
     title: 'Add the widget',
-    kind: 'behavior_change',
+    kind: 'feature',
     status: 'doing',
     deps: [],
-    risk: 'low',
+    risk: 'light',
     refs: ['src/widget.mjs', 'docs/specs/widget.md'],
     verify: 'npm test',
     ...overrides,
@@ -271,7 +271,7 @@ test('buildPrompt embeds title, kind, refs, and verify from the work item', () =
   const work = sampleWork();
   const prompt = buildPrompt(work);
   assert.match(prompt, /Add the widget/);
-  assert.match(prompt, /behavior_change/);
+  assert.match(prompt, /feature/);
   assert.match(prompt, /src\/widget\.mjs/);
   assert.match(prompt, /docs\/specs\/widget\.md/);
   assert.match(prompt, /npm test/);

@@ -5,7 +5,7 @@ import { pickNextDiscoverItem } from '../../src/state/discover-pool.mjs';
 // Pure lib — every view here is a literal; no fs, no mkdtemp, no `.fgos/`
 // writes anywhere in this file (same convention as frontier.test.mjs).
 function item(id, stage, status, extra = {}) {
-  return { id, title: id, kind: 'task', stage, status, deps: [], risk: 'low', refs: [], verify: 'true', ...extra };
+  return { id, title: id, kind: 'task', stage, status, deps: [], risk: 'light', refs: [], verify: 'true', ...extra };
 }
 
 test('pickNextDiscoverItem on an empty view returns null', () => {

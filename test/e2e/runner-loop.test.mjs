@@ -55,7 +55,7 @@ function add(cwd, id, extra = {}) {
   const flags = [
     '--title', extra.title ?? `Title ${id}`,
     '--kind', extra.kind ?? 'task',
-    '--risk', extra.risk ?? 'low',
+    '--risk', extra.risk ?? 'light',
     '--verify', extra.verify ?? 'test -f output.txt',
     // tsk-535: --description is required at add's CLI layer.
     '--description', extra.description ?? `Title ${id}`,
@@ -370,8 +370,8 @@ test('e2e stage-decompose (b) complex item: an explicit decompose --verdict deco
   assert.equal(fgos(repoRoot, ['discover', submitted.id, '--verdict', 'clear', '--verify', 'test -f root-done.txt && echo ROOT_OK']).status, 0);
 
   const children = JSON.stringify([
-    { title: 'Build the base module', verify: 'test -f child-a.txt', action: 'tsk-3xd fixture: build the base module.', kind: 'task', risk: 'low' },
-    { title: 'Wire the base module in', verify: 'test -f child-b.txt', action: 'tsk-3xd fixture: wire the base module in.', kind: 'task', risk: 'low', deps: [0] },
+    { title: 'Build the base module', verify: 'test -f child-a.txt', action: 'tsk-3xd fixture: build the base module.', kind: 'task', risk: 'light' },
+    { title: 'Wire the base module in', verify: 'test -f child-b.txt', action: 'tsk-3xd fixture: wire the base module in.', kind: 'task', risk: 'light', deps: [0] },
   ]);
   const decomposed = fgos(repoRoot, ['decompose', submitted.id, '--verdict', 'decompose', '--reason', 'Two independent surfaces, no shared state', '--children', children]);
   assert.equal(decomposed.status, 0, `decompose failed: ${decomposed.stderr}`);
