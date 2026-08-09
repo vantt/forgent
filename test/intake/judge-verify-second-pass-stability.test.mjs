@@ -39,7 +39,7 @@ function sampleWork(overrides = {}) {
     kind: 'feature',
     status: 'todo',
     deps: [],
-    risk: 'low',
+    risk: 'light',
     refs: [],
     verify: 'chưa xác định — P15 bổ sung',
     stage: 'clarify',

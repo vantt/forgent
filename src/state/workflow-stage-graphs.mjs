@@ -233,6 +233,37 @@ export const DOMAINS = Object.freeze({
       'awaiting-human': 'human-question',
       'awaiting-approval': 'natural-finish',
     }),
+    // classification: the per-domain vocabulary `work.kind`/`work.risk` are
+    // allowed to say. THIRD per-domain map in this entry, same absent-key-
+    // means-not-declared shape `skillMap`/`statusLabels`/`parkReason` already
+    // use — a domain that declares none keeps work.mjs's pre-existing
+    // "any non-empty string" rule, so `synthetic`/`triage`/`fixture-marketing`
+    // are unaffected. Classification is domain-OWNED (the rubric that decides
+    // these values is coding-specific: "typo/rename/doc fix" vs "auth,
+    // payments, data-integrity"), which is why it lives here rather than as a
+    // second global frozen list next to work.mjs's own TIERS.
+    //
+    // `risk` is `light`/`standard`/`heavy` — deliberately the SAME vocabulary
+    // as TIERS, not a leak of it. Two live consumers already read exactly
+    // these three values and would silently mis-handle any other set:
+    //   - decompose.mjs's HEAVY_RISK gate (`work.risk === 'heavy'`, D3(b))
+    //     forces a root through human confirmation before it is allowed to
+    //     split — 74 live items depend on it firing;
+    //   - priority-formula.mjs's RISK_DISCOUNTS (`{light:1, standard:0.85,
+    //     heavy:0.6}`) feeds the ranking formula, falling back to `standard`
+    //     for anything it does not recognize.
+    // classify.mjs's own D5 (`const risk = tier`) is the third: it documents
+    // "risk is derived from the same keyword signal as tier (mirrors the tier
+    // name)". A `low`/`medium`/`high` vocabulary here would leave all three
+    // silently degraded rather than loudly broken — the exact failure mode
+    // this enum exists to make impossible. Items already stored carrying
+    // `low`/`medium`/`high` stay grandfathered (validateWorkShape's
+    // `touchedFields`, tsk-1ne D1/D2): only a write that actually touches the
+    // field is held to this list.
+    classification: Object.freeze({
+      kind: Object.freeze(['bug', 'chore', 'design', 'docs', 'feature', 'task']),
+      risk: Object.freeze(['light', 'standard', 'heavy']),
+    }),
   }),
   synthetic: Object.freeze({
     stages: Object.freeze(['assembling']),
@@ -458,4 +489,15 @@ export function statusCategoryFor(domain, status) {
  * table. Never throws, safe to call unconditionally. */
 export function parkReasonForStatus(domain, status) {
   return domain?.parkReason?.[status];
+}
+
+/** The vocabulary `field` (`'kind'` or `'risk'`) is allowed to take within
+ * `domain`'s own `classification` table — a frozen array, or `undefined` when
+ * this domain declares no vocabulary for that field (every domain but
+ * `coding` today). `undefined` is the caller's (`work.mjs`) signal to fall
+ * back to the pre-existing "any non-empty string" rule rather than to reject,
+ * mirroring `statusCategoryFor`/`parkReasonForStatus`'s own absent-key shape
+ * one field over. Never throws, safe to call unconditionally. */
+export function classificationVocabulary(domain, field) {
+  return domain?.classification?.[field];
 }

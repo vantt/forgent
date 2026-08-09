@@ -45,7 +45,7 @@ function add(cwd, id, extra = {}) {
     'add', id,
     '--title', extra.title ?? `Title ${id}`,
     '--kind', extra.kind ?? 'task',
-    '--risk', extra.risk ?? 'low',
+    '--risk', extra.risk ?? 'light',
     '--verify', extra.verify ?? 'true',
     // tsk-535: --description is required at add's CLI layer.
     '--description', extra.description ?? `Title ${id}`,

@@ -6,7 +6,7 @@ import { pickNextRetrospectiveItem } from '../../src/state/retro-pool.mjs';
 // `.fgos/` writes anywhere in this file (same convention as
 // cleanup-pool.test.mjs/discover-pool.test.mjs).
 function item(id, status, extra = {}) {
-  return { id, title: id, kind: 'task', stage: 'executing', status, deps: [], risk: 'low', refs: [], verify: 'true', ...extra };
+  return { id, title: id, kind: 'task', stage: 'executing', status, deps: [], risk: 'light', refs: [], verify: 'true', ...extra };
 }
 
 function retrospectiveEntry(id, ts) {

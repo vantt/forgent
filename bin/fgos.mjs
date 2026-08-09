@@ -3472,9 +3472,12 @@ async function runVerb(verb, flags, positional, dir) {
         const rootTitle = requireField(flags['root-title'], 'promote-to-component requires --root-id (an existing member to promote) or --root-title (to create a fresh root item).');
         rootId = generateId(rootTitle, Object.keys(view.work));
         // A freshly created root is a pure milestone-style grouping item
-        // (tsk-5t3a precedent, no code of its own) — 'low'/'true' mirror
-        // that precedent's own minimal, trivially-true shape.
-        addWork(dir, { id: rootId, title: rootTitle, kind: 'feature', status: 'todo', deps: [], refs: [], risk: 'low', verify: 'true' });
+        // (tsk-5t3a precedent, no code of its own) — 'light'/'true' mirror
+        // that precedent's own minimal, trivially-true shape. 'light' is the
+        // floor of coding's declared `risk` vocabulary (DOMAINS.coding's
+        // `classification`), the same three values decompose.mjs's heavy-risk
+        // gate and priority-formula.mjs's RISK_DISCOUNTS already read.
+        addWork(dir, { id: rootId, title: rootTitle, kind: 'feature', status: 'todo', deps: [], refs: [], risk: 'light', verify: 'true' });
         rootCreated = true;
       }
 

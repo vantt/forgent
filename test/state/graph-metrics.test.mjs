@@ -7,7 +7,7 @@ import { connectedComponents, criticalPath, staleBlocked, greedyTopUnblock, goal
 // edge (blocks via deps, or parent-child via parent) into independent parallel
 // tracks.
 function item(id, extra = {}) {
-  return { id, title: id, kind: 'task', status: 'todo', deps: [], risk: 'low', refs: [], verify: 'true', ...extra };
+  return { id, title: id, kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', ...extra };
 }
 
 test('connectedComponents: an empty view has zero components', () => {
