@@ -655,6 +655,19 @@ test('the committed .fgos/config.json runner section declares the submit-assist-
   assert.ok(Array.isArray(capacity.args) && capacity.args.includes('{prompt}') && capacity.args.includes('{model}'));
 });
 
+test('the committed .fgos/config.json runner section declares the gather capacity (tsk-28o): for "gather", needs "prompt-completion", carries "repo-content" (D1, gather-capacity-purpose-binding CONTEXT.md), kind cli, allowCrossProvider true, well-formed {prompt}/{model} args', () => {
+  const cfg = committedRunnerConfig();
+  const capacity = cfg.capacities?.gather;
+  assert.ok(capacity, 'capacities.gather must exist');
+  assert.equal(capacity.kind, 'cli');
+  assert.equal(capacity.for, 'gather');
+  assert.equal(capacity.needs, 'prompt-completion');
+  assert.equal(capacity.carries, 'repo-content');
+  assert.equal(capacity.allowCrossProvider, true);
+  assert.ok(typeof capacity.command === 'string' && capacity.command.length > 0);
+  assert.ok(Array.isArray(capacity.args) && capacity.args.includes('{prompt}') && capacity.args.includes('{model}'));
+});
+
 /** Capture what's written to process.stderr during `fn()`; restores the
  * original `write` afterward even if `fn` throws. */
 function captureStderr(fn) {
