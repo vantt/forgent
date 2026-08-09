@@ -64,6 +64,19 @@ const ALLOWED_DIR_PREFIXES = [
 ];
 const HERDR_HISTORY_DOC = /^docs\/history\/herdr-/; // herdr's own PaneOrchestrator, same reasoning
 
+// tsk-2lg: an item's own docs/history/<id>/iron-law-evidence(-<suffix>).md
+// documenting a real pre-existing failure of THIS guard necessarily quotes
+// this guard's own NEGATIVE assertion message (which itself contains the
+// pinned word, e.g. `pinned term "orchestrator" leaked back into: ...`) as
+// real transcript evidence -- never fresh prose deploying the term. This is
+// structural, not incidental, so it is exempted by path shape instead of
+// requiring a new hand-added ALLOWED_FILES entry every time it recurs
+// (already happened 6 separate times: see docs/history/tsk-2lg-launcher-
+// guard-pattern-allowlist/plan.md). Scoped narrowly to this one file shape
+// only -- every other allowlist reason below stays hand-listed because it
+// does not share a generalizable path pattern.
+const IRON_LAW_EVIDENCE_META_CITATION = /^docs\/history\/[^/]+\/iron-law-evidence(-[^/]+)?\.md$/;
+
 // Every remaining file below still legitimately contains "orchestrator"
 // after the frozen-filename strip above, each for a specific, checked
 // reason (docs/history/launcher-vocabulary-rename/CONTEXT.md's own scout
@@ -81,28 +94,34 @@ const ALLOWED_FILES = new Map([
   ['docs/history/gate-question-quality-and-routing/DISCUSSION.md', 'a concurrent item\'s discussion, authored against 0026\'s pre-rename text -- describes 0026\'s OLD state as observed at the time (same historical-record reasoning as this item\'s own CONTEXT.md/plan.md); also independently converges on "Launcher" as the name for the same herdr-side role, unprompted -- not this item\'s prose to rewrite'],
   ['docs/history/launcher-vocabulary-rename/CONTEXT.md', 'this item\'s own decision record -- discusses the old term while explaining the rename'],
   ['docs/history/launcher-vocabulary-rename/plan.md', 'this item\'s own plan -- discusses the old term while explaining the rename'],
-  ['docs/history/launcher-vocabulary-rename/iron-law-evidence.md', 'this item\'s own Iron Law evidence -- quotes the old term inside real failing-before test transcript excerpts'],
   ['docs/history/tsk-18a-merge-conflict-misclassification/repro-notes.md', 'cites a repro script\'s literal filename (tsk-18a-repro-orchestrator.mjs), never committed to the repo'],
   ['docs/history/two-layer-dispatch/DISCUSSION.md', 'cites bee-swarming/SKILL.md\'s own upstream terminology verbatim'],
   ['docs/specs/work-state.md', 'same fleet-orchestrator reserved-future sense as docs/backlog.md STR27'],
   ['docs/decisions/0029-sua-dinh-nghia-roottask-subtask-capacity-t1-cua-0026.md', 'the decision record ABOUT D17 (tsk-5td) -- explains that "orchestrator" is not a third T1 value but the T0 aggregate layer, same reasoning as 0028\'s own allowlist entry above'],
   ['docs/history/tsk-5wf-decision-doc-0029-supersede-0026-vocabulary/plan.md', 'this item\'s own plan -- discusses the old term while explaining D17\'s resolution, same reasoning as launcher-vocabulary-rename/plan.md above'],
+  ['docs/history/tsk-2lg-launcher-guard-pattern-allowlist/plan.md', 'this item\'s own plan -- discusses the pinned term (including quoting this guard\'s own NEGATIVE assertion message as pattern-matching data) while explaining the new IRON_LAW_EVIDENCE_META_CITATION exemption, same reasoning as launcher-vocabulary-rename/plan.md above'],
   ['docs/history/backlog-execution-reconciliation/RECONCILIATION.md', 'reconciles against docs/backlog.md\'s own STR27 row -- same fleet-orchestrator reserved-future sense already allowlisted there'],
-  ['docs/history/tsk-33w-capacity-dispatch-command-audit-field/iron-law-evidence.md', 'meta-citation of this guard test\'s own pre-existing-failure report (quotes the guard\'s error text describing itself), not prose deploying the pinned term'],
-  ['docs/history/tsk-4eu-executors-key-tier-validation/iron-law-evidence.md', 'same meta-citation of this guard test\'s own pre-existing-failure report as tsk-33w\'s entry above'],
   ['docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md', 'documents a real historical incident in this guard test itself (a git-ls-files false-pass during tsk-2cw\'s original rename) -- a war story, same reasoning as 0028\'s own allowlist entry'],
   ['plans/260808-2210-dispatch-vocabulary-rearrange/next-session-prompt.md', 'tsk-5td\'s own working prompt for its dispatch-vocabulary-rearrange session -- discusses "orchestrator" as its own subject matter (citing 0026/0028/tsk-2cw history while analyzing the dispatch-layer vocabulary), same reasoning as gate-question-quality-and-routing/DISCUSSION.md\'s own allowlist entry above, not prose this item has authority to rewrite mid-session'],
-  ['docs/history/tsk-2uo-launcher-vocabulary-guard-allowlist/iron-law-evidence.md', 'this item\'s own Iron Law evidence -- quotes the pinned term inside a real failing-before test transcript excerpt, same reasoning as launcher-vocabulary-rename/iron-law-evidence.md\'s own allowlist entry above'],
   ['docs/explanation/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md', 'cites the orchestrator->launcher rename as a real example while explaining decision-doc superseding -- same historical-example reasoning as 0028/0029\'s own allowlist entries'],
-  ['docs/history/automated-changelog-compound-learn/iron-law-evidence.md', 'another item\'s meta-citation of this guard test\'s own pre-existing-failure report, same shape as tsk-33w/tsk-4eu/tsk-2uo\'s own entries above'],
-  ['docs/history/automated-changelog-compound-learn/iron-law-evidence-tsk-3ip.md', 'tsk-3ip\'s own Iron Law evidence in that same feature dir -- quotes this guard test\'s own NAME (which contains the pinned term) while reporting it as a pre-existing failure, identical reasoning to the sibling iron-law-evidence.md entry directly above'],
+  ['docs/how-to/allowlist-a-historical-mention-in-launcher-vocabulary-guard.md', 'tsk-2uo\'s own how-to guide for allowlisting a historical mention in THIS exact guard test -- necessarily quotes the pinned term throughout as its own worked examples while documenting the allowlist mechanism, same self-referential reasoning as this file\'s own entry above'],
+  ['docs/how-to/fix-fgos-write-rejected-merge-block.md', 'quotes a real work.decision capture (tsk-53n) that names this guard test\'s own "orchestrator" leak as a worked example of a pre-existing, unrelated failure a merge-block fix needs to recognize and exclude -- same meta-citation reasoning as the iron-law-evidence.md entries above (now covered by IRON_LAW_EVIDENCE_META_CITATION)'],
 ]);
+// tsk-2lg: the 6 docs/history/<id>/iron-law-evidence(-<suffix>).md entries
+// this Map used to list by hand (launcher-vocabulary-rename, tsk-33w, tsk-4eu,
+// tsk-2uo, automated-changelog-compound-learn x2) are now covered by
+// IRON_LAW_EVIDENCE_META_CITATION above instead -- removed to avoid a stale
+// duplicate of what the pattern already subsumes.
 
 const BINARY_EXT = /\.(png|jpe?g|gif|ico|woff2?|ttf|eot|pdf)$/i;
 const WORD = /\borchestrators?\b/i;
 
 function isDirAllowed(file) {
-  return ALLOWED_DIR_PREFIXES.some((prefix) => file.startsWith(prefix)) || HERDR_HISTORY_DOC.test(file);
+  return (
+    ALLOWED_DIR_PREFIXES.some((prefix) => file.startsWith(prefix)) ||
+    HERDR_HISTORY_DOC.test(file) ||
+    IRON_LAW_EVIDENCE_META_CITATION.test(file)
+  );
 }
 
 function stripFrozenFilenames(content) {
@@ -144,6 +163,22 @@ test('NEGATIVE self-check: real allowlisted paths are not vacuously exempted (tr
   assert.equal(isDirAllowed('docs/history/herdr-dashboard-pane-tracking/CONTEXT.md'), true);
   assert.equal(isDirAllowed('docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md'), false, 'the decision file itself is not dir-allowlisted -- it clears only via the frozen-filename strip');
   assert.equal(ALLOWED_FILES.has('docs/backlog.md'), true);
+});
+
+test('NEGATIVE self-check: IRON_LAW_EVIDENCE_META_CITATION matches the real historical paths it replaces (true positive) and stays narrow (true negative)', () => {
+  const realPaths = [
+    'docs/history/launcher-vocabulary-rename/iron-law-evidence.md',
+    'docs/history/tsk-33w-capacity-dispatch-command-audit-field/iron-law-evidence.md',
+    'docs/history/tsk-4eu-executors-key-tier-validation/iron-law-evidence.md',
+    'docs/history/tsk-2uo-launcher-vocabulary-guard-allowlist/iron-law-evidence.md',
+    'docs/history/automated-changelog-compound-learn/iron-law-evidence.md',
+    'docs/history/automated-changelog-compound-learn/iron-law-evidence-tsk-3ip.md',
+  ];
+  for (const p of realPaths) assert.equal(isDirAllowed(p), true, `${p} must be covered by IRON_LAW_EVIDENCE_META_CITATION`);
+  // a sibling file in the same feature dir, different name -- must NOT be swept in
+  assert.equal(isDirAllowed('docs/history/tsk-2uo-launcher-vocabulary-guard-allowlist/plan.md'), false);
+  // nested one level deeper than the pattern allows -- must NOT match
+  assert.equal(isDirAllowed('docs/history/tsk-2uo-launcher-vocabulary-guard-allowlist/nested/iron-law-evidence.md'), false);
 });
 
 test('POSITIVE: decision 0026 defines "launcher" (specific sentence, not a bare word)', () => {
