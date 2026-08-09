@@ -77,6 +77,30 @@ config file's other capacity keys.
 Impact-analysis posture: not applicable — no code symbol is being renamed
 or moved, only a JSON config key and one test's string literal.
 
+## Validating findings (fgos-validating pass, real evidence)
+
+Read `test/runner/dispatch.test.mjs:618-626`'s `committedRunnerConfig()`
+helper in full: it resolves the MAIN CHECKOUT root explicitly
+(`resolveMainCheckoutRoot`), by design, specifically so this exact test
+still reads the real committed `.fgos/config.json` even when the test
+suite itself runs from inside a worktree (own comment: "only the main
+checkout carries the real committed `.fgos/config.json`"). This is real,
+already-existing infrastructure for exactly this situation — confirmed by
+reading the function, not assumed.
+
+This surfaces a real EXECUTION-ORDERING constraint the plan above did not
+name explicitly: because the `.fgos/config.json` rename can only ever be
+applied as a direct main-checkout commit (ADR0020 — it can never ride
+`fgw/tsk-3fj`, and this worktree cannot even see the `.fgos/` path to edit
+it locally), the rename must land on the MAIN checkout BEFORE this item's
+final `fgos return` fires. `fgos return`'s re-verify runs
+`committedRunnerConfig()` against whatever the main checkout holds AT THAT
+MOMENT — if the manual rename has not landed yet, the test (updated to
+expect the NEW key name) fails not because the branch's own code is wrong,
+but because the precondition wasn't met first. `fgos-code-implement`
+executing this item must apply the main-checkout edit BEFORE running the
+item's own verify/return cycle, not after.
+
 ## Outstanding questions
 
 None
