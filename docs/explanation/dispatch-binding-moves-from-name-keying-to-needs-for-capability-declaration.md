@@ -78,3 +78,45 @@ after-the-fact split-and-fix cycle, this item's plan split the
 start — proof that a friction pattern discovered once (`tsk-4eu`) can be
 designed around proactively in a later, related item, instead of being
 rediscovered the hard way each time.
+
+## The predicted consumer arrives (tsk-2ie5/tsk-2c1/tsk-28o)
+
+`for` sat validate-only, as predicted above, until `tsk-2ie5` — bringing
+`fgos-researching`'s gather fan-out into the capacity mechanism, keyed by
+purpose since a runtime-composed research prompt never has a
+pre-registered id to match by name. Three things happened exactly as this
+doc anticipated, and one genuinely new wrinkle showed up.
+
+**As anticipated:** the `for`/`needs` split held up unchanged — a real
+`resolveCapacityIdForPurpose(cfg, 'gather')` scan needed no schema
+migration, just a new resolution function reading the field this doc's
+own item already shipped. The ADR0020 split-at-plan-time pattern repeated
+too: `tsk-2ie5` split into `tsk-2c1` (code) and `tsk-28o` (the
+`.fgos/config.json` registration, landed as a direct main commit, same
+shape `tsk-4eu`/`tsk-5ge` established) from the start, no after-the-fact
+scramble.
+
+**The new piece — `carries` (D15, `tsk-5td`):** binding by purpose still
+left one question unanswered: a capacity that accepts cross-provider
+dispatch has no way to declare *what content* it's safe to receive. A
+gather branch's prompt routinely includes repo file paths (its own
+`inputs` field, per `_shared/capacity-dispatch-fallback.md`'s ad-hoc
+packet shape) — a fundamentally riskier payload than a fixed classify
+question. `carries` (`user-text` | `repo-content`, closed enum, `secrets`
+never legal) is the third field a capacity declares alongside `for`/
+`needs`, with a REAL pre-dispatch gate in `resolveExecutorConfig` — not
+metadata nobody reads (the exact `sensitiveData` fate D15 supersedes,
+`docs/history/agent-executor-submit-assist-classify/CONTEXT.md` D7): a
+`carries: "user-text"` capacity handed `repo-content` is refused before
+any spawn.
+
+**The wrinkle this doc's own prediction didn't anticipate:** `tsk-28o`
+forked from `tsk-2ie5` *after* its sibling `tsk-2c1` had already merged
+into it, so Iron Law's `matchedModules` named `dispatch.mjs` for an item
+that never touched it — the classifier reading the real diff correctly,
+just not the diff a human would guess from the item's own footprint field.
+The fix wasn't disputing the classifier; it was citing the sibling's
+already-produced proof instead of re-deriving it
+(`docs/history/tsk-2c1/iron-law-evidence.md`,
+`docs/how-to/fix-fgos-write-rejected-merge-block.md`'s own new `tsk-28o`
+example).
