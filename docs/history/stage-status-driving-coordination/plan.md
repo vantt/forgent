@@ -90,3 +90,155 @@ npm test && grep -n classifyStalePostDelivery src/state/graph-metrics.mjs
 Full-suite green (matches project DoD, `AGENTS.md` #5) plus a wiring-exists
 check; the actual coverage proof is the new test cases themselves, per the
 Shape section's concrete-cases list above.
+
+---
+
+# Plan: herdr-orchestrator auto-launch (tsk-2xt)
+
+## Mode gate
+
+Flags counted against the standard list (auth, authorization, data model,
+audit/security, external systems, public contracts, cross-platform,
+existing covered behavior, weak proof around the area, multi-domain):
+
+- **multi-domain** — spans 4 independent domains (discover/merge/retro/
+  cleanup) plus a new cross-cutting settings surface, and two codebases
+  (herdr-plugin Rust, fgOS Node CLI) (1 flag).
+- **audit/security (hard-gate)** — auto-merge toggle auto-launches
+  `merge-loop`, which performs unattended merges (CONTEXT.md D9). Resolved
+  as non-conflicting with D1's human-gate reservation, but the surface
+  itself is security-relevant and forces high-risk regardless of total
+  flag count (1 flag, hard-gate).
+- **public contracts** — a new settings surface (4 toggles) is a new config
+  default per `AGENTS.md`'s install/setup/doctor gate: must register into
+  `fgos setup`'s config-merge and `fgos doctor`'s check registry
+  (`src/setup/checks.mjs`), not stand alone (1 flag).
+- **weak proof around the area** — the auto-launch mechanism itself
+  (poll-triggered pane spawn, guard-by-title, autoClose) is new,
+  unproven surface with no existing test precedent in `herdr-plugin/src`
+  (1 flag).
+- No auth, no authorization beyond the already-structural CTR005 (D9), no
+  cross-platform (OS) concern beyond the existing Rust/Node split this repo
+  already has, no removed validation.
+
+**4 flags, one of them hard-gate (audit/security) → mode: high-risk.**
+
+## Approach
+
+**Path chosen:** extend herdr-plugin's existing single poll tick
+(`herdr-plugin/src/main.rs:276-286`, `if last_poll.elapsed() >=
+poll_interval { app.refresh_from_fgos(...); app.refresh_pane_state(...);
+... }`) with one additional call reading a new settings source and, per
+enabled domain, launching a guarded pane — no new poll loop, no new
+scheduler. Settings live in the existing shared `.fgos/config.json` (a new
+`herdrOrchestrator: { autoDiscover, autoMerge, autoRetro, autoCleanup }`
+section), mirroring `gate-bypass.mjs`'s own `config.gateBypass.level`
+precedent (`src/config/shared-config-file.mjs`) rather than 4 new env
+vars — `serde_json` is already a herdr-plugin dependency
+(`herdr-plugin/Cargo.toml:17-18`), so reading this section from Rust adds
+no new dependency, and env vars (`FGOS_HERDR_SKIP_PERMISSIONS`'s own
+shape) fit one global kill-switch, not 4 independently named booleans.
+This settles the item's own "settings storage form" open point (its
+description named this as the plan/decompose stage's decision to make).
+
+**Rejected alternative:** a dedicated new config file
+(`herdr-plugin.toml` or similar) — rejected because it would duplicate the
+shared-config-file pattern this repo already has for exactly this shape
+of problem (a small named on/off section a Rust and a Node process both
+need to agree on), and `herdr-plugin.toml` is already the plugin
+*manifest*, not settings (per the item's own description) — reusing it
+would blur that boundary.
+
+**Rejected alternative (already settled in CONTEXT.md D6):** extending
+`fgos-runner --watch` instead of the herdr-launch route — not
+re-litigated here, cited from CONTEXT.md.
+
+### Files likely touched
+
+- `herdr-plugin/src/settings.rs` (new) — read + parse the
+  `herdrOrchestrator` section of `.fgos/config.json`.
+- `herdr-plugin/src/main.rs` — one new call inside the existing poll tick.
+- `herdr-plugin/src/pick.rs` — new argv builders for auto-merge/retro/
+  cleanup, mirroring `discover_run_argv`/`run_argv_for_command`
+  (`pick.rs:101-107`).
+- `herdr-plugin/src/layout.rs` — fixed-tab (`fg:operation`) placement,
+  once `tsk-5lr` delivers the tab/geometry primitives this item's own
+  launcher calls into.
+- `herdr-plugin/src/pane_scan.rs` — extend the guard-check: today's
+  label extraction (`extract_task_id`, `pane_scan.rs:68-71`) assumes an
+  id-shaped title; the fixed auto-launch titles
+  (`"fgos-auto-discover-<id>"`, `"fgos-auto-merge"`, etc.) are not
+  id-shaped and need their own match path.
+- `src/config/shared-config-file.mjs` — schema entry for
+  `herdrOrchestrator`, alongside the existing `gateBypass` entry.
+- `src/setup/checks.mjs` — doctor/setup registration (`AGENTS.md`
+  install/setup/doctor gate).
+- `CHANGELOG.md` — `## [Unreleased]` line (`AGENTS.md`: user-visible
+  change).
+
+### Order
+
+1. Settings source + doctor/setup registration first — every launcher
+   reads it; no launcher can be meaningfully tested without it.
+2. Auto-discover launcher next — targets the existing `fg:agents-N` pool
+   (already used today by `pick.rs`'s `open_pick_pane`/
+   `open_discover_pane`), needs only `tsk-5lr`'s cap (`MAX_AGENT_TABS =
+   2`) to honor the item's own "stop launching when full, no queue" rule.
+3. Auto-merge/retro/cleanup launcher last — the three share one
+   fixed-tab (`fg:operation`) placement mechanism (left pane = merge-loop,
+   right = retro/cleanup alternating, `herdr-operation-tab-layout/
+   CONTEXT.md` D1/D2) that does not exist in `layout.rs` yet; this piece
+   is the most exposed to `tsk-5lr`'s actual delivered shape.
+
+This ordering is structural (each piece's own reuse target), not a
+judgment call between similarly-valid alternatives — `fgos graph --json`
+was run this session but `topUnblock` was skipped for this repo's current
+size (`componentCount: 289`), so no `--what-if` comparison was available
+to lean on; the ordering above did not need it.
+
+### Risk map
+
+| Component | Risk | Proof point |
+|---|---|---|
+| Settings source (new `.fgos/config.json` section, read from Rust) | Medium — new cross-language contract; must fail closed (missing section/malformed JSON → all 4 toggles OFF), mirroring `gate-bypass.mjs`'s own fail-closed convention. | Tests: absent section defaults every toggle OFF; malformed JSON does not crash herdr-plugin and defaults OFF; `fgos doctor` surfaces the section. |
+| Guard-by-title double-launch check | Medium-high — `pane_scan.rs`'s current label extraction (`extract_task_id`) assumes an id-shaped title; the fixed non-id titles this item needs (`"fgos-auto-merge"` etc.) do not match that shape today (found this session, `pane_scan.rs:68-71`). | Unit test: guard-check function correctly detects a live pane by its fixed, non-id-shaped title, not just id-shaped ones. |
+| `fg:operation` placement (`tsk-5lr` not yet delivered) | High — external, in-flight dependency; this item's own `layout.rs` change must target `tsk-5lr`'s actual merged shape, not a guess made now. | Blocked structurally by `deps: [tsk-5lr, tsk-3v2]` (frontier `depsReady`) — no proof point needed before merge, per `depsReady`'s own zero-latency-unblock guarantee (CONTEXT.md D3); re-verify the placement call signature against `tsk-5lr`'s actual landed code at `fgos-validating` time for whichever child builds it. |
+| autoClose (`tsk-3v2` not yet delivered) | High — same external in-flight dependency shape as above. | Same: `deps` field already blocks; re-verify the actual autoClose hook signature once `tsk-3v2` lands. |
+| Auto-merge automation (audit/security hard-gate) | Confirmed non-conflicting with the human-gate policy wall (CONTEXT.md D9) — residual risk is scope creep into `approve`/merge internals. | This item's own footprint must never touch `bin/fgos.mjs`'s `approve`/`merge` cases or `src/state/store.mjs`'s `moveWork` — it only ever shells out to the existing `/fgOS:merge-loop` command, same as a person would; `fgos-validating`/`detect_changes()` should confirm no such file is touched. |
+| Poll-tick race (two ticks firing before a guard title registers) | Medium — new unattended-launch surface, no existing precedent to lean on (weak-proof flag). | Guard check and pane spawn must happen synchronously within the same tick, same shape `skip_permissions_enabled()`'s own read-then-act already uses; flag as an explicit `fgos-validating` proof point for whichever child implements the spawn call. |
+
+Impact-analysis posture: **full** (GitNexus present, checked fresh this
+session — see CONTEXT.md's Evidence trail).
+
+## Shape (high-risk mode — split into 3 children)
+
+One monolithic implementation would bundle a new cross-language settings
+contract, a doctor/setup registration, and two structurally-different pane-
+placement mechanisms (pooled `fg:agents-N` vs fixed `fg:operation`) into
+one build/verify/merge unit — each piece is independently buildable and
+independently verifiable once its own prerequisites land, so this item
+splits rather than proceeding as itself.
+
+Concrete cases each child's own tests must prove, at high-risk depth:
+
+- Settings: absent config section → every toggle OFF (safe default);
+  malformed JSON → fails closed, no crash; one toggle ON does not
+  silently enable the others.
+- Discover launcher: pool at `MAX_AGENT_TABS` cap → no launch attempted,
+  no queue, next tick retries cleanly; an eligible item already has a
+  live guarded pane → skipped, not double-launched; guard title survives
+  a `herdr pane list` round trip.
+- Merge/retro/cleanup launcher: left/right pane geometry resolved
+  correctly by `x`-position (`herdr-operation-tab-layout` D2); an
+  already-running guarded pane on either side → skipped; retro/cleanup
+  alternation on the right pane follows priority, not a hardcoded order.
+- Concurrent access: two poll ticks close together never produce two
+  panes for the same guard title (see the poll-tick race risk row above).
+
+## No further split beyond the 3 children below
+
+Each child is one honest piece; none of them further decomposes.
+
+## Outstanding questions
+
+None
