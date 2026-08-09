@@ -61,6 +61,24 @@
         "tier": "light",
         "model": "Gemini 3.5 Flash (Medium)",
         "allowCrossProvider": true
+      },
+      "gather": {
+        "kind": "cli",
+        "for": "gather",
+        "needs": "prompt-completion",
+        "carries": "repo-content",
+        "adapter": "cli-spawn",
+        "command": "agy",
+        "provider": "agy",
+        "args": [
+          "-p",
+          "{prompt}",
+          "--model",
+          "{model}"
+        ],
+        "tier": "light",
+        "model": "Gemini 3.5 Flash (Medium)",
+        "allowCrossProvider": true
       }
     },
     "models": {
