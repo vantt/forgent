@@ -48,7 +48,16 @@ a wrong guess is cheaply correctable later via `fgos edit <id>`.
 2. **Scan the current fgOS view for a dependency candidate.** Run:
 
    ```
-   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs list --json
+   # fgos CLI fallback (tsk-1no D3)
+   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
+   if [ -f "$FGOS_BIN" ]; then
+     node "$FGOS_BIN" list --json
+   elif command -v fgos >/dev/null 2>&1; then
+     fgos list --json
+   else
+     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
+     exit 1
+   fi
    ```
 
    Always use the literal `${CLAUDE_PROJECT_DIR}` substitution shown above,
@@ -80,7 +89,16 @@ a wrong guess is cheaply correctable later via `fgos edit <id>`.
    - If the user confirmed (or edited to) one or more dependency ids, run:
 
      ```
-     node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs submit "<text>" --deps <confirmed-ids> --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
+     # fgos CLI fallback (tsk-1no D3)
+     FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
+     if [ -f "$FGOS_BIN" ]; then
+       node "$FGOS_BIN" submit "<text>" --deps <confirmed-ids> --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
+     elif command -v fgos >/dev/null 2>&1; then
+       fgos submit "<text>" --deps <confirmed-ids> --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
+     else
+       echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
+       exit 1
+     fi
      ```
 
      where `<confirmed-ids>` is a comma-separated list of the confirmed
@@ -89,7 +107,16 @@ a wrong guess is cheaply correctable later via `fgos edit <id>`.
      step 2, run the same command with **no `--deps` flag at all**:
 
      ```
-     node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs submit "<text>" --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
+     # fgos CLI fallback (tsk-1no D3)
+     FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
+     if [ -f "$FGOS_BIN" ]; then
+       node "$FGOS_BIN" submit "<text>" --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
+     elif command -v fgos >/dev/null 2>&1; then
+       fgos submit "<text>" --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
+     else
+       echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
+       exit 1
+     fi
      ```
 
    `<text>` is the original free-text description from step 1 (or the

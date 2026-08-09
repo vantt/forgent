@@ -27,13 +27,31 @@ same contract as `ready`/`check`/`conflicts`.
    - If `$ARGUMENTS` is non-empty, run:
 
      ```
-     node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs graph --what-if $ARGUMENTS --json
+     # fgos CLI fallback (tsk-1no D3)
+     FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
+     if [ -f "$FGOS_BIN" ]; then
+       node "$FGOS_BIN" graph --what-if $ARGUMENTS --json
+     elif command -v fgos >/dev/null 2>&1; then
+       fgos graph --what-if $ARGUMENTS --json
+     else
+       echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
+       exit 1
+     fi
      ```
 
    - If `$ARGUMENTS` is empty, run the plain full-metrics form:
 
      ```
-     node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs graph --json
+     # fgos CLI fallback (tsk-1no D3)
+     FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
+     if [ -f "$FGOS_BIN" ]; then
+       node "$FGOS_BIN" graph --json
+     elif command -v fgos >/dev/null 2>&1; then
+       fgos graph --json
+     else
+       echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
+       exit 1
+     fi
      ```
 
    Always use the literal `${CLAUDE_PROJECT_DIR}` substitution shown above,

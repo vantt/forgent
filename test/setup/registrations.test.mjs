@@ -202,3 +202,52 @@ test('Data Dictionary #7b names exactly the registered doctor fixes — no missi
     REGISTERED_FIX_IDS.slice().sort(),
   );
 });
+
+// ─── plugin-skill-cli-reachable (tsk-1no D3): the plugin skill layer's own
+// CLI-resolution fallback, mirrored as a doctor check so a future install
+// gap surfaces at `fgos doctor` time instead of at first slash-command use.
+
+function pluginSkillCliReachableCheck() {
+  const entry = DOCTOR_CHECKS.find((c) => c.id === 'plugin-skill-cli-reachable');
+  assert.ok(entry, 'plugin-skill-cli-reachable must be registered');
+  return entry.check;
+}
+
+test('plugin-skill-cli-reachable passes when a local bin/fgos.mjs exists, without touching PATH', () => {
+  const dir = mkTempDir();
+  fs.mkdirSync(path.join(dir, 'bin'));
+  fs.writeFileSync(path.join(dir, 'bin', 'fgos.mjs'), '// stub\n');
+  const result = pluginSkillCliReachableCheck()(dir);
+  assert.equal(result.passed, true);
+  assert.match(result.message, /local bin\/fgos\.mjs found/);
+});
+
+test('plugin-skill-cli-reachable passes when no local bin/fgos.mjs exists but fgos resolves from PATH', () => {
+  const dir = mkTempDir();
+  const binDir = mkTempDir();
+  const stubPath = path.join(binDir, 'fgos');
+  fs.writeFileSync(stubPath, '#!/bin/sh\necho stub\n');
+  fs.chmodSync(stubPath, 0o755);
+  const originalPath = process.env.PATH;
+  process.env.PATH = `${binDir}${path.delimiter}${originalPath}`;
+  try {
+    const result = pluginSkillCliReachableCheck()(dir);
+    assert.equal(result.passed, true);
+    assert.match(result.message, /fgos resolved from PATH/);
+  } finally {
+    process.env.PATH = originalPath;
+  }
+});
+
+test('plugin-skill-cli-reachable fails when neither a local bin/fgos.mjs nor a PATH install exists', () => {
+  const dir = mkTempDir();
+  const originalPath = process.env.PATH;
+  process.env.PATH = '';
+  try {
+    const result = pluginSkillCliReachableCheck()(dir);
+    assert.equal(result.passed, false);
+    assert.match(result.message, /no bin\/fgos\.mjs at .* and no global fgos install on PATH/);
+  } finally {
+    process.env.PATH = originalPath;
+  }
+});
