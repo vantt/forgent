@@ -378,4 +378,55 @@ tất".
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-(chưa chia — chờ §6)
+§6.4 còn bốn phương án chưa chọn, nên **chưa chia được task thi công**.
+Nhưng một việc chia được ngay và không phụ thuộc lựa chọn đó: phép thử
+đọc vỉa chất liệu.
+
+### tsk-1hy — phép thử vỉa chất liệu kể chuyện {#task-storytelling-material-probe}
+
+**Mục tiêu:** script đọc-thuần gom + lọc chất liệu kể chuyện từ event log
+đã có, để biết **vỉa đó có thật sự dùng được không** trước khi cam kết
+bất kỳ kiến trúc nào. Là phép thử, không phải tính năng.
+
+**Trích §6.4 áp dụng:** Cách 1 — "chỉ mặt đọc, không đường ống". Được
+chọn làm việc-làm-trước vì nó **là phép thử**: trả lời đúng câu hỏi mà
+vòng 4 vừa chứng minh session đoán sai.
+
+**Vì sao nó tồn tại — §5 vòng 4(a):** vòng 3 khẳng định "chất liệu
+struggle đã có sẵn trong `friction`"; đo lại thì SAI (92% friction là
+telemetry máy), suy rộng từ đúng một bản ghi. Chính vì đã sai một lần
+theo kiểu đó nên phải đọc vỉa thật trước khi ai đó thiết kế tiếp trên
+giả định.
+
+**Ràng buộc mang theo:** bài học B6b (§5 vòng 2) — không bao giờ "gom
+hết"; nhưng phạm vi task này CHƯA cần ranking đầy đủ, chỉ cần lọc khuôn
+mẫu + nhóm. Chọn tín hiệu xếp hạng bằng đo là giai đoạn sau.
+
+**Quyết định thiết kế đáng ghi:** làm script trong `scripts/` (không nằm
+trong `package.json` `files`, nên không được ship), **không** thêm verb
+vào `bin/fgos.mjs`. Hai lý do thật: một phép thử chưa nên thành mặt công
+khai vĩnh viễn khi chưa biết vật liệu có dùng được; và `bin/fgos.mjs`
+đang có xung đột footprint sẵn giữa `tsk-3ip` và `tsk-3cb` — thêm cái
+thứ ba là tự chuốc khó.
+
+**Quan hệ anh em:** độc lập hoàn toàn. `fgos conflicts` xác nhận không
+xung đột với bất kỳ item nào đang mở. Chạy song song được với `tsk-469`
+và `tsk-3ip` (hai task nửa changelog, ở
+`docs/history/automated-changelog-compound-learn/DISCUSSION.md` §7).
+
+**Footprint:** `scripts/probe-storytelling-material.mjs`,
+`test/scripts/probe-storytelling-material.test.mjs`,
+`docs/history/compound-learn-artifact-registry/reports`.
+**Verify:** `node --test test/scripts/probe-storytelling-material.test.mjs`
+
+### Quan hệ với `tsk-28x` (chính nó)
+
+`tsk-28x` giờ mang `deps: [tsk-12m, tsk-1hy]` — cần kết quả phép thử mới
+trả lời được câu hỏi phương án §6.4. **Lưu ý:** `deps` trên `tsk-12m` là
+di sản từ lúc submit và vẫn là **câu hỏi mở** (§3 dòng E), chưa được xác
+nhận là đúng; `deps` trên `tsk-1hy` thì rõ ràng đúng.
+
+### Chưa chia được
+
+Mọi thứ sau khi chọn phương án: hình dạng registry/trục, port
+`authoritative_for`, triage, `draft` lifecycle. Chờ §6.4.
