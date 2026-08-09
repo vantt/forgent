@@ -136,3 +136,23 @@ export function canAutoApprove(item, artifactText, level) {
   if (hasOpenItems(artifactText)) return false;
   return true;
 }
+
+/**
+ * D6's bypass axis for `fgos-validating`'s `validateApprove` gate
+ * (`docs/history/gate-bypass/CONTEXT.md` D6). Reuses `canAutoApprove`'s
+ * first two checks verbatim (D4's hard-gate floor, D5's tier-coverage
+ * axis) and swaps the third axis: instead of `hasOpenItems` scanning an
+ * artifact's text, this reads `fgos-validating`'s own already-computed
+ * reality-gate verdict directly. `verdict` is self-reported by the skill
+ * that just computed it, per D6 — a `READY WITH CONSTRAINTS`/`NOT READY`
+ * verdict is treated the same as "has open items": never skippable.
+ */
+export function canAutoApproveValidate(item, verdict, level) {
+  const haystack = `${item?.title ?? ''}\n${item?.description ?? ''}`.toLowerCase();
+  const hardGateHit = HEAVY_KEYWORDS.some((keyword) => haystack.includes(keyword.toLowerCase()));
+  if (hardGateHit) return false;
+
+  if (!isTierCovered(item?.tier, level)) return false;
+  if (verdict !== 'READY') return false;
+  return true;
+}

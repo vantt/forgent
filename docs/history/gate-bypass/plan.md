@@ -136,3 +136,119 @@ that does not exist, and does not create the children by hand.
 Per the locked decision that Execute/verify already have a working
 mechanical path (goal-check + `return`'s re-verify), this plan does not
 redesign that — each piece above already names its one proof command.
+
+## Piece 3 — validateApprove bypass (D6, `tsk-1ds`)
+
+Item: `tsk-1ds`. Decision: `docs/history/gate-bypass/CONTEXT.md` D6, first
+written up in `docs/history/gate-question-quality-and-routing/
+DISCUSSION.md#task-validate-bypass`. Extends Pieces 1-2 above to the third
+skill-embedded gate — `fgos-validating`'s `validateApprove`, the one this
+file's own original "Deferred to planning" section flagged as a maybe.
+
+### Mode (mechanical count)
+
+| Flag | Applies? | Why |
+|---|---|---|
+| auth | no | — |
+| authorization | no | — |
+| data model | no | no schema change |
+| audit/security | **yes** | same nature as Pieces 1-2 — decides when a human confirmation step is skipped |
+| external systems | no | — |
+| public contracts | no | internal skill mechanism |
+| cross-platform | no | — |
+| existing covered behavior | **yes** | rewrites the Gate step already shipped in `fgos-validating`, and the mirror invariant (`test/skills/fgos-mirror.test.mjs`) means the edit must land in `.claude/skills/fgos-validating/SKILL.md` AND its byte-identical `.agents/skills/fgos-validating/SKILL.md` counterpart, or an existing, currently-green test breaks |
+| weak proof around the area | no | `canAutoApprove`'s core mechanism (hard-gate floor, tier coverage) already has 14 passing tests in `test/state/gate-bypass.test.mjs`; only the new third axis is unproven, and this piece's own verify adds that proof |
+| multi-domain | no | single `coding` domain |
+
+`audit/security` alone is a hard-gate flag → **mode = high-risk** per the
+same rule Pieces 1-2 used, independent of the flag count. In practice this
+piece is much smaller than Pieces 1-2: it reuses an already-proven,
+already-tested mechanism (`canAutoApprove`'s D4 floor + D5 tier check)
+rather than building it from scratch, and touches three files instead of a
+whole new subsystem — but the lane rule is mechanical, not vibes, so the
+flag still governs.
+
+### Approach
+
+Chosen path: one honest piece, not split further. Unlike Pieces 1-2 (new
+infra + a separate wiring pass across two skills), this is a single
+`canAutoApproveValidate` export plus wiring it into exactly one Gate
+section — splitting it would separate two things that are only meaningful
+together (the new export has no caller until the Gate section calls it,
+and the Gate section has nothing to call until the export exists).
+
+`fgos graph --what-if tsk-1ds --json` was not run: `tsk-1ds` has no `deps`
+and no candidate sibling split, so there is no ordering choice for that
+command to inform.
+
+Impact-analysis posture (`CLAUDE.md`'s capability gate): **full** —
+`fgos tool query --capability impact-analysis --status present` returned
+GitNexus `present`. Not exercised as a proof point here because this piece
+is purely additive to `src/state/gate-bypass.mjs` (a new export, D6 and
+the item description both bar editing `canAutoApprove`/`hasOpenItems`
+themselves) — there is no existing symbol being *edited* for impact
+analysis to bound the blast radius of.
+
+### Risk map
+
+| Component | How risky | What would prove it |
+|---|---|---|
+| `canAutoApproveValidate(item, verdict, level)` — reuses D4 floor + D5 tier axis verbatim, swaps `hasOpenItems` for `verdict === 'READY'` | low | unit tests mirroring the existing `canAutoApprove` table: `READY` → true (subject to floor/tier), `READY WITH CONSTRAINTS` → false, `NOT READY` → never reached (Gate section skips the check entirely on `NOT READY`, per "Giữ nguyên" in the item description) |
+| D4 hard-gate floor still holds through the new axis | **medium** | explicit test: a hard-gate keyword hit + verdict `READY` at level `heavy` still returns `false` — same single-most-important-case shape Pieces 1-2's own test file already established for `canAutoApprove` |
+| `fgos-validating/SKILL.md` Gate section rewrite (`.claude/skills/` AND `.agents/skills/` copies) | medium | `test/skills/fgos-mirror.test.mjs` (byte-identity, already exists, currently green) + manual read-through: does the non-bypass branch still ask exactly "Feasibility validated. Approve moving to executing?", and does `NOT READY` still skip the question and return to `fgos-planning` untouched |
+| `--actor bypass` gate-approve record shape | low | same `fgos gate-approve <id> --gate validateApprove --actor bypass --verify "..."` call already used by `fgos-exploring`/`fgos-planning`'s own bypass branch — no new record shape invented |
+
+The medium entries (D4 floor through the new axis, the Gate section
+rewrite + its mirror) are the two `fgos-validating` should treat as real
+proof points, not a guess here.
+
+### Shape
+
+What: add `canAutoApproveValidate` to `src/state/gate-bypass.mjs`,
+alongside (never replacing) the existing `canAutoApprove` — same file,
+same exports list, one new function. Rewrite `fgos-validating`'s `## Gate`
+section (`.claude/skills/fgos-validating/SKILL.md` lines ~171-190 today) to
+run the same auto-approve check `fgos-exploring`'s own Gate section already
+uses (`docs/history/gate-bypass/CONTEXT.md` D1-D5, the exact bash shape at
+`.claude/skills/fgos-exploring/SKILL.md` lines 273-284: `Promise.all` import
+of `store.mjs` + `gate-bypass.mjs`, `.fgos` resolved via `git rev-parse
+--git-common-dir`, fail-closed on anything other than the literal `true`),
+substituting `canAutoApproveValidate(item, verdict, level)` for
+`canAutoApprove(item, artifactText, level)` — `verdict` comes from this
+skill's own already-computed `READY`/`READY WITH CONSTRAINTS`/`NOT READY`
+result, not a file read. Mirror the identical edit into
+`.agents/skills/fgos-validating/SKILL.md` in the same commit (the same
+`fgos-mirror.test.mjs` requirement Pieces 1-2 already satisfied for their
+own two skills).
+
+Files touched: `src/state/gate-bypass.mjs` (add-only),
+`.claude/skills/fgos-validating/SKILL.md`, `.agents/skills/fgos-validating/
+SKILL.md` (mirror), `test/state/gate-bypass.test.mjs` (add cases for the
+new export).
+
+Verify: the item's own locked verify (`node --test
+test/state/gate-bypass.test.mjs && node -e "...canAutoApproveValidate is a
+function..." && grep -q canAutoApproveValidate .claude/skills/
+fgos-validating/SKILL.md`) plus, to keep the repo-wide suite green per this
+repo's own DoD, `node --test test/skills/fgos-mirror.test.mjs` — pinned
+here as an assumption (not material to scope/behavior/acceptance, so no
+`fgos-exploring` hand-back needed) since the item's own verify text
+predates noticing the mirror file also needs the edit.
+
+### Cases worth proving against
+
+- Verdict `READY`, tier covered, no hard-gate keyword, level covers the
+  item's tier → bypass, `--actor bypass`.
+- Verdict `READY WITH CONSTRAINTS` (even one constraint) → always ask,
+  regardless of level/tier — no floor/tier check even needs to run first,
+  same "any constraint asks" shape D6 locked.
+- Verdict `NOT READY` → unchanged: no question, returns to `fgos-planning`,
+  `canAutoApproveValidate` never called.
+- Hard-gate keyword hit + verdict `READY` at level `heavy` → still asks (D4
+  floor holds through the new axis, the single most important case here).
+- Gate-bypass level `off` + verdict `READY` → still asks (same "off
+  approves nothing" floor `isTierCovered` already gives every other gate).
+
+## Outstanding questions
+
+None
