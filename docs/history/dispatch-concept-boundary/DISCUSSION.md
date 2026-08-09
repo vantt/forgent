@@ -108,7 +108,7 @@ không mở lại những quyết định các item khác đã khoá.
 | 38 | 11 capability của hn xếp đâu | **Đề nghị** (vòng 11) | **T4 phía cung**, không ngang `gather`/`judge` (thuộc tính của nhà cung cấp, không của một lần dispatch). Cũng **không ngang `gitnexus`**: cả 11 tả **chính cái sổ**, do harness CLI tự khai qua `query.contract`. Ô tương ứng của fgOS — *sổ tự khai năng lực + dải schema* — **đang trống**, latent thật vì global/project install có thể lệch version. §6.5 |
 | 34 | Ô "mục tiêu ngoài sổ" đã có tên | **Đang hội tụ** (vòng 10) | **`errand`** — quét sạch 0 hit ở `src/`, `docs/`, `upstreams/`. Bác `cell` (false friend: bee's cell CÓ claim/reservation/registry) và `packet` (kéo theo khung *"orthogonal axes"* D1 đã bác). Bốn phép thử ở §6.3, sắc nhất: **không sở hữu branch/merge riêng**. Vẫn gated `tsk-2t6` |
 | 35 | `capacity` rút về một nghĩa | **CHỐT → D8** (vòng 18; bản P1 vòng 10 đã bị thay bởi P1′ vòng 15) | Một nghĩa = **năng lực có tên của fgOS**, cặp *behavior-promise / functional-helper* (= D2 + D1 đọc thành định nghĩa). `capacities.<id>` là **bản khai**, không phải bản thân nó; `binding` là **cạnh** T3→T4. Bản P1 đầu sai vì bỏ mất lời hứa hành vi mà không cất vào đâu. `0026` **làm rõ**, không lật |
-| 49 | `provider` xếp sai | **Rõ, ĐÃ SỬA** (vòng 19-20) | Là **chrome mang tính BẰNG CHỨNG**, không phải danh tính T4. Cổng cross-provider **cố ý không đọc** nó (`dispatch.mjs:570`) — đúng. Nhưng nó **được ghi vào `events.jsonl`** (`loop.mjs:744-758`, event `capacity.dispatch`) làm bản ghi audit, và **khai báo thắng thực tế** (`:777`). Phép thử nói dối: `command:"agy"` + `provider:"claude"` ⇒ **cổng an toàn, sổ nói dối**. Cộng `sensitiveData` chưa ship ⇒ governance cross-provider **có cổng, không có sổ đáng tin**. Đề nghị: `provider` thành **dẫn xuất từ `command`**. Mang hai nghĩa: nhãn vs `{providers}` của `tool query` — bệnh cũ lần thứ **sáu**. §6.14 |
+| 49 | `provider` xếp sai | **Rõ, ĐÃ SỬA** (vòng 19-20) | Là **chrome mang tính BẰNG CHỨNG**, không phải danh tính T4. Cổng cross-provider **cố ý không đọc** nó (`dispatch.mjs:570`) — đúng. Nhưng nó **được ghi vào `events.jsonl`** (`loop.mjs:744-758`, event `capacity.dispatch`) làm bản ghi audit, và **khai báo thắng thực tế** (`:777`). Phép thử nói dối: `command:"agy"` + `provider:"claude"` ⇒ **cổng an toàn, sổ nói dối**. Cộng `sensitiveData` chưa ship ⇒ governance cross-provider **có cổng, không có sổ đáng tin**. **CHỐT → D9**: audit ghi **cả hai** — `provider` (nhãn) và `command` (lệnh thật). Mang hai nghĩa: nhãn vs `{providers}` của `tool query` — bệnh cũ lần thứ **sáu**. §6.14 |
 | 50 | Status token của bee | **Đề nghị: LẤY** (vòng 19) | Là hợp đồng trả về của **`errand`**, không phải của `work`: `work` báo bằng đổi state vì **có sổ**; `errand` **không có sổ** nên buộc phải trả về. Khép kín đối xứng T2. §6.14 |
 | 51 | `digest` bắt buộc `file:line` anchor | **Đề nghị: LẤY** (vòng 19) | Không phải chữ mới — **siết hợp đồng `digest`** của D2. Đi kèm `tsk-2ie5`. Quét: 1 hit prose duy nhất |
 | 52 | Degrade ladder Inactive/Degraded/Full | **Đề nghị: LẤY** (vòng 19) | 0 hit trong code, chỉ prose `CLAUDE.md`. **D6 làm nó bắt buộc**: `needs: X` ⇒ resolver phải trả lời "mấy provider của X present" — đúng ba mức. Xếp **TG**, gộp theo capability không theo tên tool |
@@ -138,6 +138,7 @@ không mở lại những quyết định các item khác đã khoá.
 | **D6** | **Phía CẦU khai HAI field: `needs` (capability → chọn *provider nào*) và `for` (purpose `gather`\|`judge` → chọn *lane/nghi thức nào*).** Binding khớp bằng hai thứ đó, không bằng tên. Lý do hai chứ không một: hỏi `gitnexus` thì `for` **luôn** là `gather` và `needs` mới phân biệt; với helper thì `needs` gần như hằng số (*"chạy một prompt, trả text"*) và `for` mới phân biệt — thiếu một là mất một chiều. Phạm vi phiên từ vựng: **chỉ vị từ**; sửa code / đổi config schema / di trú là **item riêng** | 12 → 13 |
 | **D7** | **Bỏ `rootTask` và `subTask` khỏi từ vựng dispatch** — dùng `work` (T2) + vai trò bên gọi (T1) cho cái thứ nhất, `child work` cho cái thứ hai. **Supersede phần từ vựng của `0026`.** Cả hai có **0 identifier trong code**; `0026` tự gọi `rootTask` là *vai trò* (*"công việc gốc **đang làm** … **Vai trò này** có tính ĐỆ QUY/fractal"*) và tự gọi `subTask` là *tên gọi **tương đối, nhìn từ góc của bên kích hoạt***. Phép thử: `tsk-5td` nằm backlog là `work`; một launcher đứng nó lên thì **cùng dòng, cùng id, state không đổi một byte** mà đổi tên gọi ⇒ từ vai trò, không phải từ phân lớp. `subTask` còn đội hai nghĩa khác tập: (a) work con do decompose, **được lưu** ⇒ `child work` (D4); (b) target của một lần dispatch đệ quy, **thoáng qua** ⇒ chỉ là một `work`/`errand` khác. **D7 chỉ đổi NHÃN trên sơ đồ D1** (nhánh CÓ: `rootTask`→`work`); **tiêu chí D1 không đổi một chữ** | 10 → 14 |
 | **D8** | **`capacity` = một NĂNG LỰC CÓ TÊN của chính fgOS — cặp *behavior-promise / functional-helper*.** `capacities.<id>` là **bản khai** của nó, không phải bản thân nó; `binding` là **CẠNH** T3→T4, không phải tên tầng; T3 đổi tên **BINDING → NĂNG LỰC CÓ TÊN**. Cặp chữ là **D2 + D1 đọc thành một định nghĩa**: *behavior-promise* = nó **hứa** gì (`digest` hay `verdict`, D2) · *functional-helper* = nó **là** gì (hẹp, không authority, phục vụ mục tiêu người khác, D1). Một mình `functional-helper` thì hụt hợp đồng — đúng lý do `0026` trôi sang tiêu chí cấu trúc mà D1 đã bác; một mình `behavior-promise` thì không phân biệt được với `tool`. Bằng chứng từ D6: **một dòng config vô hồn không đi khai *nó cần gì*** — chỉ thứ có lời hứa riêng mới khai được `for`/`needs`. **A1 chết** (giờ đúng một nghĩa). **Không breaking**: config key và code giữ nguyên. `0026` chỉ **làm rõ** một mệnh đề (tiêu chí phân định → authority + state effects, D1 đã làm), **không lật** | 10 → 18 |
+| **D9** | **Audit ghi CẢ HAI: `provider` (nhãn, tự do đặt) VÀ `command` (lệnh thật sự spawn)** trong event `capacity.dispatch`. Hôm nay `events.jsonl` chỉ ghi `provider`, mà `provider = executor.provider ?? executor.command` (`:777`) nên **khai báo thắng thực tế** — đặt `command:"agy"` + `provider:"claude"` thì `agy` chạy, sổ ghi `claude`, không lỗi không cảnh báo. Cổng cross-provider **không bị lừa** (đọc `executor.command`, `:630`; doc comment `:566-570` nói rõ cố ý không đọc `provider`) ⇒ **không phải lỗ hổng bảo mật mà là lỗ hổng SỔ SÁCH**. Ba đường đã cân: (A) bỏ field — thật tuyệt đối, log xấu · (B) giữ field + bảng ánh xạ vendor — đẹp và thật, phải nuôi bảng · **(C) giữ nhãn, ghi cả hai** — không bỏ gì, không nuôi bảng, nhãn sai thì `command` bên cạnh vẫn nói thật. Giá: payload dài thêm một field | 19 → 21 |
 | **D2** | **Nhánh không-authority tách làm hai lớp: `gather` (trả `digest`) và `judge` (trả `verdict`)** — không phải một. Lý do tách: hai loại lỗi khác nhau ⇒ hai cách sửa khác nhau (digest sai vì *đọc thiếu* → đọc lại/rộng hơn; verdict sai vì *phán sai* → cần người hoặc đổi tiêu chí); trộn lại thì mất tín hiệu sửa lỗi. Tên **không phát minh mới** — cả hai cặp `<lớp> → <cái nó trả về>` đã sống sẵn trong repo (§5 vòng 2). Bee cũng tách đúng chỗ này, gọi review-class là *"neither class"* | 1 → 3 |
 
 ## 5. Q&A log
@@ -766,6 +767,22 @@ Lý do rơi ra khi xếp: `work` **có sổ** nên báo bằng đổi state; `er
 nhánh helper hợp đồng trả về; giờ đối xứng T2 khép kín.
 
 Chi tiết cả năm ở §6.14.
+
+### Vòng 21 — 2026-08-09 — chốt cách vá sổ audit
+
+**Người dùng:** *"provider có vấn đề gì cần anh quyết?"* rồi *"ok C"*.
+
+Phát biểu lại cho gọn, vì bản vòng 19-20 dài quá mức cần thiết: **cổng chặn
+vẫn đúng** (nó đọc `command`), nên đây **không phải lỗ hổng bảo mật**. Nó là
+**lỗ hổng sổ sách** — cái sổ dùng để trả lời *"prompt của tôi đã đi đâu"* có
+thể ghi sai, và không có gì chặn.
+
+Ba đường A/B/C, người dùng chọn **C**: giữ nhãn, ghi cả hai. Mint **D9**.
+
+Chỗ này cũng là bài học về cách trình bày: hai vòng trước tôi dựng đủ bằng
+chứng nhưng không tách được *"cái gì cần người quyết"* khỏi *"cái gì tôi tự
+xếp được"*, nên người đọc phải tự lọc. Câu hỏi đúng chỉ có một dòng, và ba
+lựa chọn.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -1577,12 +1594,17 @@ một-chuỗi-hai-nghĩa:
 `provider` (nghĩa 1) không kiểm được gì — ghi sai cũng không ai biết, kể cả
 người đọc lại `events.jsonl` sau này.
 
-**Đề nghị sửa (Bước 5, không sửa trong phiên từ vựng):** `provider` phải là
-**dẫn xuất, không khai báo** — luôn suy từ `command` đã resolve, không bao giờ
-lấy chuỗi người viết. Hôm nay `executor.provider ?? executor.command` cho
-**khai báo thắng thực tế**; lật lại thì nó không nói dối được nữa. Đúng khuôn
-`derived-never-stored` §6.6 đã đặt tên (`frontier`/`computeSchedule`/
-`footprintOverlap`). Gắn cùng cụm governance với `sensitiveData`.
+**Cách sửa [KHOÁ — D9]:** không bỏ nhãn, không nuôi bảng ánh xạ — **ghi CẢ HAI
+vào audit**: `provider` (nhãn) **và** `command` (lệnh thật sự spawn). Nhãn có
+sai thì sự thật nằm ngay cạnh nó trong cùng một dòng `events.jsonl`.
+
+Hai đường đã cân và **không chọn**: (A) bỏ field, `provider` luôn = `command` —
+thật tuyệt đối nhưng log thành đường dẫn xấu; (B) giữ field + bảng ánh xạ vendor
+để validate — đẹp và thật nhưng phải nuôi bảng. C rẻ nhất, và không lấy đi thứ
+gì đang có.
+
+Sửa ở **Bước 5**, không sửa trong phiên từ vựng. Gắn cùng cụm governance với
+`sensitiveData`.
 
 #### Status token — **LẤY**, và nó lấp đúng ô hợp đồng trả về của `errand`
 
