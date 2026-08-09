@@ -16,7 +16,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { TIERS } from './work.mjs';
-import { HEAVY_KEYWORDS } from '../intake/risk-keywords.mjs';
+import { HEAVY_KEYWORDS, matchesKeyword } from '../intake/risk-keywords.mjs';
 import { readSharedConfig } from '../config/shared-config-file.mjs';
 
 /** Level order, weakest to strongest. 'off' auto-approves nothing. */
@@ -128,8 +128,8 @@ export function hasOpenItems(artifactText) {
  * `level` is the value `readGateBypassLevel` returned.
  */
 export function canAutoApprove(item, artifactText, level) {
-  const haystack = `${item?.title ?? ''}\n${item?.description ?? ''}`.toLowerCase();
-  const hardGateHit = HEAVY_KEYWORDS.some((keyword) => haystack.includes(keyword.toLowerCase()));
+  const haystack = `${item?.title ?? ''}\n${item?.description ?? ''}`;
+  const hardGateHit = HEAVY_KEYWORDS.some((keyword) => matchesKeyword(haystack, keyword));
   if (hardGateHit) return false;
 
   if (!isTierCovered(item?.tier, level)) return false;
@@ -148,8 +148,8 @@ export function canAutoApprove(item, artifactText, level) {
  * verdict is treated the same as "has open items": never skippable.
  */
 export function canAutoApproveValidate(item, verdict, level) {
-  const haystack = `${item?.title ?? ''}\n${item?.description ?? ''}`.toLowerCase();
-  const hardGateHit = HEAVY_KEYWORDS.some((keyword) => haystack.includes(keyword.toLowerCase()));
+  const haystack = `${item?.title ?? ''}\n${item?.description ?? ''}`;
+  const hardGateHit = HEAVY_KEYWORDS.some((keyword) => matchesKeyword(haystack, keyword));
   if (hardGateHit) return false;
 
   if (!isTierCovered(item?.tier, level)) return false;
