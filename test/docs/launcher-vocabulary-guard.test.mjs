@@ -92,6 +92,7 @@ const ALLOWED_FILES = new Map([
   ['docs/history/tsk-4eu-executors-key-tier-validation/iron-law-evidence.md', 'same meta-citation of this guard test\'s own pre-existing-failure report as tsk-33w\'s entry above'],
   ['docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md', 'documents a real historical incident in this guard test itself (a git-ls-files false-pass during tsk-2cw\'s original rename) -- a war story, same reasoning as 0028\'s own allowlist entry'],
   ['plans/260808-2210-dispatch-vocabulary-rearrange/next-session-prompt.md', 'tsk-5td\'s own working prompt for its dispatch-vocabulary-rearrange session -- discusses "orchestrator" as its own subject matter (citing 0026/0028/tsk-2cw history while analyzing the dispatch-layer vocabulary), same reasoning as gate-question-quality-and-routing/DISCUSSION.md\'s own allowlist entry above, not prose this item has authority to rewrite mid-session'],
+  ['docs/history/tsk-2uo-launcher-vocabulary-guard-allowlist/iron-law-evidence.md', 'this item\'s own Iron Law evidence -- quotes the pinned term inside a real failing-before test transcript excerpt, same reasoning as launcher-vocabulary-rename/iron-law-evidence.md\'s own allowlist entry above'],
 ]);
 
 const BINARY_EXT = /\.(png|jpe?g|gif|ico|woff2?|ttf|eot|pdf)$/i;
