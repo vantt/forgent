@@ -71,6 +71,20 @@ never runs).
   via the existing `FGOS_MAIN_CHECKOUT_LOCK_TTL_MS` env var if 20s proves
   wrong in practice.
 
+- **D5.** Before implementing, found `DEFAULT_TTL_MS`'s own comment
+  (`main-checkout-lock.mjs:63-80`, commit `1dabb6b`) cites measured real
+  inter-commit gaps of ~2-3.5 minutes from
+  `docs/history/str65-worktree-isolation-enforcement/reports/validation-
+  phase1.md` as the reason the shared TTL can't safely go much below 3
+  minutes — apparently in tension with D4's 20s figure. Tried to verify
+  what that gap actually measured; the referenced report no longer exists
+  anywhere in git history (`git log --all --diff-filter=A -- "*validation-
+  phase1*"` returns nothing). Raised this directly with a person rather
+  than guess past a dated, committed safety comment — confirmed (session
+  `AskUserQuestion`): that 2-3.5min figure was not measuring the same
+  thing D4's 20s figure covers (not same-session sequential-commit gaps).
+  D4's 20s value stands as originally chosen.
+
 ## Outstanding questions
 
 None

@@ -79,6 +79,27 @@ export function formatLockDurationMs(ms) {
 // default back up.
 export const DEFAULT_TTL_MS = 3 * 60 * 1000;
 
+// HOOK_TTL_MS (tsk-1d9): `.githooks/pre-commit`'s own default hold time,
+// separate from DEFAULT_TTL_MS above. The hook never releases on exit by
+// design (self-recognition, D6 above) -- TTL is its only clearing
+// mechanism -- but DEFAULT_TTL_MS's 3-minute window was sized for a
+// DIFFERENT consumer's needs (mergeRunnerItem's long verify hold,
+// merge.mjs:660, measured up to ~185s in practice) and, reused unchanged
+// for the hook, leaves the main checkout locked to every OTHER session's
+// pick/take/approve for up to 3 minutes after every single commit --
+// measured at ~2/3 of active-work time given typical commit cadence
+// (plans/reports/project-instability-scan-260809-1608-ship-faster-
+// stability-report.md finding 1). This constant narrows the hook's OWN
+// default (still overridable via FGOS_MAIN_CHECKOUT_LOCK_TTL_MS, per
+// resolveTtlMs() in the hook itself) without touching DEFAULT_TTL_MS or
+// either of its other two callers (claim-port.mjs, merge.mjs), which keep
+// needing the longer window. Accepted, named tradeoff (docs/history/
+// tsk-1d9-pre-commit-hook-ttl-split/CONTEXT.md D4/D5): a same-session
+// pause longer than this between two commits narrows the self-recognition
+// protection window to that same duration, down from 3 minutes --
+// thinner, not eliminated.
+export const HOOK_TTL_MS = 20 * 1000;
+
 export const ACQUIRED = 'acquired';
 export const HELD = 'held-by-live-other-pid';
 export const AMBIGUOUS = 'ambiguous';
