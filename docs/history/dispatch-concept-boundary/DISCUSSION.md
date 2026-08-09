@@ -108,7 +108,7 @@ không mở lại những quyết định các item khác đã khoá.
 | 38 | 11 capability của hn xếp đâu | **Đề nghị** (vòng 11) | **T4 phía cung**, không ngang `gather`/`judge` (thuộc tính của nhà cung cấp, không của một lần dispatch). Cũng **không ngang `gitnexus`**: cả 11 tả **chính cái sổ**, do harness CLI tự khai qua `query.contract`. Ô tương ứng của fgOS — *sổ tự khai năng lực + dải schema* — **đang trống**, latent thật vì global/project install có thể lệch version. §6.5 |
 | 34 | Ô "mục tiêu ngoài sổ" đã có tên | **Đang hội tụ** (vòng 10) | **`errand`** — quét sạch 0 hit ở `src/`, `docs/`, `upstreams/`. Bác `cell` (false friend: bee's cell CÓ claim/reservation/registry) và `packet` (kéo theo khung *"orthogonal axes"* D1 đã bác). Bốn phép thử ở §6.3, sắc nhất: **không sở hữu branch/merge riêng**. Vẫn gated `tsk-2t6` |
 | 35 | `capacity` rút về một nghĩa (P1) | **Đề nghị** (vòng 10) | Chỉ còn **bản ghi binding** T3. Giết A1 bằng cấu trúc, config không breaking. ⚠ supersede định nghĩa `capacity` của `0026` |
-| 36 | Bỏ `rootTask`/`subTask` (P3) | **Đề nghị** (vòng 10) | 0 identifier trong code; `0026` tự gọi cả hai là *vai trò* / *tên gọi tương đối*. Thay: `work` + vai trò T1 · `child work` · "một `work`/`errand` khác" |
+| 36 | Bỏ `rootTask`/`subTask` | **CHỐT → D7** (vòng 14) | 0 identifier trong code; `0026` tự gọi cả hai là *vai trò* / *tên gọi tương đối*. Thay: `work` + vai trò T1 · `child work` · "một `work`/`errand` khác" |
 | 37 | Khung bảy tầng (Bước 1) | **Đề nghị** (vòng 10) | T0 hợp thành · T1 dấn thân · T2 cầu · T3 binding · T4 cung · TG cổng gác (cắt ngang) · TD dẫn xuất; `dispatch`/`spawn`/`worker`/`child work` là **cạnh**, không phải tầng. §6.1 |
 | 32 | Nhãn đúng của #4 (`kind`) | **Đang hội tụ** (vòng 9) | **Không phải** transport (`mcp`/`skill` chung nhánh probe nhưng transport ngược nhau), **không phải** protocol (`cli`/`binary` hai giá trị một protocol). Là **loại nhà cung cấp** — *nhà cung cấp nằm ở đâu*. Ba phép thử + suy dẫn thứ sáu cho A3: §6.3 |
 | 33 | `cli` vs `binary` | **Chưa xếp** (vòng 9) | Hai giá trị, **zero khác biệt cơ học**: cùng `commandExistsOnPath`, cùng đường dispatch. Ghi nhận, chưa đào |
@@ -123,6 +123,7 @@ không mở lại những quyết định các item khác đã khoá.
 | **D4** | **`work` con sinh ra bởi decompose gọi là `child work` — là CẠNH giữa hai `work`, không phải lớp thứ năm trên trục phía cầu.** Chữ `child` đã sống trong code (`decompose.mjs` 83 hit, `bin/fgos.mjs` 44, `frontier`/`dep-graph`/`graph-metrics`), field lưu thật là `work.parent` (`work.mjs:414`), và `0012` đã đặt nó thành cạnh `parent-child` trong đồ thị acyclic chung với `deps`. Phép thử: một `child work` khác `work` cha **đúng một field** — cùng FSM, tự claim, tự worktree, tự verify, tự merge. **Không** mint chữ `subTask` cho nghĩa này: `0026` đã chiếm chuỗi đó cho một nghĩa khác (vai trò thoáng qua, nhìn từ bên kích hoạt), và hai nghĩa **khác tập hợp cả hai chiều** | 10 → 11 |
 | **D5** | **fgOS nhận luật US-027 — binding khớp bằng *lời hứa năng lực*, không bao giờ bằng *tên tool*.** ⇒ **A2 trở thành khiếm khuyết đã biết, phải mở item sửa.** Ba lý do: (i) fgOS **tự viết** luật này lúc port registry (`deep-dives/tool-registry.md:27`) và đã dán nó vào `CLAUDE.md` gate — không nhận thì phải đi gỡ một lời hứa đang treo; (ii) giá di trú đang thấp nhất nó từng có — đúng **một** capacity bị ảnh hưởng (`submit-assist-classify`); (iii) nhận thì mở được ô `gather`, vốn **không phải "chưa làm" mà là BẤT KHẢ** với khoá tên — một prompt sinh lúc chạy không bao giờ có tên để khớp | 6 → 13 |
 | **D6** | **Phía CẦU khai HAI field: `needs` (capability → chọn *provider nào*) và `for` (purpose `gather`\|`judge` → chọn *lane/nghi thức nào*).** Binding khớp bằng hai thứ đó, không bằng tên. Lý do hai chứ không một: hỏi `gitnexus` thì `for` **luôn** là `gather` và `needs` mới phân biệt; với helper thì `needs` gần như hằng số (*"chạy một prompt, trả text"*) và `for` mới phân biệt — thiếu một là mất một chiều. Phạm vi phiên từ vựng: **chỉ vị từ**; sửa code / đổi config schema / di trú là **item riêng** | 12 → 13 |
+| **D7** | **Bỏ `rootTask` và `subTask` khỏi từ vựng dispatch** — dùng `work` (T2) + vai trò bên gọi (T1) cho cái thứ nhất, `child work` cho cái thứ hai. **Supersede phần từ vựng của `0026`.** Cả hai có **0 identifier trong code**; `0026` tự gọi `rootTask` là *vai trò* (*"công việc gốc **đang làm** … **Vai trò này** có tính ĐỆ QUY/fractal"*) và tự gọi `subTask` là *tên gọi **tương đối, nhìn từ góc của bên kích hoạt***. Phép thử: `tsk-5td` nằm backlog là `work`; một launcher đứng nó lên thì **cùng dòng, cùng id, state không đổi một byte** mà đổi tên gọi ⇒ từ vai trò, không phải từ phân lớp. `subTask` còn đội hai nghĩa khác tập: (a) work con do decompose, **được lưu** ⇒ `child work` (D4); (b) target của một lần dispatch đệ quy, **thoáng qua** ⇒ chỉ là một `work`/`errand` khác. **D7 chỉ đổi NHÃN trên sơ đồ D1** (nhánh CÓ: `rootTask`→`work`); **tiêu chí D1 không đổi một chữ** | 10 → 14 |
 | **D2** | **Nhánh không-authority tách làm hai lớp: `gather` (trả `digest`) và `judge` (trả `verdict`)** — không phải một. Lý do tách: hai loại lỗi khác nhau ⇒ hai cách sửa khác nhau (digest sai vì *đọc thiếu* → đọc lại/rộng hơn; verdict sai vì *phán sai* → cần người hoặc đổi tiêu chí); trộn lại thì mất tín hiệu sửa lỗi. Tên **không phát minh mới** — cả hai cặp `<lớp> → <cái nó trả về>` đã sống sẵn trong repo (§5 vòng 2). Bee cũng tách đúng chỗ này, gọi review-class là *"neither class"* | 1 → 3 |
 
 ## 5. Q&A log
@@ -623,6 +624,20 @@ và **D6** (hai field). P2 bị D6 hấp thụ.
 Hệ quả bắt buộc, không được quên ở Bước 5: **A2 chính thức là khiếm khuyết đã
 biết** — phải có item sửa, không được để im như một đặc điểm.
 
+### Vòng 14 — 2026-08-09 — chốt bỏ `rootTask`/`subTask`
+
+**Người dùng:** *"ok P3 bỏ rootTask/subTask, dùng work/child."* Mint **D7**.
+
+Đây là D-ID đầu tiên của phiên **supersede một quyết định đã khoá** (`0026`).
+Tiền lệ: `0028` đã supersede `0026` một lần rồi, cho việc đổi tên
+`orchestrator`→`launcher`. Nên hình thức đúng là **một decision doc mới**, mở ở
+Bước 5 — và nếu P1 qua thì gộp chung một doc vì cả hai cùng sửa đúng mục định
+nghĩa đó của `0026`.
+
+Nhắc lại cho rõ, vì dễ hiểu nhầm: D7 **chỉ đổi nhãn** trên sơ đồ D1 (nhánh CÓ:
+`rootTask` → `work`). **Tiêu chí của D1 không đổi một chữ** — vẫn là
+*authority + state effects*.
+
 ## 6. Thiết kế đã chốt {#design}
 
 > **Regenerate lần 3 — bản sau vòng 10.** Vòng 10 đổi hình dạng thật (T2 thành
@@ -814,7 +829,7 @@ Phép thử: một `child work` khác `work` cha ở chỗ nào về cơ chế? 
 stage, tự claim, tự worktree, tự verify, tự merge. Khác **đúng một field**
 ⇒ **cạnh giữa hai `work`**, không phải lớp mới.
 
-#### `rootTask` và `subTask` — bỏ khỏi từ vựng [ĐỀ NGHỊ — vòng 10] ⚠ đụng `0026`
+#### `rootTask` và `subTask` — bỏ khỏi từ vựng [KHOÁ — D7] ⚠ supersede `0026`
 
 Cả hai có **0 identifier trong code** (`rg "rootTask|subTask" src/ bin/` → 2
 hit, cả hai là doc-comment). Chỉ sống trong prose.
@@ -824,8 +839,11 @@ hit, cả hai là doc-comment). Chỉ sống trong prose.
 | `rootTask` | `0026` tự gọi nó là **vai trò**: *"công việc gốc **đang làm** … **Vai trò này** có tính ĐỆ QUY/fractal"*. Phép thử: `tsk-5td` nằm backlog là `work`; một launcher đứng nó lên thì **cùng dòng, cùng id, state không đổi một byte** mà đổi tên gọi ⇒ từ vai trò, không phải từ phân lớp | `work` (T2) + vai trò T1 |
 | `subTask` | `0026` tự gọi nó là **tương đối**: *"chỉ là tên gọi **tương đối, nhìn từ góc của bên kích hoạt**"*. Và nó đang đội hai nghĩa khác tập: (a) work con do decompose — **được lưu**; (b) target của một lần dispatch đệ quy — **thoáng qua** | (a) → `child work` · (b) → chỉ là một `work`/`errand` khác |
 
-⚠ `0026` khoá. Bỏ hai chữ này là **đổi nghĩa `0026`** ⇒ phải supersede tường
-minh, không được để thành hệ quả phụ.
+⚠ Bỏ hai chữ này là **đổi nghĩa `0026`** ⇒ D7 là một **supersede tường minh**,
+không phải hệ quả phụ. Tiền lệ có sẵn: `0028` đã supersede `0026` một lần cho
+việc đổi `orchestrator`→`launcher`. **Bước 5 phải mở một decision doc mới**
+supersede phần từ vựng của `0026` — và nếu P1 cũng qua thì gộp chung một doc,
+vì cả hai cùng sửa đúng mục định nghĩa đó.
 
 ### 6.4 T3 · BINDING — `capacity` [ĐỀ NGHỊ — vòng 10]
 
@@ -1225,7 +1243,7 @@ check. Latent: chưa capacity nào thuộc bốn kind đó.
 |---|---|---|---|
 | **P1** | `capacity` chỉ còn nghĩa T3 (binding) | **cao** | supersede định nghĩa `capacity` của `0026`; nhãn trên sơ đồ D1 |
 | ~~**P2**~~ | Binding khoá theo **mục đích** | **đã khoá → D6** | sửa code = item riêng (`resolveExecutorConfig`, CRITICAL) |
-| **P3** | Bỏ `rootTask`/`subTask` khỏi từ vựng | **cao** | supersede `0026`; nhãn trên sơ đồ D1 |
+| ~~**P3**~~ | Bỏ `rootTask`/`subTask` khỏi từ vựng | **đã khoá → D7** | supersede `0026` (Bước 5: mở decision doc); chỉ đổi **nhãn** trên sơ đồ D1 |
 | **P4** | mechanism → `in-session`/`out-of-session` | vừa | đổi chuỗi code trả về ⇒ item riêng |
 
 **Bốn chỗ hở A2/A4/A5 + gather-ngoài-cơ-chế cùng một gốc**: binding chưa được
