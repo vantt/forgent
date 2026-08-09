@@ -270,6 +270,68 @@ enforcement), by grepping every `--kind`/`--risk` call site across
     finding — fix this example alongside the enum change so it does not
     keep teaching the exact anti-pattern this item removes.
 
+## Implementation finding — the item's central premise was half wrong
+
+Found at `fgos-code-implement` time, while running the risk map's own
+"grep every `--kind`/`--risk` call site before landing the enum" step.
+Recorded here because it REVERSED this plan's verify point 2, and that
+reversal was taken to the user rather than decided unilaterally (they chose
+"theo code").
+
+The item's BẰNG CHỨNG SỐNG reads `risk: "heavy"` as the tier vocabulary
+leaking into the risk field. Source says the opposite — `light`/`standard`/
+`heavy` IS the risk vocabulary, deliberately, with three independent
+declarations:
+
+| Where | Evidence |
+|---|---|
+| `src/intake/classify.mjs:92-94` | `// D5: risk is derived from the same keyword signal as tier (mirrors the tier name)` → `const risk = tier;` |
+| `src/intake/decompose.mjs:106-111` | `// D3(b): ... risk domain mirrors tier (classify.mjs), and 'heavy' is the one value that gates` → `const HEAVY_RISK = 'heavy'` |
+| `src/state/priority-formula.mjs:15` | `RISK_DISCOUNTS = { light: 1, standard: 0.85, heavy: 0.6 }` |
+
+Two of those are LIVE consumers, both outside this item's originally
+declared footprint:
+- `decompose.mjs:639` — `work.risk === 'heavy'` forces a root through human
+  confirmation before it may split.
+- `priority-formula.mjs:36` — `RISK_DISCOUNTS[risk] ?? RISK_DISCOUNTS.standard`.
+
+Census of all 505 stored items:
+
+```
+risk:  standard 223 | light 140 | heavy 74     <- 437 items, the live vocabulary
+       medium 32   | low 19    | high 17      <-  68 items, matching nothing
+```
+
+So the broken values are the OTHER 68 — `low`/`medium`/`high` silently skip
+the decompose gate and collapse to the `standard` priority discount. The
+`risk: "heavy"` this item cited as its evidence of a bug was correct; the
+`risk: "medium"` the item itself carries was the actual defect.
+
+Had verify point 2 been implemented literally, it would have silently
+disabled a safety gate for 74 items — the exact "silently coerce" outcome
+this plan's own "Concrete cases to prove against" forbids.
+
+**Consequences for two earlier findings in this file:** both dissolve.
+`.claude/skills/fgos-planning/SKILL.md:211`'s `--risk light` is CORRECT
+under the real vocabulary, not the anti-pattern this plan called it — left
+unchanged. `test/cli/fgos.test.mjs`'s existing `--risk heavy` test was
+likewise asserting correct behavior and still passes untouched.
+
+**Not done here, deliberately:** the 68 legacy items are not migrated.
+`validateWorkShape`'s `touchedFields` grandfathering (tsk-1ne D1/D2) keeps
+them replaying and editable, matching Assumption 1 above. Whether to
+backfill them is a separate call with its own blast radius — a real
+follow-up, not a silent omission.
+
+**Also not done here (user's call, asked and answered):** Approach step 6
+(retire `fgos-submit-assist`) was deliberately skipped. `tsk-4ns` is already
+built and awaiting merge against that exact file, and its verify greps that
+file's content — deleting it would strand a sibling item's finished work.
+
 ## Outstanding questions
 
-None
+- Backfill the 68 items carrying a `low`/`medium`/`high` risk? Until then
+  each one silently misses the decompose human gate and scores at the
+  default priority discount. Needs its own item.
+- Approach step 6 (`fgos-submit-assist` retirement) still unresolved — it
+  becomes safe to revisit once `tsk-4ns` merges.
