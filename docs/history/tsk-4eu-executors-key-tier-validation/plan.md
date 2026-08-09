@@ -63,9 +63,20 @@ must pass before moving to the next — no reason to reorder further):
 
 Impact-analysis capability gate (`CLAUDE.md`): `fgos tool query
 --capability impact-analysis --status present` returns `gitnexus`
-present. Posture: **full** — `fgos-code-implement` must run `impact()`
-on `loadRunnerConfig`/the `executors` validation loop before editing, per
-`CLAUDE.md`'s MUST rules, exactly as written (not degraded/inactive).
+present, BUT its index is flagged stale (`last indexed: 19bc5e4`, 8
+commits behind this branch's base HEAD, including a commit that touched
+`src/runner/dispatch.mjs` itself — `8b9a6ec`). Posture: **degraded** —
+`gitnexus present`, but its blast-radius answer for
+`dispatch.mjs`/`work.mjs` is not provably fresh, so `fgos-code-implement`
+must still run `impact()` per `CLAUDE.md`'s MUST rules but treat that
+evidence as weak and name the gap. This plan's own "Verified against the
+real repo" section above already cross-checked the touched symbols by
+direct read/grep of the current file contents (not through GitNexus),
+per `CLAUDE.md`'s own "a suspicious answer is worth a grep/rg cross-check"
+guidance — that direct-read evidence stands regardless of index
+staleness; `impact()` at implementation time is still required for the
+caller-graph view (who else calls `loadRunnerConfig`/the validation
+loop) that a direct read alone does not give.
 
 ## No split
 
