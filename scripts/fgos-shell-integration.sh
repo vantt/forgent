@@ -16,18 +16,13 @@
 # same name instead of shadowing it with a bad Node error
 # (docs/history/global-project-config-awareness/CONTEXT.md D2).
 
-_fgos_repo_root() {
-  local common_dir
+fgos() {
+  local root real_bin common_dir
   common_dir=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || {
     echo "fgos: not a git repository" >&2
     return 1
   }
-  dirname "$common_dir"
-}
-
-fgos() {
-  local root real_bin
-  root=$(_fgos_repo_root) || return 1
+  root=$(dirname "$common_dir")
   if [ ! -f "$root/bin/fgos.mjs" ]; then
     # `type -P` is bash-only and silently fails under zsh, which always trips
     # this "no PATH install" branch even when one exists. `unset -f` inside
@@ -46,8 +41,12 @@ fgos() {
 }
 
 fgos-runner() {
-  local root real_bin
-  root=$(_fgos_repo_root) || return 1
+  local root real_bin common_dir
+  common_dir=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || {
+    echo "fgos-runner: not a git repository" >&2
+    return 1
+  }
+  root=$(dirname "$common_dir")
   if [ ! -f "$root/bin/fgos-runner.mjs" ]; then
     real_bin=$(unset -f fgos-runner 2>/dev/null; command -v fgos-runner)
     if [ -z "$real_bin" ]; then
