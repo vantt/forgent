@@ -13,11 +13,24 @@
         "Bash(git add:*),Bash(git commit:*)"
       ]
     },
+    "executors": {
+      "judge": {
+        "command": "claude",
+        "args": [
+          "-p",
+          "{prompt}",
+          "--model",
+          "{model}",
+          "--permission-mode",
+          "acceptEdits",
+          "--allowedTools",
+          "Task,WebSearch,WebFetch,Read,Bash(rg:*),Bash(git add:*),Bash(git commit:*)"
+        ]
+      }
+    },
     "capacities": {
       "judge-discovery": {
         "kind": "task",
-        "needs": "llm-judgment",
-        "for": "judge",
         "command": "claude",
         "args": [
           "-p",
@@ -31,35 +44,14 @@
         ]
       },
       "judge-decompose": {
-        "kind": "task",
-        "needs": "llm-judgment",
-        "for": "judge",
-        "command": "claude",
-        "args": [
-          "-p",
-          "{prompt}",
-          "--model",
-          "{model}",
-          "--permission-mode",
-          "acceptEdits",
-          "--allowedTools",
-          "Task,WebSearch,WebFetch,Read,Bash(rg:*),Bash(git add:*),Bash(git commit:*)"
-        ]
+        "kind": "task"
       },
-      "gather": {
+      "submit-assist-classify": {
         "kind": "cli",
-        "for": "gather",
-        "needs": "prompt-completion",
-        "carries": "repo-content",
         "adapter": "cli-spawn",
         "command": "agy",
         "provider": "agy",
-        "args": [
-          "-p",
-          "{prompt}",
-          "--model",
-          "{model}"
-        ],
+        "args": ["-p", "{prompt}", "--model", "{model}"],
         "tier": "light",
         "model": "Gemini 3.5 Flash (Medium)",
         "allowCrossProvider": true
