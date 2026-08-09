@@ -109,6 +109,8 @@ không mở lại những quyết định các item khác đã khoá.
 | 34 | Ô "mục tiêu ngoài sổ" đã có tên | **Đang hội tụ** (vòng 10) | **`errand`** — quét sạch 0 hit ở `src/`, `docs/`, `upstreams/`. Bác `cell` (false friend: bee's cell CÓ claim/reservation/registry) và `packet` (kéo theo khung *"orthogonal axes"* D1 đã bác). Bốn phép thử ở §6.3, sắc nhất: **không sở hữu branch/merge riêng**. Vẫn gated `tsk-2t6` |
 | 35 | `capacity` rút về một nghĩa | **Đề nghị P1′** (vòng 15; bản P1 vòng 10 **đã bị thay**) | Một nghĩa = **năng lực có tên của fgOS**, cặp *behavior-promise / functional-helper* (= D2 + D1 đọc thành định nghĩa). `capacities.<id>` là **bản khai**, không phải bản thân nó; `binding` là **cạnh** T3→T4. Bản P1 đầu sai vì bỏ mất lời hứa hành vi mà không cất vào đâu. `0026` **làm rõ**, không lật |
 | 42 | `submit-assist-classify` vướng gì | **Rõ** (vòng 16) | (a) dispatch bằng **prose**, 0 hit trong code ⇒ fgOS có hai đường dispatch song song · (b) biến trùng-tên ngẫu nhiên thành thứ **chịu lực**: làm đúng D5 thì presence query trả rỗng và skill **âm thầm** rơi về inline · (c) capacity `kind:"cli"` **duy nhất** ⇒ gánh một mình cả ba cổng gác lẫn A2 · (d) `tier:"light"` nhưng `capacity.model` đè ⇒ ca sống của hai-nghĩa-`tier`. §6.4 |
+| 44 | Nguồn gốc của trùng-tên ba chiều | **Rõ, sửa lại vòng 5** (vòng 16) | **Không** ngẫu nhiên: `CONTEXT.md` của `agent-executor-submit-assist-classify` **D3 (locked)** ghi cứng `--capability submit-assist-classify` như thể `resolveExecutorConfig` cần nó, trong khi thông báo lỗi của chính code (`dispatch.mjs:607`) nói rõ chỉ `--name` mới bắt buộc khớp, `--capability <label>` là placeholder tự do. ⇒ di trú D5 phải **supersede D3** đó, không chỉ sửa registry + skill fragment |
+| 45 | `sensitiveData` — khoá nhưng chưa ship | **Rõ, là LỖ HỔNG** (vòng 16) | Cùng CONTEXT.md, **D7 (locked, người dùng xác nhận tường minh)**: thêm `sensitiveData: false` vào capacity entry **ngay**. Kiểm: 0 hit ở `.fgos/config.json` **và** ở `src/`+`bin/`. Là mảnh từ vựng governance **duy nhất** cho cross-provider; hôm nay chỉ còn `allowCrossProvider` — boolean nói *được phép ra*, không nói *cái gì được ra*. **Bước 5 mở item** |
 | 43 | `executors.judge` là config **CHẾT** | **Rõ, là LỖI** (vòng 16) | `cfg.executors[tier]` với `tier ∈ {light,standard,heavy}`; validation chỉ kiểm shape, không kiểm key là tier thật ⇒ pass rồi không bao giờ đọc. Hệ quả: `judge-decompose` khi cli-spawn rơi xuống global executor, chạy **không có `Read`**. Cũng là **bằng chứng độc lập cho D6**: có người đã sờ tới `for:` trước khi nó có tên. **Bước 5 mở item** |
 | 41 | `capacity` và `capability` có cùng loại vật thể không | **Chưa xếp** (vòng 15) | A5 gợi ý có: `submit-assist-classify` nằm **cả hai sổ**, cùng tên, cùng `kind:"cli"`, cùng `command:"agy"` — có thể là **một thứ ghi hai lần vì fgOS có hai sổ cho một khái niệm**, không phải "trùng lặp không đối chiếu". Chưa đủ bằng chứng để đề nghị gộp. Không đào ở vòng này |
 | 36 | Bỏ `rootTask`/`subTask` | **CHỐT → D7** (vòng 14) | 0 identifier trong code; `0026` tự gọi cả hai là *vai trò* / *tên gọi tương đối*. Thay: `work` + vai trò T1 · `child work` · "một `work`/`errand` khác" |
@@ -685,6 +687,12 @@ hệ hỏng, và hỏng IM LẶNG**: presence query trả rỗng, skill rơi v�
 không lỗi. Di trú D5 vì thế phải sửa `_shared/capacity-dispatch-fallback.md`
 cùng lúc, không được sửa mỗi registry.
 
+**(b2, phát hiện khi đọc CONTEXT.md của chính item đó)** — hai quyết định đã
+khoá bị lệch với thực tế: **D3** ghi nhầm field (`--capability` thay vì
+`--name`) và chính nó tạo ra sự trùng ba chiều mà vòng 5 tưởng là ngẫu nhiên;
+**D7** khoá `sensitiveData: false` nhưng **chưa bao giờ ship** — 0 hit cả trong
+config lẫn trong code, mất mảnh từ vựng governance duy nhất cho cross-provider.
+
 **(e)** — `executors.judge` là **config chết**: resolver chỉ đọc
 `cfg.executors[tier]`, mà `judge` không phải tier; validation chỉ kiểm shape
 nên nó pass rồi bị nuốt im. Hệ quả thật: `judge-decompose` khi phải cli-spawn
@@ -1070,14 +1078,47 @@ exec). Đối chiếu: `judge-discovery`/`judge-decompose` do **code thật** g�
 (`runJudgeExecutor`). ⇒ fgOS có **hai đường dispatch song song** — đường code và
 đường prose — và khối `capacities` là thứ duy nhất chúng dùng chung.
 
-**b. Nó biến trùng-tên ngẫu nhiên thành thứ CHỊU LỰC.** Step B chạy
-`tool query --capability submit-assist-classify --status present`. Vòng 5 đã
-chứng minh việc tool này mang `capability` trùng tên capacity id là **ngẫu
-nhiên**. Giờ một skill dựa vào sự trùng đó. ⇒ **làm đúng D5** (đăng ký lại
-`capability: "classification"` để provider thứ hai vào được) thì Step B trả
-`providers: []`, skill in *"backend isn't available"* rồi **âm thầm rơi về tự
-phân loại** — không lỗi, không cảnh báo. **Làm đúng luật thì hệ hỏng, và hỏng
-im lặng.**
+**b. Trùng-tên ba chiều là thứ CHỊU LỰC — và nó được chép vào một quyết định
+đã khoá.** Step B chạy `tool query --capability submit-assist-classify --status
+present`. Vòng 5 gọi sự trùng `capacity id == tool name == capability` là *ngẫu
+nhiên*; **đọc `docs/history/agent-executor-submit-assist-classify/CONTEXT.md`
+mới thấy sai về nguồn gốc** — D3 của item đó (locked) viết:
+
+> The external CLI must be registered via `fgos tool register --kind cli
+> **--capability submit-assist-classify** …` **before `resolveExecutorConfig`
+> can resolve** `kind: "cli"` capacities
+
+Nhưng thông báo lỗi của chính code (`dispatch.mjs:607`) nói field nào mới bắt
+buộc:
+
+```js
+`run "fgos tool register --name ${capacityId} --kind cli --command <cmd> --capability <label>" first.`
+//                        ^^^^^^^^^^^^^^^^^^ cụ thể, BẮT BUỘC khớp   ^^^^^^^ placeholder, TỰ DO
+```
+
+Code join bằng `tools[capacityId]` — **`--name`**. `--capability` là nhãn tự do,
+dispatch không đọc. ⇒ **D3 nêu đúng ràng buộc nhưng viết nhầm field**: ghi cứng
+`--capability submit-assist-classify` như thể resolver cần nó. Sự trùng ba chiều
+không tình cờ — nó **được chép vào một quyết định khoá**, rồi một skill dựa lên.
+
+Hệ quả cho di trú D5: **làm đúng luật** (đăng ký lại `capability:
+"classification"` để provider thứ hai vào được) thì Step B trả `providers: []`,
+skill in *"backend isn't available"* rồi **âm thầm rơi về tự phân loại** —
+không lỗi, không cảnh báo. **Làm đúng luật thì hệ hỏng, và hỏng im lặng.** Nên
+di trú phải đụng ba chỗ cùng lúc: registry · `_shared/capacity-dispatch-
+fallback.md` · **supersede D3** của item đó.
+
+**b2. `sensitiveData` — quyết định đã khoá, chưa bao giờ ship.** Cùng
+CONTEXT.md, D7 (locked, người dùng xác nhận tường minh *"Add a minimal field
+now"* thay vì *"document only, no field"*): thêm `sensitiveData: false` vào
+`capacities.submit-assist-classify` **ngay**. Kiểm thật 2026-08-09:
+`rg "sensitiveData" .fgos/config.json` → **không có**; `rg "sensitiveData" src/
+bin/` → **không có**. Một quyết định khoá biến mất không dấu vết.
+
+Và nó là mảnh **từ vựng governance duy nhất** cho cross-provider. Hôm nay cổng
+duy nhất còn lại là `allowCrossProvider: true` — một boolean chỉ nói *"được
+phép đi ra ngoài"*, không nói *"cái gì được phép đi ra"*. ⇒ **TG thiếu một
+chiều đã từng được quyết**. Bước 5: mở item.
 
 **c. Là capacity `kind:"cli"` DUY NHẤT** ⇒ vừa là bằng chứng sống duy nhất ba
 cổng gác chạy được (registered → present → allowCrossProvider), vừa là chỗ duy
