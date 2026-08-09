@@ -48,6 +48,11 @@ function read(relPath) {
 const FROZEN_FILENAMES = [
   '0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn',
   'internal-research-260801-1823-merge-mechanism-grand-orchestrator-design-report',
+  // tsk-55h: docs/decisions/0000-index.md's own table format links every
+  // row to its own real filename ([00NN](00NN-slug.md)) -- 0028's row is
+  // no exception, so its filename must appear there too, same reasoning
+  // as 0026's entry above.
+  '0028-doi-ten-orchestrator-thanh-launcher',
 ];
 const WRAP_GAP = '-[\\s*]*';
 const FROZEN_PATTERNS = FROZEN_FILENAMES.map(

@@ -20,8 +20,8 @@ supersede event) because it only scans the *targets* of a supersession, not
 the whole directory — so the apparent "1 doc missing" is really 4. Add 4
 rows to `0000-index.md` in the file's own existing table format (see rows
 for 0002/0023/0025 for the "**Đã supersede bởi [00MM]**" convention). 0026's
-row must state it was superseded TWICE — by 0028 (orchestrator→launcher
-rename, STR72) and by 0029 (three vocabulary clauses). Whether the checker
+row must state it was superseded TWICE — by 0028 (pinned-term rename to
+`launcher`, STR72) and by 0029 (three vocabulary clauses). Whether the checker
 should scan the *entire* `docs/decisions/` directory instead of just
 supersession targets is explicitly out of scope — a separate item if
 wanted, not a scope change bundled into this data fix.

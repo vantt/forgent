@@ -6,7 +6,7 @@ timestamp: 2026-08-04T00:00:00.000Z
 source_capture_ids: []
 date: 2026-08-04
 status: accepted
-supersedes: [2ae492d8]
+supersedes_capture: 2ae492d8
 relates_specs: [work-state]
 ---
 
