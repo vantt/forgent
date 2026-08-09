@@ -1036,10 +1036,10 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
     tier,
     model,
   }).then(
-    // capacityId/provider (D7, tsk-62v)/baseCommit/headRef (tsk-4hl):
-    // additive only — every field this function already returned stays
-    // exactly where it was.
-    (result) => ({ ...result, templateName, templateHash, capacityId, provider, baseCommit, headRef }),
+    // capacityId/provider (D7, tsk-62v)/baseCommit/headRef (tsk-4hl)/command
+    // (tsk-33w D9): additive only — every field this function already
+    // returned stays exactly where it was.
+    (result) => ({ ...result, templateName, templateHash, capacityId, provider, command, baseCommit, headRef }),
     (err) => {
       if (err instanceof DispatchError) {
         err.templateName = templateName;
