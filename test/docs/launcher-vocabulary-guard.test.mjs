@@ -93,6 +93,8 @@ const ALLOWED_FILES = new Map([
   ['docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md', 'documents a real historical incident in this guard test itself (a git-ls-files false-pass during tsk-2cw\'s original rename) -- a war story, same reasoning as 0028\'s own allowlist entry'],
   ['plans/260808-2210-dispatch-vocabulary-rearrange/next-session-prompt.md', 'tsk-5td\'s own working prompt for its dispatch-vocabulary-rearrange session -- discusses "orchestrator" as its own subject matter (citing 0026/0028/tsk-2cw history while analyzing the dispatch-layer vocabulary), same reasoning as gate-question-quality-and-routing/DISCUSSION.md\'s own allowlist entry above, not prose this item has authority to rewrite mid-session'],
   ['docs/history/tsk-2uo-launcher-vocabulary-guard-allowlist/iron-law-evidence.md', 'this item\'s own Iron Law evidence -- quotes the pinned term inside a real failing-before test transcript excerpt, same reasoning as launcher-vocabulary-rename/iron-law-evidence.md\'s own allowlist entry above'],
+  ['docs/explanation/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md', 'cites the orchestrator->launcher rename as a real example while explaining decision-doc superseding -- same historical-example reasoning as 0028/0029\'s own allowlist entries'],
+  ['docs/history/automated-changelog-compound-learn/iron-law-evidence.md', 'another item\'s meta-citation of this guard test\'s own pre-existing-failure report, same shape as tsk-33w/tsk-4eu/tsk-2uo\'s own entries above'],
 ]);
 
 const BINARY_EXT = /\.(png|jpe?g|gif|ico|woff2?|ttf|eot|pdf)$/i;
