@@ -349,6 +349,55 @@ Vòng 7 dạy *"đo một kênh rồi kết luận về toàn bộ hiện tượ
 gánh nặng, không cảm nhận theo từng bảng dữ liệu. Khi số đo mâu thuẫn với cảm nhận của người vận
 hành, **giả định mặc định phải là đo thiếu kênh**, không phải người nhớ nhầm.
 
+### Làm rõ ở vòng 9 — ràng buộc ngôn ngữ vốn đã nới, không ai dùng
+
+Người chủ sản phẩm hỏi: *"nếu phát biểu là lib thì tất cả đầu ra phải develop cùng 1 ngôn ngữ…
+có thể chuyển lib thành core và nới rộng ràng buộc đầu ra hay không?"*
+
+**Đọc `0014` trực tiếp thì ràng buộc đó chưa bao giờ tồn tại.** Chốt 1 nguyên văn:
+
+> *"Contract chuẩn = SCHEMA event-log + giao thức append/read/subscribe, **KHÔNG phải một lib link
+> được**… bất kỳ tiến trình nào (**khác ngôn ngữ cũng được**) nói đúng log-format là một
+> participant đầy đủ — **chống Node-monoculture**, đúng định vị substrate đa-app."*
+
+Chốt 2: *"Lib chỉ là **CLIENT tham chiếu (Node)** của contract, không phải bản thân contract."*
+
+Thứ làm nó **trông** như ràng buộc là chữ "lib" trong dòng backlog `p-09351985` — nghe như lib là
+trung tâm, trong khi `0014` xếp nó là một client.
+
+**Giao thức CÓ được đặc tả**, không chỉ nằm trong code: `docs/specs/work-state.md` RUL10 mô tả
+`.fgos/events.lock` đủ chi tiết để hiện thực lại bằng ngôn ngữ khác — primitive wx-atomic-create +
+gặt-pid-chết, chính sách chặn-có-timeout với backoff, phạm trù lỗi `lock-timeout`, và
+`withEventsLock` bọc trọn chuỗi đọc–tiền-kiểm–ghi để đóng đua CAS ở `store.mjs`.
+
+**Hoà giải chốt 1 với chốt 4** (chốt 4 bắt daemon đi qua CLI, không link lib, để *"thừa hưởng
+identity-gate + validation + single-door-lock miễn phí"* và *"không chế được đường ghi mới"* — L10):
+tách **đọc** khỏi **ghi**.
+
+| | Ngôn ngữ tự do? | Cách làm | Vì sao |
+|---|---|---|---|
+| Đọc | ✅ hoàn toàn | gọi verb đọc (`list --json`/`ready`/`triage`) | không phải viết lại `replay.mjs` |
+| Đọc thô log | ✅ được nhưng **đắt** | tự parse `events.jsonl` | phải **tự hiện thực fold** — mỗi guard trong `replay.mjs` là một bug đã trả giá |
+| **Ghi** | ✅ ngôn ngữ tự do | **spawn `fgos <verb>`** | thừa hưởng lock + CAS + validation + identity gate; không mở đường ghi thứ hai |
+
+**Đọc qua verb, ghi qua verb — ngôn ngữ hoàn toàn tự do, không cần refactor gì.**
+`herdr-plugin` đã làm đúng vậy: Rust, `trait WorkItemSource` gọi `fgos … --json`, không đụng log
+thô, không đụng lib.
+
+Thứ duy nhất **thật sự** khoá vào Node là ai muốn **fold log thô trong tiến trình của mình** — mà
+không consumer nào trong hướng đang bàn cần.
+
+**Hệ quả lên `p-09351985`:** không chặn gì trong hướng launcher/UI. `RECONCILIATION.md` chấm nó
+`partial` (state layer import được, nhưng `bin/fgos.mjs` vẫn 4.439 dòng với thân verb inline). Nó
+chỉ có giá trị khi xuất hiện một consumer Node **cùng tiến trình** — mà `0014` chốt 4/5 đã loại bỏ
+khả năng đó cho mọi consumer ngoài CLI và TUI-local.
+
+**Lỗ thật, nhỏ:** không có tài liệu nào nói *"đây là hợp đồng để trở thành participant"*. Nó rải ra
+`io-contract.md` (cửa CLI + envelope) · `work-state.md` RUL10 (giao thức lock) · `SCHEMA_VERSION`
+(hình dạng event) · `replay.mjs` (luật fold). Người viết client Rust hôm nay phải đọc spec 215KB
+rồi tự suy ra. Một trang gom bốn thứ đó lại biến chốt 1 của `0014` từ **tuyên bố** thành **dùng
+được**. → item **`tsk-64e`** (kind `docs`, `todo/clarify`).
+
 ### Chưa rõ — cần bàn
 
 | # | Câu hỏi mở | Vì sao chưa quyết được |
@@ -368,7 +417,7 @@ hành, **giả định mặc định phải là đo thiếu kênh**, không ph�
 | **Q17** | **Nối quy ước `## Outstanding questions` vào hai skill viết artifact — đủ chưa, hay `hasOpenItems` cũng cần nới?** | Sửa phía skill là đúng hướng (giữ nguyên fail-closed). Nhưng chưa rõ: quy ước tiếng Anh cứng có hợp lý trong repo viết artifact bằng tiếng Việt không? Và `plan.md` có nên dùng cùng một mục với `CONTEXT.md`, hay mục riêng? |
 | **Q18** | **`validateApprove` có đáng luôn luôn cần người không?** | `actor` hardcode `human`, không có đường bypass nào (skills-scanner xác nhận). Chiếm **44%** số cổng gần đây. Đây là gate chứng-minh-khả-thi — lập luận giữ người rất mạnh (nó là chốt chặn cuối trước khi tiêu tiền thật vào executing). Nhưng nếu giữ, thì trần dưới của gánh nặng yes/no là ~1/3, và mọi nỗ lực khác chỉ chạm được 2/3 còn lại. **Quyết định sản phẩm, không phải kỹ thuật.** |
 | **Q16** | **Cái giá `tsk-1x3` khai báo có thành hiện thực không?** — bản thay thế cơ học tự khai KHÔNG bắt được "verify đúng cú pháp nhưng nhắm sai mục tiêu"; trách nhiệm chuyển sang skill gọi + `fgos-validating`. | Thay Q12. Đo bằng xu hướng `verify-miss` (nền: 87/141 = 62% friction, tính tới 2026-08-08). Nếu tăng sau vài ngày ⇒ việc chuyển trách nhiệm chưa được đỡ. **Chỉ đo được bằng thời gian**, không đọc code ra được. |
-| **Q13** | **Web UI nên là binary Rust thứ hai dùng chung `fgos.rs`, hay tiến trình Node cạnh CLI?** | Node gần core hơn (cùng ngôn ngữ, dùng lại lib sau khi `p-09351985` tách core); Rust tái dùng được `ports.rs`/`WorkItemSource` đã có nhưng nhân đôi khoảng cách tới core. Chưa quyết. |
+| ~~Q13~~ | ~~Web UI nên là Rust thứ hai hay tiến trình Node cạnh CLI?~~ | ✅ **ĐÓNG ở vòng 9 — câu hỏi đặt sai tiền đề.** Lựa chọn **không** phụ thuộc `p-09351985` như vòng 4 giả định: theo `0014` chốt 4, kể cả chọn Node thì web server vẫn phải spawn `fgos <verb>`, **không được link lib**. Ngôn ngữ hoàn toàn tự do — tiêu chí thật chỉ là tái dùng `ports.rs`/`WorkItemSource` đã có. Chi tiết §3 "Làm rõ ở vòng 9". |
 | **Q14** | **"Một item một lần" nghĩa là một-tiến-trình-một-item (vẫn song song), hay tuần tự thật?** | Config đang khai `parallel: {maxRoots:4, maxLeavesPerRoot:4}` và `fgos schedule` đã tính sẵn sóng song song theo footprint. Tuần tự thật làm hai thứ đó chết và tụt throughput (~40 item/ngày hiện tại) — chấp nhận được nếu là lựa chọn có ý thức, không phải hệ quả phụ. Đề xuất: một tiến trình một item, nhiều tiến trình song song theo `schedule`. |
 | **Q15** | **Launcher có tự chạy mặc định không?** | Tự chạy gỡ được tắc nghẽn nhưng biến nó thành thứ hành động không ai giám sát trên repo thật — mà `p-73d99989` (force-xoá worktree, hạng CRITICAL) **vẫn chưa vá**. |
 
@@ -408,6 +457,13 @@ hành, **giả định mặc định phải là đo thiếu kênh**, không ph�
 > Bản đã sửa được chứng minh **cả hai chiều** trước khi ghi vào item: đỏ (`exit=1`) khi skill chưa
 > có quy ước, xanh (`exit=0`) khi có. Bài học: **một `verify` chưa từng chạy đỏ thì chưa phải một
 > `verify`** — chứng minh cả hai chiều, không chỉ chiều xanh.
+
+**Ứng viên D-ID cho vòng 10** (nêu ở vòng 9, chờ một vòng):
+
+- **Đọc qua verb, ghi qua verb — ngôn ngữ hoàn toàn tự do.** Mọi consumer ngoài CLI/TUI-local gọi
+  `fgos <verb>` cho cả hai chiều; không link lib, không fold log thô, không ghi thẳng
+  `events.jsonl`. Đây là cách hoà giải `0014` chốt 1 (polyglot) với chốt 4 (đi qua cửa CLI), và nó
+  làm `p-09351985` thành không-chặn.
 
 **Ứng viên D-ID cho vòng 8** (chưa đứng đủ vững):
 
@@ -973,6 +1029,18 @@ hiện nó đã được sửa. Chi tiết §3 "Bị lật ở vòng 6".
   của khâu clarify, không phải điều kiện để submit. Và để nó nằm dạng prose là đúng rủi ro vừa xảy
   ra với D4 (mất 2 giờ vì chỉ có trong prose): `fgos ready`/`triage`/`list` không thấy thứ chỉ sống
   trong `DISCUSSION.md`.
+
+### `tsk-64e` · Trang hợp đồng participant {#task-participant-contract}
+
+- **Mục tiêu:** một trang gom bốn mảnh hợp đồng đang rải rác, để người viết client bằng ngôn ngữ
+  khác Node không phải đọc spec 215KB rồi tự suy ra. Biến `0014` chốt 1 từ tuyên bố thành dùng được.
+- **Trích §3:** "Làm rõ ở vòng 9" — bảng đọc/ghi và ba dòng ngôn-ngữ-tự-do.
+- **Quan hệ anh em:** mở đường cho `#task-launcher` và `#task-ui-tiers` mà **không** cần
+  `p-09351985`. Không chặn ai, không bị ai chặn.
+- **Không thuộc phạm vi:** viết spec mới cho giao thức lock (RUL10 đã đủ), đổi hợp đồng, refactor
+  `bin/fgos.mjs`.
+- **Tiền lệ đã có:** `herdr-plugin` (Rust, ~4.900 dòng) đã tự mò ra đúng cách làm — nhưng đó là
+  kinh nghiệm trong đầu người viết, không phải hợp đồng viết ra.
 
 ### Chưa có item · Theo dõi cái giá của `tsk-1x3` {#task-verify-miss-watch}
 
