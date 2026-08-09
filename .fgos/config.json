@@ -13,6 +13,21 @@
         "Bash(git add:*),Bash(git commit:*)"
       ]
     },
+    "executors": {
+      "judge": {
+        "command": "claude",
+        "args": [
+          "-p",
+          "{prompt}",
+          "--model",
+          "{model}",
+          "--permission-mode",
+          "acceptEdits",
+          "--allowedTools",
+          "Task,WebSearch,WebFetch,Read,Bash(rg:*),Bash(git add:*),Bash(git commit:*)"
+        ]
+      }
+    },
     "capacities": {
       "judge-discovery": {
         "kind": "task",
@@ -29,18 +44,7 @@
         ]
       },
       "judge-decompose": {
-        "kind": "task",
-        "command": "claude",
-        "args": [
-          "-p",
-          "{prompt}",
-          "--model",
-          "{model}",
-          "--permission-mode",
-          "acceptEdits",
-          "--allowedTools",
-          "Task,WebSearch,WebFetch,Read,Bash(rg:*),Bash(git add:*),Bash(git commit:*)"
-        ]
+        "kind": "task"
       },
       "submit-assist-classify": {
         "kind": "cli",
