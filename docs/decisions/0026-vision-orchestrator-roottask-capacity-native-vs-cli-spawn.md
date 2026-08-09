@@ -6,7 +6,7 @@ timestamp: 2026-08-03T10:33:57.000Z
 source_capture_ids: []
 date: 2026-08-03
 status: accepted
-superseded_by: 0028
+superseded_by: [0028, 0029]
 extends: []
 relates_specs: [runner]
 ---

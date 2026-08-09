@@ -85,6 +85,8 @@ const ALLOWED_FILES = new Map([
   ['docs/history/tsk-18a-merge-conflict-misclassification/repro-notes.md', 'cites a repro script\'s literal filename (tsk-18a-repro-orchestrator.mjs), never committed to the repo'],
   ['docs/history/two-layer-dispatch/DISCUSSION.md', 'cites bee-swarming/SKILL.md\'s own upstream terminology verbatim'],
   ['docs/specs/work-state.md', 'same fleet-orchestrator reserved-future sense as docs/backlog.md STR27'],
+  ['docs/decisions/0029-sua-dinh-nghia-roottask-subtask-capacity-t1-cua-0026.md', 'the decision record ABOUT D17 (tsk-5td) -- explains that "orchestrator" is not a third T1 value but the T0 aggregate layer, same reasoning as 0028\'s own allowlist entry above'],
+  ['docs/history/tsk-5wf-decision-doc-0029-supersede-0026-vocabulary/plan.md', 'this item\'s own plan -- discusses the old term while explaining D17\'s resolution, same reasoning as launcher-vocabulary-rename/plan.md above'],
 ]);
 
 const BINARY_EXT = /\.(png|jpe?g|gif|ico|woff2?|ttf|eot|pdf)$/i;
@@ -142,7 +144,11 @@ test('POSITIVE: decision 0026 defines "launcher" (specific sentence, not a bare 
     /\*\*launcher\*\* — tiến trình\/cơ chế QUYẾT ĐỊNH kích hoạt 1 rootTask/,
     '0026 must still define the (renamed) role with its original defining sentence, now under "launcher"',
   );
-  assert.match(content, /superseded_by: 0028/, '0026 must point forward to the superseding record (STR72)');
+  assert.match(
+    content,
+    /superseded_by: \[0028, 0029\]/,
+    '0026 must point forward to both superseding records (STR72) -- 0028 (naming) and 0029 (vocabulary), non-overlapping slices',
+  );
 });
 
 test('POSITIVE: decision 0028 exists and partially supersedes 0026 (naming only)', () => {
