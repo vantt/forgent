@@ -3,7 +3,7 @@ type: how-to
 title: How to fix a `fgos-write-rejected` merge block on a `.fgos/` change
 tags: []
 timestamp: 2026-07-30T00:00:00.000Z
-source_capture_ids: [tsk-n4i-1, tsk-5vf]
+source_capture_ids: [tsk-n4i-1, tsk-5vf, tsk-4eu, tsk-5ge]
 ---
 # How to fix a `fgos-write-rejected` merge block on a `.fgos/` change
 
@@ -218,6 +218,42 @@ overwritten") on that same path instead of the clean ADR0020 message,
 check the main checkout's own working tree for leftover uncommitted
 changes to that path before re-attempting the merge.
 
+## Example: `tsk-5ge` — the follow-up item that lands the config change directly on main
+
+`tsk-4eu` above fixed the *validation code* but, per step 5's rule, could
+not ship the actual `.fgos/config.json` content change through its own
+branch. `tsk-5ge` is that follow-up: a separate item whose entire job is
+the direct main-checkout edit step 5 describes — moving
+`runner.executors.judge`'s content into `runner.capacities.judge-decompose`
+and deleting the `executors.judge` key, applied "as a direct, single-parent
+commit on main, exactly like every other `.fgos/config.json` change in
+this repo's history":
+
+> "Hand-edit .fgos/config.json on the main checkout: move
+> runner.executors.judge's content into runner.capacities.judge-decompose
+> ... It must land as a direct, single-parent commit on main ... ADR0020's
+> fgos-write-rejected guard permanently blocks any fgw/<id> branch from
+> carrying a .fgos/ change through fgos approve (see
+> docs/how-to/fix-fgos-write-rejected-merge-block.md, precedent
+> tsk-5vf/tsk-n4i-1)"
+> — real work item description, id `tsk-5ge`
+
+Even as a deliberately-scoped "operator action" item, it still hit the
+same `merge-failed-unclassified` (exit 128) signature the `tsk-4eu`
+example above describes — this time over a wider set of paths, since more
+had drifted on the main checkout by the time this item's branch tried to
+merge:
+
+> `"errorClass":"merge-failed-unclassified","layer":"state","detail":"git merge --no-commit --no-ff fgw/tsk-5ge failed without a real conflict (exit 128): Your local changes to the following files would be overwritten by merge:\n  .fgos/entropy-history.jsonl .fgos/events.jsonl AGENTS.md CLAUDE.md; merge aborted, main unchanged"`
+> — real `work.friction` capture, id `tsk-5ge`
+
+This confirms the lesson from the `tsk-4eu` example generalizes: even an
+item whose whole purpose is the sanctioned direct-main-checkout edit still
+needs the main checkout's own working tree clean of the same paths before
+its branch's merge is attempted — the ADR0020 wall and a merely-dirty
+working tree produce the same exit-128 symptom, and both need clearing
+before retrying.
+
 ## Related
 
 - `fgos check <id>` — shows the `fgos-write-blocked` friction entry quoted
@@ -297,3 +333,25 @@ itself needed to move a config block within `.fgos/config.json`:
 
 > "Bug: `executors.<key>` khong phai tier thi chet IM — hau qua that la judge-decompose cli-spawn chay khong co Read"
 > — real work item title, id `tsk-4eu`
+
+A fourth capture, gathered the same way (`fgos doc-sources
+docs/how-to/fix-fgos-write-rejected-merge-block.md`), links `tsk-5ge` to
+this same doc path:
+
+> ```json
+> {
+>   "id": "tsk-5ge",
+>   "predicted": {"tier":"light","deps":0,"priorVisits":1,"role":"session","branchHeadAtTake":"59fa540cc26d8178aa7f776a748abd7088d80d27"},
+>   "actual": {"outcome":"awaiting-approval","passed":true,"attempts":1,"errorClass":null,"aheadCount":2},
+>   "docType": "how-to",
+>   "docPath": "docs/how-to/fix-fgos-write-rejected-merge-block.md"
+> }
+> ```
+> — real `work.outcome` capture, id `tsk-5ge`
+
+That capture's own work item is the direct follow-up that landed `tsk-4eu`'s
+config content change on main:
+
+> "Hand-edit .fgos/config.json: move runner.executors.judge into
+> runner.capacities.judge-decompose,"
+> — real work item title, id `tsk-5ge`
