@@ -727,6 +727,27 @@ cung** — thứ có tên, khai trước trong `.fgos/config.json`, probe đư�
 tại. Đúng cái config key `capacities.<id>` đang là. Nó **không còn** là tên của
 một lớp việc ở T2.
 
+> **Đọc nhầm dễ mắc nhất:** *"vậy `capacity` còn hai phân loại `gather`/`judge`
+> à?"* — **Không. Sau P1 `capacity` có ZERO phân loại**, vì nó thôi làm ô cha.
+>
+> | | trước | sau P1 |
+> |---|---|---|
+> | T2 có mấy giá trị | 2 (`rootTask`, `capacity`) + 2 con | **4 phẳng**: `work` · `errand` · `gather` · `judge` |
+> | `capacity` có mấy phân loại | 2 | **0** — nó là một DÒNG ở T3, không phân loại ai cả |
+>
+> `gather`/`judge` **không phải con của `capacity`**; chúng đứng ngang hàng
+> `work` và `errand` ở T2. Ba câu kiểm chéo:
+>
+> | Câu | |
+> |---|---|
+> | *"`gather` là một loại capacity"* | **SAI** — sai tầng |
+> | *"một prompt research sinh lúc chạy là một `gather`, và nó không có capacity nào"* | **ĐÚNG** |
+> | *"`judge-discovery` là một capacity"* | **ĐÚNG** — bản ghi binding, có tên, probe được |
+>
+> Lý do trước nay dễ tưởng `capacity` *là* lớp: cả **ba** binding đang đăng ký
+> đều tình cờ phục vụ lớp `judge`. `gather` có **0 binding** nhưng vẫn là một
+> lớp T2 đầy đủ, đang chạy thật ngoài cơ chế.
+
 **Vì sao phải rút về một nghĩa** — phép thử một câu:
 
 > *"Một prompt research sinh lúc 23:31 là một capacity."*
