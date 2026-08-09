@@ -605,11 +605,11 @@ function buildAgentTypeExecutor(baseExecutor, agentType) {
 function resolveExecutorConfig(cfg, tier, capacityId, fgosDir) {
   const capacity = capacityId && cfg && cfg.capacities && typeof cfg.capacities === 'object' ? cfg.capacities[capacityId] : undefined;
 
-  if (capacity && capacity.kind === 'cli' && fgosDir) {
+  if (capacity && capacity.kind !== 'task' && fgosDir) {
     const tools = listWork(fgosDir).tools ?? {};
     if (!tools[capacityId]) {
       throw new RunnerConfigError(
-        `capacity "${capacityId}" declares kind "cli" but is not registered — run "fgos tool register --name ${capacityId} --kind cli --command <cmd> --capability <label>" first.`,
+        `capacity "${capacityId}" declares kind "${capacity.kind}" but is not registered — run "fgos tool register --name ${capacityId} --kind ${capacity.kind} --command <cmd> --capability <label>" first.`,
       );
     }
     const status = resolvedStatus(capacityId, readLocalStatus(fgosDir));
@@ -632,7 +632,7 @@ function resolveExecutorConfig(cfg, tier, capacityId, fgosDir) {
     throw new RunnerConfigError('runner config "executor" must have a string "command" and an "args" array.');
   }
 
-  if (capacity && capacity.kind === 'cli' && !CLAUDE_CLI_COMMANDS.includes(executor.command) && capacity.allowCrossProvider !== true) {
+  if (capacity && capacity.kind !== 'task' && !CLAUDE_CLI_COMMANDS.includes(executor.command) && capacity.allowCrossProvider !== true) {
     throw new RunnerConfigError(
       `capacity "${capacityId}" resolves to non-Claude command "${executor.command}" — prompt content would leave the Claude ecosystem. Set capacities.${capacityId}.allowCrossProvider: true to permit this.`,
     );
@@ -670,9 +670,9 @@ function resolveExecutorConfig(cfg, tier, capacityId, fgosDir) {
  * with no native-vs-cli/spawn choice left to make.
  */
 export function decideDispatchMechanism({ hasNativeMechanism, hasLiveTaskAccess, forceCliSpawn } = {}) {
-  if (!hasNativeMechanism) return 'cli-spawn';
-  if (forceCliSpawn) return 'cli-spawn';
-  return hasLiveTaskAccess ? 'native' : 'cli-spawn';
+  if (!hasNativeMechanism) return 'out-of-process';
+  if (forceCliSpawn) return 'out-of-process';
+  return hasLiveTaskAccess ? 'in-process' : 'out-of-process';
 }
 
 /**
@@ -1116,7 +1116,7 @@ export async function resolveCapacityCli(
  * consumer skill ask, before choosing whether to `exec` the `resolve`d
  * command or call its own Task tool natively, which mechanism
  * `decideCapacityDispatchMechanism` picks for this capacity right now.
- * Prints `{"mechanism": "native"|"cli-spawn"}` as JSON to stdout — same
+ * Prints `{"mechanism": "in-process"|"out-of-process"}` as JSON to stdout — same
  * additive-sibling relationship to `resolveCapacityCli` above as
  * `decideCapacityDispatchMechanism` has to `resolveExecutorConfig`: reads
  * the same committed runner config, calls nothing that also feeds
@@ -1127,13 +1127,14 @@ export async function resolveCapacityCli(
  * documents) that this session already has live Agent/Task tool access.
  *
  * `agentType` (tsk-3ik-3, additive): included in the result, alongside
- * `mechanism`, whenever the capacity declares one — a `mechanism: "native"`
- * result is otherwise useless to a consumer skill's own Agent/Task tool
- * call, which needs a concrete `subagent_type` to invoke, not just "go
- * native" with no target. Omitted (`undefined`, dropped by `JSON.stringify`)
- * for a capacity with no `agentType`, e.g. every `kind: "cli"` capacity —
- * `mechanism` for those always resolves `"cli-spawn"` anyway (rule 1/3), so
- * no consumer ever needs `agentType` in that case.
+ * `mechanism`, whenever the capacity declares one — a `mechanism:
+ * "in-process"` result is otherwise useless to a consumer skill's own
+ * Agent/Task tool call, which needs a concrete `subagent_type` to invoke,
+ * not just "go in-process" with no target. Omitted (`undefined`, dropped by
+ * `JSON.stringify`) for a capacity with no `agentType`, e.g. every `kind:
+ * "cli"` capacity — `mechanism` for those always resolves
+ * `"out-of-process"` anyway (rule 1/3), so no consumer ever needs
+ * `agentType` in that case.
  */
 export async function decideCapacityCli(capacityId, { cwd = process.cwd(), repoRoot, hasLiveTaskAccess = false } = {}) {
   if (!capacityId) {

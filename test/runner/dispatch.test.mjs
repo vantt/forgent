@@ -1085,6 +1085,72 @@ test('resolveExecutorCommand skips the fgos-tool-query presence check entirely w
   );
 });
 
+// --- presence/cross-provider gate predicate (D13, tsk-592):
+// kind === 'cli' -> kind !== 'task' -- mcp/skill/http/binary capacities are
+// now gated the same way a kind:"cli" capacity always has been ------------
+
+for (const kind of ['mcp', 'skill', 'http', 'binary']) {
+  test(`resolveExecutorCommand throws a RunnerConfigError when a kind:"${kind}" capacity is not registered and fgosDir is given (D13)`, () => {
+    const dir = mkTempDir();
+    initStore(dir);
+    const cfg = {
+      executor: { command: '/global/executor', args: ['{prompt}'] },
+      capacities: { 'fgos-code-implement': { kind, target: 'agy' } },
+      models: { standard: 'sonnet' },
+      timeoutMs: 5000,
+    };
+    assert.throws(
+      () => resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-code-implement', fgosDir: dir }),
+      RunnerConfigError,
+    );
+  });
+
+  test(`resolveExecutorCommand throws a RunnerConfigError when a kind:"${kind}" capacity is registered but not present on this machine (D13)`, () => {
+    const dir = mkTempDir();
+    initStore(dir);
+    const scanTarget = ['mcp', 'skill'].includes(kind) ? mkTempDir() : undefined;
+    registerTool(dir, { name: 'fgos-code-implement', kind, capability: 'coding', command: 'agy-definitely-not-on-path-xyz', scanTarget });
+    writeLocalStatus(dir, { 'fgos-code-implement': { status: 'missing', checkedAt: new Date().toISOString() } });
+    const cfg = {
+      executor: { command: '/global/executor', args: ['{prompt}'] },
+      capacities: { 'fgos-code-implement': { kind, target: 'agy-definitely-not-on-path-xyz' } },
+      models: { standard: 'sonnet' },
+      timeoutMs: 5000,
+    };
+    assert.throws(
+      () => resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-code-implement', fgosDir: dir }),
+      RunnerConfigError,
+    );
+  });
+
+  test(`resolveExecutorCommand throws when a kind:"${kind}" capacity resolves to a non-Claude command with no allowCrossProvider (D13)`, () => {
+    const cfg = {
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: { 'fgos-code-implement': { kind, command: 'agy', args: ['{prompt}'] } },
+      models: { standard: 'sonnet' },
+      timeoutMs: 5000,
+    };
+    assert.throws(
+      () => resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-code-implement' }),
+      RunnerConfigError,
+    );
+  });
+}
+
+test('resolveExecutorCommand still skips both the presence check and the cross-provider check for a kind:"task" capacity, even unregistered and non-Claude-shaped (D13: kind !== "task" excludes task by construction)', () => {
+  const dir = mkTempDir();
+  initStore(dir);
+  const cfg = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capacities: { 'my-agent-capacity': { kind: 'task', agentType: 'code-simplifier' } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+  assert.doesNotThrow(() =>
+    resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'my-agent-capacity', fgosDir: dir }),
+  );
+});
+
 // --- capacities.<id>.agentType (D1/D2, tsk-3sw): kind:"task" capacity with
 // no own command/args resolves via a synthesized executor, Claude-only ---
 
@@ -1225,47 +1291,47 @@ test('loadRunnerConfig rejects a "capacities.<id>" entry whose forceCliSpawn is 
 // --- decideDispatchMechanism (tsk-3ik-1, Native-First Dispatch Doctrine
 // rules 1/2/4, docs/decisions/0026-...md) — pure decision, no cfg lookup ---
 
-test('decideDispatchMechanism: no native mechanism always cli-spawns, regardless of live access or force flag (rule 1)', () => {
-  assert.equal(decideDispatchMechanism({ hasNativeMechanism: false, hasLiveTaskAccess: true, forceCliSpawn: false }), 'cli-spawn');
-  assert.equal(decideDispatchMechanism({ hasNativeMechanism: false, hasLiveTaskAccess: false, forceCliSpawn: false }), 'cli-spawn');
-  assert.equal(decideDispatchMechanism({}), 'cli-spawn');
+test('decideDispatchMechanism: no native mechanism always resolves out-of-process, regardless of live access or force flag (rule 1)', () => {
+  assert.equal(decideDispatchMechanism({ hasNativeMechanism: false, hasLiveTaskAccess: true, forceCliSpawn: false }), 'out-of-process');
+  assert.equal(decideDispatchMechanism({ hasNativeMechanism: false, hasLiveTaskAccess: false, forceCliSpawn: false }), 'out-of-process');
+  assert.equal(decideDispatchMechanism({}), 'out-of-process');
 });
 
-test('decideDispatchMechanism: native mechanism + live Task access + no force -> native (rule 2)', () => {
-  assert.equal(decideDispatchMechanism({ hasNativeMechanism: true, hasLiveTaskAccess: true, forceCliSpawn: false }), 'native');
+test('decideDispatchMechanism: native mechanism + live Task access + no force -> in-process (rule 2)', () => {
+  assert.equal(decideDispatchMechanism({ hasNativeMechanism: true, hasLiveTaskAccess: true, forceCliSpawn: false }), 'in-process');
 });
 
-test('decideDispatchMechanism: native mechanism but no live Task access -> cli-spawn (safe fallback, never assumes access)', () => {
-  assert.equal(decideDispatchMechanism({ hasNativeMechanism: true, hasLiveTaskAccess: false, forceCliSpawn: false }), 'cli-spawn');
+test('decideDispatchMechanism: native mechanism but no live Task access -> out-of-process (safe fallback, never assumes access)', () => {
+  assert.equal(decideDispatchMechanism({ hasNativeMechanism: true, hasLiveTaskAccess: false, forceCliSpawn: false }), 'out-of-process');
 });
 
 test('decideDispatchMechanism: forceCliSpawn wins over native mechanism + live Task access (rule 4 exception)', () => {
-  assert.equal(decideDispatchMechanism({ hasNativeMechanism: true, hasLiveTaskAccess: true, forceCliSpawn: true }), 'cli-spawn');
+  assert.equal(decideDispatchMechanism({ hasNativeMechanism: true, hasLiveTaskAccess: true, forceCliSpawn: true }), 'out-of-process');
 });
 
 // --- decideCapacityDispatchMechanism — capacities.<id>-specific convenience,
 // derives hasNativeMechanism/forceCliSpawn from cfg.capacities[capacityId]
 // without touching resolveExecutorConfig's own resolution path ---
 
-test('decideCapacityDispatchMechanism resolves to native for a kind:"task" capacity when the caller declares live Task access', () => {
+test('decideCapacityDispatchMechanism resolves to in-process for a kind:"task" capacity when the caller declares live Task access', () => {
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
     capacities: { 'judge-discovery': { kind: 'task', agentType: 'judge' } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   };
-  assert.equal(decideCapacityDispatchMechanism(cfg, 'judge-discovery', { hasLiveTaskAccess: true }), 'native');
+  assert.equal(decideCapacityDispatchMechanism(cfg, 'judge-discovery', { hasLiveTaskAccess: true }), 'in-process');
 });
 
-test('decideCapacityDispatchMechanism falls back to cli-spawn for a kind:"task" capacity when the caller has no live Task access', () => {
+test('decideCapacityDispatchMechanism falls back to out-of-process for a kind:"task" capacity when the caller has no live Task access', () => {
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
     capacities: { 'judge-discovery': { kind: 'task', agentType: 'judge' } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   };
-  assert.equal(decideCapacityDispatchMechanism(cfg, 'judge-discovery', { hasLiveTaskAccess: false }), 'cli-spawn');
-  assert.equal(decideCapacityDispatchMechanism(cfg, 'judge-discovery'), 'cli-spawn');
+  assert.equal(decideCapacityDispatchMechanism(cfg, 'judge-discovery', { hasLiveTaskAccess: false }), 'out-of-process');
+  assert.equal(decideCapacityDispatchMechanism(cfg, 'judge-discovery'), 'out-of-process');
 });
 
 test('decideCapacityDispatchMechanism respects a capacity\'s own forceCliSpawn override even with live Task access', () => {
@@ -1275,22 +1341,22 @@ test('decideCapacityDispatchMechanism respects a capacity\'s own forceCliSpawn o
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   };
-  assert.equal(decideCapacityDispatchMechanism(cfg, 'judge-discovery', { hasLiveTaskAccess: true }), 'cli-spawn');
+  assert.equal(decideCapacityDispatchMechanism(cfg, 'judge-discovery', { hasLiveTaskAccess: true }), 'out-of-process');
 });
 
-test('decideCapacityDispatchMechanism always cli-spawns for a kind:"cli" capacity, regardless of live Task access', () => {
+test('decideCapacityDispatchMechanism always resolves out-of-process for a kind:"cli" capacity, regardless of live Task access', () => {
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
     capacities: { 'submit-assist-classify': { kind: 'cli', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
     models: { light: 'flash-3.5' },
     timeoutMs: 5000,
   };
-  assert.equal(decideCapacityDispatchMechanism(cfg, 'submit-assist-classify', { hasLiveTaskAccess: true }), 'cli-spawn');
+  assert.equal(decideCapacityDispatchMechanism(cfg, 'submit-assist-classify', { hasLiveTaskAccess: true }), 'out-of-process');
 });
 
-test('decideCapacityDispatchMechanism cli-spawns for an unconfigured capacity, regardless of live Task access', () => {
+test('decideCapacityDispatchMechanism resolves out-of-process for an unconfigured capacity, regardless of live Task access', () => {
   const cfg = { executor: { command: 'claude', args: ['{prompt}'] }, models: { standard: 'sonnet' }, timeoutMs: 5000 };
-  assert.equal(decideCapacityDispatchMechanism(cfg, 'no-such-capacity', { hasLiveTaskAccess: true }), 'cli-spawn');
+  assert.equal(decideCapacityDispatchMechanism(cfg, 'no-such-capacity', { hasLiveTaskAccess: true }), 'out-of-process');
 });
 
 // --- decideCapacityCli — the "decide <capacityId>" CLI-facing async
@@ -1302,7 +1368,7 @@ test('decideCapacityCli rejects with a usage RunnerConfigError when capacityId i
   await assert.rejects(() => decideCapacityCli('', { repoRoot: mkTempDir() }), RunnerConfigError);
 });
 
-test('decideCapacityCli resolves "native" for a kind:"task" capacity when hasLiveTaskAccess is passed true, alongside its agentType', async () => {
+test('decideCapacityCli resolves "in-process" for a kind:"task" capacity when hasLiveTaskAccess is passed true, alongside its agentType', async () => {
   const root = mkTempDir();
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
@@ -1311,10 +1377,10 @@ test('decideCapacityCli resolves "native" for a kind:"task" capacity when hasLiv
     timeoutMs: 5000,
   });
   const decided = await decideCapacityCli('judge-discovery', { repoRoot: root, hasLiveTaskAccess: true });
-  assert.deepEqual(decided, { mechanism: 'native', agentType: 'judge' });
+  assert.deepEqual(decided, { mechanism: 'in-process', agentType: 'judge' });
 });
 
-test('decideCapacityCli resolves "cli-spawn" for the same kind:"task" capacity when hasLiveTaskAccess is omitted (safe default), still reporting its agentType', async () => {
+test('decideCapacityCli resolves "out-of-process" for the same kind:"task" capacity when hasLiveTaskAccess is omitted (safe default), still reporting its agentType', async () => {
   const root = mkTempDir();
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
@@ -1323,7 +1389,7 @@ test('decideCapacityCli resolves "cli-spawn" for the same kind:"task" capacity w
     timeoutMs: 5000,
   });
   const decided = await decideCapacityCli('judge-discovery', { repoRoot: root });
-  assert.deepEqual(decided, { mechanism: 'cli-spawn', agentType: 'judge' });
+  assert.deepEqual(decided, { mechanism: 'out-of-process', agentType: 'judge' });
 });
 
 test('decideCapacityCli omits agentType entirely for a kind:"cli" capacity that declares none (tsk-3ik-3)', async () => {
@@ -1335,7 +1401,7 @@ test('decideCapacityCli omits agentType entirely for a kind:"cli" capacity that 
     timeoutMs: 5000,
   });
   const decided = await decideCapacityCli('submit-assist-classify', { repoRoot: root, hasLiveTaskAccess: true });
-  assert.deepEqual(decided, { mechanism: 'cli-spawn' });
+  assert.deepEqual(decided, { mechanism: 'out-of-process' });
   assert.ok(!('agentType' in decided));
 });
 
@@ -1344,7 +1410,7 @@ test('the "decide" CLI entry point (node src/runner/dispatch.mjs decide <capacit
   const result = spawnSync(process.execPath, [dispatchPath, 'decide', 'no-such-capacity-configured'], { encoding: 'utf8' });
   assert.equal(result.status, 0, result.stderr);
   const parsed = JSON.parse(result.stdout);
-  assert.equal(parsed.mechanism, 'cli-spawn');
+  assert.equal(parsed.mechanism, 'out-of-process');
 });
 
 test('the "decide" CLI entry point exits non-zero with a usage message when capacityId is omitted', () => {

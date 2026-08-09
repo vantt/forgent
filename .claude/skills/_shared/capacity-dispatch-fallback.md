@@ -94,21 +94,21 @@ node "$root/src/runner/dispatch.mjs" decide <CAPACITY_ID> --has-live-task-access
 
 (Omit `--has-live-task-access` entirely if you decided above that you do
 NOT currently have live Agent/Task tool access — never pass the flag on a
-guess.) Prints `{"mechanism": "native"|"cli-spawn"[, "agentType": "<name>"]}`.
+guess.) Prints `{"mechanism": "in-process"|"out-of-process"[, "agentType": "<name>"]}`.
 
-- **`mechanism: "cli-spawn"`** — proceed to Step C exactly as before.
+- **`mechanism: "out-of-process"`** — proceed to Step C exactly as before.
   This is every `kind:"cli"` capacity (e.g. `submit-assist-classify`, this
   pattern's one real live consumer today — cross-provider, always
   cli/spawn), every `kind:"task"` capacity when you lack live Task access,
   and any capacity whose config forces cli/spawn (`forceCliSpawn`).
-- **`mechanism: "native"`** — skip Step C's `exec` entirely. Print the
-  same announce line Step C.3 prints for cli-spawn, so a dispatch is
+- **`mechanism: "in-process"`** — skip Step C's `exec` entirely. Print the
+  same announce line Step C.3 prints for out-of-process, so a dispatch is
   visible on the chat transcript regardless of which branch fired
-  (observability parity — before this, only the cli-spawn branch
+  (observability parity — before this, only the out-of-process branch
   announced anything):
 
   ```
-  <CAPACITY_ID> - native - <agentType> - <model>
+  <CAPACITY_ID> - in-process - <agentType> - <model>
   ```
 
   where `<model>` is whichever model the Agent/Task call actually resolves
@@ -180,7 +180,7 @@ Once the six-field packet is built (or the fallback triggered on a missing
 field), continue at Step C.1 below, substituting the packet for
 `<PROMPT_TEMPLATE>` — every later step is unchanged.
 
-## Step C — configured-and-present dispatch (cli-spawn mechanism)
+## Step C — configured-and-present dispatch (out-of-process mechanism)
 
 1. Build the prompt from `<PROMPT_TEMPLATE>` (fixed, so every dispatch
    asks the exact same thing) — the identical prompt Step B.5's native
@@ -213,7 +213,7 @@ field), continue at Step C.1 below, substituting the packet for
    re-templated):
 
    ```
-   <CAPACITY_ID> - cli-spawn - <provider> - <model>
+   <CAPACITY_ID> - out-of-process - <provider> - <model>
    ```
 
 4. Read the response — Step D covers what "malformed" means for it.
@@ -306,10 +306,10 @@ scarcity signal needs the full denominator, not just the misses.
   the reference for config-entry/registration steps (1–3 there), which
   this fragment does not repeat.
 - `fgos-submit-assist/SKILL.md` — the real, live consumer of this fragment
-  (`<CAPACITY_ID>` = `submit-assist-classify`, always `cli-spawn` — no
-  live `kind:"task"` consumer exists yet to exercise Step B.5's `native`
-  branch end-to-end; that branch is proven by `src/runner/dispatch.mjs`'s
-  own unit tests instead, per `docs/history/tsk-3ik-3/iron-law-evidence.md`
-  if applicable).
+  (`<CAPACITY_ID>` = `submit-assist-classify`, always `out-of-process` — no
+  live `kind:"task"` consumer exists yet to exercise Step B.5's
+  `in-process` branch end-to-end; that branch is proven by
+  `src/runner/dispatch.mjs`'s own unit tests instead, per
+  `docs/history/tsk-3ik-3/iron-law-evidence.md` if applicable).
 - `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md`
   — Native-First Dispatch Doctrine, Step B.5's own governing rules 1/2/4.
