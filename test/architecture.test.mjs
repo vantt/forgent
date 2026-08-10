@@ -4,6 +4,9 @@
 //       (file thiếu row VÀ row chỉ file đã xóa đều đỏ);
 //   (b) một chiều xuống — mọi import tương đối chỉ trỏ cùng tầng hoặc tầng sâu
 //       hơn theo thứ tự layers của manifest; import ngược lên là bug kiến trúc.
+//       Chỉ áp dụng cho đích nằm trong src/+bin/ (vùng manifest quản lý) —
+//       import ra ngoài (vd. scripts/, thư mục dev/ops tool riêng, chưa bao
+//       giờ được quét vào manifest) không phải câu hỏi về tầng.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -49,10 +52,19 @@ test('import một chiều xuống: không file nào import ngược lên tầng
         .relative(root, path.resolve(root, path.dirname(file), m[1]))
         .split(path.sep)
         .join('/');
-      if (!(target in manifest.files)) {
+      // The manifest only covers src/ + bin/ (per "đủ sổ" above) — a
+      // relative import reaching outside that tree (e.g. into scripts/,
+      // a separate area of standalone dev/ops tools never scanned into
+      // the manifest) isn't a layering question at all, since there is no
+      // layer rank to compare against. Only a target actually inside
+      // src/+bin/ but missing its row is a real "forgot to register it"
+      // bug this check exists to catch.
+      const targetInManifestedTree = target.startsWith('src/') || target.startsWith('bin/');
+      if (targetInManifestedTree && !(target in manifest.files)) {
         violations.push(`${file} → ${target}: đích không có row trong manifest`);
         continue;
       }
+      if (!targetInManifestedTree) continue;
       if (rank.get(manifest.files[file]) > rank.get(manifest.files[target])) {
         violations.push(
           `${file} (${manifest.files[file]}) import ngược lên ${target} (${manifest.files[target]})`,
