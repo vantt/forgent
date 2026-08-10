@@ -2,7 +2,7 @@
 type: how-to
 title: How to allowlist a legitimate historical mention in launcher-vocabulary-guard.test.mjs
 tags: []
-source_capture_ids: [tsk-2uo, tsk-5td]
+source_capture_ids: [tsk-2uo, tsk-5td, tsk-2lg]
 ---
 # How to allowlist a legitimate historical mention in launcher-vocabulary-guard.test.mjs
 
@@ -34,6 +34,36 @@ carry the term:
   subject matter (decision records about the rename, history docs citing
   it, meta-citations of this guard test's own error text) rather than
   using it as live prose describing current behavior.
+
+## Update (`tsk-2lg`): one recurring shape no longer needs a manual entry
+
+`tsk-2uo`'s own experience (below) — 5 separate `ALLOWED_FILES` entries for
+the same recurring shape, "an `iron-law-evidence.md` file quoting this
+guard's own pre-existing-failure output as a worked example" — turned out
+to repeat often enough (`tsk-33w`, `tsk-4eu`, `tsk-2uo` twice in one item)
+that the guard now generalizes it structurally instead of by hand.
+`IRON_LAW_EVIDENCE_META_CITATION`, a path-pattern regex
+(`/^docs\/history\/[^/]+\/iron-law-evidence(-[^/]+)?\.md$/`), replaced 6
+hand-added `ALLOWED_FILES` entries matching that shape:
+
+> "Add `IRON_LAW_EVIDENCE_META_CITATION` regex exempting
+> `docs/history/<id>/iron-law-evidence(-<suffix>).md`, replacing 6
+> hand-added `ALLOWED_FILES` entries for the same recurring meta-citation
+> shape."
+> — real commit message, `45bf3cd5`, branch `fgw/tsk-2lg`
+
+**What this changes for step 3 below**: any file matching
+`docs/history/<id>/iron-law-evidence(-<suffix>).md` is now covered
+automatically — do not add a manual `ALLOWED_FILES` entry for that shape
+anymore; the negative check still catches a real "orchestrator" leak
+outside that exact pattern. Every *other* legitimate-mention shape (a
+decision record, a `DISCUSSION.md` entry, a different explanation doc, a
+still-in-progress artifact) still has no safely generalizable pattern and
+still needs its own individual `ALLOWED_FILES` entry via step 3, exactly
+as before. The historical entries quoted in step 3 and the `tsk-2uo`
+example below predate this generalization — kept as-is since they're an
+accurate record of what those items actually did at the time, not a
+stale instruction to repeat today.
 
 ## Steps
 
