@@ -299,6 +299,14 @@ test('e2e stage-clarify+stage-decompose (a) clear+pass-through: --once safely no
 
   const discovered = fgos(repoRoot, ['discover', submitted.id, '--verdict', 'clear', '--verify', 'test -f output.txt && echo VERIFY_OK']);
   assert.equal(discovered.status, 0, `discover failed: ${discovered.stderr}`);
+  assert.equal(stateView(repoRoot).work[submitted.id].stage, 'discovery', 'tsk-4b2 D3: clarify clear verdict now lands on discovery, not decompose directly');
+
+  // tsk-4b2 D3/D6: two more explicit discover calls walk it through
+  // discovery->exploring->decompose.
+  const exploring = fgos(repoRoot, ['discover', submitted.id, '--verdict', 'clear', '--verify', 'test -f output.txt && echo VERIFY_OK']);
+  assert.equal(exploring.status, 0, `discover (discovery->exploring) failed: ${exploring.stderr}`);
+  const readyToDecompose = fgos(repoRoot, ['discover', submitted.id, '--verdict', 'clear', '--verify', 'test -f output.txt && echo VERIFY_OK']);
+  assert.equal(readyToDecompose.status, 0, `discover (exploring->decompose) failed: ${readyToDecompose.stderr}`);
   assert.equal(stateView(repoRoot).work[submitted.id].stage, 'decompose');
 
   const decomposed = fgos(repoRoot, ['decompose', submitted.id, '--verdict', 'pass-through', '--reason', 'single cohesive change']);
@@ -367,6 +375,10 @@ test('e2e stage-decompose (b) complex item: an explicit decompose --verdict deco
   writeRunnerConfig(repoRoot, writeAdaptiveWorkerExecutor(scriptDir));
 
   const submitted = submit(repoRoot, 'Rebuild the whole intake pipeline');
+  // tsk-4b2 D3/D6: three explicit discover calls walk clarify->discovery->
+  // exploring->decompose (was one call directly to decompose before this item).
+  assert.equal(fgos(repoRoot, ['discover', submitted.id, '--verdict', 'clear', '--verify', 'test -f root-done.txt && echo ROOT_OK']).status, 0);
+  assert.equal(fgos(repoRoot, ['discover', submitted.id, '--verdict', 'clear', '--verify', 'test -f root-done.txt && echo ROOT_OK']).status, 0);
   assert.equal(fgos(repoRoot, ['discover', submitted.id, '--verdict', 'clear', '--verify', 'test -f root-done.txt && echo ROOT_OK']).status, 0);
 
   const children = JSON.stringify([
@@ -442,6 +454,10 @@ test('e2e stage-decompose (c) ambiguous verdict: an explicit decompose --verdict
   assert.equal(fgos(repoRoot, ['init']).status, 0);
 
   const submitted = submit(repoRoot, 'Restructure the whole thing, somehow');
+  // tsk-4b2 D3/D6: three explicit discover calls walk clarify->discovery->
+  // exploring->decompose (was one call directly to decompose before this item).
+  assert.equal(fgos(repoRoot, ['discover', submitted.id, '--verdict', 'clear', '--verify', 'test -f ambiguous-done.txt']).status, 0);
+  assert.equal(fgos(repoRoot, ['discover', submitted.id, '--verdict', 'clear', '--verify', 'test -f ambiguous-done.txt']).status, 0);
   assert.equal(fgos(repoRoot, ['discover', submitted.id, '--verdict', 'clear', '--verify', 'test -f ambiguous-done.txt']).status, 0);
 
   const decomposed = fgos(repoRoot, ['decompose', submitted.id, '--verdict', 'need-human', '--reason', reason]);
@@ -567,6 +583,14 @@ test('e2e S2-pull: submit pass-throughs 2 stages via discover, a human takes the
   // never auto-dispatched to a worker.
   const firstDiscover = fgos(repoRoot, ['discover', submitted.id, '--verdict', 'clear', '--verify', 'test -f pull-done.txt && echo PULL_OK']);
   assert.equal(firstDiscover.status, 0, `first discover failed: ${firstDiscover.stderr}`);
+  assert.equal(stateView(repoRoot).work[submitted.id].stage, 'discovery', 'tsk-4b2 D3: clarify clear verdict now lands on discovery, not decompose directly');
+
+  // tsk-4b2 D3/D6: two more explicit discover calls walk it through
+  // discovery->exploring->decompose.
+  const secondDiscover = fgos(repoRoot, ['discover', submitted.id, '--verdict', 'clear', '--verify', 'test -f pull-done.txt && echo PULL_OK']);
+  assert.equal(secondDiscover.status, 0, `second discover (discovery->exploring) failed: ${secondDiscover.stderr}`);
+  const thirdDiscover = fgos(repoRoot, ['discover', submitted.id, '--verdict', 'clear', '--verify', 'test -f pull-done.txt && echo PULL_OK']);
+  assert.equal(thirdDiscover.status, 0, `third discover (exploring->decompose) failed: ${thirdDiscover.stderr}`);
   assert.equal(stateView(repoRoot).work[submitted.id].stage, 'decompose');
 
   const decomposed = fgos(repoRoot, ['decompose', submitted.id, '--verdict', 'pass-through', '--reason', 'single cohesive change']);

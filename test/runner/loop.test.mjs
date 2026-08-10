@@ -452,7 +452,15 @@ test('runOnce: an item already advanced to decompose (via an explicit prior disc
   const docsRef = 'docs/history/item-clarify';
   mkLockedContextFixture(repoRoot, docsRef, { mode: 'tiny' });
   seedItem(dir, { id: 'item-clarify', stage: 'clarify', verify: 'test -f output.txt', docsRef });
+  // tsk-4b2 D3/D6: clarify's clear verdict now lands on `discovery`, not
+  // `decompose` directly -- three explicit discover calls walk the item
+  // through the real chain (clarify->discovery->exploring->decompose),
+  // the same three hops `fgos-coding-driving`'s own inline discovery/
+  // exploring handling (or, for exploring, `fgos-exploring`'s own Gate)
+  // would make one at a time in a live session.
   resolveDiscovery(dir, 'item-clarify', {}, 'session', { clear: true, verify: 'test -f output.txt' });
+  resolveDiscovery(dir, 'item-clarify', {}, 'session', { clear: true });
+  resolveDiscovery(dir, 'item-clarify', {}, 'session', { clear: true });
   const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
@@ -503,7 +511,11 @@ test('runOnce decompose sweep folds an unrecognized item.domain to "coding" (fai
       docsRef,
     },
   });
+  // tsk-4b2 D3/D6: see the earlier test's own comment -- three hops now
+  // walk clarify->discovery->exploring->decompose.
   resolveDiscovery(dir, 'item-clarify', {}, 'session', { clear: true, verify: 'test -f output.txt' });
+  resolveDiscovery(dir, 'item-clarify', {}, 'session', { clear: true });
+  resolveDiscovery(dir, 'item-clarify', {}, 'session', { clear: true });
   const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
   const lines = [];
   const capture = (msg) => lines.push(msg);
@@ -554,7 +566,11 @@ test('runOnce decompose sweep still fires normally for a coding-domain item adva
   const docsRef = 'docs/history/item-coding-clarify';
   mkLockedContextFixture(repoRoot, docsRef, { mode: 'tiny' });
   seedItem(dir, { id: 'item-coding-clarify', stage: 'clarify', verify: 'test -f output.txt', docsRef });
+  // tsk-4b2 D3/D6: see the earlier tests' own comment -- three hops now
+  // walk clarify->discovery->exploring->decompose.
   resolveDiscovery(dir, 'item-coding-clarify', {}, 'session', { clear: true, verify: 'test -f output.txt' });
+  resolveDiscovery(dir, 'item-coding-clarify', {}, 'session', { clear: true });
+  resolveDiscovery(dir, 'item-coding-clarify', {}, 'session', { clear: true });
   const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });

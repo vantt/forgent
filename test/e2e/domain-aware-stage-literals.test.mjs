@@ -395,6 +395,13 @@ test('runner sweep: a "triage" fixture-domain item at its own Clarify-mapped sta
   mkLockedContextFixture(repoRoot, codingDocsRef);
   const codingItem = submit(repoRoot, 'An unrelated plain coding item, same sweep', { docsRef: codingDocsRef });
   assert.equal(codingItem.stage, 'clarify');
+  // tsk-4b2 D3/D6: coding's own clarify clear verdict now lands on
+  // discovery, not decompose directly -- two more explicit discover calls
+  // walk it through discovery->exploring->decompose (triage above is
+  // unaffected: it has no discovery/exploring stages registered, so its
+  // own single discover call still lands straight on decompose, unchanged).
+  assert.equal(fgos(repoRoot, ['discover', codingItem.id, '--verdict', 'clear', '--verify', 'test -f output.txt && echo CODE_OK']).status, 0);
+  assert.equal(fgos(repoRoot, ['discover', codingItem.id, '--verdict', 'clear', '--verify', 'test -f output.txt && echo CODE_OK']).status, 0);
   assert.equal(fgos(repoRoot, ['discover', codingItem.id, '--verdict', 'clear', '--verify', 'test -f output.txt && echo CODE_OK']).status, 0);
   assert.equal(fgos(repoRoot, ['decompose', codingItem.id, '--verdict', 'pass-through', '--reason', 'single fixture item, no split needed']).status, 0);
 
