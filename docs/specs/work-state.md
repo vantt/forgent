@@ -1159,7 +1159,7 @@ Một verb đọc-thuần trả **metrics CƠ HỌC** của đồ thị công vi
 
 - Bản ghi thực tế (outcome) chưa có trường "thời lượng chạy" — nếu cần, đây là một mở rộng schema cộng thêm mới, chưa quyết (nêu lúc validate slice 1 của phase-3-compound-learning).
 - Cổng có-phân-loại (typed gates: need-review / need-approval) — vẫn cố ý gộp về một `awaiting-human` chung; thêm nhãn loại chỉ khi có consumer thật cần (per D3, deferred). Riêng nhu cầu "cần làm rõ trước khi thi công" đã giải qua chiều `stage` (clarify/decompose/executing) thay vì một loại cổng mới — xem "Giai đoạn Làm-rõ" và "Giai đoạn Chia-việc".
-- Timeout / nhắc-nhở / đánh-thức khi người vắng lâu — cố ý không làm; đậu vô thời hạn (per D4, deferred).
+- Timeout / nhắc-nhở / đánh-thức khi người vắng lâu — cố ý không làm; đậu vô thời hạn (per D4, deferred). Riêng việc CLAIM một item đang `doing` bị bỏ quên (worktree không còn ai chỉnh sửa) đã có một cửa hẹp hơn: `pick`/`take` tự kiểm tra hoạt động file/worktree thật của claim cũ ngay trong đường CAS-conflict sẵn có, và tự động reclaim (reattach, không phá hủy) khi bằng chứng đủ kết luận — không phải timeout/nhắc-nhở chủ động, chỉ kích hoạt khi một session khác chủ động thử claim lại (docs/history/session-claim-liveness/CONTEXT.md, D1-D5).
 - Phân quyền / nhiều người / giao việc: ai được trả lời cổng nào — chưa mô hình hóa (deferred).
 - Orchestrator service tầng fleet (registry/heartbeat/push assignment/lease, giao thức+auth cho worker từ xa) — không thuộc cửa pull take/return đã dựng, đắp sau trên cùng nhật ký sự kiện chỉ khi cần fleet worker (deferred, per D1 stage-decompose).
 - Rollup view theo bộ (tổng hợp trạng thái mọi hậu duệ của một gốc trong một màn hình) — STR24, chưa làm (deferred).

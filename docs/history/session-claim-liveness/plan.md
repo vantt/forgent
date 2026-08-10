@@ -68,10 +68,22 @@ runner sweep triggers on its own:
    does). Not past threshold → fall through to today's `moveWork` call,
    same refusal.
 4. Past threshold (D2's "conclusive" case): call `moveWork(dir, { id,
-   to: 'todo', expectedStatus: 'doing', reason: 'stale-claim-reclaim'
-   })` FIRST — a normal, already-registered FSM edge
-   (`status-fsm.mjs:117`, `{ from: 'doing', to: 'todo' }`), guarded by
-   its own `expectedStatus: 'doing'` CAS. Then continue into
+   to: 'todo', expectedStatus: 'doing' })` FIRST — a normal,
+   already-registered FSM edge (`status-fsm.mjs:117`,
+   `{ from: 'doing', to: 'todo' }`), guarded by its own
+   `expectedStatus: 'doing'` CAS. **Implementation finding:** `reason` is
+   NOT stamped into this edge's payload — `status-fsm.mjs:216-232` scopes
+   `payload.reason` to exactly three unrelated edges
+   (`awaiting-approval->todo`, `awaiting-approval->blocked`,
+   `cleanup->blocked`); a `reason` passed for any other edge, including
+   this one, is silently dropped. D2c's "logged with its evidence"
+   requirement is met instead via `addDecision(dir, { id, kind: 'engine',
+   ... })` right after the release succeeds — the same mechanism
+   `resolveDiscovery`/`resolveDecompose` already use for their own
+   engine-originated audit entries (`src/intake/discovery.mjs`'s
+   `addDecision(...{ source: 'resolveDiscovery', kind: 'engine' })`
+   call), carrying the real evidence (last-activity timestamp, threshold
+   crossed) in `text`/`rationale`. Then continue into
    `claimWork`'s existing, UNMODIFIED code below: it re-reads
    `branchAlreadyExists` truthfully (the branch from A's prior claim is
    still there), so it takes the exact same branch-reuse path a same-
@@ -102,20 +114,36 @@ produces, not leak the release-step's own internal CAS failure verbatim.
 
 **Rejected alternatives:**
 - A new verb/flag (`fgos pick --reclaim`) — rejected by D5; this shape
-  needs none, `pick`/`take` behave identically for the caller.
+  needs none, the caller runs the same `pick`/`take` command either way.
 - A new FSM edge — unnecessary; `doing -> todo` already exists
   (`status-fsm.mjs:117`), same edge `reject` and verify-fail-park already
-  use, just a new `reason` value (`runner-crash-reclaim` is the existing
-  precedent for a comparable `reason`, `loop.mjs:415`).
+  use. (Correction from an earlier draft of this plan: this edge does
+  NOT carry a `reason` — see the implementation finding above; evidence
+  goes through `addDecision` instead, not a new `reason` value.)
 - Reimplementing reattach — rejected; `tsk-65n`'s mechanism
   (`status: done`) already does exactly what's needed and is reached for
   free once the release makes `branchAlreadyExists` true again.
+
+**Implementation finding — pre-check is `pick`-only (`isolate: true`),
+never `take`:** reading `claim-port.mjs` while wiring this in found that
+`tsk-65n`'s own D2 ("`take` refuses instead of silently mis-claiming when
+a `todo` item's branch already exists") was never actually shipped in
+this file — no such check exists today. `take` (`isolate: false`) always
+computes `useBranchSource = isolate || isBranchTake`, so it would land
+`source: 'main'` on a reclaimed item whose real work is on `fgw/<id>`,
+the exact silent-mis-claim shape `tsk-65n` was scoped to prevent for a
+different trigger (the §3b release). Rather than also fixing `take`'s
+own pre-existing gap here (out of this item's boundary — no new verb,
+no unrelated bug fix), the pre-check is scoped to `isolate: true` only —
+`pick` is already the spec's own stated re-claim door
+(`docs/specs/runner.md` §3b); `take` on a stale claim keeps hitting
+today's ordinary refusal, unchanged.
 
 ## Risk map
 
 | Component | Risk | Proof point (for `fgos-validating`) |
 |---|---|---|
-| `claimWork`'s pre-check (`claim-port.mjs`) | **High** — the actual authorization-adjacent logic; a bug could reclaim a genuinely live claim or fail to reclaim a genuinely dead one | New `claim-port.test.mjs` cases: (a) conclusive-stale `doing`/`session` claim, new claimant `actor: 'session'` → release+reclaim succeeds, event trail shows `reason: 'stale-claim-reclaim'`; (b) recent-activity `doing` claim (regression of the literal `tsk-2ec` shape — an event <1min old) → refuses exactly as today, unchanged exit/message; (c) `claimRole: 'runner'` `doing` item → pre-check is a no-op, still plain CAS refuse (this path stays `startupReap`'s alone, D2 scope); (d) **(validating finding)** conclusive-stale `doing`/`session` claim, new claimant `actor: 'runner'` → pre-check must NOT fire — refuses exactly as today, `startupReap`'s exclusive domain untouched; (e) **(validating finding)** two claimants racing a conclusive-stale claim → loser sees the SAME conflict error shape as today's ordinary refusal, not the release-step's own internal CAS message |
+| `claimWork`'s pre-check (`claim-port.mjs`) | **High** — the actual authorization-adjacent logic; a bug could reclaim a genuinely live claim or fail to reclaim a genuinely dead one | New `claim-port.test.mjs` cases: (a) conclusive-stale `doing`/`session` claim, new claimant `actor: 'session'`, `isolate: true` → release+reclaim succeeds, event trail shows the `doing->todo` release plus an `addDecision(kind:'engine')` evidence entry (implementation finding: `reason` itself is not stamped for this edge — see Approach); (b) recent-activity `doing` claim (regression of the literal `tsk-2ec` shape) → refuses exactly as today, unchanged exit/message; (c) `claimRole: 'runner'` `doing` item → pre-check is a no-op, still plain CAS refuse (this path stays `startupReap`'s alone, D2 scope); (d) **(validating finding)** conclusive-stale `doing`/`session` claim, new claimant `actor: 'runner'` → pre-check must NOT fire — refuses exactly as today; (e) **(implementation finding)** conclusive-stale `doing`/`session` claim, new claimant via `take` (`isolate: false`) → pre-check must NOT fire either — `pick`-only scoping (see Approach). A genuine two-claimant RACE on the release step's own CAS is not separately unit-tested: `claimWork` is fully synchronous (no await/yield point between its state read and its `moveWork` calls), so no interleaving is reachable within one process without mocking against this repo's own real-behavior test convention — the property is proven by direct code reading (the catch-block's `instanceof FsmError && category === 'conflict'` check mirrors the already-tested pattern `tsk-49a`'s own test uses) plus `transitionWork`'s own already-proven CAS guarantee, not a dedicated race test. |
 | Activity-signal helper (new, `src/runner/claim-liveness.mjs`) | **Medium** — correctness of `git log`/`git status` parsing and threshold math, isolated from the claim flow | New `claim-liveness.test.mjs`: fabricate a worktree, backdate a file's mtime (`utimesSync`) and/or a commit's date (`GIT_COMMITTER_DATE`), assert the computed signal and the resulting reclaim/no-reclaim boundary at exactly the threshold |
 | Reattach reuse (`createClaimWorktree`, `worktree.mjs:697-711`) | **Low** — already-shipped, already-tested mechanism; this item only changes what CONDITION reaches it | Existing `worktree.test.mjs` reattach cases must stay green unmodified (regression); one new case confirms the cross-session stale-reclaim trigger lands in the same reattach code path, not a duplicate |
 | CLI/public-contract surface (`pick`/`take` exit behavior) | **Medium** — observable behavior changes for a subset of inputs | Every existing `claim-port.test.mjs`/`test/cli/fgos.test.mjs` assertion about today's refuse-on-conflict behavior reviewed and kept passing for the non-conclusive branch, no edits needed to those unless one turns out to assume "always refuses" unconditionally |

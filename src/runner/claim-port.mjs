@@ -7,12 +7,13 @@
 // This is the "one door" for claiming work — no direct moveWork(to:'doing')
 // calls outside this module except for FSM-internal transitions.
 
-import { moveWork, addOutcome, listWork, readRawEvents } from '../state/store.mjs';
+import { moveWork, addOutcome, addDecision, listWork, readRawEvents, FsmError } from '../state/store.mjs';
 import { isResolvedStatus } from '../state/frontier.mjs';
 import { visitCount } from './anti-loop.mjs';
 import { acquireMainCheckoutLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS, formatLockDurationMs } from './main-checkout-lock.mjs';
 import { createClaimWorktree, branchNameFor, branchExists } from './worktree.mjs';
 import { resolveRoot } from './root-affinity.mjs';
+import { lastActivityAt, isReclaimEligible } from './claim-liveness.mjs';
 import { execFileSync } from 'node:child_process';
 
 function git(repoRoot, args) {
@@ -204,6 +205,65 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
     const isBranchTake = item.status === 'blocked' && branchAlreadyExists;
     const expectedStatus = isBranchTake ? 'blocked' : 'todo';
     const useBranchSource = isolate || isBranchTake;
+
+    // Stale-claim reclaim pre-check (D1/D2/D3/D4/D5,
+    // docs/history/session-claim-liveness/CONTEXT.md): about to hit the
+    // ordinary CAS conflict below (item.status is 'doing', not a
+    // blocked branch-take) — before that, check whether the EXISTING
+    // human/session claim's worktree has genuinely gone quiet. Runner
+    // claims are untouched (startupReap's own domain, loop.mjs:364-372);
+    // this door is also never opened for a `runner` CALLER (this session's
+    // own `actor`), so the unattended runner can never walk through it and
+    // silently reclaim a human's stale work — only a live session/human
+    // attempt can trigger it.
+    //
+    // `isolate` (pick) only, never a plain `take`: per docs/specs/runner.md
+    // §3b, `pick` is the intended re-claim door, and `take` has its own
+    // pre-existing, separately-scoped gap (tsk-65n's own item boundary —
+    // never actually shipped in this file, confirmed by reading it) where
+    // it silently mis-claims as `source: 'main'` on a `todo` item whose
+    // branch already exists, instead of reusing that branch. Falling
+    // through into that gap via THIS new door would be introducing a new
+    // way to hit an old, separately-owned bug — out of this item's
+    // boundary (no new verb, no take-mis-claim fix; CONTEXT.md/plan.md).
+    if (
+      isolate
+      && !isBranchTake
+      && item.status === 'doing'
+      && (item.claimRole === 'human' || item.claimRole === 'session')
+      && (actor === 'session' || actor === 'human')
+      && isReclaimEligible(repoRoot, id, item.claimRole)
+    ) {
+      try {
+        // Same doing->todo edge already registered (status-fsm.mjs:117),
+        // guarded by its own CAS — a genuine race between two reclaimers
+        // still lets only one through, the same single-writer guarantee
+        // every other moveWork call in this module already relies on.
+        // `reason` is NOT stamped into the payload for this edge
+        // (status-fsm.mjs:216-232 scopes it to exactly three unrelated
+        // edges) — the evidence trail (D2c) is the `addDecision` call
+        // below instead, the same `kind: 'engine'` mechanism
+        // `resolveDiscovery`/`resolveDecompose` already use for their own
+        // mechanical audit entries.
+        moveWork(dir, { id, to: 'todo', expectedStatus: 'doing' });
+        const activityAt = lastActivityAt(repoRoot, id);
+        addDecision(dir, {
+          id,
+          text: `stale-claim-reclaim: released ${item.claimRole} claim (last activity ${activityAt === null ? 'unknown' : new Date(activityAt).toISOString()})`,
+          source: 'claimWork',
+          kind: 'engine',
+          rationale: `docs/history/session-claim-liveness/CONTEXT.md D2/D4/D5 — worktree activity signal past the ${item.claimRole === 'runner' ? 'agentMs' : 'humanMs'} threshold, reclaimed by a live ${actor} claim attempt`,
+        });
+      } catch (err) {
+        // Lost the race to another claimant's own release (or the item
+        // moved for an unrelated reason in between) — fall through to the
+        // ORIGINAL claim attempt below, which throws today's ordinary
+        // conflict shape. Never leak this release step's own CAS message
+        // (a different shape: "expected doing but found todo") in its
+        // place (D5's error-shape-normalization requirement).
+        if (!(err instanceof FsmError) || err.category !== 'conflict') throw err;
+      }
+    }
 
     // Claim via moveWork. moveWork's own field is `role` (store.mjs's
     // long-settled settlement-role-attribution contract, S3-closeout) — this
