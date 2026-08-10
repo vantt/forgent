@@ -1034,6 +1034,10 @@ mod tests {
         fn scan(&self) -> Result<HashMap<String, PaneIdentity>, crate::pane_scan::PaneScanError> {
             Ok(self.0.clone())
         }
+
+        fn scan_raw(&self) -> Result<String, crate::pane_scan::PaneScanError> {
+            Ok(r#"{"result":{"panes":[]}}"#.to_string())
+        }
     }
 
     #[test]

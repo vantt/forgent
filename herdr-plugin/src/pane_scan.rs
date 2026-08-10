@@ -59,14 +59,28 @@ struct PaneListEnvelope {
     result: PaneListResult,
 }
 
+/// Reserved prefix for auto-launch guard labels (tsk-2ja's
+/// `pick::auto_discover_pane_label`, and any future `fgos-auto-*` sibling)
+/// — a label in this namespace is never a real task id, even though it
+/// syntactically passes `is_valid_id` (hyphenated lowercase segments are a
+/// legal id shape). `extract_task_id` below carves it out explicitly so
+/// this map never gets a phantom entry for a pane that isn't tracking any
+/// real work item.
+const AUTO_LAUNCH_LABEL_PREFIX: &str = "fgos-auto-";
+
 /// Extracts the leading `<taskid>` segment from a pane label built per the
 /// locked convention (`docs/history/fgos-terminal-pane-rename/CONTEXT.md`
 /// D4: `<taskid> | fg.ssid:<v> | a.ssid:<v>`, unresolved segments
 /// dropped) — splits on `" | "` and validates the leading segment against
 /// fgOS's own id grammar (`pick::is_valid_id`), never trusting an
-/// arbitrary leading substring as a task-id.
+/// arbitrary leading substring as a task-id. Rejects the reserved
+/// `fgos-auto-*` namespace first (tsk-2ja) — those labels pass
+/// `is_valid_id`'s syntax check but are never real task ids.
 fn extract_task_id(label: &str) -> Option<&str> {
     let leading = label.split(" | ").next()?;
+    if leading.starts_with(AUTO_LAUNCH_LABEL_PREFIX) {
+        return None;
+    }
     is_valid_id(leading).then_some(leading)
 }
 
@@ -92,6 +106,23 @@ pub fn parse_pane_list(json: &str) -> Result<HashMap<String, PaneIdentity>, serd
         );
     }
     Ok(map)
+}
+
+/// Checks whether any pane in a `herdr pane list` response carries the
+/// exact label given — the auto-discover double-launch guard (tsk-2ja).
+/// Deliberately does NOT go through `extract_task_id`/`parse_pane_list`:
+/// a synthetic label like `fgos-auto-discover-<id>` passes `is_valid_id`'s
+/// syntax check (hyphenated lowercase segments are legal), so folding this
+/// into that map would misread it as a real task id and pollute the
+/// dashboard's own In-Process tracking. This checks the raw label for an
+/// exact match instead, independent of that map entirely.
+pub fn has_labeled_pane(json: &str, label: &str) -> Result<bool, serde_json::Error> {
+    let envelope: PaneListEnvelope = serde_json::from_str(json)?;
+    Ok(envelope
+        .result
+        .panes
+        .iter()
+        .any(|pane| pane.label.as_deref() == Some(label)))
 }
 
 fn run_pane_list(herdr_bin: &str, workspace_id: &str) -> Result<String, PaneScanError> {
@@ -123,6 +154,10 @@ impl PaneRegistry for HerdrPaneScanner {
     fn scan(&self) -> Result<HashMap<String, PaneIdentity>, PaneScanError> {
         let stdout = run_pane_list(&self.herdr_bin, &self.workspace_id)?;
         parse_pane_list(&stdout).map_err(PaneScanError::Parse)
+    }
+
+    fn scan_raw(&self) -> Result<String, PaneScanError> {
+        run_pane_list(&self.herdr_bin, &self.workspace_id)
     }
 }
 
@@ -202,5 +237,41 @@ mod tests {
         // mistaken for a task-id — mirrors pick.rs's own grammar tests.
         assert_eq!(extract_task_id("Reviewer | a.ssid:abc"), None);
         assert_eq!(extract_task_id(""), None);
+    }
+
+    #[test]
+    fn extract_task_id_rejects_the_reserved_auto_launch_label_namespace() {
+        // Syntactically id-shaped (passes `is_valid_id`) but must never
+        // be read back as a real task id — tsk-2ja's own guard label.
+        assert_eq!(extract_task_id("fgos-auto-discover-tsk-2ja"), None);
+    }
+
+    const AUTO_DISCOVER_PANE_FIXTURE: &str = r#"{"id":"cli:pane:list","result":{"panes":[
+        {"agent":"claude","agent_status":"idle","cwd":"/x","focused":false,
+         "pane_id":"wS:pZ","tab_id":"wS:t9","workspace_id":"wS",
+         "label":"fgos-auto-discover-tsk-2ja"},
+        {"agent":"claude","agent_status":"idle","cwd":"/x","focused":false,
+         "pane_id":"wS:pW","tab_id":"wS:t8","workspace_id":"wS",
+         "label":"tsk-n4i-2 | a.ssid:afffd875-be95-41cb-8eb2-fa2cf1276eb5"}
+    ],"type":"pane_list"}}"#;
+
+    #[test]
+    fn auto_discover_guard_detects_a_pane_by_its_exact_synthetic_label() {
+        assert!(has_labeled_pane(AUTO_DISCOVER_PANE_FIXTURE, "fgos-auto-discover-tsk-2ja").unwrap());
+        assert!(!has_labeled_pane(AUTO_DISCOVER_PANE_FIXTURE, "fgos-auto-discover-tsk-9zz").unwrap());
+    }
+
+    #[test]
+    fn auto_discover_pane_label_never_pollutes_the_dashboard_pane_map() {
+        // The synthetic label passes `is_valid_id`'s syntax check (legal
+        // hyphenated-lowercase shape) but must never surface as a task-id
+        // key in `parse_pane_list`'s own map — that map stays exactly as
+        // it was before this guard existed.
+        let map = parse_pane_list(AUTO_DISCOVER_PANE_FIXTURE).expect("fixture should parse");
+        assert!(
+            !map.contains_key("fgos-auto-discover-tsk-2ja"),
+            "a synthetic auto-discover label must never be read back as a task id"
+        );
+        assert_eq!(map.len(), 1, "only the real, id-labeled pane is tracked");
     }
 }
