@@ -1,4 +1,4 @@
-use crate::fgos::MergeListSummary;
+use crate::fgos::{merge_tree_line_count, MergeListSummary, MergeTreeNode};
 use crate::pane_scan::PaneIdentity;
 use crate::ports::{PaneRegistry, WorkItemSource};
 use crate::settings::OrchestratorSettings;
@@ -471,9 +471,12 @@ impl App {
     }
 
     pub fn scroll_merge_list_down(&mut self) {
-        let len = self.merge_list.ready.len()
-            + self.merge_list.waiting.len()
-            + self.merge_list.blocked_on_sync.len();
+        // tsk-59b: scroll bound now matches rendered LINE count of the tree
+        // (nodes + reason lines), not the old flat ready/waiting/
+        // blocked_on_sync bucket count — Paragraph::scroll moves by
+        // rendered line, and a `reason` line (D7) adds one line per node
+        // that carries one.
+        let len = merge_tree_line_count(&self.merge_list.tree);
         let max = len.saturating_sub(1) as u16;
         self.merge_list_scroll = (self.merge_list_scroll + 1).min(max);
     }
@@ -556,6 +559,16 @@ impl App {
                 ready: vec!["tsk-mock-ready".into()],
                 waiting: Vec::new(),
                 blocked_on_sync: Vec::new(),
+                // tsk-59b: kept in sync with `ready` above -- one top-level
+                // ready node, matching the id/shape a real `tree` field
+                // carries.
+                tree: vec![MergeTreeNode {
+                    id: "tsk-mock-ready".into(),
+                    title: "Mock ready item".into(),
+                    status: "ready".into(),
+                    reason: None,
+                    children: Vec::new(),
+                }],
             },
             pick_button_rect: None,
             discover_button_rect: None,

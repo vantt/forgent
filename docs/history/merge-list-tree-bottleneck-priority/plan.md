@@ -133,6 +133,60 @@ node "$root/bin/fgos.mjs" add \
   dropped — consistent with D2 ("show all"), never a new product
   decision, just the same "never hide" principle applied to an edge case.
 
+## fgos-validating — reality gate + feasibility matrix (tsk-59b)
+
+**Reality gate:** Mode fit PASS — both original risk-map rows for this
+task (Rust parser, tree rendering) were already marked Low, matching a
+straightforward, well-scoped piece. Repo fit PASS — re-confirmed live:
+`herdr-plugin/src/fgos.rs` and `herdr-plugin/src/app.rs` both exist,
+`MergeListSummary` at `fgos.rs:128-132`, `cargo` available on `PATH`.
+Assumptions PASS (see below — the JSON contract Task 1 promised is now
+real and tested against live data, not just theoretical). Smaller path
+PASS — no smaller path than "parse the field, render it" exists; D4
+already forecloses computing anything client-side. Proof surface PASS —
+real `cargo test`/`cargo build --release`/`npm test` command, no
+placeholder. Impact-analysis posture PASS (still `degraded`, matches
+`plan.md`'s original recording) — manual `rg` cross-check run per the
+degraded-posture rule: every real Rust reference to `MergeListSummary`/
+`fetch_merge_list` found (`herdr-plugin/src/ports.rs:6,19`,
+`app.rs:1,205,260,555,697,760`, `main.rs:620-621`) — one file outside this
+task's own footprint, `ports.rs`, references the type in a trait
+signature (`fn fetch_merge_list(&self) -> Result<MergeListSummary,
+FgosError>`) but does not need editing: extending the struct with a new
+field (not replacing it) keeps that signature valid as long as the new
+field also derives `Default` (needed for the several `MergeListSummary::
+default()` calls in `app.rs`/`main.rs`'s own test mocks) — noted as a
+build constraint for implementation, not a scope change.
+
+**Assumptions verified against the REAL, now-existing contract** (not
+theoretical — tsk-2x9k delivered and merged into `fgw/tsk-3cs`, this
+worktree's own base):
+
+```
+node bin/fgos.mjs merge list --json --dir /home/vantt/projects/forgentX
+```
+
+run live from this worktree (its own branch already contains tsk-2x9k's
+merge — confirmed via `git merge-base HEAD fgw/tsk-3cs` equalling `HEAD`)
+against the REAL current backlog returns a real `tree` array, e.g.:
+
+```json
+{"id":"tsk-4b2","title":"...","status":"blocked-sync","reason":"root cần sync: fgw/tsk-4b2 lệch 5 ahead / 104 behind main","children":[]}
+```
+
+confirming: the field is named `tree` (plan.md's own Assumptions section
+left this open — now settled by what Task 1 actually shipped), each node
+carries `id`/`title`/`status`/`children` and `reason` when blocked
+(exactly D7's shape), and the whole thing is live, real JSON — not a
+fixture.
+
+**Feasibility matrix:** no rows required — every risk-map entry for this
+task was already Low, and the one real finding above (`ports.rs`'s
+`Default` constraint) was resolved by inspection, not left as an unproven
+assumption.
+
+**Verdict: READY** (no constraints).
+
 ## Outstanding questions
 
 None
