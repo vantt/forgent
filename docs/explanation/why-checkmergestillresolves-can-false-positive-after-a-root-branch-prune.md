@@ -1,3 +1,8 @@
+---
+type: explanation
+title: Why `checkMergeStillResolves` can false-positive after a root branch prune
+source_capture_ids: [tsk-psb]
+---
 # Why `checkMergeStillResolves` can false-positive after a root branch prune
 
 `checkMergeStillResolves` (`src/state/cleanup-harness.mjs`) already
@@ -133,3 +138,50 @@ in the first place, was named as still open — `tsk-47e` was the item
 that surfaced it, not a claim that the scope was fully bounded. Full
 decision record: `fgos show tsk-3ft` (`docsRef` not filed as a separate
 `docs/history/` doc for this item).
+
+## A fourth case (`tsk-psb`): the check picks the wrong sha entirely, for any decomposed parent, deterministically
+
+The three cases above all involve the target *ref* — pruned, restructured,
+or reset. `tsk-psb` found a different-shaped bug in the same function:
+the *sha being checked* is wrong, for a specific, structural reason that
+recurs on every decomposed item, not an occasional git-history accident.
+
+`checkMergeStillResolves` already resolves the correct target ref for a
+decomposed item (`fgw/<rootId>`, via `tsk-1p9`'s root-aware resolution) —
+that part was never the bug. The bug is which sha it checks against that
+ref: it always reads the item's *own* `branchHeadAtReturn`. For an
+ordinary leaf, that sha is a real merge commit that landed the leaf's
+content into the target ref. For a **decomposed** item — one that gained
+children instead of executing directly — `branchHeadAtReturn` is
+whatever `fgw/<id>` happened to record last, which is only ever a "merge
+main back into itself to sync" commit, the wrong direction for this
+ancestry check. Once an item decomposes, its own branch is never the
+thing merged forward — its *children's* branches are merged directly
+into the same resolved root ref instead. So a decomposed parent's own
+recorded sha can never be an ancestor of anything downstream, by
+construction, every single time:
+
+> "So `branchHeadAtReturn` is structurally never an ancestor of the
+> parent branch for any task that got decomposed this way, and cleanup
+> will always misreport it as blocked ... even though the real content
+> did land in the parent via the children's own merges."
+> — real item description, `tsk-psb`
+
+Confirmed live: `tsk-4n7` (parent `tsk-19y`, decomposed into `tsk-3wl` +
+`tsk-bvh`) had its own `branchHeadAtReturn` (`d893da2f`) genuinely absent
+from `fgw/tsk-19y`'s ancestry — but the real feature commits from both
+children (`42a8e1c`, `f077b67`) were present there. No content was lost;
+the check was verifying the wrong commit's ancestry entirely.
+
+**Distinct from the prune/reset cases above in kind, not just cause**:
+those three are occasional, git-history-level accidents (a branch
+deleted, a merge restructured, a branch reset). This one is
+deterministic and structural — *every* task that decomposes and closes
+by having its children merge directly into the parent hits this false
+block, every time, with no git-history anomaly involved at all.
+
+**The fix**: when checking a decomposed item, additionally check
+ancestry against the children's own `branchHeadAtReturn`/merge commits,
+not only the parent's own branch — same diagnostic-only stance the prune
+and reset fixes above both take (never auto-unblock from an inferred
+content match, just stop misreporting a decomposed parent as blocked).
