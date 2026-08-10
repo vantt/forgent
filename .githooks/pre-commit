@@ -22,22 +22,23 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
-import { acquireMainCheckoutLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS } from '../src/runner/main-checkout-lock.mjs';
+import { acquireMainCheckoutLock, HELD, AMBIGUOUS, HOOK_TTL_MS } from '../src/runner/main-checkout-lock.mjs';
 import { resolveWriterIdentity } from '../src/runner/session-identity.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const HOW_TO_DOC = 'docs/how-to-parallel-lanes.md (workshop root, one level up from repo/)';
 
-// DEFAULT_TTL_MS now lives in main-checkout-lock.mjs itself (tsk-3w8
-// follow-up) -- claim-port.mjs's claimWork acquires this SAME lock too and
-// needs the same staleness window, not a second local copy of this repo's
-// own historical-gap-derived constant.
+// HOOK_TTL_MS (tsk-1d9) is this hook's own default -- shorter than
+// claim-port.mjs's/merge.mjs's shared DEFAULT_TTL_MS (main-checkout-
+// lock.mjs), which stays sized for mergeRunnerItem's much longer verify
+// hold. See main-checkout-lock.mjs's own HOOK_TTL_MS doc comment for the
+// full rationale and accepted tradeoff.
 function resolveTtlMs() {
   const raw = process.env.FGOS_MAIN_CHECKOUT_LOCK_TTL_MS;
-  if (raw === undefined) return DEFAULT_TTL_MS;
+  if (raw === undefined) return HOOK_TTL_MS;
   const parsed = Number(raw);
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_TTL_MS;
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : HOOK_TTL_MS;
 }
 
 function refuse(message) {

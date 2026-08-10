@@ -173,6 +173,7 @@ test('every legal edge is exactly the declared table; every other status pair is
     'blocked->wontfix',
     'todo->wontfix',
     'doing->wontfix',
+    'awaiting-human->wontfix',
   ]);
   for (const from of STATUSES) {
     for (const to of STATUSES) {
@@ -334,13 +335,25 @@ test('wontfix is terminal single-door: no transition out of wontfix, no matter t
 
 // D3: wontfix is reachable from exactly blocked/todo/doing — never from
 // proposed, done, or awaiting-human.
-test('wontfix is not reachable from proposed, done, or awaiting-human', () => {
-  for (const from of ['awaiting-approval', 'done', 'awaiting-human']) {
+test('wontfix is not reachable from awaiting-approval, delivered, retrospective, cleanup, or done -- past-completion statuses, unlike awaiting-human (tsk-2ub)', () => {
+  for (const from of ['awaiting-approval', 'delivered', 'retrospective', 'cleanup', 'done']) {
     assert.throws(
       () => transitionWork({ work: work(from), to: 'wontfix' }),
       (err) => err instanceof FsmError && err.category === 'precondition',
     );
   }
+});
+
+test('wontfix IS reachable from awaiting-human (tsk-2ub): a park-for-question state with no committed work, same shape as todo/doing -- requires the usual awaiting-human exit answer', () => {
+  assert.throws(
+    () => transitionWork({ work: work('awaiting-human'), to: 'wontfix' }),
+    (err) => err instanceof FsmError && err.category === 'validation',
+    'missing answer must still be refused, same as every other awaiting-human exit',
+  );
+  const event = transitionWork({ work: work('awaiting-human'), to: 'wontfix', answer: 'no longer relevant, closing' });
+  assert.equal(event.payload.from, 'awaiting-human');
+  assert.equal(event.payload.to, 'wontfix');
+  assert.equal(event.payload.answer, 'no longer relevant, closing');
 });
 
 test('transitionWork rejects an unknown target status as precondition', () => {

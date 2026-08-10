@@ -27,7 +27,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { appendEvent, readEvents, withEventsLock, appendEventLocked } from './events.mjs';
+import { readEvents, withEventsLock, appendEventLocked } from './events.mjs';
 import { rebuildView, viewRevision } from './replay.mjs';
 import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, classifyStalePostDelivery, footprintOverlapAmong, goalScopedCriticalPath, goalScopedGreedyTopUnblock, computeSchedule, detectCycles } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './status-fsm.mjs';
@@ -111,6 +111,27 @@ function refreshView(dir) {
   return view;
 }
 
+// tsk-1q5: every mutation below used to call `refreshView(dir)` AFTER
+// releasing `withEventsLock` (append-then-refresh, per the header comment
+// above, but as two SEPARATE critical sections). Two processes finishing
+// their own correctly-locked appends close together could then race their
+// unlocked `refreshView` calls: whichever one's whole-file `state.json`
+// write happened to land last won, even if its own log read was captured
+// before the other process's append — silently overwriting a fresher view
+// with a staler one (a lost-update on the derived cache, not the log
+// itself). Folding `refreshView` into the SAME held lock as the append
+// closes that window structurally, the same way `withEventsLock`'s own doc
+// comment already describes for a precondition read ahead of an append.
+function withEventsLockAndRefresh(dir, logPath, fn) {
+  let view;
+  const event = withEventsLock(logPath, () => {
+    const result = fn();
+    view = refreshView(dir);
+    return result;
+  });
+  return { event, view };
+}
+
 /**
  * Create `dir` (e.g. `.fgos/`) if missing, ensure the event log file exists,
  * and (re)write the view from it. Safe to call on an already-initialized
@@ -139,7 +160,7 @@ export function initStore(dir) {
  */
 export function addWork(dir, work) {
   const { logPath } = paths(dir);
-  const event = withEventsLock(logPath, () => {
+  return withEventsLockAndRefresh(dir, logPath, () => {
     const before = rebuildView(logPath);
 
     if (before.work[work?.id]) {
@@ -226,8 +247,6 @@ export function addWork(dir, work) {
 
     return appendEventLocked(logPath, { type: 'work.add', payload: item });
   });
-  const view = refreshView(dir);
-  return { event, view };
 }
 
 // D4/D5: the exact field set `edit` may patch. `id`, `status`, `stage`, and
@@ -257,7 +276,7 @@ const EDITABLE_FIELDS = new Set(['title', 'description', 'kind', 'risk', 'verify
 // precondition that the other's not-yet-visible write is about to invalidate.
 export function editWork(dir, { id, patch, role } = {}) {
   const { logPath } = paths(dir);
-  const event = withEventsLock(logPath, () => {
+  return withEventsLockAndRefresh(dir, logPath, () => {
     const before = rebuildView(logPath);
     const work = before.work[id];
     if (!work) {
@@ -343,8 +362,6 @@ export function editWork(dir, { id, patch, role } = {}) {
     payload.writer = resolveWriterIdentity(dir);
     return appendEventLocked(logPath, { type: 'work.edit', payload });
   });
-  const view = refreshView(dir);
-  return { event, view };
 }
 
 /**
@@ -392,7 +409,7 @@ function composeLearning(view, id, closingSettlement) {
  */
 export function setFocus(dir, { id, role } = {}) {
   const { logPath } = paths(dir);
-  const event = withEventsLock(logPath, () => {
+  return withEventsLockAndRefresh(dir, logPath, () => {
     const before = rebuildView(logPath);
     const work = before.work[id];
     if (!work) {
@@ -407,8 +424,6 @@ export function setFocus(dir, { id, role } = {}) {
     const payload = role !== undefined ? { id, role } : { id };
     return appendEventLocked(logPath, { type: 'goal.focus', payload });
   });
-  const view = refreshView(dir);
-  return { event, view };
 }
 
 /**
@@ -454,7 +469,7 @@ export function assertAcceptanceEvidence(id, work) {
  */
 export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, role, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk, claimTrigger, statusAtAsk, releaseTrigger, rationale, alternatives, source, askRationale, askAlternatives, askSource } = {}) {
   const { logPath } = paths(dir);
-  const event = withEventsLock(logPath, () => {
+  return withEventsLockAndRefresh(dir, logPath, () => {
   const before = rebuildView(logPath);
   const work = before.work[id];
   if (!work) {
@@ -671,8 +686,6 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   }
   return appendEventLocked(logPath, rawEvent); // captures the real seq; rawEvent itself has none
   });
-  const view = refreshView(dir);
-  return { event, view };
 }
 
 /**
@@ -732,7 +745,7 @@ export function answerAwaiting(dir, { id, answer, expectedStatus, role, rational
  */
 export function moveStage(dir, { id, to, expectedStage, verify, role } = {}) {
   const { logPath } = paths(dir);
-  const event = withEventsLock(logPath, () => {
+  return withEventsLockAndRefresh(dir, logPath, () => {
     const before = rebuildView(logPath);
     const work = before.work[id];
     if (!work) {
@@ -752,8 +765,6 @@ export function moveStage(dir, { id, to, expectedStage, verify, role } = {}) {
     rawEvent.payload.writer = resolveWriterIdentity(dir);
     return appendEventLocked(logPath, rawEvent);
   });
-  const view = refreshView(dir);
-  return { event, view };
 }
 
 /**
@@ -768,9 +779,7 @@ export function addDiscovery(dir, payload) {
   if (!payload || typeof payload.id !== 'string' || !payload.id.trim()) {
     throw new StoreError('validation', 'discovery requires a non-empty "id".');
   }
-  const event = appendEvent(logPath, { type: 'work.discovery', payload });
-  const view = refreshView(dir);
-  return { event, view };
+  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(logPath, { type: 'work.discovery', payload }));
 }
 
 // Gate approve record shape (tsk-19j D1/D11): the 3 skill-embedded Gates
@@ -805,9 +814,8 @@ export function recordGateApprove(dir, { id, gate, actor, verify } = {}) {
   if (typeof verify !== 'string' || !verify.trim()) {
     throw new StoreError('validation', 'gate-approve requires a non-empty "verify".');
   }
-  const event = appendEvent(logPath, { type: 'work.gate-approve', payload: { id, gate, actor, verify } });
-  const view = refreshView(dir);
-  return { event, view };
+  return withEventsLockAndRefresh(dir, logPath, () =>
+    appendEventLocked(logPath, { type: 'work.gate-approve', payload: { id, gate, actor, verify } }));
 }
 
 /**
@@ -839,9 +847,7 @@ export function addDecision(dir, payload) {
     throw new StoreError('validation', 'decision requires a non-empty "rationale".');
   }
   const eventPayload = { ...payload, source: payload.source ?? 'session', kind: payload.kind ?? 'design' };
-  const event = appendEvent(logPath, { type: 'decision', payload: eventPayload });
-  const view = refreshView(dir);
-  return { event, view };
+  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(logPath, { type: 'decision', payload: eventPayload }));
 }
 
 // Diataxis doc-type axis (per CONTEXT D5/D6): an OPTIONAL, additive tag on
@@ -890,9 +896,7 @@ export function addOutcome(dir, payload) {
     throw new StoreError('validation', 'outcome requires a non-empty "id".');
   }
   assertValidDocType(payload);
-  const event = appendEvent(logPath, { type: 'work.outcome', payload });
-  const view = refreshView(dir);
-  return { event, view };
+  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(logPath, { type: 'work.outcome', payload }));
 }
 
 /**
@@ -911,9 +915,7 @@ export function addFriction(dir, payload) {
     throw new StoreError('validation', 'friction requires a non-empty "id".');
   }
   assertValidDocType(payload);
-  const event = appendEvent(logPath, { type: 'work.friction', payload });
-  const view = refreshView(dir);
-  return { event, view };
+  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(logPath, { type: 'work.friction', payload }));
 }
 
 /**
@@ -928,14 +930,12 @@ export function addFriction(dir, payload) {
  */
 export function registerTool(dir, fields) {
   const { logPath } = paths(dir);
-  const event = withEventsLock(logPath, () => {
+  return withEventsLockAndRefresh(dir, logPath, () => {
     const before = rebuildView(logPath);
     const existingNames = Object.keys(before.tools ?? {});
     const record = validateToolRegistration(fields, existingNames); // ToolRegistryError: validation
     return appendEventLocked(logPath, { type: 'tool.register', payload: record });
   });
-  const view = refreshView(dir);
-  return { event, view };
 }
 
 /**
@@ -946,15 +946,13 @@ export function registerTool(dir, fields) {
  */
 export function removeTool(dir, { name } = {}) {
   const { logPath } = paths(dir);
-  const event = withEventsLock(logPath, () => {
+  return withEventsLockAndRefresh(dir, logPath, () => {
     const before = rebuildView(logPath);
     if (!before.tools?.[name]) {
       throw new StoreError('validation', `tool "${name}" not found.`);
     }
     return appendEventLocked(logPath, { type: 'tool.remove', payload: { name } });
   });
-  const view = refreshView(dir);
-  return { event, view };
 }
 
 /** Read-only: the current view, rebuilt fresh from the log (never off a stale file). */

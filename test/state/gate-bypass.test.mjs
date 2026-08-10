@@ -213,6 +213,19 @@ test('canAutoApprove: no hard-gate keyword + everything else clear at level heav
   assert.equal(canAutoApprove(item, CLEAR_ARTIFACT, 'heavy'), true);
 });
 
+// tsk-1gj: real false positives the scan report found live in the backlog
+// (finding 11) -- "auth"/"audit" as substrings of unrelated words must
+// never trip the hard-gate floor.
+test('canAutoApprove: "auth" inside "authoring" is not a hard-gate hit (tsk-1gj)', () => {
+  const item = { title: 'Verify authoring during fgos-exploring', description: 'docs-only change', tier: 'light' };
+  assert.equal(canAutoApprove(item, CLEAR_ARTIFACT, 'heavy'), true);
+});
+
+test('canAutoApprove: "audit" inside "audited" is not a hard-gate hit (tsk-1gj)', () => {
+  const item = { title: 'Already done', description: 'already audited every other remaining caller', tier: 'light' };
+  assert.equal(canAutoApprove(item, CLEAR_ARTIFACT, 'heavy'), true);
+});
+
 // ─── canAutoApproveValidate (D6, docs/history/gate-bypass/CONTEXT.md) ─────
 // Same shape as canAutoApprove above, but the third axis is fgos-validating's
 // own reality-gate verdict instead of an artifact completeness scan.
@@ -257,5 +270,15 @@ test('canAutoApproveValidate: D4 floor — hard-gate keyword in description bloc
 
 test('canAutoApproveValidate: no hard-gate keyword + verdict READY + tier covered at level heavy -> true', () => {
   const item = { title: 'Rename a helper function', description: 'pure refactor, no behavior change', tier: 'heavy' };
+  assert.equal(canAutoApproveValidate(item, 'READY', 'heavy'), true);
+});
+
+test('canAutoApproveValidate: "auth" inside "authoring" is not a hard-gate hit (tsk-1gj)', () => {
+  const item = { title: 'Verify authoring during fgos-exploring', description: 'docs-only change', tier: 'light' };
+  assert.equal(canAutoApproveValidate(item, 'READY', 'heavy'), true);
+});
+
+test('canAutoApproveValidate: "audit" inside "audited" is not a hard-gate hit (tsk-1gj)', () => {
+  const item = { title: 'Already done', description: 'already audited every other remaining caller', tier: 'light' };
   assert.equal(canAutoApproveValidate(item, 'READY', 'heavy'), true);
 });

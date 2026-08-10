@@ -32,7 +32,7 @@ import { generateEnduserDocsIndex } from '../src/report/enduser-index-generate.m
 import { rankCandidates } from '../src/evolve/candidates.mjs';
 import { rankImpact } from '../src/state/impact.mjs';
 import { isResolvedStatus } from '../src/state/frontier.mjs';
-import { mergeReadiness } from '../src/state/graph-harness.mjs';
+import { mergeReadiness, mergeTree } from '../src/state/graph-harness.mjs';
 import { paginate } from '../src/state/cursor.mjs';
 import { runGoalCheck } from '../src/runner/goal-check.mjs';
 import { frozenJudgeHits, footprintDiffHits, normalizePath } from '../src/runner/frozen-judge.mjs';
@@ -1977,7 +1977,12 @@ async function runVerb(verb, flags, positional, dir) {
       const mergeView = listWork(dir);
       const drift = driftStatus(process.cwd(), mergeView);
       if (sub === 'list') {
-        return mergeReadiness(mergeView, { drift });
+        // tsk-2x9k D1/D4: mergeReadiness's own return shape stays
+        // untouched (4 existing tests do an exact deepEqual against it) --
+        // `tree` is composed here, one layer up, never spread into that
+        // object directly.
+        const readiness = mergeReadiness(mergeView, { drift });
+        return { ...readiness, tree: mergeTree(mergeView, readiness, { drift }) };
       }
       if (sub === 'next') {
         // Picks the single top-ranked ready item and merges it by recursing

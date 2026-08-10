@@ -149,6 +149,15 @@ const TRANSITIONS = Object.freeze([
   Object.freeze({ from: 'blocked', to: 'wontfix' }),
   Object.freeze({ from: 'todo', to: 'wontfix' }),
   Object.freeze({ from: 'doing', to: 'wontfix' }),
+  // tsk-2ub: a fourth door -- awaiting-human is a park-for-question state
+  // with no committed work either way, the same shape D3 already covered
+  // for todo/doing. Without this edge, closing a question that became
+  // moot required fabricating an `answer` just to reach todo first, an
+  // intentionally-wrong permanent log entry. delivered/retrospective/
+  // cleanup/done are deliberately NOT given this door: those are
+  // past-completion states where the work already happened, which
+  // `wontfix` ("valid, never going to be done") does not fit.
+  Object.freeze({ from: 'awaiting-human', to: 'wontfix' }),
 ]);
 
 /**
@@ -211,9 +220,15 @@ export function transitionWork({ work, to, expectedStatus, reason, ask, answer }
   const from = work.status;
   const allowed = TRANSITIONS.some((edge) => edge.from === from && edge.to === to);
   if (!allowed) {
+    // tsk-2ub: name a remedy, mirroring cursor.mjs's own error-states-a-
+    // remedy pattern, instead of only naming the illegal edge.
+    const validTargets = TRANSITIONS.filter((edge) => edge.from === from).map((edge) => edge.to);
+    const remedy = validTargets.length > 0
+      ? ` -- valid targets from "${from}" are: ${validTargets.join(', ')}`
+      : ` -- "${from}" is a terminal status with no outgoing transitions`;
     throw new FsmError(
       'precondition',
-      `transitionWork: no transition from "${from}" to "${to}" for work "${work.id}".`,
+      `transitionWork: no transition from "${from}" to "${to}" for work "${work.id}".${remedy}`,
     );
   }
 

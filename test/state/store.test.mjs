@@ -38,7 +38,14 @@ function tmpDir() {
 // (in-process concurrency can never expose this: one event loop serializes
 // calls for free). Each child reports its outcome over the fork IPC channel
 // before exiting.
-async function raceAcrossProcesses(dir, storeCall, nProcesses) {
+//
+// `extraArgvPerChild` (tsk-1q5, optional, backward-compatible — both
+// pre-existing call sites below pass none): an array of length `nProcesses`,
+// one value per child, available inside `storeCall` as `process.argv[4]` —
+// lets a race test give each child a DISTINCT id to mutate (e.g. testing the
+// state.json refreshView race, which needs concurrent writers on different
+// ids, not a CAS/exists conflict on the same one).
+async function raceAcrossProcesses(dir, storeCall, nProcesses, extraArgvPerChild = null) {
   const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-store-race-'));
   const childScript = `
 import { addWork, editWork, moveWork, moveStage, StoreError, FsmError } from ${JSON.stringify(STORE_MJS)};
@@ -58,9 +65,10 @@ try {
 
   const startAt = Date.now() + 300;
   const results = await Promise.all(
-    Array.from({ length: nProcesses }, () =>
+    Array.from({ length: nProcesses }, (_, i) =>
       new Promise((resolve, reject) => {
-        const child = fork(childPath, [dir, String(startAt)], { stdio: 'inherit' });
+        const extraArgv = extraArgvPerChild ? [String(extraArgvPerChild[i])] : [];
+        const child = fork(childPath, [dir, String(startAt), ...extraArgv], { stdio: 'inherit' });
         let message = null;
         child.on('message', (msg) => {
           message = msg;
@@ -617,6 +625,49 @@ test('moveWork under concurrent OS processes racing the SAME expectedStatus CAS 
     (e) => e.type === 'work.move' && e.payload?.id === 'race-move' && e.payload?.to === 'delivered',
   );
   assert.equal(moveToDeliveredEvents.length, 1, 'the log must carry exactly one doing->delivered work.move event for the raced id');
+});
+
+// Cross-process regression (tsk-1q5): before this fix, every mutation's
+// refreshView(dir) call ran AFTER releasing withEventsLock, in its own
+// separate, unlocked critical section. Two processes racing DIFFERENT ids
+// (so neither hits the addWork/moveWork CAS races proven fixed above) could
+// still interleave their unlocked rebuild-and-overwrite-state.json calls:
+// whichever process's whole-file write landed last won, even if its own log
+// read was captured before the other process's append — silently
+// overwriting a fresher state.json with a staler one missing that other
+// mutation. refreshView now runs INSIDE the same held events.lock as the
+// append (withEventsLockAndRefresh), closing that window structurally.
+test('concurrent editWork calls on DIFFERENT ids never lose a write to state.json (tsk-1q5)', async () => {
+  const dir = tmpDir();
+  const N_PROC = 16;
+  const N_EDITS = 30; // per process — volume, same technique events.test.mjs's own append-race test uses (D2: back-to-back, no delay, to maximize scheduler-preemption overlap between processes' unlocked refreshView calls). Kept well under the 2s events.lock timeout (events.mjs EVENTS_LOCK_TIMEOUT_MS) — a higher N_PROC*N_EDITS was tried and caused genuine lock-timeout contention unrelated to the refreshView race this test targets, not a more reliable reproduction of it.
+  for (let i = 0; i < N_PROC; i += 1) {
+    addSampleWork(dir, `race-view-${i}`);
+  }
+
+  const results = await raceAcrossProcesses(
+    dir,
+    `const id = process.argv[4];
+for (let i = 0; i < ${N_EDITS}; i += 1) {
+  editWork(dir, { id, patch: { priority: i } });
+}`,
+    N_PROC,
+    Array.from({ length: N_PROC }, (_, i) => `race-view-${i}`),
+  );
+
+  assert.deepEqual(results, Array(N_PROC).fill({ ok: true }), 'every concurrent editWork loop on a distinct id must succeed (no CAS conflict expected across different ids)');
+
+  // The persisted state.json (what every reader actually sees) must equal a
+  // fresh rebuild of the now-complete log. Before the fix, a lost refreshView
+  // race would leave one or more ids' persisted `priority` behind its own
+  // process's LAST edit (i.e. not N_EDITS - 1), even though the log itself has
+  // every event.
+  const persisted = JSON.parse(fs.readFileSync(path.join(dir, 'state.json'), 'utf8'));
+  const fresh = listWork(dir);
+  for (let i = 0; i < N_PROC; i += 1) {
+    assert.equal(persisted.work[`race-view-${i}`].priority, N_EDITS - 1, `race-view-${i} must show its own process's LAST edit (priority ${N_EDITS - 1}) in the persisted state.json, not silently lost to a losing refreshView race`);
+  }
+  assert.deepEqual(persisted.work, fresh.work, 'persisted state.json must match a fresh rebuild of the log — any mismatch means a concurrent refreshView race overwrote a fresher view with a staler one');
 });
 
 // --- str73-done-flip-cos-check cell 2: per-clause CoS done-gate ------------

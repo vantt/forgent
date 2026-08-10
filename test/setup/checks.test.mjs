@@ -14,7 +14,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { DOCTOR_CHECKS, FIX_REGISTRATIONS, integrationScriptPath, mainCheckoutHookWired, resolveMainCheckout } from '../../src/setup/checks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
 import { DEFAULT_LEVEL } from '../../src/state/gate-bypass.mjs';
-import { DEFAULT_CLEANUP_TTL_DAYS, DEFAULT_CLEANUP_LEAF_TTL_DAYS } from '../../src/setup/registrations.mjs';
+import { DEFAULT_CLEANUP_TTL_DAYS, DEFAULT_CLEANUP_LEAF_TTL_DAYS, DEFAULT_HERDR_ORCHESTRATOR_SETTINGS } from '../../src/setup/registrations.mjs';
 import { initStore, addWork } from '../../src/state/store.mjs';
 import { appendEvent } from '../../src/state/events.mjs';
 
@@ -49,7 +49,7 @@ function fixById(id) {
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, changelog-unreleased-stale, work-classification-vocabulary, and enduser-docs-index-stale', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, changelog-unreleased-stale, herdr-launcher-configured, work-classification-vocabulary, and enduser-docs-index-stale', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     [
@@ -65,6 +65,7 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'claude-plugin-marketplace',
       'plugin-skill-cli-reachable',
       'changelog-unreleased-stale',
+      'herdr-launcher-configured',
       'work-classification-vocabulary',
       'enduser-docs-index-stale',
     ].sort(),
@@ -484,17 +485,61 @@ test('shell-integration-sourced fails when a detected rc file is missing the sou
   }
 });
 
-test('shell-integration-sourced passes when every detected rc file already has the source line', () => {
+test('shell-integration-sourced passes when every detected rc file already has the source line, and the sourced function actually works', () => {
   const homeDir = mkTemp('doctor-shell-present-');
   const rcFile = path.join(homeDir, '.bashrc');
   fs.writeFileSync(rcFile, `source "${integrationScriptPath()}"\n`);
+  // A disposable fixture with no underscore-prefixed dependency, probed
+  // instead of this repo's own real (possibly still-buggy) script -- see
+  // FGOS_SHELL_INTEGRATION_PROBE_SCRIPT's own doc comment in
+  // registrations.mjs. `hasSourceLine`'s own text check above still reads
+  // the real integrationScriptPath() -- only the real-invocation probe is
+  // redirected, so this test still proves the file-text half of the check
+  // against the real path while proving the invocation half against a
+  // known-good fixture.
+  const safeFixture = path.join(homeDir, 'safe-fgos.sh');
+  fs.writeFileSync(safeFixture, 'fgos() {\n  echo "safe fgos $@"\n}\n');
   const prevHome = process.env.HOME;
+  const prevProbe = process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT;
   process.env.HOME = homeDir;
+  process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT = safeFixture;
   try {
     const { passed } = checkById('shell-integration-sourced').check(process.cwd());
     assert.equal(passed, true);
   } finally {
     process.env.HOME = prevHome;
+    if (prevProbe === undefined) delete process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT;
+    else process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT = prevProbe;
+    fs.rmSync(homeDir, { recursive: true, force: true });
+  }
+});
+
+test('shell-integration-sourced fails when the source line is present but the sourced function itself is dead (tsk-2wpi: a text-present source line is not proof the command works)', () => {
+  const homeDir = mkTemp('doctor-shell-broken-fn-');
+  const rcFile = path.join(homeDir, '.bashrc');
+  fs.writeFileSync(rcFile, `source "${integrationScriptPath()}"\n`);
+  // Mirrors the real pre-fix scripts/fgos-shell-integration.sh shape: a
+  // public function whose second line calls a private, underscore-prefixed
+  // helper -- exactly the dependency a harness shell-function snapshot can
+  // drop.
+  const fragileFixture = path.join(homeDir, 'fragile-fgos.sh');
+  fs.writeFileSync(
+    fragileFixture,
+    '_fgos_helper() {\n  echo resolved\n}\n\nfgos() {\n  _fgos_helper >/dev/null || return 1\n  echo "fgos $@"\n}\n',
+  );
+  const prevHome = process.env.HOME;
+  const prevProbe = process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT;
+  process.env.HOME = homeDir;
+  process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT = fragileFixture;
+  try {
+    const { passed, message } = checkById('shell-integration-sourced').check(process.cwd());
+    assert.equal(passed, false);
+    assert.match(message, /fgos --help.*fails/);
+    assert.match(message, /_fgos_helper/);
+  } finally {
+    process.env.HOME = prevHome;
+    if (prevProbe === undefined) delete process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT;
+    else process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT = prevProbe;
     fs.rmSync(homeDir, { recursive: true, force: true });
   }
 });
@@ -516,6 +561,7 @@ test('config-not-stale passes when the existing config already has every default
       runner: DEFAULT_RUNNER_CONFIG,
       gateBypass: { level: 'off' },
       cleanup: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS, leafTtlDays: DEFAULT_CLEANUP_LEAF_TTL_DAYS },
+      herdrOrchestrator: DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
     }),
   );
   const { passed } = checkById('config-not-stale').check(cwd);
@@ -649,6 +695,47 @@ test('fgos doctor --fix --pretty (CLI e2e) renders a fix line green even when th
   assert.match(fixLine, /already "/, 'expected the second run to be the already-correct no-op case');
   assert.ok(fixLine.includes('\x1b[32m'), `expected a green mark on an already-correct fix line, got: ${fixLine}`);
   assert.ok(!fixLine.includes('\x1b[31m'), `expected no red mark on an already-correct fix line, got: ${fixLine}`);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+// ─── herdr-launcher-configured (tsk-2m5, docs/history/
+// stage-status-driving-coordination/): the herdr-launcher's own
+// auto-launch toggles. Check-only, no fix (YAGNI -- see registrations.mjs's
+// own comment on this) -- `config-not-stale` already catches the whole
+// section being MISSING; this check adds the one thing that generic
+// staleness scan cannot: a PRESENT but non-boolean toggle value.
+
+test('herdr-launcher-configured check fails when the shared file has no herdrOrchestrator key at all', () => {
+  const cwd = mkTemp('doctor-herdr-launcher-absent-');
+  const { passed, message } = checkById('herdr-launcher-configured').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /missing/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('herdr-launcher-configured check fails when a toggle is present but not a boolean', () => {
+  const cwd = mkTemp('doctor-herdr-launcher-bad-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(
+    path.join(cwd, '.fgos', 'config.json'),
+    JSON.stringify({ herdrOrchestrator: { autoDiscover: 'yes', autoMerge: false, autoRetro: false, autoCleanup: false } }),
+  );
+  const { passed, message } = checkById('herdr-launcher-configured').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /autoDiscover/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('herdr-launcher-configured check passes when every toggle is a boolean', () => {
+  const cwd = mkTemp('doctor-herdr-launcher-ok-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(
+    path.join(cwd, '.fgos', 'config.json'),
+    JSON.stringify({ herdrOrchestrator: { autoDiscover: true, autoMerge: false, autoRetro: false, autoCleanup: false } }),
+  );
+  const { passed, message } = checkById('herdr-launcher-configured').check(cwd);
+  assert.equal(passed, true);
+  assert.match(message, /autoDiscover=true/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
@@ -1065,13 +1152,23 @@ test('shell-integration-sourced counts dead lines per rc file across both bash a
 test('shell-integration-sourced still passes when every rc file has only the live line', () => {
   const homeDir = mkTemp('doctor-shell-clean-');
   fs.writeFileSync(path.join(homeDir, '.bashrc'), `source "${integrationScriptPath()}"\n`);
+  // See FGOS_SHELL_INTEGRATION_PROBE_SCRIPT's doc comment (registrations.mjs)
+  // and the earlier "...and the sourced function actually works" test for
+  // why this points the real-invocation probe at a known-good fixture
+  // rather than this repo's own real script.
+  const safeFixture = path.join(homeDir, 'safe-fgos.sh');
+  fs.writeFileSync(safeFixture, 'fgos() {\n  echo "safe fgos $@"\n}\n');
   const prevHome = process.env.HOME;
+  const prevProbe = process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT;
   process.env.HOME = homeDir;
+  process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT = safeFixture;
   try {
     const { passed } = checkById('shell-integration-sourced').check(process.cwd());
     assert.equal(passed, true);
   } finally {
     process.env.HOME = prevHome;
+    if (prevProbe === undefined) delete process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT;
+    else process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT = prevProbe;
     fs.rmSync(homeDir, { recursive: true, force: true });
   }
 });

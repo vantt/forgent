@@ -1,6 +1,7 @@
 # gate-bypass — plan
 
-Item: `tsk-6bx`. Decisions: `docs/history/gate-bypass/CONTEXT.md` (D1-D5).
+Item: `tsk-6bx` (Pieces 1-2, D1-D5), extended by `tsk-1ds` (Piece 3, D6) and
+`tsk-1vi` (Piece 4, D7-D8). Decisions: `docs/history/gate-bypass/CONTEXT.md`.
 
 ## Mode (mechanical count)
 
@@ -248,6 +249,188 @@ predates noticing the mirror file also needs the edit.
   floor holds through the new axis, the single most important case here).
 - Gate-bypass level `off` + verdict `READY` → still asks (same "off
   approves nothing" floor `isTierCovered` already gives every other gate).
+
+## Piece 4 — local-first, fallback-to-root import (D7/D8, `tsk-1vi`)
+
+Item: `tsk-1vi`. Decisions: `docs/history/gate-bypass/CONTEXT.md` D7/D8,
+first discussed in `docs/history/gate-bypass/DISCUSSION.md`. Fixes the
+stale-branch crash Piece 3 (`tsk-1ds`/D6) left latent: `canAutoApproveValidate`
+(and, it turns out, the same cwd-relative import pattern in Pieces 1-2's own
+Gate sections) breaks when a claimed item's `fgw/<id>` worktree branch
+predates a function `gate-bypass.mjs`/`store.mjs` later gained on `main`.
+
+### Mode (mechanical count)
+
+| Flag | Applies? | Why |
+|---|---|---|
+| auth | no | — |
+| authorization | no | — |
+| data model | no | no schema change |
+| audit/security | **yes** | same nature as Pieces 1-3 — touches the code path that decides when a human confirmation step is skipped, even though D7 leaves the decision logic itself (`canAutoApprove`/`canAutoApproveValidate`) byte-for-byte unchanged; a bug in the fallback could in principle cause the wrong axis to be evaluated |
+| external systems | no | — |
+| public contracts | no | internal skill mechanism |
+| cross-platform | no | — |
+| existing covered behavior | **yes** | rewrites the Gate section already shipped in all three of `fgos-exploring`, `fgos-planning`, *and* `fgos-validating` (Pieces 1-3 only ever touched one or two at a time); `test/skills/fgos-mirror.test.mjs` requires each edit land byte-identically in both `.claude/skills/<name>/SKILL.md` and `.agents/skills/<name>/SKILL.md` — 6 files, not 3 |
+| weak proof around the area | **yes** | the fallback control-flow lives entirely in each Gate section's inline `node -e` shell snippet, which has zero existing unit-test coverage today (unlike Piece 3's `canAutoApproveValidate`, which reused an already-tested core); only a static existence/count check is possible from `verify` per `docs/how-to/write-verify-for-a-skill-prose-change.md` — real runtime proof is a smoke-test/event-log concern, not verify's job |
+| multi-domain | no | single `coding` domain |
+
+`audit/security` alone is a hard-gate flag → **mode = high-risk**, same rule
+Pieces 1-3 already applied, independent of the flag count (which is 3 here
+regardless). In practice this piece is small and mechanical — the same
+one-line fallback-retry pattern applied to three near-identical Gate
+sections — but the lane rule stays mechanical, matching this feature's own
+established precedent rather than a size-based exception.
+
+### Approach
+
+Chosen path: one honest piece, not split further. The three Gate sections
+get the identical fallback-retry shape; splitting per-file would separate
+work with no independent value (each file's fix is the same three-line
+pattern, none usable alone as a partial fix — the bug reproduces on any one
+of the three today, so a partial rollout would leave two of three
+skill-embedded gates still exception-prone).
+
+`fgos graph --what-if tsk-1vi --json` was not run: `tsk-1vi` has no `deps`
+and no candidate sibling split, so there is no ordering choice for that
+command to inform (same reasoning Piece 3 already gave for `tsk-1ds`).
+
+Impact-analysis posture (`CLAUDE.md`'s capability gate): **degraded** —
+`fgos tool query --capability impact-analysis --status present` returned
+GitNexus `present`, but the tool's own PostToolUse hook flagged the index
+as stale (`last indexed: 4ce7a96`, 208 commits behind current `HEAD`).
+Named plainly per `CLAUDE.md`'s gate rather than trusted at face value.
+Cross-checked manually instead (`rg`/`grep` over the three `SKILL.md`
+files and `src/state/gate-bypass.mjs`/`store.mjs`): no other caller of
+these Gate sections' `node -e` import pattern exists elsewhere in the
+repo, and — same as Piece 3's own reasoning — this piece is purely
+additive to the Gate sections' shell snippets and touches no exported
+symbol in `gate-bypass.mjs`/`store.mjs` itself (D7 explicitly leaves both
+files unedited), so there is no existing symbol being *edited* for impact
+analysis to bound the blast radius of regardless of index freshness.
+
+### Risk map
+
+| Component | How risky | What would prove it |
+|---|---|---|
+| Local-first-fallback retry logic in each Gate section's `node -e` script | **medium** | proven empirically by `fgos-validating` (see Feasibility matrix below), reproducible: `node -e` from inside a fixture worktree whose local `gate-bypass.mjs` is missing the export correctly falls back to `$root`'s copy instead of throwing |
+| Self-referential case preserved (an item editing `gate-bypass.mjs` itself still sees its own branch's new export first) | **medium** | proven empirically, same run: `node -e` from inside a fixture worktree whose local `gate-bypass.mjs` carries its *own, different* export correctly uses the local one over `$root`'s — this is the one behavior D7 exists specifically to protect |
+| Implementation must stay inline `node -e`, never a separate `.mjs` file | **medium** | proven empirically: the identical fallback logic, run as a separate file instead of a `node -e` string, silently resolves `'./src/state/...'` against the file's own location instead of `process.cwd()` — breaks the self-referential case with no error, while the stale-branch case still "passes" by coincidence. Documented above in Shape as a hard constraint for whoever implements this. |
+| `test/skills/fgos-mirror.test.mjs` byte-identity across all three skills' `.claude/`/`.agents/` copies | low | already-existing, currently-green test; `npm test` (the item's own verify) already runs it — no new proof needed, just don't forget the mirror edit |
+| `src/state/gate-bypass.mjs`/`store.mjs` themselves stay untouched (D7's explicit constraint) | low | verify's NEGATIVE clause: `! git diff --name-only main...HEAD \| grep -qE '^src/state/(gate-bypass\|store)\.mjs$'` |
+
+The three medium entries (fallback-retry correctness, self-referential
+preservation, inline-`node -e` constraint) are the real proof points this
+feature's own precedent (Pieces 1-3) called for at `fgos-validating` — all
+three were exercised empirically during this validating pass itself
+(command run, real output captured) rather than left as "should work",
+since the risk lives in shell-snippet prose that has no unit-test surface
+of its own, unlike `gate-bypass.mjs`'s existing `canAutoApprove`/
+`canAutoApproveValidate` (already covered by `test/state/
+gate-bypass.test.mjs`).
+
+### Shape
+
+What: in each of `fgos-exploring`'s, `fgos-planning`'s, and
+`fgos-validating`'s `## Gate` sections, change the `node -e` script's single
+`import('./src/state/...')` calls into a local-first, fallback-to-`$root`
+sequence — try the existing cwd-relative import first; if the needed named
+export is `undefined` or the import throws, retry the same import from
+`` `${root}/src/state/...` `` (the `root` shell variable each Gate section
+already resolves earlier via `git rev-parse --path-format=absolute
+--git-common-dir`) before falling through to the existing `false`. Exact JS
+structure (try/catch around a second `import()` vs. a pre-check on the
+destructured export) is left to whoever implements this piece — `CONTEXT.md`
+D7 deliberately did not pin one. Recommended, not required: add the
+explanatory "this worktree's own branch already carries whatever version it
+needs [...falls back to \$root when it doesn't]" line to `fgos-validating`'s
+Gate section too, matching `fgos-exploring`'s/`fgos-planning`'s own Gate
+sections — currently the one of the three missing that context for a future
+reader.
+
+**Hard implementation constraint, found empirically during `fgos-validating`'s
+reality-gate pass (not a guess):** the fallback logic must stay inline as
+the `node -e "..."` argument's own string content — never extracted into a
+separate `.mjs` script file invoked as `node script.mjs`, even one that
+looks byte-identical. Node's ESM import resolution treats a relative
+specifier (`'./src/state/gate-bypass.mjs'`) differently depending on how
+the code runs: inside a `node -e` eval string it resolves against
+`process.cwd()` (the worktree, when the script is invoked from inside one)
+— this is the mechanism the whole feature already depends on. Inside a
+`.mjs` file loaded via `node <path>`, the identical specifier instead
+resolves against *that file's own location on disk*, never the process's
+cwd. Reproduced directly (`/tmp/.../tsk-1vi-proof/probe.mjs`, same
+resolve-local-else-fallback logic verbatim, run against a worktree fixture
+carrying its own new `canAutoApproveValidate`): as `node -e` from inside
+the worktree, local correctly wins (`{"source":"local","result":
+"worktree-IN-PROGRESS-canAutoApproveValidate"}`); as a separate `.mjs`
+file invoked the same way, it silently resolves to `$root` instead
+(`{"source":"root", ...}`) — the self-referential case breaks with no
+error, no crash, nothing to notice in review, because the stale-branch
+case (Case A) still "passes" by coincidence either way. Whoever implements
+this piece must keep the fallback logic as the literal string handed to
+`node -e`, not refactor it into a shared helper file for readability.
+
+Files touched: `.claude/skills/fgos-exploring/SKILL.md`,
+`.claude/skills/fgos-planning/SKILL.md`,
+`.claude/skills/fgos-validating/SKILL.md`, and their byte-identical
+`.agents/skills/<name>/SKILL.md` mirrors (`test/skills/fgos-mirror.test.mjs`'s
+existing requirement) — 6 files. Plus `docs/reference/gate-bypass-config.md`
+(found during `fgos-validating`'s reality-gate pass, missed in this piece's
+first draft): its "Gate-step wiring" section quotes the exact same `node -e`
+snippet and states in prose "The `gate-bypass.mjs`/`store.mjs` code imports
+stay cwd-relative — the worktree's own branch already carries whatever
+version it needs" — a factual claim about current behavior that D7 makes
+false. Update the quoted snippet and that sentence to describe the
+local-first-fallback-to-`$root` behavior instead, once the exact
+implementation shape is chosen; best-effort documentation accuracy, not
+mechanically enforced by `verify` (this doc is illustrative reference
+material, not a skill-prose path under `.claude/skills/**` per
+`docs/how-to/write-verify-for-a-skill-prose-change.md`'s own scope). No
+changes to `src/state/gate-bypass.mjs` or `src/state/store.mjs` (D7's
+explicit constraint, reused verbatim from `CONTEXT.md`).
+
+Verify (the item's own locked verify, already covers the mirror
+requirement automatically since it runs full `npm test` rather than a
+narrower `node --test` subset — unlike Piece 3's original gap):
+
+```
+npm test && grep -q "src/state/gate-bypass.mjs" .claude/skills/fgos-exploring/SKILL.md && grep -q "src/state/gate-bypass.mjs" .claude/skills/fgos-planning/SKILL.md && grep -q "src/state/gate-bypass.mjs" .claude/skills/fgos-validating/SKILL.md && [ "$(grep -o "gate-bypass.mjs" .claude/skills/fgos-exploring/SKILL.md | wc -l)" -gt 3 ] && [ "$(grep -o "gate-bypass.mjs" .claude/skills/fgos-planning/SKILL.md | wc -l)" -gt 2 ] && [ "$(grep -o "gate-bypass.mjs" .claude/skills/fgos-validating/SKILL.md | wc -l)" -gt 1 ] && ! git diff --name-only main...HEAD | grep -qE "^src/state/(gate-bypass|store)\.mjs$"
+```
+
+Baselines (3/2/1) are today's real `grep -o "gate-bypass.mjs" | wc -l`
+(total substring occurrences, not `grep -c`'s matching-line count) per
+file (measured directly, not assumed). `grep -c` was tried first during
+implementation and found unreliable: the new fallback import call landed
+on the same line as an existing prose mention in `fgos-exploring`'s Gate
+section, so the LINE count didn't increase even though a real second
+occurrence of the module path was added — `grep -o | wc -l` counts the
+actual substring, immune to incidental line-wrapping. A strictly-greater
+count after the change proves a second, distinct import path was added without pinning
+the exact JS syntax used to add it.
+
+### Cases worth proving against
+
+- Worktree-local copy has the needed export → uses it, unchanged from
+  today's behavior (covers both an unrelated item on a fresh-enough branch,
+  and an item that is itself modifying `gate-bypass.mjs` and needs its own
+  in-progress code — the case D7 exists to protect).
+- Worktree-local copy is missing the export (`tsk-5lr`'s reproduction) →
+  falls back to `$root`'s current code, check runs correctly instead of
+  throwing.
+- Worktree-local import throws for a reason *other than* a missing export
+  (e.g. a syntax error mid-edit) → still falls back to `$root`, same as the
+  missing-export case — the fallback trigger is "didn't get a usable
+  function back," not narrowly "export was `undefined`."
+- Both local and `$root` imports fail (global-install shape, `tsk-65q`'s
+  scope, not reproducible in this repo's own dev-checkout context) → falls
+  through to the existing `false`, unchanged from today — not a regression,
+  not fixed by this piece either.
+- `src/state/gate-bypass.mjs`/`store.mjs` diffs stay empty on `main...HEAD`
+  — D7's explicit "add-only via a second import call, not a rewrite of the
+  functions themselves" constraint holds.
+- `docs/reference/gate-bypass-config.md`'s "Gate-step wiring" section no
+  longer asserts the cwd-relative import is unconditional — updated to
+  describe the fallback, manual read-through (no automated check).
 
 ## Outstanding questions
 

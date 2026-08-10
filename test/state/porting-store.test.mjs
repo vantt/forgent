@@ -3,13 +3,72 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fork } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { initStore, addPorting, movePorting, listPorting, rebuild } from '../../src/state/porting-store.mjs';
 import { PortingError } from '../../src/state/porting.mjs';
 import { appendEvent } from '../../src/state/events.mjs';
 
+const PORTING_STORE_MJS = path.resolve(fileURLToPath(import.meta.url), '../../../src/state/porting-store.mjs');
+
 // Every test gets its own mkdtemp dir — never touch the repo's .fgos/.
 function tmpDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-porting-store-'));
+}
+
+function readRawPortingEvents(dir) {
+  const logPath = path.join(dir, 'porting', 'events.jsonl');
+  return fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean).map((line) => JSON.parse(line));
+}
+
+// Spawns N real child OS processes that all call `storeCall` (a snippet of
+// source referencing `dir`) at a synchronized start instant, so their
+// read-check-append windows genuinely overlap — mirrors test/state/
+// store.test.mjs's own raceAcrossProcesses technique (tsk-1jp): in-process
+// concurrency can never expose this class of bug, since one event loop
+// serializes calls for free.
+// `extraArgvPerChild` (tsk-1q5, optional, backward-compatible — both
+// pre-existing call sites below pass none): mirrors store.test.mjs's own
+// raceAcrossProcesses extension — one value per child, available inside
+// `storeCall` as `process.argv[4]`, so a race test can give each child a
+// DISTINCT id instead of racing the same one.
+async function raceAcrossProcesses(dir, storeCall, nProcesses, extraArgvPerChild = null) {
+  const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-porting-store-race-'));
+  const childScript = `
+import { addPorting, movePorting } from ${JSON.stringify(PORTING_STORE_MJS)};
+const dir = process.argv[2];
+const startAt = Number(process.argv[3]);
+const waitMs = startAt - Date.now();
+if (waitMs > 0) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, waitMs);
+try {
+  ${storeCall}
+  process.send({ ok: true });
+} catch (err) {
+  process.send({ ok: false, category: err.category, message: err.message });
+}
+`;
+  const childPath = path.join(workDir, 'race-child.mjs');
+  fs.writeFileSync(childPath, childScript);
+
+  const startAt = Date.now() + 300;
+  const results = await Promise.all(
+    Array.from({ length: nProcesses }, (_, i) =>
+      new Promise((resolve, reject) => {
+        const extraArgv = extraArgvPerChild ? [String(extraArgvPerChild[i])] : [];
+        const child = fork(childPath, [dir, String(startAt), ...extraArgv], { stdio: 'inherit' });
+        let message = null;
+        child.on('message', (msg) => {
+          message = msg;
+        });
+        child.on('exit', (code) => {
+          if (!message) return reject(new Error(`child exited (code ${code}) without reporting an outcome`));
+          resolve(message);
+        });
+      }),
+    ),
+  );
+  fs.rmSync(workDir, { recursive: true, force: true });
+  return results;
 }
 
 test('initStore creates <dir>/porting/events.jsonl and state.json, never touching <dir>\'s own root', () => {
@@ -126,4 +185,98 @@ test('porting-store never reads or writes the existing .fgos-shaped root events.
     'the root-level work-item log must be left byte-for-byte untouched',
   );
   assert.ok(!fs.existsSync(path.join(dir, 'state.json')), 'porting-store must never write a root-level state.json');
+});
+
+test('addPorting under concurrent OS processes racing the SAME id: exactly one succeeds, the rest see "already exists", and the log has exactly one porting.add (tsk-1jp)', async () => {
+  const dir = tmpDir();
+  initStore(dir);
+
+  const N = 8;
+  const results = await raceAcrossProcesses(
+    dir,
+    `addPorting(dir, { id: 'race-add', title: 'Race Add' });`,
+    N,
+  );
+
+  const succeeded = results.filter((r) => r.ok);
+  const failed = results.filter((r) => !r.ok);
+  assert.equal(succeeded.length, 1, `exactly one of ${N} concurrent addPorting calls must win the race`);
+  assert.equal(failed.length, N - 1, 'every other concurrent addPorting call must fail its precondition');
+  for (const f of failed) {
+    assert.equal(f.category, 'validation', 'a losing racer must fail as validation (already exists), not crash or hang');
+  }
+
+  const addEvents = readRawPortingEvents(dir).filter((e) => e.type === 'porting.add' && e.payload?.id === 'race-add');
+  assert.equal(addEvents.length, 1, 'the log must carry exactly one porting.add event for the raced id, never two conflicting ones');
+});
+
+test('movePorting under concurrent OS processes racing the SAME expectedStatus CAS on the SAME id: exactly one succeeds, the rest conflict, and the log has exactly one matching porting.move (tsk-1jp)', async () => {
+  const dir = tmpDir();
+  initStore(dir);
+  addPorting(dir, { id: 'race-move' });
+  movePorting(dir, { id: 'race-move', to: 'planned', expectedStatus: 'candidate' });
+  movePorting(dir, { id: 'race-move', to: 'in-progress', expectedStatus: 'planned' });
+
+  const N = 8;
+  const results = await raceAcrossProcesses(
+    dir,
+    `movePorting(dir, { id: 'race-move', to: 'ported', expectedStatus: 'in-progress' });`,
+    N,
+  );
+
+  const succeeded = results.filter((r) => r.ok);
+  const failed = results.filter((r) => !r.ok);
+  assert.equal(succeeded.length, 1, `exactly one of ${N} concurrent movePorting CAS calls must win the race`);
+  assert.equal(failed.length, N - 1, 'every other concurrent movePorting CAS call must conflict');
+  for (const f of failed) {
+    assert.equal(f.category, 'conflict', 'a losing racer must fail as conflict (stale CAS), not crash or hang');
+  }
+
+  const moveEvents = readRawPortingEvents(dir).filter(
+    (e) => e.type === 'porting.move' && e.payload?.id === 'race-move' && e.payload?.to === 'ported',
+  );
+  assert.equal(moveEvents.length, 1, 'the log must carry exactly one matching porting.move event, never two');
+});
+
+// Cross-process regression (tsk-1q5, same fix as store.test.mjs's sibling
+// test): before this fix, refreshView(dir) ran AFTER releasing
+// withEventsLock, in its own unlocked critical section. Two processes
+// racing DIFFERENT ids could interleave their unlocked rebuild-and-
+// overwrite-state.json calls, letting the process with the staler log read
+// finish (and win) last — silently overwriting a fresher state.json with
+// one missing that other mutation.
+test('concurrent movePorting calls on DIFFERENT ids never lose a write to state.json (tsk-1q5)', async () => {
+  const dir = tmpDir();
+  initStore(dir);
+  const N_PROC = 16;
+  const IDS_PER_PROC = 15; // volume per process — same technique as store.test.mjs's sibling test (many refreshView calls per process, back-to-back, no delay, to maximize scheduler-preemption overlap between processes' unlocked writes)
+  const idLists = Array.from({ length: N_PROC }, (_, p) =>
+    Array.from({ length: IDS_PER_PROC }, (_, j) => `race-view-${p}-${j}`),
+  );
+  for (const ids of idLists) {
+    for (const id of ids) {
+      addPorting(dir, { id });
+    }
+  }
+
+  const results = await raceAcrossProcesses(
+    dir,
+    `const ids = process.argv[4].split(',');
+for (const id of ids) {
+  movePorting(dir, { id, to: 'planned', expectedStatus: 'candidate' });
+}`,
+    N_PROC,
+    idLists.map((ids) => ids.join(',')),
+  );
+
+  assert.deepEqual(results, Array(N_PROC).fill({ ok: true }), 'every concurrent movePorting loop on distinct ids must succeed (no CAS conflict expected across different ids)');
+
+  const persisted = JSON.parse(fs.readFileSync(path.join(dir, 'porting', 'state.json'), 'utf8'));
+  const fresh = listPorting(dir);
+  for (const ids of idLists) {
+    for (const id of ids) {
+      assert.equal(persisted.porting[id].status, 'planned', `${id} must show status "planned" in the persisted state.json, not silently lost to a losing refreshView race`);
+    }
+  }
+  assert.deepEqual(persisted.porting, fresh.porting, 'persisted state.json must match a fresh rebuild of the log — any mismatch means a concurrent refreshView race overwrote a fresher view with a staler one');
 });

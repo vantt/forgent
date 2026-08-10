@@ -719,22 +719,34 @@ export function createClaimWorktree(repoRoot, id, opts = {}) {
  * try/finally both call sites used to write out by hand.
  */
 /**
- * The checkout `withMergeEphemeralWorktree` uses for `branch` — detached at
- * `branch`'s current tip COMMIT, never the branch ref itself. Git only
- * refuses a second checkout of the same BRANCH; a detached checkout of the
- * same commit is unrestricted, so this never inspects, moves, or removes
- * any existing checkout of `branch` — including one a person is
- * deliberately keeping open (`ExitWorktree` "keep"), clean or dirty, live
- * session or not (docs/history/merge-worktree-reclaim-clobbers-kept-
- * checkout/CONTEXT.md D1). This sidesteps the conflict entirely rather than
- * detecting and refusing it — `createWorktree`'s own reuse/relocate path
- * above stays exactly as-is for its other callers (`pick`/`take`
- * reclaiming a session's own abandoned checkout, a genuinely different,
- * intentional use case CONTEXT.md D1 explicitly leaves untouched).
+ * The checkout `withMergeEphemeralWorktree` uses for `id`'s branch —
+ * detached at the branch's current tip COMMIT, never the branch ref
+ * itself. Git only refuses a second checkout of the same BRANCH; a
+ * detached checkout of the same commit is unrestricted, so this never
+ * inspects, moves, or removes any existing checkout of the branch —
+ * including one a person is deliberately keeping open (`ExitWorktree`
+ * "keep"), clean or dirty, live session or not (docs/history/
+ * merge-worktree-reclaim-clobbers-kept-checkout/CONTEXT.md D1). This
+ * sidesteps the conflict entirely rather than detecting and refusing it —
+ * `createWorktree`'s own reuse/relocate path above stays exactly as-is
+ * for its other callers (`pick`/`take` reclaiming a session's own
+ * abandoned checkout, a genuinely different, intentional use case
+ * CONTEXT.md D1 explicitly leaves untouched).
+ *
+ * `fgw/<id>` is normally created EARLY as a ref only, via `createBranchRef`
+ * (D17, `loop.mjs`'s own leaf-dispatch call) — but a root only ever driven
+ * by a live session (never through the runner's own dispatch loop) never
+ * gets that early call, so the branch can genuinely not exist yet the
+ * first time a merge needs it (docs/history/
+ * tsk-6ch-merge-worktree-branch-fallback/CONTEXT.md). Falling back to
+ * `createBranchRef` here — idempotent, same `baseRef: 'main'` `loop.mjs`
+ * already uses for this exact early-creation step — replaces that missing
+ * step instead of crashing the merge outright.
  */
-function createDetachedMergeWorktree(repoRoot, branch) {
+function createDetachedMergeWorktree(repoRoot, id) {
+  const branch = branchNameFor(id);
   if (!branchExists(repoRoot, branch)) {
-    throw new WorktreeError(`cannot create ephemeral merge checkout — branch "${branch}" does not exist.`, { branch });
+    createBranchRef(repoRoot, id, { baseRef: 'main' });
   }
   const startCommit = git(repoRoot, ['rev-parse', branch]).trim();
   const baseDir = path.join(os.tmpdir(), 'fgos-worktrees');
@@ -763,7 +775,7 @@ function createDetachedMergeWorktree(repoRoot, branch) {
 
 export async function withMergeEphemeralWorktree(repoRoot, id, fn) {
   const branch = branchNameFor(id);
-  const worktree = createDetachedMergeWorktree(repoRoot, branch);
+  const worktree = createDetachedMergeWorktree(repoRoot, id);
   try {
     const result = await fn(worktree);
     // fn committed on top of startCommit (a successful merge) -- land it on

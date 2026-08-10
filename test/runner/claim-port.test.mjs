@@ -6,7 +6,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { claimWork, ClaimError } from '../../src/runner/claim-port.mjs';
 import { LOCK_FILE, DEFAULT_TTL_MS } from '../../src/runner/main-checkout-lock.mjs';
-import { initStore, addWork, moveWork, listWork, FsmError } from '../../src/state/store.mjs';
+import { initStore, addWork, moveWork, listWork, FsmError, readRawEvents } from '../../src/state/store.mjs';
 
 // claim-port.mjs's claimWork shares main-checkout.lock with .githooks/
 // pre-commit (tsk-3w8) — the hook writes a STRING-identity record per commit
@@ -23,6 +23,22 @@ function initTempRepo() {
   execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: repoRoot });
   return repoRoot;
+}
+
+// D4 (docs/history/session-claim-liveness/CONTEXT.md): backdates the
+// COMMITTER date `%ct` (claim-liveness.mjs's `lastActivityAt`) actually
+// reads -- `--date`/GIT_AUTHOR_DATE alone would leave it at "now".
+function commitAt(cwd, filename, contents, epochSeconds) {
+  fs.writeFileSync(path.join(cwd, filename), contents);
+  execFileSync('git', ['add', filename], { cwd });
+  execFileSync('git', ['commit', '-q', '-m', `test: ${filename}`], {
+    cwd,
+    env: {
+      ...process.env,
+      GIT_AUTHOR_DATE: `${epochSeconds} +0000`,
+      GIT_COMMITTER_DATE: `${epochSeconds} +0000`,
+    },
+  });
 }
 
 function setup() {
@@ -262,4 +278,116 @@ test('claimWork reverts a branch-take blocked->doing claim back to blocked when 
 
   const after = listWork(dir).work['item-a'];
   assert.equal(after.status, 'blocked', 'a failed worktree creation on a branch-take must revert back to blocked, not fall through to todo');
+});
+
+// D1-D5 (docs/history/session-claim-liveness/CONTEXT.md): the stale-claim
+// reclaim pre-check. HUMAN_MS below matches STALE_DOING_DEFAULTS.humanMs
+// (graph-metrics.mjs) -- D3 reuses that pair as-is.
+const HUMAN_MS = 24 * 60 * 60 * 1000;
+
+test('claimWork transparently reclaims a conclusively-quiet session doing claim via pick, reattaching to the existing branch (D2/D4/D5)', () => {
+  const { repoRoot, dir } = setup();
+
+  const first = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+  assert.equal(first.source, 'branch');
+
+  const staleSeconds = Math.floor((Date.now() - HUMAN_MS - 1000) / 1000);
+  commitAt(first.worktree.path, 'stale.txt', 'stale', staleSeconds);
+
+  const second = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+  assert.equal(second.to, 'doing');
+  assert.equal(second.source, 'branch');
+  assert.equal(second.branch, 'fgw/item-a', 'must reattach to the existing branch, never fork a new one');
+
+  const releaseEvents = readRawEvents(dir).filter(
+    (e) => e.type === 'work.move' && e.payload?.id === 'item-a' && e.payload?.from === 'doing' && e.payload?.to === 'todo',
+  );
+  assert.equal(releaseEvents.length, 1, 'the release step must land its own doing->todo event');
+
+  const evidenceDecisions = readRawEvents(dir).filter(
+    (e) => e.type === 'decision' && e.payload?.id === 'item-a' && e.payload?.source === 'claimWork' && e.payload?.text?.startsWith('stale-claim-reclaim:'),
+  );
+  assert.equal(evidenceDecisions.length, 1, 'the release must be logged with its evidence (D2c) — reason itself is not stamped for the doing->todo edge (status-fsm.mjs:216-232)');
+});
+
+// tsk-2ec regression: the literal shape of the bug report that started this
+// item -- a claim with real, recent activity must still refuse exactly as
+// today, unconditionally.
+test('claimWork still refuses a session doing claim with recent activity, unchanged (tsk-2ec regression)', () => {
+  const { repoRoot, dir } = setup();
+
+  claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+
+  assert.throws(
+    () => claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot }),
+    (err) => {
+      assert.ok(err instanceof FsmError);
+      assert.equal(err.category, 'conflict');
+      assert.match(err.message, /expected status "todo".*but found "doing"/, 'must be the ORIGINAL conflict shape, not a release-step message');
+      return true;
+    },
+  );
+
+  const after = listWork(dir).work['item-a'];
+  assert.equal(after.status, 'doing', 'the recent, still-live claim must survive completely untouched');
+});
+
+test('claimWork pre-check is a no-op for a runner-claimed doing item -- stays startupReap\'s domain alone (D2 scope)', () => {
+  const { repoRoot, dir } = setup();
+
+  claimWork(dir, { id: 'item-a', actor: 'runner', isolate: false, repoRoot });
+
+  assert.throws(
+    () => claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot }),
+    (err) => {
+      assert.ok(err instanceof FsmError);
+      assert.equal(err.category, 'conflict');
+      return true;
+    },
+  );
+
+  const after = listWork(dir).work['item-a'];
+  assert.equal(after.claimRole, 'runner', 'a runner claim must never be touched by this pre-check');
+});
+
+test('claimWork pre-check never fires for a runner CALLER, even against a conclusively-quiet session claim (validating finding: no back door around startupReap\'s human/session exclusion)', () => {
+  const { repoRoot, dir } = setup();
+
+  const first = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+  const staleSeconds = Math.floor((Date.now() - HUMAN_MS - 1000) / 1000);
+  commitAt(first.worktree.path, 'stale.txt', 'stale', staleSeconds);
+
+  assert.throws(
+    () => claimWork(dir, { id: 'item-a', actor: 'runner', isolate: true, repoRoot }),
+    (err) => {
+      assert.ok(err instanceof FsmError);
+      assert.equal(err.category, 'conflict');
+      assert.match(err.message, /expected status "todo".*but found "doing"/);
+      return true;
+    },
+  );
+
+  const after = listWork(dir).work['item-a'];
+  assert.equal(after.claimRole, 'session', 'the quiet session claim must survive -- a runner caller must never reclaim it, no matter how stale');
+});
+
+test('claimWork pre-check never fires for take (isolate:false), even against a conclusively-quiet session claim (implementation finding: take\'s own branch-reuse gap is separately scoped, tsk-65n)', () => {
+  const { repoRoot, dir } = setup();
+
+  const first = claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
+  const staleSeconds = Math.floor((Date.now() - HUMAN_MS - 1000) / 1000);
+  commitAt(first.worktree.path, 'stale.txt', 'stale', staleSeconds);
+
+  assert.throws(
+    () => claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot }),
+    (err) => {
+      assert.ok(err instanceof FsmError);
+      assert.equal(err.category, 'conflict');
+      assert.match(err.message, /expected status "todo".*but found "doing"/);
+      return true;
+    },
+  );
+
+  const after = listWork(dir).work['item-a'];
+  assert.equal(after.claimRole, 'session', 'take must never reclaim, even a quiet claim -- pick is the only door (D5 scope narrowing)');
 });
