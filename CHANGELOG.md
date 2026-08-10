@@ -16,6 +16,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `risk: light|standard|heavy`. A domain that declares no vocabulary is
   unaffected — any non-empty string still passes, exactly as before.
 
+- The shared config file gains a `herdrOrchestrator: {autoDiscover,
+  autoMerge, autoRetro, autoCleanup}` section (all off by default,
+  fail-closed on a missing or malformed value) for the herdr-plugin
+  dashboard's future auto-launch toggles. Surfaced by `fgos doctor`'s new
+  `herdr-launcher-configured` check and merged in by `fgos setup`, same
+  as every other registered config default.
+
 ### Changed
 
 - `/fgOS:submit` run from a live session now continues into the item's
