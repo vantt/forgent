@@ -2,7 +2,7 @@
 type: explanation
 title: Why mergeTree groups by parent and sorts recursively by blocks
 tags: []
-source_capture_ids: [tsk-2x9k]
+source_capture_ids: [tsk-2x9k, tsk-59b]
 ---
 # Why `mergeTree` groups by parent and sorts recursively by `blocks`
 
@@ -77,10 +77,42 @@ comparatively coarse.
 `bin/fgos.mjs`'s `merge list` sub-verb, never a breaking change to what
 any existing caller of `mergeReadiness` already reads.
 
+## Why herdr-plugin's Rust side only parses and paints the tree, never re-sorts it
+
+The MERGE LIST box in herdr-plugin used to mirror `fgos merge list --json`'s
+`ready`/`waiting`/`blockedOnSync` as three flat lists
+(`herdr-plugin/src/fgos.rs`, `app.rs`), with no `parent`/`mergeTier`
+read at all. Once `mergeTree` existed as a field on that same JSON
+response, `MergeListSummary`/`app.rs`'s rendering changed to walk the
+tree instead — indenting each node by its real depth and drawing a
+status badge per node (`ready`/`waiting`/`blocked-sync`/`conflicted`/
+`superseded`), with a blocked or conflicted node showing the specific
+reason and counterpart item rather than a bare status word.
+
+The task's own scope statement is explicit that this is a pure
+consumption change: "Rust KHÔNG tự sort hay tự tính lại thứ tự (D4) --
+chỉ đọc và vẽ lại đúng những gì JS engine đã tính" ("Rust does not sort
+or recompute order itself — it only reads and redraws exactly what the
+JS engine already computed"). This mirrors the reason the sort/tree
+logic lives in `graph-harness.mjs` in the first place (above): if the
+Rust rendering layer sorted independently for display, the order a
+person sees in the MERGE LIST box and the order `merge next`/
+`merge-loop` actually execute could silently diverge. Keeping render as
+a pure function of the JS-computed `tree` field — depth for indentation,
+per-node status for the badge, `reason`/counterpart for blocked or
+conflicted nodes — is what keeps the two views from ever disagreeing.
+
+This item ran to completion on its first attempt with no recorded
+friction: once the `tree` field's shape was locked by the engine task,
+translating it into indentation and badges was mechanical, not a design
+decision in its own right.
+
 ## Related
 
 - `docs/history/merge-list-tree-bottleneck-priority/CONTEXT.md` — full
   decision record (D1–D7) this design implements.
+- `docs/history/merge-list-tree-bottleneck-priority/DISCUSSION.md#task-merge-tree-render`
+  — the render task's own scope and D-ID mapping.
 - `docs/how-to/check-whether-a-suspected-mechanism-ever-fired-before-fixing-it.md`
   — D5's own separate lesson from the same design discussion (the
   retracted `fgos-fanout` hypothesis that motivated this feature's real
