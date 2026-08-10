@@ -235,6 +235,28 @@ test('a git commit succeeds once a different-identity lock has gone stale (ttl e
   assert.equal(commitCount(repoRoot), before + 1);
 });
 
+// --- truth 4b: the hook's own default TTL is short (HOOK_TTL_MS, tsk-1d9),
+// not the long DEFAULT_TTL_MS shared with claim-port.mjs/merge.mjs --------
+
+test('a git commit succeeds against a different-identity lock older than 20s but younger than 3 minutes, with NO env var override (proves the hook falls back to its own short default, not the old 180s one)', () => {
+  const repoRoot = initTempRepoWithHook();
+  const fgosDir = path.join(repoRoot, '.fgos');
+  fs.mkdirSync(fgosDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(fgosDir, 'main-checkout.lock'),
+    JSON.stringify({ pid: 'session-holder', ts: Date.now() - 25_000 }),
+  );
+  const before = commitCount(repoRoot);
+
+  // No FGOS_MAIN_CHECKOUT_LOCK_TTL_MS here -- exercises resolveTtlMs()'s
+  // real fallback. Under the old shared DEFAULT_TTL_MS (3 minutes) a 25s-old
+  // lock would still read as HELD and this commit would be refused.
+  const later = commitAsSession(repoRoot, { BEE_SESSION_ID: 'session-later' });
+
+  assert.equal(later.status, 0, later.stderr);
+  assert.equal(commitCount(repoRoot), before + 1);
+});
+
 // --- truth 5: refused when the lock file is corrupt/unparseable -----------
 
 test('a git commit is refused when the lock file is corrupt, and the refusal never leaks a raw pid/session id', () => {
