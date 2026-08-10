@@ -23,6 +23,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `herdr-launcher-configured` check and merged in by `fgos setup`, same
   as every other registered config default.
 
+- The herdr-plugin dashboard auto-launches a guarded agent pane running
+  `/fgOS:discover <id>` for the first `clarify`-stage, `todo`-status item
+  it finds, once per poll tick, when `herdrOrchestrator.autoDiscover` is
+  on (off by default). Guarded against double-launching the same item via
+  a dedicated pane label, kept separate from the dashboard's existing
+  In-Process pane tracking so it never shows up there as a phantom task.
+
 ### Changed
 
 - `/fgOS:submit` run from a live session now continues into the item's

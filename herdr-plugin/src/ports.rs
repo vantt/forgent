@@ -24,6 +24,12 @@ pub trait WorkItemSource {
 /// out to `herdr` itself — only through this port.
 pub trait PaneRegistry {
     fn scan(&self) -> Result<HashMap<String, PaneIdentity>, PaneScanError>;
+    /// tsk-2ja: the raw `herdr pane list` response, for the auto-discover
+    /// double-launch guard (`pane_scan::has_labeled_pane`) — deliberately
+    /// separate from `scan`'s task-id-keyed map, which must never gain a
+    /// synthetic `fgos-auto-discover-<id>` entry (see `pick::
+    /// auto_discover_pane_label`'s own doc comment for why).
+    fn scan_raw(&self) -> Result<String, PaneScanError>;
 }
 
 /// (b1) herdr pane-orchestration seam (tsk-3t9 D1) — swappable
@@ -36,6 +42,12 @@ pub trait PaneOrchestrator {
     /// Switches herdr's focus directly to an already-running pane
     /// (tsk-1eu D2), never opening a new one.
     fn focus_pane(&self, pane_id: &str) -> io::Result<()>;
+    /// Unattended equivalent of `open_discover_pane` (tsk-2ja): labels the
+    /// pane `fgos-auto-discover-<id>` via `herdr pane rename` immediately
+    /// after opening it, before spawning `claude` — closing the race
+    /// window the person-triggered button doesn't have to close (its
+    /// label is set later, from inside the launched session).
+    fn open_auto_discover_pane(&self, id: &str) -> io::Result<()>;
 }
 
 /// Domain-level input the render adapter translates real terminal events

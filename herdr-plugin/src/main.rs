@@ -2,10 +2,10 @@ use std::io;
 use std::path::Path;
 use std::time::{Duration, Instant};
 
-use herdr_fgos::app::{App, Panel};
+use herdr_fgos::app::{App, Panel, WorkItem};
 use herdr_fgos::fgos::{self, FgosCliSource};
 use herdr_fgos::layout;
-use herdr_fgos::pane_scan::HerdrPaneScanner;
+use herdr_fgos::pane_scan::{self, HerdrPaneScanner};
 use herdr_fgos::pick::{self, HerdrPaneAdapter};
 use herdr_fgos::ports::{PaneOrchestrator, PaneRegistry, TerminalUi, UiEvent, WorkItemSource};
 use herdr_fgos::settings;
@@ -93,6 +93,19 @@ fn main() -> io::Result<()> {
     ui.teardown()?;
 
     result
+}
+
+/// tsk-2ja Shape step 1: the first item ready for an unattended
+/// `/fgOS:discover` launch this tick — the exact same `stage == "clarify"`
+/// gate the manual Discover button already enforces (`UiEvent::Discover`
+/// below), plus `status == "todo"` (never `doing`/`blocked`/
+/// `awaiting-human`, all of which mean a person or another session
+/// already owns it). One candidate only, never a batch — the caller
+/// launches at most one pane per tick.
+fn next_auto_discover_candidate(work_items: &[WorkItem]) -> Option<&WorkItem> {
+    work_items
+        .iter()
+        .find(|item| item.stage == "clarify" && item.status == "todo")
 }
 
 fn run(
@@ -291,6 +304,26 @@ fn run(
             if let Some(root) = root {
                 app.orchestrator_settings = settings::read_settings(root);
             }
+            // tsk-2ja: unattended auto-discover launch, at most one per
+            // tick. Any failure (cap refusal, rename failure, spawn
+            // failure) is swallowed here — never surfaced as
+            // `app.pick_status` (person-initiated actions only), never
+            // retried within the same tick, never queued; a fresh
+            // candidate read next tick is the only retry.
+            if app.orchestrator_settings.auto_discover {
+                if let Some(candidate) = next_auto_discover_candidate(&app.work_items) {
+                    let id = candidate.id.clone();
+                    let label = pick::auto_discover_pane_label(&id);
+                    let already_open = registry
+                        .and_then(|registry| registry.scan_raw().ok())
+                        .is_some_and(|json| {
+                            pane_scan::has_labeled_pane(&json, &label).unwrap_or(false)
+                        });
+                    if !already_open {
+                        let _ = pane_orchestrator.open_auto_discover_pane(&id);
+                    }
+                }
+            }
             last_poll = Instant::now();
         }
     }
@@ -341,6 +374,10 @@ mod tests {
             self.calls.set(self.calls.get() + 1);
             Ok(HashMap::new())
         }
+
+        fn scan_raw(&self) -> Result<String, PaneScanError> {
+            Ok(r#"{"result":{"panes":[]}}"#.to_string())
+        }
     }
 
     struct NoopPaneOrchestrator;
@@ -355,6 +392,10 @@ mod tests {
         }
 
         fn focus_pane(&self, _pane_id: &str) -> io::Result<()> {
+            Ok(())
+        }
+
+        fn open_auto_discover_pane(&self, _id: &str) -> io::Result<()> {
             Ok(())
         }
     }
@@ -378,14 +419,19 @@ mod tests {
             self.focused.borrow_mut().push(pane_id.to_string());
             Ok(())
         }
+
+        fn open_auto_discover_pane(&self, _id: &str) -> io::Result<()> {
+            Ok(())
+        }
     }
 
-    /// Records every work-item id it was asked to open a pick or discover
-    /// pane for, so a test can assert each button fires exactly once, on
-    /// the second Enter/`d` respectively (tsk-1e3).
+    /// Records every work-item id it was asked to open a pick, discover,
+    /// or auto-discover pane for, so a test can assert each fires exactly
+    /// once (tsk-1e3, tsk-2ja).
     struct RecordingPickOrchestrator {
         picked: std::cell::RefCell<Vec<String>>,
         discovered: std::cell::RefCell<Vec<String>>,
+        auto_discovered: std::cell::RefCell<Vec<String>>,
     }
 
     impl PaneOrchestrator for RecordingPickOrchestrator {
@@ -400,6 +446,11 @@ mod tests {
         }
 
         fn focus_pane(&self, _pane_id: &str) -> io::Result<()> {
+            Ok(())
+        }
+
+        fn open_auto_discover_pane(&self, id: &str) -> io::Result<()> {
+            self.auto_discovered.borrow_mut().push(id.to_string());
             Ok(())
         }
     }
@@ -536,6 +587,7 @@ mod tests {
         let pane_orchestrator = RecordingPickOrchestrator {
             picked: std::cell::RefCell::new(Vec::new()),
             discovered: std::cell::RefCell::new(Vec::new()),
+            auto_discovered: std::cell::RefCell::new(Vec::new()),
         };
 
         run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO, None)
@@ -574,6 +626,7 @@ mod tests {
         let pane_orchestrator = RecordingPickOrchestrator {
             picked: std::cell::RefCell::new(Vec::new()),
             discovered: std::cell::RefCell::new(Vec::new()),
+            auto_discovered: std::cell::RefCell::new(Vec::new()),
         };
 
         run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO, None)
@@ -831,6 +884,7 @@ mod tests {
         let pane_orchestrator = RecordingPickOrchestrator {
             picked: std::cell::RefCell::new(Vec::new()),
             discovered: std::cell::RefCell::new(Vec::new()),
+            auto_discovered: std::cell::RefCell::new(Vec::new()),
         };
 
         run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO, None)
@@ -863,6 +917,7 @@ mod tests {
         let pane_orchestrator = RecordingPickOrchestrator {
             picked: std::cell::RefCell::new(Vec::new()),
             discovered: std::cell::RefCell::new(Vec::new()),
+            auto_discovered: std::cell::RefCell::new(Vec::new()),
         };
 
         run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO, None)
@@ -898,6 +953,7 @@ mod tests {
         let pane_orchestrator = RecordingPickOrchestrator {
             picked: std::cell::RefCell::new(Vec::new()),
             discovered: std::cell::RefCell::new(Vec::new()),
+            auto_discovered: std::cell::RefCell::new(Vec::new()),
         };
 
         run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO, None)
@@ -983,5 +1039,181 @@ mod tests {
         // fgos refresh still fires; pane refresh has nothing to call.
         assert_eq!(source.calls.get(), 1);
         assert!(app.last_error.is_none());
+    }
+
+    fn clarify_todo_item(id: &str) -> WorkItem {
+        WorkItem {
+            id: id.into(),
+            title: id.into(),
+            goal_tier: "mvp".into(),
+            stage: "clarify".into(),
+            status: "todo".into(),
+            blocked_by: Vec::new(),
+            blocks: 0,
+            priority: None,
+        }
+    }
+
+    #[test]
+    fn auto_discover_selects_the_first_clarify_todo_item() {
+        let items = vec![
+            {
+                let mut item = clarify_todo_item("tsk-a");
+                item.stage = "executing".into();
+                item
+            },
+            clarify_todo_item("tsk-b"),
+            clarify_todo_item("tsk-c"),
+        ];
+        let candidate = next_auto_discover_candidate(&items).expect("one clarify+todo item exists");
+        assert_eq!(candidate.id, "tsk-b", "first matching item wins, never a later one");
+    }
+
+    #[test]
+    fn auto_discover_skips_items_not_at_clarify_or_not_todo() {
+        let items = vec![
+            {
+                let mut item = clarify_todo_item("tsk-a");
+                item.status = "doing".into();
+                item
+            },
+            {
+                let mut item = clarify_todo_item("tsk-b");
+                item.stage = "decompose".into();
+                item
+            },
+        ];
+        assert!(next_auto_discover_candidate(&items).is_none());
+    }
+
+    #[test]
+    fn auto_discover_skips_when_toggle_is_off() {
+        let mut ui = QuitAfterOneTick { calls: Cell::new(0) };
+        let mut app = App::empty();
+        // `App::empty()`'s `orchestrator_settings` defaults to all-OFF
+        // (tsk-2m5) — never explicitly flipped on in this test.
+        app.work_items = vec![clarify_todo_item("tsk-b")];
+        let registry = CountingRegistry { calls: Cell::new(0) };
+        let pane_orchestrator = RecordingPickOrchestrator {
+            picked: std::cell::RefCell::new(Vec::new()),
+            discovered: std::cell::RefCell::new(Vec::new()),
+            auto_discovered: std::cell::RefCell::new(Vec::new()),
+        };
+
+        run(&mut ui, &mut app, None, Some(&registry), &pane_orchestrator, Duration::ZERO, None)
+            .expect("run should exit cleanly on Quit");
+
+        assert!(
+            pane_orchestrator.auto_discovered.borrow().is_empty(),
+            "toggle off must never launch, even with a ready item"
+        );
+    }
+
+    #[test]
+    fn auto_discover_launches_when_toggle_is_on_and_an_item_is_ready() {
+        let mut ui = QuitAfterOneTick { calls: Cell::new(0) };
+        let mut app = App::empty();
+        app.orchestrator_settings.auto_discover = true;
+        app.work_items = vec![clarify_todo_item("tsk-b")];
+        let registry = CountingRegistry { calls: Cell::new(0) };
+        let pane_orchestrator = RecordingPickOrchestrator {
+            picked: std::cell::RefCell::new(Vec::new()),
+            discovered: std::cell::RefCell::new(Vec::new()),
+            auto_discovered: std::cell::RefCell::new(Vec::new()),
+        };
+
+        run(&mut ui, &mut app, None, Some(&registry), &pane_orchestrator, Duration::ZERO, None)
+            .expect("run should exit cleanly on Quit");
+
+        assert_eq!(*pane_orchestrator.auto_discovered.borrow(), vec!["tsk-b".to_string()]);
+        assert!(
+            app.pick_status.is_none(),
+            "an unattended launch must never surface as app.pick_status"
+        );
+    }
+
+    /// A registry whose raw pane list already carries a
+    /// `fgos-auto-discover-<id>`-labeled pane — simulates a still-running
+    /// auto-launch from an earlier tick (or a previous herdr-plugin run).
+    struct RegistryWithAutoDiscoverPaneOpen {
+        label: String,
+    }
+
+    impl PaneRegistry for RegistryWithAutoDiscoverPaneOpen {
+        fn scan(&self) -> Result<HashMap<String, PaneIdentity>, PaneScanError> {
+            Ok(HashMap::new())
+        }
+
+        fn scan_raw(&self) -> Result<String, PaneScanError> {
+            Ok(format!(
+                r#"{{"result":{{"panes":[{{"pane_id":"wS:pZ","tab_id":"wS:t9","label":"{}"}}]}}}}"#,
+                self.label
+            ))
+        }
+    }
+
+    #[test]
+    fn auto_discover_skips_when_a_pane_is_already_open_for_the_id() {
+        let mut ui = QuitAfterOneTick { calls: Cell::new(0) };
+        let mut app = App::empty();
+        app.orchestrator_settings.auto_discover = true;
+        app.work_items = vec![clarify_todo_item("tsk-b")];
+        let registry = RegistryWithAutoDiscoverPaneOpen {
+            label: "fgos-auto-discover-tsk-b".to_string(),
+        };
+        let pane_orchestrator = RecordingPickOrchestrator {
+            picked: std::cell::RefCell::new(Vec::new()),
+            discovered: std::cell::RefCell::new(Vec::new()),
+            auto_discovered: std::cell::RefCell::new(Vec::new()),
+        };
+
+        run(&mut ui, &mut app, None, Some(&registry), &pane_orchestrator, Duration::ZERO, None)
+            .expect("run should exit cleanly on Quit");
+
+        assert!(
+            pane_orchestrator.auto_discovered.borrow().is_empty(),
+            "an id with an already-open guarded pane must not be launched again"
+        );
+    }
+
+    struct AlwaysFailingPaneOrchestrator;
+
+    impl PaneOrchestrator for AlwaysFailingPaneOrchestrator {
+        fn open_pick_pane(&self, _id: &str) -> io::Result<()> {
+            Ok(())
+        }
+
+        fn open_discover_pane(&self, _id: &str) -> io::Result<()> {
+            Ok(())
+        }
+
+        fn focus_pane(&self, _pane_id: &str) -> io::Result<()> {
+            Ok(())
+        }
+
+        fn open_auto_discover_pane(&self, _id: &str) -> io::Result<()> {
+            Err(io::Error::other("simulated: fg:agents-N tabs are full"))
+        }
+    }
+
+    /// Covers the wiring's own contract for ANY launch failure (cap
+    /// refusal, rename failure, spawn failure) — the cap refusal itself
+    /// is already proven at `layout.rs`'s own level
+    /// (`agent_tabs_at_cap_refuse_a_third_tab`); this proves the poll
+    /// tick swallows whatever `Err` it gets back, never panics, and never
+    /// leaks it into `app.pick_status`.
+    #[test]
+    fn auto_discover_skips_without_panic_when_agent_tabs_are_at_cap() {
+        let mut ui = QuitAfterOneTick { calls: Cell::new(0) };
+        let mut app = App::empty();
+        app.orchestrator_settings.auto_discover = true;
+        app.work_items = vec![clarify_todo_item("tsk-b")];
+        let registry = CountingRegistry { calls: Cell::new(0) };
+        let pane_orchestrator = AlwaysFailingPaneOrchestrator;
+
+        let result = run(&mut ui, &mut app, None, Some(&registry), &pane_orchestrator, Duration::ZERO, None);
+
+        assert!(result.is_ok(), "a launch failure must never crash the dashboard");
+        assert!(app.pick_status.is_none());
     }
 }

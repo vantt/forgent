@@ -163,6 +163,75 @@ pub fn open_discover_pane(
     Ok(())
 }
 
+/// The fixed label an auto-discover launch (tsk-2ja) rename its pane to,
+/// checked via `pane_scan::has_labeled_pane` before each launch to avoid
+/// double-launching. Deliberately outside the `<taskid> | ...` convention
+/// (`docs/history/fgos-terminal-pane-rename/CONTEXT.md` D4) — that
+/// convention is set from *inside* the launched session
+/// (`plugins/fgOS/skills/terminal/rename.sh`), too late to close the race
+/// between this function opening the pane and the launched session
+/// getting around to renaming it. This label is set by herdr-plugin
+/// itself, synchronously, before `claude` is even spawned.
+pub fn auto_discover_pane_label(id: &str) -> String {
+    format!("fgos-auto-discover-{id}")
+}
+
+/// Pure argv-sequence builder for an auto-discover launch (tsk-2ja):
+/// `[rename_argv, run_argv]`, in the order they must actually run — the
+/// `pane rename` call that must land *before* the `pane run` call that
+/// spawns `claude`. Kept pure and separately testable, same "pure argv,
+/// thin `Command` executor" split `run_argv`/`pane_split_argv` already
+/// use, so the ordering itself is provable without touching a real
+/// `Command`.
+fn auto_discover_launch_argv_sequence(
+    pane_id: &str,
+    id: &str,
+    skip_permissions: bool,
+) -> Result<[Vec<String>; 2], InvalidId> {
+    let rename_argv = vec![
+        "pane".into(),
+        "rename".into(),
+        pane_id.into(),
+        auto_discover_pane_label(id),
+    ];
+    let run_argv = discover_run_argv(pane_id, id, skip_permissions)?;
+    Ok([rename_argv, run_argv])
+}
+
+/// Unattended equivalent of `open_discover_pane` (tsk-2ja): opens the
+/// pane, labels it via `herdr pane rename` *before* spawning `claude` —
+/// closing the label-write race `open_discover_pane` doesn't have to
+/// close (its label arrives later, from inside the launched session) —
+/// then launches `/fgOS:discover <id>` exactly as `open_discover_pane`
+/// does. Propagates a cap-refusal `Err` from `place_new_agent_pane`
+/// unchanged, and a `pane rename` failure as its own `Err` too — the
+/// caller (the poll tick) treats either the same way: skip this tick,
+/// retry next poll, never queue.
+pub fn open_auto_discover_pane(
+    herdr_bin: &str,
+    workspace_id: &str,
+    id: &str,
+    project_root: &Path,
+) -> io::Result<()> {
+    let pane_id = layout::place_new_agent_pane(herdr_bin, workspace_id, project_root)
+        .map_err(io::Error::other)?;
+
+    let [rename_args, run_args] =
+        auto_discover_launch_argv_sequence(&pane_id, id, skip_permissions_enabled())
+            .map_err(io::Error::other)?;
+
+    let rename_output = Command::new(herdr_bin).args(rename_args).output()?;
+    if !rename_output.status.success() {
+        return Err(io::Error::other(format!(
+            "herdr pane rename failed: {}",
+            String::from_utf8_lossy(&rename_output.stderr)
+        )));
+    }
+
+    Command::new(herdr_bin).args(run_args).spawn()?;
+    Ok(())
+}
+
 /// argv for `focus_pane` below (tsk-1eu D2).
 fn focus_pane_argv(pane_id: &str) -> Vec<String> {
     ["pane", "zoom", pane_id, "--on"]
@@ -224,6 +293,15 @@ impl PaneOrchestrator for HerdrPaneAdapter {
     fn focus_pane(&self, pane_id: &str) -> io::Result<()> {
         focus_pane(&self.herdr_bin, pane_id)
     }
+
+    fn open_auto_discover_pane(&self, id: &str) -> io::Result<()> {
+        let Some(project_root) = &self.project_root else {
+            return Err(io::Error::other(
+                "project root unresolved — refusing to launch an agent outside a project",
+            ));
+        };
+        open_auto_discover_pane(&self.herdr_bin, &self.workspace_id, id, project_root)
+    }
 }
 
 #[cfg(test)]
@@ -264,6 +342,24 @@ mod tests {
         };
         let err = adapter
             .open_discover_pane("tsk-1e3")
+            .expect_err("a rootless dashboard must never open an agent pane");
+        assert!(
+            err.to_string().contains("project root unresolved"),
+            "the refusal must say why: {err}"
+        );
+    }
+
+    /// tsk-2ja: same refusal, same reason, for the auto-discover pane —
+    /// mirrors `discover_launch_is_refused_when_the_project_root_is_unresolved`.
+    #[test]
+    fn auto_discover_launch_is_refused_when_the_project_root_is_unresolved() {
+        let adapter = HerdrPaneAdapter {
+            herdr_bin: "/nonexistent/herdr".into(),
+            workspace_id: "wS".into(),
+            project_root: None,
+        };
+        let err = adapter
+            .open_auto_discover_pane("tsk-2ja")
             .expect_err("a rootless dashboard must never open an agent pane");
         assert!(
             err.to_string().contains("project root unresolved"),
@@ -347,6 +443,42 @@ mod tests {
     fn run_argv_rejects_an_id_that_could_break_out_of_the_typed_command() {
         let err = run_argv("wS:p16", "tsk'; rm -rf ~ #", true).unwrap_err();
         assert_eq!(err, InvalidId("tsk'; rm -rf ~ #".to_string()));
+    }
+
+    #[test]
+    fn auto_discover_launch_sets_label_before_spawning_claude() {
+        let [rename_args, run_args] =
+            auto_discover_launch_argv_sequence("wS:p16", "tsk-2ja", true).expect("valid id");
+        assert_eq!(
+            rename_args,
+            vec!["pane", "rename", "wS:p16", "fgos-auto-discover-tsk-2ja"],
+            "the pane must be labeled before claude is ever spawned into it"
+        );
+        assert_eq!(
+            run_args,
+            vec![
+                "pane",
+                "run",
+                "wS:p16",
+                "claude --dangerously-skip-permissions '/fgOS:discover tsk-2ja'",
+            ]
+        );
+    }
+
+    #[test]
+    fn auto_discover_launch_argv_sequence_rejects_ids_fgos_itself_would_reject() {
+        assert!(auto_discover_launch_argv_sequence("p", "", true).is_err());
+        assert!(auto_discover_launch_argv_sequence("p", "tsk-2ja", true).is_ok());
+    }
+
+    #[test]
+    fn auto_discover_pane_label_is_deliberately_outside_the_taskid_pipe_convention() {
+        // Must never contain " | " (the `<taskid> | ...` shape
+        // `pane_scan::extract_task_id` splits on) — this label is checked
+        // by an exact match instead (`pane_scan::has_labeled_pane`), never
+        // by that parser.
+        assert!(!auto_discover_pane_label("tsk-2ja").contains(" | "));
+        assert_eq!(auto_discover_pane_label("tsk-2ja"), "fgos-auto-discover-tsk-2ja");
     }
 
     #[test]
