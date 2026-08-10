@@ -2,7 +2,7 @@
 type: explanation
 title: The coding-classify-intake capacity's full lifecycle — created, never wired, retired as dead config
 tags: []
-source_capture_ids: [tsk-3fj, tsk-4fk]
+source_capture_ids: [tsk-3fj, tsk-4fk, tsk-6ar]
 ---
 # The coding-classify-intake capacity's full lifecycle — created, never wired, retired as dead config
 
@@ -108,6 +108,41 @@ split-commit shape `tsk-3fj`'s own plan had used for the original rename
 — a direct main-checkout hand-commit for `.fgos/config.json` (ADR0020),
 plus a companion commit on the item's own branch rewriting the pinning
 test to assert the entry's absence instead of its existence.
+
+## Step 4 (`tsk-6ar`): the consuming skill itself retired, not just its dispatch branch
+
+`tsk-4ns` (Step 2) stripped `fgos-submit-assist`'s dispatch branch but
+left the skill's own inline classification step in place — deliberately
+deferred, since deleting the skill outright at that point would have
+broken `tsk-4ns`'s own in-flight branch, which edited that exact file.
+Once `tsk-4ns` merged, a follow-up item checked whether
+`fgos-submit-assist` had any step left that wasn't already duplicated
+elsewhere:
+
+> "Consequence: `fgos-submit-assist` step 2 is not a unique capability —
+> it duplicates step 6b's job with strictly worse input (raw text,
+> pre-clarify — the exact 'reading the same text twice, dirty before
+> clean' defect `tsk-5wz`'s own description named and fixed at the
+> `/fgOS:submit` door)."
+> — real `docs/history/retire-fgos-submit-assist/plan.md`
+
+All three of the skill's own steps turned out to already live elsewhere:
+title derivation belongs to the `fgos submit` verb itself
+(`classify.mjs`'s `deriveTitle`), classification was already re-done,
+in-session, on cleaner post-clarify text by `/fgOS:submit`'s own step 6b,
+and the third step was just the verb call. With zero real callers left —
+and confirmed via `grep -rl "fgos-submit-assist" test/` returning zero
+hits, nothing exercising it — the skill was deleted outright, not left
+as a defined-but-unused file:
+
+> `d49a52e7 chore(tsk-6ar): retire fgos-submit-assist, superseded by
+> /fgOS:submit's own step 6b`
+> — real commit, branch `fgw/tsk-6ar`
+
+`capacity-dispatch-fallback.md` itself was re-checked at this point too
+(8 remaining citers — `fgos-code-implement`, `fgos-validating`, and
+others) and correctly left in place, exactly as `tsk-4ns`'s own earlier
+finding already established.
 
 ## The lesson
 
