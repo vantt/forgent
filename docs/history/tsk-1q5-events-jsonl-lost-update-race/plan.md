@@ -126,6 +126,25 @@ GitNexus registered and `present`. Used live during this planning pass
 (`impact` on `withEventsLock` and `refreshView` above returned real,
 current blast-radius data) — posture: **full**.
 
+## Addendum — tsk-2xt evidence (post-validating)
+
+A third live instance surfaced after this plan's gates were already
+approved: while redoing bookkeeping for tsk-2xt, two distinct event
+types were confirmed missing from `.fgos/events.jsonl` for the same item
+— (a) the entire post-`planApprove` transition chain (`validateApprove`,
+`decompose`→`executing`, `delivered`) vanished from the log though the
+real code stayed intact on git; (b) a `work.edit` that set `verify` to a
+real test command was also lost, so `verify` reverted to the placeholder
+string, which a later `return` then tried to execute as a shell command
+(`/bin/sh: chưa: not found`). Both are concrete, timestamped/seq-numbered
+instances of *raw log lines going missing*, not a derived-cache staleness
+— this strengthens root cause B (events.jsonl git-tracked in the shared
+main checkout, clobbered by another session's git operation) as the more
+likely dominant cause relative to root cause A alone. Scope stays as
+decided at `fgos-validating` (A only, this item; B logged as a decision on
+`tsk-3wq`) — recorded here so a future reader sees the full evidence
+trail without re-deriving it.
+
 ## Outstanding questions
 
 - Root cause B (git-tracked `events.jsonl` in the shared main checkout)
