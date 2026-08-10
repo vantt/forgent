@@ -105,6 +105,44 @@ your own knowledge of which files you touched, not just trusting an
 empty result at face value if you touched a module on
 `src/evolve/iron-law.mjs`'s `MODULE_RULES` list.
 
+## Watch out for: a guard test scoped by `git ls-files` silently skips its own uncommitted files
+
+`tsk-2cw` (renaming the pinned term "orchestrator" to "launcher") hit a
+different false-pass shape, this time in the guard test itself rather than
+in `classifyIronLaw`. `test/docs/launcher-vocabulary-guard.test.mjs`
+enumerates the files it scans via `git ls-files` — deliberately, so it only
+checks tracked prose, not scratch/build output. But `git ls-files` only
+sees what's already committed. On the first local run, two files the item
+itself had just created were still uncommitted: the new decision record
+(`docs/decisions/0028-doi-ten-orchestrator-thanh-launcher.md`) and the
+guard test file itself — and the guard test's own filename and prose
+*contain* the word "orchestrator" (it's a test *about* that word), so
+neither file had been added to the test's allowlist yet. `git ls-files`
+skipped both silently, so the NEGATIVE check passed — a false green, not a
+real one.
+
+The gap surfaced the moment those files were committed: `fgos return`'s
+goal-check failed on the branch (`"goal-check failed on branch
+\"fgw/tsk-2cw\" (exit 1)"`), and a retry later failed again on the staged
+merge (`"goal-check failed on staged merge (exit 1); merge aborted, main
+unchanged"`) — both real friction entries on the item's own capture,
+`errorClass: "verify-miss"`. Once committed, `git ls-files` now saw both
+files, the guard test correctly flagged "orchestrator" appearing in
+content it hadn't allowlisted, and the fix
+(`1538a6e`) was two lines: add both paths to the guard test's own
+allowlist, with the real reason recorded in the commit message ("git
+ls-files only sees tracked files, so the first, uncommitted test run
+silently skipped both").
+
+**The lesson**: any guard/vocabulary test that scopes itself via
+`git ls-files` (or an equivalent tracked-files-only listing) will not see
+files the current diff just created until they're committed — including,
+easy to miss, the guard test's own file if its own name or prose contains
+the very term it's checking for. Run the guard test *after* `git add`/
+`git commit`, the same ordering `classifyIronLaw`'s own false-negative
+lesson above already establishes, and treat a fully-green first local run
+as suspect (not proof) if the diff added any new tracked-prose files.
+
 ## Why this survives review even without re-running it
 
 A reviewer (human or a later session) reading `iron-law-evidence.md` gets

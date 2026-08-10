@@ -1,11 +1,14 @@
 # Shared fragment: capacity-dispatch-with-fallback
 
-tsk-53h: extracted from `fgos-submit-assist/SKILL.md`'s own classify step
-(`tsk-5l2-3`), the first and — until a second consumer exists — only real
-wiring of this pattern. Generalized here so a second in-session skill with
-an inline-reasoning step can gain the same optional dispatch-to-a-capacity
-path without copy-pasting this branch logic into its own `SKILL.md` (DRY —
-independent copies drift the next time this logic changes,
+tsk-53h: extracted from the standalone submit-assist skill's own classify
+step (`tsk-5l2-3`), the first and — until a second consumer exists — only
+real wiring of this pattern. That skill has since been retired in full
+(tsk-6ar) — its dispatch to this pattern was already gone before then
+(tsk-4ns, see Precedent below). Generalized here so a second in-session
+skill with an inline-reasoning step can gain the same optional
+dispatch-to-a-capacity path without copy-pasting this branch logic into
+its own `SKILL.md` (DRY — independent copies drift the next time this
+logic changes,
 `docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md` D2).
 
 Point at this file from a consumer `SKILL.md` by relative path (e.g.
@@ -13,8 +16,9 @@ Point at this file from a consumer `SKILL.md` by relative path (e.g.
 parameters where the consuming skill's own reasoning step lives:
 
 - **`<CAPACITY_ID>`** — the `.fgos/config.json`
-  `runner.capacities.<id>` key this step dispatches through (real example:
-  `submit-assist-classify`).
+  `runner.capacities.<id>` key this step dispatches through (no live
+  consumer of this fragment's own Steps A-D exists today, tsk-4ns — see
+  Precedent below).
 - **`<PROMPT_TEMPLATE>`** — the fixed prompt text to send (so every
   dispatch asks the model the exact same thing, never a paraphrase that
   drifts call to call), with the caller's own free-text input spliced in
@@ -62,8 +66,19 @@ console.log(cfg.runner?.capacities?.['<CAPACITY_ID>'] ? 'configured' : 'not-conf
 
 ## Step B — presence check
 
+US-027/D5/D6 (tsk-1o7): query by the capacity's own declared `needs`
+(its real capability) — never by `<CAPACITY_ID>` itself, which is a
+name, not a capability. A capacity that hasn't migrated to `needs` yet
+falls back to querying `<CAPACITY_ID>` unchanged, so this step still
+works for it exactly as before.
+
 ```bash
-node "$root/bin/fgos.mjs" tool query --capability <CAPACITY_ID> --status present --dir "$root"
+CAPABILITY=$(node -e "
+const cfg = JSON.parse(require('node:fs').readFileSync('$root/.fgos/config.json', 'utf8'));
+const needs = cfg.runner?.capacities?.['<CAPACITY_ID>']?.needs;
+console.log(needs || '<CAPACITY_ID>');
+")
+node "$root/bin/fgos.mjs" tool query --capability "$CAPABILITY" --status present --dir "$root"
 ```
 
 - **Empty `providers` array (registered but not present, or never
@@ -94,21 +109,20 @@ node "$root/src/runner/dispatch.mjs" decide <CAPACITY_ID> --has-live-task-access
 
 (Omit `--has-live-task-access` entirely if you decided above that you do
 NOT currently have live Agent/Task tool access — never pass the flag on a
-guess.) Prints `{"mechanism": "native"|"cli-spawn"[, "agentType": "<name>"]}`.
+guess.) Prints `{"mechanism": "in-process"|"out-of-process"[, "agentType": "<name>"]}`.
 
-- **`mechanism: "cli-spawn"`** — proceed to Step C exactly as before.
-  This is every `kind:"cli"` capacity (e.g. `submit-assist-classify`, this
-  pattern's one real live consumer today — cross-provider, always
-  cli/spawn), every `kind:"task"` capacity when you lack live Task access,
-  and any capacity whose config forces cli/spawn (`forceCliSpawn`).
-- **`mechanism: "native"`** — skip Step C's `exec` entirely. Print the
-  same announce line Step C.3 prints for cli-spawn, so a dispatch is
+- **`mechanism: "out-of-process"`** — proceed to Step C exactly as before.
+  This is every `kind:"cli"` capacity that forces cross-provider cli/spawn,
+  every `kind:"task"` capacity when you lack live Task access, and any
+  capacity whose config forces cli/spawn (`forceCliSpawn`).
+- **`mechanism: "in-process"`** — skip Step C's `exec` entirely. Print the
+  same announce line Step C.3 prints for out-of-process, so a dispatch is
   visible on the chat transcript regardless of which branch fired
-  (observability parity — before this, only the cli-spawn branch
+  (observability parity — before this, only the out-of-process branch
   announced anything):
 
   ```
-  <CAPACITY_ID> - native - <agentType> - <model>
+  <CAPACITY_ID> - in-process - <agentType> - <model>
   ```
 
   where `<model>` is whichever model the Agent/Task call actually resolves
@@ -180,7 +194,7 @@ Once the six-field packet is built (or the fallback triggered on a missing
 field), continue at Step C.1 below, substituting the packet for
 `<PROMPT_TEMPLATE>` — every later step is unchanged.
 
-## Step C — configured-and-present dispatch (cli-spawn mechanism)
+## Step C — configured-and-present dispatch (out-of-process mechanism)
 
 1. Build the prompt from `<PROMPT_TEMPLATE>` (fixed, so every dispatch
    asks the exact same thing) — the identical prompt Step B.5's native
@@ -213,7 +227,7 @@ field), continue at Step C.1 below, substituting the packet for
    re-templated):
 
    ```
-   <CAPACITY_ID> - cli-spawn - <provider> - <model>
+   <CAPACITY_ID> - out-of-process - <provider> - <model>
    ```
 
 4. Read the response — Step D covers what "malformed" means for it.
@@ -305,11 +319,20 @@ scarcity signal needs the full denominator, not just the misses.
   — the how-to this fragment's own branch logic was extracted from; still
   the reference for config-entry/registration steps (1–3 there), which
   this fragment does not repeat.
-- `fgos-submit-assist/SKILL.md` — the real, live consumer of this fragment
-  (`<CAPACITY_ID>` = `submit-assist-classify`, always `cli-spawn` — no
-  live `kind:"task"` consumer exists yet to exercise Step B.5's `native`
-  branch end-to-end; that branch is proven by `src/runner/dispatch.mjs`'s
-  own unit tests instead, per `docs/history/tsk-3ik-3/iron-law-evidence.md`
-  if applicable).
+- No live consumer of this fragment's own Steps A-D remains today (tsk-4ns
+  retired the standalone submit-assist skill's own dispatch to
+  `submit-assist-classify` — its classify step never had a real reason to
+  dispatch per the "Valid reasons to dispatch" list above: the input was
+  already in the caller's own context, and spawning added latency at the
+  exact moment a person is waiting, `AGENTS.md`'s priority #1; that skill
+  has since been retired in full, tsk-6ar). This
+  fragment stays in place: six other stage skills
+  (`fgos-validating`/`fgos-code-implement`/`fgos-fanout`/`fgos-planning`/
+  `fgos-exploring`/`fgos-researching`) cite its "Valid reasons to dispatch"
+  list directly when explaining their own never-delegate-reasoning rule,
+  and it remains the ready-made pattern for the next real cross-provider
+  consumer. Step B.5's `in-process` branch is proven by
+  `src/runner/dispatch.mjs`'s own unit tests instead, per
+  `docs/history/tsk-3ik-3/iron-law-evidence.md` if applicable.
 - `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md`
   — Native-First Dispatch Doctrine, Step B.5's own governing rules 1/2/4.

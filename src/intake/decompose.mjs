@@ -138,7 +138,7 @@ const DEFAULT_CALLER_INVALID_RATIONALE =
 // is the extra bit worth naming in `text` (e.g. child count).
 function logDecomposeVerdict(dir, id, outcome, rationale, label) {
   const text = label ? `decompose verdict: ${outcome} (${label})` : `decompose verdict: ${outcome}`;
-  addDecision(dir, { id, text, source: 'resolveDecompose', rationale });
+  addDecision(dir, { id, text, source: 'resolveDecompose', kind: 'engine', rationale });
 }
 
 // tsk-3xd D2 (docs/history/tsk-3xd-decompose-child-directive-prose/
@@ -553,6 +553,7 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
       id,
       text: `decompose caller-supplied: ${verdict.kind}`,
       source: 'resolveDecompose',
+      kind: 'engine',
       rationale:
         'tsk-27y D2/D3: caller-supplied verdict — session already reasoned live (fgos-planning); downstream gates (heavy-risk/blast-radius/footprint-overlap) still apply unconditionally, same as before',
     });
@@ -576,6 +577,7 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
         id,
         text: `decompose skip: plan.md declares mode "${mode}" (tiny/small are single-piece by fgos-planning's own mode gate), no verdict required`,
         source: 'resolveDecompose',
+        kind: 'engine',
         rationale:
           'tsk-19j D7 trust signal: plan.md already committed to no split, so there is nothing to judge — skipping avoids a pointless round-trip, never a real child-generation decision',
       });
@@ -709,6 +711,7 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
         id,
         text: `decompose --force overrode a disputed child verify: "${disputedChild.child.verify}"`,
         source: 'resolveDecompose',
+        kind: 'engine',
         rationale: `second pass disagreed on child #${disputedChild.index + 1}: ${disputedChild.secondPass.reason}`,
       });
       // fall through -- proceed to write children below, same as no dispute
@@ -766,6 +769,7 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
         id,
         text: `decompose completeness advisory: ${uncoveredDecisions.length} path(s) named in a locked decision have no child footprint covering them: ${uncoveredDecisions.join(', ')}`,
         source: 'resolveDecompose',
+        kind: 'engine',
         rationale:
           'tsk-1gr D1/D2: mechanical path-token check over CONTEXT.md\'s Locked decisions section -- advisory only, never blocks; see docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md for the failure mode this catches',
       });

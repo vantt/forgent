@@ -38,7 +38,7 @@ function sampleWork(id, overrides = {}) {
     kind: 'task',
     status: 'todo',
     deps: [],
-    risk: 'low',
+    risk: 'light',
     refs: [],
     verify: 'npm test',
     ...overrides,

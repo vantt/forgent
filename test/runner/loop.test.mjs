@@ -47,10 +47,10 @@ function seedItem(dir, overrides = {}) {
   const item = {
     id: 'item-x',
     title: 'Produce the output file',
-    kind: 'behavior_change',
+    kind: 'feature',
     status: 'todo',
     deps: [],
-    risk: 'low',
+    risk: 'light',
     refs: [],
     verify: 'test -f output.txt',
     ...overrides,
@@ -334,12 +334,53 @@ test('runOnce logs the "<capacityId> — <provider> — <model>" announce line a
     id: 'item-announce',
     capacityId: 'fgos-code-implement',
     provider: process.execPath,
+    // command (tsk-33w D9): equal to provider here because this fixture's
+    // config never overrides either -- both fall back to the same resolved
+    // executor.command. The differing-value case (provider a declared
+    // label, command the real spawned executable) is proven separately
+    // below.
+    command: process.execPath,
     model: 'sonnet',
   });
   assert.match(baseCommit, /^[0-9a-f]{40}$/, 'baseCommit must be a real commit sha, not null/undefined');
   assert.equal(headRef, 'fgw/item-announce', 'headRef must be this item\'s own dispatch branch, not the main checkout\'s');
   // the audit entry is unknown to the FSM view — never breaks replay/state.json
   assert.equal(listWork(dir).work['item-announce'].status, 'awaiting-approval');
+});
+
+test('runOnce\'s capacity.dispatch audit event records the REAL spawned command even when a capacity declares a different provider label (tsk-33w D9: the audit must not lie when the two diverge)', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-command-mismatch' });
+  const scriptPath = writeCommittingExecutor(scriptDir, counterFile);
+  // fgos-code-implement is the executing-stage capacityId a plain coding
+  // work item resolves to (dispatch.mjs's capacityIdForWork) -- overriding
+  // it here is what makes byCapacity win over the global executor below.
+  const config = {
+    executor: { command: process.execPath, args: [scriptPath, '{prompt}', '--model', '{model}'] },
+    capacities: {
+      'fgos-code-implement': {
+        kind: 'task',
+        command: process.execPath,
+        args: [scriptPath, '{prompt}', '--model', '{model}'],
+        // a declared label that is NOT the real command -- exactly the
+        // shape the item's own description warns about: a session reading
+        // only `provider` back from the audit log would wrongly conclude
+        // "claude" ran, when the real spawned command is `process.execPath`.
+        provider: 'claude',
+      },
+    },
+    models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+    timeoutMs: 30000,
+  };
+
+  await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  const events = readRawEvents(dir);
+  const auditEvent = events.find((e) => e.type === 'capacity.dispatch');
+  assert.ok(auditEvent, 'expected a capacity.dispatch event in the log');
+  assert.equal(auditEvent.payload.provider, 'claude', 'provider stays the declared label');
+  assert.equal(auditEvent.payload.command, process.execPath, 'command must be the REAL spawned executable, not the label');
+  assert.notEqual(auditEvent.payload.command, auditEvent.payload.provider, 'this is precisely the divergence the item exists to close');
 });
 
 // --- settlement role attribution (phase-3-compound-learning-5,
@@ -451,10 +492,10 @@ test('runOnce decompose sweep folds an unrecognized item.domain to "coding" (fai
     payload: {
       id: 'item-clarify',
       title: 'Produce the output file',
-      kind: 'behavior_change',
+      kind: 'feature',
       status: 'todo',
       deps: [],
-      risk: 'low',
+      risk: 'light',
       refs: [],
       verify: 'test -f output.txt',
       stage: 'clarify',

@@ -40,6 +40,17 @@ function findIndexRow(indexContent, id) {
 }
 
 /**
+ * Pure: does a record's raw `superseded_by` frontmatter value point back
+ * at `id`? A record superseded more than once carries `superseded_by` as
+ * a list (e.g. `[0028, 0029]`); a record superseded once carries it as a
+ * scalar. Both are valid — this checks membership either way rather than
+ * assuming one shape.
+ */
+function pointsBackAt(supersededBy, id) {
+  return Array.isArray(supersededBy) ? supersededBy.includes(id) : supersededBy === id;
+}
+
+/**
  * Pure: given every decision record's `{ id, meta }` and the raw
  * `0000-index.md` text, return every supersession-drift finding. Records
  * are supplied already parsed — this function does no file I/O.
@@ -74,7 +85,7 @@ export function findSupersessionFindings(records, indexContent) {
         continue;
       }
 
-      if (target.meta.superseded_by !== record.id) {
+      if (!pointsBackAt(target.meta.superseded_by, record.id)) {
         findings.push({
           kind: 'missing-frontmatter-pointer',
           id: targetId,

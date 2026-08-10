@@ -179,7 +179,7 @@ cause, fix, and real test coverage: `tsk-2vd`
 (`docs/history/tsk-2vd/`, `docs/history/worktree-dependency-provisioning/`).
 Once `tsk-2vd`'s fix was committed on `fgw/tsk-2vd` (forked from this
 item's own branch tip), `fgos return tsk-32n` was re-run using that
-branch's own patched `bin/fgos.mjs` as the orchestrator (`--dir` still
+branch's own patched `bin/fgos.mjs` as the launcher (`--dir` still
 pointing at the real `.fgos/` store) — a disposable, non-destructive way
 to prove the fix against real state without touching the shared main
 checkout or merging anything early. Verify passed cleanly.

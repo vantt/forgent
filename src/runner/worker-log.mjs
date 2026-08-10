@@ -9,7 +9,7 @@
 // without touching the FSM contract.
 //
 // `.fgos/logs/` is git-ignored (per D4): worker-authored stdout/stderr is
-// persisted locally so an orchestrator can recover what a worker actually did
+// persisted locally so a launcher can recover what a worker actually did
 // after the console tail scrolls past — but it never lands in a committed/
 // git-tracked path (the half of the security panel's OUTPUT DISCIPLINE that
 // still holds exactly, per D1).

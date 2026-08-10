@@ -27,7 +27,8 @@ import { resolveFgosDir, fgosDirFromRoot } from '../src/runner/paths.mjs';
 import { resolveDiscovery } from '../src/intake/discovery.mjs';
 import { resolveDecompose } from '../src/intake/decompose.mjs';
 import { computeEntropy, computeCounts, FINAL_STATUSES } from '../src/report/entropy.mjs';
-import { buildEnduserIndex, QUADRANTS, QUADRANT_DIR_ALIASES, findSourceCaptureIds } from '../src/report/enduser-index.mjs';
+import { findSourceCaptureIds } from '../src/report/enduser-index.mjs';
+import { generateEnduserDocsIndex } from '../src/report/enduser-index-generate.mjs';
 import { rankCandidates } from '../src/evolve/candidates.mjs';
 import { rankImpact } from '../src/state/impact.mjs';
 import { isResolvedStatus } from '../src/state/frontier.mjs';
@@ -40,6 +41,7 @@ import { createGitHubPR, mergeGitHubPR, viewGitHubPRStatus } from '../src/runner
 import { assertSafeMainCheckoutReset } from '../src/runner/main-checkout-reset-guard.mjs';
 import { classifyIronLaw } from '../src/evolve/iron-law.mjs';
 import { driftStatus } from '../src/state/drift-status.mjs';
+import { unreleasedHasEntries } from '../src/setup/registrations.mjs';
 import { branchNameFor, branchExists, withMergeEphemeralWorktree, provisionDependencies } from '../src/runner/worktree.mjs';
 import { resolveIntegrationBranch, retargetMember } from '../src/runner/promote-engine.mjs';
 import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
@@ -633,6 +635,40 @@ function collectMissingOutcomeNag(view, id) {
   return { count: missing.length, ids: missing };
 }
 
+// tsk-3ip (docs/history/automated-changelog-compound-learn/DISCUSSION.md
+// §6.1/§6.4): observe/remind only, never blocks merge (R2, tsk-28x §6.4).
+// `unreleasedHasEntries` (registrations.mjs) is the same structural read
+// the `changelog-unreleased-stale` doctor check uses, so both surfaces
+// agree on what "has an entry" means.
+function changelogNagHistoryPath(dir) {
+  return path.join(dir, 'changelog-nag-history.jsonl');
+}
+
+// Appends one snapshot per `check` run — same append-only, never-read-back
+// discipline `appendHistoryEntry` (entropy, below) already uses. This file
+// is the item's own required "bộ đếm": raw {ts, hasEntries, deliveredCount}
+// data points that, read back across N real runs spread over N real
+// merges, are what let a person later derive the three numbers the item's
+// description says are currently guesses. This function only records the
+// data point — it never computes a rate itself ("đếm, đừng mắng").
+function appendChangelogNagHistoryEntry(dir, entry) {
+  fs.mkdirSync(dir, { recursive: true });
+  fs.appendFileSync(changelogNagHistoryPath(dir), `${JSON.stringify(entry)}\n`, 'utf8');
+}
+
+function collectChangelogNag(view, dir) {
+  const root = path.dirname(dir);
+  const changelogPath = path.join(root, 'CHANGELOG.md');
+  if (!fs.existsSync(changelogPath)) {
+    return { fileExists: false };
+  }
+  const content = fs.readFileSync(changelogPath, 'utf8');
+  const hasEntries = unreleasedHasEntries(content);
+  const deliveredCount = Object.values(view.work ?? {}).filter((w) => w.status === 'delivered').length;
+  appendChangelogNagHistoryEntry(dir, { ts: new Date().toISOString(), hasEntries, deliveredCount });
+  return { fileExists: true, hasEntries, deliveredCount };
+}
+
 // Entropy-trend history path (per this cell's action (2) / must_haves: MUST
 // live in the SAME data dir as the store's own events.jsonl — never
 // hardcoded to `repo/.fgos`). `dir` here is always the caller's resolved
@@ -724,6 +760,9 @@ function collectCheckData(view, id, dir) {
     settlement: collectSettlementData(view, id),
     learning: collectLearningData(view, id),
     missingOutcomeNag: collectMissingOutcomeNag(view, id),
+    // Changelog observe/remind nag (tsk-3ip): a whole-work-state summary,
+    // not scoped to `id`, same as `entropy` below.
+    changelogNag: collectChangelogNag(view, dir),
     // Entropy-trend + seal-digest: a whole-work-state summary, not scoped to
     // `id` like the fields above — it reports on the learning area as a
     // whole even when `check <id>` was called for one item.
@@ -2052,13 +2091,16 @@ async function runVerb(verb, flags, positional, dir) {
     // living doc (D10 — that "gộp sống" slice is deferred). Enumerates the
     // real end-user docs under docs/<quadrant>/ for each of the four
     // Diataxis quadrants (enduser-index.mjs's QUADRANTS) — a missing
-    // quadrant dir (today, only docs/how-to/ exists) is skipped cleanly,
-    // never a crash. All I/O (readdir, first-H1 extraction, folding the
-    // event log, writing the manifest) lives here in the entry layer;
-    // `buildEnduserIndex` itself stays a PURE transform (zero imports,
-    // mirrors entropy.mjs) that only assembles the manifest rows and
-    // resolves each doc's `sourceCaptureId` by matching `docPath` against
-    // the rebuilt outcomes view (D13's fidelity/back-link guarantee).
+    // quadrant dir is skipped cleanly, never a crash. All I/O (readdir,
+    // first-H1 extraction, folding the event log, writing the manifest)
+    // lives in enduser-index-generate.mjs's `generateEnduserDocsIndex`
+    // (tsk-1m0: extracted from this case so the enduser-docs-index-stale
+    // doctor check/fix can share the identical generation path, never a
+    // duplicate); `buildEnduserIndex` itself stays a PURE transform (zero
+    // imports, mirrors entropy.mjs) that only assembles the manifest rows
+    // and resolves each doc's `sourceCaptureId` by matching `docPath`
+    // against the rebuilt outcomes view (D13's fidelity/back-link
+    // guarantee).
     //
     // Uses `listWork(dir)` — NOT `rebuild(dir)` — to fold the outcomes view:
     // both replay the SAME event log through the SAME fold logic
@@ -2081,83 +2123,14 @@ async function runVerb(verb, flags, positional, dir) {
       // tree entirely. `dir` is always exactly `<repoRoot>/.fgos`
       // (fgosDirFromRoot, src/runner/paths.mjs), so its parent recovers the
       // one true root regardless of where this command was invoked from.
+      //
+      // The actual enumeration/fold/write logic lives in
+      // enduser-index-generate.mjs (tsk-1m0) — the one generation path this
+      // verb shares with the enduser-docs-index-stale doctor check/fix
+      // (src/setup/registrations.mjs), so neither duplicates the other.
       const repoRoot = path.dirname(dir);
-      const docEntries = [];
-      // Scans one on-disk dir for `.md` files and pushes each as a docEntry
-      // tagged with `quadrant` — the quadrant this dir counts as, which for
-      // an alias dir (D2) differs from the dir's own on-disk name. A missing
-      // dir is skipped cleanly (ENOENT), never a crash: not every quadrant
-      // dir, nor every alias dir, is guaranteed to exist yet.
-      const scanDirAsQuadrant = (quadrantDir, quadrant) => {
-        let dirEntries;
-        try {
-          dirEntries = fs.readdirSync(quadrantDir, { withFileTypes: true });
-        } catch (err) {
-          if (err.code === 'ENOENT') return; // dir absent — skip cleanly, never a crash
-          throw err;
-        }
-        for (const dirEntry of dirEntries) {
-          if (!dirEntry.isFile() || !dirEntry.name.endsWith('.md')) continue;
-          const absPath = path.join(quadrantDir, dirEntry.name);
-          const docPath = path.relative(repoRoot, absPath).split(path.sep).join('/');
-          const content = fs.readFileSync(absPath, 'utf8');
-          const h1 = content.match(/^#\s+(.+)$/m);
-          docEntries.push({ quadrant, docPath, title: h1 ? h1[1].trim() : null });
-        }
-      };
-      for (const quadrant of QUADRANTS) {
-        scanDirAsQuadrant(path.join(repoRoot, 'docs', quadrant), quadrant);
-        for (const alias of QUADRANT_DIR_ALIASES[quadrant] ?? []) {
-          scanDirAsQuadrant(path.join(repoRoot, 'docs', alias), quadrant);
-        }
-      }
-      // fs.readdirSync order is not guaranteed stable across worktree
-      // checkouts of the same doc set — sort before building the manifest
-      // so re-runs over unchanged docs produce byte-identical output (a
-      // prerequisite for the write-only-if-changed guard below to ever
-      // actually skip a write).
-      docEntries.sort((a, b) => (a.quadrant === b.quadrant ? (a.docPath < b.docPath ? -1 : 1) : (a.quadrant < b.quadrant ? -1 : 1)));
-      const manifestPath = path.join(repoRoot, 'docs', 'enduser-docs-index.json');
-      let previousContent;
-      try {
-        previousContent = fs.readFileSync(manifestPath, 'utf8');
-      } catch (err) {
-        if (err.code !== 'ENOENT') throw err;
-      }
-      // tsk-f31: sourceCaptureId can be unresolvable this run not because
-      // the doc genuinely lacks a capture, but because the store itself is
-      // unreachable (a worktree's .fgos/ carries no events.jsonl -- ADR0020).
-      // Detected on the log file itself, not the .fgos/ directory: the
-      // directory can exist (e.g. holding only main-checkout.lock) while
-      // events.jsonl is absent -- readEvents' own ENOENT check
-      // (src/state/events.mjs) is the real signal listWork keys off, not a
-      // directory-level proxy for it. When unreachable, preserve a docPath's
-      // existing on-disk value instead of regressing it to null; a
-      // genuinely reachable store is the only thing allowed to overwrite a
-      // prior value with null.
-      const storeReachable = fs.existsSync(path.join(dir, 'events.jsonl'));
-      const previousById = new Map();
-      if (previousContent) {
-        for (const e of JSON.parse(previousContent)) previousById.set(e.docPath, e.sourceCaptureId);
-      }
-      const view = listWork(dir);
-      const rawEntries = buildEnduserIndex(docEntries, view.outcomes ?? {});
-      const entries = rawEntries.map((e) => {
-        if (!storeReachable && e.sourceCaptureId === null && previousById.get(e.docPath)) {
-          return { ...e, sourceCaptureId: previousById.get(e.docPath) };
-        }
-        return e;
-      });
-      const nextContent = `${JSON.stringify(entries, null, 2)}\n`;
-      if (previousContent !== nextContent) {
-        fs.mkdirSync(path.dirname(manifestPath), { recursive: true });
-        fs.writeFileSync(manifestPath, nextContent, 'utf8');
-      }
-      return {
-        path: path.relative(repoRoot, manifestPath).split(path.sep).join('/'),
-        count: entries.length,
-        entries,
-      };
+      const { path: manifestRelPath, count, entries } = generateEnduserDocsIndex(repoRoot, dir);
+      return { path: manifestRelPath, count, entries };
     }
 
     // Read-only doc↔capture linkage gather (Slice ① gộp-sống, CONTEXT.md
@@ -3434,9 +3407,12 @@ async function runVerb(verb, flags, positional, dir) {
         const rootTitle = requireField(flags['root-title'], 'promote-to-component requires --root-id (an existing member to promote) or --root-title (to create a fresh root item).');
         rootId = generateId(rootTitle, Object.keys(view.work));
         // A freshly created root is a pure milestone-style grouping item
-        // (tsk-5t3a precedent, no code of its own) — 'low'/'true' mirror
-        // that precedent's own minimal, trivially-true shape.
-        addWork(dir, { id: rootId, title: rootTitle, kind: 'feature', status: 'todo', deps: [], refs: [], risk: 'low', verify: 'true' });
+        // (tsk-5t3a precedent, no code of its own) — 'light'/'true' mirror
+        // that precedent's own minimal, trivially-true shape. 'light' is the
+        // floor of coding's declared `risk` vocabulary (DOMAINS.coding's
+        // `classification`), the same three values decompose.mjs's heavy-risk
+        // gate and priority-formula.mjs's RISK_DISCOUNTS already read.
+        addWork(dir, { id: rootId, title: rootTitle, kind: 'feature', status: 'todo', deps: [], refs: [], risk: 'light', verify: 'true' });
         rootCreated = true;
       }
 
@@ -3890,7 +3866,13 @@ async function runVerb(verb, flags, positional, dir) {
     // ensures the shared config file (`.fgos/config.json`) exists and has
     // every current default key from EVERY registered `registerConfigDefault`
     // entry, via `ensureSharedConfigDefaults` (the one write path allowed
-    // here; `doctor`, unlike `setup`, never calls it).
+    // here; `doctor`, unlike `setup`, never calls it). tsk-1ri: also ensures
+    // the GLOBAL config file (`~/.fgos/config.json`) the same way —
+    // `ensureSharedConfigDefaults` is already generic over its `dir`
+    // argument (`sharedConfigFilePath(os.homedir())` resolves to the exact
+    // same path `src/config/global-config.mjs`'s `defaultGlobalConfigPath()`
+    // uses), so this reuses it as-is rather than adding a parallel
+    // global-specific writer.
     case 'setup': {
       const repoRoot = process.cwd();
       const scriptPath = integrationScriptPath();
@@ -3917,6 +3899,9 @@ async function runVerb(verb, flags, positional, dir) {
       const configPath = sharedConfigFilePath(repoRoot);
       const configExisted = fs.existsSync(configPath);
       const { addedKeys } = ensureSharedConfigDefaults(repoRoot);
+      const globalConfigPath = sharedConfigFilePath(os.homedir());
+      const globalConfigExisted = fs.existsSync(globalConfigPath);
+      const { addedKeys: globalAddedKeys } = ensureSharedConfigDefaults(os.homedir());
       // str65-6/str88: wires core.hooksPath the same way `npm run setup:hooks`
       // does — a second, non-npm-lifecycle-dependent activation path for the
       // main-checkout lock hook, since pnpm 10+ blocks `prepare` for a
@@ -3940,6 +3925,9 @@ async function runVerb(verb, flags, positional, dir) {
         configPath,
         configCreated: !configExisted,
         configAddedKeys: configExisted ? addedKeys : [],
+        globalConfigPath,
+        globalConfigCreated: !globalConfigExisted,
+        globalConfigAddedKeys: globalConfigExisted ? globalAddedKeys : [],
         hooksWired,
         hooksSkippedExisting,
         fixed,

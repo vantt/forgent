@@ -122,7 +122,7 @@ doctrine tương đương nhiều tháng) nhưng không được import mù: bee
 | 31 | **Sai lầm gốc: phân loại nhầm.** "Item đã rõ chưa?" bị coi là *thuộc tính tính được tại lúc ghi*, trong khi nó là *một VIỆC*. Bốn triệu chứng (612 dòng máy móc · mất trí nhớ ⇒ không hội tụ · không với tới native · bộ spawn thứ hai) đều chảy từ đây | **Rõ** | §5 vòng 5 |
 | 32 | **Ca "không có soul khả dụng" KHÔNG tồn tại** — runner đã tự `spawnWorker` cho thi công (`loop.mjs:707`), và worker spawn là agent loop thật (0026 nesting rule) ⇒ judge-trong-verb hết lý do tồn tại | **Rõ** | §5 vòng 5 |
 | 33 | **Đối xứng có sẵn**: `executing` giao worker chạy skill thi công → `fgos return`; `discovery` giao worker chạy skill research → `fgos discover --verdict`. Cùng đường, khác skill | **Gần rõ (vòng 5)** | §5 vòng 5 |
-| 34 | Nếu research là *việc*, nó là **work item riêng** hay **một stage của item đã có, dispatch tới worker như `executing`**? | **Gần rõ (vòng 6)** — người dùng chọn **B1: stage dispatch được của item đã có**. Chờ 1 vòng nữa | §5 vòng 6 |
+| 34 | Nếu research là *việc*, nó là **work item riêng** hay **một stage của item đã có, dispatch tới worker như `executing`**? | **Rõ — đã mint D7** (người dùng chọn B1 ở vòng 6, giữ nguyên vòng 7). Lưu ý phạm vi, để không bị đọc rộng hơn thực tế: D7 khoá *research là một stage dispatch được của item đã có*; nó KHÔNG khoá việc stage đó phải mượn nguyên nghi thức của `executing`. Bản thi công cố ý **không** chạy goal-check ở `discovery` (`src/runner/loop.mjs:1066-1072`: *"No goal-check — discovery has no `verify` of its own to prove, that stays executing's job"*) — điều kiện duy nhất là worker có commit thật (`branchFacts().aheadCount > 0`); và session sống ở stage này gọi thẳng `fgos-researching` inline, không worktree, không commit (`workflow-stage-graphs.mjs`'s `skillMap.discovery`) | §5 vòng 6; §4 D7; `CONTEXT.md:50` |
 | 36 | **CÓ HAI BÀI TOÁN FAN-OUT, KHÁC HẲN NHAU — `tsk-5kn` chỉ giải một.** (A) *gather fan-out*: trong MỘT item, research chẻ câu hỏi thành nhánh độc lập, bắn subagent song song, gom digest — I/O worker, không vòng đời ⇒ giải ở `#task-skill`. (B) *execution fan-out*: sau decompose ra N children, dispatch N worker đồng thời, mỗi worker claim + thi công một child — execution worker, vòng đời đầy đủ, worktree/claim/verify/merge ⇒ **`tsk-5kn` KHÔNG giải; cần item riêng** | **Rõ — nêu vòng 7** | §5 vòng 7 |
 | 37 | Fan-out B **không bị gì chặn, chỉ là chưa ai xây**: children của decompose là rootTask thật ⇒ dispatch N cái = kích hoạt N rootTask đúng định nghĩa `0026`; demo `tsk-1sj`→`tsk-30z`/`tsk-50ic` đã chạy thật (~184s overlap) nhưng bằng tay; `computeSchedule`/`selectWave` đã có nhưng chỉ `fgos-runner` tiêu thụ mà runner chưa từng chạy; mọi loop skill hiện tại đều tuần tự | **Rõ** | §5 vòng 7 |
 | 36b | Fan-out B đã có item riêng: **`tsk-umc`** (tier `heavy`, risk `heavy`, kind `feature`, `docsRef` trỏ về thư mục này). Không phụ thuộc `tsk-5kn`, làm song song được | **Rõ** | submit vòng 7 |
@@ -164,7 +164,7 @@ thật qua `fgos decision --id tsk-5kn`.
 - `upstreams/beegog/skills/bee-hive/references/routing-and-contracts.md:262-284` — Delegation contract nguyên văn: 3 lớp dispatch (I/O worker · execution worker · review-class), phân biệt bằng **thẩm quyền + tác dụng lên state, không phải kích thước việc**; D2 rubric ">3 files HOẶC digest-not-verbatim"; digest contract; cli gather branch với delimiter `<<<BEE_DIGEST`.
 - `upstreams/beegog/AGENTS.md` rule 13 — luật đặt ở tầng luôn nạp, lý do nêu: *"'no skill is running' is exactly when the rule is most often forgotten"*.
 - `docs/history/two-layer-dispatch/{CONTEXT,DISCUSSION}.md` — D1-D12 đầy đủ.
-- `docs/decisions/0026-*.md` — 4 quy tắc native-vs-cli/spawn, vocabulary orchestrator/rootTask/subTask/capacity.
+- `docs/decisions/0026-*.md` — 4 quy tắc native-vs-cli/spawn, vocabulary launcher/rootTask/subTask/capacity.
 - `.claude/skills/_shared/capacity-dispatch-fallback.md` — Step A/B/B.5/C/D + gói ad-hoc 6 ô.
 - `docs/history/fgos-stage-skills-task-delegation-audit/CONTEXT.md` — **phát hiện lật tiền đề**, xem dưới.
 - `.claude/skills/fgos-{exploring,planning,validating,code-implement}/SKILL.md` — nguyên văn luật cấm delegation.
@@ -362,11 +362,18 @@ Nên lý do L1-thuần duy nhất bị rơi mất: **tiết kiệm context windo
 | tầng | trên vòng đời (chọn việc) | trong 1 việc (chọn delegate gì) |
 
 Đã có lệnh dành riêng chữ này: `two-layer-dispatch/CONTEXT.md:33` —
-*"L2 is never called \"orchestrator\""*; `DISCUSSION.md:102` —
-*"**Rõ — đừng gọi \"orchestrator\"** | 0026 dòng 34-56 đã gán
-\"orchestrator\" cho vai trò quyết định kích hoạt rootTask nào — tầng CAO
+*"L2 is never called \"launcher\""*; `DISCUSSION.md:102` —
+*"**Rõ — đừng gọi \"launcher\"** | 0026 dòng 34-56 đã gán
+\"launcher\" cho vai trò quyết định kích hoạt rootTask nào — tầng CAO
 hơn, không phải transport. Thuật ngữ sẵn có cho L2 là **\"cơ chế
 dispatch\"**; **\"executor\"** để dành cho backend đích"*.
+
+(Ghi chú 2026-08-08, `tsk-2cw`: đoạn trích trên phản ánh nội dung
+`two-layer-dispatch/CONTEXT.md`/`DISCUSSION.md` **sau** khi `0028` đổi tên
+"orchestrator" → "launcher" — xem `0028-doi-ten-orchestrator-thanh-
+launcher.md`. Toàn bộ phần còn lại của mục F này (và §3 hàng 3, dòng 88) mô
+tả VÒNG THẢO LUẬN LỊCH SỬ về va chạm từ vựng giữa fgOS và bee — giữ nguyên
+chữ "orchestrator" có chủ đích vì đó chính là chủ đề đang được phân tích.)
 
 Tên fgOS-native đề xuất cho khái niệm của bee: **rootTask host** — `0026:58-65`
 đã tự viết chữ "host": *"bất kỳ ai đang là 'host' thực thi cho 1 việc, tại
@@ -415,7 +422,7 @@ already knows"* — đúng lớp lãng phí `tsk-1ni` tìm ra.
   skill nào làm.
 - **Fan-out execute N children** — **không luật nào chặn**. Children của
   decompose **là work item thật = rootTask thật**; dispatch song song =
-  kích hoạt N rootTask, đúng định nghĩa orchestrator của `0026`. Demo
+  kích hoạt N rootTask, đúng định nghĩa launcher của `0026`. Demo
   `tsk-1sj`→`tsk-30z`/`tsk-50ic` đã chạy thật (~184s overlap đo được từ
   `.fgos/events.jsonl`). Thiếu: chưa skill nào tự làm — mọi loop skill hiện
   tại đều *"lần lượt"* (tuần tự).

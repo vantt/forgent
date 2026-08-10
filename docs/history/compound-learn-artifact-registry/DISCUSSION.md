@@ -13,10 +13,20 @@ quy mô vấn đề gốc). Số đo chặn lại quyết định: **54 item đa
 `retrospective`** — hàng đợi thật, nên mọi phương án thêm bước per-item
 đều đi ngược. §6.4 viết lại thành 5 ràng buộc + 4 phương án.
 
-Đứng vững qua vòng 4: D-tsk28x-1 (hai trục) và nguyên tắc tách-theo-giai-
-đoạn. Còn mở: chọn phương án nào (§6.4), hai trục có cần cùng lúc không,
-hình dạng triage, ranh giới scope `tsk-28x`/`tsk-12m`, và va giữa
-D-tsk12m-B với mô hình mới.
+Vòng 5. Phép thử Cách 1 (`tsk-1hy`) **đã chạy thật và merge** — trả lời
+xong câu hỏi của nó: vỉa chất liệu **dùng được nhưng mật độ không đều**,
+kèm ứng viên tín hiệu xếp hạng đầu tiên có căn cứ (round-count trên mỗi
+item). Đồng thời đo được một thí nghiệm tự nhiên chưa ai để ý: bước
+hậu-kỳ dựa vào "có người nhớ" đang hỏng ở **32%** (`docs/enduser-docs-
+index.json` thiếu 70/220 tài liệu, không doctor check nào canh) — thành
+ràng buộc R6 ở §6.4. Hệ quả lớn nhất: **§6.4 giờ trả lời được TỪNG NỬA**
+— nửa storytelling đã có chứng cứ, nửa changelog còn chờ `tsk-3ip`.
+
+Đứng vững: D-tsk28x-1 (hai trục), nguyên tắc tách-theo-giai-đoạn, và
+toàn bộ 6 ràng buộc R1-R6. Còn mở: chọn phương án cho nửa storytelling
+(giờ đã đủ chứng cứ để chọn), hai trục có cần cùng lúc không, ranh giới
+scope `tsk-28x`/`tsk-12m`, va giữa D-tsk12m-B với mô hình mới, và một câu
+mới — có gộp doctor check cho index drift vào `tsk-3ip` hay tách riêng.
 
 ## 2. Mục tiêu & đề bài
 
@@ -46,11 +56,15 @@ Diataxis hiện có (không đụng, không pha trộn — hard rule của
 | B | Đóng hay mở | **TRẢ LỜI V3** (chưa D-ID) — giải bởi chữ `struggle` | `struggle` KHÔNG nằm trong 4 quadrant Diataxis (Diataxis dựng từ 2 chiều hành-động/nhận-thức × tiếp-thu/vận-dụng, ra đúng 4 ô, không ô nào là struggle). Suy ra: trục trạng-thái-nhận-thức là trục TỔNG QUÁT, Diataxis chỉ là MỘT PROFILE của trục đó (profile cho tài liệu kỹ thuật); marketing có profile riêng trên cùng trục, `struggle` là một trạng thái trong đó. **Trục MỞ (thêm profile mới được) + mỗi profile ĐÓNG (Diataxis mãi đúng 4)** — chính là kiến trúc OKF v0.1 (lỏng) + Bee Profile (đóng) đã dùng. Không phải chọn một trong hai |
 | C | **GHI hay ĐỀ XUẤT** | **TRẢ LỜI V3** (chưa D-ID) — câu hỏi vòng 2 đặt SAI | Không chọn một cho cả hệ thống — tách theo GIAI ĐOẠN. **Thu chất liệu: ghi thẳng, liên tục, không bao giờ dừng để hỏi** (ràng buộc chủ sản phẩm đặt: nhanh, rẻ, ít token, không cắt ngang luồng làm việc khác — loại thẳng mọi phương án gọi LLM phân loại ngay lúc capture). **Tổng hợp: nhiều pha, có triage nổi ứng viên, có người duyệt.** Lý do OKF sợ tự-ghi chỉ áp cho TÀI LIỆU (giả vờ là kết luận đã biên tập), không áp cho CHẤT LIỆU THÔ (chỉ ghi "đã xảy ra chuyện này"). Cửa gác đặt đúng chỗ chất liệu biến thành khẳng định |
 | D | Ai giữ "một chủ đề một chủ sở hữu" khi số tài liệu tăng | CHƯA RÕ (chưa bàn vòng 3) | `fgos-compounding` phát hiện grow-vs-create CHỈ bằng `fs.existsSync`. Không có khái niệm chủ-sở-hữu-chủ-đề. OKF trả lời bằng `authoritative_for` + anti-fork gate 3 tầng (sau khi judge độc lập phá bản 1 tầng bằng 4 cách trong một buổi). Càng nhiều profile/audience thì rủi ro 2 tài liệu cùng chủ đề càng cao — port cùng lúc hay để riêng? |
-| E | Ranh giới scope `tsk-28x` vs `tsk-12m` | CHƯA RÕ, đã đổi bản chất so với vòng 1-2 | Vòng 1 hỏi "thứ tự nào trước". Vòng 3 đổi câu hỏi: đường ống 5 pha (§6) rõ ràng lớn hơn cả hai item cộng lại. Cần cắt lại: pha nào thuộc `tsk-12m`, pha nào `tsk-28x`, pha nào là item mới chưa tồn tại. `deps: [tsk-12m]` đặt lúc submit có thể không còn đúng |
-| F | Hình dạng pha TRIAGE (pha 1, §6) | MỚI, CHƯA RÕ | Pha triage phải chấm điểm ứng viên. Bài học B6b (§5 vòng 2): tín hiệu xếp hạng phải chọn BẰNG ĐO, không bằng trực giác — trùng tag đo ra AUC 0.550 (≈ tung đồng xu), `areas` 0.500 (đúng bằng tung đồng xu). fgOS hôm nay chưa có ranking/floor/guard nào. Chấm bằng gì? Đo bằng bộ nhãn nào (fgOS chưa có tập nhãn tay như bee đã có)? |
+| E | Ranh giới scope `tsk-28x` vs `tsk-12m` | CHƯA RÕ, đã đổi bản chất so với vòng 1-2 | Vòng 1 hỏi "thứ tự nào trước". Vòng 3 đổi câu hỏi: đường ống 5 pha (§6) rõ ràng lớn hơn cả hai item cộng lại. Cần cắt lại: pha nào thuộc `tsk-12m`, pha nào `tsk-28x`, pha nào là item mới chưa tồn tại. `deps: [tsk-12m]` đặt lúc submit có thể không còn đúng. **Bổ sung 2026-08-09:** `tsk-12m` vòng 4 tìm ra ranh giới **quan sát/nhắc vs quyết/viết/chặn** (`docs/history/automated-changelog-compound-learn/DISCUSSION.md` §6.1) — loại quan sát/nhắc độc lập hoàn toàn với câu hỏi §6.4 ở đây và **sống sót qua mọi phương án**, nên làm được ngay. Kèm đính chính: số đo từ nửa changelog KHÔNG mở khoá nửa storytelling — nửa đó cần phép thử riêng (Cách 1), hai phép thử chạy song song được, không tuần tự |
+| F | Hình dạng pha TRIAGE (pha 1, §6) | ĐỠ MỜ sau vòng 5 — xem J2 | Pha triage phải chấm điểm ứng viên. Bài học B6b (§5 vòng 2): tín hiệu xếp hạng phải chọn BẰNG ĐO, không bằng trực giác — trùng tag đo ra AUC 0.550 (≈ tung đồng xu), `areas` 0.500 (đúng bằng tung đồng xu). **Vòng 5 có ứng viên đầu có căn cứ: round-count trên mỗi item (J2).** Còn mở: đo nó bằng bộ nhãn nào — fgOS vẫn chưa có tập nhãn tay như bee đã có, nên chưa chạy được phép đo AUC tương đương |
 | G | ~~Chất liệu `struggle` đã có sẵn trong `friction`~~ | **RÚT LẠI — SAI** (đo lại vòng 4) | Vòng 3 kết luận "RÕ" từ ĐÚNG MỘT bản ghi (`tsk-1gn`) rồi suy rộng ra cả hệ thống. Đo toàn log: 131 friction = 81 `verify-miss` + 39 `merge-conflict` (92% telemetry máy), `detail` điển hình `goal-check failed on branch "fgw/tsk-puz" (exit null)` — ghi RẰNG hỏng, không ghi ĐÃ THỬ GÌ / VÌ SAO / CHỖ NGOẶT. Không phải chất liệu kể chuyện. Thứ làm vòng 3 phấn khích thực ra là `gates.askHistory`, KHÁC `friction` — vòng 3 lẫn hai thứ |
 | G2 | Vỉa chất liệu thật nằm ở đâu | RÕ (đo vòng 4) | (a) **375 event mang question/ask** — tranh cãi thật, văn bản thật, ví dụ "vòng 2 (kiểm tra độc lập) không đồng ý: ..."; (b) **715 rationale xuất hiện đúng một lần** trong tổng 1583 decision. Đây là vỉa, không phải `friction` |
 | H | Tỉ lệ nhiễu đã ở mức nguy hiểm NGAY HÔM NAY | RÕ (đo vòng 4) | 1583 decision nhưng chỉ **765 rationale riêng biệt**. Khuôn mẫu đo được: `x321` "caller-supplied verdict…", `x132` rỗng, `x96`, `x82` "see CONTEXT.md", `x38` → **~42% là khuôn mẫu/con trỏ, không phải nội dung**. Nghĩa là bài học B6b (không bao giờ "gom hết", phải xếp hạng) KHÔNG phải rủi ro tương lai của fgOS — nó là hiện trạng |
+| J | **Vỉa chất liệu có thật sự dùng được không** | **RÕ — phép thử `tsk-1hy` đã chạy thật (2026-08-09)** | **Dùng được, nhưng mật độ KHÔNG ĐỀU.** 10119 event → vỉa (a) 314 ask event trên ~230 item; vỉa (b) 778 rationale singleton sau lọc. Tìm được arc thật, trích nguyên văn: `tsk-19j` (15 entry, 3 ngày) có khoảnh khắc ngoặt tự-nhận-ra đóng một câu hỏi mở; `tsk-1ca` (25 entry) có quyết định người bẻ lái giữa chừng + một khoảnh khắc session tự kìm trước rủi ro git-surgery. Báo cáo đầy đủ: `reports/tsk-1hy-storytelling-material-probe-report.md` |
+| J2 | Tín hiệu xếp hạng ứng viên — câu trả lời SƠ BỘ cho dòng F | RÕ (phép thử `tsk-1hy`) | **Số vòng trên mỗi item** (round-count). Arc thật tập trung ở item có nhiều entry theo ngày; item một-hai entry gần như không mang chuyện. Đến từ dữ liệu, không phải trực giác — đúng kỷ luật B6b. CHƯA đo bằng AUC (fgOS vẫn chưa có bộ nhãn tay), nên đây là ứng viên có căn cứ, chưa phải tín hiệu đã chứng minh |
+| J3 | Vỉa (a) còn TẦNG KHUÔN MẪU THỨ HAI chưa lọc | RÕ (phép thử `tsk-1hy`) | Ngoài 4 khuôn mẫu của decision-rationale đã lọc, vỉa ask còn khuôn mẫu riêng: `"Không phán được rõ ràng — cần người xác nhận thủ công."`, `"Đề xuất: không chia (pass-through) — Item gốc có risk cao (heavy)..."` (lặp 4 lần nguyên văn trong CÙNG một item). Thiết kế nào đọc thẳng vỉa (a) phải lọc thêm tầng này |
+| K | **Bước hậu-kỳ dựa vào "có người nhớ" đang hỏng ở 32%** | **RÕ (đo 2026-08-09) — thí nghiệm tự nhiên, miễn phí** | 220 tài liệu end-user trên đĩa (`how-to`/`explanation`/`reference`/`decisions`), 151 có trong `docs/enduser-docs-index.json`, **70 thiếu = 32%**; 0 mục ma (index đúng nguyên vẹn, chỉ TỤT LẠI). Có hẳn skill `fgos-indexing` mà nhiệm vụ duy nhất là regenerate index sau mỗi lần compound-learn ghi doc — không được chạy. 6 doctor check đang đăng ký (`config-not-stale`, `main-checkout-hook-wired`, `node-version-and-git`, `root-drift`, `shell-integration-sourced`, `tool-registry-configured`), **không cái nào canh chuyện này**. Đây KHÔNG còn là rủi ro giả định: nó là tỉ lệ hỏng đã đo, trong đúng subsystem này |
 | I | Hàng đợi tổng hợp đã tồn tại thật | RÕ (đo vòng 4) | **54 item đứng ở `retrospective`**, 16 `delivered`, 99 `cleanup`, 166 `done` / tổng 435. Đọc ngược: tổng hợp hiện đắt và làm theo TỪNG ITEM (phán đoán LLM + viết doc + commit mỗi item) — hàng đợi 54 chính là bằng chứng thiết kế per-item hiện tại đã không co giãn nổi. Hệ quả trực tiếp: mọi phương án THÊM pha vào mỗi item đều đi ngược, gồm cả đường ống 5 pha ở §6 |
 
 ## 4. Quyết định đã chốt
@@ -254,6 +268,47 @@ Diataxis hiện có (không đụng, không pha trộn — hard rule của
   thật sự dùng được không). Quyết Làn A/Làn B sau, dựa trên cái nhìn thấy
   thật. Chủ sản phẩm chưa trả lời.
 
+- **2026-08-09 (vòng 5)** — Cách 1 đã được submit thành `tsk-1hy`, **chạy
+  thật và đã merge** (`delivered`). Kèm một phát hiện đo được, ngoài dự
+  kiến, trong lúc soát các câu hỏi còn mở.
+
+  **(a) Phép thử trả lời xong câu hỏi của chính nó — xem §3 dòng J/J2/J3.**
+  Vật liệu dùng được, mật độ không đều; tín hiệu xếp hạng có ứng viên đầu
+  tiên có căn cứ (round-count); vỉa ask còn một tầng khuôn mẫu thứ hai
+  chưa lọc.
+
+  **(b) Đính chính một câu trong chính báo cáo phép thử.** Báo cáo viết
+  kết quả "không xác nhận cả khẳng định quá rộng của vòng 3 lẫn việc rút
+  lại toàn phần của vòng 4". Không chính xác, và phải sửa ở đây kẻo phiên
+  sau tin nhầm: vòng 4 **chỉ** rút lại khẳng định về `friction` (§3 dòng
+  G), đồng thời chỉ đúng vỉa thật là **ask + rationale singleton** (dòng
+  G2). Phép thử soi đúng hai vỉa G2 đã chỉ ra và xác nhận chúng tốt — tức
+  **XÁC NHẬN vòng 4**, không bác. Không có "rút lại toàn phần" nào để bác
+  cả. Điều phép thử thật sự thêm vào là chiều *mật độ không đều*, thứ cả
+  vòng 3 lẫn vòng 4 đều chưa nói tới.
+
+  **(c) Phát hiện mới: bước hậu-kỳ dựa vào "có người nhớ" đang hỏng ở
+  32%** — §3 dòng K. Ý nghĩa với discussion này: ta đang tranh luận "ghi
+  thẳng thì có ai gác không" bằng suy luận, trong khi **fgOS đã vô tình
+  chạy đúng thí nghiệm đó rồi** và kết quả là 32%. Ba hệ quả: (1) luận
+  điểm của `tsk-3ip` (quan sát/nhắc vì người quên) tổng quát hơn phạm vi
+  changelog, vừa được xác nhận bằng một ca độc lập đã xảy ra; (2) mọi
+  phương án §6.4 thêm một bước "nhớ chạy" nữa phải trả lời được vì sao nó
+  sẽ không tụt như bước này — đã thành ràng buộc R6; (3) đây là **mẫu đo
+  thứ hai**, trước đó chỉ có changelog (0%, vì chưa từng có file).
+
+  **(d) Mỉa mai đáng ghi, và là bằng chứng bổ sung cho chính (c):** kết
+  quả phép thử `tsk-1hy` nằm trong `reports/`, còn phát hiện 32% ban đầu
+  chỉ được nói miệng — cả hai đứng đúng vị trí "chờ ai đó nhớ gấp vào chỗ
+  cần". Vòng 5 này chính là thao tác gấp đó, làm bằng tay.
+
+  **(e) Câu hỏi phương án §6.4 vừa được mở khoá MỘT NỬA.** Nửa
+  storytelling giờ có bằng chứng (vật liệu dùng được + ứng viên tín hiệu
+  xếp hạng). Nửa changelog vẫn chưa (chờ `tsk-3ip` đo tỉ lệ quên). Đúng
+  như lỗi 3 của vòng 4 đã tách: hai loại artifact, hai nguồn chứng cứ,
+  không đi cùng nhịp — nên §6.4 **có thể được trả lời từng nửa**, không
+  phải chờ chốt một lượt.
+
 ## 6. Thiết kế đã chốt {#design}
 
 **Tái sinh vòng 4.** Chỉ D-tsk28x-1 đã chốt thật. §6.1-6.3 giữ nguyên từ
@@ -339,6 +394,12 @@ lệch quy mô vấn đề gốc. Số đo chặn lại: **54 item đang đứng
   dòng H).
 - R5 — artifact cơ học (changelog) và artifact phán đoán (pattern/câu
   chuyện) không dùng chung một đường.
+- **R6 (vòng 5) — mọi phương án thêm một bước "nhớ chạy" phải trả lời
+  được vì sao nó không tụt như bước đã tụt.** Không phải ràng buộc suy
+  diễn: `fgos-indexing` là đúng một bước như vậy, và index đang thiếu
+  **70/220 tài liệu = 32%** (§3 dòng K), không doctor check nào canh.
+  Trả lời "sẽ có kỷ luật" không tính là trả lời — bước đang tụt cũng đã
+  có kỷ luật bằng lời.
 
 **Bốn phương án đặt cạnh nhau:**
 
@@ -378,4 +439,60 @@ tất".
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-(chưa chia — chờ §6)
+§6.4 còn bốn phương án chưa chọn, nên **chưa chia được task thi công**.
+Nhưng một việc chia được ngay và không phụ thuộc lựa chọn đó: phép thử
+đọc vỉa chất liệu.
+
+### tsk-1hy — phép thử vỉa chất liệu kể chuyện {#task-storytelling-material-probe}
+
+> **XONG 2026-08-09** (`delivered`). Giao: `scripts/probe-storytelling-
+> material.mjs` + báo cáo `reports/tsk-1hy-storytelling-material-probe-
+> report.md`. Kết quả đã gấp vào §3 (dòng J/J2/J3) và §5 vòng 5 — đọc ở
+> đó, không cần mở lại báo cáo trừ khi cần trích dẫn nguyên văn.
+
+**Mục tiêu:** script đọc-thuần gom + lọc chất liệu kể chuyện từ event log
+đã có, để biết **vỉa đó có thật sự dùng được không** trước khi cam kết
+bất kỳ kiến trúc nào. Là phép thử, không phải tính năng.
+
+**Trích §6.4 áp dụng:** Cách 1 — "chỉ mặt đọc, không đường ống". Được
+chọn làm việc-làm-trước vì nó **là phép thử**: trả lời đúng câu hỏi mà
+vòng 4 vừa chứng minh session đoán sai.
+
+**Vì sao nó tồn tại — §5 vòng 4(a):** vòng 3 khẳng định "chất liệu
+struggle đã có sẵn trong `friction`"; đo lại thì SAI (92% friction là
+telemetry máy), suy rộng từ đúng một bản ghi. Chính vì đã sai một lần
+theo kiểu đó nên phải đọc vỉa thật trước khi ai đó thiết kế tiếp trên
+giả định.
+
+**Ràng buộc mang theo:** bài học B6b (§5 vòng 2) — không bao giờ "gom
+hết"; nhưng phạm vi task này CHƯA cần ranking đầy đủ, chỉ cần lọc khuôn
+mẫu + nhóm. Chọn tín hiệu xếp hạng bằng đo là giai đoạn sau.
+
+**Quyết định thiết kế đáng ghi:** làm script trong `scripts/` (không nằm
+trong `package.json` `files`, nên không được ship), **không** thêm verb
+vào `bin/fgos.mjs`. Hai lý do thật: một phép thử chưa nên thành mặt công
+khai vĩnh viễn khi chưa biết vật liệu có dùng được; và `bin/fgos.mjs`
+đang có xung đột footprint sẵn giữa `tsk-3ip` và `tsk-3cb` — thêm cái
+thứ ba là tự chuốc khó.
+
+**Quan hệ anh em:** độc lập hoàn toàn. `fgos conflicts` xác nhận không
+xung đột với bất kỳ item nào đang mở. Chạy song song được với `tsk-469`
+và `tsk-3ip` (hai task nửa changelog, ở
+`docs/history/automated-changelog-compound-learn/DISCUSSION.md` §7).
+
+**Footprint:** `scripts/probe-storytelling-material.mjs`,
+`test/scripts/probe-storytelling-material.test.mjs`,
+`docs/history/compound-learn-artifact-registry/reports`.
+**Verify:** `node --test test/scripts/probe-storytelling-material.test.mjs`
+
+### Quan hệ với `tsk-28x` (chính nó)
+
+`tsk-28x` giờ mang `deps: [tsk-12m, tsk-1hy]` — cần kết quả phép thử mới
+trả lời được câu hỏi phương án §6.4. **Lưu ý:** `deps` trên `tsk-12m` là
+di sản từ lúc submit và vẫn là **câu hỏi mở** (§3 dòng E), chưa được xác
+nhận là đúng; `deps` trên `tsk-1hy` thì rõ ràng đúng.
+
+### Chưa chia được
+
+Mọi thứ sau khi chọn phương án: hình dạng registry/trục, port
+`authoritative_for`, triage, `draft` lifecycle. Chờ §6.4.

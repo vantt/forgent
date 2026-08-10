@@ -6,7 +6,7 @@ import { frontier, frontierAcrossSteps, FRONTIER_ORDER_VERSION, isResolvedStatus
 // replay.test.mjs's style; no fs, no mkdtemp, no `.fgos/` writes anywhere in
 // this file.
 function item(id, status, deps = []) {
-  return { id, title: id, kind: 'task', status, deps, risk: 'low', refs: [], verify: 'true' };
+  return { id, title: id, kind: 'task', status, deps, risk: 'light', refs: [], verify: 'true' };
 }
 
 test('frontier on an empty view is empty', () => {

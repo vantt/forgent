@@ -57,14 +57,16 @@ kind of premature abstraction this repo's own YAGNI stance warns
 against — a plausible-sounding capability nobody has actually needed
 twice yet.
 
-## What did ship: dispatch reframed as two orthogonal axes, not three discrete kinds
+## What did ship: dispatch reframed as a two-tier tree, not three discrete kinds
 
 Rather than "three kinds of dispatch" as a flat enumeration, the design
 locks dispatch as two layers (L1 decides *what and who*, L2 infers
-*how*) along two orthogonal axes: does this unit of work carry a real
-lifecycle, and is its prompt pre-registered ahead of time or composed at
-the moment of dispatch. L2 is deliberately never called an
-"orchestrator" — a naming discipline to avoid implying a central
+*how*) as a two-tier tree, not two independent axes: does this unit of
+work carry a real lifecycle, and — only when it does not — is its prompt
+pre-registered ahead of time or composed at the moment of dispatch. A
+unit that carries a real lifecycle can never land on the second question,
+so the two questions are not independent. L2 is deliberately never called a
+"launcher" — a naming discipline to avoid implying a central
 scheduler that doesn't exist.
 
 Concretely, the parts that shipped:

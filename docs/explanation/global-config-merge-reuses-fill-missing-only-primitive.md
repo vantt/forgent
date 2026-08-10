@@ -61,3 +61,41 @@ different pair of inputs. A primitive's own header comment naming a
 "future caller" is a real signal, not decoration — reading it first can
 turn what looks like new logic into composition of something already
 proven.
+
+## The write side hits the same shape (`fgos setup`, tsk-1ri)
+
+`tsk-2ta`'s work above made global config *readable* — `fgos doctor` could
+report which level was active, but nothing actually wrote
+`~/.fgos/config.json`. A user who wanted a global config had no guided way
+to get one. `tsk-1ri` closed that gap, and ran into the exact same
+already-proven-primitive shape one layer over, on the write side instead of
+the read side.
+
+The project-local init path already existed:
+`ensureSharedConfigDefaults(dir)` (`src/setup/registrations.mjs:161-171`)
+reads the existing config at `dir`, computes the full default shape via
+`assembleRegistryDefaults()`, fills in only genuinely-missing keys via
+`mergeConfigDefaults`, and writes the result — the same fill-missing-only
+discipline documented above, just applied to *writing* a file instead of
+*merging* two in-memory configs. The obvious-looking path was a new
+`ensureGlobalConfigDefaults` function, or a write path added to
+`global-config.mjs` duplicating `readSharedConfig`/`writeSharedConfig`.
+
+It wasn't needed. `ensureSharedConfigDefaults(dir)` was already dir-generic
+— nothing inside it assumes `dir` is a project root — and
+`sharedConfigFilePath(os.homedir())` resolves to
+`path.join(os.homedir(), '.fgos', 'config.json')`, byte-identical to
+`global-config.mjs`'s own `defaultGlobalConfigPath()`. So
+`ensureSharedConfigDefaults(os.homedir())` already does exactly what was
+needed, with zero new functions — a call-site change in `bin/fgos.mjs`'s
+`setup` case (calling the same function twice, once per `dir`), not new
+logic anywhere else. The plan's own words for the rejected alternative:
+"it would duplicate logic `ensureSharedConfigDefaults` already provides
+byte-for-byte, for no behavioral difference... violates DRY for no gain;
+the existing function's own `dir` parameter already generalizes to this
+case honestly."
+
+Same lesson as above, now confirmed on both sides of the read/write pair:
+a primitive already generalized over its input (a `dir` parameter, a pair
+of configs) is worth checking against the new surface *before* reaching
+for a parallel function that would just duplicate it.

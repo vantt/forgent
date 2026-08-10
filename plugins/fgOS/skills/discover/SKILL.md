@@ -34,13 +34,19 @@ for that; `discover` errors if called on an item that isn't at stage
 
 ## Steps
 
-1. **Read the required id argument.** `$ARGUMENTS` is the work item's id —
-   `discover` requires it. Pass it straight through to the verb in step 2 —
-   do not validate or guess it yourself; if it is missing or unknown, let
-   the CLI's own error surface verbatim.
+1. **Read the required id argument, and the optional `--autoClose` flag.**
+   `$ARGUMENTS` is the work item's id — `discover` requires it — plus an
+   optional trailing `--autoClose` token
+   (`docs/history/fgos-terminal-close-autoclose/CONTEXT.md` D1: opt-in
+   only, never a new default). Strip a trailing `--autoClose` token before
+   passing the rest through to the verb in step 2 — when absent,
+   `$ARGUMENTS` is unchanged and this skill's behavior is byte-identical to
+   before this option existed. Do not validate or guess the id itself; if
+   it is missing or unknown, let the CLI's own error surface verbatim.
+   Remember whether `--autoClose` was present — it is read again at step 4.
 
-   If `$ARGUMENTS` is empty, show the user the CLI's own usage string and
-   stop:
+   If `$ARGUMENTS` (after stripping any `--autoClose` token) is empty, show
+   the user the CLI's own usage string and stop:
 
    ```
    fgos discover <id>
@@ -57,7 +63,16 @@ for that; `discover` errors if called on an item that isn't at stage
    Read the item's live status:
 
    ```
-   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs list --id $ARGUMENTS --json --dir "$root"
+   # fgos CLI fallback (tsk-1no D3)
+   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
+   if [ -f "$FGOS_BIN" ]; then
+     node "$FGOS_BIN" list --id $ARGUMENTS --json --dir "$root"
+   elif command -v fgos >/dev/null 2>&1; then
+     fgos list --id $ARGUMENTS --json --dir "$root"
+   else
+     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
+     exit 1
+   fi
    ```
 
    If `data.work["$ARGUMENTS"].status` already reads `doing`, skip straight
@@ -66,14 +81,32 @@ for that; `discover` errors if called on an item that isn't at stage
    own step 2 does:
 
    ```
-   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs take $ARGUMENTS --role session --dir "$root"
+   # fgos CLI fallback (tsk-1no D3)
+   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
+   if [ -f "$FGOS_BIN" ]; then
+     node "$FGOS_BIN" take $ARGUMENTS --role session --dir "$root"
+   elif command -v fgos >/dev/null 2>&1; then
+     fgos take $ARGUMENTS --role session --dir "$root"
+   else
+     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
+     exit 1
+   fi
    ```
 
    If the item already carries its own branch (`fgw/<id>` from an earlier
    claim), `take` refuses and names `pick` instead — fall back to:
 
    ```
-   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs pick $ARGUMENTS --dir "$root"
+   # fgos CLI fallback (tsk-1no D3)
+   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
+   if [ -f "$FGOS_BIN" ]; then
+     node "$FGOS_BIN" pick $ARGUMENTS --dir "$root"
+   elif command -v fgos >/dev/null 2>&1; then
+     fgos pick $ARGUMENTS --dir "$root"
+   else
+     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
+     exit 1
+   fi
    ```
 
    Any other failure (the id doesn't exist, lock contention) shows the
@@ -111,3 +144,20 @@ for that; `discover` errors if called on an item that isn't at stage
 
    A parked or blocked outcome is a valid, expected result of this
    command, not a failure — say so plainly rather than treating it as one.
+
+   **If `--autoClose` was passed (step 1) and the driver's stop is one of
+   reached ceiling at stage `decompose`, or `awaiting-human`** — an advance
+   or a legitimate park, per
+   `docs/history/fgos-terminal-close-autoclose/CONTEXT.md` D2 — call
+   `/fgOS:terminal-close` as the literal last action of this skill's own
+   flow, invoked directly here rather than through a second slash-command
+   round trip:
+
+   ```
+   bash ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/plugins/fgOS/skills/terminal-close/close.sh
+   ```
+
+   Never call this on `blocked` or no-progress — the pane must stay open
+   for a person to debug (D2). Never call it if `--autoClose` was not
+   passed. Nothing runs after this call — it is unconditionally the final
+   statement of this skill's flow when it fires, with no delay before it.

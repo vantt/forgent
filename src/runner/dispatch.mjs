@@ -37,7 +37,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawn, execFileSync } from 'node:child_process';
-import { DEFAULTS } from '../state/work.mjs';
+import { DEFAULTS, TIERS } from '../state/work.mjs';
 import { DOMAINS, resolveDomainName, skillForStage } from '../state/workflow-stage-graphs.mjs';
 import { selectTemplate, renderTemplate, hashTemplate } from './prompt-templates.mjs';
 import { mergeConfigDefaults } from '../setup/config-merge.mjs';
@@ -45,6 +45,7 @@ import { sharedConfigFilePath } from '../config/shared-config-file.mjs';
 import { mergeWithGlobalConfig } from '../config/global-config.mjs';
 import { KINDS, findExecutableOnPath, resolvedStatus, readLocalStatus } from '../state/tool-registry.mjs';
 import { listWork } from '../state/store.mjs';
+import { appendEvent } from '../state/events.mjs';
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from './paths.mjs';
 
 /** Raised for malformed runner config or an unresolvable tier -> model
@@ -394,6 +395,27 @@ function validateExecutorShape(executor, label) {
  */
 export const CAPACITY_KINDS = Object.freeze([...KINDS, 'task']);
 
+/** purpose vocabulary `capacities.<id>.for` may take (D2/D6, tsk-1o7): the
+ * T2 review-class split, `gather` (returns a digest) vs `judge` (returns a
+ * verdict) — the demand side's own self-declared lane, alongside `needs`
+ * (which provider). No code consumer resolves on this yet (`tsk-2ie5` is
+ * named as the first real one) — declaring it here only lets
+ * `validateCapacityShape` accept and shape-check it now, ahead of that
+ * consumer landing.
+ */
+export const CAPACITY_PURPOSES = Object.freeze(['gather', 'judge']);
+
+/** value vocabulary `capacities.<id>.carries` may take (D15, `tsk-5td`,
+ * first real consumer `tsk-2ie5`/`tsk-2c1`): the content class a capacity
+ * is permitted to receive. `user-text` = pure user-typed text only;
+ * `repo-content` = may also carry repo file paths/content — the wider,
+ * riskier class (a capacity declaring this accepts either class, since
+ * `repo-content` covers `user-text` plus more). `secrets`/credentials is
+ * deliberately never a legal value here (D15: not a rung on this ladder,
+ * a forbidden thing).
+ */
+export const CAPACITY_CARRIES = Object.freeze(['user-text', 'repo-content']);
+
 /**
  * CLI commands recognized as staying within the Claude ecosystem for
  * cross-provider governance (D2, tsk-32n). Deliberately NOT
@@ -464,6 +486,27 @@ function validateCapacityShape(capacity, label) {
   if (capacity.forceCliSpawn !== undefined && typeof capacity.forceCliSpawn !== 'boolean') {
     throw new RunnerConfigError(`runner config (${label}) "forceCliSpawn" must be a boolean when present.`);
   }
+  // D6/tsk-1o7: demand-side self-declaration, additive and optional --
+  // absent keeps every pre-tsk-1o7 capacity byte-identical (same style as
+  // every sibling optional field above). `needs` is the real match key
+  // `resolveExecutorConfig` below now consults for a `kind:"cli"`
+  // capacity's presence check; `for` has no code consumer yet (see
+  // CAPACITY_PURPOSES's own comment) and is validated here only.
+  if (capacity.needs !== undefined && (typeof capacity.needs !== 'string' || capacity.needs.length === 0)) {
+    throw new RunnerConfigError(`runner config (${label}) "needs" must be a non-empty string when present.`);
+  }
+  if (capacity.for !== undefined && !CAPACITY_PURPOSES.includes(capacity.for)) {
+    throw new RunnerConfigError(`runner config (${label}) "for" must be one of ${CAPACITY_PURPOSES.join('/')}, got: ${JSON.stringify(capacity.for)}.`);
+  }
+  // D15/tsk-5td: the content-permission layer, alongside for/needs above.
+  // Optional (a capacity naming no `carries` skips resolveExecutorConfig's
+  // own carries gate entirely, byte-identical to every pre-D15 capacity) —
+  // but when present it must be one of CAPACITY_CARRIES, never a free
+  // string (D15's own "TAP GIA TRI phai khai ro" rule, same enum-not-
+  // free-string treatment `for` already gets above).
+  if (capacity.carries !== undefined && !CAPACITY_CARRIES.includes(capacity.carries)) {
+    throw new RunnerConfigError(`runner config (${label}) "carries" must be one of ${CAPACITY_CARRIES.join('/')}, got: ${JSON.stringify(capacity.carries)}.`);
+  }
 }
 
 function validateRunnerConfigShape(cfg, sourceLabel) {
@@ -480,6 +523,11 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
       throw new RunnerConfigError(`runner config (${sourceLabel}) "executors" must be an object mapping tier -> executor when present.`);
     }
     for (const [tier, executor] of Object.entries(cfg.executors)) {
+      if (!TIERS.includes(tier)) {
+        throw new RunnerConfigError(
+          `runner config (${sourceLabel}) "executors" key "${tier}" is not a tier — valid keys are ${TIERS.join('/')}.`,
+        );
+      }
       validateExecutorShape(executor, `${sourceLabel} executors.${tier}`);
     }
   }
@@ -558,6 +606,12 @@ export function modelForTier(cfg, tier) {
  * `fgosDir` (`spawnWorker`'s optional `opts.fgosDir`); omitted `fgosDir`
  * skips it entirely — every pre-tsk-62v call site never passes it.
  *
+ * US-027/D5/D6 (tsk-1o7): when the capacity also declares `needs` (the
+ * capability it requires), that presence check matches by the registered
+ * tool's own `capability` field, never by name coincidence with
+ * `capacityId` — a capacity naming no `needs` yet keeps the pre-tsk-1o7
+ * `tools[capacityId]` name lookup unchanged.
+ *
  * Cross-provider governance (D2/D3, tsk-32n): once the winning `executor`
  * is resolved below, a `kind: "cli"` capacity whose FINAL resolved
  * `command` is not in `CLAUDE_CLI_COMMANDS` requires
@@ -597,20 +651,99 @@ function buildAgentTypeExecutor(baseExecutor, agentType) {
   return { command: baseExecutor.command, args };
 }
 
-function resolveExecutorConfig(cfg, tier, capacityId, fgosDir) {
+/**
+ * Resolve a capacityId from a declared PURPOSE (`for`, D5/D6, tsk-1o7) —
+ * the purpose-based binding US-027 requires: a caller like a gather branch
+ * never has a pre-registered capacityId to match by name, since its
+ * prompt is composed at runtime (tsk-2ie5/tsk-2c1, the first real
+ * consumer). Scans `cfg.capacities` for the first entry whose own `for`
+ * equals `purpose`; returns `null` when none is registered — a
+ * legitimate, expected state (no gather-purpose capacity configured yet),
+ * never thrown as an error here so a caller can cleanly fall back to its
+ * own native dispatch instead of treating "not configured" as malformed
+ * config.
+ */
+export function resolveCapacityIdForPurpose(cfg, purpose) {
+  const capacities = cfg && cfg.capacities && typeof cfg.capacities === 'object' ? cfg.capacities : {};
+  for (const [id, capacity] of Object.entries(capacities)) {
+    if (capacity && capacity.for === purpose) return id;
+  }
+  return null;
+}
+
+function resolveExecutorConfig(cfg, tier, capacityId, fgosDir, contentCarries) {
   const capacity = capacityId && cfg && cfg.capacities && typeof cfg.capacities === 'object' ? cfg.capacities[capacityId] : undefined;
 
-  if (capacity && capacity.kind === 'cli' && fgosDir) {
+  // D5/D6/tsk-1o7: US-027 -- binding matches by capability promise, never
+  // by tool name. When the capacity declares `needs`, the presence gate
+  // below searches the tools registry for a provider whose OWN declared
+  // `capability` matches `capacity.needs`, instead of assuming the
+  // capacity's own id is also the registered tool's name. A capacity
+  // naming no `needs` yet keeps today's exact `tools[capacityId]` name
+  // lookup, byte-identical -- the backward-compat seam that lets this
+  // land before any real capacity in `.fgos/config.json` actually
+  // declares `needs` (tsk-53n, split off per ADR0020).
+  //
+  // D13/tsk-592: gate widened from `kind === 'cli'` to `kind !== 'task'` --
+  // mcp/skill/http/binary capacities now get the same presence check a
+  // `cli` capacity always had (latent until a capacity of one of those
+  // kinds is registered; `kind === 'task'` still excludes the one kind
+  // with no real out-of-process provider to check presence for).
+  if (capacity && capacity.kind !== 'task' && fgosDir) {
     const tools = listWork(fgosDir).tools ?? {};
-    if (!tools[capacityId]) {
+    if (capacity.needs) {
+      const localStatus = readLocalStatus(fgosDir);
+      const candidates = Object.values(tools).filter((tool) => tool.capability === capacity.needs);
+      if (candidates.length === 0) {
+        throw new RunnerConfigError(
+          `capacity "${capacityId}" needs capability "${capacity.needs}" but no tool is registered with that capability — run "fgos tool register --name <tool> --kind cli --command <cmd> --capability ${capacity.needs}" first.`,
+        );
+      }
+      const present = candidates.some((tool) => resolvedStatus(tool.name, localStatus) === 'present');
+      if (!present) {
+        throw new RunnerConfigError(
+          `capacity "${capacityId}" needs capability "${capacity.needs}" but no provider registered for it is present on this machine — run "fgos tool check --name <tool>" to refresh, or install one.`,
+        );
+      }
+    } else if (!tools[capacityId]) {
       throw new RunnerConfigError(
-        `capacity "${capacityId}" declares kind "cli" but is not registered — run "fgos tool register --name ${capacityId} --kind cli --command <cmd> --capability <label>" first.`,
+        `capacity "${capacityId}" declares kind "${capacity.kind}" but is not registered — run "fgos tool register --name ${capacityId} --kind ${capacity.kind} --command <cmd> --capability <label>" first.`,
+      );
+    } else {
+      const status = resolvedStatus(capacityId, readLocalStatus(fgosDir));
+      if (status !== 'present') {
+        throw new RunnerConfigError(
+          `capacity "${capacityId}" is registered but not present on this machine (status: "${status}") — run "fgos tool check --name ${capacityId}" to refresh, or install it.`,
+        );
+      }
+    }
+  }
+
+  // D15/tsk-5td, first real gate — carries answers "CAI GI duoc di", never
+  // "CO duoc ra ngoai khong" (allowCrossProvider's own question, checked
+  // separately below): when the capacity declares a content-permission
+  // class, the caller must self-declare what THIS dispatch actually
+  // carries (`contentCarries`) — fail closed (never silently allow) when
+  // the capacity opts into this gate but the caller passes nothing, since
+  // there is then no way to prove the dispatch is safe. `repo-content` is
+  // the wider, riskier class (it covers `user-text` plus repo paths/
+  // content); a capacity declaring `carries: "user-text"` refuses a
+  // `repo-content` dispatch before any spawn (verify item 8, tsk-2c1) —
+  // a capacity declaring `carries: "repo-content"` accepts either.
+  if (capacity && capacity.carries !== undefined) {
+    if (contentCarries === undefined) {
+      throw new RunnerConfigError(
+        `capacity "${capacityId}" declares "carries: ${capacity.carries}" but this dispatch did not declare what content it carries — pass an explicit content class before dispatch.`,
       );
     }
-    const status = resolvedStatus(capacityId, readLocalStatus(fgosDir));
-    if (status !== 'present') {
+    if (!CAPACITY_CARRIES.includes(contentCarries)) {
       throw new RunnerConfigError(
-        `capacity "${capacityId}" is registered but not present on this machine (status: "${status}") — run "fgos tool check --name ${capacityId}" to refresh, or install it.`,
+        `dispatch content class must be one of ${CAPACITY_CARRIES.join('/')}, got: ${JSON.stringify(contentCarries)}.`,
+      );
+    }
+    if (contentCarries === 'repo-content' && capacity.carries === 'user-text') {
+      throw new RunnerConfigError(
+        `capacity "${capacityId}" declares "carries: user-text" but this dispatch carries repo-content — refused before spawn (tsk-5td D15).`,
       );
     }
   }
@@ -627,7 +760,7 @@ function resolveExecutorConfig(cfg, tier, capacityId, fgosDir) {
     throw new RunnerConfigError('runner config "executor" must have a string "command" and an "args" array.');
   }
 
-  if (capacity && capacity.kind === 'cli' && !CLAUDE_CLI_COMMANDS.includes(executor.command) && capacity.allowCrossProvider !== true) {
+  if (capacity && capacity.kind !== 'task' && !CLAUDE_CLI_COMMANDS.includes(executor.command) && capacity.allowCrossProvider !== true) {
     throw new RunnerConfigError(
       `capacity "${capacityId}" resolves to non-Claude command "${executor.command}" — prompt content would leave the Claude ecosystem. Set capacities.${capacityId}.allowCrossProvider: true to permit this.`,
     );
@@ -665,9 +798,9 @@ function resolveExecutorConfig(cfg, tier, capacityId, fgosDir) {
  * with no native-vs-cli/spawn choice left to make.
  */
 export function decideDispatchMechanism({ hasNativeMechanism, hasLiveTaskAccess, forceCliSpawn } = {}) {
-  if (!hasNativeMechanism) return 'cli-spawn';
-  if (forceCliSpawn) return 'cli-spawn';
-  return hasLiveTaskAccess ? 'native' : 'cli-spawn';
+  if (!hasNativeMechanism) return 'out-of-process';
+  if (forceCliSpawn) return 'out-of-process';
+  return hasLiveTaskAccess ? 'in-process' : 'out-of-process';
 }
 
 /**
@@ -709,7 +842,7 @@ export function decideCapacityDispatchMechanism(cfg, capacityId, { hasLiveTaskAc
  * Worktree-dispatch attestation (tsk-2ig, D1/D3 of docs/history/parallel-
  * decomposition-footprint-avoidance/CONTEXT.md — mức 1, advisory-only):
  * chụp `baseCommit`/`headRef` NGAY TRƯỚC khi dispatch — captured by the
- * orchestrator itself, never trusted from whatever the dispatched executor
+ * launcher itself, never trusted from whatever the dispatched executor
  * later reports.
  *
  * `attestRoot`, when given, is read instead of `fgosDir`'s own root
@@ -750,14 +883,14 @@ function captureDispatchAttestation(fgosDir, attestRoot) {
   };
 }
 
-export function resolveExecutorCommand(cfg, { prompt, model, tier, capacityId, fgosDir, attestRoot } = {}) {
+export function resolveExecutorCommand(cfg, { prompt, model, tier, capacityId, fgosDir, attestRoot, contentCarries } = {}) {
   // Captured BEFORE resolveExecutorConfig, not after (D3) — cheap and
   // unconditional so the same call site works regardless of whether the
   // resolved executor turns out to be same-provider or cross-provider;
   // resolveExecutorConfig below is still the sole authority on which
   // executor actually gets used.
   const attestation = captureDispatchAttestation(fgosDir, attestRoot);
-  const executor = resolveExecutorConfig(cfg, tier, capacityId, fgosDir);
+  const executor = resolveExecutorConfig(cfg, tier, capacityId, fgosDir, contentCarries);
   const adapter = executor.adapter ?? DEFAULT_ADAPTER;
   if (!(adapter in EXECUTOR_ADAPTERS)) {
     throw new RunnerConfigError(
@@ -1031,10 +1164,10 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
     tier,
     model,
   }).then(
-    // capacityId/provider (D7, tsk-62v)/baseCommit/headRef (tsk-4hl):
-    // additive only — every field this function already returned stays
-    // exactly where it was.
-    (result) => ({ ...result, templateName, templateHash, capacityId, provider, baseCommit, headRef }),
+    // capacityId/provider (D7, tsk-62v)/baseCommit/headRef (tsk-4hl)/command
+    // (tsk-33w D9): additive only — every field this function already
+    // returned stays exactly where it was.
+    (result) => ({ ...result, templateName, templateHash, capacityId, provider, command, baseCommit, headRef }),
     (err) => {
       if (err instanceof DispatchError) {
         err.templateName = templateName;
@@ -1079,13 +1212,34 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
  * existed. This is plumbing only — which tier/model a caller SHOULD pick
  * is `tsk-503`'s own judgment, not decided here.
  */
+/**
+ * Record one `capacity.dispatch` audit line for an IN-SESSION capacity
+ * call (a live skill's own gather dispatch, tsk-2ie5/tsk-2c1) — the async
+ * claim/dispatch cycle's own `capacity.dispatch` event (`loop.mjs`) only
+ * ever fires from inside a work item's own claim; this is the sibling
+ * entry point for a call that has no claim of its own to attach to. Same
+ * event `type` and `provider`/`command` shape (D9, `tsk-5td`) so a
+ * downstream reader never needs a second vocabulary — `baseCommit`/
+ * `headRef` are always `null`: no worktree-dispatch attestation applies to
+ * an in-session call (`captureDispatchAttestation` is never invoked here).
+ * `appendEvent` already acquires `events.jsonl`'s own cross-process lock
+ * internally (`withEventsLock`, `src/state/events.mjs`) — no extra
+ * locking needed here even when multiple gather branches log concurrently.
+ */
+export function logCapacityDispatch(fgosDir, { id, capacityId, provider, command, model }) {
+  return appendEvent(path.join(fgosDir, 'events.jsonl'), {
+    type: 'capacity.dispatch',
+    payload: { id, capacityId, provider, command, model, baseCommit: null, headRef: null },
+  });
+}
+
 export async function resolveCapacityCli(
-  capacityId,
-  { prompt = '', cwd = process.cwd(), repoRoot, model: modelOverride, tier: tierOverride } = {},
+  capacityIdArg,
+  { prompt = '', cwd = process.cwd(), repoRoot, model: modelOverride, tier: tierOverride, for: purpose, carries } = {},
 ) {
-  if (!capacityId) {
+  if (!capacityIdArg && !purpose) {
     throw new RunnerConfigError(
-      'usage: node src/runner/dispatch.mjs resolve <capacityId> [--prompt <text>] [--model <name>] [--tier <name>]',
+      'usage: node src/runner/dispatch.mjs resolve <capacityId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] | resolve --for <purpose> [...]',
     );
   }
   // MAIN CHECKOUT root, not `resolveRepoRoot`'s worktree-own root (tsk-5hv,
@@ -1099,11 +1253,36 @@ export async function resolveCapacityCli(
   const root = repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
   const fgosDir = fgosDirFromRoot(root);
   const cfg = ensureRunnerConfigForDir(root);
+  // Purpose-based binding (D5/D6, tsk-1o7; first real consumer tsk-2ie5/
+  // tsk-2c1): `capacityIdArg` still wins when given (every pre-tsk-2c1
+  // caller always names a real id, byte-identical). Only when it's
+  // omitted does `for` resolve one — a caller with no pre-registered id
+  // to match by name (a runtime-composed gather prompt) has no other way
+  // to ask for "whichever capacity declares this purpose".
+  const resolvedByPurpose = !capacityIdArg;
+  const capacityId = capacityIdArg || resolveCapacityIdForPurpose(cfg, purpose);
+  if (!capacityId) {
+    throw new RunnerConfigError(
+      `no capacity registered for purpose "${purpose}" — call "decide --for ${purpose}" first to check availability before resolving.`,
+    );
+  }
   const capacity = cfg.capacities?.[capacityId];
   const tier = tierOverride ?? capacity?.tier ?? DEFAULTS.tier;
   const model = modelOverride ?? capacity?.model ?? modelForTier(cfg, tier);
-  const { command, args, provider } = resolveExecutorCommand(cfg, { prompt, model, tier, capacityId, fgosDir });
-  return { command, args, provider, model };
+  const { command, args, provider } = resolveExecutorCommand(cfg, {
+    prompt,
+    model,
+    tier,
+    capacityId,
+    fgosDir,
+    contentCarries: carries,
+  });
+  // capacityId is additive ONLY on the purpose-resolved path (byte-
+  // identical result shape for every pre-tsk-2c1 caller that already
+  // names a real id, per existing exact-deepEqual tests) — a purpose-only
+  // caller has no other way to learn which capacity actually got picked,
+  // needed for its own dispatch-log line.
+  return resolvedByPurpose ? { command, args, provider, model, capacityId } : { command, args, provider, model };
 }
 
 /**
@@ -1111,7 +1290,7 @@ export async function resolveCapacityCli(
  * consumer skill ask, before choosing whether to `exec` the `resolve`d
  * command or call its own Task tool natively, which mechanism
  * `decideCapacityDispatchMechanism` picks for this capacity right now.
- * Prints `{"mechanism": "native"|"cli-spawn"}` as JSON to stdout — same
+ * Prints `{"mechanism": "in-process"|"out-of-process"}` as JSON to stdout — same
  * additive-sibling relationship to `resolveCapacityCli` above as
  * `decideCapacityDispatchMechanism` has to `resolveExecutorConfig`: reads
  * the same committed runner config, calls nothing that also feeds
@@ -1122,42 +1301,69 @@ export async function resolveCapacityCli(
  * documents) that this session already has live Agent/Task tool access.
  *
  * `agentType` (tsk-3ik-3, additive): included in the result, alongside
- * `mechanism`, whenever the capacity declares one — a `mechanism: "native"`
- * result is otherwise useless to a consumer skill's own Agent/Task tool
- * call, which needs a concrete `subagent_type` to invoke, not just "go
- * native" with no target. Omitted (`undefined`, dropped by `JSON.stringify`)
- * for a capacity with no `agentType`, e.g. every `kind: "cli"` capacity —
- * `mechanism` for those always resolves `"cli-spawn"` anyway (rule 1/3), so
- * no consumer ever needs `agentType` in that case.
+ * `mechanism`, whenever the capacity declares one — a `mechanism:
+ * "in-process"` result is otherwise useless to a consumer skill's own
+ * Agent/Task tool call, which needs a concrete `subagent_type` to invoke,
+ * not just "go in-process" with no target. Omitted (`undefined`, dropped by
+ * `JSON.stringify`) for a capacity with no `agentType`, e.g. every `kind:
+ * "cli"` capacity — `mechanism` for those always resolves
+ * `"out-of-process"` anyway (rule 1/3), so no consumer ever needs
+ * `agentType` in that case.
  */
-export async function decideCapacityCli(capacityId, { cwd = process.cwd(), repoRoot, hasLiveTaskAccess = false } = {}) {
-  if (!capacityId) {
-    throw new RunnerConfigError('usage: node src/runner/dispatch.mjs decide <capacityId> [--has-live-task-access]');
+export async function decideCapacityCli(capacityIdArg, { cwd = process.cwd(), repoRoot, hasLiveTaskAccess = false, for: purpose } = {}) {
+  if (!capacityIdArg && !purpose) {
+    throw new RunnerConfigError(
+      'usage: node src/runner/dispatch.mjs decide <capacityId> [--has-live-task-access] | decide --for <purpose> [--has-live-task-access]',
+    );
   }
   // Same main-checkout resolution as resolveCapacityCli above, same reason.
   const root = repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
   const cfg = ensureRunnerConfigForDir(root);
+  // Purpose-based binding, same precedence as resolveCapacityCli above. No
+  // match is a legitimate "not configured yet" state for `decide`
+  // specifically (unlike `resolve`, which has nothing left to do without a
+  // real capacityId) — `mechanism: "unavailable"` lets a caller like
+  // gather's own fan-out branch tell "fall back to native" apart from
+  // "in-process"/"out-of-process" with one more enum value, never a thrown
+  // error for an expected, common state.
+  const resolvedByPurpose = !capacityIdArg;
+  const capacityId = capacityIdArg || resolveCapacityIdForPurpose(cfg, purpose);
+  if (!capacityId) {
+    return { mechanism: 'unavailable' };
+  }
   const mechanism = decideCapacityDispatchMechanism(cfg, capacityId, { hasLiveTaskAccess });
   const agentType = cfg.capacities?.[capacityId]?.agentType;
-  return typeof agentType === 'string' && agentType ? { mechanism, agentType } : { mechanism };
+  const base = typeof agentType === 'string' && agentType ? { mechanism, agentType } : { mechanism };
+  // capacityId additive ONLY on the purpose-resolved path — same
+  // byte-identical-shape reasoning as resolveCapacityCli above.
+  return resolvedByPurpose ? { ...base, capacityId } : base;
 }
 
 // CLI entry point — only runs when this file is executed directly (`node
 // src/runner/dispatch.mjs ...`), never on import (every existing caller
 // imports named exports, none execute this module as a script).
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const [subcommand, capacityId, ...rest] = process.argv.slice(2);
+  const [subcommand, ...afterSubcommand] = process.argv.slice(2);
+  // Purpose-based binding (tsk-2c1): a caller with no pre-registered
+  // capacityId to name (a gather branch) passes `--for <purpose>` instead
+  // of a positional id — distinguished here by whether the token right
+  // after the subcommand looks like a flag. Every pre-tsk-2c1 invocation
+  // always names a real, non-"--"-prefixed capacityId positionally, so
+  // this never changes behavior for an existing caller.
+  const capacityId = afterSubcommand[0] && !afterSubcommand[0].startsWith('--') ? afterSubcommand[0] : undefined;
+  const rest = capacityId ? afterSubcommand.slice(1) : afterSubcommand;
+  const flagValue = (name) => {
+    const i = rest.indexOf(name);
+    return i !== -1 ? rest[i + 1] : undefined;
+  };
   if (subcommand === 'resolve') {
-    let prompt = '';
-    const promptFlagIndex = rest.indexOf('--prompt');
-    if (promptFlagIndex !== -1) prompt = rest[promptFlagIndex + 1] ?? '';
-    let model;
-    const modelFlagIndex = rest.indexOf('--model');
-    if (modelFlagIndex !== -1) model = rest[modelFlagIndex + 1];
-    let tier;
-    const tierFlagIndex = rest.indexOf('--tier');
-    if (tierFlagIndex !== -1) tier = rest[tierFlagIndex + 1];
-    resolveCapacityCli(capacityId, { prompt, model, tier }).then(
+    resolveCapacityCli(capacityId, {
+      prompt: flagValue('--prompt') ?? '',
+      model: flagValue('--model'),
+      tier: flagValue('--tier'),
+      carries: flagValue('--carries'),
+      for: flagValue('--for'),
+    }).then(
       (resolved) => {
         process.stdout.write(`${JSON.stringify(resolved)}\n`);
       },
@@ -1167,8 +1373,10 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       },
     );
   } else if (subcommand === 'decide') {
-    const hasLiveTaskAccess = rest.includes('--has-live-task-access');
-    decideCapacityCli(capacityId, { hasLiveTaskAccess }).then(
+    decideCapacityCli(capacityId, {
+      hasLiveTaskAccess: rest.includes('--has-live-task-access'),
+      for: flagValue('--for'),
+    }).then(
       (decided) => {
         process.stdout.write(`${JSON.stringify(decided)}\n`);
       },
@@ -1177,9 +1385,28 @@ if (import.meta.url === `file://${process.argv[1]}`) {
         process.exitCode = 1;
       },
     );
+  } else if (subcommand === 'log') {
+    // capacityId here is the SAME shared positional above — the log
+    // line's own capacityId, e.g. whichever id `decide`'s own result
+    // named, never a second parsing scheme.
+    const id = flagValue('--id');
+    const provider = flagValue('--provider');
+    const command = flagValue('--command');
+    const model = flagValue('--model');
+    if (!id || !capacityId || !provider || !command) {
+      process.stderr.write(
+        'usage: node src/runner/dispatch.mjs log <capacityId> --id <workItemId> --provider <p> --command <c> [--model <m>]\n',
+      );
+      process.exitCode = 1;
+    } else {
+      const root = resolveMainCheckoutRoot(process.cwd()) ?? resolveRepoRoot(process.cwd());
+      const fgosDir = fgosDirFromRoot(root);
+      const event = logCapacityDispatch(fgosDir, { id, capacityId, provider, command, model });
+      process.stdout.write(`${JSON.stringify(event)}\n`);
+    }
   } else {
     process.stderr.write(
-      `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs resolve <capacityId> [--prompt <text>] [--model <name>] [--tier <name>] | decide <capacityId> [--has-live-task-access]\n`,
+      `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs resolve <capacityId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] | resolve --for <purpose> [...] | decide <capacityId> [--has-live-task-access] | decide --for <purpose> [--has-live-task-access] | log <capacityId> --id <id> --provider <p> --command <c> [--model <m>]\n`,
     );
     process.exitCode = 1;
   }

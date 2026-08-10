@@ -26,7 +26,7 @@ function addSampleWork(dir, overrides = {}) {
     kind: 'feature',
     status: 'todo',
     deps: [],
-    risk: 'low',
+    risk: 'light',
     refs: [],
     verify: 'P15 will fill this in',
     stage: 'clarify',

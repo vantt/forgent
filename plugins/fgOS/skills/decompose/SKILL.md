@@ -59,7 +59,16 @@ an item that isn't at stage `decompose`.
    Read the item's live status:
 
    ```
-   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs list --id $ARGUMENTS --json --dir "$root"
+   # fgos CLI fallback (tsk-1no D3)
+   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
+   if [ -f "$FGOS_BIN" ]; then
+     node "$FGOS_BIN" list --id $ARGUMENTS --json --dir "$root"
+   elif command -v fgos >/dev/null 2>&1; then
+     fgos list --id $ARGUMENTS --json --dir "$root"
+   else
+     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
+     exit 1
+   fi
    ```
 
    If `data.work["$ARGUMENTS"].status` already reads `doing`, skip straight
@@ -68,14 +77,32 @@ an item that isn't at stage `decompose`.
    own step 2 does:
 
    ```
-   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs take $ARGUMENTS --role session --dir "$root"
+   # fgos CLI fallback (tsk-1no D3)
+   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
+   if [ -f "$FGOS_BIN" ]; then
+     node "$FGOS_BIN" take $ARGUMENTS --role session --dir "$root"
+   elif command -v fgos >/dev/null 2>&1; then
+     fgos take $ARGUMENTS --role session --dir "$root"
+   else
+     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
+     exit 1
+   fi
    ```
 
    If the item already carries its own branch (`fgw/<id>` from an earlier
    claim), `take` refuses and names `pick` instead — fall back to:
 
    ```
-   node ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs pick $ARGUMENTS --dir "$root"
+   # fgos CLI fallback (tsk-1no D3)
+   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
+   if [ -f "$FGOS_BIN" ]; then
+     node "$FGOS_BIN" pick $ARGUMENTS --dir "$root"
+   elif command -v fgos >/dev/null 2>&1; then
+     fgos pick $ARGUMENTS --dir "$root"
+   else
+     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
+     exit 1
+   fi
    ```
 
    Any other failure (the id doesn't exist, lock contention) shows the
