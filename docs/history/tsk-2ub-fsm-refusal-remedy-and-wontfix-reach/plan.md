@@ -51,3 +51,9 @@ In addition to the standard plan-approval question, this plan needs an
 explicit answer on the `awaiting-human -> wontfix` edge specifically
 (D1/D2): **add it, or leave `wontfix` at its original 3 doors and ship
 only the message fix?**
+
+## Outstanding questions
+
+- Whether to add the `awaiting-human -> wontfix` edge (see Gate above) —
+  deliberately left open for a person to decide, not an oversight.
+
