@@ -41,6 +41,7 @@ import { readLocalStatus, classifyRegistryPosture } from '../state/tool-registry
 import { describeConfigAwareness } from '../config/global-config.mjs';
 import { sharedConfigFilePath, readSharedConfig, writeSharedConfig } from '../config/shared-config-file.mjs';
 import { DEFAULT_LEVEL, LEVELS } from '../state/gate-bypass.mjs';
+import { checkEventsJsonlContiguity, fixEventsJsonlContiguity } from '../../scripts/events-jsonl-contiguity.mjs';
 
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 
@@ -528,6 +529,64 @@ registerCheck({
   id: 'root-drift',
   description: 'every fgw/<root> branch is in sync with its real target — no unsynced drift left over from a leaf merge (tsk-3bn)',
   check: (cwd) => checkRootDrift(cwd),
+});
+
+// tsk-3wq (docs/history/events-jsonl-merge-driver-recurring-write-loss/
+// CONTEXT.md D3): the shared .fgos/events.jsonl is git-tracked, and an
+// ordinary git merge on it — through `.gitattributes`'s `merge=union`
+// entry or otherwise — can leave the log with duplicate/non-contiguous
+// `seq` values even when it merges without a conflict (git's own docs:
+// `union` "tends to leave the added lines... in random order"). This
+// check surfaces that drift the same way root-drift above surfaces a
+// stale branch, instead of only being discovered when a migrate script's
+// own contiguity guard trips over it (tsk-n4i's original origin story).
+function checkEventsJsonlContiguous(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  if (mainCheckout === null) {
+    return { passed: true, message: 'not inside a git checkout — nothing to check' };
+  }
+  const logPath = path.join(mainCheckout, '.fgos', 'events.jsonl');
+  if (!fs.existsSync(logPath)) {
+    return { passed: true, message: 'no .fgos/events.jsonl yet — nothing to check' };
+  }
+  const report = checkEventsJsonlContiguity(logPath);
+  if (report.ok) {
+    return { passed: true, message: `events.jsonl is contiguous (${report.totalLines} lines, no seq breaks/duplicates)` };
+  }
+  return {
+    passed: false,
+    message: `events.jsonl has ${report.duplicates.length} duplicate seq and ${report.gaps.length} seq break(s) — likely left behind by a git merge (tsk-3wq); run fgos doctor --fix`,
+  };
+}
+
+function fixEventsJsonlContiguous(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  if (mainCheckout === null) {
+    return { changed: false, message: 'not inside a git checkout — nothing to fix' };
+  }
+  const logPath = path.join(mainCheckout, '.fgos', 'events.jsonl');
+  if (!fs.existsSync(logPath)) {
+    return { changed: false, message: 'no .fgos/events.jsonl yet — nothing to fix' };
+  }
+  const result = fixEventsJsonlContiguity(logPath);
+  if (!result.fixed) {
+    return { changed: false, message: 'events.jsonl already contiguous — nothing to fix' };
+  }
+  return {
+    changed: true,
+    message: `deduped ${result.dedupedCount} exact-duplicate line(s), resequenced ${result.resequencedCount} event(s), backup at ${result.backupPath}`,
+  };
+}
+
+registerCheck({
+  id: 'events-jsonl-contiguous',
+  description: 'shared .fgos/events.jsonl has no seq breaks or duplicates left behind by a git merge (tsk-3wq)',
+  check: (cwd) => checkEventsJsonlContiguous(cwd),
+});
+
+registerFix({
+  id: 'events-jsonl-contiguous',
+  fix: (cwd) => fixEventsJsonlContiguous(cwd),
 });
 
 // docs/history/global-project-config-awareness/CONTEXT.md D1: reports which

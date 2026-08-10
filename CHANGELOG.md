@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `fgos doctor` gained a new check, `events-jsonl-contiguous`: the shared
+  `.fgos/events.jsonl` is now checked for seq breaks/duplicates that an
+  ordinary git merge can leave behind (a new `.gitattributes` entry routes
+  it through git's built-in `union` merge driver, closing the underlying
+  merge-conflict-hand-resolution class of event loss). `fgos doctor --fix`
+  repairs a found break by deduping exact-duplicate lines and renumbering
+  `seq` contiguously — no event is ever dropped by the fix.
+
 - Work-item `kind` and `risk` now have a per-domain vocabulary, declared by
   the domain itself (`DOMAINS.<domain>.classification`) and enforced at the
   write door alongside the existing `tier` enum. Coding declares

@@ -128,59 +128,62 @@ function parsesAsJson(line) {
  * left the log still unreadable surfaces as a thrown error, never a silent
  * "fixed" result.
  *
- * NO-CONCURRENT-PROCESSES REQUIREMENT: this is a whole-file rewrite
- * (`fs.writeFileSync` after a backup copy) and it deliberately does NOT take
- * the events.lock that guards `appendEvent`. It is a rare, operator-invoked
- * recovery step, not part of the normal concurrent-append path — and it must
- * only be run with no live fgos processes active. A concurrent `appendEvent`
- * landing between this function's read and its `writeFileSync` would be
- * silently overwritten (dropped). Guarding repair against that is out of scope
- * here (see the Deferred Idea in this feature's CONTEXT.md); the requirement is
- * documented, not enforced.
+ * The whole read → validate → backup → write sequence runs inside
+ * `withEventsLock` (tsk-3wq: this used to be an unlocked whole-file rewrite,
+ * so a concurrent `appendEvent` landing between the read and the
+ * `writeFileSync` was silently overwritten/dropped — the same
+ * read-then-write TOCTOU `withEventsLock`/`appendEventLocked` already close
+ * for `addWork`/`editWork`/`moveWork`/`moveStage` in store.mjs). Folding this
+ * function into the SAME cross-process lock `appendEvent` holds means a
+ * concurrent append can no longer land mid-repair — it either lands before
+ * this call acquires the lock (repair then reads the up-to-date file) or
+ * after this call releases it (the append reads the just-repaired file).
  */
 export function repairTruncatedLastLine(logPath) {
-  let raw;
-  try {
-    raw = fs.readFileSync(logPath, 'utf8');
-  } catch (err) {
-    if (err.code === 'ENOENT') {
-      throw new EventLogError('validation', `repair: no event log at ${logPath} — nothing to repair.`);
+  return withEventsLock(logPath, () => {
+    let raw;
+    try {
+      raw = fs.readFileSync(logPath, 'utf8');
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        throw new EventLogError('validation', `repair: no event log at ${logPath} — nothing to repair.`);
+      }
+      throw err;
     }
-    throw err;
-  }
 
-  const lines = raw.split('\n');
-  if (lines[lines.length - 1] === '') lines.pop();
+    const lines = raw.split('\n');
+    if (lines[lines.length - 1] === '') lines.pop();
 
-  if (lines.length === 0) {
-    throw new EventLogError('validation', `repair: event log at ${logPath} is empty — nothing to repair.`);
-  }
-
-  for (let i = 0; i < lines.length - 1; i++) {
-    if (!parsesAsJson(lines[i])) {
-      throw new EventLogError(
-        'corrupt-log',
-        `repair: line ${i + 1} of ${lines.length} in ${logPath} is corrupt (not just a truncated final line) — refusing to repair.`,
-      );
+    if (lines.length === 0) {
+      throw new EventLogError('validation', `repair: event log at ${logPath} is empty — nothing to repair.`);
     }
-  }
 
-  const lastLine = lines[lines.length - 1];
-  if (parsesAsJson(lastLine)) {
-    throw new EventLogError('validation', `repair: event log at ${logPath} already parses cleanly — nothing to repair.`);
-  }
+    for (let i = 0; i < lines.length - 1; i++) {
+      if (!parsesAsJson(lines[i])) {
+        throw new EventLogError(
+          'corrupt-log',
+          `repair: line ${i + 1} of ${lines.length} in ${logPath} is corrupt (not just a truncated final line) — refusing to repair.`,
+        );
+      }
+    }
 
-  const backupPath = `${logPath}.corrupt-${Date.now()}`;
-  fs.copyFileSync(logPath, backupPath);
+    const lastLine = lines[lines.length - 1];
+    if (parsesAsJson(lastLine)) {
+      throw new EventLogError('validation', `repair: event log at ${logPath} already parses cleanly — nothing to repair.`);
+    }
 
-  const repaired = lines.slice(0, -1).map((line) => `${line}\n`).join('');
-  fs.writeFileSync(logPath, repaired, 'utf8');
+    const backupPath = `${logPath}.corrupt-${Date.now()}`;
+    fs.copyFileSync(logPath, backupPath);
 
-  // Re-validate: readEvents throws if the repaired file is somehow still
-  // unreadable, so this call never returns a falsely-reported "fixed" state.
-  const events = readEvents(logPath);
+    const repaired = lines.slice(0, -1).map((line) => `${line}\n`).join('');
+    fs.writeFileSync(logPath, repaired, 'utf8');
 
-  return { backupPath, droppedLine: lastLine, eventCount: events.length };
+    // Re-validate: readEvents throws if the repaired file is somehow still
+    // unreadable, so this call never returns a falsely-reported "fixed" state.
+    const events = readEvents(logPath);
+
+    return { backupPath, droppedLine: lastLine, eventCount: events.length };
+  });
 }
 
 /** Signal-0 liveness probe (mirrors loop.mjs/session.mjs's isPidAlive). EPERM
