@@ -62,7 +62,15 @@ export function driftStatus(repoRoot, view) {
     if (!branchExists(repoRoot, branch)) continue;
 
     const rootItem = work[rootId];
-    const targetBranch = rootItem?.parent ? `fgw/${rootItem.parent}` : trunk;
+    // tsk-2ec: a parent that has already resolved (done/delivered/...) is
+    // no longer a legitimate sync target -- its own fgw/<parentId> branch
+    // is frozen (nothing further is meant to land there), even though the
+    // branch itself typically still exists on disk (worktrees/branches
+    // are never torn down promptly after merge). Route to trunk directly
+    // in that case, the same "is this item done" question isResolvedStatus
+    // already answers one line below for needsSync.
+    const parentItem = rootItem?.parent ? work[rootItem.parent] : null;
+    const targetBranch = rootItem?.parent && !isResolvedStatus(parentItem) ? `fgw/${rootItem.parent}` : trunk;
     if (targetBranch !== trunk && !branchExists(repoRoot, targetBranch)) continue;
 
     let aheadOfTarget = 0;

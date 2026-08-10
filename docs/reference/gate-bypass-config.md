@@ -89,8 +89,15 @@ question — `fgos-exploring` against `CONTEXT.md`, `fgos-planning` against
 ```bash
 root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
 node -e "
-Promise.all([import('./src/state/store.mjs'), import('./src/state/gate-bypass.mjs'), import('node:fs')]).then(([{ listWork }, { canAutoApprove, readGateBypassLevel }, fs]) => {
-  const fgosDir = process.argv[1] + '/.fgos';
+var root = process.argv[1];
+function resolveModule(relPath, needed) {
+  return import(relPath).catch(() => ({})).then((local) => {
+    if (needed.every((name) => typeof local[name] === 'function')) return local;
+    return import(root + relPath.slice(1));
+  });
+}
+Promise.all([resolveModule('./src/state/store.mjs', ['listWork']), resolveModule('./src/state/gate-bypass.mjs', ['canAutoApprove', 'readGateBypassLevel']), import('node:fs')]).then(([{ listWork }, { canAutoApprove, readGateBypassLevel }, fs]) => {
+  const fgosDir = root + '/.fgos';
   const item = listWork(fgosDir).work[process.argv[2]];
   const artifact = fs.readFileSync(process.argv[3], 'utf8');
   const level = readGateBypassLevel(fgosDir);
@@ -104,8 +111,13 @@ rev-parse --git-common-dir`, not the cwd — a worktree's own local
 `.fgos/` is gitignored and per-worktree-local, so it never carries the
 real item record (confirmed empirically: `listWork('.fgos')` from inside
 a freshly claimed worktree returns `undefined` for the claimed item
-itself). The `gate-bypass.mjs`/`store.mjs` code imports stay cwd-relative
-— the worktree's own branch already carries whatever version it needs.
+itself). The `gate-bypass.mjs`/`store.mjs` code tries the cwd-relative
+import first — the worktree's own branch already carries whatever
+version it needs, including self-referential items that modify
+`gate-bypass.mjs` itself — and falls back to `$root`'s canonical copy
+only when the needed export is missing or the import throws, fixing the
+stale-branch class of failure a flat cwd-only import used to hit
+(`docs/history/gate-bypass/CONTEXT.md` D7).
 
 Anything other than exactly `true` on stdout is treated as `false` and
 fails closed to presenting the gate normally. On `true`, the skill posts

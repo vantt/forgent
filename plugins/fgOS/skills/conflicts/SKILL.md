@@ -26,9 +26,9 @@ footprint-conflict advisory without hand-typing the CLI. Never writes
    # fgos CLI fallback (tsk-1no D3)
    FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
    if [ -f "$FGOS_BIN" ]; then
-     node "$FGOS_BIN" conflicts --json
+     node "$FGOS_BIN" conflicts --json --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
    elif command -v fgos >/dev/null 2>&1; then
-     fgos conflicts --json
+     fgos conflicts --json --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
    else
      echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
      exit 1
@@ -39,6 +39,12 @@ footprint-conflict advisory without hand-typing the CLI. Never writes
    never a relative path — an installed plugin's files run from a copied
    cache location, not from this repo checkout, so a relative path would
    resolve to the wrong place or fail outright.
+
+   `--dir` (tsk-2ew): a worktree never carries its own `.fgos/` (ADR0020),
+   so a bare call from inside one silently reads an empty store — exit 0,
+   no error. `${CLAUDE_PROJECT_DIR}` resolves to the main checkout even
+   from inside a worktree, so passing it as `--dir` here always reads the
+   one real store.
 
    If the command fails, show the real error to the user and stop — do not
    retry and do not fall back to a hand-written conflict scan.

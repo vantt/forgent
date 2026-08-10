@@ -175,3 +175,45 @@ test('driftStatus still measures aheadOfTarget for a RESOLVED root, while keepin
     assert.equal(result.root.needsSync, false, `needsSync must stay false for a "${status}" root`);
   }
 });
+
+test('driftStatus routes to trunk once the parent root has resolved -- reproduces the tsk-4n7 incident shape (tsk-2ec)', () => {
+  const repoRoot = initRepo();
+  // fgw/parent: the parent root's own branch, already merged and frozen
+  // (status: done) -- but the BRANCH ITSELF still exists on disk, since
+  // worktrees/branches are never torn down promptly after merge. main
+  // then advances further (simulating other work landing after the
+  // parent's own merge), so fgw/parent falls far BEHIND main -- exactly
+  // the frozen-branch shape.
+  checkoutNewBranch(repoRoot, 'fgw/parent');
+  commitFile(repoRoot, 'parent-work.txt', 'work that was already merged into main\n');
+  git(repoRoot, ['checkout', '-q', 'main']);
+  git(repoRoot, ['merge', '-q', '--no-ff', 'fgw/parent']);
+  commitFile(repoRoot, 'later-unrelated-work.txt', 'main kept moving after the parent merged\n');
+
+  // fgw/child: a nested root whose parent is the already-resolved item
+  // above, branched from fgw/parent's own tip (before main's later
+  // commit) -- current with main's REAL state at merge time (9/4-style
+  // "nearly current with main directly" per the report), but the OLD
+  // (pre-fix) targetBranch computation would compare it against the now-
+  // stale fgw/parent instead.
+  checkoutNewBranch(repoRoot, 'fgw/child', 'fgw/parent');
+  commitFile(repoRoot, 'child-work.txt', 'real leaf work merged into the child root\n');
+  git(repoRoot, ['checkout', '-q', 'main']);
+
+  const view = {
+    work: {
+      parent: item('parent', { status: 'done' }),
+      child: item('child', { parent: 'parent' }),
+      leaf: item('leaf', { parent: 'child' }),
+    },
+  };
+
+  const result = driftStatus(repoRoot, view);
+  assert.equal(result.child.target, 'main', 'target must be trunk once the parent has resolved, never the parent\'s own frozen branch');
+  // Real numbers against main: child is ahead by its own one commit, and
+  // behind by main's own --no-ff merge commit plus its one later commit --
+  // the honest diagnostic signature (behind > 0) that the frozen-branch
+  // comparison could never produce.
+  assert.equal(result.child.aheadOfTarget, 1);
+  assert.equal(result.child.behindTarget, 2);
+});

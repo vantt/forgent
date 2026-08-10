@@ -24,6 +24,12 @@ pub trait WorkItemSource {
 /// out to `herdr` itself — only through this port.
 pub trait PaneRegistry {
     fn scan(&self) -> Result<HashMap<String, PaneIdentity>, PaneScanError>;
+    /// Guard check for a fixed/synthetic, non-id-shaped pane title — used
+    /// by tsk-57q's own `fgos-auto-merge`/`fgos-auto-retro`/
+    /// `fgos-auto-cleanup` and tsk-2ja's `fgos-auto-discover-<id>`. `scan`
+    /// above only ever surfaces id-shaped labels, so a fixed literal title
+    /// needs this separate exact-match check instead.
+    fn has_labeled_pane(&self, label: &str) -> Result<bool, PaneScanError>;
 }
 
 /// (b1) herdr pane-orchestration seam (tsk-3t9 D1) — swappable
@@ -36,6 +42,24 @@ pub trait PaneOrchestrator {
     /// Switches herdr's focus directly to an already-running pane
     /// (tsk-1eu D2), never opening a new one.
     fn focus_pane(&self, pane_id: &str) -> io::Result<()>;
+    /// Runs `/fgOS:merge-loop` in an already-resolved pane (tsk-57q) —
+    /// unlike `open_pick_pane`/`open_discover_pane`, this never places a
+    /// new pane itself: the fixed `fg:operation` tab's left/right panes
+    /// are resolved once, eagerly, at startup (`layout::
+    /// ensure_operation_tab`, tsk-5lr) and passed in directly. No id
+    /// argument — `/fgOS:merge-loop` is a pool-sweep verb, not a per-item
+    /// one.
+    fn launch_merge_loop(&self, pane_id: &str) -> io::Result<()>;
+    /// Same shape as `launch_merge_loop`, running `/fgOS:retro-loop`.
+    fn launch_retro_loop(&self, pane_id: &str) -> io::Result<()>;
+    /// Same shape as `launch_merge_loop`, running `/fgOS:cleanup-loop`.
+    fn launch_cleanup_loop(&self, pane_id: &str) -> io::Result<()>;
+    /// Unattended equivalent of `open_discover_pane` (tsk-2ja): labels the
+    /// pane `fgos-auto-discover-<id>` via `herdr pane rename` immediately
+    /// after opening it, before spawning `claude` — closing the race
+    /// window the person-triggered button doesn't have to close (its
+    /// label is set later, from inside the launched session).
+    fn open_auto_discover_pane(&self, id: &str) -> io::Result<()>;
 }
 
 /// Domain-level input the render adapter translates real terminal events

@@ -16,6 +16,8 @@ import {
   ACQUIRED,
   HELD,
   AMBIGUOUS,
+  DEFAULT_TTL_MS,
+  HOOK_TTL_MS,
 } from '../../src/runner/main-checkout-lock.mjs';
 
 // Main-checkout activity lock (str65-worktree-isolation-enforcement, D4/D5/D6).
@@ -77,6 +79,14 @@ function spawnAcquire(moduleUrl, dir, opts) {
     child.on('error', reject);
   });
 }
+
+// --- HOOK_TTL_MS (tsk-1d9) ---------------------------------------------------
+
+test('HOOK_TTL_MS is a positive number strictly shorter than DEFAULT_TTL_MS', () => {
+  assert.equal(typeof HOOK_TTL_MS, 'number');
+  assert.ok(HOOK_TTL_MS > 0);
+  assert.ok(HOOK_TTL_MS < DEFAULT_TTL_MS, 'the hook\'s own default must stay shorter than the merge/verify path\'s shared TTL');
+});
 
 // --- formatLockDurationMs (tsk-5z2) -----------------------------------------
 
