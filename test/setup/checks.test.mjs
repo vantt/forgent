@@ -49,7 +49,7 @@ function fixById(id) {
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, changelog-unreleased-stale, and work-classification-vocabulary', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, changelog-unreleased-stale, work-classification-vocabulary, and enduser-docs-index-stale', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     [
@@ -66,6 +66,7 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'plugin-skill-cli-reachable',
       'changelog-unreleased-stale',
       'work-classification-vocabulary',
+      'enduser-docs-index-stale',
     ].sort(),
   );
 });
@@ -325,6 +326,94 @@ test('changelog-unreleased-stale passes when ## [Unreleased] has a pending entry
   const { passed, message } = checkById('changelog-unreleased-stale').check(tmp);
   assert.equal(passed, true);
   assert.match(message, /pending entr/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+// ─── enduser-docs-index-stale (tsk-1m0, docs/history/doctor-check-enduser- ──
+// docs-index-stale/CONTEXT.md): D1 count-only message, D2 one-directional
+// (missing-from-index only), D3 read-only check sharing the same
+// generation path as the fix, D5 missing-manifest is normal, D6
+// QUADRANT_DIR_ALIASES (docs/decisions -> explanation) honored.
+
+function writeEnduserDoc(tmp, quadrantDir, filename, h1) {
+  const dirPath = path.join(tmp, 'docs', quadrantDir);
+  fs.mkdirSync(dirPath, { recursive: true });
+  fs.writeFileSync(path.join(dirPath, filename), `# ${h1}\n\nbody\n`);
+}
+
+function writeEnduserManifest(tmp, entries) {
+  fs.mkdirSync(path.join(tmp, 'docs'), { recursive: true });
+  fs.writeFileSync(path.join(tmp, 'docs', 'enduser-docs-index.json'), `${JSON.stringify(entries, null, 2)}\n`);
+}
+
+test('enduser-docs-index-stale passes when docs/enduser-docs-index.json does not exist yet', () => {
+  const tmp = mkTemp('fgos-enduser-index-check-');
+  writeEnduserDoc(tmp, 'how-to', 'sample.md', 'Sample Doc');
+  const { passed, message } = checkById('enduser-docs-index-stale').check(tmp);
+  assert.equal(passed, true);
+  assert.match(message, /not found/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('enduser-docs-index-stale fails and reports a count (not a path list) when a doc on disk is missing from the index', () => {
+  const tmp = mkTemp('fgos-enduser-index-check-');
+  writeEnduserDoc(tmp, 'how-to', 'sample.md', 'Sample Doc');
+  writeEnduserDoc(tmp, 'how-to', 'second.md', 'Second Doc');
+  writeEnduserManifest(tmp, [
+    { quadrant: 'how-to', purpose: 'x', audience: 'y', docPath: 'docs/how-to/sample.md', title: 'Sample Doc', sourceCaptureId: null },
+  ]);
+  const { passed, message } = checkById('enduser-docs-index-stale').check(tmp);
+  assert.equal(passed, false);
+  assert.match(message, /1\/2/);
+  assert.doesNotMatch(message, /second\.md/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('enduser-docs-index-stale passes when the index already covers every on-disk doc', () => {
+  const tmp = mkTemp('fgos-enduser-index-check-');
+  writeEnduserDoc(tmp, 'how-to', 'sample.md', 'Sample Doc');
+  writeEnduserManifest(tmp, [
+    { quadrant: 'how-to', purpose: 'x', audience: 'y', docPath: 'docs/how-to/sample.md', title: 'Sample Doc', sourceCaptureId: null },
+  ]);
+  const { passed, message } = checkById('enduser-docs-index-stale').check(tmp);
+  assert.equal(passed, true);
+  assert.match(message, /1\/1/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('enduser-docs-index-stale counts a doc under docs/decisions toward the explanation quadrant (alias, D6)', () => {
+  const tmp = mkTemp('fgos-enduser-index-check-');
+  writeEnduserDoc(tmp, 'decisions', '0001-example.md', 'Example Decision');
+  writeEnduserManifest(tmp, []);
+  const { passed, message } = checkById('enduser-docs-index-stale').check(tmp);
+  assert.equal(passed, false);
+  assert.match(message, /1\/1/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('enduser-docs-index-stale fix regenerates the index via the same path fgos docs-index uses, resolving the drift', () => {
+  const tmp = mkTemp('fgos-enduser-index-fix-');
+  writeEnduserDoc(tmp, 'how-to', 'sample.md', 'Sample Doc');
+  writeEnduserManifest(tmp, []);
+  assert.equal(checkById('enduser-docs-index-stale').check(tmp).passed, false);
+
+  const { changed, message } = fixById('enduser-docs-index-stale').fix(tmp);
+  assert.equal(changed, true);
+  assert.match(message, /regenerated/);
+
+  const after = checkById('enduser-docs-index-stale').check(tmp);
+  assert.equal(after.passed, true);
+  assert.match(after.message, /1\/1/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('enduser-docs-index-stale fix is idempotent -- a second run reports changed:false', () => {
+  const tmp = mkTemp('fgos-enduser-index-fix-');
+  writeEnduserDoc(tmp, 'how-to', 'sample.md', 'Sample Doc');
+  fixById('enduser-docs-index-stale').fix(tmp);
+  const second = fixById('enduser-docs-index-stale').fix(tmp);
+  assert.equal(second.changed, false);
+  assert.match(second.message, /already up to date/);
   fs.rmSync(tmp, { recursive: true, force: true });
 });
 
