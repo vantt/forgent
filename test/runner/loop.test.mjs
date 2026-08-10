@@ -1695,3 +1695,99 @@ test('runWatch catches a runOnce throw, reports it via onCycle with outcome "err
   assert.equal(results[1].outcome, 'idle');
   assert.equal(results[2].outcome, 'idle');
 });
+
+// --- tsk-4v6: DISCOVERY DISPATCH sweep respects the real clear/unclear
+// verdict (CONTEXT.md D5, docs/history/tsk-4b2-discovery-exploring-stage-
+// wiring/) instead of the old "any real commit advances" bug. ---
+
+/** A worker dispatched at stage 'discovery' that commits a research file
+ * and, when `verdictBody` is given, emits a single `fgos-verdict` fence
+ * carrying it — mirrors `writeDiscoveringExecutor`'s shape for the sibling
+ * `fgos-discovered` channel, one fence format down. Omitting `verdictBody`
+ * simulates a worker that committed real research but never reported a
+ * verdict (the malformed/absent-fence case). */
+function writeDiscoveryVerdictExecutor(scriptDir, counterFile, verdictBody) {
+  const scriptPath = path.join(scriptDir, 'discovery-verdict-executor.mjs');
+  const emit = verdictBody
+    ? `process.stdout.write(${JSON.stringify('```fgos-verdict\n' + verdictBody + '\n```\n')});`
+    : '';
+  fs.writeFileSync(
+    scriptPath,
+    `
+import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
+fs.appendFileSync(${JSON.stringify(counterFile)}, 'run\\n');
+${emit}
+fs.writeFileSync('RESEARCH.md', 'findings\\n');
+execFileSync('git', ['add', 'RESEARCH.md']);
+execFileSync('git', ['commit', '-q', '-m', 'worker: RESEARCH.md']);
+`,
+  );
+  return scriptPath;
+}
+
+test('tsk-4v6: DISCOVERY DISPATCH sweep advances discovery -> exploring on a clear verdict, carrying the worker\'s proposed verify onto the item', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  // FALLBACK_VERIFY, not seedItem's default -- a fresh discovery-stage item
+  // has no real verify yet, same starting shape as an item that just landed
+  // on discovery via the clarify->discovery edge (D3).
+  seedItem(dir, { id: 'item-research-clear', stage: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
+  const body = JSON.stringify({ clear: true, verify: 'npm test -- research' });
+  const config = configFor(writeDiscoveryVerdictExecutor(scriptDir, counterFile, body));
+
+  await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  const item = listWork(dir).work['item-research-clear'];
+  assert.equal(item.stage, 'exploring', 'a clear verdict advances discovery -> exploring');
+  assert.equal(item.status, 'todo', 'exploring is a fresh todo stop, not doing/awaiting-approval');
+  assert.equal(item.verify, 'npm test -- research', "the worker's own proposed verify rides onto the item");
+});
+
+test('tsk-4v6: DISCOVERY DISPATCH sweep parks the item on an unclear verdict instead of advancing it, matching the interactive driver path', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-research-unclear', stage: 'discovery' });
+  const body = JSON.stringify({ clear: false, question: 'Which retry backoff strategy should this follow?' });
+  const config = configFor(writeDiscoveryVerdictExecutor(scriptDir, counterFile, body));
+
+  await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  const view = listWork(dir);
+  const item = view.work['item-research-unclear'];
+  assert.equal(item.stage, 'discovery', 'stage never advances on an unclear verdict');
+  assert.equal(item.status, 'awaiting-human', 'unclear verdict parks the item, matching resolveDiscovery\'s session-role behavior');
+  assert.equal(view.gates?.['item-research-unclear']?.ask, 'Which retry backoff strategy should this follow?');
+});
+
+test('tsk-4v6: DISCOVERY DISPATCH sweep never advances the item when a real commit lands but no verdict fence is reported — the exact bug this item fixes', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-research-silent', stage: 'discovery' });
+  // no verdictBody -- the worker commits real research but reports nothing,
+  // the same shape the pre-fix worker-prompt-discovery.txt template produced
+  const config = configFor(writeDiscoveryVerdictExecutor(scriptDir, counterFile, undefined));
+
+  await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  const item = listWork(dir).work['item-research-silent'];
+  assert.equal(item.stage, 'discovery', 'a commit with no verdict never advances the item (the old bug: any real commit used to advance it)');
+  assert.equal(item.status, 'todo', 'left exactly as today\'s no-commit branch already does, for the next sweep to retry');
+});
+
+test('tsk-4v6: parseVerdictBlock is fail-safe on absent/malformed fences and picks the last well-formed block when more than one is emitted', async () => {
+  const { parseVerdictBlock } = await import('../../src/runner/loop.mjs');
+  assert.equal(parseVerdictBlock(''), null);
+  assert.equal(parseVerdictBlock('no fence here'), null);
+  assert.equal(parseVerdictBlock('```fgos-verdict\nnot json\n```'), null);
+  assert.equal(parseVerdictBlock('```fgos-verdict\n{"clear": "yes"}\n```'), null, 'clear must be boolean');
+  assert.deepEqual(parseVerdictBlock('```fgos-verdict\n{"clear": true, "verify": "npm test"}\n```'), {
+    clear: true,
+    verify: 'npm test',
+  });
+  assert.deepEqual(parseVerdictBlock('```fgos-verdict\n{"clear": false, "question": "which one?"}\n```'), {
+    clear: false,
+    question: 'which one?',
+  });
+  const twoBlocks =
+    '```fgos-verdict\n{"clear": false, "question": "first"}\n```\n' +
+    '```fgos-verdict\n{"clear": true, "verify": "npm test"}\n```';
+  assert.deepEqual(parseVerdictBlock(twoBlocks), { clear: true, verify: 'npm test' }, 'last well-formed block wins');
+});

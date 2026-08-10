@@ -481,21 +481,26 @@ test('e2e stage-decompose (c) ambiguous verdict: an explicit decompose --verdict
   assert.equal(view.work[submitted.id].stage, 'decompose');
 });
 
-// --- stage-discovery e2e (tsk-5mj D1/D6/D7): the runner dispatches a
-// stage:discovery item to a real worker running fgos-researching, via the
-// same spawnWorker/createDispatchWorktree pair stage:executing already
-// uses. No verdict to gate this — discovery is a pure machine-alone pass
-// (D3); the item unconditionally advances discovery -> exploring once
-// dispatch settles. -----------------------------------------------------
+// --- stage-discovery e2e (tsk-5mj D1/D6/D7, tsk-4v6): the runner
+// dispatches a stage:discovery item to a real worker running
+// fgos-researching, via the same spawnWorker/createDispatchWorktree pair
+// stage:executing already uses. Originally (tsk-5mj) this had no verdict to
+// gate the transition — any real commit unconditionally advanced discovery
+// -> exploring. tsk-4v6 (CONTEXT.md D5, driver/launcher parity per
+// 0026/0028/0029) closed that gap: the worker's own {clear, question?,
+// verify?} verdict, reported via a `fgos-verdict` fence, now gates the
+// transition exactly like the interactive driver path. -------------------
 
 /** A fake research worker: writes RESEARCH.md under the item's own feature
- * dir and commits it on the dispatch branch -- proves the runner actually
- * checked the worker out on an isolated worktree/branch (same discipline
- * writeCommittingExecutor already proves for stage:executing), never that
+ * dir, commits it on the dispatch branch (same discipline
+ * writeCommittingExecutor already proves for stage:executing), and reports
+ * its verdict via a `fgos-verdict` fence (tsk-4v6) — `clear: true` by
+ * default; pass `clear: false` to prove the park path instead. Never that
  * fgos-researching's own real content shape is followed (out of this
  * item's scope -- that skill's own job). */
-function writeResearchWorkerExecutor(scriptDir, featureDir) {
+function writeResearchWorkerExecutor(scriptDir, featureDir, { clear = true, verify = 'test -f later.txt', question = 'Which approach?' } = {}) {
   const scriptPath = path.join(scriptDir, 'research-worker-executor.mjs');
+  const verdictBody = clear ? { clear: true, verify } : { clear: false, question };
   fs.writeFileSync(
     scriptPath,
     `
@@ -505,12 +510,13 @@ fs.mkdirSync(${JSON.stringify(featureDir)}, { recursive: true });
 fs.writeFileSync(${JSON.stringify(path.posix.join(featureDir, 'RESEARCH.md'))}, '## Round 1\\n\\nFound: nothing blocking.\\n');
 execFileSync('git', ['add', ${JSON.stringify(path.posix.join(featureDir, 'RESEARCH.md'))}]);
 execFileSync('git', ['commit', '-q', '-m', 'research: round 1']);
+process.stdout.write(${JSON.stringify('```fgos-verdict\n' + JSON.stringify(verdictBody) + '\n```\n')});
 `,
   );
   return scriptPath;
 }
 
-test('e2e stage-discovery: --once dispatches a stage:discovery item to a real worker (isolated worktree/branch), which writes+commits RESEARCH.md; the item advances discovery -> exploring, status stays todo (never claimed/proposed)', () => {
+test('e2e stage-discovery: --once dispatches a stage:discovery item to a real worker (isolated worktree/branch), which writes+commits RESEARCH.md and reports a clear verdict; the item advances discovery -> exploring, status stays todo (never claimed/proposed)', () => {
   const repoRoot = initTempRepo();
   const scriptDir = mkTempDir('fgos-runner-e2e-discovery-dispatch-');
   const featureDir = 'docs/history/discovery-dispatch-item';
@@ -518,7 +524,7 @@ test('e2e stage-discovery: --once dispatches a stage:discovery item to a real wo
   assert.equal(fgos(repoRoot, ['init']).status, 0);
   writeRunnerConfig(repoRoot, writeResearchWorkerExecutor(scriptDir, featureDir));
 
-  add(repoRoot, 'item-research', { stage: 'discovery', verify: 'test -f later.txt' });
+  add(repoRoot, 'item-research', { stage: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
   assert.equal(stateView(repoRoot).work['item-research'].stage, 'discovery');
 
   const result = runner(repoRoot, ['--once']);
@@ -526,10 +532,31 @@ test('e2e stage-discovery: --once dispatches a stage:discovery item to a real wo
 
   const view = stateView(repoRoot);
   const item = view.work['item-research'];
-  assert.equal(item.stage, 'exploring', 'the item advanced discovery -> exploring once the research worker finished');
+  assert.equal(item.stage, 'exploring', 'a clear verdict advanced discovery -> exploring');
   assert.equal(item.status, 'todo', 'discovery dispatch never claims/proposes -- exploring is the next stop, not a terminal one');
+  assert.equal(item.verify, 'test -f later.txt', "the worker's own proposed verify rode onto the item");
   assert.equal(branchExists(repoRoot, 'fgw/item-research'), true, 'the worker ran on its own real dispatch branch');
   assert.match(branchLog(repoRoot, 'fgw/item-research'), /research: round 1/);
+});
+
+test('e2e stage-discovery: --once parks the item in awaiting-human, never advancing stage, when the real worker reports an unclear verdict (tsk-4v6)', () => {
+  const repoRoot = initTempRepo();
+  const scriptDir = mkTempDir('fgos-runner-e2e-discovery-dispatch-unclear-');
+  const featureDir = 'docs/history/discovery-dispatch-unclear-item';
+
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+  writeRunnerConfig(repoRoot, writeResearchWorkerExecutor(scriptDir, featureDir, { clear: false, question: 'Which retry backoff strategy?' }));
+
+  add(repoRoot, 'item-research-unclear', { stage: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
+
+  const result = runner(repoRoot, ['--once']);
+  assert.equal(result.status, 0, `--once failed: ${result.stderr}`);
+
+  const view = stateView(repoRoot);
+  const item = view.work['item-research-unclear'];
+  assert.equal(item.stage, 'discovery', 'an unclear verdict never advances stage');
+  assert.equal(item.status, 'awaiting-human', 'an unclear verdict parks the item, matching the interactive driver path');
+  assert.equal(view.gates['item-research-unclear'].ask, 'Which retry backoff strategy?');
 });
 
 test('e2e stage-discovery fail-safe: a worker that crashes leaves the item at stage:discovery, status:todo for the next sweep to retry -- never stuck, never silently advanced', () => {
