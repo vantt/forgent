@@ -3,7 +3,7 @@ type: explanation
 title: How fgOS isolates concurrent sessions, and why the event log's write door blocks instead of backing off
 tags: [multi-session, concurrency, worktree, crash-recovery]
 timestamp: 2026-07-22T00:00:00.000Z
-source_capture_ids: [tsk-1jp]
+source_capture_ids: [tsk-1jp, tsk-3wn]
 ---
 
 # How fgOS isolates concurrent sessions, and why the event log's write door blocks instead of backing off
@@ -268,6 +268,81 @@ the actual code shape, not evidence the guarantee holds — `porting-
 store.mjs` predates being checked against `store.mjs`'s real locking
 scope, and nothing caught the drift until a targeted audit read both
 side by side.
+
+## The lock-contention regression test itself became a flake, and blamed unrelated items for it (`tsk-3wn`)
+
+`test/state/events.test.mjs`'s own regression test — "appendEvent under
+concurrent OS processes yields unique, gapless, strictly-increasing
+seqs" — forks 20 processes that each call `appendEvent` 40 times
+(800 total lock acquisitions, serialized because the lock is a mutex),
+each acquisition drawing from its own fixed `EVENTS_LOCK_TIMEOUT_MS =
+2000`ms budget. The unluckiest process in that 800-deep queue has to
+wait for nearly all of them; under a quiet machine that finishes well
+inside 2000ms, but under real load it doesn't.
+
+This surfaced as two live incidents, and both blamed the wrong thing:
+`tsk-4qu` and `tsk-104` — an unrelated docs-only prose fix — each got
+pushed to `blocked` with `reason: verify-fail-post-merge` when `approve`/
+`merge next` ran `npm test` on the shared main checkout at the exact
+moment 2746+ other tests were also running (`approve`/`sync-root`
+verify on the *main checkout*, competing directly with node's own
+test-runner parallelism across files):
+
+> "✖ appendEvent under concurrent OS processes ... (5195.869803ms)
+> AssertionError: every child must exit 0 - a non-zero exit means an
+> append threw (e.g. a lock-timeout under contention)
+> EventLogError: appendEvent: timed out acquiring events.lock after
+> 2000ms (held by pid 838346)"
+> — real test failure, `tsk-104`'s own verify run
+
+Isolated proof this was load, not a regression: `node --test
+test/state/events.test.mjs` alone passed 17/17 clean; the same file
+inside the full `npm test` run failed exactly once (2743 pass, 1 fail) —
+because node's test runner executes test *files* in parallel
+(concurrency = CPU count), so while this file's own 20-process fork was
+running, every other test file was competing for the same CPUs at once.
+A second real-world data point confirmed the trend rather than a fluke:
+the same test's observed runtime went from 5195ms to 9431ms across two
+separate contended runs — the queue got slower as load increased, while
+each acquisition's own 2000ms budget stayed fixed and increasingly
+irrelevant to the real size of the 800-deep queue it was meant to bound.
+
+**Why this is worse than an ordinary flaky test**: `approve`/`sync-root`
+run their verify step on the shared main checkout, at exactly the moment
+the whole suite (2746+ tests) plus any other concurrent fgOS sessions are
+also active — the maximum-contention condition this flake needs to fire.
+The consequence lands on a completely unrelated item: the merge rolls
+back, the item moves to `blocked` with a reason that reads as "this item
+is broken," and rescuing it needs a manual `move --to doing` then
+`return` — which just re-runs the full suite and can hit the same flake
+again (`tsk-104`'s own second rescue attempt did exactly that, this time
+timing out at 9431ms instead of 5195ms).
+
+**Fix, scoped to the test only, not production**: lower `N_PROC`/
+`N_APPEND` in `test/state/events.test.mjs` to a scale that still
+reproduces the original real bug (two OS processes racing the same
+`seq`, confirmed once by spike per the fgos-multi-session-checkout epic)
+without queueing 800 acquisitions against a flat per-acquisition
+timeout, plus a comment tying the chosen numbers to the `2000`ms budget
+directly. Two adjacent options were explicitly rejected: adding a
+`timeoutMs` param to `appendEvent` just to accommodate the test (widening
+a production API for a test-only need), and raising production's own
+`EVENTS_LOCK_TIMEOUT_MS` "just to make the test pass" (fixing the wrong
+layer — the blocking-not-backing-off policy this doc's own second
+section establishes is a real production requirement, not something to
+loosen because one test's own scale outgrew it). The regression's actual
+job — still catching a real duplicate/gap bug — must not weaken: the
+fix only changes how many processes/appends the test throws at the lock,
+never what it asserts about the result.
+
+**Left open, named rather than resolved**: should a verify failure at
+merge time distinguish "this item's own change is broken" from "the
+infrastructure/a flaky dependency broke"? Today both produce the
+identical `blocked` / `verify-fail-post-merge` outcome, so a reader
+looking at a blocked item after the fact cannot tell which happened
+without re-deriving it by hand — the same ambiguity that made `tsk-4qu`
+and `tsk-104` both look like real regressions when neither one's own
+diff touched `events.lock` at all.
 
 ---
 
