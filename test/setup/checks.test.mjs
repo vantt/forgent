@@ -105,6 +105,58 @@ test('root-drift fails and names the drifted root when fgw/<root> is ahead of ma
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
+// tsk-4qu: the drift class this check used to miss entirely. A leaf merges
+// into fgw/<root> regardless of the root's status, so a root closed out
+// (delivered/retrospective/cleanup/done) can be left holding commits its
+// target never got — and driftStatus reports needsSync:false for exactly
+// those, keeping them out of every merge bucket. Observed live twice
+// (tsk-4ns, tsk-53n) before anything reported it.
+
+test('root-drift reports a CLOSED-OUT root whose branch still holds work outside its target', () => {
+  const dir = initRepo('checks-root-drift-stranded-');
+  execFileSync('git', ['checkout', '-q', '-b', 'fgw/root'], { cwd: dir });
+  fs.writeFileSync(path.join(dir, 'leaf-work.txt'), 'leaf work merged into the root branch\n');
+  execFileSync('git', ['add', 'leaf-work.txt'], { cwd: dir });
+  execFileSync('git', ['commit', '-qm', 'leaf merged into root after the root was closed out'], { cwd: dir });
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: dir });
+  const fgosDir = path.join(dir, '.fgos');
+  initStore(fgosDir);
+  // `delivered` is what makes this the tsk-4qu case rather than the ordinary
+  // drift one above: isResolvedStatus(root) is true, so needsSync is false.
+  addWork(fgosDir, { id: 'root', title: 'root', kind: 'feature', risk: 'light', verify: 'true', status: 'delivered', deps: [], refs: [] });
+  addWork(fgosDir, { id: 'leaf', title: 'leaf', kind: 'feature', risk: 'light', verify: 'true', status: 'delivered', deps: [], refs: [], parent: 'root' });
+
+  const { passed, message } = checkById('root-drift').check(dir);
+  assert.equal(passed, false, 'a closed-out root holding unsynced work must not pass silently');
+  assert.match(message, /closed out with work still outside their target/);
+  assert.match(message, /nothing will sync these automatically/);
+  assert.match(message, /root \(fgw\/root is 1 commit\(s\) ahead of main\)/);
+  assert.match(message, /fgos sync-root/);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+// wontfix is the deliberate exception: an abandoned item's branch is SUPPOSED
+// to sit outside its target forever, so reporting it would be noise. This is
+// why the check spells out the completed statuses instead of reusing
+// isResolvedStatus, which folds wontfix in with them.
+test('root-drift stays silent for a wontfix root whose branch is ahead — abandoned work is meant to sit outside', () => {
+  const dir = initRepo('checks-root-drift-wontfix-');
+  execFileSync('git', ['checkout', '-q', '-b', 'fgw/root'], { cwd: dir });
+  fs.writeFileSync(path.join(dir, 'abandoned.txt'), 'work that was deliberately abandoned\n');
+  execFileSync('git', ['add', 'abandoned.txt'], { cwd: dir });
+  execFileSync('git', ['commit', '-qm', 'abandoned work'], { cwd: dir });
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: dir });
+  const fgosDir = path.join(dir, '.fgos');
+  initStore(fgosDir);
+  addWork(fgosDir, { id: 'root', title: 'root', kind: 'feature', risk: 'light', verify: 'true', status: 'wontfix', deps: [], refs: [] });
+  addWork(fgosDir, { id: 'leaf', title: 'leaf', kind: 'feature', risk: 'light', verify: 'true', status: 'wontfix', deps: [], refs: [], parent: 'root' });
+
+  const { passed, message } = checkById('root-drift').check(dir);
+  assert.equal(passed, true);
+  assert.match(message, /no root branch is drifted/);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
 // ─── work-classification-vocabulary (tsk-6ax) ──────────────────────────────
 // Scoped to OPEN items only (matches the item's own "no open item may carry
 // risk/kind outside its domain's vocabulary" wording) — a resolved item's
