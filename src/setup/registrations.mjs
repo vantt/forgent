@@ -34,6 +34,9 @@ import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { listWork } from '../state/store.mjs';
 import { driftStatus } from '../state/drift-status.mjs';
+import { computeEnduserDocsIndex, generateEnduserDocsIndex, manifestPathFor } from '../report/enduser-index-generate.mjs';
+import { isResolvedStatus } from '../state/frontier.mjs';
+import { getDomain } from '../state/workflow-stage-graphs.mjs';
 import { readLocalStatus, classifyRegistryPosture } from '../state/tool-registry.mjs';
 import { describeConfigAwareness } from '../config/global-config.mjs';
 import { sharedConfigFilePath, readSharedConfig, writeSharedConfig } from '../config/shared-config-file.mjs';
@@ -399,6 +402,50 @@ function checkRootDrift(cwd) {
     message: `drifted root branch(es) need syncing: ${summary} — run fgos sync-root <root-id>`,
   };
 }
+
+// tsk-6ax: tsk-5wz declared the coding domain's risk/kind vocabulary
+// (DOMAINS.coding.classification) and enforced it at the write door
+// (validateWorkShape's touchedFields grandfathering), but that only blocks
+// NEW writes — 68 items already on disk kept a pre-vocabulary risk value
+// (low/medium/high), silently degrading decompose.mjs's heavy-risk gate and
+// priority-formula.mjs's risk discount. This check makes that class of
+// drift visible to `fgos doctor` going forward, same as root-drift above.
+// Scoped to OPEN items only (`!isResolvedStatus`, the one shared open/
+// closed definition frontier.mjs already exports) — a resolved item's
+// stale classification no longer feeds any live gate or formula, so
+// flagging it here would just be noise.
+function checkWorkClassificationVocabulary(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  if (mainCheckout === null) {
+    return { passed: true, message: 'not inside a git checkout — nothing to check' };
+  }
+  const view = listWork(path.join(mainCheckout, '.fgos'));
+  const violations = [];
+  for (const item of Object.values(view.work)) {
+    if (isResolvedStatus(item)) continue;
+    const classification = getDomain(item.domain).classification;
+    if (!classification) continue;
+    if (classification.kind && !classification.kind.includes(item.kind)) {
+      violations.push(`${item.id} (kind: "${item.kind}")`);
+    }
+    if (classification.risk && !classification.risk.includes(item.risk)) {
+      violations.push(`${item.id} (risk: "${item.risk}")`);
+    }
+  }
+  if (violations.length === 0) {
+    return { passed: true, message: "every open item's risk/kind matches its domain's classification vocabulary" };
+  }
+  return {
+    passed: false,
+    message: `${violations.length} open item(s) outside their domain's classification vocabulary: ${violations.join(', ')} — run fgos edit <id> --risk/--kind <value>`,
+  };
+}
+
+registerCheck({
+  id: 'work-classification-vocabulary',
+  description: "every open item's risk/kind matches its domain's declared classification vocabulary (tsk-6ax)",
+  check: (cwd) => checkWorkClassificationVocabulary(cwd),
+});
 
 registerCheck({
   id: 'root-drift',
@@ -784,4 +831,70 @@ registerCheck({
   id: 'changelog-unreleased-stale',
   description: 'CHANGELOG.md ## [Unreleased] section has at least one pending entry (observe/remind only, never blocks merge -- tsk-3ip)',
   check: (cwd) => checkChangelogUnreleasedStale(cwd),
+});
+
+// tsk-1m0 (docs/history/doctor-check-enduser-docs-index-stale/CONTEXT.md):
+// the fgos-indexing skill's whole job is regenerating
+// docs/enduser-docs-index.json after every compound-learn doc write, but
+// nothing ever verified it actually ran -- real measurement showed drift
+// growing from 32% to 36% of on-disk end-user docs missing from the index
+// in one day, unflagged. READ-ONLY by construction (same as every other
+// check here): `computeEnduserDocsIndex` enumerates docs/ and folds the
+// event log but never writes -- it is the read-only half of the same
+// generation path `fgos docs-index` and `fixEnduserDocsIndexStale` below
+// both use, so this check never reimplements or diverges from what a real
+// `docs-index` run would compute. One-directional (CONTEXT.md D2): reports
+// on-disk docs missing from the index, never the reverse (a stale index
+// entry whose doc was deleted) -- real measured drift has always been zero
+// of the latter, out of scope for this item. A missing manifest or missing
+// quadrant dir is a normal, common state (CONTEXT.md D5) -- same
+// "absent capability = clean skip" contract `checkChangelogUnreleasedStale`
+// already gives a missing CHANGELOG.md.
+function checkEnduserDocsIndexStale(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  const root = mainCheckout ?? cwd;
+  const fgosDir = path.join(root, '.fgos');
+  const { entries, previousContent } = computeEnduserDocsIndex(root, fgosDir);
+  if (previousContent === undefined) {
+    return {
+      passed: true,
+      message: `${manifestPathFor(root)} not found -- nothing to check (project has not generated an end-user doc index yet)`,
+    };
+  }
+  const indexedPaths = new Set(JSON.parse(previousContent).map((e) => e.docPath));
+  const total = entries.length;
+  const missing = entries.filter((e) => !indexedPaths.has(e.docPath)).length;
+  if (missing === 0) {
+    return { passed: true, message: `${total}/${total} tài liệu end-user có trong index -- up to date` };
+  }
+  return {
+    passed: false,
+    message: `${missing}/${total} tài liệu end-user chưa có trong index -- chạy fgos docs-index`,
+  };
+}
+
+// Idempotent (same discipline `fixGateBypassConfigured` already uses):
+// reuses `generateEnduserDocsIndex` -- the exact same generation path
+// `fgos docs-index` runs -- so fix output is byte-identical to running
+// that verb directly (CONTEXT.md D4), never a reimplementation.
+function fixEnduserDocsIndexStale(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  const root = mainCheckout ?? cwd;
+  const fgosDir = path.join(root, '.fgos');
+  const { path: manifestRelPath, count, changed } = generateEnduserDocsIndex(root, fgosDir);
+  if (!changed) {
+    return { changed: false, message: `${manifestRelPath} already up to date (${count} tài liệu)` };
+  }
+  return { changed: true, message: `regenerated ${manifestRelPath} (${count} tài liệu)` };
+}
+
+registerCheck({
+  id: 'enduser-docs-index-stale',
+  description: 'docs/enduser-docs-index.json covers every on-disk end-user doc (tsk-1m0)',
+  check: (cwd) => checkEnduserDocsIndexStale(cwd),
+});
+
+registerFix({
+  id: 'enduser-docs-index-stale',
+  fix: (cwd) => fixEnduserDocsIndexStale(cwd),
 });

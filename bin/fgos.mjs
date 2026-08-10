@@ -27,7 +27,8 @@ import { resolveFgosDir, fgosDirFromRoot } from '../src/runner/paths.mjs';
 import { resolveDiscovery } from '../src/intake/discovery.mjs';
 import { resolveDecompose } from '../src/intake/decompose.mjs';
 import { computeEntropy, computeCounts, FINAL_STATUSES } from '../src/report/entropy.mjs';
-import { buildEnduserIndex, QUADRANTS, QUADRANT_DIR_ALIASES, findSourceCaptureIds } from '../src/report/enduser-index.mjs';
+import { findSourceCaptureIds } from '../src/report/enduser-index.mjs';
+import { generateEnduserDocsIndex } from '../src/report/enduser-index-generate.mjs';
 import { rankCandidates } from '../src/evolve/candidates.mjs';
 import { rankImpact } from '../src/state/impact.mjs';
 import { isResolvedStatus } from '../src/state/frontier.mjs';
@@ -2090,13 +2091,16 @@ async function runVerb(verb, flags, positional, dir) {
     // living doc (D10 — that "gộp sống" slice is deferred). Enumerates the
     // real end-user docs under docs/<quadrant>/ for each of the four
     // Diataxis quadrants (enduser-index.mjs's QUADRANTS) — a missing
-    // quadrant dir (today, only docs/how-to/ exists) is skipped cleanly,
-    // never a crash. All I/O (readdir, first-H1 extraction, folding the
-    // event log, writing the manifest) lives here in the entry layer;
-    // `buildEnduserIndex` itself stays a PURE transform (zero imports,
-    // mirrors entropy.mjs) that only assembles the manifest rows and
-    // resolves each doc's `sourceCaptureId` by matching `docPath` against
-    // the rebuilt outcomes view (D13's fidelity/back-link guarantee).
+    // quadrant dir is skipped cleanly, never a crash. All I/O (readdir,
+    // first-H1 extraction, folding the event log, writing the manifest)
+    // lives in enduser-index-generate.mjs's `generateEnduserDocsIndex`
+    // (tsk-1m0: extracted from this case so the enduser-docs-index-stale
+    // doctor check/fix can share the identical generation path, never a
+    // duplicate); `buildEnduserIndex` itself stays a PURE transform (zero
+    // imports, mirrors entropy.mjs) that only assembles the manifest rows
+    // and resolves each doc's `sourceCaptureId` by matching `docPath`
+    // against the rebuilt outcomes view (D13's fidelity/back-link
+    // guarantee).
     //
     // Uses `listWork(dir)` — NOT `rebuild(dir)` — to fold the outcomes view:
     // both replay the SAME event log through the SAME fold logic
@@ -2119,83 +2123,14 @@ async function runVerb(verb, flags, positional, dir) {
       // tree entirely. `dir` is always exactly `<repoRoot>/.fgos`
       // (fgosDirFromRoot, src/runner/paths.mjs), so its parent recovers the
       // one true root regardless of where this command was invoked from.
+      //
+      // The actual enumeration/fold/write logic lives in
+      // enduser-index-generate.mjs (tsk-1m0) — the one generation path this
+      // verb shares with the enduser-docs-index-stale doctor check/fix
+      // (src/setup/registrations.mjs), so neither duplicates the other.
       const repoRoot = path.dirname(dir);
-      const docEntries = [];
-      // Scans one on-disk dir for `.md` files and pushes each as a docEntry
-      // tagged with `quadrant` — the quadrant this dir counts as, which for
-      // an alias dir (D2) differs from the dir's own on-disk name. A missing
-      // dir is skipped cleanly (ENOENT), never a crash: not every quadrant
-      // dir, nor every alias dir, is guaranteed to exist yet.
-      const scanDirAsQuadrant = (quadrantDir, quadrant) => {
-        let dirEntries;
-        try {
-          dirEntries = fs.readdirSync(quadrantDir, { withFileTypes: true });
-        } catch (err) {
-          if (err.code === 'ENOENT') return; // dir absent — skip cleanly, never a crash
-          throw err;
-        }
-        for (const dirEntry of dirEntries) {
-          if (!dirEntry.isFile() || !dirEntry.name.endsWith('.md')) continue;
-          const absPath = path.join(quadrantDir, dirEntry.name);
-          const docPath = path.relative(repoRoot, absPath).split(path.sep).join('/');
-          const content = fs.readFileSync(absPath, 'utf8');
-          const h1 = content.match(/^#\s+(.+)$/m);
-          docEntries.push({ quadrant, docPath, title: h1 ? h1[1].trim() : null });
-        }
-      };
-      for (const quadrant of QUADRANTS) {
-        scanDirAsQuadrant(path.join(repoRoot, 'docs', quadrant), quadrant);
-        for (const alias of QUADRANT_DIR_ALIASES[quadrant] ?? []) {
-          scanDirAsQuadrant(path.join(repoRoot, 'docs', alias), quadrant);
-        }
-      }
-      // fs.readdirSync order is not guaranteed stable across worktree
-      // checkouts of the same doc set — sort before building the manifest
-      // so re-runs over unchanged docs produce byte-identical output (a
-      // prerequisite for the write-only-if-changed guard below to ever
-      // actually skip a write).
-      docEntries.sort((a, b) => (a.quadrant === b.quadrant ? (a.docPath < b.docPath ? -1 : 1) : (a.quadrant < b.quadrant ? -1 : 1)));
-      const manifestPath = path.join(repoRoot, 'docs', 'enduser-docs-index.json');
-      let previousContent;
-      try {
-        previousContent = fs.readFileSync(manifestPath, 'utf8');
-      } catch (err) {
-        if (err.code !== 'ENOENT') throw err;
-      }
-      // tsk-f31: sourceCaptureId can be unresolvable this run not because
-      // the doc genuinely lacks a capture, but because the store itself is
-      // unreachable (a worktree's .fgos/ carries no events.jsonl -- ADR0020).
-      // Detected on the log file itself, not the .fgos/ directory: the
-      // directory can exist (e.g. holding only main-checkout.lock) while
-      // events.jsonl is absent -- readEvents' own ENOENT check
-      // (src/state/events.mjs) is the real signal listWork keys off, not a
-      // directory-level proxy for it. When unreachable, preserve a docPath's
-      // existing on-disk value instead of regressing it to null; a
-      // genuinely reachable store is the only thing allowed to overwrite a
-      // prior value with null.
-      const storeReachable = fs.existsSync(path.join(dir, 'events.jsonl'));
-      const previousById = new Map();
-      if (previousContent) {
-        for (const e of JSON.parse(previousContent)) previousById.set(e.docPath, e.sourceCaptureId);
-      }
-      const view = listWork(dir);
-      const rawEntries = buildEnduserIndex(docEntries, view.outcomes ?? {});
-      const entries = rawEntries.map((e) => {
-        if (!storeReachable && e.sourceCaptureId === null && previousById.get(e.docPath)) {
-          return { ...e, sourceCaptureId: previousById.get(e.docPath) };
-        }
-        return e;
-      });
-      const nextContent = `${JSON.stringify(entries, null, 2)}\n`;
-      if (previousContent !== nextContent) {
-        fs.mkdirSync(path.dirname(manifestPath), { recursive: true });
-        fs.writeFileSync(manifestPath, nextContent, 'utf8');
-      }
-      return {
-        path: path.relative(repoRoot, manifestPath).split(path.sep).join('/'),
-        count: entries.length,
-        entries,
-      };
+      const { path: manifestRelPath, count, entries } = generateEnduserDocsIndex(repoRoot, dir);
+      return { path: manifestRelPath, count, entries };
     }
 
     // Read-only doc↔capture linkage gather (Slice ① gộp-sống, CONTEXT.md

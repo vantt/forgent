@@ -163,6 +163,123 @@ test('checkMergeStillResolves: ok:false detail hints at "git reflog show" when t
   assert.match(result.detail, /git reflog show HEAD/);
 });
 
+// tsk-psb: a decomposed item's own branchHeadAtReturn is structurally never
+// an ancestor of the resolved root ref -- its children's branches merge
+// directly into that ref instead, bypassing the decomposed item's own
+// branch entirely. Reproduces the reported bug shape: parent-d branches
+// off root-g, does its own work, then gets decomposed (its own branch
+// abandoned, never merged); child-a and child-b branch off parent-d but
+// merge DIRECTLY into root-g, the way a real decompose's children do.
+test('checkMergeStillResolves: a decomposed parent resolves ok:true via its children, even though its own sha is never an ancestor (tsk-psb)', () => {
+  const repoRoot = initRepo();
+  execFileSync('git', ['checkout', '-qb', 'fgw/root-g'], { cwd: repoRoot });
+  commitFile(repoRoot, 'root.txt');
+  execFileSync('git', ['checkout', '-qb', 'fgw/parent-d'], { cwd: repoRoot });
+  const parentSha = commitFile(repoRoot, 'parent-work.txt');
+  // Real topology (worktree.mjs D3 "leaf fork-from-tip-of-parent"): a
+  // decomposed item's children fork from the RESOLVED ROOT's branch tip,
+  // never from the decomposed item's own abandoned branch -- so
+  // parent-d's own commit never becomes an ancestor of either child.
+  execFileSync('git', ['checkout', '-qb', 'fgw/child-a', 'fgw/root-g'], { cwd: repoRoot });
+  const childASha = commitFile(repoRoot, 'child-a.txt');
+  execFileSync('git', ['checkout', '-qb', 'fgw/child-b', 'fgw/root-g'], { cwd: repoRoot });
+  const childBSha = commitFile(repoRoot, 'child-b.txt');
+  execFileSync('git', ['checkout', '-q', 'fgw/root-g'], { cwd: repoRoot });
+  execFileSync('git', ['merge', '--no-ff', '-q', '-m', 'merge child-a', 'fgw/child-a'], { cwd: repoRoot });
+  execFileSync('git', ['merge', '--no-ff', '-q', '-m', 'merge child-b', 'fgw/child-b'], { cwd: repoRoot });
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: repoRoot });
+
+  // Proves the fixture actually captures the reported bug shape: parent-d's
+  // own sha is genuinely NOT an ancestor of fgw/root-g (its branch was
+  // never merged there -- only its children's branches were).
+  assert.throws(() => execFileSync('git', ['merge-base', '--is-ancestor', parentSha, 'fgw/root-g'], { cwd: repoRoot }));
+
+  const view = {
+    work: {
+      'root-g': {},
+      'parent-d': { parent: 'root-g', branchHeadAtReturn: parentSha },
+      'child-a': { parent: 'parent-d', branchHeadAtReturn: childASha },
+      'child-b': { parent: 'parent-d', branchHeadAtReturn: childBSha },
+    },
+  };
+  const result = checkMergeStillResolves(repoRoot, view.work['parent-d'], { view, id: 'parent-d' });
+  assert.equal(result.ok, true, "a decomposed parent's own check must defer to its children, never its own abandoned sha");
+  assert.match(result.detail, /decomposed parent/);
+  assert.match(result.detail, /child-a/);
+  assert.match(result.detail, /child-b/);
+});
+
+test('checkMergeStillResolves: a decomposed parent is ok:false when one of its children genuinely never resolved (tsk-psb regression guard)', () => {
+  const repoRoot = initRepo();
+  execFileSync('git', ['checkout', '-qb', 'fgw/root-h'], { cwd: repoRoot });
+  commitFile(repoRoot, 'root.txt');
+  execFileSync('git', ['checkout', '-qb', 'fgw/parent-e'], { cwd: repoRoot });
+  const parentSha = commitFile(repoRoot, 'parent-work.txt');
+  execFileSync('git', ['checkout', '-qb', 'fgw/child-c', 'fgw/root-h'], { cwd: repoRoot });
+  const childCSha = commitFile(repoRoot, 'child-c.txt');
+  execFileSync('git', ['checkout', '-qb', 'fgw/child-d', 'fgw/root-h'], { cwd: repoRoot });
+  const childDSha = commitFile(repoRoot, 'child-d.txt');
+  execFileSync('git', ['checkout', '-q', 'fgw/root-h'], { cwd: repoRoot });
+  execFileSync('git', ['merge', '--no-ff', '-q', '-m', 'merge child-c', 'fgw/child-c'], { cwd: repoRoot });
+  // child-d is deliberately NOT merged anywhere -- a genuine loss, must
+  // still be caught even though its sibling child-c is fine.
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: repoRoot });
+
+  const view = {
+    work: {
+      'root-h': {},
+      'parent-e': { parent: 'root-h', branchHeadAtReturn: parentSha },
+      'child-c': { parent: 'parent-e', branchHeadAtReturn: childCSha },
+      'child-d': { parent: 'parent-e', branchHeadAtReturn: childDSha },
+    },
+  };
+  const result = checkMergeStillResolves(repoRoot, view.work['parent-e'], { view, id: 'parent-e' });
+  assert.equal(result.ok, false, 'one genuinely unresolved child must still fail the parent check');
+  assert.match(result.detail, /child-d/, 'the failing detail must name the specific failing child, not a generic message');
+});
+
+// Multi-level: child-mid was ITSELF decomposed further (has its own child,
+// grandchild-1). Proves the children-recursion composes with itself across
+// more than one decompose level, and that child-mid's own bogus sha (also
+// never merged, same shape as parent-e above) is correctly ignored in
+// favor of recursing into ITS OWN children.
+test('checkMergeStillResolves: a multi-level decompose tree (child itself decomposed further) resolves correctly through recursion (tsk-psb)', () => {
+  const repoRoot = initRepo();
+  execFileSync('git', ['checkout', '-qb', 'fgw/root-i'], { cwd: repoRoot });
+  commitFile(repoRoot, 'root.txt');
+  execFileSync('git', ['checkout', '-qb', 'fgw/parent-f'], { cwd: repoRoot });
+  const parentSha = commitFile(repoRoot, 'parent-work.txt');
+  // Same real topology as the tests above: EVERY leaf, regardless of how
+  // many decompose levels sit above it, forks from the single resolved
+  // root's branch tip (worktree.mjs D3) -- never from an intermediate
+  // decomposed item's own branch. child-mid is itself decomposed further,
+  // so its own commit (childMidSha) is exactly as abandoned as parent-f's.
+  execFileSync('git', ['checkout', '-qb', 'fgw/child-leaf', 'fgw/root-i'], { cwd: repoRoot });
+  const childLeafSha = commitFile(repoRoot, 'child-leaf.txt');
+  execFileSync('git', ['checkout', '-qb', 'fgw/child-mid', 'fgw/root-i'], { cwd: repoRoot });
+  const childMidSha = commitFile(repoRoot, 'child-mid-work.txt');
+  execFileSync('git', ['checkout', '-qb', 'fgw/grandchild-1', 'fgw/root-i'], { cwd: repoRoot });
+  const grandchildSha = commitFile(repoRoot, 'grandchild.txt');
+  execFileSync('git', ['checkout', '-q', 'fgw/root-i'], { cwd: repoRoot });
+  execFileSync('git', ['merge', '--no-ff', '-q', '-m', 'merge child-leaf', 'fgw/child-leaf'], { cwd: repoRoot });
+  execFileSync('git', ['merge', '--no-ff', '-q', '-m', 'merge grandchild-1', 'fgw/grandchild-1'], { cwd: repoRoot });
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: repoRoot });
+
+  const view = {
+    work: {
+      'root-i': {},
+      'parent-f': { parent: 'root-i', branchHeadAtReturn: parentSha },
+      'child-leaf': { parent: 'parent-f', branchHeadAtReturn: childLeafSha },
+      'child-mid': { parent: 'parent-f', branchHeadAtReturn: childMidSha },
+      'grandchild-1': { parent: 'child-mid', branchHeadAtReturn: grandchildSha },
+    },
+  };
+  const result = checkMergeStillResolves(repoRoot, view.work['parent-f'], { view, id: 'parent-f' });
+  assert.equal(result.ok, true, 'a multi-level decompose tree must resolve through recursive children checks');
+  assert.match(result.detail, /child-leaf/);
+  assert.match(result.detail, /child-mid/);
+});
+
 // --- checkRetrospectiveContent -----------------------------------------
 // tsk-558: reads outcome.docType/docPath (D8's own named fields) instead
 // of outcome.actual/predicted (claim-lifecycle artifacts, unrelated to
