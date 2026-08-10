@@ -78,6 +78,22 @@ test('fgos-runner resolves and invokes bin/fgos-runner.mjs from the repo root', 
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 
+test('fgos and fgos-runner still resolve and invoke correctly even when a leading-underscore helper function gets stripped from the shell (tsk-3k2: this is what a harness shell-function snapshot did in practice, reproduced live as "fgos:2: command not found: _fgos_repo_root")', () => {
+  const repoRoot = setupRepo();
+
+  // Simulates the harness filtering out any `_`-prefixed function from a
+  // sourced shell's surviving functions -- `fgos`/`fgos-runner` no longer
+  // depend on any such helper, so unsetting one (real or not) must have
+  // no effect on them.
+  const out = runBash(repoRoot, `source "${scriptPath}"; unset -f _fgos_repo_root 2>/dev/null; fgos --x; fgos-runner --y`);
+
+  assert.match(out, /FGOS_MARKER/);
+  assert.match(out, /"--x"/);
+  assert.match(out, /FGOS_RUNNER_MARKER/);
+  assert.match(out, /"--y"/);
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
 test('from inside a linked worktree, fgos resolves to the MAIN checkout bin/fgos.mjs, not the worktree-local copy', () => {
   const repoRoot = setupRepo();
   const worktreeRoot = mkTempDir('fgos-shell-integration-wt-');
