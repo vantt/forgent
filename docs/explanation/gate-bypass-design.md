@@ -1,6 +1,6 @@
 ---
 type: explanation
-source_capture_ids: [tsk-6bx, tsk-1ds]
+source_capture_ids: [tsk-6bx, tsk-1ds, tsk-1vi]
 ---
 
 # Why gate-bypass is shaped the way it is
@@ -178,3 +178,60 @@ two axes `canAutoApprove` already used (the `HEAVY_KEYWORDS` floor, D4;
 existing `canAutoApprove` — still driving `contextApprove`/`planApprove`
 — was left untouched rather than parameterized, so neither of those two
 gates' behavior could shift as a side effect.
+
+## A mechanical check is only as live as the branch importing it (D7/D8, `tsk-1vi`)
+
+`tsk-5hg` (above) proved a mechanical check is only as sound as whatever
+*writes* the fact it reads. `tsk-1vi` found a sibling failure mode one
+layer down: the check is also only as sound as whatever *code* actually
+runs when a Gate section imports it — and each of the three Gate
+sections' inline `node -e` scripts import `gate-bypass.mjs`/`store.mjs`
+cwd-relative, from the claimed item's own `fgw/<id>` worktree, not from
+the main checkout.
+
+That choice was deliberate for `fgos-exploring`/`fgos-planning`'s own
+Gate sections, which document it explicitly: "this worktree's own branch
+already carries whatever version it needs" — protecting the case where
+an item is itself modifying `gate-bypass.mjs` (as this feature's own
+`tsk-6bx`/`tsk-1ds` rollouts did) and needs its own gate check to
+exercise its own branch's in-progress code before `main` even has it.
+
+**The gap**: a long-lived branch forked *before* a needed export existed
+on `main` gets a cwd-relative import that resolves successfully but
+returns `undefined` for that export — not a load failure, a silently
+stale one. Reproduced live on `tsk-5lr`: its branch forked 2026-08-06,
+three days before D6 added `canAutoApproveValidate` to `main`
+(2026-08-09). Calling the `undefined` export threw `TypeError:
+canAutoApproveValidate is not a function` — which happened to fail
+closed only because each Gate section's own consumer rule treats
+"anything but `true`" as `false`, not because anyone designed that
+exception path on purpose.
+
+**The fix (D7)**: local-first, fall back to root. Try the existing
+cwd-relative import first; if the needed export comes back `undefined`
+or the import throws, retry the same import from `${root}/src/state/...`
+(the main checkout) before falling through to `false`. This is correct
+in both directions at once — the self-referential case (an item modifying
+`gate-bypass.mjs` itself) still gets its own branch's in-progress code
+via the local import succeeding first, and the stale-branch case falls
+back to `main`'s canonical code once the local import's export comes back
+missing. A flat switch to `$root`-only import was considered and rejected
+specifically because it would have broken the self-referential case this
+very feature's own two prior rollouts (D1-D6) depended on.
+
+**What stayed explicitly out of scope (D8)**: a pure global `npm install`
+of fgOS onto a different product's repo has no repo-local `src/state/*.mjs`
+at either `./` or `$root` — the same import fails unconditionally there,
+for every item, not just stale branches. That's a different failure
+shape (always-crash vs. sometimes-crash) from what D7 fixes, and was
+split into its own backlog item (`tsk-65q`) rather than folded into this
+one's scope — the DoD-before-polish priority order this repo already
+follows.
+
+The general lesson, layered onto `tsk-5hg`'s own: "this check reads a
+fact mechanically" and "this check's own code is definitely the current
+code" are two separate soundness claims. The first was already proven;
+the second silently assumed a worktree's cwd-relative import always
+resolves against fresh code, which held for every case this feature was
+originally built and tested against, and broke the moment a branch
+outlived the code it imports.
