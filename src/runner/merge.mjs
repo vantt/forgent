@@ -69,8 +69,48 @@ export class MergeError extends Error {
 // here already reads instead. Found via isMainWorktree(process.cwd()) newly
 // reachable from a plain non-git dir (tsk-56t D2's read-verb warning) —
 // no caller's behavior changes, since none relied on the live leak.
-function git(repoRoot, args) {
-  return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false, stdio: ['ignore', 'pipe', 'pipe'] });
+//
+// maxBuffer (tsk-648): optional, default undefined — Node's own 1 MiB
+// default applies exactly as before when omitted, so every existing call
+// site (none of which passes it) stays byte-identical. Only reviewDiff's
+// two full-diff calls below pass an explicit, larger value: a full `git
+// diff` (unlike every `--name-only` call in this file) can exceed 1 MiB
+// once a branch is hundreds of commits stale, which throws ENOBUFS.
+function git(repoRoot, args, { maxBuffer } = {}) {
+  return execFileSync('git', args, {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    shell: false,
+    stdio: ['ignore', 'pipe', 'pipe'],
+    ...(maxBuffer === undefined ? {} : { maxBuffer }),
+  });
+}
+
+// reviewDiff's own ceiling for a full (non-`--name-only`) diff — generous
+// on purpose: a local git subprocess call isn't memory-constrained the way
+// a network payload is, and a text diff this large from a normal repo is
+// already an outlier. Callers can still override it via opts.maxBuffer
+// (e.g. a test proving the ENOBUFS-diagnosis path deterministically,
+// without needing an actually-hundreds-of-commits-stale diff).
+const DIFF_MAX_BUFFER = 50 * 1024 * 1024;
+
+// tsk-648: raised once a diff still overflows maxBuffer above — names the
+// real condition (a diff too large to compute, most often because the
+// branch is very stale) instead of forwarding Node's raw ENOBUFS message,
+// which gave no path forward. Only fires on that one specific failure
+// mode; every other git failure keeps its original "computing <label>
+// failed: <err.message>" shape unchanged. `label` is the call site's own
+// pre-formatted description (e.g. `diff for branch "${branch}"` or
+// `pull-door diff for range "${range}"`) — this helper never reformats it.
+function diffFailureMessage(label, err) {
+  if (err.code === 'ENOBUFS') {
+    return (
+      `${label} exceeds the ${DIFF_MAX_BUFFER}-byte diff limit — ` +
+      'the branch is likely very stale relative to its merge target (many commits behind); ' +
+      'sync/rebase it before reviewing.'
+    );
+  }
+  return `computing ${label} failed: ${err.message}`;
 }
 
 /** Resolve `repoRoot`'s trunk branch name without assuming `'main'`: prefers
@@ -260,18 +300,23 @@ export function classifySource(repoRoot, item) {
  * (multi-session is a valid scenario, not an error). This is reported as an
  * honest warning (commit count in range) rather than silently attributing
  * every line in the diff to this one item.
+ *
+ * `opts.maxBuffer` (tsk-648): overrides DIFF_MAX_BUFFER for both full-diff
+ * calls below — the seam a test uses to prove the ENOBUFS-diagnosis path
+ * deterministically, without needing an actually-hundreds-of-commits-stale
+ * diff. Omitted in every real caller today, so the generous default applies.
  */
 export function reviewDiff(repoRoot, item, opts = {}) {
-  const { trunk = detectTrunk(repoRoot) } = opts;
+  const { trunk = detectTrunk(repoRoot), maxBuffer = DIFF_MAX_BUFFER } = opts;
   const source = classifySource(repoRoot, item);
 
   if (source === 'runner') {
     const branch = branchNameFor(item.id);
     let diff;
     try {
-      diff = git(repoRoot, ['diff', `${trunk}...${branch}`]);
+      diff = git(repoRoot, ['diff', `${trunk}...${branch}`], { maxBuffer });
     } catch (err) {
-      throw new MergeError(`computing diff for branch "${branch}" failed: ${err.message}`, { branch });
+      throw new MergeError(diffFailureMessage(`diff for branch "${branch}"`, err), { branch });
     }
     return { source, diff, warnings: [] };
   }
@@ -281,10 +326,10 @@ export function reviewDiff(repoRoot, item, opts = {}) {
     let diff;
     let commitCount;
     try {
-      diff = git(repoRoot, ['diff', range]);
+      diff = git(repoRoot, ['diff', range], { maxBuffer });
       commitCount = parseInt(git(repoRoot, ['rev-list', '--count', range]).trim(), 10) || 0;
     } catch (err) {
-      throw new MergeError(`computing pull-door diff for range "${range}" failed: ${err.message}`, { range });
+      throw new MergeError(diffFailureMessage(`pull-door diff for range "${range}"`, err), { range });
     }
     const warnings = commitCount > 1
       ? [`range headAtTake..headAtReturn contains ${commitCount} commits — may include commits from another session's take/return interleaved with this one (multi-session is a valid scenario; honest degrade, not an error)`]

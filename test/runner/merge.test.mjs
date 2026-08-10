@@ -16,6 +16,7 @@ import {
   buildOwnFileSet,
   classifyDecisionIndexCollision,
   abortMergeIfPossible,
+  MergeError,
 } from '../../src/runner/merge.mjs';
 import { branchNameFor, withMergeEphemeralWorktree } from '../../src/runner/worktree.mjs';
 import { acquireMainCheckoutLock, ACQUIRED } from '../../src/runner/main-checkout-lock.mjs';
@@ -147,6 +148,44 @@ test('reviewDiff for a legacy item (no branch, no head markers) returns a null d
   assert.equal(result.diff, null);
   assert.equal(result.warnings.length, 1);
   assert.match(result.warnings[0], /no live diff source/);
+});
+
+// tsk-648: a diff larger than Node's own 1 MiB execFileSync default (the
+// default in force before this item, since `git()` used to pass no
+// maxBuffer at all) must still succeed under reviewDiff's own generous
+// ceiling -- direct regression proof for the reported ENOBUFS crash
+// (fgw/tsk-19y, 332 commits stale).
+test('reviewDiff succeeds on a diff larger than Node\'s old 1 MiB execFileSync default (tsk-648 regression)', () => {
+  const repoRoot = initRepo();
+  const bigContent = `${'x'.repeat(2 * 1024 * 1024)}\n`; // 2 MiB, well past the old 1 MiB default
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'big.txt', bigContent);
+
+  const result = reviewDiff(repoRoot, makeItem());
+  assert.equal(result.source, 'runner');
+  assert.ok(result.diff.length > 1024 * 1024, 'the diff itself must exceed the old 1 MiB default to be a real regression proof');
+  assert.match(result.diff, /big\.txt/);
+  assert.deepEqual(result.warnings, []);
+});
+
+// tsk-648: once a diff still overflows maxBuffer (proven deterministically
+// here via an explicitly tiny override, not by needing an actually
+// gigantic diff), reviewDiff must throw a MergeError naming the real
+// condition -- never a raw, unhelpful "spawnSync git ENOBUFS" passthrough,
+// and never an uncaught crash.
+test('reviewDiff reports a diagnosable MergeError, not a raw ENOBUFS passthrough, when a diff still exceeds maxBuffer', () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', `${'y'.repeat(4096)}\n`);
+
+  assert.throws(
+    () => reviewDiff(repoRoot, makeItem(), { maxBuffer: 64 }),
+    (err) => {
+      assert.ok(err instanceof MergeError, 'must still be a MergeError, not an uncaught raw exception');
+      assert.match(err.message, /exceeds the .*-byte diff limit/);
+      assert.match(err.message, /stale/i);
+      assert.doesNotMatch(err.message, /spawnSync/, 'must not forward Node\'s raw spawnSync message verbatim');
+      return true;
+    },
+  );
 });
 
 // --- changedFiles (the Iron Law classifier's approve-side input, D16) ----
