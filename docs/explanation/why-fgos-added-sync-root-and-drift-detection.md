@@ -1,3 +1,8 @@
+---
+type: explanation
+title: Why fgOS added `sync-root` and drift detection
+source_capture_ids: [tsk-2ec]
+---
 # Why fgOS added `sync-root` and drift detection
 
 fgOS's nested branch-tree merge topology — leaf items merge into
@@ -122,6 +127,54 @@ subprocess call; the clustering escalation-fallback path needs an
 explicit test, not just the auto-serialize happy path; and
 `mergeAfter` cycle tests must include a case mixed with `deps`/`parent`,
 not just `mergeAfter` alone.
+
+## A follow-on bug (`tsk-2ec`): `driftStatus` targeted a resolved parent's dead branch
+
+`driftStatus`'s own target formula (`src/state/drift-status.mjs:65`)
+picks `fgw/<parentId>` as the sync target whenever `rootItem.parent` is
+set, with no check on whether that parent is itself still an active
+target:
+
+> "`targetBranch = rootItem?.parent ? \`fgw/${rootItem.parent}\` : trunk`
+> — picks the parent's own branch as the sync target whenever a `parent`
+> field is set, with no check on the parent's own resolved status."
+> — real `docs/history/tsk-2ec-drift-status-resolved-parent-target/CONTEXT.md`
+
+Live evidence via `fgos doctor`: `tsk-4n7` (parent `tsk-19y`, itself
+`status: done`, fully merged into `main` and frozen since 2026-08-07)
+computed a sync target of `fgw/tsk-19y` — a branch that still exists on
+disk (branches aren't torn down promptly after merge) but is permanently
+frozen, since nothing further is meant to land there:
+
+> `git rev-list --left-right --count main...fgw/tsk-19y` → `340 0`
+> (fully merged, `behind: 0`); the same check against `fgw/tsk-4n7` →
+> `9 4` (nearly current with `main` directly).
+> — real evidence, `docs/history/tsk-2ec-drift-status-resolved-parent-target/CONTEXT.md`
+
+The diagnostic signature that told this apart from ordinary drift:
+`behind: 0, ahead: N-large` against the parent branch. Ordinary drift
+(the incident this doc's own "real incident" section above describes)
+always has `behind > 0` — the real target kept moving forward. Here the
+target had stopped moving entirely, because it was done.
+
+The real consequence, had it gone unfixed: `needsSync` (the same
+`isResolvedStatus`-gated predicate this doc's own design already uses)
+evaluated true for `tsk-4n7`, so `mergeReadiness` would classify it as
+`blockedOnSync` and `fgos merge next` would call `sync-root tsk-4n7` —
+merging real work into a branch that was never going anywhere, reporting
+"merged" while the code never actually reached `main`. The same class of
+"looks done but silently isn't" risk this doc's own original incident
+already named, one level deeper: not root-to-main drift, but a nested
+root targeting a *grandparent* branch that had already closed out.
+
+**The fix**: when `rootItem.parent` resolves to an item whose own status
+`isResolvedStatus` reports as resolved, target `trunk` directly instead
+of `fgw/<parentId>` — applying the exact same predicate the module
+already trusted for `needsSync`, one level earlier in the same
+computation, not a new concept. An existing test covering a nested root
+targeting `fgw/<parentId>` stayed byte-identical (its fixture's parent
+uses the default unresolved status); the new test is the first to
+exercise a root whose *parent* is itself resolved — the actual gap.
 
 ## The decompose split
 
