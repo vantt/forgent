@@ -7,7 +7,8 @@
 // This is the "one door" for claiming work — no direct moveWork(to:'doing')
 // calls outside this module except for FSM-internal transitions.
 
-import { moveWork, addOutcome, addDecision, listWork, readRawEvents, FsmError } from '../state/store.mjs';
+import { moveWork, addOutcome, addDecision, readRawEvents, FsmError } from '../state/store.mjs';
+import { foldEvents } from '../state/replay.mjs';
 import { isResolvedStatus } from '../state/frontier.mjs';
 import { visitCount } from './anti-loop.mjs';
 import { acquireMainCheckoutLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS, formatLockDurationMs } from './main-checkout-lock.mjs';
@@ -87,13 +88,6 @@ export class ClaimError extends Error {
  * @returns {Object} claim result with worktree info if isolated
  */
 export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = process.cwd(), worktreeDir, skipOutcome = false } = {}) {
-  const view = listWork(dir);
-  const item = view.work[id];
-
-  if (!item) {
-    throw new ClaimError('not-found', `claimWork: work "${id}" not found.`);
-  }
-
   // Acquire main-checkout-lock before any state mutation. ttlMs is required
   // here (tsk-3w8 follow-up): the pre-commit hook (.githooks/pre-commit,
   // now wired via fgos setup/doctor) writes a STRING-identity record per
@@ -119,6 +113,13 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
 
   try {
     const rawEvents = readRawEvents(dir);
+    const view = foldEvents(rawEvents);
+    const item = view.work[id];
+
+    if (!item) {
+      throw new ClaimError('not-found', `claimWork: work "${id}" not found.`);
+    }
+
     const priorVisits = visitCount(rawEvents, id);
     const branch = branchNameFor(id);
     const branchAlreadyExists = branchExists(repoRoot, branch);
