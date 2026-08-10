@@ -1,7 +1,7 @@
 ---
 type: explanation
 title: Why `clarify` split into `clarify`, `discovery`, and `exploring`
-source_capture_ids: [tsk-4b2, tsk-12p]
+source_capture_ids: [tsk-4b2, tsk-12p, tsk-4v6]
 ---
 # Why `clarify` split into `clarify`, `discovery`, and `exploring`
 
@@ -325,3 +325,33 @@ confirming a real, producible state actually reaches that dispatcher are
 different checks, and only a full-log audit (not a code read of either
 piece in isolation) revealed that neither had ever actually happened
 across this repo's entire history.
+
+## Implementation (`tsk-4v6`, `tsk-4b2`'s own D5): the headless sweep gets the same verdict contract as the interactive path
+
+D5 named the fix but left the mechanism to planning: `loop.mjs`'s
+DISCOVERY DISPATCH sweep does not get a new parsing channel of its own —
+it reuses the same `fgos-discovered`-block-style parsing
+`captureDiscoveredWork` already uses for a different channel, reading the
+worker's own findings/verdict output directly. Once the verdict is
+captured, the branch is exactly what driver/launcher parity requires: a
+`clear` verdict keeps the existing `moveStage(... to: 'exploring' ...)`
+call; an `unclear` verdict parks the item via `fgos ask` with the
+worker's own question, matching the interactive path's behavior exactly
+rather than approximating it.
+
+The fix touched `src/runner/loop.mjs`, its own worker prompt
+(`worker-prompt-discovery.txt`, fenced so the worker's verdict output has
+a stable shape to parse), and `test/runner/loop.test.mjs` — no overlap
+with the sibling piece that made `discovery` a real stage, so the two
+could land in either order. It passed verify
+(`node --test test/runner/loop.test.mjs && npm test`) on its first
+attempt, after one transient `goal-check` verify-miss on the branch
+before merge (resolved without further code changes).
+
+The general lesson this adds to the one above: once a real audit finds a
+"dispatcher never reaches this state" bug, fixing it is two separable
+claims again — making the state reachable (`tsk-4b2`'s main piece) and
+making the dispatcher that *already* runs against that state honor the
+same contract another dispatcher already honors (`tsk-4v6`, this piece)
+— and confirming the second claim needs its own read of the dispatcher's
+code, not an inference from the first claim being fixed.
