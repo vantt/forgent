@@ -16,6 +16,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `risk: light|standard|heavy`. A domain that declares no vocabulary is
   unaffected — any non-empty string still passes, exactly as before.
 
+- The shared config file gains a `herdrOrchestrator: {autoDiscover,
+  autoMerge, autoRetro, autoCleanup}` section (all off by default,
+  fail-closed on a missing or malformed value) for the herdr-plugin
+  dashboard's future auto-launch toggles. Surfaced by `fgos doctor`'s new
+  `herdr-launcher-configured` check and merged in by `fgos setup`, same
+  as every other registered config default.
+
+- The herdr-plugin dashboard auto-launches a guarded agent pane running
+  `/fgOS:discover <id>` for the first `clarify`-stage, `todo`-status item
+  it finds, once per poll tick, when `herdrOrchestrator.autoDiscover` is
+  on (off by default). Guarded against double-launching the same item via
+  a dedicated pane label, kept separate from the dashboard's existing
+  In-Process pane tracking so it never shows up there as a phantom task.
+
 ### Changed
 
 - `/fgOS:submit` run from a live session now continues into the item's

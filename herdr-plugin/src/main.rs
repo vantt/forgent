@@ -5,12 +5,13 @@ use std::time::{Duration, Instant};
 
 use serde::Deserialize;
 
-use herdr_fgos::app::{App, Panel};
+use herdr_fgos::app::{App, Panel, WorkItem};
 use herdr_fgos::fgos::{self, FgosCliSource};
 use herdr_fgos::layout;
 use herdr_fgos::pane_scan::HerdrPaneScanner;
 use herdr_fgos::pick::{self, HerdrPaneAdapter};
 use herdr_fgos::ports::{PaneOrchestrator, PaneRegistry, TerminalUi, UiEvent, WorkItemSource};
+use herdr_fgos::settings;
 use herdr_fgos::ui::RatatuiTerminalUi;
 
 /// Same poll cadence as the existing STR40 bash cockpit's dashboard pane —
@@ -112,9 +113,9 @@ fn main() -> io::Result<()> {
         &mut app,
         source.as_ref().map(|s| s as &dyn WorkItemSource),
         pane_registry.as_ref().map(|r| r as &dyn PaneRegistry),
-        root.as_deref().ok(),
         &pane_orchestrator,
         POLL_INTERVAL,
+        root.as_deref().ok(),
     );
 
     ui.teardown()?;
@@ -122,20 +123,33 @@ fn main() -> io::Result<()> {
     result
 }
 
+/// tsk-2ja Shape step 1: the first item ready for an unattended
+/// `/fgOS:discover` launch this tick — the exact same `stage == "clarify"`
+/// gate the manual Discover button already enforces (`UiEvent::Discover`
+/// below), plus `status == "todo"` (never `doing`/`blocked`/
+/// `awaiting-human`, all of which mean a person or another session
+/// already owns it). One candidate only, never a batch — the caller
+/// launches at most one pane per tick.
+fn next_auto_discover_candidate(work_items: &[WorkItem]) -> Option<&WorkItem> {
+    work_items
+        .iter()
+        .find(|item| item.stage == "clarify" && item.status == "todo")
+}
+
 fn run(
     ui: &mut impl TerminalUi,
     app: &mut App,
     source: Option<&dyn WorkItemSource>,
     registry: Option<&dyn PaneRegistry>,
+    pane_orchestrator: &impl PaneOrchestrator,
+    poll_interval: Duration,
     // The main fgOS checkout root (tsk-45u D1's already-resolved root,
     // threaded in rather than re-resolved every tick). `None` outside a
     // real herdr-managed pane (dev/test) — same degrade-gracefully shape
-    // `source`/`registry` above already use. Needed for the
-    // auto-merge/retro/cleanup launcher's own settings read and
-    // retro-vs-cleanup priority check (tsk-57q).
+    // `source`/`registry` above already use. Needed for the auto-discover
+    // toggle read (tsk-2ja) and the auto-merge/retro/cleanup launcher's
+    // own settings read and retro-vs-cleanup priority check (tsk-57q).
     root: Option<&Path>,
-    pane_orchestrator: &impl PaneOrchestrator,
-    poll_interval: Duration,
 ) -> io::Result<()> {
     let mut last_poll = Instant::now();
     loop {
@@ -316,6 +330,31 @@ fn run(
             }
             if let Some(registry) = registry {
                 app.refresh_pane_state(registry);
+            }
+            // tsk-2m5: fail-closed local file read, no port/test-seam
+            // needed (unlike the two calls above, which shell out to an
+            // external process/registry) — storing only, no launcher
+            // logic here (tsk-2ja/tsk-57q's own footprint).
+            if let Some(root) = root {
+                app.orchestrator_settings = settings::read_settings(root);
+            }
+            // tsk-2ja: unattended auto-discover launch, at most one per
+            // tick. Any failure (cap refusal, rename failure, spawn
+            // failure) is swallowed here — never surfaced as
+            // `app.pick_status` (person-initiated actions only), never
+            // retried within the same tick, never queued; a fresh
+            // candidate read next tick is the only retry.
+            if app.orchestrator_settings.auto_discover {
+                if let Some(candidate) = next_auto_discover_candidate(&app.work_items) {
+                    let id = candidate.id.clone();
+                    let label = pick::auto_discover_pane_label(&id);
+                    let already_open = registry
+                        .map(|registry| registry.has_labeled_pane(&label).unwrap_or(false))
+                        .unwrap_or(false);
+                    if !already_open {
+                        let _ = pane_orchestrator.open_auto_discover_pane(&id);
+                    }
+                }
             }
             // tsk-57q: same tick, so the guard check and the launch it
             // gates never straddle two ticks (poll-tick race risk row,
@@ -624,6 +663,10 @@ mod tests {
         fn launch_cleanup_loop(&self, _pane_id: &str) -> io::Result<()> {
             Ok(())
         }
+
+        fn open_auto_discover_pane(&self, _id: &str) -> io::Result<()> {
+            Ok(())
+        }
     }
 
     /// Records every pane id it was asked to focus, so a test can assert
@@ -657,15 +700,20 @@ mod tests {
         fn launch_cleanup_loop(&self, _pane_id: &str) -> io::Result<()> {
             Ok(())
         }
+
+        fn open_auto_discover_pane(&self, _id: &str) -> io::Result<()> {
+            Ok(())
+        }
     }
 
-    /// Records every work-item id it was asked to open a pick or discover
-    /// pane for, so a test can assert each button fires exactly once, on
-    /// the second Enter/`d` respectively (tsk-1e3). Also records every
-    /// fixed-pane loop it was asked to launch (tsk-57q).
+    /// Records every work-item id it was asked to open a pick, discover,
+    /// or auto-discover pane for, so a test can assert each fires exactly
+    /// once (tsk-1e3, tsk-2ja). Also records every fixed-pane loop it was
+    /// asked to launch (tsk-57q).
     struct RecordingPickOrchestrator {
         picked: std::cell::RefCell<Vec<String>>,
         discovered: std::cell::RefCell<Vec<String>>,
+        auto_discovered: std::cell::RefCell<Vec<String>>,
         merge_launched: std::cell::RefCell<Vec<String>>,
         retro_launched: std::cell::RefCell<Vec<String>>,
         cleanup_launched: std::cell::RefCell<Vec<String>>,
@@ -698,6 +746,11 @@ mod tests {
 
         fn launch_cleanup_loop(&self, pane_id: &str) -> io::Result<()> {
             self.cleanup_launched.borrow_mut().push(pane_id.to_string());
+            Ok(())
+        }
+
+        fn open_auto_discover_pane(&self, id: &str) -> io::Result<()> {
+            self.auto_discovered.borrow_mut().push(id.to_string());
             Ok(())
         }
     }
@@ -834,12 +887,13 @@ mod tests {
         let pane_orchestrator = RecordingPickOrchestrator {
             picked: std::cell::RefCell::new(Vec::new()),
             discovered: std::cell::RefCell::new(Vec::new()),
+            auto_discovered: std::cell::RefCell::new(Vec::new()),
             merge_launched: std::cell::RefCell::new(Vec::new()),
             retro_launched: std::cell::RefCell::new(Vec::new()),
             cleanup_launched: std::cell::RefCell::new(Vec::new()),
         };
 
-        run(&mut ui, &mut app, None, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO, None)
             .expect("run should exit cleanly on Quit");
 
         assert_eq!(*pane_orchestrator.picked.borrow(), vec!["tsk-a".to_string()]);
@@ -875,12 +929,13 @@ mod tests {
         let pane_orchestrator = RecordingPickOrchestrator {
             picked: std::cell::RefCell::new(Vec::new()),
             discovered: std::cell::RefCell::new(Vec::new()),
+            auto_discovered: std::cell::RefCell::new(Vec::new()),
             merge_launched: std::cell::RefCell::new(Vec::new()),
             retro_launched: std::cell::RefCell::new(Vec::new()),
             cleanup_launched: std::cell::RefCell::new(Vec::new()),
         };
 
-        run(&mut ui, &mut app, None, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO, None)
             .expect("run should exit cleanly on Quit");
 
         // A miss (n=0) returns `Ok(None)` -- no event at all this tick,
@@ -919,7 +974,7 @@ mod tests {
         assert_eq!(app.active_tab, herdr_fgos::app::WorkTab::Todo);
         let pane_orchestrator = NoopPaneOrchestrator;
 
-        run(&mut ui, &mut app, None, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO, None)
             .expect("run should exit cleanly on Quit");
 
         assert_eq!(
@@ -960,7 +1015,7 @@ mod tests {
         let mut app = App::empty();
         let pane_orchestrator = NoopPaneOrchestrator;
 
-        run(&mut ui, &mut app, None, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO, None)
             .expect("run should exit cleanly on Quit");
 
         assert_eq!(app.filter_query, "ab");
@@ -997,7 +1052,7 @@ mod tests {
         let mut app = App::empty();
         let pane_orchestrator = NoopPaneOrchestrator;
 
-        run(&mut ui, &mut app, None, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO, None)
             .expect("run should exit cleanly on Quit");
 
         assert_eq!(app.filter_query, "");
@@ -1089,7 +1144,7 @@ mod tests {
             focused: std::cell::RefCell::new(Vec::new()),
         };
 
-        run(&mut ui, &mut app, None, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO, None)
             .expect("run should exit cleanly on Quit");
 
         assert_eq!(app.focused_panel, Panel::InProcess);
@@ -1110,7 +1165,7 @@ mod tests {
             focused: std::cell::RefCell::new(Vec::new()),
         };
 
-        run(&mut ui, &mut app, None, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO, None)
             .expect("run should exit cleanly on Quit");
 
         assert!(pane_orchestrator.focused.borrow().is_empty());
@@ -1135,12 +1190,13 @@ mod tests {
         let pane_orchestrator = RecordingPickOrchestrator {
             picked: std::cell::RefCell::new(Vec::new()),
             discovered: std::cell::RefCell::new(Vec::new()),
+            auto_discovered: std::cell::RefCell::new(Vec::new()),
             merge_launched: std::cell::RefCell::new(Vec::new()),
             retro_launched: std::cell::RefCell::new(Vec::new()),
             cleanup_launched: std::cell::RefCell::new(Vec::new()),
         };
 
-        run(&mut ui, &mut app, None, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO, None)
             .expect("run should exit cleanly on Quit");
 
         assert_eq!(*pane_orchestrator.picked.borrow(), vec!["tsk-a".to_string()]);
@@ -1170,12 +1226,13 @@ mod tests {
         let pane_orchestrator = RecordingPickOrchestrator {
             picked: std::cell::RefCell::new(Vec::new()),
             discovered: std::cell::RefCell::new(Vec::new()),
+            auto_discovered: std::cell::RefCell::new(Vec::new()),
             merge_launched: std::cell::RefCell::new(Vec::new()),
             retro_launched: std::cell::RefCell::new(Vec::new()),
             cleanup_launched: std::cell::RefCell::new(Vec::new()),
         };
 
-        run(&mut ui, &mut app, None, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO, None)
             .expect("run should exit cleanly on Quit");
 
         assert_eq!(*pane_orchestrator.discovered.borrow(), vec!["tsk-a".to_string()]);
@@ -1208,12 +1265,13 @@ mod tests {
         let pane_orchestrator = RecordingPickOrchestrator {
             picked: std::cell::RefCell::new(Vec::new()),
             discovered: std::cell::RefCell::new(Vec::new()),
+            auto_discovered: std::cell::RefCell::new(Vec::new()),
             merge_launched: std::cell::RefCell::new(Vec::new()),
             retro_launched: std::cell::RefCell::new(Vec::new()),
             cleanup_launched: std::cell::RefCell::new(Vec::new()),
         };
 
-        run(&mut ui, &mut app, None, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO, None)
             .expect("run should exit cleanly on Quit");
 
         assert!(pane_orchestrator.discovered.borrow().is_empty());
@@ -1240,7 +1298,7 @@ mod tests {
         app.select_next();
         let pane_orchestrator = NoopPaneOrchestrator;
 
-        run(&mut ui, &mut app, None, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO, None)
             .expect("run should exit cleanly on Quit");
 
         assert_eq!(
@@ -1265,9 +1323,9 @@ mod tests {
             &mut app,
             Some(&source),
             Some(&registry),
-            None,
             &pane_orchestrator,
             Duration::ZERO,
+            None,
         )
         .expect("run should exit cleanly on Quit");
 
@@ -1287,9 +1345,9 @@ mod tests {
             &mut app,
             Some(&source),
             None,
-            None,
             &pane_orchestrator,
             Duration::ZERO,
+            None,
         )
         .expect("run should exit cleanly on Quit");
 
@@ -1312,6 +1370,19 @@ mod tests {
             auto_merge: true,
             auto_retro: true,
             auto_cleanup: true,
+        }
+    }
+
+    fn clarify_todo_item(id: &str) -> WorkItem {
+        WorkItem {
+            id: id.into(),
+            title: id.into(),
+            goal_tier: "mvp".into(),
+            stage: "clarify".into(),
+            status: "todo".into(),
+            blocked_by: Vec::new(),
+            blocks: 0,
+            priority: None,
         }
     }
 
@@ -1527,6 +1598,7 @@ mod tests {
         let pane_orchestrator = RecordingPickOrchestrator {
             picked: std::cell::RefCell::new(Vec::new()),
             discovered: std::cell::RefCell::new(Vec::new()),
+            auto_discovered: std::cell::RefCell::new(Vec::new()),
             merge_launched: std::cell::RefCell::new(Vec::new()),
             retro_launched: std::cell::RefCell::new(Vec::new()),
             cleanup_launched: std::cell::RefCell::new(Vec::new()),
@@ -1561,6 +1633,7 @@ mod tests {
         let pane_orchestrator = RecordingPickOrchestrator {
             picked: std::cell::RefCell::new(Vec::new()),
             discovered: std::cell::RefCell::new(Vec::new()),
+            auto_discovered: std::cell::RefCell::new(Vec::new()),
             merge_launched: std::cell::RefCell::new(Vec::new()),
             retro_launched: std::cell::RefCell::new(Vec::new()),
             cleanup_launched: std::cell::RefCell::new(Vec::new()),
@@ -1588,5 +1661,186 @@ mod tests {
         );
 
         let _ = std::fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn auto_discover_selects_the_first_clarify_todo_item() {
+        let items = vec![
+            {
+                let mut item = clarify_todo_item("tsk-a");
+                item.stage = "executing".into();
+                item
+            },
+            clarify_todo_item("tsk-b"),
+            clarify_todo_item("tsk-c"),
+        ];
+        let candidate = next_auto_discover_candidate(&items).expect("one clarify+todo item exists");
+        assert_eq!(candidate.id, "tsk-b", "first matching item wins, never a later one");
+    }
+
+    #[test]
+    fn auto_discover_skips_items_not_at_clarify_or_not_todo() {
+        let items = vec![
+            {
+                let mut item = clarify_todo_item("tsk-a");
+                item.status = "doing".into();
+                item
+            },
+            {
+                let mut item = clarify_todo_item("tsk-b");
+                item.stage = "decompose".into();
+                item
+            },
+        ];
+        assert!(next_auto_discover_candidate(&items).is_none());
+    }
+
+    #[test]
+    fn auto_discover_skips_when_toggle_is_off() {
+        let mut ui = QuitAfterOneTick { calls: Cell::new(0) };
+        let mut app = App::empty();
+        // `App::empty()`'s `orchestrator_settings` defaults to all-OFF
+        // (tsk-2m5) — never explicitly flipped on in this test.
+        app.work_items = vec![clarify_todo_item("tsk-b")];
+        let registry = CountingRegistry { calls: Cell::new(0) };
+        let pane_orchestrator = RecordingPickOrchestrator {
+            picked: std::cell::RefCell::new(Vec::new()),
+            discovered: std::cell::RefCell::new(Vec::new()),
+            auto_discovered: std::cell::RefCell::new(Vec::new()),
+            merge_launched: std::cell::RefCell::new(Vec::new()),
+            retro_launched: std::cell::RefCell::new(Vec::new()),
+            cleanup_launched: std::cell::RefCell::new(Vec::new()),
+        };
+
+        run(&mut ui, &mut app, None, Some(&registry), &pane_orchestrator, Duration::ZERO, None)
+            .expect("run should exit cleanly on Quit");
+
+        assert!(
+            pane_orchestrator.auto_discovered.borrow().is_empty(),
+            "toggle off must never launch, even with a ready item"
+        );
+    }
+
+    #[test]
+    fn auto_discover_launches_when_toggle_is_on_and_an_item_is_ready() {
+        let mut ui = QuitAfterOneTick { calls: Cell::new(0) };
+        let mut app = App::empty();
+        app.orchestrator_settings.auto_discover = true;
+        app.work_items = vec![clarify_todo_item("tsk-b")];
+        let registry = CountingRegistry { calls: Cell::new(0) };
+        let pane_orchestrator = RecordingPickOrchestrator {
+            picked: std::cell::RefCell::new(Vec::new()),
+            discovered: std::cell::RefCell::new(Vec::new()),
+            auto_discovered: std::cell::RefCell::new(Vec::new()),
+            merge_launched: std::cell::RefCell::new(Vec::new()),
+            retro_launched: std::cell::RefCell::new(Vec::new()),
+            cleanup_launched: std::cell::RefCell::new(Vec::new()),
+        };
+
+        run(&mut ui, &mut app, None, Some(&registry), &pane_orchestrator, Duration::ZERO, None)
+            .expect("run should exit cleanly on Quit");
+
+        assert_eq!(*pane_orchestrator.auto_discovered.borrow(), vec!["tsk-b".to_string()]);
+        assert!(
+            app.pick_status.is_none(),
+            "an unattended launch must never surface as app.pick_status"
+        );
+    }
+
+    /// A registry whose raw pane list already carries a
+    /// `fgos-auto-discover-<id>`-labeled pane — simulates a still-running
+    /// auto-launch from an earlier tick (or a previous herdr-plugin run).
+    struct RegistryWithAutoDiscoverPaneOpen {
+        label: String,
+    }
+
+    impl PaneRegistry for RegistryWithAutoDiscoverPaneOpen {
+        fn scan(&self) -> Result<HashMap<String, PaneIdentity>, PaneScanError> {
+            Ok(HashMap::new())
+        }
+
+        fn has_labeled_pane(&self, label: &str) -> Result<bool, PaneScanError> {
+            Ok(self.label == label)
+        }
+    }
+
+    #[test]
+    fn auto_discover_skips_when_a_pane_is_already_open_for_the_id() {
+        let mut ui = QuitAfterOneTick { calls: Cell::new(0) };
+        let mut app = App::empty();
+        app.orchestrator_settings.auto_discover = true;
+        app.work_items = vec![clarify_todo_item("tsk-b")];
+        let registry = RegistryWithAutoDiscoverPaneOpen {
+            label: "fgos-auto-discover-tsk-b".to_string(),
+        };
+        let pane_orchestrator = RecordingPickOrchestrator {
+            picked: std::cell::RefCell::new(Vec::new()),
+            discovered: std::cell::RefCell::new(Vec::new()),
+            auto_discovered: std::cell::RefCell::new(Vec::new()),
+            merge_launched: std::cell::RefCell::new(Vec::new()),
+            retro_launched: std::cell::RefCell::new(Vec::new()),
+            cleanup_launched: std::cell::RefCell::new(Vec::new()),
+        };
+
+        run(&mut ui, &mut app, None, Some(&registry), &pane_orchestrator, Duration::ZERO, None)
+            .expect("run should exit cleanly on Quit");
+
+        assert!(
+            pane_orchestrator.auto_discovered.borrow().is_empty(),
+            "an id with an already-open guarded pane must not be launched again"
+        );
+    }
+
+    struct AlwaysFailingPaneOrchestrator;
+
+    impl PaneOrchestrator for AlwaysFailingPaneOrchestrator {
+        fn open_pick_pane(&self, _id: &str) -> io::Result<()> {
+            Ok(())
+        }
+
+        fn open_discover_pane(&self, _id: &str) -> io::Result<()> {
+            Ok(())
+        }
+
+        fn focus_pane(&self, _pane_id: &str) -> io::Result<()> {
+            Ok(())
+        }
+
+        fn launch_merge_loop(&self, _pane_id: &str) -> io::Result<()> {
+            Ok(())
+        }
+
+        fn launch_retro_loop(&self, _pane_id: &str) -> io::Result<()> {
+            Ok(())
+        }
+
+        fn launch_cleanup_loop(&self, _pane_id: &str) -> io::Result<()> {
+            Ok(())
+        }
+
+        fn open_auto_discover_pane(&self, _id: &str) -> io::Result<()> {
+            Err(io::Error::other("simulated: fg:agents-N tabs are full"))
+        }
+    }
+
+    /// Covers the wiring's own contract for ANY launch failure (cap
+    /// refusal, rename failure, spawn failure) — the cap refusal itself
+    /// is already proven at `layout.rs`'s own level
+    /// (`agent_tabs_at_cap_refuse_a_third_tab`); this proves the poll
+    /// tick swallows whatever `Err` it gets back, never panics, and never
+    /// leaks it into `app.pick_status`.
+    #[test]
+    fn auto_discover_skips_without_panic_when_agent_tabs_are_at_cap() {
+        let mut ui = QuitAfterOneTick { calls: Cell::new(0) };
+        let mut app = App::empty();
+        app.orchestrator_settings.auto_discover = true;
+        app.work_items = vec![clarify_todo_item("tsk-b")];
+        let registry = CountingRegistry { calls: Cell::new(0) };
+        let pane_orchestrator = AlwaysFailingPaneOrchestrator;
+
+        let result = run(&mut ui, &mut app, None, Some(&registry), &pane_orchestrator, Duration::ZERO, None);
+
+        assert!(result.is_ok(), "a launch failure must never crash the dashboard");
+        assert!(app.pick_status.is_none());
     }
 }

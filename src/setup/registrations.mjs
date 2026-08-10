@@ -383,6 +383,34 @@ registerCheck({
 // is exactly the failure mode tsk-3bn's own origin incident reproduced.
 // `passed: false` (not just an informational message) so it surfaces the
 // same way a stale-config or unwired-hook check does.
+// tsk-4qu: a SECOND drift class this check used to stay silent about. A leaf
+// always merges into `fgw/<root>` (graph-harness.mjs's mergeTier reads
+// `item.parent` alone, never the root's status), so a leaf approved after its
+// root already reached delivered/retrospective/cleanup/done lands its work on
+// a branch nothing will carry forward: driftStatus deliberately reports
+// `needsSync: false` for a resolved root (drift-status.mjs:93), which keeps it
+// out of mergeReadiness's `blockedOnSync` bucket, which is the only thing
+// `fgos merge next` auto-syncs (bin/fgos.mjs's merge-next branch). Observed
+// live twice before anyone noticed — tsk-4ns onto fgw/tsk-5wz, and tsk-53n
+// onto fgw/tsk-1o7 — with `fgos merge list` reporting every bucket empty
+// while real delivered work sat outside main.
+//
+// `needsSync` is deliberately NOT widened to cover this: `merge next` acts on
+// it by running a real `sync-root` git mutation unattended, and auto-merging
+// the branch of an item that is already closed out is a behavior change
+// nobody asked for on the riskiest path here. driftStatus already computes
+// the honest `aheadOfTarget` for these roots, so surfacing them is a filter
+// change, not new measurement.
+//
+// `wontfix` is excluded on purpose: an abandoned item's branch is SUPPOSED to
+// sit outside its target forever, so reporting it would be pure noise (a
+// repo-wide scan at the time of writing found 4 such branches, all
+// legitimate). `isResolvedStatus` alone cannot express this — it folds
+// `wontfix` in with the completed statuses by design — so the completed set
+// is spelled out here rather than widening frontier.mjs's exported surface
+// for one caller.
+const COMPLETED_ROOT_STATUSES = new Set(['delivered', 'retrospective', 'cleanup', 'done']);
+
 function checkRootDrift(cwd) {
   const mainCheckout = resolveMainCheckout(cwd);
   if (mainCheckout === null) {
@@ -390,16 +418,38 @@ function checkRootDrift(cwd) {
   }
   const view = listWork(path.join(mainCheckout, '.fgos'));
   const drift = driftStatus(mainCheckout, view);
-  const needsSync = Object.entries(drift).filter(([, status]) => status.needsSync);
-  if (needsSync.length === 0) {
+
+  const describe = ([id, status]) =>
+    `${id} (${status.branch} is ${status.aheadOfTarget} commit(s) ahead of ${status.target})`;
+
+  const needsSync = [];
+  const strandedAfterClose = [];
+  for (const entry of Object.entries(drift)) {
+    const [id, status] = entry;
+    if (status.needsSync) {
+      needsSync.push(entry);
+    } else if (status.aheadOfTarget > 0 && COMPLETED_ROOT_STATUSES.has(view.work[id]?.status)) {
+      strandedAfterClose.push(entry);
+    }
+  }
+
+  if (needsSync.length === 0 && strandedAfterClose.length === 0) {
     return { passed: true, message: 'no root branch is drifted ahead of its target' };
   }
-  const summary = needsSync
-    .map(([id, status]) => `${id} (${status.branch} is ${status.aheadOfTarget} commit(s) ahead of ${status.target})`)
-    .join(', ');
+
+  const parts = [];
+  if (needsSync.length > 0) {
+    parts.push(`drifted root branch(es) need syncing: ${needsSync.map(describe).join(', ')}`);
+  }
+  if (strandedAfterClose.length > 0) {
+    parts.push(
+      'root branch(es) closed out with work still outside their target — nothing will sync these '
+        + `automatically: ${strandedAfterClose.map(describe).join(', ')}`,
+    );
+  }
   return {
     passed: false,
-    message: `drifted root branch(es) need syncing: ${summary} — run fgos sync-root <root-id>`,
+    message: `${parts.join('; ')} — run fgos sync-root <root-id>`,
   };
 }
 
@@ -831,6 +881,59 @@ registerCheck({
   id: 'changelog-unreleased-stale',
   description: 'CHANGELOG.md ## [Unreleased] section has at least one pending entry (observe/remind only, never blocks merge -- tsk-3ip)',
   check: (cwd) => checkChangelogUnreleasedStale(cwd),
+});
+
+// tsk-2m5 (docs/history/stage-status-driving-coordination/): the
+// herdr-launcher's own auto-launch toggles, read fail-closed from Rust
+// (herdr-plugin/src/settings.rs). Mirrors gateBypass's own shape exactly
+// (config-default + a dedicated check for a present-but-malformed value --
+// `checkConfigNotStale` above already catches the section being entirely
+// MISSING via `assembleRegistryDefaults()`, same as it does for
+// `gateBypass`). No `fix` registration: unlike `gateBypass.level` (a
+// single enum value with one obvious correct default), a malformed
+// individual boolean here has no demonstrated real-world incident yet
+// (YAGNI) -- `ensureSharedConfigDefaults` already fills in a full
+// safe-OFF section the first time a project adopts it.
+export const DEFAULT_HERDR_ORCHESTRATOR_SETTINGS = {
+  autoDiscover: false,
+  autoMerge: false,
+  autoRetro: false,
+  autoCleanup: false,
+};
+
+function checkHerdrOrchestratorConfigured(cwd) {
+  const shared = readSharedConfig(cwd);
+  const settings = shared?.herdrOrchestrator;
+  if (settings === undefined) {
+    return { passed: false, message: 'herdrOrchestrator section missing -- run fgos setup' };
+  }
+  const badKeys = Object.keys(DEFAULT_HERDR_ORCHESTRATOR_SETTINGS).filter(
+    (key) => typeof settings[key] !== 'boolean',
+  );
+  if (badKeys.length > 0) {
+    return {
+      passed: false,
+      message: `herdrOrchestrator has non-boolean value(s) for: ${badKeys.join(', ')}`,
+    };
+  }
+  return {
+    passed: true,
+    message: `herdrOrchestrator: ${Object.keys(DEFAULT_HERDR_ORCHESTRATOR_SETTINGS)
+      .map((key) => `${key}=${settings[key]}`)
+      .join(', ')}`,
+  };
+}
+
+registerConfigDefault({
+  id: 'herdrOrchestrator',
+  key: 'herdrOrchestrator',
+  shape: DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
+});
+
+registerCheck({
+  id: 'herdr-launcher-configured',
+  description: 'herdrOrchestrator toggles in the shared config file are present and boolean (tsk-2m5)',
+  check: (cwd) => checkHerdrOrchestratorConfigured(cwd),
 });
 
 // tsk-1m0 (docs/history/doctor-check-enduser-docs-index-stale/CONTEXT.md):

@@ -14,7 +14,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { DOCTOR_CHECKS, FIX_REGISTRATIONS, integrationScriptPath, mainCheckoutHookWired, resolveMainCheckout } from '../../src/setup/checks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
 import { DEFAULT_LEVEL } from '../../src/state/gate-bypass.mjs';
-import { DEFAULT_CLEANUP_TTL_DAYS, DEFAULT_CLEANUP_LEAF_TTL_DAYS } from '../../src/setup/registrations.mjs';
+import { DEFAULT_CLEANUP_TTL_DAYS, DEFAULT_CLEANUP_LEAF_TTL_DAYS, DEFAULT_HERDR_ORCHESTRATOR_SETTINGS } from '../../src/setup/registrations.mjs';
 import { initStore, addWork } from '../../src/state/store.mjs';
 import { appendEvent } from '../../src/state/events.mjs';
 
@@ -49,7 +49,7 @@ function fixById(id) {
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, changelog-unreleased-stale, work-classification-vocabulary, and enduser-docs-index-stale', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, changelog-unreleased-stale, herdr-launcher-configured, work-classification-vocabulary, and enduser-docs-index-stale', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     [
@@ -65,6 +65,7 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'claude-plugin-marketplace',
       'plugin-skill-cli-reachable',
       'changelog-unreleased-stale',
+      'herdr-launcher-configured',
       'work-classification-vocabulary',
       'enduser-docs-index-stale',
     ].sort(),
@@ -102,6 +103,58 @@ test('root-drift fails and names the drifted root when fgw/<root> is ahead of ma
   assert.equal(passed, false);
   assert.match(message, /root/);
   assert.match(message, /fgos sync-root/);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+// tsk-4qu: the drift class this check used to miss entirely. A leaf merges
+// into fgw/<root> regardless of the root's status, so a root closed out
+// (delivered/retrospective/cleanup/done) can be left holding commits its
+// target never got — and driftStatus reports needsSync:false for exactly
+// those, keeping them out of every merge bucket. Observed live twice
+// (tsk-4ns, tsk-53n) before anything reported it.
+
+test('root-drift reports a CLOSED-OUT root whose branch still holds work outside its target', () => {
+  const dir = initRepo('checks-root-drift-stranded-');
+  execFileSync('git', ['checkout', '-q', '-b', 'fgw/root'], { cwd: dir });
+  fs.writeFileSync(path.join(dir, 'leaf-work.txt'), 'leaf work merged into the root branch\n');
+  execFileSync('git', ['add', 'leaf-work.txt'], { cwd: dir });
+  execFileSync('git', ['commit', '-qm', 'leaf merged into root after the root was closed out'], { cwd: dir });
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: dir });
+  const fgosDir = path.join(dir, '.fgos');
+  initStore(fgosDir);
+  // `delivered` is what makes this the tsk-4qu case rather than the ordinary
+  // drift one above: isResolvedStatus(root) is true, so needsSync is false.
+  addWork(fgosDir, { id: 'root', title: 'root', kind: 'feature', risk: 'light', verify: 'true', status: 'delivered', deps: [], refs: [] });
+  addWork(fgosDir, { id: 'leaf', title: 'leaf', kind: 'feature', risk: 'light', verify: 'true', status: 'delivered', deps: [], refs: [], parent: 'root' });
+
+  const { passed, message } = checkById('root-drift').check(dir);
+  assert.equal(passed, false, 'a closed-out root holding unsynced work must not pass silently');
+  assert.match(message, /closed out with work still outside their target/);
+  assert.match(message, /nothing will sync these automatically/);
+  assert.match(message, /root \(fgw\/root is 1 commit\(s\) ahead of main\)/);
+  assert.match(message, /fgos sync-root/);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+// wontfix is the deliberate exception: an abandoned item's branch is SUPPOSED
+// to sit outside its target forever, so reporting it would be noise. This is
+// why the check spells out the completed statuses instead of reusing
+// isResolvedStatus, which folds wontfix in with them.
+test('root-drift stays silent for a wontfix root whose branch is ahead — abandoned work is meant to sit outside', () => {
+  const dir = initRepo('checks-root-drift-wontfix-');
+  execFileSync('git', ['checkout', '-q', '-b', 'fgw/root'], { cwd: dir });
+  fs.writeFileSync(path.join(dir, 'abandoned.txt'), 'work that was deliberately abandoned\n');
+  execFileSync('git', ['add', 'abandoned.txt'], { cwd: dir });
+  execFileSync('git', ['commit', '-qm', 'abandoned work'], { cwd: dir });
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: dir });
+  const fgosDir = path.join(dir, '.fgos');
+  initStore(fgosDir);
+  addWork(fgosDir, { id: 'root', title: 'root', kind: 'feature', risk: 'light', verify: 'true', status: 'wontfix', deps: [], refs: [] });
+  addWork(fgosDir, { id: 'leaf', title: 'leaf', kind: 'feature', risk: 'light', verify: 'true', status: 'wontfix', deps: [], refs: [], parent: 'root' });
+
+  const { passed, message } = checkById('root-drift').check(dir);
+  assert.equal(passed, true);
+  assert.match(message, /no root branch is drifted/);
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
@@ -464,6 +517,7 @@ test('config-not-stale passes when the existing config already has every default
       runner: DEFAULT_RUNNER_CONFIG,
       gateBypass: { level: 'off' },
       cleanup: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS, leafTtlDays: DEFAULT_CLEANUP_LEAF_TTL_DAYS },
+      herdrOrchestrator: DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
     }),
   );
   const { passed } = checkById('config-not-stale').check(cwd);
@@ -597,6 +651,47 @@ test('fgos doctor --fix --pretty (CLI e2e) renders a fix line green even when th
   assert.match(fixLine, /already "/, 'expected the second run to be the already-correct no-op case');
   assert.ok(fixLine.includes('\x1b[32m'), `expected a green mark on an already-correct fix line, got: ${fixLine}`);
   assert.ok(!fixLine.includes('\x1b[31m'), `expected no red mark on an already-correct fix line, got: ${fixLine}`);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+// ─── herdr-launcher-configured (tsk-2m5, docs/history/
+// stage-status-driving-coordination/): the herdr-launcher's own
+// auto-launch toggles. Check-only, no fix (YAGNI -- see registrations.mjs's
+// own comment on this) -- `config-not-stale` already catches the whole
+// section being MISSING; this check adds the one thing that generic
+// staleness scan cannot: a PRESENT but non-boolean toggle value.
+
+test('herdr-launcher-configured check fails when the shared file has no herdrOrchestrator key at all', () => {
+  const cwd = mkTemp('doctor-herdr-launcher-absent-');
+  const { passed, message } = checkById('herdr-launcher-configured').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /missing/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('herdr-launcher-configured check fails when a toggle is present but not a boolean', () => {
+  const cwd = mkTemp('doctor-herdr-launcher-bad-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(
+    path.join(cwd, '.fgos', 'config.json'),
+    JSON.stringify({ herdrOrchestrator: { autoDiscover: 'yes', autoMerge: false, autoRetro: false, autoCleanup: false } }),
+  );
+  const { passed, message } = checkById('herdr-launcher-configured').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /autoDiscover/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('herdr-launcher-configured check passes when every toggle is a boolean', () => {
+  const cwd = mkTemp('doctor-herdr-launcher-ok-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(
+    path.join(cwd, '.fgos', 'config.json'),
+    JSON.stringify({ herdrOrchestrator: { autoDiscover: true, autoMerge: false, autoRetro: false, autoCleanup: false } }),
+  );
+  const { passed, message } = checkById('herdr-launcher-configured').check(cwd);
+  assert.equal(passed, true);
+  assert.match(message, /autoDiscover=true/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 

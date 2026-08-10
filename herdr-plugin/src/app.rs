@@ -1,6 +1,7 @@
 use crate::fgos::MergeListSummary;
 use crate::pane_scan::PaneIdentity;
 use crate::ports::{PaneRegistry, WorkItemSource};
+use crate::settings::OrchestratorSettings;
 
 /// tsk-417 D3: NEED ANSWER box row — `status` is `"blocked"` (ERR tag) or
 /// `"awaiting-human"` (ASK tag), one box, distinct sub-tag per row.
@@ -226,6 +227,11 @@ pub struct App {
     pub need_answer_rect: Option<ButtonRect>,
     pub merge_list_rect: Option<ButtonRect>,
     pub after_deliver_rect: Option<ButtonRect>,
+    /// tsk-2m5: the herdr-orchestrator's own auto-launch toggles, read
+    /// fail-closed from the shared config file each poll tick
+    /// (`settings::read_settings`). Storing only — acting on an enabled
+    /// toggle is a sibling launcher item's own footprint (tsk-2ja/tsk-57q).
+    pub orchestrator_settings: OrchestratorSettings,
     /// tsk-5lr CONTEXT.md D1/D2: the fixed `fg:operation` tab's left
     /// (merge-loop) pane id, `None` until `main()`'s startup call to
     /// `layout::ensure_operation_tab` resolves it. A plain data carrier —
@@ -262,6 +268,7 @@ impl App {
             need_answer_rect: None,
             merge_list_rect: None,
             after_deliver_rect: None,
+            orchestrator_settings: OrchestratorSettings::default(),
             operation_left_pane_id: None,
             operation_right_pane_id: None,
         }
@@ -560,6 +567,7 @@ impl App {
             need_answer_rect: None,
             merge_list_rect: None,
             after_deliver_rect: None,
+            orchestrator_settings: OrchestratorSettings::default(),
             operation_left_pane_id: None,
             operation_right_pane_id: None,
         }
