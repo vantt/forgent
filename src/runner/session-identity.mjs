@@ -92,10 +92,16 @@ function registryConfirms(fgosDir, sessionId) {
 }
 
 /** Returns the parent pid of `pid` via `ps -o ppid= -p <pid>`, or null if
- * `ps` is unavailable, exits non-zero, or prints something unparsable. */
+ * `ps` is unavailable, exits non-zero, prints something unparsable, or
+ * exceeds PPID_TIMEOUT_MS (tsk-13m: this call runs inside the held
+ * cross-process events.lock via resolveWriterIdentity, so a hung `ps`
+ * must not be able to block that lock indefinitely -- the timeout throws,
+ * caught below identically to every other failure mode). */
+const PPID_TIMEOUT_MS = 200;
+
 function ppidOf(pid, execFile) {
   try {
-    const out = execFile('ps', ['-o', 'ppid=', '-p', String(pid)], { encoding: 'utf8' });
+    const out = execFile('ps', ['-o', 'ppid=', '-p', String(pid)], { encoding: 'utf8', timeout: PPID_TIMEOUT_MS });
     const parsed = Number.parseInt(String(out).trim(), 10);
     return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
   } catch {
