@@ -3,7 +3,7 @@ type: explanation
 title: How fgOS isolates concurrent sessions, and why the event log's write door blocks instead of backing off
 tags: [multi-session, concurrency, worktree, crash-recovery]
 timestamp: 2026-07-22T00:00:00.000Z
-source_capture_ids: []
+source_capture_ids: [tsk-1jp]
 ---
 
 # How fgOS isolates concurrent sessions, and why the event log's write door blocks instead of backing off
@@ -225,6 +225,49 @@ additionally locked in by a regression test
 item already claimed (doing) by a live session claim…"). See
 `docs/history/tsk-49a-runner-claim-race/CONTEXT.md` for the full scout
 evidence trail.
+
+## A comment claiming lock parity with `addWork` didn't match the code (`tsk-1jp`)
+
+`src/state/porting-store.mjs`'s `addPorting`/`movePorting` each do a
+read (`rebuildViewFromLog`), check a precondition against that read
+(existence for `addPorting`, expected-status CAS for `movePorting`),
+then call bare `appendEvent` — three separate steps, with no lock
+spanning all three; `appendEvent` itself only locks its own single
+append. A comment right above `addPorting`'s check claimed parity with
+`store.mjs`'s own `addWork` dup-id guard — but `store.mjs`'s
+`addWork`/`moveWork` wrap the *entire* read-check-append in one
+`withEventsLock` scope, using `appendEventLocked` (not `appendEvent`)
+specifically to avoid re-acquiring the lock partway through:
+
+> "The comment's claim of parity is false: two concurrent `addPorting`
+> calls on the same id can both pass the existence check before either
+> writes."
+> — real `docs/history/tsk-1jp-porting-store-cas-inside-lock/CONTEXT.md`
+
+The fix mirrors `store.mjs`'s own structure exactly — wrap
+`addPorting`/`movePorting`'s read-check-append in `withEventsLock`, using
+`appendEventLocked` inside that scope. `refreshView(dir)` stays *outside*
+the lock in both, matching where `store.mjs` already calls it (a plain
+`fs` read+write with no locking of its own — the derived-cache refresh
+is a separate concern from the raw-log CAS this fix closes). The comment
+itself was corrected to state what's actually true after the fix, rather
+than deleted — its *intent* ("mirror `addWork`'s guard") was correct
+all along; only the implementation hadn't caught up to it.
+
+Proof reused this doc's own established technique rather than a new one:
+`store.test.mjs`'s `raceAcrossProcesses` helper — real, separate OS
+child processes racing the same call, the only way to actually observe
+this class of bug (in-process `Promise.all` concurrency is serialized by
+one event loop and can never expose it) — mirrored onto
+`addPorting`/`movePorting`.
+
+The lesson this confirms again, in a third module this time (after
+`events.mjs`'s and `session.mjs`'s lock-primitive TOCTOU windows above):
+a comment asserting "mirrors X's guarantee" is a claim to verify against
+the actual code shape, not evidence the guarantee holds — `porting-
+store.mjs` predates being checked against `store.mjs`'s real locking
+scope, and nothing caught the drift until a targeted audit read both
+side by side.
 
 ---
 
