@@ -17,6 +17,7 @@ use ratatui::widgets::{Block, Borders, Clear, Paragraph, Row, Table, TableState,
 use ratatui::{Frame, Terminal};
 
 use crate::app::{App, InProcessTask, Panel, WorkTab};
+use crate::fgos::{merge_tree_node_count, MergeTreeNode};
 use crate::ports::{TerminalUi as TerminalUiPort, UiEvent};
 
 /// tsk-jo1 D1 palette (ANSI-16): the Work Items panel's optional Status
@@ -492,37 +493,55 @@ fn draw_need_answer_box(frame: &mut Frame, app: &App, area: Rect) {
     );
 }
 
-/// tsk-417 D3: MERGE LIST box — a direct mapping of `fgos merge list
-/// --json`'s own `ready`/`waiting`/`blockedOnSync` id lists (never a
-/// separately-invented filter). `[MRG]` green for `ready` (the only
-/// bucket that's actually mergeable right now); `waiting`/`blockedOnSync`
-/// render plain, dimmed, to stay visually subordinate to `ready`.
+/// tsk-59b: MERGE LIST box — renders `fgos merge list --json`'s `tree`
+/// field (`mergeTree`, tsk-2x9k) as an actual nested tree, replacing the
+/// old three-flat-list rendering (D2/D3, CONTEXT.md). Indented by depth,
+/// one status badge per node: `[MRG]` green `ready` (mergeable right now),
+/// `[wait]` dim `waiting`, `[sync]` yellow `blocked-sync`, `[CFL]` red
+/// `conflicted`, `[SUP]` dim `superseded`, no badge for `container` (a
+/// real ancestor item that is not itself a merge candidate — exists only
+/// so its children have somewhere to nest, D2/D3). A blocked/conflicted/
+/// superseded node's `reason` (D7 — the specific cause and counterpart
+/// item, not a bare status word) renders as its own dim line directly
+/// under the node. Never re-sorts or re-groups here — the tree already
+/// arrives sorted and nested exactly as the JS engine computed it (D4:
+/// Rust only renders, never re-derives merge order).
+fn push_merge_tree_lines(rows: &mut Vec<Line<'static>>, nodes: &[MergeTreeNode], depth: usize) {
+    for node in nodes {
+        let indent = "  ".repeat(depth);
+        let branch = if depth == 0 { String::new() } else { "└─ ".to_string() };
+        let (tag, tag_color) = match node.status.as_str() {
+            "ready" => ("[MRG] ", Color::Green),
+            "waiting" => ("[wait] ", Color::DarkGray),
+            "blocked-sync" => ("[sync] ", Color::Yellow),
+            "conflicted" => ("[CFL] ", Color::Red),
+            "superseded" => ("[SUP] ", Color::DarkGray),
+            _ => ("", Color::DarkGray), // "container": a real ancestor, not a candidate
+        };
+        rows.push(Line::from(vec![
+            Span::raw(format!("{indent}{branch}")),
+            Span::styled(tag, Style::default().fg(tag_color)),
+            Span::raw(format!("{}  {}", node.id, node.title)),
+        ]));
+        if let Some(reason) = &node.reason {
+            rows.push(Line::from(Span::styled(
+                format!("{indent}    {reason}"),
+                Style::default().fg(Color::DarkGray),
+            )));
+        }
+        push_merge_tree_lines(rows, &node.children, depth + 1);
+    }
+}
+
 fn draw_merge_list_box(frame: &mut Frame, app: &App, area: Rect) {
     let mut rows: Vec<Line> = Vec::new();
-    for id in &app.merge_list.ready {
-        rows.push(Line::from(vec![
-            Span::styled("[MRG]", Style::default().fg(Color::Green)),
-            Span::raw(format!(" {id}")),
-        ]));
-    }
-    for id in &app.merge_list.waiting {
-        rows.push(Line::from(Span::styled(
-            format!("[wait] {id}"),
-            Style::default().fg(Color::DarkGray),
-        )));
-    }
-    for id in &app.merge_list.blocked_on_sync {
-        rows.push(Line::from(Span::styled(
-            format!("[sync] {id}"),
-            Style::default().fg(Color::DarkGray),
-        )));
-    }
+    push_merge_tree_lines(&mut rows, &app.merge_list.tree, 0);
     let body = if rows.is_empty() {
         Paragraph::new("(empty)")
     } else {
         Paragraph::new(rows).scroll((app.merge_list_scroll, 0))
     };
-    let count = app.merge_list.ready.len() + app.merge_list.waiting.len() + app.merge_list.blocked_on_sync.len();
+    let count = merge_tree_node_count(&app.merge_list.tree);
     frame.render_widget(
         body.block(
             Block::default()

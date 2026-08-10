@@ -219,6 +219,38 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/decisions/0027-domain-so-huu-status-doan-truoc-delivered-supersede-base-workflow-model-d1-d3.md",
+    "title": "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model D1-D3)",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/decisions/0028-doi-ten-orchestrator-thanh-launcher.md",
+    "title": "0028 — Đổi tên pinned term ban đầu của `0026` thành `launcher`",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/decisions/0029-sua-dinh-nghia-roottask-subtask-capacity-t1-cua-0026.md",
+    "title": "0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md",
+    "title": "A decision doc can be superseded twice — superseded_by becomes a list",
+    "sourceCaptureId": "tsk-5wf"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/acceptance-evidence-traceability-gate.md",
     "title": "Why `work.acceptance` gets a narrow write-time evidence-traceability check",
     "sourceCaptureId": "tsk-5q5-2"
@@ -251,9 +283,25 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/capacity-dispatch-audit-records-command-not-just-provider-label.md",
+    "title": "Why capacity.dispatch audits record command alongside provider",
+    "sourceCaptureId": "tsk-33w"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/cli-invocation-fault-provenance.md",
     "title": "Why malformed CLI invocations now leave a provenance trace",
     "sourceCaptureId": "tsk-5z0"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/coding-classify-intake-capacity-lifecycle-created-then-retired-as-dead-config.md",
+    "title": "The coding-classify-intake capacity's full lifecycle — created, never wired, retired as dead config",
+    "sourceCaptureId": "tsk-3fj"
   },
   {
     "quadrant": "explanation",
@@ -283,9 +331,33 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/discover-loop-pool-ordering-and-stop-rules.md",
+    "title": "Why discover-loop's pool ordering and stop rules diverge from merge-loop's",
+    "sourceCaptureId": "tsk-3go"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/discovery-decompose-reporoot-verify-overwrite.md",
     "title": "Why `fgos discover` could overwrite an already-locked `verify` command",
     "sourceCaptureId": "tsk-1ni"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/dispatch-binding-moves-from-name-keying-to-needs-for-capability-declaration.md",
+    "title": "Why dispatch binding moved from name-keying to needs/for capability declaration",
+    "sourceCaptureId": "tsk-1o7"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/dispatch-gate-widens-to-kind-not-task-and-mechanism-renames-to-process-location.md",
+    "title": "Why the dispatch gate widened to `kind !== 'task'` and mechanism values renamed to process location",
+    "sourceCaptureId": "tsk-592"
   },
   {
     "quadrant": "explanation",
@@ -310,6 +382,14 @@
     "docPath": "docs/explanation/event-log-evolution-discipline.md",
     "title": "How fgOS's event log is allowed to evolve without breaking replay",
     "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/explanatory-prose-can-outlive-the-locked-decision-that-superseded-it.md",
+    "title": "Explanatory prose can outlive the locked decision that superseded it",
+    "sourceCaptureId": "tsk-15d"
   },
   {
     "quadrant": "explanation",
@@ -347,6 +427,14 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/fgos-researching-d2-fanout-verified-live.md",
+    "title": "fgos-researching's D2 fan-out rule, verified live on a real dogfood run",
+    "sourceCaptureId": "tsk-o4l"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/fgos-retro-loop-and-the-restored-compound-verb.md",
     "title": "Why `/fgOS:retro-loop` restores the `compound` verb instead of inventing a new one",
     "sourceCaptureId": "tsk-3o3"
@@ -374,6 +462,14 @@
     "docPath": "docs/explanation/fgos-uninstall-feature-overview.md",
     "title": "Why `fgos uninstall` shipped as two pieces",
     "sourceCaptureId": "tsk-4iv"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/friction-and-decision-events-are-real-storytelling-material-once-boilerplate-is-filtered.md",
+    "title": "Friction and decision events are real storytelling material, once boilerplate is filtered",
+    "sourceCaptureId": "tsk-1hy"
   },
   {
     "quadrant": "explanation",
@@ -430,6 +526,14 @@
     "docPath": "docs/explanation/impact-analysis-capability-gate-replaces-hardcoded-gitnexus.md",
     "title": "Why workflow prose gates on a capability query, not a hardcoded tool name",
     "sourceCaptureId": "tsk-1e4"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/intake-classification-moves-after-clarify-and-back-to-the-owning-domain.md",
+    "title": "Why intake classification moved to after clarify, and back to the owning domain",
+    "sourceCaptureId": "tsk-5wz"
   },
   {
     "quadrant": "explanation",
@@ -531,6 +635,14 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/multi-domain-status-category-schema.md",
+    "title": "Why status splits into status + statusCategory only for the front segment of the lifecycle",
+    "sourceCaptureId": "tsk-38t"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/orphaned-worktree-reclaim-must-check-for-live-uncommitted-work.md",
     "title": "Why reclaiming an orphaned worktree checkout must check for live uncommitted work first",
     "sourceCaptureId": "tsk-1os"
@@ -542,6 +654,14 @@
     "docPath": "docs/explanation/pick-leaf-fork-and-sibling-merge-guard.md",
     "title": "Why a leaf claim can now be refused, and why status:done already proves the merge happened",
     "sourceCaptureId": "tsk-3t4"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/plugin-skill-cli-path-resolution-fallback.md",
+    "title": "Why plugin skills need a CLI path fallback",
+    "sourceCaptureId": "tsk-1no"
   },
   {
     "quadrant": "explanation",
@@ -587,6 +707,14 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/state-decisions-splits-engine-bookkeeping-from-cited-design-decisions.md",
+    "title": "state.decisions splits engine bookkeeping from cited design decisions",
+    "sourceCaptureId": "tsk-1ud"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/title-semantic-contract-lives-in-submitting-skills.md",
     "title": "Why a work item title's \"object + action + scope\" rule lives in the submitting skills, not just the decompose prompt",
     "sourceCaptureId": "tsk-52g-2"
@@ -611,9 +739,217 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-abortmergeifpossible-checks-merge-head-before-aborting.md",
+    "title": "Why `abortMergeIfPossible` checks `MERGE_HEAD` before aborting",
+    "sourceCaptureId": "tsk-2j9"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-approve-blocks-closing-a-milestone-with-drifted-targets.md",
+    "title": "Why `approve` blocks closing a milestone with drifted targets",
+    "sourceCaptureId": "tsk-62y"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-approve-checks-acceptance-evidence-before-merging-not-after.md",
+    "title": "Why `approve` checks acceptance evidence before merging, not after",
+    "sourceCaptureId": "tsk-396"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-approve-logs-post-success-movework-faults-outside-events-lock.md",
+    "title": "Why `approve` logs post-success `moveWork` faults outside `events.lock`",
+    "sourceCaptureId": "tsk-480"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-approves-iron-law-gate-scopes-changedfiles-to-the-leafs-own-root.md",
+    "title": "Why `approve`'s Iron Law gate scopes `changedFiles` to the leaf's own root",
+    "sourceCaptureId": "tsk-4voj"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-auto-decompose-children-carry-action-and-read-first-directive-prose.md",
+    "title": "Why auto-decompose children now carry `action` + `read_first` directive prose",
+    "sourceCaptureId": "tsk-3xd"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/why-catchup-needed-its-own-already-caught-up-guard.md",
     "title": "Why `fgos catchup` needed its own already-caught-up guard",
     "sourceCaptureId": "tsk-k7i"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-checkmergestillresolves-can-false-positive-after-a-root-branch-prune.md",
+    "title": "Why `checkMergeStillResolves` can false-positive after a root branch prune",
+    "sourceCaptureId": "tsk-577"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-clarify-split-into-clarify-discovery-and-exploring.md",
+    "title": "Why `clarify` split into `clarify`, `discovery`, and `exploring`",
+    "sourceCaptureId": "tsk-5kn"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-cleanup-loop-has-no-iteration-cap-unlike-discover-loop.md",
+    "title": "Why `cleanup-loop` has no iteration cap, unlike `discover-loop`",
+    "sourceCaptureId": "tsk-dvc"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-cook-and-pick-were-retrofitted-to-call-fgos-coding-driving.md",
+    "title": "Why `cook` and `pick` were retrofitted to call `fgos-coding-driving`",
+    "sourceCaptureId": "tsk-19j-4"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-decompose-checks-footprint-overlap-before-creating-children.md",
+    "title": "Why `decompose` checks footprint overlap before creating children",
+    "sourceCaptureId": "tsk-5e97"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-decomposes-skip-and-advance-is-narrower-than-discoverys.md",
+    "title": "Why `decompose`'s skip-and-advance is narrower than `discovery`'s",
+    "sourceCaptureId": "tsk-19j-2"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-discover-was-rewritten-as-a-clean-enrich-self-research-recipe.md",
+    "title": "Why `discover` was rewritten as a clean/enrich/self-research recipe",
+    "sourceCaptureId": "tsk-4rd"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-doctor-checks-are-documented-as-an-open-registry-not-a-fixed-list.md",
+    "title": "Why doctor checks are documented as an open registry, not a fixed list",
+    "sourceCaptureId": "tsk-1qm"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-done-split-into-delivered-retrospective-cleanup-done.md",
+    "title": "Why a single `done` status split into delivered → retrospective → cleanup → done",
+    "sourceCaptureId": "tsk-1ca"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-execution-fan-out-reuses-computeschedule-instead-of-selectwave.md",
+    "title": "Why execution fan-out reuses `computeSchedule`, not `selectWave`, and stays a capability, not an entry point",
+    "sourceCaptureId": "tsk-4fg"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-fgos-add-defaulted-new-items-to-stage-executing-with-no-way-back.md",
+    "title": "Why `fgos add` items landed permanently at stage `executing`, with no path back",
+    "sourceCaptureId": "tsk-621"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-fgos-added-sync-root-and-drift-detection.md",
+    "title": "Why fgOS added `sync-root` and drift detection",
+    "sourceCaptureId": "tsk-3bn"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-fgos-discover-embeds-repo-layout-in-its-verify-proposal-prompt.md",
+    "title": "Why `fgos discover` embeds repo layout in its verify-proposal prompt",
+    "sourceCaptureId": "tsk-545"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-fgos-dispatch-splits-into-gather-packets-and-a-gated-exec-packet.md",
+    "title": "Why fgOS dispatch splits into gather packets, with a second exec-packet shape kept gated",
+    "sourceCaptureId": "tsk-2t6"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-fgos-merge-now-refuses-outside-the-main-checkout.md",
+    "title": "Why `fgos merge` now refuses outside the main checkout",
+    "sourceCaptureId": "tsk-66x"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-fgos-planning-moved-mode-gate-to-fgos-routing.md",
+    "title": "Why fgos-planning's mode gate moved to fgos-routing, and gate traceability stayed inline",
+    "sourceCaptureId": "tsk-5ay"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-fgos-retired-the-fgos-runner-json-legacy-config-fallback.md",
+    "title": "Why fgOS retired `.fgos-runner.json` entirely instead of fixing its fallback chain",
+    "sourceCaptureId": "tsk-5hv"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-gate-approval-was-separated-from-move-next.md",
+    "title": "Why gate approval was separated from move-next",
+    "sourceCaptureId": "tsk-19j"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-heavy-keywords-matching-moved-to-word-boundaries.md",
+    "title": "Why `HEAVY_KEYWORDS` matching moved from substring to word-boundary",
+    "sourceCaptureId": "tsk-2as"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-isdepsandlineageready-uses-resolved-statuses-not-just-done.md",
+    "title": "Why `isDepsAndLineageReady` uses `RESOLVED_STATUSES`, not just `done`",
+    "sourceCaptureId": "tsk-3yh"
   },
   {
     "quadrant": "explanation",
@@ -627,6 +963,22 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-main-checkout-hook-wired-compared-raw-strings-instead-of-resolved-paths.md",
+    "title": "Why `main-checkout-hook-wired` reported a false negative on an absolute `core.hooksPath`",
+    "sourceCaptureId": "tsk-1gn"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-merge-checks-out-a-scratch-ref-instead-of-the-real-branch-name.md",
+    "title": "Why merge's ephemeral worktree checks out a scratch ref, not the real branch name",
+    "sourceCaptureId": "tsk-5yp"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md",
     "title": "Why `/fgOS:merge-loop` (`tsk-1sm`) recurses into `loop`, not `ck-loop`",
     "sourceCaptureId": "tsk-1sm"
@@ -635,9 +987,137 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-merge-next-auto-syncs-blockedonsync-roots.md",
+    "title": "Why `fgos merge next` now auto-syncs a clean `blockedOnSync` root",
+    "sourceCaptureId": "tsk-173"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/why-merge-standardization-reuses-existing-mechanisms.md",
     "title": "Why merge-standardization (`tsk-4j9`) reuses existing mechanisms instead of building new ones",
     "sourceCaptureId": "tsk-4j9"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-mergereadiness-excludes-superseded-items.md",
+    "title": "Why `mergeReadiness` excludes superseded items",
+    "sourceCaptureId": "tsk-2ie"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-mergerunneritem-returns-merge-failed-unclassified-instead-of-crashing.md",
+    "title": "Why `mergeRunnerItem` returns `merge-failed-unclassified` instead of crashing",
+    "sourceCaptureId": "tsk-18a"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-mergerunneritem-takes-a-separate-lockroot-param.md",
+    "title": "Why `mergeRunnerItem` takes a separate `lockRoot` param",
+    "sourceCaptureId": "tsk-2eq"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-mergerunneritems-already-merged-fast-path-checks-content-not-just-ancestry.md",
+    "title": "Why `mergeRunnerItem`'s already-merged fast path checks content, not just ancestry",
+    "sourceCaptureId": "tsk-15k"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-mergesets-groups-conflicts-instead-of-dropping-them-from-ready.md",
+    "title": "Why `mergeSets` groups conflicts instead of dropping them from `ready`",
+    "sourceCaptureId": "tsk-2u0"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-promote-engine-merges-members-instead-of-rebasing-them.md",
+    "title": "Why `promote-engine` merges members instead of rebasing them",
+    "sourceCaptureId": "tsk-3gx-2"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-promote-preflight-uses-git-merge-tree-instead-of-a-real-merge.md",
+    "title": "Why `promote-preflight` uses `git merge-tree` instead of a real merge",
+    "sourceCaptureId": "tsk-3gx-1"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-promote-to-component-reports-merged-parent-rejected-separately.md",
+    "title": "Why `promote-to-component` reports `merged-parent-rejected` separately",
+    "sourceCaptureId": "tsk-3gx-3"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-promote-to-component-restructures-git-before-writing-parent-state.md",
+    "title": "Why `promote-to-component` restructures git before writing parent state",
+    "sourceCaptureId": "tsk-3gx"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-reclaimorphanedcheckout-refuses-a-live-session-worktree.md",
+    "title": "Why `reclaimOrphanedCheckout` refuses a checkout the calling session is live inside",
+    "sourceCaptureId": "tsk-1tm"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-resolvediscovery-guards-re-parking-an-already-parked-item.md",
+    "title": "Why `resolveDiscovery` guards re-parking an already-parked item",
+    "sourceCaptureId": "tsk-wcl"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-retrospective-documents-vanished-on-orphaned-branches.md",
+    "title": "Why retrospective documents vanished on orphaned branches",
+    "sourceCaptureId": "tsk-3ts"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-stage-skills-forbid-ad-hoc-task-delegation-for-their-own-reasoning.md",
+    "title": "Why stage-skills forbid ad hoc Task/Agent delegation for their own reasoning",
+    "sourceCaptureId": "tsk-29i"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-the-main-checkout-lock-hook-used-to-block-worktree-commits.md",
+    "title": "Why the main-checkout-lock hook used to block worktree commits it had no reason to touch",
+    "sourceCaptureId": "tsk-sir"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-the-retrospective-content-gate-checked-the-wrong-fields.md",
+    "title": "Why the retrospective content gate checked the wrong fields",
+    "sourceCaptureId": "tsk-558"
   },
   {
     "quadrant": "explanation",
@@ -675,9 +1155,25 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/worktree-dispatch-attestation-level-1-advisory-only.md",
+    "title": "Worktree-dispatch attestation, level 1: advisory-only, never a gate",
+    "sourceCaptureId": "tsk-2ig"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/worktree-isolation-axis-decision.md",
     "title": "Why fgOS worktrees block `.fgos/` instead of locking or copying it",
     "sourceCaptureId": "worktree-in-out"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/add-a-changelog-entry-for-a-user-visible-change.md",
+    "title": "How to add a CHANGELOG.md entry for a user-visible change",
+    "sourceCaptureId": "tsk-469"
   },
   {
     "quadrant": "how-to",
@@ -739,6 +1235,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/allowlist-a-historical-mention-in-launcher-vocabulary-guard.md",
+    "title": "How to allowlist a legitimate historical mention in launcher-vocabulary-guard.test.mjs",
+    "sourceCaptureId": "tsk-2uo"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/avoid-a-hung-verify-on-return-approve-catchup.md",
     "title": "How to avoid a hung `verify` command on `fgos return`/`approve`/`catchup`",
     "sourceCaptureId": "tsk-3vo"
@@ -747,9 +1251,25 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md",
+    "title": "Avoid a vacuous pass from `node --test --test-name-pattern`",
+    "sourceCaptureId": "tsk-4nf"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/branch-fgos-coding-driving-claim-step-by-domain-worktreebacked.md",
     "title": "How to branch fgos-coding-driving's claim step by a domain's worktreeBacked flag",
     "sourceCaptureId": "tsk-5y5"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/check-main-checkout-lock-status-before-retrying.md",
+    "title": "How to check main-checkout-lock status before retrying",
+    "sourceCaptureId": "tsk-5z2"
   },
   {
     "quadrant": "how-to",
@@ -803,6 +1323,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/compute-a-parallel-dispatch-wave-schedule.md",
+    "title": "How to compute a parallel dispatch wave schedule",
+    "sourceCaptureId": "tsk-3c7"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/configure-a-capacity-to-dispatch-via-a-named-agent.md",
     "title": "How to configure a capacity to dispatch via a named agent instead of a raw command",
     "sourceCaptureId": "tsk-3sw"
@@ -814,6 +1342,14 @@
     "docPath": "docs/how-to/continue-after-root-decomposes-mid-session.md",
     "title": "How to continue when a root item decomposes into children mid-session",
     "sourceCaptureId": "tsk-424"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/declare-footprint-when-fgos-planning-splits-an-item.md",
+    "title": "How to declare `--footprint` when `fgos-planning` splits an item",
+    "sourceCaptureId": "tsk-3uz"
   },
   {
     "quadrant": "how-to",
@@ -915,6 +1451,22 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/hold-an-open-ended-design-brainstorm-with-fgos-coding-shaping.md",
+    "title": "How to hold an open-ended design brainstorm with `fgos-coding-shaping`",
+    "sourceCaptureId": "tsk-69g"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/install-the-fgos-claude-code-plugin-via-doctor.md",
+    "title": "How to get the fgOS Claude Code plugin installed via `fgos doctor`",
+    "sourceCaptureId": "tsk-4xg"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/keep-a-real-fs-writing-integration-test-from-leaving-a-tracked-file-dirty.md",
     "title": "Keep a real-fs-writing integration test from leaving a tracked file dirty",
     "sourceCaptureId": "tsk-2ce"
@@ -955,9 +1507,41 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/process-the-next-clarify-or-decompose-item-with-discover-next.md",
+    "title": "How to process the next clarify/decompose item with `/fgOS:discover-next`",
+    "sourceCaptureId": "tsk-3go-2"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
     "title": "Produce failing-test-first proof for an Iron Law-gated diff",
     "sourceCaptureId": "tsk-62v"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/recognize-a-claude-code-hook-spawn-enoent-failure.md",
+    "title": "How to recognize a Claude Code hook `ENOENT posix_spawn '/bin/sh'` failure",
+    "sourceCaptureId": "tsk-2aa"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/reconcile-a-blocked-item-after-a-leaf-into-root-merge-race.md",
+    "title": "How to reconcile a blocked item after a leaf-into-root merge race",
+    "sourceCaptureId": "tsk-19j-3"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/reconcile-a-strategic-backlog-row-against-real-execution-state.md",
+    "title": "Reconcile a strategic backlog row against real execution state",
+    "sourceCaptureId": "tsk-3vv"
   },
   {
     "quadrant": "how-to",
@@ -1053,7 +1637,23 @@
     "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/smoke-test-fgos-code-implement-with-a-trivial-item.md",
     "title": "How to smoke-test fgos-code-implement with a trivial verify=true item",
-    "sourceCaptureId": "str89-case-study-executing"
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/sweep-the-clarify-decompose-backlog-with-discover-loop.md",
+    "title": "How to sweep the clarify/decompose backlog with `/fgOS:discover-loop`",
+    "sourceCaptureId": "tsk-3go-3"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/sync-a-fgos-item-whose-fix-already-shipped-outside-the-normal-lifecycle.md",
+    "title": "Sync an fgOS item whose fix already shipped outside the normal claim/return/approve lifecycle",
+    "sourceCaptureId": "tsk-3w3x"
   },
   {
     "quadrant": "how-to",
@@ -1070,6 +1670,14 @@
     "docPath": "docs/how-to/uninstall-fgos-wiring.md",
     "title": "Reverse `fgos setup`'s wiring with `fgos uninstall`",
     "sourceCaptureId": "tsk-4iv-1"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md",
+    "title": "Use `--force` to clear a red-first verify disagreement at clarify",
+    "sourceCaptureId": "tsk-66o"
   },
   {
     "quadrant": "how-to",
@@ -1107,9 +1715,25 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/wire-a-skill-to-a-capacity-by-purpose-not-name.md",
+    "title": "How to wire a skill to a capacity by purpose, not by name",
+    "sourceCaptureId": "tsk-2c1"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-capacity.md",
     "title": "How to wire an existing skill's inline-reasoning step through an agent-executor capacity",
     "sourceCaptureId": "tsk-5l2-3"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/write-verify-for-a-skill-prose-change.md",
+    "title": "Viết verify cho một item thay đổi skill prose",
+    "sourceCaptureId": "tsk-4l9"
   },
   {
     "quadrant": "reference",
@@ -1118,6 +1742,22 @@
     "docPath": "docs/reference/capacity-cross-provider-governance.md",
     "title": "capacity cross-provider governance",
     "sourceCaptureId": "tsk-32n"
+  },
+  {
+    "quadrant": "reference",
+    "purpose": "Describe the machinery accurately and completely for lookup.",
+    "audience": "A user who needs precise facts about a specific field/command/API.",
+    "docPath": "docs/reference/discover-pool-pick-next-sort-key-order.md",
+    "title": "`pickNextDiscoverItem`'s real sort-key order",
+    "sourceCaptureId": "tsk-3go-1"
+  },
+  {
+    "quadrant": "reference",
+    "purpose": "Describe the machinery accurately and completely for lookup.",
+    "audience": "A user who needs precise facts about a specific field/command/API.",
+    "docPath": "docs/reference/drift-status-return-shape.md",
+    "title": "`driftStatus`'s real return shape",
+    "sourceCaptureId": "tsk-5m7"
   },
   {
     "quadrant": "reference",
@@ -1133,7 +1773,7 @@
     "audience": "A user who needs precise facts about a specific field/command/API.",
     "docPath": "docs/reference/fgos-participant-contract.md",
     "title": "fgOS participant contract — what it takes to be a full participant in any language",
-    "sourceCaptureId": null
+    "sourceCaptureId": "tsk-64e"
   },
   {
     "quadrant": "reference",
@@ -1142,6 +1782,14 @@
     "docPath": "docs/reference/fgos-show-verb-output-fields.md",
     "title": "`fgos show <id>` output fields",
     "sourceCaptureId": "tsk-2fw"
+  },
+  {
+    "quadrant": "reference",
+    "purpose": "Describe the machinery accurately and completely for lookup.",
+    "audience": "A user who needs precise facts about a specific field/command/API.",
+    "docPath": "docs/reference/fgos-sync-root-outcome-shape.md",
+    "title": "`fgos sync-root`'s real guards and outcome shape",
+    "sourceCaptureId": "tsk-50i"
   },
   {
     "quadrant": "reference",
@@ -1158,6 +1806,14 @@
     "docPath": "docs/reference/gate-bypass-config.md",
     "title": "Gate-bypass config",
     "sourceCaptureId": "tsk-6bx-1"
+  },
+  {
+    "quadrant": "reference",
+    "purpose": "Describe the machinery accurately and completely for lookup.",
+    "audience": "A user who needs precise facts about a specific field/command/API.",
+    "docPath": "docs/reference/herdr-dashboard-layout-and-action-queues.md",
+    "title": "herdr-plugin dashboard layout: work-items panel + action-queue boxes",
+    "sourceCaptureId": "tsk-1d5"
   },
   {
     "quadrant": "reference",
@@ -1187,6 +1843,22 @@
     "quadrant": "reference",
     "purpose": "Describe the machinery accurately and completely for lookup.",
     "audience": "A user who needs precise facts about a specific field/command/API.",
+    "docPath": "docs/reference/recordgateapprove-contract.md",
+    "title": "`recordGateApprove`'s real contract",
+    "sourceCaptureId": "tsk-19j-1"
+  },
+  {
+    "quadrant": "reference",
+    "purpose": "Describe the machinery accurately and completely for lookup.",
+    "audience": "A user who needs precise facts about a specific field/command/API.",
+    "docPath": "docs/reference/state-machine-module-file-names.md",
+    "title": "State-machine module file names",
+    "sourceCaptureId": "tsk-3id"
+  },
+  {
+    "quadrant": "reference",
+    "purpose": "Describe the machinery accurately and completely for lookup.",
+    "audience": "A user who needs precise facts about a specific field/command/API.",
     "docPath": "docs/reference/test-suite-legibility-cleanup-numbers.md",
     "title": "Test suite legibility/dedup cleanup — before/after numbers",
     "sourceCaptureId": "tsk-3wr-3"
@@ -1198,6 +1870,14 @@
     "docPath": "docs/reference/triage-table-columns.md",
     "title": "`/fgOS:triage` table columns",
     "sourceCaptureId": "tsk-dus"
+  },
+  {
+    "quadrant": "reference",
+    "purpose": "Describe the machinery accurately and completely for lookup.",
+    "audience": "A user who needs precise facts about a specific field/command/API.",
+    "docPath": "docs/reference/verify-cost-audit-pick-return-approve-cycle-counts.md",
+    "title": "Verify-cost audit: real pick/return/approve cycle counts",
+    "sourceCaptureId": "tsk-vms"
   },
   {
     "quadrant": "reference",
