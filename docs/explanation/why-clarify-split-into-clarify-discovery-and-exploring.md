@@ -1,3 +1,8 @@
+---
+type: explanation
+title: Why `clarify` split into `clarify`, `discovery`, and `exploring`
+source_capture_ids: [tsk-4b2]
+---
 # Why `clarify` split into `clarify`, `discovery`, and `exploring`
 
 `tsk-5kn` split fgOS's single `clarify` stage into three real stages in
@@ -257,3 +262,66 @@ Full decision record (D1-D17), the 7-round shaping discussion, and the
 scout evidence behind each locked decision:
 `docs/history/fanout-and-delegation-rubric/CONTEXT.md` and
 `DISCUSSION.md`.
+
+## A gap discovered later (`tsk-4b2`): despite this design, `discovery`/`exploring` were never actually reachable
+
+Both stages landed as declared schema (`workflow-stage-graphs.mjs`) and
+valid transitions — but a full-log audit across all 482 work items ever
+recorded found **zero** events that ever moved an item into `discovery`
+or `exploring`:
+
+> "Bằng chứng log trên toàn bộ 482 item, mọi event từng ghi: work.stage
+> edges = {decompose->executing 255, clarify->decompose 253,
+> executing->compound-learn 158}; số event từng đưa item tới
+> discovery/exploring = 0 và 0."
+> — real item description, `tsk-4b2`
+
+The concrete, lived consequence: `fgos-exploring` — the *only* skill that
+writes `CONTEXT.md` — had never run once. Every item this doc's own
+"Implementation" sections describe (`tsk-2c1`, `tsk-28o`, `tsk-4eu`,
+`tsk-5ge`, and dozens of others cited across this repo's own
+`docs/history/`) reached `fgos-planning` with no `CONTEXT.md` to read,
+each writing its own ad hoc paragraph justifying the absence — exactly
+`tsk-36i`'s own experience, the item whose friction surfaced this gap.
+
+**Root cause: two independently-correct decisions that were never
+reconciled.** `coding.stepMap` (the table `stageForStep` reads) has no
+entry for `discovery`/`exploring` by design — `tsk-1x3`'s own retarget
+(cited above, "Reverting the verbs to pure write doors") deliberately
+routes a clear verdict straight from `clarify` to `decompose` via
+`stageForStep(..., 'Divide')`, retiring the old judge-based path. That
+retarget was correct for its own scope. Separately, `tsk-5mj`'s own
+runner wiring (also described above) dispatches `discovery`-stage work
+the same way it dispatches `executing` work — but its dispatcher
+(`loop.mjs:1105`) only fires for an item already sitting *at*
+`discovery`, a state the retargeted `discovery.mjs` handler never
+produces. Two correct pieces, never actually connected end to end.
+
+A second real bug compounded the gap: `fgos-runner`'s own background
+DISCOVERY DISPATCH sweep (`loop.mjs`, ~1030-1108) never read the
+dispatched worker's own `{clear, question}` verdict at all — it
+unconditionally advanced `discovery -> exploring` on any real commit,
+violating this doc's own driver/launcher-parity principle (an
+interactive session and a headless launcher must resolve the same stage
+through the same verdict contract, only the start/stop point differs).
+
+**The fix, locked as `tsk-4b2`**: wire it up rather than retire it —
+`discovery.mjs`'s clear-verdict handler now targets the literal stage
+`'discovery'` instead of retargeting through `stepMap`; both
+`fgos-coding-driving` (the interactive driver) and `fgos-runner`'s
+background sweep (the launcher) gained matching inline handling for
+`discovery`/`exploring`, applying the same clear/unclear verdict contract
+either way; `fgos-exploring` gained the real `exploring -> decompose`
+forward edge it was missing; and `fgos-routing/SKILL.md`'s own
+first-read stage table — which every session reads before anything
+else — got two fixes: a plain factual bug (`clarify` was mapped to
+`fgos-exploring` in prose while the real registry returns
+`fgos-clarifying`), and real rows added for `discovery`/`exploring`,
+which stopped being theoretical once this item landed.
+
+The general lesson: adding a stage to a graph and wiring one dispatcher
+to reach it are two separate claims — confirming the schema is valid and
+confirming a real, producible state actually reaches that dispatcher are
+different checks, and only a full-log audit (not a code read of either
+piece in isolation) revealed that neither had ever actually happened
+across this repo's entire history.
