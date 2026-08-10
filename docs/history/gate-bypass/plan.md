@@ -394,12 +394,18 @@ requirement automatically since it runs full `npm test` rather than a
 narrower `node --test` subset — unlike Piece 3's original gap):
 
 ```
-npm test && grep -q "src/state/gate-bypass.mjs" .claude/skills/fgos-exploring/SKILL.md && grep -q "src/state/gate-bypass.mjs" .claude/skills/fgos-planning/SKILL.md && grep -q "src/state/gate-bypass.mjs" .claude/skills/fgos-validating/SKILL.md && [ "$(grep -c "gate-bypass.mjs" .claude/skills/fgos-exploring/SKILL.md)" -gt 3 ] && [ "$(grep -c "gate-bypass.mjs" .claude/skills/fgos-planning/SKILL.md)" -gt 2 ] && [ "$(grep -c "gate-bypass.mjs" .claude/skills/fgos-validating/SKILL.md)" -gt 1 ] && ! git diff --name-only main...HEAD | grep -qE "^src/state/(gate-bypass|store)\.mjs$"
+npm test && grep -q "src/state/gate-bypass.mjs" .claude/skills/fgos-exploring/SKILL.md && grep -q "src/state/gate-bypass.mjs" .claude/skills/fgos-planning/SKILL.md && grep -q "src/state/gate-bypass.mjs" .claude/skills/fgos-validating/SKILL.md && [ "$(grep -o "gate-bypass.mjs" .claude/skills/fgos-exploring/SKILL.md | wc -l)" -gt 3 ] && [ "$(grep -o "gate-bypass.mjs" .claude/skills/fgos-planning/SKILL.md | wc -l)" -gt 2 ] && [ "$(grep -o "gate-bypass.mjs" .claude/skills/fgos-validating/SKILL.md | wc -l)" -gt 1 ] && ! git diff --name-only main...HEAD | grep -qE "^src/state/(gate-bypass|store)\.mjs$"
 ```
 
-Baselines (3/2/1) are today's real `grep -c "gate-bypass.mjs"` counts per
-file (measured directly, not assumed) — a strictly-greater count after the
-change proves a second, distinct import path was added without pinning
+Baselines (3/2/1) are today's real `grep -o "gate-bypass.mjs" | wc -l`
+(total substring occurrences, not `grep -c`'s matching-line count) per
+file (measured directly, not assumed). `grep -c` was tried first during
+implementation and found unreliable: the new fallback import call landed
+on the same line as an existing prose mention in `fgos-exploring`'s Gate
+section, so the LINE count didn't increase even though a real second
+occurrence of the module path was added — `grep -o | wc -l` counts the
+actual substring, immune to incidental line-wrapping. A strictly-greater
+count after the change proves a second, distinct import path was added without pinning
 the exact JS syntax used to add it.
 
 ### Cases worth proving against

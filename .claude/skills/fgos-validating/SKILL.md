@@ -181,14 +181,23 @@ skill-embedded question):
 ```bash
 root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
 node -e "
-Promise.all([import('./src/state/store.mjs'), import('./src/state/gate-bypass.mjs')]).then(([{ listWork }, { canAutoApproveValidate, readGateBypassLevel }]) => {
-  const fgosDir = process.argv[1] + '/.fgos';
+var root = process.argv[1];
+function resolveModule(relPath, needed) {
+  return import(relPath).catch(() => ({})).then((local) => {
+    if (needed.every((name) => typeof local[name] === 'function')) return local;
+    return import(root + relPath.slice(1));
+  });
+}
+Promise.all([resolveModule('./src/state/store.mjs', ['listWork']), resolveModule('./src/state/gate-bypass.mjs', ['canAutoApproveValidate', 'readGateBypassLevel'])]).then(([{ listWork }, { canAutoApproveValidate, readGateBypassLevel }]) => {
+  const fgosDir = root + '/.fgos';
   const item = listWork(fgosDir).work[process.argv[2]];
   const level = readGateBypassLevel(fgosDir);
   console.log(canAutoApproveValidate(item, process.argv[3], level) ? 'true' : 'false');
 });
 " -- "$root" "<item-id>" "<READY|READY WITH CONSTRAINTS>"
 ```
+
+The code (`gate-bypass.mjs`/`store.mjs`) tries the cwd-relative import first — this worktree's own branch already carries whatever version it needs, including an item that is itself modifying `gate-bypass.mjs` and needs its own in-progress code (docs/history/gate-bypass/CONTEXT.md D7) — and falls back to `$root`'s canonical copy only when the needed export is missing or the import throws (a stale `fgw/<id>` branch forked before that export existed on `main`, D7's fix for the `tsk-5lr` class of failure). Only the state lookup (`.fgos/`, gitignored and per-worktree-local) resolves to the main checkout's `.fgos/` via `git rev-parse --git-common-dir`, the same resolution `scripts/fgos-shell-integration.sh`'s `fgos` shell function already uses — a worktree's own local `.fgos/` never carries the real item record.
 
 `<READY|READY WITH CONSTRAINTS>` is this skill's own already-computed
 verdict from the Flow above, passed directly — never re-derived or
