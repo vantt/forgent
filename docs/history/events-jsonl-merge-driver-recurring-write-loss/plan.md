@@ -184,20 +184,33 @@ narrower perspective, so that guard still fires there exactly as before).
 
 ## Verify
 
-The item's own top-level proof, recorded on `tsk-3wq`'s `verify` field:
+The item's own top-level proof, recorded on `tsk-3wq`'s `verify` field —
+**corrected during Implement (tsk-56t-class bug, found and fixed
+directly per `fgos-code-implement`'s "blocking issue in the path" rule):
+the original draft (`node scripts/events-jsonl-contiguity.mjs --check
+.fgos/events.jsonl && ...`) is not portable — a worktree-backed item's
+`fgos return` runs verify from inside its own worktree, which never
+carries its own `.fgos/` at all (ADR0020), so the relative path never
+resolves. Dropped the direct live-log invocation; the test suite below
+already exercises the exact same check/fix functions against portable
+temp-dir fixtures, which is the correct place for that proof — live-log
+health going forward is `fgos doctor`'s ongoing job, not a one-time
+item-verify concern:**
 
 ```
-node scripts/events-jsonl-contiguity.mjs --check .fgos/events.jsonl && node --test test/state/events.test.mjs test/state/store.test.mjs test/setup/checks.test.mjs
+node --test test/state/events.test.mjs test/state/store.test.mjs test/setup/checks.test.mjs test/scripts/events-jsonl-contiguity.test.mjs
 ```
 
-Covers the audit script (component 3) against the live log, plus every
-existing test file touched by components 2-3. The `union`-driver and
-`--fix` correctness proof points in the risk map above (a live/simulated
-ad hoc merge repro, a concurrent-append-vs-repair repro) are additional
-proof `fgos-validating`/execution must produce and record — they are
-scenario repros, not single assertions this one command alone captures,
-so they're named in the risk map rather than folded into this one-line
-verify.
+Covers the audit script (component 3, both its pure-core logic and its
+doctor-check/fix wiring) plus every existing test file touched by
+components 2-3, including the concurrent-repair-vs-repair regression
+(`test/state/events.test.mjs`, mirroring the existing concurrent-append
+fork-based harness) that proves D2's lock fix. The `union`-driver
+correctness proof point in the risk map above (a live/simulated ad hoc
+merge repro) is additional proof produced separately below (see
+`docs/history/events-jsonl-merge-driver-recurring-write-loss/
+repro-notes.md`) — a scenario repro, not a single assertion this command
+alone captures.
 
 ## Outstanding questions
 

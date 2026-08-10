@@ -201,6 +201,84 @@ test('repairTruncatedLastLine refuses a log that already parses cleanly — noth
   );
 });
 
+// tsk-3wq: repairTruncatedLastLine used to be an UNLOCKED whole-file
+// read-modify-write (its own old docstring admitted a concurrent appendEvent
+// or a second repair landing between its read and its write would be
+// silently overwritten). Mirroring the SAME real-OS-process fork technique
+// the concurrent-appendEvent regression above already uses: two separate
+// processes both call repairTruncatedLastLine on the SAME corrupt log at the
+// same instant. With the fix (folding the whole read/validate/backup/write
+// into withEventsLock, the same cross-process lock appendEvent holds), the
+// two calls must serialize — exactly one succeeds and actually repairs;
+// the other, running only after the first releases the lock, sees an
+// already-clean log and throws the existing 'validation' "already parses
+// cleanly" error (the same error the single-process test above already
+// documents as expected for a clean log) — never a torn write, never a
+// silently-lost or re-corrupted result.
+test('repairTruncatedLastLine under two concurrent OS processes serializes — exactly one repairs, the other sees it already clean, and the result is never corrupted', async () => {
+  const logPath = tmpLogPath();
+  const workDir = path.dirname(logPath);
+  appendEvent(logPath, { type: 'work.add', payload: { id: 'a' } });
+  appendEvent(logPath, { type: 'work.add', payload: { id: 'b' } });
+  fs.appendFileSync(logPath, '{"seq":3,"ts":"2026-07-14T00:00:00.000Z","type":"work.move","pay', 'utf8');
+
+  const childScript = `
+import { repairTruncatedLastLine, EventLogError } from ${JSON.stringify(EVENTS_MJS)};
+const logPath = process.argv[2];
+const startAt = Number(process.argv[3]);
+const waitMs = startAt - Date.now();
+if (waitMs > 0) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, waitMs);
+try {
+  const result = repairTruncatedLastLine(logPath);
+  console.log(JSON.stringify({ outcome: 'repaired', eventCount: result.eventCount }));
+} catch (err) {
+  if (err instanceof EventLogError && err.category === 'validation') {
+    console.log(JSON.stringify({ outcome: 'already-clean' }));
+  } else {
+    console.log(JSON.stringify({ outcome: 'unexpected-error', message: err.message }));
+    process.exitCode = 1;
+  }
+}
+`;
+  const childPath = path.join(workDir, 'repair-race-child.mjs');
+  fs.writeFileSync(childPath, childScript);
+
+  const startAt = Date.now() + 300;
+  const results = await Promise.all(
+    Array.from({ length: 2 }, () =>
+      new Promise((resolve) => {
+        let output = '';
+        const child = fork(childPath, [logPath, String(startAt)], { stdio: ['inherit', 'pipe', 'inherit', 'ipc'] });
+        child.stdout.on('data', (chunk) => {
+          output += chunk;
+        });
+        child.on('exit', (code) => resolve({ code, output: output.trim() }));
+      }),
+    ),
+  );
+
+  assert.deepEqual(
+    results.map((r) => r.code),
+    [0, 0],
+    'both children must exit 0 — a non-zero exit means an unexpected error, not the expected already-clean validation error',
+  );
+
+  const outcomes = results.map((r) => JSON.parse(r.output).outcome).sort();
+  assert.deepEqual(
+    outcomes,
+    ['already-clean', 'repaired'],
+    'exactly one process must have actually repaired the log; the other must see it already clean — never both repairing, never both erroring',
+  );
+
+  // The final on-disk state must be exactly the 2 original valid events,
+  // never re-corrupted, never duplicated, never lost.
+  const events = readEvents(logPath);
+  assert.equal(events.length, 2, 'the log must contain exactly the 2 original valid events after both processes finish');
+  assert.deepEqual(events.map((e) => e.payload.id), ['a', 'b']);
+
+  fs.rmSync(workDir, { recursive: true, force: true });
+});
+
 test('readEvents reads a pre-Phase-2 event with no v field at all, unmodified (per D7a: never rewritten)', () => {
   const logPath = tmpLogPath();
   fs.writeFileSync(
