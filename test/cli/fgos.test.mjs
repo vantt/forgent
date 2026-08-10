@@ -6263,6 +6263,68 @@ test('sync-root refuses from inside a linked worktree (must land on the real mai
   gitAtCwd(cwd, ['worktree', 'remove', '--force', wt]);
 });
 
+// --- sync-root Iron Law + verify-fail (tsk-n2x, docs/history/sync-root-
+// direct-outcome-tests/) -----------------------------------------------
+//
+// The 2 sync-root outcomes with no DIRECT test coverage until this item:
+// the Iron Law refusal (validation, exit 4, before any git mutation) and
+// the verify-fail blocked outcome. Mirrors approve's own already-proven
+// pattern for the same 2 outcomes (makeRunnerProposedItemTouching /
+// approve-verify-fail-item, above), adapted to sync-root's own
+// makeDriftedRoot helper and outcome shape -- unlike approve, sync-root
+// never changes the root item's own status.
+
+test('sync-root of a root whose diff touches a self-modifying-capable module REFUSES without --acknowledge-iron-law: exit 4, root status untouched, no merge', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, { id: 'sync-root-iron-refuse', title: 'Title sync-root-iron-refuse', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'test -f src/runner/probe.mjs' });
+  commitPending(cwd, 'state: add sync-root-iron-refuse');
+  run(cwd, ['move', 'sync-root-iron-refuse', '--to', 'doing']);
+  commitPending(cwd, 'state: claim sync-root-iron-refuse');
+
+  gitAtCwd(cwd, ['checkout', '-b', 'fgw/sync-root-iron-refuse']);
+  fs.mkdirSync(path.join(cwd, 'src/runner'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'src/runner/probe.mjs'), 'export const produced = true;\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'worker output for sync-root-iron-refuse']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+  commitPendingBeforeApprove(cwd, 'sync-root-iron-refuse');
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['sync-root', 'sync-root-iron-refuse']);
+  assert.equal(result.status, 4, `expected a validation refusal: ${result.stdout}${result.stderr}`);
+  assert.match(result.stderr, /Iron Law/);
+  assert.match(result.stderr, /src\/runner\/probe\.mjs/, 'the refusal must name the exact module that tripped required:true');
+  assert.match(result.stderr, /--acknowledge-iron-law/);
+
+  assert.equal(gitHead(cwd), headBefore, 'a refused sync-root attempts no merge -- HEAD is unchanged');
+  const view = stateView(cwd);
+  assert.equal(view.work['sync-root-iron-refuse'].status, 'doing', 'sync-root must never change the root item\'s own status, including on Iron Law refusal');
+  const survivingBranches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/']);
+  assert.match(survivingBranches, /fgw\/sync-root-iron-refuse/, 'the branch survives an Iron Law refusal -- nothing was merged or cleaned up');
+});
+
+test('sync-root of a root whose staged merge fails its own verify: outcome blocked reason verify-fail, root status untouched', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeDriftedRoot(cwd, 'sync-root-verify-fail', { verify: 'test -f file-never-produced.txt' });
+  commitPendingBeforeApprove(cwd, 'sync-root-verify-fail');
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['sync-root', 'sync-root-verify-fail']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.outcome, 'blocked');
+  assert.equal(data.reason, 'verify-fail');
+
+  assert.equal(gitHead(cwd), headBefore, 'main must be byte-for-byte unchanged after an aborted sync-root');
+  assert.equal(fs.existsSync(path.join(cwd, 'sync-root-verify-fail-produced.txt')), false, 'a staged-then-aborted merge must not leave its file behind');
+
+  const view = stateView(cwd);
+  assert.equal(view.work['sync-root-verify-fail'].status, 'doing', 'sync-root must never change the root item\'s own status, including on a verify-fail block');
+});
+
 // --- promote-to-component (tsk-3gx-3, docs/history/promote-to-component/) -
 //
 // Takes N flat sibling item ids (D2: caller's own explicit list) and
