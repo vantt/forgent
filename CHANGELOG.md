@@ -16,6 +16,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `risk: light|standard|heavy`. A domain that declares no vocabulary is
   unaffected — any non-empty string still passes, exactly as before.
 
+- `pick`/`take` now transparently reclaim a `doing` item whose `human`/
+  `session` claim has genuinely gone quiet — no new verb or flag. When a
+  claim conflict would otherwise refuse unconditionally, the existing
+  claim's worktree/branch activity (real commit + file-edit signal, not
+  session/process identity) is checked first; past a conservative
+  threshold (same `agentMs`/`humanMs` split `/fgOS:stale` already uses),
+  the stale claim is released and the new claim reattaches to the
+  existing branch (never force-removed). Runner claims stay untouched
+  (`startupReap`'s own domain), and only a live `pick` attempt (never
+  `take`, never a `runner` caller) can trigger it. Every other case —
+  recent activity, or unreadable evidence — refuses exactly as before.
+
 - The shared config file gains a `herdrOrchestrator: {autoDiscover,
   autoMerge, autoRetro, autoCleanup}` section (all off by default,
   fail-closed on a missing or malformed value) for the herdr-plugin
