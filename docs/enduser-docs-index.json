@@ -228,7 +228,7 @@
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/decisions/0028-doi-ten-orchestrator-thanh-launcher.md",
-    "title": "0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
+    "title": "0028 — Đổi tên pinned term ban đầu của `0026` thành `launcher`",
     "sourceCaptureId": null
   },
   {
