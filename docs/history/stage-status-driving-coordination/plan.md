@@ -242,3 +242,224 @@ Each child is one honest piece; none of them further decomposes.
 ## Outstanding questions
 
 None
+
+---
+
+# Plan: settings source for auto-launch toggles + doctor/setup registration (tsk-2m5)
+
+Mode: standard
+
+## Mode gate
+
+- **public contracts** — a new config default (`herdrOrchestrator`) is a new
+  install/setup/doctor-gate surface per `AGENTS.md`, must register into
+  `fgos setup`'s config-merge and `fgos doctor`'s check registry (1 flag).
+- **weak proof around the area** — reading a shared-config section from Rust
+  via `serde_json` has no existing precedent inside `herdr-plugin/src`
+  today; the parent plan's own risk map flagged this component Medium for
+  exactly this reason (1 flag).
+- No auth, no authorization, no data-model change (an additive config
+  section, same shape `gateBypass`/`cleanup` already use), no audit/security
+  surface (this piece never launches a pane or performs a merge — that is
+  tsk-2ja's/tsk-57q's own footprint, deliberately excluded here per the
+  parent plan's risk-map row "Auto-merge automation… this item's own
+  footprint must never touch…"), no external system, no cross-platform
+  concern beyond the existing Rust/Node split, single product domain.
+
+**2 flags → mode: standard.** Below `high-risk` (no hard-gate flag applies
+to this piece specifically — that flag was consumed by tsk-2xt's
+auto-merge launcher, tsk-57q, per the parent plan's own risk-map row), above
+`tiny`/`small` (a genuinely new cross-language contract, not a
+copy-paste of an existing one).
+
+## Approach
+
+**Path chosen:** mirror `gate-bypass.mjs`'s `config.gateBypass.level`
+precedent exactly, on both sides.
+
+Node side — register the new section in `src/setup/registrations.mjs`
+(not `src/config/shared-config-file.mjs`, which stays a generic
+read/write module with no per-module knowledge; the item's own
+pre-declared footprint named the wrong file — `registrations.mjs` is the
+one real registration point every existing section, including
+`gateBypass`, actually uses):
+
+```js
+export const DEFAULT_HERDR_ORCHESTRATOR_SETTINGS = {
+  autoDiscover: false,
+  autoMerge: false,
+  autoRetro: false,
+  autoCleanup: false,
+};
+
+registerConfigDefault({
+  id: 'herdrOrchestrator',
+  key: 'herdrOrchestrator',
+  shape: DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
+});
+
+registerCheck({
+  id: 'herdr-orchestrator-configured',
+  description: 'herdrOrchestrator toggles in the shared config file are present and boolean',
+  check: (cwd) => checkHerdrOrchestratorConfigured(cwd),
+});
+```
+
+`checkConfigNotStale` (already generic over every `registerConfigDefault`
+entry, `checks.mjs`) automatically starts reporting a missing
+`herdrOrchestrator` key the moment this registration lands — no separate
+wiring needed for the "section absent" case. The new
+`checkHerdrOrchestratorConfigured` check exists only for the case that
+staleness check cannot catch: a *present* but malformed value (e.g.
+`autoDiscover: "yes"` instead of a boolean) — same reasoning
+`checkGateBypassConfigured` already documents for `gateBypass.level`'s enum
+check.
+
+**Rejected alternative:** a `fix` registration (mirroring
+`fixGateBypassConfigured`) — rejected as scope creep for this piece.
+`ensureSharedConfigDefaults` (`fgos setup`'s own write path) already fills
+in the whole section with safe-OFF defaults the first time a project adopts
+it, and the Rust side fails closed to OFF on any malformed value regardless
+(see below) — a malformed-but-present boolean has no real incident this repo
+has hit yet (YAGNI). Revisit if `fgos doctor --fix` visibly needs it later.
+
+Rust side — new `herdr-plugin/src/settings.rs`, read once per poll tick
+using the `root: Result<PathBuf, _>` `main.rs` already resolves once at
+startup (`fgos::repo_root()`, `main.rs:43`) — no second git shell-out:
+
+```rust
+use serde::Deserialize;
+use std::path::Path;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Deserialize)]
+#[serde(default, rename_all = "camelCase")]
+pub struct OrchestratorSettings {
+    pub auto_discover: bool,
+    pub auto_merge: bool,
+    pub auto_retro: bool,
+    pub auto_cleanup: bool,
+}
+
+#[derive(Deserialize, Default)]
+struct SharedConfig {
+    #[serde(default, rename = "herdrOrchestrator")]
+    herdr_orchestrator: OrchestratorSettings,
+}
+
+/// Fails closed (every toggle off) on a missing `.fgos/config.json`, a
+/// missing `herdrOrchestrator` section, or malformed JSON — never panics,
+/// never crashes the dashboard on a bad config file.
+pub fn read_settings(root: &Path) -> OrchestratorSettings {
+    let path = root.join(".fgos").join("config.json");
+    let Ok(raw) = std::fs::read_to_string(path) else {
+        return OrchestratorSettings::default();
+    };
+    serde_json::from_str::<SharedConfig>(&raw)
+        .map(|c| c.herdr_orchestrator)
+        .unwrap_or_default()
+}
+```
+
+`#[serde(default)]` on every field is what makes a partially-specified
+section (e.g. only `autoDiscover` set) leave the other three at `false`
+rather than erroring — `Deserialize`'s own missing-field behavior, not
+custom code. `serde` (with the `derive` feature) is not yet a
+`herdr-plugin` dependency (only `serde_json` is, `Cargo.toml:18`) — add
+`serde = { version = "1.0", features = ["derive"] }`.
+
+`herdr-plugin/src/lib.rs` gains `pub mod settings;` (alongside the 7
+existing `pub mod` lines). `main.rs`'s existing poll tick (the
+`if last_poll.elapsed() >= poll_interval { … }` block) gains one more call
+reading `settings::read_settings` into a new `App` field
+(`pub orchestrator_settings: OrchestratorSettings`, defaulting to all-OFF
+in `App::empty()`) — mirroring `refresh_from_fgos`/`refresh_pane_state`'s
+existing shape (a plain field write, no new port trait: this is a local
+file read, not an external process/registry call needing a test seam like
+those two). This item stops at storing the read value — acting on any
+toggle (launching a pane) is tsk-2ja's/tsk-57q's own footprint, per the
+parent plan's ordering ("every launcher reads it; no launcher can be
+meaningfully tested without it").
+
+**Rejected alternative:** giving `settings::read_settings` its own
+`WorkItemSource`-style port/trait for testability — rejected: unlike
+`fetch_triage`/`fetch_doing` (which shell out to `node bin/fgos.mjs`, slow
+and needing a fake for tests), this is a synchronous local file read
+already trivially fake-able in a unit test via a temp directory — no
+external process to seam around.
+
+### Files touched
+
+- `herdr-plugin/src/settings.rs` (new)
+- `herdr-plugin/src/lib.rs` (`pub mod settings;`)
+- `herdr-plugin/src/main.rs` (one call in the poll tick; one new `App` field
+  read)
+- `herdr-plugin/src/app.rs` (`orchestrator_settings` field + default)
+- `herdr-plugin/Cargo.toml` (add `serde` derive dependency)
+- `src/setup/registrations.mjs` (registration — corrects the item's own
+  pre-declared footprint guess of `src/config/shared-config-file.mjs`,
+  see Approach above)
+- `CHANGELOG.md` (`## [Unreleased]` line)
+
+### Risk map
+
+| Component | Risk | Proof point |
+|---|---|---|
+| Rust settings read (new cross-language contract) | Medium (parent plan's own risk-map row) — must fail closed on missing file/section/malformed JSON. | `cargo test settings_`: absent `.fgos/config.json` → all-OFF; file present, section absent → all-OFF; malformed JSON → all-OFF, no panic; one toggle `true`, rest omitted → only that one `true`. |
+| Node config registration | Low — additive `registerConfigDefault`/`registerCheck` calls, same shape `gateBypass`/`cleanup` already use; GitNexus `impact(registerConfigDefault, upstream)` returned **LOW** (2 impacted symbols, checked fresh this session — impact-analysis posture: full). | `npm test`: `checkConfigNotStale` reports a missing `herdrOrchestrator` key before this lands and stops after; `checkHerdrOrchestratorConfigured` fails on a non-boolean value, passes once all 4 keys are booleans. |
+| Scope boundary (must not touch merge/pane-launch code) | Low — this piece stores a value, nothing reads it to act yet. | `detect_changes()`/`git diff --name-only` at `fgos-validating`/return time confirms no file outside the list above is touched. |
+
+Impact-analysis posture: **full** (GitNexus present, `fgos tool query
+--capability impact-analysis --status present` checked fresh this session).
+
+## Shape (standard mode — two-part plan, one item)
+
+1. **Rust side.** Add `serde` derive dependency. Write `settings.rs`
+   (`OrchestratorSettings`, `read_settings`) per the Approach section
+   above. Wire `pub mod settings;` into `lib.rs`. Add
+   `orchestrator_settings: OrchestratorSettings` to `App` (default all-OFF
+   in `App::empty()`). Add one call inside `main.rs`'s existing poll tick,
+   guarded the same way `source`/`registry` already are (`if let Ok(root)
+   = &root { app.orchestrator_settings = settings::read_settings(root); }`).
+   Tests in `settings.rs` itself, named so `cargo test settings_` selects
+   them: absent file, absent section, malformed JSON, partial section —
+   see Risk map's first row for the concrete cases.
+2. **Node side.** Add `DEFAULT_HERDR_ORCHESTRATOR_SETTINGS` +
+   `registerConfigDefault` + `checkHerdrOrchestratorConfigured` +
+   `registerCheck` to `src/setup/registrations.mjs`, next to the
+   `gateBypass` block they mirror. Tests in
+   `test/setup/registrations.test.mjs` (existing file, following its
+   existing per-check test shape): missing key flagged stale by
+   `checkConfigNotStale`; present-and-boolean passes
+   `checkHerdrOrchestratorConfigured`; present-and-non-boolean fails it
+   with a message naming the bad key.
+3. **Changelog.** One `## [Unreleased]` bullet naming the new
+   `herdrOrchestrator` settings surface (`AGENTS.md`'s install/setup/doctor
+   gate: "does this change something a user of fgOS would see?" — yes, a
+   new `fgos doctor`-visible config section).
+
+Concrete cases both sides' tests must prove: absent config → safe default
+(all-OFF); malformed value → fails closed, never crashes/throws past the
+read boundary; one toggle set does not silently flip the others; doctor
+surfaces both "missing" and "present-but-malformed" as distinct, named
+failures.
+
+## No split
+
+One honest piece — already the smallest unit the parent plan's own split
+produced ("each child is one honest piece; none of them further
+decomposes"). Proceeds as itself.
+
+## Proof surface (this item, whole)
+
+```
+cd herdr-plugin && cargo test settings_ && cd .. && npm test
+```
+
+Matches the item's own already-recorded `verify` field exactly (`fgos list
+--id tsk-2m5`) — the Rust-side `settings_`-prefixed tests plus the
+existing Node full suite (which now also covers `registrations.test.mjs`'s
+new cases).
+
+## Outstanding questions
+
+None
