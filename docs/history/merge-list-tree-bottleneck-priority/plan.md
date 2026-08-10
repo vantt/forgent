@@ -66,6 +66,37 @@ until `gitnexus analyze` is re-run, and cross-check with a plain `rg` for
 `mergeReadiness(` callers instead of trusting a GitNexus zero-result
 blind, per this repo's own capability-gate guidance in `CLAUDE.md`.
 
+## fgos-validating — reality gate + feasibility matrix (tsk-2x9k)
+
+**Reality gate:** Mode fit PASS (child scope matches the split's own
+sizing). Repo fit PASS — re-confirmed live: `mergeReadiness`
+(`src/state/graph-harness.mjs:94`), `rankImpact`
+(`src/state/impact.mjs:88`), the `bin/fgos.mjs:1973` `merge list` call
+site, and `test/state/graph-harness.test.mjs` (413 lines, real file) all
+exist exactly as the plan claims. Smaller path PASS — D4 already rejects
+the smaller-looking alternative (grouping done client-side in Rust from
+flat ids) with a concrete reason (order/automation divergence risk), not
+overlooked. Proof surface PASS — real `node --test`/`npm test` command
+against a real, existing file. Impact-analysis posture PASS (matches:
+still `degraded`, GitNexus `present` but index stale, re-confirmed at
+validate time) — manual `rg` cross-check run per the degraded-posture
+rule: `mergeReadiness(` has exactly 3 real call sites outside its own
+test file, all in `bin/fgos.mjs` (lines 1973, 1990, 2009) — no hidden
+caller elsewhere in `src/`/`bin/`.
+
+**Feasibility matrix:**
+
+| Assumption | Risk | Proof required | Evidence found | Result |
+|---|---|---|---|---|
+| `mergeReadiness`'s existing shape must not regress | Medium | A real, currently-passing regression floor exists to protect | `node --test test/state/graph-harness.test.mjs` run live: **31/31 pass**. Sharper constraint found beyond what `plan.md` stated: exactly **4** of those tests do `assert.deepEqual(mergeReadiness(...), {...})` — an EXACT full-shape match. This means the new field must NOT be added onto `mergeReadiness`'s own return object directly (that would break these 4 tests immediately) — it must be composed one layer up, in `bin/fgos.mjs`'s `case 'merge'`/`sub === 'list'` handler (e.g. `{ ...mergeReadiness(...), tree: mergeTree(...) }`), exactly as `plan.md`'s Split description already said ("KHÔNG đổi shape trả về cũ của mergeReadiness... phơi ra qua bin/fgos.mjs's case 'merge' sub 'list'") — this confirms that instruction is load-bearing, not stylistic. | PASS, with this constraint named explicitly for the implementer |
+| `item.parent` is real, reliable structural data for grouping | Medium | The field exists and is already used for grouping elsewhere | `src/state/work.mjs:444-445` documents `parent` as the real child→decomposed-from field; `mergeTier` (`graph-harness.mjs:207-210`) already derives from `item.parent` today, live-confirmed | PASS |
+| `blockedOnSync` drift detail (D7) can be threaded through without new plumbing beyond this task's own scope | Low-medium | The richer detail already exists somewhere reachable | `src/state/drift-status.mjs:45-93` — `driftStatus` already returns `{branch, target, aheadOfTarget, behindTarget, lastSyncedTip, needsSync}` per root; `mergeReadiness` already receives this exact object as `opts.drift` and reads `drift[root]?.needsSync` (`graph-harness.mjs:121`) — the richer fields are already sitting right there, unused, no new computation needed, only new plumbing to attach them | PASS |
+
+**Verdict: READY WITH CONSTRAINTS** — the one constraint: `mergeTree`'s new
+field must be composed in `bin/fgos.mjs`, never merged into
+`mergeReadiness`'s own return object (4 existing `deepEqual` tests would
+break otherwise). Everything else is a clean PASS with live evidence.
+
 ## Split
 
 Two independently workable pieces, each with `parent: tsk-3cs`:
