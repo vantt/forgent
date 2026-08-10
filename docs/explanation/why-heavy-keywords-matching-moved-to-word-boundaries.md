@@ -1,3 +1,8 @@
+---
+type: explanation
+title: Why `HEAVY_KEYWORDS` matching moved from substring to word-boundary
+source_capture_ids: [tsk-1gj]
+---
 # Why `HEAVY_KEYWORDS` matching moved from substring to word-boundary
 
 `HEAVY_KEYWORDS` (`src/intake/risk-keywords.mjs`) is matched against free
@@ -67,9 +72,58 @@ regex does not reliably bound — the exact boundary implementation was
 left to planning/implementation to get right for those entries too, not
 just the ASCII ones.
 
+## A third consumer was missed (`tsk-1gj`): `gate-bypass.mjs` never migrated
+
+This fix's own scope reasoning ("fixing only one would have left the
+other's false-positive exposure live") named exactly two consumers,
+`classifyIronLaw` and `classify()` — but a third, independent
+`HEAVY_KEYWORDS` consumer existed and was never touched:
+`src/state/gate-bypass.mjs`'s `canAutoApprove`/
+`canAutoApproveValidate` (identical `hardGateHit` blocks at :132/:152)
+kept the original raw substring scan, and didn't even import
+`matchesKeyword`:
+
+> "The other two `HEAVY_KEYWORDS` consumers already migrated
+> (`src/intake/classify.mjs:63`, `src/evolve/iron-law.mjs:87`) —
+> `gate-bypass.mjs` is the sole holdout, and doesn't even import
+> `matchesKeyword`."
+> — real `docs/history/tsk-1gj-gate-bypass-word-boundary-match/CONTEXT.md`
+
+A real-backlog scan quantified the cost: 21 of 482 items matched a
+`HEAVY_KEYWORDS` entry only as a substring, never as a genuine
+word-boundary match — e.g. `"auth"` inside `"...human-authored
+plan..."`, `"delete"` inside `"...createworktree now deletes .fgos/
+outright..."`. `canAutoApprove` checks `hardGateHit` **first** and
+returns `false` unconditionally on a hit, regardless of tier — so these
+21 items could never auto-approve at any tier, 12 of them despite
+already having a `tier` that `standard` mode would otherwise have
+covered. Each item pays this gate at up to 3 separate checkpoints
+(`fgos-planning`'s auto-approve, `fgos-validating`'s auto-approve,
+`fgos-fanout`'s inherited floor, which shares the same function) — up to
+63 unnecessary human-asks total, for exactly the class of prose this
+project's own risk vocabulary says should never trigger one.
+
+**The fix**: swap both `hardGateHit` computations to use
+`matchesKeyword` (the same shared helper this doc's own fix already
+built), dropping the now-redundant `.toLowerCase()` call in the process
+(`matchesKeyword`'s own regex already handles case-insensitivity).
+Existing tests needed no change — checked directly, and none of
+`gate-bypass.test.mjs`'s existing fixtures relied on the substring bug
+to pass (its "auth"/"payment" cases were genuine standalone-word
+matches all along).
+
+The general lesson: fixing a shared helper's *implementation* doesn't
+retroactively fix every *caller* still using the old inline pattern
+directly — `gate-bypass.mjs` predated `matchesKeyword`'s introduction and
+was simply never revisited when the other two consumers migrated. A
+migration scoped by "every known consumer of this bug" is only as
+complete as the consumer inventory it was checked against.
+
 ## Related
 
 - `docs/history/heavy-keywords-word-boundary-match/CONTEXT.md` — full
   decision record and scout evidence.
 - `docs/history/fgos-coding-shaping/CONTEXT.md` — where this
   false-positive was first observed, on `tsk-69g`.
+- `docs/history/tsk-1gj-gate-bypass-word-boundary-match/CONTEXT.md` —
+  the missed third consumer's own fix.
