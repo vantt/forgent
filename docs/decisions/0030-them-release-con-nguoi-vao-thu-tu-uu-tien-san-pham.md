@@ -21,7 +21,7 @@ việc liên tục đề xuất gộp các bước nhỏ lại cho gọn (vd g�
 `tier`/`kind`/`risk` vào stage `discovery`) — user chặn lại, chỉ ra một
 bậc ưu tiên đã phát biểu nhiều lần từ những phiên làm việc đầu tiên
 ("từ những ngày đầu", đặc biệt xuyên suốt 3 ngày cuối tuần thảo luận
-concept orchestrator/launcher/dispatch/capacity dẫn tới `0026`/`0028`/
+khái niệm launcher/dispatch/capacity dẫn tới `0026`/`0028`/
 `0029`) nhưng chưa từng được ghi thành quyết định sản phẩm đứng riêng —
 khiến câu hỏi "có nên gộp không" cứ lặp lại ở nhiều phiên khác nhau.
 

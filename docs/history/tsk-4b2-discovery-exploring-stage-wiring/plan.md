@@ -78,9 +78,13 @@ piece. Per `CONTEXT.md` D3/D4/D6/D9:
     && grep -q "expectedStage: 'exploring'" src/intake/discovery.mjs \
     && grep -q "## Discovery and exploring stages" .claude/skills/fgos-coding-driving/SKILL.md \
     && grep -q "## Discovery and exploring stages" .agents/skills/fgos-coding-driving/SKILL.md \
-    && grep -q "stage is \`exploring\`" .claude/skills/fgos-exploring/SKILL.md \
-    && ! grep -q "stage is \`clarify\`" .claude/skills/fgos-exploring/SKILL.md
+    && grep -q '`stage` is `exploring`' .claude/skills/fgos-exploring/SKILL.md \
+    && ! grep -q '`stage` is `clarify`' .claude/skills/fgos-exploring/SKILL.md
   ```
+  (corrected during Execute: the original grep patterns above dropped the
+  backticks around `stage` itself, a genuine typo caught by running the
+  verify for real before calling `fgos return` — never trust a written
+  verify without running it once.)
 
 **Piece 2 (new child) — headless sweep respects the real verdict
 (`CONTEXT.md` D5).** `src/runner/loop.mjs`'s DISCOVERY DISPATCH sweep

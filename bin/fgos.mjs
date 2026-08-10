@@ -24,7 +24,7 @@ import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfigForDir } from '../src/runner/dispatch.mjs';
 import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
 import { resolveFgosDir, fgosDirFromRoot } from '../src/runner/paths.mjs';
-import { resolveDiscovery } from '../src/intake/discovery.mjs';
+import { resolveDiscovery, discoverableStages } from '../src/intake/discovery.mjs';
 import { resolveDecompose } from '../src/intake/decompose.mjs';
 import { computeEntropy, computeCounts, FINAL_STATUSES } from '../src/report/entropy.mjs';
 import { findSourceCaptureIds } from '../src/report/enduser-index.mjs';
@@ -1178,9 +1178,16 @@ async function runVerb(verb, flags, positional, dir) {
       const id = requireField(positional[0] ?? flags.id, 'discover requires an id: fgos discover <id> [--config <path>]');
       const work = listWork(dir).work[id];
       const stage = work?.stage;
-      const clarifyStage = stageForStep(getDomain(work?.domain, { onUnrecognized: () => {} }), 'Clarify');
-      if (stage !== clarifyStage) {
-        throw new StoreError('validation', `discover: work "${id}" is at stage "${stage}", not "${clarifyStage}" -- use "fgos decompose ${id}" instead.`);
+      // tsk-4b2 D3/D6: domain-aware -- a domain that registers discovery/
+      // exploring (today: coding) can call `discover` from any of its own
+      // three stages; a domain that never registered them (triage/
+      // synthetic) keeps the original single-stage precondition unchanged.
+      const validStages = discoverableStages(getDomain(work?.domain, { onUnrecognized: () => {} }));
+      if (!validStages.includes(stage)) {
+        throw new StoreError(
+          'validation',
+          `discover: work "${id}" is at stage "${stage}", not ${validStages.map((s) => `"${s}"`).join('/')} -- use "fgos decompose ${id}" instead.`,
+        );
       }
       // An explicit --config path stays a loud, unmodified failure on ENOENT
       // (loadRunnerConfig); only the default, unflagged path bootstraps a

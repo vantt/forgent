@@ -2,7 +2,7 @@
 
 Item: `tsk-4b2`. Feature boundary: make `discovery`/`exploring` genuinely
 reachable stages — driven identically whether an interactive session or a
-headless orchestrator is holding the item — instead of dead schema with a
+headless launcher is holding the item — instead of dead schema with a
 direct `clarify -> decompose` bypass. Not a rename, not a retirement: this
 locks the "wire it up" direction chosen over "retire the dead stages"
 (the other option originally on the table).
@@ -143,7 +143,6 @@ project rule, `test/skills/fgos-mirror.test.mjs`).
 ## Canonical references
 
 - `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md`
-- `docs/decisions/0028-doi-ten-orchestrator-thanh-launcher.md`
 - `docs/decisions/0029-sua-dinh-nghia-roottask-subtask-capacity-t1-cua-0026.md`
 - `docs/decisions/0030-them-release-con-nguoi-vao-thu-tu-uu-tien-san-pham.md`
 - `plans/reports/project-instability-scan-260809-1608-ship-faster-stability-report.md` (finding #6, the item's own source)

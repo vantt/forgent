@@ -10,6 +10,22 @@
 // guarded on `from === 'clarify'`, not the destination, so it still fires
 // unchanged.
 //
+// RE-RETARGET (tsk-4b2 D3/D6): a clear verdict at `clarify` now lands on
+// stage `discovery` instead of jumping straight to `decompose` — the
+// `discovery`/`exploring` stages were registered (workflow-stage-graphs.mjs)
+// but structurally unreachable until this item, because every real caller
+// addressed stage transitions through `stepMap`, which deliberately has no
+// entry for either stage. This same verdict-driven machinery now also
+// drives `discovery -> exploring` (a `fgos-researching` verdict, applied
+// by whichever caller invoked it — `fgos-researching` itself never touches
+// item state) and `exploring -> decompose` (a clear verdict once
+// `fgos-exploring` has locked `CONTEXT.md`) — see `nextDiscoveryEdge`
+// below. One verb (`fgos discover --verdict ...`), three edges, picked by
+// `work.stage`. `src/runner/loop.mjs`'s own direct `moveStage` call for
+// `discovery -> exploring` (a separate, older mechanism, pre-dating this
+// item) still exists unchanged here — reconciling it to call this same
+// verb instead is tsk-4v6's own job, not this item's footprint.
+//
 // RETIRED (tsk-1x3 D1/D9, docs/history/fanout-and-delegation-rubric/
 // CONTEXT.md): this module used to spawn a nested `claude -p` judge
 // (judgeDiscovery) whenever no caller-supplied verdict was given — the
@@ -24,7 +40,7 @@ import { judgeVerifySemanticCorrectness } from './verify-pattern-check.mjs';
 import { readLockedContext, resolveContentRoot } from './decompose.mjs';
 import { DEFAULTS } from '../state/work.mjs';
 import { listWork, moveStage, addDiscovery, addDecision, putInAwaiting, editWork, StoreError } from '../state/store.mjs';
-import { getDomain, stageForStep } from '../state/workflow-stage-graphs.mjs';
+import { getDomain, stageForStep, resolveDomainName } from '../state/workflow-stage-graphs.mjs';
 import { rankImpact } from '../state/impact.mjs';
 import { computeImpact, computePriority } from '../state/priority-formula.mjs';
 
@@ -70,6 +86,54 @@ function blocksForItem(work, view) {
   return entry ? entry.blocks : 0;
 }
 
+// tsk-4b2 D3/D6: the one function both moveStage call sites below share --
+// a clear verdict is "a verdict-driven forward move once a Socratic/research
+// pass finishes", the same shape at `clarify` (this item's own D3) and at
+// `exploring` (D6), so this picks the right edge from `work.stage` instead
+// of the two call sites duplicating a hardcoded `stageForStep(...,'Divide')`
+// target each.
+//
+// Domain-aware (found by the real `domain-aware-stage-literals.test.mjs`
+// e2e guard, not assumed): `discovery`/`exploring` are additions specific
+// to whichever domain actually registers them in its own `stages` array
+// (today: only `coding`) -- a domain that never declared either stage
+// (the 'triage'/'synthetic' fixture domains this repo's own e2e suite uses
+// to prove domain-agnosticism) keeps the original direct `clarify ->
+// decompose` edge unchanged, exactly as before this item.
+//
+// EXPORTED (tsk-4b2): `bin/fgos.mjs`'s own `discover` CLI case has a
+// precondition gate of its own (refusing before this function is ever
+// called) that needs the exact same domain-aware stage set -- shared here
+// rather than duplicating the `hasDiscoveryExploring` check in two files.
+export function discoverableStages(domain) {
+  const clarifyStage = stageForStep(domain, 'Clarify');
+  const hasDiscoveryExploring = domain.stages?.includes('discovery') && domain.stages?.includes('exploring');
+  return hasDiscoveryExploring ? [clarifyStage, 'discovery', 'exploring'] : [clarifyStage];
+}
+
+function nextDiscoveryEdge(work) {
+  const domain = getDomain(work.domain);
+  const clarifyStage = stageForStep(domain, 'Clarify');
+  const decomposeStage = stageForStep(domain, 'Divide');
+  const hasDiscoveryExploring = discoverableStages(domain).length > 1;
+
+  if (work.stage === clarifyStage) {
+    return hasDiscoveryExploring
+      ? { to: 'discovery', expectedStage: clarifyStage }
+      : { to: decomposeStage, expectedStage: clarifyStage };
+  }
+  if (hasDiscoveryExploring && work.stage === 'discovery') {
+    return { to: 'exploring', expectedStage: 'discovery' };
+  }
+  if (hasDiscoveryExploring && work.stage === 'exploring') {
+    return { to: decomposeStage, expectedStage: 'exploring' };
+  }
+  throw new StoreError(
+    'validation',
+    `resolveDiscovery: work "${work.id}" (domain "${resolveDomainName(work.domain)}") is at stage "${work.stage}", which this engine cannot advance from.`,
+  );
+}
+
 /**
  * Read `id` from the store at `dir` and resolve its clarify-loop
  * transition — the ONE function both the sync `discover` verb and the
@@ -88,13 +152,16 @@ function blocksForItem(work, view) {
  * item trusts it too, which also covers the crashed-mid-explore-session
  * case RUL19 exists to catch.
  *
- * Per D3/D6: the discovery record is written for BOTH outcomes (clear and
- * unclear), never only the failure path. A clear verdict moves the item to
- * `decompose` (stage-decompose D2 retarget — chia-việc is the next stop,
- * not `executing` directly), always carrying a `verify` (D10 — the
- * caller's proposal, or `FALLBACK_VERIFY` when it did not supply one —
- * never the retired P14 placeholder). An unclear verdict parks the item in
- * `awaiting-human` with the verdict's question.
+ * Per stage-decompose D3/D6: the discovery record is written for BOTH
+ * outcomes (clear and unclear), never only the failure path. A clear
+ * verdict moves the item forward via `nextDiscoveryEdge` (tsk-4b2 D3/D6) —
+ * `clarify -> discovery` when the item is at `clarify`, or
+ * `exploring -> decompose` when it is at `exploring` (`fgos-exploring`'s
+ * own Gate calling this same verb once `CONTEXT.md` is locked) — always
+ * carrying a `verify` (D10 — the caller's proposal, or `FALLBACK_VERIFY`
+ * when it did not supply one — never the retired P14 placeholder). An
+ * unclear verdict parks the item in `awaiting-human` with the verdict's
+ * question.
  *
  * `role` (per Phase 3 S3-closeout settlement design) attributes WHO ran
  * this pass — the two call sites disagree, so it is the caller's job to say:
@@ -182,8 +249,7 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
       // when it is already real.
       moveStage(dir, {
         id,
-        to: stageForStep(getDomain(work.domain), 'Divide'),
-        expectedStage: stageForStep(getDomain(work.domain), 'Clarify'),
+        ...nextDiscoveryEdge(work),
         verify: hasRealVerify(work.verify) ? work.verify : (view.gates?.[id]?.contextApprove?.verify ?? FALLBACK_VERIFY),
         role,
       });
@@ -321,8 +387,7 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
 
     moveStage(dir, {
       id,
-      to: stageForStep(getDomain(work.domain), 'Divide'),
-      expectedStage: stageForStep(getDomain(work.domain), 'Clarify'),
+      ...nextDiscoveryEdge(work),
       verify,
       role,
     });

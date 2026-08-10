@@ -123,7 +123,7 @@ function mkLockedContextFixture(storeDir, content = '# CONTEXT\n\nD1: locked.\n'
   return path.basename(featureDir);
 }
 
-test('resolveDiscovery advances to decompose when docsRef points at a real, non-empty CONTEXT.md, with no verdict required', () => {
+test('resolveDiscovery advances to discovery when docsRef points at a real, non-empty CONTEXT.md, with no verdict required (tsk-4b2 D3)', () => {
   const storeDir = tmpStoreDir();
   const docsRef = mkLockedContextFixture(storeDir);
   addWork(storeDir, sampleWork({ docsRef }));
@@ -133,7 +133,7 @@ test('resolveDiscovery advances to decompose when docsRef points at a real, non-
   assert.equal(result.verdict.skipped, true);
 
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].stage, 'decompose');
+  assert.equal(view.work['item-x'].stage, 'discovery');
   assert.equal(view.discovery['item-x'].length, 1);
   assert.equal(view.discovery['item-x'][0].clear, true);
   const decisions = view.decisionsById?.['item-x'] ?? [];
@@ -254,7 +254,7 @@ test('resolveDiscovery skip path finds CONTEXT.md via a real registered worktree
 // --- caller-supplied verdict (tsk-27y D1/D2): the ONLY way an interactive
 // caller reaches a clear/unclear outcome now that judgeDiscovery is retired.
 
-test('resolveDiscovery advances to decompose on a caller-supplied clear verdict', () => {
+test('resolveDiscovery advances to discovery on a caller-supplied clear verdict at clarify (tsk-4b2 D3)', () => {
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork());
 
@@ -262,11 +262,55 @@ test('resolveDiscovery advances to decompose on a caller-supplied clear verdict'
   assert.equal(result.outcome, 'clear');
 
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].stage, 'decompose');
+  assert.equal(view.work['item-x'].stage, 'discovery');
   assert.equal(view.work['item-x'].verify, 'npm test -- caller');
   assert.equal(view.discovery['item-x'].at(-1).clear, true);
   const decisions = view.decisionsById?.['item-x'] ?? [];
   assert.ok(decisions.some((d) => d.text.startsWith('discovery caller-supplied:')), 'caller-supplied path must log a distinct audit-trail decision');
+});
+
+test('resolveDiscovery advances discovery -> exploring on a caller-supplied clear verdict (tsk-4b2 D3/D6, nextDiscoveryEdge)', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ stage: 'discovery' }));
+
+  const result = resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: true });
+  assert.equal(result.outcome, 'clear');
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'exploring');
+});
+
+test('resolveDiscovery advances exploring -> decompose on a caller-supplied clear verdict (tsk-4b2 D6)', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ stage: 'exploring' }));
+
+  const result = resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: true, verify: 'npm test -- exploring' });
+  assert.equal(result.outcome, 'clear');
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'decompose');
+  assert.equal(view.work['item-x'].verify, 'npm test -- exploring');
+});
+
+test('resolveDiscovery refuses a clear verdict for a coding-domain item already at decompose (tsk-4b2 D3/D6)', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ stage: 'decompose' }));
+
+  assert.throws(
+    () => resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: true }),
+    /work "item-x" \(domain "coding"\) is at stage "decompose", which this engine cannot advance from/,
+  );
+});
+
+test('resolveDiscovery keeps the direct clarify->decompose edge unchanged for a domain that never registered discovery/exploring (tsk-4b2, domain-aware nextDiscoveryEdge)', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ domain: 'triage', stage: 'triage' }));
+
+  const result = resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: true, verify: 'npm test -- triage' });
+  assert.equal(result.outcome, 'clear');
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'shaping', 'triage domain has no discovery/exploring -- Clarify->Divide stays direct, same as before tsk-4b2');
 });
 
 test('resolveDiscovery parks in awaiting-human on a caller-supplied unclear verdict, with the caller-supplied question', () => {
@@ -305,7 +349,7 @@ test('resolveDiscovery on a caller-supplied clear verdict with no verify falls b
 
   resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: true });
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].stage, 'decompose');
+  assert.equal(view.work['item-x'].stage, 'discovery');
   assert.notEqual(view.work['item-x'].verify, RETIRED_P14_PLACEHOLDER);
   assert.equal(view.work['item-x'].verify, FALLBACK_VERIFY);
 });
@@ -389,7 +433,7 @@ test('resolveDiscovery still advances normally on a caller-supplied clear verdic
   assert.equal(result.outcome, 'clear');
 
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].stage, 'decompose');
+  assert.equal(view.work['item-x'].stage, 'discovery');
   assert.notEqual(view.work['item-x'].status, 'awaiting-human');
 });
 
@@ -479,6 +523,6 @@ test('resolveDiscovery still updates priority on a legacy-invalid item shape —
 
   assert.doesNotThrow(() => resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: true, verify: 'npm test -- discovered' }));
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].stage, 'decompose');
+  assert.equal(view.work['item-x'].stage, 'discovery');
   assert.equal(typeof view.work['item-x'].priority, 'number');
 });

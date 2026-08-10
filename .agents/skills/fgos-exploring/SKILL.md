@@ -12,12 +12,14 @@ description: >-
 
 Turns a fuzzy request into locked decisions written down in
 `docs/history/<feature>/CONTEXT.md`. This skill normally runs while a
-claimed item's `stage` is `clarify` — it finds the flowers; it does not
-build the comb. It can also be invoked directly by `fgos-planning`,
-mid-`decompose`, when that skill finds `CONTEXT.md` silent on something
-material to the plan (`fgos-planning/SKILL.md`'s own hand-back step);
-`item.stage` stays `decompose` the entire time in that case — this skill
-never moves it.
+claimed item's `stage` is `exploring` (tsk-4b2 D9 — retargeted from
+`clarify`, once `clarify -> discovery -> exploring` became a real,
+reachable chain instead of `clarify` jumping straight to `decompose`) — it
+finds the flowers; it does not build the comb. It can also be invoked
+directly by `fgos-planning`, mid-`decompose`, when that skill finds
+`CONTEXT.md` silent on something material to the plan
+(`fgos-planning/SKILL.md`'s own hand-back step); `item.stage` stays
+`decompose` the entire time in that case — this skill never moves it.
 
 ## Hard rules
 
@@ -299,12 +301,15 @@ skill's own "do not research implementation" rule; it only snapshots
 whatever verify the item already carries into the structured record).
 
 Immediately after that gate-approve record, in BOTH branches, this session
-fires the clarify→decompose engine transition itself — this session is
-already the live soul that just did the real Socratic reasoning, so it
-passes that verdict directly instead of leaving the transition to a LATER
-blind `fgos discover` call or the fragile `readLockedContext` file-read
-trust signal (tsk-27y D1/D2, Native-First Dispatch Doctrine Phase 2 —
-`docs/decisions/0026-...md`):
+fires the exploring→decompose engine transition itself (tsk-4b2 D6 —
+retargeted from clarify→decompose now that this skill runs at `exploring`,
+not `clarify`; `nextDiscoveryEdge`, `src/intake/discovery.mjs`, resolves
+the right edge from the item's own `stage`, so this is still the exact
+same verb call) — this session is already the live soul that just did the
+real Socratic reasoning, so it passes that verdict directly instead of
+leaving the transition to a LATER blind `fgos discover` call or the
+fragile `readLockedContext` file-read trust signal (tsk-27y D1/D2,
+Native-First Dispatch Doctrine Phase 2 — `docs/decisions/0026-...md`):
 
 ```bash
 node "$root/bin/fgos.mjs" discover "<item-id>" --verdict clear --verify "<the same verify value just recorded via gate-approve>" --dir "$root"
