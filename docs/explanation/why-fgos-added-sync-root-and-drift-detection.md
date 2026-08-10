@@ -1,7 +1,7 @@
 ---
 type: explanation
 title: Why fgOS added `sync-root` and drift detection
-source_capture_ids: [tsk-2ec]
+source_capture_ids: [tsk-2ec, tsk-66t]
 ---
 # Why fgOS added `sync-root` and drift detection
 
@@ -175,6 +175,59 @@ computation, not a new concept. An existing test covering a nested root
 targeting `fgw/<parentId>` stayed byte-identical (its fixture's parent
 uses the default unresolved status); the new test is the first to
 exercise a root whose *parent* is itself resolved — the actual gap.
+
+## A follow-on bug (`tsk-66t`): `sync-root`'s no-parent merge had no clean-tree gate at all
+
+`sync-root`'s two branches don't carry equal risk to the shared main
+checkout. A root with a `parent` merges inside a throwaway
+`withMergeEphemeralWorktree`, never touching the shared checkout
+directly. A root with **no** parent runs `git merge --no-commit --no-ff`
+and `git commit --no-edit` straight on the shared `repoRoot` — and unlike
+`approve`'s own local-merge branch (which gates on `isMainTreeClean`
+before any git mutation, `bin/fgos.mjs`), this branch had **no
+clean-tree check anywhere** — confirmed by reading the full case body:
+the only pre-merge guards present were branch-existence and the Iron Law
+check, neither of which inspects working-tree cleanliness.
+
+The consequence is the same class of risk this doc's own original
+incident named — work silently not where it looks like it is — but
+sharper: another session's already-staged changes get silently swept
+into the merge commit (`git commit --no-edit` commits the *entire*
+index, not just the merge's own changes), or the merge fails with
+`"local changes would be overwritten"` and gets reported as
+`merge-failed-unclassified` — a classification that reads as "something
+conflicted" when nothing actually did.
+
+This wasn't theoretical: a live reproduction happened during a separate
+item's own `sync-root` landing on 2026-08-09/10 —
+
+> "`fgos sync-root tsk-19y` crashed with 'Cannot read properties of
+> undefined (reading 'output')' when the main checkout had uncommitted
+> `.fgos/` changes. Traced: `mergeRunnerItem` returned
+> `{outcome:'merge-failed-unclassified'}` (no `.check` field), and
+> `sync-root`'s `runAndReport` has no explicit case for that outcome,
+> falling through to the success path's unconditional `result.check.output`
+> read."
+> — real decision record, `tsk-66t`
+
+**The fix** mirrors `approve`'s own gate byte-for-byte — same
+`buildOwnFileSet`/`isMainTreeClean` helpers, same `ownFileSet` shape,
+same `StoreError('validation')` refusal — attached to `sync-root`'s
+no-parent branch immediately before its merge call, using the same
+`runnerOwnDiff` already computed a few lines above for the Iron Law
+check (no new computation). Because `fgos merge next` dispatches through
+this same `sync-root` verb and only recognized one prior `StoreError`
+shape (`Iron Law`) in its own `catch` block, the fix also had to teach
+that `catch` a second recognized case (`is not clean` → a new, additive
+`blocked: 'dirty-tree'` reason) — without this, the new gate's refusal
+would have propagated as an uncaught, unattended-loop-breaking crash
+instead of the graceful `{picked, blocked, syncRoot}` shape `merge-loop`'s
+own stop-rule logic already expects. This was flagged as a hard-gated
+**data loss** risk (forcing `high-risk` mode regardless of total flag
+count) precisely because the bug's real consequence — another session's
+staged work silently swept into a commit on the one shared checkout — is
+exactly the kind of silent loss this doc's own drift-detection design
+already exists to catch one layer up.
 
 ## The decompose split
 
