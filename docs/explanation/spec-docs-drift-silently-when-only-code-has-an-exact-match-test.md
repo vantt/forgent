@@ -1,3 +1,8 @@
+---
+type: explanation
+title: Spec docs drift silently when only the code has an exact-match test
+source_capture_ids: [tsk-2m5]
+---
 # Spec docs drift silently when only the code has an exact-match test
 
 `tsk-2ta-2` added a 6th entry (`config-awareness`) to `src/setup/checks.mjs`'s
@@ -88,3 +93,30 @@ holds for any other enumerable spec claim that has no equivalent test;
 this item only closes it for the Data Dictionary #7/#7b row specifically,
 not as a general mechanism for every future enumerable claim a spec might
 make.
+
+## The guard caught its own predicted repeat (`tsk-2m5`)
+
+`tsk-4y2`'s own writeup above named a concrete risk: a future item adding
+a new doctor check the way `claude-plugin-marketplace` had, without also
+touching the spec, would drift the doc again with nothing to catch it —
+unless the new guard actually worked. `tsk-2m5` (adding a
+`herdr-orchestrator-configured` doctor check) is a real, later instance
+of exactly that scenario, and confirms the guard held:
+
+> "adding `herdr-orchestrator-configured` also needs
+> `docs/specs/distribution.md`'s Data Dictionary row #7 updated, or
+> `registrations.test.mjs`'s enumeration test fails."
+> — real commit message, `f14f1175`, branch `fgw/tsk-2m5`
+
+This was caught at `fgos-validating` — before the item's own plan.md
+grounding was accepted — not discovered later as a live test failure
+after implementation. The two-way guard did exactly the job `tsk-4y2`
+built it for: a new check registered without its matching spec row
+update turned red immediately, the same way `checks.test.mjs`'s own
+code-side exact-match test already had for years.
+
+## Related
+
+- `docs/history/stage-status-driving-coordination/plan.md` (`tsk-2m5`'s
+  own plan, grounding correction) — the real instance where this guard
+  fired.
