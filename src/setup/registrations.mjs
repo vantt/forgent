@@ -910,6 +910,59 @@ registerCheck({
   check: (cwd) => checkChangelogUnreleasedStale(cwd),
 });
 
+// tsk-2m5 (docs/history/stage-status-driving-coordination/): the
+// herdr-launcher's own auto-launch toggles, read fail-closed from Rust
+// (herdr-plugin/src/settings.rs). Mirrors gateBypass's own shape exactly
+// (config-default + a dedicated check for a present-but-malformed value --
+// `checkConfigNotStale` above already catches the section being entirely
+// MISSING via `assembleRegistryDefaults()`, same as it does for
+// `gateBypass`). No `fix` registration: unlike `gateBypass.level` (a
+// single enum value with one obvious correct default), a malformed
+// individual boolean here has no demonstrated real-world incident yet
+// (YAGNI) -- `ensureSharedConfigDefaults` already fills in a full
+// safe-OFF section the first time a project adopts it.
+export const DEFAULT_HERDR_ORCHESTRATOR_SETTINGS = {
+  autoDiscover: false,
+  autoMerge: false,
+  autoRetro: false,
+  autoCleanup: false,
+};
+
+function checkHerdrOrchestratorConfigured(cwd) {
+  const shared = readSharedConfig(cwd);
+  const settings = shared?.herdrOrchestrator;
+  if (settings === undefined) {
+    return { passed: false, message: 'herdrOrchestrator section missing -- run fgos setup' };
+  }
+  const badKeys = Object.keys(DEFAULT_HERDR_ORCHESTRATOR_SETTINGS).filter(
+    (key) => typeof settings[key] !== 'boolean',
+  );
+  if (badKeys.length > 0) {
+    return {
+      passed: false,
+      message: `herdrOrchestrator has non-boolean value(s) for: ${badKeys.join(', ')}`,
+    };
+  }
+  return {
+    passed: true,
+    message: `herdrOrchestrator: ${Object.keys(DEFAULT_HERDR_ORCHESTRATOR_SETTINGS)
+      .map((key) => `${key}=${settings[key]}`)
+      .join(', ')}`,
+  };
+}
+
+registerConfigDefault({
+  id: 'herdrOrchestrator',
+  key: 'herdrOrchestrator',
+  shape: DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
+});
+
+registerCheck({
+  id: 'herdr-launcher-configured',
+  description: 'herdrOrchestrator toggles in the shared config file are present and boolean (tsk-2m5)',
+  check: (cwd) => checkHerdrOrchestratorConfigured(cwd),
+});
+
 // tsk-1m0 (docs/history/doctor-check-enduser-docs-index-stale/CONTEXT.md):
 // the fgos-indexing skill's whole job is regenerating
 // docs/enduser-docs-index.json after every compound-learn doc write, but

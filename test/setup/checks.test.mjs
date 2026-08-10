@@ -14,7 +14,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { DOCTOR_CHECKS, FIX_REGISTRATIONS, integrationScriptPath, mainCheckoutHookWired, resolveMainCheckout } from '../../src/setup/checks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
 import { DEFAULT_LEVEL } from '../../src/state/gate-bypass.mjs';
-import { DEFAULT_CLEANUP_TTL_DAYS, DEFAULT_CLEANUP_LEAF_TTL_DAYS } from '../../src/setup/registrations.mjs';
+import { DEFAULT_CLEANUP_TTL_DAYS, DEFAULT_CLEANUP_LEAF_TTL_DAYS, DEFAULT_HERDR_ORCHESTRATOR_SETTINGS } from '../../src/setup/registrations.mjs';
 import { initStore, addWork } from '../../src/state/store.mjs';
 import { appendEvent } from '../../src/state/events.mjs';
 
@@ -49,7 +49,7 @@ function fixById(id) {
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, changelog-unreleased-stale, work-classification-vocabulary, and enduser-docs-index-stale', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, changelog-unreleased-stale, herdr-launcher-configured, work-classification-vocabulary, and enduser-docs-index-stale', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     [
@@ -65,6 +65,7 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'claude-plugin-marketplace',
       'plugin-skill-cli-reachable',
       'changelog-unreleased-stale',
+      'herdr-launcher-configured',
       'work-classification-vocabulary',
       'enduser-docs-index-stale',
     ].sort(),
@@ -560,6 +561,7 @@ test('config-not-stale passes when the existing config already has every default
       runner: DEFAULT_RUNNER_CONFIG,
       gateBypass: { level: 'off' },
       cleanup: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS, leafTtlDays: DEFAULT_CLEANUP_LEAF_TTL_DAYS },
+      herdrOrchestrator: DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
     }),
   );
   const { passed } = checkById('config-not-stale').check(cwd);
@@ -693,6 +695,47 @@ test('fgos doctor --fix --pretty (CLI e2e) renders a fix line green even when th
   assert.match(fixLine, /already "/, 'expected the second run to be the already-correct no-op case');
   assert.ok(fixLine.includes('\x1b[32m'), `expected a green mark on an already-correct fix line, got: ${fixLine}`);
   assert.ok(!fixLine.includes('\x1b[31m'), `expected no red mark on an already-correct fix line, got: ${fixLine}`);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+// ─── herdr-launcher-configured (tsk-2m5, docs/history/
+// stage-status-driving-coordination/): the herdr-launcher's own
+// auto-launch toggles. Check-only, no fix (YAGNI -- see registrations.mjs's
+// own comment on this) -- `config-not-stale` already catches the whole
+// section being MISSING; this check adds the one thing that generic
+// staleness scan cannot: a PRESENT but non-boolean toggle value.
+
+test('herdr-launcher-configured check fails when the shared file has no herdrOrchestrator key at all', () => {
+  const cwd = mkTemp('doctor-herdr-launcher-absent-');
+  const { passed, message } = checkById('herdr-launcher-configured').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /missing/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('herdr-launcher-configured check fails when a toggle is present but not a boolean', () => {
+  const cwd = mkTemp('doctor-herdr-launcher-bad-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(
+    path.join(cwd, '.fgos', 'config.json'),
+    JSON.stringify({ herdrOrchestrator: { autoDiscover: 'yes', autoMerge: false, autoRetro: false, autoCleanup: false } }),
+  );
+  const { passed, message } = checkById('herdr-launcher-configured').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /autoDiscover/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('herdr-launcher-configured check passes when every toggle is a boolean', () => {
+  const cwd = mkTemp('doctor-herdr-launcher-ok-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(
+    path.join(cwd, '.fgos', 'config.json'),
+    JSON.stringify({ herdrOrchestrator: { autoDiscover: true, autoMerge: false, autoRetro: false, autoCleanup: false } }),
+  );
+  const { passed, message } = checkById('herdr-launcher-configured').check(cwd);
+  assert.equal(passed, true);
+  assert.match(message, /autoDiscover=true/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
