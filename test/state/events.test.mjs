@@ -227,8 +227,28 @@ test('appendEvent under concurrent OS processes yields unique, gapless, strictly
   const workDir = path.dirname(logPath);
   fs.writeFileSync(logPath, '');
 
-  const N_PROC = 20;
-  const N_APPEND = 40;
+  // tsk-3wn — these two numbers are a BUDGET, not a "more is better" dial.
+  // The lock is a mutex, so the run costs N_PROC * N_APPEND serialized
+  // acquisitions, and every one of them is held to the SAME per-acquisition
+  // deadline (EVENTS_LOCK_TIMEOUT_MS = 2000, src/state/events.mjs:50). The
+  // last process in the queue therefore waits for very nearly the whole run.
+  //
+  // At 20 x 40 = 800 holders this test sat right on that deadline and failed
+  // under load — not because the lock was broken, but because it had queued
+  // an order of magnitude past what the timeout is documented for
+  // (events.mjs:44-48 calls 2s "generous headroom for genuine contention
+  // (dozens of serialized sub-ms holders) or a slow disk"). It failed three
+  // times in one day inside `approve`/`return`'s post-merge verify — which
+  // runs the whole suite on the busiest machine state there is — and each
+  // failure rolled a merge back and parked an innocent item in `blocked`.
+  //
+  // 8 x 15 = 120 holders keeps a genuine stampede (8 real OS processes
+  // released together by the barrier below, which is what actually exposes
+  // the read-then-write race) while leaving roughly 5x headroom under the
+  // deadline instead of ~1x. Raising these back without also raising the
+  // budget they are measured against just re-arms the same trap.
+  const N_PROC = 8;
+  const N_APPEND = 15;
 
   // Each child imports the REAL appendEvent, waits until `startAt` (a shared
   // wall-clock barrier a few hundred ms out) so all processes stampede the

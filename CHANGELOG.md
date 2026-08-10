@@ -38,6 +38,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and stay editable; only a write that actually touches the field is held
   to the vocabulary.
 
+- Merging could fail for reasons that had nothing to do with the work being
+  merged. The event-log concurrency test queued 800 serialized lock
+  acquisitions against a 2s per-acquisition budget, so under the load of a
+  full test run it could exceed that budget and fail — and because that run
+  is what `fgos approve`/`fgos return` use to verify a merge, the merge was
+  rolled back and an innocent item was parked in `blocked`. Observed three
+  times in one day on two unrelated items. The test now queues an amount
+  the budget was actually documented for, and still fails loudly if the
+  append lock itself regresses.
+
 ### Removed
 
 - The standalone `fgos-submit-assist` skill. Its own steps had no reason
