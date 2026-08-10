@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mergeReadiness } from '../../src/state/graph-harness.mjs';
+import { mergeReadiness, mergeTree } from '../../src/state/graph-harness.mjs';
 
 // mergeReadiness is pure over a hand-built view (same shape replay.mjs's
 // foldEvents produces: view.work[id] = { id, title, status, deps, ... }).
@@ -410,4 +410,166 @@ test('mergeReadiness: supersededOut is always empty for every item that never se
   };
   const result = mergeReadiness(view);
   assert.deepEqual(result.supersededOut, []);
+});
+
+// mergeTree (tsk-2x9k, docs/history/merge-list-tree-bottleneck-priority/)
+
+test('mergeTree on an empty view returns an empty tree', () => {
+  const view = { work: {} };
+  assert.deepEqual(mergeTree(view, mergeReadiness(view)), []);
+});
+
+test('mergeTree: a single ready root-to-main item is one top-level node with no children', () => {
+  const view = { work: { a: item('a', 'awaiting-approval') } };
+  assert.deepEqual(mergeTree(view, mergeReadiness(view)), [
+    { id: 'a', title: 'title-a', status: 'ready', children: [] },
+  ]);
+});
+
+test('mergeTree: a ready leaf nests under its real parent even though the parent itself is not a merge candidate (decomposed root never merges itself)', () => {
+  const view = {
+    work: {
+      root: item('root', 'doing'), // decomposed, not itself awaiting-approval -- never appears in mergeReadiness's own buckets
+      child: item('child', 'awaiting-approval', [], { parent: 'root' }),
+    },
+  };
+  const readiness = mergeReadiness(view);
+  assert.deepEqual(readiness.ready, ['child']); // sanity: mergeReadiness itself never mentions 'root'
+  assert.deepEqual(mergeTree(view, readiness), [
+    {
+      id: 'root',
+      title: 'title-root',
+      status: 'container',
+      children: [{ id: 'child', title: 'title-child', status: 'ready', children: [] }],
+    },
+  ]);
+});
+
+test('mergeTree: three-level chain (root -> child -> grandchild) nests correctly at every level', () => {
+  const view = {
+    work: {
+      root: item('root', 'doing'),
+      child: item('child', 'doing', [], { parent: 'root' }),
+      grandchild: item('grandchild', 'awaiting-approval', [], { parent: 'child' }),
+    },
+  };
+  const readiness = mergeReadiness(view);
+  assert.deepEqual(mergeTree(view, readiness), [
+    {
+      id: 'root',
+      title: 'title-root',
+      status: 'container',
+      children: [
+        {
+          id: 'child',
+          title: 'title-child',
+          status: 'container',
+          children: [{ id: 'grandchild', title: 'title-grandchild', status: 'ready', children: [] }],
+        },
+      ],
+    },
+  ]);
+});
+
+test('mergeTree: sibling children under the same parent sort by blocks descending (D3/D6), recursively -- not just at top level', () => {
+  const view = {
+    work: {
+      root: item('root', 'doing'),
+      // 'busy' blocks one other open item (its own dep target), 'quiet' blocks none
+      quiet: item('quiet', 'awaiting-approval', [], { parent: 'root' }),
+      busy: item('busy', 'awaiting-approval', [], { parent: 'root' }),
+      downstream: item('downstream', 'todo', ['busy']),
+    },
+  };
+  const readiness = mergeReadiness(view);
+  const tree = mergeTree(view, readiness);
+  assert.equal(tree.length, 1);
+  assert.equal(tree[0].id, 'root');
+  assert.deepEqual(tree[0].children.map((n) => n.id), ['busy', 'quiet']);
+});
+
+test('mergeTree: a waiting item shows status "waiting"', () => {
+  const view = {
+    work: {
+      dep: item('dep', 'awaiting-approval'),
+      leaf: item('leaf', 'awaiting-approval', ['dep']),
+    },
+  };
+  const readiness = mergeReadiness(view);
+  const tree = mergeTree(view, readiness);
+  const leafNode = tree.find((n) => n.id === 'leaf');
+  assert.equal(leafNode.status, 'waiting');
+  assert.equal(leafNode.reason, undefined);
+});
+
+test('mergeTree: a blockedOnSync item shows status "blocked-sync" with a reason citing the real drift detail (D7)', () => {
+  const view = { work: { a: item('a', 'awaiting-approval') } };
+  const drift = { a: { branch: 'fgw/a', target: 'main', aheadOfTarget: 3, behindTarget: 2, needsSync: true } };
+  const readiness = mergeReadiness(view, { drift });
+  const tree = mergeTree(view, readiness, { drift });
+  assert.equal(tree[0].status, 'blocked-sync');
+  assert.match(tree[0].reason, /fgw\/a/);
+  assert.match(tree[0].reason, /3/);
+  assert.match(tree[0].reason, /2/);
+  assert.match(tree[0].reason, /main/);
+});
+
+test('mergeTree: a footprint-conflicted item shows status "conflicted" with a reason citing the counterpart item (D7)', () => {
+  const view = {
+    work: {
+      a: item('a', 'awaiting-approval', [], { footprint: ['src/shared.mjs'] }),
+      b: item('b', 'awaiting-approval', [], { footprint: ['src/shared.mjs'] }),
+    },
+  };
+  const readiness = mergeReadiness(view);
+  const tree = mergeTree(view, readiness);
+  const nodeA = tree.find((n) => n.id === 'a');
+  assert.equal(nodeA.status, 'conflicted');
+  assert.match(nodeA.reason, /\bb\b/);
+  assert.match(nodeA.reason, /shared\.mjs/);
+});
+
+test('mergeTree: a superseded item shows status "superseded" with a reason citing the target item (D7)', () => {
+  const view = {
+    work: {
+      a: item('a', 'awaiting-approval', [], { supersededBy: 'b' }),
+      b: item('b', 'awaiting-approval', [], { supersededBy: 'a' }),
+    },
+  };
+  const readiness = mergeReadiness(view);
+  const tree = mergeTree(view, readiness);
+  const nodeA = tree.find((n) => n.id === 'a');
+  assert.equal(nodeA.status, 'superseded');
+  assert.match(nodeA.reason, /\bb\b/);
+});
+
+test('mergeTree: a dangling/stale parent reference (parent id absent from view.work) surfaces the child at top level instead of dropping it', () => {
+  const view = {
+    work: {
+      orphan: item('orphan', 'awaiting-approval', [], { parent: 'ghost-parent-id-not-in-work' }),
+    },
+  };
+  const readiness = mergeReadiness(view);
+  const tree = mergeTree(view, readiness);
+  assert.deepEqual(tree, [{ id: 'orphan', title: 'title-orphan', status: 'ready', children: [] }]);
+});
+
+test('mergeTree: every id mergeReadiness surfaces in any bucket appears somewhere in the tree (D2 -- never just ready)', () => {
+  const view = {
+    work: {
+      dep: item('dep', 'awaiting-approval'),
+      waitingLeaf: item('waitingLeaf', 'awaiting-approval', ['dep']),
+      a: item('a', 'awaiting-approval', [], { footprint: ['x.mjs'] }),
+      b: item('b', 'awaiting-approval', [], { footprint: ['x.mjs'] }),
+      superseded: item('superseded', 'awaiting-approval', [], { supersededBy: 'dep' }),
+    },
+  };
+  const readiness = mergeReadiness(view);
+  const tree = mergeTree(view, readiness);
+  const flatIds = new Set();
+  const walk = (nodes) => nodes.forEach((n) => { flatIds.add(n.id); walk(n.children); });
+  walk(tree);
+  for (const id of [...readiness.ready, ...readiness.waiting, ...readiness.supersededOut, 'a', 'b']) {
+    assert.ok(flatIds.has(id), `expected ${id} to appear in the tree`);
+  }
 });

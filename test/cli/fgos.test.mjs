@@ -8378,7 +8378,7 @@ test('merge list on an empty store: empty ready/waiting/conflicts, exit 0, no ev
   const before = eventLines(cwd).length;
   const result = run(cwd, ['merge', 'list']);
   assert.equal(result.status, 0);
-  assert.deepEqual(envelopeData(result.stdout), { ready: [], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: {}, supersededOut: [], stageByItem: {} });
+  assert.deepEqual(envelopeData(result.stdout), { ready: [], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: {}, supersededOut: [], stageByItem: {}, tree: [] });
   assert.equal(eventLines(cwd).length, before, 'merge list must not append any event');
 });
 
@@ -8403,7 +8403,7 @@ test('merge list: a proposed item whose dep is already done is ready', () => {
   assert.equal(run(cwd, ['add', 'leaf', '--title', 'Leaf', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--deps', 'dep', '--description', 'tsk-535 fixture description.']).status, 0);
   toProposed(cwd, 'leaf');
   const data = envelopeData(run(cwd, ['merge', 'list']).stdout);
-  assert.deepEqual(data, { ready: ['leaf'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { leaf: 'root-to-main' }, supersededOut: [], stageByItem: data.stageByItem });
+  assert.deepEqual(data, { ready: ['leaf'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { leaf: 'root-to-main' }, supersededOut: [], stageByItem: data.stageByItem, tree: [{ id: 'leaf', title: 'Leaf', status: 'ready', children: [] }] });
   // tsk-4zj D6: both dep and leaf were `add`ed directly (no --stage),
   // which stamps an explicit 'clarify' by default (add-stage-default-gap
   // D1/D2); every subsequent `move`/`approve`/toProposed step only ever
@@ -8418,7 +8418,7 @@ test('merge list: a proposed item whose dep is NOT done waits, never ready', () 
   assert.equal(run(cwd, ['add', 'leaf', '--title', 'Leaf', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--deps', 'dep', '--description', 'tsk-535 fixture description.']).status, 0);
   toProposed(cwd, 'leaf');
   const data = envelopeData(run(cwd, ['merge', 'list']).stdout);
-  assert.deepEqual(data, { ready: [], waiting: ['leaf'], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { leaf: 'root-to-main' }, supersededOut: [], stageByItem: data.stageByItem });
+  assert.deepEqual(data, { ready: [], waiting: ['leaf'], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { leaf: 'root-to-main' }, supersededOut: [], stageByItem: data.stageByItem, tree: [{ id: 'leaf', title: 'Leaf', status: 'waiting', children: [] }] });
   // tsk-4zj D6: dep via addOk carries addOk's own explicit --stage
   // executing default; leaf was added via the raw CLI `add` (no --stage),
   // which stamps 'clarify' by default (add-stage-default-gap D1/D2) —
