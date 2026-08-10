@@ -7,6 +7,7 @@ import { execFileSync } from 'node:child_process';
 import { resolveDecompose, resolveCallerDecomposeVerdict, resolveContentRoot, findUncoveredLockedDecisions } from '../../src/intake/decompose.mjs';
 import { computeImpact, computePriority } from '../../src/state/priority-formula.mjs';
 import { addWork, listWork, StoreError, categoryOf, moveWork, readRawEvents, recordGateApprove } from '../../src/state/store.mjs';
+import { appendEvent } from '../../src/state/events.mjs';
 import { createWorktree } from '../../src/runner/worktree.mjs';
 
 // tsk-1x3 D1/D9/D16 (docs/history/fanout-and-delegation-rubric/CONTEXT.md):
@@ -393,6 +394,29 @@ test('resolveDecompose on a caller-supplied pass-through verdict releases a held
     .filter((e) => e.type === 'work.move' && e.payload.id === 'item-x' && e.payload.to === 'todo')
     .at(-1);
   assert.equal(releaseEvent.payload.releaseTrigger, 'claim-lock-3b');
+});
+
+// tsk-4hb: the refined priority-write pass (this file's own call site) logs
+// the same observability decision discovery.mjs's rough pass does when
+// work.risk is present but not a real RISK_DISCOUNTS key. `addWork` now
+// enforces risk as an enum (tsk-5wz), so this shape only exists as legacy
+// data -- appendEvent bypasses the write door to plant one, same technique
+// discovery.test.mjs uses for its own legacy-shape fixtures.
+test('resolveDecompose logs a decision when work.risk is present but unrecognized, never for a recognized value', () => {
+  const storeDir = tmpStoreDir();
+  const logPath = path.join(storeDir, 'events.jsonl');
+  appendEvent(logPath, { type: 'work.add', payload: { ...sampleWork(), id: 'item-unrecognized', risk: 'medium' } });
+  appendEvent(logPath, { type: 'work.add', payload: { ...sampleWork(), id: 'item-recognized', risk: 'heavy' } });
+
+  resolveDecompose(storeDir, 'item-unrecognized', cfg, 'session', { verdict: 'pass-through' });
+  resolveDecompose(storeDir, 'item-recognized', cfg, 'session', { verdict: 'pass-through' });
+
+  const view = listWork(storeDir);
+  const unrecognizedDecisions = (view.decisionsById?.['item-unrecognized'] ?? []).filter((d) => d.text.includes('not a recognized RISK_DISCOUNTS key'));
+  const recognizedDecisions = (view.decisionsById?.['item-recognized'] ?? []).filter((d) => d.text.includes('not a recognized RISK_DISCOUNTS key'));
+  assert.equal(unrecognizedDecisions.length, 1);
+  assert.match(unrecognizedDecisions[0].text, /work\.risk "medium"/);
+  assert.equal(recognizedDecisions.length, 0);
 });
 
 test('resolveDecompose on a caller-supplied decompose verdict writes every child with parent/deps/verify and moves the root to executing', () => {

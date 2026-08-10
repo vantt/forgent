@@ -5,6 +5,7 @@ import {
   computeImpact,
   weightForUrgency,
   discountForRisk,
+  isRecognizedRisk,
   discountForRiskWithBlastRadius,
   derisknBonus,
   EFFORT_FLOOR,
@@ -100,4 +101,16 @@ test('weightForUrgency/discountForRisk fall back to a sane default for an unreco
   assert.equal(weightForUrgency('not-a-level'), weightForUrgency('medium'));
   assert.equal(discountForRisk(undefined), discountForRisk('standard'));
   assert.equal(discountForRisk('not-a-risk'), discountForRisk('standard'));
+});
+
+// tsk-4hb: discountForRisk's own fallback cannot tell "absent" apart from
+// "present but unrecognized" -- isRecognizedRisk exists so a caller that
+// already does side effects can make that distinction observable.
+test('isRecognizedRisk distinguishes a real RISK_DISCOUNTS key from an absent or unrecognized one', () => {
+  assert.equal(isRecognizedRisk('light'), true);
+  assert.equal(isRecognizedRisk('standard'), true);
+  assert.equal(isRecognizedRisk('heavy'), true);
+  assert.equal(isRecognizedRisk(undefined), false);
+  assert.equal(isRecognizedRisk('medium'), false, 'a real-world unrecognized value seen in production (tsk-4hb\'s own log evidence)');
+  assert.equal(isRecognizedRisk('not-a-risk'), false);
 });

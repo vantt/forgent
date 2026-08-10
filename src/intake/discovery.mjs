@@ -42,7 +42,7 @@ import { DEFAULTS } from '../state/work.mjs';
 import { listWork, moveStage, addDiscovery, addDecision, putInAwaiting, editWork, StoreError } from '../state/store.mjs';
 import { getDomain, stageForStep, resolveDomainName } from '../state/workflow-stage-graphs.mjs';
 import { rankImpact } from '../state/impact.mjs';
-import { computeImpact, computePriority } from '../state/priority-formula.mjs';
+import { computeImpact, computePriority, isRecognizedRisk } from '../state/priority-formula.mjs';
 
 const DEFAULT_UNCLEAR_QUESTION =
   'Không phán được rõ ràng — cần người xác nhận thủ công.';
@@ -293,6 +293,19 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
     });
     const priority = computePriority({ impact, urgent: work.urgent, risk: work.risk });
     editWork(dir, { id, patch: { priority }, role });
+    // tsk-4hb: risk is free text (Data Dictionary #6) -- a present-but-
+    // unrecognized value silently folds to the same discount as "absent"
+    // inside discountForRisk, with no signal anywhere. Log it here so the
+    // fold is visible in the audit trail instead of invisible.
+    if (work.risk && !isRecognizedRisk(work.risk)) {
+      addDecision(dir, {
+        id,
+        text: `priority: work.risk "${work.risk}" is not a recognized RISK_DISCOUNTS key -- discountForRisk folded it to the "standard" default`,
+        source: 'resolveDiscovery',
+        kind: 'engine',
+        rationale: 'tsk-4hb: making the silent unrecognized-value fallback observable',
+      });
+    }
   } catch {
     // Swallowed intentionally — see comment above.
   }

@@ -26,7 +26,7 @@ import { judgeVerifySemanticCorrectness } from './verify-pattern-check.mjs';
 import { listWork, moveStage, moveWork, addWork, putInAwaiting, addDecision, editWork, StoreError } from '../state/store.mjs';
 import { getDomain, stageForStep } from '../state/workflow-stage-graphs.mjs';
 import { rankImpact } from '../state/impact.mjs';
-import { computeImpact, computePriority, effortForMode, MODE_EFFORT } from '../state/priority-formula.mjs';
+import { computeImpact, computePriority, effortForMode, MODE_EFFORT, isRecognizedRisk } from '../state/priority-formula.mjs';
 import { footprintOverlapAmong } from '../state/graph-metrics.mjs';
 import { branchNameFor, findCheckoutPath } from '../runner/worktree.mjs';
 
@@ -616,6 +616,17 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
       blastRadius: verdict.blastRadius,
     });
     editWork(dir, { id, patch: { priority }, role });
+    // tsk-4hb: see discovery.mjs's rough pass -- same observability gap,
+    // same fix, the refined pass's own call site.
+    if (work.risk && !isRecognizedRisk(work.risk)) {
+      addDecision(dir, {
+        id,
+        text: `priority: work.risk "${work.risk}" is not a recognized RISK_DISCOUNTS key -- discountForRisk folded it to the "standard" default`,
+        source: 'resolveDecompose',
+        kind: 'engine',
+        rationale: 'tsk-4hb: making the silent unrecognized-value fallback observable',
+      });
+    }
   } catch {
     // Swallowed intentionally — same fail-safe discipline as discovery.mjs's
     // rough pass: a corrupted item shape or write-door rejection here must
