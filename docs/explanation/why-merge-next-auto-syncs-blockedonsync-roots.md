@@ -1,3 +1,8 @@
+---
+type: explanation
+title: Why `fgos merge next` now auto-syncs a clean `blockedOnSync` root
+source_capture_ids: [tsk-4qu]
+---
 # Why `fgos merge next` now auto-syncs a clean `blockedOnSync` root
 
 `fgos merge next` (and `/fgOS:merge-loop`, which calls it repeatedly) used
@@ -59,6 +64,48 @@ finish it this call."
   changing the root item's own status/stage. Reuses
   `mergeRunnerItem`'s lock/verify/Iron-Law path — the same gates
   `approve` already applies to a runner-sourced item.
+
+## A blind spot this mechanism has by design (`tsk-4qu`): a resolved root's drift is invisible to every bucket
+
+`needsSync`'s own formula (`aheadOfTarget > 0 &&
+!RESOLVED_STATUSES.has(rootItem.status)`) deliberately excludes a root
+whose own status is already resolved — `blockedOnSync` was built to
+catch an *active* `awaiting-approval` root drifting from its target, not
+a root that has already finished. That exclusion has a real, silent
+consequence this doc's own mechanism never covers: once a root reaches
+`delivered`/`retrospective`/`cleanup`/`done`, a leaf approved *after*
+that point still always merges into `fgw/<root-id>` (`graph-harness.mjs`'s
+`mergeTier` reads `item.parent` alone, never the root's own status) — but
+`needsSync` reports `false` for that now-resolved root, so the branch
+never enters `blockedOnSync`, and `merge next`'s auto-sync (this doc's
+whole subject) never fires for it either. The leaf's real, delivered work
+sits on a branch nothing carries forward, invisible to every bucket
+`fgos merge list` reports.
+
+Observed live twice before anything reported it: `tsk-4ns` landed on
+`fgw/tsk-5wz` after `tsk-5wz` had already gone `retrospective`, and
+independently `tsk-53n` landed on `fgw/tsk-1o7` after `tsk-1o7` had
+already reached `cleanup` — the second instance itself a leaf whose own
+root (`tsk-1o7`) was *itself* also stuck the same way, one gap nested
+inside another. Both times, `fgos merge list --json` showed every bucket
+empty while real, delivered work sat outside `main`; the only way out
+was `fgos sync-root <root-id>` typed by hand, with nothing telling
+anyone to type it.
+
+**The fix stayed deliberately narrow**: `checkRootDrift` (the doctor
+check) already printed the right remedy instruction — it just filtered
+this exact case out. It now reports both drift classes (an active root
+still needing its normal sync, and a resolved root stuck outside its
+target) with distinct messages. `needsSync` itself, and `merge next`'s
+own auto-sync behavior this doc describes, were deliberately left
+unchanged: `merge next` acts on `blockedOnSync` by running a real,
+unattended `sync-root` git mutation, and auto-merging the branch of an
+already-closed-out item is a behavior change nobody asked for on the
+riskiest path in the system. `driftStatus` already measured the honest
+`aheadOfTarget` count for these roots — this was a reporting-filter fix,
+not a new measurement, pinned by a new test so a later "simplification"
+that skips resolved roots fails loudly instead of silently dropping the
+data source again.
 
 ## Related
 
