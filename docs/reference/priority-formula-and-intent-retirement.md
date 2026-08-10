@@ -129,14 +129,60 @@ passing, `outcome: awaiting-approval`, no code-level rework needed —
 though the merge itself hit two transient `goal-check` verify-miss
 blocks before landing, per `tsk-4hb`'s own friction capture).
 
+## Real-world finding: 69% of scored items collapsed to the worst priority value (`tsk-1r3`)
+
+The same real-log scan found `priority`'s sort key had degenerated much
+further than the `urgent`/`risk` axes alone explain: of 189 items that
+ever had a `priority` write, 131 (69%) sat at exactly `10000` —
+`PRIORITY_SCALE`'s own worst-possible value under the ASC-absent-last
+sort contract (Data Dictionary #25), i.e. sorted dead last among every
+scored item. Real examples: `tsk-4y8: 449 -> 10000`, `tsk-62d: 278 -> 323
+-> 10000`, `tsk-2ta: 192 -> 209 -> 10000` — each item's own priority
+getting *worse* on a later write, not better, as `decompose`'s "refined"
+pass overwrote `clarify`'s rough one (`src/state/replay.mjs`'s
+`Object.assign(item, patch)` is unconditional, latest-wins, so the
+refined pass's write always sticks).
+
+**Initial hypothesis, corrected by research**: the item's own starting
+claim was that `decompose.mjs`'s refined `computeImpact` call structurally
+omits the `semanticRelatedness` term that `discovery.mjs`'s rough call
+supplies (confirmed true by reading both call sites) — implying the
+later, "more refined" pass was working from strictly less information
+than the earlier one. Investigation (`RESEARCH.md`) found this term
+carries **no real data to lose today**: `verdict.impactScore` (what the
+rough pass's `semanticRelatedness` would read) is never actually
+populated by the live `callerVerdict` path — the subprocess-judge path
+that might once have set it was already retired
+(see `tsk-1x3` above). The dramatic `449 -> 10000` collapses are actually
+driven by `blocks` (from `rankImpact(view)`) genuinely changing between
+the two live reads — a real graph-state difference, not a term silently
+dropped.
+
+**Fix, scoped to structural parity only**: add an explicit
+`semanticRelatedness: 0` to `decompose.mjs`'s call site so both writers
+of the same computed value agree on what parameters they pass — a real,
+independently-worth-fixing correctness smell, confirmed by a human as
+"no behavior change, no split needed" since the term carries no live
+data either way today. This does **not**, by itself, fix the
+`blocks`-driven collapse to `10000` — that remains open, explicitly
+flagged rather than silently folded into this item's scope: **whether
+`decompose`'s refined pass should re-derive `blocks` fresh from the
+current graph state (today's behavior) or carry forward the value the
+rough pass computed** is a separate, larger design question for a future
+item. Landed clean, one attempt, `node --test test/state/priority-
+formula.test.mjs test/intake/decompose.test.mjs && npm test` passing.
+
 ## See also
 
 - `docs/history/work-item-priority-matrix/CONTEXT.md` — D1-D8, scout
   evidence, pinned terms.
 - `docs/history/work-item-priority-matrix/plan.md` — mode/risk-map/phases.
 - `docs/history/tsk-4hb-priority-formula-degenerate-axes/plan.md` — the
-  real-data scan and `isRecognizedRisk` fix shape behind the section
-  above.
+  real-data scan and `isRecognizedRisk` fix shape behind the `risk`-axis
+  section above.
+- `docs/history/tsk-1r3-priority-refined-pass-drops-term/CONTEXT.md` — D1
+  (scope is parity, not the `blocks` collapse) and D2 (the still-open
+  re-derive-vs-carry-forward question) behind the section above.
 - `docs/reference/rankimpact-sort-key-order.md` — the pre-existing
   `blocks`/`rankImpact` derive `impact` builds on.
 - `docs/reference/work-item-pipeline-stages-verbs-and-handoffs.md` — the
