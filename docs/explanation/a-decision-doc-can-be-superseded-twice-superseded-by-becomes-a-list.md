@@ -1,5 +1,7 @@
 ---
+type: explanation
 title: A decision doc can be superseded twice — superseded_by becomes a list
+source_capture_ids: [tsk-5wf, tsk-18t, tsk-55h]
 ---
 
 # A decision doc can be superseded twice — superseded_by becomes a list
@@ -91,6 +93,72 @@ shape for an existing frontmatter field (scalar → scalar-or-list) is a
 breaking change for any code that reads that field with strict equality,
 not just an additive data change — the field's readers need auditing
 alongside the field's writers.
+
+## The twice-superseded record's own index row was still missing (`tsk-55h`)
+
+`tsk-18t` fixed the checker's *code* to read `superseded_by` as a list.
+Running the checker for real afterward still reported findings — not new
+bugs, but two distinct, still-unresolved data gaps `tsk-18t` had
+explicitly deferred rather than folded into its own scope:
+
+> `check-decision-supersession: 3 finding(s):`
+> `  - 0027: supersedes frontmatter is not a clean list of ids -- check by hand`
+> `  - 0026: no row found in 0000-index.md (expected a "[0026]" anchor)  x2`
+> — real checker output, `docs/history/tsk-55h/CONTEXT.md`
+
+The checker only scans supersession *targets*, not the whole
+`docs/decisions/` directory, so it surfaced 0026's missing index row twice
+(once per supersede event) without ever mentioning 0027, 0028, or 0029 —
+making the visible finding count ("1 doc missing") a real undercount of
+the actual gap (4 docs missing their row):
+
+> "the apparent '1 doc missing' is really 4 ... 0026's row must state it
+> was superseded TWICE — by 0028 (pinned-term rename to `launcher`, STR72)
+> and by 0029 (three vocabulary clauses)."
+> — real `docs/history/tsk-55h/CONTEXT.md`
+
+Fixed with 4 additive rows in `0000-index.md`, following the file's own
+existing "**Đã supersede bởi [00MM](...)**" convention — no code change,
+a pure data-completeness fix once the real gap was scanned for directly
+rather than trusted from the checker's own (narrower-than-it-looked)
+finding count.
+
+## A `supersedes:` target can be a capture hash, not just a decision id (`tsk-55h`)
+
+The same run's third finding was a genuinely different problem, not
+another instance of the first: `0027`'s frontmatter carried
+`supersedes: [2ae492d8]` — an 8-char capture hash referencing a real
+compound-learning capture record (`base-workflow-model` D1-D3), not a
+4-digit `docs/decisions/NNNN-*.md` id. Semantically correct (0027 really
+does supersede that capture), but `classifySupersedes()` only recognizes
+`supersedes:` as a clean id-list, empty, or unparseable "prose" — a
+capture-hash array falls into "prose", producing the checker's
+deliberately-honest "not a clean list of ids -- check by hand" finding
+rather than a false pass or a false failure.
+
+Two shapes were possible: (a) teach the checker to recognize a
+capture-hash as a second valid target kind, or (b) give capture-hash
+supersession its own field, keeping `supersedes:` scoped to decision ids
+only. The locked choice was (b) — a new `supersedes_capture:` field,
+`supersedes:`'s existing meaning left untouched:
+
+> "User chose this (option B) over teaching the checker a second
+> 'capture-hash' target kind (option A, rejected): a capture has no
+> frontmatter of its own to verify a back-pointer against, so the checker
+> would gain nothing by recognizing it as a valid target — keeping
+> `supersedes:` single-purpose (decision ids only) is simpler and matches
+> YAGNI."
+> — real locked decision D1, `docs/history/tsk-55h/CONTEXT.md`
+
+The reasoning matters beyond this one field: a checker's value comes from
+verifying a *bidirectional* pointer (a decision id target must itself
+carry a matching `superseded_by` back-reference) — recognizing a target
+kind that structurally can't carry that back-reference wouldn't add real
+verification, only a wider "valid" classification for the same
+unverifiable data. Confirmed as a one-file migration (a repo-wide scan
+found `0027` as the only record using a capture-hash in `supersedes:`
+today), with a known second instance (`tsk-5jb`, still open at the time)
+expected to follow the same `supersedes_capture:` shape once it lands.
 
 ## Related
 
