@@ -3,7 +3,7 @@ type: how-to
 title: How to wait out a genuinely active main-checkout lock holder
 tags: []
 timestamp: 2026-08-04T08:50:44.000Z
-source_capture_ids: [tsk-2rf]
+source_capture_ids: [tsk-2rf, tsk-mgb]
 ---
 # How to wait out a genuinely active main-checkout lock holder
 
@@ -68,6 +68,42 @@ every check meant the holder was actively refreshing, not orphaned.
    ```
 
    Before that point, output is unchanged (no line printed mid-retry).
+
+## Update (`tsk-mgb`): step 4's progress line used to never print at all on the default path
+
+Step 4 above describes the *intended* behavior. Until `tsk-mgb` fixed it,
+the *default* (no `--wait`) path never printed the progress line at
+all, even after a long wait — the print guard (`delayMs > 0 &&
+elapsedMs >= originalRemainingTtlMs`) was two mutually-exclusive
+conditions on that path: once `elapsedMs >= originalRemainingTtlMs`
+(`budgetMs` on the default path), the remaining budget `budgetMs -
+elapsedMs` could never still be positive, so `delayMs > 0` could never
+also hold. A `pick`/`take`/`approve` blocked on lock contention with no
+`--wait` printed nothing but Node's own `TimeoutNegativeWarning` —
+looking exactly like a silent hang, not a bounded wait:
+
+> "Root cause confirmed by reading `src/runner/lock-wait.mjs:76` in full:
+> the print guard is `delayMs > 0 && elapsedMs >=
+> originalRemainingTtlMs`. On the default (no explicit `waitMs`) path,
+> `budgetMs === originalRemainingTtlMs` ... The two conjuncts are
+> mutually exclusive by construction on this path."
+> — real `docs/history/tsk-mgb-lock-wait-progress-line-and-busy-spin/CONTEXT.md`
+
+A second bug shared the same root: once `elapsedMs` exceeded `budgetMs`
+but stayed inside the intentional 250ms landing grace window, the
+schedule-derived delay went negative, `setTimeout` clamped it to ~1ms,
+and the retry loop busy-spun full `claimWork` attempts back-to-back —
+measured at 233 full attempts for a single 3-second wait.
+
+**The fix**: once the remaining budget is no longer positive, sleep out
+exactly what's left of the 250ms grace window instead of the
+(possibly-negative) schedule-derived delay — guaranteeing exactly one
+more bounded sleep, never a busy-spin — then simplify the print guard to
+just `delayMs > 0`, which now correctly covers every real sleep on both
+the default and explicit-`--wait` paths. Since this fix, the progress
+line described in step 4 prints on the default (no-`--wait`) path too,
+not only once an explicit `--wait` extends past the old TTL-snapshot
+boundary.
 
 ## What doesn't change
 
