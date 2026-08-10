@@ -108,15 +108,14 @@ pub fn parse_pane_list(json: &str) -> Result<HashMap<String, PaneIdentity>, serd
     Ok(map)
 }
 
-/// Checks whether any pane in a `herdr pane list` response carries the
-/// exact label given — the auto-discover double-launch guard (tsk-2ja).
-/// Deliberately does NOT go through `extract_task_id`/`parse_pane_list`:
-/// a synthetic label like `fgos-auto-discover-<id>` passes `is_valid_id`'s
-/// syntax check (hyphenated lowercase segments are legal), so folding this
-/// into that map would misread it as a real task id and pollute the
-/// dashboard's own In-Process tracking. This checks the raw label for an
-/// exact match instead, independent of that map entirely.
-pub fn has_labeled_pane(json: &str, label: &str) -> Result<bool, serde_json::Error> {
+/// Guard check for a fixed, non-id-shaped pane title — shared by both
+/// tsk-57q's own `fgos-auto-merge`/`fgos-auto-retro`/`fgos-auto-cleanup`
+/// and tsk-2ja's `fgos-auto-discover-<id>`. `parse_pane_list` above only
+/// ever returns id-shaped labels (`extract_task_id` rejects anything else
+/// outright — including the `fgos-auto-*` namespace explicitly, below),
+/// so any fixed/synthetic literal title needs this separate exact-match
+/// check instead. `extract_task_id` itself is left untouched.
+pub fn pane_has_label(json: &str, label: &str) -> Result<bool, serde_json::Error> {
     let envelope: PaneListEnvelope = serde_json::from_str(json)?;
     Ok(envelope
         .result
@@ -156,8 +155,9 @@ impl PaneRegistry for HerdrPaneScanner {
         parse_pane_list(&stdout).map_err(PaneScanError::Parse)
     }
 
-    fn scan_raw(&self) -> Result<String, PaneScanError> {
-        run_pane_list(&self.herdr_bin, &self.workspace_id)
+    fn has_labeled_pane(&self, label: &str) -> Result<bool, PaneScanError> {
+        let stdout = run_pane_list(&self.herdr_bin, &self.workspace_id)?;
+        pane_has_label(&stdout, label).map_err(PaneScanError::Parse)
     }
 }
 
@@ -239,6 +239,80 @@ mod tests {
         assert_eq!(extract_task_id(""), None);
     }
 
+    // Fixture for the auto-merge/retro/cleanup launcher's own fixed-title
+    // guard (tsk-57q) — one pane carries exactly the fixed, non-id-shaped
+    // label `extract_task_id` would silently drop.
+    const FIXED_LABEL_PANE_LIST_FIXTURE: &str = r#"{"id":"cli:pane:list","result":{"panes":[
+        {"agent":"claude","agent_status":"working","cwd":"/x","focused":false,
+         "pane_id":"wS:pOpL","tab_id":"wS:tOp","workspace_id":"wS",
+         "label":"fgos-auto-merge"},
+        {"agent":"claude","agent_status":"idle","cwd":"/x","focused":false,
+         "pane_id":"wS:pOpR","tab_id":"wS:tOp","workspace_id":"wS"}
+    ],"type":"pane_list"}}"#;
+
+    #[test]
+    fn pane_has_label_finds_an_exact_fixed_title_match() {
+        assert!(
+            pane_has_label(FIXED_LABEL_PANE_LIST_FIXTURE, "fgos-auto-merge")
+                .expect("fixture should parse")
+        );
+    }
+
+    #[test]
+    fn pane_has_label_is_false_when_no_pane_carries_that_exact_title() {
+        assert!(
+            !pane_has_label(FIXED_LABEL_PANE_LIST_FIXTURE, "fgos-auto-retro")
+                .expect("fixture should parse")
+        );
+    }
+
+    #[test]
+    fn pane_has_label_ignores_panes_with_no_label_at_all() {
+        // wS:pOpR carries no label — must never be mistaken for a match.
+        assert!(
+            !pane_has_label(FIXED_LABEL_PANE_LIST_FIXTURE, "")
+                .expect("fixture should parse")
+        );
+    }
+
+    #[test]
+    fn is_valid_id_s_grammar_happens_to_accept_the_fixed_operation_titles_too() {
+        // `is_valid_id`'s grammar (hyphen-joined lowercase-alnum segments,
+        // `pick.rs:47-67`) is not tied to any `tsk-`-style prefix, so
+        // `fgos-auto-merge` etc. structurally pass it too — this is a
+        // pre-existing property of the shared id grammar. It no longer
+        // means these titles leak into `parse_pane_list`'s map (next
+        // test): `extract_task_id` explicitly rejects the whole
+        // `fgos-auto-*` namespace (tsk-2ja's `AUTO_LAUNCH_LABEL_PREFIX`,
+        // closing the gap this test originally documented as a known,
+        // unaddressed limitation). `pane_has_label` itself never depended
+        // on this either way — it matches the exact literal label
+        // regardless of shape.
+        assert!(crate::pick::is_valid_id("fgos-auto-merge"));
+        assert!(crate::pick::is_valid_id("fgos-auto-retro"));
+        assert!(crate::pick::is_valid_id("fgos-auto-cleanup"));
+    }
+
+    #[test]
+    fn pane_has_label_is_additive_and_extract_task_id_no_longer_matches_these_titles() {
+        // Corrected during the tsk-2ja/tsk-57q merge: `extract_task_id`
+        // now rejects the reserved `fgos-auto-*` namespace outright (see
+        // `extract_task_id_rejects_the_reserved_auto_launch_label_namespace`
+        // below), so `fgos-auto-merge` no longer parses as a bogus task id
+        // — `pane_has_label` remains a second, independent check, never a
+        // replacement for it, and its own exact-match result never
+        // depended on what `extract_task_id` decided either way.
+        let map = parse_pane_list(FIXED_LABEL_PANE_LIST_FIXTURE).expect("fixture should parse");
+        assert!(
+            !map.contains_key("fgos-auto-merge"),
+            "the reserved fgos-auto-* namespace must never be read back as a task id"
+        );
+        assert!(
+            pane_has_label(FIXED_LABEL_PANE_LIST_FIXTURE, "fgos-auto-merge")
+                .expect("fixture should parse")
+        );
+    }
+
     #[test]
     fn extract_task_id_rejects_the_reserved_auto_launch_label_namespace() {
         // Syntactically id-shaped (passes `is_valid_id`) but must never
@@ -257,8 +331,8 @@ mod tests {
 
     #[test]
     fn auto_discover_guard_detects_a_pane_by_its_exact_synthetic_label() {
-        assert!(has_labeled_pane(AUTO_DISCOVER_PANE_FIXTURE, "fgos-auto-discover-tsk-2ja").unwrap());
-        assert!(!has_labeled_pane(AUTO_DISCOVER_PANE_FIXTURE, "fgos-auto-discover-tsk-9zz").unwrap());
+        assert!(pane_has_label(AUTO_DISCOVER_PANE_FIXTURE, "fgos-auto-discover-tsk-2ja").unwrap());
+        assert!(!pane_has_label(AUTO_DISCOVER_PANE_FIXTURE, "fgos-auto-discover-tsk-9zz").unwrap());
     }
 
     #[test]

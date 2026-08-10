@@ -683,3 +683,184 @@ new cases).
 ## Outstanding questions
 
 None
+---
+
+# Plan: herdr-launcher auto-merge/retro/cleanup launcher (tsk-57q)
+
+## Mode gate
+
+Flags counted against the standard list:
+
+- **audit/security (hard-gate)** — the auto-merge toggle auto-launches
+  `/fgOS:merge-loop`, an unattended-merge trigger (CONTEXT.md D9). Forces
+  high-risk regardless of total flag count (1 flag, hard-gate).
+- **weak proof around the area** — fixed-tab guard-by-title for a
+  non-id-shaped label has no test precedent: confirmed by reading
+  `herdr-plugin/src/pane_scan.rs:68` (`extract_task_id`) directly on this
+  branch — it still only accepts a leading segment that passes
+  `is_valid_id`, silently dropping anything else, exactly the gap
+  tsk-2xt's own plan section above flagged (1 flag).
+- **multi-domain** — spans 3 automation domains (merge/retro/cleanup)
+  across 2 codebases (herdr-plugin Rust, shells out to fgOS's Node-CLI
+  slash commands) (1 flag).
+- No auth, no data-model change, no external system, no new public CLI
+  contract of its own (the settings *surface* is tsk-2m5's, this item only
+  *reads* it), no cross-platform concern beyond the existing split.
+
+**3 flags, one hard-gate (audit/security) → mode: high-risk** — matches
+the parent's own lane for this whole feature; nothing about narrowing to
+this one child lowers it, since the hard-gate flag is this child's alone
+(it is the one that actually launches merge-loop).
+
+## Approach
+
+**Grounding note:** `tsk-5lr` and `tsk-3v2` were confirmed `delivered` in
+state but their code was verifiably absent from this worktree at the time
+`fgos-planning` was first invoked for this item (neither feature commit
+was an ancestor of `fgw/tsk-57q`'s original fork point, and `tsk-3v2`'s
+own merge into `main` had silently failed — an orphaned, uncommitted merge
+attempt). Both gaps were closed before writing this section: `tsk-3v2`'s
+merge was completed for real (`main` now at `0b9a52d`), and `fgw/tsk-57q`
+was merged forward onto current `main` to pull both in. Every file
+citation below was re-verified by reading the actual code on this branch
+after that merge — not assumed from the item's own (now-partially-stale
+line-number) description.
+
+**Path chosen:** extend the existing poll tick in `herdr-plugin/src/
+main.rs`'s `run()` (the `if last_poll.elapsed() >= poll_interval` block,
+currently at `main.rs:301-308` — shifted from the description's original
+`276-286` cite by `tsk-5lr`'s own 27-line addition to this file) with one
+more call: read `herdrOrchestrator.autoMerge`/`autoRetro`/`autoCleanup`
+from `.fgos/config.json`, and for each enabled toggle, guard-check then
+launch into the already-resolved fixed `fg:operation` panes.
+
+Three concrete technical facts, found by reading the real delivered code,
+that were not resolvable from the item's own description alone:
+
+1. **Pane placement needs no new geometry logic.** `layout::
+   ensure_operation_tab` (`layout.rs:446-473`, tsk-5lr) already resolves
+   and returns `(left_pane_id, right_pane_id)` once, eagerly, at
+   herdr-plugin startup, stored on `App.operation_left_pane_id`/
+   `operation_right_pane_id` (`main.rs:63-65`). This item only ever reads
+   those two fields — it never calls `layout::place_new_agent_pane` (the
+   `fg:agents-N` pool logic `open_pick_pane`/`open_discover_pane` use),
+   since the fixed tab's placement is a one-time startup concern, not a
+   per-launch one.
+2. **The existing argv-builder pattern does not fit as-is.** `pick.rs`'s
+   `run_argv_for_command` (`pick.rs:78-99`) always validates and
+   interpolates an `id: &str` (`/fgOS:pick <id>`, `/fgOS:discover <id>`) —
+   but `/fgOS:merge-loop`/`/fgOS:retro-loop`/`/fgOS:cleanup-loop` are
+   pool-sweep verbs that take no id argument at all. This item adds its
+   own argv builder(s) for these three fixed commands, passing `pane_id`
+   directly (mirroring the *shape* of `run_argv`/`discover_run_argv` as
+   thin wrappers, tsk-1e3 D4's own precedent) but never routing through
+   `is_valid_id`/`InvalidId` for a nonexistent id argument.
+3. **The guard needs a second label-matching path.** `pane_scan.rs`'s
+   `extract_task_id` (confirmed above) only recognizes `is_valid_id`-shaped
+   leading label segments. This item adds a sibling check recognizing
+   exactly the three fixed, literal titles it owns
+   (`fgos-auto-merge`/`fgos-auto-retro`/`fgos-auto-cleanup`) — additive
+   only, `extract_task_id`'s own existing id-shaped path is untouched.
+
+**Settings-read shape (resolves the tsk-2m5 ordering question the parent
+plan raised, without a hard `deps` addition):** `tsk-2m5` (settings
+source) is still at `stage: decompose`/`status: doing` — no
+`herdrOrchestrator` section exists in `.fgos/config.json`'s schema on this
+branch yet. Per tsk-2m5's own already-locked settings-source risk row
+above ("missing section/malformed JSON → all 4 toggles OFF, fail-closed"),
+this item reads `herdrOrchestrator.autoMerge`/`autoRetro`/`autoCleanup`
+directly via `serde_json` with that exact same fail-closed default —
+absent section, absent field, or malformed JSON all resolve to `false`,
+never a launch. This makes this item independently buildable and
+testable now: it activates for real the moment `tsk-2m5` lands its actual
+write-side, with no further change needed here. This is a labeled
+assumption (not a material product decision — it changes no scope or
+acceptance criteria of this item), pinned rather than asked, per
+`fgos-exploring`'s material/grounded/answerable filter.
+
+**Rejected alternative:** routing merge/retro/cleanup launches through
+`layout::place_new_agent_pane`/the `fg:agents-N` pool — rejected because
+the item's own description and `CONTEXT.md` D2/D5 both pin these three to
+the fixed, singular `fg:operation` tab, not the pooled multi-tab surface;
+reusing the pool function would silently violate that pinned placement.
+
+### Files touched
+
+- `herdr-plugin/src/pick.rs` — three new slash-command constants
+  (`MERGE_LOOP_SLASH_COMMAND` etc.) and a no-id argv builder, plus new
+  `PaneOrchestrator` trait methods (`ports.rs`) implemented on
+  `HerdrPaneAdapter`.
+- `herdr-plugin/src/pane_scan.rs` — additive fixed-title guard check
+  alongside `extract_task_id`.
+- `herdr-plugin/src/main.rs` — one new call inside the existing poll tick;
+  reads settings fail-closed, guard-checks, launches.
+- `herdr-plugin/src/layout.rs` — none expected; `ensure_operation_tab`
+  already delivers what this item needs (see grounding note above). Kept
+  in the item's own `footprint` regardless, in case the poll-tick wiring
+  surfaces a real gap once written.
+
+### Risk map
+
+| Component | Risk | Proof point |
+|---|---|---|
+| Settings read (fail-closed) | Low-medium — new cross-language read, but the fail-closed contract is already locked (tsk-2m5's own risk row above). | Tests: absent section, malformed JSON, and one-toggle-only-enables-that-toggle all resolve to no-launch / correctly scoped launch. |
+| No-id argv builder | Medium — every existing `pick.rs` precedent assumes an id; this is the first that does not. | Unit test asserting the built argv never interpolates or validates an id. |
+| Fixed-title guard | Medium-high — same gap the parent plan already flagged, reconfirmed still present in current `pane_scan.rs`. | Unit test: the new check recognizes exactly the three fixed titles, still rejects arbitrary non-id strings the existing path already rejects. |
+| Left/right pane role reuse | Low — `ensure_operation_tab`/`left_right_panes` already delivered and unit-tested by `tsk-5lr`. | No new geometry test needed here; this item only asserts it reads `App.operation_left_pane_id`/`operation_right_pane_id` correctly. |
+| Poll-tick race | Medium — new unattended-launch surface, no existing precedent (weak-proof flag). | Guard check and launch happen synchronously within one tick, mirroring `skip_permissions_enabled`'s own read-then-act shape. |
+| Audit/security (merge-loop launch) | Confirmed non-conflicting with the human-gate policy wall (CONTEXT.md D9); residual risk is scope creep into `approve`/merge internals. | `detect_changes()` at `fgos-validating`/before commit must confirm `bin/fgos.mjs`'s `approve`/`merge` cases and `store.mjs`'s `moveWork` are untouched — this item's footprint stays scoped to the 4 `herdr-plugin/src/*.rs` files above. |
+
+Impact-analysis posture: **degraded** — GitNexus reports `present`
+(`fgos tool query --capability impact-analysis --status present`), but its
+index is stale (last indexed `4ce7a96`, current branch far ahead). Per
+`AGENTS.md`'s capability gate this counts as degraded, not full; not
+leaned on for this item's proof points regardless, since every claim
+above was grounded by reading `pick.rs`/`layout.rs`/`pane_scan.rs`/
+`main.rs` directly on this branch rather than via GitNexus query.
+
+`fgos graph --json` was run this session: `componentCount: 292`,
+`topUnblock` skipped for repo size (same finding the parent plan already
+recorded at 289) — no `--what-if` split comparison needed, since the
+parent already fixed this item as one of exactly 3 children with no
+further split (below).
+
+## Shape (high-risk mode)
+
+Concrete cases the tests must prove:
+
+- Toggle off (default, or section/field missing/malformed) → no launch,
+  ever, for any of the three loops.
+- Toggle on, no existing guarded pane for that title → launches into the
+  correct fixed pane (left = merge-loop, right = retro/cleanup).
+- Toggle on, a guarded pane with that exact fixed title is already live →
+  skipped, never double-launched.
+- Retro/cleanup alternation on the right pane follows priority, never a
+  hardcoded fixed order.
+- Two poll ticks firing close together never produce two panes for the
+  same fixed guard title.
+- Malformed `.fgos/config.json` → fails closed, no crash, no launch (same
+  proof shape as the settings-read row above).
+
+Test names must contain the literal substring `auto_operation_tab` (e.g.
+`auto_operation_tab_skips_when_guard_pane_already_live`) — the item's own
+recorded `verify` (`cd herdr-plugin && cargo test auto_operation_tab`)
+filters by substring match on the full test path, so a test named outside
+this convention would silently not run under that verify command.
+
+## No split
+
+One honest piece of work — per the parent's own "No further split beyond
+the 3 children below" decision above. Proceeds as itself, no further
+children.
+
+## Proof surface (this item, whole)
+
+```
+cd herdr-plugin && cargo test auto_operation_tab
+```
+
+Matches the item's own recorded `verify` field exactly.
+
+## Outstanding questions
+
+None

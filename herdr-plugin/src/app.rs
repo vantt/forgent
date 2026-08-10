@@ -1046,8 +1046,8 @@ mod tests {
             Ok(self.0.clone())
         }
 
-        fn scan_raw(&self) -> Result<String, crate::pane_scan::PaneScanError> {
-            Ok(r#"{"result":{"panes":[]}}"#.to_string())
+        fn has_labeled_pane(&self, _label: &str) -> Result<bool, crate::pane_scan::PaneScanError> {
+            Ok(false)
         }
     }
 

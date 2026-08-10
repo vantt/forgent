@@ -16,6 +16,16 @@ const PICK_SLASH_COMMAND: &str = "/fgOS:pick";
 /// pane that types the slash command a person would type by hand.
 const DISCOVER_SLASH_COMMAND: &str = "/fgOS:discover";
 
+/// tsk-57q: same door-opening discipline as `PICK_SLASH_COMMAND` above —
+/// the auto-merge launcher never calls `fgos approve`/`merge` itself, only
+/// opens a pane that types the same pool-sweep slash command a person
+/// would type by hand.
+const MERGE_LOOP_SLASH_COMMAND: &str = "/fgOS:merge-loop";
+/// Same door-opening discipline, for the right (retro/cleanup) slot.
+const RETRO_LOOP_SLASH_COMMAND: &str = "/fgOS:retro-loop";
+/// Same door-opening discipline, for the right (retro/cleanup) slot.
+const CLEANUP_LOOP_SLASH_COMMAND: &str = "/fgOS:cleanup-loop";
+
 #[derive(Debug, PartialEq)]
 pub struct InvalidId(pub String);
 
@@ -108,6 +118,22 @@ pub fn discover_run_argv(pane_id: &str, id: &str, skip_permissions: bool) -> Res
     run_argv_for_command(pane_id, DISCOVER_SLASH_COMMAND, id, skip_permissions)
 }
 
+/// argv for launching `claude` with a pool-sweep slash command that takes
+/// no id argument (`/fgOS:merge-loop`/`/fgOS:retro-loop`/
+/// `/fgOS:cleanup-loop`, tsk-57q) into an already-resolved pane. Unlike
+/// `run_argv_for_command` above, there is no id to validate or
+/// interpolate — every existing argv builder in this file assumes one,
+/// so this is deliberately a separate, smaller function rather than a
+/// third `run_argv_for_command` wrapper.
+fn loop_run_argv(pane_id: &str, slash_command: &str, skip_permissions: bool) -> Vec<String> {
+    let command = if skip_permissions {
+        format!("claude --dangerously-skip-permissions '{slash_command}'")
+    } else {
+        format!("claude '{slash_command}'")
+    };
+    vec!["pane".into(), "run".into(), pane_id.into(), command]
+}
+
 /// Resolve the herdr binary the same way the plugin docs recommend:
 /// `HERDR_BIN_PATH`, injected into every plugin runtime command, falling
 /// back to a bare `herdr` (PATH lookup) outside a live herdr session.
@@ -163,8 +189,33 @@ pub fn open_discover_pane(
     Ok(())
 }
 
+/// Runs `/fgOS:merge-loop` directly into an already-resolved pane
+/// (tsk-57q) — unlike `open_pick_pane`/`open_discover_pane` above, this
+/// never calls `layout::place_new_agent_pane`: the fixed `fg:operation`
+/// tab's two panes are resolved once, eagerly, at herdr-plugin startup
+/// (`layout::ensure_operation_tab`, tsk-5lr) and passed in by the caller.
+pub fn run_merge_loop(herdr_bin: &str, pane_id: &str, skip_permissions: bool) -> io::Result<()> {
+    let run_args = loop_run_argv(pane_id, MERGE_LOOP_SLASH_COMMAND, skip_permissions);
+    Command::new(herdr_bin).args(run_args).spawn()?;
+    Ok(())
+}
+
+/// Same shape as `run_merge_loop` above, running `/fgOS:retro-loop`.
+pub fn run_retro_loop(herdr_bin: &str, pane_id: &str, skip_permissions: bool) -> io::Result<()> {
+    let run_args = loop_run_argv(pane_id, RETRO_LOOP_SLASH_COMMAND, skip_permissions);
+    Command::new(herdr_bin).args(run_args).spawn()?;
+    Ok(())
+}
+
+/// Same shape as `run_merge_loop` above, running `/fgOS:cleanup-loop`.
+pub fn run_cleanup_loop(herdr_bin: &str, pane_id: &str, skip_permissions: bool) -> io::Result<()> {
+    let run_args = loop_run_argv(pane_id, CLEANUP_LOOP_SLASH_COMMAND, skip_permissions);
+    Command::new(herdr_bin).args(run_args).spawn()?;
+    Ok(())
+}
+
 /// The fixed label an auto-discover launch (tsk-2ja) rename its pane to,
-/// checked via `pane_scan::has_labeled_pane` before each launch to avoid
+/// checked via `pane_scan::pane_has_label` before each launch to avoid
 /// double-launching. Deliberately outside the `<taskid> | ...` convention
 /// (`docs/history/fgos-terminal-pane-rename/CONTEXT.md` D4) — that
 /// convention is set from *inside* the launched session
@@ -292,6 +343,18 @@ impl PaneOrchestrator for HerdrPaneAdapter {
 
     fn focus_pane(&self, pane_id: &str) -> io::Result<()> {
         focus_pane(&self.herdr_bin, pane_id)
+    }
+
+    fn launch_merge_loop(&self, pane_id: &str) -> io::Result<()> {
+        run_merge_loop(&self.herdr_bin, pane_id, skip_permissions_enabled())
+    }
+
+    fn launch_retro_loop(&self, pane_id: &str) -> io::Result<()> {
+        run_retro_loop(&self.herdr_bin, pane_id, skip_permissions_enabled())
+    }
+
+    fn launch_cleanup_loop(&self, pane_id: &str) -> io::Result<()> {
+        run_cleanup_loop(&self.herdr_bin, pane_id, skip_permissions_enabled())
     }
 
     fn open_auto_discover_pane(&self, id: &str) -> io::Result<()> {
@@ -446,6 +509,24 @@ mod tests {
     }
 
     #[test]
+    fn loop_run_argv_never_interpolates_or_validates_an_id() {
+        // Every other argv builder in this file (`run_argv`,
+        // `discover_run_argv`) requires and validates an id — this one is
+        // the first that does not, since `/fgOS:merge-loop`/
+        // `/fgOS:retro-loop`/`/fgOS:cleanup-loop` are pool-sweep verbs
+        // with no per-item argument (tsk-57q).
+        assert_eq!(
+            loop_run_argv("wS:pOpL", MERGE_LOOP_SLASH_COMMAND, true),
+            vec![
+                "pane",
+                "run",
+                "wS:pOpL",
+                "claude --dangerously-skip-permissions '/fgOS:merge-loop'",
+            ]
+        );
+    }
+
+    #[test]
     fn auto_discover_launch_sets_label_before_spawning_claude() {
         let [rename_args, run_args] =
             auto_discover_launch_argv_sequence("wS:p16", "tsk-2ja", true).expect("valid id");
@@ -466,6 +547,22 @@ mod tests {
     }
 
     #[test]
+    fn loop_run_argv_respects_skip_permissions_false() {
+        assert_eq!(
+            loop_run_argv("wS:pOpR", RETRO_LOOP_SLASH_COMMAND, false),
+            vec!["pane", "run", "wS:pOpR", "claude '/fgOS:retro-loop'"]
+        );
+    }
+
+    #[test]
+    fn loop_run_argv_builds_the_cleanup_loop_command() {
+        assert_eq!(
+            loop_run_argv("wS:pOpR", CLEANUP_LOOP_SLASH_COMMAND, false),
+            vec!["pane", "run", "wS:pOpR", "claude '/fgOS:cleanup-loop'"]
+        );
+    }
+
+    #[test]
     fn auto_discover_launch_argv_sequence_rejects_ids_fgos_itself_would_reject() {
         assert!(auto_discover_launch_argv_sequence("p", "", true).is_err());
         assert!(auto_discover_launch_argv_sequence("p", "tsk-2ja", true).is_ok());
@@ -475,7 +572,7 @@ mod tests {
     fn auto_discover_pane_label_is_deliberately_outside_the_taskid_pipe_convention() {
         // Must never contain " | " (the `<taskid> | ...` shape
         // `pane_scan::extract_task_id` splits on) — this label is checked
-        // by an exact match instead (`pane_scan::has_labeled_pane`), never
+        // by an exact match instead (`pane_scan::pane_has_label`), never
         // by that parser.
         assert!(!auto_discover_pane_label("tsk-2ja").contains(" | "));
         assert_eq!(auto_discover_pane_label("tsk-2ja"), "fgos-auto-discover-tsk-2ja");
