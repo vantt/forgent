@@ -27,7 +27,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-import { detectRcFiles, hasSourceLine, deadSourceLines } from './shell-rc.mjs';
+import { detectRcFiles, hasSourceLine, deadSourceLines, probeShellIntegrationInvocation } from './shell-rc.mjs';
 import { mergeConfigDefaults } from './config-merge.mjs';
 import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
@@ -264,6 +264,33 @@ function checkShellIntegrationSourced() {
   const problems = [];
   if (missing.length > 0) {
     problems.push(`not sourced in: ${missing.join(', ')} — run fgos setup`);
+  }
+  // tsk-2wpi: a source line can be textually present and correct while the
+  // function it defines is dead (e.g. a harness snapshot dropping an
+  // underscore-prefixed helper the function depends on) -- the checks
+  // above can't tell the difference, since neither ever actually invokes
+  // the resulting shell function. Only probe once integration is active
+  // somewhere (missing.length < rcFiles.length) -- the failure mode lives
+  // in the shared script itself, not in which rc file references it, so
+  // one probe against scriptPath covers every rc file that sources it.
+  if (missing.length < rcFiles.length) {
+    // FGOS_SHELL_INTEGRATION_PROBE_SCRIPT (test-only seam, mirrors
+    // FGOS_CLAUDE_COMMAND/FGOS_GH_COMMAND below): lets a test probe a
+    // disposable fixture script instead of this repo's own real, live
+    // scripts/fgos-shell-integration.sh -- needed because integrationScriptPath()
+    // always resolves to the real file (derived from import.meta.url, not
+    // cwd), so a passing-case test would otherwise couple its own
+    // assertion to whatever state that real file happens to be in.
+    const probeTarget = process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT || scriptPath;
+    const { ok, strippedFunctions } = probeShellIntegrationInvocation(probeTarget);
+    if (!ok) {
+      const helperNote = strippedFunctions.length > 0
+        ? ` after stripping ${strippedFunctions.join(', ')} (an underscore-prefixed helper a harness shell-function snapshot can drop)`
+        : '';
+      problems.push(
+        `sourced correctly, but "fgos --help" fails${helperNote} -- the source line being present is not proof the command actually works`,
+      );
+    }
   }
   if (dead.length > 0) {
     const byFile = new Map();

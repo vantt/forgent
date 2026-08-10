@@ -484,17 +484,61 @@ test('shell-integration-sourced fails when a detected rc file is missing the sou
   }
 });
 
-test('shell-integration-sourced passes when every detected rc file already has the source line', () => {
+test('shell-integration-sourced passes when every detected rc file already has the source line, and the sourced function actually works', () => {
   const homeDir = mkTemp('doctor-shell-present-');
   const rcFile = path.join(homeDir, '.bashrc');
   fs.writeFileSync(rcFile, `source "${integrationScriptPath()}"\n`);
+  // A disposable fixture with no underscore-prefixed dependency, probed
+  // instead of this repo's own real (possibly still-buggy) script -- see
+  // FGOS_SHELL_INTEGRATION_PROBE_SCRIPT's own doc comment in
+  // registrations.mjs. `hasSourceLine`'s own text check above still reads
+  // the real integrationScriptPath() -- only the real-invocation probe is
+  // redirected, so this test still proves the file-text half of the check
+  // against the real path while proving the invocation half against a
+  // known-good fixture.
+  const safeFixture = path.join(homeDir, 'safe-fgos.sh');
+  fs.writeFileSync(safeFixture, 'fgos() {\n  echo "safe fgos $@"\n}\n');
   const prevHome = process.env.HOME;
+  const prevProbe = process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT;
   process.env.HOME = homeDir;
+  process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT = safeFixture;
   try {
     const { passed } = checkById('shell-integration-sourced').check(process.cwd());
     assert.equal(passed, true);
   } finally {
     process.env.HOME = prevHome;
+    if (prevProbe === undefined) delete process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT;
+    else process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT = prevProbe;
+    fs.rmSync(homeDir, { recursive: true, force: true });
+  }
+});
+
+test('shell-integration-sourced fails when the source line is present but the sourced function itself is dead (tsk-2wpi: a text-present source line is not proof the command works)', () => {
+  const homeDir = mkTemp('doctor-shell-broken-fn-');
+  const rcFile = path.join(homeDir, '.bashrc');
+  fs.writeFileSync(rcFile, `source "${integrationScriptPath()}"\n`);
+  // Mirrors the real pre-fix scripts/fgos-shell-integration.sh shape: a
+  // public function whose second line calls a private, underscore-prefixed
+  // helper -- exactly the dependency a harness shell-function snapshot can
+  // drop.
+  const fragileFixture = path.join(homeDir, 'fragile-fgos.sh');
+  fs.writeFileSync(
+    fragileFixture,
+    '_fgos_helper() {\n  echo resolved\n}\n\nfgos() {\n  _fgos_helper >/dev/null || return 1\n  echo "fgos $@"\n}\n',
+  );
+  const prevHome = process.env.HOME;
+  const prevProbe = process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT;
+  process.env.HOME = homeDir;
+  process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT = fragileFixture;
+  try {
+    const { passed, message } = checkById('shell-integration-sourced').check(process.cwd());
+    assert.equal(passed, false);
+    assert.match(message, /fgos --help.*fails/);
+    assert.match(message, /_fgos_helper/);
+  } finally {
+    process.env.HOME = prevHome;
+    if (prevProbe === undefined) delete process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT;
+    else process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT = prevProbe;
     fs.rmSync(homeDir, { recursive: true, force: true });
   }
 });
@@ -1065,13 +1109,23 @@ test('shell-integration-sourced counts dead lines per rc file across both bash a
 test('shell-integration-sourced still passes when every rc file has only the live line', () => {
   const homeDir = mkTemp('doctor-shell-clean-');
   fs.writeFileSync(path.join(homeDir, '.bashrc'), `source "${integrationScriptPath()}"\n`);
+  // See FGOS_SHELL_INTEGRATION_PROBE_SCRIPT's doc comment (registrations.mjs)
+  // and the earlier "...and the sourced function actually works" test for
+  // why this points the real-invocation probe at a known-good fixture
+  // rather than this repo's own real script.
+  const safeFixture = path.join(homeDir, 'safe-fgos.sh');
+  fs.writeFileSync(safeFixture, 'fgos() {\n  echo "safe fgos $@"\n}\n');
   const prevHome = process.env.HOME;
+  const prevProbe = process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT;
   process.env.HOME = homeDir;
+  process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT = safeFixture;
   try {
     const { passed } = checkById('shell-integration-sourced').check(process.cwd());
     assert.equal(passed, true);
   } finally {
     process.env.HOME = prevHome;
+    if (prevProbe === undefined) delete process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT;
+    else process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT = prevProbe;
     fs.rmSync(homeDir, { recursive: true, force: true });
   }
 });
