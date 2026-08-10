@@ -237,3 +237,129 @@ export function mergeReadiness(view, opts = {}) {
     stageByItem,
   };
 }
+
+/**
+ * Group `mergeReadiness`'s own buckets into a nested merge tree (tsk-2x9k,
+ * docs/history/merge-list-tree-bottleneck-priority/). PURE, same read-only
+ * discipline as `mergeReadiness` itself — takes the SAME view plus the
+ * `mergeReadiness` result already computed for it, never recomputes
+ * `footprintOverlapAmong`/the dep-wait gate internally.
+ *
+ * D1/D4 (docs/history/merge-list-tree-bottleneck-priority/CONTEXT.md):
+ * `mergeReadiness`'s own return shape is NEVER touched by this function —
+ * a separate, additive view over the same computed buckets, meant to be
+ * composed by a caller (`bin/fgos.mjs`'s `merge list` sub-verb) as
+ * `{ ...mergeReadiness(...), tree: mergeTree(...) }`, never spread INTO
+ * `mergeReadiness`'s own object. Four existing tests in this module's own
+ * test file do an exact `assert.deepEqual` against `mergeReadiness`'s full
+ * return shape — adding a field there directly would break them.
+ *
+ * D2: every id `mergeReadiness` surfaces in ANY bucket (`ready`, `waiting`,
+ * `blockedOnSync`, every id inside a `footprint-overlap` `mergeSets` entry,
+ * `supersededOut`) gets a node here — never just `ready`. A `shared-root`
+ * `mergeSets` entry is informational only (its items are already in
+ * `ready`) and adds no separate status.
+ *
+ * D3: every nesting level — the top-level root set AND every parent's own
+ * children group — is sorted by the SAME order `mergeReadiness` already
+ * uses for `ready` (`rankImpact`'s `blocks` descending, tie-broken by
+ * `goalTier` then id), never a bespoke per-level sort.
+ *
+ * D7: a blocked/conflicted node carries a `reason` string naming the
+ * specific cause and counterpart item, not just a bare status word.
+ *
+ * Nesting needs more than the direct candidate ids: a leaf's own immediate
+ * parent is very often NOT itself a merge candidate — a decomposed root/
+ * intermediate item never merges itself (`cleanup-harness.mjs`'s own
+ * "decompose-into-children never itself merges"), so it never appears in
+ * any of `mergeReadiness`'s buckets — but it still has to exist as a node
+ * for its children to nest under, or the tree cannot show "child merges
+ * into parent" at all. This function walks each candidate's `parent`
+ * chain and materializes those real ancestors as plain container nodes
+ * (`status: 'container'`, no `reason`) — real items, just not themselves
+ * proposed for merge right now. An ancestor id not itself present in
+ * `view.work` (a dangling/stale `parent` reference) stops the walk there
+ * and the child surfaces at the top level instead of being silently
+ * dropped — the same "never hide" principle D2 already established.
+ */
+export function mergeTree(view, readiness, opts = {}) {
+  const work = view?.work ?? {};
+  const drift = opts.drift ?? {};
+
+  const statusById = new Map();
+  for (const id of readiness.waiting) statusById.set(id, { status: 'waiting' });
+  for (const id of readiness.blockedOnSync) {
+    const root = resolveRoot(view, id);
+    const d = drift[root];
+    statusById.set(id, {
+      status: 'blocked-sync',
+      reason: d
+        ? `root cần sync: ${d.branch} lệch ${d.aheadOfTarget} ahead / ${d.behindTarget} behind ${d.target}`
+        : 'root cần sync',
+    });
+  }
+  for (const set of readiness.mergeSets) {
+    if (set.reason !== 'footprint-overlap') continue;
+    for (const id of set.items) {
+      const conflict = readiness.conflicts.find((c) => c.a === id || c.b === id);
+      const counterpart = conflict ? (conflict.a === id ? conflict.b : conflict.a) : null;
+      const sharedFiles = conflict?.shared?.length ? conflict.shared.join(', ') : null;
+      statusById.set(id, {
+        status: 'conflicted',
+        reason: counterpart
+          ? `conflict với ${counterpart}${sharedFiles ? ` qua ${sharedFiles}` : ''}`
+          : 'footprint conflict',
+      });
+    }
+  }
+  for (const id of readiness.supersededOut) {
+    const target = work[id]?.supersededBy;
+    statusById.set(id, {
+      status: 'superseded',
+      reason: target ? `superseded bởi ${target}` : 'superseded',
+    });
+  }
+  // `ready` last -- mergeReadiness's own membership rule already keeps
+  // `ready` disjoint from every exclusion bucket above, so plain
+  // assignment here never overwrites a real blocked/conflicted status.
+  for (const id of readiness.ready) statusById.set(id, { status: 'ready' });
+
+  const nodeIds = new Set(statusById.keys());
+  for (const id of statusById.keys()) {
+    let current = work[id];
+    const seen = new Set([id]); // cycle guard against a malformed parent loop
+    while (current?.parent && work[current.parent] && !seen.has(current.parent)) {
+      nodeIds.add(current.parent);
+      seen.add(current.parent);
+      current = work[current.parent];
+    }
+  }
+
+  const rankedIds = rankImpact(view).map((row) => row.id);
+  const orderByRank = (ids) => rankedIds.filter((id) => ids.includes(id));
+
+  const childrenByParent = new Map();
+  const topLevelIds = [];
+  for (const id of nodeIds) {
+    const parentId = work[id]?.parent;
+    if (parentId && work[parentId] && nodeIds.has(parentId)) {
+      if (!childrenByParent.has(parentId)) childrenByParent.set(parentId, []);
+      childrenByParent.get(parentId).push(id);
+    } else {
+      topLevelIds.push(id);
+    }
+  }
+
+  const buildNode = (id) => {
+    const info = statusById.get(id) ?? { status: 'container' };
+    const kids = childrenByParent.get(id) ?? [];
+    return {
+      id,
+      title: work[id]?.title ?? id,
+      ...info,
+      children: orderByRank(kids).map(buildNode),
+    };
+  };
+
+  return orderByRank(topLevelIds).map(buildNode);
+}
