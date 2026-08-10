@@ -312,16 +312,21 @@ analysis to bound the blast radius of regardless of index freshness.
 
 | Component | How risky | What would prove it |
 |---|---|---|
-| Local-first-fallback retry logic in each Gate section's `node -e` script | **medium** | manual exercise per `plan.md`'s own draft verify (§ below): stub an older worktree-local copy of `gate-bypass.mjs` missing a given export, confirm the check falls back to `$root`'s copy instead of throwing, for at least the `validateApprove` case `tsk-5lr` actually hit |
-| Self-referential case preserved (an item editing `gate-bypass.mjs` itself still sees its own branch's new export first) | **medium** | manual exercise: stub a worktree-local `gate-bypass.mjs` whose export *differs* from `$root`'s (not just missing) and confirm the local version wins — this is the one behavior D7 exists specifically to protect, so it needs its own explicit proof, not incidental coverage |
+| Local-first-fallback retry logic in each Gate section's `node -e` script | **medium** | proven empirically by `fgos-validating` (see Feasibility matrix below), reproducible: `node -e` from inside a fixture worktree whose local `gate-bypass.mjs` is missing the export correctly falls back to `$root`'s copy instead of throwing |
+| Self-referential case preserved (an item editing `gate-bypass.mjs` itself still sees its own branch's new export first) | **medium** | proven empirically, same run: `node -e` from inside a fixture worktree whose local `gate-bypass.mjs` carries its *own, different* export correctly uses the local one over `$root`'s — this is the one behavior D7 exists specifically to protect |
+| Implementation must stay inline `node -e`, never a separate `.mjs` file | **medium** | proven empirically: the identical fallback logic, run as a separate file instead of a `node -e` string, silently resolves `'./src/state/...'` against the file's own location instead of `process.cwd()` — breaks the self-referential case with no error, while the stale-branch case still "passes" by coincidence. Documented above in Shape as a hard constraint for whoever implements this. |
 | `test/skills/fgos-mirror.test.mjs` byte-identity across all three skills' `.claude/`/`.agents/` copies | low | already-existing, currently-green test; `npm test` (the item's own verify) already runs it — no new proof needed, just don't forget the mirror edit |
 | `src/state/gate-bypass.mjs`/`store.mjs` themselves stay untouched (D7's explicit constraint) | low | verify's NEGATIVE clause: `! git diff --name-only main...HEAD \| grep -qE '^src/state/(gate-bypass\|store)\.mjs$'` |
 
-The two medium entries (fallback-retry correctness, self-referential
-preservation) are the real proof points for `fgos-validating` — both are
-manual/exercised rather than unit-testable, since the risk lives in
-shell-snippet prose, not in `gate-bypass.mjs` code that already has
-`test/state/gate-bypass.test.mjs` coverage.
+The three medium entries (fallback-retry correctness, self-referential
+preservation, inline-`node -e` constraint) are the real proof points this
+feature's own precedent (Pieces 1-3) called for at `fgos-validating` — all
+three were exercised empirically during this validating pass itself
+(command run, real output captured) rather than left as "should work",
+since the risk lives in shell-snippet prose that has no unit-test surface
+of its own, unlike `gate-bypass.mjs`'s existing `canAutoApprove`/
+`canAutoApproveValidate` (already covered by `test/state/
+gate-bypass.test.mjs`).
 
 ### Shape
 
@@ -341,6 +346,29 @@ needs [...falls back to \$root when it doesn't]" line to `fgos-validating`'s
 Gate section too, matching `fgos-exploring`'s/`fgos-planning`'s own Gate
 sections — currently the one of the three missing that context for a future
 reader.
+
+**Hard implementation constraint, found empirically during `fgos-validating`'s
+reality-gate pass (not a guess):** the fallback logic must stay inline as
+the `node -e "..."` argument's own string content — never extracted into a
+separate `.mjs` script file invoked as `node script.mjs`, even one that
+looks byte-identical. Node's ESM import resolution treats a relative
+specifier (`'./src/state/gate-bypass.mjs'`) differently depending on how
+the code runs: inside a `node -e` eval string it resolves against
+`process.cwd()` (the worktree, when the script is invoked from inside one)
+— this is the mechanism the whole feature already depends on. Inside a
+`.mjs` file loaded via `node <path>`, the identical specifier instead
+resolves against *that file's own location on disk*, never the process's
+cwd. Reproduced directly (`/tmp/.../tsk-1vi-proof/probe.mjs`, same
+resolve-local-else-fallback logic verbatim, run against a worktree fixture
+carrying its own new `canAutoApproveValidate`): as `node -e` from inside
+the worktree, local correctly wins (`{"source":"local","result":
+"worktree-IN-PROGRESS-canAutoApproveValidate"}`); as a separate `.mjs`
+file invoked the same way, it silently resolves to `$root` instead
+(`{"source":"root", ...}`) — the self-referential case breaks with no
+error, no crash, nothing to notice in review, because the stale-branch
+case (Case A) still "passes" by coincidence either way. Whoever implements
+this piece must keep the fallback logic as the literal string handed to
+`node -e`, not refactor it into a shared helper file for readability.
 
 Files touched: `.claude/skills/fgos-exploring/SKILL.md`,
 `.claude/skills/fgos-planning/SKILL.md`,
