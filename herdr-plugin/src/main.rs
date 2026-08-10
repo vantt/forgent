@@ -1,5 +1,9 @@
 use std::io;
+use std::path::Path;
+use std::process::Command;
 use std::time::{Duration, Instant};
+
+use serde::Deserialize;
 
 use herdr_fgos::app::{App, Panel};
 use herdr_fgos::fgos::{self, FgosCliSource};
@@ -108,6 +112,7 @@ fn main() -> io::Result<()> {
         &mut app,
         source.as_ref().map(|s| s as &dyn WorkItemSource),
         pane_registry.as_ref().map(|r| r as &dyn PaneRegistry),
+        root.as_deref().ok(),
         &pane_orchestrator,
         POLL_INTERVAL,
     );
@@ -122,6 +127,13 @@ fn run(
     app: &mut App,
     source: Option<&dyn WorkItemSource>,
     registry: Option<&dyn PaneRegistry>,
+    // The main fgOS checkout root (tsk-45u D1's already-resolved root,
+    // threaded in rather than re-resolved every tick). `None` outside a
+    // real herdr-managed pane (dev/test) — same degrade-gracefully shape
+    // `source`/`registry` above already use. Needed for the
+    // auto-merge/retro/cleanup launcher's own settings read and
+    // retro-vs-cleanup priority check (tsk-57q).
+    root: Option<&Path>,
     pane_orchestrator: &impl PaneOrchestrator,
     poll_interval: Duration,
 ) -> io::Result<()> {
@@ -305,7 +317,232 @@ fn run(
             if let Some(registry) = registry {
                 app.refresh_pane_state(registry);
             }
+            // tsk-57q: same tick, so the guard check and the launch it
+            // gates never straddle two ticks (poll-tick race risk row,
+            // plan.md). `None` for either `root`/`registry` (outside a
+            // real herdr-managed pane, e.g. local dev/test) skips this
+            // entirely — same degrade-gracefully shape the two refreshes
+            // above already use.
+            if let (Some(root), Some(registry)) = (root, registry) {
+                auto_launch_operation_panes(app, root, registry, pane_orchestrator);
+            }
             last_poll = Instant::now();
+        }
+    }
+}
+
+/// Fail-closed read of `.fgos/config.json`'s `herdrOrchestrator` section
+/// (tsk-57q) — read directly here rather than through a shared settings
+/// module (`tsk-2m5`'s own settings-source item, not yet landed on this
+/// branch at the time this was written): a missing file, missing
+/// section, any missing/malformed field, or a parse failure all resolve
+/// to every toggle OFF, the same fail-closed convention `gate-bypass.mjs`
+/// already uses for this exact shape of on/off config
+/// (`src/config/shared-config-file.mjs`). Activates for real the moment
+/// `tsk-2m5` lands its actual write-side — no further change needed here.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+struct HerdrOrchestratorToggles {
+    auto_merge: bool,
+    auto_retro: bool,
+    auto_cleanup: bool,
+}
+
+fn read_herdr_orchestrator_toggles(root: &Path) -> HerdrOrchestratorToggles {
+    let Ok(raw) = std::fs::read_to_string(root.join(".fgos/config.json")) else {
+        return HerdrOrchestratorToggles::default();
+    };
+    let Ok(value) = serde_json::from_str::<serde_json::Value>(&raw) else {
+        return HerdrOrchestratorToggles::default();
+    };
+    // `serde_json::Value`'s `Index` impl returns a static `Null` for a
+    // missing key rather than panicking, so an absent `herdrOrchestrator`
+    // section (or an absent field inside it) falls straight through to
+    // `as_bool()`'s own `None` -> `unwrap_or(false)` below — no separate
+    // "section missing" branch needed.
+    let section = &value["herdrOrchestrator"];
+    HerdrOrchestratorToggles {
+        auto_merge: section["autoMerge"].as_bool().unwrap_or(false),
+        auto_retro: section["autoRetro"].as_bool().unwrap_or(false),
+        auto_cleanup: section["autoCleanup"].as_bool().unwrap_or(false),
+    }
+}
+
+/// Which loop belongs in the right (retro/cleanup) slot of the fixed
+/// `fg:operation` tab right now (tsk-57q).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum RightPaneLoop {
+    Retro,
+    Cleanup,
+}
+
+#[derive(Debug, Deserialize)]
+struct ListWorkItemForPriority {
+    status: String,
+    priority: Option<i64>,
+}
+
+#[derive(Debug, Deserialize)]
+struct ListWorkDataForPriority {
+    work: std::collections::HashMap<String, ListWorkItemForPriority>,
+}
+
+#[derive(Debug, Deserialize)]
+struct ListEnvelopeForPriority {
+    data: ListWorkDataForPriority,
+}
+
+/// Decides which of the two right-pane loops has the more urgent ready
+/// work (tsk-57q's own "alternating by priority", never a hardcoded
+/// order): shells to `fgos list --all --json` (the same CLI-JSON idiom
+/// `fgos.rs`'s own fetch functions already use, mirrored here rather
+/// than reused since `fgos.rs` is not part of this item's own footprint)
+/// and compares each pool's own top (lowest-number) `priority` field —
+/// ascending scale, smaller number = higher priority
+/// (`src/state/priority-formula.mjs`, confirmed via `fgos.rs`'s own
+/// `TriageRow.priority` doc comment). `None` when neither pool has ready
+/// work, or the call/parse fails (fail-closed — never launches on
+/// unreadable state).
+fn pick_right_pane_loop(root: &Path) -> Option<RightPaneLoop> {
+    let fgos_mjs = root.join("bin/fgos.mjs");
+    let output = Command::new("node")
+        .args([
+            fgos_mjs.to_string_lossy().as_ref(),
+            "list",
+            "--all",
+            "--json",
+            "--dir",
+            root.to_string_lossy().as_ref(),
+        ])
+        .output()
+        .ok()?;
+    if !output.status.success() {
+        return None;
+    }
+    let envelope: ListEnvelopeForPriority = serde_json::from_slice(&output.stdout).ok()?;
+
+    let top_priority = |status: &str| -> Option<i64> {
+        envelope
+            .data
+            .work
+            .values()
+            .filter(|item| item.status == status)
+            .map(|item| item.priority.unwrap_or(i64::MAX))
+            .min()
+    };
+
+    choose_right_pane_loop(top_priority("retrospective"), top_priority("cleanup"))
+}
+
+/// Pure comparison `pick_right_pane_loop` above dispatches on — isolated
+/// so the "alternating by priority" decision stays unit-testable without
+/// a real `fgos` subprocess/store. Ascending scale: smaller number =
+/// higher priority (`src/state/priority-formula.mjs`). A pool with no
+/// ready item at all (`None`) never wins over one that has any.
+fn choose_right_pane_loop(
+    retro_top_priority: Option<i64>,
+    cleanup_top_priority: Option<i64>,
+) -> Option<RightPaneLoop> {
+    match (retro_top_priority, cleanup_top_priority) {
+        (Some(retro), Some(cleanup)) => Some(if cleanup < retro {
+            RightPaneLoop::Cleanup
+        } else {
+            RightPaneLoop::Retro
+        }),
+        (Some(_), None) => Some(RightPaneLoop::Retro),
+        (None, Some(_)) => Some(RightPaneLoop::Cleanup),
+        (None, None) => None,
+    }
+}
+
+/// The auto-merge/retro/cleanup launcher itself (tsk-57q): for each
+/// enabled toggle, guard-checks the fixed pane title, then launches —
+/// never queues, never double-launches (an unreadable guard check fails
+/// closed toward "treat as already running", i.e. skip the launch,
+/// never toward "launch anyway"). Left pane is always merge-loop; right
+/// pane alternates between retro-loop/cleanup-loop by priority
+/// (`pick_right_pane_loop` above). A `None` fixed pane id (outside a
+/// live herdr session, or `ensure_operation_tab` failed at startup) is a
+/// no-op for that slot.
+/// Which of the three loops (if any) to actually launch this tick —
+/// isolated as a pure decision so it stays unit-testable against fixed
+/// inputs, the same separation `layout.rs`'s `find_operation_tab`/
+/// `left_right_panes` already use for the same reason.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+struct AutoOperationTabLaunches {
+    merge: bool,
+    retro: bool,
+    cleanup: bool,
+}
+
+/// Pure decision `auto_launch_operation_panes` below dispatches on
+/// (tsk-57q): given already-resolved toggles, which loop currently owns
+/// the right pane's priority slot, and whether each fixed guard title is
+/// already live, decides which loops to launch. Never queues, never
+/// double-launches — a title already live for a toggle that's on is
+/// `false` here, not retried.
+fn decide_auto_operation_tab_launches(
+    toggles: HerdrOrchestratorToggles,
+    right_pane_loop: Option<RightPaneLoop>,
+    merge_already_running: bool,
+    retro_already_running: bool,
+    cleanup_already_running: bool,
+) -> AutoOperationTabLaunches {
+    AutoOperationTabLaunches {
+        merge: toggles.auto_merge && !merge_already_running,
+        retro: toggles.auto_retro
+            && right_pane_loop == Some(RightPaneLoop::Retro)
+            && !retro_already_running,
+        cleanup: toggles.auto_cleanup
+            && right_pane_loop == Some(RightPaneLoop::Cleanup)
+            && !cleanup_already_running,
+    }
+}
+
+/// The auto-merge/retro/cleanup launcher itself (tsk-57q): gathers the
+/// real settings/guard/priority state (all impure I/O — file read,
+/// subprocess, herdr pane scan) and hands it to the pure
+/// `decide_auto_operation_tab_launches` above, then acts on the result.
+/// Guard-check and launch happen synchronously within this one call —
+/// this function only ever runs once per poll tick (`run`'s own tick
+/// block above), so a launch decision is never stale by the time it acts
+/// on it (poll-tick race risk row, plan.md). A `None` fixed pane id
+/// (outside a live herdr session, or `ensure_operation_tab` failed at
+/// startup) is a no-op for that slot. An unreadable guard check
+/// (`has_labeled_pane` erroring) fails closed toward "treat as already
+/// running", i.e. skip the launch, never toward "launch anyway".
+fn auto_launch_operation_panes(
+    app: &App,
+    root: &Path,
+    registry: &dyn PaneRegistry,
+    pane_orchestrator: &impl PaneOrchestrator,
+) {
+    let toggles = read_herdr_orchestrator_toggles(root);
+    let right_pane_loop = pick_right_pane_loop(root);
+    let merge_already_running = registry.has_labeled_pane("fgos-auto-merge").unwrap_or(true);
+    let retro_already_running = registry.has_labeled_pane("fgos-auto-retro").unwrap_or(true);
+    let cleanup_already_running = registry.has_labeled_pane("fgos-auto-cleanup").unwrap_or(true);
+
+    let launches = decide_auto_operation_tab_launches(
+        toggles,
+        right_pane_loop,
+        merge_already_running,
+        retro_already_running,
+        cleanup_already_running,
+    );
+
+    if launches.merge {
+        if let Some(left_pane) = &app.operation_left_pane_id {
+            let _ = pane_orchestrator.launch_merge_loop(left_pane);
+        }
+    }
+    if launches.retro {
+        if let Some(right_pane) = &app.operation_right_pane_id {
+            let _ = pane_orchestrator.launch_retro_loop(right_pane);
+        }
+    }
+    if launches.cleanup {
+        if let Some(right_pane) = &app.operation_right_pane_id {
+            let _ = pane_orchestrator.launch_cleanup_loop(right_pane);
         }
     }
 }
@@ -355,6 +592,10 @@ mod tests {
             self.calls.set(self.calls.get() + 1);
             Ok(HashMap::new())
         }
+
+        fn has_labeled_pane(&self, _label: &str) -> Result<bool, PaneScanError> {
+            Ok(false)
+        }
     }
 
     struct NoopPaneOrchestrator;
@@ -369,6 +610,18 @@ mod tests {
         }
 
         fn focus_pane(&self, _pane_id: &str) -> io::Result<()> {
+            Ok(())
+        }
+
+        fn launch_merge_loop(&self, _pane_id: &str) -> io::Result<()> {
+            Ok(())
+        }
+
+        fn launch_retro_loop(&self, _pane_id: &str) -> io::Result<()> {
+            Ok(())
+        }
+
+        fn launch_cleanup_loop(&self, _pane_id: &str) -> io::Result<()> {
             Ok(())
         }
     }
@@ -392,14 +645,30 @@ mod tests {
             self.focused.borrow_mut().push(pane_id.to_string());
             Ok(())
         }
+
+        fn launch_merge_loop(&self, _pane_id: &str) -> io::Result<()> {
+            Ok(())
+        }
+
+        fn launch_retro_loop(&self, _pane_id: &str) -> io::Result<()> {
+            Ok(())
+        }
+
+        fn launch_cleanup_loop(&self, _pane_id: &str) -> io::Result<()> {
+            Ok(())
+        }
     }
 
     /// Records every work-item id it was asked to open a pick or discover
     /// pane for, so a test can assert each button fires exactly once, on
-    /// the second Enter/`d` respectively (tsk-1e3).
+    /// the second Enter/`d` respectively (tsk-1e3). Also records every
+    /// fixed-pane loop it was asked to launch (tsk-57q).
     struct RecordingPickOrchestrator {
         picked: std::cell::RefCell<Vec<String>>,
         discovered: std::cell::RefCell<Vec<String>>,
+        merge_launched: std::cell::RefCell<Vec<String>>,
+        retro_launched: std::cell::RefCell<Vec<String>>,
+        cleanup_launched: std::cell::RefCell<Vec<String>>,
     }
 
     impl PaneOrchestrator for RecordingPickOrchestrator {
@@ -414,6 +683,21 @@ mod tests {
         }
 
         fn focus_pane(&self, _pane_id: &str) -> io::Result<()> {
+            Ok(())
+        }
+
+        fn launch_merge_loop(&self, pane_id: &str) -> io::Result<()> {
+            self.merge_launched.borrow_mut().push(pane_id.to_string());
+            Ok(())
+        }
+
+        fn launch_retro_loop(&self, pane_id: &str) -> io::Result<()> {
+            self.retro_launched.borrow_mut().push(pane_id.to_string());
+            Ok(())
+        }
+
+        fn launch_cleanup_loop(&self, pane_id: &str) -> io::Result<()> {
+            self.cleanup_launched.borrow_mut().push(pane_id.to_string());
             Ok(())
         }
     }
@@ -550,9 +834,12 @@ mod tests {
         let pane_orchestrator = RecordingPickOrchestrator {
             picked: std::cell::RefCell::new(Vec::new()),
             discovered: std::cell::RefCell::new(Vec::new()),
+            merge_launched: std::cell::RefCell::new(Vec::new()),
+            retro_launched: std::cell::RefCell::new(Vec::new()),
+            cleanup_launched: std::cell::RefCell::new(Vec::new()),
         };
 
-        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, None, &pane_orchestrator, Duration::ZERO)
             .expect("run should exit cleanly on Quit");
 
         assert_eq!(*pane_orchestrator.picked.borrow(), vec!["tsk-a".to_string()]);
@@ -588,9 +875,12 @@ mod tests {
         let pane_orchestrator = RecordingPickOrchestrator {
             picked: std::cell::RefCell::new(Vec::new()),
             discovered: std::cell::RefCell::new(Vec::new()),
+            merge_launched: std::cell::RefCell::new(Vec::new()),
+            retro_launched: std::cell::RefCell::new(Vec::new()),
+            cleanup_launched: std::cell::RefCell::new(Vec::new()),
         };
 
-        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, None, &pane_orchestrator, Duration::ZERO)
             .expect("run should exit cleanly on Quit");
 
         // A miss (n=0) returns `Ok(None)` -- no event at all this tick,
@@ -629,7 +919,7 @@ mod tests {
         assert_eq!(app.active_tab, herdr_fgos::app::WorkTab::Todo);
         let pane_orchestrator = NoopPaneOrchestrator;
 
-        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, None, &pane_orchestrator, Duration::ZERO)
             .expect("run should exit cleanly on Quit");
 
         assert_eq!(
@@ -670,7 +960,7 @@ mod tests {
         let mut app = App::empty();
         let pane_orchestrator = NoopPaneOrchestrator;
 
-        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, None, &pane_orchestrator, Duration::ZERO)
             .expect("run should exit cleanly on Quit");
 
         assert_eq!(app.filter_query, "ab");
@@ -707,7 +997,7 @@ mod tests {
         let mut app = App::empty();
         let pane_orchestrator = NoopPaneOrchestrator;
 
-        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, None, &pane_orchestrator, Duration::ZERO)
             .expect("run should exit cleanly on Quit");
 
         assert_eq!(app.filter_query, "");
@@ -799,7 +1089,7 @@ mod tests {
             focused: std::cell::RefCell::new(Vec::new()),
         };
 
-        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, None, &pane_orchestrator, Duration::ZERO)
             .expect("run should exit cleanly on Quit");
 
         assert_eq!(app.focused_panel, Panel::InProcess);
@@ -820,7 +1110,7 @@ mod tests {
             focused: std::cell::RefCell::new(Vec::new()),
         };
 
-        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, None, &pane_orchestrator, Duration::ZERO)
             .expect("run should exit cleanly on Quit");
 
         assert!(pane_orchestrator.focused.borrow().is_empty());
@@ -845,9 +1135,12 @@ mod tests {
         let pane_orchestrator = RecordingPickOrchestrator {
             picked: std::cell::RefCell::new(Vec::new()),
             discovered: std::cell::RefCell::new(Vec::new()),
+            merge_launched: std::cell::RefCell::new(Vec::new()),
+            retro_launched: std::cell::RefCell::new(Vec::new()),
+            cleanup_launched: std::cell::RefCell::new(Vec::new()),
         };
 
-        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, None, &pane_orchestrator, Duration::ZERO)
             .expect("run should exit cleanly on Quit");
 
         assert_eq!(*pane_orchestrator.picked.borrow(), vec!["tsk-a".to_string()]);
@@ -877,9 +1170,12 @@ mod tests {
         let pane_orchestrator = RecordingPickOrchestrator {
             picked: std::cell::RefCell::new(Vec::new()),
             discovered: std::cell::RefCell::new(Vec::new()),
+            merge_launched: std::cell::RefCell::new(Vec::new()),
+            retro_launched: std::cell::RefCell::new(Vec::new()),
+            cleanup_launched: std::cell::RefCell::new(Vec::new()),
         };
 
-        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, None, &pane_orchestrator, Duration::ZERO)
             .expect("run should exit cleanly on Quit");
 
         assert_eq!(*pane_orchestrator.discovered.borrow(), vec!["tsk-a".to_string()]);
@@ -912,9 +1208,12 @@ mod tests {
         let pane_orchestrator = RecordingPickOrchestrator {
             picked: std::cell::RefCell::new(Vec::new()),
             discovered: std::cell::RefCell::new(Vec::new()),
+            merge_launched: std::cell::RefCell::new(Vec::new()),
+            retro_launched: std::cell::RefCell::new(Vec::new()),
+            cleanup_launched: std::cell::RefCell::new(Vec::new()),
         };
 
-        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, None, &pane_orchestrator, Duration::ZERO)
             .expect("run should exit cleanly on Quit");
 
         assert!(pane_orchestrator.discovered.borrow().is_empty());
@@ -941,7 +1240,7 @@ mod tests {
         app.select_next();
         let pane_orchestrator = NoopPaneOrchestrator;
 
-        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, None, &pane_orchestrator, Duration::ZERO)
             .expect("run should exit cleanly on Quit");
 
         assert_eq!(
@@ -966,6 +1265,7 @@ mod tests {
             &mut app,
             Some(&source),
             Some(&registry),
+            None,
             &pane_orchestrator,
             Duration::ZERO,
         )
@@ -987,6 +1287,7 @@ mod tests {
             &mut app,
             Some(&source),
             None,
+            None,
             &pane_orchestrator,
             Duration::ZERO,
         )
@@ -995,5 +1296,297 @@ mod tests {
         // fgos refresh still fires; pane refresh has nothing to call.
         assert_eq!(source.calls.get(), 1);
         assert!(app.last_error.is_none());
+    }
+
+    // --- tsk-57q: auto-merge/retro/cleanup launcher --------------------
+    // Named with the literal substring `auto_operation_tab` throughout —
+    // the item's own recorded verify (`cargo test auto_operation_tab`)
+    // filters by substring match on the full test path (plan.md).
+
+    fn all_off() -> HerdrOrchestratorToggles {
+        HerdrOrchestratorToggles::default()
+    }
+
+    fn all_on() -> HerdrOrchestratorToggles {
+        HerdrOrchestratorToggles {
+            auto_merge: true,
+            auto_retro: true,
+            auto_cleanup: true,
+        }
+    }
+
+    #[test]
+    fn auto_operation_tab_decision_stays_off_for_every_loop_when_every_toggle_is_off() {
+        let launches = decide_auto_operation_tab_launches(
+            all_off(),
+            Some(RightPaneLoop::Retro),
+            false,
+            false,
+            false,
+        );
+        assert_eq!(launches, AutoOperationTabLaunches::default());
+    }
+
+    #[test]
+    fn auto_operation_tab_decision_launches_merge_when_toggle_on_and_pane_not_already_running() {
+        let launches = decide_auto_operation_tab_launches(all_on(), None, false, true, true);
+        assert!(launches.merge);
+    }
+
+    #[test]
+    fn auto_operation_tab_decision_skips_merge_when_the_guard_pane_is_already_live() {
+        // Also stands in for "two poll ticks close together never
+        // produce two panes for the same guard title" (plan.md): the
+        // second tick reads `merge_already_running: true` (the first
+        // tick's own launch having registered by then) and must decide
+        // the same way as any other already-live guard.
+        let launches = decide_auto_operation_tab_launches(all_on(), None, true, true, true);
+        assert!(!launches.merge);
+    }
+
+    #[test]
+    fn auto_operation_tab_decision_only_launches_retro_when_it_is_also_the_priority_winner() {
+        let retro_wins = decide_auto_operation_tab_launches(
+            all_on(),
+            Some(RightPaneLoop::Retro),
+            true,
+            false,
+            false,
+        );
+        assert!(retro_wins.retro);
+        assert!(!retro_wins.cleanup);
+
+        let cleanup_wins = decide_auto_operation_tab_launches(
+            all_on(),
+            Some(RightPaneLoop::Cleanup),
+            true,
+            false,
+            false,
+        );
+        assert!(!cleanup_wins.retro);
+        assert!(cleanup_wins.cleanup);
+    }
+
+    #[test]
+    fn auto_operation_tab_decision_skips_retro_and_cleanup_launch_when_neither_pool_has_ready_work()
+    {
+        let launches =
+            decide_auto_operation_tab_launches(all_on(), None, true, false, false);
+        assert!(!launches.retro);
+        assert!(!launches.cleanup);
+    }
+
+    #[test]
+    fn auto_operation_tab_decision_skips_the_priority_winner_when_its_own_toggle_is_off() {
+        let toggles = HerdrOrchestratorToggles {
+            auto_merge: false,
+            auto_retro: false,
+            auto_cleanup: true,
+        };
+        // Retro wins priority, but auto_retro is off — must stay off.
+        let launches = decide_auto_operation_tab_launches(
+            toggles,
+            Some(RightPaneLoop::Retro),
+            true,
+            false,
+            false,
+        );
+        assert!(!launches.retro);
+        assert!(!launches.cleanup);
+    }
+
+    #[test]
+    fn auto_operation_tab_priority_prefers_the_lower_number_pool() {
+        // Ascending scale: smaller number = higher priority.
+        assert_eq!(choose_right_pane_loop(Some(100), Some(200)), Some(RightPaneLoop::Retro));
+        assert_eq!(choose_right_pane_loop(Some(200), Some(100)), Some(RightPaneLoop::Cleanup));
+    }
+
+    #[test]
+    fn auto_operation_tab_priority_falls_back_to_whichever_pool_has_any_ready_work() {
+        assert_eq!(choose_right_pane_loop(Some(100), None), Some(RightPaneLoop::Retro));
+        assert_eq!(choose_right_pane_loop(None, Some(100)), Some(RightPaneLoop::Cleanup));
+    }
+
+    #[test]
+    fn auto_operation_tab_priority_is_none_when_neither_pool_has_ready_work() {
+        assert_eq!(choose_right_pane_loop(None, None), None);
+    }
+
+    // `tag` alone already disambiguates every call site below (each uses
+    // its own literal, never reused); `process::id()` only additionally
+    // guards against two full test-binary runs racing on the same tmp
+    // dir (e.g. a retry) — not needed against parallel tests within one
+    // run, since no two tests here share a tag.
+    fn unique_temp_root(tag: &str) -> std::path::PathBuf {
+        let dir = std::env::temp_dir().join(format!(
+            "herdr-fgos-auto-operation-tab-test-{tag}-{}",
+            std::process::id()
+        ));
+        std::fs::create_dir_all(dir.join(".fgos")).expect("create temp .fgos dir");
+        dir
+    }
+
+    #[test]
+    fn auto_operation_tab_toggles_default_off_when_config_file_is_missing() {
+        let root = unique_temp_root("missing-config");
+        // No `.fgos/config.json` written at all.
+        assert_eq!(read_herdr_orchestrator_toggles(&root), all_off());
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn auto_operation_tab_toggles_default_off_when_config_json_is_malformed() {
+        let root = unique_temp_root("malformed-config");
+        std::fs::write(root.join(".fgos/config.json"), "{ not valid json")
+            .expect("write malformed config");
+        assert_eq!(read_herdr_orchestrator_toggles(&root), all_off());
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn auto_operation_tab_toggles_default_off_when_the_herdr_orchestrator_section_is_absent() {
+        let root = unique_temp_root("no-section");
+        std::fs::write(root.join(".fgos/config.json"), r#"{"gateBypass":{"level":0}}"#)
+            .expect("write config without herdrOrchestrator");
+        assert_eq!(read_herdr_orchestrator_toggles(&root), all_off());
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn auto_operation_tab_toggles_default_off_for_a_field_missing_inside_the_section() {
+        let root = unique_temp_root("partial-section");
+        std::fs::write(
+            root.join(".fgos/config.json"),
+            r#"{"herdrOrchestrator":{"autoMerge":true}}"#,
+        )
+        .expect("write partial section");
+        let toggles = read_herdr_orchestrator_toggles(&root);
+        assert!(toggles.auto_merge);
+        assert!(!toggles.auto_retro);
+        assert!(!toggles.auto_cleanup);
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn auto_operation_tab_toggles_read_real_values_when_the_section_is_present() {
+        let root = unique_temp_root("full-section");
+        std::fs::write(
+            root.join(".fgos/config.json"),
+            r#"{"herdrOrchestrator":{"autoMerge":true,"autoRetro":false,"autoCleanup":true}}"#,
+        )
+        .expect("write full section");
+        assert_eq!(
+            read_herdr_orchestrator_toggles(&root),
+            HerdrOrchestratorToggles {
+                auto_merge: true,
+                auto_retro: false,
+                auto_cleanup: true,
+            }
+        );
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    struct StubOperationRegistry {
+        live_labels: std::collections::HashSet<&'static str>,
+    }
+
+    impl PaneRegistry for StubOperationRegistry {
+        fn scan(&self) -> Result<HashMap<String, PaneIdentity>, PaneScanError> {
+            Ok(HashMap::new())
+        }
+
+        fn has_labeled_pane(&self, label: &str) -> Result<bool, PaneScanError> {
+            Ok(self.live_labels.contains(label))
+        }
+    }
+
+    #[test]
+    fn auto_operation_tab_launcher_fires_merge_loop_into_the_left_pane_end_to_end() {
+        // Real settings read (from a real file), real guard check (via a
+        // stub registry reporting nothing live), real decision, real
+        // launch call — only the `fgos` subprocess `pick_right_pane_loop`
+        // shells out to is out of reach here (no real store at this temp
+        // root), so it fails closed to `None` and the right pane stays
+        // untouched; this test only asserts the left (merge) pane, which
+        // needs no such subprocess.
+        let root = unique_temp_root("end-to-end-merge");
+        std::fs::write(
+            root.join(".fgos/config.json"),
+            r#"{"herdrOrchestrator":{"autoMerge":true,"autoRetro":false,"autoCleanup":false}}"#,
+        )
+        .expect("write config");
+
+        let mut app = App::empty();
+        app.operation_left_pane_id = Some("wS:pOpL".to_string());
+        app.operation_right_pane_id = Some("wS:pOpR".to_string());
+
+        let registry = StubOperationRegistry {
+            live_labels: std::collections::HashSet::new(),
+        };
+        let pane_orchestrator = RecordingPickOrchestrator {
+            picked: std::cell::RefCell::new(Vec::new()),
+            discovered: std::cell::RefCell::new(Vec::new()),
+            merge_launched: std::cell::RefCell::new(Vec::new()),
+            retro_launched: std::cell::RefCell::new(Vec::new()),
+            cleanup_launched: std::cell::RefCell::new(Vec::new()),
+        };
+
+        auto_launch_operation_panes(&app, &root, &registry, &pane_orchestrator);
+
+        assert_eq!(*pane_orchestrator.merge_launched.borrow(), vec!["wS:pOpL".to_string()]);
+        assert!(pane_orchestrator.retro_launched.borrow().is_empty());
+        assert!(pane_orchestrator.cleanup_launched.borrow().is_empty());
+
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn auto_operation_tab_launcher_never_double_launches_merge_across_two_ticks() {
+        // The concrete "two poll ticks close together" case (plan.md),
+        // exercised through the real launcher function this time rather
+        // than the pure decision fn alone: tick 2's registry reports the
+        // fixed title as already live (as a real herdr scan would once
+        // tick 1's launch registers), and must not fire again.
+        let root = unique_temp_root("no-double-launch");
+        std::fs::write(
+            root.join(".fgos/config.json"),
+            r#"{"herdrOrchestrator":{"autoMerge":true,"autoRetro":false,"autoCleanup":false}}"#,
+        )
+        .expect("write config");
+
+        let mut app = App::empty();
+        app.operation_left_pane_id = Some("wS:pOpL".to_string());
+
+        let pane_orchestrator = RecordingPickOrchestrator {
+            picked: std::cell::RefCell::new(Vec::new()),
+            discovered: std::cell::RefCell::new(Vec::new()),
+            merge_launched: std::cell::RefCell::new(Vec::new()),
+            retro_launched: std::cell::RefCell::new(Vec::new()),
+            cleanup_launched: std::cell::RefCell::new(Vec::new()),
+        };
+
+        // Tick 1: nothing live yet.
+        let registry_tick_1 = StubOperationRegistry {
+            live_labels: std::collections::HashSet::new(),
+        };
+        auto_launch_operation_panes(&app, &root, &registry_tick_1, &pane_orchestrator);
+
+        // Tick 2: the fixed title is now live (the real launch from tick
+        // 1 having registered).
+        let mut registry_tick_2_labels = std::collections::HashSet::new();
+        registry_tick_2_labels.insert("fgos-auto-merge");
+        let registry_tick_2 = StubOperationRegistry {
+            live_labels: registry_tick_2_labels,
+        };
+        auto_launch_operation_panes(&app, &root, &registry_tick_2, &pane_orchestrator);
+
+        assert_eq!(
+            *pane_orchestrator.merge_launched.borrow(),
+            vec!["wS:pOpL".to_string()],
+            "tick 2 must not launch a second time"
+        );
+
+        let _ = std::fs::remove_dir_all(&root);
     }
 }

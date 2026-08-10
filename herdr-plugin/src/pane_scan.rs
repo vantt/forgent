@@ -94,6 +94,21 @@ pub fn parse_pane_list(json: &str) -> Result<HashMap<String, PaneIdentity>, serd
     Ok(map)
 }
 
+/// Second, additive guard check for a fixed, non-id-shaped pane title
+/// (tsk-57q's own `fgos-auto-merge`/`fgos-auto-retro`/`fgos-auto-cleanup`)
+/// — `parse_pane_list` above only ever returns id-shaped labels
+/// (`extract_task_id` rejects anything else outright), so a fixed literal
+/// title needs this separate exact-match check instead. `extract_task_id`
+/// itself is left untouched.
+pub fn pane_has_label(json: &str, label: &str) -> Result<bool, serde_json::Error> {
+    let envelope: PaneListEnvelope = serde_json::from_str(json)?;
+    Ok(envelope
+        .result
+        .panes
+        .iter()
+        .any(|pane| pane.label.as_deref() == Some(label)))
+}
+
 fn run_pane_list(herdr_bin: &str, workspace_id: &str) -> Result<String, PaneScanError> {
     let output = Command::new(herdr_bin)
         .args(["pane", "list", "--workspace", workspace_id])
@@ -123,6 +138,11 @@ impl PaneRegistry for HerdrPaneScanner {
     fn scan(&self) -> Result<HashMap<String, PaneIdentity>, PaneScanError> {
         let stdout = run_pane_list(&self.herdr_bin, &self.workspace_id)?;
         parse_pane_list(&stdout).map_err(PaneScanError::Parse)
+    }
+
+    fn has_labeled_pane(&self, label: &str) -> Result<bool, PaneScanError> {
+        let stdout = run_pane_list(&self.herdr_bin, &self.workspace_id)?;
+        pane_has_label(&stdout, label).map_err(PaneScanError::Parse)
     }
 }
 
@@ -202,5 +222,74 @@ mod tests {
         // mistaken for a task-id — mirrors pick.rs's own grammar tests.
         assert_eq!(extract_task_id("Reviewer | a.ssid:abc"), None);
         assert_eq!(extract_task_id(""), None);
+    }
+
+    // Fixture for the auto-merge/retro/cleanup launcher's own fixed-title
+    // guard (tsk-57q) — one pane carries exactly the fixed, non-id-shaped
+    // label `extract_task_id` would silently drop.
+    const FIXED_LABEL_PANE_LIST_FIXTURE: &str = r#"{"id":"cli:pane:list","result":{"panes":[
+        {"agent":"claude","agent_status":"working","cwd":"/x","focused":false,
+         "pane_id":"wS:pOpL","tab_id":"wS:tOp","workspace_id":"wS",
+         "label":"fgos-auto-merge"},
+        {"agent":"claude","agent_status":"idle","cwd":"/x","focused":false,
+         "pane_id":"wS:pOpR","tab_id":"wS:tOp","workspace_id":"wS"}
+    ],"type":"pane_list"}}"#;
+
+    #[test]
+    fn pane_has_label_finds_an_exact_fixed_title_match() {
+        assert!(
+            pane_has_label(FIXED_LABEL_PANE_LIST_FIXTURE, "fgos-auto-merge")
+                .expect("fixture should parse")
+        );
+    }
+
+    #[test]
+    fn pane_has_label_is_false_when_no_pane_carries_that_exact_title() {
+        assert!(
+            !pane_has_label(FIXED_LABEL_PANE_LIST_FIXTURE, "fgos-auto-retro")
+                .expect("fixture should parse")
+        );
+    }
+
+    #[test]
+    fn pane_has_label_ignores_panes_with_no_label_at_all() {
+        // wS:pOpR carries no label — must never be mistaken for a match.
+        assert!(
+            !pane_has_label(FIXED_LABEL_PANE_LIST_FIXTURE, "")
+                .expect("fixture should parse")
+        );
+    }
+
+    #[test]
+    fn is_valid_id_s_grammar_happens_to_accept_the_fixed_operation_titles_too() {
+        // Found while writing the test above: `is_valid_id`'s grammar
+        // (hyphen-joined lowercase-alnum segments, `pick.rs:47-67`) is
+        // not tied to any `tsk-`-style prefix, so `fgos-auto-merge` etc.
+        // structurally pass it — `extract_task_id` really does pick them
+        // up as if they were real work-item ids (next test). This is a
+        // pre-existing property of the shared id grammar, not something
+        // this item's own `pane_has_label` guard depends on or is
+        // affected by: it matches on the exact literal label regardless
+        // of shape. Documented here rather than silently worked around —
+        // changing the shared grammar to reserve these titles is a
+        // separate design call outside this item's own footprint.
+        assert!(crate::pick::is_valid_id("fgos-auto-merge"));
+        assert!(crate::pick::is_valid_id("fgos-auto-retro"));
+        assert!(crate::pick::is_valid_id("fgos-auto-cleanup"));
+    }
+
+    #[test]
+    fn pane_has_label_is_additive_even_though_extract_task_id_also_matches_these_titles() {
+        // Per the finding above, `parse_pane_list` (the id-shaped path)
+        // does surface these fixed titles too — `pane_has_label` is a
+        // second, independent check, never a replacement for it, and its
+        // own exact-match result does not depend on what
+        // `extract_task_id` decided.
+        let map = parse_pane_list(FIXED_LABEL_PANE_LIST_FIXTURE).expect("fixture should parse");
+        assert_eq!(map.len(), 1, "fgos-auto-merge parses as a (bogus) task id too");
+        assert!(
+            pane_has_label(FIXED_LABEL_PANE_LIST_FIXTURE, "fgos-auto-merge")
+                .expect("fixture should parse")
+        );
     }
 }

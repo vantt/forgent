@@ -1037,6 +1037,10 @@ mod tests {
         fn scan(&self) -> Result<HashMap<String, PaneIdentity>, crate::pane_scan::PaneScanError> {
             Ok(self.0.clone())
         }
+
+        fn has_labeled_pane(&self, _label: &str) -> Result<bool, crate::pane_scan::PaneScanError> {
+            Ok(false)
+        }
     }
 
     #[test]
