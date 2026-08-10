@@ -607,7 +607,13 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
   // recorded one). Rides on every non-invalid outcome, same fail-safe
   // try/catch discipline discovery.mjs's rough pass uses.
   try {
-    const impact = computeImpact({ blocks: rankImpact(view).find((r) => r.id === id)?.blocks ?? 0, blastRadius: verdict.blastRadius });
+    // tsk-1r3: semanticRelatedness explicit (not omitted) for parameter
+    // parity with discovery.mjs's rough pass -- always 0 at BOTH call
+    // sites today (discovery.mjs's own verdict.impactScore is never
+    // populated by the live callerVerdict path; decompose's own verdict
+    // shape has no equivalent field either), so this is a documentation/
+    // consistency fix, not a behavior change.
+    const impact = computeImpact({ blocks: rankImpact(view).find((r) => r.id === id)?.blocks ?? 0, semanticRelatedness: 0, blastRadius: verdict.blastRadius });
     const priority = computePriority({
       impact,
       urgent: work.urgent,
