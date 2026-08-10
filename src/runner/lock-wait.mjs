@@ -64,16 +64,30 @@ export async function withLockRetry(fn, { waitMs } = {}) {
         if (attempt > 0) err.message += ` -- waited ${elapsedMs}ms before giving up`;
         throw err;
       }
-      const delayMs = Math.min(BACKOFF_SCHEDULE_MS[Math.min(attempt, BACKOFF_SCHEDULE_MS.length - 1)], budgetMs - elapsedMs);
-      // tsk-2rf D4: once elapsed passes the point today's un-decoupled
-      // behavior would already have given up (the original remainingTtlMs
-      // snapshot), an extended wait needs its own feedback so it never
-      // looks like a silent hang. Gated on delayMs > 0 -- the exhaustion
-      // check above already bounds how close to budgetMs this gets, but
-      // the tail end of that window still produces near-zero delays on
-      // every loop iteration; printing on each of those would spam far
-      // more often than an actual backoff tick, not less.
-      if (delayMs > 0 && elapsedMs >= originalRemainingTtlMs) {
+      const scheduleDelayMs = BACKOFF_SCHEDULE_MS[Math.min(attempt, BACKOFF_SCHEDULE_MS.length - 1)];
+      const remainingBudgetMs = budgetMs - elapsedMs;
+      // tsk-mgb: once the backoff schedule's own budget is spent but we're
+      // still inside BOUNDARY_GRACE_MS (the exhaustion check above hasn't
+      // fired yet), sleep out exactly what's left of that grace window
+      // instead of the schedule-derived value, which goes negative here.
+      // `setTimeout` clamps a negative delay to ~0-1ms (Node's own
+      // TimeoutNegativeWarning), turning every subsequent loop iteration
+      // into a near-instant full retry attempt -- measured at 233 calls
+      // for a 3-second wait before this fix. This guarantees exactly one
+      // more bounded sleep before the exhaustion check's next pass.
+      const delayMs = remainingBudgetMs > 0
+        ? Math.min(scheduleDelayMs, remainingBudgetMs)
+        : Math.max(0, budgetMs + BOUNDARY_GRACE_MS - elapsedMs);
+      // tsk-mgb: printed on every real sleep. Previously gated on ALSO
+      // `elapsedMs >= originalRemainingTtlMs` (tsk-2rf D4's own "extended
+      // wait past the default TTL needs its own feedback" intent) -- but
+      // on the default (no explicit waitMs) path, budgetMs IS
+      // originalRemainingTtlMs, so that condition and `delayMs > 0` were
+      // mutually exclusive by construction: delayMs > 0 requires elapsedMs
+      // < budgetMs, while the other conjunct requires elapsedMs >=
+      // budgetMs. Never both true -- the progress line never printed at
+      // all on the one path (no --wait) most likely to need it.
+      if (delayMs > 0) {
         process.stderr.write(
           `still waiting on main-checkout lock (holder pid ${err.holderPid}, ${Math.round(elapsedMs / 1000)}s elapsed)\n`,
         );
