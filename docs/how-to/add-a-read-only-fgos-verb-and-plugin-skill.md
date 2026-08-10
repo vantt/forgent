@@ -1,3 +1,8 @@
+---
+type: how-to
+title: Add a read-only fgOS verb and its plugin skill
+source_capture_ids: [tsk-2ew]
+---
 # Add a read-only fgOS verb and its plugin skill
 
 A recipe for adding a new pure-read CLI verb (no `.fgos/` mutation) and the
@@ -65,6 +70,49 @@ substitution (never a relative path — an installed plugin runs from a
 copied cache location), and relay the `data` field back plainly without
 reinterpreting it. No separate plugin manifest entry is needed — skills
 are discovered by directory presence under `plugins/<name>/skills/`.
+
+**Always pass `--dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"`
+on the `node "$FGOS_BIN" <verb> ...` line and its paired `fgos <verb> ...`
+PATH-fallback line** — the same flag every write-verb skill already
+carries. See the real bug this omission caused below: this is not
+optional polish for a read-verb skill, it is the difference between a
+correct result and a silently wrong one.
+
+## A real bug this pattern prevents (`tsk-2ew`): a missing `--dir` looks like an empty backlog, not an error
+
+All 10 existing read-verb plugin skills (`list`, `ready`, `triage`,
+`show`, `stale`, `rollup`, `graph`, `check`, `conflicts`, `merge-list` —
+including the very `conflicts` skill this doc names as the shape to
+copy) shipped without `--dir` at all:
+
+> "grep -c -- \"--dir\" on all 10 `plugins/fgOS/skills/{list,ready,...}
+> /SKILL.md` returns 0 for every file. Every one of the 13 write-verb
+> skills ... already passes `--dir` on every `fgos <verb>` call — the
+> split is exactly read vs write."
+> — real `docs/history/tsk-2ew-read-verb-skills-add-dir/CONTEXT.md`
+
+A worktree never carries its own `.fgos/` by design (ADR0020). Without
+`--dir`, a read-verb call from inside a worktree session — the normal
+`/fgOS:pick` workflow — resolves against a non-existent local store and
+returns an **empty result with exit 0**, not an error:
+
+> "Đo trực tiếp từ worktree: `fgos list` -> 0 item, exit 0; cùng lệnh với
+> `--dir <mainRoot>` -> 86 item."
+> — real item description, `tsk-2ew`
+
+The CLI does print a warning, but only to stderr — a plugin skill that
+only pipes stdout never sees it. Worse, `list/SKILL.md`'s own closing
+instruction ("if `data.work` is empty, say so plainly — an empty result
+is valid, not a failure") was *correct* prose for a genuinely empty
+backlog, but became exactly the wrong guidance for this specific failure
+mode: a session in a worktree calling `/fgOS:list`/`/fgOS:ready`/
+`/fgOS:triage` reported "nothing to do" against a real 86-item backlog,
+and its own instructions told it that silence was the expected, valid
+answer. The fix was mechanical once found (mirror the `--dir` pattern
+onto all 10 files), but the danger is structural: a missing `--dir` on a
+read-verb skill degrades to a plausible-looking wrong answer, never a
+visible error — which is exactly why this step calls it out as
+mandatory rather than a style preference.
 
 ## 4. Test at both layers
 
