@@ -2,17 +2,9 @@
 
 ## 1. Trạng thái hiện tại
 
-Vòng 5. D1-D5 đã chốt (§4). QUAN TRỌNG — round 4 rút lại một kết luận sai
-của round 3: `fgos-fanout` KHÔNG phải nguyên nhân của tình trạng "nhiều
-tiến trình cùng lúc vào merge" — kiểm tra lại bằng số liệu thật
-(`capacity.dispatch` = 0 sự kiện trong toàn bộ lịch sử repo) không ủng hộ
-suy diễn đó. Người dùng xác nhận trực tiếp (round 5): nguyên nhân thật là
-chính người dùng tự bấm approve thủ công ở nhiều terminal cùng lúc, mỗi
-terminal có agent hỏi "approve merge?" riêng — không phải xung đột giữa
-hai cơ chế tự động. Không cần tách item riêng cho fanout nữa (câu hỏi §3
-dòng 7 cũ đã rút — xem D5). Còn lại một điểm mở duy nhất trước khi viết
-§6: định nghĩa "bottleneck" dùng để sort (§3 dòng 1) — đề xuất tái dùng
-`blocks` sẵn có, người dùng chưa xác nhận trực tiếp.
+Vòng 6. D1-D6 đã chốt (§4) — không còn điểm mở nào. §6/§7 đã viết. Sẵn
+sàng cho terminal handoff (`fgos-exploring` → `fgos-planning`) khi người
+dùng xác nhận thiết kế ở §6 là đúng.
 
 ## 2. Mục tiêu & đề bài
 
@@ -39,7 +31,7 @@ bày riêng ở lớp UI.
 
 | # | Vấn đề | Trạng thái | Ghi chú |
 |---|---|---|---|
-| 1 | Định nghĩa "bottleneck" dùng để sort: `rankImpact`'s `blocks` (toàn graph, mọi status) hay một tín hiệu hẹp hơn — đếm riêng item đang nằm trong `mergeReadiness`'s `waiting` bucket mà bị chặn trực tiếp bởi item này? | ĐIỂM MỞ DUY NHẤT CÒN LẠI — đề xuất round 2, chưa xác nhận | Dữ liệu thật lúc scout: `waiting` đang RỖNG (0 item) — tín hiệu hẹp gần như luôn bằng 0, không tạo khác biệt thứ tự thật. Đề xuất: tái dùng `blocks` sẵn có (không phát minh metric mới) — đã được `priority-formula.mjs` dùng cho cùng mục đích ("đòn bẩy backlog"), nhất quán với phần còn lại của hệ thống. |
+| 1 | Định nghĩa "bottleneck" dùng để sort | D6 | |
 | 2 | Logic sort mới đặt ở đâu | D4 | |
 | 3 | Tree hiển thị gồm những gì | D2 | |
 | 4 | Bottleneck-priority áp dụng đệ quy ở mọi cấp child-merge, hay chỉ ở top-level? | D3 | |
@@ -56,6 +48,7 @@ bày riêng ở lớp UI.
 | D3 | Bottleneck-priority áp dụng đệ quy ở mọi cấp child-merge, không chỉ top-level | Người dùng xác nhận rõ ràng ("recursive"), không bị revise qua các round sau |
 | D4 | Sort/bottleneck-priority logic đặt ở JS engine (`graph-harness.mjs`/`impact.mjs`), Rust herdr-plugin chỉ đọc lại kết quả | `merge next`/`merge-loop` đọc thẳng `mergeReadiness(view).ready[0]` — sort chỉ ở Rust sẽ khiến tree hiển thị một thứ tự trong khi automation thật thực thi thứ tự khác |
 | D5 | Nguyên nhân thật của "nhiều tiến trình cùng chạy vào merge" là con người tự bấm approve thủ công ở nhiều terminal, KHÔNG phải xung đột tự động (rút lại nghi ngờ fanout ban đầu) | Người dùng xác nhận trực tiếp round 5; số liệu thật: 0 sự kiện `capacity.dispatch` trong toàn bộ lịch sử repo |
+| D6 | Định nghĩa "bottleneck" dùng để sort = tái dùng `rankImpact`'s `blocks` sẵn có (đếm mọi item mở phụ thuộc trực tiếp, mọi status) — không phát minh metric hẹp mới | `waiting` bucket rỗng thật lúc scout (0 item) nên một metric hẹp hơn (đếm riêng item trong `waiting`) hầu như luôn bằng 0, không tạo khác biệt thứ tự thật; `blocks` đã nhất quán với `priority-formula.mjs`/triage |
 
 ## 5. Q&A log
 
@@ -152,8 +145,146 @@ bày riêng ở lớp UI.
 
 ## 6. Thiết kế đã chốt {#design}
 
-*(chưa đủ chín để viết — còn 4 điểm mở ở §3)*
+**Bối cảnh thật (D1, D5):** fgOS chỉ có MỘT execution path cho mọi merge,
+leaf hay root — verb `approve` (`bin/fgos.mjs:2689`) tự resolve target
+branch động qua `resolveRoot` mỗi lần gọi (leaf → `fgw/<root cha>`, root →
+`main`). Không có, và không cần, một cơ chế "cha tự merge con" riêng biệt
+— `cleanup-harness.mjs` tự nói rõ điều này. Cái đang thiếu KHÔNG phải là
+code coordinate nhiều tiến trình tự động (không có tiến trình tự động
+nào cạnh tranh cả — `capacity.dispatch` = 0 sự kiện trong lịch sử) — cái
+đang thiếu là con người (hiện đang tự đóng vai "single owner" một cách
+thủ công, bấm approve rải rác ở nhiều terminal) chưa có một quy trình rõ
+ràng để nhìn và giao việc đó cho máy. Việc TỰ ĐỘNG HOÁ vai trò đó — một
+pane `merge-loop` cố định, tự launch — là phạm vi của tsk-2xt, không phải
+item này. Item này chỉ có một trách nhiệm: đảm bảo THỨ TỰ mà pane đó (khi
+có) sẽ thực thi là đúng (ưu tiên giải phóng bottleneck), và làm cho thứ
+tự đó QUAN SÁT ĐƯỢC bằng mắt thường trước khi tự động hoá thay con người.
+
+**Nguyên tắc kiến trúc (D4):** logic tính "ai merge trước" phải sống ở
+MỘT chỗ duy nhất — JS state layer (`src/state/`) — vì đó là nơi
+`merge next`/`merge-loop` thật sự đọc để quyết định merge cái gì kế tiếp
+(`mergeReadiness(view).ready[0]`). herdr-plugin (Rust) không được tự tính
+lại thứ tự của riêng nó; nó chỉ đọc và vẽ lại đúng những gì JS engine đã
+tính. Nếu vi phạm nguyên tắc này, tree hiển thị một thứ tự trong khi
+automation thật thực thi thứ tự khác — đúng loại lỗi "UI nói dối" mà D3
+(tsk-417) trong `fgos.rs` đã cẩn thận tránh cho ba box khác (map thẳng,
+không filter tự chế).
+
+**Thiết kế cụ thể:**
+
+1. **Không đổi hành vi hiện có (an toàn cho automation).** `mergeReadiness`
+   giữ NGUYÊN shape trả về hôm nay (`ready`/`waiting`/`conflicts`/
+   `mergeSets`/`blockedOnSync`/`mergeTier`/`supersededOut`/`stageByItem`)
+   — `merge next`/`merge-loop` không đổi một dòng nào. Tree là một view
+   PHÁI SINH thêm vào, không phải một đường tính lại song song.
+
+2. **Một hàm tree-builder mới trong JS state layer** (ví dụ
+   `mergeTree(view, opts)`, cùng module `graph-harness.mjs` hoặc module
+   liền kề), nhận view + kết quả `mergeReadiness` đã có, và:
+   - Gom TẤT CẢ id xuất hiện ở bất kỳ bucket nào (`ready`, `waiting`,
+     `blockedOnSync`, mọi id trong `mergeSets`, `supersededOut`) — D2:
+     hiển thị toàn bộ, không chỉ `ready`.
+   - Với mỗi id, gắn nhãn trạng thái (`ready`/`waiting`/`blocked-sync`/
+     `conflicted`/`superseded`) từ đúng bucket nó thuộc về.
+   - Nhóm theo `item.parent` (đã có sẵn trên mọi work item) thành cây
+     lồng nhau: root-to-main (không có `parent`) ở top-level, mỗi con
+     lồng dưới đúng cha của nó theo `mergeTier` (D1: `mergeTier` đã có
+     sẵn, chỉ cần dùng để xác nhận, không cần tính lại).
+   - Sort MỖI cấp (kể cả top-level lẫn từng nhóm con) bằng đúng
+     `rankImpact`'s `blocks` giảm dần (D6: tái dùng tín hiệu sẵn có,
+     không phát minh metric mới), tie-break `goalTier` rồi id — giống hệt
+     `orderByRank` nội bộ `mergeReadiness` đang dùng cho `ready` hôm nay,
+     áp dụng ĐỆ QUY cho từng cấp (D3).
+   - Trả về qua `fgos merge list --json` dưới một field mới (vd. `tree`)
+     bên cạnh các field cũ — additive, không phá vỡ contract cũ.
+
+3. **herdr-plugin (Rust) đổi từ 3 danh sách phẳng sang render cây.**
+   `MergeListSummary` (`herdr-plugin/src/fgos.rs:127-145`) cần thêm field
+   đọc `tree` mới (giữ `ready`/`waiting`/`blocked_on_sync` cũ nếu còn chỗ
+   dùng, hoặc thay hẳn nếu tree đã bao trùm đủ). `app.rs`'s merge_list
+   rendering cần logic vẽ cây thật (thụt lề theo độ sâu, hoặc dùng ký hiệu
+   phân cấp) + badge trạng thái mỗi node (ready/waiting/blocked-
+   sync/conflicted/superseded) để người dùng thấy ngay cái gì merge trước,
+   cái gì đang kẹt và vì sao.
+
+**Sơ đồ luồng dữ liệu:**
+
+```mermaid
+flowchart TB
+    subgraph JS["JS state layer (nguồn sự thật duy nhất)"]
+        RI["rankImpact — blocks (D6)"]
+        MR["mergeReadiness — ready/waiting/blockedOnSync/mergeSets/supersededOut/mergeTier (KHÔNG đổi)"]
+        MT["mergeTree (MỚI) — gom tất cả bucket, nhóm theo parent, sort đệ quy mỗi cấp bằng blocks"]
+        RI --> MR --> MT
+    end
+    CLI["fgos merge list --json — thêm field tree, additive"]
+    MT --> CLI
+    ML["merge-loop / merge next — vẫn đọc ready[0] y nguyên"]
+    MR -.->|"không đổi"| ML
+    RUST["herdr-plugin (Rust) — chỉ render lại, không tự tính"]
+    CLI --> RUST
+    HUMAN["Con người xem MERGE LIST box"]
+    RUST --> HUMAN
+```
+
+**Ví dụ cụ thể (D2):** root X (`awaiting-approval`, `ready`, blocks=5) có
+hai con A (`awaiting-approval`, footprint-conflict với item khác →
+`mergeSets`) và B (root của B có sync drift → `blockedOnSync`). Tree hiển
+thị:
+
+```
+X  [ready, blocks=5]
+├─ A  [conflicted: footprint overlap với tsk-xxx]
+└─ B  [blocked: root drift, cần sync-root trước]
+```
+
+X vẫn merge được ngay dù A/B đang kẹt — X là root-to-main, A/B là
+leaf-to-root của MỘT cây con khác (hoặc của chính X nếu X là root của
+chúng); hiển thị đủ cả ba giúp người xem hiểu ngay "cái gì merge trước,
+cái gì phải tự xử lý trước khi merge được."
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-*(chưa tách task — chờ §6 ổn định)*
+### {#task-merge-tree-engine} Task 1 — Tree-builder trong JS state layer
+
+**Mục tiêu:** thêm hàm `mergeTree(view, opts)` (hoặc tương đương) vào
+`src/state/graph-harness.mjs`, dùng lại `mergeReadiness`'s buckets +
+`rankImpact`'s `blocks` để tạo cấu trúc cây (root-to-main top-level,
+leaf-to-root lồng theo `parent`, sort đệ quy mỗi cấp), phơi ra qua `fgos
+merge list --json` dưới field mới, KHÔNG đổi shape cũ.
+
+**Trích §6:** mục 1 (không đổi hành vi hiện có) + mục 2 (tree-builder) +
+sơ đồ luồng dữ liệu.
+
+**D-ID áp dụng:** D1 (dùng `mergeTier`/`resolveRoot` sẵn có, không tính
+lại target), D2 (gom tất cả bucket), D3 (sort đệ quy mỗi cấp), D4 (logic
+sống ở JS, không phải Rust), D6 (tái dùng `blocks`).
+
+**Quan hệ với task khác:** Task 2 phụ thuộc trực tiếp vào field JSON mà
+task này định nghĩa (cần chốt shape trước khi Task 2 viết parser Rust).
+
+**Verify nháp:** `node --test test/state/graph-harness.test.mjs && npm
+test` — test mới cho `mergeTree` (nhóm đúng theo parent, sort đúng theo
+blocks ở mọi cấp, không bỏ sót bucket nào) cộng test hồi quy xác nhận
+`mergeReadiness`'s shape cũ không đổi (bảo vệ `merge next`/`merge-loop`).
+
+### {#task-merge-tree-render} Task 2 — Render cây trong herdr-plugin MERGE LIST box
+
+**Mục tiêu:** đổi `MergeListSummary`/parser (`herdr-plugin/src/fgos.rs`)
+để đọc field `tree` mới từ Task 1, và đổi `app.rs`'s merge_list rendering
+từ ba danh sách phẳng sang vẽ cây thật (thụt lề theo độ sâu + badge trạng
+thái mỗi node: ready/waiting/blocked-sync/conflicted/superseded).
+
+**Trích §6:** mục 3 (herdr-plugin đổi sang render cây) + ví dụ cụ thể X/A/B.
+
+**D-ID áp dụng:** D1 (mergeTier đã có, chỉ đọc), D2 (hiển thị tất cả
+bucket, có badge lý do kẹt), D3 (thụt lề đúng độ sâu, giữ nguyên thứ tự
+JS đã sort — Rust không tự sort lại), D4 (Rust chỉ render).
+
+**Quan hệ với task khác:** phụ thuộc Task 1 (cần field `tree` tồn tại
+trước). Độc lập với tsk-2xt (không cần đợi pane auto-launch tồn tại để
+build/test phần render này — có thể test bằng `fgos merge list --json`
+chạy tay).
+
+**Verify nháp:** `cargo test --manifest-path herdr-plugin/Cargo.toml
+merge_list && npm test`.
