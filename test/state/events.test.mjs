@@ -202,19 +202,20 @@ test('repairTruncatedLastLine refuses a log that already parses cleanly — noth
 });
 
 // tsk-3wq: repairTruncatedLastLine used to be an UNLOCKED whole-file
-// read-modify-write (its own old docstring admitted a concurrent appendEvent
-// or a second repair landing between its read and its write would be
-// silently overwritten). Mirroring the SAME real-OS-process fork technique
-// the concurrent-appendEvent regression above already uses: two separate
+// read-modify-write. Mirroring the SAME real-OS-process fork technique the
+// concurrent-appendEvent regression above already uses: two separate
 // processes both call repairTruncatedLastLine on the SAME corrupt log at the
-// same instant. With the fix (folding the whole read/validate/backup/write
-// into withEventsLock, the same cross-process lock appendEvent holds), the
-// two calls must serialize — exactly one succeeds and actually repairs;
-// the other, running only after the first releases the lock, sees an
-// already-clean log and throws the existing 'validation' "already parses
-// cleanly" error (the same error the single-process test above already
-// documents as expected for a clean log) — never a torn write, never a
-// silently-lost or re-corrupted result.
+// same instant. Two concurrent repairs happen to compute the SAME output
+// from the SAME source either way (locked or not — neither adds new
+// content, both only drop the same corrupt tail), so this test alone does
+// NOT discriminate old vs. new code; it is real regression coverage for
+// deterministic, lossless behavior under concurrent repair attempts, kept
+// alongside the actually-discriminating lock-contention test below. With
+// the fix, the two calls serialize — exactly one succeeds and actually
+// repairs; the other, running only after the first releases the lock, sees
+// an already-clean log and throws the existing 'validation' "already
+// parses cleanly" error (the same error the single-process test above
+// already documents as expected for a clean log) — never a torn write.
 test('repairTruncatedLastLine under two concurrent OS processes serializes — exactly one repairs, the other sees it already clean, and the result is never corrupted', async () => {
   const logPath = tmpLogPath();
   const workDir = path.dirname(logPath);
@@ -276,6 +277,63 @@ try {
   assert.equal(events.length, 2, 'the log must contain exactly the 2 original valid events after both processes finish');
   assert.deepEqual(events.map((e) => e.payload.id), ['a', 'b']);
 
+  fs.rmSync(workDir, { recursive: true, force: true });
+});
+
+// tsk-3wq: the actual before/after discriminator. A separate OS process
+// acquires events.lock (via the real withEventsLock, the SAME lock
+// appendEvent/repairTruncatedLastLine share) and holds it for a fixed
+// duration; the parent then calls repairTruncatedLastLine and times it.
+// Fixed (locked) code MUST block for at least that duration before it can
+// even start its own read. Pre-fix (unlocked) code ignores the held lock
+// entirely and returns almost immediately regardless of the other holder —
+// this is what makes the assertion below fail on the pre-fix version
+// (confirmed: swapping in `git show HEAD~1:src/state/events.mjs` and
+// re-running this test measures an elapsed time far under HOLD_MS, while
+// the post-fix version measures elapsed >= HOLD_MS reliably).
+test('repairTruncatedLastLine now blocks on a lock another process holds — the actual old-vs-new discriminator', async () => {
+  const logPath = tmpLogPath();
+  const workDir = path.dirname(logPath);
+  appendEvent(logPath, { type: 'work.add', payload: { id: 'a' } });
+  fs.appendFileSync(logPath, '{"seq":2,"ts":"2026-07-14T00:00:00.000Z","type":"work.move","pay', 'utf8');
+
+  const HOLD_MS = 500;
+  const markerPath = path.join(workDir, 'lock-acquired.marker');
+  const holderScript = `
+import fs from 'node:fs';
+import { withEventsLock } from ${JSON.stringify(EVENTS_MJS)};
+const logPath = process.argv[2];
+const markerPath = process.argv[3];
+const holdMs = Number(process.argv[4]);
+withEventsLock(logPath, () => {
+  fs.writeFileSync(markerPath, String(Date.now()));
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, holdMs);
+});
+`;
+  const holderPath = path.join(workDir, 'lock-holder.mjs');
+  fs.writeFileSync(holderPath, holderScript);
+
+  const holder = fork(holderPath, [logPath, markerPath, String(HOLD_MS)], { stdio: 'inherit' });
+  // Poll for the marker instead of a fixed delay — proves the holder
+  // actually has the lock before this test starts its own timer, with no
+  // race against the holder's own startup time.
+  const deadline = Date.now() + 2000;
+  while (!fs.existsSync(markerPath)) {
+    if (Date.now() > deadline) throw new Error('lock holder never acquired the lock within 2s');
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 5);
+  }
+
+  const start = Date.now();
+  const result = repairTruncatedLastLine(logPath);
+  const elapsedMs = Date.now() - start;
+
+  assert.equal(result.eventCount, 1);
+  assert.ok(
+    elapsedMs >= HOLD_MS - 50,
+    `repairTruncatedLastLine must block until the held lock releases (~${HOLD_MS}ms) — only took ${elapsedMs}ms, meaning it did not actually wait for the lock`,
+  );
+
+  await new Promise((resolve) => holder.on('exit', resolve));
   fs.rmSync(workDir, { recursive: true, force: true });
 });
 
