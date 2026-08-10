@@ -15,6 +15,7 @@ import {
   reclaimOrphanedCheckout,
   provisionDependencies,
   resyncClaimWorktree,
+  withMergeEphemeralWorktree,
   WorktreeError,
 } from '../../src/runner/worktree.mjs';
 
@@ -430,6 +431,48 @@ test('createBranchRef is idempotent: a second call on an existing branch is a no
   assert.equal(second.created, false);
   assert.equal(second.branch, 'fgw/root-b');
   assert.equal(branchTip(repoRoot, 'fgw/root-b'), shaAfterFirst, 'branch must not move on idempotent no-op');
+});
+
+test('withMergeEphemeralWorktree falls back to createBranchRef (seeded from main) instead of throwing when fgw/<id> was never created early', async () => {
+  const repoRoot = initTempRepo();
+  execFileSync('git', ['branch', '-M', 'main'], { cwd: repoRoot });
+  // seed a tracked .fgos/ so finishWorktreeSetup's strip is meaningfully
+  // exercised on the fallback path too, not just the already-exists path.
+  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, '.fgos', 'marker.txt'), 'x\n');
+  execFileSync('git', ['add', '.fgos/marker.txt'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'seed .fgos'], { cwd: repoRoot });
+  const mainTip = branchTip(repoRoot, 'main');
+
+  assert.throws(() => branchTip(repoRoot, 'fgw/never-dispatched'), 'precondition: branch genuinely does not exist yet');
+
+  const result = await withMergeEphemeralWorktree(repoRoot, 'never-dispatched', async (worktree) => {
+    assert.equal(worktree.branch, 'fgw/never-dispatched');
+    assert.equal(worktree.startCommit, mainTip, 'fallback-created branch is seeded from main\'s current tip');
+    assert.equal(fs.existsSync(path.join(worktree.path, '.fgos')), false, 'finishWorktreeSetup strips .fgos on the fallback path too');
+    return 'fn-ran';
+  });
+
+  assert.equal(result, 'fn-ran');
+  assert.equal(branchTip(repoRoot, 'fgw/never-dispatched'), mainTip, 'the branch now exists, created by the fallback');
+
+  const listing = execFileSync('git', ['worktree', 'list', '--porcelain'], { cwd: repoRoot, encoding: 'utf8' });
+  assert.doesNotMatch(listing, /fgw\/never-dispatched/, 'the ephemeral checkout is removed on the way out');
+});
+
+test('withMergeEphemeralWorktree leaves an already-existing fgw/<id> branch untouched by the fallback (checkout at its real tip, not reset to main)', async () => {
+  const repoRoot = initTempRepo();
+  execFileSync('git', ['branch', '-M', 'main'], { cwd: repoRoot });
+  createBranchRef(repoRoot, 'already-dispatched', { baseRef: 'main' });
+  const advancedTip = advanceBranchExternally(repoRoot, 'fgw/already-dispatched', 'leaf-work.txt', 'leaf commit\n');
+
+  const result = await withMergeEphemeralWorktree(repoRoot, 'already-dispatched', async (worktree) => {
+    assert.equal(worktree.startCommit, advancedTip, 'checkout must be at the branch\'s real current tip, not reset to main');
+    return 'ok';
+  });
+
+  assert.equal(result, 'ok');
+  assert.equal(branchTip(repoRoot, 'fgw/already-dispatched'), advancedTip, 'branch tip is unchanged when fn makes no new commit');
 });
 
 test('createWorktree with opts.baseRef forks a new branch from that ref\'s tip, not from repoRoot\'s current HEAD', () => {
