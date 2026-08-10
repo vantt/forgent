@@ -95,7 +95,7 @@ const IRON_LAW_EVIDENCE_META_CITATION = /^docs\/history\/[^/]+\/iron-law-evidenc
 // after the frozen-filename strip above, each for a specific, checked
 // reason (docs/history/launcher-vocabulary-rename/CONTEXT.md's own scout
 // evidence) -- never a blanket skip.
-const ALLOWED_FILES = new Map([
+const ALLOWED_FILES_ENTRIES = [
   ['docs/decisions/0028-doi-ten-orchestrator-thanh-launcher.md', 'the decision record ABOUT the rename -- its filename and body legitimately discuss the old term while explaining why/how it was retired'],
   ['test/docs/launcher-vocabulary-guard.test.mjs', 'this file itself -- its own source must reference the literal word as pattern-matching data (frozen filenames, allowlist reasons, self-check assertions), not as prose deploying the pinned term'],
   ['docs/architecture-map.md', 'CTR003 gloss + runner-loop ORCHESTRATION label describe the continuous fgos-runner supervision loop (industry sense), not 0026\'s one-shot role -- reserved for the future meaning, not renamed'],
@@ -111,7 +111,6 @@ const ALLOWED_FILES = new Map([
   ['docs/history/tsk-18a-merge-conflict-misclassification/repro-notes.md', 'cites a repro script\'s literal filename (tsk-18a-repro-orchestrator.mjs), never committed to the repo'],
   ['docs/history/two-layer-dispatch/DISCUSSION.md', 'cites bee-swarming/SKILL.md\'s own upstream terminology verbatim'],
   ['docs/specs/work-state.md', 'same fleet-orchestrator reserved-future sense as docs/backlog.md STR27'],
-  ['docs/history/merge-list-tree-bottleneck-priority/DISCUSSION.md', 'tsk-3cs\'s own shaping discussion -- cites work-item title "herdr-orchestrator" (tsk-2xt) while describing pane auto-launch into the fixed fg:operation tab, same reasoning as fgos-terminal-close-autoclose/CONTEXT.md\'s own allowlist entry above'],
   ['docs/history/tsk-2au-herdr-orchestrator-frozen-phrase-exemption/plan.md', 'this item\'s own plan -- discusses the pinned phrase "herdr-orchestrator" (tsk-2xt\'s item nickname) throughout while designing a FROZEN_PHRASES exemption for it in this exact guard test, same reasoning as launcher-vocabulary-rename/plan.md\'s own allowlist entry above'],
   ['docs/decisions/0029-sua-dinh-nghia-roottask-subtask-capacity-t1-cua-0026.md', 'the decision record ABOUT D17 (tsk-5td) -- explains that "orchestrator" is not a third T1 value but the T0 aggregate layer, same reasoning as 0028\'s own allowlist entry above'],
   ['docs/history/tsk-5wf-decision-doc-0029-supersede-0026-vocabulary/plan.md', 'this item\'s own plan -- discusses the old term while explaining D17\'s resolution, same reasoning as launcher-vocabulary-rename/plan.md above'],
@@ -123,13 +122,24 @@ const ALLOWED_FILES = new Map([
   ['docs/explanation/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md', 'cites the orchestrator->launcher rename as a real example while explaining decision-doc superseding -- same historical-example reasoning as 0028/0029\'s own allowlist entries'],
   ['docs/how-to/allowlist-a-historical-mention-in-launcher-vocabulary-guard.md', 'tsk-2uo\'s own how-to guide for allowlisting a historical mention in THIS exact guard test -- necessarily quotes the pinned term throughout as its own worked examples while documenting the allowlist mechanism, same self-referential reasoning as this file\'s own entry above'],
   ['docs/how-to/fix-fgos-write-rejected-merge-block.md', 'quotes a real work.decision capture (tsk-53n) that names this guard test\'s own "orchestrator" leak as a worked example of a pre-existing, unrelated failure a merge-block fix needs to recognize and exclude -- same meta-citation reasoning as the iron-law-evidence.md entries above (now covered by IRON_LAW_EVIDENCE_META_CITATION)'],
-]);
+  ['docs/history/tsk-4cx-allowed-files-duplicate-key-guard/plan.md', 'this item\'s own plan -- discusses this guard\'s pinned term and the duplicate-key bug it found while explaining the new ALLOWED_FILES_ENTRIES self-check, same self-referential reasoning as tsk-2lg-launcher-guard-pattern-allowlist/plan.md\'s own entry above'],
+];
+// tsk-4cx: named as its own array (not inlined into `new Map([...])`
+// directly) so a self-check below can assert `ALLOWED_FILES_ENTRIES.length
+// === ALLOWED_FILES.size` -- a Map silently collapses a duplicate key at
+// runtime with no syntax error and no test failure otherwise, which
+// happened twice in quick succession while landing tsk-2au (two concurrent
+// sessions each adding an entry for the same file at different, non-
+// conflicting positions in this same array).
+const ALLOWED_FILES = new Map(ALLOWED_FILES_ENTRIES);
 // tsk-2au: docs/history/merge-list-tree-bottleneck-priority/DISCUSSION.md
 // (tsk-3cs) used to need its own hand-added entry here for citing
 // tsk-2xt's "herdr-orchestrator" nickname -- now covered by
 // FROZEN_PHRASE_PATTERNS above instead, same "avoid a stale duplicate of
 // what the pattern already subsumes" reasoning tsk-2lg used for its own
-// 6 removed iron-law-evidence.md entries.
+// 6 removed iron-law-evidence.md entries. (tsk-4cx: a second such entry,
+// re-added by a later concurrent merge after this reasoning already
+// applied, was found and removed the same way.)
 // tsk-2lg: the 6 docs/history/<id>/iron-law-evidence(-<suffix>).md entries
 // this Map used to list by hand (launcher-vocabulary-rename, tsk-33w, tsk-4eu,
 // tsk-2uo, automated-changelog-compound-learn x2) are now covered by
@@ -203,6 +213,18 @@ test('NEGATIVE self-check: IRON_LAW_EVIDENCE_META_CITATION matches the real hist
   assert.equal(isDirAllowed('docs/history/tsk-2uo-launcher-vocabulary-guard-allowlist/plan.md'), false);
   // nested one level deeper than the pattern allows -- must NOT match
   assert.equal(isDirAllowed('docs/history/tsk-2uo-launcher-vocabulary-guard-allowlist/nested/iron-law-evidence.md'), false);
+});
+
+test('NEGATIVE self-check: ALLOWED_FILES_ENTRIES has no duplicate key (tsk-4cx)', () => {
+  // prove the check actually fires before trusting it against the real array
+  const withDuplicate = [['a', 'x'], ['b', 'y'], ['a', 'z']];
+  assert.notEqual(withDuplicate.length, new Map(withDuplicate).size, 'sanity: a duplicate key must change size vs length');
+
+  assert.equal(
+    ALLOWED_FILES_ENTRIES.length,
+    ALLOWED_FILES.size,
+    'ALLOWED_FILES_ENTRIES has a duplicate key -- a Map silently collapses it, dropping one reason with no syntax error',
+  );
 });
 
 test('NEGATIVE self-check: "herdr-orchestrator" strips as a frozen phrase, but a bare "orchestrator" still trips (tsk-2au)', () => {
