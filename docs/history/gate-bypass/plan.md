@@ -346,9 +346,20 @@ Files touched: `.claude/skills/fgos-exploring/SKILL.md`,
 `.claude/skills/fgos-planning/SKILL.md`,
 `.claude/skills/fgos-validating/SKILL.md`, and their byte-identical
 `.agents/skills/<name>/SKILL.md` mirrors (`test/skills/fgos-mirror.test.mjs`'s
-existing requirement) — 6 files. No changes to `src/state/gate-bypass.mjs`
-or `src/state/store.mjs` (D7's explicit constraint, reused verbatim from
-`CONTEXT.md`).
+existing requirement) — 6 files. Plus `docs/reference/gate-bypass-config.md`
+(found during `fgos-validating`'s reality-gate pass, missed in this piece's
+first draft): its "Gate-step wiring" section quotes the exact same `node -e`
+snippet and states in prose "The `gate-bypass.mjs`/`store.mjs` code imports
+stay cwd-relative — the worktree's own branch already carries whatever
+version it needs" — a factual claim about current behavior that D7 makes
+false. Update the quoted snippet and that sentence to describe the
+local-first-fallback-to-`$root` behavior instead, once the exact
+implementation shape is chosen; best-effort documentation accuracy, not
+mechanically enforced by `verify` (this doc is illustrative reference
+material, not a skill-prose path under `.claude/skills/**` per
+`docs/how-to/write-verify-for-a-skill-prose-change.md`'s own scope). No
+changes to `src/state/gate-bypass.mjs` or `src/state/store.mjs` (D7's
+explicit constraint, reused verbatim from `CONTEXT.md`).
 
 Verify (the item's own locked verify, already covers the mirror
 requirement automatically since it runs full `npm test` rather than a
@@ -383,6 +394,9 @@ the exact JS syntax used to add it.
 - `src/state/gate-bypass.mjs`/`store.mjs` diffs stay empty on `main...HEAD`
   — D7's explicit "add-only via a second import call, not a rewrite of the
   functions themselves" constraint holds.
+- `docs/reference/gate-bypass-config.md`'s "Gate-step wiring" section no
+  longer asserts the cwd-relative import is unconditional — updated to
+  describe the fallback, manual read-through (no automated check).
 
 ## Outstanding questions
 
