@@ -1,7 +1,7 @@
 ---
 type: explanation
 title: Why `clarify` split into `clarify`, `discovery`, and `exploring`
-source_capture_ids: [tsk-4b2]
+source_capture_ids: [tsk-4b2, tsk-12p]
 ---
 # Why `clarify` split into `clarify`, `discovery`, and `exploring`
 
