@@ -18,6 +18,15 @@ item's own status/stage.
 5. The same Iron Law gate `approve` applies to a runner-sourced item runs
    here too — "refuse before any git mutation" — requiring
    `--acknowledge-iron-law` when tripped.
+6. (tsk-66t) For a root with **no** `parent` only — the branch that merges
+   directly on the shared main checkout, never the `item.parent` branch
+   below which merges in a throwaway ephemeral worktree — the same
+   clean-tree gate `approve`'s own local-merge branch already applies
+   (`isMainTreeClean`/`buildOwnFileSet`) refuses before any git mutation
+   if the shared checkout carries an uncommitted foreign change. Closes a
+   real silent-data-loss gap: without this gate, a dirty checkout let
+   `git commit --no-edit` (`mergeRunnerItem`, `merge.mjs`) sweep another
+   session's staged changes into the merge commit.
 
 ## Outcome shape
 
@@ -27,6 +36,13 @@ item's own status/stage.
 | `blocked`, `reason: 'fgos-write-rejected'` | the branch staged a change under `.fgos/` (ADR0020 violation); merge aborted | `target`, `branch`, `paths` |
 | `blocked`, `reason: 'verify-fail'` | goal-check failed on the staged merge; merge aborted, target unchanged | `target`, `branch`, `exitStatus`, `output` |
 | `synced` | real success | `target`, `branch`, `seq` (the decision event's sequence), `output` |
+
+A no-parent root that trips precondition 6 above never reaches this table
+at all — like the Iron Law/branch-existence preconditions, it throws a
+`StoreError('validation')` before `runAndReport` is ever called, so there
+is no `sync-root`-level `outcome` for it. `fgos merge next`'s own caller
+catches this one specifically and reports it as `blocked: 'dirty-tree'`
+(see `docs/explanation/why-merge-next-auto-syncs-blockedonsync-roots.md`).
 
 ## The locked contract: status/stage stays untouched on success
 

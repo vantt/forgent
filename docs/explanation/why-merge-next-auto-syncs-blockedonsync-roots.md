@@ -45,6 +45,19 @@ sync — the distinction D1/D2's design depended on for `merge-loop` to
 tell "genuinely nothing to do" apart from "found something, couldn't
 finish it this call."
 
+A second follow-up (`tsk-66t`) added a new blocked reason to D1's
+enumerated failure surface: `sync-root`'s no-parent branch (the one that
+merges directly on the shared main checkout, not the `item.parent`
+ephemeral-worktree branch) previously had no clean-tree precondition at
+all — a dirty checkout let the merge commit silently sweep in another
+session's staged changes. The new gate throws the same way the Iron Law
+gate does, and `merge next`'s existing Iron-Law-recognizing `catch` block
+(this file's own `bin/fgos.mjs`'s `merge next` case) gained one more
+branch for it, reporting `{picked: rootId, blocked: 'dirty-tree', message,
+syncRoot: {id: rootId}}` — the same shape every other blocked reason here
+already uses, so `merge-loop/SKILL.md`'s own same-id-blocked-twice rule
+needed no change to recognize it.
+
 ## Terms
 
 - **blockedOnSync** — `mergeReadiness()`'s (`src/state/graph-harness.mjs:93`)

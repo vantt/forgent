@@ -2034,6 +2034,15 @@ async function runVerb(verb, flags, positional, dir) {
             if (err instanceof StoreError && err.message.includes('Iron Law')) {
               return { picked: rootId, blocked: 'iron-law', message: err.message, syncRoot: { id: rootId } };
             }
+            // tsk-66t: sync-root's own dirty-tree gate (below) refuses the
+            // same way Iron Law does — recognized here the same way, so an
+            // unattended `merge next`/merge-loop run gets the graceful
+            // `{picked, blocked, syncRoot}` shape merge-loop/SKILL.md's own
+            // same-id-blocked-twice rule already parses, instead of an
+            // uncaught exit-4 crash.
+            if (err instanceof StoreError && err.message.includes('is not clean')) {
+              return { picked: rootId, blocked: 'dirty-tree', message: err.message, syncRoot: { id: rootId } };
+            }
             throw err;
           }
         }
@@ -3329,6 +3338,18 @@ async function runVerb(verb, flags, positional, dir) {
 
       if (item.parent) {
         return await withMergeEphemeralWorktree(repoRoot, item.parent, async (ephemeral) => runAndReport(ephemeral.path, repoRoot));
+      }
+      // tsk-66t: a root with no parent merges directly on the shared main
+      // checkout (runAndReport(repoRoot) below), unlike the item.parent
+      // branch above which merges in a throwaway ephemeral worktree. Same
+      // clean-tree gate `approve`'s own local-merge branch already applies
+      // before any git mutation (bin/fgos.mjs's `case 'approve'`) — without
+      // it, a dirty repoRoot here means `git commit --no-edit` (merge.mjs's
+      // mergeRunnerItem) sweeps another session's staged changes into this
+      // merge commit silently.
+      const ownFileSet = buildOwnFileSet(runnerOwnDiff, item.footprint);
+      if (!isMainTreeClean(repoRoot, ownFileSet)) {
+        throw new StoreError('validation', `sync-root: working tree at "${repoRoot}" is not clean — commit or stash pending changes before syncing "${id}".`);
       }
       return await runAndReport(repoRoot);
     }

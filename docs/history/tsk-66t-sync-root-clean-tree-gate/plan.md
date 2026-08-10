@@ -165,6 +165,26 @@ alone. Cross-checked directly instead: `grep -n "isMainTreeClean"
 bin/fgos.mjs` plus a full read of the `sync-root` case body (Evidence
 above) — this is the evidence this plan actually relies on.
 
+## Scope clarification found during execution (tsk-66t)
+
+`buildOwnFileSet`/`isMainTreeClean`'s own `ownFileSet` filtering
+(`src/runner/merge.mjs:129-154`, `isFgosOnlyStatusLine`) is **own-file-set
+scoped, not a whole-tree gate** (tsk-598 D1/D2, proven directly by
+`test/cli/fgos.test.mjs`'s existing "approve of a runner item succeeds
+when a dirty file on main is UNRELATED to the item" test): a dirty path
+NOT in the item's own committed-diff/footprint is explicitly tolerated,
+by design, even by `approve`'s own existing gate — mirrored here exactly,
+byte-for-byte. This means the new sync-root gate catches the *same-path*
+conflict (`git merge` would otherwise fail with "local changes would be
+overwritten", the exact scenario live-reproduced against `tsk-3v2` and
+already recorded as a decision on this item) but does **not** block an
+unrelated foreign session's dirty/staged file elsewhere in the repo — the
+same accepted boundary `approve` already has. The two new regression
+tests were corrected mid-execution to dirty the root's OWN produced path
+(matching `approve`'s own "real conflict" test, `test/cli/fgos.test.mjs`)
+after an initial version using an unrelated path failed by exposing this
+exact scoping (proof the gate does what `approve`'s does, not more).
+
 ## Outstanding questions
 
 None

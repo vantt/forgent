@@ -6246,6 +6246,28 @@ test('sync-root aborts cleanly on a genuine conflict: main left byte-for-byte un
   assert.equal(stateView(cwd).work['sync-root-conflict'].status, 'doing', 'a blocked sync-root must never touch the root item\'s status');
 });
 
+test('sync-root on a no-parent root refuses when the shared main checkout carries an uncommitted change on a path the root itself touches, exit 4, no merge lands (tsk-66t)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeDriftedRoot(cwd, 'sync-root-dirty', { verify: 'true' });
+  // sync-root-dirty-produced.txt IS in this root's own fgw/sync-root-dirty
+  // diff (makeDriftedRoot committed it there) — re-dirtying that SAME path
+  // on main, uncommitted, is the own-file-set conflict this gate exists to
+  // catch (mirrors approve's own real-conflict test, tsk-598 D2: an
+  // UNRELATED dirty path is explicitly tolerated by isMainTreeClean's own
+  // ownFileSet scoping, so the negative case here must be a same-path one).
+  fs.writeFileSync(path.join(cwd, 'sync-root-dirty-produced.txt'), 'clobbered by another writer\n'); // never git add/commit
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['sync-root', 'sync-root-dirty']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /is not clean/);
+
+  assert.equal(gitHead(cwd), headBefore, 'main must be byte-for-byte unchanged when sync-root refuses on a dirty tree');
+  assert.equal(fs.readFileSync(path.join(cwd, 'sync-root-dirty-produced.txt'), 'utf8'), 'clobbered by another writer\n', 'the uncommitted local change must survive untouched');
+  assert.equal(stateView(cwd).work['sync-root-dirty'].status, 'doing', 'a refused sync-root must never touch the root item\'s status');
+});
+
 test('sync-root refuses from inside a linked worktree (must land on the real main checkout)', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
@@ -8565,6 +8587,41 @@ test('merge next on a blockedOnSync root whose sync-root attempt hits a genuine 
 
   assert.equal(gitHead(cwd), headBefore, 'main must be byte-for-byte unchanged after an aborted auto-sync');
   assert.equal(stateView(cwd).work['auto-sync-conflict'].status, 'awaiting-approval', 'a blocked sync must never touch the root item\'s own status');
+});
+
+test('merge next on a blockedOnSync root whose sync-root attempt hits a dirty main checkout: picked is the root id (never null), blocked: dirty-tree, main untouched (tsk-66t)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeDriftedRoot(cwd, 'auto-sync-dirty', { verify: 'true' });
+  // See auto-sync-happy above: driftStatus only tracks ids that are some
+  // other item's `parent`.
+  assert.equal(run(cwd, ['add', 'auto-sync-dirty-child', '--title', 'child', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--parent', 'auto-sync-dirty', '--description', 'tsk-66t fixture description.']).status, 0);
+  assert.equal(run(cwd, ['move', 'auto-sync-dirty', '--to', 'awaiting-approval']).status, 0);
+  commitPendingBeforeApprove(cwd, 'auto-sync-dirty');
+  // auto-sync-dirty-produced.txt IS in this root's own fgw/auto-sync-dirty
+  // diff (makeDriftedRoot committed it there) — re-dirtying that SAME path
+  // on main, uncommitted, AFTER the legitimate state commits above is the
+  // own-file-set conflict the new gate exists to catch, exercised through
+  // the unattended merge-next path this item's own description names (an
+  // UNRELATED dirty path is explicitly tolerated by isMainTreeClean's own
+  // ownFileSet scoping, tsk-598 D2, so this must be a same-path conflict).
+  fs.writeFileSync(path.join(cwd, 'auto-sync-dirty-produced.txt'), 'clobbered by another writer\n'); // never git add/commit
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['merge', 'next']);
+  assert.equal(result.status, 0, `merge next itself must not exit non-zero on a blocked sync: ${result.stdout}${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  // picked must be the resolved root id, NEVER null -- same tsk-173
+  // invariant the conflict test above already proves for merge-conflict;
+  // this proves it holds for the new dirty-tree reason too.
+  assert.equal(data.picked, 'auto-sync-dirty');
+  assert.equal(data.blocked, 'dirty-tree');
+  assert.match(data.message, /is not clean/);
+  assert.equal(data.syncRoot.id, 'auto-sync-dirty');
+
+  assert.equal(gitHead(cwd), headBefore, 'main must be byte-for-byte unchanged after a refused auto-sync');
+  assert.equal(fs.readFileSync(path.join(cwd, 'auto-sync-dirty-produced.txt'), 'utf8'), 'clobbered by another writer\n', 'the uncommitted local change must survive untouched');
+  assert.equal(stateView(cwd).work['auto-sync-dirty'].status, 'awaiting-approval', 'a blocked sync must never touch the root item\'s own status');
 });
 
 // --- str73-done-flip-cos-check cell 1: --acceptance on add/submit/edit ----
