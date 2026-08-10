@@ -107,6 +107,7 @@ const ALLOWED_FILES = new Map([
   ['docs/explanation/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md', 'cites the orchestrator->launcher rename as a real example while explaining decision-doc superseding -- same historical-example reasoning as 0028/0029\'s own allowlist entries'],
   ['docs/how-to/allowlist-a-historical-mention-in-launcher-vocabulary-guard.md', 'tsk-2uo\'s own how-to guide for allowlisting a historical mention in THIS exact guard test -- necessarily quotes the pinned term throughout as its own worked examples while documenting the allowlist mechanism, same self-referential reasoning as this file\'s own entry above'],
   ['docs/how-to/fix-fgos-write-rejected-merge-block.md', 'quotes a real work.decision capture (tsk-53n) that names this guard test\'s own "orchestrator" leak as a worked example of a pre-existing, unrelated failure a merge-block fix needs to recognize and exclude -- same meta-citation reasoning as the iron-law-evidence.md entries above (now covered by IRON_LAW_EVIDENCE_META_CITATION)'],
+  ['docs/history/merge-list-tree-bottleneck-priority/DISCUSSION.md', 'tsk-3cs\'s own live scout notes -- cites tsk-2xt\'s work-item title "herdr-orchestrator" as a historical citation, same reasoning as fgos-terminal-close-autoclose/CONTEXT.md\'s own entry above; a different, still-open item\'s in-progress artifact, not this fix\'s prose to rewrite'],
 ]);
 // tsk-2lg: the 6 docs/history/<id>/iron-law-evidence(-<suffix>).md entries
 // this Map used to list by hand (launcher-vocabulary-rename, tsk-33w, tsk-4eu,
