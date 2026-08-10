@@ -3,7 +3,7 @@ type: how-to
 title: How to read a CRITICAL impact-analysis result before treating it as a real blocker
 tags: []
 timestamp: 2026-08-10T11:10:00.000Z
-source_capture_ids: [tsk-2x9]
+source_capture_ids: [tsk-2x9, tsk-5lr]
 ---
 # How to read a CRITICAL impact-analysis result before treating it as a real blocker
 
@@ -59,6 +59,50 @@ actually matter.
    graph-shape explanation for why it reads lower once traced. Never
    silently downgrade the warning by omitting it.
 
+## Alternative: design around the flagged symbol, then re-check what you actually edit
+
+Sometimes the CRITICAL result isn't a graph-shape artifact — it's genuinely
+about a high-blast-radius symbol (a shared trait, a widely-implemented
+interface) that your change doesn't actually need to touch. In that case,
+the fix isn't reading the count more carefully — it's choosing an
+implementation shape that routes around the flagged symbol entirely, then
+verifying the *real* edit target separately.
+
+`tsk-5lr` (capping herdr-plugin's `fg:agents-N` tabs and adding a fixed
+`fg:operation` tab) hit this: the natural-looking fix was adding a "no
+room" variant to the `PaneOrchestrator` trait's return type.
+
+> `impact({target: "PaneOrchestrator", direction: "upstream"})` returned
+> **CRITICAL** risk — 15 impacted symbols, 4 direct trait implementers, ...
+> and 6 UI-interaction tests.
+> — real `plan.md`, `docs/history/herdr-operation-tab-layout/plan.md`
+
+Reading the existing error-propagation path showed the signal could reach
+the screen with zero trait changes at all: `find_agents_tab_with_room`
+already returns `Result<_, LayoutError>`, and every caller up the chain
+already propagates that `Err` as-is. Adding one new `LayoutError` variant
+inside the function actually being edited was enough — never touching
+`PaneOrchestrator`:
+
+> "the CRITICAL blast radius on `PaneOrchestrator` is avoided entirely by
+> never touching it. `impact()` on `find_agents_tab_with_room` itself (the
+> function this plan actually edits) confirmed **LOW** risk, 5 impacted
+> symbols, no direct test breakage at depth 1."
+> — real `plan.md`, `docs/history/herdr-operation-tab-layout/plan.md`
+
+The same pattern repeated for the plan's second piece: `impact()` on
+`ensure_cockpit_tab` (the existing precedent function being mirrored) came
+back LOW, 1 impacted symbol — confirming the new eager-startup function
+being added alongside it wasn't stepping into a high-risk surface either.
+
+The general move: when `impact` flags a *related* high-level symbol
+(a trait, an interface, a shared type) as CRITICAL, check whether your
+plan can avoid that symbol's own surface entirely — then run `impact`
+again on the function your diff actually edits to confirm the real risk,
+rather than either accepting the trait-level CRITICAL as your change's own
+risk or assuming a lower-level edit is automatically safe without
+re-checking it.
+
 ## Why this matters
 
 `impact`'s upstream count answers "how many symbols transitively reach
@@ -75,4 +119,6 @@ warning itself.
 - `.claude/skills/gitnexus/gitnexus-impact-analysis/SKILL.md` — the
   `impact` tool's own usage guide.
 - `docs/history/herdr-task-detail-modal-fields/plan.md` — the full plan
-  this example is drawn from.
+  the first example is drawn from.
+- `docs/history/herdr-operation-tab-layout/plan.md` — the full plan the
+  "design around the flagged symbol" example is drawn from.
