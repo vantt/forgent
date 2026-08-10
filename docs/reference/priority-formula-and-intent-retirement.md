@@ -89,11 +89,54 @@ framing the task started from):
 Outcome: `passed: true`, `awaiting-approval`, 1 attempt, no friction
 recorded.
 
+## Real-world finding: two of three axes were nearly degenerate in practice (`tsk-4hb`)
+
+A scan of 482 real items (`plans/reports/project-instability-scan-260809-1608-ship-faster-stability-report.md`)
+found `urgent` and `risk` contributing far less than the formula's own
+comment (`priority-formula.mjs:5-12`, calling the inversion "the single
+highest-consequence correctness risk in this feature") implied — the
+inversion math was correct; the degeneracy was in the inputs feeding it:
+
+- **`urgent`**: absent on 476/482 items, so `weightForUrgency(undefined)`
+  (falling back to `medium`'s weight) fired for 98.8% of real items —
+  effectively a constant. This is a **producer gap, not a formula bug**:
+  `docs/specs/work-state.md`'s own Data Dictionary #6 documents `risk` as
+  free text (see below), and `weightForUrgency`'s absent-default is
+  exactly correct behavior for a genuinely unset value. Whether items
+  should always carry an explicit urgency is a submit-time product
+  decision, out of this item's scope.
+- **`risk`**: 415/482 items used one of the three recognized values
+  (`light`/`standard`/`heavy`), but the remaining 67/482 carried a
+  present-but-unrecognized value (`medium`/`low`/`high` — legal per Data
+  Dictionary #6's free-text shape) and silently folded to `standard`'s
+  discount via `discountForRisk`'s `?? RISK_DISCOUNTS.standard` fallback,
+  with no signal anywhere that this had happened. This **is** a real
+  correctness bug: the fallback could not distinguish "absent" (a
+  legitimate default) from "present but unrecognized" (silently masked).
+
+**Fix, scoped to `risk` only**: `priority-formula.mjs` stays pure (no
+fs/Date.now/mutation, same discipline as `impact.mjs`) — it does not log
+itself. Instead it exports a new pure query, `isRecognizedRisk(risk)`,
+alongside the existing `discountForRisk`. The two real call sites
+(`src/intake/discovery.mjs` and `src/intake/decompose.mjs`, both already
+calling `addDecision`) now log a decision when `work.risk` is a
+truthy, present string that `isRecognizedRisk` reports as unrecognized —
+making the fold visible in the audit trail instead of silent.
+`discountForRisk`'s actual return value is byte-identical before and
+after this change for every input; only observability was added. Landed
+clean (`node --test test/state/priority-formula.test.mjs && npm test`
+passing, `outcome: awaiting-approval`, no code-level rework needed —
+though the merge itself hit two transient `goal-check` verify-miss
+blocks before landing, per `tsk-4hb`'s own friction capture).
+
 ## See also
 
 - `docs/history/work-item-priority-matrix/CONTEXT.md` — D1-D8, scout
   evidence, pinned terms.
 - `docs/history/work-item-priority-matrix/plan.md` — mode/risk-map/phases.
+- `docs/history/tsk-4hb-priority-formula-degenerate-axes/plan.md` — the
+  real-data scan and `isRecognizedRisk` fix shape behind the section
+  above.
 - `docs/reference/rankimpact-sort-key-order.md` — the pre-existing
   `blocks`/`rankImpact` derive `impact` builds on.
 - `docs/reference/work-item-pipeline-stages-verbs-and-handoffs.md` — the
