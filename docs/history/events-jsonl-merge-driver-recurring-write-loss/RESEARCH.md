@@ -119,3 +119,69 @@ full-range write loss tsk-3wq's three new repros describe.
   .fgos/events.jsonl` / `git blame` sweep around each incident's timestamp,
   left for planning/exploring's own deeper dive, not required to establish
   that the goal itself is clear.
+
+## Round 2 — 2026-08-10 (tsk-3wq, fgos-validating reality gate)
+
+**Asked:** the first `plan.md` draft proposed wiring a merge-driver fixup
+call into `src/runner/merge.mjs`'s `mergeRunnerItemLocked`, immediately
+after `git merge --no-commit --no-ff` stages cleanly and before
+`runGoalCheck`. Before locking that as the wiring point: does that
+function actually let a `.fgos/`-touching merge reach that point at all?
+
+**Checked — `src/runner/merge.mjs:877-891`:** `mergeRunnerItemLocked`
+already runs `git diff --name-only --cached` right after the merge stages,
+and if ANY path under `.fgos/` shows up staged, it aborts the merge
+outright (`abortMergeIfPossible`) and returns `outcome:
+'fgos-write-rejected'` — it never reaches `runGoalCheck` in that case.
+This guard is real, deliberate, and unconditional; inserting a "fix up and
+continue" call before it would either never fire (the guard already
+aborted first) or require also loosening/reordering that guard — a
+second, larger, riskier design question this item's own CONTEXT.md
+decisions never asked for.
+
+**Checked — when this guard was introduced, relative to the known
+incidents:**
+- `git log --oneline -S "fgos-write-rejected" -- src/runner/merge.mjs` →
+  commit `59551886` "fix(tsk-1an): keep .fgos/ out of fgw/<id> worker
+  worktrees", dated **2026-07-28 19:58:18** — a few hours AFTER tsk-n4i's
+  two corrupting merge commits (`aa9ae156`/`9e3fb469`, both `2026-07-28
+  17:2x`), i.e. this guard was very likely added in direct response to
+  that same-day incident.
+- The three NEW repros this item (tsk-3wq) reports — tsk-4vo's children,
+  tsk-5td, tsk-2x9k — are all dated **2026-08-09/2026-08-10**, roughly two
+  weeks AFTER this guard already existed. So the guard has been in place
+  and active for every one of the three new incidents, yet they still
+  happened.
+
+**Checked — is `mergeRunnerItemLocked` the only place fgOS code runs `git
+merge` at all?** `grep -rn "'merge'\]" src bin scripts` (excluding tests):
+zero other matches. fgOS's own code has exactly one `git merge` call site,
+and it already refuses any `.fgos/`-touching result.
+
+**Finding:** the three new incidents cannot be coming through `fgos
+merge`'s own path — it already refuses before ever committing a
+`.fgos/`-touching merge. The real, currently-unguarded vector is a raw
+`git merge`/`git pull`/hand-resolution run directly by a session, outside
+any fgOS verb — exactly the pattern already visible in this repo's own
+recent history (e.g. a `catch-up: merge main into fgw/<id>` commit style,
+syncing a feature branch forward from main by hand). This is also exactly
+tsk-n4i's own original D1 finding ("ad hoc git-merge-conflict hand-
+resolution"), just confirmed here to still be the live, unguarded vector
+today, unaffected by the `fgos-write-rejected` guard added the same day.
+
+**Consequence for the plan:** `.gitattributes: .fgos/events.jsonl
+merge=union` is the correct fix BECAUSE it is git-level and path-scoped,
+not code-path-scoped — it applies uniformly to every `git merge`
+regardless of who invokes it (a live session's raw Bash command included),
+unlike any change inside `merge.mjs`. No `merge.mjs` change is needed or
+appropriate for this item's actual scope; touching its existing
+`fgos-write-rejected` guard is a separate, bigger design question this
+item's CONTEXT.md decisions never asked for.
+
+**Checked — precedent for a non-install-config doctor check** (does a
+data-integrity check even belong in `fgos doctor`'s registry, or only
+config/install checks?): `src/setup/registrations.mjs:441-...`
+(`checkRootDrift`, tsk-5m7) is already exactly this shape — a repo/data
+health check (branches drifted ahead of their merge target), not a local
+machine config check — confirms the registry already holds this class of
+check, not just install-config ones.
