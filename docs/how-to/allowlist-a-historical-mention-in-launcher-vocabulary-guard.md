@@ -2,7 +2,7 @@
 type: how-to
 title: How to allowlist a legitimate historical mention in launcher-vocabulary-guard.test.mjs
 tags: []
-source_capture_ids: [tsk-2uo]
+source_capture_ids: [tsk-2uo, tsk-5td]
 ---
 # How to allowlist a legitimate historical mention in launcher-vocabulary-guard.test.mjs
 
@@ -107,6 +107,35 @@ a real regression:
 
 The fix landed as five additive `ALLOWED_FILES` entries, no rewrite of
 any of the five files' actual content.
+
+## A second real case (`tsk-5td`): the guard itself postdates your own branch's fork point
+
+`tsk-5td` (closing out `docs/history/dispatch-concept-boundary/
+DISCUSSION.md` itself, a long-lived branch far behind `main`) hit this
+guard from the opposite direction of the `tsk-2uo` example above: not a
+different item's file discovered as a side effect, but the very file this
+item's own branch had been authoring the whole time, discussing D17
+(orchestrator is the T0 aggregate layer) the same legitimate way the
+decision record and other `DISCUSSION.md` entries already do:
+
+> "docs/history/dispatch-concept-boundary/DISCUSSION.md legitimately
+> discusses D17 ... same reasoning already used for the other
+> DISCUSSION.md entries and for decision 0029's own allowlist entry
+> covering the same D17. Caught by `fgos approve`'s post-merge verify
+> since this guard test postdates this branch's own fork point; merged
+> main forward first to pick it up."
+> — real commit message, `0ff244a6`, branch `fgw/tsk-5td`
+
+The lesson this adds: a long-lived branch (this one was 215+ commits
+behind `main`) can fork *before* `launcher-vocabulary-guard.test.mjs`
+even existed, or before it grew stricter — so `npm test` on the branch's
+own tree stays green locally right up until `approve`'s post-merge verify
+runs against the merged result and the guard fires for the first time.
+Merging main forward into the branch before allowlisting surfaces this the
+same way any other newly-added guard would; the fix is the same additive
+`ALLOWED_FILES` entry step 3 already describes, just for a file the
+branch itself authored rather than one discovered as someone else's
+side effect.
 
 ## Related
 
