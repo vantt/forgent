@@ -56,7 +56,6 @@ import { execFileSync } from 'node:child_process';
 import {
   listWork,
   moveWork,
-  moveStage,
   addWork,
   readyWork,
   readRawEvents,
@@ -85,7 +84,7 @@ import { createWriteQueue } from './write-queue.mjs';
 import { createOwnershipStore, resolveRoot, claimRoot, steerFrontier } from './root-affinity.mjs';
 import { claimWork, ClaimError } from './claim-port.mjs';
 import { resolveRepoRoot, fgosDirFromRoot } from './paths.mjs';
-import { FALLBACK_VERIFY } from '../intake/discovery.mjs';
+import { FALLBACK_VERIFY, resolveDiscovery } from '../intake/discovery.mjs';
 import { resolveDecompose } from '../intake/decompose.mjs';
 import { classify, generateId } from '../intake/classify.mjs';
 import { setTimeout as delay } from 'node:timers/promises';
@@ -560,6 +559,35 @@ export function parseDiscoveredBlocks(output) {
     });
   }
   return blocks;
+}
+
+// tsk-4v6: the discovery-stage worker's own completion verdict channel — a
+// single-block sibling of `parseDiscoveredBlocks` above (same fence-based
+// shape, different purpose: this item's own {clear, question?, verify?}
+// outcome, not a newly-discovered work item). FAIL-SAFE by construction,
+// same as its sibling: absent fence, malformed JSON, a non-object payload,
+// or a missing/non-boolean `clear` all yield `null` rather than throwing —
+// a garbled or missing worker report must never be treated as a verdict.
+// Last well-formed block wins if a worker emits more than one.
+const FGOS_VERDICT_FENCE = /```fgos-verdict[^\n]*\n([\s\S]*?)```/g;
+
+export function parseVerdictBlock(output) {
+  if (typeof output !== 'string' || !output) return null;
+  let verdict = null;
+  for (const match of output.matchAll(FGOS_VERDICT_FENCE)) {
+    let parsed;
+    try {
+      parsed = JSON.parse(match[1]);
+    } catch {
+      continue; // malformed body — skip this block, keep scanning
+    }
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) continue;
+    if (typeof parsed.clear !== 'boolean') continue;
+    verdict = parsed.clear
+      ? { clear: true, verify: typeof parsed.verify === 'string' ? parsed.verify : undefined }
+      : { clear: false, question: typeof parsed.question === 'string' ? parsed.question : undefined };
+  }
+  return verdict;
 }
 
 // Per-dispatch ceiling on how many fgos-discovered blocks a single worker
@@ -1094,16 +1122,21 @@ export async function runOnce(options = {}) {
           if (facts.aheadCount === 0) {
             log(`fgos-runner: research worker for "${item.id}" produced no commit — left at stage discovery, status todo, for the next sweep to retry`);
           } else {
-            // 'discovery'/'exploring' are coding-domain-specific stages with
-            // no base-workflow step of their own (workflow-stage-graphs.mjs's
-            // own coding.stepMap, tsk-1w7 D10) — there is no `stageForStep`
-            // symbolic name to resolve 'exploring' through, unlike the
-            // Clarify/Divide/Execute edges every domain declares. This whole
-            // dispatch loop already only ever matches a real `stage ===
-            // 'discovery'` literal (no other registered domain declares that
-            // stage name at all), so the literal target here is equally safe.
-            moveStage(dir, { id: item.id, to: 'exploring', expectedStage: 'discovery', role: 'runner' });
-            log(`fgos-runner: discovery dispatch advanced "${item.id}" to exploring`);
+            // tsk-4v6 (CONTEXT.md D5, driver/launcher parity per 0026/0028/
+            // 0029): the worker's own {clear, question?, verify?} verdict
+            // gates the transition now, never a bare "did a commit land"
+            // check. `resolveDiscovery` is the same engine function
+            // `bin/fgos.mjs`'s `discover` verb and the interactive driver's
+            // own discovery handling both call — reusing it here (role:
+            // 'runner') is what keeps this sweep and the interactive path
+            // provably identical instead of a second hand-rolled
+            // moveStage/ask pair drifting from it. No `callerVerdict` (fence
+            // absent or malformed) hits `resolveDiscovery`'s own 'runner'
+            // no-op fail-safe — the item is left exactly where it is, same
+            // as the no-commit branch above, never silently advanced.
+            const callerVerdict = parseVerdictBlock(worker.stdout ?? '');
+            const result = resolveDiscovery(dir, item.id, config, 'runner', callerVerdict);
+            log(`fgos-runner: discovery dispatch for "${item.id}" resolved outcome "${result.outcome}"`);
           }
         } catch (err) {
           // Fail-safe (matches the old sweep's own never-halt-the-whole-tick
