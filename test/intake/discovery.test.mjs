@@ -462,6 +462,29 @@ test('resolveDiscovery writes EXACTLY ONE work.edit event carrying priority per 
   assert.equal(priorityEdits.length, 1);
 });
 
+// tsk-4hb: the priority-write pass now logs a decision when work.risk is
+// present but not a real RISK_DISCOUNTS key -- the exact real-world shape
+// (67/482 items on the real log) this item exists to make observable.
+// `addWork` itself now enforces risk as an enum (tsk-5wz) so this shape can
+// only exist as LEGACY data today -- same appendEvent bypass technique the
+// legacy-invalid-shape test above already uses to plant one.
+test('resolveDiscovery logs a decision when work.risk is present but unrecognized, never for a recognized value', () => {
+  const storeDir = tmpStoreDir();
+  const logPath = path.join(storeDir, 'events.jsonl');
+  appendEvent(logPath, { type: 'work.add', payload: { ...sampleWork(), id: 'item-unrecognized', risk: 'medium' } });
+  appendEvent(logPath, { type: 'work.add', payload: { ...sampleWork(), id: 'item-recognized', risk: 'heavy' } });
+
+  resolveDiscovery(storeDir, 'item-unrecognized', {}, 'session', { clear: true, verify: 'npm test -- a' });
+  resolveDiscovery(storeDir, 'item-recognized', {}, 'session', { clear: true, verify: 'npm test -- b' });
+
+  const view = listWork(storeDir);
+  const unrecognizedDecisions = (view.decisionsById?.['item-unrecognized'] ?? []).filter((d) => d.text.includes('not a recognized RISK_DISCOUNTS key'));
+  const recognizedDecisions = (view.decisionsById?.['item-recognized'] ?? []).filter((d) => d.text.includes('not a recognized RISK_DISCOUNTS key'));
+  assert.equal(unrecognizedDecisions.length, 1);
+  assert.match(unrecognizedDecisions[0].text, /work\.risk "medium"/);
+  assert.equal(recognizedDecisions.length, 0);
+});
+
 test('resolveDiscovery still updates priority on a legacy-invalid item shape — editWork\'s scoped validation (tsk-1ne) grandfathers the untouched field instead of blocking the patch', () => {
   const storeDir = tmpStoreDir();
   const logPath = path.join(storeDir, 'events.jsonl');

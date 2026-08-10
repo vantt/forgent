@@ -36,6 +36,17 @@ export function discountForRisk(risk) {
   return RISK_DISCOUNTS[risk] ?? RISK_DISCOUNTS.standard;
 }
 
+// tsk-4hb: `risk` is free text (Data Dictionary #6, docs/specs/work-state.md),
+// so a value outside RISK_DISCOUNTS is spec-legal, not a data error --
+// discountForRisk's own `?? standard` fallback cannot tell "absent" (a
+// legitimate default) apart from "present but unrecognized" (silently
+// masked, same discount either way). This pure query lets a caller that
+// already does side effects (addDecision) log the distinction instead of
+// leaving it invisible.
+export function isRecognizedRisk(risk) {
+  return Object.hasOwn(RISK_DISCOUNTS, risk);
+}
+
 // D8: de-risking value feeds `impact` as a bonus (never `risk`) — sub-linear
 // (sqrt) so a very large blast radius still yields a bounded bonus rather
 // than dominating the whole score. 0 when no measurement exists yet (the
