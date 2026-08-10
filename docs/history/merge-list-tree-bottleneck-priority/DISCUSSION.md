@@ -2,24 +2,17 @@
 
 ## 1. Trạng thái hiện tại
 
-Vòng 3. Đã xác nhận: chỉ có model A (một process/instance duy nhất —
-`merge-loop`, chạy trong pane cố định `fg:operation` mà tsk-2xt sẽ
-tự-launch — được phép thực thi merge thật xuyên suốt hệ thống), không có
-model B riêng biệt (không tồn tại cơ chế "cha tự merge con"). Câu hỏi
-"ai/process nào thực hiện merge" đã tinh chỉnh lại thành: single-owner
-merge execution — mọi luồng khác (`cook`, `pick`, `fgos-code-implement`/
-`return`, VÀ `fanout`) chỉ được dừng ở `awaiting-approval`, không tự gọi
-`approve`. Phát hiện quan trọng: `fgos-fanout` HIỆN TẠI đang tự gọi `fgos
-approve` cho các leaf auto-approve — một caller thứ hai, độc lập với
-`merge-loop`, đúng là nguyên nhân cụ thể của tình trạng "nhiều tiến trình
-cùng lúc chạy vào merge, human phải hang-around đợi approve" mà người
-dùng mô tả từ kinh nghiệm thực tế. Đề xuất single-owner đang chờ xác nhận
-rõ ràng (round tới), cùng với việc có tách fanout-conflict thành item
-riêng ngay bây giờ hay chỉ ghi nhận. Q3 đã trả lời: hiển thị TẤT CẢ
-(`ready`/`waiting`/`blockedOnSync`/`mergeSets`/`supersededOut`), vì A/B
-dù đang kẹt cỡ nào cuối cùng cũng phải merge vào X. Định nghĩa
-"bottleneck" (§3 dòng 1) và tính đệ quy (§3 dòng 4) đã có đề xuất/câu trả
-lời nhưng CHƯA giữ ổn định qua hơn một vòng — chưa mint D-ID nào.
+Vòng 5. D1-D5 đã chốt (§4). QUAN TRỌNG — round 4 rút lại một kết luận sai
+của round 3: `fgos-fanout` KHÔNG phải nguyên nhân của tình trạng "nhiều
+tiến trình cùng lúc vào merge" — kiểm tra lại bằng số liệu thật
+(`capacity.dispatch` = 0 sự kiện trong toàn bộ lịch sử repo) không ủng hộ
+suy diễn đó. Người dùng xác nhận trực tiếp (round 5): nguyên nhân thật là
+chính người dùng tự bấm approve thủ công ở nhiều terminal cùng lúc, mỗi
+terminal có agent hỏi "approve merge?" riêng — không phải xung đột giữa
+hai cơ chế tự động. Không cần tách item riêng cho fanout nữa (câu hỏi §3
+dòng 7 cũ đã rút — xem D5). Còn lại một điểm mở duy nhất trước khi viết
+§6: định nghĩa "bottleneck" dùng để sort (§3 dòng 1) — đề xuất tái dùng
+`blocks` sẵn có, người dùng chưa xác nhận trực tiếp.
 
 ## 2. Mục tiêu & đề bài
 
@@ -46,17 +39,23 @@ bày riêng ở lớp UI.
 
 | # | Vấn đề | Trạng thái | Ghi chú |
 |---|---|---|---|
-| 1 | Định nghĩa "bottleneck" dùng để sort: `rankImpact`'s `blocks` (toàn graph, mọi status) hay một tín hiệu hẹp hơn — đếm riêng item đang nằm trong `mergeReadiness`'s `waiting` bucket mà bị chặn trực tiếp bởi item này? | đề xuất round 2, chưa xác nhận | Dữ liệu thật lúc scout: `waiting` đang RỖNG (0 item) — tín hiệu hẹp gần như luôn bằng 0, không tạo khác biệt thứ tự thật. Đề xuất: tái dùng `blocks` sẵn có (không phát minh metric mới) — đã được `priority-formula.mjs` dùng cho cùng mục đích ("đòn bẩy backlog"), nhất quán với phần còn lại của hệ thống. Người dùng chưa xác nhận trực tiếp đề xuất này (round 3 rẽ sang câu hỏi "ai merge"). |
-| 2 | Logic sort mới đặt ở đâu: sửa `rankImpact`/`mergeReadiness` (JS, `src/state/`) hay chỉ ở tầng hiển thị Rust? | rõ | `merge next`/`merge-loop` đọc thẳng `mergeReadiness(view).ready[0]` — sửa ở JS engine, Rust chỉ phản ánh lại. Củng cố thêm bởi round 3: nếu single-owner (dòng 6 dưới) được xác nhận, `merge-loop` càng chắc chắn là nơi duy nhất thứ tự này thật sự được thực thi. |
-| 3 | Tree hiển thị gồm những gì | đã trả lời (round 3) | Hiển thị TẤT CẢ: `ready` + `waiting` + `blockedOnSync` + `mergeSets` + `supersededOut` (node phụ/đánh dấu lý do kẹt) — vì A/B dù đang kẹt ở trạng thái nào cuối cùng cũng phải merge vào X, ẩn đi sẽ mất đúng mục đích quan sát bottleneck. |
-| 4 | Bottleneck-priority áp dụng đệ quy ở mọi cấp child-merge, hay chỉ ở top-level? | đã trả lời (round 2: "recursive"), chưa qua vòng thứ hai để mint D-ID | |
+| 1 | Định nghĩa "bottleneck" dùng để sort: `rankImpact`'s `blocks` (toàn graph, mọi status) hay một tín hiệu hẹp hơn — đếm riêng item đang nằm trong `mergeReadiness`'s `waiting` bucket mà bị chặn trực tiếp bởi item này? | ĐIỂM MỞ DUY NHẤT CÒN LẠI — đề xuất round 2, chưa xác nhận | Dữ liệu thật lúc scout: `waiting` đang RỖNG (0 item) — tín hiệu hẹp gần như luôn bằng 0, không tạo khác biệt thứ tự thật. Đề xuất: tái dùng `blocks` sẵn có (không phát minh metric mới) — đã được `priority-formula.mjs` dùng cho cùng mục đích ("đòn bẩy backlog"), nhất quán với phần còn lại của hệ thống. |
+| 2 | Logic sort mới đặt ở đâu | D4 | |
+| 3 | Tree hiển thị gồm những gì | D2 | |
+| 4 | Bottleneck-priority áp dụng đệ quy ở mọi cấp child-merge, hay chỉ ở top-level? | D3 | |
 | 5 | Quan hệ với tsk-2xt | rõ | Độc lập nhưng bổ trợ: tsk-2xt tự khai "logic pick giữ nguyên" (không đổi), nên cải thiện sort ở đây tự động nâng cấp hành vi automation của tsk-2xt mà không cần đổi gì bên tsk-2xt. Không cần dep giữa hai item. |
-| 6 | AI (process nào) được phép thực thi merge thật xuyên suốt hệ thống | đề xuất round 3, chờ xác nhận | Model A xác nhận (không có model B: `cleanup-harness.mjs:115-116` — "decompose-into-children never itself merges... children's own branches merge directly into the same resolved root"). Đề xuất cụ thể: single-owner = `merge-loop` (pane `fg:operation`, tsk-2xt) là caller DUY NHẤT được gọi `approve` thật; mọi luồng khác (`cook`/`pick`/`fgos-code-implement`/`return`/`fanout`) chỉ dừng ở `awaiting-approval`. Xung đột phát hiện được: `fgos-fanout` (`.claude/skills/fgos-fanout/SKILL.md:94-106`) hiện đang TỰ gọi `fgos approve` cho leaf auto-approve — caller thứ hai độc lập, khớp đúng với hiện tượng "nhiều tiến trình cùng lúc vào merge, human phải đợi" người dùng mô tả. `withLockRetry` đã ngăn corruption (không phải bug đúng nghĩa) — đây là vấn đề coordination/observability. |
-| 7 | fanout self-approve conflict: tách thành item riêng ngay, hay chỉ ghi nhận trong discussion này? | chưa rõ | Hỏi trực tiếp người dùng round 3, đang chờ trả lời. |
+| 6 | AI (process nào) được phép thực thi merge thật xuyên suốt hệ thống | D1 + D5 | Model A xác nhận, model B không tồn tại. Nguyên nhân thật của tình trạng nhiều tiến trình cùng lúc vào merge KHÔNG phải xung đột tự động (fanout claim đã rút) mà là con người tự bấm approve thủ công ở nhiều terminal — nghĩa là "single-owner" hôm nay chưa tồn tại dưới dạng code, mà là VAI TRÒ con người đang tự làm thủ công. Việc TỰ ĐỘNG HOÁ vai trò đó (một pane `merge-loop` cố định) là phạm vi của tsk-2xt, không phải tsk-3cs — tsk-3cs chỉ cần đảm bảo thứ tự/tree mà pane đó (khi có) sẽ thực thi là đúng và quan sát được. |
+| ~~7~~ | ~~fanout self-approve conflict~~ | RÚT LẠI (D5) | Không cần — không có bằng chứng fanout từng tự approve thật (0 `capacity.dispatch` event); nguyên nhân thật là thao tác thủ công của con người, không phải fanout. |
 
 ## 4. Quyết định đã chốt
 
-*(chưa có D-ID nào)*
+| D-ID | Quyết định | Lý do |
+|---|---|---|
+| D1 | Chỉ có model A: một execution path duy nhất qua `approve`, không có cơ chế cha-tự-merge-con riêng biệt | `approve` (`bin/fgos.mjs:2689`) tự `resolveRoot`/`branchNameFor` động mỗi lần gọi, cùng verb cho cả leaf lẫn root; `cleanup-harness.mjs:115-116` xác nhận bằng lời |
+| D2 | Tree hiển thị TẤT CẢ bucket (`ready`/`waiting`/`blockedOnSync`/`mergeSets`/`supersededOut`), không chỉ `ready` | Người dùng xác nhận: A/B dù đang kẹt ở trạng thái nào cuối cùng cũng phải merge vào X, ẩn đi mất đúng mục đích quan sát bottleneck |
+| D3 | Bottleneck-priority áp dụng đệ quy ở mọi cấp child-merge, không chỉ top-level | Người dùng xác nhận rõ ràng ("recursive"), không bị revise qua các round sau |
+| D4 | Sort/bottleneck-priority logic đặt ở JS engine (`graph-harness.mjs`/`impact.mjs`), Rust herdr-plugin chỉ đọc lại kết quả | `merge next`/`merge-loop` đọc thẳng `mergeReadiness(view).ready[0]` — sort chỉ ở Rust sẽ khiến tree hiển thị một thứ tự trong khi automation thật thực thi thứ tự khác |
+| D5 | Nguyên nhân thật của "nhiều tiến trình cùng chạy vào merge" là con người tự bấm approve thủ công ở nhiều terminal, KHÔNG phải xung đột tự động (rút lại nghi ngờ fanout ban đầu) | Người dùng xác nhận trực tiếp round 5; số liệu thật: 0 sự kiện `capacity.dispatch` trong toàn bộ lịch sử repo |
 
 ## 5. Q&A log
 
@@ -135,6 +134,21 @@ bày riêng ở lớp UI.
   coordination/observability. Đề xuất single-owner = `merge-loop` (dòng 6
   trong §3), hỏi người dùng có tách fanout-conflict thành item riêng
   ngay không.
+- 2026-08-10T11:33Z (người dùng): Phản bác trực tiếp — "thật ra hiện tại
+  đâu có ai tự merge nhỉ, tất cả đều dừng lại hỏi có merge hay không mà?"
+- 2026-08-10T11:35Z (scout, session): Kiểm tra lại bằng số liệu thật thay
+  vì tin mô tả trong SKILL.md — `grep -c capacity.dispatch .fgos/
+  events.jsonl` = 0 trong TOÀN BỘ lịch sử repo. `pick/SKILL.md` (đọc lúc
+  làm tsk-2ec) tự nói driver dừng ở `awaiting-approval` và trả quyền cho
+  người, khớp đúng với điều người dùng mô tả. → rút lại kết luận round 3
+  đổ lỗi cho `fgos-fanout`: SKILL.md của fanout CÓ viết "tự approve leaf"
+  (sự thật văn bản), nhưng không có bằng chứng đường đó từng chạy thật.
+  Chẩn đoán lại: không có cơ chế tự động nào merge hôm nay — "ai merge" =
+  "bất kỳ ai/terminal nào chạy lệnh trước", không có tổ chức, không phải
+  2 cơ chế tự động tranh nhau.
+- 2026-08-10T11:37Z (người dùng): Xác nhận chẩn đoán lại là đúng — "đúng
+  vậy, do anh tự đánh approve trong nhiều terminal nơi agent đang thực
+  thi việc của nó và hỏi có muốn approve merge không." Chốt D5.
 
 ## 6. Thiết kế đã chốt {#design}
 
