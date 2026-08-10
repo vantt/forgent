@@ -56,6 +56,36 @@ function writeHookStyleLock(dir, ageMs) {
   fs.writeFileSync(path.join(dir, LOCK_FILE), JSON.stringify({ pid: 'some-writer-session-id', ts: Date.now() - ageMs }));
 }
 
+// tsk-3jh: claimWork used to parse events.jsonl twice for the same
+// unmutated data (listWork, then readRawEvents) before moveWork/addOutcome
+// ever ran their own separate reads (CAS reread + appendEventCore's own
+// seq-computation read, both load-bearing and untouched by this item — see
+// docs/history/tsk-3jh-dedupe-redundant-state-reads/RESEARCH.md). Counts
+// real fs.readFileSync calls against the log path to prove the dedupe, not
+// just the resulting shape.
+test('claimWork reads the event log 6 times per call, not 7 (tsk-3jh dedupe of the listWork + readRawEvents pair)', () => {
+  const { repoRoot, dir } = setup();
+  const logPath = path.join(dir, 'events.jsonl');
+  const originalReadFileSync = fs.readFileSync;
+  let logReadCount = 0;
+  fs.readFileSync = function patched(target, ...rest) {
+    if (target === logPath) logReadCount++;
+    return originalReadFileSync.call(fs, target, ...rest);
+  };
+  try {
+    claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot });
+  } finally {
+    fs.readFileSync = originalReadFileSync;
+  }
+
+  // 6 reads: claimWork's own single combined read, moveWork's CAS
+  // pre-read, moveWork's appendEventCore seq-read, moveWork's
+  // post-append refreshView read, addOutcome's appendEventCore seq-read,
+  // addOutcome's post-append refreshView read. Pre-fix this was 7 (an
+  // extra listWork call ahead of the same readRawEvents call).
+  assert.equal(logReadCount, 6);
+});
+
 test('claimWork reclaims a stale hook-written (string-identity) lock past DEFAULT_TTL_MS, instead of failing lock-ambiguous forever', () => {
   const { repoRoot, dir } = setup();
   writeHookStyleLock(dir, DEFAULT_TTL_MS + 1000);

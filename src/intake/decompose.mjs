@@ -633,10 +633,12 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
         rationale: 'tsk-4hb: making the silent unrecognized-value fallback observable',
       });
     }
-  } catch {
-    // Swallowed intentionally — same fail-safe discipline as discovery.mjs's
-    // rough pass: a corrupted item shape or write-door rejection here must
-    // never abort the pass-through/decompose/need-human resolution below.
+  } catch (err) {
+    // tsk-6d8: swallowed intentionally (see comment above), but never
+    // silently -- see discovery.mjs's own rough-pass catch for the same
+    // fix and its full rationale (never a second write-door call, never
+    // a re-throw).
+    process.stderr.write(`fgos: priority write for "${id}" failed (${err?.message ?? err}) -- swallowed intentionally\n`);
   }
 
   // D3: need-human (an explicit verdict) OR a risk-heavy root (classify's
