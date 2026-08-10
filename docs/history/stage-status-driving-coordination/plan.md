@@ -93,7 +93,7 @@ Shape section's concrete-cases list above.
 
 ---
 
-# Plan: herdr-orchestrator auto-launch (tsk-2xt)
+# Plan: herdr-launcher auto-launch (tsk-2xt)
 
 ## Mode gate
 
@@ -299,7 +299,7 @@ registerConfigDefault({
 });
 
 registerCheck({
-  id: 'herdr-orchestrator-configured',
+  id: 'herdr-launcher-configured',
   description: 'herdrOrchestrator toggles in the shared config file are present and boolean',
   check: (cwd) => checkHerdrOrchestratorConfigured(cwd),
 });
@@ -320,7 +320,7 @@ above:** `test/setup/registrations.test.mjs`'s "Data Dictionary #7 names
 exactly the registered doctor checks" test asserts the registered-check-id
 list against `docs/specs/distribution.md`'s Data Dictionary row #7 verbatim
 (`specEnumeratedIds("Today's registered checks: ")`, `registrations.
-test.mjs:42,192-197`) — adding `herdr-orchestrator-configured` without
+test.mjs:42,192-197`) — adding `herdr-launcher-configured` without
 updating that row's enumerated list fails this test. `docs/specs/
 distribution.md` (row #7's own text: "a module adding one updates this row
 in the same change") is added to Files touched and to Shape step 2 below.
@@ -443,7 +443,7 @@ Impact-analysis posture: **full** (GitNexus present, `fgos tool query
 2. **Node side.** Add `DEFAULT_HERDR_ORCHESTRATOR_SETTINGS` +
    `registerConfigDefault` + `checkHerdrOrchestratorConfigured` +
    `registerCheck` to `src/setup/registrations.mjs`, next to the
-   `gateBypass` block they mirror. Add `herdr-orchestrator-configured` to
+   `gateBypass` block they mirror. Add `herdr-launcher-configured` to
    `docs/specs/distribution.md`'s Data Dictionary row #7 enumerated list
    (found at `fgos-validating` — `registrations.test.mjs`'s "Data
    Dictionary #7" test asserts this list verbatim against the spec, will

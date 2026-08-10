@@ -1,4 +1,5 @@
 use std::io;
+use std::path::Path;
 use std::time::{Duration, Instant};
 
 use herdr_fgos::app::{App, Panel};
@@ -7,6 +8,7 @@ use herdr_fgos::layout;
 use herdr_fgos::pane_scan::HerdrPaneScanner;
 use herdr_fgos::pick::{self, HerdrPaneAdapter};
 use herdr_fgos::ports::{PaneOrchestrator, PaneRegistry, TerminalUi, UiEvent, WorkItemSource};
+use herdr_fgos::settings;
 use herdr_fgos::ui::RatatuiTerminalUi;
 
 /// Same poll cadence as the existing STR40 bash cockpit's dashboard pane —
@@ -85,6 +87,7 @@ fn main() -> io::Result<()> {
         pane_registry.as_ref().map(|r| r as &dyn PaneRegistry),
         &pane_orchestrator,
         POLL_INTERVAL,
+        root.as_deref().ok(),
     );
 
     ui.teardown()?;
@@ -99,6 +102,7 @@ fn run(
     registry: Option<&dyn PaneRegistry>,
     pane_orchestrator: &impl PaneOrchestrator,
     poll_interval: Duration,
+    root: Option<&Path>,
 ) -> io::Result<()> {
     let mut last_poll = Instant::now();
     loop {
@@ -279,6 +283,13 @@ fn run(
             }
             if let Some(registry) = registry {
                 app.refresh_pane_state(registry);
+            }
+            // tsk-2m5: fail-closed local file read, no port/test-seam
+            // needed (unlike the two calls above, which shell out to an
+            // external process/registry) — storing only, no launcher
+            // logic here (tsk-2ja/tsk-57q's own footprint).
+            if let Some(root) = root {
+                app.orchestrator_settings = settings::read_settings(root);
             }
             last_poll = Instant::now();
         }
@@ -527,7 +538,7 @@ mod tests {
             discovered: std::cell::RefCell::new(Vec::new()),
         };
 
-        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO, None)
             .expect("run should exit cleanly on Quit");
 
         assert_eq!(*pane_orchestrator.picked.borrow(), vec!["tsk-a".to_string()]);
@@ -565,7 +576,7 @@ mod tests {
             discovered: std::cell::RefCell::new(Vec::new()),
         };
 
-        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO, None)
             .expect("run should exit cleanly on Quit");
 
         // A miss (n=0) returns `Ok(None)` -- no event at all this tick,
@@ -604,7 +615,7 @@ mod tests {
         assert_eq!(app.active_tab, herdr_fgos::app::WorkTab::Todo);
         let pane_orchestrator = NoopPaneOrchestrator;
 
-        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO, None)
             .expect("run should exit cleanly on Quit");
 
         assert_eq!(
@@ -645,7 +656,7 @@ mod tests {
         let mut app = App::empty();
         let pane_orchestrator = NoopPaneOrchestrator;
 
-        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO, None)
             .expect("run should exit cleanly on Quit");
 
         assert_eq!(app.filter_query, "ab");
@@ -682,7 +693,7 @@ mod tests {
         let mut app = App::empty();
         let pane_orchestrator = NoopPaneOrchestrator;
 
-        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO, None)
             .expect("run should exit cleanly on Quit");
 
         assert_eq!(app.filter_query, "");
@@ -774,7 +785,7 @@ mod tests {
             focused: std::cell::RefCell::new(Vec::new()),
         };
 
-        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO, None)
             .expect("run should exit cleanly on Quit");
 
         assert_eq!(app.focused_panel, Panel::InProcess);
@@ -795,7 +806,7 @@ mod tests {
             focused: std::cell::RefCell::new(Vec::new()),
         };
 
-        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO, None)
             .expect("run should exit cleanly on Quit");
 
         assert!(pane_orchestrator.focused.borrow().is_empty());
@@ -822,7 +833,7 @@ mod tests {
             discovered: std::cell::RefCell::new(Vec::new()),
         };
 
-        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO, None)
             .expect("run should exit cleanly on Quit");
 
         assert_eq!(*pane_orchestrator.picked.borrow(), vec!["tsk-a".to_string()]);
@@ -854,7 +865,7 @@ mod tests {
             discovered: std::cell::RefCell::new(Vec::new()),
         };
 
-        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO, None)
             .expect("run should exit cleanly on Quit");
 
         assert_eq!(*pane_orchestrator.discovered.borrow(), vec!["tsk-a".to_string()]);
@@ -889,7 +900,7 @@ mod tests {
             discovered: std::cell::RefCell::new(Vec::new()),
         };
 
-        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO, None)
             .expect("run should exit cleanly on Quit");
 
         assert!(pane_orchestrator.discovered.borrow().is_empty());
@@ -916,7 +927,7 @@ mod tests {
         app.select_next();
         let pane_orchestrator = NoopPaneOrchestrator;
 
-        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO)
+        run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO, None)
             .expect("run should exit cleanly on Quit");
 
         assert_eq!(
@@ -943,6 +954,7 @@ mod tests {
             Some(&registry),
             &pane_orchestrator,
             Duration::ZERO,
+            None,
         )
         .expect("run should exit cleanly on Quit");
 
@@ -964,6 +976,7 @@ mod tests {
             None,
             &pane_orchestrator,
             Duration::ZERO,
+            None,
         )
         .expect("run should exit cleanly on Quit");
 
