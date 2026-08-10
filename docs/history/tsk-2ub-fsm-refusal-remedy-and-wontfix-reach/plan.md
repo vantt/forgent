@@ -21,10 +21,16 @@ addition. No split.
    'wontfix' })` entry to `TRANSITIONS`. Update
    `test/state/fsm.test.mjs:150-197`'s `legalEdges` set to add
    `'awaiting-human->wontfix'` (the sweep test would otherwise expect this
-   pair to still refuse). No `reason`/`ask`/`answer` requirement added —
-   matches `wontfix`'s three existing doors, none of which require one
-   either (per `fsm-wontfix-terminal-status` D2: the closure reason lives
-   in the item's decision log, not a transition-payload field).
+   pair to still refuse). No NEW `reason`/`ask`/`answer` requirement is
+   added by this edge specifically — but `transitionWork`'s existing
+   generic rule (`:260-268`, `if (from === 'awaiting-human')`) already
+   requires a non-empty `answer` for ANY exit from `awaiting-human`,
+   unconditional on `to` — this edge inherits that unchanged, same as the
+   two existing `awaiting-human -> todo/doing` exits. This is still a real
+   improvement over today: the `answer` on a `-> wontfix` close is an
+   honest closure rationale ("no longer relevant"), collapsing the
+   fabricate-an-answer-to-resume-then-close-again two-write dishonesty
+   into one honest write, not eliminating the field.
 3. **`delivered`/`retrospective`/`cleanup`/`done -> wontfix` are NOT
    added.** `CONTEXT.md` D2: these are past-completion states; `wontfix`
    means "valid, never going to be done," which doesn't semantically fit
