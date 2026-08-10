@@ -306,8 +306,13 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
         rationale: 'tsk-4hb: making the silent unrecognized-value fallback observable',
       });
     }
-  } catch {
-    // Swallowed intentionally — see comment above.
+  } catch (err) {
+    // tsk-6d8: swallowed intentionally (see comment above), but never
+    // silently -- a stderr line is the visible signal that "every write
+    // failed" no longer looks identical to "every write succeeded". Never
+    // a second write-door call here (could itself fail and recurse into
+    // the same silence) or a re-throw (defeats the fail-safe).
+    process.stderr.write(`fgos: priority write for "${id}" failed (${err?.message ?? err}) -- swallowed intentionally\n`);
   }
 
   if (verdict.clear) {
