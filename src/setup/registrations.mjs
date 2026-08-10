@@ -41,7 +41,7 @@ import { readLocalStatus, classifyRegistryPosture } from '../state/tool-registry
 import { describeConfigAwareness } from '../config/global-config.mjs';
 import { sharedConfigFilePath, readSharedConfig, writeSharedConfig } from '../config/shared-config-file.mjs';
 import { DEFAULT_LEVEL, LEVELS } from '../state/gate-bypass.mjs';
-import { checkEventsJsonlContiguity, fixEventsJsonlContiguity } from '../../scripts/events-jsonl-contiguity.mjs';
+import { checkEventsJsonlContiguity, fixEventsJsonlContiguity } from '../state/events-jsonl-contiguity.mjs';
 
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 
