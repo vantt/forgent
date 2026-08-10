@@ -17,6 +17,11 @@ use herdr_fgos::ui::RatatuiTerminalUi;
 const POLL_INTERVAL: Duration = Duration::from_secs(5);
 
 fn main() -> io::Result<()> {
+    // tsk-45u D1: resolved once, up front, so the fixed `fg:operation`
+    // tab this dashboard creates at startup (below) and every pane it
+    // opens later both start in the same project root.
+    let root = fgos::repo_root();
+
     // tsk-3i3 D2/D3: before touching the terminal at all, check whether a
     // `fg:cockpit` tab already exists for this workspace. If so, hand off
     // to it and close this (now-redundant) tab instead of ever rendering
@@ -25,6 +30,8 @@ fn main() -> io::Result<()> {
     // same degrade-gracefully shape the rest of this function already
     // uses.
     let mut cockpit_error: Option<String> = None;
+    let mut operation_tab_error: Option<String> = None;
+    let mut operation_panes: Option<(String, String)> = None;
     if let (Ok(workspace_id), Ok(tab_id)) = (
         std::env::var("HERDR_WORKSPACE_ID"),
         std::env::var("HERDR_TAB_ID"),
@@ -34,6 +41,18 @@ fn main() -> io::Result<()> {
             Ok(false) => {}            // this tab is now the cockpit tab
             Err(err) => cockpit_error = Some(format!("could not ensure dashboard's own cockpit tab: {err}")),
         }
+
+        // tsk-5lr CONTEXT.md D1: the fixed `fg:operation` tab, created or
+        // found eagerly at startup the same way `ensure_cockpit_tab` just
+        // was above -- never lazy on first loop-launch attempt.
+        if let Ok(project_root) = &root {
+            match layout::ensure_operation_tab(&pick::herdr_bin(), &workspace_id, project_root) {
+                Ok(panes) => operation_panes = Some(panes),
+                Err(err) => {
+                    operation_tab_error = Some(format!("could not ensure fg:operation tab: {err}"))
+                }
+            }
+        }
     }
 
     let mut ui = RatatuiTerminalUi::init()?;
@@ -42,7 +61,13 @@ fn main() -> io::Result<()> {
     if let Some(err) = cockpit_error {
         app.last_error = Some(err);
     }
-    let root = fgos::repo_root();
+    if let Some(err) = operation_tab_error {
+        app.last_error = Some(err);
+    }
+    if let Some((left, right)) = operation_panes {
+        app.operation_left_pane_id = Some(left);
+        app.operation_right_pane_id = Some(right);
+    }
     let source: Option<FgosCliSource> = match &root {
         Ok(root) => Some(FgosCliSource {
             root: root.clone(),

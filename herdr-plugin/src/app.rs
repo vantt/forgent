@@ -232,6 +232,13 @@ pub struct App {
     /// (`settings::read_settings`). Storing only — acting on an enabled
     /// toggle is a sibling launcher item's own footprint (tsk-2ja/tsk-57q).
     pub orchestrator_settings: OrchestratorSettings,
+    /// tsk-5lr CONTEXT.md D1/D2: the fixed `fg:operation` tab's left
+    /// (merge-loop) pane id, `None` until `main()`'s startup call to
+    /// `layout::ensure_operation_tab` resolves it. A plain data carrier —
+    /// which loop launches into it is tsk-2xt's own scope, not this item's.
+    pub operation_left_pane_id: Option<String>,
+    /// Same as `operation_left_pane_id`, for the right (retro/cleanup) slot.
+    pub operation_right_pane_id: Option<String>,
 }
 
 impl App {
@@ -262,6 +269,8 @@ impl App {
             merge_list_rect: None,
             after_deliver_rect: None,
             orchestrator_settings: OrchestratorSettings::default(),
+            operation_left_pane_id: None,
+            operation_right_pane_id: None,
         }
     }
 
@@ -559,6 +568,8 @@ impl App {
             merge_list_rect: None,
             after_deliver_rect: None,
             orchestrator_settings: OrchestratorSettings::default(),
+            operation_left_pane_id: None,
+            operation_right_pane_id: None,
         }
     }
 

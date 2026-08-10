@@ -146,3 +146,32 @@ test('driftStatus omits a nested root whose target parent branch does not exist'
   };
   assert.deepEqual(driftStatus(repoRoot, view), {});
 });
+
+// tsk-4qu: the invariant checkRootDrift's stranded-work report is built on.
+// driftStatus deliberately suppresses `needsSync` for a resolved root (so
+// `fgos merge next`, which auto-runs a real sync-root on the blockedOnSync
+// bucket, never touches an item that is already closed out) — but it still
+// MEASURES the honest ahead count for that root, because findRootIds includes
+// any id that is some item's parent regardless of status. Surfacing the
+// stranded case is therefore a filter change in the consumer, not new
+// measurement here. If someone later "simplifies" driftStatus to skip
+// resolved roots entirely, this test fails and that consumer silently loses
+// its only data source.
+test('driftStatus still measures aheadOfTarget for a RESOLVED root, while keeping needsSync false', () => {
+  const repoRoot = initRepo();
+  checkoutNewBranch(repoRoot, 'fgw/root');
+  commitFile(repoRoot, 'leaf-work.txt', 'work merged into the root branch after the root closed out\n');
+  git(repoRoot, ['checkout', '-q', 'main']);
+
+  for (const status of ['delivered', 'retrospective', 'cleanup', 'done']) {
+    const view = {
+      work: {
+        root: item('root', { status }),
+        leaf: item('leaf', { parent: 'root', status }),
+      },
+    };
+    const result = driftStatus(repoRoot, view);
+    assert.equal(result.root.aheadOfTarget, 1, `ahead count must stay real for a "${status}" root`);
+    assert.equal(result.root.needsSync, false, `needsSync must stay false for a "${status}" root`);
+  }
+});

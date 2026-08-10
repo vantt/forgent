@@ -245,7 +245,7 @@ None
 
 ---
 
-# Plan: herdr-orchestrator auto-discover launcher (tsk-2ja)
+# Plan: herdr-launcher auto-discover launcher (tsk-2ja)
 
 Mode: **standard**
 
