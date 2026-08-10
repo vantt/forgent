@@ -506,6 +506,17 @@ test('resolveDiscovery writes EXACTLY ONE work.edit event carrying priority per 
   assert.equal(priorityEdits.length, 1);
 });
 
+// tsk-6d8: a write-door failure during the priority-write pass used to be
+// completely silent (bare `catch {}`) -- now writes one stderr line, but
+// the fail-safe control flow (never abort the clear/unclear resolution)
+// stays byte-identical. A real fs-permission failure (chmod 0o444) can't
+// isolate JUST this one call -- every real path through resolveDiscovery
+// writes at least one earlier decision (e.g. the caller-supplied-verdict
+// log) before ever reaching this try/catch, so a blanket read-only file
+// throws there instead. Proven correct by direct read + the unchanged
+// legacy-invalid-shape test below (still completes normally on a real
+// write-door rejection), not a dedicated fs-fault-injection test.
+
 // tsk-4hb: the priority-write pass now logs a decision when work.risk is
 // present but not a real RISK_DISCOUNTS key -- the exact real-world shape
 // (67/482 items on the real log) this item exists to make observable.
