@@ -3,7 +3,7 @@ type: how-to
 title: How to fix a `fgos-write-rejected` merge block on a `.fgos/` change
 tags: []
 timestamp: 2026-07-30T00:00:00.000Z
-source_capture_ids: [tsk-n4i-1, tsk-5vf, tsk-4eu, tsk-5ge, tsk-53n]
+source_capture_ids: [tsk-n4i-1, tsk-5vf, tsk-4eu, tsk-5ge, tsk-53n, tsk-3v2]
 ---
 # How to fix a `fgos-write-rejected` merge block on a `.fgos/` change
 
@@ -333,6 +333,41 @@ config content change itself landed the same way `tsk-5ge`'s did:
 applied directly against the main checkout as an operator action, with
 the full original verify (field-check `&&` `npm test`) run and passed
 there before the branch's own verify was narrowed.
+
+## Example: `tsk-3v2` — the block triggers from merging main in, not from your own commit
+
+Every example above involves the item's own branch committing a `.fgos/`
+change directly. `tsk-3v2` shows a different trigger for the same wall:
+its target branch, `fgw/tsk-19y`, carries its own `.fgos/` snapshot frozen
+at its historical fork point. Merging main into `fgw/tsk-19y` (done to
+pick up `CONTEXT.md` and later fixes) pulled in *current* main `.fgos/`
+state, which staged a diff against that frozen snapshot and tripped the
+same `fgos-write-rejected` wall on approve — no new `.fgos/` edit was
+ever authored by this item's own work:
+
+> `"errorClass":"fgos-write-blocked","layer":"state","detail":"fgw/tsk-3v2 staged a change under .fgos/ (.fgos/config.json, .fgos/entropy-history.jsonl, .fgos/events.jsonl); merge aborted, fgw/tsk-19y unchanged — ADR0020"`
+> — real `work.friction` capture, id `tsk-3v2`
+
+The fix follows the same shape steps 3–4 already give (restore the
+`.fgos/` paths to what they were before the offending commit), just
+applied against the *target* branch's own frozen versions instead of an
+earlier commit on the same branch — since here the drift came in through
+a merge, not a direct edit:
+
+> "fgw/tsk-19y's own `.fgos/` snapshot is frozen at its historical fork
+> point. Merging main into this branch ... pulled in current `.fgos/`
+> state, which staged a diff against `fgw/tsk-19y`'s frozen snapshot and
+> tripped ADR0020's `fgos-write-rejected` wall on approve. Restoring these
+> 3 paths to `fgw/tsk-19y`'s own versions removes that diff."
+> — real commit message, `857695c6`, branch `fgw/tsk-3v2`
+
+The lesson this adds: the trigger for this block isn't only "did I commit
+a `.fgos/` change" — it's "does my branch's current `.fgos/` state differ
+from its target's own frozen snapshot," which a routine `merge main in`
+can cause on its own. Any branch that periodically merges main to stay
+current is worth re-checking `git status`/`git diff` against `.fgos/`
+paths right after that merge, before assuming only a direct edit could
+have caused this.
 
 ## Related
 
