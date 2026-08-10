@@ -2,7 +2,7 @@
 type: explanation
 title: Why auto-launched herdr panes must be labeled before spawning claude, unlike person-triggered ones
 tags: []
-source_capture_ids: [tsk-2ja]
+source_capture_ids: [tsk-2ja, tsk-57q]
 ---
 # Why auto-launched herdr panes must be labeled before spawning `claude`, unlike person-triggered ones
 
@@ -57,6 +57,38 @@ own nature: an unattended poll tick has nobody to report a failure to
 mid-cycle; the safe behavior is to skip this tick's launch and let the
 next tick retry, not to crash or block the poll loop over one failed
 attempt.
+
+## A sibling launcher needed new trait methods, not the same ones (`tsk-57q`)
+
+`tsk-2ja`'s guard/launch machinery (`open_auto_discover_pane`,
+`has_labeled_pane`) was built around a single-item shape: one work item
+id, one dynamically-created `fg:agents-N` pane, one id-shaped title to
+scan for. The auto-merge/retro/cleanup launcher (`tsk-57q`) doesn't fit
+that shape at all — `/fgOS:merge-loop`/`/fgOS:retro-loop`/
+`/fgOS:cleanup-loop` are pool-sweep verbs with no single item id to
+launch against, and they target the *fixed*, already-resolved
+`fg:operation` tab (`tsk-5lr`) rather than a dynamically-picked
+`fg:agents-N` slot:
+
+> "New `PaneOrchestrator`/`PaneRegistry` trait methods for the fixed-pane
+> launch and fixed-title guard, since neither existing
+> pick.rs/pane_scan.rs path fit a no-id pool-sweep verb or a non-id-shaped
+> pane title."
+> — real commit message, `55e4a4df`, branch `fgw/tsk-57q`
+
+The label-before-spawn ordering and the reserved-namespace guard this
+doc describes both still apply — `fgos-auto-merge`/`fgos-auto-retro`/
+`fgos-auto-cleanup` are fixed, non-id-shaped labels in the same reserved
+`fgos-auto-*` namespace `tsk-2ja`'s `extract_task_id` exclusion already
+covers. What's new is the launch/scan *mechanism* itself: a no-id,
+fixed-pane variant sitting alongside the id-shaped, dynamic-pane variant,
+rather than one mechanism trying to serve both shapes. Each of the three
+toggles (`autoMerge`/`autoRetro`/`autoCleanup`) also stayed confirmed
+non-conflicting with the human-gate policy wall
+(`stage-status-driving-coordination/CONTEXT.md` D9) by construction — this
+launcher only ever shells out to the existing `/fgOS:merge-loop` command,
+never touching `bin/fgos.mjs`'s `approve`/`merge` cases or `store.mjs`'s
+`moveWork` directly.
 
 ## Related
 
