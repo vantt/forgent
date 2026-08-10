@@ -13,7 +13,15 @@ quy mô vấn đề gốc). Số đo chặn lại quyết định: **54 item đa
 `retrospective`** — hàng đợi thật, nên mọi phương án thêm bước per-item
 đều đi ngược. §6.4 viết lại thành 5 ràng buộc + 4 phương án.
 
-Vòng 5. Phép thử Cách 1 (`tsk-1hy`) **đã chạy thật và merge** — trả lời
+Vòng 6. Chấm lại §6.4 cho **nửa storytelling**: bảng bốn phương án co còn
+**một** — Làn B của phương án 2 (quét theo lô, xếp hạng trên quần thể, đẻ
+ứng viên `draft`, curate bất đồng bộ, kèm doctor check canh chính nó).
+Ba phương án kia tự loại chứ không bị chấm thua. **R1 sụp** (hàng đợi 54
+là tồn đọng chứ không phải trần — đo lại còn 2, riêng 07-08 đẩy 86 item
+qua `cleanup`), gộp vào R6. Kết luận **chưa mint**, chờ xác nhận. Nửa
+changelog vẫn chờ số đo tỉ lệ quên (`tsk-12m` đang park `awaiting-human`).
+
+*Vòng 5 (giữ lại để đối chiếu):* Phép thử Cách 1 (`tsk-1hy`) **đã chạy thật và merge** — trả lời
 xong câu hỏi của nó: vỉa chất liệu **dùng được nhưng mật độ không đều**,
 kèm ứng viên tín hiệu xếp hạng đầu tiên có căn cứ (round-count trên mỗi
 item). Đồng thời đo được một thí nghiệm tự nhiên chưa ai để ý: bước
@@ -309,6 +317,41 @@ Diataxis hiện có (không đụng, không pha trộn — hard rule của
   không đi cùng nhịp — nên §6.4 **có thể được trả lời từng nửa**, không
   phải chờ chốt một lượt.
 
+- **2026-08-10 (vòng 6 — chấm lại §6.4 cho nửa storytelling)** — Chứng cứ
+  đã đủ (phép thử + R6 có tiền lệ), nên chấm. Hai kết quả.
+
+  **(a) R1 SỤP, và cách nó sụp mới là điều đáng ghi.** R1 rút từ ảnh chụp
+  "54 item đứng ở `retrospective`", suy ra ngầm rằng tổng hợp per-item
+  không co giãn nổi. Đo lại hai ngày sau: `retrospective` còn **2**,
+  `done` 229 (từ 166), tổng 518 item (từ 435); nhật ký cho thấy riêng
+  2026-08-07 đẩy **86 item** qua `cleanup`. Hàng đợi 54 là **tồn đọng**,
+  không phải trần — nó là khoảnh khắc chưa ai chạy vòng lặp, tức **cùng
+  gốc với R6**, không phải ràng buộc riêng. Gạch R1, gộp vào R6, giữ
+  nguyên dòng cũ để thấy lịch sử.
+
+  Đây là **lần thứ hai** trong thảo luận này một kết luận rút từ MỘT ảnh
+  chụp bị dữ liệu-theo-thời-gian bác (lần đầu: `friction`, §3 dòng G).
+  Bài học lặp lại đủ hai lần để đáng thành nguyên tắc làm việc: **một
+  ảnh chụp không phân biệt được "trần năng lực" với "lúc chưa ai chạy" —
+  phải nhìn chuỗi thời gian trước khi rút ràng buộc từ một con số.**
+
+  **(b) Bảng bốn phương án co còn hai, rồi còn một.** Phương án 1 đã làm
+  (`tsk-1hy`); phương án 4 không độc lập (bỏ cửa chặn để thoả R2 thì nó
+  BIẾN THÀNH phương án 2); phương án 3 trượt R3 vì lý do đã đo — phép thử
+  chứng minh tín hiệu nằm ở quần thể, mà 3 thì per-item. Còn **Làn B của
+  phương án 2**. Bảng chấm chi tiết theo R2-R6 ở §6.4.
+
+  Đáng chú ý: R6 từng là ràng buộc khó nhất, cấm trả lời bằng lời hứa
+  ("sẽ có kỷ luật" không tính). Trong đúng một ngày nó có **hai tiền lệ
+  chạy thật**: `tsk-3ip` đăng ký `changelog-unreleased-stale`, `tsk-1m0`
+  đăng ký `enduser-docs-index-stale` (hiện FAIL đúng như thiết kế: "85/237
+  tài liệu end-user chưa có trong index"). Doctor giờ 14 check. Câu trả
+  lời cho R6 không còn là hứa hẹn.
+
+  **(c) Chưa mint D-ID.** Kết luận Làn B mới qua một vòng; chờ xác nhận.
+  Ba điều còn chưa chắc ghi ở cuối §6.4 — round-count mới là ứng viên
+  chưa đo, tầng khuôn mẫu thứ hai chưa lọc, chi phí curate chưa ước.
+
 ## 6. Thiết kế đã chốt {#design}
 
 **Tái sinh vòng 4.** Chỉ D-tsk28x-1 đã chốt thật. §6.1-6.3 giữ nguyên từ
@@ -385,7 +428,16 @@ lệch quy mô vấn đề gốc. Số đo chặn lại: **54 item đang đứng
 
 **Ràng buộc rút ra, dùng để chấm mọi phương án:**
 
-- R1 — không thêm bước per-item nào vào một hàng đợi đã 54.
+- ~~R1 — không thêm bước per-item nào vào một hàng đợi đã 54.~~
+  **SỤP (vòng 6, 2026-08-10) — gộp vào R6.** Tiền đề sai: hàng đợi 54
+  không phải trần năng lực mà là **tồn đọng lúc chưa ai chạy vòng lặp**.
+  Đo lại: `retrospective` còn **2** (từ 54), `done` 229 (từ 166), tổng
+  item 518 (từ 435); riêng 2026-08-07 đẩy **86 item** qua `cleanup`. Mô
+  hình per-item xử lý được 518 item. Cùng gốc với R6 (bước cần người
+  chạy, có lúc không ai chạy) — không phải ràng buộc riêng. Giữ dòng này
+  gạch ngang thay vì xoá: đây là lần THỨ HAI một kết luận rút từ MỘT ảnh
+  chụp bị dữ liệu theo thời gian bác (lần đầu: `friction` là chất liệu
+  kể chuyện, §3 dòng G).
 - R2 — quyền quyết định của người phải đạt được **không bằng cửa chặn**
   (dùng trạng thái `draft`, hoặc curate bất đồng bộ).
 - R3 — cái gì cần xếp hạng thì phải chạy trên **quần thể**, không nằm
@@ -401,14 +453,42 @@ lệch quy mô vấn đề gốc. Số đo chặn lại: **54 item đang đứng
   Trả lời "sẽ có kỷ luật" không tính là trả lời — bước đang tụt cũng đã
   có kỷ luật bằng lời.
 
-**Bốn phương án đặt cạnh nhau:**
+**Bốn phương án — chấm lại vòng 6, co còn hai:**
 
-| # | Hình dạng | Được | Mất | Chi phí |
-|---|---|---|---|---|
-| 1 | **Chỉ mặt đọc** — verb truy vấn trên chất liệu đã có (gom ask + rationale-một-lần, lọc khuôn mẫu, nhóm, in ra). Không state mới, không gate, không hàng đợi | Dùng được ngay; **là phép thử**: cho biết vật liệu có đủ tốt để xây tiếp không, trước khi cam kết kiến trúc | Không tích luỹ; không giải changelog | Vài ngày |
-| 2 | **Hai làn tách theo chi phí phán đoán** — Làn A (cơ học, per-item, chạy thẳng): changelog một dòng, không xếp hạng không gác. Làn B (phán đoán, quét theo lô): verb quét pool, xếp hạng, đẻ ứng viên dạng nháp, người curate bất đồng bộ | Khớp đúng sự khác nhau thật của hai loại việc; thoả R1-R5 | Hai đường phải nuôi | Trung bình |
-| 3 | **Chỉ thêm `draft` vào compound hiện tại** | Thay đổi nhỏ nhất; giải được vấn đề lòng tin | Không giải hàng đợi 54; không giải triage | Nhỏ |
-| 4 | **Đường ống 5 pha (bản vòng 3)** | Đầy đủ nhất trên giấy | Vi phạm R1 và R2; đắt nhất | Cao |
+| # | Hình dạng | Trạng thái sau vòng 6 |
+|---|---|---|
+| 1 | **Chỉ mặt đọc** — verb/script truy vấn chất liệu đã có, không state mới, không gate | **ĐÃ LÀM RỒI** — chính là `tsk-1hy`, đã merge. Không còn là ứng viên; nó là phép thử đã hoàn thành, và kết quả của nó là đầu vào cho việc chấm này |
+| 2 | **Hai làn tách theo chi phí phán đoán** — Làn A (cơ học, per-item, chạy thẳng): changelog. Làn B (phán đoán, quét theo lô): quét pool, xếp hạng, đẻ ứng viên dạng `draft`, người curate bất đồng bộ | **CÒN LẠI — ứng viên duy nhất cho nửa storytelling.** Làn A đã xong (`tsk-469` + `tsk-3ip`) |
+| 3 | **Chỉ thêm `draft` vào compound hiện tại** | **LOẠI cho mục đích storytelling** — per-item, không xếp hạng trên quần thể. Nhưng phép thử đã đo: tín hiệu NẰM Ở QUẦN THỂ (arc tập trung ở item nhiều vòng — `tsk-19j` 15 entry, `tsk-1ca` 25 entry; item một-hai entry gần như rỗng). Trượt R3 vì lý do đã đo, không phải lý do lý thuyết. *Vẫn có thể hữu ích cho mục đích khác — chỉ loại cho storytelling* |
+| 4 | **Đường ống 5 pha (bản vòng 3)** | **KHÔNG PHẢI LỰA CHỌN ĐỘC LẬP.** R1 sụp nên nó hết bị chặn bởi R1, nhưng R2 vẫn chặn (cửa gác chặn). Đổi cửa gác thành trạng thái `draft` để thoả R2 thì nó **biến thành đúng phương án 2**. Tức 4 = 2 + một cửa chặn không cần thiết |
+
+**Chấm Làn B (phương án 2) theo R2-R6 — nửa storytelling:**
+
+| Ràng buộc | Thoả? | Căn cứ |
+|---|---|---|
+| R2 — không cửa chặn | ✓ | Đẻ ứng viên dạng `draft`, người curate bất đồng bộ |
+| R3 — xếp hạng trên quần thể | ✓ | Quét theo lô, đúng chỗ phép thử đo được tín hiệu |
+| R4 — không gom hết | ✓ **nhưng phải lọc HAI tầng** | Phép thử phát hiện vỉa ask còn tầng khuôn mẫu thứ hai chưa lọc (§3 dòng J3) |
+| R5 — tách cơ học/phán đoán | ✓ | Làn A đã xong rồi, tách sẵn |
+| R6 — không tụt | ✓ **có câu trả lời ĐÃ CHỨNG MINH** | Đăng ký doctor check. `tsk-3ip` làm rồi (`changelog-unreleased-stale`), `tsk-1m0` làm rồi (`enduser-docs-index-stale`, hiện FAIL đúng: "85/237 tài liệu chưa có trong index"). R6 xưa cấm trả lời bằng lời hứa — giờ có tiền lệ chạy thật, hai lần |
+
+**Kết luận đề xuất (CHƯA mint):** nửa storytelling đi theo **Làn B của
+phương án 2** — verb quét theo lô trên quần thể, xếp hạng, đẻ ứng viên
+dạng `draft`, người curate bất đồng bộ, kèm doctor check canh chính nó.
+Không phải vì nó ăn điểm cao nhất trên giấy, mà vì **ba phương án kia đã
+tự loại**: 1 đã làm, 4 là 2 đội thêm cửa chặn, 3 trượt đúng chỗ phép thử
+vừa đo.
+
+**Ba điều còn chưa chắc, không được lờ khi thi công:**
+
+1. **Round-count mới là ỨNG VIÊN, chưa phải tín hiệu đã chứng minh.** bee
+   chọn được tín hiệu vì có bộ nhãn tay để đo AUC; fgOS chưa có. Không
+   khoá round-count như thể đã đo.
+2. **Tầng khuôn mẫu thứ hai của vỉa ask chưa ai lọc** — phải lọc trước
+   khi xếp hạng, kẻo xếp hạng trên rác.
+3. **Chi phí curate của người chưa ai ước.** Làn B đẻ ứng viên; không ai
+   duyệt thì thành nghĩa địa `draft` — đúng rủi ro nêu từ vòng 4, vẫn
+   chưa xử.
 
 Ghi chú sự thật hiện trạng, đúng cho mọi phương án: `fgos compound` chạy
 khi item ở `retrospective`, tức SAU cổng duyệt `awaiting-approval`
