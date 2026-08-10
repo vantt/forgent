@@ -19,7 +19,7 @@ possibly-stale line numbers)
   aliased as `isMainTreeClean`; a local wrapper of the same name is defined
   at `bin/fgos.mjs:129-134` for `return`'s own subtree-scoped gate.
 - `approve`'s local-merge branch gates on it before any git mutation
-  (`bin/fgos.mjs:2907-2910`): `ownFileSet = buildOwnFileSet(runnerOwnDiff,
+  (`bin/fgos.mjs:2914-2916`): `ownFileSet = buildOwnFileSet(runnerOwnDiff,
   item.footprint)` then `if (!isMainTreeClean(repoRoot, ownFileSet)) throw
   new StoreError('validation', ...)`. This one check covers BOTH of
   approve's own leaf-vs-root branches (it runs before the `if (rootId !==
@@ -30,7 +30,7 @@ possibly-stale line numbers)
     shared `repoRoot` directly. Out of this item's scope (item's own
     description already excludes this branch).
   - `item.parent` falsy (a root with no parent) → `return await
-    runAndReport(repoRoot)` (`bin/fgos.mjs:3325`) — runs `git merge
+    runAndReport(repoRoot)` (`bin/fgos.mjs:3340`) — runs `git merge
     --no-commit --no-ff` and `git commit --no-edit` directly on the shared
     main checkout, with **no clean-tree check anywhere in this branch**.
     Confirmed by reading the full case body: the only pre-merge guards
@@ -53,6 +53,26 @@ possibly-stale line numbers)
   refusing cleanly. Adding the gate below prevents this crash too, by
   refusing before the merge is ever attempted — the same mechanism
   `approve` already relies on for this.
+- **fgos-validating finding (this round):** `fgos merge next` never calls a
+  separate sync-root implementation — it dispatches through the same verb
+  (`const syncResult = await runVerb('sync-root', flags, [rootId], dir);`,
+  `bin/fgos.mjs:2010`), wrapped in a `try { ... } catch (err) { if (err
+  instanceof StoreError && err.message.includes('Iron Law')) { return {
+  picked: rootId, blocked: 'iron-law', message: err.message, syncRoot: {
+  id: rootId } }; } throw err; }` (`bin/fgos.mjs:2009,2033-2038`). Only an
+  Iron Law `StoreError` is recognized; any other thrown `StoreError` —
+  including the new dirty-tree gate below, thrown the same way — falls to
+  `throw err`, propagating to the CLI's top-level handler as a generic
+  exit-4 error envelope (`bin/fgos.mjs:4416`,
+  `process.exitCode = EXIT_CODES[categoryOf(err)] ?? 1`) instead of the
+  graceful `{picked, blocked, syncRoot}` shape. `plugins/fgOS/skills/merge-
+  loop/SKILL.md:105-114` documents that shape (`iron-law` /
+  `merge-conflict` / `fgos-write-rejected` / `verify-fail`, alongside an
+  `approve`-reported block) as exactly what its own same-id-blocked-twice
+  stop rule parses — an uncaught error here is a shape merge-loop's own
+  driving logic has no rule for, undermining the unattended-loop scenario
+  this item's own description names. This item's fix must also teach this
+  one catch block the new failure, not just add the gate itself.
 
 ## Approach
 
@@ -72,33 +92,66 @@ possibly-stale line numbers)
    mirrors `approve`'s own gate byte-for-byte (same helper, same
    ownFileSet shape, same StoreError('validation') refusal), just
    attached to `sync-root`'s own no-parent branch instead.
-2. No change to `merge.mjs`'s `mergeRunnerItem`/`runAndReport`'s own
+2. `bin/fgos.mjs`, `merge next`'s own `catch (err)` at line ~2033-2038
+   (wrapping the `runVerb('sync-root', ...)` call at line 2010): add a
+   branch recognizing the new gate's refusal the same way the existing
+   branch already recognizes Iron Law, using a distinctive substring of
+   the new gate's own message (`is not clean`, from step 1's exact
+   message text) so the two branches never collide:
+   ```js
+   } catch (err) {
+     if (err instanceof StoreError && err.message.includes('Iron Law')) {
+       return { picked: rootId, blocked: 'iron-law', message: err.message, syncRoot: { id: rootId } };
+     }
+     if (err instanceof StoreError && err.message.includes('is not clean')) {
+       return { picked: rootId, blocked: 'dirty-tree', message: err.message, syncRoot: { id: rootId } };
+     }
+     throw err;
+   }
+   ```
+   `'dirty-tree'` is a new `blocked` reason value, additive only — every
+   existing reason (`iron-law`/`merge-conflict`/`fgos-write-rejected`/
+   `verify-fail`) is untouched, and `merge-loop/SKILL.md:105-114`'s own
+   rule already treats "any other" reason on this shape as the same
+   blocked-pick bucket, so the skill needs no doc change for this to be
+   handled correctly today.
+3. No change to `merge.mjs`'s `mergeRunnerItem`/`runAndReport`'s own
    `merge-failed-unclassified` handling — out of scope (this item is
    about the missing gate, not the misclassification; the live
    reproduction above shows the gate alone prevents ever reaching that
    crash path for a dirty-tree cause).
-3. `test/cli/fgos.test.mjs` (the item's own `verify` target), next to the
+4. `test/cli/fgos.test.mjs` (the item's own `verify` target), next to the
    existing sync-root suite (`bin/fgos.mjs:6108` onward, helpers
    `makeDriftedRoot`/`commitPendingBeforeApprove` already exist and are
-   reused, not reinvented): one new test proving `sync-root` on a
-   no-parent root refuses (exit 4, `StoreError('validation')`) when the
-   shared main checkout carries an uncommitted foreign change — built with
-   `makeDriftedRoot` but *without* calling `commitPendingBeforeApprove`
-   (that helper is what every existing sync-root test uses to clear the
-   tree first; skipping it is what leaves the tree dirty for this negative
-   case) — then asserts the root's own `fgw/<id>` branch and `main`'s HEAD
-   are both unchanged (no merge commit landed) and the foreign uncommitted
-   file is still present untouched.
+   reused, not reinvented):
+   - one new test proving `sync-root` on a no-parent root refuses (exit 4,
+     `StoreError('validation')`) when the shared main checkout carries an
+     uncommitted foreign change — built with `makeDriftedRoot` but
+     *without* calling `commitPendingBeforeApprove` (that helper is what
+     every existing sync-root test uses to clear the tree first; skipping
+     it is what leaves the tree dirty for this negative case) — then
+     asserts the root's own `fgw/<id>` branch and `main`'s HEAD are both
+     unchanged (no merge commit landed) and the foreign uncommitted file
+     is still present untouched.
+   - one new test, next to the existing `merge next` blockedOnSync suite
+     (`test/cli/fgos.test.mjs:8551` onward, same `commitPendingBeforeApprove`-
+     omission technique as above), proving `fgos merge next` on a
+     blockedOnSync root with a dirty shared checkout exits 0 with
+     `{picked: <rootId>, blocked: 'dirty-tree', syncRoot: {id: <rootId>}}`
+     — not a bare non-zero crash — mirroring the existing
+     `blocked: 'merge-conflict'` test's own assertion shape
+     (`test/cli/fgos.test.mjs:8551-8581`) exactly.
 
-No split: this is one function-local gate plus one new regression test,
-not independently workable pieces.
+No split: this is one function-local gate, one catch-block branch, and two
+new regression tests — one honest piece, not independently workable ones.
 
 ## Risk map
 
 | Component | Risk | Proof |
 |---|---|---|
-| New gate on sync-root's no-parent branch | medium — every unattended `fgos merge next`/`merge-loop` root-sync now refuses instead of merging on a dirty shared checkout | New negative-path test (above), run against pre-fix code first to confirm it fails there (failing-test-first), then passes after the gate is added. Existing sync-root happy-path/nested-parent/decision tests (`bin/fgos.mjs:6151` onward) re-read and re-run unchanged — none of them leave the tree dirty going into the merge, so none should newly refuse. |
-| Reused `buildOwnFileSet`/`isMainTreeClean` helpers | low — no change to either helper, only a new call site | `approve`'s own existing test coverage for these two helpers is untouched; this item adds a call, not a change, to shared code |
+| New gate on sync-root's no-parent branch | medium — every unattended `fgos merge next`/`merge-loop` root-sync now refuses instead of merging on a dirty shared checkout | New negative-path test (above), run against pre-fix code first to confirm it fails there (failing-test-first), then passes after the gate is added. Existing sync-root happy-path/nested-parent/decision tests (`bin/fgos.mjs:6151` onward) re-read and re-run unchanged — none of them leave the tree dirty going into the merge, so none should newly refuse. `test/cli/fgos.test.mjs` baseline run this round (all 9 sync-root-family tests, `node --test --test-name-pattern="sync-root"`): 9 pass, 0 fail — confirms every existing test already calls `commitPendingBeforeApprove` before its own `sync-root`/`merge next` call, so none is dirty going in. |
+| `merge next`'s catch block not recognizing the new refusal | medium — an unhandled shape breaks `merge-loop/SKILL.md`'s own same-id-blocked-twice parsing for exactly the unattended path this item's own description names | New `merge next` test (above), same failing-test-first discipline. `merge-loop/SKILL.md:105-114` read directly and cited above — the new `blocked: 'dirty-tree'` value needs no doc change since the skill's own rule already treats any reason on this shape as one bucket. |
+| Reused `buildOwnFileSet`/`isMainTreeClean` helpers | low — no change to either helper, only two new call sites | `approve`'s own existing test coverage for these two helpers is untouched; this item adds calls, not changes, to shared code |
 | `item.parent` (ephemeral-worktree) branch | none — explicitly out of scope, not touched | confirmed by direct code read (Evidence above): that branch never calls `runAndReport(repoRoot)` |
 
 Impact-analysis posture: **degraded**. `fgos tool query --capability
