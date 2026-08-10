@@ -315,6 +315,16 @@ staleness check cannot catch: a *present* but malformed value (e.g.
 `checkGateBypassConfigured` already documents for `gateBypass.level`'s enum
 check.
 
+**Found at `fgos-validating`, correcting an omission from the Approach
+above:** `test/setup/registrations.test.mjs`'s "Data Dictionary #7 names
+exactly the registered doctor checks" test asserts the registered-check-id
+list against `docs/specs/distribution.md`'s Data Dictionary row #7 verbatim
+(`specEnumeratedIds("Today's registered checks: ")`, `registrations.
+test.mjs:42,192-197`) — adding `herdr-orchestrator-configured` without
+updating that row's enumerated list fails this test. `docs/specs/
+distribution.md` (row #7's own text: "a module adding one updates this row
+in the same change") is added to Files touched and to Shape step 2 below.
+
 **Rejected alternative:** a `fix` registration (mirroring
 `fixGateBypassConfigured`) — rejected as scope creep for this piece.
 `ensureSharedConfigDefaults` (`fgos setup`'s own write path) already fills
@@ -363,9 +373,14 @@ pub fn read_settings(root: &Path) -> OrchestratorSettings {
 `#[serde(default)]` on every field is what makes a partially-specified
 section (e.g. only `autoDiscover` set) leave the other three at `false`
 rather than erroring — `Deserialize`'s own missing-field behavior, not
-custom code. `serde` (with the `derive` feature) is not yet a
-`herdr-plugin` dependency (only `serde_json` is, `Cargo.toml:18`) — add
-`serde = { version = "1.0", features = ["derive"] }`.
+custom code.
+
+**Corrected at `fgos-validating`:** the Approach section above claimed
+`serde` (derive) was not yet a `herdr-plugin` dependency — false.
+`herdr-plugin/Cargo.toml:17` already carries
+`serde = { version = "1.0", features = ["derive"] }`, alongside
+`serde_json` on line 18. No `Cargo.toml` edit is needed for this item; the
+"add serde derive dependency" file/step below is removed.
 
 `herdr-plugin/src/lib.rs` gains `pub mod settings;` (alongside the 7
 existing `pub mod` lines). `main.rs`'s existing poll tick (the
@@ -394,10 +409,11 @@ external process to seam around.
 - `herdr-plugin/src/main.rs` (one call in the poll tick; one new `App` field
   read)
 - `herdr-plugin/src/app.rs` (`orchestrator_settings` field + default)
-- `herdr-plugin/Cargo.toml` (add `serde` derive dependency)
 - `src/setup/registrations.mjs` (registration — corrects the item's own
   pre-declared footprint guess of `src/config/shared-config-file.mjs`,
   see Approach above)
+- `docs/specs/distribution.md` (Data Dictionary row #7's enumerated
+  check-id list — found at `fgos-validating`, see above)
 - `CHANGELOG.md` (`## [Unreleased]` line)
 
 ### Risk map
@@ -413,9 +429,10 @@ Impact-analysis posture: **full** (GitNexus present, `fgos tool query
 
 ## Shape (standard mode — two-part plan, one item)
 
-1. **Rust side.** Add `serde` derive dependency. Write `settings.rs`
-   (`OrchestratorSettings`, `read_settings`) per the Approach section
-   above. Wire `pub mod settings;` into `lib.rs`. Add
+1. **Rust side.** `serde` derive is already a dependency (`Cargo.toml:17`,
+   confirmed at `fgos-validating`) — no `Cargo.toml` edit. Write
+   `settings.rs` (`OrchestratorSettings`, `read_settings`) per the Approach
+   section above. Wire `pub mod settings;` into `lib.rs`. Add
    `orchestrator_settings: OrchestratorSettings` to `App` (default all-OFF
    in `App::empty()`). Add one call inside `main.rs`'s existing poll tick,
    guarded the same way `source`/`registry` already are (`if let Ok(root)
@@ -426,9 +443,13 @@ Impact-analysis posture: **full** (GitNexus present, `fgos tool query
 2. **Node side.** Add `DEFAULT_HERDR_ORCHESTRATOR_SETTINGS` +
    `registerConfigDefault` + `checkHerdrOrchestratorConfigured` +
    `registerCheck` to `src/setup/registrations.mjs`, next to the
-   `gateBypass` block they mirror. Tests in
-   `test/setup/registrations.test.mjs` (existing file, following its
-   existing per-check test shape): missing key flagged stale by
+   `gateBypass` block they mirror. Add `herdr-orchestrator-configured` to
+   `docs/specs/distribution.md`'s Data Dictionary row #7 enumerated list
+   (found at `fgos-validating` — `registrations.test.mjs`'s "Data
+   Dictionary #7" test asserts this list verbatim against the spec, will
+   fail otherwise). Tests in `test/setup/registrations.test.mjs` (existing
+   file; `plugin-skill-cli-reachable`'s tests at lines 216-242 are the
+   real per-check precedent to follow): missing key flagged stale by
    `checkConfigNotStale`; present-and-boolean passes
    `checkHerdrOrchestratorConfigured`; present-and-non-boolean fails it
    with a message naming the bad key.
