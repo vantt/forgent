@@ -118,17 +118,64 @@ pub struct AfterDeliverRow {
     pub status: String,
 }
 
+/// tsk-59b: one node of `fgos merge list --json`'s `tree` field
+/// (`mergeTree`, `src/state/graph-harness.mjs` — tsk-2x9k). Recursive:
+/// `children` nests leaf-to-root items under their real parent, sorted by
+/// the same `blocks`-descending order the JS engine already computed
+/// (CONTEXT.md D3/D4 — this struct never re-sorts, only reflects). `status`
+/// is one of `ready`/`waiting`/`blocked-sync`/`conflicted`/`superseded`/
+/// `container` (a real ancestor item that is not itself a merge candidate,
+/// existing purely so its children have somewhere to nest — D2/D3).
+/// `reason` is present only on `blocked-sync`/`conflicted`/`superseded`
+/// nodes, naming the specific cause and counterpart item (D7) — absent
+/// (not empty-string) on every other status, matching the JS side's own
+/// `reason?: string` optionality.
+#[derive(Debug, Clone, Default, Deserialize, PartialEq)]
+pub struct MergeTreeNode {
+    pub id: String,
+    pub title: String,
+    pub status: String,
+    pub reason: Option<String>,
+    #[serde(default)]
+    pub children: Vec<MergeTreeNode>,
+}
+
+/// tsk-59b: total node count across the whole tree, recursively — the MERGE
+/// LIST box title's `(N)` count (was `ready.len() + waiting.len() +
+/// blocked_on_sync.len()` before the tree existed; every id in those three
+/// buckets is a node somewhere in `tree`, so this is the same count).
+pub fn merge_tree_node_count(nodes: &[MergeTreeNode]) -> usize {
+    nodes.iter().map(|n| 1 + merge_tree_node_count(&n.children)).sum()
+}
+
+/// tsk-59b: total RENDERED LINE count across the whole tree — one line per
+/// node plus one extra line for each node that carries a `reason` (D7).
+/// Distinct from `merge_tree_node_count` because `Paragraph::scroll`
+/// scrolls by rendered line, not by node — the scroll bound must match
+/// what is actually on screen.
+pub fn merge_tree_line_count(nodes: &[MergeTreeNode]) -> usize {
+    nodes
+        .iter()
+        .map(|n| 1 + usize::from(n.reason.is_some()) + merge_tree_line_count(&n.children))
+        .sum()
+}
+
 /// tsk-417 D3: MERGE LIST box source — mirrors `fgos merge list --json`'s
 /// own `ready`/`waiting`/`blockedOnSync` id lists directly (D3: "map
 /// thẳng fgos merge list --json, không filter tự chế"). `conflicts`/
 /// `mergeSets`/`mergeTier`/`supersededOut` are real fields on that same
 /// response this box doesn't need — `serde` silently ignores them (no
 /// `deny_unknown_fields`), so this struct only names what it uses.
+/// `tree` (tsk-59b) is the one exception to "flat id lists only": it is
+/// the nested view of the SAME data the flat lists already carry, meant to
+/// replace them in rendering (never re-derived here — see `MergeTreeNode`
+/// above).
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct MergeListSummary {
     pub ready: Vec<String>,
     pub waiting: Vec<String>,
     pub blocked_on_sync: Vec<String>,
+    pub tree: Vec<MergeTreeNode>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -142,6 +189,11 @@ struct MergeListData {
     waiting: Vec<String>,
     #[serde(rename = "blockedOnSync")]
     blocked_on_sync: Vec<String>,
+    /// `#[serde(default)]`: defensive against a version-skewed fgOS CLI
+    /// that predates tsk-2x9k's `tree` field — an empty tree parses
+    /// cleanly instead of failing the whole envelope.
+    #[serde(default)]
+    tree: Vec<MergeTreeNode>,
 }
 
 #[derive(Debug)]
@@ -270,6 +322,7 @@ pub fn parse_merge_list(json: &str) -> Result<MergeListSummary, serde_json::Erro
         ready: envelope.data.ready,
         waiting: envelope.data.waiting,
         blocked_on_sync: envelope.data.blocked_on_sync,
+        tree: envelope.data.tree,
     })
 }
 
@@ -770,7 +823,25 @@ mod tests {
             ],
             "blockedOnSync": ["tsk-stale-root"],
             "mergeTier": {"tsk-3c7": "leaf-to-root", "tsk-2ig": "leaf-to-root"},
-            "supersededOut": []
+            "supersededOut": [],
+            "tree": [
+                {
+                    "id": "tsk-root",
+                    "title": "Root item",
+                    "status": "container",
+                    "children": [
+                        {"id": "tsk-2ig", "title": "Leaf 2ig", "status": "ready", "children": []},
+                        {"id": "tsk-3c7", "title": "Leaf 3c7", "status": "ready", "children": []}
+                    ]
+                },
+                {
+                    "id": "tsk-stale-root",
+                    "title": "Stale root",
+                    "status": "blocked-sync",
+                    "reason": "root cần sync: fgw/tsk-stale-root lệch 3 ahead / 2 behind main",
+                    "children": []
+                }
+            ]
         }
     }"#;
 
@@ -780,5 +851,52 @@ mod tests {
         assert_eq!(summary.ready, vec!["tsk-2ig".to_string(), "tsk-3c7".to_string()]);
         assert_eq!(summary.waiting, vec!["tsk-blocked-dep".to_string()]);
         assert_eq!(summary.blocked_on_sync, vec!["tsk-stale-root".to_string()]);
+    }
+
+    /// tsk-59b: the tree parses as a real nested structure, not flattened —
+    /// a container node (not itself a merge candidate, D2/D3) holding two
+    /// ready leaves, sibling to a blocked-sync node carrying a real reason
+    /// string (D7).
+    #[test]
+    fn fetch_merge_list_parses_the_nested_tree_field() {
+        let summary = parse_merge_list(MERGE_LIST_FIXTURE).expect("fixture should parse");
+        assert_eq!(summary.tree.len(), 2);
+
+        let root = &summary.tree[0];
+        assert_eq!(root.id, "tsk-root");
+        assert_eq!(root.status, "container");
+        assert_eq!(root.reason, None);
+        assert_eq!(root.children.len(), 2);
+        assert_eq!(root.children[0].id, "tsk-2ig");
+        assert_eq!(root.children[0].status, "ready");
+        assert!(root.children[0].children.is_empty());
+
+        let stale_root = &summary.tree[1];
+        assert_eq!(stale_root.id, "tsk-stale-root");
+        assert_eq!(stale_root.status, "blocked-sync");
+        assert_eq!(
+            stale_root.reason.as_deref(),
+            Some("root cần sync: fgw/tsk-stale-root lệch 3 ahead / 2 behind main")
+        );
+    }
+
+    /// tsk-59b: a response with no `tree` field at all (a version-skewed
+    /// fgOS CLI predating tsk-2x9k) still parses cleanly via
+    /// `#[serde(default)]` — an empty tree, not a parse failure.
+    #[test]
+    fn fetch_merge_list_tolerates_a_missing_tree_field() {
+        let json = r#"{
+            "data": {
+                "ready": [],
+                "waiting": [],
+                "conflicts": [],
+                "mergeSets": [],
+                "blockedOnSync": [],
+                "mergeTier": {},
+                "supersededOut": []
+            }
+        }"#;
+        let summary = parse_merge_list(json).expect("missing tree field should still parse");
+        assert!(summary.tree.is_empty());
     }
 }
