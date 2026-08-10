@@ -81,6 +81,21 @@ function refreshView(dir) {
   return view;
 }
 
+// tsk-1q5: same fix as store.mjs's sibling helper — fold `refreshView` into
+// the SAME held `withEventsLock` scope as the append, instead of running it
+// as a separate, unlocked critical section afterward. Closes the same
+// lost-update window (two processes' unlocked `refreshView` calls racing to
+// overwrite `state.json`, staler-write-wins) for this store too.
+function withEventsLockAndRefresh(dir, logPath, fn) {
+  let view;
+  const event = withEventsLock(logPath, () => {
+    const result = fn();
+    view = refreshView(dir);
+    return result;
+  });
+  return { event, view };
+}
+
 /**
  * Create `<dir>/porting/` if missing, ensure the event log file exists, and
  * (re)write the view from it. Safe to call on an already-initialized dir —
@@ -116,7 +131,7 @@ export function addPorting(dir, entry) {
     throw new PortingError('validation', 'addPorting: entry requires a non-empty "id".');
   }
 
-  const event = withEventsLock(logPath, () => {
+  return withEventsLockAndRefresh(dir, logPath, () => {
     const before = rebuildViewFromLog(logPath);
     if (before.porting[entry.id]) {
       throw new PortingError('validation', `porting "${entry.id}" already exists.`);
@@ -125,8 +140,6 @@ export function addPorting(dir, entry) {
     const item = { ...entry, status: 'candidate' };
     return appendEventLocked(logPath, { type: 'porting.add', payload: item });
   });
-  const view = refreshView(dir);
-  return { event, view };
 }
 
 /**
@@ -141,7 +154,7 @@ export function addPorting(dir, entry) {
  */
 export function movePorting(dir, { id, to, expectedStatus } = {}) {
   const { logPath } = paths(dir);
-  const event = withEventsLock(logPath, () => {
+  return withEventsLockAndRefresh(dir, logPath, () => {
     const before = rebuildViewFromLog(logPath);
     const porting = before.porting[id];
     if (!porting) {
@@ -151,8 +164,6 @@ export function movePorting(dir, { id, to, expectedStatus } = {}) {
     const rawEvent = transitionPorting({ porting, to, expectedStatus }); // PortingError: precondition | conflict
     return appendEventLocked(logPath, rawEvent);
   });
-  const view = refreshView(dir);
-  return { event, view };
 }
 
 /** Read-only: the current view, rebuilt fresh from the log (never off a stale file). */
