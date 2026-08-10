@@ -2,7 +2,7 @@
 type: how-to
 title: How to allowlist a legitimate historical mention in launcher-vocabulary-guard.test.mjs
 tags: []
-source_capture_ids: [tsk-2uo, tsk-5td, tsk-2lg]
+source_capture_ids: [tsk-2uo, tsk-5td, tsk-2lg, tsk-2au]
 ---
 # How to allowlist a legitimate historical mention in launcher-vocabulary-guard.test.mjs
 
@@ -64,6 +64,54 @@ as before. The historical entries quoted in step 3 and the `tsk-2uo`
 example below predate this generalization — kept as-is since they're an
 accurate record of what those items actually did at the time, not a
 stale instruction to repeat today.
+
+## Update (`tsk-2au`): a second generalized shape — a frozen *phrase*, not a frozen *path*
+
+`tsk-2lg`'s `IRON_LAW_EVIDENCE_META_CITATION` generalizes by **path
+pattern** — any file whose path matches
+`docs/history/<id>/iron-law-evidence(-<suffix>).md` is exempt regardless
+of content. A second recurring shape doesn't fit that mold: any file,
+anywhere, that legitimately cites `tsk-2xt`'s own item nickname —
+`"herdr-orchestrator"` — trips the guard, and there's no fixed path
+pattern to match, since a citation can land in any history doc that
+mentions that item by name.
+
+> "docs/history/fgos-terminal-close-autoclose/CONTEXT.md ... then
+> tsk-3cs's DISCUSSION.md ... this recurred a 2nd time ... generalize the
+> launcher-vocabulary-guard's herdr-orchestrator nickname citation into a
+> frozen-phrase exemption (like tsk-2lg's IRON_LAW_EVIDENCE_META_CITATION),
+> so future citations of tsk-2xt's item title don't need a new
+> hand-added ALLOWED_FILES entry each time."
+> — real item description, `tsk-2au`
+
+The fix reused a *different* existing mechanism already in the same file
+— `FROZEN_FILENAMES`/`FROZEN_PATTERNS`/`stripFrozenFilenames()`, built
+for two frozen decision-doc filenames — rather than copying
+`IRON_LAW_EVIDENCE_META_CITATION`'s path-regex shape, since
+`"herdr-orchestrator"` is a hyphenated **phrase** that can appear inside
+any file's prose, not a path shape. A new `FROZEN_PHRASES` list
+(`['herdr-orchestrator']`) reuses the exact same wrap-tolerant
+segment-join regex-building logic `FROZEN_PATTERNS` already has, so both
+lists share one regex builder rather than duplicating it.
+
+**Two real occurrences resolved differently**, which matters for how you
+apply a frozen-phrase generalization: `merge-list-tree-bottleneck-
+priority/DISCUSSION.md` had exactly one occurrence of the phrase, so
+stripping it fully cleared the file — its now-redundant `ALLOWED_FILES`
+entry was removed. `fgos-terminal-close-autoclose/CONTEXT.md` had five
+occurrences, only one of which was the frozen phrase — the other four
+were unrelated legitimate senses (an industry "orchestrator" usage, the
+Rust `PaneOrchestrator` trait) already covered by that file's own
+`ALLOWED_FILES` reason. Its entry had to *stay*, just with its reason
+string tightened to name only the still-relevant justification —
+stripping a frozen phrase does not automatically mean the whole file
+becomes exempt if other real "orchestrator" mentions remain in it.
+
+A self-check test locks the boundary the same way
+`IRON_LAW_EVIDENCE_META_CITATION`'s own self-check does: confirms
+`"herdr-orchestrator"` strips to empty, while a bare `"orchestrator"`
+(no `"herdr-"` prefix) still trips the guard afterward — so the pinned
+role itself stays caught, only the specific nickname compound is exempt.
 
 ## Steps
 
