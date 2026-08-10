@@ -2,7 +2,7 @@
 type: explanation
 title: Why .fgos/events.jsonl can silently lose lines under concurrent session writes
 tags: []
-source_capture_ids: [tsk-2xt]
+source_capture_ids: [tsk-2xt, tsk-1q5]
 ---
 # Why `.fgos/events.jsonl` can silently lose lines under concurrent session writes
 
@@ -56,6 +56,65 @@ instance is raw log lines disappearing, not a stale rebuild — the same
 signature as candidate B, and the plan's own addendum treats it as
 strengthening B as the more likely dominant cause.
 
+## Two candidate causes, and why the investigation started with the wrong one
+
+`tsk-1q5`'s own starting hypothesis was that `withEventsLock`/
+`appendEvent` (`src/state/events.mjs`) is a fake in-process JS mutex,
+useless across separate node processes. Reading the code disproved this:
+`acquireEventsLock` is a real cross-process OS lock (write-to-tempfile +
+atomic `fs.linkSync`, with stale-pid reclaim) — the same primitive
+`loop.mjs` and `session.mjs` already used, and a prior investigation
+(`docs/history/events-lock-concurrency-race/CONTEXT.md`) had already
+proven by fork-based ablation test that it genuinely serializes the
+append itself. That closed a *different*, already-fixed race
+(duplicate/out-of-order `seq`), not the one this item was chasing.
+
+Two real candidate causes turned up instead:
+
+- **Root cause A — `refreshView`/`writeView` run outside
+  `withEventsLock`.** Every write door in `src/state/store.mjs`
+  (`addWork`, `editWork`, `moveWork`, `moveStage`, and ~10 others) appends
+  under the lock, then calls `refreshView(dir)` — a full replay of
+  `events.jsonl` into `state.json` — *after* releasing it. Two processes
+  finishing their own correctly-locked appends close together can race at
+  this derived-cache layer: whichever process's unlocked replay-and-write
+  finishes last wins, even if its read of the log was captured before the
+  other process's append landed. `src/state/porting-store.mjs` carries the
+  identical shape.
+- **Root cause B — `.fgos/events.jsonl` itself is git-tracked in the one
+  shared main checkout** (confirmed via `git ls-files .fgos/`; unlike
+  `state.json`, which is gitignored). A `git checkout`/`reset --hard`/
+  merge from *any other* session sharing that checkout can silently
+  discard whatever uncommitted appends are sitting in the file — raw log
+  lines disappearing, not a stale rebuild. This matches the `tsk-2x9k`
+  evidence above (only 3 of the expected lines surviving) more directly
+  than root cause A does on its own, and is the same class of hazard
+  `AGENTS.md` already names for the wider tree (tsk-3au/tsk-4hk).
+
+## What actually got fixed, and what stayed deferred
+
+`fgos-validating`'s own scope decision, confirmed by a human at the
+`decompose` gate: fix root cause A only as this item's one honest piece —
+"widen `withEventsLock` scope in `store.mjs`/`porting-store.mjs` to
+include `refreshView`, closing the lost-update race on `state.json`" —
+and defer root cause B, "logged as a lead on `tsk-3wq`", since B has no
+test-provable fix the way A does (a git-operational hazard, not a code
+bug). The item's own accepted answer states this split directly:
+
+> "Confirm: no split, pass-through. Fix root cause A (refreshView-outside-
+> lock race in store.mjs/porting-store.mjs) as one piece; root cause B
+> (events.jsonl git-tracked-in-shared-checkout hazard) stays deferred,
+> logged as a lead on tsk-3wq."
+> — real `work.settlement` (`answer`/`human`), id `tsk-1q5`
+
+The fix moves each mutation function's existing `refreshView(dir)` call
+inside the same `withEventsLock` scope its own append already uses,
+closing the window structurally rather than adding a second, independent
+lock — passed verify on the first attempt
+(`node --test test/state/events.test.mjs test/state/store.test.mjs
+test/state/porting-store.test.mjs`). Root cause B remains open, tracked
+as a lead against `tsk-3wq` rather than folded silently into this fix.
+
 ## Related
 
 - `docs/history/tsk-1q5-events-jsonl-lost-update-race/plan.md` — the full
@@ -64,3 +123,5 @@ strengthening B as the more likely dominant cause.
 - `AGENTS.md`'s own documented main-checkout hazard (tsk-3au/tsk-4hk) —
   the same class of danger candidate B names: any session sharing the
   main checkout can discard another session's uncommitted work.
+- `tsk-3wq` — where root cause B's hardening lead is tracked as a
+  follow-up, separate from this item's own root-cause-A fix.

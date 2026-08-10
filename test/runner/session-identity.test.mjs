@@ -26,6 +26,22 @@ function mkFgosDir(rawRegistryBody) {
   return dir;
 }
 
+// tsk-13m: a hung `ps` must not be able to block the caller (and, in
+// production, the held cross-process events.lock) forever. Asserts the
+// real fix -- a bounded timeout actually reaches execFileSync's options --
+// rather than just the pre-existing catch-all behavior around it.
+test('ppidOf passes a bounded timeout to execFileSync, so a hung ps command cannot block the caller forever (tsk-13m)', () => {
+  let capturedOptions;
+  const execFile = (_file, _args, options) => {
+    capturedOptions = options;
+    return '90\n';
+  };
+  resolveWriterIdentity(undefined, { env: {}, pid: 100, execFile });
+  assert.equal(typeof capturedOptions.timeout, 'number');
+  assert.ok(capturedOptions.timeout > 0, 'timeout must be a positive bound, not 0/undefined (no bound)');
+  assert.ok(capturedOptions.timeout <= 500, 'timeout must stay a small fraction of events.lock\'s own 2s budget');
+});
+
 test('BEE_SESSION_ID takes precedence over CLAUDE_CODE_SESSION_ID when both set', () => {
   const result = resolveWriterIdentity(undefined, {
     env: { BEE_SESSION_ID: 'bee-session-1', CLAUDE_CODE_SESSION_ID: 'claude-session-2' },
