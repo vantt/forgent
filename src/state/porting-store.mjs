@@ -20,7 +20,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { appendEvent, readEvents } from './events.mjs';
+import { readEvents, withEventsLock, appendEventLocked } from './events.mjs';
 import { transitionPorting, PortingError } from './porting.mjs';
 
 function paths(dir) {
@@ -100,8 +100,15 @@ export function initStore(dir) {
  * `'candidate'` regardless of what the caller supplies — `candidate` is the
  * only legal entry point per porting.mjs's TRANSITIONS table. Validates
  * against the log's own current ids (read fresh, never off a possibly-stale
- * view) BEFORE writing anything — a duplicate id never reaches the log,
- * mirroring store.mjs's addWork dup-id guard.
+ * view) BEFORE writing anything — a duplicate id never reaches the log.
+ *
+ * The existence check through the append is one held `events.lock` critical
+ * section (`withEventsLock`/`appendEventLocked`, not bare `appendEvent`),
+ * mirroring store.mjs's addWork dup-id guard (tsk-1jp): two processes racing
+ * `addPorting` on the same id can no longer both read "id not present yet"
+ * and both append a `porting.add` — the second to acquire the lock re-reads
+ * with the first's event already in the log, so its own existence check now
+ * correctly fails.
  */
 export function addPorting(dir, entry) {
   const { logPath } = paths(dir);
@@ -109,13 +116,15 @@ export function addPorting(dir, entry) {
     throw new PortingError('validation', 'addPorting: entry requires a non-empty "id".');
   }
 
-  const before = rebuildViewFromLog(logPath);
-  if (before.porting[entry.id]) {
-    throw new PortingError('validation', `porting "${entry.id}" already exists.`);
-  }
+  const event = withEventsLock(logPath, () => {
+    const before = rebuildViewFromLog(logPath);
+    if (before.porting[entry.id]) {
+      throw new PortingError('validation', `porting "${entry.id}" already exists.`);
+    }
 
-  const item = { ...entry, status: 'candidate' };
-  const event = appendEvent(logPath, { type: 'porting.add', payload: item });
+    const item = { ...entry, status: 'candidate' };
+    return appendEventLocked(logPath, { type: 'porting.add', payload: item });
+  });
   const view = refreshView(dir);
   return { event, view };
 }
@@ -124,17 +133,24 @@ export function addPorting(dir, entry) {
  * Move a porting record to a new status. Looks the record up fresh from the
  * log, delegates the precondition/CAS decision to porting.mjs (pure — never
  * writes), and only then appends the event it returns.
+ *
+ * Same one held `events.lock` critical section as `addPorting` above
+ * (tsk-1jp): the lookup, the CAS decision, and the append all happen inside
+ * one `withEventsLock` scope, so a stale `expectedStatus` read can no longer
+ * slip past the check before a racing write lands.
  */
 export function movePorting(dir, { id, to, expectedStatus } = {}) {
   const { logPath } = paths(dir);
-  const before = rebuildViewFromLog(logPath);
-  const porting = before.porting[id];
-  if (!porting) {
-    throw new PortingError('validation', `porting "${id}" not found.`);
-  }
+  const event = withEventsLock(logPath, () => {
+    const before = rebuildViewFromLog(logPath);
+    const porting = before.porting[id];
+    if (!porting) {
+      throw new PortingError('validation', `porting "${id}" not found.`);
+    }
 
-  const rawEvent = transitionPorting({ porting, to, expectedStatus }); // PortingError: precondition | conflict
-  const event = appendEvent(logPath, rawEvent);
+    const rawEvent = transitionPorting({ porting, to, expectedStatus }); // PortingError: precondition | conflict
+    return appendEventLocked(logPath, rawEvent);
+  });
   const view = refreshView(dir);
   return { event, view };
 }
