@@ -121,6 +121,23 @@ block on it.
 - The contiguity audit script against a synthetic file with an injected
   duplicate-seq and an injected gap — both must be reported.
 
+## Verify
+
+The item's own top-level proof, recorded on `tsk-3wq`'s `verify` field:
+
+```
+node scripts/check-events-jsonl-contiguity.mjs .fgos/events.jsonl && node --test test/state/events.test.mjs test/state/store.test.mjs test/runner/merge.test.mjs test/setup/checks.test.mjs
+```
+
+Covers the audit script (component 3) against the live log, plus every
+existing test file touched by components 1-2. The merge-driver-correctness
+and repair-lock-fix proof points in the risk map above (a live/simulated
+concurrent-merge repro, a concurrent-append-vs-repair repro) are additional
+proof `fgos-validating`/execution must produce and record — they are
+scenario repros, not single assertions this one command alone captures,
+so they're named in the risk map rather than folded into this one-line
+verify.
+
 ## Outstanding questions
 
 None
