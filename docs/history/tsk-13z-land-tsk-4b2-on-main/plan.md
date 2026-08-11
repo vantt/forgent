@@ -125,6 +125,27 @@ dry-run + green baseline) is what a feasibility check can honestly gather
 before the merge is materialized; nothing here lowers the bar or skips a
 row.
 
+## Implementation addendum (fgos-code-implement, 2026-08-11T07:18Z)
+
+The merge landed clean, exactly matching the dry-run: `git merge --no-ff
+fgw/tsk-4b2` on `fgw/tsk-13z`, 0 conflicts, the same 9 files. But the
+item's own `verify` command turned out to be structurally unsatisfiable —
+see `CONTEXT.md` D4 (supersedes D2). `git merge-base --is-ancestor
+7add82b8 main` can never return true through `fgos approve`'s own
+goal-check, which runs on a staged (`--no-commit`) merge before the
+commit that would advance `main` (`src/runner/merge.mjs:889-1052`). This
+was not visible at the `fgos-validating` pass above — that pass evidenced
+conflict-freedom and a green baseline, not the mechanics of *when* `main`
+advances relative to the goal-check, since that question only surfaces
+once a real merge commit exists to test the ancestor check against.
+
+Replaced the item's `verify` with a content-based
+`npm test && POSITIVE && NEGATIVE` check per `docs/how-to/write-verify-
+for-a-skill-prose-change.md`, confirmed by the user before editing.
+Empirically confirmed to fail against current `main` and pass against
+the merged content — see `CONTEXT.md` D4 for the full command and
+verification trail.
+
 ## Outstanding questions
 
 None
