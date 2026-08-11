@@ -106,6 +106,65 @@ below the 429s measured before the fix and wall-clock below ~50s.
   confirmed inside a full-suite run; the D5 measurement confirms or refutes
   it.
 
+## Validation (reality check, 2026-08-11)
+
+Verdict: **READY WITH CONSTRAINTS**.
+
+A1 was proven without editing anything. Because the tests spread
+`process.env` into the spawned child, exporting `FGOS_CLAUDE_COMMAND` in the
+outer environment reaches `fgos setup` by the identical path `NO_CLAUDE_ENV`
+would — so the post-edit state is directly observable on unmodified files:
+
+```
+FGOS_CLAUDE_COMMAND=/nonexistent/fgos-test-claude-binary \
+  node --test test/setup/checks-setup-{config,envelope,hookspath,idempotent,rc-line}.test.mjs
+-> tests 10, pass 10, fail 0, duration_ms 280.5   WALL 0.30 USER 0.95 SYS 0.29
+```
+
+All 10 pass on the blocked branch. A1 is proven, not flagged.
+
+### Feasibility matrix
+
+| Assumption | Risk | Proof required | Evidence found | Result |
+|---|---|---|---|---|
+| A1 — the 10 assertions do not depend on the live `checkClaudePluginMarketplace` branch | Medium | Run the 5 files on the blocked branch | The run above: 10/10 pass in 280ms | **PASS** |
+| A2 — the ~11s per test is essentially all the unblocked spawn, so blocking recovers essentially all of it | Medium | Measure blocked vs unblocked | `node --test checks-setup-config.test.mjs` unblocked: 2 tests, WALL 23.08 USER 3.71 SYS 1.02. Blocked (above): 10 tests, WALL 0.30 USER 0.95 SYS 0.29 | **PASS for wall-clock, FAIL for CPU** — see C1 |
+
+### Constraints
+
+- **C1 — the item's predicted CPU saving is wrong, and the measurement says
+  why.** Unblocked costs **2.37s CPU** per test but **11.54s wall**; blocked
+  costs 0.12s CPU per test. So the ~11.5s per test is overwhelmingly
+  *network wait*, not CPU. Across 10 tests the real CPU recovered is
+  **≈22s** (429s → ≈407s, about 5%), not the ≈110s the item's
+  "429s → ~319s" figure predicted. That prediction subtracted a wall-clock
+  saving from a CPU total — two different quantities. The wall-clock win is
+  the large one and is real: ≈115s of serialized wall time removed from
+  these files (117.6s → 0.3s measured).
+
+  This does not change the edit, which is still clearly worth making (the
+  wall win, plus removing an unintended network dependency and the
+  violation of `checks.test.mjs`'s own stated intent). It does mean the
+  item's verify clause "total CPU clearly down from 429s" should be judged
+  against ≈407s. Whether a 5% CPU reduction counts as "clearly down" is the
+  person's call, not this session's, and it is raised rather than silently
+  reinterpreted — the verify itself is left exactly as locked.
+
+- **C2 — all 10 sites, both shapes.** Per CONTEXT D3, confirm with
+  `rg -- "\.\.\.process\.env" test/setup/checks-setup-*.test.mjs` returning
+  zero matches after the edit.
+
+### Reality gate
+
+| Dimension | Result | Citation |
+|---|---|---|
+| Mode fit | PASS | 1 flag (existing covered behavior), 5 files, one task — `small` is the honest lane; the flag's own risk was then actually proven, not assumed |
+| Repo fit | PASS | All 10 sites read at the exact lines claimed; `NO_CLAUDE_ENV` at `test/setup/helpers/setup-checks-harness.mjs:41`, re-exported `:116`, imported at line 16 of all 5 files |
+| Assumptions | PASS | A1 proven by the run above; A2 proven for wall and refuted for CPU, recorded as C1 rather than left as a silent assumption |
+| Smaller path | PASS | None exists — the change is one token per site, reusing a constant the files already import |
+| Proof surface | PASS | The item's own locked verify is a real runnable command; no placeholder |
+| Impact-analysis posture | PASS | `fgos tool query --capability impact-analysis --status present` → 1 provider, `gitnexus:present`, matching the `full` posture the plan recorded. Carries no weight here regardless: no production symbol is edited |
+
 ## Outstanding questions
 
 None
