@@ -1,9 +1,17 @@
 # sync-root/approve trust-dir opt-in flag — plan (tsk-4uj)
 
-CONTEXT.md: `docs/history/catchup-worktree-cwd-fix/CONTEXT.md` (D3 locked
-and approved, gate-bypass level `standard`). This plan covers ONLY
+CONTEXT.md: `docs/history/catchup-worktree-cwd-fix/CONTEXT.md` (D3/D4
+locked and approved, gate-bypass level `standard`). This plan covers ONLY
 tsk-4uj's own scope; tsk-5vl's `catchup` fix is already delivered
 separately (same feature dir, same CONTEXT.md, different D-ID).
+
+**Revision note:** `fgos-validating`'s first pass on this plan found two
+things this revision addresses: (1) `promote-to-component` shares the
+same guard pattern but is explicitly OUT of scope per CONTEXT.md D4
+(filed as `tsk-2bg`) — see the Approach section's own out-of-scope note;
+(2) `main-checkout-reset` already establishes a different, broader
+trust-widening precedent this plan must cite and explain the divergence
+from, also in Approach below.
 
 ## Mode gate
 
@@ -60,6 +68,32 @@ worktree session, not an automated caller (neither `fgos-coding-driving`
 nor `fgos-code-implement` ever calls `approve` themselves — that stays a
 human gate per AGENTS.md's own boundary).
 
+**Explicitly out of scope (CONTEXT.md D4):** `promote-to-component`
+(`bin/fgos.mjs` ~3411-3423) shares the exact same `repoRoot =
+process.cwd()` + `isMainWorktree` single-layer guard as `sync-root`, but
+is NOT touched by this item — it has a second, independent guard layer
+(`retargetMember`, `src/runner/promote-engine.mjs:53-58`, which takes
+`repoRoot` as a parameter and re-checks `isMainWorktree` itself) reached
+via a structurally different batch/multi-member promotion path. Filed as
+its own follow-up item, `tsk-2bg`, for dedicated review of both guard
+layers together.
+
+**Existing precedent, and why this plan diverges from it:**
+`main-checkout-reset` (`bin/fgos.mjs:4172-4180`) already implements a
+DIFFERENT trust-widening shape for the identical underlying question —
+its guard only fires `if (flags.dir === undefined &&
+!isMainWorktree(repoRoot))`, meaning passing `--dir` explicitly is
+*already* full trust there, no separate flag required. This plan
+deliberately does NOT follow that precedent for `approve`/`sync-root`:
+every automated caller in this codebase (`fgos-coding-driving`,
+`fgos-code-implement`) already always passes `--dir` on every call, so
+adopting `main-checkout-reset`'s convention verbatim would silently
+relax `approve`/`sync-root`'s trust boundary for all of them at once —
+exactly the broad, unreviewed change D3's explicit opt-in flag exists to
+avoid. `main-checkout-reset` itself carries no comparable incident
+history to `approve`'s `P44`/`review-260718`, which is presumably why its
+narrower, `--dir`-implicit trust model was acceptable there.
+
 `fgos graph tsk-4uj --json`: isolated item, no deps, no children —
 `criticalPath`/`topUnblock` carry no ordering signal; one honest piece of
 work, no split (step 4 of this skill's flow doesn't apply).
@@ -108,7 +142,7 @@ blast-radius proof point for the risk-map rows below, carried to
 
 | Component | Risk | Proof point (carried to `fgos-validating`) |
 |---|---|---|
-| `approve`'s guard interaction with the new flag | **High** — `approve` is the final merge-to-main gate with a two-incident history (`P44`, `review-260718`) of real false-verification failures when its worktree-identity check was bypassed or mispositioned | `impact({target: "isMainWorktree", direction: "upstream"})` AND `impact({target: "runVerb", direction: "upstream"})` before editing (GitNexus's index was stale during tsk-5vl's own work — re-run `gitnexus analyze` first if still stale, or fail this proof point open per CLAUDE.md's degraded posture and cross-check manually via `grep`); full existing `approve` suite green with UNCHANGED pass/fail set when the new flag is NOT passed (regression baseline); every existing P44/session-nesting/`--github` guard test still refuses exactly as today when the flag is omitted |
+| `approve`'s guard interaction with the new flag | **High** — `approve` is the final merge-to-main gate with a two-incident history (`P44`, `review-260718`) of real false-verification failures when its worktree-identity check was bypassed or mispositioned | `impact({target: "isMainWorktree", direction: "upstream"})` already run during `fgos-validating`'s own pass on THIS plan: GitNexus's index was confirmed stale (`last indexed 4ce7a96`, behind current HEAD) and returned only 1 of 7 real callers — degraded posture, named plainly, not silently dropped. Manual `grep -n "isMainWorktree(" bin/fgos.mjs src/runner/promote-engine.mjs` cross-check substituted and is what surfaced D4's `promote-to-component` finding — re-run both (GitNexus + grep cross-check) again at implementation time in case the index has since been refreshed. Full existing `approve` suite green with UNCHANGED pass/fail set when the new flag is NOT passed (regression baseline); every existing P44/session-nesting/`--github` guard test still refuses exactly as today when the flag is omitted |
 | `sync-root`'s guard interaction with the new flag | Medium — same guard shape as `approve`, one layer instead of two, lower stakes (internal decision-record op, never the final done/delivered edge) | Full existing `sync-root` suite green, unchanged pass/fail set, when the flag is omitted |
 | New CLI-level regression coverage for the flag itself (currently absent, by definition — the flag doesn't exist yet) | The whole point of this item — nothing today can prove the opt-in path actually works OR that the default path is truly unchanged | New tests in `test/cli/fgos.test.mjs`: (a) `approve`/`sync-root` with the new flag, cwd inside the item's own linked worktree, `--dir` at the main checkout — succeeds, no worktree-refusal error; (b) the SAME setup WITHOUT the flag — still refuses exactly as today (this is the regression guard that proves the default is untouched); (c) every existing P44/session-nesting/`--github` test re-run unmodified to confirm zero behavior change without the flag |
 | Doc addition | Low — prose-only | `docs/how-to/write-verify-for-a-skill-prose-change.md`'s shape does not apply here (this is a `docs/how-to/*` page, not a `SKILL.md` change) — a plain markdown read-through is enough proof |
@@ -132,6 +166,10 @@ blast-radius proof point for the risk-map rows below, carried to
 - `approve --github` WITH the flag — the `review-260718` guard
   repositioning must still hold; the flag changes `repoRoot`'s VALUE, never
   the ORDER guards run in relative to the `--github` branch.
+- `promote-to-component` — completely untouched by this item's diff;
+  its own existing tests (if any) pass unmodified, confirming the
+  out-of-scope boundary (CONTEXT.md D4) was actually honored, not just
+  declared.
 
 ## Assumptions
 
