@@ -5932,9 +5932,12 @@ test('catchup accepts a blocked reason of merge-blocked-other-item as a valid pr
 
   const result = run(cwd, ['catchup', 'catchup-blocked-other-item']);
   // The precondition check itself must accept the reason -- a rejected
-  // reason exits 2 ("blocked: <reason> is not one of ..."); anything else
-  // (including a real merge outcome below) proves the reason was accepted.
-  assert.notEqual(result.status, 2, result.stderr);
+  // reason exits 4 (validation: "catchup only resolves a merge-related
+  // park (...)"); anything else (including a real merge outcome, since
+  // the branch already contains main and this is an "already-caught-up"
+  // no-op) proves the reason was accepted.
+  assert.notEqual(result.status, 4, result.stderr);
+  assert.doesNotMatch(result.stderr, /catchup only resolves a merge-related park/);
 });
 
 test('approve of a pull-door item (no merge, code already on main): re-verifies and closes awaiting-approval -> done with role human', () => {
