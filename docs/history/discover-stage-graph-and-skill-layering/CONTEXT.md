@@ -1,100 +1,92 @@
-# CONTEXT: tsk-403 — Đổi tên cả họ `decompose` thành `plan`
+# CONTEXT: tsk-qod — Đưa fgos-clarifying về bước Init
 
 ## Feature boundary
 
-Scope là đúng ba việc, gộp một đợt quét repo (D15), chỉ cho `tsk-403` — không
-đụng phần còn lại của cây `tsk-2mt` (discovery skill chủ, clarifying về
-Init, v.v. — các con khác của cùng cha):
+Ba việc, tất cả trong phạm vi domain `coding` (không đụng
+`triage`/`synthetic`/`fixture-marketing` — mỗi domain đó có `stages` riêng,
+không share entry `clarify` của coding):
 
-1. **Rename stage/verb/launcher**: stage `decompose` → `planning`; engine
-   verb `fgos decompose` → `fgos plan`; launcher `/fgOS:decompose` →
-   `/fgOS:plan`. Giá trị verdict `decompose | pass-through` **giữ nguyên**
-   — đó là tên một kết cục, không phải tên một chặng (D11).
-2. **Rename file**: `src/intake/decompose.mjs` → `src/intake/plan.mjs`
-   (D15).
-3. **Thêm tiền tố `coding-`** cho đúng 5 skill: `fgos-exploring` →
-   `fgos-coding-exploring`, `fgos-planning` → `fgos-coding-planning`,
-   `fgos-validating` → `fgos-coding-validating`, `fgos-compounding` →
-   `fgos-coding-compounding`, `fgos-code-implement` →
-   `fgos-coding-implement` (D15). **Không** đụng `fgos-clarifying` /
-   `fgos-researching` (helper, D9) và **không bao giờ** đụng
-   `fgos-fanout` / `fgos-indexing` / `fgos-routing` / `fgos-unlock` (D19 —
-   không phải hoãn, là loại vĩnh viễn).
-
-Rename chuẩn "full rewrite" theo tiền lệ rename `fgos-executing` trước đó:
-gồm cả `docs/history/*`, cả hai bản mirror skill dir (`.claude/skills/` +
-`.agents/skills/` nếu có), cả how-to doc.
+1. **Migrate trước, xoá sau**: đẩy 90 item đang ở `stage: 'clarify'` (đếm
+   fresh 2026-08-11) sang stage khác — TRƯỚC khi xoá
+   `skillMap.clarify`/`'clarify'` khỏi `stages` (D1). Không giữ legacy
+   alias kiểu D18 (tsk-403) — quyết dứt điểm.
+2. **Xoá khỏi registry**: gỡ `clarify: 'fgos-clarifying'` khỏi
+   `skillMap`, gỡ `'clarify'` khỏi `stages` của domain `coding`
+   (`src/state/workflow-stage-graphs.mjs`).
+3. **Wiring lại `/fgOS:submit`** (D2): launcher gọi `fgos-clarifying`
+   SỐNG (live session) TRƯỚC khi tạo item — rewrite text + phân loại
+   `domain` — rồi mới gọi verb `fgos submit "<text đã rewrite>" --domain
+   <domain đã phân loại>`. Đảo ngược thứ tự hiện tại (submit trước, gọi
+   `fgos-clarifying` SAU khi item đã tồn tại, chỉ cho live session — xem
+   scout evidence bên dưới).
 
 ## Locked decisions
 
 | D-ID | Quyết định |
 |------|-----------|
-| D11 | Đổi tên **cả họ**, không nửa vời: stage `decompose` → `planning`, verb `fgos decompose` → `fgos plan`, launcher `/fgOS:decompose` → `/fgOS:plan`, cộng cặp mới `plan-next` + `plan-loop` sinh ra ở một task con khác (không thuộc `tsk-403`) nhưng **phải sinh sau khi con này xong** để có tên đúng ngay từ đầu. Giá trị verdict `decompose` **giữ nguyên** vì nó là tên kết cục (`fgos plan --verdict decompose\|pass-through`), không phải tên chặng. |
-| D15 | Gộp cả ba việc (rename họ, rename file, thêm tiền tố `coding-`) vào một task vì cùng là một loại thao tác (quét toàn repo theo pattern rename) — tách ba đợt là quét ba lần cho cùng một việc. Rủi ro capacityId bằng 0 (`.fgos/config.json` → `capacities` rỗng, xác nhận lại bên dưới). |
-| D18 | Giữ **`decompose` làm alias legacy chỉ-để-rút-cạn**: còn trong `stages` array + `skillMap` + giữ cạnh ra của nó, **KHÔNG** có trong `stepMap` — đúng cách `discovery`/`exploring` đang được xử lý hôm nay (không base-workflow step riêng), nên bất biến một-stage-một-step của `stageForStep` giữ nguyên. Lý do: có item đang MỞ đứng trên stage đó (xem scout evidence bên dưới) — sau rename mà xoá thẳng, `stages.indexOf("decompose")=-1` và `skillForStage(...,"decompose")=null` khiến driver đọc ra "không có skill, dừng" — kẹt vĩnh viễn, và không verb nào relabel được `stage` (`EDITABLE_FIELDS` không có `stage`). Kèm comment "legacy, drain-only, không item mới nào vào đây nữa" tại chỗ khai báo, cộng một follow-up (item mới, ngoài phạm vi `tsk-403`) xoá alias khi đếm mở về 0. |
-| D19 | 4 skill `fgos-fanout`, `fgos-indexing`, `fgos-routing`, `fgos-unlock` **không bao giờ** mang tiền tố `coding-` — không phải hoãn sang đợt sau, là loại khỏi tập file vĩnh viễn. Theo đúng logic D9 (tiền tố = tính đúng đắn bị giới hạn trong domain `coding`): `routing` định tuyến item của mọi domain, `unlock` gỡ khoá main checkout (domain-agnostic), `indexing` dựng index docs end-user (không phải stage-skill), `fanout` chạy con qua `/fgOS:pick` (domain-agnostic). Không đứa nào sở hữu một stage hay có tên trong `skillMap` của bất kỳ domain nào — phép thử D7 (skill chủ = có trong `skillMap[stage]` + tự gọi engine verb) loại cả bốn. |
+| D1 | Migrate 90 item đang ở stage `clarify` sang stage khác TRƯỚC khi xoá `skillMap.clarify`/`stages` entry — KHÔNG giữ legacy alias kiểu D18. Lý do (người trả lời trực tiếp): "xử lý dứt điểm bằng di trú thay vì để lại một alias khác phải dọn sau." Cơ chế migrate cụ thể (một lượt hay từng item, đích là stage nào, cách xử lý khác nhau giữa item `todo` và item `doing`/`awaiting-human`) để lại cho `fgos-coding-planning`'s Approach/Shape — không phải quyết định sản phẩm, là chi tiết triển khai. |
+| D2 | Wiring `/fgOS:submit` gọi `fgos-clarifying` sống TRƯỚC khi tạo item LÀ trong phạm vi item này, không hoãn. Người trả lời trực tiếp: "Human dùng skill fgOS submit, skill đó sẽ gọi clarifying, xong có kết quả mới submit. Nên task này cần wiring." Domain classification (năng lực đang thiếu hoàn toàn, xác nhận qua scout — xem bên dưới) nằm trong `fgos-clarifying`'s job theo đúng D5 gốc, không phải một capacity/hàm riêng mới. |
 
 ## Pinned terms
 
-- **"cả họ" (rename cả họ)** — đổi đồng thời stage name, engine verb name,
-  và launcher name cho cùng một khái niệm; không đổi một nửa (ví dụ chỉ
-  đổi stage mà giữ verb `fgos decompose`).
-- **alias legacy drain-only** — một entry vẫn hợp lệ trong `stages` +
-  `skillMap` + cạnh, nhưng bị khoá khỏi `stepMap` nên không item MỚI nào
-  còn vào được; chỉ item đã đứng sẵn trên đó mới được rút ra dần qua các
-  cạnh hiện có.
-- **verdict vs chặng (stage)** — `decompose`/`pass-through` là tên một
-  *kết cục* của việc gọi verb `fgos plan`, tách biệt hoàn toàn khỏi tên
-  *chặng* (`planning`); đổi tên chặng không kéo theo đổi tên giá trị
-  verdict.
+- **"bước Init"** — giai đoạn TRƯỚC khi item tồn tại, ngoài trục `stage`
+  và `status` hoàn toàn (đúng định nghĩa D5 gốc trong DISCUSSION.md).
+  `fgos-clarifying` chạy ở đây đọc CHỈ đoạn text vừa submit — thế giới
+  đóng, không tra cứu repo/online — khác hẳn `fgos-coding-exploring`
+  (chạy SAU khi item đã tồn tại, có scout, có thể tra cứu).
+- **hợp đồng verdict-only (không ghi state)** — vì Init không có item nào
+  tồn tại, `fgos-clarifying` KHÔNG THỂ dùng `fgos ask <id>`/`fgos answer
+  <id>` (không có id) như hợp đồng cũ của nó (chạy như stage-skill trên
+  item đã tồn tại). Nó phải trả `{title?, description?, domain, question?}`
+  thẳng về cho launcher gọi nó — đúng hợp đồng verdict-only
+  `fgos-researching` đã dùng cho stage `discovery` (`fgos-coding-driving`'s
+  own "Discovery and exploring stages" exception) — không phải một khuôn
+  mới, là tái dùng khuôn đã có tiền lệ.
 
 ## Scout evidence
 
-- `src/state/workflow-stage-graphs.mjs`: domain `coding`'s `stages` array
-  (dòng 61) chứa `decompose`; `skillMap.decompose = 'fgos-planning'` (dòng
-  151); hai cạnh `clarify -> decompose` và `exploring -> decompose` (dòng
-  96, 100). Domain thứ hai trong cùng file (dòng 334+, một domain khác
-  `coding`) cũng còn `decompose` trong `stages` nhưng `skillMap.decompose =
-  null` — rename chỉ chạm domain `coding`, không đụng domain kia.
-- `src/intake/decompose.mjs` tồn tại thật, 44.4K — mục tiêu rename việc 2.
-- 13 thư mục `fgos-*` dưới `.claude/skills/`: `fgos-clarifying`,
-  `fgos-code-implement`, `fgos-coding-driving`, `fgos-coding-shaping`,
-  `fgos-compounding`, `fgos-exploring`, `fgos-fanout`, `fgos-indexing`,
-  `fgos-planning`, `fgos-researching`, `fgos-routing`, `fgos-unlock`,
-  `fgos-validating` — khớp đúng D19: 2 đã có tiền tố `coding-`
-  (`coding-driving`, `coding-shaping`, không thuộc phạm vi), 5 trong phạm
-  vi việc 3, 2 helper bị loại (`clarifying`, `researching`), 4 platform
-  skill bị loại vĩnh viễn (`fanout`, `indexing`, `routing`, `unlock`).
-  Tổng 2+5+2+4=13, không thừa không thiếu.
-- `plugins/fgOS/skills/decompose/` tồn tại (launcher hiện tại);
-  `plugins/fgOS/skills/plan/` chưa tồn tại — khớp đích rename việc 1.
-- **Đếm lại item đang mở trên stage `decompose` (fresh read, 2026-08-11
-  ~12:21 UTC)**: `tsk-42i` (blocked), `tsk-3at` (awaiting-human), `tsk-3m6`
-  (doing) — **3 item**, không phải 4 như con số D18 ghi lúc chốt quyết
-  định. `tsk-1opx` (item thứ tư D18 từng liệt) đã tự đi tiếp, hiện đứng ở
-  `stage: executing, status: todo` — không còn đứng trên `decompose` nữa.
-  Số liệu đổi nhưng **quyết định D18 không đổi**: vẫn có item mở đứng trên
-  stage đó (3 > 0), lý do giữ alias drain-only vẫn nguyên vẹn; đây chỉ là
-  cập nhật bằng chứng, không phải câu hỏi mới.
+- **Đếm fresh item ở stage `clarify`** (`fgos list --all --json`,
+  2026-08-11 ~14:32 UTC): **90 item**, gồm `tsk-2mt` (cha của chính cây
+  này, `status: doing`) và 4 con em cùng cây (`tsk-tku`, `tsk-2yo`,
+  `tsk-30v`, `tsk-lya`, `tsk-15u`, đều `status: todo`). Đủ trạng thái:
+  `todo`/`doing`/`awaiting-human`/`wontfix`/`done`/`cleanup`.
+- `bin/fgos.mjs`'s `submitWork` (dòng 856): `title = deriveTitle(text)`
+  (cắt cơ học, KHÔNG phải LLM rewrite); `domain: opts.domain` (chỉ nhận
+  từ flag người gọi, không có gì tự phân loại). Xác nhận claim của D5:
+  domain classification là "năng lực đang thiếu hoàn toàn."
+  `verify: SUBMIT_VERIFY_SENTINEL` — verb `submit` không đổi field này.
+- `plugins/fgOS/skills/submit/SKILL.md` (203 dòng, đã đọc toàn bộ)
+  — luồng HIỆN TẠI: bước 4 gọi `fgos submit "<text thô>"` TRƯỚC (tạo
+  item ngay, classify cơ học); bước 6 ("tsk-5wz") mới gọi
+  `fgos-clarifying` SAU khi item đã tồn tại — CHỈ khi có "soul" (session
+  tương tác), có gate rõ ràng loại trừ no-soul caller
+  (`dogfood-fixture:submit`, cron/script/agent khác). Bước 6b chỉ re-judge
+  `tier`/`kind`/`risk` trên text sạch — KHÔNG đụng `domain` ở đâu cả.
+  Đây chính là thứ tự cần ĐẢO NGƯỢC theo D2: `fgos-clarifying` (rewrite +
+  domain) chạy TRƯỚC, rồi mới gọi `submit` với text/domain đã có.
+  `tier`/`kind`/`risk` re-judge (bước 6b) giữ nguyên không đổi — thuộc
+  phạm vi task 4 (`tsk-2yo`, DISCUSSION.md), KHÔNG phải task này.
+- `.claude/skills/fgos-clarifying/SKILL.md` (đã đọc toàn bộ trong tsk-403,
+  còn hiệu lực) — hôm nay là stage-skill vận hành trên item ĐÃ TỒN TẠI
+  (`fgos ask`/`fgos answer` dùng `<id>` thật), được load bởi
+  `fgos-coding-driving` khi `item.stage === 'clarify'`. Hợp đồng này phải
+  đổi thành verdict-only (xem Pinned terms) khi chạy ở Init.
 - `impact-analysis` capability gate (CLAUDE.md): `fgos tool query
-  --capability impact-analysis --status present` trả về provider
-  `gitnexus`, `status: "present"` — **full**. Thông tin này chỉ để ghi lại
-  cho `fgos-planning`/`fgos-validating` đọc tiếp; `fgos-exploring` không
-  sửa code nên không tự áp MUST rules ở đây.
-- `.fgos/config.json` → `capacities` rỗng — xác nhận lại claim "rủi ro
-  capacityId bằng 0" trong mô tả item và D15.
+  --capability impact-analysis --status present` → provider `gitnexus`,
+  `status: "present"` → **full**. Ghi lại cho `fgos-coding-planning`/
+  `fgos-coding-validating` đọc tiếp.
 
 ## Canonical references
 
-- `docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md` —
-  toàn bộ thiết kế cha (`tsk-2mt`), mục 4 (D1-D19), mục 6 (thiết kế đã
-  chốt), mục 7 task 1 (`{#task-plan-family-rename}`) là nguồn quyết định
-  gốc cho tài liệu này.
-- `tsk-403`'s own `gates.tsk-403` record (`fgos list --id tsk-403 --json`)
-  — vòng hỏi/đáp Q1/Q2 đã chốt, câu trả lời của người đã được chép lại
-  nguyên văn vào `description` của item.
-- Tiền lệ rename trước: rename `fgos-executing` (full rewrite bao gồm
-  `docs/history/*`) — chuẩn quét cho việc 3.
+- `docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md`
+  mục 4 (D5, D9), mục 7 task 2 (`{#task-clarifying-to-init}`) — nguồn
+  quyết định gốc.
+- `docs/history/discover-stage-graph-and-skill-layering/RESEARCH.md` —
+  2 vòng nghiên cứu máy-một-mình (đếm 90 item, xác nhận quyết định D1 của
+  người).
+- Tiền lệ cùng cây: `tsk-403` (đã delivered) — D18's decompose-alias
+  pattern, dẫn chứng cho lý do KHÔNG chọn cùng hướng ở D1 trên đây (quy mô
+  90 khác 3-4).
 
 ## Outstanding questions
 
