@@ -657,7 +657,18 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
   const gate = view?.gates?.[id];
   const heavyRiskAlreadyConfirmed =
     typeof gate?.answer === 'string' && gate.answer.trim() && typeof gate?.ask === 'string' && gate.ask.includes(DEFAULT_RISK_GATE_REASON);
-  const keywordRiskGate = work.risk === HEAVY_RISK && !heavyRiskAlreadyConfirmed;
+  // tsk-wve D1: a heavy-risk verdict that cites a real, already-locked
+  // decision from this item's own CONTEXT.md is grounded, not off-the-cuff
+  // -- same D-ID-citation precedent normalizeChild already trusts for a
+  // decompose child's own `action` field (above). `lockedDecisionIds.size
+  // === 0` (no CONTEXT.md, or none with a "## Locked decisions" table)
+  // never counts as evidence -- the floor stays exactly as before for an
+  // item that never went through fgos-exploring, same graceful-degrade
+  // normalizeChild already applies.
+  const lockedDecisionIds = extractLockedDecisionIds(lockedContext);
+  const citesRealEvidence =
+    lockedDecisionIds.size > 0 && (verdict.reason?.match(D_ID_PATTERN) ?? []).some((cited) => lockedDecisionIds.has(cited));
+  const keywordRiskGate = work.risk === HEAVY_RISK && !heavyRiskAlreadyConfirmed && !citesRealEvidence;
 
   // work-item-priority-matrix D4/D8, Phase C: same bypass-detection shape as
   // keywordRiskGate above (matched by its own reason text, never a stale
