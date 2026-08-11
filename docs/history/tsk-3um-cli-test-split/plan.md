@@ -47,25 +47,28 @@ phân biệt "lỗi sẵn có" với "regression do item này gây ra".
 
 Cắt theo **verb của CLI** — đơn vị chủ đề tự nhiên của file này, và đúng quy
 ước sẵn có của thư mục (`fgos-help.test.mjs`, `fgos-manifest.test.mjs`,
-`fgos-tool.test.mjs`, `take-pick-claim-eligibility.test.mjs`). Phân bố thật,
-đếm từ `^test('<verb>` trên chính file:
+`fgos-tool.test.mjs`, `take-pick-claim-eligibility.test.mjs`).
 
-| Verb | Test |
-|---|---|
-| approve 47, merge 17 | 64 |
-| edit 41, add 39 | 80 |
-| return 43, review 15, reject 4 | 62 |
-| take 17, pick 18, session 11, unlock 6, lock-status 6, main-checkout-reset 3 | 61 |
-| submit 24, move 16, ask/answer 5, decision 4 | 49 |
-| list 22, show 6, ready 11, triage 6, graph 4, rollup 11, stale 4, conflicts 4, goal 6 | 74 |
-| discover 11, decompose 8, evolve 13, promote-to-component 8, sync-root 10, check 20 | 70 |
-| cleanup 7, compound 9, catchup 9, init 9, docs-index 5, doc-sources 5, + phần lẻ | ~87 |
+Ranh giới dưới đây **cân theo chi phí đo được (P1b đã chạy), không theo đếm
+đầu test** — và số đo đã bác chính con số 8 nhóm mà vòng shape đầu tiên
+đề xuất: `approve` một mình đã 19.8s, tức gần trọn một nhóm, nên chia 547
+test thành 8 phần bằng nhau về số lượng sẽ đẻ ra nhóm vượt ngưỡng.
 
-**8 nhóm**, trung bình ~68 test/nhóm. Với ~0.31s/test (171.0s / 547) thì mỗi
-nhóm ≈ 21s — dưới ngưỡng 30s của D3, còn biên cho nhóm lệch.
+| # | File | Verb | Chi phí đo được |
+|---|---|---|---|
+| 1 | `fgos-approve.test.mjs` | approve | 19.8s |
+| 2 | `fgos-return.test.mjs` | return, reject | 18.4s |
+| 3 | `fgos-edit.test.mjs` | edit | 15.1s |
+| 4 | `fgos-intake.test.mjs` | add, submit, move, decision, ask/answer | 21.3s |
+| 5 | `fgos-claim.test.mjs` | take, pick, session, unlock, lock-status, main-checkout-reset | 19.0s |
+| 6 | `fgos-setup.test.mjs` | setup, init, repair, rebuild | 13.4s |
+| 7 | `fgos-merge.test.mjs` | merge, review, promote-to-component, sync-root | 17.2s |
+| 8 | `fgos-read.test.mjs` | list, show, ready, triage, graph, rollup, stale, conflicts, goal, check | 20.7s |
+| 9 | `fgos-stage.test.mjs` | discover, decompose, evolve, compound | 11.5s |
+| 10 | `fgos-post-merge.test.mjs` | catchup, cleanup, retrospective, docs-index, doc-sources + phần lẻ | 12.5s |
 
-Ranh giới cuối cùng **cân bằng theo chi phí đo được, không theo đếm đầu
-test** (xem P1b). Bảng trên là điểm xuất phát, không phải con số bất di.
+**10 nhóm**, nặng nhất 21.3s — dưới ngưỡng 30s của D3 với biên ~30%. Tổng
+170.5s khớp phép đo cả file (171.0s ở `RESEARCH.md` của item cha).
 
 ### Helper dùng chung
 
@@ -81,7 +84,7 @@ import/helper cần thiết"). Đặt dưới `helpers/` với đuôi không ph�
 |---|---|---|
 | ~~Ngưỡng 45s có thể bất khả thi~~ | ~~cao~~ | **P1 — ĐÃ ĐÓNG**, xem bảng số đo trên: 116 file còn lại chạy hết trong 29.70s, nên trần sau khi chẻ ≈ 30s và mục tiêu 45s khả thi. Đo bằng một lần chạy trên tập-trừ-hai-file, rẻ hơn nhiều so với đo tuần tự 118 file mà cho đúng con số cần biết (makespan, chính là thứ quyết định wall-clock). |
 | **Baseline không xanh** — suite có sẵn 1 test đỏ không liên quan, nên verify dạng "0 fail" là bất khả thi và sẽ chặn item ở `fgos return`. | **cao** | Verify được viết lại để so tập đỏ sau với tập đỏ baseline thay vì đòi rỗng — xem "Proof surface" bên dưới. Không mở scope sang sửa lỗi của tsk-107. |
-| **Chia nhóm theo đếm đầu có thể lệch** — giả định ~0.31s/test đều nhau chưa được chứng minh cho file này. | trung bình | **P1b**: chạy `node --test --test-reporter=spec test/cli/fgos.test.mjs` một lần (~171s), lấy duration từng test, cộng theo nhóm ở bảng trên, chỉnh ranh giới cho nhóm nặng nhất < 30s. |
+| ~~Chia nhóm theo đếm đầu có thể lệch~~ | ~~trung bình~~ | **P1b — ĐÃ ĐÓNG**: đo duration từng test (581 dòng, tổng 170.5s). Giả định "0.31s/test đều nhau" **sai** và số đo đã bác nó — nhưng theo hướng vô hại: test nặng nhất là **11.1s** (`setup inside a .fgos/-less linked worktree still succeeds`), test nhì chỉ **1.8s**, phần còn lại đều nhỏ. Không test đơn lẻ nào tới gần 30s, nên đường cắt luôn khả thi; chỉ cần cân theo ms thay vì theo số lượng, đúng như bảng nhóm ở trên. |
 | **Test phụ thuộc side effect của test chạy trước nó trong cùng file** — tách file là tách process, side effect biến mất. | trung bình | Không cần proof riêng: nếu có, nó đỏ ngay lần chạy đầu sau khi chẻ. Bắt bởi chính verify — mệnh đề (2) chỉ tha đúng một lỗi guard sẵn có, mọi test đỏ khác đều làm verify đỏ. |
 | **5 item còn bay có `verify` trỏ đường dẫn cũ**; 2 trong số đó (`tsk-4uj`, `tsk-1cp`) đang `doing` — phiên khác đang chạm. | trung bình | **P3**: đọc lại danh sách ngay trước khi sửa (danh sách chụp 2026-08-11 có thể đã đổi), chỉ ghi qua verb của engine, không sửa tay `.fgos/`. |
 | Vỡ ràng buộc kiến trúc | không | `test/` ngoài `docs/architecture-manifest.json`; `test/architecture.test.mjs` chỉ quét `src/`+`bin/`. |
@@ -118,14 +121,11 @@ reporter mặc định không bao giờ in.
 
 ## Shape
 
-1. **Đo per-test cost** — chạy `node --test --test-reporter=spec
-   test/cli/fgos.test.mjs` một lần (~171s), lấy duration từng test, cộng
-   theo nhóm ở bảng trên, chỉnh ranh giới cho nhóm nặng nhất < 30s (P1b —
-   đây là dữ liệu để chia nhóm, thuộc thi công, không phải proof point
-   feasibility; P1 ở trên mới là cái gate tính khả thi và nó đã đóng).
+1. ~~Đo per-test cost~~ — **xong ở vòng validating** (P1b), kết quả là bảng
+   10 nhóm ở trên. Thi công bắt đầu thẳng từ bước 2.
 2. **Trích helper** ra `test/cli/helpers/fgos-cli-harness.mjs`.
-3. **Chuyển test theo 8 nhóm**, ranh giới chốt theo số đo ở P1b. Mỗi nhóm
-   một file `test/cli/fgos-<chủ-đề>.test.mjs`.
+3. **Chuyển test theo 10 nhóm** ở bảng trên, mỗi nhóm một file
+   `test/cli/fgos-<chủ-đề>.test.mjs`.
 4. **Xoá `test/cli/fgos.test.mjs`** (D1).
 5. **Sửa `verify` của 5 item còn bay** qua verb của engine (P3).
 6. **Đo lại** — `npm test` 0 fail, tổng test không giảm, không file nào
@@ -144,14 +144,18 @@ reporter mặc định không bao giờ in.
 
 ## Assumptions
 
-- **A1** — chi phí mỗi test trong file này tương đối đều (~0.31s). Không dựa
-  vào giả định này: P1b đo thật trước khi chốt ranh giới.
+- ~~**A1** — chi phí mỗi test tương đối đều (~0.31s)~~ — **bác bỏ bằng số
+  đo** (P1b): một test 11.1s, phần còn lại ≤1.8s. Ranh giới nhóm cân theo ms
+  thật, không theo giả định này.
 - **A2** — 50 item đã ở `cleanup`/`done` mang `verify` trỏ đường dẫn cũ sẽ
   không chạy lại verify, nên không cần sửa (verify chỉ chạy ở `return` và
   post-merge, cả hai đã qua).
-- **A3** — tăng số file bận trong `test/cli/` từ 1 lên 8 vẫn nằm trong 16
-  core; nếu sai thì wall-clock chạm trần CPU chứ không chạm trần file, và
-  P1 sẽ lộ ra khi so số.
+- **A3** — tăng số file bận trong `test/cli/` từ 1 lên 10 vẫn nằm trong 16
+  core. Chứng minh một phần bởi P1: 116 file chạy cùng lúc xong trong 29.70s.
+  Phần chưa chứng minh: 10 nhóm mới cộng thêm ~170s CPU vào cùng cửa sổ đó,
+  nên makespan cuối có thể cao hơn 29.70s do tranh core — vẫn dưới 45s theo
+  ước lượng, nhưng con số thật chỉ biết sau khi chẻ xong. Verify là chỗ bắt
+  điều này.
 
 ## Outstanding questions
 
