@@ -88,12 +88,41 @@ thay vì giả định).
 - Gỡ `clarify: 'fgos-clarifying'` khỏi `skillMap` của domain `coding`.
 - Gỡ `'clarify'` khỏi `stages` array của domain `coding`.
 - Gỡ `clarify: 'Clarify'` khỏi `stepMap` — hệ quả: `stageForStep(coding,
-  'Clarify')` trả `undefined`. Cần kiểm tra MỌI call site đọc giá trị đó
-  không sập khi nhận `undefined` (vd. `discoverableStages` dòng
-  `clarifyStage = stageForStep(domain,'Clarify')` — nếu `undefined`,
-  logic `CLARIFY_SHAPED_STAGES`/so sánh `item.stage === clarifyStage` vẫn
-  an toàn vì không item nào còn `stage: undefined` để khớp nhầm, nhưng
-  CẦN xác nhận bằng test thật, không giả định).
+  'Clarify')` trả `undefined`. **Đã đọc thật MỌI call site** (`rg -- "'Clarify'" src`),
+  tìm ra 2 chỗ thật sự vỡ (không phải giả định, đã kiểm chứng bằng đọc code):
+  - `src/state/frontier.mjs`'s `frontier()` **AN TOÀN sẵn** — dòng
+    `if (executeStage === undefined) continue;` đã tường minh guard đúng
+    trường hợp này (cùng cách nó đã xử lý domain `synthetic` không có
+    Clarify/Divide). `frontierAcrossSteps`'s default `['Clarify', 'Divide',
+    'Execute']` thừa hưởng an toàn này — không cần sửa.
+  - `src/intake/discovery.mjs`'s `discoverableStages(domain)` (dòng 122-125)
+    **VỠ THẬT**: trả `[clarifyStage, 'discovery', 'exploring']` —
+    `clarifyStage` sẽ là `undefined` cho domain `coding` sau Phase 2, tức
+    hàm trả `[undefined, 'discovery', 'exploring']`. Hàm này nuôi trực
+    tiếp `bin/fgos.mjs`'s `discover` CLI case's precondition
+    (`validStages.includes(stage)`) — `undefined` lọt vào danh sách "stage
+    hợp lệ" là một lỗ hổng validation thật. Sửa: lọc bỏ giá trị falsy
+    trước khi trả — `[clarifyStage, 'discovery', 'exploring'].filter(Boolean)`
+    (hoặc tương đương) — giữ nguyên hành vi cho domain KHÁC `coding` vẫn
+    còn Clarify-mapped stage thật (vd. `triage`).
+  - `src/intake/discovery.mjs`'s `nextDiscoveryEdge` (dòng 132)
+    **VỠ THẬT KHÁC**: `if (work.stage === clarifyStage)` — khi
+    `clarifyStage === undefined`, so sánh này khớp NHẦM với bất kỳ item
+    nào có `stage` field bị thiếu/hỏng (dù domain đó không còn có khái
+    niệm "clarify" nữa) — một false-positive match nguy hiểm, không phải
+    lý thuyết. Sửa: thêm guard `clarifyStage !== undefined &&` trước so
+    sánh, đúng cùng kiểu guard `frontier.mjs` đã làm.
+  - `src/runner/loop.mjs:681` **VỠ THẬT, nặng nhất**: dòng
+    `stage: stageForStep(getDomain(item.domain), 'Clarify')` gán thẳng
+    stage cho item MỚI mà runner tự tạo (nhánh "discovered-from", khi
+    worker báo cáo một `fgos-discovered` block). Sau Phase 2, dòng này
+    tạo item với `stage: undefined` — hỏng dữ liệu thật, không phải rủi
+    ro giả định. Sửa: `stageForStep(domain, 'Clarify') ?? domain.stages?.[0]`
+    — fallback về stage ĐẦU TIÊN domain đó khai báo; với domain `coding`
+    sau Phase 2, `stages[0]` chính là `'discovery'` (thứ tự mảng đã đổi ở
+    Phase 2's own change tới `stages`) — đúng ý định D5 ("item mới sinh ra
+    bỏ qua clarify, vào thẳng discovery"), không cần thêm nhánh domain-cụ-thể
+    nào trong file này (giữ nguyên tính domain-agnostic).
 - Gỡ cạnh `{from:'clarify', to:...}` còn sót nếu có (transitions array) —
   đọc lại: `clarify` là NGUỒN của mọi cạnh xuất phát
   (`clarify->executing`, `clarify->discovery`, `clarify->exploring`,
