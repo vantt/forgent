@@ -44,14 +44,14 @@ Flags counted:
   path new-root, happy path reuse-member, cycle-rejection, conflict
   handling — lines ~6613-6850+) that must stay green unmodified when the
   new flag is omitted. **1 flag.**
-- **weak proof around the area** — confirmed this item's own
-  `fgos-researching` Round 3: NEITHER guard layer
-  (`bin/fgos.mjs`'s CLI-level `isMainWorktree` check, nor
-  `retargetMember`'s own independent check in
-  `src/runner/promote-engine.mjs:53-58`) has ANY existing test coverage
-  today — worse than tsk-4uj's own finding for `approve`/`sync-root`
-  (which at least had P44-guard tests, just not the untested `--dir`
-  combination). **1 flag.**
+- **weak proof around the area** — **corrected during `fgos-code-implement`
+  (RESEARCH.md's own correction note)**: `retargetMember`'s guard already
+  had a test (`test/runner/promote-engine.test.mjs`,
+  `56b34d9a`, original implementation — Round 3's keyword search missed it).
+  The real gap was narrower: `bin/fgos.mjs`'s CLI-level guard for
+  `promote-to-component` had NO worktree-refusal test at all before this
+  item — now closed by three new tests in `test/cli/fgos.test.mjs`.
+  **1 flag** (still applies — the CLI layer's gap was real).
 - **public contract** — adds a new CLI flag to an already-documented verb
   (`fgos promote-to-component`), visible to anyone scripting against it.
   **1 flag.**

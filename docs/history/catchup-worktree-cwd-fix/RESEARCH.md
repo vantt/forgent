@@ -260,3 +260,21 @@ assumption note).
 **Verdict:** `clear: true`. Nothing about this item's own intent, root
 cause, or guard structure is in question — ready to proceed past
 `discovery`.
+
+**Correction (`fgos-code-implement`, 260811):** Finding 2 above ("zero
+existing test coverage" for both guard layers) was only half right.
+`test/runner/promote-engine.test.mjs`'s `'retargetMember refuses to run
+from a linked worktree, mirroring sync-root's own discipline'` test
+(added by `56b34d9a feat(tsk-3gx-2): mutating engine restructure for
+promote-to-component` — the ORIGINAL implementation, not a later
+addition) already covers `retargetMember`'s own guard directly. This
+round's `rg -n "isMainWorktree|repoRoot"` search missed it because the
+test exercises the BEHAVIOR (rejects from a linked worktree) without
+referencing the guard function's name — a keyword-search gap, not an
+absent test. The CLI-layer half of the finding was correct: no
+worktree-guard test existed for `promote-to-component`'s own case before
+this item (confirmed again directly this pass, now closed by three new
+tests in `test/cli/fgos.test.mjs`). Net effect: the "weak proof" Mode-gate
+flag in `plan.md` was grounded in a real gap (the CLI layer), just a
+narrower one than stated; it does not change the lane (the hard-gate flag
+alone already forced high-risk) or D6's own conclusion.

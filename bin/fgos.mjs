@@ -3562,7 +3562,21 @@ async function runVerb(verb, flags, positional, dir) {
         throw new StoreError('validation', 'promote-to-component requires --ids (or positional args) listing at least 2 member item ids.');
       }
 
-      const repoRoot = process.cwd();
+      // repoRoot: process.cwd() by default -- isMainWorktree below then
+      // refuses outright when cwd is any linked worktree, catching a batch
+      // promotion that would otherwise merge member branches against that
+      // worktree's own (possibly stale) checkout. --trust-dir (tsk-2bg)
+      // opts into deriving repoRoot from --dir instead, the same
+      // substitution tsk-4uj already shipped for sync-root/approve
+      // (CONTEXT.md D5/D6) -- gated behind this explicit flag here, never
+      // the unconditional default: same posture as sync-root (merges land
+      // on a runner-owned integration branch, never main directly), so the
+      // caller must say it knows --dir is trustworthy rather than getting
+      // the relaxed behavior silently. Byte-identical to today when the
+      // flag is omitted. retargetMember's own isMainWorktree check
+      // (promote-engine.mjs:54) inherits this relaxation for free -- it
+      // receives this same repoRoot value unchanged, never re-derives it.
+      const repoRoot = flags['trust-dir'] === true ? path.dirname(dir) : process.cwd();
       if (!isMainWorktree(repoRoot)) {
         throw new StoreError(
           'validation',
