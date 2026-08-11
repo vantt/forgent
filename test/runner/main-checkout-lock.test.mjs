@@ -9,6 +9,7 @@ import {
   acquireMainCheckoutLock,
   releaseMainCheckoutLock,
   releaseMainCheckoutLockIfOwn,
+  renewMainCheckoutLockIfOwn,
   forceReclaimAmbiguousLock,
   inspectMainCheckoutLock,
   formatLockDurationMs,
@@ -378,6 +379,119 @@ test('releaseMainCheckoutLockIfOwn works for a numeric (pid) identity too, not j
 
   assert.equal(res.status, 'released');
   assert.equal(fs.existsSync(lockPathFor(dir)), false);
+});
+
+// --- renewMainCheckoutLockIfOwn (tsk-4l8): heartbeat for a long hold -------
+
+test('renewMainCheckoutLockIfOwn refreshes the timestamp of a lock recorded under the caller\'s own identity', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  const oldTs = Date.now() - 10_000;
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: 'session-abc-123', ts: oldTs }));
+
+  const now = Date.now();
+  const res = renewMainCheckoutLockIfOwn(dir, 'session-abc-123', { now });
+
+  assert.equal(res.status, 'renewed');
+  const record = JSON.parse(fs.readFileSync(lockPathFor(dir), 'utf8'));
+  assert.equal(record.pid, 'session-abc-123');
+  assert.equal(record.ts, now);
+});
+
+test('renewMainCheckoutLockIfOwn leaves a DIFFERENT identity\'s lock untouched (never steals or refreshes someone else\'s)', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  const oldTs = Date.now() - 10_000;
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: 'session-other-live', ts: oldTs }));
+
+  const res = renewMainCheckoutLockIfOwn(dir, 'session-abc-123');
+
+  assert.equal(res.status, 'not-owner');
+  assert.equal(res.holderPid, 'session-other-live');
+  const record = JSON.parse(fs.readFileSync(lockPathFor(dir), 'utf8'));
+  assert.equal(record.ts, oldTs, 'a non-owner renew must never touch the recorded timestamp');
+});
+
+test('renewMainCheckoutLockIfOwn is a no-op when no lock file exists (never creates one)', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+
+  const res = renewMainCheckoutLockIfOwn(dir, 'session-abc-123');
+
+  assert.equal(res.status, 'no-lock');
+  assert.equal(fs.existsSync(lockPathFor(dir)), false);
+});
+
+test('renewMainCheckoutLockIfOwn leaves an unparseable (AMBIGUOUS) lock file untouched', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(lockPathFor(dir), 'not json at all {{{');
+
+  const res = renewMainCheckoutLockIfOwn(dir, 'session-abc-123');
+
+  assert.equal(res.status, 'ambiguous');
+  assert.equal(fs.readFileSync(lockPathFor(dir), 'utf8'), 'not json at all {{{');
+});
+
+test('renewMainCheckoutLockIfOwn works for a numeric (pid) identity too, not just strings', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: process.pid, ts: Date.now() - 10_000 }));
+
+  const now = Date.now();
+  const res = renewMainCheckoutLockIfOwn(dir, process.pid, { now });
+
+  assert.equal(res.status, 'renewed');
+  const record = JSON.parse(fs.readFileSync(lockPathFor(dir), 'utf8'));
+  assert.equal(record.ts, now);
+});
+
+// --- the core race, proven with a controlled clock (tsk-4l8 RESEARCH.md) ---
+// A live holder's lock, aged past a contender's own ttlMs, is judged HELD
+// (not stale) by that contender ONLY because the holder heartbeated in
+// between — this is the exact mechanism the item's own investigation found
+// missing (main-checkout-lock.mjs's `held = pidLive && withinTtl` is
+// evaluated against the CONTENDER's ttlMs, not the holder's own).
+
+test('a live holder that never renews gets reclaimed by a contender once its ttlMs elapses (the bug, reproduced without the fix)', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  const shortTtl = 1000;
+  const staleTs = Date.now() - 10_000; // far older than shortTtl, never renewed
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: process.pid, ts: staleTs }));
+
+  const contender = acquireMainCheckoutLock(dir, { identity: process.pid + 1, ttlMs: shortTtl });
+
+  assert.equal(contender.status, ACQUIRED, 'without a heartbeat, a still-live holder\'s lock reads as free once its age exceeds the contender\'s own ttlMs');
+});
+
+test('a live holder that renews on a heartbeat is judged still HELD by a contender using the same short ttlMs (the fix)', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  const shortTtl = 1000;
+  const staleTs = Date.now() - 10_000; // would be stale under shortTtl if untouched
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: process.pid, ts: staleTs }));
+
+  // The holder's own heartbeat tick, exactly what merge.mjs's interval calls:
+  const renew = renewMainCheckoutLockIfOwn(dir, process.pid);
+  assert.equal(renew.status, 'renewed');
+
+  const contender = acquireMainCheckoutLock(dir, { identity: process.pid + 1, ttlMs: shortTtl });
+
+  assert.equal(contender.status, HELD, 'a heartbeat renewal must protect a live holder against ANY contender\'s own ttlMs, not just the original acquirer\'s');
+  assert.equal(contender.holderPid, process.pid);
+});
+
+test('abandoned-lock self-healing is unchanged: a dead holder whose last heartbeat exceeds ttlMs is still reclaimed', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  const dead = deadPid();
+  const lastHeartbeatTs = Date.now() - 10_000; // the crashed session's last real write
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: dead, ts: lastHeartbeatTs }));
+
+  const contender = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: 1000 });
+
+  assert.equal(contender.status, ACQUIRED, 'a crashed holder stops heartbeating, so self-healing still reclaims the lock after ttlMs from its LAST real write, unchanged from before this fix');
 });
 
 // --- crash-safety: exit/SIGINT/SIGTERM release the lock automatically ------
