@@ -8,18 +8,22 @@ resolved (`delivered`/`retrospective`/`cleanup`/`done`). This is the
 prevention half of a two-piece fix; the detection half (`checkRootDrift`
 reporting `strandedAfterClose`) already landed via tsk-4qu.
 
-Scope is `approve`'s own gate plus `mergeTier`'s classification in
-`src/state/graph-harness.mjs:209` — the two places `bin/fgos.mjs`'s own
-approve path and `merge list`/`merge next` read to decide where a leaf's
-merge lands. Remediation of the two already-stranded branches (tsk-4ns,
-tsk-53n) is explicitly out of scope — both were already resolved by hand
-via `fgos sync-root`.
+Scope is `approve`'s own gate (`bin/fgos.mjs`, the actual enforcement
+point — confirmed it never reads `mergeTier` at all) plus `mergeReadiness`'s
+`ready`/`blockedOnSync` classification (`src/state/graph-harness.mjs`) so
+`merge list`/herdr-plugin stop reporting a soon-to-be-refused leaf as
+plainly "ready." Remediation of the two already-stranded branches
+(tsk-4ns, tsk-53n) is explicitly out of scope — both were already resolved
+by hand via `fgos sync-root`. See `plan.md` for the final approach
+decision (piece 2's own (a) vs (b) call, and the graph-harness.mjs
+consistency fix this uncovered).
 
 ## Decisions
 
 | ID | Decision |
 |---|---|
-| D1 | The set of "resolved" root statuses this block checks against is the SAME `COMPLETED_ROOT_STATUSES` set `checkRootDrift` already uses: `{delivered, retrospective, cleanup, done}` (`src/setup/registrations.mjs:440`). `wontfix` stays excluded — not asked as a question because it is already grounded in tsk-4qu's own Assumption #1 (`docs/history/leaf-merge-into-resolved-root/plan.md`): an abandoned root is a different category from a closed-out one, and a wontfix root's branch is *supposed* to sit unmerged. Piece 2 stays consistent with piece 1's own precedent rather than inventing a second status set. |
+| D1 | ~~The set of "resolved" root statuses this block checks against is the SAME `COMPLETED_ROOT_STATUSES` set `checkRootDrift` already uses: `{delivered, retrospective, cleanup, done}`. `wontfix` stays excluded.~~ **Superseded by D2.** |
+| D2 | The resolved-root check uses `isResolvedStatus` (`src/state/frontier.mjs:247`), NOT the narrower `COMPLETED_ROOT_STATUSES` D1 named — `wontfix` IS blocking, same as `delivered`/`retrospective`/`cleanup`/`done`. Found mid-planning: every other "is this ancestor closed out" gate already inside `mergeReadiness` (deps/mergeAfter/supersededOut, `src/state/graph-harness.mjs:107,109,155`) uses `isResolvedStatus`, which already treats `wontfix` as resolved via `statusCategory === 'canceled'`. D1's citation of tsk-4qu's Assumption #1 only justified piece 1's *reporting* exemption for `wontfix` ("an abandoned branch is supposed to sit unmerged, no need to flag its drift") — that reasoning does not transfer to piece 2's *prevention* gate: a leaf merging into a wontfix root's branch is stranded exactly the same way as one merging into a delivered root's branch, arguably worse since nobody is watching a wontfix branch at all. Confirmed with the user in conversation before locking. |
 
 **Explicitly deferred to `fgos-planning`, not decided here:** which of the
 item's own two proposed directions to implement —
@@ -38,18 +42,22 @@ enforces for a leaf-to-root merge.
 
 ## Pinned terms
 
-- **root** — any work item that is some other item's `parent`
-  (`drift-status.mjs`'s own comment: "a work item whose `fgw/<id>` branch
-  is a merge target for its own children"). Direct parent only; this item
-  does not address multi-level parent chains (a root that itself has an
-  unresolved parent) — `drift-status.mjs:73` already special-cases that one
-  level for its own `targetBranch` resolution, but `mergeTier` (the
-  function this item touches) only ever distinguishes "has any parent" vs
-  "has none," and the item's own real-incident evidence (tsk-4ns, tsk-53n)
-  is single-level in both cases. Multi-level nesting, if it turns out to
-  matter, is new evidence for a follow-up, not something to guess into
-  scope here.
-- **resolved** (root status) — see D1.
+- **root** — **correction, found mid-planning:** the item's actual `approve`
+  gate (`bin/fgos.mjs`) does NOT use direct-parent-only resolution. It
+  consistently calls `resolveRoot(view, id)` (imported as `n` from
+  `src/runner/root-affinity.mjs`) for its real git merge target, its Iron
+  Law diff base, and its `item.targets` drift check alike (`bin/fgos.mjs`
+  lines 2795, 2837, 2939) — `resolveRoot` walks `item.parent` all the way
+  to the top-level ancestor, not just one hop. `mergeTier`
+  (`graph-harness.mjs:209`) is the one place in the codebase that still
+  reads `item.parent` directly rather than `resolveRoot` — that is part of
+  the bug this item fixes, not the intended semantic to preserve. Piece
+  2's own check must match what `approve` actually merges into
+  (`resolveRoot`'s walk), not `mergeTier`'s narrower reading, so a
+  multi-level chain (leaf under a mid-level item under a resolved root) is
+  correctly covered too — this doesn't expand scope, it's required for the
+  fix to actually close the bug for any chain deeper than one level.
+- **resolved** (root status) — see D2.
 
 ## Scout evidence
 
