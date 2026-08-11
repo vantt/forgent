@@ -67,16 +67,29 @@ One command proves the whole item (already set on the work record, no
 split to give separate ones to):
 
 ```
-npm test && grep -q 'once per fgos-coding-driving invocation' .claude/skills/fgos-coding-driving/SKILL.md && grep -q 'once per fgos-coding-driving invocation' .agents/skills/fgos-coding-driving/SKILL.md && diff .claude/skills/fgos-coding-driving/SKILL.md .agents/skills/fgos-coding-driving/SKILL.md && grep -q 'Rename the pane via' plugins/fgOS/skills/pick/SKILL.md && ! grep -q 'Then show the task description: read the claimed' plugins/fgOS/skills/pick/SKILL.md && ! git diff --name-only main...HEAD | grep -q '^src/'
+npm test && grep -q 'once per fgos-coding-driving invocation' .claude/skills/fgos-coding-driving/SKILL.md && grep -q 'once per fgos-coding-driving invocation' .agents/skills/fgos-coding-driving/SKILL.md && grep -q 'Rename the pane via' plugins/fgOS/skills/pick/SKILL.md && ! grep -q 'Then show the task description: read the claimed' plugins/fgOS/skills/pick/SKILL.md && ! git diff --name-only main...HEAD | grep -q '^src/'
 ```
 
 Shape per `docs/how-to/write-verify-for-a-skill-prose-change.md` (this item
 touches `.claude/skills/**/SKILL.md`, `.agents/skills/**/SKILL.md`, and
 `plugins/fgOS/skills/**/SKILL.md`, so that how-to's own scope applies):
-`npm test` first, then POSITIVE (the new anchor phrase exists in both
-driver mirrors, they stay identical, `pick` still has its rename call),
-then NEGATIVE (`pick`'s old duplicate print phrase is gone; no `src/` file
-was touched by a prose-only item).
+`npm test` first, then POSITIVE (the new anchor phrase exists in EACH
+driver mirror independently, `pick` still has its rename call), then
+NEGATIVE (`pick`'s old duplicate print phrase is gone; no `src/` file was
+touched by a prose-only item).
+
+**Correction (`fgos-validating`'s own reality-gate pass, repo-fit FAIL):**
+the original verify also asserted `diff .claude/skills/fgos-coding-driving/
+SKILL.md .agents/skills/fgos-coding-driving/SKILL.md` (whole-file
+identity). That assumption was true when `CONTEXT.md`/this plan were
+written, but a concurrent session updated `.claude/`'s copy's `/fgOS:cook`
+fan-out row (an unrelated revert) without mirroring it into `.agents/`'s
+copy before this item reached validating — the same dual-mirror drift risk
+`tsk-11f` already flagged for `fgos-exploring`. Fixing that pre-existing,
+unrelated drift is out of this item's own footprint/scope (`CONTEXT.md`
+never decided to take it on); the corrected verify above only proves what
+this item is actually responsible for — its own new anchor phrase landing
+in both copies — dropping the over-strict whole-file-identity assertion.
 
 ## Assumptions
 
