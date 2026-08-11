@@ -85,19 +85,24 @@ pub fn skip_permissions_enabled() -> bool {
 /// over which slash command (tsk-1e3 D4: `run_argv`/`discover_run_argv`
 /// below are thin wrappers over this, so both stay covered by the same
 /// id-validation and skip-permissions logic instead of duplicating it).
+/// `extra_args` (tsk-358 D1) is appended inside the same single-quoted
+/// command text, right after `<slash_command> <id>` — the only place a
+/// caller-supplied flag like `--autoClose` can land, since herdr types
+/// this whole string literally into the pane's shell.
 fn run_argv_for_command(
     pane_id: &str,
     slash_command: &str,
     id: &str,
     skip_permissions: bool,
+    extra_args: &str,
 ) -> Result<Vec<String>, InvalidId> {
     if !is_valid_id(id) {
         return Err(InvalidId(id.to_string()));
     }
     let command = if skip_permissions {
-        format!("claude --dangerously-skip-permissions '{slash_command} {id}'")
+        format!("claude --dangerously-skip-permissions '{slash_command} {id}{extra_args}'")
     } else {
-        format!("claude '{slash_command} {id}'")
+        format!("claude '{slash_command} {id}{extra_args}'")
     };
     Ok(vec!["pane".into(), "run".into(), pane_id.into(), command])
 }
@@ -108,14 +113,21 @@ fn run_argv_for_command(
 /// `skip_permissions` is threaded in explicitly (never read from env
 /// inside this pure function) so it stays deterministically testable —
 /// D1's actual env resolution lives in `skip_permissions_enabled` above.
+/// Never carries `--autoClose` (tsk-358 D1 is discover-only) — a person
+/// working a claimed item in this pane must never have it closed out
+/// from under them.
 pub fn run_argv(pane_id: &str, id: &str, skip_permissions: bool) -> Result<Vec<String>, InvalidId> {
-    run_argv_for_command(pane_id, PICK_SLASH_COMMAND, id, skip_permissions)
+    run_argv_for_command(pane_id, PICK_SLASH_COMMAND, id, skip_permissions, "")
 }
 
-/// argv for launching `claude` with `/fgOS:discover <id>` (tsk-1e3 D4) —
-/// same shape as `run_argv`, different slash command.
+/// argv for launching `claude` with `/fgOS:discover <id> --autoClose`
+/// (tsk-1e3 D4 for the slash command; tsk-358 D1 for `--autoClose`, wired
+/// here so both `open_discover_pane`'s manual button and
+/// `open_auto_discover_pane`'s tsk-2ja auto-launcher — the only two
+/// callers of this function — pick it up through this one change) — same
+/// shape as `run_argv`, different slash command and always-on flag.
 pub fn discover_run_argv(pane_id: &str, id: &str, skip_permissions: bool) -> Result<Vec<String>, InvalidId> {
-    run_argv_for_command(pane_id, DISCOVER_SLASH_COMMAND, id, skip_permissions)
+    run_argv_for_command(pane_id, DISCOVER_SLASH_COMMAND, id, skip_permissions, " --autoClose")
 }
 
 /// argv for launching `claude` with a pool-sweep slash command that takes
@@ -491,7 +503,24 @@ mod tests {
                 "pane",
                 "run",
                 "wS:p16",
-                "claude --dangerously-skip-permissions '/fgOS:discover tsk-19y-3'",
+                "claude --dangerously-skip-permissions '/fgOS:discover tsk-19y-3 --autoClose'",
+            ]
+        );
+    }
+
+    /// tsk-358 D1: `discover_run_argv` always carries `--autoClose`,
+    /// whether or not skip-permissions is on — mirrors the test above for
+    /// the non-skip-permissions branch of the same command format.
+    #[test]
+    fn discover_run_argv_always_includes_autoclose() {
+        let argv = discover_run_argv("wS:p16", "tsk-19y-3", false).expect("valid id");
+        assert_eq!(
+            argv,
+            vec![
+                "pane",
+                "run",
+                "wS:p16",
+                "claude '/fgOS:discover tsk-19y-3 --autoClose'",
             ]
         );
     }
@@ -541,8 +570,9 @@ mod tests {
                 "pane",
                 "run",
                 "wS:p16",
-                "claude --dangerously-skip-permissions '/fgOS:discover tsk-2ja'",
-            ]
+                "claude --dangerously-skip-permissions '/fgOS:discover tsk-2ja --autoClose'",
+            ],
+            "tsk-358 D1: the auto-launcher's own run argv must carry --autoClose too"
         );
     }
 
