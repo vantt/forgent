@@ -39,7 +39,13 @@ import { isResolvedStatus } from '../state/frontier.mjs';
 import { getDomain } from '../state/workflow-stage-graphs.mjs';
 import { readLocalStatus, classifyRegistryPosture } from '../state/tool-registry.mjs';
 import { describeConfigAwareness } from '../config/global-config.mjs';
-import { sharedConfigFilePath, readSharedConfig, writeSharedConfig } from '../config/shared-config-file.mjs';
+import {
+  sharedConfigFilePath,
+  readSharedConfig,
+  writeSharedConfig,
+  readInvariantCheckCommands,
+  DEFAULT_INVARIANT_CHECK_COMMANDS,
+} from '../config/shared-config-file.mjs';
 import { DEFAULT_LEVEL, LEVELS } from '../state/gate-bypass.mjs';
 import { checkEventsJsonlContiguity, fixEventsJsonlContiguity } from '../state/events-jsonl-contiguity.mjs';
 
@@ -731,6 +737,51 @@ registerConfigDefault({
   id: 'cleanup',
   key: 'cleanup',
   shape: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS, leafTtlDays: DEFAULT_CLEANUP_LEAF_TTL_DAYS },
+});
+
+// docs/history/tsk-516-approve-reverify-scope/CONTEXT.md D6: the invariant
+// check commands are project config, not a hardcoded runner constant --
+// registered here so `fgos setup`'s config-merge writes the default and
+// `fgos doctor` can see the section at all, the same registry every other
+// module's config already goes through.
+registerConfigDefault({
+  id: 'invariantChecks',
+  key: 'invariantChecks',
+  shape: { commands: DEFAULT_INVARIANT_CHECK_COMMANDS },
+});
+
+// Deliberately does NOT execute the configured commands. `doctor` is a
+// cheap, side-effect-free diagnosis (RUL9's doctor-never-writes discipline),
+// and these are arbitrary project-supplied shell strings -- running them
+// here would let a config entry turn `fgos doctor` into an unbounded, and
+// potentially destructive, command. What this check CAN answer without
+// executing anything is the misconfiguration that actually bites: a present
+// but malformed `invariantChecks` section reads as zero commands at
+// return/merge, silently disabling the gate while looking configured.
+// `checkConfigNotStale` already covers the wholly-missing case generically
+// via the registration above; this covers present-but-unusable.
+function checkInvariantChecksConfigured(cwd) {
+  const section = readSharedConfig(cwd).invariantChecks;
+  if (section === undefined) {
+    return {
+      passed: false,
+      message: 'invariantChecks section missing -- run fgos setup (no invariant check runs at return/merge until it exists)',
+    };
+  }
+  const commands = readInvariantCheckCommands(cwd);
+  if (commands.length === 0) {
+    return {
+      passed: false,
+      message: 'invariantChecks is present but yields no runnable command -- expected { "commands": ["<shell command>", ...] } with at least one non-empty string',
+    };
+  }
+  return { passed: true, message: `invariantChecks.commands = ${commands.length} command(s): ${commands.join(' && ')}` };
+}
+
+registerCheck({
+  id: 'invariant-checks-configured',
+  description: 'invariantChecks.commands in the shared config file yields at least one runnable command',
+  check: (cwd) => checkInvariantChecksConfigured(cwd),
 });
 
 registerCheck({

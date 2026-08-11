@@ -15,6 +15,7 @@ import { DOCTOR_CHECKS, FIX_REGISTRATIONS, integrationScriptPath, mainCheckoutHo
 import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
 import { DEFAULT_LEVEL } from '../../src/state/gate-bypass.mjs';
 import { DEFAULT_CLEANUP_TTL_DAYS, DEFAULT_CLEANUP_LEAF_TTL_DAYS, DEFAULT_HERDR_ORCHESTRATOR_SETTINGS } from '../../src/setup/registrations.mjs';
+import { DEFAULT_INVARIANT_CHECK_COMMANDS } from '../../src/config/shared-config-file.mjs';
 import { initStore, addWork } from '../../src/state/store.mjs';
 import { appendEvent } from '../../src/state/events.mjs';
 
@@ -49,7 +50,7 @@ function fixById(id) {
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, changelog-unreleased-stale, herdr-launcher-configured, work-classification-vocabulary, enduser-docs-index-stale, and events-jsonl-contiguous', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, changelog-unreleased-stale, herdr-launcher-configured, work-classification-vocabulary, enduser-docs-index-stale, events-jsonl-contiguous, and invariant-checks-configured', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     [
@@ -69,6 +70,7 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'work-classification-vocabulary',
       'enduser-docs-index-stale',
       'events-jsonl-contiguous',
+      'invariant-checks-configured',
     ].sort(),
   );
 });
@@ -624,6 +626,7 @@ test('config-not-stale passes when the existing config already has every default
       gateBypass: { level: 'off' },
       cleanup: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS, leafTtlDays: DEFAULT_CLEANUP_LEAF_TTL_DAYS },
       herdrOrchestrator: DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
+      invariantChecks: { commands: DEFAULT_INVARIANT_CHECK_COMMANDS },
     }),
   );
   const { passed } = checkById('config-not-stale').check(cwd);
@@ -657,6 +660,49 @@ test('config-not-stale fails when the existing config is missing a default key',
 // keyed to "is config.gateBypass.level present and a recognized LEVEL",
 // deliberately distinct from config-not-stale's generic "key present at
 // all" scan above (a malformed-but-present level is never "missing").
+
+// ─── invariant-checks-configured (docs/history/tsk-516-approve-reverify-
+// scope/CONTEXT.md D6): same check+configDefault registry shape as
+// gate-bypass below. The check deliberately never EXECUTES the configured
+// commands — they are arbitrary project-supplied shell strings, and doctor
+// is a cheap, side-effect-free diagnosis — so what it can and does answer is
+// the misconfiguration that actually bites: a present-but-unusable section
+// reads as zero commands at return/merge, silently disabling the gate while
+// looking configured.
+
+test('invariant-checks-configured fails when the section is missing entirely', () => {
+  const cwd = mkTemp('doctor-invariant-absent-');
+  const { passed, message } = checkById('invariant-checks-configured').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /invariantChecks section missing/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('invariant-checks-configured fails when the section is present but yields no runnable command', () => {
+  for (const malformed of [{ commands: [] }, { commands: 'not-a-list' }, {}, { commands: ['', '  '] }]) {
+    const cwd = mkTemp('doctor-invariant-malformed-');
+    fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+    fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ invariantChecks: malformed }));
+    const { passed, message } = checkById('invariant-checks-configured').check(cwd);
+    assert.equal(passed, false, `malformed: ${JSON.stringify(malformed)}`);
+    assert.match(message, /present but yields no runnable command/);
+    fs.rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+test('invariant-checks-configured passes and names the configured commands', () => {
+  const cwd = mkTemp('doctor-invariant-ok-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(
+    path.join(cwd, '.fgos', 'config.json'),
+    JSON.stringify({ invariantChecks: { commands: ['node --test test/architecture.test.mjs'] } }),
+  );
+  const { passed, message } = checkById('invariant-checks-configured').check(cwd);
+  assert.equal(passed, true);
+  assert.match(message, /1 command\(s\)/);
+  assert.match(message, /node --test test\/architecture\.test\.mjs/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
 
 test('gate-bypass-configured check fails when the shared file has no gateBypass key at all', () => {
   const cwd = mkTemp('doctor-gatebypass-absent-');

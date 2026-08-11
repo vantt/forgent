@@ -44,7 +44,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { branchNameFor, branchExists, reclaimOrphanedCheckout } from './worktree.mjs';
-import { runGoalCheck } from './goal-check.mjs';
+import { runGoalCheck, runInvariantChecks, invariantFailureAsCheck } from './goal-check.mjs';
+import { readInvariantCheckCommands } from '../config/shared-config-file.mjs';
 import { normalizePath } from './frozen-judge.mjs';
 import { acquireMainCheckoutLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS, formatLockDurationMs } from './main-checkout-lock.mjs';
 import { resolveWriterIdentity } from './session-identity.mjs';
@@ -745,6 +746,41 @@ function isAlreadyMerged(repoRoot, branch, ref) {
   }
 }
 
+/**
+ * tsk-516 (docs/history/tsk-516-approve-reverify-scope/CONTEXT.md D5):
+ * true when the tree this merge is about to produce is provably the exact
+ * tree `return` already verified green, so re-running the checks over it
+ * would be a duplicate of a result already known.
+ *
+ * Two conditions, both required:
+ *  - `HEAD` is an ancestor of `branch` — main has not advanced past the
+ *    fork, so merging `branch` yields `branch`'s own tree. Verified
+ *    empirically during this item's validating pass: with main an ancestor,
+ *    the tree staged by `git merge --no-commit --no-ff` is byte-identical
+ *    to the branch tip's tree; once main advances by even one commit, it is
+ *    not, and this returns false so the full checks run.
+ *  - the branch tip still equals `branchHeadAtReturn` — the SHA whose tree
+ *    actually passed. Without this, a commit pushed onto the branch after
+ *    `return` would ride in unverified.
+ *
+ * Deliberately SUFFICIENT, not necessary: it skips only where identity is
+ * provable, and false-negatives (running checks that would have passed)
+ * cost time, while a false-positive would land an unverified tree on main.
+ * A main-source return is never eligible — it records `headAtReturn`, not
+ * `branchHeadAtReturn`, and this returns false for it.
+ */
+function mergedTreeAlreadyVerified(repoRoot, item, branch) {
+  if (typeof item.branchHeadAtReturn !== 'string' || !item.branchHeadAtReturn) return false;
+  let branchTip;
+  try {
+    branchTip = git(repoRoot, ['rev-parse', branch]).trim();
+  } catch {
+    return false;
+  }
+  if (branchTip !== item.branchHeadAtReturn) return false;
+  return isAlreadyMerged(repoRoot, 'HEAD', branch);
+}
+
 // tsk-15k: whether the paths `branch` actually introduced (relative to its
 // own true fork point, found via the EARLIEST merge commit on the
 // `branch..ref` ancestry path) are still reflected in `ref`'s current tree.
@@ -878,6 +914,15 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
     if (!check.passed) {
       return { outcome: 'verify-fail', branch, check };
     }
+    // tsk-516 (CONTEXT.md D3/D4): this path already merged earlier, so the
+    // tree here IS main's own — a repo invariant broken by this branch is
+    // exactly what must not be declared 'merged' again. D5's skip never
+    // applies here: HEAD has already absorbed the branch, so the tree under
+    // test is not the branch tip's tree.
+    const invariant = await runInvariantChecks(readInvariantCheckCommands(repoRoot), repoRoot, timeoutMs);
+    if (!invariant.passed) {
+      return { outcome: 'verify-fail', branch, check: invariantFailureAsCheck(invariant) };
+    }
     return { outcome: 'merged', branch, check };
   }
 
@@ -935,7 +980,32 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
     return { outcome: 'fgos-write-rejected', branch, paths: fgosPaths, ...(selfResolved && { selfResolved }) };
   }
 
-  const check = await runGoalCheck(item, repoRoot, timeoutMs);
+  // tsk-516 (CONTEXT.md D1/D5): when the tree this merge produces is
+  // provably the tree `return` already verified, running the checks again
+  // is a duplicate of a result already known — the "no test thừa" half of
+  // this item. Both the item's own verify AND the repo-invariant checks are
+  // skipped together: same tree, same answer, and skipping one while
+  // re-running the other would be an arbitrary split.
+  //
+  // Read before the staged-tree checks below but AFTER the merge itself:
+  // both refs it reads (HEAD, the branch tip) are untouched by
+  // `git merge --no-commit`, so its answer is the same either side of it.
+  //
+  // A skipped check still returns a real, honest `check` object — both
+  // callers in bin/fgos.mjs read `result.check.output` unconditionally
+  // (see the header of the already-merged branch above), and a person
+  // reading a merge report deserves to see WHY nothing ran rather than a
+  // blank pass.
+  const skipRedundantChecks = mergedTreeAlreadyVerified(repoRoot, item, branch);
+  const check = skipRedundantChecks
+    ? {
+        passed: true,
+        status: 0,
+        timedOut: false,
+        skipped: true,
+        output: `verify skipped: the merged tree is identical to ${item.branchHeadAtReturn}, already verified green at return (HEAD is an ancestor of "${branch}" and the branch tip has not moved since)`,
+      }
+    : await runGoalCheck(item, repoRoot, timeoutMs);
   if (!check.passed) {
     try {
       abortMergeIfPossible(repoRoot);
@@ -943,6 +1013,23 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
       throw new MergeError(`post-merge verify failed for "${branch}" and "git merge --abort" itself failed: ${abortErr.message}`, { branch });
     }
     return { outcome: 'verify-fail', branch, check, ...(selfResolved && { selfResolved }) };
+  }
+
+  // tsk-516 (CONTEXT.md D3/D4): the repo-invariant gate, on the tree that is
+  // actually about to land on main — the exact state that went red and STAYED
+  // red across later merges in the tsk-1m0 case this item exists for. Hard
+  // gate, not advisory: the checks are deterministic (no flake surface to
+  // absorb), and an advisory here is what already failed once.
+  if (!skipRedundantChecks) {
+    const invariant = await runInvariantChecks(readInvariantCheckCommands(repoRoot), repoRoot, timeoutMs);
+    if (!invariant.passed) {
+      try {
+        abortMergeIfPossible(repoRoot);
+      } catch (abortErr) {
+        throw new MergeError(`post-merge repo-invariant check failed for "${branch}" and "git merge --abort" itself failed: ${abortErr.message}`, { branch });
+      }
+      return { outcome: 'verify-fail', branch, check: invariantFailureAsCheck(invariant), ...(selfResolved && { selfResolved }) };
+    }
   }
 
   try {

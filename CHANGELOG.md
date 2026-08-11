@@ -9,6 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Repo-invariant checks now run alongside an item's own `verify`, at both
+  `fgos return` and the post-merge gate of `fgos approve`. The commands are
+  declared per project in `.fgos/config.json` under `invariantChecks.commands`
+  (this repo's default: `node --test test/architecture.test.mjs`), registered
+  into `fgos setup`'s config-merge and visible to `fgos doctor` as the new
+  `invariant-checks-configured` check. They are a hard gate: a red invariant
+  blocks the return and aborts the merge, naming the command that failed.
+  A project with no `invariantChecks` section behaves exactly as before —
+  nothing runs, nothing changes. This closes the gap where a repo-wide
+  invariant broken by one item could land on main and stay red across later
+  merges, because no item's own narrow `verify` happened to touch it.
+
+### Changed
+
+- `fgos approve` no longer re-runs an item's checks when the tree it is about
+  to merge is provably the exact tree `return` already verified green (main
+  has not advanced past the fork, and the branch tip still matches the SHA
+  recorded at return). In that case both the item's `verify` and the
+  invariant checks are skipped, and the merge report says so explicitly.
+  Whenever main HAS advanced, the merged tree is genuinely different and
+  every check runs as before.
+
 - `fgos doctor` gained a new check, `events-jsonl-contiguous`: the shared
   `.fgos/events.jsonl` is now checked for seq breaks/duplicates that an
   ordinary git merge can leave behind (a new `.gitattributes` entry routes

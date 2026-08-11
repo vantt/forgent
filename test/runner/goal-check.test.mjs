@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { runGoalCheck, detachedWorktreeFgosHint } from '../../src/runner/goal-check.mjs';
+import { runGoalCheck, detachedWorktreeFgosHint, runCommand, runInvariantChecks, invariantFailureAsCheck } from '../../src/runner/goal-check.mjs';
 
 // runGoalCheck runs `item.verify` — a real shell command string, via a real
 // shell (shell:true is intentional here, per goal-check.mjs's own doc
@@ -172,4 +172,115 @@ test('detachedWorktreeFgosHint recognizes "not found"/"no such file" phrasing to
 test('detachedWorktreeFgosHint returns null for non-string input', () => {
   assert.equal(detachedWorktreeFgosHint(undefined), null);
   assert.equal(detachedWorktreeFgosHint(null), null);
+});
+
+// --- repo-invariant checks (tsk-516) ---------------------------------------
+//
+// The invariant checks share runCommand with runGoalCheck deliberately (one
+// spawn/timeout implementation, per goal-check.mjs's own comment), so these
+// tests cover what that sharing does NOT settle on its own: ordering, the
+// stop-at-first-failure contract, the configured-off path, and that a
+// failure is reported through the shape every downstream caller already
+// reads.
+
+test('runCommand runs a bare command string, with no item wrapper', async () => {
+  const cwd = mkTempDir();
+  const result = await runCommand('exit 0', cwd);
+  assert.equal(result.passed, true);
+  assert.equal(result.status, 0);
+  assert.equal(result.timedOut, false);
+});
+
+test('runGoalCheck still runs item.verify through runCommand (unchanged contract)', async () => {
+  const cwd = mkTempDir();
+  const result = await runGoalCheck(makeItem('exit 3'), cwd);
+  assert.equal(result.passed, false);
+  assert.equal(result.status, 3);
+  assert.equal(result.timedOut, false);
+});
+
+// The configured-off path. This is the backward-compatibility guarantee for
+// every repo that never opts in: an absent `invariantChecks` section reads
+// as an empty list, and an empty list must pass without spawning anything.
+test('runInvariantChecks passes trivially on an empty command list', async () => {
+  const cwd = mkTempDir();
+  const result = await runInvariantChecks([], cwd);
+  assert.equal(result.passed, true);
+  assert.equal(result.command, null);
+  assert.equal(result.output, '');
+});
+
+test('runInvariantChecks passes when every command exits 0', async () => {
+  const cwd = mkTempDir();
+  const result = await runInvariantChecks(['exit 0', 'exit 0'], cwd);
+  assert.equal(result.passed, true);
+  assert.equal(result.command, null);
+});
+
+// Stop-at-first-failure, and NAME the command that failed: a caller that
+// only learned "something was red" could not tell the person which
+// invariant broke.
+test('runInvariantChecks returns the first failing command and stops there', async () => {
+  const cwd = mkTempDir();
+  const marker = path.join(cwd, 'third-ran.txt');
+  const result = await runInvariantChecks(
+    ['exit 0', 'echo boom 1>&2; exit 4', `touch ${JSON.stringify(marker)}`],
+    cwd,
+  );
+  assert.equal(result.passed, false);
+  assert.equal(result.command, 'echo boom 1>&2; exit 4');
+  assert.equal(result.status, 4);
+  assert.match(result.output, /boom/);
+  assert.equal(fs.existsSync(marker), false, 'commands after the first failure must not run');
+});
+
+test('runInvariantChecks runs in the given cwd', async () => {
+  const cwd = mkTempDir();
+  fs.writeFileSync(path.join(cwd, 'marker.txt'), 'x');
+  const result = await runInvariantChecks(['test -f marker.txt'], cwd);
+  assert.equal(result.passed, true);
+});
+
+// A timeout must stay distinguishable from a genuine red (tsk-53o's
+// contract), otherwise a loaded machine parks an item as if its invariant
+// were actually broken.
+// Same GRANDCHILD-SIGTERM bound the runGoalCheck timeout test above already
+// documents: the timeout kills only the directly-spawned shell, so the
+// command's own runtime must be short enough to not hold this suite open.
+// `sleep 60` here measured +58s of pure orphaned wall-clock; 2s is well past
+// the 200ms timeout (so the timeout path is genuinely exercised) while
+// staying bounded.
+test('runInvariantChecks surfaces timedOut instead of reporting a false red', async () => {
+  const cwd = mkTempDir();
+  const result = await runInvariantChecks(['sleep 2'], cwd, 200);
+  assert.equal(result.passed, false);
+  assert.equal(result.timedOut, true);
+  assert.equal(result.status, null);
+});
+
+test('invariantFailureAsCheck reports through the same shape a failed verify carries, naming the command', () => {
+  const check = invariantFailureAsCheck({
+    passed: false,
+    status: 1,
+    timedOut: false,
+    output: 'manifest row missing',
+    command: 'node --test test/architecture.test.mjs',
+  });
+  assert.equal(check.passed, false);
+  assert.equal(check.status, 1);
+  assert.equal(check.timedOut, false);
+  assert.match(check.output, /repo-invariant check failed: node --test test\/architecture\.test\.mjs/);
+  assert.match(check.output, /manifest row missing/);
+});
+
+test('invariantFailureAsCheck preserves a timeout as a timeout, not a red', () => {
+  const check = invariantFailureAsCheck({
+    passed: false,
+    status: null,
+    timedOut: true,
+    output: '',
+    command: 'slow-check',
+  });
+  assert.equal(check.timedOut, true);
+  assert.equal(check.status, null);
 });
