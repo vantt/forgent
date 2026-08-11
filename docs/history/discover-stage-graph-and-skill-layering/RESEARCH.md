@@ -94,3 +94,68 @@ explicit answer above. `verify` carried forward unchanged (the item's own
 current `verify`); `fgos-coding-planning` at `exploring` next locks the
 migration decision into `CONTEXT.md` with its own D-ID and refines
 `verify` to match the now-larger scope.
+
+## Round 3 — 2026-08-11, tsk-tku (skill chủ cho stage discovery)
+
+**Asked:** Is tsk-tku's goal ("tạo `fgos-coding-discovering`, trỏ
+`skillMap.discovery` vào nó thay `fgos-researching`, gỡ khối ngoại lệ
+`## Discovery and exploring stages` khỏi `fgos-coding-driving`") clear
+enough to move forward, and are prerequisite decisions (D4/D6/D7/D8/D9) and
+prerequisite items (`tsk-403`, `tsk-qod`) actually settled on disk?
+
+**Checked:**
+
+- `DISCUSSION.md` §4 D4/D6/D7/D8/D9 (this file, lines 86-91) — fully
+  specify: name (`fgos-coding-discovering`, not `fgos-discover`, D8), why
+  `fgos-researching` isn't promoted to stage-owner (helper reused from
+  multiple call sites, D7), the mechanical chủ-vs-helper test ("mở file
+  ra, có lệnh gọi `fgos <verb>` chuyển stage không", D7), and the domain
+  prefix (`coding`, D9). §7 task 3's own row (`DISCUSSION.md:405-417`)
+  restates the exact verify command that matches this item's own live
+  `verify` field byte-for-byte.
+- `src/state/workflow-stage-graphs.mjs:89` — `stages` already reads
+  `['discovery', 'exploring', 'decompose', 'planning', 'executing']`;
+  `:212-219` — `skillMap.discovery` is still `'fgos-researching'` today
+  (the literal thing this item repoints), and every OTHER stage skill
+  already carries the `coding-` prefix (`fgos-coding-exploring`,
+  `fgos-coding-planning`, `fgos-coding-implement`,
+  `fgos-coding-compounding`) — confirms task 1 (`tsk-403`, family rename)
+  already landed, so this item is not blocked waiting on that prefix
+  convention to exist.
+- `bin/fgos.mjs:1183-1215`, `case 'discover':` — already domain-aware via
+  `discoverableStages(getDomain(...))` (tsk-4b2), accepting a call from
+  any of the domain's registered discovery-capable stages, not hardcoded
+  to one. The engine verb side needs no change for this item — confirms
+  D17's own "con 3 nhỏ hơn" scope read (`DISCUSSION.md:99`).
+- `.claude/skills/fgos-coding-driving/SKILL.md`'s own loaded content (this
+  session's transcript) — the `## Discovery and exploring stages` section
+  and its own Hard-rule "one documented exception" both still present
+  verbatim, confirming the item's own verify line
+  (`! grep -q "Discovery and exploring stages" ...`) targets a real,
+  currently-failing condition, not something already removed.
+- `find .claude/skills`, `find .agents/skills` — both mirrors exist for
+  every existing `fgos-coding-*` skill (`.claude/skills/fgos-coding-
+  exploring`, `.agents/skills/fgos-coding-exploring`, same pair for
+  `fgos-researching`). Confirms D15's "hai bản mirror skill dir" applies
+  the same way to a brand-new skill directory, not only to the renames
+  task 1 already did — `fgos-coding-discovering` needs both.
+- `settlements.tsk-tku` (`fgos list --id tsk-tku --json`) shows a
+  `clarify-pass` entry and `deps: ["tsk-qod"]` with `tsk-qod` off the open
+  frontier — confirms this item's own prerequisite (`tsk-qod`, clarify
+  retired to Init) is already settled, not merely designed.
+
+**What's still open:** nothing that blocks this item's own scope. D12's
+"phán lại tier/kind/risk" classification logic is explicitly task 4
+(`tsk-2yo`)'s job, not this item's (`DISCUSSION.md:405-417` names task 3's
+scope as registry-repoint + exception-removal only) — confirmed not to
+leak into this item's verify or description.
+
+## Round 3 verdict
+
+`clear: true` — every named decision (D4/D6/D7/D8/D9) is already locked in
+`DISCUSSION.md`, every prerequisite (`tsk-403`, `tsk-qod`) is already
+delivered on disk (not just decided), and the item's own literal `verify`
+command was independently re-derived from the repo's current state, not
+just copied. `verify` carried forward unchanged (the item's own current
+`verify`). Verdict handed to the engine verb directly — this item skips
+`exploring` and moves straight to `planning`.
