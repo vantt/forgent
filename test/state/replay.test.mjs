@@ -5,10 +5,26 @@ import os from 'node:os';
 import path from 'node:path';
 import { appendEvent } from '../../src/state/events.mjs';
 import { foldEvents, rebuildView, viewRevision } from '../../src/state/replay.mjs';
+import { initStore, addWork, moveWork } from '../../src/state/store.mjs';
+import { fixEventsJsonlContiguity } from '../../src/state/events-jsonl-contiguity.mjs';
+import { repairTruncatedLastLine } from '../../src/state/events.mjs';
 
 // Every test gets its own mkdtemp dir — never touch the repo's .fgos/.
 function tmpLogPath() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-replay-'));
+  return path.join(dir, 'events.jsonl');
+}
+
+// tsk-49e: a full `.fgos`-shaped dir with a real state.json snapshot,
+// written through store.mjs's own real write path (never hand-crafted) --
+// the snapshot fast path only ever exists on disk this way in production.
+function tmpFgosDir() {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-replay-snapshot-'));
+  initStore(dir);
+  return dir;
+}
+
+function logPathOf(dir) {
   return path.join(dir, 'events.jsonl');
 }
 
@@ -788,3 +804,219 @@ test("foldEvents' tool.register is a full-record overwrite, never a merge with a
   const view = foldEvents(events);
   assert.equal(view.tools.gitnexus.responsibility, undefined);
 });
+
+// ─── tsk-49e: incremental-read snapshot fast path ──────────────────────────
+
+test('rebuildView takes the zero-read fast path when the log is byte-identical to the snapshot -- spies on real fs reads', () => {
+  const dir = tmpFgosDir();
+  const logPath = logPathOf(dir);
+  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+
+  let readCount = 0;
+  const originalReadFileSync = fs.readFileSync;
+  const originalReadSync = fs.readSync;
+  fs.readFileSync = function patched(target, ...rest) {
+    if (target === logPath) readCount++;
+    return originalReadFileSync.call(fs, target, ...rest);
+  };
+  fs.readSync = function patched(fd, ...rest) {
+    // readSync's first arg is a numeric fd, not a path -- can't filter by
+    // path directly, but nothing else in this test touches fs.readSync, so
+    // any call here is real signal.
+    readCount++;
+    return originalReadSync.call(fs, fd, ...rest);
+  };
+  try {
+    rebuildView(logPath);
+  } finally {
+    fs.readFileSync = originalReadFileSync;
+    fs.readSync = originalReadSync;
+  }
+  assert.equal(readCount, 0, 'an unchanged log must read zero bytes of events.jsonl -- only state.json (a different path) and a stat call');
+});
+
+test('rebuildView via the zero-read fast path still returns a view deep-equal to a fresh full read', () => {
+  const dir = tmpFgosDir();
+  const logPath = logPathOf(dir);
+  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  moveWork(dir, { id: 'a', to: 'doing', expectedStatus: 'todo' });
+
+  const viaFastPath = rebuildView(logPath);
+  const freshFold = foldEvents(readEventsWhole(logPath));
+  assert.deepEqual(viaFastPath, freshFold);
+});
+
+test('rebuildView incrementally folds new events after the snapshot, deep-equal to a fresh full read', () => {
+  const dir = tmpFgosDir();
+  const logPath = logPathOf(dir);
+  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  // state.json now snapshots the log as of the addWork above. Append MORE
+  // events directly (bypassing store.mjs's own refreshView) so the log
+  // genuinely outgrows the snapshot without state.json itself moving.
+  appendEvent(logPath, { type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' } });
+  appendEvent(logPath, { type: 'work.edit', payload: { id: 'a', patch: { priority: 42 } } });
+
+  const incremental = rebuildView(logPath);
+  const freshFold = foldEvents(readEventsWhole(logPath));
+  assert.deepEqual(incremental, freshFold);
+  assert.equal(incremental.work.a.status, 'doing');
+  assert.equal(incremental.work.a.priority, 42);
+});
+
+test('rebuildView incremental path reads only the NEW bytes, not the whole file', () => {
+  const dir = tmpFgosDir();
+  const logPath = logPathOf(dir);
+  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  const sizeAtSnapshot = fs.statSync(logPath).size;
+  appendEvent(logPath, { type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' } });
+
+  const originalReadFileSync = fs.readFileSync;
+  let sawFullFileRead = false;
+  fs.readFileSync = function patched(target, ...rest) {
+    if (target === logPath) sawFullFileRead = true;
+    return originalReadFileSync.call(fs, target, ...rest);
+  };
+  try {
+    rebuildView(logPath);
+  } finally {
+    fs.readFileSync = originalReadFileSync;
+  }
+  assert.equal(sawFullFileRead, false, 'the incremental path must never call fs.readFileSync on the full log path');
+  assert.ok(fs.statSync(logPath).size > sizeAtSnapshot, 'sanity: the log genuinely grew past the snapshot');
+});
+
+test('rebuildView falls back to a full read when the log SHRANK since the snapshot (never trusts a smaller file)', () => {
+  const dir = tmpFgosDir();
+  const logPath = logPathOf(dir);
+  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  addWork(dir, { id: 'b', title: 'B', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  // Truncate the log back to something SMALLER than the snapshot recorded --
+  // simulates any pathological external rewrite that shrinks the file.
+  const raw = fs.readFileSync(logPath, 'utf8');
+  const firstLineEnd = raw.indexOf('\n') + 1;
+  fs.writeFileSync(logPath, raw.slice(0, firstLineEnd), 'utf8');
+
+  const view = rebuildView(logPath);
+  const freshFold = foldEvents(readEventsWhole(logPath));
+  assert.deepEqual(view, freshFold, 'must still produce a CORRECT view of the (now-shrunk) real log, never a stale cached one');
+});
+
+test('rebuildView is safe against repairTruncatedLastLine (tail-only rewrite -- prefix genuinely untouched)', () => {
+  const dir = tmpFgosDir();
+  const logPath = logPathOf(dir);
+  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  // Simulate a crash mid-append: a genuinely corrupt trailing line.
+  fs.appendFileSync(logPath, '{"seq":999,"type":"work.move","payload":{"id":"a"', 'utf8'); // no closing brace, no trailing \n
+  repairTruncatedLastLine(logPath);
+
+  const view = rebuildView(logPath);
+  const freshFold = foldEvents(readEventsWhole(logPath));
+  assert.deepEqual(view, freshFold, 'must still produce a view identical to a fresh full read of the repaired log');
+  assert.ok(view.work.a, 'the item added before the corruption must still be present');
+});
+
+test('rebuildView falls back to a full read after fixEventsJsonlContiguity rewrites the log (resort+reseq changes the fingerprint)', () => {
+  const dir = tmpFgosDir();
+  const logPath = logPathOf(dir);
+  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  // Craft a real seq duplicate/gap directly on the log -- the shape
+  // fixEventsJsonlContiguity's own module exists to repair.
+  const raw = fs.readFileSync(logPath, 'utf8');
+  const lastEvent = JSON.parse(raw.trim().split('\n').pop());
+  const duplicateLine = `${JSON.stringify({ ...lastEvent, ts: '2026-08-11T00:00:00.000Z' })}\n`;
+  fs.appendFileSync(logPath, duplicateLine, 'utf8');
+
+  const result = fixEventsJsonlContiguity(logPath);
+  assert.equal(result.fixed, true, 'sanity: the crafted duplicate seq was actually detected and fixed');
+
+  const view = rebuildView(logPath);
+  const freshFold = foldEvents(readEventsWhole(logPath));
+  assert.deepEqual(view, freshFold, 'must still produce a view identical to a fresh full read of the fixed log');
+});
+
+test('rebuildView falls back to a full read after a wholesale reordering rewrite (git merge=union stand-in)', () => {
+  const dir = tmpFgosDir();
+  const logPath = logPathOf(dir);
+  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  appendEvent(logPath, { type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' } });
+
+  // Simulate what git's own docs say merge=union produces: the same lines,
+  // reordered, never a targeted edit -- a real union merge could ALSO
+  // reorder lines that were already part of the pre-snapshot prefix.
+  const lines = fs.readFileSync(logPath, 'utf8').trim().split('\n');
+  const reordered = [...lines].reverse().map((l) => `${l}\n`).join('');
+  fs.writeFileSync(logPath, reordered, 'utf8');
+
+  const view = rebuildView(logPath);
+  const freshFold = foldEvents(readEventsWhole(logPath));
+  assert.deepEqual(view, freshFold, 'must still produce a view identical to a fresh full read of the reordered log');
+});
+
+test('rebuildView falls back to a full read when state.json has no snapshot field at all (pre-tsk-49e state.json, or hand-edited)', () => {
+  const dir = tmpFgosDir();
+  const logPath = logPathOf(dir);
+  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  const viewPath = path.join(dir, 'state.json');
+  const persisted = JSON.parse(fs.readFileSync(viewPath, 'utf8'));
+  delete persisted.snapshot;
+  fs.writeFileSync(viewPath, JSON.stringify(persisted), 'utf8');
+
+  const view = rebuildView(logPath);
+  const freshFold = foldEvents(readEventsWhole(logPath));
+  assert.deepEqual(view, freshFold);
+});
+
+test('rebuildView falls back to a full read when the snapshot sub-fields are malformed (wrong type, not absent)', () => {
+  const dir = tmpFgosDir();
+  const logPath = logPathOf(dir);
+  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  const viewPath = path.join(dir, 'state.json');
+  const persisted = JSON.parse(fs.readFileSync(viewPath, 'utf8'));
+  persisted.snapshot.size = 'not-a-number';
+  fs.writeFileSync(viewPath, JSON.stringify(persisted), 'utf8');
+
+  const view = rebuildView(logPath);
+  const freshFold = foldEvents(readEventsWhole(logPath));
+  assert.deepEqual(view, freshFold);
+});
+
+test('rebuildView zero-read fast path never mutates the persisted view when a caller mutates the returned object (cloneTopLevel protects the snapshot)', () => {
+  const dir = tmpFgosDir();
+  const logPath = logPathOf(dir);
+  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  appendEvent(logPath, { type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' } });
+  appendEvent(logPath, { type: 'work.edit', payload: { id: 'a', patch: { priority: 7 } } });
+
+  const first = rebuildView(logPath); // incremental fold onto the snapshot's savedView
+  first.decisions.push({ text: 'mutated by caller, must not leak' });
+  first.work.a.priority = 999;
+
+  const second = rebuildView(logPath); // same log, same snapshot -- must be unaffected by the mutation above
+  assert.deepEqual(second.decisions, []);
+  assert.equal(second.work.a.priority, 7);
+});
+
+test('determinism: the zero-read fast path\'s round-tripped view is deep-equal to a fresh fold for a multi-field, realistic item', () => {
+  const dir = tmpFgosDir();
+  const logPath = logPathOf(dir);
+  addWork(dir, {
+    id: 'a', title: 'A realistic item', kind: 'feature', status: 'todo', deps: [], risk: 'standard', refs: ['docs/x.md'],
+    verify: 'npm test', tier: 'standard', description: 'a full description', footprint: ['src/a.mjs'],
+  });
+  moveWork(dir, { id: 'a', to: 'doing', expectedStatus: 'todo' });
+
+  const viaFastPath = rebuildView(logPath); // exact-match zero-read shortcut
+  const freshFold = foldEvents(readEventsWhole(logPath));
+  assert.deepEqual(viaFastPath, freshFold, 'the round-trip through state.json (JSON.stringify/parse) must never drop or alter a field a fresh fold would carry');
+});
+
+// Local helper: reads the whole log via a bypass path (never through
+// rebuildView, so these tests' own "fresh full read" oracle is never
+// itself affected by the snapshot fast path under test).
+function readEventsWhole(logPath) {
+  const raw = fs.readFileSync(logPath, 'utf8');
+  return raw
+    .split('\n')
+    .filter((l) => l !== '')
+    .map((l) => JSON.parse(l));
+}
