@@ -29,9 +29,15 @@ self-pace."
 
 ## Steps
 
-1. **Ignore `$ARGUMENTS`.** Neither `/loop` nor `/fgOS:merge-next` takes
-   an id or any other argument for this flow — do not read, parse, or
-   forward anything from the slash command's argument text.
+1. **Parse `$ARGUMENTS` for `--wait <ms>`/`--no-wait`/`--timeout <ms>`
+   only.** This flow never accepts an id here — `/loop` has none of its
+   own, and `/fgOS:merge-next` always picks the top-ranked item itself. Do
+   not read, parse, or forward an id or any other token from the slash
+   command's argument text. `$ARGUMENTS` may still carry one or more of
+   the same three lock-wait/verify-timeout flags `/fgOS:merge-next` itself
+   now parses (`plugins/fgOS/skills/merge-next/SKILL.md` step 1) — carry
+   forward only whichever of these three were actually present, verbatim,
+   into step 3 below.
 
 2. **Pre-flight (soft warn only).** Run `git status --short` in the main
    checkout. If it reports anything, print a reminder that merging
@@ -43,14 +49,17 @@ self-pace."
    problem; this step is a courtesy heads-up, not a second gate.
 
 3. **Start the loop.** Invoke the `loop` skill with `prompt:
-   "/fgOS:merge-next"`, and no fixed interval — let it self-pace
-   dynamically. Each `/fgOS:merge-next` call runs a real `npm test`-class
-   verify as part of `approve`, so how long one iteration takes varies by
-   item; a fixed short interval would either hammer `merge-next` before
-   the previous attempt could possibly matter, or sit idle needlessly
-   long. Never write a bespoke timer/scheduling mechanism in this skill's
-   own place of `/loop` — that would duplicate a working mechanism
-   instead of reusing it.
+   "/fgOS:merge-next"` — or, when step 1 parsed one or more of `--wait
+   <ms>`/`--no-wait`/`--timeout <ms>`, `prompt: "/fgOS:merge-next --wait
+   <ms>"` (etc.), so every iteration of the loop keeps forwarding the same
+   explicit budget, not just the first one — and no fixed interval, let it
+   self-pace dynamically. Each `/fgOS:merge-next` call runs a real `npm
+   test`-class verify as part of `approve`, so how long one iteration
+   takes varies by item; a fixed short interval would either hammer
+   `merge-next` before the previous attempt could possibly matter, or sit
+   idle needlessly long. Never write a bespoke timer/scheduling mechanism
+   in this skill's own place of `/loop` — that would duplicate a working
+   mechanism instead of reusing it.
 
 4. **Read each iteration's result and decide whether to continue.** Every
    time `/fgOS:merge-next` runs, read its JSON envelope's `data` field:
