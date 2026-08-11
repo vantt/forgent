@@ -6,7 +6,7 @@ of "launcher" by decision `0028`) had leaked back into
 `test/docs/launcher-vocabulary-guard.test.mjs`'s NEGATIVE guard. The item
 confirmed the leak was already fixed by an earlier commit (`10c0bed5`),
 and closed itself as a verify-only confirmation — plus one small
-follow-up: `fgos-validating`'s reality gate found that this item's own
+follow-up: `fgos-coding-validating`'s reality gate found that this item's own
 required `CONTEXT.md`/`RESEARCH.md`/`plan.md` files, each legitimately
 *discussing* the leaked word as their own subject matter, tripped the
 same guard. Fixed the established way — allowlisting the 3 new

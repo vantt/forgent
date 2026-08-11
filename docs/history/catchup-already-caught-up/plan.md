@@ -80,7 +80,7 @@ Rejected alternatives:
 | Regression on the seven existing `catchup` scenarios, all of which now run through the guard | medium | `node --test --test-name-pattern 'catchup' test/cli/fgos.test.mjs` stays at 8 pass / 0 fail, with no test edited to accommodate the guard (that is the pre-change baseline, measured) |
 | The `blocked → awaiting-approval` move on a path that created no commit | low | The already-caught-up green test asserts the item's status moved and that `git rev-parse HEAD` on the branch is unchanged from before the call |
 
-Every medium above carries to `fgos-validating` as a proof point; none is
+Every medium above carries to `fgos-coding-validating` as a proof point; none is
 settled by argument here.
 
 ## Shape (phased)

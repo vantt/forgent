@@ -4,9 +4,9 @@ description: >-
   Turn an unresolved question into a grounded finding plus a clear/unclear
   verdict, without deciding anything a person should decide. Stage-agnostic:
   callable from stage `discovery`, from mid-conversation inside
-  `fgos-exploring` when a named library or concept surfaces that the calling
+  `fgos-coding-exploring` when a named library or concept surfaces that the calling
   session cannot resolve from what it already knows, and later from
-  `fgos-planning`/`fgos-validating`. Never the source of Socratic questions
+  `fgos-coding-planning`/`fgos-coding-validating`. Never the source of Socratic questions
   or product decisions — those stay with the calling skill. Examples: "item
   needs to know whether library X already exists in this repo", "the person
   mentioned Temporal mid-discussion, go find out what it is", "does this

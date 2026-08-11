@@ -65,7 +65,7 @@ harmless append-only noise, superseded by the scoped 7517 entry).
   `blocks` semantics: "what am I still waiting on" / "how many other
   things wait on me").
 - `src/state/priority-formula.mjs`, callers in
-  `src/intake/discovery.mjs:627` and `src/intake/decompose.mjs:707` —
+  `src/intake/discovery.mjs:627` and `src/intake/plan.mjs:707` —
   confirms `priority` is a real computed, multi-signal score, not a flat
   field (this was directly checked against user's claim before locking
   D2, and confirmed correct).

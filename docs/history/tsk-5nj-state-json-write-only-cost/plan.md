@@ -12,7 +12,7 @@ before the higher-risk seeking mechanism is added on top of them.
 Impact-analysis posture: **degraded** (GitNexus present per `fgos tool
 query`, but this session's own PostToolUse hook repeatedly flags the
 index as stale). Both children's own plan work will re-check this at
-their own `fgos-planning` pass; noted here so `fgos-validating`'s reality
+their own `fgos-coding-planning` pass; noted here so `fgos-coding-validating`'s reality
 gate has an honest starting posture rather than assuming a fresh index.
 
 `fgos graph --what-if` was not run to pick between the two pieces' order
@@ -32,7 +32,7 @@ not a frontier-priority judgment call; `tsk-4mx` (piece 2) carries piece
   log-rewrite paths). Risk: heavy, `deps: [tsk-4mx]`. Verify: `node --test
   test/state/store.test.mjs test/state/replay.test.mjs
   test/state/events.test.mjs && npm test`. Requires a real feasibility
-  matrix at its own `fgos-validating` pass proving the anchor-hash
+  matrix at its own `fgos-coding-validating` pass proving the anchor-hash
   invalidation against `repairTruncatedLastLine`,
   `scripts/events-jsonl-contiguity.mjs --fix`, and a real
   `merge=union` reorder — plausibility is not sufficient given the

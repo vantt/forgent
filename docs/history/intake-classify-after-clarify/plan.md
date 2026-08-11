@@ -6,7 +6,7 @@ Mode: high-risk
 ## Lane — how it was counted
 
 No prior lane hand-off existed for this session (this item jumped `clarify
--> decompose` directly on the legacy edge — `fgos-exploring`/`discovery`
+-> decompose` directly on the legacy edge — `fgos-coding-exploring`/`discovery`
 never ran, so nothing recorded a `Mode:` line and no Orient step handed one
 off either). Applying `fgos-routing`'s own Mode-gate table directly
 (`.claude/skills/fgos-routing/SKILL.md` §"Mode gate"):
@@ -142,7 +142,7 @@ Impact-analysis posture (`fgos tool query --capability impact-analysis
 high-risk `work.mjs` enum-enforcement proof point above will run
 `impact({target:"validateWork", direction:"upstream"})` (and the same for
 whichever `kind`/`risk` call sites the grep above turns up) before that
-specific edit lands, at `fgos-code-implement` time — not here; this plan
+specific edit lands, at `fgos-coding-implement` time — not here; this plan
 only records that the posture is full so that step is not skipped later.
 
 **Files likely touched** (excluding the two split-off children below):
@@ -229,7 +229,7 @@ above actually needs it now.)
   site's own test, never silently coerce, so the grep-all-callers step in
   the risk map is not skippable.
 
-## Validating findings (fgos-validating pass, real evidence)
+## Validating findings (fgos-coding-validating pass, real evidence)
 
 Two commands originally written into this plan were wrong and have been
 corrected on the live items (`fgos edit`) before this gate:
@@ -261,9 +261,9 @@ enforcement), by grepping every `--kind`/`--risk` call site across
     exactly this ("risk khong nhan duoc gia tri thuoc tu vung tier ...
     phai bi tu choi hoac normalize") — this test's assertion is the bug
     being fixed, so it is expected to change, not a plan gap. Named here
-    so `fgos-code-implement` updates this exact test rather than
+    so `fgos-coding-implement` updates this exact test rather than
     discovering the conflict mid-implementation.
-  - `.claude/skills/fgos-planning/SKILL.md`'s own `fgos add` worked
+  - `.claude/skills/fgos-coding-planning/SKILL.md`'s own `fgos add` worked
     example (line 211) uses `--risk light` — the SAME skill this plan was
     just written with conflates tier/risk vocabulary in its own canonical
     example. Not in the item's original file list; added here as a real
@@ -272,7 +272,7 @@ enforcement), by grepping every `--kind`/`--risk` call site across
 
 ## Implementation finding — the item's central premise was half wrong
 
-Found at `fgos-code-implement` time, while running the risk map's own
+Found at `fgos-coding-implement` time, while running the risk map's own
 "grep every `--kind`/`--risk` call site before landing the enum" step.
 Recorded here because it REVERSED this plan's verify point 2, and that
 reversal was taken to the user rather than decided unilaterally (they chose
@@ -286,7 +286,7 @@ declarations:
 | Where | Evidence |
 |---|---|
 | `src/intake/classify.mjs:92-94` | `// D5: risk is derived from the same keyword signal as tier (mirrors the tier name)` → `const risk = tier;` |
-| `src/intake/decompose.mjs:106-111` | `// D3(b): ... risk domain mirrors tier (classify.mjs), and 'heavy' is the one value that gates` → `const HEAVY_RISK = 'heavy'` |
+| `src/intake/plan.mjs:106-111` | `// D3(b): ... risk domain mirrors tier (classify.mjs), and 'heavy' is the one value that gates` → `const HEAVY_RISK = 'heavy'` |
 | `src/state/priority-formula.mjs:15` | `RISK_DISCOUNTS = { light: 1, standard: 0.85, heavy: 0.6 }` |
 
 Two of those are LIVE consumers, both outside this item's originally
@@ -312,7 +312,7 @@ disabled a safety gate for 74 items — the exact "silently coerce" outcome
 this plan's own "Concrete cases to prove against" forbids.
 
 **Consequences for two earlier findings in this file:** both dissolve.
-`.claude/skills/fgos-planning/SKILL.md:211`'s `--risk light` is CORRECT
+`.claude/skills/fgos-coding-planning/SKILL.md:211`'s `--risk light` is CORRECT
 under the real vocabulary, not the anti-pattern this plan called it — left
 unchanged. `test/cli/fgos.test.mjs`'s existing `--risk heavy` test was
 likewise asserting correct behavior and still passes untouched.

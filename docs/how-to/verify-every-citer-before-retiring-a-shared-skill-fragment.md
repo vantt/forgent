@@ -22,8 +22,8 @@ shared fragment too." A repo-wide grep at planning time found this
 assumption false:
 
 > "Checked with a repo-wide grep: it is NOT the only consumer. Six
-> other stage skills (`fgos-validating`, `fgos-code-implement`,
-> `fgos-fanout`, `fgos-planning`, `fgos-exploring`, `fgos-researching`)
+> other stage skills (`fgos-coding-validating`, `fgos-coding-implement`,
+> `fgos-fanout`, `fgos-coding-planning`, `fgos-coding-exploring`, `fgos-researching`)
 > cite this fragment's "Valid reasons to dispatch" list directly, in
 > their own never-delegate-reasoning rule. Deleting the file would
 > leave all six pointing at nothing."
@@ -75,7 +75,7 @@ skills is not.
 
 - `docs/how-to/find-every-caller-before-requiring-a-cli-flag.md` — the
   same shape one layer down (code-level CLI callers instead of
-  skill-level doc citers), at the `fgos-validating` stage instead of
+  skill-level doc citers), at the `fgos-coding-validating` stage instead of
   planning.
 - `docs/how-to/reuse-the-shared-capacity-dispatch-fallback-fragment.md`
   — the fragment this example is drawn from, and how to wire a new

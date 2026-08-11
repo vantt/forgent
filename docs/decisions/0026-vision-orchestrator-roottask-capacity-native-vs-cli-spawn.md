@@ -185,7 +185,7 @@ khi launcher vốn đã tương tác.
 | Pha | Item | Phụ thuộc | Song song được với |
 |---|---|---|---|
 | 1 | `tsk-1ni` — fix `repoRoot` (state-root/content-root lẫn nhau) + verify-overwrite | không | Pha 3 (`tsk-53h`, khác file) |
-| 2 | `tsk-27y` — protocol caller tự khai verdict cho `fgos discover`/`fgos decompose` | không (chỉ overlap footprint với Pha 1, không phải dep logic) | Pha 3 (`tsk-53h`, khác file) |
+| 2 | `tsk-27y` — protocol caller tự khai verdict cho `fgos discover`/`fgos plan` | không (chỉ overlap footprint với Pha 1, không phải dep logic) | Pha 3 (`tsk-53h`, khác file) |
 | 3 | `tsk-53h` — shared helper phát hiện native-vs-cli/spawn cho skill-facing capacity | `tsk-3sw` (đã done) | Pha 1, Pha 2 (khác file, không overlap) |
 | 4 | `tsk-3ik` — hợp nhất `capacities.<id>` config dispatch với lời gọi Task tool trực tiếp | `tsk-27y` + `tsk-53h` | không (chờ cả 2 xong) |
 | 5 | `tsk-6db` — mở rộng native detection sang `agy` (deferred, YAGNI, chưa consumer thật) | `tsk-53h` | Pha 2, Pha 4 (concern khác nhau) |

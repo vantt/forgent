@@ -19,13 +19,13 @@ target. Discussion during clarify surfaced the real complaint: fgOS
 already has a legitimate unclear-stop (`awaiting-human`, via `fgos
 ask`/`answer`) that intentionally-unattended flows rely on — that one is
 working as designed. The actual friction was the *other* kind of stop:
-skill-embedded confirmation prompts (`fgos-exploring`'s "Approve
-CONTEXT.md?", `fgos-planning`'s "Approve work shape?") firing
+skill-embedded confirmation prompts (`fgos-coding-exploring`'s "Approve
+CONTEXT.md?", `fgos-coding-planning`'s "Approve work shape?") firing
 unconditionally, even when the artifact behind them was already clearly
 complete and there was no real decision left for a human to make.
 
 This reframing (**D1**) is why the feature touches exactly two files
-(`fgos-exploring`/`fgos-planning`'s Gate sections) and not the
+(`fgos-coding-exploring`/`fgos-coding-planning`'s Gate sections) and not the
 `awaiting-human` state machine at all. A design that started from the
 literal "add a bypass toggle" reading would have touched the wrong
 mechanism entirely.
@@ -99,8 +99,8 @@ D2's `hasOpenItems` check is mechanical, but mechanical still means it
 reads something a producer wrote — and for months after this design
 shipped, nothing wrote it. `tsk-5hg` found and fixed a real gap: the
 skills that actually write `CONTEXT.md`/`plan.md`
-(`.claude/skills/fgos-exploring/SKILL.md`,
-`.claude/skills/fgos-planning/SKILL.md`) never mentioned the `##
+(`.claude/skills/fgos-coding-exploring/SKILL.md`,
+`.claude/skills/fgos-coding-planning/SKILL.md`) never mentioned the `##
 Outstanding questions` convention `hasOpenItems` depends on —
 `gate-bypass.mjs` itself asserts it's "the convention this item's own
 CONTEXT.md/plan.md already follow," but nothing wired that convention
@@ -128,9 +128,9 @@ assumed from the check's own code comment.
 
 ## The third gate needed a different axis, not the same one reused (D6, tsk-1ds)
 
-`validateApprove` (`fgos-validating`'s own Gate) was, until `tsk-1ds`, the
+`validateApprove` (`fgos-coding-validating`'s own Gate) was, until `tsk-1ds`, the
 one gate of the three skill gates with no bypass path at all —
-`.claude/skills/fgos-validating/SKILL.md` used to hardcode "No
+`.claude/skills/fgos-coding-validating/SKILL.md` used to hardcode "No
 auto-approve path exists for this Gate today ... actor is always human
 here," even after `contextApprove` and `planApprove` both gained
 `canAutoApprove`.
@@ -159,12 +159,12 @@ a constraint. A self-reported axis was judged more honest than five axes
 that would have had to guess ahead of time.
 
 **The mechanism.** Not a content-inspection check like `hasOpenItems` —
-the axis is `fgos-validating`'s own already-computed verdict:
+the axis is `fgos-coding-validating`'s own already-computed verdict:
 
 - verdict `READY` (no constraints) → bypass, `actor: bypass`
 - verdict `READY WITH CONSTRAINTS` → ask a human, `actor: human`
 - verdict `NOT READY` → unchanged: skip the question entirely, return to
-  `fgos-planning`
+  `fgos-coding-planning`
 
 This keeps the same self-reported trade-off `hasOpenItems` already
 carries (a skill could under-report constraints to earn a bypass) rather
@@ -189,7 +189,7 @@ sections' inline `node -e` scripts import `gate-bypass.mjs`/`store.mjs`
 cwd-relative, from the claimed item's own `fgw/<id>` worktree, not from
 the main checkout.
 
-That choice was deliberate for `fgos-exploring`/`fgos-planning`'s own
+That choice was deliberate for `fgos-coding-exploring`/`fgos-coding-planning`'s own
 Gate sections, which document it explicitly: "this worktree's own branch
 already carries whatever version it needs" — protecting the case where
 an item is itself modifying `gate-bypass.mjs` (as this feature's own

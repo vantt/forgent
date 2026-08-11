@@ -15,10 +15,10 @@ before anything could be built — "cần chốt scope (những gì tính là
 ## What got locked, and why it needed a person
 
 The real recorded settlement (`fgos check tsk-4iv`) captures the answer
-given during `fgos-exploring`, cited verbatim:
+given during `fgos-coding-exploring`, cited verbatim:
 
 > Đã chốt trong docs/history/fgos-uninstall/CONTEXT.md (D1-D4), approved
-> qua fgos-exploring: (1) shell profiles — CHỈ report dòng source, KHÔNG
+> qua fgos-coding-exploring: (1) shell profiles — CHỈ report dòng source, KHÔNG
 > tự xoá (D4, giữ nguyên precedent docs/history/shell-rc-dead-source-lines
 > D1 'deletion stays a human act'); (2) .githooks — xoá file+dir CHỈ khi
 > core.hooksPath vẫn còn đúng '.githooks' (D2, mirror installGitHooks
@@ -27,7 +27,7 @@ given during `fgos-exploring`, cited verbatim:
 > ~/.fgos/config.json, project config.json đều PHẢI giữ nguyên, không đụng
 > tới (pinned constraint từ mô tả item gốc).
 
-D4 specifically only got locked because `fgos-validating`'s reality gate
+D4 specifically only got locked because `fgos-coding-validating`'s reality gate
 caught a real conflict: the plan's first draft assumed the shell-rc source
 line would be deleted, but this repo already has a locked decision saying
 the opposite. That's a genuine example of the reality gate doing its job —
@@ -35,7 +35,7 @@ not a hypothetical failure mode.
 
 ## Why it split into two items instead of one
 
-`fgos-planning`'s mode gate scored this **high-risk** — 5 flags hit, two
+`fgos-coding-planning`'s mode gate scored this **high-risk** — 5 flags hit, two
 of them hard-gate on their own (it disables a live security control, the
 main-checkout-lock pre-commit hook; and it "removes a validation" by the
 same token). The split separated the well-precedented piece (wiring
@@ -47,7 +47,7 @@ anywhere in this repo).
   `fgos uninstall --yes`: unwires git hooks, reports (never deletes) the
   shell-rc line.
 - **`tsk-4iv-2`** — `docs/explanation/fgos-self-uninstall-package-removal-spike.md`.
-  A feasibility spike, not a full build — `fgos-validating` caught that the
+  A feasibility spike, not a full build — `fgos-coding-validating` caught that the
   package-removal piece had been shaped as a buildable feature with zero
   supporting evidence, and sent it back to be reshaped as a spike first.
   The finding: real self-removal via `npm uninstall -g` works reliably on

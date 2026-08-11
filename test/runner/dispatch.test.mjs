@@ -174,10 +174,10 @@ test('buildPrompt includes all five framing sections', () => {
   assert.match(prompt, /# Constraints/);
 });
 
-test('buildPrompt for a coding-domain (or no-domain) work item also contains a new "# Agent skill" section naming the fgos-code-implement SKILL.md', () => {
+test('buildPrompt for a coding-domain (or no-domain) work item also contains a new "# Agent skill" section naming the fgos-coding-implement SKILL.md', () => {
   const prompt = buildPrompt(sampleWork());
   assert.match(prompt, /# Agent skill/);
-  assert.ok(prompt.includes('.claude/skills/fgos-code-implement/SKILL.md'));
+  assert.ok(prompt.includes('.claude/skills/fgos-coding-implement/SKILL.md'));
 });
 
 // --- tsk-5mj D1/D6/D7: stage-aware buildPrompt (discovery dispatch) ------
@@ -1595,7 +1595,7 @@ test('spawnWorker result carries capacityId and provider alongside every existin
 
   const result = await spawnWorker(sampleWork(), cfg, mkTempDir());
 
-  assert.equal(result.capacityId, 'fgos-code-implement');
+  assert.equal(result.capacityId, 'fgos-coding-implement');
   assert.equal(result.provider, process.execPath);
   // every pre-tsk-62v field still present, unchanged
   assert.equal(result.tier, 'standard');
@@ -1615,7 +1615,7 @@ test('spawnWorker result carries command (the real spawned executable) alongside
 
   assert.equal(result.command, process.execPath);
   // every pre-tsk-33w field still present, unchanged
-  assert.equal(result.capacityId, 'fgos-code-implement');
+  assert.equal(result.capacityId, 'fgos-coding-implement');
   assert.equal(result.provider, process.execPath);
   assert.equal(result.tier, 'standard');
   assert.equal(result.model, 'sonnet');
@@ -1650,22 +1650,22 @@ test('spawnWorker threads opts.fgosDir into a kind:"cli" capacity\'s presence ch
   const dir = mkTempDir();
   const fgosDir = mkTempDir();
   initStore(fgosDir);
-  registerTool(fgosDir, { name: 'fgos-code-implement', kind: 'cli', capability: 'coding', command: 'agy' });
-  writeLocalStatus(fgosDir, { 'fgos-code-implement': { status: 'present', checkedAt: new Date().toISOString() } });
+  registerTool(fgosDir, { name: 'fgos-coding-implement', kind: 'cli', capability: 'coding', command: 'agy' });
+  writeLocalStatus(fgosDir, { 'fgos-coding-implement': { status: 'present', checkedAt: new Date().toISOString() } });
   const scriptPath = writeEchoExecutor(dir);
   const cfg = {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
-    capacities: { 'fgos-code-implement': { kind: 'cli', tier: 'standard', allowCrossProvider: true } },
+    capacities: { 'fgos-coding-implement': { kind: 'cli', tier: 'standard', allowCrossProvider: true } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   };
 
   const result = await spawnWorker(sampleWork(), cfg, mkTempDir(), { fgosDir });
-  assert.equal(result.capacityId, 'fgos-code-implement');
+  assert.equal(result.capacityId, 'fgos-coding-implement');
 
   const cfgUnregistered = {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
-    capacities: { 'fgos-code-implement': { kind: 'cli', target: 'not-registered' } },
+    capacities: { 'fgos-coding-implement': { kind: 'cli', target: 'not-registered' } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   };

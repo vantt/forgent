@@ -18,7 +18,7 @@
 
 ## Why no new failing-before/passing-after transcript is captured here
 
-tsk-5kn is the root item split (via `fgos decompose`) into six children —
+tsk-5kn is the root item split (via `fgos plan`) into six children —
 tsk-2t9, tsk-v4b, tsk-1x3, tsk-1w7, tsk-5mj, tsk-puz — each independently
 implemented, verified, and merged into `fgw/tsk-5kn`. The root's own
 `aheadCount: 25` diff (`git diff main...fgw/tsk-5kn`) is the union of the

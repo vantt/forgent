@@ -75,7 +75,7 @@ Two concrete defects, both must be fixed without losing real coverage:
 - Whether/how to group the 48 offending files into batches for the
   implementer (by module, by decision-code density, or file-by-file) is
   an implementation/shaping call, not a product decision — left to
-  `fgos-planning`.
+  `fgos-coding-planning`.
 - Whether removed/merged tests need any "formerly verified by X" trace
   (e.g. for CI dashboards or flaky-test history) was considered and
   judged to matter only to the implementer, not to product scope — also

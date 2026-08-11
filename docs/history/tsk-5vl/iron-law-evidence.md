@@ -50,11 +50,11 @@ whatever the invoking session's shell `cwd` happens to be, so `catchup`
 now works correctly when called from inside the item's own linked
 worktree instead of crashing with git's "Cannot force update the current
 branch". `sync-root`/`approve` were explicitly descoped from this item
-(CONTEXT.md D2) after `fgos-validating` found they carry deliberate,
+(CONTEXT.md D2) after `fgos-coding-validating` found they carry deliberate,
 incident-documented worktree-refusal guards `catchup` never had — filed
 separately as `tsk-4uj`.
 
-`.claude/skills/fgos-code-implement/SKILL.md`'s Return-step hard rule also
+`.claude/skills/fgos-coding-implement/SKILL.md`'s Return-step hard rule also
 gained a `blocked`-specific branch: for an item already `blocked` (e.g.
 `approve`'s post-merge verify-fail rollback), `return` structurally
 refuses (`status: doing` precondition), so the rule now names `fgos

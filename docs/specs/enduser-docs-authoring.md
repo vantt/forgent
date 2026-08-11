@@ -115,7 +115,7 @@ write-side, đối trọng với mặt read-side (area `enduser-docs-index` — 
 
 ## Pointers (implementation)
 
-- Kỷ luật soạn: kỹ năng `fgos-compounding` (cả hai gốc `repo/.claude/skills/` và
+- Kỷ luật soạn: kỹ năng `fgos-coding-compounding` (cả hai gốc `repo/.claude/skills/` và
   `repo/.agents/skills/`), Flow bước 1-5 — gom capture, phân ngăn, lưu tag+móc, gom
   mọi nguồn qua `fgos doc-sources` rồi grow-or-create theo tồn-tại-tệp, xác nhận.
 - Producer tag+móc: nhánh `compound` trong `repo/bin/fgos.mjs` (nhánh compound-learn ghi

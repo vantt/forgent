@@ -1,7 +1,7 @@
 ---
 type: explanation
 title: Why cook's "never auto-approve" prose lost to gate-bypass
-tags: [cook, gate-bypass, fgos-exploring, fgos-planning, fgos-validating]
+tags: [cook, gate-bypass, fgos-coding-exploring, fgos-coding-planning, fgos-coding-validating]
 source_capture_ids: [tsk-104]
 ---
 # Why cook's "never auto-approve" prose lost to gate-bypass
@@ -10,7 +10,7 @@ source_capture_ids: [tsk-104]
 frontmatter `description` ("Pauses for real human approval at every
 dev-skill gate ... never auto-approved") and its Hard rules bullet
 ("Never auto-approve a gate"). Both directly contradicted the Gate
-sections inside `fgos-exploring`, `fgos-planning`, and `fgos-validating`
+sections inside `fgos-coding-exploring`, `fgos-coding-planning`, and `fgos-coding-validating`
 themselves, which each check `canAutoApprove`/`canAutoApproveValidate`
 first and skip their own question when the repo's configured
 gate-bypass level covers it (`docs/history/gate-bypass/CONTEXT.md`

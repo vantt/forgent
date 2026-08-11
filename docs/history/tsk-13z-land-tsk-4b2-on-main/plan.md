@@ -11,7 +11,7 @@ remove-validation) applies. 2 flags -> **standard** lane per
 `fgos-routing`'s own Mode-gate table (this session entered via
 `/fgOS:pick` -> `fgos-coding-driving`, never through `fgos-routing`'s
 Orient step, so no lane was handed off — applying the Mode-gate table
-directly here per `fgos-planning`'s own direct-entry fallback).
+directly here per `fgos-coding-planning`'s own direct-entry fallback).
 
 ## Approach
 
@@ -96,7 +96,7 @@ worth proving, matching the standard-lane depth:
   inside this item's own isolated worktree branch, no shared runtime
   state involved.
 
-## Validating — reality gate (fgos-validating, 2026-08-11T06:38Z)
+## Validating — reality gate (fgos-coding-validating, 2026-08-11T06:38Z)
 
 | Dimension | Result | Citation |
 |---|---|---|
@@ -125,7 +125,7 @@ dry-run + green baseline) is what a feasibility check can honestly gather
 before the merge is materialized; nothing here lowers the bar or skips a
 row.
 
-## Implementation addendum (fgos-code-implement, 2026-08-11T07:18Z)
+## Implementation addendum (fgos-coding-implement, 2026-08-11T07:18Z)
 
 The merge landed clean, exactly matching the dry-run: `git merge --no-ff
 fgw/tsk-4b2` on `fgw/tsk-13z`, 0 conflicts, the same 9 files. But the
@@ -134,7 +134,7 @@ see `CONTEXT.md` D4 (supersedes D2). `git merge-base --is-ancestor
 7add82b8 main` can never return true through `fgos approve`'s own
 goal-check, which runs on a staged (`--no-commit`) merge before the
 commit that would advance `main` (`src/runner/merge.mjs:889-1052`). This
-was not visible at the `fgos-validating` pass above — that pass evidenced
+was not visible at the `fgos-coding-validating` pass above — that pass evidenced
 conflict-freedom and a green baseline, not the mechanics of *when* `main`
 advances relative to the goal-check, since that question only surfaces
 once a real merge commit exists to test the ancestor check against.

@@ -23,7 +23,7 @@ such redesign is worth planning.
 | D3 | `tsk-49a` (dep of this item, status done) is an unrelated session-role claim race in the dispatcher, not a locking/worktree-.fgos issue — orthogonal, already fixed. |
 | D4 | `tsk-2eq`, which had self-recorded "xung đột hướng với tsk-45y — phải chờ quyết định trước khi sửa," was independently re-examined via code scan on 2026-08-02 (`plans/reports/internal-design-260802-0907-merge-harness-v2-locked-decisions-report.md`, D3) and shipped its fix (lockRoot separated from git-op cwd) without waiting on tsk-45y — confirming no real tension existed between the two items. |
 | D5 | The residual UX pain this item's proposal was actually reaching for — a process waiting on `main-checkout.lock` during a slow/hung verify — already has a shipped, narrower fix: `tsk-6c2`'s `--wait[=<ms>]` flag on the CLI verbs that call `acquireMainCheckoutLock` (status done, `test/cli/fgos.test.mjs:7796`). No further mitigation is pending on this item's outcome. |
-| D6 | No implementation work remains for this item. It resolves as **wontfix** (resolved-by-context): the architecture it asked to change was never the architecture actually running, the one real bug matching its description was already fixed by other items, and the softer UX complaint already has its own shipped fix. This is a closure, not a hand-off to `fgos-planning` — there is nothing left to shape or build. |
+| D6 | No implementation work remains for this item. It resolves as **wontfix** (resolved-by-context): the architecture it asked to change was never the architecture actually running, the one real bug matching its description was already fixed by other items, and the softer UX complaint already has its own shipped fix. This is a closure, not a hand-off to `fgos-coding-planning` — there is nothing left to shape or build. |
 
 ## Pinned terms
 
@@ -71,4 +71,4 @@ such redesign is worth planning.
 ## Outstanding questions deferred to planning
 
 None — this item closes here (D6). No implementation work is being handed
-to `fgos-planning`.
+to `fgos-coding-planning`.

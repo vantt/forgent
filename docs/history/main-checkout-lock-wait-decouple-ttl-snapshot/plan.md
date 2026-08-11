@@ -42,7 +42,7 @@ one.
 
 ### Risk map
 
-| Component | Risk | Proof point (→ fgos-validating) |
+| Component | Risk | Proof point (→ fgos-coding-validating) |
 |---|---|---|
 | `withLockRetry` budget formula (`src/runner/lock-wait.mjs:35-62`) | Medium — the exact line that both existing tests pin (`waitMs` vs `remainingTtlMs` interplay) | Confirm both existing tests (`lock-wait.test.mjs:79`, `fgos.test.mjs:7931`) still pass unmodified, and add a new case for `waitMs > remainingTtlMs` extending past it |
 | `parseWaitFlags` cap (`bin/fgos.mjs:205-221`) | Low — additive validation branch, same shape as the existing non-positive check | New cap-rejection test parallel to the existing `--wait must be a positive number` test |
@@ -51,7 +51,7 @@ one.
 Impact-analysis capability gate (`fgos tool query --capability
 impact-analysis --status present`, already run during clarify): 1 provider
 (`gitnexus`, `present`) → **impact-analysis: full** per `CLAUDE.md`'s gate.
-`fgos-validating` should run real `impact`/`detect_changes` against
+`fgos-coding-validating` should run real `impact`/`detect_changes` against
 `withLockRetry` and `parseWaitFlags` before this item is treated as proven,
 per the MUST rules in `CLAUDE.md`/`AGENTS.md`.
 
@@ -91,7 +91,7 @@ Item-level (already set by discover's clear verdict): `npm test`. No split
 
 - The periodic status line (D4) writes to stderr, not stdout — keeps
   scripts parsing stdout JSON output unaffected. (Not material enough to
-  send back to `fgos-exploring`; implementer detail, flagged here per
+  send back to `fgos-coding-exploring`; implementer detail, flagged here per
   step 7's own filter.)
 - "Elapsed passes the original remainingTtlMs snapshot" (D4's trigger point)
   is measured from the same `start = Date.now()` `withLockRetry` already

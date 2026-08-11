@@ -463,8 +463,8 @@ test('DEFAULTS.tier is itself a member of TIERS, and SCHEMA_VERSION is a positiv
   assert.ok(Number.isInteger(SCHEMA_VERSION) && SCHEMA_VERSION > 0);
 });
 
-test('STAGES includes "decompose" between clarify and executing — compound-learn is retired (D11); "discovery"/"exploring" now sit between clarify and decompose (tsk-1w7 D10)', () => {
-  assert.deepEqual(STAGES, ['clarify', 'discovery', 'exploring', 'decompose', 'executing']);
+test('STAGES includes "decompose" between clarify and executing — compound-learn is retired (D11); "discovery"/"exploring" now sit between clarify and decompose (tsk-1w7 D10); "planning" (renamed from "decompose", tsk-403 D11) sits after the legacy "decompose" alias (D18)', () => {
+  assert.deepEqual(STAGES, ['clarify', 'discovery', 'exploring', 'decompose', 'planning', 'executing']);
 });
 
 test('validateWork accepts every stage in STAGES', () => {
@@ -475,7 +475,7 @@ test('validateWork accepts every stage in STAGES', () => {
 
 test('validateWork rejects a stage outside the STAGES domain', () => {
   assert.throws(
-    () => validateWork(baseWork({ stage: 'planning' })),
+    () => validateWork(baseWork({ stage: 'bogus-stage' })),
     (err) => err instanceof WorkValidationError && /stage/.test(err.message),
   );
 });

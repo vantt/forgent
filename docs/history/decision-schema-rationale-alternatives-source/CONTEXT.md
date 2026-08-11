@@ -14,13 +14,13 @@ with more granularity, per the deep-dive cited below.
 Out of scope for this item: `tsk-6b6`'s own `judgeDecompose`
 verdict-recording work (depends on this item's `id`-optional shape, but
 is a separate item); the structural CONTEXT.md gate / phase-graph
-precondition change (deep-dive idea #4, needs its own `fgos-exploring`
+precondition change (deep-dive idea #4, needs its own `fgos-coding-exploring`
 round per `tsk-47e`); bee's `type: supersede` mechanism (deep-dive idea
 #3, needs `decision` to be id-scoped first — this item delivers that
 id-scoping but does not itself add supersede semantics); the exact
 in-memory/view shape of `view.decisions[id]` vs the existing global
 `view.decisions` array (an implementation/architecture call, left to
-`fgos-planning`).
+`fgos-coding-planning`).
 
 ## Locked decisions
 
@@ -94,7 +94,7 @@ Prior decision cited, not re-locked here:
   `view.decisionsById[id]`) holding an accumulating array (mirrors
   `view.discovery`/`view.frictions`, since decisions append over time
   and D1 of this very item is itself the second decision logged against
-  `tsk-63c`), vs. some other structure. `fgos-planning`'s call, not a
+  `tsk-63c`), vs. some other structure. `fgos-coding-planning`'s call, not a
   product decision.
 - Whether `gates[id]`'s new `rationale`/`alternatives`/`source` fields
   get populated only via CLI flags on `fgos ask`/`fgos answer` (mirroring

@@ -17,8 +17,8 @@ const GATE_APPROVE_ACTORS = new Set(['human', 'bypass']);
 ```
 
 One gate field per stage in the clarify→decompose sequence:
-`contextApprove` (`fgos-exploring`), `planApprove` (`fgos-planning`),
-`validateApprove` (`fgos-validating`).
+`contextApprove` (`fgos-coding-exploring`), `planApprove` (`fgos-coding-planning`),
+`validateApprove` (`fgos-coding-validating`).
 
 ## Valid `actor` values
 

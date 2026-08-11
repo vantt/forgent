@@ -41,7 +41,7 @@ asserted to generalize automatically to a domain that does not exist yet.
   differently.
 - Never apply a stage or status transition directly. Every transition
   happens because the loaded stage-skill called its own engine verb
-  (`fgos discover`/`fgos decompose`/`fgos return`) — this skill only reads
+  (`fgos discover`/`fgos plan`/`fgos return`) — this skill only reads
   state and decides whether to loop again, exactly the same "engine's verb
   always wins" stance `fgos-routing` itself states. **One documented
   exception (tsk-4b2 D4):** at stage `discovery`, the loaded skill
@@ -54,7 +54,7 @@ asserted to generalize automatically to a domain that does not exist yet.
 - Check the ceiling BEFORE invoking the current stage's skill, never after
   (tsk-19j §3's own verified boundary — this is what lets a `ceiling:
   stage:decompose` loop stop with the item freshly landed AT `decompose`,
-  never one stage further, having invoked `fgos-planning` first by mistake).
+  never one stage further, having invoked `fgos-coding-planning` first by mistake).
 - The three person/system-shaped stops below are resolved through
   `parkReasonForStatus(domain, status)` (`src/state/workflow-stage-graphs.mjs`,
   tsk-3w3 follow-up), never a direct `status === 'awaiting-human'`-style
@@ -135,7 +135,7 @@ asserted to generalize automatically to a domain that does not exist yet.
   `/fgOS:cook`'s existing hard rule "never claims before stage executing"
   into this skill, since it is now the one thing that decides when a
   stage-skill is about to run): immediately before invoking the skill this
-  loop resolved for stage `executing` (`fgos-code-implement` in the `coding`
+  loop resolved for stage `executing` (`fgos-coding-implement` in the `coding`
   domain's registry today), check the item's live `status` from the SAME
   fresh read this iteration already did. If it is already `doing` (the
   caller — e.g. `/fgOS:pick`'s own step 2 — already claimed it, or a prior
@@ -158,7 +158,7 @@ asserted to generalize automatically to a domain that does not exist yet.
     then hand the session into the returned `data.worktree.path` the same
     way `/fgOS:pick`'s own step 4 does (`EnterWorktree`, falling back to
     printing the path and stopping if it is unavailable/refuses — never
-    fail or retry past that fallback) — only THEN invoke `fgos-code-implement`.
+    fail or retry past that fallback) — only THEN invoke `fgos-coding-implement`.
 
   - `worktreeBacked === false` — claim without a worktree, the same
     stage-agnostic claim `fgos-routing` and 2 other skills already use
@@ -349,7 +349,7 @@ loop:
 
   invoke `skill` (it runs its own Socratic/shape/implement pass, hits its
   own gate, and — once satisfied — calls the engine verb that actually
-  advances stage/status: `fgos discover`/`fgos decompose`/`fgos return` —
+  advances stage/status: `fgos discover`/`fgos plan`/`fgos return` —
   EXCEPT at stage `discovery`: apply `fgos-researching`'s own returned
   verdict via `fgos discover` on its behalf, see `## Discovery and
   exploring stages` below)
@@ -373,24 +373,24 @@ D3/D4): they were registered in `workflow-stage-graphs.mjs` but
 structurally unreachable until `tsk-4b2` — nothing ever moved an item's
 `stage` to `discovery`/`exploring` before this item. Reachable now,
 `skillForStage` already resolves `discovery -> fgos-researching` and
-`exploring -> fgos-exploring` — this loop needs no new registry lookup for
+`exploring -> fgos-coding-exploring` — this loop needs no new registry lookup for
 either, only the following:
 
-- **`exploring`** needs no special handling. `fgos-exploring`'s own Gate
+- **`exploring`** needs no special handling. `fgos-coding-exploring`'s own Gate
   already calls `fgos discover --verdict clear` (or parks via `fgos ask`)
   once `CONTEXT.md` is locked and approved, the same "invoked skill calls
   its own engine verb" shape every other stage-skill in this loop already
   follows. The generic `invoke skill` step already covers it.
 - **`discovery`** is the one exception (see the Hard rule above). Its
   resolved skill, `fgos-researching`, is a stage-agnostic helper reused
-  from several call sites (mid-`fgos-exploring`, mid-`fgos-planning`) — its
+  from several call sites (mid-`fgos-coding-exploring`, mid-`fgos-coding-planning`) — its
   own Hard rules state plainly that it "never writes item state itself;
   the caller... does that with the verdict this skill hands back." When
   `skill` resolves to `fgos-researching` this turn, invoke it with the
   goal (the item's own title/description) and everything already known
   (its `refs`, prior `view.discovery[id]` verdicts), then apply the
   returned `{clear, question?, verify?}` verdict yourself, through the
-  same engine verb `fgos-clarifying`/`fgos-exploring` already use —
+  same engine verb `fgos-clarifying`/`fgos-coding-exploring` already use —
   `nextDiscoveryEdge` (`src/intake/discovery.mjs`, tsk-4b2 D3/D6) resolves
   `discovery -> exploring` through this verb when the item's `stage` is
   already `discovery`:

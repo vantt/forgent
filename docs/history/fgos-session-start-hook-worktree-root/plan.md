@@ -32,8 +32,8 @@ No `docs/history/<feature>/CONTEXT.md` exists for this item — it reached
 own "understood, no rewrite, hand off" verdict), which is legitimate for an
 item whose intent and fix are already fully specified in its own
 description. Nothing this plan needs is silent in that description, so
-there is no material gap to hand back to `fgos-exploring` for — this is
-recorded here only per fgos-planning's own Mid-planning gap step, not
+there is no material gap to hand back to `fgos-coding-exploring` for — this is
+recorded here only per fgos-coding-planning's own Mid-planning gap step, not
 because a real decision is missing.
 
 ## Impact analysis (CLAUDE.md gate: impact-analysis capability = full)

@@ -80,7 +80,7 @@ current repo, and does prior art already cover this ground?
 to proceed to `exploring`. No new person-facing question raised; the D10
 tension above is planning-stage input, not a discovery-stage blocker.
 
-## Round 2 — 2026-08-11 (fgos-exploring, stage `exploring`, tsk-cgg)
+## Round 2 — 2026-08-11 (fgos-coding-exploring, stage `exploring`, tsk-cgg)
 
 **Asked:** (1) Does a prior item already cover this ground more completely
 than Round 1 found? (2) How many silent stash-style truncations have

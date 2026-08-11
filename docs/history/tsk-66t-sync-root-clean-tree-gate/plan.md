@@ -1,6 +1,6 @@
 # Plan: add the missing clean-tree gate to sync-root's no-parent merge
 
-Item: `tsk-66t`. Mode: **high-risk** — no CONTEXT.md/`fgos-exploring` pass
+Item: `tsk-66t`. Mode: **high-risk** — no CONTEXT.md/`fgos-coding-exploring` pass
 exists for this item (its `clarify` verdict was clear, so the engine
 (`resolveDiscovery`, `src/intake/discovery.mjs`) moved it straight from
 `clarify` to `decompose`, the direct edge `DOMAINS.coding.transitions`
@@ -53,7 +53,7 @@ possibly-stale line numbers)
   refusing cleanly. Adding the gate below prevents this crash too, by
   refusing before the merge is ever attempted — the same mechanism
   `approve` already relies on for this.
-- **fgos-validating finding (this round):** `fgos merge next` never calls a
+- **fgos-coding-validating finding (this round):** `fgos merge next` never calls a
   separate sync-root implementation — it dispatches through the same verb
   (`const syncResult = await runVerb('sync-root', flags, [rootId], dir);`,
   `bin/fgos.mjs:2010`), wrapped in a `try { ... } catch (err) { if (err

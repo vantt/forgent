@@ -45,7 +45,7 @@ design docs. The only real choices left for this plan were D7/D8
 `fgos tool query --capability impact-analysis --status present` → one
 provider, `gitnexus`, `status: "present"` → **full**. Every proof point
 below that touches `resolveExecutorConfig`/`resolveExecutorCommand`/
-`spawnWorker` needs `impact()` run against it at `fgos-code-implement`, blast
+`spawnWorker` needs `impact()` run against it at `fgos-coding-implement`, blast
 radius reported, before editing (AGENTS.md gate, unchanged from
 `CONTEXT.md`'s own note).
 
@@ -59,7 +59,7 @@ alone, not by graph leverage.
 
 ### Risk map
 
-| Component | Risk | Proof point (for `fgos-validating`) |
+| Component | Risk | Proof point (for `fgos-coding-validating`) |
 |---|---|---|
 | `.fgos-runner.json` capacities entry (D1, D7) | low — additive, shape-validated by existing `validateCapacityShape` (confirmed this session it doesn't reject unknown keys, so `sensitiveData` needs no schema change) | existing `dispatch.test.mjs` capacities-shape tests stay green; one new test asserts `sensitiveData` round-trips through `loadRunnerConfig` untouched |
 | `fgos tool register` step (D3) | low — mechanical CLI call, `checkToolRegistryConfigured` already generic | `fgos doctor` (or the equivalent setup-checks test) picks up the new registration without a new check being written |
@@ -105,13 +105,13 @@ fragments.
 
 Verify command: `npm test` (matches the engine's own `discover` verdict:
 `{"clear": true, "verify": "npm test", "impactScore": 68}`). No re-plan of
-Execute/verify mechanics needed — `fgos-code-implement`'s existing goal-check and
+Execute/verify mechanics needed — `fgos-coding-implement`'s existing goal-check and
 `return`'s re-verify already cover it.
 
 ## Assumptions
 
 - The exact real CLI command for step 4 (D2) is picked at
-  `fgos-code-implement` time, not here — confirmed available today: `agy`,
+  `fgos-coding-implement` time, not here — confirmed available today: `agy`,
   `codex`; confirmed absent: `gemini`. Not material to this plan's shape,
   since the mechanism is generic over whichever one gets registered.
 - "Malformed output" (D8) is left at the definition already pinned in

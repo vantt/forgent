@@ -69,7 +69,7 @@ existing precedent (same file, same helper, same file).
    `ttlDays`, same as today.
 
 5. **`plugins/fgOS/skills/cleanup-next/SKILL.md`** (found at
-   `fgos-validating` via `grep -rn "pickNextCleanupItem(" bin src plugins
+   `fgos-coding-validating` via `grep -rn "pickNextCleanupItem(" bin src plugins
    .claude` — the plan's own risk-map row anticipating this): the ONLY
    real caller of `pickNextCleanupItem`, an inline `node -e` script
    (lines 39-54) that reads `ttlDays` the same way `bin/fgos.mjs`'s
@@ -98,11 +98,11 @@ untouched (zero risk to its own 24 existing tests).
 
 ## Risk map
 
-| Component | Risk | Proof point (→ `fgos-validating`) |
+| Component | Risk | Proof point (→ `fgos-coding-validating`) |
 |---|---|---|
 | Leaf detection correctness | medium — must never misclassify a root as a leaf (would prematurely reclaim a root's own worktree while it's still the live merge target for other leaves) | new test: a root item (no `parent`) with `resolveTtlDaysForItem` called still resolves to `ttlDays` (root value), never `leafTtlDays`, even when passed alongside sibling leaf items |
 | Root path stays byte-identical when `leafTtlDays` omitted | medium — this is the one flagged regression risk against 24 existing tests | run existing `test/state/cleanup-harness.test.mjs` + `test/state/cleanup-pool.test.mjs` suites unmodified against the new code — every existing call site that never passes `leafTtlDays` must still pass exactly as before |
-| `pickNextCleanupItem`'s other real callers exist beyond what this plan enumerated | medium — `/fgOS:cleanup-next`/`/fgOS:cleanup-loop`'s exact call site wasn't read during this planning pass | `fgos-validating`: grep `pickNextCleanupItem(` across the repo and confirm every call site either gets `leafTtlDays` threaded or is a test fixture that doesn't need it |
+| `pickNextCleanupItem`'s other real callers exist beyond what this plan enumerated | medium — `/fgOS:cleanup-next`/`/fgOS:cleanup-loop`'s exact call site wasn't read during this planning pass | `fgos-coding-validating`: grep `pickNextCleanupItem(` across the repo and confirm every call site either gets `leafTtlDays` threaded or is a test fixture that doesn't need it |
 | Dangling-parent edge case (`resolveRoot` treats a missing-parent-record item as root) | low — matches existing `checkMergeStillResolves` behavior already in this same file, not a new risk this item introduces | none needed beyond the existing precedent already covering it |
 
 ## Files touched
@@ -116,11 +116,11 @@ untouched (zero risk to its own 24 existing tests).
 - `bin/fgos.mjs` — `case 'cleanup'` reads and threads `leafTtlDays`
 - `plugins/fgOS/skills/cleanup-next/SKILL.md` — its own inline script
   threads `leafTtlDays` through to `pickNextCleanupItem` (found at
-  `fgos-validating`, confirmed the only real caller)
+  `fgos-coding-validating`, confirmed the only real caller)
 - `test/state/cleanup-harness.test.mjs`, `test/state/cleanup-pool.test.mjs`
   — new cases per risk map above
 
-## Verify (revised at `fgos-validating`)
+## Verify (revised at `fgos-coding-validating`)
 
 ```
 node --test test/state/cleanup-harness.test.mjs && npm test && grep -q "leafTtlDays" plugins/fgOS/skills/cleanup-next/SKILL.md && ! grep -q "pickNextCleanupItem(view, rawEvents, { ttlDays })" plugins/fgOS/skills/cleanup-next/SKILL.md

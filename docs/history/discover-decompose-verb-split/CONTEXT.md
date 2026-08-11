@@ -15,7 +15,7 @@ const result = stage === 'decompose'
 ```
 
 `resolveDiscovery` (`src/intake/discovery.mjs:231`, wraps `judgeDiscovery`)
-and `resolveDecompose` (`src/intake/decompose.mjs:279`, wraps
+and `resolveDecompose` (`src/intake/plan.mjs:279`, wraps
 `judgeDecompose`) are already two distinct functions with distinct
 behavior — only the CLI verb name conflates them, so nothing in the CLI
 surface tells a caller which judgment will actually run. This item splits
@@ -76,8 +76,8 @@ a separate item).
   companion `decompose` skill or an update to route explicitly.
 - `plugins/fgOS/skills/cook/SKILL.md:90` — calls `fgos discover <id>
   --json` generically as "the same engine command" regardless of stage.
-- `.claude/skills/fgos-exploring/SKILL.md:46`, `.claude/skills/
-  fgos-validating/SKILL.md:50` (and their `.agents/skills/` mirrors) —
+- `.claude/skills/fgos-coding-exploring/SKILL.md:46`, `.claude/skills/
+  fgos-coding-validating/SKILL.md:50` (and their `.agents/skills/` mirrors) —
   hand-off prose citing `fgos discover` as the stage-advancing call from
   both `clarify` and `decompose`.
 - `test/cli/fgos.test.mjs:2738-2884` — 9 call sites using `['discover',
@@ -97,15 +97,15 @@ a separate item).
 - `bin/fgos.mjs` — the verb dispatch itself
 - `src/cli/command-registry.mjs` — registry entries
 - `plugins/fgOS/skills/discover/SKILL.md` — update, and/or add a sibling
-  `decompose` skill (shape/size is `fgos-planning`'s call, not locked
+  `decompose` skill (shape/size is `fgos-coding-planning`'s call, not locked
   here)
 - `plugins/fgOS/skills/cook/SKILL.md`
-- `.claude/skills/fgos-exploring/SKILL.md`, `.claude/skills/
-  fgos-validating/SKILL.md`, and their `.agents/skills/` mirrors
+- `.claude/skills/fgos-coding-exploring/SKILL.md`, `.claude/skills/
+  fgos-coding-validating/SKILL.md`, and their `.agents/skills/` mirrors
 - `test/cli/fgos.test.mjs`
 - `docs/reference/work-item-pipeline-stages-verbs-and-handoffs.md`
 
-## Outstanding questions deferred to `fgos-planning`
+## Outstanding questions deferred to `fgos-coding-planning`
 
 - Exact error message/exit-code shape for calling `discover`/`decompose`
   on the wrong stage.
@@ -113,5 +113,5 @@ a separate item).
   skill directory, or `discover/SKILL.md` itself gets narrowed and a new
   file added alongside it — a shaping/sizing call, not a product decision.
 - Whether this ships as one commit/pass or is itself split further —
-  `fgos-planning`'s mode-gate call, given the number of live callers in
+  `fgos-coding-planning`'s mode-gate call, given the number of live callers in
   scope (D2).

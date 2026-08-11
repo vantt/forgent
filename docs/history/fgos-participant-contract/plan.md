@@ -12,7 +12,7 @@ task (write the page) with the index entry as a mechanical five-line
 addendum to that same task, not a second piece of work.
 
 No `fgos-routing` Orient step ran earlier in this session (the item went
-`pick` → `fgos-coding-driving` → `fgos-exploring` directly) and `plan.md`
+`pick` → `fgos-coding-driving` → `fgos-coding-exploring` directly) and `plan.md`
 carried no prior `Mode:` line, so this lane was decided here via the
 direct-entry fallback, reading `fgos-routing`'s own Mode-gate subsection
 rather than re-deriving the thresholds inline.
@@ -70,7 +70,7 @@ already works in a real ~4900-line non-Node crate.
 | Staying inside declared scope (no new spec, no contract change) | low | nothing in this plan touches `bin/fgos.mjs`, `src/state/*.mjs`, or any spec file — footprint is exactly the two declared files |
 
 No medium/high-risk entries — this is a pure documentation compile with no
-code path touched, so `fgos-validating`'s reality check has no blast-radius
+code path touched, so `fgos-coding-validating`'s reality check has no blast-radius
 proof point to carry forward. Impact-analysis capability gate (`fgos tool
 query --capability impact-analysis --status present`): GitNexus `present`
 → **full**, but not load-bearing here since no symbol is edited.
@@ -86,7 +86,7 @@ query --capability impact-analysis --status present`): GitNexus `present`
    who needs precise facts about a specific field/command/API."`,
    `docPath: "docs/reference/fgos-participant-contract.md"`, a real
    `title`, `sourceCaptureId: null` (hand-authored, not a
-   `fgos-compounding` capture).
+   `fgos-coding-compounding` capture).
 
 Single component in `fgos graph`'s output (no deps, `deps: []` on the item
 itself, and CONTEXT.md's originating discussion states this item "blocks

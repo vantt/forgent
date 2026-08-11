@@ -78,7 +78,7 @@ The actual boundary check needs a Unicode-aware definition of "word
 character" (e.g. a Unicode property escape `\p{L}`/`\p{N}` with the `u`
 flag, or an explicit check of the character before/after the match
 against a wider letter/digit/underscore class) — left as the concrete
-implementation choice for `fgos-code-implement`, constrained by the proof
+implementation choice for `fgos-coding-implement`, constrained by the proof
 below.
 
 Risk map:
@@ -87,7 +87,7 @@ Risk map:
 |---|---|---|
 | `classify()` word-boundary change | medium | 2 real call sites confirmed via `grep` (GitNexus's own answer was stale/wrong here — see posture above): `bin/fgos.mjs:683` (`fgos submit`'s classification path) and `src/runner/loop.mjs:592` (runner's own auto-submission-of-blocks path). Both exercised by `test/evolve/iron-law.test.mjs`'s existing `classify` assertions — extending that file covers this. |
 | `classifyIronLaw()` word-boundary change | medium | 2 real call sites confirmed via `grep`: `bin/fgos.mjs:2392` and `bin/fgos.mjs:2794` (the Iron Law gate inside `approve`/`merge next`). Same test file already exercises `classifyIronLaw` directly. |
-| Vietnamese-diacritic keyword boundary correctness | medium | This is the item's own core risk (why D1's CONTEXT.md flagged it as a pinned-term caveat) — proof required at `fgos-validating`: the extended test's Vietnamese true-positive case (a real, unmodified diacritic keyword mention still matches) must be evidenced with a real test run, not asserted. |
+| Vietnamese-diacritic keyword boundary correctness | medium | This is the item's own core risk (why D1's CONTEXT.md flagged it as a pinned-term caveat) — proof required at `fgos-coding-validating`: the extended test's Vietnamese true-positive case (a real, unmodified diacritic keyword mention still matches) must be evidenced with a real test run, not asserted. |
 
 Order: `countMatches` in `classify.mjs` first (the shared primitive both
 this file and, indirectly by import, `iron-law.mjs`'s own equivalent
@@ -132,14 +132,14 @@ No split. One honestly-sized piece — confirmed by the mode-gate count
 
 - The exact Unicode-boundary regex construction (which property escapes,
   whether to precompile per-keyword or build one alternation pattern) is
-  `fgos-code-implement`'s own call — this plan fixes the *behavior* contract
+  `fgos-coding-implement`'s own call — this plan fixes the *behavior* contract
   (standalone keyword matches, substring-inside-another-word does not,
   Vietnamese diacritics handled correctly), not the literal regex.
 
 ## Proof (leave execution alone, step 6)
 
 The item's own `verify` (already locked via this session's
-`fgos-exploring` pass, survived three rounds of an independent second-pass
+`fgos-coding-exploring` pass, survived three rounds of an independent second-pass
 judge — round 1 rejected a placeholder, round 2 rejected an inline-only
 check that ignored the stale item description, round 3 rejected an
 inline-only check that skipped the existing Vietnamese-inclusive test
@@ -150,9 +150,9 @@ node --test test/evolve/iron-law.test.mjs && node --input-type=module -e "
 import assert from 'node:assert/strict';
 import { classifyIronLaw } from './src/evolve/iron-law.mjs';
 import { classify } from './src/intake/classify.mjs';
-const fp = classifyIronLaw({ filesChanged: [], description: 'does NOT duplicate fgos-exploring authoring logic' });
+const fp = classifyIronLaw({ filesChanged: [], description: 'does NOT duplicate fgos-coding-exploring authoring logic' });
 assert.equal(fp.matchedFlags.includes('auth'), false);
-const fpClassify = classify('does NOT duplicate fgos-exploring authoring logic');
+const fpClassify = classify('does NOT duplicate fgos-coding-exploring authoring logic');
 assert.equal(fpClassify.tier, 'standard');
 const tp = classifyIronLaw({ filesChanged: [], description: 'fix the auth flow' });
 assert.equal(tp.matchedFlags.includes('auth'), true);

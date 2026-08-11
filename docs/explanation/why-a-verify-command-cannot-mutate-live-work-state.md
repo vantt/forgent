@@ -52,7 +52,7 @@ a stronger check than the original, not a weaker one. This mirrors a
 precedent already recorded elsewhere in this store (`tsk-5q5`: an
 auto-generated verify/acceptance can be wrong or non-executable and gets
 corrected via `fgos edit --verify`/`--acceptance` during
-`fgos-validating`/`fgos-code-implement`, never invented from a guess, never
+`fgos-coding-validating`/`fgos-coding-implement`, never invented from a guess, never
 silently weakened).
 
 The general rule this confirms: a `verify` command must exercise the

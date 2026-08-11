@@ -50,7 +50,7 @@ export function decideDispatchMechanism({ hasNativeMechanism, hasLiveTaskAccess,
 | Pha | Item | Nội dung | Trạng thái |
 |---|---|---|---|
 | 1 | `tsk-1ni` | Sửa `judgeDiscovery`'s blind cli-spawn (repoRoot bug) — điểm khởi phát cả doctrine | Delivered |
-| 2 | `tsk-27y` | Caller-supplied-verdict: session sống tự cấp verdict cho `fgos discover`/`fgos decompose`, bỏ qua judge subprocess mù | Delivered |
+| 2 | `tsk-27y` | Caller-supplied-verdict: session sống tự cấp verdict cho `fgos discover`/`fgos plan`, bỏ qua judge subprocess mù | Delivered |
 | 3 | `tsk-53h` | Rút `capacity-dispatch-fallback.md` thành fragment dùng chung — nhưng **chỉ rút wiring cli/spawn có sẵn của `fgos-submit-assist`, chưa từng xây nhánh native thật** (phát hiện lúc scout Pha 4) | Delivered (nhưng không đúng như phase-table kỳ vọng ban đầu) |
 | 4 | `tsk-3ik` | Hợp nhất `capacities.<id>` config-path với direct Task-tool call dưới MỘT quyết định — xây `decideDispatchMechanism`/`decideCapacityDispatchMechanism`/CLI `decide`, và tự xây **nhánh native-Task-dispatch THẬT ĐẦU TIÊN** (vì Pha 3 chưa làm) | Delivered — 126/126 test xanh, không đụng `resolveExecutorConfig` |
 | 5 | ? | Không tìm thấy nội dung Pha 5 cụ thể trong tài liệu quét được | **Chưa xác định** — có thể là khoảng trống tài liệu, không phải khoảng trống thiết kế; đáng hỏi người |
@@ -233,7 +233,7 @@ Trước 2026-08-07, KHÔNG điểm dispatch nào tự báo mechanism/provider/m
 
 - Vocabulary orchestrator/rootTask/subTask/capacity khoá (0026).
 - `decideDispatchMechanism`/`decideCapacityDispatchMechanism`/CLI `decide` — Pha 4, 126/126 test.
-- `capacity-dispatch-fallback.md` A→D đầy đủ, 6 consumer thật trỏ vào (fgos-code-implement/exploring/planning/validating/researching/submit-assist).
+- `capacity-dispatch-fallback.md` A→D đầy đủ, 6 consumer thật trỏ vào (fgos-coding-implement/exploring/planning/validating/researching/submit-assist).
 - Ad-hoc packet 6-field + `--model`/`--tier` override trên `dispatch.mjs resolve`.
 - Provider/tier judgment fragment (D12) — inline, ghi qua `appendWorkerLog`.
 - Fan-out execution thật (`tsk-umc`) — D1-D10, verify chồng-lấn-thời-gian thật, xác nhận sống qua `tsk-o4l`.

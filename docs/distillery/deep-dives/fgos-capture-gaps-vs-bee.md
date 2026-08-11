@@ -18,7 +18,7 @@ free-text `source` (15 distinct values: `user`, `agent`, `Phil`,
 (CONTEXT.md unenforced) is also solved, but structurally, not by a field:
 bee's phase chain makes Gate 1 (bee-exploring's CONTEXT.md lock) mandatory,
 and `bee-qualifying` guarantees the same outcome even with no human driving
-— fgOS has the mechanism (`fgos-exploring`) but not the gate. Gap 2
+— fgOS has the mechanism (`fgos-coding-exploring`) but not the gate. Gap 2
 (`judgeDecompose` capturing nothing) has no bee analog to copy directly —
 bee's closest parallel (`bee-qualifying`) always writes *something*
 (locked or parked) rather than nothing, which is the design principle to
@@ -111,7 +111,7 @@ mechanism that makes this possible: ONE skill is the sole writer of
 CONTEXT.md, serving both the human-interactive path and the automatic
 path, so both paths funnel into the same non-optional write — "it
 renders; it does not decide." fgOS has no equivalent single-writer gate;
-`fgos-exploring` is a skill a session *may* invoke, not a structural
+`fgos-coding-exploring` is a skill a session *may* invoke, not a structural
 checkpoint the engine enforces before allowing the stage edge.
 
 ### Gap 2 (fgOS: `judgeDecompose` captures nothing) — no direct bee field to copy, but a clear principle
@@ -132,7 +132,7 @@ just a parked question" — applied to `judgeDecompose`'s own
 | Who made a decision | nothing (`decision` verb, `gates[id]`) | `source` (free text, 15 real values) | Yes — direct field port |
 | Why a decision was made | `reason` (latest-wins, only on reject/gate-break) | `rationale` (required on every decision) | Yes — direct field port |
 | What was rejected, and why | nothing anywhere | `alternatives` (populated ~9% of real entries, rich prose) | Yes — direct field port |
-| CONTEXT.md enforcement | none — `fgos-exploring` is optional | mandatory Gate 1 + `bee-qualifying`'s always-write unattended path | Yes — but structural (gate + single-writer), not a field |
+| CONTEXT.md enforcement | none — `fgos-coding-exploring` is optional | mandatory Gate 1 + `bee-qualifying`'s always-write unattended path | Yes — but structural (gate + single-writer), not a field |
 | Automated judgment capturing rationale | `view.discovery` thin (clarify only); `judgeDecompose` zero | `bee-qualifying` always locks-or-parks | Principle transfers; no field to copy |
 | Superseding a changed decision | not supported for decisions (only `reason` overwrites) | `type: supersede`, append-only | Worth adopting for fgOS's own `decision` verb too |
 
@@ -168,7 +168,7 @@ modification, since bee's `decisions.jsonl` is itself append-only):
    marker is recorded — matching bee's own two-path guarantee (locked or
    explicitly parked, never silent). This is a genuinely bigger, riskier
    change than #1/#2 — matches tsk-ma4's own conclusion that gap 3 is a
-   policy decision requiring its own `fgos-exploring` round (tsk-47e),
+   policy decision requiring its own `fgos-coding-exploring` round (tsk-47e),
    not a code patch to bolt on here.
 5. **Gap 2 gets no new field** — instead, `judgeDecompose`'s four verdict
    branches (`invalid`/`need-human`/`pass-through`/`decompose`) should
@@ -183,8 +183,8 @@ modification, since bee's `decisions.jsonl` is itself append-only):
 | Idea | R | E | F | Note |
 |---|---|---|---|---|
 | `decision`/`gates[id]` schema: add `rationale` (required) + `alternatives` (optional) + `source` (optional free text) | 3 | 2 | 2 | Cross-cutting (touches the one capture surface all 4 gap items reference); dogfooded by bee (701 real entries, 64 with real alternatives); component-level effort — extend two existing functions + fold sites, no new subsystem |
-| Structural CONTEXT.md gate (mandatory Gate-1-equivalent + always-locks-or-parks unattended path) | 3 | 2 | 3 | Cross-cutting (changes the `decompose` edge's own precondition); bee dogfoods this at scale (18 skills, mandatory chain); subsystem-level effort — a new precondition on a stage edge, needs its own `fgos-exploring` round first (tsk-47e already filed) |
-| `judgeDecompose` calling `addDecision` on every verdict branch | 2 | 2 | 1 | One subsystem (`src/intake/decompose.mjs`); bee's `bee-qualifying` principle, not a literal field; small once idea #1's schema lands |
+| Structural CONTEXT.md gate (mandatory Gate-1-equivalent + always-locks-or-parks unattended path) | 3 | 2 | 3 | Cross-cutting (changes the `decompose` edge's own precondition); bee dogfoods this at scale (18 skills, mandatory chain); subsystem-level effort — a new precondition on a stage edge, needs its own `fgos-coding-exploring` round first (tsk-47e already filed) |
+| `judgeDecompose` calling `addDecision` on every verdict branch | 2 | 2 | 1 | One subsystem (`src/intake/plan.mjs`); bee's `bee-qualifying` principle, not a literal field; small once idea #1's schema lands |
 
 ## Open questions
 

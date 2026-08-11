@@ -30,12 +30,12 @@ behavior bug, not a local logic bug with a clean pre/post assertion.
 
 Impact-analysis posture: `full` (GitNexus `present`, confirmed via `fgos
 tool query --capability impact-analysis --status present` both at
-`fgos-exploring` and again here).
+`fgos-coding-exploring` and again here).
 
 ## No split
 
 `judgeVerifySemanticCorrectness`'s callers (GitNexus `impact`,
-`fgos-exploring` step) are `resolveDiscovery`/`resolveDecompose`/
+`fgos-coding-exploring` step) are `resolveDiscovery`/`resolveDecompose`/
 `discovery.test.mjs` — a small, contained blast radius. D1a (stabilize) and
 D1b (override) are locked as one claim (D1: "both"), touch overlapping
 files (`judge-executor.mjs`'s prompt builder feeds the same call
@@ -88,7 +88,7 @@ not via anything this override would have been.
 
 ## Risk map
 
-| Component | Risk | Proof point (for fgos-validating) |
+| Component | Risk | Proof point (for fgos-coding-validating) |
 |---|---|---|
 | `buildVerifyCheckPrompt` prompt change | Medium — could shift the judge's behavior in unintended ways beyond fixing the contradiction | A regression check: existing `test/intake/judge-executor.test.mjs` cases for this function still pass unchanged (fixed-mock executor, deterministic) |
 | Prior-verdict threading source | Medium — needs a real per-item store of prior second-pass verdicts (none exists today; only `view.discovery[id]` stores first-pass `judgeDiscovery` verdicts) | Confirm at Execute whether a new event kind is needed, or whether prior second-pass reasons can be derived from existing `awaiting-human` ask-text history (`putInAwaiting`'s own `ask` string already contains it, per `resolveDiscovery`'s dispute-park code) — cheaper, reuses existing data, avoids a new event kind (YAGNI) |
@@ -111,9 +111,9 @@ override.test.mjs` covers D1b at the CLI level.
 ## Assumptions
 
 - The override flag's exact name/spelling is an implementation detail, not
-  locked here (not material to scope/behavior per `fgos-exploring`'s own
+  locked here (not material to scope/behavior per `fgos-coding-exploring`'s own
   filter — CONTEXT.md correctly left it unspecified).
 - Reusing `putInAwaiting`'s existing `ask` text as the prior-round-reason
   source (rather than a new event kind) is a proposed default, not proven
-  yet — flagged here for `fgos-validating` to confirm feasible against the
+  yet — flagged here for `fgos-coding-validating` to confirm feasible against the
   real store shape before Execute commits to it.

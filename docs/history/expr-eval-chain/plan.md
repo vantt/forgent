@@ -38,7 +38,7 @@ naturally separable).
 | `evaluate` | low — precedence logic is the only real branch point | its own test file: `*`/`/` binds before `+`/`-`, left-to-right within same precedence, malformed token sequence throws (A1) |
 | `evaluateExpr` | low — thin composition of the two above | its own test file: end-to-end string→number, delegates correctly |
 
-No medium/high-risk entries — nothing carried forward to `fgos-validating`
+No medium/high-risk entries — nothing carried forward to `fgos-coding-validating`
 beyond running the three test files for real.
 
 ## Shape (small)

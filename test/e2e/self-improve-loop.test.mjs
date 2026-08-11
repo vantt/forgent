@@ -257,7 +257,7 @@ test(
     // A real runner config must exist BEFORE either CLI call: even
     // with an explicit --verdict, `discover`/`decompose`'s own bin/fgos.mjs
     // case still unconditionally calls `ensureRunnerConfigForDir` to resolve
-    // `cfg` (unused inside resolveDiscovery/resolveDecompose now, but the
+    // `cfg` (unused inside resolveDiscovery/resolvePlan now, but the
     // parameter itself is still threaded through, per this item's own D9
     // finding) — with no config on disk yet, that bootstraps a DEFAULT one
     // into `.fgos/config.json` pointed at whatever real agent CLI it
@@ -273,7 +273,7 @@ test(
     assert.equal(discovered2.status, 0, `discover (discovery->exploring) failed: ${discovered2.stderr}`);
     const discovered3 = fgos(repoRoot, ['discover', submitted.id, '--verdict', 'clear', '--verify', 'test -f fixed.txt && echo FIX_OK']);
     assert.equal(discovered3.status, 0, `discover (exploring->decompose) failed: ${discovered3.stderr}`);
-    const decomposed = fgos(repoRoot, ['decompose', submitted.id, '--verdict', 'pass-through', '--reason', 'single self-improve fix, no split needed']);
+    const decomposed = fgos(repoRoot, ['plan', submitted.id, '--verdict', 'pass-through', '--reason', 'single self-improve fix, no split needed']);
     assert.equal(decomposed.status, 0, `decompose failed: ${decomposed.stderr}`);
     commitPending(repoRoot, `state: discover+decompose ${submitted.id}`);
 

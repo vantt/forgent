@@ -589,7 +589,7 @@ thật" cho tình trạng hiện tại.
 | 4 | Status flow theo domain | **CHỐT (round 4):** LÀM — domain sở hữu bảng transition riêng (full fidelity, không lủng); `statusCategory` KHÔNG dùng để validate move, chỉ phục vụ cơ chế domain-agnostic (mục 6) | HIGH — supersede thật D1-D3, cần decision record + audit toàn bộ consumer `fsm.mjs` | **ĐÃ SHIP, NHƯNG THU HẸP HƠN round-4 ĐỀ XUẤT** — domain KHÔNG sở hữu bảng transition (`TRANSITIONS` vẫn 1 bảng CHUNG, DISCUSSION.md §1/§6 tự nhận đã BÁC khung round-4 gốc); domain chỉ sở hữu `statusLabels` (map 6 status đầu → `statusCategory`, KHÔNG phải literal status/cạnh chuyển). 4 status đoạn đuôi (`delivered/retrospective/cleanup/done`) là chuỗi phổ quát MỚI, report round 1-12 chưa từng nghĩ tới — xem `0027` |
 | 6 mới | Tách `status` (label, domain sở hữu, dùng validate move) khỏi `statusCategory` (foundation, dùng cho compound-learn/frontier/rollup/outcome...) | Nên làm cùng đợt với #4 — 2 field bổ trợ nhau, không tách rời được nữa sau round 4 | MEDIUM-HIGH (đổi mọi consumer domain-agnostic sang đọc category, xem danh sách mục 6) | **ĐÃ SHIP** — `tsk-38t-2`/`tsk-38t-4`, `statusCategory` đóng băng lúc ghi, không dùng validate move (đúng thiết kế), domain thật thứ 2 `fixture-marketing` chứng minh end-to-end (`tsk-38t-7`) |
 
-**Về câu hỏi riêng "skill fgos-planning coi lại việc dùng harness ghi task
+**Về câu hỏi riêng "skill fgos-coding-planning coi lại việc dùng harness ghi task
 cho đúng quan hệ/type":** phụ thuộc kết quả quyết định mục 2 (type hierarchy)
 trước — chưa nên implement, để ở mục câu hỏi mở dưới.
 
@@ -762,7 +762,7 @@ Mọi gate đều DUPLICATE qua 2 đường tách biệt (main-source/branch-sou
 `test/cli/fgos.test.mjs` dòng 3416-3887 và 5556-5764) — sửa gì cũng x2 bề
 mặt.
 
-**Câu hỏi kiến trúc chưa quyết (để `fgos-exploring` đào, không tự chốt ở
+**Câu hỏi kiến trúc chưa quyết (để `fgos-coding-exploring` đào, không tự chốt ở
 đây):** domain `manual-confirm` có nên đi qua `return` luôn hay không, hay
 bỏ qua `return` hoàn toàn — đi thẳng `doing→awaiting-approval` qua verb/
 đường riêng — thay vì nhét vào `return` rồi tắt từng gate một.
@@ -800,7 +800,7 @@ compound-learn xong", RUL50 gate cả 2 lối vào `done` bằng compound-learn)
   (`EDITABLE_FIELDS`, event fold) — làm song song không phối hợp dễ conflict
   thật.
 
-**Khuyến nghị:** đưa `tsk-3p1` vào CHUNG 1 vòng fgos-exploring với thiết kế
+**Khuyến nghị:** đưa `tsk-3p1` vào CHUNG 1 vòng fgos-coding-exploring với thiết kế
 `statusCategory` (Phase 2), không tách 2 vòng riêng.
 
 ## Câu hỏi chưa giải quyết
@@ -881,7 +881,7 @@ qua `retrospective`, chờ dọn TTL). Decision record thật:
 khung RỘNG HƠN record này thật sự chốt").
 
 **Khác biệt thật so với round 4 (đáng ghi nhớ, không phải lỗi round 4 — là
-kết quả của phiên `fgos-exploring` THU HẸP phạm vi đúng lúc):**
+kết quả của phiên `fgos-coding-exploring` THU HẸP phạm vi đúng lúc):**
 
 - 10 status hôm nay (không phải 7): `todo/doing/blocked/awaiting-human/
   awaiting-approval/wontfix` (**6 status ĐẦU**) cộng `delivered/retrospective/

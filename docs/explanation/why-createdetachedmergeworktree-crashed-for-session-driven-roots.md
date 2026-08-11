@@ -27,7 +27,7 @@ asserted that guarantee held universally:
 
 That's real for a root the runner loop actually dispatched. It's false for
 a root only ever driven by a live session — `/fgOS:pick` into
-`fgos-planning`'s `fgos add --parent` split, `fgos-fanout`, or similar —
+`fgos-coding-planning`'s `fgos add --parent` split, `fgos-fanout`, or similar —
 which never routes through `loop.mjs`'s dispatch path and so never gets
 the early `createBranchRef` call. The first place such a root's branch was
 ever needed was exactly this merge step, and by then it simply wasn't

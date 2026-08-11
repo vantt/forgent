@@ -138,7 +138,7 @@ passes.)
 ## Explicitly out of scope for tsk-4ad
 
 > Việc CHƯA nằm trong tsk-4ad: sửa prose 3 skill
-> (fgos-planning/validating/executing) + CLAUDE.md để MỖI BƯỚC workflow
+> (fgos-coding-planning/validating/executing) + CLAUDE.md để MỖI BƯỚC workflow
 > tự hỏi capability (`fgos tool query --capability impact-analysis
 > --status present`) thay vì hardcode tên "GitNexus" trong logic gate —
 > đó là injection thật sự (xem mục "Ví dụ end-to-end" ở trên), và là
@@ -146,7 +146,7 @@ passes.)
 > DOCTOR_CHECKS entry, và ghi chú đọc-hiểu-được này.
 
 (Not done by tsk-4ad: rewriting the three skills'
-(fgos-planning/validating/executing) prose plus CLAUDE.md so every
+(fgos-coding-planning/validating/executing) prose plus CLAUDE.md so every
 workflow step asks the capability (`fgos tool query --capability
 impact-analysis --status present`) instead of hardcoding the name
 "GitNexus" in gate logic — that's the real injection point, and it's

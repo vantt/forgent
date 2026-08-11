@@ -50,7 +50,7 @@ into one `reasons` array, and `bin/fgos.mjs`'s `case 'cleanup'` (line
 
 | ID | Decision |
 |----|----------|
-| D1 | `assessCleanupReadiness` returns two separate groups instead of one flat `ready`/`reasons` pair — `notReadyYet` (TTL-only) and `failed` (content + merge checks). Shape and field names are the implementer's call in `fgos-planning`, not fixed here. |
+| D1 | `assessCleanupReadiness` returns two separate groups instead of one flat `ready`/`reasons` pair — `notReadyYet` (TTL-only) and `failed` (content + merge checks). Shape and field names are the implementer's call in `fgos-coding-planning`, not fixed here. |
 | D2 | `bin/fgos.mjs`'s `case 'cleanup':` branches on the two groups: `failed` non-empty → `cleanup -> blocked` exactly as today, joined-reason string unchanged. `failed` empty AND `notReadyYet` non-empty → no-op: no `moveWork` call, item stays at `cleanup`, no new event is written. |
 | D3 | `pickNextCleanupItem`'s existing TTL pre-filter (`cleanup-pool.mjs:43-44`) is kept as a scheduling optimization (skip invoking a verb call known in advance to be a no-op) — no longer read as a correctness guard. Its comment gets updated to say so explicitly, so a future reader doesn't mistake it for the guard again. |
 | D4 | Recovering the 6 historically-stuck `blocked` items (tsk-3b3, tsk-1ca, tsk-3w3x, tsk-3o3, tsk-3xo, tsk-5y5) is manual operational follow-up through the existing mechanical `blocked -> delivered` retry edge (D2 of the parent feature) — not new code, not part of this item's test/acceptance scope, and not performed by this item itself. |
@@ -79,5 +79,5 @@ into one `reasons` array, and `bin/fgos.mjs`'s `case 'cleanup'` (line
 
 - Exact return-value shape for the no-op verb result (field names,
   whether `notReadyYet` reasons are surfaced to the caller) — implementer
-  choice, left to `fgos-planning`/execution, not locked here (out of this
+  choice, left to `fgos-coding-planning`/execution, not locked here (out of this
   skill's scope per its own rules).

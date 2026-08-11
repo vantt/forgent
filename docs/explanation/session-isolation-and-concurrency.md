@@ -114,7 +114,7 @@ The investigation itself is worth noting for how it corrected course
 mid-stream: its first-pass conclusion (confirm the lock design is sound by
 construction; the flake trigger is the lock's 10-second acquire timeout
 under full-suite CPU/disk contention, not a real race) was reversed once
-`fgos-validating`'s reality check re-read the code and found it had only
+`fgos-coding-validating`'s reality check re-read the code and found it had only
 checked the *stale-holder-reclaim* branch's TOCTOU guard (which is sound)
 and missed the *earlier*, different window — the fast-path create itself.
 Once found, the match to the already-fixed `events.mjs` bug was exact:

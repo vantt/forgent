@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-// retrospective-doc-write-path D1/D3: `fgos-compounding`'s own document is
+// retrospective-doc-write-path D1/D3: `fgos-coding-compounding`'s own document is
 // pure prose read by an agent, with no function boundary `npm test` can call
 // directly — so what these tests prove is the artifact the phase actually
 // produces: the skill text itself carries the write-before-tag order and
@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 // content rather than simulating an agent following it.
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const SKILL_PATH = path.resolve(__dirname, '../../.claude/skills/fgos-compounding/SKILL.md');
+const SKILL_PATH = path.resolve(__dirname, '../../.claude/skills/fgos-coding-compounding/SKILL.md');
 const skillText = fs.readFileSync(SKILL_PATH, 'utf8');
 
 function stepIndex(stepLabel) {
@@ -22,13 +22,13 @@ function stepIndex(stepLabel) {
   return match.index;
 }
 
-test('fgos-compounding writes the document before it stores the tag (D1/D3 order)', () => {
+test('fgos-coding-compounding writes the document before it stores the tag (D1/D3 order)', () => {
   const writeStep = stepIndex('Gather every linked capture, then grow or create the document');
   const tagStep = stepIndex('Store the tag\\.');
   assert.ok(writeStep < tagStep, 'the document-writing step must appear before the tag-storing step — write first, tag second, per D3');
 });
 
-test('fgos-compounding\'s document-writing step resolves the main checkout root before writing or committing', () => {
+test('fgos-coding-compounding\'s document-writing step resolves the main checkout root before writing or committing', () => {
   const writeStep = stepIndex('Gather every linked capture, then grow or create the document');
   const tagStep = stepIndex('Store the tag\\.');
   const writeStepText = skillText.slice(writeStep, tagStep);
@@ -42,7 +42,7 @@ test('fgos-compounding\'s document-writing step resolves the main checkout root 
   assert.match(writeStepText, /git -C "\$root" commit/, 'the write step must commit at the resolved root before the tag step runs — an uncommitted document is what let 34 real documents go missing');
 });
 
-test('fgos-compounding\'s tag-storing step names the D3 refusal it now depends on', () => {
+test('fgos-coding-compounding\'s tag-storing step names the D3 refusal it now depends on', () => {
   const tagStep = stepIndex('Store the tag\\.');
   const nextStep = stepIndex('Confirm the close');
   const tagStepText = skillText.slice(tagStep, nextStep);

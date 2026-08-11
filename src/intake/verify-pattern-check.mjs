@@ -13,7 +13,7 @@
 // during tsk-5kn's own clarify pass — a verify that is syntactically fine
 // shell but targets the wrong claim. That responsibility now belongs to
 // whichever skill calls `fgos discover`/`fgos decompose`, backed by
-// `fgos-validating`'s own reality-gate discipline (the same mechanism that
+// `fgos-coding-validating`'s own reality-gate discipline (the same mechanism that
 // caught both live disputes and this exact finding).
 
 // tsk-12t D1/D2/D4: mechanical pre-check for the documented `node --test`/

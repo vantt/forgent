@@ -17,7 +17,7 @@ leaving `main` untouched but the item parked.
 
 ## Why `fgos return` won't work here
 
-`fgos-code-implement`'s own Return-step hard rule used to say "if
+`fgos-coding-implement`'s own Return-step hard rule used to say "if
 `return` reports `blocked`, treat that exactly like a failed verify:
 diagnose, fix, and return again" — correct for the case where `return`
 *itself* just moved the item to `blocked` while `status` was still

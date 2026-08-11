@@ -12,7 +12,7 @@ timestamp: 2026-08-11T05:20:00.000Z
 the user before starting work on it (tsk-62x, tsk-62x-2, done). This item
 generalizes that same display to every OTHER interactive fgOS launcher
 that drives a coding-domain item through its lifecycle — `/fgOS:discover`,
-`/fgOS:decompose`, `/fgOS:discover-next`, and `/fgOS:cook` — so a person
+`/fgOS:plan`, `/fgOS:discover-next`, and `/fgOS:cook` — so a person
 watching any of them sees what's about to be worked on, the same way
 `/fgOS:pick` already lets them.
 
@@ -26,7 +26,7 @@ against the interactive/headless transparency law).
 **D1 — Single insertion point inside `fgos-coding-driving`'s own loop, not
 duplicated per wrapper skill.** `fgos-coding-driving` is the one shared
 loop every interactive coding-domain caller (`/fgOS:pick`, `/fgOS:discover`,
-`/fgOS:decompose`, `/fgOS:discover-next`, `/fgOS:cook`) already drives
+`/fgOS:plan`, `/fgOS:discover-next`, `/fgOS:cook`) already drives
 through. Adding the display there means every one of those five callers
 gets it automatically, with zero duplication, and `/fgOS:pick`'s own
 already-shipped step 3 (tsk-62x-2) gets simplified to drop its now-
@@ -122,7 +122,7 @@ No changes needed to `discover`/`decompose`/`discover-next`/`cook`'s own
 ## Pinned terms
 
 - **Interactive launcher** — any of `/fgOS:pick`, `/fgOS:discover`,
-  `/fgOS:decompose`, `/fgOS:discover-next`, `/fgOS:cook`: a command
+  `/fgOS:plan`, `/fgOS:discover-next`, `/fgOS:cook`: a command
   invoked inside a live, visible Claude Code session that drives a
   coding-domain item through `fgos-coding-driving`. Distinct from the
   headless `fgos-runner --watch`/`--once` daemon, which never invokes

@@ -89,7 +89,7 @@ the two changed functions):**
 - `src/setup/registrations.mjs:343` — see file 2 above; this is the one
   real caller that needed a change, not just a check.
 
-**Proof points (carried to `fgos-validating`, not proven here):**
+**Proof points (carried to `fgos-coding-validating`, not proven here):**
 
 | Risk | Proof point |
 |---|---|
@@ -149,4 +149,4 @@ answerable filter; none changes scope/behavior/data shape/acceptance)
 ## No CONTEXT.md gaps found
 
 Every choice above cites D1/D2/D3 directly; nothing required handing back
-to `fgos-exploring`.
+to `fgos-coding-exploring`.

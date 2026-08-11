@@ -86,7 +86,7 @@ evidence).
 - Concrete shape of the recurrence-prevention guard (D3) -- a git merge
   driver for `.fgos/events.jsonl`, a documented hand-resolution procedure,
   a CI/pre-commit contiguity check, or some combination -- is an
-  implementation choice for `fgos-planning` to shape, not a product
+  implementation choice for `fgos-coding-planning` to shape, not a product
   decision to lock here.
 - Whether the repair script that performs the D4 renumber is a one-off
   throwaway or a reusable `scripts/` tool (mirroring the two existing

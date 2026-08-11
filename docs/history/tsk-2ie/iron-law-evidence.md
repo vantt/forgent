@@ -1,7 +1,7 @@
 # Iron Law evidence: tsk-2ie
 
 Classification (`classifyIronLaw({ filesChanged, description })`, run at
-`fgos-code-implement` time against the item's own diff, the same function/module
+`fgos-coding-implement` time against the item's own diff, the same function/module
 list `approve`'s real gate uses — `src/evolve/iron-law.mjs`):
 
 ```json
@@ -64,6 +64,6 @@ cases, CLI `--superseded-by`/`--duplicates` round-trip cases):
 ```
 
 Baseline (pre-diff, same command, same test files, captured at
-`fgos-validating` time before any implementation started): 2238 tests,
+`fgos-coding-validating` time before any implementation started): 2238 tests,
 2233 pass, 0 fail, 5 skipped. 31 new tests added by this diff, zero
 regressions in either direction.

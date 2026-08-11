@@ -79,7 +79,7 @@ ordering constraint from other work):
 
 `impact-analysis: full` (GitNexus registered and `present` — `fgos tool
 query --capability impact-analysis --status present`, confirmed during
-`fgos-exploring`). Per `CLAUDE.md`'s MUST rule, `fgos-code-implement` runs
+`fgos-coding-exploring`). Per `CLAUDE.md`'s MUST rule, `fgos-coding-implement` runs
 `impact({target: "moveWork", direction: "upstream"})` and
 `impact({target: "mergeRunnerItem", direction: "upstream"})` before
 editing either symbol, and reports blast radius before proceeding — not
@@ -87,7 +87,7 @@ optional at build time given both are shared, heavily-called symbols.
 
 ## Risk map
 
-| Component | Risk | Proof point (carried to `fgos-validating`) |
+| Component | Risk | Proof point (carried to `fgos-coding-validating`) |
 |---|---|---|
 | `store.mjs` validator extraction | low | existing acceptance-clause test suite (`store.test.mjs`, `fgos.test.mjs:6606-6784`) stays green, unmodified — pure refactor, no new test needed for this step alone |
 | Local pre-flight wiring (leaf→root, root→main) | medium | new integration test: runner-sourced item, real `fgw/<id>` branch, acceptance clause with missing evidence, real `approve` call — assert refusal, assert **no new commit lands on the target branch** (`git log` unchanged before/after), assert item status stays `awaiting-approval` |

@@ -60,7 +60,7 @@ hooks repeatedly surfaced `GitNexus index is stale (last indexed:
 251d0b5)` against current HEAD throughout this session. Per `CLAUDE.md`'s
 three-way gate, `present` but flagged stale is degraded. Informational
 only here — this skill edits no code; the MUST-run-impact rule binds
-`fgos-code-implement`, not this stop.
+`fgos-coding-implement`, not this stop.
 
 - `src/setup/registrations.mjs:540-551` — `DEFAULT_CLEANUP_TTL_DAYS = 7`,
   registered as global config `cleanup.ttlDays`, with the exact D7 comment

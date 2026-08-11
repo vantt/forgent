@@ -85,7 +85,7 @@ import { createOwnershipStore, resolveRoot, claimRoot, steerFrontier } from './r
 import { claimWork, ClaimError } from './claim-port.mjs';
 import { resolveRepoRoot, fgosDirFromRoot } from './paths.mjs';
 import { FALLBACK_VERIFY, resolveDiscovery } from '../intake/discovery.mjs';
-import { resolveDecompose } from '../intake/decompose.mjs';
+import { resolvePlan } from '../intake/plan.mjs';
 import { classify, generateId } from '../intake/classify.mjs';
 import { setTimeout as delay } from 'node:timers/promises';
 
@@ -1068,7 +1068,7 @@ export async function runOnce(options = {}) {
     // via `opts.stage: 'discovery'` (dispatch.mjs). Discovery is a pure
     // machine-alone pass (D3 — "pha máy-một-mình tách khỏi pha máy+người"):
     // there is no verdict to gate the transition on here, unlike the
-    // clarify->decompose engine's own edge — the worker records
+    // clarify->planning engine's own edge — the worker records
     // its findings in `RESEARCH.md` and the item unconditionally advances
     // `discovery -> exploring` once dispatch settles; the human-facing
     // decision-lock happens at `exploring`, not here. Sequential (mirrors
@@ -1149,23 +1149,35 @@ export async function runOnce(options = {}) {
         }
       }
 
-      // DECOMPOSE SWEEP (stage-decompose D2/D4, mirrors the discovery
-      // dispatch above one stage over): re-reads the view FRESH rather than
-      // reusing the loop above's snapshot, so an item this same tick already
-      // carried through clarify/discovery/exploring is swept in the same
-      // `--once` pass too (the chain must not wait a full extra tick to
-      // continue). Only `todo` is touched, same R15 rule as above — an item
-      // already parked in `awaiting-human` (D3's need-human/risk-heavy gate)
-      // is never re-swept.
+      // PLAN SWEEP (renamed from DECOMPOSE SWEEP, tsk-403 D11 — stage
+      // `decompose` renamed to `planning`; stage-decompose D2/D4, mirrors
+      // the discovery dispatch above one stage over): re-reads the view
+      // FRESH rather than reusing the loop above's snapshot, so an item
+      // this same tick already carried through clarify/discovery/exploring
+      // is swept in the same `--once` pass too (the chain must not wait a
+      // full extra tick to continue). Only `todo` is touched, same R15
+      // rule as above — an item already parked in `awaiting-human` (D3's
+      // need-human/risk-heavy gate) is never re-swept.
       for (const item of Object.values(listWork(dir).work)) {
         const domain = getDomain(item.domain, {
           onUnrecognized: (bad) =>
             log(`fgos-runner: work "${item.id}" has unrecognized domain "${bad}" — folding to "coding".`),
         });
-        const decomposeStage = stageForStep(domain, 'Divide');
-        if (decomposeStage !== undefined && item.stage === decomposeStage && item.status === 'todo') {
-          resolveDecompose(dir, item.id, config, 'runner');
-          log(`fgos-runner: chia-việc swept decompose item "${item.id}"`);
+        const planningStage = stageForStep(domain, 'Divide');
+        // tsk-403 D18: also sweep the legacy `decompose` alias — an item
+        // still parked there (from before the rename) must keep draining
+        // through the SAME mechanical sweep, not be silently excluded from
+        // it just because `stageForStep` no longer resolves NEW items
+        // there. Only activates when a domain declares both names
+        // distinctly (today: only `coding`).
+        const legacyPlanStage = domain.stages?.includes('decompose') && planningStage !== 'decompose' ? 'decompose' : undefined;
+        if (
+          planningStage !== undefined &&
+          (item.stage === planningStage || item.stage === legacyPlanStage) &&
+          item.status === 'todo'
+        ) {
+          resolvePlan(dir, item.id, config, 'runner');
+          log(`fgos-runner: chia-việc swept plan item "${item.id}"`);
         }
       }
     }

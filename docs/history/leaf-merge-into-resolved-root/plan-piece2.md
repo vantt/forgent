@@ -5,9 +5,9 @@ Mode: **standard**
 
 ## Lane — how it was counted
 
-No lane was handed off (this item reached `fgos-planning` through
+No lane was handed off (this item reached `fgos-coding-planning` through
 `/fgOS:pick` → `fgos-coding-driving` → `fgos-clarifying` →
-`fgos-researching` → `fgos-exploring`, none of which run `fgos-routing`'s
+`fgos-researching` → `fgos-coding-exploring`, none of which run `fgos-routing`'s
 Orient step) and no `Mode:` line existed yet in this file. Applying
 `fgos-routing`'s own Mode-gate table directly
 (`.claude/skills/fgos-routing/SKILL.md` §"Mode gate"), same table
@@ -132,8 +132,8 @@ isResolvedStatus(view.work[rootId])) { throw new StoreError('validation',
 ...) }` — message names the root id, its status, and `fgos sync-root
 <rootId>`, plus an override flag mirroring `--acknowledge-drift`'s
 existing shape (exact flag name — reuse `--acknowledge-drift` itself, or a
-new one — is an implementation-depth choice for `fgos-code-implement`;
-either is consistent with this plan, `fgos-validating`'s reality check can
+new one — is an implementation-depth choice for `fgos-coding-implement`;
+either is consistent with this plan, `fgos-coding-validating`'s reality check can
 weigh in on which reads clearer). Runs after the worktree-identity guards
 already there, before the Iron Law gate.
 
@@ -150,7 +150,7 @@ Add the id to a distinctly-named new field instead (backward-compatible:
 herdr-plugin's `MergeListData` has no `deny_unknown_fields`, so an unknown
 field is silently ignored by existing herdr-plugin builds — confirmed from
 `fgos.rs`'s own struct definitions). Exact field name is implementation
-depth for `fgos-code-implement`; this plan fixes the REQUIREMENT (must not
+depth for `fgos-coding-implement`; this plan fixes the REQUIREMENT (must not
 silently disappear, must not overload `blockedOnSync`), not the literal
 key.
 
@@ -158,7 +158,7 @@ key.
 
 | Component | Risk | What proves it |
 |---|---|---|
-| `approve` refusal (Change 1) | high — `approve` is the widest-reach path in the repo | `fgos-validating`'s own reality check; a new test in `test/cli/fgos.test.mjs` exercising a resolved-root leaf hitting the refusal, and a wontfix-root leaf hitting it too (D2) |
+| `approve` refusal (Change 1) | high — `approve` is the widest-reach path in the repo | `fgos-coding-validating`'s own reality check; a new test in `test/cli/fgos.test.mjs` exercising a resolved-root leaf hitting the refusal, and a wontfix-root leaf hitting it too (D2) |
 | hoisting before `--github` | medium — same bug class the Iron Law gate's own f01 finding already fixed once; easy to silently regress by placing the new check inside the local-merge branch only | a test asserting the refusal is reached before the `source === 'runner'` branch splits (i.e. covers both transports), or an explicit unit test on the gate logic isolated from a live GitHub call |
 | `mergeReadiness` reporting change (Change 2) | medium — `ready`/`blocked_on_sync` CONTENTS are a real cross-language contract (`herdr-plugin/src/fgos.rs` deserializes both) | existing `test/state/graph-harness.test.mjs` regression stays green for every untouched case; new test pins the new bucket's shape explicitly; confirm no `deny_unknown_fields` in `fgos.rs` (already checked above) so an unrecognized new field never breaks an existing herdr-plugin build |
 | `wontfix` inclusion (D2) | low-medium — a genuine behavior widening beyond D1's original text | new test: a leaf whose root is `wontfix` also gets refused and also excluded from `ready` |

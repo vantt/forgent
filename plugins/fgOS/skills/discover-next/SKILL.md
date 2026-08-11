@@ -65,7 +65,7 @@ CONTEXT.md` D2).
    - `ceiling: stage:decompose` when step 2's `stage` was `"clarify"`,
    - `ceiling: stage:executing` when step 2's `stage` was `"decompose"`.
 
-   Never invoke `fgos-exploring`/`fgos-planning`/`fgos-validating` by name
+   Never invoke `fgos-coding-exploring`/`fgos-coding-planning`/`fgos-coding-validating` by name
    directly here — the driver resolves which skill a stage maps to through
    its own registry lookup, the one place that mapping is allowed to live
    (`fgos-coding-driving`'s own red-flag rule). This dynamic ceiling is
@@ -73,7 +73,7 @@ CONTEXT.md` D2).
    (`docs/history/discover-decompose-skill-wrapper-verdict-routing/
    CONTEXT.md` D2, D6): without it, a `decompose`-stage pick that resolves
    `pass-through` would let the driving loop cascade straight into
-   `fgos-code-implement` — silently starting a real build from what this
+   `fgos-coding-implement` — silently starting a real build from what this
    command is meant to be a single judgment step.
 
 5. **Report whatever `fgos-coding-driving` reported.** Relay its stop
@@ -83,7 +83,7 @@ CONTEXT.md` D2).
 
    - **reached ceiling at stage `decompose`** (picked stage was `clarify`)
      — item cleared clarify with a real verify command now attached;
-     `/fgOS:decompose <id>` is the next step.
+     `/fgOS:plan <id>` is the next step.
    - **reached ceiling at stage `executing`** (picked stage was
      `decompose`) — item passed through decompose, ready to build.
    - **anchored by open children** — item split into real children; relay

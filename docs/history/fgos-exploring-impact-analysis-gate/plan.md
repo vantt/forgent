@@ -1,4 +1,4 @@
-# fgos-exploring-impact-analysis-gate — plan
+# fgos-coding-exploring-impact-analysis-gate — plan
 
 Item: `tsk-17w`. Decisions: `CONTEXT.md` D1-D3 (this directory).
 
@@ -10,7 +10,7 @@ contracts, cross-platform, existing covered behavior, weak proof, or
 multi-domain apply. This is a one-file, one-section markdown edit inside a
 Claude Code skill's own instruction prose — no runtime code, no CLI
 surface, no schema, no test suite covers `SKILL.md` prose today (scouted:
-no hit for `fgos-exploring` content assertions in `test/`, only its FSM
+no hit for `fgos-coding-exploring` content assertions in `test/`, only its FSM
 routing entry in `test/state/workflow-stage-graphs.test.mjs` and
 `test/cli/fgos.test.mjs`, neither of which reads `SKILL.md` text). A direct
 note is the honest size — a phased plan would invent structure this item
@@ -22,7 +22,7 @@ piece done in one pass.
 
 ## Approach
 
-Edit `.claude/skills/fgos-exploring/SKILL.md` step 1 ("Scope the gray
+Edit `.claude/skills/fgos-coding-exploring/SKILL.md` step 1 ("Scope the gray
 areas") only. Directly after the existing `rg` keyword-scout code block
 (current line ~72, ending `| head -20`) and before the "Cite what the scout
 actually found..." paragraph, insert a new paragraph + code block that:
@@ -51,9 +51,9 @@ Risk map:
 
 | Component | Risk | What would prove it |
 |---|---|---|
-| `.claude/skills/fgos-exploring/SKILL.md` edit | low — prose-only, no code path, no schema | grep-based verify below; a human/agent read-through of the edited section for the three required elements |
+| `.claude/skills/fgos-coding-exploring/SKILL.md` edit | low — prose-only, no code path, no schema | grep-based verify below; a human/agent read-through of the edited section for the three required elements |
 
-No medium/high risk entry — no proof point carried to `fgos-validating`
+No medium/high risk entry — no proof point carried to `fgos-coding-validating`
 beyond the verify command itself.
 
 **Impact-analysis capability gate** (checked per this skill's step 3, `fgos
@@ -66,12 +66,12 @@ analysis would apply to (a `.md` file, not indexed code).
 
 Single task, no split:
 
-- **Task**: extend `.claude/skills/fgos-exploring/SKILL.md` step 1 with the
+- **Task**: extend `.claude/skills/fgos-coding-exploring/SKILL.md` step 1 with the
   impact-analysis capability query + posture-recording sub-step described
   above, and add `tool` to the Hard Rules bare-verb list.
-- **Verify**: `rg -n "tool query --capability impact-analysis" .claude/skills/fgos-exploring/SKILL.md`
+- **Verify**: `rg -n "tool query --capability impact-analysis" .claude/skills/fgos-coding-exploring/SKILL.md`
   matches (the new query call exists), and
-  `rg -n "add, ask, answer, decision, discover, tool" .claude/skills/fgos-exploring/SKILL.md`
+  `rg -n "add, ask, answer, decision, discover, tool" .claude/skills/fgos-coding-exploring/SKILL.md`
   matches (the Hard Rules list was updated) — both real, runnable commands,
   not placeholders.
 
@@ -79,4 +79,4 @@ Single task, no split:
 
 Per the locked decision that Execute and its verify already have a working
 mechanical path, this plan does not redesign that — it names the one task
-and its one verify command above; `fgos-code-implement` runs it.
+and its one verify command above; `fgos-coding-implement` runs it.

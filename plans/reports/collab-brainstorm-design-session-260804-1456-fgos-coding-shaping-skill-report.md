@@ -2,12 +2,12 @@
 
 Item: tsk-69g. Stage: clarify (not yet run). This report is scout evidence
 for that clarify pass — every decision below already has human sign-off
-from this conversation; fgos-exploring should extract, not re-ask.
+from this conversation; fgos-coding-exploring should extract, not re-ask.
 
 ## Mục tiêu & đề bài
 
 fgOS lacks a phase for collaborative, multi-turn, multi-day design
-brainstorming upstream of `fgos-exploring`/`fgos-planning`. Discussion
+brainstorming upstream of `fgos-coding-exploring`/`fgos-coding-planning`. Discussion
 today either happens ad hoc (lost) or gets forced into the Socratic-lock
 shape those two skills already use — wrong fit for open-ended
 exploration where the human wants to revisit, compare options, and change
@@ -28,7 +28,7 @@ All rõ (resolved this session):
 | # | Question | Resolution |
 |---|---|---|
 | 1 | Domain-agnostic name ("shape") or domain-scoped? | Domain-scoped — only `coding` domain is real (`src/state/workflow-stage-graphs.mjs`: `synthetic` is illustrative/disposable, never loads a skill; `discovery.mjs`/`decompose.mjs` hardcode coding's stage literals). |
-| 2 | Reuse fgos-exploring/fgos-planning, or build parallel logic? | Reuse — never re-implement their CONTEXT.md/plan.md authoring. |
+| 2 | Reuse fgos-coding-exploring/fgos-coding-planning, or build parallel logic? | Reuse — never re-implement their CONTEXT.md/plan.md authoring. |
 | 3 | 1 skill or 2, for interactive vs. fast-distill mode? | 1 skill, 2 entry commands (matches discover/discover-next, merge-list/merge-next precedent). |
 | 4 | Separate index file per parent's children? | No — reuse `parent` field + `fgos rollup <id>` + plan.md's own split-list section. Zero-index-file precedent across all 162 existing `docs/history/*/` folders. |
 | 5 | How does a later cold session (different day) extract the right content without missing it? | 3-layer mitigation: native-first in-session invoke (primary), per-task scoped `refs` anchors written to stranger-readable standard (fallback for cold pickup), real `fgos decision` calls per stabilized point (machine-readable trail independent of doc-reading quality). |
@@ -48,9 +48,9 @@ All rõ (resolved this session):
   `brainstorm` skill).
 - **D2** — No duplicated authoring logic. The skill never writes
   `CONTEXT.md`/`plan.md` itself. It sets the item's existing `refs`
-  field (already read by `fgos-exploring` step 1) to a scoped anchor
-  inside its own document, then invokes `fgos-exploring` and
-  `fgos-planning` directly in the same session once the discussion has
+  field (already read by `fgos-coding-exploring` step 1) to a scoped anchor
+  inside its own document, then invokes `fgos-coding-exploring` and
+  `fgos-coding-planning` directly in the same session once the discussion has
   converged — Native-First Dispatch Doctrine (tsk-27y D1/D2), the same
   reason that doctrine already exists: the live session has full context,
   a later blind session would have to re-derive it.
@@ -79,7 +79,7 @@ All rõ (resolved this session):
      relationship to sibling tasks, and a draft verify command.
 - **D4** — Brainstorm tone: open conversational prose, never a
   structured-choice tool forcing a decision each round (matches
-  `fgos-exploring`'s own existing "ask as open conversational prose, not
+  `fgos-coding-exploring`'s own existing "ask as open conversational prose, not
   `AskUserQuestion`" rule, extended here to the whole loop, not just
   individual questions). A D-ID is minted only once a point holds across
   multiple rounds without changing — revisiting and changing one's mind
@@ -87,7 +87,7 @@ All rõ (resolved this session):
   at the terminal handoff (D2) — never mid-brainstorm.
 - **D5** — No new index file for a parent's children. Reuse `parent`
   field, `fgos rollup <id>` (live status), and `plan.md`'s own mandatory
-  split-list section (`fgos-planning` step 5 already requires this).
+  split-list section (`fgos-coding-planning` step 5 already requires this).
   Matches the observed zero-index-file convention across all 162
   existing `docs/history/*/` folders (checked directly, no exceptions
   found).
@@ -104,7 +104,7 @@ All rõ (resolved this session):
 ## Q&A log (condensed)
 
 1. Q: suggest a name; can distill learn from superpowers/ck first? →
-   A: scouted `fgos-exploring`/`fgos-planning`/`distill` conventions
+   A: scouted `fgos-coding-exploring`/`fgos-coding-planning`/`distill` conventions
    before naming (see D1).
 2. Q: should there be one index file per task to manage child files? →
    A: no — checked all 162 `docs/history/*/` folders, zero index-file
@@ -126,7 +126,7 @@ All rõ (resolved this session):
    A: yes, §6 "Thiết kế đã chốt", regenerate-not-append (D3).
 8. Q: submit as one task or split? → A: one — no hard-gate flags
    (auth/data-model/external-system/public-contract-break) present yet
-   to justify a pre-split guess; let `fgos-planning`'s own mode-gate
+   to justify a pre-split guess; let `fgos-coding-planning`'s own mode-gate
    (decompose stage) decide.
 
 ## Thiết kế đã chốt
@@ -148,12 +148,12 @@ Both entries converge on the same terminal step: once the human confirms
 the discussion has converged (§6 is stable, §7's task list is real),
 the skill sets each relevant item's `refs` to point at its own
 `#task-<slug>` anchor, then — in the same session — invokes
-`fgos-exploring` and `fgos-planning` directly for each item
+`fgos-coding-exploring` and `fgos-coding-planning` directly for each item
 (Native-First Dispatch). Those two skills do the actual `CONTEXT.md`/
 `plan.md` authoring exactly as they do today; because `refs` already
 resolves their own material/grounded/answerable gray-area check, they
 find little or nothing left to ask and move straight to their own Gate.
-`fgos-planning`'s step 5 (existing mechanism, unchanged) creates any
+`fgos-coding-planning`'s step 5 (existing mechanism, unchanged) creates any
 child items via `fgos add --parent <id> --docs-ref ...`.
 
 ```mermaid
@@ -163,16 +163,16 @@ flowchart TD
     D -->|"§6 Thiết kế đã chốt stable"| G{Converged?}
     G -- no, keep discussing --> A
     G -- yes --> R["set refs -> DISCUSSION.md#task-slug\nper relevant item"]
-    R --> E["fgos-exploring\n(native-first, same session)"]
+    R --> E["fgos-coding-exploring\n(native-first, same session)"]
     E -->|writes| CTX[CONTEXT.md]
-    E --> P["fgos-planning\n(native-first, same session)"]
+    E --> P["fgos-coding-planning\n(native-first, same session)"]
     P -->|writes| PLAN[plan.md]
     P -->|"step 5: split, if any"| CH["fgos add --parent --docs-ref\n(child items)"]
 ```
 
 Never duplicated: `CONTEXT.md`/`plan.md` authoring rules, D-ID gate
 mechanics, mode-flag counting, split logic. All of it stays exactly
-where it already lives, in `fgos-exploring`/`fgos-planning`.
+where it already lives, in `fgos-coding-exploring`/`fgos-coding-planning`.
 
 ## Danh mục hạng mục / task
 
@@ -188,14 +188,14 @@ Single task for now (D-decompose stage will decide whether to split):
 - **Draft verify:** manual — new skill files exist, both commands
   invocable, produced `DISCUSSION.md` matches §D3's section shape, and
   a smoke run against a throwaway item shows `refs` set + native-first
-  `fgos-exploring` invocation producing a non-empty `CONTEXT.md` with
+  `fgos-coding-exploring` invocation producing a non-empty `CONTEXT.md` with
   zero re-asked questions when `refs` already answered them. (Real
-  verify command to be finalized during `fgos-planning`'s own pass —
+  verify command to be finalized during `fgos-coding-planning`'s own pass —
   this skill's own rule (D2) says this report never authors that for
   it.)
 
 ## Unresolved questions
 
 None outstanding from this session. Everything above is locked pending
-`fgos-exploring`'s own formal pass (which should find near-zero new
+`fgos-coding-exploring`'s own formal pass (which should find near-zero new
 gray areas, per this report's own §Vấn đề #5 mitigation).

@@ -29,7 +29,7 @@ bundled three genuinely different concerns into one gate:
 
 1. **Code merged** — the actual work landed on `main`.
 2. **Learning synthesized** — the retrospective doc/decision-record work
-   now done by `fgos-compounding`.
+   now done by `fgos-coding-compounding`.
 3. **Worktree reclaimed** — housekeeping, freeing the isolated worktree
    the item's work happened in.
 
@@ -118,7 +118,7 @@ verb it hung off of — is retired outright, not layered alongside the new
 `retrospective` status. Keeping both would have meant two mechanisms doing
 the same reflect-and-learn job along two different axes (`stage` vs.
 `status`) at once — accepted as redundant technical debt if it had
-shipped that way, so it wasn't shipped that way. `fgos-compounding` (the
+shipped that way, so it wasn't shipped that way. `fgos-coding-compounding` (the
 skill this very synthesis runs through) now triggers on the `retrospective`
 *status*, processed by a dedicated batch loop that scans every `delivered`
 item once per invocation — never inline inside `return`/`approve` the way

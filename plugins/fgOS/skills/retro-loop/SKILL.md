@@ -18,7 +18,7 @@ Wraps the existing `loop` skill (invoked as `/loop`) around the existing
 `status:retrospective` item in sequence, visibly, inside this same
 conversation — without hand-typing `/loop /fgOS:retro-next` and
 re-deriving its stop rules every time. Never writes `.fgos/` state
-directly, never re-implements `fgos-compounding`'s synthesis or the
+directly, never re-implements `fgos-coding-compounding`'s synthesis or the
 `retrospective`/`cleanup` verbs, and never adds a new CLI verb
 (`docs/history/fgos-retro-loop/CONTEXT.md`'s own scope boundary).
 
@@ -39,7 +39,7 @@ precedent `merge-loop`/`discover-loop` already establish; see
 `cleanup-next`'s own per-item step is a purely mechanical
 TTL/content/merge check, so `cleanup-loop` never needed an iteration cap
 (`docs/history/fgos-cleanup-loop/CONTEXT.md` D3). `retro-next`'s own
-per-item step runs `fgos-compounding` — real LLM judgment, the same cost
+per-item step runs `fgos-coding-compounding` — real LLM judgment, the same cost
 profile `discover-loop`'s cap-of-15 exists to bound. This skill follows
 `discover-loop`'s stop-rule shape, not `cleanup-loop`'s.
 
@@ -51,7 +51,7 @@ profile `discover-loop`'s cap-of-15 exists to bound. This skill follows
 2. **Reset the running counters, in this conversation's own context
    only** — never written to any file or `.fgos/` state: `synthesized = 0`
    (items that moved to `cleanup`), `skipped = 0` (items whose
-   `fgos-compounding` synthesis did not confirm complete, or a per-item
+   `fgos-coding-compounding` synthesis did not confirm complete, or a per-item
    CAS conflict `/fgOS:retro-next` reports), and an iteration counter
    against a cap. Default cap: **15** — same number `discover-loop` uses,
    for the same reason (bounding real LLM-judge cost per run). The user
@@ -61,7 +61,7 @@ profile `discover-loop`'s cap-of-15 exists to bound. This skill follows
 3. **Start the loop.** Invoke the `loop` skill with `prompt:
    "/fgOS:retro-next"`, and no fixed interval — let it self-pace
    dynamically, same rationale `discover-loop`/`merge-loop` already give
-   (a real `fgos-compounding` synthesis call's cost varies per item; a
+   (a real `fgos-coding-compounding` synthesis call's cost varies per item; a
    fixed short interval would either hammer the next call too early or
    sit idle needlessly long).
 

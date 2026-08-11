@@ -6,7 +6,7 @@ Mode: small
 ## Lane
 
 No `Mode:` line recorded yet, no Orient hand-off (this session invoked
-`fgos-planning` directly on a split child). Applying `fgos-routing`'s
+`fgos-coding-planning` directly on a split child). Applying `fgos-routing`'s
 Mode-gate directly: auth/authz no, data-model no (config value rename,
 not a schema shape change), audit/security no, cross-platform no, weak
 proof no, multi-domain — arguably yes in spirit (moves ownership from
@@ -77,7 +77,7 @@ config file's other capacity keys.
 Impact-analysis posture: not applicable — no code symbol is being renamed
 or moved, only a JSON config key and one test's string literal.
 
-## Validating findings (fgos-validating pass, real evidence)
+## Validating findings (fgos-coding-validating pass, real evidence)
 
 Read `test/runner/dispatch.test.mjs:618-626`'s `committedRunnerConfig()`
 helper in full: it resolves the MAIN CHECKOUT root explicitly
@@ -97,7 +97,7 @@ final `fgos return` fires. `fgos return`'s re-verify runs
 `committedRunnerConfig()` against whatever the main checkout holds AT THAT
 MOMENT — if the manual rename has not landed yet, the test (updated to
 expect the NEW key name) fails not because the branch's own code is wrong,
-but because the precondition wasn't met first. `fgos-code-implement`
+but because the precondition wasn't met first. `fgos-coding-implement`
 executing this item must apply the main-checkout edit BEFORE running the
 item's own verify/return cycle, not after.
 

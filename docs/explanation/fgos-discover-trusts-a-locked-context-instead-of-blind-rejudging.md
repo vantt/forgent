@@ -1,8 +1,8 @@
 # Why `fgos discover` now trusts a locked CONTEXT.md instead of blindly re-judging
 
 `tsk-ozl` fixed a real, live-observed friction: right after a person ran
-`fgos-exploring` to completion and committed `CONTEXT.md`, calling `fgos
-discover <id>` — as `fgos-exploring`'s own "Hand off" step instructs, to
+`fgos-coding-exploring` to completion and committed `CONTEXT.md`, calling `fgos
+discover <id>` — as `fgos-coding-exploring`'s own "Hand off" step instructs, to
 fire the stage-advance edge — could instead ask a brand-new, unrelated
 question and park the item in `awaiting-human`, even though every
 decision had just been locked.
@@ -12,12 +12,12 @@ decision had just been locked.
 > `resolveDiscovery` (`discovery.mjs:231-273`) calls `judgeDiscovery`
 > unconditionally on every invocation — both the sync `fgos discover <id>`
 > verb (role `session`, called by a live session right after
-> `fgos-exploring` locks decisions) and the runner's RUL19 safety-net
+> `fgos-coding-exploring` locks decisions) and the runner's RUL19 safety-net
 > sweep (role `runner`, scans every `stage:clarify && status:todo` item
 > each loop, specifically to catch items no live session ever touched).
 >
 > `buildDiscoveryPrompt` ... never reads `work.docsRef` or `CONTEXT.md` at
-> all — so even when `fgos-exploring` has already locked every decision
+> all — so even when `fgos-coding-exploring` has already locked every decision
 > and written them to `CONTEXT.md`, the next `fgos discover` call is blind
 > to that artifact and can re-derive a fresh, possibly contradictory
 > judgment, including asking a brand-new question and parking the item in
@@ -25,7 +25,7 @@ decision had just been locked.
 
 Confirmed live, in-session, on this very item:
 
-> Đã xác nhận sống ngay trong phiên này (2026-07-31): fgos-exploring chạy
+> Đã xác nhận sống ngay trong phiên này (2026-07-31): fgos-coding-exploring chạy
 > xong, CONTEXT.md đã khoá D1-D3 và commit lên fgw/tsk-ozl, sau đó gọi
 > 'fgos discover tsk-ozl' ngay — kết quả outcome=unclear, model hỏi một
 > câu MỚI không liên quan (hỏi lại đúng câu hỏi xác nhận này) và item bị
@@ -86,6 +86,6 @@ the wrong thing:
 > the suite: the `test` script hardcodes `node --test
 > 'test/**/*.test.mjs'`, so npm appends the path as an *additional*
 > target rather than filtering to it — confirmed by actually running it
-> during `fgos-validating` (ran the full 1919-test, 111.8s suite instead
+> during `fgos-coding-validating` (ran the full 1919-test, 111.8s suite instead
 > of the intended file). `node --test <path>` directly is the real scoped
 > command.

@@ -1,23 +1,28 @@
-// decompose.mjs — chia-việc engine for stage `decompose` (per stage-decompose
-// D2/D3/D4/D5). Mirrors discovery.mjs's shape exactly one stage over.
+// plan.mjs (renamed from decompose.mjs, tsk-403 D11/D15) — chia-việc
+// engine for stage `planning` (per stage-decompose D2/D3/D4/D5 — `planning`
+// is the renamed `decompose` stage; the verdict-kind vocabulary below
+// ("decompose verdict", `logDecomposeVerdict`, etc.) stays unchanged, D11:
+// it names an outcome, not a stage). Mirrors discovery.mjs's shape exactly
+// one stage over.
 //
 // RETIRED (tsk-1x3 D1/D9/D16, docs/history/fanout-and-delegation-rubric/
 // CONTEXT.md): this module used to spawn a nested `claude -p` judge
-// (judgeDecompose) whenever no caller-supplied verdict was given — the same
-// "soul re-deriving what a live soul already knows" waste `tsk-1ni` found
-// in judgeDiscovery. `resolveDecompose` now requires an explicit
-// `callerVerdict` from any interactive caller; only the tiny/small
-// skip-and-advance trust signal and a mechanical no-op for the runner's own
-// sweep (D16 — resolveDecompose was NOT symmetric with resolveDiscovery
-// here before this item) remain as alternatives.
+// (the retired `judgeDecompose`) whenever no caller-supplied verdict was
+// given — the same "soul re-deriving what a live soul already knows"
+// waste `tsk-1ni` found in judgeDiscovery. `resolvePlan` now requires an
+// explicit `callerVerdict` from any interactive caller; only the
+// tiny/small skip-and-advance trust signal and a mechanical no-op for the
+// runner's own sweep (D16 — resolvePlan was NOT symmetric with
+// resolveDiscovery here before this item) remain as alternatives.
 //
 // FAIL-SAFE, but a DIFFERENT shape from discovery.mjs's (chốt tại
 // validating, S1 feasibility matrix): a caller-supplied verdict that fails
 // validation — or a "decompose" verdict where any child is missing a real
 // `verify` (D2 forbids a placeholder/FALLBACK_VERIFY for a child, unlike
 // discovery's clarify-pass fallback) — resolves to `{ kind: 'invalid' }`
-// and resolveDecompose does NOT write anything: the item is left exactly
-// where it was (stage decompose, status todo).
+// and resolvePlan does NOT write anything: the item is left exactly at
+// the same stage/status it was already at (`planning`, or the legacy
+// `decompose` alias for an item that hadn't yet drained off it, todo).
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -30,8 +35,8 @@ import { computeImpact, computePriority, effortForMode, MODE_EFFORT, isRecognize
 import { footprintOverlapAmong } from '../state/graph-metrics.mjs';
 import { branchNameFor, findCheckoutPath } from '../runner/worktree.mjs';
 
-// Best-effort read of the locked-decisions artifacts fgos-exploring/
-// fgos-planning write under `work.docsRef` (docs/history/<feature>/). A
+// Best-effort read of the locked-decisions artifacts fgos-coding-exploring/
+// fgos-coding-planning write under `work.docsRef` (docs/history/<feature>/). A
 // missing docsRef, or a missing/unreadable file under it, is never fatal.
 //
 // EXPORTED (tsk-ozl D2): discovery.mjs's resolveDiscovery reuses this same
@@ -48,7 +53,7 @@ export function readLockedContext(repoRoot, docsRef) {
       if (content.trim()) sections.push(`## ${file}\n${content.trim()}`);
     } catch {
       // optional artifact; absence is not an error (item may still be
-      // mid-clarify with no plan.md yet, or predate fgos-exploring)
+      // mid-clarify with no plan.md yet, or predate fgos-coding-exploring)
     }
   }
   return sections.join('\n\n');
@@ -56,14 +61,14 @@ export function readLockedContext(repoRoot, docsRef) {
 
 // CONTENT-ROOT RESOLUTION (tsk-1ni D1): every caller of readLockedContext
 // used to pass `stateRoot` (`path.dirname(dir)`, always the main checkout
-// per ADR0020) as the content root too -- but fgos-exploring/fgos-planning
+// per ADR0020) as the content root too -- but fgos-coding-exploring/fgos-coding-planning
 // commit CONTEXT.md/plan.md to the item's OWN fgw/<id> branch/worktree,
 // never to main, so that always missed the real content in the standard
 // interactive workflow (the exact scenario the trust-signal shortcuts
 // above exist to serve). Tries, in order, first hit wins:
 // 1) `process.cwd()` -- the common case: an interactive session invokes
-//    `fgos discover`/`fgos decompose` from inside the worktree it just
-//    committed to (fgos-exploring's/fgos-planning's own hard rule: commit
+//    `fgos discover`/`fgos plan` from inside the worktree it just
+//    committed to (fgos-coding-exploring's/fgos-coding-planning's own hard rule: commit
 //    before calling either verb). Zero extra cost.
 // 2) the item's own fgw/<id> worktree via `git worktree list --porcelain`
 //    (`findCheckoutPath`, the exact parse `promote-preflight.mjs` already
@@ -132,13 +137,13 @@ const DEFAULT_CALLER_INVALID_RATIONALE =
   'Caller-supplied verdict không hợp lệ (thiếu reason, hoặc 1 child thiếu verify).';
 
 // tsk-6b6 D1: log every decompose verdict branch via the shipped
-// addDecision (tsk-63c, store.mjs) -- `outcome` is what resolveDecompose
+// addDecision (tsk-63c, store.mjs) -- `outcome` is what resolvePlan
 // actually did (never just verdict.kind, since the heavy-risk gate can force
 // a `need-human` outcome out of a pass-through/decompose verdict), `label`
 // is the extra bit worth naming in `text` (e.g. child count).
 function logDecomposeVerdict(dir, id, outcome, rationale, label) {
   const text = label ? `decompose verdict: ${outcome} (${label})` : `decompose verdict: ${outcome}`;
-  addDecision(dir, { id, text, source: 'resolveDecompose', kind: 'engine', rationale });
+  addDecision(dir, { id, text, source: 'resolvePlan', kind: 'engine', rationale });
 }
 
 // tsk-3xd D2 (docs/history/tsk-3xd-decompose-child-directive-prose/
@@ -186,7 +191,7 @@ function normalizeChild(child, lockedDecisionIds) {
   // when the parent carries NO locked decisions at all (empty/missing
   // CONTEXT.md) — same graceful-degrade precedent
   // findUncoveredLockedDecisions already sets for that case — so an item
-  // that never went through fgos-exploring does not hard-break decompose
+  // that never went through fgos-coding-exploring does not hard-break decompose
   // entirely; it only requires a non-empty action, not a citation with
   // nothing real to cite.
   if (typeof child.action !== 'string' || !child.action.trim()) return null;
@@ -251,13 +256,13 @@ function buildDecomposeChildrenVerdict(rawReason, rawChildren, lockedContext) {
   return { kind: 'decompose', reason, children };
 }
 
-// tsk-27y D1/D2: resolves a caller-supplied verdict (`fgos decompose
+// tsk-27y D1/D2: resolves a caller-supplied verdict (`fgos plan
 // --verdict ...`) into the `{kind, reason?, children?}` shape
-// resolveDecompose dispatches on (pass-through/need-human/decompose). `raw`
+// resolvePlan dispatches on (pass-through/need-human/decompose). `raw`
 // is the CLI's already-argv-validated object (`bin/fgos.mjs`'s
-// `parseDecomposeCallerVerdict`) — this function only re-validates the
+// `parsePlanCallerVerdict`) — this function only re-validates the
 // parts that matter to write correctness (reason, children shape).
-export function resolveCallerDecomposeVerdict(raw, lockedContext) {
+export function resolveCallerPlanVerdict(raw, lockedContext) {
   if (!raw || typeof raw !== 'object') return { kind: 'invalid' };
 
   if (raw.verdict === 'pass-through') {
@@ -362,7 +367,7 @@ export function findUncoveredLockedDecisions(contextText, children, repoRoot) {
     for (const f of Array.isArray(child?.footprint) ? child.footprint : []) {
       // tsk-297 fix: a non-string footprint entry used to reach
       // isCoveredByDirectory's f.replace(...) below and throw -- silently,
-      // since that call now sits inside resolveDecompose's own catch{}
+      // since that call now sits inside resolvePlan's own catch{}
       // (tsk-gio). Filtering here keeps `covered` a plain Set<string>,
       // which both isCoveredByDirectory and isDirectoryContainingCoverage
       // below assume without needing their own per-entry type guard.
@@ -389,7 +394,7 @@ export function findUncoveredLockedDecisions(contextText, children, repoRoot) {
   // fs.existsSync (above) is true for directories too, so a locked
   // decision naming an enclosing directory (e.g. "src/intake/") is a
   // real candidate path. A child declaring a FILE inside that directory
-  // (e.g. "src/intake/decompose.mjs") clearly does touch it, but exact-
+  // (e.g. "src/intake/plan.mjs") clearly does touch it, but exact-
   // match/isCoveredByDirectory above only ever check the decision path
   // as a potential PREFIX of a footprint entry, never the reverse. Found
   // by independent review: 20+ real CONTEXT.md decisions name a
@@ -408,7 +413,7 @@ export function findUncoveredLockedDecisions(contextText, children, repoRoot) {
   // PATH_TOKEN_PATTERN's 2+-segment requirement (a bare top-level
   // directory like "src/" alone never tokenizes as a decision path at
   // all), and this whole check is advisory-only -- it never blocks a
-  // decompose, only logs an advisory decision (see resolveDecompose's
+  // decompose, only logs an advisory decision (see resolvePlan's
   // caller). Never blocks == the class of unnecessary rework a false
   // positive would cause is why looser was chosen here, while
   // isCoveredByDirectory above stays the direction it already was.
@@ -446,14 +451,14 @@ export function findUncoveredLockedDecisions(contextText, children, repoRoot) {
  *
  * `callerVerdict` (tsk-27y D1/D2): `{verdict: 'pass-through'|'need-human'|
  * 'decompose', reason?, children?}` — when supplied (`fgos decompose
- * --verdict ...`), resolved via `resolveCallerDecomposeVerdict` INSTEAD of
+ * --verdict ...`), resolved via `resolveCallerPlanVerdict` INSTEAD of
  * any subprocess judgment, checked before the plan.md tiny/small mode
  * skip-and-advance heuristic. Every downstream gate (heavy-risk,
  * blast-radius, footprint-overlap) still applies unconditionally (D3) —
  * only the model/subprocess call itself is skipped.
  *
  * MISSING BOTH (tsk-1x3 D16): no `callerVerdict` and plan.md does not
- * declare `tiny`/`small` mode. `resolveDecompose` was NOT symmetric with
+ * declare `tiny`/`small` mode. `resolvePlan` was NOT symmetric with
  * `resolveDiscovery` here before this item — its fallback here used to
  * call `judgeDecompose`, a real subprocess judge, for every other mode. A
  * `'runner'` role (the mechanical decompose sweep, `src/runner/loop.mjs`)
@@ -468,11 +473,11 @@ export function findUncoveredLockedDecisions(contextText, children, repoRoot) {
 // that judgeDecompose is retired — same reasoning discovery.mjs's own
 // resolveDiscovery states for its identical unused `cfg` parameter: kept
 // for call-site compatibility outside this item's declared footprint.
-export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
+export function resolvePlan(dir, id, cfg, role, callerVerdict) {
   const view = listWork(dir);
   const work = view.work[id];
   if (!work) {
-    throw new StoreError('validation', `resolveDecompose: work "${id}" not found.`);
+    throw new StoreError('validation', `resolvePlan: work "${id}" not found.`);
   }
 
   // Claim release on the decompose->executing boundary (claim-lock §3b): a
@@ -502,7 +507,17 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
   // catch that error.
   const domain = getDomain(work.domain);
   const currentStage = work.stage ?? stageForStep(domain, 'Execute');
-  if (currentStage !== stageForStep(domain, 'Divide')) {
+  const planningStage = stageForStep(domain, 'Divide');
+  // tsk-403 D18: `decompose` is coding's own drain-only legacy alias for
+  // this same step — an item still parked there (from before the rename)
+  // must NOT read as "already past Divide" here, or this function would
+  // silently no-op on it forever instead of actually processing it. Only
+  // activates when a domain declares both names distinctly (today: only
+  // `coding`) — a domain whose OWN live Divide stage is still literally
+  // named `decompose` (never renamed by this item) already has
+  // `planningStage === 'decompose'`, so this stays a no-op for it.
+  const legacyPlanStage = domain.stages?.includes('decompose') && planningStage !== 'decompose' ? 'decompose' : undefined;
+  if (currentStage !== planningStage && currentStage !== legacyPlanStage) {
     return { outcome: 'noop', id };
   }
 
@@ -514,7 +529,7 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
   // own stage-move.
   const hasChildren = Object.values(view.work).some((item) => item.parent === id);
   // Real verify (tsk-19j D1/D11, closes gap 2): `gates[id].planApprove.verify`
-  // is the real command fgos-planning/fgos-validating recorded for this item
+  // is the real command fgos-coding-planning/fgos-coding-validating recorded for this item
   // — read once, reused by every moveStage call below that advances this item
   // to `executing`, so none of them silently carry FALLBACK_VERIFY or leave
   // `verify` untouched (transitionStage only overwrites it when passed a
@@ -523,7 +538,7 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
   // Track A's Gates, e.g. from before this item, is unaffected).
   const planApproveVerify = view.gates?.[id]?.planApprove?.verify ?? work.verify;
   if (hasChildren) {
-    moveStage(dir, { id, to: stageForStep(domain, 'Execute'), expectedStage: stageForStep(domain, 'Divide'), verify: planApproveVerify, role });
+    moveStage(dir, { id, to: stageForStep(domain, 'Execute'), expectedStage: currentStage, verify: planApproveVerify, role });
     releaseClaimOnExecuting();
     return { outcome: 'already-decomposed', id };
   }
@@ -544,7 +559,7 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
     // tsk-27y D2: caller-supplied verdict checked FIRST, before the plan.md
     // tiny/small mode skip-and-advance heuristic below — explicit beats
     // heuristic.
-    verdict = resolveCallerDecomposeVerdict(callerVerdict, lockedContext);
+    verdict = resolveCallerPlanVerdict(callerVerdict, lockedContext);
     if (verdict.kind === 'invalid') {
       logDecomposeVerdict(dir, id, 'invalid', DEFAULT_CALLER_INVALID_RATIONALE);
       return { outcome: 'invalid', id };
@@ -552,10 +567,10 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
     addDecision(dir, {
       id,
       text: `decompose caller-supplied: ${verdict.kind}`,
-      source: 'resolveDecompose',
+      source: 'resolvePlan',
       kind: 'engine',
       rationale:
-        'tsk-27y D2/D3: caller-supplied verdict — session already reasoned live (fgos-planning); downstream gates (heavy-risk/blast-radius/footprint-overlap) still apply unconditionally, same as before',
+        'tsk-27y D2/D3: caller-supplied verdict — session already reasoned live (fgos-coding-planning); downstream gates (heavy-risk/blast-radius/footprint-overlap) still apply unconditionally, same as before',
     });
   } else {
     // TINY/SMALL SKIP-AND-ADVANCE (tsk-19j D1/D3/D7, closes gap 3) —
@@ -564,7 +579,7 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
     // REAL CHILDREN (addWork below) — skipping blind would also skip the
     // one thing that turns plan.md's documented split into real work
     // items. The only case where skipping is provably safe is when
-    // fgos-planning's own mode gate (SKILL.md step 2) already guarantees
+    // fgos-coding-planning's own mode gate (SKILL.md step 2) already guarantees
     // no split is possible: `tiny`/`small` mode is single-piece by
     // definition (0-1 risk flags). Detected by reading plan.md's own
     // recorded mode line — any other mode, or no match at all, now falls
@@ -575,13 +590,13 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
       const mode = passThroughModeMatch[1].toLowerCase();
       addDecision(dir, {
         id,
-        text: `decompose skip: plan.md declares mode "${mode}" (tiny/small are single-piece by fgos-planning's own mode gate), no verdict required`,
-        source: 'resolveDecompose',
+        text: `decompose skip: plan.md declares mode "${mode}" (tiny/small are single-piece by fgos-coding-planning's own mode gate), no verdict required`,
+        source: 'resolvePlan',
         kind: 'engine',
         rationale:
           'tsk-19j D7 trust signal: plan.md already committed to no split, so there is nothing to judge — skipping avoids a pointless round-trip, never a real child-generation decision',
       });
-      moveStage(dir, { id, to: stageForStep(domain, 'Execute'), expectedStage: stageForStep(domain, 'Divide'), verify: planApproveVerify, role });
+      moveStage(dir, { id, to: stageForStep(domain, 'Execute'), expectedStage: currentStage, verify: planApproveVerify, role });
       releaseClaimOnExecuting();
       return { outcome: 'pass-through', id };
     }
@@ -595,15 +610,15 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
     }
     throw new StoreError(
       'validation',
-      `decompose: work "${id}" has no --verdict and plan.md does not declare tiny/small mode -- run "fgos decompose ${id} --verdict pass-through --reason \"...\"" (or --verdict decompose --children '[...]', or --verdict need-human --reason \"...\") after reasoning about it yourself.`,
+      `plan: work "${id}" has no --verdict and plan.md does not declare tiny/small mode -- run "fgos plan ${id} --verdict pass-through --reason \"...\"" (or --verdict decompose --children '[...]', or --verdict need-human --reason \"...\") after reasoning about it yourself.`,
     );
   }
 
   // work-item-priority-matrix D6/D8, Phase C: the REFINED pass -- unlike
   // discovery.mjs's rough pass (impact = blocks + semantic scan only,
   // effort assumed at EFFORT_FLOOR), this one has real `effort` (from
-  // fgos-planning's own mode, when a caller-supplied verdict carries one)
-  // and a real `blastRadius` (when fgos-planning/fgos-validating actually
+  // fgos-coding-planning's own mode, when a caller-supplied verdict carries one)
+  // and a real `blastRadius` (when fgos-coding-planning/fgos-coding-validating actually
   // recorded one). Rides on every non-invalid outcome, same fail-safe
   // try/catch discipline discovery.mjs's rough pass uses.
   try {
@@ -628,7 +643,7 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
       addDecision(dir, {
         id,
         text: `priority: work.risk "${work.risk}" is not a recognized RISK_DISCOUNTS key -- discountForRisk folded it to the "standard" default`,
-        source: 'resolveDecompose',
+        source: 'resolvePlan',
         kind: 'engine',
         rationale: 'tsk-4hb: making the silent unrecognized-value fallback observable',
       });
@@ -663,7 +678,7 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
   // decompose child's own `action` field (above). `lockedDecisionIds.size
   // === 0` (no CONTEXT.md, or none with a "## Locked decisions" table)
   // never counts as evidence -- the floor stays exactly as before for an
-  // item that never went through fgos-exploring, same graceful-degrade
+  // item that never went through fgos-coding-exploring, same graceful-degrade
   // normalizeChild already applies.
   const lockedDecisionIds = extractLockedDecisionIds(lockedContext);
   const citesRealEvidence =
@@ -695,7 +710,7 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
 
   if (verdict.kind === 'pass-through') {
     logDecomposeVerdict(dir, id, 'pass-through', verdict.reason ?? DEFAULT_PASS_THROUGH_RATIONALE);
-    moveStage(dir, { id, to: stageForStep(domain, 'Execute'), expectedStage: stageForStep(domain, 'Divide'), verify: planApproveVerify, role });
+    moveStage(dir, { id, to: stageForStep(domain, 'Execute'), expectedStage: currentStage, verify: planApproveVerify, role });
     releaseClaimOnExecuting();
     return { outcome: 'pass-through', id };
   }
@@ -734,13 +749,13 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
       if (work.status === 'awaiting-human') {
         throw new StoreError(
           'validation',
-          `decompose --force: work "${id}" is already "awaiting-human" -- run "fgos answer ${id} --text ..." to resume it before retrying --force.`,
+          `plan --force: work "${id}" is already "awaiting-human" -- run "fgos answer ${id} --text ..." to resume it before retrying --force.`,
         );
       }
       addDecision(dir, {
         id,
-        text: `decompose --force overrode a disputed child verify: "${disputedChild.child.verify}"`,
-        source: 'resolveDecompose',
+        text: `plan --force overrode a disputed child verify: "${disputedChild.child.verify}"`,
+        source: 'resolvePlan',
         kind: 'engine',
         rationale: `second pass disagreed on child #${disputedChild.index + 1}: ${disputedChild.secondPass.reason}`,
       });
@@ -798,7 +813,7 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
       addDecision(dir, {
         id,
         text: `decompose completeness advisory: ${uncoveredDecisions.length} path(s) named in a locked decision have no child footprint covering them: ${uncoveredDecisions.join(', ')}`,
-        source: 'resolveDecompose',
+        source: 'resolvePlan',
         kind: 'engine',
         rationale:
           'tsk-1gr D1/D2: mechanical path-token check over CONTEXT.md\'s Locked decisions section -- advisory only, never blocks; see docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md for the failure mode this catches',
@@ -839,7 +854,7 @@ export function resolveDecompose(dir, id, cfg, role, callerVerdict) {
   });
 
   logDecomposeVerdict(dir, id, 'decompose', verdict.reason, `${childIds.length} children`);
-  moveStage(dir, { id, to: stageForStep(domain, 'Execute'), expectedStage: stageForStep(domain, 'Divide'), verify: planApproveVerify, role });
+  moveStage(dir, { id, to: stageForStep(domain, 'Execute'), expectedStage: currentStage, verify: planApproveVerify, role });
   releaseClaimOnExecuting();
   return { outcome: 'decompose', id, childIds };
 }

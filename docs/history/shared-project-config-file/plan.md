@@ -99,7 +99,7 @@ Alternatives rejected:
 
 ## Risk map
 
-| Component | Risk | Proof point (→ fgos-validating) |
+| Component | Risk | Proof point (→ fgos-coding-validating) |
 |---|---|---|
 | Registry-driven assembler (D4, new module) | High — brand-new code path, zero test today, the one piece every other step depends on | A test asserting every `CONFIG_DEFAULT_REGISTRATIONS` entry lands under its own key in the assembled default, and an existing shared-file value is never overwritten |
 | 5 call-site retarget (`bin/fgos.mjs` x4, `bin/fgos-runner.mjs` x1, `dispatch.mjs`'s runner functions) | Medium — existing tests (`test/runner/dispatch.test.mjs`) target the old flat path | Grep every `.fgos-runner.json` reference in `src`/`bin`/`test` before changing; confirm none remain except the fallback-read path itself |
@@ -110,7 +110,7 @@ Alternatives rejected:
 
 **impact-analysis: full** — GitNexus registered and `present`, confirmed via
 `fgos tool query --capability impact-analysis --status present` during
-`fgos-exploring`. Before editing any symbol in `src/runner/dispatch.mjs`,
+`fgos-coding-exploring`. Before editing any symbol in `src/runner/dispatch.mjs`,
 `src/setup/checks.mjs`, `src/setup/registrations.mjs`,
 `src/config/global-config.mjs`, `bin/fgos.mjs`, or `bin/fgos-runner.mjs`,
 run `impact()` and report the blast radius before editing, per the
@@ -177,12 +177,12 @@ Full suite — this item touches `src/config/`, `src/runner/`, `src/setup/`,
 and `bin/`, each already covered by existing tests that must stay green
 (AGENTS.md DoD question 5).
 
-## Assumptions (pending fgos-validating proof)
+## Assumptions (pending fgos-coding-validating proof)
 
 - `checkConfigNotStale` becomes generic over `CONFIG_DEFAULT_REGISTRATIONS`
   (checks every registered entry's staleness, not just `runner` alone) as a
   natural consequence of D4's registry-driven approach — not itself a new
-  CONTEXT.md decision, pinned here as an implementer detail; `fgos-validating`
+  CONTEXT.md decision, pinned here as an implementer detail; `fgos-coding-validating`
   confirms this doesn't silently change `config-not-stale`'s `passed`
   semantics for the 4 checks that have no config-default today.
 - `.fgos-runner.json` is never deleted automatically by any step in this

@@ -84,22 +84,22 @@ Prints `{"mechanism": "native"|"cli-spawn"[, "agentType": "<name>"]}`.
 ## Why judge-discovery/judge-decompose are NOT wired through `decide` (tsk-3ik-2's real finding)
 
 `judgeDiscovery`/`judgeDecompose` (`src/intake/discovery.mjs`,
-`src/intake/decompose.mjs`) dispatch via `runJudgeExecutor` ->
+`src/intake/plan.mjs`) dispatch via `runJudgeExecutor` ->
 `spawnAttempt` -> `spawnSync` (`src/intake/judge-executor.mjs`) — a bare
 subprocess-spawn code path that never has live Agent/Task tool access,
-whether invoked from a live session's own `fgos discover`/`fgos decompose`
+whether invoked from a live session's own `fgos discover`/`fgos plan`
 Bash call or the headless runner sweep. Calling `decide` there would only
 ever pass `hasLiveTaskAccess: false`, which can never resolve to anything
 but `cli-spawn` — a dead branch, not real wiring.
 
 The actual "native" answer for these two capacities is `tsk-27y`'s
 caller-supplied-verdict mechanism: a live session that already reasoned
-about the item (`fgos-exploring`, `fgos-validating`) self-supplies its own
-verdict via `fgos discover --verdict ...`/`fgos decompose --verdict ...`,
+about the item (`fgos-coding-exploring`, `fgos-coding-validating`) self-supplies its own
+verdict via `fgos discover --verdict ...`/`fgos plan --verdict ...`,
 bypassing `judgeDiscovery`/`judgeDecompose`'s subprocess spawn entirely for
 that invocation. That mechanism is a different, already-built path — not
-`decide`-shaped — and it is already wired into `fgos-exploring`'s and
-`fgos-validating`'s own `SKILL.md` Gate sections. Do not try to route
+`decide`-shaped — and it is already wired into `fgos-coding-exploring`'s and
+`fgos-coding-validating`'s own `SKILL.md` Gate sections. Do not try to route
 `judgeDiscovery`/`judgeDecompose` through `decide` — there is nothing for
 it to decide in that code path.
 

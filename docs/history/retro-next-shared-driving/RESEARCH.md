@@ -4,7 +4,7 @@
 
 **Asked:** Is it clear how to refactor `/fgOS:retro-next` to delegate its
 synthesis-skill invocation to `fgos-coding-driving` (or an equivalent shared
-driving primitive) "the way `/fgOS:pick`, `/fgOS:discover`, `/fgOS:decompose`,
+driving primitive) "the way `/fgOS:pick`, `/fgOS:discover`, `/fgOS:plan`,
 and `/fgOS:discover-next` all do" (item's own wording), so it inherits the
 same park/anchor handling and future driving improvements?
 
@@ -35,7 +35,7 @@ same park/anchor handling and future driving improvements?
   counting as "not open") — never as a status this loop itself drives
   through.
 - `src/state/workflow-stage-graphs.mjs:114-154` — confirms `skillMap` does
-  carry a `retrospective` entry (`'fgos-compounding'`), added by decision
+  carry a `retrospective` entry (`'fgos-coding-compounding'`), added by decision
   record 0027 D5 specifically so `retro-next`'s lookup matches
   `skillForStage`'s own registry — this part of the item's premise is
   correct and already true today, zero work needed.
@@ -55,7 +55,7 @@ same park/anchor handling and future driving improvements?
   - **D2**: even granting a human has already crossed D1 manually (item
     now `delivered`), a single loop resuming automatic drive through
     `retrospective → cleanup → done` hits four independent structural
-    breaks, quoted verbatim: (a) `fgos-compounding` does not self-advance
+    breaks, quoted verbatim: (a) `fgos-coding-compounding` does not self-advance
     `status` the way `discover`/`decompose`/`return` do — a caller must
     separately run `fgos move <id> --to cleanup` after it (exactly what
     `retro-next`'s own step 5 does today); (b) `fgos retrospective` sweeps
@@ -88,7 +88,7 @@ same park/anchor handling and future driving improvements?
 
 tsk-3cx's own stated goal — delegate `retro-next`'s synthesis-skill
 invocation to `fgos-coding-driving` "the way `/fgOS:pick`, `/fgOS:discover`,
-`/fgOS:decompose`, and `/fgOS:discover-next` all do" — reads as exactly the
+`/fgOS:plan`, and `/fgOS:discover-next` all do" — reads as exactly the
 "one unified driving-loop mechanism" that
 `stage-status-driving-coordination/CONTEXT.md` D1-D3 already considered and
 rejected, after two rounds of independent advisory review, for four
@@ -106,7 +106,7 @@ appearing only as "terminal, not-open" statuses for the child-anchor check.
 The item's own text checked two *adjacent* skills for scope creep
 (`cleanup-next`, `merge-next`) but does not mention or account for this
 locked decision record, which is precisely on-point for the mechanism this
-item proposes to build. This is not a missing fact fgos-planning can look
+item proposes to build. This is not a missing fact fgos-coding-planning can look
 up and proceed past — it is a direct collision with a decision a prior
 session locked after real review, and reversing it needs new evidence or
 an explicit user call (per this repo's own review-audit-self-decision
@@ -174,7 +174,7 @@ launcher/driver split — three dissolve, one is a table entry:**
   id** — dissolves entirely. Sweeping a pool and picking one item is the
   **launcher's** job, never a driver's. Round 1 treated a launcher
   responsibility as evidence against the driver.
-- **(a) `fgos-compounding` does not self-advance `status`** — not a law.
+- **(a) `fgos-coding-compounding` does not self-advance `status`** — not a law.
   `fgos-coding-driving` **already carries this exact documented exception**
   for stage `discovery`, where `fgos-researching` likewise refuses to write
   state and the driver applies its returned verdict via `fgos discover` on
@@ -225,5 +225,5 @@ fewer hand-rolled mechanism, not one more axis.
 
 **Verdict:** clear. The remaining work (exact shape of the position→step
 resolution, where `waiting-ttl` is declared, which callers change) is
-implementation shaping — `fgos-planning`'s job, not a gap blocking the
+implementation shaping — `fgos-coding-planning`'s job, not a gap blocking the
 item.

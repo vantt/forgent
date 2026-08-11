@@ -67,15 +67,17 @@ test('transitionStage carries verify in the payload when supplied, and omits it 
   assert.equal('verify' in withoutVerify.payload, false);
 });
 
-test('transitionStage rejects edges outside the three legal ones (clarify->executing, clarify->decompose, decompose->executing) as precondition', () => {
+test('transitionStage rejects edges outside the legal ones (clarify->executing, clarify->decompose, decompose->executing, clarify->planning, planning->executing) as precondition', () => {
   const illegalPairs = [
     ['executing', 'clarify'],
     ['executing', 'executing'],
     ['clarify', 'clarify'],
-    ['clarify', 'planning'],
     ['decompose', 'clarify'],
     ['decompose', 'decompose'],
     ['executing', 'decompose'],
+    ['planning', 'clarify'],
+    ['planning', 'planning'],
+    ['executing', 'planning'],
   ];
   for (const [from, to] of illegalPairs) {
     assert.throws(

@@ -7,7 +7,7 @@ audit/security, no external-system change, no public contract, no
 cross-platform, no existing covered behavior, no weak-proof area, single
 domain) — this item ships no code; it is a dogfood observation walked
 through live via `/fgOS:pick`, direct-entry into `decompose` (item never
-went through `fgos-exploring`, so no `CONTEXT.md` exists — nothing here
+went through `fgos-coding-exploring`, so no `CONTEXT.md` exists — nothing here
 overrides a locked decision, there is none to override).
 
 ## Approach
@@ -22,8 +22,8 @@ paper.
 No forgentX source file changes. The "deliverable" is the observation
 itself, captured in `RESEARCH.md` by whichever stage actually needs the two
 research points below as real evidence (per `fgos-researching`'s own
-description, it is callable "later from `fgos-planning`/`fgos-validating`")
-— most likely `fgos-validating`'s own reality check, since both proof
+description, it is callable "later from `fgos-coding-planning`/`fgos-coding-validating`")
+— most likely `fgos-coding-validating`'s own reality check, since both proof
 points below are exactly the kind of evidence that gate is supposed to
 demand before trusting a plan.
 
@@ -54,7 +54,7 @@ test -f docs/history/dispatch-fanout-research-dogfood/RESEARCH.md
 
 Risk map (regression risk: none — no code path touched. Evidence risk:
 medium on both rows below — this item's entire proof burden IS P1/P2,
-so `fgos-validating`'s feasibility matrix must not skip them):
+so `fgos-coding-validating`'s feasibility matrix must not skip them):
 
 | Component | How risky | What would prove it |
 |---|---|---|
@@ -68,9 +68,9 @@ direct-read/external-source evidence instead.
 
 ## Assumptions
 
-- Which stage actually invokes `fgos-researching` (`fgos-planning` itself
-  never calls it directly per its own Flow; `fgos-validating` is the more
-  likely caller per D2's "later from... `fgos-validating`") is left open —
+- Which stage actually invokes `fgos-researching` (`fgos-coding-planning` itself
+  never calls it directly per its own Flow; `fgos-coding-validating` is the more
+  likely caller per D2's "later from... `fgos-coding-validating`") is left open —
   not material enough to block this plan, since either caller uses the
   exact same fan-out mechanism this item exists to observe. `fgos-
   validating`'s own reality check is expected to be the one that actually

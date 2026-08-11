@@ -20,7 +20,7 @@ import { addWork, listWork } from '../../src/state/store.mjs';
 // `judgeVerifySemanticCorrectness` can only ever return `{agrees: false}`
 // with `mechanical: true` attached -- there is no other source of
 // disagreement left. The `secondPass.mechanical !== true` branch in
-// resolveDiscovery/resolveDecompose (the "a --force can override a
+// resolveDiscovery/resolvePlan (the "a --force can override a
 // non-mechanical disagreement" path) is now structurally unreachable. It
 // is left in place -- unchanged behavior for the one case that can still
 // happen (a mechanical disagreement always falls through to the park

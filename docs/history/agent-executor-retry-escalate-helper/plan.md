@@ -51,7 +51,7 @@ pieces' proof points below that lean on blast-radius evidence keep GitNexus
 
 | Component | How risky | What proves it |
 |---|---|---|
-| `runJudgeExecutor` extraction shape (piece 1) | Low — pure refactor, same file, same two callers, existing tests already pin exact retry/parse/suffix behavior | `node --test test/intake/judge-executor.test.mjs test/intake/discovery.test.mjs test/intake/decompose.test.mjs` all green, no test edits needed for the zero-behavior-change claim to hold |
+| `runJudgeExecutor` extraction shape (piece 1) | Low — pure refactor, same file, same two callers, existing tests already pin exact retry/parse/suffix behavior | `node --test test/intake/judge-executor.test.mjs test/intake/discovery.test.mjs test/intake/plan.test.mjs` all green, no test edits needed for the zero-behavior-change claim to hold |
 | `cfg.capacities.<id>` escalation field + branch integration (piece 2) | High (hard-gate: external provider) — depends on merging `tsk-62v`'s commit (`1f1788a`) that this branch doesn't have; wrong precedence could silently route real dispatches to an unintended backend | `git merge-base --is-ancestor 1f1788a HEAD` true after integration; new unit test asserting `resolveExecutorConfig` precedence still holds `capacities.<id>` > `executors.<tier>` > `executor` with the new escalation field present but inert when unset |
 | Escalation trigger uniformity (D1) | Medium — must fire on both the parse-exhausted path and the immediate spawn-error/timeout/non-zero-exit path without reintroducing a retry loop for the latter | Unit tests: a spawn-error mock and a parse-garbage mock both reach the fallback attempt when one is configured; both return the original `null` behavior when none is configured |
 | Non-judge consumer proof (D3, test double) | Low — explicitly scoped to a test double, not real `tsk-5l2` wiring | A test double capacity in the new test file calls the shared helper directly and demonstrates a configured fallback firing |
@@ -61,7 +61,7 @@ pieces' proof points below that lean on blast-radius evidence keep GitNexus
 
 - `src/intake/judge-executor.mjs` — extract + generalize (piece 1), add
   escalation param (piece 2).
-- `src/intake/discovery.mjs`, `src/intake/decompose.mjs` — call sites,
+- `src/intake/discovery.mjs`, `src/intake/plan.mjs` — call sites,
   touched only if the extracted signature needs a shape change (expected:
   no change, per zero-behavior-change).
 - `src/runner/dispatch.mjs` — `cfg.capacities.<id>` schema gains the new
@@ -79,7 +79,7 @@ pieces' proof points below that lean on blast-radius evidence keep GitNexus
    `fgw/tsk-418`) — prerequisite for piece 2, done once, not itself a
    separate work item (it is repo-integration mechanics, not product
    work — CONTEXT.md's Deferred section already flagged the *mechanics*
-   choice, still open, as fgos-validating's to prove safe).
+   choice, still open, as fgos-coding-validating's to prove safe).
 3. Piece 2 (escalation + schema field + test-double proof) — after 2.
 
 ## Split
@@ -87,7 +87,7 @@ pieces' proof points below that lean on blast-radius evidence keep GitNexus
 Two child items, both `parent: tsk-418`:
 
 1. **Title**: "Extract judge-executor.mjs's retry-on-malformed-output shape into a reusable, capacity-agnostic helper"
-   **Verify**: `node --test test/intake/judge-executor.test.mjs test/intake/discovery.test.mjs test/intake/decompose.test.mjs`
+   **Verify**: `node --test test/intake/judge-executor.test.mjs test/intake/discovery.test.mjs test/intake/plan.test.mjs`
    Scope: pure extraction/generalization per CONTEXT.md's feature boundary
    point 1 — no escalation logic yet, no schema change, zero behavior
    change for judge callers.
@@ -109,10 +109,10 @@ Two child items, both `parent: tsk-418`:
 - The fallback attempt (once escalation fires) is single-shot, not its own
   bounded retry loop — CONTEXT.md's "escalate" pinned term leaves this open
   as low-materiality; pinned here as an assumption for
-  `fgos-validating` to flag as unproven if it turns out to matter.
+  `fgos-coding-validating` to flag as unproven if it turns out to matter.
 - D4's branch integration is a merge of `tsk-62v`'s commit (`1f1788a`)
   directly into `fgw/tsk-418`, mirroring `fgw/tsk-5l2`/`fgw/tsk-g18` —
   assumed safe because those two sibling branches already did the
-  identical merge without reported conflict; `fgos-validating` should
+  identical merge without reported conflict; `fgos-coding-validating` should
   confirm no conflict actually arises on this branch specifically before
   treating it as proven.

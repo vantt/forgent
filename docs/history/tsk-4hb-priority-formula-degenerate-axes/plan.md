@@ -44,7 +44,7 @@ carries an unrecognized-but-present risk value — making the fold visible
 in the audit trail instead of silent.
 
 Files touched: `src/state/priority-formula.mjs` (add `isRecognizedRisk`),
-`src/intake/discovery.mjs` and `src/intake/decompose.mjs` (the two real
+`src/intake/discovery.mjs` and `src/intake/plan.mjs` (the two real
 `computePriority` call sites — log via `addDecision` when
 `work.risk` is present and `!isRecognizedRisk(work.risk)`).
 

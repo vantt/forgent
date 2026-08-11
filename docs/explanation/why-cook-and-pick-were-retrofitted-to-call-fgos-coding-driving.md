@@ -29,8 +29,8 @@ stage-to-skill lookup or the claim-timing logic itself.
 - **This skill still never claims before stage `executing`** — now enforced
   by `fgos-coding-driving`'s own claim-timing hard rule (tsk-19j-4), not by
   this skill's own manual step ordering.
-- **Reuse, never duplicate.** `fgos-exploring`, `fgos-planning`,
-  `fgos-validating`, and `fgos-coding-driving` (tsk-19j-4) already define
+- **Reuse, never duplicate.** `fgos-coding-exploring`, `fgos-coding-planning`,
+  `fgos-coding-validating`, and `fgos-coding-driving` (tsk-19j-4) already define
   the Socratic/shaping/proving/driving substance — invoke them (Skill tool)
   for their real work; this skill only owns the id QUEUE the driver has no
   concept of.

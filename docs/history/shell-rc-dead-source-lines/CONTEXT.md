@@ -3,7 +3,7 @@
 Item: `tsk-5lk` (kind `bug`, tier `standard`, risk `standard`)
 
 Stage `clarify` output. Locked decisions only — no implementation, no shaping.
-Shaping and splitting belong to `fgos-planning`.
+Shaping and splitting belong to `fgos-coding-planning`.
 
 ## Feature boundary
 
@@ -125,7 +125,7 @@ red for anyone who declines to hand-edit their rc file.
 
 `npm test` must not modify the developer's shell profile. The suite sandboxes
 `HOME` for tests that exercise `fgos setup`. Locked as required behavior;
-whether it lands inside `tsk-5lk` or as a child item is `fgos-planning`'s
+whether it lands inside `tsk-5lk` or as a child item is `fgos-coding-planning`'s
 call, since it means touching the shared `run()` helper at
 `test/cli/fgos.test.mjs:41` used by every CLI test.
 

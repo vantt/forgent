@@ -12,7 +12,7 @@ Two paths share the exact mechanical shape:
 1. **Claim-lock §3b release/reclaim** (the confirmed repro): a `pick`
    claim held through `clarify`/`decompose` (`status: doing`) is released
    back to `todo` the moment `resolveDecompose` moves the root to
-   `executing` (`src/intake/decompose.mjs:261-265`,
+   `executing` (`src/intake/plan.mjs:261-265`,
    `releaseClaimOnExecuting`). A session that re-picks the same item
    afterward has `claimWork` (`src/runner/claim-port.mjs:119-126`) see
    `branchAlreadyExists === true` and stamp `branchHeadAtTake` to the
@@ -22,7 +22,7 @@ Two paths share the exact mechanical shape:
 2. **Blocked-item branch-retake** (`claim-port.mjs:131`, `isBranchTake`,
    human-rounds D2): a person retaking a `blocked` item that already has a
    branch hits the identical `branchAlreadyExists` recompute at
-   `claim-port.mjs:121`. UPDATE (fgos-validating pass): this recompute is
+   `claim-port.mjs:121`. UPDATE (fgos-coding-validating pass): this recompute is
    deliberate, not a bug — it is the anti-cheat gate that forces new work
    after a verify-fail or reject before `return` can succeed again
    (confirmed by `test/cli/fgos.test.mjs:4997-5019`, which asserts the
@@ -41,7 +41,7 @@ repro is exclusively branch-sourced (`isolate`/`isBranchTake`).
 | ID | Decision |
 |----|----------|
 | D1 | Fix direction is an infra change to the claim/return mechanism itself — not a docs-only workaround telling a continuing session to defer implementation commits until after the stage-firing `discover` call. Chosen for consistency with the sibling item (tsk-424, `docs/history/fgos-pick-worktree-relocation/CONTEXT.md` D1) which faced the identical infra-fix-vs-docs-only fork and locked the infra fix, on the same reasoning: a docs-only answer relies on a person or agent remembering an unenforced ordering rule, and silently regresses the moment that order isn't followed. |
-| D2 | ~~Fix scope covers BOTH reclaim paths...~~ **REVISED at fgos-validating**: fix scope is the claim-lock §3b decompose→executing release/reclaim path ONLY (the confirmed repro). The blocked-item branch-retake path (`isBranchTake`) is explicitly OUT of scope — its recompute-to-live-tip is a deliberate anti-cheat gate (forces new work after verify-fail/reject), not shared bug shape; extending the fix there would defeat that gate. Reversed on new evidence (`test/cli/fgos.test.mjs:4997-5019`, the `human-rounds D2` comment at `claim-port.mjs:128-130`), confirmed with the user before reversing (review-audit-self-decision.md protocol). |
+| D2 | ~~Fix scope covers BOTH reclaim paths...~~ **REVISED at fgos-coding-validating**: fix scope is the claim-lock §3b decompose→executing release/reclaim path ONLY (the confirmed repro). The blocked-item branch-retake path (`isBranchTake`) is explicitly OUT of scope — its recompute-to-live-tip is a deliberate anti-cheat gate (forces new work after verify-fail/reject), not shared bug shape; extending the fix there would defeat that gate. Reversed on new evidence (`test/cli/fgos.test.mjs:4997-5019`, the `human-rounds D2` comment at `claim-port.mjs:128-130`), confirmed with the user before reversing (review-audit-self-decision.md protocol). |
 | D3 | The fix mechanism must positively identify "this todo entry came from a §3b release," not infer it from "status is todo and branch already exists." A rejected item (`proposed→todo`, `bin/fgos.mjs:1978-1989`) never deletes its branch, so it lands in the exact same shape a §3b-released item does — a naive "preserve branchHeadAtTake whenever already set" would also wrongly preserve a stale marker across a reject-then-retake. Mechanism: tag the §3b release's `moveWork(..., to: 'todo', ...)` call (`decompose.mjs:263`) with a distinguishing marker, and have `claimWork` check — via `readRawEvents` (already read at claim time for `visitCount`, `claim-port.mjs:96`) — whether the item's most recent `work.move` event landing on `todo` carries that marker before deciding to preserve vs. recompute `branchHeadAtTake`. |
 
 ## Scout evidence
@@ -56,7 +56,7 @@ repro is exclusively branch-sourced (`isolate`/`isBranchTake`).
   'blocked' && branchAlreadyExists`; `useBranchSource = isolate ||
   isBranchTake` — both the pick-isolate path and the blocked-retake path
   route through the same `branchHeadAtTake` recompute.
-- `src/intake/decompose.mjs:261-265` — `releaseClaimOnExecuting`: `if
+- `src/intake/plan.mjs:261-265` — `releaseClaimOnExecuting`: `if
   (work.status === 'doing') moveWork(dir, { id, to: 'todo',
   expectedStatus: 'doing' })` — releases the claim without touching
   `branchHeadAtTake` at all; the field is left stale until the next

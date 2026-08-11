@@ -4,8 +4,8 @@ description: >-
   Use when the user wants a free-text task driven end-to-end through fgOS's
   whole lifecycle in one session — submit, clarify, decompose, real
   implementation, and return — invoked as /fgOS:cook <free-text task
-  description>. Each dev-skill gate (fgos-exploring/fgos-planning/
-  fgos-validating) auto-approves when the repo's configured gate-bypass
+  description>. Each dev-skill gate (fgos-coding-exploring/fgos-coding-planning/
+  fgos-coding-validating) auto-approves when the repo's configured gate-bypass
   level covers it, otherwise pauses for real human approval — auto-
   implements at stage executing, and stops once the item (and every
   child it split into) reaches status awaiting-approval — final merge
@@ -18,7 +18,7 @@ description: >-
 
 Drives a task from a single sentence to a real, verified, `awaiting-approval`
 change — chaining the same verbs and dev-skills a person would use one at a
-time (`submit` → `fgos-exploring` → `fgos-planning`/`fgos-validating` →
+time (`submit` → `fgos-coding-exploring` → `fgos-coding-planning`/`fgos-coding-validating` →
 real implementation → `return`), so the user doesn't have to drive each
 stage by hand. Every state transition goes through the `fgos` CLI (one-door-
 write, CTR001) — this skill never writes `.fgos/` state directly, and it
@@ -27,8 +27,8 @@ never re-implements a dev-skill's substance inline; it invokes them.
 ## Hard rules
 
 - **Never bypass a gate beyond what its own dev-skill already permits.**
-  `fgos-exploring`'s CONTEXT.md gate, `fgos-planning`'s plan gate, and
-  `fgos-validating`'s proof gate each check the repo's configured
+  `fgos-coding-exploring`'s CONTEXT.md gate, `fgos-coding-planning`'s plan gate, and
+  `fgos-coding-validating`'s proof gate each check the repo's configured
   gate-bypass level themselves (`canAutoApprove`/`canAutoApproveValidate`,
   `docs/history/gate-bypass/CONTEXT.md` D1-D6) and only skip their own
   question when that check returns true — this skill's driver invokes
@@ -50,8 +50,8 @@ never re-implements a dev-skill's substance inline; it invokes them.
   in this skill's own queue-draining ever needs that: clarify/decompose
   work happens on the item while it is still `todo`, exactly as the driver
   already handles it.
-- **Reuse, never duplicate.** `fgos-exploring`, `fgos-planning`,
-  `fgos-validating`, and `fgos-coding-driving` (tsk-19j-4) already define
+- **Reuse, never duplicate.** `fgos-coding-exploring`, `fgos-coding-planning`,
+  `fgos-coding-validating`, and `fgos-coding-driving` (tsk-19j-4) already define
   the Socratic/shaping/proving/driving substance — invoke them (Skill tool)
   for their real work; this skill only owns the id QUEUE the driver has no
   concept of, one id at a time, never split into concurrent flows.
@@ -129,15 +129,15 @@ never re-implements a dev-skill's substance inline; it invokes them.
    - **no-progress** — same treatment as a real block: stop, report, let a
      person look at it.
 
-   Every real gate a stage-skill hits along the way (`fgos-exploring`'s
-   "Approve CONTEXT.md?", `fgos-planning`'s "Approve before execution?",
-   `fgos-validating`'s "Approve moving to executing?") still surfaces
+   Every real gate a stage-skill hits along the way (`fgos-coding-exploring`'s
+   "Approve CONTEXT.md?", `fgos-coding-planning`'s "Approve before execution?",
+   `fgos-coding-validating`'s "Approve moving to executing?") still surfaces
    exactly as before — the driver invokes those skills unchanged, it does
    not swallow or pre-answer their own gates. Same for the real
    implementation work at `stage: executing`: the driver's own claim-timing
    rule claims the id and enters its worktree at exactly the point this
    step used to do it by hand (`fgos pick <id>` then `EnterWorktree`), then
-   invokes `fgos-code-implement`, which implements, verifies, and calls
+   invokes `fgos-coding-implement`, which implements, verifies, and calls
    `fgos return <id>` itself — never taking anyone's word for real progress,
    the same "measures real progress itself" contract this step always
    relied on.

@@ -34,7 +34,7 @@ Alternatives considered and rejected:
   (verified in CONTEXT.md's scout evidence); no engine change is needed
   or wanted.
 - **Leave Red Flags/D9-D10 intro untouched** — rejected per D2 (user's
-  explicit choice in the `fgos-exploring` gate round): add one clarifying
+  explicit choice in the `fgos-coding-exploring` gate round): add one clarifying
   line instead, to prevent a future reader seeing the new branch as
   contradicting the coding-only disclaimer.
 
@@ -44,11 +44,11 @@ Risk map:
 |---|---|---|
 | `fgos-coding-driving/SKILL.md` prose (hard rule + loop pseudocode + Red Flags line) | Low — doc-only, no code path, no test surface, no behavior change for the only domain in production use today (`coding`) | The verify command already locked via `fgos discover` (recorded on the item, `gates.contextApprove.verify`): both mirror files stay byte-identical; both the hard-rule paragraph and the loop pseudocode's claim step read `domain.worktreeBacked`; the `true` path is unchanged (`fgos pick` + `EnterWorktree`); the `false` path specifies `fgos take --role session --id <id> --dir root`, explicitly skips `EnterWorktree`, and invokes the executing-stage skill at the main checkout; the Red Flags section carries the added D2 clarifying line |
 
-No medium/high risk entries — nothing here needs a `fgos-validating` proof
+No medium/high risk entries — nothing here needs a `fgos-coding-validating` proof
 point beyond re-confirming the verify command above is runnable and
 matches what actually got written.
 
-Impact-analysis capability gate (`CLAUDE.md`): checked in `fgos-exploring`
+Impact-analysis capability gate (`CLAUDE.md`): checked in `fgos-coding-exploring`
 (GitNexus present, freshly checked → **full** posture) — moot for this
 item regardless, since no symbol/function is edited; no blast-radius proof
 point applies to a prose-only doc change.
@@ -95,10 +95,10 @@ no dedicated test, since none exists for this file type):
 No split. One honest piece of work — both files edited together as a
 single item, no child items created.
 
-## Proof surface (for the gate below and for `fgos-validating`)
+## Proof surface (for the gate below and for `fgos-coding-validating`)
 
 Verify (already the item's own live `verify` field, set during
-`fgos-exploring`'s gate and confirmed by `fgos discover --verdict clear`):
+`fgos-coding-exploring`'s gate and confirmed by `fgos discover --verdict clear`):
 per-file `worktreeBacked` present in both the hard-rule and loop-pseudocode
 locations, `true`-path unchanged, `false`-path names `fgos take --role
 session --id <id> --dir root` with no `EnterWorktree`, Red Flags carries

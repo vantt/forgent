@@ -10,7 +10,7 @@ children):
 
 ## Why this item's own evidence is a citation, not a re-derivation
 
-`tsk-2ie5` split into two children the moment `fgos-planning` found the
+`tsk-2ie5` split into two children the moment `fgos-coding-planning` found the
 ADR0020 wall (`.fgos/config.json` can never land through a `fgw/<id>`
 branch): `tsk-2c1` (the code — `src/runner/dispatch.mjs`, `fgos-researching`
 wiring) and `tsk-28o` (the config — the `gather` capacity registered

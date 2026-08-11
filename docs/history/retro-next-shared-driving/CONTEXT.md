@@ -31,7 +31,7 @@ supersedes part of `docs/history/stage-status-driving-coordination/CONTEXT.md`
 | D1 | **`status` is the full-lifecycle axis; `stage` is the sub-axis.** `src/state/status-fsm.mjs`'s `TRANSITIONS` spans `todo → doing → awaiting-approval → delivered → retrospective → cleanup → done` plus the `blocked`/`awaiting-human`/`wontfix` branches — ten values covering the entire item lifetime. `stage` (`clarify → discovery → exploring → decompose → executing`) only carries meaning while `status ∈ {todo, doing, blocked, awaiting-human}` and is frozen from `awaiting-approval` onward. The driver's advance-axis is therefore generalized to resolve each iteration's next step from **the item's current position** — reading `stage` pre-merge, `status` post-merge — instead of being hardcoded to `domain.stages`. This is not a new axis: `skillMap` (`src/state/workflow-stage-graphs.mjs:147-154`) already holds five stage names *and* one status name (`retrospective`) in one frozen object, put there deliberately by decision record 0027 D5, which recorded that "the two vocabularies never collide" and that which lookup table a key belongs to is the caller's concern. The registry already merged the two vocabularies; only the driver had not caught up. |
 | D2 | **`awaiting-approval` changes from an unconditional hard stop into the *default, overridable* ceiling.** A launcher that supplies no ceiling still stops there — today's observable behavior is unchanged. A launcher that deliberately supplies a ceiling beyond it (e.g. `status:cleanup`) drives past it. **Cost, stated explicitly so a later session never removes it by accident:** the human merge gate is no longer protected *structurally* by the driver refusing; it is protected *by convention* — no launcher ships a default ceiling past `awaiting-approval`. Accepted deliberately by the user: ceiling becomes the single mechanism deciding how far a drive goes, with no hardcoded exception inside the driver. |
 | D3 | **`/fgOS:retro-next` sets `ceiling: status:cleanup`.** Observable behavior stays byte-identical to today (sweep → pick one → run the domain's `retrospective` skill → land at `cleanup` → stop, leaving TTL-gated finishing to `/fgOS:cleanup-loop`). Only the mechanism underneath changes: its hand-rolled invoke-skill / `fgos move --to cleanup` / classify-by-raw-exit-code sequence is replaced by launcher-sets-ceiling + driver-drives. |
-| D4 | **`/fgOS:cleanup-next` is folded into this same item**, shrinking to a launcher the same way. `skillMap` deliberately declares no `cleanup` entry (0027 D5: "pure harness, no skill ever loads for it"), so the driver at that position resolves no skill — how the driver handles a position with no registered skill (today's rule: stop and let the caller's own mechanical verb cover it) is implementation shaping for `fgos-planning`, not a product decision. The original item text excluded `cleanup-next` on reasoning derived from the old framing; the user re-confirmed inclusion under the new one. |
+| D4 | **`/fgOS:cleanup-next` is folded into this same item**, shrinking to a launcher the same way. `skillMap` deliberately declares no `cleanup` entry (0027 D5: "pure harness, no skill ever loads for it"), so the driver at that position resolves no skill — how the driver handles a position with no registered skill (today's rule: stop and let the caller's own mechanical verb cover it) is implementation shaping for `fgos-coding-planning`, not a product decision. The original item text excluded `cleanup-next` on reasoning derived from the old framing; the user re-confirmed inclusion under the new one. |
 | D5 | **No `waiting-ttl` park reason is needed.** `RESEARCH.md` round 2 proposed one to stop the driver misreading `cleanup → blocked` (a legitimate TTL wait) as a real failure. Scout falsified it: `pickNextCleanupItem` (`src/state/cleanup-pool.mjs`, quoted in `plugins/fgOS/skills/cleanup-next/SKILL.md`'s own description) is "pre-filtered so only TTL-elapsed items are ever passed to the verb" — the launcher already filters, so the driver never receives an item still waiting on TTL. This also weakens `stage-status-driving-coordination` D2(c) further than round 2 recorded. |
 
 ## Pinned terms
@@ -76,8 +76,8 @@ supersedes part of `docs/history/stage-status-driving-coordination/CONTEXT.md`
   correction.
 - Impact-analysis capability gate at this pass: `fgos tool query
   --capability impact-analysis --status present` returned `gitnexus`
-  `present` — posture **full**. Recorded for `fgos-planning` to read
-  without re-querying; `fgos-exploring` produces no proof points itself.
+  `present` — posture **full**. Recorded for `fgos-coding-planning` to read
+  without re-querying; `fgos-coding-exploring` produces no proof points itself.
 
 ## Superseded
 
@@ -90,7 +90,7 @@ four structural breaks resolve as:
 
 - D2(b) "sweeps the whole pool, not one id" — dissolves: pool-sweep-and-pick
   is the launcher's job, never the driver's.
-- D2(a) "`fgos-compounding` does not self-advance status" — not a law: the
+- D2(a) "`fgos-coding-compounding` does not self-advance status" — not a law: the
   driver already carries this exact exception for `fgos-researching` at
   stage `discovery`.
 - D2(c) "TTL parks `cleanup → blocked`" — falsified by D5 above (the

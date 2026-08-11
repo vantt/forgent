@@ -12,15 +12,15 @@ systems/public-contracts/cross-platform/multi-domain — không cái nào).
 "Existing covered behavior" cũng KHÔNG áp: thêm hàm MỚI cạnh
 `footprintOverlapAmong`'s check đã có trong `decompose.mjs`, không sửa
 hàm cũ, advisory-only (D1) nên không risk regression cho path hiện có.
-"Weak proof around the area" cũng không — `test/intake/decompose.test.mjs`
+"Weak proof around the area" cũng không — `test/intake/plan.test.mjs`
 (84.5K) đã cover dày. **→ tiny.** Một file sản phẩm
-(`src/intake/decompose.mjs`) + test của nó, một tác vụ trực tiếp.
+(`src/intake/plan.mjs`) + test của nó, một tác vụ trực tiếp.
 
 ## Approach
 
 Thêm hàm thuần `findUncoveredLockedDecisions(contextText, children)`
 (tên cụ thể, có thể đổi khi implement — không phải quyết định khoá)
-trong `src/intake/decompose.mjs`, gọi ngay CẠNH
+trong `src/intake/plan.mjs`, gọi ngay CẠNH
 `footprintOverlapAmong`'s check đã có (cùng chỗ trong `verdict.children`
 processing), theo đúng D1 (advisory, không chặn) + D2 (thuần cơ học):
 
@@ -53,12 +53,12 @@ nào để so thứ tự.
 Một tác vụ trực tiếp: viết `findUncoveredLockedDecisions` +
 gọi nó trong nhánh `verdict.children` của `decompose.mjs` (advisory
 log, không đổi outcome `need-human`/`decompose` hiện có) + test 2 case
-(có gap / không gap) trong `test/intake/decompose.test.mjs`.
+(có gap / không gap) trong `test/intake/plan.test.mjs`.
 
 ## Quyết định split
 
 Không chia — 1 mảnh honest, không cần children thật. Verify:
-`grep -q 'findUncoveredLockedDecisions\|footprintCoverageGap' src/intake/decompose.mjs && node --test test/intake/decompose.test.mjs`
+`grep -q 'findUncoveredLockedDecisions\|footprintCoverageGap' src/intake/plan.mjs && node --test test/intake/plan.test.mjs`
 (đã khoá qua `discover --force`, xem CONTEXT.md/friction log).
 
 ## Assumptions

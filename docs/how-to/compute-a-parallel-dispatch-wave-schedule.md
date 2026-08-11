@@ -86,7 +86,7 @@ to test whether a computed wave (no footprint overlap, so both eligible
 for the same wave per step 2 above) results in genuinely concurrent
 execution, not just an advisory schedule nobody actually dispatches in
 parallel. Dispatched via 2 concurrent Agent subagents, each running
-`/fgOS:pick` + `fgos-code-implement` independently.
+`/fgOS:pick` + `fgos-coding-implement` independently.
 
 Measured directly from `.fgos/events.jsonl`, not simulated: `tsk-30z`/
 `tsk-50ic` claims landed 2s apart, returns landed 5s apart, with ~184s of

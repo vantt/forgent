@@ -4,7 +4,7 @@ Mode: high-risk
 
 **Flag count / which flags applied** (fgos-routing Mode-gate, direct-entry
 fallback — no session Orient handoff existed for this item, so the gate's
-own subsection was read and applied directly per fgos-planning's Bootstrap
+own subsection was read and applied directly per fgos-coding-planning's Bootstrap
 step): 2 flags — **audit/security / data-loss** (hard-gate, on its own
 already forces high-risk) because D1 fixes a destructive `git reset --hard`
 targeting the wrong tree; **existing covered behavior**, because every
@@ -42,12 +42,12 @@ one batch. Pass-through: item proceeds as itself, no children.
 ## Files touched (footprint)
 
 - `bin/fgos.mjs` — D1, D2, D3
-- `src/intake/decompose.mjs` — D5
-- `test/intake/decompose.test.mjs` — D6
-- `.claude/skills/fgos-exploring/SKILL.md` — D4
-- `.agents/skills/fgos-exploring/SKILL.md` — D4 (dual-root mirror, byte-identical)
-- `test/skills/fgos-exploring-root-fix.test.mjs` — new, asserts D4 (repo
-  precedent: `test/skills/fgos-compounding-doc-write-path.test.mjs` already
+- `src/intake/plan.mjs` — D5
+- `test/intake/plan.test.mjs` — D6
+- `.claude/skills/fgos-coding-exploring/SKILL.md` — D4
+- `.agents/skills/fgos-coding-exploring/SKILL.md` — D4 (dual-root mirror, byte-identical)
+- `test/skills/fgos-coding-exploring-root-fix.test.mjs` — new, asserts D4 (repo
+  precedent: `test/skills/fgos-coding-compounding-doc-write-path.test.mjs` already
   reads a `SKILL.md`'s content and asserts on it — same pattern, new file)
 
 ## Risk map
@@ -57,9 +57,9 @@ one batch. Pass-through: item proceeds as itself, no children.
 | D1 `main-checkout-reset` refusal (`bin/fgos.mjs` ~3842) | **High** — wrong fix silently leaves the destructive-reset-targets-wrong-tree bug live, or breaks the verb for the legitimate main-checkout case | `test/runner/main-checkout-reset-guard.test.mjs` (existing, must still pass — the guard function itself is untouched) + a new CLI-level test in `test/cli/fgos.test.mjs` asserting: (a) from a linked worktree with no `--dir`, the verb refuses before touching git; (b) from the real main checkout, or with `--dir <mainRoot>` from a worktree, it behaves exactly as before |
 | D2 `excludeFgosPaths` narrowing (`bin/fgos.mjs` ~179) | **Medium** — too narrow reintroduces the noise tsk-x5r fixed; too broad keeps the policy-file blind spot | Existing `test/cli/fgos.test.mjs` tsk-x5r self-exempt test must still pass (noise still fixed) + a new test asserting a `.fgos/gate-bypass.json` change OUTSIDE the declared footprint DOES surface in `footprintDiffHits` (the blind spot closed) |
 | D3 `STORE_MISSING_WARNING_VERBS` (`bin/fgos.mjs` ~4025) | **Low** — mechanical Set addition, same shape as the 3 verbs tsk-3g5 already added | New tests mirroring tsk-3g5's own pattern for `evolve` and `docs-index` (stderr warning fires from a `.fgos/`-less worktree) |
-| D5 `isDirectoryContainingCoverage` (`src/intake/decompose.mjs`) | **Medium** — CONTEXT.md D5 left the exact approach (tighten vs. document) to this stage; a behavior change risks new false positives on real single-file children | Decided here (see Shape): document, not tighten (see rationale below) — proof point is a code comment, not new test behavior, so risk is contained to documentation accuracy, checked by human review during Iron Law evidence write-up |
-| D6 phantom test fixture (`test/intake/decompose.test.mjs`) | **Low** — mechanical, the correct fixture shape is already fully specified in CONTEXT.md D6 | The fixed fixture must fail against `9174313~1` (pre-fix) source and pass against current `HEAD` — both checked by hand during implementation, same method all 4 round-3 reviewers used |
-| D4 skill-doc `root=` gap (both dual-root copies) | **Low** — prose-only, no code path depends on it | New `test/skills/fgos-exploring-root-fix.test.mjs` reads both files' content and asserts the `root=` assignment line appears before the `fgos add --dir "$root"` example in each |
+| D5 `isDirectoryContainingCoverage` (`src/intake/plan.mjs`) | **Medium** — CONTEXT.md D5 left the exact approach (tighten vs. document) to this stage; a behavior change risks new false positives on real single-file children | Decided here (see Shape): document, not tighten (see rationale below) — proof point is a code comment, not new test behavior, so risk is contained to documentation accuracy, checked by human review during Iron Law evidence write-up |
+| D6 phantom test fixture (`test/intake/plan.test.mjs`) | **Low** — mechanical, the correct fixture shape is already fully specified in CONTEXT.md D6 | The fixed fixture must fail against `9174313~1` (pre-fix) source and pass against current `HEAD` — both checked by hand during implementation, same method all 4 round-3 reviewers used |
+| D4 skill-doc `root=` gap (both dual-root copies) | **Low** — prose-only, no code path depends on it | New `test/skills/fgos-coding-exploring-root-fix.test.mjs` reads both files' content and asserts the `root=` assignment line appears before the `fgos add --dir "$root"` example in each |
 
 ## Order
 
@@ -71,7 +71,7 @@ one batch. Pass-through: item proceeds as itself, no children.
    half-finished edits to `bin/fgos.mjs` at once.
 3. **D3** — same file, mechanical, last in the `bin/fgos.mjs` group.
 4. **D6** — fix the phantom-test fixture next; this makes the existing
-   `test/intake/decompose.test.mjs` suite an honest regression guard again
+   `test/intake/plan.test.mjs` suite an honest regression guard again
    before D5 touches the function it guards.
 5. **D5** — now that D6 makes the test file trustworthy, adjust/document
    `isDirectoryContainingCoverage` with real coverage watching it.
@@ -108,7 +108,7 @@ plan proves against, one per component:
   case (a bare top-level dir can never be captured). Document the
   intentional one-file-covers-directory trade-off in a code comment next to
   `isDirectoryContainingCoverage` instead.
-- D4: the `fgos-exploring` example, copy-pasted as a standalone block, must
+- D4: the `fgos-coding-exploring` example, copy-pasted as a standalone block, must
   actually run (`--dir "$root"` resolves because `root=` was assigned
   earlier in the SAME block, not just earlier in the file).
 
@@ -119,7 +119,7 @@ plan proves against, one per component:
   are untouched by D1 — the bug is in `bin/fgos.mjs`'s `repoRoot`
   computation feeding that function correct-vs-wrong booleans, not in the
   guard's own decision logic. Not material to CONTEXT.md (implementation
-  detail); pinned here per fgos-planning's own Assumptions rule.
+  detail); pinned here per fgos-coding-planning's own Assumptions rule.
 - `STORE_MISSING_WARNING_VERBS` entries for `evolve`/`docs-index` follow the
   exact same test/warning shape tsk-3g5 already established for
   `gate-bypass`/`doc-sources`/`lock-status` — no new warning message
@@ -132,16 +132,16 @@ grep -A5 "main-checkout-reset" bin/fgos.mjs | grep -q isMainWorktree && \
 grep -A20 "function excludeFgosPaths" bin/fgos.mjs | grep -q entropy-history && \
 grep -A3 "STORE_MISSING_WARNING_VERBS = new Set" bin/fgos.mjs | grep -q evolve && \
 grep -A3 "STORE_MISSING_WARNING_VERBS = new Set" bin/fgos.mjs | grep -q docs-index && \
-test $(grep -c "root=\$(git rev-parse --path-format=absolute --git-common-dir" .claude/skills/fgos-exploring/SKILL.md) -ge 3 && \
-test $(grep -c "root=\$(git rev-parse --path-format=absolute --git-common-dir" .agents/skills/fgos-exploring/SKILL.md) -ge 3 && \
-grep -q other.mjs test/intake/decompose.test.mjs && \
-node --test test/cli/fgos.test.mjs test/intake/decompose.test.mjs test/runner/loop.test.mjs test/runner/main-checkout-reset-guard.test.mjs test/skills/fgos-exploring-root-fix.test.mjs && \
+test $(grep -c "root=\$(git rev-parse --path-format=absolute --git-common-dir" .claude/skills/fgos-coding-exploring/SKILL.md) -ge 3 && \
+test $(grep -c "root=\$(git rev-parse --path-format=absolute --git-common-dir" .agents/skills/fgos-coding-exploring/SKILL.md) -ge 3 && \
+grep -q other.mjs test/intake/plan.test.mjs && \
+node --test test/cli/fgos.test.mjs test/intake/plan.test.mjs test/runner/loop.test.mjs test/runner/main-checkout-reset-guard.test.mjs test/skills/fgos-coding-exploring-root-fix.test.mjs && \
 node --test 'test/**/*.test.mjs'
 ```
 
 Same command CONTEXT.md's discover gate already locked (D1-D6), extended
 with `test/runner/main-checkout-reset-guard.test.mjs` and the new
-`test/skills/fgos-exploring-root-fix.test.mjs`.
+`test/skills/fgos-coding-exploring-root-fix.test.mjs`.
 
 ## Open questions
 

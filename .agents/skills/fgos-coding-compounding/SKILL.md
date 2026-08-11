@@ -1,5 +1,5 @@
 ---
-name: fgos-compounding
+name: fgos-coding-compounding
 description: >-
   Turn a retrospective-status item's real captured signal into a Diataxis-classified,
   evidence-quoted end-user document before the item is allowed toward `done`.
@@ -10,7 +10,7 @@ description: >-
   just reached retrospective, what happens now".
 ---
 
-# fgos-compounding
+# fgos-coding-compounding
 
 Runs while a work item sits at status `retrospective` (D11,
 work-item-status-delivered-retrospective-cleanup; superseded the retired
@@ -130,7 +130,7 @@ evidence-quoted end-user document.
 
    ```bash
    if git -C "$root" rev-parse --verify -q MERGE_HEAD >/dev/null; then
-     echo "fgos-compounding: refusing to commit — MERGE_HEAD is set on \"$root\" — a merge is already staged there (likely a concurrent or crashed fgos approve). Resolve or abort that merge first; never let this step's own commit silently absorb it." >&2
+     echo "fgos-coding-compounding: refusing to commit — MERGE_HEAD is set on \"$root\" — a merge is already staged there (likely a concurrent or crashed fgos approve). Resolve or abort that merge first; never let this step's own commit silently absorb it." >&2
      exit 1
    fi
    git -C "$root" add "docs/<quadrant>/<file>.md"

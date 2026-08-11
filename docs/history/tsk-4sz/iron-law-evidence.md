@@ -24,7 +24,7 @@ scoped to the two new assertions):
 node --test --test-name-pattern="domain-aware (decompose child addWork|discovered-from addWork) inherits parent domain" test/e2e/domain-aware-stage-literals.test.mjs
 ```
 
-**Before the fix** (`src/intake/decompose.mjs` / `src/runner/loop.mjs`
+**Before the fix** (`src/intake/plan.mjs` / `src/runner/loop.mjs`
 temporarily reverted to the pre-fix commit, test file kept at its
 post-fix state) — both new tests failed exactly on the claimed bug: a
 `triage`-domain child/discovered-from item silently defaulted to no
@@ -92,11 +92,11 @@ pre-exist this item, unrelated to this change).
 
 `loop.mjs` sits in the runner's core dispatch chain
 (`dispatchClaimedItem → claimAndDispatch → runOnce`, confirmed via
-GitNexus `impact()` during `fgos-planning` — HIGH blast radius,
+GitNexus `impact()` during `fgos-coding-planning` — HIGH blast radius,
 `impactedCount: 3`) — exactly the kind of self-modifying-capable module
 the Iron Law exists to gate. The proof above is real failing-test-first
 evidence, captured by reverting only the two target files to their
-pre-fix state (`git checkout HEAD~1 -- src/intake/decompose.mjs
+pre-fix state (`git checkout HEAD~1 -- src/intake/plan.mjs
 src/runner/loop.mjs`) while keeping the new test file at its post-fix
 state, then restoring the fix (`git checkout HEAD -- ...`) and
 re-running — never fabricated or paraphrased from expectation.

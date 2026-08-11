@@ -48,7 +48,7 @@ party actually looking at it.
 ## Why the trigger reuses `classifyIronLaw` at return-time instead of a separate heuristic
 
 Evidence isn't gathered speculatively for every item "just in case." D2
-ties collection to a real signal: `fgos-code-implement` already runs its
+ties collection to a real signal: `fgos-coding-implement` already runs its
 normal before/after test cycle for a fix as a matter of course; the
 contract file only gets *persisted* when the item's final diff, evaluated
 with the exact same function the real gate uses
@@ -67,7 +67,7 @@ The contract file's storage location (D3) is
 `fgw/<id>` branch — deliberately not `.fgos/` and not the outcome
 record's `docType`/`docPath` fields. Two separate constraints rule those
 out: worktrees never carry their own `.fgos/` (ADR0020), so evidence
-written mid-`fgos-code-implement` inside a worktree has nowhere durable to land
+written mid-`fgos-coding-implement` inside a worktree has nowhere durable to land
 in `.fgos/` even if that were otherwise desirable; and the outcome
 record's `docType`/`docPath` fields are only populated at
 `compound-learn`, which runs *after* `approve` already needs the evidence

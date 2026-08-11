@@ -1,6 +1,6 @@
-# Why `fgos-compounding` refuses to commit when `MERGE_HEAD` is set
+# Why `fgos-coding-compounding` refuses to commit when `MERGE_HEAD` is set
 
-`fgos-compounding`'s retrospective-synthesis step writes an end-user
+`fgos-coding-compounding`'s retrospective-synthesis step writes an end-user
 document to the main checkout and commits it with `git -C "$root" commit
 -m "docs(<id>): retrospective synthesis"`. That commit step used to run
 unconditionally — no `MERGE_HEAD` check, no `.fgos/main-checkout.lock`
@@ -11,7 +11,7 @@ to.
 ## The bug this closes (tsk-2oy)
 
 When a concurrent or crashed `fgos approve` merge was staged but not yet
-committed (`MERGE_HEAD` present) at the exact moment `fgos-compounding`'s
+committed (`MERGE_HEAD` present) at the exact moment `fgos-coding-compounding`'s
 step 3 ran its own `git commit`, that plain commit silently **completed**
 the other process's staged merge and mislabeled it under the
 retrospective item's own commit message — burying the other item's real
@@ -41,19 +41,19 @@ around two failed merges, not by this stray-`MERGE_HEAD` mechanism.)
 
 ## The fix
 
-`fgos-compounding` step 3 now refuses instead of silently absorbing:
+`fgos-coding-compounding` step 3 now refuses instead of silently absorbing:
 
 ```bash
 if git -C "$root" rev-parse --verify -q MERGE_HEAD >/dev/null; then
-  echo "fgos-compounding: refusing to commit — MERGE_HEAD is set on \"$root\" — a merge is already staged there (likely a concurrent or crashed fgos approve). Resolve or abort that merge first; never let this step's own commit silently absorb it." >&2
+  echo "fgos-coding-compounding: refusing to commit — MERGE_HEAD is set on \"$root\" — a merge is already staged there (likely a concurrent or crashed fgos approve). Resolve or abort that merge first; never let this step's own commit silently absorb it." >&2
   exit 1
 fi
 git -C "$root" add "docs/<quadrant>/<file>.md"
 git -C "$root" commit -m "docs(<id>): retrospective synthesis"
 ```
 
-Mirrored identically in both `.claude/skills/fgos-compounding/SKILL.md`
-and `.agents/skills/fgos-compounding/SKILL.md` — this repo keeps the two
+Mirrored identically in both `.claude/skills/fgos-coding-compounding/SKILL.md`
+and `.agents/skills/fgos-coding-compounding/SKILL.md` — this repo keeps the two
 skill copies in lockstep.
 
 ## Why a plain precondition check, not the full main-checkout lock

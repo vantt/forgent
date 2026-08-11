@@ -41,7 +41,7 @@ lần chốt này) và `domainFields` nested per-domain (optional-additive).
 
 | # | Vấn đề | Trạng thái | Ghi chú |
 |---|---|---|---|
-| 1 | `tsk-3p1` (marker RUL12, acceptance clause 5 của tsk-38t nói "gộp chung 1 vòng explore với tsk-3p1") | **RÕ — đã đổi** | `fgos show tsk-3p1` xác nhận `status: wontfix`. Việc đó KHÔNG còn cần gộp — RUL12 dependent-open hôm nay đã đọc `frontier.mjs:186 RESOLVED_STATUSES = {'delivered','retrospective','cleanup','done','wontfix'}`, tức là code thật đã tự giải quyết đúng câu hỏi "done trả lời 2 nghĩa" theo hướng khác (thêm status `delivered` làm điểm mở-dependent, không phải marker cộng-thêm). Acceptance clause 5 của tsk-38t nên coi là lỗi thời, cần xoá/viết lại khi item quay lại `fgos-planning`. |
+| 1 | `tsk-3p1` (marker RUL12, acceptance clause 5 của tsk-38t nói "gộp chung 1 vòng explore với tsk-3p1") | **RÕ — đã đổi** | `fgos show tsk-3p1` xác nhận `status: wontfix`. Việc đó KHÔNG còn cần gộp — RUL12 dependent-open hôm nay đã đọc `frontier.mjs:186 RESOLVED_STATUSES = {'delivered','retrospective','cleanup','done','wontfix'}`, tức là code thật đã tự giải quyết đúng câu hỏi "done trả lời 2 nghĩa" theo hướng khác (thêm status `delivered` làm điểm mở-dependent, không phải marker cộng-thêm). Acceptance clause 5 của tsk-38t nên coi là lỗi thời, cần xoá/viết lại khi item quay lại `fgos-coding-planning`. |
 | 2 | Bảng map status → statusCategory trong report gốc (mục 6) chỉ liệt 7 status cũ | **RÕ — đã đổi, cần bảng mới** | FSM hôm nay có 10 status (`todo/doing/blocked/awaiting-approval/awaiting-human/delivered/retrospective/cleanup/done/wontfix`) — `delivered/retrospective/cleanup` được thêm SAU report bởi quyết định `work-item-status-delivered-retrospective-cleanup` D1/D2, thay `doing→done`/`awaiting-approval→done` trực tiếp bằng chuỗi `delivered→retrospective→cleanup→done`. Đây đúng là câu hỏi đang treo ở gate (`fgos show tsk-38t` — discovery Q2, impactScore 78) — mình sẽ bàn kỹ ở vòng tới, KHÔNG tự chốt ở đây. |
 | 3 | `RESOLVED_STATUSES` (`frontier.mjs:186`) đã là 1 tập hợp "giống category" viết tay | **RÕ** | Đây chính là bằng chứng sống cho thấy code đã tự phát sinh nhu cầu category — `{delivered, retrospective, cleanup, done, wontfix}` dùng cho dep-resolve VÀ `hasOpenDescendant`. Khớp gần đúng với đề xuất gate Q2 của item (4 status đó → `completed`, `wontfix` → `canceled`). |
 | 4 | `retro-pool.mjs:12` (`isRetrospectiveReady`) đọc `item.status === 'retrospective'` literal | **RÕ — xác nhận consumer thật** | Đây là ví dụ cụ thể, thật, của "cơ chế domain-agnostic đang đọc literal status" mà report mục 6 mô tả trừu tượng — object thật cần đổi sang đọc statusCategory (hoặc giữ nguyên nếu category `review`/`completed` không đủ mịn để phân biệt "vừa delivered" khỏi "sẵn sàng retrospective" — CẦN BÀN, vì nếu cả `delivered/retrospective/cleanup/done` đều → `completed` thì statusCategory KHÔNG đủ mịn để retro-pool tự phân biệt trạng thái nào trong chuỗi đó — xem #5). |
@@ -63,7 +63,7 @@ lần chốt này) và `domainFields` nested per-domain (optional-additive).
 | D2 | `wontfix` ở lại đoạn ĐẦU (domain-owned label — coding giữ nguyên chữ `wontfix`, 0 migration) nhưng LUÔN map cố định vào `statusCategory: 'canceled'` — áp đúng cơ chế label/category đã có cho cả đoạn đầu, không phải luật riêng cho `wontfix`. Domain khác có thể tự đặt label khác (`declined`/`out-of-scope`) cùng map vào `canceled`. | ✅ `tsk-38t` seq 5585 |
 | D3 | Bảng map 5 status đoạn đầu còn lại → `statusCategory`: `todo→todo`, `doing→in-progress`, `blocked→in-progress`, `awaiting-human→in-progress`, `awaiting-approval→review`. Căn cứ tiền lệ đã ghi thành luật: `docs/history/status-proposed-rename/CONTEXT.md` D3 — "1 status cấp cao mới CHỈ khi có hiệu ứng cấu trúc riêng trên frontier/dependency graph; nếu không, gộp vào `awaiting-human`, phân biệt mịn hơn nằm ở field `reason`/`ask`/`answer`, không phải enum mới." `doing`/`blocked`/`awaiting-human` có hiệu ứng cấu trúc GIỐNG HỆT nhau trên `frontier.mjs` hôm nay (không cái nào trong `ready`-filter, không cái nào trong `RESOLVED_STATUSES`) → đúng luật này, gộp `in-progress`. Category `backlog`/`completed` tạm không status nào map (dự phòng, đúng khung Linear-style). | ✅ `tsk-38t` seq 5586 |
 | D4 | Backfill `statusCategory` cho event cũ qua 1 migration script (KHÔNG lazy-default derive-on-read), theo đúng khuôn 2 tiền lệ đã có (`migrate-status-proposed-to-awaiting-approval.mjs`, `migrate-actor-to-role.mjs`) — backup + dry-run report + khoá `withEventsLock` + phạm vi đúng 3 kho (live store, `dogfood-fixture/.fgos`, `fgos-test-drive/.fgos`). Áp bảng map D2/D3 cho ~1500+ `work.move` event sang 6 status đoạn đầu. Lý do: L3 (luật khoá) đòi hỏi replay-from-zero xác định tuyệt đối; lazy-default rủi ro thật vì `DOMAINS[domain].statusLabels` vẫn là code sửa được — sửa sau này sẽ làm 2 lần replay ra 2 kết quả khác nhau cho cùng 1 event cũ, vi phạm L3 rule 2. | ✅ `tsk-38t` seq 5589 |
-| D5 | Cơ chế skill-per-domain chỉ cần cho `retrospective` — tái dùng field `skillMap` đã có trong `DOMAINS[domain]` (không thêm field mới), thêm key `'retrospective'` (mặc định `fgos-compounding` cho coding, 0 regression); `fgOS:retro-next` đổi từ gọi cứng sang tra `getDomain(item.domain).skillMap['retrospective']`. `cleanup` GIỮ NGUYÊN pure-harness, không cần skill nào — khác biệt per-domain đã đủ qua field `worktreeBacked` có sẵn. | ✅ `tsk-38t` seq 5595 |
+| D5 | Cơ chế skill-per-domain chỉ cần cho `retrospective` — tái dùng field `skillMap` đã có trong `DOMAINS[domain]` (không thêm field mới), thêm key `'retrospective'` (mặc định `fgos-coding-compounding` cho coding, 0 regression); `fgOS:retro-next` đổi từ gọi cứng sang tra `getDomain(item.domain).skillMap['retrospective']`. `cleanup` GIỮ NGUYÊN pure-harness, không cần skill nào — khác biệt per-domain đã đủ qua field `worktreeBacked` có sẵn. | ✅ `tsk-38t` seq 5595 |
 | D6 | `domainFields` chốt NGUYÊN theo thiết kế report gốc (mục 3), không sửa: field optional `domainFields: { [domainName]: {...} }` trên work item, optional-additive (RUL11); ghi qua 2 cửa sẵn có (`add` payload, `edit` thêm vào `EDITABLE_FIELDS`); patch **ghi đè toàn object** mỗi lần (latest-wins, không deep-merge); chỉ namespace khớp `work.domain` hiện tại được đọc/validate; validate qua optional `fieldSchema` khai trong `DOMAINS[domain]` (giống `skillMap`); fold qua spread-fold sẵn có. (Distill từ report — xem §5.) | ✅ `tsk-38t` seq 5602 |
 
 ## 5. Q&A log
@@ -87,7 +87,7 @@ lần chốt này) và `domainFields` nested per-domain (optional-additive).
   status/stage trước deliver là chắc chắn khác nhau. nhưng retro không có
   status khác nhưng sẽ có cách học khác (skill), cleanup cũng sẽ có cách
   dọn khác (skill)." — giữ nguyên không đổi qua 2 vòng → chốt **D1**. Scout
-  thêm: grep xác nhận `fgos-compounding` gọi cứng không theo domain
+  thêm: grep xác nhận `fgos-coding-compounding` gọi cứng không theo domain
   (`retro-pool.mjs`, `bin/fgos.mjs:1012/1088`) → mở vấn đề #10 (gap thật,
   chưa có cơ chế skill-per-domain cho `retrospective`/`cleanup`).
 - **2026-08-04 (vòng 4, tổng quan):** Anh hỏi tổng quan toàn bộ 10 status,
@@ -226,7 +226,7 @@ category — chúng đã đúng, mãi mãi, không phụ thuộc domain; KHÔNG 
 per-domain nằm ở **skill nào chạy** bước `retrospective`/`cleanup` (mở
 rộng pattern `skillMap` per-domain đã có ở tầng `stage`,
 `workflow-stage-graphs.mjs`), không phải ở tên status — nhưng cơ chế chọn
-skill-theo-domain đó CHƯA TỒN TẠI (gap thật, §3 #10; `fgos-compounding`
+skill-theo-domain đó CHƯA TỒN TẠI (gap thật, §3 #10; `fgos-coding-compounding`
 đang gọi cứng, không tham số hoá theo domain).
 
 **Hệ quả 1 chi tiết cần lưu ý cho `RESOLVED_STATUSES` (frontier.mjs:186):**
@@ -245,7 +245,7 @@ L3 (replay-from-zero xác định) nếu bảng đó bị sửa sau này.
 
 **Skill-per-domain cho `retrospective` (D5):** thêm key `'retrospective'`
 vào `skillMap` đã có trong `DOMAINS[domain]` (`workflow-stage-graphs.mjs`),
-mặc định `fgos-compounding` cho coding — 0 regression. `fgOS:retro-next`
+mặc định `fgos-coding-compounding` cho coding — 0 regression. `fgOS:retro-next`
 đổi tra cứu từ gọi cứng sang `getDomain(item.domain).skillMap['retrospective']`.
 `cleanup` không đổi gì — pure harness, khác biệt per-domain đã đủ qua
 `worktreeBacked`.
@@ -313,14 +313,14 @@ từng consumer với item domain giả lập có label khác coding.
 
 ### skillMap['retrospective'] per-domain {#task-skillmap-retrospective}
 **Mục tiêu:** thêm key `'retrospective'` vào `skillMap` của `DOMAINS[coding]`
-(mặc định `fgos-compounding`), đổi `fgOS:retro-next` từ gọi cứng sang tra
+(mặc định `fgos-coding-compounding`), đổi `fgOS:retro-next` từ gọi cứng sang tra
 `getDomain(item.domain).skillMap['retrospective']`. **D-ID áp dụng:** D5.
 **Quan hệ:** độc lập kỹ thuật với các task trên (đụng
 `workflow-stage-graphs.mjs` + skill file `fgOS:retro-next`, không tranh
 file với schema/backfill/consumer-migration) — làm trước/sau/song song
 đều được. **Verify nháp:** domain giả lập thứ 2 (xem task test dưới) với
-`skillMap.retrospective` khác `fgos-compounding` — `fgOS:retro-next` load
-đúng skill đó, không phải `fgos-compounding`.
+`skillMap.retrospective` khác `fgos-coding-compounding` — `fgOS:retro-next` load
+đúng skill đó, không phải `fgos-coding-compounding`.
 
 ### domainFields nested per-domain {#task-domain-fields}
 **Mục tiêu:** thêm field optional `domainFields` — schema (`work.mjs`'s

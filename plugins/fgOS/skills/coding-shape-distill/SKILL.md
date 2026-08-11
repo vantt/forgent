@@ -41,7 +41,7 @@ section it fills, every judgment about what's still open belongs to
    source document leaves something genuinely open and material, expect a
    short live exchange for that gap specifically — this mode is fast, not
    silent about real ambiguity. Otherwise it proceeds straight to its own
-   native-first handoff into `fgos-exploring`/`fgos-planning` once
+   native-first handoff into `fgos-coding-exploring`/`fgos-coding-planning` once
    converged. Report back whichever of those `fgos-coding-shaping` actually
    reached — this wrapper does not add a second stopping condition of its
    own.

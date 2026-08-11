@@ -10,7 +10,7 @@ no cross-platform concern, no multi-domain, no weak-proof area. 1 flag →
 small (a couple of files, no gray areas — no larger lane honestly fits).
 
 No `CONTEXT.md` exists for this item: it took the `clarify -> decompose`
-direct edge (no `fgos-exploring` pass), a registered edge in
+direct edge (no `fgos-coding-exploring` pass), a registered edge in
 `src/state/workflow-stage-graphs.mjs`'s `DOMAINS.coding.transitions`. There
 is no locked decision to cite here; this plan's only source is the item's
 own (rewritten) title/description.
@@ -114,7 +114,7 @@ Concrete cases worth covering, matched to `small`'s depth:
   (`status`, `priority`, `blocked_by`, `blocks`), not a new data field
   requiring a wider `fgos triage` contract. See "Rejected alternative"
   above. Unproven until a person confirms it's what they meant — flagged
-  here per `fgos-validating`'s own assumption check, not asked as a
+  here per `fgos-coding-validating`'s own assumption check, not asked as a
   question (fails the material/grounded/answerable filter's "answerable"
   leg: a reasonable, low-risk default already exists from the data on
   hand).

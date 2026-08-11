@@ -5,7 +5,7 @@ existing test's own allowlist data. No auth/data-model/public-contract/
 cross-platform/multi-domain flags apply; a single-file text addition).
 
 No local `CONTEXT.md` — direct-entry item, discovered mid-tsk-592, not
-shaped via `fgos-coding-shaping`/`fgos-exploring`. The item's own
+shaped via `fgos-coding-shaping`/`fgos-coding-exploring`. The item's own
 description (written with full context of the discovery) is the whole
 spec.
 

@@ -16,7 +16,7 @@ files once committed) match any entry in `MODULE_RULES` (no
 
 `matchedFlags: ["auth"]` is a keyword-substring hit on this item's own
 `description` field — the word **"authoring"** ("does NOT duplicate
-fgos-exploring/fgos-planning **authoring** logic") contains the literal
+fgos-coding-exploring/fgos-coding-planning **authoring** logic") contains the literal
 substring `auth`, which `classifyIronLaw`'s case-insensitive
 `description.includes(keyword)` check matches against `HEAVY_KEYWORDS`.
 This item makes no auth/authorization/authentication change of any kind —
@@ -33,10 +33,10 @@ this skill's own "no skip on a false-positive-looking flag" rule.
 ## Failing-test-first proof
 
 Item's own `verify` command (recorded on `tsk-69g`, survived two rounds of
-an independent second-pass judge at `fgos-exploring`):
+an independent second-pass judge at `fgos-coding-exploring`):
 
 ```
-test -f .claude/skills/fgos-coding-shaping/SKILL.md && grep -q "DISCUSSION.md" .claude/skills/fgos-coding-shaping/SKILL.md && grep -qi "native-first" .claude/skills/fgos-coding-shaping/SKILL.md && grep -q "fgos-exploring" .claude/skills/fgos-coding-shaping/SKILL.md && grep -q "fgos-planning" .claude/skills/fgos-coding-shaping/SKILL.md && grep -q "^name: coding-shape$" plugins/fgOS/skills/coding-shape/SKILL.md && grep -qi "fgos-coding-shaping" plugins/fgOS/skills/coding-shape/SKILL.md && grep -q "^name: coding-shape-distill$" plugins/fgOS/skills/coding-shape-distill/SKILL.md && grep -qi "fgos-coding-shaping" plugins/fgOS/skills/coding-shape-distill/SKILL.md && grep -qi "doc-path" plugins/fgOS/skills/coding-shape-distill/SKILL.md
+test -f .claude/skills/fgos-coding-shaping/SKILL.md && grep -q "DISCUSSION.md" .claude/skills/fgos-coding-shaping/SKILL.md && grep -qi "native-first" .claude/skills/fgos-coding-shaping/SKILL.md && grep -q "fgos-coding-exploring" .claude/skills/fgos-coding-shaping/SKILL.md && grep -q "fgos-coding-planning" .claude/skills/fgos-coding-shaping/SKILL.md && grep -q "^name: coding-shape$" plugins/fgOS/skills/coding-shape/SKILL.md && grep -qi "fgos-coding-shaping" plugins/fgOS/skills/coding-shape/SKILL.md && grep -q "^name: coding-shape-distill$" plugins/fgOS/skills/coding-shape-distill/SKILL.md && grep -qi "fgos-coding-shaping" plugins/fgOS/skills/coding-shape-distill/SKILL.md && grep -qi "doc-path" plugins/fgOS/skills/coding-shape-distill/SKILL.md
 ```
 
 **Before** (the three new files temporarily moved aside, proving the

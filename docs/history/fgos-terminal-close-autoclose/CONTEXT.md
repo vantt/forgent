@@ -23,7 +23,7 @@ closes its own panes fills both tabs permanently.
 
 | ID | Decision |
 |----|----------|
-| D1 | `autoClose` ships only for the 2 pane-launch points that actually exist today: `/fgOS:pick` and `/fgOS:discover`, via `PaneOrchestrator::open_pick_pane`/`open_discover_pane` (`herdr-plugin/src/pick.rs`, `herdr-plugin/src/ports.rs`). `/fgOS:decompose`, `/fgOS:retro-next`, `/fgOS:cleanup-next` have no launch-into-pane mechanism at all yet — building one for them is out of scope here; their own `autoClose` wiring waits for whichever item first adds that mechanism. |
+| D1 | `autoClose` ships only for the 2 pane-launch points that actually exist today: `/fgOS:pick` and `/fgOS:discover`, via `PaneOrchestrator::open_pick_pane`/`open_discover_pane` (`herdr-plugin/src/pick.rs`, `herdr-plugin/src/ports.rs`). `/fgOS:plan`, `/fgOS:retro-next`, `/fgOS:cleanup-next` have no launch-into-pane mechanism at all yet — building one for them is out of scope here; their own `autoClose` wiring waits for whichever item first adds that mechanism. |
 | D2 | `/fgOS:terminal-close` only fires when the driven item's outcome is an advance (stage/status moved forward) or a park at `awaiting-human`. On a genuine error stop — `blocked`, `lock-timeout`, `no-progress` (the categories `fgos-coding-driving` already distinguishes) — the pane stays open. Auto-closing on an error outcome would destroy the only evidence available to a person debugging an unattended orchestrator run. |
 
 ## Pinned terms
@@ -68,6 +68,6 @@ closes its own panes fills both tabs permanently.
 - Whether `/fgOS:terminal-close`'s own no-op guard reuses `rename.sh`'s
   shell script directly or is a new script — implementation choice, should
   follow the existing precedent's shape closely regardless.
-- Adding launch-into-pane mechanisms for `/fgOS:decompose`/
+- Adding launch-into-pane mechanisms for `/fgOS:plan`/
   `/fgOS:retro-next`/`/fgOS:cleanup-next` — explicitly out of scope (D1),
   a separate future item.

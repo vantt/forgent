@@ -62,7 +62,7 @@ match is a real risk worth fixing now, and if so, how — scoped strictly to
   available for tsk-4ot to depend on even if D2 had gone the other way.
 - Impact-analysis posture (`fgos tool query --capability impact-analysis
   --status present`): GitNexus registered and `present`. Informational
-  only per `fgos-exploring`'s own rule — this crate (separate `Cargo.toml`,
+  only per `fgos-coding-exploring`'s own rule — this crate (separate `Cargo.toml`,
   outside the indexed Node project's `npm test` surface per its own header
   comment in `bin/fgos.mjs`) is unlikely to be covered by the existing
   GitNexus index; not re-verified here since this skill performs no code

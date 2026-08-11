@@ -68,7 +68,7 @@ retrospective-stage skill itself, invoking it, running `fgos move --to
 cleanup`, and classifying a raw subprocess exit code — shrank to a true
 *launcher*: pick one `status:retrospective` item, hand it to
 `fgos-coding-driving` with `ceiling: status:cleanup`, relay whatever the
-driver reports. The driver now owns resolving `fgos-compounding` for the
+driver reports. The driver now owns resolving `fgos-coding-compounding` for the
 `retrospective` position and calling `fgos move --to cleanup` once
 synthesis completes — the same "engine's verb always wins" shape every
 other stage-skill in the driver's loop already followed, just extended

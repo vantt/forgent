@@ -1243,7 +1243,7 @@ export async function resolveCapacityCli(
     );
   }
   // MAIN CHECKOUT root, not `resolveRepoRoot`'s worktree-own root (tsk-5hv,
-  // found by fgos-code-implement): `ensureRunnerConfigForDir` reads
+  // found by fgos-coding-implement): `ensureRunnerConfigForDir` reads
   // `.fgos/config.json`, which is unconditionally wiped from every
   // freshly-created worktree (ADR0020) — resolving to a worktree's own
   // root here would silently bootstrap a throwaway default config instead

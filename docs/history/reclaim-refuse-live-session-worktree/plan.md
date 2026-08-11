@@ -5,7 +5,7 @@
 **high-risk** (hard-gate: data loss — the whole item is about preventing
 destructive removal of a live, in-use worktree).
 
-Flag count for the record (10-flag checklist, `fgos-planning`'s own mode
+Flag count for the record (10-flag checklist, `fgos-coding-planning`'s own mode
 gate):
 
 | Flag | Applies? |
@@ -56,7 +56,7 @@ here" path without mutating the real global `process.cwd()`.
 
 Error message includes the phrase **"the calling session's own live
 checkout"** — deliberate, concrete wording chosen now (not left to
-`fgos-code-implement` to improvise) so `CONTEXT.md`'s own verify command
+`fgos-coding-implement` to improvise) so `CONTEXT.md`'s own verify command
 (`rg -n 'live session|isLiveSessionWorktree' -i ...`) has something real to
 match once this lands.
 
@@ -103,7 +103,7 @@ radius is genuinely this narrow: one function, one direct caller.
 --json` shows this item in its own isolated component — nothing else in
 the graph blocks or is blocked by it).
 
-## Proof surface (for `fgos-validating` / `fgos-code-implement`)
+## Proof surface (for `fgos-coding-validating` / `fgos-coding-implement`)
 
 | Risk | How risky | Proof point |
 |---|---|---|
@@ -128,7 +128,7 @@ regression).
   separately from `cwd` (confirmed: `bin/fgos.mjs`'s own `--dir` flag
   exists specifically because `cwd` and `repoRoot` already diverge in a
   linked worktree). Not re-verified against a live two-hop chained session
-  in this plan — `fgos-validating`'s reality check should confirm this
+  in this plan — `fgos-coding-validating`'s reality check should confirm this
   assumption holds, since it is the one thing the whole fix leans on.
 
 ## Split

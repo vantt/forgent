@@ -34,8 +34,8 @@ Risk map:
 
 | Component | Risk | Proof point |
 |---|---|---|
-| `.claude/skills/fgos-exploring/SKILL.md` prose edit | Light — additive instruction, no existing step removed or reworded | `grep -q "^## Outstanding questions"` against the file itself (item's own `verify`) |
-| `.claude/skills/fgos-planning/SKILL.md` prose edit | Light — same shape, additive | same, against the other file |
+| `.claude/skills/fgos-coding-exploring/SKILL.md` prose edit | Light — additive instruction, no existing step removed or reworded | `grep -q "^## Outstanding questions"` against the file itself (item's own `verify`) |
+| `.claude/skills/fgos-coding-planning/SKILL.md` prose edit | Light — same shape, additive | same, against the other file |
 | `src/state/gate-bypass.mjs` staying untouched | The one real risk this item could get wrong is scope creep into "loosening" the check | verify's own NEGATIVE clause: `! git diff --name-only main...HEAD | grep -q "^src/state/gate-bypass\.mjs$"` |
 | `test/state/gate-bypass.test.mjs` regression coverage | Light — existing suite already covers `hasOpenItems`/`canAutoApprove`; this item adds no new code path to that file, only keeps it green | `npm test` (item's own `verify`, first clause) |
 
@@ -51,14 +51,14 @@ is not invoked for a proof point (already queried once, informationally, in
 Add one short instruction to each `SKILL.md`'s existing artifact-writing
 step:
 
-- **`fgos-exploring/SKILL.md`**, in its "Write the decision doc" step
+- **`fgos-coding-exploring/SKILL.md`**, in its "Write the decision doc" step
   (the step that already lists what `CONTEXT.md` must cover): append that
   the doc must end with a `## Outstanding questions` section — `None`
   (optionally with a short trailing clause, matching the existing
   convention already used by 128/197 `CONTEXT.md` files) when every
   candidate question was locked or deferred, otherwise a real list of what
-  is still open for `fgos-planning`.
-- **`fgos-planning/SKILL.md`**, in its "Shape" step (the step that already
+  is still open for `fgos-coding-planning`.
+- **`fgos-coding-planning/SKILL.md`**, in its "Shape" step (the step that already
   scales `plan.md`'s content to the mode): append the identical
   instruction for `plan.md` — same heading, same `None`-or-list body. Per
   `CONTEXT.md` D2, this will almost always read `None` since step 6
@@ -89,7 +89,7 @@ indented heading example each `SKILL.md` now carries — see D3's
 implementation-time correction note):
 
 ```
-npm test && grep -Eq "^[[:space:]]*## Outstanding questions[[:space:]]*$" .claude/skills/fgos-exploring/SKILL.md && grep -Eq "^[[:space:]]*## Outstanding questions[[:space:]]*$" .claude/skills/fgos-planning/SKILL.md && ! git diff --name-only main...HEAD | grep -q "^src/state/gate-bypass\.mjs$"
+npm test && grep -Eq "^[[:space:]]*## Outstanding questions[[:space:]]*$" .claude/skills/fgos-coding-exploring/SKILL.md && grep -Eq "^[[:space:]]*## Outstanding questions[[:space:]]*$" .claude/skills/fgos-coding-planning/SKILL.md && ! git diff --name-only main...HEAD | grep -q "^src/state/gate-bypass\.mjs$"
 ```
 
 Per `docs/how-to/write-verify-for-a-skill-prose-change.md`: `npm test` is

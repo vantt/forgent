@@ -83,7 +83,7 @@ child order, so this doesn't change the internal ordering call.
 
 ### Risk map
 
-| Component | Risk | Proof point (for `fgos-validating`) |
+| Component | Risk | Proof point (for `fgos-coding-validating`) |
 |---|---|---|
 | `driftStatus` git subprocess calls | medium — wrong ahead/behind math silently mis-reports drift | test against a real git fixture repo with a deliberately-diverged branch (mirrors the actual tsk-3bn incident shape) |
 | `sync-root` action | **high** — mutates `main`/a parent branch; a bug here recreates the exact incident this item exists to prevent | must run through the SAME lock/verify path `approve` already uses (no second, untested mutation path); test both nested-target (`fgw/parent`) and `main`-target cases |
@@ -116,7 +116,7 @@ execute time.
 
 ## Split — child items (reconciled with engine's `judgeDecompose`, D8)
 
-`fgos decompose tsk-3bn` returned `need-human`: the engine's own
+`fgos plan tsk-3bn` returned `need-human`: the engine's own
 independent judgment (reading only the item's title/description/refs, no
 visibility into `CONTEXT.md`/this file) proposed a 3-child split covering
 `sync-root` / drift-detection wired into `fgos doctor` / a close-out
@@ -166,7 +166,7 @@ the real child holding their needed capability exists.
 
 - `driftStatus`'s git subprocess calls run from the real main checkout
   (per this item's own origin incident and ADR0020) — never from a
-  dispatch worktree's ephemeral path. Not proven here; `fgos-validating`
+  dispatch worktree's ephemeral path. Not proven here; `fgos-coding-validating`
   should check this explicitly given it's exactly the class of bug this
   item exists to close.
 - The `deps-chain`/`waiting`-vs-`mergeSets` structural question

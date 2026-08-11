@@ -288,7 +288,7 @@ test('resolveDiscovery advances exploring -> decompose on a caller-supplied clea
   assert.equal(result.outcome, 'clear');
 
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].stage, 'decompose');
+  assert.equal(view.work['item-x'].stage, 'planning');
   assert.equal(view.work['item-x'].verify, 'npm test -- exploring');
 });
 

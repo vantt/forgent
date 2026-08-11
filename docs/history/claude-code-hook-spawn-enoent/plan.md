@@ -57,6 +57,6 @@ assess for a new markdown file.
 ## Assumptions
 
 - The runbook's exact prose/heading structure is left to
-  `fgos-code-implement` to write, following the cited sibling-doc
+  `fgos-coding-implement` to write, following the cited sibling-doc
   convention — not material enough to lock as a separate `CONTEXT.md`
-  decision (implementation detail, per `fgos-exploring`'s own filter).
+  decision (implementation detail, per `fgos-coding-exploring`'s own filter).
