@@ -34,7 +34,7 @@ import { rankImpact } from '../src/state/impact.mjs';
 import { isResolvedStatus } from '../src/state/frontier.mjs';
 import { mergeReadiness, mergeTree } from '../src/state/graph-harness.mjs';
 import { paginate } from '../src/state/cursor.mjs';
-import { runGoalCheck } from '../src/runner/goal-check.mjs';
+import { runGoalCheck, detachedWorktreeFgosHint } from '../src/runner/goal-check.mjs';
 import { frozenJudgeHits, footprintDiffHits, normalizePath } from '../src/runner/frozen-judge.mjs';
 import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, buildOwnFileSet, detectTrunk, isMainWorktree } from '../src/runner/merge.mjs';
 import { createGitHubPR, mergeGitHubPR, viewGitHubPRStatus } from '../src/runner/github-adapter.mjs';
@@ -2475,16 +2475,23 @@ async function runVerb(verb, flags, positional, dir) {
         // "(exit null)" as if that were a real exit code.
         moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: check.timedOut ? 'verify-timeout' : 'verify-fail', role: 'system' });
         addOutcome(dir, { id, actual: { outcome: 'blocked', passed: false, attempts: 1, errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss', aheadCount: branchAheadCount } });
-        addFriction(dir, {
-          id,
-          disposition: 'blocked',
-          errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss',
-          layer: 'verification',
-          attempts: 1,
-          detail: check.timedOut
+        {
+          const detail = check.timedOut
             ? `goal-check on branch "${branch}" timed out after ${timeoutMs}ms — not a verify failure, rerun return`
-            : `goal-check failed on branch "${branch}" (exit ${check.status})`,
-        });
+            : `goal-check failed on branch "${branch}" (exit ${check.status})`;
+          // tsk-4o9: advisory only, never a gate -- a timeout is not proof
+          // of a real verify failure (per the tsk-53o comment above), so it
+          // gets no hint either.
+          const hint = check.timedOut ? null : detachedWorktreeFgosHint(check.output);
+          addFriction(dir, {
+            id,
+            disposition: 'blocked',
+            errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss',
+            layer: 'verification',
+            attempts: 1,
+            detail: hint ? `${detail}\n${hint}` : detail,
+          });
+        }
         return { id, from: 'doing', to: 'blocked', source: 'branch', branch, aheadCount: branchAheadCount, passed: false, timedOut: check.timedOut, exitStatus: check.status, output: check.output };
       }
 
@@ -2539,16 +2546,23 @@ async function runVerb(verb, flags, positional, dir) {
       // above — a timeout is not proof the item's verify failed.
       moveWork(dir, { id, to: 'blocked', expectedStatus: 'doing', reason: check.timedOut ? 'verify-timeout' : 'verify-fail', role: 'system' });
       addOutcome(dir, { id, actual: { outcome: 'blocked', passed: false, attempts: 1, errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss', aheadCount } });
-      addFriction(dir, {
-        id,
-        disposition: 'blocked',
-        errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss',
-        layer: 'verification',
-        attempts: 1,
-        detail: check.timedOut
+      {
+        const detail = check.timedOut
           ? `goal-check timed out after ${timeoutMs}ms — not a verify failure, rerun return`
-          : `goal-check failed (exit ${check.status})`,
-      });
+          : `goal-check failed (exit ${check.status})`;
+        // tsk-4o9: advisory only, never a gate -- same timeout exclusion as
+        // the branch-source path above (tsk-53o: a timeout is not proof of
+        // a real verify failure).
+        const hint = check.timedOut ? null : detachedWorktreeFgosHint(check.output);
+        addFriction(dir, {
+          id,
+          disposition: 'blocked',
+          errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss',
+          layer: 'verification',
+          attempts: 1,
+          detail: hint ? `${detail}\n${hint}` : detail,
+        });
+      }
       // Same early-release as the passing branch above (tsk-45z D1/D2) — a
       // failed verify still means this session is done touching the main
       // checkout; the item settling to `blocked` is just as much "done with
