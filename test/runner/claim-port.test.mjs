@@ -63,7 +63,7 @@ function writeHookStyleLock(dir, ageMs) {
 // docs/history/tsk-3jh-dedupe-redundant-state-reads/RESEARCH.md). Counts
 // real fs.readFileSync calls against the log path to prove the dedupe, not
 // just the resulting shape.
-test('claimWork reads the event log 6 times per call, not 7 (tsk-3jh dedupe of the listWork + readRawEvents pair)', () => {
+test('claimWork reads the event log fully 3 times per call, not 6 or 7 (tsk-3jh dedupe + tsk-49e incremental snapshot)', () => {
   const { repoRoot, dir } = setup();
   const logPath = path.join(dir, 'events.jsonl');
   const originalReadFileSync = fs.readFileSync;
@@ -78,12 +78,20 @@ test('claimWork reads the event log 6 times per call, not 7 (tsk-3jh dedupe of t
     fs.readFileSync = originalReadFileSync;
   }
 
-  // 6 reads: claimWork's own single combined read, moveWork's CAS
-  // pre-read, moveWork's appendEventCore seq-read, moveWork's
-  // post-append refreshView read, addOutcome's appendEventCore seq-read,
-  // addOutcome's post-append refreshView read. Pre-fix this was 7 (an
-  // extra listWork call ahead of the same readRawEvents call).
-  assert.equal(logReadCount, 6);
+  // 3 FULL fs.readFileSync reads remain: claimWork's own single combined
+  // read, moveWork's appendEventCore seq-read, addOutcome's
+  // appendEventCore seq-read (none of these three go through rebuildView,
+  // so tsk-49e's snapshot fast path never applies to them). tsk-3jh's own
+  // dedupe (7->6, listWork+readRawEvents collapsed to one read) is still
+  // intact here. The further 6->3 drop is tsk-49e's own snapshot fast
+  // path: moveWork's CAS pre-read and both post-append refreshView reads
+  // all go through rebuildView, which by this point in the call always
+  // finds the log has grown past state.json's own last snapshot -- so
+  // each now takes the INCREMENTAL path (a bounded fs.readSync of only the
+  // new bytes, never fs.readFileSync on the whole file), correctly
+  // dropping out of this full-read counter without this test needing to
+  // assert on fs.readSync's own call count too.
+  assert.equal(logReadCount, 3);
 });
 
 test('claimWork reclaims a stale hook-written (string-identity) lock past DEFAULT_TTL_MS, instead of failing lock-ambiguous forever', () => {
