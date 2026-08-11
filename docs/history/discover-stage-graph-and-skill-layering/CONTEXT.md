@@ -1,100 +1,148 @@
-# CONTEXT: tsk-403 — Đổi tên cả họ `decompose` thành `plan`
+# CONTEXT: tsk-lya — Chẻ picker + sửa prose launcher `discover`
 
 ## Feature boundary
 
-Scope là đúng ba việc, gộp một đợt quét repo (D15), chỉ cho `tsk-403` — không
-đụng phần còn lại của cây `tsk-2mt` (discovery skill chủ, clarifying về
-Init, v.v. — các con khác của cùng cha):
+Scope là đúng ba việc, chỉ cho `tsk-lya` — con số 1 (`tsk-403`, plan-family
+rename) đã `delivered` và có mặt trên nhánh này, nên tiền đề D11 đặt ra đã
+thoả:
 
-1. **Rename stage/verb/launcher**: stage `decompose` → `planning`; engine
-   verb `fgos decompose` → `fgos plan`; launcher `/fgOS:decompose` →
-   `/fgOS:plan`. Giá trị verdict `decompose | pass-through` **giữ nguyên**
-   — đó là tên một kết cục, không phải tên một chặng (D11).
-2. **Rename file**: `src/intake/decompose.mjs` → `src/intake/plan.mjs`
-   (D15).
-3. **Thêm tiền tố `coding-`** cho đúng 5 skill: `fgos-exploring` →
-   `fgos-coding-exploring`, `fgos-planning` → `fgos-coding-planning`,
-   `fgos-validating` → `fgos-coding-validating`, `fgos-compounding` →
-   `fgos-coding-compounding`, `fgos-code-implement` →
-   `fgos-coding-implement` (D15). **Không** đụng `fgos-clarifying` /
-   `fgos-researching` (helper, D9) và **không bao giờ** đụng
-   `fgos-fanout` / `fgos-indexing` / `fgos-routing` / `fgos-unlock` (D19 —
-   không phải hoãn, là loại vĩnh viễn).
+1. **`discover-next` thôi tự claim + tự dispatch driver + tự tính
+   ceiling.** Hôm nay step 4 của `discover-next/SKILL.md` tự đọc state,
+   tự claim, rồi tự gọi `fgos-coding-driving` với một ceiling nó tự tính từ
+   stage vừa pick được (`stage:decompose` khi pick trúng `clarify`,
+   `stage:executing` khi pick trúng `decompose`) — di sản từ trước
+   `tsk-2b0` khi `discover` còn ôm cả hai stage. Sau khi việc 2 tách xong
+   pool, `discover-next` pick xong chỉ còn một việc: gọi `/fgOS:discover
+   <id>`, để tầng dưới (launcher `discover`) tự lo claim + dispatch +
+   ceiling của chính nó — mỗi tầng một việc, tầng dưới là điểm hội tụ duy
+   nhất (D10).
+2. **Sinh cặp `plan-next` + `plan-loop`.** Bốn cặp `<root>-next`/
+   `<root>-loop` đã có (`cleanup`, `discover`, `merge`, `retro`) nhưng
+   chưa từng có cặp nào cho pool `planning`/`decompose` — pool đó đang ăn
+   ké logic của `discover-next` (`discover-pool.mjs`'s
+   `pickNextDiscoverItem` gộp chung cả clarify-shaped stages lẫn
+   `decompose`/`planning` trong một hàm). Việc này tách một pick-function
+   riêng cho pool `planning` và sinh cặp skill mới theo đúng khuôn ba
+   template đã có (D11).
+3. **Sửa bốn lỗi prose trong `plugins/fgOS/skills/discover/SKILL.md`**
+   (D8, và các phát hiện của vòng chấm điểm §5 Q&A vòng 4-7 trong
+   `DISCUSSION.md`):
+   - Bỏ 3 câu khẳng định sai gán "Socratic reasoning" cho
+     `fgos-coding-exploring` khi mô tả việc `/fgOS:discover` làm — kể cả
+     dòng frontmatter `description` được nạp vào MỌI session. Stage
+     `clarify` được lái bởi `fgos-clarifying` (registry
+     `skillMap.clarify`), không phải `fgos-coding-exploring`; một verdict
+     `clear` đưa item sang stage `discovery`, không nhảy thẳng `planning`.
+   - Sửa câu sai sự thật ở dòng ~30-33: `discover` **không** errors với
+     mọi stage khác `clarify` — `nextDiscoveryEdge` xử lý đúng ba stage
+     (`clarify`, `discovery`, `exploring`) mà không throw; nó chỉ throw
+     ngoài `discoverableStages(domain)`.
+   - Thêm bước **đọc lại state thật** trước khi báo stop reason ở step 4 —
+     hiện tại skill này relay thẳng narration của `fgos-coding-driving` mà
+     không xác minh lại, đúng lớp lỗi đã bắt được một lần (Q&A vòng 4-5:
+     báo "reached ceiling at decompose" trong khi item thật đang ở
+     `discovery`).
+   - Thêm khối khai báo **tầng + caller**: `discover` là **launcher**
+     (ADR 0028 — chọn 1, đứng lên, bước ra hoàn toàn, không cần soul);
+     caller của nó là `discover-next` (sau khi pick), auto-launcher của
+     `herdr-plugin` (luôn kèm `--autoClose`, `pick.rs:17,130`), và hiếm
+     khi là người bấm tay trực tiếp — phần lớn thời gian không có ai ngồi
+     xem pane.
 
-Rename chuẩn "full rewrite" theo tiền lệ rename `fgos-executing` trước đó:
-gồm cả `docs/history/*`, cả hai bản mirror skill dir (`.claude/skills/` +
-`.agents/skills/` nếu có), cả how-to doc.
+Không đụng phần còn lại của cây `tsk-2mt` (skill chủ discovery — con 3,
+phân loại xuống discovery — con 4, nhánh verdict clear/unclear — con 5,
+v.v.) — các con khác của cùng cha, ngoài phạm vi item này.
 
 ## Locked decisions
 
 | D-ID | Quyết định |
 |------|-----------|
-| D11 | Đổi tên **cả họ**, không nửa vời: stage `decompose` → `planning`, verb `fgos decompose` → `fgos plan`, launcher `/fgOS:decompose` → `/fgOS:plan`, cộng cặp mới `plan-next` + `plan-loop` sinh ra ở một task con khác (không thuộc `tsk-403`) nhưng **phải sinh sau khi con này xong** để có tên đúng ngay từ đầu. Giá trị verdict `decompose` **giữ nguyên** vì nó là tên kết cục (`fgos plan --verdict decompose\|pass-through`), không phải tên chặng. |
-| D15 | Gộp cả ba việc (rename họ, rename file, thêm tiền tố `coding-`) vào một task vì cùng là một loại thao tác (quét toàn repo theo pattern rename) — tách ba đợt là quét ba lần cho cùng một việc. Rủi ro capacityId bằng 0 (`.fgos/config.json` → `capacities` rỗng, xác nhận lại bên dưới). |
-| D18 | Giữ **`decompose` làm alias legacy chỉ-để-rút-cạn**: còn trong `stages` array + `skillMap` + giữ cạnh ra của nó, **KHÔNG** có trong `stepMap` — đúng cách `discovery`/`exploring` đang được xử lý hôm nay (không base-workflow step riêng), nên bất biến một-stage-một-step của `stageForStep` giữ nguyên. Lý do: có item đang MỞ đứng trên stage đó (xem scout evidence bên dưới) — sau rename mà xoá thẳng, `stages.indexOf("decompose")=-1` và `skillForStage(...,"decompose")=null` khiến driver đọc ra "không có skill, dừng" — kẹt vĩnh viễn, và không verb nào relabel được `stage` (`EDITABLE_FIELDS` không có `stage`). Kèm comment "legacy, drain-only, không item mới nào vào đây nữa" tại chỗ khai báo, cộng một follow-up (item mới, ngoài phạm vi `tsk-403`) xoá alias khi đếm mở về 0. |
-| D19 | 4 skill `fgos-fanout`, `fgos-indexing`, `fgos-routing`, `fgos-unlock` **không bao giờ** mang tiền tố `coding-` — không phải hoãn sang đợt sau, là loại khỏi tập file vĩnh viễn. Theo đúng logic D9 (tiền tố = tính đúng đắn bị giới hạn trong domain `coding`): `routing` định tuyến item của mọi domain, `unlock` gỡ khoá main checkout (domain-agnostic), `indexing` dựng index docs end-user (không phải stage-skill), `fanout` chạy con qua `/fgOS:pick` (domain-agnostic). Không đứa nào sở hữu một stage hay có tên trong `skillMap` của bất kỳ domain nào — phép thử D7 (skill chủ = có trong `skillMap[stage]` + tự gọi engine verb) loại cả bốn. |
+| D1 | `discover` **không bao giờ** làm việc split-work của `decompose`/`planning`. Khẳng định lại tsk-2b0 D1 (hard split, no fallback) và mở rộng lên tầng picker phía trên: `discover-next` cũng phải tôn trọng thế chẻ đôi này — không được tự gộp lại việc claim/dispatch/ceiling của cả hai stage trong cùng một hàm pick. |
+| D8 | Tên skill chủ stage `discovery`/`exploring` theo khuôn `fgos-coding-<gerund>` (`fgos-coding-exploring`, không phải `fgos-discover` hay `fgos-explore`) — lý do gốc: `fgos-discover` khác engine verb `fgos discover` đúng một ký tự, mắt/`rg` không phân biệt được. Áp dụng ở đây: prose trong `discover/SKILL.md` phải nói đúng TÊN skill thật sự chạy ở mỗi stage (`fgos-clarifying` ở `clarify`, không phải `fgos-coding-exploring`), không được lẫn hai skill khác stage vào một câu khẳng định. |
+| D10 | `discover-next` (launcher tầng pick) phải **giao xuống** `/fgOS:discover <id>`, không được tự claim + tự dispatch `fgos-coding-driving` + tự tính ceiling như hôm nay. Mỗi tầng một việc; tầng dưới phải là điểm hội tụ duy nhất. |
+| D11 | Sinh cặp mới `plan-next` + `plan-loop` (bốn cặp `<root>-next`/`<root>-loop` đã có: cleanup, discover, merge, retro — chưa từng có cặp nào cho `decompose`/`planning`, pool đó vẫn ăn ké `discover-next`). Tiền đề (rename `decompose`→`planning`, con 1/`tsk-403`) đã `delivered` trước khi con này bắt đầu, nên cặp mới sinh ra đã đúng tên ngay từ đầu — không cần rename lại sau. |
 
 ## Pinned terms
 
-- **"cả họ" (rename cả họ)** — đổi đồng thời stage name, engine verb name,
-  và launcher name cho cùng một khái niệm; không đổi một nửa (ví dụ chỉ
-  đổi stage mà giữ verb `fgos decompose`).
-- **alias legacy drain-only** — một entry vẫn hợp lệ trong `stages` +
-  `skillMap` + cạnh, nhưng bị khoá khỏi `stepMap` nên không item MỚI nào
-  còn vào được; chỉ item đã đứng sẵn trên đó mới được rút ra dần qua các
-  cạnh hiện có.
-- **verdict vs chặng (stage)** — `decompose`/`pass-through` là tên một
-  *kết cục* của việc gọi verb `fgos plan`, tách biệt hoàn toàn khỏi tên
-  *chặng* (`planning`); đổi tên chặng không kéo theo đổi tên giá trị
-  verdict.
+- **"giao xuống" (hand down / delegate down)** — `discover-next` sau khi
+  pick chỉ gọi `/fgOS:discover <id>` và dừng ở đó; không tự claim, không
+  tự gọi `fgos-coding-driving`, không tự tính ceiling. Tầng dưới
+  (`discover`) sở hữu toàn bộ phần đó cho stage `clarify`.
+- **"ăn ké" (piggyback)** — pool `planning`/`decompose` hôm nay không có
+  pick-function/skill riêng; nó đi nhờ trong cùng `pickNextDiscoverItem`
+  và cùng launcher `discover-next` mà lẽ ra chỉ nên phục vụ pool
+  clarify-shaped.
+- **"tầng" (layer/tier)** — từ vựng ADR 0028: **launcher** (chọn 1 item,
+  đứng lên xử lý, bước ra hoàn toàn, không cần soul theo dõi) vs.
+  **orchestrator** (điều phối N đơn vị theo thời gian, ở lại). Trong cây
+  này: `discover-loop`/`plan-loop` = orchestrator; `discover-next`/
+  `plan-next` = launcher-có-pick; `/fgOS:discover`/`/fgOS:plan` = launcher
+  thuần (fire & forget); `herdr-plugin` = orchestrator khác ở mức
+  terminal.
 
 ## Scout evidence
 
-- `src/state/workflow-stage-graphs.mjs`: domain `coding`'s `stages` array
-  (dòng 61) chứa `decompose`; `skillMap.decompose = 'fgos-planning'` (dòng
-  151); hai cạnh `clarify -> decompose` và `exploring -> decompose` (dòng
-  96, 100). Domain thứ hai trong cùng file (dòng 334+, một domain khác
-  `coding`) cũng còn `decompose` trong `stages` nhưng `skillMap.decompose =
-  null` — rename chỉ chạm domain `coding`, không đụng domain kia.
-- `src/intake/decompose.mjs` tồn tại thật, 44.4K — mục tiêu rename việc 2.
-- 13 thư mục `fgos-*` dưới `.claude/skills/`: `fgos-clarifying`,
-  `fgos-code-implement`, `fgos-coding-driving`, `fgos-coding-shaping`,
-  `fgos-compounding`, `fgos-exploring`, `fgos-fanout`, `fgos-indexing`,
-  `fgos-planning`, `fgos-researching`, `fgos-routing`, `fgos-unlock`,
-  `fgos-validating` — khớp đúng D19: 2 đã có tiền tố `coding-`
-  (`coding-driving`, `coding-shaping`, không thuộc phạm vi), 5 trong phạm
-  vi việc 3, 2 helper bị loại (`clarifying`, `researching`), 4 platform
-  skill bị loại vĩnh viễn (`fanout`, `indexing`, `routing`, `unlock`).
-  Tổng 2+5+2+4=13, không thừa không thiếu.
-- `plugins/fgOS/skills/decompose/` tồn tại (launcher hiện tại);
-  `plugins/fgOS/skills/plan/` chưa tồn tại — khớp đích rename việc 1.
-- **Đếm lại item đang mở trên stage `decompose` (fresh read, 2026-08-11
-  ~12:21 UTC)**: `tsk-42i` (blocked), `tsk-3at` (awaiting-human), `tsk-3m6`
-  (doing) — **3 item**, không phải 4 như con số D18 ghi lúc chốt quyết
-  định. `tsk-1opx` (item thứ tư D18 từng liệt) đã tự đi tiếp, hiện đứng ở
-  `stage: executing, status: todo` — không còn đứng trên `decompose` nữa.
-  Số liệu đổi nhưng **quyết định D18 không đổi**: vẫn có item mở đứng trên
-  stage đó (3 > 0), lý do giữ alias drain-only vẫn nguyên vẹn; đây chỉ là
-  cập nhật bằng chứng, không phải câu hỏi mới.
+- `plugins/fgOS/skills/discover-next/SKILL.md:55-77` — step 4 tự claim rồi
+  tự gọi `fgos-coding-driving` với ceiling tự tính (`stage:decompose` /
+  `stage:executing`) tuỳ stage vừa pick — đúng lỗi D10 nêu.
+- `src/state/discover-pool.mjs:19-24,53-61,76-108` — `pickNextDiscoverItem`
+  gộp cả `CLARIFY_SHAPED_STAGES` (`clarify`/`discovery`/`exploring`) lẫn
+  `decompose`/`planning` trong một hàm; `compareDecomposeOrder` (dòng
+  53-61) đã tách riêng như một hàm độc lập, sẵn sàng để lấy ra làm
+  pick-function riêng cho `plan-next`.
+- Ba template next/loop đã đọc đầy đủ: `discover-next/SKILL.md`,
+  `discover-loop/SKILL.md`, `cleanup-next/SKILL.md` — cùng khuôn 5-6 bước:
+  bỏ qua `$ARGUMENTS` → pick qua pure pool function → pool rỗng thì dừng →
+  claim + dispatch (hoặc chạy verb) → relay nguyên văn stop reason của
+  driver, kể cả hợp đồng relay `lock-timeout`.
+- `plugins/fgOS/skills/discover/SKILL.md:7,21,127` (bản đã qua rename
+  `tsk-403`) — 3 câu khẳng định "live session does its own real Socratic
+  reasoning (`fgos-coding-exploring`)", kể cả dòng frontmatter
+  `description` (dòng 7) nạp vào MỌI session. Xác minh sống trong chính
+  phiên này: gọi `fgos discover tsk-lya` lúc item ở `clarify` đã nạp
+  `fgos-clarifying` (đúng `skillMap.clarify`, `workflow-stage-graphs.mjs:
+  148`), không phải `fgos-coding-exploring`; verdict `clear` đưa item sang
+  `discovery`, không nhảy thẳng `planning` (`nextDiscoveryEdge`,
+  `src/intake/discovery.mjs:120-124`).
+- `plugins/fgOS/skills/discover/SKILL.md` dòng ~30-33 — khẳng định
+  "`discover` errors if called on an item that isn't at stage `clarify`"
+  sai: `nextDiscoveryEdge` (`discovery.mjs:120-134`) xử lý đúng ba stage
+  `clarify`/`discovery`/`exploring` không hề throw; chỉ throw ngoài
+  `discoverableStages(domain)`.
+- `plugins/fgOS/skills/discover/SKILL.md:132-146` (step 4) — relay thẳng
+  narration của `fgos-coding-driving`, không đọc lại state thật trước khi
+  báo — đúng lớp lỗi Q&A vòng 4-5 đã bắt (`DISCUSSION.md:113-114`).
+- `DISCUSSION.md:126-136` (vòng 7) + `herdr-plugin/src/pick.rs:17,130` —
+  ADR 0028 đã pin từ vựng launcher/orchestrator; `pick.rs` gọi thẳng
+  `/fgOS:discover <id> --autoClose` từ cả nút bấm tay lẫn auto-launcher —
+  xác nhận caller shape "hiếm khi là người, không ai ngồi xem" là thật,
+  không phải giả định.
+- Verify hiện tại của `tsk-lya` (`! grep -q "Socratic reasoning"
+  plugins/fgOS/skills/discover/SKILL.md`) đang **đỏ** — xác nhận sống 3
+  lần khớp còn tồn tại, đúng như mong đợi trước khi implement.
 - `impact-analysis` capability gate (CLAUDE.md): `fgos tool query
-  --capability impact-analysis --status present` trả về provider
-  `gitnexus`, `status: "present"` — **full**. Thông tin này chỉ để ghi lại
-  cho `fgos-planning`/`fgos-validating` đọc tiếp; `fgos-exploring` không
-  sửa code nên không tự áp MUST rules ở đây.
-- `.fgos/config.json` → `capacities` rỗng — xác nhận lại claim "rủi ro
-  capacityId bằng 0" trong mô tả item và D15.
+  --capability impact-analysis --status present` trả provider `gitnexus`,
+  `status: "present"` — **full**. Ghi lại cho `fgos-planning`/
+  `fgos-validating` đọc tiếp; `fgos-exploring` không sửa code nên không tự
+  áp MUST rules ở đây.
+- `find .claude -iname "discover-next*" -o -iname "plan-next*"` — không có
+  hit; skill launcher/picker dưới `plugins/fgOS/skills/*` không có mirror
+  ở `.claude`/`.agents` (khác 5 skill chủ stage tsk-403 vừa đổi tên) — con
+  này không có thêm mặt file bị mirror cần sửa.
 
 ## Canonical references
 
 - `docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md` —
-  toàn bộ thiết kế cha (`tsk-2mt`), mục 4 (D1-D19), mục 6 (thiết kế đã
-  chốt), mục 7 task 1 (`{#task-plan-family-rename}`) là nguồn quyết định
-  gốc cho tài liệu này.
-- `tsk-403`'s own `gates.tsk-403` record (`fgos list --id tsk-403 --json`)
-  — vòng hỏi/đáp Q1/Q2 đã chốt, câu trả lời của người đã được chép lại
-  nguyên văn vào `description` của item.
-- Tiền lệ rename trước: rename `fgos-executing` (full rewrite bao gồm
-  `docs/history/*`) — chuẩn quét cho việc 3.
+  mục 4 (D1-D19), mục 7 task 6 (`{#task-picker-split-and-prose}`) là nguồn
+  quyết định gốc cho tài liệu này.
+- `docs/history/discover-stage-graph-and-skill-layering/RESEARCH.md` —
+  Round 1 (`tsk-lya`, stage `discovery`) chứa toàn bộ evidence chi tiết
+  hơn bảng scout evidence phía trên.
+- `tsk-403`'s own delivered record (`fgos list --id tsk-403 --json`) —
+  xác nhận tiền đề D11 đã thoả trước khi con này bắt đầu.
+- `src/state/workflow-stage-graphs.mjs`, `src/intake/discovery.mjs`,
+  `src/state/discover-pool.mjs` — nguồn cơ học cho các claim sự thật ở
+  trên.
 
 ## Outstanding questions
 
