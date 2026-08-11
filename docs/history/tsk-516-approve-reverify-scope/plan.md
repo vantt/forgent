@@ -143,13 +143,31 @@ Xong khi: R1 có test cả hai chiều; R2 được `fgos-validating` chốt.
 
 ## Files dự kiến chạm
 
-`src/runner/goal-check.mjs`, `src/runner/merge.mjs`, `bin/fgos.mjs`,
-`src/setup/registrations.mjs`, `.fgos/config.json`, `CHANGELOG.md`,
+`src/config/shared-config-file.mjs`, `src/runner/goal-check.mjs`,
+`src/runner/merge.mjs`, `bin/fgos.mjs`, `src/setup/registrations.mjs`,
+`CHANGELOG.md`, `test/config/shared-config-file.test.mjs`,
 `test/runner/goal-check.test.mjs`, `test/runner/merge.test.mjs`,
-`test/cli/fgos.test.mjs`, `test/setup/checks.test.mjs`.
+`test/setup/checks.test.mjs`.
 
 Không thêm file `.mjs` mới trong `src/`+`bin/` ⇒ không phát sinh row
 manifest mới.
+
+**Hai sai lệch so với dự kiến ban đầu, phát hiện khi build:**
+
+1. **`.fgos/config.json` bị loại khỏi diff.** `merge.mjs` từ chối mọi merge
+   có stage file dưới `.fgos/` (`fgos-write-rejected`, nhánh `fgosPaths`),
+   nên commit key mặc định lên branch này sẽ làm chính item không merge
+   được. Key phải vào qua `fgos setup` config-merge trên main checkout —
+   đúng cơ chế D6 đã chọn. Cho tới khi `fgos setup` chạy,
+   `readInvariantCheckCommands` trả `[]` và không check bất biến nào chạy:
+   tương thích ngược, đúng R4.
+2. **Hằng số mặc định nằm ở `src/config/shared-config-file.mjs` (domain),
+   không ở `src/setup/registrations.mjs` (use-case).** Runner
+   (`infra`) phải import nó, mà `infra -> use-case` là import ngược lên,
+   vi phạm đúng luật một-chiều-xuống mà `test/architecture.test.mjs` canh
+   — tức chính bất biến item này đang dựng lưới để bảo vệ. Đặt ở `domain`
+   thì cả use-case lẫn infra đều import xuống hợp lệ.
+   `test/config/shared-config-file.test.mjs` vào danh sách file chạm theo.
 
 ## Verify
 

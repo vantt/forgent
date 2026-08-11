@@ -18,6 +18,7 @@ import {
   abortMergeIfPossible,
   MergeError,
 } from '../../src/runner/merge.mjs';
+import { writeSharedConfig } from '../../src/config/shared-config-file.mjs';
 import { branchNameFor, withMergeEphemeralWorktree } from '../../src/runner/worktree.mjs';
 import { acquireMainCheckoutLock, ACQUIRED } from '../../src/runner/main-checkout-lock.mjs';
 
@@ -1099,4 +1100,122 @@ function initClonedRepoWithOriginHead(defaultBranch) {
 test('detectTrunk resolves the origin/HEAD target branch, not the local main/master fallback', () => {
   const repoRoot = initClonedRepoWithOriginHead('release-line');
   assert.equal(detectTrunk(repoRoot), 'release-line');
+});
+
+// --- repo-invariant gate + redundant-check skip (tsk-516) ------------------
+//
+// docs/history/tsk-516-approve-reverify-scope/CONTEXT.md D3/D4 (the gate)
+// and D5 (the skip). The skip is the dangerous half: a false positive lands
+// a tree nobody verified on main, so both directions are pinned below, and
+// the "does skip" cases are written so that ANY unwanted execution would be
+// visibly red (the item's verify and the invariant command are both set to
+// commands that fail).
+
+function configureInvariantChecks(repoRoot, commands) {
+  writeSharedConfig(repoRoot, { invariantChecks: { commands } });
+}
+
+function tipOf(repoRoot, branch) {
+  return git(repoRoot, ['rev-parse', branch]).trim();
+}
+
+test('a red repo-invariant check blocks the merge even when the item verify is green', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+  configureInvariantChecks(repoRoot, ['exit 9']);
+  const before = headOf(repoRoot);
+
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }));
+
+  assert.equal(result.outcome, 'verify-fail');
+  assert.match(result.check.output, /repo-invariant check failed: exit 9/);
+  assert.equal(headOf(repoRoot), before, 'the merge must be aborted, leaving HEAD untouched');
+  assert.equal(isWorkingTreeClean(repoRoot), true, 'the aborted merge must leave no half-merged tree behind');
+});
+
+test('a green repo-invariant check lets the merge land', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+  configureInvariantChecks(repoRoot, ['exit 0']);
+
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }));
+
+  assert.equal(result.outcome, 'merged');
+  assert.equal(fs.existsSync(path.join(repoRoot, 'produced.txt')), true);
+});
+
+// Backward compatibility: every repo that never opted in must behave exactly
+// as it did before this gate existed.
+test('no invariantChecks config means no invariant check runs at merge', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }));
+
+  assert.equal(result.outcome, 'merged');
+});
+
+// D5, the skip direction. `verify: 'exit 1'` and a failing invariant command
+// would BOTH fail if they ran — so a 'merged' outcome here is proof neither
+// was executed, not merely that they happened to pass.
+test('D5: the merged tree already verified at return skips both the verify and the invariant checks', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+  configureInvariantChecks(repoRoot, ['exit 9']);
+  const branchHeadAtReturn = tipOf(repoRoot, 'fgw/demo-item');
+
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'exit 1', branchHeadAtReturn }));
+
+  assert.equal(result.outcome, 'merged');
+  assert.equal(result.check.passed, true);
+  assert.equal(result.check.skipped, true);
+  assert.match(result.check.output, /verify skipped: the merged tree is identical to/);
+  assert.match(result.check.output, new RegExp(branchHeadAtReturn));
+});
+
+// D5, the must-NOT-skip direction — the one whose failure would be silent.
+// main advancing by a single commit means the merged tree is no longer the
+// tree that was verified, so the checks have to run again.
+test('D5: main advancing past the fork forces the checks to run again', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+  const branchHeadAtReturn = tipOf(repoRoot, 'fgw/demo-item');
+  fs.writeFileSync(path.join(repoRoot, 'moved-on.txt'), 'main moved\n');
+  git(repoRoot, ['add', 'moved-on.txt']);
+  git(repoRoot, ['commit', '-q', '-m', 'main advanced after the return']);
+
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'exit 1', branchHeadAtReturn }));
+
+  assert.equal(result.outcome, 'verify-fail', 'the verify must actually run, and its red must be honoured');
+  assert.notEqual(result.check.skipped, true);
+});
+
+// A commit pushed onto the branch after `return` is unverified content: the
+// recorded SHA no longer matches the tip, so the skip must not apply.
+test('D5: a branch tip that moved past branchHeadAtReturn forces the checks to run again', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+  const branchHeadAtReturn = tipOf(repoRoot, 'fgw/demo-item');
+  git(repoRoot, ['checkout', '-q', 'fgw/demo-item']);
+  fs.writeFileSync(path.join(repoRoot, 'added-after-return.txt'), 'unverified\n');
+  git(repoRoot, ['add', 'added-after-return.txt']);
+  git(repoRoot, ['commit', '-q', '-m', 'pushed after the return']);
+  git(repoRoot, ['checkout', '-q', 'main']);
+
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'exit 1', branchHeadAtReturn }));
+
+  assert.equal(result.outcome, 'verify-fail');
+  assert.notEqual(result.check.skipped, true);
+});
+
+// A main-source return records headAtReturn, never branchHeadAtReturn — so
+// it can never satisfy the skip condition, and must always be checked.
+test('D5: an item with no branchHeadAtReturn is never eligible for the skip', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'exit 1', headAtReturn: headOf(repoRoot) }));
+
+  assert.equal(result.outcome, 'verify-fail');
+  assert.notEqual(result.check.skipped, true);
 });

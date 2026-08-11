@@ -34,7 +34,7 @@ import { rankImpact } from '../src/state/impact.mjs';
 import { isResolvedStatus } from '../src/state/frontier.mjs';
 import { mergeReadiness, mergeTree } from '../src/state/graph-harness.mjs';
 import { paginate } from '../src/state/cursor.mjs';
-import { runGoalCheck, detachedWorktreeFgosHint } from '../src/runner/goal-check.mjs';
+import { runGoalCheck, detachedWorktreeFgosHint, runInvariantChecks, invariantFailureAsCheck } from '../src/runner/goal-check.mjs';
 import { frozenJudgeHits, footprintDiffHits, normalizePath } from '../src/runner/frozen-judge.mjs';
 import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, buildOwnFileSet, detectTrunk, isMainWorktree } from '../src/runner/merge.mjs';
 import { createGitHubPR, mergeGitHubPR, viewGitHubPRStatus } from '../src/runner/github-adapter.mjs';
@@ -69,7 +69,7 @@ import { recordInvocationFault } from '../src/cli/invocation-fault-log.mjs';
 import { recordApprovePostSuccessFault } from '../src/cli/approve-fault-log.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { DOCTOR_CHECKS, integrationScriptPath, ensureSharedConfigDefaults, runFixes } from '../src/setup/checks.mjs';
-import { sharedConfigFilePath, readSharedConfig } from '../src/config/shared-config-file.mjs';
+import { sharedConfigFilePath, readSharedConfig, readInvariantCheckCommands } from '../src/config/shared-config-file.mjs';
 import { assessCleanupReadiness } from '../src/state/cleanup-harness.mjs';
 import { DEFAULT_CLEANUP_TTL_DAYS, DEFAULT_CLEANUP_LEAF_TTL_DAYS } from '../src/setup/registrations.mjs';
 import { installGitHooks, uninstallGitHooks } from '../src/setup/git-hooks.mjs';
@@ -2373,6 +2373,14 @@ async function runVerb(verb, flags, positional, dir) {
       // default contract (prove new work since take) stays byte-identical
       // when this flag is absent.
       const noNewCommitsOk = flags['no-new-commits-ok'] === true;
+      // tsk-516 (CONTEXT.md D3/D6): read once, used by BOTH return paths
+      // below (branch-source and main-source). Resolved from the project
+      // root the store itself sits under — the same `path.dirname(dir)`
+      // the verify timeout right above already resolves its config from,
+      // never `process.cwd()`: a session returning from inside a worktree
+      // would otherwise read that branch's own possibly-stale copy of
+      // config.json instead of the project's real one.
+      const invariantCheckCommands = readInvariantCheckCommands(path.dirname(dir));
 
       const view = listWork(dir);
       const item = view.work[id];
@@ -2445,6 +2453,15 @@ async function runVerb(verb, flags, positional, dir) {
           // worktree's own package.json instead.
           provisionDependencies(tmpWorktree);
           check = await runGoalCheck(item, tmpWorktree, timeoutMs);
+          // tsk-516 (CONTEXT.md D3/D4): the repo-invariant checks run in the
+          // SAME disposable worktree, while it still exists — the `finally`
+          // below removes it. Only after the item's own verify is green:
+          // a red verify already blocks, and reporting the invariant result
+          // on top of it would just be noise about a tree already refused.
+          if (check.passed) {
+            const invariant = await runInvariantChecks(invariantCheckCommands, tmpWorktree, timeoutMs);
+            if (!invariant.passed) check = invariantFailureAsCheck(invariant);
+          }
         } finally {
           try {
             execFileSync('git', ['worktree', 'remove', tmpWorktree, '--force'], { cwd: repoRoot, encoding: 'utf8', shell: false });
@@ -2521,7 +2538,14 @@ async function runVerb(verb, flags, positional, dir) {
         assertNoPriorBlockedOutcome(view, id);
       }
 
-      const check = await runGoalCheck(item, cwd, timeoutMs);
+      let check = await runGoalCheck(item, cwd, timeoutMs);
+      // tsk-516 (CONTEXT.md D3/D4): same gate as the branch path above, on
+      // the main checkout's own tree. Only after the item's own verify is
+      // green — a red verify already blocks on its own.
+      if (check.passed) {
+        const invariant = await runInvariantChecks(invariantCheckCommands, cwd, timeoutMs);
+        if (!invariant.passed) check = invariantFailureAsCheck(invariant);
+      }
       if (check.passed) {
         // STR63: advisory only (per cos) — a hit never blocks this return.
         const frozenJudge = frozenJudgeHits(ownDiff, item.footprint);
