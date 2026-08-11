@@ -2792,7 +2792,20 @@ async function runVerb(verb, flags, positional, dir) {
         throw new StoreError('precondition', `approve: work "${id}" is "${item.status}", not "awaiting-approval" — nothing to approve.`);
       }
 
-      const repoRoot = process.cwd();
+      // repoRoot: process.cwd() by default -- the guards below then refuse
+      // outright when cwd is any linked/session/ad-hoc worktree, catching a
+      // merge that would otherwise land on that worktree's own (possibly
+      // stale) checkout or a goal-check that verifies stale code while
+      // claiming "verified on main" (the P44/review-260718 incident
+      // history this file's own comments already document). --trust-dir
+      // (tsk-4uj) opts into deriving repoRoot from --dir instead, the same
+      // substitution tsk-k8u/tsk-5vl already proved for take/pick/catchup
+      // -- but gated behind this explicit flag, never the unconditional
+      // default, given approve's own incident history: the caller must say
+      // it knows --dir is trustworthy rather than getting the relaxed
+      // behavior silently. Byte-identical to today when the flag is
+      // omitted.
+      const repoRoot = flags['trust-dir'] === true ? path.dirname(dir) : process.cwd();
       const source = classifySource(repoRoot, item);
 
       // Multi-session guard (fgos-multi-session-checkout Epic 2): approve must
@@ -3396,7 +3409,18 @@ async function runVerb(verb, flags, positional, dir) {
         throw new StoreError('validation', `sync-root: work "${id}" not found.`);
       }
 
-      const repoRoot = process.cwd();
+      // repoRoot: process.cwd() by default -- isMainWorktree below then
+      // refuses outright when cwd is any linked worktree, catching a merge
+      // that would otherwise land on that worktree's own (possibly stale)
+      // checkout. --trust-dir (tsk-4uj) opts into deriving repoRoot from
+      // --dir instead, the same substitution tsk-k8u/tsk-5vl already proved
+      // for take/pick/catchup -- but gated behind this explicit flag here,
+      // never the unconditional default: unlike catchup, sync-root's guard
+      // is deliberate (mirrors approve's own discipline), so the caller
+      // must say it knows --dir is trustworthy rather than getting the
+      // relaxed behavior silently. Byte-identical to today when the flag is
+      // omitted.
+      const repoRoot = flags['trust-dir'] === true ? path.dirname(dir) : process.cwd();
       if (!isMainWorktree(repoRoot)) {
         throw new StoreError(
           'validation',

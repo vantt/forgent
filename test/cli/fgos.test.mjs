@@ -6509,6 +6509,45 @@ test('sync-root refuses from inside a linked worktree (must land on the real mai
   gitAtCwd(cwd, ['worktree', 'remove', '--force', wt]);
 });
 
+// tsk-4uj: --trust-dir opts into deriving repoRoot from --dir instead of
+// cwd, so sync-root can succeed from inside a linked worktree PROVIDED
+// --dir is also given explicitly -- default behavior (no flag, or the
+// flag with no --dir) stays exactly the refuse-outright guard above.
+test('sync-root --trust-dir with --dir succeeds from inside a linked worktree (tsk-4uj)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeDriftedRoot(cwd, 'sync-root-trust-dir', { verify: 'true' });
+  commitPendingBeforeApprove(cwd, 'sync-root-trust-dir');
+
+  const wtParent = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-sync-root-trust-wt-'));
+  const wt = path.join(wtParent, 'wt');
+  gitAtCwd(cwd, ['worktree', 'add', '-q', '-b', 'sync-root-trust-dir-side-branch', wt]);
+
+  const result = spawnSync(process.execPath, [FGOS, 'sync-root', 'sync-root-trust-dir', '--trust-dir', '--dir', cwd], { cwd: wt, encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.outcome, 'synced');
+
+  gitAtCwd(cwd, ['worktree', 'remove', '--force', wt]);
+});
+
+test('sync-root --trust-dir WITHOUT --dir is a no-op -- still refuses from inside a linked worktree (tsk-4uj)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeDriftedRoot(cwd, 'sync-root-trust-dir-noop', { verify: 'true' });
+  commitPendingBeforeApprove(cwd, 'sync-root-trust-dir-noop');
+
+  const wtParent = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-sync-root-trust-noop-wt-'));
+  const wt = path.join(wtParent, 'wt');
+  gitAtCwd(cwd, ['worktree', 'add', '-q', '-b', 'sync-root-trust-dir-noop-side-branch', wt]);
+
+  const result = spawnSync(process.execPath, [FGOS, 'sync-root', 'sync-root-trust-dir-noop', '--trust-dir'], { cwd: wt, encoding: 'utf8' });
+  assert.equal(result.status, 4, result.stderr);
+  assert.match(result.stderr, /main checkout/);
+
+  gitAtCwd(cwd, ['worktree', 'remove', '--force', wt]);
+});
+
 // --- sync-root Iron Law + verify-fail (tsk-n2x, docs/history/sync-root-
 // direct-outcome-tests/) -----------------------------------------------
 //
@@ -8456,6 +8495,42 @@ test('approve from the main checkout is unaffected by the ad-hoc-worktree guard 
   assert.equal(stateView(cwdP).work['approve-adhoc-main-pull'].status, 'delivered');
 });
 
+// tsk-4uj: --trust-dir opts into deriving repoRoot from --dir instead of
+// cwd, so approve can succeed from inside an ad-hoc worktree PROVIDED
+// --dir is also given explicitly -- default behavior (no flag, or the
+// flag with no --dir) stays exactly the refuse-outright guard above.
+test('approve --trust-dir with --dir succeeds from inside an ad-hoc worktree (tsk-4uj)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'approve-trust-dir', { verify: 'test -f approve-trust-dir-produced.txt' });
+
+  const worktreePath = addAdHocWorktree(cwd, 'adhoc-trust-dir-branch');
+  try {
+    const result = run(worktreePath, ['approve', 'approve-trust-dir', '--trust-dir', '--dir', cwd]);
+    assert.equal(result.status, 0, `approve --trust-dir --dir from an ad-hoc worktree unexpectedly failed: ${result.stdout}${result.stderr}`);
+    assert.equal(stateView(cwd).work['approve-trust-dir'].status, 'delivered');
+  } finally {
+    removeAdHocWorktree(cwd, worktreePath);
+  }
+});
+
+test('approve --trust-dir WITHOUT --dir is a no-op -- still refuses from inside an ad-hoc worktree (tsk-4uj)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'approve-trust-dir-noop', { verify: 'test -f approve-trust-dir-noop-produced.txt' });
+  const headBefore = gitHead(cwd);
+
+  const worktreePath = addAdHocWorktree(cwd, 'adhoc-trust-dir-noop-branch');
+  try {
+    const result = run(worktreePath, ['approve', 'approve-trust-dir-noop', '--trust-dir']);
+    assert.equal(result.status, 4, `expected a clean validation refusal, not a merge on an unregistered worktree: ${result.stdout}${result.stderr}`);
+    assert.equal(stateView(cwd).work['approve-trust-dir-noop'].status, 'awaiting-approval', 'item is untouched — no merge, no false "done"');
+    assert.equal(gitHead(cwd), headBefore, 'main HEAD must be unchanged — nothing landed on main');
+  } finally {
+    removeAdHocWorktree(cwd, worktreePath);
+  }
+});
+
 // --- approve --github + worktree guard (approve-worktree-guard-github-fix) -
 //
 // P1 finding (review-260718-concurrency-hard-gate-cluster): the --github
@@ -8507,6 +8582,32 @@ test('approve --github --pr refuses from inside a registered session worktree, w
     assert.equal(stateView(cwd).work['approve-session-github'].status, 'awaiting-approval', 'item is untouched — no moveWork, no false "done"');
   } finally {
     endSession(cwd, session.sessionId, { force: true });
+  }
+});
+
+// tsk-4uj: confirms --trust-dir doesn't disturb review-260718's own guard
+// ordering ahead of --github -- repoRoot's VALUE changes with the flag,
+// never WHERE the guard runs relative to the --github branch. Without
+// --dir, --trust-dir is a no-op (repoRoot falls back to process.cwd()),
+// so this must refuse exactly like the plain --github worktree-guard test
+// above.
+test('approve --github --pr --trust-dir WITHOUT --dir is a no-op -- still refuses from an ad-hoc worktree before any gh call (tsk-4uj)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'approve-gh-trust-noop', { verify: 'test -f approve-gh-trust-noop-produced.txt' });
+  const headBefore = gitHead(cwd);
+  const marker = path.join(cwd, 'gh-was-called');
+  const fake = writeMarkerFake(cwd, marker);
+
+  const worktreePath = addAdHocWorktree(cwd, 'adhoc-github-trust-dir-noop-branch');
+  try {
+    const result = run(worktreePath, ['approve', 'approve-gh-trust-noop', '--github', '--pr', '9', '--trust-dir'], { FGOS_GH_COMMAND: fake });
+    assert.equal(result.status, 4, `expected a clean validation refusal, not a GitHub merge from an unregistered worktree: ${result.stdout}${result.stderr}`);
+    assert.ok(!fs.existsSync(marker), 'the worktree guard must reject before any gh CLI call');
+    assert.equal(stateView(cwd).work['approve-gh-trust-noop'].status, 'awaiting-approval', 'item is untouched — no moveWork, no false "done"');
+    assert.equal(gitHead(cwd), headBefore, 'main HEAD must be unchanged — nothing landed on main');
+  } finally {
+    removeAdHocWorktree(cwd, worktreePath);
   }
 });
 
