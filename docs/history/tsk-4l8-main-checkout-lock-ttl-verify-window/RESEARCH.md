@@ -53,3 +53,26 @@ scope boundary (never architecture/product decisions here).
 — P15 bổ sung") is left as-is — no real runnable command exists yet for
 "investigate", and the item's own placeholder already defers this to a
 later stage (P15).
+
+## Round 2 (2026-08-11, user-supplied, during `executing`)
+
+**Reported by the user, independently of this session's own measurement:**
+two fresh `npm test` runs today at **188.4s** and **180.9s** — both ≥ the
+180s `DEFAULT_TTL_MS`, same as the original 184.93s. Confirms the race
+window is a live, current condition, not a one-off historical measurement
+that may have since narrowed (e.g. via test-suite speedups).
+
+**Also observed live, within this same session:** a different, genuinely
+live session held the main-checkout lock during this item's own `/fgOS:pick`
+attempt — `fgos pick` reported it "held 25s, expires in 2m34s" at first
+check, then this session's own retry loop waited up to 172s before the
+lock freed. The user reports that same holding session's own `approve`
+then hit a merge conflict — a distinct but related symptom of the same
+root cause this item's fix (heartbeat-refresh during `mergeRunnerItem`'s
+verify hold, `plan.md`) targets: a long lock hold on the shared main
+checkout, contended by another session.
+
+**Effect on this item:** none of the locked decisions (`CONTEXT.md` D1) or
+the shaped fix (`plan.md`) change — this is corroborating evidence for
+already-grounded findings, not a new gap. Recorded here per this file's
+own accumulate-never-overwrite convention.
