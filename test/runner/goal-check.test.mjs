@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { runGoalCheck } from '../../src/runner/goal-check.mjs';
+import { runGoalCheck, detachedWorktreeFgosHint } from '../../src/runner/goal-check.mjs';
 
 // runGoalCheck runs `item.verify` — a real shell command string, via a real
 // shell (shell:true is intentional here, per goal-check.mjs's own doc
@@ -134,4 +134,42 @@ test('runGoalCheck caps captured output at maxBuffer but still resolves the real
   // what the child actually wrote — proving the over-cap chunks were dropped.
   assert.ok(result.output.length <= maxBuffer, `output ${result.output.length} must not exceed maxBuffer ${maxBuffer}`);
   assert.ok(result.output.length < emitted, 'captured output must be smaller than the emitted stream');
+});
+
+// tsk-4o9: detachedWorktreeFgosHint -- advisory hint keyed on the real
+// failure OUTPUT, never the verify command string (see plan.md's own
+// false-positive analysis for why a string-match approach was rejected).
+
+test('detachedWorktreeFgosHint returns null for output with no .fgos mention at all', () => {
+  assert.equal(detachedWorktreeFgosHint('AssertionError: expected 1 to equal 2\n'), null);
+});
+
+test('detachedWorktreeFgosHint returns null when .fgos appears but nothing suggests it is missing', () => {
+  // Mirrors the confirmed false-positive class (RESEARCH.md): tsk-f38/tsk-5hv's
+  // own real verify greps for ".fgos/" only inside an rg exclusion glob --
+  // a failure unrelated to that glob must never produce this hint.
+  assert.equal(
+    detachedWorktreeFgosHint("rg: pattern matched in some-other-file.mjs\n(excluded '.fgos/events.jsonl*' as configured)\n"),
+    null,
+  );
+});
+
+test('detachedWorktreeFgosHint returns null for a real missing-file error unrelated to .fgos', () => {
+  assert.equal(detachedWorktreeFgosHint("Error: ENOENT: no such file or directory, open 'package.json'\n"), null);
+});
+
+test('detachedWorktreeFgosHint returns the hint for output shaped like a real .fgos/-missing failure', () => {
+  const hint = detachedWorktreeFgosHint("Error: ENOENT: no such file or directory, open '.fgos/config.json'\n");
+  assert.equal(typeof hint, 'string');
+  assert.match(hint, /ADR0020/);
+});
+
+test('detachedWorktreeFgosHint recognizes "not found"/"no such file" phrasing too, not only ENOENT', () => {
+  assert.equal(typeof detachedWorktreeFgosHint('.fgos/config.json: not found\n'), 'string');
+  assert.equal(typeof detachedWorktreeFgosHint('cat: .fgos/config.json: no such file or directory\n'), 'string');
+});
+
+test('detachedWorktreeFgosHint returns null for non-string input', () => {
+  assert.equal(detachedWorktreeFgosHint(undefined), null);
+  assert.equal(detachedWorktreeFgosHint(null), null);
 });

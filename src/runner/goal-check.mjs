@@ -104,3 +104,20 @@ export function runGoalCheck(item, cwd, timeoutMs) {
     });
   });
 }
+
+const FGOS_HINT_RE = /\.fgos\b/;
+const MISSING_RE = /ENOENT|no such file|not found/i;
+
+/**
+ * tsk-4o9: advisory-only. Returns a hint string when `output` (a failed
+ * goal-check's combined stdout+stderr) looks like the verify command
+ * depended on `.fgos/`'s presence -- which a detached worktree never has
+ * (ADR0020; `bin/fgos.mjs`'s `return` re-verify runs inside one). Returns
+ * null otherwise. Never changes pass/fail -- callers append this to an
+ * already-failing friction record's own `detail`, nothing more.
+ */
+export function detachedWorktreeFgosHint(output) {
+  if (typeof output !== 'string') return null;
+  if (!FGOS_HINT_RE.test(output) || !MISSING_RE.test(output)) return null;
+  return "hint: this verify command's output mentions .fgos/ together with a missing-file signal -- a detached worktree (bin/fgos.mjs's return re-verify) never carries .fgos/ (ADR0020); if that is the real cause, redesign this item's verify to check real code/behavior instead of .fgos/ presence.";
+}
