@@ -385,7 +385,7 @@ Question:
 
 | Caller | Changed in this item? |
 |---|---|
-| `/fgOS:cook` | **Yes** — its own anchored-by-open-children step (`plugins/fgOS/skills/cook/SKILL.md`) now follows the contract above, invoking `fgos-fanout` in place of the old sequential front-of-queue push |
+| `/fgOS:cook` | Reverted — tsk-66d wired it to `fgos-fanout` for a time; per an explicit user decision (260811) it was reverted back to the sequential front-of-queue push (`plugins/fgOS/skills/cook/SKILL.md`), since the contract above already states fan-out is an OPTION, never a requirement |
 | `/fgOS:pick` | No — it still drives exactly the one id it was given; an anchor there means that ONE claimed item split into children, a legitimate stop for a single-id claim to report as-is |
 | a clarify-only sweep | No — inherits the contract, unmodified this item |
 | a planning-only sweep | No — inherits the contract, unmodified this item |

@@ -63,7 +63,7 @@ narrating every internal stage hop.
 **D3 — This is display-only, not a mechanism/capability fork, so it does
 not implicate the interactive/headless transparency law.** That law
 (mechanism and capability must be identical between an interactive session
-and a headless orchestrator; the only legitimate difference is the launch
+and a headless launcher; the only legitimate difference is the launch
 trigger and the stop/ceiling point) governs decisions and stage
 transitions, not terminal output aimed at a human who happens to be
 watching. A headless daemon has no human present to read a print
