@@ -1,265 +1,225 @@
-# Plan: tsk-403 — Đổi tên cả họ `decompose` thành `plan`
+# Plan: tsk-qod — Đưa fgos-clarifying về bước Init
 
-Mode: **standard**
+Mode: **high-risk**
 
-Đếm cờ theo Mode-gate (`fgos-routing`): 2 cờ áp dụng —
-**public contracts** (đổi tên verb CLI `fgos decompose`→`fgos plan` và
-launcher `/fgOS:decompose`→`/fgOS:plan`, cả hai là bề mặt người dùng gõ
-trực tiếp) và **existing covered behavior** (rename chạm
-`workflow-stage-graphs.mjs`, `bin/fgos.mjs`, `src/intake/decompose.mjs`,
-đều có test bao phủ hôm nay). Không cờ hard-gate nào áp dụng (không auth,
-không data loss, không audit/security, không external provider, không gỡ
-validation) → không tự động lên `high-risk`. 2 cờ khớp khung "2–3 cờ →
-standard", khớp `risk: "standard"` item đã tự khai từ lúc tạo.
+Đếm cờ theo Mode-gate (`fgos-routing`): **public contracts** (đảo thứ tự
+`/fgOS:submit`, đổi hợp đồng của `fgos-clarifying` — mọi item mới tạo từ
+giờ đi qua đường khác), **existing covered behavior** (chạm
+`workflow-stage-graphs.mjs`, `submit`, và `migrate-clarify-split.mjs` +
+test suite của nó, tất cả đã có test bao phủ), **weak proof around the
+area** (verify hiện tại của item hẹp hơn nhiều phạm vi thật đã khoá ở D1/D2)
+— cộng một **cờ hard-gate: data loss** (di trú 90 item sản xuất thật, sai
+là mất/nhầm dữ liệu thật, không phải fixture). Một cờ hard-gate → thẳng
+**high-risk**, không cần đếm đủ 4 cờ.
 
-Không lane này được handoff sẵn từ phiên trước (session tự claim thẳng qua
-`/fgOS:pick` rồi `fgos-coding-driving`, chưa từng qua `fgos-routing`'s
-Orient), và `plan.md` chưa tồn tại trước bước này — áp dụng fallback: tự
-đọc Mode-gate và tính cờ như trên (không tái dùng một lane đã quyết từ
-trước, vì thật sự chưa có).
+Không lane nào được handoff sẵn (claim thẳng qua `/fgOS:pick`, chưa qua
+`fgos-routing`'s Orient); `plan.md` chưa tồn tại trước bước này — áp dụng
+fallback Mode-gate như trên.
 
 ## Approach
 
-**Đường đi.** Rename cơ học xuyên repo theo đúng tiền lệ commit `8eba4a40`
-(`chore(tsk-f38): rename skill fgos-executing to fgos-code-implement`) —
-đã kiểm tra trực tiếp: commit đó đổi **131 file** cho **một** skill rename,
-gồm cả `docs/history/*/CONTEXT.md` + `plan.md` lịch sử, `plans/reports/*`,
-`docs/{explanation,how-to,reference,decisions}/*`, test, và cả file gốc
-`tsk-1op-case-study-note.md` — xác nhận "full rewrite gồm cả docs/history"
-không phải giả định của phiên này, là quy ước **đã có tiền lệ thật**, đúng
-như D15/mô tả item đã trích.
+**Bằng chứng lớn nhất, thay đổi hẳn đánh giá rủi ro của con này:** đã tìm
+thấy `scripts/migrate-clarify-split.mjs` — một script di trú **đã có sẵn,
+đã có test suite đầy đủ** (`test/state/migrate-clarify-split.test.mjs`),
+viết cho đúng lớp vấn đề này (tsk-puz D12, lần `clarify` bị tách thành
+`clarify -> discovery -> exploring` trước đây). Đọc toàn văn: nó phân loại
+mỗi item đang ở `stage: 'clarify'` vào 1 trong 3 nhóm — `awaiting-human` →
+`exploring`; có `decisionsById` thật hoặc `CONTEXT.md` đã commit → 
+`discovery`; còn lại (chưa đụng gì) → **giữ nguyên tại `clarify`**
+(`targetStageFor`, dòng 42-51). Ghi qua cửa thật (`moveStage`,
+`role: 'system'`), tự idempotent (item đã dời khỏi `clarify` thì lần chạy
+sau không còn khớp filter nữa — không cần CAS-retry riêng), có `--dry-run`
+để xem trước an toàn trên store thật.
 
-**Phương án bị loại.** Đổi riêng lẻ ba việc (stage/verb/launcher trước,
-file sau, tiền tố sau nữa) trong ba PR khác nhau — bị loại vì quét toàn
-repo ba lần cho cùng một việc (chính lý do D15 đã chốt gộp). Cân nhắc thay
-`decompose` alias bằng deprecation-warning runtime thay vì static
-`skillMap` entry — bị loại vì phức tạp hơn không cần thiết; `skillMap` là
-data tĩnh, không cần logic runtime mới (đúng "Do not invent a new stage,
-field, or event kind" của skill này).
+**Việc DUY NHẤT cần đổi trong chính script đó:** nhánh thứ 3
+(`return "clarify"` ở dòng 50) — hôm nay nghĩa là "để yên", nhưng sau khi
+xoá `clarify` khỏi registry thì "để yên" không còn hợp lệ. Đổi đích nhánh
+đó thành `"discovery"` — nhất quán với nhánh 2 (có bằng chứng thật) vì cả
+hai đều là "item đã tồn tại, cần một lượt research máy-một-mình trước khi
+sang exploring", chỉ khác độ chín của bằng chứng đã có sẵn. Không cần viết
+script mới từ đầu — thu hẹp đáng kể rủi ro "data loss" so với ước lượng
+ban đầu, vì cơ chế ghi-qua-cửa-thật + idempotent + dry-run đã được kiểm
+chứng trước đó (tsk-puz), chỉ đổi MỘT dòng đích.
 
-**Bằng chứng scout mới, khác số liệu DISCUSSION.md đã ước lượng ban đầu:**
-`rg -l "decompose"` (loại `node_modules`/`.git`/`.fgos`) khớp **493 file**,
-không phải "hai how-to doc" như DISCUSSION.md ước lượng nhẹ ban đầu. Vỡ ra:
-
-| Thư mục | Số file |
-|---|---|
-| `docs/history` | 281 |
-| `docs/explanation` | 50 |
-| `plans/reports` | 32 |
-| `docs/how-to` | 24 |
-| `src/state` | 11 |
-| `plugins/fgOS` | 10 |
-| `test/state` | 9 |
-| `test/e2e` | 7 |
-| `src/runner` | 7 |
-| `docs/reference` | 7 |
-| `docs/decisions` | 7 |
-| còn lại (test/cli, test/runner, src/intake, herdr-plugin, docs/specs, docs/distillery, test/intake, docs/journals, gốc) | 26 |
-
-**Cảnh báo quan trọng cho người thực thi (không phải quyết định mới, là
-ranh giới thực thi):** `rg "decompose"` khớp CẢ literal identifier
-(stage/verb/tên file) LẪN từ tiếng Anh thông thường "decompose" dùng
-trong văn xuôi (vd. "decompose công việc thành phần nhỏ" — nghĩa "chia
-nhỏ", không liên quan gì tên stage). Sweep phải phân biệt hai loại này:
-chỉ đổi literal identifier (`stage: 'decompose'`, `fgos decompose`,
-`skillMap.decompose`, tên file `decompose.mjs`, đường dẫn
-`plugins/fgOS/skills/decompose`), **không** đổi câu văn xuôi dùng từ
-"decompose" với nghĩa từ điển thông thường. Đây là ranh giới thực thi cho
-`fgos-code-implement`, không phải một quyết định sản phẩm mới — không cần
-quay lại `CONTEXT.md`.
+**Phương án bị loại.** Viết migration script mới từ đầu — bị loại vì
+trùng lặp hoàn toàn với script đã có, đúng lý do D1 chọn "di trú dứt điểm"
+thay vì giữ alias: tận dụng cơ chế đã kiểm chứng thay vì phát minh lại.
+Giữ nhánh 3 ở `leftAtClarify` rồi xử lý tay từng item — bị loại vì D1 đã
+minh thị từ chối "chấp nhận kẹt, xử lý tay."
 
 **impact-analysis posture:** `fgos tool query --capability impact-analysis
---status present` → provider `gitnexus`, `status: "present"` → **full**.
-Bằng chứng blast-radius cho các proof point bên dưới nên chạy qua GitNexus
-(`impact`/`detect_changes`) khi khả thi, theo CLAUDE.md.
+--status present` → `gitnexus`, `status: "present"` → **full** (lưu ý:
+GitNexus index của repo này đang lệch xa HEAD tại thời điểm viết plan —
+xem ghi chú trong tsk-403's iron-law-evidence.md; bằng chứng blast-radius
+cho các proof point dưới đây dựa trên đọc code trực tiếp thay vì
+`impact`/`detect_changes`, degraded nhưng đã cross-check bằng `rg`/`grep`).
 
-## Shape (phased — mode standard)
+## Shape (phased — mode high-risk)
 
-### Phase 1 — Core engine registry (`src/state/workflow-stage-graphs.mjs`)
+### Phase 1 — Migrate 90 item khỏi stage `clarify`
 
-- Đổi `stages` array của domain `coding`: thêm `planning`, **giữ**
-  `decompose` (D18 — alias legacy).
-- `skillMap`: thêm `planning: 'fgos-coding-planning'`; **sửa** (không
-  xoá) `decompose: 'fgos-planning'` thành `decompose: 'fgos-coding-planning'`
-  — **điểm dễ sai nhất của cả kế hoạch**: alias `decompose` vẫn phải trỏ
-  tới skill THẬT sau khi thư mục skill đã đổi tên (việc 3), nếu không 3
-  item đang mở trên stage đó (`tsk-42i`, `tsk-3at`, `tsk-3m6`) sẽ trỏ tới
-  một thư mục không còn tồn tại — đúng thất bại D18 định ngăn, chỉ là ở
-  một lớp khác (skill file, không phải stage name).
-- `stepMap`: **đã đọc thật** `src/state/workflow-stage-graphs.mjs:74-78`
-  — hôm nay `stepMap` của domain `coding` là `{ clarify: 'Clarify',
-  decompose: 'Divide', executing: 'Execute' }`, tức `decompose` ĐANG có
-  entry thật, không phải "chưa có gì để khỏi thêm". Hành động chính xác:
-  **xoá hẳn** entry `decompose: 'Divide'` hiện có, **thêm mới** `planning:
-  'Divide'` thay vào đúng vị trí đó — kết quả giống hệt D18 mô tả (`decompose`
-  không còn trong `stepMap`, `discovery`/`exploring` vẫn tiếp tục không có
-  như hôm nay), chỉ khác ở chỗ đây là một phép XOÁ+THÊM, không phải một
-  phép THÊM đơn thuần như bản nháp trước đó lỡ viết.
-- `transitions`: giữ cạnh `decompose -> executing` và `clarify ->
-  decompose`/`exploring -> decompose` (D18 "giữ cạnh ra của nó" — đọc kỹ:
-  giữ cả cạnh VÀO lẫn RA, vì 2 trong 3 item mở đang ở `blocked`/
-  `awaiting-human`, tức đã từng đi vào bằng một cạnh vào rồi; không cần
-  cạnh vào mới nhưng cạnh cũ không được xoá). Thêm cạnh mới song song
-  dùng tên `planning` cho luồng mới: `clarify -> planning`, `exploring ->
-  planning`, `planning -> executing`.
-- Domain thứ hai trong cùng file (dòng ~334, không phải `coding`) **không
-  đụng** — nó đã tự có `decompose: null` trong `skillMap`, ngoài phạm vi
-  D9's domain-prefix logic.
+- Sửa `targetStageFor`'s nhánh thứ 3 (`scripts/migrate-clarify-split.mjs`
+  dòng 50): `return "clarify"` → `return "discovery"`.
+- Cập nhật `test/state/migrate-clarify-split.test.mjs`: các test hiện
+  đang khẳng định "untouched item ở lại `leftAtClarify`" (dòng 43-51,
+  84-86, 119-123, 137-145, 167) phải đổi kỳ vọng — untouched item giờ di
+  chuyển sang `discovery`, KHÔNG còn xuất hiện trong `leftAtClarify` nữa
+  (mảng đó có thể vẫn tồn tại trong shape trả về cho tương thích, nhưng
+  luôn rỗng sau đổi này — hoặc xoá hẳn khỏi return shape nếu không còn ý
+  nghĩa; quyết định cụ thể để lúc code, không phải quyết định sản phẩm).
+- Chạy script thật với `--dry-run` trước, đối chiếu số liệu với 90 item
+  đã đếm ở CONTEXT.md, RỒI chạy thật (không dry-run) TRƯỚC khi động vào
+  Phase 2/3/4 — đúng thứ tự D1 yêu cầu ("di trú TRƯỚC khi xoá").
 
-**Proof point (risk: TRUNG BÌNH).** 3 item đang mở phải vẫn resolve được
-skill thật sau rename — test: đọc `skillForStage(getDomain('coding'),
-'decompose')` trả về `'fgos-coding-planning'`, và
-`fs.existsSync('.claude/skills/fgos-coding-planning')` = true tại thời
-điểm Phase 1 hoàn tất (tức Phase 1 phải làm SAU Phase 4's rename thư mục
-skill, hoặc Phase 1 phải trỏ tới tên đích trước rồi Phase 4 hiện thực hoá
-— xem thứ tự Phase bên dưới, đã chọn vế sau vì `fgos graph` không áp dụng
-được cho thứ tự nội-file của một item không-split).
+**Proof point (risk: TRUNG BÌNH, đã giảm nhờ tiền lệ).** Sau khi chạy
+thật: `fgos list --all --json` không còn item nào `stage === 'clarify'`
+(trừ phi domain khác `coding` cũng dùng tên này — script gốc không lọc
+theo domain, cần xác nhận KHÔNG di chuyển nhầm item của domain khác; đọc
+lại `targetStageFor`: nó chỉ lọc `item.stage !== 'clarify'`, không đọc
+`item.domain` — CẦN THÊM lọc domain==='coding' vào vòng lặp chính, vì
+domain `triage`/`fixture-marketing` không có 'clarify' theo nghĩa này
+nhưng có thể trùng tên field tình cờ — kiểm tra thật: cả hai domain đó
+không dùng literal 'clarify' làm stage name của chúng, chỉ domain
+`coding` có, nên rủi ro này thực ra bằng 0, ghi lại ở đây để tường minh
+thay vì giả định).
 
-### Phase 2 — File + hàm nội bộ (`src/intake/decompose.mjs` → `plan.mjs`)
+### Phase 2 — Xoá `clarify` khỏi registry (`src/state/workflow-stage-graphs.mjs`)
 
-- `git mv src/intake/decompose.mjs src/intake/plan.mjs`.
-- **Sửa lại theo bằng chứng thật (đã đọc file, không đoán):** hàm export
-  thật trong file là `resolveDecompose`, `resolveCallerDecomposeVerdict`,
-  `resolveContentRoot`, `readLockedContext`,
-  `findUncoveredLockedDecisions` — đổi hai cái đầu mang chữ `decompose`:
-  `resolveDecompose`→`resolvePlan`, `resolveCallerDecomposeVerdict`→
-  `resolveCallerPlanVerdict`. **`judgeDecompose` KHÔNG PHẢI hàm còn sống**
-  — chỉ còn trong comment mô tả nó đã bị retire (dòng 6, 458, 468 của
-  `decompose.mjs`: "that judgeDecompose is retired", cùng lý do
-  `judgeDiscovery` bị khai tử ở `discovery.mjs`) — không có gì để đổi
-  tên, chỉ cần sửa CHỮ trong các comment đó từ `judgeDecompose` thành một
-  cụm mô tả tương đương (vd. "the retired subprocess judge") nếu muốn
-  nhất quán, không bắt buộc vì đó không phải identifier thật.
-  `passThroughModeMatch` (nằm ở `fgos-planning`, không phải file này) giữ
-  nguyên tên. **Giá trị verdict STRING `"decompose"` / `"pass-through"` /
-  `"need-human"` GIỮ NGUYÊN nguyên văn** (D11: tên kết cục, không phải
-  tên hàm/chặng). Cập nhật mọi call site — xác nhận qua `grep`:
-  `bin/fgos.mjs:28` (`import { resolveDecompose } from
-  '../src/intake/decompose.mjs'`) là call site DUY NHẤT import trực tiếp
-  từ file này; `resolveCallerDecomposeVerdict` chỉ được gọi NỘI BỘ trong
-  chính `decompose.mjs` (dòng 547), không bị import ở nơi khác — thu hẹp
-  đáng kể bề mặt cần sửa so với ước lượng ban đầu.
-- `git mv test/intake/decompose.test.mjs test/intake/plan.test.mjs`, sửa
-  import path.
+- Gỡ `clarify: 'fgos-clarifying'` khỏi `skillMap` của domain `coding`.
+- Gỡ `'clarify'` khỏi `stages` array của domain `coding`.
+- Gỡ `clarify: 'Clarify'` khỏi `stepMap` — hệ quả: `stageForStep(coding,
+  'Clarify')` trả `undefined`. **Đã đọc thật MỌI call site** (`rg -- "'Clarify'" src`),
+  tìm ra 2 chỗ thật sự vỡ (không phải giả định, đã kiểm chứng bằng đọc code):
+  - `src/state/frontier.mjs`'s `frontier()` **AN TOÀN sẵn** — dòng
+    `if (executeStage === undefined) continue;` đã tường minh guard đúng
+    trường hợp này (cùng cách nó đã xử lý domain `synthetic` không có
+    Clarify/Divide). `frontierAcrossSteps`'s default `['Clarify', 'Divide',
+    'Execute']` thừa hưởng an toàn này — không cần sửa.
+  - `src/intake/discovery.mjs`'s `discoverableStages(domain)` (dòng 122-125)
+    **VỠ THẬT**: trả `[clarifyStage, 'discovery', 'exploring']` —
+    `clarifyStage` sẽ là `undefined` cho domain `coding` sau Phase 2, tức
+    hàm trả `[undefined, 'discovery', 'exploring']`. Hàm này nuôi trực
+    tiếp `bin/fgos.mjs`'s `discover` CLI case's precondition
+    (`validStages.includes(stage)`) — `undefined` lọt vào danh sách "stage
+    hợp lệ" là một lỗ hổng validation thật. Sửa: lọc bỏ giá trị falsy
+    trước khi trả — `[clarifyStage, 'discovery', 'exploring'].filter(Boolean)`
+    (hoặc tương đương) — giữ nguyên hành vi cho domain KHÁC `coding` vẫn
+    còn Clarify-mapped stage thật (vd. `triage`).
+  - `src/intake/discovery.mjs`'s `nextDiscoveryEdge` (dòng 132)
+    **VỠ THẬT KHÁC**: `if (work.stage === clarifyStage)` — khi
+    `clarifyStage === undefined`, so sánh này khớp NHẦM với bất kỳ item
+    nào có `stage` field bị thiếu/hỏng (dù domain đó không còn có khái
+    niệm "clarify" nữa) — một false-positive match nguy hiểm, không phải
+    lý thuyết. Sửa: thêm guard `clarifyStage !== undefined &&` trước so
+    sánh, đúng cùng kiểu guard `frontier.mjs` đã làm.
+  - `src/runner/loop.mjs:681` **VỠ THẬT, nặng nhất**: dòng
+    `stage: stageForStep(getDomain(item.domain), 'Clarify')` gán thẳng
+    stage cho item MỚI mà runner tự tạo (nhánh "discovered-from", khi
+    worker báo cáo một `fgos-discovered` block). Sau Phase 2, dòng này
+    tạo item với `stage: undefined` — hỏng dữ liệu thật, không phải rủi
+    ro giả định. Sửa: `stageForStep(domain, 'Clarify') ?? domain.stages?.[0]`
+    — fallback về stage ĐẦU TIÊN domain đó khai báo; với domain `coding`
+    sau Phase 2, `stages[0]` chính là `'discovery'` (thứ tự mảng đã đổi ở
+    Phase 2's own change tới `stages`) — đúng ý định D5 ("item mới sinh ra
+    bỏ qua clarify, vào thẳng discovery"), không cần thêm nhánh domain-cụ-thể
+    nào trong file này (giữ nguyên tính domain-agnostic).
+- Gỡ cạnh `{from:'clarify', to:...}` còn sót nếu có (transitions array) —
+  đọc lại: `clarify` là NGUỒN của mọi cạnh xuất phát
+  (`clarify->executing`, `clarify->discovery`, `clarify->exploring`,
+  `clarify->planning` theo tsk-403); một khi không còn item nào ở
+  `clarify` (Phase 1 đã xong) và không stepMap nào trỏ tới `clarify`
+  (không tạo item mới ở đó), các cạnh này trở thành tử — có thể xoá sạch
+  hoặc để lại vô hại. Chọn XOÁ SẠCH để nhất quán với D1 "dứt điểm, không
+  để lại rác."
 
-**Vì sao đổi tên hàm dù item chỉ nói "đổi tên file":** một file `plan.mjs`
-export `resolveDecompose` là mâu thuẫn tên ngay trong chính file đó —
-cùng lỗi lệch verb-vs-stage mà D11 ghi nhận là *lý do gốc gây ra cả phiên
-rename này*. Đây là suy luận triển khai (Approach), không phải quyết định
-sản phẩm mới — không cần quay lại `CONTEXT.md`.
+**Proof point (risk: CAO — điểm dễ vỡ nhất).** Test `npm test` phải xanh
+NGUYÊN VẸN sau đổi này — đặc biệt `test/state/workflow-stage-graphs.test.mjs`
+(nhiều assertion cứng liệt kê `'clarify'` trong `stages`/`stepMap`,
+tương tự các assertion tsk-403 đã phải sửa cho `'decompose'`/`'planning'`)
+và `test/e2e/domain-aware-stage-literals.test.mjs`/`fixture-marketing`
+(kiểm tra domain khác không bị ảnh hưởng). Không chạy Phase 2 tách rời
+Phase 1 — thứ tự D1 là ràng buộc cứng, không phải gợi ý.
 
-### Phase 3 — Engine verb + CLI dispatch (`bin/fgos.mjs`)
+### Phase 3 — Đổi hợp đồng `fgos-clarifying` (`.claude/skills/fgos-clarifying/SKILL.md` + mirror `.agents/`)
 
-- `case 'decompose':` (dòng 1219) → `case 'plan':`. Thông báo lỗi bên
-  trong (`"decompose requires an id..."`, `"decompose: work ... not ...,
-  use fgos discover ... instead"`) đổi chữ `decompose` → `plan` NHƯNG câu
-  `--verdict must be "pass-through", "need-human", or "decompose"` (dòng
-  436) **giữ nguyên** vì đó là danh sách giá trị verdict hợp lệ (D11).
-- Import từ `plan.mjs` (Phase 2) thay vì `decompose.mjs`.
-- `stageForStep(..., 'Divide')` vẫn đúng nguyên (không đổi, chỉ đổi cái
-  gì gọi nó).
+- Đổi input: từ "item đã tồn tại (đọc qua `<id>`)" sang "text thô vừa
+  submit, chưa có item nào."
+- Đổi output: từ "ghi qua `fgos ask <id>`/`fgos answer <id>` (state của
+  item)" sang "trả `{title?, description?, domain, question?}` thẳng về
+  launcher gọi nó — KHÔNG ghi state, đúng khuôn verdict-only
+  `fgos-researching` đã dùng cho stage `discovery` (D2, CONTEXT.md's
+  Pinned terms)."
+- Thêm nhiệm vụ phân loại `domain` — D5 gốc đã giao việc này cho
+  `fgos-clarifying`, nhưng file hiện tại (đọc toàn văn lúc tsk-403) chỉ
+  làm rewrite text, KHÔNG phân loại domain. Cần thêm phần này thật —
+  đọc `getDomain`'s vocabulary từ `src/state/workflow-stage-graphs.mjs`'s
+  `DOMAINS` keys (`coding`/`synthetic`/`triage`/`fixture-marketing`) làm
+  từ vựng hợp lệ, tự phán dựa trên nội dung text (session sống, không cần
+  capacity dispatch riêng — cùng lý do Native-First đã áp dụng cho chính
+  fgos-clarifying's judgment hôm nay).
 
-**Proof point (risk: THẤP — cơ học, có test bao phủ sẵn).** `npm test`
-phần `test/cli/*` phải xanh; đặc biệt case gọi `fgos decompose <id>` cũ
-giờ phải báo "unknown command" hoặc tương tự có kiểm soát — không câm
-lặng.
+**Proof point (risk: TRUNG BÌNH).** Skill-prose change — theo
+`docs/how-to/write-verify-for-a-skill-prose-change.md` (đọc trước khi
+viết verify cho phần này), verify dạng `npm test && POSITIVE && NEGATIVE`
+— POSITIVE xác nhận SKILL.md không còn nhắc `fgos ask`/`fgos answer` với
+`<id>` (đã đổi hợp đồng), NEGATIVE xác nhận vẫn còn "Init"/"domain" trong
+nội dung (chưa xoá nhầm phần cốt lõi).
 
-### Phase 4 — Launcher (`plugins/fgOS/skills/decompose` → `plan`)
+### Phase 4 — Nối lại `/fgOS:submit` (`plugins/fgOS/skills/submit/SKILL.md`)
 
-- `git mv plugins/fgOS/skills/decompose plugins/fgOS/skills/plan`, sửa
-  toàn bộ `SKILL.md` bên trong: `/fgOS:decompose` → `/fgOS:plan`, mọi câu
-  gọi `fgos decompose` → `fgos plan`.
-- **Không** tạo alias ở lớp launcher — verify item yêu cầu thẳng `!
-  test -d plugins/fgOS/skills/decompose` (xoá hẳn, không giữ). Điều này
-  **không mâu thuẫn** D18: D18 chỉ giữ alias ở lớp STAGE (máy, cho item
-  đang đứng sẵn), còn launcher là lệnh người gõ tay — người luôn gõ
-  `/fgOS:plan <id>` bất kể item đang ở stage `decompose` (legacy) hay
-  `planning` (mới), vì `fgos-coding-driving` resolve theo `skillMap` dữ
-  liệu, không theo tên launcher người gõ.
-- Sửa mọi launcher khác trỏ tới cặp `decompose-next`/`decompose-loop` nếu
-  có (D11 ghi cặp `plan-next`/`plan-loop` thuộc MỘT task con khác, ngoài
-  phạm vi `tsk-403` — task này chỉ cần đảm bảo tên `plan` đã sẵn sàng cho
-  con đó dùng, không tự tạo cặp launcher mới).
+- Đảo thứ tự bước 4/6 hiện tại: gọi `fgos-clarifying` (Phase 3's hợp đồng
+  mới) TRƯỚC bước gọi verb `submit`, CHỈ cho nhánh có "soul" (gate hiện
+  tại đã phân biệt sẵn — giữ nguyên gate đó, chỉ đảo vị trí lệnh bên
+  trong nó).
+- Nếu `fgos-clarifying` trả `question` (không rõ ý định) — KHÔNG có `id`
+  nào để `fgos ask` vào, nên launcher phải giữ câu hỏi trong hội thoại
+  (giống `fgos-researching`'s "unclear" verdict tại stage `discovery`
+  đang được `fgos-coding-driving` áp dụng bằng `fgos discover --verdict
+  unclear` — nhưng ở ĐÂY chưa có discover call nào cả vì chưa có item).
+  Đơn giản nhất: launcher hỏi lại người NGAY trong hội thoại, không tạo
+  item cho tới khi có câu trả lời — giống bước 3 hiện tại của chính file
+  này (xác nhận dependency) đã làm annotation "Do not proceed... until
+  the user has answered in this turn."
+- Nếu có `domain`/`title`/`description` đã rewrite: gọi `fgos submit
+  "<text đã rewrite>" --domain <domain đã phân loại> --deps ...` (giữ
+  nguyên logic dependency-confirm ở bước 2/3 không đổi).
+- Bước 6b (re-judge tier/kind/risk) GIỮ NGUYÊN không đổi — thuộc phạm vi
+  task 4 khác (`tsk-2yo`), không phải task này.
+- Bước 5 (report kết quả) GIỮ NGUYÊN.
 
-### Phase 5 — Tiền tố `coding-` cho 5 skill (cả hai mirror)
+**Proof point (risk: TRUNG BÌNH).** Cùng chuẩn skill-prose verify như
+Phase 3. Kiểm tra thủ công (không tự động hoá được trong CI vì cần
+tương tác live): chạy `/fgOS:submit "<text mơ hồ>"` thật trong một phiên
+Claude Code, xác nhận launcher hỏi lại TRƯỚC khi tạo item (không còn tạo
+item rồi mới hỏi như hôm nay).
 
-Đổi cả `.claude/skills/` và `.agents/skills/` (đã xác nhận có mirror đầy
-đủ 13 thư mục ở cả hai phía):
+## Documentation touch points (đọc thật, không phải phỏng đoán)
 
-| Cũ | Mới |
-|---|---|
-| `fgos-exploring` | `fgos-coding-exploring` |
-| `fgos-planning` | `fgos-coding-planning` |
-| `fgos-validating` | `fgos-coding-validating` |
-| `fgos-compounding` | `fgos-coding-compounding` |
-| `fgos-code-implement` | `fgos-coding-implement` |
+`rg -l "fgos-clarifying"` ngoài Phase 3/4's own file, còn 2 chỗ tường
+thuật cần sửa cho khớp thật (không phải rủi ro chức năng, chỉ là prose
+sai sau khi đổi hợp đồng):
+- `.claude/skills/fgos-routing/SKILL.md:139` — bảng route liệt kê
+  `clarify -> fgos-clarifying`; hàng này chết sau Phase 2, xoá cùng lúc.
+- `.claude/skills/fgos-coding-driving/SKILL.md:393` — câu văn nói
+  `fgos-clarifying`/`fgos-coding-exploring` "already use" một engine
+  verb; sau Phase 3, `fgos-clarifying` không còn tự gọi engine verb nào
+  cả (verdict-only) — câu này cần sửa lại, đừng để nói sai sự thật mới.
 
-`git mv` từng cặp thư mục ở cả hai mirror (10 lệnh `mv`), rồi sửa mọi
-cross-reference bên trong từng `SKILL.md` (skill nào cũng nhắc tên các
-skill khác trong chuỗi `clarify → discovery → exploring → planning →
-executing`), cộng chính `skillMap` (Phase 1) đã trỏ đúng tên mới.
-**Không** đụng `fgos-clarifying`/`fgos-researching` (D9, helper) và
-**không bao giờ** đụng `fgos-fanout`/`fgos-indexing`/`fgos-routing`/
-`fgos-unlock` (D19).
+## Assumptions
 
-**Proof point (risk: TRUNG BÌNH).** Sau rename, `grep -rn
-"fgos-code-implement\|fgos-planning\b\|fgos-validating\b\|fgos-compounding
-\|fgos-exploring\b"` (không phải bare `decompose`) trên toàn repo — ngoại
-trừ `docs/history` snapshot của các item ĐÃ HOÀN TẤT TRƯỚC `tsk-403` mà
-KHÔNG thuộc "full rewrite" convention của chính `tsk-403` — phải về 0 tại
-những chỗ đang hoạt động thật (`src/`, `bin/`, `plugins/`, `.claude/`,
-`.agents/`, `test/`). Đây là clause item's own `verify` field **không**
-kiểm — item chỉ kiểm `! test -d plugins/fgOS/skills/decompose`. Rủi ro:
-verify hiện tại KHÔNG bắt được một cross-reference sót trong SKILL.md của
-skill khác. Khuyến nghị cho `fgos-validating`: chạy sweep thủ công này
-như một proof point độc lập, không chỉ dựa vào `verify` string hiện có.
-
-### Phase 6 — Sweep toàn repo còn lại + CHANGELOG
-
-- `docs/history/*` (281 file, theo tiền lệ commit `8eba4a40` — full
-  rewrite, gồm cả CONTEXT.md/plan.md lịch sử của các item **khác**
-  `tsk-403`, không phải chỉ tài liệu của chính item này).
-- `docs/{explanation,how-to,reference,decisions}` (~88 file cộng lại) —
-  đây là **living docs**, mọi tham chiếu `fgos decompose`/stage
-  `decompose`/tên skill cũ phải cập nhật vì chúng mô tả hành vi HIỆN TẠI,
-  không phải lịch sử.
-- `plans/reports` (32 file) — theo cùng tiền lệ.
-- `test/state`, `test/e2e`, `test/cli`, `test/runner`, `herdr-plugin/src`
-  — sửa theo Phase 1-4 đã đổi API/CLI.
-- **CHANGELOG.md**: thêm dòng vào `## [Unreleased]` — bắt buộc theo
-  AGENTS.md's install/setup/doctor gate ("Does this change something a
-  user of fgOS would see? If yes, add a line"). Đổi tên CLI verb
-  (`fgos decompose`→`fgos plan`) và launcher (`/fgOS:decompose`→
-  `/fgOS:plan`) là thay đổi người dùng thấy trực tiếp — dòng CHANGELOG
-  không có trong bất kỳ D-ID nào ở CONTEXT.md vì đây là nghĩa vụ đứng
-  ngoài phạm vi rename, áp dụng cho MỌI thay đổi user-visible.
-
-**Proof point (risk: THẤP, khối lượng lớn nhưng cơ học).** `npm test`
-xanh sau toàn bộ sweep; verify string của item tự nó không kiểm hết 493
-file nhưng `npm test` sẽ bắt được phần nào tham chiếu code thật bị đổi mà
-quên sửa (import path vỡ, v.v.) — phần docs thuần văn bản (đa số 281 file
-`docs/history`) không có gì tự động bắt sai nếu sót, rủi ro duy nhất là
-"lười sót", giảm bằng cách chạy `rg -l "decompose"` lại SAU sweep và audit
-thủ công từng file còn sót xem là literal identifier hay từ tiếng Anh
-thường (đã phân biệt ở mục Approach).
-
-## Assumptions (không phải câu hỏi mới — chi tiết chỉ người thực thi cần)
-
-1. Thứ tự Phase 1→6 như trên là AN TOÀN cho `npm test` chạy xanh giữa
-   chừng — không bắt buộc; có thể gộp Phase 1+2+3+4 thành một commit rồi
-   Phase 5+6 một commit khác, miễn cuối cùng `fgos-code-implement`'s "one
-   commit per item" khi return item (nhiều commit trong lúc làm là bình
-   thường, chỉ cần lịch sử sạch trước khi return).
-2. `fgos graph --json`/`--what-if` không áp dụng để quyết thứ tự SÁU
-   PHASE NỘI BỘ của một item không-split (D15 đã chốt không split) — công
-   cụ đó phục vụ thứ tự GIỮA CÁC ITEM, không phải giữa các bước trong một
-   item. Thứ tự 6 phase trên chọn theo phụ thuộc kỹ thuật thật (Phase 1
-   cần biết tên đích của Phase 4 trước khi ghi `skillMap`, nên viết theo
-   thứ tự khai báo nhưng thực hiện Phase 4 song song/trước khi commit
-   Phase 1 nếu cần — không phải một ràng buộc tuần tự cứng).
-3. Repo có công cụ `git mv` sẵn dùng bình thường; không cần script
-   riêng cho khối lượng này (493 file nhưng đa số là sed/rg thay chữ, không
-   phải rename thư mục).
+1. **Đã xác nhận thật, không còn là giả định** (chạy `fgos list --all
+   --json`, đếm theo `domain` field): toàn bộ 90 item ở stage `'clarify'`
+   đều domain `coding` (hoặc không set, mặc định `coding`) — 0 item thuộc
+   domain khác. Không cần lọc domain trong Phase 1's vòng lặp chính, dù
+   thêm vào vẫn vô hại (defensive).
+2. Việc thêm domain-classification vào `fgos-clarifying` (Phase 3) dùng
+   chính phán đoán của session sống, không cần capacity/model riêng —
+   nhất quán với cách `fgos-clarifying` hôm nay đã tự phán intent mà
+   không dispatch ra ngoài.
+3. Không cần split thành nhiều item con — 4 phase trên phụ thuộc chuỗi
+   thật (Phase 2 cần Phase 1 xong trước; Phase 4 cần Phase 3's hợp đồng
+   mới tồn tại trước), gộp một item nhất quán với D15's lý do gốc (tsk-403)
+   dù đây là tiền lệ khác cây con, cùng nguyên tắc.
 
 ## Outstanding questions
 

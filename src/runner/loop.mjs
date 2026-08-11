@@ -678,11 +678,23 @@ async function captureDiscoveredWork({ output, item, queue, dir, log }) {
           refs: [],
           verify: FALLBACK_VERIFY,
           tier: derived.tier,
-          stage: stageForStep(getDomain(item.domain), 'Clarify'),
+          // tsk-qod D1/D2: `stageForStep(domain, 'Clarify')` resolves to
+          // `undefined` for a domain that retired `clarify` entirely
+          // (today: only `coding`) -- assigning `stage: undefined` here
+          // would silently corrupt this new item's own required field.
+          // Falls back to the domain's own first declared stage instead
+          // (`stages[0]`), which for `coding` post-retirement is
+          // `discovery` -- exactly D5's own intent: a runner-created item
+          // (already has title/description, needs no clarify pass) enters
+          // the same stage a migrated pre-existing item now lands on
+          // (`scripts/migrate-clarify-split.mjs`'s own "untouched" target).
+          // A domain that still has a real Clarify-mapped stage (e.g.
+          // `triage`) is unaffected -- the `??` never fires for it.
+          stage: stageForStep(getDomain(item.domain), 'Clarify') ?? getDomain(item.domain).stages?.[0],
           domain: item.domain,
           discoveredFrom: item.id,
         });
-        log(`fgos-runner: discovered work "${id}" from "${item.id}" (runner-created, stage clarify)`);
+        log(`fgos-runner: discovered work "${id}" from "${item.id}"`);
       });
     } catch (err) {
       log(`fgos-runner: discovery-report create skipped for "${item.id}" ("${sanitizeTitleForLog(block.title)}"): ${err.message}`);

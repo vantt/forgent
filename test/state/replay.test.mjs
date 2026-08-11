@@ -330,31 +330,37 @@ test('foldEvents on a log with no work.discovery events yields a view with no "d
 // per D3/R3): 'clarify-pass' (work.stage -> executing), 'answer' (work.move
 // carrying an answer), 'close' (work.move -> done). `role` rides on the
 // SAME event's payload (additive, optional) rather than a separate write.
+//
+// tsk-qod D1/D2: the settlement gate itself moved from `from === 'clarify'`
+// to `from === 'discovery'` (replay.mjs) — `discovery` (`stages[0]`) is now
+// the coding domain's own entry stage, since `clarify` retired entirely.
+// The settlement `kind` string stays the literal 'clarify-pass' (a stable,
+// already-persisted event-history label, never renamed retroactively).
 
-test('foldEvents derives a clarify-pass settlement from work.stage -> executing, carrying role + verify as detail', () => {
+test('foldEvents derives a clarify-pass settlement from work.stage -> exploring, carrying role + verify as detail', () => {
   const events = [
-    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'clarify' }, v: 2 },
-    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'clarify', to: 'executing', verify: 'npm test -- a', role: 'runner' }, v: 2 },
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'discovery' }, v: 2 },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'discovery', to: 'exploring', verify: 'npm test -- a', role: 'runner' }, v: 2 },
   ];
   const view = foldEvents(events);
   assert.equal(view.settlements.a.length, 1);
   assert.deepEqual(view.settlements.a[0], { kind: 'clarify-pass', role: 'runner', ts: '2026-07-16T00:00:01.000Z', detail: 'npm test -- a' });
 });
 
-test('foldEvents derives a clarify-pass settlement from work.stage clarify -> decompose too (settlement keys off leaving clarify, not landing on executing)', () => {
+test('foldEvents derives a clarify-pass settlement from work.stage discovery -> planning too (settlement keys off leaving the entry stage, not landing on executing)', () => {
   const events = [
-    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'clarify' }, v: 2 },
-    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'clarify', to: 'decompose', verify: 'npm test -- a', role: 'runner' }, v: 2 },
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'discovery' }, v: 2 },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'discovery', to: 'planning', verify: 'npm test -- a', role: 'runner' }, v: 2 },
   ];
   const view = foldEvents(events);
   assert.equal(view.settlements.a.length, 1);
   assert.deepEqual(view.settlements.a[0], { kind: 'clarify-pass', role: 'runner', ts: '2026-07-16T00:00:01.000Z', detail: 'npm test -- a' });
 });
 
-test('foldEvents does NOT derive a settlement from work.stage decompose -> executing (it never leaves clarify)', () => {
+test('foldEvents does NOT derive a settlement from work.stage exploring -> planning (it never leaves discovery)', () => {
   const events = [
-    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'decompose' }, v: 2 },
-    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'decompose', to: 'executing' }, v: 2 },
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'exploring' }, v: 2 },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'exploring', to: 'planning' }, v: 2 },
   ];
   const view = foldEvents(events);
   assert.equal('settlements' in view, false);
@@ -383,8 +389,8 @@ test('foldEvents derives a close settlement from a work.move -> done, with a nul
 
 test('foldEvents settlement APPENDS across multiple settling transitions on the same id — none erase a prior one', () => {
   const events = [
-    { seq: 1, ts: '2026-07-15T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'clarify' }, v: 2 },
-    { seq: 2, ts: '2026-07-15T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'clarify', to: 'executing', verify: 'npm test', role: 'runner' }, v: 2 },
+    { seq: 1, ts: '2026-07-15T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'discovery' }, v: 2 },
+    { seq: 2, ts: '2026-07-15T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'discovery', to: 'exploring', verify: 'npm test', role: 'runner' }, v: 2 },
     { seq: 3, ts: '2026-07-15T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'awaiting-human', ask: 'sure?' }, v: 2 },
     { seq: 4, ts: '2026-07-15T00:00:03.000Z', type: 'work.move', payload: { id: 'a', from: 'awaiting-human', to: 'todo', answer: 'yes', role: 'human' }, v: 2 },
     { seq: 5, ts: '2026-07-15T00:00:04.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'done', role: 'human' }, v: 2 },

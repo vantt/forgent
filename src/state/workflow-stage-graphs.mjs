@@ -73,7 +73,20 @@ export const DOMAINS = Object.freeze({
     // `decompose` again (enforced below: it carries no `stepMap` entry).
     // Follow-up: delete this alias once zero items remain at stage
     // `decompose` (out of `tsk-403`'s own footprint).
-    stages: Object.freeze(['clarify', 'discovery', 'exploring', 'decompose', 'planning', 'executing']),
+    //
+    // tsk-qod D1/D2: `clarify` retires as a stage ENTIRELY — moved to a
+    // pre-item-creation Init helper (`fgos-clarifying`, called by
+    // `/fgOS:submit` before an item exists, D2), never a stage-skill
+    // again. UNLIKE `decompose` (tsk-403 D18), `clarify` does NOT keep a
+    // legacy drain-only alias here: the 90 items that were open on it at
+    // rename time were migrated off first, for real
+    // (`scripts/migrate-clarify-split.mjs`, tsk-qod D1 — "resolve it
+    // definitively via migration, not leave another alias to clean up
+    // later"), so there is nothing left to strand. `stages[0]` is now
+    // `discovery` — the domain's own new entry point for an existing item
+    // (`src/runner/loop.mjs`'s runner-discovered-item creation falls back
+    // to `stages[0]` for exactly this reason).
+    stages: Object.freeze(['discovery', 'exploring', 'decompose', 'planning', 'executing']),
     // Maps each of coding's stages to the base-workflow step it satisfies.
     // Init and Compound-learn are the two base-workflow steps that now
     // happen outside `stage` entirely (intake before any stage exists;
@@ -87,50 +100,49 @@ export const DOMAINS = Object.freeze({
     // directly, tsk-1w7 impact-analysis posture: degraded). Legacy
     // `decompose` (tsk-403 D18) joins that same "no entry here" set now —
     // it is drain-only, so it must never satisfy `Divide` for a NEW item;
-    // `planning` (the renamed stage) takes over that key instead.
+    // `planning` (the renamed stage) takes over that key instead. `clarify`
+    // (tsk-qod D1/D2) carries no entry here anymore either — it is no
+    // longer a stage at all, not merely drain-only.
     stepMap: Object.freeze({
-      clarify: 'Clarify',
       planning: 'Divide',
       executing: 'Execute',
     }),
     // Pre-retrofit stage-fsm.mjs STAGE_TRANSITIONS value — the
     // executing -> compound-learn edge is retired along with the stage
-    // itself (D11) — PLUS four new edges for the D10 chain (tsk-1w7/
-    // tsk-puz): `clarify -> discovery -> exploring -> decompose`, the
-    // sequential chain a NEW item walks, and one direct `clarify ->
-    // exploring` jump (tsk-puz D12) for a PRE-EXISTING item being migrated
-    // straight into `exploring` because it is already parked mid-Socratic-
-    // question (`status: 'awaiting-human'`) — such an item is already at
-    // the machine+human decision-lock stage; routing it through `discovery`
-    // first would misrepresent it as needing a machine-alone research pass
-    // it never asked for. The three pre-existing edges stay exactly as they
-    // were: `clarify -> executing` is still dormant-but-legal (stage-fsm.mjs's
-    // own header comment), and `clarify -> decompose` / `decompose ->
-    // executing` were, at the time of this paragraph's own writing, the
-    // literal edges discovery.mjs/decompose.mjs fired — neither file was in
-    // tsk-1w7's or tsk-puz's own declared footprint, so both edges had to
-    // stay legal exactly as-is THEN. tsk-403 D11/D18 supersedes the
-    // "sequential chain a NEW item walks" framing above: a NEW item now
-    // walks `clarify -> discovery -> exploring -> planning`, never
-    // `decompose` (see the legacy-alias comment above `stages`); the
-    // `decompose`-named edges below are kept ONLY as drain-only legacy —
-    // `plan.mjs` (renamed from `decompose.mjs`) fires them for items that
-    // still carry that old stage name.
+    // itself (D11). Historically this array's edges all originated from
+    // `clarify` (tsk-1w7/tsk-puz's own "sequential chain a NEW item
+    // walks": `clarify -> discovery -> exploring -> decompose`, tsk-403
+    // D11/D18's later `-> planning` update). tsk-qod D1/D2 retires
+    // `clarify` as a stage ENTIRELY (not merely drain-only, unlike
+    // `decompose`) — `discovery` is now the domain's own entry point
+    // (`stages[0]`), so a NEW item's sequential chain is simply
+    // `discovery -> exploring -> planning`. `decompose`-named edges stay
+    // exactly as they were (tsk-403 D18, still drain-only legacy,
+    // unaffected by this item).
     transitions: Object.freeze([
-      Object.freeze({ from: 'clarify', to: 'executing' }),
+      // `clarify -> discovery` / `clarify -> exploring` (tsk-qod D1) —
+      // NOT a routing alias like `decompose`'s (D18): `clarify` carries no
+      // entry anywhere else here (`stages`/`skillMap`/`stepMap` all lost
+      // it), so `validateWorkShape` refuses `stage: 'clarify'` on any item
+      // creation and no live item can ever legitimately reach this edge
+      // through ordinary flow again. Kept ONLY so `moveStage`'s FSM check
+      // (`stage-fsm.mjs`'s `transitionStage`, which always requires a
+      // registered edge, no bypass) stays legally able to advance a
+      // historical `clarify`-stage item forward — the exact shape
+      // `scripts/migrate-clarify-split.mjs` (and its own test suite,
+      // which re-creates that historical shape via a raw `work.add` event
+      // to verify the script for real) still needs, even though the real
+      // 90-item production migration this item ran already completed.
+      Object.freeze({ from: 'clarify', to: 'discovery' }),
+      Object.freeze({ from: 'clarify', to: 'exploring' }),
       // Legacy `decompose` edges (tsk-403 D18) — kept exactly as they were
-      // so the 3 items still open on that stage name can keep draining out
+      // so the items still open on that stage name can keep draining out
       // through them; never used by a new item since `decompose` carries
       // no `stepMap` entry above.
-      Object.freeze({ from: 'clarify', to: 'decompose' }),
       Object.freeze({ from: 'decompose', to: 'executing' }),
       Object.freeze({ from: 'exploring', to: 'decompose' }),
-      Object.freeze({ from: 'clarify', to: 'discovery' }),
       Object.freeze({ from: 'discovery', to: 'exploring' }),
-      Object.freeze({ from: 'clarify', to: 'exploring' }),
-      // New `planning` edges (tsk-403 D11) — the active replacements for
-      // the three legacy `decompose` edges above.
-      Object.freeze({ from: 'clarify', to: 'planning' }),
+      // `planning` edges (tsk-403 D11) — the active chain a NEW item walks.
       Object.freeze({ from: 'exploring', to: 'planning' }),
       Object.freeze({ from: 'planning', to: 'executing' }),
     ]),
@@ -174,15 +186,17 @@ export const DOMAINS = Object.freeze({
     // in `bin/fgos.mjs`/`cleanup-harness.mjs`): it is pure harness, no skill
     // ever loads for it, and its own per-domain difference is already fully
     // carried by the existing `worktreeBacked` field below.
-    // tsk-1w7 D10/D13: `clarify` now runs the NEW lightweight self-judging
-    // skill (`fgos-clarifying`, tsk-v4b/P2 — "chỉ hỏi khi không hiểu", D13)
-    // instead of the old deep Socratic lock; that old behavior lives on
-    // under the NEW `exploring` stage name instead, still served by the
-    // SAME `fgos-coding-exploring` skill file (renamed from `fgos-exploring`
-    // per tsk-403 D15, content unchanged). `discovery` runs the new
-    // stage-agnostic research skill (`fgos-researching`, tsk-2t9/P1). Both
-    // skill files already exist on disk (P1/P2 merged before this item —
-    // exactly the dependency plan.md's own P4 row records: "Chờ: P1, P2").
+    // tsk-1w7 D10/D13: the old deep Socratic lock lives on under the
+    // `exploring` stage name, still served by the SAME `fgos-coding-exploring`
+    // skill file (renamed from `fgos-exploring` per tsk-403 D15, content
+    // unchanged). `discovery` runs the new stage-agnostic research skill
+    // (`fgos-researching`, tsk-2t9/P1). Both skill files already exist on
+    // disk (P1/P2 merged before this item — exactly the dependency plan.md's
+    // own P4 row records: "Chờ: P1, P2"). `clarify` (tsk-1w7 D10/D13's own
+    // lightweight self-judging skill, `fgos-clarifying`) carries no entry
+    // here anymore (tsk-qod D1/D2) — it moved to a pre-item-creation Init
+    // helper (`/fgOS:submit`'s own launcher calls it directly, D2), never a
+    // stage-skill loaded through this map again.
     // tsk-403 D15: 5 stage skills gain a `coding-` prefix
     // (`fgos-exploring`->`fgos-coding-exploring`,
     // `fgos-planning`->`fgos-coding-planning`,
@@ -196,7 +210,6 @@ export const DOMAINS = Object.freeze({
     // skill that actually exists on disk after the rename, not the old,
     // now-deleted `fgos-planning` directory name.
     skillMap: Object.freeze({
-      clarify: 'fgos-clarifying',
       discovery: 'fgos-researching',
       exploring: 'fgos-coding-exploring',
       decompose: 'fgos-coding-planning',

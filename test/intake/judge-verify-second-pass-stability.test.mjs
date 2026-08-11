@@ -42,7 +42,9 @@ function sampleWork(overrides = {}) {
     risk: 'light',
     refs: [],
     verify: 'chưa xác định — P15 bổ sung',
-    stage: 'clarify',
+    // tsk-qod D1/D2: `clarify` is retired as a stage entirely -- `discovery`
+    // (`stages[0]`) is the real entry point a fresh item now starts at.
+    stage: 'discovery',
     ...overrides,
   };
 }

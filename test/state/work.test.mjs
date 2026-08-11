@@ -463,8 +463,8 @@ test('DEFAULTS.tier is itself a member of TIERS, and SCHEMA_VERSION is a positiv
   assert.ok(Number.isInteger(SCHEMA_VERSION) && SCHEMA_VERSION > 0);
 });
 
-test('STAGES includes "decompose" between clarify and executing — compound-learn is retired (D11); "discovery"/"exploring" now sit between clarify and decompose (tsk-1w7 D10); "planning" (renamed from "decompose", tsk-403 D11) sits after the legacy "decompose" alias (D18)', () => {
-  assert.deepEqual(STAGES, ['clarify', 'discovery', 'exploring', 'decompose', 'planning', 'executing']);
+test('STAGES: "clarify" is retired entirely (tsk-qod D1/D2) — "discovery" is stages[0], the domain\'s own entry point; "decompose" survives only as a legacy, drain-only alias (D18) ahead of "planning" (tsk-403 D11)', () => {
+  assert.deepEqual(STAGES, ['discovery', 'exploring', 'decompose', 'planning', 'executing']);
 });
 
 test('validateWork accepts every stage in STAGES', () => {

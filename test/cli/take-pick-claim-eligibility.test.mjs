@@ -55,15 +55,15 @@ function envelopeData(stdout) {
   return JSON.parse(stdout).data;
 }
 
-test('take --id claims a status:todo item at stage clarify — matches pick, no longer rejected', () => {
+test('take --id claims a status:todo item at stage discovery — matches pick, no longer rejected', () => {
   const cwd = initGitCwd();
   const id = envelopeData(run(cwd, ['submit', 'Fuzzy request needing discovery']).stdout).id;
-  assert.equal(stateView(cwd).work[id].stage, 'clarify');
+  assert.equal(stateView(cwd).work[id].stage, 'discovery');
 
   const result = run(cwd, ['take', '--id', id]);
   assert.equal(result.status, 0, `take failed: ${result.stderr}`);
   assert.equal(stateView(cwd).work[id].status, 'doing');
-  assert.equal(stateView(cwd).work[id].stage, 'clarify', 'take claims the item without touching its stage');
+  assert.equal(stateView(cwd).work[id].stage, 'discovery', 'take claims the item without touching its stage');
 });
 
 test('take --id claims a status:todo item at stage decompose — matches pick, no longer rejected', () => {
@@ -86,16 +86,16 @@ test('take --id claims a status:todo item at stage decompose — matches pick, n
   assert.equal(stateView(cwd).work['decompose-stage-item'].status, 'doing');
 });
 
-test('take --id on a clarify-stage item with an unmet dep is still rejected — the stage relaxation never dropped the deps guard', () => {
+test('take --id on a discovery-stage item with an unmet dep is still rejected — the stage relaxation never dropped the deps guard', () => {
   const cwd = initGitCwd();
   const dir = path.join(cwd, '.fgos');
   addWork(dir, { id: 'unmet-dep-source', title: 'Dep', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
   addWork(dir, {
     id: 'clarify-with-unmet-dep',
-    title: 'Clarify item blocked on a dep',
+    title: 'Discovery-stage item blocked on a dep',
     kind: 'task',
     status: 'todo',
-    stage: 'clarify',
+    stage: 'discovery',
     deps: ['unmet-dep-source'],
     risk: 'light',
     refs: [],
@@ -142,9 +142,9 @@ test('take --id not found is still rejected exactly as before (unchanged path)',
 
 test('take with no --id still only opens the frontier head — the relaxation applies to the explicit --id branch alone (D1 unchanged)', () => {
   const cwd = initGitCwd();
-  run(cwd, ['submit', 'Fuzzy request never taken by id']); // stage clarify, never in the frontier
+  run(cwd, ['submit', 'Fuzzy request never taken by id']); // stage discovery, never in the frontier
   const result = run(cwd, ['take']);
-  assert.notEqual(result.status, 0, 'the frontier is empty — a clarify-stage item must not be silently auto-taken');
+  assert.notEqual(result.status, 0, 'the frontier is empty — a discovery-stage item must not be silently auto-taken');
 });
 
 // tsk-3yh: isDepsAndLineageReady (frontier.mjs) used to check a dep's
@@ -163,7 +163,7 @@ test('take --id claims an item whose dep is status:delivered — RESOLVED_STATUS
     title: 'Item blocked only by a resolved-but-not-done dep',
     kind: 'task',
     status: 'todo',
-    stage: 'clarify',
+    stage: 'discovery',
     deps: ['delivered-dep'],
     risk: 'light',
     refs: [],
@@ -184,7 +184,7 @@ test('take --id claims an item whose dep is status:wontfix — RESOLVED_STATUSES
     title: 'Item blocked only by a wontfix dep',
     kind: 'task',
     status: 'todo',
-    stage: 'clarify',
+    stage: 'discovery',
     deps: ['wontfix-dep'],
     risk: 'light',
     refs: [],
