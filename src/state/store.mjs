@@ -27,7 +27,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { readEvents, withEventsLock, appendEventLocked } from './events.mjs';
+import { readEvents, withEventsLock, appendEventLocked, readLastLineBefore } from './events.mjs';
 import { rebuildView, viewRevision } from './replay.mjs';
 import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, classifyStalePostDelivery, footprintOverlapAmong, goalScopedCriticalPath, goalScopedGreedyTopUnblock, computeSchedule, detectCycles } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './status-fsm.mjs';
@@ -89,7 +89,7 @@ function paths(dir) {
   return { logPath: path.join(dir, 'events.jsonl'), viewPath: path.join(dir, 'state.json') };
 }
 
-function writeView(viewPath, view) {
+function writeView(viewPath, view, snapshot) {
   fs.mkdirSync(path.dirname(viewPath), { recursive: true });
   // work-graph-intelligence S3: stamp a deterministic revision-hash onto the
   // ON-DISK derived view only. `view` (what refreshView returns to store
@@ -97,7 +97,11 @@ function writeView(viewPath, view) {
   // a sibling field written to state.json, never folded back into the view a
   // rebuild returns. Determinism (same log -> same revision) keeps the
   // rebuild-determinism e2e's before/after deep-equal green.
-  const persisted = { ...view, revision: viewRevision(view) };
+  // tsk-49e: `snapshot` ({size, mtimeMs, lastLine} of events.jsonl as of
+  // this write) is the same kind of additive sibling field — read back only
+  // by replay.mjs's own incremental-rebuild fast path, never folded into the
+  // view a rebuild returns.
+  const persisted = { ...view, revision: viewRevision(view), snapshot };
   // tsk-4mx: write to a uniquely-named temp file, then rename(2) it onto
   // viewPath -- an atomic replace on POSIX, so a reader can never observe a
   // truncated/partial state.json, same pattern as main-checkout-lock.mjs's
@@ -112,8 +116,15 @@ function writeView(viewPath, view) {
 // caused the change has already been appended — never before.
 function refreshView(dir) {
   const { logPath, viewPath } = paths(dir);
-  const view = rebuildView(logPath);
-  writeView(viewPath, view);
+  const view = rebuildView(logPath); // may itself take replay.mjs's own snapshot fast path -- still correct either way
+  // tsk-49e: captures the exact {size, mtimeMs} events.jsonl has RIGHT NOW,
+  // plus the raw text of its own last line -- safe to stat/read here
+  // uncontended: refreshView always runs inside withEventsLockAndRefresh's
+  // held lock (tsk-1q5), so no concurrent append can land between
+  // rebuildView's own read above and this stat/tail-read.
+  const stat = fs.statSync(logPath);
+  const lastLine = readLastLineBefore(logPath, stat.size);
+  writeView(viewPath, view, { size: stat.size, mtimeMs: stat.mtimeMs, lastLine });
   return view;
 }
 

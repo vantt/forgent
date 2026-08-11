@@ -9,9 +9,30 @@
 // Deterministic: folding the same ordered event array (or rebuilding from
 // the same log) twice always yields deep-equal views.
 
+import fs from 'node:fs';
+import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { readEvents } from './events.mjs';
+import { readEvents, readLastLineBefore, readEventsFromByte } from './events.mjs';
 import { DEFAULTS } from './work.mjs';
+
+// tsk-49e: every top-level key applyEvent ever writes to `view` is either an
+// array `.push`ed onto in place (only `decisions`) or reassigned via a
+// `{...oldValue, ...patch}` spread (every other container: work, gates,
+// settlements, learnings, decisionsById, outcomes, discovery, tools, and any
+// future one applyEvent adds) — never mutated two levels deep in place. A
+// generic ONE-LEVEL shallow clone of each top-level key is therefore
+// sufficient to protect a seed view's own nested references: `foldEvents`
+// only ever needs to guarantee its OWN `view` object (and each of its direct
+// children) is a fresh reference, never that every nested object is.
+function cloneTopLevel(seedView) {
+  const out = {};
+  for (const [key, value] of Object.entries(seedView)) {
+    if (Array.isArray(value)) out[key] = [...value];
+    else if (value && typeof value === 'object') out[key] = { ...value };
+    else out[key] = value;
+  }
+  return out;
+}
 
 /**
  * Fold an ordered array of events (as returned by `readEvents`) into a state
@@ -26,9 +47,15 @@ import { DEFAULTS } from './work.mjs';
  * old and new logs (and a log mixing old events followed by new ones) all
  * fold into a view shaped the same way. This module declares no default of
  * its own.
+ *
+ * `seedView` (tsk-49e, optional): when supplied, folding starts from a
+ * shallow clone of it (`cloneTopLevel`, above) instead of an empty view —
+ * `events` is then expected to be only the events NOT already folded into
+ * `seedView`, e.g. the incremental-snapshot read path in `rebuildView`
+ * below. Omitting it is byte-identical to every pre-tsk-49e caller.
  */
-export function foldEvents(events) {
-  const view = { work: {}, decisions: [] };
+export function foldEvents(events, seedView) {
+  const view = seedView ? cloneTopLevel(seedView) : { work: {}, decisions: [] };
   for (const event of events) {
     applyEvent(view, event);
   }
@@ -515,12 +542,67 @@ function applyEvent(view, event) {
   }
 }
 
+// tsk-49e: state.json's own sibling `snapshot` field (written by
+// store.mjs's refreshView) — {size, mtimeMs, lastLine} as of the last
+// successful full read. Returns the persisted view directly (zero bytes of
+// `logPath` read) when the log is byte-for-byte unchanged since that
+// snapshot; folds only the NEW bytes onto it when the log has safely grown
+// past it (verified via readLastLineBefore); returns null (falls back to a
+// full read) on any doubt at all — a wrong-in-doubt design that can only
+// ever cost a slower call, never a wrong view. See docs/history/
+// tsk-49e-incremental-read-snapshot/RESEARCH.md for why mtime+size (not a
+// content hash of the whole prefix) is the right signal here, and why the
+// last-line fingerprint is proven safe against all 3 known log-rewrite
+// paths (repairTruncatedLastLine, fixEventsJsonlContiguity --fix, git's own
+// merge=union driver).
+function tryIncrementalRebuild(logPath) {
+  const viewPath = path.join(path.dirname(logPath), 'state.json');
+  let persisted;
+  try {
+    persisted = JSON.parse(fs.readFileSync(viewPath, 'utf8'));
+  } catch {
+    return null;
+  }
+  if (!persisted || typeof persisted !== 'object') return null;
+  const snap = persisted.snapshot;
+  if (!snap || typeof snap.size !== 'number' || typeof snap.mtimeMs !== 'number' || typeof snap.lastLine !== 'string') return null;
+
+  let stat;
+  try {
+    stat = fs.statSync(logPath);
+  } catch {
+    return null;
+  }
+
+  // Destructured only to exclude these two sibling fields (revision/
+  // snapshot) from the returned view shape -- everything else in
+  // `persisted` IS the real view, per writeView's own "additive sibling
+  // field, never folded back" pattern (see viewRevision's own doc comment).
+  const { revision, snapshot, ...savedView } = persisted;
+
+  if (stat.mtimeMs === snap.mtimeMs && stat.size === snap.size) {
+    return savedView; // untouched since the snapshot -- zero-read shortcut
+  }
+  if (stat.size <= snap.size) return null; // shrank, or same-size-different-mtime rewrite -- never safe to trust the prefix
+
+  const stillThere = readLastLineBefore(logPath, snap.size) === snap.lastLine;
+  if (!stillThere) return null; // prefix was rewritten (or the check itself failed) -- fall back, never guess
+
+  const newEvents = readEventsFromByte(logPath, snap.size);
+  return foldEvents(newEvents, savedView);
+}
+
 /**
  * Read every event from `logPath` (via `readEvents`) and fold it into a
  * fresh state view. This is the `fgos rebuild` primitive: rebuilding twice
- * from the same log must produce deep-equal views (D3 determinism).
+ * from the same log must produce deep-equal views (D3 determinism) —
+ * including via the tsk-49e snapshot fast path above, which is why that
+ * path is tried FIRST here but always falls back to this exact full-read
+ * shape on any doubt, never a partial or best-effort result.
  */
 export function rebuildView(logPath) {
+  const fast = tryIncrementalRebuild(logPath);
+  if (fast) return fast;
   const events = readEvents(logPath);
   return foldEvents(events);
 }
