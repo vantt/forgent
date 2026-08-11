@@ -293,7 +293,7 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
     frame.render_widget(tabs, work_items_area[0]);
 
     let work_items_header =
-        Row::new(["ID", "Tier", "Pri", "Status", "Blocked By", "Blocks", "Title"]).style(header_style);
+        Row::new(["ID", "Tier", "Pri", "Status", "Stage", "Blocked By", "Blocks", "Title"]).style(header_style);
     let visible_work_items = app.visible_work_items();
     let work_items_rows: Vec<Row> = visible_work_items
         .iter()
@@ -315,6 +315,7 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
                 item.goal_tier.clone(),
                 priority,
                 item.status.clone(),
+                item.stage.clone(),
                 blocked_by,
                 item.blocks.to_string(),
                 item.title.clone(),
@@ -332,6 +333,7 @@ pub fn draw(frame: &mut Frame, app: &mut App) {
                 Constraint::Length(6),
                 Constraint::Length(5),
                 Constraint::Length(16),
+                Constraint::Length(10),
                 Constraint::Length(14),
                 Constraint::Length(6),
                 Constraint::Fill(1),
@@ -731,6 +733,23 @@ mod tests {
         for label in ["TODO", "DOING", "REVIEW", "DONE"] {
             assert!(content.contains(label), "missing tab label {label}: {content}");
         }
+    }
+
+    /// tsk-4cxl D2: the Work Items table renders a `Stage` column right
+    /// after `Status`, carrying each row's own `stage` value — `App::mock`'s
+    /// default TODO-tab row (`tsk-19y-1`) has `stage: "clarify"`.
+    #[test]
+    fn work_items_table_renders_stage_column_next_to_status() {
+        let mut app = App::mock();
+        let backend = TestBackend::new(120, 30);
+        let mut terminal = Terminal::new(backend).expect("terminal init");
+        terminal
+            .draw(|frame| draw(frame, &mut app))
+            .expect("draw should not panic");
+        let buffer = terminal.backend().buffer();
+        let content: String = buffer.content().iter().map(|cell| cell.symbol()).collect();
+        assert!(content.contains("Stage"), "missing Stage header: {content}");
+        assert!(content.contains("clarify"), "missing row's stage value: {content}");
     }
 
     /// tsk-417 D3: NEED ANSWER, MERGE LIST, AFTER DELIVER render as 3

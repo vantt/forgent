@@ -10,7 +10,7 @@ locked layout spec for that redesign.
 - **Tabs**: `TODO` / `DOING` / `REVIEW` / `DONE` — filtered client-side
   over one `fgos triage --json --all` response; no separate CLI call per
   tab.
-- **Columns**, in order: `ID`, `Tier`, `Priority`, `Status`,
+- **Columns**, in order: `ID`, `Tier`, `Priority`, `Status`, `Stage`,
   `Blocked By`, `Blocks`, `Title`.
 - **Row order**: `priority` field, ascending — smaller number is higher
   priority (`priority-formula.mjs`'s inverted scale, `computePriority` =
@@ -116,7 +116,8 @@ truecolor does not.
 ## Implementation (`tsk-64z`): Work Items panel color-coding, guidance not hard-lock
 
 The child item that actually built the Work Items panel (tabs + 7-column
-table, D1/D2/D7/D8 above) added Status-column color-coding as *guidance*,
+table, D1/D2/D7/D8 above — a `Stage` column was added later, `tsk-4cxl`)
+added Status-column color-coding as *guidance*,
 explicitly not a hard-locked spec the way the layout decisions above are:
 
 | Status | Color |
@@ -282,7 +283,7 @@ build --release`.
 
 ## Left deliberately open (implementer's call, not locked here)
 
-- Column width/truncation strategy for the 7-column Work Items table on
+- Column width/truncation strategy for the 8-column Work Items table on
   a narrow pane.
 
 Full decision record, scout evidence, and the related `tsk-jo1` palette
