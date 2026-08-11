@@ -5,6 +5,7 @@
 // surfaces `stage: executing` items; this covers the earlier
 // clarify/decompose pool `frontier()` deliberately excludes.
 import { rankImpact } from './impact.mjs';
+import { isDepsAndLineageReady } from './frontier.mjs';
 
 // tsk-1w7 D10: `discovery`/`exploring` sit between `clarify` and
 // `decompose` now — both join the pool as ordinary clarify-shaped
@@ -19,8 +20,12 @@ import { rankImpact } from './impact.mjs';
 const CLARIFY_SHAPED_STAGES = new Set(['clarify', 'discovery', 'exploring']);
 const CANDIDATE_STAGES = new Set([...CLARIFY_SHAPED_STAGES, 'decompose']);
 
-function isCandidate(item) {
-  return item.status === 'todo' && CANDIDATE_STAGES.has(item.stage);
+function isCandidate(item, view) {
+  return (
+    item.status === 'todo' &&
+    CANDIDATE_STAGES.has(item.stage) &&
+    isDepsAndLineageReady(view, item.id)
+  );
 }
 
 // Clarify-pool order: `blocks` DESCENDING, then `urgent` (true first), then
@@ -73,7 +78,7 @@ export function pickNextDiscoverItem(view) {
   const decompose = [];
   for (const id of Object.keys(work)) {
     const item = work[id];
-    if (!isCandidate(item)) continue;
+    if (!isCandidate(item, view)) continue;
     if (CLARIFY_SHAPED_STAGES.has(item.stage)) clarify.push(item);
     else decompose.push(item);
   }
