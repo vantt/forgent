@@ -6,11 +6,21 @@ Mode: tiny
 Work Items table already has render tests, lines 722-927). No auth,
 authorization, data model, audit/security, external systems, public
 contracts, cross-platform, weak-proof, or multi-domain flags apply. One
-direct task, two files touched (plus a doc). `impact-analysis: full`
-(`fgos tool query --capability impact-analysis --status present` →
-GitNexus registered and present on this machine, per `CONTEXT.md`'s scout
-evidence) — `impact()` MUST be run on the touched render symbols before
-editing (`CLAUDE.md` gate).
+direct task, two files touched (plus a doc). `impact-analysis: degraded`
+(corrected at `fgos-validating`, tsk-4cxl: `fgos tool query --capability
+impact-analysis --status present` shows GitNexus registered and
+`present`, but `mcp__gitnexus__list_repos` shows the `forgentX` index is
+426 commits behind HEAD — `present` only means installed, not fresh,
+per `CLAUDE.md`'s gate). Cross-checked anyway: `impact({target: "draw",
+direction: "upstream", file_path: "herdr-plugin/src/ui.rs"})` →
+`Function:herdr-plugin/src/ui.rs:draw` (the function containing this
+table's render code) has exactly 5 upstream callers, all existing tests
+in the same file (`work_items_panel_renders_four_tabs_todo_doing_review_
+done` and 4 siblings) — matches the direct `grep`/`Read` findings in
+`RESEARCH.md`/`CONTEXT.md` exactly, despite the stale index. No
+production caller outside this file depends on `draw` — blast radius is
+contained to `herdr-plugin/src/ui.rs`'s own test suite, already covered
+by the item's `verify` command.
 
 ## Approach
 
