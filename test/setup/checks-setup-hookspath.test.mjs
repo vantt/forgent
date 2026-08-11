@@ -41,7 +41,7 @@ import {
 test('fgos setup in a cwd with no .git reports hooksWired: false and does not throw', () => {
   const cwd = mkTemp('setup-cli-no-git-');
   const homeDir = mkTemp('setup-cli-no-git-home-');
-  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
+  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir } });
   assert.equal(result.status, 0, result.stderr);
   const envelope = JSON.parse(result.stdout);
   assert.equal(envelope.data.hooksWired, false);
@@ -54,7 +54,7 @@ test('fgos setup leaves a pre-existing custom core.hooksPath untouched — fill-
   const homeDir = mkTemp('setup-cli-custom-hooks-home-');
   execFileSync('git', ['init', '-q'], { cwd });
   execFileSync('git', ['config', 'core.hooksPath', 'my-own-hooks'], { cwd });
-  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
+  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir } });
   assert.equal(result.status, 0, result.stderr);
   const envelope = JSON.parse(result.stdout);
   assert.equal(envelope.data.hooksWired, false);
