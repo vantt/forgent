@@ -137,3 +137,37 @@ test('the clarify-shaped pool (clarify/discovery/exploring) still wins over the 
   };
   assert.deepEqual(pickNextDiscoverItem(view), { id: 'exploringItem', stage: 'exploring' });
 });
+
+// --- tsk-2v3: isCandidate() now checks isDepsAndLineageReady -------------
+
+test('an item with an unmet dep is never picked, even as the only candidate', () => {
+  const view = {
+    work: {
+      blocker: item('blocker', 'clarify', 'todo'),
+      dependent: item('dependent', 'clarify', 'todo', { deps: ['blocker'] }),
+    },
+  };
+  assert.deepEqual(pickNextDiscoverItem(view), { id: 'blocker', stage: 'clarify' });
+});
+
+test('an item becomes pickable once its dep resolves', () => {
+  const view = {
+    work: {
+      blocker: item('blocker', 'clarify', 'done'),
+      dependent: item('dependent', 'clarify', 'todo', { deps: ['blocker'] }),
+    },
+  };
+  assert.deepEqual(pickNextDiscoverItem(view), { id: 'dependent', stage: 'clarify' });
+});
+
+test('an item anchored by an open decomposed child is never picked, even with status:todo and no unmet deps', () => {
+  const view = {
+    work: {
+      // child is stage:executing (not itself a candidate-stage item) so the
+      // only thing this test proves is the anchor exclusion on `parent`.
+      parent: item('parent', 'decompose', 'todo'),
+      child: item('child', 'executing', 'todo', { parent: 'parent' }),
+    },
+  };
+  assert.equal(pickNextDiscoverItem(view), null);
+});

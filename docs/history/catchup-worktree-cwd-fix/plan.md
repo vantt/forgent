@@ -2,8 +2,13 @@
 
 CONTEXT.md: `docs/history/catchup-worktree-cwd-fix/CONTEXT.md` (D5/D6
 locked and approved, gate-bypass level `standard`). This plan covers ONLY
-tsk-2bg's own scope; `catchup` (tsk-5vl) and `sync-root`/`approve`
-(tsk-4uj) are delivered separately, same feature dir, different D-IDs.
+tsk-2bg's own scope; `catchup` (tsk-5vl, `plan-tsk-5vl.md`) and
+`sync-root`/`approve` (tsk-4uj, `plan-tsk-4uj.md`) are delivered
+separately, same feature dir, different D-IDs — this shared dir's bare
+`plan.md` always belongs to whichever item is currently being planned
+here; an outgoing item's own final plan is preserved at `plan-<id>.md`
+before the next one takes the slot (the same pattern tsk-4uj's own
+`plan-tsk-5vl.md` already established).
 
 **Revision note (`fgos-validating`, 260811):** tsk-4uj merged to `main`
 while this plan was being validated (`64f86633`, `status: delivered`).

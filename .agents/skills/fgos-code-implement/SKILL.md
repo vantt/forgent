@@ -183,10 +183,21 @@ re-shapes the work; that already happened at `clarify`/`decompose`.
    moves it to `blocked` instead) — it never takes the caller's word for
    it, the same "proof, not assertion" discipline bee's cap-with-evidence
    rule enforces, just applied by the engine instead of a recorded trace
-   field. If `return` reports `blocked`, treat that exactly like a failed
-   verify: diagnose, fix, and return again — never re-run `return` hoping
-   the same red state passes on a retry without a real change underneath
-   it.
+   field. If `return` itself just moved the item to `blocked` (a verify
+   failure caught while `status` was still `doing`), treat that exactly
+   like a failed verify: diagnose, fix, and return again — never re-run
+   `return` hoping the same red state passes on a retry without a real
+   change underneath it.
+
+   If the item is instead ALREADY `blocked` when you go to call `return`
+   (e.g. `approve`'s post-merge verify-fail rollback left it
+   `reason: verify-fail-post-merge`), `return` structurally refuses — it
+   requires `status: doing`, and this item's `blocked → awaiting-approval`
+   edge never passes through `doing` (RUL33/RUL34,
+   `docs/specs/work-state.md`). The correct recovery verb there is `fgos
+   catchup <id>`, not another `return` call: it re-runs `verify` on a
+   staged merge into the item's target branch and, on green, moves it
+   straight to `awaiting-approval`.
 
 ## Headless
 
