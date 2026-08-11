@@ -3750,7 +3750,19 @@ async function runVerb(verb, flags, positional, dir) {
         );
       }
 
-      const repoRoot = process.cwd();
+      // repoRoot from --dir, never raw process.cwd() (tsk-5vl, same class
+      // as tsk-k8u's take/pick fix): a caller running catchup from inside
+      // the item's own linked worktree (e.g. a session that just hit
+      // verify-fail-post-merge and is still sitting inside its own picked
+      // worktree) always passes --dir at the stable main checkout —
+      // deriving repoRoot from it keeps withMergeEphemeralWorktree's own
+      // `git branch -f` (src/runner/worktree.mjs) targeting that stable
+      // root instead of the worktree currently checked out on the same
+      // branch it is about to force-update, which git refuses ("Cannot
+      // force update the current branch"). Byte-identical to today when
+      // --dir is omitted (dataDir() resolves dir from process.cwd() too
+      // in that case).
+      const repoRoot = path.dirname(dir);
       const ownBranch = branchNameFor(id);
       // Guards against a human hand-forcing an inapplicable blocked state
       // (e.g. `fgos move <id> --to blocked --reason integration-drift` on a
