@@ -800,6 +800,37 @@ test('resolveDecompose does NOT release the risk-heavy gate on a stale/unrelated
   assert.equal(listWork(storeDir).work['item-x'].stage, 'decompose');
 });
 
+// --- tsk-wve D1: the heavy-risk floor skips only when the verdict's own
+// reason cites a real, already-locked decision from the item's own
+// CONTEXT.md -- same D-ID-citation precedent normalizeChild already
+// applies to a decompose child's own action field. ---
+
+test('resolveDecompose skips the risk-heavy gate when the verdict cites a real locked decision from the item\'s own CONTEXT.md (tsk-wve D1)', () => {
+  const storeDir = tmpStoreDir();
+  const { docsRef } = mkContextFixture(storeDir, '## Locked decisions\n\nD1: placeholder.\n');
+  addWork(storeDir, sampleWork({ risk: 'heavy', docsRef }));
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'human', {
+    verdict: 'pass-through',
+    reason: 'D1: already grounded in the locked decision, no split needed.',
+  });
+  assert.equal(result.outcome, 'pass-through', 'a real D-ID citation grounds the verdict, releasing the heavy-risk floor');
+  assert.equal(listWork(storeDir).work['item-x'].stage, 'executing');
+});
+
+test('resolveDecompose still gates a risk-heavy root when its CONTEXT.md carries no locked decisions at all, even if the reason mentions a D-ID-shaped token (tsk-wve D1, fail-safe against a fabricated citation)', () => {
+  const storeDir = tmpStoreDir();
+  const { docsRef } = mkContextFixture(storeDir, '# CONTEXT\n\nNo locked decisions section here.\n');
+  addWork(storeDir, sampleWork({ risk: 'heavy', docsRef }));
+
+  const result = resolveDecompose(storeDir, 'item-x', cfg, 'human', {
+    verdict: 'pass-through',
+    reason: 'D1: nothing real backs this -- the parent never locked a D1.',
+  });
+  assert.equal(result.outcome, 'need-human', 'a D-ID-shaped token with nothing real to cite must never bypass the floor');
+  assert.equal(listWork(storeDir).work['item-x'].stage, 'decompose');
+});
+
 test('resolveDecompose rejects a caller-supplied decompose verdict with a child missing verify, same fail-safe an invalid shape always gets — no partial write', () => {
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork());
