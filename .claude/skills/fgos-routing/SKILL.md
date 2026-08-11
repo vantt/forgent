@@ -136,7 +136,9 @@ call, not a different table:
 
 | stage | what's true right now | load (coding domain today) |
 |---|---|---|
-| `clarify` | the request is still fuzzy — gray areas, missing acceptance criteria, an ambiguous ask | `fgos-exploring` |
+| `clarify` | a freshly submitted item's intent hasn't been checked yet — decide whether it's already understood, asking a person only when a genuine gap remains | `fgos-clarifying` |
+| `discovery` | intent is understood; an unresolved question remains that needs a grounded finding before the item can move to `exploring` | `fgos-researching` |
+| `exploring` | the request is still fuzzy — gray areas, missing acceptance criteria, an ambiguous ask | `fgos-exploring` |
 | `decompose` — shaping | scope is settled; the work now needs shaping and, where it doesn't fit in one pass, splitting into child items | `fgos-planning` (the registry's entry-point default for `decompose`) |
 | `decompose` — proving | shape and children (if any) exist; what's left is proving the plan against reality before the item is allowed to move to `executing` | `fgos-validating` — this branch is this skill's own session-side judgment layered on top of the registry's single `decompose` default, never a second registry entry |
 | `executing` | the item has already cleared clarification and shaping (or never needed either), and is ready for direct implementation | `fgos-code-implement` (str89-fgos-domain-skills D4/D6 — the build/verify/return path, hand-authored from bee-executing's implement→verify→cap discipline) |
