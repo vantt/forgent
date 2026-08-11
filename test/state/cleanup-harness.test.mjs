@@ -280,6 +280,87 @@ test('checkMergeStillResolves: a multi-level decompose tree (child itself decomp
   assert.match(result.detail, /child-mid/);
 });
 
+// tsk-5j0: the gap the tests above never covered -- calling
+// checkMergeStillResolves with `id` set to the ROOT itself (not a non-root
+// decomposed node) while that root has children. Before this fix, the
+// function returned checkChildrenResolve's result directly and never
+// checked the root's own branch against anything.
+test('checkMergeStillResolves: a decomposed ROOT is ok:false when its own branch never merged into main, even though all its children resolve (tsk-5j0)', () => {
+  const repoRoot = initRepo();
+  execFileSync('git', ['checkout', '-qb', 'fgw/root-j'], { cwd: repoRoot });
+  commitFile(repoRoot, 'root.txt');
+  execFileSync('git', ['checkout', '-qb', 'fgw/child-e', 'fgw/root-j'], { cwd: repoRoot });
+  const childESha = commitFile(repoRoot, 'child-e.txt');
+  execFileSync('git', ['checkout', '-q', 'fgw/root-j'], { cwd: repoRoot });
+  execFileSync('git', ['merge', '--no-ff', '-q', '-m', 'merge child-e', 'fgw/child-e'], { cwd: repoRoot });
+  // Deliberately never merge fgw/root-j into main -- the exact gap tsk-5j0
+  // reports (confirmed live on tsk-4b2): a root with children whose own
+  // branch never merged, silently reported ok because only the children
+  // check ever ran.
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: repoRoot });
+
+  const view = {
+    work: {
+      'root-j': {},
+      'child-e': { parent: 'root-j', branchHeadAtReturn: childESha },
+    },
+  };
+  const result = checkMergeStillResolves(repoRoot, view.work['root-j'], { view, id: 'root-j' });
+  assert.equal(result.ok, false, "a root's own unmerged branch must fail the check even when every child resolves");
+  assert.match(result.detail, /fgw\/root-j/);
+  assert.match(result.detail, /never merged into HEAD/);
+});
+
+test('checkMergeStillResolves: a decomposed ROOT is ok:true when its own branch merged into main AND all its children resolve (tsk-5j0)', () => {
+  const repoRoot = initRepo();
+  execFileSync('git', ['checkout', '-qb', 'fgw/root-k'], { cwd: repoRoot });
+  commitFile(repoRoot, 'root.txt');
+  execFileSync('git', ['checkout', '-qb', 'fgw/child-f', 'fgw/root-k'], { cwd: repoRoot });
+  const childFSha = commitFile(repoRoot, 'child-f.txt');
+  execFileSync('git', ['checkout', '-q', 'fgw/root-k'], { cwd: repoRoot });
+  execFileSync('git', ['merge', '--no-ff', '-q', '-m', 'merge child-f', 'fgw/child-f'], { cwd: repoRoot });
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: repoRoot });
+  execFileSync('git', ['merge', '--no-ff', '-q', '-m', 'merge root-k into main', 'fgw/root-k'], { cwd: repoRoot });
+
+  const view = {
+    work: {
+      'root-k': {},
+      'child-f': { parent: 'root-k', branchHeadAtReturn: childFSha },
+    },
+  };
+  const result = checkMergeStillResolves(repoRoot, view.work['root-k'], { view, id: 'root-k' });
+  assert.equal(result.ok, true, "a root whose own branch merged into main, with every child resolving, must pass");
+  assert.match(result.detail, /child-f/);
+  assert.match(result.detail, /fgw\/root-k/);
+});
+
+test("checkMergeStillResolves: a decomposed ROOT still ok:false when a child fails, even though the root's own branch did merge into main (tsk-5j0 regression guard)", () => {
+  const repoRoot = initRepo();
+  execFileSync('git', ['checkout', '-qb', 'fgw/root-l'], { cwd: repoRoot });
+  commitFile(repoRoot, 'root.txt');
+  execFileSync('git', ['checkout', '-qb', 'fgw/child-g', 'fgw/root-l'], { cwd: repoRoot });
+  const childGSha = commitFile(repoRoot, 'child-g.txt');
+  execFileSync('git', ['checkout', '-qb', 'fgw/child-h', 'fgw/root-l'], { cwd: repoRoot });
+  const childHSha = commitFile(repoRoot, 'child-h.txt');
+  execFileSync('git', ['checkout', '-q', 'fgw/root-l'], { cwd: repoRoot });
+  execFileSync('git', ['merge', '--no-ff', '-q', '-m', 'merge child-g', 'fgw/child-g'], { cwd: repoRoot });
+  // child-h deliberately NOT merged anywhere -- the root's own branch check
+  // must never mask an already-caught children failure.
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: repoRoot });
+  execFileSync('git', ['merge', '--no-ff', '-q', '-m', 'merge root-l into main', 'fgw/root-l'], { cwd: repoRoot });
+
+  const view = {
+    work: {
+      'root-l': {},
+      'child-g': { parent: 'root-l', branchHeadAtReturn: childGSha },
+      'child-h': { parent: 'root-l', branchHeadAtReturn: childHSha },
+    },
+  };
+  const result = checkMergeStillResolves(repoRoot, view.work['root-l'], { view, id: 'root-l' });
+  assert.equal(result.ok, false, 'a genuinely unresolved child must still fail the check; the root-branch check must never mask it');
+  assert.match(result.detail, /child-h/);
+});
+
 // --- checkRetrospectiveContent -----------------------------------------
 // tsk-558: reads outcome.docType/docPath (D8's own named fields) instead
 // of outcome.actual/predicted (claim-lifecycle artifacts, unrelated to

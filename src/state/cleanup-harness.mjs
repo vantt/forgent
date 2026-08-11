@@ -134,7 +134,15 @@ export function checkMergeStillResolves(repoRoot, work, { view, id } = {}) {
   if (view && id) {
     const children = Object.entries(view.work ?? {}).filter(([, item]) => item.parent === id);
     if (children.length > 0) {
-      return checkChildrenResolve(repoRoot, view, children);
+      const childrenResult = checkChildrenResolve(repoRoot, view, children);
+      if (!childrenResult.ok) return childrenResult;
+      // tsk-5j0: children resolving into THIS item's branch says nothing
+      // about whether THIS item's own branch ever reached main -- only
+      // matters for the true root, since a non-root decomposed node's own
+      // branch is never itself merged forward (tsk-psb).
+      return resolveRoot(view, id) === id
+        ? checkRootBranchResolves(repoRoot, id, childrenResult)
+        : childrenResult;
     }
   }
   const sha = work?.branchHeadAtReturn ?? work?.headAtReturn ?? work?.branchHeadAtTake ?? work?.headAtTake;
@@ -163,6 +171,37 @@ function checkChildrenResolve(repoRoot, view, children) {
   return {
     ok: true,
     detail: `decomposed parent: all ${children.length} child item(s) (${children.map(([childId]) => childId).join(', ')}) resolve as ancestors of their own target ref`,
+  };
+}
+
+/**
+ * A decomposed ROOT's own branch (`fgw/<id>`) never merges into anything
+ * via the children-recursion above -- children merge directly into it, but
+ * nothing checks whether `fgw/<id>` itself ever merged into `main`. Combined
+ * with `childrenResult` via AND (tsk-5j0 D2): `ok:true` only when children
+ * resolve AND the root's own branch also reached `main`. Diagnostic-only,
+ * same posture as every other check in this file -- never auto-recovers,
+ * just stops silently reporting ok when it isn't.
+ */
+function checkRootBranchResolves(repoRoot, id, childrenResult) {
+  const namedRef = `fgw/${id}`;
+  if (!refExists(repoRoot, namedRef)) {
+    return {
+      ok: false,
+      detail: `${childrenResult.detail} — but this root's own branch ${namedRef} no longer exists, so whether it ever reached HEAD cannot be confirmed`,
+    };
+  }
+  const tipSha = git(repoRoot, ['rev-parse', namedRef]);
+  const rootAncestry = checkAncestry(repoRoot, tipSha, 'HEAD');
+  if (!rootAncestry.ok) {
+    return {
+      ok: false,
+      detail: `${childrenResult.detail} — but this root's own branch ${namedRef} was never merged into HEAD: ${rootAncestry.detail}`,
+    };
+  }
+  return {
+    ok: true,
+    detail: `${childrenResult.detail}; root's own branch ${namedRef} is also an ancestor of HEAD`,
   };
 }
 
