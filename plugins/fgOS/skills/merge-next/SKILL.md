@@ -19,13 +19,26 @@ CONTEXT.md` D6).
 
 ## Steps
 
-1. **Ignore `$ARGUMENTS`.** `merge next` takes no arguments — it always
-   picks the single top-ranked item from the same ranking `/fgOS:merge-
-   list` shows (dependency-wait clear, no footprint conflict, highest
-   `rankImpact`). Do not pass an id or let the user pick one for this
-   command; that is what `/fgOS:approve <id>` is for.
+1. **Parse `$ARGUMENTS` for `--wait <ms>`/`--no-wait`/`--timeout <ms>`
+   only.** `merge next` still takes no id — it always picks the single
+   top-ranked item from the same ranking `/fgOS:merge-list` shows
+   (dependency-wait clear, no footprint conflict, highest `rankImpact`).
+   Do not pass an id or let the user pick one for this command; that is
+   what `/fgOS:approve <id>` is for. `$ARGUMENTS` may still carry one or
+   more of these three flags — the same lock-wait/verify-timeout overrides
+   `approve`/`sync-root` already accept and `merge next` already forwards
+   (`src/cli/command-registry.mjs`'s `merge` entry: `"next" only:
+   forwarded to the underlying approve call, same as approve
+   --wait/--timeout`). Any other token in `$ARGUMENTS` (an id, an
+   unrecognized flag) is still ignored exactly as before — carry forward
+   only whichever of these three were actually present, verbatim, into
+   step 2 below.
 
-2. **Run the merge.** Run:
+2. **Run the merge**, appending whichever of `--wait <ms>`, `--no-wait`,
+   or `--timeout <ms>` step 1 parsed, verbatim, onto both `merge next`
+   invocations below. Omit them entirely when none were present in
+   `$ARGUMENTS` — this keeps today's default lock-wait behavior
+   byte-identical for a caller who passes nothing:
 
    ```
    # fgos CLI fallback (tsk-1no D3)
@@ -39,6 +52,10 @@ CONTEXT.md` D6).
      exit 1
    fi
    ```
+
+   (append the parsed flags after `merge next` on both the `node
+   "$FGOS_BIN" merge next` and `fgos merge next` lines above, e.g. `fgos
+   merge next --wait 300000`.)
 
    Always use the literal `${CLAUDE_PROJECT_DIR}` substitution shown
    above, never a relative path — an installed plugin's files run from a
