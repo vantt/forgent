@@ -1,52 +1,46 @@
-// checks.test.mjs — fgos doctor's check registry (str87-fgos-setup-doctor
-// D2) plus CLI-level proof that `fgos setup`/`fgos doctor` (with/without
-// --pretty) actually behave as CTR001/D7 require. Mirrors
-// test/cli/fgos-manifest.test.mjs's/test/install-packaging.test.mjs's real
-// spawnSync harness — no mocking the CLI process itself.
+// checks.test.mjs -- registry check của `fgos doctor` cùng phần chứng minh ở
+// mức CLI rằng `fgos doctor` (có/không --pretty) hành xử đúng CTR001/D7.
+// Harness spawnSync thật, không mock chính process CLI.
+//
+// tsk-67g: 10 test dựng môi trường thật cho `fgos setup` đã dọn sang các file
+// checks-setup-*.test.mjs bên cạnh -- chúng chiếm 117.6s trong 120s của file
+// này và một mình quyết định wall-clock của cả bộ test. Phần ở lại đây chạy
+// hết trong khoảng 2.5s.
 import { test } from 'node:test';
-import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { execFileSync, spawnSync } from 'node:child_process';
+import {
+  DEFAULT_CLEANUP_LEAF_TTL_DAYS,
+  DEFAULT_CLEANUP_TTL_DAYS,
+  DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
+  DEFAULT_INVARIANT_CHECK_COMMANDS,
+  DEFAULT_LEVEL,
+  DEFAULT_RUNNER_CONFIG,
+  DOCTOR_CHECKS,
+  FGOS,
+  FIX_REGISTRATIONS,
+  NO_CLAUDE_ENV,
+  __dirname,
+  addWork,
+  appendEvent,
+  assert,
+  checkById,
+  execFileSync,
+  fileURLToPath,
+  fixById,
+  fs,
+  initRepo,
+  initStore,
+  integrationScriptPath,
+  mainCheckoutHookWired,
+  mkTemp,
+  os,
+  path,
+  resolveMainCheckout,
+  spawnSync,
+  withHome,
+  writeEnduserDoc,
+  writeEnduserManifest,
+} from './helpers/setup-checks-harness.mjs';
 
-import { DOCTOR_CHECKS, FIX_REGISTRATIONS, integrationScriptPath, mainCheckoutHookWired, resolveMainCheckout } from '../../src/setup/checks.mjs';
-import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
-import { DEFAULT_LEVEL } from '../../src/state/gate-bypass.mjs';
-import { DEFAULT_CLEANUP_TTL_DAYS, DEFAULT_CLEANUP_LEAF_TTL_DAYS, DEFAULT_HERDR_ORCHESTRATOR_SETTINGS } from '../../src/setup/registrations.mjs';
-import { DEFAULT_INVARIANT_CHECK_COMMANDS } from '../../src/config/shared-config-file.mjs';
-import { initStore, addWork } from '../../src/state/store.mjs';
-import { appendEvent } from '../../src/state/events.mjs';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
-
-// tsk-4xg: `doctor --fix` now runs the real `claude-plugin-marketplace` fix
-// too, which shells out to a real, mutating external CLI (`claude plugin
-// marketplace add`/`install`) when the `claude` binary is present --
-// FGOS_CLAUDE_COMMAND (registrations.mjs's own test-only seam, mirroring
-// bin/fgos.mjs's FGOS_GH_COMMAND for `gh`) points it at a path that never
-// exists, so every `doctor --fix` spawned below sees "claude CLI not
-// found" and no-ops that fix, never touching this machine's real Claude
-// Code config as a side effect of running the test suite.
-const NO_CLAUDE_ENV = { ...process.env, FGOS_CLAUDE_COMMAND: '/nonexistent/fgos-test-claude-binary' };
-
-function mkTemp(prefix) {
-  return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
-}
-
-function checkById(id) {
-  const entry = DOCTOR_CHECKS.find((c) => c.id === id);
-  assert.ok(entry, `DOCTOR_CHECKS is missing "${id}"`);
-  return entry;
-}
-
-function fixById(id) {
-  const entry = FIX_REGISTRATIONS.find((f) => f.id === id);
-  assert.ok(entry, `FIX_REGISTRATIONS is missing "${id}"`);
-  return entry;
-}
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
@@ -393,23 +387,6 @@ test('changelog-unreleased-stale passes when ## [Unreleased] has a pending entry
   assert.match(message, /pending entr/);
   fs.rmSync(tmp, { recursive: true, force: true });
 });
-
-// ─── enduser-docs-index-stale (tsk-1m0, docs/history/doctor-check-enduser- ──
-// docs-index-stale/CONTEXT.md): D1 count-only message, D2 one-directional
-// (missing-from-index only), D3 read-only check sharing the same
-// generation path as the fix, D5 missing-manifest is normal, D6
-// QUADRANT_DIR_ALIASES (docs/decisions -> explanation) honored.
-
-function writeEnduserDoc(tmp, quadrantDir, filename, h1) {
-  const dirPath = path.join(tmp, 'docs', quadrantDir);
-  fs.mkdirSync(dirPath, { recursive: true });
-  fs.writeFileSync(path.join(dirPath, filename), `# ${h1}\n\nbody\n`);
-}
-
-function writeEnduserManifest(tmp, entries) {
-  fs.mkdirSync(path.join(tmp, 'docs'), { recursive: true });
-  fs.writeFileSync(path.join(tmp, 'docs', 'enduser-docs-index.json'), `${JSON.stringify(entries, null, 2)}\n`);
-}
 
 test('enduser-docs-index-stale passes when docs/enduser-docs-index.json does not exist yet', () => {
   const tmp = mkTemp('fgos-enduser-index-check-');
@@ -847,24 +824,6 @@ test('herdr-launcher-configured check passes when every toggle is a boolean', ()
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
-// ─── config-awareness (docs/history/global-project-config-awareness/ ──────
-// CONTEXT.md D1): always passes (informational, read-only, same contract as
-// tool-registry-configured) -- only the message and `active` distinguish
-// which level is in play. Every case overrides HOME (same pattern the
-// shell-integration-sourced tests above already use) so this never touches
-// the real ~/.fgos/config.json; project config is checked at the temp cwd's
-// own .fgos/config.json, matching describeConfigAwareness's real defaults.
-
-function withHome(homeDir, fn) {
-  const prevHome = process.env.HOME;
-  process.env.HOME = homeDir;
-  try {
-    return fn();
-  } finally {
-    process.env.HOME = prevHome;
-  }
-}
-
 test('config-awareness is registered on DOCTOR_CHECKS and always passes', () => {
   const { passed, message } = checkById('config-awareness').check(process.cwd());
   assert.equal(passed, true);
@@ -1006,113 +965,6 @@ test('main-checkout-hook-wired doctor check reports passed/failed matching mainC
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
-// ─── CLI-level tests: real spawned `fgos setup` / `fgos doctor` ───────────
-
-test('fgos setup (no flags) produces valid wrapEnvelope-shaped JSON on stdout', () => {
-  const cwd = mkTemp('setup-cli-json-');
-  const homeDir = mkTemp('setup-cli-json-home-');
-  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
-  assert.equal(result.status, 0, result.stderr);
-  const envelope = JSON.parse(result.stdout);
-  assert.equal(typeof envelope.contract, 'string');
-  assert.ok('data' in envelope);
-  fs.rmSync(cwd, { recursive: true, force: true });
-  fs.rmSync(homeDir, { recursive: true, force: true });
-});
-
-test('fgos setup wires core.hooksPath to .githooks in a real git checkout, and reports hooksWired: true', () => {
-  const cwd = mkTemp('setup-cli-hooks-');
-  const homeDir = mkTemp('setup-cli-hooks-home-');
-  execFileSync('git', ['init', '-q'], { cwd });
-  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
-  assert.equal(result.status, 0, result.stderr);
-  const envelope = JSON.parse(result.stdout);
-  assert.equal(envelope.data.hooksWired, true);
-  const hooksPath = execFileSync('git', ['config', '--get', 'core.hooksPath'], { cwd, encoding: 'utf8' }).trim();
-  assert.equal(hooksPath, '.githooks');
-  fs.rmSync(cwd, { recursive: true, force: true });
-  fs.rmSync(homeDir, { recursive: true, force: true });
-});
-
-test('fgos setup in a cwd with no .git reports hooksWired: false and does not throw', () => {
-  const cwd = mkTemp('setup-cli-no-git-');
-  const homeDir = mkTemp('setup-cli-no-git-home-');
-  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
-  assert.equal(result.status, 0, result.stderr);
-  const envelope = JSON.parse(result.stdout);
-  assert.equal(envelope.data.hooksWired, false);
-  fs.rmSync(cwd, { recursive: true, force: true });
-  fs.rmSync(homeDir, { recursive: true, force: true });
-});
-
-test('fgos setup leaves a pre-existing custom core.hooksPath untouched — fill-only, never silently repoint someone else\'s hooks', () => {
-  const cwd = mkTemp('setup-cli-custom-hooks-');
-  const homeDir = mkTemp('setup-cli-custom-hooks-home-');
-  execFileSync('git', ['init', '-q'], { cwd });
-  execFileSync('git', ['config', 'core.hooksPath', 'my-own-hooks'], { cwd });
-  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
-  assert.equal(result.status, 0, result.stderr);
-  const envelope = JSON.parse(result.stdout);
-  assert.equal(envelope.data.hooksWired, false);
-  assert.equal(envelope.data.hooksSkippedExisting, 'my-own-hooks');
-  const hooksPath = execFileSync('git', ['config', '--get', 'core.hooksPath'], { cwd, encoding: 'utf8' }).trim();
-  assert.equal(hooksPath, 'my-own-hooks', 'must not be silently repointed to .githooks');
-  fs.rmSync(cwd, { recursive: true, force: true });
-  fs.rmSync(homeDir, { recursive: true, force: true });
-});
-
-test('fgos setup initializes ~/.fgos/config.json with the full default shape (tsk-1ri D1) when it does not exist', () => {
-  const cwd = mkTemp('setup-cli-global-config-');
-  const homeDir = mkTemp('setup-cli-global-config-home-');
-  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
-  assert.equal(result.status, 0, result.stderr);
-  const envelope = JSON.parse(result.stdout);
-  const expectedGlobalPath = path.join(homeDir, '.fgos', 'config.json');
-  assert.equal(envelope.data.globalConfigPath, expectedGlobalPath);
-  assert.equal(envelope.data.globalConfigCreated, true);
-  assert.ok(fs.existsSync(expectedGlobalPath));
-  const written = JSON.parse(fs.readFileSync(expectedGlobalPath, 'utf8'));
-  assert.deepEqual(written.runner, DEFAULT_RUNNER_CONFIG);
-  fs.rmSync(cwd, { recursive: true, force: true });
-  fs.rmSync(homeDir, { recursive: true, force: true });
-});
-
-test('fgos setup run twice does not rewrite an already-complete ~/.fgos/config.json (tsk-1ri D2, fill-missing-only)', () => {
-  const cwd = mkTemp('setup-cli-global-config-repeat-');
-  const homeDir = mkTemp('setup-cli-global-config-repeat-home-');
-  const env = { ...process.env, HOME: homeDir };
-  const first = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env });
-  assert.equal(first.status, 0, first.stderr);
-  const globalPath = JSON.parse(first.stdout).data.globalConfigPath;
-  const mtimeBefore = fs.statSync(globalPath).mtimeMs;
-
-  const second = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env });
-  assert.equal(second.status, 0, second.stderr);
-  const envelope = JSON.parse(second.stdout);
-  assert.equal(envelope.data.globalConfigCreated, false);
-  assert.deepEqual(envelope.data.globalConfigAddedKeys, []);
-  assert.equal(fs.statSync(globalPath).mtimeMs, mtimeBefore, 'must not rewrite a file that already has every default key');
-  fs.rmSync(cwd, { recursive: true, force: true });
-  fs.rmSync(homeDir, { recursive: true, force: true });
-});
-
-test('fgos setup fills a missing default key into an existing ~/.fgos/config.json without touching a key the user already customized (tsk-1ri D1)', () => {
-  const cwd = mkTemp('setup-cli-global-config-fill-');
-  const homeDir = mkTemp('setup-cli-global-config-fill-home-');
-  const globalDir = path.join(homeDir, '.fgos');
-  fs.mkdirSync(globalDir, { recursive: true });
-  const globalPath = path.join(globalDir, 'config.json');
-  const customized = { runner: { ...DEFAULT_RUNNER_CONFIG, executor: { command: 'my-custom-cli', args: ['{prompt}'] } } };
-  fs.writeFileSync(globalPath, `${JSON.stringify(customized, null, 2)}\n`);
-
-  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
-  assert.equal(result.status, 0, result.stderr);
-  const written = JSON.parse(fs.readFileSync(globalPath, 'utf8'));
-  assert.equal(written.runner.executor.command, 'my-custom-cli', 'a value the user already customized must never be overwritten');
-  fs.rmSync(cwd, { recursive: true, force: true });
-  fs.rmSync(homeDir, { recursive: true, force: true });
-});
-
 test('fgos doctor (no flags) produces valid wrapEnvelope-shaped JSON on stdout', () => {
   const cwd = mkTemp('doctor-cli-json-');
   const homeDir = mkTemp('doctor-cli-json-home-');
@@ -1137,18 +989,6 @@ test('fgos doctor --pretty prints colored ANSI text, not JSON', () => {
   fs.rmSync(homeDir, { recursive: true, force: true });
 });
 
-test('fgos setup --pretty prints colored ANSI text describing what it did, not JSON', () => {
-  const cwd = mkTemp('setup-cli-pretty-');
-  const homeDir = mkTemp('setup-cli-pretty-home-');
-  const result = spawnSync(process.execPath, [FGOS, 'setup', '--pretty'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
-  assert.equal(result.status, 0, result.stderr);
-  assert.ok(result.stdout.includes('\x1b['), 'expected ANSI escape codes in --pretty output');
-  assert.throws(() => JSON.parse(result.stdout), 'expected --pretty output to NOT be valid JSON');
-  assert.ok(result.stdout.includes('.fgos/config.json'), 'expected --pretty output to describe the config file it touched');
-  fs.rmSync(cwd, { recursive: true, force: true });
-  fs.rmSync(homeDir, { recursive: true, force: true });
-});
-
 test('fgos doctor against a fresh cwd with no runner config never creates the shared config file (read-only proof)', () => {
   const cwd = mkTemp('doctor-cli-readonly-');
   const homeDir = mkTemp('doctor-cli-readonly-home-');
@@ -1163,19 +1003,6 @@ test('fgos doctor against a fresh cwd with no runner config never creates the sh
   fs.rmSync(cwd, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });
 });
-
-// ─── D2/D3: the shell-integration path is canonicalized to the main checkout ─
-
-function initRepo(prefix) {
-  const dir = mkTemp(prefix);
-  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: dir });
-  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: dir });
-  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: dir });
-  fs.writeFileSync(path.join(dir, 'seed.txt'), 'seed\n');
-  execFileSync('git', ['add', 'seed.txt'], { cwd: dir });
-  execFileSync('git', ['commit', '-qm', 'seed'], { cwd: dir });
-  return dir;
-}
 
 test('resolveMainCheckout from inside a linked worktree resolves the main checkout, not the worktree', () => {
   const main = initRepo('checks-main-');
@@ -1279,65 +1106,6 @@ test('shell-integration-sourced still passes when every rc file has only the liv
     else process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT = prevProbe;
     fs.rmSync(homeDir, { recursive: true, force: true });
   }
-});
-
-test('setup from a copy of fgos that is not in a git checkout declines the rc write and says why', () => {
-  // The `/tmp/tmp.XXXXXXXX` shape observed in the wild: an unpacked copy with
-  // no `.git` of its own. Its path is ephemeral, so writing it into a shell
-  // profile leaves a `source` line that outlives the directory.
-  const copyRoot = mkTemp('checks-nongit-copy-');
-  const repoRoot = path.resolve(__dirname, '../..');
-  for (const entry of ['bin', 'src', 'scripts', 'package.json']) {
-    fs.cpSync(path.join(repoRoot, entry), path.join(copyRoot, entry), { recursive: true });
-  }
-  assert.equal(fs.existsSync(path.join(copyRoot, '.git')), false);
-
-  const homeDir = mkTemp('checks-nongit-home-');
-  const rcFile = path.join(homeDir, '.bashrc');
-  fs.writeFileSync(rcFile, 'echo hi\n');
-
-  const result = spawnSync(process.execPath, [path.join(copyRoot, 'bin', 'fgos.mjs'), 'setup'], {
-    cwd: copyRoot,
-    encoding: 'utf8',
-    env: { ...process.env, HOME: homeDir },
-  });
-
-  assert.equal(result.status, 0, `setup failed: ${result.stderr}`);
-  const { data } = JSON.parse(result.stdout);
-  assert.deepEqual(data.rcFilesInserted, []);
-  assert.deepEqual(data.rcFilesAlreadyConfigured, []);
-  assert.ok(
-    /not inside a git checkout/.test(data.rcWriteDeclinedReason ?? ''),
-    `expected a stated reason, got: ${JSON.stringify(data.rcWriteDeclinedReason)}`,
-  );
-  // The whole point: nothing was appended to the profile.
-  assert.equal(fs.readFileSync(rcFile, 'utf8'), 'echo hi\n');
-  // Setup's other work still happened.
-  assert.equal(fs.existsSync(path.join(copyRoot, '.fgos', 'config.json')), true);
-
-  fs.rmSync(copyRoot, { recursive: true, force: true });
-  fs.rmSync(homeDir, { recursive: true, force: true });
-});
-
-test('setup from a real checkout still writes the rc line and reports no declined reason', () => {
-  const homeDir = mkTemp('checks-git-home-');
-  fs.writeFileSync(path.join(homeDir, '.bashrc'), 'echo hi\n');
-  const cwd = initRepo('checks-git-cwd-');
-
-  const result = spawnSync(process.execPath, [FGOS, 'setup'], {
-    cwd,
-    encoding: 'utf8',
-    env: { ...process.env, HOME: homeDir },
-  });
-
-  assert.equal(result.status, 0, `setup failed: ${result.stderr}`);
-  const { data } = JSON.parse(result.stdout);
-  assert.equal(data.rcWriteDeclinedReason, undefined);
-  assert.deepEqual(data.rcFilesInserted, [path.join(homeDir, '.bashrc')]);
-  assert.ok(fs.readFileSync(path.join(homeDir, '.bashrc'), 'utf8').includes('fgos-shell-integration.sh'));
-
-  fs.rmSync(cwd, { recursive: true, force: true });
-  fs.rmSync(homeDir, { recursive: true, force: true });
 });
 
 test('shell-integration-sourced samples dead paths instead of printing all of them', () => {

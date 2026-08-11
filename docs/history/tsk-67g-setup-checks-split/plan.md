@@ -38,22 +38,51 @@ Hệ quả cho đường cắt, và đây là chỗ số đo bác chính giả �
 - Đơn vị nhỏ nhất khả dụng là **2 test nặng/file ≈ 23s**. Một test nặng/file
   sẽ cho 10 file cho 85 test — vụn vô ích, vì 73 test còn lại gộp hết vào một
   file cũng chỉ tốn 2s.
-- Vì vậy: **5 file × 2 test nặng, ghép lớn với nhỏ để cân**, cộng **1 file**
-  gom toàn bộ phần nhẹ. Tổng **6 file**, không phải 5 như plan cha ước —
-  con số đó ước trên giả định chi phí đều, mà P2 vừa bác.
+- Vì vậy: **5 file mới × 2 test nặng, ghép lớn với nhỏ để cân**, và
+  **`checks.test.mjs` ở nguyên chỗ cũ** với 75 test nhẹ.
+
+**Không xoá `checks.test.mjs`** — điểm này là đường nhỏ hơn mà vòng shape đầu
+bỏ sót và reality gate bắt lại: sau khi 10 test nặng rời đi, file cũ chỉ còn
+~2.5s, tức không còn là file chi phối gì cả, nên đổi chỗ nó chẳng mua được
+gì mà lại tạo thêm xáo trộn. D1 (xoá hẳn đường dẫn) chỉ ràng buộc
+`test/cli/fgos.test.mjs`, không ràng buộc file này — và không item còn bay
+nào tham chiếu tới nó, nên cũng không có `verify` nào phải sửa.
 
 | File | Test nặng | Chi phí |
 |---|---|---|
-| `checks-setup-envelope.test.mjs` | wrapEnvelope-shaped JSON (14.27) + fills a missing default key (10.66) | ~24.9s |
-| `checks-setup-hookspath.test.mjs` | pre-existing custom core.hooksPath (13.21) + cwd with no .git (10.98) | ~24.2s |
-| `checks-setup-idempotent.test.mjs` | run twice (11.96) + real checkout rc line (11.08) | ~23.0s |
-| `checks-setup-rc-line.test.mjs` | non-git copy declines rc write (11.79) + --pretty (11.19) | ~23.0s |
-| `checks-setup-config.test.mjs` | wires core.hooksPath (11.27) + initializes config.json (11.21) | ~22.5s |
-| `checks-doctor-and-registry.test.mjs` | toàn bộ 75 test nhẹ còn lại (doctor, registry, shell-integration, …) | ~2.5s |
+| `checks-setup-envelope.test.mjs` (mới) | wrapEnvelope-shaped JSON (14.27) + fills a missing default key (10.66) | ~24.9s |
+| `checks-setup-hookspath.test.mjs` (mới) | pre-existing custom core.hooksPath (13.21) + cwd with no .git (10.98) | ~24.2s |
+| `checks-setup-idempotent.test.mjs` (mới) | run twice (11.96) + real checkout rc line (11.08) | ~23.0s |
+| `checks-setup-rc-line.test.mjs` (mới) | non-git copy declines rc write (11.79) + --pretty (11.19) | ~23.0s |
+| `checks-setup-config.test.mjs` (mới) | wires core.hooksPath (11.27) + initializes config.json (11.21) | ~22.5s |
+| `checks.test.mjs` (giữ nguyên chỗ) | 75 test nhẹ còn lại (doctor, registry, shell-integration, …) | ~2.5s |
 
 Tên file lấy theo test nặng nhất của nhóm. Ghi thẳng ở đây cho người đọc sau:
 **các nhóm này cân theo chi phí, không theo chủ đề** — với phân bố 98%/12%
 như trên thì không có cách nào vừa cân vừa gọn chủ đề, và cân là thứ D3 đòi.
+
+## Kết quả sau khi chẻ (2026-08-11)
+
+| Phép đo | Trước | Sau |
+|---|---|---|
+| File `test/setup/` chậm nhất | 120.0s (`checks.test.mjs`) | **22.82s** (`checks-setup-idempotent`) |
+| `checks.test.mjs` | 120.0s / 85 test | **2.55s** / 75 test |
+| Test của cả `test/setup/checks*` | 85 | **85, 0 đỏ** — khớp từng test một |
+
+Từng file mới: config 21.58s, envelope 22.02s, hookspath 21.90s, idempotent
+22.82s, rc-line 22.47s. Tất cả dưới 30s, biên hẹp nhất ~24%.
+
+**`npm test` trên branch này đo được 161.30s — con số đó KHÔNG nói lên điều
+gì về mục tiêu ≤45s**, và đây là chỗ dễ đọc nhầm nhất: `fgw/tsk-67g` fork từ
+`3ecec74`, tức trước commit của `tsk-3um`, nên branch này vẫn mang
+`test/cli/fgos.test.mjs` nguyên vẹn ở 171s và chính nó là trần. Con số cuối
+chỉ đo được ở item cha `tsk-25b`, sau khi cả hai con merge. Verify của item
+này vì vậy không đòi ngưỡng toàn suite — nó đòi đúng ba thứ item này kiểm
+soát: không mất test, không test đỏ mới, không file `test/setup/` nào vượt 30s.
+
+Một thứ đáng ghi cho người đọc sau: `test/setup/uninstall-wiring.test.mjs`
+đo được **21.70s** — không thuộc phạm vi item này, vẫn dưới ngưỡng, nhưng nó
+là ứng viên rõ ràng cho trần tiếp theo nếu ai đó muốn hạ nữa.
 
 ## Bản đồ rủi ro
 
@@ -95,15 +124,18 @@ Guard này chặn đúng lớp lỗi đó.
 ## Shape
 
 1. Gom mọi định nghĩa top-level của `checks.test.mjs` vào
-   `test/setup/helpers/setup-checks-harness.mjs`.
-2. Chuyển test sang 6 file theo bảng trên, thân test bê nguyên văn (D2).
-3. Xoá `test/setup/checks.test.mjs`.
+   `test/setup/helpers/setup-checks-harness.mjs`, và cho chính
+   `checks.test.mjs` import lại từ đó — nó cũng cần đúng bộ helper ấy.
+2. Chuyển 10 test nặng sang 5 file mới theo bảng trên, thân test bê nguyên
+   văn (D2). `checks.test.mjs` giữ nguyên chỗ với 75 test còn lại.
+3. Sửa comment đầu `checks.test.mjs` cho khớp nội dung mới (nó đang tự mô tả
+   là chứa cả phần `fgos setup`, phần vừa dọn đi) — comment, không phải test.
 4. Đo lại: tổng test không giảm, không test đỏ mới, không file `test/setup/`
    nào vượt 30s.
 
 ### Trường hợp đáng chứng minh
 
-- **Không mất/thừa test**: tổng test của riêng 6 file mới phải bằng đúng 85 —
+- **Không mất/thừa test**: tổng test của cả 6 file `test/setup/` phải bằng đúng 85 —
   cùng phép đối chiếu đã bắt được lỗi ở `tsk-3um` (581 = 581).
 - **Đường dẫn trong helper**: `checks.test.mjs` cũng dùng
   `path.resolve(__dirname, '../../bin/fgos.mjs')`; phép sửa phải là `__dirname`
