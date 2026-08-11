@@ -130,10 +130,28 @@ song song hơn, cụ thể 5 file `checks-setup-*` (mỗi file 2 test nặng, ~2
 tách thành 10 file một test (~11–14s), và các file `test/cli` nặng ~20s
 tách đôi.
 
-Không hứa trước là đủ để xuống dưới 45s: mỗi test còn spawn một process CLI
-thật, nên một file test ăn hơn một core, và chỉ đo mới biết. Nếu chẻ mịn vẫn
-không đạt, việc còn lại là hạ **tổng** CPU (gộp fixture, bớt spawn) — đúng
-thứ D2 đã hoãn sang item riêng — và lúc đó D3 cần người xem lại bằng số thật.
+### Đã thử chẻ mịn — kết quả âm tính, đã revert
+
+Giả thuyết "nhiều file nhỏ hơn ⇒ lấp core tốt hơn" **sai**, và đo được:
+
+| Cấu hình | Wall-clock |
+|---|---|
+| 27 file `test/cli` + `test/setup` (giữ) | 46.91s, 52.51s, 50.37s |
+| 40 file (5 file setup → 10, 6 file cli → 12) | 53.46s, **61.79s** |
+
+Chẻ mịn **làm chậm hơn**, không nhanh hơn. Lý do đứng vững với số liệu đã
+có: tổng CPU (429s) không đổi khi chia lại, nhưng mỗi file test là một
+process `node` riêng phải tự khởi động và tự import lại toàn bộ harness, nên
+thêm 13 file là thêm 13 lần chi phí đó cộng thêm tranh CPU. Số test vẫn khớp
+2878 ở cả hai cấu hình, tức phép chẻ đúng — chỉ là nó không mua được gì.
+
+Đã revert về 27 file. Ghi lại ở đây để không ai thử lại đường này.
+
+**Kết luận: đường chẻ cơ học (D2) đã hết dư địa ở ~50s.** Muốn xuống dưới
+45s phải hạ **tổng** CPU — gộp fixture, bớt spawn process thật — đúng thứ D2
+đã cố ý hoãn sang item riêng. Ngưỡng 45s của D3 vì vậy cần người xem lại
+bằng số thật này, vì nó được chốt khi chưa ai đo được 429s CPU trên 8.5/16
+core.
 
 ### Phase 4 — Nghiệm thu
 
