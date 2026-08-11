@@ -47,7 +47,7 @@ import { branchNameFor, branchExists, reclaimOrphanedCheckout } from './worktree
 import { runGoalCheck, runInvariantChecks, invariantFailureAsCheck } from './goal-check.mjs';
 import { readInvariantCheckCommands } from '../config/shared-config-file.mjs';
 import { normalizePath } from './frozen-judge.mjs';
-import { acquireMainCheckoutLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS, formatLockDurationMs } from './main-checkout-lock.mjs';
+import { acquireMainCheckoutLock, renewMainCheckoutLockIfOwn, HELD, AMBIGUOUS, DEFAULT_TTL_MS, formatLockDurationMs } from './main-checkout-lock.mjs';
 import { resolveWriterIdentity } from './session-identity.mjs';
 
 /** Raised only for a genuinely unexpected git failure (e.g. `git merge
@@ -662,6 +662,20 @@ export function autoResolveDecisionIndexCollision(repoRoot, branch, classificati
  * introduces relative to current HEAD, correct for both a root->main merge
  * and a leaf->parent merge without needing to know either branch's trunk.
  */
+// HEARTBEAT_INTERVAL_MS (tsk-4l8): this call holds `acquireMainCheckoutLock`
+// across the entire `mergeRunnerItemLocked` call below, including
+// `runGoalCheck`'s verify run — measured up to ~185s in practice, exceeding
+// `DEFAULT_TTL_MS` (180s). Without a periodic renew, a contender's own
+// acquire attempt judges this still-live holder's lock as stale once its
+// age exceeds ITS OWN `ttlMs` (main-checkout-lock.mjs's `held = pidLive &&
+// withinTtl` is evaluated with the CONTENDER's ttlMs, not this holder's),
+// regardless of who wrote the record — the exact race this item
+// investigated. Derived as a fraction of `DEFAULT_TTL_MS` (not a second
+// fixed constant) so the two stay proportional if the TTL is ever retuned
+// again; a third of the TTL leaves a comfortable margin (renews at ~60s
+// against a 180s window) even if one renew tick is delayed.
+const HEARTBEAT_INTERVAL_MS = Math.floor(DEFAULT_TTL_MS / 3);
+
 export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = repoRoot } = {}) {
   const branch = branchNameFor(item.id);
 
@@ -717,9 +731,26 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = re
     throw new MergeError(`cannot merge "${branch}": main checkout lock is ambiguous (unparseable lock file) — refusing per fail-closed policy.`, { branch, code: 'lock-ambiguous', lockAgeMs: lock.lockAgeMs });
   }
 
+  // Heartbeat (tsk-4l8): renews the lock's timestamp every
+  // HEARTBEAT_INTERVAL_MS for as long as this call holds it, so its age
+  // never approaches DEFAULT_TTL_MS no matter how long the wrapped call
+  // (in particular runGoalCheck, called from within mergeRunnerItemLocked)
+  // actually runs. `.unref()`'d so a lingering timer never blocks process
+  // exit; `renewMainCheckoutLockIfOwn` only ever writes when this call's
+  // own `identity` still owns the record, so a lock legitimately reclaimed
+  // out from under a crashed/hung holder is never resurrected by a stray
+  // tick. Cleared in the same `finally` that already releases the lock —
+  // covers every exit path (success, verify-fail, a thrown exception)
+  // exactly like `lock.release()` already does.
+  const heartbeat = setInterval(() => {
+    renewMainCheckoutLockIfOwn(fgosDir, identity);
+  }, HEARTBEAT_INTERVAL_MS);
+  heartbeat.unref();
+
   try {
     return await mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs });
   } finally {
+    clearInterval(heartbeat);
     lock.release();
   }
 }

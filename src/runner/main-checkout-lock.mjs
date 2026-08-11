@@ -451,6 +451,67 @@ export function releaseMainCheckoutLockIfOwn(dir, identity) {
 }
 
 /**
+ * Renews `.fgos/main-checkout.lock`'s timestamp ONLY when its recorded
+ * holder identity strictly equals (===) `identity` (tsk-4l8: heartbeat for
+ * a caller holding this lock across a long operation whose duration can
+ * exceed `ttlMs` — e.g. `mergeRunnerItem`'s verify hold, `merge.mjs`).
+ * Mirrors `releaseMainCheckoutLockIfOwn`'s own ownership/TOCTOU discipline
+ * exactly, writing a fresh timestamp instead of unlinking: this is the same
+ * refresh `tryAcquireOnce`'s self-recognition (D6) branch already performs
+ * when the SAME identity re-acquires, exposed here as its own narrow
+ * primitive so a long-running holder can call it repeatedly without paying
+ * the full acquire path's create-if-missing race handling or its
+ * exit/SIGINT listener registration.
+ *
+ * Never creates a lock that doesn't exist, and never touches one recorded
+ * under a different identity — a caller renewing a lock it does not
+ * actually hold would be indistinguishable from a bug stealing someone
+ * else's lock.
+ *
+ * Returns `{ status }`:
+ *   - 'renewed'    -- the lock was held under `identity`; timestamp refreshed.
+ *   - 'no-lock'    -- no lock file was present (nothing to renew).
+ *   - 'not-owner'  -- a lock is present but recorded under a DIFFERENT
+ *     identity (or changed underneath this call, see below) -- left
+ *     untouched.
+ *   - 'ambiguous'  -- the lock file content is unparseable -- left
+ *     untouched, same fail-closed stance every other primitive in this
+ *     file already takes for this shape.
+ *
+ * Re-reads the lock file immediately before writing (same TOCTOU
+ * discipline `releaseMainCheckoutLockIfOwn` already uses): a competitor
+ * could reclaim the lock between the first read and this call's write, and
+ * changed content must never be overwritten on a stale judgment.
+ */
+export function renewMainCheckoutLockIfOwn(dir, identity, { now = Date.now() } = {}) {
+  const lockPath = path.join(dir, LOCK_FILE);
+
+  const readRecord = () => {
+    let raw;
+    try {
+      raw = fs.readFileSync(lockPath, 'utf8');
+    } catch (err) {
+      if (err.code === 'ENOENT') return undefined;
+      throw err;
+    }
+    return parseLockContent(raw);
+  };
+
+  const record = readRecord();
+  if (record === undefined) return { status: 'no-lock' };
+  if (record === null) return { status: 'ambiguous' };
+  if (record.pid !== identity) return { status: 'not-owner', holderPid: record.pid };
+
+  const recheck = readRecord();
+  if (recheck === undefined) return { status: 'no-lock' };
+  if (recheck === null) return { status: 'ambiguous' };
+  if (recheck.pid !== identity) return { status: 'not-owner', holderPid: recheck.pid };
+
+  writeAtomicReplace(lockPath, JSON.stringify({ pid: identity, ts: now }));
+  return { status: 'renewed' };
+}
+
+/**
  * Read-only inspection of `.fgos/main-checkout.lock` (tsk-5z2, D1) --
  * unlike `acquireMainCheckoutLock`, this NEVER creates, refreshes, or
  * deletes the lock file; it only reports what's there right now. Exists
