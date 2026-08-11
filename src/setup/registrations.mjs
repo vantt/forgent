@@ -48,6 +48,7 @@ import {
 } from '../config/shared-config-file.mjs';
 import { DEFAULT_LEVEL, LEVELS } from '../state/gate-bypass.mjs';
 import { checkEventsJsonlContiguity, fixEventsJsonlContiguity } from '../state/events-jsonl-contiguity.mjs';
+import { advanceEventsJsonlTruncationGuard } from '../state/events-jsonl-truncation-guard.mjs';
 
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 
@@ -593,6 +594,45 @@ registerCheck({
 registerFix({
   id: 'events-jsonl-contiguous',
   fix: (cwd) => fixEventsJsonlContiguous(cwd),
+});
+
+// events-jsonl-not-truncated (tsk-cgg, docs/history/events-jsonl-git-
+// tracked-truncation/CONTEXT.md D1): catches a stash/checkout/reset/clean-
+// style silent truncation of the shared, git-tracked .fgos/events.jsonl --
+// the failure class events-jsonl-contiguous above is structurally blind
+// to, since a truncate-then-reappend renumbers forward and stays
+// perfectly contiguous. See src/state/events-jsonl-truncation-guard.mjs's
+// own header for the full detection mechanism. No matching registerFix
+// (unlike events-jsonl-contiguous): a break here means real data is
+// already gone -- auto-repairing would erase the loud signal before a
+// human ever saw it, defeating the reason this check exists. The
+// re-baseline-after-acknowledgment step is a deliberate, documented
+// manual command (docs/how-to/resolve-an-events-jsonl-truncation.md), not
+// a blanket `doctor --fix` sweep.
+function checkEventsJsonlNotTruncated(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  if (mainCheckout === null) {
+    return { passed: true, message: 'not inside a git checkout — nothing to check' };
+  }
+  const logPath = path.join(mainCheckout, '.fgos', 'events.jsonl');
+  const guardPath = path.join(mainCheckout, '.fgos', 'events-jsonl.truncation-guard.json');
+  if (!fs.existsSync(logPath)) {
+    return { passed: true, message: 'no .fgos/events.jsonl yet — nothing to check' };
+  }
+  const report = advanceEventsJsonlTruncationGuard(logPath, guardPath);
+  if (report.ok) {
+    return { passed: true, message: `events.jsonl truncation guard holds (${report.message})` };
+  }
+  return {
+    passed: false,
+    message: `events.jsonl truncation detected: ${report.message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,
+  };
+}
+
+registerCheck({
+  id: 'events-jsonl-not-truncated',
+  description: 'shared .fgos/events.jsonl has not been silently reverted by a git stash/checkout/reset/clean (tsk-cgg)',
+  check: (cwd) => checkEventsJsonlNotTruncated(cwd),
 });
 
 // docs/history/global-project-config-awareness/CONTEXT.md D1: reports which
