@@ -193,13 +193,25 @@ tương tác live): chạy `/fgOS:submit "<text mơ hồ>"` thật trong một p
 Claude Code, xác nhận launcher hỏi lại TRƯỚC khi tạo item (không còn tạo
 item rồi mới hỏi như hôm nay).
 
+## Documentation touch points (đọc thật, không phải phỏng đoán)
+
+`rg -l "fgos-clarifying"` ngoài Phase 3/4's own file, còn 2 chỗ tường
+thuật cần sửa cho khớp thật (không phải rủi ro chức năng, chỉ là prose
+sai sau khi đổi hợp đồng):
+- `.claude/skills/fgos-routing/SKILL.md:139` — bảng route liệt kê
+  `clarify -> fgos-clarifying`; hàng này chết sau Phase 2, xoá cùng lúc.
+- `.claude/skills/fgos-coding-driving/SKILL.md:393` — câu văn nói
+  `fgos-clarifying`/`fgos-coding-exploring` "already use" một engine
+  verb; sau Phase 3, `fgos-clarifying` không còn tự gọi engine verb nào
+  cả (verdict-only) — câu này cần sửa lại, đừng để nói sai sự thật mới.
+
 ## Assumptions
 
-1. Domain khác `coding` (triage/synthetic/fixture-marketing) không có
-   item nào ở stage `'clarify'` hôm nay (xác nhận nhanh: đếm 90 item ở
-   CONTEXT.md đều đọc qua `fgos list --all`, không lọc domain — cần xác
-   nhận lại lúc code Phase 1 bằng cách in kèm `domain` field, không giả
-   định thuần từ số đếm ban đầu).
+1. **Đã xác nhận thật, không còn là giả định** (chạy `fgos list --all
+   --json`, đếm theo `domain` field): toàn bộ 90 item ở stage `'clarify'`
+   đều domain `coding` (hoặc không set, mặc định `coding`) — 0 item thuộc
+   domain khác. Không cần lọc domain trong Phase 1's vòng lặp chính, dù
+   thêm vào vẫn vô hại (defensive).
 2. Việc thêm domain-classification vào `fgos-clarifying` (Phase 3) dùng
    chính phán đoán của session sống, không cần capacity/model riêng —
    nhất quán với cách `fgos-clarifying` hôm nay đã tự phán intent mà
