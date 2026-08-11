@@ -144,6 +144,36 @@ catching those still depends on the LLM judge, an executed-and-verified
 test run, or a human reading the command closely. Full decision record:
 `docs/history/tsk-12t-verify-known-bad-pattern-check/CONTEXT.md`.
 
+## Another real example (`tsk-n2x`): locking test titles up front, before the tests exist
+
+`tsk-n2x` (adding 2 direct `sync-root` tests for the Iron Law trip and
+verify-fail outcomes, which `test/cli/fgos.test.mjs`'s existing
+`sync-root` block did not cover) applied this doc's own pattern from the
+start rather than discovering the trap mid-fix. Its own decision record
+(`docs/history/sync-root-direct-outcome-tests/CONTEXT.md` D3/D4) locked
+the two new tests' exact description strings *before* writing them:
+
+- `'sync-root of a root whose diff touches a self-modifying-capable module REFUSES without --acknowledge-iron-law: exit 4, root status untouched, no merge'`
+- `'sync-root of a root whose staged merge fails its own verify: outcome blocked reason verify-fail, root status untouched'`
+
+then set `verify` to the same fail-count-plus-description-grep shape this
+doc recommends:
+
+```bash
+out=$(node --test --test-name-pattern="sync-root of a root whose" test/cli/fgos.test.mjs 2>&1)
+fail=$(echo "$out" | grep -oE "^. fail [0-9]+" | grep -oE "[0-9]+$")
+[ "$fail" = "0" ] \
+  && echo "$out" | grep -qE "^. .*diff touches a self-modifying-capable module REFUSES" \
+  && echo "$out" | grep -qE "^. .*staged merge fails its own verify: outcome blocked reason verify-fail"
+```
+
+Checked by hand against the pre-fix file before implementation, per this
+doc's own "before trusting a verify command" rule: the pattern matched
+zero real tests, so `fail` was `0` (the file-wrapper synthetic pass) but
+both `grep -qE` description checks failed — a real non-zero exit, not a
+vacuous pass. Confirmed to flip to a real pass once both named tests
+existed and passed.
+
 ## Related
 
 - `docs/history/tsk-5t3-iron-law-evidence-contract/CONTEXT.md` — the
