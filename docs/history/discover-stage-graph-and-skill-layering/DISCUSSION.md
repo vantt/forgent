@@ -1,8 +1,8 @@
 # DISCUSSION — discover: tầng skill, đồ thị stage trước planning
 
-> Chưa có work item nào cho thảo luận này. Vì vậy các D-ID ở §4 **chưa**
-> được ghi vào máy qua `fgos decision --id <item-id>` — chúng mới chỉ sống
-> trong prose. Việc đầu tiên khi mở item: ghi lại toàn bộ §4 qua verb thật.
+> Cây work item đã mở (xem §1). Toàn bộ D-ID ở §4 đã được ghi vào máy qua
+> `fgos decision --id tsk-2mt`, nên một session lạnh đọc được chúng bằng
+> `fgos show tsk-2mt` mà không cần đọc đúng file prose này.
 
 ## 1. Trạng thái hiện tại
 
@@ -24,6 +24,12 @@ con**.
 **Còn mở:** chỉ còn **một** — `skillMap` nhiều-pha-một-stage (D16): tạm
 dùng phương án A (giữ chuỗi prose), B là hướng đã nghiêng nhưng chưa đủ
 chín để làm trong cây task này.
+
+**Cây đã mở (2026-08-11):** cha `tsk-2mt` · con 1 `tsk-403` · con 2
+`tsk-qod` · con 3 `tsk-tku` · con 4 `tsk-2yo` · con 5 `tsk-30v` · con 6
+`tsk-lya` · item thảo luận B `tsk-15u` (ngoài cây). D1-D16 đã ghi vào máy
+trên `tsk-2mt`. `deps` nối theo thứ tự thi công nên engine tự cưỡng chế:
+403 → qod → tku → {2yo, 30v}, và 403 → lya.
 
 **Nợ thực địa:** `tsk-1yt` đang kẹt ở stage `discovery`, status `doing`,
 mang `verify` do agent tự chế (`npm test`) và một `CONTEXT.md` chưa
@@ -66,7 +72,9 @@ mà không ai hay.
 | `src/intake/decompose.mjs` có đổi tên file không | **Rõ** | Có, `plan.mjs`. Gộp vào con 1. D15 |
 | Đợt thêm tiền tố `coding-`: ngay hay tách | **Rõ** | Gộp luôn vào con 1. D15 |
 | `skillMap` nhiều pha một stage | **Tạm A, hướng B** | A giữ chuỗi prose; B cần dấu mốc pha + chỉ tuần tự. D16 |
-| `worker-prompt-discovery.txt` phải sửa nhiều không | **Chưa đo** | Chưa đọc nội dung file |
+| `worker-prompt-discovery.txt` phải sửa nhiều không | **Đã đo** | Con 3 không cần đụng; con 5 nhỏ hơn nhiều; con 4 to hơn. D17 ghi chi tiết |
+| 4 item đang đứng trên stage `decompose` lúc rename | **Rõ** | Giữ `decompose` làm alias drain-only. D18 |
+| 4 skill platform có mang tiền tố không | **Rõ** | Không bao giờ. D19 |
 
 ## 4. Quyết định đã chốt
 
@@ -88,6 +96,9 @@ mà không ai hay.
 | D14 | Giao hàng theo **một task cha gom hết task con**, không chẻ nhỏ độc lập — chẻ rời sẽ quên. Engine đã có sẵn cơ chế đúng ý này: luật lineage (`hasOpenDescendant`, `frontier.mjs`) neo cha lại chừng nào còn con mở, và `fgos-coding-driving` báo "anchored by open children" rồi dừng. Nghĩa là "quên" bị chặn bằng máy, không bằng trí nhớ. |
 | D15 | Gộp vào con 1 (`{#task-plan-family-rename}`) luôn hai việc: đổi tên file `src/intake/decompose.mjs` → `plan.mjs`, và **thêm tiền tố `coding-`** cho 5 skill còn lại (`exploring`, `planning`, `validating`, `compounding`, `code-implement` → `coding-implement`). Lý do gộp: cả ba đều là cùng một loại thao tác (rename xuyên repo theo chuẩn *"full rewrite… including dated historical snapshots"*) — tách ra thành 3 đợt là quét toàn repo 3 lần cho cùng một việc. Rủi ro capacityId bằng 0 (`.fgos/config.json` → `capacities` rỗng). |
 | D16 | **Tạm dùng phương án A** cho chuyện nhiều pha trong một stage: giữ chuỗi prose `fgos-planning` → `fgos-validating`, chấp nhận `skillMap` không phản ánh đúng ai kết thúc stage `planning`. **Không** nằm trong cây task này. Nhưng **hướng đã nghiêng là B** (`skillMap` nhận danh sách pha), với ba điều kiện đã phân tích: (1) chỉ dùng cho quan hệ **chuỗi pha** (hai đồng cấp, mỗi đứa gate+artifact riêng, đứa cuối thoát stage) — **không** dùng cho quan hệ **gọi helper** (chủ gọi tool rồi vẫn chịu trách nhiệm, như `fgos-researching`), thứ vốn không cần registry; (2) **chỉ tuần tự** — song song ở lại trục item (children + `fgos-fanout` + footprint conflict đã có sẵn và đã an toàn), vì hai skill trên cùng một item chia sẻ cả event-log lock lẫn artifact, còn hai item thì độ chồng lấn đã được theo dõi; (3) phải có **dấu mốc hoàn thành pha**, nếu không driver sẽ chạy lại pha 1 — hiểm hoạ có thật, đã ghi trong `fgos-validating/SKILL.md:248` (*"unconditional… would create duplicate positional-id children while orphaning the real ones"*), và fail-safe no-progress cũng nổ oan vì stage không đổi giữa hai pha. Dấu mốc đó **đã có sẵn**: gate record mang tên pha (`fgos gate-approve --gate <name>`, bảng `view.gates[id]`) — pha nào đã có gate thì bỏ qua, an toàn theo cấu tạo. Căn cứ cho B không phải sở thích: priority #2 (`AGENTS.md`) đã ra luật *"stage/skill vì vậy phải chia nhỏ, mịn, **mỗi mảnh park/tiến độc lập**"*, mà A không thực hiện được — validating park thì cả stage park. Thêm bằng chứng trục stage đang căng: `discovery`/`exploring` là stage **không có base-workflow step nào**, được xử lý *"outside the 5-step vocabulary"* — tức repo đã dùng stage như phase một cách ứng biến vì thiếu cơ chế phase. **Câu để quyết khi nào đủ chín:** có bao giờ muốn dừng / resume / báo cáo tại ranh giới giữa hai pha không? |
+| D17 | Chỉnh phạm vi sau khi đọc `worker-prompt-discovery.txt` (bài tập còn nợ ở vòng trước): **con 3 nhỏ hơn** — prompt trỏ `{skillPath}` resolve qua `skillForStage`, nên đổi `skillMap.discovery` là worker tự nạp skill mới, KHÔNG cần sửa template. **Con 5 nhỏ hơn nhiều** — tsk-4v6 đã nối dây verdict xong: worker emit khối ```fgos-verdict``` với `{clear, verify}` hoặc `{clear:false, question}`, và runner gọi `resolveDiscovery(dir, id, config, 'runner', callerVerdict)` (`loop.mjs:1132-1138`), tức verdict ĐÃ được áp dụng; phần còn thiếu chỉ là `nextDiscoveryEdge` chọn cạnh. Kèm sửa comment stale ở `loop.mjs:1068-1074` vẫn viết *"unconditionally advances"* trong khi code đã gate theo verdict. **Con 4 to hơn** — đường headless cần mở rộng schema khối `fgos-verdict` để worker báo `tier`/`kind`/`risk` dạng DATA cho runner áp dụng, vì worker bị cấm gọi `fgos`; đường tương tác thì skill tự gọi `fgos edit`. |
+| D18 | Lúc rename, giữ **`decompose` làm alias legacy chỉ-để-rút-cạn**: vẫn có mặt trong `stages` + `skillMap` + giữ cạnh ra của nó, **nhưng KHÔNG có trong `stepMap`** — đúng cách `discovery`/`exploring` đang được xử lý (*"no base-workflow step of their own"*), nên `stageForStep` giữ nguyên bất biến một-stage-một-step. Lý do: **4 item đang MỞ đứng trên stage đó** — `tsk-42i` (blocked), `tsk-3at` (awaiting-human), `tsk-3m6` (doing), `tsk-1opx` (doing) — sau rename `stages.indexOf("decompose")` = -1 và `skillForStage(...,"decompose")` = null nên driver đọc ra "không có skill, dừng" và chúng kẹt vĩnh viễn. Tiền lệ compound-learn KHÔNG che ca này: 4 item cùng stage đã đóng đều terminal, còn đây là 4 đứa mở. `EDITABLE_FIELDS` (`store.mjs:257`) **không có `stage`** nên không verb nào relabel được, và D1 của lần rename trước cấm sửa tay `state.json`. Không chọn "drain trước" vì 2 trong 4 đang chờ người, mà con 1 lại chặn cả cây — đổi blocker kỹ thuật lấy blocker người là lỗ. Kèm comment "legacy, drain-only, không item mới nào vào đây nữa" + một follow-up xoá alias khi đếm về 0. |
+| D19 | Bốn skill `fgos-fanout`, `fgos-indexing`, `fgos-routing`, `fgos-unlock` **không bao giờ mang tiền tố `coding-`** — không phải hoãn sang đợt sau. Theo đúng logic D9 (tiền tố = tính đúng đắn bị giới hạn trong domain coding): `routing` định tuyến item của mọi domain, `unlock` gỡ khoá main checkout, `indexing` dựng index docs end-user, `fanout` chạy con qua `/fgOS:pick` vốn domain-agnostic. Không đứa nào sở hữu một stage hay có tên trong `skillMap` của bất kỳ domain nào. Kiểm chứng: đúng 13 thư mục `fgos-*` — 2 đã có tiền tố, 5 trong con 1, 2 helper bị loại theo D9, 4 đứa này. Điều này khép kín định nghĩa done của con 1. |
 
 ## 5. Q&A log
 
@@ -218,6 +229,20 @@ skill trên cùng một item chia sẻ cả lock lẫn artifact; (f) bằng ch�
 stage đang căng: `discovery`/`exploring` là stage **không có base-workflow
 step nào**. → D16.
 
+**vòng 18 (mở cây, và session lạnh bắt lỗi).**
+Mở 8 item (xem §1). Ngay sau khi tạo, **một session khác** (writer
+`bacf1ea7`, không phải session thảo luận) tự nhặt `tsk-403` qua auto-launcher
+của herdr, chạy discover, đẩy `clarify → discovery → exploring`, rồi park
+kèm hai câu hỏi. **Cả hai đều là lỗ hổng thật mà phiên thảo luận bỏ sót** —
+đúng giá trị của chuẩn L5: nó đọc lạnh nên đi kiểm `state.json` và đếm thư
+mục skill thay vì thừa hưởng giả định. → D18, D19. Kiểm chứng lại số liệu
+của nó thì ra **4 item mở** trên stage `decompose` chứ không phải 3
+(`tsk-1opx` bị sót), còn con số 13 thư mục skill thì chính xác. Cũng xác
+nhận bằng engine: `fgos take tsk-2mt` bị từ chối — *"has an unmet dependency
+or an open decomposed child"* — nên **không có chuyện pick cha để làm luôn
+một lượt**; cha là vỏ lineage, công việc nằm ở các con, và `/fgOS:pick`
+theo hợp đồng của nó *"drives exactly the one id it was given"*.
+
 ## 6. Thiết kế đã chốt {#design}
 
 Một work item đi qua ba vùng tách bạch: **Init** (trước khi item tồn tại),
@@ -321,7 +346,7 @@ Theo D14: **một task cha, các task con treo dưới nó**, cha chỉ done khi
 con đã done (`hasOpenDescendant` tự neo). `{#task-tsk-1yt-cleanup}` nằm
 **ngoài** cây này — nó là nợ cũ, không thuộc phạm vi thiết kế.
 
-### CHA — Dựng lại vòng đời trước planning {#task-parent}
+### CHA — `tsk-2mt` Dựng lại vòng đời trước planning {#task-parent}
 
 **Mục tiêu.** Đưa toàn bộ §6 thành hiện thực: Init sinh item đã sạch và có
 domain; `discovery` là pha máy-một-mình có chủ, tự phán, tự chọn cạnh; họ
@@ -331,7 +356,7 @@ domain; `discovery` là pha máy-một-mình có chủ, tự phán, tự chọn 
 
 ---
 
-### 1. Đổi tên cả họ plan {#task-plan-family-rename}
+### 1. `tsk-403` — Đổi tên cả họ plan {#task-plan-family-rename}
 
 **Phải đi TRƯỚC mọi con khác** — để `plan-next`/`plan-loop` ở con số 6
 sinh ra đã đúng tên, khỏi đẻ file rồi đổi.
@@ -352,13 +377,17 @@ Chi phí nặng nhất: `.claude/skills/fgos-validating/SKILL.md` (9 chỗ),
 dir (`.claude/` + `.agents/`), cộng `docs/history/*` theo chuẩn D1 của lần
 rename trước. Rủi ro capacityId bằng 0 (`capacities` rỗng).
 
-**D-ID.** D11, D15.
+Thêm hai ràng buộc từ session lạnh: giữ `decompose` làm **alias legacy
+drain-only** cho 4 item đang đứng trên nó (D18), và **không** đụng
+`fgos-fanout`/`fgos-indexing`/`fgos-routing`/`fgos-unlock` (D19).
+
+**D-ID.** D11, D15, D18, D19.
 **Verify nháp.**
 ```
 npm test && grep -q "planning: .fgos-coding-planning." src/state/workflow-stage-graphs.mjs && test -f src/intake/plan.mjs && test -d plugins/fgOS/skills/plan && ! test -d plugins/fgOS/skills/decompose && ! rg -l --hidden "fgos-code-implement" --glob "!node_modules" --glob "!.git" --glob "!.fgos" --glob "!docs/history" .
 ```
 
-### 2. Đưa clarifying về bước Init {#task-clarifying-to-init}
+### 2. `tsk-qod` — Đưa clarifying về bước Init {#task-clarifying-to-init}
 
 Gỡ `fgos-clarifying` khỏi `skillMap`; bỏ stage `clarify` khỏi `stages`.
 Verb/skill `submit` gọi nó **trước** khi tạo item; nó rewrite text và phân
@@ -373,7 +402,7 @@ song hai con này**.
 npm test && ! grep -q "clarify: .fgos-clarifying." src/state/workflow-stage-graphs.mjs
 ```
 
-### 3. Skill chủ cho stage discovery {#task-discovery-stage-owner}
+### 3. `tsk-tku` — Skill chủ cho stage discovery {#task-discovery-stage-owner}
 
 Tạo `fgos-coding-discovering`, trỏ `skillMap.discovery` vào nó. Nó gọi
 helper `fgos-researching`, ghi `RESEARCH.md`, tự phán, tự gọi
@@ -387,7 +416,7 @@ stages` khỏi `fgos-coding-driving`.
 npm test && test -f .claude/skills/fgos-coding-discovering/SKILL.md && grep -q "discovery: .fgos-coding-discovering." src/state/workflow-stage-graphs.mjs && ! grep -q "Discovery and exploring stages" .claude/skills/fgos-coding-driving/SKILL.md
 ```
 
-### 4. Phân loại xuống discovery + retire capacity {#task-classification-to-discovery}
+### 4. `tsk-2yo` — Phân loại xuống discovery + retire capacity {#task-classification-to-discovery}
 
 Skill chủ discovery phán lại `tier`/`kind`/`risk` trên bằng chứng đã
 research, đọc từ vựng qua `getDomain(item.domain).classification`.
@@ -402,7 +431,7 @@ code, đổi vai trò thành giá trị tạm. Retire capacity:
 npm test && ! grep -q "submit-assist-classify" .fgos/state.json && ! grep -q "re-judge" plugins/fgOS/skills/submit/SKILL.md
 ```
 
-### 5. Nhánh verdict clear/unclear {#task-verdict-branch-edges}
+### 5. `tsk-30v` — Nhánh verdict clear/unclear {#task-verdict-branch-edges}
 
 `nextDiscoveryEdge` chọn cạnh **theo verdict**: `clear` → planning (bỏ qua
 exploring), `unclear` → exploring (thay vì park). Cả hai cạnh đã hợp lệ sẵn
@@ -417,7 +446,7 @@ advance` bằng verdict thật.
 npm test && node --test test/intake/discovery.test.mjs
 ```
 
-### 6. Chẻ picker + sửa prose launcher {#task-picker-split-and-prose}
+### 6. `tsk-lya` — Chẻ picker + sửa prose launcher {#task-picker-split-and-prose}
 
 `discover-next` thôi tự claim + tự dispatch + tự tính ceiling; nó pick xong
 gọi `/fgOS:discover <id>`. Sinh `plan-next` + `plan-loop` cho pool
@@ -450,7 +479,7 @@ untracked trên `main`, không có branch `fgw/tsk-1yt`.
 **Verify nháp.** Quyết định thủ công (giữ hay bỏ CONTEXT.md, đặt lại verify
 thật), không có lệnh máy nào chứng minh được.
 
-### FOLLOW-UP — `skillMap` nhiều pha một stage {#task-multiphase-skillmap}
+### FOLLOW-UP — `tsk-15u` `skillMap` nhiều pha một stage {#task-multiphase-skillmap}
 
 **Ngoài cây này (D16 chốt tạm A).** Nhưng phải được ghi, không để trôi:
 sau khi cây này xong, `planning` là **stage duy nhất còn nói dối** —
