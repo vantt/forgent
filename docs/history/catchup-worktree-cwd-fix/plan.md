@@ -3,8 +3,15 @@
 CONTEXT.md: `docs/history/catchup-worktree-cwd-fix/CONTEXT.md` (D5/D6
 locked and approved, gate-bypass level `standard`). This plan covers ONLY
 tsk-2bg's own scope; `catchup` (tsk-5vl) and `sync-root`/`approve`
-(tsk-4uj) are delivered/in-review separately, same feature dir, different
-D-IDs.
+(tsk-4uj) are delivered separately, same feature dir, different D-IDs.
+
+**Revision note (`fgos-validating`, 260811):** tsk-4uj merged to `main`
+while this plan was being validated (`64f86633`, `status: delivered`).
+This revision replaces every "reuse whatever tsk-4uj ships" hedge below
+with the real, shipped mechanism, and corrects every `bin/fgos.mjs` line
+citation to match `main`'s current HEAD (tsk-4uj's own diff shifted
+everything after `approve`/`sync-root` down by ~24-30 lines). See
+CONTEXT.md's own superseded-assumption note for the full citation.
 
 ## Mode gate
 
@@ -57,37 +64,42 @@ high-risk-lane plan).
 
 ## Approach
 
-Locked scope (CONTEXT.md D5/D6): add the **same** opt-in trust-dir flag
-`promote-to-component` (`bin/fgos.mjs`, `case 'promote-to-component'`,
-currently lines 3535-3547) that tsk-4uj is adding to `sync-root`/
-`approve` — when passed, `repoRoot` derives from `path.dirname(dir)`
-instead of `process.cwd()`, before the existing `isMainWorktree(repoRoot)`
-guard at line 3542 (guard itself UNCHANGED code, evaluating a different
-`repoRoot` value depending on the flag). When the flag is OMITTED
+Locked scope (CONTEXT.md D5/D6): add the **same, real, already-shipped**
+`--trust-dir` flag `promote-to-component` (`bin/fgos.mjs`,
+`case 'promote-to-component'`, currently line 3559 on `main`, `repoRoot`
+declared at line 3565) that tsk-4uj already added to `sync-root`/
+`approve` (`64f86633`, confirmed by reading the merged diff directly):
+
+```js
+const repoRoot = flags['trust-dir'] === true ? path.dirname(dir) : process.cwd();
+```
+
+placed ahead of the existing `isMainWorktree(repoRoot)` guard (currently
+line 3566) — guard itself UNCHANGED code, evaluating a different
+`repoRoot` value depending on the flag. When the flag is OMITTED
 (default), behavior is byte-identical to today.
 
 **D6's own scope boundary: zero change to `src/runner/promote-engine.mjs`.**
 `retargetMember` (`promote-engine.mjs:53-58`) is called at
-`bin/fgos.mjs:3624` with the exact same `repoRoot` variable the CLI
-handler resolves once at line 3541 — never re-derived downstream. Once
-the CLI layer resolves `repoRoot` correctly (flag-gated), `retargetMember`'s
-own `isMainWorktree(repoRoot)` check passes through transparently on an
-already-correct input; the guard is neither removed nor weakened, it
-simply receives correct input, same as today when invoked from the real
-main checkout.
+`bin/fgos.mjs:3648` (current `main` HEAD) with the exact same `repoRoot`
+variable the CLI handler resolves once at line 3565 — never re-derived
+downstream. Once the CLI layer resolves `repoRoot` correctly (flag-gated),
+`retargetMember`'s own `isMainWorktree(repoRoot)` check passes through
+transparently on an already-correct input; the guard is neither removed
+nor weakened, it simply receives correct input, same as today when
+invoked from the real main checkout.
 
-**Hard dependency on tsk-4uj landing first** (CONTEXT.md's own tsk-2bg
-assumption note): tsk-4uj is currently `status: awaiting-approval`
-(returned, not yet merged to `main`), and its exact flag name/no-op-vs-
-error shape for a bare flag without `--dir` is explicitly left to
-`fgos-planning` in D3's own text — not yet finalized as of this pass.
-**Whoever implements this item must reuse tsk-4uj's actual shipped
-mechanism verbatim** (flag name, `repoRoot`-resolution shape, test
-pattern) rather than inventing a parallel one ahead of it. If tsk-4uj has
-not yet merged to `main` when this item reaches `executing`, implementation
-should pull tsk-4uj's real flag name/shape from its merged code (or its
-own `fgw/tsk-4uj` branch if still unmerged) before writing this item's
-diff — never guess the flag name independently.
+**tsk-4uj dependency resolved** (CONTEXT.md's own superseded assumption
+note): tsk-4uj is `status: delivered`, merged to `main` as `64f86633`.
+Whoever implements this item must **rebase/sync `fgw/tsk-2bg` onto
+current `main` before editing `bin/fgos.mjs`** — this plan's own branch
+was forked before tsk-4uj merged, so its local copy of `bin/fgos.mjs`
+still has `promote-to-component` at the OLD pre-tsk-4uj line numbers
+(3535/3541/3542/3624 — cited in this plan's own earlier revision and in
+`CONTEXT.md`'s scout evidence); the real, current line numbers above are
+read from `main`'s HEAD, not from this branch's own stale snapshot. Do
+not trust either plan's line citations without re-`grep`ping fresh at
+implementation time regardless — both are a moving target.
 
 `fgos graph tsk-2bg --json`: isolated item, no deps, no children, own
 connected component of size 1 — `criticalPath`/`topUnblock` carry no
@@ -102,10 +114,11 @@ it is `full` only when freshly checked, `degraded` when `present` but
 flagged stale). GitNexus's index is independently confirmed STALE a
 second time this item (after D4's own `isMainWorktree` finding): its
 `impact()` query on `retargetMember` returned only 1 caller
-(`promote-engine.test.mjs`), omitting the real production call site at
-`bin/fgos.mjs:3624` — manual `grep`/`rg` cross-check substitutes and is
-what confirmed both guard
-layers' real call graph this pass. GitNexus `impact()` MUST still be
+(`promote-engine.test.mjs`), omitting the real production call site
+(then `bin/fgos.mjs:3624`, now `:3648` on current `main` HEAD post-tsk-4uj
+— see the revision note above) — manual `grep`/`rg` cross-check
+substitutes and is what confirmed both guard layers' real call graph
+this pass. GitNexus `impact()` MUST still be
 re-run before editing the `promote-to-component` handler and
 `retargetMember` — CLAUDE.md's Always-Do rules — but its degraded output
 should be treated as a starting point, not the full picture, until the
@@ -113,34 +126,42 @@ index is refreshed (`gitnexus analyze`).
 
 ### Changes
 
-1. **`bin/fgos.mjs` — `promote-to-component` handler.** Add the same flag
-   tsk-4uj lands on `sync-root`/`approve` (exact name is tsk-4uj's own
-   call, reused here verbatim — see the dependency note above). When
-   passed, `repoRoot = path.dirname(dir)` instead of `process.cwd()`
-   (currently line 3541), before the existing `isMainWorktree(repoRoot)`
-   guard (currently line 3542) — the guard itself stays unchanged code,
-   it now just evaluates a different `repoRoot` value depending on the
-   flag.
+1. **`bin/fgos.mjs` — `promote-to-component` handler.** Add
+   `const repoRoot = flags['trust-dir'] === true ? path.dirname(dir) : process.cwd();`
+   in place of the current `const repoRoot = process.cwd();` (real `main`
+   line 3565 as of this pass — re-`grep` fresh at implementation time,
+   see the dependency note above), immediately before the existing
+   `isMainWorktree(repoRoot)` guard (line 3566) — the guard itself stays
+   unchanged code, it now just evaluates a different `repoRoot` value
+   depending on the flag. Byte-identical shape to tsk-4uj's own
+   `approve`/`sync-root` change (`64f86633`).
 
 2. **`src/runner/promote-engine.mjs` — no change** (D6). `retargetMember`'s
    own `isMainWorktree` check at line 54 is left exactly as-is; it inherits
    the relaxation for free once change 1 above resolves `repoRoot`
-   correctly at the call site (`bin/fgos.mjs:3624`).
+   correctly at the call site (`bin/fgos.mjs:3648`, current `main` HEAD).
 
 3. **New regression tests in `test/cli/fgos.test.mjs`** (near the existing
    `promote-to-component` suite, ~line 6613+): today's complete absence of
    any worktree-guard test for this verb (either layer) is itself a gap
    this item must close, independent of the new flag — see risk map below.
+   Directly adapt tsk-4uj's own four new tests (`64f86633`,
+   `test('sync-root --trust-dir with --dir succeeds from inside a linked
+   worktree (tsk-4uj)', ...)` and its no-op counterpart, plus the
+   `approve`/`approve --github` equivalents) to `promote-to-component`'s
+   own call shape (`--ids <a,b>` instead of a single id) rather than
+   writing the pattern from scratch.
 
-4. **Docs** — if tsk-4uj already added a `docs/how-to/` page for the
-   flag on `approve`/`sync-root` by the time this item is implemented,
-   extend that same page with a `promote-to-component` section rather
-   than writing a new one (same flag, same trust trade-off, same target
-   audience — a person running the command by hand from inside a
-   worktree session). If tsk-4uj's doc page does not exist yet, whoever
-   implements this item decides placement the same way tsk-4uj's own
-   plan left it — a documentation organization choice, not a product
-   decision.
+4. **Docs** — extend tsk-4uj's own real how-to page,
+   `docs/how-to/recover-approve-sync-root-from-inside-a-worktree-with-
+   trust-dir.md`, with a `promote-to-component` section (same flag, same
+   trust trade-off, same target audience — a person running the command
+   by hand from inside a worktree session) rather than writing a new
+   page. The page's own title implies `approve`/`sync-root` only —
+   whoever implements should judge whether the title needs updating too
+   (e.g. dropping the specific verb names) or whether a scoped addition
+   under the existing title reads fine; a documentation wording choice,
+   not a product decision.
 
 ### Risk map
 
@@ -171,16 +192,20 @@ index is refreshed (`gitnexus analyze`).
 
 ## Assumptions
 
-- Exact flag name is NOT this item's own call — reused verbatim from
-  whatever tsk-4uj actually ships (see the hard dependency note in
-  Approach above). This is a stronger constraint than tsk-4uj's own
-  "implementation-detail" framing of its own flag name, precisely because
-  tsk-2bg's whole point is consistency with that already-decided
-  mechanism, not an independent design.
-- Whether the doc lands as a `promote-to-component` section on tsk-4uj's
-  own how-to page, or a new page, is left to whoever implements — a
-  documentation organization choice (same class of assumption tsk-4uj's
-  own plan pinned for its own doc placement).
+- Flag name and `repoRoot`-resolution shape are no longer assumptions —
+  confirmed directly from tsk-4uj's real merged diff (`64f86633`), cited
+  verbatim in Approach/Changes above.
+- Exact wording/placement of the `promote-to-component` addition to
+  tsk-4uj's real how-to page is left to whoever implements — a
+  documentation wording choice, not a product decision.
+- `fgw/tsk-2bg` will need a rebase/sync onto `main` before implementation
+  to pick up tsk-4uj's real code — every `bin/fgos.mjs` line number in
+  this plan is a snapshot of `main`'s HEAD as of this validating pass,
+  not a promise it will still be exact by the time this item reaches
+  `executing` (repo state kept moving during this item's own planning
+  pass — `main` gained several other merges in the same window). Re-`grep`
+  fresh, do not trust either this plan's or `CONTEXT.md`'s cited line
+  numbers blindly.
 - GitNexus's index was confirmed stale twice now in this same feature
   area (tsk-4uj D4, and again this item's Round 3) — `fgos-validating`/
   `fgos-code-implement` should re-check freshness rather than assume it

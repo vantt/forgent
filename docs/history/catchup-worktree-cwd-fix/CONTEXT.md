@@ -86,16 +86,26 @@ other flags in this file already resolve redundant-combination behavior.
 
 ## Assumption (pinned for tsk-2bg, not asked — follows directly from D5/D6)
 
-This item's actual implementation depends on tsk-4uj's own mechanism
-landing first: tsk-4uj is currently `status: awaiting-approval` (returned,
-not yet merged to `main`), and its exact flag name/no-op-vs-error shape
-for a bare `--trust-dir` without `--dir` is explicitly left to
-`fgos-planning` in D3's own text — still unresolved as of this item's own
-exploring pass. `fgos-planning` for tsk-2bg should reuse tsk-4uj's actual
-shipped mechanism verbatim (flag name, resolution shape, test pattern)
-once it lands, rather than inventing a parallel one ahead of it — this is
-a real sequencing fact from repo state (`fgw/tsk-4uj` unmerged), not a
-question that needed asking.
+**Superseded during `fgos-validating`'s reality-gate pass on `tsk-2bg`
+(260811):** tsk-4uj has since landed on `main`
+(`64f86633 feat(tsk-4uj): add --trust-dir opt-in flag to approve/sync-root`,
+`status: delivered`). The real, shipped mechanism (confirmed by reading
+the merged diff directly) is:
+
+```js
+const repoRoot = flags['trust-dir'] === true ? path.dirname(dir) : process.cwd();
+```
+
+applied ahead of the existing `isMainWorktree(repoRoot)` guard on both
+`approve` (`bin/fgos.mjs`, now line ~2760+ on `main`) and `sync-root`
+(now line ~3307+ on `main`) — byte-identical to today when `--trust-dir`
+is omitted, or passed without `--dir`. tsk-4uj also shipped
+`docs/how-to/recover-approve-sync-root-from-inside-a-worktree-with-trust-
+dir.md` and four new regression tests in `test/cli/fgos.test.mjs`
+(`sync-root --trust-dir with --dir succeeds...`, its no-op counterpart,
+and the `approve` + `approve --github` equivalents). `plan.md`'s own
+Approach/Changes sections now cite this real mechanism directly instead
+of deferring to it — see `plan.md`'s own revision note.
 
 ## Scout evidence
 
