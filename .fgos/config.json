@@ -1,4 +1,7 @@
 {
+  "herdrOrchestrator": {
+    "autoDiscover": true
+  },
   "runner": {
     "executor": {
       "command": "claude",
