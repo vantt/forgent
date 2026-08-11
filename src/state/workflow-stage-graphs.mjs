@@ -53,7 +53,8 @@ export const DOMAINS = Object.freeze({
   coding: Object.freeze({
     // tsk-1w7 D10 (docs/history/fanout-and-delegation-rubric/CONTEXT.md):
     // two new stages sit between `clarify` and `decompose` — `discovery`
-    // (machine-alone research, fgos-researching) and `exploring` (the
+    // (machine-alone research; owned by `fgos-coding-discovering` since
+    // tsk-tku, D7 — see the `skillMap` comment below) and `exploring` (the
     // machine+human Socratic decision-lock D3 calls the "pha máy+người"
     // half — the deep-dive work `clarify` itself used to do before this
     // item). `clarify` is KEPT (D10 — never renamed), but its own SKILL
@@ -189,10 +190,12 @@ export const DOMAINS = Object.freeze({
     // tsk-1w7 D10/D13: the old deep Socratic lock lives on under the
     // `exploring` stage name, still served by the SAME `fgos-coding-exploring`
     // skill file (renamed from `fgos-exploring` per tsk-403 D15, content
-    // unchanged). `discovery` runs the new stage-agnostic research skill
-    // (`fgos-researching`, tsk-2t9/P1). Both skill files already exist on
-    // disk (P1/P2 merged before this item — exactly the dependency plan.md's
-    // own P4 row records: "Chờ: P1, P2"). `clarify` (tsk-1w7 D10/D13's own
+    // unchanged). `discovery` is owned by `fgos-coding-discovering`
+    // (tsk-tku, D7/D8) — a real skill chủ that calls the stage-agnostic
+    // helper `fgos-researching` (tsk-2t9/P1, unchanged, D4/D9) as many
+    // times as it needs, then self-judges `clear`/`unclear` and calls the
+    // engine verb itself, same as every other stage owner. `clarify`
+    // (tsk-1w7 D10/D13's own
     // lightweight self-judging skill, `fgos-clarifying`) carries no entry
     // here anymore (tsk-qod D1/D2) — it moved to a pre-item-creation Init
     // helper (`/fgOS:submit`'s own launcher calls it directly, D2), never a
@@ -210,7 +213,7 @@ export const DOMAINS = Object.freeze({
     // skill that actually exists on disk after the rename, not the old,
     // now-deleted `fgos-planning` directory name.
     skillMap: Object.freeze({
-      discovery: 'fgos-researching',
+      discovery: 'fgos-coding-discovering',
       exploring: 'fgos-coding-exploring',
       decompose: 'fgos-coding-planning',
       planning: 'fgos-coding-planning',

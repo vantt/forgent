@@ -84,7 +84,7 @@ test('DOMAINS.coding.skillMap maps every stage, including executing, to its skil
   // to a pre-item-creation Init helper (`fgos-clarifying`, called directly
   // by `/fgOS:submit`), never a stage-skill loaded through this map again.
   assert.equal('clarify' in DOMAINS.coding.skillMap, false);
-  assert.equal(DOMAINS.coding.skillMap.discovery, 'fgos-researching');
+  assert.equal(DOMAINS.coding.skillMap.discovery, 'fgos-coding-discovering');
   assert.equal(DOMAINS.coding.skillMap.exploring, 'fgos-coding-exploring');
   // legacy `decompose` alias and the renamed `planning` stage both resolve
   // to the SAME renamed skill (tsk-403 D18) — the alias must not point at
@@ -165,7 +165,7 @@ test('skillForStage resolves each of coding\'s mapped stages to its skill name',
   // tsk-qod D1/D2: 'clarify' is no longer in skillMap at all -- resolves
   // to null like any other absent stage, same as 'compound-learn' below.
   assert.equal(skillForStage(DOMAINS.coding, 'clarify'), null);
-  assert.equal(skillForStage(DOMAINS.coding, 'discovery'), 'fgos-researching');
+  assert.equal(skillForStage(DOMAINS.coding, 'discovery'), 'fgos-coding-discovering');
   assert.equal(skillForStage(DOMAINS.coding, 'exploring'), 'fgos-coding-exploring');
   assert.equal(skillForStage(DOMAINS.coding, 'decompose'), 'fgos-coding-planning');
   assert.equal(skillForStage(DOMAINS.coding, 'planning'), 'fgos-coding-planning');

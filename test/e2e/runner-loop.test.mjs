@@ -504,8 +504,10 @@ test('e2e stage-decompose (c) ambiguous verdict: an explicit decompose --verdict
 
 // --- stage-discovery e2e (tsk-5mj D1/D6/D7, tsk-4v6): the runner
 // dispatches a stage:discovery item to a real worker running
-// fgos-researching, via the same spawnWorker/createDispatchWorktree pair
-// stage:executing already uses. Originally (tsk-5mj) this had no verdict to
+// fgos-coding-discovering (tsk-tku D7 — the skill chủ that itself calls
+// fgos-researching as a helper), via the same spawnWorker/
+// createDispatchWorktree pair stage:executing already uses. Originally
+// (tsk-5mj) this had no verdict to
 // gate the transition — any real commit unconditionally advanced discovery
 // -> exploring. tsk-4v6 (CONTEXT.md D5, driver/launcher parity per
 // 0026/0028/0029) closed that gap: the worker's own {clear, question?,
@@ -517,8 +519,9 @@ test('e2e stage-decompose (c) ambiguous verdict: an explicit decompose --verdict
  * writeCommittingExecutor already proves for stage:executing), and reports
  * its verdict via a `fgos-verdict` fence (tsk-4v6) — `clear: true` by
  * default; pass `clear: false` to prove the park path instead. Never that
- * fgos-researching's own real content shape is followed (out of this
- * item's scope -- that skill's own job). */
+ * fgos-coding-discovering's own real content shape (nor the
+ * fgos-researching helper it calls) is followed (out of this item's
+ * scope -- that skill's own job). */
 function writeResearchWorkerExecutor(scriptDir, featureDir, { clear = true, verify = 'test -f later.txt', question = 'Which approach?' } = {}) {
   const scriptPath = path.join(scriptDir, 'research-worker-executor.mjs');
   const verdictBody = clear ? { clear: true, verify } : { clear: false, question };
