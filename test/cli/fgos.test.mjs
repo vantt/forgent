@@ -5898,6 +5898,110 @@ test('approve of a root item that HAD children, whose merge into main conflicts,
   assert.match(view.frictions['drift-root-item'][0].detail, new RegExp(`main@${headBefore}`), 'friction detail must record the main@<sha> ref');
 });
 
+// tsk-4hj D1/D2/D3: a MERGE_HEAD already on the main checkout BEFORE this
+// item's own merge attempt runs belongs to a DIFFERENT item's in-progress
+// or abandoned merge -- must be reported distinctly, and that other item's
+// merge state must survive untouched (no misclassification as this item's
+// own conflict, no `git merge --abort` on state this call did not create).
+test('approve of a runner item is blocked (reason merge-blocked-other-item), not misclassified as a conflict, when the main checkout already has an unrelated item\'s pre-existing MERGE_HEAD -- and that other item\'s merge state is left untouched', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'approve-blocked-item');
+
+  // Simulate another item's in-progress/abandoned merge already staged on
+  // the main checkout by a concurrent session -- a real, unrelated branch,
+  // staged but never committed or aborted.
+  gitAtCwd(cwd, ['checkout', '-b', 'fgw/other-blocker-item']);
+  fs.writeFileSync(path.join(cwd, 'other-blocker-produced.txt'), 'other\n');
+  gitAtCwd(cwd, ['add', 'other-blocker-produced.txt']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'worker output for other-blocker-item']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+  gitAtCwd(cwd, ['merge', '--no-commit', '--no-ff', 'fgw/other-blocker-item']);
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['approve', 'approve-blocked-item']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.to, 'blocked');
+  assert.equal(data.reason, 'merge-blocked-other-item');
+
+  assert.equal(gitHead(cwd), headBefore, 'HEAD must be unchanged');
+  assert.doesNotThrow(
+    () => gitAtCwd(cwd, ['rev-parse', '--verify', 'MERGE_HEAD']),
+    'the other item\'s MERGE_HEAD must survive untouched',
+  );
+  assert.match(gitAtCwd(cwd, ['diff', '--name-only', '--cached']), /other-blocker-produced\.txt/);
+  assert.equal(fs.existsSync(path.join(cwd, 'approve-blocked-item-produced.txt')), false, 'the approved item\'s own merge must never have been attempted');
+
+  const view = stateView(cwd);
+  assert.equal(view.work['approve-blocked-item'].status, 'blocked');
+  assert.equal(view.frictions['approve-blocked-item'][0].errorClass, 'merge-blocked-other-item');
+});
+
+test('approve of a root item, whose merge into main hits a pre-existing MERGE_HEAD from an unrelated item, parks with reason merge-blocked-other-item (root→main call site, tsk-4hj D2)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  addOk(cwd, 'approve-blocked-root-item');
+  run(cwd, ['move', 'approve-blocked-root-item', '--to', 'doing']);
+  commitPending(cwd, 'state: claim approve-blocked-root-item');
+
+  gitAtCwd(cwd, ['checkout', '-b', 'fgw/approve-blocked-root-item']);
+  fs.writeFileSync(path.join(cwd, 'approve-blocked-root-item-produced.txt'), 'ok\n');
+  gitAtCwd(cwd, ['add', 'approve-blocked-root-item-produced.txt']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'worker output for approve-blocked-root-item']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  run(cwd, ['move', 'approve-blocked-root-item', '--to', 'awaiting-approval']);
+  commitPending(cwd, 'state: propose approve-blocked-root-item');
+
+  gitAtCwd(cwd, ['checkout', '-b', 'fgw/other-blocker-root-item']);
+  fs.writeFileSync(path.join(cwd, 'other-blocker-root-produced.txt'), 'other\n');
+  gitAtCwd(cwd, ['add', 'other-blocker-root-produced.txt']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'worker output for other-blocker-root-item']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+  gitAtCwd(cwd, ['merge', '--no-commit', '--no-ff', 'fgw/other-blocker-root-item']);
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['approve', 'approve-blocked-root-item']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(envelopeData(result.stdout).reason, 'merge-blocked-other-item');
+
+  assert.equal(gitHead(cwd), headBefore, 'HEAD must be unchanged');
+  assert.doesNotThrow(() => gitAtCwd(cwd, ['rev-parse', '--verify', 'MERGE_HEAD']));
+
+  const view = stateView(cwd);
+  assert.equal(view.work['approve-blocked-root-item'].status, 'blocked');
+  assert.equal(view.frictions['approve-blocked-root-item'][0].errorClass, 'merge-blocked-other-item');
+});
+
+test('catchup accepts a blocked reason of merge-blocked-other-item as a valid precondition (tsk-4hj D2, mirrors tsk-18a\'s own precedent for merge-failed-unclassified)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  addOk(cwd, 'catchup-blocked-other-item');
+  run(cwd, ['move', 'catchup-blocked-other-item', '--to', 'doing']);
+  commitPending(cwd, 'state: claim catchup-blocked-other-item');
+
+  gitAtCwd(cwd, ['checkout', '-b', 'fgw/catchup-blocked-other-item']);
+  fs.writeFileSync(path.join(cwd, 'catchup-blocked-other-item-produced.txt'), 'ok\n');
+  gitAtCwd(cwd, ['add', 'catchup-blocked-other-item-produced.txt']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'worker output for catchup-blocked-other-item']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  run(cwd, ['move', 'catchup-blocked-other-item', '--to', 'awaiting-approval']);
+  commitPending(cwd, 'state: propose catchup-blocked-other-item');
+  run(cwd, ['move', 'catchup-blocked-other-item', '--to', 'blocked', '--reason', 'merge-blocked-other-item']);
+  commitPending(cwd, 'state: park catchup-blocked-other-item');
+
+  const result = run(cwd, ['catchup', 'catchup-blocked-other-item']);
+  // The precondition check itself must accept the reason -- a rejected
+  // reason exits 4 (validation: "catchup only resolves a merge-related
+  // park (...)"); anything else (including a real merge outcome, since
+  // the branch already contains main and this is an "already-caught-up"
+  // no-op) proves the reason was accepted.
+  assert.notEqual(result.status, 4, result.stderr);
+  assert.doesNotMatch(result.stderr, /catchup only resolves a merge-related park/);
+});
+
 test('approve of a pull-door item (no merge, code already on main): re-verifies and closes awaiting-approval -> done with role human', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
@@ -6319,6 +6423,51 @@ test('sync-root aborts cleanly on a genuine conflict: main left byte-for-byte un
 
   assert.equal(gitHead(cwd), headBefore, 'main must be byte-for-byte unchanged after an aborted sync-root');
   assert.equal(stateView(cwd).work['sync-root-conflict'].status, 'doing', 'a blocked sync-root must never touch the root item\'s status');
+});
+
+// tsk-4hj D4: found during fgos-validating's reality gate on this item's own
+// plan.md -- sync-root's runAndReport had no branch for any outcome other
+// than 'conflict'/'fgos-write-rejected'/'verify-fail', so an unrecognized
+// outcome (today: 'merge-blocked-other-item', already-existing
+// 'merge-failed-unclassified') fell through unguarded to the success block
+// and sync-root would have silently reported { outcome: 'synced' } for a
+// merge that never actually completed. This proves the defensive guard: a
+// pre-existing MERGE_HEAD from an unrelated item must block, never synced.
+test('sync-root never reports outcome "synced" when mergeRunnerItem returns an outcome it does not explicitly handle -- proves the defensive guard closes the false-success gap D4 found', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeDriftedRoot(cwd, 'sync-root-blocked-other', { verify: 'true' });
+
+  // Simulate another item's in-progress/abandoned merge already staged on
+  // the main checkout -- a real, unrelated branch, staged but never
+  // committed or aborted, which makes mergeRunnerItem return
+  // 'merge-blocked-other-item' for THIS sync-root call (tsk-4hj D1).
+  gitAtCwd(cwd, ['checkout', '-b', 'fgw/sync-root-other-blocker']);
+  fs.writeFileSync(path.join(cwd, 'sync-root-other-blocker-produced.txt'), 'other\n');
+  gitAtCwd(cwd, ['add', 'sync-root-other-blocker-produced.txt']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'worker output for sync-root-other-blocker']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+  gitAtCwd(cwd, ['merge', '--no-commit', '--no-ff', 'fgw/sync-root-other-blocker']);
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['sync-root', 'sync-root-blocked-other']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.notEqual(data.outcome, 'synced', 'must never report success for an outcome it does not recognize');
+  assert.equal(data.outcome, 'blocked');
+  assert.equal(data.reason, 'merge-blocked-other-item');
+
+  assert.equal(gitHead(cwd), headBefore, 'main must be unchanged');
+  assert.doesNotThrow(
+    () => gitAtCwd(cwd, ['rev-parse', '--verify', 'MERGE_HEAD']),
+    'the other item\'s MERGE_HEAD must survive untouched',
+  );
+  assert.equal(fs.existsSync(path.join(cwd, 'sync-root-blocked-other-produced.txt')), false, 'the drifted root\'s own content must NOT have landed on main');
+  assert.equal(stateView(cwd).work['sync-root-blocked-other'].status, 'doing', 'a blocked sync-root must never touch the root item\'s status');
+
+  const lines = eventLines(cwd);
+  const mergedDecisions = lines.map((l) => JSON.parse(l)).filter((e) => e.type === 'decision' && e.payload?.id === 'sync-root-blocked-other' && /merged/.test(e.payload?.text ?? ''));
+  assert.equal(mergedDecisions.length, 0, 'must never record a "merged" decision for a merge that never actually completed');
 });
 
 test('sync-root on a no-parent root refuses when the shared main checkout carries an uncommitted change on a path the root itself touches, exit 4, no merge lands (tsk-66t)', () => {

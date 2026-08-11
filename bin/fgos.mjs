@@ -3084,6 +3084,25 @@ async function runVerb(verb, flags, positional, dir) {
               return { id, mode: 'merge', to: 'blocked', reason: 'merge-failed-unclassified', target: rootBranch, error: result.error };
             }
 
+            if (result.outcome === 'merge-blocked-other-item') {
+              // tsk-4hj D1/D2/D3: a MERGE_HEAD already existed BEFORE this
+              // call's own merge attempt ran -- a different item's
+              // in-progress or abandoned merge, not this branch's conflict.
+              // git merge --no-commit --no-ff was never attempted and
+              // git merge --abort was never called, so ${rootBranch}'s own
+              // merge state (if any) is exactly as this call found it.
+              moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-blocked-other-item', role: 'system' });
+              addFriction(dir, {
+                id,
+                disposition: 'blocked',
+                errorClass: 'merge-blocked-other-item',
+                layer: 'state',
+                attempts: 1,
+                detail: `main checkout already has a MERGE_HEAD from another item's in-progress merge; ${rootBranch}'s own merge of ${result.branch} was never attempted`,
+              });
+              return { id, mode: 'merge', to: 'blocked', reason: 'merge-blocked-other-item', target: rootBranch };
+            }
+
             if (result.outcome === 'fgos-write-rejected') {
               moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'fgos-write-rejected', role: 'system' });
               addFriction(dir, {
@@ -3203,6 +3222,28 @@ async function runVerb(verb, flags, positional, dir) {
             detail,
           });
           return { id, mode: 'merge', to: 'blocked', reason: 'merge-failed-unclassified', target: 'main', error: result.error };
+        }
+
+        if (result.outcome === 'merge-blocked-other-item') {
+          // tsk-4hj D1/D2/D3: same non-genuine-conflict, non-genuine-drift
+          // class as merge-failed-unclassified above — reason stays constant
+          // regardless of hadChildren, since a pre-existing MERGE_HEAD from a
+          // DIFFERENT item is neither this branch's own conflict nor cross-root
+          // integration drift. git merge --no-commit --no-ff was never
+          // attempted and git merge --abort was never called.
+          const detail = hadChildren
+            ? `cross-root integration attempt at main@${currentHead(repoRoot)}; main checkout already has a MERGE_HEAD from another item's in-progress merge; merge of ${result.branch} was never attempted`
+            : `main checkout already has a MERGE_HEAD from another item's in-progress merge; merge of ${result.branch} was never attempted`;
+          moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-blocked-other-item', role: 'system' });
+          addFriction(dir, {
+            id,
+            disposition: 'blocked',
+            errorClass: 'merge-blocked-other-item',
+            layer: 'state',
+            attempts: 1,
+            detail,
+          });
+          return { id, mode: 'merge', to: 'blocked', reason: 'merge-blocked-other-item', target: 'main' };
         }
 
         if (result.outcome === 'fgos-write-rejected') {
@@ -3400,6 +3441,28 @@ async function runVerb(verb, flags, positional, dir) {
               : `sync-root: goal-check failed on staged merge of ${branch} into ${targetBranch} (exit ${result.check.status}); merge aborted, ${targetBranch} unchanged`,
           });
           return { id, mode: 'sync-root', outcome: 'blocked', reason: result.check.timedOut ? 'verify-timeout' : 'verify-fail', timedOut: result.check.timedOut, target: targetBranch, branch, exitStatus: result.check.status, output: result.check.output };
+        }
+
+        if (result.outcome !== 'merged') {
+          // tsk-4hj D4: defensive guard against any outcome this call site
+          // does not explicitly recognize above (today:
+          // 'merge-blocked-other-item', 'merge-failed-unclassified') --
+          // without this, an unhandled outcome fell through unguarded to
+          // the success block below, and sync-root silently reported
+          // { outcome: 'synced' } for a merge that never actually
+          // completed. Deliberately never lists specific outcome strings
+          // here (unlike the named branches above) -- this guard's whole
+          // point is to catch whatever this call site doesn't already
+          // handle by name, today and for any outcome added later.
+          addFriction(dir, {
+            id,
+            disposition: 'blocked',
+            errorClass: 'sync-root-unhandled-outcome',
+            layer: 'state',
+            attempts: 1,
+            detail: `sync-root: mergeRunnerItem returned unrecognized outcome "${result.outcome}" for ${branch} into ${targetBranch} — refusing to report success`,
+          });
+          return { id, mode: 'sync-root', outcome: 'blocked', reason: result.outcome, target: targetBranch, branch };
         }
 
         // Success — status/stage of `id` is deliberately UNTOUCHED (the
@@ -3621,7 +3684,12 @@ async function runVerb(verb, flags, positional, dir) {
       // a timed-out post-merge check is exactly the transient condition
       // this comment already describes, and catchup (a retry) is the
       // correct next step for it, not a manual rework.
-      const CATCHUP_REASONS = new Set(['merge-conflict', 'verify-fail-post-merge', 'verify-timeout-post-merge', 'integration-drift', 'merge-failed-unclassified']);
+      // tsk-4hj D2: 'merge-blocked-other-item' joins this set the same way
+      // 'merge-failed-unclassified' did — the block is a DIFFERENT item's
+      // still-in-progress merge, not this item's own conflict, so a retry
+      // once that other merge finishes or gets aborted is the natural
+      // recovery, not a manual rework.
+      const CATCHUP_REASONS = new Set(['merge-conflict', 'verify-fail-post-merge', 'verify-timeout-post-merge', 'integration-drift', 'merge-failed-unclassified', 'merge-blocked-other-item']);
       if (!CATCHUP_REASONS.has(item.reason)) {
         throw new StoreError(
           'validation',

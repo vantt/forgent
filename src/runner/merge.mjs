@@ -957,6 +957,22 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
     return { outcome: 'merged', branch, check };
   }
 
+  // tsk-4hj D1/D2/D3: a MERGE_HEAD already on disk BEFORE this call ever
+  // runs belongs to a DIFFERENT item's in-progress or abandoned merge --
+  // git itself refuses ("You have not concluded your merge") whenever
+  // this is true, regardless of which branch it belongs to, so this call
+  // never gets a chance to attempt anything of its own. Must be checked
+  // here, before the git merge attempt below: the existing post-call
+  // `mergeHeadExists` read further down (tsk-18a D1) cannot tell "created
+  // BY this call" apart from "already there before it ran" -- both read
+  // the same boolean at the same post-failure moment. Must never call
+  // `abortMergeIfPossible` on this path -- that would discard the OTHER
+  // item's merge state, exactly the data-loss bug this decision exists
+  // to close.
+  if (mergeHeadExists(repoRoot)) {
+    return { outcome: 'merge-blocked-other-item', branch };
+  }
+
   let selfResolved = false;
   try {
     git(repoRoot, ['merge', '--no-commit', '--no-ff', branch]);
