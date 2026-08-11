@@ -41,6 +41,27 @@ chưa có trong allowlist của guard đó. File này đến từ commit `d0ce47
 của tsk-25b, nên item này **không** sửa — verify bên dưới được viết để
 phân biệt "lỗi sẵn có" với "regression do item này gây ra".
 
+## Kết quả sau khi chẻ (2026-08-11)
+
+| Phép đo | Trước | Sau |
+|---|---|---|
+| `npm test` toàn suite | 169.76s, 1 đỏ | **133.49s**, 1 đỏ (vẫn đúng lỗi guard sẵn có) |
+| Test của riêng phần CLI tách ra | 581 (trong 1 file) | **581 (trong 10 file), 0 đỏ** — khớp từng test một |
+| File `test/cli/` chậm nhất | 171.0s | **19.78s** |
+| Tổng test cả suite | — | 2878, `fail 1` |
+
+133.49s **chưa** phải ≤45s của D3, và điều đó đúng như dự đoán: trần bây giờ
+là `test/setup/checks.test.mjs` (109s), việc của `tsk-67g`. Verify của item
+này vì thế không đòi ngưỡng toàn suite — nó đòi đúng ba thứ item này kiểm
+soát được (xem Proof surface).
+
+**Một lỗi tự gây, tự bắt, đáng ghi lại**: bản verify đầu tiên đo thời gian
+bằng `{ /usr/bin/time -f %e node --test "$f" >/dev/null 2>&1; } 2>&1` —
+`2>&1` nuốt luôn output của `time` cùng output của node, nên biến thời gian
+về rỗng, và `awk -v s="" 'BEGIN{exit (s>30)}'` trả 0, tức **verify xanh giả
+với mọi file dù chậm bao nhiêu**. Đã sửa: `time -o <file>` ghi riêng, cộng
+một `case` chặn giá trị không phải số và làm đỏ verify thay vì bỏ qua.
+
 ## Approach
 
 ### Đường cắt
@@ -104,14 +125,17 @@ awk '/^ℹ tests /{t=$3} /^ℹ fail /{f=$3} END{exit !(t>=2827 && f<=1)}' /tmp/t
   && ! grep '^✖' /tmp/tsk-3um-verify.log | grep -v 'failing tests:' \
        | grep -qv 'orchestrator" does not appear in fgOS-owned prose' \
   && for f in test/cli/*.test.mjs; do
-       s=$( { /usr/bin/time -f %e node --test "$f" >/dev/null 2>&1; } 2>&1 | tail -1 )
+       /usr/bin/time -f %e -o /tmp/tsk-3um-one.txt node --test "$f" >/dev/null 2>&1
+       s=$(cat /tmp/tsk-3um-one.txt)
+       case "$s" in ''|*[!0-9.]*) echo "BAD TIMING for $f: [$s]"; exit 1;; esac
        awk -v s="$s" 'BEGIN{exit (s>30)}' || { echo "SLOW $f ${s}s"; exit 1; }
      done
 ```
 
 Ba mệnh đề: (1) tổng test không giảm dưới 2827 và không quá 1 test đỏ;
 (2) test đỏ duy nhất được phép là đúng lỗi guard sẵn có — bất kỳ test đỏ nào
-khác đều làm verify đỏ; (3) không file nào trong `test/cli/` vượt 30s.
+khác đều làm verify đỏ; (3) không file nào trong `test/cli/` vượt 30s, và một
+phép đo không ra số cũng làm verify đỏ thay vì được bỏ qua.
 
 Dùng `ℹ tests`/`ℹ fail` — đúng định dạng reporter mặc định của Node in ra
 (kiểm chứng trực tiếp trên `test/architecture.test.mjs`), **không** phải dạng
