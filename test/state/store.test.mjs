@@ -670,6 +670,46 @@ for (let i = 0; i < ${N_EDITS}; i += 1) {
   assert.deepEqual(persisted.work, fresh.work, 'persisted state.json must match a fresh rebuild of the log — any mismatch means a concurrent refreshView race overwrote a fresher view with a staler one');
 });
 
+// tsk-4mx: writeView used to be a bare fs.writeFileSync straight onto
+// state.json -- a crash or a concurrent read mid-write could observe a
+// truncated file. Proves the real fix (write to a uniquely-named temp path,
+// then rename(2) it onto state.json) by spying on the real fs calls a
+// mutation makes, not just the resulting file content.
+test('writeView writes state.json via a temp-file-then-rename, never a direct writeFileSync onto it (tsk-4mx)', () => {
+  const dir = tmpDir();
+  const viewPath = path.join(dir, 'state.json');
+  const writeFileSyncCalls = [];
+  const renameSyncCalls = [];
+  const originalWriteFileSync = fs.writeFileSync;
+  const originalRenameSync = fs.renameSync;
+  fs.writeFileSync = function patchedWriteFileSync(target, ...rest) {
+    writeFileSyncCalls.push(String(target));
+    return originalWriteFileSync.call(fs, target, ...rest);
+  };
+  fs.renameSync = function patchedRenameSync(from, to) {
+    renameSyncCalls.push({ from: String(from), to: String(to) });
+    return originalRenameSync.call(fs, from, to);
+  };
+  try {
+    addSampleWork(dir, 'atomic-write-check');
+  } finally {
+    fs.writeFileSync = originalWriteFileSync;
+    fs.renameSync = originalRenameSync;
+  }
+
+  const viewWrites = writeFileSyncCalls.filter((target) => target === viewPath || target.startsWith(`${viewPath}.tmp-`));
+  assert.ok(viewWrites.every((target) => target !== viewPath), 'no writeFileSync call may target state.json directly');
+  assert.ok(viewWrites.some((target) => target.startsWith(`${viewPath}.tmp-`)), 'writeView must writeFileSync to a uniquely-named temp path derived from state.json\'s own path');
+
+  const viewRenames = renameSyncCalls.filter((call) => call.to === viewPath);
+  assert.equal(viewRenames.length, 1, 'exactly one renameSync must land the temp file onto state.json');
+  assert.ok(viewRenames[0].from.startsWith(`${viewPath}.tmp-`), 'the renamed-from path must be the same temp path writeFileSync wrote to');
+
+  assert.ok(fs.existsSync(viewPath), 'state.json must exist after the rename');
+  assert.ok(!fs.existsSync(viewRenames[0].from), 'the temp file must no longer exist after rename(2) moved it');
+  JSON.parse(fs.readFileSync(viewPath, 'utf8'));
+});
+
 // --- str73-done-flip-cos-check cell 2: per-clause CoS done-gate ------------
 //
 // Retargeted by work-item-status-delivered-retrospective-cleanup D3: this

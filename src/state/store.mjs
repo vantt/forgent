@@ -98,7 +98,13 @@ function writeView(viewPath, view) {
   // rebuild returns. Determinism (same log -> same revision) keeps the
   // rebuild-determinism e2e's before/after deep-equal green.
   const persisted = { ...view, revision: viewRevision(view) };
-  fs.writeFileSync(viewPath, `${JSON.stringify(persisted, null, 2)}\n`, 'utf8');
+  // tsk-4mx: write to a uniquely-named temp file, then rename(2) it onto
+  // viewPath -- an atomic replace on POSIX, so a reader can never observe a
+  // truncated/partial state.json, same pattern as main-checkout-lock.mjs's
+  // own writeAtomicReplace.
+  const tmpPath = `${viewPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  fs.writeFileSync(tmpPath, `${JSON.stringify(persisted, null, 2)}\n`, 'utf8');
+  fs.renameSync(tmpPath, viewPath);
 }
 
 // Shared tail of every mutation: rebuild the view fresh from the (now
