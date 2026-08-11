@@ -103,7 +103,39 @@ thấy ngưỡng 45s bất khả thi, plan này quay lại chỉnh D3 chứ khô
 - Chia 85 test thành 5 file theo chi phí đo được ở P2, không theo số lượng.
 - Hai test nặng nhất nằm hai file khác nhau.
 
-### Phase 3 — Nghiệm thu (chính item này, sau khi cả hai child xong)
+### Phase 3 — Đo sau khi hợp hai con, và chẻ mịn thêm nếu cần (2026-08-11)
+
+Hai con đã merge vào `fgw/tsk-25b`. Số đo đầu tiên có cả hai thay đổi:
+
+| Lần | Wall-clock |
+|---|---|
+| 1 | **46.91s** |
+| 2 | **52.51s** |
+| 3 (kèm đo CPU) | **50.37s** — `user=324.46s sys=104.50s cpu=851%` |
+
+169.76s → ~47–53s, tức giảm khoảng 70%. Nhưng **chưa ổn định dưới ngưỡng
+45s của D3**, và số CPU chỉ ra vì sao — đây là điều cả plan này lẫn plan hai
+con đều chưa tính:
+
+- Tổng CPU của cả bộ test là **429s**, nhưng chỉ dùng được **8.5 trên 16
+  core** (`cpu=851%`).
+- Sàn lý thuyết nếu lấp kín 16 core là ~27s. Khoảng cách 27s → 50s **không**
+  đến từ file chậm nhất nữa (file nặng nhất chỉ ~22s), mà từ **độ lấp đầy
+  core**: về cuối run chỉ còn dăm file nặng chạy, phần lớn core ngồi không.
+
+Nói cách khác, đòn bẩy đã đổi. Vòng đầu, trần là `max(file)` nên chẻ tới
+ngưỡng 30s là đủ. Bây giờ trần là makespan trên 16 core, nên **cùng một
+phép chẻ cơ học (D2) vẫn còn dư địa**: chia nhỏ hơn nữa để có nhiều file
+song song hơn, cụ thể 5 file `checks-setup-*` (mỗi file 2 test nặng, ~22s)
+tách thành 10 file một test (~11–14s), và các file `test/cli` nặng ~20s
+tách đôi.
+
+Không hứa trước là đủ để xuống dưới 45s: mỗi test còn spawn một process CLI
+thật, nên một file test ăn hơn một core, và chỉ đo mới biết. Nếu chẻ mịn vẫn
+không đạt, việc còn lại là hạ **tổng** CPU (gộp fixture, bớt spawn) — đúng
+thứ D2 đã hoãn sang item riêng — và lúc đó D3 cần người xem lại bằng số thật.
+
+### Phase 4 — Nghiệm thu
 
 `time npm test` → wall-clock ≤ 45s, 0 fail, tổng test không giảm; và không
 file nào > ~30s. Ghi cả số trước lẫn số sau vào `docs/history/
