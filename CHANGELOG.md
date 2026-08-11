@@ -16,6 +16,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (`retrospective` → `cleanup`) that previously needed hand-rolled
   sequencing in each launcher. No registry or code change was required —
   `skillMap` has mixed stage and status keys since decision `0027` D5.
+- `/fgOS:cleanup-next` now reports a stuck shared lock with the same
+  `stop-reason: lock-timeout` marker line every other launcher and the
+  driver already use, instead of describing that condition only in prose —
+  so `/fgOS:cleanup-loop` reads the one loop-stopping category off a line
+  rather than inferring it. Its exit-code classification is unchanged and
+  documented as deliberate: unlike `/fgOS:retro-next`, it runs a real CLI
+  subprocess, so an exit code genuinely exists to read.
 - `awaiting-approval` changes from an unconditional stop into the driver's
   **default, overridable ceiling**. A caller that supplies no ceiling stops
   there exactly as before, so existing behavior is unchanged; a caller that
