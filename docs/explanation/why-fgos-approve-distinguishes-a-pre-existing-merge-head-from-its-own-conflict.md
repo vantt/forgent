@@ -102,3 +102,25 @@ scope: `tsk-2j9`'s already-delivered abort-crash guard (a *missing*
 split (a `MERGE_HEAD` this call itself created or never created) — both
 orthogonal, already-shipped fixes for different classification gaps in
 the same function.
+
+## Update (`tsk-1cp`): the `sync-root` guard's own independent traceability record
+
+`sync-root`'s defensive guard (D4 above) was significant enough on its
+own — a pre-existing bug (`tsk-18a` had already missed this same call
+site once, when it added `merge-failed-unclassified`) that this fix's
+own D1 would otherwise have made worse, not better — that it was given
+its own separate, independently-traceable documentation record
+(`docs/history/tsk-1cp-sync-root-unrecognized-outcome-guard/`), distinct
+from `tsk-4hj`'s own decision log, even though the guard's actual code
+and test landed as part of `tsk-4hj`'s own commit (`fc59e7d9`) and no
+separate code change belongs to this second item.
+
+The guard itself, precisely: `bin/fgos.mjs:3404`, `if (result.outcome
+!== 'merged')` before `sync-root`'s success block, tagged with
+`errorClass: 'sync-root-unhandled-outcome'` — a defensive `else` that
+treats *any* outcome other than `'merged'` as an error, never listing
+`merge-blocked-other-item` (or any other specific outcome name) in the
+condition itself, so it also future-proofs against whatever outcome a
+later fix adds. Regression test: `test/cli/fgos.test.mjs:6374`.
+Fail-before/pass-after proof: `docs/history/
+tsk-4hj-stale-merge-head-misclassified-as-conflict/iron-law-evidence.md`.
