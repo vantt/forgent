@@ -425,6 +425,47 @@ test('mergeRunnerItem reports "merge-failed-unclassified" (not "conflict") when 
   assert.equal(fs.readFileSync(path.join(repoRoot, 'newfile.txt'), 'utf8'), 'stray-untracked\n', 'the stray untracked file must be left exactly as it was');
 });
 
+// tsk-4hj D1/D2/D3: a MERGE_HEAD already on disk BEFORE mergeRunnerItem's
+// own `git merge --no-commit --no-ff` attempt ever runs belongs to a
+// DIFFERENT item's in-progress/abandoned merge -- git itself refuses
+// ("You have not concluded your merge") whenever this is true, regardless
+// of which branch it belongs to. The pre-tsk-4hj code read
+// mergeHeadExists() only AFTER this call failed, which could not tell
+// "created by this call" apart from "already there before it ran", and
+// misclassified this case as this call's own genuine conflict -- then
+// called `git merge --abort`, discarding the OTHER item's real merge
+// state. Must be reported as its own outcome, and must never touch the
+// leftover MERGE_HEAD at all.
+test('mergeRunnerItem reports "merge-blocked-other-item" (not "conflict") and never touches a pre-existing MERGE_HEAD from a different branch', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/other-item', 'other.txt', 'other-item content\n');
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'newfile.txt', 'clean-content\n');
+
+  // Simulate another item's in-progress/abandoned merge already staged on
+  // the main checkout, left behind by a session that has not yet
+  // committed or aborted it.
+  git(repoRoot, ['merge', '--no-commit', '--no-ff', 'fgw/other-item']);
+  assert.doesNotThrow(
+    () => git(repoRoot, ['rev-parse', '--verify', 'MERGE_HEAD']),
+    'fixture setup must actually leave a real MERGE_HEAD behind',
+  );
+
+  const headBefore = headOf(repoRoot);
+  const result = await mergeRunnerItem(repoRoot, makeItem());
+  assert.equal(result.outcome, 'merge-blocked-other-item');
+  assert.equal(result.branch, 'fgw/demo-item');
+
+  // The OTHER item's merge state must be exactly as this call found it —
+  // proves no abort ran against it.
+  assert.doesNotThrow(
+    () => git(repoRoot, ['rev-parse', '--verify', 'MERGE_HEAD']),
+    'the other item\'s MERGE_HEAD must survive untouched',
+  );
+  assert.match(git(repoRoot, ['diff', '--name-only', '--cached']).trim(), /other\.txt/);
+  assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged');
+  assert.equal(fs.existsSync(path.join(repoRoot, 'newfile.txt')), false, 'demo-item\'s own merge must never have been attempted');
+});
+
 // --- mergeRunnerItem: decision-ID collision auto-resolve (tsk-3mv-1 D1a) ---
 // Mirrors the real occurrence (tsk-66l,
 // docs/how-to/resolve-a-decision-id-collision-merge-conflict-on-approve.md):
