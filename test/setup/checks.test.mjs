@@ -44,7 +44,7 @@ import {
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, changelog-unreleased-stale, herdr-launcher-configured, work-classification-vocabulary, enduser-docs-index-stale, events-jsonl-contiguous, and invariant-checks-configured', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, changelog-unreleased-stale, herdr-launcher-configured, work-classification-vocabulary, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, and events-jsonl-not-truncated', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     [
@@ -65,6 +65,7 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'enduser-docs-index-stale',
       'events-jsonl-contiguous',
       'invariant-checks-configured',
+      'events-jsonl-not-truncated',
     ].sort(),
   );
 });
@@ -213,6 +214,51 @@ test('events-jsonl-contiguous fix is a no-op when the log is already contiguous'
   const { changed, message } = fixById('events-jsonl-contiguous').fix(dir);
   assert.equal(changed, false);
   assert.match(message, /already contiguous/);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+// ─── events-jsonl-not-truncated (tsk-cgg) ──────────────────────────────────
+
+test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {
+  assert.equal(
+    FIX_REGISTRATIONS.some((f) => f.id === 'events-jsonl-not-truncated'),
+    false,
+  );
+});
+
+test('events-jsonl-not-truncated passes and bootstraps a mark on first run against a healthy log', () => {
+  const dir = initRepo('checks-truncguard-bootstrap-');
+  const fgosDir = path.join(dir, '.fgos');
+  initStore(fgosDir);
+  addWork(fgosDir, { id: 'a', title: 'a', kind: 'feature', risk: 'light', verify: 'true', status: 'todo', deps: [], refs: [] });
+
+  const { passed, message } = checkById('events-jsonl-not-truncated').check(dir);
+  assert.equal(passed, true);
+  assert.match(message, /truncation guard holds/);
+  assert.equal(fs.existsSync(path.join(fgosDir, 'events-jsonl.truncation-guard.json')), true, 'a passing check advances/bootstraps the mark');
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('events-jsonl-not-truncated fails when the log was truncated then reappended past the old mark', () => {
+  const dir = initRepo('checks-truncguard-break-');
+  const fgosDir = path.join(dir, '.fgos');
+  initStore(fgosDir);
+  const logPath = path.join(fgosDir, 'events.jsonl');
+  fs.appendFileSync(logPath, `${JSON.stringify({ seq: 1, ts: '2026-01-01T00:00:00.000Z', type: 'orig', payload: null })}\n`);
+  fs.appendFileSync(logPath, `${JSON.stringify({ seq: 2, ts: '2026-01-01T00:00:01.000Z', type: 'orig', payload: null })}\n`);
+
+  const first = checkById('events-jsonl-not-truncated').check(dir);
+  assert.equal(first.passed, true, 'first run bootstraps clean');
+
+  // Simulate a stash-style truncation: revert to just line 1, then append a
+  // DIFFERENT event reusing seq 2.
+  fs.writeFileSync(logPath, `${JSON.stringify({ seq: 1, ts: '2026-01-01T00:00:00.000Z', type: 'orig', payload: null })}\n`, 'utf8');
+  fs.appendFileSync(logPath, `${JSON.stringify({ seq: 2, ts: '2026-01-01T09:00:00.000Z', type: 'post-truncation', payload: null })}\n`);
+
+  const { passed, message } = checkById('events-jsonl-not-truncated').check(dir);
+  assert.equal(passed, false);
+  assert.match(message, /truncation detected/);
+  assert.match(message, /resolve-an-events-jsonl-truncation/);
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
