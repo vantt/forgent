@@ -46,7 +46,8 @@ not go red the instant it is turned on. `tsk-3wr` shows `status: done`.
 - Re-ran `tsk-3wr`'s own verify regex
   (`grep -rnP "^\s*(test|it|describe)\(\s*['\"].*\b(str[0-9]{2,3}|D[0-9]{1,2}\b|RUL[0-9]{2,3}|STR[0-9]{2,3}|tsk-[0-9a-z]{3})\b" test --include='*.test.mjs' --exclude='next-doc-id.test.mjs'`)
   against the live `test/` tree on `tsk-3ch`'s own branch (forked from
-  `main` @ `9bff1bbc`, the commit at claim time): **204 matches across 50
+  `main` @ `9bff1bbc`, the commit at claim time, re-verified reproducibly
+  across repeated runs at implementation time): **254 matches across 50
   of 117 test files (42.7%)** — essentially the same violation rate as
   `tsk-3wr`'s original baseline (49%, 34/70 files, measured 2026-07-28),
   against a test suite that grew from 70 to 117 files in the ~12 days

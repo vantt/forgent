@@ -88,7 +88,7 @@ symbol, so no blast-radius proof point is needed beyond the tests above.
 - `scripts/check-decision-codes.mjs` — new: `findDecisionCodeFindings`,
   ratchet/baseline helpers, CLI (default + `--write-baseline`).
 - `scripts/check-decision-codes.baseline.json` — new: generated snapshot
-  of today's real findings (~204, run for real, not hand-written).
+  of today's real findings (~254, run for real, not hand-written).
 - `test/scripts/check-decision-codes.test.mjs` — new: unit tests for the
   pure functions + ratchet logic, plus CLI fixture tests (new-file case,
   new-line-in-baselined-file case, all-baselined-stays-green case).
