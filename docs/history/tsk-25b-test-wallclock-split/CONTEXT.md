@@ -1,0 +1,73 @@
+# CONTEXT — tsk-25b: chẻ nhỏ hai file test chi phối wall-clock của `npm test`
+
+## Ranh giới tính năng
+
+Hạ wall-clock của `npm test` bằng cách chẻ **đúng hai file** đang chi phối
+nó — `test/cli/fgos.test.mjs` và `test/setup/checks.test.mjs` — thành nhiều
+file nhỏ hơn để `node --test` trải chúng ra song song.
+
+**Trong phạm vi:** di chuyển test giữa các file test; sửa các câu `verify`
+còn đang bay trỏ vào đường dẫn cũ; ghi lại số đo trước/sau.
+
+**Ngoài phạm vi:** hạ *tổng* chi phí CPU (gộp fixture, bớt spawn, viết lại
+harness sang spawn bất đồng bộ); dựng cơ chế kiểm tự động enforce ngưỡng
+thời gian; đụng vào bất kỳ file test nào khác hai file trên.
+
+## Quyết định đã chốt
+
+| ID | Quyết định | Lý do |
+|---|---|---|
+| **D1** | **Xoá hẳn đường dẫn `test/cli/fgos.test.mjs`** — không giữ tên cho shard nào. Sửa `verify` của 5 item còn đang bay (`tsk-1wdf` todo, `tsk-483` blocked, `tsk-5vl` awaiting-approval, `tsk-4uj` doing, `tsk-1cp` doing). | 55 item có `verify` trỏ vào hai file này, 158 doc nhắc đường dẫn — nhưng chỉ 5 item còn thật sự chạy lại verify (số còn lại đã ở `cleanup`/`done`, verify đã tiêu). Nếu giữ tên cho shard lớn nhất, các câu `node --test test/cli/fgos.test.mjs` **vẫn xanh nhưng phủ ít hơn hẳn** — đúng lớp xanh-giả mà `docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md` đã cảnh báo. Vỡ to tiếng hơn xanh giả. |
+| **D2** | **Chỉ chẻ cơ học**: bê nguyên test sang file mới, không sửa nội dung test nào. Việc hạ tổng chi phí (gộp fixture, bớt spawn — vd hai test nặng nhất của `checks.test.mjs`: 12.2s và 10.7s) tách thành item riêng. | Tổng CPU-time **không phải** nút thắt; core rảnh mới là tài nguyên (16 CPU, hiện chỉ ~2 file thật sự bận). Chẻ cơ học là zero-behavior-change và chứng minh được số test không đổi; đụng vào fixture thì có thể âm thầm làm yếu độ phủ mà không đổi được điều gì đang thật sự chặn. |
+| **D3** | **Acceptance lấy cả hai ngưỡng**: cả suite `npm test` ≤ **45s**, VÀ không file test nào vượt **~30s**. Phần kiểm tự động enforce invariant thứ hai hoãn sang item sau. | Một con số cho cả suite là vạch đích một lần; ngưỡng per-file mới là thứ chống mọc lại — và đây đúng là bệnh mọc dần (`fgos.test.mjs` đã phình tới 9761 dòng / 547 test). Dựng harness đo thời gian từng file là mảng việc khác hẳn với chẻ file, nên không nhét chung. |
+
+## Thuật ngữ đã pin
+
+- **"Chẻ cơ học"** (D2) — chuyển nguyên văn thân test từ file cũ sang file
+  mới, kèm phần import/helper cần thiết. Không đổi tên test, không đổi
+  assert, không gộp/bỏ test, không đổi fixture. Tổng số test trước = sau.
+- **"File chi phối wall-clock"** — file có wall-clock riêng xấp xỉ wall-clock
+  của cả suite. Hôm nay đúng hai file: `fgos.test.mjs` (171.0s) và
+  `checks.test.mjs` (109.0s), so với cả suite 163.1s.
+
+## Bằng chứng scout
+
+Chi tiết đầy đủ, kèm trích dẫn `file:line`, nằm ở
+[`RESEARCH.md`](./RESEARCH.md) (Round 1, 2026-08-11). Tóm tắt những điểm
+chi phối các quyết định trên:
+
+- `package.json` → `"test": "node --test 'test/**/*.test.mjs'"`, không cờ
+  concurrency nào. Node v24.18.0, máy 16 CPU.
+- **Đo trực tiếp** (probe rời, hai file y hệt, mỗi test `execFileSync('sleep',
+  ['2'])`): 1 file / 2 test = **4.07s**; 2 file / 4 test = **4.09s**. Tức
+  song song theo **file** là mặc định, còn trong **một file** thì tuần tự
+  tuyệt đối.
+- Cả hai file dùng `spawnSync`/`execFileSync` (đồng bộ, chặn event loop) —
+  `test/cli/fgos.test.mjs:7,:49,:120-126`; `test/setup/checks.test.mjs:12,:496`.
+  Nên bật `concurrency` của `node:test` cũng vô nghĩa: **song song hoá tại
+  chỗ không tồn tại như một lựa chọn rẻ**, chẻ file là đòn bẩy thật duy nhất.
+- Phải chẻ **cả hai** file mới có lợi thật: wall-clock ≈ max(file), nên chẻ
+  riêng `fgos.test.mjs` chỉ đưa suite 163s → ~109s rồi dừng ở
+  `checks.test.mjs`.
+- `test/architecture.test.mjs` chỉ quét `src/` + `bin/` so với
+  `docs/architecture-manifest.json`; **`test/` nằm ngoài manifest** → tách
+  file test không đụng phép kiểm kiến trúc nào.
+- `test/cli/` đã có tiền lệ tách theo chủ đề (`fgos-help.test.mjs`,
+  `fgos-manifest.test.mjs`, `fgos-tool.test.mjs`,
+  `take-pick-claim-eligibility.test.mjs`) → chẻ là mở rộng quy ước sẵn có.
+- `impact-analysis: full` (`fgos tool query --capability impact-analysis
+  --status present` → gitnexus `present`). Ghi lại cho người đọc sau; không
+  gate gì ở stage này, và gitnexus chỉ index `src/`+`bin/` nên không nói
+  được gì về `test/`.
+
+## Tham chiếu chuẩn
+
+- `docs/history/tsk-516-approve-reverify-scope/CONTEXT.md:46,106` — nguồn của
+  các con số 163.1s / 2827 test, và D2 của item đó (check rộng dùng tập con
+  bất biến rẻ chứ không phải full suite).
+- `docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md` — lớp
+  xanh-giả mà D1 tránh.
+
+## Outstanding questions
+
+None
