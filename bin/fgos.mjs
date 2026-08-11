@@ -1717,6 +1717,27 @@ async function runVerb(verb, flags, positional, dir) {
       // Left untouched by tsk-38t-4 on purpose — Rust code outside this
       // repo's own Node test/build surface is out of that item's scope.
       const rawView = listWork(dir);
+      // tsk-483: generalizes tsk-2u9's own single-id `scopedById` (below,
+      // inside the `--id` branch, left untouched -- already correct) to a
+      // SET of ids, for the default/paginated multi-item paths further
+      // down. Same shapes tsk-2u9 already proved safe: id-keyed dicts
+      // filtered to `{[id]: v[id]}` per matching id; the flat `decisions`
+      // array filtered by `d.id` membership; `tools`/`work`/
+      // `awaitingContext` untouched (not id-keyed, or already correctly
+      // scoped by the caller before this runs).
+      const scopedByIds = (section, idSet) =>
+        section ? Object.fromEntries(Object.entries(section).filter(([id]) => idSet.has(id))) : {};
+      const scopeSideLogsTo = (view, idSet) => ({
+        ...view,
+        decisions: (view.decisions ?? []).filter((d) => idSet.has(d.id)),
+        discovery: scopedByIds(view.discovery, idSet),
+        gates: scopedByIds(view.gates, idSet),
+        settlements: scopedByIds(view.settlements, idSet),
+        outcomes: scopedByIds(view.outcomes, idSet),
+        frictions: scopedByIds(view.frictions, idSet),
+        learnings: scopedByIds(view.learnings, idSet),
+        decisionsById: scopedByIds(view.decisionsById, idSet),
+      });
       // Single-item lookup (tsk-42m D1/D2): `--id` bypasses the open-only
       // default and `--all` entirely -- naming a specific id already
       // commits to that item regardless of status, the same way every
@@ -1822,19 +1843,30 @@ async function runVerb(verb, flags, positional, dir) {
         if (ctx) awaitingContext[item.id] = ctx;
       }
       const base = Object.keys(awaitingContext).length > 0 ? { ...view, awaitingContext } : view;
-      // Pagination (D5/D35): only `work` (the biggest payload, per plan.md's
-      // Discovery) ever changes shape, and only when --cursor/--limit was
-      // actually passed — every other view key (decisions/gates/settlements/
-      // etc.) is untouched. `view.work` is a map keyed by id, so it is
-      // wrapped into `{id, item}` pairs before going through the same
-      // generic `paginate()` every array-returning verb uses, then unwrapped
-      // back into a plain id->item map for the page itself.
+      // Pagination (D5/D35, reopened by tsk-483 -- see docs/history/
+      // tsk-483-list-side-log-pagination-scoping/CONTEXT.md D1): `work`
+      // still drives the actual page slice, but every other view key
+      // (decisions/gates/settlements/etc.) now scopes to the SAME ids
+      // being returned, everywhere except the one protected combination
+      // below. `view.work` is a map keyed by id, so it is wrapped into
+      // `{id, item}` pairs before going through the same generic
+      // `paginate()` every array-returning verb uses, then unwrapped back
+      // into a plain id->item map for the page itself.
       const { cursor, limit } = readPaginationFlags(flags, 'list');
-      if (cursor === undefined && limit === undefined) return base;
+      if (cursor === undefined && limit === undefined) {
+        // tsk-483 D2: the ONE combination that must stay byte-identical --
+        // `herdr-plugin/src/fgos.rs` (confirmed directly, not by comment:
+        // exactly 3 call sites, every one `["list", "--all", "--json"]`
+        // verbatim, never combined with pagination flags, never reading
+        // any of the scoped-away fields) parses exactly this shape.
+        if (showAll) return base;
+        return scopeSideLogsTo(base, new Set(Object.keys(base.work)));
+      }
       const entries = Object.entries(view.work).map(([id, item]) => ({ id, item }));
       const { items: pagedEntries, nextCursor } = paginate(entries, { cursor, limit, order: 'list-work-v1' });
       const workPage = Object.fromEntries(pagedEntries.map(({ id, item }) => [id, item]));
-      return { ...base, work: { items: workPage, nextCursor } };
+      const scoped = scopeSideLogsTo(base, new Set(pagedEntries.map(({ id }) => id)));
+      return { ...scoped, work: { items: workPage, nextCursor } };
     }
 
     // Request-class per D1 (same contract as `list`): a pure read — never

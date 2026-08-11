@@ -2323,16 +2323,78 @@ test('ready --cursor rejects a stale cursor (id no longer in the current frontie
   assert.match(result.stderr, /re-issue the call without --cursor/);
 });
 
-test('list --limit paginates only the work map: view.work becomes {items, nextCursor} while other view keys are untouched', () => {
+test('list --limit paginates work into {items, nextCursor}, AND scopes every other view key to just the paged ids (tsk-483, supersedes D5/D35)', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'list-page-a');
   addOk(cwd, 'list-page-b');
+  assert.equal(run(cwd, ['decision', '--id', 'list-page-a', '--text', 'decision for a', '--rationale', 'r']).status, 0);
+  assert.equal(run(cwd, ['decision', '--id', 'list-page-b', '--text', 'decision for b', '--rationale', 'r']).status, 0);
   const result = run(cwd, ['list', '--limit', '1']);
   assert.equal(result.status, 0);
   const data = envelopeData(result.stdout);
   assert.deepEqual(Object.keys(data.work).sort(), ['items', 'nextCursor']);
-  assert.equal(Object.keys(data.work.items).length, 1);
-  assert.ok(Array.isArray(data.decisions));
+  const pagedIds = Object.keys(data.work.items);
+  assert.equal(pagedIds.length, 1);
+  // tsk-483: decisions now scoped to exactly the ids on THIS page -- the
+  // other item's own decision must not leak through, unlike D5/D35's own
+  // "every other view key untouched" behavior this item supersedes.
+  assert.deepEqual(
+    data.decisions.map((d) => d.id).sort(),
+    pagedIds,
+  );
+});
+
+test('list --all --limit combined: scopes side-logs to the paged ids too -- a combination herdr-plugin never uses (tsk-483 D2)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'list-all-page-a');
+  addOk(cwd, 'list-all-page-b');
+  assert.equal(run(cwd, ['decision', '--id', 'list-all-page-a', '--text', 'decision for a', '--rationale', 'r']).status, 0);
+  assert.equal(run(cwd, ['decision', '--id', 'list-all-page-b', '--text', 'decision for b', '--rationale', 'r']).status, 0);
+  const result = run(cwd, ['list', '--all', '--limit', '1']);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  const pagedIds = Object.keys(data.work.items);
+  assert.equal(pagedIds.length, 1);
+  assert.deepEqual(
+    data.decisions.map((d) => d.id).sort(),
+    pagedIds,
+  );
+});
+
+test('list default (no flags at all) scopes side-logs to only the open (non-done) ids -- a done item\'s own decision must not appear (tsk-483)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'list-default-open');
+  assert.equal(run(cwd, ['decision', '--id', 'list-default-open', '--text', 'decision for open', '--rationale', 'r']).status, 0);
+  toProposed(cwd, 'list-default-done');
+  assert.equal(run(cwd, ['decision', '--id', 'list-default-done', '--text', 'decision for done', '--rationale', 'r']).status, 0);
+  assert.equal(toDoneViaChain(cwd, 'list-default-done').status, 0);
+  const result = run(cwd, ['list']);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  assert.deepEqual(Object.keys(data.work).sort(), ['list-default-open']);
+  assert.deepEqual(data.decisions.map((d) => d.id), ['list-default-open']);
+});
+
+test('list --all --json with NO pagination flags stays byte-identical -- herdr-plugin\'s own protected contract (tsk-483 D2)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'list-protected-open');
+  assert.equal(run(cwd, ['decision', '--id', 'list-protected-open', '--text', 'decision for open', '--rationale', 'r']).status, 0);
+  toProposed(cwd, 'list-protected-done');
+  assert.equal(run(cwd, ['decision', '--id', 'list-protected-done', '--text', 'decision for done', '--rationale', 'r']).status, 0);
+  assert.equal(toDoneViaChain(cwd, 'list-protected-done').status, 0);
+  const result = run(cwd, ['list', '--all', '--json']);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  // Both items' work rows present (D1: --all restores done items).
+  assert.deepEqual(Object.keys(data.work).sort(), ['list-protected-done', 'list-protected-open']);
+  // Both decisions present, UNSCOPED -- this exact combination must never
+  // gain tsk-483's new scoping, matching herdr-plugin's own real,
+  // vendored call sites (herdr-plugin/src/fgos.rs, confirmed directly:
+  // every one of its 3 call sites is exactly ["list", "--all", "--json"]).
+  assert.deepEqual(
+    data.decisions.map((d) => d.id).sort(),
+    ['list-protected-done', 'list-protected-open'],
+  );
 });
 
 // --- `fgos check` (phase-3-compound-learning-3): predicted-vs-actual report ---
