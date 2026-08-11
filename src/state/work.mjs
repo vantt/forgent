@@ -419,7 +419,7 @@ export function validateWorkShape(work, touchedFields) {
     );
   }
   // Effort (per work-item-priority-matrix D5): OPTIONAL additive number,
-  // computed at decompose from fgos-planning's own mode/flag-count — never
+  // computed at decompose from fgos-coding-planning's own mode/flag-count — never
   // human-entered directly. Same non-negative-number shape as impact;
   // absent stays absent.
   if (touched('effort') && work.effort !== undefined && !(typeof work.effort === 'number' && Number.isFinite(work.effort) && work.effort >= 0)) {

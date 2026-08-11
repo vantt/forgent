@@ -5,9 +5,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 // tsk-5iv D4 (round-3 review, MEDIUM): tsk-59a's own `fgos add` example in
-// fgos-exploring/SKILL.md used `--dir "$root"` with no `root=` assignment
+// fgos-coding-exploring/SKILL.md used `--dir "$root"` with no `root=` assignment
 // anywhere in that fenced code block — the exact bare-`$root` defect that
-// same commit fixed next door in fgos-planning/SKILL.md. Proves the
+// same commit fixed next door in fgos-coding-planning/SKILL.md. Proves the
 // assignment now lives INSIDE the same fenced block as the `fgos add`
 // call (copy-pasting just that block must actually run), not merely
 // somewhere earlier in the file — `test/skills/fgos-mirror.test.mjs`
@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 // only needs to check one of them.
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const SKILL_PATH = path.resolve(__dirname, '../../.claude/skills/fgos-exploring/SKILL.md');
+const SKILL_PATH = path.resolve(__dirname, '../../.claude/skills/fgos-coding-exploring/SKILL.md');
 const skillText = fs.readFileSync(SKILL_PATH, 'utf8');
 
 function fencedBlockContaining(marker) {
@@ -27,7 +27,7 @@ function fencedBlockContaining(marker) {
   return skillText.slice(blockStart, blockEnd);
 }
 
-test('fgos-exploring\'s "fgos add" example resolves $root inside the SAME fenced block, not just earlier in the file', () => {
+test('fgos-coding-exploring\'s "fgos add" example resolves $root inside the SAME fenced block, not just earlier in the file', () => {
   const block = fencedBlockContaining('fgos add --title');
   assert.match(
     block,

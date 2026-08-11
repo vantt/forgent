@@ -1,51 +1,55 @@
 ---
-name: decompose
+name: plan
 description: >-
   Use when the user wants to advance one fgOS work item past stage
-  decompose, from inside a Claude Code session, invoked as /fgOS:decompose
-  <id>. Claims the item if needed, then dispatches it through
-  fgos-coding-driving so the live session does its own real shaping and
-  reality-check reasoning (fgos-planning/fgos-validating) and supplies the
-  decompose verb's verdict itself (one-door-write) — never writes .fgos/
-  state directly, and never re-derives a judgment blind. For an item at
-  stage clarify, use /fgOS:discover instead. Examples: "/fgOS:decompose
-  build-cli", "/fgOS:decompose tsk-3wd".
+  planning (or its legacy alias, decompose), from inside a Claude Code
+  session, invoked as /fgOS:plan <id>. Claims the item if needed, then
+  dispatches it through fgos-coding-driving so the live session does its
+  own real shaping and reality-check reasoning
+  (fgos-coding-planning/fgos-coding-validating) and supplies the plan
+  verb's verdict itself (one-door-write) — never writes .fgos/ state
+  directly, and never re-derives a judgment blind. For an item at stage
+  clarify, use /fgOS:discover instead. Examples: "/fgOS:plan build-cli",
+  "/fgOS:plan tsk-3wd".
 ---
 
-# fgOS decompose
+# fgOS plan
 
 Claims a work item (if not already claimed) and dispatches it through
 `fgos-coding-driving` so a person working inside Claude Code can advance it
-past `decompose` without hand-typing the CLI. This is a real judgment call,
-not a mechanical read: the live session itself reads the item's full
-context (title/description/verify/refs/deps, plus any locked
+past `planning` (renamed from `decompose`, tsk-403 D11 — `decompose`
+survives only as a legacy, drain-only stage alias, D18) without
+hand-typing the CLI. This is a real judgment call, not a mechanical read:
+the live session itself reads the item's full context
+(title/description/verify/refs/deps, plus any locked
 `CONTEXT.md`/`plan.md`), shapes and reality-checks it
-(`fgos-planning`/`fgos-validating`'s own flow), and supplies that verdict
-to the `decompose` engine verb directly — instead of leaving the judgment
-to a later, context-blind subprocess call. Either way the item passes
-through to `executing`, splits into children, or parks in `awaiting-human`
-with a proposal. One-door-write, CTR001 — never writes `.fgos/` state
-directly (`docs/history/discover-decompose-skill-wrapper-verdict-routing/
-CONTEXT.md` D1).
+(`fgos-coding-planning`/`fgos-coding-validating`'s own flow), and supplies
+that verdict to the `plan` engine verb directly — instead of leaving the
+judgment to a later, context-blind subprocess call. Either way the item
+passes through to `executing`, splits into children, or parks in
+`awaiting-human` with a proposal. One-door-write, CTR001 — never writes
+`.fgos/` state directly (`docs/history/discover-decompose-skill-wrapper-
+verdict-routing/CONTEXT.md` D1).
 
-tsk-2b0 D1 (hard split, no fallback): `decompose` is the sibling of
-`discover` created by splitting the old dual-purpose verb — it only ever
-runs split-work judgment for a `decompose`-stage item. Use `/fgOS:discover
-<id>` for a `clarify`-stage item instead; `decompose` errors if called on
-an item that isn't at stage `decompose`.
+tsk-2b0 D1 (hard split, no fallback): `plan` is the sibling of `discover`
+created by splitting the old dual-purpose verb — it only ever runs
+split-work judgment for an item at stage `planning` (or the legacy
+`decompose` alias). Use `/fgOS:discover <id>` for a `clarify`-stage item
+instead; `plan` errors if called on an item that isn't at one of those two
+stages.
 
 ## Steps
 
 1. **Read the required id argument.** `$ARGUMENTS` is the work item's id —
-   `decompose` requires it. Pass it straight through to the verb in step 2
-   — do not validate or guess it yourself; if it is missing or unknown,
-   let the CLI's own error surface verbatim.
+   `plan` requires it. Pass it straight through to the verb in step 2 —
+   do not validate or guess it yourself; if it is missing or unknown, let
+   the CLI's own error surface verbatim.
 
    If `$ARGUMENTS` is empty, show the user the CLI's own usage string and
    stop:
 
    ```
-   fgos decompose <id>
+   fgos plan <id>
    ```
 
 2. **Claim if not already claimed.** Resolve the main checkout root (every
@@ -111,28 +115,29 @@ an item that isn't at stage `decompose`.
 
 3. **Dispatch through `fgos-coding-driving`.** Invoke the
    `fgos-coding-driving` skill for `$ARGUMENTS` with `ceiling:
-   stage:executing`. Never invoke `fgos-planning`/`fgos-validating` (or
-   any other stage-skill) by name directly here — the driver resolves
-   which skill a `decompose`-stage item maps to through its own registry
-   lookup, the one place that mapping is allowed to live
-   (`fgos-coding-driving`'s own red-flag rule against a caller inventing a
-   stage-to-skill mapping). The ceiling stops the loop the instant the
-   item's stage reaches `executing` — it never lets the loop drift onward
-   into `fgos-code-implement` (a real build) in the same call
-   (`docs/history/discover-decompose-skill-wrapper-verdict-routing/
-   CONTEXT.md` D1, D6). A real split (a `decompose` verdict with real
+   stage:executing`. Never invoke `fgos-coding-planning`/`fgos-coding-
+   validating` (or any other stage-skill) by name directly here — the
+   driver resolves which skill a `planning`-stage item (or the legacy
+   `decompose` alias) maps to through its own registry lookup, the one
+   place that mapping is allowed to live (`fgos-coding-driving`'s own
+   red-flag rule against a caller inventing a stage-to-skill mapping). The
+   ceiling stops the loop the instant the item's stage reaches `executing`
+   — it never lets the loop drift onward into `fgos-coding-implement` (a
+   real build) in the same call (`docs/history/discover-decompose-skill-
+   wrapper-verdict-routing/CONTEXT.md` D1, D6). A real split (a
+   `decompose` verdict — the value name is unchanged, D11 — with real
    children) instead anchors the item by its own open children before the
    ceiling is ever reached — the driving loop's own anchor stop, see step
    4. The live session doing the real shaping/reality-check reasoning
-   inside `fgos-planning`/`fgos-validating` is what supplies the
-   `decompose` engine verb its `--verdict` directly — no context-blind
+   inside `fgos-coding-planning`/`fgos-coding-validating` is what supplies
+   the `plan` engine verb its `--verdict` directly — no context-blind
    subprocess judge runs for this call.
 
 4. **Report whatever `fgos-coding-driving` reported.** Relay its stop
    reason exactly; do not add a separate report of your own beyond it:
 
    - **reached ceiling at stage `executing`** — the item passed through
-     `decompose` (`pass-through`/`noop`), keeping its existing verify;
+     `planning` (`pass-through`/`noop`), keeping its existing verify;
      tell the user the item is ready to build (`/fgOS:pick <id>` or an
      execution sweep picks it up next).
    - **anchored by open children** — the item split into real children;

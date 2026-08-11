@@ -244,7 +244,7 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
         // (status-fsm.mjs:216-232 scopes it to exactly three unrelated
         // edges) — the evidence trail (D2c) is the `addDecision` call
         // below instead, the same `kind: 'engine'` mechanism
-        // `resolveDiscovery`/`resolveDecompose` already use for their own
+        // `resolveDiscovery`/`resolvePlan` already use for their own
         // mechanical audit entries.
         moveWork(dir, { id, to: 'todo', expectedStatus: 'doing' });
         const activityAt = lastActivityAt(repoRoot, id);

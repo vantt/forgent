@@ -25,7 +25,7 @@ import { loadRunnerConfig, ensureRunnerConfigForDir } from '../src/runner/dispat
 import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
 import { resolveFgosDir, fgosDirFromRoot } from '../src/runner/paths.mjs';
 import { resolveDiscovery, discoverableStages } from '../src/intake/discovery.mjs';
-import { resolveDecompose } from '../src/intake/decompose.mjs';
+import { resolvePlan } from '../src/intake/plan.mjs';
 import { computeEntropy, computeCounts, FINAL_STATUSES } from '../src/report/entropy.mjs';
 import { findSourceCaptureIds } from '../src/report/enduser-index.mjs';
 import { generateEnduserDocsIndex } from '../src/report/enduser-index-generate.mjs';
@@ -394,46 +394,48 @@ function parseDiscoverCallerVerdict(flags) {
   throw new StoreError('validation', `discover --verdict must be "clear" or "unclear" (got "${flags.verdict}").`);
 }
 
-// tsk-27y D1/D2: `--verdict` on `decompose`, same shape one stage over --
-// lets a live session that already reasoned about split-work
-// (fgos-planning) pass its own verdict directly, skipping resolveDecompose's
-// judgeDecompose subprocess call for this one invocation. Omitting
-// `--verdict` entirely leaves `callerVerdict` undefined -- byte-identical to
-// before this item. `--children` reuses parseAcceptanceFlag (same
-// JSON-encoded-array shape `submit --acceptance` already established) --
-// each element matches judgeDecompose's own child shape (title/verify
-// required; kind/risk/refs/footprint/deps optional), validated downstream
-// by the same `normalizeChild` a model-produced verdict goes through
-// (`resolveCallerDecomposeVerdict`, decompose.mjs).
-function parseDecomposeCallerVerdict(flags) {
+// tsk-27y D1/D2: `--verdict` on `plan` (renamed from `decompose`, tsk-403
+// D11 — the VALUES `pass-through`/`need-human`/`decompose` stay unchanged,
+// only the verb name changes), same shape one stage over -- lets a live
+// session that already reasoned about split-work (fgos-coding-planning)
+// pass its own verdict directly, skipping resolvePlan's retired subprocess
+// judge for this one invocation. Omitting `--verdict` entirely leaves
+// `callerVerdict` undefined -- byte-identical to before this item.
+// `--children` reuses parseAcceptanceFlag (same JSON-encoded-array shape
+// `submit --acceptance` already established) -- each element matches the
+// same child shape (title/verify required; kind/risk/refs/footprint/deps
+// optional) the retired judge used to produce, validated downstream by the
+// same `normalizeChild` a model-produced verdict goes through
+// (`resolveCallerPlanVerdict`, plan.mjs).
+function parsePlanCallerVerdict(flags) {
   if (flags.verdict === undefined) return undefined;
   if (flags.verdict === 'pass-through') {
-    return { verdict: 'pass-through', reason: optionalField(flags.reason, 'decompose --verdict pass-through --reason requires a non-empty value when passed') };
+    return { verdict: 'pass-through', reason: optionalField(flags.reason, 'plan --verdict pass-through --reason requires a non-empty value when passed') };
   }
   if (flags.verdict === 'need-human') {
-    return { verdict: 'need-human', reason: requireField(flags.reason, 'decompose --verdict need-human requires --reason "<text>"') };
+    return { verdict: 'need-human', reason: requireField(flags.reason, 'plan --verdict need-human requires --reason "<text>"') };
   }
   if (flags.verdict === 'decompose') {
     const childrenMessage =
-      'decompose --verdict decompose requires --children, a JSON-encoded array of child objects ({title, verify, kind?, risk?, refs?, footprint?, deps?})';
+      'plan --verdict decompose requires --children, a JSON-encoded array of child objects ({title, verify, kind?, risk?, refs?, footprint?, deps?})';
     const children = parseAcceptanceFlag(flags.children, childrenMessage);
     if (children === undefined) {
       throw new StoreError('validation', childrenMessage);
     }
     const verdict = {
       verdict: 'decompose',
-      reason: requireField(flags.reason, 'decompose --verdict decompose requires --reason "<text>"'),
+      reason: requireField(flags.reason, 'plan --verdict decompose requires --reason "<text>"'),
       children,
     };
     // tsk-25g D2: mirrors discover's --force (tsk-5cf D1b) -- only ever
     // means something on the per-child second-pass verify dispute path
-    // (resolveDecompose's disputedChild branch), silently a no-op on
+    // (resolvePlan's disputedChild branch), silently a no-op on
     // pass-through/need-human the same way discover's --force is a
     // no-op on the unclear branch.
     if (flags.force) verdict.force = true;
     return verdict;
   }
-  throw new StoreError('validation', `decompose --verdict must be "pass-through", "need-human", or "decompose" (got "${flags.verdict}").`);
+  throw new StoreError('validation', `plan --verdict must be "pass-through", "need-human", or "decompose" (got "${flags.verdict}").`);
 }
 
 // Pagination opt-in (str46-io-contract D5/D35): `ready`/`triage`/`evolve`
@@ -1210,27 +1212,40 @@ async function runVerb(verb, flags, positional, dir) {
 
     // The sync branch's entry point into chia-việc/split-work judgment
     // (tsk-2b0 D1: hard split, no fallback — this verb only ever wraps
-    // `resolveDecompose`/`judgeDecompose`, for an item at stage
-    // `decompose`). A live session runs the SAME engine the async runner
-    // sweep calls (D3's sync/async parity: identical trace either way, only
-    // the role differs). `resolveDecompose` either passes the item through
-    // to `executing`, splits it into children, or parks it in
+    // `resolvePlan` (renamed from `resolveDecompose`, tsk-403 D11 —
+    // `judgeDecompose` is long retired, no subprocess judge left to wrap),
+    // for an item at stage `planning` (or the legacy `decompose` alias,
+    // D18). A live session runs the SAME engine the async runner sweep
+    // calls (D3's sync/async parity: identical trace either way, only the
+    // role differs). `resolvePlan` either passes the item through to
+    // `executing`, splits it into children, or parks it in
     // `awaiting-human` (D3).
-    case 'decompose': {
-      const id = requireField(positional[0] ?? flags.id, 'decompose requires an id: fgos decompose <id> [--config <path>]');
+    case 'plan': {
+      const id = requireField(positional[0] ?? flags.id, 'plan requires an id: fgos plan <id> [--config <path>]');
       const work = listWork(dir).work[id];
       const stage = work?.stage;
-      const decomposeStage = stageForStep(getDomain(work?.domain, { onUnrecognized: () => {} }), 'Divide');
-      if (stage !== decomposeStage) {
-        throw new StoreError('validation', `decompose: work "${id}" is at stage "${stage}", not "${decomposeStage}" -- use "fgos discover ${id}" instead.`);
+      const domain = getDomain(work?.domain, { onUnrecognized: () => {} });
+      const planningStage = stageForStep(domain, 'Divide');
+      // tsk-403 D18: `decompose` is coding's own drain-only legacy alias
+      // for this same step -- still legal for an item that reached it
+      // before the rename (kept legal in this domain's own `stages`/
+      // `transitions`), even though `stageForStep` no longer resolves a
+      // NEW item there. Only activates when a domain actually declares
+      // both names distinctly (today: only `coding`) -- a domain that
+      // never had this rename (e.g. the `decompose`-native fixture
+      // domains) has `planningStage === 'decompose'` already, so this
+      // stays a no-op for them.
+      const legacyPlanStage = domain.stages?.includes('decompose') && planningStage !== 'decompose' ? 'decompose' : undefined;
+      if (stage !== planningStage && stage !== legacyPlanStage) {
+        throw new StoreError('validation', `plan: work "${id}" is at stage "${stage}", not "${planningStage}"${legacyPlanStage ? ` (or legacy "${legacyPlanStage}")` : ''} -- use "fgos discover ${id}" instead.`);
       }
       // path.dirname(dir), not process.cwd() -- see the discover case above
       // for why (tsk-5hv, found by fgos-code-implement).
       const cfg = flags.config
         ? loadRunnerConfig(flags.config)
         : ensureRunnerConfigForDir(path.dirname(dir));
-      const callerVerdict = parseDecomposeCallerVerdict(flags);
-      return resolveDecompose(dir, id, cfg, 'session', callerVerdict);
+      const callerVerdict = parsePlanCallerVerdict(flags);
+      return resolvePlan(dir, id, cfg, 'session', callerVerdict);
     }
 
     case 'move': {

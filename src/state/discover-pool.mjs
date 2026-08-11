@@ -18,7 +18,13 @@ import { isDepsAndLineageReady } from './frontier.mjs';
 // item's own footprint fires those new transitions either), so this only
 // widens coverage for whenever something later does.
 const CLARIFY_SHAPED_STAGES = new Set(['clarify', 'discovery', 'exploring']);
-const CANDIDATE_STAGES = new Set([...CLARIFY_SHAPED_STAGES, 'decompose']);
+// tsk-403 D11/D18: `decompose` renamed to `planning` -- both stage names
+// stay candidates, since `decompose` survives as a legacy, drain-only
+// alias (workflow-stage-graphs.mjs) for items that reached it before the
+// rename. Omitting `decompose` here would make this pool blind to those
+// items forever; omitting `planning` would make it blind to every NEW
+// item instead (nothing lands on literal `decompose` anymore).
+const CANDIDATE_STAGES = new Set([...CLARIFY_SHAPED_STAGES, 'decompose', 'planning']);
 
 function isCandidate(item, view) {
   return (
@@ -91,7 +97,12 @@ export function pickNextDiscoverItem(view) {
 
   if (decompose.length > 0) {
     decompose.sort(compareDecomposeOrder);
-    return { id: decompose[0].id, stage: 'decompose' };
+    // tsk-403 D18: report the item's OWN real stage, never a hardcoded
+    // literal -- this bucket now mixes `planning` (new items) and the
+    // legacy `decompose` alias (items that reached it before the rename),
+    // and the caller's own ceiling logic (`/fgOS:discover-next`) branches
+    // on this exact string.
+    return { id: decompose[0].id, stage: decompose[0].stage };
   }
 
   return null;

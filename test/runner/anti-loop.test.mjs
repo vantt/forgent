@@ -103,7 +103,7 @@ test('visitCount counts the doing-move once the item has actually reached stage 
     move('a', 'doing', 2), // pick at clarify — excluded
     move('a', 'todo', 3), // release
     stageMove('a', 'decompose', 4),
-    stageMove('a', 'executing', 5), // resolveDecompose's own moveStage
+    stageMove('a', 'executing', 5), // resolvePlan's own moveStage
     move('a', 'doing', 6), // pick at executing — the real first dispatch
   ];
   assert.equal(visitCount(events, 'a'), 1);

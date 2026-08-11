@@ -305,7 +305,7 @@ export function reclaimOrphanedCheckout(repoRoot, branch, { callerCwd = process.
  * the source under an existing directory instead of placing it there —
  * verified empirically against this repo's own git (2.34.1), recorded in
  * `docs/history/pick-worktree-reclaim-zero-destroy/plan.md`'s "Validated
- * at fgos-validating" section — so the caller's own `mkdtemp`'d empty
+ * at fgos-coding-validating" section — so the caller's own `mkdtemp`'d empty
  * placeholder directory must be removed immediately before this call, not
  * reused as-is.
  */

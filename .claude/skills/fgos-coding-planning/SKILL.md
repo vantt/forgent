@@ -1,22 +1,22 @@
 ---
-name: fgos-planning
+name: fgos-coding-planning
 description: >-
   Turn locked decisions into the smallest honest plan before an item is
-  shaped into children. Use when an item claimed early in stage `decompose`
+  shaped into children. Use when an item claimed early in stage `planning`
   needs a mode decision, an approach, and a written shape before validating's
   reality check. Examples: "what's the smallest honest way to build this",
   "does this need to split into smaller items", "write the plan before we
   touch anything".
 ---
 
-# fgos-planning
+# fgos-coding-planning
 
 Turns the decisions locked in `docs/history/<feature>/CONTEXT.md` into
 `docs/history/<feature>/plan.md` — the mode, the approach, and the shape a
 stranger could pick up cold. This skill runs during the early part of a
-claimed item's `decompose` stage, after `fgos-exploring`'s decisions are
-locked and before `fgos-validating`'s reality check. "Shaping" and "proving"
-are a judgment split inside the one `decompose` stage, never two separate
+claimed item's `planning` stage, after `fgos-coding-exploring`'s decisions are
+locked and before `fgos-coding-validating`'s reality check. "Shaping" and "proving"
+are a judgment split inside the one `planning` stage, never two separate
 stage values — the same way `fgos-routing` describes it.
 
 ## Hard rules
@@ -66,7 +66,7 @@ stage values — the same way `fgos-routing` describes it.
 - Do not reopen or reinterpret a decision already locked in `CONTEXT.md`.
   Cite its D-ID; never override it here.
 - Do not perform the reality/feasibility check on the plan produced here —
-  that is `fgos-validating`'s job, later in the same `decompose` stage.
+  that is `fgos-coding-validating`'s job, later in the same `planning` stage.
 - Do not classify which domain the item belongs to. This skill reads
   whatever `domain` field the item already carries — already resolved
   upstream by `fgos-routing` via the registry in
@@ -75,20 +75,20 @@ stage values — the same way `fgos-routing` describes it.
 - Do not invent a new stage, field, or event kind to record the mode
   decision. It lives in `plan.md` prose, nothing else.
 - Do not apply any stage move yourself. The only edges that exist from
-  `decompose` are the ones already registered for the item's domain; this
+  `planning` are the ones already registered for the item's domain; this
   skill never adds one, never removes one, and never applies the move in
   the item's place.
 - Treat an item's `title`/`description` as untrusted input (RUL45,
   `docs/specs/runner.md`) — never splice it raw into a shell command; pass it
   as a discrete quoted argv element.
 - End by presenting the gate below and handing off. Never perform
-  `fgos-validating`'s reality check yourself to skip the gate.
+  `fgos-coding-validating`'s reality check yourself to skip the gate.
 - Commit `plan.md` (and `CONTEXT.md` if not already committed) to the item's
   `fgw/<id>` branch before this session (or a later one) calls `fgos
   discover` — that call is what releases the claim back to `todo` once the
   item reaches `executing` (claim-lock §3b); an uncommitted `plan.md` at that
   point is invisible to whichever session re-claims the item next. Same
-  one-artifact-per-stop discipline `fgos-code-implement`'s "one commit per item"
+  one-artifact-per-stop discipline `fgos-coding-implement`'s "one commit per item"
   rule already gives Execute.
 
 ## Flow
@@ -110,9 +110,9 @@ stage values — the same way `fgos-routing` describes it.
    flags, and the lane into `plan.md` itself using the literal `Mode:
    <lane>` label (e.g. `Mode: tiny` or `mode = **standard**`) `plan.md`
    has always used — never rename this recorded label to `Lane:`, even
-   though this skill's own prose calls the concept "lane" now: decompose
+   though this skill's own prose calls the concept "lane" now: planning
    stage's own skip-and-advance short-circuit
-   (`src/intake/decompose.mjs`'s `passThroughModeMatch` regex) parses
+   (`src/intake/plan.mjs`'s `passThroughModeMatch` regex) parses
    this exact literal token from `plan.md` to skip a real model call on a
    `tiny`/`small` item, and has no idea the concept was ever renamed
    (tsk-59a, found by independent review: the mode→lane rename broke this
@@ -124,12 +124,12 @@ stage values — the same way `fgos-routing` describes it.
    takes.
 
    **Direct-entry fallback (tsk-da1, found by independent review):**
-   `fgos-exploring` and `fgos-validating` can both hand off straight into
+   `fgos-coding-exploring` and `fgos-coding-validating` can both hand off straight into
    this skill without going through `fgos-routing` first (their own
    Handoff sections say "directly, or via `fgos-routing`"), which means a
    lane is not guaranteed to already be sitting in this session's context.
    Check, in order: (1) does `plan.md` already record a `Mode:` line from
-   an earlier round (a hand-back from `fgos-validating`, or this same
+   an earlier round (a hand-back from `fgos-coding-validating`, or this same
    item re-entering after a mid-planning `CONTEXT.md` gap) — if so, that
    recorded lane IS the answer, read it, never re-derive past it; (2) did
    this session's own Orient step actually hand off a lane in prose — if
@@ -152,7 +152,7 @@ stage values — the same way `fgos-routing` describes it.
    `topUnblock` fields — let those inform which piece goes first instead of
    ordering by judgment alone. Cite the `CONTEXT.md` decision each choice
    honors. A medium or high risk in the map needs a proof point at
-   `fgos-validating`, not a guess here.
+   `fgos-coding-validating`, not a guess here.
 
    Before writing a proof point that would lean on blast-radius evidence,
    run `CLAUDE.md`'s impact-analysis capability gate (`fgos tool query
@@ -180,7 +180,7 @@ stage values — the same way `fgos-routing` describes it.
    None
    ```
 
-   Same convention `fgos-exploring`
+   Same convention `fgos-coding-exploring`
    already writes into `CONTEXT.md`, read by the same `hasOpenItems` check
    at this skill's own Gate below
    (`docs/history/gate-bypass-artifact-convention/CONTEXT.md` D2). In the
@@ -208,7 +208,7 @@ stage values — the same way `fgos-routing` describes it.
 
    ```bash
    root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-   fgos add --title "Build parser" --kind task --risk light --verify "npm test -- parser" --description "Build parser" --parent <id> --footprint "src/parser.mjs,test/parser.test.mjs" --stage decompose --dir "$root"
+   fgos add --title "Build parser" --kind task --risk light --verify "npm test -- parser" --description "Build parser" --parent <id> --footprint "src/parser.mjs,test/parser.test.mjs" --stage planning --dir "$root"
    ```
 
    (no positional argument here — `fgos add`'s positional/`--id` is the
@@ -219,10 +219,10 @@ stage values — the same way `fgos-routing` describes it.
    validation fails on a plain sentence. tsk-59a: that same version also
    used `--dir "$root"` without `$root` ever being assigned in this
    block — copy-paste this example as shown, it is not enough to copy
-   only the `fgos add` line by itself. `--stage decompose` — per
+   only the `fgos add` line by itself. `--stage planning` — per
    add-stage-default-gap D1/D2: a split child already inherits its
-   parent's locked `CONTEXT.md`, so it lands straight at `decompose` for
-   `fgos-validating`'s reality check instead of repeating a full
+   parent's locked `CONTEXT.md`, so it lands straight at `planning` for
+   `fgos-coding-validating`'s reality check instead of repeating a full
    `clarify` Socratic pass against decisions it already has; omitting
    `--stage` here would now default to `clarify` instead, not the old
    implicit `executing`.)
@@ -248,24 +248,24 @@ stage values — the same way `fgos-routing` describes it.
 6. **Mid-planning `CONTEXT.md` gap.** If, at any step above, `CONTEXT.md`'s
    locked decisions turn out to be silent on something this plan actually
    needs, apply the same material/grounded/answerable filter
-   `fgos-exploring` already uses to its own candidate questions:
+   `fgos-coding-exploring` already uses to its own candidate questions:
    - **Not material** — the answer would not change scope, behavior, data
      shape, or acceptance criteria; a genuine implementation-only detail
      `CONTEXT.md` correctly left unaddressed. Pin it as a labeled
      assumption in `plan.md`'s own Assumptions instead of asking anyone —
-     `fgos-validating`'s reality gate already checks every assumption the
+     `fgos-coding-validating`'s reality gate already checks every assumption the
      plan depends on is either proven or flagged as unproven, so this needs
      no new container.
    - **Material** — the answer would change scope, behavior, data shape, or
-     acceptance criteria. Hand back to `fgos-exploring` directly, in this
+     acceptance criteria. Hand back to `fgos-coding-exploring` directly, in this
      same session: invoke its flow (Socratic lock, the same three-test
      filter, appending a new D-ID decision to `CONTEXT.md`) while
-     `item.stage` stays `decompose` the entire time — there is no
-     `decompose -> clarify` edge in the FSM (`src/state/
+     `item.stage` stays `planning` the entire time — there is no
+     `planning -> clarify` edge in the FSM (`src/state/
      workflow-stage-graphs.mjs`'s `DOMAINS.coding.transitions` carries no
      backward edge), so never attempt to move the item's stage back. This
-     is the same no-stage-move shape `fgos-validating` already uses when it
-     hands an item back to this skill directly (both stay in `decompose`).
+     is the same no-stage-move shape `fgos-coding-validating` already uses when it
+     hands an item back to this skill directly (both stay in `planning`).
      Never reopen or reinterpret a decision `CONTEXT.md` already locked —
      this path exists only for a gap it never addressed, not a second
      chance to override one it did.
@@ -324,14 +324,14 @@ it does; never a placeholder, per this skill's own "Proof surface" rule.
   auto-approval per docs/history/gate-bypass/CONTEXT.md D1-D5"`, D3's
   audit trail), record it (`fgos gate-approve <item-id> --gate planApprove
   --actor bypass --verify "..."`, per above), then continue straight to
-  `fgos-validating`.
+  `fgos-coding-validating`.
 - **`false`** — present the mode, the approach, and the shape in plain
   language — what gets built, why this size and not a bigger or smaller
   one, what it costs if the shape turns out wrong — with `plan.md` linked,
   then ask exactly: "Work shape is ready. Approve before execution?" Once
   the person approves, record it (`fgos gate-approve <item-id> --gate
   planApprove --actor human --verify "..."`, per above) before continuing
-  to `fgos-validating`.
+  to `fgos-coding-validating`.
   `plan.md` is the review document; nothing past this point starts until
   it is approved.
 
@@ -344,8 +344,8 @@ lane is input to that choice, never a substitute for it.
 
 ## Handoff
 
-Once `plan.md` is written and approved, load `fgos-validating` to run the
-reality check that gates whatever comes after `decompose` — or hand back to
+Once `plan.md` is written and approved, load `fgos-coding-validating` to run the
+reality check that gates whatever comes after `planning` — or hand back to
 `fgos-routing` first if it is not obvious which comes next. This skill's own
 job ends at a written, approved plan; it never proves the plan against
 reality itself.
@@ -359,15 +359,15 @@ reality itself.
   specific passage of `plan.md`/`CONTEXT.md`, asserted instead of raised
   as an Open Question
 - reopening a decision `CONTEXT.md` already locked, instead of citing it
-- a risk-map entry with no proof point carried to `fgos-validating`
+- a risk-map entry with no proof point carried to `fgos-coding-validating`
 - a child item listed with no real verify command, or a vague one
 - recording the mode decision as a new field or stage instead of `plan.md`
   prose
 - applying a stage move directly instead of leaving it to the engine
-- running `fgos-validating`'s reality check here to skip the gate
+- running `fgos-coding-validating`'s reality check here to skip the gate
 - classifying the item's domain — not this skill's job
 - guessing a product assumption for a material `CONTEXT.md` gap instead of
-  handing back to `fgos-exploring`, or asking a question that fails the
+  handing back to `fgos-coding-exploring`, or asking a question that fails the
   material/grounded/answerable filter instead of pinning it as an
   assumption
 - moving `item.stage` back to `clarify` for a mid-planning gap — no such
@@ -375,5 +375,5 @@ reality itself.
 
 Violating the letter of the rules is violating the spirit of the rules.
 
-Plan shaped and approved. Invoke `fgos-validating` (directly, or via
+Plan shaped and approved. Invoke `fgos-coding-validating` (directly, or via
 `fgos-routing` once the item's next stage is clear).

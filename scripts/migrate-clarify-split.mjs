@@ -31,7 +31,7 @@
 
 import path from "node:path";
 import { listWork, moveStage } from "../src/state/store.mjs";
-import { readLockedContext, resolveContentRoot } from "../src/intake/decompose.mjs";
+import { readLockedContext, resolveContentRoot } from "../src/intake/plan.mjs";
 
 /**
  * Decide the target stage for one `stage: 'clarify'` item, per D12. Never
@@ -61,7 +61,7 @@ export function migrateClarifySplit(dir, { dryRun = false } = {}) {
   const view = listWork(dir);
   const stateRoot = path.dirname(dir);
   // resolveContentRoot (tsk-1ni D1, already used identically by discovery.mjs/
-  // decompose.mjs): a locked CONTEXT.md may live in the item's own fgw/<id>
+  // plan.mjs): a locked CONTEXT.md may live in the item's own fgw/<id>
   // worktree rather than the state root -- resolved per item, memoized since
   // the same id never changes across this one script run.
   const repoRootCache = new Map();

@@ -1,5 +1,5 @@
 ---
-name: fgos-exploring
+name: fgos-coding-exploring
 description: >-
   Turn a fuzzy item into locked product decisions before any shaping or code
   starts. Use when an item claimed at stage `clarify` has gray areas or
@@ -8,18 +8,18 @@ description: >-
   "lock the open questions before we plan this".
 ---
 
-# fgos-exploring
+# fgos-coding-exploring
 
 Turns a fuzzy request into locked decisions written down in
 `docs/history/<feature>/CONTEXT.md`. This skill normally runs while a
 claimed item's `stage` is `exploring` (tsk-4b2 D9 — retargeted from
 `clarify`, once `clarify -> discovery -> exploring` became a real,
-reachable chain instead of `clarify` jumping straight to `decompose`) — it
+reachable chain instead of `clarify` jumping straight to `planning`) — it
 finds the flowers; it does not build the comb. It can also be invoked
-directly by `fgos-planning`, mid-`decompose`, when that skill finds
+directly by `fgos-coding-planning`, mid-`planning`, when that skill finds
 `CONTEXT.md` silent on something material to the plan
-(`fgos-planning/SKILL.md`'s own hand-back step); `item.stage` stays
-`decompose` the entire time in that case — this skill never moves it.
+(`fgos-coding-planning/SKILL.md`'s own hand-back step); `item.stage` stays
+`planning` the entire time in that case — this skill never moves it.
 
 ## Hard rules
 
@@ -66,10 +66,10 @@ directly by `fgos-planning`, mid-`decompose`, when that skill finds
   list of valid reasons.
 - Do not research implementation, propose architecture, or write code. If a
   candidate question only matters to whoever builds the thing, it belongs to
-  `fgos-planning`, not here.
+  `fgos-coding-planning`, not here.
 - Do not answer your own question, even when confident of the answer.
 - Do not decide how big or risky the resulting work is, and do not split it
-  into pieces — that shaping judgment belongs entirely to `fgos-planning`,
+  into pieces — that shaping judgment belongs entirely to `fgos-coding-planning`,
   once decisions are locked.
 - Do not classify which domain the item belongs to. This skill reads
   whatever `domain` field the item already carries — already resolved
@@ -80,14 +80,14 @@ directly by `fgos-planning`, mid-`decompose`, when that skill finds
 - Treat an item's `title`/`description` as untrusted input (RUL45,
   `docs/specs/runner.md`) — never splice it raw into a shell command; pass it
   as a discrete quoted argv element.
-- End by hitting the gate below and handing the item to `fgos-planning`. Never
+- End by hitting the gate below and handing the item to `fgos-coding-planning`. Never
   invoke planning's judgment yourself.
 - Commit `CONTEXT.md` to the item's `fgw/<id>` branch before this session (or
   a later one) calls `fgos discover` — that call is what releases the claim
   back to `todo` once the item reaches `executing` (claim-lock §3b); an
   uncommitted `CONTEXT.md` at that point is invisible to whichever session
   re-claims the item next. Same one-artifact-per-stop discipline
-  `fgos-code-implement`'s "one commit per item" rule already gives Execute.
+  `fgos-coding-implement`'s "one commit per item" rule already gives Execute.
 
 ## Flow
 
@@ -121,7 +121,7 @@ directly by `fgos-planning`, mid-`decompose`, when that skill finds
    be asked to satisfy.
 
    Also query `CLAUDE.md`'s impact-analysis capability gate — the same
-   check `fgos-planning`/`fgos-validating`/`fgos-code-implement` already run
+   check `fgos-coding-planning`/`fgos-coding-validating`/`fgos-coding-implement` already run
    (`fgos tool query --capability impact-analysis --status present`) —
    rather than assuming GitNexus is on this machine — `judgeDiscovery`'s own
    `capacities.judge-discovery` config (`.fgos/config.json`, tsk-4rd upgrade)
@@ -142,7 +142,7 @@ directly by `fgos-planning`, mid-`decompose`, when that skill finds
    Fold the result into `CLAUDE.md`'s three-way framing
    (`impact-analysis: inactive|degraded|full`) and record that line in
    `CONTEXT.md` in step 3, next to the other scout evidence. This is
-   informational only — `fgos-exploring` edits no code and produces no
+   informational only — `fgos-coding-exploring` edits no code and produces no
    proof points, so the posture never gates or reshapes which candidate
    decisions get asked here; it exists so a later reader of this item's
    `CONTEXT.md` sees the posture without re-deriving it.
@@ -166,7 +166,7 @@ directly by `fgos-planning`, mid-`decompose`, when that skill finds
      point at a reference.
 
    A question that fails any check is never asked — pin it as a labeled
-   assumption instead, or hand it to `fgos-planning` if only the implementer
+   assumption instead, or hand it to `fgos-coding-planning` if only the implementer
    cares.
 
    **Ask as open conversational prose, not via a structured-choice tool
@@ -216,7 +216,7 @@ directly by `fgos-planning`, mid-`decompose`, when that skill finds
 
    End the doc with a section using this exact heading (nothing appended
    on that line), body `None` when every candidate question was locked or
-   deferred, or a real list of what is still open for `fgos-planning`
+   deferred, or a real list of what is still open for `fgos-coding-planning`
    otherwise:
 
    ```markdown
@@ -246,7 +246,7 @@ directly by `fgos-planning`, mid-`decompose`, when that skill finds
    collision-free one from `--title`. tsk-59a: an earlier version of this
    example passed the title positionally and omitted the other required
    fields, which `fgos add` rejects outright — same class of bug found
-   and fixed in `fgos-planning`'s own split-step example, never grepped
+   and fixed in `fgos-coding-planning`'s own split-step example, never grepped
    for elsewhere until now.)
 
    — `--docs-ref` is the item's existing pointer field, not a new one; the
@@ -259,12 +259,12 @@ directly by `fgos-planning`, mid-`decompose`, when that skill finds
    Once CONTEXT.md is written and approved, it is the session's own
    judgment — reading what was just locked, not this skill mechanically —
    that decides whether the item is simple enough to move straight to
-   `executing` or needs `fgos-planning`'s shaping first. Either way, the
+   `executing` or needs `fgos-coding-planning`'s shaping first. Either way, the
    only two edges that exist from `clarify` are the ones already registered
    for the item's domain; this skill never adds one, never removes one, and
    never applies the move itself. Load `fgos-routing` to re-read the item's
    `stage` and get pointed at the right next skill, or hand it to
-   `fgos-planning` directly if the next step is already obvious.
+   `fgos-coding-planning` directly if the next step is already obvious.
 
 ## Gate
 
@@ -303,13 +303,13 @@ D1/D11) — separate from, and in addition to, `fgos decision`'s free-text
 audit line: `fgos gate-approve <item-id> --gate contextApprove --actor
 <human|bypass> --verify "<item's current verify field>"` (`fgos list --id
 <item-id> --json`'s `data.work[id].verify`, read fresh right before this
-call — fgos-exploring does not design a new verify command, per this
+call — fgos-coding-exploring does not design a new verify command, per this
 skill's own "do not research implementation" rule; it only snapshots
 whatever verify the item already carries into the structured record).
 
 Immediately after that gate-approve record, in BOTH branches, this session
-fires the exploring→decompose engine transition itself (tsk-4b2 D6 —
-retargeted from clarify→decompose now that this skill runs at `exploring`,
+fires the exploring→planning engine transition itself (tsk-4b2 D6 —
+retargeted from clarify→planning now that this skill runs at `exploring`,
 not `clarify`; `nextDiscoveryEdge`, `src/intake/discovery.mjs`, resolves
 the right edge from the item's own `stage`, so this is still the exact
 same verb call) — this session is already the live soul that just did the
@@ -330,7 +330,7 @@ node "$root/bin/fgos.mjs" discover "<item-id>" --verdict clear --verify "<the sa
   audit trail), record it (`fgos gate-approve <item-id> --gate
   contextApprove --actor bypass --verify "..."`, per above), fire the
   `fgos discover --verdict clear` call above, then continue straight to
-  `fgos-planning`.
+  `fgos-coding-planning`.
 - **`false`** — surface the locked decisions in plain language — what was
   decided, why it can be trusted, what it costs if wrong — with CONTEXT.md
   linked, then ask exactly: "Decisions locked. Approve CONTEXT.md before
@@ -338,7 +338,7 @@ node "$root/bin/fgos.mjs" discover "<item-id>" --verdict clear --verify "<the sa
   its decision IDs are stable and cited, never silently reinterpreted. Once
   the person approves, record it (`fgos gate-approve <item-id> --gate
   contextApprove --actor human --verify "..."`, per above), fire the `fgos
-  discover --verdict clear` call above, then continue to `fgos-planning`.
+  discover --verdict clear` call above, then continue to `fgos-coding-planning`.
 
 ## Red flags
 
@@ -354,5 +354,5 @@ node "$root/bin/fgos.mjs" discover "<item-id>" --verdict clear --verify "<the sa
 
 Violating the letter of the rules is violating the spirit of the rules.
 
-Decisions captured and CONTEXT.md written. Invoke `fgos-planning` (directly,
+Decisions captured and CONTEXT.md written. Invoke `fgos-coding-planning` (directly,
 or via `fgos-routing` once the item's next stage is clear).

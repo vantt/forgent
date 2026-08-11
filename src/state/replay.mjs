@@ -452,8 +452,8 @@ function applyEvent(view, event) {
       // from the ask/answer fold above (that pair is the `awaiting-human`
       // park, a different mechanism). Three parallel fields live side by
       // side in the SAME lazy `gates[id]` object the ask/answer fold already
-      // creates: `contextApprove` (fgos-exploring), `planApprove`
-      // (fgos-planning), `validateApprove` (fgos-validating) — each an
+      // creates: `contextApprove` (fgos-coding-exploring), `planApprove`
+      // (fgos-coding-planning), `validateApprove` (fgos-coding-validating) — each an
       // OVERWRITE of just that one field (last approve wins per gate, mirrors
       // how a fresh `ask` overwrites the prior one above), never merged with
       // the other two gates' fields. `gates` stays the same LAZY key as

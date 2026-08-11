@@ -257,7 +257,7 @@ test(
     // A real runner config must exist BEFORE either CLI call: even
     // with an explicit --verdict, `discover`/`decompose`'s own bin/fgos.mjs
     // case still unconditionally calls `ensureRunnerConfigForDir` to resolve
-    // `cfg` (unused inside resolveDiscovery/resolveDecompose now, but the
+    // `cfg` (unused inside resolveDiscovery/resolvePlan now, but the
     // parameter itself is still threaded through, per this item's own D9
     // finding) — with no config on disk yet, that bootstraps a DEFAULT one
     // into `.fgos/config.json` pointed at whatever real agent CLI it
