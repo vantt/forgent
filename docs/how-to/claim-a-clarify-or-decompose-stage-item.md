@@ -7,7 +7,7 @@ source_capture_ids: [tsk-1ab-1, choke-point-take-vs-pick-claim-eligibility, tsk-
 ---
 # How to claim an item that is still at stage `clarify` or `decompose`
 
-Use this when you need to start `fgos-exploring` or `fgos-planning` work on
+Use this when you need to start `fgos-coding-exploring` or `fgos-coding-planning` work on
 an item that has not yet reached the frontier (`fgos ready`) — i.e. its
 `stage` is `clarify` or `decompose`, not `executing`.
 
@@ -111,7 +111,7 @@ correct re-claim door for an item you already worked on.
 
 **When this comes up:** an item held at stage `decompose` is released back
 to `status: todo` the moment it reaches stage `executing` (the "claim-lock
-§3b release", `src/intake/decompose.mjs`'s `releaseClaimOnExecuting`,
+§3b release", `src/intake/plan.mjs`'s `releaseClaimOnExecuting`,
 `docs/specs/runner.md:163-168`) — precisely so the same or another session
 can claim it again for the executing phase on the same branch. Re-running
 `pick <id>` at that point is the intended, routine door.

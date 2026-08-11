@@ -62,7 +62,7 @@ Risk map:
 | `format-duration.mjs` | light — pure function, no I/O, no shared state | `node --test test/util/format-duration.test.mjs` covers D2's four-unit behavior |
 | `format-bytes.mjs` | light — pure function, no I/O, no shared state | `node --test test/util/format-bytes.test.mjs` covers D1's binary-base behavior |
 
-Neither needs `fgos-validating`-level proof beyond the direct test run —
+Neither needs `fgos-coding-validating`-level proof beyond the direct test run —
 no external system, no auth, no shared file with any other in-flight item.
 
 ## Shape

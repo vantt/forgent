@@ -15,7 +15,7 @@ người trong khi câu trả lời đã nằm sẵn trong repo (vd "file X có 
 "hàm Y có test chưa") — lẽ ra judge tự tra được, không cần hỏi người.
 
 Mục tiêu cụ thể: judge tự scout trước → nếu scout đủ làm rõ, tự phán luôn; chỉ
-khi VẪN mù mờ sau scout mới rơi xuống nhánh hỏi người hiện có (fgos-exploring).
+khi VẪN mù mờ sau scout mới rơi xuống nhánh hỏi người hiện có (fgos-coding-exploring).
 Không đổi bản chất "real-model judge" đã có — chỉ thêm input (bằng chứng tự tìm)
 trước khi judge kết luận.
 
@@ -61,9 +61,9 @@ trước khi judge kết luận.
 
 ## 3. Sibling context (cost sizing)
 
-- **tsk-4xr** (fgos-exploring re-scout mid-conversation) — RẺ hơn nhiều: chỉ
+- **tsk-4xr** (fgos-coding-exploring re-scout mid-conversation) — RẺ hơn nhiều: chỉ
   sửa `SKILL.md` step 2 (thêm hướng dẫn "scout lại khi câu trả lời hé lộ term
-  mới"), không đụng config/architecture — fgos-exploring vốn đã là live session
+  mới"), không đụng config/architecture — fgos-coding-exploring vốn đã là live session
   có tool access sẵn. Không phải hard dependency của tsk-62d nhưng cùng hướng
   ("cho vòng làm-rõ nhiều grounding hơn trước khi hỏi người") — có thể cân nhắc
   làm tsk-4xr trước vì rẻ, học được pattern prompt/scout trước khi đụng
@@ -130,11 +130,11 @@ tràn lan). `judge-executor.mjs`'s `spawnAttempt` gọi
 - **Không build Skill riêng cho scout.** Lý do: RUL6 (`docs/specs/runner.md:853`)
   — headless `claude -p` phòng thủ bằng chỉ-dẫn + allowlist TỐI THIỂU, không
   sandbox; mở Skill tool là mở thêm bề mặt, ngược tinh thần "tối thiểu". Khác
-  lớp thực thi: fgos-exploring's scout chạy trong session tương tác (đã có
+  lớp thực thi: fgos-coding-exploring's scout chạy trong session tương tác (đã có
   Grep/Bash sẵn); judgeDiscovery/judgeDecompose chạy nested `claude -p` process
   con riêng, không thừa hưởng skill catalog của session cha — Skill tool không
   giải đúng vấn đề (vấn đề thật là scope `--allowedTools` của process con).
-- **DRY cho câu chữ "1 lượt scout" giữa 3 chỗ dùng (fgos-exploring step 1,
+- **DRY cho câu chữ "1 lượt scout" giữa 3 chỗ dùng (fgos-coding-exploring step 1,
   judgeDiscovery, judgeDecompose): tách prompt-template file riêng**, theo
   đúng pattern RUL44 đã có (`src/runner/prompt-templates/*.txt`, committed,
   chỉ substitution, không logic trong template). Không phải Skill artifact.

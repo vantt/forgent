@@ -73,7 +73,7 @@ có, cùng nguyên tắc `computeSchedule`'s `candidateIds` optional đã dùng)
 - `computeSchedule`'s default behavior — khoá ở `docs/history/
   execution-fanout/CONTEXT.md`/`plan.md`, backward-compat cho case2/runner.
 - Thêm `--step` flag cho `conflicts` để narrow xuống 1 step riêng — không
-  được hỏi/chọn, để `fgos-planning` quyết nếu thấy cần khi thi công (không
+  được hỏi/chọn, để `fgos-coding-planning` quyết nếu thấy cần khi thi công (không
   material ở tầng quyết định sản phẩm).
 
 ## Tham chiếu
@@ -90,4 +90,4 @@ có, cùng nguyên tắc `computeSchedule`'s `candidateIds` optional đã dùng)
 
 - Không có câu hỏi mở còn lại ở tầng sản phẩm. Implementation shape (nơi
   đặt hàm union step, có cần helper riêng trong `frontier.mjs` hay gộp
-  ngay trong `graph-metrics.mjs`, tên hàm) thuộc `fgos-planning`.
+  ngay trong `graph-metrics.mjs`, tên hàm) thuộc `fgos-coding-planning`.

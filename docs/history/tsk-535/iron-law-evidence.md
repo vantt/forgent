@@ -15,7 +15,7 @@ gate itself uses, comes back `required: true`.
 }
 ```
 
-**Process note**: the pre-return check during `fgos-code-implement` was run
+**Process note**: the pre-return check during `fgos-coding-implement` was run
 BEFORE the source-code commit landed (against a stale/empty diff), and
 incorrectly returned `required: false` — a mistake in this session's own
 process, not a gap in `classifyIronLaw` itself. Caught at `approve` time,
@@ -72,5 +72,5 @@ landed in commit `3d58ee3` on `fgw/tsk-535`), same two commands:
 ## Broader verify
 
 The item's own recorded verify, `node --test test/cli/fgos.test.mjs
-test/intake/decompose.test.mjs test/runner/loop.test.mjs` (723 tests), is
+test/intake/plan.test.mjs test/runner/loop.test.mjs` (723 tests), is
 green — confirmed at `fgos return` time.

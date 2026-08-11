@@ -1,7 +1,7 @@
 # Why workflow prose gates on a capability query, not a hardcoded tool name
 
-`tsk-1e4` rewrote `CLAUDE.md` and the `fgos-planning`/`fgos-validating`/
-`fgos-code-implement` skill prose so that "should I demand GitNexus impact
+`tsk-1e4` rewrote `CLAUDE.md` and the `fgos-coding-planning`/`fgos-coding-validating`/
+`fgos-coding-implement` skill prose so that "should I demand GitNexus impact
 analysis here?" is answered by querying the `impact-analysis` capability
 (`tsk-1dj`'s tool registry) instead of assuming GitNexus is on this
 machine. Sibling item `tsk-1e4` was explicitly carved out of `tsk-1dj`'s
@@ -37,7 +37,7 @@ Each skill consults the gate at a different moment in the item lifecycle,
 so each needed the degrade-ladder wired into what that moment already
 does:
 
-**`fgos-code-implement`** — at the point it already reads a symbol's file
+**`fgos-coding-implement`** — at the point it already reads a symbol's file
 before editing it:
 
 > Before editing a symbol, apply `CLAUDE.md`'s impact-analysis capability
@@ -47,7 +47,7 @@ before editing it:
 > (registered but not present — proceed, but say the blast radius is
 > unconfirmed), or Inactive (nothing registered — proceed without it).
 
-**`fgos-planning`** — at the point a proof point would lean on blast-radius
+**`fgos-coding-planning`** — at the point a proof point would lean on blast-radius
 evidence:
 
 > Before writing a proof point that would lean on blast-radius evidence,
@@ -58,12 +58,12 @@ evidence:
 > proof point — inactive drops the requirement, degraded keeps it but
 > marks the evidence weak, full keeps it exactly as before.
 
-**`fgos-validating`** — checking the posture `fgos-planning` recorded is
+**`fgos-coding-validating`** — checking the posture `fgos-coding-planning` recorded is
 still true, and treating a stale posture as a real failure, not a skip:
 
 > **Impact-analysis posture** — where the plan leans on blast-radius
 > evidence, does its recorded `impact-analysis: inactive|degraded|full`
-> posture (`fgos-planning`'s step 3) match what `CLAUDE.md`'s
+> posture (`fgos-coding-planning`'s step 3) match what `CLAUDE.md`'s
 > impact-analysis capability gate actually reports right now (`fgos tool
 > query --capability impact-analysis --status present`)? A stale or
 > missing posture is a FAIL here, not a skip — never assume GitNexus is
@@ -86,34 +86,34 @@ prose contract, never automatic." `tsk-1e4` is the item that actually
 performs that injection into the three lifecycle skills plus `CLAUDE.md`;
 without it, the registry existing was inert.
 
-## The fourth skill: `fgos-exploring` (`tsk-17w`)
+## The fourth skill: `fgos-coding-exploring` (`tsk-17w`)
 
-`tsk-1e4` covered `fgos-planning`/`fgos-validating`/`fgos-code-implement`, but
-left the earliest lifecycle stage — `fgos-exploring`, stage `clarify` —
+`tsk-1e4` covered `fgos-coding-planning`/`fgos-coding-validating`/`fgos-coding-implement`, but
+left the earliest lifecycle stage — `fgos-coding-exploring`, stage `clarify` —
 without the same gate. `tsk-17w` closed that gap, adding the query to
-`fgos-exploring`'s own scout step:
+`fgos-coding-exploring`'s own scout step:
 
 > Also query `CLAUDE.md`'s impact-analysis capability gate — the same
-> check `fgos-planning`/`fgos-validating`/`fgos-code-implement` already run
+> check `fgos-coding-planning`/`fgos-coding-validating`/`fgos-coding-implement` already run
 > (`fgos tool query --capability impact-analysis --status present`) —
 > rather than assuming GitNexus is on this machine, since this is the only
 > clarify-stage session with real tool access (`judgeDiscovery` itself has
 > none: `src/runner/dispatch.mjs:207-220`'s `--allowedTools` permits only
 > `git add`/`git commit`).
 
-Why `fgos-exploring` records the posture but never gates on it, unlike the
+Why `fgos-coding-exploring` records the posture but never gates on it, unlike the
 other three skills:
 
 > Fold the result into `CLAUDE.md`'s three-way framing
 > (`impact-analysis: inactive|degraded|full`) and record that line in
 > `CONTEXT.md` in step 3, next to the other scout evidence. This is
-> informational only — `fgos-exploring` edits no code and produces no
+> informational only — `fgos-coding-exploring` edits no code and produces no
 > proof points, so the posture never gates or reshapes which candidate
 > decisions get asked here; it exists so a later reader of this item's
 > `CONTEXT.md` sees the posture without re-deriving it.
 
-With this item, all four lifecycle skills (`fgos-exploring`,
-`fgos-planning`, `fgos-validating`, `fgos-code-implement`) plus `CLAUDE.md`
+With this item, all four lifecycle skills (`fgos-coding-exploring`,
+`fgos-coding-planning`, `fgos-coding-validating`, `fgos-coding-implement`) plus `CLAUDE.md`
 consult the same capability query — the injection `tsk-1dj`'s own D3 first
 flagged as still-needed is now complete across the full item lifecycle.
 

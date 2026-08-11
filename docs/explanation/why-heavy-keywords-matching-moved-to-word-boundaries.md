@@ -98,7 +98,7 @@ returns `false` unconditionally on a hit, regardless of tier — so these
 21 items could never auto-approve at any tier, 12 of them despite
 already having a `tier` that `standard` mode would otherwise have
 covered. Each item pays this gate at up to 3 separate checkpoints
-(`fgos-planning`'s auto-approve, `fgos-validating`'s auto-approve,
+(`fgos-coding-planning`'s auto-approve, `fgos-coding-validating`'s auto-approve,
 `fgos-fanout`'s inherited floor, which shares the same function) — up to
 63 unnecessary human-asks total, for exactly the class of prose this
 project's own risk vocabulary says should never trigger one.

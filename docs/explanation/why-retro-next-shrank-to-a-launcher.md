@@ -1,12 +1,12 @@
 # Why `/fgOS:retro-next` shrank to a launcher
 
 `/fgOS:retro-next` used to hand-roll its own sequencing: resolve the
-item's domain-specific synthesis skill itself (`fgos-compounding` for
+item's domain-specific synthesis skill itself (`fgos-coding-compounding` for
 `coding`, per decision record `0027` D5), invoke it directly, run `fgos
 move <id> --to cleanup` on success, and classify a raw subprocess exit
 code to decide what happened. That left it with thinner park/anchor
 handling than the shared `fgos-coding-driving` loop every other
-launcher (`/fgOS:pick`, `/fgOS:discover`, `/fgOS:decompose`,
+launcher (`/fgOS:pick`, `/fgOS:discover`, `/fgOS:plan`,
 `/fgOS:discover-next`) already goes through, and no way to inherit that
 loop's later improvements — any fix to the shared driver's park/anchor/
 no-progress handling would need to be separately re-implemented in

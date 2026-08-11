@@ -19,11 +19,11 @@ flags, two files touched (a "couple of files, one direct task") → tiny.
 impact-analysis: degraded (`fgos tool query --capability impact-analysis
 --status present` returned 1 provider, gitnexus, `status: present` — but
 `mcp__gitnexus__list_repos` shows this repo's index 344 commits behind
-HEAD, last indexed `251d0b5`, corrected at `fgos-validating` from an
+HEAD, last indexed `251d0b5`, corrected at `fgos-coding-validating` from an
 initial `full` reading that only checked the capability-gate `status`
 field, not actual index freshness per CLAUDE.md's own gate: "present" only
 means installed, never that the index is fresh). Cross-checked at
-`fgos-validating` regardless (CLAUDE.md: "a suspicious zero-result or
+`fgos-coding-validating` regardless (CLAUDE.md: "a suspicious zero-result or
 'not found' answer... worth a quick grep/rg cross-check"): `impact({target:
 "buildVerifyCheckPrompt", direction:"upstream", repo:"/home/vantt/
 projects/forgentX"})` returned exactly the same 2 callers a manual `grep -n

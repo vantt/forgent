@@ -16,7 +16,7 @@ of this item's own worktree branch. There is nothing to build — the one
 honest piece of work is running the item's own verify command and
 confirming it already passes, then returning the item.
 
-**Revised at `fgos-validating` (reality-gate FAIL, first pass):** writing
+**Revised at `fgos-coding-validating` (reality-gate FAIL, first pass):** writing
 this item's own required CONTEXT.md/RESEARCH.md/plan.md — each legitimately
 discussing the leaked "orchestrator" term as its own subject matter — trips
 the same guard test this item's verify command runs (`node --test

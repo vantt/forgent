@@ -20,16 +20,16 @@ still contains "authoring") — irrelevant to the verdict here since
 ## Failing-test-first proof
 
 Item's own `verify` command (recorded on `tsk-2as`, survived three rounds
-of an independent second-pass judge at `fgos-exploring`):
+of an independent second-pass judge at `fgos-coding-exploring`):
 
 ```
 node --test test/evolve/iron-law.test.mjs && node --input-type=module -e "
 import assert from 'node:assert/strict';
 import { classifyIronLaw } from './src/evolve/iron-law.mjs';
 import { classify } from './src/intake/classify.mjs';
-const fp = classifyIronLaw({ filesChanged: [], description: 'does NOT duplicate fgos-exploring authoring logic' });
+const fp = classifyIronLaw({ filesChanged: [], description: 'does NOT duplicate fgos-coding-exploring authoring logic' });
 assert.equal(fp.matchedFlags.includes('auth'), false);
-const fpClassify = classify('does NOT duplicate fgos-exploring authoring logic');
+const fpClassify = classify('does NOT duplicate fgos-coding-exploring authoring logic');
 assert.equal(fpClassify.tier, 'standard');
 const tp = classifyIronLaw({ filesChanged: [], description: 'fix the auth flow' });
 assert.equal(tp.matchedFlags.includes('auth'), true);

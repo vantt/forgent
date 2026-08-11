@@ -4,7 +4,7 @@
 
 Three write paths let a work item land with `description` completely
 missing: `fgos add` (no `--description` flag exists), decompose-child
-creation (`normalizeChild`/`addWork` in `src/intake/decompose.mjs` never
+creation (`normalizeChild`/`addWork` in `src/intake/plan.mjs` never
 sets it), and the runner's discovered-work channel (`src/runner/
 loop.mjs:626`, `block.description` is optional per the worker-prompt-
 template's `fgos-discovered` schema — found mid-planning, D4). This item
@@ -21,7 +21,7 @@ them.
 - **`fgos add`'s param list has zero description-shaped flag**
   (`src/cli/command-registry.mjs`, `add` verb definition) — confirmed by
   reading its full parameter list.
-- **`normalizeChild`/`addWork` in `src/intake/decompose.mjs`** never set
+- **`normalizeChild`/`addWork` in `src/intake/plan.mjs`** never set
   `description` on a decompose child — confirmed by reading the current
   (post-tsk-3xd-merge) source.
 - **tsk-4zg already shipped and closed** (`status: done`, commit `5679d82`,
@@ -67,7 +67,7 @@ them.
 
 - `src/cli/command-registry.mjs` — `add`/`edit` verb parameter lists
   (`edit` already has `--description`, `add` does not).
-- `src/intake/decompose.mjs` — `normalizeChild`/`addWork`, the decompose
+- `src/intake/plan.mjs` — `normalizeChild`/`addWork`, the decompose
   write path this item's other half fixes.
 - `src/runner/loop.mjs:626` — the discovered-work `addWork` call, D4's
   third write path.
@@ -92,4 +92,4 @@ them.
   above) is an implementation choice, not a product decision.
 - Whether `add`'s new required `--description` flag needs a migration note
   for any existing caller/script that invokes `add` without it (a scope
-  question for `fgos-planning` to size, not decided here).
+  question for `fgos-coding-planning` to size, not decided here).

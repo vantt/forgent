@@ -78,11 +78,11 @@ shape or the already-correct skill-level D2 close-gate
 
 - Exact Rust shape for threading the extra argv token (a parameter on
   `run_argv_for_command`, a discover-only wrapper, a post-format string
-  edit inside the quote) — implementation choice for `fgos-planning`.
+  edit inside the quote) — implementation choice for `fgos-coding-planning`.
 - `run_argv`/pick's own command shape — explicitly untouched; verify must
   prove it (`cargo test launch_agent_run_argv` unchanged pass).
 - Extending autoClose to any OTHER launch mechanism (`/fgOS:pick` itself,
-  `/fgOS:decompose`, `/fgOS:retro-next`, `/fgOS:cleanup-next`) — out of
+  `/fgOS:plan`, `/fgOS:retro-next`, `/fgOS:cleanup-next`) — out of
   scope, unrelated to this bug.
 
 ## Outstanding questions

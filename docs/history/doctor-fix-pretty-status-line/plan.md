@@ -46,7 +46,7 @@ Risk map:
 
 Impact-analysis capability gate (`fgos tool query --capability
 impact-analysis --status present`): **full** — `gitnexus` provider
-registered and `present`. `fgos-validating`/`fgos-code-implement` run
+registered and `present`. `fgos-coding-validating`/`fgos-coding-implement` run
 `impact({target: "renderPretty", direction: "upstream"})` before the edit
 lands, per `CLAUDE.md`'s MUST rule — expected low blast radius (`renderPretty`
 is called only from the CLI's own output path, `bin/fgos.mjs`'s
@@ -55,7 +55,7 @@ change looks small.
 
 Files touched: `bin/fgos.mjs` only (the one line inside `renderPretty`).
 `test/setup/checks.test.mjs` is already committed with the regression test
-(written during `fgos-exploring`'s scout pass, ahead of the fix, so it
+(written during `fgos-coding-exploring`'s scout pass, ahead of the fix, so it
 proves the bug before proving the fix).
 
 Order: single step — flip the boolean, then run the verify command.

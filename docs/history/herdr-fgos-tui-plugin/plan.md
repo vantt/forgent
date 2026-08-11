@@ -39,7 +39,7 @@ against. Rejected: `ftui` (used by `upstreams/beads-viewer-rust/Cargo.toml:
 This is an execution-time detail, not a re-opening of any `CONTEXT.md`
 decision — no D-ID covers language/library.
 
-**Rust vs. Node, weighed explicitly (`fgos-validating` flagged this as
+**Rust vs. Node, weighed explicitly (`fgos-coding-validating` flagged this as
 missing from the first draft):** a Node-based plugin was a real smaller
 alternative — herdr accepts any argv-launchable program as a plugin
 (`plugins.mdx`), Node is already this repo's own language, and per decision
@@ -92,7 +92,7 @@ rejected per D2 (this item ships an independent, actually-installable
 
 ## Risk map
 
-| Component | Risk | Proof point (for `fgos-validating`) |
+| Component | Risk | Proof point (for `fgos-coding-validating`) |
 |---|---|---|
 | fgOS-CLI polling + parse (triage/list JSON → sorted rows) | Low | Unit test against a fixture JSON response asserting the parsed row order matches D5's `rankImpact` order byte-for-byte, and that `status: doing` rows populate the in-process list |
 | Herdr manifest authoring + local link | Medium — first plugin manifest ever written in this repo, no local precedent to copy | `herdr plugin link <path>` (`upstreams/herdr/src/cli/plugin.rs:28`) exits 0 and `herdr plugin list --json` shows the plugin registered and enabled |

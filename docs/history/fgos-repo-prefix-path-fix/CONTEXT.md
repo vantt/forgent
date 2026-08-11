@@ -47,7 +47,7 @@ either context, instead of assuming one.
   copied.
 - `grep -rn "repo/bin/fgos.mjs\|CLAUDE_PROJECT_DIR" .claude/skills/fgos/*/SKILL.md`
   — no hits. The internal dev-session skills (`fgos-routing`,
-  `fgos-exploring`, etc.) never hardcode this path; they assume the
+  `fgos-coding-exploring`, etc.) never hardcode this path; they assume the
   session is already `cd`'d into the repo and call `fgos`/`./bin/fgos.mjs`
   directly. Out of scope for this item — they don't have the bug.
 

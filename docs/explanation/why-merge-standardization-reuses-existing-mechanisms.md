@@ -31,7 +31,7 @@ durable").
 
 This decision survived a correction mid-build: the CONTEXT.md row
 originally described the comparator backwards ("blocking-fan-out count,
-then goalTier"), and `fgos-code-implement` on `tsk-4j9-2` found the real order
+then goalTier"), and `fgos-coding-implement` on `tsk-4j9-2` found the real order
 is `goalTier` primary, blocking-fan-out second. The reuse decision itself
 did not change — `mergeReadiness` (`src/state/graph-harness.mjs`) calls
 `rankImpact(view)` directly and filters its real output rather than

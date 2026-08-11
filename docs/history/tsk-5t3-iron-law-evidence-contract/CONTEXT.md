@@ -15,7 +15,7 @@ go find or reconstruct the failing-test-first proof themselves before
 deciding whether to re-run `approve --acknowledge-iron-law`.
 
 This item builds the contract that lets an item collect that proof while
-the work happens (`fgos-code-implement`) and lets `/fgOS:merge-loop` find and
+the work happens (`fgos-coding-implement`) and lets `/fgOS:merge-loop` find and
 present it when the gate trips — cutting the time a human spends
 reconstructing evidence, without ever loosening who is allowed to press
 acknowledge. It does not touch `approve`'s own refusal behavior, and it
@@ -34,7 +34,7 @@ survives here.
 | ID | Decision |
 |----|----------|
 | D1 | Scope is evidence-only. `/fgOS:merge-loop` gathers and presents failing-test-first proof (before/after) when it hits an Iron Law block, but never self-acknowledges. RUL34/RUL37 (`docs/specs/runner.md` lines 530-531, 598-603) stay exactly as locked — a real human operator must still type `--acknowledge-iron-law` themselves, no exception. The separate question of whether that requirement can ever be loosened belongs to `tsk-44f` (not yet filed, depends on `tsk-5t3` per `tsk-3mv` D2), never silently folded in here. |
-| D2 | Trigger: `fgos-code-implement` runs its normal before/after test cycle for a real fix as a matter of course; it only *persists* the contract file when the item's final diff, evaluated the same way `approve` itself would (`classifyIronLaw({filesChanged: finalDiff, description})` at `fgos return` time), comes back `required: true`. This reuses the exact same function and module list the real gate uses (`src/evolve/iron-law.mjs`) rather than a separate early-prediction heuristic, and avoids writing/storing evidence for the ~99% of items that never touch a self-modifying module. |
+| D2 | Trigger: `fgos-coding-implement` runs its normal before/after test cycle for a real fix as a matter of course; it only *persists* the contract file when the item's final diff, evaluated the same way `approve` itself would (`classifyIronLaw({filesChanged: finalDiff, description})` at `fgos return` time), comes back `required: true`. This reuses the exact same function and module list the real gate uses (`src/evolve/iron-law.mjs`) rather than a separate early-prediction heuristic, and avoids writing/storing evidence for the ~99% of items that never touch a self-modifying module. |
 | D3 | Storage: the contract is a file at `docs/history/<id>/iron-law-evidence.md`, committed on the item's own `fgw/<id>` branch (not `.fgos/`, which worktrees never carry per ADR0020; not the `docType`/`docPath` outcome fields, which are only populated at `compound-learn`, after `approve` already ran). `approve`/`merge-loop` read it via `git show fgw/<id>:docs/history/<id>/iron-law-evidence.md` from the main checkout — the same branch-ref read pattern already established for reading branch-local state before a merge (`tsk-56t` D1). |
 | D4 | Surface point: `approve`'s own thrown refusal message (`bin/fgos.mjs:1931-1938`) stays byte-for-byte unchanged — this item never edits that locked gate's code. `/fgOS:merge-loop` (the chat/skill layer) is what reads the evidence file, if present, and prints it for the human before asking them to decide on `--acknowledge-iron-law`. |
 
@@ -87,14 +87,14 @@ survives here.
 
 ## Outstanding questions deferred to planning
 
-- Exact `fgos-code-implement` implementation shape for capturing before/after
+- Exact `fgos-coding-implement` implementation shape for capturing before/after
   test output during work (which command output gets saved, how the
   session knows "this is the fix's own test" vs incidental test runs) is
   an implementation choice, not a product decision — left to
-  `fgos-planning`.
+  `fgos-coding-planning`.
 - Exact `merge-loop` skill wording/format for presenting the evidence
   file's content in chat is an implementation choice — left to
-  `fgos-planning`.
+  `fgos-coding-planning`.
 
 ## References
 

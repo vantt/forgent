@@ -1,7 +1,7 @@
 # fgOS participant contract — what it takes to be a full participant in any language
 
 Hand-authored reference, verified 2026-08-09 by reading the real source
-(not generated via `fgos-compounding`/`fgos-indexing` — no captured work
+(not generated via `fgos-coding-compounding`/`fgos-indexing` — no captured work
 item backs this doc, so it carries no `docType`/`docPath` linkage). Scope:
 the complete answer to "what does my process need to do to be a full
 fgOS participant, in a language other than Node?" Gathers and points —

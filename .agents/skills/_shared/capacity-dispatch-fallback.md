@@ -327,8 +327,8 @@ scarcity signal needs the full denominator, not just the misses.
   exact moment a person is waiting, `AGENTS.md`'s priority #1; that skill
   has since been retired in full, tsk-6ar). This
   fragment stays in place: six other stage skills
-  (`fgos-validating`/`fgos-code-implement`/`fgos-fanout`/`fgos-planning`/
-  `fgos-exploring`/`fgos-researching`) cite its "Valid reasons to dispatch"
+  (`fgos-coding-validating`/`fgos-coding-implement`/`fgos-fanout`/`fgos-coding-planning`/
+  `fgos-coding-exploring`/`fgos-researching`) cite its "Valid reasons to dispatch"
   list directly when explaining their own never-delegate-reasoning rule,
   and it remains the ready-made pattern for the next real cross-provider
   consumer. Step B.5's `in-process` branch is proven by

@@ -7,7 +7,7 @@ locked decisions D1-D5.
 
 **Mode: high-risk** (fuller map below, phased execution).
 
-Flags counted (from `fgos-planning`'s fixed checklist):
+Flags counted (from `fgos-coding-planning`'s fixed checklist):
 
 | Flag | Applies? | Why |
 |---|---|---|
@@ -75,12 +75,12 @@ branching is wrong — that is exactly the kind of proof-carrying risk
 
 ## Risk map
 
-| Component | Risk | Proof point (for `fgos-validating`) |
+| Component | Risk | Proof point (for `fgos-coding-validating`) |
 |---|---|---|
 | `.github/workflows/ci.yml` (new) | low | Workflow YAML is valid and a real push triggers a green run — config-only, easy to eyeball. |
 | `install-packaging.test.mjs` win32 branching (D5) | **high** | Must actually pass on a real `windows-latest` GitHub Actions runner, not just a local diff review — path-layout logic is easy to get subtly wrong (e.g. `.cmd` vs extensionless resolution, exec-bit assertion). |
 | new `test/setup/doctor-fresh-run.test.mjs` (D4) | medium | Must actually pass on all three matrix OSes. Traced today (not guessed): `fgos setup`'s `installGitHooks` fill-only-writes `core.hooksPath=.githooks` for any git repo unconditionally (no-op-safe even without a local `.githooks/` folder existing), so `main-checkout-hook-wired` should report passed for an external test project too — but this needs confirming against real `fgos doctor` output, not just reading the source. `shell-integration-sourced` auto-passes when the runner has zero detected rc files, which may differ by OS/runner image — confirm actual behavior per OS rather than assume. |
-| `package.json` | low | Item's footprint lists it defensively; no change identified as necessary yet beyond what already exists (`scripts.test` already runs the right glob). Pin as assumption — if `fgos-code-implement` finds a real need (e.g. a lockfile, a `ci` script alias), it's a small addition, not a redesign. |
+| `package.json` | low | Item's footprint lists it defensively; no change identified as necessary yet beyond what already exists (`scripts.test` already runs the right glob). Pin as assumption — if `fgos-coding-implement` finds a real need (e.g. a lockfile, a `ci` script alias), it's a small addition, not a redesign. |
 
 Impact-analysis gate checked (`fgos tool query --capability impact-analysis
 --status present`): **full** (GitNexus registered and present). Low
@@ -131,5 +131,5 @@ needs one real verify command per deliverable, named here:
   OS; also the same command a contributor runs locally on their own OS.
 - No new verify command needed for piece 3 (the workflow file itself) —
   its own proof is a real green GitHub Actions run after push, which
-  `fgos-validating`/`fgos-code-implement` can check via `gh run list`/`gh run
+  `fgos-coding-validating`/`fgos-coding-implement` can check via `gh run list`/`gh run
   view` once pushed.

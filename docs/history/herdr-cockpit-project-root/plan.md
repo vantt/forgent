@@ -51,7 +51,7 @@ validation.
   hợp lý cho một script bash, nhưng ở đây sẽ phá 3 test `run_argv` và thêm
   quoting risk, đổi lại không được gì.
 - **Cả hai (belt-and-braces)**: thừa. Nếu `--cwd` không hoạt động thì phải
-  biết ngay ở `fgos-validating`, không phải giấu sau một lớp `cd`.
+  biết ngay ở `fgos-coding-validating`, không phải giấu sau một lớp `cd`.
 - **Resolve root lại trong `pick.rs`**: `main.rs:21` đã gọi
   `fgos::repo_root()` một lần rồi và giao cho `FgosCliSource`. Gọi lần hai là
   DRY vi phạm, và mở ra khả năng hai nơi thấy hai root khác nhau.
@@ -94,8 +94,8 @@ tiết của adapter, không phải của domain.
 
 | Thành phần | Rủi ro | Cái gì chứng minh được |
 |---|---|---|
-| herdr có honor `pane split --cwd` cho pane mới không | **trung bình** — cờ có trong usage nhưng chưa từng dùng trong repo này | Live: `pane split --cwd /tmp` rồi `pane get <pane_id_mới>` xem field `cwd`. Điểm chứng minh cho `fgos-validating`. |
-| herdr có honor `tab create --cwd` cho root pane của tab mới không | **trung bình** — cùng lý do; nhánh này chạy khi mọi tab `fg:agents-N` đã đầy 4 pane | Live: `tab create --cwd /tmp` rồi `pane get <root_pane>`. Điểm chứng minh cho `fgos-validating`. |
+| herdr có honor `pane split --cwd` cho pane mới không | **trung bình** — cờ có trong usage nhưng chưa từng dùng trong repo này | Live: `pane split --cwd /tmp` rồi `pane get <pane_id_mới>` xem field `cwd`. Điểm chứng minh cho `fgos-coding-validating`. |
+| herdr có honor `tab create --cwd` cho root pane của tab mới không | **trung bình** — cùng lý do; nhánh này chạy khi mọi tab `fg:agents-N` đã đầy 4 pane | Live: `tab create --cwd /tmp` rồi `pane get <root_pane>`. Điểm chứng minh cho `fgos-coding-validating`. |
 | `repo_root()` trả đúng main checkout khi plugin chạy trong pane cockpit thật | **trung bình** — hôm nay nó ăn cwd kế thừa, chưa ai kiểm trong pane thật | Live: mở plugin pane trong workspace có `--cwd <project>`, xem dashboard có list được item không. |
 | Test double + 6 test hiện có trong `pick.rs`/`layout.rs` | thấp — đổi chữ ký, không đổi hành vi | `cargo test --manifest-path herdr-plugin/Cargo.toml` |
 | `run_argv` giữ nguyên byte-for-byte | thấp — chủ ý của approach | 3 test `run_argv` hiện có phải xanh, không sửa dòng nào |
@@ -125,7 +125,7 @@ cargo test --manifest-path herdr-plugin/Cargo.toml && cargo build --release --ma
 
 Cùng convention với mọi item herdr-plugin trước (`docs/history/herdr-fgos-hexagonal-architecture/CONTEXT.md` D3).
 
-**Cảnh báo cho `fgos-validating`/Execute:** field `verify` mà engine tự điền
+**Cảnh báo cho `fgos-coding-validating`/Execute:** field `verify` mà engine tự điền
 cho `tsk-45u` là `"npm test — full suite green, plus new/updated test..."`.
 `npm test` trong repo này là `node --test 'test/**/*.test.mjs'`
 (`package.json`) — **không** chạy crate Rust, nên nó không thể chứng minh item

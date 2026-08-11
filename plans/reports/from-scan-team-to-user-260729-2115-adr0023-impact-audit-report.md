@@ -36,7 +36,7 @@ không thấy được:
   suite 85s (91% do 1 file `test/cli/fgos.test.mjs`).
 
 **Khuyến nghị:** đừng mở lại từ đầu — tiếp `tsk-4op` (đang kẹt ở `clarify`,
-cần 1 vòng `fgos-exploring` hoặc `fgos discover tsk-4op`) là đường ngắn nhất.
+cần 1 vòng `fgos-coding-exploring` hoặc `fgos discover tsk-4op`) là đường ngắn nhất.
 
 ---
 
@@ -68,8 +68,8 @@ nhau trước khi kết luận, KHÔNG khẳng định ở đây.
 
 ### 3. Skill routing (`scan-skills`) — 9 skill, 52 hit
 
-`fgos-routing`/`fgos-exploring`/`fgos-planning`/`fgos-validating`/
-`fgos-code-implement`/`fgos-compounding`/`fgos-indexing` đều nhắc "gate" theo
+`fgos-routing`/`fgos-coding-exploring`/`fgos-coding-planning`/`fgos-coding-validating`/
+`fgos-coding-implement`/`fgos-coding-compounding`/`fgos-indexing` đều nhắc "gate" theo
 nghĩa **chuyển stage** (clarify→decompose→executing→compound-learn) — TRỤC
 KHÁC với "DoD gate" (CoS/evidence-check) của ADR 0023. `scan-skills` tự gọi
 đây là "CRITICAL OUT-OF-STEP" — **hạ cấp độ nghiêm trọng đó**: 2 trục có tên
@@ -77,7 +77,7 @@ trùng chữ "gate" nhưng không cùng nghĩa (giống hệt case `judgeDecompo
 "decompose" trùng tên ngẫu nhiên mà backlog STR93 đã tự phân biệt). Không
 skill nào cần sửa GẤP vì lý do này; nhưng đúng là chưa skill nào mã hoá rõ
 3 bậc ưu tiên ADR 0023 — nếu sau này muốn skill tự biết "đừng chờ
-compound-learn để ship", phải sửa `fgos-routing`/`fgos-code-implement`.
+compound-learn để ship", phải sửa `fgos-routing`/`fgos-coding-implement`.
 
 ### 4. Test coverage (`scan-tests`) — an toàn tốt, đã sẵn safety net
 

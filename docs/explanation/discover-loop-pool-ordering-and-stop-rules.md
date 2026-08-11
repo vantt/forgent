@@ -45,7 +45,7 @@ cleanly express or reuse.
 
 `discover-next` only considers `status:todo` items in either sub-pool.
 `status:doing` items are excluded — those are actively claimed by another
-live session (an open `fgos-exploring`/`fgos-planning` session on that
+live session (an open `fgos-coding-exploring`/`fgos-coding-planning` session on that
 item), and the loop must not touch a session someone else already has
 open.
 
@@ -80,10 +80,10 @@ re-selected on the next pass.
 ## The lock-timeout signal broke silently when discover-next stopped being a CLI subprocess, then was restored end-to-end
 
 The stop rule above (`lock-timeout` — exit code `7` — stops the whole
-loop) assumed `discover-next` calls `fgos discover`/`fgos decompose` as a
+loop) assumed `discover-next` calls `fgos discover`/`fgos plan` as a
 raw CLI subprocess, whose real exit code it can read directly. `tsk-31l`
 later switched `discover-next` to dispatch through the `fgos-coding-driving`
-skill instead (which invokes `fgos-exploring`/`fgos-planning` in-session,
+skill instead (which invokes `fgos-coding-exploring`/`fgos-coding-planning` in-session,
 never as a subprocess) — and that switch silently broke the signal this
 doc's own stop-rule section depends on. A `lock-timeout` several skill
 layers down now looked identical to any other one-off `blocked` outcome:
@@ -95,7 +95,7 @@ continue."
 explicit out-of-scope gap rather than silently patched inline) restored
 the signal by threading a literal, locked token —
 **`stop-reason: lock-timeout`** — through every layer between where a
-`fgos discover`/`fgos decompose` call can actually fail and where
+`fgos discover`/`fgos plan` call can actually fail and where
 `discover-next`/`discover-loop` classify the result:
 
 > "D2: Fix lives at the root: `fgos-coding-driving`'s own stop-report
@@ -107,14 +107,14 @@ the signal by threading a literal, locked token —
 > "D4: The stop-report's lock-timeout signal is identified by the literal
 > token `stop-reason: lock-timeout`. This is a locked contract string, not
 > an implementation detail: whoever implements D2 must emit exactly this
-> token, and `fgos-exploring`/`fgos-planning` must relay exactly this
+> token, and `fgos-coding-exploring`/`fgos-coding-planning` must relay exactly this
 > token when their own engine-verb call fails that way."
 
 Ten `SKILL.md` files ended up needing the token (both `.claude/skills/`
-and `.agents/skills/` mirrors of `fgos-coding-driving`/`fgos-exploring`/
-`fgos-planning`/`fgos-validating`, plus `discover-next`/`discover-loop`
-themselves) — `fgos-validating` was added mid-implementation once
-`fgos-planning`'s reality gate noticed it also fires `fgos decompose`
+and `.agents/skills/` mirrors of `fgos-coding-driving`/`fgos-coding-exploring`/
+`fgos-coding-planning`/`fgos-coding-validating`, plus `discover-next`/`discover-loop`
+themselves) — `fgos-coding-validating` was added mid-implementation once
+`fgos-coding-planning`'s reality gate noticed it also fires `fgos plan`
 internally (its own Gate section), which the original eight-file count had
 missed.
 
@@ -125,7 +125,7 @@ can assert the literal token is *present* in the prose (and that a
 superseded "Known gap" paragraph is *gone*), but cannot prove an LLM
 actually relays that token across a live skill-invocation hop at runtime —
 that proof is explicitly left to `docs/how-to/
-smoke-test-fgos-code-implement-with-a-trivial-item.md` plus real
+smoke-test-fgos-coding-implement-with-a-trivial-item.md` plus real
 event-log observation, not to this field. `tsk-1c6`'s own verify went
 through three locked-then-reversed forms before landing there (a
 mechanical grep, disputed five times as unable to prove a runtime claim;

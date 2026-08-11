@@ -71,4 +71,4 @@ pre-existing, unrelated failure (`test/docs/launcher-vocabulary-guard.
 test.mjs`, flagging "orchestrator" vocabulary in docs this item never
 touches, part of the separate in-flight tsk-2cw). Re-confirmed still
 failing, unchanged by this item, before scoping `verify` down
-(`fgos-validating`'s own reality-gate pass for this item).
+(`fgos-coding-validating`'s own reality-gate pass for this item).

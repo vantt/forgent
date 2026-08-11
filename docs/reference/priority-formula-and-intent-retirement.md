@@ -52,7 +52,7 @@ no circularity (neither role depends on the other's output).
 | Point | Where | `effort` | `blastRadius` |
 |---|---|---|---|
 | Rough pass | `clarify`, `resolveDiscovery` (was `intentScore`, now `impactScore`) | `EFFORT_FLOOR` (unknown yet) | absent (no code target yet) |
-| Refined pass | `decompose`, `resolveDecompose` | read from the judge's `mode` (fgos-planning's own tiny/small/standard/high-risk/spike vocabulary, `effortForMode()`) | read from the judge's `blastRadius` (when `plan.md` recorded a real `impact-analysis` measurement) |
+| Refined pass | `decompose`, `resolveDecompose` | read from the judge's `mode` (fgos-coding-planning's own tiny/small/standard/high-risk/spike vocabulary, `effortForMode()`) | read from the judge's `blastRadius` (when `plan.md` recorded a real `impact-analysis` measurement) |
 
 Both write via the existing `edit --priority` door (`editWork`), wrapped in
 the same try/catch fail-safe discipline `intentScore`'s write always used —
@@ -75,7 +75,7 @@ The clarify-stage judge's own settlement note, verbatim:
 
 > "cat docs/history/work-item-priority-matrix/CONTEXT.md — confirm D1-D8
 > locked incl. formula priority=invert((impact\*weight(urgent))/effort\*
-> discount(risk)), then run fgos-planning on item to shape formula's
+> discount(risk)), then run fgos-coding-planning on item to shape formula's
 > concrete weight/discount table"
 
 The human's own answer, verbatim (superseding the original P1-P4-matrix
@@ -118,7 +118,7 @@ inversion math was correct; the degeneracy was in the inputs feeding it:
 fs/Date.now/mutation, same discipline as `impact.mjs`) — it does not log
 itself. Instead it exports a new pure query, `isRecognizedRisk(risk)`,
 alongside the existing `discountForRisk`. The two real call sites
-(`src/intake/discovery.mjs` and `src/intake/decompose.mjs`, both already
+(`src/intake/discovery.mjs` and `src/intake/plan.mjs`, both already
 calling `addDecision`) now log a decision when `work.risk` is a
 truthy, present string that `isRecognizedRisk` reports as unrecognized —
 making the fold visible in the audit trail instead of silent.
@@ -170,7 +170,7 @@ flagged rather than silently folded into this item's scope: **whether
 current graph state (today's behavior) or carry forward the value the
 rough pass computed** is a separate, larger design question for a future
 item. Landed clean, one attempt, `node --test test/state/priority-
-formula.test.mjs test/intake/decompose.test.mjs && npm test` passing.
+formula.test.mjs test/intake/plan.test.mjs && npm test` passing.
 
 ## See also
 

@@ -40,5 +40,5 @@ remaining code defect. There is no `introducedPaths`-vs-current-`HEAD`
 comparison left in `branchContentMismatch` for this item to fix.
 
 **Still open:** Whether `npm test` passes clean on this branch as-is (no
-new code change expected) — that's `fgos-code-implement`'s own verify step,
+new code change expected) — that's `fgos-coding-implement`'s own verify step,
 not this skill's job to run definitively at the discovery stage.

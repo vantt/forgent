@@ -135,7 +135,7 @@ test("DOMAINS['fixture-marketing'] declares its OWN statusLabels/skillMap.retros
   assert.notEqual(fixture.statusLabels.blocked, coding.statusLabels.blocked);
 
   // skillMap.retrospective (0027 D5) resolves to a distinct value, not a
-  // silent fallback to coding's 'fgos-compounding'.
+  // silent fallback to coding's 'fgos-coding-compounding'.
   assert.equal(fixture.skillMap.retrospective, 'fgos-fixture-retro');
   assert.notEqual(fixture.skillMap.retrospective, coding.skillMap.retrospective);
 
@@ -153,7 +153,7 @@ test('adding "fixture-marketing" leaves DOMAINS.coding completely unchanged (RUL
     'awaiting-approval': 'review',
     wontfix: 'canceled',
   });
-  assert.equal(DOMAINS.coding.skillMap.retrospective, 'fgos-compounding');
+  assert.equal(DOMAINS.coding.skillMap.retrospective, 'fgos-coding-compounding');
   assert.equal(DOMAINS.coding.fieldSchema, undefined);
   assert.equal(DOMAINS.coding.worktreeBacked, true);
 });

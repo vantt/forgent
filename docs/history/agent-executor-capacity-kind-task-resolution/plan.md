@@ -26,7 +26,7 @@ through to `perTier ?? cfg.executor` (today's `byCapacity` gate only checks
 **Concrete shape** (not previously locked in `CONTEXT.md` — an
 implementation-only detail, not material to `D1`/`D2`'s product decisions,
 so decided here per this skill's own mid-planning-gap filter rather than
-handed back to `fgos-exploring`):
+handed back to `fgos-coding-exploring`):
 
 ```js
 const byCapacity =

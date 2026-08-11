@@ -13,7 +13,7 @@ cite thẳng D-ID.
 | data model | **có** | thêm field cấu trúc mới `gates[id].contextApprove/planApprove/validateApprove` (D1/D11) + event kind mới `work.gate-approve` |
 | audit/security | **có** | chính là mục đích track A — bản ghi duyệt tường minh cho audit trail |
 | public contract | **có** | đổi hành vi `resolveDiscovery`/`resolveDecompose` (engine), Gate section của 3 skill exploring/planning/validating, thêm skill mới `fgos-coding-driving`, sửa `cook`/`pick` |
-| existing covered behavior | **có** | `resolveDiscovery`/`resolveDecompose`/`frontier()` đều có test suite sống (`test/intake/discovery.test.mjs`, `test/intake/decompose.test.mjs`, `test/state/frontier.test.mjs`) — đổi phải giữ xanh, không né |
+| existing covered behavior | **có** | `resolveDiscovery`/`resolveDecompose`/`frontier()` đều có test suite sống (`test/intake/discovery.test.mjs`, `test/intake/plan.test.mjs`, `test/state/frontier.test.mjs`) — đổi phải giữ xanh, không né |
 | auth/authorization | không | — |
 | external systems | không | — |
 | cross-platform | không | — |
@@ -80,8 +80,8 @@ khác gợi ý thứ tự, nên thứ tự dưới đây suy từ phụ thuộc 
 - `src/state/replay.mjs`: case `work.gate-approve` mới, fold vào
   `gates[id][gate] = {actor, at: event.ts, verify}` (thêm case, không sửa
   case `work.move` hiện tại).
-- `.claude/skills/fgos-exploring/SKILL.md`, `fgos-planning/SKILL.md`,
-  `fgos-validating/SKILL.md`: nhánh `true` (auto-approve) của mỗi Gate gọi
+- `.claude/skills/fgos-coding-exploring/SKILL.md`, `fgos-coding-planning/SKILL.md`,
+  `fgos-coding-validating/SKILL.md`: nhánh `true` (auto-approve) của mỗi Gate gọi
   thêm `recordGateApprove`/`fgos gate-approve` verb (actor=`bypass`) NGAY
   CẠNH `fgos decision` hiện có, không thay thế; nhánh `false` (người
   approve) gọi cùng verb với actor=`human` SAU KHI người trả lời "Approve"
@@ -110,7 +110,7 @@ tồn tại thì không có gì đọc).
 
 **Phạm vi (đã điều chỉnh lúc thi công — xem "Phát hiện lúc thi công" bên
 dưới):**
-- `src/intake/decompose.mjs` — `resolveDecompose`: skip `judgeDecompose`
+- `src/intake/plan.mjs` — `resolveDecompose`: skip `judgeDecompose`
   CHỈ khi `plan.md` (đọc qua `readLockedContext`, có sẵn) khai `mode =
   tiny`/`small` — không skip vô điều kiện chỉ vì `plan.md` tồn tại. Mọi
   nhánh advance sang `executing` (skip, pass-through thật, decompose thật,
@@ -130,12 +130,12 @@ an toàn 1:1 cho decompose. Khác biệt cốt lõi: `resolveDiscovery`'s skip c
 đổi `stage` (không sinh dữ liệu mới); `resolveDecompose` có thể SINH CON
 THẬT (`addWork`) — skip mù (chỉ dựa "plan.md tồn tại") sẽ bỏ qua chính việc
 LLM đọc plan.md để tạo children, đúng thứ chính root `tsk-19j` này vừa cần
-thật (`fgos decompose tsk-19j` phải gọi `judgeDecompose` thật để sinh 3
+thật (`fgos plan tsk-19j` phải gọi `judgeDecompose` thật để sinh 3
 item con — không skip được). Sửa: chỉ skip khi `plan.md` tự khai `mode =
-tiny`/`small` (fgos-planning's mode gate: 0-1 cờ → luôn single-piece, không
+tiny`/`small` (fgos-coding-planning's mode gate: 0-1 cờ → luôn single-piece, không
 bao giờ chia) — mode khác hoặc không đọc được mode → fail-safe, vẫn gọi
 `judgeDecompose` thật như hôm nay. Ghi qua `fgos decision` lúc thi công,
-test `test/intake/decompose.test.mjs` phủ cả 2 nhánh (skip đúng lúc tiny/
+test `test/intake/plan.test.mjs` phủ cả 2 nhánh (skip đúng lúc tiny/
 small, không skip lúc standard/high-risk hoặc thiếu plan.md).
 
 **Rủi ro:** vừa-cao — sửa hành vi 2 engine function đang có test bao phủ
@@ -147,7 +147,7 @@ direction:"upstream"})` và `impact({target:"resolveDiscovery",
 direction:"upstream"})` — báo blast radius cho người trước khi sửa (posture
 full, §2).
 
-**Ràng buộc contract (tìm thấy ở fgos-validating, xác nhận qua
+**Ràng buộc contract (tìm thấy ở fgos-coding-validating, xác nhận qua
 `src/runner/loop.mjs:970-1000` + `bin/fgos.mjs`'s `decompose` verb, dòng
 871+):** `loop.mjs`'s 2 sweep không đọc giá trị trả về (fire-and-forget,
 chỉ log) — nhưng `bin/fgos.mjs`'s verb trả thẳng `resolveDecompose`'s
@@ -162,7 +162,7 @@ chưa biết xử lý giá trị lạ.
 
 **Verify:**
 ```
-node --test test/intake/discovery.test.mjs test/intake/decompose.test.mjs
+node --test test/intake/discovery.test.mjs test/intake/plan.test.mjs
 ```
 
 ### Item con 3 — `tsk-19j-3`: Driver `fgos-coding-driving` + frontier generalize + retrofit cook/pick (Track D)
@@ -209,7 +209,7 @@ thể, không phải ngại việc:
    skill tương tác nhiều lượt hỏi-đáp người thật; không có cách chạy "song
    song" nó với driver mà không tốn hàng chục lượt turn thật hoặc giả lập
    câu trả lời (giả lập = không phải bằng chứng thật, đúng đại kỵ
-   fgos-validating's "no plausibility language as evidence").
+   fgos-coding-validating's "no plausibility language as evidence").
 2. **`cook` đang được dùng thật, đồng thời, bởi 1 session Claude Code khác
    trên chính repo này** (quan sát trực tiếp lúc thi công tsk-19j-2:
    `CK_SESSION_ID` khác đang tự chạy `fgos merge`/`fgos return` song song)
@@ -257,7 +257,7 @@ lên đầu) là logic riêng của `cook`.
 → `tsk-19j-3` làm song song bất kỳ lúc nào (không phụ thuộc dữ liệu A/B),
 nhưng RETROFIT `cook`/`pick` (phần cuối track D) nên đợi `tsk-19j-1`+
 `tsk-19j-2` xong — vì sau retrofit, mọi lần `cook`/`pick` chạy qua
-`fgos-exploring`/`fgos-planning`/`fgos-validating` sẽ đụng đường ghi
+`fgos-coding-exploring`/`fgos-coding-planning`/`fgos-coding-validating` sẽ đụng đường ghi
 approve record mới; đổi thứ tự ngược lại (retrofit trước) không sai kỹ
 thuật nhưng dồn rủi ro 2 thay đổi lớn (schema mới + driver mới) vào cùng
 một lần chạy thật, không tách được nguyên nhân nếu có lỗi.

@@ -77,7 +77,7 @@ now that its content is confirmed safe.
 - Exact wording/shape of the improved diagnostic message and how
   `checkMergeStillResolves` detects "ref exists but sha is neither
   ancestor nor descendant of its tip" cheaply — an implementation choice,
-  left to `fgos-planning`.
+  left to `fgos-coding-planning`.
 - Exact mechanism for manually unblocking `tsk-47e` (D3) — `fgos edit`
   the stale `branchHeadAtReturn` field to the branch's real current tip,
-  vs. a direct status move — left to `fgos-planning`.
+  vs. a direct status move — left to `fgos-coding-planning`.

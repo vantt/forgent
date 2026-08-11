@@ -26,7 +26,7 @@ resolve step, no skill-side branching.
 ## Real example (tsk-2yp)
 
 `src/intake/judge-executor.mjs`'s `runJudgeExecutor` — called by
-`judgeDiscovery`/`judgeDecompose` on every `fgos discover`/`fgos decompose`
+`judgeDiscovery`/`judgeDecompose` on every `fgos discover`/`fgos plan`
 call — always called `resolveExecutorCommand(cfg, { prompt, model, tier:
 'judge' })` with no `capacityId`. Fix was pure signature threading, no new
 mechanism:

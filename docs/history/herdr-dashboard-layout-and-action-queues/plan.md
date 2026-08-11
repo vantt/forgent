@@ -17,7 +17,7 @@ layout-and-action-queues/CONTEXT.md`) — `fgos-routing`'s own gate treats
 "story-sized behavior" as an independent trigger for **standard**, same as
 2-3 flags.
 
-Impact-analysis posture: **degraded**, corrected during `fgos-validating`
+Impact-analysis posture: **degraded**, corrected during `fgos-coding-validating`
 (the `full` recorded during clarify only checked `fgos tool query
 --capability impact-analysis --status present`, which reports
 `status: "present"` with no freshness signal). Running `node
@@ -56,7 +56,7 @@ test. Splitting into 4 pieces, each provable independently against
 
 **Risk map:**
 
-| Piece | Risk | Why | Proof point (for `fgos-validating`) |
+| Piece | Risk | Why | Proof point (for `fgos-coding-validating`) |
 |---|---|---|---|
 | Left panel (tabs/columns/sort) | standard | Changes `TriageRow`'s shape and the existing "Work items" table's sort order — read by existing render-smoke test | `cargo test --manifest-path herdr-plugin/Cargo.toml` green, including a new priority-ASC-order assertion |
 | Right side (3 boxes) | standard | New data-fetch paths (`NEED ANSWER`/`AFTER DELIVER` need new `fgos.rs` filters; `MERGE LIST` shells a second CLI verb, `fgos merge list`) | Each box's fetch function unit-tested against a fixture JSON matching real `fgos merge list --json`'s shape (already captured this session) |
@@ -116,7 +116,7 @@ would just re-touch lines the other 4 children already own.
 
 ## Handoff
 
-Once this plan is approved, `fgos-validating` runs the reality check
+Once this plan is approved, `fgos-coding-validating` runs the reality check
 before `decompose` moves to `executing` for the anchoring root
 (`tsk-1d5` itself becomes anchored by these 4 children once they exist —
 it will not be directly executable again until every child reaches

@@ -78,7 +78,7 @@ this check's contract needs to reconcile.
 - Exact check/fix implementation shape (what `claude` subcommand output
   the check parses to decide pass/fail, how the fix handles `claude`
   binary absent, whether it targets `project` scope, `local` scope, or
-  both) is an implementation choice for `fgos-planning`, not locked here.
+  both) is an implementation choice for `fgos-coding-planning`, not locked here.
 - Whether `.fgos`/setup config needs a new config-default entry (vs. the
   check/fix being self-contained with no persisted config) is also left
   to planning — trụ cột 4's registry supports either shape.

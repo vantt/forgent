@@ -3,7 +3,7 @@ item: tsk-3uz
 mode: tiny
 ---
 
-# plan.md — tsk-3uz: fgos-planning's split step gets --footprint guidance
+# plan.md — tsk-3uz: fgos-coding-planning's split step gets --footprint guidance
 
 ## Mode gate
 
@@ -14,8 +14,8 @@ dung), không đụng code, không schema, không hành vi runtime nào đổi.
 ## Approach
 
 Sửa bước 5 ("Decide the split") ở CẢ HAI dual-root:
-`.claude/skills/fgos-planning/SKILL.md` và
-`.agents/skills/fgos-planning/SKILL.md` (đồng bộ nội dung — dual-root
+`.claude/skills/fgos-coding-planning/SKILL.md` và
+`.agents/skills/fgos-coding-planning/SKILL.md` (đồng bộ nội dung — dual-root
 apply đã là quy ước sẵn có trong repo, không phải quyết định mới của
 item này). Thêm 1 câu hướng dẫn ngay sau đoạn "carries this item's own
 id as its parent" hiện có: LUÔN kèm `--footprint` khi gọi `fgos add
@@ -40,7 +40,7 @@ Một tác vụ trực tiếp: sửa 1 đoạn văn bản, đồng bộ 2 file.
 
 ## Quyết định split
 
-Không chia — 1 mảnh honest. Verify: `awk '/Decide the split/,0' .claude/skills/fgos-planning/SKILL.md | grep -q -- '--footprint' && awk '/Decide the split/,0' .agents/skills/fgos-planning/SKILL.md | grep -q -- '--footprint'` (đã khoá qua `discover --force`, xem CONTEXT.md/friction log).
+Không chia — 1 mảnh honest. Verify: `awk '/Decide the split/,0' .claude/skills/fgos-coding-planning/SKILL.md | grep -q -- '--footprint' && awk '/Decide the split/,0' .agents/skills/fgos-coding-planning/SKILL.md | grep -q -- '--footprint'` (đã khoá qua `discover --force`, xem CONTEXT.md/friction log).
 
 ## Assumptions
 

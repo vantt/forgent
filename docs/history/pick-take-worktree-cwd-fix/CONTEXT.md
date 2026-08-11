@@ -53,7 +53,7 @@ Both confirmed by user: "Fix trọn vẹn cả D1 và D2" (fix both fully).
   '.claude', 'worktrees') })`.
 - Established correct pattern already exists elsewhere in the same file:
   `bin/fgos.mjs:1537` (`wiki` verb) — `const repoRoot =
-  path.dirname(dir);` — and `src/intake/decompose.mjs:438` — same pattern.
+  path.dirname(dir);` — and `src/intake/plan.mjs:438` — same pattern.
   `dataDir()`/`fgosDirFromRoot` (`bin/fgos.mjs:89-100`) confirms `dir ===
   <repoRoot>/.fgos` whenever `--dir` is passed; without `--dir`, `dir`
   resolves from `process.cwd()` too, so `path.dirname(dir)` is
@@ -79,7 +79,7 @@ Both confirmed by user: "Fix trọn vẹn cả D1 và D2" (fix both fully).
   exists as that layer) — spawn `pick`/`take` with `--dir` pointed at a
   main checkout while `cwd` is set to a different (e.g. already-removed or
   simply different) directory, and confirm no ENOENT / correct repoRoot
-  used. Left to `fgos-planning` to shape the actual test.
+  used. Left to `fgos-coding-planning` to shape the actual test.
 - `fgos tool query --capability impact-analysis --status present` →
   `gitnexus` present. Posture: **impact-analysis: full** — GitNexus's
   MUST rules (impact analysis before editing `claimWork`,
@@ -93,7 +93,7 @@ Both confirmed by user: "Fix trọn vẹn cả D1 và D2" (fix both fully).
   verb's existing `repoRoot = path.dirname(dir)` pattern)
 - `src/runner/claim-port.mjs` (`claimWork`)
 - `src/runner/worktree.mjs` (`reclaimOrphanedCheckout`, `createWorktree`)
-- `src/intake/decompose.mjs:438` (sibling correct pattern)
+- `src/intake/plan.mjs:438` (sibling correct pattern)
 - `test/runner/claim-port.test.mjs`, `test/cli/fgos.test.mjs` (existing
   test layers)
 

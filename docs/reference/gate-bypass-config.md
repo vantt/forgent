@@ -6,7 +6,7 @@ source_capture_ids: [tsk-6bx-1, tsk-6bx-2]
 # Gate-bypass config
 
 Reference for `.fgos/gate-bypass.json`, the `fgos gate-bypass` verb, and
-the `fgos-exploring`/`fgos-planning` Gate steps that consult them — the
+the `fgos-coding-exploring`/`fgos-coding-planning` Gate steps that consult them — the
 full mechanism that lets a skill-embedded confirmation gate auto-approve
 instead of asking (`docs/history/gate-bypass/CONTEXT.md` D1-D5).
 
@@ -80,10 +80,10 @@ An artifact that never adopts the `## Outstanding questions` convention
 is always treated as incomplete — this is a fail-closed default, not a
 detection gap to fix later.
 
-## Gate-step wiring (`fgos-exploring`, `fgos-planning`)
+## Gate-step wiring (`fgos-coding-exploring`, `fgos-coding-planning`)
 
 Both skills' Gate sections run a check before presenting their approval
-question — `fgos-exploring` against `CONTEXT.md`, `fgos-planning` against
+question — `fgos-coding-exploring` against `CONTEXT.md`, `fgos-coding-planning` against
 `plan.md`:
 
 ```bash

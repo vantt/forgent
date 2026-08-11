@@ -18,8 +18,8 @@ test -f .claude/skills/fgos/fgos-terminal/SKILL.md && grep -q fgOS:terminal .cla
 (still visible in the item's own `settlement.recent` entry, kind
 `clarify-pass`, even after the field was corrected). Both paths are wrong:
 `.claude/skills/fgos/` only ever holds the core workflow skills
-(`fgos-routing`, `fgos-exploring`, `fgos-planning`, `fgos-validating`,
-`fgos-code-implement`, `fgos-compounding`, `fgos-submit-assist`, `fgos-unlock`,
+(`fgos-routing`, `fgos-coding-exploring`, `fgos-coding-planning`, `fgos-coding-validating`,
+`fgos-coding-implement`, `fgos-coding-compounding`, `fgos-submit-assist`, `fgos-unlock`,
 `fgos-indexing`) — never a per-verb slash-command skill. The real
 `/fgOS:pick` skill lives at `plugins/fgOS/skills/pick/SKILL.md`, confirmed
 directly (`test -d .claude/skills/fgos/fgos-pick` → missing;
@@ -28,7 +28,7 @@ anything.
 
 ## Why this isn't a "reopen a locked decision" violation
 
-`fgos-validating`'s hard rules forbid reopening a decision already locked
+`fgos-coding-validating`'s hard rules forbid reopening a decision already locked
 in `CONTEXT.md`/`plan.md`. A `verify` path that provably doesn't exist on
 disk isn't a locked *decision* — it's a factual claim the machine
 judgment made about the repo's own layout, independently falsifiable with

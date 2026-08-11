@@ -71,7 +71,7 @@ visibility (`view.decisions`).
 - `src/intake/judge-executor.mjs` (full file, read this session) —
   `runJudgeExecutor`, `parseVerdict`, `MAX_JUDGE_ATTEMPTS`,
   `JUDGE_STRICT_JSON_SUFFIX`, `spawnAttempt`.
-- `src/intake/discovery.mjs:28,187-189` and `src/intake/decompose.mjs:24,222-224`
+- `src/intake/discovery.mjs:28,187-189` and `src/intake/plan.mjs:24,222-224`
   — the two existing callers of `runJudgeExecutor`/`JUDGE_STRICT_JSON_SUFFIX`,
   confirming "zero behavior change" is the full blast radius of the
   extraction (both call sites unchanged if the helper's exported signature
@@ -94,7 +94,7 @@ visibility (`view.decisions`).
   provider, `gitnexus`, `status: "present"` — AGENTS.md's impact-analysis
   gate reads **full**: `impact()` MUST be run (and its risk level reported)
   before editing `judge-executor.mjs`'s exported functions or their two
-  call sites, once this item reaches `fgos-code-implement`.
+  call sites, once this item reaches `fgos-coding-implement`.
 - `git merge-base --is-ancestor 1f1788a main` (false) and
   `git branch --all --contains 1f1788a` (`fgw/tsk-5l2`, `fgw/tsk-g18`) — the
   base-branch integration gap and its existing in-repo precedent (D4).

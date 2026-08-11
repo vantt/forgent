@@ -8,7 +8,7 @@ full-suite close-out (`fgos approve tsk-3ik-4 --acknowledge-iron-law`,
 2026-08-03), passed cleanly on repeated isolated reruns (15/15). This item
 covers: determining the real cause of the flake, and deciding what — if
 anything — changes in `session.mjs` or the test itself. It does not cover
-implementing that change; that is `fgos-planning`/`fgos-executing`'s job.
+implementing that change; that is `fgos-coding-planning`/`fgos-executing`'s job.
 
 ## Locked decisions
 
@@ -16,7 +16,7 @@ implementing that change; that is `fgos-planning`/`fgos-executing`'s job.
 |----|----------|
 | D1 | **SUPERSEDED by D3** — was: "confirm the lock design prevents lost-update by construction, and diagnose whether `sessions.lock`'s coarse scope... plus its 10s timeout is the real flake trigger". Wrong: see D3. |
 | D2 | **SUPERSEDED by D4** — was: "exclude/tag the test out of the default `npm test` run, mirroring `tsk-3ld`'s precedent". Wrong: `tsk-3ld` never excluded a test; see D4. |
-| D3 | D1 reversed (new evidence, surfaced at `fgos-validating`). `session.mjs`'s `tryAcquireOnce` (`session.mjs:137-145`) still carries the exact pre-fix vulnerable pattern `events.mjs` had: `fs.openSync(lockPath, 'wx')` then a separate `fs.writeSync` — a TOCTOU window where the lock file exists but is empty, so a competing process reading it mid-write sees unparseable (NaN) content, misreads it as a dead/garbage holder, and unlinks a lock a live process still holds. This is the SAME bug `tsk-3ld` already found and fixed in `events.mjs` (commit `962eb6b`, `fs.linkSync`-based atomic create — `events.mjs:214-225`), reproduced there at ~30% failure rate at 20 concurrent processes (`docs/history/events-lock-concurrency-race/plan.md`). `session.test.mjs`'s own test only spawns 5 processes — below that reproduction threshold — which exactly matches the "isolated pass, full-suite flake" signature this item started from. Real, confirmed-by-precedent bug — not test oversensitivity, not lock-contention-timeout. |
+| D3 | D1 reversed (new evidence, surfaced at `fgos-coding-validating`). `session.mjs`'s `tryAcquireOnce` (`session.mjs:137-145`) still carries the exact pre-fix vulnerable pattern `events.mjs` had: `fs.openSync(lockPath, 'wx')` then a separate `fs.writeSync` — a TOCTOU window where the lock file exists but is empty, so a competing process reading it mid-write sees unparseable (NaN) content, misreads it as a dead/garbage holder, and unlinks a lock a live process still holds. This is the SAME bug `tsk-3ld` already found and fixed in `events.mjs` (commit `962eb6b`, `fs.linkSync`-based atomic create — `events.mjs:214-225`), reproduced there at ~30% failure rate at 20 concurrent processes (`docs/history/events-lock-concurrency-race/plan.md`). `session.test.mjs`'s own test only spawns 5 processes — below that reproduction threshold — which exactly matches the "isolated pass, full-suite flake" signature this item started from. Real, confirmed-by-precedent bug — not test oversensitivity, not lock-contention-timeout. |
 | D4 | D2 reversed. No longer exclude the test. Instead: port `events.mjs`'s `tryAcquireEventsLockOnce`'s `linkSync`-based atomic-create fix to `session.mjs`'s `tryAcquireOnce` (write pid to a per-attempt temp file, `fs.linkSync` onto `lockPath`, instead of `openSync('wx')` + `writeSync`). Mirror `tsk-3ld`'s actual remedy shape: keep the test in the default suite; consider raising its process count as permanent regression coverage at the scale that actually catches this (`tsk-3ld` bumped `N_PROC` 6→20 for the same reason). |
 
 ## Pinned terms
@@ -60,7 +60,7 @@ implementing that change; that is `fgos-planning`/`fgos-executing`'s job.
   concurrent reader can catch mid-write. See D3/D4.
 - `src/state/events.mjs:205-243` (`tryAcquireEventsLockOnce`) and
   `docs/history/events-lock-concurrency-race/plan.md` — `tsk-3ld`'s actual
-  outcome (read fresh at `fgos-validating`, not assumed): a **real** race
+  outcome (read fresh at `fgos-coding-validating`, not assumed): a **real** race
   in this exact create-vs-write shape, reproduced at ~30% failure rate at
   20 concurrent processes, fixed by writing the pid to a per-attempt temp
   file then `fs.linkSync`-ing it onto `lockPath` (atomic — `link()` only
@@ -104,11 +104,11 @@ implementing that change; that is `fgos-planning`/`fgos-executing`'s job.
 
 - The exact diff shape for porting `events.mjs`'s `linkSync` technique into
   `session.mjs`'s `tryAcquireOnce` (temp-file naming, cleanup on the
-  link-failure path) — implementation detail, left to `fgos-planning`.
+  link-failure path) — implementation detail, left to `fgos-coding-planning`.
 - Whether `session.test.mjs`'s concurrent-createSession test should have
   its process count raised (mirroring `tsk-3ld`'s `N_PROC` 6→20 bump) as
   permanent regression coverage, and by how much — sizing left to
-  `fgos-planning` against this item's `light` tier.
+  `fgos-coding-planning` against this item's `light` tier.
 - Whether `loop.mjs`'s `acquireRunnerLock` (the third sibling
   `events.mjs:29-33` names as sharing the original pattern) also needs
   this fix is explicitly OUT OF SCOPE for this item — `tsk-1u7`'s

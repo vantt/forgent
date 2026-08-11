@@ -13,13 +13,13 @@ Flags counted:
 - audit/security — no
 - external systems — no
 - **public contracts — yes.** `resolveDiscovery`/`resolveDecompose` back
-  the `fgos discover`/`fgos decompose` CLI verbs, consumed by every
-  coding-domain skill (`fgos-exploring`, `fgos-planning`, `fgos-validating`,
-  `fgos-code-implement`) and the runner's RUL19 sweep — a behavior change here is
+  the `fgos discover`/`fgos plan` CLI verbs, consumed by every
+  coding-domain skill (`fgos-coding-exploring`, `fgos-coding-planning`, `fgos-coding-validating`,
+  `fgos-coding-implement`) and the runner's RUL19 sweep — a behavior change here is
   visible to all of them.
 - cross-platform — no
 - **existing covered behavior — yes.** `test/intake/discovery.test.mjs`
-  (55K) and `test/intake/decompose.test.mjs` (65K) already cover
+  (55K) and `test/intake/plan.test.mjs` (65K) already cover
   `resolveDiscovery`/`resolveDecompose` in depth.
 - **weak proof around the area — yes.** `mkLockedContextFixture`
   deliberately constructs `repoRoot == content-root`, which is exactly why
@@ -39,8 +39,8 @@ by dependency between the two fixes themselves, not by `fgos graph`.
 
 Impact-analysis posture: **full** (`fgos tool query --capability
 impact-analysis --status present` returned `gitnexus`/`present`, checked
-during `fgos-exploring`). GitNexus impact analysis is run before editing
-`resolveDiscovery`/`resolveDecompose` at `fgos-code-implement`, per `CLAUDE.md`'s
+during `fgos-coding-exploring`). GitNexus impact analysis is run before editing
+`resolveDiscovery`/`resolveDecompose` at `fgos-coding-implement`, per `CLAUDE.md`'s
 own MUST rule — not skipped or degraded here.
 
 ## Approach
@@ -60,8 +60,8 @@ next to `readLockedContext` in `decompose.mjs` (same module, same import
 
 1. `process.cwd()` — the common case. Every caller that has real locked
    content to find is the interactive session itself, invoked from inside
-   the item's own worktree (`fgos-exploring`'s and `fgos-planning`'s own
-   hard rule: commit before calling `fgos discover`/`fgos decompose`, and
+   the item's own worktree (`fgos-coding-exploring`'s and `fgos-coding-planning`'s own
+   hard rule: commit before calling `fgos discover`/`fgos plan`, and
    this session's own actual invocations in this branch confirm the CLI is
    run from that same cwd). Zero extra cost — just use the process's own
    working directory as the first candidate.
@@ -108,13 +108,13 @@ placeholders. Applies regardless of whether D1's skip-and-advance path or
 the real `judgeDiscovery` path produced the clear verdict — both call
 `moveStage` with a `verify` value today, both get the guard.
 
-`decompose.mjs` needs no equivalent guard (confirmed at `fgos-exploring`:
+`decompose.mjs` needs no equivalent guard (confirmed at `fgos-coding-exploring`:
 `planApproveVerify` is read once at line 431 and reused unconditionally at
 every `moveStage`-to-`executing` call site already).
 
 ## Files touched, in order
 
-1. `src/intake/decompose.mjs` — add `resolveContentRoot`, export it; update
+1. `src/intake/plan.mjs` — add `resolveContentRoot`, export it; update
    `resolveDecompose`'s call site (line ~438-439) to use it. Depends on
    nothing else in this plan — do first since `discovery.mjs` imports from
    this module already.
@@ -122,7 +122,7 @@ every `moveStage`-to-`executing` call site already).
    `resolveDiscovery`'s call site (line ~518-519) to use it; add the D2
    verify-overwrite guard before the clear-verdict `moveStage` call
    (line ~572-580).
-3. `test/intake/decompose.test.mjs` — new fixture shape that separates
+3. `test/intake/plan.test.mjs` — new fixture shape that separates
    `stateRoot` from `content-root` (a real second directory, or a fixture
    `git worktree`), replacing/supplementing `mkLockedContextFixture`'s
    coincidental `repoRoot == content-root` construction; cover all three
@@ -142,12 +142,12 @@ every `moveStage`-to-`executing` call site already).
 | D2 verify-overwrite guard | Low — isolated conditional, single call site | Test: clear verdict + already-real `work.verify` → unchanged; clear verdict + placeholder/empty `work.verify` → `verdict.verify` used, matching today's behavior |
 | RUL19 sweep behavior for items with no worktree and no merged content | Low — must stay unchanged (fail open to real judge) | Existing sweep tests continue passing; `resolveContentRoot`'s fallback branch is exactly today's `repoRoot`, same as before this fix |
 
-## Assumptions (unproven, flagged for fgos-validating)
+## Assumptions (unproven, flagged for fgos-coding-validating)
 
 - `process.cwd()` at the time `resolveDiscovery`/`resolveDecompose` run
   during a real interactive session is reliably the item's own `fgw/<id>`
   worktree — true for every call site observed in this session's own
-  history (fgos-exploring/fgos-planning/pick's own worktree-switch flow),
+  history (fgos-coding-exploring/fgos-coding-planning/pick's own worktree-switch flow),
   not independently proven for every possible caller shape.
 - `git worktree list --porcelain`'s branch-name field is stable/parseable
   the same way across the git version(s) this repo runs on — not verified
@@ -158,7 +158,7 @@ every `moveStage`-to-`executing` call site already).
 Verify command for this item as a whole (no split):
 
 ```
-node --test test/intake/discovery.test.mjs test/intake/decompose.test.mjs
+node --test test/intake/discovery.test.mjs test/intake/plan.test.mjs
 ```
 
 Narrow, matches the two touched source files exactly (same pattern

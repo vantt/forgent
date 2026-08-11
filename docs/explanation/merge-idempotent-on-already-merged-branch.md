@@ -84,7 +84,7 @@ node --test --test-name-pattern="mergeRunnerItem|merge.*idempotent" test/runner/
 confirmed against the file's existing tests (8 matched) before the fix, and
 against all 10 (8 existing + 2 new) after. The lesson: a recorded `verify`
 command is only real evidence once it has actually been *run*, not read and
-assumed correct — the whole reason `fgos-validating` exists as a distinct
+assumed correct — the whole reason `fgos-coding-validating` exists as a distinct
 step before `executing` begins.
 
 ## The tests that pin this down

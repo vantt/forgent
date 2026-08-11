@@ -1,7 +1,7 @@
 # tsk-3xo — Iron Law evidence
 
 `classifyIronLaw` on this item's real diff (commit `8b6741f`, computed via
-`changedFiles`/`classifyIronLaw` per `fgos-code-implement`'s own step 4):
+`changedFiles`/`classifyIronLaw` per `fgos-coding-implement`'s own step 4):
 
 ```json
 {
@@ -9,7 +9,7 @@
     "bin/fgos.mjs",
     "docs/history/tsk-3xo-domain-agnostic-stage-literals/CONTEXT.md",
     "docs/history/tsk-3xo-domain-agnostic-stage-literals/plan.md",
-    "src/intake/decompose.mjs",
+    "src/intake/plan.mjs",
     "src/intake/discovery.mjs",
     "src/state/workflow-stage-graphs.mjs",
     "test/e2e/domain-aware-stage-literals.test.mjs",
@@ -33,13 +33,13 @@ node --test test/e2e/domain-aware-stage-literals.test.mjs
 ## Failing-before transcript
 
 Real run against the pre-fix source (`git checkout 6a2ec31 -- bin/fgos.mjs
-src/intake/decompose.mjs src/intake/discovery.mjs
+src/intake/plan.mjs src/intake/discovery.mjs
 src/state/workflow-stage-graphs.mjs test/state/workflow-stage-graphs.test.mjs`,
 new test file kept as-is, then restored to the fixed `HEAD` version
 afterward — never a hand-edited/fabricated transcript):
 
 ```
-✖ sync CLI: fgos discover / fgos decompose cross a "triage" fixture-domain item through its own Clarify/Divide-mapped stages (not coding's literal names), no throw (177.019127ms)
+✖ sync CLI: fgos discover / fgos plan cross a "triage" fixture-domain item through its own Clarify/Divide-mapped stages (not coding's literal names), no throw (177.019127ms)
 ✖ runner sweep: a "triage" fixture-domain item at its own Clarify-mapped stage no longer halts the whole tick — an unrelated coding item in the same sweep still dispatches (160.624223ms)
 ℹ tests 2
 ℹ suites 0
@@ -53,7 +53,7 @@ afterward — never a hand-edited/fabricated transcript):
 ✖ failing tests:
 
 test at test/e2e/domain-aware-stage-literals.test.mjs:168:1
-✖ sync CLI: fgos discover / fgos decompose cross a "triage" fixture-domain item through its own Clarify/Divide-mapped stages (not coding's literal names), no throw (177.019127ms)
+✖ sync CLI: fgos discover / fgos plan cross a "triage" fixture-domain item through its own Clarify/Divide-mapped stages (not coding's literal names), no throw (177.019127ms)
   AssertionError [ERR_ASSERTION]: fgos submit failed: fgos: work.domain must be one of ["coding","synthetic"] when present, got: "triage"
 
   4 !== 0
@@ -79,7 +79,7 @@ does not work pre-fix.
 Real run against the fixed source (`HEAD`, commit `8b6741f`):
 
 ```
-✔ sync CLI: fgos discover / fgos decompose cross a "triage" fixture-domain item through its own Clarify/Divide-mapped stages (not coding's literal names), no throw (315.038267ms)
+✔ sync CLI: fgos discover / fgos plan cross a "triage" fixture-domain item through its own Clarify/Divide-mapped stages (not coding's literal names), no throw (315.038267ms)
 ✔ runner sweep: a "triage" fixture-domain item at its own Clarify-mapped stage no longer halts the whole tick — an unrelated coding item in the same sweep still dispatches (569.053536ms)
 ℹ tests 2
 ℹ suites 0

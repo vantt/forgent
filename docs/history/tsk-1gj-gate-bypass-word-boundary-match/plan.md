@@ -32,7 +32,7 @@ stale. Cross-checked instead: `grep -rn "canAutoApprove\b\|canAutoApproveValidat
 src` finds only the two functions' own definitions in `gate-bypass.mjs` --
 no other `src/` module imports or calls them directly. Every real caller is
 a `node -e` inline snippet inside skill prose (`.claude/skills/fgos-
-planning/SKILL.md`, `fgos-validating/SKILL.md`, already read and used
+planning/SKILL.md`, `fgos-coding-validating/SKILL.md`, already read and used
 directly this session), which only ever consumes the boolean return value
 -- none depend on the substring-vs-word-boundary matching internals, so
 tightening the match is a pure bugfix with no call-site-shape change

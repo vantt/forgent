@@ -77,9 +77,9 @@ buộc phải giữ lại (id, footprint, verify, merge) khi việc con thực s
 | 6 | Bee chống xung đột footprint bằng xếp sóng, không bằng từ chối | **Rõ** | `bee-swarming/SKILL.md:94` (`cells schedule`, Kahn); `planning-reference.md:105`: *"Cross-cell file overlap is legal, not a scoping error — it only costs a wave"* |
 | 7 | Bee không tin worker | **Rõ** | `bee-swarming/SKILL.md:114-118`: orchestrator tự chạy lại verify + `cells judge`; worker chỉ trả đúng 1 token `[DONE]/[BLOCKED]/[HANDOFF]/[NOOP]` (`swarming-reference.md:246`) |
 | 8 | fgOS có field per-item nào khẳng định "task con trọn vẹn, tự chạy hết stage" không? | **Rõ — KHÔNG có** | `src/state/store.mjs:238` `EDITABLE_FIELDS` 22 field, không có cờ nào dạng đó. Cái gần nhất là cấu hình toàn repo: `src/state/gate-bypass.mjs` — `level × tier` (`isTierCovered`) + kiểm cơ học trên ARTIFACT (`hasOpenItems`: `TODO/FIXME`, `## Outstanding questions` phải là "None") + sàn `HEAVY_KEYWORDS` luôn ghi đè |
-| 9 | Con auto-decompose có bị GATE không? | **Rõ — không bị** | `src/intake/decompose.mjs:940` đóng dấu thẳng `stage: stageForStep(domain,'Execute')` — con bỏ qua clarify + decompose, không chạm gate của exploring/planning/validating |
+| 9 | Con auto-decompose có bị GATE không? | **Rõ — không bị** | `src/intake/plan.mjs:940` đóng dấu thẳng `stage: stageForStep(domain,'Execute')` — con bỏ qua clarify + decompose, không chạm gate của exploring/planning/validating |
 | 10 | Con auto-decompose có đủ chi tiết để chạy không? | **Rõ — KHÔNG, và lỗ nằm ở BA tầng** | Tầng 1: prompt hỏi LLM không xin prose (`decompose.mjs:227`, schema chỉ `{title, verify, kind...}`). Tầng 2: `normalizeChild` (`decompose.mjs:231-255`) chỉ giữ `title, verify, kind, risk, refs, footprint, rawDeps` — model có trả prose cũng bị vứt. Tầng 3: `addWork` (`decompose.mjs:929-944`) không truyền `description`, trong khi `src/runner/prompt-templates/worker-prompt-{default,skill-pointer}.txt` nội suy `{description}`. Đã tách ra item riêng `tsk-3xd` |
-| 10b | Lỗ này có phải do chất lượng LLM judge không? | **Rõ — không, là lỗ hợp đồng** | `buildDecomposeChildrenVerdict` dùng CHUNG `normalizeChild` cho cả đường `fgos decompose --children` (tsk-27y D1, native-first, session sống tự lý luận cách chia) ⇒ kể cả session có đủ context tự viết cách chia cũng không có đường truyền thân mệnh lệnh xuống con |
+| 10b | Lỗ này có phải do chất lượng LLM judge không? | **Rõ — không, là lỗ hợp đồng** | `buildDecomposeChildrenVerdict` dùng CHUNG `normalizeChild` cho cả đường `fgos plan --children` (tsk-27y D1, native-first, session sống tự lý luận cách chia) ⇒ kể cả session có đủ context tự viết cách chia cũng không có đường truyền thân mệnh lệnh xuống con |
 | 11 | Launcher tự pick con thì merge có tuần tự qua cha? | **Rõ — có** | `src/runner/worktree.mjs:30` leaf fork từ tip nhánh root (D3 "leaf fork-from-tip-of-parent"); `src/runner/merge.mjs:600` target là `main` cho root→main, `fgw/<root>` cho leaf→parent; `src/state/dep-graph.mjs:156` cạnh `parent-child` hướng parent→child ⇒ cha đợi con. Git log thực tế: `da2d382 Merge branch 'fgw/tsk-40t' into fgw/tsk-1d5` |
 | 12 | Làm B1 trước rồi đánh giá lại, hay mở luôn B2? | **Chốt — D3 + D4** | Câu hỏi tự tan sau vòng 4: B1 đã tồn tại (là `capacity`), nên việc thật là mở gói động (D3); còn B2 gác (D4). Không còn là lựa chọn thứ tự nữa |
 | 13 | Nếu làm B2: id ephemeral hình dạng nào | **Gác theo D4** — nhưng đừng lẫn với D6b | D6b đã định id dạng `<scope>#p<n>` cho **gói động**, và đó là id **tham chiếu** (khớp digest với gói khi chạy song song), KHÔNG phải id vòng đời. Id vòng-đời-rút-gọn mà B2 cần (claim/reserve/cap/merge, chỗ lưu sổ) vẫn chưa quyết và vẫn gác |
@@ -92,7 +92,7 @@ buộc phải giữ lại (id, footprint, verify, merge) khi việc con thực s
 | 20 | B1 có phải khái niệm mới không? | **Rõ — KHÔNG, nó là `capacity` đã khoá** | `docs/decisions/0026` dòng 67-74: **subTask** *"đúng bản chất chỉ là 1 rootTask khác, được kích hoạt đệ quy"*; **capacity** *"1 đơn vị functional/helper hẹp... không tự mang vòng đời 1 rootTask đầy đủ"*. Dòng 76-86 chốt hai cái **không gộp khái niệm**, chỉ gộp **cơ chế dispatch** (4 quy tắc, dòng 88-115). Trùng khít ranh giới bee ở hàng 2 |
 | 21 | Máy của capacity đã chạy chưa? | **Rõ — đã xong tới Pha 4** | `.claude/skills/_shared/capacity-dispatch-fallback.md` (config check → presence check → native-vs-cli → prompt → fallback inline). Pha 1-4 của 0026 đều ở `cleanup`: `tsk-1ni`, `tsk-27y`, `tsk-53h`, `tsk-3ik`. Chỉ Pha 5 (`tsk-6db`, native detection cho agy) còn `todo`, deferred YAGNI |
 | 22 | Hình dạng capacity có khớp cách chia việc người dùng cần không? | **Rõ — KHÔNG, lệch hai chốt** | Chốt 1: capacity là điểm dispatch **đăng ký trước** — đòi `capacities.<id>` trong config + `<PROMPT_TEMPLATE>` **cố định** hardcode trong skill (*"so every dispatch asks the exact same thing, never a paraphrase that drifts call to call"*). Chốt 2: danh sách lý do hợp lệ để dispatch chỉ có ba — *cheaper model, cross-provider, resource isolation* — **không có song song hoá** |
-| 23 | Lệnh cấm ad-hoc Task dispatch nằm ở đâu? | **Rõ — ở skill, không ở 0026** | `fgos-exploring/SKILL.md:32-49` và bản sao ở `fgos-planning:46`, `fgos-validating:55`, `fgos-code-implement:48`. 0026 §Ranh giới quan sát được chỉ tách hai lý do của **native-vs-cli** (tránh soul mù re-derive; quan sát được) — chưa bao giờ phát biểu về **dispatch-vs-inline**. Sửa danh sách trong skill không đụng luật khoá |
+| 23 | Lệnh cấm ad-hoc Task dispatch nằm ở đâu? | **Rõ — ở skill, không ở 0026** | `fgos-coding-exploring/SKILL.md:32-49` và bản sao ở `fgos-coding-planning:46`, `fgos-coding-validating:55`, `fgos-coding-implement:48`. 0026 §Ranh giới quan sát được chỉ tách hai lý do của **native-vs-cli** (tránh soul mù re-derive; quan sát được) — chưa bao giờ phát biểu về **dispatch-vs-inline**. Sửa danh sách trong skill không đụng luật khoá |
 | 23b | Danh sách ba lý do bị chép ở 4 skill | **Rõ — vấn đề DRY kèm theo** | Bốn bản sao gần như y hệt (`grep "cheaper model"`). Sửa D2 nên chuyển danh sách về `_shared/` rồi trỏ tới, không sửa bốn chỗ song song |
 | 24 | Có thêm song-song-hoá thành lý do hợp lệ không? | **Chốt — D2 (có)** | `AGENTS.md` để Ship Faster ở ưu tiên #1 mà danh sách hiện tại loại trừ đúng lý do tốc độ |
 | 25 | Prompt động hay nhân bản capacity id? | **Chốt — D3 (prompt động)** | Chấp nhận mất bảo đảm chống-drift của fixed template, đổi lấy chia việc uyển chuyển |
@@ -121,7 +121,7 @@ gọi `fgos decision --id tsk-2t6` thật.)_
 | **D5** | Dispatch tả bằng **hai tầng L1/L2**, và trong L1 dùng **hai trục vuông góc** thay vì ba loại rời rạc. Kèm: (a) **không** gọi L2 là "launcher"; (b) **L1 chọn cái gì + ai, L2 suy ra bằng cách nào** | Trục (i) *có mang vòng đời không* là nhị phân sẵn có của 0026; trục (ii) *gói đăng ký trước hay soạn lúc chạy* là phần khung refined thêm vào. Ba ô có nghĩa, ô thứ tư trống **có lý do** — việc mang vòng đời là việc riêng từng lần nên không thể có prompt cố định. (a): 0026 dòng 34-56 đã gán "launcher" cho vai trò quyết định kích hoạt rootTask nào, cao hơn transport. (b): quy tắc 3 ép cross-provider luôn cli/spawn ⇒ cơ chế không phải lựa chọn độc lập của soul | Vòng 5 (người xác nhận). `fgos decision` seq 8020 |
 | **D6** | Gói động phải đủ **SÁU ô bắt buộc**: id gói · mục tiêu một câu · đầu vào phải đọc (đường dẫn cụ thể) · ranh giới (không được chạm/ghi gì) · hình dạng kết quả mong đợi · hợp đồng trả về. Thiếu ô nào ⇒ skill **từ chối dispatch và làm inline** | Fixed template bảo đảm *"cùng một câu hỏi mỗi lần"*; gói động không giữ được nên thay bằng **"cùng một KHUNG câu hỏi"**. Năm ô nội dung là lõi chung của ba nguồn độc lập (`worker-prompt-default.txt` của fgOS, worker prompt template của bee, `RUN_CONTRACT.json` của symphony). Ô id cần vì D2 mở dispatch song song — nhiều gói bay cùng lúc thì cha phải khớp được digest với gói. Fail-safe tái dùng Step D đã có | Vòng 6 (người xác nhận). `fgos decision` seq 8090 |
 | **D6b** | Id gói dạng **`<scope>#p<n>`** — scope là id item đang claim (hoặc token phiên khi không có), `n` tăng dần theo scope | Ký tự `#` làm id **không bao giờ** hợp lệ với `work.mjs:24` `ID_PATTERN` (`/^[a-z][a-z0-9]*(-[a-z0-9]+)*$/`) ⇒ một gói không thể bị nhầm thành work item, không `fgos add`/`pick` được — bảo đảm bằng **cấu trúc**, không bằng quy ước. **Đây là id THAM CHIẾU, không phải id VÒNG ĐỜI**: không claim, không reserve, không cap, không merge — D4 không bị mở lại | Vòng 6 (người xác nhận). `fgos decision` seq 8091 |
-| **D7** | Ba hạng mục sống tách **ba item riêng**, xâu bằng `mergeAfter`: `parallelism-reason` → `adhoc-capacity` → `tier-judged-at-dispatch` | Cả ba sửa `_shared/capacity-dispatch-fallback.md` ⇒ chồng footprint. Gộp thì một item mang ba loại proof không liên quan — đúng thứ `fgos-planning` gọi SPLIT RECOMMENDED. `mergeAfter` chỉ xếp thứ tự lúc merge nên vẫn clarify/plan song song. `parallelism-reason` đi đầu vì chỉ là prose, merge sớm thì hai cái sau rebase sạch | Vòng 6 (người xác nhận). `fgos decision` seq 8092 |
+| **D7** | Ba hạng mục sống tách **ba item riêng**, xâu bằng `mergeAfter`: `parallelism-reason` → `adhoc-capacity` → `tier-judged-at-dispatch` | Cả ba sửa `_shared/capacity-dispatch-fallback.md` ⇒ chồng footprint. Gộp thì một item mang ba loại proof không liên quan — đúng thứ `fgos-coding-planning` gọi SPLIT RECOMMENDED. `mergeAfter` chỉ xếp thứ tự lúc merge nên vẫn clarify/plan song song. `parallelism-reason` đi đầu vì chỉ là prose, merge sớm thì hai cái sau rebase sạch | Vòng 6 (người xác nhận). `fgos decision` seq 8092 |
 | **D8** | **Không** thêm field `selfSufficient`; cần biết thì tính **dẫn xuất** (có prose mệnh lệnh + `verify` chạy được + `footprint` ⇒ dispatch-ready) | Mọi tín hiệu gate hiện nay đều cơ học và **không do agent tự khai** (`hasOpenItems`, `isTierCovered`, `HEAVY_KEYWORDS`). Một cờ tự khai là chỗ **duy nhất** agent tự phong, mà người viết cờ chính là agent muốn qua cổng. Dẫn xuất đúng thói quen derived-never-stored sẵn có | Vòng 6 (người xác nhận). `fgos decision` seq 8093 |
 | **D9** | D4 chỉ xét lại khi **đủ hai điều kiện AND**: (a) `tsk-3xd` đã merge — **ĐÃ THỎA 2026-08-06**; (b) ≥2 ca thật, ghi bằng capture/friction, cha cần con GHI file mà việc đó không đáng thành work item | "Xem lại sau" quá mơ hồ, dễ thành zombie. Thiếu (b) thì D4 giữ nguyên vô thời hạn — YAGNI có răng, đo bằng ca thật chứ không phải cảm giác | Vòng 6 (người xác nhận). `fgos decision` seq 8094 |
 | **D10** | Lớp chọn provider/smart-tier là việc **PHẢI làm** (hoãn, không bỏ). Ràng buộc áp dụng **NGAY**: gói động chừa sẵn hai ô `provider`/`tier` (rỗng = để hệ tự quyết), và `resolve` nhận override từ caller | `dispatch.mjs:1139-1141` đã đọc `capacity?.tier`/`capacity?.model` và truyền xuống `resolveExecutorCommand(cfg, {prompt, model, tier, ...})` — plumbing xuyên suốt đã có. Thiếu đúng một thứ: CLI `resolve` chỉ nhận `<capacityId>` + `--prompt`. Không chừa ô ngay thì mọi dispatch đóng đinh vào `capacity.model ?? modelForTier(cfg, work.tier)` = **luôn rơi về default backend**, và sửa sau phải đụng lại mọi call site. Chừa bây giờ gần như miễn phí | Vòng 6 (người xác nhận). `fgos decision` seq 8095 |
@@ -174,7 +174,7 @@ của (b).
 **Trả lời (sau khi scout `decompose.mjs` sâu hơn):** chưa đủ, nhưng phần thiếu
 đúng việc của `clarify`, không phải của discussion này. Hai thứ scout mới ra và
 đáng vá thẳng vào item: lỗ có **ba tầng** chứ không phải một (§3 hàng 10), và
-đường `fgos decompose --children` dùng chung `normalizeChild` nên đây là **lỗ
+đường `fgos plan --children` dùng chung `normalizeChild` nên đây là **lỗ
 hợp đồng, không phải lỗi chất lượng model** (§3 hàng 10b). Bốn quyết định còn
 mở của item đó (dùng `description` hay thêm field riêng; prose lấy từ verdict
 hay từ `plan.md`/`CONTEXT.md` của cha; có phủ đường `fgos add --parent` thủ công
@@ -224,7 +224,7 @@ không ghi chéo sang item của phiên khác.
 
 **Người dùng:** bàn tiếp.
 
-**Scout (trước khi hỏi bất cứ điều gì mới):** đọc `fgos-exploring/SKILL.md`,
+**Scout (trước khi hỏi bất cứ điều gì mới):** đọc `fgos-coding-exploring/SKILL.md`,
 `.claude/skills/_shared/capacity-dispatch-fallback.md`,
 `docs/decisions/0026`, `src/runner/dispatch.mjs`, và trạng thái 6 item của kế
 hoạch 5 pha trong 0026. Kết quả đảo ngược khung của vòng 1: **B1 không phải thứ
@@ -375,7 +375,7 @@ nặng cho development-ux"*.
 `bin/fgos.mjs:805-822` cho thấy chỉ `submit` stamp stage entry (`add` *"deliberately
 omits this (lazy default, D8)"*), `work.mjs:169` quy định stage vắng đọc là
 `executing`, `workflow-stage-graphs.mjs:69-73` chỉ có ba cạnh **tiến**, và
-`stage` không nằm trong `EDITABLE_FIELDS`. Nặng hơn: `fgos-planning/SKILL.md`
+`stage` không nằm trong `EDITABLE_FIELDS`. Nặng hơn: `fgos-coding-planning/SKILL.md`
 step 4 **dạy** tách con bằng đúng `fgos add --parent` ⇒ mọi con do planning tách
 ra đều mất reality check. Đã submit **`tsk-621`** (bug/standard).
 
@@ -438,8 +438,8 @@ phương án (c) "chỉ sửa cửa vào" **không** xử được cơ chế 2.
 có ổn không, đóng phiên này được chưa?
 
 **Tính từ footprint thật, không đoán.** Chồng chéo **liên-nhánh**:
-`tsk-2sl` ↔ `tsk-621` (`fgos-planning/SKILL.md` + mirror + mirror-test) và
-`tsk-2sl` ↔ `tsk-3cb` (`fgos-validating/SKILL.md` + mirror + mirror-test). Nên
+`tsk-2sl` ↔ `tsk-621` (`fgos-coding-planning/SKILL.md` + mirror + mirror-test) và
+`tsk-2sl` ↔ `tsk-3cb` (`fgos-coding-validating/SKILL.md` + mirror + mirror-test). Nên
 đáp án không phải "ba nhánh song song" mà là **một luồng prose-skill tuần tự +
 hai luồng code song song**: `tsk-2k1`/`tsk-503` (chạm `dispatch.mjs`,
 `gate-bypass.mjs`) chạy song song với N3 được vì không đụng `bin/fgos.mjs`.
@@ -613,9 +613,9 @@ không merge. Ô "có vòng đời nhưng bỏ hành chính" vẫn gác nguyên.
 - **Mục tiêu:** thêm "chạy song song / rút ngắn thời gian" vào danh sách lý do
   hợp lệ để một bước được dispatch thay vì làm inline, và **gộp danh sách về
   một chỗ** thay vì bốn bản sao.
-- **File đã biết:** `.claude/skills/fgos-exploring/SKILL.md:32-49`,
-  `fgos-planning/SKILL.md:46`, `fgos-validating/SKILL.md:55`,
-  `fgos-code-implement/SKILL.md:48` (bốn bản sao gần y hệt — §3 hàng 23b), đích
+- **File đã biết:** `.claude/skills/fgos-coding-exploring/SKILL.md:32-49`,
+  `fgos-coding-planning/SKILL.md:46`, `fgos-coding-validating/SKILL.md:55`,
+  `fgos-coding-implement/SKILL.md:48` (bốn bản sao gần y hệt — §3 hàng 23b), đích
   gộp là `.claude/skills/_shared/capacity-dispatch-fallback.md`. Cả `.agents/`
   mirror cũng phải theo.
 - **Trích §6:** *"bốn skill hiện liệt kê ba lý do hợp lệ... và không có 'để
@@ -719,8 +719,8 @@ hành, không phải thiết kế:
 
 - **Handoff.** `tsk-2sl`/`tsk-2k1`/`tsk-503` đã tồn tại và mang description
   action-prose; bước còn lại là `fgos edit <id> --refs "docs/history/
-  two-layer-dispatch/DISCUSSION.md#task-<slug>"` rồi gọi `fgos-exploring` →
-  `fgos-planning` cho từng cái (terminal handoff của skill này).
+  two-layer-dispatch/DISCUSSION.md#task-<slug>"` rồi gọi `fgos-coding-exploring` →
+  `fgos-coding-planning` cho từng cái (terminal handoff của skill này).
 - **Chỗ ghi lựa chọn tier** (D12 vế e) — `appendWorkerLog` keyed theo `workId`
   mà gói không phải work item. Cố ý để `tsk-503` quyết ở planning, không chốt
   sẵn ở đây.

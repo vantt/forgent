@@ -2,7 +2,7 @@
 
 **Supersedes the prior revision of this file** (small mode, exclude-the-test
 approach) — that revision was built on D1/D2, which `CONTEXT.md` D3/D4 now
-reverse: `fgos-validating` found `session.mjs`'s lock still carries a real,
+reverse: `fgos-coding-validating` found `session.mjs`'s lock still carries a real,
 precedent-confirmed race. This plan implements the fix instead.
 
 ## Mode gate
@@ -65,7 +65,7 @@ Risk map:
 
 | Component | Risk | Proof point |
 |---|---|---|
-| `session.mjs`'s `tryAcquireOnce` fast-path create | Medium — every `createSession`/`endSession`/`listSessions`/`reclaimOrphanedSessions` call funnels through this lock; a botched port could deadlock (never releasing) or leave orphaned temp files | **DONE at `fgos-validating`, real evidence**: `N=20` with no synchronization barrier reproduced 0/10 unpatched (the plan's original assumption — wrong, named below). Adding a shared `startAt` barrier (mirroring `events.test.mjs`'s own technique — a plain `Promise.all` spreads real spawn/import jitter too wide to hit the microsecond create-vs-write window) and raising to `N=50`: unpatched reproduced 8/30 (~27%, matching `tsk-3ld`'s own ~30%) — including one direct hit, `sessions.json ... is corrupt (not valid JSON): Unexpected end of JSON input`, the exact concurrent-writer signature the hypothesis predicted. Patched: 0/30 at the same `N=50`+barrier. Fix applied (`session.mjs:131-166`, ported `events.mjs`'s `linkSync` technique). |
+| `session.mjs`'s `tryAcquireOnce` fast-path create | Medium — every `createSession`/`endSession`/`listSessions`/`reclaimOrphanedSessions` call funnels through this lock; a botched port could deadlock (never releasing) or leave orphaned temp files | **DONE at `fgos-coding-validating`, real evidence**: `N=20` with no synchronization barrier reproduced 0/10 unpatched (the plan's original assumption — wrong, named below). Adding a shared `startAt` barrier (mirroring `events.test.mjs`'s own technique — a plain `Promise.all` spreads real spawn/import jitter too wide to hit the microsecond create-vs-write window) and raising to `N=50`: unpatched reproduced 8/30 (~27%, matching `tsk-3ld`'s own ~30%) — including one direct hit, `sessions.json ... is corrupt (not valid JSON): Unexpected end of JSON input`, the exact concurrent-writer signature the hypothesis predicted. Patched: 0/30 at the same `N=50`+barrier. Fix applied (`session.mjs:131-166`, ported `events.mjs`'s `linkSync` technique). |
 | `session.test.mjs`'s other 5 tests in the same file (nesting guard, refuse-to-nest, lock-reclaim, etc.) | Low — none touch the fast-path create directly | **DONE**: full file run after the fix — 15/15 pass, no regression. |
 
 ## Files touched
@@ -89,7 +89,7 @@ rewrite plus a test-parameter bump, both in the same feature area
 1. Rewrite `tryAcquireOnce`'s create branch per the Approach above.
 2. Run the ablation (risk-map proof point) to confirm the fix actually
    closes the window at the concurrency level that reproduces it —
-   deferred to `fgos-validating`, not guessed here.
+   deferred to `fgos-coding-validating`, not guessed here.
 3. Once the ablation confirms, raise the test's process count to the
    value the ablation showed is needed, as permanent coverage.
 4. Run the full verify command.
@@ -119,7 +119,7 @@ cleanly 3 times in a row — both the fix and its test coverage hold.
   material — an already-proven primitive, not a new one.
 - ~~The concurrency level needed to reliably reproduce `session.mjs`'s
   version of this race may differ from `events.mjs`'s `N=20`~~ — **proven
-  wrong, corrected at `fgos-validating`**: the deciding factor was not `N`
+  wrong, corrected at `fgos-coding-validating`**: the deciding factor was not `N`
   alone but the missing synchronization barrier (`session.test.mjs`'s
   original `Promise.all` never guaranteed simultaneity the way
   `events.test.mjs`'s `Atomics.wait` barrier does). `N=50` + a shared

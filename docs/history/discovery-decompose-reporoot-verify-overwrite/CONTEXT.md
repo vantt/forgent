@@ -5,12 +5,12 @@ Item: tsk-1ni
 ## Feature boundary
 
 Fixes two related, independently-confirmed bugs in the `clarify`/`decompose`
-engines (`src/intake/discovery.mjs`, `src/intake/decompose.mjs`):
+engines (`src/intake/discovery.mjs`, `src/intake/plan.mjs`):
 
 1. Both `resolveDiscovery` and `resolveDecompose` compute `repoRoot =
    path.dirname(dir)` (the main checkout, per `--dir`/ADR0020) and pass it to
    `readLockedContext` to look for the item's committed `CONTEXT.md`/
-   `plan.md`. But `fgos-exploring`/`fgos-planning` commit those files to the
+   `plan.md`. But `fgos-coding-exploring`/`fgos-coding-planning` commit those files to the
    item's own `fgw/<id>` branch/worktree, never to main — so
    `readLockedContext`'s plain `fs.readFileSync` against
    `path.join(repoRoot, docsRef)` always misses them in the exact scenario
@@ -22,7 +22,7 @@ engines (`src/intake/discovery.mjs`, `src/intake/decompose.mjs`):
    with `judgeDiscovery`'s own model-guessed `verdict.verify` on every clear
    verdict (`discovery.mjs:577`, `verify: verdict.verify ?? FALLBACK_VERIFY`)
    — with no check for whether the item already carries a real, locked
-   `verify` from a later stage (e.g. `fgos-validating`'s `planApprove.verify`
+   `verify` from a later stage (e.g. `fgos-coding-validating`'s `planApprove.verify`
    gate record). `decompose.mjs` already avoids this class of bug: it reads
    `gates[id].planApprove.verify ?? work.verify` ONCE (line 431) and reuses
    that single value at every `moveStage`-to-`executing` call site,
@@ -56,7 +56,7 @@ Both bugs are fixed together in this item — D1/D2 below.
   on a clear verdict, `moveStage(..., verify: verdict.verify ??
   FALLBACK_VERIFY, ...)` with no comparison against the item's current
   `work.verify`.
-- `src/intake/decompose.mjs:420-470` (`resolveDecompose`) — same repoRoot
+- `src/intake/plan.mjs:420-470` (`resolveDecompose`) — same repoRoot
   bug; `planApproveVerify` read once at line 431 and passed unconditionally
   into every `moveStage`-to-`executing` call, confirming decompose.mjs's own
   verify-handling is already correct and out of this item's fix scope.
@@ -98,7 +98,7 @@ Both bugs are fixed together in this item — D1/D2 below.
   checkout per ADR0020), when the actual committed `CONTEXT.md`/`plan.md`
   live in the item's own separate `fgw/<id>` worktree.
 - **"content root"** — the caller's live working directory (the worktree an
-  interactive `fgos-exploring`/`fgos-planning` session is standing in),
+  interactive `fgos-coding-exploring`/`fgos-coding-planning` session is standing in),
   distinct from the state root (`dir`, always main).
 - **"verify-overwrite guard"** (D2) — the new check in `resolveDiscovery`
   that skips writing `verdict.verify` over an existing non-empty,
@@ -135,7 +135,7 @@ None — D1-D3 locked with the user in this session.
 
 - `src/intake/discovery.mjs` — `resolveDiscovery`, engine being fixed (D1,
   D2).
-- `src/intake/decompose.mjs` — `resolveDecompose`, `readLockedContext`
+- `src/intake/plan.mjs` — `resolveDecompose`, `readLockedContext`
   (shared helper), engine being fixed (D1 only — verify-handling already
   correct there).
 - `docs/history/discover-verb-context-blind-clarify-judge/CONTEXT.md`

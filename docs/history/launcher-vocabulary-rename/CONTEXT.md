@@ -22,7 +22,7 @@ does not apply to this item's own scope).
 | ID | Decision |
 |----|----------|
 | D1 | The rename is delivered as a **new, separate decision record** that supersedes 0026 **on the "orchestrator" naming only** — 0026's own doctrine/design (native-first dispatch, the pick-1-rootTask + stand-up + step-out role's behavior) is untouched and stays cited from 0026. This follows the repo's own written policy, not a fresh judgment call: `docs/decisions/0000-index.md` line 27 states plainly "Đổi một quyết định = supersede record tương ứng bằng một record mới, không sửa tại chỗ" (changing a decision = supersede the record with a new one, never edit in place), backed by STR72's required backward pointer (`superseded_by` in the old record's frontmatter, `supersedes: [<old-id>]` in the new one). This is not a novel choice: it is the exact shape decision 0024 already used to rename `proposed`→`awaiting-approval` — 0024's frontmatter reads `supersedes: [0006]`, and 0024's own body says "record này chỉ supersede THUẬT NGỮ, không phải cạnh chuyển trạng thái" (this record supersedes the TERM only, not the state-transition edges) — term-only partial supersede, same shape this item needs. 0012's supersede of 0002 (deps/parent split) is the same pattern a second time. New record gets the next number in sequence: **0028**. |
-| D2 | Consequence of D1: **`docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md` is never renamed.** Precedent: when 0024 superseded 0006's term, `0006-trang-thai-proposed.md`'s filename was NOT changed — it stays exactly as originally named, a historical record, only gaining a `superseded_by: 0024` frontmatter pointer. Applying the same rule to 0026 means its filename keeps the word "orchestrator" permanently, as a historical artifact — this is consistent with this item's own allowlist principle for `plans/reports/**` ("bản ghi lịch sử, không sửa ngược"). **This resolves the file-rename question the item's own description raised as material** ("Có đổi tên FILE 0026... hay không? 6 skill... đang trỏ tới file này bằng đường dẫn"): since the file is never renamed, the 12 skill files (6 in `.claude/skills/`, 6 mirrored in `.agents/skills/` — confirmed by scout below) that reference `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md` by path need **zero path changes**. 0026's own body prose may still gain inline notes pointing at the new 0028 record (normal supersede hygiene), but that is `fgos-planning`'s shaping detail, not a second decision. |
+| D2 | Consequence of D1: **`docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md` is never renamed.** Precedent: when 0024 superseded 0006's term, `0006-trang-thai-proposed.md`'s filename was NOT changed — it stays exactly as originally named, a historical record, only gaining a `superseded_by: 0024` frontmatter pointer. Applying the same rule to 0026 means its filename keeps the word "orchestrator" permanently, as a historical artifact — this is consistent with this item's own allowlist principle for `plans/reports/**` ("bản ghi lịch sử, không sửa ngược"). **This resolves the file-rename question the item's own description raised as material** ("Có đổi tên FILE 0026... hay không? 6 skill... đang trỏ tới file này bằng đường dẫn"): since the file is never renamed, the 12 skill files (6 in `.claude/skills/`, 6 mirrored in `.agents/skills/` — confirmed by scout below) that reference `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md` by path need **zero path changes**. 0026's own body prose may still gain inline notes pointing at the new 0028 record (normal supersede hygiene), but that is `fgos-coding-planning`'s shaping detail, not a second decision. |
 
 ## Pinned terms
 
@@ -40,7 +40,7 @@ does not apply to this item's own scope).
 root) returns matches far broader than the item description's own
 enumerated scope list. The description's scope list already anticipates
 this ("mọi docs/history/* khác dùng từ này theo NGHĨA 0026 (kiểm từng chỗ,
-đừng đổi hàng loạt mù)") — per-spot triage is explicitly `fgos-planning`/
+đừng đổi hàng loạt mù)") — per-spot triage is explicitly `fgos-coding-planning`/
 execution's job, not re-litigated here. Full result set, for planning's
 own Approach/Shape step to triage spot-by-spot against the item's PHẠM VI
 ĐỔI / ALLOWLIST:
@@ -73,8 +73,8 @@ own Approach/Shape step to triage spot-by-spot against the item's PHẠM VI
   too.
 - Path-reference scout for D1/D2 (`rg -l "0026-vision-orchestrator"`):
   exactly 6 files under `.claude/skills/` (`fgos-clarifying`,
-  `fgos-exploring`, `_shared/capacity-dispatch-fallback.md`,
-  `fgos-planning`, `fgos-code-implement`, `fgos-validating`) and the same
+  `fgos-coding-exploring`, `_shared/capacity-dispatch-fallback.md`,
+  `fgos-coding-planning`, `fgos-coding-implement`, `fgos-coding-validating`) and the same
   6 mirrored under `.agents/skills/` — 12 total, matching the item
   description's own count. `plugins/fgOS/skills/` has zero references.
   None of these need edits under D2 (file path unchanged).
@@ -94,10 +94,10 @@ own Approach/Shape step to triage spot-by-spot against the item's PHẠM VI
 ## Outstanding questions deferred to planning
 
 - Exact title/wording of the new 0028 decision record — authoring detail,
-  `fgos-planning`'s call.
+  `fgos-coding-planning`'s call.
 - Per-spot classification of every "not named in scope" file listed above
   (does this specific occurrence use "orchestrator" in 0026's sense, or an
-  unrelated/generic sense?) — `fgos-planning`'s Approach/Shape step, using
+  unrelated/generic sense?) — `fgos-coding-planning`'s Approach/Shape step, using
   the scout list above as its starting point rather than re-scouting from
   scratch.
 - Guard test's precise allowlist implementation (regex vs path-list) for

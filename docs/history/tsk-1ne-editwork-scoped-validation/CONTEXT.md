@@ -13,7 +13,7 @@ current 3-value enum `[clarify, decompose, executing]`,
 the 30-character `MAX_ID_LENGTH` guard (`src/state/work.mjs:33,237`).
 
 This item's job is to lock which of the three named fixes to pursue, not
-to design the implementation — that is `fgos-planning`'s job next.
+to design the implementation — that is `fgos-coding-planning`'s job next.
 
 ## Locked decisions
 
@@ -21,7 +21,7 @@ to design the implementation — that is `fgos-planning`'s job next.
 |----|----------|
 | D1 | Fix by scoping `editWork`'s re-validation to only the fields actually present in the patch (or fields whose rule depends on a patched field), instead of re-validating the whole merged candidate. Chosen over (a) adding a `compound-learn` stage-enum allowance for legacy items — fixes only the 61 stage-invalid items, leaves the 4 id-length items still permanently blocked, and permanently pollutes a currently-clean 3-value enum with a value that only exists for old data; and (b) migrating the 65 items' `stage`/`id` to valid values — a data rewrite of historical (mostly `done`/`wontfix`/`retrospective`) records, and renaming an id risks breaking references to it elsewhere (`refs`/`deps`/`parent`, the `fgw/<id>` branch name, the append-only event log) for items that otherwise need no further edits. Confirmed via user approval in conversation (2026-08-06) after this session presented the three-way tradeoff. |
 | D2 | This fix loses zero validation strength for the two failing checks specifically: `EDITABLE_FIELDS` (`src/state/store.mjs:238`) never includes `id` or `stage` — `editWork`'s own patch-key allowlist rejects a patch containing either before the merge even happens (`store.mjs:270-276`, comment at line 244 confirms `id`/`status`/`stage`/`domain` are always rejected). So a patch can never introduce a NEW invalid `id` or `stage` value through this door — scoping validation to patched fields only stops re-rejecting OLD values that were already sitting in the store untouched, never weakens what the patch itself is allowed to contain. |
-| D3 | Scope stays narrow to the bug as described: `editWork`'s validation pathway only. No change to `addWork` (new items still get full-shape validation, unchanged), no change to `validateDomainFields`/`checkAcceptanceEvidenceTraceable`, no backfill of the 65 items' data. A regression test proving "patching an unrelated field on a legacy-invalid item now succeeds" is an implementation detail for `fgos-planning`/`fgos-code-implement`, not locked here. |
+| D3 | Scope stays narrow to the bug as described: `editWork`'s validation pathway only. No change to `addWork` (new items still get full-shape validation, unchanged), no change to `validateDomainFields`/`checkAcceptanceEvidenceTraceable`, no backfill of the 65 items' data. A regression test proving "patching an unrelated field on a legacy-invalid item now succeeds" is an implementation detail for `fgos-coding-planning`/`fgos-coding-implement`, not locked here. |
 
 ## Pinned terms
 
@@ -64,8 +64,8 @@ to design the implementation — that is `fgos-planning`'s job next.
 - Exact mechanism for "scope validation to patched fields" — e.g. skip
   `validateWorkShape`'s per-field checks whose field is absent from
   `patch` and unchanged from `before`, vs. a more granular per-field
-  validator refactor. `fgos-planning` decides the smallest honest
+  validator refactor. `fgos-coding-planning` decides the smallest honest
   implementation shape.
 - Whether a regression test is added covering this exact scenario (edit an
   unrelated field on a `stage: compound-learn` or long-id item) — expected
-  yes, but the test's shape is `fgos-planning`/`fgos-code-implement`'s call.
+  yes, but the test's shape is `fgos-coding-planning`/`fgos-coding-implement`'s call.

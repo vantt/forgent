@@ -39,7 +39,7 @@ concrete tier-sort (D2).
 
 - Exact `Table` column set per list (e.g. `Goal Tier | ID | Title` for work
   items, `ID | Title | Status` for in-process) — implementation detail,
-  `fgos-planning`'s call.
+  `fgos-coding-planning`'s call.
 - Whether `awaiting-approval` rows get their own visual marker distinct
   from `doing` rows in the table — implementation/design detail for
   planning, not decided here.

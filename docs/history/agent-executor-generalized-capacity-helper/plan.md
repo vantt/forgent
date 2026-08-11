@@ -7,7 +7,7 @@ timestamp: 2026-08-03T11:30:00.000Z
 
 ## Mode
 
-Flags counted (per fgos-planning's mode gate):
+Flags counted (per fgos-coding-planning's mode gate):
 - **weak proof around the area** — yes. The precedent doc itself
   (`docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-capacity.md`,
   "Why this exists") names a real, structural gap: no skill's runtime
@@ -28,7 +28,7 @@ shape.
 
 `impact-analysis` posture (`fgos tool query --capability impact-analysis
 --status present`): **full** — GitNexus registered and present on this
-machine. `fgos-code-implement` should run `impact` on any exported symbol this
+machine. `fgos-coding-implement` should run `impact` on any exported symbol this
 item touches (none currently planned — see below) before editing it.
 
 ## Decision split (per CONTEXT.md's own deferred question)
@@ -92,7 +92,7 @@ via the mirror machinery.
 
 **Risk map:**
 
-| Component | Risk | Proof point (for `fgos-validating`) |
+| Component | Risk | Proof point (for `fgos-coding-validating`) |
 |---|---|---|
 | New `_shared/capacity-dispatch-fallback.md` mirror pair | low | `test/skills/fgos-mirror.test.mjs` (extended) passes — byte-identical, same file set |
 | `fgos-submit-assist/SKILL.md` rewrite (both mirrors) | low-medium | Same mirror test, plus a real manual run of the "configured and present" path (mirrors the precedent item's own step 5 acceptance proof: resolve `submit-assist-classify`, invoke the resolved command with a real prompt, confirm a sane parseable response) — must still work identically after the rewrite, not just look unchanged. **Run this from the main checkout, not this item's own worktree** — see Assumptions below for why. |
@@ -121,7 +121,7 @@ doc update last (it only needs to point at what already exists by then).
   is stable going forward — confirmed by reading the landed `tsk-3sw`
   code directly (`src/runner/dispatch.mjs`'s current `resolveCapacityCli`),
   not merely inferred from `CONTEXT.md`'s description of the pre-landing
-  design. Not material enough to send back to `fgos-exploring` — an
+  design. Not material enough to send back to `fgos-coding-exploring` — an
   implementation-detail confirmation, not a product decision.
 - No second real consumer skill exists yet to generalize *against* beyond
   `fgos-submit-assist` — the shared fragment is written generic enough for
@@ -146,11 +146,11 @@ doc update last (it only needs to point at what already exists by then).
   a pre-existing gap in the reused dispatch mechanism (`tsk-62v`/`tsk-5l2-
   1`'s own scope), out of this item's declared feature boundary to fix
   (`CONTEXT.md`: "This item does not build a new dispatch mechanism --
-  `tsk-62v` already built that") — pinned here only so `fgos-code-implement`'s
+  `tsk-62v` already built that") — pinned here only so `fgos-coding-implement`'s
   own manual verify pass doesn't misdiagnose this known gap as evidence
   the rewrite itself is broken.
 
-## Proof surface (for `fgos-code-implement`/`fgos-validating`)
+## Proof surface (for `fgos-coding-implement`/`fgos-coding-validating`)
 
 Real verify command for this item as a whole (not `npm test --
 test/skills/fgos-mirror.test.mjs` — `package.json`'s `test` script

@@ -95,10 +95,10 @@ User chốt: dùng tsk-66o làm gốc — claim, discover (Socratic), trả lờ
 bằng chính 2 candidate làm kết quả decompose, thay vì submit item mới
 trùng câu hỏi.
 
-## 6. `fgos take tsk-66o` + `fgos-exploring` — D1-D4
+## 6. `fgos take tsk-66o` + `fgos-coding-exploring` — D1-D4
 
 Claim tsk-66o (`todo` → `doing`). Chạy `fgos-coding-driving` ceiling
-`stage:decompose` → resolve skill `fgos-exploring` cho stage `clarify`.
+`stage:decompose` → resolve skill `fgos-coding-exploring` cho stage `clarify`.
 
 Scout: `rg footprint` tìm ra **`src/state/graph-harness.mjs`**
 (`mergeReadiness`, tsk-4j9-2) — phát hiện làm thay đổi bức tranh deep-dive
@@ -168,8 +168,8 @@ Chưa có câu trả lời cho câu hỏi này khi phiên chuyển hướng sang
 
 `tsk-66o`: `doing` / stage `clarify` / claimed bởi phiên này (branch
 `fgw/tsk-66o` nếu có, hoặc main checkout tuỳ `worktreeBacked` của domain
-`coding` tại stage `clarify` — `fgos-exploring` không tự tạo worktree,
+`coding` tại stage `clarify` — `fgos-coding-exploring` không tự tạo worktree,
 chỉ `fgos pick` ở stage `executing` mới tạo). `CONTEXT.md` CHƯA được viết
-(bước 3 của `fgos-exploring` chưa chạy — phiên bị ngắt bởi yêu cầu
+(bước 3 của `fgos-coding-exploring` chưa chạy — phiên bị ngắt bởi yêu cầu
 code-shape trước khi tới bước viết doc + gate). `fgos discover --verdict
 clear` CHƯA được gọi.

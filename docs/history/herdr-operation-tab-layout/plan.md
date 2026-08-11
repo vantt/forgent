@@ -4,7 +4,7 @@ tsk-5lr. Mode: small
 
 Flags counted (per `fgos-routing`'s Mode gate, applied directly — no lane
 was handed off before this skill loaded, since this session reached
-`fgos-planning` via `/fgOS:pick` → `fgos-coding-driving` rather than
+`fgos-coding-planning` via `/fgOS:pick` → `fgos-coding-driving` rather than
 `fgos-routing`'s own Orient step): **existing covered behavior**
 (`find_agents_tab_with_room` and `Rect`, both in `herdr-plugin/src/
 layout.rs`, are pinned by `layout.rs`'s own `#[cfg(test)]` module —

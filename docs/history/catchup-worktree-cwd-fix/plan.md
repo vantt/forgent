@@ -10,7 +10,7 @@ here; an outgoing item's own final plan is preserved at `plan-<id>.md`
 before the next one takes the slot (the same pattern tsk-4uj's own
 `plan-tsk-5vl.md` already established).
 
-**Revision note (`fgos-validating`, 260811):** tsk-4uj merged to `main`
+**Revision note (`fgos-coding-validating`, 260811):** tsk-4uj merged to `main`
 while this plan was being validated (`64f86633`, `status: delivered`).
 This revision replaces every "reuse whatever tsk-4uj ships" hedge below
 with the real, shipped mechanism, and corrects every `bin/fgos.mjs` line
@@ -44,7 +44,7 @@ Flags counted:
   path new-root, happy path reuse-member, cycle-rejection, conflict
   handling — lines ~6613-6850+) that must stay green unmodified when the
   new flag is omitted. **1 flag.**
-- **weak proof around the area** — **corrected during `fgos-code-implement`
+- **weak proof around the area** — **corrected during `fgos-coding-implement`
   (RESEARCH.md's own correction note)**: `retargetMember`'s guard already
   had a test (`test/runner/promote-engine.test.mjs`,
   `56b34d9a`, original implementation — Round 3's keyword search missed it).
@@ -170,7 +170,7 @@ index is refreshed (`gitnexus analyze`).
 
 ### Risk map
 
-| Component | Risk | Proof point (carried to `fgos-validating`) |
+| Component | Risk | Proof point (carried to `fgos-coding-validating`) |
 |---|---|---|
 | `promote-to-component`'s CLI-layer guard interaction with the new flag | **Medium** — same guard shape as `sync-root` (D5: lower stakes than `approve`, merges land on a runner-owned integration branch, never `main` directly), but touches N member branches in one call instead of one | `impact({target: "isMainWorktree", direction: "upstream"})` and a manual `grep -n "isMainWorktree(" bin/fgos.mjs src/runner/promote-engine.mjs` cross-check (re-run both at implementation time; GitNexus's index was confirmed stale this pass and last time, tsk-4uj D4). Full existing `promote-to-component` suite (~10 tests) green with UNCHANGED pass/fail set when the new flag is NOT passed (regression baseline) |
 | `retargetMember`'s guard (D6: expected to require zero code change) | **Low-Medium** — the change is provably a no-op for this function (same `repoRoot` value, already correctly resolved upstream), but this is the item's own central technical claim and deserves direct proof, not just the D6 argument on paper | A new test exercising `retargetMember` directly (or through the CLI with the flag) confirming it still correctly REFUSES when `repoRoot` is NOT flag-relaxed (i.e., the guard still fires on a bad `repoRoot`), and correctly SUCCEEDS when the CLI layer already resolved a good one — proves the "guard receives correct input, unmodified" claim empirically, not just by code reading |
@@ -212,8 +212,8 @@ index is refreshed (`gitnexus analyze`).
   fresh, do not trust either this plan's or `CONTEXT.md`'s cited line
   numbers blindly.
 - GitNexus's index was confirmed stale twice now in this same feature
-  area (tsk-4uj D4, and again this item's Round 3) — `fgos-validating`/
-  `fgos-code-implement` should re-check freshness rather than assume it
+  area (tsk-4uj D4, and again this item's Round 3) — `fgos-coding-validating`/
+  `fgos-coding-implement` should re-check freshness rather than assume it
   has since been fixed; if still stale, the impact-analysis proof points
   above degrade per CLAUDE.md's own gate (manual grep cross-check
   substitutes, named plainly as weaker evidence).

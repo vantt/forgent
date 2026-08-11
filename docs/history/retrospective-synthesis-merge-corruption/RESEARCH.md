@@ -23,7 +23,7 @@ message? Is the intent (what needs fixing) clear enough to move forward?
   `plugins/fgOS/skills/cook/SKILL.md` — none of tsk-4v6's own files
   (`src/runner/loop.mjs`). Confirms tsk-4v6's own docs-synthesis change is
   NOT what actually landed in this commit's diff; tsk-104's content is.
-- Read `.claude/skills/fgos-compounding/SKILL.md` step 3 (lines ~121-128):
+- Read `.claude/skills/fgos-coding-compounding/SKILL.md` step 3 (lines ~121-128):
   the retrospective-synthesis flow's ONLY git write is a plain, non-merge
   commit:
   ```bash
@@ -41,7 +41,7 @@ message? Is the intent (what needs fixing) clear enough to move forward?
 - Read `src/runner/merge.mjs`'s `mergeRunnerItem`: it acquires
   `.fgos/main-checkout.lock` (`acquireMainCheckoutLock`) before its own
   `git merge --no-commit --no-ff` / `git commit` / `git merge --abort`
-  sequence. **`fgos-compounding`'s step 3 acquires no lock, checks no
+  sequence. **`fgos-coding-compounding`'s step 3 acquires no lock, checks no
   `MERGE_HEAD`, and checks no working-tree-clean state before its own
   `git commit`** — the two paths are not mutually exclusive.
 - Confirmed this is a **systemic pattern, not a one-off**:
@@ -70,7 +70,7 @@ message? Is the intent (what needs fixing) clear enough to move forward?
 1. **tsk-4v6's real fix (`687abfb8`) is confirmed missing from main.**
    Requirement (1) of the item — merge `fgw/tsk-4v6`'s real tip into main —
    is a real, necessary fix, not a false alarm.
-2. **Root cause located (requirement 2):** `fgos-compounding` step 3's raw
+2. **Root cause located (requirement 2):** `fgos-coding-compounding` step 3's raw
    `git commit` on the shared main checkout has no `MERGE_HEAD` guard, no
    `main-checkout.lock` acquisition, and no working-tree-clean precondition
    — unlike every other main-checkout writer in this repo
@@ -89,9 +89,9 @@ message? Is the intent (what needs fixing) clear enough to move forward?
 ### Still open (for `exploring`/`decompose`)
 
 - Whether the fix is (a) add a `MERGE_HEAD`/lock guard to
-  `fgos-compounding` step 3, (b) route the docs commit through a proper
+  `fgos-coding-compounding` step 3, (b) route the docs commit through a proper
   one-door verb instead of raw `git commit`, or (c) both — this is a design
-  decision for `fgos-exploring`/`fgos-planning`, not this round's call.
+  decision for `fgos-coding-exploring`/`fgos-coding-planning`, not this round's call.
   All 5 confirmed instances of the bug ARE the evidence such a guard would
   have caught (a `MERGE_HEAD`-present precondition check on the plain
   commit step would refuse in every one of these 5 cases).

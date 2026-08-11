@@ -77,7 +77,7 @@ strong evidence for (b)):
 
 | Component | Risk | Proof point |
 |---|---|---|
-| `acquireEventsLock`/`tryAcquireEventsLockOnce` (`src/state/events.mjs:203-292`) | Medium — every `appendEvent` call in the whole system funnels through this lock; a real bug here is critical, but the RUL10 ablation and the 557-event measurement in `CONTEXT.md` both lean toward the lock being sound | The question above, run at `fgos-validating` |
+| `acquireEventsLock`/`tryAcquireEventsLockOnce` (`src/state/events.mjs:203-292`) | Medium — every `appendEvent` call in the whole system funnels through this lock; a real bug here is critical, but the RUL10 ablation and the 557-event measurement in `CONTEXT.md` both lean toward the lock being sound | The question above, run at `fgos-coding-validating` |
 | `test/state/events.test.mjs:225-287` (the race test itself) | Low — worst case is the test stays imperfect, not that production data corrupts | Same run above |
 
 ## Files likely touched

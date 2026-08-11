@@ -94,7 +94,7 @@ fgOS child items, for exactly this reason:
 > every child would carry its own worktree and human merge gate for a
 > read-only investigation that changes no code, and all six would declare
 > the same single report file as footprint, which
-> `src/intake/decompose.mjs:741`'s `footprintOverlapAmong` flags as a real
+> `src/intake/plan.mjs:741`'s `footprintOverlapAmong` flags as a real
 > sibling collision."
 > — real `work.decision` capture, id `tsk-36i`
 

@@ -2,13 +2,13 @@
 
 ## Status
 
-Mode: **standard**. Ready for `fgos-validating`.
+Mode: **standard**. Ready for `fgos-coding-validating`.
 
 No `CONTEXT.md` exists for this feature. `fgos-clarifying` judged the
 item's own description fully self-specifying (exact bug, exact file/lines,
 exact forbidden approaches, exact incident evidence) and passed it straight
 from `clarify` to `decompose` with a caller-supplied clear verdict — there
-was no gray area for `fgos-exploring` to lock. This plan treats the item's
+was no gray area for `fgos-coding-exploring` to lock. This plan treats the item's
 own `description` as the decision record; every design choice below cites
 back to it directly instead of a `CONTEXT.md` D-ID.
 

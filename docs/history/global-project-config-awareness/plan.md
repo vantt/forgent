@@ -88,7 +88,7 @@ AskUserQuestion answer, not defaulted).
 
 ## Risk map
 
-| Component | Risk | Proof point (→ fgos-validating) |
+| Component | Risk | Proof point (→ fgos-coding-validating) |
 |---|---|---|
 | `.fgos-runner.json` → `.fgos/config.json` path move | Medium — existing code/tests reference the old path (`src/setup/checks.mjs:156`, `src/runner/dispatch.mjs`'s `ensureRunnerConfig`, `test/setup/*.test.mjs`) | Grep every reference to `.fgos-runner.json` across `src`/`test` before changing; confirm the old-path fallback read is real in the diff, not just described here |
 | New global config (`~/.fgos/config.json`) merge precedence | Medium — brand-new code path, no test exists today | A test asserting a project-set value wins over a global-set value for the same key |
@@ -98,7 +98,7 @@ AskUserQuestion answer, not defaulted).
 
 **impact-analysis: full** — GitNexus registered and `present`, confirmed via
 `fgos tool query --capability impact-analysis --status present` during
-`fgos-exploring`. Before editing `scripts/fgos-shell-integration.sh`,
+`fgos-coding-exploring`. Before editing `scripts/fgos-shell-integration.sh`,
 `src/setup/checks.mjs`, or `src/runner/dispatch.mjs`'s `ensureRunnerConfig`,
 run `impact()` on each touched symbol per the CLAUDE.md/AGENTS.md gate and
 report the blast radius before editing, exactly as those rules require.
@@ -154,7 +154,7 @@ Full suite — this item touches `src/setup/`, `src/runner/`, and
 `scripts/`, each already covered by existing tests that must stay green
 (AGENTS.md DoD question 5).
 
-## Assumptions (pending fgos-validating proof)
+## Assumptions (pending fgos-coding-validating proof)
 
 - The old `.fgos-runner.json` is read as a fallback (never deleted) until
   a project re-runs `fgos setup`, which is what actually performs the
@@ -162,5 +162,5 @@ Full suite — this item touches `src/setup/`, `src/runner/`, and
   pinned here rather than re-asked.
 - `src/runner/dispatch.mjs`'s `ensureRunnerConfig` references the same
   config path — not yet confirmed by a direct read at planning time,
-  flagged here as unproven for `fgos-validating` to check before
+  flagged here as unproven for `fgos-coding-validating` to check before
   executing starts.

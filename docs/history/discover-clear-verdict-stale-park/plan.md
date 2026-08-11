@@ -93,7 +93,7 @@ this one function — the guard applies identically to both callers).
   the `--force` guard's own precedent (`discovery.mjs:696-699` uses
   category `'validation'`) unless implementation finds a concrete reason
   to diverge. Not material enough to lock as a separate `CONTEXT.md`
-  decision (implementation detail, per `fgos-exploring`'s own filter,
+  decision (implementation detail, per `fgos-coding-exploring`'s own filter,
   already deferred there).
 - Guard placement: checked once, right before the existing `moveStage`
   call at the end of the clear-verdict branch (after the dispute/force

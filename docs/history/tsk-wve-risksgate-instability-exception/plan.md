@@ -2,11 +2,11 @@
 
 Mode: **high-risk** — flag count from `fgos-routing`'s Mode-gate (applied
 directly here, since no earlier session in this item's history handed off
-a lane; direct-entry fallback per `fgos-planning/SKILL.md`): this item
+a lane; direct-entry fallback per `fgos-coding-planning/SKILL.md`): this item
 **removes/narrows a validation** (`keywordRiskGate`'s heavy-risk floor),
 which is itself one of the named hard-gate flags — any hard-gate flag
 forces `high-risk` regardless of count. A second flag also applies:
-*existing covered behavior* — `test/intake/decompose.test.mjs` already
+*existing covered behavior* — `test/intake/plan.test.mjs` already
 exercises the exact path being changed.
 
 ## Approach
@@ -15,7 +15,7 @@ exercises the exact path being changed.
 `keywordRiskGate`, reusing machinery `decompose.mjs` already trusts for
 the same purpose elsewhere, rather than inventing a new judged/LLM check.
 
-Concretely, in `src/intake/decompose.mjs`, where `keywordRiskGate` is
+Concretely, in `src/intake/plan.mjs`, where `keywordRiskGate` is
 computed today (`~line 660`):
 
 ```js
@@ -72,9 +72,9 @@ introduced by this item.
   citation path reuses a convention already proven in this same file.
 
 **Files touched:**
-- `src/intake/decompose.mjs` — `keywordRiskGate` computation (the only
+- `src/intake/plan.mjs` — `keywordRiskGate` computation (the only
   behavior change).
-- `test/intake/decompose.test.mjs` — new/updated assertions (Proof
+- `test/intake/plan.test.mjs` — new/updated assertions (Proof
   surface below).
 
 **Order:** single file, single logical change — no ordering decision
@@ -90,7 +90,7 @@ fresh here per this skill's own rule). The proof point below (regression
 coverage on the exact function this item edits) does not itself lean on
 blast-radius evidence — `resolveDecompose`'s only direct caller inside
 this repo is `bin/fgos.mjs`'s `decompose` CLI case and its own test
-suite; no wider blast radius beyond what `test/intake/decompose.test.mjs`
+suite; no wider blast radius beyond what `test/intake/plan.test.mjs`
 already exercises end to end.
 
 ## Shape
@@ -123,7 +123,7 @@ change this small; YAGNI).
    assert new behavior for `blastRadiusGate` — `CONTEXT.md` D2 keeps it
    explicitly out of scope, confirmed dead code.
 
-**Proof surface:** `npm test -- test/intake/decompose.test.mjs` — the
+**Proof surface:** `npm test -- test/intake/plan.test.mjs` — the
 item's own `verify` field, already set via `fgos-researching`'s round 1
 verdict and unchanged since. Real and runnable today (confirmed: the file
 exists, 398+ lines, exercises `resolveDecompose` against a real store

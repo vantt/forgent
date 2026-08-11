@@ -4,7 +4,7 @@
 `/fgOS:merge-next` until the frontier is empty or a safety condition
 trips. The requester's own item description named the mechanism to
 recurse into as "`/loop` (ck-loop)" — treating the two as the same thing.
-They are not, and the mismatch survived all the way to `fgos-validating`
+They are not, and the mismatch survived all the way to `fgos-coding-validating`
 before it was caught.
 
 ## The request's own wording conflated two unrelated skills
@@ -15,7 +15,7 @@ From the item's own text (`docs/history/merge-loop-skill/CONTEXT.md`):
 > `/loop` (ck-loop) có sẵn... SKILL.md chỉ nên gọi `/loop` với
 > `prompt=/fgOS:merge-next`, dynamic self-pace.
 
-`fgos-exploring` and `fgos-planning` both carried this parenthetical
+`fgos-coding-exploring` and `fgos-coding-planning` both carried this parenthetical
 through into `CONTEXT.md` and `plan.md` unchallenged — citing
 `~/.claude/skills/ck-loop/SKILL.md` as if it were the dynamic self-pacing
 mechanism this item needed.
@@ -52,10 +52,10 @@ independently of `ck-loop`.
 
 ## Where this was caught, and why it matters generally
 
-The mismatch was not caught at `fgos-exploring` or `fgos-planning` — both
+The mismatch was not caught at `fgos-coding-exploring` or `fgos-coding-planning` — both
 carried the requester's own phrasing forward without independently
 verifying what `ck-loop` actually does. It surfaced only at
-`fgos-validating`'s reality gate, whose rule against accepting
+`fgos-coding-validating`'s reality gate, whose rule against accepting
 plausibility language forced an actual read of
 `~/.claude/skills/ck-loop/SKILL.md` before letting the "repo fit" row pass
 as evidence. `CONTEXT.md` and `plan.md` were both corrected in place

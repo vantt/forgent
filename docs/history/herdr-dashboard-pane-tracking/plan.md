@@ -142,7 +142,7 @@ not absorbed into this item's own scope.
 
 ## Risk map
 
-| Component | Risk | Proof (→ `fgos-validating`) |
+| Component | Risk | Proof (→ `fgos-coding-validating`) |
 |---|---|---|
 | `pane_scan.rs` JSON parsing | Low (was the plan's weak-proof flag; resolved this session — see real capture above) | Unit test using the captured live fixture as a `#[cfg(test)]` string constant, same pattern `pick.rs`'s `parse_split_pane_id_reads_the_real_herdr_response_shape` already uses |
 | Label→task-id extraction: absent `label`, 1-segment (`taskid` only), 2-segment (`taskid \| a.ssid:<v>`, the live-observed shape), 3-segment | Low — all 4 shapes are now proven real or trivially derivable from the locked convention | Unit tests covering each of the 4 shapes explicitly |

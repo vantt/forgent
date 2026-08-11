@@ -55,7 +55,7 @@ one for Windows would only add a fifth).
 
 ## Risk map
 
-| Component | Risk | Proof point (for `fgos-validating`) |
+| Component | Risk | Proof point (for `fgos-coding-validating`) |
 |---|---|---|
 | Resolver core + CLI wiring | medium — regression risk if the unified root diverges from any of the 4 existing getters under worktree/nested-repo layouts | `session.test.mjs`/`loop.test.mjs`/`worker-log.test.mjs` must be confirmed to actually exercise the replaced code paths post-migration, not just avoid touching them |
 | Windows profile-path detection | low-medium — new code path, additive only, no existing platform regression risk | `shell-rc.test.mjs` gets a Windows-profile fixture/mock case exercising the new detection, mirroring the existing bash/zsh cases |

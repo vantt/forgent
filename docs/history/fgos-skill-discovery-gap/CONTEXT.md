@@ -3,8 +3,8 @@
 ## Feature boundary
 
 `tsk-d3c`. Any session that claims an fgOS item and calls `Skill()` to
-route through `fgos-routing`, `fgos-exploring`, `fgos-planning`,
-`fgos-validating`, `fgos-code-implement`, `fgos-compounding`,
+route through `fgos-routing`, `fgos-coding-exploring`, `fgos-coding-planning`,
+`fgos-coding-validating`, `fgos-coding-implement`, `fgos-coding-compounding`,
 `fgos-indexing`, `fgos-submit-assist`, or `fgos-unlock` — the 9 dotdir
 skills at `.claude/skills/fgos/<name>/SKILL.md` (`fgos-unlock` is
 missing from this item's own original acceptance text, which counted
@@ -12,20 +12,20 @@ only 8 — corrected here against the real directory listing) — gets
 `Unknown skill`, for both
 the scoped form (`fgOS:fgos-routing`) and the unscoped form
 (`fgos-routing`). This item locks what's actually true about the gap
-before any fix is chosen, and hands the fix itself to `fgos-planning`.
+before any fix is chosen, and hands the fix itself to `fgos-coding-planning`.
 
 Reproduced twice, independently, from a fresh `/fgOS:pick` +
 `EnterWorktree` session each time: `tsk-62x` (per this item's own
 acceptance record) and `tsk-d3c` (this session, both `Skill(fgos-routing)`
 and `Skill(fgOS:fgos-routing)` calls failed identically, then
-`Skill(fgos-exploring)` failed the same way after `stage` resolved to
+`Skill(fgos-coding-exploring)` failed the same way after `stage` resolved to
 `clarify`).
 
 ## Locked decisions
 
 | D-ID | Decision |
 |------|----------|
-| D1 | Do not duplicate the 9 `fgos/*` skills into `plugins/fgOS/skills/*` as a first move, and do not blindly rename the `fgos/` subdirectory as an unverified workaround. Hand the item to `fgos-planning` to root-cause *why* the discovery gap exists before picking a fix — the original hypothesis this item shipped with ("dotdir skills need plugin registration") is contradicted by scout evidence below, so the fix shape is still open. |
+| D1 | Do not duplicate the 9 `fgos/*` skills into `plugins/fgOS/skills/*` as a first move, and do not blindly rename the `fgos/` subdirectory as an unverified workaround. Hand the item to `fgos-coding-planning` to root-cause *why* the discovery gap exists before picking a fix — the original hypothesis this item shipped with ("dotdir skills need plugin registration") is contradicted by scout evidence below, so the fix shape is still open. |
 
 ## Pinned terms
 
@@ -75,18 +75,18 @@ and `Skill(fgOS:fgos-routing)` calls failed identically, then
 - Whatever narrow mechanism actually explains the `fgos` vs. `gitnexus`
   discovery difference (name collision, stale skill-index cache tied to
   session lifecycle, a harness-side scan limit or bug) is explicitly
-  **not** decided here — `fgos-planning` investigates and proposes the
+  **not** decided here — `fgos-coding-planning` investigates and proposes the
   fix shape. This item's contribution is ruling out the original
   "needs-plugin-registration" hypothesis and ruling in "root-cause
   first" as the approach, per D1.
 - Whether the eventual fix lives entirely in this repo (e.g. a rename,
   a manifest tweak) or is actually a Claude Code harness behavior this
-  repo cannot control on its own is left open — `fgos-planning` should
+  repo cannot control on its own is left open — `fgos-coding-planning` should
   surface that distinction explicitly if it turns out to be the latter.
 
 ## D2 — collision hypothesis disproven (post-executing)
 
-The `fgos-planning`-shaped rename (`.claude/skills/fgos/` →
+The `fgos-coding-planning`-shaped rename (`.claude/skills/fgos/` →
 `.claude/skills/fgos-workflow/`, plus the `.agents/` mirror,
 `dispatch.mjs`, 3 tests, and doc references — committed `3e683aa` on
 `fgw/tsk-d3c`) shipped, `npm test` green, item returned to `proposed`.
@@ -168,7 +168,7 @@ implement → verify → real-session confirmation.
 ## Canonical references
 
 - `.claude/skills/fgos/fgos-routing/SKILL.md`
-- `.claude/skills/fgos/fgos-exploring/SKILL.md`
+- `.claude/skills/fgos/fgos-coding-exploring/SKILL.md`
 - `.claude/skills/distill/SKILL.md` (real working comparator — flat)
 - `plugins/fgOS/.claude-plugin/plugin.json`
 - `.claude/settings.json` (`enabledPlugins`)

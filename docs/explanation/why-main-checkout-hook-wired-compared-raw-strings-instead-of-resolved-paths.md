@@ -85,7 +85,7 @@ absolute-path-equivalence case each for `installGitHooks` and
 `uninstallGitHooks` — so a pass self-evidently covers the real scenario,
 not just "the file that already existed still runs green."
 
-A related correction surfaced at `fgos-validating`'s reality-check gate:
+A related correction surfaced at `fgos-coding-validating`'s reality-check gate:
 the file expected to hold the `uninstallGitHooks` test case was
 originally misidentified — a grep proved that file had zero
 `uninstallGitHooks` references at all; the real existing coverage lived

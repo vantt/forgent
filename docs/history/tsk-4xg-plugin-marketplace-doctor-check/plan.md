@@ -40,7 +40,7 @@ this stage). `tsk-4xg` is not on the current `fgos graph`'s critical path.
 This plan.md was written after the implementation, not strictly before it
 — this session's own reasoning ran continuously from planning straight into
 Execute without stopping at the intermediate written-plan gate first, which
-`fgos-planning`'s own rules require. Corrected here: the plan below
+`fgos-coding-planning`'s own rules require. Corrected here: the plan below
 describes exactly what was actually built and proven (real code, real
 tests, real regression-safety fix), not a forward guess — stronger evidence
 than a pre-code plan would have had, but the process itself skipped a step

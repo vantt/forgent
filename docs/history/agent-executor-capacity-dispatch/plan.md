@@ -30,7 +30,7 @@ breaks the one dispatch path the runner already depends on in production.
 provider, `gitnexus`, `status: present` → **impact-analysis: full**. Per
 AGENTS.md's gate, every proof point below that touches a named symbol
 requires `impact({target, direction: "upstream"})` on that symbol before
-editing it, at `fgos-code-implement` time — not before (this skill does not edit
+editing it, at `fgos-coding-implement` time — not before (this skill does not edit
 code). Symbols this plan touches: `resolveExecutorConfig`,
 `resolveExecutorCommand`, `spawnWorker`, `buildPrompt`,
 `validateRunnerConfigShape`, `commandExistsOnPath`, `detectAssistantCli`.
@@ -51,7 +51,7 @@ build-out of that shape, not a fresh design.
 
 ### Reality-gate finding: `resolveExecutorConfig` needs `.fgos/` dir access for D6
 
-Found at `fgos-validating` time (repo-fit check), not a `CONTEXT.md` reopen:
+Found at `fgos-coding-validating` time (repo-fit check), not a `CONTEXT.md` reopen:
 `resolveExecutorConfig(cfg, tier)` (`dispatch.mjs:404`), `resolveExecutorCommand`
 (`:423`), and `spawnWorker(work, cfg, cwd, opts)` (`:616`) have no `.fgos/`
 directory parameter today — `cwd` there is the dispatch **worktree** checkout
@@ -110,7 +110,7 @@ view, which is not what D8 wants.
 
 ## Risk map
 
-| Component | Risk | Proof point (for `fgos-validating`) |
+| Component | Risk | Proof point (for `fgos-coding-validating`) |
 |---|---|---|
 | `resolveExecutorConfig`/`resolveExecutorCommand` signature change | **high** — every existing call site and the whole `dispatch.test.mjs` suite depends on today's exact tier-only behavior | existing test suite green, unchanged; new tests pin capacity > tier > global precedence and the "capacity absent → byte-identical to today" invariant, mirroring the P41 `executors` block's own pinned test (`dispatch.test.mjs:659`) |
 | `capacities` schema validation (`validateRunnerConfigShape`) | medium — malformed `kind` or missing `command`/`args` on a capacity entry could silently no-op instead of failing loud | new tests mirroring the existing `executors.<tier>` shape tests (`dispatch.test.mjs:322` pattern) for `capacities.<id>` |
@@ -158,7 +158,7 @@ tie-breaking — there was only one candidate order here)
    not already covered by an existing generic test — check before adding a
    duplicate).
 
-## Assumptions (pinned, not asked — implementation-only, per fgos-planning's
+## Assumptions (pinned, not asked — implementation-only, per fgos-coding-planning's
 own material/grounded/answerable filter)
 
 - No new `capacities.<id>` entries need to be added to the *live*,
@@ -174,7 +174,7 @@ own material/grounded/answerable filter)
   kind `fgos tool` has no reason to know").
 - The dedup in D5 keeps `tool-registry.mjs` as the owner (it already
   exports `KINDS`, the more natural home) and has `dispatch.mjs` import
-  from it — but this is genuinely free to flip during `fgos-code-implement` if
+  from it — but this is genuinely free to flip during `fgos-coding-implement` if
   a cleaner shape turns up; D5 itself says ownership is not a design
   decision.
 
@@ -186,7 +186,7 @@ the design doc's own "Đã chốt" #9 already carved the adjacent concerns
 (`tsk-g18`-adjacent follow-up, `depends: [tsk-62v]`); folding them in here
 would re-open a boundary the upstream design already deliberately drew.
 
-## Verify (unchanged mechanical path, per fgos-planning's own scope limit)
+## Verify (unchanged mechanical path, per fgos-coding-planning's own scope limit)
 
 Execute's existing goal-check/`fgos return` re-verify path is untouched by
 this plan. The concrete command this item's own acceptance proves against:

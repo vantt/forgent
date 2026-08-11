@@ -27,7 +27,7 @@ symptoms:
 
 This item adds a new terminal status to close both gaps. **Out of scope**:
 implementation shape (which files change, test structure) — that's
-`fgos-planning`'s job once these decisions are locked.
+`fgos-coding-planning`'s job once these decisions are locked.
 
 ## Locked decisions
 
@@ -37,7 +37,7 @@ implementation shape (which files change, test structure) — that's
 | D2 | The new status is named `wontfix` — the industry-standard umbrella term (GitHub/Bugzilla convention) for "valid, not going to be done." It covers multiple concrete reasons (superseded, duplicate, admin closure) without picking one name that only fits one case; the specific reason for any given closure goes in the item's decision log, the same way `blocked` reasons already do today. |
 | D3 | `wontfix` is enterable from `blocked`, `todo`, and `doing` — three edges, mirroring how `awaiting-human` already enters from both `todo` and `doing` (`src/state/fsm.mjs:85-86`), plus `blocked`. This covers both trigger cases found: an item already parked in `blocked` when closed (tsk-4fu-1), and an item closed directly from `clarify` (i.e. `todo`/`doing`) before ever being blocked, e.g. a duplicate-report closure (tsk-5h4's own concrete repro: closing tsk-2ib as a duplicate of tsk-3yl). |
 | D4 | `wontfix` has no exit edge — fully terminal, no reopen. A wrongly-closed item is revived by filing a new item that references the old one (`refs`, already an existing field), not by reopening the FSM edge. This matches D1's terminal framing and keeps the transition table symmetric with `done` (also zero exits). |
-| D5 | Items reaching `wontfix` do not go through `compound-learn`'s synthesis gate. That gate synthesizes learnings from real completed work and outcomes into end-user docs (`fgos-compounding`) — an item closed at `clarify` (or `blocked`, or `doing`) built nothing to synthesize. The closure reasoning is already captured natively in the item's decision log via this same clarify-stage dialog, so routing through compound-learn would misrepresent unbuilt work as done work. |
+| D5 | Items reaching `wontfix` do not go through `compound-learn`'s synthesis gate. That gate synthesizes learnings from real completed work and outcomes into end-user docs (`fgos-coding-compounding`) — an item closed at `clarify` (or `blocked`, or `doing`) built nothing to synthesize. The closure reasoning is already captured natively in the item's decision log via this same clarify-stage dialog, so routing through compound-learn would misrepresent unbuilt work as done work. |
 
 ## Pinned terms
 
@@ -98,4 +98,4 @@ implementation shape (which files change, test structure) — that's
 ## Outstanding questions
 
 None — all material product decisions locked (D1-D5). Implementation shape
-is `fgos-planning`'s job.
+is `fgos-coding-planning`'s job.

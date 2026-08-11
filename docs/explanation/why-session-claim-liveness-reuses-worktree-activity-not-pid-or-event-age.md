@@ -41,7 +41,7 @@ Two other signals were considered and rejected:
 - **Event-log age** — cheap, reuses `staleDoingAdvisory`'s existing
   `work.move` idiom, but structurally blind during the exact period that
   matters most: a session actively editing files inside
-  `fgos-code-implement` produces zero `.fgos` events while genuinely
+  `fgos-coding-implement` produces zero `.fgos` events while genuinely
   working. Event-log age would misclassify real, in-progress work as
   quiet.
 

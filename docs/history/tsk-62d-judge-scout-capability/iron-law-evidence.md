@@ -16,7 +16,7 @@
 `filesChanged`: `.fgos-runner.json`, `docs/history/tsk-62d-judge-scout-capability/CONTEXT.md`,
 `docs/history/tsk-62d-judge-scout-capability/plan.md`,
 `docs/how-to/add-a-scoped-allowedtools-override-for-a-nested-executor-call.md`,
-`src/intake/decompose.mjs`, `src/intake/discovery.mjs`,
+`src/intake/plan.mjs`, `src/intake/discovery.mjs`,
 `src/intake/judge-executor.mjs`, `src/runner/prompt-templates/judge-scout-instructions.txt`,
 `test/intake/judge-executor.test.mjs`.
 

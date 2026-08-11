@@ -1,9 +1,9 @@
 # Plan: render effective stage on every read surface
 
 **Item:** tsk-4zj
-**Mode:** standard (2 flags, unchanged from the first round: public-contracts, existing-covered-behavior — see `fgos-routing`'s Orient handoff). The scope grew during `fgos-validating`'s reality-gate FAIL and the mid-planning gap that followed (D5/D6), but the flag count driving lane sizing did not — no auth/authorization/audit/security/cross-platform/multi-domain surface was ever in play, and the growth is still "attach a derived field to existing read paths," not a new hard-gate concern. Staying at `standard` rather than escalating to `high-risk`.
+**Mode:** standard (2 flags, unchanged from the first round: public-contracts, existing-covered-behavior — see `fgos-routing`'s Orient handoff). The scope grew during `fgos-coding-validating`'s reality-gate FAIL and the mid-planning gap that followed (D5/D6), but the flag count driving lane sizing did not — no auth/authorization/audit/security/cross-platform/multi-domain surface was ever in play, and the growth is still "attach a derived field to existing read paths," not a new hard-gate concern. Staying at `standard` rather than escalating to `high-risk`.
 
-**Revision note:** this is the SECOND version of this plan. The first version was returned by `fgos-validating` (repo-fit FAIL — see `CONTEXT.md`'s Scout evidence for the full per-verb table) because it assumed all 10 originally-named verbs uniformly carry `item.stage`; that assumption was false for half of them. `CONTEXT.md`'s D5/D6 correct the scope; this plan is shaped against the corrected decisions only.
+**Revision note:** this is the SECOND version of this plan. The first version was returned by `fgos-coding-validating` (repo-fit FAIL — see `CONTEXT.md`'s Scout evidence for the full per-verb table) because it assumed all 10 originally-named verbs uniformly carry `item.stage`; that assumption was false for half of them. `CONTEXT.md`'s D5/D6 correct the scope; this plan is shaped against the corrected decisions only.
 
 **Decisions:** `docs/history/read-surface-effective-stage/CONTEXT.md` (D1-D6)
 
@@ -119,7 +119,7 @@ exist today):**
 
 ### Risk map
 
-| Component | Risk | Proof point (fgos-validating) |
+| Component | Risk | Proof point (fgos-coding-validating) |
 |---|---|---|
 | `effectiveStage()` helper | light | Unit test in `test/state/workflow-stage-graphs.test.mjs`: explicit stage returned as-is; absent stage on `coding` domain resolves to `'executing'`. |
 | Group A wiring (`list`/`show`/`ready`/`merge-candidates`/table) | light-medium | CLI test asserts `stageEffective` present and correct in each of the 5 surfaces, for both a stage-absent and stage-explicit item. |
@@ -181,22 +181,22 @@ unblock; ordering is pure implementation sequencing):
 
 - **A1:** `stageForStep(domain, 'Execute')` never returns `undefined` for
   the `coding` domain — confirmed by reading `DOMAINS.coding.stepMap`
-  (`workflow-stage-graphs.mjs:64`). `fgos-validating` should re-confirm
+  (`workflow-stage-graphs.mjs:64`). `fgos-coding-validating` should re-confirm
   this holds at execution time.
 - **A2 (revised):** the six-surface set (D6) is the complete set of read
   verbs where `stageEffective`/`stageByItem` is both possible (the verb's
   own candidate items aren't stage-restricted by construction) and useful
   (the plan's own Approach section traces each one's real backing
-  function). `fgos-validating` should spot-check this against the actual
+  function). `fgos-coding-validating` should spot-check this against the actual
   `bin/fgos.mjs` case list one more time before `executing`, since A2 was
   wrong once already this round.
 - **A3 (new):** `merge list`'s `waiting` branch and `stale`/`conflicts`/
   `check` genuinely have no id-to-stage-aware consumer today that this
-  exclusion would break — `fgos-validating` confirmed the candidate-set
+  exclusion would break — `fgos-coding-validating` confirmed the candidate-set
   filters during the mid-planning gap session, but did not exhaustively
   search every existing test file for an assertion that might depend on
   those verbs' current (stage-free) shape staying exactly as-is; a
-  narrow grep pass at `fgos-validating` time would close this out fully.
+  narrow grep pass at `fgos-coding-validating` time would close this out fully.
 
 ## Proof surface (for the gate below)
 

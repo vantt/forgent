@@ -24,7 +24,7 @@
   passed unchanged; new tests cover transcript parsing, the
   Bash(rg:\*)-only capture filter, and the skip-on-fresh-notes path
   (`test/intake/judge-executor.test.mjs`, `test/intake/discovery.test.mjs`,
-  `test/intake/decompose.test.mjs`). Status: `done`.
+  `test/intake/plan.test.mjs`). Status: `done`.
 
 ## What shipping this milestone actually amortizes
 

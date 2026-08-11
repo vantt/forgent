@@ -57,7 +57,7 @@ Rejected alternatives:
 ### Finding: `cleanup-next`'s folding is real but small
 
 `CONTEXT.md` D4 folds `cleanup-next` into this item, and left *how* to
-`fgos-planning` as shaping. Scouting it (`plugins/fgOS/skills/cleanup-next/
+`fgos-coding-planning` as shaping. Scouting it (`plugins/fgOS/skills/cleanup-next/
 SKILL.md`, steps 2-5) shows it **invokes no skill at all** — it picks a
 TTL-pre-filtered item, runs the `fgos cleanup <id>` CLI verb, and classifies
 by that subprocess's real exit code. There is nothing for a driver to drive,
@@ -77,9 +77,9 @@ not reopen D4 (which locked inclusion, never a mechanism).
 
 | Component | How risky | What would prove it |
 |---|---|---|
-| Driver: `awaiting-approval` becomes an overridable ceiling (D2) | **High** — removes a validation; the human merge gate's protection becomes conventional | At `fgos-validating`: confirm no launcher in `plugins/fgOS/skills/**` ships a default ceiling past `awaiting-approval`, and that the driver prose states the convention explicitly as a named constraint, not a passing remark. Blast-radius evidence available (`impact-analysis: full`) but of limited use — the coupling is prose-to-prose, not symbol-to-symbol, so a `rg` sweep over `plugins/fgOS/skills/**/SKILL.md` is the real check |
-| Driver: position-based advance-axis (D1) | **Medium** — five callers read this contract (`cook`, `pick`, `discover-next`, and the clarify/planning/execution sweeps); a wrong generalization silently changes what every one of them drives | At `fgos-validating`: re-read each of the five callers' own ceiling arguments against the new prose and confirm each still resolves to the same behavior it has today |
-| Stale docs describing today's driver behavior | **Medium** — `docs/explanation/why-cook-and-pick-were-retrofitted-to-call-fgos-coding-driving.md` and `docs/how-to/advance-a-clarify-or-decompose-stage-item-with-discover-decompose.md` both describe current semantics | At `fgos-validating`: grep both for claims D1/D2 invalidate; any hit is in P1's scope, not a follow-up |
+| Driver: `awaiting-approval` becomes an overridable ceiling (D2) | **High** — removes a validation; the human merge gate's protection becomes conventional | At `fgos-coding-validating`: confirm no launcher in `plugins/fgOS/skills/**` ships a default ceiling past `awaiting-approval`, and that the driver prose states the convention explicitly as a named constraint, not a passing remark. Blast-radius evidence available (`impact-analysis: full`) but of limited use — the coupling is prose-to-prose, not symbol-to-symbol, so a `rg` sweep over `plugins/fgOS/skills/**/SKILL.md` is the real check |
+| Driver: position-based advance-axis (D1) | **Medium** — five callers read this contract (`cook`, `pick`, `discover-next`, and the clarify/planning/execution sweeps); a wrong generalization silently changes what every one of them drives | At `fgos-coding-validating`: re-read each of the five callers' own ceiling arguments against the new prose and confirm each still resolves to the same behavior it has today |
+| Stale docs describing today's driver behavior | **Medium** — `docs/explanation/why-cook-and-pick-were-retrofitted-to-call-fgos-coding-driving.md` and `docs/how-to/advance-a-clarify-or-decompose-stage-item-with-discover-decompose.md` both describe current semantics | At `fgos-coding-validating`: grep both for claims D1/D2 invalidate; any hit is in P1's scope, not a follow-up |
 | Launcher edits (P2, P3) | **Low** — single-file prose, behavior deliberately unchanged (D3) | Their own verify commands |
 | Proof is inherently weak for all three | **Structural** — skill prose is LLM-interpreted; no static check asserts runtime behavior (`docs/how-to/write-verify-for-a-skill-prose-change.md`) | Accepted, not fixable here. Every verify below follows that doc's mandated `npm test && POSITIVE && NEGATIVE` shape, which proves the deliverable exists and the old pattern is gone — never that the prose is understood |
 
@@ -140,7 +140,7 @@ driver (see the finding above).
   (`src/state/workflow-stage-graphs.mjs:475-492`), not assumed.
 - No new test file is needed: the existing suite covers the registry
   functions, and skill prose has no runtime assertion surface. Flagged here
-  so `fgos-validating` checks it rather than inheriting it silently.
+  so `fgos-coding-validating` checks it rather than inheriting it silently.
 
 ## Outstanding questions
 

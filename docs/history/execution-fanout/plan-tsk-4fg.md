@@ -14,7 +14,7 @@ cross-platform/multi-domain flags apply.
 hook repeatedly surfaced `GitNexus index is stale (last indexed: 251d0b5)`
 against the current HEAD. Per `CLAUDE.md`'s three-way gate, `present` but
 flagged stale is degraded, not full — corrected here from an earlier,
-inaccurate `full` claim (`fgos-validating`'s reality gate). No risk-map row
+inaccurate `full` claim (`fgos-coding-validating`'s reality gate). No risk-map row
 below leans on GitNexus blast-radius evidence (each proof point is a new
 test, not an `impact()` call), so this correction does not invalidate any
 row — it is recorded for honesty per the reality-gate dimension, not
@@ -66,7 +66,7 @@ people actually see when they type `fgos list` bare.
 
 ## Risk map
 
-| Component | Risk | Proof point (→ `fgos-validating`) |
+| Component | Risk | Proof point (→ `fgos-coding-validating`) |
 |---|---|---|
 | Default-view filter shape change | medium — could hide a child that has no visible parent in ways D2 didn't anticipate | new test: item with `parent` pointing at a resolved (hidden) parent still appears as a top-level row in default `list --json` output |
 | Badge honesty (counts all children, not just visible ones) | medium — a badge computed only from the filtered set would undercount when some children are already `done` (correctly hidden as individually-resolved) | new test: parent with 3 children (1 `done`, 1 `doing`, 1 `todo`) shows badge `1/3` in default `list --json`, and the 2 open children are absent from that same output |
@@ -82,7 +82,7 @@ people actually see when they type `fgos list` bare.
 ## Assumptions
 
 - No recursive grandchild case exists in this repo's current `.fgos` (open
-  question left to `fgos-validating`/implementer if it surfaces — D3's own
+  question left to `fgos-coding-validating`/implementer if it surfaces — D3's own
   text and this item's scope only ever discuss one level of `parent`).
 - Badge field name/shape in JSON output (e.g. `childProgress: {done,
   total}` on the parent's work entry) is an implementer choice — not

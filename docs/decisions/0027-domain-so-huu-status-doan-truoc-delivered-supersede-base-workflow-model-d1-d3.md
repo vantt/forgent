@@ -49,7 +49,7 @@ không phụ thuộc từ vựng domain. Bản thân report nguồn
 (`plans/reports/research-260730-0931-work-item-schema-multi-domain-upgrade-report.md`,
 round 4) ban đầu kết luận **"domain sở hữu TOÀN BỘ bảng transition"** — một
 khung rộng hơn record này thật sự chốt. Khung đó đã bị xét lại và THU HẸP
-trong phiên `fgos-exploring` cho `tsk-38t`
+trong phiên `fgos-coding-exploring` cho `tsk-38t`
 (`docs/history/phase-2-status-category-schema/DISCUSSION.md`, đọc toàn văn):
 §1 tự ghi nhận "Đây là thu hẹp thật so với kết luận round-4 của report gốc
 ('domain sở hữu TOÀN BỘ bảng transition') — thu hẹp lại đúng phạm vi domain
@@ -204,7 +204,7 @@ cùng category) — không còn là 1 Set string thuần.
 
 ### 6. Gap liên quan nhưng KHÔNG phải phạm vi audit status literal (ghi nhận để không lặp lại công sức)
 
-`fgos-compounding` bị gọi CỨNG cho mọi item tới `retrospective`
+`fgos-coding-compounding` bị gọi CỨNG cho mọi item tới `retrospective`
 (`src/state/retro-pool.mjs`, `bin/fgos.mjs:1012,1088`) — không tham số hoá
 theo domain. Đây là gap D5 đã chốt hướng xử lý (mở rộng `skillMap` sang key
 `retrospective`) nhưng CHƯA code — thuộc `tsk-38t` decompose kế tiếp, không

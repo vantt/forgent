@@ -22,7 +22,7 @@ git diff --name-only b1aba62..HEAD
 ```
 .claude/skills/fgos-submit-assist/SKILL.md
 plugins/fgOS/skills/submit/SKILL.md
-src/intake/decompose.mjs
+src/intake/plan.mjs
 ```
 
 None of these three paths match any `MODULE_RULES` entry in
@@ -37,10 +37,10 @@ proof; it points at it.
 
 `tsk-52g-2`'s diff is prose and prompt-instruction text: two `SKILL.md`
 files and one string literal inside `buildDecomposePrompt`
-(`src/intake/decompose.mjs`). It adds guidance for whoever writes the free
+(`src/intake/plan.mjs`). It adds guidance for whoever writes the free
 text a title gets derived from, and for the LLM composing a child item's
 title at `decompose` — neither is asserted by any test. Confirmed before
-editing: no test in `test/intake/decompose.test.mjs` snapshots or asserts
+editing: no test in `test/intake/plan.test.mjs` snapshots or asserts
 on the prompt's literal text (the file's own comment at line 325 notes
 exactly this — no test asserts on the actual prompt string sent to the
 executor).
@@ -63,7 +63,7 @@ The full suite this item's diff could plausibly affect stayed green
 throughout:
 
 ```
-node --test test/intake/decompose.test.mjs test/state/store.test.mjs test/runner/loop.test.mjs
+node --test test/intake/plan.test.mjs test/state/store.test.mjs test/runner/loop.test.mjs
 ℹ pass 132
 ℹ fail 0
 ```

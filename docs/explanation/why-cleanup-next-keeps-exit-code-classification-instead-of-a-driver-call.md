@@ -21,7 +21,7 @@ would resolve nothing and stop immediately on its first iteration —
 ceremony with no value, not a real dispatch.
 
 `retro-next`'s old exit-code branch was a genuine defect: it invoked an
-in-session skill (`fgos-compounding`) via the Skill tool, which returns
+in-session skill (`fgos-coding-compounding`) via the Skill tool, which returns
 control in-session with no subprocess exit code to read at all — the
 exit-code classification there was reading a signal that no longer
 existed. `cleanup-next`'s exit-code branch has no such defect: it really

@@ -96,7 +96,7 @@ lookup.
 This directly contradicted the skill docs that motivated this whole
 feature: `pick/SKILL.md` step 3 documents the call as "filtered to just
 this item so the call never dumps the whole backlog," and
-`fgos-exploring/SKILL.md` step 1 implies scoped access to
+`fgos-coding-exploring/SKILL.md` step 1 implies scoped access to
 `view.discovery["<item-id>"]`. The behavior these docs promised was never
 actually shipped for anything past `work` itself.
 

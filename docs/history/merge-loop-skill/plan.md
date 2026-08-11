@@ -44,7 +44,7 @@ yet on `main` — see Ordering below). The skill's own steps:
    separate, unrelated skill (mechanical-metric optimization: requires
    `Goal`/`Scope`/`Verify`-single-number/`Guard` config, git-commit-then-
    measure per iteration); confirmed by reading
-   `~/.claude/skills/ck-loop/SKILL.md` in full at `fgos-validating` and
+   `~/.claude/skills/ck-loop/SKILL.md` in full at `fgos-coding-validating` and
    ruled out — there is no metric to optimize here, only a repeat-until-
    stop-condition task, which is exactly what the plain `loop` skill's own
    description covers ("run a prompt on a recurring interval... omit the
@@ -85,12 +85,12 @@ yet on `main` — see Ordering below). The skill's own steps:
 
 ## Risk map
 
-| Component | Risk | Proof point (for `fgos-validating`) |
+| Component | Risk | Proof point (for `fgos-coding-validating`) |
 |---|---|---|
 | Same-id-blocked-2-consecutive-turns tracking | Medium — this state must persist across `ScheduleWakeup` wake-ups within one `/loop` run without misfiring (false-stop on the first block, or never stopping) | Trace the exact stop-condition prose above against `merge-next`'s three real envelope shapes; confirm the SKILL.md text leaves no ambiguity about "consecutive" (same id, immediately-prior iteration only) |
 | Recursing into `/loop`'s dynamic self-pace | Low-medium — wrong pacing guidance could read as a fixed short interval instead of dynamic, or could wrongly target `ck-loop` instead | Confirm SKILL.md's `/loop` invocation instructions match the plain `loop` skill's own self-pace contract (`prompt` + omitted interval), and explicitly does not reference `ck-loop` |
 | New public-contract surface (`/fgOS:merge-loop`) | Low — mitigated by going through this exact clarify → plan → validate lifecycle instead of ad hoc | Confirm this plan and `CONTEXT.md` were both approved before any execution |
-| Dependency chain unmerged (`worktree-in-out` → `tsk-4j9` → `tsk-1sm`, per `fgos graph --json`'s component listing) | High for *today's* buildability, but structurally gated | `fgos-validating`/executing must confirm `tsk-4j9` has actually merged to `main` (and `merge-next`/`merge-list` exist there) before this item is allowed into `executing` — the frontier already enforces this via `deps`, not a new check this item invents |
+| Dependency chain unmerged (`worktree-in-out` → `tsk-4j9` → `tsk-1sm`, per `fgos graph --json`'s component listing) | High for *today's* buildability, but structurally gated | `fgos-coding-validating`/executing must confirm `tsk-4j9` has actually merged to `main` (and `merge-next`/`merge-list` exist there) before this item is allowed into `executing` — the frontier already enforces this via `deps`, not a new check this item invents |
 
 ## Ordering
 
@@ -112,7 +112,7 @@ already use. No plugin manifest change needed — `plugins/fgOS/
 `merge-list`/`merge-next` (skills are discovered by directory, not
 manifest-listed).
 
-Cases worth proving at `fgos-validating`:
+Cases worth proving at `fgos-coding-validating`:
 - `{picked: null}` on the very first iteration (frontier already empty).
 - A single `blocked` result followed by a *different* id picked next
   (must NOT trigger the stop condition — only same-id-twice does).

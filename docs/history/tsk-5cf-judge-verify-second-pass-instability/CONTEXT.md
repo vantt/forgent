@@ -63,11 +63,11 @@ separately.
   an intentional design choice, not a bug in itself — the bug this item
   covers is the judge's own criteria being unstable round to round, not
   the parking mechanism.
-- `docs/history/rename-fgos-executing-to-fgos-code-implement/CONTEXT.md`
+- `docs/history/rename-fgos-executing-to-fgos-coding-implement/CONTEXT.md`
   — prior precedent of 3-4 verify-disputed rounds being normal/expected
   and each catching a real gap. `tsk-4xg`'s reproduction (10 rounds,
   contradictory not just additive objections) goes past that precedent.
-- `src/intake/decompose.mjs` — confirms `risk: heavy` triggers
+- `src/intake/plan.mjs` — confirms `risk: heavy` triggers
   `DEFAULT_RISK_GATE_REASON` mandatory human gate at decompose (D3(b)),
   grounding D2's stated trade-off.
 - `src/runner/dispatch.mjs:590-596` (`modelForTier`) + this repo's local
@@ -95,17 +95,17 @@ separately.
 - "stabilize" (D1a) means: give the judge continuity across rounds for
   the *same item* (e.g. its own prior rejection reasons folded into the
   next round's prompt) and/or reduce call-to-call variance — the exact
-  mechanism is left to `fgos-planning`, not decided here.
+  mechanism is left to `fgos-coding-planning`, not decided here.
 - "override" (D1b) means: some person-facing way to make `fgos discover`
   proceed past a disputed second-pass verdict without requiring the two
   judge passes to agree — the exact shape (a flag, reusing the recorded
-  `fgos answer` text as authoritative, etc.) is left to `fgos-planning`.
+  `fgos answer` text as authoritative, etc.) is left to `fgos-coding-planning`.
 
 ## Outstanding questions (deferred to planning)
 
 - Exact stabilization mechanism (prior-round context injection vs.
   sampling/temperature change vs. a fixed rubric) is an implementation
-  choice for `fgos-planning`.
+  choice for `fgos-coding-planning`.
 - Exact override mechanism and its own audit-trail/abuse-resistance
   shape (should it require a reason string, should it be logged
   distinctly from a normal `clear` verdict) is also left to planning —

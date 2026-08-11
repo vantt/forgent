@@ -1,11 +1,11 @@
 # tsk-4iv — `fgos uninstall` plan
 
-**Stage:** decompose (fgos-planning). **Date:** 2026-08-01. Builds on
+**Stage:** decompose (fgos-coding-planning). **Date:** 2026-08-01. Builds on
 `docs/history/fgos-uninstall/CONTEXT.md` (D1-D4, approved).
 
 ## Mode
 
-**high-risk.** Flag count (per fgos-planning's mechanical gate):
+**high-risk.** Flag count (per fgos-coding-planning's mechanical gate):
 
 | Flag | Applies? | Why |
 |---|---|---|
@@ -26,7 +26,7 @@ Either alone would already force high-risk; a `standard` or smaller mode
 would not honestly cover a verb that both disables a security control and
 attempts to delete its own running package. (Note: the item's own
 `risk: light` field was set at submit time before this shaping pass — not
-reopened or overridden, per fgos-planning's own rule that mode is
+reopened or overridden, per fgos-coding-planning's own rule that mode is
 `plan.md` prose, never a field write; it simply informs which edge gets
 picked next, same as this item's own tier.)
 
@@ -53,17 +53,17 @@ Impact-analysis posture: **full** (`gitnexus` present, confirmed in
 CONTEXT.md's scout evidence) — the proof points below that lean on
 blast-radius evidence (nothing else calls `insertSourceLine`/
 `installGitHooks` in a way this reversal would break) can use it directly
-at `fgos-validating`, not carry a "weak evidence" caveat for that part.
+at `fgos-coding-validating`, not carry a "weak evidence" caveat for that part.
 
 ### Risk map
 
-| Component | Risk | Proof point (for `fgos-validating`) |
+| Component | Risk | Proof point (for `fgos-coding-validating`) |
 |---|---|---|
 | Shell-rc report (D4, not a deletion) | low | test asserting `fgos uninstall` detects the fgOS source line via the existing `hasSourceLine`/`deadSourceLines` primitives and reports its rc file + path in its result, without modifying the rc file's bytes at all — matches `docs/history/shell-rc-dead-source-lines/CONTEXT.md` D1's existing report-only contract |
 | Git-hooks reversal (D2) | low-medium | round-trip test: unwires only when `core.hooksPath` is still exactly `.githooks`; a hooksPath the caller changed to something else is left untouched — mirrors `installGitHooks`'s existing fill-only test pattern |
 | Confirmation gate (D3) | medium | test asserting `fgos uninstall` (no flag) refuses to touch anything and exits without side effects; explicit opt-in actually runs |
 | Config preservation (pinned constraint) | medium | test asserting `.fgos/` data, `~/.fgos/config.json`, and project `config.json` are byte-identical before/after a full `fgos uninstall` run |
-| Package self-removal (D1) — **reshaped as a spike, see below** (`fgos-validating` returned this row NOT READY on 2026-08-01: zero precedent anywhere in this repo for a process removing its own installed package; plausibility only) | **high** | spike answers this before any build verify is written |
+| Package self-removal (D1) — **reshaped as a spike, see below** (`fgos-coding-validating` returned this row NOT READY on 2026-08-01: zero precedent anywhere in this repo for a process removing its own installed package; plausibility only) | **high** | spike answers this before any build verify is written |
 | Cross-platform self-deletion | **high, unresolved** | no CI matrix exists yet for this repo (`tsk-3nx`, separate item, still `todo`) — Windows file-locking behavior for a running process deleting its own files is flagged as an open risk, explicitly out of scope for the spike below (npm + Linux/macOS only); carried forward as an explicit unproven assumption |
 
 ### Files likely touched
@@ -86,7 +86,7 @@ at `fgos-validating`, not carry a "weak evidence" caveat for that part.
 - Confirmation UX is a `--yes` flag (mirrors the common `npm uninstall -y`
   / `rm -i` convention already familiar to this CLI's users), not an
   interactive TTY prompt — D3 only locked that confirmation is required,
-  not its shape; `fgos-validating` checks this is either proven or
+  not its shape; `fgos-coding-validating` checks this is either proven or
   flagged unproven, not asked here.
 - Package-manager detection reads the nearest lockfile
   (`package-lock.json`/`pnpm-lock.yaml`/`yarn.lock`) relative to the
@@ -108,7 +108,7 @@ Both carry `parent: tsk-4iv`.
 
 `tsk-4iv-2` carries `deps: [tsk-4iv-1]` (reuses the same `uninstall` verb
 scaffold piece 1 builds) and is reshaped as a spike per
-`fgos-validating`'s 2026-08-01 NOT READY verdict on the original
+`fgos-coding-validating`'s 2026-08-01 NOT READY verdict on the original
 `Package self-removal` risk-map row — that row had zero accepted evidence
 anywhere in this repo (no precedent for a process removing its own
 installed package), which is exactly the "one yes/no question decides
@@ -123,7 +123,7 @@ enables for Windows) gets created then, not now (YAGNI — no point
 shaping a 3-package-manager build plan before the one-package-manager
 question is even answered). If the finding is "no, unreliable" — that
 result itself is the deliverable, and `tsk-4iv`'s own scope (specifically
-D1) goes back through `fgos-exploring` with real evidence in hand.
+D1) goes back through `fgos-coding-exploring` with real evidence in hand.
 
 ## Gate
 

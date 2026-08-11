@@ -1,9 +1,9 @@
-# Rename skill `fgos-executing` → `fgos-code-implement`
+# Rename skill `fgos-executing` → `fgos-coding-implement`
 
 ## Feature boundary
 
 Rename the `coding` domain's `executing`-stage skill from `fgos-executing`
-to `fgos-code-implement`, everywhere the literal string is load-bearing or
+to `fgos-coding-implement`, everywhere the literal string is load-bearing or
 descriptive — code, tests, skill docs, product docs — while leaving the
 two governed state files (`.fgos/state.json`, `.fgos/events.jsonl`)
 untouched. Not a behavior change to what the skill does; a naming change
@@ -14,8 +14,8 @@ to the skill's identity, including the `capacityId` it doubles as.
 | ID | Decision |
 |----|----------|
 | D1 | Full rewrite covers all markdown docs, including dated historical snapshots: `docs/history/*`, `plans/*`, `plans/reports/*`. Does **not** cover `.fgos/state.json` or `.fgos/events.jsonl` — live materialized state and an append-only event log respectively; every skill in this repo carries a hard rule against writing `.fgos/` state directly (one-door-write, CTR001), and no verb exists to bulk-patch historical fields inside old records. Hand-editing those two files would falsify recorded events, not just relabel them. |
-| D2 | The doc file `docs/how-to/smoke-test-fgos-executing-with-a-trivial-item.md` is renamed to `docs/how-to/smoke-test-fgos-code-implement-with-a-trivial-item.md`, with the corresponding entry in `docs/enduser-docs-index.json` updated to match. |
-| D3 | The `capacityId` string `fgos-executing` — used as the `coding` domain's `executing`-stage skillMap value in `src/state/workflow-stage-graphs.mjs` and as the runner's default dispatch lookup key in `src/runner/dispatch.mjs` — is renamed to `fgos-code-implement` too, kept in full sync with the skill's display name. This is a runtime-behavior-adjacent change, not a pure doc edit: verified via `.fgos/config.json` (no `fgos-executing` key in its `capacities` block) and `.fgos/state.json`'s `tools` registry (only `gitnexus`, `submit-assist-classify` registered) that nothing live in this repo currently keys off the old literal string, so no other config needs a matching update here. Any external, out-of-repo local capacity config keyed literally `fgos-executing` would silently fall back to default after this change — accepted risk per explicit user choice. |
+| D2 | The doc file `docs/how-to/smoke-test-fgos-executing-with-a-trivial-item.md` is renamed to `docs/how-to/smoke-test-fgos-coding-implement-with-a-trivial-item.md`, with the corresponding entry in `docs/enduser-docs-index.json` updated to match. |
+| D3 | The `capacityId` string `fgos-executing` — used as the `coding` domain's `executing`-stage skillMap value in `src/state/workflow-stage-graphs.mjs` and as the runner's default dispatch lookup key in `src/runner/dispatch.mjs` — is renamed to `fgos-coding-implement` too, kept in full sync with the skill's display name. This is a runtime-behavior-adjacent change, not a pure doc edit: verified via `.fgos/config.json` (no `fgos-executing` key in its `capacities` block) and `.fgos/state.json`'s `tools` registry (only `gitnexus`, `submit-assist-classify` registered) that nothing live in this repo currently keys off the old literal string, so no other config needs a matching update here. Any external, out-of-repo local capacity config keyed literally `fgos-executing` would silently fall back to default after this change — accepted risk per explicit user choice. |
 
 ## Pinned terms
 
@@ -52,8 +52,8 @@ to the skill's identity, including the `capacityId` it doubles as.
   `.agents/skills/fgos-executing/SKILL.md`.
 - Cross-referencing `SKILL.md` files naming `fgos-executing` by name, both
   under `.claude/skills/` and `.agents/skills/`: `fgos-routing`,
-  `fgos-coding-driving`, `fgos-coding-shaping`, `fgos-exploring`,
-  `fgos-planning`, `fgos-validating`.
+  `fgos-coding-driving`, `fgos-coding-shaping`, `fgos-coding-exploring`,
+  `fgos-coding-planning`, `fgos-coding-validating`.
 - `plugins/fgOS/skills/{decompose,discover-next,cook}/SKILL.md` reference
   it in prose.
 - `docs/specs/{reading-map,work-state,runner}.md`, several
@@ -102,7 +102,7 @@ plans/reports rewrite without missing files).
 
 | ID | Decision |
 |----|----------|
-| D4 | `docs/history/rename-fgos-executing-to-fgos-code-implement/` (this directory, including this file) is excluded from the "zero leftover `fgos-executing` reference" verify check — both the content grep and the tracked-path check. This is the decision record ABOUT the rename itself; by definition it must keep naming the old skill to document what changed FROM and TO. Requiring it to scrub its own subject would make the verify command permanently unsatisfiable. This is a structural exception like the governed state files (D1's addendum), not a narrowing of D1's product-docs scope — every other `docs/history/*` file still gets the full rename. |
+| D4 | `docs/history/rename-fgos-executing-to-fgos-coding-implement/` (this directory, including this file) is excluded from the "zero leftover `fgos-executing` reference" verify check — both the content grep and the tracked-path check. This is the decision record ABOUT the rename itself; by definition it must keep naming the old skill to document what changed FROM and TO. Requiring it to scrub its own subject would make the verify command permanently unsatisfiable. This is a structural exception like the governed state files (D1's addendum), not a narrowing of D1's product-docs scope — every other `docs/history/*` file still gets the full rename. |
 
 Surfaced by the second-pass verify judge during clarify (two prior
 `verify-disputed` rounds also caught real gaps: a broken
@@ -134,5 +134,5 @@ directory over. Added to the exclusion list.
 Final verify command:
 
 ```
-npm test && test -f .claude/skills/fgos-code-implement/SKILL.md && test -f .agents/skills/fgos-code-implement/SKILL.md && grep -q "^name: fgos-code-implement$" .claude/skills/fgos-code-implement/SKILL.md && grep -q "^name: fgos-code-implement$" .agents/skills/fgos-code-implement/SKILL.md && test -f docs/how-to/smoke-test-fgos-code-implement-with-a-trivial-item.md && grep -q "executing: .fgos-code-implement." src/state/workflow-stage-graphs.mjs && ! rg -l --hidden "fgos-executing" --glob "!node_modules" --glob "!.git" --glob "!.claude/worktrees/**" --glob "!.fgos/state.json" --glob "!.fgos/events.jsonl*" --glob "!docs/history/rename-fgos-executing-to-fgos-code-implement/**" --glob "!docs/history/tsk-f38/**" . && ! git ls-files | grep "fgos-executing" | grep -v "^docs/history/rename-fgos-executing-to-fgos-code-implement/" | grep -v "^docs/history/tsk-f38/"
+npm test && test -f .claude/skills/fgos-coding-implement/SKILL.md && test -f .agents/skills/fgos-coding-implement/SKILL.md && grep -q "^name: fgos-coding-implement$" .claude/skills/fgos-coding-implement/SKILL.md && grep -q "^name: fgos-coding-implement$" .agents/skills/fgos-coding-implement/SKILL.md && test -f docs/how-to/smoke-test-fgos-coding-implement-with-a-trivial-item.md && grep -q "executing: .fgos-coding-implement." src/state/workflow-stage-graphs.mjs && ! rg -l --hidden "fgos-executing" --glob "!node_modules" --glob "!.git" --glob "!.claude/worktrees/**" --glob "!.fgos/state.json" --glob "!.fgos/events.jsonl*" --glob "!docs/history/rename-fgos-executing-to-fgos-coding-implement/**" --glob "!docs/history/tsk-f38/**" . && ! git ls-files | grep "fgos-executing" | grep -v "^docs/history/rename-fgos-executing-to-fgos-coding-implement/" | grep -v "^docs/history/tsk-f38/"
 ```

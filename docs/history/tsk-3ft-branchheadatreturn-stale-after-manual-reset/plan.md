@@ -3,7 +3,7 @@
 ## Mode: standard
 
 2 flags counted per `fgos-routing`'s Mode-gate criteria (computed directly
-here — direct-entry from `fgos-exploring`, no prior Orient hand-off to
+here — direct-entry from `fgos-coding-exploring`, no prior Orient hand-off to
 read): **existing covered behavior** — `checkMergeStillResolves` already
 has passing tests (`tsk-1p9`'s root-aware ref, `tsk-577`'s missing-ref
 fallback) this change must not regress; **weak proof around the area** —

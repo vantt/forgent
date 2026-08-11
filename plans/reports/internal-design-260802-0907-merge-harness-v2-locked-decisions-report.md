@@ -91,7 +91,7 @@ rather than left wrong in a decision record:
 worktree path stays git-op `cwd`) does not expand `main-checkout.lock`'s
 blast radius to worktrees — that lock was already this narrow. There is
 nothing to supersede. tsk-45y's stated premise predates (or misdescribes)
-`tsk-56t`'s fix; recommend it go through `fgos-exploring` on its own
+`tsk-56t`'s fix; recommend it go through `fgos-coding-exploring` on its own
 merits to re-check its premise against current code, likely closing as
 resolved-by-context rather than being decided one way or the other by
 this report. tsk-2eq proceeds independently, unblocked by tsk-45y.
@@ -197,7 +197,7 @@ in `mergeReadiness` v2 depends on for correctness).
    submit`), or does the user want to review this report first and file
    separately? Not done yet — filing is a real backlog mutation.
 2. Should `tsk-45y`'s supersession (D3) be recorded on the item now (via
-   its own `fgos-exploring`/`fgos-planning` pass), or left for whoever
+   its own `fgos-coding-exploring`/`fgos-coding-planning` pass), or left for whoever
    picks `tsk-45y` next to discover via this report's reference? Not
    done yet — same reason.
 3. Merge-set clustering algorithm (D2's accepted risk) has exactly one

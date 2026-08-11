@@ -27,7 +27,7 @@ in a worktree run are an accurate reflection of that checkout's real
 | D1 | Fix via snapshot/restore of `docs/enduser-docs-index.json`'s real content — capture it before the docs-index-touching tests run, restore it (or remove it, if it didn't exist before) after — rather than switching to a temp fixture tree or adding a new CLI `--out` flag. Keeps the file's existing explicit design intent (`runDocsIndex`'s own comment: "Deliberately run against the REAL repo cwd (never a temp fixture)... this cell's must_haves forbid a proxy test") intact — the test still exercises the real generator over the real `docs/` tree and reads the real produced manifest; only the leftover disk state changes. No production CLI surface touched. |
 | D2 | Restore runs unconditionally — in a linked worktree AND in the main checkout, even when `.fgos/` state is real and the regenerated content legitimately differs from what's committed. `npm test`'s job is verification, not regeneration; keeping the tracked manifest current is `fgos-indexing`'s separate, deliberate action, never an `npm test` side effect. One restore path, no worktree-vs-main branch in the test. |
 
-## Pinned assumptions (implementer-level, deferred to `fgos-planning`)
+## Pinned assumptions (implementer-level, deferred to `fgos-coding-planning`)
 
 - Snapshot/restore mechanism: plain `fs.readFileSync`/`fs.writeFileSync`
   (or `fs.rmSync` if the file was absent before), not `git checkout` —
@@ -36,7 +36,7 @@ in a worktree run are an accurate reflection of that checkout's real
   git dependency) and avoids any risk of a git-based restore discarding a
   real uncommitted edit to the manifest that predates the test run.
 - Restore hook placement (single module-level `after()` vs. per-test
-  `try/finally`) is an implementation choice for `fgos-planning`/execution
+  `try/finally`) is an implementation choice for `fgos-coding-planning`/execution
   to make, not locked here.
 
 ## Scout evidence cited

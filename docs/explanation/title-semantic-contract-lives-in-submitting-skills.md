@@ -25,7 +25,7 @@ produced, never into a mechanical check:
 - `.claude/skills/fgos-submit-assist/SKILL.md` — the classifier skill that
   reads the same free text (to pick tier/kind/risk) before filing it.
 - The `decompose` LLM prompt's child-title instruction
-  (`src/intake/decompose.mjs`), for the one other path that produces a
+  (`src/intake/plan.mjs`), for the one other path that produces a
   title: an LLM choosing a name for a split-off child item.
 
 The measurement that decided where the *weight* of this guidance should
@@ -62,7 +62,7 @@ predicted `standard` tier, 0 deps, ran once, passed, no friction recorded.
 The genuine substance of the outcome is in the placement decision above,
 not in a colorful failure story — three prose edits, no code path change,
 verified by a `grep` on one of the three files and the existing
-`test/intake/decompose.test.mjs` suite staying green (its own comment
+`test/intake/plan.test.mjs` suite staying green (its own comment
 confirms nothing in that suite snapshots the prompt's literal text, so
 there was nothing for the edit to silently break there).
 

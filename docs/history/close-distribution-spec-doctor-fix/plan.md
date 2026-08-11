@@ -1,6 +1,6 @@
 # tsk-1qm — plan
 
-**Stage:** decompose (fgos-planning). **Date:** 2026-08-02. Builds on
+**Stage:** decompose (fgos-coding-planning). **Date:** 2026-08-02. Builds on
 `CONTEXT.md` (D1-D4, approved).
 
 ## Mode

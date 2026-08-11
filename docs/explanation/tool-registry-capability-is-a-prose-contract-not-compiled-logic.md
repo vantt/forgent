@@ -85,10 +85,10 @@ skip) from "registered but broken" (a real gap worth warning about). The
 deep-dive's proposed fix follows the harness/symphony shape: fgOS
 consults a `impact-analysis` **capability**, never the literal string
 "GitNexus," so a second provider could register later without any of the
-three consuming skills (`fgos-planning`, `fgos-validating`,
-`fgos-code-implement`) needing to change:
+three consuming skills (`fgos-coding-planning`, `fgos-coding-validating`,
+`fgos-coding-implement`) needing to change:
 
-> fgos-planning/validating tham chiếu **capability** `impact-analysis`,
+> fgos-coding-planning/validating tham chiếu **capability** `impact-analysis`,
 > KHÔNG BAO GIỜ tham chiếu tên "GitNexus" trực tiếp trong logic gate —
 > GitNexus chỉ là provider đầu tiên đăng ký.
 

@@ -23,7 +23,7 @@ once tsk-4hj is approved and merged. **No code changes belong to tsk-1cp**
 | D-ID | Decision |
 |------|----------|
 | D1 | tsk-1cp's deliverable is a standalone record at `docs/history/tsk-1cp-sync-root-unrecognized-outcome-guard/` (this doc + RESEARCH.md) — no source or test changes. The guard/test already exist on `fgw/tsk-4hj`. |
-| D2 | This item cannot verify-pass (`node --test test/cli/fgos.test.mjs`) until tsk-4hj's commits are present on `fgw/tsk-1cp`'s ancestry — i.e., until tsk-4hj merges to `main` and this item's own branch catches up. This is explicit in the item's own submitted text ("chỉ cần gắn liền với commit thực tế của tsk-4hj khi được approve/merge") — not a new judgment call, restated here as a locked decision so `fgos-planning`/`fgos-validating` don't re-derive it. |
+| D2 | This item cannot verify-pass (`node --test test/cli/fgos.test.mjs`) until tsk-4hj's commits are present on `fgw/tsk-1cp`'s ancestry — i.e., until tsk-4hj merges to `main` and this item's own branch catches up. This is explicit in the item's own submitted text ("chỉ cần gắn liền với commit thực tế của tsk-4hj khi được approve/merge") — not a new judgment call, restated here as a locked decision so `fgos-coding-planning`/`fgos-coding-validating` don't re-derive it. |
 | D3 | The record cites `fgw/tsk-4hj`'s branch-relative evidence now (commit `fc59e7d9`, `bin/fgos.mjs:3404`, `test/cli/fgos.test.mjs:6374`, `docs/history/tsk-4hj-stale-merge-head-misclassified-as-conflict/iron-law-evidence.md`) and gets a final pass, once tsk-4hj's real `main` merge commit SHA is known, replacing the branch-relative citations with the merged-commit ones. |
 
 ## Pinned terms

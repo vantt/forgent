@@ -71,7 +71,7 @@ CONTEXT.md's scout evidence.
 | Skill-level D2 close-gate | None — explicitly unchanged, already correct (CONTEXT.md scout evidence) | No new proof needed; verified by inspection already recorded in CONTEXT.md |
 
 Impact-analysis posture: `full` (GitNexus present, freshly checked at
-`fgos-exploring` — see CONTEXT.md). Implementation must run `impact` on
+`fgos-coding-exploring` — see CONTEXT.md). Implementation must run `impact` on
 `discover_run_argv`/`run_argv_for_command` before editing, per CLAUDE.md's
 gate, to confirm no other caller beyond the two named above exists.
 
