@@ -7571,6 +7571,38 @@ test('catchup on an item whose target has a REAL same-line conflict leaves it bl
   assert.equal(stateView(cwd).work['catchup-conflict-item'].status, 'blocked');
 });
 
+// tsk-5vl: catchup used to derive repoRoot from process.cwd() instead of
+// --dir, so a session invoking it from inside the item's own linked
+// worktree (checked out on fgw/<id>, the exact branch catchup's own merge
+// is about to force-update via `git branch -f`) hit git's "Cannot force
+// update the current branch" — the same class of bug tsk-k8u already
+// fixed for take/pick. Reproduces the doomed-cwd shape directly: spawn cwd
+// is the linked worktree, --dir points at the real main checkout.
+test('catchup succeeds when invoked with cwd inside the item\'s own linked worktree and --dir pointed at the main checkout (tsk-5vl regression guard)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeBlockedRunnerItem(cwd, 'catchup-worktree-cwd', 'integration-drift', { verify: 'test -f catchup-worktree-cwd-produced.txt' });
+
+  const wt = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-catchup-wt-'));
+  fs.rmdirSync(wt);
+  gitAtCwd(cwd, ['worktree', 'add', wt, 'fgw/catchup-worktree-cwd']);
+
+  const mainHeadBefore = gitHead(cwd);
+  const result = run(wt, ['catchup', 'catchup-worktree-cwd', '--dir', cwd]);
+  assert.equal(result.status, 0, `catchup from inside the item's own worktree unexpectedly failed: ${result.stderr}`);
+  assert.doesNotMatch(result.stderr ?? '', /Cannot force update the current branch/);
+  const catchupData = envelopeData(result.stdout);
+  assert.equal(catchupData.from, 'blocked');
+  assert.equal(catchupData.to, 'awaiting-approval');
+
+  assert.equal(gitHead(cwd), mainHeadBefore, "catchup must never touch the human's own main checkout");
+  assert.equal(stateView(cwd).work['catchup-worktree-cwd'].status, 'awaiting-approval');
+  const branchLog = gitAtCwd(cwd, ['log', '--oneline', 'fgw/catchup-worktree-cwd']);
+  assert.match(branchLog, /catch-up: merge main into fgw\/catchup-worktree-cwd/);
+
+  gitAtCwd(cwd, ['worktree', 'remove', '--force', wt]);
+});
+
 // The branch already contains the target's tip, so catchup's own merge would
 // stage nothing and its `git commit` would die with "nothing to commit",
 // leaving the item blocked forever. Reproduced here the way it happens for
