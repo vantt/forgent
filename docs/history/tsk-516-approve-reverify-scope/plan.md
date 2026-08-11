@@ -154,12 +154,43 @@ manifest mới.
 ## Verify
 
 ```
-node --test test/runner/goal-check.test.mjs test/runner/merge.test.mjs test/setup/checks.test.mjs test/cli/fgos.test.mjs
+npm test
 ```
 
-Đúng các suite phủ code bị đổi, không hơn — chính là "đúng và đủ" của D1.
-Verify hiện tại của item (`node --test test/runner/goal-check.test.mjs`)
-hẹp hơn phạm vi thật của phase 1/3/4 nên phải cập nhật thành lệnh trên.
+Chọn bằng số đo, không bằng khẩu hiệu. Vòng `fgos-validating` đầu tiên đã
+đánh trượt phương án "4 file phủ đúng code bị đổi" ở dòng *smaller path*,
+với bằng chứng đo trong chính worktree này (2026-08-11, mỗi phép đo chạy
+một mình):
+
+| lệnh | wall-clock | số test |
+|------|-----------|---------|
+| `npm test` (118 file) | **163.1s** | 2827 |
+| `node --test` 4 file phủ đúng code đổi | **172.6s** | 732 |
+| `test/cli/fgos.test.mjs` một mình | **171.0s** | — |
+| `test/setup/checks.test.mjs` một mình | **109.0s** | — |
+| `test/runner/merge.test.mjs` một mình | 2.0s | — |
+| `test/runner/goal-check.test.mjs` một mình | 2.0s | — |
+
+`node --test` song song **theo file**, nên wall-clock của cả suite ≈ chi
+phí của đúng file chậm nhất: `fgos.test.mjs` một mình đã 171.0s so với
+163.1s của toàn bộ (chênh 5%, trong biến động của loại test dựng môi
+trường thật) — 117 file còn lại nấp sau nó, chạy thêm gần như miễn phí.
+
+Item này sửa `bin/fgos.mjs` (phase 2), mà code đó do `fgos.test.mjs` phủ,
+nên **không tồn tại** tập con nào vừa chứng minh được phase 2 vừa rẻ hơn
+`npm test`. Tập con 4 file bị `npm test` chi phối tuyệt đối: đắt hơn 9.5s
+và phủ ít hơn 2095 test.
+
+Đây **không** phải đảo ngược D2. D2 loại full suite khỏi vai trò *check bất
+biến chạy mỗi lần return/merge cho mọi item* — vai trò đó vẫn là
+`test/architecture.test.mjs` (0.14s), không đổi. Chỗ này là *verify của
+riêng item tsk-516*, một câu hỏi khác, và D1 ("không test thừa") đo bằng
+thời gian thật thì chính tập con mới là thứ thừa.
+
+**Bài học rộng hơn, ghi lại cho item sau:** ở repo này chi phí verify bị
+lượng tử hoá — chạm code do `fgos.test.mjs` phủ là trả ~171s, chạm code do
+`checks.test.mjs` phủ là trả ~109s, bất kể thu hẹp thế nào. "Ít test hơn"
+không đồng nghĩa "nhanh hơn".
 
 ## Outstanding questions
 
