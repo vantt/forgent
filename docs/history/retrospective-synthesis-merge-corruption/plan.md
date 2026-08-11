@@ -56,6 +56,10 @@ call on `fgos-compounding`'s own step-3 commit block before editing, per
 - `.claude/skills/fgos-compounding/SKILL.md` — add the `MERGE_HEAD` guard
   immediately before the existing `git -C "$root" commit -m "docs(<id>):
   retrospective synthesis"` line (step 3).
+- `.agents/skills/fgos-compounding/SKILL.md` — identical mirror edit
+  (found mid-Execute: this repo keeps `.claude/skills/` and
+  `.agents/skills/` in lockstep for every skill, per tsk-4b2's own D10
+  precedent; not captured in this plan's earlier draft).
 
 ### Order
 
@@ -87,18 +91,30 @@ Item's `verify`, refined from the clarify-stage placeholder and with the
 `git merge-base --is-ancestor 687abfb8 main` clause DROPPED (D3 — that
 proof now belongs to `tsk-13z`, not this item) to also cover the
 skill-prose deliverable (`docs/how-to/write-verify-for-a-skill-prose-
-change.md`'s required shape for any item touching a `SKILL.md` path):
+change.md`'s required shape for any item touching a `SKILL.md` path), and
+checked against BOTH the `.claude/skills/` and `.agents/skills/` mirrors
+(discovered mid-Execute: this repo keeps the two in lockstep, per
+tsk-4b2's own D10 precedent — not captured in this plan's earlier Files
+touched list, corrected there too):
 
 ```
-npm test && grep -q "refusing to commit — MERGE_HEAD is set" .claude/skills/fgos-compounding/SKILL.md && grep -q 'git -C "\$root" commit -m "docs(<id>): retrospective synthesis"' .claude/skills/fgos-compounding/SKILL.md
+npm test && grep -qF "refusing to commit — MERGE_HEAD is set" .claude/skills/fgos-compounding/SKILL.md && grep -qF 'git -C "$root" commit -m "docs(<id>): retrospective synthesis"' .claude/skills/fgos-compounding/SKILL.md && grep -qF "refusing to commit — MERGE_HEAD is set" .agents/skills/fgos-compounding/SKILL.md && grep -qF 'git -C "$root" commit -m "docs(<id>): retrospective synthesis"' .agents/skills/fgos-compounding/SKILL.md
 ```
+
+`-F` (fixed-string, not regex) is required, not cosmetic: a plain `grep -q`
+against `docs(<id>)` interprets the parentheses as a regex group, so the
+pattern never matches the file's own literal text — found live running
+this verify for real during Execute, the exact "grep from đơn quá yếu"-
+adjacent trap `docs/how-to/write-verify-for-a-skill-prose-change.md`
+warns about, just a different mechanism (metacharacter misread, not a
+too-weak token).
 
 No true NEGATIVE clause: this change is a pure addition to
 `fgos-compounding`'s prose (a guard inserted before an existing line), not
 a rename/removal — the how-to doc's NEGATIVE requirement exists to catch
-"verify passes because the deliverable was deleted," which the second
-`grep -q` above (asserting the original commit line survives unremoved)
-already covers for this shape of change.
+"verify passes because the deliverable was deleted," which the "SURVIVE"
+`grep -qF` calls above (asserting the original commit line survives
+unremoved, in both mirrors) already cover for this shape of change.
 
 ## Outstanding questions
 

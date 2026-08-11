@@ -120,9 +120,19 @@ evidence-quoted end-user document.
 
    Commit the write at `$root` before continuing to step 4 — an
    uncommitted document is indistinguishable from a missing one to step
-   4's own check:
+   4's own check. Refuse first if `$root` already has a merge staged
+   (`MERGE_HEAD` set) — a concurrent or crashed `fgos approve` elsewhere on
+   the same main checkout leaves exactly this state, and a plain `git
+   commit` here would silently complete THAT merge under this item's own
+   commit message, burying whatever the other item's merge was landing
+   (tsk-2oy: confirmed real, 5 times, via `git log --all --min-parents=2
+   --grep="retrospective synthesis"`):
 
    ```bash
+   if git -C "$root" rev-parse --verify -q MERGE_HEAD >/dev/null; then
+     echo "fgos-compounding: refusing to commit — MERGE_HEAD is set on \"$root\" — a merge is already staged there (likely a concurrent or crashed fgos approve). Resolve or abort that merge first; never let this step's own commit silently absorb it." >&2
+     exit 1
+   fi
    git -C "$root" add "docs/<quadrant>/<file>.md"
    git -C "$root" commit -m "docs(<id>): retrospective synthesis"
    ```
