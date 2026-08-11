@@ -6845,6 +6845,78 @@ test('promote-to-component bails a conflicting member without setting its parent
   assert.equal(view.work['ptc-conflict-b'].parent, data.rootId);
 });
 
+// tsk-2bg: promote-to-component shares sync-root's exact single-layer
+// repoRoot = process.cwd() + isMainWorktree guard (CONTEXT.md D5/D6,
+// docs/history/catchup-worktree-cwd-fix/) -- no worktree-guard test existed
+// for either layer before this item (fgos-researching Round 3). This test
+// establishes the baseline refusal; the two below mirror it with --trust-dir.
+test('promote-to-component refuses from inside a linked worktree (must land on the real main checkout)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeFlatMember(cwd, 'ptc-worktree-guard-a');
+  makeFlatMember(cwd, 'ptc-worktree-guard-b', { deps: ['ptc-worktree-guard-a'] });
+
+  const wtParent = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-ptc-wt-'));
+  const wt = path.join(wtParent, 'wt');
+  gitAtCwd(cwd, ['worktree', 'add', '-q', '-b', 'ptc-worktree-guard-side-branch', wt]);
+
+  const result = spawnSync(process.execPath, [FGOS, 'promote-to-component', '--ids', 'ptc-worktree-guard-a,ptc-worktree-guard-b', '--root-title', 'Component worktree guard'], { cwd: wt, encoding: 'utf8' });
+  assert.equal(result.status, 4, result.stderr);
+  assert.match(result.stderr, /main checkout/);
+
+  gitAtCwd(cwd, ['worktree', 'remove', '--force', wt]);
+});
+
+// tsk-2bg: --trust-dir opts into deriving repoRoot from --dir instead of
+// cwd, so promote-to-component can succeed from inside a linked worktree
+// PROVIDED --dir is also given explicitly -- same substitution tsk-4uj
+// already shipped for sync-root/approve. retargetMember's own independent
+// isMainWorktree check (promote-engine.mjs:54) never re-derives repoRoot,
+// so a real merge succeeding here is direct proof D6's "zero code change
+// needed there" claim holds, not just an argument on paper.
+test('promote-to-component --trust-dir with --dir succeeds from inside a linked worktree (tsk-2bg)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  registerFlatMember(cwd, 'ptc-trust-dir-a');
+  registerFlatMember(cwd, 'ptc-trust-dir-b', { deps: ['ptc-trust-dir-a'] });
+  commitPending(cwd, 'state: setup ptc-trust-dir members');
+  cutMemberBranch(cwd, 'ptc-trust-dir-a');
+  cutMemberBranch(cwd, 'ptc-trust-dir-b');
+
+  const wtParent = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-ptc-trust-wt-'));
+  const wt = path.join(wtParent, 'wt');
+  gitAtCwd(cwd, ['worktree', 'add', '-q', '-b', 'ptc-trust-dir-side-branch', wt]);
+
+  const result = spawnSync(process.execPath, [FGOS, 'promote-to-component', '--ids', 'ptc-trust-dir-a,ptc-trust-dir-b', '--root-title', 'Component trust dir', '--trust-dir', '--dir', cwd], { cwd: wt, encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr);
+  const data = JSON.parse(result.stdout).data;
+  assert.equal(data.results.find((r) => r.id === 'ptc-trust-dir-a').outcome, 'merged');
+  assert.equal(data.results.find((r) => r.id === 'ptc-trust-dir-b').outcome, 'merged');
+
+  const view = stateView(cwd);
+  assert.equal(view.work['ptc-trust-dir-a'].parent, data.rootId);
+  assert.equal(view.work['ptc-trust-dir-b'].parent, data.rootId);
+
+  gitAtCwd(cwd, ['worktree', 'remove', '--force', wt]);
+});
+
+test('promote-to-component --trust-dir WITHOUT --dir is a no-op -- still refuses from inside a linked worktree (tsk-2bg)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeFlatMember(cwd, 'ptc-trust-dir-noop-a');
+  makeFlatMember(cwd, 'ptc-trust-dir-noop-b', { deps: ['ptc-trust-dir-noop-a'] });
+
+  const wtParent = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-ptc-trust-noop-wt-'));
+  const wt = path.join(wtParent, 'wt');
+  gitAtCwd(cwd, ['worktree', 'add', '-q', '-b', 'ptc-trust-dir-noop-side-branch', wt]);
+
+  const result = spawnSync(process.execPath, [FGOS, 'promote-to-component', '--ids', 'ptc-trust-dir-noop-a,ptc-trust-dir-noop-b', '--root-title', 'Component trust dir noop', '--trust-dir'], { cwd: wt, encoding: 'utf8' });
+  assert.equal(result.status, 4, result.stderr);
+  assert.match(result.stderr, /main checkout/);
+
+  gitAtCwd(cwd, ['worktree', 'remove', '--force', wt]);
+});
+
 // --- close-out drift guard (tsk-62y, docs/history/
 //     tsk-3bn-merge-conductor-harness-v2/) ----------------------------------
 //

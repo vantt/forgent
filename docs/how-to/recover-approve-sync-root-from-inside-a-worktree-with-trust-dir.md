@@ -64,3 +64,22 @@ exactly as if you had run them from there — the git operations underneath
 (`withMergeEphemeralWorktree`, the merge/verify steps) already target
 `repoRoot`, which now resolves correctly regardless of your shell's own
 `cwd`.
+
+## `promote-to-component`
+
+`fgos promote-to-component` (batch-merging several flat member items into
+one shared component) carries the exact same guard, one layer deeper —
+`retargetMember`, the engine function it delegates each member's own
+merge to, independently re-checks the same worktree identity. `--trust-dir`
+still only needs passing once, at the `promote-to-component` call itself:
+
+```
+fgos promote-to-component --ids <a,b> --root-title "..." --trust-dir --dir "$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)"
+```
+
+`retargetMember`'s own guard never needs its own separate flag — it
+receives the same `repoRoot` value `promote-to-component`'s own CLI
+handler already resolved from `--dir`, so it correctly allows the batch
+merge to proceed once the outer guard has. As with `approve`/`sync-root`
+above, omitting `--dir` makes `--trust-dir` a no-op — every member merge
+still refuses exactly as it does today.

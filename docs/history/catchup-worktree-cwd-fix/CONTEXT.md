@@ -41,6 +41,8 @@ guidance never names it.
 | D2 | Descope to **`catchup` only**. `fgos-validating`'s reality-gate pass (Repo fit) found that, unlike `catchup`, `sync-root` (`bin/fgos.mjs:3274`) and `approve` (`bin/fgos.mjs:2764-2790`) already carry deliberate, incident-documented worktree-refusal guards (`approve`'s comments cite a real past incident, tag `P44` / "Multi-session-checkout Epic 2" / "spike-proven": a merge could silently land on a worktree's own detached HEAD, or a stale goal-check could falsely report "verified on main"). Those two verbs don't crash confusingly today — they refuse cleanly with an actionable message. Changing their `repoRoot` derivation would convert "always refuse from a worktree" into "work from a worktree provided `--dir` is trustworthy" — a real behavior/risk-posture change for `approve` specifically (the system's highest-stakes, final merge-to-main gate), not a pure bug fix like `catchup`'s. Confirmed by user: "Descope to catchup only" over "keep all three, with explicit proof points" — `sync-root`/`approve`'s guard interaction is filed as its own follow-up item (`tsk-4uj`, see below) for dedicated review, not bundled into this bug fix. |
 | D3 (tsk-4uj) | `sync-root`/`approve` get an **opt-in flag** (exact name left to `fgos-planning`, e.g. `--trust-dir`) to derive `repoRoot` from `path.dirname(dir)` instead of `process.cwd()` — default behavior stays exactly as today (strict cwd-identity, zero regression risk to the incident-driven guard). A caller that knows its `--dir` is trustworthy passes the flag explicitly to get the relaxed behavior. Confirmed by user over three other framings: fix both verbs unconditionally (full consistency with `catchup`/`take`/`pick`), fix `sync-root` only, or change neither (keep the permanent `ExitWorktree`-first requirement). Grounded in `RESEARCH.md` Round 2: `approve`'s guard has a TWO-incident history (`P44` original + a later `--github`-path bypass, `review-260718`), and tracing every existing guard test confirms none of them pass `--dir` explicitly, so the fix (gated behind the new flag) would not silently defeat any of them — it only changes the untested cwd-in-worktree-plus-explicit---dir combination. |
 | D4 (tsk-4uj) | `promote-to-component` (`bin/fgos.mjs` ~3411-3423) shares `sync-root`'s exact single-layer `repoRoot = process.cwd()` + `isMainWorktree` guard — found during `fgos-validating`'s own Repo-fit pass on tsk-4uj's plan, cross-checking `isMainWorktree`'s real callers after GitNexus's stale index returned an incomplete result. Excluded from tsk-4uj's scope: it has a SECOND, independent guard layer downstream — `retargetMember` (`src/runner/promote-engine.mjs:53-58`) takes `repoRoot` as a parameter and re-checks `isMainWorktree` itself, explicitly documented as mirroring `sync-root`'s own discipline, called via a batch/multi-member promotion path structurally different from the single-item merge path `sync-root`/`approve` use — not a trivial third instance of the same one-line fix. Confirmed by user: filed as its own follow-up item (`tsk-2bg`) over folding it into tsk-4uj. |
+| D5 (tsk-2bg) | `promote-to-component` gets the **same opt-in trust-dir relaxation** as `sync-root`/`approve` (D3), not a stricter posture. Its risk shape matches `sync-root` (merges member branches into a runner-owned integration branch `fgw/<rootId>`, never `main` directly) rather than `approve`'s higher-stakes final merge-to-main gate, and each per-member merge already reuses the identical primitive (`mergeRunnerItem` via `withMergeEphemeralWorktree`) `sync-root` uses today. Running the promotion over N members in one call is a repetition of that same guarded primitive, not a new kind of risk. Confirmed by user (260811). |
+| D6 (tsk-2bg) | The fix lands **only at the CLI entry layer** (`bin/fgos.mjs`'s `promote-to-component` case, same `repoRoot`-resolution shape D3 gives `sync-root`/`approve`) — **zero change to `src/runner/promote-engine.mjs`'s `retargetMember`**. Scout finding: `retargetMember` is called at `bin/fgos.mjs:3624` with the exact same `repoRoot` variable the CLI handler already resolved at line 3541 — it never re-derives its own value. Once the CLI layer resolves `repoRoot` correctly (trust-dir-gated, same as D3), `retargetMember`'s own `isMainWorktree(repoRoot)` check (`promote-engine.mjs:54`) passes through transparently on an already-correct input — its guard is neither removed nor weakened, it simply now receives correct input, same as today when invoked from the real main checkout. Adding a second, independent opt-in parameter to `retargetMember` itself was considered and rejected as speculative (YAGNI): no caller besides this one CLI case exists today, and any future caller that does not itself resolve a trustworthy `repoRoot` remains correctly blocked by the unchanged guard. Confirmed by user (260811). |
 
 ## Pinned terms
 
@@ -81,6 +83,29 @@ by hand while still inside a worktree session). Exact flag name and
 whether passing it without an explicit `--dir` is a no-op or a validation
 error are implementation nuances — left to `fgos-planning`, matching how
 other flags in this file already resolve redundant-combination behavior.
+
+## Assumption (pinned for tsk-2bg, not asked — follows directly from D5/D6)
+
+**Superseded during `fgos-validating`'s reality-gate pass on `tsk-2bg`
+(260811):** tsk-4uj has since landed on `main`
+(`64f86633 feat(tsk-4uj): add --trust-dir opt-in flag to approve/sync-root`,
+`status: delivered`). The real, shipped mechanism (confirmed by reading
+the merged diff directly) is:
+
+```js
+const repoRoot = flags['trust-dir'] === true ? path.dirname(dir) : process.cwd();
+```
+
+applied ahead of the existing `isMainWorktree(repoRoot)` guard on both
+`approve` (`bin/fgos.mjs`, now line ~2760+ on `main`) and `sync-root`
+(now line ~3307+ on `main`) — byte-identical to today when `--trust-dir`
+is omitted, or passed without `--dir`. tsk-4uj also shipped
+`docs/how-to/recover-approve-sync-root-from-inside-a-worktree-with-trust-
+dir.md` and four new regression tests in `test/cli/fgos.test.mjs`
+(`sync-root --trust-dir with --dir succeeds...`, its no-op counterpart,
+and the `approve` + `approve --github` equivalents). `plan.md`'s own
+Approach/Changes sections now cite this real mechanism directly instead
+of deferring to it — see `plan.md`'s own revision note.
 
 ## Scout evidence
 
@@ -151,10 +176,27 @@ other flags in this file already resolve redundant-combination behavior.
   present status only means the tool is installed, never that its index
   is fresh."
 
+- `bin/fgos.mjs:3535-3547` (`case 'promote-to-component'`) — same
+  `repoRoot = process.cwd()` + `isMainWorktree` single-layer guard as
+  `sync-root`, confirmed by direct read (D4's own finding).
+- `src/runner/promote-engine.mjs:53-58` (`retargetMember`) — independent
+  `isMainWorktree(repoRoot)` check, `repoRoot` taken as a plain function
+  parameter, no derivation of its own.
+- `bin/fgos.mjs:3624` (the `retargetMember(repoRoot, member, rootId, ...)`
+  call site inside `case 'promote-to-component'`) — confirms `repoRoot` is
+  the exact same variable resolved once at line 3541 and passed straight
+  through, never re-derived — the basis for D6.
+- `tsk-4uj` (`docs/history/catchup-worktree-cwd-fix/CONTEXT.md` D3/D4, this
+  same doc) — origin of the trust-dir flag concept and this item's own
+  spin-out; read from `fgw/tsk-4uj` since tsk-4uj is unmerged as of this
+  pass.
+
 ## Canonical references
 
-- `bin/fgos.mjs` (`catchup`/`sync-root`/`approve`/`take`/`pick` handlers)
+- `bin/fgos.mjs` (`catchup`/`sync-root`/`approve`/`take`/`pick`/
+  `promote-to-component` handlers)
 - `src/runner/worktree.mjs` (`withMergeEphemeralWorktree`)
+- `src/runner/promote-engine.mjs` (`retargetMember`)
 - `docs/specs/work-state.md` (RUL33, RUL34)
 - `.claude/skills/fgos-code-implement/SKILL.md` (Return step)
 - `docs/history/pick-take-worktree-cwd-fix/CONTEXT.md` (sibling fix, same

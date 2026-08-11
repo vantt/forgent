@@ -192,3 +192,89 @@ research can settle further.
 and its actual (non-)interaction with existing test coverage are all now
 evidenced. Ready for `fgos-exploring`'s Socratic pass with the product
 owner — no further research needed first.
+
+## Round 3 — 2026-08-11 (tsk-2bg, discovery stage)
+
+**Asked:** tsk-2bg's own goal — does `promote-to-component`'s
+`process.cwd()` + `isMainWorktree` guard (mirroring `sync-root`) plus its
+downstream `retargetMember` guard need any further research before
+`fgos-exploring`'s Socratic pass can lock the two open framing questions
+(same-posture-as-sync-root? single- vs. dual-layer fix?), or is everything
+material already grounded in repo evidence?
+
+**Checked — repo:**
+
+- `bin/fgos.mjs:3535-3547` (`case 'promote-to-component'`): confirms D4's
+  own finding directly — `const repoRoot = process.cwd();` followed by
+  `if (!isMainWorktree(repoRoot))`, byte-identical shape to `sync-root`
+  (Round 2, line 3273).
+- `src/runner/promote-engine.mjs:53-58` (`retargetMember`): confirms the
+  second guard — `isMainWorktree(repoRoot)` re-checked on the `repoRoot`
+  parameter, with a docstring comment explicitly stating it "mirrors
+  `sync-root`'s own discipline."
+- `bin/fgos.mjs:3624` (the `retargetMember(repoRoot, member, rootId, ...)`
+  call site): confirms `repoRoot` is the exact same binding resolved once
+  at line 3541, never re-derived downstream — the CLI layer is the single
+  point where `repoRoot`'s value is decided.
+- `rg -l "retargetMember" bin src test` → three hits only: `bin/fgos.mjs`
+  (the one real production caller), `src/runner/promote-engine.mjs` (its
+  own definition), `test/runner/promote-engine.test.mjs` (direct unit
+  test). No second production caller exists today — corroborates D6's
+  "no caller besides this one CLI case exists today" claim directly,
+  rather than assuming it.
+- `test/runner/promote-engine.test.mjs` (read via `rg -n "isMainWorktree|
+  repoRoot"`, 54 hits, all plain temp-dir `repoRoot` fixtures): confirms
+  `retargetMember`'s own `isMainWorktree` refusal branch (line 54-58) has
+  **no dedicated test today** — unlike `sync-root`/`approve`, which have
+  named P44-guard tests (Round 2). Worth flagging to `fgos-planning`: this
+  item's test scope should add that missing coverage regardless of which
+  layer the actual code fix touches.
+- GitNexus's own `impact`/graph query on `retargetMember` again returned an
+  incomplete caller list ("Called by: promote-engine.test.mjs" only,
+  omitting `bin/fgos.mjs`'s real call site at line 3624) — the same
+  stale-index gap D4 already found for `isMainWorktree` itself, now
+  reproduced a second time on a different symbol in the same file. Cross-
+  checked by `grep`/`rg` per CLAUDE.md's own gate note; not re-querying
+  `fgos tool query` this round since Round 2/D4 already established the
+  posture (`impact-analysis: full`, index stale).
+
+**Not found in repo / external:** nothing external needed — this is a
+purely internal guard-placement and trust-boundary question, same as
+Rounds 1-2.
+
+**Findings:**
+
+1. Every claim `fgos-exploring`'s own scout (and the D5/D6 decisions it
+   locked) relies on is now independently re-confirmed by direct repo
+   evidence in this round, not carried over on assertion alone.
+2. `retargetMember`'s worktree-refusal branch has zero existing test
+   coverage — a concrete gap for `fgos-planning` to size into this item's
+   verify scope, independent of the D5/D6 framing decisions themselves.
+
+**Still open:** none for this discovery pass. Whether the actual code
+change matches D6's "CLI-layer only" framing, and the exact `--trust-dir`
+mechanics (name, no-op-vs-error shape), stay `fgos-planning`'s call once
+tsk-4uj's own real mechanism has landed (see CONTEXT.md's tsk-2bg
+assumption note).
+
+**Verdict:** `clear: true`. Nothing about this item's own intent, root
+cause, or guard structure is in question — ready to proceed past
+`discovery`.
+
+**Correction (`fgos-code-implement`, 260811):** Finding 2 above ("zero
+existing test coverage" for both guard layers) was only half right.
+`test/runner/promote-engine.test.mjs`'s `'retargetMember refuses to run
+from a linked worktree, mirroring sync-root's own discipline'` test
+(added by `56b34d9a feat(tsk-3gx-2): mutating engine restructure for
+promote-to-component` — the ORIGINAL implementation, not a later
+addition) already covers `retargetMember`'s own guard directly. This
+round's `rg -n "isMainWorktree|repoRoot"` search missed it because the
+test exercises the BEHAVIOR (rejects from a linked worktree) without
+referencing the guard function's name — a keyword-search gap, not an
+absent test. The CLI-layer half of the finding was correct: no
+worktree-guard test existed for `promote-to-component`'s own case before
+this item (confirmed again directly this pass, now closed by three new
+tests in `test/cli/fgos.test.mjs`). Net effect: the "weak proof" Mode-gate
+flag in `plan.md` was grounded in a real gap (the CLI layer), just a
+narrower one than stated; it does not change the lane (the hard-gate flag
+alone already forced high-risk) or D6's own conclusion.

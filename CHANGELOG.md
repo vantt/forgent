@@ -66,6 +66,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   invariant broken by one item could land on main and stay red across later
   merges, because no item's own narrow `verify` happened to touch it.
 
+- `fgos promote-to-component` gained an opt-in `--trust-dir` flag: with an
+  explicit `--dir` also passed, it can now run from inside a linked
+  worktree instead of refusing outright. Default behavior (no flag) is
+  unchanged. See `docs/how-to/recover-approve-sync-root-from-inside-a-
+  worktree-with-trust-dir.md`'s new `promote-to-component` section.
+
 ### Changed
 
 - `fgos approve` no longer re-runs an item's checks when the tree it is about
