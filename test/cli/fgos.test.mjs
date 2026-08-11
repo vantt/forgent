@@ -6889,6 +6889,105 @@ test('approve of an ordinary item with no targets is completely unaffected by th
   assert.equal(stateView(cwd).work['closeout-no-targets-item'].status, 'delivered');
 });
 
+// --- resolved-root guard (tsk-4s0, piece 2 of tsk-4qu's leaf-merge-into-
+//     resolved-root fix; docs/history/leaf-merge-into-resolved-root/) -----
+//
+// A leaf approved after its OWN resolved root (walked via resolveRoot, same
+// function the Iron Law gate and the targets drift guard above already use)
+// has already gone delivered/retrospective/cleanup/done/wontfix would land
+// on a branch nothing else will ever sync to main — driftStatus's own
+// needsSync is deliberately false for a resolved root (drift-status.mjs),
+// so the close-out drift guard above never catches this. Distinct from that
+// guard: this one keys on the item's OWN `parent` chain, not `item.targets`.
+
+function moveRootToResolved(cwd, rootId, finalStatus) {
+  run(cwd, ['move', rootId, '--to', 'doing']);
+  if (finalStatus === 'wontfix') {
+    run(cwd, ['move', rootId, '--to', 'wontfix']);
+  } else {
+    run(cwd, ['move', rootId, '--to', 'awaiting-approval']);
+    run(cwd, ['move', rootId, '--to', 'delivered']);
+  }
+  commitPending(cwd, `state: resolve ${rootId} to ${finalStatus}`);
+}
+
+test('approve of a leaf whose own root is delivered refuses, exit 4, item stays awaiting-approval, no merge attempted', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedLeafItem(cwd, 'resolved-root', 'resolved-root-leaf', { verify: 'true' });
+  moveRootToResolved(cwd, 'resolved-root', 'delivered');
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['approve', 'resolved-root-leaf']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /resolved-root/);
+  assert.match(result.stderr, /delivered/);
+  assert.match(result.stderr, /fgos sync-root/);
+  assert.equal(gitHead(cwd), headBefore, 'a refused approve attempts no merge');
+  assert.equal(stateView(cwd).work['resolved-root-leaf'].status, 'awaiting-approval');
+});
+
+test('approve of a leaf whose own root is wontfix ALSO refuses (D2 — wontfix blocks too, not just delivered/retrospective/cleanup/done)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedLeafItem(cwd, 'wontfix-root', 'wontfix-root-leaf', { verify: 'true' });
+  moveRootToResolved(cwd, 'wontfix-root', 'wontfix');
+
+  const result = run(cwd, ['approve', 'wontfix-root-leaf']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /wontfix-root/);
+  assert.equal(stateView(cwd).work['wontfix-root-leaf'].status, 'awaiting-approval');
+});
+
+test('approve of a leaf whose own root is delivered succeeds with --acknowledge-drift, merges onto fgw/<root> same as before', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedLeafItem(cwd, 'resolved-root-ack', 'resolved-root-ack-leaf', { verify: 'true' });
+  moveRootToResolved(cwd, 'resolved-root-ack', 'delivered');
+
+  const result = run(cwd, ['approve', 'resolved-root-ack-leaf', '--acknowledge-drift']);
+  assert.equal(result.status, 0, result.stderr);
+  const approveData = envelopeData(result.stdout);
+  assert.equal(approveData.target, 'fgw/resolved-root-ack');
+  assert.equal(stateView(cwd).work['resolved-root-ack-leaf'].status, 'delivered');
+});
+
+test('approve of a leaf whose root is still open (not resolved) is unaffected by the resolved-root guard (regression)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedLeafItem(cwd, 'open-root', 'open-root-leaf', { verify: 'true' });
+  // root stays at its default 'todo' status — never resolved.
+
+  const result = run(cwd, ['approve', 'open-root-leaf']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(stateView(cwd).work['open-root-leaf'].status, 'delivered');
+});
+
+test('approve of a root-to-main item (no parent) is unaffected by the resolved-root guard even though the item is a fresh proposal (regression)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'standalone-root-item', { verify: 'true' });
+
+  const result = run(cwd, ['approve', 'standalone-root-item']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(stateView(cwd).work['standalone-root-item'].status, 'delivered');
+});
+
+test('approve --github --pr on a leaf whose own root is delivered ALSO refuses before any gh call (hoisted ahead of --github, same as the Iron Law gate), gh is never invoked', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedLeafItem(cwd, 'gh-resolved-root', 'gh-resolved-root-leaf', { verify: 'true' });
+  moveRootToResolved(cwd, 'gh-resolved-root', 'delivered');
+  const marker = path.join(cwd, 'gh-was-called');
+  const fake = writeMarkerFake(cwd, marker);
+
+  const result = run(cwd, ['approve', 'gh-resolved-root-leaf', '--github', '--pr', '7'], { FGOS_GH_COMMAND: fake });
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /gh-resolved-root/);
+  assert.equal(stateView(cwd).work['gh-resolved-root-leaf'].status, 'awaiting-approval');
+  assert.ok(!fs.existsSync(marker), 'the resolved-root guard must refuse before any gh CLI call');
+});
+
 test('reject on a nonexistent id is rejected as validation, exit 4', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['reject', 'ghost', '--reason', 'nope']);
@@ -8686,7 +8785,7 @@ test('merge list on an empty store: empty ready/waiting/conflicts, exit 0, no ev
   const before = eventLines(cwd).length;
   const result = run(cwd, ['merge', 'list']);
   assert.equal(result.status, 0);
-  assert.deepEqual(envelopeData(result.stdout), { ready: [], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: {}, supersededOut: [], stageByItem: {}, tree: [] });
+  assert.deepEqual(envelopeData(result.stdout), { ready: [], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], strandedByResolvedRoot: [], mergeTier: {}, supersededOut: [], stageByItem: {}, tree: [] });
   assert.equal(eventLines(cwd).length, before, 'merge list must not append any event');
 });
 
@@ -8711,7 +8810,7 @@ test('merge list: a proposed item whose dep is already done is ready', () => {
   assert.equal(run(cwd, ['add', 'leaf', '--title', 'Leaf', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--deps', 'dep', '--description', 'tsk-535 fixture description.']).status, 0);
   toProposed(cwd, 'leaf');
   const data = envelopeData(run(cwd, ['merge', 'list']).stdout);
-  assert.deepEqual(data, { ready: ['leaf'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { leaf: 'root-to-main' }, supersededOut: [], stageByItem: data.stageByItem, tree: [{ id: 'leaf', title: 'Leaf', status: 'ready', children: [] }] });
+  assert.deepEqual(data, { ready: ['leaf'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], strandedByResolvedRoot: [], mergeTier: { leaf: 'root-to-main' }, supersededOut: [], stageByItem: data.stageByItem, tree: [{ id: 'leaf', title: 'Leaf', status: 'ready', children: [] }] });
   // tsk-4zj D6: both dep and leaf were `add`ed directly (no --stage),
   // which stamps an explicit 'clarify' by default (add-stage-default-gap
   // D1/D2); every subsequent `move`/`approve`/toProposed step only ever
@@ -8726,7 +8825,7 @@ test('merge list: a proposed item whose dep is NOT done waits, never ready', () 
   assert.equal(run(cwd, ['add', 'leaf', '--title', 'Leaf', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--deps', 'dep', '--description', 'tsk-535 fixture description.']).status, 0);
   toProposed(cwd, 'leaf');
   const data = envelopeData(run(cwd, ['merge', 'list']).stdout);
-  assert.deepEqual(data, { ready: [], waiting: ['leaf'], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { leaf: 'root-to-main' }, supersededOut: [], stageByItem: data.stageByItem, tree: [{ id: 'leaf', title: 'Leaf', status: 'waiting', children: [] }] });
+  assert.deepEqual(data, { ready: [], waiting: ['leaf'], conflicts: [], mergeSets: [], blockedOnSync: [], strandedByResolvedRoot: [], mergeTier: { leaf: 'root-to-main' }, supersededOut: [], stageByItem: data.stageByItem, tree: [{ id: 'leaf', title: 'Leaf', status: 'waiting', children: [] }] });
   // tsk-4zj D6: dep via addOk carries addOk's own explicit --stage
   // executing default; leaf was added via the raw CLI `add` (no --stage),
   // which stamps 'clarify' by default (add-stage-default-gap D1/D2) —

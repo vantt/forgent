@@ -9,13 +9,13 @@ function item(id, status, deps = [], extra = {}) {
   return { id, title: `title-${id}`, status, deps, ...extra };
 }
 
-test('mergeReadiness on an empty view returns empty ready/waiting/conflicts/mergeSets/blockedOnSync/mergeTier/supersededOut', () => {
-  assert.deepEqual(mergeReadiness({ work: {} }), { ready: [], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: {}, supersededOut: [], stageByItem: {} });
+test('mergeReadiness on an empty view returns empty ready/waiting/conflicts/mergeSets/blockedOnSync/strandedByResolvedRoot/mergeTier/supersededOut', () => {
+  assert.deepEqual(mergeReadiness({ work: {} }), { ready: [], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], strandedByResolvedRoot: [], mergeTier: {}, supersededOut: [], stageByItem: {} });
 });
 
 test('mergeReadiness: a proposed item with no deps is ready', () => {
   const view = { work: { a: item('a', 'awaiting-approval') } };
-  assert.deepEqual(mergeReadiness(view), { ready: ['a'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { a: 'root-to-main' }, supersededOut: [], stageByItem: { a: 'executing' } });
+  assert.deepEqual(mergeReadiness(view), { ready: ['a'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], strandedByResolvedRoot: [], mergeTier: { a: 'root-to-main' }, supersededOut: [], stageByItem: { a: 'executing' } });
 });
 
 test('mergeReadiness: a proposed item whose dep is NOT done waits, never ready', () => {
@@ -37,7 +37,7 @@ test('mergeReadiness: a proposed item whose dep IS done is ready, not waiting', 
       leaf: item('leaf', 'awaiting-approval', ['dep']),
     },
   };
-  assert.deepEqual(mergeReadiness(view), { ready: ['leaf'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { leaf: 'root-to-main' }, supersededOut: [], stageByItem: { dep: 'executing', leaf: 'executing' } });
+  assert.deepEqual(mergeReadiness(view), { ready: ['leaf'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], strandedByResolvedRoot: [], mergeTier: { leaf: 'root-to-main' }, supersededOut: [], stageByItem: { dep: 'executing', leaf: 'executing' } });
 });
 
 test('mergeReadiness: only proposed items are considered — todo/doing/done/blocked never appear in ready or waiting', () => {
@@ -50,7 +50,7 @@ test('mergeReadiness: only proposed items are considered — todo/doing/done/blo
       e: item('e', 'awaiting-approval'),
     },
   };
-  assert.deepEqual(mergeReadiness(view), { ready: ['e'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], mergeTier: { e: 'root-to-main' }, supersededOut: [], stageByItem: { a: 'executing', b: 'executing', c: 'executing', d: 'executing', e: 'executing' } });
+  assert.deepEqual(mergeReadiness(view), { ready: ['e'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], strandedByResolvedRoot: [], mergeTier: { e: 'root-to-main' }, supersededOut: [], stageByItem: { a: 'executing', b: 'executing', c: 'executing', d: 'executing', e: 'executing' } });
 });
 
 test('mergeReadiness: two dep-clear proposed items sharing a footprint conflict are excluded from ready, not counted as waiting', () => {
@@ -233,6 +233,82 @@ test('mergeReadiness: blockedOnSync is rank-ordered same as ready (tsk-173), not
     drift: { plainRoot: { needsSync: true }, mvpRoot: { needsSync: true } },
   });
   assert.deepEqual(result.blockedOnSync, ['mvpLeaf', 'plainLeaf']);
+});
+
+// --- strandedByResolvedRoot (tsk-4s0, piece 2 of tsk-4qu's leaf-merge-into-
+// resolved-root fix; CONTEXT.md D2) -----------------------------------------
+
+test('mergeReadiness: a candidate whose resolved root is delivered is strandedByResolvedRoot, excluded from ready', () => {
+  const view = {
+    work: {
+      root: item('root', 'delivered'),
+      leaf: item('leaf', 'awaiting-approval', [], { parent: 'root' }),
+    },
+  };
+  const result = mergeReadiness(view);
+  assert.deepEqual(result.strandedByResolvedRoot, ['leaf']);
+  assert.deepEqual(result.ready, []);
+  assert.deepEqual(result.blockedOnSync, []);
+  assert.deepEqual(result.waiting, []);
+});
+
+test('mergeReadiness: a candidate whose resolved root is wontfix is ALSO strandedByResolvedRoot (D2 — wontfix blocks too)', () => {
+  const view = {
+    work: {
+      root: item('root', 'wontfix'),
+      leaf: item('leaf', 'awaiting-approval', [], { parent: 'root' }),
+    },
+  };
+  const result = mergeReadiness(view);
+  assert.deepEqual(result.strandedByResolvedRoot, ['leaf']);
+  assert.deepEqual(result.ready, []);
+});
+
+test('mergeReadiness: a candidate whose root is open (not resolved) is unaffected, stays ready — strandedByResolvedRoot stays empty', () => {
+  const view = {
+    work: {
+      root: item('root', 'doing'),
+      leaf: item('leaf', 'awaiting-approval', [], { parent: 'root' }),
+    },
+  };
+  const result = mergeReadiness(view);
+  assert.deepEqual(result.strandedByResolvedRoot, []);
+  assert.deepEqual(result.ready, ['leaf']);
+});
+
+test('mergeReadiness: a root-to-main item (no parent) is never strandedByResolvedRoot even when its own status is resolved', () => {
+  // A resolved item with no parent has resolveRoot(view, id) === id, so the
+  // `root !== item.id` guard must exclude it — a root can't strand itself.
+  const view = { work: { solo: item('solo', 'awaiting-approval') } };
+  const result = mergeReadiness(view);
+  assert.deepEqual(result.strandedByResolvedRoot, []);
+  assert.deepEqual(result.ready, ['solo']);
+});
+
+test('mergeReadiness: strandedByResolvedRoot resolves through a nested root chain (grandparent) via resolveRoot, not immediate parent', () => {
+  const view = {
+    work: {
+      grandroot: item('grandroot', 'cleanup'),
+      root: item('root', 'doing', [], { parent: 'grandroot' }),
+      leaf: item('leaf', 'awaiting-approval', [], { parent: 'root' }),
+    },
+  };
+  const result = mergeReadiness(view);
+  assert.deepEqual(result.strandedByResolvedRoot, ['leaf']);
+  assert.deepEqual(result.ready, []);
+});
+
+test('mergeReadiness: strandedByResolvedRoot is rank-ordered same as ready/blockedOnSync, not raw candidate-iteration order', () => {
+  const view = {
+    work: {
+      plainRoot: item('plainRoot', 'delivered'),
+      plainLeaf: item('plainLeaf', 'awaiting-approval', [], { parent: 'plainRoot' }),
+      mvpRoot: item('mvpRoot', 'delivered'),
+      mvpLeaf: item('mvpLeaf', 'awaiting-approval', [], { parent: 'mvpRoot', goalTier: 'mvp' }),
+    },
+  };
+  const result = mergeReadiness(view);
+  assert.deepEqual(result.strandedByResolvedRoot, ['mvpLeaf', 'plainLeaf']);
 });
 
 // --- mergeSets: footprint-overlap (D2) --------------------------------------
@@ -512,6 +588,33 @@ test('mergeTree: a blockedOnSync item shows status "blocked-sync" with a reason 
   assert.match(tree[0].reason, /3/);
   assert.match(tree[0].reason, /2/);
   assert.match(tree[0].reason, /main/);
+});
+
+test('mergeTree: a strandedByResolvedRoot item shows status "stranded-resolved-root" with a reason citing the real root and its status (tsk-4s0)', () => {
+  const view = {
+    work: {
+      root: item('root', 'delivered'),
+      leaf: item('leaf', 'awaiting-approval', [], { parent: 'root' }),
+    },
+  };
+  const readiness = mergeReadiness(view);
+  const tree = mergeTree(view, readiness);
+  const flatIds = new Set();
+  const walk = (nodes) => nodes.forEach((n) => { flatIds.add(n.id); walk(n.children); });
+  walk(tree);
+  assert.ok(flatIds.has('leaf'), 'a strandedByResolvedRoot id must still get a node (D2 never-hide invariant)');
+  const findNode = (nodes, id) => {
+    for (const n of nodes) {
+      if (n.id === id) return n;
+      const found = findNode(n.children, id);
+      if (found) return found;
+    }
+    return null;
+  };
+  const leafNode = findNode(tree, 'leaf');
+  assert.equal(leafNode.status, 'stranded-resolved-root');
+  assert.match(leafNode.reason, /root/);
+  assert.match(leafNode.reason, /delivered/);
 });
 
 test('mergeTree: a footprint-conflicted item shows status "conflicted" with a reason citing the counterpart item (D7)', () => {

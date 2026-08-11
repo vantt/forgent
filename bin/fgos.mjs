@@ -2880,6 +2880,35 @@ async function runVerb(verb, flags, positional, dir) {
         }
       }
 
+      // Resolved-root guard (tsk-4s0, piece 2 of tsk-4qu's leaf-merge-into-
+      // resolved-root fix): a leaf approved after its own resolved root
+      // (walked via resolveRoot, same as the Iron Law/targets checks below)
+      // has already gone delivered/retrospective/cleanup/done/wontfix would
+      // land on a branch nothing else will ever sync to main (driftStatus's
+      // needsSync is deliberately false for a resolved root, so nothing
+      // else catches this — docs/history/leaf-merge-into-resolved-root/
+      // CONTEXT.md D2). Hoisted here, ahead of the --github branch, for the
+      // exact same reason the Iron Law gate right below was hoisted (f01):
+      // a check that only lived in the local-merge branch let --github
+      // bypass it entirely. Same "acknowledge to override" shape as the
+      // targets drift guard just above — --acknowledge-drift is reused
+      // rather than a new flag, since this is the same class of hazard
+      // (an unsynced/closed-out root branch) just keyed on the leaf's own
+      // parent chain instead of item.targets.
+      {
+        const ownRootId = resolveRoot(view, id);
+        if (ownRootId !== id) {
+          const ownRoot = view.work[ownRootId];
+          if (isResolvedStatus(ownRoot) && flags['acknowledge-drift'] !== true) {
+            throw new StoreError(
+              'validation',
+              `approve: "${id}"'s root "${ownRootId}" is already "${ownRoot?.status}" — merging into "${branchNameFor(ownRootId)}" would strand this work on a branch nothing else will sync to main. `
+                + `Run "fgos sync-root ${ownRootId}" first, or re-run with --acknowledge-drift to merge anyway.`,
+            );
+          }
+        }
+      }
+
       // Iron Law gate (D16/D17), hoisted ahead of the --github branch —
       // review-20260718-self-improve-loop finding f01: this check previously
       // lived only inside the local-merge branch further below, so `approve
