@@ -94,14 +94,17 @@ connected component of size 1 — `criticalPath`/`topUnblock` carry no
 ordering signal; one honest piece of work, no split (step 4 of this
 skill's flow doesn't apply).
 
-Impact-analysis posture: **full** (`fgos tool query --capability
+Impact-analysis posture: **degraded** (`fgos tool query --capability
 impact-analysis --status present` → `gitnexus` present, re-confirmed
-fresh this session — see CONTEXT.md's own Round 3 scout evidence).
-GitNexus's index is independently confirmed STALE a second time this item
-(after D4's own `isMainWorktree` finding): its `impact()` query on
-`retargetMember` returned only 1 caller (`promote-engine.test.mjs`),
-omitting the real production call site at `bin/fgos.mjs:3624` — manual
-`grep`/`rg` cross-check substitutes and is what confirmed both guard
+fresh this session — see CONTEXT.md's own Round 3 scout evidence — but
+per CLAUDE.md's own three-way framing, `present` alone is not `full`;
+it is `full` only when freshly checked, `degraded` when `present` but
+flagged stale). GitNexus's index is independently confirmed STALE a
+second time this item (after D4's own `isMainWorktree` finding): its
+`impact()` query on `retargetMember` returned only 1 caller
+(`promote-engine.test.mjs`), omitting the real production call site at
+`bin/fgos.mjs:3624` — manual `grep`/`rg` cross-check substitutes and is
+what confirmed both guard
 layers' real call graph this pass. GitNexus `impact()` MUST still be
 re-run before editing the `promote-to-component` handler and
 `retargetMember` — CLAUDE.md's Always-Do rules — but its degraded output
