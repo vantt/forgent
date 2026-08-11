@@ -7,6 +7,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- `/fgOS:retro-next` is now a launcher in the strict sense: it sweeps,
+  picks one item, and hands it to `fgos-coding-driving` with an explicit
+  `ceiling: status:cleanup`, relaying whatever the driver reports. It no
+  longer resolves the synthesis skill, invokes it, moves the item, or reads
+  a subprocess exit code itself. Observable behavior is unchanged —
+  synthesis runs, the item lands at `cleanup`, the run stops there — but it
+  now inherits the driver's park/anchor handling and its
+  `stop-reason: lock-timeout` relay instead of duplicating thinner versions.
+- `fgos-coding-driving` now resolves each iteration's next step from the
+  item's **position** rather than always from `stage`: `stage` while it is
+  live, `status` once it freezes at `awaiting-approval`. This makes the
+  driver able to carry an item through the post-merge chain
+  (`retrospective` → `cleanup`) that previously needed hand-rolled
+  sequencing in each launcher. No registry or code change was required —
+  `skillMap` has mixed stage and status keys since decision `0027` D5.
+- `/fgOS:cleanup-next` now reports a stuck shared lock with the same
+  `stop-reason: lock-timeout` marker line every other launcher and the
+  driver already use, instead of describing that condition only in prose —
+  so `/fgOS:cleanup-loop` reads the one loop-stopping category off a line
+  rather than inferring it. Its exit-code classification is unchanged and
+  documented as deliberate: unlike `/fgOS:retro-next`, it runs a real CLI
+  subprocess, so an exit code genuinely exists to read.
+- `awaiting-approval` changes from an unconditional stop into the driver's
+  **default, overridable ceiling**. A caller that supplies no ceiling stops
+  there exactly as before, so existing behavior is unchanged; a caller that
+  deliberately passes a further `status:*` ceiling can drive past it. The
+  merge gate stays a human decision, now protected by a named launcher
+  convention (no launcher ships a default ceiling past `awaiting-approval`)
+  rather than by the driver refusing structurally.
+
+### Removed
+
+- The `orchestrator` word ban (`test/docs/launcher-vocabulary-guard.test.mjs`
+  and its 28-entry allowlist) is retired, per decision `0031`. Decision
+  `0028` banned the term while it carried no meaning; decision `0029` D17
+  then assigned it one — the T0 aggregate layer (N units, stays engaged),
+  the role `/fgOS:*-loop` and `fgos-fanout` actually play. The guard was
+  left blocking fgOS's own current vocabulary, and a word-level grep cannot
+  tell the retired sense from the assigned one. Writing `orchestrator` in
+  that assigned sense no longer fails the suite. `launcher` remains the only
+  correct name for the one-unit, fire-and-forget role — that half of `0028`
+  stands.
+
 ### Added
 
 - Repo-invariant checks now run alongside an item's own `verify`, at both
