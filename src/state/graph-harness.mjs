@@ -73,6 +73,21 @@ import { effectiveStage, getDomain } from './workflow-stage-graphs.mjs';
  *   - `blockedOnSync` — ids of otherwise-candidate items whose resolved
  *     root shows `needsSync: true` in the supplied `opts.drift` — always
  *     empty when `opts.drift` is omitted.
+ *   - `strandedByResolvedRoot` (tsk-4s0, piece 2 of tsk-4qu's leaf-merge-
+ *     into-resolved-root fix) — ids of otherwise-candidate items whose
+ *     resolved root (`resolveRoot`) is already RESOLVED
+ *     (`isResolvedStatus` — delivered/retrospective/cleanup/done/wontfix).
+ *     `approve` now refuses these (`bin/fgos.mjs`'s resolved-root guard),
+ *     so they are pulled out of `ready` here too rather than reported as
+ *     plainly mergeable — a DIFFERENT hazard from `blockedOnSync` (that
+ *     bucket means "the root branch itself needs syncing," not "the root
+ *     is closed out and nothing will ever sync it"), kept as its own
+ *     bucket rather than folded into `blockedOnSync` so that name's
+ *     existing cross-language contract (`herdr-plugin/src/fgos.rs`
+ *     deserializes it by name) keeps its current meaning unchanged.
+ *     Checked independently of `opts.drift` (item status, not a git-shelled
+ *     drift computation) — never empty just because `opts.drift` was
+ *     omitted, unlike `blockedOnSync`.
  *   - `mergeTier` — `{[id]: 'leaf-to-root' | 'root-to-main'}` for every
  *     `proposed` item, derived from `item.parent` alone (an item with a
  *     parent always merges into SOME `fgw/<root>`, never straight to
@@ -115,11 +130,14 @@ export function mergeReadiness(view, opts = {}) {
   }
 
   const blockedOnSync = [];
+  const strandedByResolvedRoot = [];
   const syncClear = [];
   for (const item of candidates) {
     const root = resolveRoot(view, item.id);
     if (drift[root]?.needsSync) {
       blockedOnSync.push(item.id);
+    } else if (root !== item.id && isResolvedStatus(work[root])) {
+      strandedByResolvedRoot.push(item.id);
     } else {
       syncClear.push(item);
     }
@@ -232,6 +250,7 @@ export function mergeReadiness(view, opts = {}) {
     // as "the top-ranked blocked root", a claim only meaningful once this
     // bucket is ordered like every other one already is.
     blockedOnSync: orderByRank(blockedOnSync),
+    strandedByResolvedRoot: orderByRank(strandedByResolvedRoot),
     mergeTier,
     supersededOut,
     stageByItem,
@@ -255,10 +274,10 @@ export function mergeReadiness(view, opts = {}) {
  * return shape — adding a field there directly would break them.
  *
  * D2: every id `mergeReadiness` surfaces in ANY bucket (`ready`, `waiting`,
- * `blockedOnSync`, every id inside a `footprint-overlap` `mergeSets` entry,
- * `supersededOut`) gets a node here — never just `ready`. A `shared-root`
- * `mergeSets` entry is informational only (its items are already in
- * `ready`) and adds no separate status.
+ * `blockedOnSync`, `strandedByResolvedRoot` (tsk-4s0), every id inside a
+ * `footprint-overlap` `mergeSets` entry, `supersededOut`) gets a node here
+ * — never just `ready`. A `shared-root` `mergeSets` entry is informational
+ * only (its items are already in `ready`) and adds no separate status.
  *
  * D3: every nesting level — the top-level root set AND every parent's own
  * children group — is sorted by the SAME order `mergeReadiness` already
@@ -319,6 +338,21 @@ export function mergeTree(view, readiness, opts = {}) {
       reason: target ? `superseded bởi ${target}` : 'superseded',
     });
   }
+  // tsk-4s0 (piece 2 of tsk-4qu's leaf-merge-into-resolved-root fix): a
+  // strandedByResolvedRoot id would otherwise get NO node at all here (it
+  // is deliberately excluded from `ready` and was never in any other
+  // bucket) — violates D2's own "never hide" invariant. Same shape as
+  // blockedOnSync just above: a distinct status naming the real cause.
+  for (const id of readiness.strandedByResolvedRoot) {
+    const root = resolveRoot(view, id);
+    const rootItem = work[root];
+    statusById.set(id, {
+      status: 'stranded-resolved-root',
+      reason: rootItem
+        ? `root ${root} đã ${rootItem.status} — sẽ không được sync lên main`
+        : 'root đã resolved',
+    });
+  }
   // `ready` last -- mergeReadiness's own membership rule already keeps
   // `ready` disjoint from every exclusion bucket above, so plain
   // assignment here never overwrites a real blocked/conflicted status.
@@ -335,7 +369,15 @@ export function mergeTree(view, readiness, opts = {}) {
     }
   }
 
-  const rankedIds = rankImpact(view).map((row) => row.id);
+  // tsk-4s0: `{ includeDone: true }` (unlike mergeReadiness's own
+  // `orderByRank` above, which only ever ranks already-open `candidates`)
+  // -- a RESOLVED item can now legitimately need a container node here
+  // (an open leaf nesting under its own resolved root is exactly the
+  // strandedByResolvedRoot case just above), and `rankImpact`'s default
+  // `openIds`-only ranking would silently drop that container id out of
+  // `orderByRank`'s filter, hiding every child nested under it -- the
+  // same D2 "never hide" invariant this whole function exists to uphold.
+  const rankedIds = rankImpact(view, { includeDone: true }).map((row) => row.id);
   const orderByRank = (ids) => rankedIds.filter((id) => ids.includes(id));
 
   const childrenByParent = new Map();
