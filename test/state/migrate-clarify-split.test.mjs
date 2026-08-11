@@ -4,7 +4,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { migrateClarifySplit } from '../../scripts/migrate-clarify-split.mjs';
-import { addWork, listWork, putInAwaiting, addDecision } from '../../src/state/store.mjs';
+import { listWork, putInAwaiting, addDecision } from '../../src/state/store.mjs';
+import { appendEvent } from '../../src/state/events.mjs';
 
 // tsk-puz D12 (docs/history/fanout-and-delegation-rubric/CONTEXT.md),
 // retargeted by tsk-qod D1 (docs/history/discover-stage-graph-and-skill-
@@ -36,6 +37,17 @@ function sampleWork(overrides = {}) {
   };
 }
 
+// tsk-qod D1/D2: `clarify` no longer exists in `stages` at all, so
+// `addWork`'s own `validateWorkShape` now rejects it outright -- these
+// fixtures simulate an item that was already at that stage BEFORE this
+// item's own rename (exactly what the real 90-item migration ran against),
+// so they inject the raw `work.add` event directly, the same
+// bypass-validation pattern `test/state/backward-compat.test.mjs` already
+// uses for simulating pre-existing (grandfathered) log state.
+function addLegacyWork(storeDir, overrides = {}) {
+  appendEvent(path.join(storeDir, 'events.jsonl'), { type: 'work.add', payload: sampleWork(overrides) });
+}
+
 function mkLockedContextFixture(storeDir, docsRef, content = '# CONTEXT\n\nD1: locked.\n') {
   const repoRoot = path.dirname(storeDir);
   const featureDir = path.join(repoRoot, docsRef);
@@ -45,7 +57,7 @@ function mkLockedContextFixture(storeDir, docsRef, content = '# CONTEXT\n\nD1: l
 
 test('an untouched item (no decision, no docsRef content, not parked) migrates to discovery — clarify is retired, nowhere left to stay', () => {
   const storeDir = tmpStoreDir();
-  addWork(storeDir, sampleWork({ id: 'untouched' }));
+  addLegacyWork(storeDir, { id: 'untouched' });
 
   const report = migrateClarifySplit(storeDir);
 
@@ -56,7 +68,7 @@ test('an untouched item (no decision, no docsRef content, not parked) migrates t
 
 test('an item with a real logged decision (decisionsById) migrates to discovery', () => {
   const storeDir = tmpStoreDir();
-  addWork(storeDir, sampleWork({ id: 'has-decision' }));
+  addLegacyWork(storeDir, { id: 'has-decision' });
   addDecision(storeDir, { id: 'has-decision', text: 'D1: locked something real', source: 'fgos-exploring', rationale: 'real evidence' });
 
   const report = migrateClarifySplit(storeDir);
@@ -70,7 +82,7 @@ test('an item with a real committed CONTEXT.md under its own docsRef (no decisio
   const storeDir = tmpStoreDir();
   const docsRef = 'docs/history/has-context-item';
   mkLockedContextFixture(storeDir, docsRef);
-  addWork(storeDir, sampleWork({ id: 'has-context', docsRef }));
+  addLegacyWork(storeDir, { id: 'has-context', docsRef });
 
   const report = migrateClarifySplit(storeDir);
 
@@ -80,7 +92,7 @@ test('an item with a real committed CONTEXT.md under its own docsRef (no decisio
 
 test('an item with a docsRef pointing at an empty/missing CONTEXT.md migrates to discovery too (no false positive treating a bare field as a real locked decision — same "untouched" target either way)', () => {
   const storeDir = tmpStoreDir();
-  addWork(storeDir, sampleWork({ id: 'empty-docsref', docsRef: 'docs/history/never-written' }));
+  addLegacyWork(storeDir, { id: 'empty-docsref', docsRef: 'docs/history/never-written' });
 
   const report = migrateClarifySplit(storeDir);
 
@@ -90,7 +102,7 @@ test('an item with a docsRef pointing at an empty/missing CONTEXT.md migrates to
 
 test('an item parked awaiting-human migrates to exploring, even when it also carries a real decision (parked status wins — it is already past the discovery point)', () => {
   const storeDir = tmpStoreDir();
-  addWork(storeDir, sampleWork({ id: 'parked' }));
+  addLegacyWork(storeDir, { id: 'parked' });
   addDecision(storeDir, { id: 'parked', text: 'D1: something', source: 'fgos-exploring', rationale: 'real' });
   putInAwaiting(storeDir, { id: 'parked', ask: 'Which provider?', statusAtAsk: 'todo' });
 
@@ -103,7 +115,7 @@ test('an item parked awaiting-human migrates to exploring, even when it also car
 
 test('a non-clarify-stage item is never touched, regardless of its own status/decisions', () => {
   const storeDir = tmpStoreDir();
-  addWork(storeDir, sampleWork({ id: 'already-executing', stage: 'executing' }));
+  addLegacyWork(storeDir, { id: 'already-executing', stage: 'executing' });
 
   const report = migrateClarifySplit(storeDir);
 
@@ -113,9 +125,9 @@ test('a non-clarify-stage item is never touched, regardless of its own status/de
 
 test('dry-run computes the exact same plan but writes nothing at all — every item still reads at stage clarify afterward', () => {
   const storeDir = tmpStoreDir();
-  addWork(storeDir, sampleWork({ id: 'has-decision' }));
+  addLegacyWork(storeDir, { id: 'has-decision' });
   addDecision(storeDir, { id: 'has-decision', text: 'D1: locked something real', source: 'fgos-exploring', rationale: 'real evidence' });
-  addWork(storeDir, sampleWork({ id: 'untouched-2' }));
+  addLegacyWork(storeDir, { id: 'untouched-2' });
 
   const report = migrateClarifySplit(storeDir, { dryRun: true });
 
@@ -128,11 +140,11 @@ test('dry-run computes the exact same plan but writes nothing at all — every i
 
 test('idempotent by construction: a second real run right after the first moves nothing further — every item already migrated on the first pass, clarify has zero candidates left', () => {
   const storeDir = tmpStoreDir();
-  addWork(storeDir, sampleWork({ id: 'has-decision' }));
+  addLegacyWork(storeDir, { id: 'has-decision' });
   addDecision(storeDir, { id: 'has-decision', text: 'D1: locked something real', source: 'fgos-exploring', rationale: 'real evidence' });
-  addWork(storeDir, sampleWork({ id: 'parked' }));
+  addLegacyWork(storeDir, { id: 'parked' });
   putInAwaiting(storeDir, { id: 'parked', ask: 'Which provider?', statusAtAsk: 'todo' });
-  addWork(storeDir, sampleWork({ id: 'untouched' }));
+  addLegacyWork(storeDir, { id: 'untouched' });
 
   const first = migrateClarifySplit(storeDir);
   assert.equal(first.totalClarifyItemsSeen, 3);
@@ -158,7 +170,7 @@ test('CLI: node scripts/migrate-clarify-split.mjs --dir <path> --dry-run prints 
   const scriptPath = path.resolve(__dirname, '../../scripts/migrate-clarify-split.mjs');
 
   const storeDir = tmpStoreDir();
-  addWork(storeDir, sampleWork({ id: 'untouched' }));
+  addLegacyWork(storeDir, { id: 'untouched' });
 
   const stdout = execFileSync(process.execPath, [scriptPath, '--dir', storeDir, '--dry-run'], { encoding: 'utf8' });
   const report = JSON.parse(stdout);
