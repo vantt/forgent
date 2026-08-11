@@ -165,6 +165,42 @@ All 10 pass on the blocked branch. A1 is proven, not flagged.
 | Proof surface | PASS | The item's own locked verify is a real runnable command; no placeholder |
 | Impact-analysis posture | PASS | `fgos tool query --capability impact-analysis --status present` → 1 provider, `gitnexus:present`, matching the `full` posture the plan recorded. Carries no weight here regardless: no production symbol is edited |
 
+## Measured result (after the edit, 2026-08-11)
+
+All 10 sites landed, both shapes:
+`rg -- "\.\.\.process\.env" test/setup/checks-setup-*.test.mjs` returns zero
+matches, and the 5 files now carry 10 `...NO_CLAUDE_ENV, HOME: homeDir`
+sites (2 per file). C2 satisfied.
+
+The 5 files alone: `tests 10, pass 10, fail 0, duration_ms 283.6`,
+`WALL 0.30 USER 0.93 SYS 0.29` — matching the pre-edit simulation (280ms) to
+within noise, which confirms the edit reproduces exactly the state validation
+had already proven.
+
+Full suite, `/usr/bin/time -f "%e %U %S" npm test`:
+
+| Metric | Before | After | Change |
+|---|---|---|---|
+| Total tests | 2878 (floor) | **2921** (pass 2916, fail 0, skipped 5) | above the floor, nothing lost |
+| Wall-clock | ~50s | **43.70s** | −6.3s |
+| CPU (user+sys) | 429s | **374.39s** (279.77 + 94.62) | **−54.6s (~12.7%)** |
+| The 5 files' own share | 117.6s | 0.30s | −117.3s |
+
+The item's locked verify is satisfied on every clause: green, count above
+2878, CPU down from 429s, wall down from ~50s. `fail 0` — the run did not
+even produce the pre-existing orchestrator guard error the verify allowed
+for.
+
+**C1 was too pessimistic, and the honest number sits between the two
+estimates.** Validation predicted ≈22s of CPU recovered by extrapolating
+per-test isolation timings; the real full-suite saving is 54.6s. Isolated
+per-test measurement under-counted what the unblocked path actually costs
+inside a fully parallel suite run. The original item prediction (≈110s) is
+still not reached, so C1's core correction stands — a wall-clock saving is
+not a CPU saving — but the CPU win is meaningfully larger than C1's own
+figure. Both numbers came from single runs, so treat ±few-percent variance
+as expected rather than reading 54.6s as exact.
+
 ## Outstanding questions
 
 None
