@@ -34,6 +34,12 @@ computes the boolean this fix needs — it is currently read only ONCE,
 after the failed `git merge` call, which cannot tell case 1 apart from
 case 3. The fix is to also read it BEFORE the call.
 
+The fix lands once, inside `mergeRunnerItemLocked` (`merge.mjs`), but
+`mergeRunnerItem` (its caller) is shared by three call sites in
+`bin/fgos.mjs` — two `approve` paths and `fgos sync-root` — so the new
+outcome this produces is visible at all three; see D4 for the one of
+those three (`sync-root`) that needs its own additional guard.
+
 Scope excludes: `tsk-2j9`'s already-delivered abort-crash guard (a MISSING
 MERGE_HEAD), `tsk-18a`'s already-delivered conflict/unclassified split (a
 MERGE_HEAD this call itself created or never created) — see
@@ -96,6 +102,43 @@ conflict fix, silently discarded). This is the one behavior change that is
 non-negotiable, not an assumption: it is the literal safety gap the item's
 own description names.
 
+### D4 — `sync-root`'s call site (`bin/fgos.mjs:3305-3357`) gets a defensive unrecognized-outcome guard, not a named `merge-blocked-other-item` branch
+Found during `fgos-validating`'s reality gate (not anticipated when D1-D3
+were locked): `mergeRunnerItem` is shared by THREE call sites, not two —
+the two `approve` paths (`~2999`, `~3114`) already handled by D2, and
+`fgos sync-root`'s own `runAndReport` (`~3305-3357`), which has no branch
+at all for `merge-failed-unclassified` — an outcome it does not
+recognize falls straight through to the success block
+(`bin/fgos.mjs:3349-3357`: `addDecision(...'merged'...)` +
+`return {outcome: 'synced', ...}`). This is a pre-existing gap (predates
+this item, `tsk-18a` never touched this call site), but D1's own fix
+makes it newly reachable in a worse way: today a pre-existing MERGE_HEAD
+at least surfaces as a wrong-but-visible `blocked`/`merge-conflict` via
+`sync-root`'s existing `conflict` branch (`~3312-3322`); after D1, the
+same condition returns the new `merge-blocked-other-item` outcome, which
+`sync-root` has NO branch for either — so it would silently report
+`synced` (false success) instead. D1 must not ship without closing this,
+per D3's own already-established bar (never silently misreport a blocked
+merge as if it succeeded).
+
+Fix: add a defensive `else` after `sync-root`'s existing `verify-fail`
+branch (`~3346`) that treats ANY outcome other than `'merged'` as an
+error instead of falling through to the success block — future-proof
+against any outcome this call site doesn't yet recognize, not just this
+item's new one by name. Never widen `sync-root`'s own three existing
+named branches (`conflict`/`fgos-write-rejected`/`verify-fail`) to also
+list `merge-blocked-other-item`/`merge-failed-unclassified` by name —
+the defensive `else` covers both without hardcoding either, and covers
+whatever a future D1-shaped fix adds later too.
+
+Pinned rather than asked: grounded in this session's own direct read of
+`bin/fgos.mjs:3305-3357` (cited above), and the fix is the smallest
+possible closure of a real regression D1 would otherwise introduce — not
+a product/UX choice with more than one reasonable answer. `sync-root`'s
+own existing test suite (`test/cli/fgos.test.mjs:6121+`, confirmed
+present and covering the happy path plus rejection cases) is the natural
+home for the new regression test.
+
 ## Pinned terms
 
 - **Pre-existing MERGE_HEAD** — `mergeHeadExists(repoRoot)` returns `true`
@@ -131,6 +174,15 @@ Additional this round:
 - `docs/history/tsk-2j9-merge-abort-missing-merge-head/CONTEXT.md` —
   confirms `mergeHeadExists`'s own origin and existing guard shape, reused
   unchanged by D1.
+- `bin/fgos.mjs:3305-3357` (`sync-root`'s `runAndReport`) — read in full
+  during `fgos-validating`'s reality gate: confirms `conflict`,
+  `fgos-write-rejected`, `verify-fail` are the only three named outcome
+  branches; any other outcome (including today's `merge-failed-unclassified`
+  and this item's new `merge-blocked-other-item`) falls through unguarded
+  to the success block at `:3349-3357`. Basis for D4.
+- `test/cli/fgos.test.mjs:6121+` — confirms `sync-root` has real, existing
+  test coverage (happy path, validation rejections) to extend for D4's new
+  regression test, not a cold-start test file.
 
 ## Outstanding questions
 
