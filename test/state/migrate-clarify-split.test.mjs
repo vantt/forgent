@@ -6,10 +6,13 @@ import path from 'node:path';
 import { migrateClarifySplit } from '../../scripts/migrate-clarify-split.mjs';
 import { addWork, listWork, putInAwaiting, addDecision } from '../../src/state/store.mjs';
 
-// tsk-puz D12 (docs/history/fanout-and-delegation-rubric/CONTEXT.md): sorts
-// every stage:clarify item into discovery/exploring/clarify per real,
-// mechanical signals (status, decisionsById, a real committed CONTEXT.md) —
-// never a placeholder or a guess.
+// tsk-puz D12 (docs/history/fanout-and-delegation-rubric/CONTEXT.md),
+// retargeted by tsk-qod D1 (docs/history/discover-stage-graph-and-skill-
+// layering/CONTEXT.md): sorts every stage:clarify item into
+// discovery/exploring per real, mechanical signals (status, decisionsById,
+// a real committed CONTEXT.md) — never a placeholder or a guess. `clarify`
+// is retired as a stage entirely, so every candidate item now moves; there
+// is no longer a "stays at clarify" outcome.
 
 function tmpStoreDir() {
   const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-migrate-clarify-split-'));
@@ -40,16 +43,15 @@ function mkLockedContextFixture(storeDir, docsRef, content = '# CONTEXT\n\nD1: l
   fs.writeFileSync(path.join(featureDir, 'CONTEXT.md'), content);
 }
 
-test('an untouched item (no decision, no docsRef content, not parked) stays at clarify — no moveStage call, reported in leftAtClarify', () => {
+test('an untouched item (no decision, no docsRef content, not parked) migrates to discovery — clarify is retired, nowhere left to stay', () => {
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork({ id: 'untouched' }));
 
   const report = migrateClarifySplit(storeDir);
 
-  assert.deepEqual(report.movedToDiscovery, []);
+  assert.deepEqual(report.movedToDiscovery, ['untouched']);
   assert.deepEqual(report.movedToExploring, []);
-  assert.deepEqual(report.leftAtClarify, ['untouched']);
-  assert.equal(listWork(storeDir).work.untouched.stage, 'clarify');
+  assert.equal(listWork(storeDir).work.untouched.stage, 'discovery');
 });
 
 test('an item with a real logged decision (decisionsById) migrates to discovery', () => {
@@ -61,7 +63,6 @@ test('an item with a real logged decision (decisionsById) migrates to discovery'
 
   assert.deepEqual(report.movedToDiscovery, ['has-decision']);
   assert.deepEqual(report.movedToExploring, []);
-  assert.deepEqual(report.leftAtClarify, []);
   assert.equal(listWork(storeDir).work['has-decision'].stage, 'discovery');
 });
 
@@ -77,14 +78,14 @@ test('an item with a real committed CONTEXT.md under its own docsRef (no decisio
   assert.equal(listWork(storeDir).work['has-context'].stage, 'discovery');
 });
 
-test('an item with a docsRef pointing at an empty/missing CONTEXT.md stays at clarify (no false positive from a bare field)', () => {
+test('an item with a docsRef pointing at an empty/missing CONTEXT.md migrates to discovery too (no false positive treating a bare field as a real locked decision — same "untouched" target either way)', () => {
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork({ id: 'empty-docsref', docsRef: 'docs/history/never-written' }));
 
   const report = migrateClarifySplit(storeDir);
 
-  assert.deepEqual(report.leftAtClarify, ['empty-docsref']);
-  assert.equal(listWork(storeDir).work['empty-docsref'].stage, 'clarify');
+  assert.deepEqual(report.movedToDiscovery, ['empty-docsref']);
+  assert.equal(listWork(storeDir).work['empty-docsref'].stage, 'discovery');
 });
 
 test('an item parked awaiting-human migrates to exploring, even when it also carries a real decision (parked status wins — it is already past the discovery point)', () => {
@@ -119,14 +120,13 @@ test('dry-run computes the exact same plan but writes nothing at all — every i
   const report = migrateClarifySplit(storeDir, { dryRun: true });
 
   assert.equal(report.dryRun, true);
-  assert.deepEqual(report.movedToDiscovery, ['has-decision']);
-  assert.deepEqual(report.leftAtClarify, ['untouched-2']);
+  assert.deepEqual(report.movedToDiscovery.sort(), ['has-decision', 'untouched-2'].sort());
   // nothing actually written -- both items still read at their original stage
   assert.equal(listWork(storeDir).work['has-decision'].stage, 'clarify');
   assert.equal(listWork(storeDir).work['untouched-2'].stage, 'clarify');
 });
 
-test('idempotent by construction: a second real run right after the first moves nothing further and reports every already-migrated item as no longer a clarify candidate at all', () => {
+test('idempotent by construction: a second real run right after the first moves nothing further — every item already migrated on the first pass, clarify has zero candidates left', () => {
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork({ id: 'has-decision' }));
   addDecision(storeDir, { id: 'has-decision', text: 'D1: locked something real', source: 'fgos-exploring', rationale: 'real evidence' });
@@ -138,18 +138,17 @@ test('idempotent by construction: a second real run right after the first moves 
   assert.equal(first.totalClarifyItemsSeen, 3);
 
   const second = migrateClarifySplit(storeDir);
-  // 'untouched' is still the only stage:clarify item left -- the other two
-  // no longer match the filter at all, so this rerun sees exactly one
-  // candidate, itself left alone again (no decision, not parked).
-  assert.equal(second.totalClarifyItemsSeen, 1);
-  assert.deepEqual(second.leftAtClarify, ['untouched']);
+  // Every candidate moved on the first pass (clarify is retired — nothing
+  // stays behind), so the rerun's own filter (`item.stage !== 'clarify'`)
+  // matches zero items.
+  assert.equal(second.totalClarifyItemsSeen, 0);
   assert.deepEqual(second.movedToDiscovery, []);
   assert.deepEqual(second.movedToExploring, []);
 
   const view = listWork(storeDir);
   assert.equal(view.work['has-decision'].stage, 'discovery');
   assert.equal(view.work.parked.stage, 'exploring');
-  assert.equal(view.work.untouched.stage, 'clarify');
+  assert.equal(view.work.untouched.stage, 'discovery');
 });
 
 test('CLI: node scripts/migrate-clarify-split.mjs --dir <path> --dry-run prints the report as JSON, writes nothing', async () => {
@@ -164,7 +163,7 @@ test('CLI: node scripts/migrate-clarify-split.mjs --dir <path> --dry-run prints 
   const stdout = execFileSync(process.execPath, [scriptPath, '--dir', storeDir, '--dry-run'], { encoding: 'utf8' });
   const report = JSON.parse(stdout);
   assert.equal(report.dryRun, true);
-  assert.deepEqual(report.leftAtClarify, ['untouched']);
+  assert.deepEqual(report.movedToDiscovery, ['untouched']);
   assert.equal(listWork(storeDir).work.untouched.stage, 'clarify');
 });
 
