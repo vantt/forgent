@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- The `orchestrator` word ban (`test/docs/launcher-vocabulary-guard.test.mjs`
+  and its 28-entry allowlist) is retired, per decision `0031`. Decision
+  `0028` banned the term while it carried no meaning; decision `0029` D17
+  then assigned it one — the T0 aggregate layer (N units, stays engaged),
+  the role `/fgOS:*-loop` and `fgos-fanout` actually play. The guard was
+  left blocking fgOS's own current vocabulary, and a word-level grep cannot
+  tell the retired sense from the assigned one. Writing `orchestrator` in
+  that assigned sense no longer fails the suite. `launcher` remains the only
+  correct name for the one-unit, fire-and-forget role — that half of `0028`
+  stands.
+
 ### Added
 
 - Repo-invariant checks now run alongside an item's own `verify`, at both

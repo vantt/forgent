@@ -73,11 +73,6 @@
   "test/cli/take-pick-claim-eligibility.test.mjs": [
     "test('take with no --id still only opens the frontier head — the relaxation applies to the explicit --id branch alone (D1 unchanged)', () => {"
   ],
-  "test/docs/launcher-vocabulary-guard.test.mjs": [
-    "test('NEGATIVE self-check: ALLOWED_FILES_ENTRIES has no duplicate key (tsk-4cx)', () => {",
-    "test('NEGATIVE self-check: \"herdr-orchestrator\" strips as a frozen phrase, but a bare \"orchestrator\" still trips (tsk-2au)', () => {",
-    "test('POSITIVE: the 12 skill mirrors still point at 0026\\'s unchanged filename (D2)', () => {"
-  ],
   "test/e2e/compound-learn-lifecycle.test.mjs": [
     "test('e2e approve no longer requires the compound-learn stage — the retired RUL50 gate does not block reaching delivered', () => {"
   ],

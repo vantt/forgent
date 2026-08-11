@@ -1235,14 +1235,6 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
-    "docPath": "docs/how-to/allowlist-a-historical-mention-in-launcher-vocabulary-guard.md",
-    "title": "How to allowlist a legitimate historical mention in launcher-vocabulary-guard.test.mjs",
-    "sourceCaptureId": "tsk-2uo"
-  },
-  {
-    "quadrant": "how-to",
-    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
-    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/avoid-a-hung-verify-on-return-approve-catchup.md",
     "title": "How to avoid a hung `verify` command on `fgos return`/`approve`/`catchup`",
     "sourceCaptureId": "tsk-3vo"

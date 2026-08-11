@@ -7,6 +7,7 @@ source_capture_ids: []
 date: 2026-08-08
 status: accepted
 supersedes: [0026]
+superseded_by: [0031]
 relates_specs: [runner]
 ---
 
