@@ -32,11 +32,16 @@ In scope for tsk-2oy itself (revised, see D3):
    requirement's scope.
 
 Out of scope for tsk-2oy (see D1, D3): remediating the OTHER 4 items'
-own missing content (`tsk-648`, `tsk-1q5`, `tsk-1vi`, `tsk-2x9`/`tsk-1r3`);
-landing `fgw/tsk-4b2`'s real content on `main` (now `tsk-13z` — a DIFFERENT
-bug, a manual `fgos move --to delivered` bypass around two failed merges,
-not the stray-`MERGE_HEAD` corruption this item investigates); and the
-`checkMergeStillResolves` decomposed-root gap (now `tsk-5j0`).
+own corrupted retrospective-synthesis commits — filed as `tsk-67t`
+(tsk-648, absorbed tsk-5nj), `tsk-4dy` (tsk-1q5, absorbed a `fgw/tsk-13m`
+sync merge — possibly benign, needs real investigation), `tsk-3u8`
+(tsk-1vi, absorbed tsk-66t), and `tsk-5z9` (tsk-2x9, absorbed
+`fix(tsk-1r3)` — a real code fix, higher severity than the other three,
+prioritize first); landing `fgw/tsk-4b2`'s real content on `main` (now
+`tsk-13z` — a DIFFERENT bug, a manual `fgos move --to delivered` bypass
+around two failed merges, not the stray-`MERGE_HEAD` corruption this item
+investigates); and the `checkMergeStillResolves` decomposed-root gap (now
+`tsk-5j0`).
 
 ## Locked decisions
 
