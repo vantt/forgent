@@ -30,11 +30,21 @@ index.json` thiếu 70/220 tài liệu, không doctor check nào canh) — thàn
 ràng buộc R6 ở §6.4. Hệ quả lớn nhất: **§6.4 giờ trả lời được TỪNG NỬA**
 — nửa storytelling đã có chứng cứ, nửa changelog còn chờ `tsk-3ip`.
 
-Đứng vững: D-tsk28x-1 (hai trục), nguyên tắc tách-theo-giai-đoạn, và
-toàn bộ 6 ràng buộc R1-R6. Còn mở: chọn phương án cho nửa storytelling
-(giờ đã đủ chứng cứ để chọn), hai trục có cần cùng lúc không, ranh giới
-scope `tsk-28x`/`tsk-12m`, va giữa D-tsk12m-B với mô hình mới, và một câu
-mới — có gộp doctor check cho index drift vào `tsk-3ip` hay tách riêng.
+Vòng 7 (2026-08-11). Một phiên `fgos-researching` độc lập (chạy trong
+`fgos-coding-driving`'s discovery-stage pass cho `tsk-28x`, không đọc
+trước §3 dòng E) tự đọc lại toàn bộ discussion và tự nêu đúng hai câu hỏi
+§1/§3 dòng E đã treo: (1) kết luận Làn B chưa mint, (2) `deps: [tsk-12m]`
+đáng ngờ. Trùng khớp độc lập này được tính là thêm một điểm dữ liệu, không
+phải bằng chứng mới. Chủ sản phẩm trả lời câu (2) trực tiếp: **tách quan
+hệ `tsk-28x` → `tsk-12m`** — xem D-tsk28x-2. Câu (1) (mint Làn B) vẫn
+CHƯA chốt, chờ vòng sau.
+
+Đứng vững: D-tsk28x-1 (hai trục), D-tsk28x-2 (tách dep `tsk-12m`), nguyên
+tắc tách-theo-giai-đoạn, và toàn bộ 6 ràng buộc R1-R6. Còn mở: mint kết
+luận Làn B cho nửa storytelling (đã đủ chứng cứ, chờ vòng xác nhận thứ
+hai theo D4), hai trục có cần cùng lúc không, va giữa D-tsk12m-B với mô
+hình mới, và một câu mới — có gộp doctor check cho index drift vào
+`tsk-3ip` hay tách riêng.
 
 ## 2. Mục tiêu & đề bài
 
@@ -64,7 +74,7 @@ Diataxis hiện có (không đụng, không pha trộn — hard rule của
 | B | Đóng hay mở | **TRẢ LỜI V3** (chưa D-ID) — giải bởi chữ `struggle` | `struggle` KHÔNG nằm trong 4 quadrant Diataxis (Diataxis dựng từ 2 chiều hành-động/nhận-thức × tiếp-thu/vận-dụng, ra đúng 4 ô, không ô nào là struggle). Suy ra: trục trạng-thái-nhận-thức là trục TỔNG QUÁT, Diataxis chỉ là MỘT PROFILE của trục đó (profile cho tài liệu kỹ thuật); marketing có profile riêng trên cùng trục, `struggle` là một trạng thái trong đó. **Trục MỞ (thêm profile mới được) + mỗi profile ĐÓNG (Diataxis mãi đúng 4)** — chính là kiến trúc OKF v0.1 (lỏng) + Bee Profile (đóng) đã dùng. Không phải chọn một trong hai |
 | C | **GHI hay ĐỀ XUẤT** | **TRẢ LỜI V3** (chưa D-ID) — câu hỏi vòng 2 đặt SAI | Không chọn một cho cả hệ thống — tách theo GIAI ĐOẠN. **Thu chất liệu: ghi thẳng, liên tục, không bao giờ dừng để hỏi** (ràng buộc chủ sản phẩm đặt: nhanh, rẻ, ít token, không cắt ngang luồng làm việc khác — loại thẳng mọi phương án gọi LLM phân loại ngay lúc capture). **Tổng hợp: nhiều pha, có triage nổi ứng viên, có người duyệt.** Lý do OKF sợ tự-ghi chỉ áp cho TÀI LIỆU (giả vờ là kết luận đã biên tập), không áp cho CHẤT LIỆU THÔ (chỉ ghi "đã xảy ra chuyện này"). Cửa gác đặt đúng chỗ chất liệu biến thành khẳng định |
 | D | Ai giữ "một chủ đề một chủ sở hữu" khi số tài liệu tăng | CHƯA RÕ (chưa bàn vòng 3) | `fgos-compounding` phát hiện grow-vs-create CHỈ bằng `fs.existsSync`. Không có khái niệm chủ-sở-hữu-chủ-đề. OKF trả lời bằng `authoritative_for` + anti-fork gate 3 tầng (sau khi judge độc lập phá bản 1 tầng bằng 4 cách trong một buổi). Càng nhiều profile/audience thì rủi ro 2 tài liệu cùng chủ đề càng cao — port cùng lúc hay để riêng? |
-| E | Ranh giới scope `tsk-28x` vs `tsk-12m` | CHƯA RÕ, đã đổi bản chất so với vòng 1-2 | Vòng 1 hỏi "thứ tự nào trước". Vòng 3 đổi câu hỏi: đường ống 5 pha (§6) rõ ràng lớn hơn cả hai item cộng lại. Cần cắt lại: pha nào thuộc `tsk-12m`, pha nào `tsk-28x`, pha nào là item mới chưa tồn tại. `deps: [tsk-12m]` đặt lúc submit có thể không còn đúng. **Bổ sung 2026-08-09:** `tsk-12m` vòng 4 tìm ra ranh giới **quan sát/nhắc vs quyết/viết/chặn** (`docs/history/automated-changelog-compound-learn/DISCUSSION.md` §6.1) — loại quan sát/nhắc độc lập hoàn toàn với câu hỏi §6.4 ở đây và **sống sót qua mọi phương án**, nên làm được ngay. Kèm đính chính: số đo từ nửa changelog KHÔNG mở khoá nửa storytelling — nửa đó cần phép thử riêng (Cách 1), hai phép thử chạy song song được, không tuần tự |
+| E | Ranh giới scope `tsk-28x` vs `tsk-12m` | **ĐÃ CHỐT — D-tsk28x-2 (vòng 7)** | Vòng 1 hỏi "thứ tự nào trước". Vòng 3 đổi câu hỏi: đường ống 5 pha (§6) rõ ràng lớn hơn cả hai item cộng lại. **Bổ sung 2026-08-09:** `tsk-12m` vòng 4 tìm ra ranh giới **quan sát/nhắc vs quyết/viết/chặn** (`docs/history/automated-changelog-compound-learn/DISCUSSION.md` §6.1) — loại quan sát/nhắc độc lập hoàn toàn với câu hỏi §6.4 ở đây và **sống sót qua mọi phương án**, nên làm được ngay, không cần chờ `tsk-28x`. **Vòng 7 (2026-08-11):** chủ sản phẩm xác nhận tách quan hệ — `tsk-28x` không còn `deps` trên `tsk-12m`; `tsk-12m` tự xây phần quan-sát/nhắc độc lập, phần ghi/registry của nó cắm vào bất cứ hình dạng `tsk-28x` chốt sau, không phải chờ ngược lại |
 | F | Hình dạng pha TRIAGE (pha 1, §6) | ĐỠ MỜ sau vòng 5 — xem J2 | Pha triage phải chấm điểm ứng viên. Bài học B6b (§5 vòng 2): tín hiệu xếp hạng phải chọn BẰNG ĐO, không bằng trực giác — trùng tag đo ra AUC 0.550 (≈ tung đồng xu), `areas` 0.500 (đúng bằng tung đồng xu). **Vòng 5 có ứng viên đầu có căn cứ: round-count trên mỗi item (J2).** Còn mở: đo nó bằng bộ nhãn nào — fgOS vẫn chưa có tập nhãn tay như bee đã có, nên chưa chạy được phép đo AUC tương đương |
 | G | ~~Chất liệu `struggle` đã có sẵn trong `friction`~~ | **RÚT LẠI — SAI** (đo lại vòng 4) | Vòng 3 kết luận "RÕ" từ ĐÚNG MỘT bản ghi (`tsk-1gn`) rồi suy rộng ra cả hệ thống. Đo toàn log: 131 friction = 81 `verify-miss` + 39 `merge-conflict` (92% telemetry máy), `detail` điển hình `goal-check failed on branch "fgw/tsk-puz" (exit null)` — ghi RẰNG hỏng, không ghi ĐÃ THỬ GÌ / VÌ SAO / CHỖ NGOẶT. Không phải chất liệu kể chuyện. Thứ làm vòng 3 phấn khích thực ra là `gates.askHistory`, KHÁC `friction` — vòng 3 lẫn hai thứ |
 | G2 | Vỉa chất liệu thật nằm ở đâu | RÕ (đo vòng 4) | (a) **375 event mang question/ask** — tranh cãi thật, văn bản thật, ví dụ "vòng 2 (kiểm tra độc lập) không đồng ý: ..."; (b) **715 rationale xuất hiện đúng một lần** trong tổng 1583 decision. Đây là vỉa, không phải `friction` |
@@ -80,6 +90,7 @@ Diataxis hiện có (không đụng, không pha trộn — hard rule của
 | D-ID | Tóm tắt | Ghi chú |
 |---|---|---|
 | D-tsk28x-1 | Phân loại tài liệu cần HAI trục vuông góc, không phải một danh sách dài hơn: trục trạng-thái-nhận-thức (Diataxis là một profile của nó) + trục danh tính (LÀ gì, của ai, về vấn đề gì) | Nêu vòng 2 (scout OKF), chủ sản phẩm xác nhận + làm sắc vòng 3, không bị sửa. Ghi qua `fgos decision --id tsk-28x` seq 9180 |
+| D-tsk28x-2 | Tách quan hệ `tsk-28x` → `tsk-12m`: bỏ `tsk-12m` khỏi `deps` của `tsk-28x`. Hai item độc lập — `tsk-12m` tự xây phần quan-sát/nhắc; phần ghi/registry của nó cắm vào hình dạng `tsk-28x` chốt sau, không chặn ngược | Câu hỏi treo từ §3 dòng E (vòng 1), một phiên `fgos-researching` độc lập vòng 7 tự nêu lại đúng câu này, chủ sản phẩm xác nhận trực tiếp cùng vòng. Căn cứ: `tsk-12m` vòng 4 đã tách quan-sát/nhắc khỏi quyết/viết/chặn, nửa quan-sát sống sót qua mọi phương án §6.4 |
 
 ## 5. Q&A log
 
@@ -352,6 +363,27 @@ Diataxis hiện có (không đụng, không pha trộn — hard rule của
   Ba điều còn chưa chắc ghi ở cuối §6.4 — round-count mới là ứng viên
   chưa đo, tầng khuôn mẫu thứ hai chưa lọc, chi phí curate chưa ước.
 
+- **2026-08-11 (vòng 7 — `fgos-researching` độc lập + xác nhận chủ sản
+  phẩm)** — `tsk-28x` được pick qua `/fgOS:pick tsk-28x` (`take` từng từ
+  chối claim vì `deps` chưa xong: `tsk-12m` `awaiting-human`, `tsk-1hy`
+  lúc đó còn `cleanup`; `pick` claim được vì không kiểm deps — phát hiện
+  phụ, ghi riêng ở `tsk-2v3`). Dispatch vào `fgos-researching` ở stage
+  `discovery`: đọc lại toàn bộ `DISCUSSION.md` từ đầu, KHÔNG có ngữ cảnh
+  hội thoại trước, tự nêu lại đúng hai câu §1/§3 dòng E đang treo — trùng
+  khớp độc lập, tính là một điểm dữ liệu thêm, không phải bằng chứng mới.
+  Trả về verdict `unclear`, item park `awaiting-human`.
+
+  Chủ sản phẩm trả lời (`/fgOS:answer`): "đồng ý tiếp tục thảo luận
+  coding-shape" — chọn tiếp tục discussion trước khi khoá Socratic. Vòng
+  này (qua `/fgOS:coding-shape tsk-28x`) trình bày lại phân tích Làn B +
+  câu hỏi dep bằng tiếng Việt theo yêu cầu, rồi hỏi riêng từng câu.
+
+  **Câu (2) — dep `tsk-12m`:** chủ sản phẩm trả lời thẳng "tách quan hệ
+  giữa tsk-28x → tsk-12m". Chốt thành D-tsk28x-2 (bảng §4) — xem thêm §3
+  dòng E, §7 "Quan hệ với tsk-28x".
+
+  **Câu (1) — mint Làn B:** chưa được trả lời trong vòng này, vẫn treo.
+
 ## 6. Thiết kế đã chốt {#design}
 
 **Tái sinh vòng 4.** Chỉ D-tsk28x-1 đã chốt thật. §6.1-6.3 giữ nguyên từ
@@ -567,10 +599,10 @@ và `tsk-3ip` (hai task nửa changelog, ở
 
 ### Quan hệ với `tsk-28x` (chính nó)
 
-`tsk-28x` giờ mang `deps: [tsk-12m, tsk-1hy]` — cần kết quả phép thử mới
-trả lời được câu hỏi phương án §6.4. **Lưu ý:** `deps` trên `tsk-12m` là
-di sản từ lúc submit và vẫn là **câu hỏi mở** (§3 dòng E), chưa được xác
-nhận là đúng; `deps` trên `tsk-1hy` thì rõ ràng đúng.
+**Cập nhật vòng 7 (D-tsk28x-2):** `tsk-28x` chỉ còn `deps: [tsk-1hy]` —
+`tsk-1hy` đã `delivered`, dep này giờ luôn thoả. Dep trên `tsk-12m` đã bị
+bỏ (đã tách quan hệ, xem §3 dòng E, §4) — `tsk-12m` không còn chặn
+`tsk-28x` tiến tiếp.
 
 ### Chưa chia được
 
