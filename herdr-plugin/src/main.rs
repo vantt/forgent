@@ -124,7 +124,7 @@ fn main() -> io::Result<()> {
 }
 
 /// tsk-2ja Shape step 1: the first item ready for an unattended
-/// `/fgOS:discover` launch this tick — the exact same `stage == "clarify"`
+/// `/fgOS:discover` launch this tick — the exact same `stage == "discovery"`
 /// gate the manual Discover button already enforces (`UiEvent::Discover`
 /// below), plus `status == "todo"` (never `doing`/`blocked`/
 /// `awaiting-human`, all of which mean a person or another session
@@ -133,7 +133,7 @@ fn main() -> io::Result<()> {
 fn next_auto_discover_candidate(work_items: &[WorkItem]) -> Option<&WorkItem> {
     work_items
         .iter()
-        .find(|item| item.stage == "clarify" && item.status == "todo")
+        .find(|item| item.stage == "discovery" && item.status == "todo")
 }
 
 fn run(
@@ -250,15 +250,15 @@ fn run(
                 }
                 // tsk-1e3 D4: only meaningful while the detail modal is
                 // open, and only fires when the selected item's stage is
-                // `clarify` — otherwise inert (the disabled/dimmed button
+                // `discovery` — otherwise inert (the disabled/dimmed button
                 // gives no keyboard action to fire, D4's own "disable,
                 // never hide" shape carried through to the event loop).
                 UiEvent::Discover => {
                     if app.detail_modal_open {
-                        let is_clarify = app
+                        let is_discovery = app
                             .selected_work_item()
-                            .is_some_and(|item| item.stage == "clarify");
-                        if is_clarify {
+                            .is_some_and(|item| item.stage == "discovery");
+                        if is_discovery {
                             app.pick_status = Some(match app.selected_id() {
                                 Some(id) => match pane_orchestrator.open_discover_pane(id) {
                                     Ok(()) => format!("opened pane for /fgOS:discover {id}"),
@@ -800,7 +800,7 @@ mod tests {
 
     /// Returns, in order: `Pick`, `Discover`, `Quit`, `Quit` — opens the
     /// detail modal, presses `d` (inert when the selected item isn't at
-    /// `clarify` — the modal stays open), then Esc/q twice to close and
+    /// `discovery` — the modal stays open), then Esc/q twice to close and
     /// exit.
     struct DiscoverThenQuit {
         calls: Cell<u32>,
@@ -1205,18 +1205,18 @@ mod tests {
     }
 
     /// tsk-1e3 D4: Discover only fires while the modal is open AND the
-    /// selected item's stage is `clarify` — mirrors the Pick test above
+    /// selected item's stage is `discovery` — mirrors the Pick test above
     /// (`PickTwiceThenQuit`/`work_item_enter_opens_detail_modal_and_pick_
     /// only_fires_on_second_enter`), driving `d` instead of `Enter` twice.
     #[test]
-    fn discover_button_fires_pane_open_when_item_is_at_clarify_stage() {
+    fn discover_button_fires_pane_open_when_item_is_at_discovery_stage() {
         let mut ui = DiscoverTwiceThenQuit { calls: Cell::new(0) };
         let mut app = App::empty();
         app.work_items = vec![herdr_fgos::app::WorkItem {
             id: "tsk-a".into(),
             title: "A".into(),
             goal_tier: "mvp".into(),
-            stage: "clarify".into(),
+            stage: "discovery".into(),
             status: "todo".into(),
             blocked_by: Vec::new(),
             blocks: 0,
@@ -1245,10 +1245,10 @@ mod tests {
     }
 
     /// tsk-1e3 D4: `d` is inert when the selected item's stage isn't
-    /// `clarify` — the modal stays open, nothing is opened, no status is
+    /// `discovery` — the modal stays open, nothing is opened, no status is
     /// set (the disabled button gives no keyboard action to fire).
     #[test]
-    fn discover_button_is_inert_when_item_is_not_at_clarify_stage() {
+    fn discover_button_is_inert_when_item_is_not_at_discovery_stage() {
         let mut ui = DiscoverThenQuit { calls: Cell::new(0) };
         let mut app = App::empty();
         app.work_items = vec![herdr_fgos::app::WorkItem {
@@ -1373,12 +1373,12 @@ mod tests {
         }
     }
 
-    fn clarify_todo_item(id: &str) -> WorkItem {
+    fn discovery_todo_item(id: &str) -> WorkItem {
         WorkItem {
             id: id.into(),
             title: id.into(),
             goal_tier: "mvp".into(),
-            stage: "clarify".into(),
+            stage: "discovery".into(),
             status: "todo".into(),
             blocked_by: Vec::new(),
             blocks: 0,
@@ -1664,30 +1664,30 @@ mod tests {
     }
 
     #[test]
-    fn auto_discover_selects_the_first_clarify_todo_item() {
+    fn auto_discover_selects_the_first_discovery_todo_item() {
         let items = vec![
             {
-                let mut item = clarify_todo_item("tsk-a");
+                let mut item = discovery_todo_item("tsk-a");
                 item.stage = "executing".into();
                 item
             },
-            clarify_todo_item("tsk-b"),
-            clarify_todo_item("tsk-c"),
+            discovery_todo_item("tsk-b"),
+            discovery_todo_item("tsk-c"),
         ];
-        let candidate = next_auto_discover_candidate(&items).expect("one clarify+todo item exists");
+        let candidate = next_auto_discover_candidate(&items).expect("one discovery+todo item exists");
         assert_eq!(candidate.id, "tsk-b", "first matching item wins, never a later one");
     }
 
     #[test]
-    fn auto_discover_skips_items_not_at_clarify_or_not_todo() {
+    fn auto_discover_skips_items_not_at_discovery_or_not_todo() {
         let items = vec![
             {
-                let mut item = clarify_todo_item("tsk-a");
+                let mut item = discovery_todo_item("tsk-a");
                 item.status = "doing".into();
                 item
             },
             {
-                let mut item = clarify_todo_item("tsk-b");
+                let mut item = discovery_todo_item("tsk-b");
                 item.stage = "decompose".into();
                 item
             },
@@ -1701,7 +1701,7 @@ mod tests {
         let mut app = App::empty();
         // `App::empty()`'s `orchestrator_settings` defaults to all-OFF
         // (tsk-2m5) — never explicitly flipped on in this test.
-        app.work_items = vec![clarify_todo_item("tsk-b")];
+        app.work_items = vec![discovery_todo_item("tsk-b")];
         let registry = CountingRegistry { calls: Cell::new(0) };
         let pane_orchestrator = RecordingPickOrchestrator {
             picked: std::cell::RefCell::new(Vec::new()),
@@ -1726,7 +1726,7 @@ mod tests {
         let mut ui = QuitAfterOneTick { calls: Cell::new(0) };
         let mut app = App::empty();
         app.orchestrator_settings.auto_discover = true;
-        app.work_items = vec![clarify_todo_item("tsk-b")];
+        app.work_items = vec![discovery_todo_item("tsk-b")];
         let registry = CountingRegistry { calls: Cell::new(0) };
         let pane_orchestrator = RecordingPickOrchestrator {
             picked: std::cell::RefCell::new(Vec::new()),
@@ -1769,7 +1769,7 @@ mod tests {
         let mut ui = QuitAfterOneTick { calls: Cell::new(0) };
         let mut app = App::empty();
         app.orchestrator_settings.auto_discover = true;
-        app.work_items = vec![clarify_todo_item("tsk-b")];
+        app.work_items = vec![discovery_todo_item("tsk-b")];
         let registry = RegistryWithAutoDiscoverPaneOpen {
             label: "fgos-auto-discover-tsk-b".to_string(),
         };
@@ -1834,7 +1834,7 @@ mod tests {
         let mut ui = QuitAfterOneTick { calls: Cell::new(0) };
         let mut app = App::empty();
         app.orchestrator_settings.auto_discover = true;
-        app.work_items = vec![clarify_todo_item("tsk-b")];
+        app.work_items = vec![discovery_todo_item("tsk-b")];
         let registry = CountingRegistry { calls: Cell::new(0) };
         let pane_orchestrator = AlwaysFailingPaneOrchestrator;
 
