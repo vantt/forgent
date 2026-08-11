@@ -390,7 +390,7 @@ either, only the following:
   goal (the item's own title/description) and everything already known
   (its `refs`, prior `view.discovery[id]` verdicts), then apply the
   returned `{clear, question?, verify?}` verdict yourself, through the
-  same engine verb `fgos-clarifying`/`fgos-coding-exploring` already use —
+  same engine verb `fgos-coding-exploring` already uses —
   `nextDiscoveryEdge` (`src/intake/discovery.mjs`, tsk-4b2 D3/D6) resolves
   `discovery -> exploring` through this verb when the item's `stage` is
   already `discovery`:

@@ -62,7 +62,7 @@ test('discover --verdict clear without --force still parks in awaiting-human on 
 
   const view = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(view.work[id].status, 'awaiting-human');
-  assert.equal(view.work[id].stage, 'clarify');
+  assert.equal(view.work[id].stage, 'discovery');
 });
 
 test('discover --verdict unclear --force is a silent no-op for --force (force only ever applies to the clear branch)', () => {
@@ -110,7 +110,7 @@ test('discover --verdict clear --force refuses when the item is already awaiting
 
   let view = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(view.work[id].status, 'awaiting-human');
-  assert.equal(view.work[id].stage, 'clarify');
+  assert.equal(view.work[id].stage, 'discovery');
 
   // Round 2: a clear --force call directly on the still-parked item.
   const round2 = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- forced', '--force']);
@@ -121,5 +121,5 @@ test('discover --verdict clear --force refuses when the item is already awaiting
   // Refused before touching state: stage/status stay exactly where round 1 left them.
   view = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(view.work[id].status, 'awaiting-human');
-  assert.equal(view.work[id].stage, 'clarify');
+  assert.equal(view.work[id].stage, 'discovery');
 });

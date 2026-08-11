@@ -912,11 +912,14 @@ function submitWork(dir, text, opts = {}) {
     // Per D8: every item entering through the public door starts at its
     // domain's Clarify-mapped stage — context-discovery must pass before
     // it can be worked. Generalized from the hardcoded 'clarify' (D8) to
-    // stay domain-aware (base-workflow-model D1-D4/S2): byte-identical
-    // 'clarify' for the default/omitted (coding) case, since
-    // stageForStep(DOMAINS.coding, 'Clarify') === 'clarify'. A domain with
-    // no Clarify-mapped stage (e.g. 'synthetic') falls back to its own
-    // first declared stage. `add` deliberately omits this (lazy default,
+    // stay domain-aware (base-workflow-model D1-D4/S2). tsk-qod D1/D2:
+    // coding no longer maps a Clarify stage at all (clarify is retired
+    // entirely, moved to a pre-item-creation Init helper), so
+    // stageForStep(DOMAINS.coding, 'Clarify') is now undefined and this
+    // falls straight through to `.stages[0]` — 'discovery', the domain's
+    // own entry point. A domain with no Clarify-mapped stage (e.g.
+    // 'synthetic', or 'coding' as of tsk-qod) falls back to its own first
+    // declared stage. `add` deliberately omits this (lazy default,
     // D8) — only `submit` needs an explicit entry stage.
     //
     // A no-op onUnrecognized here (review-20260717-self-improve-base-workflow
@@ -1033,15 +1036,16 @@ async function runVerb(verb, flags, positional, dir) {
         // stamps an entry stage the same way submit always has (line ~822
         // above) instead of leaving stage undefined -- explicit --stage
         // overrides; omitting it defaults to the domain's Clarify-mapped
-        // stage (byte-identical 'clarify' for the default/omitted coding
-        // case). Same silenced onUnrecognized as submit's own call: an
+        // stage, which for coding (tsk-qod D1/D2: Clarify retired entirely)
+        // falls straight through to `.stages[0]` — 'discovery'. Same
+        // silenced onUnrecognized as submit's own call: an
         // out-of-registry --domain is about to be rejected by addWork's
         // validateWork below anyway, so this must not fire a spurious
         // "folding to coding" warning first. An out-of-enum --stage value
         // is rejected downstream by store.mjs's validateWorkShape (the
         // single source for the STAGES domain), same "don't duplicate the
         // validation source" discipline --domain/--tier already follow.
-        stage: optionalField(flags.stage, 'add --stage requires a stage value (e.g. clarify/decompose/executing); omit --stage entirely to use the default.')
+        stage: optionalField(flags.stage, 'add --stage requires a stage value (e.g. discovery/decompose/executing); omit --stage entirely to use the default.')
           ?? stageForStep(getDomain(flags.domain, { onUnrecognized: () => {} }), 'Clarify')
           ?? getDomain(flags.domain, { onUnrecognized: () => {} }).stages[0],
         // Per work-graph-intelligence S2b (producer A): --discovered-from is

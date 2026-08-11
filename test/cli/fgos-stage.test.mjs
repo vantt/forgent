@@ -108,7 +108,7 @@ test('evolve from a .fgos/-less linked worktree with no --dir warns on stderr in
 // is the next stop before executing. This assertion changed its expected
 // destination from `executing` to `decompose` for exactly that reason (per
 // D2, an intentional contract change, not a test nerf).
-test('discover on a clear verdict moves the submitted item to stage discovery with the caller-supplied verify (tsk-4b2 D3: retargeted from decompose)', () => {
+test('discover on a clear verdict moves the submitted item to stage exploring with the caller-supplied verify (tsk-4b2 D3, tsk-qod: a fresh item starts at discovery now, so a clear verdict moves it one hop further to exploring)', () => {
   const cwd = tmpCwd();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
@@ -123,7 +123,7 @@ test('discover on a clear verdict moves the submitted item to stage discovery wi
   assert.equal(envelope.data.outcome, 'clear');
 
   const item = envelopeData(run(cwd, ['list']).stdout).work[id];
-  assert.equal(item.stage, 'discovery');
+  assert.equal(item.stage, 'exploring');
   assert.equal(item.verify, 'npm test -- proven');
 });
 
@@ -164,21 +164,21 @@ test('discover on a planning-stage item errors instead of silently dispatching t
 
   const result = run(cwd, ['discover', id]);
   assert.equal(result.status, 4);
-  assert.match(result.stderr, /not "clarify"/);
+  assert.match(result.stderr, /not "discovery"\/"exploring"/);
   assert.match(result.stderr, /fgos plan/);
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'planning', 'a rejected call must never mutate the item');
 });
 
-test('plan on a clarify-stage item errors instead of silently dispatching to resolveDiscovery (tsk-2b0 D1: hard split, no fallback)', () => {
+test('plan on a discovery-stage item errors instead of silently dispatching to resolveDiscovery (tsk-2b0 D1: hard split, no fallback)', () => {
   const cwd = tmpCwd();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
-  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'clarify');
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'discovery');
 
   const result = run(cwd, ['plan', id]);
   assert.equal(result.status, 4);
   assert.match(result.stderr, /not "planning"/);
   assert.match(result.stderr, /fgos discover/);
-  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'clarify', 'a rejected call must never mutate the item');
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'discovery', 'a rejected call must never mutate the item');
 });
 
 test('plan with no id is rejected as validation, exit 4', () => {
@@ -187,7 +187,7 @@ test('plan with no id is rejected as validation, exit 4', () => {
   assert.equal(result.status, 4);
 });
 
-test('discover on an unclear verdict parks the submitted item in awaiting-human with the question, still stage clarify', () => {
+test('discover on an unclear verdict parks the submitted item in awaiting-human with the question, still stage discovery', () => {
   const cwd = tmpCwd();
   const id = JSON.parse(run(cwd, ['submit', 'Do the ambiguous work']).stdout).data.id;
 
@@ -197,7 +197,7 @@ test('discover on an unclear verdict parks the submitted item in awaiting-human 
 
   const view = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(view.work[id].status, 'awaiting-human');
-  assert.equal(view.work[id].stage, 'clarify');
+  assert.equal(view.work[id].stage, 'discovery');
   assert.equal(view.gates[id].ask, 'Which service?');
 });
 
@@ -231,7 +231,7 @@ test('discover on a fresh cwd with no runner config bootstraps the default confi
 
   const view = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(view.work[id].status, 'todo', 'the refused call must never mutate the item');
-  assert.equal(view.work[id].stage, 'clarify');
+  assert.equal(view.work[id].stage, 'discovery');
 });
 
 test('discover --config pointing at a missing path still throws RunnerConfigError unchanged, exit 4', () => {
@@ -251,7 +251,7 @@ test('discover --config pointing at a missing path still throws RunnerConfigErro
 // OPPOSITE verdict from what `--verdict` supplies — proving the flag
 // actually bypassed the judge, not just that a real judge happened to agree.
 
-test('discover --verdict clear --verify moves the item to discovery with that exact verify, bypassing the configured (opposite) judge verdict (tsk-4b2 D3: retargeted from decompose)', () => {
+test('discover --verdict clear --verify moves the item to exploring with that exact verify, bypassing the configured (opposite) judge verdict (tsk-4b2 D3, tsk-qod: a fresh item starts at discovery now, one hop further to exploring)', () => {
   const cwd = tmpCwd();
   writeRunnerConfig(cwd, { clear: false, question: 'SHOULD NEVER SURFACE' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
@@ -261,7 +261,7 @@ test('discover --verdict clear --verify moves the item to discovery with that ex
   assert.equal(JSON.parse(result.stdout).data.outcome, 'clear');
 
   const view = envelopeData(run(cwd, ['list']).stdout);
-  assert.equal(view.work[id].stage, 'discovery');
+  assert.equal(view.work[id].stage, 'exploring');
   assert.equal(view.work[id].verify, 'npm test -- cli-caller');
   assert.notEqual(view.work[id].status, 'awaiting-human');
 });
@@ -277,7 +277,7 @@ test('discover --verdict unclear --question parks in awaiting-human with that ex
 
   const view = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(view.work[id].status, 'awaiting-human');
-  assert.equal(view.work[id].stage, 'clarify');
+  assert.equal(view.work[id].stage, 'discovery');
   assert.equal(view.gates[id].ask, 'Which provider?');
 });
 
@@ -548,7 +548,7 @@ test("evolve --submit <id> with a matching candidate creates exactly one new wor
   assert.equal(envelope.contract, 'fgos.v1');
   const item = envelope.data;
   assert.equal(item.status, 'todo');
-  assert.equal(item.stage, 'clarify');
+  assert.equal(item.stage, 'discovery');
   assert.match(item.description, /Self-improve candidate submit-item/);
   assert.match(item.description, /blocked/);
   assert.match(item.description, /verify-miss/);

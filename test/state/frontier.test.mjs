@@ -405,15 +405,18 @@ test('frontier(view, {step}) omitted defaults to "Execute", byte-identical to ev
   assert.deepEqual(frontier(view), frontier(view, { step: 'Execute' }));
 });
 
-test('frontier(view, {step: "Clarify"}) selects items at the clarify stage instead of executing', () => {
+test('frontier(view, {step: "Divide"}) selects items at the planning stage instead of executing', () => {
   const view = {
     work: {
-      atClarify: { ...item('atClarify', 'todo'), stage: 'clarify' },
+      atPlanning: { ...item('atPlanning', 'todo'), stage: 'planning' },
       atExecuting: { ...item('atExecuting', 'todo'), stage: 'executing' },
     },
   };
-  assert.deepEqual(frontier(view, { step: 'Clarify' }).map((i) => i.id), ['atClarify']);
-  assert.deepEqual(frontier(view, { step: 'Divide' }).map((i) => i.id), []);
+  assert.deepEqual(frontier(view, { step: 'Divide' }).map((i) => i.id), ['atPlanning']);
+  // tsk-qod D1/D2: `clarify` is retired as a coding stage entirely --
+  // stageForStep(domain, 'Clarify') is undefined for coding now, so no
+  // item (whatever its own `stage` field reads) can ever match this step.
+  assert.deepEqual(frontier(view, { step: 'Clarify' }).map((i) => i.id), []);
   assert.deepEqual(frontier(view).map((i) => i.id), ['atExecuting']);
 });
 
@@ -437,14 +440,16 @@ test('frontier(view, {step}) for a step the item\'s domain never maps excludes e
 // DIFFERENT steps sharing a footprint ------------------------------------
 
 test('frontierAcrossSteps: items at different steps are all included (the real gap this exists to close)', () => {
+  // tsk-qod D1/D2: coding's own Clarify step is retired -- no coding stage
+  // maps to it anymore -- so this uses the two steps coding still maps
+  // (Divide/Execute) rather than a third, now-impossible Clarify item.
   const view = {
     work: {
-      atClarify: { ...item('atClarify', 'todo'), stage: 'clarify' },
-      atDecompose: { ...item('atDecompose', 'todo'), stage: 'planning' },
+      atPlanning: { ...item('atPlanning', 'todo'), stage: 'planning' },
       atExecuting: { ...item('atExecuting', 'todo'), stage: 'executing' },
     },
   };
-  assert.deepEqual(frontierAcrossSteps(view).map((i) => i.id).sort(), ['atClarify', 'atDecompose', 'atExecuting']);
+  assert.deepEqual(frontierAcrossSteps(view).map((i) => i.id).sort(), ['atExecuting', 'atPlanning']);
 });
 
 test('frontierAcrossSteps: an item is never duplicated even though a missing `stage` field matches every step', () => {
@@ -472,13 +477,13 @@ test('frontierAcrossSteps re-sorts the unioned set by FRONTIER_ORDER_VERSION\'s 
   const view = {
     work: {
       // Declared executing first but with a WORSE priority than the
-      // clarify-stage item -- a naive concat of already-sorted per-step
+      // planning-stage item -- a naive concat of already-sorted per-step
       // arrays would keep 'atExecuting' first; a correct re-sort must not.
       atExecuting: { ...item('atExecuting', 'todo'), stage: 'executing', priority: 20 },
-      atClarify: { ...item('atClarify', 'todo'), stage: 'clarify', priority: 10 },
+      atPlanning: { ...item('atPlanning', 'todo'), stage: 'planning', priority: 10 },
     },
   };
-  assert.deepEqual(frontierAcrossSteps(view).map((i) => i.id), ['atClarify', 'atExecuting']);
+  assert.deepEqual(frontierAcrossSteps(view).map((i) => i.id), ['atPlanning', 'atExecuting']);
 });
 
 // --- tsk-38t-4 (decision record 0027, D1/D2/D3): isResolvedStatus ---------

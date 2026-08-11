@@ -119,10 +119,18 @@ function blocksForItem(work, view) {
 // precondition gate of its own (refusing before this function is ever
 // called) that needs the exact same domain-aware stage set -- shared here
 // rather than duplicating the `hasDiscoveryExploring` check in two files.
+//
+// tsk-qod D1/D2: `stageForStep(domain, 'Clarify')` now resolves to
+// `undefined` for a domain that retired `clarify` entirely (today: only
+// `coding`) -- `.filter(Boolean)` drops that phantom entry instead of
+// letting `undefined` leak into the CLI's own `validStages.includes(stage)`
+// precondition as if it were a real, valid stage name. A domain that still
+// has a real Clarify-mapped stage (e.g. `triage`) is unaffected -- its
+// `clarifyStage` is truthy and survives the filter unchanged.
 export function discoverableStages(domain) {
   const clarifyStage = stageForStep(domain, 'Clarify');
   const hasDiscoveryExploring = domain.stages?.includes('discovery') && domain.stages?.includes('exploring');
-  return hasDiscoveryExploring ? [clarifyStage, 'discovery', 'exploring'] : [clarifyStage];
+  return (hasDiscoveryExploring ? [clarifyStage, 'discovery', 'exploring'] : [clarifyStage]).filter(Boolean);
 }
 
 function nextDiscoveryEdge(work) {
@@ -131,7 +139,12 @@ function nextDiscoveryEdge(work) {
   const planningStage = stageForStep(domain, 'Divide');
   const hasDiscoveryExploring = discoverableStages(domain).length > 1;
 
-  if (work.stage === clarifyStage) {
+  // tsk-qod D1/D2: `clarifyStage !== undefined` guards against a
+  // false-positive match -- once a domain retires `clarify` entirely,
+  // `clarifyStage` is `undefined`, and `work.stage === undefined` would
+  // otherwise wrongly match any item whose own `stage` field is missing or
+  // corrupted, regardless of what domain it actually belongs to.
+  if (clarifyStage !== undefined && work.stage === clarifyStage) {
     return hasDiscoveryExploring
       ? { to: 'discovery', expectedStage: clarifyStage }
       : { to: planningStage, expectedStage: clarifyStage };

@@ -407,16 +407,21 @@ function applyEvent(view, event) {
       }
       // Settlement channel, third kind (mirrors the work.move case above):
       // a clarify-pass is the third settling event type per the S3-closeout
-      // design — settlement means "left clarify carrying a verify" (D10),
-      // which is what `from === 'clarify'` actually tests. Guarded on the
-      // origin rather than `to === 'executing'` (stage-decompose D2): once
-      // cell 3 retargets the discovery engine onto `clarify -> decompose`,
-      // that edge must still settle even though it no longer lands on
-      // `executing`; `decompose -> executing` does NOT settle here (it never
-      // carries a `from === 'clarify'`), so it stays undocumented until a
-      // future spec pass. Guarded on `item` for the same ghost-id no-op
-      // reason as work.move above.
-      if (item && from === 'clarify') {
+      // design — settlement means "left the domain's entry stage carrying a
+      // verify" (D10), originally what `from === 'clarify'` tested. tsk-qod
+      // D1/D2: `clarify` retires entirely for coding — `discovery`
+      // (`stages[0]`) is now that entry stage, so this gate moves with it;
+      // no live coding item can ever produce `from === 'clarify'` again
+      // (only the historical migration edges do, which never carry a
+      // `role`/`verify` settlement shape to begin with). Guarded on the
+      // origin rather than `to === 'executing'` (stage-decompose D2): the
+      // discovery engine's first real hop off `discovery` must still settle
+      // even though it no longer lands on `executing` directly;
+      // `exploring -> planning`/`planning -> executing` do NOT settle here
+      // (they never carry a `from === 'discovery'`), so they stay
+      // undocumented until a future spec pass. Guarded on `item` for the
+      // same ghost-id no-op reason as work.move above.
+      if (item && from === 'discovery') {
         if (!view.settlements) {
           view.settlements = {};
         }

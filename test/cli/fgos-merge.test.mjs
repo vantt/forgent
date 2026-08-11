@@ -817,10 +817,11 @@ test('merge list: a proposed item whose dep is already done is ready', () => {
   const data = envelopeData(run(cwd, ['merge', 'list']).stdout);
   assert.deepEqual(data, { ready: ['leaf'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], strandedByResolvedRoot: [], mergeTier: { leaf: 'root-to-main' }, supersededOut: [], stageByItem: data.stageByItem, tree: [{ id: 'leaf', title: 'Leaf', status: 'ready', children: [] }] });
   // tsk-4zj D6: both dep and leaf were `add`ed directly (no --stage),
-  // which stamps an explicit 'clarify' by default (add-stage-default-gap
-  // D1/D2); every subsequent `move`/`approve`/toProposed step only ever
-  // touches `status`, never `stage`, so both stay at 'clarify'.
-  assert.deepEqual(data.stageByItem, { dep: 'clarify', leaf: 'clarify' });
+  // which stamps an explicit entry-stage default ('discovery' as of
+  // tsk-qod D1/D2, 'clarify' before it — add-stage-default-gap D1/D2);
+  // every subsequent `move`/`approve`/toProposed step only ever touches
+  // `status`, never `stage`, so both stay at 'discovery'.
+  assert.deepEqual(data.stageByItem, { dep: 'discovery', leaf: 'discovery' });
 });
 
 test('merge list: a proposed item whose dep is NOT done waits, never ready', () => {
@@ -833,10 +834,11 @@ test('merge list: a proposed item whose dep is NOT done waits, never ready', () 
   assert.deepEqual(data, { ready: [], waiting: ['leaf'], conflicts: [], mergeSets: [], blockedOnSync: [], strandedByResolvedRoot: [], mergeTier: { leaf: 'root-to-main' }, supersededOut: [], stageByItem: data.stageByItem, tree: [{ id: 'leaf', title: 'Leaf', status: 'waiting', children: [] }] });
   // tsk-4zj D6: dep via addOk carries addOk's own explicit --stage
   // executing default; leaf was added via the raw CLI `add` (no --stage),
-  // which stamps 'clarify' by default (add-stage-default-gap D1/D2) —
-  // toProposed's internal addOk(cwd,'leaf') fails silently (leaf already
-  // exists) so only `status` moves, `stage` stays at its original 'clarify'.
-  assert.deepEqual(data.stageByItem, { dep: 'executing', leaf: 'clarify' });
+  // which stamps an entry-stage default ('discovery' as of tsk-qod D1/D2,
+  // 'clarify' before it — add-stage-default-gap D1/D2) — toProposed's
+  // internal addOk(cwd,'leaf') fails silently (leaf already exists) so
+  // only `status` moves, `stage` stays at its original 'discovery'.
+  assert.deepEqual(data.stageByItem, { dep: 'executing', leaf: 'discovery' });
 });
 
 test('merge list: two dep-clear proposed items sharing a footprint are excluded from ready and listed as conflicts', () => {
