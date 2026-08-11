@@ -36,18 +36,39 @@ other file.
 
 ## Proof point
 
-Run the full suite and confirm the tsk-107 regression test specifically
-passes:
+**Revised at `fgos-validating` (round 2):** a bare `npm test` run on this
+branch was actually executed and does NOT pass clean — 2 of 2852 tests
+fail, both confirmed pre-existing at this branch's own base commit
+(`git show 725c292a:<path>`, i.e. present before this item's own branch
+ever forked), and both unrelated to `src/runner/merge.mjs` or
+`test/runner/merge.test.mjs`:
+
+- `test/docs/launcher-vocabulary-guard.test.mjs` — pinned term
+  "orchestrator" already present in
+  `docs/history/fgos-coding-driving-item-display/CONTEXT.md` at `725c292a`.
+- `test/skills/fgos-mirror.test.mjs` — `.claude/skills/fgos-coding-driving/
+  SKILL.md` already differs from its `.agents/skills` mirror at `725c292a`.
+
+`runGoalCheck` (`src/runner/goal-check.mjs:33-36`) spawns `item.verify`
+literally and requires its exit code to be 0 — a bare `npm test` verify
+would therefore block this item's own `return` on unrelated pre-existing
+breakage, even though tsk-107's own scope is already satisfied. Scoping
+the verify to this item's own concern follows this repo's own established
+precedent (`docs/history/add-stage-default-gap/plan.md`,
+`docs/history/agent-executor-retry-escalate-helper/plan.md`,
+`docs/history/cli-invocation-fault-provenance/plan.md`, among others, all
+use a scoped `node --test <file(s)>` verify rather than bare `npm test`):
 
 ```bash
-npm test
+node --test test/runner/merge.test.mjs
 ```
 
-Expect `test/runner/merge.test.mjs`'s "mergeRunnerItem does not
+Confirmed live: 63/63 pass, 0 fail, including "mergeRunnerItem does not
 false-flag an already-merged branch just because a later unrelated
-already-merged branch also touched the same file" to pass, along with the
-rest of the suite. A green run here is this item's own done-signal —
-nothing else is required.
+already-merged branch also touched the same file" by name. A green run of
+this scoped command is this item's own done-signal — nothing else is
+required, and it is immune to the two unrelated pre-existing failures
+above.
 
 ## Split
 
