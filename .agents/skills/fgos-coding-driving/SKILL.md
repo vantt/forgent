@@ -79,17 +79,30 @@ asserted to generalize automatically to a domain that does not exist yet.
   == 'blocked'`) also always stops the loop immediately — a failed verify
   or a rejected merge is a real stop, never something to loop past silently.
 - **`parkReasonForStatus(domain, status) == 'natural-finish'` (today:
-  `status == 'awaiting-approval'`) also always stops the loop immediately**
-  (tsk-19j-4 — the safety gap an "unlimited" ceiling would otherwise hit on
-  its very first real run): this is `fgos return`'s own natural finish
-  line for the `executing`-stage skill, and there is no next stage-skill
-  registered past it for this loop to resolve — re-invoking the
-  `executing`-stage skill on an already-`awaiting-approval` item would be
-  invoking it on an item whose claim was already released, which is never
-  correct. Merge/approve past `awaiting-approval` stays out of this loop's
-  reach entirely (a human decision, same boundary `/fgOS:cook`'s own hard
-  rules already draw) — this skill's job ends here either way, ceiling or
-  not.
+  `status == 'awaiting-approval'`) is the DEFAULT ceiling, overridable —
+  never an unconditional stop.** A caller that supplies no ceiling stops
+  here, exactly as before (tsk-19j-4's original safety gap stays closed:
+  an "unlimited" drive still ends at the merge gate). A caller that
+  deliberately supplies a ceiling beyond it — `status:cleanup`, say —
+  drives past it, because there IS a next step registered past this point
+  once the advance-axis is read as position rather than stage (see
+  `## Advance-axis: position, not stage` below). Two things stay true
+  either way: re-invoking the `executing`-stage skill on an
+  already-`awaiting-approval` item is never correct (its claim was already
+  released), and this loop never itself performs the merge/approve action.
+- **The merge gate is protected by a launcher convention now, not by this
+  loop refusing — do not remove the convention (`0031`, `CONTEXT.md` D2).**
+  Because the stop above became overridable, the thing that keeps
+  `awaiting-approval → delivered` a human decision is this named
+  constraint: **no launcher ships a default ceiling past
+  `awaiting-approval`.** Every launcher in `plugins/fgOS/skills/**` either
+  omits `ceiling` or passes a `stage:*` one; a launcher that needs to work
+  the post-merge chain passes an explicit `status:*` ceiling naming exactly
+  how far it goes, and never one that would cross the merge edge itself.
+  Merge/approve stays a human decision, the same boundary `/fgOS:cook`'s
+  own hard rules already draw. A future session that finds this constraint
+  inconvenient is looking at the actual safety mechanism — change it by
+  superseding the decision, never by quietly widening a launcher's default.
 - **Anchored-by-open-children always stops the loop, checked every
   iteration, before the ceiling check** (tsk-19j-4 — the gap D14's original
   "retrofit is nearly free" claim missed): a `decompose` outcome can turn
@@ -211,9 +224,54 @@ asserted to generalize automatically to a domain that does not exist yet.
   ever needs exact-match ceilings in practice). `status:awaiting-approval`
   no longer needs to be passed explicitly (tsk-19j-4): it is one of the
   loop's own always-checked implicit stops now, same as `awaiting-human`/
-  `blocked`. Omitting `ceiling` entirely means "unlimited" — loop until a
+  `blocked`. Omitting `ceiling` entirely means "default" — loop until a
   person-shaped stop, an anchor, a no-progress read, or `awaiting-approval`
-  ends it.
+  ends it. A caller that genuinely means to work the post-merge chain says
+  so with an explicit `status:*` ceiling; it never gets there by accident.
+
+## Advance-axis: position, not stage
+
+Two sentences pin this whole section. The advance-axis is the item's
+position, not its stage. And, kept on one unwrapped line so a line-based
+search matches it:
+
+awaiting-approval is the DEFAULT ceiling, overridable
+
+A ceiling-less drive still ends there; an explicit further ceiling drives
+past it.
+
+Which axis this loop advances along is resolved from the item's **current
+position**, not fixed to `stage` (`CONTEXT.md` D1). Position means:
+
+- **while `stage` is still live** — `status` is one of `todo`/`doing`/
+  `blocked`/`awaiting-human` — the position IS the item's `stage`
+  (`clarify`/`discovery`/`exploring`/`decompose`/`executing` for coding).
+- **once `stage` is frozen** — from `awaiting-approval` onward, where no
+  further `stage` transition exists — the position IS the item's `status`
+  (`delivered`/`retrospective`/`cleanup`/…).
+
+`status` is the full-lifecycle axis (`src/state/status-fsm.mjs`'s
+`TRANSITIONS`: `todo → doing → awaiting-approval → delivered →
+retrospective → cleanup → done`, plus the `blocked`/`awaiting-human`/
+`wontfix` branches); `stage` is the sub-axis that only carries meaning
+across the front of it. Reading position this way is not a second
+mechanism bolted on: `skillMap` (`src/state/workflow-stage-graphs.mjs`)
+has held five stage names *and* the status name `retrospective` in one
+frozen object since decision record `0027` D5, which recorded that "the
+two vocabularies never collide" and that which lookup table a key belongs
+to is the caller's concern. The registry was already a position→skill
+map; this loop simply reads it as one. The three-role vocabulary this
+serves — `launcher` (1 unit, lets go) / `driver` (1 unit, stays) /
+`orchestrator` (N units, stays, the T0 aggregate layer) — is `0029` D17's
+own 2×2 grid; this skill is the `driver` cell.
+
+Nothing else about the loop changes. The same `skillForStage(domain,
+position)` lookup resolves the skill, the same `null` result means "this
+position is mechanical, nothing to load", and the same three
+`parkReasonForStatus` stops apply. In particular, `cleanup` deliberately
+registers no skill (`0027` D5: "pure harness, no skill ever loads for
+it"), so a loop that reaches it resolves nothing and stops — the caller's
+own mechanical verb covers that position, exactly as before.
 
 ## Loop
 
@@ -225,6 +283,10 @@ loop:
   read id's current {stage, status, domain} FRESH via `fgos list --id <id> --json`
   iterationStartStage, iterationStartStatus = stage, status   # for the no-progress check below
   domain = getDomain(item.domain)   # resolve early — parkReasonForStatus below needs the object, not the name
+  position = stage-is-live(status) ? (stage ?? <domain's own Execute-mapped stage>) : status
+             # see `## Advance-axis: position, not stage` — stage while it is
+             # live (status in todo/doing/blocked/awaiting-human), status once
+             # it is frozen (awaiting-approval onward)
 
   if parkReasonForStatus(domain, status) == 'human-question':
     stop. Report the parked question back to the caller. Never answer it here.
@@ -232,9 +294,10 @@ loop:
   if parkReasonForStatus(domain, status) == 'system-error':
     stop. Report the block back to the caller. Never retry blind.
 
-  if parkReasonForStatus(domain, status) == 'natural-finish':
-    stop. Report "returned, awaiting-approval" back to the caller. There is
-    no next stage-skill past this point in this loop's reach.
+  if parkReasonForStatus(domain, status) == 'natural-finish' AND no ceiling was supplied:
+    stop. Report "returned, awaiting-approval" back to the caller — the
+    default ceiling. A caller that supplied an explicit ceiling beyond this
+    point falls through to the ceiling check below instead.
 
   openChildren = every item in a fresh `fgos list --all --json` with
     `parent == id` and `status` NOT IN {delivered, retrospective, cleanup,
@@ -249,14 +312,15 @@ loop:
   else if ceiling is 'status:<name>':
     if status == name:
       stop. Report "reached ceiling at status <status>". Do not invoke anything this turn.
-  # (no ceiling supplied: never stops here — only a person-shaped stop or
-  # running out of registered stages/skills ends the loop)
+  # (no ceiling supplied: the natural-finish check above already stopped at
+  # `awaiting-approval` — the default ceiling — so nothing more is needed here)
 
-  skill = skillForStage(domain, stage ?? <domain's own Execute-mapped stage>)
+  skill = skillForStage(domain, position)
   if skill is null:
-    stop. Stage is mechanical (today: only `executing` for domains that
-    declare no skill there) — nothing left for THIS skill to load; the
-    caller's own next step (e.g. `fgos return`) already covers it.
+    stop. This position is mechanical (`executing` for a domain that
+    declares no skill there; `cleanup`, which deliberately registers none)
+    — nothing left for THIS skill to load; the caller's own next step
+    (e.g. `fgos return`, `fgos cleanup`) already covers it.
 
   if not shownItemOnce:
     print the claimed item's title/description (tsk-23z): read it fresh
@@ -425,9 +489,17 @@ rather than legitimate scope, that is new evidence for a follow-up item —
   invoked stage-skill's own engine-verb call
 - checking the ceiling after invoking the current stage's skill instead of
   before
-- continuing to loop past `parkReasonForStatus == 'human-question'`,
-  `'system-error'`, or `'natural-finish'` (today's `awaiting-human`,
-  `blocked`, `awaiting-approval`)
+- continuing to loop past `parkReasonForStatus == 'human-question'` or
+  `'system-error'` (today's `awaiting-human`, `blocked`) — both are
+  unconditional, no ceiling overrides either
+- continuing past `'natural-finish'` (today's `awaiting-approval`) when the
+  caller supplied NO ceiling — it is the default ceiling, so a
+  ceiling-less drive still ends there
+- widening a launcher's default ceiling past `awaiting-approval`, which is
+  the one convention keeping the merge gate a human decision now that this
+  loop no longer refuses structurally
+- fixing the advance-axis to `stage` instead of resolving `position` (stage
+  while live, status once frozen)
 - treating `status:<name>` as a ranked comparison instead of an exact match
 - reusing a stage/status snapshot from a prior loop turn instead of
   re-reading fresh

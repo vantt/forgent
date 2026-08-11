@@ -42,9 +42,9 @@ stage-to-skill lookup or the claim-timing logic itself.
 2. **Drain the queue, one id at a time, via `fgos-coding-driving`
    (tsk-19j-4).** While the queue is non-empty, take the id at its front and
    invoke the `fgos-coding-driving` skill for it, no `ceiling` (omit it —
-   the driver's own implicit stops already cover everything this step used
-   to hand-roll: `awaiting-approval`, an anchor by open children, a
-   person-shaped stop, or a no-progress read). This skill never re-derives
+   the driver's own stops already cover everything this step used to
+   hand-roll: `awaiting-approval` as the default ceiling, an anchor by open
+   children, a person-shaped stop, or a no-progress read). This skill never re-derives
    which skill a stage maps to, never applies a stage/status transition
    itself, and never decides claim-timing on its own — the driver already
    owns all three (its own hard rules: registry-only stage lookup, "engine's

@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- `fgos-coding-driving` now resolves each iteration's next step from the
+  item's **position** rather than always from `stage`: `stage` while it is
+  live, `status` once it freezes at `awaiting-approval`. This makes the
+  driver able to carry an item through the post-merge chain
+  (`retrospective` → `cleanup`) that previously needed hand-rolled
+  sequencing in each launcher. No registry or code change was required —
+  `skillMap` has mixed stage and status keys since decision `0027` D5.
+- `awaiting-approval` changes from an unconditional stop into the driver's
+  **default, overridable ceiling**. A caller that supplies no ceiling stops
+  there exactly as before, so existing behavior is unchanged; a caller that
+  deliberately passes a further `status:*` ceiling can drive past it. The
+  merge gate stays a human decision, now protected by a named launcher
+  convention (no launcher ships a default ceiling past `awaiting-approval`)
+  rather than by the driver refusing structurally.
+
 ### Removed
 
 - The `orchestrator` word ban (`test/docs/launcher-vocabulary-guard.test.mjs`
