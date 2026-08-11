@@ -2,7 +2,37 @@
 
 ## 1. Trạng thái hiện tại
 
-Vòng 4. Chủ sản phẩm chặn việc chốt vội, yêu cầu đánh giá lại chính mô
+**Vòng 8 (2026-08-11) — kết luận Làn B của vòng 6 bị RÚT LẠI.** Chủ sản
+phẩm phản biện: *"tại sao không đánh giá cơ hội từng task mà lại quét
+thành bộ? vì nếu làm theo task thì stage compound được kích, chúng ta sẽ
+kích hoạt làm luôn"*. Kiểm lại báo cáo phép thử thì phản biện đúng — vòng
+6 lẫn giữa **chọn tiêu chí** (cần quần thể, một lần, offline — phép thử
+đã làm rồi) và **áp tiêu chí lúc chạy** (chỉ cần bản thân item). Tín hiệu
+phép thử tìm ra, `round-count-per-item`, là thuộc tính của CHÍNH item đó.
+Nên phần chọn lọc không mất, nó đổi từ **xếp hạng tương đối** (cần quần
+thể) sang **ngưỡng tuyệt đối** (không cần). Và per-item còn mạnh hơn ở
+đúng ràng buộc khó nhất R6: quét-theo-lô là một bước cần-người-nhớ-chạy,
+đúng hình dạng đã đo hỏng 32%; chạy tại compound stage thì không có bước
+mới nào để quên. Chi tiết §5 vòng 8, §6.4 viết lại.
+
+**Chốt được nghĩa của chữ "bản nháp" — trống suốt 4 vòng.** Em tra: fgOS
+KHÔNG có `lifecycle`/`draft` ở đâu cả; chữ này mượn từ bee, chưa ai định
+nghĩa trong fgOS. Hai nghĩa rất khác nhau (bài đã viết sẵn / chất liệu đã
+trích), và **chi phí của nháp quyết định ngưỡng phải chặt tới đâu** — chỗ
+dính nhau chưa ai nối. Chủ sản phẩm chọn **chất liệu đã trích**, kèm mở
+rộng phạm vi: *"ý tưởng câu chuyện và chất liệu thật cho câu chuyện với
+đầy đủ dẫn chứng, struggle/problem → solution, trao đổi thật, code thật,
+commit thật"*. Xem §3 dòng M/N, §6.6.
+
+**Chưa mint D-ID nào cho hai điều trên** — cả hai mới qua một vòng, luật
+D4 đòi đứng vững qua hơn một vòng. Chờ vòng 9 xác nhận.
+
+Còn mở: đo hình dạng struggle→solution ở diện rộng (mới có 2 ví dụ); đặt
+ngưỡng ở đâu; hai trục có cần triển khai cùng lúc không; va giữa
+D-tsk12m-B với mô hình mới; doctor check index drift gộp vào `tsk-3ip`
+hay tách.
+
+*Vòng 4 (giữ lại để đối chiếu):* Chủ sản phẩm chặn việc chốt vội, yêu cầu đánh giá lại chính mô
 hình 5 pha vòng 3 phác ra. Session đo dữ liệu thật rồi tự phê bình, kết
 quả: **rút lại một khẳng định của vòng 3** (`friction` KHÔNG phải chất
 liệu kể chuyện — 92% là telemetry máy; vòng 3 suy rộng từ một bản ghi
@@ -83,6 +113,14 @@ Diataxis hiện có (không đụng, không pha trộn — hard rule của
 | J2 | Tín hiệu xếp hạng ứng viên — câu trả lời SƠ BỘ cho dòng F | RÕ (phép thử `tsk-1hy`) | **Số vòng trên mỗi item** (round-count). Arc thật tập trung ở item có nhiều entry theo ngày; item một-hai entry gần như không mang chuyện. Đến từ dữ liệu, không phải trực giác — đúng kỷ luật B6b. CHƯA đo bằng AUC (fgOS vẫn chưa có bộ nhãn tay), nên đây là ứng viên có căn cứ, chưa phải tín hiệu đã chứng minh |
 | J3 | Vỉa (a) còn TẦNG KHUÔN MẪU THỨ HAI chưa lọc | RÕ (phép thử `tsk-1hy`) | Ngoài 4 khuôn mẫu của decision-rationale đã lọc, vỉa ask còn khuôn mẫu riêng: `"Không phán được rõ ràng — cần người xác nhận thủ công."`, `"Đề xuất: không chia (pass-through) — Item gốc có risk cao (heavy)..."` (lặp 4 lần nguyên văn trong CÙNG một item). Thiết kế nào đọc thẳng vỉa (a) phải lọc thêm tầng này |
 | K | **Bước hậu-kỳ dựa vào "có người nhớ" đang hỏng ở 32%** | **RÕ (đo 2026-08-09) — thí nghiệm tự nhiên, miễn phí** | 220 tài liệu end-user trên đĩa (`how-to`/`explanation`/`reference`/`decisions`), 151 có trong `docs/enduser-docs-index.json`, **70 thiếu = 32%**; 0 mục ma (index đúng nguyên vẹn, chỉ TỤT LẠI). Có hẳn skill `fgos-indexing` mà nhiệm vụ duy nhất là regenerate index sau mỗi lần compound-learn ghi doc — không được chạy. 6 doctor check đang đăng ký (`config-not-stale`, `main-checkout-hook-wired`, `node-version-and-git`, `root-drift`, `shell-integration-sourced`, `tool-registry-configured`), **không cái nào canh chuyện này**. Đây KHÔNG còn là rủi ro giả định: nó là tỉ lệ hỏng đã đo, trong đúng subsystem này |
+| L | **Quét theo lô hay chạy per-item tại compound stage** | **TRẢ LỜI V8** (chưa D-ID, chờ vòng 9) — per-item | Vòng 6 kết luận "tín hiệu nằm ở quần thể nên phải quét lô". Sai: lẫn giữa CHỌN tiêu chí (cần quần thể, một lần, offline — phép thử `tsk-1hy` đã làm) và ÁP tiêu chí lúc chạy (chỉ cần item đó). `round-count-per-item` là thuộc tính per-item. Chọn lọc đổi hình thức: **xếp hạng tương đối → ngưỡng tuyệt đối**, không mất. Vòng 4 lỗi (2) "triage cần quần thể" đúng lúc chưa đo, nhưng phép thử vòng 5 đổi sự thật: arc nằm TRONG một item (`tsk-19j` 15 entry, `tsk-1ca` 25 entry), không trải qua nhiều item — vòng 6 giữ kết luận sau khi chứng cứ đỡ nó đã thay đổi. **Đây là lần thứ BA** một kết luận đứng trên chứng cứ lỗi thời (lần 1: `friction`, dòng G; lần 2: R1 hàng đợi 54) |
+| L2 | Per-item mạnh hơn ở đúng R6 | RÕ (suy ra từ L) | Quét-theo-lô LÀ một bước cần-người-nhớ-chạy — đúng hình dạng `fgos-indexing` đã đo hỏng 32% (dòng K). Vòng 6 trả lời bằng "thêm doctor check canh nó" = vá vấn đề lẽ ra đừng tạo. Compound stage đã tự kích hoạt sẵn: `pickNextRetrospectiveItem` (`src/state/retro-pool.mjs`) vốn nhận nguyên `rawEvents`, đếm round-count của item đó là chuyện tại chỗ. Cộng ưu tiên AGENTS.md #1 Ship Faster + #2 Release con người: không verb mới, không hàng đợi mới, không ai phải lên lịch |
+| L3 | Cái giá thật của ngưỡng tuyệt đối | RÕ, phải mang theo | Xếp hạng tương đối luôn ra đúng N cái và tự hiệu chuẩn. Ngưỡng tuyệt đối thì không: đặt thấp → ngập nháp, cao → cả tháng không ra gì, và nếu item trung bình dày lên thì vạch cũ vô nghĩa. Cần xem lại định kỳ / để trong config. **Không** phải lý do dựng lại cơ chế quét |
+| M | **"Bản nháp" nghĩa là gì** | **TRẢ LỜI V8** (chưa D-ID) — chất liệu đã trích, KHÔNG phải bài viết | Trống suốt 4 vòng: fgOS không có `lifecycle`/`draft` ở đâu (`frontmatter.mjs` chỉ là codec `key: value` chung, không ai đọc field nào tên vậy); chữ mượn từ bee. Hai nghĩa: (A) **bài đã viết sẵn** — tốn một lượt LLM/item, không ai duyệt thì đốt token cho 100 bài không đọc, ngưỡng phải CHẶT; (B) **chất liệu đã trích** — gần như 0 chi phí, cơ học, không ai duyệt thì chỉ là dữ liệu nằm im, ngưỡng LỎNG được. **Chi phí của nháp quyết định ngưỡng phải chặt tới đâu** — chỗ dính nhau chưa ai nối trong 7 vòng. Chủ sản phẩm chọn **(B)**. Ba căn cứ đã có sẵn: lời chính chủ sản phẩm vòng 3 (thu chất liệu = ghi thẳng, không hỏi, rẻ, ít token); OKF `promote` trả ứng viên trích nguyên văn và KHÔNG BAO GIỜ ghi (`writes: []`); nỗi lo "nghĩa địa nháp" tan phần lớn vì dữ liệu nằm im không tốn gì. **Nhược điểm thật:** B đẩy phần VIẾT về phía người — nâng cấp việc TÌM, không nâng cấp việc VIẾT |
+| N | **Phạm vi chất liệu rộng hơn chỗ phép thử đã đo** | MỚI (vòng 8) — nối được về cơ học, hình dạng chưa đo | Chủ sản phẩm yêu cầu chất liệu gồm: struggle/problem → solution, **trao đổi thật, code thật, commit thật**. Phép thử `tsk-1hy` CHỈ đọc `.fgos/events.jsonl` = chỉ nửa "trao đổi thật". Nửa code/commit chưa từng đo — xem N2 (khoá nối) và N3 (hình dạng arc) |
+| N2 | Khoá nối item ↔ commit | RÕ (đo vòng 8) | **Không dùng được branch**: `fgw/tsk-19j` đã bị xoá sau merge, commit còn trên `main`, branch thì không. **Không dùng được `branchHeadAtTake`**: `tsk-2zv` ghi rõ mỗi lần reclaim nó bị tính lại theo tip hiện tại, **nuốt mất commit làm trước đó** — dùng làm mốc gom là kế thừa đúng bug đó. **Dùng được: quy ước commit message `type(id): subject`.** Đo: 800 commit gần nhất phủ **85%** (560 mang id + 120 merge `fgw/`), toàn bộ 3157 commit phủ 67% — quy ước mạnh dần theo thời gian. 15% rơi rụng gần đây gần như toàn dọn dẹp (`chore(fgos): sync event log`, `merge: sync main into fgw/...`), vốn không mang chuyện |
+| N3 | Gãy mới: công việc thật nằm ở item CON | RÕ (đo vòng 8) | `tsk-19j` — chính item phép thử tìm ra arc hay nhất — code thật nằm ở `tsk-19j-2/-3/-4`. Gom commit khớp đúng một id sẽ **hụt mất phần code**. Phải đi xuống cây con (field `parent` đã có). Chưa ai nêu trong 7 vòng trước |
+| N4 | Hình dạng struggle → solution có dày không | **CHƯA ĐO** | Phép thử tìm được 2 ví dụ có đủ hình dạng (`tsk-19j` có câu đóng vấn đề "đúng, không còn câu hỏi mở nào nữa"; `tsk-1ca` có người bẻ lái giữa chừng). Nhưng 2 ví dụ đúng bằng cỡ mẫu đã hai lần làm thảo luận này rút lại kết luận (dòng G, R1). Chưa đo diện rộng: **bao nhiêu item mang đủ CẢ HAI nửa**, không chỉ nửa "bí" |
 | I | Hàng đợi tổng hợp đã tồn tại thật | RÕ (đo vòng 4) | **54 item đứng ở `retrospective`**, 16 `delivered`, 99 `cleanup`, 166 `done` / tổng 435. Đọc ngược: tổng hợp hiện đắt và làm theo TỪNG ITEM (phán đoán LLM + viết doc + commit mỗi item) — hàng đợi 54 chính là bằng chứng thiết kế per-item hiện tại đã không co giãn nổi. Hệ quả trực tiếp: mọi phương án THÊM pha vào mỗi item đều đi ngược, gồm cả đường ống 5 pha ở §6 |
 
 ## 4. Quyết định đã chốt
@@ -384,12 +422,59 @@ Diataxis hiện có (không đụng, không pha trộn — hard rule của
 
   **Câu (1) — mint Làn B:** chưa được trả lời trong vòng này, vẫn treo.
 
+- **2026-08-11 (vòng 8 — chủ sản phẩm phản biện, Làn B bị rút lại)** —
+  Session trình bày lại phân tích Làn B bằng tiếng Việt (theo yêu cầu),
+  rồi hỏi có mint không. Chủ sản phẩm không gật mà phản biện.
+
+  **(a) Phản biện đúng, vòng 6 sai.** Nguyên văn: *"tại sao không đánh giá
+  cơ hội từng task mà lại quét thành bộ. vì nếu làm theo task thì stage
+  compound được kích chúng ta sẽ kích hoạt làm luôn."* Session đọc lại
+  `reports/tsk-1hy-...report.md` để kiểm thay vì bảo vệ kết luận cũ. Câu
+  kết luận thật của phép thử (dòng 96-100): *"A future design should weight
+  by **round-count-per-item**"* — đây là thuộc tính của CHÍNH item, không
+  cần hàng xóm. Vòng 6 lẫn hai việc: chọn tiêu chí (cần quần thể, MỘT LẦN,
+  offline — phép thử đã làm xong) và áp tiêu chí lúc chạy (chỉ cần item
+  đó). Chi tiết §3 dòng L/L2/L3.
+
+  Đáng ghi hơn cả kết luận: **vòng 4 lỗi (2) "triage cần quần thể" đúng
+  vào lúc nó được viết**, nhưng phép thử vòng 5 đã đổi sự thật (arc nằm
+  TRONG một item, không trải qua nhiều item). Vòng 6 giữ nguyên kết luận
+  vòng 4 sau khi chứng cứ đỡ nó đã bị rút chân. Nguyên tắc làm việc rút
+  ra: **sau mỗi phép thử phải rà lại xem kết luận CŨ nào vừa mất chỗ dựa,
+  không chỉ đọc kết quả mới.** Đây là lần thứ ba trong thảo luận này
+  (dòng G, R1, và L).
+
+  **(b) Câu hỏi thứ hai của chủ sản phẩm lộ ra một lỗ trống 4 vòng:**
+  *"bỏ quần thể sinh luôn bản nháp? bản nháp này là gì"*. Session tra
+  repo: fgOS **không có** `lifecycle`/`draft` ở đâu cả. Chữ "bản nháp" đi
+  qua 4 vòng chưa từng được định nghĩa. Hai nghĩa khác nhau về chi phí một
+  trời một vực, và **chi phí nháp quyết định ngưỡng phải chặt tới đâu** —
+  hai thứ trước giờ bàn rời nhau. Xem §3 dòng M.
+
+  **(c) Chủ sản phẩm chọn nghĩa B + mở rộng phạm vi chất liệu.** Nguyên
+  văn: *"B, chất liệu đã trích thôi. ở đây không cần bài viết, này là ý
+  tưởng câu chuyện và chất liệu thật cho câu chuyện với đầy đủ dẫn chứng,
+  struggle/problem → solution, trao đổi thật, code thật, commit thật."*
+
+  **(d) Phần "code thật, commit thật" mở vỉa ra ngoài chỗ đã đo** — phép
+  thử chỉ đọc `.fgos/events.jsonl`. Session đo khoá nối trước khi gật:
+  branch không dùng được (đã xoá sau merge), `branchHeadAtTake` không dùng
+  được (`tsk-2zv` ghi rõ nó nuốt commit khi reclaim), quy ước commit
+  message dùng được (**85%** trên 800 commit gần nhất). Kèm một gãy mới
+  chưa ai nêu: công việc thật nằm ở item CON (`tsk-19j` → `tsk-19j-2/-3/
+  -4`). Chi tiết §3 dòng N/N2/N3/N4.
+
+  **(e) Chưa mint gì.** Cả kết luận per-item lẫn nghĩa B đều mới qua một
+  vòng — luật D4 đòi đứng vững qua hơn một vòng. Chờ vòng 9.
+
 ## 6. Thiết kế đã chốt {#design}
 
-**Tái sinh vòng 4.** Chỉ D-tsk28x-1 đã chốt thật. §6.1-6.3 giữ nguyên từ
-vòng 3 (vẫn đứng vững). **§6.4 bị vòng 4 bác phần lớn và đã viết lại** —
-đường ống 5 pha của vòng 3 giờ là MỘT trong bốn phương án, không còn là
-"thiết kế". Viết cho người đọc không có lịch sử hội thoại.
+**Tái sinh vòng 8.** Đã chốt thật: D-tsk28x-1 (hai trục), D-tsk28x-2
+(tách dep `tsk-12m`). §6.1-6.3 giữ nguyên từ vòng 3 — chưa vòng nào bác,
+vẫn đứng vững. **§6.4 viết lại lần hai ở vòng 8**: Làn B của vòng 6 bị
+rút, phương án 3 (per-item + ngưỡng) lên thay. **§6.6 là phần mới của
+vòng 8** — định nghĩa "bản nháp", chỗ trống suốt bốn vòng. Viết cho người
+đọc không có lịch sử hội thoại.
 
 ### 6.1 Vấn đề gốc: một trục gánh ba việc
 
@@ -485,31 +570,36 @@ lệch quy mô vấn đề gốc. Số đo chặn lại: **54 item đang đứng
   Trả lời "sẽ có kỷ luật" không tính là trả lời — bước đang tụt cũng đã
   có kỷ luật bằng lời.
 
-**Bốn phương án — chấm lại vòng 6, co còn hai:**
+**Đọc lại R3 (vòng 8) — ràng buộc này bị đọc quá rộng.** Nguyên văn R3:
+*"cái gì cần xếp hạng thì phải chạy trên quần thể"*. Đúng cho **xếp hạng
+tương đối** (so item với nhau, lấy top N — buộc phải có mặt đủ để so).
+KHÔNG đúng cho **ngưỡng tuyệt đối** (mỗi item tự đo mình so với một vạch).
+Vòng 6 đọc R3 theo nghĩa thứ nhất rồi loại phương án 3 bằng nghĩa đó. Cả
+hai đều là chọn lọc; chỉ nghĩa thứ nhất cần quần thể.
 
-| # | Hình dạng | Trạng thái sau vòng 6 |
+**Bốn phương án — chấm lại vòng 8:**
+
+| # | Hình dạng | Trạng thái sau vòng 8 |
 |---|---|---|
 | 1 | **Chỉ mặt đọc** — verb/script truy vấn chất liệu đã có, không state mới, không gate | **ĐÃ LÀM RỒI** — chính là `tsk-1hy`, đã merge. Không còn là ứng viên; nó là phép thử đã hoàn thành, và kết quả của nó là đầu vào cho việc chấm này |
-| 2 | **Hai làn tách theo chi phí phán đoán** — Làn A (cơ học, per-item, chạy thẳng): changelog. Làn B (phán đoán, quét theo lô): quét pool, xếp hạng, đẻ ứng viên dạng `draft`, người curate bất đồng bộ | **CÒN LẠI — ứng viên duy nhất cho nửa storytelling.** Làn A đã xong (`tsk-469` + `tsk-3ip`) |
-| 3 | **Chỉ thêm `draft` vào compound hiện tại** | **LOẠI cho mục đích storytelling** — per-item, không xếp hạng trên quần thể. Nhưng phép thử đã đo: tín hiệu NẰM Ở QUẦN THỂ (arc tập trung ở item nhiều vòng — `tsk-19j` 15 entry, `tsk-1ca` 25 entry; item một-hai entry gần như rỗng). Trượt R3 vì lý do đã đo, không phải lý do lý thuyết. *Vẫn có thể hữu ích cho mục đích khác — chỉ loại cho storytelling* |
-| 4 | **Đường ống 5 pha (bản vòng 3)** | **KHÔNG PHẢI LỰA CHỌN ĐỘC LẬP.** R1 sụp nên nó hết bị chặn bởi R1, nhưng R2 vẫn chặn (cửa gác chặn). Đổi cửa gác thành trạng thái `draft` để thoả R2 thì nó **biến thành đúng phương án 2**. Tức 4 = 2 + một cửa chặn không cần thiết |
+| 2 | **Hai làn tách theo chi phí phán đoán** — Làn A (cơ học, per-item): changelog. Làn B (quét theo lô, xếp hạng trên quần thể) | **LÀN B BỊ RÚT LẠI (vòng 8).** Làn A vẫn đúng và đã xong (`tsk-469` + `tsk-3ip`). Làn B trượt chính R6: quét-theo-lô LÀ một bước cần-người-nhớ-chạy, đúng hình dạng đã đo hỏng 32% (§3 dòng K). Vòng 6 vá bằng "thêm doctor check canh nó" — vá một vấn đề lẽ ra đừng tạo ra. Và tiền đề của nó (cần quần thể) sai, xem §3 dòng L |
+| 3 | **Sinh nháp ngay tại compound stage, per-item** — cộng NGƯỠNG để không gom hết | **ĐƯỢC CHỌN (chưa mint, chờ vòng 9).** Lý do loại ở vòng 6 (trượt R3) không đứng: tín hiệu phép thử tìm ra là per-item. Xem bảng chấm dưới |
+| 4 | **Đường ống 5 pha (bản vòng 3)** | **KHÔNG PHẢI LỰA CHỌN ĐỘC LẬP.** R1 sụp nên hết bị chặn bởi R1, nhưng R2 vẫn chặn (cửa gác chặn). Bỏ cửa chặn để thoả R2 thì nó biến thành phương án 2 — vốn cũng vừa bị rút |
 
-**Chấm Làn B (phương án 2) theo R2-R6 — nửa storytelling:**
+**Chấm phương án 3 (per-item + ngưỡng, nháp = chất liệu) theo R2-R6:**
 
 | Ràng buộc | Thoả? | Căn cứ |
 |---|---|---|
-| R2 — không cửa chặn | ✓ | Đẻ ứng viên dạng `draft`, người curate bất đồng bộ |
-| R3 — xếp hạng trên quần thể | ✓ | Quét theo lô, đúng chỗ phép thử đo được tín hiệu |
-| R4 — không gom hết | ✓ **nhưng phải lọc HAI tầng** | Phép thử phát hiện vỉa ask còn tầng khuôn mẫu thứ hai chưa lọc (§3 dòng J3) |
-| R5 — tách cơ học/phán đoán | ✓ | Làn A đã xong rồi, tách sẵn |
-| R6 — không tụt | ✓ **có câu trả lời ĐÃ CHỨNG MINH** | Đăng ký doctor check. `tsk-3ip` làm rồi (`changelog-unreleased-stale`), `tsk-1m0` làm rồi (`enduser-docs-index-stale`, hiện FAIL đúng: "85/237 tài liệu chưa có trong index"). R6 xưa cấm trả lời bằng lời hứa — giờ có tiền lệ chạy thật, hai lần |
+| R2 — không cửa chặn | ✓ | Sinh bản ghi chất liệu rồi đi tiếp ngay; người xem lúc nào tuỳ họ. Không ai đứng chờ |
+| R3 — xếp hạng | ✓ **theo nghĩa đúng** | Chọn lọc bằng **ngưỡng tuyệt đối** trên thuộc tính per-item, không phải xếp hạng tương đối. Xem đoạn "Đọc lại R3" ở trên |
+| R4 — không gom hết | ✓ **nhờ có ngưỡng** | Ngưỡng chính là chỗ chống "gom hết": dưới vạch thì bỏ qua, không sinh gì. Vẫn phải lọc tầng khuôn mẫu thứ hai của vỉa ask (§3 dòng J3) |
+| R5 — tách cơ học/phán đoán | ✓ | Làn A (changelog) đã xong và đi đường riêng. Nháp ở đây là **chất liệu**, cũng cơ học — phần phán đoán dời hẳn sang người, xem §6.6 |
+| R6 — không tụt | ✓ **mạnh hơn Làn B** | Không có bước mới nào để quên: compound stage đã tự kích hoạt sẵn cho mỗi item. `pickNextRetrospectiveItem` (`src/state/retro-pool.mjs`) vốn đã nhận nguyên `rawEvents` |
 
-**Kết luận đề xuất (CHƯA mint):** nửa storytelling đi theo **Làn B của
-phương án 2** — verb quét theo lô trên quần thể, xếp hạng, đẻ ứng viên
-dạng `draft`, người curate bất đồng bộ, kèm doctor check canh chính nó.
-Không phải vì nó ăn điểm cao nhất trên giấy, mà vì **ba phương án kia đã
-tự loại**: 1 đã làm, 4 là 2 đội thêm cửa chặn, 3 trượt đúng chỗ phép thử
-vừa đo.
+**Cái giá phải mang theo, không được giấu:** ngưỡng tuyệt đối không tự
+hiệu chuẩn. Đặt thấp → ngập; cao → cả tháng không ra gì; item trung bình
+dày lên thì vạch cũ vô nghĩa. Cần để trong config + xem lại định kỳ (§3
+dòng L3).
 
 **Ba điều còn chưa chắc, không được lờ khi thi công:**
 
@@ -517,10 +607,10 @@ vừa đo.
    chọn được tín hiệu vì có bộ nhãn tay để đo AUC; fgOS chưa có. Không
    khoá round-count như thể đã đo.
 2. **Tầng khuôn mẫu thứ hai của vỉa ask chưa ai lọc** — phải lọc trước
-   khi xếp hạng, kẻo xếp hạng trên rác.
-3. **Chi phí curate của người chưa ai ước.** Làn B đẻ ứng viên; không ai
-   duyệt thì thành nghĩa địa `draft` — đúng rủi ro nêu từ vòng 4, vẫn
-   chưa xử.
+   khi áp ngưỡng, kẻo đo trên rác.
+3. **Hình dạng struggle → solution chưa đo diện rộng** (§3 dòng N4) — mới
+   có 2 ví dụ. Rủi ro "nghĩa địa nháp" của vòng 4 thì đã nhẹ hẳn nhờ chọn
+   nghĩa B: bản ghi chất liệu nằm im không tốn gì (§3 dòng M).
 
 Ghi chú sự thật hiện trạng, đúng cho mọi phương án: `fgos compound` chạy
 khi item ở `retrospective`, tức SAU cổng duyệt `awaiting-approval`
@@ -548,6 +638,70 @@ Ba bước bắt buộc, theo thứ tự: (1) tách bài học thành đơn vị
 hoá được, (2) xếp hạng khi lấy ra — không bao giờ "lấy tất", (3) chọn tín
 hiệu xếp hạng bằng đo. Bước 1 không giải quyết gì nếu bước 2 vẫn là "lấy
 tất".
+
+### 6.6 "Bản nháp" là gì — chất liệu đã trích, không phải bài đã viết
+
+Chữ này đi qua bốn vòng mà chưa lần nào được định nghĩa; nó mượn từ bee
+(`lifecycle: draft|active|superseded|archived`), còn fgOS thì **không có
+khái niệm nào tương đương** — không `lifecycle`, không `draft`;
+`frontmatter.mjs` chỉ là codec `key: value` phẳng, không ai đọc field nào
+tên như vậy. Vòng 8 đóng lỗ này.
+
+**Nháp KHÔNG phải một bài đã viết chờ duyệt.** Nó là **một bản ghi chất
+liệu**: ý tưởng câu chuyện, kèm dẫn chứng thật, chưa có văn, chưa có phán
+đoán biên tập. Người đọc bản ghi rồi tự quyết có viết hay không; lúc gật
+mới có ai đó viết.
+
+Ba căn cứ, đều đã nằm sẵn trong thảo luận này từ trước:
+
+1. Chính lời chủ sản phẩm vòng 3: *thu chất liệu thì ghi thẳng, liên tục,
+   không cần hỏi — nhanh, rẻ, ít token, không cắt ngang luồng khác*; còn
+   *tổng hợp mới là chỗ có phán xét của người*. Bản ghi chất liệu nằm
+   đúng bên "thu", nên nó được phép chạy tự do.
+2. OKF `promote` (§5 vòng 2): trả về ứng viên, mọi dòng trích nguyên văn
+   từ trace đã capped, và **không bao giờ ghi** (`writes: []`). Lý do họ
+   nêu — *"một đề xuất tự ghi mình vào kho sẽ đến với dáng vẻ tri thức đã
+   được biên tập và được tin ngay, mà chưa ai phán xét nó"* — đúng là mô
+   tả nghĩa (A), không phải nghĩa (B).
+3. Nỗi lo "nghĩa địa nháp" (vòng 4) tan phần lớn: dữ liệu nằm im không
+   ai đọc thì không tốn gì, khác hẳn một đống file `.md` rác trong
+   `docs/` làm tụt thêm cái index vốn đã thiếu 32%.
+
+**Chi phí nháp và độ chặt của ngưỡng dính nhau** — bảy vòng trước bàn hai
+thứ này rời nhau. Nháp là bài đã viết ⇒ mỗi lần vượt ngưỡng tốn một lượt
+LLM ⇒ ngưỡng phải chặt. Nháp là chất liệu cơ học ⇒ gần như 0 chi phí ⇒
+ngưỡng lỏng được.
+
+**Nội dung một bản ghi chất liệu** (chủ sản phẩm, vòng 8): ý tưởng câu
+chuyện + chất liệu thật với đầy đủ dẫn chứng — struggle/problem →
+solution, trao đổi thật, **code thật, commit thật**.
+
+**Hệ quả bắt buộc: bản ghi là DANH MỤC CON TRỎ kèm trích ngắn, không phải
+bản sao.** Mã commit (sha), file đụng tới, vài dòng trích nguyên văn, để
+người mở ra xem bản thật. Nhét nguyên diff vào là phình bản ghi và chép
+lại thứ git đã giữ — đi ngược đúng tinh thần "dẫn chứng, không chép".
+
+**Nơi lưu:** bản ghi trong `.fgos/` (không phải file `.md` trong `docs/`)
+thì không làm bẩn cây tài liệu và không kéo index tụt thêm. Chưa chốt.
+
+**Nhược điểm thật của lựa chọn này:** nghĩa (B) đẩy phần VIẾT về phía con
+người — không bao giờ có thứ gì "sẵn sàng đọc", lúc nào người cũng phải
+làm chặng cuối. Nó nâng cấp việc TÌM, không nâng cấp việc VIẾT.
+
+```mermaid
+flowchart TD
+    A["Item xong → status: retrospective<br/>(compound stage tự kích hoạt)"] --> B{"Đếm round-count<br/>của CHÍNH item này"}
+    B -->|"dưới ngưỡng"| C["Bỏ qua — không sinh gì<br/>(đây là chỗ chống 'gom hết')"]
+    B -->|"trên ngưỡng"| D["Gom chất liệu, thuần cơ học"]
+    D --> D1["Trao đổi thật<br/>.fgos/events.jsonl<br/>(lọc 2 tầng khuôn mẫu)"]
+    D --> D2["Code/commit thật<br/>git log grep 'type(id):'<br/>+ đi xuống item con"]
+    D1 --> E["Bản ghi chất liệu<br/>con trỏ + trích ngắn<br/>KHÔNG có văn"]
+    D2 --> E
+    E --> F["Đi tiếp ngay — không chặn ai"]
+    E -.->|"bất đồng bộ, lúc nào tuỳ người"| G["Người đọc chất liệu"]
+    G -->|"gật"| H["Lúc này mới VIẾT"]
+    G -->|"lắc"| I["Để đó — nằm im, không tốn gì"]
+```
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
@@ -604,7 +758,22 @@ và `tsk-3ip` (hai task nửa changelog, ở
 bỏ (đã tách quan hệ, xem §3 dòng E, §4) — `tsk-12m` không còn chặn
 `tsk-28x` tiến tiếp.
 
-### Chưa chia được
+### Chưa chia được — nhưng đã thấy hình (vòng 8)
 
-Mọi thứ sau khi chọn phương án: hình dạng registry/trục, port
-`authoritative_for`, triage, `draft` lifecycle. Chờ §6.4.
+Chưa mint nên chưa chia task chính thức (luật D4: chờ vòng 9 xác nhận
+per-item + nghĩa B). Nhưng §6.4/§6.6 giờ đủ cụ thể để thấy các mảnh sẽ
+tách ra thế nào, ghi lại đây để vòng sau không phải nghĩ lại:
+
+- **Lọc tầng khuôn mẫu thứ hai của vỉa ask** (§3 dòng J3) — độc lập, cơ
+  học, làm được trước mọi thứ khác vì mọi thứ khác đo trên đầu ra của nó.
+- **Nối item ↔ commit** (§3 dòng N2/N3) — grep `type(id):` + đi xuống item
+  con qua field `parent`. Độc lập với phần event log. Lưu ý: KHÔNG dùng
+  branch (đã xoá sau merge) và KHÔNG dùng `branchHeadAtTake` (`tsk-2zv`).
+- **Đo hình dạng struggle → solution ở diện rộng** (§3 dòng N4) — có thể
+  cần một phép thử thứ hai kiểu `tsk-1hy`, vì hiện mới có 2 ví dụ và
+  thảo luận này đã hai lần trả giá cho cỡ mẫu đó.
+- **Bản ghi chất liệu + ngưỡng, cắm vào compound stage** — phụ thuộc ba
+  mảnh trên.
+- Chưa đụng tới: hình dạng registry/trục danh tính, port
+  `authoritative_for`. Vẫn chờ, và câu vòng 4(d) "hai trục có cần cùng
+  lúc không" vẫn chưa ai trả lời.
