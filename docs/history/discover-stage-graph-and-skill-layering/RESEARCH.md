@@ -60,7 +60,7 @@ This is a real product/sequencing decision — not an implementation detail
 parent and four queued siblings) become silently unreachable the moment
 this item's own literal verify condition is satisfied.
 
-## Verdict
+## Round 1 verdict
 
 `clear: false` — the *what* (retire `clarify` as a stage-skill, move
 `fgos-clarifying` to run at Init) is understood; the open item count this
@@ -68,3 +68,29 @@ round surfaced is new evidence neither D5 nor D9 accounted for, and is
 material to scope/sequencing in the same way D18 was for `tsk-403`.
 Handed back to the caller as an `unclear` verdict with a concrete question
 citing this round's own evidence.
+
+## Round 2 — 2026-08-11, tsk-qod (human answer applied)
+
+**Answered:** Option (b) — migrate/advance the 90 stage-`clarify` items
+past `clarify` *before* the `skillMap.clarify` entry is removed. Explicitly
+**not** a D18-style legacy drain-only alias — the person's own words:
+"xử lý dứt điểm bằng di trú thay vì để lại một alias khác phải dọn sau"
+(resolve it definitively via migration, not leave another alias to clean
+up later).
+
+**Consequence for scope:** this item's own footprint now includes a real
+migration step (advancing 90 items off `stage: 'clarify'`) in addition to
+the registry edit the item's title already named. The concrete mechanism
+(one bulk pass vs. per-item, which target stage each item lands on, how a
+`doing`/`awaiting-human` item is handled differently from a `todo` one)
+is left to `fgos-coding-planning`'s own Approach/Shape step — this round's
+job was only to confirm the decision is now locked, not to design the
+migration.
+
+## Round 2 verdict
+
+`clear: true` — the open question from round 1 is resolved by the human's
+explicit answer above. `verify` carried forward unchanged (the item's own
+current `verify`); `fgos-coding-planning` at `exploring` next locks the
+migration decision into `CONTEXT.md` with its own D-ID and refines
+`verify` to match the now-larger scope.
