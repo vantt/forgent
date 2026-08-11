@@ -953,10 +953,14 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
     } catch (abortErr) {
       throw new MergeError(
         `verify passed for "${branch}" but "git commit" failed, and "git merge --abort" itself failed: ${abortErr.message} (commit error: ${err.message})`,
-        { branch },
+        { branch, stderr: err.stderr ?? null, status: err.status ?? null },
       );
     }
-    throw new MergeError(`verify passed for "${branch}" but "git commit" failed: ${err.message}`, { branch });
+    throw new MergeError(`verify passed for "${branch}" but "git commit" failed: ${err.message}`, {
+      branch,
+      stderr: err.stderr ?? null,
+      status: err.status ?? null,
+    });
   }
   return { outcome: 'merged', branch, check, ...(selfResolved && { selfResolved }) };
 }
