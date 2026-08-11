@@ -86,9 +86,15 @@ Bằng chứng blast-radius cho các proof point bên dưới nên chạy qua Gi
   item đang mở trên stage đó (`tsk-42i`, `tsk-3at`, `tsk-3m6`) sẽ trỏ tới
   một thư mục không còn tồn tại — đúng thất bại D18 định ngăn, chỉ là ở
   một lớp khác (skill file, không phải stage name).
-- `stepMap`: **không** thêm `decompose` (giữ đúng D18 — legacy không có
-  step riêng, giống `discovery`/`exploring` hôm nay); thêm `planning:
-  'Divide'` thay cho vị trí cũ.
+- `stepMap`: **đã đọc thật** `src/state/workflow-stage-graphs.mjs:74-78`
+  — hôm nay `stepMap` của domain `coding` là `{ clarify: 'Clarify',
+  decompose: 'Divide', executing: 'Execute' }`, tức `decompose` ĐANG có
+  entry thật, không phải "chưa có gì để khỏi thêm". Hành động chính xác:
+  **xoá hẳn** entry `decompose: 'Divide'` hiện có, **thêm mới** `planning:
+  'Divide'` thay vào đúng vị trí đó — kết quả giống hệt D18 mô tả (`decompose`
+  không còn trong `stepMap`, `discovery`/`exploring` vẫn tiếp tục không có
+  như hôm nay), chỉ khác ở chỗ đây là một phép XOÁ+THÊM, không phải một
+  phép THÊM đơn thuần như bản nháp trước đó lỡ viết.
 - `transitions`: giữ cạnh `decompose -> executing` và `clarify ->
   decompose`/`exploring -> decompose` (D18 "giữ cạnh ra của nó" — đọc kỹ:
   giữ cả cạnh VÀO lẫn RA, vì 2 trong 3 item mở đang ở `blocked`/
@@ -112,13 +118,27 @@ skill, hoặc Phase 1 phải trỏ tới tên đích trước rồi Phase 4 hi�
 ### Phase 2 — File + hàm nội bộ (`src/intake/decompose.mjs` → `plan.mjs`)
 
 - `git mv src/intake/decompose.mjs src/intake/plan.mjs`.
-- Đổi tên hàm export (`resolveDecompose`→`resolvePlan`,
-  `judgeDecompose`→`judgePlan`, `parseDecomposeCallerVerdict`→
-  `parsePlanCallerVerdict`, `passThroughModeMatch` giữ nguyên tên vì
-  không mang chữ decompose) — **giá trị verdict STRING `"decompose"` /
-  `"pass-through"` / `"need-human"` GIỮ NGUYÊN nguyên văn** (D11: tên kết
-  cục, không phải tên hàm/chặng). Cập nhật mọi call site
-  (`bin/fgos.mjs`, test).
+- **Sửa lại theo bằng chứng thật (đã đọc file, không đoán):** hàm export
+  thật trong file là `resolveDecompose`, `resolveCallerDecomposeVerdict`,
+  `resolveContentRoot`, `readLockedContext`,
+  `findUncoveredLockedDecisions` — đổi hai cái đầu mang chữ `decompose`:
+  `resolveDecompose`→`resolvePlan`, `resolveCallerDecomposeVerdict`→
+  `resolveCallerPlanVerdict`. **`judgeDecompose` KHÔNG PHẢI hàm còn sống**
+  — chỉ còn trong comment mô tả nó đã bị retire (dòng 6, 458, 468 của
+  `decompose.mjs`: "that judgeDecompose is retired", cùng lý do
+  `judgeDiscovery` bị khai tử ở `discovery.mjs`) — không có gì để đổi
+  tên, chỉ cần sửa CHỮ trong các comment đó từ `judgeDecompose` thành một
+  cụm mô tả tương đương (vd. "the retired subprocess judge") nếu muốn
+  nhất quán, không bắt buộc vì đó không phải identifier thật.
+  `passThroughModeMatch` (nằm ở `fgos-planning`, không phải file này) giữ
+  nguyên tên. **Giá trị verdict STRING `"decompose"` / `"pass-through"` /
+  `"need-human"` GIỮ NGUYÊN nguyên văn** (D11: tên kết cục, không phải
+  tên hàm/chặng). Cập nhật mọi call site — xác nhận qua `grep`:
+  `bin/fgos.mjs:28` (`import { resolveDecompose } from
+  '../src/intake/decompose.mjs'`) là call site DUY NHẤT import trực tiếp
+  từ file này; `resolveCallerDecomposeVerdict` chỉ được gọi NỘI BỘ trong
+  chính `decompose.mjs` (dòng 547), không bị import ở nơi khác — thu hẹp
+  đáng kể bề mặt cần sửa so với ước lượng ban đầu.
 - `git mv test/intake/decompose.test.mjs test/intake/plan.test.mjs`, sửa
   import path.
 
