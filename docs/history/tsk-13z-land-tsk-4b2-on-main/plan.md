@@ -96,6 +96,35 @@ worth proving, matching the standard-lane depth:
   inside this item's own isolated worktree branch, no shared runtime
   state involved.
 
+## Validating — reality gate (fgos-validating, 2026-08-11T06:38Z)
+
+| Dimension | Result | Citation |
+|---|---|---|
+| Mode fit | PASS | `plan.md`'s own `Mode: standard` line (2 flags: existing covered behavior, weak proof around area — no hard-gate flag) matches a branch-land bug fix; not over- or under-built. |
+| Repo fit | PASS | Every path the plan leans on was confirmed real via actual commands in `RESEARCH.md`: `fgw/tsk-4b2` exists (`git branch -a`), tip `7add82b8` matches (`git log -1`), the 9-file merge-tree footprint exists. |
+| Assumptions | PASS | The one load-bearing assumption — "the merge is conflict-free" — is proven by a real `git merge-tree 30653bf1 main fgw/tsk-4b2` dry-run (0 conflict markers, `RESEARCH.md` round 1), not asserted from plausibility. |
+| Smaller path | PASS | Cherry-picking the 7 unique commits instead of merging was considered and rejected: the item's own `verify` requires the literal commit `7add82b8` to become an ancestor of `main` (`git merge-base --is-ancestor`), which only a real merge satisfies — a cherry-pick produces different commit hashes and would never pass. Merging is the smallest correct path. |
+| Proof surface | PASS | `plan.md` step 3 already names the item's own real, runnable verify command — no placeholder. |
+| Impact-analysis posture | PASS | `plan.md`'s recorded `degraded` posture matches `fgos tool query --capability impact-analysis --status present` run fresh in this pass: `gitnexus` registered and `present`, but this session's own hook independently flagged the index stale (`last indexed: 4ce7a96`) — same posture, no drift. |
+
+No FAIL. Continuing to the feasibility matrix for the plan's one
+medium-risk row.
+
+### Feasibility matrix
+
+| Assumption | Risk | Proof required | Evidence found | Result |
+|---|---|---|---|---|
+| `npm test` stays green after the real merge lands | Medium | A real command run, not plausibility | Two real pieces: (1) `git merge-tree 30653bf1 main fgw/tsk-4b2` dry-run — 0 conflicts across all 9 touched files, including both test files (`test/e2e/runner-loop.test.mjs`, `test/runner/loop.test.mjs`); (2) baseline `npm test` run fresh on the current (pre-merge) tree in this pass — **2848 passing, 0 failing, 5 skipped**, confirming the starting point is healthy. The literal post-merge full-suite run is the one thing that cannot be evidenced without materializing the merge itself — that is Execute's own build step (per this skill's "leave execution alone" rule), re-confirmed automatically by the engine's own goal-check when `fgos return` runs the item's `verify` (which itself runs `npm test`). | READY WITH CONSTRAINTS |
+
+## Verdict
+
+**READY WITH CONSTRAINTS.** Constraint: the post-merge full `npm test` run
+is proven by the engine's own goal-check at `fgos return` time (the item's
+`verify` already runs it), not by this pass — this pass's evidence (clean
+dry-run + green baseline) is what a feasibility check can honestly gather
+before the merge is materialized; nothing here lowers the bar or skips a
+row.
+
 ## Outstanding questions
 
 None
