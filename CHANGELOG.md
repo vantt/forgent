@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `/fgOS:retro-next` is now a launcher in the strict sense: it sweeps,
+  picks one item, and hands it to `fgos-coding-driving` with an explicit
+  `ceiling: status:cleanup`, relaying whatever the driver reports. It no
+  longer resolves the synthesis skill, invokes it, moves the item, or reads
+  a subprocess exit code itself. Observable behavior is unchanged —
+  synthesis runs, the item lands at `cleanup`, the run stops there — but it
+  now inherits the driver's park/anchor handling and its
+  `stop-reason: lock-timeout` relay instead of duplicating thinner versions.
 - `fgos-coding-driving` now resolves each iteration's next step from the
   item's **position** rather than always from `stage`: `stage` while it is
   live, `status` once it freezes at `awaiting-approval`. This makes the
