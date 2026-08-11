@@ -90,6 +90,16 @@ import {
   writeViewFake,
 } from './helpers/fgos-cli-harness.mjs';
 
+function moveRootToResolved(cwd, rootId, finalStatus) {
+  run(cwd, ['move', rootId, '--to', 'doing']);
+  if (finalStatus === 'wontfix') {
+    run(cwd, ['move', rootId, '--to', 'wontfix']);
+  } else {
+    run(cwd, ['move', rootId, '--to', 'awaiting-approval']);
+    run(cwd, ['move', rootId, '--to', 'delivered']);
+  }
+  commitPending(cwd, `state: resolve ${rootId} to ${finalStatus}`);
+}
 
 test('approve on a nonexistent id is rejected as validation, exit 4', () => {
   const cwd = tmpCwd();
