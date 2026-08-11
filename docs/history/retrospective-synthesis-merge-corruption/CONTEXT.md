@@ -20,22 +20,23 @@ item's real diff.
 (`fix(tsk-1r3)`), the same severity class as tsk-4v6's own loss — not just
 a docs-vs-docs collision.
 
-In scope for tsk-2oy itself:
-1. Merge `fgw/tsk-4v6`'s real tip (`687abfb8`/`dbd31b42`) into `main`.
-2. Add a guard to the retrospective-synthesis commit step (`fgos-compounding`
+In scope for tsk-2oy itself (revised, see D3):
+1. Add a guard to the retrospective-synthesis commit step (`fgos-compounding`
    step 3, `.claude/skills/fgos-compounding/SKILL.md`) so it refuses (or
    safely stops) instead of silently absorbing a stray `MERGE_HEAD` — exact
    mechanism (skill-prose precondition vs. a code-level check) is
    `fgos-planning`'s call, not decided here.
-3. Report the audit findings already gathered in `RESEARCH.md` (the 5
+2. Report the audit findings already gathered in `RESEARCH.md` (the 5
    confirmed instances) as this item's own audit deliverable for requirement
    3 — see D2 below for why this is treated as already satisfying that
    requirement's scope.
 
-Out of scope for tsk-2oy (see D1): remediating the OTHER 4 items'
-own missing content (`tsk-648`, `tsk-1q5`, `tsk-1vi`, `tsk-2x9`/`tsk-1r3`).
-Each becomes its own follow-up item once tsk-2oy's own fix and audit report
-land.
+Out of scope for tsk-2oy (see D1, D3): remediating the OTHER 4 items'
+own missing content (`tsk-648`, `tsk-1q5`, `tsk-1vi`, `tsk-2x9`/`tsk-1r3`);
+landing `fgw/tsk-4b2`'s real content on `main` (now `tsk-13z` — a DIFFERENT
+bug, a manual `fgos move --to delivered` bypass around two failed merges,
+not the stray-`MERGE_HEAD` corruption this item investigates); and the
+`checkMergeStillResolves` decomposed-root gap (now `tsk-5j0`).
 
 ## Locked decisions
 
@@ -43,6 +44,7 @@ land.
 |----|----------|-----------|
 | D1 | tsk-2oy's own remediation is scoped to **tsk-4v6 only** (merge its real tip + fix the pipeline root cause), not to also re-merge the other 4 items RESEARCH.md's audit already found with the same corruption. Each of those becomes its own follow-up work item. | tsk-2oy's own description names tsk-4v6 specifically for requirement (1)'s merge, and frames requirement (3) as "audit ... **to scope how widespread this is**" — scoping/reporting language, not a remediation mandate for every item the audit turns up. Pinned as a labeled assumption (not asked to a person) per RUL "release con người": the text itself already resolves it, asking would be a redundant interrupt. If this reading is wrong, the person can correct it at the Gate below or at `fgos-planning`. |
 | D2 | The audit for requirement (3) is treated as **already executed and sufficient** by `RESEARCH.md` round 1's `git log --all --min-parents=2 --grep="retrospective synthesis"` pass (5 instances found, full reachable history, not a bounded "recent" window) — `fgos-planning`/`fgos-code-implement` do not need to re-run a broader audit; they only need to (a) fix the root cause and (b) write the 5 findings into a durable, linkable artifact (this doc + RESEARCH.md already are that artifact) so the follow-up items in D1 have something concrete to point at. | The item's own wording said "recent" but gave no explicit boundary; a full-history `--all` grep is strictly more complete than any bounded "recent" window and was already cheap to run. Re-scoping narrower would throw away real evidence for no benefit. |
+| D3 | tsk-2oy's own remediation is narrowed further, dropping the merge-`fgw/tsk-4v6` piece entirely: `fgos cleanup tsk-4v6` (run during Execute) correctly moved tsk-4v6 to `done`, since its real fix (`687abfb8`/`dbd31b42`) had already landed on its *parent* item's branch, `fgw/tsk-4b2` — confirmed via `git merge-base --is-ancestor dbd31b42 fgw/tsk-4b2`. No content was lost; tsk-4v6's own remediation is complete. But `fgw/tsk-4b2` itself has never reached `main` — filed separately as `tsk-13z`, because its cause is a DIFFERENT bug (a direct `fgos move tsk-4b2 --to delivered` bypass around two failed `fgos approve` attempts — `event seq 11979`, `role: human` — never a stray `MERGE_HEAD` absorption). A related harness gap found investigating (`checkMergeStillResolves` never validates a decomposed root's own branch against `main`, only children-onto-parent) is filed as `tsk-5j0`. tsk-2oy's own item `verify` is revised to drop the `git merge-base --is-ancestor 687abfb8 main` clause accordingly — that proof now belongs to `tsk-13z`. | Real evidence found mid-Execute (`fgos-code-implement`), not a guess: `fgos cleanup tsk-4v6`'s own output, `git merge-base --is-ancestor` checks, and `.fgos/events.jsonl`'s real event history for tsk-4b2 (`seq 11979`). Splitting into 3 independent items (per user decision, not this session's own call) keeps each fix independently reviewable — tsk-2oy's own guard fix does not depend on either follow-up landing first. |
 
 ## Pinned terms
 
