@@ -165,35 +165,52 @@ verdict-based edge selection (that is task 5, `tsk-30v`, still open); a
 `clear` verdict at `discovery` still walked the item to `exploring`
 unconditionally, matching today's pre-`tsk-30v` behavior exactly.
 
-## Round 4 — 2026-08-11, tsk-tku (empirical finding at the exploring→? edge)
+## Round 4 — 2026-08-11, tsk-tku (empirical finding, corrected)
 
-**Finding, not a question — recorded for the tree, not blocking this
-item.** After `fgos-exploring`'s own gate fired `fgos discover --verdict
-clear` for `tsk-tku` at stage `exploring`, the item landed on stage
-`decompose` (the legacy drain-only alias, D18), not `planning` (the active
-chain a new item is supposed to walk per D11/D18's own stated intent —
-"chỉ dùng cho item CÒN MỞ tại thời điểm rename... không item mới nào vào
-đây nữa"). `tsk-tku` is unambiguously a new item in this same design tree,
-not one of the 4 named in D18 (`tsk-42i`/`tsk-3at`/`tsk-3m6`/`tsk-1opx`).
+**Initial (wrong) diagnosis:** first read of this event guessed a
+`transitions`-array-ordering bug in `nextDiscoveryEdge`'s resolver picking
+the legacy `decompose` alias over `planning` for a new item. Traced
+further and retracted below — root cause is environmental, not a code
+defect in this tree's own `workflow-stage-graphs.mjs`.
 
-**Checked:** `src/state/workflow-stage-graphs.mjs`'s `transitions` array —
-`{from:'exploring',to:'decompose'}` is registered BEFORE
-`{from:'exploring',to:'planning'}`. Whatever function resolves the
-exploring→? edge (not `nextDiscoveryEdge`, which only handles
-`discovery`'s own two edges per D2/D6 — this is a separate resolver for
-the `clarify`-legacy `exploring→decompose`/`exploring→planning` pair)
-appears to pick array order rather than filtering the legacy alias for
-new items, contrary to D18's stated intent.
+**Real root cause:** every `fgos <verb>` call any session in this whole
+`tsk-2mt` feature tree makes resolves `bin/fgos.mjs` from the **main
+checkout** (`/home/vantt/projects/forgentX`, per every skill's own Hard
+rule: "resolve the main checkout root ... and pass `--dir` explicitly") —
+and that file's OWN relative imports (`'../src/state/store.mjs'` etc.)
+therefore load the **main checkout's own working tree**, not the calling
+worktree's. Confirmed empirically: `main`'s tip is `70e7eca7`
+(`git log --oneline -5 main`, matches this session's own start-of-turn
+`gitStatus`); `fgw/tsk-2mt`'s tip (`f566d747`) is **not an ancestor of
+`main`**; `git merge-base --is-ancestor 5e824ac... fgw/tsk-2mt` — **yes**,
+this item's own fork point IS `fgw/tsk-2mt`, confirming D14's
+"một task cha gom hết con" is implemented as a real git accumulator
+branch (children merge into the PARENT's branch, not into `main`) — the
+whole tree, including `tsk-403`'s rename, has never touched `main`. Read
+directly (no git needed): `/home/vantt/projects/forgentX/src/state/
+workflow-stage-graphs.mjs`'s own `stepMap` for `coding` still reads
+`{clarify: 'Clarify', decompose: 'Divide', executing: 'Execute'}` —
+pre-`tsk-403` shape, no `planning` key at all. So `fgos discover`'s call
+into `nextDiscoveryEdge` necessarily ran **pre-rename code**, where
+`decompose` is the only real Divide-mapped stage name — landing `tsk-tku`
+on `decompose` was the ONLY possible outcome, not a bug in this branch's
+own registry.
 
-**Why this doesn't block tsk-tku:** `skillMap.decompose` and
-`skillMap.planning` both already resolve to the identical skill
-(`'fgos-coding-planning'`) — functionally a no-op difference for THIS
-item's own forward progress via `fgos-coding-driving`. Not fixed here:
-out of tsk-tku's own literal scope (registry-repoint for `discovery` +
-exception removal only, per `DISCUSSION.md` task 3), and the `transitions`
-array is shared, live state that 4 other currently-open items depend on
-for their own FSM legality — changing it without a scoped task risks
-those items, not something to fix as a drive-by inside this item's own
-verify. Flagged here as evidence for whoever picks up `tsk-30v` (task 5,
-verdict branch edges) or a new follow-up item on the `exploring→?`
-resolver specifically.
+**Why this is actually safe, not a gap:** D18 already anticipated exactly
+this class of event — an item caught mid-transition on the legacy
+`decompose` name at the moment a future merge to `main` finally lands
+tsk-403's rename there. `tsk-tku` just became a 5th such item alongside
+the 4 D18 already named (`tsk-42i`/`tsk-3at`/`tsk-3m6`/`tsk-1opx`) — the
+legacy alias `skillMap.decompose = 'fgos-coding-planning'` this tree's own
+registry already carries exists precisely to catch it. No fix needed
+inside this item's own scope; this is the safety net working as designed,
+not a defect to flag for `tsk-30v`.
+
+**Second, separate observation (informational, not a defect either):**
+the `Skill` tool's own content-loading also resolves against the main
+checkout's path, not the active `EnterWorktree` location — invoking
+`fgos-exploring`/`fgos-planning` (pre-rename names) served real content,
+which cross-checked as substantively identical to this worktree's own
+`fgos-coding-exploring`/`fgos-coding-planning` (same D-ID markers present
+in both, e.g. `tsk-59a`/`tsk-da1`/`tsk-5ay`) — harness behavior, not
+something this item's own scope touches or needs to correct.
