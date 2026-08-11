@@ -9072,6 +9072,29 @@ test('unlock: lock genuinely held by a live session -- refuses, reports the hold
   assert.equal(fs.existsSync(mainCheckoutLockPath(cwd)), true);
 });
 
+test('unlock: string-identity lock within TTL -- still refuses (D5 fail-closed, unchanged), but never claims "live session" (tsk-24t)', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
+  // The exact shape .githooks/pre-commit writes per commit: a STRING
+  // identity, not a numeric pid -- tryAcquireOnce can never probe its
+  // liveness (no pid to check), so held-ness is judged by TTL freshness
+  // alone (main-checkout-lock.mjs's own documented D5 fail-closed design).
+  fs.writeFileSync(mainCheckoutLockPath(cwd), JSON.stringify({ pid: 'some-writer-session-id', ts: Date.now() }));
+
+  const result = run(cwd, ['unlock']);
+
+  // Behavior unchanged (D1): still refuses, still never deletes the file.
+  assert.equal(result.status, 7, result.stderr);
+  assert.equal(fs.existsSync(mainCheckoutLockPath(cwd)), true);
+  // Message honesty (D2): must not fabricate "live session" for a branch
+  // that never checked liveness -- must say plainly that liveness is
+  // undetermined.
+  assert.doesNotMatch(result.stderr, /live session/);
+  assert.match(result.stderr, /liveness cannot be determined/);
+  assert.match(result.stderr, /some-writer-session-id/);
+});
+
 test('unlock: corrupt (unparseable) lock content -- force-reclaims via forceReclaimAmbiguousLock, removes the file', () => {
   const cwd = tmpCwd();
   assert.equal(run(cwd, ['init']).status, 0);

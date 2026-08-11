@@ -4088,9 +4088,18 @@ async function runVerb(verb, flags, positional, dir) {
         const ttlPart = lockResult.remainingTtlMs != null
           ? `, expires in ${formatLockDurationMs(lockResult.remainingTtlMs)}`
           : ', no TTL window known';
+        // tsk-24t: main-checkout-lock.mjs's own tryAcquireOnce only probes
+        // liveness (isPidAlive) for a NUMERIC holder identity -- a string
+        // identity (the shape .githooks/pre-commit writes per commit) is
+        // judged purely by TTL freshness, by design (D5 fail-closed,
+        // undecidable without a liveness window). Claiming "live session"
+        // for that branch is a fabrication; say what is actually known.
+        const holderDescription = typeof lockResult.holderPid === 'number'
+          ? `a live session (${lockResult.holderPid}`
+          : `an identity whose liveness cannot be determined (${JSON.stringify(lockResult.holderPid)}`;
         throw new StoreError(
           'lock-timeout',
-          `unlock: main checkout lock is held by a live session (${lockResult.holderPid}, held ${formatLockDurationMs(lockResult.lockAgeMs)}${ttlPart}) -- refusing to clear it.`,
+          `unlock: main checkout lock is held by ${holderDescription}, held ${formatLockDurationMs(lockResult.lockAgeMs)}${ttlPart}) -- refusing to clear it.`,
         );
       }
       if (lockResult.status === ACQUIRED) {
