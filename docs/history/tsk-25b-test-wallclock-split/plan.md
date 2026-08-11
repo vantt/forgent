@@ -147,6 +147,25 @@ thêm 13 file là thêm 13 lần chi phí đó cộng thêm tranh CPU. Số test
 
 Đã revert về 27 file. Ghi lại ở đây để không ai thử lại đường này.
 
+### Ba lần cùng một lớp lỗi khi đo thời gian trong verify
+
+Đáng ghi vì cả ba đều **im lặng** — verify vẫn "chạy được", chỉ là không đo
+đúng thứ nó tưởng:
+
+1. `{ /usr/bin/time -f %e node --test "$f" >/dev/null 2>&1; } 2>&1 | tail -1`
+   — `2>&1` nuốt output của `time` cùng output của node, biến số đo thành
+   rỗng. `awk -v s="" 'BEGIN{exit (s>30)}'` trả 0, tức **mọi file đều lọt dù
+   chậm bao nhiêu**. Sửa bằng `time -o <file>`.
+2. Thêm `case "$s" in ''|*[!0-9.]*)` để một số đo không ra số làm verify đỏ
+   thay vì được bỏ qua — chính guard này bắt được lỗi thứ ba.
+3. `/usr/bin/time -o` ghi **thêm** dòng `Command exited with non-zero status 1`
+   vào file khi lệnh được đo trả về khác 0 — mà `npm test` ở repo này *luôn*
+   trả khác 0 vì lỗi guard sẵn có. Số đo thành hai dòng, guard (2) bắt đúng.
+   Sửa bằng `tail -1` thay vì `cat`.
+
+Bài học chung: một phép đo trong verify phải tự chứng minh nó là số, và phải
+đọc đúng dòng — nếu không thì nó không đo gì cả mà vẫn xanh.
+
 **Kết luận: đường chẻ cơ học (D2) đã hết dư địa ở ~50s.** Muốn xuống dưới
 45s phải hạ **tổng** CPU — gộp fixture, bớt spawn process thật — đúng thứ D2
 đã cố ý hoãn sang item riêng. Ngưỡng 45s của D3 vì vậy cần người xem lại
