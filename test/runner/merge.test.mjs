@@ -629,6 +629,33 @@ test('mergeRunnerItem aborts the merge when "git commit" itself fails (e.g. a re
   assert.equal(fs.existsSync(path.join(repoRoot, 'produced.txt')), false, 'a staged-then-aborted merge must not leave its file behind');
 });
 
+// tsk-50i7: the thrown MergeError's own `.message` only ever carried
+// execFileSync's generic wrapper text ("Command failed: git commit
+// --no-edit"), never the real git reason (hook rejection, nothing to
+// commit, missing identity, ...) that lives on the underlying error's
+// `.stderr` — diverging from this same file's own convention (the `git()`
+// helper already captures stderr on every call; a sibling catch already
+// surfaces it). Pin that `.stderr`/`.status` now reach the caller.
+test('mergeRunnerItem carries the real "git commit" stderr/status on its thrown MergeError, not just the generic wrapper message', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+
+  const hookPath = path.join(repoRoot, '.git', 'hooks', 'pre-commit');
+  fs.writeFileSync(hookPath, '#!/bin/sh\necho "refused by test hook for stderr-pinning" >&2\nexit 1\n');
+  fs.chmodSync(hookPath, 0o755);
+
+  let caught;
+  try {
+    await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }));
+    assert.fail('expected mergeRunnerItem to throw');
+  } catch (err) {
+    caught = err;
+  }
+  assert.ok(caught instanceof MergeError, 'must still be a MergeError');
+  assert.match(caught.stderr, /refused by test hook for stderr-pinning/, 'the real git stderr must reach the caller, not just the generic execFileSync wrapper message');
+  assert.equal(typeof caught.status, 'number', 'the real git commit exit status must reach the caller');
+});
+
 // The pre-commit hook only ever locked the final `git commit` — the merge
 // --no-commit/verify steps before it ran unprotected, letting a concurrent
 // session's own merge/commit land in that window and pull MERGE_HEAD out
