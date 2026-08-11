@@ -590,14 +590,25 @@ cả qua `--github`). Cả hai cờ vẫn thuần **khai báo** — chưa nối 
 phối hay xác danh; cổng "ai được nói verb nào" vẫn là việc riêng sau này
 (backlog STR38).
 
-**Phân trang cho verb trả tập lớn (per D5/D35 str46-io-contract).** Sổ verb
-khai thêm cờ `paginated` (đúng/sai) cho MỌI verb — chỉ bốn verb mang
-`paginated: true`: `ready`, `triage`, `evolve` (lượt liệt-kê không cờ của
-nó), và khoá `work` của `list`. Bốn verb này nhận thêm hai tham số tuỳ chọn
-`--cursor`/`--limit`: không truyền cờ nào → kết quả y hệt hôm nay (mảng/map
-đầy đủ, không đổi hình dạng); truyền một trong hai → kết quả đổi hình dạng
-thành `{items, nextCursor}` (với `list`, chỉ khoá `work` đổi, các khoá khác
-của kết quả `list` giữ nguyên). Con trỏ (`cursor`) là **đục hoàn toàn** —
+**Phân trang cho verb trả tập lớn (per D5/D35 str46-io-contract, D5/D35
+được tsk-483 mở lại — xem `docs/history/tsk-483-list-side-log-pagination-
+scoping/CONTEXT.md`).** Sổ verb khai thêm cờ `paginated` (đúng/sai) cho
+MỌI verb — chỉ bốn verb mang `paginated: true`: `ready`, `triage`,
+`evolve` (lượt liệt-kê không cờ của nó), và khoá `work` của `list`. Bốn
+verb này nhận thêm hai tham số tuỳ chọn `--cursor`/`--limit`: không
+truyền cờ nào → kết quả y hệt hôm nay (mảng/map đầy đủ, không đổi hình
+dạng) — NGOẠI LỆ DUY NHẤT: `list --all --json` không kèm `--cursor`/
+`--limit` giữ nguyên hình dạng thô này VĨNH VIỄN, vì `herdr-plugin/src/
+fgos.rs` (crate Rust ngoài repo Node này) đọc đúng lời gọi đó làm hợp
+đồng công khai. Mọi tổ hợp KHÁC của `list` (mặc định trần không cờ nào,
+`--id`, hoặc bất kỳ tổ hợp nào có `--cursor`/`--limit` — kể cả kèm
+`--all`) đều thu hẹp `decisions`/`discovery`/`gates`/`settlements`/
+`outcomes`/`frictions`/`learnings`/`decisionsById` xuống đúng tập id đang
+thật sự được trả trong `work` — `tools` (khoá theo TÊN công cụ, không
+theo id việc) không bao giờ bị đụng tới. Với ba verb còn lại (`ready`/
+`triage`/`evolve`), truyền một trong hai `--cursor`/`--limit` → kết quả
+đổi hình dạng thành `{items, nextCursor}`. Con trỏ (`cursor`) là **đục
+hoàn toàn** —
 người gọi chỉ nhận lại nguyên văn từ `nextCursor` của lượt trước rồi truyền
 tiếp, không bao giờ tự phân tích hay tự chế. `nextCursor` là `null` khi đã
 tới cuối tập. Một con trỏ trỏ tới một mục đã rời tập (vd việc đã `done` từ
