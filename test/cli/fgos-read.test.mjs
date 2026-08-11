@@ -20,7 +20,7 @@ import {
   addOk,
   addOutcome,
   addWork,
-  advanceThroughDiscoveryToDecompose,
+  advanceThroughDiscoveryToPlanning,
   assert,
   coexistPath,
   commitFile,
@@ -1502,7 +1502,7 @@ test('conflicts verb on a store with no overlaps: empty list, exit 0', () => {
 test('conflicts verb: items at DIFFERENT stages sharing a footprint are flagged (the real gap: a single-step frontier never saw this)', () => {
   const cwd = tmpCwd();
   assert.equal(run(cwd, ['init']).status, 0);
-  assert.equal(run(cwd, ['add', 'atdecompose', '--title', 'A', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--footprint', 'bin/fgos.mjs', '--stage', 'decompose', '--description', 'tsk-4so fixture description.']).status, 0);
+  assert.equal(run(cwd, ['add', 'atdecompose', '--title', 'A', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--footprint', 'bin/fgos.mjs', '--stage', 'planning', '--description', 'tsk-4so fixture description.']).status, 0);
   assert.equal(run(cwd, ['add', 'atexecuting', '--title', 'B', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--footprint', 'bin/fgos.mjs', '--stage', 'executing', '--description', 'tsk-4so fixture description.']).status, 0);
 
   const data = envelopeData(run(cwd, ['conflicts']).stdout);
@@ -1511,7 +1511,7 @@ test('conflicts verb: items at DIFFERENT stages sharing a footprint are flagged 
   // informative here, not a constant.
   assert.deepEqual(data, {
     conflicts: [{ a: 'atdecompose', b: 'atexecuting', shared: ['bin/fgos.mjs'], suggestions: ['sequence', 'hoist', 're-slice'] }],
-    stageByItem: { atdecompose: 'decompose', atexecuting: 'executing' },
+    stageByItem: { atdecompose: 'planning', atexecuting: 'executing' },
   });
 });
 

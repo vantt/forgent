@@ -440,7 +440,7 @@ test('frontierAcrossSteps: items at different steps are all included (the real g
   const view = {
     work: {
       atClarify: { ...item('atClarify', 'todo'), stage: 'clarify' },
-      atDecompose: { ...item('atDecompose', 'todo'), stage: 'decompose' },
+      atDecompose: { ...item('atDecompose', 'todo'), stage: 'planning' },
       atExecuting: { ...item('atExecuting', 'todo'), stage: 'executing' },
     },
   };

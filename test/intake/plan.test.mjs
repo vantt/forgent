@@ -140,7 +140,7 @@ test('resolvePlan with no callerVerdict, no locked plan.md, and role "session" r
     (err) => {
       assert.ok(err instanceof StoreError);
       assert.match(err.message, /no --verdict and plan.md does not declare tiny\/small mode/);
-      assert.match(err.message, /fgos decompose item-x --verdict/);
+      assert.match(err.message, /fgos plan item-x --verdict/);
       return true;
     },
   );

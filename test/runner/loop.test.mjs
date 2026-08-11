@@ -315,7 +315,7 @@ test('runOnce logs the "<capacityId> — <provider> — <model>" announce line a
   await runOnce({ repoRoot, config, worktreeDir, log: (msg) => logs.push(msg) });
 
   assert.ok(
-    logs.includes(`fgos-runner: fgos-code-implement — ${process.execPath} — sonnet`),
+    logs.includes(`fgos-runner: fgos-coding-implement — ${process.execPath} — sonnet`),
     `expected an announce line in: ${JSON.stringify(logs)}`,
   );
   const events = readRawEvents(dir);
@@ -332,7 +332,7 @@ test('runOnce logs the "<capacityId> — <provider> — <model>" announce line a
   const { baseCommit, headRef, ...rest } = auditEvent.payload;
   assert.deepEqual(rest, {
     id: 'item-announce',
-    capacityId: 'fgos-code-implement',
+    capacityId: 'fgos-coding-implement',
     provider: process.execPath,
     // command (tsk-33w D9): equal to provider here because this fixture's
     // config never overrides either -- both fall back to the same resolved
@@ -352,13 +352,13 @@ test('runOnce\'s capacity.dispatch audit event records the REAL spawned command 
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-command-mismatch' });
   const scriptPath = writeCommittingExecutor(scriptDir, counterFile);
-  // fgos-code-implement is the executing-stage capacityId a plain coding
+  // fgos-coding-implement is the executing-stage capacityId a plain coding
   // work item resolves to (dispatch.mjs's capacityIdForWork) -- overriding
   // it here is what makes byCapacity win over the global executor below.
   const config = {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}', '--model', '{model}'] },
     capacities: {
-      'fgos-code-implement': {
+      'fgos-coding-implement': {
         kind: 'task',
         command: process.execPath,
         args: [scriptPath, '{prompt}', '--model', '{model}'],
