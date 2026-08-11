@@ -157,5 +157,43 @@ leak into this item's verify or description.
 delivered on disk (not just decided), and the item's own literal `verify`
 command was independently re-derived from the repo's current state, not
 just copied. `verify` carried forward unchanged (the item's own current
-`verify`). Verdict handed to the engine verb directly — this item skips
-`exploring` and moves straight to `planning`.
+`verify`).
+
+**Correction (empirical, post-verdict):** the prediction above ("skips
+`exploring`") was wrong — `nextDiscoveryEdge` does not yet do
+verdict-based edge selection (that is task 5, `tsk-30v`, still open); a
+`clear` verdict at `discovery` still walked the item to `exploring`
+unconditionally, matching today's pre-`tsk-30v` behavior exactly.
+
+## Round 4 — 2026-08-11, tsk-tku (empirical finding at the exploring→? edge)
+
+**Finding, not a question — recorded for the tree, not blocking this
+item.** After `fgos-exploring`'s own gate fired `fgos discover --verdict
+clear` for `tsk-tku` at stage `exploring`, the item landed on stage
+`decompose` (the legacy drain-only alias, D18), not `planning` (the active
+chain a new item is supposed to walk per D11/D18's own stated intent —
+"chỉ dùng cho item CÒN MỞ tại thời điểm rename... không item mới nào vào
+đây nữa"). `tsk-tku` is unambiguously a new item in this same design tree,
+not one of the 4 named in D18 (`tsk-42i`/`tsk-3at`/`tsk-3m6`/`tsk-1opx`).
+
+**Checked:** `src/state/workflow-stage-graphs.mjs`'s `transitions` array —
+`{from:'exploring',to:'decompose'}` is registered BEFORE
+`{from:'exploring',to:'planning'}`. Whatever function resolves the
+exploring→? edge (not `nextDiscoveryEdge`, which only handles
+`discovery`'s own two edges per D2/D6 — this is a separate resolver for
+the `clarify`-legacy `exploring→decompose`/`exploring→planning` pair)
+appears to pick array order rather than filtering the legacy alias for
+new items, contrary to D18's stated intent.
+
+**Why this doesn't block tsk-tku:** `skillMap.decompose` and
+`skillMap.planning` both already resolve to the identical skill
+(`'fgos-coding-planning'`) — functionally a no-op difference for THIS
+item's own forward progress via `fgos-coding-driving`. Not fixed here:
+out of tsk-tku's own literal scope (registry-repoint for `discovery` +
+exception removal only, per `DISCUSSION.md` task 3), and the `transitions`
+array is shared, live state that 4 other currently-open items depend on
+for their own FSM legality — changing it without a scoped task risks
+those items, not something to fix as a drive-by inside this item's own
+verify. Flagged here as evidence for whoever picks up `tsk-30v` (task 5,
+verdict branch edges) or a new follow-up item on the `exploring→?`
+resolver specifically.
