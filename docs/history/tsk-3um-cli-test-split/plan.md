@@ -18,6 +18,29 @@ Vì sao không `small`: 547 test, một file 9761 dòng có helper dùng chung p
 trích ra, cộng việc sửa `verify` của item khác đang bay. Không phải "vài
 file, không vùng xám".
 
+## Số đo baseline (P1 đã chạy — vòng validating 2026-08-11)
+
+Đo trên chính worktree này, mỗi phép chạy một mình, tuần tự:
+
+| Phép đo | Kết quả |
+|---|---|
+| `npm test` toàn bộ 118 file | **169.76s**, **1 test đỏ** |
+| 116 file còn lại (trừ `fgos.test.mjs` + `checks.test.mjs`) | **29.70s** |
+
+**29.70s trả lời câu hỏi rủi ro cao nhất**: trần của cả suite sau khi chẻ hai
+file kia không thể thấp hơn con số này, và cũng không cao hơn nó bao nhiêu
+nếu mọi nhóm mới đều dưới 30s. Mục tiêu ≤45s của D3 **khả thi** — không cần
+chỉnh D3.
+
+**1 test đỏ là lỗi sẵn có, không liên quan item này**: `NEGATIVE:
+"orchestrator" does not appear in fgOS-owned prose outside the allowlist`
+(`test/docs/launcher-vocabulary-guard.test.mjs`), đỏ vì
+`docs/history/branch-content-mismatch-post-merge-false-positive/plan.md`
+chưa có trong allowlist của guard đó. File này đến từ commit `d0ce4728`
+(tsk-107), nằm trước điểm branch này fork. Sửa nó nằm ngoài `CONTEXT.md`
+của tsk-25b, nên item này **không** sửa — verify bên dưới được viết để
+phân biệt "lỗi sẵn có" với "regression do item này gây ra".
+
 ## Approach
 
 ### Đường cắt
@@ -56,9 +79,10 @@ import/helper cần thiết"). Đặt dưới `helpers/` với đuôi không ph�
 
 | Thành phần | Mức | Proof point |
 |---|---|---|
-| **Ngưỡng 45s có thể bất khả thi** — wall-clock ≈ max(file); nếu file chậm thứ ba của suite đã > 45s thì chẻ hoàn hảo cũng không tới đích. | **cao** | **P1**: đo `time npm test` trên chính worktree này (baseline mới, thay số 163.1s đo ở worktree tsk-516), rồi đo tuần tự từng file trong 118 file, lấy top 10. Chạy TRƯỚC khi sửa dòng nào. Nếu 45s bất khả thi → dừng, trả D3 về cho người, không đi tiếp. |
+| ~~Ngưỡng 45s có thể bất khả thi~~ | ~~cao~~ | **P1 — ĐÃ ĐÓNG**, xem bảng số đo trên: 116 file còn lại chạy hết trong 29.70s, nên trần sau khi chẻ ≈ 30s và mục tiêu 45s khả thi. Đo bằng một lần chạy trên tập-trừ-hai-file, rẻ hơn nhiều so với đo tuần tự 118 file mà cho đúng con số cần biết (makespan, chính là thứ quyết định wall-clock). |
+| **Baseline không xanh** — suite có sẵn 1 test đỏ không liên quan, nên verify dạng "0 fail" là bất khả thi và sẽ chặn item ở `fgos return`. | **cao** | Verify được viết lại để so tập đỏ sau với tập đỏ baseline thay vì đòi rỗng — xem "Proof surface" bên dưới. Không mở scope sang sửa lỗi của tsk-107. |
 | **Chia nhóm theo đếm đầu có thể lệch** — giả định ~0.31s/test đều nhau chưa được chứng minh cho file này. | trung bình | **P1b**: chạy `node --test --test-reporter=spec test/cli/fgos.test.mjs` một lần (~171s), lấy duration từng test, cộng theo nhóm ở bảng trên, chỉnh ranh giới cho nhóm nặng nhất < 30s. |
-| **Test phụ thuộc side effect của test chạy trước nó trong cùng file** — tách file là tách process, side effect biến mất. | trung bình | Không cần proof riêng: nếu có, nó đỏ ngay lần chạy đầu sau khi chẻ. Bắt bởi chính verify (0 fail + tổng test không giảm). |
+| **Test phụ thuộc side effect của test chạy trước nó trong cùng file** — tách file là tách process, side effect biến mất. | trung bình | Không cần proof riêng: nếu có, nó đỏ ngay lần chạy đầu sau khi chẻ. Bắt bởi chính verify — mệnh đề (2) chỉ tha đúng một lỗi guard sẵn có, mọi test đỏ khác đều làm verify đỏ. |
 | **5 item còn bay có `verify` trỏ đường dẫn cũ**; 2 trong số đó (`tsk-4uj`, `tsk-1cp`) đang `doing` — phiên khác đang chạm. | trung bình | **P3**: đọc lại danh sách ngay trước khi sửa (danh sách chụp 2026-08-11 có thể đã đổi), chỉ ghi qua verb của engine, không sửa tay `.fgos/`. |
 | Vỡ ràng buộc kiến trúc | không | `test/` ngoài `docs/architecture-manifest.json`; `test/architecture.test.mjs` chỉ quét `src/`+`bin/`. |
 
@@ -66,10 +90,39 @@ import/helper cần thiết"). Đặt dưới `helpers/` với đuôi không ph�
 point nào ở trên dựa vào nó — gitnexus chỉ index `src/`+`bin/`, không nói gì
 được về `test/`.
 
+## Proof surface
+
+Verify của item (đã cập nhật qua `fgos edit --verify`), chạy được nguyên
+văn, tự đỏ khi sai:
+
+```sh
+npm test >/tmp/tsk-3um-verify.log 2>&1
+awk '/^ℹ tests /{t=$3} /^ℹ fail /{f=$3} END{exit !(t>=2827 && f<=1)}' /tmp/tsk-3um-verify.log \
+  && ! grep '^✖' /tmp/tsk-3um-verify.log | grep -v 'failing tests:' \
+       | grep -qv 'orchestrator" does not appear in fgOS-owned prose' \
+  && for f in test/cli/*.test.mjs; do
+       s=$( { /usr/bin/time -f %e node --test "$f" >/dev/null 2>&1; } 2>&1 | tail -1 )
+       awk -v s="$s" 'BEGIN{exit (s>30)}' || { echo "SLOW $f ${s}s"; exit 1; }
+     done
+```
+
+Ba mệnh đề: (1) tổng test không giảm dưới 2827 và không quá 1 test đỏ;
+(2) test đỏ duy nhất được phép là đúng lỗi guard sẵn có — bất kỳ test đỏ nào
+khác đều làm verify đỏ; (3) không file nào trong `test/cli/` vượt 30s.
+
+Dùng `ℹ tests`/`ℹ fail` — đúng định dạng reporter mặc định của Node in ra
+(kiểm chứng trực tiếp trên `test/architecture.test.mjs`), **không** phải dạng
+TAP `^# pass`/`^# fail` mà
+`docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md` cấm vì
+reporter mặc định không bao giờ in.
+
 ## Shape
 
-1. **Đo trước, chưa sửa gì** — P1 rồi P1b. Kết quả ghi vào
-   `docs/history/tsk-3um-cli-test-split/` làm bằng chứng before.
+1. **Đo per-test cost** — chạy `node --test --test-reporter=spec
+   test/cli/fgos.test.mjs` một lần (~171s), lấy duration từng test, cộng
+   theo nhóm ở bảng trên, chỉnh ranh giới cho nhóm nặng nhất < 30s (P1b —
+   đây là dữ liệu để chia nhóm, thuộc thi công, không phải proof point
+   feasibility; P1 ở trên mới là cái gate tính khả thi và nó đã đóng).
 2. **Trích helper** ra `test/cli/helpers/fgos-cli-harness.mjs`.
 3. **Chuyển test theo 8 nhóm**, ranh giới chốt theo số đo ở P1b. Mỗi nhóm
    một file `test/cli/fgos-<chủ-đề>.test.mjs`.
