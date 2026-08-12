@@ -3302,12 +3302,18 @@ async function runVerb(verb, flags, positional, dir) {
       if (source === 'runner') {
         // Iron Law check now runs earlier (hoisted above the --github branch,
         // f01) so it guards both merge transports identically — see that
-        // block for the full rationale. This local-merge branch continues
-        // directly with the dirty-tree check.
+        // block for the full rationale.
+        //
+        // tsk-kv3 (Q1): the main-checkout clean-tree gate USED to run here,
+        // unconditionally, covering both the leaf->root and root->main
+        // paths below. Removed for leaf->root specifically: that merge runs
+        // entirely inside a DETACHED ephemeral worktree
+        // (withMergeEphemeralWorktree, a few lines down) and never reads or
+        // writes repoRoot's own working tree at all — gating on its
+        // cleanliness protected a resource that path never touches. The
+        // gate is re-added below, scoped to the root->main branch only,
+        // which genuinely does merge onto the shared checkout.
         const ownFileSet = buildOwnFileSet(runnerOwnDiff, item.footprint);
-        if (!isMainTreeClean(repoRoot, ownFileSet)) {
-          throw new StoreError('validation', `approve: working tree at "${repoRoot}" is not clean — commit or stash pending changes before approving "${id}".`);
-        }
 
         // Acceptance-evidence pre-flight (tsk-396 D1): covers both merge
         // paths below (leaf->root and root->main share this one branch
@@ -3552,6 +3558,16 @@ async function runVerb(verb, flags, positional, dir) {
             };
             });
           });
+        }
+
+        // tsk-kv3 (Q1): unlike leaf->root above, THIS path genuinely merges
+        // onto the shared main checkout (mergeRunnerItem(repoRoot, ...)
+        // just below, no ephemeral worktree) — the clean-tree gate belongs
+        // here, scoped to the item's own file set exactly as it already
+        // was before this item (tsk-598's own buildOwnFileSet narrowing,
+        // unchanged; only the GATE'S LOCATION moved, not its logic).
+        if (!isMainTreeClean(repoRoot, ownFileSet)) {
+          throw new StoreError('validation', `approve: working tree at "${repoRoot}" is not clean — commit or stash pending changes before approving "${id}".`);
         }
 
         // Root merge into main — unchanged except for D8: a root that

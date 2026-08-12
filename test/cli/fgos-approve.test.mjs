@@ -219,6 +219,39 @@ test('approve of a runner item with a declared footprint still refuses on an unc
   assert.equal(stateView(cwd).work['approve-footprint-dirty'].status, 'awaiting-approval');
 });
 
+// tsk-kv3 (Q1): the main-checkout clean-tree gate no longer runs at all on
+// the leaf->root path — that merge happens entirely inside a DETACHED
+// ephemeral worktree (withMergeEphemeralWorktree) and never reads or
+// writes repoRoot's own working tree. Gating on it protected a resource
+// that path never touches, and could block a leaf approve on a dirty file
+// that has nothing to do with the merge actually being attempted.
+
+test('approve of a LEAF item is unaffected by a dirty main checkout, even one colliding with the leaf\'s own declared footprint path (tsk-kv3 Q1) — the root-to-main equivalent test above still refuses, this one must not', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedLeafItem(cwd, 'kv3-leaf-root', 'kv3-leaf-dirty', {
+    verify: 'test -f kv3-leaf-dirty-produced.txt',
+    footprint: 'footprint-guarded.txt',
+  });
+  commitPendingBeforeApprove(cwd, 'kv3-leaf-dirty');
+
+  // Same shape as the root/standalone test above (an uncommitted footprint
+  // path dirtying the main checkout) — for a root that still refuses (D3).
+  // For a leaf, it must NOT: this file sits in repoRoot's own working tree,
+  // which the leaf's ephemeral-worktree merge never reads or writes.
+  fs.writeFileSync(path.join(cwd, 'footprint-guarded.txt'), 'unrelated to the ephemeral merge\n');
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['approve', 'kv3-leaf-dirty']);
+  assert.equal(result.status, 0, `leaf approve must succeed despite the dirty main checkout: ${result.stdout}${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.to, 'delivered');
+  assert.equal(data.target, 'fgw/kv3-leaf-root');
+
+  assert.equal(gitHead(cwd), headBefore, 'main HEAD must be unchanged — the dirty file is still sitting there, untouched, exactly as it was');
+  assert.equal(fs.readFileSync(path.join(cwd, 'footprint-guarded.txt'), 'utf8'), 'unrelated to the ephemeral merge\n', 'the dirty file itself must survive untouched — this gate never claimed to clean it up, only to block on it');
+});
+
 test('approve of a leaf item with a clean merge lands the work on fgw/<root> (not main) via an ephemeral worktree, leaf -> delivered, fgw/<leaf> SURVIVES the approve (tsk-1p9: teardown deferred to the cleanup verb), fgw/<root> survives', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
