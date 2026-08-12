@@ -13,7 +13,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { COMMAND_REGISTRY } from '../../src/cli/command-registry.mjs';
-import { DEFAULT_DOMAIN, DOMAINS } from '../../src/state/workflow-stage-graphs.mjs';
+import { DEFAULT_DOMAIN, DOMAINS, discoverableStages } from '../../src/state/workflow-stage-graphs.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SRC_DIR = path.resolve(__dirname, '../../src');
@@ -95,8 +95,7 @@ test('no registry description names a stage the default domain has retired', () 
 // own `case 'discover':` -- for the default domain that is discovery/exploring.
 // The description must name those, since it is what a caller reads before
 // choosing between `discover` and `plan`.
-test('discover\'s description names the stages its precondition actually accepts', async () => {
-  const { discoverableStages } = await import('../../src/intake/discovery.mjs');
+test('discover\'s description names the stages its precondition actually accepts', () => {
   const entry = COMMAND_REGISTRY.find((e) => e.name === 'discover');
   assert.ok(entry, 'COMMAND_REGISTRY is missing a "discover" entry');
   for (const stage of discoverableStages(DOMAINS[DEFAULT_DOMAIN])) {

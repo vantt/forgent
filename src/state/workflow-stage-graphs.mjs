@@ -518,6 +518,30 @@ export function stageForStep(domain, step) {
   return Object.keys(domain.stepMap).find((stage) => domain.stepMap[stage] === step);
 }
 
+/** The stages within `domain` that `fgos discover` can legally act on — the
+ * domain's own Clarify-mapped stage (if it still declares one) plus
+ * `discovery`/`exploring` when the domain registers both.
+ *
+ * tsk-qod D1/D2: `stageForStep(domain, 'Clarify')` resolves to `undefined`
+ * for a domain that retired `clarify` entirely (today: only `coding`) —
+ * `.filter(Boolean)` drops that phantom entry instead of letting
+ * `undefined` leak out as if it were a real, valid stage name. A domain
+ * that still has a real Clarify-mapped stage (e.g. `triage`) is unaffected.
+ *
+ * tsk-64h: lives here, in the registry module, rather than in
+ * `src/intake/discovery.mjs` where it started. It is a pure question about
+ * a domain's own `stages`/`stepMap` — and `src/state/discover-pool.mjs`
+ * (layer `domain`) needs the same answer, which it could not get from a
+ * `use-case`-layer module without the upward import
+ * `test/architecture.test.mjs` forbids. One definition, three callers
+ * (`discover-pool.mjs`, `discovery.mjs`'s own `nextDiscoveryEdge`, and
+ * `bin/fgos.mjs`'s `discover` precondition), no literal copy anywhere. */
+export function discoverableStages(domain) {
+  const clarifyStage = stageForStep(domain, 'Clarify');
+  const hasDiscoveryExploring = domain.stages?.includes('discovery') && domain.stages?.includes('exploring');
+  return (hasDiscoveryExploring ? [clarifyStage, 'discovery', 'exploring'] : [clarifyStage]).filter(Boolean);
+}
+
 /** The stage `item` should be treated as being at, whether or not `stage`
  * was ever explicitly written (D8 lazy-default) — `item.stage ??
  * stageForStep(domain, 'Execute')`, the same expression `frontier.mjs`/
