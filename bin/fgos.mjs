@@ -3292,7 +3292,59 @@ async function runVerb(verb, flags, positional, dir) {
           // the target's tip BEFORE this callback runs, so the slot must
           // already be held by the time that read happens, not acquired
           // from inside it (that would leave the tip read unprotected).
-          return await withMergeTargetSlot(repoRoot, rootBranch, () => withMergeEphemeralWorktree(repoRoot, rootId, async (ephemeral) => {
+          return await withMergeTargetSlot(repoRoot, rootBranch, async () => {
+            // tsk-4ax (D3): catchup as a STANDARD step, not only a recovery
+            // from `blocked` — if the target isn't yet an ancestor of the
+            // branch, catch it up FIRST, still inside the slot (so the
+            // target provably cannot move between this check and the land
+            // below — the whole invariant D3 depends on). Once caught up,
+            // the branch itself is now an ancestor and carries a commit
+            // this call JUST verified green; `effectiveItem` threads that
+            // fresh tip into the land below in-memory only (never persisted
+            // via moveWork — awaiting-approval -> awaiting-approval is not
+            // a valid FSM edge, and there is nothing to persist: this same
+            // call is about to consume the proof immediately).
+            let effectiveItem = item;
+            let alreadyAncestor = false;
+            try {
+              execFileSync('git', ['merge-base', '--is-ancestor', rootBranch, branchNameFor(id)], { cwd: repoRoot, encoding: 'utf8', shell: false });
+              alreadyAncestor = true;
+            } catch (ancestorErr) {
+              if (ancestorErr.status !== 1) throw ancestorErr;
+            }
+            if (!alreadyAncestor) {
+              const catchupResult = await performCatchUp(repoRoot, id, item, rootBranch, timeoutMs);
+              if (catchupResult.outcome === 'conflict') {
+                moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-conflict', role: 'system' });
+                addFriction(dir, {
+                  id,
+                  disposition: 'blocked',
+                  errorClass: 'merge-conflict',
+                  layer: 'state',
+                  attempts: 1,
+                  detail: `catchup (inbound gate): git merge --no-commit --no-ff ${rootBranch} into ${branchNameFor(id)} conflicted; merge aborted, ${branchNameFor(id)} unchanged`,
+                });
+                return { id, mode: 'merge', to: 'blocked', reason: 'merge-conflict', target: rootBranch, conflictedFiles: catchupResult.conflictedFiles };
+              }
+              if (catchupResult.outcome === 'verify-fail') {
+                const mergeReason = catchupResult.timedOut ? 'verify-timeout-post-merge' : 'verify-fail-post-merge';
+                moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: mergeReason, role: 'system' });
+                addFriction(dir, {
+                  id,
+                  disposition: 'blocked',
+                  errorClass: catchupResult.timedOut ? 'verify-timeout' : 'verify-miss',
+                  layer: 'verification',
+                  attempts: 1,
+                  detail: catchupResult.timedOut
+                    ? `catchup (inbound gate): goal-check timed out on staged merge into ${branchNameFor(id)} after ${timeoutMs}ms — not a verify failure; merge aborted, ${branchNameFor(id)} unchanged, rerun catchup`
+                    : `catchup (inbound gate): goal-check failed on staged merge into ${branchNameFor(id)} (exit ${catchupResult.exitStatus}); merge aborted, ${branchNameFor(id)} unchanged`,
+                });
+                return { id, mode: 'merge', to: 'blocked', reason: mergeReason, target: rootBranch, timedOut: catchupResult.timedOut, exitStatus: catchupResult.exitStatus, output: catchupResult.output };
+              }
+              // 'merged' or 'already-caught-up'.
+              effectiveItem = { ...item, branchHeadAtReturn: catchupResult.catchupHead };
+            }
+            return await withMergeEphemeralWorktree(repoRoot, rootId, async (ephemeral) => {
             // tsk-2eq: lockRoot pins the main-checkout lock to the real
             // repo root — ephemeral.path stays the git-op cwd (unchanged)
             // but is never the lock's own root, since it's a throwaway
@@ -3303,7 +3355,7 @@ async function runVerb(verb, flags, positional, dir) {
             // path doesn't use, so it is skipped in favor of the target
             // slot already held by withMergeTargetSlot around this whole
             // call.
-            const result = await runMerge(() => mergeRunnerItem(ephemeral.path, item, { timeoutMs, lockRoot: repoRoot, targetSlot: true }));
+            const result = await runMerge(() => mergeRunnerItem(ephemeral.path, effectiveItem, { timeoutMs, lockRoot: repoRoot, targetSlot: true }));
 
             if (result.outcome === 'conflict') {
               moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-conflict', role: 'system' });
@@ -3426,7 +3478,8 @@ async function runVerb(verb, flags, positional, dir) {
               output: result.check.output,
               postLand: result.postLand,
             };
-          }));
+            });
+          });
         }
 
         // Root merge into main — unchanged except for D8: a root that
@@ -3671,8 +3724,8 @@ async function runVerb(verb, flags, positional, dir) {
       const { noWait, waitMs } = parseWaitFlags(flags, 'sync-root');
       const runMerge = (mergeFn) => (noWait ? mergeFn() : withLockRetry(mergeFn, { waitMs }));
 
-      const runAndReport = async (mergeRoot, lockRoot, targetSlot = false) => {
-        const result = await runMerge(() => mergeRunnerItem(mergeRoot, item, lockRoot ? { timeoutMs, lockRoot, targetSlot } : { timeoutMs }));
+      const runAndReport = async (mergeRoot, lockRoot, targetSlot = false, itemOverride = item) => {
+        const result = await runMerge(() => mergeRunnerItem(mergeRoot, itemOverride, lockRoot ? { timeoutMs, lockRoot, targetSlot } : { timeoutMs }));
 
         if (result.outcome === 'conflict') {
           addFriction(dir, {
@@ -3748,7 +3801,48 @@ async function runVerb(verb, flags, positional, dir) {
         // tsk-xyr (§E): same target-slot-outside-the-ephemeral-worktree
         // ordering as approve's leaf-to-root path above — the slot must be
         // held before createDetachedMergeWorktree reads the target's tip.
-        return await withMergeTargetSlot(repoRoot, targetBranch, () => withMergeEphemeralWorktree(repoRoot, item.parent, async (ephemeral) => runAndReport(ephemeral.path, repoRoot, true)));
+        return await withMergeTargetSlot(repoRoot, targetBranch, async () => {
+          // tsk-4ax (D3): same inbound-gate catchup as approve's leaf-to-root
+          // path — still inside the slot, so the target provably cannot
+          // move between this check and the land below.
+          let effectiveItem = item;
+          let alreadyAncestor = false;
+          try {
+            execFileSync('git', ['merge-base', '--is-ancestor', targetBranch, branch], { cwd: repoRoot, encoding: 'utf8', shell: false });
+            alreadyAncestor = true;
+          } catch (ancestorErr) {
+            if (ancestorErr.status !== 1) throw ancestorErr;
+          }
+          if (!alreadyAncestor) {
+            const catchupResult = await performCatchUp(repoRoot, id, item, targetBranch, timeoutMs);
+            if (catchupResult.outcome === 'conflict') {
+              addFriction(dir, {
+                id,
+                disposition: 'blocked',
+                errorClass: 'merge-conflict',
+                layer: 'state',
+                attempts: 1,
+                detail: `sync-root catchup (inbound gate): git merge --no-commit --no-ff ${targetBranch} into ${branch} conflicted; merge aborted, ${branch} unchanged`,
+              });
+              return { id, mode: 'sync-root', outcome: 'blocked', reason: 'merge-conflict', target: targetBranch, branch, conflictedFiles: catchupResult.conflictedFiles };
+            }
+            if (catchupResult.outcome === 'verify-fail') {
+              addFriction(dir, {
+                id,
+                disposition: 'blocked',
+                errorClass: catchupResult.timedOut ? 'verify-timeout' : 'verify-miss',
+                layer: 'verification',
+                attempts: 1,
+                detail: catchupResult.timedOut
+                  ? `sync-root catchup (inbound gate): goal-check timed out on staged merge into ${branch} after ${timeoutMs}ms — not a verify failure; merge aborted, ${branch} unchanged`
+                  : `sync-root catchup (inbound gate): goal-check failed on staged merge into ${branch} (exit ${catchupResult.exitStatus}); merge aborted, ${branch} unchanged`,
+              });
+              return { id, mode: 'sync-root', outcome: 'blocked', reason: catchupResult.timedOut ? 'verify-timeout' : 'verify-fail', timedOut: catchupResult.timedOut, target: targetBranch, branch, exitStatus: catchupResult.exitStatus, output: catchupResult.output };
+            }
+            effectiveItem = { ...item, branchHeadAtReturn: catchupResult.catchupHead };
+          }
+          return await withMergeEphemeralWorktree(repoRoot, item.parent, async (ephemeral) => runAndReport(ephemeral.path, repoRoot, true, effectiveItem));
+        });
       }
       // tsk-66t: a root with no parent merges directly on the shared main
       // checkout (runAndReport(repoRoot) below), unlike the item.parent
