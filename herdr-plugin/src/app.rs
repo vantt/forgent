@@ -536,7 +536,7 @@ impl App {
                     id: "tsk-19y-2".into(),
                     title: "Wire real fgOS data into the dashboard".into(),
                     goal_tier: "mvp".into(),
-                    stage: "decompose".into(),
+                    stage: "planning".into(),
                     status: "doing".into(),
                     blocked_by: Vec::new(),
                     blocks: 1,
