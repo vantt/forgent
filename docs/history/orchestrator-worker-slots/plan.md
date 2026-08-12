@@ -232,15 +232,38 @@ trọn-mẻ.
   trong nó — chứ không tái dùng chính file lock đó. Nếu T1 tìm được lý do
   ngược lại thì phải nêu bằng chứng, không mặc định quay về khuôn cũ.
 
+  **BẪY LỚN NHẤT khi code T1: lock KHÔNG dùng được làm tín hiệu
+  occupancy.** Không agent nào ôm lock suốt vòng đời của nó, dù chạy
+  interactive hay headless. Agent chỉ ôm `main-checkout.lock` trong
+  *khoảnh khắc* gọi engine (`pick`/`return`/`approve`) rồi nhả ngay
+  (`releaseOnExit: true`); lúc nó ngồi sửa file hàng chục phút trong
+  worktree riêng thì không giữ lock nào cả. Một agent đang làm việc thật
+  sự là *vô hình* với mọi lock. Đó chính là lý do D2 chọn occupancy =
+  state (`status: doing`) + tín hiệu hoạt động worktree của `tsk-3ni`.
+
+  Cùng lý do đó cho thấy cổng trần trong `claimWork` đúng chỗ: nó chạy
+  *dưới* `main-checkout.lock` nên hai launcher không thể cùng giành slot
+  cuối — nhưng lock nhả ngay sau claim, nên occupancy *sau đó* buộc phải
+  là derived state, không phải lock-held.
+
   **Ba lock đang tồn tại, đừng lẫn** (validating xác minh):
-  `runner.lock` (chỉ runner); `main-checkout.lock`
-  (`main-checkout-lock.mjs:49` — `claimWork` `claim-port.mjs:98`,
-  `merge.mjs:720`, `fgos unlock` `fgos.mjs:4344`, identity là
-  `process.pid`); `EVENTS_LOCK_FILE` (`state/events.mjs`, chính là
-  category `lock-timeout`). Đáng ghi: `main-checkout.lock` do **engine**
-  giữ theo `process.pid`, bất kể lời gọi đến từ session tương tác hay
-  headless — cổng trần đặt trong `claimWork` vì vậy nằm sẵn dưới lock
-  này, không cần tự lo đồng bộ.
+  - **`runner.lock`** (`loop.mjs:119`) — bảo vệ quyền *điều phối*, không
+    phải quyền làm việc: chỉ `fgos-runner` giữ, suốt cả lượt `runOnce`
+    (reap + discovery dispatch + drain), để hai runner không cùng
+    reap/dispatch một repo (`loop.mjs:1079-1083`). Agent bị nó spawn ra
+    **không** giữ lock này — agent không ra quyết định xếp việc.
+  - **`main-checkout.lock`** (`main-checkout-lock.mjs:49`) — bảo vệ quyền
+    *ghi vào main checkout*. Giữ bởi `claimWork` (`claim-port.mjs:98`),
+    `merge.mjs:720`, `fgos unlock` (`fgos.mjs:4344`), **và git hook mỗi
+    lần commit**. Ngắn, TTL 3 phút. Identity là `process.pid` *hoặc một
+    chuỗi* — hook ghi chuỗi mỗi commit và không bao giờ release, TTL tự
+    hết hạn là thiết kế chứ không phải bug.
+  - **`EVENTS_LOCK_FILE`** (`state/events.mjs`) — khoá `events.jsonl`,
+    chính là category `lock-timeout`.
+
+  `main-checkout.lock` do **engine** giữ theo `process.pid`, bất kể lời
+  gọi đến từ session tương tác hay headless — nên cổng trần trong
+  `claimWork` nằm sẵn dưới nó, không cần tự lo đồng bộ.
 - **A2** — Đặt cổng trong `claimWork` không làm hỏng đường claim nào hiện
   có. *Chưa chứng minh* — cần chạy thật toàn bộ test claim.
 - **A3** — `fgos move --to doing` (bypass thủ công, RESEARCH F-A) chấp
