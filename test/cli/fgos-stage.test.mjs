@@ -297,6 +297,90 @@ test('discover --verdict with an unrecognized value is rejected as validation, e
   assert.match(result.stderr, /"clear" or "unclear"/);
 });
 
+// --- caller-supplied classification (D12): `--tier`/`--kind`/`--risk` on
+// `discover` give the interactive path the same data contract the headless
+// worker already has through its `fgos-verdict` block, routed through the
+// SAME guard (`classificationPatchFromVerdict`) rather than a second copy of
+// it. Decided at discovery on real evidence, never guessed from submit text.
+
+test('discover --verdict clear with --tier/--kind/--risk applies the classification to the item', () => {
+  const cwd = tmpCwd();
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+
+  const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- classified', '--tier', 'heavy', '--kind', 'bug', '--risk', 'heavy']);
+  assert.equal(result.status, 0);
+  assert.equal(JSON.parse(result.stdout).data.outcome, 'clear');
+
+  const item = envelopeData(run(cwd, ['list']).stdout).work[id];
+  assert.equal(item.tier, 'heavy');
+  assert.equal(item.kind, 'bug');
+  assert.equal(item.risk, 'heavy');
+  assert.equal(item.stage, 'planning');
+});
+
+test('discover applies only the classification fields actually passed, leaving the rest untouched', () => {
+  const cwd = tmpCwd();
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  const before = envelopeData(run(cwd, ['list']).stdout).work[id];
+
+  const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- partial', '--kind', 'docs']);
+  assert.equal(result.status, 0);
+
+  const item = envelopeData(run(cwd, ['list']).stdout).work[id];
+  assert.equal(item.kind, 'docs');
+  assert.equal(item.tier, before.tier, 'an unpassed field is never rewritten');
+  assert.equal(item.risk, before.risk, 'an unpassed field is never rewritten');
+});
+
+test('discover --verdict unclear never applies classification — the same guard the headless path uses', () => {
+  const cwd = tmpCwd();
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+  const before = envelopeData(run(cwd, ['list']).stdout).work[id];
+
+  const result = run(cwd, ['discover', id, '--verdict', 'unclear', '--question', 'Which provider?', '--tier', 'heavy', '--kind', 'bug', '--risk', 'heavy']);
+  assert.equal(result.status, 0);
+  assert.equal(JSON.parse(result.stdout).data.outcome, 'unclear');
+
+  const item = envelopeData(run(cwd, ['list']).stdout).work[id];
+  assert.equal(item.tier, before.tier);
+  assert.equal(item.kind, before.kind);
+  assert.equal(item.risk, before.risk);
+  assert.equal(item.status, 'awaiting-human');
+});
+
+test('discover with an out-of-vocabulary --kind is rejected as validation (exit 4) before the item moves at all', () => {
+  const cwd = tmpCwd();
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+
+  const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- bad-kind', '--kind', 'bogus']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /work\.kind must be one of/);
+
+  const item = envelopeData(run(cwd, ['list']).stdout).work[id];
+  assert.equal(item.stage, 'discovery', 'a rejected classification must never leave the item half-advanced');
+  assert.notEqual(item.kind, 'bogus');
+});
+
+test('discover with an out-of-vocabulary --tier is rejected as validation (exit 4) before the item moves at all', () => {
+  const cwd = tmpCwd();
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+
+  const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- bad-tier', '--tier', 'enormous']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /work\.tier must be one of/);
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'discovery');
+});
+
+test('discover with a bare --risk (no value) is rejected as validation, exit 4', () => {
+  const cwd = tmpCwd();
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+
+  const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- bare-risk', '--risk']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /--risk/);
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'discovery');
+});
+
 test('plan --verdict pass-through moves the item to executing', () => {
   const cwd = tmpCwd();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;

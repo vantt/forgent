@@ -77,8 +77,8 @@ threshold is hit. Changing one supersedes its decision ID — never edit it in p
 A session opening in this repo to work an item through its lifecycle loads
 `fgos-routing` first (`.claude/skills/fgos-routing/SKILL.md`): it orients
 on open work, claims one item through the pull door, then points to
-`fgos-exploring`, `fgos-planning`, or `fgos-validating` based on where that
-item's `stage` puts it.
+`fgos-coding-discovering`, `fgos-coding-exploring`, `fgos-coding-planning`,
+or `fgos-coding-validating` based on where that item's `stage` puts it.
 
 **Never run a raw `git reset --hard` on the main checkout without a full
 `git status` first** (tsk-3au: `docs/history/main-checkout-destructive-
@@ -93,7 +93,7 @@ when the tree is dirty.
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **forgent** (12247 symbols, 17374 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **forgent** (14761 symbols, 20688 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939).
 

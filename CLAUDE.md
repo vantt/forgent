@@ -9,7 +9,8 @@ context-load time. Never wrap it in backticks; that disables it.
 
 The GitNexus "Always Do" / "Never Do" rules below assume GitNexus is
 present on this machine. Before treating them as binding — and before
-`fgos-planning`/`fgos-validating`/`fgos-code-implement` decide how much
+`fgos-coding-planning`/`fgos-coding-validating`/`fgos-coding-implement`
+decide how much
 impact-analysis evidence a plan's verify/test scope needs — query the
 capability instead of assuming the tool:
 
@@ -41,7 +42,7 @@ when the policy changes, never the rules inside the block.
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **forgent** (12247 symbols, 17374 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **forgent** (14761 symbols, 20688 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939).
 

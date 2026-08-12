@@ -87,7 +87,7 @@ import { claimWork, ClaimError } from './claim-port.mjs';
 import { hasWorkerSlotRoom } from '../state/worker-slots.mjs';
 import { readSharedConfig } from '../config/shared-config-file.mjs';
 import { resolveRepoRoot, fgosDirFromRoot } from './paths.mjs';
-import { FALLBACK_VERIFY, resolveDiscovery } from '../intake/discovery.mjs';
+import { FALLBACK_VERIFY, resolveDiscovery, classificationPatchFromVerdict } from '../intake/discovery.mjs';
 import { resolvePlan } from '../intake/plan.mjs';
 import { classify, generateId } from '../intake/classify.mjs';
 import { setTimeout as delay } from 'node:timers/promises';
@@ -625,22 +625,14 @@ export function parseVerdictBlock(output) {
   return verdict;
 }
 
-// D12/D17 (tsk-2yo): the editWork patch for a headless worker's classification
-// report, extracted as its own pure function so it is unit-testable without
-// mocking the whole dispatch pipeline. Never applies unless the discovery
-// outcome actually resolved 'clear' AND the caller verdict itself was clear
-// -- an 'unclear'/'runner-noop' outcome must never pick up a classification
-// the worker only judged conditionally on evidence that turned out
-// insufficient. Returns an empty object (never null) when there is nothing
-// to apply, so the call site can check `Object.keys(patch).length` uniformly.
-export function classificationPatchFromVerdict(outcome, callerVerdict) {
-  if (outcome !== 'clear' || !callerVerdict?.clear) return {};
-  const patch = {};
-  if (callerVerdict.tier !== undefined) patch.tier = callerVerdict.tier;
-  if (callerVerdict.kind !== undefined) patch.kind = callerVerdict.kind;
-  if (callerVerdict.risk !== undefined) patch.risk = callerVerdict.risk;
-  return patch;
-}
+// D12/D17: the classification guard used to be defined here, when the
+// headless sweep below was the only path that applied tier/kind/risk. The
+// interactive `discover` verb now applies it too, so the function moved down
+// into `src/intake/discovery.mjs` — the engine module BOTH paths already
+// call — and is re-exported here unchanged. One door, checked in one place;
+// this line only keeps `src/runner/loop.mjs` a valid import site for callers
+// that already read it from here.
+export { classificationPatchFromVerdict };
 
 // Per-dispatch ceiling on how many fgos-discovered blocks a single worker
 // output can mint into items (review-fix S10, P2 finding): untrusted worker

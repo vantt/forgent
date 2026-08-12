@@ -2,8 +2,9 @@
 name: fgos-routing
 description: >-
   Use at the start of every fgOS work session in this repo: orient on open
-  work, claim an item through the pull door, then route to fgos-coding-exploring,
-  fgos-coding-planning, or fgos-coding-validating based on the claimed item's current
+  work, claim an item through the pull door, then route to
+  fgos-coding-discovering, fgos-coding-exploring, fgos-coding-planning, or
+  fgos-coding-validating based on the claimed item's current
   stage. Examples: "what should I work on next", "I just claimed an item,
   what do I do now", "this item is stuck waiting on a person".
 ---
@@ -11,7 +12,9 @@ description: >-
 # fgos-routing
 
 Entry point for a session working an fgOS item through the core loop
-(`clarify` → `decompose` → `executing`). This skill never does the work
+(`discovery` → `exploring` → `planning` → `executing`, with `exploring`
+skipped outright when `discovery`'s own verdict comes back clear). This
+skill never does the work
 itself — it locates where an item stands right now and names the one
 other skill to load next. Load it first when a session opens in this
 repo.
@@ -31,10 +34,11 @@ Both are read-only. Nothing here writes state.
 
 ### Mode gate (mechanical, not vibes) — decide the lane before loading a heavy skill
 
-For any claimed item at stage `decompose`, decide its lane HERE, before
+For any claimed item at stage `planning` (or its legacy drain-only alias
+`decompose`), decide its lane HERE, before
 routing it to `fgos-coding-planning` below (tsk-5ay D1: triage-before-load, moved
 from inside `fgos-coding-planning` itself). This is knowing-before-load, not
-skip-load — read the table below plainly: every `decompose`-shaping item
+skip-load — read the table below plainly: every `planning`-shaping item
 still gets routed to `fgos-coding-planning` regardless of lane, so this alone
 does not save that skill's own load cost (tsk-da1, found by independent
 review — tsk-5ay's own original rationale overstated this; recorded
@@ -63,7 +67,7 @@ moved here; the recording still happens in `plan.md` itself, written by
 `fgos-coding-planning`'s own Bootstrap step from this lane, carried forward as
 prose (never a new field on the item, never a value `stage` takes). Hand
 the lane, the flag count, and which flags applied to `fgos-coding-planning`
-directly when routing a `decompose`-stage item there.
+directly when routing a `planning`-stage item there.
 
 ## Running a state-writing verb from this session
 
@@ -94,10 +98,12 @@ fgos take --role session [--id <id>]
 ```
 
 The frontier (`fgos ready`) is executing-stage-only by definition — every
-item it surfaces has already cleared `clarify` and `decompose`. Omitting
+item it surfaces has already cleared `discovery`, `exploring`, and
+`planning`. Omitting
 `--id` pulls the next frontier item, so a default claim can only ever land
-on an item ready for direct execution. To work an item still at `clarify`
-or `decompose` — the ones routed to `fgos-coding-exploring` or `fgos-coding-planning`
+on an item ready for direct execution. To work an item still at
+`discovery`, `exploring`, or `planning` — the ones routed to
+`fgos-coding-discovering`, `fgos-coding-exploring`, or `fgos-coding-planning`
 below — claim it specifically with `--id <id>` (found via `fgos list`).
 `--role session` marks the claim as coming from a live session rather than
 a person — always pass it here.
@@ -136,11 +142,12 @@ call, not a different table:
 
 | stage | what's true right now | load (coding domain today) |
 |---|---|---|
-| `discovery` | intent is understood (checked at Init, before the item exists — `fgos-clarifying`, called by `/fgOS:submit`); an unresolved question remains that needs a grounded finding before the item can move to `exploring` | `fgos-researching` |
+| `discovery` | intent is understood (checked at Init, before the item exists — `fgos-clarifying`, called by `/fgOS:submit`); what's left is the machine-alone pass that decides whether anything ambiguous remains — clear skips `exploring` and lands on `planning` directly, unclear falls to `exploring` | `fgos-coding-discovering` (`fgos-researching` is the helper it calls per unresolved question, never the stage's own skill) |
 | `exploring` | the request is still fuzzy — gray areas, missing acceptance criteria, an ambiguous ask | `fgos-coding-exploring` |
-| `decompose` — shaping | scope is settled; the work now needs shaping and, where it doesn't fit in one pass, splitting into child items | `fgos-coding-planning` (the registry's entry-point default for `decompose`) |
-| `decompose` — proving | shape and children (if any) exist; what's left is proving the plan against reality before the item is allowed to move to `executing` | `fgos-coding-validating` — this branch is this skill's own session-side judgment layered on top of the registry's single `decompose` default, never a second registry entry |
-| `executing` | the item has already cleared clarification and shaping (or never needed either), and is ready for direct implementation | `fgos-coding-implement` (str89-fgos-domain-skills D4/D6 — the build/verify/return path, hand-authored from bee-executing's implement→verify→cap discipline) |
+| `planning` — shaping | scope is settled; the work now needs shaping and, where it doesn't fit in one pass, splitting into child items | `fgos-coding-planning` (the registry's entry-point default for `planning`) |
+| `planning` — proving | shape and children (if any) exist; what's left is proving the plan against reality before the item is allowed to move to `executing` | `fgos-coding-validating` — this branch is this skill's own session-side judgment layered on top of the registry's single `planning` default, never a second registry entry |
+| `decompose` (legacy) | the pre-rename name for `planning`, kept drain-only so items already sitting on it can finish (tsk-403 D18); no new item ever lands here | same as `planning` above — `fgos-coding-planning`, then `fgos-coding-validating` |
+| `executing` | the item has already cleared discovery and shaping (or never needed either), and is ready for direct implementation | `fgos-coding-implement` (str89-fgos-domain-skills D4/D6 — the build/verify/return path, hand-authored from bee-executing's implement→verify→cap discipline) |
 
 `compound-learn` is retired as a stage (work-item-status-delivered-
 retrospective-cleanup D11, supersedes RUL49/RUL50/RUL51) — the synthesis
@@ -148,16 +155,24 @@ layer it used to gate (`fgos-coding-compounding`) now triggers on the status
 `retrospective` instead, driven by a separate retrospective loop, not this
 stage-routing table.
 
-`decompose` is one stage in the data, not two — "shaping" and "proving"
+`clarify` is not in that table because it is no longer a stage at all
+(tsk-qod D1/D2): the intent check it used to hold moved to Init, run by
+`fgos-clarifying` before `fgos submit` ever creates an item, and the 90
+items open on it at rename time were migrated off for real. `discovery`
+is the domain's own entry point now — `stages[0]`, which is also what
+omitting `--stage` on `fgos submit`/`fgos add` resolves to.
+
+`planning` is one stage in the data, not two — "shaping" and "proving"
 above are a judgment call inside that single stage, never a value `stage`
 itself takes. This skill's whole job is exactly that judgment: read
 `stage`, resolve the domain's registered skill via
 `getDomain`/`skillForStage`, and layer the shaping/proving split on top of it
 (and whether the item is parked per the gate contract below) to decide
-which of `fgos-coding-exploring` / `fgos-coding-planning` / `fgos-coding-validating` answers
+which of `fgos-coding-discovering` / `fgos-coding-exploring` /
+`fgos-coding-planning` / `fgos-coding-validating` answers
 where the item stands. It is the only skill that makes this particular
-call — the other three never re-derive it, and this skill never does
-their work in their place.
+call — the stage-skills themselves never re-derive it, and this skill
+never does their work in their place.
 
 This skill still never classifies which *domain* an item belongs to —
 it only reads whatever `domain` field the item already carries (or the
@@ -171,8 +186,10 @@ touch.
 
 Reading `stage` here is judgment for routing *this session* to the right
 skill — it is never authority to move the item. When this skill's own
-read of an item's readiness and the engine's own auto-judge
-(`judgeDiscovery`/`judgeDecompose` in `src/intake/`) would disagree, the
+read of an item's readiness and the engine's own resolution of the edge
+(`resolveDiscovery`/`resolvePlan` in `src/intake/`, which require the
+calling session's verdict now that the old subprocess judges are retired)
+would disagree, the
 engine's verb decides, not this skill: stage transitions are always the
 engine's own machine judgment, never applied by this skill or any other
 skill in this layer (per D8, the same "trí tuệ không cầm picker" stance
@@ -214,8 +231,9 @@ lying about what's actually happening.
 
 1. `fgos list` / `fgos ready` to orient.
 2. `fgos take --role session [--id <id>]` to claim one item.
-3. Read the claimed item's `stage` and load `fgos-coding-exploring`,
-   `fgos-coding-planning`, or `fgos-coding-validating` per the table above — or proceed
+3. Read the claimed item's `stage` and load `fgos-coding-discovering`,
+   `fgos-coding-exploring`, `fgos-coding-planning`, or
+   `fgos-coding-validating` per the table above — or proceed
    directly if it's already at `executing`.
 4. Hit a decision only a person can make? `fgos ask` / `fgos answer`,
    same path whether it resolves right away or later.

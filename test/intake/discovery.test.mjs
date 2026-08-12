@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { resolveDiscovery, RETIRED_P14_PLACEHOLDER, FALLBACK_VERIFY } from '../../src/intake/discovery.mjs';
+import { resolveDiscovery, RETIRED_P14_PLACEHOLDER, FALLBACK_VERIFY, classificationPatchFromVerdict, assertCallerClassification } from '../../src/intake/discovery.mjs';
 import { computeImpact, computePriority } from '../../src/state/priority-formula.mjs';
 import { addWork, listWork, StoreError, categoryOf, putInAwaiting, answerAwaiting, moveWork, recordGateApprove } from '../../src/state/store.mjs';
 import { appendEvent, readEvents } from '../../src/state/events.mjs';
@@ -329,6 +329,41 @@ test('resolveDiscovery at discovery advances to exploring AND parks in awaiting-
   assert.equal(view.gates?.['item-x']?.ask, 'Which auth provider?');
 });
 
+// tsk-31lz: the stage move above is real, but it is NOT a settlement — the
+// item was just judged not clear and is parked with an open question. This
+// is the end-to-end guard for the replay gate (test/state/replay.test.mjs
+// covers the fold in isolation); it also pins the write ORDER the gate
+// depends on, since the fold reads the verdict from the work.discovery event
+// this call appends before its moveStage.
+test('resolveDiscovery records NO clarify-pass settlement for an unclear verdict at discovery, even though the item leaves the stage (tsk-31lz)', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: false, question: 'Which auth provider?' });
+  assert.equal(result.outcome, 'unclear');
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'exploring');
+  assert.equal(
+    view.settlements?.['item-x'],
+    undefined,
+    'an unclear verdict must never fold into the settlement channel as a pass',
+  );
+});
+
+test('resolveDiscovery DOES record a clarify-pass settlement for a clear verdict at discovery, carrying the real verify as detail (tsk-31lz: the fix narrows the unclear path only)', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: true, verify: 'npm test -- item-x' });
+  assert.equal(result.outcome, 'clear');
+
+  const view = listWork(storeDir);
+  assert.equal(view.settlements['item-x'].length, 1);
+  assert.equal(view.settlements['item-x'][0].kind, 'clarify-pass');
+  assert.equal(view.settlements['item-x'][0].detail, 'npm test -- item-x');
+});
+
 test('resolveDiscovery keeps park-in-place for an unclear verdict outside discovery (tsk-30v D6: scoped to discovery only, using the triage domain-agnostic fixture)', () => {
   const storeDir = tmpStoreDir();
   // triage domain's own Clarify-mapped stage is literally named 'triage'
@@ -578,4 +613,33 @@ test('resolveDiscovery still updates priority on a legacy-invalid item shape —
   const view = listWork(storeDir);
   assert.equal(view.work['item-x'].stage, 'planning');
   assert.equal(typeof view.work['item-x'].priority, 'number');
+});
+
+// --- D12 classification door: the interactive `discover` verb and the
+// headless runner sweep must share ONE guard, not two copies that can drift.
+
+test('the headless sweep and the interactive verb read the SAME classification guard, not a copy of it', async () => {
+  const { classificationPatchFromVerdict: fromLoop } = await import('../../src/runner/loop.mjs');
+  assert.equal(fromLoop, classificationPatchFromVerdict, 'src/runner/loop.mjs must re-export discovery.mjs\'s function, never define its own');
+});
+
+test('assertCallerClassification refuses an out-of-vocabulary value and passes a valid one, without writing anything', () => {
+  const work = { ...sampleWork(), domain: 'coding' };
+
+  assert.throws(
+    () => assertCallerClassification(work, { clear: true, kind: 'bogus' }),
+    (err) => categoryOf(err) === 'validation' && /work\.kind must be one of/.test(err.message),
+  );
+  assert.throws(
+    () => assertCallerClassification(work, { clear: true, tier: 'enormous' }),
+    (err) => categoryOf(err) === 'validation' && /work\.tier must be one of/.test(err.message),
+  );
+  assert.doesNotThrow(() => assertCallerClassification(work, { clear: true, tier: 'heavy', kind: 'bug', risk: 'heavy' }));
+});
+
+test('assertCallerClassification is a no-op on an unclear verdict, even one carrying a bad classification', () => {
+  const work = { ...sampleWork(), domain: 'coding' };
+  assert.doesNotThrow(() => assertCallerClassification(work, { clear: false, question: 'which one?', kind: 'bogus' }));
+  assert.doesNotThrow(() => assertCallerClassification(work, undefined));
+  assert.doesNotThrow(() => assertCallerClassification(work, { clear: true }));
 });

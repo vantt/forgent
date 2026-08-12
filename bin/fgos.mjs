@@ -24,7 +24,7 @@ import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfigForDir } from '../src/runner/dispatch.mjs';
 import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
 import { resolveFgosDir, fgosDirFromRoot } from '../src/runner/paths.mjs';
-import { resolveDiscovery, discoverableStages } from '../src/intake/discovery.mjs';
+import { resolveDiscovery, classificationPatchFromVerdict, assertCallerClassification } from '../src/intake/discovery.mjs';
 import { resolvePlan } from '../src/intake/plan.mjs';
 import { computeEntropy, computeCounts, FINAL_STATUSES } from '../src/report/entropy.mjs';
 import { findSourceCaptureIds } from '../src/report/enduser-index.mjs';
@@ -62,7 +62,7 @@ import { createSession, endSession, listSessions, reclaimOrphanedSessions, Sessi
 import { resolveRoot } from '../src/runner/root-affinity.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
-import { getDomain, stageForStep, effectiveStage } from '../src/state/workflow-stage-graphs.mjs';
+import { getDomain, stageForStep, effectiveStage, discoverableStages, resolveDomainName } from '../src/state/workflow-stage-graphs.mjs';
 import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
 import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
 import { recordInvocationFault } from '../src/cli/invocation-fault-log.mjs';
@@ -387,6 +387,25 @@ function parseDiscoverCallerVerdict(flags) {
     // silently misapply" stance for every other flag here by simply not
     // reading it on that branch.
     if (flags.force) verdict.force = true;
+    // D12: tier/kind/risk are decided AT discovery, on evidence — the
+    // headless worker already reports them in its `fgos-verdict` block, and
+    // these three flags are the interactive path's half of that same data
+    // contract, so a live session no longer has to remember a separate
+    // `fgos edit` call to record what it just judged. Read only on the clear
+    // branch, the same way `--force` is: a classification judged against
+    // evidence that turned out insufficient must never ride an unclear
+    // verdict, and simply not reading the flags there is what enforces it —
+    // the same guard the headless path runs
+    // (`classificationPatchFromVerdict`) then re-checks the resolved outcome
+    // before anything is written. Each key is present only when the caller
+    // actually passed it, so a call that omits all three produces the exact
+    // same verdict shape as before these flags existed.
+    const tier = optionalField(flags.tier, "discover --tier requires a value ('light'/'standard'/'heavy'); omit --tier entirely to leave the item's tier unchanged.");
+    const kind = optionalField(flags.kind, "discover --kind requires a value from the domain's own kind vocabulary; omit --kind entirely to leave the item's kind unchanged.");
+    const risk = optionalField(flags.risk, "discover --risk requires a value ('light'/'standard'/'heavy'); omit --risk entirely to leave the item's risk unchanged.");
+    if (tier !== undefined) verdict.tier = tier;
+    if (kind !== undefined) verdict.kind = kind;
+    if (risk !== undefined) verdict.risk = risk;
     return verdict;
   }
   if (flags.verdict === 'unclear') {
@@ -1189,11 +1208,26 @@ async function runVerb(verb, flags, positional, dir) {
       // exploring (today: coding) can call `discover` from any of its own
       // three stages; a domain that never registered them (triage/
       // synthetic) keeps the original single-stage precondition unchanged.
-      const validStages = discoverableStages(getDomain(work?.domain, { onUnrecognized: () => {} }));
+      const discoverDomain = getDomain(work?.domain, { onUnrecognized: () => {} });
+      const validStages = discoverableStages(discoverDomain);
       if (!validStages.includes(stage)) {
+        // tsk-1l9: only point at `plan` when `plan` would actually take the
+        // item. Suggesting it unconditionally made the two gates refer the
+        // reader to each other in a closed loop for any stage NEITHER verb
+        // serves -- which is exactly what the three items stranded at retired
+        // `clarify` hit, leaving them with no verb-shaped way out at all.
+        const planStage = stageForStep(discoverDomain, 'Divide');
+        const planTakesIt = stage === planStage
+          || (stage === 'decompose' && discoverDomain.stages?.includes('decompose'));
         throw new StoreError(
           'validation',
-          `discover: work "${id}" is at stage "${stage}", not ${validStages.map((s) => `"${s}"`).join('/')} -- use "fgos plan ${id}" instead.`,
+          `discover: work "${id}" is at stage "${stage}", not ${validStages.map((s) => `"${s}"`).join('/')}`
+            + (planTakesIt
+              ? ` -- use "fgos plan ${id}" instead.`
+              : ` -- and "fgos plan" does not serve that stage either. No stage verb does:`
+                + ` "${stage}" is not registered by domain "${resolveDomainName(work?.domain, { onUnrecognized: () => {} })}"`
+                + ` (${JSON.stringify(discoverDomain.stages)}). Run "fgos doctor" and read the`
+                + ' work-stage-vocabulary check.'),
         );
       }
       // An explicit --config path stays a loud, unmodified failure on ENOENT
@@ -1212,7 +1246,24 @@ async function runVerb(verb, flags, positional, dir) {
         ? loadRunnerConfig(flags.config)
         : ensureRunnerConfigForDir(path.dirname(dir));
       const callerVerdict = parseDiscoverCallerVerdict(flags);
-      return resolveDiscovery(dir, id, cfg, 'session', callerVerdict);
+      // D12: refuse an out-of-vocabulary --tier/--kind/--risk BEFORE
+      // resolveDiscovery writes anything — the same validation editWork
+      // applies below, run early so a typo can never leave the item with its
+      // stage advanced and its classification rejected.
+      assertCallerClassification(work, callerVerdict);
+      const result = resolveDiscovery(dir, id, cfg, 'session', callerVerdict);
+      // The interactive half of D12's classification contract, applied
+      // through the SAME guard the headless sweep uses (loop.mjs re-exports
+      // it from discovery.mjs) rather than a second copy: only a resolved
+      // `clear` outcome carrying a clear caller verdict ever produces a
+      // patch, so an unclear verdict or a parked verify dispute applies
+      // nothing. A call that passed no classification flags leaves the patch
+      // empty, editWork is never called, and the returned payload keeps its
+      // exact pre-existing shape.
+      const classificationPatch = classificationPatchFromVerdict(result.outcome, callerVerdict);
+      if (Object.keys(classificationPatch).length === 0) return result;
+      editWork(dir, { id, patch: classificationPatch, role: 'session' });
+      return { ...result, classification: classificationPatch };
     }
 
     // The sync branch's entry point into chia-việc/split-work judgment
@@ -1242,7 +1293,21 @@ async function runVerb(verb, flags, positional, dir) {
       // stays a no-op for them.
       const legacyPlanStage = domain.stages?.includes('decompose') && planningStage !== 'decompose' ? 'decompose' : undefined;
       if (stage !== planningStage && stage !== legacyPlanStage) {
-        throw new StoreError('validation', `plan: work "${id}" is at stage "${stage}", not "${planningStage}"${legacyPlanStage ? ` (or legacy "${legacyPlanStage}")` : ''} -- use "fgos discover ${id}" instead.`);
+        // tsk-1l9: mirror of the discover gate above -- only refer the reader
+        // to `discover` when `discover` would actually accept the item, so
+        // the two gates can never form a closed loop around a stage neither
+        // of them serves.
+        const discoverTakesIt = discoverableStages(domain).includes(stage);
+        throw new StoreError(
+          'validation',
+          `plan: work "${id}" is at stage "${stage}", not "${planningStage}"${legacyPlanStage ? ` (or legacy "${legacyPlanStage}")` : ''}`
+            + (discoverTakesIt
+              ? ` -- use "fgos discover ${id}" instead.`
+              : ` -- and "fgos discover" does not serve that stage either. No stage verb does:`
+                + ` "${stage}" is not registered by domain "${resolveDomainName(work?.domain, { onUnrecognized: () => {} })}"`
+                + ` (${JSON.stringify(domain.stages)}). Run "fgos doctor" and read the`
+                + ' work-stage-vocabulary check.'),
+        );
       }
       // path.dirname(dir), not process.cwd() -- see the discover case above
       // for why (tsk-5hv, found by fgos-coding-implement).

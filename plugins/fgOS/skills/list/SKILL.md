@@ -75,8 +75,9 @@ never appends an event).
 3. **Report as a table and stop.** Render every item from `data.work` as a
    markdown table with exactly these columns, in this order: **id**,
    **status**, **stage**, **goalTier**, **priority**, **title**.
-   - `stage` (`clarify` | `decompose` | `executing` | `compound-learn` per
-     work.mjs's stage domain) is optional on the raw record — an item with
+   - `stage` (`discovery` | `exploring` | `planning` | `executing`, plus
+     the drain-only legacy `decompose`, per the coding domain's own
+     `stages` in workflow-stage-graphs.mjs) is optional on the raw record — an item with
      no `stage` field defaults to `executing` (work-state Data Dictionary
      #12); render that default explicitly as `executing`, not `-` or blank.
    - `goalTier` is optional (`mvp` | `milestone` per work.mjs's

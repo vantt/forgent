@@ -37,6 +37,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   as before. A runner that finds the lane full now ends its run cleanly
   (`idle`, exit 0) rather than halting with a non-zero exit, and an item
   refused for lack of room is simply left for a later poll.
+- `fgos doctor` gained a `delivered-not-on-trunk` check: it names any item
+  whose status says its work was handed over (`delivered`, `retrospective`,
+  `cleanup`, `done`) while its own `fgw/<id>` branch is still not reachable
+  from the trunk. `delivered` is reachable through a bare `fgos move`, which
+  merges nothing and asks for no proof that anything merged, so real tested
+  work could sit outside `main` with nothing reporting it — `root-drift`
+  only walks root items, and `fgos stale` waits a three-day TTL and then
+  says "forgotten", not "unmerged". The check separates the two causes: a
+  branch that merged nowhere needs its content landed, while one that landed
+  on a root branch that has not synced needs `fgos sync-root` on the root
+  instead.
+- `fgos discover` and `fgos plan` no longer send the reader to each other
+  when neither serves the item's stage. Each gate now checks whether its
+  sibling would actually accept the item; when neither does, both say so
+  plainly and point at `fgos doctor`'s stage-vocabulary check, instead of
+  forming a closed referral loop with no way out.
+
 - The `decompose` stage/verb/launcher family is renamed to `plan`: the CLI
   verb `fgos decompose` is now `fgos plan`, the slash command
   `/fgOS:decompose` is now `/fgOS:plan`, and the stage a coding-domain item
@@ -51,6 +68,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `fgos-coding-planning`, `fgos-validating`→`fgos-coding-validating`,
   `fgos-compounding`→`fgos-coding-compounding`, `fgos-code-implement`→
   `fgos-coding-implement`.
+- The `clarify` stage is retired entirely — it is no longer a stage at
+  all. The understand-the-ask pass it used to run moved to an Init-time
+  helper (`fgos-clarifying`) that `/fgOS:submit` calls BEFORE the item is
+  created, so an item is now born with the cleaned-up title/description
+  and its domain already settled. Unlike `decompose`, no drain-only alias
+  is kept: every item still open on `clarify` was migrated onto a real
+  stage first, so nothing is stranded. `discovery` is now the coding
+  domain's first stage, and no item can be created at, or moved to,
+  `clarify` anymore.
+- A `discovery` verdict now picks WHICH EDGE the item takes, instead of
+  every item walking one fixed chain. `clear` skips `exploring` entirely
+  and lands the item straight on `planning`; `unclear` advances it to
+  `exploring` and parks it there for a person, so whoever answers resumes
+  already sitting at the stage where the Socratic pass happens instead of
+  looping back through discovery on the same unresolved question.
+  Previously an unclear verdict parked the item in place, at whatever
+  stage it was already on.
+- `tier`/`kind`/`risk` are no longer judged from the raw submit text. The
+  `fgos submit` verb still stamps its mechanical keyword-derived values,
+  but those are now explicitly a temporary placeholder: stage
+  `discovery`'s own skill (`fgos-coding-discovering`) makes the real call
+  once, on the research evidence it just gathered, reading each domain's
+  declared `kind`/`risk` vocabulary rather than a hardcoded list. No
+  caller re-judges them at intake anymore — a wrong placeholder is
+  corrected later by discovery's own judgment, not earlier by guessing
+  harder at the ask. The `submit-assist-classify` capacity is retired
+  outright, with no migration: it only ever described how to call a
+  helper, never held a judgment that needed handing over.
 - `/fgOS:retro-next` is now a launcher in the strict sense: it sweeps,
   picks one item, and hands it to `fgos-coding-driving` with an explicit
   `ceiling: status:cleanup`, relaying whatever the driver reports. It no
@@ -81,6 +126,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   convention (no launcher ships a default ceiling past `awaiting-approval`)
   rather than by the driver refusing structurally.
 
+### Fixed
+
+- `fgos check`'s entropy report no longer under-counts the backlog waiting
+  at the front of the lifecycle. The signal filtered on the literal stage
+  name `clarify`, which the coding domain retired entirely, so it reported
+  0 forever while every open item genuinely parked at the domain's real
+  entry stage (`discovery`) went uncounted. It now resolves each item's own
+  domain entry stage, and the row is labelled `stage-entry` instead of
+  `stage-clarify` to match what it actually counts.
+
 ### Removed
 
 - The `orchestrator` word ban (`test/docs/launcher-vocabulary-guard.test.mjs`
@@ -96,6 +151,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `fgos discover` accepts `--tier`, `--kind`, and `--risk` alongside
+  `--verdict clear`, so an interactive session can record the classification
+  it just judged in the same call that resolves discovery, instead of
+  remembering a separate `fgos edit`. This is the same data contract a
+  headless worker already had through its `fgos-verdict` block, and both
+  paths now run it through one shared guard: nothing is applied unless the
+  discovery outcome actually resolves clear, so an unclear verdict or a
+  parked verify dispute still changes no classification. A value outside the
+  item's own domain vocabulary is refused as a validation error (exit 4)
+  before the item moves at all, and omitting a flag leaves that field
+  untouched.
 - Repo-invariant checks now run alongside an item's own `verify`, at both
   `fgos return` and the post-merge gate of `fgos approve`. The commands are
   declared per project in `.fgos/config.json` under `invariantChecks.commands`
@@ -107,6 +173,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   nothing runs, nothing changes. This closes the gap where a repo-wide
   invariant broken by one item could land on main and stay red across later
   merges, because no item's own narrow `verify` happened to touch it.
+
+- `fgos doctor` gained a `work-stage-vocabulary` check: it names any open
+  item sitting at a stage its own domain no longer registers. Until now
+  only `risk`/`kind` drift was surfaced this way, so an item stranded on a
+  retired stage — which no `fgos edit` can correct, since `stage` has no
+  editable door — stayed invisible until some other command tripped over
+  it. The `discover` pool now derives its candidate stages from the same
+  source the `fgos discover` verb checks against, so it can no longer offer
+  an item that the verb would then refuse.
 
 - `fgos promote-to-component` gained an opt-in `--trust-dir` flag: with an
   explicit `--dir` also passed, it can now run from inside a linked
@@ -159,8 +234,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   as every other registered config default.
 
 - The herdr-plugin dashboard auto-launches a guarded agent pane running
-  `/fgOS:discover <id>` for the first `clarify`-stage, `todo`-status item
-  it finds, once per poll tick, when `herdrOrchestrator.autoDiscover` is
+  `/fgOS:discover <id>` for the first `discovery`-stage, `todo`-status
+  item it finds, once per poll tick, when `herdrOrchestrator.autoDiscover` is
   on (off by default). Guarded against double-launching the same item via
   a dedicated pane label, kept separate from the dashboard's existing
   In-Process pane tracking so it never shows up there as a phantom task.
@@ -175,17 +250,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- `/fgOS:submit` run from a live session now continues into the item's
-  `discovery` stage in the same session: it clarifies the title/description
-  first, then judges `tier`/`kind`/`risk` against the cleaned-up text
-  instead of the raw ask. Any question it needs to ask is asked while you
-  are still in the conversation, rather than days later at a discovery
-  sweep. The `fgos submit` verb itself is unchanged — still mechanical,
+- `/fgOS:submit` run from a live session now clarifies the ask before the
+  item is created: `fgos-clarifying` reads the raw text and hands back the
+  cleaned-up title/description and the domain, and `fgos submit` is called
+  with those. It never judges `tier`/`kind`/`risk` itself — stage
+  `discovery` does that, once, on real evidence. Any question it needs to
+  ask is asked while you are still in the conversation, rather than days
+  later at a discovery sweep. The `fgos submit` verb itself is unchanged — still mechanical,
   still no model call — so a bare shell, cron, another agent, or the
   dogfood fixture replay all behave exactly as before.
 
 ### Fixed
 
+- An item parked for a person after being judged NOT clear at `discovery`
+  was still recorded in the settlement channel as having passed, because
+  the settlement record keyed only on the item leaving `discovery` — which
+  an unclear verdict now also does. Where the item had no real verify yet,
+  the record's detail read as the literal "chưa xác định — bổ sung thủ
+  công" placeholder. A settlement is now recorded only when the verdict
+  that drove the move was clear. Records already written for real clear
+  passes are unaffected; nothing is re-derived or silenced retroactively.
 - Items could be stored with a `risk` value nothing in the system reads
   (`low`/`medium`/`high`), which silently disabled two behaviors rather
   than failing: the human-confirmation gate that fires before a
@@ -209,10 +293,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The standalone `fgos-submit-assist` skill. Its own steps had no reason
   left to exist on their own: title derivation always lived in the
-  `submit` verb itself, and its tier/kind/risk classification is now done
-  automatically — on cleaner, post-clarify text — by `/fgOS:submit`'s own
-  step 6 for any live session. Use `/fgOS:submit` directly; it now does
-  strictly more than this skill did.
+  `submit` verb itself, and its tier/kind/risk classification now happens
+  once at stage `discovery`, on real research evidence, for every item
+  regardless of which caller created it. Use `/fgOS:submit` directly; it
+  now does strictly more than this skill did.
 
 ## [0.1.0]
 
