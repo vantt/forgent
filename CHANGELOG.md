@@ -43,11 +43,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   their values but change role: they bound how large a batch that launcher
   may propose, while the shared ceiling decides whether the batch runs at
   all — so the real limit on a machine is one number rather than the sum of
-  three. A batch passes whole or not at all, never trimmed to the number of
-  free slots. With no `workerSlots.ceiling` configured, both behave exactly
+  three. A batch is trimmed to the number of free slots: the ceiling is hard,
+  and anything fired past it would be refused at the claim door anyway, so a
+  launcher stands up only what the engine granted and defers the rest to the
+  next wave. With no `workerSlots.ceiling` configured, both behave exactly
   as before. A runner that finds the lane full now ends its run cleanly
   (`idle`, exit 0) rather than halting with a non-zero exit, and an item
   refused for lack of room is simply left for a later poll.
+- The runner's discovery sweep now asks for a worker slot too. It stands a
+  real research worker up but never claims the item, so that process was
+  invisible to the ceiling and ran even when the lane was full — the machine
+  could carry more workers than the configured total while `fgos slots`
+  reported fewer.
+- A runner that dispatched nothing now says which of the two happened.
+  "Frontier empty — nothing to do" and "the lane is full, work is waiting"
+  previously printed the same line and returned the same envelope; the idle
+  result now carries `reason` (`frontier-empty` or `worker-slot-ceiling`),
+  and a refusal names the item ids currently holding the slots, so a lane
+  wedged by an abandoned claim is visible instead of looking like an empty
+  backlog.
 - `fgos doctor` gained a `delivered-not-on-trunk` check: it names any item
   whose status says its work was handed over (`delivered`, `retrospective`,
   `cleanup`, `done`) while its own `fgw/<id>` branch is still not reachable

@@ -108,15 +108,43 @@ test('hasWorkerSlotRoom below the ceiling reports the real free count', () => {
   assert.equal(room.granted, 1);
 });
 
-test('hasWorkerSlotRoom grants a WHOLE batch larger than the free slots while any slot is free (D8)', () => {
+// Supersedes the whole-batch rule, which this test previously asserted as
+// `granted === 5`. That rule said a pre-computed batch passes whole while any
+// slot is free, overshooting by a bounded margin — but the enforcing gate
+// inside claimWork claims ONE item per call and re-folds the log each time,
+// so it never had a way to honor a batch grant. Nothing ever overshot: a
+// batch of five against one free slot landed one and refused four, every
+// time. Trimming here is what stops a launcher standing up four workers that
+// die at the claim door.
+test('hasWorkerSlotRoom trims a batch to the free slots, because the gate can only ever admit that many', () => {
   const view = viewOf(...Array.from({ length: 7 }, (_, n) => doingItem(`i${n}`)));
   const room = hasWorkerSlotRoom(view, { ceiling: 8, batchSize: 5 });
   assert.equal(room.allowed, true);
   assert.equal(room.free, 1);
-  assert.equal(room.granted, 5, 'a pre-computed batch is never split by the ceiling');
+  assert.equal(room.granted, 1, 'granting more than free would promise what claimWork refuses');
 });
 
-test('hasWorkerSlotRoom refuses exactly at the ceiling — this is what makes D8 self-bounding', () => {
+// The claim-door proof for the test above: a grant is advice, the gate
+// decides, and it admits exactly `free` — never one more.
+test('a batch trimmed to granted is exactly what the claim door actually admits', () => {
+  const view = viewOf(...Array.from({ length: 7 }, (_, n) => doingItem(`i${n}`)));
+  const room = hasWorkerSlotRoom(view, { ceiling: 8, batchSize: 5 });
+
+  // Simulate dispatching `granted` items: each claim re-reads occupancy the
+  // way claimWork does, one at a time.
+  let occupied = room.occupied;
+  let admitted = 0;
+  for (let i = 0; i < room.granted; i += 1) {
+    const perClaim = hasWorkerSlotRoom(viewOf(...Array.from({ length: occupied }, (_, n) => doingItem(`i${n}`))), { ceiling: 8 });
+    if (!perClaim.allowed) break;
+    admitted += 1;
+    occupied += 1;
+  }
+  assert.equal(admitted, room.granted, 'every granted item must survive the claim door');
+  assert.equal(occupied, 8, 'and occupancy lands exactly on the ceiling, never past it');
+});
+
+test('hasWorkerSlotRoom refuses exactly at the ceiling, so occupancy can never exceed it', () => {
   const view = viewOf(...Array.from({ length: 8 }, (_, n) => doingItem(`i${n}`)));
   const room = hasWorkerSlotRoom(view, { ceiling: 8, batchSize: 5 });
   assert.equal(room.allowed, false);

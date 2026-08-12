@@ -60,9 +60,9 @@ own judgment.
 - **Every child runs `/fgOS:pick <id>` unabridged (D5).** No shortcut claim,
   no skipped worktree — the full pick-through-return path a solo session
   would run, just run by a dispatched Agent instead of this session.
-- **Ask the engine for a worker-slot before firing a batch, and then take
-  that batch whole** (`docs/history/orchestrator-worker-slots/
-  DISCUSSION.md` D6/D7/D8). Read `fgos slots --json` fresh before every
+- **Ask the engine for worker-slots before firing a batch, and fire only as
+  many as it grants** (`docs/history/orchestrator-worker-slots/
+  DISCUSSION.md` D6/D7). Read `fgos slots --json` fresh before every
   batch — that verb is the port, and per decision `0014` the CLI is the
   only door a prose skill has into the engine (`herdr-plugin` asks through
   the same one). A `execution.hasRoom: false` answer means the machine is
@@ -72,15 +72,19 @@ own judgment.
   (D7), which is engine state, not by an Agent that has not claimed one
   yet.
 
-  While at least one slot is free, fire the batch **whole** — never
-  trimmed down to `execution.free`. Splitting a pre-computed batch across
-  two waves is exactly what D8 forbids. `computeSchedule`'s own wave
-  packing already batches by footprint; this skill additionally never lets
-  a single batch exceed **5 members**. That 5 is a maximum batch SIZE, no
-  longer a ceiling of its own — the ceiling belongs to the engine now, and
-  5 is simply what bounds how far one whole-batch grant can overshoot it:
-  at most 4 past, and never compounding, because the next ask sees no room
-  and is refused outright.
+  **Trim the batch to `execution.free`.** This SUPERSEDES D8's whole-batch
+  rule, which said a batch passes whole while any slot is free and
+  overshoots by a bounded margin. That rule was never implemented and could
+  not be: the engine's enforcing gate lives inside `claimWork`, which claims
+  ONE item per call, so a batch of five against one free slot lands one item
+  and refuses four — deterministically, not as a race. Firing whole does not
+  buy a wave; it just spawns four Agents that die at the claim door and come
+  back as failed candidates. Splitting across two waves is the cheaper half
+  of that trade. `computeSchedule`'s own wave packing already batches by
+  footprint; this skill additionally never lets a single batch exceed **5
+  members**. That 5 is a maximum batch SIZE, not a ceiling of its own — the
+  ceiling belongs to the engine, and the batch actually fired is
+  `min(5, execution.free)`.
 - **Announce every dispatch before firing it.** Print one line per
   candidate, same shape `_shared/capacity-dispatch-fallback.md`'s Step
   B.5/C.3 already use for observability parity across every dispatch path
@@ -150,13 +154,25 @@ loop:
   ready = scheduled candidates that also pass the D5 pre-check
     (frontier membership + isResolvedStatus on deps)
 
-  for each batch of up to 5 ids from `ready` (5 = max batch size, D8):
+  for each batch of up to 5 ids from `ready` (5 = max batch size):
     slots = fresh `fgos slots --json` read
-    if slots.execution.hasRoom is false:
-      fire nothing; wait, then re-read `fgos slots --json` and re-check
-      before this batch is tried again (D6 — refusal is accepted, never
-      worked around)
-    dispatch the batch WHOLE — never trimmed to slots.execution.free (D8)
+
+    while slots.execution.hasRoom is false:
+      # The engine is the authority and refusal is final (D6) — never work
+      # around it, never fire "just one to be sure".
+      report to the caller that the lane is full, naming the ids in
+        slots.execution.items that are holding it, then wait ~60s and
+        re-read `fgos slots --json`
+      after 10 consecutive refusals (~10 min), STOP and hand back to the
+        caller: a lane that never frees is an incident (an abandoned claim
+        a person must clear with `/fgOS:stale`), not a queue to keep
+        polling. Report the holding ids so the caller can act.
+
+    # Trim, do not fire whole: the engine admits at most `free` (see the
+    # hard rule above — D8's whole-batch rule is superseded).
+    batch = the first min(batch.length, slots.execution.free) ids
+    any id trimmed off stays in `ready` for the next batch — it is
+      deferred, never dropped and never reported as failed
 
     for each id in the batch: print its announce line
       (`<id> - native - <subagent_type> - <model>`)
@@ -199,8 +215,11 @@ separate, later concern (D8) — this skill is invocable on its own with just
   candidate blindly
 - firing a batch without asking `fgos slots` first, or firing one anyway
   after the engine answered `hasRoom: false`
-- trimming a pre-computed batch down to the number of free slots instead
-  of taking it whole, or letting one batch exceed 5 members
+- firing more than `execution.free` Agents because the batch was already
+  computed — every one past that number dies at the claim door and comes
+  back as a false failure; or letting one batch exceed 5 members
+- polling a full lane forever instead of handing back to the caller once
+  it is clear the lane is wedged rather than busy
 - counting the Agents this skill itself fired as if that were the
   worker-slot occupancy — the engine owns that number (D2/D7)
 - reading state before a batch has fully settled

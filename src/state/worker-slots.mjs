@@ -26,8 +26,15 @@
 //
 // The race between the two faces is accepted on purpose (plan.md): between
 // "asked, saw room" and "actually claimed" another launcher can take the last
-// slot. No reservation or TTL is added to close it — the ceiling is soft at
-// the top edge by design (D7), and a refused pane already closes itself.
+// slot. No reservation or TTL is added to close it, so a launcher must treat
+// a grant as advice and a refusal as final — the enforcing face is the one
+// that decides, and it never lets `occupied` exceed `ceiling`.
+//
+// The ceiling is therefore HARD, not soft at the top edge: the original
+// design called for a bounded overshoot (D7/D8), but the enforcing gate
+// claims one item at a time and never had a way to honor a batch grant, so
+// no overshoot was ever possible. See `hasWorkerSlotRoom` for the full
+// supersede.
 
 /**
  * The admin lane (merge/retro/cleanup loops, plus one spare) is a FIXED
@@ -114,11 +121,27 @@ export function countWorkerSlots(view, { excludeId } = {}) {
 /**
  * Is there room in the execution lane, and for how many?
  *
- * D8's whole-batch rule lives here: while at least one slot is free, a
- * pre-computed batch passes WHOLE — `granted` is the full `batchSize`, never
- * trimmed to the number of free slots. That is what makes the overshoot
- * self-bounding without any tunable: the batch that overshoots raises
- * occupancy, so the next acquire sees zero free and is refused outright.
+ * `granted` is how many of `batchSize` the caller may actually stand up:
+ * `min(batchSize, free)` once a ceiling is armed, the whole batch when none
+ * is. A launcher trims its batch to this number.
+ *
+ * This SUPERSEDES the whole-batch rule (DISCUSSION.md D8), which said a
+ * pre-computed batch passes whole while any slot is free, overshooting the
+ * ceiling by a bounded margin that could not compound. That rule was never
+ * implemented and could not be, without machinery the same plan rejected:
+ * the enforcing gate lives inside `claimWork`, which claims exactly ONE item
+ * and re-folds the log per call, so it has no concept of a batch to honor a
+ * whole-batch grant with. Nothing overshot — a batch of five against one
+ * free slot landed one item and refused four, deterministically, every time.
+ * Honoring the original rule would have required a reservation token held
+ * across claims, which is the reservation/TTL machinery the plan turned down
+ * on purpose.
+ *
+ * So the ceiling is hard, not soft: `occupied` never exceeds `ceiling`. The
+ * launcher-side cost the old rule was avoiding — a batch split across two
+ * waves — is real but cheap, and strictly cheaper than standing up workers
+ * that die at the claim door. `granted` is the number that makes trimming
+ * possible instead of leaving each launcher to guess.
  *
  * A `ceiling` that is absent or not a positive integer means no ceiling —
  * `allowed: true`, always. Callers configure a real number through
@@ -137,5 +160,5 @@ export function hasWorkerSlotRoom(view, { ceiling, batchSize = 1, excludeId } = 
   if (free === 0) {
     return { allowed: false, occupied, ceiling, free, granted: 0, reason: 'ceiling-reached' };
   }
-  return { allowed: true, occupied, ceiling, free, granted: size, reason: 'room-available' };
+  return { allowed: true, occupied, ceiling, free, granted: Math.min(size, free), reason: 'room-available' };
 }
