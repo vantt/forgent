@@ -74,8 +74,10 @@ self-pace."
      and no self-resolve attempt has been made for this `<id>` yet in this
      loop run — **agent-diagnose it before counting the block at all**
      (tsk-3mv-2 D1b, CONTEXT.md's locked scope: this is the ONE block
-     reason this skill ever investigates; every other reason skips
-     straight to the plain block-counting bullets below). Walk
+     reason this skill ever investigates by diagnosis; every other reason
+     skips straight to the plain block-counting bullets below, except
+     `merge-conflict`, which has its own recovery-verb playbook in the
+     next bullet). Walk
      `docs/how-to/diagnose-a-verify-fail-post-merge-block-on-approve.md`'s
      steps directly, in this same session:
      1. Read `approve`'s own `output` field from the response (the full
@@ -111,11 +113,50 @@ self-pace."
        a second time and do not fall through to the block-counting bullets
        below — stop the loop immediately and report, same as the
        same-id-blocked-twice bullet already does.
-   - `{picked: <id>, approve: {blocked, reason: ...}}` (`merge-conflict`,
-     plain `verify-fail`, `integration-drift`, or any other
+   - `{picked: <id>, approve: {blocked, reason: "merge-conflict"}}`, and no
+     catchup attempt has been made for this `<id>` yet in this loop run —
+     **run the catchup playbook before counting the block at all** (tsk-60h:
+     the `merge-conflict` slice of the same escalation-narrowing the
+     `verify-fail-post-merge` bullet above already does for its own reason).
+     This park has a recovery verb of its own, and reaching for it needs no
+     person: `fgos catchup <id>` accepts exactly this reason
+     (`CATCHUP_REASONS`, `bin/fgos.mjs`), merges the item's own target
+     branch back into the item's branch inside an ephemeral worktree,
+     re-runs the item's own `verify` there, and on green takes the
+     `blocked -> awaiting-approval` edge itself. Walk
+     `docs/how-to/recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree.md`:
+     1. Run `fgos catchup <id>` (appending whichever of `--timeout <ms>`/
+        `--no-timeout` step 1 parsed). It resolves its own repo root from
+        `--dir`, so it runs correctly from any directory — never leave or
+        enter a worktree first to make it work.
+     2. Read the returned `outcome` and act on exactly that, nothing else:
+        - `merged` or `already-caught-up` — the item is back at
+          `awaiting-approval`. Run `/fgOS:merge-next` again and read that
+          result through this same step 4.
+        - `conflict` — a genuine textual conflict survived the playbook.
+          This is one of the three stops that really do need a person
+          (`docs/history/merge-conductor-throughput-and-human-release/DISCUSSION.md`
+          §6). Stop the loop and report the id together with the returned
+          `conflictedFiles` list. Never resolve the hunks on this skill's
+          own authority.
+        - `verify-fail` — the branches reconciled but the item's own verify
+          is red on the merged tree. Stop the loop and report the id, and
+          say plainly when `timedOut` is set that it was a timeout rather
+          than a real red.
+     Record `<id>` as "catchup playbook already attempted" before running
+     any of the above, regardless of outcome — this playbook runs **at most
+     once per id per loop run**, the same tsk-3mv D3 discipline the
+     `verify-fail-post-merge` bullet above already follows, and a
+     successful merge forgets it again exactly as that bullet's own reset
+     describes. This playbook never applies to a `blocked: "iron-law"`
+     pick, and never to the `syncRoot` shapes below — those stay exactly
+     as the next bullet already handles them.
+   - `{picked: <id>, approve: {blocked, reason: ...}}` (plain
+     `verify-fail`, `integration-drift`, or any other
      `approve`-reported block this skill never investigates — including a
      `verify-fail-post-merge` block on an `<id>` already self-resolve-
-     attempted this run), `{picked: <id>, blocked: "iron-law", ...}`, or
+     attempted this run, and a `merge-conflict` block on an `<id>` already
+     catchup-attempted this run), `{picked: <id>, blocked: "iron-law", ...}`, or
      `{picked: <id>, blocked: <reason>, syncRoot: {...}}` with no `approve`
      field (tsk-173: a blockedOnSync root's own `sync-root` attempt was
      blocked — `<id>` here is the resolved root id, `<reason>` is
@@ -159,7 +200,9 @@ self-pace."
 
 6. **Report on stop.** Whichever condition ends the loop, say plainly
    which one it was (frontier empty, a D1b self-resolve attempt that made
-   no progress, or same-id-blocked-twice) and, for the latter two, which
-   id and why — including step 5's evidence (or its absence) when the
-   reason is Iron Law. There is nothing further to do automatically past
-   that point.
+   no progress, a catchup playbook that ended in a real `conflict` or
+   `verify-fail`, or same-id-blocked-twice) and, for all but the first,
+   which id and why — including step 5's evidence (or its absence) when
+   the reason is Iron Law, and the returned `conflictedFiles` list when
+   the reason is a surviving `conflict`. There is nothing further to do
+   automatically past that point.
