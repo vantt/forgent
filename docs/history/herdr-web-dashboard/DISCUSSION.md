@@ -6,16 +6,13 @@ herdr (đã làm), 3) web dashboard, webserver tự quản tự host frontend...
 
 ## 1. Trạng thái hiện tại
 
-Vòng 2. Người dùng đã trả lời cả 5 câu hỏi mở của vòng 1 (xem §5). Trong
-lúc xử lý câu trả lời #5 ("tôi nhớ trước đã đặt vấn đề map câu hỏi->câu trả
-lời rồi"), phát hiện một cuộc bàn trước đó rất sâu (12+ vòng,
-`docs/history/gate-question-quality-and-routing/DISCUSSION.md`, item
-`tsk-65i`+`tsk-539`, cả hai vẫn `todo/discovery`) đã đề xuất gần như đúng
-kiến trúc item này đang hình thành, và đã CHỐT một số quyết định liên quan
-trực tiếp (D7 hai vùng lưu trữ, Q13 đóng — ngôn ngữ tự do, Q8 đóng — hoãn
-đổi lược đồ event). Đang chờ người dùng quyết 2 điểm ranh giới còn mở ở
-cuối §5 trước khi viết §6: (a) tsk-ldb vs tsk-539 chia việc thế nào, (b)
-lập trường bảo mật khi mở cổng HTTP.
+Vòng 3, hội tụ. Cả 2 câu hỏi ranh giới (tsk-ldb↔tsk-539, bảo mật) đã được
+người dùng trả lời rõ ràng, không mơ hồ — 6 D-ID (D1-D6) đã mint và ghi
+qua `fgos decision --id tsk-ldb` (seq 14637-14642). §6 đã tổng hợp đầy đủ,
+§7 đã tách 3 task ứng viên + 1 companion item (`tsk-539`). Bước tiếp theo:
+người dùng xác nhận thiết kế đã ổn để bàn giao sang `fgos-coding-exploring`
+→ `fgos-coding-planning` (native-first handoff), sau đó phiên này tiếp tục
+đẩy `tsk-539` (D5) sang trạng thái hoạt động.
 
 ## 2. Mục tiêu & đề bài
 
@@ -53,12 +50,20 @@ nguyên văn dữ liệu thô.
 | 11 | Cấu trúc dữ liệu ask/answer hiện tại: có phải chỉ lưu Q+A thô, không có "brief"? | Rõ — KHÔNG đúng như giả định | Thực tế đã có sẵn đúng 2 tầng người dùng mô tả: **câu hỏi** → `gates[id].askHistory` (mảng, CỘNG DỒN mọi lần hỏi — không cần đổi); **brief/rationale lúc hỏi** → `gates[id].askRationale/askAlternatives/askSource` (GHI ĐÈ, chỉ giữ bản mới nhất — đúng như người dùng muốn, "brief không cần history"). Không cần đổi schema cho ý này. |
 | 12 | Q&A không phải kênh yes/no lớn nhất — kênh `work.gate-approve` (3 cổng skill duyệt: contextApprove/planApprove/validateApprove) lớn gấp 8 lần (48 vs 6 lượt, sau khi gỡ 1 LLM judge dư) | Rõ, từ `tsk-539` D4 (đã chốt, seq 9771) | Trực tiếp giải thích lý do người dùng thấy TUI "gây mental pressure" ở khâu duyệt — không phải cảm giác, có số đo. Ảnh hưởng scope: nếu web dashboard muốn thật sự giảm mental pressure ở approve, cần hiển thị/thao tác được cả `gate-approve` events, không chỉ `ask`/`answer`. |
 | 13 | Ghép cặp nhiều câu hỏi ↔ nhiều câu trả lời (điều người dùng nhớ đã từng đặt vấn đề) — có cần thêm liên kết tường minh (id/con trỏ) vào lược đồ event không? | Rõ — KHÔNG cần, đã kiểm chứng | `tsk-65i`/`tsk-539` S4(b) (vòng 12b): FSM chặn sẵn — item rời `frontier` ngay khi vào `awaiting-human`, không session nào hỏi-đè được trước khi có `answer`. Nên `askHistory[i]` ghép với bản ghi `answer` thứ i trong `settlements[id]` (lọc `kind:'answer'`) **theo đúng thứ tự `seq`** là đủ, không có race, không cần trường liên kết mới. Q8 (tsk-65i/539) đã đóng "HOÃN" chính vì lý do này — không đổi lược đồ event, nhu cầu thật nằm ở tầng đọc/trình bày. |
-| 14 | Nguồn dữ liệu narrative "lịch sử agent đã làm": `CONTEXT.md` (vùng người, git-versioned) hay `state.decisions` (vùng máy, ~100 token/bản, hiện 35% là ghi-sổ máy móc + 12% thiếu rationale)? | **Chưa rõ, cần người dùng xác nhận** | `tsk-65i`/`tsk-539` D7 (đã chốt, seq 10187) thiết kế sẵn: `CONTEXT.md` là vùng-người, đích render web UI (chính sơ đồ D7 có mũi tên `CONTEXT.md → Web UI`); `state.decisions` là vùng-máy, KHÔNG được nối cho consumer mới cho tới khi qua "phép kiểm độ sạch" (hiện chưa qua). Gợi ý: tsk-ldb nên đọc `CONTEXT.md`/`plan.md` (đã narrative, tường minh) làm nguồn chính cho "lịch sử agent đã làm", không phải đọc thẳng `decisions[]` thô — tránh hiện lại đúng 35% nhiễu đã đo được. |
-| 15 | Mở cổng HTTP đổi threat model của fgOS (hiện chỉ nghe từ terminal người dùng) | Rõ — cảnh báo đã có sẵn trong `tsk-65i`/`tsk-539` DISCUSSION.md §6 | *"`verify` chạy như một lệnh shell… Mở cổng HTTP đổi hẳn threat model: ai tới được cổng đó đều ghi được `verify`, và `verify` được thực thi. STR38 đã tự ghi yêu cầu identity gate trước khi dịch xuống CTR001 — không vá sau được."* Cần chốt lập trường bảo mật cho tsk-ldb TRƯỚC khi viết §6 (xem Q-mới bên dưới). |
+| 14 | Nguồn dữ liệu narrative "lịch sử agent đã làm": `CONTEXT.md` (vùng người, git-versioned) hay `state.decisions` (vùng máy) | Rõ | Áp dụng thẳng D7 của `tsk-65i`/`tsk-539` (đã chốt nơi khác, không re-derive): `CONTEXT.md`/`plan.md` là nguồn chính; `decisions[]` chỉ hiện như chi tiết mở rộng, không phải mặc định. Không có phản đối từ người dùng ở vòng 2 — giữ nguyên đề xuất. |
+| 15 | Mở cổng HTTP đổi threat model của fgOS (hiện chỉ nghe từ terminal người dùng) | Rõ | Người dùng chốt vòng 3: thêm lớp auth tối thiểu ngay từ v1 (không chấp nhận "localhost-only, không auth"). |
+| 16 | Ranh giới tsk-ldb ↔ tsk-539 | Rõ | Người dùng chốt vòng 3: **tách rời** (phương án (a) — tsk-ldb không nuốt phạm vi, không chờ tsk-539), nhưng muốn "gom/kéo theo" tsk-539 để nó cũng được deliver — xem D5 ở §4 cho cách cụ thể (không phải `deps` chặn). |
 
 ## 4. Quyết định đã chốt
 
-(chưa có mục nào — vòng đầu tiên, chưa gì đủ ổn định để mint D-ID)
+| D-ID | Quyết định | Vòng chốt | `fgos decision` |
+|---|---|---|---|
+| **D1** | Web dashboard là một **subsystem mới trong binary herdr-plugin hiện có** (Rust), không phải tiến trình/binary riêng, không chờ "launcher tổng" (đang discovery, chưa hiện thực). Chấp nhận dependency thật (HTTP server crate + embed-asset crate), miễn kết quả build vẫn là MỘT binary kèm asset frontend nhúng sẵn. Tái dùng `ports.rs`'s `trait WorkItemSource`/`PaneRegistry` làm lớp đọc dữ liệu — không viết lại. | 2-3 | ✅ seq 14637 |
+| **D2** | **Không đổi lược đồ event** để ghép nhiều câu hỏi↔câu trả lời. Ghép `gates[id].askHistory[i]` với bản ghi thứ i có `kind:'answer'` trong `settlements[id]`, theo đúng thứ tự `seq`, tại tầng đọc của web dashboard. Grounded từ `tsk-65i`/`tsk-539` Q8 (đóng HOÃN) + S4(b) (FSM đã chặn hỏi-đè, không có race). | 2 | ✅ seq 14638 |
+| **D3** | Nguồn chính cho "lịch sử agent đã làm" là `CONTEXT.md`/`plan.md` của item (vùng-người, narrative, git-versioned) — theo D7 (`tsk-65i`/`tsk-539`, đã chốt nơi khác). `fgos show --json`'s `decisions/discovery/gates/outcome/friction/settlement/learning` chỉ hiện như chi tiết mở rộng (expandable), không phải nội dung mặc định — vì 35% `decisions` hiện là ghi-sổ máy móc, chưa qua "phép kiểm sạch" D7 yêu cầu trước khi làm nguồn chính cho một consumer mới. | 3 | ✅ seq 14639 |
+| **D4** | Phạm vi "câu hỏi cần trả lời" trong task-detail bao gồm **cả hai kênh**: `ask` (gates, đã park ở `awaiting-human`) VÀ `work.gate-approve` (contextApprove/planApprove/validateApprove). Kênh `gate-approve` là kênh nặng nhất thực tế (8x khối lượng gần đây theo D4 của `tsk-539`) và đúng là nguồn "mental pressure ở khâu duyệt" người dùng nêu ở vòng 2 — chỉ làm `ask` sẽ bỏ sót phần lớn vấn đề thật. | 3 | ✅ seq 14640 |
+| **D5** | **Ranh giới tsk-ldb ↔ tsk-539: tách rời, không phải `deps` chặn.** tsk-ldb render best-effort trên nội dung `ask`/`gate-approve` hiện có, kể cả khi còn brief/trích D-ID khó hiểu — khi `tsk-539` cải thiện chất lượng authoring sau này, dashboard tự động hưởng lợi mà không cần sửa lại (hai việc tách bạch theo thiết kế: authoring vs rendering). "Kéo theo deliver" thực hiện bằng cách: `tsk-539` được ghi nhận là companion item trong §7, và phiên này sẽ tiếp tục đẩy `tsk-539` (đang `todo/discovery`, không ai giữ) sang `exploring`/`planning` ngay sau khi tsk-ldb hội tụ — không phải một `deps` edge trong state. | 3 | ✅ seq 14641 |
+| **D6** | Bảo mật: webserver bind `127.0.0.1` mặc định (không expose ra mạng ngoài máy) **cộng thêm một lớp auth tối thiểu (token) bắt buộc ngay từ v1** — không hoãn sang sau, theo đúng cảnh báo *"không vá sau được"* (STR38, trích từ `tsk-65i`/`tsk-539`). | 3 | ✅ seq 14642 |
 
 ## 5. Q&A log
 
@@ -194,10 +199,179 @@ phối cả tui"*) và đã CHỐT nhiều điểm liên quan trực tiếp:
    định phải nằm trong thiết kế từ đầu, không vá sau được (theo cảnh báo
    STR38 đã trích ở trên).
 
-## 6. Thiết kế đã chốt
+### 2026-08-12 — Vòng 3
 
-(chưa có gì để tổng hợp — chưa có quyết định nào chốt ở §4)
+**Người dùng trả lời cả 2 câu hỏi:**
+1. "tách rời. nhưng có thể gom task kia vào để lôi kéo nói deliver luôn?"
+   → chọn phương án (a) (tách rời), cộng thêm một ý mới: muốn tận dụng đà
+   của cụm này để đẩy `tsk-539` (đang không ai giữ) ra khỏi trạng thái
+   đứng im. → D5: companion item, không phải `deps` chặn (xem lý do ở D5
+   — một `deps` edge sẽ mâu thuẫn với chính "tách rời", vì D7/D2 đã chứng
+   minh tsk-ldb không cần chờ kỹ thuật gì từ tsk-539).
+2. "thêm lớp auth tối thiểu." → D6.
+
+Cả hai đủ rõ ràng, không mơ hồ, không cần vòng thứ hai để xác nhận lại —
+mint D-ID ngay (D1-D6 ở §4), khác với các điểm còn đang tranh luận/suy
+diễn (không có điểm nào như vậy còn sót trong cụm này).
+
+## 6. Thiết kế đã chốt {#design}
+
+herdr-plugin hôm nay có 2/3 core component: **herdr-orchestrator** (tự
+launch pane theo settings discover/merge/retro/cleanup, `done`) và **TUI
+dashboard** (cockpit trong herdr, `done`). Mảnh còn thiếu là **web
+dashboard**: một subsystem mới, cùng sống trong binary herdr-plugin hiện
+có (D1), tự host một webserver + frontend đã compile sẵn, chạy **song
+song** với TUI chứ không thay thế nó. Lý do tồn tại không phải "cùng dữ
+liệu, giao diện đẹp hơn" — mà là một môi trường tương tác thoải mái hơn
+hẳn, nhắm thẳng vào chỗ TUI đang gây "mental pressure" nhất: khâu
+duyệt/approve và trả lời câu hỏi treo.
+
+Đây không phải đất trống. Cụm `docs/history/gate-question-quality-and-
+routing/` (`tsk-65i`+`tsk-539`, 12+ vòng, cả hai vẫn `todo/discovery`,
+chưa ai chạm code) đã đo được chính xác cái gì đang tạo ra "mental
+pressure" đó, và đã tự đề xuất kiến trúc gần giống hệt item này ở vòng 4
+của chính nó. Thiết kế dưới đây xây trên nền quyết định đã chốt ở đó
+(D7, Q8, Q13, S4(b), D4 của `tsk-539`) thay vì phát minh lại.
+
+### Vì sao web dashboard, và nhắm vào đâu
+
+Số đo thật (từ `tsk-539` D4, đo trên toàn lịch sử `.fgos/events.jsonl`):
+kênh yes/no nặng nhất **không phải** `ask` (Q&A treo, 6 lượt gần đây) mà
+là `work.gate-approve` — ba cổng duyệt skill (`contextApprove`/
+`planApprove`/`validateApprove`), **48 lượt gần đây, gấp 8 lần**. Đây
+chính xác là "cơ chế duyệt và approve" người dùng chỉ tên là nguồn mental
+pressure. Nên (D4) task-detail's "câu hỏi cần trả lời" phải hiển thị và
+cho thao tác trên **cả hai kênh**, không chỉ Q&A hẹp — chỉ làm `ask` sẽ bỏ
+sót 8/9 khối lượng thật.
+
+### Nguồn dữ liệu — không phát minh, tái dùng seam có sẵn
+
+```mermaid
+flowchart LR
+    subgraph HP["herdr-plugin (Rust binary)"]
+      TUI["TUI dashboard<br/>(đã có)"]
+      WEB["Web dashboard<br/>(item này)"]
+      PORT["ports.rs<br/>trait WorkItemSource / PaneRegistry<br/>(đã có, tái dùng — D1)"]
+      TUI --> PORT
+      WEB --> PORT
+    end
+    PORT -->|"spawn, --json<br/>(D5 của tsk-65i/539:<br/>đọc/ghi qua verb)"| CLI["fgos CLI<br/>list / show / triage"]
+    CLI --> LOG[(".fgos/events.jsonl"<br/>nguồn sự thật)]
+
+    WEB -->|"đọc trực tiếp,<br/>nguồn CHÍNH — D3"| CTX["docs/history/&lt;feature&gt;/<br/>CONTEXT.md · plan.md<br/>(vùng-người, D7 tsk-65i/539)"]
+    WEB -.->|"chi tiết mở rộng,<br/>KHÔNG mặc định — D3"| DEC["state.decisions<br/>(vùng-máy, 35% nhiễu,<br/>chưa qua kiểm sạch)"]
+    WEB -->|"ghép seq — D2"| QA["askHistory[i] ⨝ settlements[i]<br/>(kind:'answer')<br/>không đổi lược đồ"]
+    WEB -->|"D4"| GA["work.gate-approve<br/>contextApprove/planApprove/<br/>validateApprove"]
+
+    style CTX fill:#e0ede2,stroke:#3B7A4B
+    style DEC fill:#f5e2df,stroke:#9E3A30
+    style QA fill:#ddeded,stroke:#186E71
+    style GA fill:#f2e9d8,stroke:#8E6318
+```
+
+- **Taskboard** (danh sách task): đọc qua `WorkItemSource` y hệt TUI —
+  không có nguồn dữ liệu mới, chỉ có renderer mới.
+- **Task detail — "lịch sử agent đã làm"**: nguồn chính là `CONTEXT.md`/
+  `plan.md` của item (đã narrative, đã git-versioned, D3) — không phải
+  `decisions[]` thô, vì 35% hiện là ghi-sổ máy móc chưa qua kiểm sạch
+  (D7 cấm nối consumer mới vào vùng-máy trước khi sạch). `decisions[]`
+  vẫn hiện được, nhưng dưới dạng "xem thêm", không phải mặc định.
+- **Task detail — "lịch sử câu hỏi"**: ghép `gates[id].askHistory[i]`
+  với bản `answer` thứ i trong `settlements[id]` theo `seq` (D2) — an
+  toàn vì FSM đã chặn hỏi-đè (S4(b), không có race). Không đổi lược đồ
+  event, không cần `answerHistory`/liên kết mới — đúng quyết định Q8 đã
+  đóng ở cụm kia.
+- **Task detail — "câu hỏi cần trả lời"**: cả `ask` hiện tại VÀ mọi
+  `gate-approve` đang chờ (D4). Render best-effort trên nội dung hiện có
+  — không tự viết lại/tổng hợp nội dung `ask` cũ (đó là việc của
+  `tsk-539`, D5) — nhưng layout phải tách rõ 3 phần luôn có sẵn trong dữ
+  liệu: **câu hỏi** (`ask`)/**vì sao đang hỏi** (`askRationale`/
+  `askAlternatives`/`askSource`)/**bối cảnh item** (`awaitingContext`),
+  để ngay cả nội dung brief hôm nay cũng đọc thoải mái hơn TUI's một dòng
+  văn xuôi hiện tại.
+
+### Bảo mật — nằm trong thiết kế từ đầu (D6)
+
+Mở cổng HTTP đổi threat model: `verify` chạy như shell command
+(`dispatch.mjs`), ai gọi được verb đều có khả năng kích hoạt nó. Web
+dashboard bind `127.0.0.1` mặc định + một token tối thiểu (sinh lúc
+herdr-plugin khởi động, bắt buộc trên mọi request) — không hoãn sang
+version sau.
+
+### Ranh giới tsk-ldb ↔ tsk-539 (D5)
+
+```mermaid
+flowchart LR
+    A["tsk-539 (STR71)<br/>AUTHORING<br/>sửa cách agent VIẾT ask<br/>(chưa ai làm, todo/discovery)"]
+    B["tsk-ldb<br/>RENDERING<br/>hiển thị những gì ĐÃ CÓ"]
+    A -.->|"khi tsk-539 xong,<br/>nội dung ask tốt hơn<br/>TỰ ĐỘNG hiện đẹp hơn<br/>— không cần sửa lại renderer"| B
+    B -.->|"companion, không deps chặn —<br/>phiên này đẩy tsk-539 sang<br/>exploring/planning kế tiếp"| A
+```
+
+Hai việc tách bạch theo thiết kế — không phải vì ngại làm chung, mà vì
+ghép chúng sẽ làm renderer phải đợi một item khác chưa ai giữ. Tách ra
+cho phép tsk-ldb chạy ngay trên dữ liệu hiện có, và tsk-539 cải thiện độc
+lập, có lợi ích cộng dồn tự nhiên.
 
 ## 7. Danh mục hạng mục / task
 
-(chưa tách — chờ §6 có hình dạng cụ thể trước)
+### {#task-webserver-core} Nền webserver trong herdr-plugin
+
+**Mục tiêu:** embed một HTTP server + frontend asset đã build vào binary
+herdr-plugin hiện có; bind `127.0.0.1`, sinh token khởi động, mọi request
+phải kèm token (D1, D6). Chưa có UI thật — chỉ có bộ khung phục vụ
+static asset + một endpoint health-check.
+
+**Trích §6 áp dụng:** "Nguồn dữ liệu — không phát minh, tái dùng seam có
+sẵn" (sơ đồ HP), "Bảo mật".
+
+**D-ID áp dụng:** D1, D6.
+
+**Quan hệ với sibling:** nền tảng cho `#task-taskboard-view` và
+`#task-detail-history` — cả hai dựng trên webserver này.
+
+**Draft verify:** `cargo test --manifest-path herdr-plugin/Cargo.toml
+webserver_ && cargo build --release --manifest-path
+herdr-plugin/Cargo.toml`
+
+### {#task-taskboard-view} Taskboard chính trên web dashboard
+
+**Mục tiêu:** view danh sách task (tương đương Work Items panel của TUI:
+tabs TODO/DOING/REVIEW/DONE, sort theo priority) render qua HTML/JS,
+đọc data qua `WorkItemSource` có sẵn — không có API/data mới.
+
+**Trích §6 áp dụng:** "Taskboard".
+
+**D-ID áp dụng:** D1.
+
+**Quan hệ với sibling:** phụ thuộc `#task-webserver-core`; điểm vào tới
+`#task-detail-history` (click task → detail view).
+
+**Draft verify:** `cargo test --manifest-path herdr-plugin/Cargo.toml
+web_taskboard_`
+
+### {#task-detail-history} Task detail: lịch sử agent + lịch sử câu hỏi + câu hỏi cần trả lời
+
+**Mục tiêu:** view chi tiết 1 task — phần trọng tâm của toàn bộ item
+theo lời người dùng gốc. Ba khối: (1) lịch sử agent đã làm, đọc
+`CONTEXT.md`/`plan.md` làm nguồn chính (D3); (2) lịch sử câu hỏi, ghép
+`askHistory`↔`settlements` theo `seq` (D2); (3) câu hỏi cần trả lời, phủ
+cả `ask` và `gate-approve` (D4), layout tách 3 phần
+câu-hỏi/vì-sao/bối-cảnh.
+
+**Trích §6 áp dụng:** toàn bộ phần "Nguồn dữ liệu" + sơ đồ HP.
+
+**D-ID áp dụng:** D2, D3, D4.
+
+**Quan hệ với sibling:** phụ thuộc `#task-webserver-core` và
+`#task-taskboard-view` (điểm vào).
+
+**Draft verify:** `cargo test --manifest-path herdr-plugin/Cargo.toml
+web_task_detail_ web_qa_history_ web_gate_approve_`
+
+---
+
+**Companion item (không phải con của tsk-ldb — D5):** `tsk-539` (STR71,
+"ask self-sufficiency") nên được đẩy sang `exploring`/`planning` ngay sau
+khi cụm này hội tụ, tận dụng đà của phiên này thay vì để tiếp tục nằm
+`todo/discovery` không ai giữ.
