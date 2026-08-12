@@ -60,6 +60,7 @@ tên đúng khái niệm chứ không phải sơn phết.
 | Q11 | "Agent tự xử xung đột merge" có nằm trong đợt này không | **rõ** | Để ngoài. Đã mở item riêng `tsk-60h` |
 | Q12 | Vòng đời worker: cần khái niệm mới không | **rõ — KHÔNG cần** | Vòng 7 bác vòng 6: `payload.writer.id` đã có sẵn trong event log (97,3% cạnh `→ doing`), đủ suy ra cả "list worker vừa xong xếp cũ→mới". Không field mới, không event type mới. Về lại tầm planning |
 | Q13 | Phân biệt "session loop giữa hai item" với "session đã xong" | **rõ** | Vòng 8: không xảy ra trong lane workers — loop sống ở lane operation theo cấu trúc. Ràng buộc "chỉ tái dùng pane one-shot" vì vậy có lý do thật, không phải cách né |
+| Q15 | Tái dùng pane khi người còn đang đọc | **rõ** | Vòng 9 → D10: tái dùng không xin phép, trừ pane `focused`; bỏ delay-rồi-đóng; cho báo cáo driver một chỗ hạ cánh trên item |
 | Q14 | **Thế nào là biết đã xong** | **rõ — quan sát được** | Vòng 8: flow luôn có ceiling nên chỉ kết thúc hai kiểu, cả hai ghi log (chạm ceiling; park → rời `doing`). "Claim rồi bỏ đi" là **sự cố**, không phải state — đường xử là `/fgOS:stale` + `tsk-3ni` ở nhánh ngoại lệ. Không cần cơ chế khai báo mới |
 
 ## 4. Quyết định đã chốt
@@ -351,6 +352,34 @@ lý do thật: **lane workers chỉ chứa flow one-shot có ceiling.**
 phải state, phép đếm **không cần lọc liveness mỗi vòng poll** — không
 `git log`/`git status` cho từng item mỗi 5 giây. Đếm trở thành fold thuần
 trên view: rẻ, tất định. Sự cố để `/fgOS:stale` lo ngoài luồng.
+
+### 2026-08-12 — Vòng 9 (chốt chính sách tái dùng pane)
+
+Câu còn lại: flow đã chạm ceiling, item đã rời `doing`, nhưng pane vẫn
+còn với người đang ngồi đọc — herdr sắp ghi đè lên đó.
+
+**Phiên này đặt sai trọng tâm** (hỏi "có được ghi đè không", như thể nội
+dung pane là thứ quý). Đặt lại: *trong pane đã xong, cái gì là bản duy
+nhất?* Code → commit `fgw/<id>`; quyết định → event log; câu hỏi lúc park
+→ `fgos ask --text`; tài liệu → `docs/`. Đúng **một** thứ chỉ có trong
+pane: **báo cáo cuối của driver**. Và đó chính là thứ người ta đang đọc.
+
+⇒ Không ra chính sách về pane — **bỏ đi lý do phải giữ pane**. Chốt (D10):
+
+1. Tái dùng, không xin phép — pane đã xong là đồ bỏ.
+2. Trừ pane đang `focused` — dữ liệu đã có sẵn trong `herdr pane list` /
+   `pane layout` (`focused_pane_id`), không tốn gọi thêm, và là tín hiệu
+   chrome-level hợp lệ chứ không phải `agent_status` bị runbook cấm.
+3. Cho báo cáo cuối của driver một chỗ hạ cánh trên item → người đọc bằng
+   `fgos show <id>`, không phải bằng terminal phải canh.
+
+**Bỏ hẳn nhánh delay-rồi-đóng.** Pane tái dùng được thì không cần đóng
+pane nữa; cả nhánh biến mất thay vì phải sửa cho đáng tin.
+
+**Điểm đáng ghi:** (3) chính là ý "stop reason thành bản ghi" của vòng 6,
+nhưng hẹp hơn nhiều — chỉ **một chỗ ghi**, vì driver là vòng lặp duy nhất
+mọi flow coding đi qua. Vòng 6 lo "chạm mọi luồng stage" nên đẩy nó lên
+tầm shaping; đó là lo thừa.
 
 ## 6. Thiết kế đã chốt {#design}
 

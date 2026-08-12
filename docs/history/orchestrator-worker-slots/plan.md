@@ -362,6 +362,40 @@ trọn-mẻ.
   cho từng item mỗi 5 giây. Rẻ, tất định. Đây là đơn giản hoá thật so với
   bản plan trước, không phải nới lỏng.
 
+- **A8 — Chính sách tái dùng pane khi flow đã xong nhưng người còn đang
+  đọc.** *Đã chốt ở validating, không còn là giả định.*
+
+  Đặt lại câu hỏi cho đúng: trong một pane đã xong, **cái gì là bản duy
+  nhất?** Code đã ở commit `fgw/<id>`; quyết định ở event log; câu hỏi
+  lúc park ở `fgos ask --text`; tài liệu ở `docs/`. Đúng **một** thứ chỉ
+  tồn tại trong pane: **báo cáo cuối của driver** (stop reason + tóm
+  tắt). Và đó chính là thứ người ta ngồi đọc.
+
+  ⇒ Không ra chính sách về pane; **bỏ đi lý do phải giữ pane**:
+
+  1. **Tái dùng, không xin phép.** Pane đã xong là đồ bỏ.
+  2. **Trừ pane đang được focus.** `herdr pane list` đã trả sẵn
+     `focused`, `pane layout` trả `focused_pane_id` — plugin chưa parse
+     nhưng dữ liệu có sẵn, không tốn thêm gọi nào. Đây là tín hiệu
+     chrome-level hợp lệ, KHÔNG phải `agent_status` mà
+     `docs/operator-runbook-herdr-cockpit.md` cấm đọc. Đang focus thì lấy
+     pane rỗi khác; hết thì split mới.
+  3. **Cho báo cáo cuối của driver một chỗ hạ cánh trên item**, để người
+     đọc kết quả bằng `fgos show <id>` thay vì bằng terminal phải canh.
+     Đây là thứ làm (1) *an toàn*, không chỉ *chấp nhận được*.
+
+  **Bỏ hẳn nhánh delay-rồi-đóng** (`terminal-close` + delay 10s): nó
+  prose-driven nên không đáng tin — chính `close.sh` là bằng chứng của
+  buổi này. Và một khi pane tái dùng được thì **không cần đóng pane
+  nữa**; cả nhánh đó biến mất thay vì phải sửa cho đáng tin.
+
+  **Phạm vi:** (3) là bản hẹp của ý "stop reason thành bản ghi" — chỉ
+  **một chỗ ghi**, vì `fgos-coding-driving` là vòng lặp duy nhất mọi flow
+  coding đi qua; lane admin chạy loop trong pane cố định nên không cần.
+  Phần ghi thuộc **T1** (engine), phần prose gọi nó thuộc **T3** (vốn đã
+  sở hữu `.claude/skills/fgos-coding-driving/SKILL.md`). Không task mới,
+  không đổi footprint.
+
 - **A7 — Lane workers chỉ chứa flow one-shot.** *Đã chứng minh.* Tab
   workers chỉ nhận `PICK`/`DISCOVER`/`DISCOVER_NEXT` (đều qua
   `place_new_agent_pane`); loop merge/retro/cleanup chạy trong pane cố
