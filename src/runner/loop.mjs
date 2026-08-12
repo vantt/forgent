@@ -57,6 +57,7 @@ import {
   listWork,
   moveWork,
   addWork,
+  editWork,
   readyWork,
   readRawEvents,
   addOutcome,
@@ -584,10 +585,45 @@ export function parseVerdictBlock(output) {
     if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) continue;
     if (typeof parsed.clear !== 'boolean') continue;
     verdict = parsed.clear
-      ? { clear: true, verify: typeof parsed.verify === 'string' ? parsed.verify : undefined }
+      ? {
+          clear: true,
+          verify: typeof parsed.verify === 'string' ? parsed.verify : undefined,
+          // D12/D17 (tsk-2yo): optional classification data a headless worker
+          // reports alongside a clear verdict, additive to the existing
+          // {clear, verify} shape -- each key is only present at all when
+          // the worker actually reported it (conditional spread, not an
+          // always-present `undefined`-valued key), so a fence that predates
+          // this parses to the exact same two-key object as before: an
+          // extra key present-but-undefined would still change the object's
+          // own key set and could trip a deepEqual comparison even though
+          // the value itself is absent either way. Vocabulary/enum
+          // validation happens where these are actually applied (editWork),
+          // not here -- this parse step stays fail-safe-only, same as its
+          // sibling `parseDiscoveredBlocks`.
+          ...(typeof parsed.tier === 'string' ? { tier: parsed.tier } : {}),
+          ...(typeof parsed.kind === 'string' ? { kind: parsed.kind } : {}),
+          ...(typeof parsed.risk === 'string' ? { risk: parsed.risk } : {}),
+        }
       : { clear: false, question: typeof parsed.question === 'string' ? parsed.question : undefined };
   }
   return verdict;
+}
+
+// D12/D17 (tsk-2yo): the editWork patch for a headless worker's classification
+// report, extracted as its own pure function so it is unit-testable without
+// mocking the whole dispatch pipeline. Never applies unless the discovery
+// outcome actually resolved 'clear' AND the caller verdict itself was clear
+// -- an 'unclear'/'runner-noop' outcome must never pick up a classification
+// the worker only judged conditionally on evidence that turned out
+// insufficient. Returns an empty object (never null) when there is nothing
+// to apply, so the call site can check `Object.keys(patch).length` uniformly.
+export function classificationPatchFromVerdict(outcome, callerVerdict) {
+  if (outcome !== 'clear' || !callerVerdict?.clear) return {};
+  const patch = {};
+  if (callerVerdict.tier !== undefined) patch.tier = callerVerdict.tier;
+  if (callerVerdict.kind !== undefined) patch.kind = callerVerdict.kind;
+  if (callerVerdict.risk !== undefined) patch.risk = callerVerdict.risk;
+  return patch;
 }
 
 // Per-dispatch ceiling on how many fgos-discovered blocks a single worker
@@ -1150,6 +1186,29 @@ export async function runOnce(options = {}) {
             const callerVerdict = parseVerdictBlock(worker.stdout ?? '');
             const result = resolveDiscovery(dir, item.id, config, 'runner', callerVerdict);
             log(`fgos-runner: discovery dispatch for "${item.id}" resolved outcome "${result.outcome}"`);
+            // D12/D17 (tsk-2yo): headless classification application --
+            // resolveDiscovery itself is never touched (it stays the exact
+            // engine function the interactive `fgos discover` verb also
+            // calls, tsk-4v6's own driver/launcher parity); applying
+            // tier/kind/risk is a separate, additive edit here, same
+            // "block overrides win, only apply what the worker actually
+            // reported" idiom captureDiscoveredWork already uses above.
+            // A worker report carrying no classification fields is
+            // byte-identical to today (patch stays empty, editWork never
+            // called). Never lets an out-of-vocabulary value block the
+            // already-resolved discover outcome above -- editWork's own
+            // enum validation (work.mjs, `classificationVocabulary`/`TIERS`)
+            // is the enforcement; a rejected value is logged and dropped,
+            // not retried with a guess.
+            const classificationPatch = classificationPatchFromVerdict(result.outcome, callerVerdict);
+            if (Object.keys(classificationPatch).length > 0) {
+              try {
+                editWork(dir, { id: item.id, patch: classificationPatch, role: 'runner' });
+                log(`fgos-runner: applied headless classification for "${item.id}": ${JSON.stringify(classificationPatch)}`);
+              } catch (err) {
+                log(`fgos-runner: headless classification for "${item.id}" rejected (${JSON.stringify(classificationPatch)}), dropped: ${err.message}`);
+              }
+            }
           }
         } catch (err) {
           // Fail-safe (matches the old sweep's own never-halt-the-whole-tick

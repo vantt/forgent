@@ -21,6 +21,10 @@ The `submit` VERB's own classification of `kind`/`tier`/`risk` is always
 the mechanical keyword-count fallback (`src/intake/classify.mjs`, no
 model/LLM call, deterministic) — that never changes, and it is what a
 bare shell, cron, or another agent calling the verb directly always gets.
+This value is only ever a TEMP placeholder now (D12, tsk-2yo): the real
+judgment happens later, once at stage `discovery`, on real research
+evidence — this skill never re-judges `tier`/`kind`/`risk` itself, at any
+point, for any caller.
 
 What changed (tsk-qod D2, supersedes tsk-5wz's own ordering): when this
 skill runs inside a LIVE session, `fgos-clarifying` now runs BEFORE the
@@ -31,13 +35,15 @@ pure Init-time, verdict-only helper that reads the raw submitted text and
 returns `{title?, description?, domain, question?}` straight back to this
 skill — it never touches item state itself, because at this point no item
 exists yet to touch. `submit` (step 5) is called with whatever text/domain
-that verdict settled on. `tier`/`kind`/`risk` re-judging (step 7) stays a
-separate, later pass against the clean text, unchanged from tsk-5wz.
+that verdict settled on. `tier`/`kind`/`risk` are never re-judged here at
+all (D12, tsk-2yo) — `discovery`'s own skill chủ (`fgos-coding-discovering`)
+does that, once, on real research evidence, for every item regardless of
+which caller created it.
 
-Steps 4 and 7 are both skipped for the no-soul callers (see step 4's own
-gate) — for them this skill's behavior stays byte-identical to before,
-mechanical values included. A wrong guess is cheaply correctable later via
-`fgos edit <id>` either way.
+Step 4 is skipped entirely for the no-soul callers (see its own gate) —
+for them this skill's behavior stays byte-identical to before, mechanical
+placeholder values included. A wrong placeholder is cheaply corrected
+later by `discovery`'s own judgment, not by this skill.
 
 ## Steps
 
@@ -96,8 +102,8 @@ mechanical values included. A wrong guess is cheaply correctable later via
    Never auto-attach a suggested dependency without this explicit
    response — this is a hard requirement (D4), not a convenience default.
 
-4. **If — and only if — a live soul is running this, clarify BEFORE the
-   item exists (tsk-qod D2).**
+4. **If — and only if — a live interactive session is running this,
+   clarify BEFORE the item exists (tsk-qod D2).**
 
    **The gate.** Do this step when a person invoked `/fgOS:submit`
    directly in an interactive session. SKIP it entirely when this skill
@@ -109,7 +115,7 @@ mechanical values included. A wrong guess is cheaply correctable later via
    whole reason the replay stays byte-identical — never widen it to
    "always".
 
-   For a live soul: invoke the `fgos-clarifying` skill on the raw text
+   For a live interactive session: invoke the `fgos-clarifying` skill on the raw text
    from step 1 — there is no item yet, so it reads text only, never an
    id. It returns `{title?, description?, domain, question?}` (verdict-
    only — it writes no state itself, tsk-qod D1/D2):
@@ -182,45 +188,8 @@ mechanical values included. A wrong guess is cheaply correctable later via
 6. **Report the result.** Relay `submit`'s own output (the new item's id
    and derived fields) back to the user. If the command fails (e.g. an
    unknown dependency id), show the real error — do not retry with a
-   modified/guessed id and do not silently drop the failure.
-
-7. **If — and only if — a live soul is running this (same gate as step
-   4), re-judge `tier`/`kind`/`risk` on the clean text.** Read the item's
-   own `domain` and resolve that domain's declared classification
-   vocabulary — `getDomain(item.domain).classification`
-   (`src/state/workflow-stage-graphs.mjs`), the same registry lookup
-   `skillForStage`/`skillMap.retrospective` already resolve through.
-   Never hardcode the value set here: a domain that declares none imposes
-   none, and this step then leaves the verb's values alone.
-
-   Judge it yourself, in this session. Do NOT dispatch to a capacity
-   or spawn an Agent for it — you already hold the full text and the
-   person's own follow-ups in context, so re-deriving it elsewhere from
-   less context is pure overhead and pure added latency (Native-First,
-   0026 rule 2; the same rule `fgos-clarifying` states for itself).
-
-   Apply only the fields that actually changed, through the verb:
-
-   ```
-   # fgos CLI fallback (tsk-1no D3)
-   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
-   if [ -f "$FGOS_BIN" ]; then
-     node "$FGOS_BIN" edit "<id>" --tier <tier> --kind <kind> --risk <risk> --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-   elif command -v fgos >/dev/null 2>&1; then
-     fgos edit "<id>" --tier <tier> --kind <kind> --risk <risk> --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-   else
-     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
-     exit 1
-   fi
-   ```
-
-   A value outside the domain's declared vocabulary is rejected by the
-   verb (`work.risk must be one of [...]`) rather than stored — that is
-   the enum working, not a bug to route around. Re-read the vocabulary
-   and pick from it; never retry with a guess.
-
-8. **Report what changed.** Show the user the before/after for any of
-   `tier`/`kind`/`risk` that moved in step 7 — the mechanical guess and
-   the considered judgment both visible. (`title`/`description`'s own
-   before/after, when clarify rewrote them, was already reported back in
-   step 4.)
+   modified/guessed id and do not silently drop the failure. `tier`/
+   `kind`/`risk` on this new item are still the mechanical placeholder
+   (D12, tsk-2yo) — `discovery`'s own skill chủ judges the real values
+   later, not this skill; there is no further step here that touches
+   them.
