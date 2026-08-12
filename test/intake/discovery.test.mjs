@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { resolveDiscovery, RETIRED_P14_PLACEHOLDER, FALLBACK_VERIFY } from '../../src/intake/discovery.mjs';
+import { resolveDiscovery, RETIRED_P14_PLACEHOLDER, FALLBACK_VERIFY, classificationPatchFromVerdict, assertCallerClassification } from '../../src/intake/discovery.mjs';
 import { computeImpact, computePriority } from '../../src/state/priority-formula.mjs';
 import { addWork, listWork, StoreError, categoryOf, putInAwaiting, answerAwaiting, moveWork, recordGateApprove } from '../../src/state/store.mjs';
 import { appendEvent, readEvents } from '../../src/state/events.mjs';
@@ -613,4 +613,33 @@ test('resolveDiscovery still updates priority on a legacy-invalid item shape —
   const view = listWork(storeDir);
   assert.equal(view.work['item-x'].stage, 'planning');
   assert.equal(typeof view.work['item-x'].priority, 'number');
+});
+
+// --- D12 classification door: the interactive `discover` verb and the
+// headless runner sweep must share ONE guard, not two copies that can drift.
+
+test('the headless sweep and the interactive verb read the SAME classification guard, not a copy of it', async () => {
+  const { classificationPatchFromVerdict: fromLoop } = await import('../../src/runner/loop.mjs');
+  assert.equal(fromLoop, classificationPatchFromVerdict, 'src/runner/loop.mjs must re-export discovery.mjs\'s function, never define its own');
+});
+
+test('assertCallerClassification refuses an out-of-vocabulary value and passes a valid one, without writing anything', () => {
+  const work = { ...sampleWork(), domain: 'coding' };
+
+  assert.throws(
+    () => assertCallerClassification(work, { clear: true, kind: 'bogus' }),
+    (err) => categoryOf(err) === 'validation' && /work\.kind must be one of/.test(err.message),
+  );
+  assert.throws(
+    () => assertCallerClassification(work, { clear: true, tier: 'enormous' }),
+    (err) => categoryOf(err) === 'validation' && /work\.tier must be one of/.test(err.message),
+  );
+  assert.doesNotThrow(() => assertCallerClassification(work, { clear: true, tier: 'heavy', kind: 'bug', risk: 'heavy' }));
+});
+
+test('assertCallerClassification is a no-op on an unclear verdict, even one carrying a bad classification', () => {
+  const work = { ...sampleWork(), domain: 'coding' };
+  assert.doesNotThrow(() => assertCallerClassification(work, { clear: false, question: 'which one?', kind: 'bogus' }));
+  assert.doesNotThrow(() => assertCallerClassification(work, undefined));
+  assert.doesNotThrow(() => assertCallerClassification(work, { clear: true }));
 });
