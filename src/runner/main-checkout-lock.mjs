@@ -208,10 +208,11 @@ function writeAtomicReplace(lockPath, content) {
  * locks' single-attempt primitive for the create/EEXIST/liveness/reclaim
  * shape — diverging only where `parseLockContent` returns null (AMBIGUOUS),
  * where the recorded identity matches the caller's own (self-recognition,
- * always ACQUIRED), and where a string-identity holder is judged by
- * `ttlMs` freshness alone (never a liveness probe).
+ * always ACQUIRED unless `allowSelfRecognition` is false), and where a
+ * string-identity holder is judged by `ttlMs` freshness alone (never a
+ * liveness probe).
  */
-function tryAcquireOnce(lockPath, identity, now, ttlMs) {
+function tryAcquireOnce(lockPath, identity, now, ttlMs, allowSelfRecognition = true) {
   try {
     writeAtomicCreate(lockPath, JSON.stringify({ pid: identity, ts: now }));
     return { status: ACQUIRED };
@@ -234,8 +235,15 @@ function tryAcquireOnce(lockPath, identity, now, ttlMs) {
 
   // Self-recognition (D6): the caller's own identity always refreshes,
   // regardless of ttlMs or liveness — this is the same writer continuing
-  // its own session, never a competing holder.
-  if (record.pid === identity) {
+  // its own session, never a competing holder. tsk-1wr: an env-derived
+  // session id is inherited byte-identically by every forked child, so for
+  // a lock keyed on that identity two genuinely separate OS processes can
+  // read as "the same writer" here. `allowSelfRecognition: false` is for
+  // call sites (the merge target-ref slot) where a real cross-process
+  // exclusion guarantee matters more than same-session reentrancy — that
+  // lock is always released in the same call that acquired it, so it has
+  // no legitimate re-entry to protect.
+  if (allowSelfRecognition && record.pid === identity) {
     writeAtomicReplace(lockPath, JSON.stringify({ pid: identity, ts: now }));
     return { status: ACQUIRED };
   }
@@ -340,12 +348,12 @@ function tryAcquireOnce(lockPath, identity, now, ttlMs) {
  * accumulating listeners across repeated acquire/release cycles in the
  * same process.
  */
-export function acquireMainCheckoutLock(dir, { identity = process.pid, ttlMs, now = Date.now(), releaseOnExit = false, lockFile = LOCK_FILE } = {}) {
+export function acquireMainCheckoutLock(dir, { identity = process.pid, ttlMs, now = Date.now(), releaseOnExit = false, lockFile = LOCK_FILE, allowSelfRecognition = true } = {}) {
   fs.mkdirSync(dir, { recursive: true });
   const lockPath = path.join(dir, lockFile);
 
   for (let attempt = 0; attempt < 2; attempt += 1) {
-    const res = tryAcquireOnce(lockPath, identity, now, ttlMs);
+    const res = tryAcquireOnce(lockPath, identity, now, ttlMs, allowSelfRecognition);
     if (res.status === ACQUIRED) {
       let released = false;
       const release = () => {

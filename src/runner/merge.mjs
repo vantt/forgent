@@ -769,7 +769,13 @@ export async function withMergeTargetSlot(lockRoot, targetRef, fn) {
   const fgosDir = path.join(lockRoot, '.fgos');
   const identity = resolveWriterIdentity(fgosDir).id;
   const lockFile = mergeSlotLockFile(targetRef);
-  const lock = acquireMainCheckoutLock(fgosDir, { identity, ttlMs: DEFAULT_TTL_MS, releaseOnExit: true, lockFile });
+  // tsk-1wr: this slot is always released in the same call that acquired
+  // it (see `finally` below), so there is no legitimate same-identity
+  // re-entry to protect. Two OS processes can inherit the same env session
+  // id (a subagent fanout approving sibling leaves into the same target,
+  // for example) — allowSelfRecognition:false makes them contend for real
+  // instead of both reading as "the same writer".
+  const lock = acquireMainCheckoutLock(fgosDir, { identity, ttlMs: DEFAULT_TTL_MS, releaseOnExit: true, lockFile, allowSelfRecognition: false });
   if (lock.status === HELD) {
     const ttlPart = lock.remainingTtlMs != null
       ? `, expires in ${formatLockDurationMs(lock.remainingTtlMs)}`
