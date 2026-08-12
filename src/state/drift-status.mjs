@@ -105,7 +105,8 @@ const DELIVERED_STATUSES = new Set(['delivered', 'retrospective', 'cleanup', 'do
 /**
  * Compute drift status for every root branch reachable from `view`'s work
  * state. Returns `{ [rootId]: { branch, target, aheadOfTarget,
- * behindTarget, lastSyncedTip, needsSync } }` — a root whose `fgw/<id>`
+ * behindTarget, lastSyncedTip, carriesContent, needsSync } }` — a root whose
+ * `fgw/<id>`
  * branch does not exist locally (never created, or already cleaned up
  * after merge) is omitted entirely, not reported as an error.
  *
@@ -154,12 +155,25 @@ export function driftStatus(repoRoot, view) {
       // no common ancestor (orphan branch) — leave null.
     }
 
+    // tsk-1l9 follow-up: `aheadOfTarget` counts COMMITS, which is the wrong
+    // question for "is anything stranded". A root branch that only ever
+    // merged its target back into itself sits many commits ahead while
+    // carrying no content of its own, and a branch whose commits all landed
+    // by another route is just a stale ref. Reported as a separate ADDITIVE
+    // field rather than folded into `needsSync`: that flag drives `fgos merge
+    // next`'s own auto-sync path (bin/fgos.mjs), and narrowing it here would
+    // silently change what the unattended merge loop acts on. Only
+    // `fgos doctor`'s root-drift check reads this.
+    const carriesContent = !introducesNothing(repoRoot, branch, targetBranch)
+      && unmatchedCommitCount(repoRoot, branch, targetBranch) > 0;
+
     result[rootId] = {
       branch,
       target: targetBranch,
       aheadOfTarget,
       behindTarget,
       lastSyncedTip,
+      carriesContent,
       needsSync: aheadOfTarget > 0 && !isResolvedStatus(rootItem),
     };
   }

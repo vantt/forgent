@@ -461,6 +461,15 @@ function checkRootDrift(cwd) {
   const strandedAfterClose = [];
   for (const entry of Object.entries(drift)) {
     const [id, status] = entry;
+    // tsk-1l9 follow-up: `aheadOfTarget` answers "how many commits", not "is
+    // anything stranded". A root that only merged its target back into itself
+    // is many commits ahead carrying nothing, and a branch whose commits all
+    // landed by another route is a stale ref. Both were reported here as
+    // drift needing a sync, forever, with no sync able to clear them --
+    // fgw/tsk-4n7 and fgw/tsk-19y are exactly that shape today. Skipping them
+    // is a REPORTING change only: `needsSync` itself is untouched, so `fgos
+    // merge next`'s auto-sync path behaves exactly as before.
+    if (status.carriesContent === false) continue;
     if (status.needsSync) {
       needsSync.push(entry);
     } else if (status.aheadOfTarget > 0 && COMPLETED_ROOT_STATUSES.has(view.work[id]?.status)) {
