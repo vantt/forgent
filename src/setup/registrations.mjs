@@ -596,9 +596,12 @@ registerCheck({
 // real, tested, reviewed work outside main until someone read the graph by
 // hand.
 //
-// Mechanical, no judgment: `git merge-base --is-ancestor fgw/<id> <trunk>`.
-// An item with no local branch is skipped rather than flagged, since the
-// branch is often cleaned up after a genuine merge.
+// Mechanical, no judgment: `git merge-base --is-ancestor fgw/<id> <trunk>`,
+// then a patch-id comparison to separate "this ref was never merged" from
+// "this work is missing". An item with no local branch is skipped rather than
+// flagged, since the branch is often cleaned up after a genuine merge; so is
+// a branch whose every commit already has a patch-equivalent on trunk, which
+// carried its content in by some other route and is only a stale ref.
 function checkDeliveredNotOnTrunk(cwd) {
   const mainCheckout = resolveMainCheckout(cwd);
   if (mainCheckout === null) {
@@ -608,7 +611,7 @@ function checkDeliveredNotOnTrunk(cwd) {
   const stranded = unmergedDeliveries(mainCheckout, view);
   const entries = Object.entries(stranded);
   if (entries.length === 0) {
-    return { passed: true, message: "every handed-over item's branch is reachable from the trunk" };
+    return { passed: true, message: "every handed-over item's content is on the trunk" };
   }
 
   // Two causes, two fixes — see unmergedDeliveries' own comment. Reported
@@ -620,7 +623,7 @@ function checkDeliveredNotOnTrunk(cwd) {
   if (neverMerged.length > 0) {
     parts.push(
       `${neverMerged.length} item(s) marked handed-over whose branch merged nowhere: `
-        + `${neverMerged.map(([id, s]) => `${id} (${s.status}, ${s.branch})`).join(', ')}`
+        + `${neverMerged.map(([id, s]) => `${id} (${s.status}, ${s.branch}, ${s.unmatched} commit(s) not on trunk by patch-id)`).join(', ')}`
         + ' — land the content through a new item, never by re-driving the closed item\'s status backward',
     );
   }

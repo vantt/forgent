@@ -271,7 +271,7 @@ test('unmergedDeliveries reports a delivered item whose branch merged nowhere �
   commitFile(repoRoot, 'a.txt', 'a');
   const view = { work: { a: item('a', { status: 'delivered' }) } };
   assert.deepEqual(unmergedDeliveries(repoRoot, view), {
-    a: { branch: 'fgw/a', status: 'delivered', landedOn: null },
+    a: { branch: 'fgw/a', status: 'delivered', landedOn: null, unmatched: 1 },
   });
 });
 
@@ -308,7 +308,7 @@ test('unmergedDeliveries names the parent branch when a leaf landed there and th
   // The leaf merged correctly; only the root is behind. Re-merging the leaf
   // would be the wrong fix, so the report has to say where it landed.
   assert.deepEqual(unmergedDeliveries(repoRoot, view), {
-    leaf: { branch: 'fgw/leaf', status: 'delivered', landedOn: 'fgw/root' },
+    leaf: { branch: 'fgw/leaf', status: 'delivered', landedOn: 'fgw/root', unmatched: 2 },
   });
 });
 
@@ -326,4 +326,35 @@ test('unmergedDeliveries reports landedOn null for a leaf that never reached its
     },
   };
   assert.equal(unmergedDeliveries(repoRoot, view).leaf.landedOn, null);
+});
+
+test('unmergedDeliveries omits a branch whose commits all have a patch-equivalent on trunk', () => {
+  const repoRoot = initRepo();
+  checkoutNewBranch(repoRoot, 'fgw/a');
+  commitFile(repoRoot, 'a.txt', 'a');
+  const branchTip = git(repoRoot, ['rev-parse', 'HEAD']).trim();
+
+  // The same content reaches trunk by a different route — a cherry-pick, the
+  // shape a re-applied or rewritten branch leaves behind. The ref is stale;
+  // nothing is missing, so this must not be reported as lost work.
+  git(repoRoot, ['checkout', '-q', 'main']);
+  git(repoRoot, ['cherry-pick', branchTip]);
+
+  const view = { work: { a: item('a', { status: 'delivered' }) } };
+  assert.deepEqual(unmergedDeliveries(repoRoot, view), {});
+});
+
+test('unmergedDeliveries counts only the commits with no patch-equivalent on trunk', () => {
+  const repoRoot = initRepo();
+  checkoutNewBranch(repoRoot, 'fgw/a');
+  commitFile(repoRoot, 'shared.txt', 'shared');
+  const shared = git(repoRoot, ['rev-parse', 'HEAD']).trim();
+  commitFile(repoRoot, 'only-here.txt', 'only-here');
+
+  git(repoRoot, ['checkout', '-q', 'main']);
+  git(repoRoot, ['cherry-pick', shared]);
+
+  const view = { work: { a: item('a', { status: 'delivered' }) } };
+  // Two commits ahead, but one already landed — only the other is missing.
+  assert.equal(unmergedDeliveries(repoRoot, view).a.unmatched, 1);
 });

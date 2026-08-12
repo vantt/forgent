@@ -53,6 +53,29 @@ function isAncestor(repoRoot, branch, from) {
   }
 }
 
+// How many commits on `branch` have no patch-equivalent anywhere on `from`.
+// `--cherry-pick` compares patch-ids, so a commit whose content reached trunk
+// by a different route — cherry-picked, re-applied, or carried in on a branch
+// that was later rewritten — is not counted.
+//
+// This is the difference between "this branch is not merged" (a ref fact) and
+// "this work is missing" (a content fact). The first without the second is
+// ordinary housekeeping, not an incident: the first live run of this module
+// flagged three branches, and two of them (tsk-67g, tsk-3um) turned out to
+// have landed their content by another path already. Reporting those as lost
+// work is exactly the kind of false alarm that teaches people to skip doctor.
+function unmatchedCommitCount(repoRoot, branch, from) {
+  try {
+    const out = git(repoRoot, ['rev-list', '--count', '--cherry-pick', '--right-only', `${from}...${branch}`]).trim();
+    const n = Number.parseInt(out, 10);
+    return Number.isFinite(n) ? n : 0;
+  } catch {
+    // Unreadable refs — report nothing rather than guess a number that would
+    // drive a false alarm either way.
+    return 0;
+  }
+}
+
 // A completed item's branch is supposed to be reachable from trunk. These
 // four statuses all mean "this item's work is finished and handed over";
 // `wontfix` is deliberately absent for the same reason `driftStatus`'s own
@@ -129,9 +152,12 @@ export function driftStatus(repoRoot, view) {
  * Every item whose status says its work was handed over, but whose own
  * `fgw/<id>` branch is NOT reachable from trunk — i.e. the work is not on
  * main even though the state says it is. Returns
- * `{ [id]: { branch, status, landedOn } }`; `landedOn` names the parent
- * branch the item did merge into when that is why it is off trunk, and is
- * `null` when the branch was never merged anywhere.
+ * `{ [id]: { branch, status, landedOn, unmatched } }`; `landedOn` names the
+ * parent branch the item did merge into when that is why it is off trunk,
+ * and is `null` when the branch was never merged anywhere. `unmatched` is
+ * how many of the branch's commits have no patch-equivalent on trunk — a
+ * branch where that is zero is omitted entirely, because its content is
+ * already there and only the ref is stale.
  *
  * Why this is not covered by `driftStatus` above: that function is scoped to
  * ROOTS (an item some other item calls `parent`), so a leaf is invisible to
@@ -158,6 +184,12 @@ export function unmergedDeliveries(repoRoot, view) {
     if (!branchExists(repoRoot, branch)) continue;
     if (isAncestor(repoRoot, branch, trunk)) continue;
 
+    // Not merged, but is anything actually missing? A branch whose every
+    // commit has a patch-equivalent on trunk carried its content in by some
+    // other route and is just a stale ref — housekeeping, never an incident.
+    const unmatched = unmatchedCommitCount(repoRoot, branch, trunk);
+    if (unmatched === 0) continue;
+
     // Distinguish the two causes, because they need different fixes. A leaf
     // that DID merge into its parent's branch is stranded only because that
     // root has not synced — `fgos sync-root <parent>` carries it, and
@@ -168,7 +200,7 @@ export function unmergedDeliveries(repoRoot, view) {
       ? parentBranch
       : null;
 
-    result[item.id] = { branch, status: item.status, landedOn };
+    result[item.id] = { branch, status: item.status, landedOn, unmatched };
   }
 
   return result;
