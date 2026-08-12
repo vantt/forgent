@@ -10,12 +10,18 @@ thiết kế, chỉ đổi cách chia hạng mục nên §6 không cần regener
 Thứ tự đã chốt: **§E đi trước** (D5), hấp thụ luôn tsk-1zd (D6). tsk-kv3 và
 tsk-60h chạy song song. tsk-280 đã kiểm: **không chặn** (D6).
 
-Điểm mở còn lại: **#17** — phần còn lại của §H (playbook cho `verify-fail`,
-`integration-drift`) chưa ai nhận, hiện chưa thành hạng mục.
+**#17 đã đóng**: §H thành `task-escalation-playbooks`, phạm vi chính xác là ba
+reason còn lại trong `CATCHUP_REASONS` chưa có playbook
+(`verify-timeout-post-merge`, `integration-drift`,
+`merge-failed-unclassified`) cộng việc thu hẹp stop rule chung.
 
-Thiết kế đã đủ chín để handoff: §6 ổn định, §7 có 4 hạng mục với anchor +
-verify nháp. Chờ người xác nhận để chuyển sang
-`fgos-coding-exploring` → `fgos-coding-planning`.
+§7 nay có **5 hạng mục**, mỗi cái đủ để tự vận hành: bối cảnh phải đọc, file
+đụng, footprint khai báo, D-ID áp dụng, acceptance đánh số, verify, rủi ro/
+rollback. `tsk-51m` là item chủ quản; tiến độ tổng đọc bằng
+`fgos rollup tsk-51m`.
+
+Thiết kế đã chín, sẵn sàng handoff sang `fgos-coding-exploring` →
+`fgos-coding-planning`. **Dừng trước implement** theo yêu cầu của người.
 
 ## 2. Mục tiêu & đề bài
 
@@ -55,7 +61,7 @@ thật sự cần người.
 | 14 | Trigger refresh ở #2 | **D4** | |
 | 15 | §E còn là hạng mục "để sau" không | **rõ — KHÔNG, đi trước** | Người quyết vòng 3: §E lên trước, ba fix nhỏ song song. Lý do kỹ thuật: §E là điều kiện để D3 đứng vững — target không được nhích giữa catchup-verify và land, nếu không bằng chứng vỡ và verify lại rơi vào lock |
 | 16 | Cô lập footprint giữa §E và ba fix nhỏ | **D6** | tsk-1zd gộp vào §E. tsk-kv3 (`isWorkingTreeClean`, cùng file khác hàm) và tsk-60h (chỉ `merge-loop/SKILL.md`) chạy song song |
-| 17 | §H (thu hẹp escalation) đứng riêng hay nằm trong §E | **CHƯA RÕ** | tsk-60h là một lát của §H. Phần còn lại (playbook cho `verify-fail`, `integration-drift`) chưa ai đụng |
+| 17 | §H (thu hẹp escalation) đứng riêng hay nằm trong §E | **rõ — đứng riêng** | Thành `task-escalation-playbooks`, làn song song. Phạm vi: 3 reason trong `CATCHUP_REASONS` (`bin/fgos.mjs:3814`) chưa có playbook — `verify-timeout-post-merge`, `integration-drift`, `merge-failed-unclassified` — cộng thu hẹp stop rule "kẹt hai lượt". tsk-60h là lát `merge-conflict` của cùng §H |
 | 18 | tsk-280 có chặn §E không | **D6 — KHÔNG** | Bậc 8 của thiết kế 2026-08-01 giả định Conductor tin vào status. D3 khiến nó tin vào `branchHeadAtReturn`, mà `move` không cấp được trường đó. tsk-280 vẫn là vấn đề vệ sinh thật (item tới `awaiting-approval` chưa từng verify xanh) nhưng không làm merge land code chưa verify |
 
 ## 4. Quyết định đã chốt
@@ -215,88 +221,277 @@ nhích, item kẹt đầu hàng, cây chung bẩn vì việc của người khá
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
+### Cấu trúc cha–con
+
+`tsk-51m` là **item chủ quản**, giữ toàn bộ thiết kế và điều phối. Năm hạng
+mục dưới đây là con trực tiếp của nó. Tiến độ tổng đọc bằng
+`fgos rollup tsk-51m`; không dựng thêm file index nào cho bộ con này.
+
+Hai làn thi công (D5, D6):
+
+| Làn | Hạng mục | Chạy khi nào |
+|---|---|---|
+| 1 — tới hạn, tuần tự | `task-merge-queue` → `task-verify-at-inbound-gate` | nối đuôi, không đảo được |
+| 2 — song song | `task-refresh-at-pick`, `task-post-sync-detection`, `task-escalation-playbooks`, tsk-kv3, tsk-60h | bung ngay, không giao file với làn 1 |
+
+**Footprint phải khai ngay lúc tạo con** — đây là cơ chế duy nhất khiến
+`mergeReadiness` tự serialize hai item đụng nhau thay vì để phát hiện lúc
+merge. Mỗi hạng mục dưới đều có mục "Footprint khai báo"; copy nguyên vào
+trường `footprint` của item con.
+
+---
+
 ### task-merge-queue {#task-merge-queue}
 
 **Mục tiêu**: §E — hàng đợi đơn cho mỗi target branch. Một item chỉ land khi
-giữ slot của target đó; trong lúc giữ slot, không ai khác chạm target ấy.
-**Hấp thụ luôn tsk-1zd** (D6): picker phải bỏ qua item không tiến được ở lượt
-này thay vì trả về nó vô hạn, và phải tách tín hiệu "hết việc để merge" khỏi
-"kẹt mãi một item" — đây là hành vi hàng đợi vốn phải có, không phải fix rời.
+đang giữ slot của target đó; trong lúc nó giữ slot, không ai khác chạm target
+ấy. **Hấp thụ luôn tsk-1zd** (D6): picker phải bỏ qua item không tiến được ở
+lượt này thay vì trả về nó vô hạn, và phải tách tín hiệu "hết việc để merge"
+khỏi "kẹt mãi một item".
 
-**Trích §6**: *"Điều kiện để chuỗi này đứng vững là target không được nhích
-trong khoảng giữa catchup verify xong và land... Thứ đảm bảo điều đó là §E."*
+**Vì sao cần** (§6): D3 chỉ đứng khi target không nhích giữa lúc catchup-verify
+xong và lúc land. Nếu nhích, `mergedTreeAlreadyVerified` trả false, verify rơi
+lại vào trong lock — quay về đúng vòng lặp tự siết đang có.
 
-**D-ID áp dụng**: D3 (§E tồn tại để bảo vệ bằng chứng của D3), D5, D6.
+**Bối cảnh nền cần đọc trước**:
+- `plans/reports/internal-research-260801-1823-merge-mechanism-grand-orchestrator-design-report.md` §E — thiết kế gốc, đọc nguyên mục
+- `src/runner/main-checkout-lock.mjs` — lineage lock wx-atomic-create đã chứng minh 4 lần; §E **tái dùng** lineage này, khoá theo target branch, không phát minh primitive mới
+- `src/state/graph-harness.mjs:94` `mergeReadiness` — đã tính sẵn `ready`/`mergeSets`; hàng đợi tiêu thụ nó, không tính lại
+- tsk-1zd's own description — số đo 13 lượt lặp, item `tsk-2ej`
 
-**Quan hệ**: đi **trước**, là điều kiện của task-verify-at-inbound-gate.
-**Không** bị tsk-280 chặn (D6). Sau khi hấp thụ tsk-1zd thì không còn giẫm
-footprint với làn song song nào.
+**File đụng**: `bin/fgos.mjs` (case `merge`, picker quanh dòng 2038; case
+`approve`), `src/runner/main-checkout-lock.mjs` (mở rộng khoá theo target),
+`src/runner/merge.mjs` (điểm gọi lock trong `mergeRunnerItem`, ~dòng 711).
 
-**Verify nháp**: `npm test` + test mới chứng minh (a) hai phiên cùng xin slot
-của một target thì phiên thứ hai chờ, và target không đổi tip trong lúc phiên
-đầu giữ slot; (b) một item vướng Iron Law không làm picker trả về nó lượt thứ
-hai, các item ready khác vẫn tới lượt; (c) "hết việc" và "kẹt mãi" trả về hai
-tín hiệu phân biệt được ở tầng gọi.
+**Footprint khai báo**: `bin/fgos.mjs`, `src/runner/main-checkout-lock.mjs`,
+`src/runner/merge.mjs`
+
+**D-ID áp dụng**: D3, D5, D6.
+
+**Acceptance**:
+1. Hai phiên cùng xin slot của một target: phiên thứ hai chờ có giới hạn, không
+   crash, không fail-closed nhầm.
+2. Trong lúc phiên A giữ slot của target T, tip của T không đổi bởi bất kỳ
+   đường nào khác.
+3. Merge vào **hai target khác nhau** chạy được đồng thời — không còn khoá
+   toàn repo.
+4. Item vướng Iron Law không được picker trả về ở lượt kế tiếp; các item ready
+   khác tới lượt.
+5. "Hết việc để merge" và "kẹt mãi một item" là hai tín hiệu phân biệt được ở
+   tầng gọi (`merge-loop` dựa vào đó cho stop rule pool-cạn).
+
+**Verify**: `npm test`
+
+**Rủi ro / rollback**: đụng lineage lock — sai là chặn toàn bộ merge của repo.
+Giữ đường cũ sau cờ tắt được cho tới khi acceptance 1–3 xanh trên thực địa.
+Không đụng `catchup`'s lock gap trong hạng mục này (xem ghi chú cuối §7).
+
+---
 
 ### task-verify-at-inbound-gate {#task-verify-at-inbound-gate}
 
-**Mục tiêu**: D3 — đưa verify về cửa vào, để cửa ra chỉ fast-forward. Gồm: gọi
-`catchup` như bước chuẩn khi tới lượt land nếu target chưa là ancestor, và bảo
-đảm `mergedTreeAlreadyVerified` thực sự bật ở cửa ra sau đó.
+**Mục tiêu**: D3 — đưa verify về cửa vào để cửa ra chỉ còn fast-forward. Gồm
+hai nửa: (a) khi tới lượt land mà target chưa là ancestor của nhánh thì gọi
+`catchup` như bước chuẩn, không phải chỉ khi đã kẹt; (b) bảo đảm
+`mergedTreeAlreadyVerified` thực sự bật ở cửa ra sau đó.
 
-**Trích §6**: *"Verify chạy đúng một lần, ở cửa vào, ngoài lock. Cửa ra chỉ còn
-fast-forward và commit."*
+**Vì sao cần** (§6): verify là khoản đắt nhất (~185s) và hiện nằm trong lock.
+Đảo vị trí nó ra ngoài lock thu vùng găng xuống mức giây mà không viết engine
+mới — cơ chế bỏ verify ở cửa ra đã tồn tại sẵn, chỉ chưa bao giờ đủ điều kiện
+bật.
 
-**D-ID áp dụng**: D3, D2 (refresh bằng merge-in, không rebase).
+**Bối cảnh nền cần đọc trước**:
+- `src/runner/merge.mjs:780-813` `mergedTreeAlreadyVerified` — đọc nguyên
+  docblock, nó nêu rõ hai điều kiện và vì sao cố ý "sufficient, not necessary"
+- `src/runner/merge.mjs:1046` `skipRedundantChecks` — điểm tiêu thụ
+- `bin/fgos.mjs:3814` `CATCHUP_REASONS` — catchup hôm nay chỉ chạy khi item đã
+  `blocked` vì 1 trong 6 reason; hạng mục này cần nó chạy được cả ở đường
+  bình thường, chưa kẹt
+- `docs/history/tsk-516-approve-reverify-scope/CONTEXT.md` D5 — nguồn gốc
 
-**Quan hệ**: phụ thuộc task-merge-queue. Không tự đứng được nếu thiếu hàng đợi.
+**File đụng**: `src/runner/merge.mjs`, `bin/fgos.mjs` (case `catchup`, case
+`approve`).
 
-**Verify nháp**: `npm test` + test chứng minh sau catchup, `skipRedundantChecks`
-bật và cửa ra không chạy verify; đo thời gian giữ lock giảm từ ~185s xuống
-mức giây.
+**Footprint khai báo**: `src/runner/merge.mjs`, `bin/fgos.mjs`
+
+**D-ID áp dụng**: D3, D2.
+
+**Acceptance**:
+1. Item đi qua catchup rồi land: cửa ra **không** chạy verify
+   (`skipRedundantChecks` bật), và chứng minh được bằng test chứ không bằng
+   quan sát thời gian.
+2. Item **không** đi qua catchup mà target đã nhích: cửa ra vẫn chạy verify đầy
+   đủ — fail-closed giữ nguyên, không nới.
+3. Item chưa từng `return` (không có `branchHeadAtReturn`): cửa ra chạy verify
+   đầy đủ (D6 — chốt chặn của tsk-280).
+4. Thời gian giữ `main-checkout.lock` trong một lần land giảm từ mức ~185s
+   xuống mức giây; đo được, ghi lại con số thật.
+
+**Verify**: `npm test`
+
+**Rủi ro / rollback**: đây là chỗ **false-positive thì land code chưa verify**.
+Tuyệt đối không nới hai điều kiện của `mergedTreeAlreadyVerified`; chỉ làm cho
+chúng **có cơ hội đúng**, không bao giờ sửa để chúng dễ đúng hơn.
+
+**Phụ thuộc**: `task-merge-queue` phải xong trước.
+
+---
 
 ### task-refresh-at-pick {#task-refresh-at-pick}
 
-**Mục tiêu**: refresh base lúc `pick` cho nhánh **chưa có commit riêng**, đóng
-khoảng trống decompose→pick. Đụng `createWorktree`'s reuse path
-(`worktree.mjs:438`) và `docs/decisions/0022`'s "6 call site tự quyết baseRef".
+**Mục tiêu**: refresh base lúc `pick` cho nhánh **chưa có commit riêng nào**,
+đóng khoảng trống decompose→pick.
 
-**Trích §6**: *"Lúc pick — nếu nhánh chưa có commit riêng nào, refresh là thao
-tác rủi ro bằng không. Làm tự động, không hỏi."*
+**Vì sao cần** (§6): `fgw/<id>` thường được tạo ngay lúc decompose và nằm chờ
+tới lúc có người pick, nên base đã cũ trước cả khi ai bắt đầu làm. Người dùng
+mô tả trực tiếp: *"tốc độ agent nhanh, work tạo ra mà đến khi được pick là
+outdated rồi."*
 
-**D-ID áp dụng**: D2 (nhánh đã có commit riêng thì không tự đụng).
+**Bối cảnh nền cần đọc trước**:
+- `src/runner/worktree.mjs:436-439` — docblock nói rõ `opts.baseRef` **bị bỏ
+  qua trên đường reuse**; đây là gốc của vấn đề
+- `src/runner/worktree.mjs:749` — `createBranchRef(..., baseRef:'main')` lúc
+  decompose
+- `docs/decisions/0022` mục "createWorktree 6 call site tự quyết baseRef/
+  cleanup" — đã nhận diện, chưa sửa; hạng mục này đóng nó
 
-**Quan hệ**: độc lập với hàng đợi, chạy song song được.
+**File đụng**: `src/runner/worktree.mjs`.
 
-**Verify nháp**: `npm test` + test chứng minh pick một item có nhánh trắng tạo
-từ lâu thì worktree đứng trên tip hiện tại; còn nhánh đã có commit riêng thì
-KHÔNG bị đụng, chỉ báo độ lệch.
+**Footprint khai báo**: `src/runner/worktree.mjs`
+
+**D-ID áp dụng**: D2.
+
+**Acceptance**:
+1. Pick một item có nhánh **trắng** tạo từ lâu: worktree đứng trên tip hiện tại
+   của target, không phải base cũ.
+2. Pick một item có nhánh **đã có commit riêng**: nhánh KHÔNG bị đụng vào, chỉ
+   báo độ lệch (ahead/behind) cho phiên.
+3. Không có đường nào trong hạng mục này viết lại lịch sử nhánh (D2).
+
+**Verify**: `npm test`
+
+**Rủi ro / rollback**: nhầm "nhánh trắng" thành "có commit" (hoặc ngược lại)
+là mất việc thật. Phép kiểm phải dựa trên so tip nhánh với base của chính nó,
+không dựa vào việc worktree có tồn tại hay không.
+
+---
 
 ### task-post-sync-detection {#task-post-sync-detection}
 
-**Mục tiêu**: D4 — sau mỗi lần land, so `changedFiles` với từng leaf còn mở,
-phân ba nhánh xử lý. Không catchup hàng loạt.
+**Mục tiêu**: D4 — sau mỗi lần land, so `changedFiles` của cái vừa land với
+`changedFiles` của từng leaf còn mở, rồi phân ba nhánh xử lý. **Không** catchup
+hàng loạt.
 
-**Trích §6**: *"Đây là điểm phát hiện... Không giao path ⇒ không làm gì."*
+**Vì sao cần** (§6): trigger "root vừa nhích" lấy sự kiện topology làm proxy
+cho rủi ro thật — root 13 con land tuần tự cho ~78 lượt catchup+verify (~4h
+verify thuần) mà phần lớn phát hiện ra không có gì đụng nhau.
+
+**Bối cảnh nền cần đọc trước**:
+- `src/runner/merge.mjs:362` `changedFiles` — nguồn sự thật, cả hai phía
+- `src/state/graph-metrics.mjs:598` `footprintOverlapAmong` — **KHÔNG dùng** ở
+  đây; nó so footprint *khai báo*, trường có thể thiếu/lệch. Đọc để biết vì sao
+  không dùng
+- `src/runner/claim-liveness.mjs` — cách xác định "phiên còn sống"
+
+**File đụng**: mô-đun mới dưới `src/state/` hoặc `src/runner/` (ranh giới do
+planning chốt), điểm gọi sau land trong `src/runner/merge.mjs`.
+
+**Footprint khai báo**: `src/runner/merge.mjs`, `src/state/graph-harness.mjs`
 
 **D-ID áp dụng**: D4, D2.
 
-**Quan hệ**: độc lập, chạy song song được. Tiêu thụ output của
-task-merge-queue nhưng không bị chặn bởi nó.
+**Acceptance**:
+1. Không giao path ⇒ **không sinh việc gì**, không thông báo, không đánh dấu.
+2. Có giao path + leaf có phiên đang sống ⇒ sinh thông báo cho đúng phiên đó,
+   không tự đụng nhánh.
+3. Có giao path + không phiên nào sống ⇒ chỉ đánh dấu stale, không catchup.
+4. Chi phí của bước phát hiện là O(số leaf mở), không kéo theo verify nào.
 
-**Verify nháp**: `npm test` + test ba nhánh: không giao ⇒ không sinh việc gì;
-có giao + phiên sống ⇒ sinh thông báo cho đúng phiên; có giao + không phiên ⇒
-chỉ đánh dấu stale.
+**Verify**: `npm test`
 
-### Item đã tồn tại, không tạo mới
+**Rủi ro / rollback**: nếu bước phát hiện tự nó gọi catchup ở bất kỳ nhánh nào
+thì đã phá đúng lý do nó tồn tại. Test phải chứng minh **không có** verify nào
+chạy trong đường này.
 
-- **tsk-1zd** — **đã hấp thụ vào task-merge-queue** (D6). Không chạy riêng.
-  Việc đổi state (đánh dấu `supersededBy`/`duplicates`) thuộc bước handoff
-  sang planning, không phải việc của skill này.
+---
+
+### task-escalation-playbooks {#task-escalation-playbooks}
+
+**Mục tiêu**: §H — thu stop rule về đúng những chỗ thật sự cần người. Viết
+playbook tự xử cho ba block reason còn lại trong `CATCHUP_REASONS` chưa có:
+`verify-timeout-post-merge`, `integration-drift`, `merge-failed-unclassified`;
+đồng thời thu hẹp stop rule chung "cùng id kẹt hai lượt liên tiếp" để nó không
+còn nuốt chung mọi reason.
+
+**Vì sao cần** (§6): sau thiết kế này chỉ còn ba chỗ cần người — Iron Law,
+conflict thật sau khi playbook đã thử, verify đỏ thật sau khi playbook đã thử.
+Hiện các reason còn lại dừng chờ người **vì chưa ai viết playbook**, không phải
+vì máy không quyết được.
+
+**Bối cảnh nền cần đọc trước**:
+- `bin/fgos.mjs:3814` `CATCHUP_REASONS` — sáu reason catchup đã nhận; hai cái
+  đã có playbook là `verify-fail-post-merge` và `merge-blocked-other-item`
+- `plugins/fgOS/skills/merge-loop/SKILL.md` — bốn stop rule hiện tại, và chỗ
+  `verify-fail-post-merge` tự chẩn đoán (khuôn mẫu để nhân bản)
+- `plans/reports/internal-research-260801-1823-...-report.md` §H — danh sách
+  escalation gốc, 5 mục
+- tsk-3mv + hai con của nó — tiền lệ đã chứng minh hình dạng tự xử chạy được
+
+**File đụng**: `plugins/fgOS/skills/merge-loop/SKILL.md` và các skill anh em
+(`merge-next`, `cleanup-next`) nếu stop rule nằm rải.
+
+**Footprint khai báo**: `plugins/fgOS/skills/merge-loop/SKILL.md`,
+`plugins/fgOS/skills/merge-next/SKILL.md`
+
+**D-ID áp dụng**: D1 (escalation cho ca root chưa gom đủ con giữ nguyên, không
+được playbook hoá).
+
+**Acceptance**:
+1. Mỗi reason trong ba cái trên có một playbook viết rõ: dấu hiệu nhận biết,
+   bước máy tự thử, điều kiện dừng, và cái gì được báo lên khi thử thất bại.
+2. Stop rule "kẹt hai lượt" chỉ còn áp cho reason **chưa** có playbook, không
+   nuốt chung.
+3. Iron Law giữ nguyên là stop cần người, không bị playbook hoá.
+4. Ca D1 (root chưa gom đủ con định land vào `main`) vẫn escalate, tuyệt đối
+   không tự quyết.
+
+**Verify**: `npm test`
+
+**Rủi ro / rollback**: playbook quá hăng sẽ giấu lỗi thật thành "đã tự xử".
+Mỗi playbook phải để lại dấu vết quyết định qua cơ chế `fgos decision` đã có
+(§I), không im lặng.
+
+**Quan hệ**: song song. tsk-60h là lát `merge-conflict` của chính §H — làm
+trước hoặc cùng lúc, không trùng phạm vi.
+
+---
+
+### Item đã tồn tại, xử lý ra sao
+
+- **tsk-1zd** — **hấp thụ vào `task-merge-queue`** (D6), không chạy riêng. Việc
+  đổi state (`supersededBy`/`duplicates`) thuộc bước handoff sang planning, không
+  phải việc của skill này.
 - **tsk-kv3** — thu cổng cây-sạch về đúng footprint item đang merge. Song song
-  với làn 1; cùng file `merge.mjs` nhưng khác hàm (`isWorkingTreeClean`), khai
-  `footprint` hẹp để `mergeReadiness` tự serialize nếu cần.
-- **tsk-60h** — playbook cho skill tự gọi `catchup` khi gặp `merge-conflict`.
-  Song song an toàn thật (chỉ `merge-loop/SKILL.md`). Là một lát của §H.
-- **tsk-280** — **không** thuộc phạm vi này (D6). Vẫn là vấn đề vệ sinh riêng,
-  không chặn làn 1.
+  với làn 1. Cùng file `merge.mjs` nhưng khác hàm (`isWorkingTreeClean`,
+  `merge.mjs:109-124`) — khai `footprint` hẹp để `mergeReadiness` tự serialize
+  nếu cần. Ghi chú: hạng mục này chồng lấn khái niệm với
+  `task-verify-at-inbound-gate` (cả hai đều làm merge bớt phụ thuộc cây chung)
+  — planning cần chốt ranh giới trước khi cả hai cùng chạy.
+- **tsk-60h** — lát `merge-conflict` của §H. Song song an toàn thật (chỉ
+  `merge-loop/SKILL.md`).
+- **tsk-280** — **ngoài phạm vi** (D6). Vấn đề vệ sinh riêng, không chặn làn 1.
+
+### Ghi chú kỹ thuật chưa gán chủ
+
+Ba thứ scout phát hiện, chưa thuộc hạng mục nào — planning quyết gộp vào đâu
+hay tách item mới:
+
+1. **`catchup` không giữ `main-checkout` lock** và tự chép lại logic
+   merge/verify/commit thay vì gọi `mergeRunnerItem`. Vì
+   `task-verify-at-inbound-gate` biến catchup thành đường chính, lỗ này chuyển
+   từ "hẹp" thành "trên đường nóng" — nhiều khả năng phải gộp vào hạng mục đó.
+2. **`worktree.mjs:652` `git branch -f` không khoá** — gốc chung của cả tsk-46a
+   lẫn tsk-2cd. Một fix CAS đóng cả hai.
+3. **`provisionDependencies` chạy `npm ci` mới tinh trên mỗi ephemeral merge
+   worktree**, không tái dùng cache lúc dispatch; và `driftStatus` tính lại 2
+   lần trong một `merge next` khi sync-root nổ.
