@@ -2,16 +2,20 @@
 
 ## 1. Trạng thái hiện tại
 
-Vòng 3 (2026-08-12). **D1–D4 đã mint** (§4) và đã ghi vào state qua
-`fgos decision` (seq 14590–14593). §6 vừa regenerate quanh trục *"verify
-chạy đúng một lần, ngoài lock; cửa ra chỉ fast-forward"*. §7 đã viết.
+Vòng 4 (2026-08-12). **D1–D6 đã mint** (§4), đã ghi vào state qua
+`fgos decision` (seq 14590–14595). §6 giữ nguyên trục *"verify chạy đúng một
+lần, ngoài lock; cửa ra chỉ fast-forward"* — vòng này không đổi hình dạng
+thiết kế, chỉ đổi cách chia hạng mục nên §6 không cần regenerate.
 
-Thứ tự triển khai vừa đổi ở vòng này: **§E (hàng đợi theo target branch) đi
-trước**, ba fix nhỏ chạy song song — đảo lại quyết định vòng 2 ("ba fix nhỏ
-trước"). Điểm này còn mới, chưa đủ một vòng nên **chưa mint D-ID**.
+Thứ tự đã chốt: **§E đi trước** (D5), hấp thụ luôn tsk-1zd (D6). tsk-kv3 và
+tsk-60h chạy song song. tsk-280 đã kiểm: **không chặn** (D6).
 
-Còn một rủi ro chưa giải: hai trong ba fix nhỏ giẫm footprint với §E (xem
-#16). Cần chốt cách cô lập trước khi bung song song.
+Điểm mở còn lại: **#17** — phần còn lại của §H (playbook cho `verify-fail`,
+`integration-drift`) chưa ai nhận, hiện chưa thành hạng mục.
+
+Thiết kế đã đủ chín để handoff: §6 ổn định, §7 có 4 hạng mục với anchor +
+verify nháp. Chờ người xác nhận để chuyển sang
+`fgos-coding-exploring` → `fgos-coding-planning`.
 
 ## 2. Mục tiêu & đề bài
 
@@ -50,8 +54,9 @@ thật sự cần người.
 | 13 | Verify ở cửa vào hay cửa ra | **D3** | |
 | 14 | Trigger refresh ở #2 | **D4** | |
 | 15 | §E còn là hạng mục "để sau" không | **rõ — KHÔNG, đi trước** | Người quyết vòng 3: §E lên trước, ba fix nhỏ song song. Lý do kỹ thuật: §E là điều kiện để D3 đứng vững — target không được nhích giữa catchup-verify và land, nếu không bằng chứng vỡ và verify lại rơi vào lock |
-| 16 | Cô lập footprint giữa §E và ba fix nhỏ | **CHƯA RÕ — điểm mở chính vòng 4** | tsk-60h an toàn thật (chỉ `merge-loop/SKILL.md`). tsk-kv3 đụng `isWorkingTreeClean` trong `merge.mjs` (cùng file khác hàm). tsk-1zd đụng picker `merge next` (`bin/fgos.mjs:2038`) mà §E cũng sửa orchestration ở đó — rủi ro cao |
+| 16 | Cô lập footprint giữa §E và ba fix nhỏ | **D6** | tsk-1zd gộp vào §E. tsk-kv3 (`isWorkingTreeClean`, cùng file khác hàm) và tsk-60h (chỉ `merge-loop/SKILL.md`) chạy song song |
 | 17 | §H (thu hẹp escalation) đứng riêng hay nằm trong §E | **CHƯA RÕ** | tsk-60h là một lát của §H. Phần còn lại (playbook cho `verify-fail`, `integration-drift`) chưa ai đụng |
+| 18 | tsk-280 có chặn §E không | **D6 — KHÔNG** | Bậc 8 của thiết kế 2026-08-01 giả định Conductor tin vào status. D3 khiến nó tin vào `branchHeadAtReturn`, mà `move` không cấp được trường đó. tsk-280 vẫn là vấn đề vệ sinh thật (item tới `awaiting-approval` chưa từng verify xanh) nhưng không làm merge land code chưa verify |
 
 ## 4. Quyết định đã chốt
 
@@ -61,6 +66,13 @@ thật sự cần người.
 | D2 | Không tự rebase nhánh đang có commit riêng; refresh chỉ bằng merge-target-vào-nhánh | fgOS có worktree sống gắn từng nhánh; rebase viết lại lịch sử nhánh đang checkout là kiểu tai nạn tsk-3au. Merge-in đạt cùng mục tiêu mà không rewrite, và đúng thứ `catchup` đang làm |
 | D3 | Verify chạy đúng một lần ở cửa vào (ngoài lock); cửa ra chỉ fast-forward, không verify | `mergedTreeAlreadyVerified` (`merge.mjs:803`, tsk-516) đã cho phép bỏ verify cửa ra khi target là ancestor + tip = `branchHeadAtReturn`. Catchup verify là thứ cấp lại bằng chứng đó; bỏ nó thì verify rơi vào trong lock (~185s, vượt TTL 180s) |
 | D4 | Sau-khi-root-sync là điểm **phát hiện**, không phải điểm catchup; trigger bằng giao đường dẫn thật | Trigger "root nhích" lấy topology làm proxy cho rủi ro: root 13 con ⇒ ~78 lượt verify (~4h) phần lớn vô ích. Dùng `changedFiles` (`merge.mjs:362`) cả hai phía, không dùng footprint khai báo |
+| D5 | §E đi trước; ba fix nhỏ chạy song song | §E là điều kiện để D3 đứng vững — target không được nhích giữa catchup-verify và land. Ba fix nhỏ không nằm trên đường tới hạn đó |
+| D6 | tsk-280 không chặn §E; tsk-1zd gộp vào §E | tsk-280: `mergedTreeAlreadyVerified` fail-closed khi thiếu/lệch `branchHeadAtReturn` (`merge.mjs:804`), mà `move` không cấp trường đó (`bin/fgos.mjs:1301`, không guard verify trong `store.mjs`) — item lách chỉ tự trả giá bằng verify đầy đủ ở cửa ra. tsk-1zd: "bỏ qua item không tiến được" chính là hành vi hàng đợi phải có, và cả hai cùng sửa picker ở `bin/fgos.mjs` nên tách ra chỉ tự tạo xung đột footprint |
+
+> Ghi chú độ chín: nửa tsk-280 của D6 là **phát hiện có bằng chứng** (đọc
+> code), không cần đứng qua vòng. Nửa tsk-1zd là **quyết định của người ở
+> vòng 4**, mới một vòng — nếu vòng sau người đổi ý thì supersede D6 thay vì
+> sửa tại chỗ.
 
 ## 5. Q&A log
 
@@ -103,6 +115,17 @@ thật sự cần người.
 
 - **2026-08-12T08:31Z — người đảo thứ tự**: "§E lên trước luôn, ba fix nhỏ làm
   song song." Ghi nhận #15 giải, #16 mở (footprint giữa §E và tsk-1zd/tsk-kv3).
+
+- **2026-08-12T08:39Z — người chốt gộp + yêu cầu kiểm tsk-280**: "gộp tsk-1zd
+  vào §E, kiểm tra tsk-280 luôn." Scout tsk-280: `move` vẫn gọi thẳng
+  `moveWork` với `role: 'human'`, không tiền điều kiện ngoài FSM hợp lệ
+  (`bin/fgos.mjs:1291-1303`); `store.mjs` không có guard verify trên đường
+  status — mô tả tsk-280 còn đúng về cấu trúc. NHƯNG nó không chặn §E:
+  `mergedTreeAlreadyVerified` fail-closed ngay dòng đầu khi thiếu/lệch
+  `branchHeadAtReturn` (`merge.mjs:804`), mà `move` không bao giờ cấp trường
+  đó. Ba ca đã soi: chưa từng return ⇒ không chứng chỉ ⇒ verify đầy đủ; từng
+  return rồi có commit mới ⇒ tip lệch ⇒ verify đầy đủ; từng return, tip vẫn
+  đúng SHA đã xanh ⇒ skip bật, và đúng như vậy. → D6.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -196,20 +219,24 @@ nhích, item kẹt đầu hàng, cây chung bẩn vì việc của người khá
 
 **Mục tiêu**: §E — hàng đợi đơn cho mỗi target branch. Một item chỉ land khi
 giữ slot của target đó; trong lúc giữ slot, không ai khác chạm target ấy.
+**Hấp thụ luôn tsk-1zd** (D6): picker phải bỏ qua item không tiến được ở lượt
+này thay vì trả về nó vô hạn, và phải tách tín hiệu "hết việc để merge" khỏi
+"kẹt mãi một item" — đây là hành vi hàng đợi vốn phải có, không phải fix rời.
 
 **Trích §6**: *"Điều kiện để chuỗi này đứng vững là target không được nhích
 trong khoảng giữa catchup verify xong và land... Thứ đảm bảo điều đó là §E."*
 
-**D-ID áp dụng**: D3 (§E tồn tại để bảo vệ bằng chứng của D3).
+**D-ID áp dụng**: D3 (§E tồn tại để bảo vệ bằng chứng của D3), D5, D6.
 
-**Quan hệ**: đi **trước**, là điều kiện của task-verify-at-inbound-gate. Chặn
-bởi tsk-280 (FSM guard) theo thứ tự gốc của thiết kế Conductor bậc 8 — cần
-xác nhận lại xem còn đúng không, vì tsk-280 mang nhãn quét-lại-trước-khi-làm.
-Giẫm footprint với tsk-1zd (#16).
+**Quan hệ**: đi **trước**, là điều kiện của task-verify-at-inbound-gate.
+**Không** bị tsk-280 chặn (D6). Sau khi hấp thụ tsk-1zd thì không còn giẫm
+footprint với làn song song nào.
 
-**Verify nháp**: `npm test` + test mới chứng minh hai phiên cùng xin slot của
-một target thì phiên thứ hai chờ, và target không đổi tip trong lúc phiên đầu
-giữ slot.
+**Verify nháp**: `npm test` + test mới chứng minh (a) hai phiên cùng xin slot
+của một target thì phiên thứ hai chờ, và target không đổi tip trong lúc phiên
+đầu giữ slot; (b) một item vướng Iron Law không làm picker trả về nó lượt thứ
+hai, các item ready khác vẫn tới lượt; (c) "hết việc" và "kẹt mãi" trả về hai
+tín hiệu phân biệt được ở tầng gọi.
 
 ### task-verify-at-inbound-gate {#task-verify-at-inbound-gate}
 
@@ -263,9 +290,13 @@ chỉ đánh dấu stale.
 
 ### Item đã tồn tại, không tạo mới
 
-- **tsk-1zd** — picker bỏ qua item không tiến được + tách tín hiệu "hết việc"
-  khỏi "kẹt mãi". Giẫm footprint với task-merge-queue (#16).
-- **tsk-kv3** — thu cổng cây-sạch về đúng footprint item đang merge. Giẫm
-  footprint mức vừa với task-merge-queue.
+- **tsk-1zd** — **đã hấp thụ vào task-merge-queue** (D6). Không chạy riêng.
+  Việc đổi state (đánh dấu `supersededBy`/`duplicates`) thuộc bước handoff
+  sang planning, không phải việc của skill này.
+- **tsk-kv3** — thu cổng cây-sạch về đúng footprint item đang merge. Song song
+  với làn 1; cùng file `merge.mjs` nhưng khác hàm (`isWorkingTreeClean`), khai
+  `footprint` hẹp để `mergeReadiness` tự serialize nếu cần.
 - **tsk-60h** — playbook cho skill tự gọi `catchup` khi gặp `merge-conflict`.
   Song song an toàn thật (chỉ `merge-loop/SKILL.md`). Là một lát của §H.
+- **tsk-280** — **không** thuộc phạm vi này (D6). Vẫn là vấn đề vệ sinh riêng,
+  không chặn làn 1.
