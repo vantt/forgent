@@ -243,3 +243,124 @@ v.v.) — các con khác của cùng cha, ngoài phạm vi item này.
 ## Outstanding questions
 
 None
+
+---
+
+# CONTEXT: tsk-2yo — Chuyển phân loại tier/kind/risk xuống discovery, retire capacity submit-assist-classify
+
+## Feature boundary
+
+Bốn việc, tất cả trong phạm vi domain `coding`:
+
+1. Skill chủ stage `discovery` (`fgos-coding-discovering`) phán lại
+   `tier`/`kind`/`risk` trên bằng chứng đã research (không phải suy đoán từ
+   text submit), đọc vựng qua `getDomain(item.domain).classification`
+   (`kind`/`risk`) và `TIERS` global (`tier` — không nằm trong bảng
+   `classification`) — không hardcode value set ở đây.
+2. `classify.mjs` **giữ nguyên code**, đổi vai trò: kết quả của nó chỉ còn
+   là giá trị TẠM lúc `fgos submit` sinh item, không còn là phán quyết
+   cuối cùng.
+3. `/fgOS:submit` mất hẳn step 7 (re-judge `tier`/`kind`/`risk` trên clean
+   text, gate "live soul" hiện tại) — quay về wrapper mỏng, đúng bản chất
+   một verb thuần tạo item.
+4. Retire capacity `submit-assist-classify`: `fgos tool remove --name
+   submit-assist-classify`, giữ nguyên decision record, thuần retire
+   không migration.
+
+Đường headless (worker bị cấm gọi `fgos`) cần khối `fgos-verdict` mang
+thêm `tier`/`kind`/`risk` dạng DATA để runner tự áp dụng — hướng đã chốt ở
+D17 (xem Locked decisions), CHƯA triển khai; đường tương tác (skill tự gọi
+`fgos edit`) và đường headless (schema mở rộng) đều thuộc phạm vi
+implementation của chính item này, để lại cho `fgos-coding-planning`.
+
+## Locked decisions
+
+| D-ID | Quyết định |
+|------|-----------|
+| D12 | Phân loại `tier`/`kind`/`risk` chuyển xuống stage `discovery`, sau research — không thể phán "khó hay không khó" từ text submit, phải nhìn codebase. `classify.mjs` giữ nguyên code, đổi vai trò thành giá trị tạm lúc sinh; `/fgOS:submit` mất hẳn step re-judge + gate "no-soul"/"live soul" của nó. Skill chủ discovery đọc vựng qua `getDomain(item.domain).classification`, không hardcode. (Trích nguyên văn `DISCUSSION.md` D12, `{#task-classification-to-discovery}`.) |
+| D13 | Retire capacity `submit-assist-classify` (`fgos tool remove --name submit-assist-classify`) — thuần retire, không migration: capacity chỉ mô tả cách gọi (`kind: cli`, `command: agy`), không chứa phán đoán nào cần chuyển giao. Giữ nguyên decision record, không xoá. (Trích nguyên văn `DISCUSSION.md` D13.) |
+| D17 | Đường headless cần mở rộng schema khối `fgos-verdict` để worker báo `tier`/`kind`/`risk` dạng DATA cho runner áp dụng (worker bị cấm gọi `fgos`); đường tương tác thì skill tự gọi `fgos edit`. Đây là lý do task này "to hơn" các con khác cùng cây. (Trích nguyên văn `DISCUSSION.md` D17, dòng 99.) |
+
+Không mở lại D12/D13/D17 ở đây — chỉ trích D-ID, cùng cây quyết định với
+`tsk-qod`/`tsk-lya` phía trên, chung một `DISCUSSION.md`.
+
+## Pinned terms
+
+- **"giá trị tạm lúc sinh" (temp value at generation time)** — kết quả
+  `classify.mjs` trả về khi `fgos submit` tạo item chỉ còn là một điểm
+  khởi đầu để item luôn hợp lệ ngay từ lúc sinh (verb `submit` vẫn phải
+  tạo được item cho shell/cron/agent khác không có soul) — không còn là
+  phán quyết cuối. Giá trị cuối là phán quyết của skill chủ discovery,
+  sau khi research xong.
+- **"đọc vựng qua getDomain"** — `classificationVocabulary(domain, field)`
+  (`src/state/workflow-stage-graphs.mjs:569-571`) là accessor đã có sẵn
+  cho `kind`/`risk`; `tier` KHÔNG nằm trong bảng `classification` của
+  domain — nó dùng `TIERS` global của `work.mjs`, không đổi bởi item này.
+  Skill chủ discovery gọi accessor này cho `kind`/`risk`, không hardcode
+  mảng giá trị.
+
+## Scout evidence
+
+- `src/state/workflow-stage-graphs.mjs:304-334, 562-571` — vựng
+  `classification: { kind: [...], risk: ['light','standard','heavy'] }`
+  đã tồn tại sẵn trên domain `coding`, cùng accessor
+  `classificationVocabulary`. Không phải thứ item này phải phát minh mới.
+- `src/intake/classify.mjs:41-96` — hàm `classify()` hiện tại thuần
+  keyword-based, xác định `{tier, kind, risk}` (deterministic, `risk =
+  tier` theo D5 riêng của file này). Không có gì cần viết lại, chỉ đổi
+  vai trò người tiêu thụ kết quả.
+- `bin/fgos.mjs:4075, 4124` — verb `fgos tool remove --name <name>` đã có
+  sẵn (`case 'tool'`), retire capacity là một lệnh gọi, không cần plumbing
+  mới.
+- `src/runner/loop.mjs:564-591`, `src/runner/prompt-templates/worker-
+  prompt-discovery.txt:25-31` — khối `fgos-verdict` hiện tại chỉ mang
+  `{clear, verify?}`/`{clear:false, question?}`, KHÔNG có `tier`/`kind`/
+  `risk`. Xác nhận đúng gap D17 nêu — hướng mở rộng đã chốt, chưa triển
+  khai. `captureDiscoveredWork` (`loop.mjs:612-636`) đã có tiền lệ sống
+  cho cùng ý tưởng ở một khối chị em (`fgos-discovered`): "classify()-
+  derived tier/kind/risk (block overrides win)".
+- `.claude/skills/fgos-coding-discovering/SKILL.md` (đọc toàn bộ, phiên
+  hiện tại) — có Non-goal tường minh + hard rule cấm skill đó tự phán
+  `tier`/`kind`/`risk` hoặc gọi `fgos edit` trên các field này, ghi rõ đây
+  là phạm vi của `tsk-2yo`. Đúng đoạn item này sẽ sửa, không phải một
+  thiếu sót.
+- `plugins/fgOS/skills/submit/SKILL.md:37, 99-112, 171, 187-188` — step 7
+  (đánh số lại từ "step 6" bản nháp) re-judge `tier`/`kind`/`risk` trên
+  clean text, gate "a live soul is running this" (dòng 187) — đúng đích
+  verify hiện tại của item (`! grep -q "live soul"`); gate song sinh ở
+  step 4 (dòng 99) là "gate no-soul" item mô tả.
+- **Con đã xong (không xung đột với item này)**: `plan.mjs:829-844`'s
+  `addWork` cho con decompose đặt `stage: stageForStep(domain, 'Execute')`
+  thẳng — con KHÔNG BAO GIỜ đi qua `clarify`/`discovery`/`exploring`. Vậy
+  việc discovery phán lại `tier`/`kind`/`risk` không bao giờ đụng giá trị
+  `kind`/`risk` một người/`fgos-coding-planning` đã cố ý đặt cho con lúc
+  decompose — chỉ item xuất phát từ `/fgOS:submit` (mang giá trị tạm của
+  `classify.mjs`) mới thực sự đi qua discovery mang theo giá trị cần phán
+  lại. Không còn kịch bản xung đột cần hỏi người.
+- Dependency `tsk-tku` (`fgos list --id tsk-tku --json`): `status:
+  delivered`, `stage: executing` — skill chủ discovery (`fgos-coding-
+  discovering`) item này mở rộng đã tồn tại và đã merge.
+- `impact-analysis` capability gate (CLAUDE.md): `fgos tool query
+  --capability impact-analysis --status present` → provider `gitnexus`,
+  `status: "present"` → **full**. Ghi lại cho `fgos-coding-planning`/
+  `fgos-coding-validating`/`fgos-coding-implement` đọc tiếp.
+- `docs/history/discover-stage-graph-and-skill-layering/RESEARCH.md`,
+  Round 1 (2026-08-12, tsk-2yo, stage `discovery`) — bằng chứng chi tiết
+  hơn cho mọi dòng ở trên, do helper `fgos-researching` tự ghi khi
+  `fgos-coding-discovering` gọi nó trước khi item này rời `discovery`.
+
+## Canonical references
+
+- `docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md` —
+  mục 4 (D12, D13, D17), mục 7 task 4 (`{#task-classification-to-
+  discovery}`) — nguồn quyết định gốc.
+- `docs/history/discover-stage-graph-and-skill-layering/RESEARCH.md` —
+  Round 1 cho `tsk-2yo` — evidence chi tiết cho mọi claim ở scout evidence
+  trên.
+- `src/state/workflow-stage-graphs.mjs`, `src/intake/classify.mjs`,
+  `src/runner/loop.mjs`, `src/intake/plan.mjs` — nguồn cơ học cho các
+  claim sự thật ở trên.
+
+## Outstanding questions
+
+None

@@ -154,3 +154,52 @@ self-computing ceiling, delegates to `/fgOS:discover <id>` after picking;
 independently confirmed against the live tree; the attached verify is a
 real, currently-red, runnable command that accurately targets what was
 found. Reusing the item's own attached verify unchanged.
+
+---
+
+## Round 1 — 2026-08-12 — tsk-2yo (classification → discovery, retire capacity), stage `discovery`
+
+**Asked.** Is tsk-2yo's goal clear enough to leave `discovery`? Scope as
+stated (D12/D13, `DISCUSSION.md:419-432`): (a) the `discovery`-stage skill
+chủ (`fgos-coding-discovering`) starts judging `tier`/`kind`/`risk` on
+research evidence, reading vocabulary via `getDomain(item.domain)
+.classification` instead of hardcoding; (b) `classify.mjs` keeps its code
+but its role is redefined to "temp value at generation time only"; (c)
+`/fgOS:submit` loses its step 6/7 re-judge + no-soul gate; (d) capacity
+`submit-assist-classify` is retired via `fgos tool remove --name
+submit-assist-classify`, decision record kept.
+
+**Checked** (all repo-first; nothing needed an external lookup):
+
+| Thing | Where checked | Found |
+|---|---|---|
+| Task definition + D-IDs | `DISCUSSION.md:419-432` (`{#task-classification-to-discovery}`), D12 `:94`, D13 `:95` | Item's own description matches D12/D13 near-verbatim; item's own `verify` field (`fgos list --id tsk-2yo --json`) is a refined, more concrete version of the draft verify in `DISCUSSION.md:430-432` (targets `"live soul"` absence + `"classification"` presence in `fgos-coding-discovering/SKILL.md` instead of the draft's `.fgos/state.json` grep) |
+| Dependency `tsk-tku` | `fgos list --id tsk-tku --json` | `status: delivered`, `stage: executing` — the discovery-stage skill chủ (`fgos-coding-discovering`) this task extends already exists and is merged |
+| `getDomain(domain).classification` vocabulary | `src/state/workflow-stage-graphs.mjs:304-334, 562-571` | **Already exists** — `classification: { kind: [...], risk: ['light','standard','heavy'] }` on the `coding` domain entry, plus an exported accessor `classificationVocabulary(domain, field)`. Not something tsk-2yo has to invent; it already follows the same absent-key-means-not-declared shape as `skillMap`/`parkReason`. `tier` is NOT in this table (it uses `work.mjs`'s separate global `TIERS`, unchanged) |
+| `classify.mjs` current shape | `src/intake/classify.mjs:41-96` | Pure, deterministic keyword-based `{tier, kind, risk}` derivation (`risk = tier` per its own D5) — exactly what the item's description means by "temp value at generation time"; no design gap, just a role/consumer change, not a rewrite |
+| `fgos tool remove --name` CLI verb | `bin/fgos.mjs:4075, 4124` | Already implemented (`case 'tool'`, `requireField(... 'tool remove requires --name ...')`) — retiring `submit-assist-classify` is a one-line call, not new plumbing |
+| Headless `fgos-verdict` schema | `src/runner/loop.mjs:564-591`, `src/runner/prompt-templates/worker-prompt-discovery.txt:25-31` | Current shape is `{clear: true, verify?}` / `{clear: false, question?}` only — **no tier/kind/risk fields today**. This is a real, named gap, but NOT an open design question: `DISCUSSION.md:99` (D17) already spells out the exact direction — "đường headless cần mở rộng schema khối `fgos-verdict` để worker báo `tier`/`kind`/`risk` dạng DATA cho runner áp dụng, vì worker bị cấm gọi `fgos`; đường tương tác thì skill tự gọi `fgos edit`" — and D17 explicitly flags task 4 (this item) as "to hơn" for exactly this reason. The runner side already has a working precedent to mirror: `captureDiscoveredWork` (`loop.mjs:612-636`) already applies "classify()-derived tier/kind/risk (block overrides win)" from a sibling fence (`fgos-discovered`) |
+| `fgos-coding-discovering/SKILL.md` current non-goal | Full read, this session | Explicitly states classification is "Non-goal ... thuộc phạm vi task khác — tsk-2yo — KHÔNG phải skill này", with a matching hard rule forbidding `tier`/`kind`/`risk` judgment and `fgos edit` calls on those fields. This is precisely the passage tsk-2yo's implementation edits — confirms scope boundary, not a gap |
+| `/fgOS:submit` current step 6/7 | `plugins/fgOS/skills/submit/SKILL.md:37, 99-112, 171, 187-188` | Step 7 (renumbered from the draft's "step 6") re-judges `tier`/`kind`/`risk` on clean text, gated behind "a live soul is running this" (line 187) — exactly what the item's own verify (`! grep -q "live soul"`) targets; step 4's own live-soul gate (line 99) is the twin the item's description calls the "no-soul gate" |
+
+**Still open** (for `fgos-coding-planning`, not for a person):
+
+- Exact mechanism for how the discovery-stage skill applies its judged
+  `tier`/`kind`/`risk` on the interactive path (`fgos edit`, per D17) vs.
+  what field(s)/flags that verb needs — an implementation detail, not a
+  product decision; D17 already names the split (`fgos edit` interactive,
+  extended `fgos-verdict` fence headless).
+- Exact shape of the `fgos-verdict` fence extension (new optional keys vs.
+  a nested object) and where the runner applies them (mirroring
+  `captureDiscoveredWork`'s block-overrides-win pattern, or a new path) —
+  implementation detail, `DISCUSSION.md` D17 already fixes the direction.
+
+**Verdict.** `clear: true` — goal and scope are independently confirmed
+against the live tree; every mechanism the description depends on (domain
+classification vocabulary, `classify.mjs`, `fgos tool remove`, the
+`fgos-verdict` fence and its known extension direction, submit's current
+gate) exists and matches the description, with the two open points above
+being implementation-detail, not ambiguity. Reusing the item's own attached
+`verify` unchanged: `npm test && ! grep -q "live soul"
+plugins/fgOS/skills/submit/SKILL.md && grep -q "classification"
+.claude/skills/fgos-coding-discovering/SKILL.md`.
