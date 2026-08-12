@@ -116,10 +116,12 @@ export const DOMAINS = Object.freeze({
     // D11/D18's later `-> planning` update). tsk-qod D1/D2 retires
     // `clarify` as a stage ENTIRELY (not merely drain-only, unlike
     // `decompose`) — `discovery` is now the domain's own entry point
-    // (`stages[0]`), so a NEW item's sequential chain is simply
-    // `discovery -> exploring -> planning`. `decompose`-named edges stay
-    // exactly as they were (tsk-403 D18, still drain-only legacy,
-    // unaffected by this item).
+    // (`stages[0]`). tsk-30v (D2/D3/D6): a NEW item's path branches on its
+    // own discovery verdict instead of walking one fixed chain — `clear`
+    // skips `exploring` entirely (`discovery -> planning` directly),
+    // `unclear` goes through `exploring` first (`discovery -> exploring ->
+    // planning`). `decompose`-named edges stay exactly as they were
+    // (tsk-403 D18, still drain-only legacy, unaffected by this item).
     transitions: Object.freeze([
       // `clarify -> discovery` / `clarify -> exploring` (tsk-qod D1) —
       // NOT a routing alias like `decompose`'s (D18): `clarify` carries no
@@ -143,6 +145,12 @@ export const DOMAINS = Object.freeze({
       Object.freeze({ from: 'decompose', to: 'executing' }),
       Object.freeze({ from: 'exploring', to: 'decompose' }),
       Object.freeze({ from: 'discovery', to: 'exploring' }),
+      // tsk-30v (D2/D6, D-local-1): new edge — a `clear` discovery verdict
+      // skips `exploring` and lands directly on `planning`. This tuple did
+      // not exist before this item; `nextDiscoveryEdge` could not legally
+      // pick it without this registration (`stage-fsm.mjs`'s CAS check has
+      // no bypass).
+      Object.freeze({ from: 'discovery', to: 'planning' }),
       // `planning` edges (tsk-403 D11) — the active chain a NEW item walks.
       Object.freeze({ from: 'exploring', to: 'planning' }),
       Object.freeze({ from: 'planning', to: 'executing' }),

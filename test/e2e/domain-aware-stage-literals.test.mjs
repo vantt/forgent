@@ -395,12 +395,10 @@ test('runner sweep: a "triage" fixture-domain item at its own Clarify-mapped sta
   mkLockedContextFixture(repoRoot, codingDocsRef);
   const codingItem = submit(repoRoot, 'An unrelated plain coding item, same sweep', { docsRef: codingDocsRef });
   assert.equal(codingItem.stage, 'discovery');
-  // tsk-qod D1/D2: `clarify` is retired entirely -- a fresh coding item now
-  // starts at `discovery` (`stages[0]`) directly, so two explicit discover
-  // calls walk it through discovery->exploring->planning (triage above is
+  // tsk-30v D2/D6: a clear verdict at `discovery` now skips `exploring` and
+  // lands directly on `planning` in ONE discover call (triage above is
   // unaffected: it has no discovery/exploring stages registered, so its
   // own single discover call still lands straight on decompose, unchanged).
-  assert.equal(fgos(repoRoot, ['discover', codingItem.id, '--verdict', 'clear', '--verify', 'test -f output.txt && echo CODE_OK']).status, 0);
   assert.equal(fgos(repoRoot, ['discover', codingItem.id, '--verdict', 'clear', '--verify', 'test -f output.txt && echo CODE_OK']).status, 0);
   assert.equal(fgos(repoRoot, ['plan', codingItem.id, '--verdict', 'pass-through', '--reason', 'single fixture item, no split needed']).status, 0);
 

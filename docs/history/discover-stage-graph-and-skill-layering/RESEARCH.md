@@ -203,3 +203,90 @@ being implementation-detail, not ambiguity. Reusing the item's own attached
 `verify` unchanged: `npm test && ! grep -q "live soul"
 plugins/fgOS/skills/submit/SKILL.md && grep -q "classification"
 .claude/skills/fgos-coding-discovering/SKILL.md`.
+
+---
+
+## Round 1 — 2026-08-12 — tsk-30v (nextDiscoveryEdge verdict-branch edges), stage `discovery`
+
+**Asked.** Is tsk-30v's goal clear enough to leave `discovery`? Item's own
+claim: `nextDiscoveryEdge` picks its edge PURELY BY STAGE today, verdict
+never participates — clear walks the linear chain
+clarify→discovery→exploring, unclear parks in place. Wanted: clear skips
+`exploring`, lands straight on `planning`; unclear goes to `exploring`
+(instead of parking). Item also claims "both edges already valid in the
+FSM, only the edge-picker doesn't use them" and names a stale
+`loop.mjs:1068-1074` comment plus the already-wired `loop.mjs:1132-1138`
+`resolveDiscovery(..., callerVerdict)` call (tsk-4v6).
+
+**Checked** (all repo-first; nothing needed an external lookup):
+
+| Thing | Where checked | Found |
+|---|---|---|
+| `nextDiscoveryEdge` current body | `src/intake/discovery.mjs:136-162` | Confirmed: signature is `(work)` — no verdict parameter anywhere. Three `if` branches keyed only on `work.stage`. For `work.stage === 'discovery'` it unconditionally `return { to: 'exploring', expectedStage: 'discovery' }` — no verdict input possible. Matches the item's own claim exactly. |
+| Caller `resolveDiscovery` | `src/intake/discovery.mjs:225-461` | `nextDiscoveryEdge(work)` is called at two sites (277-283 trust-signal skip, 433-438 explicit-clear), both **only reachable when `verdict.clear === true`**. When `verdict.clear === false` the function goes straight to `putInAwaiting` (457-459) — `nextDiscoveryEdge` is never invoked, stage never changes. Confirms "unclear parks in place" literally: status becomes `awaiting-human`, `stage` stays `discovery`. |
+| FSM `transitions` array, `coding` domain | `src/state/workflow-stage-graphs.mjs:123-149` | Full list: `clarify→discovery`, `clarify→exploring` (legacy, dead — `clarify` retired from `stages`/`stepMap` per tsk-qod), `decompose→executing`, `exploring→decompose` (legacy drain-only per tsk-403 D18), `discovery→exploring`, `exploring→planning`, `planning→executing`. **`discovery→planning` (or `discovery→decompose`) is NOT registered.** The item's own claim ("cả hai cạnh đã hợp lệ sẵn trong FSM") does not hold for the clear-verdict destination edge — only `discovery→exploring` pre-exists; a genuinely new transition tuple must be added to this array for the clear-skip-exploring path to be legal, or `transitionStage`/`stage-fsm.mjs`'s CAS check (which requires a registered edge, no bypass, per its own no-bypass contract cited at `workflow-stage-graphs.mjs:131`) will throw. |
+| `stage-fsm.mjs` edge enforcement | Confirmed via `workflow-stage-graphs.mjs:129-131`'s own comment ("`moveStage`'s FSM check … always requires a registered edge, no bypass") | No bypass path exists — adding the edge to `transitions` is mandatory, not optional polish. |
+| `moveStage` / `putInAwaiting` independence | `src/state/store.mjs:763-785` (`moveStage`, delegates to `stage-fsm.mjs`'s `transitionStage`, reads/writes only `work.stage`), `store.mjs:721-733` (`putInAwaiting`, delegates to `status-fsm.mjs`'s `transitionWork` via `moveWork`, reads/writes only `work.status`) | The two are structurally independent — neither FSM inspects the other's field. Calling `moveStage(..., to:'exploring')` then `putInAwaiting(..., ask)` in sequence on the same item, in the same `resolveDiscovery` call, succeeds at the FSM level (no cross-guard blocks this direction). Existing convention in `resolveDiscovery`/`plan.mjs`'s `resolvePlan` today treats the two calls as mutually exclusive per branch (never both), with an explicit guard (`discovery.mjs:418-423`) blocking `moveStage` when status is ALREADY `awaiting-human` — that guard protects the opposite ordering (a stale, unanswered park), not this one. |
+| `answerAwaiting` resume semantics | `store.mjs:747-751` | Resumes only `status` (to `statusAtAsk`, `todo` or `doing`) — never touches `stage`. Confirms that if `moveStage` advances an unclear item to `exploring` *before* `putInAwaiting` parks it, the item sits at `stage: 'exploring'` both while parked and after a person answers — landing the resumed session straight into the Socratic collab (`fgos-coding-exploring`), never looping back through `fgos-coding-discovering` a second time on the same unresolved question. |
+| `loop.mjs` stale comment | `src/runner/loop.mjs:1082-1085` (current line numbers; item description's `1068-1074` is stale/drifted, same block) | Confirmed stale: `// there is no verdict to gate the transition on here, unlike the` / `// clarify->planning engine's own edge — the worker records / // its findings in RESEARCH.md and the item unconditionally advances / // discovery -> exploring once dispatch settles`. Contradicted ~65 lines below. |
+| `loop.mjs` real verdict-gated call | `src/runner/loop.mjs:1132-1151` | Confirmed: `const callerVerdict = parseVerdictBlock(worker.stdout ?? '');` then `resolveDiscovery(dir, item.id, config, 'runner', callerVerdict)` at line 1150. Matches item's claim (tsk-4v6 already wired verdict through here) — only the comment 65 lines above is stale, not the code. |
+| `test/intake/discovery.test.mjs` existing coverage | Full file read, 566 lines | Existing test at line 275-284, `'resolveDiscovery advances discovery -> exploring on a caller-supplied clear verdict'`, currently encodes the OLD (to-be-changed) behavior — it will need to become an `unclear`-verdict test once the edge picker is verdict-aware. No existing test exercises a `clear` verdict landing on `planning` from `discovery`, nor an `unclear` verdict advancing stage while also parking. Test helpers already present (`tmpStoreDir`, `sampleWork` defaulting `stage: 'discovery'`) are sufficient to write both new cases without new infrastructure. |
+| `decompose`→`planning` rename status | `workflow-stage-graphs.mjs:90,107-108,215-222` | Already landed for the active literal: `planningStage` resolves via `stageForStep(domain,'Divide')` → `'planning'`. `decompose` survives only as drain-only legacy (no `stepMap` entry, so unreachable by any new edge). New code must target `'planning'`, never `'decompose'`. |
+
+**Found.**
+
+1. The product decision itself (`clear` skips `exploring`, `unclear` goes to
+   `exploring` instead of parking) is already locked at the parent-tree
+   level — `DISCUSSION.md` D2/D3/D6, D14 (`{#task-verdict-branch-edges}`).
+   Nothing here reopens that.
+2. One factual correction to the item's own premise: the `discovery →
+   planning` edge does **not** pre-exist in `transitions` — it must be
+   added there (`workflow-stage-graphs.mjs`), same file/array the item's
+   own description didn't call out as in-scope but that the enforced
+   no-bypass CAS check (`stage-fsm.mjs`) makes mandatory. This is a small,
+   mechanical addition (one more frozen tuple), not a design gap — the
+   edge's *validity* was never in question, only its literal registration.
+3. `nextDiscoveryEdge` needs a `verdict`-shaped input (today `(work)` only)
+   so its `discovery`-stage branch can pick `planning` vs. `exploring`
+   instead of hardcoding `exploring`.
+4. `resolveDiscovery`'s clear/unclear branching needs restructuring so that
+   specifically at `stage === 'discovery'`, the unclear path also calls
+   `moveStage(..., to: 'exploring')` before/alongside the existing
+   `putInAwaiting` park — confirmed structurally safe (independent FSMs,
+   no cross-guard blocks this ordering) and matches D2's literal wording
+   ("unclear không còn park tại chỗ" — no longer parks *in place*, i.e. the
+   *stage* must move even though status still asks a person). The
+   `clarify`/`exploring`-stage unclear paths (legacy, and exploring's own
+   gate) are unaffected — this restructuring is scoped to the
+   `stage === 'discovery'` branch only, matching D6's stated boundary
+   (discovery is the only "máy một mình" stage in this design).
+5. The stale `loop.mjs:1082-1085` comment and the already-real
+   `loop.mjs:1132-1151` verdict-gated call are both confirmed exactly as
+   the item describes (module-relative line numbers drifted slightly from
+   the item's draft numbers, same block).
+6. The item's own attached `verify` (`npm test && node --test
+   test/intake/discovery.test.mjs`) is real, runnable, and already targets
+   the right test file — `hasRealVerify` (`discovery.mjs:89-91`) will
+   preserve it unchanged regardless of what this round proposes.
+
+**Still open** (for `fgos-coding-planning`, not for a person):
+
+- Exact call-site shape for the `discovery`-stage unclear branch (a small
+  local `if (work.stage === 'discovery')` special-case inside
+  `resolveDiscovery`, vs. lifting the whole clear/unclear branch into a
+  stage-aware helper) — an implementation/module-boundary choice, not a
+  goal-clarity gap.
+- Whether the new `discovery → planning` transition tuple needs its own
+  code comment explaining why it's new (repo convention, seen throughout
+  `workflow-stage-graphs.mjs`) — a style/documentation detail, not a
+  design question.
+
+**Verdict.** `clear: true` — the design decision was already locked
+upstream; this round confirms every mechanical fact needed to implement it
+(current `nextDiscoveryEdge`/`resolveDiscovery` shape, the missing FSM
+edge, the stale comment, the already-real verify, FSM independence
+enabling the unclear-also-advances-stage fix) and surfaces one factual
+correction to the item's own premise (the `discovery→planning` edge is
+missing, not merely unused) that `fgos-coding-planning` needs as
+input, not a person. `verify` carried forward unchanged: `npm test && node
+--test test/intake/discovery.test.mjs`.
