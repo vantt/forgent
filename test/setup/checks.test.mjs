@@ -40,12 +40,12 @@ import {
   writeEnduserDoc,
   writeEnduserManifest,
 } from './helpers/setup-checks-harness.mjs';
-import { DEFAULT_WORKER_SLOT_CEILING, ADMIN_LANE_RESERVATION } from '../../src/state/worker-slots.mjs';
+import { DEFAULT_WORKER_SLOT_CEILING } from '../../src/state/worker-slots.mjs';
 
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, changelog-unreleased-stale, herdr-launcher-configured, work-classification-vocabulary, work-stage-vocabulary, delivered-not-on-trunk, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, and events-jsonl-not-truncated', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, changelog-unreleased-stale, herdr-launcher-configured, work-classification-vocabulary, work-stage-vocabulary, delivered-not-on-trunk, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, events-jsonl-not-truncated, and worker-slots-ceiling-usable', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     [
@@ -69,6 +69,7 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'events-jsonl-contiguous',
       'invariant-checks-configured',
       'events-jsonl-not-truncated',
+      'worker-slots-ceiling-usable',
     ].sort(),
   );
 });
@@ -771,7 +772,7 @@ test('config-not-stale passes when the existing config already has every default
       cleanup: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS, leafTtlDays: DEFAULT_CLEANUP_LEAF_TTL_DAYS },
       herdrOrchestrator: DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
       invariantChecks: { commands: DEFAULT_INVARIANT_CHECK_COMMANDS },
-      workerSlots: { ceiling: DEFAULT_WORKER_SLOT_CEILING, adminReservation: ADMIN_LANE_RESERVATION },
+      workerSlots: { ceiling: null },
     }),
   );
   const { passed } = checkById('config-not-stale').check(cwd);
@@ -846,6 +847,54 @@ test('invariant-checks-configured passes and names the configured commands', () 
   assert.equal(passed, true);
   assert.match(message, /1 command\(s\)/);
   assert.match(message, /node --test test\/architecture\.test\.mjs/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('worker-slots-ceiling-usable fails when the section is missing entirely', () => {
+  const cwd = mkTemp('doctor-slots-absent-');
+  const { passed, message } = checkById('worker-slots-ceiling-usable').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /workerSlots section missing/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+// The whole point of the check: each of these silently enforces NOTHING,
+// because hasWorkerSlotRoom treats anything that is not a positive integer
+// as "no ceiling configured" and allows every claim. A project reading its
+// own config would believe it is capped.
+test('worker-slots-ceiling-usable fails on a ceiling that silently enforces nothing', () => {
+  for (const ceiling of ['8', 8.5, 0, -1, true, []]) {
+    const cwd = mkTemp('doctor-slots-malformed-');
+    fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+    fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ workerSlots: { ceiling } }));
+    const { passed, message } = checkById('worker-slots-ceiling-usable').check(cwd);
+    assert.equal(passed, false, `malformed ceiling: ${JSON.stringify(ceiling)}`);
+    assert.match(message, /enforces NOTHING/);
+    fs.rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+// `null` is the one non-number that is not a mistake -- it is exactly what
+// `fgos setup` writes, and it means "deliberately unarmed", so it must pass
+// while still saying plainly that nothing is being enforced.
+test('worker-slots-ceiling-usable passes on the unarmed null fgos setup writes, and says so', () => {
+  const cwd = mkTemp('doctor-slots-unarmed-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ workerSlots: { ceiling: null } }));
+  const { passed, message } = checkById('worker-slots-ceiling-usable').check(cwd);
+  assert.equal(passed, true);
+  assert.match(message, /unarmed/);
+  assert.match(message, new RegExp(`recommended: ${DEFAULT_WORKER_SLOT_CEILING}`));
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('worker-slots-ceiling-usable passes and names a real armed ceiling', () => {
+  const cwd = mkTemp('doctor-slots-armed-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ workerSlots: { ceiling: 6 } }));
+  const { passed, message } = checkById('worker-slots-ceiling-usable').check(cwd);
+  assert.equal(passed, true);
+  assert.match(message, /workerSlots\.ceiling = 6/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 

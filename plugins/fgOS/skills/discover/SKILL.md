@@ -56,14 +56,21 @@ callers, in practice:
   `fgos-coding-driving` itself). `herdr-plugin`'s unattended auto-discover
   launcher is one caller of `/fgOS:discover-next` itself now (it only
   knows an item exists, never which one — picking stays centralized in
-  `pickNextDiscoverItem`), always passing `--autoClose` through both
-  tiers.
+  `pickNextDiscoverItem`).
 - `herdr-plugin`'s manual per-item Discover button, which calls here
-  directly with the id the person selected in the dashboard, also always
-  passing `--autoClose` (`herdr-plugin/src/pick.rs`).
+  directly with the id the person selected in the dashboard.
 - Rarely, a person invoking it by hand with a specific id in mind. Most of
   the time — the two herdr-plugin paths and `discover-next` above —
   nobody is sitting watching this pane while it runs.
+
+**Neither herdr-plugin path passes `--autoClose` any more** (tsk-1zq,
+`herdr-plugin/src/pick.rs`). A finished worker pane is now reclaimed by
+being REUSED for the next worker rather than closed, so asking a session to
+close its own pane bought nothing and cost the reuse. The flag below is
+therefore a manual opt-in only: it fires when a person types it, and never
+from the cockpit. Read a finished drive's result with `fgos show <id>` —
+`fgos-coding-driving` lands its closing report on the item precisely so no
+one has to keep a pane open to see it.
 
 ## Steps
 
