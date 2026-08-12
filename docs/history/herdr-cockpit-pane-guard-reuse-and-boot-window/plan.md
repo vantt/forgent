@@ -2,6 +2,52 @@
 
 Mode: standard
 
+## Reality-gate finding (fgos-coding-validating, round 1) — split, don't guess defect 3
+
+**Smaller path: FAIL on the original "one item, no split" shape.** Reading
+`src/state/worker-slots.mjs:39-59` (D9, cited there verbatim: "the admin
+lane never claims a work item at all... there is nothing here to count,
+and nothing for a liveness filter to reclaim — the reservation is
+constant by definition") and
+`docs/history/orchestrator-worker-slots/DISCUSSION.md` (D2, D9, and the
+whole Round 6-8 arc, which explicitly rejects heuristic/guessed liveness
+in favor of hard, observable state transitions — but that arc resolves
+EXECUTION-lane worker liveness only, never admin-loop relaunch semantics)
+found that defect 3's two candidate fixes sketched below by the original
+Approach are both blocked:
+
+- Reading `has_labeled_pane` to decide relaunch (today's bug) violates D2
+  outright — already established.
+- Replacing it with an engine-occupancy query (defect 2's own pattern) is
+  a structural non-starter: the engine deliberately does not track
+  admin-lane occupancy (D9), and nothing in DISCUSSION.md's Round 6-8
+  resolution (which fixed the analogous "is a worker done" question)
+  covers a long-running admin loop's own relaunch-after-natural-exit
+  question.
+
+The one concrete design that DOES fit every locked constraint (D2: never
+read a label to decide; D9: no engine signal to ask; admin panes are
+fixed, never split/reclaimed per DISCUSSION.md Round 8) is an adapter-
+local "already launched this toggle-on period" latch, mirroring defect
+2's own `pending_discover_pane` fix shape — but this changes real,
+observable operator behavior: a merge-loop that naturally exits (pool
+empty, a NORMAL and frequent event per `/fgOS:merge-loop`'s own stop
+rules) would, under a one-shot latch, never auto-relaunch until someone
+manually flips `autoMerge` off and back on. Whether that is the intended
+behavior for the `autoMerge`/`autoRetro`/`autoCleanup` toggles, versus an
+auto-relaunch-on-natural-exit design, is a genuine product-behavior fork
+this plan cannot answer from repo evidence alone — it is exactly the
+"material" gap `fgos-coding-planning`'s own step 6 describes (the answer
+would change observable behavior), not an implementation detail to pin as
+an assumption.
+
+**Decision: split.** Defects 1 and 2 have clear, fully evidence-backed fix
+directions (reporter-stated for 1, engine-truth-pattern-consistent for 2)
+and proceed as this item's own scope. Defect 3 is carved into its own
+child item and handed to a stage that can park a real question for a
+person, rather than guessed here under a validating pass's own "do not
+fabricate a pass" rule.
+
 ## Bootstrap note
 
 No `fgos-coding-exploring` round ran for this item — discovery verdict was
@@ -31,15 +77,14 @@ it, per `CLAUDE.md`'s gate, at `fgos-coding-implement`.
 Three independent defects in the herdr-plugin pane-guard family, one crate,
 one shared verify command already on the item
 (`cargo test --manifest-path herdr-plugin/Cargo.toml && cargo build
---release --manifest-path herdr-plugin/Cargo.toml`) — kept as ONE item, not
-split. Rationale: all three touch the same small footprint already
-declared (`app.rs`, `main.rs`, `layout.rs`, `pane_scan.rs`), share one test
-suite and one build, and none blocks or depends on either of the others —
-splitting would just fragment one coherent "guard family" review into three
-PRs reviewing the same handful of files with no unblocking benefit
-(`fgos graph --what-if` was not run per-defect since there is nothing
-downstream in the work graph to unblock differently between them — this
-item has no children today, `deps: []`).
+--release --manifest-path herdr-plugin/Cargo.toml`). Originally shaped as
+ONE item (all three touch the same small footprint, share one test suite
+and one build, none blocks or depends on either of the others) — revised
+after the reality-gate finding above: **split into two children.** Defects
+1-2 (clear fix directions, low/medium risk) ship together as one child;
+defect 3 (genuine product-behavior fork, no repo-derivable answer) becomes
+its own child, routed to a stage that can park the open question for a
+person rather than guess it here.
 
 ### Defect 1 — reused-pane retirement (app.rs:805-819)
 
@@ -160,6 +205,19 @@ reuse), then defect 2 (medium risk, same pattern, new field), then defect
 3 last (high risk, still-open design call, benefits most from having the
 other two landed and tested first as a working reference for what a
 correct D2-consistent guard looks like in this codebase).
+
+## Children (created via `fgos add --parent tsk-40g`)
+
+- `tsk-3q8z` — defects 1+2 (reused-pane retirement, auto-discover
+  boot-window), stage `planning`. Clear fix directions, proceeds directly.
+- `tsk-4ry` — defect 3 (admin-lane relaunch guard), stage `exploring`.
+  Genuine product-behavior fork (auto-relaunch-on-natural-exit vs
+  one-shot latch) that needs a person's answer — see its own description
+  for the full evidence trail.
+
+tsk-40g itself becomes the coordinating parent; both children carry the
+full evidence already gathered in this feature's `RESEARCH.md`/`plan.md`
+rather than re-deriving it.
 
 ## Outstanding questions
 
