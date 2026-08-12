@@ -49,6 +49,9 @@ import { readInvariantCheckCommands } from '../config/shared-config-file.mjs';
 import { normalizePath } from './frozen-judge.mjs';
 import { acquireMainCheckoutLock, renewMainCheckoutLockIfOwn, HELD, AMBIGUOUS, DEFAULT_TTL_MS, formatLockDurationMs } from './main-checkout-lock.mjs';
 import { resolveWriterIdentity } from './session-identity.mjs';
+import { listSessions } from './session.mjs';
+import { listWork } from '../state/store.mjs';
+import { openLeavesSharingTarget, classifyPostLandDrift } from '../state/graph-harness.mjs';
 
 /** Raised only for a genuinely unexpected git failure (e.g. `git merge
  * --abort` itself failing) — never for a conflict or a red verify, which are
@@ -359,6 +362,65 @@ export function reviewDiff(repoRoot, item, opts = {}) {
  * durability ladder D4), so the approve-side Iron Law check has nothing to
  * gate. This is a confirmed, intentional boundary, not a coverage gap.
  */
+/**
+ * POST-LAND DRIFT DETECTION (tsk-2ypd, CONTEXT.md D4): after a merge lands,
+ * which still-open branches did it actually put behind? Answered by
+ * intersecting REAL changed-file sets on both sides — never declared
+ * `footprint` (`graph-metrics.mjs`'s `footprintOverlapAmong` compares that
+ * weaker, hand-filled signal; git already has the ground truth here).
+ *
+ * This is a DETECTION point, never a catchup point. Triggering catchup on
+ * "the root moved" uses a topology event as a proxy for real risk: a root
+ * landing 13 children sequentially costs ~78 catchup+verify rounds, and
+ * nearly all of them find nothing collided. So nothing in this path touches
+ * a branch, runs a verify, or writes to `.fgos/` — it runs `git diff
+ * --name-only` per candidate and returns a report. The three outcomes are
+ * `classifyPostLandDrift`'s (nothing / notify the owning session / mark
+ * stale); this function's own job is gathering the real inputs for it.
+ *
+ * `target` and `landedFiles` are supplied by the caller because they can
+ * only be read correctly BEFORE the merge: once the branch lands, `target`
+ * contains it, so `git diff target...branch` is empty and the paths this
+ * branch brought are no longer recoverable from the three-dot diff.
+ *
+ * `view` and `sessions` are passed in rather than read here, keeping this
+ * function's own I/O to git alone — and keeping this module's standing rule
+ * that state access belongs to the caller.
+ */
+export function detectPostLandDrift(repoRoot, view, landedItem, { target, landedFiles = [], sessions = [] } = {}) {
+  const sessionsByItem = new Map();
+  for (const entry of sessions) {
+    if (!entry?.itemId) continue;
+    const known = sessionsByItem.get(entry.itemId) ?? [];
+    known.push(entry.sessionId);
+    sessionsByItem.set(entry.itemId, known);
+  }
+
+  const examined = [];
+  const leaves = [];
+  for (const id of openLeavesSharingTarget(view, landedItem.id)) {
+    // A candidate whose branch is gone (deleted after its own merge, or
+    // never created) has nothing to diff — skipped rather than thrown on, so
+    // a detection pass can never turn an already-successful merge into a
+    // failure.
+    if (!branchExists(repoRoot, branchNameFor(id))) continue;
+    examined.push(id);
+    leaves.push({
+      id,
+      files: changedFiles(repoRoot, view.work[id], { trunk: target }),
+      sessionIds: sessionsByItem.get(id) ?? [],
+    });
+  }
+
+  return {
+    landed: landedItem.id,
+    target,
+    landedFiles,
+    examined,
+    ...classifyPostLandDrift({ landedFiles, leaves }),
+  };
+}
+
 export function changedFiles(repoRoot, item, opts = {}) {
   const { trunk = detectTrunk(repoRoot) } = opts;
   const source = classifySource(repoRoot, item);
@@ -679,6 +741,12 @@ const HEARTBEAT_INTERVAL_MS = Math.floor(DEFAULT_TTL_MS / 3);
 export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = repoRoot } = {}) {
   const branch = branchNameFor(item.id);
 
+  // tsk-2ypd (D4): read the paths this branch brings BEFORE merging. Once it
+  // lands, `target` contains `branch`, so `git diff target...branch` is empty
+  // and this set can no longer be recovered.
+  const postLandTarget = item.parent ? branchNameFor(item.parent) : detectTrunk(repoRoot);
+  const postLandFiles = changedFiles(repoRoot, item, { trunk: postLandTarget });
+
   // The pre-commit hook only locks the final `git commit` — everything
   // before it (`git merge --no-commit`, the .fgos-write check, verify) ran
   // unprotected, so a concurrent session's own merge/commit could land in
@@ -747,12 +815,32 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = re
   }, HEARTBEAT_INTERVAL_MS);
   heartbeat.unref();
 
+  let result;
   try {
-    return await mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs });
+    result = await mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs });
   } finally {
     clearInterval(heartbeat);
     lock.release();
   }
+
+  // Detection runs here, AFTER the lock is released: it is read-only work
+  // that must never widen the critical section this whole design exists to
+  // narrow. Only a landed merge can have put anything behind.
+  if (result.outcome !== 'merged') {
+    return result;
+  }
+  return {
+    ...result,
+    postLand: detectPostLandDrift(repoRoot, listWork(path.join(lockRoot, '.fgos')), item, {
+      target: postLandTarget,
+      landedFiles: postLandFiles,
+      // lockRoot, never repoRoot: a leaf->parent merge runs in an ephemeral
+      // worktree whose own `.fgos/` is stripped at setup (ADR0020,
+      // worktree.mjs's finishWorktreeSetup), so only lockRoot reaches the
+      // one real store.
+      sessions: listSessions(lockRoot),
+    }),
+  };
 }
 
 // tsk-3yl D1: a prior `approve` run can already have landed this branch's
