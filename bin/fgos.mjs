@@ -62,7 +62,7 @@ import { createSession, endSession, listSessions, reclaimOrphanedSessions, Sessi
 import { resolveRoot } from '../src/runner/root-affinity.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
-import { getDomain, stageForStep, effectiveStage, discoverableStages } from '../src/state/workflow-stage-graphs.mjs';
+import { getDomain, stageForStep, effectiveStage, discoverableStages, resolveDomainName } from '../src/state/workflow-stage-graphs.mjs';
 import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
 import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
 import { recordInvocationFault } from '../src/cli/invocation-fault-log.mjs';
@@ -1207,11 +1207,26 @@ async function runVerb(verb, flags, positional, dir) {
       // exploring (today: coding) can call `discover` from any of its own
       // three stages; a domain that never registered them (triage/
       // synthetic) keeps the original single-stage precondition unchanged.
-      const validStages = discoverableStages(getDomain(work?.domain, { onUnrecognized: () => {} }));
+      const discoverDomain = getDomain(work?.domain, { onUnrecognized: () => {} });
+      const validStages = discoverableStages(discoverDomain);
       if (!validStages.includes(stage)) {
+        // tsk-1l9: only point at `plan` when `plan` would actually take the
+        // item. Suggesting it unconditionally made the two gates refer the
+        // reader to each other in a closed loop for any stage NEITHER verb
+        // serves -- which is exactly what the three items stranded at retired
+        // `clarify` hit, leaving them with no verb-shaped way out at all.
+        const planStage = stageForStep(discoverDomain, 'Divide');
+        const planTakesIt = stage === planStage
+          || (stage === 'decompose' && discoverDomain.stages?.includes('decompose'));
         throw new StoreError(
           'validation',
-          `discover: work "${id}" is at stage "${stage}", not ${validStages.map((s) => `"${s}"`).join('/')} -- use "fgos plan ${id}" instead.`,
+          `discover: work "${id}" is at stage "${stage}", not ${validStages.map((s) => `"${s}"`).join('/')}`
+            + (planTakesIt
+              ? ` -- use "fgos plan ${id}" instead.`
+              : ` -- and "fgos plan" does not serve that stage either. No stage verb does:`
+                + ` "${stage}" is not registered by domain "${resolveDomainName(work?.domain, { onUnrecognized: () => {} })}"`
+                + ` (${JSON.stringify(discoverDomain.stages)}). Run "fgos doctor" and read the`
+                + ' work-stage-vocabulary check.'),
         );
       }
       // An explicit --config path stays a loud, unmodified failure on ENOENT
@@ -1277,7 +1292,21 @@ async function runVerb(verb, flags, positional, dir) {
       // stays a no-op for them.
       const legacyPlanStage = domain.stages?.includes('decompose') && planningStage !== 'decompose' ? 'decompose' : undefined;
       if (stage !== planningStage && stage !== legacyPlanStage) {
-        throw new StoreError('validation', `plan: work "${id}" is at stage "${stage}", not "${planningStage}"${legacyPlanStage ? ` (or legacy "${legacyPlanStage}")` : ''} -- use "fgos discover ${id}" instead.`);
+        // tsk-1l9: mirror of the discover gate above -- only refer the reader
+        // to `discover` when `discover` would actually accept the item, so
+        // the two gates can never form a closed loop around a stage neither
+        // of them serves.
+        const discoverTakesIt = discoverableStages(domain).includes(stage);
+        throw new StoreError(
+          'validation',
+          `plan: work "${id}" is at stage "${stage}", not "${planningStage}"${legacyPlanStage ? ` (or legacy "${legacyPlanStage}")` : ''}`
+            + (discoverTakesIt
+              ? ` -- use "fgos discover ${id}" instead.`
+              : ` -- and "fgos discover" does not serve that stage either. No stage verb does:`
+                + ` "${stage}" is not registered by domain "${resolveDomainName(work?.domain, { onUnrecognized: () => {} })}"`
+                + ` (${JSON.stringify(domain.stages)}). Run "fgos doctor" and read the`
+                + ' work-stage-vocabulary check.'),
+        );
       }
       // path.dirname(dir), not process.cwd() -- see the discover case above
       // for why (tsk-5hv, found by fgos-coding-implement).

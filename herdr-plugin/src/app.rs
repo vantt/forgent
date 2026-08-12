@@ -526,7 +526,7 @@ impl App {
                     id: "tsk-19y-1".into(),
                     title: "Herdr plugin scaffold + mock/static dashboard TUI".into(),
                     goal_tier: "mvp".into(),
-                    stage: "clarify".into(),
+                    stage: "discovery".into(),
                     status: "todo".into(),
                     blocked_by: Vec::new(),
                     blocks: 0,

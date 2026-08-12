@@ -166,7 +166,7 @@ state or touches git worktrees directly — every write goes through the
      returned; tell the user and mention the review gate
      (`fgos review`/`fgos approve`/`fgos reject`) is theirs to run next,
      this skill never calls it.
-   - **anchored by open children** — the driver's own decompose pass split
+   - **anchored by open children** — the driver's own planning pass split
      this item; tell the user which child ids are still open and that
      `/fgOS:pick <child-id>` is the way to continue on any of them.
    - **a person-shaped stop (`awaiting-human`) or a real block

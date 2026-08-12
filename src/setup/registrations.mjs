@@ -33,7 +33,7 @@ import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { listWork } from '../state/store.mjs';
-import { driftStatus } from '../state/drift-status.mjs';
+import { driftStatus, unmergedDeliveries } from '../state/drift-status.mjs';
 import { computeEnduserDocsIndex, generateEnduserDocsIndex, manifestPathFor } from '../report/enduser-index-generate.mjs';
 import { isResolvedStatus } from '../state/frontier.mjs';
 import { getDomain, resolveDomainName, effectiveStage } from '../state/workflow-stage-graphs.mjs';
@@ -583,6 +583,61 @@ registerCheck({
   id: 'root-drift',
   description: 'every fgw/<root> branch is in sync with its real target — no unsynced drift left over from a leaf merge (tsk-3bn)',
   check: (cwd) => checkRootDrift(cwd),
+});
+
+// tsk-1l9: the LEAF-inclusive sibling of root-drift above. `root-drift` only
+// walks items that some other item calls `parent`, so an ordinary leaf marked
+// handed-over with its branch still off trunk is invisible to it — and
+// `delivered` is reachable through a bare `fgos move`, which merges nothing
+// and demands no proof that anything merged. Nothing else closes the gap:
+// `fgos stale`'s post-delivery bucket waits a three-day TTL and then reports
+// "forgotten", never "unmerged". It happened three times before this check
+// existed — tsk-4b2, then tsk-64h and tsk-2t5 together — each time losing
+// real, tested, reviewed work outside main until someone read the graph by
+// hand.
+//
+// Mechanical, no judgment: `git merge-base --is-ancestor fgw/<id> <trunk>`.
+// An item with no local branch is skipped rather than flagged, since the
+// branch is often cleaned up after a genuine merge.
+function checkDeliveredNotOnTrunk(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  if (mainCheckout === null) {
+    return { passed: true, message: 'not inside a git checkout — nothing to check' };
+  }
+  const view = listWork(path.join(mainCheckout, '.fgos'));
+  const stranded = unmergedDeliveries(mainCheckout, view);
+  const entries = Object.entries(stranded);
+  if (entries.length === 0) {
+    return { passed: true, message: "every handed-over item's branch is reachable from the trunk" };
+  }
+
+  // Two causes, two fixes — see unmergedDeliveries' own comment. Reported
+  // separately so the reader is not sent to re-merge a leaf that already
+  // merged correctly into a root that simply has not synced yet.
+  const neverMerged = entries.filter(([, s]) => s.landedOn === null);
+  const awaitingRootSync = entries.filter(([, s]) => s.landedOn !== null);
+  const parts = [];
+  if (neverMerged.length > 0) {
+    parts.push(
+      `${neverMerged.length} item(s) marked handed-over whose branch merged nowhere: `
+        + `${neverMerged.map(([id, s]) => `${id} (${s.status}, ${s.branch})`).join(', ')}`
+        + ' — land the content through a new item, never by re-driving the closed item\'s status backward',
+    );
+  }
+  if (awaitingRootSync.length > 0) {
+    parts.push(
+      `${awaitingRootSync.length} item(s) landed on a root branch that has not reached the trunk: `
+        + `${awaitingRootSync.map(([id, s]) => `${id} (${s.status}, on ${s.landedOn})`).join(', ')}`
+        + ' — run fgos sync-root on the root, not on these',
+    );
+  }
+  return { passed: false, message: parts.join('; ') };
+}
+
+registerCheck({
+  id: 'delivered-not-on-trunk',
+  description: "every item whose status says its work was handed over has its fgw/<id> branch reachable from the trunk (tsk-1l9)",
+  check: (cwd) => checkDeliveredNotOnTrunk(cwd),
 });
 
 // tsk-3wq (docs/history/events-jsonl-merge-driver-recurring-write-loss/

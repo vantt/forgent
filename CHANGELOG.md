@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `fgos doctor` gained a `delivered-not-on-trunk` check: it names any item
+  whose status says its work was handed over (`delivered`, `retrospective`,
+  `cleanup`, `done`) while its own `fgw/<id>` branch is still not reachable
+  from the trunk. `delivered` is reachable through a bare `fgos move`, which
+  merges nothing and asks for no proof that anything merged, so real tested
+  work could sit outside `main` with nothing reporting it — `root-drift`
+  only walks root items, and `fgos stale` waits a three-day TTL and then
+  says "forgotten", not "unmerged". The check separates the two causes: a
+  branch that merged nowhere needs its content landed, while one that landed
+  on a root branch that has not synced needs `fgos sync-root` on the root
+  instead.
+- `fgos discover` and `fgos plan` no longer send the reader to each other
+  when neither serves the item's stage. Each gate now checks whether its
+  sibling would actually accept the item; when neither does, both say so
+  plainly and point at `fgos doctor`'s stage-vocabulary check, instead of
+  forming a closed referral loop with no way out.
+
 - The `decompose` stage/verb/launcher family is renamed to `plan`: the CLI
   verb `fgos decompose` is now `fgos plan`, the slash command
   `/fgOS:decompose` is now `/fgOS:plan`, and the stage a coding-domain item

@@ -1,5 +1,8 @@
-// drift-status.mjs — read-only, git-inspecting drift check per root branch
-// (tsk-3bn, docs/history/tsk-3bn-merge-conductor-harness-v2/). Kept OUT of
+// drift-status.mjs — read-only, git-inspecting drift checks over item
+// branches: `driftStatus` per ROOT branch (tsk-3bn,
+// docs/history/tsk-3bn-merge-conductor-harness-v2/) and
+// `unmergedDeliveries` over EVERY handed-over item, leaf included
+// (tsk-1l9). Kept OUT of
 // graph-harness.mjs deliberately: that file declares itself pure ("no fs,
 // no Date.now(), no event append, no mutation"), while this module shells
 // real git subprocesses — a different testing/mocking story (design report
@@ -39,6 +42,23 @@ function branchExists(repoRoot, branch) {
     return false;
   }
 }
+
+// Whether every commit on `branch` is already reachable from `from`.
+function isAncestor(repoRoot, branch, from) {
+  try {
+    git(repoRoot, ['merge-base', '--is-ancestor', branch, from]);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// A completed item's branch is supposed to be reachable from trunk. These
+// four statuses all mean "this item's work is finished and handed over";
+// `wontfix` is deliberately absent for the same reason `driftStatus`'s own
+// caller excludes it — an abandoned item's branch is SUPPOSED to sit outside
+// trunk forever, so reporting it would be pure noise.
+const DELIVERED_STATUSES = new Set(['delivered', 'retrospective', 'cleanup', 'done']);
 
 /**
  * Compute drift status for every root branch reachable from `view`'s work
@@ -100,6 +120,55 @@ export function driftStatus(repoRoot, view) {
       lastSyncedTip,
       needsSync: aheadOfTarget > 0 && !isResolvedStatus(rootItem),
     };
+  }
+
+  return result;
+}
+
+/**
+ * Every item whose status says its work was handed over, but whose own
+ * `fgw/<id>` branch is NOT reachable from trunk — i.e. the work is not on
+ * main even though the state says it is. Returns
+ * `{ [id]: { branch, status, landedOn } }`; `landedOn` names the parent
+ * branch the item did merge into when that is why it is off trunk, and is
+ * `null` when the branch was never merged anywhere.
+ *
+ * Why this is not covered by `driftStatus` above: that function is scoped to
+ * ROOTS (an item some other item calls `parent`), so a leaf is invisible to
+ * it. `delivered` is reachable through a bare `fgos move`, which performs no
+ * merge and asks for no proof of one, so a leaf can be marked handed-over
+ * with its branch still sitting outside trunk and nothing anywhere says so:
+ * `fgos stale`'s post-delivery bucket waits a three-day TTL and then reports
+ * "forgotten", never "unmerged". Observed three times before this existed —
+ * `tsk-4b2` (recovered by tsk-13z), then `tsk-64h` and `tsk-2t5` together
+ * (recovered by tsk-1l9, which is where this function comes from).
+ *
+ * An item with no local `fgw/<id>` branch is omitted, not reported: the
+ * branch may simply have been cleaned up after a real merge, and this
+ * function must never turn ordinary housekeeping into an alarm.
+ */
+export function unmergedDeliveries(repoRoot, view) {
+  const work = view?.work ?? {};
+  const trunk = detectTrunk(repoRoot);
+  const result = {};
+
+  for (const item of Object.values(work)) {
+    if (!DELIVERED_STATUSES.has(item.status)) continue;
+    const branch = `fgw/${item.id}`;
+    if (!branchExists(repoRoot, branch)) continue;
+    if (isAncestor(repoRoot, branch, trunk)) continue;
+
+    // Distinguish the two causes, because they need different fixes. A leaf
+    // that DID merge into its parent's branch is stranded only because that
+    // root has not synced — `fgos sync-root <parent>` carries it, and
+    // re-merging the leaf would be wrong. A branch that merged nowhere needs
+    // its content landed on its own.
+    const parentBranch = item.parent ? `fgw/${item.parent}` : null;
+    const landedOn = parentBranch && branchExists(repoRoot, parentBranch) && isAncestor(repoRoot, branch, parentBranch)
+      ? parentBranch
+      : null;
+
+    result[item.id] = { branch, status: item.status, landedOn };
   }
 
   return result;
