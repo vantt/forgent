@@ -38,7 +38,7 @@ nguyên văn dữ liệu thô.
 | 3 | Repo hiện KHÔNG có dependency web/http nào (`package.json` chỉ có `yaml`) | Rõ | không Express/Fastify/http.createServer nào tồn tại trong `src/` |
 | 4 | Dữ liệu "lịch sử task agent đã làm" đã có sẵn qua `fgos show <id> --json`: `discovery`, `decisions`, `gates`, `outcome`, `friction`, `settlement`, `learning` | Rõ | xác nhận bằng lệnh `show --json` thật trên tsk-2xt |
 | 5 | Dữ liệu câu hỏi/trả lời: `ask` (câu hỏi) nằm trên event `work.move` khi chuyển sang `awaiting-human`; `gates[id]` còn giữ `askRationale/askAlternatives/askSource` (checkpoint lúc hỏi) và `rationale/alternatives/source` (lời cuối lúc trả lời) — theo `src/state/awaiting-context.mjs` | Rõ | đọc trực tiếp file nguồn |
-| 6 | Một item bị park nhiều lần (nhiều vòng hỏi/đáp) có giữ lại TOÀN BỘ lịch sử Q&A hay chỉ giữ bản mới nhất | **Chưa rõ** | đang scout (agent research đang chạy) |
+| 6 | Một item bị park nhiều lần (nhiều vòng hỏi/đáp) có giữ lại TOÀN BỘ lịch sử Q&A hay chỉ giữ bản mới nhất | Rõ | Hỗn hợp: `gates[id].ask`/`.answer` GHI ĐÈ (chỉ giữ bản mới nhất); nhưng `gates[id].askHistory` là mảng CỘNG DỒN mọi câu hỏi (xác minh thật: tsk-48i park 23 lần → `askHistory.length===23`); câu trả lời đầy đủ nằm ở `settlements[id]` (mảng `{kind:'answer',...}`, cũng 23 bản ghi cho tsk-48i) chứ không phải ở `gates`. `show`/`check` hiện cap hiển thị 5 bản ghi settlement gần nhất (`SETTLEMENT_DISPLAY_CAP=5`, bin/fgos.mjs:564) dù `count` vẫn phản ánh tổng thật. Raw `.fgos/events.jsonl` luôn giữ đủ 100% — không mất gì. `docs/specs/work-state.md` §"Bản ghi cổng-người" mô tả G3/G4 là ghi đè nhưng KHÔNG document `askHistory`. |
 | 7 | Stack kỹ thuật cho webserver + frontend (ngôn ngữ, framework, hay zero-dep thuần Node như phần còn lại của fgOS) | **Chưa rõ** | cần quyết định của người dùng — có kéo theo thay đổi triết lý zero-dep hiện tại |
 | 8 | Vòng đời webserver: ai start/stop nó, port cố định hay cấu hình, có phải một phần của `fgos setup`/`doctor` registry không (theo AGENTS.md "Install/setup/doctor gate") | **Chưa rõ** | |
 | 9 | Ranh giới với TUI dashboard: web dashboard có phải bản sao chức năng của TUI (đọc cùng data qua `fgos list/show --json`), hay có phạm vi/độc giả khác (vd xem trên điện thoại, xem từ xa không cần mở terminal) | **Chưa rõ** | ảnh hưởng lớn tới scope |
@@ -92,8 +92,15 @@ fgos-coding-shaping D6):
    merge/retro/cleanup)?
 5. "Lịch sử câu hỏi" — bạn muốn thấy TOÀN BỘ các lần hỏi/đáp qua nhiều vòng
    park của một task (nếu có), hay chỉ cần câu hỏi/trả lời gần nhất là đủ?
-   (đang xác minh kỹ thuật xem dữ liệu hiện có giữ được toàn bộ lịch sử này
-   hay chỉ bản mới nhất — sẽ báo lại).
+   Đã xác minh: dữ liệu ĐỦ để hiển thị full history (mọi câu hỏi trong
+   `gates[id].askHistory`, mọi câu trả lời trong `settlements[id]`), nhưng
+   nằm ở 2 chỗ khác nhau và `show`/`check` hiện tại chỉ hiện 5 bản ghi gần
+   nhất — nên đây vẫn là quyết định thiết kế (web dashboard có tự query đủ
+   cả 2 nguồn + ghép cặp ask/answer theo thứ tự thời gian không, hay chỉ
+   cần cap 5 như hành vi hiện có là đủ).
+
+**[2026-08-12, vòng 1 — bổ sung]** Research agent xác nhận câu hỏi #6 ở §3
+(xem cột Ghi chú). Cập nhật câu hỏi #5 ở trên theo phát hiện này.
 
 ## 6. Thiết kế đã chốt
 
