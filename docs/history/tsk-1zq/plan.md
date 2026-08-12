@@ -214,6 +214,12 @@ sống trong tiến trình, không phải state orchestrator.
 `MAX_PANES_PER_TAB` → `PANES_PER_WORKERS_TAB`; xoá `MAX_AGENT_TABS`,
 `LayoutError::NoRoomForAgentTabs`, và nhánh `AgentTabPlacement::NoRoom`.
 
+Vế negative của verify quét cả `src/`, mà module test nằm **trong**
+`src/*.rs`, nên 27 chỗ đang có (`layout.rs` 25, `pick.rs` 1, `main.rs` 1)
+phải đi hết — kể cả chuỗi `fg:agents-1`/`fg:agents-2` nằm trong fixture
+đã bắt sống. Đổi fixture ở đây là đổi *dữ liệu mẫu*, không phải nới test:
+fixture mô tả một workspace mang nhãn mới.
+
 ### Bước 5 — `fg:operation` 4 pane (`layout.rs`, `main.rs`, `app.rs`)
 
 ```
@@ -226,6 +232,12 @@ ensure_operation_tab(...) -> Result<OperationPanes, LayoutError>
 `App.operation_panes: Option<OperationPanes>`. Tab thiếu pane thì split
 cho đủ 4 (migrate); `left_right_panes` và toàn bộ nhánh so sánh ưu tiên
 retro-vs-cleanup bị xoá.
+
+`struct Rect` hôm nay chỉ parse `{height, x, width}` (`layout.rs:156-166`)
+— thiếu `y`, trong khi phép sắp theo thứ tự đọc cần nó. Response thật của
+`pane layout` **đã** mang `y` (thấy trong cả hai fixture,
+`layout.rs:554-565`), nên đây là thêm một field vào bản parse, không phải
+thiếu dữ liệu.
 
 ### Ca đáng chứng minh
 
