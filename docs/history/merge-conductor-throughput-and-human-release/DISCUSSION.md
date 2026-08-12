@@ -2,7 +2,17 @@
 
 ## 1. Trạng thái hiện tại
 
-Vòng 1 (2026-08-12). Scout xong, **chưa chốt D-ID nào**.
+Vòng 2 (2026-08-12). Người đã trả lời cả 3 câu hỏi vòng 1; **chưa mint D-ID
+nào** — theo luật của skill, một điểm phải đứng vững qua hơn một vòng mà
+không bị sửa mới được chốt thành D-ID. Ba điểm đang chờ đủ điều kiện đó:
+thứ tự "ba fix nhỏ trước", Q2 "không land từng phần vào `main`", Q3 "không
+auto-rebase".
+
+Điểm mở chính của vòng 2 là **#12**: ý (3) của người không dừng ở "không
+auto-rebase" mà đổi luôn đề bài sang "nhánh active cần một thời điểm rõ
+ràng để refresh base". Scout đã tìm ra cơ chế cụ thể gây outdated
+(`worktree.mjs:438` + `:749`). Cần chốt refresh xảy ra ở điểm nào trong
+vòng đời trước khi §6 viết được.
 
 Phát hiện lớn nhất của vòng scout: **thiết kế cho đúng bài toán này đã tồn
 tại từ 2026-08-01** — "Merge Conductor", §A–§I, trong
@@ -46,9 +56,10 @@ thật sự cần người.
 | 4 | "Pipeline 16 làn" có thật đang chạy không | **rõ — KHÔNG** | `capacity.dispatch` = 1 event trên ~14.500 (D5 của tsk-3cs đo 0 lúc 2026-08-10). Song song thật đến từ N phiên người/agent: 7–8 item vào `doing` mỗi giờ lúc cao điểm |
 | 5 | Câu hỏi mở Q1 (lock có chặn worktree không) | **rõ — đã giải** | tsk-45y đóng `wontfix`, tsk-2eq `done` → chốt là CÓ, lock thật áp cho leaf merge |
 | 6 | Câu hỏi mở Q4 (chặn git op huỷ diệt trên main checkout) | **rõ — đã giải** | `fgos main-checkout-reset --sha --confirm` đã có (AGENTS.md, tsk-3au) |
-| 7 | Câu hỏi mở Q2: merge-set bound-to-main có được land từng phần khi root chưa sync đủ? | **CHƯA RÕ** | Thiết kế đề xuất luôn escalate; chưa ai xác nhận |
-| 8 | Câu hỏi mở Q3: auto-rebase leaf lên root tip mới, hay chỉ cảnh báo? | **CHƯA RÕ** | Đánh đổi tự-động-hoá vs rủi ro ghi đè nhánh phiên khác đang làm |
-| 9 | tsk-280 (FSM guard) có phải chặn §E không | **CHƯA RÕ** | Thứ tự triển khai của thiết kế xếp nó ở bậc 8, "land trước khi Conductor được tin để tự hành động"; nay vẫn `todo` |
+| 7 | Câu hỏi mở Q2: merge-set bound-to-main có được land từng phần khi root chưa sync đủ? | **chốt vòng 1 — KHÔNG** | Người quyết: root tồn tại để gom con; root thiếu con mà ra `main` có thể gây hỏng. Khớp đề xuất gốc của thiết kế (luôn escalate). Chờ vòng 2 để mint D-ID |
+| 8 | Câu hỏi mở Q3: auto-rebase leaf lên root tip mới, hay chỉ cảnh báo? | **chốt vòng 1 — không auto-rebase, NHƯNG đề bài đổi** | Người quyết: không tự rebase nhánh đang active. Đồng thời mở lối thứ ba mà Q3 gốc không có: nhánh active cần **thời điểm rõ ràng để rebase**, rebase sớm đỡ conflict sau — vì tốc độ agent nhanh, work sinh ra đến lúc được pick đã outdated. Xem #12 |
+| 9 | tsk-280 (FSM guard) có phải chặn §E không | **rõ** | Chặn §E, KHÔNG chặn ba fix nhỏ. Hiện `todo`/stage `discovery`, tier standard, dep `tsk-4on`, mang nhãn "[MUST khi bắt đầu] quét lại codebase" + ghi chú 2026-08-09 chưa xác định lỗ ở cửa `move` hay `return` |
+| 12 | Thời điểm refresh base cho nhánh đang mở là ở đâu | **CHƯA RÕ — điểm mở chính của vòng 2** | Cơ chế đã xác định: `createWorktree` bỏ qua `opts.baseRef` trên đường reuse (`worktree.mjs:438`), mà `fgw/<id>` thường đã được tạo từ lúc decompose (`createBranchRef(..., baseRef:'main')`, `worktree.mjs:749`) → pick dựng worktree trên base đóng băng, không refresh. `docs/decisions/0022` từng nêu ("createWorktree 6 call site tự quyết baseRef") nhưng xếp lại chưa sửa |
 | 10 | Verify chạy ở đâu khi ra khỏi lock | **CHƯA RÕ** | Clone dùng-một-lần, worktree ephemeral tái dùng, hay cơ chế khác — quyết định này định hình cả §E |
 | 11 | Cổng cây-sạch thu về footprint item, hay merge chạy hẳn ngoài cây chung | **CHƯA RÕ** | tsk-kv3 nêu cả hai lối; chưa chọn |
 
@@ -84,6 +95,25 @@ vững qua hơn một vòng mà không bị sửa. Vòng 1 chưa đủ điều k
   nhiều phiên chạy song song, không phải fanout tự động. Khung "phễu 1 làn
   dưới pipeline 16 làn" bị bác bỏ và thay bằng "phễu 1 làn dưới N phiên song
   song, 7–8 claim/giờ".
+
+- **2026-08-12T08:02Z — người trả lời 3 câu hỏi vòng 1**:
+  1. *Thứ tự*: đồng ý ba fix nhỏ (tsk-1zd / tsk-kv3 / tsk-60h) làm trước.
+     Hỏi lại trạng thái tsk-280 → `todo`, stage `discovery`, dep `tsk-4on`,
+     có nhãn quét-lại-trước-khi-làm; xác định nó chặn §E chứ không chặn ba
+     fix nhỏ.
+  2. *Q2 — land từng phần vào `main`*: **không nên**. Lý do người nêu: "root
+     là để gom con, nên root thiếu con mà ra main có thể gây hỏng."
+  3. *Q3 — auto-rebase*: **không tự rebase**. Nhưng người mở rộng đề bài:
+     "các nhánh đang active working nên có thời điểm rõ ràng để rebase,
+     rebase sớm thì đỡ phải conflict sau. Vì thực tế tốc độ làm việc agent
+     nhanh, work tạo ra mà đến khi được pick là outdated rồi."
+
+- **2026-08-12T08:04Z — scout xác nhận cơ chế đằng sau ý (3)**:
+  `worktree.mjs:438` — `opts.baseRef` bị bỏ qua trên đường reuse, nhánh có
+  sẵn được dùng lại nguyên trạng. `worktree.mjs:749` — `createBranchRef`
+  tạo `fgw/<id>` từ `main` ngay lúc decompose. Hệ quả: item con sinh lúc
+  decompose giữ base của thời điểm đó cho tới lúc được pick, không refresh.
+  `docs/decisions/0022` đã nêu chỗ này nhưng chưa sửa.
 
 ## 6. Thiết kế đã chốt {#design}
 
