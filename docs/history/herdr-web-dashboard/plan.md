@@ -100,8 +100,22 @@ Thêm section config riêng cho web dashboard vào `.fgos/config.json` (cạnh
 `settings.rs` hiện có, **nhưng mặc định BẬT** (D10 — cố ý khác 4 toggle
 kia). Đăng ký vào `fgos setup` config-merge + `fgos doctor` check registry
 theo khuôn `herdr-launcher-configured`
-(`src/setup/registrations.mjs:1064-1112`). Thêm dòng `.gitignore` cho
-đường dẫn secret của D9.
+(`src/setup/registrations.mjs:1074-1114`: `DEFAULT_*_SETTINGS` +
+`registerConfigDefault({id,key,shape})` + `registerCheck({id,description,
+check})`). Thêm dòng `.gitignore` cho đường dẫn secret của D9.
+
+**Đường dẫn secret ghim tại đây: `.fgos/herdr-web-secret`.** D9 chỉ nói
+"một file gitignored dưới `.fgos/`" mà không đặt tên; không có tên cụ thể
+thì không verify nào assert được nó bị ignore. Ghim tên là hoàn tất D9,
+không phải mở lại nó.
+
+**Lane riêng của P1: `high-risk`** (không thừa hưởng mù từ cha). Đếm lại
+cho đúng phạm vi con này: data model (thêm hình dạng config bền), **audit/
+security — hard-gate** (dòng `.gitignore` là biện pháp ngăn commit
+credential; D9 tồn tại đúng vì `.fgos/config.json` bị git track), public
+contracts (`fgos doctor` thêm check id; `config.json` thêm section),
+existing covered behavior (`registrations.mjs` dùng chung mọi doctor check;
+`test/setup` 162 test), multi-domain (Node + Rust) = **5 flag, 1 hard-gate**.
 
 ### P2 — webserver core + auth lớp 1
 
@@ -168,7 +182,7 @@ chạy đỏ thì chưa phải một verify"*.
 
 | Mảnh | id | deps | verify (đã sửa, đã đo đỏ) |
 |---|---|---|---|
-| P1 config + doctor/setup | `tsk-48w` | — | `node --test 'test/setup/**/*.test.mjs' && node bin/fgos.mjs doctor --json --dir . \| grep -q 'herdr-web-dashboard-configured'` |
+| P1 config + doctor/setup | `tsk-48w` | — | `node --test 'test/setup/**/*.test.mjs' && node bin/fgos.mjs doctor --json --dir . \| grep -q 'herdr-web-dashboard-configured' && git check-ignore -q .fgos/herdr-web-secret` *(mệnh đề thứ 3 thêm sau reality gate riêng của P1 — xem cuối file)* |
 | P2 webserver core + auth L1 | `tsk-k4v` | `tsk-48w` | `grep -q 'fn login_rejects_wrong_token_with_opaque_404' …/web/auth.rs && grep -q 'fn warns_when_bind_address_is_not_loopback' …/web/mod.rs && cargo test <manifest> \| grep -qE '[1-9][0-9]* passed' && cargo build --release` |
 | P3 taskboard | `tsk-5jr` | `tsk-k4v` | `grep -q 'fn taskboard_lists_work_items_through_work_item_source' …/web/taskboard.rs && cargo test <manifest> web_taskboard \| grep -qE '[1-9][0-9]* passed'` |
 | P4 task detail *(mục tiêu chính)* | `tsk-4id` | `tsk-5jr` | 3 × `grep -q 'fn …'` (`pairs_ask_history_with_answers_by_seq`, `rejects_docs_ref_path_traversal`, `lists_gate_approve_alongside_ask`) `&& cargo test <manifest> web_task_detail \| grep -qE '[1-9][0-9]* passed'` |
@@ -298,6 +312,57 @@ chứng không đổi).
 | C1 | **A1/R1 chưa chứng minh:** tokio có thể phá event loop ratatui | Chỉ lộ ra khi P2 chạy thật. Giảm thiểu đã chốt: server chạy trên runtime/thread riêng, không đụng vòng lặp TUI. Cổng thật: 128 test cũ phải còn xanh — nằm ngay trong verify của `tsk-k4v` |
 | C2 | **impact-analysis: degraded** | gitnexus `present` nhưng index cũ (`79fead3` vs HEAD) và `.gitnexus/` vắng trong worktree. Mọi phát biểu blast-radius chưa xác nhận — phải cross-check bằng `rg`, không tin kết quả rỗng |
 | C3 | **R6 chưa hiện thực** (guard canonicalize `docsRef`) | Đúng lịch: nó là proof point của P4, không phải của stage này. Đã ghim thành một `grep -q 'fn rejects_docs_ref_path_traversal'` trong verify của `tsk-4id` nên không thể quên |
+
+```text
+READY WITH CONSTRAINTS
+```
+
+## Reality gate riêng của P1 `tsk-48w` (2026-08-12)
+
+Con này được tạo với `--stage planning` để tự đi qua reality check của
+chính nó, thừa hưởng `CONTEXT.md` của cha chứ không lặp lại exploring.
+
+### Vòng 1: **NOT READY** — Proof surface FAIL
+
+Lane của P1 tự đếm lại ra `high-risk` (5 flag, hard-gate = audit/security
+— xem mục P1 ở Shape). Mà chiều high-risk đòi mọi rủi ro medium+ có proof
+point, thì đúng mệnh đề an toàn duy nhất lại **không có** proof:
+
+| | Nội dung |
+|---|---|
+| Verify cũ chứng minh | (a) `test/setup` xanh, (b) doctor check đã đăng ký |
+| Verify cũ **không** chứng minh | (c) đường dẫn secret thật sự bị git ignore |
+| Vì sao (c) không tự có | Precedent `checkHerdrOrchestratorConfigured` (`registrations.mjs:1081-1102`) chỉ kiểm *section có mặt + giá trị boolean*. Check mới theo khuôn đó cũng sẽ không đụng gitignore — nên không thể trông chờ nó phủ hộ |
+| Lỗ kèm theo | Tên file secret chưa ghim ở đâu (D9 chỉ nói "một file dưới `.fgos/`") → không có đường dẫn thì không assert được |
+
+### Đã sửa
+
+Ghim `.fgos/herdr-web-secret` (mục P1 ở Shape) và thêm mệnh đề thứ ba vào
+verify. Đo thật:
+
+| Mệnh đề | Hôm nay |
+|---|---|
+| `git check-ignore -q .fgos/herdr-web-secret` | **exit 1** — chưa ignore, đỏ đúng |
+| `git check-ignore -q .fgos/state.json` *(đối chứng)* | **exit 0** — cơ chế chạy đúng, không phải luôn-đỏ |
+| Cả verify mới | **exit 1** — đỏ |
+
+Đối chứng `state.json` là phần quan trọng: nó chứng minh `git check-ignore`
+thật sự phân biệt được ignored/không, chứ không phải một lệnh luôn fail —
+tức mệnh đề mới sẽ chuyển xanh thật khi dòng `.gitignore` được thêm.
+
+### Vòng 2: **READY WITH CONSTRAINTS**
+
+Năm chiều kia PASS: **Repo fit** — đọc trực tiếp `registrations.mjs:
+1074-1114`, đúng ba mảnh `DEFAULT_*_SETTINGS`/`registerConfigDefault`/
+`registerCheck` như plan mô tả; **Mode fit** — `high-risk` khớp phần đếm
+lại ở trên; **Smaller path** — không có, đây đã là mảnh nhỏ nhất tách theo
+ranh giới ngôn ngữ (tiền lệ `tsk-2m5`); **Assumptions** — A4 (`.fgos/` là
+nhà hợp lệ cho secret) chứng minh bằng 5 tiền lệ gitignore + đối chứng
+`state.json`; **Impact-analysis posture** — kiểm lại tươi, gitnexus vẫn
+`present`, `.gitnexus/` vẫn vắng trong worktree → `degraded` như cha ghi.
+
+Ràng buộc mang sang executing: **C2** (impact-analysis `degraded` — blast
+radius chưa xác nhận, cross-check bằng `rg`).
 
 ```text
 READY WITH CONSTRAINTS
