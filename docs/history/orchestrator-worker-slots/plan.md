@@ -345,12 +345,29 @@ trọn-mẻ.
   ⇒ Thuộc T2 (adapter herdr) + phần phơi mapping ra CLI thuộc T1. Không
   đẻ task mới, không quay lại shaping.
 
-- **A6 — Lọc liveness cho item kẹt `doing` đủ rẻ để chạy mỗi vòng poll.**
-  *Chưa chứng minh.* Người claim rồi bỏ đi giữa chừng làm item kẹt `doing`
-  vĩnh viễn, giữ slot vĩnh viễn; D2 nói tái dùng tín hiệu `tsk-3ni`,
-  nhưng tín hiệu đó thiết kế cho *claim-conflict*, chưa phải bộ lọc đếm.
-  Áp nó vào phép đếm nghĩa là chạy `git log` + `git status` cho từng item
-  `doing`, mỗi 5 giây herdr poll — chi phí chưa ai đo.
+- **A6 — Lọc liveness cho item kẹt `doing` mỗi vòng poll.** **KHÔNG CÒN
+  CẦN — giả định này đã bị gỡ, không phải được chứng minh.**
+
+  Mọi flow đều có ceiling (`fgos-coding-driving` nhận `ceiling`; launcher
+  hoặc truyền `stage:*` hoặc nhận mặc định `awaiting-approval`), nên chỉ
+  kết thúc đúng hai kiểu, cả hai đều ghi log: chạm ceiling, hoặc dừng hỏi
+  người — mà park thì item **rời `doing`** (`status-fsm.mjs:138`
+  `doing → awaiting-human`, `:102` `doing → blocked`), tức slot tự nhả.
+
+  Vậy "kẹt `doing` vĩnh viễn" là **sự cố** (tiến trình chết, người đóng
+  terminal, model dừng câm), không phải trạng thái thiết kế — và sự cố đã
+  có đường xử riêng ngoài luồng: `/fgOS:stale` + tín hiệu `tsk-3ni`.
+
+  ⇒ Phép đếm là **fold thuần trên view**, không `git log`/`git status`
+  cho từng item mỗi 5 giây. Rẻ, tất định. Đây là đơn giản hoá thật so với
+  bản plan trước, không phải nới lỏng.
+
+- **A7 — Lane workers chỉ chứa flow one-shot.** *Đã chứng minh.* Tab
+  workers chỉ nhận `PICK`/`DISCOVER`/`DISCOVER_NEXT` (đều qua
+  `place_new_agent_pane`); loop merge/retro/cleanup chạy trong pane cố
+  định của `ensure_operation_tab`, không bao giờ split hay reclaim. Đây
+  là lý do cấu trúc cho ràng buộc "chỉ tái dùng pane one-shot" ở A5 — một
+  session loop giữa hai item không bao giờ xuất hiện trong lane này.
 
 ## Supersede
 

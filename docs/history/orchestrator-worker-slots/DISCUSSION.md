@@ -59,7 +59,8 @@ tên đúng khái niệm chứ không phải sơn phết.
 | Q10 | Biên du di cụ thể là bao nhiêu | **rõ** | → D8: không bao giờ bẻ một mẻ đã tính sẵn |
 | Q11 | "Agent tự xử xung đột merge" có nằm trong đợt này không | **rõ** | Để ngoài. Đã mở item riêng `tsk-60h` |
 | Q12 | Vòng đời worker: cần khái niệm mới không | **rõ — KHÔNG cần** | Vòng 7 bác vòng 6: `payload.writer.id` đã có sẵn trong event log (97,3% cạnh `→ doing`), đủ suy ra cả "list worker vừa xong xếp cũ→mới". Không field mới, không event type mới. Về lại tầm planning |
-| Q13 | Phân biệt "session loop giữa hai item" với "session đã xong" | **rõ** | Không giữ item `doing` ≠ pane rỗi. Giải bằng thông tin adapter tự có: herdr chỉ tái dùng pane do chính nó mở dạng one-shot, không đụng pane đang chạy loop |
+| Q13 | Phân biệt "session loop giữa hai item" với "session đã xong" | **rõ** | Vòng 8: không xảy ra trong lane workers — loop sống ở lane operation theo cấu trúc. Ràng buộc "chỉ tái dùng pane one-shot" vì vậy có lý do thật, không phải cách né |
+| Q14 | **Thế nào là biết đã xong** | **rõ — quan sát được** | Vòng 8: flow luôn có ceiling nên chỉ kết thúc hai kiểu, cả hai ghi log (chạm ceiling; park → rời `doing`). "Claim rồi bỏ đi" là **sự cố**, không phải state — đường xử là `/fgOS:stale` + `tsk-3ni` ở nhánh ngoại lệ. Không cần cơ chế khai báo mới |
 
 ## 4. Quyết định đã chốt
 
@@ -305,6 +306,51 @@ tự có: **herdr chỉ tái dùng pane do chính nó mở dạng one-shot**, kh
 đụng pane đang chạy loop. Không cần khai báo, không cần ngưỡng thời gian.
 
 ⇒ Vấn đề về lại tầm **planning**, không phải shaping.
+
+### 2026-08-12 — Vòng 8 (người dùng: flow có ceiling ⇒ "xong" quan sát được)
+
+Phiên này liệt kê 5 trạng thái worker và than rằng log chỉ tách được hai
+nhóm, nên "đã xong chưa" là câu không trả lời được nếu thiếu cơ chế khai
+báo. **Người dùng bác cách đặt vấn đề đó:**
+
+> "claim rồi bỏ đi, phải cụ thể claim gì. chúng ta không thiết kế để luồng
+> chạy phong long. launcher bật 1 luồng phải có chủ đích và ceiling. nên
+> nó chỉ có thể dừng theo 2 kiểu: 1 là chạm ceiling, 2 là bị dừng hỏi
+> người. với luồng non-interactive hoặc một vài loại luồng interactive có
+> ceiling, dừng hỏi người đồng nghĩa với ngưng luồng luôn."
+
+**Ba mắt xích, đều xác minh được:**
+
+1. **Park thật sự nhả slot.** `doing → awaiting-human`
+   (`status-fsm.mjs:138`) và `doing → blocked` (`:102`) là cạnh thật —
+   "dừng hỏi người" khiến item rời `doing`, slot nhả, log ghi lại.
+2. **Flow luôn có ceiling.** `fgos-coding-driving` nhận `ceiling`; mọi
+   launcher hoặc truyền `stage:*` hoặc nhận mặc định
+   `awaiting-approval`. Không có flow chạy vô định.
+3. **Hai lane đã tách theo *đặc tính flow*, không phải loại việc.** Tab
+   workers chỉ nhận one-shot (`PICK`/`DISCOVER`/`DISCOVER_NEXT` — đều qua
+   `place_new_agent_pane`); loop (merge/retro/cleanup) chạy trong pane cố
+   định của `ensure_operation_tab`, không bao giờ split hay reclaim.
+
+**Hai trạng thái tự tan:**
+
+- **"Claim rồi bỏ đi" không phải trạng thái thiết kế.** Flow kết thúc
+  đúng hai kiểu, cả hai ghi log. Còn lại — tiến trình chết, người đóng
+  terminal, model dừng câm — là **sự cố**, và sự cố đã có đường xử riêng
+  (`/fgOS:stale` + tín hiệu `tsk-3ni`) ở nhánh ngoại lệ, không phải
+  thiết kế chính.
+- **"Loop giữa hai item" không xảy ra trong lane workers**, vì loop sống
+  ở lane operation theo cấu trúc.
+
+**⇒ Q1 đóng: "xong" QUAN SÁT ĐƯỢC** cho mọi đường đi có thiết kế. Không
+cần cơ chế khai báo mới. Ràng buộc "herdr chỉ tái dùng pane one-shot"
+(vòng 7) hoá ra đúng, nhưng vòng 7 đưa ra nó như một cách né; giờ nó có
+lý do thật: **lane workers chỉ chứa flow one-shot có ceiling.**
+
+**Hệ quả không lường, gỡ luôn A6:** nếu "kẹt `doing`" là sự cố chứ không
+phải state, phép đếm **không cần lọc liveness mỗi vòng poll** — không
+`git log`/`git status` cho từng item mỗi 5 giây. Đếm trở thành fold thuần
+trên view: rẻ, tất định. Sự cố để `/fgOS:stale` lo ngoài luồng.
 
 ## 6. Thiết kế đã chốt {#design}
 
