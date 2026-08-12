@@ -26,6 +26,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `fgos-runner` and `fgos-fanout` now ask for a worker slot before standing
+  a worker up, instead of each enforcing a ceiling of its own. The runner's
+  `runner.parallel.maxRoots`/`maxLeavesPerRoot` and fan-out's cap of 5 keep
+  their values but change role: they bound how large a batch that launcher
+  may propose, while the shared ceiling decides whether the batch runs at
+  all — so the real limit on a machine is one number rather than the sum of
+  three. A batch passes whole or not at all, never trimmed to the number of
+  free slots. With no `workerSlots.ceiling` configured, both behave exactly
+  as before. A runner that finds the lane full now ends its run cleanly
+  (`idle`, exit 0) rather than halting with a non-zero exit, and an item
+  refused for lack of room is simply left for a later poll.
 - The `decompose` stage/verb/launcher family is renamed to `plan`: the CLI
   verb `fgos decompose` is now `fgos plan`, the slash command
   `/fgOS:decompose` is now `/fgOS:plan`, and the stage a coding-domain item
