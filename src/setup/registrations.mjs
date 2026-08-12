@@ -36,7 +36,7 @@ import { listWork } from '../state/store.mjs';
 import { driftStatus } from '../state/drift-status.mjs';
 import { computeEnduserDocsIndex, generateEnduserDocsIndex, manifestPathFor } from '../report/enduser-index-generate.mjs';
 import { isResolvedStatus } from '../state/frontier.mjs';
-import { getDomain } from '../state/workflow-stage-graphs.mjs';
+import { getDomain, resolveDomainName, effectiveStage } from '../state/workflow-stage-graphs.mjs';
 import { readLocalStatus, classifyRegistryPosture } from '../state/tool-registry.mjs';
 import { describeConfigAwareness } from '../config/global-config.mjs';
 import {
@@ -530,6 +530,53 @@ registerCheck({
   id: 'work-classification-vocabulary',
   description: "every open item's risk/kind matches its domain's declared classification vocabulary (tsk-6ax)",
   check: (cwd) => checkWorkClassificationVocabulary(cwd),
+});
+
+// tsk-64h: the stage-axis sibling of the risk/kind check above, and the
+// same class of drift — a domain may retire a stage (coding dropped
+// `clarify` outright, tsk-qod D1/D2) while items still sit on it. Unlike
+// risk/kind, there is no write door to grandfather against: `stage` is not
+// in `EDITABLE_FIELDS` (store.mjs) and only `moveStage` may change it, so
+// a stranded item cannot be corrected by an edit at all — it has to be
+// drained forward through a registered transition or migrated. That makes
+// the drift quieter, not rarer: three items sat at retired `clarify` with
+// nothing surfacing them until a migration script tripped over them.
+//
+// `effectiveStage`, not a bare `item.stage`, so the lazy Execute default
+// (D8 — an item that never had `stage` written) reads as the stage every
+// other consumer already treats it as, instead of being flagged as
+// out-of-vocabulary for being absent. OPEN items only (`!isResolvedStatus`,
+// the one shared open/closed definition), same reasoning as the check
+// above: a resolved item's stage no longer routes anything.
+function checkWorkStageVocabulary(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  if (mainCheckout === null) {
+    return { passed: true, message: 'not inside a git checkout — nothing to check' };
+  }
+  const view = listWork(path.join(mainCheckout, '.fgos'));
+  const violations = [];
+  for (const item of Object.values(view.work)) {
+    if (isResolvedStatus(item)) continue;
+    const domainName = resolveDomainName(item.domain, { onUnrecognized: () => {} });
+    const domain = getDomain(domainName);
+    const stage = effectiveStage(item, domain);
+    if (!domain.stages.includes(stage)) {
+      violations.push(`${item.id} (stage: "${stage}", domain: "${domainName}")`);
+    }
+  }
+  if (violations.length === 0) {
+    return { passed: true, message: 'every open item sits at a stage still registered by its domain' };
+  }
+  return {
+    passed: false,
+    message: `${violations.length} open item(s) at a stage their domain no longer registers: ${violations.join(', ')} — no verb can relabel a live item's stage; drain each one forward through a registered transition or migrate it (see scripts/migrate-clarify-split.mjs)`,
+  };
+}
+
+registerCheck({
+  id: 'work-stage-vocabulary',
+  description: "every open item sits at a stage its own domain still registers — no item stranded on a retired stage (tsk-64h)",
+  check: (cwd) => checkWorkStageVocabulary(cwd),
 });
 
 registerCheck({

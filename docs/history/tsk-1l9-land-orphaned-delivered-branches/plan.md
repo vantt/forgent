@@ -41,9 +41,24 @@ recovers the lost content.
 
 | Branch | File | Conflict | Resolution |
 |---|---|---|---|
-| `fgw/tsk-64h` | `bin/fgos.mjs` | the `src/intake/discovery.mjs` import line — `main` widened it for `tsk-19m`'s `discoverableStages`/`classificationPatchFromVerdict`/`assertCallerClassification`, the branch still has the narrow one | take **main**'s wider import; the branch needs no symbol main does not already import |
-| `fgw/tsk-64h` | `CHANGELOG.md` | both sides append to `## [Unreleased]` | keep **both** entries |
+| `fgw/tsk-64h` | `bin/fgos.mjs` | the `src/intake/discovery.mjs` import line — `main` widened it for `tsk-19m`'s `classificationPatchFromVerdict`/`assertCallerClassification`, the branch still has the narrow one | **neither side verbatim** — see below |
+| `fgw/tsk-64h` | `CHANGELOG.md` | both sides append to `## [Unreleased]` | auto-merged, both entries kept |
 | `fgw/tsk-2t5` | — | none (`git merge-tree` → 0 conflicts) | — |
+
+**Correction to the dry-run's reading.** Taking `main`'s wider import verbatim
+would have broken the merge: `fgw/tsk-64h` *moves* `discoverableStages` out of
+`src/intake/discovery.mjs` into `src/state/workflow-stage-graphs.mjs` (so
+`src/state/discover-pool.mjs` can reach it without a `domain`-layer module
+importing a `use-case`-layer one — `test/architecture.test.mjs`). The branch
+side of the neighbouring registry import already carries
+`discoverableStages`, and that hunk auto-merged. Keeping `main`'s line as-is
+would therefore have declared the same binding twice.
+
+Resolution actually applied — `main`'s list **minus** the moved symbol:
+
+```js
+import { resolveDiscovery, classificationPatchFromVerdict, assertCallerClassification } from '../src/intake/discovery.mjs';
+```
 
 ## Files this brings onto main
 
