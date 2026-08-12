@@ -48,8 +48,10 @@ different provider, not editing N prose files. Four concrete pieces:
 
 1. **Declare the capability.** `fgos tool register --name herdr --kind cli
    --capability pane-labeling --command herdr`, through the existing
-   registry (`src/state/tool-registry.mjs`; `normalizeCapability` `:43`
-   folds the label to `pane-labeling`, `KINDS` `:34` accepts `cli`). No new
+   registry (`src/state/tool-registry.mjs`; `normalizeCapability` `:49`
+   folds the label to `pane-labeling`, `KINDS` `:35` accepts `cli` — the
+   real line numbers today; RESEARCH F-E's `:43`/`:34` are one edit stale,
+   the symbols themselves are unchanged). No new
    mechanism (RESEARCH F-E). This is a state write through the one door,
    not a code change — it lands in `.fgos/events.jsonl`, which this repo
    tracks, so it propagates to clones.
@@ -106,13 +108,22 @@ construction.
 
 ### Bản đồ rủi ro
 
-`impact-analysis: full` — `fgos tool query --capability impact-analysis
---status present` returns gitnexus `present`. It is **not load-bearing for
-this item**: nothing in the footprint is a code symbol GitNexus indexes
-(three `SKILL.md` prose files and one bash script), so blast radius here is
-established by `grep -rn` over call sites, which is the primary evidence
-either way. The parent plan's standing constraint (never let GitNexus alone
-lower a risk rating; cross-check with `rg`/`grep`) is honored trivially.
+`impact-analysis: degraded`. `fgos tool query --capability impact-analysis
+--status present` returns gitnexus `present`, but that overlay is a cached
+`tool check` result and `present` never means the index is fresh
+(`CLAUDE.md`'s own gate wording). Checked directly: `node
+.gitnexus/run.cjs status` reports `stale` — indexed commit `79fead3`
+against current `18dbd4a`. So the posture is **degraded**, not `full`.
+
+It is **not load-bearing for this item** either way: nothing in the
+footprint is a code symbol GitNexus indexes (three `SKILL.md` prose files
+and one bash script), so no row of the risk map below leans on blast-radius
+evidence at all — blast radius here is established by `grep -rn` over call
+sites, which is the primary evidence regardless of posture. The parent
+plan's standing constraint (never let GitNexus alone lower a risk rating;
+cross-check with `rg`/`grep`) is honored trivially. The gap is named
+plainly rather than dropped: GitNexus's index is behind current HEAD, so
+any blast-radius answer it gave would be stale — none was used.
 
 | Thành phần | Mức | Cái gì chứng minh được |
 |---|---|---|
