@@ -296,8 +296,38 @@ test('the worker-slot ceiling is registered as a config default so fgos setup wr
   const entry = CONFIG_DEFAULT_REGISTRATIONS.find((e) => e.id === 'workerSlots');
   assert.ok(entry, 'workerSlots must be registered via registerConfigDefault');
   assert.equal(entry.key, 'workerSlots');
-  assert.deepEqual(entry.shape, {
-    ceiling: DEFAULT_WORKER_SLOT_CEILING,
-    adminReservation: ADMIN_LANE_RESERVATION,
-  });
+  assert.deepEqual(entry.shape, { ceiling: null });
+});
+
+// The regression that matters most about that shape: `fgos doctor` tells
+// every project to run `fgos setup` as ordinary maintenance, so whatever
+// setup writes is armed on a command nobody runs meaning "cap me now". This
+// repo was carrying 12 running items when the ceiling shipped; had setup
+// written the recommended 8, the very next take/pick would have been
+// refused and the backlog frozen. Asserting the shape alone would not catch
+// a future edit that puts a number back, so assert the CONSEQUENCE.
+test('what fgos setup writes leaves every claim allowed, however many items are already running', async () => {
+  const { CONFIG_DEFAULT_REGISTRATIONS } = await import('../../src/setup/registrations.mjs');
+  const { shape } = CONFIG_DEFAULT_REGISTRATIONS.find((e) => e.id === 'workerSlots');
+
+  const work = {};
+  for (let i = 0; i < DEFAULT_WORKER_SLOT_CEILING * 3; i += 1) {
+    work[`tsk-busy${i}`] = { status: 'doing' };
+  }
+  const room = hasWorkerSlotRoom({ work }, { ceiling: shape.ceiling });
+
+  assert.equal(room.allowed, true, 'a fresh `fgos setup` must never refuse a claim');
+  assert.equal(room.reason, 'no-ceiling-configured');
+});
+
+// The admin reservation is constant by definition (D9): the lane never
+// claims a work item, so nothing counts it and nothing could enforce a
+// different number. It was briefly a `workerSlots.adminReservation` config
+// key that setup wrote, doctor displayed, and no code ever read.
+test('the admin reservation is reported as a constant, never offered as a config knob', async () => {
+  const { CONFIG_DEFAULT_REGISTRATIONS } = await import('../../src/setup/registrations.mjs');
+  const { shape } = CONFIG_DEFAULT_REGISTRATIONS.find((e) => e.id === 'workerSlots');
+
+  assert.equal('adminReservation' in shape, false, 'a dial wired to nothing is worse than no dial');
+  assert.equal(countWorkerSlots({ work: {} }).admin.reserved, ADMIN_LANE_RESERVATION);
 });

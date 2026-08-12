@@ -47,7 +47,7 @@ import {
   DEFAULT_INVARIANT_CHECK_COMMANDS,
 } from '../config/shared-config-file.mjs';
 import { DEFAULT_LEVEL, LEVELS } from '../state/gate-bypass.mjs';
-import { DEFAULT_WORKER_SLOT_CEILING, ADMIN_LANE_RESERVATION } from '../state/worker-slots.mjs';
+import { DEFAULT_WORKER_SLOT_CEILING } from '../state/worker-slots.mjs';
 import { checkEventsJsonlContiguity, fixEventsJsonlContiguity } from '../state/events-jsonl-contiguity.mjs';
 import { advanceEventsJsonlTruncationGuard } from '../state/events-jsonl-truncation-guard.mjs';
 
@@ -896,20 +896,73 @@ registerConfigDefault({
 
 // docs/history/orchestrator-worker-slots/plan.md §Shape T1: the worker-slot
 // ceiling is project config, not a runner constant -- registered here so
-// `fgos setup` writes the default and `fgos doctor` can see the section at
-// all, per AGENTS.md's install/setup/doctor gate. `ceiling` bounds the
-// execution lane (running work items); `adminReservation` is the separate,
-// fixed allowance for the merge/retro/cleanup loops, which never claim a
-// work item and so share no pool with it.
+// `fgos setup` writes the section and `fgos doctor` can see it at all, per
+// AGENTS.md's install/setup/doctor gate.
 //
-// Registering a default here does NOT make the gate live everywhere: until a
-// project's config actually carries the section, claimWork reads no ceiling
-// and refuses nothing. That keeps a repo already running more items than this
-// number from having its very next claim refused the moment this ships.
+// `ceiling` ships as `null` -- present but unarmed -- and that is the whole
+// point of this entry (tsk-1oz). Shipping the recommended NUMBER here would
+// arm the gate the moment anyone runs `fgos setup`, and `fgos doctor` asks
+// every project to run exactly that ("stale config — missing keys ... — run
+// fgos setup") as routine maintenance, never as an opt-in. A repo already
+// running more items than the recommended number would then have its very
+// next `take`/`pick` refused, freezing the whole backlog until a person
+// parked enough work by hand. `worker-slots.mjs` already refuses to treat
+// silence as a reason to start refusing work; writing a live number here
+// would have re-introduced that same trap one command away from the nag
+// that points at it. A person arms the gate by replacing `null` with a real
+// count (see DEFAULT_WORKER_SLOT_CEILING for the recommended starting
+// value), which is the only moment the intent is unambiguous.
+//
+// `adminReservation` is deliberately NOT a key here. The admin lane
+// (merge/retro/cleanup loops plus one spare) is a FIXED reservation whose
+// size is constant by definition, not a project knob -- it never claims a
+// work item, so nothing counts it and nothing could enforce a different
+// number. It lives as `ADMIN_LANE_RESERVATION` in `worker-slots.mjs` and is
+// reported by `fgos slots`; offering it as config would have been a dial
+// wired to nothing.
 registerConfigDefault({
   id: 'workerSlots',
   key: 'workerSlots',
-  shape: { ceiling: DEFAULT_WORKER_SLOT_CEILING, adminReservation: ADMIN_LANE_RESERVATION },
+  shape: { ceiling: null },
+});
+
+// A present-but-unusable `ceiling` is the misconfiguration that actually
+// bites, and it fails SILENTLY: `hasWorkerSlotRoom` treats anything that is
+// not a positive integer as "no ceiling configured" and allows every claim,
+// so a project that believes it is capped runs uncapped. `"8"` (a string,
+// the easiest hand-edit slip), `8.5`, `0` and `-1` all land there. The
+// generic `checkConfigNotStale` above only catches a wholly-missing section,
+// exactly the same blind spot `checkInvariantChecksConfigured` was written
+// to cover for `invariantChecks`. `null` is the one non-number that is not a
+// mistake: it is what `fgos setup` writes to mean "deliberately unarmed".
+function checkWorkerSlotsCeiling(cwd) {
+  const section = readSharedConfig(cwd).workerSlots;
+  if (section === undefined) {
+    return {
+      passed: false,
+      message: 'workerSlots section missing -- run fgos setup (no worker-slot ceiling is enforced until it exists)',
+    };
+  }
+  const { ceiling } = section;
+  if (ceiling === null || ceiling === undefined) {
+    return {
+      passed: true,
+      message: `workerSlots.ceiling is unarmed (null) -- no claim is refused; set a positive integer (recommended: ${DEFAULT_WORKER_SLOT_CEILING}) to enforce a ceiling`,
+    };
+  }
+  if (!Number.isInteger(ceiling) || ceiling <= 0) {
+    return {
+      passed: false,
+      message: `workerSlots.ceiling is ${JSON.stringify(ceiling)}, which enforces NOTHING -- expected a positive integer (recommended: ${DEFAULT_WORKER_SLOT_CEILING}) or null to mean deliberately unarmed`,
+    };
+  }
+  return { passed: true, message: `workerSlots.ceiling = ${ceiling} running work item(s)` };
+}
+
+registerCheck({
+  id: 'worker-slots-ceiling-usable',
+  description: 'workerSlots.ceiling is either a positive integer or explicitly null (a malformed value silently enforces nothing)',
+  check: (cwd) => checkWorkerSlotsCeiling(cwd),
 });
 
 // docs/history/tsk-516-approve-reverify-scope/CONTEXT.md D6: the invariant

@@ -41,17 +41,35 @@
  * (status-fsm.mjs:100,104,146). So there is nothing here to count, and
  * nothing for a liveness filter to reclaim — the reservation is constant by
  * definition.
+ *
+ * Constant by definition is also why this is NOT project config (tsk-1oz).
+ * It was briefly registered as a `workerSlots.adminReservation` key that
+ * `fgos setup` wrote and `fgos doctor` displayed, but nothing ever read:
+ * every consumer reports this constant. A dial wired to nothing is worse
+ * than no dial, so the key is gone and the number lives here, reported
+ * through `fgos slots` for anyone who needs to see it.
  */
 export const ADMIN_LANE_RESERVATION = 4;
 
 /**
- * The execution-lane ceiling `fgos setup` writes into the shared config. It
- * is NOT a fallback applied when the config is silent: an absent
- * `workerSlots.ceiling` means no ceiling at all, so the gate stays inert and
- * behavior is identical to before it existed (the same discipline
- * shared-config-file.mjs documents for invariantChecks). That matters
- * concretely — a live default would refuse the very next claim in any repo
- * already carrying more running items than this number.
+ * The RECOMMENDED starting ceiling — a suggestion a person copies, never a
+ * value the system applies on its own.
+ *
+ * It is NOT a fallback for a silent config, and (tsk-1oz) it is NOT what
+ * `fgos setup` writes either: setup writes `ceiling: null`, present but
+ * unarmed. Both would refuse the very next claim in any repo already running
+ * more items than this number, and `fgos doctor` asks every project to run
+ * `fgos setup` as routine maintenance — so writing a live number would arm
+ * the gate on a command nobody runs meaning "cap me now", and freeze the
+ * backlog until someone parked work by hand.
+ *
+ * An absent, null, or malformed `workerSlots.ceiling` therefore means no
+ * ceiling at all: the gate stays inert and behavior is identical to before
+ * it existed, the same discipline shared-config-file.mjs documents for
+ * invariantChecks. A person arms it by writing a real count, which is the
+ * only moment the intent is unambiguous. `fgos doctor`'s
+ * `worker-slots-ceiling-usable` check reports which of the two a project is
+ * in, so "unarmed" is visible rather than silent.
  */
 export const DEFAULT_WORKER_SLOT_CEILING = 8;
 

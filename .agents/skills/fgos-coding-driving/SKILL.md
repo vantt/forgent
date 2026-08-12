@@ -176,6 +176,13 @@ asserted to generalize automatically to a domain that does not exist yet.
   labelable pane. Never stop the loop, retry, or branch on its result — and
   never read a pane label back to decide anything, which is forbidden
   outright (D2: labels are for humans; occupancy is engine state).
+- **Every stop lands a closing report on the item before it reports to the
+  caller** — `fgos report <id> --text ... --stop-reason ...`, see
+  `## Closing report: the drive's landing place on the item` below. The
+  terminal is not a storage medium: a finished worker pane is reused by the
+  orchestrator, so a result that exists only there is a result that can be
+  overwritten before anyone reads it. Like the labeling call this is never a
+  gate — if it fails, report the stop to the caller anyway.
 - Every bare `fgos <verb>` this skill calls directly (`list`, to re-read
   state each iteration) is `requiresExistingStore: true` — resolve the main
   checkout root the same way every other stage-skill does and pass it
@@ -284,6 +291,22 @@ own mechanical verb covers that position, exactly as before.
 shownItemOnce = false   # scoped to this ONE fgos-coding-driving call only,
                          # never persisted — see the display step below
 labeledPaneOnce = false # same scope, same lifetime — see the labeling step
+
+# Every `stop.` below lands the same closing report on the item BEFORE it
+# reports to the caller — see `## Closing report: the drive's landing place
+# on the item`. One call, mechanical, never a gate:
+#
+#   land-closing-report(reason) =
+#     root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+#     node "$root/bin/fgos.mjs" report "<id>" --dir "$root" \
+#       --text "<the same summary this stop reports to the caller>" \
+#       --stop-reason "<reason>"
+#
+# `reason` is the stop's own name, from this loop's existing vocabulary:
+# human-question | system-error | natural-finish | anchored-by-open-children
+# | ceiling-reached | mechanical-position | no-progress. When the stop also
+# carries a known error category (today only `lock-timeout`), pass that
+# instead — it is the more specific answer to "why did this end".
 
 loop:
   read id's current {stage, status, domain} FRESH via `fgos list --id <id> --json`
@@ -419,6 +442,40 @@ than this loop, and it covers pick's own `EnterWorktree`-fallback branch
 where this loop is never invoked at all. The two calls produce the same
 label for the same id, so the overlap is redundant, never conflicting.
 
+## Closing report: the drive's landing place on the item
+
+Every `stop.` in the loop above records its own closing report on the item
+(`fgos report <id> --text ... --stop-reason ...`) before reporting the same
+thing to the caller. Same argument as the labeling call: invoking a verb is
+mechanical, not a routing judgment, so it does not break the "purely
+mechanical loop" hard rule.
+
+**Why this exists at all.** A drive's closing report used to live in exactly
+one place — the pane it ran in — and that made the pane precious. It is the
+one artifact with no copy anywhere else: code is on `fgw/<id>`, decisions are
+in the event log, a parked question is in `fgos ask --text`, documentation is
+under `docs/`. Recording it on the item is what lets an orchestrator treat a
+finished pane as disposable and reuse it, instead of a person having to sit
+and guard a terminal to read a result before it scrolls away
+(`docs/history/orchestrator-worker-slots/plan.md` A8, DISCUSSION.md D10).
+herdr-plugin already reuses finished worker panes; this call is the reason
+that is safe rather than merely tolerable, so it is not optional decoration.
+
+**One item, one landing place.** The report is written through the decision
+log (`source: driver-report`), so `fgos show <id>` surfaces it among that
+item's own history — no new event type, no new field. Read a result with
+`fgos show <id>`; never require anyone to still have the pane open.
+
+**Never a gate.** Do not stop, retry, or branch on the outcome of the call,
+and never let it change what is reported to the caller. If the verb fails,
+report the stop to the caller anyway — losing the copy is strictly better
+than losing the stop.
+
+**Admin lane does not need it.** `merge`/`retro`/`cleanup` run as loops in a
+fixed pane that is never split or reclaimed, so nothing overwrites their
+output. This is an execution-lane call only, which is also why it belongs
+here: this loop is the one every coding flow passes through.
+
 ## Which existing loops are this loop (D9 §3, no separate mechanisms)
 
 | Caller | `id` source | `ceiling` |
@@ -521,6 +578,10 @@ rather than legitimate scope, that is new evidence for a follow-up item —
 - treating the pane-labeling call as a gate — stopping, retrying, or
   branching on its result — or reading a pane label back to decide
   anything (D2)
+- reporting a stop to the caller without first landing the same closing
+  report on the item, leaving the result to live only in a pane the
+  orchestrator is free to reuse — or letting that call's failure change,
+  delay, or suppress the stop itself
 - asserting this loop generalizes to a domain other than `coding` without
   new evidence for that domain (D10)
 - reading the claim step's `worktreeBacked` branch, or the stop-condition
@@ -532,9 +593,9 @@ rather than legitimate scope, that is new evidence for a follow-up item —
 Violating the letter of the rules is violating the spirit of the rules.
 
 Ceiling reached, `awaiting-approval` reached, an anchor by open children,
-a no-progress read, or a person-shaped stop. Report which one to the
-caller — this skill's own job ends there; it never decides what happens
-next on its own authority.
+a no-progress read, or a person-shaped stop. Land it on the item with
+`fgos report` first, then report which one to the caller — this skill's own
+job ends there; it never decides what happens next on its own authority.
 
 When the stop came from a failure carrying a known error category, the
 report also carries that category's own line verbatim — today

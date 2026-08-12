@@ -16,13 +16,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   enforced inside every claim path (`take`, `pick`, and the runner alike),
   which refuses with `worker-slot ceiling reached` once the lane is full.
   Occupancy is derived from work items already at `doing`; nothing new is
-  recorded to get it. The ceiling is OFF until configured: `fgos setup`
-  writes a `workerSlots` section (`ceiling`, `adminReservation`) and `fgos
-  doctor` reports it, but a project whose config lacks that section behaves
-  exactly as before.
+  recorded to get it. The ceiling ships UNARMED and stays that way until a
+  person sets it: `fgos setup` writes `workerSlots.ceiling: null`, which
+  refuses nothing, and a project is capped only once someone replaces that
+  with a real count. It is deliberately not armed on your behalf — `fgos
+  doctor` asks every project to run `fgos setup` as routine maintenance, so
+  a number written there would cap a repo that never asked to be capped, and
+  freeze its backlog if it was already running more items than the cap.
+- `fgos doctor` gained a `worker-slots-ceiling-usable` check. A
+  `workerSlots.ceiling` that is not a positive integer — `"8"` as a string,
+  `8.5`, `0`, `-1` — enforces nothing at all, so a project could believe it
+  was capped while running uncapped. The check names that, and reports the
+  deliberate `null` as "unarmed" rather than as a problem.
 - `fgos report <id> --text "..." [--stop-reason ...]` records a driver's
   closing report on the item, so a result can be read with `fgos show <id>`
-  instead of by watching a terminal pane.
+  instead of by watching a terminal pane. `fgos-coding-driving` now records
+  one at every stop, which is what makes a finished worker pane safe for the
+  cockpit to reuse: the result no longer lives only on a screen somebody has
+  to guard.
 
 ### Changed
 

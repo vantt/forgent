@@ -473,7 +473,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'slots',
     invoke: 'fgos slots',
-    description: 'Read-only worker-slot ledger: how many work items are running right now (execution-lane occupancy, one running item = one slot), whether the lane has room under the configured ceiling, and the admin lane\'s fixed reservation. This is the port launchers pre-check before standing a worker up — herdr-plugin (Rust) and fgos-fanout (a prose skill) reach the engine only through the CLI, per decision 0014. An absent workerSlots.ceiling means no ceiling: hasRoom is always true. Not paginated: the result is one fixed-shape summary, not a growing row set.',
+    description: 'Read-only worker-slot ledger: how many work items are running right now (execution-lane occupancy, one running item = one slot), whether the lane has room under the configured ceiling, and the admin lane\'s fixed reservation. This is the port launchers pre-check before standing a worker up — herdr-plugin (Rust) and fgos-fanout (a prose skill) reach the engine only through the CLI, per decision 0014. An absent or null workerSlots.ceiling means no ceiling: hasRoom is always true, which is what `fgos setup` writes until a person arms it. Not paginated: a launcher reads the fixed summary fields (hasRoom, occupied, ceiling, free), and execution.items — one row per running item, so it grows with the number of items at doing — is diagnostic detail for a human, never a row set to page through.',
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos slots'],
     touchesState: false,
