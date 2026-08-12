@@ -677,6 +677,40 @@ test('self-recognition: the same string identity refreshes its own lock with no 
   assert.equal(res.status, ACQUIRED);
 });
 
+// --- allowSelfRecognition (tsk-1wr): opt-out for locks with no legitimate ---
+// --- same-identity re-entry, e.g. the merge target-ref slot -----------------
+
+test('allowSelfRecognition omitted still self-recognizes (byte-identical default)', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  const staleTs = Date.now() - 10_000;
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: 'session-abc-123', ts: staleTs }));
+
+  const res = acquireMainCheckoutLock(dir, { identity: 'session-abc-123', ttlMs: 1 });
+
+  assert.equal(res.status, ACQUIRED);
+});
+
+test('allowSelfRecognition:false treats the caller\'s own identity as a real holder, not a refresh — string identity under ttlMs judges it HELD', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  const freshTs = Date.now();
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: 'session-abc-123', ts: freshTs }));
+
+  const res = acquireMainCheckoutLock(dir, { identity: 'session-abc-123', ttlMs: 60_000, allowSelfRecognition: false });
+
+  assert.equal(res.status, HELD);
+  assert.equal(res.holderPid, 'session-abc-123');
+});
+
+test('allowSelfRecognition:false still lets a genuinely fresh acquire succeed (no lock file yet)', () => {
+  const { dir } = setup();
+
+  const res = acquireMainCheckoutLock(dir, { identity: 'session-abc-123', ttlMs: 60_000, allowSelfRecognition: false });
+
+  assert.equal(res.status, ACQUIRED);
+});
+
 // --- forceReclaimAmbiguousLock (tsk-3h4) -------------------------------------
 
 test('forceReclaimAmbiguousLock: already-clear when no lock file exists', () => {
