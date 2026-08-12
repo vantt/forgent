@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mergeReadiness, mergeTree } from '../../src/state/graph-harness.mjs';
+import { mergeReadiness, mergeTree, openLeavesSharingTarget, classifyPostLandDrift } from '../../src/state/graph-harness.mjs';
 
 // mergeReadiness is pure over a hand-built view (same shape replay.mjs's
 // foldEvents produces: view.work[id] = { id, title, status, deps, ... }).
@@ -675,4 +675,108 @@ test('mergeTree: every id mergeReadiness surfaces in any bucket appears somewher
   for (const id of [...readiness.ready, ...readiness.waiting, ...readiness.supersededOut, 'a', 'b']) {
     assert.ok(flatIds.has(id), `expected ${id} to appear in the tree`);
   }
+});
+
+// --- post-land drift detection (D4) --------------------------------------
+//
+// The pure half of "after a land, which still-open branches did it actually
+// put behind?". Both functions are hand-fed here: the real changed-file sets
+// come from git at the caller (merge.mjs), never from declared footprint.
+
+test('openLeavesSharingTarget: only items merging into the same target ref, never the landed item itself', () => {
+  const view = {
+    work: {
+      root: item('root', 'doing'),
+      landed: item('landed', 'awaiting-approval', [], { parent: 'root' }),
+      sibling: item('sibling', 'doing', [], { parent: 'root' }),
+      otherRoot: item('otherRoot', 'doing', [], { parent: 'somewhere-else' }),
+      rootless: item('rootless', 'doing'),
+    },
+  };
+  assert.deepEqual(openLeavesSharingTarget(view, 'landed'), ['sibling']);
+});
+
+test('openLeavesSharingTarget: two parentless items share the trunk as their target', () => {
+  const view = {
+    work: {
+      landed: item('landed', 'awaiting-approval'),
+      other: item('other', 'doing'),
+      child: item('child', 'doing', [], { parent: 'landed' }),
+    },
+  };
+  assert.deepEqual(openLeavesSharingTarget(view, 'landed'), ['other']);
+});
+
+test('openLeavesSharingTarget: excludes resolved siblings and pre-claim siblings', () => {
+  // A pre-claim sibling's fgw/<id> branch is created at decompose and carries
+  // no commit of its own, so its changed-file set is empty and can never
+  // intersect anything -- diffing it is paid work for a guaranteed empty set.
+  const view = {
+    work: {
+      landed: item('landed', 'awaiting-approval', [], { parent: 'root' }),
+      live: item('live', 'doing', [], { parent: 'root' }),
+      parked: item('parked', 'awaiting-human', [], { parent: 'root' }),
+      preClaim: item('preClaim', 'todo', [], { parent: 'root' }),
+      merged: item('merged', 'delivered', [], { parent: 'root' }),
+      finished: item('finished', 'done', [], { parent: 'root' }),
+      dropped: item('dropped', 'wontfix', [], { parent: 'root' }),
+    },
+  };
+  assert.deepEqual(openLeavesSharingTarget(view, 'landed'), ['live', 'parked']);
+});
+
+test('openLeavesSharingTarget: an unknown landed id yields nothing rather than throwing', () => {
+  assert.deepEqual(openLeavesSharingTarget({ work: {} }, 'nope'), []);
+});
+
+test('classifyPostLandDrift: a leaf sharing no path produces nothing at all -- no notification, no mark', () => {
+  const result = classifyPostLandDrift({
+    landedFiles: ['src/a.mjs'],
+    leaves: [{ id: 'leaf', files: ['src/b.mjs'], sessionIds: ['sess-1'] }],
+  });
+  assert.deepEqual(result, { notify: [], stale: [] });
+});
+
+test('classifyPostLandDrift: a shared path with a live session notifies that exact session', () => {
+  const result = classifyPostLandDrift({
+    landedFiles: ['src/a.mjs', 'src/shared.mjs'],
+    leaves: [{ id: 'leaf', files: ['src/shared.mjs', 'src/c.mjs'], sessionIds: ['sess-1'] }],
+  });
+  assert.deepEqual(result, {
+    notify: [{ id: 'leaf', shared: ['src/shared.mjs'], sessionIds: ['sess-1'] }],
+    stale: [],
+  });
+});
+
+test('classifyPostLandDrift: a shared path reaches every session of that leaf, not just the first', () => {
+  const result = classifyPostLandDrift({
+    landedFiles: ['src/shared.mjs'],
+    leaves: [{ id: 'leaf', files: ['src/shared.mjs'], sessionIds: ['sess-1', 'sess-2'] }],
+  });
+  assert.deepEqual(result.notify, [{ id: 'leaf', shared: ['src/shared.mjs'], sessionIds: ['sess-1', 'sess-2'] }]);
+});
+
+test('classifyPostLandDrift: a shared path with no session is marked stale only', () => {
+  const result = classifyPostLandDrift({
+    landedFiles: ['src/shared.mjs'],
+    leaves: [{ id: 'leaf', files: ['src/shared.mjs'], sessionIds: [] }],
+  });
+  assert.deepEqual(result, { notify: [], stale: [{ id: 'leaf', shared: ['src/shared.mjs'] }] });
+});
+
+test('classifyPostLandDrift: each leaf is bucketed independently', () => {
+  const result = classifyPostLandDrift({
+    landedFiles: ['src/shared.mjs'],
+    leaves: [
+      { id: 'untouched', files: ['src/other.mjs'], sessionIds: ['sess-1'] },
+      { id: 'owned', files: ['src/shared.mjs'], sessionIds: ['sess-2'] },
+      { id: 'orphan', files: ['src/shared.mjs'], sessionIds: [] },
+    ],
+  });
+  assert.deepEqual(result.notify, [{ id: 'owned', shared: ['src/shared.mjs'], sessionIds: ['sess-2'] }]);
+  assert.deepEqual(result.stale, [{ id: 'orphan', shared: ['src/shared.mjs'] }]);
+});
+
+test('classifyPostLandDrift: no leaves and no landed files produce empty buckets', () => {
+  assert.deepEqual(classifyPostLandDrift({}), { notify: [], stale: [] });
 });
