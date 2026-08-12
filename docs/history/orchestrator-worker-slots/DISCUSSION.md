@@ -4,27 +4,21 @@ Item: `tsk-2sj`.
 
 ## 1. Trạng thái hiện tại
 
-Hết vòng 4. **Bảy D-ID đã chốt** (§4) — thiết kế về cơ bản đã thành hình,
-§6 và §7 đều đã viết được.
+Hết vòng 9, sau khi `fgos-coding-validating` chạy và trả `NOT READY` một
+lần rồi được gỡ. **Mười D-ID đã chốt** (§4); §3 không còn hàng "chưa rõ".
 
-Vòng 4 giải quyết Q5 qua một phản biện thật: phiên này đề xuất bỏ hẳn
-việc skill gọi rename (nhãn là phép chiếu, adapter tự vẽ) và **đã sai** —
-sai vì tổng quát hoá từ đúng một ca. Ca phổ biến nhất là người tự mở
-session rồi gõ `/fgOS:pick`, lúc đó không có orchestrator process nào
-đang chạy, nên chỉ chính session biết binding. Helper skill có
-capability-gate mới là điểm hexagon đúng (D5). Kèm theo đó là nhận thức
-đúng hơn về bug `fgos-auto-discover`: lỗi không nằm ở việc session đổi
-nhãn, mà ở việc herdr-plugin *đọc nhãn như state* — sửa bằng cách hỏi
-engine, không phải bằng cách cấm session đổi nhãn.
+Bốn vòng cuối đều theo cùng một khuôn: phiên này gặp một chỗ hở thì đề
+xuất **dựng cơ chế mới**, người dùng bác bằng cách chỉ ra **ràng buộc
+hoặc dữ liệu vốn đã có**. Vòng 6 bịa ra "vòng đời worker" cho dữ liệu đã
+nằm sẵn trong `payload.writer.id` (vòng 7 bác). Vòng 8 gỡ tiếp: mọi flow
+đều có ceiling nên "xong" là quan sát được, và "kẹt `doing`" là **sự cố**
+chứ không phải trạng thái thiết kế — bỏ luôn được yêu cầu lọc liveness
+mỗi vòng poll. Vòng 9 chốt pane là đồ bỏ, bằng cách bỏ đi lý do phải giữ
+pane thay vì ra chính sách giữ pane.
 
-**Vòng 5: hội tụ.** Q10 chốt thành D8 (không bao giờ bẻ một mẻ đã tính
-sẵn); Q11 chốt để ngoài phạm vi và đã mở item riêng `tsk-60h`. Không còn
-hàng "chưa rõ" nào trong §3.
-
-`refs` của `tsk-2sj` đã trỏ về `#tasks` — đây là item ô dù cho cả bốn
-hạng mục T1-T4; việc tách thành item con, mỗi con trỏ về anchor riêng của
-nó, là việc của `fgos-coding-planning`, không phải của buổi thảo luận
-này. Cửa ra tiếp theo: `fgos-coding-exploring` rồi `fgos-coding-planning`.
+Kết quả ròng: thiết kế **gọn hơn** bản đầu — không ranker toàn cục, không
+event type mới, không cơ chế khai báo mới, không lọc liveness định kỳ,
+không cơ chế đóng pane.
 
 ## 2. Mục tiêu & đề bài
 
@@ -60,8 +54,8 @@ tên đúng khái niệm chứ không phải sơn phết.
 | Q11 | "Agent tự xử xung đột merge" có nằm trong đợt này không | **rõ** | Để ngoài. Đã mở item riêng `tsk-60h` |
 | Q12 | Vòng đời worker: cần khái niệm mới không | **rõ — KHÔNG cần** | Vòng 7 bác vòng 6: `payload.writer.id` đã có sẵn trong event log (97,3% cạnh `→ doing`), đủ suy ra cả "list worker vừa xong xếp cũ→mới". Không field mới, không event type mới. Về lại tầm planning |
 | Q13 | Phân biệt "session loop giữa hai item" với "session đã xong" | **rõ** | Vòng 8: không xảy ra trong lane workers — loop sống ở lane operation theo cấu trúc. Ràng buộc "chỉ tái dùng pane one-shot" vì vậy có lý do thật, không phải cách né |
-| Q15 | Tái dùng pane khi người còn đang đọc | **rõ** | Vòng 9 → D10: tái dùng không xin phép, trừ pane `focused`; bỏ delay-rồi-đóng; cho báo cáo driver một chỗ hạ cánh trên item |
 | Q14 | **Thế nào là biết đã xong** | **rõ — quan sát được** | Vòng 8: flow luôn có ceiling nên chỉ kết thúc hai kiểu, cả hai ghi log (chạm ceiling; park → rời `doing`). "Claim rồi bỏ đi" là **sự cố**, không phải state — đường xử là `/fgOS:stale` + `tsk-3ni` ở nhánh ngoại lệ. Không cần cơ chế khai báo mới |
+| Q15 | Tái dùng pane khi người còn đang đọc | **rõ** | Vòng 9 → D10: tái dùng không xin phép, trừ pane `focused`; bỏ delay-rồi-đóng; cho báo cáo driver một chỗ hạ cánh trên item |
 
 ## 4. Quyết định đã chốt
 
@@ -74,11 +68,13 @@ tên đúng khái niệm chứ không phải sơn phết.
 | D5 | Cơ chế đặt nhãn là một **helper skill có capability-gate, gọi từ phía session** (hướng `terminal`/`rename.sh` hôm nay), KHÔNG phải vòng poll của adapter tự vẽ. Đây chính là điểm hexagon để đổi orchestrator sau này. Hệ quả: bug `fgos-auto-discover` được sửa bằng cách herdr-plugin **hỏi engine** thay vì đọc nhãn, chứ không phải bằng cách cấm session đổi nhãn. |
 | D6 | Hình dạng của "thống nhất" là **gác trần**, không phải ranker toàn cục. Giữ nguyên 6 picker theo pool — chúng phải trả lời đúng và không block; engine thêm đúng một lớp: gác tổng trần. Launcher **xin slot trước khi dựng** worker; hết chỗ thì bị từ chối, không tự quyết. Ranker toàn cục xuyên pool để lại có chủ ý. |
 | D7 | Trần đếm theo **work-item** — một work-item đang chạy tốn đúng một slot, bất kể launcher nào dựng nó lên. Và trần **mềm ở mép trên**: launcher được phép vượt một biên nhỏ để khỏi bẻ một mẻ việc thành hai wave (biên cụ thể còn mở, Q10). Ship Faster thắng độ chính xác của con số, miễn biên nhỏ và biết trước. |
-
 | D8 | Biên du di diễn đạt thành luật tự mô tả, không thêm nút chỉnh: **không bao giờ bẻ một mẻ đã tính sẵn — còn ít nhất 1 slot trống thì lấy trọn mẻ.** Ưu điểm quyết định: biên vượt **không cộng dồn được** — sau khi vượt, lần acquire kế tiếp thấy 0 chỗ nên bị từ chối ngay, nên biên vượt tối đa luôn bị chặn bởi kích thước mẻ lớn nhất một launcher có thể tạo (`fgos-fanout` cap 5 → vượt tối đa 4). Không cần con số ma thuật nào phải tinh chỉnh. |
 
+| D9 | Lane hành chính **không bao giờ claim** một work-item, nên "đếm theo work-item" chỉ có đối tượng ở lane execution; lane admin là chỗ dành riêng kích thước cố định theo số loại loop (3 hôm nay + 1 thủ sẵn). Khớp D4, không mâu thuẫn. |
+| D10 | **Pane đã xong là đồ bỏ** — tái dùng không xin phép, trừ pane đang `focused` (dữ liệu có sẵn trong `herdr pane list`/`pane layout`, là tín hiệu chrome hợp lệ chứ không phải `agent_status` bị cấm). **Bỏ hẳn** nhánh delay-rồi-đóng. Và cho **báo cáo cuối của driver** một chỗ hạ cánh trên item, để người đọc bằng `fgos show <id>` thay vì bằng terminal phải canh — đó là thứ duy nhất trong pane không có bản sao ở nơi khác. |
+
 Đã ghi vào event log qua `fgos decision --id tsk-2sj` (seq 14352, 14353,
-14354, 14362, 14373, 14374, 14375, 14376).
+14354, 14362, 14373, 14374, 14375, 14376, 14401, 14597).
 
 ## 5. Q&A log
 
