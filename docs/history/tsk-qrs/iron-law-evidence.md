@@ -7,15 +7,45 @@ same way `bin/fgos.mjs`'s `approve` verb computes it):
 {
   "required": true,
   "matchedFlags": [],
-  "matchedModules": ["src/runner/loop.mjs"]
+  "matchedModules": [
+    "bin/fgos.mjs",
+    "src/runner/claim-port.mjs",
+    "src/runner/loop.mjs"
+  ]
 }
 ```
 
 `matchedFlags` is empty — checked against `HEAVY_KEYWORDS` directly, not
-assumed. The single matched module is this item's own work, not inherited:
-`src/runner/loop.mjs` is touched by two of the four fixes here (the wave trim
-and the discovery-sweep gate), and `MODULE_RULES` covers the whole
-`src/runner/` prefix.
+assumed. All three matched modules are this item's own work, none inherited:
+`loop.mjs` carries the wave trim and the discovery-sweep gate, and
+`claim-port.mjs`/`bin/fgos.mjs` were touched by the later config-hardening
+fix below. `MODULE_RULES` covers the whole `src/runner/` prefix and
+`bin/fgos.mjs` exactly.
+
+## Scope note: this item grew after its first return
+
+The item was returned green at `4c22d470`, and an independent engine-side
+review then found two more defects — one of them caused by this batch's own
+earlier fix. They were fixed on the same item rather than deferred, so the
+recorded `branchHeadAtReturn` predates the final tree. `approve` re-runs the
+verify against the merged tree, so the gate still sees the real final state;
+the numbers below are from the final tree, not the returned one.
+
+Footprint grew beyond the declared list, named here rather than buried:
+`src/state/cleanup-harness.mjs`, `src/config/shared-config-file.mjs`,
+`bin/fgos.mjs`, `src/setup/registrations.mjs`, `test/state/cleanup-harness.
+test.mjs` and `test/runner/loop.test.mjs`. Each is where the two later
+defects actually live; none is scope creep.
+
+## The defect this batch introduced, and closed
+
+`checkRetrospectiveContent` accepted ANY decision record as evidence a
+retrospective had run. Wiring `fgos-coding-driving` to record a closing
+report at every stop (this batch's own earlier fix, `tsk-1oz`) turned a rare
+false pass into a universal one: every driven item carried a decision before
+retrospective started, so the `cleanup -> done` content gate was permanently
+green. Recorded plainly because it is the one place this work made something
+worse before making it better.
 
 ## What was genuinely proven red-before-green
 
@@ -48,6 +78,26 @@ sides deliberately. It is a regression guard proving the new gate does not
 change behavior when there is room — it is not a feature test, and this file
 does not claim it as one.
 
+The two later fixes were proven the same way, by restoring
+`src/state/cleanup-harness.mjs` and `src/runner/claim-port.mjs` from `HEAD`
+and re-running before restoring the fixed files:
+
+```
+--- pre-fix: expect the 3 new tests RED ---
+✖ checkRetrospectiveContent: NOT ok when the only decision is an engine record such as a driver report
+✖ a shared config that is not valid JSON leaves claiming alive: no ceiling, no crash
+ℹ tests 66
+ℹ pass 64
+ℹ fail 2
+```
+
+Both reds are the defects themselves: a driver report satisfying the
+retrospective gate, and an unparseable config throwing an uncategorized error
+straight out of `claimWork`. The companion test (`ok when a real (non-engine)
+decision sits alongside engine records`) passes on both sides on purpose — it
+guards against over-narrowing the gate, which would have been the obvious way
+to break real items while fixing this one.
+
 The tree was restored from a byte copy and confirmed identical to `HEAD`
 (`git diff --stat src/runner/loop.mjs` empty) before the final run.
 
@@ -73,9 +123,9 @@ written:
 
 ```
 $ npm test
-ℹ tests 3048
+ℹ tests 3051
 ℹ suites 0
-ℹ pass 3043
+ℹ pass 3046
 ℹ fail 0
 ℹ cancelled 0
 ℹ skipped 5
@@ -83,7 +133,7 @@ $ npm test
 ```
 
 (The 5 skips pre-date this item.) The pre-change baseline on this same branch
-was 3045 tests / 3040 pass — so +3 tests, none removed and none weakened.
+was 3045 tests / 3040 pass — so +6 tests, none removed and none weakened.
 
 The item's own verify also passed at `fgos return`, which re-ran it
 independently of any claim made here (`passed: true`, `from: doing`,
