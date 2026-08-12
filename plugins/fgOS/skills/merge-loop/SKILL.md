@@ -201,9 +201,9 @@ self-pace."
         branch/commits. Confirm the fix with the specific failing test,
         then the full suite, before moving on. If it's flake, no fix is
         needed.
-     5. Either way, retry once: `fgos move <id> --to proposed` (the FSM's
-        `blocked -> proposed` recovery door for this exact reason), then
-        run `/fgOS:merge-next` again.
+     5. Either way, retry once: `fgos move <id> --to awaiting-approval`
+        (the FSM's `blocked -> awaiting-approval` recovery door for this
+        exact reason), then run `/fgOS:merge-next` again.
    - *Stop condition*: 4b's once-per-id-per-run rule. Read the retry's own
      result: `{picked: <id>, approve: {done}}` continues the loop
      normally; blocked again for any reason — identical
