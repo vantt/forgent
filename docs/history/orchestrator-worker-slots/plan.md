@@ -66,6 +66,26 @@ không có lệnh claim nào, mọi hit chữ "pick" trong hai file đó chỉ l
 xuôi — nên chúng nằm ngoài cổng hoàn toàn và được đếm bằng cơ chế riêng
 của lane admin (D9).
 
+**Cạm bẫy khi đặt cổng — đừng lồng vào nhánh `isolate` sẵn có.** Ba
+caller gọi CÙNG một hàm `claimWork`, chỉ khác tham số:
+
+| Caller | `actor` | `isolate` | Ghi chú |
+|---|---|---|---|
+| `take` (`bin/fgos.mjs:2320`) | `role` | `false` | claim tại main checkout, không dựng worktree |
+| `pick` (`bin/fgos.mjs:2391`) | `session` | `true` | dựng `fgw/<id>` dưới `.claude/worktrees` |
+| runner (`loop.mjs:496`) | `runner` | `false` | `skipOutcome: true`, runner tự ghi outcome sau |
+
+Check `deps-not-merged` sẵn có nằm trong `if (isolate && isLeaf)`
+(`claim-port.mjs:160`) — tức **chỉ bắn cho `pick`**, không bắn cho `take`.
+Cổng trần thì ngược lại: phải bắn **đồng đều bất kể `isolate`**, vì một
+worker chiếm một slot dù nó có worktree riêng hay không. Đặt cổng ngang
+hàng với nhánh đó, không lồng vào trong.
+
+Chính vì tầng chọn đa dạng (6 picker) mà tầng claim lại hội tụ về một hàm
+nên cổng **không cần biết picker nào đã chọn item** — nó chỉ đếm số
+work-item đang ở `doing`. Đó là điều làm D6 khả thi: giữ nguyên 6 picker,
+thêm đúng 1 cổng, thay vì vá 6 chỗ.
+
 Lane execution: cổng gác trần nằm **bên trong `claimWork`**
 (`src/runner/claim-port.mjs:90`) — nơi `fgos take` (`doTake`), `fgos pick`
 (`doPick`) và runner (`loop.mjs:496`) đều đi qua (RESEARCH F-A). Occupancy
