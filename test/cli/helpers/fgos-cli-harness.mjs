@@ -373,20 +373,13 @@ const SUBMIT_BAD_FLAG_CASES = [
   ['an empty --kind ""', ['--kind', '']],
 ];
 
-// tsk-4b2 D3/D6: coding's own clarify clear verdict now lands on
-// `discovery`, not `planning` (renamed from `decompose`, tsk-403 D11)
-// directly -- two more explicit `discover` calls walk it through
-// discovery->exploring->planning. Shared by every test below that needs
-// an item actually AT `planning` for its own setup.
-// tsk-qod D1/D2: a freshly submitted item now starts at stage `discovery`
-// (`stages[0]`) directly -- `clarify` retired entirely, no longer an
-// intermediate hop here -- so only two `discover` calls are needed to reach
-// `planning`, not three.
+// tsk-30v D2/D6: a clear verdict at `discovery` now skips `exploring` and
+// lands directly on `planning` in ONE `discover` call (previously two
+// explicit calls walked discovery->exploring->planning). Shared by every
+// test below that needs an item actually AT `planning` for its own setup.
 function advanceThroughDiscoveryToPlanning(cwd, id, verify = 'npm test -- proven') {
   const step1 = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', verify]);
-  assert.equal(step1.status, 0, `expected discovery->exploring to succeed: ${step1.stderr}`);
-  const step2 = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', verify]);
-  assert.equal(step2.status, 0, `expected exploring->planning to succeed: ${step2.stderr}`);
+  assert.equal(step1.status, 0, `expected discovery->planning to succeed: ${step1.stderr}`);
 }
 
 // tsk-3vo D2/D3/D5: omitting --timeout on return/approve/catchup used to

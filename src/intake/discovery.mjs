@@ -133,7 +133,14 @@ export function discoverableStages(domain) {
   return (hasDiscoveryExploring ? [clarifyStage, 'discovery', 'exploring'] : [clarifyStage]).filter(Boolean);
 }
 
-function nextDiscoveryEdge(work) {
+// `verdict` (tsk-30v D2/D6): only the `discovery`-stage branch reads it —
+// `clear` skips `exploring` and lands on `planning` directly; `unclear`
+// (or no verdict at all, e.g. the readLockedContext trust-signal path,
+// which always means clear) goes to `exploring`. The `clarify`/`exploring`
+// branches are unaffected: `clarify` is legacy/dead for `coding` and
+// `exploring`'s own gate (`fgos-coding-exploring`) never sends anything but
+// a clear verdict once CONTEXT.md is locked.
+function nextDiscoveryEdge(work, verdict) {
   const domain = getDomain(work.domain);
   const clarifyStage = stageForStep(domain, 'Clarify');
   const planningStage = stageForStep(domain, 'Divide');
@@ -150,7 +157,9 @@ function nextDiscoveryEdge(work) {
       : { to: planningStage, expectedStage: clarifyStage };
   }
   if (hasDiscoveryExploring && work.stage === 'discovery') {
-    return { to: 'exploring', expectedStage: 'discovery' };
+    return verdict?.clear
+      ? { to: planningStage, expectedStage: 'discovery' }
+      : { to: 'exploring', expectedStage: 'discovery' };
   }
   if (hasDiscoveryExploring && work.stage === 'exploring') {
     return { to: planningStage, expectedStage: 'exploring' };
@@ -276,7 +285,7 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
       // when it is already real.
       moveStage(dir, {
         id,
-        ...nextDiscoveryEdge(work),
+        ...nextDiscoveryEdge(work, { clear: true }),
         verify: hasRealVerify(work.verify) ? work.verify : (view.gates?.[id]?.contextApprove?.verify ?? FALLBACK_VERIFY),
         role,
       });
@@ -432,11 +441,33 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
 
     moveStage(dir, {
       id,
-      ...nextDiscoveryEdge(work),
+      ...nextDiscoveryEdge(work, verdict),
       verify,
       role,
     });
     return { outcome: 'clear', id, verdict };
+  }
+
+  // tsk-30v (D2/D3/D6): an unclear verdict at `discovery` no longer parks
+  // "in place" — it also advances stage to `exploring` (a real, registered
+  // edge nextDiscoveryEdge already picks for `verdict.clear === false`) so
+  // a person who answers the park below resumes already sitting at
+  // `exploring`, ready for `fgos-coding-exploring`'s own Socratic collab,
+  // instead of looping back through `fgos-coding-discovering` for the same
+  // unresolved question. `moveStage` and `putInAwaiting` touch disjoint
+  // fields (`stage` vs. `status`) — confirmed safe to call in sequence
+  // here (RESEARCH.md Round 1, tsk-30v: `stage-fsm.mjs`'s `transitionStage`
+  // reads only `work.stage`, `status-fsm.mjs`'s `transitionWork` reads
+  // only `work.status`, neither guards against the other). Scoped to
+  // `discovery` only — `clarify` (legacy) and `exploring` (its own gate
+  // never sends unclear) keep today's park-in-place behavior unchanged.
+  if (work.stage === 'discovery') {
+    moveStage(dir, {
+      id,
+      ...nextDiscoveryEdge(work, verdict),
+      verify: hasRealVerify(work.verify) ? work.verify : FALLBACK_VERIFY,
+      role,
+    });
   }
 
   // tsk-wcl: `putInAwaiting` always attempts a real `awaiting-human` status

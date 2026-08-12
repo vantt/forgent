@@ -108,7 +108,7 @@ test('evolve from a .fgos/-less linked worktree with no --dir warns on stderr in
 // is the next stop before executing. This assertion changed its expected
 // destination from `executing` to `decompose` for exactly that reason (per
 // D2, an intentional contract change, not a test nerf).
-test('discover on a clear verdict moves the submitted item to stage exploring with the caller-supplied verify (tsk-4b2 D3, tsk-qod: a fresh item starts at discovery now, so a clear verdict moves it one hop further to exploring)', () => {
+test('discover on a clear verdict moves the submitted item to stage planning with the caller-supplied verify (tsk-30v D2/D6: clear skips exploring, discovery -> planning directly)', () => {
   const cwd = tmpCwd();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
@@ -123,7 +123,7 @@ test('discover on a clear verdict moves the submitted item to stage exploring wi
   assert.equal(envelope.data.outcome, 'clear');
 
   const item = envelopeData(run(cwd, ['list']).stdout).work[id];
-  assert.equal(item.stage, 'exploring');
+  assert.equal(item.stage, 'planning');
   assert.equal(item.verify, 'npm test -- proven');
 });
 
@@ -187,7 +187,7 @@ test('plan with no id is rejected as validation, exit 4', () => {
   assert.equal(result.status, 4);
 });
 
-test('discover on an unclear verdict parks the submitted item in awaiting-human with the question, still stage discovery', () => {
+test('discover on an unclear verdict parks the submitted item in awaiting-human with the question, and advances it to exploring (tsk-30v D2/D3: unclear no longer parks in place)', () => {
   const cwd = tmpCwd();
   const id = JSON.parse(run(cwd, ['submit', 'Do the ambiguous work']).stdout).data.id;
 
@@ -197,7 +197,7 @@ test('discover on an unclear verdict parks the submitted item in awaiting-human 
 
   const view = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(view.work[id].status, 'awaiting-human');
-  assert.equal(view.work[id].stage, 'discovery');
+  assert.equal(view.work[id].stage, 'exploring');
   assert.equal(view.gates[id].ask, 'Which service?');
 });
 
@@ -251,7 +251,7 @@ test('discover --config pointing at a missing path still throws RunnerConfigErro
 // OPPOSITE verdict from what `--verdict` supplies — proving the flag
 // actually bypassed the judge, not just that a real judge happened to agree.
 
-test('discover --verdict clear --verify moves the item to exploring with that exact verify, bypassing the configured (opposite) judge verdict (tsk-4b2 D3, tsk-qod: a fresh item starts at discovery now, one hop further to exploring)', () => {
+test('discover --verdict clear --verify moves the item to planning with that exact verify, bypassing the configured (opposite) judge verdict (tsk-30v D2/D6: clear skips exploring)', () => {
   const cwd = tmpCwd();
   writeRunnerConfig(cwd, { clear: false, question: 'SHOULD NEVER SURFACE' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
@@ -261,12 +261,12 @@ test('discover --verdict clear --verify moves the item to exploring with that ex
   assert.equal(JSON.parse(result.stdout).data.outcome, 'clear');
 
   const view = envelopeData(run(cwd, ['list']).stdout);
-  assert.equal(view.work[id].stage, 'exploring');
+  assert.equal(view.work[id].stage, 'planning');
   assert.equal(view.work[id].verify, 'npm test -- cli-caller');
   assert.notEqual(view.work[id].status, 'awaiting-human');
 });
 
-test('discover --verdict unclear --question parks in awaiting-human with that exact question, bypassing the configured (opposite) judge verdict', () => {
+test('discover --verdict unclear --question parks in awaiting-human with that exact question and advances to exploring, bypassing the configured (opposite) judge verdict (tsk-30v D2/D3)', () => {
   const cwd = tmpCwd();
   writeRunnerConfig(cwd, { clear: true, verify: 'SHOULD NEVER SURFACE' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
@@ -277,7 +277,7 @@ test('discover --verdict unclear --question parks in awaiting-human with that ex
 
   const view = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(view.work[id].status, 'awaiting-human');
-  assert.equal(view.work[id].stage, 'discovery');
+  assert.equal(view.work[id].stage, 'exploring');
   assert.equal(view.gates[id].ask, 'Which provider?');
 });
 

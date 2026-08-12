@@ -265,14 +265,12 @@ test(
     // dispatch time instead of this test's own fake worker script.
     writeRunnerConfig(repoRoot, writeCommittingExecutor(scriptDir, 'fixed.txt'));
 
-    // tsk-qod D1/D2: `clarify` is retired entirely -- a fresh item now
-    // starts at `discovery` (`stages[0]`) directly, so two explicit discover
-    // calls walk discovery->exploring->planning (was one call directly to
-    // decompose before tsk-4b2, three calls between tsk-4b2 and this item).
+    // tsk-30v D2/D6: `clarify` is retired entirely -- a fresh item now
+    // starts at `discovery` (`stages[0]`) directly, and a clear verdict
+    // there skips exploring, landing on planning in ONE explicit discover
+    // call.
     const discovered = fgos(repoRoot, ['discover', submitted.id, '--verdict', 'clear', '--verify', 'test -f fixed.txt && echo FIX_OK']);
-    assert.equal(discovered.status, 0, `discover (discovery->exploring) failed: ${discovered.stderr}`);
-    const discovered2 = fgos(repoRoot, ['discover', submitted.id, '--verdict', 'clear', '--verify', 'test -f fixed.txt && echo FIX_OK']);
-    assert.equal(discovered2.status, 0, `discover (exploring->planning) failed: ${discovered2.stderr}`);
+    assert.equal(discovered.status, 0, `discover (discovery->planning) failed: ${discovered.stderr}`);
     const decomposed = fgos(repoRoot, ['plan', submitted.id, '--verdict', 'pass-through', '--reason', 'single self-improve fix, no split needed']);
     assert.equal(decomposed.status, 0, `decompose failed: ${decomposed.stderr}`);
     commitPending(repoRoot, `state: discover+decompose ${submitted.id}`);
