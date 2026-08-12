@@ -17,9 +17,14 @@ capability-gate mới là điểm hexagon đúng (D5). Kèm theo đó là nhận
 nhãn, mà ở việc herdr-plugin *đọc nhãn như state* — sửa bằng cách hỏi
 engine, không phải bằng cách cấm session đổi nhãn.
 
-Còn mở, đều nhỏ: **Q10** — biên du di cụ thể (đề xuất "không bao giờ bẻ
-một mẻ đã tính sẵn" chờ xác nhận); và xác nhận việc "agent tự xử xung đột
-merge" nằm ngoài phạm vi đợt này.
+**Vòng 5: hội tụ.** Q10 chốt thành D8 (không bao giờ bẻ một mẻ đã tính
+sẵn); Q11 chốt để ngoài phạm vi và đã mở item riêng `tsk-60h`. Không còn
+hàng "chưa rõ" nào trong §3.
+
+`refs` của `tsk-2sj` đã trỏ về `#tasks` — đây là item ô dù cho cả bốn
+hạng mục T1-T4; việc tách thành item con, mỗi con trỏ về anchor riêng của
+nó, là việc của `fgos-coding-planning`, không phải của buổi thảo luận
+này. Cửa ra tiếp theo: `fgos-coding-exploring` rồi `fgos-coding-planning`.
 
 ## 2. Mục tiêu & đề bài
 
@@ -51,8 +56,8 @@ tên đúng khái niệm chứ không phải sơn phết.
 | Q7 | "Du di phía trên" nghĩa gì | **rõ** | → D7: trần mềm ở mép trên |
 | Q8 | Ranker toàn cục hay gác trần | **rõ** | → D6: gác trần. (a) để lại có chủ ý |
 | Q9 | Trần đếm theo cái gì | **rõ** | → D7: theo **work-item** |
-| Q10 | Biên du di cụ thể là bao nhiêu | **chưa rõ** | Đề xuất: "không bao giờ bẻ một mẻ đã tính sẵn — còn ≥1 slot thì lấy trọn mẻ". Chờ xác nhận |
-| Q11 | "Agent tự xử xung đột merge" có nằm trong đợt này không | **chưa rõ** | Em đề xuất để ngoài — `fgos catchup` đã có, thiếu là hành vi skill (F7) |
+| Q10 | Biên du di cụ thể là bao nhiêu | **rõ** | → D8: không bao giờ bẻ một mẻ đã tính sẵn |
+| Q11 | "Agent tự xử xung đột merge" có nằm trong đợt này không | **rõ** | Để ngoài. Đã mở item riêng `tsk-60h` |
 
 ## 4. Quyết định đã chốt
 
@@ -66,8 +71,10 @@ tên đúng khái niệm chứ không phải sơn phết.
 | D6 | Hình dạng của "thống nhất" là **gác trần**, không phải ranker toàn cục. Giữ nguyên 6 picker theo pool — chúng phải trả lời đúng và không block; engine thêm đúng một lớp: gác tổng trần. Launcher **xin slot trước khi dựng** worker; hết chỗ thì bị từ chối, không tự quyết. Ranker toàn cục xuyên pool để lại có chủ ý. |
 | D7 | Trần đếm theo **work-item** — một work-item đang chạy tốn đúng một slot, bất kể launcher nào dựng nó lên. Và trần **mềm ở mép trên**: launcher được phép vượt một biên nhỏ để khỏi bẻ một mẻ việc thành hai wave (biên cụ thể còn mở, Q10). Ship Faster thắng độ chính xác của con số, miễn biên nhỏ và biết trước. |
 
+| D8 | Biên du di diễn đạt thành luật tự mô tả, không thêm nút chỉnh: **không bao giờ bẻ một mẻ đã tính sẵn — còn ít nhất 1 slot trống thì lấy trọn mẻ.** Ưu điểm quyết định: biên vượt **không cộng dồn được** — sau khi vượt, lần acquire kế tiếp thấy 0 chỗ nên bị từ chối ngay, nên biên vượt tối đa luôn bị chặn bởi kích thước mẻ lớn nhất một launcher có thể tạo (`fgos-fanout` cap 5 → vượt tối đa 4). Không cần con số ma thuật nào phải tinh chỉnh. |
+
 Đã ghi vào event log qua `fgos decision --id tsk-2sj` (seq 14352, 14353,
-14354, 14362, 14373, 14374, 14375).
+14354, 14362, 14373, 14374, 14375, 14376).
 
 ## 5. Q&A log
 
@@ -201,6 +208,14 @@ skill lẫn D2.
 F6(A) — nhãn không mang state, không ai được ĐỌC nhãn để quyết định —
 vẫn đứng nguyên, đó là D2.
 
+### 2026-08-12 — Vòng 5 (hội tụ)
+
+- **Q10:** đồng ý luật "không bao giờ bẻ một mẻ đã tính sẵn". → D8.
+- **Q11:** để ngoài phạm vi và mở item riêng. → `tsk-60h` đã submit.
+
+Không còn câu hỏi mở. `refs` của `tsk-2sj` trỏ về `#tasks`; bàn giao sang
+`fgos-coding-exploring` → `fgos-coding-planning`.
+
 ## 6. Thiết kế đã chốt {#design}
 
 *(Bản tổng hợp cho người đọc chưa từng dự buổi nào. Phần còn mở được
@@ -268,8 +283,11 @@ viên thì cho đẩy cả 4, thay vì tách thành 2 wave. Ưu tiên ship faste
 (`AGENTS.md` mục 1) thắng sự chính xác của con số, miễn biên vượt còn
 nhỏ và biết trước.
 
-**Chưa chốt (Q10):** biên đó là bao nhiêu và diễn đạt thế nào — một số cố
-định, một tỉ lệ, hay chỉ cho phép trong phạm vi một mẻ đã tính sẵn.
+Biên đó diễn đạt thành một luật tự mô tả, không thêm nút chỉnh (D8):
+**không bao giờ bẻ một mẻ đã tính sẵn — còn ít nhất 1 slot trống thì lấy
+trọn mẻ.** Biên vượt không cộng dồn được: sau khi vượt, lần acquire kế
+tiếp thấy 0 chỗ nên bị từ chối ngay, nên mức vượt tối đa luôn bị chặn bởi
+kích thước mẻ lớn nhất một launcher có thể tạo.
 
 ### Nhãn: session tự đặt qua helper skill có gate
 
@@ -343,8 +361,12 @@ flowchart TB
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-Bản phác, chờ Q10 chốt trước khi giao. Thứ tự dưới đây là thứ tự phụ
-thuộc thật: T1 phải xong trước, T2-T4 song song được sau đó.
+Thứ tự dưới đây là thứ tự phụ thuộc thật: T1 phải xong trước, T2-T4 song
+song được sau đó (lưu ý T2/T3 cùng đụng `pick.rs`).
+
+`tsk-2sj` là item ô dù trỏ về `#tasks`. Việc tách thành bốn item con, mỗi
+con trỏ về anchor riêng, thuộc `fgos-coding-planning` — buổi thảo luận
+này không tự thiết kế cách theo dõi task.
 
 ### T1 — Sổ worker slot + cổng gác trần trong engine {#task-slot-ledger}
 
@@ -436,6 +458,6 @@ hình; test: runner và fanout đều bị từ chối khi engine hết chỗ.
 
 - Ranker toàn cục xuyên pool (a) — để lại có chủ ý (D6).
 - Agent tự xử xung đột merge — `fgos catchup` đã có, thiếu là hành vi
-  skill (F7). Xứng đáng item riêng (Q11, chờ xác nhận).
+  skill (F7). **Đã mở item riêng: `tsk-60h`.**
 - Gom câu hỏi để hỏi người một lần — `AGENTS.md` ưu tiên #2, không phải
   phạm vi slot.
