@@ -161,13 +161,32 @@ tuần tự đúng thứ tự ở phần Approach (không chỉ nói trong prose
 có thể chạy P3 trước khi P2 tồn tại, đúng thứ footprint chồng lấn đã cảnh
 báo).
 
-| Mảnh | id | deps | verify |
+Bảng verify dưới đây là **bản đã sửa sau reality gate vòng 1** (xem mục
+"Reality gate" cuối file — ba lệnh cũ đã bị bác). Mỗi lệnh dưới đây đã được
+**chạy thật và xác nhận ĐỎ hôm nay**, đúng kỷ luật *"một verify chưa từng
+chạy đỏ thì chưa phải một verify"*.
+
+| Mảnh | id | deps | verify (đã sửa, đã đo đỏ) |
 |---|---|---|---|
-| P1 config + doctor/setup | `tsk-48w` | — | `npm test -- test/setup && node bin/fgos.mjs doctor --json --dir . \| grep -q herdr-web` |
-| P2 webserver core + auth L1 | `tsk-k4v` | `tsk-48w` | `cargo test --manifest-path herdr-plugin/Cargo.toml && cargo build --release --manifest-path herdr-plugin/Cargo.toml` |
-| P3 taskboard | `tsk-5jr` | `tsk-k4v` | `cargo test --manifest-path herdr-plugin/Cargo.toml web_taskboard` |
-| P4 task detail *(mục tiêu chính)* | `tsk-4id` | `tsk-5jr` | `cargo test --manifest-path herdr-plugin/Cargo.toml web_task_detail web_qa_history web_gate_approve` |
-| P5 cf-access *(tuỳ chọn)* | `tsk-18to` | `tsk-k4v` | `cargo test --manifest-path herdr-plugin/Cargo.toml cf_access` |
+| P1 config + doctor/setup | `tsk-48w` | — | `node --test 'test/setup/**/*.test.mjs' && node bin/fgos.mjs doctor --json --dir . \| grep -q 'herdr-web-dashboard-configured'` |
+| P2 webserver core + auth L1 | `tsk-k4v` | `tsk-48w` | `grep -q 'fn login_rejects_wrong_token_with_opaque_404' …/web/auth.rs && grep -q 'fn warns_when_bind_address_is_not_loopback' …/web/mod.rs && cargo test <manifest> \| grep -qE '[1-9][0-9]* passed' && cargo build --release` |
+| P3 taskboard | `tsk-5jr` | `tsk-k4v` | `grep -q 'fn taskboard_lists_work_items_through_work_item_source' …/web/taskboard.rs && cargo test <manifest> web_taskboard \| grep -qE '[1-9][0-9]* passed'` |
+| P4 task detail *(mục tiêu chính)* | `tsk-4id` | `tsk-5jr` | 3 × `grep -q 'fn …'` (`pairs_ask_history_with_answers_by_seq`, `rejects_docs_ref_path_traversal`, `lists_gate_approve_alongside_ask`) `&& cargo test <manifest> web_task_detail \| grep -qE '[1-9][0-9]* passed'` |
+| P5 cf-access *(tuỳ chọn)* | `tsk-18to` | `tsk-k4v` | 2 × `grep -q 'fn …'` (`rejects_forged_assertion`, `fails_closed_when_jwks_unreachable`) `&& cargo test <manifest> cf_access \| grep -qE '[1-9][0-9]* passed'` |
+
+Item cha `tsk-ldb` cũng đã sửa cùng lý do (verify cũ chạy **xanh** hôm nay
+vì nó chỉ là toàn bộ suite đang xanh sẵn): nay là
+`test -f herdr-plugin/src/web/mod.rs && cargo test <manifest> | grep -qE '[1-9][0-9]* passed' && cargo build --release && npm test`
+— đo đỏ hôm nay (`exit 1`).
+
+**Ba cơ chế trong bảng, mỗi cái đã đo cả hai chiều:**
+
+| Cơ chế | Chiều đỏ | Chiều xanh |
+|---|---|---|
+| `node --test 'test/setup/**/*.test.mjs'` | — | chạy thật: **162 pass, 0 fail, 35s** (so với 186s cả suite) |
+| `grep -q 'fn <tên test>'` | file/hàm chưa tồn tại → `exit 2` | xanh khi hàm test được viết. Idiom sẵn có của repo (`tsk-4ot`, `tsk-64z`, `tsk-417`) — tái dùng, không tự chế |
+| `cargo test <filter> \| grep -qE '[1-9][0-9]* passed'` | filter không khớp gì → guard chặn (đo thật: "GUARD SAYS FAIL — vacuous caught") | filter khớp thật → guard cho qua (đo thật trên `settings_missing`) |
+| `doctor --json \| grep -q 'herdr-web-dashboard-configured'` | id chưa tồn tại hôm nay (đo thật) | id anh em `herdr-launcher-configured` đã có sẵn trong output → hình dạng có thật |
 
 P5 nhánh song song từ P2 (không chặn P3/P4) — đúng tính chất "tuỳ chọn"
 của nó: ba mảnh kia deliver được mà không cần nó.
@@ -233,6 +252,34 @@ Việc cần làm ở `fgos-coding-planning`: sửa `verify` của `tsk-48w`,
 `tsk-4id`, `tsk-5jr`, `tsk-18to` (và siết thêm cho `tsk-k4v`) sao cho mỗi
 lệnh **chạy đỏ được hôm nay** và chỉ xanh khi hành vi mới tồn tại. Không
 đụng D1-D11, không đổi hình dạng 5 mảnh — chỉ lớp chứng minh.
+
+### Đã sửa (quay lại planning, cùng phiên)
+
+Toàn bộ 5 verify con + verify của item cha đã viết lại (bảng ở mục Split).
+Không đụng D1-D11, không đổi hình dạng 5 mảnh, không đổi `deps` — đúng
+phạm vi mà reality gate yêu cầu.
+
+**Sáu lệnh, mỗi lệnh đã chạy thật và xác nhận đỏ hôm nay:**
+
+| Item | exit hôm nay |
+|---|---|
+| `tsk-48w` | `1` — doctor chưa có check id |
+| `tsk-k4v` | `2` — `web/auth.rs` chưa tồn tại |
+| `tsk-5jr` | `2` — `web/taskboard.rs` chưa tồn tại |
+| `tsk-4id` | `2` — `web/qa_pairing.rs` chưa tồn tại |
+| `tsk-18to` | `2` — `web/cf_access.rs` chưa tồn tại |
+| `tsk-ldb` (cha) | `1` — `web/mod.rs` chưa tồn tại |
+
+Cũng đã đo chiều xanh của từng cơ chế (bảng ở mục Split) để không đổi một
+lỗi fail-open lấy một lỗi fail-closed: `node --test` scoped chạy 162 test
+xanh thật; guard `[1-9][0-9]* passed` cho qua khi filter khớp thật; id
+`herdr-launcher-configured` có thật trong output `doctor` nên hình dạng
+grep của P1 là có thật.
+
+**Nguyên nhân gốc, ghi lại để không tái phạm:** vòng 1 tôi chép draft
+verify từ §7 của `DISCUSSION.md` mà **không chạy thử lệnh nào**. §7 là bản
+phác trong lúc thảo luận thiết kế, chưa bao giờ là lệnh đã kiểm chứng —
+coi nó như đã kiểm chứng chính là lỗi.
 
 ## Outstanding questions
 
