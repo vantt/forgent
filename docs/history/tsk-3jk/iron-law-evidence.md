@@ -37,10 +37,16 @@ those two paths (`docs/history/tsk-3dt/iron-law-evidence.md`).
 $ git diff --name-only fgw/tsk-2sj...HEAD
 .agents/skills/fgos-fanout/SKILL.md
 .claude/skills/fgos-fanout/SKILL.md
+CHANGELOG.md
+docs/history/tsk-3jk/iron-law-evidence.md
 docs/history/tsk-3jk/plan.md
 src/runner/loop.mjs
 test/runner/loop.test.mjs
 ```
+
+(captured after the evidence commit itself landed, so this file appears in
+its own listing — the classification above was computed one commit earlier,
+on the implementation commit, which is the diff `approve` will re-classify.)
 
 `MODULE_RULES`'s `{kind:'prefix', value:'src/runner/'}` matches that file, so
 the requirement is fired by this item's own new code, not only by inherited
