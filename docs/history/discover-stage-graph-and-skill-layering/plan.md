@@ -365,3 +365,180 @@ for this reason: there are no candidate sibling pieces to compare.
 ## Outstanding questions
 
 None
+
+---
+
+# Plan: tsk-2yo — Chuyển phân loại tier/kind/risk xuống discovery, retire capacity submit-assist-classify
+
+Mode: **standard** (3 flags: public contracts — `fgos-coding-discovering/
+SKILL.md` and `submit/SKILL.md` are both live contracts other sessions/
+dispatches already depend on; existing covered behavior — `parseVerdictBlock`/
+`resolveDiscovery`/submit flow all have existing tests that must keep
+passing; weak proof around the area — the headless worker path cannot be
+exercised end-to-end by a unit test, only its parsing/application logic
+can be. No hard-gate flag fires: no auth/data-loss/audit-security/removed-
+validation, and the capacity retire is dead-config removal, not an
+external-provider integration change.)
+
+## Approach
+
+**Chosen path.** Implement both the interactive path (discovery skill
+judges + calls `fgos edit`) and the headless path (`fgos-verdict` schema
+extension) as ONE item, two ordered phases — not split into two child
+items. They are two delivery faces of the same D17 decision, share the
+same evidence-gathering step (discovery's own research pass already
+produces the judgment; only the APPLICATION mechanism differs by caller),
+and the item's own already-locked `verify` includes `npm test`, which
+already exercises both surfaces once tests are added for each. A split
+would add claim/commit coordination overhead for two pieces this tightly
+coupled, and neither piece is honestly "done" alone: an interactive-only
+delivery leaves unresolved the exact problem D17 names as the origin of
+the headless requirement ("worker bị cấm gọi fgos").
+
+**Alternatives rejected.**
+- *Split into 2 children.* Rejected for the coupling reason above — see
+  Chosen path.
+- *Route interactive tier/kind/risk through new `fgos discover --tier/
+  --kind/--risk` flags, unifying both paths through `resolveDiscovery`'s
+  `callerVerdict` instead of a separate `fgos edit` call.* Rejected: D17
+  (locked in `CONTEXT.md`) already fixes "đường tương tác thì skill tự
+  gọi `fgos edit`" as the mechanism. Overriding that here would reopen a
+  decision this skill does not have standing to reopen, not pick an
+  implementation detail left open.
+
+**Risk map.**
+
+| Component | How risky | Proof point (for `fgos-coding-validating`) |
+|---|---|---|
+| `fgos-coding-discovering/SKILL.md` classification logic | Medium — new judgment logic in a skill every coding-domain item passing through `discovery` loads | Item's own `grep -q "classification"` verify clause + `npm test` regression; this plan's own scout confirms only submit-originated items carry a real placeholder value to override (decompose children never reach `discovery` — `plan.mjs:829-844`) |
+| `submit/SKILL.md` step 7 removal + step 4 reword | Low-medium — public entry point other callers (`dogfood-fixture:submit`, cron/scripts) already route through; must not break the no-soul mechanical path | Item's own `! grep -q "live soul"` verify clause |
+| `fgos-verdict` fence schema extension (`loop.mjs`, `worker-prompt-discovery.txt`) | Medium — sole call site confirmed at `loop.mjs:1149-1150` → `resolveDiscovery` (GitNexus index is stale for this symbol — see below — cross-checked directly via `rg`; `test/runner/loop.test.mjs:1772` already covers `parseVerdictBlock`'s fail-safe contract with 6 assertions) | New, additive assertions in `test/runner/loop.test.mjs` for the new optional fields — must not touch the 6 existing assertions at lines 1774-1789 |
+| Capacity retire (`fgos tool remove --name submit-assist-classify`) | Low — D13 (locked) already confirmed nothing in the codebase queries it by capability | `npm test` regression only |
+
+**Files touched.** `.claude/skills/fgos-coding-discovering/SKILL.md`,
+`plugins/fgOS/skills/submit/SKILL.md`, `src/runner/loop.mjs`,
+`src/runner/prompt-templates/worker-prompt-discovery.txt`,
+`test/runner/loop.test.mjs` (new assertions only). The capacity retire is
+a runtime `fgos tool remove` action during Execute, not a source-file edit.
+
+**impact-analysis capability gate: degraded.** `fgos tool query
+--capability impact-analysis --status present` reports provider
+`gitnexus`, `status: "present"` — but the post-tool-use hook flagged the
+index stale (last indexed `4ce7a96`), and a direct `impact()` query for
+`parseVerdictBlock` (confirmed to exist by direct `Read`,
+`loop.mjs:574`) came back `Target 'parseVerdictBlock' not found` —
+the index predates this symbol. Cross-checked its real blast radius
+directly instead: `rg -n "parseVerdictBlock" src/runner/loop.mjs
+test/runner/*.mjs` finds exactly one call site (`loop.mjs:1149-1150`,
+inside `resolveDiscovery`'s caller) and one dedicated test block
+(`test/runner/loop.test.mjs:1772-1789`). The risk map above uses this
+live grep, not GitNexus, for this row.
+
+**Ordering.** Phase 1 (interactive) before Phase 2 (headless) — Phase 1
+needs zero net-new plumbing (`fgos edit --tier/--kind/--risk` already
+exists, confirmed at `bin/fgos.mjs:1432-1439`) and directly satisfies both
+of the item's own attached verify's grep clauses; Phase 2 is genuinely
+separable follow-on work with its own test surface. `fgos graph --json`/
+`--what-if` was not run for this ordering — this item is not split into
+children, so the question is purely internal-to-item sequencing, which
+those commands (cross-item unblock ranking) do not inform.
+
+## Shape (phased — mode standard)
+
+### Phase 1 — Interactive path: discovery judges, submit thins back down
+
+1. `.claude/skills/fgos-coding-discovering/SKILL.md`: remove the current
+   Non-goal note and its accompanying hard rule (both cite `tsk-2yo` by
+   name as the reason classification isn't handled there yet — this item
+   is that named follow-up). Add: after step 4 ("Tự phán") reaches a
+   `clear` verdict, before step 5's engine-verb call, judge `tier`/`kind`/
+   `risk` from the SAME research evidence already gathered (no new
+   research round) — read `kind`/`risk` vocab via
+   `classificationVocabulary(domain, 'kind'|'risk')`
+   (`src/state/workflow-stage-graphs.mjs:569-571`), `tier` against
+   `work.mjs`'s existing `TIERS`. If the judged values differ from the
+   item's current stored values, call `fgos edit <id> --tier <t> --kind
+   <k> --risk <r> --dir "$root"` before the `fgos discover --verdict
+   clear` call. An `unclear` verdict never judges classification — no
+   evidence gathered yet to judge from.
+2. `plugins/fgOS/skills/submit/SKILL.md`: delete step 7 in full (the
+   re-judge block, ~line 187 onward). Reword step 4's gate condition at
+   BOTH its two occurrences of the phrase (line 99: "a live soul is
+   running this"; line 112: "For a live soul:") so the literal phrase "a
+   live soul" no longer appears anywhere in the file (e.g. "a live
+   interactive session is running this" / "For a live interactive
+   session:") while keeping its function unchanged — the
+   `fgos-clarifying` pre-creation gate `tsk-qod` (delivered) put there is
+   unrelated to this item and stays. Confirmed via `rg -n "live soul"
+   --glob "*.{mjs,cjs,md,sh}" -g '!docs/history/**'` that no other file
+   in the repo depends on this exact phrase (the only other hits are an
+   unrelated idiom, "soul re-deriving what a live soul already knows", in
+   `plan.mjs`/`discovery.mjs`/an explanation doc — different words,
+   different meaning, not a grep target this item's verify touches).
+   Satisfies the item's own verify: `! grep -q "live soul" ...`.
+3. Optional, not verify-gated: a one-line comment in `src/intake/
+   classify.mjs` near the `classify()` docstring noting its output is now
+   a temp placeholder superseded by discovery's own judgment — code itself
+   unchanged (D12: "giữ nguyên code").
+4. `fgos tool remove --name submit-assist-classify --dir "$root"` —
+   retires the capacity. Keep the decision record (D13).
+
+### Phase 2 — Headless path: extend the fgos-verdict fence schema
+
+5. `src/runner/loop.mjs`: extend `parseVerdictBlock` (`loop.mjs:574-591`)
+   to also read optional `tier`/`kind`/`risk` string fields from the
+   parsed JSON — additive only; `verdict.clear`/`.verify`/`.question`
+   parsing stays byte-identical, malformed/absent stays `null` exactly as
+   today. Where `resolveDiscovery` is called from the runner
+   (`loop.mjs:1149-1150`), when a `clear` verdict carries any of `tier`/
+   `kind`/`risk`, apply them via `editWork` — the same "block overrides
+   win" idiom `captureDiscoveredWork` already uses (`loop.mjs:612-636`).
+   Never a second classification judgment inline in the runner — only
+   apply what the worker already reported.
+6. `src/runner/prompt-templates/worker-prompt-discovery.txt`: document the
+   new optional `tier`/`kind`/`risk` keys in the `fgos-verdict` fence
+   example (template already shows two example fences, lines 25 and 31).
+7. `test/runner/loop.test.mjs`: add assertions for `parseVerdictBlock`
+   parsing the new optional fields (additive to the block starting at
+   line 1772, never modifying the 6 existing assertions at lines
+   1774-1789), plus a test that a runner-resolved `clear` verdict carrying
+   `tier`/`kind`/`risk` actually applies them to the work item.
+
+## Concrete cases worth proving
+
+- Empty/boundary: a `clear` verdict (either path) carrying NO tier/kind/
+  risk override — item's existing values must stay untouched, byte-
+  identical to today's behavior.
+- Existing behavior that must not regress: `parseVerdictBlock`'s 6
+  existing fail-safe assertions (absent fence, malformed JSON, non-boolean
+  `clear`, last-block-wins) — all stay green, zero modification.
+- Malformed worker report: a `fgos-verdict` fence with a `tier`/`kind`/
+  `risk` value outside `classificationVocabulary` — must not corrupt the
+  item; dropped silently, mirroring `parseVerdictBlock`'s existing
+  "skip malformed" discipline.
+- Submit's no-soul path (steps 4 and 7 both skipped): an item created by a
+  no-soul caller still gets a valid, in-vocabulary `tier`/`kind`/`risk`
+  from `classify()`'s placeholder — unchanged, since `discovery` (not
+  `submit`) is now the only place re-judging happens.
+
+## Assumptions
+
+- ~~Rewording step 4's gate condition is a safe, behavior-preserving text
+  change~~ — **confirmed by `fgos-coding-validating`** (repo-wide `rg -n "live
+  soul" --glob "*.{mjs,cjs,md,sh}" -g '!docs/history/**'`): the only hits
+  outside `submit/SKILL.md`'s own three lines (99, 112, 187) are an
+  unrelated idiom ("soul re-deriving what a live soul already knows") in
+  `plan.mjs`, `discovery.mjs`, and one explanation doc — different words,
+  no coupling to submit's specific gate phrase. No longer an open
+  assumption.
+- **Remaining, pinned per `fgos-coding-planning`'s own rule**: an unrecognized
+  `tier`/`kind`/`risk` value inside a headless worker's `fgos-verdict`
+  fence should be dropped silently rather than blocking the discover
+  verdict from applying at all — assumed as the safer default (matches
+  `parseVerdictBlock`'s existing "malformed → skip" discipline for the
+  whole fence), not confirmed against a product-level ruling.
+  `fgos-coding-implement` carries this forward as a constraint on Phase 2.
+
+## Outstanding questions
+
+None
