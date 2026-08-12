@@ -53,6 +53,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   convention (no launcher ships a default ceiling past `awaiting-approval`)
   rather than by the driver refusing structurally.
 
+### Fixed
+
+- `fgos check`'s entropy report no longer under-counts the backlog waiting
+  at the front of the lifecycle. The signal filtered on the literal stage
+  name `clarify`, which the coding domain retired entirely, so it reported
+  0 forever while every open item genuinely parked at the domain's real
+  entry stage (`discovery`) went uncounted. It now resolves each item's own
+  domain entry stage, and the row is labelled `stage-entry` instead of
+  `stage-clarify` to match what it actually counts.
+
 ### Removed
 
 - The `orchestrator` word ban (`test/docs/launcher-vocabulary-guard.test.mjs`
