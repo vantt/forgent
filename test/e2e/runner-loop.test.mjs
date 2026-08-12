@@ -430,8 +430,12 @@ test('e2e stage-decompose (b) complex item: an explicit decompose --verdict deco
 
   // Accept childA into the tree (human close via the normal `done` door) —
   // walk the sequential delivered->retrospective->cleanup->done chain
-  // (work-item-status-delivered-retrospective-cleanup D1/D2/D10).
-  assert.equal(fgos(repoRoot, ['move', childA.id, '--to', 'delivered']).status, 0);
+  // (work-item-status-delivered-retrospective-cleanup D1/D2/D10). This
+  // proves the FSM lifecycle chain itself, not merge mechanics — childA's
+  // own real fgw/<id> branch is deliberately never merged onto trunk here,
+  // so tsk-5dk's move-refusal check needs --override-reason (its intended
+  // escape hatch for exactly this kind of non-merge delivery).
+  assert.equal(fgos(repoRoot, ['move', childA.id, '--to', 'delivered', '--override-reason', 'e2e fixture: lifecycle-chain test, not a real merge']).status, 0);
   assert.equal(fgos(repoRoot, ['move', childA.id, '--to', 'retrospective']).status, 0);
   assert.equal(fgos(repoRoot, ['move', childA.id, '--to', 'cleanup']).status, 0);
   assert.equal(fgos(repoRoot, ['move', childA.id, '--to', 'done']).status, 0);
@@ -443,8 +447,9 @@ test('e2e stage-decompose (b) complex item: an explicit decompose --verdict deco
   assert.equal(view.work[childB.id].status, 'awaiting-approval');
   assert.equal(view.work[submitted.id].status, 'todo', 'the root is still blocked — childB is proposed, not done, yet');
 
-  // childB walks the same sequential chain before done.
-  assert.equal(fgos(repoRoot, ['move', childB.id, '--to', 'delivered']).status, 0);
+  // childB walks the same sequential chain before done (same non-merge
+  // override reasoning as childA above).
+  assert.equal(fgos(repoRoot, ['move', childB.id, '--to', 'delivered', '--override-reason', 'e2e fixture: lifecycle-chain test, not a real merge']).status, 0);
   assert.equal(fgos(repoRoot, ['move', childB.id, '--to', 'retrospective']).status, 0);
   assert.equal(fgos(repoRoot, ['move', childB.id, '--to', 'cleanup']).status, 0);
   assert.equal(fgos(repoRoot, ['move', childB.id, '--to', 'done']).status, 0);

@@ -107,14 +107,26 @@ process.exit(0);`,
 }
 
 /** A fake serving both `pr view` (settled) and `pr merge` (exit `mergeExit`,
- * with `mergeStderr` on failure). */
-function writeMergeFake(dir, mergeExit, mergeStderr = '') {
+ * with `mergeStderr` on failure). `mergeCommitOid`, when given, is attached
+ * to every `pr view` response's `mergeCommit` field (tsk-5dk D2) — real
+ * GitHub only populates it post-merge, but this fake does not model
+ * call-order differences any more than `SETTLED_VIEW` already does, and
+ * `mergeGitHubPR` only ever reads the field off its post-merge call. */
+function writeMergeFake(dir, mergeExit, mergeStderr = '', mergeCommitOid = null) {
   return writeFakeGh(
     dir,
     'gh-merge.cjs',
     `const args = process.argv.slice(2);
 if (args[0] === 'pr' && args[1] === 'view') {
-  process.stdout.write(${JSON.stringify(SETTLED_VIEW)});
+  process.stdout.write(JSON.stringify({
+    state: 'OPEN',
+    mergeable: 'MERGEABLE',
+    mergeStateStatus: 'CLEAN',
+    mergedAt: null,
+    closed: false,
+    closedAt: null,
+    mergeCommit: ${mergeCommitOid ? JSON.stringify({ oid: mergeCommitOid }) : 'null'},
+  }));
   process.exit(0);
 }
 if (args[0] === 'pr' && args[1] === 'merge') {
@@ -241,7 +253,23 @@ test('viewGitHubPRStatus resolves blocked/status (not throw) when gh fails', asy
 test('mergeGitHubPR resolves merged/merge when the merge call exits 0', async () => {
   const ghCommand = writeMergeFake(mkTempDir(), 0);
   const result = await mergeGitHubPR(mkTempDir(), 3, { ghCommand, pollIntervalMs: 5, pollTimeoutMs: 200 });
-  assert.deepEqual(result, { outcome: 'merged', step: 'merge', prNumber: 3 });
+  assert.deepEqual(result, { outcome: 'merged', step: 'merge', prNumber: 3, mergeCommit: null });
+});
+
+// --- mergeGitHubPR: mergeCommit (tsk-5dk D2) --------------------------------
+
+test('mergeGitHubPR reads mergeCommit off its post-merge status read when gh provides it', async () => {
+  const ghCommand = writeMergeFake(mkTempDir(), 0, '', 'deadbeefcafe0123456789');
+  const result = await mergeGitHubPR(mkTempDir(), 3, { ghCommand, pollIntervalMs: 5, pollTimeoutMs: 200 });
+  assert.equal(result.outcome, 'merged');
+  assert.deepEqual(result.mergeCommit, { oid: 'deadbeefcafe0123456789' });
+});
+
+test('mergeGitHubPR resolves mergeCommit undefined (not a throw) when the post-merge status read never settles it', async () => {
+  const ghCommand = writeMergeFake(mkTempDir(), 0); // no mergeCommitOid — gh never attaches one
+  const result = await mergeGitHubPR(mkTempDir(), 3, { ghCommand, pollIntervalMs: 5, pollTimeoutMs: 200 });
+  assert.equal(result.outcome, 'merged');
+  assert.equal(result.mergeCommit, null);
 });
 
 test('mergeGitHubPR resolves blocked/merge (never a distinct conflict outcome) on a merge failure', async () => {
