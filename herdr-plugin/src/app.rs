@@ -292,6 +292,22 @@ pub struct App {
     /// clears it, whereas the pane label it replaces could stay stuck
     /// forever.
     pub pending_worker_panes: HashSet<String>,
+    /// The one auto-discover pane this dashboard has launched but not yet
+    /// seen claim land, if any (tsk-3q8z). `discovery_worker_alive` only
+    /// answers true once the launched session actually runs `fgos take`/
+    /// `fgos discover` against its item, so between launch and that claim
+    /// the poll-tick auto-discover condition (`main.rs::run`) would
+    /// otherwise re-fire every tick for the whole boot+claim window.
+    /// Deliberately separate from `pending_worker_panes` above: that set is
+    /// shared with the execution lane's own launches, and gating
+    /// auto-discover on "any pending pane at all" would wrongly block a
+    /// fresh discover launch behind an unrelated execution-lane one. Only
+    /// ever holds at most one pane id, since `next_auto_discover_candidate`
+    /// picks at most one candidate per tick. Same in-process, never-
+    /// persisted discipline as `pending_worker_panes` — a herdr-plugin
+    /// restart clears it, which is correct: nothing this adapter believed
+    /// about an in-flight launch survives a restart either.
+    pub pending_discover_pane: Option<String>,
 }
 
 impl App {
@@ -324,6 +340,7 @@ impl App {
             orchestrator_settings: OrchestratorSettings::default(),
             operation_panes: None,
             pending_worker_panes: HashSet::new(),
+            pending_discover_pane: None,
         }
     }
 
@@ -636,6 +653,7 @@ impl App {
             orchestrator_settings: OrchestratorSettings::default(),
             operation_panes: None,
             pending_worker_panes: HashSet::new(),
+            pending_discover_pane: None,
         }
     }
 
@@ -791,31 +809,64 @@ impl App {
                     task.pane = map.get(&task.id).cloned();
                 }
                 self.retire_settled_pending_panes(&panes);
+                self.retire_settled_pending_discover_pane();
                 self.last_error = None;
             }
             Err(err) => self.last_error = Some(err.to_string()),
         }
     }
 
-    /// A pending pane stops being pending the moment it carries an
-    /// id-shaped label: that write only happens from inside the launched
-    /// session (D5), so seeing it is proof the worker booted and claimed.
-    /// A pane that vanished from the scan entirely is dropped too — a
-    /// closed pane is nothing to hold open for.
+    /// A pending pane stops being pending once it settles: gone from the
+    /// scan entirely (a closed pane is nothing to hold open for), or
+    /// carrying a label whose task id the engine actually reports at
+    /// `doing` — that write only happens from inside a launched session
+    /// (D5) that has genuinely claimed its item, which is the real proof
+    /// the worker booted (tsk-3q8z). A pane that carries a label for an id
+    /// that is NOT `doing` stays pending: on a REUSED pane, the previous
+    /// occupant's stale label is still sitting there the instant the new
+    /// worker's pane is opened, before the new worker has booted at all —
+    /// checking against `doing_item_ids()` here (not just "any label at
+    /// all") is what keeps that stale label from retiring the pane one
+    /// tick too early and letting herdr stack a second launch on top of
+    /// the first.
     fn retire_settled_pending_panes(&mut self, panes: &[PaneSnapshot]) {
         let labeled = task_id_map(panes);
+        let doing: HashSet<&str> = self
+            .work_items
+            .iter()
+            .filter(|item| item.status == "doing")
+            .map(|item| item.id.as_str())
+            .collect();
         let still_pending: HashSet<String> = self
             .pending_worker_panes
             .iter()
             .filter(|pane_id| panes.iter().any(|pane| pane.pane_id == **pane_id))
             .filter(|pane_id| {
-                !labeled
-                    .values()
-                    .any(|identity| identity.pane_id == **pane_id)
+                match labeled.iter().find(|(_, identity)| identity.pane_id == **pane_id) {
+                    None => true,
+                    Some((task_id, _)) => !doing.contains(task_id.as_str()),
+                }
             })
             .cloned()
             .collect();
         self.pending_worker_panes = still_pending;
+    }
+
+    /// Clears `pending_discover_pane` once it settles (tsk-3q8z). Reuses
+    /// `retire_settled_pending_panes`'s own "gone from scan, or claimed and
+    /// doing" verdict rather than re-deriving it: every pane
+    /// `launch_worker` opens — including an auto-discover launch — is
+    /// inserted into `pending_worker_panes` too, so once this pane id is no
+    /// longer present there, it has already settled by the same rule.
+    /// Called right after `retire_settled_pending_panes` in the same
+    /// `refresh_pane_state` pass, so both fields stay consistent within one
+    /// poll tick.
+    fn retire_settled_pending_discover_pane(&mut self) {
+        if let Some(pane_id) = &self.pending_discover_pane {
+            if !self.pending_worker_panes.contains(pane_id) {
+                self.pending_discover_pane = None;
+            }
+        }
     }
 
     /// The ids the engine currently reports at `status: doing` — the
@@ -1201,5 +1252,122 @@ mod tests {
             })
         );
         assert_eq!(app.in_process[1].pane, None);
+    }
+
+    struct FixedLabelRegistry(Vec<PaneSnapshot>);
+
+    impl PaneRegistry for FixedLabelRegistry {
+        fn scan_panes(&self) -> Result<Vec<PaneSnapshot>, crate::pane_scan::PaneScanError> {
+            Ok(self.0.clone())
+        }
+
+        fn has_labeled_pane(&self, _label: &str) -> Result<bool, crate::pane_scan::PaneScanError> {
+            Ok(false)
+        }
+    }
+
+    /// tsk-3q8z defect 1: a REUSED pane still carries the previous
+    /// occupant's label the instant it is scanned, before the new worker
+    /// boots. That stale label's task id is no longer `doing` (the old
+    /// item already moved on), so the pane must stay pending — retiring it
+    /// here is exactly the bug that let herdr stack a second launch on top.
+    #[test]
+    fn retire_settled_pending_panes_keeps_a_reused_panes_stale_label_pending() {
+        let mut app = App::empty();
+        app.pending_worker_panes.insert("wS:pReused".to_string());
+        // No item is `doing` -- the old occupant already returned.
+        let registry = FixedLabelRegistry(vec![PaneSnapshot {
+            pane_id: "wS:pReused".into(),
+            tab_id: "wS:t1".into(),
+            label: Some("tsk-old-occupant".into()),
+            focused: false,
+        }]);
+
+        app.refresh_pane_state(&registry);
+
+        assert!(
+            app.pending_pane_ids().contains(&"wS:pReused".to_string()),
+            "a pane labeled with a non-doing id must stay pending, not retire"
+        );
+    }
+
+    /// The fresh-claim case: once the label's task id IS `doing`, the pane
+    /// has genuinely settled and retires.
+    #[test]
+    fn retire_settled_pending_panes_drops_a_pane_once_its_label_is_doing() {
+        let mut app = App::empty();
+        app.pending_worker_panes.insert("wS:pNew".to_string());
+        app.refresh_from_fgos(&FakeSource {
+            triage: vec![triage_row("tsk-new-claim", "doing", Some(1))],
+        });
+        let registry = FixedLabelRegistry(vec![PaneSnapshot {
+            pane_id: "wS:pNew".into(),
+            tab_id: "wS:t1".into(),
+            label: Some("tsk-new-claim".into()),
+            focused: false,
+        }]);
+
+        app.refresh_pane_state(&registry);
+
+        assert!(
+            !app.pending_pane_ids().contains(&"wS:pNew".to_string()),
+            "a pane labeled with a doing id has genuinely settled and must retire"
+        );
+    }
+
+    /// A pane that vanished from the scan entirely (closed) still retires,
+    /// same as before this fix.
+    #[test]
+    fn retire_settled_pending_panes_drops_a_pane_that_vanished_from_the_scan() {
+        let mut app = App::empty();
+        app.pending_worker_panes.insert("wS:pGone".to_string());
+        let registry = FixedLabelRegistry(vec![]);
+
+        app.refresh_pane_state(&registry);
+
+        assert!(!app.pending_pane_ids().contains(&"wS:pGone".to_string()));
+    }
+
+    /// tsk-3q8z defect 2: `pending_discover_pane` settles by the same rule
+    /// as `pending_worker_panes` -- once the pane id it names is no longer
+    /// tracked there (gone from the scan, or its label resolved to a real
+    /// `doing` claim), it clears too.
+    #[test]
+    fn retire_settled_pending_discover_pane_clears_once_the_shared_pane_settles() {
+        let mut app = App::empty();
+        app.pending_worker_panes.insert("wS:pDiscover".to_string());
+        app.pending_discover_pane = Some("wS:pDiscover".to_string());
+        // The pane vanished from the scan -- retire_settled_pending_panes
+        // drops it from pending_worker_panes, and the discover-specific
+        // field must follow.
+        let registry = FixedLabelRegistry(vec![]);
+
+        app.refresh_pane_state(&registry);
+
+        assert_eq!(app.pending_discover_pane, None);
+    }
+
+    /// While the shared pane is still genuinely pending, the discover-
+    /// specific field must not clear early.
+    #[test]
+    fn retire_settled_pending_discover_pane_stays_set_while_the_shared_pane_is_still_pending() {
+        let mut app = App::empty();
+        app.pending_worker_panes.insert("wS:pDiscover".to_string());
+        app.pending_discover_pane = Some("wS:pDiscover".to_string());
+        let registry = FixedLabelRegistry(vec![PaneSnapshot {
+            pane_id: "wS:pDiscover".into(),
+            tab_id: "wS:t1".into(),
+            label: Some("fgos-auto-discover-tsk-2ja".into()),
+            focused: false,
+        }]);
+
+        app.refresh_pane_state(&registry);
+
+        assert_eq!(
+            app.pending_discover_pane,
+            Some("wS:pDiscover".to_string()),
+            "the synthetic auto-discover label never maps to a real task id, so it never appears \
+             in doing_item_ids() -- the pane must stay pending until the real launched session claims"
+        );
     }
 }

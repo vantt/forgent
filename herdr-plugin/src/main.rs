@@ -491,13 +491,23 @@ fn run(
             // (person-initiated actions only), never retried within the
             // same tick, never queued; a fresh read next tick is the only
             // retry.
+            //
+            // tsk-3q8z: `discovery_worker_alive` only becomes true once the
+            // launched session actually claims its item (`fgos take`/
+            // `fgos discover`), which leaves the whole boot+claim window
+            // (roughly 10-60s) where both conjuncts above stay true —
+            // without `pending_discover_pane.is_none()` this would re-fire
+            // every tick and stack launches into the same pane.
             if app.orchestrator_settings.auto_discover
                 && !discovery_worker_alive(&app.work_items)
+                && app.pending_discover_pane.is_none()
                 && next_auto_discover_candidate(&app.work_items).is_some()
             {
-                let _ = launch_worker(app, root, |lane| {
+                if let Ok(pane_id) = launch_worker(app, root, |lane| {
                     pane_orchestrator.open_auto_discover_pane(lane)
-                });
+                }) {
+                    app.pending_discover_pane = Some(pane_id);
+                }
             }
             // tsk-57q: same tick, so the guard check and the launch it
             // gates never straddle two ticks (poll-tick race risk row,
@@ -1872,6 +1882,69 @@ mod tests {
             0,
             "a discovery worker the engine reports at `doing` must stop a \
              second unattended launch, even with no pane label in sight"
+        );
+    }
+
+    struct StillOpenPendingPaneRegistry {
+        pane_id: &'static str,
+    }
+
+    impl PaneRegistry for StillOpenPendingPaneRegistry {
+        fn scan_panes(&self) -> Result<Vec<PaneSnapshot>, PaneScanError> {
+            // The launched pane is still open but unlabeled -- the shape a
+            // real boot-window scan takes before the new session claims
+            // and labels its own pane.
+            Ok(vec![PaneSnapshot {
+                pane_id: self.pane_id.to_string(),
+                tab_id: "wS:t9".into(),
+                label: None,
+                focused: false,
+            }])
+        }
+
+        fn has_labeled_pane(&self, _label: &str) -> Result<bool, PaneScanError> {
+            Ok(false)
+        }
+    }
+
+    /// tsk-3q8z defect 2: between an auto-discover launch and the launched
+    /// session's own claim landing, `discovery_worker_alive` stays false
+    /// (nothing is `doing` yet) and the candidate item stays `todo` — the
+    /// exact boot window that used to re-fire a launch every tick.
+    /// `pending_discover_pane` must stop the second launch even though
+    /// neither of the other two conjuncts changed.
+    #[test]
+    fn auto_discover_skips_during_the_boot_window_when_a_discover_pane_is_already_pending() {
+        let mut ui = QuitAfterOneTick { calls: Cell::new(0) };
+        let mut app = App::empty();
+        app.orchestrator_settings.auto_discover = true;
+        app.work_items = vec![discovery_todo_item("tsk-b")];
+        app.pending_worker_panes.insert("wS:pPendingDiscover".to_string());
+        app.pending_discover_pane = Some("wS:pPendingDiscover".to_string());
+        let registry = StillOpenPendingPaneRegistry { pane_id: "wS:pPendingDiscover" };
+        let pane_orchestrator = RecordingPickOrchestrator {
+            picked: std::cell::RefCell::new(Vec::new()),
+            discovered: std::cell::RefCell::new(Vec::new()),
+            auto_discovered: std::cell::RefCell::new(0),
+            merge_launched: std::cell::RefCell::new(Vec::new()),
+            retro_launched: std::cell::RefCell::new(Vec::new()),
+            cleanup_launched: std::cell::RefCell::new(Vec::new()),
+        };
+
+        run(&mut ui, &mut app, None, Some(&registry), &pane_orchestrator, Duration::ZERO, None)
+            .expect("run should exit cleanly on Quit");
+
+        assert_eq!(
+            *pane_orchestrator.auto_discovered.borrow(),
+            0,
+            "a pending, not-yet-claimed auto-discover pane must stop a second launch during \
+             the boot window, even though discovery_worker_alive and the candidate check alone \
+             would both still allow one"
+        );
+        assert_eq!(
+            app.pending_discover_pane,
+            Some("wS:pPendingDiscover".to_string()),
+            "the pending pane is still open and unlabeled -- it must stay tracked, not clear early"
         );
     }
 
