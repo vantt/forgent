@@ -4,21 +4,21 @@ Item: `tsk-2sj`.
 
 ## 1. Trạng thái hiện tại
 
-Hết vòng 2. Ba D-ID đầu đã chốt (§4): tên khái niệm là **worker slot**,
-engine sở hữu sự thật về "đang chạy gì" (nhãn không bao giờ gánh state),
-và rename + slot là một feature không tách đôi.
+Hết vòng 3. Bốn D-ID đã chốt (§4): tên khái niệm là **worker slot**;
+engine sở hữu sự thật về "đang chạy gì" và nhãn không bao giờ gánh state;
+rename + slot là một feature; và **hai lane riêng biệt**, lane admin có
+chỗ dành riêng vì merge nằm thượng nguồn của mọi claim execution mới.
 
-Vòng 2 làm sắc lại ranh giới quan trọng nhất: **cơ chế thực thi giữ khác
-nhau, phần đếm và phần chọn thì thống nhất**. Ba launcher là ba năng lực
-thực thi ở quy mô khác nhau và vẫn khác nhau; nhưng "đang chạy cái gì" và
-"tiếp theo nên là cái gì" phải là một câu trả lời duy nhất của engine, và
-cả ba đều tuân thủ tổng trần của engine.
+Vòng 3 chốt thêm ba điểm (chưa mint, chờ vòng sau xác nhận, nhưng coi như
+đã ngã ngũ — sẽ không mở lại): hình dạng của "thống nhất" là **(b)** —
+giữ nguyên 6 picker theo pool, engine thêm lớp gác trần, launcher xin
+slot trước khi dựng; **trần đếm theo work-item**; và "du di" nghĩa là cho
+phép vượt trần một biên nhỏ để khỏi phải bẻ một mẻ việc thành hai wave.
 
-Còn mở, và là thứ quyết định phạm vi thật của đợt này: engine trả lời
-"tiếp theo là gì" theo kiểu nào — một ranker toàn cục xuyên mọi pool, hay
-mỗi launcher hỏi cho pool của mình còn engine chỉ gác tổng trần (§3 Q8).
-Cùng với đó là cách hiểu cụ thể của "trần mềm, du di phía trên" (§3 Q7),
-em đã có đề xuất kèm bằng chứng, chờ anh xác nhận.
+Còn mở: Q5 — cơ chế rename đặt ở đâu. Em có một đề xuất *khác* với ý ban
+đầu của anh, suy ra trực tiếp từ chính D2 anh đã chốt: nhãn trở thành
+phép chiếu thuần của state, không skill nào gọi rename nữa (§5 vòng 3,
+F6). Cùng với đó là biên du di cụ thể (Q10).
 
 ## 2. Mục tiêu & đề bài
 
@@ -41,224 +41,258 @@ tên đúng khái niệm chứ không phải sơn phết.
 
 | # | Vấn đề | Trạng thái | Ghi chú |
 |---|--------|-----------|---------|
-| Q1 | Gọi khái niệm mới là gì | **rõ** | → D1: `worker slot`. `capacity` bị loại vì đụng `0026` |
-| Q2 | Phạm vi: một hay ba launcher | **rõ** | Cả ba tuân thủ tổng trần engine. Cơ chế thực thi giữ riêng |
-| Q3 | Nguồn chân lý cho occupancy | **rõ** | → D2: state fgOS. Tái dùng tín hiệu của `tsk-3ni` |
-| Q4 | Nhãn/label có được gánh state không | **rõ** | → D2: không, tuyệt đối |
-| Q5 | Rename ở `fgos-coding-driving` hay chỗ khác | **chưa rõ** | Căng thẳng với hard rule "purely mechanical loop" của chính skill đó. Chưa bàn lại từ vòng mở màn |
-| Q6 | `fg:operation` 2 pane → 4 pane | **rõ về số** | 3 loại hành chính hôm nay (merge/retro/cleanup) + 1 thủ sẵn. Là supersede tsk-5lr D2, nhận diện theo hình học biến mất |
-| Q7 | "Trần mềm, du di phía trên" nghĩa cụ thể là gì | **chưa rõ** | Em đề xuất: hai lane, admin là phần du di và không bao giờ bị execution chiếm chỗ. Bằng chứng ở §5 vòng 2 F5 |
-| Q8 | "Tiếp theo là gì" — ranker toàn cục xuyên pool, hay mỗi launcher hỏi pool của mình | **chưa rõ** | Quyết định phạm vi thật của đợt này |
-| Q9 | Trần đếm theo cái gì | **chưa rõ** | Slot (chỗ đứng) hay tiến trình `claude` thật? Ba launcher tốn tài nguyên rất khác nhau cho cùng "1 slot" |
+| Q1 | Gọi khái niệm mới là gì | **rõ** | → D1: `worker slot` |
+| Q2 | Phạm vi: một hay ba launcher | **rõ** | Cả ba tuân thủ tổng trần engine; cơ chế thực thi giữ riêng |
+| Q3 | Nguồn chân lý cho occupancy | **rõ** | → D2: state fgOS, tái dùng tín hiệu `tsk-3ni` |
+| Q4 | Nhãn có được gánh state không | **rõ** | → D2: không, tuyệt đối |
+| Q5 | Rename đặt ở đâu | **chưa rõ** | Ý ban đầu: `fgos-coding-driving`. Đề xuất mới của em: không skill nào cả — nhãn là phép chiếu của state (F6) |
+| Q6 | `fg:operation` 4 pane | **rõ** | 3 loại admin hôm nay + 1 thủ sẵn. Supersede `tsk-5lr` D2 |
+| Q7 | "Du di phía trên" nghĩa gì | **rõ (chờ xác nhận)** | Cho phép vượt trần một biên nhỏ để khỏi bẻ mẻ việc thành 2 wave. Ưu tiên ship faster |
+| Q8 | Ranker toàn cục hay gác trần | **rõ (chờ xác nhận)** | **(b)** — giữ 6 picker, engine gác trần, launcher xin slot trước khi dựng. (a) để lại |
+| Q9 | Trần đếm theo cái gì | **rõ (chờ xác nhận)** | Theo **work-item** |
+| Q10 | Biên du di cụ thể là bao nhiêu | **chưa rõ** | Mới phát sinh từ Q7. Cố định? Theo tỉ lệ? Chỉ cho phép trong một mẻ? |
 
 ## 4. Quyết định đã chốt
 
 | D-ID | Quyết định |
 |------|-----------|
-| D1 | Khái niệm là **worker slot** — 1 worker slot = chỗ đứng của đúng 1 rootTask (đơn vị work item lớn nhất). Loại bỏ từ `capacity` cho khái niệm này, vì `docs/decisions/0026:73-87` đã khoá `capacity` với nghĩa khác hẳn (đơn vị helper hẹp như `judge-discovery`, không mang vòng đời rootTask đầy đủ) và nói rõ subTask với capacity không gộp làm một. `worker` giữ liên mạch với `fg:workers-N`, và tách đúng *chỗ* (slot) khỏi *cái chiếm chỗ* (worker). |
-| D2 | **Engine sở hữu sự thật về "đang chạy gì"** — occupancy là state fgOS, không phải state của tool/launcher. Hệ quả bắt buộc: nhãn/label của pane KHÔNG BAO GIỜ được gánh state của orchestrator; nhãn chỉ để cho người đọc. Khớp hard rule của `docs/operator-runbook-herdr-cockpit.md` (sinh từ bug production thật "idle killed an agent"). Cơ chế thay thế đã có sẵn: `tsk-3ni` D1/D4. |
-| D3 | Cơ chế rename/label và khái niệm worker slot là **một feature**, không tách đôi; và **không vá tạm** bug `fgos-auto-discover` đang sống — để thiết kế nuốt luôn. |
+| D1 | Khái niệm là **worker slot** — 1 worker slot = chỗ đứng của đúng 1 rootTask (đơn vị work item lớn nhất). Loại bỏ từ `capacity`, vì `docs/decisions/0026:73-87` đã khoá từ đó với nghĩa khác hẳn (đơn vị helper hẹp, không mang vòng đời rootTask) và nói rõ subTask với capacity không gộp làm một. `worker` giữ liên mạch với `fg:workers-N`, tách đúng *chỗ* khỏi *cái chiếm chỗ*. |
+| D2 | **Engine sở hữu sự thật về "đang chạy gì"** — occupancy là state fgOS, không phải state của tool/launcher. Hệ quả bắt buộc: nhãn/label KHÔNG BAO GIỜ được gánh state của orchestrator; nhãn chỉ để cho người đọc. Khớp hard rule của `docs/operator-runbook-herdr-cockpit.md`. Cơ chế thay thế đã có sẵn: `tsk-3ni` D1/D4. |
+| D3 | Cơ chế rename/label và khái niệm worker slot là **một feature**, không tách đôi; và **không vá tạm** bug `fgos-auto-discover` đang sống. |
+| D4 | **Hai lane riêng biệt** — execution (discovery/plan/implement) và admin (merge/retro/cleanup). Lane admin có chỗ dành riêng, không bao giờ bị execution chiếm chỗ. Lý do cấu trúc: `claim-port.mjs:160-167` từ chối claim một lá có dep chưa `done`, nên merge nằm thượng nguồn của mọi claim execution mới; xếp chung pool sẽ tự khoá. Cấu trúc này đã tồn tại trong code (`fg:operation` không nằm trong cap của `fg:agents-N`), thiết kế chỉ tổng quát hoá. |
 
-Cả ba đã ghi vào event log qua `fgos decision --id tsk-2sj` (seq 14352,
-14353, 14354).
+Đã ghi vào event log qua `fgos decision --id tsk-2sj` (seq 14352, 14353,
+14354, 14362).
 
 ## 5. Q&A log
 
 ### 2026-08-12 — Vòng mở màn (người dùng nêu đề bài)
 
-Người dùng nêu 2 mảng cần bàn:
+Hai mảng: (1) cơ chế rename pane phải thành hexagon có capability-gate,
+đề xuất đặt ở `fgos-coding-driving`, mở để bàn chuyện tự rename và bỏ
+rename; (2) khái niệm work-capacity tổng quát — bao nhiêu slot cho mỗi
+loại việc và cách phân bổ, với quan sát rằng có 2 loại work-item (đơn vị
+thực hiện và đơn vị quản trị hành chính), và mong muốn đổi `fg:agents-N`
+thành `fg:workers-N`.
 
-1. Cơ chế rename pane phải thành hexagon (port/adapter + capability-gate
-   qua tool registry), vì có thể đổi tool không dùng herdr. Đề xuất đặt ở
-   `fgos-coding-driving` vì đó là driver tổng, biết id sớm nhất, làm một
-   lần thay cho N launcher. Mở để bàn: có support tự rename và bỏ rename.
-2. Khái niệm work-capacity tổng quát: bao nhiêu slot cho mỗi loại việc và
-   cách phân bổ. Quan sát của người dùng: có 2 loại work-item — đơn vị
-   thực hiện (discovery/plan/implement) và đơn vị quản trị hành chính
-   (merge/retro/cleanup). Với herdr: hành chính mỗi loại 1 đơn vị chạy một
-   lúc, chia ngẫu nhiên vào 1 trong 4 pane tab `fg:operation`; loại còn
-   lại chia ngẫu nhiên vào pane thuộc `fg:agents-N`, muốn đổi thành
-   `fg:workers-N`.
-
-Ba trả lời nhanh của người dùng ở cùng vòng này:
-
-- Occupancy lấy chân lý từ state fgOS; adapter chỉ xếp chỗ và báo id;
-  lệch thì engine thắng, adapter reconcile.
-- Gộp 2 mảng thành 1 feature, vì rename chỉ sạch khi nhãn hết gánh state.
-- Không vá tạm bug đang sống, để thiết kế nuốt luôn.
+Ba trả lời nhanh cùng vòng: occupancy lấy chân lý từ state fgOS; gộp 2
+mảng thành 1 feature; không vá tạm bug đang sống.
 
 ### 2026-08-12 — Vòng 1, scout
 
 **F1 — `capacity` là thuật ngữ đã khoá, nghĩa khác hẳn.**
-`docs/decisions/0026:73-87` chốt `capacity` = "đơn vị functional/helper
-hẹp (judge-discovery, submit-assist-classify) — không tự mang vòng đời 1
-rootTask đầy đủ", và nói rõ subTask với capacity KHÔNG gộp làm một. Thứ
-người dùng đang mô tả (chỗ đứng cho một việc có vòng đời đầy đủ) trong
-vocabulary 0026 chính là chỗ chứa một **rootTask**. Cùng doc,
-`0026:49-52` đã nêu đích danh `herdr-plugin` như một **launcher** tiềm
-năng. → thành D1.
+`docs/decisions/0026:73-87`. → thành D1.
 
 **F2 — Đã có BA trần song song độc lập, không cái nào biết cái kia.**
 
 | Launcher | Trần | Khai ở đâu | Thuật toán xếp |
 |---|---|---|---|
 | `fgos-runner` (headless) | `maxRoots × maxLeavesPerRoot`, mặc định 4×4 | `runner.parallel` trong config, validate lúc load (`loop.mjs:126-150`) | `selectWave`, FIFO theo root (`loop.mjs:158-170`) |
-| `fgos-fanout` (Agent trong session) | 5 Agent/wave, hard cap | văn xuôi D7 trong SKILL.md (`fgos-fanout/SKILL.md:62-66`) | `computeSchedule`, xếp wave tránh đụng footprint (`graph-metrics.mjs:736`) |
-| `herdr-plugin` (pane) | 8 pane (4×2) | hằng số Rust (`layout.rs:10,14`) | `find_agents_tab_with_room`, tab nhỏ số nhất còn chỗ |
+| `fgos-fanout` (Agent trong session) | 5 Agent/wave, hard cap | văn xuôi D7 trong SKILL.md (`fgos-fanout/SKILL.md:62-66`) | `computeSchedule`, tránh đụng footprint (`graph-metrics.mjs:736`) |
+| `herdr-plugin` (pane) | 8 pane (4×2) | hằng số Rust (`layout.rs:10,14`) | `find_agents_tab_with_room` |
 
-Ba nơi khai báo, ba thuật toán, không chung từ vựng. Và chúng chạy được
-ĐỒNG THỜI: runner có lock riêng (`runner.lock`, `EXIT_BUSY`) nhưng
-auto-launcher của herdr không hề tra lock đó, còn fanout chạy trong
-session. Trần thật ở mức máy hôm nay là tổng của cả ba, không ai quản.
+Ba nơi khai báo, ba thuật toán, không chung từ vựng — và chạy đồng thời
+được, nên trần thật ở mức máy là tổng của cả ba, không ai quản.
 
-**F3 — Cơ chế "engine là chân lý" đã được thiết kế sẵn, tái dùng được.**
-`session-claim-liveness` (`tsk-3ni`) đã chốt: D1 tín hiệu sống = hoạt
-động sửa file thật trong worktree, KHÔNG phải PID/heartbeat, KHÔNG phải
-tuổi claim; D4 công thức = `max(git log -1 %ct trên fgw/<id>, mtime mới
-nhất trong danh sách git status --porcelain)`; D3 ngưỡng tái dùng thẳng
-`/fgOS:stale` (`agentMs` 15 phút, `humanMs` 24 giờ). → thành D2.
+**F3 — Cơ chế "engine là chân lý" đã thiết kế sẵn.** `tsk-3ni` D1/D4/D3:
+tín hiệu sống = hoạt động sửa file thật trong worktree, công thức
+`max(git log -1 %ct, mtime mới nhất trong git status --porcelain)`,
+ngưỡng tái dùng `/fgOS:stale`. → thành D2.
 
-**F4 — `fg:operation` 2 pane là quyết định đã khoá, không phải thiếu sót.**
-`herdr-operation-tab-layout` (`tsk-5lr`) D2 chốt nhận diện trái/phải bằng
-hình học (`x` nhỏ nhất = trái = merge-loop; còn lại = retro/cleanup), kèm
-"pinned assumption": tab không đúng 2 pane là trạng thái lỗi/không hỗ
-trợ, "revisit only if it's hit in practice". Muốn 4 pane là **supersede**
-D2 đó.
+**F4 — `fg:operation` 2 pane là quyết định đã khoá** (`tsk-5lr` D2, nhận
+diện trái/phải bằng hình học) — muốn 4 pane là supersede, không sửa tại
+chỗ.
 
 ### 2026-08-12 — Vòng 2 (người dùng trả lời)
 
-- **F1 →** khái niệm cần đặt tên đúng là *tổng trần chỗ chứa* — slot cho
-  đơn vị work item lớn nhất. Tên chốt: `worker slot` (→ D1).
-- **F2 →** cả ba nên dùng chung một đầu ra và thuật toán chung của
-  engine/harness, đừng chế riêng, hướng chúng lại. Ba cơ chế chạy là ba
-  *năng lực thực thi ở mức độ và quy mô khác nhau*; còn "cái gì đang thực
-  thi" và "tiếp theo nên là cái gì" phải thống nhất toàn engine. Cả ba
-  launcher đều tuân thủ tổng trần của engine.
-- **F4 →** trước nghĩ 2, giờ là 3 (merge/retro/cleanup), thủ sẵn 4 cho
-  một việc hành chính mới phát sinh.
-- **Trần mềm:** thống nhất tổng trần nhưng đừng cứng quá, có thể du di mở
-  phía trên cho linh hoạt — vì giới hạn tổng trần giúp máy chạy ổn định.
+- Khái niệm cần đặt tên là *tổng trần chỗ chứa* — slot cho đơn vị work
+  item lớn nhất. Tên chốt: `worker slot`.
+- Cả ba launcher dùng chung một đầu ra và thuật toán của engine/harness,
+  đừng chế riêng. Ba cơ chế là ba *năng lực thực thi ở quy mô khác nhau*;
+  còn "đang thực thi cái gì" và "tiếp theo nên là cái gì" phải thống nhất
+  toàn engine. Cả ba tuân thủ tổng trần của engine.
+- `fg:operation`: trước nghĩ 2, giờ 3, thủ sẵn 4 cho một việc hành chính
+  mới phát sinh.
+- Trần: thống nhất nhưng đừng cứng quá, du di mở phía trên cho linh hoạt,
+  vì giới hạn tổng trần giúp máy chạy ổn định.
 
-### 2026-08-12 — Vòng 2, scout tiếp
+### 2026-08-12 — Vòng 2, scout
 
-**F5 — Lane riêng cho việc hành chính đã tồn tại trong code, và có lý do
-cấu trúc bắt buộc phải giữ.** `tsk-5lr` CONTEXT.md:21 ghi `fg:operation`
-"never counted against the `fg:agents-N` cap", và code khớp:
-`agents_tab_index` (`layout.rs:170-172`) chỉ parse tiền tố `fg:agents-`,
-nên tab operation không bao giờ vào phép đếm cap.
+**F5 — Lane riêng cho admin đã tồn tại trong code, và có lý do cấu trúc
+bắt buộc.** `tsk-5lr` CONTEXT.md:21 ghi `fg:operation` "never counted
+against the `fg:agents-N` cap"; code khớp — `agents_tab_index`
+(`layout.rs:170-172`) chỉ parse tiền tố `fg:agents-`.
 
-Lý do bắt buộc, xác minh được: `src/runner/claim-port.mjs:160-167` — một
-lá có dep chưa `done` bị **từ chối claim** thẳng (`deps-not-merged`).
-Nghĩa là merge nằm THƯỢNG NGUỒN của mọi claim execution mới. Nếu việc
-hành chính phải xếp hàng sau việc execution trong cùng một pool, thì khi
-pool đầy: không merge được → không lá nào mới claim được → execution lane
-cạn dần rồi ngồi không trong khi backlog phình. Đây là đói tài nguyên
-(starvation) có thật, không phải rủi ro lý thuyết — và nó là lập luận cấu
-trúc cho việc admin phải có chỗ riêng, không tranh chỗ với execution.
+Lý do bắt buộc: `src/runner/claim-port.mjs:160-167` từ chối claim một lá
+có dep chưa `done` (`deps-not-merged`). Merge nằm thượng nguồn của mọi
+claim execution mới → xếp chung pool sẽ tự khoá khi pool đầy. → thành D4.
+
+### 2026-08-12 — Vòng 3 (người dùng trả lời)
+
+- **Du di:** ý vượt hơn phần lane. Ví dụ còn 3 slot mà fanout muốn 4 —
+  câu hỏi là fanout tự giảm xuống 2 wave, hay cho phép đẩy luôn 4. Ý
+  người dùng: cho phép đẩy, chủ yếu để linh hoạt và **ship faster**.
+- **Q8: (b).** Engine có 6 picker tool, phải trả đúng và không block;
+  launcher xin slot trước khi dựng. (a) đồng ý để lại.
+- **Góc nhìn hiện tại về hai điểm nghẽn thật** (bối cảnh cho (a) sau
+  này, không phải phạm vi đợt này): (1) thông tin phải sẵn sàng và đầy đủ
+  để hỏi người một lần, release con người, không tạo hiện tượng người
+  phải ngồi canh — trả lời hết câu hỏi rồi thì máy túc tắc làm cả ngày
+  cũng được; (2) nghẽn merge — không merge thì không xử lý tiếp được phía
+  sau, mà agent xử lý xung đột merge rất tốt nhưng cứ hỏi người miết,
+  nhất quyết không tự xử lý.
+- **Q9:** trần đếm theo **work-item**.
+
+### 2026-08-12 — Vòng 3, scout
+
+**F6 — Nếu nhãn không gánh state (D2) thì không skill nào cần gọi rename
+nữa.** Đây là hệ quả của chính D2, và nó trả lời Q5 khác với đề xuất ban
+đầu.
+
+Khi launcher phải xin slot trước khi dựng (Q8 b), engine biết cặp
+`slot ↔ work-item`. Nhãn lúc đó chỉ còn là *phép chiếu* của cặp đó: mỗi
+vòng poll, adapter đọc binding từ engine rồi vẽ lại nhãn. Không cần
+`/fgOS:terminal` gọi `rename.sh` từ trong session, không cần nhét chrome
+vào `fgos-coding-driving`, và không còn cửa cho session ghi đè nhãn của
+orchestrator — tức bug `fgos-auto-discover` biến mất theo cấu trúc chứ
+không phải bị vá.
+
+"Bỏ rename" cũng thành tầm thường: binding được nhả thì vòng poll kế
+tiếp vẽ lại nhãn rỗi, không cần cơ chế un-rename riêng.
+
+Capability-gate vẫn cần: một tool khác (tmux) có thể không có khái niệm
+nhãn pane. Nhưng gate đó nằm ở adapter, không phải ở skill.
+
+**F7 — Điểm nghẽn merge: cơ chế đã có, cái thiếu là agent chịu dùng.**
+`fgos catchup` (`bin/fgos.mjs:3747-3783`) nhận đúng `merge-conflict`
+trong `CATCHUP_REASONS`, merge target vào nhánh item rồi verify lại và
+land (`blocked → awaiting-approval`) hoặc báo lại. Nên lời phàn nàn "agent
+cứ hỏi người miết" không phải thiếu verb — là vấn đề hành vi skill. Ghi
+nhận là **liền kề, ngoài phạm vi** đợt này; xứng đáng item riêng.
 
 ## 6. Thiết kế đã chốt {#design}
 
 *(Bản tổng hợp cho người đọc chưa từng dự buổi nào. Phần còn mở được
-đánh dấu rõ — không viết như thể đã chốt.)*
+đánh dấu rõ.)*
 
 ### Khái niệm
 
 Một **worker** là một chỗ thực thi đang chạy đúng một *rootTask* — đơn vị
 công việc có vòng đời đầy đủ, theo từ vựng đã khoá ở
-`docs/decisions/0026`. **Worker slot** là chỗ đứng đó, được định cỡ theo
-đơn vị work item lớn nhất, nên một slot luôn đủ cho một rootTask bất kể
-nó là việc loại nào (D1).
+`docs/decisions/0026`. **Worker slot** là chỗ đứng đó, định cỡ theo đơn
+vị work item lớn nhất, nên một slot luôn đủ cho một rootTask bất kể loại
+việc (D1). Trần đếm theo **work-item**: một work-item đang chạy tiêu tốn
+đúng một slot, bất kể launcher nào dựng nó lên.
 
-Khái niệm này cố tình KHÔNG mang tên `capacity`: trong fgOS, `capacity`
-đã là một đơn vị helper hẹp (`judge-discovery`, `submit-assist-classify`)
-không mang vòng đời rootTask. Hai thứ khác bản chất, không được dùng
-chung tên.
+Khái niệm này cố tình KHÔNG mang tên `capacity` — trong fgOS `capacity`
+đã là một đơn vị helper hẹp (`judge-discovery`), khác bản chất.
 
 ### Ai sở hữu cái gì
 
-Ranh giới cốt lõi, chốt ở vòng 2: **cơ chế thực thi khác nhau; phần đếm
-và phần chọn thống nhất.**
+**Cơ chế thực thi khác nhau; phần đếm và phần chọn thống nhất.**
 
 - **Engine (fgOS) sở hữu** — đang chạy gì (occupancy), tổng trần bao
-  nhiêu, và tiếp theo nên chạy gì. Đây là một câu trả lời duy nhất cho cả
-  hệ (D2).
-- **Launcher/adapter sở hữu** — *cách* dựng một worker lên và *chỗ* đặt
-  nó. Ba launcher hôm nay là ba năng lực thực thi ở ba quy mô: pane
-  tương tác (`herdr-plugin`), tiến trình headless (`fgos-runner`), Agent
-  trong session (`fgos-fanout`). Chúng vẫn khác nhau và không bị ép gộp.
+  nhiêu, còn chỗ hay không, và trả lời "tiếp theo là gì" cho từng pool.
+- **Launcher/adapter sở hữu** — *cách* dựng một worker và *chỗ* đặt nó.
+  Ba launcher là ba năng lực thực thi ở ba quy mô: pane tương tác
+  (`herdr-plugin`), tiến trình headless (`fgos-runner`), Agent trong
+  session (`fgos-fanout`). Chúng vẫn khác nhau, không bị ép gộp.
 
-Hệ quả trực tiếp và tuyệt đối (D2): **nhãn/label không bao giờ được gánh
-state.** Nhãn chỉ để người đọc. Mọi câu hỏi kiểu "chỗ này còn trống
-không" phải hỏi engine, không được suy từ nhãn của tool.
+Tín hiệu occupancy tái dùng `tsk-3ni`: claim còn sống khi worktree
+`fgw/<id>` còn hoạt động sửa file thật, so với ngưỡng sẵn có của
+`/fgOS:stale`. Không PID, không heartbeat, không tuổi claim.
 
-Tín hiệu occupancy không phải phát minh mới — tái dùng `tsk-3ni`: một
-claim còn sống khi worktree `fgw/<id>` còn hoạt động sửa file thật
-(`max(git log -1 %ct, mtime mới nhất trong git status --porcelain)`), so
-với ngưỡng sẵn có của `/fgOS:stale`. Không dùng PID, không dùng
-heartbeat, không dùng tuổi claim.
+### Hình dạng của "thống nhất" — (b), không phải (a)
+
+Sáu picker theo pool hiện có (`pickNextDiscoverItem`, `pickNextPlanItem`,
+`pickNextRetrospectiveItem`, `pickNextCleanupItem`, `frontier`, ranking
+của `merge`) **giữ nguyên**. Engine thêm đúng một lớp: gác tổng trần.
+Launcher **xin slot trước khi dựng**; hết chỗ thì bị từ chối, không tự
+quyết. Picker phải trả lời đúng và không block.
+
+Một ranker toàn cục xuyên pool — (a) — được **để lại có chủ ý**, vì trục
+ưu tiên chung giữa những thứ hôm nay không so sánh được (một item chờ
+discovery so với một item chờ merge) cần dữ liệu occupancy thật mới thiết
+kế đúng. Khi làm (a), hai điểm nghẽn đã được nêu làm trục: (1) gom đủ
+thông tin để hỏi người một lần rồi release con người; (2) nghẽn merge.
 
 ### Hai lane, và vì sao phải hai
 
-Công việc chia hai lớp: **execution** (discovery/plan/implement — chạy
-theo `stage`) và **admin** (merge/retro/cleanup — quét theo pool
-`status`). Lớp suy ra được từ dữ liệu đã có, không cần field mới.
+**Execution** (discovery/plan/implement — chạy theo `stage`) và **admin**
+(merge/retro/cleanup — quét theo pool `status`). Lớp suy ra được từ dữ
+liệu đã có, không cần field mới.
 
-Hai lane không phải để cho gọn mà là bắt buộc về cấu trúc: merge nằm
-thượng nguồn của mọi claim execution mới (`claim-port.mjs:160-167` từ
-chối lá có dep chưa `done`). Nếu admin xếp hàng chung với execution, pool
-đầy sẽ khoá chính thứ cần chạy để mở khoá pool. Cấu trúc lane riêng này
-đã tồn tại trong code hôm nay (`fg:operation` không nằm trong cap của
-`fg:agents-N`) — thiết kế này giữ và tổng quát hoá nó, không phát minh
-lại.
+Hai lane là bắt buộc về cấu trúc, không phải cho gọn: merge nằm thượng
+nguồn của mọi claim execution mới (`claim-port.mjs:160-167`). Nếu admin
+xếp hàng chung với execution, pool đầy sẽ khoá chính thứ cần chạy để mở
+khoá pool (D4).
 
-**Đề xuất chưa chốt (Q7):** đây cũng chính là chỗ đặt phần "du di phía
-trên" — tổng trần siết lane execution, còn lane admin là phần dôi ra bên
-trên và không bao giờ bị execution chiếm chỗ. Cần anh xác nhận đây có
-đúng ý "đừng cứng quá" không.
+### Trần mềm
+
+Tổng trần siết lane execution; lane admin có chỗ dành riêng bên trên và
+không bao giờ bị execution chiếm chỗ (D4). Ngoài ra, trần là **mềm ở mép
+trên**: một launcher được phép vượt trần một biên nhỏ để khỏi phải bẻ một
+mẻ việc thành hai wave — ví dụ còn 3 slot mà một mẻ fanout có 4 thành
+viên thì cho đẩy cả 4, thay vì tách thành 2 wave. Ưu tiên ship faster
+(`AGENTS.md` mục 1) thắng sự chính xác của con số, miễn biên vượt còn
+nhỏ và biết trước.
+
+**Chưa chốt (Q10):** biên đó là bao nhiêu và diễn đạt thế nào — một số cố
+định, một tỉ lệ, hay chỉ cho phép trong phạm vi một mẻ đã tính sẵn.
+
+### Nhãn là phép chiếu, không phải state
+
+Vì engine giữ cặp `slot ↔ work-item` (hệ quả của "xin slot trước khi
+dựng"), nhãn pane chỉ còn là *phép chiếu* của cặp đó: mỗi vòng poll,
+adapter đọc binding rồi vẽ lại nhãn. Không session nào gọi rename, không
+chrome nào chui vào `fgos-coding-driving`, và không còn cửa cho session
+ghi đè nhãn của orchestrator — bug `fgos-auto-discover` biến mất theo cấu
+trúc. "Bỏ rename" thành tầm thường: nhả binding thì vòng sau vẽ nhãn rỗi.
+
+Capability-gate vẫn cần (tool khác có thể không có khái niệm nhãn), nhưng
+đặt ở adapter, không ở skill.
+
+**Chưa chốt (Q5):** đây là đề xuất khác với ý ban đầu (đặt rename ở
+`fgos-coding-driving`) — chờ xác nhận.
 
 ### Hình
 
 ```mermaid
 flowchart TB
     subgraph ENGINE["fgOS engine — một nguồn sự thật"]
-        OCC["Occupancy<br/>đang chạy gì<br/>(tín hiệu tsk-3ni)"]
-        CEIL["Tổng trần<br/>execution + admin lane"]
-        PICK["Chọn việc tiếp theo<br/>(Q8: toàn cục hay theo pool?)"]
+        OCC["Occupancy: đang chạy gì<br/>tín hiệu tsk-3ni"]
+        CEIL["Tổng trần theo work-item<br/>execution lane + admin lane<br/>mềm ở mép trên"]
+        P1["6 picker theo pool<br/>giữ nguyên"]
+        BIND["Binding slot ↔ work-item"]
         OCC --> CEIL
-        CEIL --> PICK
+        CEIL --> BIND
+        P1 --> BIND
     end
 
-    PICK --> PORT{{"Worker-slot port<br/>acquire / release / list<br/>+ capability-gate"}}
+    BIND --> PORT{{"Worker-slot port<br/>acquire / release / list<br/>+ capability-gate"}}
 
     PORT --> H["herdr-plugin<br/>pane trong tab"]
     PORT --> R["fgos-runner<br/>tiến trình headless"]
     PORT --> F["fgos-fanout<br/>Agent trong session"]
 
-    H -.->|"báo lại slot đã dựng"| OCC
-    R -.->|"báo lại"| OCC
-    F -.->|"báo lại"| OCC
+    H -.->|"xin slot trước khi dựng"| CEIL
+    R -.->|"xin slot"| CEIL
+    F -.->|"xin slot"| CEIL
 
-    LBL["Nhãn pane<br/>CHỈ để người đọc<br/>không mang state"]
+    BIND -.->|"phép chiếu mỗi vòng poll"| LBL["Nhãn pane<br/>chỉ để người đọc"]
     H -.- LBL
 ```
 
-### Phần chưa chốt, ảnh hưởng phạm vi thật
+### Ngoài phạm vi, ghi nhận không nuốt
 
-- **Q8 — "tiếp theo là gì" hình dạng nào.** Hôm nay đã có ~6 picker theo
-  pool (`pickNextDiscoverItem`, `pickNextPlanItem`,
-  `pickNextRetrospectiveItem`, `pickNextCleanupItem`, `frontier`, ranking
-  của `merge`), mỗi cái chọn độc lập trong pool của nó. "Thống nhất toàn
-  engine" có thể nghĩa là (a) thêm một ranker toàn cục xuyên pool, hay
-  (b) giữ các picker hiện có, engine chỉ thêm lớp gác tổng trần và mỗi
-  launcher hỏi pool của mình. Khác biệt về khối lượng là lớn.
-- **Q9 — trần đếm theo cái gì.** Một pane herdr, một tiến trình headless,
-  và một Agent trong session tốn tài nguyên rất khác nhau, nhưng đều là
-  "1 slot". Chưa chốt trần đếm slot trừu tượng hay quy về tài nguyên thật.
-- **Q5 — rename đặt ở đâu.** Đề xuất ban đầu là `fgos-coding-driving`;
-  chưa bàn lại kể từ vòng mở màn.
-- **Supersede cần viết rõ:** `tsk-5lr` D2 (nhận diện trái/phải theo hình
-  học trong `fg:operation` 2 pane) sẽ bị thay bởi mô hình 4 pane.
+- **Ranker toàn cục xuyên pool (a)** — để lại có chủ ý, xem trên.
+- **Agent tự xử xung đột merge** — `fgos catchup` đã có và nhận đúng
+  `merge-conflict`; cái thiếu là hành vi skill chịu dùng nó. Xứng đáng
+  item riêng.
+- **Gom câu hỏi để hỏi người một lần** — điểm nghẽn (1), thuộc `AGENTS.md`
+  ưu tiên #2, không phải phạm vi slot.
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-Chưa có. Chờ Q8 chốt — nó quyết định đợt này là một task hay một chùm.
+Chưa viết. Chờ Q5 và Q10 chốt — Q5 quyết định có hay không một hạng mục
+"port đặt nhãn" tách riêng, hay nó tan vào hạng mục adapter.
