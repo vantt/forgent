@@ -63,4 +63,40 @@ Red before: the file does not exist, so `node --test` exits non-zero.
 
 ## Outstanding questions
 
-None.
+None as originally scoped (the coverage-gap test above). One new question
+surfaced once the test went live and is answered in the addendum below.
+
+## Addendum (2026-08-12): the red test surfaced a real design question, now answered
+
+Running the file did not just close the coverage gap — the fourth test came
+back genuinely RED against real code, not flaky: `withMergeTargetSlot`'s
+identity is `resolveWriterIdentity`'s env-derived session id
+(`session-identity.mjs:135-138`), which every forked child inherits
+byte-identically, and `main-checkout-lock.mjs`'s self-recognition branch
+(`record.pid === identity`, D6) treats that as "the same writer returning" —
+so two genuinely separate OS processes sharing one session id do not
+exclude each other for the same target ref.
+
+**Is this a real scenario, not just a theoretical one?** Yes — this
+session's own subagent fanout hit the same-shaped bug independently
+(unpinned subagents inheriting one session id, fixed by assigning each a
+distinct `BEE_SESSION_ID`), and `fgos-fanout`'s documented behavior (batch
+`Agent` dispatch, auto-approve of sibling leaves sharing one root/target)
+is exactly the shape that would trigger it here too.
+
+**Locked decision: targeted fix, not a wider identity-model change.**
+`acquireMainCheckoutLock`/`tryAcquireOnce` gained `allowSelfRecognition`
+(default `true` — every existing caller is byte-identical). `withMergeTargetSlot`
+passes `allowSelfRecognition: false`. Safe because this lock is always
+released in the same call that acquired it (`finally` in `withMergeTargetSlot`),
+so there is no legitimate same-identity re-entry to protect for this call site —
+unlike `main-checkout.lock`'s own use (a session refreshing across several
+back-to-back operations), which keeps its existing behavior untouched.
+Rejected: switching the slot to per-process identity — the item's own text
+already flagged that `isPidAlive`/stale-reclaim assume a numeric identity,
+a wider blast radius for a narrower gain.
+
+The four-test file now passes 4/4 against the fix. Full suite green
+(see Iron Law evidence). Branch caught up with `main` (merge, not rebase —
+the branch already carries its own commits) before the fix, since `main`
+had moved well past this branch's original fork point.
