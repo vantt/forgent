@@ -24,7 +24,7 @@ import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfigForDir } from '../src/runner/dispatch.mjs';
 import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
 import { resolveFgosDir, fgosDirFromRoot } from '../src/runner/paths.mjs';
-import { resolveDiscovery, discoverableStages, classificationPatchFromVerdict, assertCallerClassification } from '../src/intake/discovery.mjs';
+import { resolveDiscovery, classificationPatchFromVerdict, assertCallerClassification } from '../src/intake/discovery.mjs';
 import { resolvePlan } from '../src/intake/plan.mjs';
 import { computeEntropy, computeCounts, FINAL_STATUSES } from '../src/report/entropy.mjs';
 import { findSourceCaptureIds } from '../src/report/enduser-index.mjs';
@@ -62,7 +62,7 @@ import { createSession, endSession, listSessions, reclaimOrphanedSessions, Sessi
 import { resolveRoot } from '../src/runner/root-affinity.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
-import { getDomain, stageForStep, effectiveStage } from '../src/state/workflow-stage-graphs.mjs';
+import { getDomain, stageForStep, effectiveStage, discoverableStages, resolveDomainName } from '../src/state/workflow-stage-graphs.mjs';
 import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
 import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
 import { recordInvocationFault } from '../src/cli/invocation-fault-log.mjs';
@@ -70,6 +70,7 @@ import { recordApprovePostSuccessFault } from '../src/cli/approve-fault-log.mjs'
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { DOCTOR_CHECKS, integrationScriptPath, ensureSharedConfigDefaults, runFixes } from '../src/setup/checks.mjs';
 import { sharedConfigFilePath, readSharedConfig, readInvariantCheckCommands } from '../src/config/shared-config-file.mjs';
+import { countWorkerSlots, hasWorkerSlotRoom } from '../src/state/worker-slots.mjs';
 import { assessCleanupReadiness } from '../src/state/cleanup-harness.mjs';
 import { DEFAULT_CLEANUP_TTL_DAYS, DEFAULT_CLEANUP_LEAF_TTL_DAYS } from '../src/setup/registrations.mjs';
 import { installGitHooks, uninstallGitHooks } from '../src/setup/git-hooks.mjs';
@@ -1301,11 +1302,26 @@ async function runVerb(verb, flags, positional, dir) {
       // exploring (today: coding) can call `discover` from any of its own
       // three stages; a domain that never registered them (triage/
       // synthetic) keeps the original single-stage precondition unchanged.
-      const validStages = discoverableStages(getDomain(work?.domain, { onUnrecognized: () => {} }));
+      const discoverDomain = getDomain(work?.domain, { onUnrecognized: () => {} });
+      const validStages = discoverableStages(discoverDomain);
       if (!validStages.includes(stage)) {
+        // tsk-1l9: only point at `plan` when `plan` would actually take the
+        // item. Suggesting it unconditionally made the two gates refer the
+        // reader to each other in a closed loop for any stage NEITHER verb
+        // serves -- which is exactly what the three items stranded at retired
+        // `clarify` hit, leaving them with no verb-shaped way out at all.
+        const planStage = stageForStep(discoverDomain, 'Divide');
+        const planTakesIt = stage === planStage
+          || (stage === 'decompose' && discoverDomain.stages?.includes('decompose'));
         throw new StoreError(
           'validation',
-          `discover: work "${id}" is at stage "${stage}", not ${validStages.map((s) => `"${s}"`).join('/')} -- use "fgos plan ${id}" instead.`,
+          `discover: work "${id}" is at stage "${stage}", not ${validStages.map((s) => `"${s}"`).join('/')}`
+            + (planTakesIt
+              ? ` -- use "fgos plan ${id}" instead.`
+              : ` -- and "fgos plan" does not serve that stage either. No stage verb does:`
+                + ` "${stage}" is not registered by domain "${resolveDomainName(work?.domain, { onUnrecognized: () => {} })}"`
+                + ` (${JSON.stringify(discoverDomain.stages)}). Run "fgos doctor" and read the`
+                + ' work-stage-vocabulary check.'),
         );
       }
       // An explicit --config path stays a loud, unmodified failure on ENOENT
@@ -1371,7 +1387,21 @@ async function runVerb(verb, flags, positional, dir) {
       // stays a no-op for them.
       const legacyPlanStage = domain.stages?.includes('decompose') && planningStage !== 'decompose' ? 'decompose' : undefined;
       if (stage !== planningStage && stage !== legacyPlanStage) {
-        throw new StoreError('validation', `plan: work "${id}" is at stage "${stage}", not "${planningStage}"${legacyPlanStage ? ` (or legacy "${legacyPlanStage}")` : ''} -- use "fgos discover ${id}" instead.`);
+        // tsk-1l9: mirror of the discover gate above -- only refer the reader
+        // to `discover` when `discover` would actually accept the item, so
+        // the two gates can never form a closed loop around a stage neither
+        // of them serves.
+        const discoverTakesIt = discoverableStages(domain).includes(stage);
+        throw new StoreError(
+          'validation',
+          `plan: work "${id}" is at stage "${stage}", not "${planningStage}"${legacyPlanStage ? ` (or legacy "${legacyPlanStage}")` : ''}`
+            + (discoverTakesIt
+              ? ` -- use "fgos discover ${id}" instead.`
+              : ` -- and "fgos discover" does not serve that stage either. No stage verb does:`
+                + ` "${stage}" is not registered by domain "${resolveDomainName(work?.domain, { onUnrecognized: () => {} })}"`
+                + ` (${JSON.stringify(domain.stages)}). Run "fgos doctor" and read the`
+                + ' work-stage-vocabulary check.'),
+        );
       }
       // path.dirname(dir), not process.cwd() -- see the discover case above
       // for why (tsk-5hv, found by fgos-coding-implement).
@@ -2109,6 +2139,48 @@ async function runVerb(verb, flags, positional, dir) {
     // pairs of ready items whose declared file footprints overlap, so a
     // parallel dispatch would risk a file conflict. Suggests sequence/hoist/
     // re-slice; never mutates anything.
+    // Read-only worker-slot ledger: how many work items are running and
+    // whether the execution lane has room. This verb IS the port — decision
+    // 0014 makes the CLI the door, and herdr-plugin (Rust) and fgos-fanout
+    // (a prose skill) have no other way to ask the engine before they stand a
+    // worker up. Pure read: worker-slots.mjs never touches fs, and the
+    // ceiling comes from the same config resolution claimWork's own gate uses.
+    case 'slots': {
+      const slotsView = listWork(dir);
+      const ceiling = readSharedConfig(path.dirname(dir))?.workerSlots?.ceiling;
+      const counts = countWorkerSlots(slotsView);
+      const room = hasWorkerSlotRoom(slotsView, { ceiling });
+      return {
+        execution: {
+          ...counts.execution,
+          ceiling: room.ceiling,
+          free: room.free,
+          hasRoom: room.allowed,
+          reason: room.reason,
+        },
+        admin: counts.admin,
+      };
+    }
+
+    // D10: give a driver's closing report a landing place on the item, so a
+    // result is read with `fgos show <id>` instead of by watching a terminal
+    // pane nobody can afford to guard. Deliberately no new event type and no
+    // new field -- this writes through addDecision, which `show` already
+    // surfaces per item, and `source: 'driver-report'` is what tells a
+    // consumer these apart from real design decisions.
+    case 'report': {
+      const id = requireField(positional[0] ?? flags.id, 'report requires an id: fgos report <id> --text "..."');
+      const text = requireField(flags.text, 'report requires --text "..."');
+      const stopReason = optionalField(flags['stop-reason'], 'report --stop-reason requires a non-empty value (omit --stop-reason entirely to skip it)');
+      // addDecision requires a non-empty rationale, so a report that carries
+      // no stop reason still has to say why it exists rather than pass "".
+      const rationale = stopReason
+        ? `driver stop reason: ${stopReason}`
+        : 'closing report recorded on the item so results are read via `fgos show`, not a guarded terminal pane';
+      const { event } = addDecision(dir, { id, text, rationale, source: 'driver-report', kind: 'engine' });
+      return { id, stopReason: stopReason ?? null, seq: event.seq };
+    }
+
     case 'conflicts': {
       // tsk-4zj D7: footprintConflicts' candidate set now spans multiple
       // stages (tsk-4so's frontierAcrossSteps), so stageEffective is real

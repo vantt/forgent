@@ -738,7 +738,10 @@ mod tests {
 
     /// tsk-4cxl D2: the Work Items table renders a `Stage` column right
     /// after `Status`, carrying each row's own `stage` value — `App::mock`'s
-    /// default TODO-tab row (`tsk-19y-1`) has `stage: "clarify"`.
+    /// default TODO-tab row (`tsk-19y-1`) has `stage: "discovery"`, the
+    /// coding domain's real entry stage (tsk-1l9: the fixture used to say
+    /// `clarify`, a stage retired out of the registry entirely, so the mock
+    /// rendered a value no live item could hold).
     #[test]
     fn work_items_table_renders_stage_column_next_to_status() {
         let mut app = App::mock();
@@ -750,7 +753,7 @@ mod tests {
         let buffer = terminal.backend().buffer();
         let content: String = buffer.content().iter().map(|cell| cell.symbol()).collect();
         assert!(content.contains("Stage"), "missing Stage header: {content}");
-        assert!(content.contains("clarify"), "missing row's stage value: {content}");
+        assert!(content.contains("discovery"), "missing row's stage value: {content}");
     }
 
     /// tsk-417 D3: NEED ANSWER, MERGE LIST, AFTER DELIVER render as 3

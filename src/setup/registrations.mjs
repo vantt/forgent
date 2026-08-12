@@ -33,10 +33,10 @@ import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { listWork } from '../state/store.mjs';
-import { driftStatus } from '../state/drift-status.mjs';
+import { driftStatus, unmergedDeliveries } from '../state/drift-status.mjs';
 import { computeEnduserDocsIndex, generateEnduserDocsIndex, manifestPathFor } from '../report/enduser-index-generate.mjs';
 import { isResolvedStatus } from '../state/frontier.mjs';
-import { getDomain } from '../state/workflow-stage-graphs.mjs';
+import { getDomain, resolveDomainName, effectiveStage } from '../state/workflow-stage-graphs.mjs';
 import { readLocalStatus, classifyRegistryPosture } from '../state/tool-registry.mjs';
 import { describeConfigAwareness } from '../config/global-config.mjs';
 import {
@@ -47,6 +47,7 @@ import {
   DEFAULT_INVARIANT_CHECK_COMMANDS,
 } from '../config/shared-config-file.mjs';
 import { DEFAULT_LEVEL, LEVELS } from '../state/gate-bypass.mjs';
+import { DEFAULT_WORKER_SLOT_CEILING } from '../state/worker-slots.mjs';
 import { checkEventsJsonlContiguity, fixEventsJsonlContiguity } from '../state/events-jsonl-contiguity.mjs';
 import { advanceEventsJsonlTruncationGuard } from '../state/events-jsonl-truncation-guard.mjs';
 
@@ -461,6 +462,15 @@ function checkRootDrift(cwd) {
   const strandedAfterClose = [];
   for (const entry of Object.entries(drift)) {
     const [id, status] = entry;
+    // tsk-1l9 follow-up: `aheadOfTarget` answers "how many commits", not "is
+    // anything stranded". A root that only merged its target back into itself
+    // is many commits ahead carrying nothing, and a branch whose commits all
+    // landed by another route is a stale ref. Both were reported here as
+    // drift needing a sync, forever, with no sync able to clear them --
+    // fgw/tsk-4n7 and fgw/tsk-19y are exactly that shape today. Skipping them
+    // is a REPORTING change only: `needsSync` itself is untouched, so `fgos
+    // merge next`'s auto-sync path behaves exactly as before.
+    if (status.carriesContent === false) continue;
     if (status.needsSync) {
       needsSync.push(entry);
     } else if (status.aheadOfTarget > 0 && COMPLETED_ROOT_STATUSES.has(view.work[id]?.status)) {
@@ -532,10 +542,115 @@ registerCheck({
   check: (cwd) => checkWorkClassificationVocabulary(cwd),
 });
 
+// tsk-64h: the stage-axis sibling of the risk/kind check above, and the
+// same class of drift — a domain may retire a stage (coding dropped
+// `clarify` outright, tsk-qod D1/D2) while items still sit on it. Unlike
+// risk/kind, there is no write door to grandfather against: `stage` is not
+// in `EDITABLE_FIELDS` (store.mjs) and only `moveStage` may change it, so
+// a stranded item cannot be corrected by an edit at all — it has to be
+// drained forward through a registered transition or migrated. That makes
+// the drift quieter, not rarer: three items sat at retired `clarify` with
+// nothing surfacing them until a migration script tripped over them.
+//
+// `effectiveStage`, not a bare `item.stage`, so the lazy Execute default
+// (D8 — an item that never had `stage` written) reads as the stage every
+// other consumer already treats it as, instead of being flagged as
+// out-of-vocabulary for being absent. OPEN items only (`!isResolvedStatus`,
+// the one shared open/closed definition), same reasoning as the check
+// above: a resolved item's stage no longer routes anything.
+function checkWorkStageVocabulary(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  if (mainCheckout === null) {
+    return { passed: true, message: 'not inside a git checkout — nothing to check' };
+  }
+  const view = listWork(path.join(mainCheckout, '.fgos'));
+  const violations = [];
+  for (const item of Object.values(view.work)) {
+    if (isResolvedStatus(item)) continue;
+    const domainName = resolveDomainName(item.domain, { onUnrecognized: () => {} });
+    const domain = getDomain(domainName);
+    const stage = effectiveStage(item, domain);
+    if (!domain.stages.includes(stage)) {
+      violations.push(`${item.id} (stage: "${stage}", domain: "${domainName}")`);
+    }
+  }
+  if (violations.length === 0) {
+    return { passed: true, message: 'every open item sits at a stage still registered by its domain' };
+  }
+  return {
+    passed: false,
+    message: `${violations.length} open item(s) at a stage their domain no longer registers: ${violations.join(', ')} — no verb can relabel a live item's stage; drain each one forward through a registered transition or migrate it (see scripts/migrate-clarify-split.mjs)`,
+  };
+}
+
+registerCheck({
+  id: 'work-stage-vocabulary',
+  description: "every open item sits at a stage its own domain still registers — no item stranded on a retired stage (tsk-64h)",
+  check: (cwd) => checkWorkStageVocabulary(cwd),
+});
+
 registerCheck({
   id: 'root-drift',
   description: 'every fgw/<root> branch is in sync with its real target — no unsynced drift left over from a leaf merge (tsk-3bn)',
   check: (cwd) => checkRootDrift(cwd),
+});
+
+// tsk-1l9: the LEAF-inclusive sibling of root-drift above. `root-drift` only
+// walks items that some other item calls `parent`, so an ordinary leaf marked
+// handed-over with its branch still off trunk is invisible to it — and
+// `delivered` is reachable through a bare `fgos move`, which merges nothing
+// and demands no proof that anything merged. Nothing else closes the gap:
+// `fgos stale`'s post-delivery bucket waits a three-day TTL and then reports
+// "forgotten", never "unmerged". It happened three times before this check
+// existed — tsk-4b2, then tsk-64h and tsk-2t5 together — each time losing
+// real, tested, reviewed work outside main until someone read the graph by
+// hand.
+//
+// Mechanical, no judgment: `git merge-base --is-ancestor fgw/<id> <trunk>`,
+// then a patch-id comparison to separate "this ref was never merged" from
+// "this work is missing". An item with no local branch is skipped rather than
+// flagged, since the branch is often cleaned up after a genuine merge; so is
+// a branch whose every commit already has a patch-equivalent on trunk, which
+// carried its content in by some other route and is only a stale ref.
+function checkDeliveredNotOnTrunk(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  if (mainCheckout === null) {
+    return { passed: true, message: 'not inside a git checkout — nothing to check' };
+  }
+  const view = listWork(path.join(mainCheckout, '.fgos'));
+  const stranded = unmergedDeliveries(mainCheckout, view);
+  const entries = Object.entries(stranded);
+  if (entries.length === 0) {
+    return { passed: true, message: "every handed-over item's content is on the trunk" };
+  }
+
+  // Two causes, two fixes — see unmergedDeliveries' own comment. Reported
+  // separately so the reader is not sent to re-merge a leaf that already
+  // merged correctly into a root that simply has not synced yet.
+  const neverMerged = entries.filter(([, s]) => s.landedOn === null);
+  const awaitingRootSync = entries.filter(([, s]) => s.landedOn !== null);
+  const parts = [];
+  if (neverMerged.length > 0) {
+    parts.push(
+      `${neverMerged.length} item(s) marked handed-over whose branch merged nowhere: `
+        + `${neverMerged.map(([id, s]) => `${id} (${s.status}, ${s.branch}, ${s.unmatched} commit(s) not on trunk by patch-id)`).join(', ')}`
+        + ' — land the content through a new item, never by re-driving the closed item\'s status backward',
+    );
+  }
+  if (awaitingRootSync.length > 0) {
+    parts.push(
+      `${awaitingRootSync.length} item(s) landed on a root branch that has not reached the trunk: `
+        + `${awaitingRootSync.map(([id, s]) => `${id} (${s.status}, on ${s.landedOn})`).join(', ')}`
+        + ' — run fgos sync-root on the root, not on these',
+    );
+  }
+  return { passed: false, message: parts.join('; ') };
+}
+
+registerCheck({
+  id: 'delivered-not-on-trunk',
+  description: "every item whose status says its work was handed over has its fgw/<id> branch reachable from the trunk (tsk-1l9)",
+  check: (cwd) => checkDeliveredNotOnTrunk(cwd),
 });
 
 // tsk-3wq (docs/history/events-jsonl-merge-driver-recurring-write-loss/
@@ -777,6 +892,77 @@ registerConfigDefault({
   id: 'cleanup',
   key: 'cleanup',
   shape: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS, leafTtlDays: DEFAULT_CLEANUP_LEAF_TTL_DAYS },
+});
+
+// docs/history/orchestrator-worker-slots/plan.md §Shape T1: the worker-slot
+// ceiling is project config, not a runner constant -- registered here so
+// `fgos setup` writes the section and `fgos doctor` can see it at all, per
+// AGENTS.md's install/setup/doctor gate.
+//
+// `ceiling` ships as `null` -- present but unarmed -- and that is the whole
+// point of this entry (tsk-1oz). Shipping the recommended NUMBER here would
+// arm the gate the moment anyone runs `fgos setup`, and `fgos doctor` asks
+// every project to run exactly that ("stale config — missing keys ... — run
+// fgos setup") as routine maintenance, never as an opt-in. A repo already
+// running more items than the recommended number would then have its very
+// next `take`/`pick` refused, freezing the whole backlog until a person
+// parked enough work by hand. `worker-slots.mjs` already refuses to treat
+// silence as a reason to start refusing work; writing a live number here
+// would have re-introduced that same trap one command away from the nag
+// that points at it. A person arms the gate by replacing `null` with a real
+// count (see DEFAULT_WORKER_SLOT_CEILING for the recommended starting
+// value), which is the only moment the intent is unambiguous.
+//
+// `adminReservation` is deliberately NOT a key here. The admin lane
+// (merge/retro/cleanup loops plus one spare) is a FIXED reservation whose
+// size is constant by definition, not a project knob -- it never claims a
+// work item, so nothing counts it and nothing could enforce a different
+// number. It lives as `ADMIN_LANE_RESERVATION` in `worker-slots.mjs` and is
+// reported by `fgos slots`; offering it as config would have been a dial
+// wired to nothing.
+registerConfigDefault({
+  id: 'workerSlots',
+  key: 'workerSlots',
+  shape: { ceiling: null },
+});
+
+// A present-but-unusable `ceiling` is the misconfiguration that actually
+// bites, and it fails SILENTLY: `hasWorkerSlotRoom` treats anything that is
+// not a positive integer as "no ceiling configured" and allows every claim,
+// so a project that believes it is capped runs uncapped. `"8"` (a string,
+// the easiest hand-edit slip), `8.5`, `0` and `-1` all land there. The
+// generic `checkConfigNotStale` above only catches a wholly-missing section,
+// exactly the same blind spot `checkInvariantChecksConfigured` was written
+// to cover for `invariantChecks`. `null` is the one non-number that is not a
+// mistake: it is what `fgos setup` writes to mean "deliberately unarmed".
+function checkWorkerSlotsCeiling(cwd) {
+  const section = readSharedConfig(cwd).workerSlots;
+  if (section === undefined) {
+    return {
+      passed: false,
+      message: 'workerSlots section missing -- run fgos setup (no worker-slot ceiling is enforced until it exists)',
+    };
+  }
+  const { ceiling } = section;
+  if (ceiling === null || ceiling === undefined) {
+    return {
+      passed: true,
+      message: `workerSlots.ceiling is unarmed (null) -- no claim is refused; set a positive integer (recommended: ${DEFAULT_WORKER_SLOT_CEILING}) to enforce a ceiling`,
+    };
+  }
+  if (!Number.isInteger(ceiling) || ceiling <= 0) {
+    return {
+      passed: false,
+      message: `workerSlots.ceiling is ${JSON.stringify(ceiling)}, which enforces NOTHING -- expected a positive integer (recommended: ${DEFAULT_WORKER_SLOT_CEILING}) or null to mean deliberately unarmed`,
+    };
+  }
+  return { passed: true, message: `workerSlots.ceiling = ${ceiling} running work item(s)` };
+}
+
+registerCheck({
+  id: 'worker-slots-ceiling-usable',
+  description: 'workerSlots.ceiling is either a positive integer or explicitly null (a malformed value silently enforces nothing)',
+  check: (cwd) => checkWorkerSlotsCeiling(cwd),
 });
 
 // docs/history/tsk-516-approve-reverify-scope/CONTEXT.md D6: the invariant
