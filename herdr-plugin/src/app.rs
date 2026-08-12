@@ -1,5 +1,8 @@
+use std::collections::HashSet;
+
 use crate::fgos::{merge_tree_line_count, MergeListSummary, MergeTreeNode};
-use crate::pane_scan::PaneIdentity;
+use crate::layout::OperationPanes;
+use crate::pane_scan::{task_id_map, PaneIdentity, PaneSnapshot};
 use crate::ports::{PaneRegistry, WorkItemSource};
 use crate::settings::OrchestratorSettings;
 
@@ -77,7 +80,22 @@ impl WorkItem {
     /// non-empty `blocked_by` means `fgos take`/`pick` would refuse this
     /// item today, so herdr must never open a discover pane for it.
     pub fn discover_eligible(&self) -> bool {
-        matches!(self.stage.as_str(), "clarify" | "discovery" | "exploring") && self.blocked_by.is_empty()
+        self.in_discover_stage() && self.blocked_by.is_empty()
+    }
+
+    /// The stage half of `discover_eligible` on its own — the stages
+    /// `/fgOS:discover` drives, mirroring `CANDIDATE_STAGES` in
+    /// `src/state/discover-pool.mjs`.
+    ///
+    /// Split out for `main::discovery_worker_alive` (tsk-1zq), which asks
+    /// whether a discovery worker is ALREADY RUNNING and so must not also
+    /// require `blocked_by` to be empty: a claimed item is running no
+    /// matter what it once waited on. Sharing the stage list rather than
+    /// copying it is deliberate — a render-side `stage == "clarify"` and a
+    /// handler-side `stage == "discovery"` drifting apart is a bug this
+    /// file has already had once.
+    pub fn in_discover_stage(&self) -> bool {
+        matches!(self.stage.as_str(), "clarify" | "discovery" | "exploring")
     }
 }
 
@@ -254,13 +272,26 @@ pub struct App {
     /// (`settings::read_settings`). Storing only — acting on an enabled
     /// toggle is a sibling launcher item's own footprint (tsk-2ja/tsk-57q).
     pub orchestrator_settings: OrchestratorSettings,
-    /// tsk-5lr CONTEXT.md D1/D2: the fixed `fg:operation` tab's left
-    /// (merge-loop) pane id, `None` until `main()`'s startup call to
-    /// `layout::ensure_operation_tab` resolves it. A plain data carrier —
-    /// which loop launches into it is tsk-2xt's own scope, not this item's.
-    pub operation_left_pane_id: Option<String>,
-    /// Same as `operation_left_pane_id`, for the right (retro/cleanup) slot.
-    pub operation_right_pane_id: Option<String>,
+    /// The fixed `fg:operation` tab's four slot panes (tsk-5lr CONTEXT.md
+    /// D1; its D2's left/right geometry superseded by tsk-1zq), `None`
+    /// until `main()`'s startup call to `layout::ensure_operation_tab`
+    /// resolves them. A plain data carrier — which loop launches into
+    /// which slot is tsk-2xt's own scope, not this item's.
+    pub operation_panes: Option<OperationPanes>,
+    /// Worker-lane panes this dashboard has launched into but has not yet
+    /// seen label themselves (tsk-1zq). A launched session sets its own
+    /// label through T3's capability-gated helper (D5), so between the
+    /// launch and that write the pane looks unlabeled and would otherwise
+    /// read as free — reusing it there would drop a second worker on top
+    /// of a booting one.
+    ///
+    /// Deliberately in-process and never persisted: this is the adapter's
+    /// bookkeeping about its own actions, not orchestrator state (which
+    /// D2 puts in the engine). Being in-process is also what keeps it from
+    /// becoming the very bug this item removes — a herdr-plugin restart
+    /// clears it, whereas the pane label it replaces could stay stuck
+    /// forever.
+    pub pending_worker_panes: HashSet<String>,
 }
 
 impl App {
@@ -291,8 +322,8 @@ impl App {
             merge_list_rect: None,
             after_deliver_rect: None,
             orchestrator_settings: OrchestratorSettings::default(),
-            operation_left_pane_id: None,
-            operation_right_pane_id: None,
+            operation_panes: None,
+            pending_worker_panes: HashSet::new(),
         }
     }
 
@@ -603,8 +634,8 @@ impl App {
             merge_list_rect: None,
             after_deliver_rect: None,
             orchestrator_settings: OrchestratorSettings::default(),
-            operation_left_pane_id: None,
-            operation_right_pane_id: None,
+            operation_panes: None,
+            pending_worker_panes: HashSet::new(),
         }
     }
 
@@ -753,15 +784,55 @@ impl App {
     /// the failure is surfaced via `last_error` — same transient-failure
     /// discipline `refresh_from_fgos` already uses.
     pub fn refresh_pane_state(&mut self, registry: &dyn PaneRegistry) {
-        match registry.scan() {
-            Ok(map) => {
+        match registry.scan_panes() {
+            Ok(panes) => {
+                let map = task_id_map(&panes);
                 for task in &mut self.in_process {
                     task.pane = map.get(&task.id).cloned();
                 }
+                self.retire_settled_pending_panes(&panes);
                 self.last_error = None;
             }
             Err(err) => self.last_error = Some(err.to_string()),
         }
+    }
+
+    /// A pending pane stops being pending the moment it carries an
+    /// id-shaped label: that write only happens from inside the launched
+    /// session (D5), so seeing it is proof the worker booted and claimed.
+    /// A pane that vanished from the scan entirely is dropped too — a
+    /// closed pane is nothing to hold open for.
+    fn retire_settled_pending_panes(&mut self, panes: &[PaneSnapshot]) {
+        let labeled = task_id_map(panes);
+        let still_pending: HashSet<String> = self
+            .pending_worker_panes
+            .iter()
+            .filter(|pane_id| panes.iter().any(|pane| pane.pane_id == **pane_id))
+            .filter(|pane_id| {
+                !labeled
+                    .values()
+                    .any(|identity| identity.pane_id == **pane_id)
+            })
+            .cloned()
+            .collect();
+        self.pending_worker_panes = still_pending;
+    }
+
+    /// The ids the engine currently reports at `status: doing` — the
+    /// liveness half of every worker-lane decision (D2). Read straight off
+    /// the work list the poll tick already fetched via `fgos triage
+    /// --json`, so this costs no extra call.
+    pub fn doing_item_ids(&self) -> Vec<String> {
+        self.work_items
+            .iter()
+            .filter(|item| item.status == "doing")
+            .map(|item| item.id.clone())
+            .collect()
+    }
+
+    /// `pending_worker_panes` as the slice the `WorkerLaneView` port takes.
+    pub fn pending_pane_ids(&self) -> Vec<String> {
+        self.pending_worker_panes.iter().cloned().collect()
     }
 }
 
@@ -1077,8 +1148,17 @@ mod tests {
     struct FakeRegistry(HashMap<String, PaneIdentity>);
 
     impl PaneRegistry for FakeRegistry {
-        fn scan(&self) -> Result<HashMap<String, PaneIdentity>, crate::pane_scan::PaneScanError> {
-            Ok(self.0.clone())
+        fn scan_panes(&self) -> Result<Vec<PaneSnapshot>, crate::pane_scan::PaneScanError> {
+            Ok(self
+                .0
+                .iter()
+                .map(|(task_id, identity)| PaneSnapshot {
+                    pane_id: identity.pane_id.clone(),
+                    tab_id: identity.tab_id.clone(),
+                    label: Some(task_id.clone()),
+                    focused: false,
+                })
+                .collect())
         }
 
         fn has_labeled_pane(&self, _label: &str) -> Result<bool, crate::pane_scan::PaneScanError> {
