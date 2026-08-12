@@ -26,7 +26,7 @@ pub trait PaneRegistry {
     fn scan(&self) -> Result<HashMap<String, PaneIdentity>, PaneScanError>;
     /// Guard check for a fixed/synthetic, non-id-shaped pane title — used
     /// by tsk-57q's own `fgos-auto-merge`/`fgos-auto-retro`/
-    /// `fgos-auto-cleanup` and tsk-2ja's `fgos-auto-discover-<id>`. `scan`
+    /// `fgos-auto-cleanup` and tsk-2ja's `fgos-auto-discover`. `scan`
     /// above only ever surfaces id-shaped labels, so a fixed literal title
     /// needs this separate exact-match check instead.
     fn has_labeled_pane(&self, label: &str) -> Result<bool, PaneScanError>;
@@ -54,12 +54,19 @@ pub trait PaneOrchestrator {
     fn launch_retro_loop(&self, pane_id: &str) -> io::Result<()>;
     /// Same shape as `launch_merge_loop`, running `/fgOS:cleanup-loop`.
     fn launch_cleanup_loop(&self, pane_id: &str) -> io::Result<()>;
-    /// Unattended equivalent of `open_discover_pane` (tsk-2ja): labels the
-    /// pane `fgos-auto-discover-<id>` via `herdr pane rename` immediately
-    /// after opening it, before spawning `claude` — closing the race
-    /// window the person-triggered button doesn't have to close (its
-    /// label is set later, from inside the launched session).
-    fn open_auto_discover_pane(&self, id: &str) -> io::Result<()>;
+    /// Unattended equivalent of `open_discover_pane` (tsk-2ja) — but never
+    /// for a specific id: the caller only ever knows a discoverable item
+    /// exists (via `next_auto_discover_candidate`'s own engine-backed
+    /// readiness check against `fgos triage --json`'s dependency data),
+    /// never which one, so picking stays fully centralized in
+    /// `pickNextDiscoverItem` (`src/state/discover-pool.mjs`) — the typed
+    /// command is `/fgOS:discover-next --autoClose`, no id. Labels the
+    /// pane with the fixed `fgos-auto-discover` guard label via `herdr
+    /// pane rename` immediately after opening it, before spawning
+    /// `claude` — closing the race window the person-triggered button
+    /// doesn't have to close (its label is set later, from inside the
+    /// launched session).
+    fn open_auto_discover_pane(&self) -> io::Result<()>;
 }
 
 /// Domain-level input the render adapter translates real terminal events

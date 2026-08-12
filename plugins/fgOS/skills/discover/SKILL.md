@@ -53,13 +53,17 @@ callers, in practice:
 
 - `/fgOS:discover-next`, after picking an item off the discovery-shaped pool
   (tsk-lya D10 — it delegates down here rather than dispatching
-  `fgos-coding-driving` itself).
-- `herdr-plugin`'s auto-launcher, which always passes `--autoClose`
-  (`herdr-plugin/src/pick.rs:17,130`) — both a manual pane button and an
-  unattended auto-pick path route through here.
+  `fgos-coding-driving` itself). `herdr-plugin`'s unattended auto-discover
+  launcher is one caller of `/fgOS:discover-next` itself now (it only
+  knows an item exists, never which one — picking stays centralized in
+  `pickNextDiscoverItem`), always passing `--autoClose` through both
+  tiers.
+- `herdr-plugin`'s manual per-item Discover button, which calls here
+  directly with the id the person selected in the dashboard, also always
+  passing `--autoClose` (`herdr-plugin/src/pick.rs`).
 - Rarely, a person invoking it by hand with a specific id in mind. Most of
-  the time — the auto-launcher and `discover-next` paths above — nobody is
-  sitting watching this pane while it runs.
+  the time — the two herdr-plugin paths and `discover-next` above —
+  nobody is sitting watching this pane while it runs.
 
 ## Steps
 

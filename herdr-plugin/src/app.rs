@@ -45,8 +45,8 @@ pub struct WorkItem {
     pub id: String,
     pub title: String,
     pub goal_tier: String,
-    /// tsk-1e3 D4: gates the detail modal's Discover button — enabled only
-    /// at `"clarify"`.
+    /// Gates the detail modal's Discover button — see `discover_eligible`
+    /// below for the actual enablement rule.
     pub stage: String,
     /// tsk-64z D1: raw status literal — drives the Status column and the
     /// tab membership check (`WorkTab::matches`, below).
@@ -57,6 +57,28 @@ pub struct WorkItem {
     pub blocks: u32,
     /// tsk-64z D2: sort key, ascending. `None` when not yet computed.
     pub priority: Option<i64>,
+}
+
+impl WorkItem {
+    /// Whether `/fgOS:discover` actually applies to this item right now —
+    /// the single shared definition `ui.rs` (button render) and `main.rs`
+    /// (button click handler, auto-discover candidate filter) must both
+    /// use, so they can never drift apart the way a `stage == "clarify"`
+    /// render-side check and a `stage == "discovery"` handler-side check
+    /// once did.
+    ///
+    /// Mirrors `CANDIDATE_STAGES` in `src/state/discover-pool.mjs`
+    /// (`clarify`/`discovery`/`exploring` — the stages `/fgOS:discover`
+    /// itself drives) plus that same module's `isDepsAndLineageReady`
+    /// gate, approximated here via `blocked_by`: it is sourced from
+    /// `fgos triage --json`'s `blockedBy`, which walks the identical
+    /// unified dependency+lineage graph (`rankImpact`/`buildUnifiedEdges`,
+    /// tsk-dus D1/D2) that `isDepsAndLineageReady` itself queries — a
+    /// non-empty `blocked_by` means `fgos take`/`pick` would refuse this
+    /// item today, so herdr must never open a discover pane for it.
+    pub fn discover_eligible(&self) -> bool {
+        matches!(self.stage.as_str(), "clarify" | "discovery" | "exploring") && self.blocked_by.is_empty()
+    }
 }
 
 /// tsk-64z D1/D7: the Work Items panel's 4 tabs — a pure classification
@@ -514,7 +536,7 @@ impl App {
                     id: "tsk-19y-2".into(),
                     title: "Wire real fgOS data into the dashboard".into(),
                     goal_tier: "mvp".into(),
-                    stage: "decompose".into(),
+                    stage: "planning".into(),
                     status: "doing".into(),
                     blocked_by: Vec::new(),
                     blocks: 1,

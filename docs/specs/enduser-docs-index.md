@@ -1,7 +1,7 @@
 ---
 area: enduser-docs-index
-updated: 2026-07-22
-sources: [compound-learn-enduser-docs, str64-backfill]
+updated: 2026-08-12
+sources: [compound-learn-enduser-docs, str64-backfill, spec-docs-lifecycle-realignment]
 decisions: [1d336d8a, 02623bff, c74bcef9, acda11a7]
 coverage: full
 ---
@@ -27,7 +27,8 @@ cung cấp truy vấn ngược "một tài liệu sinh ra từ những capture n
   bề mặt duy nhất; không có lịch chạy tự động, không có sự kiện nào kích hoạt nó. Bề
   mặt CLI sống ở area work-state (cửa lệnh `fgos` một cửa); hành vi sống ở đây.
 - Kỳ vọng chạy sau khi một tài liệu người-dùng-cuối mới được soạn ở khâu
-  compound-learn, để chỉ mục bắt kịp tài liệu và linkage mới.
+  tổng-hợp (việc mang status `retrospective`), để chỉ mục bắt kịp tài liệu và
+  linkage mới.
 - **`fgos doc-sources <docPath>`** — người hoặc agent gọi verb này để lấy **mọi**
   capture đã liên kết tới một đường dẫn tài liệu (truy vấn ngược nhiều-kết-quả), làm
   nguồn cho area `enduser-docs-authoring` dựng lại tài liệu không mất chi tiết. Cũng
@@ -197,7 +198,8 @@ duy nhất của linkage vẫn là nhật ký capture, tra qua `fgos doc-sources
   đây KHÔNG phải "tài liệu không có capture", giá trị thật vẫn tồn tại, chỉ là lần chạy
   này không tra được. Giữ nguyên giá trị cũ trên đĩa thay vì null-hóa (tsk-f31; xem
   bước 3 ở trên).
-- Tài liệu backfill từ nội dung di sản (không qua compound-learn): đầu-mô-tả của nó
+- Tài liệu backfill từ nội dung di sản (không qua khâu tổng-hợp ở status
+  `retrospective`): đầu-mô-tả của nó
   khai `móc-liên-kết-nguồn` rỗng một cách trung thực — không bịa linkage giả (per D1/D4
   của str64-backfill).
 - Chạy `fgos docs-index` nhiều lần liên tiếp: manifest hội tụ, không mục trùng (R7).

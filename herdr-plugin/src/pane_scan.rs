@@ -110,7 +110,7 @@ pub fn parse_pane_list(json: &str) -> Result<HashMap<String, PaneIdentity>, serd
 
 /// Guard check for a fixed, non-id-shaped pane title — shared by both
 /// tsk-57q's own `fgos-auto-merge`/`fgos-auto-retro`/`fgos-auto-cleanup`
-/// and tsk-2ja's `fgos-auto-discover-<id>`. `parse_pane_list` above only
+/// and tsk-2ja's `fgos-auto-discover`. `parse_pane_list` above only
 /// ever returns id-shaped labels (`extract_task_id` rejects anything else
 /// outright — including the `fgos-auto-*` namespace explicitly, below),
 /// so any fixed/synthetic literal title needs this separate exact-match
