@@ -358,3 +358,32 @@ test('unmergedDeliveries counts only the commits with no patch-equivalent on tru
   // Two commits ahead, but one already landed — only the other is missing.
   assert.equal(unmergedDeliveries(repoRoot, view).a.unmatched, 1);
 });
+
+test('unmergedDeliveries omits a branch whose tree is identical to its fork point', () => {
+  const repoRoot = initRepo();
+  // A branch that only ever merged trunk back into itself: many commits
+  // "ahead" by count, zero content of its own. Merge commits carry no
+  // patch-id, so a patch-id count alone would call these unmatched forever.
+  checkoutNewBranch(repoRoot, 'fgw/a');
+  git(repoRoot, ['checkout', '-q', 'main']);
+  commitFile(repoRoot, 'trunk.txt', 'trunk');
+  git(repoRoot, ['checkout', '-q', 'fgw/a']);
+  git(repoRoot, ['merge', '-q', '--no-ff', '-m', 'merge main into fgw/a', 'main']);
+
+  const view = { work: { a: item('a', { status: 'delivered' }) } };
+  assert.deepEqual(unmergedDeliveries(repoRoot, view), {});
+});
+
+test('unmergedDeliveries does not count merge commits as unmatched work', () => {
+  const repoRoot = initRepo();
+  checkoutNewBranch(repoRoot, 'fgw/side');
+  commitFile(repoRoot, 'side.txt', 'side');
+  checkoutNewBranch(repoRoot, 'fgw/a');
+  commitFile(repoRoot, 'own.txt', 'own');
+  git(repoRoot, ['merge', '-q', '--no-ff', '-m', 'merge fgw/side into fgw/a', 'fgw/side']);
+
+  const view = { work: { a: item('a', { status: 'delivered' }) } };
+  // Three commits ahead (own + side + the merge); only the two real patches
+  // count, never the merge commit itself.
+  assert.equal(unmergedDeliveries(repoRoot, view).a.unmatched, 2);
+});

@@ -53,10 +53,29 @@ function isAncestor(repoRoot, branch, from) {
   }
 }
 
-// How many commits on `branch` have no patch-equivalent anywhere on `from`.
-// `--cherry-pick` compares patch-ids, so a commit whose content reached trunk
-// by a different route — cherry-picked, re-applied, or carried in on a branch
-// that was later rewritten — is not counted.
+// Whether `branch` introduces no file change at all relative to where it
+// forked from `from`. A branch can sit many commits "ahead" while its tree is
+// byte-identical to the merge-base — a chain of merge commits that only
+// carried trunk's own content back in, which is what a synced-up root branch
+// looks like. Nothing there can possibly be missing, whatever the commit
+// count says.
+function introducesNothing(repoRoot, branch, from) {
+  try {
+    const base = git(repoRoot, ['merge-base', from, branch]).trim();
+    if (!base) return false;
+    return git(repoRoot, ['diff', '--name-only', base, branch]).trim() === '';
+  } catch {
+    return false;
+  }
+}
+
+// How many NON-MERGE commits on `branch` have no patch-equivalent anywhere on
+// `from`. `--cherry-pick` compares patch-ids, so a commit whose content
+// reached trunk by a different route — cherry-picked, re-applied, or carried
+// in on a branch that was later rewritten — is not counted.
+//
+// `--no-merges` matters: a merge commit has no patch-id, so `--cherry-pick`
+// can never match one and would count every merge as unmatched forever.
 //
 // This is the difference between "this branch is not merged" (a ref fact) and
 // "this work is missing" (a content fact). The first without the second is
@@ -66,7 +85,7 @@ function isAncestor(repoRoot, branch, from) {
 // work is exactly the kind of false alarm that teaches people to skip doctor.
 function unmatchedCommitCount(repoRoot, branch, from) {
   try {
-    const out = git(repoRoot, ['rev-list', '--count', '--cherry-pick', '--right-only', `${from}...${branch}`]).trim();
+    const out = git(repoRoot, ['rev-list', '--count', '--cherry-pick', '--right-only', '--no-merges', `${from}...${branch}`]).trim();
     const n = Number.parseInt(out, 10);
     return Number.isFinite(n) ? n : 0;
   } catch {
@@ -155,8 +174,9 @@ export function driftStatus(repoRoot, view) {
  * `{ [id]: { branch, status, landedOn, unmatched } }`; `landedOn` names the
  * parent branch the item did merge into when that is why it is off trunk,
  * and is `null` when the branch was never merged anywhere. `unmatched` is
- * how many of the branch's commits have no patch-equivalent on trunk — a
- * branch where that is zero is omitted entirely, because its content is
+ * how many of the branch's non-merge commits have no patch-equivalent on
+ * trunk — a branch where that is zero, or which changes no file at all
+ * against its fork point, is omitted entirely, because its content is
  * already there and only the ref is stale.
  *
  * Why this is not covered by `driftStatus` above: that function is scoped to
@@ -184,9 +204,11 @@ export function unmergedDeliveries(repoRoot, view) {
     if (!branchExists(repoRoot, branch)) continue;
     if (isAncestor(repoRoot, branch, trunk)) continue;
 
-    // Not merged, but is anything actually missing? A branch whose every
-    // commit has a patch-equivalent on trunk carried its content in by some
-    // other route and is just a stale ref — housekeeping, never an incident.
+    // Not merged, but is anything actually missing? Two ways the answer is
+    // no, and neither is an incident: the branch changes no file at all
+    // against its fork point, or every commit it does carry already has a
+    // patch-equivalent on trunk. Both are stale refs, pure housekeeping.
+    if (introducesNothing(repoRoot, branch, trunk)) continue;
     const unmatched = unmatchedCommitCount(repoRoot, branch, trunk);
     if (unmatched === 0) continue;
 
