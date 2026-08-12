@@ -84,8 +84,8 @@ import { runGoalCheck } from './goal-check.mjs';
 import { createWriteQueue } from './write-queue.mjs';
 import { createOwnershipStore, resolveRoot, claimRoot, steerFrontier } from './root-affinity.mjs';
 import { claimWork, ClaimError } from './claim-port.mjs';
-import { hasWorkerSlotRoom } from '../state/worker-slots.mjs';
-import { readSharedConfig } from '../config/shared-config-file.mjs';
+import { hasWorkerSlotRoom, countWorkerSlots } from '../state/worker-slots.mjs';
+import { readSharedConfig, readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';
 import { resolveRepoRoot, fgosDirFromRoot } from './paths.mjs';
 import { FALLBACK_VERIFY, resolveDiscovery, classificationPatchFromVerdict } from '../intake/discovery.mjs';
 import { resolvePlan } from '../intake/plan.mjs';
@@ -1157,8 +1157,30 @@ export async function runOnce(options = {}) {
       // equivalent (tsk-1w7 D10) — no other registered domain ever declares
       // a stage named 'discovery' at all, so this direct literal comparison
       // can never wrongly match a non-coding item.
+      // This sweep stands a REAL worker process up, so it has to obey the
+      // shared ceiling like every other launcher (D6/D7) — the whole point of
+      // one engine-owned total is that no launcher keeps a private one. It is
+      // the one dispatch path that never claims: the item stays `todo` and
+      // moves to `doing` only inside the worker itself, so `countWorkerSlots`
+      // (which counts `doing`) cannot see this process at all. Left ungated,
+      // a full lane refused the execution wave below and then spawned research
+      // workers anyway, and `fgos slots` under-reported the machine while
+      // every other launcher decided on that undercount.
+      //
+      // Asked per item, not once for the sweep: these run sequentially and
+      // each one occupies the lane only while it runs, so a fresh read is both
+      // cheaper and more accurate than a batch grant. `break`, not `continue`
+      // — the answer will not change within this pass.
       for (const item of Object.values(listWork(dir).work)) {
         if (item.stage !== 'discovery' || item.status !== 'todo') continue;
+        const researchRoom = hasWorkerSlotRoom(listWork(dir), {
+          ceiling: readSharedConfigOrEmpty(path.dirname(dir))?.workerSlots?.ceiling,
+          excludeId: item.id,
+        });
+        if (!researchRoom.allowed) {
+          log(`fgos-runner: no worker-slot room for research on "${item.id}" — ${researchRoom.occupied} of ${researchRoom.ceiling} slot(s) in use; left for a later poll`);
+          break;
+        }
         let wt = null;
         try {
           wt = createDispatchWorktree(repoRoot, item.id, { worktreeDir });
@@ -1325,9 +1347,13 @@ export async function runOnce(options = {}) {
     // gate does (claim-port.mjs), rather than from `repoRoot`, which callers
     // set independently. An absent `workerSlots.ceiling` means no ceiling at
     // all, so this whole gate stays inert until a project configures one.
-    const ceiling = readSharedConfig(path.dirname(dir))?.workerSlots?.ceiling;
+    const ceiling = readSharedConfigOrEmpty(path.dirname(dir))?.workerSlots?.ceiling;
     const dispatched = [];
     let haltExitCode = null;
+    // Set whenever the worker-slot gate refused or trimmed a wave, so the
+    // "nothing dispatched" branch below can tell a full lane from an empty
+    // frontier instead of reporting both as the same silent idle.
+    let roomRefused = false;
 
     while (true) {
       const frontierItems = readyWork(dir);
@@ -1358,21 +1384,37 @@ export async function runOnce(options = {}) {
       const wave = selectWave(steered, view, parallel);
       if (wave.length === 0) break; // nothing dispatchable — drain complete
 
-      // Ask the engine for room BEFORE standing any worker up (D6). The
-      // whole pre-computed wave is offered as one batch and passes whole or
-      // not at all (D8) — never trimmed to the number of free slots, which
-      // is why `granted` is read for nothing here and only `allowed` decides.
+      // Ask the engine for room BEFORE standing any worker up (D6), then
+      // TRIM the wave to what it granted. The batch is never offered whole:
+      // the enforcing gate inside `claimWork` claims one item at a time and
+      // re-folds the log per call, so it cannot honor a whole-batch grant —
+      // dispatching more than `granted` just sends the tail to a claim that
+      // refuses it. See `hasWorkerSlotRoom` for the supersede of D8's
+      // whole-batch rule. With no ceiling armed, `granted` is the whole wave,
+      // so this slice is a no-op and behavior is identical to before.
       // `break`, not `continue`: a drain-run is bounded (D15), so re-polling
       // a full lane would only see it full again; `--watch`'s next cycle is
       // where waiting belongs.
       const room = hasWorkerSlotRoom(view, { ceiling, batchSize: wave.length });
       if (!room.allowed) {
-        log(`fgos-runner: no worker-slot room — ${room.occupied} of ${room.ceiling} slot(s) in use; ${wave.length} ready item(s) left for a later poll`);
+        // Name the ids actually holding the lane. Without this, a lane wedged
+        // by claims nobody is working (a closed terminal, a crashed session --
+        // `startupReap` skips human/session claims by design) is invisible:
+        // every launcher is refused and the only clue is a count.
+        const holders = countWorkerSlots(view).execution.items.map((i) => i.id);
+        log(`fgos-runner: no worker-slot room — ${room.occupied} of ${room.ceiling} slot(s) in use by ${holders.join(', ')}; ${wave.length} ready item(s) left for a later poll`);
+        roomRefused = true;
         break;
       }
 
+      const admitted = wave.slice(0, room.granted);
+      if (admitted.length < wave.length) {
+        log(`fgos-runner: worker-slot ceiling admits ${admitted.length} of ${wave.length} ready item(s) — ${room.occupied} of ${room.ceiling} slot(s) in use; the rest wait for a later poll`);
+        roomRefused = true;
+      }
+
       const ctxBase ={ repoRoot, dir, config, worktreeDir, breaker, queue, log, ownershipStore, ownerIdentity };
-      const settled = await Promise.allSettled(wave.map((item) => claimAndDispatch({ ...ctxBase, item })));
+      const settled = await Promise.allSettled(admitted.map((item) => claimAndDispatch({ ...ctxBase, item })));
 
       let progressed = false;
       for (const s of settled) {
@@ -1389,8 +1431,17 @@ export async function runOnce(options = {}) {
     }
 
     if (dispatched.length === 0) {
+      // "Nothing to do" and "work is waiting behind a full lane" are opposite
+      // situations that used to print the same line and return the same
+      // envelope. A caller polling `outcome: 'idle'` could not tell a quiet
+      // backlog from a wedged one, and the log flatly contradicted the
+      // refusal message printed moments earlier.
+      if (roomRefused) {
+        log('fgos-runner: nothing dispatched — the worker-slot lane is full; see the refusal above.');
+        return { outcome: 'idle', reason: 'worker-slot-ceiling', reap, parked, dispatched, exitCode: 0 };
+      }
       log('fgos-runner: frontier empty — nothing to do.');
-      return { outcome: 'idle', reap, parked, dispatched, exitCode: 0 };
+      return { outcome: 'idle', reason: 'frontier-empty', reap, parked, dispatched, exitCode: 0 };
     }
     return { outcome: 'drained', dispatched, parked, reap, exitCode: haltExitCode ?? 0 };
   } catch (err) {

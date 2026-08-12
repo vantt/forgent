@@ -936,7 +936,16 @@ registerConfigDefault({
 // to cover for `invariantChecks`. `null` is the one non-number that is not a
 // mistake: it is what `fgos setup` writes to mean "deliberately unarmed".
 function checkWorkerSlotsCeiling(cwd) {
-  const section = readSharedConfig(cwd).workerSlots;
+  // Deliberately NOT the fail-soft reader the claim paths use: those want an
+  // unreadable file to read as "no ceiling", but naming a broken config is
+  // this check's entire job, and degrading to `{}` would report the file as
+  // merely unconfigured while every claim silently ran uncapped.
+  let section;
+  try {
+    section = readSharedConfig(cwd).workerSlots;
+  } catch (err) {
+    return { passed: false, message: `shared config cannot be parsed, so no worker-slot ceiling can be read: ${err.message}` };
+  }
   if (section === undefined) {
     return {
       passed: false,

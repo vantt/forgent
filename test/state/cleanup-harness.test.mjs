@@ -390,6 +390,39 @@ test('checkRetrospectiveContent: ok when docType/docPath are recorded AND the fi
   assert.equal(result.ok, true, 'a real doc must pass even with no predicted/actual field — that was the false-fail bug');
 });
 
+// An engine-written record is the same class of evidence as the
+// predicted/actual outcome above: written by machinery as a side effect of
+// the lifecycle, never by anyone reflecting on the work. `fgos report` (the
+// driver's closing report) is one, and `fgos-coding-driving` writes one at
+// EVERY stop — so counting engine records left this gate permanently green
+// for every item that had ever been driven, before retrospective ran at all.
+test('checkRetrospectiveContent: NOT ok when the only decision is an engine record such as a driver report', () => {
+  const repoRoot = initRepo();
+  const view = {
+    decisionsById: {
+      'driver-report-only': [
+        { text: 'reached ceiling at status awaiting-approval', source: 'driver-report', kind: 'engine' },
+      ],
+    },
+  };
+  const result = checkRetrospectiveContent(view, 'driver-report-only', repoRoot);
+  assert.equal(result.ok, false, 'engine bookkeeping is not evidence that a retrospective ran');
+});
+
+test('checkRetrospectiveContent: ok when a real (non-engine) decision sits alongside engine records', () => {
+  const repoRoot = initRepo();
+  const view = {
+    decisionsById: {
+      'real-decision': [
+        { text: 'returned, awaiting-approval', source: 'driver-report', kind: 'engine' },
+        { text: 'chose the pull door over a second write path', source: 'session', kind: 'design' },
+      ],
+    },
+  };
+  const result = checkRetrospectiveContent(view, 'real-decision', repoRoot);
+  assert.equal(result.ok, true, 'a genuine decision still satisfies the gate, engine noise alongside it or not');
+});
+
 test('checkRetrospectiveContent: NOT ok when docPath is recorded but the file does not exist on disk (the orphaned-doc incident)', () => {
   const repoRoot = initRepo();
   const view = { outcomes: { 'orphaned-doc': { docType: 'how-to', docPath: 'docs/how-to/never-written.md' } } };

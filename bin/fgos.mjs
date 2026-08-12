@@ -69,7 +69,7 @@ import { recordInvocationFault } from '../src/cli/invocation-fault-log.mjs';
 import { recordApprovePostSuccessFault } from '../src/cli/approve-fault-log.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { DOCTOR_CHECKS, integrationScriptPath, ensureSharedConfigDefaults, runFixes } from '../src/setup/checks.mjs';
-import { sharedConfigFilePath, readSharedConfig, readInvariantCheckCommands } from '../src/config/shared-config-file.mjs';
+import { sharedConfigFilePath, readSharedConfig, readSharedConfigOrEmpty, readInvariantCheckCommands } from '../src/config/shared-config-file.mjs';
 import { countWorkerSlots, hasWorkerSlotRoom } from '../src/state/worker-slots.mjs';
 import { assessCleanupReadiness } from '../src/state/cleanup-harness.mjs';
 import { DEFAULT_CLEANUP_TTL_DAYS, DEFAULT_CLEANUP_LEAF_TTL_DAYS } from '../src/setup/registrations.mjs';
@@ -2147,7 +2147,7 @@ async function runVerb(verb, flags, positional, dir) {
     // ceiling comes from the same config resolution claimWork's own gate uses.
     case 'slots': {
       const slotsView = listWork(dir);
-      const ceiling = readSharedConfig(path.dirname(dir))?.workerSlots?.ceiling;
+      const ceiling = readSharedConfigOrEmpty(path.dirname(dir))?.workerSlots?.ceiling;
       const counts = countWorkerSlots(slotsView);
       const room = hasWorkerSlotRoom(slotsView, { ceiling });
       return {

@@ -730,6 +730,73 @@ test('an overshooting batch lands soft: the member the ceiling gate refuses is l
   assert.equal(countRuns(counterFile), 2);
 });
 
+// The discovery sweep stands a REAL worker process up but never claims the
+// item — it stays `todo` and only moves to `doing` inside the worker — so
+// occupancy, which counts `doing`, cannot see that process at all. Left
+// ungated it ran even while the lane was full, and `fgos slots` under-
+// reported the machine every other launcher was deciding against.
+test('the discovery sweep obeys the shared ceiling too: a full lane spawns no research worker', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  occupySlots(dir, 2);
+  writeCeiling(repoRoot, 2);
+  seedItem(dir, { id: 'item-research-blocked', stage: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
+  const body = JSON.stringify({ clear: true, verify: 'npm test -- research' });
+  const config = configFor(writeDiscoveryVerdictExecutor(scriptDir, counterFile, body));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(countRuns(counterFile), 0, 'no research worker may be stood up while the lane is full');
+  assert.equal(result.exitCode, 0, 'a refusal is an answer, not a failure');
+  const item = listWork(dir).work['item-research-blocked'];
+  assert.equal(item.stage, 'discovery', 'the item is left exactly where it was, for a later poll');
+  assert.equal(item.status, 'todo');
+});
+
+test('the discovery sweep still runs normally when the lane has room', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  occupySlots(dir, 1);
+  writeCeiling(repoRoot, 4);
+  seedItem(dir, { id: 'item-research-ok', stage: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
+  const body = JSON.stringify({ clear: true, verify: 'npm test -- research' });
+  const config = configFor(writeDiscoveryVerdictExecutor(scriptDir, counterFile, body));
+
+  await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(countRuns(counterFile), 1, 'room means the sweep is untouched');
+  assert.equal(listWork(dir).work['item-research-ok'].stage, 'planning');
+});
+
+// "Nothing to do" and "work is waiting behind a full lane" are opposite
+// situations that used to return the same envelope and log the same line —
+// one line after printing the refusal that contradicted it. A caller polling
+// `idle` could not tell a quiet backlog from a wedged one.
+test('an idle run says WHY it was idle: an empty frontier and a full lane are not the same answer', async () => {
+  const full = setup();
+  occupySlots(full.dir, 2);
+  writeCeiling(full.repoRoot, 2);
+  seedItem(full.dir, { id: 'root-waiting' });
+  const fullResult = await runOnce({
+    repoRoot: full.repoRoot,
+    config: configFor(writeCommittingExecutor(full.scriptDir, full.counterFile)),
+    worktreeDir: full.worktreeDir,
+    log: noLog,
+  });
+
+  assert.equal(fullResult.outcome, 'idle');
+  assert.equal(fullResult.reason, 'worker-slot-ceiling', 'work IS waiting — it just cannot start');
+
+  const quiet = setup();
+  const quietResult = await runOnce({
+    repoRoot: quiet.repoRoot,
+    config: configFor(writeCommittingExecutor(quiet.scriptDir, quiet.counterFile)),
+    worktreeDir: quiet.worktreeDir,
+    log: noLog,
+  });
+
+  assert.equal(quietResult.outcome, 'idle');
+  assert.equal(quietResult.reason, 'frontier-empty', 'genuinely nothing to do');
+});
+
 // --- D3 branch targeting: leaf fork-from-root-tip, root branch-reuse ------
 
 test('cell fan-out-parallel-9: a leaf whose root branch already carries a planted commit forks its own worktree from that root tip, not from main', async () => {
