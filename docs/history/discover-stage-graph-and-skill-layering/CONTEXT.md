@@ -243,3 +243,117 @@ v.v.) — các con khác của cùng cha, ngoài phạm vi item này.
 ## Outstanding questions
 
 None
+
+---
+
+# CONTEXT: tsk-30v — Nhánh verdict clear/unclear cho `nextDiscoveryEdge`
+
+## Feature boundary
+
+DoD của cả cây `tsk-2mt` (D2/D3/D6). Bốn việc, tất cả trong
+`src/intake/discovery.mjs` + `src/state/workflow-stage-graphs.mjs` +
+`src/runner/loop.mjs` + `test/intake/discovery.test.mjs`, domain `coding`
+only:
+
+1. `nextDiscoveryEdge` (`src/intake/discovery.mjs`) chuyển từ chọn cạnh
+   THUẦN THEO STAGE sang chọn cạnh **theo verdict** — nhưng chỉ tại
+   `work.stage === 'discovery'`: `clear` → nhảy thẳng `planning` (bỏ qua
+   `exploring`), `unclear` → `exploring` (thay vì giữ nguyên `discovery`).
+   Nhánh `clarify`/`exploring` (legacy và exploring's own gate) giữ
+   nguyên không đổi — chỉ `discovery` là pha "máy một mình" theo D6.
+2. **Đăng ký cạnh FSM mới `discovery → planning`**
+   (`workflow-stage-graphs.mjs`'s `transitions` array, domain `coding`) —
+   cạnh này KHÔNG tồn tại sẵn hôm nay (đính chính lại premise gốc của
+   item, xem Scout evidence) — bắt buộc vì `stage-fsm.mjs`'s CAS check
+   không có đường vòng (no bypass), thiếu cạnh thì `moveStage` throw.
+3. `resolveDiscovery`'s nhánh unclear được cấu trúc lại: riêng tại
+   `work.stage === 'discovery'`, verdict unclear vừa gọi `moveStage(...,
+   to: 'exploring')` VỪA gọi `putInAwaiting` (park) như hôm nay — không
+   phải chọn một trong hai như hôm nay. Xác nhận cơ học: hai FSM
+   (`stage-fsm.mjs`/`status-fsm.mjs`) độc lập, không guard nào chặn thứ
+   tự này; `answerAwaiting` không đụng `stage`, nên item resume thẳng vào
+   `exploring` sau khi người trả lời — đúng nghĩa "không còn park tại
+   chỗ" của D2.
+4. Sửa comment cũ ở `src/runner/loop.mjs:1082-1085` ("there is no verdict
+   to gate the transition on here … unconditionally advances discovery ->
+   exploring") — mâu thuẫn với lệnh gọi thật đã verdict-gate ở
+   `loop.mjs:1132-1151` (`resolveDiscovery(dir, item.id, config, 'runner',
+   callerVerdict)`, tsk-4v6 đã nối dây). Chỉ sửa comment, không đụng logic
+   dưới nó — logic đã đúng.
+
+Test mới trong `test/intake/discovery.test.mjs` khẳng định cả hai nhánh
+(clear-tại-discovery → planning; unclear-tại-discovery → exploring +
+park). Test hiện có ở dòng 275-284 (`'resolveDiscovery advances discovery
+-> exploring on a caller-supplied clear verdict'`) mã hoá hành vi CŨ sắp
+đổi — cần viết lại/thay bằng test unclear tương ứng, không xoá trần trụi.
+
+**Không đụng:** phân loại tier/kind/risk (`tsk-2yo`, cha khác), picker/prose
+`discover-next`/`discover` (`tsk-lya`), cạnh legacy `decompose`
+(`tsk-403` D18) — cả ba ngoài phạm vi item này.
+
+## Locked decisions
+
+| D-ID | Quyết định |
+|------|-----------|
+| D2 (kế thừa `tsk-2mt`) | Verdict của pha máy-một-mình quyết định **cạnh đi**: `clear` → bỏ qua `exploring`, sang thẳng `planning`; `unclear` → sang `exploring`, không còn park tại chỗ. Trích nguyên văn từ `DISCUSSION.md` §4 — không mở lại. |
+| D3 (kế thừa `tsk-2mt`) | `exploring` là pha người + máy — verdict unclear phải ĐƯA item TỚI đó (không chỉ hỏi rồi giữ nguyên `discovery`), để người trả lời xong rơi thẳng vào Socratic collab, không phải quay lại `fgos-coding-discovering` lần hai cho cùng một câu hỏi chưa giải quyết. |
+| D6 (kế thừa `tsk-2mt`) | `discovery` là pha máy-một-mình duy nhất có quyền tự phán verdict theo nghĩa này — `clarify` (legacy) và `exploring` (gate riêng, luôn gửi clear) không thuộc phạm vi cấu trúc lại ở việc 3. |
+| D-local-1 | Cạnh FSM `discovery → planning` là cạnh **mới**, không phải cạnh có sẵn chưa được dùng — đính chính premise gốc của item (`DISCUSSION.md` §7 task 5 viết "cả hai cạnh đã hợp lệ sẵn"). Xác nhận qua đọc trực tiếp `workflow-stage-graphs.mjs:123-149` (`RESEARCH.md` round 1, tsk-30v) — không phải giả định, không cần hỏi người vì đây là một sự thật cơ học đọc được từ code, không phải quyết định sản phẩm. |
+| D-local-2 | `resolveDiscovery`'s unclear-tại-`discovery` gọi CẢ HAI `moveStage` và `putInAwaiting` trong cùng một lượt (thứ tự: `moveStage` trước, `putInAwaiting` sau) — xác nhận an toàn cơ học qua đọc `store.mjs`'s `moveStage`/`putInAwaiting`/`answerAwaiting` (`RESEARCH.md` round 1, tsk-30v): hai FSM độc lập, không guard chặn hướng này; tiền lệ hiện có (`resolveDiscovery`/`resolvePlan`) chỉ chọn MỘT trong hai mỗi nhánh — đây là ca đầu tiên cần cả hai, không phải vi phạm tiền lệ mà là mở rộng nó đúng theo D2/D3. |
+
+## Pinned terms
+
+- **"cạnh" (edge)** — một cặp `{from, to}` trong `transitions` array của
+  domain `coding` (`workflow-stage-graphs.mjs`) — khác với "verdict"
+  (kết quả tự phán của skill chủ) hay "stage" (vị trí hiện tại của item).
+- **"không còn park tại chỗ"** — cụm D2 gốc: unclear KHÔNG giữ nguyên
+  `stage: 'discovery'` khi park; nó phải advance `stage` sang `exploring`
+  ĐỒNG THỜI với park status `awaiting-human` — hai field độc lập, cùng
+  đổi trong một lượt `resolveDiscovery`.
+
+## Scout evidence
+
+Toàn bộ evidence chi tiết (file:line, code quote) đã ghi trong
+`RESEARCH.md` Round 1 — tsk-30v, stage `discovery` (2026-08-12). Tóm tắt:
+
+- `src/intake/discovery.mjs:136-162` (`nextDiscoveryEdge`) — xác nhận:
+  không có tham số verdict, ba nhánh `if` chỉ khoá theo `work.stage`; tại
+  `discovery` luôn trả `{to: 'exploring'}` bất kể gì.
+- `src/intake/discovery.mjs:225-461` (`resolveDiscovery`) — xác nhận:
+  `nextDiscoveryEdge` chỉ được gọi khi `verdict.clear === true`; unclear
+  đi thẳng `putInAwaiting`, không bao giờ đụng `nextDiscoveryEdge`/`stage`.
+- `src/state/workflow-stage-graphs.mjs:123-149` (`transitions`) — xác
+  nhận: `discovery → exploring` có sẵn; `discovery → planning`/`discovery
+  → decompose` KHÔNG có — đính chính premise gốc (D-local-1).
+- `src/state/store.mjs:763-785` (`moveStage`), `:721-733`
+  (`putInAwaiting`), `:747-751` (`answerAwaiting`) — xác nhận độc lập
+  cơ học giữa `stage` và `status` (D-local-2).
+- `src/runner/loop.mjs:1082-1085` (comment cũ), `:1132-1151` (lệnh gọi
+  thật đã verdict-gate) — xác nhận đúng như item mô tả, chỉ lệch số dòng
+  do drift.
+- `test/intake/discovery.test.mjs` (566 dòng, đọc toàn bộ) — helper sẵn
+  có (`tmpStoreDir`, `sampleWork`) đủ dùng; test dòng 275-284 mã hoá hành
+  vi cũ, cần viết lại.
+- `impact-analysis` capability gate (CLAUDE.md): `fgos tool query
+  --capability impact-analysis --status present` → provider `gitnexus`,
+  `status: "present"` → **full**. Ghi lại cho `fgos-coding-planning` đọc
+  tiếp trước khi sửa `nextDiscoveryEdge`/`resolveDiscovery` (cả hai đều
+  là hàm nội bộ, không export ra ngoài file trừ hai export đã có sẵn
+  `discoverableStages`/`resolveDiscovery`/`FALLBACK_VERIFY`/
+  `RETIRED_P14_PLACEHOLDER`).
+
+## Canonical references
+
+- `docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md`
+  §4 D2/D3/D6, §7 task 5 (`{#task-verdict-branch-edges}`) — nguồn quyết
+  định gốc, đã khoá ở cấp cha `tsk-2mt`.
+- `docs/history/discover-stage-graph-and-skill-layering/RESEARCH.md`
+  Round 1 — tsk-30v — toàn bộ evidence chi tiết hơn bảng scout evidence
+  phía trên.
+- `src/intake/discovery.mjs`, `src/state/workflow-stage-graphs.mjs`,
+  `src/state/store.mjs`, `src/runner/loop.mjs`,
+  `test/intake/discovery.test.mjs` — nguồn cơ học cho mọi claim ở trên.
+
+## Outstanding questions
+
+None
