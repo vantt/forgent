@@ -47,6 +47,7 @@ import {
   DEFAULT_INVARIANT_CHECK_COMMANDS,
 } from '../config/shared-config-file.mjs';
 import { DEFAULT_LEVEL, LEVELS } from '../state/gate-bypass.mjs';
+import { DEFAULT_WORKER_SLOT_CEILING, ADMIN_LANE_RESERVATION } from '../state/worker-slots.mjs';
 import { checkEventsJsonlContiguity, fixEventsJsonlContiguity } from '../state/events-jsonl-contiguity.mjs';
 import { advanceEventsJsonlTruncationGuard } from '../state/events-jsonl-truncation-guard.mjs';
 
@@ -777,6 +778,24 @@ registerConfigDefault({
   id: 'cleanup',
   key: 'cleanup',
   shape: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS, leafTtlDays: DEFAULT_CLEANUP_LEAF_TTL_DAYS },
+});
+
+// docs/history/orchestrator-worker-slots/plan.md §Shape T1: the worker-slot
+// ceiling is project config, not a runner constant -- registered here so
+// `fgos setup` writes the default and `fgos doctor` can see the section at
+// all, per AGENTS.md's install/setup/doctor gate. `ceiling` bounds the
+// execution lane (running work items); `adminReservation` is the separate,
+// fixed allowance for the merge/retro/cleanup loops, which never claim a
+// work item and so share no pool with it.
+//
+// Registering a default here does NOT make the gate live everywhere: until a
+// project's config actually carries the section, claimWork reads no ceiling
+// and refuses nothing. That keeps a repo already running more items than this
+// number from having its very next claim refused the moment this ships.
+registerConfigDefault({
+  id: 'workerSlots',
+  key: 'workerSlots',
+  shape: { ceiling: DEFAULT_WORKER_SLOT_CEILING, adminReservation: ADMIN_LANE_RESERVATION },
 });
 
 // docs/history/tsk-516-approve-reverify-scope/CONTEXT.md D6: the invariant
