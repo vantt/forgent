@@ -95,122 +95,62 @@ current `verify`); `fgos-coding-planning` at `exploring` next locks the
 migration decision into `CONTEXT.md` with its own D-ID and refines
 `verify` to match the now-larger scope.
 
-## Round 3 — 2026-08-11, tsk-tku (skill chủ cho stage discovery)
+---
 
-**Asked:** Is tsk-tku's goal ("tạo `fgos-coding-discovering`, trỏ
-`skillMap.discovery` vào nó thay `fgos-researching`, gỡ khối ngoại lệ
-`## Discovery and exploring stages` khỏi `fgos-coding-driving`") clear
-enough to move forward, and are prerequisite decisions (D4/D6/D7/D8/D9) and
-prerequisite items (`tsk-403`, `tsk-qod`) actually settled on disk?
+## Round 1 — 2026-08-11 — tsk-lya (picker split + discover prose), stage `discovery`
 
-**Checked:**
+**Asked.** Is tsk-lya's goal clear enough to leave `discovery`? Scope as
+stated: (1) `discover-next` stops self-claiming/self-dispatching/
+self-computing ceiling, delegates to `/fgOS:discover <id>` after picking;
+(2) generate a `plan-next`/`plan-loop` pair for the planning-stage pool;
+(3) fix four prose defects in `discover/SKILL.md`.
 
-- `DISCUSSION.md` §4 D4/D6/D7/D8/D9 (this file, lines 86-91) — fully
-  specify: name (`fgos-coding-discovering`, not `fgos-discover`, D8), why
-  `fgos-researching` isn't promoted to stage-owner (helper reused from
-  multiple call sites, D7), the mechanical chủ-vs-helper test ("mở file
-  ra, có lệnh gọi `fgos <verb>` chuyển stage không", D7), and the domain
-  prefix (`coding`, D9). §7 task 3's own row (`DISCUSSION.md:405-417`)
-  restates the exact verify command that matches this item's own live
-  `verify` field byte-for-byte.
-- `src/state/workflow-stage-graphs.mjs:89` — `stages` already reads
-  `['discovery', 'exploring', 'decompose', 'planning', 'executing']`;
-  `:212-219` — `skillMap.discovery` is still `'fgos-researching'` today
-  (the literal thing this item repoints), and every OTHER stage skill
-  already carries the `coding-` prefix (`fgos-coding-exploring`,
-  `fgos-coding-planning`, `fgos-coding-implement`,
-  `fgos-coding-compounding`) — confirms task 1 (`tsk-403`, family rename)
-  already landed, so this item is not blocked waiting on that prefix
-  convention to exist.
-- `bin/fgos.mjs:1183-1215`, `case 'discover':` — already domain-aware via
-  `discoverableStages(getDomain(...))` (tsk-4b2), accepting a call from
-  any of the domain's registered discovery-capable stages, not hardcoded
-  to one. The engine verb side needs no change for this item — confirms
-  D17's own "con 3 nhỏ hơn" scope read (`DISCUSSION.md:99`).
-- `.claude/skills/fgos-coding-driving/SKILL.md`'s own loaded content (this
-  session's transcript) — the `## Discovery and exploring stages` section
-  and its own Hard-rule "one documented exception" both still present
-  verbatim, confirming the item's own verify line
-  (`! grep -q "Discovery and exploring stages" ...`) targets a real,
-  currently-failing condition, not something already removed.
-- `find .claude/skills`, `find .agents/skills` — both mirrors exist for
-  every existing `fgos-coding-*` skill (`.claude/skills/fgos-coding-
-  exploring`, `.agents/skills/fgos-coding-exploring`, same pair for
-  `fgos-researching`). Confirms D15's "hai bản mirror skill dir" applies
-  the same way to a brand-new skill directory, not only to the renames
-  task 1 already did — `fgos-coding-discovering` needs both.
-- `settlements.tsk-tku` (`fgos list --id tsk-tku --json`) shows a
-  `clarify-pass` entry and `deps: ["tsk-qod"]` with `tsk-qod` off the open
-  frontier — confirms this item's own prerequisite (`tsk-qod`, clarify
-  retired to Init) is already settled, not merely designed.
+**Checked** (all repo-first; nothing needed an external lookup):
 
-**What's still open:** nothing that blocks this item's own scope. D12's
-"phán lại tier/kind/risk" classification logic is explicitly task 4
-(`tsk-2yo`)'s job, not this item's (`DISCUSSION.md:405-417` names task 3's
-scope as registry-repoint + exception-removal only) — confirmed not to
-leak into this item's verify or description.
+| Thing | Where checked | Found |
+|---|---|---|
+| Task definition + D-IDs | `DISCUSSION.md:449-465` (`{#task-picker-split-and-prose}`), D1 `:83`, D8 `:90`, D10 `:92`, D11 `:93` | Scope matches the item's own description verbatim, incl. the draft verify |
+| Dependency `tsk-403` | `fgos list --id tsk-403 --json` | `status: delivered` — the plan-family rename (D11's prerequisite: `decompose`→`planning`, `fgos decompose`→`fgos plan`, skill prefix `coding-`) has already landed on `main` and is present in this worktree |
+| Rename landed | `src/intake/plan.mjs`, `plugins/fgOS/skills/plan/`, absence of `plugins/fgOS/skills/decompose/` | All confirmed in this worktree — the picker split is unblocked |
+| `discover-next/SKILL.md` current shape | `plugins/fgOS/skills/discover-next/SKILL.md:55-77` | Step 4 self-claims, then invokes `fgos-coding-driving` directly with a ceiling it computes itself from the picked stage (`stage:decompose` or `stage:executing`) — exactly D10's complaint, a legacy from before `tsk-2b0` split the bottom tier (`discover-pool.mjs:1-2`'s own pre-split comment) |
+| `discover-pool.mjs` pooling | `src/state/discover-pool.mjs:19-24, 53-61, 76-108` | `pickNextDiscoverItem` pools BOTH clarify-shaped stages (`clarify`/`discovery`/`exploring`) AND `decompose`/`planning` in one function — the "planning pool ăn ké discover-next" the item names; a `plan-next`/`plan-loop` pair needs its own pick function scoped to `decompose`/`planning` only (mirrors `compareDecomposeOrder`, already isolated as its own function) |
+| Existing next/loop template | `plugins/fgOS/skills/discover-next/SKILL.md`, `discover-loop/SKILL.md`, `cleanup-next/SKILL.md` (full read) | Consistent five/six-step shape across all three: ignore `$ARGUMENTS` → pick via a pure pool function → pool-empty stop → claim + dispatch (or run the verb) → relay the driver's stop reason verbatim, incl. the `lock-timeout` relay contract. `plan-next`/`plan-loop` has three ready templates to mirror |
+| `discover/SKILL.md` Socratic claims | `plugins/fgOS/skills/discover/SKILL.md:7, 21, 127` (post-tsk-403-rename text) | 3 assertive sentences, incl. the frontmatter `description` (loaded into every session), all claim the live session does "real Socratic reasoning (`fgos-coding-exploring`)" when `/fgOS:discover` runs — but the driver resolves stage `clarify` to `fgos-clarifying` (`workflow-stage-graphs.mjs:148`, verified live this session: my own `discover` call at `clarify` invoked `fgos-clarifying`, not `fgos-coding-exploring`), and a clear verdict lands on stage `discovery`, not `planning` directly (`nextDiscoveryEdge`, `discovery.mjs:120-124`) |
+| `discover/SKILL.md` lines 30-33 | Same file | Claims "`discover` errors if called on an item that isn't at stage `clarify`" — but `nextDiscoveryEdge` (`discovery.mjs:120-134`) explicitly handles `clarify`, `discovery`, AND `exploring` without erroring; it only throws for stages outside `discoverableStages(domain)` (i.e. `decompose`/`planning`/`executing`) |
+| `discover/SKILL.md` step 4 | Same file `:132-146` | Relays `fgos-coding-driving`'s narrated stop reason with no re-read of live state first — exactly the class of bug the Q&A log's vòng 4-5 already caught once (`DISCUSSION.md:113-114`: a session reported "reached ceiling at decompose" while the item was actually at `discovery`) |
+| `discover/SKILL.md` layer/caller context | `DISCUSSION.md:126-136` (vòng 7), `herdr-plugin/src/pick.rs:17,130` | ADR 0028 vocabulary already pins launcher (picks one, steps out, no soul needed) vs orchestrator; `pick.rs` calls `/fgOS:discover <id> --autoClose` from both a manual button and an auto-launcher — confirms "hiếm khi là người, không ai ngồi xem" is a real caller shape, not a hypothetical |
+| Item's own attached verify | `fgos list --id tsk-lya --json` | `! grep -q "Socratic reasoning"` currently fails (3 live hits confirmed above) — the verify is red today as expected pre-implementation, and its negative-grep is broader/more correct than the DISCUSSION draft's narrower `"Socratic reasoning (fgos-exploring)"` (catches all 3 assertions, not just one phrasing) |
+| Skill-dir mirrors | `find .claude -iname "discover-next*" -o -iname "plan-next*"` | No hits — `plugins/fgOS/skills/*` launcher/picker skills have no `.claude`/`.agents` mirror (unlike the 5 coding-domain stage skills tsk-403 renamed); no extra mirrored-edit surface for this item |
+| Note: `RESEARCH.md` itself | This worktree vs. main checkout | The file was untracked/uncommitted on the main checkout (a prior session's scratch from `tsk-403`'s own discovery pass) and is absent from this worktree's git history. Created fresh here per this skill's own flow step 4 ("create if it does not exist yet") — not a merge of the main-checkout content, which sits outside this item's footprint |
 
-## Round 3 verdict
+**Found.**
 
-`clear: true` — every named decision (D4/D6/D7/D8/D9) is already locked in
-`DISCUSSION.md`, every prerequisite (`tsk-403`, `tsk-qod`) is already
-delivered on disk (not just decided), and the item's own literal `verify`
-command was independently re-derived from the repo's current state, not
-just copied. `verify` carried forward unchanged (the item's own current
-`verify`).
+1. Every claim in the item's description is independently verifiable in the
+   current tree — this is a well-grounded, already-decided scope (D1/D8/D10/
+   D11), not an open design question.
+2. The dependency (`tsk-403`) is satisfied — `delivered` and present in this
+   worktree — so nothing blocks starting.
+3. Three ready templates exist for the new `plan-next`/`plan-loop` pair
+   (`discover-next`, `discover-loop`, `cleanup-next`), and the pool split
+   needed underneath them is already half-isolated (`compareDecomposeOrder`
+   is a separate function today, just not exposed as its own pick entry
+   point).
+4. All four named `discover/SKILL.md` prose defects reproduce exactly as
+   described, with concrete line numbers and a live-verified mechanism
+   (this session's own `fgos discover` call moved `tsk-lya` `clarify` →
+   `discovery` via `fgos-clarifying`, not `fgos-coding-exploring`).
 
-**Correction (empirical, post-verdict):** the prediction above ("skips
-`exploring`") was wrong — `nextDiscoveryEdge` does not yet do
-verdict-based edge selection (that is task 5, `tsk-30v`, still open); a
-`clear` verdict at `discovery` still walked the item to `exploring`
-unconditionally, matching today's pre-`tsk-30v` behavior exactly.
+**Still open** (for `fgos-planning`, not for a person):
 
-## Round 4 — 2026-08-11, tsk-tku (empirical finding, corrected)
+- Whether the new pick function for the planning pool lives in
+  `discover-pool.mjs` (narrowed to clarify-shaped stages only) plus a new
+  sibling file, or a renamed/split module — a naming/module-boundary
+  choice, not a goal-clarity gap.
+- Exact wording for the new layer/caller declaration block in
+  `discover/SKILL.md` — content is fully specified by the item's
+  description and the Q&A log; phrasing is an implementation detail.
 
-**Initial (wrong) diagnosis:** first read of this event guessed a
-`transitions`-array-ordering bug in `nextDiscoveryEdge`'s resolver picking
-the legacy `decompose` alias over `planning` for a new item. Traced
-further and retracted below — root cause is environmental, not a code
-defect in this tree's own `workflow-stage-graphs.mjs`.
-
-**Real root cause:** every `fgos <verb>` call any session in this whole
-`tsk-2mt` feature tree makes resolves `bin/fgos.mjs` from the **main
-checkout** (`/home/vantt/projects/forgentX`, per every skill's own Hard
-rule: "resolve the main checkout root ... and pass `--dir` explicitly") —
-and that file's OWN relative imports (`'../src/state/store.mjs'` etc.)
-therefore load the **main checkout's own working tree**, not the calling
-worktree's. Confirmed empirically: `main`'s tip is `70e7eca7`
-(`git log --oneline -5 main`, matches this session's own start-of-turn
-`gitStatus`); `fgw/tsk-2mt`'s tip (`f566d747`) is **not an ancestor of
-`main`**; `git merge-base --is-ancestor 5e824ac... fgw/tsk-2mt` — **yes**,
-this item's own fork point IS `fgw/tsk-2mt`, confirming D14's
-"một task cha gom hết con" is implemented as a real git accumulator
-branch (children merge into the PARENT's branch, not into `main`) — the
-whole tree, including `tsk-403`'s rename, has never touched `main`. Read
-directly (no git needed): `/home/vantt/projects/forgentX/src/state/
-workflow-stage-graphs.mjs`'s own `stepMap` for `coding` still reads
-`{clarify: 'Clarify', decompose: 'Divide', executing: 'Execute'}` —
-pre-`tsk-403` shape, no `planning` key at all. So `fgos discover`'s call
-into `nextDiscoveryEdge` necessarily ran **pre-rename code**, where
-`decompose` is the only real Divide-mapped stage name — landing `tsk-tku`
-on `decompose` was the ONLY possible outcome, not a bug in this branch's
-own registry.
-
-**Why this is actually safe, not a gap:** D18 already anticipated exactly
-this class of event — an item caught mid-transition on the legacy
-`decompose` name at the moment a future merge to `main` finally lands
-tsk-403's rename there. `tsk-tku` just became a 5th such item alongside
-the 4 D18 already named (`tsk-42i`/`tsk-3at`/`tsk-3m6`/`tsk-1opx`) — the
-legacy alias `skillMap.decompose = 'fgos-coding-planning'` this tree's own
-registry already carries exists precisely to catch it. No fix needed
-inside this item's own scope; this is the safety net working as designed,
-not a defect to flag for `tsk-30v`.
-
-**Second, separate observation (informational, not a defect either):**
-the `Skill` tool's own content-loading also resolves against the main
-checkout's path, not the active `EnterWorktree` location — invoking
-`fgos-exploring`/`fgos-planning` (pre-rename names) served real content,
-which cross-checked as substantively identical to this worktree's own
-`fgos-coding-exploring`/`fgos-coding-planning` (same D-ID markers present
-in both, e.g. `tsk-59a`/`tsk-da1`/`tsk-5ay`) — harness behavior, not
-something this item's own scope touches or needs to correct.
+**Verdict.** `clear: true` — goal, scope, and every named defect are
+independently confirmed against the live tree; the attached verify is a
+real, currently-red, runnable command that accurately targets what was
+found. Reusing the item's own attached verify unchanged.
