@@ -79,6 +79,15 @@ pub fn skip_permissions_enabled() -> bool {
     }
 }
 
+/// Mirrors `skip_permissions_enabled` above (tsk-4iz D2/D3): the model
+/// every herdr-plugin-launched `claude` session is pinned to, read once
+/// per launch, never cached. Set `FGOS_HERDR_MODEL` to override; defaults
+/// to `sonnet` — this repo's own already-established `--model` alias
+/// (`.fgos/config.json`'s `runner.executor.args`/`capacities.*.args`).
+pub fn model_flag() -> String {
+    std::env::var("FGOS_HERDR_MODEL").unwrap_or_else(|_| "sonnet".into())
+}
+
 /// argv for launching `claude` in the newly opened pane with
 /// `<slash_command> <id>` piped in as the initial prompt — the automated
 /// equivalent of a person typing the slash command by hand. Generalized
@@ -93,6 +102,7 @@ fn run_argv_for_command(
     pane_id: &str,
     slash_command: &str,
     id: &str,
+    model: &str,
     skip_permissions: bool,
     extra_args: &str,
 ) -> Result<Vec<String>, InvalidId> {
@@ -100,9 +110,11 @@ fn run_argv_for_command(
         return Err(InvalidId(id.to_string()));
     }
     let command = if skip_permissions {
-        format!("claude --dangerously-skip-permissions '{slash_command} {id}{extra_args}'")
+        format!(
+            "claude --model {model} --dangerously-skip-permissions '{slash_command} {id}{extra_args}'"
+        )
     } else {
-        format!("claude '{slash_command} {id}{extra_args}'")
+        format!("claude --model {model} '{slash_command} {id}{extra_args}'")
     };
     Ok(vec!["pane".into(), "run".into(), pane_id.into(), command])
 }
@@ -116,8 +128,13 @@ fn run_argv_for_command(
 /// Never carries `--autoClose` (tsk-358 D1 is discover-only) — a person
 /// working a claimed item in this pane must never have it closed out
 /// from under them.
-pub fn run_argv(pane_id: &str, id: &str, skip_permissions: bool) -> Result<Vec<String>, InvalidId> {
-    run_argv_for_command(pane_id, PICK_SLASH_COMMAND, id, skip_permissions, "")
+pub fn run_argv(
+    pane_id: &str,
+    id: &str,
+    model: &str,
+    skip_permissions: bool,
+) -> Result<Vec<String>, InvalidId> {
+    run_argv_for_command(pane_id, PICK_SLASH_COMMAND, id, model, skip_permissions, "")
 }
 
 /// argv for launching `claude` with `/fgOS:discover <id> --autoClose`
@@ -126,8 +143,20 @@ pub fn run_argv(pane_id: &str, id: &str, skip_permissions: bool) -> Result<Vec<S
 /// `open_auto_discover_pane`'s tsk-2ja auto-launcher — the only two
 /// callers of this function — pick it up through this one change) — same
 /// shape as `run_argv`, different slash command and always-on flag.
-pub fn discover_run_argv(pane_id: &str, id: &str, skip_permissions: bool) -> Result<Vec<String>, InvalidId> {
-    run_argv_for_command(pane_id, DISCOVER_SLASH_COMMAND, id, skip_permissions, " --autoClose")
+pub fn discover_run_argv(
+    pane_id: &str,
+    id: &str,
+    model: &str,
+    skip_permissions: bool,
+) -> Result<Vec<String>, InvalidId> {
+    run_argv_for_command(
+        pane_id,
+        DISCOVER_SLASH_COMMAND,
+        id,
+        model,
+        skip_permissions,
+        " --autoClose",
+    )
 }
 
 /// argv for launching `claude` with a pool-sweep slash command that takes
@@ -137,11 +166,11 @@ pub fn discover_run_argv(pane_id: &str, id: &str, skip_permissions: bool) -> Res
 /// interpolate — every existing argv builder in this file assumes one,
 /// so this is deliberately a separate, smaller function rather than a
 /// third `run_argv_for_command` wrapper.
-fn loop_run_argv(pane_id: &str, slash_command: &str, skip_permissions: bool) -> Vec<String> {
+fn loop_run_argv(pane_id: &str, slash_command: &str, model: &str, skip_permissions: bool) -> Vec<String> {
     let command = if skip_permissions {
-        format!("claude --dangerously-skip-permissions '{slash_command}'")
+        format!("claude --model {model} --dangerously-skip-permissions '{slash_command}'")
     } else {
-        format!("claude '{slash_command}'")
+        format!("claude --model {model} '{slash_command}'")
     };
     vec!["pane".into(), "run".into(), pane_id.into(), command]
 }
@@ -177,7 +206,8 @@ pub fn open_pick_pane(
     let pane_id = layout::place_new_agent_pane(herdr_bin, workspace_id, project_root)
         .map_err(io::Error::other)?;
 
-    let run_args = run_argv(&pane_id, id, skip_permissions_enabled()).map_err(io::Error::other)?;
+    let run_args = run_argv(&pane_id, id, &model_flag(), skip_permissions_enabled())
+        .map_err(io::Error::other)?;
     // Fire-and-forget: the dashboard never waits on the launched claude
     // session's own lifetime, only on herdr accepting the typed command.
     Command::new(herdr_bin).args(run_args).spawn()?;
@@ -195,8 +225,8 @@ pub fn open_discover_pane(
     let pane_id = layout::place_new_agent_pane(herdr_bin, workspace_id, project_root)
         .map_err(io::Error::other)?;
 
-    let run_args =
-        discover_run_argv(&pane_id, id, skip_permissions_enabled()).map_err(io::Error::other)?;
+    let run_args = discover_run_argv(&pane_id, id, &model_flag(), skip_permissions_enabled())
+        .map_err(io::Error::other)?;
     Command::new(herdr_bin).args(run_args).spawn()?;
     Ok(())
 }
@@ -206,22 +236,37 @@ pub fn open_discover_pane(
 /// never calls `layout::place_new_agent_pane`: the fixed `fg:operation`
 /// tab's two panes are resolved once, eagerly, at herdr-plugin startup
 /// (`layout::ensure_operation_tab`, tsk-5lr) and passed in by the caller.
-pub fn run_merge_loop(herdr_bin: &str, pane_id: &str, skip_permissions: bool) -> io::Result<()> {
-    let run_args = loop_run_argv(pane_id, MERGE_LOOP_SLASH_COMMAND, skip_permissions);
+pub fn run_merge_loop(
+    herdr_bin: &str,
+    pane_id: &str,
+    model: &str,
+    skip_permissions: bool,
+) -> io::Result<()> {
+    let run_args = loop_run_argv(pane_id, MERGE_LOOP_SLASH_COMMAND, model, skip_permissions);
     Command::new(herdr_bin).args(run_args).spawn()?;
     Ok(())
 }
 
 /// Same shape as `run_merge_loop` above, running `/fgOS:retro-loop`.
-pub fn run_retro_loop(herdr_bin: &str, pane_id: &str, skip_permissions: bool) -> io::Result<()> {
-    let run_args = loop_run_argv(pane_id, RETRO_LOOP_SLASH_COMMAND, skip_permissions);
+pub fn run_retro_loop(
+    herdr_bin: &str,
+    pane_id: &str,
+    model: &str,
+    skip_permissions: bool,
+) -> io::Result<()> {
+    let run_args = loop_run_argv(pane_id, RETRO_LOOP_SLASH_COMMAND, model, skip_permissions);
     Command::new(herdr_bin).args(run_args).spawn()?;
     Ok(())
 }
 
 /// Same shape as `run_merge_loop` above, running `/fgOS:cleanup-loop`.
-pub fn run_cleanup_loop(herdr_bin: &str, pane_id: &str, skip_permissions: bool) -> io::Result<()> {
-    let run_args = loop_run_argv(pane_id, CLEANUP_LOOP_SLASH_COMMAND, skip_permissions);
+pub fn run_cleanup_loop(
+    herdr_bin: &str,
+    pane_id: &str,
+    model: &str,
+    skip_permissions: bool,
+) -> io::Result<()> {
+    let run_args = loop_run_argv(pane_id, CLEANUP_LOOP_SLASH_COMMAND, model, skip_permissions);
     Command::new(herdr_bin).args(run_args).spawn()?;
     Ok(())
 }
@@ -249,6 +294,7 @@ pub fn auto_discover_pane_label(id: &str) -> String {
 fn auto_discover_launch_argv_sequence(
     pane_id: &str,
     id: &str,
+    model: &str,
     skip_permissions: bool,
 ) -> Result<[Vec<String>; 2], InvalidId> {
     let rename_argv = vec![
@@ -257,7 +303,7 @@ fn auto_discover_launch_argv_sequence(
         pane_id.into(),
         auto_discover_pane_label(id),
     ];
-    let run_argv = discover_run_argv(pane_id, id, skip_permissions)?;
+    let run_argv = discover_run_argv(pane_id, id, model, skip_permissions)?;
     Ok([rename_argv, run_argv])
 }
 
@@ -280,7 +326,7 @@ pub fn open_auto_discover_pane(
         .map_err(io::Error::other)?;
 
     let [rename_args, run_args] =
-        auto_discover_launch_argv_sequence(&pane_id, id, skip_permissions_enabled())
+        auto_discover_launch_argv_sequence(&pane_id, id, &model_flag(), skip_permissions_enabled())
             .map_err(io::Error::other)?;
 
     let rename_output = Command::new(herdr_bin).args(rename_args).output()?;
@@ -358,15 +404,15 @@ impl PaneOrchestrator for HerdrPaneAdapter {
     }
 
     fn launch_merge_loop(&self, pane_id: &str) -> io::Result<()> {
-        run_merge_loop(&self.herdr_bin, pane_id, skip_permissions_enabled())
+        run_merge_loop(&self.herdr_bin, pane_id, &model_flag(), skip_permissions_enabled())
     }
 
     fn launch_retro_loop(&self, pane_id: &str) -> io::Result<()> {
-        run_retro_loop(&self.herdr_bin, pane_id, skip_permissions_enabled())
+        run_retro_loop(&self.herdr_bin, pane_id, &model_flag(), skip_permissions_enabled())
     }
 
     fn launch_cleanup_loop(&self, pane_id: &str) -> io::Result<()> {
-        run_cleanup_loop(&self.herdr_bin, pane_id, skip_permissions_enabled())
+        run_cleanup_loop(&self.herdr_bin, pane_id, &model_flag(), skip_permissions_enabled())
     }
 
     fn open_auto_discover_pane(&self, id: &str) -> io::Result<()> {
@@ -452,24 +498,29 @@ mod tests {
 
     #[test]
     fn launch_agent_run_argv_includes_skip_permissions_by_default() {
-        let argv = run_argv("wS:p16", "tsk-19y-3", true).expect("valid id");
+        let argv = run_argv("wS:p16", "tsk-19y-3", "sonnet", true).expect("valid id");
         assert_eq!(
             argv,
             vec![
                 "pane",
                 "run",
                 "wS:p16",
-                "claude --dangerously-skip-permissions '/fgOS:pick tsk-19y-3'",
+                "claude --model sonnet --dangerously-skip-permissions '/fgOS:pick tsk-19y-3'",
             ]
         );
     }
 
     #[test]
     fn launch_agent_run_argv_omits_skip_permissions_when_disabled() {
-        let argv = run_argv("wS:p16", "tsk-19y-3", false).expect("valid id");
+        let argv = run_argv("wS:p16", "tsk-19y-3", "sonnet", false).expect("valid id");
         assert_eq!(
             argv,
-            vec!["pane", "run", "wS:p16", "claude '/fgOS:pick tsk-19y-3'",]
+            vec![
+                "pane",
+                "run",
+                "wS:p16",
+                "claude --model sonnet '/fgOS:pick tsk-19y-3'",
+            ]
         );
     }
 
@@ -494,16 +545,31 @@ mod tests {
         std::env::remove_var("FGOS_HERDR_SKIP_PERMISSIONS");
     }
 
+    /// tsk-4iz D2/D3: mirrors
+    /// `launch_agent_skip_permissions_enabled_reads_env_with_safe_default`
+    /// above, same sequential-in-one-test discipline to avoid the same
+    /// process-global env-var race.
+    #[test]
+    fn launch_agent_model_flag_reads_env_with_safe_default() {
+        std::env::remove_var("FGOS_HERDR_MODEL");
+        assert_eq!(model_flag(), "sonnet", "unset must default to sonnet (D3)");
+
+        std::env::set_var("FGOS_HERDR_MODEL", "haiku");
+        assert_eq!(model_flag(), "haiku", "FGOS_HERDR_MODEL must override the default");
+
+        std::env::remove_var("FGOS_HERDR_MODEL");
+    }
+
     #[test]
     fn discover_run_argv_includes_skip_permissions_by_default() {
-        let argv = discover_run_argv("wS:p16", "tsk-19y-3", true).expect("valid id");
+        let argv = discover_run_argv("wS:p16", "tsk-19y-3", "sonnet", true).expect("valid id");
         assert_eq!(
             argv,
             vec![
                 "pane",
                 "run",
                 "wS:p16",
-                "claude --dangerously-skip-permissions '/fgOS:discover tsk-19y-3 --autoClose'",
+                "claude --model sonnet --dangerously-skip-permissions '/fgOS:discover tsk-19y-3 --autoClose'",
             ]
         );
     }
@@ -513,27 +579,27 @@ mod tests {
     /// the non-skip-permissions branch of the same command format.
     #[test]
     fn discover_run_argv_always_includes_autoclose() {
-        let argv = discover_run_argv("wS:p16", "tsk-19y-3", false).expect("valid id");
+        let argv = discover_run_argv("wS:p16", "tsk-19y-3", "sonnet", false).expect("valid id");
         assert_eq!(
             argv,
             vec![
                 "pane",
                 "run",
                 "wS:p16",
-                "claude '/fgOS:discover tsk-19y-3 --autoClose'",
+                "claude --model sonnet '/fgOS:discover tsk-19y-3 --autoClose'",
             ]
         );
     }
 
     #[test]
     fn discover_run_argv_rejects_ids_fgos_itself_would_reject() {
-        assert!(discover_run_argv("p", "", true).is_err());
-        assert!(discover_run_argv("p", "tsk-19y-3", true).is_ok());
+        assert!(discover_run_argv("p", "", "sonnet", true).is_err());
+        assert!(discover_run_argv("p", "tsk-19y-3", "sonnet", true).is_ok());
     }
 
     #[test]
     fn run_argv_rejects_an_id_that_could_break_out_of_the_typed_command() {
-        let err = run_argv("wS:p16", "tsk'; rm -rf ~ #", true).unwrap_err();
+        let err = run_argv("wS:p16", "tsk'; rm -rf ~ #", "sonnet", true).unwrap_err();
         assert_eq!(err, InvalidId("tsk'; rm -rf ~ #".to_string()));
     }
 
@@ -545,12 +611,12 @@ mod tests {
         // `/fgOS:retro-loop`/`/fgOS:cleanup-loop` are pool-sweep verbs
         // with no per-item argument (tsk-57q).
         assert_eq!(
-            loop_run_argv("wS:pOpL", MERGE_LOOP_SLASH_COMMAND, true),
+            loop_run_argv("wS:pOpL", MERGE_LOOP_SLASH_COMMAND, "sonnet", true),
             vec![
                 "pane",
                 "run",
                 "wS:pOpL",
-                "claude --dangerously-skip-permissions '/fgOS:merge-loop'",
+                "claude --model sonnet --dangerously-skip-permissions '/fgOS:merge-loop'",
             ]
         );
     }
@@ -558,7 +624,8 @@ mod tests {
     #[test]
     fn auto_discover_launch_sets_label_before_spawning_claude() {
         let [rename_args, run_args] =
-            auto_discover_launch_argv_sequence("wS:p16", "tsk-2ja", true).expect("valid id");
+            auto_discover_launch_argv_sequence("wS:p16", "tsk-2ja", "sonnet", true)
+                .expect("valid id");
         assert_eq!(
             rename_args,
             vec!["pane", "rename", "wS:p16", "fgos-auto-discover-tsk-2ja"],
@@ -570,7 +637,7 @@ mod tests {
                 "pane",
                 "run",
                 "wS:p16",
-                "claude --dangerously-skip-permissions '/fgOS:discover tsk-2ja --autoClose'",
+                "claude --model sonnet --dangerously-skip-permissions '/fgOS:discover tsk-2ja --autoClose'",
             ],
             "tsk-358 D1: the auto-launcher's own run argv must carry --autoClose too"
         );
@@ -579,23 +646,33 @@ mod tests {
     #[test]
     fn loop_run_argv_respects_skip_permissions_false() {
         assert_eq!(
-            loop_run_argv("wS:pOpR", RETRO_LOOP_SLASH_COMMAND, false),
-            vec!["pane", "run", "wS:pOpR", "claude '/fgOS:retro-loop'"]
+            loop_run_argv("wS:pOpR", RETRO_LOOP_SLASH_COMMAND, "sonnet", false),
+            vec![
+                "pane",
+                "run",
+                "wS:pOpR",
+                "claude --model sonnet '/fgOS:retro-loop'",
+            ]
         );
     }
 
     #[test]
     fn loop_run_argv_builds_the_cleanup_loop_command() {
         assert_eq!(
-            loop_run_argv("wS:pOpR", CLEANUP_LOOP_SLASH_COMMAND, false),
-            vec!["pane", "run", "wS:pOpR", "claude '/fgOS:cleanup-loop'"]
+            loop_run_argv("wS:pOpR", CLEANUP_LOOP_SLASH_COMMAND, "sonnet", false),
+            vec![
+                "pane",
+                "run",
+                "wS:pOpR",
+                "claude --model sonnet '/fgOS:cleanup-loop'",
+            ]
         );
     }
 
     #[test]
     fn auto_discover_launch_argv_sequence_rejects_ids_fgos_itself_would_reject() {
-        assert!(auto_discover_launch_argv_sequence("p", "", true).is_err());
-        assert!(auto_discover_launch_argv_sequence("p", "tsk-2ja", true).is_ok());
+        assert!(auto_discover_launch_argv_sequence("p", "", "sonnet", true).is_err());
+        assert!(auto_discover_launch_argv_sequence("p", "tsk-2ja", "sonnet", true).is_ok());
     }
 
     #[test]
@@ -611,13 +688,19 @@ mod tests {
     #[test]
     fn run_argv_rejects_ids_fgos_itself_would_reject() {
         // Mirrors src/state/work.mjs's ID_PATTERN test cases.
-        assert!(run_argv("p", "", true).is_err());
-        assert!(run_argv("p", "-leading-hyphen", true).is_err());
-        assert!(run_argv("p", "trailing-hyphen-", true).is_err());
-        assert!(run_argv("p", "double--hyphen", true).is_err());
-        assert!(run_argv("p", "1starts-with-digit", true).is_err());
-        assert!(run_argv("p", "Has-Upper-Case", true).is_err());
-        assert!(run_argv("p", "tsk-19y-3", true).is_ok());
-        assert!(run_argv("p", "choke-point-take-vs-pick-claim-eligibility", true).is_ok());
+        assert!(run_argv("p", "", "sonnet", true).is_err());
+        assert!(run_argv("p", "-leading-hyphen", "sonnet", true).is_err());
+        assert!(run_argv("p", "trailing-hyphen-", "sonnet", true).is_err());
+        assert!(run_argv("p", "double--hyphen", "sonnet", true).is_err());
+        assert!(run_argv("p", "1starts-with-digit", "sonnet", true).is_err());
+        assert!(run_argv("p", "Has-Upper-Case", "sonnet", true).is_err());
+        assert!(run_argv("p", "tsk-19y-3", "sonnet", true).is_ok());
+        assert!(run_argv(
+            "p",
+            "choke-point-take-vs-pick-claim-eligibility",
+            "sonnet",
+            true
+        )
+        .is_ok());
     }
 }
