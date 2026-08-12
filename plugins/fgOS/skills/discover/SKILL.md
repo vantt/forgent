@@ -85,9 +85,9 @@ callers, in practice:
    fgos discover <id>
    ```
 
-2. **Claim if not already claimed.** Resolve the main checkout root (every
-   verb below is `requiresExistingStore: true`, same as every other fgOS
-   skill):
+2. **Claim if not already claimed, into the item's own worktree.** Resolve
+   the main checkout root (every verb below is `requiresExistingStore:
+   true`, same as every other fgOS skill):
 
    ```bash
    root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
@@ -110,24 +110,13 @@ callers, in practice:
 
    If `data.work["$ARGUMENTS"].status` already reads `doing`, skip straight
    to step 3 — the caller (or an earlier iteration of this same command)
-   already holds the claim. Otherwise claim it, the same way `/fgOS:pick`'s
-   own step 2 does:
-
-   ```
-   # fgos CLI fallback (tsk-1no D3)
-   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
-   if [ -f "$FGOS_BIN" ]; then
-     node "$FGOS_BIN" take $ARGUMENTS --role session --dir "$root"
-   elif command -v fgos >/dev/null 2>&1; then
-     fgos take $ARGUMENTS --role session --dir "$root"
-   else
-     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
-     exit 1
-   fi
-   ```
-
-   If the item already carries its own branch (`fgw/<id>` from an earlier
-   claim), `take` refuses and names `pick` instead — fall back to:
+   already holds the claim and this session is already inside its
+   worktree. Otherwise claim it and stand up its worktree, the exact same
+   way `/fgOS:pick`'s own steps 2 and 4 do — `fgos-coding-discovering`'s
+   and `fgos-coding-exploring`'s own file writes (`CONTEXT.md`, the
+   `RESEARCH.md` helper writes) must land on the item's `fgw/<id>` branch,
+   never on the main checkout, so the claim below is a real worktree
+   claim, not a status-only one:
 
    ```
    # fgos CLI fallback (tsk-1no D3)
@@ -141,6 +130,18 @@ callers, in practice:
      exit 1
    fi
    ```
+
+   On success, read the command's JSON output for the worktree's **path**
+   (`data.worktree.path`) and switch into it: if the `EnterWorktree` tool
+   is available in this session's toolset, call it with that `path`,
+   switching the session into that worktree before step 3 runs. If
+   `EnterWorktree` is unavailable, refuses, or errors for any reason, do
+   NOT fail or retry — fall back instead: print the worktree path plainly
+   and tell the user to open a new session there, the same fallback
+   `/fgOS:pick`'s own step 4 already uses. `pick` already reuses an
+   existing `fgw/<id>` branch/worktree from an earlier claim on this same
+   item (`data.worktree.reused: true`) rather than erroring, so there is
+   no separate branch-already-exists fallback to handle here.
 
    Any other failure (the id doesn't exist, lock contention) shows the
    real error to the user and stops — do not retry with a guessed id and
