@@ -26,7 +26,7 @@ boundary).
 
 1. **Ignore `$ARGUMENTS`.** This command takes no arguments — it always
    picks the single next TTL-ready item from the pool, the same way
-   `/fgOS:discover-next` always picks the single next clarify/decompose
+   `/fgOS:discover-next` always picks the single next discovery/exploring
    item. Do not pass an id or let the user pick one for this command; that
    is what running `fgos cleanup <id>` directly is for.
 

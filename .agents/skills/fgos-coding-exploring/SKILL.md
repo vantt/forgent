@@ -2,7 +2,7 @@
 name: fgos-coding-exploring
 description: >-
   Turn a fuzzy item into locked product decisions before any shaping or code
-  starts. Use when an item claimed at stage `clarify` has gray areas or
+  starts. Use when an item claimed at stage `exploring` has gray areas or
   unstated product decisions that would make planning guess. Examples: "what
   should this item actually do", "this request is too vague to shape yet",
   "lock the open questions before we plan this".
@@ -260,7 +260,7 @@ directly by `fgos-coding-planning`, mid-`planning`, when that skill finds
    judgment — reading what was just locked, not this skill mechanically —
    that decides whether the item is simple enough to move straight to
    `executing` or needs `fgos-coding-planning`'s shaping first. Either way, the
-   only two edges that exist from `clarify` are the ones already registered
+   only edges that exist from `exploring` are the ones already registered
    for the item's domain; this skill never adds one, never removes one, and
    never applies the move itself. Load `fgos-routing` to re-read the item's
    `stage` and get pointed at the right next skill, or hand it to

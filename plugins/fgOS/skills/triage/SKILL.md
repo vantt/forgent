@@ -85,7 +85,8 @@ read never appends an event).
    **blocks**, **tier**, **priority**, **title**.
    - `status` is the item's raw status (`todo` | `doing` | `blocked` |
      `awaiting-human` | `awaiting-approval` | `done`), rendered as-is.
-   - `stage` (`clarify` | `decompose` | `executing` | `compound-learn`) is
+   - `stage` (`discovery` | `exploring` | `planning` | `executing`, plus
+     the drain-only legacy `decompose`) is
      always present (defaults to `executing` when the raw record has none).
    - `blocked-by` renders `blockedBy` — the ids of OTHER still-open items
      THIS row directly waits on (its own unmet `deps`, plus — when this row

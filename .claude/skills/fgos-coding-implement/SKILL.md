@@ -2,7 +2,7 @@
 name: fgos-coding-implement
 description: >-
   Implement, verify, and hand back exactly one claimed coding-domain item at
-  stage `executing`. Use once an item has already cleared `clarify` and
+  stage `executing`. Use once an item has already cleared `discovery` and
   `planning` (or never needed either) and is ready for direct
   implementation. Examples: "I've claimed this item, it's ready to build",
   "implement this and return it", "the item is at executing, what do I do
@@ -15,7 +15,7 @@ Runs while a claimed item's `stage` reads `executing` — the direct
 implementation step between shaping and synthesis. This skill turns a
 claimed item into real changes, proves them with the item's own `verify`
 command, and hands the item back through `fgos return`. It never designs or
-re-shapes the work; that already happened at `clarify`/`planning`.
+re-shapes the work; that already happened at `discovery`/`exploring`/`planning`.
 
 ## Hard rules
 
