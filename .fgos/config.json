@@ -93,5 +93,8 @@
     "commands": [
       "node --test test/architecture.test.mjs"
     ]
+  },
+  "workerSlots": {
+    "ceiling": null
   }
 }
