@@ -281,6 +281,28 @@ verify từ §7 của `DISCUSSION.md` mà **không chạy thử lệnh nào**. �
 phác trong lúc thảo luận thiết kế, chưa bao giờ là lệnh đã kiểm chứng —
 coi nó như đã kiểm chứng chính là lỗi.
 
+## Reality gate — vòng 2 (2026-08-12): **READY WITH CONSTRAINTS**
+
+Chỉ chạy lại chiều đã FAIL; năm chiều kia giữ nguyên kết quả vòng 1 (bằng
+chứng không đổi).
+
+| Chiều | Kết quả | Bằng chứng |
+|---|---|---|
+| **Proof surface** | **PASS** (trước FAIL) | Cả 6 lệnh đo đỏ hôm nay (bảng exit code ở mục "Đã sửa"); cả 3 cơ chế đo được chiều xanh; guard vacuous đo cả hai chiều |
+| 5 chiều còn lại | PASS | không đổi từ vòng 1 |
+
+### Ràng buộc mang sang executing (không phải lỗi, là điều chưa chứng minh được ở đây)
+
+| # | Ràng buộc | Vì sao không chứng minh được ở stage này |
+|---|---|---|
+| C1 | **A1/R1 chưa chứng minh:** tokio có thể phá event loop ratatui | Chỉ lộ ra khi P2 chạy thật. Giảm thiểu đã chốt: server chạy trên runtime/thread riêng, không đụng vòng lặp TUI. Cổng thật: 128 test cũ phải còn xanh — nằm ngay trong verify của `tsk-k4v` |
+| C2 | **impact-analysis: degraded** | gitnexus `present` nhưng index cũ (`79fead3` vs HEAD) và `.gitnexus/` vắng trong worktree. Mọi phát biểu blast-radius chưa xác nhận — phải cross-check bằng `rg`, không tin kết quả rỗng |
+| C3 | **R6 chưa hiện thực** (guard canonicalize `docsRef`) | Đúng lịch: nó là proof point của P4, không phải của stage này. Đã ghim thành một `grep -q 'fn rejects_docs_ref_path_traversal'` trong verify của `tsk-4id` nên không thể quên |
+
+```text
+READY WITH CONSTRAINTS
+```
+
 ## Outstanding questions
 
 None
