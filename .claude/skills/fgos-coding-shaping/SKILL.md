@@ -120,10 +120,46 @@ see the "Distill mode" section below for how the second one differs.
 
 ## Flow
 
-1. **Locate or create `DISCUSSION.md`.** If the target item(s) already
-   carry a `docsRef`/`refs` pointing at an existing `DISCUSSION.md`, open
-   it and read §1 first — that recap is the fastest way back into where a
-   prior round left off. Otherwise create the file with all seven section
+1. **Claim (`fgos pick <id>`) before writing anything, then locate or
+   create `DISCUSSION.md`.** Every `DISCUSSION.md` write must land on the
+   item's own `fgw/<id>` branch, never on the main checkout — this step is
+   what makes the "commit `DISCUSSION.md` to `fgw/<id>`" hard rule below
+   literally true instead of aspirational.
+
+   Resolve which item is in play first:
+   - **An existing item id was passed** (a bare `id` argument, or
+     `coding-shape-distill`'s own `[id]` argument): no `fgos submit` call
+     — the item already exists.
+   - **Free text was passed with no existing item** (this skill's
+     free-text entry): call `fgos submit` (the same protocol
+     `plugins/fgOS/skills/submit/SKILL.md` documents — scan for a
+     textually-grounded dependency candidate, confirm before attaching)
+     against the free text, and use the returned id.
+   - **A `<doc-path>` was passed with no `id`** (`coding-shape-distill`'s
+     own no-`id` case): call `fgos submit` using the doc-path's own
+     title/first line as the submitted text, and use the returned id.
+   - **Empty argument, resuming a prior round**: if this session is
+     already inside a worktree from an earlier claim in this same
+     multi-day thread, there is nothing to claim again — skip straight to
+     locating `DISCUSSION.md` below.
+
+   Once an id is resolved and the session is not already claimed/inside
+   that item's worktree, claim it and enter the worktree — the same
+   pattern `fgos-coding-driving`'s own claim hard rule and `/fgOS:pick`
+   steps 2/4 already use, never a new mechanism:
+
+   ```bash
+   root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+   node "$root/bin/fgos.mjs" pick "<id>" --dir "$root"
+   ```
+
+   then `EnterWorktree` into the returned `data.worktree.path` (falling
+   back to printing the path and stopping, same as `/fgOS:pick`'s own
+   fallback, if `EnterWorktree` is unavailable or refuses). Only after
+   this — never before — proceed: if the claimed item already carries a
+   `docsRef`/`refs` pointing at an existing `DISCUSSION.md`, open it and
+   read §1 first — that recap is the fastest way back into where a prior
+   round left off. Otherwise create the file with all seven section
    headers present (even if some start empty), under
    `docs/history/<feature>/DISCUSSION.md` where `<feature>` is a
    descriptive kebab-case name for the thing being discussed.
