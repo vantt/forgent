@@ -2,7 +2,7 @@
 name: cook
 description: >-
   Use when the user wants a free-text task driven end-to-end through fgOS's
-  whole lifecycle in one session — submit, clarify, decompose, real
+  whole lifecycle in one session — submit, discovery, planning, real
   implementation, and return — invoked as /fgOS:cook <free-text task
   description>. Each dev-skill gate (fgos-coding-exploring/fgos-coding-planning/
   fgos-coding-validating) auto-approves when the repo's configured gate-bypass
@@ -44,11 +44,11 @@ never re-implements a dev-skill's substance inline; it invokes them.
 - **This skill still never claims before stage `executing`** — now enforced
   by `fgos-coding-driving`'s own claim-timing hard rule (tsk-19j-4), not by
   this skill's own manual step ordering. `take`/`pick` both accept an
-  explicit `--id` claim on a `clarify`/`decompose` item too
+  explicit `--id` claim on a pre-`executing` item too
   (`choke-point-take-vs-pick-claim-eligibility` fixed the prior
   disagreement between the two verbs — see "Known gap" below), but nothing
-  in this skill's own queue-draining ever needs that: clarify/decompose
-  work happens on the item while it is still `todo`, exactly as the driver
+  in this skill's own queue-draining ever needs that: discovery/exploring/
+  planning work happens on the item while it is still `todo`, exactly as the driver
   already handles it.
 - **Reuse, never duplicate.** `fgos-coding-exploring`, `fgos-coding-planning`,
   `fgos-coding-validating`, and `fgos-coding-driving` (tsk-19j-4) already define
@@ -151,8 +151,9 @@ never re-implements a dev-skill's substance inline; it invokes them.
 ## Known gap (fixed)
 
 `fgos-routing`'s own "Claim" section states an item still at
-`clarify`/`decompose` can be claimed directly with `fgos take --id <id>`.
-That prose used to be wrong — `take --id <id>` on a `clarify`-stage item
+`discovery`/`exploring`/`planning` can be claimed directly with `fgos take
+--id <id>`.
+That prose used to be wrong — `take --id <id>` on a pre-`executing` item
 was rejected outright ("not in the frontier yet (stage/deps/lineage)"),
 while `pick --id <id>` accepted the same claim. `choke-point-
 take-vs-pick-claim-eligibility` closed that gap: `take`'s explicit `--id`

@@ -1,12 +1,13 @@
 ---
 name: discover
 description: >-
-  Use when the user wants to advance one fgOS work item past stage clarify,
+  Use when the user wants to advance one fgOS work item past stage
+  discovery,
   from inside a Claude Code session, invoked as /fgOS:discover <id>. Claims
   the item if needed, then dispatches it through fgos-coding-driving so the
   live session runs whichever stage-skill each stage along the way
-  resolves to (fgos-clarifying at clarify, fgos-researching at discovery,
-  fgos-coding-exploring at exploring), supplying each stage's own verdict
+  resolves to (fgos-coding-discovering at discovery, fgos-coding-exploring
+  at exploring), supplying each stage's own verdict
   to the discover verb as it goes — never writes .fgos/ state directly,
   and never re-derives a judgment blind. For an item at stage planning,
   use /fgOS:plan instead. Examples: "/fgOS:discover build-cli",
@@ -17,11 +18,12 @@ description: >-
 
 Claims a work item (if not already claimed) and dispatches it through
 `fgos-coding-driving` so a person working inside Claude Code can advance it
-past `clarify` without hand-typing the CLI. This is a real judgment call,
+past `discovery` without hand-typing the CLI. This is a real judgment call,
 not a mechanical read: the live session runs whichever stage-skill each
-stage along the way resolves to — `fgos-clarifying`'s silent-by-default
-intent check at `clarify`, `fgos-researching`'s research pass at
-`discovery`, `fgos-coding-exploring`'s Socratic collaboration at
+stage along the way resolves to — `fgos-coding-discovering`'s machine-alone
+pass at `discovery` (which calls the `fgos-researching` helper itself, as
+many times as the open questions need), then `fgos-coding-exploring`'s
+Socratic collaboration at
 `exploring` — and each one supplies its own verdict to the `discover`
 engine verb as the item advances, instead of leaving any of those
 judgments to a later, context-blind subprocess call. Either way the item's
@@ -30,15 +32,18 @@ question. One-door-write, CTR001 — never writes `.fgos/` state directly
 (`docs/history/discover-decompose-skill-wrapper-verdict-routing/
 CONTEXT.md` D1).
 
-tsk-2b0 D1 (hard split, no fallback): `discover` runs the `clarify` ->
-`discovery` -> `exploring` chain for an item at any of those three stages
+tsk-2b0 D1 (hard split, no fallback): `discover` runs the `discovery` ->
+`exploring` chain for an item at either of those stages
 (`discoverableStages`, `src/intake/discovery.mjs`) — it no longer also
 handles `planning`-stage split-work judgment (renamed from `decompose`,
-tsk-403 D11). Use `/fgOS:plan <id>` for that; `discover` errors only if
-called on an item outside `{clarify, discovery, exploring}` (e.g. an item
+tsk-403 D11). Use `/fgOS:plan <id>` for that; `discover` errors if
+called on an item outside that set (e.g. an item
 already at `planning`/`decompose` or `executing`) — it does **not** error
 on `discovery` or `exploring`, both of which `nextDiscoveryEdge` handles
-directly.
+directly. `clarify` is NOT in the set for coding: `discoverableStages`
+builds it from `stageForStep(domain, 'Clarify')`, which coding no longer
+maps to any stage (tsk-qod D1/D2), so the entry drops out — only a domain
+that still declares a Clarify-mapped stage keeps it.
 
 ## Layer
 
@@ -46,7 +51,7 @@ directly.
 out entirely once it stops — never needs a soul watching it run). Its
 callers, in practice:
 
-- `/fgOS:discover-next`, after picking an item off the clarify-shaped pool
+- `/fgOS:discover-next`, after picking an item off the discovery-shaped pool
   (tsk-lya D10 — it delegates down here rather than dispatching
   `fgos-coding-driving` itself).
 - `herdr-plugin`'s auto-launcher, which always passes `--autoClose`
@@ -139,7 +144,7 @@ callers, in practice:
 
 3. **Dispatch through `fgos-coding-driving`.** Invoke the
    `fgos-coding-driving` skill for `$ARGUMENTS` with `ceiling:
-   stage:planning`. Never invoke `fgos-clarifying`/`fgos-researching`/
+   stage:planning`. Never invoke `fgos-coding-discovering`/
    `fgos-coding-exploring` (or any other stage-skill) by name directly
    here — the driver resolves which skill each stage maps to through its
    own registry lookup, the one place that mapping is allowed to live
@@ -152,8 +157,8 @@ callers, in practice:
    split-work judgment, which stays `/fgOS:plan`'s exclusive job (D1).
    Along the way, whichever stage-skill each stage resolves to does its
    own real reasoning and supplies that stage's verdict to the `discover`
-   engine verb directly — no context-blind subprocess judge runs for any
-   of the three stages this call may pass through.
+   engine verb directly — no context-blind subprocess judge runs for
+   either of the two stages this call may pass through.
 
 4. **Re-read the item's live state, then report it — never relay bare
    narration.** Before reporting anything, re-read `$ARGUMENTS`'s current
@@ -167,9 +172,9 @@ callers, in practice:
    reason, verified against this fresh read, not blind narration; do not
    add a separate report of your own beyond it:
 
-   - **reached ceiling at stage `planning`** — the item cleared `clarify`
-     (and, if it passed through, `discovery`/`exploring` too) with a real
-     verify command now attached. Tell the user `/fgOS:plan <id>` is the
+   - **reached ceiling at stage `planning`** — the item cleared `discovery`
+     (and `exploring` too, if its discovery verdict sent it there) with a
+     real verify command now attached. Tell the user `/fgOS:plan <id>` is the
      next step for this item.
    - **`awaiting-human`** — relay the parked question exactly and tell the
      user to resolve it via `/fgOS:answer <id> <answer text>`.

@@ -1,21 +1,21 @@
 ---
 name: discover-next
 description: >-
-  Use when the user wants the single next stage:clarify (or stage:discovery/
+  Use when the user wants the single next stage:discovery (or
   stage:exploring) fgOS work item processed now — invoked as
   /fgOS:discover-next. Picks the item via the same next-picker
-  /fgOS:discover-loop uses (clarify-shaped pool ordered by blocking
+  /fgOS:discover-loop uses (discovery-shaped pool ordered by blocking
   fan-out), claims it, and delegates to /fgOS:discover <id> — the launcher
   underneath owns claim/dispatch/ceiling for its own stage; this command's
   only job is picking. Example: "/fgOS:discover-next", "process the next
-  clarify item".
+  discovery item".
 ---
 
 # fgOS discover-next
 
 Wraps `pickNextDiscoverItem` (`src/state/discover-pool.mjs`) plus
 `/fgOS:discover` so a person (or a `/fgOS:discover-loop` iteration) can
-process the single next clarify-shaped backlog item without hand-typing
+process the single next discovery-shaped backlog item without hand-typing
 the CLI or re-deriving the pick order every time. Never writes `.fgos/`
 state directly, and never re-implements the pick logic itself —
 `pickNextDiscoverItem` stays exactly as it is
@@ -26,7 +26,9 @@ tsk-lya D10: this command picks, claims, and hands off — it does not
 itself claim + dispatch `fgos-coding-driving` + compute a ceiling anymore.
 `/fgOS:discover` (the launcher one tier down) owns all of that for
 whichever stage the picked item is actually at
-(`clarify`/`discovery`/`exploring`). The `decompose`/`planning` pool this
+(`discovery`/`exploring` — the pool's own candidate set still carries a
+`clarify` entry, dead for coding since that stage retired). The
+`planning` pool (with its legacy `decompose` alias) this
 command used to also pick from (a legacy from before `tsk-2b0` split the
 bottom tier) now has its own dedicated picker — see `/fgOS:plan-next`.
 
@@ -61,7 +63,7 @@ bottom tier) now has its own dedicated picker — see `/fgOS:plan-next`.
    own pool-empty stop signal; nothing else to do here.
 
 4. **Delegate to `/fgOS:discover <id>`.** The output from step 2 is
-   `{"id": "<id>", "stage": "clarify"|"discovery"|"exploring"}`. Invoke
+   `{"id": "<id>", "stage": "discovery"|"exploring"}`. Invoke
    `/fgOS:discover <id>` directly — do not claim the item here, do not
    dispatch `fgos-coding-driving` yourself, and do not compute a ceiling:
    `/fgOS:discover`'s own step 2 (claim if not already claimed) and step 3
