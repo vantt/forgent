@@ -59,7 +59,10 @@ thật sự cần người.
 | 7 | Câu hỏi mở Q2: merge-set bound-to-main có được land từng phần khi root chưa sync đủ? | **chốt vòng 1 — KHÔNG** | Người quyết: root tồn tại để gom con; root thiếu con mà ra `main` có thể gây hỏng. Khớp đề xuất gốc của thiết kế (luôn escalate). Chờ vòng 2 để mint D-ID |
 | 8 | Câu hỏi mở Q3: auto-rebase leaf lên root tip mới, hay chỉ cảnh báo? | **chốt vòng 1 — không auto-rebase, NHƯNG đề bài đổi** | Người quyết: không tự rebase nhánh đang active. Đồng thời mở lối thứ ba mà Q3 gốc không có: nhánh active cần **thời điểm rõ ràng để rebase**, rebase sớm đỡ conflict sau — vì tốc độ agent nhanh, work sinh ra đến lúc được pick đã outdated. Xem #12 |
 | 9 | tsk-280 (FSM guard) có phải chặn §E không | **rõ** | Chặn §E, KHÔNG chặn ba fix nhỏ. Hiện `todo`/stage `discovery`, tier standard, dep `tsk-4on`, mang nhãn "[MUST khi bắt đầu] quét lại codebase" + ghi chú 2026-08-09 chưa xác định lỗ ở cửa `move` hay `return` |
-| 12 | Thời điểm refresh base cho nhánh đang mở là ở đâu | **CHƯA RÕ — điểm mở chính của vòng 2** | Cơ chế đã xác định: `createWorktree` bỏ qua `opts.baseRef` trên đường reuse (`worktree.mjs:438`), mà `fgw/<id>` thường đã được tạo từ lúc decompose (`createBranchRef(..., baseRef:'main')`, `worktree.mjs:749`) → pick dựng worktree trên base đóng băng, không refresh. `docs/decisions/0022` từng nêu ("createWorktree 6 call site tự quyết baseRef") nhưng xếp lại chưa sửa |
+| 12 | Thời điểm refresh base cho nhánh đang mở là ở đâu | **rõ dần — 3 ứng viên, #2 đã giải** | Cơ chế gây outdated: `createWorktree` bỏ qua `opts.baseRef` trên đường reuse (`worktree.mjs:438`), mà `fgw/<id>` thường đã tạo từ lúc decompose (`createBranchRef(..., baseRef:'main')`, `worktree.mjs:749`) → pick dựng worktree trên base đóng băng. `docs/decisions/0022` từng nêu nhưng xếp lại. Ứng viên: #1 lúc `pick`, #2 sau khi root sync, #3 trước `return`. #2 xử lý ở hàng dưới |
+| 13 | Verify nên chạy ở cửa vào hay cửa ra | **chốt vòng 2 — cửa vào, ngoài lock** | `mergedTreeAlreadyVerified` (`merge.mjs:803`, tsk-516) đã cho phép cửa ra bỏ verify khi target là ancestor + tip = `branchHeadAtReturn`. Catchup verify chính là thứ cấp lại bằng chứng đó. Bỏ verify ở catchup ⇒ verify rơi vào trong lock. Chờ vòng 3 để mint D-ID |
+| 14 | Trigger nào cho refresh ở #2 | **chốt vòng 2 — giao đường dẫn thật, và #2 chỉ là điểm PHÁT HIỆN** | "root vừa nhích" là trigger sai (root 13 con ⇒ ~78 lượt verify ≈ 4h, phần lớn vô ích). Dùng `changedFiles` (`merge.mjs:362`) cho cả hai phía, KHÔNG dùng footprint khai báo. Không giao ⇒ không làm gì; có giao + phiên sống ⇒ báo phiên đó tự xử; có giao + không phiên ⇒ đánh dấu stale. Chờ vòng 3 để mint D-ID |
+| 15 | §E (hàng đợi theo target) còn là hạng mục "để sau" không | **CHƯA RÕ — cần xác nhận lại** | Lập luận vòng 2 nâng §E từ "xa xỉ" lên "điều kiện để verify chỉ chạy một lần": nếu target nhích giữa catchup-verify và land thì bằng chứng vỡ, verify lại rơi vào lock. Có thể phải xếp lại so với quyết định "ba fix nhỏ trước" |
 | 10 | Verify chạy ở đâu khi ra khỏi lock | **CHƯA RÕ** | Clone dùng-một-lần, worktree ephemeral tái dùng, hay cơ chế khác — quyết định này định hình cả §E |
 | 11 | Cổng cây-sạch thu về footprint item, hay merge chạy hẳn ngoài cây chung | **CHƯA RÕ** | tsk-kv3 nêu cả hai lối; chưa chọn |
 
@@ -114,6 +117,37 @@ vững qua hơn một vòng mà không bị sửa. Vòng 1 chưa đủ điều k
   tạo `fgw/<id>` từ `main` ngay lúc decompose. Hệ quả: item con sinh lúc
   decompose giữ base của thời điểm đó cho tới lúc được pick, không refresh.
   `docs/decisions/0022` đã nêu chỗ này nhưng chưa sửa.
+
+- **2026-08-12T08:25Z — người chất vấn verify của catchup**: "catchup đầu
+  vào tại sao phải verify... verify đầu ra thôi chứ. catchup mà mượt thì
+  đâu có chuyện gì." Scout trả lời: `merge.mjs:803`
+  `mergedTreeAlreadyVerified` (tsk-516) ĐÃ cho phép bỏ verify ở cửa ra, với
+  2 điều kiện — target là ancestor của nhánh, và tip nhánh bằng
+  `branchHeadAtReturn`. `merge.mjs:1046` `skipRedundantChecks`. Comment
+  trong hàm nói thẳng: main nhích một commit là điều kiện vỡ, verify đầy đủ
+  chạy lại TRONG lock. Catchup tạo commit mới nên làm vỡ điều kiện 2 — đó
+  chính là lý do nó phải verify: để cấp lại bằng chứng cho cửa ra tiêu thụ.
+  Bỏ verify ở catchup ⇒ cửa ra mất bằng chứng ⇒ verify chạy trong lock, chỗ
+  đắt nhất. Kết luận đề xuất: **verify đầu vào (ngoài lock), cửa ra khỏi
+  verify** — nghịch với phát biểu ban đầu của người nhưng phục vụ đúng mục
+  tiêu của người (không trả verify hai lần). Ghi nhận vòng lặp tự siết:
+  merge chậm → main nhích → verify phải chạy trong lock → merge chậm hơn.
+
+- **2026-08-12T08:31Z — người hỏi trigger cho thời điểm #2**: "cái giá thật
+  sự là ở số 2, trigger nào để catchup ở số 2?" Phân tích: trigger "root vừa
+  nhích" là sai vì lấy sự kiện topology làm proxy cho rủi ro thật — root 13
+  con, land tuần tự cả cây ⇒ ~78 lượt catchup+verify (~4h verify thuần) mà
+  phần lớn phát hiện ra không có gì đụng nhau. Đề xuất: trigger bằng **giao
+  đường dẫn thật**, dùng `changedFiles` (`merge.mjs:362`,
+  `git diff --name-only trunk...branch`) cho CẢ HAI phía — không dùng
+  `footprintOverlapAmong` (`graph-metrics.mjs:598`) vì nó so footprint KHAI
+  BÁO, trường có thể thiếu/lệch (agent contention nêu đây là ẩn số chưa xác
+  minh). Ba nhánh: không giao ⇒ không làm gì, catchup lười lúc tới lượt; có
+  giao + phiên đang sống ⇒ báo phiên đó tự xử (đúng ca "rebase sớm đỡ
+  conflict sau", và không vi phạm ràng buộc không-đụng-nhánh-người-khác); có
+  giao + không phiên sống ⇒ chỉ đánh dấu stale. Hệ quả: **#2 là điểm PHÁT
+  HIỆN, không phải điểm catchup** — catchup thật chỉ xảy ra do phiên sở hữu
+  tự làm, hoặc lười lúc tới lượt land.
 
 ## 6. Thiết kế đã chốt {#design}
 
