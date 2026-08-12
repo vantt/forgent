@@ -9,6 +9,7 @@ import {
   classifySource,
   reviewDiff,
   mergeRunnerItem,
+  withMergeTargetSlot,
   cleanupMergedBranch,
   changedFiles,
   isWorkingTreeClean,
@@ -21,7 +22,7 @@ import {
 } from '../../src/runner/merge.mjs';
 import { writeSharedConfig } from '../../src/config/shared-config-file.mjs';
 import { branchNameFor, withMergeEphemeralWorktree } from '../../src/runner/worktree.mjs';
-import { acquireMainCheckoutLock, ACQUIRED } from '../../src/runner/main-checkout-lock.mjs';
+import { acquireMainCheckoutLock, mergeSlotLockFile, ACQUIRED } from '../../src/runner/main-checkout-lock.mjs';
 
 // Every test here creates its own disposable git repo (mirrors
 // worktree.test.mjs's own initTempRepo) — never this repo's own checkout.
@@ -766,6 +767,144 @@ test('mergeRunnerItem refuses when lockRoot (not repoRoot) already holds the mai
     },
   );
   assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged — refused before the merge ever started');
+});
+
+// withMergeTargetSlot / mergeRunnerItem's targetSlot option (tsk-xyr, §E of
+// the Merge Conductor design: a queue keyed by target ref, not a directory).
+
+test('withMergeTargetSlot acquires and releases cleanly around a successful fn', async () => {
+  const lockRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-merge-test-slot-'));
+  const slotFile = mergeSlotLockFile('fgw/tsk-51m');
+
+  let ranInsideSlot = false;
+  const result = await withMergeTargetSlot(lockRoot, 'fgw/tsk-51m', async () => {
+    assert.equal(fs.existsSync(path.join(lockRoot, '.fgos', slotFile)), true, 'the slot lock file must exist while fn runs');
+    ranInsideSlot = true;
+    return 'fn-result';
+  });
+
+  assert.equal(ranInsideSlot, true);
+  assert.equal(result, 'fn-result');
+  assert.equal(fs.existsSync(path.join(lockRoot, '.fgos', slotFile)), false, 'the slot lock file must be released once fn returns');
+});
+
+test('withMergeTargetSlot releases the slot even when fn throws', async () => {
+  const lockRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-merge-test-slot-'));
+  const slotFile = mergeSlotLockFile('fgw/tsk-51m');
+
+  await assert.rejects(
+    () => withMergeTargetSlot(lockRoot, 'fgw/tsk-51m', async () => {
+      throw new Error('fn blew up');
+    }),
+    /fn blew up/,
+  );
+  assert.equal(fs.existsSync(path.join(lockRoot, '.fgos', slotFile)), false, 'a thrown fn must still release the slot (finally)');
+});
+
+test('withMergeTargetSlot refuses when the SAME target ref is already held by another live identity — code lock-held', async () => {
+  const lockRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-merge-test-slot-'));
+  const fgosDir = path.join(lockRoot, '.fgos');
+  const slotFile = mergeSlotLockFile('fgw/tsk-51m');
+  const otherLock = acquireMainCheckoutLock(fgosDir, { identity: 'a-different-live-session', lockFile: slotFile });
+  assert.equal(otherLock.status, ACQUIRED);
+
+  await assert.rejects(
+    () => withMergeTargetSlot(lockRoot, 'fgw/tsk-51m', async () => 'should never run'),
+    (err) => {
+      assert.match(err.message, /target's merge slot is held by another live session/);
+      assert.equal(err.code, 'lock-held');
+      assert.equal(err.targetRef, 'fgw/tsk-51m');
+      assert.equal(typeof err.remainingTtlMs, 'number');
+      return true;
+    },
+  );
+});
+
+test('withMergeTargetSlot for TWO DIFFERENT target refs run concurrently — no shared serialization between them (acceptance 3)', async () => {
+  const lockRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-merge-test-slot-'));
+  let bothInsideAtOnce = false;
+
+  const gate = { a: false, b: false };
+  const runA = withMergeTargetSlot(lockRoot, 'fgw/tsk-xyr', async () => {
+    gate.a = true;
+    // Wait for b to also be inside before either finishes — if the two
+    // slots contended with each other, this would deadlock and the test
+    // would time out instead of passing.
+    while (!gate.b) await new Promise((r) => setTimeout(r, 5));
+    bothInsideAtOnce = true;
+  });
+  const runB = withMergeTargetSlot(lockRoot, 'fgw/tsk-55p', async () => {
+    gate.b = true;
+    while (!gate.a) await new Promise((r) => setTimeout(r, 5));
+  });
+
+  await Promise.all([runA, runB]);
+  assert.equal(bothInsideAtOnce, true, 'both target slots must have been held simultaneously — they must not contend with each other');
+});
+
+test('mergeRunnerItem with targetSlot:true does NOT take main-checkout.lock — a concurrent holder of main-checkout.lock does not block it (acceptance: additive, unchanged default when omitted)', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+
+  // Simulate another session holding the ORDINARY main-checkout.lock (the
+  // resource mergeRunnerItem's default path contends on) — targetSlot:true
+  // must not even look at it.
+  const fgosDir = path.join(repoRoot, '.fgos');
+  const otherLock = acquireMainCheckoutLock(fgosDir, { identity: 'a-different-live-session' });
+  assert.equal(otherLock.status, ACQUIRED);
+
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }), { targetSlot: true });
+  assert.equal(result.outcome, 'merged', 'targetSlot:true must merge successfully while main-checkout.lock is held by someone else');
+});
+
+test('mergeRunnerItem omitting targetSlot (default false) still takes main-checkout.lock exactly as before — byte-identical default', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+
+  const fgosDir = path.join(repoRoot, '.fgos');
+  const otherLock = acquireMainCheckoutLock(fgosDir, { identity: 'a-different-live-session' });
+  assert.equal(otherLock.status, ACQUIRED);
+
+  await assert.rejects(
+    () => mergeRunnerItem(repoRoot, makeItem({ verify: 'true' })),
+    (err) => {
+      assert.equal(err.code, 'lock-held');
+      return true;
+    },
+  );
+});
+
+test('the target-slot pattern in practice: withMergeTargetSlot held around withMergeEphemeralWorktree blocks a second concurrent attempt on the SAME target BEFORE it can read the target tip (acceptance 7)', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/tsk-51m', 'root.txt', 'root\n');
+  makeBranchWithCommit(repoRoot, 'fgw/leaf-a', 'a.txt', 'a\n');
+
+  const targetRef = 'fgw/tsk-51m';
+  const tipBefore = git(repoRoot, ['rev-parse', targetRef]).trim();
+
+  // Hold the slot exactly as a real caller would (bin/fgos.mjs wraps
+  // withMergeEphemeralWorktree in this), simulating a first, in-progress
+  // merge into the same target from a different session.
+  const fgosDir = path.join(repoRoot, '.fgos');
+  const slotFile = mergeSlotLockFile(targetRef);
+  const heldByOther = acquireMainCheckoutLock(fgosDir, { identity: 'a-different-live-session', lockFile: slotFile });
+  assert.equal(heldByOther.status, ACQUIRED);
+
+  // A second attempt on the SAME target must be refused by the slot BEFORE
+  // withMergeEphemeralWorktree ever creates its detached checkout (which is
+  // what reads the tip) — proven here by wrapping the whole ephemeral-merge
+  // call in withMergeTargetSlot and asserting it throws lock-held, with the
+  // target's tip completely unchanged.
+  await assert.rejects(
+    () => withMergeTargetSlot(repoRoot, targetRef, () => withMergeEphemeralWorktree(repoRoot, 'tsk-51m', async (ephemeral) => {
+      throw new Error('must never reach here — the slot should refuse first');
+    })),
+    (err) => {
+      assert.equal(err.code, 'lock-held');
+      return true;
+    },
+  );
+  assert.equal(git(repoRoot, ['rev-parse', targetRef]).trim(), tipBefore, 'target tip must be completely untouched — the ephemeral worktree must never even have been created');
 });
 
 test('mergeRunnerItem: an ambiguous (unparseable) lock file carries code "lock-ambiguous", distinct from "lock-held" -- a retry wrapper must never retry this one either', async () => {
