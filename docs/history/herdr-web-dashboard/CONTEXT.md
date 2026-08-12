@@ -1,0 +1,89 @@
+# CONTEXT — herdr-web-dashboard (tsk-ldb)
+
+Quyết định đã khoá cho web dashboard của herdr-plugin. Nguồn thảo luận đầy
+đủ (5 vòng, kèm mọi bằng chứng đã trích): `DISCUSSION.md` cùng thư mục.
+File này là bản hợp đồng ngắn để `fgos-coding-planning` làm việc — đọc
+`DISCUSSION.md` khi cần lý do sâu hơn đằng sau một D-ID.
+
+## Ranh giới tính năng
+
+**Trong phạm vi:** một subsystem web dashboard mới nằm trong binary
+herdr-plugin (`herdr-fgos`) đang có — tự chạy HTTP server, tự host frontend
+đã nhúng sẵn. Ba màn: taskboard danh sách task; task-detail gồm lịch sử
+agent đã làm + lịch sử câu hỏi; và "câu hỏi cần trả lời" phủ cả kênh `ask`
+lẫn `gate-approve`. Chạy **song song** TUI, không thay thế.
+
+**Ngoài phạm vi:** cải thiện chất lượng câu hỏi tại nguồn (authoring) —
+thuộc `tsk-539`, tách rời có chủ ý (D5). Cơ chế đa-project/định danh
+cockpit — thuộc `tsk-3b0` (D11). Không đổi lược đồ event (D2). Không
+"launcher tổng" (D1).
+
+## Quyết định đã khoá
+
+| D-ID | Quyết định | seq |
+|---|---|---|
+| **D1** | Web dashboard là subsystem mới **trong binary `herdr-fgos` hiện có**, không phải tiến trình/binary riêng, không chờ launcher tổng. Chấp nhận dependency thật miễn build ra một binary kèm asset nhúng. Tái dùng `ports.rs`'s `WorkItemSource`/`PaneRegistry`. | 14637 |
+| **D2** | **Không đổi lược đồ event.** Ghép `gates[id].askHistory[i]` với bản ghi thứ i có `kind:'answer'` trong `settlements[id]`, theo thứ tự `seq`, tại tầng đọc. | 14638 |
+| **D3** | Nguồn chính của "lịch sử agent đã làm" là `CONTEXT.md`/`plan.md` (vùng-người); `state.decisions` chỉ hiện dạng chi tiết mở rộng, không mặc định. | 14639 |
+| **D4** | "Câu hỏi cần trả lời" phủ **cả hai kênh**: `ask` (gates) và `work.gate-approve` (contextApprove/planApprove/validateApprove). | 14640 |
+| **D5** | tsk-ldb (rendering) ↔ `tsk-539` (authoring) **tách rời, không `deps` chặn**; `tsk-539` là companion item được đẩy tiếp sau. | 14641 |
+| **D6** | Auth token bắt buộc ngay từ v1 (vế bind của nó bị D7 thay). | 14642 |
+| **D7** | Bind mặc định `0.0.0.0`, cấu hình được, cảnh báo khi không phải loopback. | 14703 |
+| **D8** | **Xác thực hai lớp cộng dồn**, port idiom đã kiểm chứng từ `herdr-gateway`: (1) cookie-session trước — token hex 24-byte POST một lần `/api/login`, `constant_time_eq`, đổi lấy cookie `HttpOnly; SameSite=Strict`, mọi thất bại trả **404 câm**; (2) cf-access là credential thay thế, **bắt buộc xác minh chữ ký JWT** (RS256 qua JWKS, require `exp`/`iss`/`aud`, validate `nbf`). Hai lớp không loại trừ nhau. | 14704 |
+| **D9** | Token: env `FGOS_HERDR_WEB_SECRET` ưu tiên, vắng thì **tự sinh file gitignored dưới `.fgos/`, chmod 0600**. **Không bao giờ nằm trong `.fgos/config.json`** — file đó đang được git track. | 14732 |
+| **D10** | Web dashboard có toggle riêng trong `.fgos/config.json`, **mặc định BẬT** — cố ý khác 4 toggle `herdrOrchestrator` hiện có (đều mặc định `false`). | 14741 |
+| **D11** | Đa-project (port/định danh) **defer sang `tsk-3b0`**; v1 giả định một tiến trình cockpit. Hướng đã ghi cho `tsk-3b0`: nên chỉ **một** tiến trình dashboard, herdr/client gửi thông tin định danh project để TUI/web nhận ra đang xem project nào. | 14742 |
+
+### Hệ quả của D10 phải ghi rõ, không giấu
+
+Mặc định BẬT + bind `0.0.0.0` (D7) nghĩa là **lần chạy cockpit đầu tiên đã
+mở một cổng với tới được từ LAN**, không ai chủ động chọn. Người chủ sản
+phẩm quyết định như vậy sau khi đã được trình bày đúng hệ quả này. Nên
+token bắt buộc + tự sinh (D6/D8/D9) là **thứ chịu lực giữ an toàn**, không
+phải lớp gia cố tuỳ chọn — bỏ nó đi là mở toang, không phải giảm bớt một
+tầng phòng thủ.
+
+## Thuật ngữ đã ghim
+
+- **"orchestrator"** — dùng theo nghĩa `docs/decisions/0029` D17 đã gán:
+  tầng hợp thành T0, điều phối N đơn vị chạy đồng thời và ở lại. Không
+  phải nghĩa cũ đã bị `0028` đổi tên thành `launcher`.
+- **"vùng-người" / "vùng-máy"** — theo D7 của cụm `tsk-65i`/`tsk-539`:
+  `CONTEXT.md`/`plan.md` là vùng-người (narrative, git-versioned);
+  `state.decisions` là vùng-máy (ngắn, cho agent).
+- **"câu hỏi cần trả lời"** — sau D4, gồm cả `ask` lẫn `gate-approve`,
+  không chỉ kênh `ask`.
+
+## Bằng chứng scout
+
+| Đường dẫn | Xác nhận điều gì |
+|---|---|
+| `herdr-plugin/src/ports.rs:11-20` | `trait WorkItemSource` có thật, 5 method `fetch_*` — tiền đề của D1 đứng vững |
+| `herdr-plugin/Cargo.toml` | Crate tên `herdr-fgos`; deps hiện **thuần đồng bộ** (ratatui/crossterm/serde/serde_json) — chưa có async runtime nào |
+| `herdr-plugin/src/settings.rs:1-53` | Precedent config: section `herdrOrchestrator` trong `.fgos/config.json`, đọc fail-closed từ Rust, 4 toggle **đều mặc định `false`** |
+| `src/setup/registrations.mjs:1064-1112` | Precedent đăng ký `doctor`/`setup`: check id `herdr-launcher-configured` — đúng cổng AGENTS.md bắt buộc cho config default mới |
+| `git ls-files .fgos/config.json` → trả về file; `.gitignore` không có mục nào cho nó | **`.fgos/config.json` ĐANG ĐƯỢC GIT TRACK** — gốc của D9 |
+| `.gitignore` (5 mục `.fgos/*`, mỗi mục kèm lý do) | Có sẵn nếp gitignore cho file "local, không bao giờ commit" — nhà hợp lệ cho file secret của D9 |
+| Không có `.env` nào trong repo; không có `dotenv`; `.gitignore` **không** có mục `.env` | Token web sẽ là **secret đầu tiên** fgOS phải lưu — không có cơ chế sẵn để tái dùng |
+| `grep FGOS_*` trong `src`/`bin` và `env::var` trong `herdr-plugin/src` | Nếp env var sẵn có: `FGOS_CLAUDE_COMMAND`, `FGOS_GH_COMMAND`, `FGOS_HERDR_MODEL`, `FGOS_HERDR_SKIP_PERMISSIONS`, `HERDR_BIN_PATH`… — D9 đặt tên theo nếp `FGOS_HERDR_*` |
+| `/home/vantt/projects/herdr-gateway` (crate `herdr-go` v0.1.14) | Prior art của D8: `src/web/cf_access.rs:195-217` xác minh chữ ký RS256 qua JWKS thật; `src/web/auth.rs:40-42,80-105,138-149` cookie-first + constant-time + 404 câm; `config.example.json:2` bind `0.0.0.0:8787`; crates `axum 0.7`, `jsonwebtoken 9`, `rust-embed 8` + `axum-embed 0.1` |
+| `docs/io-contract.md` (mục quy-thuộc-không-phải-xác-thực + §Ranh giới) | fgOS **không có tầng phân quyền nào**, có chủ ý; STR38/STR48 đều ngoài hợp đồng và chưa xây — nền của toàn bộ lập luận bảo mật |
+
+**`impact-analysis: degraded`** — `fgos tool query` báo gitnexus `present`,
+nhưng index đang cũ (last indexed `79fead3`, HEAD `13eef94d`) và thư mục
+`.gitnexus/` không có trong worktree này. Ghi lại để người đọc sau không
+phải tự dò; stage này không sửa code nên posture không chặn gì.
+
+## Tham chiếu chuẩn
+
+- `docs/history/herdr-web-dashboard/DISCUSSION.md` — 5 vòng thảo luận gốc,
+  §6 thiết kế + §7 tách task (4 anchor mà `refs` của item đang trỏ tới).
+- `docs/history/gate-question-quality-and-routing/DISCUSSION.md` — cụm
+  `tsk-65i`/`tsk-539`; nguồn của D7 (hai vùng lưu trữ), Q8/S4(b) (không
+  đổi lược đồ), D4 (`gate-approve` gấp 8 lần `ask`).
+- `/home/vantt/projects/herdr-gateway` — prior art cho D8/D9.
+- `AGENTS.md` §"Install/setup/doctor gate" — bắt buộc với D9/D10.
+
+## Outstanding questions
+
+None
