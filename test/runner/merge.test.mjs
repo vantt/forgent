@@ -17,6 +17,7 @@ import {
   buildOwnFileSet,
   classifyDecisionIndexCollision,
   abortMergeIfPossible,
+  detectPostLandDrift,
   MergeError,
 } from '../../src/runner/merge.mjs';
 import { writeSharedConfig } from '../../src/config/shared-config-file.mjs';
@@ -1398,4 +1399,182 @@ test('D5: an item with no branchHeadAtReturn is never eligible for the skip', as
 
   assert.equal(result.outcome, 'verify-fail');
   assert.notEqual(result.check.skipped, true);
+});
+
+// --- detectPostLandDrift (D4) -------------------------------------------
+//
+// The git-facing half of post-land detection. This is a DETECTION point, not
+// a catchup point: a root landing 13 children sequentially would otherwise
+// cost ~78 catchup+verify rounds, nearly all of which discover that nothing
+// actually collided. Nothing here may touch a branch or run a verify.
+
+function driftItem(id, overrides = {}) {
+  return { id, verify: 'true', ...overrides };
+}
+
+test('detectPostLandDrift: no shared path produces nothing at all -- no notification, no mark', () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/landed', 'a.mjs', 'a\n');
+  makeBranchWithCommit(repoRoot, 'fgw/leaf', 'b.mjs', 'b\n');
+  const view = {
+    work: {
+      landed: driftItem('landed', { status: 'awaiting-approval' }),
+      leaf: driftItem('leaf', { status: 'doing' }),
+    },
+  };
+
+  const report = detectPostLandDrift(repoRoot, view, view.work.landed, {
+    target: 'main',
+    landedFiles: changedFiles(repoRoot, view.work.landed),
+    sessions: [{ sessionId: 'sess-1', itemId: 'leaf' }],
+  });
+
+  assert.deepEqual(report.notify, []);
+  assert.deepEqual(report.stale, []);
+});
+
+test('detectPostLandDrift: a shared path with a live session notifies that exact session and leaves its branch untouched', () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/landed', 'shared.mjs', 'landed\n');
+  makeBranchWithCommit(repoRoot, 'fgw/leaf', 'shared.mjs', 'leaf\n');
+  const view = {
+    work: {
+      landed: driftItem('landed', { status: 'awaiting-approval' }),
+      leaf: driftItem('leaf', { status: 'doing' }),
+    },
+  };
+  const leafTipBefore = tipOf(repoRoot, 'fgw/leaf');
+
+  const report = detectPostLandDrift(repoRoot, view, view.work.landed, {
+    target: 'main',
+    landedFiles: changedFiles(repoRoot, view.work.landed),
+    sessions: [
+      { sessionId: 'sess-leaf', itemId: 'leaf' },
+      { sessionId: 'sess-elsewhere', itemId: 'someone-else' },
+    ],
+  });
+
+  assert.deepEqual(report.notify, [{ id: 'leaf', shared: ['shared.mjs'], sessionIds: ['sess-leaf'] }]);
+  assert.deepEqual(report.stale, []);
+  // D2: the owning session decides what to do with its own branch; detection
+  // never moves it.
+  assert.equal(tipOf(repoRoot, 'fgw/leaf'), leafTipBefore);
+});
+
+test('detectPostLandDrift: a shared path with no live session is marked stale only', () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/landed', 'shared.mjs', 'landed\n');
+  makeBranchWithCommit(repoRoot, 'fgw/leaf', 'shared.mjs', 'leaf\n');
+  const view = {
+    work: {
+      landed: driftItem('landed', { status: 'awaiting-approval' }),
+      leaf: driftItem('leaf', { status: 'doing' }),
+    },
+  };
+  const leafTipBefore = tipOf(repoRoot, 'fgw/leaf');
+
+  const report = detectPostLandDrift(repoRoot, view, view.work.landed, {
+    target: 'main',
+    landedFiles: changedFiles(repoRoot, view.work.landed),
+    sessions: [],
+  });
+
+  assert.deepEqual(report.notify, []);
+  assert.deepEqual(report.stale, [{ id: 'leaf', shared: ['shared.mjs'] }]);
+  assert.equal(tipOf(repoRoot, 'fgw/leaf'), leafTipBefore);
+});
+
+test('detectPostLandDrift runs no verify at all -- the whole reason this is a detection point', () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/landed', 'shared.mjs', 'landed\n');
+  makeBranchWithCommit(repoRoot, 'fgw/leaf', 'shared.mjs', 'leaf\n');
+  // A verify command whose only observable effect is creating this file. If
+  // any verify ran for either side, the file exists afterwards.
+  const sentinel = path.join(repoRoot, 'verify-ran.sentinel');
+  const verify = `touch ${JSON.stringify(sentinel)}`;
+  const view = {
+    work: {
+      landed: driftItem('landed', { status: 'awaiting-approval', verify }),
+      leaf: driftItem('leaf', { status: 'doing', verify }),
+    },
+  };
+
+  detectPostLandDrift(repoRoot, view, view.work.landed, {
+    target: 'main',
+    landedFiles: changedFiles(repoRoot, view.work.landed),
+    sessions: [],
+  });
+
+  assert.equal(fs.existsSync(sentinel), false);
+});
+
+test('detectPostLandDrift examines exactly the open leaves sharing the target -- O(open leaves)', () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/landed', 'shared.mjs', 'landed\n');
+  makeBranchWithCommit(repoRoot, 'fgw/live', 'shared.mjs', 'live\n');
+  makeBranchWithCommit(repoRoot, 'fgw/resolved', 'shared.mjs', 'resolved\n');
+  makeBranchWithCommit(repoRoot, 'fgw/otherTarget', 'shared.mjs', 'other\n');
+  const view = {
+    work: {
+      landed: driftItem('landed', { status: 'awaiting-approval' }),
+      live: driftItem('live', { status: 'doing' }),
+      resolved: driftItem('resolved', { status: 'delivered' }),
+      otherTarget: driftItem('otherTarget', { status: 'doing', parent: 'some-root' }),
+      noBranch: driftItem('noBranch', { status: 'doing' }),
+    },
+  };
+
+  const report = detectPostLandDrift(repoRoot, view, view.work.landed, {
+    target: 'main',
+    landedFiles: changedFiles(repoRoot, view.work.landed),
+    sessions: [],
+  });
+
+  assert.deepEqual(report.examined, ['live']);
+  assert.deepEqual(report.stale, [{ id: 'live', shared: ['shared.mjs'] }]);
+});
+
+test('detectPostLandDrift: a landed item with no branch of its own contributes no paths, so nothing is flagged', () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/leaf', 'shared.mjs', 'leaf\n');
+  const view = {
+    work: {
+      landed: driftItem('landed', { status: 'awaiting-approval' }),
+      leaf: driftItem('leaf', { status: 'doing' }),
+    },
+  };
+
+  const report = detectPostLandDrift(repoRoot, view, view.work.landed, {
+    target: 'main',
+    landedFiles: changedFiles(repoRoot, view.work.landed),
+    sessions: [],
+  });
+
+  assert.deepEqual(report.notify, []);
+  assert.deepEqual(report.stale, []);
+});
+
+test('mergeRunnerItem attaches a postLand report whose landed paths were captured BEFORE the merge', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'shared.mjs', 'landed\n');
+
+  const result = await mergeRunnerItem(repoRoot, makeItem());
+
+  assert.equal(result.outcome, 'merged');
+  // Once the merge lands, main contains fgw/demo-item, so the three-dot diff
+  // main...fgw/demo-item is EMPTY -- a report computed after the fact would
+  // find no paths at all and could never flag anything. A non-empty set here
+  // is the proof the capture happened before the merge ran.
+  assert.deepEqual(result.postLand.landedFiles, ['shared.mjs']);
+  assert.deepEqual(changedFiles(repoRoot, makeItem()), []);
+});
+
+test('mergeRunnerItem attaches no postLand report when the merge did not land', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'exit 1' }));
+
+  assert.equal(result.outcome, 'verify-fail');
+  assert.equal(result.postLand, undefined);
 });
