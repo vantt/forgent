@@ -110,6 +110,25 @@ events for one fact.
   is a naming detail only the implementer needs; not material enough to
   send back to `CONTEXT.md`.
 
+## Validating addendum (fgos-coding-validating, READY WITH CONSTRAINTS)
+
+Reality gate: mode fit PASS, repo fit PASS (every path/function cited in
+this plan and in `CONTEXT.md` read directly and confirmed to exist at the
+stated shape), assumptions PASS (both flagged assumptions confirmed
+non-material), smaller-path PASS (no smaller lane overlooked given the
+hard-gate flags), proof surface PASS (item's own `verify` field is real
+and runnable), impact-analysis posture PASS (`fgos tool query
+--capability impact-analysis --status present` re-checked fresh: still
+`present` → `full`, matches what this plan recorded).
+
+Feasibility matrix (medium+ risk rows only):
+
+| Assumption | Risk | Proof required | Evidence found | Result |
+|---|---|---|---|---|
+| Local merge call sites can derive `mergedSha` via `currentHead(repoRoot)` read right after `moveDeliveredOrRecordFault` | Medium | Confirm `currentHead(repoRoot)` actually reflects the just-landed merge commit at both call sites | Read `bin/fgos.mjs:3425-3436`: **leaf-into-root's real `git merge` runs inside `withMergeEphemeralWorktree(repoRoot, rootId, ...)`, at `ephemeral.path` — NOT `repoRoot`.** `currentHead(repoRoot)` there would read the wrong tree. Separately, `src/runner/merge.mjs:1099` (`mergeRunnerItemLocked`)'s `isAlreadyMerged` branch returns `outcome:'merged'` for a branch that was ALREADY an ancestor of HEAD *before this call ran* (idempotent re-approve) — reading `currentHead(repoRoot)` immediately after in that case can capture a LATER, unrelated commit, not the actual merge point. | **CONSTRAINT** (not a plan-invalidating FAIL — a sourcing correction): derive `mergedSha` from `git rev-parse <result.branch>` (the source branch's own tip commit, resolved in the correct git context — `ephemeral.path` for leaf-into-root, `repoRoot` for root-into-main) instead of `currentHead(repoRoot)` uniformly. This is stable across both the fresh-merge and idempotent-already-merged cases, since it identifies "which commit of the branch landed" rather than "what HEAD happens to be right now." |
+| `gh pr view --json mergeCommit` is a valid field on this repo's `gh` | Medium | Confirm the field exists on the installed `gh` version | Ran `gh pr view --json mergeCommit --help` directly: `mergeCommit` is listed as a valid field (`gh version 2.96.0`). Standard GitHub API shape: `mergeCommit` is an object with an `.oid` field — extract that as the sha. | PASS — proceed as planned in `github-adapter.mjs`, reading `.oid` off the returned `mergeCommit` object. |
+| New `move --to delivered` refusal doesn't conflict with `case 'move':`'s existing behavior | Medium | Confirm `move` has no existing branch/reachability logic today | Read `bin/fgos.mjs:1415-1427` directly: fully generic, no existing check of this kind for any `--to` target. | PASS — additive, nothing to conflict with. |
+
 ## Outstanding questions
 
 None
