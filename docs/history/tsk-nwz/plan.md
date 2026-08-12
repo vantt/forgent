@@ -84,9 +84,25 @@ patch a prose misreading is backwards.
 | The three trim sites | Low, but a partial edit is the live failure mode — fixing `:173` and leaving `:218`'s Never-do intact would leave the skill self-contradicting. | A NEGATIVE grep pinning the old `min(batch.length, slots.execution.free)` phrasing gone. |
 | `docs/explanation/…-labeled-before-spawning-claude.md`, `docs/how-to/read-a-critical-impact-analysis-result…md` | Low. Stale `fg:agents-N` naming after the rename to `fg:workers-N`. | A NEGATIVE `rg` scoped to `docs/explanation` + `docs/how-to` only — `docs/history/**` legitimately keeps the old name as a record of what was true then. |
 
-`impact-analysis: inactive` — no proof point here leans on blast-radius
-evidence (nothing imports a `SKILL.md`), so the capability gate result
-does not gate this plan either way.
+`impact-analysis: degraded` — `fgos tool query --capability impact-analysis
+--status present` reports one provider, gitnexus, at `status: present`, so
+the capability is NOT inactive. But `present` only means installed, never
+that the index is fresh (tsk-j7y), and this repo's index is behind: last
+indexed `79fead3`, while this branch is at `c82cb488`. Blast radius from
+that index would be stale, so it is not trusted here.
+
+Naming the gap plainly, as the gate requires rather than silently
+dropping it: no blast-radius claim in this plan rests on GitNexus. Nothing
+imports a `SKILL.md`, so there is no call graph to walk — the reach of
+this change is "which files name the strings being edited", which is a
+text question, and every citation in the risk map and Assumptions above
+was established by `rg`/`sed` against the real files, not by a graph
+query. That is also the cross-check `CLAUDE.md` asks for when an
+impact-analysis answer cannot be trusted.
+
+(Corrected after `fgos-coding-validating` returned NOT READY on this row:
+this plan first recorded `inactive`, which was wrong — the provider is
+registered and present, it is only its index that is behind.)
 
 ## Shape
 
