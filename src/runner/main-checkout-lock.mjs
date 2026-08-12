@@ -48,28 +48,6 @@ import path from 'node:path';
 
 export const LOCK_FILE = 'main-checkout.lock';
 
-/**
- * Maps a target ref (e.g. `fgw/tsk-51m`, `main`) to a collision-free,
- * filesystem-safe lock filename for the target-ref merge queue (tsk-xyr,
- * §E of the Merge Conductor design). Pure: no fs access, no side effects.
- *
- * Uses `encodeURIComponent` over the WHOLE ref, not a hand-picked
- * character substitution (e.g. `/` -> `-`) — the naive substitution is
- * NOT injective: `fgw/tsk-51m` and a (hypothetical but not disallowed by
- * git-check-ref-format) `fgw-tsk-51m` would both collapse onto
- * `merge-slot--fgw-tsk-51m.lock`, silently serializing two unrelated
- * targets onto one lock file, or letting one target's slot stand in for
- * another's — exactly the data-loss class this queue exists to close.
- * `encodeURIComponent` is a byte-for-byte reversible encoding (every
- * character outside `A-Za-z0-9-_.!~*'()` becomes a distinct `%XX`
- * escape), so distinct input refs always produce distinct output
- * filenames, and its output charset is itself filesystem-safe (no `/`,
- * no null bytes, no path traversal).
- */
-export function mergeSlotLockFile(targetRef) {
-  return `merge-slot--${encodeURIComponent(targetRef)}.lock`;
-}
-
 /** Formats a millisecond duration (lockAgeMs/remainingTtlMs) as a short
  * human-readable string ("2m15s", "45s") for CLI messages. Non-numeric or
  * negative input (no known duration) formats as "unknown" rather than
@@ -340,9 +318,9 @@ function tryAcquireOnce(lockPath, identity, now, ttlMs) {
  * accumulating listeners across repeated acquire/release cycles in the
  * same process.
  */
-export function acquireMainCheckoutLock(dir, { identity = process.pid, ttlMs, now = Date.now(), releaseOnExit = false, lockFile = LOCK_FILE } = {}) {
+export function acquireMainCheckoutLock(dir, { identity = process.pid, ttlMs, now = Date.now(), releaseOnExit = false } = {}) {
   fs.mkdirSync(dir, { recursive: true });
-  const lockPath = path.join(dir, lockFile);
+  const lockPath = path.join(dir, LOCK_FILE);
 
   for (let attempt = 0; attempt < 2; attempt += 1) {
     const res = tryAcquireOnce(lockPath, identity, now, ttlMs);
@@ -356,7 +334,7 @@ export function acquireMainCheckoutLock(dir, { identity = process.pid, ttlMs, no
           process.removeListener('SIGINT', onSignal);
           process.removeListener('SIGTERM', onSignal);
         }
-        releaseMainCheckoutLock(dir, { lockFile });
+        releaseMainCheckoutLock(dir);
       };
       let onExit;
       let onSignal;
@@ -401,8 +379,8 @@ export function acquireMainCheckoutLock(dir, { identity = process.pid, ttlMs, no
 /** Removes `.fgos/main-checkout.lock` under `dir` if present. Idempotent — a
  * caller releasing a lock already reclaimed/removed by someone else is not
  * an error. */
-export function releaseMainCheckoutLock(dir, { lockFile = LOCK_FILE } = {}) {
-  const lockPath = path.join(dir, lockFile);
+export function releaseMainCheckoutLock(dir) {
+  const lockPath = path.join(dir, LOCK_FILE);
   try {
     fs.unlinkSync(lockPath);
   } catch (err) {
@@ -441,8 +419,8 @@ export function releaseMainCheckoutLock(dir, { lockFile = LOCK_FILE } = {}) {
  * the first read and this call's unlink, and changed content must never be
  * touched on a stale judgment.
  */
-export function releaseMainCheckoutLockIfOwn(dir, identity, { lockFile = LOCK_FILE } = {}) {
-  const lockPath = path.join(dir, lockFile);
+export function releaseMainCheckoutLockIfOwn(dir, identity) {
+  const lockPath = path.join(dir, LOCK_FILE);
 
   const readRecord = () => {
     let raw;
@@ -505,8 +483,8 @@ export function releaseMainCheckoutLockIfOwn(dir, identity, { lockFile = LOCK_FI
  * could reclaim the lock between the first read and this call's write, and
  * changed content must never be overwritten on a stale judgment.
  */
-export function renewMainCheckoutLockIfOwn(dir, identity, { now = Date.now(), lockFile = LOCK_FILE } = {}) {
-  const lockPath = path.join(dir, lockFile);
+export function renewMainCheckoutLockIfOwn(dir, identity, { now = Date.now() } = {}) {
+  const lockPath = path.join(dir, LOCK_FILE);
 
   const readRecord = () => {
     let raw;
@@ -554,8 +532,8 @@ export function renewMainCheckoutLockIfOwn(dir, identity, { now = Date.now(), lo
  * `lockAgeMs`/`remainingTtlMs` follow the same never-fabricate rule as
  * `acquireMainCheckoutLock`'s own HELD/AMBIGUOUS shape.
  */
-export function inspectMainCheckoutLock(dir, { ttlMs, now = Date.now(), lockFile = LOCK_FILE } = {}) {
-  const lockPath = path.join(dir, lockFile);
+export function inspectMainCheckoutLock(dir, { ttlMs, now = Date.now() } = {}) {
+  const lockPath = path.join(dir, LOCK_FILE);
 
   let raw;
   try {
@@ -613,8 +591,8 @@ export function inspectMainCheckoutLock(dir, { ttlMs, now = Date.now(), lockFile
  *   - 'reclaimed'         -- content still unparseable on the second read;
  *     removed
  */
-export function forceReclaimAmbiguousLock(dir, { lockFile = LOCK_FILE } = {}) {
-  const lockPath = path.join(dir, lockFile);
+export function forceReclaimAmbiguousLock(dir) {
+  const lockPath = path.join(dir, LOCK_FILE);
 
   let raw;
   try {

@@ -893,18 +893,7 @@ test('merge next picks the higher-ranked (mvp goalTier) item first when two are 
   assert.equal(data.picked, 'important', 'the mvp-goalTier item outranks the plain one per rankImpact');
 });
 
-// tsk-xyr (absorbs tsk-1zd): the picker now SKIPS a provably Iron-Law-
-// required candidate instead of returning it as "picked" and merging
-// nothing -- classifyIronLaw is pure, so this is decided before any merge
-// is even attempted. The two tests below replace the old single-item
-// "picked then blocked" contract with the new one: a SOLE ready item that
-// trips Iron Law is never attempted at all ("every ready item is blocked"),
-// and when a second, non-blocked ready item also exists, THAT one gets
-// picked and merged instead -- the acceptance criterion this item exists
-// for ("an Iron-Law item is not returned next turn; other ready items get
-// a turn").
-
-test('merge next on a SOLE ready item that trips the Iron Law: skips it without attempting a merge, never auto-acknowledges', () => {
+test('merge next on a runner-sourced pick that trips the Iron Law: reports blocked, merges nothing, never auto-acknowledges', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItemTouching(cwd, 'iron-next-item', 'src/runner/probe.mjs', {
@@ -913,51 +902,16 @@ test('merge next on a SOLE ready item that trips the Iron Law: skips it without 
 
   const headBefore = gitHead(cwd);
   const result = run(cwd, ['merge', 'next']);
-  assert.equal(result.status, 0, `merge next itself must not exit non-zero on an all-skipped pool: ${result.stdout}${result.stderr}`);
+  assert.equal(result.status, 0, `merge next itself must not exit non-zero on a blocked pick: ${result.stdout}${result.stderr}`);
   const data = envelopeData(result.stdout);
-  assert.equal(data.picked, null, 'the Iron-Law-required item must never be reported as picked -- it was never attempted');
-  assert.equal(data.reason, 'every ready item is blocked');
-  assert.deepEqual(data.skipped, [{ id: 'iron-next-item', reason: 'iron-law' }]);
-  assert.ok(!('blocked' in data), 'blocked is for a real attempted-and-failed merge -- this candidate was never attempted');
+  assert.equal(data.picked, 'iron-next-item');
+  assert.equal(data.blocked, 'iron-law');
+  assert.match(data.message, /Iron Law/);
 
-  assert.equal(stateView(cwd).work['iron-next-item'].status, 'awaiting-approval', 'a skipped pick leaves the item exactly where it was');
-  assert.equal(gitHead(cwd), headBefore, 'a skipped pick attempts no merge -- HEAD is unchanged');
+  assert.equal(stateView(cwd).work['iron-next-item'].status, 'awaiting-approval', 'a blocked pick leaves the item proposed');
+  assert.equal(gitHead(cwd), headBefore, 'a blocked pick attempts no merge -- HEAD is unchanged');
   const survivingBranches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/']);
   assert.match(survivingBranches, /fgw\/iron-next-item/, 'the branch survives -- nothing was merged or cleaned up');
-});
-
-test('merge next with one Iron-Law-required ready item AND one ordinary ready item: skips the first, picks and merges the other (the core acceptance criterion)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
-  makeRunnerProposedItemTouching(cwd, 'iron-next-item', 'src/runner/probe.mjs', {
-    verify: 'test -f src/runner/probe.mjs',
-  });
-  makeRunnerProposedItem(cwd, 'ordinary-next-item', { verify: 'true' });
-
-  const result = run(cwd, ['merge', 'next']);
-  assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
-  const data = envelopeData(result.stdout);
-
-  assert.equal(data.picked, 'ordinary-next-item', 'the non-blocked ready item must be picked, not the Iron-Law one, regardless of rank order');
-  assert.equal(data.approve.to, 'delivered');
-  assert.deepEqual(data.skipped, [{ id: 'iron-next-item', reason: 'iron-law' }]);
-
-  assert.equal(stateView(cwd).work['ordinary-next-item'].status, 'delivered');
-  assert.equal(stateView(cwd).work['iron-next-item'].status, 'awaiting-approval', 'the skipped item is untouched -- still there for a human to acknowledge, next call');
-});
-
-test('merge next --acknowledge-iron-law forwarded by the caller: the picker does not pre-skip -- the flag applies to whichever item is picked, exactly as before', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
-  makeRunnerProposedItemTouching(cwd, 'iron-next-item', 'src/runner/probe.mjs', {
-    verify: 'test -f src/runner/probe.mjs',
-  });
-
-  const result = run(cwd, ['merge', 'next', '--acknowledge-iron-law']);
-  assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
-  const data = envelopeData(result.stdout);
-  assert.equal(data.picked, 'iron-next-item', 'an explicitly-forwarded acknowledgment must let the picker attempt it, unchanged from before this item');
-  assert.ok(!('skipped' in data), 'nothing was skipped -- the flag made the candidate attemptable');
 });
 
 // --- tsk-173: merge next auto sync-root on blockedOnSync (docs/history/
