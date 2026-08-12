@@ -421,7 +421,34 @@ function applyEvent(view, event) {
       // (they never carry a `from === 'discovery'`), so they stay
       // undocumented until a future spec pass. Guarded on `item` for the
       // same ghost-id no-op reason as work.move above.
-      if (item && from === 'discovery') {
+      //
+      // tsk-31lz: leaving `discovery` stopped being sufficient once tsk-30v
+      // made an UNCLEAR verdict advance the stage too (`discovery ->
+      // exploring`) while the item parks in `awaiting-human` with an open
+      // question — that path recorded a "passed" settlement for an item
+      // just judged NOT clear, with the FALLBACK_VERIFY placeholder as its
+      // `detail`. The verdict, not the destination, is what decides: the
+      // gate keys off the `work.discovery` record `resolveDiscovery`
+      // appends immediately before its own `moveStage` (discovery.mjs), so
+      // this stays a plain forward fold over data the log ALREADY carries.
+      //
+      // Deliberately not `to !== 'exploring'`: that reads the arrival edge,
+      // which RUL27 (`docs/specs/work-state.md`) locks against precisely so
+      // inserting a stage in the middle cannot silence an existing
+      // settlement — and it would retroactively silence every real
+      // `discovery -> exploring` settlement in this repo's own live log (all
+      // 45 of them, written before tsk-30v, when that edge WAS the clear
+      // path). Deliberately not a new payload field stamped in
+      // discovery.mjs either: replay is a pure fold over events already
+      // written, so a source-side marker would only ever fix moves made
+      // AFTER the fix, leaving any already-logged unclear move settling
+      // wrongly on every replay forever.
+      //
+      // A log line with no readable verdict (legacy, or a hand-run `fgos
+      // stage` move) settles exactly as it did before this fix — only an
+      // explicit `clear: false` suppresses.
+      const drivingVerdict = view.discovery?.[id]?.at(-1);
+      if (item && from === 'discovery' && drivingVerdict?.clear !== false) {
         if (!view.settlements) {
           view.settlements = {};
         }

@@ -329,6 +329,41 @@ test('resolveDiscovery at discovery advances to exploring AND parks in awaiting-
   assert.equal(view.gates?.['item-x']?.ask, 'Which auth provider?');
 });
 
+// tsk-31lz: the stage move above is real, but it is NOT a settlement — the
+// item was just judged not clear and is parked with an open question. This
+// is the end-to-end guard for the replay gate (test/state/replay.test.mjs
+// covers the fold in isolation); it also pins the write ORDER the gate
+// depends on, since the fold reads the verdict from the work.discovery event
+// this call appends before its moveStage.
+test('resolveDiscovery records NO clarify-pass settlement for an unclear verdict at discovery, even though the item leaves the stage (tsk-31lz)', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: false, question: 'Which auth provider?' });
+  assert.equal(result.outcome, 'unclear');
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'exploring');
+  assert.equal(
+    view.settlements?.['item-x'],
+    undefined,
+    'an unclear verdict must never fold into the settlement channel as a pass',
+  );
+});
+
+test('resolveDiscovery DOES record a clarify-pass settlement for a clear verdict at discovery, carrying the real verify as detail (tsk-31lz: the fix narrows the unclear path only)', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolveDiscovery(storeDir, 'item-x', {}, 'session', { clear: true, verify: 'npm test -- item-x' });
+  assert.equal(result.outcome, 'clear');
+
+  const view = listWork(storeDir);
+  assert.equal(view.settlements['item-x'].length, 1);
+  assert.equal(view.settlements['item-x'][0].kind, 'clarify-pass');
+  assert.equal(view.settlements['item-x'][0].detail, 'npm test -- item-x');
+});
+
 test('resolveDiscovery keeps park-in-place for an unclear verdict outside discovery (tsk-30v D6: scoped to discovery only, using the triage domain-agnostic fixture)', () => {
   const storeDir = tmpStoreDir();
   // triage domain's own Clarify-mapped stage is literally named 'triage'

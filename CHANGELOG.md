@@ -158,6 +158,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- An item parked for a person after being judged NOT clear at `discovery`
+  was still recorded in the settlement channel as having passed, because
+  the settlement record keyed only on the item leaving `discovery` — which
+  an unclear verdict now also does. Where the item had no real verify yet,
+  the record's detail read as the literal "chưa xác định — bổ sung thủ
+  công" placeholder. A settlement is now recorded only when the verdict
+  that drove the move was clear. Records already written for real clear
+  passes are unaffected; nothing is re-derived or silenced retroactively.
 - Items could be stored with a `risk` value nothing in the system reads
   (`low`/`medium`/`high`), which silently disabled two behaviors rather
   than failing: the human-confirmation gate that fires before a
