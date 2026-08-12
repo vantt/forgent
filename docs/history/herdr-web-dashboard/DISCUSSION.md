@@ -6,13 +6,27 @@ herdr (đã làm), 3) web dashboard, webserver tự quản tự host frontend...
 
 ## 1. Trạng thái hiện tại
 
-Vòng 3, hội tụ. Cả 2 câu hỏi ranh giới (tsk-ldb↔tsk-539, bảo mật) đã được
-người dùng trả lời rõ ràng, không mơ hồ — 6 D-ID (D1-D6) đã mint và ghi
-qua `fgos decision --id tsk-ldb` (seq 14637-14642). §6 đã tổng hợp đầy đủ,
-§7 đã tách 3 task ứng viên + 1 companion item (`tsk-539`). Bước tiếp theo:
-người dùng xác nhận thiết kế đã ổn để bàn giao sang `fgos-coding-exploring`
-→ `fgos-coding-planning` (native-first handoff), sau đó phiên này tiếp tục
-đẩy `tsk-539` (D5) sang trạng thái hoạt động.
+Vòng 4. Thiết kế đã hội tụ về mặt chức năng từ vòng 3 (D1-D5 giữ nguyên,
+không bị lật); vòng 4 chỉ chạm phần bảo mật và làm nó chặt hơn:
+
+- **Vế bind của D6 bị lật**: `0.0.0.0` thay cho `127.0.0.1` (quyết định
+  người chủ sản phẩm). Bản đính chính đã ghi vào event log để phiên lạnh
+  không hiện thực nhầm. Vế token của D6 giữ nguyên và nay chịu lực hoàn
+  toàn.
+- **Phát hiện nền quan trọng**: fgOS không có tầng phân quyền nào, có chủ
+  ý (`io-contract.md`; STR38/STR48 đều chưa xây) — nên §6 bổ sung một
+  ràng buộc kỹ thuật cụ thể: bề mặt ghi qua mạng là allowlist hẹp
+  (`answer`/`approve`/`reject`), vì `verify` chạy như shell thật.
+- **cf-access** được nêu dạng "nếu cần thì" → thành task tuỳ chọn thứ 4
+  trong §7, kèm ràng buộc loại trừ với chế độ bind LAN.
+
+§6 đã viết lại toàn bộ phần Bảo mật. §7 nay có 3 task bắt buộc + 1 tuỳ
+chọn + 1 companion item (`tsk-539`). Vế bind và cf-access **chưa mint
+D-ID** (vừa lật một lần / mới nêu) — mint ở vòng sau nếu giữ nguyên.
+
+Bước tiếp theo: người dùng xác nhận để bàn giao sang
+`fgos-coding-exploring` → `fgos-coding-planning` (native-first), sau đó
+phiên này đẩy `tsk-539` (D5).
 
 ## 2. Mục tiêu & đề bài
 
@@ -51,7 +65,9 @@ nguyên văn dữ liệu thô.
 | 12 | Q&A không phải kênh yes/no lớn nhất — kênh `work.gate-approve` (3 cổng skill duyệt: contextApprove/planApprove/validateApprove) lớn gấp 8 lần (48 vs 6 lượt, sau khi gỡ 1 LLM judge dư) | Rõ, từ `tsk-539` D4 (đã chốt, seq 9771) | Trực tiếp giải thích lý do người dùng thấy TUI "gây mental pressure" ở khâu duyệt — không phải cảm giác, có số đo. Ảnh hưởng scope: nếu web dashboard muốn thật sự giảm mental pressure ở approve, cần hiển thị/thao tác được cả `gate-approve` events, không chỉ `ask`/`answer`. |
 | 13 | Ghép cặp nhiều câu hỏi ↔ nhiều câu trả lời (điều người dùng nhớ đã từng đặt vấn đề) — có cần thêm liên kết tường minh (id/con trỏ) vào lược đồ event không? | Rõ — KHÔNG cần, đã kiểm chứng | `tsk-65i`/`tsk-539` S4(b) (vòng 12b): FSM chặn sẵn — item rời `frontier` ngay khi vào `awaiting-human`, không session nào hỏi-đè được trước khi có `answer`. Nên `askHistory[i]` ghép với bản ghi `answer` thứ i trong `settlements[id]` (lọc `kind:'answer'`) **theo đúng thứ tự `seq`** là đủ, không có race, không cần trường liên kết mới. Q8 (tsk-65i/539) đã đóng "HOÃN" chính vì lý do này — không đổi lược đồ event, nhu cầu thật nằm ở tầng đọc/trình bày. |
 | 14 | Nguồn dữ liệu narrative "lịch sử agent đã làm": `CONTEXT.md` (vùng người, git-versioned) hay `state.decisions` (vùng máy) | Rõ | Áp dụng thẳng D7 của `tsk-65i`/`tsk-539` (đã chốt nơi khác, không re-derive): `CONTEXT.md`/`plan.md` là nguồn chính; `decisions[]` chỉ hiện như chi tiết mở rộng, không phải mặc định. Không có phản đối từ người dùng ở vòng 2 — giữ nguyên đề xuất. |
-| 15 | Mở cổng HTTP đổi threat model của fgOS (hiện chỉ nghe từ terminal người dùng) | Rõ | Người dùng chốt vòng 3: thêm lớp auth tối thiểu ngay từ v1 (không chấp nhận "localhost-only, không auth"). |
+| 15 | Mở cổng HTTP đổi threat model của fgOS (hiện chỉ nghe từ terminal người dùng) | Rõ, ĐÃ SỬA ở vòng 4 | Vòng 3 người dùng chốt "thêm lớp auth tối thiểu" → D6. Vòng 4 người dùng sửa vế bind: **`0.0.0.0`**, không phải `127.0.0.1`. Vế auth token giữ nguyên và nay **chịu lực hoàn toàn** (xem hàng 17). |
+| 16 | fgOS hôm nay có tầng phân quyền nào không? | Rõ — **KHÔNG, có chủ ý** | `docs/io-contract.md` D1/D9: *"CLI local không xác thực được ai đang gọi nó — ai chạy được `fgos` thì đã ghi thẳng vào `.fgos/` được. Cổng này mua về dấu vết audit + chống nhầm giữa các phiên, **không mua về an ninh**"*; và *"caller chưa xác danh KHÔNG bị chặn"* gọi verb ghi. §"Ranh giới" của cùng file: tầng phân quyền thuộc **STR38**, cửa mạng của daemon thuộc **STR48** — cả hai **NGOÀI hợp đồng, chưa xây**. Nên mô hình tin cậy của fgOS hôm nay = ranh giới user của OS, không hơn. |
+| 17 | Hệ quả cụ thể của bind `0.0.0.0` lên bề mặt ghi | Rõ | Cơ chế chính xác (không phải lo xa chung chung): `verify` của mỗi item chạy như **lệnh shell thật** (`dispatch.mjs`). Ai ghi được trường `verify` của một item thì lệnh đó sẽ được thực thi khi verify chạy. Nên một endpoint ghi TỔNG QUÁT (kiểu proxy mọi verb, hoặc `edit` tuỳ trường) mở ra mạng = bề mặt thực thi shell từ xa. Đây là lý do §6 chốt bề mặt ghi phải là **allowlist hẹp** (`answer`/`approve`/`reject`), không phải cửa verb tổng quát. |
 | 16 | Ranh giới tsk-ldb ↔ tsk-539 | Rõ | Người dùng chốt vòng 3: **tách rời** (phương án (a) — tsk-ldb không nuốt phạm vi, không chờ tsk-539), nhưng muốn "gom/kéo theo" tsk-539 để nó cũng được deliver — xem D5 ở §4 cho cách cụ thể (không phải `deps` chặn). |
 
 ## 4. Quyết định đã chốt
@@ -63,7 +79,14 @@ nguyên văn dữ liệu thô.
 | **D3** | Nguồn chính cho "lịch sử agent đã làm" là `CONTEXT.md`/`plan.md` của item (vùng-người, narrative, git-versioned) — theo D7 (`tsk-65i`/`tsk-539`, đã chốt nơi khác). `fgos show --json`'s `decisions/discovery/gates/outcome/friction/settlement/learning` chỉ hiện như chi tiết mở rộng (expandable), không phải nội dung mặc định — vì 35% `decisions` hiện là ghi-sổ máy móc, chưa qua "phép kiểm sạch" D7 yêu cầu trước khi làm nguồn chính cho một consumer mới. | 3 | ✅ seq 14639 |
 | **D4** | Phạm vi "câu hỏi cần trả lời" trong task-detail bao gồm **cả hai kênh**: `ask` (gates, đã park ở `awaiting-human`) VÀ `work.gate-approve` (contextApprove/planApprove/validateApprove). Kênh `gate-approve` là kênh nặng nhất thực tế (8x khối lượng gần đây theo D4 của `tsk-539`) và đúng là nguồn "mental pressure ở khâu duyệt" người dùng nêu ở vòng 2 — chỉ làm `ask` sẽ bỏ sót phần lớn vấn đề thật. | 3 | ✅ seq 14640 |
 | **D5** | **Ranh giới tsk-ldb ↔ tsk-539: tách rời, không phải `deps` chặn.** tsk-ldb render best-effort trên nội dung `ask`/`gate-approve` hiện có, kể cả khi còn brief/trích D-ID khó hiểu — khi `tsk-539` cải thiện chất lượng authoring sau này, dashboard tự động hưởng lợi mà không cần sửa lại (hai việc tách bạch theo thiết kế: authoring vs rendering). "Kéo theo deliver" thực hiện bằng cách: `tsk-539` được ghi nhận là companion item trong §7, và phiên này sẽ tiếp tục đẩy `tsk-539` (đang `todo/discovery`, không ai giữ) sang `exploring`/`planning` ngay sau khi tsk-ldb hội tụ — không phải một `deps` edge trong state. | 3 | ✅ seq 14641 |
-| **D6** | Bảo mật: webserver bind `127.0.0.1` mặc định (không expose ra mạng ngoài máy) **cộng thêm một lớp auth tối thiểu (token) bắt buộc ngay từ v1** — không hoãn sang sau, theo đúng cảnh báo *"không vá sau được"* (STR38, trích từ `tsk-65i`/`tsk-539`). | 3 | ✅ seq 14642 |
+| **D6** | ⚠️ **VẾ BIND ĐÃ BỊ SỬA Ở VÒNG 4 — xem ghi chú dưới bảng.** ~~Bind `127.0.0.1` mặc định~~ + một lớp auth tối thiểu (token) bắt buộc ngay từ v1 — không hoãn sang sau, theo cảnh báo *"không vá sau được"* (STR38). **Vế token vẫn nguyên hiệu lực và nay chịu lực hoàn toàn.** | 3 | ✅ seq 14642, sửa bởi seq 14644 |
+
+**Đã bị sửa ở vòng 4 — chưa cấp D-ID mới (đúng luật §4: một điểm vừa bị lật
+chưa đủ vững để mint).**
+
+| Phát biểu | Vòng nêu | Vòng sửa | Sửa thành |
+|---|---|---|---|
+| D6 vế bind: `127.0.0.1` mặc định | 3 | **4** | **`0.0.0.0`** — người dùng chốt trực tiếp. Hệ quả: token không còn là lớp phòng thủ thứ hai mà là **hàng rào duy nhất**; và vì fgOS không có tầng phân quyền nào (§3 hàng 16), bề mặt ghi qua mạng phải là allowlist hẹp (§3 hàng 17). Ghi bản đính chính vào event log (seq 14644) để một phiên lạnh đọc `decisions` không hiện thực nhầm `127.0.0.1`. **Mint D-ID cho vế bind ở vòng sau nếu giữ nguyên.** |
 
 ## 5. Q&A log
 
@@ -214,6 +237,50 @@ Cả hai đủ rõ ràng, không mơ hồ, không cần vòng thứ hai để x�
 mint D-ID ngay (D1-D6 ở §4), khác với các điểm còn đang tranh luận/suy
 diễn (không có điểm nào như vậy còn sót trong cụm này).
 
+### 2026-08-12 — Vòng 4: sửa vế bind, và cf-access
+
+**Người dùng sửa D6:** *"bind 0.0.0.0"* — lật vế bind của quyết định vừa
+chốt vòng trước. Không tranh luận lại: đây là quyết định của người chủ sản
+phẩm, và nhu cầu đằng sau nó rõ (muốn với tới dashboard từ máy/điện thoại
+khác, đúng tinh thần "môi trường tương tác thoải mái hơn" của vòng 2).
+
+**Scout trước khi ghi lại, vì đây là thay đổi threat model chứ không phải
+đổi một chuỗi config.** Đọc `docs/io-contract.md`:
+
+> *"Đây là quy thuộc, không phải xác thực (D1): CLI local không xác thực
+> được ai đang gọi nó — ai chạy được `fgos` thì đã ghi thẳng vào `.fgos/`
+> được. Cổng này mua về dấu vết audit + chống nhầm giữa các phiên, **không
+> mua về an ninh**. Do đó caller chưa xác danh **KHÔNG bị chặn** gọi verb
+> ghi… chặn thật thuộc tầng phân quyền (STR38) và cửa mạng của daemon
+> tương lai (STR48), cả hai nằm NGOÀI hợp đồng này."*
+
+Và §"Ranh giới" của cùng file xác nhận cả STR38 lẫn STR48 đều **chưa
+xây**. Kết luận: mô hình tin cậy của fgOS hôm nay chính là ranh giới user
+của OS — không có tầng phân quyền nào bên dưới để đỡ. Bind `0.0.0.0` dời
+ranh giới đó ra mạng, nên token của D6 không còn là lớp thứ hai mà là
+**hàng rào duy nhất**. Đó là lý do vòng này bổ sung một ràng buộc kỹ thuật
+cụ thể chứ không phải một lời cảnh báo chung: bề mặt ghi qua mạng phải là
+**allowlist hẹp**, vì trường `verify` của item chạy như lệnh shell thật
+(`dispatch.mjs`) — một endpoint ghi tổng quát mở ra mạng là bề mặt thực
+thi shell từ xa (§3 hàng 17).
+
+**Người dùng bổ sung:** *"nếu cần thì hỗ trợ tích hợp cf-access"* —
+Cloudflare Access. Đây là câu trả lời tốt cho đúng lỗ hổng vừa nêu: nó cấp
+từ bên ngoài chính tầng identity/authz mà fgOS không có (STR38 chưa xây).
+Ghi nhận là hướng đúng, đưa vào §7 như một task **tuỳ chọn** (đúng chữ
+"nếu cần thì" — không phải yêu cầu bắt buộc của v1), kèm một ràng buộc
+mạch lạc bắt buộc phải nói rõ: cf-access chỉ có tác dụng khi lưu lượng
+**buộc** phải đi qua Cloudflare. Nếu cổng vẫn bind `0.0.0.0` trên LAN thì
+bất kỳ ai trong LAN đi thẳng vào cổng là vòng qua Access hoàn toàn — cửa
+trước có gác, cửa sau mở. Nên hai chế độ phải chọn một cách có ý thức, xem
+§6.
+
+**Chưa mint D-ID cho vế bind lẫn cf-access ở vòng này** — đúng luật §4:
+vế bind vừa bị lật một lần, cf-access thì mới nêu và còn là "nếu cần".
+Cả hai được ghi vào §3/§5 và một bản đính chính đã vào event log để một
+phiên lạnh không hiện thực nhầm `127.0.0.1`; mint D-ID ở vòng sau nếu giữ
+nguyên.
+
 ## 6. Thiết kế đã chốt {#design}
 
 herdr-plugin hôm nay có 2/3 core component: **herdr-orchestrator** (tự
@@ -290,13 +357,73 @@ flowchart LR
   để ngay cả nội dung brief hôm nay cũng đọc thoải mái hơn TUI's một dòng
   văn xuôi hiện tại.
 
-### Bảo mật — nằm trong thiết kế từ đầu (D6)
+### Bảo mật — phần chịu lực nhất của thiết kế này
 
-Mở cổng HTTP đổi threat model: `verify` chạy như shell command
-(`dispatch.mjs`), ai gọi được verb đều có khả năng kích hoạt nó. Web
-dashboard bind `127.0.0.1` mặc định + một token tối thiểu (sinh lúc
-herdr-plugin khởi động, bắt buộc trên mọi request) — không hoãn sang
-version sau.
+*(Viết lại toàn bộ ở vòng 4 sau khi vế bind bị lật và cf-access được nêu.
+Phần "Vì sao web dashboard" và "Nguồn dữ liệu" ở trên không đổi — không có
+quyết định nào vòng 4 chạm tới chúng.)*
+
+**Điểm xuất phát phải nói thẳng: fgOS hôm nay không có tầng phân quyền
+nào, và đó là chủ ý.** `docs/io-contract.md` khai rõ cửa CLI chỉ làm *quy
+thuộc* (attribution) chứ không *xác thực* (authentication) — *"ai chạy
+được `fgos` thì đã ghi thẳng vào `.fgos/` được"*, và caller chưa xác danh
+**không bị chặn** gọi verb ghi. Tầng chặn thật (STR38) và cửa mạng của
+daemon (STR48) đều được khai là ngoài hợp đồng và **đều chưa xây**. Nghĩa
+là toàn bộ mô hình tin cậy hiện tại chính là ranh giới user của OS.
+
+Bind `0.0.0.0` (quyết định của người chủ sản phẩm, vòng 4) dời ranh giới
+đó ra mạng. Hệ quả không phải "kém an toàn hơn một chút" mà là một sự đổi
+vai: **token của D6 từ lớp phòng thủ thứ hai trở thành hàng rào duy nhất**,
+đứng trước một hệ vốn được thiết kế để không cần hàng rào nào.
+
+**Cơ chế rủi ro cụ thể, không phải lo xa chung chung.** Trường `verify`
+của mỗi item được thực thi như một lệnh shell thật (`dispatch.mjs`). Ai
+ghi được trường đó thì lệnh đó sẽ chạy. Nên ràng buộc bắt buộc của thiết
+kế này là **bề mặt ghi qua mạng phải là allowlist hẹp** — đúng ba việc
+người cần làm ở dashboard: `answer` (trả lời câu hỏi treo), `approve`,
+`reject`. Tuyệt đối không có endpoint proxy verb tổng quát, không có
+`edit` tuỳ trường qua mạng. Ràng buộc này giữ nguyên trong mọi chế độ bên
+dưới, vì nó chặn đúng cơ chế thực thi shell chứ không phụ thuộc việc ai
+lọt qua được cửa.
+
+**Hai chế độ triển khai — phải chọn một cách có ý thức, không trộn.**
+
+```mermaid
+flowchart TB
+    subgraph M1["Chế độ A — LAN tin cậy (v1, mặc định)"]
+      A1["bind 0.0.0.0"] --> A2["token bắt buộc<br/>random ≥128-bit, sinh lúc khởi động<br/>KHÔNG đặt trong URL query"]
+      A2 --> A3["allowlist ghi hẹp<br/>answer · approve · reject"]
+      A4["⚠ HTTP cleartext trên LAN<br/>token sniff được<br/>— chấp nhận có ý thức"]
+    end
+    subgraph M2["Chế độ B — cf-access (tuỳ chọn, 'nếu cần thì')"]
+      B1["cloudflared tunnel<br/>bind loopback"] --> B2["Cloudflare Access<br/>SSO + policy<br/>= tầng identity fgOS đang thiếu"]
+      B2 --> B3["app xác minh<br/>Cf-Access-Jwt-Assertion"]
+      B3 --> B4["allowlist ghi hẹp<br/>(giữ nguyên)"]
+    end
+    M1 -.->|"KHÔNG chạy đồng thời:<br/>còn bind 0.0.0.0 trên LAN thì<br/>ai trong LAN đi thẳng vào cổng<br/>là VÒNG QUA Access hoàn toàn"| M2
+
+    style A4 fill:#f5e2df,stroke:#9E3A30
+    style B2 fill:#e0ede2,stroke:#3B7A4B
+```
+
+**Chế độ A** là v1 theo đúng quyết định của người chủ sản phẩm: bind
+`0.0.0.0` để với tới từ điện thoại/máy khác trong nhà, token bắt buộc trên
+mọi request. Điều phải khai báo thẳng thay vì giấu: HTTP cleartext trên
+LAN nghĩa là token đi qua mạng ở dạng đọc được — ai bắt được gói tin trong
+LAN đó thì có toàn quyền. Trên một LAN nhà riêng tin cậy thì đây là rủi ro
+chấp nhận được, nhưng nó phải là một sự chấp nhận có ý thức, không phải
+một giả định im lặng.
+
+**Chế độ B** (cf-access, người dùng nêu vòng 4 dưới dạng "nếu cần thì") là
+đường nâng cấp đúng khi cần với tới từ ngoài nhà: Cloudflare Access cấp
+chính xác tầng identity/authz mà fgOS chưa có, và app chỉ cần xác minh
+JWT header `Cf-Access-Jwt-Assertion` mà Access chèn vào. Nhưng nó **chỉ có
+tác dụng khi lưu lượng buộc phải đi qua Cloudflare** — chuẩn mực là chạy
+`cloudflared` tunnel (kết nối hướng ra) và bind loopback, để không còn
+đường vào trực tiếp. Nếu vừa bật cf-access vừa giữ bind `0.0.0.0` trên
+LAN thì bất kỳ ai trong LAN vẫn đi thẳng vào cổng và vòng qua Access hoàn
+toàn — cửa trước có gác, cửa sau mở toang. Đây là lý do hai chế độ được
+vẽ loại trừ nhau chứ không cộng dồn.
 
 ### Ranh giới tsk-ldb ↔ tsk-539 (D5)
 
@@ -318,14 +445,17 @@ lập, có lợi ích cộng dồn tự nhiên.
 ### {#task-webserver-core} Nền webserver trong herdr-plugin
 
 **Mục tiêu:** embed một HTTP server + frontend asset đã build vào binary
-herdr-plugin hiện có; bind `127.0.0.1`, sinh token khởi động, mọi request
-phải kèm token (D1, D6). Chưa có UI thật — chỉ có bộ khung phục vụ
-static asset + một endpoint health-check.
+herdr-plugin hiện có. Bind `0.0.0.0` (địa chỉ bind cấu hình được, mặc định
+`0.0.0.0` theo quyết định vòng 4), sinh token ngẫu nhiên ≥128-bit lúc khởi
+động, mọi request phải kèm token, token không bao giờ nằm trong URL query.
+Bề mặt ghi là allowlist hẹp `answer`/`approve`/`reject` — không proxy verb
+tổng quát, không `edit` tuỳ trường (§6 "Bảo mật"). Chưa có UI thật — chỉ
+bộ khung phục vụ static asset + health-check.
 
 **Trích §6 áp dụng:** "Nguồn dữ liệu — không phát minh, tái dùng seam có
-sẵn" (sơ đồ HP), "Bảo mật".
+sẵn" (sơ đồ HP), toàn bộ "Bảo mật" (Chế độ A).
 
-**D-ID áp dụng:** D1, D6.
+**D-ID áp dụng:** D1, D6 (vế token; vế bind theo bản đính chính vòng 4).
 
 **Quan hệ với sibling:** nền tảng cho `#task-taskboard-view` và
 `#task-detail-history` — cả hai dựng trên webserver này.
@@ -368,6 +498,28 @@ câu-hỏi/vì-sao/bối-cảnh.
 
 **Draft verify:** `cargo test --manifest-path herdr-plugin/Cargo.toml
 web_task_detail_ web_qa_history_ web_gate_approve_`
+
+### {#task-cf-access} (TUỲ CHỌN) Chế độ cf-access cho truy cập ngoài LAN
+
+**Mục tiêu:** hỗ trợ Chế độ B của §6 "Bảo mật" — xác minh JWT header
+`Cf-Access-Jwt-Assertion` do Cloudflare Access chèn vào, cấu hình team
+domain + audience tag, và tài liệu hoá cách chạy `cloudflared` tunnel với
+bind loopback. **Kèm một guard bắt buộc:** khi chế độ cf-access bật mà
+địa chỉ bind vẫn không phải loopback, phải cảnh báo rõ (hoặc từ chối khởi
+động) — vì đó chính là cấu hình vòng-qua-Access mà §6 mô tả.
+
+**Trích §6 áp dụng:** "Bảo mật" — Chế độ B và ràng buộc loại trừ giữa hai
+chế độ.
+
+**D-ID áp dụng:** chưa có (cf-access nêu vòng 4 dạng "nếu cần thì", chưa
+mint D-ID — xem ghi chú cuối §4).
+
+**Quan hệ với sibling:** phụ thuộc `#task-webserver-core`; hoàn toàn tuỳ
+chọn — ba task kia deliver được mà không cần task này. Đây là lý do nó
+đứng riêng thay vì nhét vào `#task-webserver-core`.
+
+**Draft verify:** `cargo test --manifest-path herdr-plugin/Cargo.toml
+cf_access_`
 
 ---
 
