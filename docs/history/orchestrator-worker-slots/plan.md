@@ -320,12 +320,30 @@ trọn-mẻ.
   còn chỗ**. Trần logic và trần vật lý phân kỳ, và cái vật lý mới là ràng
   buộc thật — không ai thu hồi nó.
 
-  **Hướng vá đề xuất cho planning (chưa chốt): tái dùng pane thay vì đóng
-  pane.** Mỗi vòng poll, herdr map pane → item nó đang gắn; pane nào có
-  item đã rời `doing` là pane rỗi → chạy worker kế tiếp *vào chính pane
-  đó* thay vì split pane mới. Cách này né hẳn cơ chế đóng prose không
-  đáng tin (không cần pane đóng nữa), và làm trần vật lý bám theo trần
-  logic theo cấu trúc chứ không nhờ may mắn.
+  **ĐÃ GIẢI — dữ liệu cần đã có sẵn trong event log, không cần cơ chế
+  mới.** Mỗi `work.move` mang `payload.writer.id` (session id, resolve từ
+  env). Độ phủ đo trên log thật: cạnh `→ doing` có `writer.id` hợp lệ
+  1280/1315 (97,3%), `source` 100% `env`, không có `unresolved` nào.
+
+  Từ đó suy thuần được, không thêm field/event type: (a) session nào giữ
+  item nào; (b) **danh sách worker vừa xong, xếp cũ→mới** — với mỗi
+  `writer.id` lấy `ts` của cạnh terminal gần nhất rồi sort tăng dần;
+  (c) pane rỗi chưa — `writer.id` gắn với nó còn giữ item `doing` không.
+
+  **Vá:** herdr **tái dùng pane** thay vì đóng — mỗi vòng poll, pane nào
+  có session không còn giữ item `doing` là pane rỗi → chạy worker kế tiếp
+  *vào chính pane đó* thay vì split pane mới. Né hẳn cơ chế đóng prose
+  không đáng tin, và làm trần vật lý bám theo trần logic theo cấu trúc.
+
+  **Một chỗ vênh phải xử, nếu không sẽ đè worker lên nhau:** "không giữ
+  item `doing`" ≠ "pane rỗi" với session dạng **loop** — `discover-loop`
+  vừa return xong và đang chuẩn bị pick item kế cũng không giữ item nào.
+  Giải bằng thông tin adapter tự có: **herdr chỉ tái dùng pane do chính
+  nó mở dạng one-shot**, không đụng pane đang chạy loop. Không cần khai
+  báo mới, không cần ngưỡng thời gian.
+
+  ⇒ Thuộc T2 (adapter herdr) + phần phơi mapping ra CLI thuộc T1. Không
+  đẻ task mới, không quay lại shaping.
 
 - **A6 — Lọc liveness cho item kẹt `doing` đủ rẻ để chạy mỗi vòng poll.**
   *Chưa chứng minh.* Người claim rồi bỏ đi giữa chừng làm item kẹt `doing`

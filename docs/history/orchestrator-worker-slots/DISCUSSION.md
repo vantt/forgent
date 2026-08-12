@@ -58,7 +58,8 @@ tên đúng khái niệm chứ không phải sơn phết.
 | Q9 | Trần đếm theo cái gì | **rõ** | → D7: theo **work-item** |
 | Q10 | Biên du di cụ thể là bao nhiêu | **rõ** | → D8: không bao giờ bẻ một mẻ đã tính sẵn |
 | Q11 | "Agent tự xử xung đột merge" có nằm trong đợt này không | **rõ** | Để ngoài. Đã mở item riêng `tsk-60h` |
-| Q12 | **Vòng đời worker: khai báo "xong và ngưng" vs "xong và đi tiếp"** | **chưa rõ — mở lại §6** | Từ vòng 6. Hệ chỉ biết vòng đời item, không biết vòng đời worker; đó là gốc của việc mọi cơ chế thu hồi chỗ đều phải đoán. Thêm khái niệm ⇒ vượt tầm planning |
+| Q12 | Vòng đời worker: cần khái niệm mới không | **rõ — KHÔNG cần** | Vòng 7 bác vòng 6: `payload.writer.id` đã có sẵn trong event log (97,3% cạnh `→ doing`), đủ suy ra cả "list worker vừa xong xếp cũ→mới". Không field mới, không event type mới. Về lại tầm planning |
+| Q13 | Phân biệt "session loop giữa hai item" với "session đã xong" | **rõ** | Không giữ item `doing` ≠ pane rỗi. Giải bằng thông tin adapter tự có: herdr chỉ tái dùng pane do chính nó mở dạng one-shot, không đụng pane đang chạy loop |
 
 ## 4. Quyết định đã chốt
 
@@ -259,9 +260,51 @@ xong, xếp cũ→mới**. Orchestrator bất kỳ (herdr hôm nay, cmux/tmux sa
 này) thu hồi chỗ tất định: đọc danh sách, lấy cái cũ nhất, dùng lại —
 không heuristic, không reaper, không phụ thuộc dòng cuối một file prose.
 
-**Ảnh hưởng:** đây là thêm một *khái niệm* (vòng đời worker song song với
-vòng đời item), không phải chi tiết triển khai — nên nó đổi hình §6, vượt
-tầm planning. Xem §3 Q12.
+**Ảnh hưởng (đánh giá ở vòng 6, ĐÃ BỊ VÒNG 7 BÁC — giữ lại để thấy đường
+đi):** vòng 6 kết luận đây là thêm một *khái niệm* nên vượt tầm planning.
+Sai. Xem vòng 7.
+
+### 2026-08-12 — Vòng 7 (người dùng bác vòng 6: log đã đủ)
+
+> "thật chất thì eventlog của chúng ta đã có rồi mà, chỉ cần thêm id của
+> session là đếm được slot?"
+
+**Người dùng đúng, và đúng hơn cả câu hỏi:** session id KHÔNG cần thêm —
+nó đã có sẵn. Một `work.move` thật:
+
+```json
+{"seq":14543,"ts":"2026-08-12T07:49:02.010Z","type":"work.move",
+ "payload":{"id":"tsk-51m","from":"todo","to":"doing","role":"session",
+   "writer":{"id":"abc1ba04-...","source":"env"},
+   "branchHeadAtTake":"79fead..."},"v":3}
+```
+
+Độ phủ đo trên log thật: `work.move` có `writer` 4083/4191 (97,4%); cạnh
+`→ doing` có `writer.id` hợp lệ 1280/1315 (97,3%); `source` 100% là
+`env`; **không có `unresolved` nào**. Phần ~3% thiếu gần chắc là event cũ
+trước khi field ra đời.
+
+**Suy được từ log hiện tại, không thêm field/event type nào:**
+
+1. Đếm slot — item ở `doing`.
+2. Session nào giữ item nào — `writer.id` trên cạnh `→ doing`.
+3. **"List worker vừa xong, xếp cũ→mới"** — với mỗi `writer.id`, lấy `ts`
+   của cạnh terminal gần nhất, sort tăng dần. Đúng thứ vòng 6 tưởng phải
+   đẻ khái niệm mới mới có; nó là một phép fold thuần trên log.
+4. Pane rỗi chưa — `writer.id` gắn với nó còn giữ item `doing` nào không.
+
+**Vòng 6 sai ở đâu:** bịa ra một khái niệm ("vòng đời worker") cho dữ
+liệu đã tồn tại. Bài học lặp lại đúng kiểu sai của cả buổi: thấy một chỗ
+hở thì dựng cơ chế mới, thay vì hỏi trước "hệ đã ghi cái này chưa".
+
+**Chỗ vênh còn lại, giải được không cần khái niệm mới (Q13):** "không giữ
+item `doing`" ≠ "pane rỗi" với session dạng **loop** — `discover-loop`
+vừa return xong và đang chuẩn bị pick item kế cũng không giữ item nào,
+herdr sẽ tưởng pane rỗi và bắn worker đè lên. Giải bằng thông tin adapter
+tự có: **herdr chỉ tái dùng pane do chính nó mở dạng one-shot**, không
+đụng pane đang chạy loop. Không cần khai báo, không cần ngưỡng thời gian.
+
+⇒ Vấn đề về lại tầm **planning**, không phải shaping.
 
 ## 6. Thiết kế đã chốt {#design}
 
