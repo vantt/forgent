@@ -33,6 +33,30 @@ cockpit — thuộc `tsk-3b0` (D11). Không đổi lược đồ event (D2). Kh�
 | **D9** | Token: env `FGOS_HERDR_WEB_SECRET` ưu tiên, vắng thì **tự sinh file gitignored dưới `.fgos/`, chmod 0600**. **Không bao giờ nằm trong `.fgos/config.json`** — file đó đang được git track. | 14732 |
 | **D10** | Web dashboard có toggle riêng trong `.fgos/config.json`, **mặc định BẬT** — cố ý khác 4 toggle `herdrOrchestrator` hiện có (đều mặc định `false`). | 14741 |
 | **D11** | Đa-project (port/định danh) **defer sang `tsk-3b0`**; v1 giả định một tiến trình cockpit. Hướng đã ghi cho `tsk-3b0`: nên chỉ **một** tiến trình dashboard, herdr/client gửi thông tin định danh project để TUI/web nhận ra đang xem project nào. | 14742 |
+| **D12** | Webserver chạy như **tiến trình con sống lâu hơn cockpit pane**, không nằm trong tiến trình TUI. Cockpit chỉ bật/tắt; đóng cockpit **không** giết web dashboard. Vẫn một binary theo D1 — binary tự re-exec chính nó ở chế độ server, không sinh artifact thứ hai. | 14998 |
+| **D13** | Section config mang thêm field `port`, mặc định **8788** (né 8787 của `herdr-gateway` để chạy được cả hai trên một máy). | 14999 |
+| **D14** | Frontend có **toolchain thật**: vite + TypeScript + vitest dưới `herdr-plugin/web/`, bundle ra `static/` (gitignored), `rust-embed` nhúng vào binary. Thêm `herdr-plugin/build.rs` bảo đảm `static/` tồn tại để `cargo build/test/clippy` **không bao giờ phụ thuộc** việc frontend đã bundle hay chưa. Thứ tự release: `npm run bundle` → `cargo build --release`. | 15000 |
+
+### Vì sao D12 (bối cảnh không được để mất)
+
+Nhu cầu gốc là xem/duyệt **từ điện thoại** — đúng lúc đó thường không có
+cockpit nào mở. Nếu webserver sống trong tiến trình TUI thì tính năng vắng
+mặt đúng lúc cần nhất. Đây là lý do D12 tách vòng đời, không phải sở thích
+kiến trúc.
+
+### Vì sao D14 (và vì sao khuyến nghị ban đầu của phiên này SAI)
+
+Phiên này lúc đầu khuyến nghị "không toolchain, HTML/JS thuần" với lý do
+`cargo build` sẽ phụ thuộc `npm run build` nên dễ vỡ. Người dùng phản biện,
+và đọc prior art thì **lý do đó bị bác bằng code đang chạy**:
+`herdr-gateway/build.rs` mở đầu bằng `create_dir_all("static")` kèm comment
+nguyên văn — *"Guarantees `static/` exists before `RustEmbed`'s derive macro
+scans it, so `cargo build`/`test`/`clippy` never fail on a fresh checkout
+where `npm run bundle` hasn't produced the web UI yet"*. Hai pipeline tách
+rời hẳn; `cargo` chạy được kể cả khi chưa từng bundle frontend. Ràng buộc
+một-binary của D1 cũng không bị đụng vì bundle được nhúng lúc biên dịch.
+Đổi lại còn được `vite dev` + HMR trỏ vào API Rust, `vitest`, và type
+safety — thứ mà HTML nhúng viết tay không có.
 
 ### Hệ quả của D10 phải ghi rõ, không giấu
 

@@ -98,7 +98,9 @@ không song song** — đây đúng loại va chạm `footprintOverlapAmong` sin
 Thêm section config riêng cho web dashboard vào `.fgos/config.json` (cạnh
 `herdrOrchestrator`), đọc fail-closed từ Rust theo đúng khuôn
 `settings.rs` hiện có, **nhưng mặc định BẬT** (D10 — cố ý khác 4 toggle
-kia). Đăng ký vào `fgos setup` config-merge + `fgos doctor` check registry
+kia). Section gồm tối thiểu: cờ bật/tắt (mặc định `true`), `bindAddress`
+(mặc định `0.0.0.0`, D7) và **`port` mặc định `8788`** (D13 — né 8787 của
+`herdr-gateway` để chạy được cả hai trên một máy). Đăng ký vào `fgos setup` config-merge + `fgos doctor` check registry
 theo khuôn `herdr-launcher-configured`
 (`src/setup/registrations.mjs:1074-1114`: `DEFAULT_*_SETTINGS` +
 `registerConfigDefault({id,key,shape})` + `registerCheck({id,description,
@@ -120,17 +122,42 @@ existing covered behavior (`registrations.mjs` dùng chung mọi doctor check;
 ### P2 — webserver core + auth lớp 1
 
 axum + `rust-embed`/`axum-embed`, phục vụ static asset + health-check.
-Bind theo config, mặc định `0.0.0.0`, cảnh báo khi không phải loopback
-(D7). Auth lớp 1 đầy đủ theo D8/D9: resolve token (env → file 0600 tự
-sinh), `POST /api/login` với `constant_time_eq`, cookie `HttpOnly;
-SameSite=Strict`, mọi thất bại **404 câm**. Bề mặt ghi khai báo dạng
-allowlist ngay từ đây (`answer`/`approve`/`reject`), chưa cần có handler
-thật.
+Bind theo config, mặc định `0.0.0.0:8788` (D7 + D13), cảnh báo khi không
+phải loopback. Auth lớp 1 đầy đủ theo D8/D9: resolve token (env → file
+0600 tự sinh), `POST /api/login` với `constant_time_eq`, cookie
+`HttpOnly; SameSite=Strict`, mọi thất bại **404 câm**. Bề mặt ghi khai báo
+dạng allowlist ngay từ đây (`answer`/`approve`/`reject`), chưa cần có
+handler thật.
+
+**Thêm ở vòng quyết định 2026-08-12 (D12/D14):**
+
+- **Tiến trình con, không nằm trong TUI (D12).** Binary tự re-exec chính
+  nó ở chế độ server; cockpit chỉ bật/tắt. Đóng cockpit **không** giết web
+  dashboard — đây là điều kiện để dùng được từ điện thoại, lúc mà không
+  cockpit nào đang mở.
+- **`herdr-plugin/build.rs` (chưa tồn tại hôm nay — đã kiểm) với
+  `create_dir_all("static")` (D14).** Đây là mảnh làm hai pipeline tách
+  rời: `cargo build/test/clippy` chạy được trên checkout sạch chưa từng
+  `npm run bundle`. Port thẳng từ `herdr-gateway/build.rs`.
+- **`.gitignore` thêm `herdr-plugin/static/`** (output bundle, không commit).
+- Nhúng: `#[derive(RustEmbed)] #[folder = "static/"]` + feature
+  `debug-embed`, **không** bật `compression` — trả thẳng `&'static [u8]`,
+  không copy heap mỗi request. Kèm đường override đọc từ đĩa khi
+  `<static_dir>/index.html` có mặt, để dev sửa frontend không phải rebuild
+  binary (cả hai đều theo đúng `herdr-gateway/src/web/mod.rs:25-29,95-98`).
+
+Chi phí bộ nhớ đã đo, không phỏng đoán: bundle thật của `herdr-gateway` là
+**76K** (mà phần lớn là `@xterm/xterm`, thứ dashboard này không cần). Asset
+nằm ở `.rodata`, demand-paged, file-backed sạch — RSS chỉ tăng theo phần
+thật sự được phục vụ và kernel evict được. Không phải heap.
 
 ### P3 — taskboard
 
 Danh sách work item đọc qua `WorkItemSource` đã có
 (`herdr-plugin/src/ports.rs:11-20`), không thêm nguồn dữ liệu mới.
+Frontend dựng bằng vite + TypeScript dưới `herdr-plugin/web/` (D14) —
+`package.json`/`vite.config.ts` dựng ở mảnh này vì đây là màn web đầu tiên;
+P4 dùng lại, không dựng lại.
 
 ### P4 — task detail (mục tiêu chính)
 
