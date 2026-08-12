@@ -16,7 +16,7 @@ operation" pattern already used elsewhere (`lock-wait.mjs`).
 
 ## Scout evidence
 
-- `src/intake/discovery.mjs:289-310`, `src/intake/decompose.mjs`'s
+- `src/intake/discovery.mjs:289-310`, `src/intake/plan.mjs`'s
   priority-write try/catch — read in full, cited in `RESEARCH.md`.
 
 ## Canonical references

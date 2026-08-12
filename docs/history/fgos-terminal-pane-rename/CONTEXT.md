@@ -31,7 +31,7 @@ below rules this out explicitly).
 - **a.ssid** — the concrete coding-agent tool's own native session id
   (e.g. `CLAUDE_CODE_SESSION_ID` for Claude Code). A different env var per
   agent tool; which var to check for which agent is an implementation
-  detail for `fgos-planning`, not pinned here.
+  detail for `fgos-coding-planning`, not pinned here.
 - **chrome-only** — STR40's hard rule (`docs/operator-runbook-herdr-cockpit.md`):
   herdr commands only arrange/label panes and never become a second
   source of truth for fgOS state or agent status.

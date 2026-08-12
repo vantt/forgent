@@ -1,6 +1,6 @@
 # tsk-4iv — `fgos uninstall`
 
-**Stage:** clarify (fgos-exploring). **Date:** 2026-08-01.
+**Stage:** clarify (fgos-coding-exploring). **Date:** 2026-08-01.
 
 ## Feature boundary
 
@@ -19,8 +19,8 @@ the first one.
 |----|----------|
 | D1 | `fgos uninstall` actually removes the installed fgOS package via the detected package manager (npm/pnpm/yarn) — not just fgOS's own wiring. Chosen over a wiring-only reading of "gỡ bin" because `docs/specs/distribution.md`'s Install behavior supports all 3 managers symmetrically, and the item text says "gỡ bin" (remove the bin), not "gỡ wiring". |
 | D2 | `.githooks/pre-commit` (and the `.githooks/` dir, if left empty afterward) is deleted only when `core.hooksPath` is still exactly `.githooks` at uninstall time — mirrors `installGitHooks`'s own fill-only detection in `src/setup/git-hooks.mjs` (never touches a hooksPath the caller repointed elsewhere). Any other value (custom, or already changed) is left completely untouched. |
-| D3 | `fgos uninstall` requires explicit confirmation before running — it touches shell profiles, git config, and removes the installed package, so unlike `setup`/`doctor --fix` (which run immediately, no prompt), this one must not run silently. Exact confirmation UX (flag vs interactive prompt) is left to `fgos-planning`. |
-| D4 | (added at `fgos-validating`, mid-planning gap) `fgos uninstall` does **not** delete the fgOS shell-rc source line itself — it only detects it and reports its rc file + path, instructing the human to remove it by hand. This keeps the item consistent with the already-locked `docs/history/shell-rc-dead-source-lines/CONTEXT.md` D1 ("fgOS never edits an rc file to remove a line — deletion stays a human act") rather than carving out an exception to it. D1 itself is not reopened or amended. |
+| D3 | `fgos uninstall` requires explicit confirmation before running — it touches shell profiles, git config, and removes the installed package, so unlike `setup`/`doctor --fix` (which run immediately, no prompt), this one must not run silently. Exact confirmation UX (flag vs interactive prompt) is left to `fgos-coding-planning`. |
+| D4 | (added at `fgos-coding-validating`, mid-planning gap) `fgos uninstall` does **not** delete the fgOS shell-rc source line itself — it only detects it and reports its rc file + path, instructing the human to remove it by hand. This keeps the item consistent with the already-locked `docs/history/shell-rc-dead-source-lines/CONTEXT.md` D1 ("fgOS never edits an rc file to remove a line — deletion stays a human act") rather than carving out an exception to it. D1 itself is not reopened or amended. |
 
 ## Pinned constraint (from item text, not re-asked)
 
@@ -67,7 +67,7 @@ hard constraint, not a D-decision.
 - Impact-analysis capability posture: **full** (`gitnexus` present,
   `fgos tool query --capability impact-analysis --status present`).
 
-## Flagged for `fgos-planning` (not decided here — implementation/architecture)
+## Flagged for `fgos-coding-planning` (not decided here — implementation/architecture)
 
 - How a running process reliably removes its own package's files across
   npm/pnpm/yarn and OSes (Windows file-locking risk in particular) —

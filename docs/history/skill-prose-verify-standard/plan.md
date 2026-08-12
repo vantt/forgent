@@ -56,7 +56,7 @@ Nội dung bắt buộc có:
    `.claude/skills/**`; grep cụm đặc trưng thay vì từ đơn.
 4. **Chủ sở hữu chứng-minh-runtime** (D3) — không phải verify field, mà là
    smoke-test how-to theo mẫu
-   `docs/how-to/smoke-test-fgos-code-implement-with-a-trivial-item.md`, cộng
+   `docs/how-to/smoke-test-fgos-coding-implement-with-a-trivial-item.md`, cộng
    quan sát `.fgos/events.jsonl`. Nêu giới hạn trung thực: event log chứng
    minh đường thuận, không bắt ca âm, không gate được lúc merge.
 5. **Ranh giới** — điều verify không được đòi: "tài liệu/prose có đúng và
@@ -71,7 +71,7 @@ Nội dung bắt buộc có:
 | Doc trôi khỏi thực hành | thấp | Verify ghim cụm đặc trưng, nên sửa nội dung mà bỏ mất luận điểm chính sẽ đỏ |
 | Item vô tình đụng code | thấp | Verify có `! git diff --name-only main...HEAD \| grep -q '^src/'` |
 
-Không có mục nào ở mức medium/high cần proof point riêng ở `fgos-validating`
+Không có mục nào ở mức medium/high cần proof point riêng ở `fgos-coding-validating`
 ngoài việc đọc lại chính doc.
 
 ## File đụng tới
@@ -81,23 +81,23 @@ ngoài việc đọc lại chính doc.
 
 Không đụng `src/`, không đụng test, không đụng SKILL.md nào.
 
-## Giả định (nhãn rõ, cho `fgos-validating` soát)
+## Giả định (nhãn rõ, cho `fgos-coding-validating` soát)
 
 - **A1** — `docs/how-to/` là chỗ đúng, không cần thêm entry vào
   `docs/enduser-docs-index.json` trong item này; việc index thuộc khâu
   compound-learn (`fgos-indexing`), sau `delivered`.
 - **A2** — không cần trỏ từ `AGENTS.md`/`CLAUDE.md` sang doc mới. Nếu
-  `fgos-validating` thấy doc sẽ không được ai tìm ra nếu không có trỏ, đó là
+  `fgos-coding-validating` thấy doc sẽ không được ai tìm ra nếu không có trỏ, đó là
   phát hiện hợp lệ và thêm một dòng trỏ là thay đổi nhỏ, không đổi mode.
 - **A3** — verify hiện tại ghim cụm tiếng Việt đặc trưng
   (`deliverable mới thật sự tồn tại`, `pattern cũ đã biến mất`,
   `chủ sở hữu chứng-minh-runtime`). Doc phải chứa đúng các cụm đó — verify
-  là contract, cùng shape `tsk-f38` dùng (`grep -q "^name: fgos-code-implement$"`).
+  là contract, cùng shape `tsk-f38` dùng (`grep -q "^name: fgos-coding-implement$"`).
 
 ## Verify (một lệnh, đã set trên item)
 
 ```
-npm test && test -f docs/how-to/write-verify-for-a-skill-prose-change.md && grep -q '^type: how-to$' docs/how-to/write-verify-for-a-skill-prose-change.md && grep -q 'smoke-test-fgos-code-implement-with-a-trivial-item' docs/how-to/write-verify-for-a-skill-prose-change.md && grep -q 'deliverable mới thật sự tồn tại' docs/how-to/write-verify-for-a-skill-prose-change.md && grep -q 'pattern cũ đã biến mất' docs/how-to/write-verify-for-a-skill-prose-change.md && grep -q 'chủ sở hữu chứng-minh-runtime' docs/how-to/write-verify-for-a-skill-prose-change.md && grep -q 'test -f' docs/how-to/write-verify-for-a-skill-prose-change.md && ! grep -q 'TODO' docs/how-to/write-verify-for-a-skill-prose-change.md && ! git diff --name-only main...HEAD | grep -q '^src/'
+npm test && test -f docs/how-to/write-verify-for-a-skill-prose-change.md && grep -q '^type: how-to$' docs/how-to/write-verify-for-a-skill-prose-change.md && grep -q 'smoke-test-fgos-coding-implement-with-a-trivial-item' docs/how-to/write-verify-for-a-skill-prose-change.md && grep -q 'deliverable mới thật sự tồn tại' docs/how-to/write-verify-for-a-skill-prose-change.md && grep -q 'pattern cũ đã biến mất' docs/how-to/write-verify-for-a-skill-prose-change.md && grep -q 'chủ sở hữu chứng-minh-runtime' docs/how-to/write-verify-for-a-skill-prose-change.md && grep -q 'test -f' docs/how-to/write-verify-for-a-skill-prose-change.md && ! grep -q 'TODO' docs/how-to/write-verify-for-a-skill-prose-change.md && ! git diff --name-only main...HEAD | grep -q '^src/'
 ```
 
 Chính lệnh này là ví dụ sống của D2: có `npm test`, có vế positive (`test -f`

@@ -8,7 +8,7 @@ fixes the two things a `CONTEXT.md` would have had to lock — the priority
 order (ship-faster first, instability second) and the method (split by
 AREA, parallel independent scan agents, report-only, no code changes).
 Nothing material was left unaddressed, so there was no gap to hand back
-to `fgos-exploring` for.
+to `fgos-coding-exploring` for.
 
 ## Mode
 

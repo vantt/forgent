@@ -42,7 +42,7 @@ Flags counted:
 
 Single item, no split — one honest piece of work, one PR-sized change confined to `herdr-plugin/`.
 
-Cases to prove at `fgos-validating`/execution:
+Cases to prove at `fgos-coding-validating`/execution:
 - No `fg:cockpit` tab exists yet in the workspace → new tab created and labeled, operator's current tab untouched.
 - A `fg:cockpit` tab already exists → opening cockpit again focuses it, closes the redundant new tab, never leaves two `fg:cockpit`-labeled tabs.
 - Non-herdr environment (`HERDR_WORKSPACE_ID`/`HERDR_TAB_ID` absent, e.g. local dev/test) → degrades gracefully, same as today's `if let Ok(tab_id) = ...` shape; never panics.

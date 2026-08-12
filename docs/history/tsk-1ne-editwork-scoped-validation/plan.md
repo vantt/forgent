@@ -1,8 +1,8 @@
 Mode: high-risk
 
-Lane decided via direct-entry fallback (`fgos-planning`'s own Bootstrap
+Lane decided via direct-entry fallback (`fgos-coding-planning`'s own Bootstrap
 step 1): no lane was handed off from `fgos-routing` — this session went
-straight from `fgos-exploring` into planning — and `plan.md` carried no
+straight from `fgos-coding-exploring` into planning — and `plan.md` carried no
 prior `Mode:` line. Applying `fgos-routing`'s Mode-gate table directly:
 flag count is 0 (no auth, no data-loss, no audit/security, no external
 system, no cross-platform, no multi-domain, no weak-proof area, no
@@ -38,10 +38,10 @@ migrating the 65 items' `stage`/`id` (rewrites historical `done`/
 
 | Component | How risky | What proves it |
 |---|---|---|
-| `editWork`'s scoped re-validation | Low in isolation (CONTEXT.md D2: `id`/`stage` are not in `EDITABLE_FIELDS`, so no patch could ever have exercised the removed re-checks on those two fields) | `fgos-validating`: confirm `EDITABLE_FIELDS` still excludes `id`/`stage`/`status`/`domain` today (the whole safety argument depends on this staying true) |
-| Other validators inside `editWork`'s chain (`validateDeps`, `validateMergeAfter`, `validateSupersededBy`, `validateDuplicates`, `validateDomainFields`, `checkAcceptanceEvidenceTraceable`) | Medium — but de-risked by validating (below): every one of these six is already single-field-scoped in its own right (`validateDeps` only reads `work.deps`, `validateMergeAfter` only `work.mergeAfter`, `validateSupersededBy` only `work.supersededBy`, `validateDuplicates` only `work.duplicates`, `validateDomainFields` only `work.domainFields[ownDomain]`, `checkAcceptanceEvidenceTraceable` only `work.acceptance`, confirmed by direct read of `src/state/work.mjs:655-715,632-648,763-788`) — none reads a SECOND field to decide whether a first field is valid, so "run a validator only when its own field is present in `patch`" is a complete, non-leaky rule; no relational cross-field case exists to miss | `fgos-validating` (this pass): confirmed by reading each validator's body — see cell to the left |
+| `editWork`'s scoped re-validation | Low in isolation (CONTEXT.md D2: `id`/`stage` are not in `EDITABLE_FIELDS`, so no patch could ever have exercised the removed re-checks on those two fields) | `fgos-coding-validating`: confirm `EDITABLE_FIELDS` still excludes `id`/`stage`/`status`/`domain` today (the whole safety argument depends on this staying true) |
+| Other validators inside `editWork`'s chain (`validateDeps`, `validateMergeAfter`, `validateSupersededBy`, `validateDuplicates`, `validateDomainFields`, `checkAcceptanceEvidenceTraceable`) | Medium — but de-risked by validating (below): every one of these six is already single-field-scoped in its own right (`validateDeps` only reads `work.deps`, `validateMergeAfter` only `work.mergeAfter`, `validateSupersededBy` only `work.supersededBy`, `validateDuplicates` only `work.duplicates`, `validateDomainFields` only `work.domainFields[ownDomain]`, `checkAcceptanceEvidenceTraceable` only `work.acceptance`, confirmed by direct read of `src/state/work.mjs:655-715,632-648,763-788`) — none reads a SECOND field to decide whether a first field is valid, so "run a validator only when its own field is present in `patch`" is a complete, non-leaky rule; no relational cross-field case exists to miss | `fgos-coding-validating` (this pass): confirmed by reading each validator's body — see cell to the left |
 | Regression on the 65-item unblock itself | Low, directly provable | New/updated test: patch an unrelated field (e.g. `description`) on a fixture item with `stage: compound-learn` or an over-length `id`, assert it now succeeds |
-| Blast radius of touching `editWork` | Low — confirmed by both `mcp__gitnexus__impact(editWork, upstream)` (LOW risk, 3 upstream symbols: `resolveDecompose`, `resolveDiscovery`, `runOnce`) and a manual grep cross-check (GitNexus index is stale — last indexed `251d0b5` per this session's own tool-use hook — so the automated result was cross-checked per `CLAUDE.md`'s gate note). Grep found 4 real call sites total: `src/intake/discovery.mjs:628`, `src/intake/decompose.mjs:816` (both priority-only patches, matching GitNexus's 2 direct hits), plus `bin/fgos.mjs:1486` (the `fgos edit` CLI door — the actual path that hit this bug) and `bin/fgos.mjs:3260` (a `parent`-only patch during decompose splitting) — GitNexus's stale index missed both `bin/fgos.mjs` call sites | None of the 4 call sites patch `id`/`stage`, so none are affected beyond gaining the fix; `fgos-validating` should re-run this same grep to catch any new call site added since this plan was written |
+| Blast radius of touching `editWork` | Low — confirmed by both `mcp__gitnexus__impact(editWork, upstream)` (LOW risk, 3 upstream symbols: `resolveDecompose`, `resolveDiscovery`, `runOnce`) and a manual grep cross-check (GitNexus index is stale — last indexed `251d0b5` per this session's own tool-use hook — so the automated result was cross-checked per `CLAUDE.md`'s gate note). Grep found 4 real call sites total: `src/intake/discovery.mjs:628`, `src/intake/plan.mjs:816` (both priority-only patches, matching GitNexus's 2 direct hits), plus `bin/fgos.mjs:1486` (the `fgos edit` CLI door — the actual path that hit this bug) and `bin/fgos.mjs:3260` (a `parent`-only patch during decompose splitting) — GitNexus's stale index missed both `bin/fgos.mjs` call sites | None of the 4 call sites patch `id`/`stage`, so none are affected beyond gaining the fix; `fgos-coding-validating` should re-run this same grep to catch any new call site added since this plan was written |
 
 `impact-analysis: degraded` — `gitnexus` reports status `present`, but the
 index is confirmed stale (`251d0b5`, this session's own tool-use hooks),
@@ -92,7 +92,7 @@ node --test test/state/store.test.mjs
 ```
 
 (This is the same verify already recorded via `gate-approve`/`discover`
-on this item — `fgos-code-implement` extends this suite with cases 1-5
+on this item — `fgos-coding-implement` extends this suite with cases 1-5
 above rather than replacing it.)
 
 ## Assumptions

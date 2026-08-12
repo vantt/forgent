@@ -2,7 +2,7 @@
 
 **Date**: 2026-07-28 22:45  
 **Severity**: Critical (all three fix release-blocking gates)  
-**Component**: fgOS lifecycle gates, `judgeDecompose`, `claim-port.mjs`, `src/intake/decompose.mjs`  
+**Component**: fgOS lifecycle gates, `judgeDecompose`, `claim-port.mjs`, `src/intake/plan.mjs`  
 **Status**: Resolved (merged to main, 525eae8)
 
 ## What Happened
@@ -36,7 +36,7 @@ Also hit two pre-existing flaky tests that burned cycles before being correctly 
 **Bug #2 — Gate answer never consulted (e86bcb0, part 1):**
 - `judgeDecompose` called `buildDecomposePrompt(model, work)` with no `view` argument.
 - `buildDiscoveryPrompt` already had the pattern: thread `view` through, pass `view.gates[id]` to the prompt builder.
-- Fixed by adding `view` parameter to `buildDecomposePrompt`, matching discovery exactly, and wrote matching test suite (`test/intake/decompose.test.mjs` with gate-answer/prior-verdict regression).
+- Fixed by adding `view` parameter to `buildDecomposePrompt`, matching discovery exactly, and wrote matching test suite (`test/intake/plan.test.mjs` with gate-answer/prior-verdict regression).
 
 **Bug #3 — Heavy-risk gate unconditional (e86bcb0, part 2):**
 - `resolveDecompose`'s check `if (work.risk === 'heavy') { throw D3_GATE_ERROR }` was unconditional.

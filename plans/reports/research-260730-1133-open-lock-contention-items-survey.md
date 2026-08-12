@@ -123,6 +123,6 @@ Lịch sử cho thấy đây KHÔNG phải lần đầu — đã có **7 item do
 ## 8. Unresolved Questions
 
 - `tsk-45y` chưa có acceptance criteria/verify — cần P15 bổ sung trước khi có thể lên plan thật.
-- Cơ chế "ai đó chủ động commit/push .fgos vào lúc phù hợp" (tsk-45y) — ai, khi nào, tự động hay thủ công? Chưa có câu trả lời trong item, cần làm rõ ở bước `fgos discover`/`fgos-exploring` cho chính item này.
+- Cơ chế "ai đó chủ động commit/push .fgos vào lúc phù hợp" (tsk-45y) — ai, khi nào, tự động hay thủ công? Chưa có câu trả lời trong item, cần làm rõ ở bước `fgos discover`/`fgos-coding-exploring` cho chính item này.
 - Conflict-resolution khi 2 worktree cùng sửa cùng 1 work item trong `.fgos/state.json`/`events.jsonl` dưới Option 2 — chưa thấy đề cập ở đâu trong backlog hiện có.
 - `tsk-49a`'s nghi vấn root cause (runner có check session-role claim hay không) — chưa xác nhận, cần đọc `loop.mjs`'s dispatch selection logic để trả lời dứt điểm trước khi lên plan sửa.

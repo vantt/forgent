@@ -30,7 +30,7 @@ investigative work, not a one-line change.
 `fgos tool query --capability impact-analysis --status present` →
 `gitnexus` present — **full** posture; MUST rules apply at execute time.
 
-Checked now (informational, re-run for real at `fgos-code-implement` per
+Checked now (informational, re-run for real at `fgos-coding-implement` per
 `CLAUDE.md`'s own gate — the index may drift between now and then):
 - `mergeRunnerItemLocked` upstream impact: **LOW risk**, exactly one
   caller (`mergeRunnerItem`, same file) — the classification change stays
@@ -135,7 +135,7 @@ before the item is returned, per D2):
    the diagnostic capture itself works end-to-end).
 3. Write the result — reproduced or not, and why — into
    `repro-notes.md`, and append it to the item's decision log
-   (`fgos decision`) before `fgos-validating`'s reality check runs.
+   (`fgos decision`) before `fgos-coding-validating`'s reality check runs.
 
 This step does not gate D1 landing (the classification fix is correct
 regardless of root cause), but per D2 it gates the item being reported
@@ -184,7 +184,7 @@ no regression. (`npm test --` was tried first and rejected: the package's
 it. `node --test <files>` directly does scope correctly, confirmed the
 same way: 520 tests, 0 fail, baseline green before any code change.)
 
-## Assumptions (unproven, flagged for `fgos-validating`)
+## Assumptions (unproven, flagged for `fgos-coding-validating`)
 
 - The untracked-file-collision scenario is assumed to be a real,
   reachable trigger for "git merge fails without creating `MERGE_HEAD`"

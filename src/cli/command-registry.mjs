@@ -138,7 +138,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'discover',
     invoke: 'fgos discover',
-    description: 'Run context-discovery for an item at stage clarify, moving it forward to decompose (or parking it in awaiting-human). Errors if the item is not at stage clarify -- use "decompose" for a decompose-stage item. --verdict lets a caller that already reasoned about clarity (e.g. a live session running fgos-exploring) supply its own verdict directly, skipping the judgeDiscovery subprocess judge for this call.',
+    description: 'Run context-discovery for an item at stage clarify, moving it forward to planning (or parking it in awaiting-human). Errors if the item is not at stage clarify -- use "plan" for a planning-stage item. --verdict lets a caller that already reasoned about clarity (e.g. a live session running fgos-coding-exploring) supply its own verdict directly, skipping the judgeDiscovery subprocess judge for this call.',
     parameters: {
       type: 'object',
       properties: {
@@ -160,23 +160,23 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
-    name: 'decompose',
-    invoke: 'fgos decompose',
-    description: 'Run chia-viec (split-work judgment) for an item at stage decompose, moving it forward to executing (pass-through or split into children) or parking it in awaiting-human. Errors if the item is not at stage decompose -- use "discover" for a clarify-stage item. --verdict lets a caller that already reasoned about split-work (e.g. a live session running fgos-planning) supply its own verdict directly, skipping the judgeDecompose subprocess judge for this call -- downstream safety gates (heavy-risk/blast-radius/footprint-overlap) still apply unconditionally.',
+    name: 'plan',
+    invoke: 'fgos plan',
+    description: 'Run chia-viec (split-work judgment) for an item at stage planning (renamed from decompose, tsk-403 D11 -- the legacy decompose stage alias still routes here too, D18), moving it forward to executing (pass-through or split into children) or parking it in awaiting-human. Errors if the item is not at stage planning (or the legacy decompose alias) -- use "discover" for a clarify-stage item. --verdict lets a caller that already reasoned about split-work (e.g. a live session running fgos-coding-planning) supply its own verdict directly, skipping the retired subprocess judge for this call -- downstream safety gates (heavy-risk/blast-radius/footprint-overlap) still apply unconditionally.',
     parameters: {
       type: 'object',
       properties: {
         id: { type: 'string', description: 'Work item id (positional or --id).' },
         config: { type: 'string', description: 'Path to the runner config (default .fgos/config.json in cwd).' },
-        verdict: { type: 'string', description: 'Optional caller-supplied verdict: "pass-through", "need-human", or "decompose". Omit to run the normal judgeDecompose subprocess judge (or the plan.md tiny/small mode skip-and-advance heuristic, if applicable).' },
+        verdict: { type: 'string', description: 'Optional caller-supplied verdict: "pass-through", "need-human", or "decompose" (this value name is unchanged, tsk-403 D11 -- it names an outcome, not a stage). Omit to run the normal retired subprocess judge (or the plan.md tiny/small mode skip-and-advance heuristic, if applicable).' },
         reason: { type: 'string', description: 'Required with --verdict need-human or --verdict decompose (optional with pass-through): why this call is verdicting the way it is.' },
-        children: { type: 'string', description: 'Required with --verdict decompose: JSON-encoded array of child objects ({title, verify, kind?, risk?, refs?, footprint?, deps?}), same shape judgeDecompose itself produces.', multiValueFormat: 'json-array' },
+        children: { type: 'string', description: 'Required with --verdict decompose: JSON-encoded array of child objects ({title, verify, kind?, risk?, refs?, footprint?, deps?}), same shape the retired subprocess judge used to produce.', multiValueFormat: 'json-array' },
         force: { type: 'boolean', description: 'Only meaningful with --verdict decompose: proceed past a disputed second-pass verify judge on a child, instead of parking the whole decompose verdict in awaiting-human. Always logged as a decision naming the disagreement it overrode -- never a silent bypass. Mirrors discover --force (tsk-5cf D1b).' },
       },
       positional: ['id'],
       required: ['id'],
     },
-    examples: ['fgos decompose build-cli', 'fgos decompose build-cli --verdict pass-through --reason "single-piece, no split needed"'],
+    examples: ['fgos plan build-cli', 'fgos plan build-cli --verdict pass-through --reason "single-piece, no split needed"'],
     touchesState: true,
     requiresExistingStore: true,
     externalEffect: false,
@@ -244,7 +244,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'compound',
     invoke: 'fgos compound',
-    description: 'Tag a retrospective-status work item\'s outcome with a Diataxis doc-type/doc-path linkage (tutorial | how-to | reference | explanation) -- the producer surface fgos-compounding uses to record its synthesis classification. Requires the item to be at status "retrospective"; omitted --doc-type is a no-op.',
+    description: 'Tag a retrospective-status work item\'s outcome with a Diataxis doc-type/doc-path linkage (tutorial | how-to | reference | explanation) -- the producer surface fgos-coding-compounding uses to record its synthesis classification. Requires the item to be at status "retrospective"; omitted --doc-type is a no-op.',
     parameters: {
       type: 'object',
       properties: {
@@ -286,7 +286,7 @@ export const COMMAND_REGISTRY = [
         'docs-ref': { type: 'string', description: 'New relative path to this item\'s docs/history/<feature>/ directory (its own CONTEXT.md/plan.md) — lets an item gain or change this link after creation, e.g. one created via submit (which had no --docs-ref of its own before this field was added here).' },
         urgent: { type: 'string', description: 'New urgency level: one of low/medium/high/critical, human-entered. Absent reads as medium at the priority formula, never stored as a default here.' },
         impact: { type: 'number', description: 'New impact score: a non-negative number, computed (blocking fan-out + semantic scan + de-risk bonus) — not typically human-entered directly.' },
-        effort: { type: 'number', description: 'New effort score: a non-negative number, computed from fgos-planning\'s mode/flag-count — not typically human-entered directly.' },
+        effort: { type: 'number', description: 'New effort score: a non-negative number, computed from fgos-coding-planning\'s mode/flag-count — not typically human-entered directly.' },
         'merge-after': { type: 'string', description: 'Comma-separated list of ids this item must merge AFTER (empty string clears the field). A weak, merge-order-only edge — blocks this item\'s MERGE until every target is resolved, but never blocks its own start/dispatch the way deps does. Validated at set-time: target existence, no self-reference, no cycle (including a cycle mixed with deps/parent).', multiValueFormat: 'csv' },
       },
       positional: ['id'],
@@ -372,7 +372,7 @@ export const COMMAND_REGISTRY = [
       type: 'object',
       properties: {
         id: { type: 'string', description: 'Work item id the Gate belongs to.' },
-        gate: { type: 'string', description: 'Which Gate was approved: "contextApprove" (fgos-exploring), "planApprove" (fgos-planning), or "validateApprove" (fgos-validating).' },
+        gate: { type: 'string', description: 'Which Gate was approved: "contextApprove" (fgos-coding-exploring), "planApprove" (fgos-coding-planning), or "validateApprove" (fgos-coding-validating).' },
         actor: { type: 'string', description: 'Who approved it: "human" (a person answered the Gate question) or "bypass" (gate-bypass level auto-approved it).' },
         verify: { type: 'string', description: 'The real verify command this Gate\'s artifact carries (never a placeholder).' },
       },

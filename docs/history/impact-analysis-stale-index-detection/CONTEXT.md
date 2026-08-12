@@ -75,7 +75,7 @@ corruption itself (see D2).
   session-facing guidance this item's D1(a) updates.
 - `src/state/tool-registry.mjs` — `probeTool`, the presence-check function
   this item's D1(b)/D2 extend.
-- `docs/history/fgos-exploring-impact-analysis-gate/` — prior art for how
+- `docs/history/fgos-coding-exploring-impact-analysis-gate/` — prior art for how
   the impact-analysis capability gate itself was introduced.
 
 ## Deferred to planning

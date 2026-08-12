@@ -73,7 +73,7 @@ add`/`git commit` of `.fgos/events.jsonl`, not a CLI mechanism.
   git-common-dir fallback inside `dataDir()`, or a purely doc-level fix
   in `pick`/`fgos-routing`/`return`'s own `SKILL.md`s instructing the caller
   to resolve/cd to the main root first) is an implementation choice, not a
-  product decision — `fgos-planning`'s job.
+  product decision — `fgos-coding-planning`'s job.
 - Whether/how to surface D2's read-verb silence (a warning line, a changed
   default, a doc note) is also an implementation choice for planning.
 

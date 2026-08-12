@@ -5,7 +5,7 @@ Use this when you want the single next `stage:clarify` or
 or re-deriving the pick order yourself — invoked as `/fgOS:discover-next`
 (`tsk-3go-2`). It wraps `pickNextDiscoverItem`
 (`src/state/discover-pool.mjs`) plus the existing `fgos discover`/
-`fgos decompose` verbs. It never writes `.fgos/` state directly, and never
+`fgos plan` verbs. It never writes `.fgos/` state directly, and never
 re-implements `discover`/`decompose` mechanics — both verbs stay exactly
 as they are. Takes no arguments — always picks the single next item, the
 same way `/fgOS:merge-next` always picks the single top-ranked

@@ -107,7 +107,7 @@ const TRANSITIONS = Object.freeze([
   Object.freeze({ from: 'doing', to: 'awaiting-approval' }),
   // Claim release (claim-lock §3b): the clarify/decompose -> executing
   // boundary hands a held pick claim back to `todo` the moment the item is
-  // actually ready for its executing phase (resolveDecompose, after its own
+  // actually ready for its executing phase (resolvePlan, after its own
   // moveStage(...,'executing',...)) — silent, no `reason` required, mirroring
   // `blocked -> todo`'s own no-reason shape immediately above. This is the
   // one new status edge the design needs beyond the awaiting-human ones: a

@@ -43,7 +43,7 @@ providing higher-order judgment. Both are peer consumers of the same kernel.
   the loop to re-derive "is this an interactive resume" every iteration.
 
 Existing precedent for "domain sidecar strictness": `gate-bypass.mjs`'s
-`level` knob, already consulted by `fgos-exploring`'s/`fgos-planning`'s own
+`level` knob, already consulted by `fgos-coding-exploring`'s/`fgos-coding-planning`'s own
 approval gates (`canAutoApprove(item, artifact, level)`) — currently global,
 not per-domain, but the template for extending strictness-injection per
 domain the same way `worktreeBacked` is already per-domain.
@@ -52,7 +52,7 @@ domain the same way `worktreeBacked` is already per-domain.
 
 Verified 3 findings by reading code, not guessing:
 
-1. `src/intake/discovery.mjs`/`src/intake/decompose.mjs` hardcode literal
+1. `src/intake/discovery.mjs`/`src/intake/plan.mjs` hardcode literal
    stage names (`'clarify'`, `'decompose'`, `'executing'`) instead of
    resolving via `stageForStep(domain, 'Clarify'/'Divide')` — flagged as a
    silent-overwrite risk for a second domain.
@@ -96,7 +96,7 @@ verbs — a second domain's item can never reach `resolveDiscovery`/
 | `bin/fgos.mjs` | 955 | `if (stage !== 'clarify')` — `discover` verb gate |
 | `bin/fgos.mjs` | 979 | `if (stage !== 'decompose')` — `decompose` verb gate |
 | `src/intake/discovery.mjs` | 593-599, 663-669 | `moveStage(..., to:'decompose', expectedStage:'clarify', ...)` ×2 |
-| `src/intake/decompose.mjs` | 542, 604, 685, 759 | `moveStage(..., to:'executing', expectedStage:'decompose', ...)` ×4 |
+| `src/intake/plan.mjs` | 542, 604, 685, 759 | `moveStage(..., to:'executing', expectedStage:'decompose', ...)` ×4 |
 
 **Real failure mode (corrected severity):** sync CLI path rejects outright
 before reaching the engine (confusing error for a legitimately-staged
@@ -326,10 +326,10 @@ flowchart TB
   end
 
   subgraph StageSkills["Stage skills — do the real work"]
-    EXPLORE["fgos-exploring — clarify"]
-    PLAN["fgos-planning — decompose / shaping"]
-    VALIDATE["fgos-validating — decompose / proving"]
-    EXEC["fgos-code-implement — executing"]
+    EXPLORE["fgos-coding-exploring — clarify"]
+    PLAN["fgos-coding-planning — decompose / shaping"]
+    VALIDATE["fgos-coding-validating — decompose / proving"]
+    EXEC["fgos-coding-implement — executing"]
   end
 
   HUMAN(["a person opening a session"]) --> ROUTING
@@ -401,10 +401,10 @@ sequenceDiagram
   participant Cook as /fgOS:cook
   participant Drive as fgos-coding-driving
   participant Reg as DOMAINS registry
-  participant Explore as fgos-exploring
-  participant Plan as fgos-planning
-  participant Valid as fgos-validating
-  participant Exec as fgos-code-implement
+  participant Explore as fgos-coding-exploring
+  participant Plan as fgos-coding-planning
+  participant Valid as fgos-coding-validating
+  participant Exec as fgos-coding-implement
   participant Engine as engine verbs
 
   Cook->>Drive: drive(id, ceiling = none)
@@ -412,7 +412,7 @@ sequenceDiagram
   rect rgba(120,120,120,0.08)
   note over Drive,Explore: stage: clarify
   Drive->>Reg: skillForStage(coding, clarify)
-  Reg-->>Drive: fgos-exploring
+  Reg-->>Drive: fgos-coding-exploring
   Drive->>Explore: invoke
   Explore->>Engine: fgos discover --verdict clear
   Engine-->>Drive: stage → decompose
@@ -421,10 +421,10 @@ sequenceDiagram
   rect rgba(120,120,120,0.08)
   note over Drive,Valid: stage: decompose (shaping → proving)
   Drive->>Reg: skillForStage(coding, decompose)
-  Reg-->>Drive: fgos-planning
+  Reg-->>Drive: fgos-coding-planning
   Drive->>Plan: invoke
   Plan->>Valid: direct handoff once plan.md is approved
-  Valid->>Engine: fgos decompose --verdict pass
+  Valid->>Engine: fgos plan --verdict pass
   Engine-->>Drive: stage → executing
   end
 
@@ -442,7 +442,7 @@ sequenceDiagram
 
 The shaping→proving split inside `decompose` is a direct hand-off between
 two stage skills, not a second pass through the registry — the registry maps
-`decompose` to `fgos-planning` only, as the entry-point default.
+`decompose` to `fgos-coding-planning` only, as the entry-point default.
 
 ### 7.5 Where the four findings sit — updated post-implementation
 
@@ -493,15 +493,15 @@ to change in the loop skill.
 registry:**
 
 1. Routing's "Route by stage" table's `decompose` row splits into "shaping"
-   vs "proving" (→ `fgos-planning` vs `fgos-validating`) — a judgment call
+   vs "proving" (→ `fgos-coding-planning` vs `fgos-coding-validating`) — a judgment call
    routing itself makes in prose, not something `skillForStage` returns (the
-   registry maps `decompose` → `fgos-planning` only, as the entry-point
+   registry maps `decompose` → `fgos-coding-planning` only, as the entry-point
    default). A domain without a stage named `decompose`, or with different
    shaping/proving semantics, has no equivalent split defined anywhere for
    routing to fall back on. This would need real generalization work, not a
    rename.
 2. Renaming ahead of the Finding 1 fix (section 3, Finding 1) would be a
-   claim ahead of evidence: routing could correctly name `fgos-exploring` for
+   claim ahead of evidence: routing could correctly name `fgos-coding-exploring` for
    a domain-2 item, but that stage skill's own engine-verb call
    (`fgos discover`) would still crash on the hardcoded literal underneath.
    Naming the dispatcher "domain-routing" while the kernel beneath it still

@@ -20,7 +20,7 @@ import {
   addOk,
   addOutcome,
   addWork,
-  advanceThroughDiscoveryToDecompose,
+  advanceThroughDiscoveryToPlanning,
   assert,
   coexistPath,
   commitFile,
@@ -431,12 +431,12 @@ test('pick surfaces a real createWorktree failure and reverts the claim it alrea
 
 // --- pick: claim-lock §3a/§3c/§7 (guard loosen, branch-reuse generalize, claimTrigger) ---
 
-test('pick --id claims a status:todo item at stage clarify (not the frontier at all) — the frontier/stage guard is gone (claim-lock §3a)', () => {
+test('pick --id claims a status:todo item at stage discovery (not the frontier at all) — the frontier/stage guard is gone (claim-lock §3a)', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
   const id = JSON.parse(run(cwd, ['submit', 'Fuzzy request needing discovery']).stdout).data.id;
-  assert.equal(stateView(cwd).work[id].stage, 'clarify');
-  assert.ok(!envelopeData(run(cwd, ['ready']).stdout).some((i) => i.id === id), 'a clarify-stage item is never in the frontier');
+  assert.equal(stateView(cwd).work[id].stage, 'discovery');
+  assert.ok(!envelopeData(run(cwd, ['ready']).stdout).some((i) => i.id === id), 'a discovery-stage item is never in the frontier');
 
   const result = run(cwd, ['pick', '--id', id]);
   assert.equal(result.status, 0, `pick failed: ${result.stderr}`);
@@ -444,13 +444,13 @@ test('pick --id claims a status:todo item at stage clarify (not the frontier at 
   assert.equal(data.from, 'todo');
   assert.equal(data.to, 'doing');
   assert.equal(stateView(cwd).work[id].status, 'doing');
-  assert.equal(stateView(cwd).work[id].stage, 'clarify', 'pick claims the item without touching its stage');
+  assert.equal(stateView(cwd).work[id].stage, 'discovery', 'pick claims the item without touching its stage');
 });
 
 test('pick with no --id still only opens the frontier head — the loosened guard applies to the explicit --id branch alone', () => {
   const cwd = initGitCwd();
   run(cwd, ['init']);
-  run(cwd, ['submit', 'Fuzzy request never picked by id']); // stage clarify, never in the frontier
+  run(cwd, ['submit', 'Fuzzy request never picked by id']); // stage discovery, never in the frontier
   const result = run(cwd, ['pick']);
   assert.notEqual(result.status, 0, 'the frontier is empty — a clarify-stage item must not be silently auto-picked');
 });

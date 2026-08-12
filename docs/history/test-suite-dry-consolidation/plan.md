@@ -43,7 +43,7 @@ multi-item shape to weigh.
 
 Risk map:
 
-| Component | Risk | Proof point (for `fgos-validating` / execution) |
+| Component | Risk | Proof point (for `fgos-coding-validating` / execution) |
 |---|---|---|
 | Merging exit-4-rejection cluster (54 tests) | medium — largest cluster, most flags/verbs to preserve | each flag/verb still gets its own data-table row; `npm test` count for this cluster drops from 54 to 1 body + N rows, no assertion coverage lost |
 | Merging no-event-written cluster (53 tests) | medium — overlaps with cluster above (same tests may satisfy both patterns) | check overlap before double-counting reduction; verify no test is deleted outright, only reshaped |
@@ -52,7 +52,7 @@ Risk map:
 
 Files likely touched: `test/cli/fgos.test.mjs` (primary), possibly
 `test/state/replay.test.mjs`, `test/runner/dispatch.test.mjs`,
-`test/runner/loop.test.mjs`, `test/intake/decompose.test.mjs`,
+`test/runner/loop.test.mjs`, `test/intake/plan.test.mjs`,
 `test/intake/discovery.test.mjs`, `test/state/store.test.mjs` (only if scan
 confirms real duplication there — not guaranteed), plus one new report file
 under `plans/reports/`.

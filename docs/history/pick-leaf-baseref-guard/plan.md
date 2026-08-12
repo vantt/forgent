@@ -61,7 +61,7 @@ correctness — rejected per KISS.
 
 **Risk map:**
 
-| Component | Risk | Proof point (→ `fgos-validating`) |
+| Component | Risk | Proof point (→ `fgos-coding-validating`) |
 |---|---|---|
 | Guard ordering vs. `moveWork` | **Medium** — the `268b172` incident was exactly a check-ordering bug: a rejected `createWorktree` call *after* `moveWork` had already committed orphaned the claim in `doing` with no branch/worktree. The new guard MUST run before `moveWork`, not after. | A test claiming a leaf with an unfinished dep must assert the item's `status` is still `todo` afterward (not stranded in `doing`) — mirroring the existing orphan-guard test at `test/cli/fgos.test.mjs:3069`. |
 | Existing test regressions | **Low-medium** — `test/cli/fgos.test.mjs:2993` and other pick tests use items with `deps: []` or unspecified; need to confirm none of the ~10 existing `pick`/`take` tests use a leaf item with an unsatisfied dep (which would newly fail under the guard). | Full `npm test` run must stay green — no existing test's fixture data should trip the new guard. |
@@ -83,7 +83,7 @@ correctness — rejected per KISS.
 
 Single item, no split (`fgos graph tsk-3t4 --json`: standalone component,
 nothing unblocked by it, nothing it depends on). Proceeds as itself through
-`fgos-code-implement`.
+`fgos-coding-implement`.
 
 Concrete cases to prove, standard-mode depth:
 

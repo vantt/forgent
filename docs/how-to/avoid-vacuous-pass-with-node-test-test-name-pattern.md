@@ -79,7 +79,7 @@ hit this exact trap while shaping its own item verify:
   exit 1 (no matching test exists yet), and exit 0 once the real tests were
   written and passing. Full transcript:
   `docs/history/tsk-580/plan.md` (section "Verify cho tsk-580 — sửa lại
-  tại `fgos-validating`") and `docs/history/tsk-580/iron-law-evidence.md`
+  tại `fgos-coding-validating`") and `docs/history/tsk-580/iron-law-evidence.md`
   (the reconstructed red/green proof required by the Iron Law gate at
   `approve`).
 
@@ -124,7 +124,7 @@ how-to doc in the rejection reason.
 
 This was added specifically because `tsk-4sz`'s own verify authoring
 proposed exactly this mistake (`grep -qE "^# pass [1-9]"`) live during
-`fgos-exploring` — the second-pass LLM judge disputed that same verify
+`fgos-coding-exploring` — the second-pass LLM judge disputed that same verify
 three separate times over content/coverage concerns (missing call-site
 coverage, testing the wrong file) but never once caught the format bug
 itself; it only surfaced when `fgos return`'s real spawn ran the command

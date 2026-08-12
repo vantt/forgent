@@ -11,7 +11,7 @@ source_capture_ids: [tsk-69g]
 Use this when one or more related coding-domain work items need real
 back-and-forth exploration — revisiting points, comparing options,
 changing your mind — before anything should be locked into `CONTEXT.md`/
-`plan.md`. This is upstream of `fgos-exploring`/`fgos-planning`, not a
+`plan.md`. This is upstream of `fgos-coding-exploring`/`fgos-coding-planning`, not a
 replacement for either.
 
 ## Two ways in
@@ -48,19 +48,19 @@ avoid fragmenting the read-through — at
 
 ## Why the brainstorm stays open conversational prose
 
-Unlike `fgos-exploring`/`fgos-planning`/`fgos-discover`, this skill never
+Unlike `fgos-coding-exploring`/`fgos-coding-planning`/`fgos-discover`, this skill never
 forces convergence each round with a structured-choice tool
 (`AskUserQuestion`). Revisiting and changing your mind mid-discussion is
 expected, not a failure — a D-ID is only minted once a point has held
 stable across multiple rounds. All formal convergence happens at one
 place only: the native-first handoff below, never mid-brainstorm.
 
-## How it hands off — never re-implements `fgos-exploring`/`fgos-planning`
+## How it hands off — never re-implements `fgos-coding-exploring`/`fgos-coding-planning`
 
 This skill never writes `CONTEXT.md`/`plan.md` itself. Once the
 discussion converges, it sets the target item(s)' `refs` field to a
 scoped anchor inside its own `DISCUSSION.md`, then invokes
-`fgos-exploring` and `fgos-planning` directly in the *same* session
+`fgos-coding-exploring` and `fgos-coding-planning` directly in the *same* session
 (Native-First Dispatch Doctrine, `tsk-27y` D1/D2) — so those two skills
 do their own real authoring with full live context, instead of a later
 cold session having to re-derive it from scratch.
@@ -79,7 +79,7 @@ rejected (collides with the existing `design` skill's branding meaning);
 
 There is deliberately no per-parent index file across a feature's child
 tasks. Reuse the existing `parent` field, the live `fgos rollup <id>`
-command, and `fgos-planning` step 5's own mandatory split-list section in
+command, and `fgos-coding-planning` step 5's own mandatory split-list section in
 `plan.md` instead — verified directly against all 162 pre-existing
 `docs/history/*/` folders at design time, none of which carried an
 index/README file; adding one here would have been a second, driftable
@@ -89,8 +89,8 @@ source of truth alongside the item store.
 
 - `docs/history/fgos-coding-shaping/CONTEXT.md` — full locked decisions
   (D1–D6) and scout evidence.
-- `.claude/skills/fgos-exploring/SKILL.md`,
-  `.claude/skills/fgos-planning/SKILL.md` — the two skills this feature
+- `.claude/skills/fgos-coding-exploring/SKILL.md`,
+  `.claude/skills/fgos-coding-planning/SKILL.md` — the two skills this feature
   invokes natively, never duplicates.
 - `.claude/skills/fgos-coding-driving/SKILL.md` — the naming precedent.
 - `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md`

@@ -14,7 +14,7 @@ regress the other callers.
 
 ## Approach
 
-**REVISED at fgos-validating** (see CONTEXT.md D2 revision + D3): the
+**REVISED at fgos-coding-validating** (see CONTEXT.md D2 revision + D3): the
 original "preserve `branchHeadAtTake` whenever already set" mechanism was
 unsafe — it cannot distinguish a §3b release from a reject (`proposed→
 todo`, which never deletes the branch, `bin/fgos.mjs:1978-1989`) or a
@@ -25,7 +25,7 @@ retaken item can `return` again (`test/cli/fgos.test.mjs:4997-5019`).
 
 **Chosen:** a positive marker, not an inference from status shape.
 
-1. `src/intake/decompose.mjs:263` — `releaseClaimOnExecuting`'s own
+1. `src/intake/plan.mjs:263` — `releaseClaimOnExecuting`'s own
    `moveWork(dir, { id, to: 'todo', expectedStatus: 'doing' })` call gains
    a new additive field marking this specific `todo`-entry as a claim-lock
    §3b release (mirrors the existing `claimTrigger`/`headAtTake` additive-
@@ -70,17 +70,17 @@ This satisfies both locked decisions:
 
 ## Risk map
 
-| Component | Risk | Proof point (fgos-validating) |
+| Component | Risk | Proof point (fgos-coding-validating) |
 |---|---|---|
 | `claimWork`'s `branchAlreadyExists` branch, marker check (`src/runner/claim-port.mjs:116-126`) | Medium — shared by every claim through this path (fresh take, §3b reclaim, blocked-retake, reject-retake) | `test/runner/claim-port.test.mjs`'s existing 3 tests stay green; new test proves a §3b-style release+reclaim (marker present) preserves the original `branchHeadAtTake` |
 | Reject-then-retake at `todo` (`bin/fgos.mjs:1978-1989` reject, no branch deletion) | Medium — must NOT preserve stale `branchHeadAtTake` here (no marker present) | New test: reject a branch-source proposed item, retake it, assert `branchHeadAtTake` recomputes to the live tip (marker absent → fresh, same as today) |
 | Blocked-item branch-retake (`isBranchTake`, `claim-port.mjs:131-133`) | Low — explicitly OUT of scope (D2 revised); must be provably UNCHANGED | `test/e2e/pr-gate.test.mjs` test (e)/(f) and `test/cli/fgos.test.mjs:4997-5019` stay green unmodified — no marker ever applies to this path, so the existing recompute-to-live-tip fires exactly as before |
-| `decompose.mjs`'s `releaseClaimOnExecuting` marker stamp (`src/intake/decompose.mjs:263`) | Low — additive field on an existing call, mirrors `claimTrigger`/`headAtTake` convention (`store.mjs:334-400`) | `test/intake/decompose.test.mjs` (existing suite) stays green; new assertion that the release event carries the marker |
+| `decompose.mjs`'s `releaseClaimOnExecuting` marker stamp (`src/intake/plan.mjs:263`) | Low — additive field on an existing call, mirrors `claimTrigger`/`headAtTake` convention (`store.mjs:334-400`) | `test/intake/plan.test.mjs` (existing suite) stays green; new assertion that the release event carries the marker |
 | `return`'s branch-ahead check (`bin/fgos.mjs:1404-1418`) | Low — no code change here, but its correctness now depends on the write-side fix | New e2e test: claim → §3b-style marked release → reclaim → commit → `return` succeeds, proving credit for the pre-reclaim commit is no longer lost |
 
 ## Files touched
 
-1. `src/intake/decompose.mjs` — `releaseClaimOnExecuting`'s `moveWork`
+1. `src/intake/plan.mjs` — `releaseClaimOnExecuting`'s `moveWork`
    call gains the release marker.
 2. `src/state/store.mjs` — `moveWork`'s signature/post-transition stamp
    gains the new additive param (mirrors `claimTrigger`).
@@ -92,7 +92,7 @@ This satisfies both locked decisions:
 5. `test/runner/claim-port.test.mjs` — new tests: (a) §3b-style marked
    release + reclaim preserves the original `branchHeadAtTake`; (b)
    reject-then-retake (no marker) still recomputes fresh.
-6. `test/intake/decompose.test.mjs` — assert the release event carries
+6. `test/intake/plan.test.mjs` — assert the release event carries
    the new marker.
 7. `test/e2e/pr-gate.test.mjs` / `test/cli/fgos.test.mjs:4997-5019` — no
    new test required; run unmodified to confirm the blocked-retake path

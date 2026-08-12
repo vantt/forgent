@@ -75,7 +75,7 @@ see D1 below for why.
   `isCandidate()` should match it), not a bug in the claim step itself.
 - `fgos tool query --capability impact-analysis --status present` →
   GitNexus present. `impact-analysis: full` per CLAUDE.md's gate — informational
-  only here (this skill edits no code); `fgos-planning`/`fgos-code-implement`
+  only here (this skill edits no code); `fgos-coding-planning`/`fgos-coding-implement`
   should run `impact({target: "isCandidate", direction: "upstream"})` before
   editing.
 

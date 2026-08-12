@@ -57,12 +57,12 @@ inferred from GitNexus).
 The item's description undercounts two things. Both corrections below are
 mechanical (same rename intent the item already states), not new design
 decisions, so they're pinned here as assumptions rather than sent back to
-`fgos-exploring`:
+`fgos-coding-exploring`:
 
 1. **`stage.mjs`'s "5 importers" list is wrong.** Only 2 files actually
    `import` from `stage.mjs`: `src/state/store.mjs` and
    `test/state/stage.test.mjs`. The other three named
-   (`src/intake/decompose.mjs`, `src/runner/anti-loop.mjs`,
+   (`src/intake/plan.mjs`, `src/runner/anti-loop.mjs`,
    `src/state/work.mjs`) only *mention* `stage.mjs` in a comment — no
    import statement. They still need their comment text updated (same
    staleness class the item exists to fix for `domains.mjs`), just not an
@@ -115,7 +115,7 @@ literal filenames (see Verify).
 **Stale-comment fixes — `fsm.mjs`/`stage.mjs` → new names** (same
 staleness class, found during this planning pass, prose-only, no behavior
 change):
-- `src/intake/decompose.mjs`:537 (comment mentions `stage.mjs`)
+- `src/intake/plan.mjs`:537 (comment mentions `stage.mjs`)
 - `src/runner/anti-loop.mjs`:45,117 (comment mentions `stage.mjs`,`fsm.mjs`)
 - `src/state/work.mjs`:147 (comment mentions `stage.mjs`)
 - `test/runner/anti-loop.test.mjs`:143 (comment mentions `fsm.mjs`)

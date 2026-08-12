@@ -83,12 +83,12 @@ mechanical shortcut into code.
 
 ## Risk map
 
-| Component | Risk | Proof point (for `fgos-validating` / execution) |
+| Component | Risk | Proof point (for `fgos-coding-validating` / execution) |
 |---|---|---|
 | D1a conflict-shape detector (which paths, row-insertion vs same-row edit) | High — a false positive silently keeps wrong content | Unit tests on the detector with a real captured collision case (mirror `tsk-66l`'s actual conflict shape) AND a same-row-edit case that must NOT be treated as self-resolvable |
 | D1a renumber-and-remerge sequence | High — git surgery (worktree, `.fgos/*` force-checkout from main) done by code instead of by hand | Integration test: fixture repo with two branches independently claiming the same decision ID, assert the auto-resolve reaches a real merge commit and the real goal-check still runs (matching `isAlreadyMerged`'s existing "never skip the real check" precedent) |
 | D1a's own Iron Law exposure | Medium — this item's own `approve` will require `--acknowledge-iron-law` with real failing-test-first proof | Confirmed as an expected, not accidental, consequence (D2) — the failing-test-first proof IS the above two test cases, written red first |
-| D1b diagnosis step | Medium — judgment-based, could misclassify a real regression as "unrelated flake" | `fgos-validating` should require a dry-run trace against a captured real case (`tsk-2z3`'s two blocks) showing the step reaches the same conclusion a person already reached |
+| D1b diagnosis step | Medium — judgment-based, could misclassify a real regression as "unrelated flake" | `fgos-coding-validating` should require a dry-run trace against a captured real case (`tsk-2z3`'s two blocks) showing the step reaches the same conclusion a person already reached |
 | D1b's interaction with D3's stop condition | Low-medium — must actually stop on second no-progress block, not loop | Trace through D3's stop condition by hand against a synthetic "fix didn't help" case before relying on it live |
 
 ## Split
@@ -116,5 +116,5 @@ into can already lean on D1b's diagnosis step) before it lands.
 
 Per the locked decision that Execute/verify already has a working
 mechanical path, this plan names one real verify command per piece and
-stops there — it does not redesign how `fgos-code-implement`/`return`/`approve`
+stops there — it does not redesign how `fgos-coding-implement`/`return`/`approve`
 run.

@@ -4,7 +4,7 @@ Mode: **standard**
 
 Lane decided directly (no `fgos-routing` Orient step ran for this item —
 it entered via `/fgOS:submit` → `fgos-clarifying` → `fgos-coding-shaping`
-→ `fgos-exploring`, never through Orient — so per this skill's
+→ `fgos-coding-exploring`, never through Orient — so per this skill's
 direct-entry fallback, the Mode-gate table is applied here). Flags
 counted (`fgos-routing/SKILL.md`'s Mode-gate list):
 
@@ -51,7 +51,7 @@ dependency explicit instead of leaving it implicit inside one large diff.
 
 **Risk map:**
 
-| Component | Risk | Proof point (for `fgos-validating`) |
+| Component | Risk | Proof point (for `fgos-coding-validating`) |
 |---|---|---|
 | `mergeReadiness`'s existing return shape | Medium — `merge next`/`merge-loop` read it directly; a silent shape change would misroute real automation | Regression test asserting the existing fields (`ready`/`waiting`/`conflicts`/`mergeSets`/`blockedOnSync`/`mergeTier`/`supersededOut`/`stageByItem`) are unchanged before/after adding the new field (D4, D1) |
 | New `mergeTree` grouping/sort logic | Medium — recursive per-level sort could be wrong, or an item whose `parent` id is missing from `view.work` could be silently dropped | Unit tests: multi-level nesting sorts correctly at every depth (D3), an orphaned-parent id still surfaces at top level rather than disappearing (consistent with D2's "show all", never silently hide) |
@@ -60,13 +60,13 @@ dependency explicit instead of leaving it implicit inside one large diff.
 | Tree rendering (`app.rs`) | Low — cosmetic/UX | Extend existing `render_smoke.rs` pattern |
 
 Impact-analysis posture: **degraded** (GitNexus `present` but stale index
-per this session's own hook warnings). `fgos-validating` should treat any
+per this session's own hook warnings). `fgos-coding-validating` should treat any
 blast-radius claim about `mergeReadiness`'s real callers as unconfirmed
 until `gitnexus analyze` is re-run, and cross-check with a plain `rg` for
 `mergeReadiness(` callers instead of trusting a GitNexus zero-result
 blind, per this repo's own capability-gate guidance in `CLAUDE.md`.
 
-## fgos-validating — reality gate + feasibility matrix (tsk-2x9k)
+## fgos-coding-validating — reality gate + feasibility matrix (tsk-2x9k)
 
 **Reality gate:** Mode fit PASS (child scope matches the split's own
 sizing). Repo fit PASS — re-confirmed live: `mergeReadiness`
@@ -133,7 +133,7 @@ node "$root/bin/fgos.mjs" add \
   dropped — consistent with D2 ("show all"), never a new product
   decision, just the same "never hide" principle applied to an edge case.
 
-## fgos-validating — reality gate + feasibility matrix (tsk-59b)
+## fgos-coding-validating — reality gate + feasibility matrix (tsk-59b)
 
 **Reality gate:** Mode fit PASS — both original risk-map rows for this
 task (Rust parser, tree rendering) were already marked Low, matching a

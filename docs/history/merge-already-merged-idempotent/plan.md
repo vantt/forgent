@@ -63,7 +63,7 @@ compare via `--what-if`; this proceeds as one piece.
 
 **Risk map:**
 
-| Component | Risk | Proof point (for `fgos-validating`) |
+| Component | Risk | Proof point (for `fgos-coding-validating`) |
 |---|---|---|
 | Ancestry check placement (before merge attempt, inside the existing lock's critical section) | low | Existing test suite's lock-acquisition test (`:396-409`) must still pass unchanged — the short-circuit still runs inside `mergeRunnerItemLocked`, called after the lock is already held. |
 | Reusing `outcome: 'merged'` for the idempotent path | low | New test asserting HEAD does not move a second time, no new commit is created, and `cleanupMergedBranch`/status-move-to-`done` still work (exercised indirectly — `bin/fgos.mjs`'s own approve path needs no change, verified by the existing call-site fallthrough already reading `result.check`/`.branch` generically). |
@@ -101,7 +101,7 @@ handle any non-blocked outcome generically.
 ## Verify
 
 `node --test --test-name-pattern="mergeRunnerItem|merge.*idempotent"
-test/runner/merge.test.mjs` — corrected at `fgos-validating` from the
+test/runner/merge.test.mjs` — corrected at `fgos-coding-validating` from the
 `discover` verdict's original `npm test -- --testNamePattern=...` form.
 Confirmed by real execution: `npm test -- --testNamePattern=...` silently
 runs the *entire* 1276-test suite unfiltered — `--testNamePattern` isn't a

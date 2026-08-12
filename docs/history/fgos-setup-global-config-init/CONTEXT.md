@@ -64,7 +64,7 @@ gap).
   the existing project-local init pattern: read existing, compute
   `assembleRegistryDefaults()`, `mergeConfigDefaults`, write only when
   something changed or the file didn't exist. D1's global-init should
-  mirror this shape (exact function/call-site left to `fgos-planning`, not
+  mirror this shape (exact function/call-site left to `fgos-coding-planning`, not
   designed here).
 - `src/config/global-config.mjs` — `loadGlobalConfig` (missing file → `{}`,
   not an error), `mergeWithGlobalConfig`, `describeConfigAwareness`. No

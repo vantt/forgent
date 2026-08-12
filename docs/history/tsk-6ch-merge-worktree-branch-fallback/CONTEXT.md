@@ -18,7 +18,7 @@ dispatch-side wiring". That guarantee is real for a root the automated
 runner loop actually dispatched (`src/runner/loop.mjs:696` calls
 `createBranchRef(repoRoot, rootId, { baseRef: 'main' })` as its own
 leaf-dispatch step, idempotent, "nhánh tạo sớm" per D17) — but a root that
-was only ever driven by a live session (`/fgOS:pick` → `fgos-planning`'s
+was only ever driven by a live session (`/fgOS:pick` → `fgos-coding-planning`'s
 `fgos add --parent` split, `fgos-fanout`, etc., never through
 `loop.mjs`'s dispatch path) never gets that early `createBranchRef` call.
 The first time such a root's branch is needed is exactly this merge step,
@@ -37,7 +37,7 @@ own target branch wasn't created early, for the same underlying reason.
 decision needed): `createDetachedMergeWorktree` falls back to
 `createBranchRef` instead of throwing, when the branch doesn't exist yet.
 
-## Why this item skipped `fgos-exploring`
+## Why this item skipped `fgos-coding-exploring`
 
 `fgos-clarifying` judged intent as understood directly from the item's own
 title/description (no product-level gray area — this is a pure internal
@@ -45,7 +45,7 @@ bug fix with one already-named fix), so this item went straight from
 `clarify` to `decompose` via a caller-supplied `clear` verdict
 (`fgos discover --verdict clear`). No `CONTEXT.md` gray area exists to
 lock as a Locked decision — this document exists only to carry the scout
-evidence `fgos-planning`'s own plan.md cites, not a Socratic record.
+evidence `fgos-coding-planning`'s own plan.md cites, not a Socratic record.
 
 ## Scout evidence
 

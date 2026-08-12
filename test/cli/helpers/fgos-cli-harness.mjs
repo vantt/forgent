@@ -96,9 +96,10 @@ function stateView(cwd) {
 }
 
 function addOk(cwd, id, extra = {}) {
-  // add-stage-default-gap D1/D2: add now stamps stage 'clarify' by default
-  // (same door submit has always had), instead of the old implicit
-  // 'executing'. Every pre-existing call site of this helper (ready/take/
+  // add-stage-default-gap D1/D2: add now stamps an entry stage by default
+  // (same door submit has always had — 'discovery' as of tsk-qod D1/D2,
+  // 'clarify' before it), instead of the old implicit 'executing'. Every
+  // pre-existing call site of this helper (ready/take/
   // pick/conflicts/triage/ask-answer tests, none of which are testing add's
   // own stage semantics) relied on that old implicit default to get an
   // immediately frontier-ready item — default this helper's own --stage to
@@ -373,16 +374,19 @@ const SUBMIT_BAD_FLAG_CASES = [
 ];
 
 // tsk-4b2 D3/D6: coding's own clarify clear verdict now lands on
-// `discovery`, not `decompose` directly -- two more explicit `discover`
-// calls walk it through discovery->exploring->decompose. Shared by every
-// test below that needs an item actually AT decompose for its own setup.
-function advanceThroughDiscoveryToDecompose(cwd, id, verify = 'npm test -- proven') {
+// `discovery`, not `planning` (renamed from `decompose`, tsk-403 D11)
+// directly -- two more explicit `discover` calls walk it through
+// discovery->exploring->planning. Shared by every test below that needs
+// an item actually AT `planning` for its own setup.
+// tsk-qod D1/D2: a freshly submitted item now starts at stage `discovery`
+// (`stages[0]`) directly -- `clarify` retired entirely, no longer an
+// intermediate hop here -- so only two `discover` calls are needed to reach
+// `planning`, not three.
+function advanceThroughDiscoveryToPlanning(cwd, id, verify = 'npm test -- proven') {
   const step1 = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', verify]);
-  assert.equal(step1.status, 0, `expected clarify->discovery to succeed: ${step1.stderr}`);
+  assert.equal(step1.status, 0, `expected discovery->exploring to succeed: ${step1.stderr}`);
   const step2 = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', verify]);
-  assert.equal(step2.status, 0, `expected discovery->exploring to succeed: ${step2.stderr}`);
-  const step3 = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', verify]);
-  assert.equal(step3.status, 0, `expected exploring->decompose to succeed: ${step3.stderr}`);
+  assert.equal(step2.status, 0, `expected exploring->planning to succeed: ${step2.stderr}`);
 }
 
 // tsk-3vo D2/D3/D5: omitting --timeout on return/approve/catchup used to
@@ -509,7 +513,7 @@ function makeRunnerProposedItem(cwd, id, extra = {}) {
 // that root branch's TIP, carrying a real commit — with the leaf item's own
 // status independently moved to `proposed` and `parent: rootId` set
 // directly through store.mjs's addWork (the CLI's `add` verb has no
-// --parent flag; only decompose.mjs writes it in production). The root
+// --parent flag; only plan.mjs writes it in production). The root
 // item itself is added but never dispatched through the CLI — only its
 // existence (for `resolveRoot` to resolve against) and its branch matter to
 // these tests.
@@ -991,7 +995,7 @@ export {
   addOk,
   addOutcome,
   addWork,
-  advanceThroughDiscoveryToDecompose,
+  advanceThroughDiscoveryToPlanning,
   assert,
   coexistPath,
   commitFile,

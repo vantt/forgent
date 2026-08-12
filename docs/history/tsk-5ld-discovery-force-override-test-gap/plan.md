@@ -18,7 +18,7 @@ using an already-proven pattern from `decompose.test.mjs`); multi-domain
 Direct note (tiny mode, per this skill's own Shape scaling): add exactly
 the two test cases `CONTEXT.md` D1 locked, to the exact file D2 locked
 (`test/intake/judge-verify-second-pass-stability.test.mjs`), mirroring
-`test/intake/decompose.test.mjs:1315-1418`'s already-proven pattern
+`test/intake/plan.test.mjs:1315-1418`'s already-proven pattern
 (tsk-25g, commit `cd0cc56`, merged to `main`) adapted to
 `resolveDiscovery`'s call shape instead of `resolveDecompose`'s:
 
@@ -45,7 +45,7 @@ between them worth a separate item.
 
 Not applicable — this item adds `test()` blocks to an already-fully-read
 file (`judge-verify-second-pass-stability.test.mjs`, read in full at
-`fgos-exploring`); it edits no production symbol, so there is no blast
+`fgos-coding-exploring`); it edits no production symbol, so there is no blast
 radius to confirm. `fgos tool query` reports GitNexus `present` (index
 still flagged stale mid-session, unchanged from `tsk-25g`'s own
 observation) — moot here regardless of freshness, same reasoning
@@ -53,7 +53,7 @@ observation) — moot here regardless of freshness, same reasoning
 
 ## Proof surface
 
-The item's own already-accepted `verify` (locked at `fgos-exploring`'s
+The item's own already-accepted `verify` (locked at `fgos-coding-exploring`'s
 gate, `outcome: clear`, no dispute):
 
 ```
@@ -61,7 +61,7 @@ top=$(git rev-parse --show-toplevel); out=$(node --test --test-name-pattern="tsk
 ```
 
 RED-confirmed against the current (unmodified) repo this session
-(`fgos-exploring`'s Gate section / decision log).
+(`fgos-coding-exploring`'s Gate section / decision log).
 
 ## Assumptions
 

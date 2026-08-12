@@ -49,7 +49,7 @@ the flag through from herdr-plugin's own launch call.
 ## What stayed out of scope
 
 Extending `--autoClose` to any other launch mechanism — `/fgOS:pick`
-itself, `/fgOS:decompose`, `/fgOS:retro-next`, `/fgOS:cleanup-next` — was
+itself, `/fgOS:plan`, `/fgOS:retro-next`, `/fgOS:cleanup-next` — was
 explicitly out of scope, unrelated to this specific bug (the two
 already-shipped discover launch points that `tsk-3v2` had to skip).
 

@@ -851,7 +851,7 @@ export function recordGateApprove(dir, { id, gate, actor, verify } = {}) {
  * `kind` (tsk-1ud D7 step 1): `'engine' | 'design'`, optional free text (no
  * enum, same posture as `source`), defaulting to `'design'` when omitted —
  * lets a consumer separate the engine's own bookkeeping records
- * (`resolveDiscovery`/`resolveDecompose`, which pass `kind: 'engine'`
+ * (`resolveDiscovery`/`resolvePlan`, which pass `kind: 'engine'`
  * explicitly) from real design decisions without matching on `text`
  * prefixes.
  */

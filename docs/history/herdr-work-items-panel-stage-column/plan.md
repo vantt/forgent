@@ -7,7 +7,7 @@ Work Items table already has render tests, lines 722-927). No auth,
 authorization, data model, audit/security, external systems, public
 contracts, cross-platform, weak-proof, or multi-domain flags apply. One
 direct task, two files touched (plus a doc). `impact-analysis: degraded`
-(corrected at `fgos-validating`, tsk-4cxl: `fgos tool query --capability
+(corrected at `fgos-coding-validating`, tsk-4cxl: `fgos tool query --capability
 impact-analysis --status present` shows GitNexus registered and
 `present`, but `mcp__gitnexus__list_repos` shows the `forgentX` index is
 426 commits behind HEAD — `present` only means installed, not fresh,
@@ -41,7 +41,7 @@ Files touched, in order:
 3. `herdr-plugin/src/ui.rs:330-338` — add one `Constraint::Length(n)` to
    the constraints array, same position, `n` sized for the longest stage
    name (`"compound-learn"`, 14 chars) or a shorter truncating length
-   consistent with the panel's existing width budget (`fgos-code-implement`
+   consistent with the panel's existing width budget (`fgos-coding-implement`
    picks the exact number against the real terminal-width constraints
    already governing this table).
 4. `herdr-plugin/src/ui.rs` (near line 927, alongside the existing sibling
@@ -62,7 +62,7 @@ Files touched, in order:
 | Column width budget on a narrow terminal | low — cosmetic only, no functional impact | none needed beyond the existing render test; explicitly out of scope per D3 (no new styling/behavior beyond adding the column) |
 
 No medium/high risk identified — nothing here needs a separate
-`fgos-validating` proof point beyond the verify command itself.
+`fgos-coding-validating` proof point beyond the verify command itself.
 
 ## Decide the split
 

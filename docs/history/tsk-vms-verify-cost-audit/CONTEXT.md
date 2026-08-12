@@ -51,7 +51,7 @@ thực sự nằm ở phiên khác.
   after Nms", xuất hiện 1 lần trong log) vốn đến từ một code path khác
   (dispatch executor, không phải `return`'s runGoalCheck timeout).
   → Đây là chi tiết PHƯƠNG PHÁP đo (implementation của báo cáo), không phải
-  quyết định sản phẩm — để `fgos-planning` quyết cách parse cụ thể; ghi lại
+  quyết định sản phẩm — để `fgos-coding-planning` quyết cách parse cụ thể; ghi lại
   ở đây để không ai phải re-scout lần hai.
 - Số lần chạy full verify (`npm test`) trên một item không nằm gọn trong
   MỘT loại event — mỗi lệnh `return` gọi `runGoalCheck` đúng 1 lần
@@ -61,7 +61,7 @@ thực sự nằm ở phiên khác.
   thêm lần nữa bên trong `src/runner/merge.mjs:832,893`. Tổng "số lần chạy
   full suite" = số lần `return` bị gọi cho id đó + số lần `approve` (khi
   verify-on-merge áp dụng) — không đọc được từ một field đơn lẻ, phải cộng
-  qua nhiều verb. Ghi lại làm methodology cho `fgos-planning`, không tự
+  qua nhiều verb. Ghi lại làm methodology cho `fgos-coding-planning`, không tự
   quyết ở đây.
 - "Worktree lệch" (tsk-2cd — worktree dài hạn của item cha lệch khỏi
   branch của nó sau khi approve merge một child) là một BUG đã biết, không
@@ -89,8 +89,8 @@ thực nghiệm, không phải một lựa chọn cần người quyết.
 Những khoảng xám còn lại (heuristic tách timeout khỏi verify-fail; cách
 cộng dồn số lần chạy full verify qua nhiều verb; worktree-lệch không có
 tín hiệu cơ học) đều là chi tiết PHƯƠNG PHÁP đo — thuộc thẩm quyền của
-`fgos-planning`/người viết script phân tích, không phải quyết định sản
-phẩm mà `fgos-exploring` cần khoá. Không câu hỏi nào trong số này qua được
+`fgos-coding-planning`/người viết script phân tích, không phải quyết định sản
+phẩm mà `fgos-coding-exploring` cần khoá. Không câu hỏi nào trong số này qua được
 bộ lọc material/grounded/answerable theo nghĩa "cần MỘT NGƯỜI chọn" — câu
 trả lời đã nằm sẵn trong code, chỉ cần đọc.
 
@@ -126,7 +126,7 @@ trả lời đã nằm sẵn trong code, chỉ cần đọc.
 
 - Cách chính xác parse `detail` string để tách timeout khỏi verify-fail
   thật trong `errorClass: 'verify-miss'` (regex trên `"(exit null)"` là
-  ứng viên, cần `fgos-planning` chốt shape script/report cụ thể).
+  ứng viên, cần `fgos-coding-planning` chốt shape script/report cụ thể).
 - Cách trình bày "worktree-lệch" trong báo cáo khi log không có tín hiệu
   cơ học — đề xuất: liệt kê định tính (tham chiếu tsk-2cd/tsk-53o), không
   đếm số.

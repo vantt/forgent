@@ -26,7 +26,15 @@ test('a stage:clarify item with status:doing (already claimed) is never picked',
   assert.equal(pickNextDiscoverItem(view), null);
 });
 
-test('a single stage:clarify candidate is picked over stage:decompose ones', () => {
+// tsk-lya D10/D11: `decompose`/`planning` items are no longer candidates
+// for this pool at all — `plan-pool.mjs`'s `pickNextPlanItem` covers that
+// pool now (see plan-pool.test.mjs). This pool ignores them entirely.
+test('a stage:decompose item is never picked here, even as the only candidate', () => {
+  const view = { work: { a: item('a', 'decompose', 'todo', { priority: 1 }) } };
+  assert.equal(pickNextDiscoverItem(view), null);
+});
+
+test('a single stage:clarify candidate is picked regardless of a stage:decompose item present', () => {
   const view = {
     work: {
       a: item('a', 'decompose', 'todo', { priority: 1 }),
@@ -70,36 +78,6 @@ test('clarify pool ties on blocks and urgent: FIFO (declaration order) wins', ()
   assert.deepEqual(pickNextDiscoverItem(view), { id: 'first', stage: 'clarify' });
 });
 
-test('decompose pool orders by priority ASCENDING (lower value = higher priority)', () => {
-  const view = {
-    work: {
-      a: item('a', 'decompose', 'todo', { priority: 5 }),
-      b: item('b', 'decompose', 'todo', { priority: 1 }),
-    },
-  };
-  assert.deepEqual(pickNextDiscoverItem(view), { id: 'b', stage: 'decompose' });
-});
-
-test('decompose pool: an item WITH a priority sorts before one with no priority at all', () => {
-  const view = {
-    work: {
-      a: item('a', 'decompose', 'todo'),
-      b: item('b', 'decompose', 'todo', { priority: 99 }),
-    },
-  };
-  assert.deepEqual(pickNextDiscoverItem(view), { id: 'b', stage: 'decompose' });
-});
-
-test('decompose pool ties (both absent priority): FIFO (declaration order) wins', () => {
-  const view = {
-    work: {
-      first: item('first', 'decompose', 'todo'),
-      second: item('second', 'decompose', 'todo'),
-    },
-  };
-  assert.deepEqual(pickNextDiscoverItem(view), { id: 'first', stage: 'decompose' });
-});
-
 // --- tsk-1w7 D10: 'discovery'/'exploring' join the clarify-shaped pool ----
 
 test('a stage:discovery item is picked into the clarify-shaped pool, with its own real stage returned', () => {
@@ -128,7 +106,7 @@ test('clarify/discovery/exploring items share ONE pool, ordered by blocks like a
   assert.deepEqual(pickNextDiscoverItem(view), { id: 'discoveryItem', stage: 'discovery' });
 });
 
-test('the clarify-shaped pool (clarify/discovery/exploring) still wins over the decompose pool regardless of which of the three stages the candidate is at', () => {
+test('a stage:exploring candidate is picked regardless of a stage:decompose item present', () => {
   const view = {
     work: {
       decomposeItem: item('decomposeItem', 'decompose', 'todo', { priority: 1 }),
@@ -165,7 +143,10 @@ test('an item anchored by an open decomposed child is never picked, even with st
     work: {
       // child is stage:executing (not itself a candidate-stage item) so the
       // only thing this test proves is the anchor exclusion on `parent`.
-      parent: item('parent', 'decompose', 'todo'),
+      // `parent` is stage:clarify (a clarify-shaped candidate stage in
+      // THIS pool, tsk-lya D10/D11 narrowing) so the anchor exclusion is
+      // genuinely what stops it from being picked, not stage filtering.
+      parent: item('parent', 'clarify', 'todo'),
       child: item('child', 'executing', 'todo', { parent: 'parent' }),
     },
   };

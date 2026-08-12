@@ -88,9 +88,9 @@ capacityId, fgosDir)`).
   provider, `gitnexus`, `status: "present"` — AGENTS.md's impact-analysis
   gate reads **full**: `impact()` MUST be run (and its risk level
   reported) before editing `resolveExecutorConfig`/`resolveExecutorCommand`
-  once this item reaches `fgos-code-implement`. Note: GitNexus's own index is
+  once this item reaches `fgos-coding-implement`. Note: GitNexus's own index is
   currently stale (last indexed `1ac5a85`, predates this session's merge)
-  — `fgos-code-implement` should re-run `gitnexus analyze` before relying on
+  — `fgos-coding-implement` should re-run `gitnexus analyze` before relying on
   impact output for the post-merge code.
 
 ## Deferred to planning

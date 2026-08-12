@@ -2,7 +2,7 @@
 
 ## Feature boundary
 
-`resolveDecompose`'s `decompose` verdict branch (`src/intake/decompose.mjs:477-504`)
+`resolveDecompose`'s `decompose` verdict branch (`src/intake/plan.mjs:477-504`)
 writes each tentative child's `footprint` field but never checks whether two
 sibling children's declared footprints overlap before creating them. This item
 adds that check, calling the existing `footprintOverlapAmong` (already built

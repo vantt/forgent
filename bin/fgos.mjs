@@ -25,7 +25,7 @@ import { loadRunnerConfig, ensureRunnerConfigForDir } from '../src/runner/dispat
 import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
 import { resolveFgosDir, fgosDirFromRoot } from '../src/runner/paths.mjs';
 import { resolveDiscovery, discoverableStages } from '../src/intake/discovery.mjs';
-import { resolveDecompose } from '../src/intake/decompose.mjs';
+import { resolvePlan } from '../src/intake/plan.mjs';
 import { computeEntropy, computeCounts, FINAL_STATUSES } from '../src/report/entropy.mjs';
 import { findSourceCaptureIds } from '../src/report/enduser-index.mjs';
 import { generateEnduserDocsIndex } from '../src/report/enduser-index-generate.mjs';
@@ -287,7 +287,7 @@ function parseWaitFlags(flags, verbName) {
 // command with no diagnosis and the main-checkout lock held until TTL
 // expiry. --no-timeout is the only way left to opt into an actually-
 // unbounded verify run. Every call site passes `path.dirname(dir)`, not
-// `process.cwd()` (tsk-5hv, found by fgos-code-implement): same
+// `process.cwd()` (tsk-5hv, found by fgos-coding-implement): same
 // worktree-blindness fix as `discover`/`decompose` above -- `dir` already
 // reflects `--dir` when a skill passes it explicitly, `process.cwd()`
 // never does.
@@ -366,7 +366,7 @@ function parseAcceptanceFlag(value, message) {
 }
 
 // tsk-27y D1/D2: `--verdict` on `discover` lets a live session that already
-// reasoned about clarity (fgos-exploring) pass its own verdict directly,
+// reasoned about clarity (fgos-coding-exploring) pass its own verdict directly,
 // skipping resolveDiscovery's judgeDiscovery subprocess call for this one
 // invocation. Omitting `--verdict` entirely leaves `callerVerdict`
 // undefined -- byte-identical to before this item. `--verify`/`--question`
@@ -394,46 +394,48 @@ function parseDiscoverCallerVerdict(flags) {
   throw new StoreError('validation', `discover --verdict must be "clear" or "unclear" (got "${flags.verdict}").`);
 }
 
-// tsk-27y D1/D2: `--verdict` on `decompose`, same shape one stage over --
-// lets a live session that already reasoned about split-work
-// (fgos-planning) pass its own verdict directly, skipping resolveDecompose's
-// judgeDecompose subprocess call for this one invocation. Omitting
-// `--verdict` entirely leaves `callerVerdict` undefined -- byte-identical to
-// before this item. `--children` reuses parseAcceptanceFlag (same
-// JSON-encoded-array shape `submit --acceptance` already established) --
-// each element matches judgeDecompose's own child shape (title/verify
-// required; kind/risk/refs/footprint/deps optional), validated downstream
-// by the same `normalizeChild` a model-produced verdict goes through
-// (`resolveCallerDecomposeVerdict`, decompose.mjs).
-function parseDecomposeCallerVerdict(flags) {
+// tsk-27y D1/D2: `--verdict` on `plan` (renamed from `decompose`, tsk-403
+// D11 — the VALUES `pass-through`/`need-human`/`decompose` stay unchanged,
+// only the verb name changes), same shape one stage over -- lets a live
+// session that already reasoned about split-work (fgos-coding-planning)
+// pass its own verdict directly, skipping resolvePlan's retired subprocess
+// judge for this one invocation. Omitting `--verdict` entirely leaves
+// `callerVerdict` undefined -- byte-identical to before this item.
+// `--children` reuses parseAcceptanceFlag (same JSON-encoded-array shape
+// `submit --acceptance` already established) -- each element matches the
+// same child shape (title/verify required; kind/risk/refs/footprint/deps
+// optional) the retired judge used to produce, validated downstream by the
+// same `normalizeChild` a model-produced verdict goes through
+// (`resolveCallerPlanVerdict`, plan.mjs).
+function parsePlanCallerVerdict(flags) {
   if (flags.verdict === undefined) return undefined;
   if (flags.verdict === 'pass-through') {
-    return { verdict: 'pass-through', reason: optionalField(flags.reason, 'decompose --verdict pass-through --reason requires a non-empty value when passed') };
+    return { verdict: 'pass-through', reason: optionalField(flags.reason, 'plan --verdict pass-through --reason requires a non-empty value when passed') };
   }
   if (flags.verdict === 'need-human') {
-    return { verdict: 'need-human', reason: requireField(flags.reason, 'decompose --verdict need-human requires --reason "<text>"') };
+    return { verdict: 'need-human', reason: requireField(flags.reason, 'plan --verdict need-human requires --reason "<text>"') };
   }
   if (flags.verdict === 'decompose') {
     const childrenMessage =
-      'decompose --verdict decompose requires --children, a JSON-encoded array of child objects ({title, verify, kind?, risk?, refs?, footprint?, deps?})';
+      'plan --verdict decompose requires --children, a JSON-encoded array of child objects ({title, verify, kind?, risk?, refs?, footprint?, deps?})';
     const children = parseAcceptanceFlag(flags.children, childrenMessage);
     if (children === undefined) {
       throw new StoreError('validation', childrenMessage);
     }
     const verdict = {
       verdict: 'decompose',
-      reason: requireField(flags.reason, 'decompose --verdict decompose requires --reason "<text>"'),
+      reason: requireField(flags.reason, 'plan --verdict decompose requires --reason "<text>"'),
       children,
     };
     // tsk-25g D2: mirrors discover's --force (tsk-5cf D1b) -- only ever
     // means something on the per-child second-pass verify dispute path
-    // (resolveDecompose's disputedChild branch), silently a no-op on
+    // (resolvePlan's disputedChild branch), silently a no-op on
     // pass-through/need-human the same way discover's --force is a
     // no-op on the unclear branch.
     if (flags.force) verdict.force = true;
     return verdict;
   }
-  throw new StoreError('validation', `decompose --verdict must be "pass-through", "need-human", or "decompose" (got "${flags.verdict}").`);
+  throw new StoreError('validation', `plan --verdict must be "pass-through", "need-human", or "decompose" (got "${flags.verdict}").`);
 }
 
 // Pagination opt-in (str46-io-contract D5/D35): `ready`/`triage`/`evolve`
@@ -910,11 +912,14 @@ function submitWork(dir, text, opts = {}) {
     // Per D8: every item entering through the public door starts at its
     // domain's Clarify-mapped stage — context-discovery must pass before
     // it can be worked. Generalized from the hardcoded 'clarify' (D8) to
-    // stay domain-aware (base-workflow-model D1-D4/S2): byte-identical
-    // 'clarify' for the default/omitted (coding) case, since
-    // stageForStep(DOMAINS.coding, 'Clarify') === 'clarify'. A domain with
-    // no Clarify-mapped stage (e.g. 'synthetic') falls back to its own
-    // first declared stage. `add` deliberately omits this (lazy default,
+    // stay domain-aware (base-workflow-model D1-D4/S2). tsk-qod D1/D2:
+    // coding no longer maps a Clarify stage at all (clarify is retired
+    // entirely, moved to a pre-item-creation Init helper), so
+    // stageForStep(DOMAINS.coding, 'Clarify') is now undefined and this
+    // falls straight through to `.stages[0]` — 'discovery', the domain's
+    // own entry point. A domain with no Clarify-mapped stage (e.g.
+    // 'synthetic', or 'coding' as of tsk-qod) falls back to its own first
+    // declared stage. `add` deliberately omits this (lazy default,
     // D8) — only `submit` needs an explicit entry stage.
     //
     // A no-op onUnrecognized here (review-20260717-self-improve-base-workflow
@@ -1031,15 +1036,16 @@ async function runVerb(verb, flags, positional, dir) {
         // stamps an entry stage the same way submit always has (line ~822
         // above) instead of leaving stage undefined -- explicit --stage
         // overrides; omitting it defaults to the domain's Clarify-mapped
-        // stage (byte-identical 'clarify' for the default/omitted coding
-        // case). Same silenced onUnrecognized as submit's own call: an
+        // stage, which for coding (tsk-qod D1/D2: Clarify retired entirely)
+        // falls straight through to `.stages[0]` — 'discovery'. Same
+        // silenced onUnrecognized as submit's own call: an
         // out-of-registry --domain is about to be rejected by addWork's
         // validateWork below anyway, so this must not fire a spurious
         // "folding to coding" warning first. An out-of-enum --stage value
         // is rejected downstream by store.mjs's validateWorkShape (the
         // single source for the STAGES domain), same "don't duplicate the
         // validation source" discipline --domain/--tier already follow.
-        stage: optionalField(flags.stage, 'add --stage requires a stage value (e.g. clarify/decompose/executing); omit --stage entirely to use the default.')
+        stage: optionalField(flags.stage, 'add --stage requires a stage value (e.g. discovery/decompose/executing); omit --stage entirely to use the default.')
           ?? stageForStep(getDomain(flags.domain, { onUnrecognized: () => {} }), 'Clarify')
           ?? getDomain(flags.domain, { onUnrecognized: () => {} }).stages[0],
         // Per work-graph-intelligence S2b (producer A): --discovered-from is
@@ -1186,14 +1192,14 @@ async function runVerb(verb, flags, positional, dir) {
       if (!validStages.includes(stage)) {
         throw new StoreError(
           'validation',
-          `discover: work "${id}" is at stage "${stage}", not ${validStages.map((s) => `"${s}"`).join('/')} -- use "fgos decompose ${id}" instead.`,
+          `discover: work "${id}" is at stage "${stage}", not ${validStages.map((s) => `"${s}"`).join('/')} -- use "fgos plan ${id}" instead.`,
         );
       }
       // An explicit --config path stays a loud, unmodified failure on ENOENT
       // (loadRunnerConfig); only the default, unflagged path bootstraps a
       // missing config (D1/D3, ensureRunnerConfigForDir — tsk-5vf D1/D2).
       // `path.dirname(dir)`, not `process.cwd()` (tsk-5hv, found by
-      // fgos-code-implement): `dir` already reflects `--dir` when given
+      // fgos-coding-implement): `dir` already reflects `--dir` when given
       // (every skill's own hard rule: resolve the main checkout and pass
       // it explicitly) or `process.cwd()` when omitted (dataDir()'s own
       // documented cwd-strict contract) -- reusing it here instead of a
@@ -1210,27 +1216,40 @@ async function runVerb(verb, flags, positional, dir) {
 
     // The sync branch's entry point into chia-việc/split-work judgment
     // (tsk-2b0 D1: hard split, no fallback — this verb only ever wraps
-    // `resolveDecompose`/`judgeDecompose`, for an item at stage
-    // `decompose`). A live session runs the SAME engine the async runner
-    // sweep calls (D3's sync/async parity: identical trace either way, only
-    // the role differs). `resolveDecompose` either passes the item through
-    // to `executing`, splits it into children, or parks it in
+    // `resolvePlan` (renamed from `resolveDecompose`, tsk-403 D11 —
+    // `judgeDecompose` is long retired, no subprocess judge left to wrap),
+    // for an item at stage `planning` (or the legacy `decompose` alias,
+    // D18). A live session runs the SAME engine the async runner sweep
+    // calls (D3's sync/async parity: identical trace either way, only the
+    // role differs). `resolvePlan` either passes the item through to
+    // `executing`, splits it into children, or parks it in
     // `awaiting-human` (D3).
-    case 'decompose': {
-      const id = requireField(positional[0] ?? flags.id, 'decompose requires an id: fgos decompose <id> [--config <path>]');
+    case 'plan': {
+      const id = requireField(positional[0] ?? flags.id, 'plan requires an id: fgos plan <id> [--config <path>]');
       const work = listWork(dir).work[id];
       const stage = work?.stage;
-      const decomposeStage = stageForStep(getDomain(work?.domain, { onUnrecognized: () => {} }), 'Divide');
-      if (stage !== decomposeStage) {
-        throw new StoreError('validation', `decompose: work "${id}" is at stage "${stage}", not "${decomposeStage}" -- use "fgos discover ${id}" instead.`);
+      const domain = getDomain(work?.domain, { onUnrecognized: () => {} });
+      const planningStage = stageForStep(domain, 'Divide');
+      // tsk-403 D18: `decompose` is coding's own drain-only legacy alias
+      // for this same step -- still legal for an item that reached it
+      // before the rename (kept legal in this domain's own `stages`/
+      // `transitions`), even though `stageForStep` no longer resolves a
+      // NEW item there. Only activates when a domain actually declares
+      // both names distinctly (today: only `coding`) -- a domain that
+      // never had this rename (e.g. the `decompose`-native fixture
+      // domains) has `planningStage === 'decompose'` already, so this
+      // stays a no-op for them.
+      const legacyPlanStage = domain.stages?.includes('decompose') && planningStage !== 'decompose' ? 'decompose' : undefined;
+      if (stage !== planningStage && stage !== legacyPlanStage) {
+        throw new StoreError('validation', `plan: work "${id}" is at stage "${stage}", not "${planningStage}"${legacyPlanStage ? ` (or legacy "${legacyPlanStage}")` : ''} -- use "fgos discover ${id}" instead.`);
       }
       // path.dirname(dir), not process.cwd() -- see the discover case above
-      // for why (tsk-5hv, found by fgos-code-implement).
+      // for why (tsk-5hv, found by fgos-coding-implement).
       const cfg = flags.config
         ? loadRunnerConfig(flags.config)
         : ensureRunnerConfigForDir(path.dirname(dir));
-      const callerVerdict = parseDecomposeCallerVerdict(flags);
-      return resolveDecompose(dir, id, cfg, 'session', callerVerdict);
+      const callerVerdict = parsePlanCallerVerdict(flags);
+      return resolvePlan(dir, id, cfg, 'session', callerVerdict);
     }
 
     case 'move': {
@@ -1252,7 +1271,7 @@ async function runVerb(verb, flags, positional, dir) {
     // moving every `delivered` item to `retrospective` (marking it picked
     // up for the batch synthesis pass). Never runs inline in
     // return/approve, per the same D9 decision. The actual synthesis
-    // (settlement/decision/enduser-docs, formerly `fgos-compounding`'s
+    // (settlement/decision/enduser-docs, formerly `fgos-coding-compounding`'s
     // stage-triggered job) is a session's own separate work while an item
     // sits at `retrospective`; this verb only performs the mechanical
     // claim-like transition, exactly once per swept item, never the
@@ -1342,7 +1361,7 @@ async function runVerb(verb, flags, positional, dir) {
 
     // Restored (tsk-3o3, git-recovered from fcfbae5/tsk-1zi which removed
     // it along with the retired `compound-learn` stage): the producer
-    // surface `fgos-compounding` uses to store its Diataxis classification
+    // surface `fgos-coding-compounding` uses to store its Diataxis classification
     // on a `retrospective`-status item's outcome. Unlike the removed
     // version, this never moves stage — there is no `compound-learn` stage
     // left to move into (D11); the only precondition is the item actually
@@ -2042,7 +2061,7 @@ async function runVerb(verb, flags, positional, dir) {
         // silently swallow a real merge-conflict/Iron-Law block as if
         // nothing were wrong — the exact invisibility this item exists to
         // fix, one level down (validated against the real skill file during
-        // fgos-validating).
+        // fgos-coding-validating).
         if (ready.length === 0 && blockedOnSync.length > 0) {
           const rootId = resolveRoot(mergeView, blockedOnSync[0]);
           try {
@@ -3398,7 +3417,7 @@ async function runVerb(verb, flags, positional, dir) {
     // own status/stage (CONTEXT.md's locked contract: this replaces the
     // ad-hoc `git merge` tsk-3bn's own origin incident required by hand).
     // Reuses `mergeRunnerItem`'s exact lock/verify path (constraint #1,
-    // fgos-validating's gate) — never a second bespoke merge mechanism.
+    // fgos-coding-validating's gate) — never a second bespoke merge mechanism.
     // Unlike `approve`'s root-into-main path, this never deletes fgw/<id>
     // afterward: the root stays open for further leaf merges.
     case 'sync-root': {
@@ -4374,7 +4393,7 @@ async function runVerb(verb, flags, positional, dir) {
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|decompose|move|retrospective|cleanup|compound|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|sync-root|reject|catchup|evolve|triage|session|goal|tool|setup|doctor|unlock|lock-status|main-checkout-reset> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|sync-root|reject|catchup|evolve|triage|session|goal|tool|setup|doctor|unlock|lock-status|main-checkout-reset> ...`);
   }
 }
 

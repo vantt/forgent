@@ -72,7 +72,7 @@ graph không chỉ định thứ tự nào cho item này. Thứ tự bên dướ
 phép đo, không từ graph:
 
 **P1 phải chạy trước mọi thứ** — nếu trần thứ ba đã > 45s thì ngưỡng của D3
-cần chỉnh trước khi viết một dòng nào, và đó là việc của `fgos-validating`.
+cần chỉnh trước khi viết một dòng nào, và đó là việc của `fgos-coding-validating`.
 
 ## Shape
 
@@ -86,7 +86,7 @@ before/after so được với nhau (verify của item yêu cầu đúng điều
   chạy tuần tự, xếp hạng. Lấy top 10 (**P1**).
 - Đo từng test của `checks.test.mjs` (**P2**).
 
-Kết quả Phase 0 là dữ liệu vào cho `fgos-validating`. Nếu top-3 file cho
+Kết quả Phase 0 là dữ liệu vào cho `fgos-coding-validating`. Nếu top-3 file cho
 thấy ngưỡng 45s bất khả thi, plan này quay lại chỉnh D3 chứ không đi tiếp.
 
 ### Phase 1 — Chẻ `test/cli/fgos.test.mjs` (child A)
@@ -200,7 +200,7 @@ cắt, nên chạy song song được:
 | **B** = `tsk-67g` | Chẻ `test/setup/checks.test.mjs` thành 5 file theo chi phí đo được | `test/setup/*` | **P2** (đo chi phí từng test của `checks.test.mjs`) |
 
 Cả hai child vào thẳng stage `decompose`, nên reality check của chúng
-(`fgos-validating`) là chỗ P1/P2 thật sự chạy — Phase 0 bên dưới không phải
+(`fgos-coding-validating`) là chỗ P1/P2 thật sự chạy — Phase 0 bên dưới không phải
 một phase riêng của item cha, nó là proof point gắn vào child. **P1 nằm ở
 child A và phải chạy trước khi child A sửa dòng nào**: nếu top-3 file cho
 thấy ngưỡng 45s bất khả thi, cả hai child dừng và D3 phải chỉnh trước.

@@ -32,7 +32,7 @@ write root cause.
 
 ### Risk map
 
-| Component | Risk | Proof point (for fgos-validating) |
+| Component | Risk | Proof point (for fgos-coding-validating) |
 |---|---|---|
 | `repoRoot` resolution | medium — must match `dir`'s own `--dir`-aware resolution exactly, including the no-`--dir`-passed default case | a test that runs the verb from a cwd that is NOT the resolved root and asserts the manifest lands at the resolved root, not cwd |
 | Registry label correctness | low — pure metadata, `fgos-manifest.test.mjs` already exists to pin manifest shape and its own `requiresExistingStore ⇒ touchesState` invariant (D4) | extend that test file's existing assertions to cover `docs-index`'s `externalEffect` field; existing invariant test already guards the other two |
@@ -59,7 +59,7 @@ write root cause.
 - `test/cli/fgos.test.mjs` — new test(s) for D1 (repoRoot targeting) and
   D3 (guard + sort behavior).
 
-## Cases to prove (fgos-validating)
+## Cases to prove (fgos-coding-validating)
 
 - Run `docs-index` from a cwd that differs from the resolved main-checkout
   root (simulating a worktree session) → manifest lands at the resolved

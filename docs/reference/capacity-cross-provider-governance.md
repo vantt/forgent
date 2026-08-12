@@ -46,7 +46,7 @@ happens.
 ```json
 {
   "capacities": {
-    "fgos-code-implement": {
+    "fgos-coding-implement": {
       "kind": "cli",
       "command": "agy",
       "args": ["{prompt}"],
@@ -57,6 +57,6 @@ happens.
 ```
 
 Without `"allowCrossProvider": true`, this exact config throws at resolve
-time: `capacity "fgos-code-implement" resolves to non-Claude command "agy" —
+time: `capacity "fgos-coding-implement" resolves to non-Claude command "agy" —
 prompt content would leave the Claude ecosystem. Set
-capacities.fgos-code-implement.allowCrossProvider: true to permit this.`
+capacities.fgos-coding-implement.allowCrossProvider: true to permit this.`

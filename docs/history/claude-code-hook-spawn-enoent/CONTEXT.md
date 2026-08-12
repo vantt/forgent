@@ -79,7 +79,7 @@ repo — nothing more. No forgentX source changes.
 ## Outstanding questions deferred to planning
 
 - The runbook's precise content structure (headings, exact workaround
-  steps) — implementation detail, left to `fgos-planning`/
-  `fgos-code-implement` to follow the existing sibling-doc convention
+  steps) — implementation detail, left to `fgos-coding-planning`/
+  `fgos-coding-implement` to follow the existing sibling-doc convention
   already scouted above (e.g.
   `docs/how-to/recover-a-stuck-doing-claim-after-worktree-creation-failure.md`).

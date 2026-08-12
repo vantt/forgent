@@ -51,7 +51,7 @@ compensating event.
 
 Risk map:
 
-| Component | Risk | Proof point (for fgos-validating) |
+| Component | Risk | Proof point (for fgos-coding-validating) |
 |---|---|---|
 | Renumber correctness | medium — must not touch any field but `seq`, must not perturb lines 1-272 | diff the file before/after; assert every non-`seq` byte on line 273+ is unchanged, and lines 1-272 are byte-identical |
 | Downstream comment drift | low-medium — `replay.mjs:263`'s "seq 1190" anchor may now point at the wrong line | grep the repo for other hardcoded seq references before executing; update or annotate any found |
@@ -122,11 +122,11 @@ Two child items, both `parent: tsk-n4i`:
 
 ## Handoff
 
-Plan shaped. Next: `fgos-validating` reality-checks this plan (both pieces'
+Plan shaped. Next: `fgos-coding-validating` reality-checks this plan (both pieces'
 risk maps and verify commands) before the `decompose` → `executing` edge is
 picked, per D3/D4 scope locked in CONTEXT.md.
 
-## Validation (fgos-validating, READY WITH CONSTRAINTS)
+## Validation (fgos-coding-validating, READY WITH CONSTRAINTS)
 
 Reality gate: mode fit PASS, repo fit PASS (all cited files/lines/flags
 confirmed by direct read), smaller path PASS (D4 already locked by explicit
@@ -162,7 +162,7 @@ Two constraints attached before executing either piece:
    green is necessary but not sufficient proof on its own.
 
 User approved proceeding with these constraints attached (not folded back
-through a second `fgos-planning` pass, since neither changes the chosen
+through a second `fgos-coding-planning` pass, since neither changes the chosen
 mode, approach, or split -- both only sharpen proof-surface detail within
 what was already approved).
 

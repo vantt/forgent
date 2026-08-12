@@ -5,7 +5,7 @@ Nothing below reopens or reinterprets any of them.
 
 ## Mode
 
-Flags counted (per fgos-planning's mechanical gate):
+Flags counted (per fgos-coding-planning's mechanical gate):
 
 | Flag | Applies? | Why |
 |---|---|---|
@@ -35,7 +35,7 @@ proceeds as `tsk-6c2` itself.
 
 ## Approach
 
-**Chosen path (revised after `fgos-validating`'s third pass — see
+**Chosen path (revised after `fgos-coding-validating`'s third pass — see
 "Approach history" below)**: retry lives entirely at the `bin/fgos.mjs`
 CLI-verb layer, matching `research-260730-1133-cli-wait-flag-main-checkout-lock-design.md`
 §3's own original framing ("flag optional ở lớp CLI verb... gọi lại y
@@ -72,7 +72,7 @@ holderPid, lockAgeMs }` alongside what they already pass. Existing
 assertions on `err.code`/`err.category`/the message text are untouched —
 this only adds new properties.
 
-**`MergeError` discriminator gap (found at fourth `fgos-validating` pass)**:
+**`MergeError` discriminator gap (found at fourth `fgos-coding-validating` pass)**:
 `ClaimError` already carries a specific `.code` (`'lock-held'`,
 `'lock-ambiguous'`, `'not-found'`, `'deps-not-merged'` — confirmed via every
 `throw new ClaimError(...)` site in `claim-port.mjs`), so `withLockRetry`
@@ -105,7 +105,7 @@ contract, none of the 7 existing synchronous call sites in
 
 **Alternatives rejected**:
 - Retrying inside `claimWork`/`mergeRunnerItem` themselves (the first two
-  drafts of this plan) — rejected after `fgos-validating` found it forces
+  drafts of this plan) — rejected after `fgos-coding-validating` found it forces
   `claimWork` to become `async`, which breaks 7 existing synchronous test
   assertions and silently changes `loop.mjs:452`'s autonomous-dispatch
   behavior unless separately patched. The CLI-layer retry avoids both
@@ -116,10 +116,10 @@ contract, none of the 7 existing synchronous call sites in
 
 **Risk map**:
 
-| Component | Risk | Proof point (for `fgos-validating`) |
+| Component | Risk | Proof point (for `fgos-coding-validating`) |
 |---|---|---|
 | `withLockRetry`'s backoff/TTL-bound logic | medium — must stop retrying exactly when the budget is spent, never loop past it, never retry a non-lock-held error | unit test: a thunk that throws a `ClaimError('lock-held', ..., { remainingTtlMs: 1000 })` a few times then succeeds, assert retry stops and reports failure at or just after that 1s bound, not before and not indefinitely after; a thunk throwing `lock-ambiguous` or any other error must never retry |
-| `MergeError` retry-discriminator gap (found at fourth `fgos-validating` pass) | **medium-high** — without `code: 'lock-held'` added, `withLockRetry` has no safe way to tell a lock-contention `MergeError` apart from a real merge conflict or verify-fail `MergeError` (both share identical `errorClass`/`category` today) | unit test: a thunk that throws a `MergeError('...conflict...', { branch })` with **no** `code` field must never retry (proves the wrapper checks `err.code`, not `errorClass`/`category`); a thunk throwing `MergeError('...', { code: 'lock-held', remainingTtlMs })` must retry exactly like the `ClaimError` case |
+| `MergeError` retry-discriminator gap (found at fourth `fgos-coding-validating` pass) | **medium-high** — without `code: 'lock-held'` added, `withLockRetry` has no safe way to tell a lock-contention `MergeError` apart from a real merge conflict or verify-fail `MergeError` (both share identical `errorClass`/`category` today) | unit test: a thunk that throws a `MergeError('...conflict...', { branch })` with **no** `code` field must never retry (proves the wrapper checks `err.code`, not `errorClass`/`category`); a thunk throwing `MergeError('...', { code: 'lock-held', remainingTtlMs })` must retry exactly like the `ClaimError` case |
 | `ClaimError`/`MergeError` gaining `details` properties | low — additive only | existing `claim-port.test.mjs`/`merge.test.mjs` assertions on `err.code`/`err.category`/message text run unmodified and still pass (no rewrite needed, unlike the rejected approach) |
 | `--no-wait` opt-out wiring across `take`/`pick`/`approve` in `bin/fgos.mjs` | low — mechanical flag threading | one test per verb asserting `--no-wait` reproduces byte-for-byte today's error on a forced `HELD` fixture |
 | exhausted-wait failure message | low — UX only, no logic risk | assert the message states elapsed wait time, distinguishable from today's immediate-fail message (design report's own suggestion) |
@@ -154,7 +154,7 @@ contract, none of the 7 existing synchronous call sites in
 
 **Approach history** (kept for the item's own record, not re-litigated):
 the first plan draft put the retry inside `claimWork`/`mergeRunnerItem`
-directly; `fgos-validating`'s first pass found it omitted `loop.mjs:452` as
+directly; `fgos-coding-validating`'s first pass found it omitted `loop.mjs:452` as
 a caller needing an explicit opt-out; its second pass found that call site
 also needed an `await` fix once `claimWork` turned `async`; its third pass
 found a smaller path that avoids touching `claimWork`'s signature (and

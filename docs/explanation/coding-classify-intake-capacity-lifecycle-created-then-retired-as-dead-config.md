@@ -140,7 +140,7 @@ as a defined-but-unused file:
 > — real commit, branch `fgw/tsk-6ar`
 
 `capacity-dispatch-fallback.md` itself was re-checked at this point too
-(8 remaining citers — `fgos-code-implement`, `fgos-validating`, and
+(8 remaining citers — `fgos-coding-implement`, `fgos-coding-validating`, and
 others) and correctly left in place, exactly as `tsk-4ns`'s own earlier
 finding already established.
 

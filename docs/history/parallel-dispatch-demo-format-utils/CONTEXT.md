@@ -19,7 +19,7 @@ own new file and its own test file, touching no file the other touches:
 This item exists to empirically demonstrate `tsk-66o`'s
 computed-parallel-wave-schedule (`fgos schedule`): the two functions above
 are its own two candidate children, deliberately shaped with zero shared
-footprint, so `fgos-planning` can split them and they land in the same
+footprint, so `fgos-coding-planning` can split them and they land in the same
 wave, dispatched and implemented concurrently.
 
 ## Locked decisions
@@ -37,14 +37,14 @@ wave, dispatched and implemented concurrently.
 - **four-unit duration** — `format-duration`'s output picks from
   day/hour/minute/second, largest non-zero unit first (exact rounding/
   truncation behavior at unit boundaries is an implementation choice,
-  left to `fgos-planning`/implementation, not locked here per this
+  left to `fgos-coding-planning`/implementation, not locked here per this
   skill's own "do not research implementation" rule).
 
 ## Scout evidence
 
 - `rg -i "duration|humaniz|bytes|MB|formatDuration|formatBytes" src --glob "*.mjs"` — no existing formatting helper of this shape anywhere in `src/`; no prior convention to follow or conflict with.
 - No prior `judgeDiscovery` verdicts recorded for `tsk-1sj` (`view.discovery["tsk-1sj"]` empty) — nothing to reconcile against.
-- Impact-analysis capability gate (`fgos tool query --capability impact-analysis --status present`): GitNexus `present`, checked fresh this session — Full mode per `CLAUDE.md`'s gate. Informational only here (this skill edits no code); both target files are new, so there is no existing symbol to run `impact` against yet — that check applies once `fgos-planning`/`fgos-code-implement` touch real code.
+- Impact-analysis capability gate (`fgos tool query --capability impact-analysis --status present`): GitNexus `present`, checked fresh this session — Full mode per `CLAUDE.md`'s gate. Informational only here (this skill edits no code); both target files are new, so there is no existing symbol to run `impact` against yet — that check applies once `fgos-coding-planning`/`fgos-coding-implement` touch real code.
 
 ## Canonical references
 
@@ -54,7 +54,7 @@ wave, dispatched and implemented concurrently.
 
 - Exact rounding/truncation rule at each unit boundary for both functions
   (e.g. whether `format-bytes` shows one decimal place always, or trims a
-  trailing `.0`) — implementation detail, `fgos-planning`'s/the
+  trailing `.0`) — implementation detail, `fgos-coding-planning`'s/the
   implementer's call, not a product decision.
 - Behavior for zero/negative input on either function — same
   implementation-detail deferral.

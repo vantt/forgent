@@ -29,7 +29,7 @@ established for a doc-only, pass-through diff.
 ## Item's own verify command
 
 ```
-node --test test/intake/discovery.test.mjs test/intake/decompose.test.mjs
+node --test test/intake/discovery.test.mjs test/intake/plan.test.mjs
 ```
 
 ```

@@ -30,7 +30,7 @@ the staged content is correct.
 `git merge-base --is-ancestor 7add82b8 main && npm test`. It was
 confirmed *runnable* during `fgos-researching` (round 1), but turned out
 unsatisfiable through the gate pipeline — found empirically during
-`fgos-code-implement`, *after* the real merge had already landed on the
+`fgos-coding-implement`, *after* the real merge had already landed on the
 item's own working branch: running the exact command in that worktree
 still reported NOT ANCESTOR, since `main` is a ref shared across every
 worktree and genuinely hadn't moved yet from `approve`'s perspective at

@@ -32,7 +32,7 @@ no split-ordering question to resolve against other work.
 Impact-analysis posture (`fgos tool query --capability impact-analysis
 --status present`): gitnexus **present** → **full**. Recorded here per
 CLAUDE.md's gate; no code is edited by this skill, so it does not change
-this plan's proof points, but `fgos-code-implement` must run real `impact()`
+this plan's proof points, but `fgos-coding-implement` must run real `impact()`
 calls on `moveWork`/`addFriction`/the new fallback helper before editing
 them, per the repo's Always-Do rule.
 
@@ -80,7 +80,7 @@ them, per the repo's Always-Do rule.
   full 2s wait on top makes a CLI command hang for up to 4s on the
   contended case D2 is explicitly about (sustained contention), for a
   fallback that must work regardless of the retry outcome anyway. Not
-  ruled out entirely — `fgos-code-implement` may add one bounded, cheap retry
+  ruled out entirely — `fgos-coding-implement` may add one bounded, cheap retry
   if profiling during implementation shows it meaningfully reduces
   fallback-path frequency — but the design does not depend on it.
 - **A second locked file for the fallback record**: rejected — reusing
@@ -97,7 +97,7 @@ them, per the repo's Always-Do rule.
 
 ## Risk map
 
-| Component | Risk | What proves it (→ fgos-validating) |
+| Component | Risk | What proves it (→ fgos-coding-validating) |
 |---|---|---|
 | Fallback diagnostic write (D2) | Medium — must genuinely not share `events.lock`'s failure mode, or D2 is unmet in practice, not just on paper | Confirm the chosen write path (recommended: `.fgos/logs/`) uses no lock file shared with `events.mjs`'s `withEventsLock`/`acquireEventsLock`, and confirm `appendWorkerLog`'s own "never throws" contract still holds for this new call site |
 | Cleanup ordering on caught failure (leaf/root merge paths) | Medium — a caught `moveWork` failure must still run `cleanupMergedBranch`, or the leaf/root branch leaks in addition to the status desync | Confirm both merge call sites (2223, 2297) still call `cleanupMergedBranch` after a caught failure, not only on the happy path |
@@ -119,7 +119,7 @@ them, per the repo's Always-Do rule.
 ## Order
 
 No cross-item ordering constraint (`fgos graph` confirms tsk-480 is an
-isolated component). Internal order for `fgos-code-implement`:
+isolated component). Internal order for `fgos-coding-implement`:
 
 1. Fallback diagnostic write path (D2) — needed by every guarded call
    site, build once.
@@ -128,7 +128,7 @@ isolated component). Internal order for `fgos-code-implement`:
 3. Test-only failure seam + the regression test proving it (D3) — last,
    since it exercises the guard built in step 2.
 
-## Assumptions (unproven, flagged for fgos-validating)
+## Assumptions (unproven, flagged for fgos-coding-validating)
 
 - No additional retry beyond `withEventsLock`'s own internal timeout
   loop is required to satisfy D2 — the fallback write is designed to

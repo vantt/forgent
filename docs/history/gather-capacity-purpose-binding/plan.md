@@ -57,7 +57,7 @@ new in-session path — no third caller exists to regress silently.
 
 ### Risk map
 
-| Component | How risky | Proof point (carried to `fgos-validating`) |
+| Component | How risky | Proof point (carried to `fgos-coding-validating`) |
 |---|---|---|
 | `validateCapacityShape` gains `carries` enum check | Medium — shared validation path, but single caller (`loop.mjs`) plus this item's new one; existing tests already exercise `for`/`allowCrossProvider` validation the same way `carries` will follow | New test: an out-of-enum `carries` value throws at config-load, not silently accepted; existing `for`/`allowCrossProvider` tests still pass unmodified |
 | `resolveExecutorConfig` gains a real `carries` read-gate | Medium — this is the actual security-relevant piece (D15's whole point: a declared `carries: user-text` capacity must be refused BEFORE spawn if handed repo content) | New test: a capacity declared `carries: user-text` invoked with repo-content-shaped input is rejected before any spawn; a `carries: repo-content` capacity accepts the same input |
@@ -79,7 +79,7 @@ carrying code past this point.
 1. **Implement gather capacity dispatch** (parent: tsk-2ie5)
    - Footprint: `src/runner/dispatch.mjs`, `.claude/skills/fgos-researching/SKILL.md`, `test/runner/dispatch.test.mjs`
    - Covers original verify items 1–9 (npm test; purpose-based binding via `for: gather`; presence/cross-provider gate — `kind !== 'task'`, already shipped by tsk-1o7, regression-tested here rather than re-implemented; one dispatch-log line per gather call; fallback to native Task dispatch when the capacity is absent/not present; parallelism preserved — measured wall-clock; `carries` closed-enum validation at config-load; a real pre-dispatch gate on `carries`; grep proof that `carries` ships only alongside the code that reads it)
-   - Verify: `npm test && grep -n "carries" src/runner/dispatch.mjs test/runner/dispatch.test.mjs | grep -q .` (real command to be sharpened by `fgos-validating`/`fgos-code-implement` against the actual test names written)
+   - Verify: `npm test && grep -n "carries" src/runner/dispatch.mjs test/runner/dispatch.test.mjs | grep -q .` (real command to be sharpened by `fgos-coding-validating`/`fgos-coding-implement` against the actual test names written)
 
 2. **Hand-edit `.fgos/config.json`: register the `gather` capacity** (parent: tsk-2ie5, depends on piece 1 landing — `carries`/`for`-aware validation must exist before the real entry is registered, so it is actually checked rather than silently accepted by pre-this-item code)
    - Footprint: `.fgos/config.json`
@@ -91,11 +91,11 @@ carrying code past this point.
 
 - The `needs` capability name for `gather` is left to whoever implements
   piece 1/piece 2 to name concretely (e.g. `prompt-completion`) — this is
-  an implementation-only choice per `fgos-exploring`'s own scope
+  an implementation-only choice per `fgos-coding-exploring`'s own scope
   boundary (does not change behavior, data shape, or acceptance criteria;
   `needs` is validated at resolve-time against whatever the tools
   registry declares, not against a closed enum, so no config-schema risk
-  rides on the exact string). `fgos-validating` should confirm piece 1's
+  rides on the exact string). `fgos-coding-validating` should confirm piece 1's
   own tests do not hardcode a real production capability name that piece
   2 would then be locked into matching.
 - Which provider satisfies that capability is explicitly deferred to a
@@ -105,7 +105,7 @@ carrying code past this point.
   left to implementation: it must produce a durable, per-call log line
   distinguishable from `loop.mjs`'s own `capacity.dispatch` event, but
   need not reuse that event's exact writer given gather calls have no
-  work-item claim of their own to attach an event to. `fgos-validating`
+  work-item claim of their own to attach an event to. `fgos-coding-validating`
   should confirm whatever shape is chosen is durable (survives process
   exit) before treating piece 1 as done.
 - `tsk-5td` (soft dependency, not declared in `deps`) — its decision log

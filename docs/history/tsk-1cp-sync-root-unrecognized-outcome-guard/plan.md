@@ -22,7 +22,7 @@ Risk map:
 | Component | Risk | Proof point |
 |---|---|---|
 | Traceability record itself (this doc + RESEARCH.md) | low — pure docs, no code path | already written and reviewable in this commit |
-| Verify command (`node --test test/cli/fgos.test.mjs`) | medium — will FAIL until tsk-4hj's commits are present on this branch's ancestry (D2) | `fgos-validating`'s reality check must confirm this is an accepted, expected-to-fail-until-merge state, not a plan defect |
+| Verify command (`node --test test/cli/fgos.test.mjs`) | medium — will FAIL until tsk-4hj's commits are present on this branch's ancestry (D2) | `fgos-coding-validating`'s reality check must confirm this is an accepted, expected-to-fail-until-merge state, not a plan defect |
 
 impact-analysis: `full` (GitNexus present) — not applicable in practice;
 this item's own footprint touches no code symbols.

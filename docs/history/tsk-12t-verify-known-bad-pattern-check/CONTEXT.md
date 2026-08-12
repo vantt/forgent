@@ -40,7 +40,7 @@ rely on the LLM catching a known syntactic anti-pattern every single time.
   independent call sites, not one:
   - `src/intake/discovery.mjs:652` (`resolveDiscovery`, stage `clarify`) —
     the case this item's own title names.
-  - `src/intake/decompose.mjs:703` (`resolveDecompose`, stage `decompose`,
+  - `src/intake/plan.mjs:703` (`resolveDecompose`, stage `decompose`,
     per-child `verify` during chia-việc) — an equally-real second exposure
     to the same bug class the item description did not originally name.
 - `docs/explanation/fgos-choke-point-pattern.md` — confirms the existing
@@ -61,7 +61,7 @@ rely on the LLM catching a known syntactic anti-pattern every single time.
 | D2 | The check only trips when the verify string BOTH references Node's test runner (`node --test` / `--test-name-pattern`) AND matches the wrong-reporter grep shape (e.g. `/\^#\s*(pass\|fail)\b/`) — not a bare pattern-anywhere match — scoped exactly to the how-to doc's own documented trap, to avoid false-positiving a legitimate TAP-consuming verify from an unrelated tool. |
 | D3 | On a trip, return the existing `{agrees: false, reason}` shape `judgeVerifySemanticCorrectness` already returns for an LLM disagreement, but mark the reason as mechanical (a distinct field or prefix) so both callers can tell it apart from an LLM-sourced disagreement. |
 | D4 | Short-circuit: skip the `runJudgeExecutor` LLM spawn entirely once the mechanical check trips — return immediately, per the item's own stated rationale (cheaper than a per-call LLM judgement). |
-| D5 | Out of scope: no change to `buildVerifyCheckPrompt` (the LLM prompt) and no change to `fgos-exploring`'s `SKILL.md` prose. The mechanical gate at the shared choke point is self-enforcing regardless of either; the separate vacuous-match trap stays the LLM judge's job. |
+| D5 | Out of scope: no change to `buildVerifyCheckPrompt` (the LLM prompt) and no change to `fgos-coding-exploring`'s `SKILL.md` prose. The mechanical gate at the shared choke point is self-enforcing regardless of either; the separate vacuous-match trap stays the LLM judge's job. |
 | D6 | The mechanical trip is **not** forceable via the existing `--force` override. It is a syntactic fact (Node's default reporter never prints `^# pass`/`^# fail`), not a judgement call an LLM could plausibly get wrong. Both call sites (`resolveDiscovery`, `resolveDecompose`) must check D3's mechanical marker before honoring `--force`, and must refuse to let `--force` bypass a mechanical-flagged disagreement — unlike today's uniform `--force` handling of any LLM disagreement. |
 
 ## Pinned terms
@@ -90,4 +90,4 @@ rely on the LLM catching a known syntactic anti-pattern every single time.
 - `docs/explanation/fgos-choke-point-pattern.md`
 - `src/intake/judge-executor.mjs`
 - `src/intake/discovery.mjs`
-- `src/intake/decompose.mjs`
+- `src/intake/plan.mjs`

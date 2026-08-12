@@ -2,8 +2,8 @@
 name: fgos-routing
 description: >-
   Use at the start of every fgOS work session in this repo: orient on open
-  work, claim an item through the pull door, then route to fgos-exploring,
-  fgos-planning, or fgos-validating based on the claimed item's current
+  work, claim an item through the pull door, then route to fgos-coding-exploring,
+  fgos-coding-planning, or fgos-coding-validating based on the claimed item's current
   stage. Examples: "what should I work on next", "I just claimed an item,
   what do I do now", "this item is stuck waiting on a person".
 ---
@@ -32,14 +32,14 @@ Both are read-only. Nothing here writes state.
 ### Mode gate (mechanical, not vibes) — decide the lane before loading a heavy skill
 
 For any claimed item at stage `decompose`, decide its lane HERE, before
-routing it to `fgos-planning` below (tsk-5ay D1: triage-before-load, moved
-from inside `fgos-planning` itself). This is knowing-before-load, not
+routing it to `fgos-coding-planning` below (tsk-5ay D1: triage-before-load, moved
+from inside `fgos-coding-planning` itself). This is knowing-before-load, not
 skip-load — read the table below plainly: every `decompose`-shaping item
-still gets routed to `fgos-planning` regardless of lane, so this alone
+still gets routed to `fgos-coding-planning` regardless of lane, so this alone
 does not save that skill's own load cost (tsk-da1, found by independent
 review — tsk-5ay's own original rationale overstated this; recorded
 honestly here rather than silently fixed). What it DOES buy: the lane is
-known before `fgos-planning` is even opened, so a stranger picking this
+known before `fgos-coding-planning` is even opened, so a stranger picking this
 item up cold — or this session itself, mid-Orient — already knows how
 much ceremony to expect, instead of learning it only after reading
 through that skill's own flow. A genuine skip-load optimization (e.g.
@@ -58,11 +58,11 @@ existing covered behavior, weak proof around the area, multi-domain.
   regardless of flag count.
 
 This is the same lane vocabulary (tiny/small/standard/high-risk/spike)
-`fgos-planning`'s own `plan.md` has always recorded — only the deciding
+`fgos-coding-planning`'s own `plan.md` has always recorded — only the deciding
 moved here; the recording still happens in `plan.md` itself, written by
-`fgos-planning`'s own Bootstrap step from this lane, carried forward as
+`fgos-coding-planning`'s own Bootstrap step from this lane, carried forward as
 prose (never a new field on the item, never a value `stage` takes). Hand
-the lane, the flag count, and which flags applied to `fgos-planning`
+the lane, the flag count, and which flags applied to `fgos-coding-planning`
 directly when routing a `decompose`-stage item there.
 
 ## Running a state-writing verb from this session
@@ -74,7 +74,7 @@ session's cwd is a linked worktree, which never carries its own `.fgos/`
 by design (ADR0020: `docs/decisions/0020-chan-fgos-khoi-worktree-worker.md`).
 Resolve the main checkout root once and pass it explicitly on every such
 call — never a bare `fgos <verb>` when this session might already be
-inside a worktree (e.g. mid-`fgos-code-implement`, or a `pick`'d session
+inside a worktree (e.g. mid-`fgos-coding-implement`, or a `pick`'d session
 running `fgos-routing` again):
 
 ```bash
@@ -82,7 +82,7 @@ root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
 node "$root/bin/fgos.mjs" <verb> ... --dir "$root"
 ```
 
-(the same `root` resolution `fgos-exploring`'s and `fgos-planning`'s own
+(the same `root` resolution `fgos-coding-exploring`'s and `fgos-coding-planning`'s own
 gate-bypass checks already rely on — tsk-56t D1).
 
 ## Claim
@@ -97,7 +97,7 @@ The frontier (`fgos ready`) is executing-stage-only by definition — every
 item it surfaces has already cleared `clarify` and `decompose`. Omitting
 `--id` pulls the next frontier item, so a default claim can only ever land
 on an item ready for direct execution. To work an item still at `clarify`
-or `decompose` — the ones routed to `fgos-exploring` or `fgos-planning`
+or `decompose` — the ones routed to `fgos-coding-exploring` or `fgos-coding-planning`
 below — claim it specifically with `--id <id>` (found via `fgos list`).
 `--role session` marks the claim as coming from a live session rather than
 a person — always pass it here.
@@ -136,16 +136,15 @@ call, not a different table:
 
 | stage | what's true right now | load (coding domain today) |
 |---|---|---|
-| `clarify` | a freshly submitted item's intent hasn't been checked yet — decide whether it's already understood, asking a person only when a genuine gap remains | `fgos-clarifying` |
-| `discovery` | intent is understood; an unresolved question remains that needs a grounded finding before the item can move to `exploring` | `fgos-researching` |
-| `exploring` | the request is still fuzzy — gray areas, missing acceptance criteria, an ambiguous ask | `fgos-exploring` |
-| `decompose` — shaping | scope is settled; the work now needs shaping and, where it doesn't fit in one pass, splitting into child items | `fgos-planning` (the registry's entry-point default for `decompose`) |
-| `decompose` — proving | shape and children (if any) exist; what's left is proving the plan against reality before the item is allowed to move to `executing` | `fgos-validating` — this branch is this skill's own session-side judgment layered on top of the registry's single `decompose` default, never a second registry entry |
-| `executing` | the item has already cleared clarification and shaping (or never needed either), and is ready for direct implementation | `fgos-code-implement` (str89-fgos-domain-skills D4/D6 — the build/verify/return path, hand-authored from bee-executing's implement→verify→cap discipline) |
+| `discovery` | intent is understood (checked at Init, before the item exists — `fgos-clarifying`, called by `/fgOS:submit`); an unresolved question remains that needs a grounded finding before the item can move to `exploring` | `fgos-researching` |
+| `exploring` | the request is still fuzzy — gray areas, missing acceptance criteria, an ambiguous ask | `fgos-coding-exploring` |
+| `decompose` — shaping | scope is settled; the work now needs shaping and, where it doesn't fit in one pass, splitting into child items | `fgos-coding-planning` (the registry's entry-point default for `decompose`) |
+| `decompose` — proving | shape and children (if any) exist; what's left is proving the plan against reality before the item is allowed to move to `executing` | `fgos-coding-validating` — this branch is this skill's own session-side judgment layered on top of the registry's single `decompose` default, never a second registry entry |
+| `executing` | the item has already cleared clarification and shaping (or never needed either), and is ready for direct implementation | `fgos-coding-implement` (str89-fgos-domain-skills D4/D6 — the build/verify/return path, hand-authored from bee-executing's implement→verify→cap discipline) |
 
 `compound-learn` is retired as a stage (work-item-status-delivered-
 retrospective-cleanup D11, supersedes RUL49/RUL50/RUL51) — the synthesis
-layer it used to gate (`fgos-compounding`) now triggers on the status
+layer it used to gate (`fgos-coding-compounding`) now triggers on the status
 `retrospective` instead, driven by a separate retrospective loop, not this
 stage-routing table.
 
@@ -155,7 +154,7 @@ itself takes. This skill's whole job is exactly that judgment: read
 `stage`, resolve the domain's registered skill via
 `getDomain`/`skillForStage`, and layer the shaping/proving split on top of it
 (and whether the item is parked per the gate contract below) to decide
-which of `fgos-exploring` / `fgos-planning` / `fgos-validating` answers
+which of `fgos-coding-exploring` / `fgos-coding-planning` / `fgos-coding-validating` answers
 where the item stands. It is the only skill that makes this particular
 call — the other three never re-derive it, and this skill never does
 their work in their place.
@@ -215,8 +214,8 @@ lying about what's actually happening.
 
 1. `fgos list` / `fgos ready` to orient.
 2. `fgos take --role session [--id <id>]` to claim one item.
-3. Read the claimed item's `stage` and load `fgos-exploring`,
-   `fgos-planning`, or `fgos-validating` per the table above — or proceed
+3. Read the claimed item's `stage` and load `fgos-coding-exploring`,
+   `fgos-coding-planning`, or `fgos-coding-validating` per the table above — or proceed
    directly if it's already at `executing`.
 4. Hit a decision only a person can make? `fgos ask` / `fgos answer`,
    same path whether it resolves right away or later.

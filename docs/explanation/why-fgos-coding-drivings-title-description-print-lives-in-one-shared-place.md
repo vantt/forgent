@@ -10,7 +10,7 @@ source_capture_ids: [tsk-23z]
 the user before starting work on it. This item generalized that same
 display to every other interactive fgOS launcher that drives a
 coding-domain item through its lifecycle — `/fgOS:discover`,
-`/fgOS:decompose`, `/fgOS:discover-next`, and `/fgOS:cook` — so a person
+`/fgOS:plan`, `/fgOS:discover-next`, and `/fgOS:cook` — so a person
 watching any of them sees what is about to be worked on, the way
 `/fgOS:pick`'s users already could.
 

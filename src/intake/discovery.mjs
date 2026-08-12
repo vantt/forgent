@@ -4,11 +4,11 @@
 // trusted, already-committed CONTEXT.md.
 //
 // RETARGET (stage-decompose D2, cell 3): a clear verdict now lands the item
-// on stage `decompose`, not `executing` — chia-việc (decompose.mjs) is the
-// next stop before executing, and it is the one that produces children or
-// passes the item through. The clarify-pass settlement (replay.mjs) is
-// guarded on `from === 'clarify'`, not the destination, so it still fires
-// unchanged.
+// on stage `decompose`, not `executing` — chia-việc (`decompose.mjs` at the
+// time) is the next stop before executing, and it is the one that produces
+// children or passes the item through. The clarify-pass settlement
+// (replay.mjs) is guarded on `from === 'clarify'`, not the destination, so
+// it still fires unchanged.
 //
 // RE-RETARGET (tsk-4b2 D3/D6): a clear verdict at `clarify` now lands on
 // stage `discovery` instead of jumping straight to `decompose` — the
@@ -19,10 +19,24 @@
 // drives `discovery -> exploring` (a `fgos-researching` verdict, applied
 // by whichever caller invoked it — `fgos-researching` itself never touches
 // item state) and `exploring -> decompose` (a clear verdict once
-// `fgos-exploring` has locked `CONTEXT.md`) — see `nextDiscoveryEdge`
+// `fgos-coding-exploring` has locked `CONTEXT.md`) — see `nextDiscoveryEdge`
 // below. One verb (`fgos discover --verdict ...`), three edges, picked by
-// `work.stage`. `src/runner/loop.mjs`'s own direct `moveStage` call for
-// `discovery -> exploring` (a separate, older mechanism, pre-dating this
+// `work.stage`.
+//
+// RE-RE-RETARGET (tsk-403 D11/D18): `decompose` is renamed to `planning`
+// — `chia-việc` now lives in `plan.mjs` (renamed from `decompose.mjs`).
+// `nextDiscoveryEdge` resolves its destination via `stageForStep(domain,
+// 'Divide')`, and `Divide` now maps to `planning` in `stepMap` (not
+// `decompose` — that key was removed, D18), so both remaining edges above
+// — `clarify -> decompose` and `exploring -> decompose` — automatically
+// resolve to `clarify -> planning` / `exploring -> planning` for every
+// domain that adopted the rename, with ZERO code change needed in this
+// function beyond the variable rename below. `decompose` itself survives
+// only as a legacy, drain-only stage name (workflow-stage-graphs.mjs) for
+// the handful of items still parked there; no new item can reach it
+// through this function anymore. `src/runner/loop.mjs`'s own direct
+// `moveStage` call for `discovery -> exploring` (a separate, older
+// mechanism, pre-dating this
 // item) still exists unchanged here — reconciling it to call this same
 // verb instead is tsk-4v6's own job, not this item's footprint.
 //
@@ -37,7 +51,7 @@
 
 import path from 'node:path';
 import { judgeVerifySemanticCorrectness } from './verify-pattern-check.mjs';
-import { readLockedContext, resolveContentRoot } from './decompose.mjs';
+import { readLockedContext, resolveContentRoot } from './plan.mjs';
 import { DEFAULTS } from '../state/work.mjs';
 import { listWork, moveStage, addDiscovery, addDecision, putInAwaiting, editWork, StoreError } from '../state/store.mjs';
 import { getDomain, stageForStep, resolveDomainName } from '../state/workflow-stage-graphs.mjs';
@@ -105,28 +119,41 @@ function blocksForItem(work, view) {
 // precondition gate of its own (refusing before this function is ever
 // called) that needs the exact same domain-aware stage set -- shared here
 // rather than duplicating the `hasDiscoveryExploring` check in two files.
+//
+// tsk-qod D1/D2: `stageForStep(domain, 'Clarify')` now resolves to
+// `undefined` for a domain that retired `clarify` entirely (today: only
+// `coding`) -- `.filter(Boolean)` drops that phantom entry instead of
+// letting `undefined` leak into the CLI's own `validStages.includes(stage)`
+// precondition as if it were a real, valid stage name. A domain that still
+// has a real Clarify-mapped stage (e.g. `triage`) is unaffected -- its
+// `clarifyStage` is truthy and survives the filter unchanged.
 export function discoverableStages(domain) {
   const clarifyStage = stageForStep(domain, 'Clarify');
   const hasDiscoveryExploring = domain.stages?.includes('discovery') && domain.stages?.includes('exploring');
-  return hasDiscoveryExploring ? [clarifyStage, 'discovery', 'exploring'] : [clarifyStage];
+  return (hasDiscoveryExploring ? [clarifyStage, 'discovery', 'exploring'] : [clarifyStage]).filter(Boolean);
 }
 
 function nextDiscoveryEdge(work) {
   const domain = getDomain(work.domain);
   const clarifyStage = stageForStep(domain, 'Clarify');
-  const decomposeStage = stageForStep(domain, 'Divide');
+  const planningStage = stageForStep(domain, 'Divide');
   const hasDiscoveryExploring = discoverableStages(domain).length > 1;
 
-  if (work.stage === clarifyStage) {
+  // tsk-qod D1/D2: `clarifyStage !== undefined` guards against a
+  // false-positive match -- once a domain retires `clarify` entirely,
+  // `clarifyStage` is `undefined`, and `work.stage === undefined` would
+  // otherwise wrongly match any item whose own `stage` field is missing or
+  // corrupted, regardless of what domain it actually belongs to.
+  if (clarifyStage !== undefined && work.stage === clarifyStage) {
     return hasDiscoveryExploring
       ? { to: 'discovery', expectedStage: clarifyStage }
-      : { to: decomposeStage, expectedStage: clarifyStage };
+      : { to: planningStage, expectedStage: clarifyStage };
   }
   if (hasDiscoveryExploring && work.stage === 'discovery') {
     return { to: 'exploring', expectedStage: 'discovery' };
   }
   if (hasDiscoveryExploring && work.stage === 'exploring') {
-    return { to: decomposeStage, expectedStage: 'exploring' };
+    return { to: planningStage, expectedStage: 'exploring' };
   }
   throw new StoreError(
     'validation',
@@ -142,11 +169,11 @@ function nextDiscoveryEdge(work) {
  *
  * TRUST SIGNAL (tsk-ozl D1-D3): before requiring an explicit verdict, check
  * whether the item already carries a committed, non-empty CONTEXT.md under
- * its `docsRef` (`readLockedContext`, shared with decompose.mjs's own
+ * its `docsRef` (`readLockedContext`, shared with plan.mjs's own
  * locked-context read). When it does, decisions are already locked and
  * approved — advance directly, logging a `discovery skip:` decision for
  * the audit trail (mirrors `logDecomposeVerdict`'s pattern in
- * decompose.mjs) — same content-based signal for BOTH the sync `session`
+ * plan.mjs) — same content-based signal for BOTH the sync `session`
  * caller and the runner's RUL19 sweep (`role: 'runner'`), never a role
  * branch: a sweep that finds a real committed CONTEXT.md on an untouched
  * item trusts it too, which also covers the crashed-mid-explore-session
@@ -156,7 +183,7 @@ function nextDiscoveryEdge(work) {
  * outcomes (clear and unclear), never only the failure path. A clear
  * verdict moves the item forward via `nextDiscoveryEdge` (tsk-4b2 D3/D6) —
  * `clarify -> discovery` when the item is at `clarify`, or
- * `exploring -> decompose` when it is at `exploring` (`fgos-exploring`'s
+ * `exploring -> planning` when it is at `exploring` (`fgos-coding-exploring`'s
  * own Gate calling this same verb once `CONTEXT.md` is locked) — always
  * carrying a `verify` (D10 — the caller's proposal, or `FALLBACK_VERIFY`
  * when it did not supply one — never the retired P14 placeholder). An
@@ -173,7 +200,7 @@ function nextDiscoveryEdge(work) {
  * when supplied (`fgos discover --verdict ...`), used INSTEAD of any
  * subprocess judgment, checked before the `readLockedContext` trust-signal
  * above (explicit beats heuristic — the whole point of this protocol: a
- * live session that already reasoned about clarity, fgos-exploring, should
+ * live session that already reasoned about clarity, fgos-coding-exploring, should
  * never fall through to a blind subprocess judge or a second heuristic
  * guess).
  *
@@ -221,12 +248,12 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
       source: 'resolveDiscovery',
       kind: 'engine',
       rationale:
-        'tsk-27y D2: caller-supplied verdict — session already reasoned live (fgos-exploring), skipping the readLockedContext trust-signal check',
+        'tsk-27y D2: caller-supplied verdict — session already reasoned live (fgos-coding-exploring), skipping the readLockedContext trust-signal check',
     });
   } else {
     // repoRoot (tsk-1ni D1): resolved to the item's own worktree when one
     // exists, never the raw state root -- see resolveContentRoot's own
-    // comment in decompose.mjs.
+    // comment in plan.mjs.
     const stateRoot = path.dirname(dir);
     const repoRoot = resolveContentRoot(stateRoot, id, work.docsRef);
     const lockedContext = readLockedContext(repoRoot, work.docsRef);
@@ -241,7 +268,7 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
       });
       addDiscovery(dir, { id, clear: true });
       // Real verify (tsk-19j D1/D11, closes gap 2): `gates[id].contextApprove.
-      // verify` is the real command fgos-exploring's own Gate recorded for
+      // verify` is the real command fgos-coding-exploring's own Gate recorded for
       // this item when it approved CONTEXT.md — preferred over the retired
       // placeholder whenever a Track A approve record actually exists (an item
       // that never went through that Gate, e.g. from before this item, keeps
@@ -277,7 +304,7 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
   // verdict still gets scored; the item just doesn't advance stage). D7:
   // `intent` is retired IN PLACE — this is the rough clarify-stage pass
   // computing `priority` instead (effort is not yet known here, so it
-  // defaults to EFFORT_FLOOR inside computePriority; `decompose`'s refined
+  // defaults to EFFORT_FLOOR inside computePriority; `planning`'s refined
   // pass recomputes once effort/blast-radius are known, per plan.md Phase
   // B). Wrapped in its own try/catch so a write-door rejection never aborts
   // the clarify/unclear resolution that follows. tsk-1ne (`store.mjs`'s
@@ -366,7 +393,7 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
           });
         } else {
           const ask =
-            `Đề xuất verify bị nghi ngờ (chưa ghi vào clarify->decompose, cần xác nhận) — ` +
+            `Đề xuất verify bị nghi ngờ (chưa ghi vào clarify->planning, cần xác nhận) — ` +
             `vòng 1 đề xuất: ${verdict.verify}\n` +
             `vòng 2 (kiểm tra độc lập) không đồng ý: ${secondPass.reason}`;
           // statusAtAsk (claim-lock §5.1): same rule as the unclear branch
@@ -396,7 +423,7 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
     }
 
     // tsk-1ni D2: never let a caller's guess overwrite a verify a prior
-    // stage already locked (e.g. fgos-validating's planApprove, reached
+    // stage already locked (e.g. fgos-coding-validating's planApprove, reached
     // because this item's stage never got moved off clarify before later
     // stages ran) -- only an empty/placeholder field gets filled, same
     // "locked beats fresh guess" trust the D1 skip-and-advance path above

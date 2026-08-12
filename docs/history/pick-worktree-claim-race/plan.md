@@ -59,7 +59,7 @@ oversight.
 
 **Risk map:**
 
-| Component | Risk | Proof point (→ `fgos-validating`) |
+| Component | Risk | Proof point (→ `fgos-coding-validating`) |
 |---|---|---|
 | Revert-on-failure for the `todo` path (the reproduced case) | Medium — core claim CAS, already-tested function | New test: force `createClaimWorktree` to throw (e.g. pass an unwritable/invalid `worktreeDir`), assert `claimWork` rethrows the original error AND the item's status is back to `todo` in the store afterward |
 | Revert-on-failure for the `blocked`/branch-take path | Medium — same ordering bug, less-trodden path, no live incident yet | New test: same failure injection, but starting from a `blocked` item with an existing branch (`isBranchTake` true), assert revert lands back on `blocked` not `todo` |
@@ -91,7 +91,7 @@ inform.
 ## Shape
 
 One phase, no split — see below. Concrete cases to prove at
-`fgos-validating`/execution time, matching the risk map:
+`fgos-coding-validating`/execution time, matching the risk map:
 
 - **Empty/boundary**: `createClaimWorktree` fails on the very first claim
   attempt (branch doesn't exist yet, `git worktree add -b` itself fails) —

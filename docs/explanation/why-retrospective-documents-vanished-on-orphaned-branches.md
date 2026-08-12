@@ -2,7 +2,7 @@
 
 `tsk-3ts` started from a scan finding 36 of 182 recorded `docPath` values
 pointing at files absent from the tree — end-user documents that
-`fgos-compounding` had tagged as written, but that did not actually exist
+`fgos-coding-compounding` had tagged as written, but that did not actually exist
 on disk. The source request that opened the item:
 
 > Retro-loop sweep ghi tai lieu end-user len work branch roi de mo coi,
@@ -41,7 +41,7 @@ stale path left over from a file rename, not an actual loss.
 
 ## Why the write-then-tag order made the loss undetectable
 
-`fgos-compounding`'s own step order made the gap invisible while it was
+`fgos-coding-compounding`'s own step order made the gap invisible while it was
 happening: step 3 wrote the document at a cwd-relative path, and step 4
 tagged it — meaning the tag necessarily preceded (or at best coincided
 with) a file that had already been written wherever the session

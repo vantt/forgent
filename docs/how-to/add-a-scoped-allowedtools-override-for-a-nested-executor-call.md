@@ -8,7 +8,7 @@ source_capture_ids: [tsk-62d]
 # How to grant a nested `claude -p` executor call its own scoped `allowedTools`
 
 `tsk-62d` needed `judgeDiscovery`/`judgeDecompose` (`src/intake/discovery.mjs`,
-`src/intake/decompose.mjs`) to run one extra tool (`rg`, for a bounded scout
+`src/intake/plan.mjs`) to run one extra tool (`rg`, for a bounded scout
 pass) that the shared worker `allowedTools`
 (`Bash(git add:*),Bash(git commit:*)`, `dispatch.mjs`'s
 `DEFAULT_RUNNER_CONFIG`) never grants. Both call sites resolve their spawn
@@ -88,7 +88,7 @@ inspection alone:
 
 The original plan for this item proposed adding a whole new `role`
 parameter to `resolveExecutorCommand`/`resolveExecutorConfig`, parallel to
-`tier` — caught at `fgos-validating`'s "smaller path" reality-gate check by
+`tier` — caught at `fgos-coding-validating`'s "smaller path" reality-gate check by
 actually reading `resolveExecutorConfig` and `judge-executor.mjs`'s existing
 call (`resolveExecutorCommand(cfg, { prompt, model })`, no `tier` passed at
 all): the generic lookup already did everything the new parameter was for.

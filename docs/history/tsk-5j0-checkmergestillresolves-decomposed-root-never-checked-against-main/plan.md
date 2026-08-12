@@ -8,7 +8,7 @@ one direct task" — but every gray area is already resolved in `CONTEXT.md`
 (D1-D3), so it stays "a few files, no gray areas" rather than `standard`.
 
 **Lane derivation (fgos-routing's Mode gate, applied directly — this
-session went straight from `fgos-exploring` into this skill without
+session went straight from `fgos-coding-exploring` into this skill without
 `fgos-routing`'s own Orient step ever running, so no lane was handed off
 in prose; `plan.md` did not exist yet either, so neither direct-entry
 fallback branch had an answer to read):**
@@ -56,7 +56,7 @@ AND (not-root, or the root's own branch resolves too).
 
 **Risk map:**
 
-| Component | Risk | Proof point (for fgos-validating) |
+| Component | Risk | Proof point (for fgos-coding-validating) |
 |---|---|---|
 | `checkMergeStillResolves`'s new root-branch check | Light — additive, reuses existing tested helpers (`refExists`/`checkAncestry`), same function that already runs this exact ancestry check for a childless item today | New test: root-with-children whose own branch never merged → `ok:false`; root-with-children whose own branch DID merge → `ok:true` alongside a passing children check |
 | Existing children-recursion tests (`test/state/cleanup-harness.test.mjs:173-281`) | None expected — CONTEXT.md's Scout evidence confirms all three call the function with a **non-root** `id`, so the new root-gated check never fires for them | Run `npm test` unchanged; all three must still pass with zero edits |
@@ -92,7 +92,7 @@ children) — there is no cross-item sequencing question here.
 ## Shape
 
 One honest piece of work — no split (see `## Split` below). Concrete
-cases to prove at `fgos-validating`/execution:
+cases to prove at `fgos-coding-validating`/execution:
 
 - **Root with children, own branch never merged into `main`** — must now
   report `ok:false` naming the root's own branch as the failing detail

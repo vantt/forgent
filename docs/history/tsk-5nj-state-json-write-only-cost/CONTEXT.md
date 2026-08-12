@@ -38,7 +38,7 @@ rather than one large piece:
   content hash of the log bytes `[0, offset)`; `rebuildView` re-hashes
   that range before trusting the offset, falling back to a full read on
   any mismatch (never wrong, only ever loses the perf win for that one
-  call). Requires `fgos-validating`'s feasibility matrix to prove the
+  call). Requires `fgos-coding-validating`'s feasibility matrix to prove the
   anchor-hash invalidation against all 3 rewrite paths named above before
   implementation proceeds, not just plausibility.
 

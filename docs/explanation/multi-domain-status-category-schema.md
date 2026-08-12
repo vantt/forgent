@@ -148,7 +148,7 @@ research. The record's own "Bối cảnh" section says so explicitly:
 > schema-multi-domain-upgrade-report.md`, round 4) ban đầu kết luận
 > **"domain sở hữu TOÀN BỘ bảng transition"** — một khung rộng hơn record
 > này thật sự chốt. Khung đó đã bị xét lại và THU HẸP trong phiên
-> `fgos-exploring` cho `tsk-38t`... §1 tự ghi nhận 'Đây là thu hẹp thật so
+> `fgos-coding-exploring` cho `tsk-38t`... §1 tự ghi nhận 'Đây là thu hẹp thật so
 > với kết luận round-4 của report gốc... thu hẹp lại đúng phạm vi domain
 > thật sự cần tự khai (đoạn đầu vòng đời)'."
 
@@ -222,10 +222,10 @@ above ("Khác biệt per-domain ở bước `retrospective` nằm ở SKILL nào
 This is not a hypothetical: `/fgOS:retro-next`'s own step 4 (the skill that
 produced this very document) resolves which synthesis skill to run for a
 given item by reading exactly this key —
-`skillForStage(getDomain(item.domain), 'retrospective') ?? 'fgos-compounding'`
-— with the `?? 'fgos-compounding'` fallback matching `skillForStage`'s own
+`skillForStage(getDomain(item.domain), 'retrospective') ?? 'fgos-coding-compounding'`
+— with the `?? 'fgos-coding-compounding'` fallback matching `skillForStage`'s own
 null-safe shape one level up. For `coding` today this always resolves back
-to `fgos-compounding` itself, zero behavior change from before the lookup
+to `fgos-coding-compounding` itself, zero behavior change from before the lookup
 existed — the field's purpose is to give a second domain somewhere to
 plug in a different synthesis skill without `retro-next` needing an
 if/else keyed on domain name. Landed `awaiting-approval`, first attempt,

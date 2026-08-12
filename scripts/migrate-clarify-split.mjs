@@ -1,14 +1,19 @@
 #!/usr/bin/env node
 // migrate-clarify-split.mjs -- tsk-puz (docs/history/fanout-and-delegation-
-// rubric/CONTEXT.md D12). A one-shot, EAGER migration (plan.md's own
-// Assumption 4: not lazy -- an item's stage must read correctly right away,
-// never depend on whether something later happens to touch it) that sorts
-// every item currently sitting at stage `clarify` into the right of the
-// three baskets tsk-1w7's own stage split created:
+// rubric/CONTEXT.md D12), retargeted by tsk-qod (D1/D2, docs/history/
+// discover-stage-graph-and-skill-layering/CONTEXT.md): `clarify` retires
+// as a stage entirely (moved to a pre-item-creation Init helper), so this
+// migration now sorts EVERY item still sitting at stage `clarify` into the
+// right of the two baskets that remain:
 //
-//   - never touched (no locked decision, not parked)      -> stays `clarify`
 //   - has a real locked decision (decisionsById, or a real
-//     committed CONTEXT.md under its own docsRef)          -> `discovery`
+//     committed CONTEXT.md under its own docsRef), OR was never
+//     touched at all (no decision, no locked CONTEXT.md)        -> `discovery`
+//     (tsk-qod D1: `clarify` is retired, so "never touched" no
+//     longer has anywhere to stay -- it lands at the same machine-
+//     alone research stage a "has decision" item already got,
+//     since both are simply "an existing item with no clarify pass
+//     left to run")
 //   - parked mid-Socratic-question (`status: 'awaiting-human'`)
 //                                                           -> `exploring`
 //     (already at the machine+human decision-lock stage --
@@ -31,13 +36,14 @@
 
 import path from "node:path";
 import { listWork, moveStage } from "../src/state/store.mjs";
-import { readLockedContext, resolveContentRoot } from "../src/intake/decompose.mjs";
+import { readLockedContext, resolveContentRoot } from "../src/intake/plan.mjs";
 
 /**
- * Decide the target stage for one `stage: 'clarify'` item, per D12. Never
- * throws -- a read failure inside `readLockedContext` already degrades to
- * "no locked context" (that function's own contract), so the only outcome
- * here is one of the three literal stage names.
+ * Decide the target stage for one `stage: 'clarify'` item, per tsk-qod D1.
+ * Never throws -- a read failure inside `readLockedContext` already
+ * degrades to "no locked context" (that function's own contract), so the
+ * only outcome here is one of the two literal stage names that remain
+ * once `clarify` retires.
  */
 function targetStageFor(item, view, repoRootFor) {
   if (item.status === "awaiting-human") return "exploring";
@@ -47,7 +53,11 @@ function targetStageFor(item, view, repoRootFor) {
     const repoRoot = repoRootFor(item);
     if (readLockedContext(repoRoot, item.docsRef).trim()) return "discovery";
   }
-  return "clarify";
+  // tsk-qod D1: `clarify` no longer exists to stay at -- an untouched item
+  // (no decision, no locked CONTEXT.md) gets the same target a "has
+  // decision" item already gets, since both are simply "an existing item
+  // with no clarify pass left to run."
+  return "discovery";
 }
 
 /**
@@ -61,7 +71,7 @@ export function migrateClarifySplit(dir, { dryRun = false } = {}) {
   const view = listWork(dir);
   const stateRoot = path.dirname(dir);
   // resolveContentRoot (tsk-1ni D1, already used identically by discovery.mjs/
-  // decompose.mjs): a locked CONTEXT.md may live in the item's own fgw/<id>
+  // plan.mjs): a locked CONTEXT.md may live in the item's own fgw/<id>
   // worktree rather than the state root -- resolved per item, memoized since
   // the same id never changes across this one script run.
   const repoRootCache = new Map();
@@ -72,17 +82,15 @@ export function migrateClarifySplit(dir, { dryRun = false } = {}) {
     return repoRootCache.get(item.id);
   };
 
+  // tsk-qod D1: `targetStageFor` never returns `"clarify"` anymore (there
+  // is nowhere left to stay), so there is no `leftAtClarify` basket to
+  // track -- every candidate item moves.
   const movedToDiscovery = [];
   const movedToExploring = [];
-  const leftAtClarify = [];
 
   for (const item of Object.values(view.work)) {
     if (item.stage !== "clarify") continue;
     const target = targetStageFor(item, view, repoRootFor);
-    if (target === "clarify") {
-      leftAtClarify.push(item.id);
-      continue;
-    }
     if (!dryRun) {
       moveStage(dir, { id: item.id, to: target, expectedStage: "clarify", role: "system" });
     }
@@ -91,10 +99,9 @@ export function migrateClarifySplit(dir, { dryRun = false } = {}) {
 
   return {
     dryRun,
-    totalClarifyItemsSeen: movedToDiscovery.length + movedToExploring.length + leftAtClarify.length,
+    totalClarifyItemsSeen: movedToDiscovery.length + movedToExploring.length,
     movedToDiscovery,
     movedToExploring,
-    leftAtClarify,
   };
 }
 

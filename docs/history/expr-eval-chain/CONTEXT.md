@@ -36,7 +36,7 @@ assumptions instead of asked:
   precedent: no special-casing, native-semantics-or-throw. Same default
   here: `tokenize`/`evaluate` throw a descriptive `Error` on an
   unrecognized character or a token sequence that can't reduce to a single
-  number (e.g. trailing operator). Left to `fgos-planning` to size the
+  number (e.g. trailing operator). Left to `fgos-coding-planning` to size the
   actual exception shape.
 - **A2 — whitespace.** The example (`"3 + 4 * 2"`) uses spaces, but the
   item never requires them. Assumption: `tokenize` tolerates any amount of
@@ -71,5 +71,5 @@ assumptions instead of asked:
 ## Deferred to planning
 
 - Exact split points / whether this decomposes into 3 children matching
-  the 3 functions, or fewer — `fgos-planning`'s call, not locked here.
+  the 3 functions, or fewer — `fgos-coding-planning`'s call, not locked here.
 - Exact `Error` message/shape for A1.

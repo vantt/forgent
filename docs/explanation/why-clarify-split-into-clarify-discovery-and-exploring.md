@@ -96,7 +96,7 @@ the *main* path, with the CLI verb reduced to a pure "receive a verdict,
 write it" door. The reasoning: the one-door-write rule only requires
 every *write* to go through the CLI — it never required the verb itself
 to be the thing that *produces* the value being written. A live session
-(running `fgos-exploring`, `fgos-researching`, etc.) has already done
+(running `fgos-coding-exploring`, `fgos-researching`, etc.) has already done
 the real reasoning; the subprocess judge exists specifically for the
 case where nobody has, and that case shrank once research became a
 proper stage with its own skill.
@@ -124,7 +124,7 @@ LLM-fallback branch (the `runJudgeExecutor` call) entirely. The real
 cost, named explicitly rather than glossed over: the verb itself can no
 longer catch a certain class of error on its own (a structural false-
 negative in the mechanical regex check) — that responsibility shifts
-outward, to the calling skill and to `fgos-validating`'s own discipline.
+outward, to the calling skill and to `fgos-coding-validating`'s own discipline.
 
 ## Migration: 57 open `clarify` items sorted by real signal, not touched uniformly
 
@@ -174,7 +174,7 @@ its `skillMap` to point at real skill files — which is why this piece
 depended on P1 (`fgos-researching`) and P2 (`fgos-clarifying`) already
 existing, rather than adding stages ahead of the skills that back them.
 
-A real cross-check at `fgos-validating` bounded the footprint precisely
+A real cross-check at `fgos-coding-validating` bounded the footprint precisely
 rather than by guess: `getDomain`/`skillForStage` have 9 real consumer
 files (`store.mjs`, `frontier.mjs`, `stage-fsm.mjs`, `decompose.mjs`,
 `dispatch.mjs`, `loop.mjs`, `anti-loop.mjs`, `discovery.mjs`,
@@ -213,7 +213,7 @@ from the repo entirely**, confirmed by the item's own verify command
 asserting `! test -f src/intake/judge-executor.mjs`. Nothing was left
 half-removed for a future cleanup to find.
 
-**A real footprint-discovery gap surfaced during `fgos-validating`**:
+**A real footprint-discovery gap surfaced during `fgos-coding-validating`**:
 scouting with `rg` found 3 test files —
 `judge-verify-second-pass-stability.test.mjs`, `discovery.test.mjs`,
 `decompose.test.mjs` — importing `readScoutNotes`/
@@ -256,7 +256,7 @@ LLM-fallback branch (the actual `runJudgeExecutor` call) outright. The
 real, named cost: the verb itself can no longer catch a structural
 false-negative in that mechanical regex check on its own — that
 responsibility moves outward, to the calling skill and to
-`fgos-validating`'s own discipline, rather than staying inside the verb.
+`fgos-coding-validating`'s own discipline, rather than staying inside the verb.
 
 Full decision record (D1-D17), the 7-round shaping discussion, and the
 scout evidence behind each locked decision:
@@ -276,11 +276,11 @@ or `exploring`:
 > discovery/exploring = 0 và 0."
 > — real item description, `tsk-4b2`
 
-The concrete, lived consequence: `fgos-exploring` — the *only* skill that
+The concrete, lived consequence: `fgos-coding-exploring` — the *only* skill that
 writes `CONTEXT.md` — had never run once. Every item this doc's own
 "Implementation" sections describe (`tsk-2c1`, `tsk-28o`, `tsk-4eu`,
 `tsk-5ge`, and dozens of others cited across this repo's own
-`docs/history/`) reached `fgos-planning` with no `CONTEXT.md` to read,
+`docs/history/`) reached `fgos-coding-planning` with no `CONTEXT.md` to read,
 each writing its own ad hoc paragraph justifying the absence — exactly
 `tsk-36i`'s own experience, the item whose friction surfaced this gap.
 
@@ -311,11 +311,11 @@ through the same verdict contract, only the start/stop point differs).
 `fgos-coding-driving` (the interactive driver) and `fgos-runner`'s
 background sweep (the launcher) gained matching inline handling for
 `discovery`/`exploring`, applying the same clear/unclear verdict contract
-either way; `fgos-exploring` gained the real `exploring -> decompose`
+either way; `fgos-coding-exploring` gained the real `exploring -> decompose`
 forward edge it was missing; and `fgos-routing/SKILL.md`'s own
 first-read stage table — which every session reads before anything
 else — got two fixes: a plain factual bug (`clarify` was mapped to
-`fgos-exploring` in prose while the real registry returns
+`fgos-coding-exploring` in prose while the real registry returns
 `fgos-clarifying`), and real rows added for `discovery`/`exploring`,
 which stopped being theoretical once this item landed.
 

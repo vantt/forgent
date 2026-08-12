@@ -17,7 +17,7 @@
 // always reuses that `seq` for a DIFFERENT event, so a content mismatch at
 // that position is the direct structural signature of this failure class,
 // catching it even after the log has regrown past the old mark (proven
-// against a synthetic repro of the real incident during `fgos-validating`,
+// against a synthetic repro of the real incident during `fgos-coding-validating`,
 // see plan.md's feasibility matrix -- a seq-only mark would miss exactly
 // this case).
 //

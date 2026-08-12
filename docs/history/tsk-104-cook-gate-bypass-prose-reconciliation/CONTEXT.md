@@ -10,8 +10,8 @@ other items).
   - frontmatter `description` (:6-11): "Pauses for real human approval at
     every dev-skill gate ... never auto-approved."
   - Hard rules (:27-31): "Never auto-approve a gate."
-  Both contradict `.claude/skills/fgos-exploring`/`fgos-planning`/
-  `fgos-validating`'s own Gate sections (`:269-271,313-321` /
+  Both contradict `.claude/skills/fgos-coding-exploring`/`fgos-coding-planning`/
+  `fgos-coding-validating`'s own Gate sections (`:269-271,313-321` /
   `:282-284,313-314` / `:177,210-213`), which check `canAutoApprove`/
   `canAutoApproveValidate` first and skip the question when it returns
   true (`docs/history/gate-bypass/CONTEXT.md` D1-D6). Confirmed live this

@@ -9,7 +9,7 @@ lỗ hổng thật tìm được.
 
 ## 1. Bối cảnh — vì sao câu hỏi này nảy sinh
 
-Trong lúc thống nhất `/fgOS:discover`/`/fgOS:decompose`/`discover-next` đi
+Trong lúc thống nhất `/fgOS:discover`/`/fgOS:plan`/`discover-next` đi
 qua `fgos-coding-driving` thay vì gọi verb CLI trực tiếp (mù, `tsk-31l`),
 phát hiện `fgos-coding-driving` chỉ lái được trục `stage`
 (`clarify→decompose→executing`), còn chuỗi hậu-merge
@@ -50,7 +50,7 @@ Advisor được giao đọc trực tiếp `fgos-coding-driving/SKILL.md`,
 | # | Vấn đề | Bằng chứng |
 |---|---|---|
 | 1 | Ranh giới `awaiting-approval` không vượt qua được — dù đề xuất CÓ nhận diện đúng "stage đông cứng ở executing, status là tín hiệu thật", quyết định tiếp theo (bước qua `delivered`) chính là hành động merge code — 1 quyết định hệ thống đã cố ý dành riêng cho người, không phải chỗ nào trong logic 2-trục sửa được. Giữ nguyên chỗ dừng cứng ở đây (từ `tsk-19j-4`, vá đúng lỗ hổng "unlimited ceiling lần chạy thật đầu tiên") thì loop KHÔNG BAO GIỜ chạm được trục status — tức "thống nhất" chỉ là vẽ trên giấy, hành vi thật vẫn 2 pha tách biệt như hiện tại. | `SKILL.md:59-69` |
-| 2 | Không handler nào ở trục status tự đẩy được `status` bằng verb riêng của nó — `fgos-compounding` chỉ ghi tag `fgos compound`, còn `retrospective→cleanup` do CALLER gọi `fgos move` (`retro-next/SKILL.md:86`). Loop hợp nhất hoặc tự áp transition (phạm đúng luật gốc "never applies a transition directly" của chính nó), hoặc đọc lại thấy state không đổi → tự bắn no-progress mỗi lần. | `retro-next/SKILL.md:86`, `SKILL.md:42-46,87-96` |
+| 2 | Không handler nào ở trục status tự đẩy được `status` bằng verb riêng của nó — `fgos-coding-compounding` chỉ ghi tag `fgos compound`, còn `retrospective→cleanup` do CALLER gọi `fgos move` (`retro-next/SKILL.md:86`). Loop hợp nhất hoặc tự áp transition (phạm đúng luật gốc "never applies a transition directly" của chính nó), hoặc đọc lại thấy state không đổi → tự bắn no-progress mỗi lần. | `retro-next/SKILL.md:86`, `SKILL.md:42-46,87-96` |
 | 3 | `fgos retrospective` quét CẢ REPO (mọi item đang `delivered`), không phải 1 item — loop "lái 1 id" gọi lệnh này đụng chéo item khác, đá văng FIFO của `pickNextRetrospectiveItem`, và **đảo ngược D9** ("processed by a separate loop... never inline in return/approve") không có bằng chứng mới — vi phạm luật "không đảo quyết định đã verify nếu không có bằng chứng mới". | `bin/fgos.mjs:1019-1023`, `retro-pool.mjs:33-47`, CONTEXT.md D9 |
 | 4 | `cleanup` TTL không "chờ êm" — TTL chưa tới, `assessCleanupReadiness` KHÔNG no-op mà PARK item vào `cleanup→blocked` kèm lý do — loop coi đây là lỗi thật trên 1 item hoàn toàn khoẻ mạnh. | `cleanup-harness.mjs:97-111` |
 | 5 | Worktree/cwd vỡ ngang biên merge — việc code diễn ra trong worktree riêng của item; `approve` TỪ CHỐI chạy nếu đang đứng trong bất kỳ worktree nào; `cleanup` dùng thẳng `process.cwd()` làm `repoRoot`, có thể dọn dẹp đúng worktree loop đang đứng trong đó. 3 việc ở 3 vị trí vật lý khác nhau, không đi xuyên được trong 1 phiên. | `bin/fgos.mjs:2277-2308`, `cleanup-harness.mjs`/`bin/fgos.mjs:1051` |
@@ -112,7 +112,7 @@ lifecycle bị "quên" thiết kế — chỉ là không nằm chung 1 vòng l�
 | Hạng mục | Trạng thái hiện tại | Ghi chú |
 |---|---|---|
 | `tsk-1bl` — `classifyStalePostDelivery` (vá gap quan sát) | `todo`/`clarify` | ngưỡng đã khoá: `delivered` 3 ngày (từ sự kiện entry), `cleanup` = `ttlDays+3` ngày (grace sau TTL thật); ngưỡng `retrospective` để ngỏ |
-| `tsk-2xt` — herdr plugin tự detect + tự launch pane retro/cleanup (vá gap kích hoạt) | `todo`/`clarify` | chốt hướng herdr, KHÔNG mở rộng `fgos-runner --watch` (lý do: tránh tái tạo pattern "mù" `judgeDiscovery`/`judgeDecompose` cho `fgos-compounding`) |
+| `tsk-2xt` — herdr plugin tự detect + tự launch pane retro/cleanup (vá gap kích hoạt) | `todo`/`clarify` | chốt hướng herdr, KHÔNG mở rộng `fgos-runner --watch` (lý do: tránh tái tạo pattern "mù" `judgeDiscovery`/`judgeDecompose` cho `fgos-coding-compounding`) |
 | `docs/history/stage-status-driving-coordination/CONTEXT.md` | đã ghi | D1-D6, gắn `docsRef` vào cả `tsk-1bl` và `tsk-2xt` |
 | `tsk-31l` (nền tảng dẫn tới câu hỏi này — thống nhất dispatch discover/decompose qua routing) | `retrospective`/`executing` | đã delivered, đang tổng hợp tài liệu |
 
@@ -158,7 +158,7 @@ thiết kế) để phân biệt tinh, không phải chỉ đổi tên trục đ
 ### 8.2 — Tín hiệu thứ 3 ngoài stage/status: artifact existence
 
 `fgos-routing`'s own text (gap-plan report §1) mô tả điểm tách "shaping" (→
-`fgos-planning`) vs "proving" (→ `fgos-validating`) trong `decompose` bằng
+`fgos-coding-planning`) vs "proving" (→ `fgos-coding-validating`) trong `decompose` bằng
 "shape and children (if any) exist" — KHÔNG phải `stage`, KHÔNG phải
 `status`, mà là artifact/lineage tồn tại hay chưa (`plan.md` có chưa,
 children đã tạo chưa). Không có field registry nào cho tín hiệu này —

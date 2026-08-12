@@ -20,7 +20,7 @@ import {
   addOk,
   addOutcome,
   addWork,
-  advanceThroughDiscoveryToDecompose,
+  advanceThroughDiscoveryToPlanning,
   assert,
   coexistPath,
   commitFile,
@@ -444,17 +444,18 @@ test('add --domain coding is explicit and behaves identically to omitting --doma
 });
 
 // --- add-stage-default-gap D1/D2: add stamps an entry stage (--stage, and a
-// clarify default when omitted), same door submit has always had ---
+// domain-entry-stage default when omitted -- 'discovery' as of tsk-qod
+// D1/D2, 'clarify' before it), same door submit has always had ---
 
-test('add without --stage or --domain now defaults to stage "clarify" (was implicit "executing"), and is NOT frontier-ready, exit 0', () => {
+test('add without --stage or --domain now defaults to stage "discovery" (was implicit "executing"), and is NOT frontier-ready, exit 0', () => {
   const cwd = tmpCwd();
   // Raw run(), not addOk() -- addOk defaults its own --stage to 'executing'
   // for its many other callers' sake (see its own comment); this test is
   // specifically about the CLI's bare, flagless default.
   const result = run(cwd, ['add', 'default-stage-item', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
-  assert.equal(stateView(cwd).work['default-stage-item'].stage, 'clarify');
-  assert.deepEqual(envelopeData(run(cwd, ['ready']).stdout).map((w) => w.id), [], 'a stage-clarify item has no dependencies and no unfinished descendants, but is not stage-executing, so it must not appear in the frontier');
+  assert.equal(stateView(cwd).work['default-stage-item'].stage, 'discovery');
+  assert.deepEqual(envelopeData(run(cwd, ['ready']).stdout).map((w) => w.id), [], 'a stage-discovery item has no dependencies and no unfinished descendants, but is not stage-executing, so it must not appear in the frontier');
 });
 
 test('add --stage decompose explicitly persists that stage, exit 0', () => {
@@ -842,44 +843,44 @@ test('submit with no text at all is rejected as validation, exit 4, no event wri
   assert.equal(eventLines(cwd).length, 0);
 });
 
-test("submit tags the new item with stage:'clarify', visible via list", () => {
+test("submit tags the new item with stage:'discovery', visible via list", () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);
   assert.equal(result.status, 0);
   const id = JSON.parse(result.stdout).data.id;
-  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'clarify');
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'discovery');
 });
 
-test('add stamps stage "clarify" by default (D1/D2, add-stage-default-gap) — parity with submit, no longer the old implicit "executing"', () => {
+test('add stamps stage "discovery" by default (D1/D2, add-stage-default-gap; tsk-qod D1/D2: clarify retired, discovery is stages[0] now) — parity with submit, no longer the old implicit "executing"', () => {
   const cwd = tmpCwd();
   // Raw run(), not addOk() -- addOk defaults its own --stage to 'executing'
   // for its many other callers' sake (see its own comment); this test is
   // specifically about the CLI's bare, flagless default.
   run(cwd, ['add', 'plain-add', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--description', 'tsk-535 fixture description.']);
   const item = envelopeData(run(cwd, ['list']).stdout).work['plain-add'];
-  assert.equal(item.stage, 'clarify');
+  assert.equal(item.stage, 'discovery');
 });
 
 // --- base-workflow-model S2: --domain on `submit` (D1-D4, E3) ---
 
-test('submit without --domain is byte-identical to before: domain unset, stage "clarify" (coding\'s Clarify-mapped stage), exit 0', () => {
+test('submit without --domain is byte-identical to before: domain unset, stage "discovery" (coding\'s own entry stage, stages[0] — tsk-qod D1/D2: clarify retired), exit 0', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);
   assert.equal(result.status, 0);
   const id = JSON.parse(result.stdout).data.id;
   const item = envelopeData(run(cwd, ['list']).stdout).work[id];
   assert.equal(item.domain, undefined);
-  assert.equal(item.stage, 'clarify');
+  assert.equal(item.stage, 'discovery');
 });
 
-test('submit --domain coding is explicit and still resolves stage to "clarify", exit 0', () => {
+test('submit --domain coding is explicit and still resolves stage to "discovery", exit 0', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['submit', 'Investigate the sluggish overview page', '--domain', 'coding']);
   assert.equal(result.status, 0);
   const id = JSON.parse(result.stdout).data.id;
   const item = envelopeData(run(cwd, ['list']).stdout).work[id];
   assert.equal(item.domain, 'coding');
-  assert.equal(item.stage, 'clarify');
+  assert.equal(item.stage, 'discovery');
 });
 
 test('submit --domain synthetic persists work.domain and resolves stage to its own first stage ("assembling", no Clarify-mapped stage), exit 0', () => {
@@ -1079,7 +1080,7 @@ test('submit stays byte-identical after the submitWork extraction: a plain call 
   assert.equal(plainItem.status, 'todo');
   assert.equal(plainItem.mode, 'sync');
   assert.equal(plainItem.domain, undefined);
-  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[plainItem.id].stage, 'clarify');
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[plainItem.id].stage, 'discovery');
 
   const flagged = run(cwd, ['submit', 'Try the synthetic domain', '--async', '--domain', 'synthetic']);
   assert.equal(flagged.status, 0);

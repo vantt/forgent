@@ -1,7 +1,7 @@
 # CONTEXT: pre-commit hook's main-checkout-lock hold time
 
 Item: `tsk-1d9`. Written retroactively (same structural gap as `tsk-49u`'s
-own CONTEXT.md — `clarify` jumps straight to `decompose`, `fgos-exploring`
+own CONTEXT.md — `clarify` jumps straight to `decompose`, `fgos-coding-exploring`
 never runs).
 
 ## Decisions

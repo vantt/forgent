@@ -1,6 +1,6 @@
 ---
 type: how-to
-title: "tsk-27y — plan: caller-supplied verdict protocol for fgos discover/fgos decompose"
+title: "tsk-27y — plan: caller-supplied verdict protocol for fgos discover/fgos plan"
 ---
 
 # tsk-27y — plan
@@ -8,11 +8,11 @@ title: "tsk-27y — plan: caller-supplied verdict protocol for fgos discover/fgo
 ## Mode
 
 **standard**. Flags counted: **public contracts** (new CLI flags on `fgos
-discover`/`fgos decompose`, registered in `src/cli/command-registry.mjs` —
+discover`/`fgos plan`, registered in `src/cli/command-registry.mjs` —
 part of the CLI's introspectable contract other tooling/agents read) +
 **existing covered behavior** (`resolveDiscovery`/`resolveDecompose` and the
 `discover`/`decompose` CLI verbs are already covered by
-`test/intake/discovery.test.mjs`, `test/intake/decompose.test.mjs`,
+`test/intake/discovery.test.mjs`, `test/intake/plan.test.mjs`,
 `test/cli/fgos.test.mjs`, `test/cli/fgos-help.test.mjs`, `test/runner/
 loop.test.mjs`, `test/e2e/runner-loop.test.mjs` — new behavior must not
 regress any of it). 2 flags, no hard-gate flag (no auth/data-loss/audit-
@@ -34,16 +34,16 @@ verdict straight into the same downstream write path (`addDiscovery`/
 `moveStage`/`addWork`/`putInAwaiting` for decompose) — including
 decompose's mechanical safety gates (D3), which stay unconditional. New CLI
 flags on `bin/fgos.mjs`'s `discover`/`decompose` case blocks build that
-verdict object from argv and pass it through. `fgos-exploring`/
-`fgos-validating`'s own SKILL.md (and `.agents/` mirror) then call the new
+verdict object from argv and pass it through. `fgos-coding-exploring`/
+`fgos-coding-validating`'s own SKILL.md (and `.agents/` mirror) then call the new
 flags once their own gate approves, closing the loop the item's original
-description named (`.claude/skills/fgos-exploring/SKILL.md` /
-`.agents/skills/fgos-exploring/SKILL.md`, same pair for `fgos-validating` —
-corrected from the description's own guess of `fgos-planning`, see Piece 7
+description named (`.claude/skills/fgos-coding-exploring/SKILL.md` /
+`.agents/skills/fgos-coding-exploring/SKILL.md`, same pair for `fgos-coding-validating` —
+corrected from the description's own guess of `fgos-coding-planning`, see Piece 7
 below) — this resolves CONTEXT.md's one outstanding question: the original
 submitted description already commits to this as in-scope footprint, so
 it is a Piece of this plan, not a fresh product decision requiring a
-hand-back to `fgos-exploring`.
+hand-back to `fgos-coding-exploring`.
 
 **Alternatives rejected**:
 - Extending `readLockedContext`'s file-based heuristic further instead of
@@ -60,7 +60,7 @@ hand-back to `fgos-exploring`.
   already own the "should I even call the judge" decision (the
   `readLockedContext` skip lives there, not inside `judgeDiscovery`) — the
   caller-verdict skip belongs at the same level, by the same precedent.
-- A new CLI verb (`fgos discover-native`/`fgos decompose-native`) instead
+- A new CLI verb (`fgos discover-native`/`fgos plan-native`) instead
   of new flags on the existing verbs — rejected: DRY: same item, same
   stage-transition doors, same gates; a parallel verb would duplicate the
   stage-guard check (`bin/fgos.mjs:889`, `:912`) and the registry entry for
@@ -75,11 +75,11 @@ hand-back to `fgos-exploring`.
 | D2 precedence (verdict flag before `readLockedContext`) | low, but behavior-changing for a caller that passes both | new test: item has both a committed CONTEXT.md AND a `--verdict` flag — verdict flag wins, no model call, `readLockedContext` path not taken |
 | D1 full decompose scope — reusing `normalizeChild` for caller-supplied children | medium — `normalizeChild` (`decompose.mjs:177-201`) is unexported but same-file, no new export needed; must reject a child missing `verify` exactly like a model-produced one | new test: caller-supplied child missing `verify` → `{kind: 'invalid'}`, same as today's model-verdict path |
 | D3 gates on caller-supplied children | low — gates are pre-existing, unconditional call, no new logic | new test: caller-supplied `decompose` verdict with two children sharing a footprint path still parks in `need-human` via the existing footprint-overlap gate |
-| Skill wiring (`fgos-exploring`/`fgos-validating` SKILL.md + `.agents/` mirror — corrected from `fgos-planning`, see Piece 7 below) | low — prose-only edit, `diff` must confirm mirror pairs stay byte-identical (precedent: `docs/history/fgos-planning-context-gap-handback/plan.md`) | `diff .claude/skills/fgos-exploring/SKILL.md .agents/skills/fgos-exploring/SKILL.md` (and the `fgos-validating` pair) both empty |
+| Skill wiring (`fgos-coding-exploring`/`fgos-coding-validating` SKILL.md + `.agents/` mirror — corrected from `fgos-coding-planning`, see Piece 7 below) | low — prose-only edit, `diff` must confirm mirror pairs stay byte-identical (precedent: `docs/history/fgos-coding-planning-context-gap-handback/plan.md`) | `diff .claude/skills/fgos-coding-exploring/SKILL.md .agents/skills/fgos-coding-exploring/SKILL.md` (and the `fgos-coding-validating` pair) both empty |
 
 `impact-analysis: full` (GitNexus present, `CLAUDE.md`'s capability gate) —
 before editing `resolveDiscovery`/`resolveDecompose`/the `discover`/
-`decompose` CLI case blocks at `fgos-code-implement`, run real `impact()` calls
+`decompose` CLI case blocks at `fgos-coding-implement`, run real `impact()` calls
 on those symbols and report blast radius, per `CLAUDE.md`'s MUST rule; this
 plan does not fabricate a blast-radius number here since none of the risk
 items above depend on one (no `blastRadiusGate` threshold concern — this
@@ -92,7 +92,7 @@ ordering here is internal to this item only, not backlog-wide.
 
 **Files touched, in order**:
 
-1. `src/intake/decompose.mjs` — `resolveDecompose` gains the optional
+1. `src/intake/plan.mjs` — `resolveDecompose` gains the optional
    caller-verdict param; branch that skips `judgeDecompose` when present,
    reuses `normalizeChild` for supplied children, keeps D3's gates
    unconditional.
@@ -105,26 +105,26 @@ ordering here is internal to this item only, not backlog-wide.
    argument.
 4. `src/cli/command-registry.mjs` — register the new flags on both `discover`
    (`:130-149`) and `decompose` (`:150-169`) entries.
-5. `test/intake/decompose.test.mjs`, `test/intake/discovery.test.mjs` — new
+5. `test/intake/plan.test.mjs`, `test/intake/discovery.test.mjs` — new
    cases per the risk map above.
 6. `test/cli/fgos.test.mjs` — CLI-level flag parsing/malformed-JSON test.
-7. `.claude/skills/fgos-exploring/SKILL.md` + `.agents/skills/fgos-exploring/
-   SKILL.md`, `.claude/skills/fgos-validating/SKILL.md` + `.agents/skills/
-   fgos-validating/SKILL.md` — call the new flags once their own gate
+7. `.claude/skills/fgos-coding-exploring/SKILL.md` + `.agents/skills/fgos-coding-exploring/
+   SKILL.md`, `.claude/skills/fgos-coding-validating/SKILL.md` + `.agents/skills/
+   fgos-coding-validating/SKILL.md` — call the new flags once their own gate
    approves; mirror pairs edited identically, `diff` confirms.
 
    **Correction found during executing (tsk-27y, this item):** the file
-   list above originally named `fgos-planning/SKILL.md` as the second call
+   list above originally named `fgos-coding-planning/SKILL.md` as the second call
    site (per the item's own original description, written before the
    pipeline was traced start to finish). Tracing it live during this item's
    own `executing` stage — including this session hitting the exact bug
    this item fixes, when it forgot to fire `fgos discover` after
-   `fgos-exploring`'s gate and had to debug why the item was still stuck at
-   `clarify` — showed `fgos-planning` hands off to `fgos-validating` BEFORE
-   the `decompose`→`executing` edge fires (`fgos-validating/SKILL.md`'s own
-   existing hard rule: "Before this session ... calls `fgos decompose` ...").
-   `fgos-validating` is the actual last gate before that edge, so it is the
-   correct call site — `fgos-planning` never calls an engine verb at all
+   `fgos-coding-exploring`'s gate and had to debug why the item was still stuck at
+   `clarify` — showed `fgos-coding-planning` hands off to `fgos-coding-validating` BEFORE
+   the `decompose`→`executing` edge fires (`fgos-coding-validating/SKILL.md`'s own
+   existing hard rule: "Before this session ... calls `fgos plan` ...").
+   `fgos-coding-validating` is the actual last gate before that edge, so it is the
+   correct call site — `fgos-coding-planning` never calls an engine verb at all
    (its own hard rule: "Do not apply any stage move yourself"). This is a
    file-target fix, not a scope change: the intent CONTEXT.md/plan.md
    already locked (call the new flag once the decision is truly locked and

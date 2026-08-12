@@ -34,30 +34,31 @@ test('DOMAINS.triage (tsk-3xo regression fixture) maps Clarify/Divide/Execute un
   assert.equal(stageForStep(DOMAINS.triage, 'Execute'), 'assembling');
 });
 
-test('DOMAINS.coding.stages adds "discovery" and "exploring" between clarify and decompose (tsk-1w7 D10) — compound-learn stays retired (D11)', () => {
-  assert.deepEqual(DOMAINS.coding.stages, ['clarify', 'discovery', 'exploring', 'decompose', 'executing']);
+test('DOMAINS.coding.stages: "clarify" is retired entirely (tsk-qod D1/D2) — "discovery" is now stages[0], the domain\'s own entry point; "decompose" survives only as a legacy, drain-only alias (D18) ahead of "planning" (tsk-403 D11)', () => {
+  assert.deepEqual(DOMAINS.coding.stages, ['discovery', 'exploring', 'decompose', 'planning', 'executing']);
 });
 
-test('DOMAINS.coding.transitions keeps the three pre-existing edges byte-for-byte (discovery.mjs/decompose.mjs are untouched by tsk-1w7, still fire them) and adds the three new D10 edges, plus tsk-puz D12\'s direct clarify->exploring migration jump', () => {
+test('DOMAINS.coding.transitions: "clarify"-sourced edges survive ONLY as the two FSM-legality edges migrate-clarify-split.mjs needs for historical data (tsk-qod D1/D2) — no new item can ever reach them (clarify carries no stages/skillMap/stepMap entry anymore); the live chain a new item walks is discovery -> exploring -> planning -> executing, plus the legacy "decompose" drain edges (tsk-403 D18)', () => {
   assert.deepEqual(DOMAINS.coding.transitions, [
-    { from: 'clarify', to: 'executing' },
-    { from: 'clarify', to: 'decompose' },
-    { from: 'decompose', to: 'executing' },
     { from: 'clarify', to: 'discovery' },
-    { from: 'discovery', to: 'exploring' },
-    { from: 'exploring', to: 'decompose' },
     { from: 'clarify', to: 'exploring' },
+    { from: 'decompose', to: 'executing' },
+    { from: 'exploring', to: 'decompose' },
+    { from: 'discovery', to: 'exploring' },
+    { from: 'exploring', to: 'planning' },
+    { from: 'planning', to: 'executing' },
   ]);
 });
 
-test('DOMAINS.coding.stepMap maps every stage to a base-workflow step (vision §2 vocabulary) — compound-learn retired (D11); discovery/exploring carry NO step entry (tsk-1w7 D10, same "outside the 5-step vocabulary" treatment Init/Compound-learn already get)', () => {
+test('DOMAINS.coding.stepMap maps every LIVE stage to a base-workflow step (vision §2 vocabulary) — compound-learn retired (D11); discovery/exploring carry NO step entry (tsk-1w7 D10, same "outside the 5-step vocabulary" treatment Init/Compound-learn already get); legacy decompose joins that same no-entry set (tsk-403 D18), planning takes over its Divide mapping; clarify carries NO entry at all anymore (tsk-qod D1/D2 — it is no longer a stage, not merely drain-only)', () => {
   assert.deepEqual(DOMAINS.coding.stepMap, {
-    clarify: 'Clarify',
-    decompose: 'Divide',
+    planning: 'Divide',
     executing: 'Execute',
   });
+  assert.equal('clarify' in DOMAINS.coding.stepMap, false);
   assert.equal('discovery' in DOMAINS.coding.stepMap, false);
   assert.equal('exploring' in DOMAINS.coding.stepMap, false);
+  assert.equal('decompose' in DOMAINS.coding.stepMap, false);
 });
 
 test('DOMAINS is deeply frozen: the registry, each domain entry, and each nested array/object reject mutation', () => {
@@ -79,16 +80,20 @@ test('DOMAINS.coding.skillMap has an entry for every stage in DOMAINS.coding.sta
 });
 
 test('DOMAINS.coding.skillMap maps every stage, including executing, to its skill', () => {
-  // tsk-1w7 D10/D13: clarify now runs the NEW lightweight self-judging
-  // skill; the OLD deep Socratic-lock skill (still named fgos-exploring,
-  // unchanged file) moves to the NEW `exploring` stage instead.
-  assert.equal(DOMAINS.coding.skillMap.clarify, 'fgos-clarifying');
-  assert.equal(DOMAINS.coding.skillMap.discovery, 'fgos-researching');
-  assert.equal(DOMAINS.coding.skillMap.exploring, 'fgos-exploring');
-  assert.equal(DOMAINS.coding.skillMap.decompose, 'fgos-planning');
-  assert.equal(DOMAINS.coding.skillMap.executing, 'fgos-code-implement');
-  // fgos-compounding no longer has a stage entry (D11) — it triggers on
-  // status `retrospective` now, not a stage->skill lookup.
+  // tsk-qod D1/D2: `clarify` carries NO skillMap entry anymore — it moved
+  // to a pre-item-creation Init helper (`fgos-clarifying`, called directly
+  // by `/fgOS:submit`), never a stage-skill loaded through this map again.
+  assert.equal('clarify' in DOMAINS.coding.skillMap, false);
+  assert.equal(DOMAINS.coding.skillMap.discovery, 'fgos-coding-discovering');
+  assert.equal(DOMAINS.coding.skillMap.exploring, 'fgos-coding-exploring');
+  // legacy `decompose` alias and the renamed `planning` stage both resolve
+  // to the SAME renamed skill (tsk-403 D18) — the alias must not point at
+  // a now-deleted directory name.
+  assert.equal(DOMAINS.coding.skillMap.decompose, 'fgos-coding-planning');
+  assert.equal(DOMAINS.coding.skillMap.planning, 'fgos-coding-planning');
+  assert.equal(DOMAINS.coding.skillMap.executing, 'fgos-coding-implement');
+  // fgos-coding-compounding no longer has a stage entry (D11) — it
+  // triggers on status `retrospective` now, not a stage->skill lookup.
   assert.equal('compound-learn' in DOMAINS.coding.skillMap, false);
 });
 
@@ -102,17 +107,17 @@ test('DOMAINS.synthetic.skillMap.assembling is null (synthetic has never loaded 
 // use, resolving which skill fgOS's retrospective loop (/fgOS:retro-next)
 // should run for a domain's status:retrospective items. ---
 
-test("DOMAINS.coding.skillMap.retrospective is 'fgos-compounding' (0027 D5 — zero regression, coding's synthesis skill does not change)", () => {
-  assert.equal(DOMAINS.coding.skillMap.retrospective, 'fgos-compounding');
+test("DOMAINS.coding.skillMap.retrospective is 'fgos-coding-compounding' (0027 D5 — zero regression, coding's synthesis skill does not change; renamed from fgos-compounding, tsk-403 D15)", () => {
+  assert.equal(DOMAINS.coding.skillMap.retrospective, 'fgos-coding-compounding');
 });
 
-test('skillForStage(DOMAINS.coding, "retrospective") resolves fgos-compounding — skillForStage is a generic skillMap[key] lookup, not scoped to `stage` names by implementation, only by its usual callers', () => {
+test('skillForStage(DOMAINS.coding, "retrospective") resolves fgos-coding-compounding — skillForStage is a generic skillMap[key] lookup, not scoped to `stage` names by implementation, only by its usual callers', () => {
   // skillForStage's body (`(domain.skillMap && domain.skillMap[stage]) ??
   // null`) never inspects whether `stage` is actually one of
   // DOMAINS.coding.stages — it is safe and correct to reuse it here for
   // the status key `retrospective` exactly as /fgOS:retro-next's own
   // SKILL.md now does, rather than writing a second, redundant accessor.
-  assert.equal(skillForStage(DOMAINS.coding, 'retrospective'), 'fgos-compounding');
+  assert.equal(skillForStage(DOMAINS.coding, 'retrospective'), 'fgos-coding-compounding');
 });
 
 test('skillForStage falls back to null for "retrospective" on a domain that declares no skillMap.retrospective entry (synthetic, triage) — the caller-side ?? \'fgos-compounding\' fallback documented in retro-next/SKILL.md step 4 covers this case', () => {
@@ -157,17 +162,20 @@ test('parkReasonForStatus never throws on a null/undefined domain', () => {
 });
 
 test('skillForStage resolves each of coding\'s mapped stages to its skill name', () => {
-  assert.equal(skillForStage(DOMAINS.coding, 'clarify'), 'fgos-clarifying');
-  assert.equal(skillForStage(DOMAINS.coding, 'discovery'), 'fgos-researching');
-  assert.equal(skillForStage(DOMAINS.coding, 'exploring'), 'fgos-exploring');
-  assert.equal(skillForStage(DOMAINS.coding, 'decompose'), 'fgos-planning');
+  // tsk-qod D1/D2: 'clarify' is no longer in skillMap at all -- resolves
+  // to null like any other absent stage, same as 'compound-learn' below.
+  assert.equal(skillForStage(DOMAINS.coding, 'clarify'), null);
+  assert.equal(skillForStage(DOMAINS.coding, 'discovery'), 'fgos-coding-discovering');
+  assert.equal(skillForStage(DOMAINS.coding, 'exploring'), 'fgos-coding-exploring');
+  assert.equal(skillForStage(DOMAINS.coding, 'decompose'), 'fgos-coding-planning');
+  assert.equal(skillForStage(DOMAINS.coding, 'planning'), 'fgos-coding-planning');
   // compound-learn is retired (D11) — no longer a stage, resolves to null
   // like any other stage absent from skillMap.
   assert.equal(skillForStage(DOMAINS.coding, 'compound-learn'), null);
 });
 
-test('skillForStage(DOMAINS.coding, "executing") resolves to fgos-code-implement', () => {
-  assert.equal(skillForStage(DOMAINS.coding, 'executing'), 'fgos-code-implement');
+test('skillForStage(DOMAINS.coding, "executing") resolves to fgos-coding-implement', () => {
+  assert.equal(skillForStage(DOMAINS.coding, 'executing'), 'fgos-coding-implement');
 });
 
 test('skillForStage never throws for a stage absent from a domain\'s skillMap, returning null', () => {
@@ -200,20 +208,19 @@ test('DOMAINS.synthetic is deeply frozen: the entry and its nested array/object 
 });
 
 test('adding "synthetic" leaves DOMAINS.coding unchanged', () => {
-  assert.deepEqual(DOMAINS.coding.stages, ['clarify', 'discovery', 'exploring', 'decompose', 'executing']);
+  assert.deepEqual(DOMAINS.coding.stages, ['discovery', 'exploring', 'decompose', 'planning', 'executing']);
   assert.deepEqual(DOMAINS.coding.stepMap, {
-    clarify: 'Clarify',
-    decompose: 'Divide',
+    planning: 'Divide',
     executing: 'Execute',
   });
   assert.deepEqual(DOMAINS.coding.transitions, [
-    { from: 'clarify', to: 'executing' },
-    { from: 'clarify', to: 'decompose' },
-    { from: 'decompose', to: 'executing' },
     { from: 'clarify', to: 'discovery' },
-    { from: 'discovery', to: 'exploring' },
-    { from: 'exploring', to: 'decompose' },
     { from: 'clarify', to: 'exploring' },
+    { from: 'decompose', to: 'executing' },
+    { from: 'exploring', to: 'decompose' },
+    { from: 'discovery', to: 'exploring' },
+    { from: 'exploring', to: 'planning' },
+    { from: 'planning', to: 'executing' },
   ]);
 });
 
@@ -279,17 +286,19 @@ test('getDomain resolves straight to the registry entry, folding an unrecognized
 
 // --- stageForStep ---
 
-test('stageForStep resolves each of coding\'s three steps to its stage name', () => {
-  assert.equal(stageForStep(DOMAINS.coding, 'Clarify'), 'clarify');
-  assert.equal(stageForStep(DOMAINS.coding, 'Divide'), 'decompose');
+test('stageForStep resolves coding\'s two remaining live steps to their stage names', () => {
+  assert.equal(stageForStep(DOMAINS.coding, 'Divide'), 'planning');
   assert.equal(stageForStep(DOMAINS.coding, 'Execute'), 'executing');
 });
 
-test('stageForStep returns undefined for a step the domain never declares (Init and Compound-learn stay outside the stage dimension)', () => {
+test('stageForStep returns undefined for a step the domain never declares (Init and Compound-learn stay outside the stage dimension); Clarify too now that coding retired it as a stage entirely (tsk-qod D1/D2)', () => {
   assert.equal(stageForStep(DOMAINS.coding, 'Init'), undefined);
   // Compound-learn is retired as a stage (D11) — the synthesis it used to
   // gate is now the status `retrospective` instead.
   assert.equal(stageForStep(DOMAINS.coding, 'Compound-learn'), undefined);
+  // tsk-qod D1/D2: Clarify carries no stepMap entry anymore either -- it
+  // moved to a pre-item-creation Init helper, never a stage-skill again.
+  assert.equal(stageForStep(DOMAINS.coding, 'Clarify'), undefined);
 });
 
 // --- effectiveStage (tsk-4zj D1/D4) ---

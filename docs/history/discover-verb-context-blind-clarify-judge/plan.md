@@ -47,7 +47,7 @@ degrade to `''`, never throw), violates DRY for zero behavioral gain.
    - `moveStage(dir, { id, to: 'decompose', expectedStage: 'clarify', verify: FALLBACK_VERIFY, role })`
      — same fallback `judgeDiscovery`'s own clear-but-no-verify path
      already uses (discovery.mjs:262); a real `verify` is
-     `fgos-planning`'s job at the next stage regardless of which path
+     `fgos-coding-planning`'s job at the next stage regardless of which path
      produced the transition, so no new verify source is needed.
    - Return `{ outcome: 'clear', id, verdict: { clear: true, skipped: true } }`
      — the `skipped: true` field is additive, existing callers reading
@@ -67,7 +67,7 @@ degrade to `''`, never throw), violates DRY for zero behavioral gain.
 | `judgeDiscovery`'s blind path (untouched) | none — this plan does not touch it | n/a, regression-covered by existing `test/intake/discovery.test.mjs` cases |
 
 **Files touched:**
-- `src/intake/decompose.mjs` — export `readLockedContext` (currently
+- `src/intake/plan.mjs` — export `readLockedContext` (currently
   module-private).
 - `src/intake/discovery.mjs` — import `readLockedContext`, add the
   skip-and-advance branch in `resolveDiscovery`, add `path`/`addDecision`
@@ -129,8 +129,8 @@ wrong invocation — the real test file is `test/intake/discovery.test.mjs`,
 and `npm test <path>` does not scope the suite: the `test` script hardcodes
 `node --test 'test/**/*.test.mjs'`, so npm appends the path as an
 *additional* target rather than filtering to it — confirmed by actually
-running it during `fgos-validating` (ran the full 1919-test, 111.8s suite
+running it during `fgos-coding-validating` (ran the full 1919-test, 111.8s suite
 instead of the intended file). `node --test <path>` directly is the real
 scoped command — confirmed: 36 tests, ~1s, all passing today as the
-pre-change baseline. `fgos-code-implement` should use the corrected command
+pre-change baseline. `fgos-coding-implement` should use the corrected command
 above.)

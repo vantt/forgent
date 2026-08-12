@@ -14,7 +14,7 @@ run against the real changed-file set from `changedFiles` (`src/runner/merge.mjs
 ## Failing-test-first proof
 
 Test: `test/state/workflow-stage-graphs.test.mjs`, the case
-`skillForStage(DOMAINS.coding, "executing") resolves to fgos-code-implement`.
+`skillForStage(DOMAINS.coding, "executing") resolves to fgos-coding-implement`.
 
 **Before** (`src/state/workflow-stage-graphs.mjs`'s `skillMap.executing`
 temporarily reverted to the old literal `'fgos-executing'`, test file left
@@ -25,22 +25,22 @@ node --test test/state/workflow-stage-graphs.test.mjs
 ```
 
 ```
-✖ skillForStage(DOMAINS.coding, "executing") resolves to fgos-code-implement (0.153035ms)
+✖ skillForStage(DOMAINS.coding, "executing") resolves to fgos-coding-implement (0.153035ms)
   AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
   + actual - expected
 
   + 'fgos-executing'
-  - 'fgos-code-implement'
+  - 'fgos-coding-implement'
       at TestContext.<anonymous> (file:///home/vantt/projects/forgentX/.claude/worktrees/tsk-f38-tAOj2Y/test/state/workflow-stage-graphs.test.mjs:107:10)
     generatedMessage: true,
     code: 'ERR_ASSERTION',
     actual: 'fgos-executing',
-    expected: 'fgos-code-implement',
+    expected: 'fgos-coding-implement',
     operator: 'strictEqual',
     diff: 'simple'
 ```
 
-**After** (`skillMap.executing` restored to `'fgos-code-implement'`):
+**After** (`skillMap.executing` restored to `'fgos-coding-implement'`):
 
 ```
 node --test test/state/workflow-stage-graphs.test.mjs

@@ -5,7 +5,7 @@ dispatch). Depends on `tsk-62v` (the capacity mechanism itself, done,
 `docs/history/agent-executor-capacity-dispatch/CONTEXT.md`). Related sibling
 proof: `tsk-5l2` (domain 2, `fgos-submit-assist`'s classify step) — this item
 is the highest-frequency headless consumer (`judge-executor.mjs`, called by
-`fgos discover`/`fgos decompose` on every clarify/decompose pass), not yet
+`fgos discover`/`fgos plan` on every clarify/decompose pass), not yet
 wired.
 
 ## Feature boundary

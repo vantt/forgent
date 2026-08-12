@@ -51,7 +51,7 @@ that consumes it.
 
 | Component | Risk | Proof point |
 |---|---|---|
-| 16 `SKILL.md` path lines | Low — prose instructions, not executed code; a typo is caught by the verify grep below, not a runtime crash | `fgos-validating`: grep confirms zero remaining `repo/bin/fgos.mjs` occurrences in the 16 files |
+| 16 `SKILL.md` path lines | Low — prose instructions, not executed code; a typo is caught by the verify grep below, not a runtime crash | `fgos-coding-validating`: grep confirms zero remaining `repo/bin/fgos.mjs` occurrences in the 16 files |
 | 2 spec doc lines (`fgos-plugin.md:167-168`, `distribution.md`) | Low — documentation only | Same grep, scoped to the 2 files |
 | Standalone default behavior | Medium — this is the behavior every unset-env-var session hits today, so a wrong default breaks every plugin verb call again | Manual check: run one wrapped verb (`node ${CLAUDE_PROJECT_DIR}/bin/fgos.mjs list --json`, no `FGOS_NESTED_PREFIX` set) from this repo's own root and confirm it succeeds |
 

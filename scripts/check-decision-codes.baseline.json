@@ -239,9 +239,9 @@
   "test/setup/self-uninstall-spike.test.mjs": [
     "test('SPIKE: fgos uninstall --yes --remove-package removes a real npm -g installed package on this platform', { skip: isWin && 'spike is scoped to Linux/macOS only (D1) — Windows self-deletion is a separate, still-unresolved risk' }, () => {"
   ],
-  "test/skills/fgos-compounding-doc-write-path.test.mjs": [
-    "test('fgos-compounding writes the document before it stores the tag (D1/D3 order)', () => {",
-    "test('fgos-compounding\\'s tag-storing step names the D3 refusal it now depends on', () => {",
+  "test/skills/fgos-coding-compounding-doc-write-path.test.mjs": [
+    "test('fgos-coding-compounding writes the document before it stores the tag (D1/D3 order)', () => {",
+    "test('fgos-coding-compounding\\'s tag-storing step names the D3 refusal it now depends on', () => {",
     "test('the regrown document is sourced from tsk-5z2\\'s own decision record and the shipped lock-status behaviour, not fabricated', () => {"
   ],
   "test/state/awaiting.test.mjs": [

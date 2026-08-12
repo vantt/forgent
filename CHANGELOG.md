@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The `decompose` stage/verb/launcher family is renamed to `plan`: the CLI
+  verb `fgos decompose` is now `fgos plan`, the slash command
+  `/fgOS:decompose` is now `/fgOS:plan`, and the stage a coding-domain item
+  sits at while being shaped is now called `planning`. The verdict values
+  (`pass-through` / `need-human` / `decompose`) are unchanged — they name
+  an outcome, not a stage. `decompose` itself survives as a legacy,
+  drain-only stage alias so items already parked there before this change
+  keep advancing through their existing edges; no new item can land on it.
+  Five stage skills gain a `coding-` prefix to match the domain-prefix
+  convention every other stage skill already follows:
+  `fgos-exploring`→`fgos-coding-exploring`, `fgos-planning`→
+  `fgos-coding-planning`, `fgos-validating`→`fgos-coding-validating`,
+  `fgos-compounding`→`fgos-coding-compounding`, `fgos-code-implement`→
+  `fgos-coding-implement`.
 - `/fgOS:retro-next` is now a launcher in the strict sense: it sweeps,
   picks one item, and hands it to `fgos-coding-driving` with an explicit
   `ceiling: status:cleanup`, relaying whatever the driver reports. It no

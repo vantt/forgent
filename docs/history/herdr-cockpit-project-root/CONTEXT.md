@@ -76,7 +76,7 @@ Ngoài phạm vi (đã nêu ra và defer, không hấp thụ vào item này):
   - `herdr plugin config-dir <plugin_id>`
   - `herdr workspace list`
 
-## Đính chính bằng chứng (probe live 2026-07-30, trong `fgos-validating` của tsk-45u)
+## Đính chính bằng chứng (probe live 2026-07-30, trong `fgos-coding-validating` của tsk-45u)
 
 - D6 viết "cwd của mọi herdr workspace khác qua `herdr workspace list`" — **sai**.
   `herdr workspace list` và `herdr workspace get <id>` **không** trả field `cwd`

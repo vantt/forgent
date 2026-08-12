@@ -67,7 +67,7 @@ radius blocking reuse by any other dispatch call site.
    its callers before treating the extraction as done:
 
    ```
-   node --test test/intake/judge-executor.test.mjs test/intake/discovery.test.mjs test/intake/decompose.test.mjs
+   node --test test/intake/judge-executor.test.mjs test/intake/discovery.test.mjs test/intake/plan.test.mjs
    ```
 
    112/112 passed here with no test edits, confirming the extraction really

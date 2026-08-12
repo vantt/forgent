@@ -265,7 +265,7 @@ test("e2e synthetic domain: the real 'fgos cleanup' verb closes a synthetic item
   assert.equal(stateView(repoRoot).work['synth-cleanup-item'].status, 'done');
 });
 
-test('e2e synthetic domain: submit --domain synthetic is deliberately NOT the entry door for this domain — this proof exercises add, not submit; a plain submit (no --domain) is completely unaffected, still landing in stage clarify, domain coding', () => {
+test('e2e synthetic domain: submit --domain synthetic is deliberately NOT the entry door for this domain — this proof exercises add, not submit; a plain submit (no --domain) is completely unaffected, still landing in stage discovery, domain coding', () => {
   const repoRoot = initTempRepo();
   assert.equal(fgos(repoRoot, ['init']).status, 0);
 
@@ -277,12 +277,12 @@ test('e2e synthetic domain: submit --domain synthetic is deliberately NOT the en
   // plain `submit` (no --domain at all) stays byte-for-byte unchanged by
   // this feature's existence.
   const submitted = submit(repoRoot, 'Investigate the sluggish overview page');
-  assert.equal(submitted.stage, 'clarify', 'a plain submit still lands in stage clarify, unaffected by the synthetic domain');
+  assert.equal(submitted.stage, 'discovery', 'a plain submit still lands in stage discovery, unaffected by the synthetic domain');
   assert.equal(submitted.domain, undefined, 'a plain submit carries no explicit domain field — it lazily defaults to coding');
 
   const view = stateView(repoRoot);
   const item = view.work[submitted.id];
-  assert.equal(item.stage, 'clarify');
+  assert.equal(item.stage, 'discovery');
   assert.equal(item.domain, undefined);
 });
 

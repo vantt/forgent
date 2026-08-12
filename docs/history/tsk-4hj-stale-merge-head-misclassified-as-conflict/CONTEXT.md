@@ -86,7 +86,7 @@ already names "refuse rõ ràng" as the desired behavior, and `tsk-18a`
 (same file, same classification boundary, already delivered) already
 established "new distinct outcome + catchup-retryable" as this codebase's
 answer to "a merge call didn't run/complete for a reason unrelated to
-content" — pinned rather than asked per `fgos-exploring`'s own
+content" — pinned rather than asked per `fgos-coding-exploring`'s own
 material/grounded/answerable bar: grounded in direct precedent, and an
 internal-auto-retry alternative would contradict that established
 recovery mechanism (`fgos catchup` exists specifically for this
@@ -103,7 +103,7 @@ non-negotiable, not an assumption: it is the literal safety gap the item's
 own description names.
 
 ### D4 — `sync-root`'s call site (`bin/fgos.mjs:3305-3357`) gets a defensive unrecognized-outcome guard, not a named `merge-blocked-other-item` branch
-Found during `fgos-validating`'s reality gate (not anticipated when D1-D3
+Found during `fgos-coding-validating`'s reality gate (not anticipated when D1-D3
 were locked): `mergeRunnerItem` is shared by THREE call sites, not two —
 the two `approve` paths (`~2999`, `~3114`) already handled by D2, and
 `fgos sync-root`'s own `runAndReport` (`~3305-3357`), which has no branch
@@ -175,7 +175,7 @@ Additional this round:
   confirms `mergeHeadExists`'s own origin and existing guard shape, reused
   unchanged by D1.
 - `bin/fgos.mjs:3305-3357` (`sync-root`'s `runAndReport`) — read in full
-  during `fgos-validating`'s reality gate: confirms `conflict`,
+  during `fgos-coding-validating`'s reality gate: confirms `conflict`,
   `fgos-write-rejected`, `verify-fail` are the only three named outcome
   branches; any other outcome (including today's `merge-failed-unclassified`
   and this item's new `merge-blocked-other-item`) falls through unguarded

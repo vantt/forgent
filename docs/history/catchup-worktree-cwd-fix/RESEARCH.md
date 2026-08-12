@@ -4,7 +4,7 @@
 
 **Asked:** Is tsk-5vl's reported bug ("fgos catchup fails to force-update
 the item's branch when checked out in a linked worktree") grounded in real
-repo evidence, and is `fgos-code-implement/SKILL.md`'s blocked-recovery
+repo evidence, and is `fgos-coding-implement/SKILL.md`'s blocked-recovery
 hard rule actually incomplete as described?
 
 **Checked — repo:**
@@ -43,7 +43,7 @@ hard rule actually incomplete as described?
   `doing`" (never passes through `doing`) — corroborates that `return`
   (which requires `status: doing`) cannot be the recovery verb for a
   `blocked` item; `catchup` is the only edge that applies.
-- `.claude/skills/fgos-code-implement/SKILL.md:174-189` (Return step, hard
+- `.claude/skills/fgos-coding-implement/SKILL.md:174-189` (Return step, hard
   rule): current text reads "If `return` reports `blocked`, treat that
   exactly like a failed verify: diagnose, fix, and return again" — this
   is the literal text tsk-5vl says is incomplete. Confirmed: `return`
@@ -69,7 +69,7 @@ or concept involved.
    but OUTSIDE tsk-5vl's own reported scope (which names `catchup`
    specifically); worth flagging to planning as a possible sibling gap,
    not something to silently fold in.
-3. `fgos-code-implement/SKILL.md`'s Return-step hard rule is confirmed
+3. `fgos-coding-implement/SKILL.md`'s Return-step hard rule is confirmed
    incomplete exactly as tsk-5vl states: it never mentions `catchup` as
    the correct recovery verb for a `blocked` item, and its "return again"
    instruction cannot succeed on a `blocked` item at all (`return`
@@ -81,16 +81,16 @@ or concept involved.
    (title-matched only, not opened in full this round — left for planning
    to confirm before deciding whether to extend one or add a new doc).
 
-**Still open (for `fgos-planning`, not this skill's call):** whether the
+**Still open (for `fgos-coding-planning`, not this skill's call):** whether the
 fix is (a) `repoRoot = path.dirname(dir)` in `catchup` alone, (b) the same
 pattern also applied to `sync-root`/`approve` in one pass, and exactly
-which doc(s) (`--help` text, `fgos-code-implement/SKILL.md`,
+which doc(s) (`--help` text, `fgos-coding-implement/SKILL.md`,
 `fgos-coding-driving/SKILL.md`, a `docs/how-to/*` page) get the
 catchup-recovery-verb and worktree-precondition callouts.
 
 **Verdict:** `clear: true`. Goal, root cause, and both documentation gaps
 are all confirmed against real repo evidence; nothing about the item's own
-intent is in question. Sizing/exact fix shape is `fgos-planning`'s job,
+intent is in question. Sizing/exact fix shape is `fgos-coding-planning`'s job,
 not blocked on any further research.
 
 ## Round 2 — 2026-08-11 (tsk-4uj, discovery stage)
@@ -190,7 +190,7 @@ research can settle further.
 
 **Verdict:** `clear: true`. The trade-off, its real incident grounding,
 and its actual (non-)interaction with existing test coverage are all now
-evidenced. Ready for `fgos-exploring`'s Socratic pass with the product
+evidenced. Ready for `fgos-coding-exploring`'s Socratic pass with the product
 owner — no further research needed first.
 
 ## Round 3 — 2026-08-11 (tsk-2bg, discovery stage)
@@ -198,7 +198,7 @@ owner — no further research needed first.
 **Asked:** tsk-2bg's own goal — does `promote-to-component`'s
 `process.cwd()` + `isMainWorktree` guard (mirroring `sync-root`) plus its
 downstream `retargetMember` guard need any further research before
-`fgos-exploring`'s Socratic pass can lock the two open framing questions
+`fgos-coding-exploring`'s Socratic pass can lock the two open framing questions
 (same-posture-as-sync-root? single- vs. dual-layer fix?), or is everything
 material already grounded in repo evidence?
 
@@ -226,7 +226,7 @@ material already grounded in repo evidence?
   repoRoot"`, 54 hits, all plain temp-dir `repoRoot` fixtures): confirms
   `retargetMember`'s own `isMainWorktree` refusal branch (line 54-58) has
   **no dedicated test today** — unlike `sync-root`/`approve`, which have
-  named P44-guard tests (Round 2). Worth flagging to `fgos-planning`: this
+  named P44-guard tests (Round 2). Worth flagging to `fgos-coding-planning`: this
   item's test scope should add that missing coverage regardless of which
   layer the actual code fix touches.
 - GitNexus's own `impact`/graph query on `retargetMember` again returned an
@@ -244,16 +244,16 @@ Rounds 1-2.
 
 **Findings:**
 
-1. Every claim `fgos-exploring`'s own scout (and the D5/D6 decisions it
+1. Every claim `fgos-coding-exploring`'s own scout (and the D5/D6 decisions it
    locked) relies on is now independently re-confirmed by direct repo
    evidence in this round, not carried over on assertion alone.
 2. `retargetMember`'s worktree-refusal branch has zero existing test
-   coverage — a concrete gap for `fgos-planning` to size into this item's
+   coverage — a concrete gap for `fgos-coding-planning` to size into this item's
    verify scope, independent of the D5/D6 framing decisions themselves.
 
 **Still open:** none for this discovery pass. Whether the actual code
 change matches D6's "CLI-layer only" framing, and the exact `--trust-dir`
-mechanics (name, no-op-vs-error shape), stay `fgos-planning`'s call once
+mechanics (name, no-op-vs-error shape), stay `fgos-coding-planning`'s call once
 tsk-4uj's own real mechanism has landed (see CONTEXT.md's tsk-2bg
 assumption note).
 
@@ -261,7 +261,7 @@ assumption note).
 cause, or guard structure is in question — ready to proceed past
 `discovery`.
 
-**Correction (`fgos-code-implement`, 260811):** Finding 2 above ("zero
+**Correction (`fgos-coding-implement`, 260811):** Finding 2 above ("zero
 existing test coverage" for both guard layers) was only half right.
 `test/runner/promote-engine.test.mjs`'s `'retargetMember refuses to run
 from a linked worktree, mirroring sync-root's own discipline'` test

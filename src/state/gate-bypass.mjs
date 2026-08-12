@@ -1,5 +1,5 @@
 // gate-bypass.mjs — decides whether a skill-embedded confirmation gate
-// (fgos-exploring's "Approve CONTEXT.md?", fgos-planning's "Approve work
+// (fgos-coding-exploring's "Approve CONTEXT.md?", fgos-coding-planning's "Approve work
 // shape?") can be auto-approved instead of asked (docs/history/gate-bypass/
 // CONTEXT.md D1-D5). Never touches the `awaiting-human` park (D1) — that
 // stays a separate, untouched mechanism.
@@ -29,8 +29,8 @@ const CONFIG_FILE_NAME = 'gate-bypass.json';
 /**
  * Read the configured bypass level. `dir` is the `.fgos` directory (every
  * existing caller already resolves this before calling — bin/fgos.mjs's
- * `gate-bypass` verb, both skill-embedded gate checks in fgos-exploring/
- * fgos-planning).
+ * `gate-bypass` verb, both skill-embedded gate checks in fgos-coding-exploring/
+ * fgos-coding-planning).
  *
  * Tries the shared config file first (`config.gateBypass.level`,
  * docs/history/doctor-fix-gate-bypass/CONTEXT.md D1/D3 — gate-bypass's real
@@ -138,11 +138,11 @@ export function canAutoApprove(item, artifactText, level) {
 }
 
 /**
- * D6's bypass axis for `fgos-validating`'s `validateApprove` gate
+ * D6's bypass axis for `fgos-coding-validating`'s `validateApprove` gate
  * (`docs/history/gate-bypass/CONTEXT.md` D6). Reuses `canAutoApprove`'s
  * first two checks verbatim (D4's hard-gate floor, D5's tier-coverage
  * axis) and swaps the third axis: instead of `hasOpenItems` scanning an
- * artifact's text, this reads `fgos-validating`'s own already-computed
+ * artifact's text, this reads `fgos-coding-validating`'s own already-computed
  * reality-gate verdict directly. `verdict` is self-reported by the skill
  * that just computed it, per D6 — a `READY WITH CONSTRAINTS`/`NOT READY`
  * verdict is treated the same as "has open items": never skippable.

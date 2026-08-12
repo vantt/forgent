@@ -37,7 +37,7 @@ material real," not "how should it be used."
 Run against the live log (10119 events, 2026-08-09): 1701 decision
 events, 1569 carrying a rationale. After removing the boilerplate
 patterns (`tsk-27y D2: caller-supplied verdict...` x321, empty x132,
-the `fgos-planning` mirror of the same string x96, `see CONTEXT.md for
+the `fgos-coding-planning` mirror of the same string x96, `see CONTEXT.md for
 full scout evidence and reasoning` x82/x38) and the 132 missing-rationale
 entries, 778 singleton rationales remained. Vista (a) surfaced 314 ask
 events across roughly 230 items.

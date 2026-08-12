@@ -16,7 +16,7 @@ Flags checked against the item:
 | external systems | no | — |
 | public contracts | no | `.fgos/gate-bypass.json` is internal state, not a published contract |
 | cross-platform | no | — |
-| existing covered behavior | **yes** | rewrites the Gate step already shipped in `fgos-exploring` and `fgos-planning` (this file's own skill) |
+| existing covered behavior | **yes** | rewrites the Gate step already shipped in `fgos-coding-exploring` and `fgos-coding-planning` (this file's own skill) |
 | weak proof around the area | **yes** | skill-prose Gate behavior has exactly one existing test today (`test/skills/fgos-mirror.test.mjs`), and it only checks byte-identity between `.claude/skills/fgos/` and `.agents/skills/fgos/` — it asserts nothing about the Gate logic itself |
 | multi-domain | no | single `coding` domain |
 
@@ -47,11 +47,11 @@ not the graph's.
 | tier-coverage check (`level` × item `tier` → covered?) | low | unit test: table-driven over all `(level, tier)` pairs against `TIERS` ordering |
 | "zero open items" completeness scan | **medium** | unit test against a fixture `CONTEXT.md`/`plan.md` with deferred questions/assumption markers present vs. absent — false-negative here (calling an incomplete artifact "clear") is exactly the failure D2 exists to prevent |
 | hard-gate floor check reuse (D4) | **medium** | unit test: an item carrying a `src/intake/risk-keywords.mjs` hard-gate hit is never skippable even at `level: heavy` — this is the floor the whole feature's safety story rests on, needs its own explicit proof, not incidental coverage |
-| `fgos-exploring`/`fgos-planning` Gate section rewrite | medium | `test/skills/fgos-mirror.test.mjs` (byte-identity, already exists) + manual read-through: does the rewritten Gate section still ask exactly the two locked wordings ("Decisions locked...", "Work shape is ready...") on the non-skip path? |
+| `fgos-coding-exploring`/`fgos-coding-planning` Gate section rewrite | medium | `test/skills/fgos-mirror.test.mjs` (byte-identity, already exists) + manual read-through: does the rewritten Gate section still ask exactly the two locked wordings ("Decisions locked...", "Work shape is ready...") on the non-skip path? |
 | D3 audit visibility (log + "auto-approved" line) | low | unit/integration test: skipping a gate produces a `fgos decision` log entry; no test can assert the conversational line gets *said* — that's a prose instruction, proven only by following the skill, same as every other Gate wording in this repo today |
 
 The medium entries (completeness scan, hard-gate floor reuse) are the two
-that need a real proof point at `fgos-validating`, not a guess here — they
+that need a real proof point at `fgos-coding-validating`, not a guess here — they
 are the two ways this feature could fail in the direction that matters
 (silently skipping a gate that should have fired).
 
@@ -79,7 +79,7 @@ Depends on: nothing (first piece).
 
 ### Piece 2 — wire the Gate steps
 
-What: rewrite `fgos-exploring`'s and `fgos-planning`'s Gate sections to
+What: rewrite `fgos-coding-exploring`'s and `fgos-coding-planning`'s Gate sections to
 call `canAutoApprove` before presenting their respective approval question;
 on a covered+clear result, post the D3 visible line and log the D3 decision
 instead of asking; otherwise present the gate exactly as today, unchanged
@@ -87,8 +87,8 @@ wording. Mirror every edit into `.agents/skills/fgos/` in the same commit
 (`fgos-mirror.test.mjs`'s existing requirement, not a new one this item
 invents).
 
-Files likely touched: `.claude/skills/fgos/fgos-exploring/SKILL.md`,
-`.claude/skills/fgos/fgos-planning/SKILL.md`, and their byte-identical
+Files likely touched: `.claude/skills/fgos/fgos-coding-exploring/SKILL.md`,
+`.claude/skills/fgos/fgos-coding-planning/SKILL.md`, and their byte-identical
 `.agents/skills/fgos/` counterparts.
 
 Verify: `node --test test/skills/fgos-mirror.test.mjs`
@@ -118,7 +118,7 @@ Two pieces as shaped above. Per the schema's own `parent` field semantics
 `id/title/kind/risk/verify/deps/refs/learn/tier/domain/footprint/
 discovered-from/docs-ref/acceptance/goal-tier/targets`, no `parent`. Setting
 `parent` is the decompose auto-judge's own machine action — confirmed at
-`src/intake/decompose.mjs:349` (`parent: id` written when a split is
+`src/intake/plan.mjs:349` (`parent: id` written when a split is
 judged) — consistent with `fgos-routing`'s "the
 engine's verb always wins" precedence rule. This plan documents the two
 child titles and their verify commands as the shape for that later
@@ -128,7 +128,7 @@ that does not exist, and does not create the children by hand.
 - **Child 1**: "gate-bypass config + tier-coverage + completeness check
   (state/CLI layer)" — kind: feature, risk: standard, verify:
   `node --test test/state/gate-bypass.test.mjs`.
-- **Child 2**: "wire fgos-exploring/fgos-planning Gate steps to
+- **Child 2**: "wire fgos-coding-exploring/fgos-coding-planning Gate steps to
   gate-bypass check, mirror to .agents" — kind: feature, risk: standard,
   verify: `node --test test/skills/fgos-mirror.test.mjs`. Depends on Child 1.
 
@@ -143,7 +143,7 @@ redesign that — each piece above already names its one proof command.
 Item: `tsk-1ds`. Decision: `docs/history/gate-bypass/CONTEXT.md` D6, first
 written up in `docs/history/gate-question-quality-and-routing/
 DISCUSSION.md#task-validate-bypass`. Extends Pieces 1-2 above to the third
-skill-embedded gate — `fgos-validating`'s `validateApprove`, the one this
+skill-embedded gate — `fgos-coding-validating`'s `validateApprove`, the one this
 file's own original "Deferred to planning" section flagged as a maybe.
 
 ### Mode (mechanical count)
@@ -157,7 +157,7 @@ file's own original "Deferred to planning" section flagged as a maybe.
 | external systems | no | — |
 | public contracts | no | internal skill mechanism |
 | cross-platform | no | — |
-| existing covered behavior | **yes** | rewrites the Gate step already shipped in `fgos-validating`, and the mirror invariant (`test/skills/fgos-mirror.test.mjs`) means the edit must land in `.claude/skills/fgos-validating/SKILL.md` AND its byte-identical `.agents/skills/fgos-validating/SKILL.md` counterpart, or an existing, currently-green test breaks |
+| existing covered behavior | **yes** | rewrites the Gate step already shipped in `fgos-coding-validating`, and the mirror invariant (`test/skills/fgos-mirror.test.mjs`) means the edit must land in `.claude/skills/fgos-coding-validating/SKILL.md` AND its byte-identical `.agents/skills/fgos-coding-validating/SKILL.md` counterpart, or an existing, currently-green test breaks |
 | weak proof around the area | no | `canAutoApprove`'s core mechanism (hard-gate floor, tier coverage) already has 14 passing tests in `test/state/gate-bypass.test.mjs`; only the new third axis is unproven, and this piece's own verify adds that proof |
 | multi-domain | no | single `coding` domain |
 
@@ -196,44 +196,44 @@ analysis to bound the blast radius of.
 |---|---|---|
 | `canAutoApproveValidate(item, verdict, level)` — reuses D4 floor + D5 tier axis verbatim, swaps `hasOpenItems` for `verdict === 'READY'` | low | unit tests mirroring the existing `canAutoApprove` table: `READY` → true (subject to floor/tier), `READY WITH CONSTRAINTS` → false, `NOT READY` → never reached (Gate section skips the check entirely on `NOT READY`, per "Giữ nguyên" in the item description) |
 | D4 hard-gate floor still holds through the new axis | **medium** | explicit test: a hard-gate keyword hit + verdict `READY` at level `heavy` still returns `false` — same single-most-important-case shape Pieces 1-2's own test file already established for `canAutoApprove` |
-| `fgos-validating/SKILL.md` Gate section rewrite (`.claude/skills/` AND `.agents/skills/` copies) | medium | `test/skills/fgos-mirror.test.mjs` (byte-identity, already exists, currently green) + manual read-through: does the non-bypass branch still ask exactly "Feasibility validated. Approve moving to executing?", and does `NOT READY` still skip the question and return to `fgos-planning` untouched |
-| `--actor bypass` gate-approve record shape | low | same `fgos gate-approve <id> --gate validateApprove --actor bypass --verify "..."` call already used by `fgos-exploring`/`fgos-planning`'s own bypass branch — no new record shape invented |
+| `fgos-coding-validating/SKILL.md` Gate section rewrite (`.claude/skills/` AND `.agents/skills/` copies) | medium | `test/skills/fgos-mirror.test.mjs` (byte-identity, already exists, currently green) + manual read-through: does the non-bypass branch still ask exactly "Feasibility validated. Approve moving to executing?", and does `NOT READY` still skip the question and return to `fgos-coding-planning` untouched |
+| `--actor bypass` gate-approve record shape | low | same `fgos gate-approve <id> --gate validateApprove --actor bypass --verify "..."` call already used by `fgos-coding-exploring`/`fgos-coding-planning`'s own bypass branch — no new record shape invented |
 
 The medium entries (D4 floor through the new axis, the Gate section
-rewrite + its mirror) are the two `fgos-validating` should treat as real
+rewrite + its mirror) are the two `fgos-coding-validating` should treat as real
 proof points, not a guess here.
 
 ### Shape
 
 What: add `canAutoApproveValidate` to `src/state/gate-bypass.mjs`,
 alongside (never replacing) the existing `canAutoApprove` — same file,
-same exports list, one new function. Rewrite `fgos-validating`'s `## Gate`
-section (`.claude/skills/fgos-validating/SKILL.md` lines ~171-190 today) to
-run the same auto-approve check `fgos-exploring`'s own Gate section already
+same exports list, one new function. Rewrite `fgos-coding-validating`'s `## Gate`
+section (`.claude/skills/fgos-coding-validating/SKILL.md` lines ~171-190 today) to
+run the same auto-approve check `fgos-coding-exploring`'s own Gate section already
 uses (`docs/history/gate-bypass/CONTEXT.md` D1-D5, the exact bash shape at
-`.claude/skills/fgos-exploring/SKILL.md` lines 273-284: `Promise.all` import
+`.claude/skills/fgos-coding-exploring/SKILL.md` lines 273-284: `Promise.all` import
 of `store.mjs` + `gate-bypass.mjs`, `.fgos` resolved via `git rev-parse
 --git-common-dir`, fail-closed on anything other than the literal `true`),
 substituting `canAutoApproveValidate(item, verdict, level)` for
 `canAutoApprove(item, artifactText, level)` — `verdict` comes from this
 skill's own already-computed `READY`/`READY WITH CONSTRAINTS`/`NOT READY`
 result, not a file read. Mirror the identical edit into
-`.agents/skills/fgos-validating/SKILL.md` in the same commit (the same
+`.agents/skills/fgos-coding-validating/SKILL.md` in the same commit (the same
 `fgos-mirror.test.mjs` requirement Pieces 1-2 already satisfied for their
 own two skills).
 
 Files touched: `src/state/gate-bypass.mjs` (add-only),
-`.claude/skills/fgos-validating/SKILL.md`, `.agents/skills/fgos-validating/
+`.claude/skills/fgos-coding-validating/SKILL.md`, `.agents/skills/fgos-coding-validating/
 SKILL.md` (mirror), `test/state/gate-bypass.test.mjs` (add cases for the
 new export).
 
 Verify: the item's own locked verify (`node --test
 test/state/gate-bypass.test.mjs && node -e "...canAutoApproveValidate is a
 function..." && grep -q canAutoApproveValidate .claude/skills/
-fgos-validating/SKILL.md`) plus, to keep the repo-wide suite green per this
+fgos-coding-validating/SKILL.md`) plus, to keep the repo-wide suite green per this
 repo's own DoD, `node --test test/skills/fgos-mirror.test.mjs` — pinned
 here as an assumption (not material to scope/behavior/acceptance, so no
-`fgos-exploring` hand-back needed) since the item's own verify text
+`fgos-coding-exploring` hand-back needed) since the item's own verify text
 predates noticing the mirror file also needs the edit.
 
 ### Cases worth proving against
@@ -243,7 +243,7 @@ predates noticing the mirror file also needs the edit.
 - Verdict `READY WITH CONSTRAINTS` (even one constraint) → always ask,
   regardless of level/tier — no floor/tier check even needs to run first,
   same "any constraint asks" shape D6 locked.
-- Verdict `NOT READY` → unchanged: no question, returns to `fgos-planning`,
+- Verdict `NOT READY` → unchanged: no question, returns to `fgos-coding-planning`,
   `canAutoApproveValidate` never called.
 - Hard-gate keyword hit + verdict `READY` at level `heavy` → still asks (D4
   floor holds through the new axis, the single most important case here).
@@ -270,7 +270,7 @@ predates a function `gate-bypass.mjs`/`store.mjs` later gained on `main`.
 | external systems | no | — |
 | public contracts | no | internal skill mechanism |
 | cross-platform | no | — |
-| existing covered behavior | **yes** | rewrites the Gate section already shipped in all three of `fgos-exploring`, `fgos-planning`, *and* `fgos-validating` (Pieces 1-3 only ever touched one or two at a time); `test/skills/fgos-mirror.test.mjs` requires each edit land byte-identically in both `.claude/skills/<name>/SKILL.md` and `.agents/skills/<name>/SKILL.md` — 6 files, not 3 |
+| existing covered behavior | **yes** | rewrites the Gate section already shipped in all three of `fgos-coding-exploring`, `fgos-coding-planning`, *and* `fgos-coding-validating` (Pieces 1-3 only ever touched one or two at a time); `test/skills/fgos-mirror.test.mjs` requires each edit land byte-identically in both `.claude/skills/<name>/SKILL.md` and `.agents/skills/<name>/SKILL.md` — 6 files, not 3 |
 | weak proof around the area | **yes** | the fallback control-flow lives entirely in each Gate section's inline `node -e` shell snippet, which has zero existing unit-test coverage today (unlike Piece 3's `canAutoApproveValidate`, which reused an already-tested core); only a static existence/count check is possible from `verify` per `docs/how-to/write-verify-for-a-skill-prose-change.md` — real runtime proof is a smoke-test/event-log concern, not verify's job |
 | multi-domain | no | single `coding` domain |
 
@@ -312,7 +312,7 @@ analysis to bound the blast radius of regardless of index freshness.
 
 | Component | How risky | What would prove it |
 |---|---|---|
-| Local-first-fallback retry logic in each Gate section's `node -e` script | **medium** | proven empirically by `fgos-validating` (see Feasibility matrix below), reproducible: `node -e` from inside a fixture worktree whose local `gate-bypass.mjs` is missing the export correctly falls back to `$root`'s copy instead of throwing |
+| Local-first-fallback retry logic in each Gate section's `node -e` script | **medium** | proven empirically by `fgos-coding-validating` (see Feasibility matrix below), reproducible: `node -e` from inside a fixture worktree whose local `gate-bypass.mjs` is missing the export correctly falls back to `$root`'s copy instead of throwing |
 | Self-referential case preserved (an item editing `gate-bypass.mjs` itself still sees its own branch's new export first) | **medium** | proven empirically, same run: `node -e` from inside a fixture worktree whose local `gate-bypass.mjs` carries its *own, different* export correctly uses the local one over `$root`'s — this is the one behavior D7 exists specifically to protect |
 | Implementation must stay inline `node -e`, never a separate `.mjs` file | **medium** | proven empirically: the identical fallback logic, run as a separate file instead of a `node -e` string, silently resolves `'./src/state/...'` against the file's own location instead of `process.cwd()` — breaks the self-referential case with no error, while the stale-branch case still "passes" by coincidence. Documented above in Shape as a hard constraint for whoever implements this. |
 | `test/skills/fgos-mirror.test.mjs` byte-identity across all three skills' `.claude/`/`.agents/` copies | low | already-existing, currently-green test; `npm test` (the item's own verify) already runs it — no new proof needed, just don't forget the mirror edit |
@@ -320,7 +320,7 @@ analysis to bound the blast radius of regardless of index freshness.
 
 The three medium entries (fallback-retry correctness, self-referential
 preservation, inline-`node -e` constraint) are the real proof points this
-feature's own precedent (Pieces 1-3) called for at `fgos-validating` — all
+feature's own precedent (Pieces 1-3) called for at `fgos-coding-validating` — all
 three were exercised empirically during this validating pass itself
 (command run, real output captured) rather than left as "should work",
 since the risk lives in shell-snippet prose that has no unit-test surface
@@ -330,8 +330,8 @@ gate-bypass.test.mjs`).
 
 ### Shape
 
-What: in each of `fgos-exploring`'s, `fgos-planning`'s, and
-`fgos-validating`'s `## Gate` sections, change the `node -e` script's single
+What: in each of `fgos-coding-exploring`'s, `fgos-coding-planning`'s, and
+`fgos-coding-validating`'s `## Gate` sections, change the `node -e` script's single
 `import('./src/state/...')` calls into a local-first, fallback-to-`$root`
 sequence — try the existing cwd-relative import first; if the needed named
 export is `undefined` or the import throws, retry the same import from
@@ -342,12 +342,12 @@ structure (try/catch around a second `import()` vs. a pre-check on the
 destructured export) is left to whoever implements this piece — `CONTEXT.md`
 D7 deliberately did not pin one. Recommended, not required: add the
 explanatory "this worktree's own branch already carries whatever version it
-needs [...falls back to \$root when it doesn't]" line to `fgos-validating`'s
-Gate section too, matching `fgos-exploring`'s/`fgos-planning`'s own Gate
+needs [...falls back to \$root when it doesn't]" line to `fgos-coding-validating`'s
+Gate section too, matching `fgos-coding-exploring`'s/`fgos-coding-planning`'s own Gate
 sections — currently the one of the three missing that context for a future
 reader.
 
-**Hard implementation constraint, found empirically during `fgos-validating`'s
+**Hard implementation constraint, found empirically during `fgos-coding-validating`'s
 reality-gate pass (not a guess):** the fallback logic must stay inline as
 the `node -e "..."` argument's own string content — never extracted into a
 separate `.mjs` script file invoked as `node script.mjs`, even one that
@@ -370,12 +370,12 @@ case (Case A) still "passes" by coincidence either way. Whoever implements
 this piece must keep the fallback logic as the literal string handed to
 `node -e`, not refactor it into a shared helper file for readability.
 
-Files touched: `.claude/skills/fgos-exploring/SKILL.md`,
-`.claude/skills/fgos-planning/SKILL.md`,
-`.claude/skills/fgos-validating/SKILL.md`, and their byte-identical
+Files touched: `.claude/skills/fgos-coding-exploring/SKILL.md`,
+`.claude/skills/fgos-coding-planning/SKILL.md`,
+`.claude/skills/fgos-coding-validating/SKILL.md`, and their byte-identical
 `.agents/skills/<name>/SKILL.md` mirrors (`test/skills/fgos-mirror.test.mjs`'s
 existing requirement) — 6 files. Plus `docs/reference/gate-bypass-config.md`
-(found during `fgos-validating`'s reality-gate pass, missed in this piece's
+(found during `fgos-coding-validating`'s reality-gate pass, missed in this piece's
 first draft): its "Gate-step wiring" section quotes the exact same `node -e`
 snippet and states in prose "The `gate-bypass.mjs`/`store.mjs` code imports
 stay cwd-relative — the worktree's own branch already carries whatever
@@ -394,14 +394,14 @@ requirement automatically since it runs full `npm test` rather than a
 narrower `node --test` subset — unlike Piece 3's original gap):
 
 ```
-npm test && grep -q "src/state/gate-bypass.mjs" .claude/skills/fgos-exploring/SKILL.md && grep -q "src/state/gate-bypass.mjs" .claude/skills/fgos-planning/SKILL.md && grep -q "src/state/gate-bypass.mjs" .claude/skills/fgos-validating/SKILL.md && [ "$(grep -o "gate-bypass.mjs" .claude/skills/fgos-exploring/SKILL.md | wc -l)" -gt 3 ] && [ "$(grep -o "gate-bypass.mjs" .claude/skills/fgos-planning/SKILL.md | wc -l)" -gt 2 ] && [ "$(grep -o "gate-bypass.mjs" .claude/skills/fgos-validating/SKILL.md | wc -l)" -gt 1 ] && ! git diff --name-only main...HEAD | grep -qE "^src/state/(gate-bypass|store)\.mjs$"
+npm test && grep -q "src/state/gate-bypass.mjs" .claude/skills/fgos-coding-exploring/SKILL.md && grep -q "src/state/gate-bypass.mjs" .claude/skills/fgos-coding-planning/SKILL.md && grep -q "src/state/gate-bypass.mjs" .claude/skills/fgos-coding-validating/SKILL.md && [ "$(grep -o "gate-bypass.mjs" .claude/skills/fgos-coding-exploring/SKILL.md | wc -l)" -gt 3 ] && [ "$(grep -o "gate-bypass.mjs" .claude/skills/fgos-coding-planning/SKILL.md | wc -l)" -gt 2 ] && [ "$(grep -o "gate-bypass.mjs" .claude/skills/fgos-coding-validating/SKILL.md | wc -l)" -gt 1 ] && ! git diff --name-only main...HEAD | grep -qE "^src/state/(gate-bypass|store)\.mjs$"
 ```
 
 Baselines (3/2/1) are today's real `grep -o "gate-bypass.mjs" | wc -l`
 (total substring occurrences, not `grep -c`'s matching-line count) per
 file (measured directly, not assumed). `grep -c` was tried first during
 implementation and found unreliable: the new fallback import call landed
-on the same line as an existing prose mention in `fgos-exploring`'s Gate
+on the same line as an existing prose mention in `fgos-coding-exploring`'s Gate
 section, so the LINE count didn't increase even though a real second
 occurrence of the module path was added — `grep -o | wc -l` counts the
 actual substring, immune to incidental line-wrapping. A strictly-greater

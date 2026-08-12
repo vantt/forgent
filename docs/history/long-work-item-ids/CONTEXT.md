@@ -16,7 +16,7 @@ existing long id already in `.fgos/events.jsonl`.
 | ID | Decision |
 |----|----------|
 | D1 | Scope is report + fix (not report-only). See root cause below. |
-| D2 | Fix shape is a hard reject: add a max-length check to `validateWorkShape` (`src/state/work.mjs`) alongside the existing `ID_PATTERN` kebab-case check, so `fgos add` refuses an over-long id at write time. Exact threshold value and its justification is left to `fgos-planning`. |
+| D2 | Fix shape is a hard reject: add a max-length check to `validateWorkShape` (`src/state/work.mjs`) alongside the existing `ID_PATTERN` kebab-case check, so `fgos add` refuses an over-long id at write time. Exact threshold value and its justification is left to `fgos-coding-planning`. |
 
 ## Root cause (scout evidence)
 

@@ -49,14 +49,14 @@ close. Proof surface is the item's own already-passing `verify`:
 grep -q "Lớp 1 — cell (ghi file)" docs/distillery/deep-dives/parallel-decomposition-and-merge.md && grep -q "Lớp 2 — I/O worker" docs/distillery/deep-dives/parallel-decomposition-and-merge.md && grep -q "GHI file/mutate git thì phải có danh tính" docs/distillery/deep-dives/parallel-decomposition-and-merge.md && grep -q "cell KHÔNG phải backlog item" docs/distillery/deep-dives/parallel-decomposition-and-merge.md && grep -q "bee:fan-out-cost-tiering-rubric" docs/distillery/porting-log.md && grep -q "R3 E2 F2" docs/distillery/porting-log.md
 ```
 
-Already passing at time of writing (confirmed during the `fgos-exploring`
+Already passing at time of writing (confirmed during the `fgos-coding-exploring`
 pass just before this one).
 
 ## Split decision
 
 No split. One honest piece of work, and that piece is already complete —
-this item proceeds as itself, straight to `fgos-validating`'s reality
-check and then `executing`, where `fgos-code-implement` should find
+this item proceeds as itself, straight to `fgos-coding-validating`'s reality
+check and then `executing`, where `fgos-coding-implement` should find
 nothing left to do beyond re-confirming the already-passing verify and
 returning.
 

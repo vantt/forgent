@@ -102,7 +102,7 @@ Source item: `tsk-62x-1`, `docs/history/fgos-terminal-pane-rename/CONTEXT.md`
    The one place this doesn't apply is the `fgos` *shell function*
    (`scripts/fgos-shell-integration.sh`), which resolves root via
    `git rev-parse --path-format=absolute --git-common-dir` instead of raw
-   cwd — that's why `fgos-exploring`/`fgos-planning`/`fgos-validating`'s
+   cwd — that's why `fgos-coding-exploring`/`fgos-coding-planning`/`fgos-coding-validating`'s
    own `fgos ask`/`fgos decision` calls (which run *after* the session is
    already inside the claimed item's worktree) use that shell function,
    while `/fgOS:pick`'s own `node ${CLAUDE_PROJECT_DIR}.../bin/fgos.mjs`

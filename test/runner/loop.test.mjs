@@ -315,7 +315,7 @@ test('runOnce logs the "<capacityId> — <provider> — <model>" announce line a
   await runOnce({ repoRoot, config, worktreeDir, log: (msg) => logs.push(msg) });
 
   assert.ok(
-    logs.includes(`fgos-runner: fgos-code-implement — ${process.execPath} — sonnet`),
+    logs.includes(`fgos-runner: fgos-coding-implement — ${process.execPath} — sonnet`),
     `expected an announce line in: ${JSON.stringify(logs)}`,
   );
   const events = readRawEvents(dir);
@@ -332,7 +332,7 @@ test('runOnce logs the "<capacityId> — <provider> — <model>" announce line a
   const { baseCommit, headRef, ...rest } = auditEvent.payload;
   assert.deepEqual(rest, {
     id: 'item-announce',
-    capacityId: 'fgos-code-implement',
+    capacityId: 'fgos-coding-implement',
     provider: process.execPath,
     // command (tsk-33w D9): equal to provider here because this fixture's
     // config never overrides either -- both fall back to the same resolved
@@ -352,13 +352,13 @@ test('runOnce\'s capacity.dispatch audit event records the REAL spawned command 
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-command-mismatch' });
   const scriptPath = writeCommittingExecutor(scriptDir, counterFile);
-  // fgos-code-implement is the executing-stage capacityId a plain coding
+  // fgos-coding-implement is the executing-stage capacityId a plain coding
   // work item resolves to (dispatch.mjs's capacityIdForWork) -- overriding
   // it here is what makes byCapacity win over the global executor below.
   const config = {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}', '--model', '{model}'] },
     capacities: {
-      'fgos-code-implement': {
+      'fgos-coding-implement': {
         kind: 'task',
         command: process.execPath,
         args: [scriptPath, '{prompt}', '--model', '{model}'],
@@ -447,19 +447,18 @@ function mkLockedContextFixture(repoRoot, docsRef, { mode } = {}) {
 // `role: 'runner'` on it anymore. This test now advances the item past
 // clarify itself (mirroring the one live way left) before proving what IS
 // still real: the decompose sweep + dispatch chain the same runOnce pass.
-test('runOnce: an item already advanced to decompose (via an explicit prior discover call, the only live path left post-tsk-5mj) still gets swept to executing and dispatched in the SAME runOnce pass; the clarify-pass settlement recorded at that prior call reads role "session"', async () => {
+test('runOnce: an item already advanced to planning (via an explicit prior discover call, the only live path left post-tsk-5mj) still gets swept to executing and dispatched in the SAME runOnce pass; the clarify-pass settlement recorded at that prior call reads role "session"', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   const docsRef = 'docs/history/item-clarify';
   mkLockedContextFixture(repoRoot, docsRef, { mode: 'tiny' });
-  seedItem(dir, { id: 'item-clarify', stage: 'clarify', verify: 'test -f output.txt', docsRef });
-  // tsk-4b2 D3/D6: clarify's clear verdict now lands on `discovery`, not
-  // `decompose` directly -- three explicit discover calls walk the item
-  // through the real chain (clarify->discovery->exploring->decompose),
-  // the same three hops `fgos-coding-driving`'s own inline discovery/
-  // exploring handling (or, for exploring, `fgos-exploring`'s own Gate)
-  // would make one at a time in a live session.
+  seedItem(dir, { id: 'item-clarify', stage: 'discovery', verify: 'test -f output.txt', docsRef });
+  // tsk-qod D1/D2: `clarify` is retired entirely -- a fresh item now starts
+  // at `discovery` (`stages[0]`) directly, so two explicit discover calls
+  // walk the item through the real chain (discovery->exploring->planning),
+  // the same two hops `fgos-coding-driving`'s own inline discovery/
+  // exploring handling (or, for exploring, `fgos-coding-exploring`'s own
+  // Gate) would make one at a time in a live session.
   resolveDiscovery(dir, 'item-clarify', {}, 'session', { clear: true, verify: 'test -f output.txt' });
-  resolveDiscovery(dir, 'item-clarify', {}, 'session', { clear: true });
   resolveDiscovery(dir, 'item-clarify', {}, 'session', { clear: true });
   const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
 
@@ -506,15 +505,14 @@ test('runOnce decompose sweep folds an unrecognized item.domain to "coding" (fai
       risk: 'light',
       refs: [],
       verify: 'test -f output.txt',
-      stage: 'clarify',
+      stage: 'discovery',
       domain: 'bogus-domain',
       docsRef,
     },
   });
-  // tsk-4b2 D3/D6: see the earlier test's own comment -- three hops now
-  // walk clarify->discovery->exploring->decompose.
+  // tsk-qod D1/D2: see the earlier test's own comment -- two hops now walk
+  // discovery->exploring->planning.
   resolveDiscovery(dir, 'item-clarify', {}, 'session', { clear: true, verify: 'test -f output.txt' });
-  resolveDiscovery(dir, 'item-clarify', {}, 'session', { clear: true });
   resolveDiscovery(dir, 'item-clarify', {}, 'session', { clear: true });
   const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
   const lines = [];
@@ -561,15 +559,14 @@ test('runOnce clarify+decompose sweeps never touch a synthetic-domain item with 
   assert.ok(!events.some((e) => e.type === 'work.discovery' || e.type === 'work.stage'));
 });
 
-test('runOnce decompose sweep still fires normally for a coding-domain item advanced to decompose (no behavior change for coding)', async () => {
+test('runOnce decompose sweep still fires normally for a coding-domain item advanced to planning (no behavior change for coding)', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   const docsRef = 'docs/history/item-coding-clarify';
   mkLockedContextFixture(repoRoot, docsRef, { mode: 'tiny' });
-  seedItem(dir, { id: 'item-coding-clarify', stage: 'clarify', verify: 'test -f output.txt', docsRef });
-  // tsk-4b2 D3/D6: see the earlier tests' own comment -- three hops now
-  // walk clarify->discovery->exploring->decompose.
+  seedItem(dir, { id: 'item-coding-clarify', stage: 'discovery', verify: 'test -f output.txt', docsRef });
+  // tsk-qod D1/D2: see the earlier tests' own comment -- two hops now walk
+  // discovery->exploring->planning.
   resolveDiscovery(dir, 'item-coding-clarify', {}, 'session', { clear: true, verify: 'test -f output.txt' });
-  resolveDiscovery(dir, 'item-coding-clarify', {}, 'session', { clear: true });
   resolveDiscovery(dir, 'item-coding-clarify', {}, 'session', { clear: true });
   const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
 
@@ -1355,7 +1352,7 @@ test('wgi-8: a worker fgos-discovered block makes the RUNNER create a new item s
   assert.equal(d.title, 'Wire retry metrics into the dashboard');
   assert.equal(d.description, 'surfaced while doing item-happy');
   assert.equal(d.status, 'todo');
-  assert.equal(d.stage, 'clarify', 'enters at clarify so context-discovery attaches the real verify later');
+  assert.equal(d.stage, 'discovery', 'enters at discovery (stages[0], tsk-qod D1/D2: clarify retired) so context-discovery attaches the real verify later');
   assert.equal(d.kind, 'feature', 'block kind override wins over classify()');
   assert.equal(d.risk, 'standard', 'block risk override wins over classify()');
   assert.equal(d.deps.length, 0);
@@ -1443,7 +1440,7 @@ test('S10: a re-dispatched item re-emitting a block it already captured on a pri
     risk: 'standard',
     refs: [],
     verify: 'chưa xác định',
-    stage: 'clarify',
+    stage: 'discovery',
     discoveredFrom: 'item-redispatch',
   });
   const body = JSON.stringify({ title: 'Wire retry metrics into the dashboard' });

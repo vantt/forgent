@@ -18,7 +18,7 @@ Flags counted against `CONTEXT.md`'s locked scope (D1-D3):
 | external systems | yes | Entire item is about how external processes (`claude`, `agy`, subprocess spawns) get dispatched. |
 | public contracts | yes | `resolveExecutorConfig`/`resolveCapacityCli`'s return shape and the `_shared/capacity-dispatch-fallback.md` fragment are contracts already consumed by `fgos-submit-assist`, `judgeDiscovery`, `judgeDecompose` — this item changes both. |
 | cross-platform | no | (cross-provider governance already counted under external systems/public contracts, not a literal OS-platform concern) |
-| existing covered behavior | yes | `judgeDiscovery`/`judgeDecompose` (`test/intake/discovery.test.mjs`, `test/intake/decompose.test.mjs`) and `submit-assist-classify` (`test/skills/fgos-mirror.test.mjs`) are existing, tested behavior this item modifies. |
+| existing covered behavior | yes | `judgeDiscovery`/`judgeDecompose` (`test/intake/discovery.test.mjs`, `test/intake/plan.test.mjs`) and `submit-assist-classify` (`test/skills/fgos-mirror.test.mjs`) are existing, tested behavior this item modifies. |
 | weak proof around the area | yes | Native-Task dispatch has never been built anywhere in this repo (CONTEXT.md scout evidence) — no precedent test pattern to lean on. |
 | multi-domain | yes | Spans `src/runner/dispatch.mjs`, `src/intake/discovery.mjs`/`decompose.mjs`, `.claude/skills/_shared/`, and (per D3) documentation for future skill authors. |
 
@@ -32,14 +32,14 @@ Flags counted against `CONTEXT.md`'s locked scope (D1-D3):
 
 **`fgos graph --json`:** tsk-3ik's own component (`{tsk-53h, tsk-3sw, tsk-27y, tsk-3ik, tsk-6db}`) shows nothing external currently depends on tsk-3ik finishing — `topUnblock`/`criticalPath` carry no signal for ordering the split below. Ordering is decided by internal logical dependency instead (helper must exist before either consumer can use it).
 
-**impact-analysis posture:** `full` — GitNexus present (`fgos tool query --capability impact-analysis --status present`, confirmed in `CONTEXT.md`'s own scout evidence). Every risk-map entry below carries a real blast-radius proof point at `fgos-validating`, not a guess.
+**impact-analysis posture:** `full` — GitNexus present (`fgos tool query --capability impact-analysis --status present`, confirmed in `CONTEXT.md`'s own scout evidence). Every risk-map entry below carries a real blast-radius proof point at `fgos-coding-validating`, not a guess.
 
 **Risk map:**
 
 | Component | Risk | What proves it |
 |---|---|---|
 | Shared decision helper (new) | High — no precedent in this repo, first native-Task branch ever built; **Iron-Law-gated** — `src/runner/dispatch.mjs` matches `MODULE_RULES`'s `src/runner/` prefix rule (verified: `classifyIronLaw({filesChanged:['src/runner/dispatch.mjs'], description: <this item's own description>})` → `{required:true, matchedModules:['src/runner/dispatch.mjs']}`) | `impact({target: "resolveExecutorConfig", direction: "upstream"})` before touching `dispatch.mjs`; new unit tests covering both branches (native-eligible vs not); `docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`'s recipe since `required:true` |
-| `judgeDiscovery`/`judgeDecompose` migration | Medium — **not** Iron-Law-gated (verified: `classifyIronLaw({filesChanged:['src/intake/discovery.mjs','src/intake/decompose.mjs','src/intake/judge-executor.mjs'], description: <this item's own description>})` → `{required:false}` — none of these three files match any `MODULE_RULES` entry, only `src/intake/risk-keywords.mjs`/`classify.mjs` do) | `test/intake/discovery.test.mjs`, `test/intake/decompose.test.mjs` green — ordinary test-pass evidence, no failing-test-first recipe required |
+| `judgeDiscovery`/`judgeDecompose` migration | Medium — **not** Iron-Law-gated (verified: `classifyIronLaw({filesChanged:['src/intake/discovery.mjs','src/intake/plan.mjs','src/intake/judge-executor.mjs'], description: <this item's own description>})` → `{required:false}` — none of these three files match any `MODULE_RULES` entry, only `src/intake/risk-keywords.mjs`/`classify.mjs` do) | `test/intake/discovery.test.mjs`, `test/intake/plan.test.mjs` green — ordinary test-pass evidence, no failing-test-first recipe required |
 | `submit-assist-classify` shared fragment migration | Medium — prose-only, no runtime test executes SKILL.md branch logic (same gap `tsk-53h`'s own iron-law-evidence.md already named) | `test/skills/fgos-mirror.test.mjs` (mirror-drift structural check) + one live manual dispatch run, same acceptance pattern `tsk-53h` used |
 | Future-skill consult convention (docs) | Low — documentation only, no runtime behavior change | Full regression suite (`node --test 'test/**/*.test.mjs'`) confirms no behavior regression from a doc-only diff |
 
@@ -56,12 +56,12 @@ Concrete cases each child's own execution needs to prove against:
 Four child items, `parent: tsk-3ik`, built and merged one at a time (per D3's explicit continuous build/merge instruction) in this order (foundation first, then its two consumers, then the doc closing the loop):
 
 1. **Build shared native-vs-cli/spawn dispatch decision helper**
-   Extends `src/runner/dispatch.mjs` (or a new sibling module, exact shape left to this child's own `fgos-planning` pass) with the decision logic: given a resolved capacity/`kind` and a caller's self-declared live-Task-access, decide native-Task vs cli/spawn, respecting the config-forces-cli/spawn exception (0026 rule 4).
+   Extends `src/runner/dispatch.mjs` (or a new sibling module, exact shape left to this child's own `fgos-coding-planning` pass) with the decision logic: given a resolved capacity/`kind` and a caller's self-declared live-Task-access, decide native-Task vs cli/spawn, respecting the config-forces-cli/spawn exception (0026 rule 4).
    Verify: `node --test test/runner/dispatch.test.mjs`
 
 2. **Wire `judge-discovery`/`judge-decompose` through the native-Task branch**
-   `src/intake/judge-executor.mjs`'s `runJudgeExecutor`, consumed by `src/intake/discovery.mjs:383` and `src/intake/decompose.mjs:317`, gains the ability to call Task natively when the calling session (a live `fgos-exploring`/`fgos-planning` session) already has access and the capacity is native-eligible per child 1's helper.
-   Verify: `node --test test/intake/discovery.test.mjs test/intake/decompose.test.mjs`
+   `src/intake/judge-executor.mjs`'s `runJudgeExecutor`, consumed by `src/intake/discovery.mjs:383` and `src/intake/plan.mjs:317`, gains the ability to call Task natively when the calling session (a live `fgos-coding-exploring`/`fgos-coding-planning` session) already has access and the capacity is native-eligible per child 1's helper.
+   Verify: `node --test test/intake/discovery.test.mjs test/intake/plan.test.mjs`
 
 3. **Wire `submit-assist-classify` through the native-Task branch**
    `.claude/skills/_shared/capacity-dispatch-fallback.md`'s Step C gains a native-Task option (mirrored to `.agents/skills/_shared/`), consumed by `fgos-submit-assist`.
@@ -71,7 +71,7 @@ Four child items, `parent: tsk-3ik`, built and merged one at a time (per D3's ex
    A how-to (sibling to `docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-capacity.md`) stating: any new skill that wants to call the Agent/Task tool directly for a capacity-shaped or subTask-shaped target must first consult child 1's shared decision helper, not invent its own branch.
    Verify: `node --test 'test/**/*.test.mjs'`
 
-## Assumptions (implementer-level, not asked — fgos-validating's call to confirm or revise)
+## Assumptions (implementer-level, not asked — fgos-coding-validating's call to confirm or revise)
 
 - Child 1's helper is additive/optional-parameter shaped, matching every other `resolveExecutorConfig`/`resolveDiscovery`/`resolveDecompose` extension precedent in this codebase (`tsk-27y`, `tsk-3sw`, `tsk-2yp`) — no existing call site breaks by omitting the new capability.
 - Children 2 and 3 can be built in either order once child 1 lands (no dependency between them) — the order above (2 before 3) is not load-bearing, just the order this plan happened to list them.

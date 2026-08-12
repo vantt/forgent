@@ -32,7 +32,7 @@ internal, no external lookup needed):**
   call would not work; the builder itself needs an extra-args knob (or
   `discover_run_argv` needs its own small variant) so `run_argv`/pick
   stays byte-identical while `discover_run_argv` gains the suffix. This is
-  an implementation-shape detail for `fgos-planning`, not a design
+  an implementation-shape detail for `fgos-coding-planning`, not a design
   decision this research round makes.
 - `herdr-plugin/src/pick.rs:177-190` (`open_discover_pane`, the manual
   Discover button) and `herdr-plugin/src/pick.rs:230-284`

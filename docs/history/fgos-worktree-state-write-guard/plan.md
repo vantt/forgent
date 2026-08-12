@@ -12,12 +12,12 @@ Flags counted: **3** — standard.
   is an agent-facing contract this item changes the invocation shape of.
   First verified by a narrow grep (12 files: `plugins/fgOS/skills/
   {ask,answer,return,discover,move,cook}` and `.claude/skills/fgos/
-  {fgos-routing,fgos-exploring,fgos-planning,fgos-validating,
-  fgos-code-implement,fgos-submit-assist}`), then widened during Phase 3's own
+  {fgos-routing,fgos-coding-exploring,fgos-coding-planning,fgos-coding-validating,
+  fgos-coding-implement,fgos-submit-assist}`), then widened during Phase 3's own
   implementation to a full sweep against every `requiresExistingStore:
   true` verb name, not just the 7 originally searched for — found 5 more:
   `plugins/fgOS/skills/{submit,pick,goal,unlock}` and `.claude/skills/fgos/
-  {fgos-unlock,fgos-compounding}` (`fgos-validating` dropped — it only
+  {fgos-unlock,fgos-coding-compounding}` (`fgos-coding-validating` dropped — it only
   mentions `discover` descriptively, never calls a state verb itself).
   **17 files total**, grep-verified clean (no remaining bare invocation of
   a `requiresExistingStore: true` verb across either skill tree). There is
@@ -25,7 +25,7 @@ Flags counted: **3** — standard.
   (confirmed: `ls` lists only `answer, ask, check, conflicts, cook,
   discover, goal, graph, list, move, pick, ready, return, rollup, stale,
   submit, triage, unlock`) — those two verbs are only ever invoked inline
-  from `fgos-exploring`/`fgos-planning`'s own flow text, already covered.
+  from `fgos-coding-exploring`/`fgos-coding-planning`'s own flow text, already covered.
 - existing covered behavior (1) — `test/cli/fgos.test.mjs` already has
   uncommitted WIP hardening the exact linked-worktree
   `requiresExistingStore` refusal this plan must not regress.
@@ -82,7 +82,7 @@ escape hatch a caller must opt into, never a silent change to what a bare
 
 ## Risk map
 
-| component | risk | proof point (→ fgos-validating) |
+| component | risk | proof point (→ fgos-coding-validating) |
 |---|---|---|
 | `bin/fgos.mjs` `--dir` flag parsing / `dataDir()` | low — additive, default path unchanged | `fgos list --dir <mainRoot>` run with cwd inside a `.fgos/`-less linked worktree returns the real view; `fgos list` with no `--dir` from the same cwd is unchanged (still silent-empty, until phase 2) |
 | requiresExistingStore refusal path | low — must not regress tsk-4fu-2 | existing + WIP tests in `test/cli/fgos.test.mjs` still pass unmodified; a state verb given a garbage `--dir` still refuses with the same `.fgos/ not found` message, just naming the given dir instead of cwd |
@@ -129,10 +129,10 @@ escape hatch a caller must opt into, never a silent change to what a bare
      the prefix for `/bin/fgos.mjs` — that same value, by construction, IS
      the repo root. Reuse it verbatim as `--dir`'s value; no new
      subprocess, no new mechanism.
-   - `.claude/skills/fgos/{fgos-routing,fgos-exploring,fgos-planning,
-     fgos-code-implement,fgos-submit-assist,fgos-unlock,fgos-compounding}/
-     SKILL.md` (7 files — `fgos-validating` dropped, it never calls a
-     state verb itself; `fgos-unlock`/`fgos-compounding` found during the
+   - `.claude/skills/fgos/{fgos-routing,fgos-coding-exploring,fgos-coding-planning,
+     fgos-coding-implement,fgos-submit-assist,fgos-unlock,fgos-coding-compounding}/
+     SKILL.md` (7 files — `fgos-coding-validating` dropped, it never calls a
+     state verb itself; `fgos-unlock`/`fgos-coding-compounding` found during the
      same sweep) never use `${CLAUDE_PROJECT_DIR}` today (some are loaded
      mid-session via the Skill tool, not a slash command, so that
      substitution isn't verified available there) — they keep the
@@ -144,7 +144,7 @@ escape hatch a caller must opt into, never a silent change to what a bare
    `title`/`description` stays a discrete quoted argv element — `--dir`
    doesn't change that).
 4. **End-to-end proof.** The dry run described in the risk map's last row,
-   carried to `fgos-validating` as this plan's concrete proof case,
+   carried to `fgos-coding-validating` as this plan's concrete proof case,
    alongside the boundary cases: garbage `--dir` value (clean validation
    error, not a crash), and running from the actual main checkout with
    `--dir` pointed at itself (no-op, identical result to omitting it).

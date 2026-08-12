@@ -66,7 +66,7 @@ descriptive id, not a slugified title.
 
 **Risk map:**
 
-| component | risk | proof point (for fgos-validating) |
+| component | risk | proof point (for fgos-coding-validating) |
 |---|---|---|
 | `validateWorkShape` new check | low | unit test: id of exactly 30 chars passes, 31 chars rejects, error message matches |
 | `addWork` write path | low | existing `test/state/work.test.mjs` / any `fgos add` CLI test still green — confirms no regression to short-id adds |

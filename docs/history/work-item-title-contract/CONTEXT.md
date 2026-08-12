@@ -17,7 +17,7 @@ feature covers all three, and nothing else:
   (`bin/fgos.mjs`, `title: flags.title`). It never touches `deriveTitle`,
   so no rule written into `deriveTitle` can reach it.
 - **`decompose` children** — the LLM authors each child's `title`
-  (`src/intake/decompose.mjs:130` prompt; `normalizeChild` at
+  (`src/intake/plan.mjs:130` prompt; `normalizeChild` at
   `decompose.mjs:146` accepts any non-empty string). This is the "logic
   của llm lúc đặt tên" the request names.
 
@@ -57,7 +57,7 @@ Source of each half of the complaint:
   test goalTier"`, `"viêt một hello world app bằng vanila js"`) have
   `description` byte-identical to `title` — the submitted text itself was
   that terse and `deriveTitle` cut nothing. The other 3
-  (`"fgos-exploring/SKILL"`, `"STR66: Rename src/state/domains"`, `"fgos
+  (`"fgos-coding-exploring/SKILL"`, `"STR66: Rename src/state/domains"`, `"fgos
   approve's root-merge path (bin/fgos"`) were cut at a dot inside a
   filename — a defect already fixed under `tsk-2z3`; the current regex
   `/[.!?](?:\s|$)|\n/` (`classify.mjs:24`) does not match `.md`, and
@@ -83,7 +83,7 @@ Source of each half of the complaint:
 | **D3** | `submit` stays **fully mechanical** — no LLM call and no `--title` override flag is added to it. `deriveTitle` remains its only title source. |
 | **D4** | Existing items are **re-derived automatically from `description`** — all items, not only the ones violating the ceiling. |
 | **D5** | The length ceiling lives at the **store layer** (`validateWorkShape`/`addWork` in `src/state/work.mjs`), not inside `deriveTitle`, so `submit`, `add --title`, and `decompose` children all obey one rule. Over-long titles are **truncated, not rejected** — an over-length `add --title` must not break a running agent or script. |
-| **D6** | The **semantic** contract (D1) is written into the **skills agents use to submit** — `.claude/skills/fgos-submit-assist/SKILL.md`, `plugins/fgOS/skills/submit/SKILL.md` — **and** into the `decompose` LLM prompt (`src/intake/decompose.mjs`). It is guidance for authors, never a mechanical assertion. |
+| **D6** | The **semantic** contract (D1) is written into the **skills agents use to submit** — `.claude/skills/fgos-submit-assist/SKILL.md`, `plugins/fgOS/skills/submit/SKILL.md` — **and** into the `decompose` LLM prompt (`src/intake/plan.mjs`). It is guidance for authors, never a mechanical assertion. |
 
 ### Why D1 cannot be enforced where D3 puts the work
 
@@ -107,7 +107,7 @@ first. Placing D1 in those skills puts it on the path actually producing
   (D1), regardless of character count. Distinct from a title that is short
   *because the submitted text was short*, which no title logic can repair.
 - **"logic của llm lúc đặt tên"** — the `decompose` prompt at
-  `src/intake/decompose.mjs:130` plus `normalizeChild`'s acceptance check at
+  `src/intake/plan.mjs:130` plus `normalizeChild`'s acceptance check at
   `decompose.mjs:146`. `submit` has no LLM naming logic to review.
 - **Title ceiling** — a truncation bound, not a rejection bound (D5).
 - **Re-derive** — recomputing a title from the item's existing
@@ -135,7 +135,7 @@ Recorded so planning does not rediscover them:
 - `src/intake/classify.mjs:13,20-36` — `TITLE_MAX_LENGTH`, `deriveTitle`.
 - `bin/fgos.mjs:609` — `submit`'s `deriveTitle` call; `add`'s raw
   `title: flags.title` passthrough.
-- `src/intake/decompose.mjs:130,146` — LLM child-title prompt and
+- `src/intake/plan.mjs:130,146` — LLM child-title prompt and
   `normalizeChild` acceptance.
 - `src/state/work.mjs:131,143,146,402` — `validateWorkShape`, the
   `MAX_ID_LENGTH` precedent, the existing title check, `addWork`'s call.
