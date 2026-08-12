@@ -71,14 +71,29 @@ chỗ là bị từ chối — không cần biến tinh chỉnh nào.
 
 ### Bản đồ rủi ro
 
-`impact-analysis: degraded`. GitNexus có đăng ký và `fgos tool query
---capability impact-analysis --status present` trả `present`, NHƯNG index
-đang lệch sau HEAD (hook cảnh báo `last indexed: 4ce7a96` suốt phiên) và
-`node .gitnexus/run.cjs analyze` fail thật với lỗi nội bộ ("FTS index
-'file_fts' is inconsistent ... Drop and recreate"). Nên mọi bằng chứng
-blast-radius lấy từ GitNexus ở đợt này phải coi là **yếu** và bắt buộc
-đối chiếu chéo bằng `rg`/`grep` — đúng nhánh degraded của gate trong
-`CLAUDE.md`.
+`impact-analysis: degraded` — index đã được làm tươi trong phiên này,
+nhưng vẫn degraded, vì một lý do sắc hơn "index cũ".
+
+Index nay `up-to-date` (indexed commit `fa067c9` khớp HEAD, 14.640 node /
+20.545 edge). Dù vậy, với chính index tươi đó:
+
+- `impact({target: 'claimWork', direction: 'upstream'})` trả
+  `impactedCount: 0`, `risk: "LOW"`, `epistemic: "exact"`;
+- `context({name: 'claimWork'})` chỉ thấy caller là file test.
+
+Trong khi `grep -rn "claimWork(" src bin` cho **ba caller sản xuất thật**:
+`src/runner/loop.mjs:496`, `bin/fgos.mjs:2320` (`doTake`), `bin/fgos.mjs:2391`
+(`doPick`). Chi tiết: `RESEARCH.md` vòng 3, F-G.
+
+Nghĩa là công cụ đang tự tin báo `LOW` cho đúng symbol mang rủi ro CAO
+của kế hoạch này — nguy hiểm hơn một index tự khai là cũ. Ràng buộc bắt
+buộc cho cả 4 hạng mục con: **bằng chứng blast-radius từ GitNexus phải
+đối chiếu chéo `rg`/`grep`, không bao giờ dùng một mình để hạ mức rủi
+ro.** Đúng nhánh degraded của gate trong `CLAUDE.md`.
+
+Ghi chú vận hành phát hiện kèm: `gitnexus analyze` trả **exit code 0 dù
+thất bại** (lần đầu chết ở bước xoay WAL, log level 50, index không đổi).
+Chỉ `node .gitnexus/run.cjs status` mới nói thật index có tươi hay không.
 
 | Thành phần | Mức | Cái gì chứng minh được |
 |---|---|---|

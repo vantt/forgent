@@ -134,3 +134,63 @@ trong `AGENTS.md`.
 
 Cả A2 và A3 đều `clear`, cơ học, có điểm neo cụ thể. Không phát sinh câu
 hỏi nào cần người.
+
+## 2026-08-12 — Vòng 3 (sau khi reindex GitNexus theo yêu cầu người dùng)
+
+### Hỏi gì
+
+Sau khi index được làm tươi, posture `impact-analysis` có nâng từ
+`degraded` lên `full` được không — tức bằng chứng blast-radius cho rủi ro
+CAO của kế hoạch (`claimWork`) có tin được một mình không?
+
+### Kiểm gì, thấy gì
+
+**Reindex thành công, nhưng phải hai lần và exit code nói dối.**
+
+- Lần 1 `analyze --force`: tự phát hiện cờ `incrementalInProgress` còn
+  treo từ lần fail buổi sáng và tự chuyển sang full rebuild — nhưng chết
+  ở bước xoay/xoá file checkpoint WAL của LadybugDB, kèm gợi ý phục hồi
+  (`--wal-checkpoint-threshold 67108864`). **Exit code vẫn là 0** dù log
+  ở level 50 (error), và `status` sau đó vẫn báo `stale`, index còn ở
+  `4ce7a96`.
+- Lần 2 với ngưỡng WAL 64 MiB: thành công. `status` báo `up-to-date`,
+  indexed commit `fa067c9` khớp HEAD. Quy mô 14.640 node / 20.545 edge
+  (trước: 12.247 / 17.374).
+
+⇒ Bài học vận hành: **không tin exit code của `gitnexus analyze`** —
+phải `node .gitnexus/run.cjs status` mới biết index có tươi thật không.
+
+**F-G — Index tươi VẪN trả false negative trên đúng symbol rủi ro nhất.**
+
+Với index đã `up-to-date`:
+
+- `impact({target: 'claimWork', direction: 'upstream'})` →
+  `impactedCount: 0`, `risk: "LOW"`, `epistemic: "exact"`.
+- `context({name: 'claimWork'})` → `incoming.calls` chỉ có
+  `test/runner/claim-port.test.mjs` (lặp 2 lần), không có caller sản xuất
+  nào.
+
+Đối chiếu chéo bằng `grep -rn "claimWork(" src bin` cho **ba caller sản
+xuất thật**:
+
+```
+src/runner/loop.mjs:496       claimWork(dir, { id: item.id, actor: 'runner', ... })
+bin/fgos.mjs:2320             const doTake = () => claimWork(dir, {
+bin/fgos.mjs:2391             const doPick = () => claimWork(dir, {
+```
+
+`loop.mjs:496` là lời gọi `.mjs` phẳng, không phải pattern lạ — vậy mà đồ
+thị vẫn sót. Hai tool còn mâu thuẫn nhau (`impact` trả 0, `context` trả
+2), nên đây là lỗ hổng cạnh incoming, không phải cách đọc khác nhau.
+
+### Kết luận vòng 3
+
+Posture giữ nguyên **`degraded`**, nhưng vì lý do sắc hơn lúc đầu: không
+còn vì index cũ (đã tươi), mà vì **index tươi tự tin báo `risk: LOW` cho
+một symbol có ba caller sản xuất**. Một câu trả lời zero tự tin nguy hiểm
+hơn một index tự khai là cũ. Đúng thứ gate trong `CLAUDE.md` dặn nghi ngờ
+("a suspicious zero-result ... is worth a quick grep/rg cross-check before
+being trusted") — và ở đây nó trượt bài kiểm chéo.
+
+Ràng buộc cho mọi hạng mục con: bằng chứng blast-radius từ GitNexus phải
+đối chiếu chéo `rg`/`grep`, không dùng một mình để hạ mức rủi ro.
