@@ -28,11 +28,11 @@ chỉ là helper trả verdict/finding về cho caller. `fgos-coding-discovering
 là chủ; `fgos-researching` vẫn là helper, không đổi vai trò sau khi skill
 này tồn tại.
 
-**Non-goal tường minh (D12, thuộc phạm vi task khác — `tsk-2yo` —
-KHÔNG phải skill này):** phán lại `tier`/`kind`/`risk` trên bằng chứng vừa
-research là việc của một item riêng, chưa được nối dây vào đây. Đừng
-tưởng lầm đây là thiếu sót khi đọc skill này — đó là ranh giới phạm vi đã
-chốt, chưa phải quên.
+Skill này cũng là nơi phán `tier`/`kind`/`risk` (D12, tsk-2yo): trên bằng
+chứng đã research xong ở bước 3, không phải suy đoán từ text submit —
+đọc vựng qua `classificationVocabulary(domain, field)`
+(`src/state/workflow-stage-graphs.mjs`), không hardcode mảng giá trị. Xem
+bước 4/5.
 
 ## Hard rules
 
@@ -62,9 +62,10 @@ chốt, chưa phải quên.
   trong repo, tra ngoài) là việc của helper `fgos-researching` — gọi nó,
   không tự làm lại; nhưng việc ĐỌC LẠI những gì item đã có sẵn (title,
   `refs`, verdict cũ) là việc của chính skill này, làm trực tiếp.
-- Không tự phán `tier`/`kind`/`risk` (xem Non-goal ở trên) — không viết
-  logic đó vào đây, không gọi `fgos edit` để đổi các trường đó trong item
-  này.
+- Chỉ phán `tier`/`kind`/`risk` từ bằng chứng THẬT `fgos-researching` đã
+  trả về ở bước 3 (D12) — không phán từ suy đoán hợp lý, không tái research
+  một vòng mới chỉ để phán classification. Chỉ gọi `fgos edit` khi giá trị
+  phán ra khác giá trị hiện có trên item — không ghi đè vô ích khi trùng.
 - Không mở lại hay diễn giải khác một quyết định đã khoá ở `CONTEXT.md`
   (nếu item đã có, từ một vòng `exploring`/`discovery` trước) — trích D-ID,
   không bao giờ ghi đè ở đây.
@@ -117,11 +118,22 @@ chốt, chưa phải quên.
      dẫn lại bằng chứng đã có (để người ở `exploring` không phải scout lại
      từ đầu) — không hỏi chung chung.
 
+   **Chỉ khi `clear`: phán luôn `tier`/`kind`/`risk`** (D12, tsk-2yo) —
+   trên CÙNG bằng chứng vừa thu ở bước 3, không research thêm vòng mới.
+   Đọc vựng `kind`/`risk` qua `classificationVocabulary(domain, 'kind')` /
+   `classificationVocabulary(domain, 'risk')`
+   (`src/state/workflow-stage-graphs.mjs`, không hardcode mảng giá trị);
+   `tier` so với `TIERS` toàn cục của `work.mjs` (không nằm trong bảng
+   `classification` — dùng chung mọi domain, không riêng `coding`). Một
+   verdict `unclear` không phán classification — chưa đủ bằng chứng.
+
 5. **Tự gọi engine verb.** Ngay sau bước 4, không dừng lại chờ gì thêm:
 
    ```bash
    root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-   # clear:
+   # clear (nếu tier/kind/risk phán ra khác giá trị hiện có trên item,
+   # gọi edit TRƯỚC discover — bỏ qua lệnh edit khi giá trị trùng):
+   node "$root/bin/fgos.mjs" edit "<item-id>" --tier "<tier phán>" --kind "<kind phán>" --risk "<risk phán>" --dir "$root"
    node "$root/bin/fgos.mjs" discover "<item-id>" --verdict clear --verify "<verify thật vừa xác nhận ở bước 4>" --dir "$root"
    # unclear:
    node "$root/bin/fgos.mjs" discover "<item-id>" --verdict unclear --question "<câu hỏi cụ thể, trích bằng chứng>" --dir "$root"
@@ -137,7 +149,12 @@ chốt, chưa phải quên.
 
 - tự đi research trực tiếp (search repo, tra online) thay vì gọi helper
   `fgos-researching`
-- viết logic phán `tier`/`kind`/`risk` vào skill này (thuộc `tsk-2yo`)
+- phán `tier`/`kind`/`risk` từ suy đoán hợp lý thay vì từ finding thật
+  `fgos-researching` đã trả về, hoặc phán classification cho một verdict
+  `unclear`
+- hardcode mảng giá trị `kind`/`risk` thay vì đọc qua
+  `classificationVocabulary(domain, field)`
+- gọi `fgos edit` khi giá trị phán ra trùng giá trị hiện có (ghi đè vô ích)
 - mở lại một quyết định đã khoá ở `CONTEXT.md` thay vì trích D-ID
 - dừng lại hỏi người, hoặc check gate-bypass — không có gate nào ở stage
   này, đây là pha máy một mình
