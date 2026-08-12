@@ -3,21 +3,23 @@ name: discover-next
 description: >-
   Use when the user wants the single next stage:clarify (or stage:discovery/
   stage:exploring) fgOS work item processed now — invoked as
-  /fgOS:discover-next. Picks the item via the same next-picker
-  /fgOS:discover-loop uses (clarify-shaped pool ordered by blocking
-  fan-out), claims it, and delegates to /fgOS:discover <id> — the launcher
-  underneath owns claim/dispatch/ceiling for its own stage; this command's
-  only job is picking. Example: "/fgOS:discover-next", "process the next
-  clarify item".
+  /fgOS:discover-next [--autoClose]. Picks the item via the same
+  next-picker /fgOS:discover-loop uses (clarify-shaped pool ordered by
+  blocking fan-out), claims it, and delegates to /fgOS:discover <id> — the
+  launcher underneath owns claim/dispatch/ceiling for its own stage; this
+  command's only job is picking. An optional trailing --autoClose token
+  forwards to /fgOS:discover and also covers this command's own pool-empty
+  stop. Example: "/fgOS:discover-next", "process the next clarify item".
 ---
 
 # fgOS discover-next
 
 Wraps `pickNextDiscoverItem` (`src/state/discover-pool.mjs`) plus
-`/fgOS:discover` so a person (or a `/fgOS:discover-loop` iteration) can
-process the single next clarify-shaped backlog item without hand-typing
-the CLI or re-deriving the pick order every time. Never writes `.fgos/`
-state directly, and never re-implements the pick logic itself —
+`/fgOS:discover` so a person (or a `/fgOS:discover-loop` iteration, or
+`herdr-plugin`'s unattended auto-discover launcher) can process the single
+next clarify-shaped backlog item without hand-typing the CLI, re-deriving
+the pick order, or picking an id itself. Never writes `.fgos/` state
+directly, and never re-implements the pick logic itself —
 `pickNextDiscoverItem` stays exactly as it is
 (`docs/history/discover-decompose-skill-wrapper-verdict-routing/
 CONTEXT.md` D2).
@@ -32,10 +34,15 @@ bottom tier) now has its own dedicated picker — see `/fgOS:plan-next`.
 
 ## Steps
 
-1. **Ignore `$ARGUMENTS`.** This command takes no arguments — it always
-   picks the single next item from the pool, the same way `/fgOS:merge-
-   next` always picks the single top-ranked ready-to-merge item. Do not
-   pass an id or let the user pick one for this command.
+1. **Read the optional `--autoClose` flag; ignore everything else in
+   `$ARGUMENTS`.** This command takes no positional argument — it always
+   picks the single next item from the pool itself, the same way
+   `/fgOS:merge-next` always picks the single top-ranked ready-to-merge
+   item. Do not pass an id or let the user pick one for this command. The
+   only token worth reading out of `$ARGUMENTS` is a trailing `--autoClose`
+   (`/fgOS:discover`'s own step 1 convention — opt-in only, never a new
+   default): remember whether it was present, it is read again at steps 3
+   and 4.
 
 2. **Pick the next item.** Resolve the main checkout root (every verb
    below is `requiresExistingStore: true`, same as every other fgOS skill)
@@ -58,17 +65,41 @@ bottom tier) now has its own dedicated picker — see `/fgOS:plan-next`.
 
 3. **Pool empty — stop.** If the command printed `null`, report "pool
    empty — nothing to discover" and stop. This is `/fgOS:discover-loop`'s
-   own pool-empty stop signal; nothing else to do here.
+   own pool-empty stop signal; `/fgOS:discover-loop` itself never passes
+   `--autoClose` (its own step 1 ignores `$ARGUMENTS` entirely), so this
+   branch is unchanged for that caller.
+
+   **If `--autoClose` was passed (step 1), call `/fgOS:terminal-close`**
+   as the literal last action, right after reporting "pool empty" —
+   mirroring `/fgOS:discover`'s own step 4 D2 pattern, invoked directly
+   here rather than through a second slash-command round trip:
+
+   ```
+   bash ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/plugins/fgOS/skills/terminal-close/close.sh
+   ```
+
+   Without this, a herdr-launched pane that opened on a real candidate
+   which another session claimed out from under it in the race window
+   between herdr's own pre-open readiness check and this step would sit
+   open forever, permanently blocking herdr's dedupe guard from ever
+   opening a fresh auto-discover pane again. Never call this when
+   `--autoClose` was not passed — an interactive `/fgOS:discover-next` or
+   `/fgOS:discover-loop` iteration must never close a pane a person is
+   sitting in front of.
 
 4. **Delegate to `/fgOS:discover <id>`.** The output from step 2 is
    `{"id": "<id>", "stage": "clarify"|"discovery"|"exploring"}`. Invoke
-   `/fgOS:discover <id>` directly — do not claim the item here, do not
-   dispatch `fgos-coding-driving` yourself, and do not compute a ceiling:
+   `/fgOS:discover <id>`, appending a trailing `--autoClose` when step 1
+   found one — do not claim the item here, do not dispatch
+   `fgos-coding-driving` yourself, and do not compute a ceiling:
    `/fgOS:discover`'s own step 2 (claim if not already claimed) and step 3
    (dispatch through `fgos-coding-driving` with `ceiling: stage:planning`)
    own that entirely (D10 — each tier does exactly one job; the tier below
    is the one convergence point). This command's own job ends at handing
-   off the picked id.
+   off the picked id (plus the `--autoClose` flag, unchanged, if present)
+   — `/fgOS:discover`'s own step 4 owns the actual close-on-stop decision
+   from here on, exactly as it already does for a direct `/fgOS:discover
+   <id> --autoClose` caller.
 
 5. **Report whatever `/fgOS:discover` reported.** Relay its own report
    exactly; do not add a separate report of your own beyond it — it

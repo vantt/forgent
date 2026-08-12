@@ -599,8 +599,9 @@ fn draw_after_deliver_box(frame: &mut Frame, app: &App, area: Rect) {
 /// A blocking dialog for the selected work item — opened by Enter on the
 /// "Work items" panel instead of picking directly. Two fixed actions
 /// (tsk-1e3 D4): Pick (Enter, unconditional) and Discover (`d`, disabled/
-/// dimmed — never hidden, so the layout never shifts — when the item's
-/// `stage != "clarify"`, since `/fgOS:discover` only applies there).
+/// dimmed — never hidden, so the layout never shifts — unless
+/// `WorkItem::discover_eligible()` says the item is both the right stage
+/// AND dependency-ready).
 fn draw_detail_modal(frame: &mut Frame, app: &mut App, item: &crate::app::WorkItem) {
     // tsk-2x9: bumped from 40% to 70% height -- 8 detail lines (was 4) plus
     // the block's own 2 border rows plus the fixed 3-row button strip need
@@ -643,7 +644,7 @@ fn draw_detail_modal(frame: &mut Frame, app: &mut App, item: &crate::app::WorkIt
     );
     frame.render_widget(detail, sections[0]);
 
-    let discover_enabled = item.stage == "clarify";
+    let discover_enabled = item.discover_eligible();
     let button_cells = Layout::default()
         .direction(Direction::Horizontal)
         .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
@@ -677,7 +678,7 @@ fn draw_detail_modal(frame: &mut Frame, app: &mut App, item: &crate::app::WorkIt
         .block(
             Block::default()
                 .borders(Borders::ALL)
-                .title(if discover_enabled { "d: discover" } else { "d: discover (stage != clarify)" }),
+                .title(if discover_enabled { "d: discover" } else { "d: discover (wrong stage or blocked)" }),
         );
     frame.render_widget(discover_button, button_cells[1]);
     app.discover_button_rect = Some(crate::app::ButtonRect {
@@ -846,7 +847,7 @@ mod tests {
 
     /// tsk-1e3 D4: both buttons always render, regardless of stage — only
     /// Discover's color changes (see
-    /// `discover_button_disabled_when_stage_not_clarify` below).
+    /// `discover_button_disabled_when_stage_not_eligible` below).
     #[test]
     fn detail_modal_renders_pick_and_discover_buttons() {
         let buffer = render_modal_buffer("clarify");
@@ -908,10 +909,10 @@ mod tests {
     }
 
     /// tsk-1e3 D4 / tsk-jo1 D1: Discover renders `Color::DarkGray` (never
-    /// hidden, never a layout shift) when the item's stage isn't
-    /// `clarify`.
+    /// hidden, never a layout shift) when the item's stage is outside
+    /// `discover_eligible`'s set (`clarify`/`discovery`/`exploring`).
     #[test]
-    fn discover_button_disabled_when_stage_not_clarify() {
+    fn discover_button_disabled_when_stage_not_eligible() {
         let buffer = render_modal_buffer("executing");
         let discover_is_dimmed = buffer
             .content()
@@ -919,7 +920,7 @@ mod tests {
             .any(|cell| cell.symbol() == "D" && cell.fg == Color::DarkGray);
         assert!(
             discover_is_dimmed,
-            "Discover button must render Color::DarkGray when stage != clarify"
+            "Discover button must render Color::DarkGray when stage is not discover-eligible"
         );
 
         let buffer = render_modal_buffer("clarify");
@@ -929,7 +930,34 @@ mod tests {
             .any(|cell| cell.symbol() == "D" && cell.fg == Color::DarkGray);
         assert!(
             !discover_is_dimmed_when_enabled,
-            "Discover button must not render dimmed when stage == clarify"
+            "Discover button must not render dimmed when stage == clarify and not blocked"
+        );
+    }
+
+    /// Companion to `discover_button_disabled_when_stage_not_eligible`:
+    /// a right-stage item still renders Discover dimmed when it has an
+    /// unmet dependency (`blocked_by` non-empty) — the gap that let
+    /// herdr open a discover pane for an item `fgos take` would go on to
+    /// refuse.
+    #[test]
+    fn discover_button_disabled_when_blocked_even_at_eligible_stage() {
+        let buffer = render_modal_buffer_with_item(WorkItem {
+            id: "tsk-a".into(),
+            title: "A".into(),
+            goal_tier: "mvp".into(),
+            stage: "clarify".into(),
+            status: "todo".into(),
+            blocked_by: vec!["tsk-dep".into()],
+            blocks: 0,
+            priority: None,
+        });
+        let discover_is_dimmed = buffer
+            .content()
+            .iter()
+            .any(|cell| cell.symbol() == "D" && cell.fg == Color::DarkGray);
+        assert!(
+            discover_is_dimmed,
+            "Discover button must render Color::DarkGray when blocked_by is non-empty"
         );
     }
 
