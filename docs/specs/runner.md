@@ -639,10 +639,9 @@ sức khỏe cho toàn bộ vòng compounding.
     trần trụi): item ở trạng thái cuối (đề xuất/đỗ/xong) mà thiếu nửa
     thực-tế của kết quả (trọng số nặng nhất), item hiện đang "doing" (snapshot
     tại thời điểm check, không có ngưỡng thời gian riêng — trọng số nặng
-    ngang hàng), item còn đọng ở stage đầu vòng (trọng vừa — tín hiệu này vẫn
-    khai đúng tên stage `clarify` đã nghỉ hưu, nên trên thực tế nó luôn đóng
-    góp 0; xem Open Gaps), một bản ghi friction chưa có settlement nào theo
-    sau trên CÙNG id (trọng nhẹ), item đang đậu chờ người (trọng nhẹ).
+    ngang hàng), item còn đọng ở stage đầu vòng của domain của chính nó
+    (trọng vừa), một bản ghi friction chưa có settlement nào theo sau trên
+    CÙNG id (trọng nhẹ), item đang đậu chờ người (trọng nhẹ).
   - Điểm này LUÔN đi kèm **so với lần `check` gần nhất** — lần đọc đầu tiên
     là baseline (chưa có gì để so); mọi lần sau in kèm phần chênh lệch thật.
   - Một dòng **seal-digest** tóm tắt những gì đã "gộp thêm" kể từ lần `check`
@@ -992,8 +991,6 @@ Một báo-cáo hỏng-hình (không phân tích được, thiếu tên việc) 
 - `approve --github` chưa phân biệt được lý do gãy "PR chưa đủ lượt duyệt trên GitHub" (một trạng thái BÌNH THƯỜNG, đang chờ người, không phải lỗi) khỏi mọi lý do gãy KHÁC (xác thực, mạng, xung đột thật) — hôm nay cả hai đều đi cùng một đường `blocked`+friction; tách riêng cần bằng chứng thật từ một PR bị chặn duyệt thật (chưa có), không đoán (github-adapter S3, cùng kỷ luật "không đoán giá trị enum chưa chứng minh" như S2's quyết định bỏ outcome `conflict` riêng).
 - Một đề xuất CON (có việc cha) gọi `review --github` chỉ đẩy nhánh của CHÍNH NÓ lên remote gốc, không đẩy nhánh của GỐC nó — nên `gh pr create` thật trên GitHub sẽ gãy vì nhánh đích (`base`) không tồn tại trên remote cho một đề xuất con; vận chuyển GitHub hôm nay chỉ dùng được thật cho đề xuất gốc/độc lập, ngữ nghĩa GitHub cho con cần một slice riêng (github-adapter S3, giới hạn đã biết trước khi build).
 - Lời gọi phán-đoán bên dưới engine (quyết đủ-rõ/chưa-đủ-rõ) có thể trả về văn bản không máy-đọc-được thay vì phán quyết đúng khuôn khi được gọi TỪ BÊN TRONG một phiên trợ lý khác đang chạy (lồng phiên) — engine fail-safe đúng thiết kế (đậu cổng chờ-người, không bao giờ coi không chắc là pass). **Nguyên nhân gốc xác nhận 2026-07-22 (`claude -p` thật, không đoán):** không phải lỗi định dạng — model con ĐÔI KHI từ chối một prompt-chỉ-đòi-JSON vì đọc như prompt-injection (exit code vẫn 0), tính chất XÁC SUẤT chứ không tất định. Thử thêm một câu mào đầu "hợp thức hoá" lời gọi — PHẢN TÁC DỤNG, model đọc chính khung đó như dấu hiệu injection rõ hơn (bằng chứng thật, gỡ bỏ). Giải pháp còn lại: tăng số lần thử lại từ 1 lên 2 (3 lượt tổng) — giảm xác suất gặp phải, KHÔNG loại trừ hoàn toàn (`docs/backlog.md` STR68, đóng lại 2026-07-22).
-
-- Tín hiệu entropy "item đọng ở stage đầu vòng" (xem "Tín hiệu compounding qua check") vẫn đếm đúng tên stage `clarify` — một stage đã nghỉ hưu, không item nào còn nằm ở đó — nên trên thực tế nó luôn đóng góp 0 vào điểm entropy. Tín hiệu không cho kết quả SAI (không bao giờ đếm nhầm item khác), chỉ là đã mất tác dụng; sửa cho đúng nghĩa cần chọn lại stage nào mới đáng coi là "đọng" (`discovery`? `exploring`? cả hai?) — một quyết định sản phẩm chứ không phải một phép đổi tên, nên ghi nhận là biết-nhưng-chưa-sửa.
 
 - Khóa hoạt động cây chính (STR65) suy danh tính từ một tiến trình tổ tiên gần khi
   không có biến môi trường phiên trợ lý — suy đoán tốt-nhất cho terminal người gõ

@@ -60,16 +60,22 @@ decision-lock, so the autonomous loop must leave it to a live session. The
 rewrite says this outright — a spec that lists two of the three front stages
 leaves a stranger guessing whether the third was forgotten.
 
-## D-local-3 — the entropy signal is documented as inert, not silently renamed
+## D-local-3 — the entropy signal is described by intent, not by either literal
 
-src/report/entropy.mjs:61,127,141 still counts w.stage === 'clarify' under the
-label stage-clarify, weight 3. clarify is retired and the live store holds 0
-items at that stage, so the signal exists and always contributes zero. Renaming
-it in prose to discovery would document a behavior the code does not have. It
-is described truthfully where it is mentioned, and recorded once under Open
-Gaps — which is where this spec already keeps known code/spec divergences.
-Fixing it for real means choosing which stage now counts as stuck, a product
-call, not a rename.
+src/report/entropy.mjs on main still counts w.stage === 'clarify' under the
+label stage-clarify. My first pass recorded that as an Open Gaps divergence,
+since clarify is retired and the count is therefore always zero on this branch.
+That was withdrawn: sibling item tsk-2t3 (awaiting-approval, unmerged, which is
+the only reason this branch cannot see it) already replaces the literal with
+`w.stage === domain.stages[0]` resolved per item's OWN domain and relabels the
+signal stage-entry. Verified directly with
+`git diff main..fgw/tsk-2t3 -- src/report/entropy.mjs`.
+
+So a gap row would be true today and false the moment both branches merge —
+exactly the defect class this whole family exists to remove. The spec instead
+describes the signal by what it is FOR ("item còn đọng ở stage đầu vòng của
+domain của chính nó"), which is BA-grade, names neither retired nor incoming
+literal, and stays true across the merge in either order.
 
 ## What changed, anchor by anchor
 
@@ -82,14 +88,14 @@ call, not a rename.
 | the old clarify-sweep section, now the research-dispatch section | rewritten per D-local-1, plus D-local-2's named absence and the two never-advance fail-safes (no commit / no readable verdict) |
 | the plan-sweep section | rewritten per D-local-1: no model call, drain-only alias explained, claim-release wording widened |
 | evolve --submit | the entry stage is the domain's own first stage (discovery for coding), matching bin/fgos.mjs:934-935; its lifecycle line renamed to the research sweep |
-| entropy signal | per D-local-3 |
+| entropy signal | described by intent per D-local-3 — the domain's own entry stage, naming neither the retired nor the incoming literal |
 | P50 skill map | stage-to-skill map corrected to the registry's real rows, incl. fgos-coding-validating having no skillMap entry of its own |
 | RUL14, RUL17 | rewritten to the two real sweeps |
 | RUL15, RUL29, RUL45 | stage names only; the rules themselves unchanged |
 | Edge Cases (6 rows) | the chain clarify -> decompose -> executing becomes discovery -> planning -> executing; the two "model returns garbage" rows replaced with what actually fails today (worker crash / no commit; and "no model call happens here at all") |
 | Pointers | loop.mjs's sweep description, captureDiscoveredWork's stamped stage, discovery.mjs, plan.mjs (renamed from decompose.mjs); the judge-executor.mjs pointer is GONE — replaced by the discovery prompt template that took its place |
 | Pointers (skills) | added fgos-coding-discovering; corrected the stage label on exploring/planning/validating |
-| Open Gaps | one new row for D-local-3 |
+| Open Gaps | unchanged — the row this item briefly added was withdrawn, see D-local-3 |
 
 Left alone on purpose: the dated 2026-07-20 case-study paragraph (historical
 narration of one real run), every sources slug, and every feature-slug decision
