@@ -3960,7 +3960,18 @@ async function runVerb(verb, flags, positional, dir) {
             // does not read as a real verify failure when it was a timeout.
             return { id, outcome: 'verify-fail', timedOut: caughtUpCheck.timedOut, target, branch: ownBranch, exitStatus: caughtUpCheck.status, output: caughtUpCheck.output };
           }
-          const { event } = moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'blocked', role: 'runner' });
+          // tsk-4ax (D3): record the tip this verify actually passed on, the
+          // same field `return`'s own success path already writes
+          // (`branchHeadAtReturn`). Without this, `mergedTreeAlreadyVerified`
+          // (merge.mjs:803) can never see this catchup's own green verify as
+          // proof — its second condition compares the branch's CURRENT tip
+          // to `branchHeadAtReturn`, which would still be pointing at
+          // whatever `return` last wrote, long before this catchup ran. The
+          // outbound gate would then re-run the full verify inside the lock
+          // every time, even after a catchup just proved the tree green —
+          // exactly the self-tightening loop this item exists to close.
+          const catchupHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ephemeral.path, encoding: 'utf8', shell: false }).trim();
+          const { event } = moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'blocked', role: 'runner', branchHeadAtReturn: catchupHead });
           return {
             id,
             outcome: 'already-caught-up',
@@ -4030,7 +4041,12 @@ async function runVerb(verb, flags, positional, dir) {
         // D18's edge: mechanical, uncounted reconcile-success — never
         // touches 'doing', so anti-loop's visitCount never sees it. No
         // reason/ask required on this edge (fsm.mjs).
-        const { event } = moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'blocked', role: 'runner' });
+        // tsk-4ax (D3): same branchHeadAtReturn write as the already-caught-up
+        // path above — this commit's own SHA is the tip this verify passed
+        // on, and mergedTreeAlreadyVerified needs it recorded to skip the
+        // outbound gate's redundant re-verify.
+        const catchupHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ephemeral.path, encoding: 'utf8', shell: false }).trim();
+        const { event } = moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'blocked', role: 'runner', branchHeadAtReturn: catchupHead });
         return { id, outcome: 'merged', from: 'blocked', to: 'awaiting-approval', target, branch: ownBranch, seq: event.seq, output: check.output };
       });
     }
