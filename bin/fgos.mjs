@@ -70,6 +70,7 @@ import { recordApprovePostSuccessFault } from '../src/cli/approve-fault-log.mjs'
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { DOCTOR_CHECKS, integrationScriptPath, ensureSharedConfigDefaults, runFixes } from '../src/setup/checks.mjs';
 import { sharedConfigFilePath, readSharedConfig, readInvariantCheckCommands } from '../src/config/shared-config-file.mjs';
+import { countWorkerSlots, hasWorkerSlotRoom } from '../src/state/worker-slots.mjs';
 import { assessCleanupReadiness } from '../src/state/cleanup-harness.mjs';
 import { DEFAULT_CLEANUP_TTL_DAYS, DEFAULT_CLEANUP_LEAF_TTL_DAYS } from '../src/setup/registrations.mjs';
 import { installGitHooks, uninstallGitHooks } from '../src/setup/git-hooks.mjs';
@@ -1979,6 +1980,48 @@ async function runVerb(verb, flags, positional, dir) {
     // pairs of ready items whose declared file footprints overlap, so a
     // parallel dispatch would risk a file conflict. Suggests sequence/hoist/
     // re-slice; never mutates anything.
+    // Read-only worker-slot ledger: how many work items are running and
+    // whether the execution lane has room. This verb IS the port — decision
+    // 0014 makes the CLI the door, and herdr-plugin (Rust) and fgos-fanout
+    // (a prose skill) have no other way to ask the engine before they stand a
+    // worker up. Pure read: worker-slots.mjs never touches fs, and the
+    // ceiling comes from the same config resolution claimWork's own gate uses.
+    case 'slots': {
+      const slotsView = listWork(dir);
+      const ceiling = readSharedConfig(path.dirname(dir))?.workerSlots?.ceiling;
+      const counts = countWorkerSlots(slotsView);
+      const room = hasWorkerSlotRoom(slotsView, { ceiling });
+      return {
+        execution: {
+          ...counts.execution,
+          ceiling: room.ceiling,
+          free: room.free,
+          hasRoom: room.allowed,
+          reason: room.reason,
+        },
+        admin: counts.admin,
+      };
+    }
+
+    // D10: give a driver's closing report a landing place on the item, so a
+    // result is read with `fgos show <id>` instead of by watching a terminal
+    // pane nobody can afford to guard. Deliberately no new event type and no
+    // new field -- this writes through addDecision, which `show` already
+    // surfaces per item, and `source: 'driver-report'` is what tells a
+    // consumer these apart from real design decisions.
+    case 'report': {
+      const id = requireField(positional[0] ?? flags.id, 'report requires an id: fgos report <id> --text "..."');
+      const text = requireField(flags.text, 'report requires --text "..."');
+      const stopReason = optionalField(flags['stop-reason'], 'report --stop-reason requires a non-empty value (omit --stop-reason entirely to skip it)');
+      // addDecision requires a non-empty rationale, so a report that carries
+      // no stop reason still has to say why it exists rather than pass "".
+      const rationale = stopReason
+        ? `driver stop reason: ${stopReason}`
+        : 'closing report recorded on the item so results are read via `fgos show`, not a guarded terminal pane';
+      const { event } = addDecision(dir, { id, text, rationale, source: 'driver-report', kind: 'engine' });
+      return { id, stopReason: stopReason ?? null, seq: event.seq };
+    }
+
     case 'conflicts': {
       // tsk-4zj D7: footprintConflicts' candidate set now spans multiple
       // stages (tsk-4so's frontierAcrossSteps), so stageEffective is real
