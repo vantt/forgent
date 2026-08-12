@@ -4,21 +4,22 @@ Item: `tsk-2sj`.
 
 ## 1. Trạng thái hiện tại
 
-Hết vòng 3. Bốn D-ID đã chốt (§4): tên khái niệm là **worker slot**;
-engine sở hữu sự thật về "đang chạy gì" và nhãn không bao giờ gánh state;
-rename + slot là một feature; và **hai lane riêng biệt**, lane admin có
-chỗ dành riêng vì merge nằm thượng nguồn của mọi claim execution mới.
+Hết vòng 4. **Bảy D-ID đã chốt** (§4) — thiết kế về cơ bản đã thành hình,
+§6 và §7 đều đã viết được.
 
-Vòng 3 chốt thêm ba điểm (chưa mint, chờ vòng sau xác nhận, nhưng coi như
-đã ngã ngũ — sẽ không mở lại): hình dạng của "thống nhất" là **(b)** —
-giữ nguyên 6 picker theo pool, engine thêm lớp gác trần, launcher xin
-slot trước khi dựng; **trần đếm theo work-item**; và "du di" nghĩa là cho
-phép vượt trần một biên nhỏ để khỏi phải bẻ một mẻ việc thành hai wave.
+Vòng 4 giải quyết Q5 qua một phản biện thật: phiên này đề xuất bỏ hẳn
+việc skill gọi rename (nhãn là phép chiếu, adapter tự vẽ) và **đã sai** —
+sai vì tổng quát hoá từ đúng một ca. Ca phổ biến nhất là người tự mở
+session rồi gõ `/fgOS:pick`, lúc đó không có orchestrator process nào
+đang chạy, nên chỉ chính session biết binding. Helper skill có
+capability-gate mới là điểm hexagon đúng (D5). Kèm theo đó là nhận thức
+đúng hơn về bug `fgos-auto-discover`: lỗi không nằm ở việc session đổi
+nhãn, mà ở việc herdr-plugin *đọc nhãn như state* — sửa bằng cách hỏi
+engine, không phải bằng cách cấm session đổi nhãn.
 
-Còn mở: Q5 — cơ chế rename đặt ở đâu. Em có một đề xuất *khác* với ý ban
-đầu của anh, suy ra trực tiếp từ chính D2 anh đã chốt: nhãn trở thành
-phép chiếu thuần của state, không skill nào gọi rename nữa (§5 vòng 3,
-F6). Cùng với đó là biên du di cụ thể (Q10).
+Còn mở, đều nhỏ: **Q10** — biên du di cụ thể (đề xuất "không bao giờ bẻ
+một mẻ đã tính sẵn" chờ xác nhận); và xác nhận việc "agent tự xử xung đột
+merge" nằm ngoài phạm vi đợt này.
 
 ## 2. Mục tiêu & đề bài
 
@@ -45,12 +46,13 @@ tên đúng khái niệm chứ không phải sơn phết.
 | Q2 | Phạm vi: một hay ba launcher | **rõ** | Cả ba tuân thủ tổng trần engine; cơ chế thực thi giữ riêng |
 | Q3 | Nguồn chân lý cho occupancy | **rõ** | → D2: state fgOS, tái dùng tín hiệu `tsk-3ni` |
 | Q4 | Nhãn có được gánh state không | **rõ** | → D2: không, tuyệt đối |
-| Q5 | Rename đặt ở đâu | **chưa rõ** | Ý ban đầu: `fgos-coding-driving`. Đề xuất mới của em: không skill nào cả — nhãn là phép chiếu của state (F6) |
+| Q5 | Rename đặt ở đâu | **rõ** | → D5: helper skill có capability-gate, gọi từ phía session. Đề xuất "adapter tự vẽ" đã bị bác, lý do ở §5 vòng 4 |
 | Q6 | `fg:operation` 4 pane | **rõ** | 3 loại admin hôm nay + 1 thủ sẵn. Supersede `tsk-5lr` D2 |
-| Q7 | "Du di phía trên" nghĩa gì | **rõ (chờ xác nhận)** | Cho phép vượt trần một biên nhỏ để khỏi bẻ mẻ việc thành 2 wave. Ưu tiên ship faster |
-| Q8 | Ranker toàn cục hay gác trần | **rõ (chờ xác nhận)** | **(b)** — giữ 6 picker, engine gác trần, launcher xin slot trước khi dựng. (a) để lại |
-| Q9 | Trần đếm theo cái gì | **rõ (chờ xác nhận)** | Theo **work-item** |
-| Q10 | Biên du di cụ thể là bao nhiêu | **chưa rõ** | Mới phát sinh từ Q7. Cố định? Theo tỉ lệ? Chỉ cho phép trong một mẻ? |
+| Q7 | "Du di phía trên" nghĩa gì | **rõ** | → D7: trần mềm ở mép trên |
+| Q8 | Ranker toàn cục hay gác trần | **rõ** | → D6: gác trần. (a) để lại có chủ ý |
+| Q9 | Trần đếm theo cái gì | **rõ** | → D7: theo **work-item** |
+| Q10 | Biên du di cụ thể là bao nhiêu | **chưa rõ** | Đề xuất: "không bao giờ bẻ một mẻ đã tính sẵn — còn ≥1 slot thì lấy trọn mẻ". Chờ xác nhận |
+| Q11 | "Agent tự xử xung đột merge" có nằm trong đợt này không | **chưa rõ** | Em đề xuất để ngoài — `fgos catchup` đã có, thiếu là hành vi skill (F7) |
 
 ## 4. Quyết định đã chốt
 
@@ -60,9 +62,12 @@ tên đúng khái niệm chứ không phải sơn phết.
 | D2 | **Engine sở hữu sự thật về "đang chạy gì"** — occupancy là state fgOS, không phải state của tool/launcher. Hệ quả bắt buộc: nhãn/label KHÔNG BAO GIỜ được gánh state của orchestrator; nhãn chỉ để cho người đọc. Khớp hard rule của `docs/operator-runbook-herdr-cockpit.md`. Cơ chế thay thế đã có sẵn: `tsk-3ni` D1/D4. |
 | D3 | Cơ chế rename/label và khái niệm worker slot là **một feature**, không tách đôi; và **không vá tạm** bug `fgos-auto-discover` đang sống. |
 | D4 | **Hai lane riêng biệt** — execution (discovery/plan/implement) và admin (merge/retro/cleanup). Lane admin có chỗ dành riêng, không bao giờ bị execution chiếm chỗ. Lý do cấu trúc: `claim-port.mjs:160-167` từ chối claim một lá có dep chưa `done`, nên merge nằm thượng nguồn của mọi claim execution mới; xếp chung pool sẽ tự khoá. Cấu trúc này đã tồn tại trong code (`fg:operation` không nằm trong cap của `fg:agents-N`), thiết kế chỉ tổng quát hoá. |
+| D5 | Cơ chế đặt nhãn là một **helper skill có capability-gate, gọi từ phía session** (hướng `terminal`/`rename.sh` hôm nay), KHÔNG phải vòng poll của adapter tự vẽ. Đây chính là điểm hexagon để đổi orchestrator sau này. Hệ quả: bug `fgos-auto-discover` được sửa bằng cách herdr-plugin **hỏi engine** thay vì đọc nhãn, chứ không phải bằng cách cấm session đổi nhãn. |
+| D6 | Hình dạng của "thống nhất" là **gác trần**, không phải ranker toàn cục. Giữ nguyên 6 picker theo pool — chúng phải trả lời đúng và không block; engine thêm đúng một lớp: gác tổng trần. Launcher **xin slot trước khi dựng** worker; hết chỗ thì bị từ chối, không tự quyết. Ranker toàn cục xuyên pool để lại có chủ ý. |
+| D7 | Trần đếm theo **work-item** — một work-item đang chạy tốn đúng một slot, bất kể launcher nào dựng nó lên. Và trần **mềm ở mép trên**: launcher được phép vượt một biên nhỏ để khỏi bẻ một mẻ việc thành hai wave (biên cụ thể còn mở, Q10). Ship Faster thắng độ chính xác của con số, miễn biên nhỏ và biết trước. |
 
 Đã ghi vào event log qua `fgos decision --id tsk-2sj` (seq 14352, 14353,
-14354, 14362).
+14354, 14362, 14373, 14374, 14375).
 
 ## 5. Q&A log
 
@@ -170,6 +175,32 @@ land (`blocked → awaiting-approval`) hoặc báo lại. Nên lời phàn nàn 
 cứ hỏi người miết" không phải thiếu verb — là vấn đề hành vi skill. Ghi
 nhận là **liền kề, ngoài phạm vi** đợt này; xứng đáng item riêng.
 
+### 2026-08-12 — Vòng 4 (người dùng phản biện F6)
+
+Người dùng bác đề xuất F6(B): "thực chất cơ chế nhãn không phải
+orchestrator nào cũng có, skill helper terminal là để support và là một
+điểm hexagon để đổi sau này khi có dùng tool khác."
+
+**Phiên này nhận sai.** F6(B) tổng quát hoá từ đúng một ca — ca
+auto-launcher của herdr-plugin, nơi orchestrator có biết binding. Ca phổ
+biến nhất thì ngược lại: một người tự mở session Claude Code trong pane
+rồi gõ `/fgOS:pick`, lúc đó **không có orchestrator process nào đang
+chạy** (dashboard herdr-plugin có thể còn chưa bật), và thứ duy nhất biết
+"pane này đang làm item X" chính là session đó. Nếu chỉ vòng poll của
+adapter vẽ nhãn thì pane ấy không bao giờ được đặt tên. Đây đúng là lý do
+`/fgOS:terminal` tồn tại, `/fgOS:pick` bước 3 gọi nó, và `rename.sh`
+thiết kế để exit 0 im lặng khi không ở trong pane herdr. → thành D5.
+
+**Nhận thức đúng hơn về bug `fgos-auto-discover`:** lỗi chưa bao giờ nằm
+ở việc session đổi nhãn. Nó nằm ở chỗ herdr-plugin *đọc nhãn như state*.
+Dưới D2, herdr-plugin phải hỏi engine "còn worker auto-discover nào sống
+không" thay vì "có pane nào mang nhãn X không". Sửa đúng chỗ đó thì
+session tự do đổi nhãn tuỳ ý — hai thứ hết đụng nhau, giữ được cả helper
+skill lẫn D2.
+
+F6(A) — nhãn không mang state, không ai được ĐỌC nhãn để quyết định —
+vẫn đứng nguyên, đó là D2.
+
 ## 6. Thiết kế đã chốt {#design}
 
 *(Bản tổng hợp cho người đọc chưa từng dự buổi nào. Phần còn mở được
@@ -240,20 +271,37 @@ nhỏ và biết trước.
 **Chưa chốt (Q10):** biên đó là bao nhiêu và diễn đạt thế nào — một số cố
 định, một tỉ lệ, hay chỉ cho phép trong phạm vi một mẻ đã tính sẵn.
 
-### Nhãn là phép chiếu, không phải state
+### Nhãn: session tự đặt qua helper skill có gate
 
-Vì engine giữ cặp `slot ↔ work-item` (hệ quả của "xin slot trước khi
-dựng"), nhãn pane chỉ còn là *phép chiếu* của cặp đó: mỗi vòng poll,
-adapter đọc binding rồi vẽ lại nhãn. Không session nào gọi rename, không
-chrome nào chui vào `fgos-coding-driving`, và không còn cửa cho session
-ghi đè nhãn của orchestrator — bug `fgos-auto-discover` biến mất theo cấu
-trúc. "Bỏ rename" thành tầm thường: nhả binding thì vòng sau vẽ nhãn rỗi.
+Nhãn chỉ để cho người đọc — **không ai được đọc nhãn để quyết định bất cứ
+điều gì** (D2). Nhưng việc *đặt* nhãn vẫn do chính session làm, qua một
+helper skill có capability-gate (hướng `/fgOS:terminal` + `rename.sh` hôm
+nay), không phải do vòng poll của adapter vẽ (D5).
 
-Capability-gate vẫn cần (tool khác có thể không có khái niệm nhãn), nhưng
-đặt ở adapter, không ở skill.
+Lý do là một ca không thể bỏ qua: khi một người tự mở session trong pane
+rồi gõ `/fgOS:pick`, không có orchestrator process nào đang chạy — thứ
+duy nhất biết pane này đang làm item nào là chính session đó. Adapter
+không có mặt để vẽ hộ.
 
-**Chưa chốt (Q5):** đây là đề xuất khác với ý ban đầu (đặt rename ở
-`fgos-coding-driving`) — chờ xác nhận.
+Đây cũng chính là điểm hexagon: không phải orchestrator nào cũng có khái
+niệm nhãn pane, nên helper phải gate theo capability và no-op im lặng khi
+môi trường không hỗ trợ — đúng như `rename.sh` đã làm (exit 0 khi ngoài
+pane herdr). Đổi sang tmux/cmux chỉ cần thay adapter phía sau gate.
+
+Bug `fgos-auto-discover` được sửa ở phía *đọc*, không phải phía *ghi*:
+herdr-plugin hỏi engine "còn worker auto-discover nào sống không" thay vì
+dò nhãn. Session đổi nhãn bao nhiêu tuỳ thích, không ảnh hưởng.
+
+Phân công đặt nhãn theo lane:
+
+- **Lane execution** — session tự đặt, qua helper. `fgos-coding-driving`
+  là chỗ gọi hợp lý nhất vì nó biết id sớm nhất và biết mỗi lần stage
+  đổi, làm một lần thay cho N launcher (ý ban đầu của người dùng, vẫn
+  đứng). Gọi một helper có gate và no-op là thao tác cơ học, không phải
+  phán đoán định tuyến, nên không phá hard rule "purely mechanical loop"
+  của skill đó.
+- **Lane admin** — nhãn cố định theo slot (`fg:operation`), do adapter
+  đặt một lần khi dựng tab, không đổi theo item.
 
 ### Hình
 
@@ -279,8 +327,9 @@ flowchart TB
     R -.->|"xin slot"| CEIL
     F -.->|"xin slot"| CEIL
 
-    BIND -.->|"phép chiếu mỗi vòng poll"| LBL["Nhãn pane<br/>chỉ để người đọc"]
-    H -.- LBL
+    SESS["Session đang làm việc<br/>fgos-coding-driving"]
+    SESS -->|"helper skill có gate<br/>no-op khi không hỗ trợ"| LBL["Nhãn pane<br/>chỉ để người đọc<br/>KHÔNG ai đọc để quyết định"]
+    LBL -.- H
 ```
 
 ### Ngoài phạm vi, ghi nhận không nuốt
@@ -294,5 +343,99 @@ flowchart TB
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-Chưa viết. Chờ Q5 và Q10 chốt — Q5 quyết định có hay không một hạng mục
-"port đặt nhãn" tách riêng, hay nó tan vào hạng mục adapter.
+Bản phác, chờ Q10 chốt trước khi giao. Thứ tự dưới đây là thứ tự phụ
+thuộc thật: T1 phải xong trước, T2-T4 song song được sau đó.
+
+### T1 — Sổ worker slot + cổng gác trần trong engine {#task-slot-ledger}
+
+**Mục tiêu.** Dựng lớp duy nhất mà cả ba launcher phải đi qua: engine
+biết đang chạy gì, còn bao nhiêu chỗ, và cấp/nhả slot.
+
+**Trích §6.** "Engine (fgOS) sở hữu — đang chạy gì (occupancy), tổng trần
+bao nhiêu, còn chỗ hay không"; "Launcher xin slot trước khi dựng worker;
+hết chỗ thì bị từ chối, không tự quyết."
+
+**D-ID áp dụng.** D1 (đơn vị là worker slot), D2 (engine là chân lý,
+occupancy tái dùng tín hiệu `tsk-3ni`), D4 (hai lane), D6 (chỉ gác trần,
+không ranker), D7 (đếm theo work-item, mềm ở mép trên).
+
+**Quan hệ.** Chặn T2/T3/T4 — cả ba đều gọi vào port này.
+
+**Verify nháp.** `npm test` xanh, cộng test mới: cấp slot tới trần thì
+bị từ chối; lane admin không bị execution chiếm; một claim `doing` mà
+worktree im lặng quá ngưỡng `/fgOS:stale` thì được thu hồi slot; và
+đường mềm ở mép trên cho lấy trọn mẻ khi còn ≥1 chỗ.
+
+### T2 — herdr-plugin dùng port, bỏ nhãn-guard {#task-herdr-adapter}
+
+**Mục tiêu.** Chuyển herdr-plugin từ tự đếm sang xin phép engine, và sửa
+bug `fgos-auto-discover` ở đúng chỗ (phía đọc).
+
+**Trích §6.** "Bug `fgos-auto-discover` được sửa ở phía *đọc*, không phải
+phía *ghi*: herdr-plugin hỏi engine 'còn worker auto-discover nào sống
+không' thay vì dò nhãn."
+
+**D-ID áp dụng.** D2, D3, D5, D6, D7.
+
+**Bao gồm.** Đổi `fg:agents-N` → `fg:workers-N` (pinned term của
+`tsk-1q3`); `fg:operation` 2 → 4 pane, **supersede `tsk-5lr` D2** (nhận
+diện trái/phải theo hình học biến mất); bỏ `MAX_PANES_PER_TAB`/
+`MAX_AGENT_TABS` như nguồn trần, chuyển sang hỏi engine; `place_new_agent_pane`
+đổi từ vựng pane sang slot.
+
+**Quan hệ.** Phụ thuộc T1. Đụng cùng file với T3 (`pick.rs`) — cần xếp
+tuần tự hoặc tách footprint rõ.
+
+**Verify nháp.** `cargo test --manifest-path herdr-plugin/Cargo.toml` và
+`cargo build --release` (đúng quy ước `tsk-19y`/`tsk-3t9`), cộng test:
+không còn đường nào đọc nhãn để quyết định.
+
+### T3 — Helper đặt nhãn có capability-gate {#task-labeling-port}
+
+**Mục tiêu.** Đưa `terminal`/`rename.sh` thành điểm hexagon thật: khai
+capability vào tool registry, gate theo `fgos tool query`, no-op im lặng
+khi môi trường không hỗ trợ.
+
+**Trích §6.** "Không phải orchestrator nào cũng có khái niệm nhãn pane,
+nên helper phải gate theo capability và no-op im lặng khi môi trường
+không hỗ trợ."
+
+**D-ID áp dụng.** D5, D2.
+
+**Bao gồm.** Chốt chỗ gọi cho lane execution (`fgos-coding-driving`), và
+gỡ lời gọi rename rải rác ở các launcher hiện tại (`discover-next` bước 6
+là ví dụ).
+
+**Quan hệ.** Phụ thuộc T1 (cần binding để biết đặt nhãn gì). Đụng
+`pick.rs` cùng T2.
+
+**Verify nháp.** `npm test` xanh; đường gate trả "inactive" khi không có
+provider và không skill nào vỡ.
+
+### T4 — runner và fanout xin slot trước khi dispatch {#task-launcher-adoption}
+
+**Mục tiêu.** Đóng lỗ F2: hai launcher còn lại thôi tự chế trần.
+
+**Trích §6.** "Ba launcher là ba năng lực thực thi ở ba quy mô... Chúng
+vẫn khác nhau, không bị ép gộp" — nhưng đều xin slot.
+
+**D-ID áp dụng.** D6, D7, D4.
+
+**Bao gồm.** `runner.parallel.{maxRoots,maxLeavesPerRoot}` trở thành đầu
+vào của trần chung thay vì trần riêng; `fgos-fanout` D7 (cap 5) diễn đạt
+lại theo trần chung cộng luật lấy trọn mẻ; đăng ký config mới vào
+`fgos setup` config-merge và `fgos doctor` check registry
+(`src/setup/checks.mjs`) theo install/setup/doctor gate của `AGENTS.md`.
+
+**Quan hệ.** Phụ thuộc T1. Độc lập file với T2/T3.
+
+**Verify nháp.** `npm test` xanh; `fgos doctor` báo được trần đang cấu
+hình; test: runner và fanout đều bị từ chối khi engine hết chỗ.
+
+### Ngoài phạm vi, không có task ở đây
+
+- Ranker toàn cục xuyên pool (a) — để lại có chủ ý (D6).
+- Agent tự xử xung đột merge — `fgos catchup` đã có, thiếu là hành vi
+  skill (F7). Xứng đáng item riêng (Q11, chờ xác nhận).
+- Gom câu hỏi để hỏi người một lần — `AGENTS.md` ưu tiên #2, không phải
+  phạm vi slot.
