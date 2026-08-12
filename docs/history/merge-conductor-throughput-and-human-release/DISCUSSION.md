@@ -256,7 +256,7 @@ lại vào trong lock — quay về đúng vòng lặp tự siết đang có.
 **Bối cảnh nền cần đọc trước**:
 - `plans/reports/internal-research-260801-1823-merge-mechanism-grand-orchestrator-design-report.md` §E — thiết kế gốc, đọc nguyên mục
 - `src/runner/main-checkout-lock.mjs` — lineage lock wx-atomic-create đã chứng minh 4 lần; §E **tái dùng** lineage này, khoá theo target branch, không phát minh primitive mới
-- `src/state/graph-harness.mjs:94` `mergeReadiness` — đã tính sẵn `ready`/`mergeSets`; hàng đợi tiêu thụ nó, không tính lại
+- `src/state/graph-harness.mjs:109` `mergeReadiness` — đã tính sẵn `ready`/`mergeSets`; hàng đợi tiêu thụ nó, không tính lại
 - tsk-1zd's own description — số đo 13 lượt lặp, item `tsk-2ej`
 
 **File đụng**: `bin/fgos.mjs` (case `merge`, picker quanh dòng 2038; case

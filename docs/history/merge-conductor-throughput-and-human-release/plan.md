@@ -129,6 +129,40 @@ không làm ở đây.
 
 Tiến độ tổng: `fgos rollup tsk-51m`.
 
+## Ràng buộc Iron Law (phát hiện ở validating — áp cho mọi con)
+
+`src/evolve/iron-law.mjs:20-39` `MODULE_RULES` gác `{prefix: 'src/runner/'}`
+và `{equals: 'bin/fgos.mjs'}`; `:93` quyết định
+`required = matchedModules.length > 0 || matchedFlags.length > 0` — **chạm
+module là đủ bật, không cần từ khoá nào trong description**.
+
+Hệ quả cho bộ này:
+
+| Con | Chạm module gác? | Iron Law |
+|---|---|---|
+| `tsk-xyr` | `bin/fgos.mjs`, `src/runner/*` | **required** |
+| `tsk-4ax` | `src/runner/merge.mjs`, `bin/fgos.mjs` | **required** |
+| `tsk-55p` | `src/runner/worktree.mjs` | **required** |
+| `tsk-2ypd` | `src/runner/merge.mjs` | **required** |
+| `tsk-4xq` | chỉ `plugins/fgOS/skills/**` | không |
+| `tsk-51m` (root→main) | gộp diff của mọi con | **required** |
+
+Iron Law là stop **cần người** theo thiết kế (§H.3 và luật đã chốt) — bộ này
+**không thể tự merge trọn vẹn không người**. Mỗi con chạm module gác phải
+viết `iron-law-evidence.md` trên nhánh của mình (khuôn đã có tiền lệ:
+`docs/history/tsk-3bn-merge-conductor-harness-v2/iron-law-evidence.md`) để
+người duyệt xác nhận nhanh thay vì phải tự đi dựng lại bằng chứng.
+
+## Đính chính trích dẫn (validating)
+
+- `mergeReadiness` ở `src/state/graph-harness.mjs:**109**`, không phải `:94`
+  (bản nháp shaping ghi nhầm; mô tả của `tsk-xyr` còn giữ số cũ).
+- "Phiên đang sống" cho `tsk-2ypd` lấy từ `listSessions`
+  (`src/runner/session.mjs:485`, đọc `.fgos/sessions.json`), **không phải**
+  `src/runner/claim-liveness.mjs` — file đó chỉ export `lastActivityAt` và
+  `isReclaimEligible` (ngưỡng stale), không phải danh sách phiên sống. Mô tả
+  của `tsk-2ypd` còn trỏ sai chỗ này.
+
 ## Việc chưa gán chủ
 
 `worktree.mjs:652` `git branch -f` không khoá (gốc chung tsk-46a + tsk-2cd);
