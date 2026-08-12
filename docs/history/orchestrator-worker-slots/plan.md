@@ -41,6 +41,22 @@ T1 phơi **hai mặt tách bạch**, không được gộp làm một:
 1. **Hỏi trước (read-only)** — `còn chỗ cho class này không`. Launcher gọi
    *trước khi* dựng worker (mở pane / spawn tiến trình / bắn Agent). Rẻ,
    không giữ chỗ, không ghi gì.
+
+   **Mặt này BẮT BUỘC có một CLI verb read-only, không chỉ là hàm
+   JS.** Trong bốn consumer, chỉ `fgos-runner` là Node cùng tiến trình và
+   import thẳng được. Hai consumer còn lại không:
+   `herdr-plugin` là **Rust** và chỉ với tới engine qua
+   `Command::new("node") + bin/fgos.mjs` (`fgos.rs:362-368`, đúng như nó
+   đang đọc `triage --json`/`list --all --json` hôm nay); `fgos-fanout`
+   là **prose skill** chạy trong session Claude, cũng chỉ shell ra CLI.
+   Quyết định `0014` khoá đúng ranh giới này: *"CLI-spawn = cửa"*, còn
+   lib chỉ là "CLIENT tham chiếu (Node) của contract, không phải bản thân
+   contract".
+
+   ⇒ Không có verb thì T2 và T4 **không có đường nào** gọi pre-check, và
+   T1 sẽ ship một module mà một nửa consumer không với tới. Verb đọc
+   (dạng `fgos slots --json`, trả occupancy + còn chỗ theo từng lane) là
+   deliverable của T1, không phải việc để sau.
 2. **Chặn sau (cưỡng chế)** — cổng bên trong `claimWork`, để không đường
    nào lách qua, kể cả một launcher tương lai quên gọi mặt (1).
 
@@ -168,11 +184,14 @@ tiêu thụ, không sửa file đó); T2 chỉ đụng Rust; T3 chỉ đụng pr
 
 ## Shape — 4 pha
 
-**T1 — Sổ worker slot + cổng gác trần (engine).** Thêm module thuần
-`src/state/worker-slots.mjs` (không fs, cùng kỷ luật `discover-pool.mjs`/
-`plan-pool.mjs`) export **cả hai mặt**: phép đếm occupancy + phép hỏi còn
-chỗ (mặt read-only launcher gọi trước khi dựng worker), gồm cả luật
-trọn-mẻ của D8. Nối mặt cưỡng chế vào `claimWork`. Đăng ký mục config trần
+**T1 — Sổ worker slot + cổng gác trần + verb đọc (engine).** Thêm module
+thuần `src/state/worker-slots.mjs` (không fs, cùng kỷ luật
+`discover-pool.mjs`/`plan-pool.mjs`) export **cả hai mặt**: phép đếm
+occupancy + phép hỏi còn chỗ, gồm cả luật trọn-mẻ của D8. Nối mặt cưỡng
+chế vào `claimWork`. **Và phơi mặt read-only ra thành một CLI verb**
+(`bin/fgos.mjs` + đăng ký trong `src/cli/command-registry.mjs`) — đây là
+đường duy nhất `herdr-plugin` (Rust) và `fgos-fanout` (prose skill) với
+tới được, theo `0014`. Đăng ký mục config trần
 qua `registerConfigDefault({id, key, shape})`
 (`src/setup/registrations.mjs:97`, theo đúng vết `gateBypass` `:754` và
 `cleanup` `:776`) để `fgos setup` ghi mặc định và `fgos doctor` nhìn thấy
@@ -270,7 +289,50 @@ trọn-mẻ.
   nhận để ngoài cổng ở đợt này. *Giả định có chủ ý*, ghi nhận là giới hạn
   đã biết.
 - **A4** — Không có launcher thứ tư nào chưa biết đang dựng worker ngoài
-  ba cái đã khảo sát.
+  ba cái đã khảo sát. *Đã chứng minh* ở validating: `goal-check.mjs:42`
+  có spawn nhưng 0 lần gọi `claimWork`; `prompt-templates.mjs` chỉ nhắc
+  trong comment. Kèm tinh chỉnh: trần đếm rootTask, **không** đếm tải máy
+  — `goal-check` chạy lệnh verify và các capacity helper (judge/gather)
+  đều tốn máy mà vô hình với trần.
+
+- **A5 — CHỖ PANE VẬT LÝ LUÔN CÓ KHI ENGINE NÓI CÒN SLOT.** *Assumption
+  này plan bản đầu KHÔNG hề nêu, và validating đã BÁC nó.* Đây là lý do
+  verdict đầu tiên (`READY WITH CONSTRAINTS`) bị đảo thành `NOT READY`.
+
+  Bằng chứng:
+  - **Slot logic nhả tốt.** 6 cạnh ra khỏi `doing`
+    (`status-fsm.mjs:102,107,117,122,138,151`) đều nhả slot cơ học, ngay
+    lập tức. Một session làm xong `fgos return` nhả slot kể cả khi người
+    để terminal mở — pane mở chỉ là rác nhìn, không giữ slot.
+  - **Pane vật lý thì không.** `place_new_agent_pane` (`layout.rs`) CHỈ
+    tạo mới: `find_agents_tab_with_room` → `next_split_target` →
+    `pane_split_argv`. Grep toàn `herdr-plugin/src`: không có đóng pane,
+    không tái dùng, không reaper.
+  - **Cơ chế đóng hiện có không đáng tin, và không phải vì môi trường.**
+    `close.sh` có 3 guard (`HERDR_ENV=1`, `herdr` trên PATH,
+    `HERDR_PANE_ID`) — trong session thật kiểm lúc validating, **cả 3
+    đều pass**. Nó không chạy vì nó là *dòng cuối của một SKILL.md
+    prose*: không gì cưỡng chế model thực thi, và nó chỉ bắn khi có
+    `--autoClose` cộng đúng loại stop reason. `/fgOS:pick` thủ công không
+    bao giờ truyền cờ đó.
+
+  ⇒ Pane tích tụ tới cap 8 rồi herdr **không mở nổi worker dù engine báo
+  còn chỗ**. Trần logic và trần vật lý phân kỳ, và cái vật lý mới là ràng
+  buộc thật — không ai thu hồi nó.
+
+  **Hướng vá đề xuất cho planning (chưa chốt): tái dùng pane thay vì đóng
+  pane.** Mỗi vòng poll, herdr map pane → item nó đang gắn; pane nào có
+  item đã rời `doing` là pane rỗi → chạy worker kế tiếp *vào chính pane
+  đó* thay vì split pane mới. Cách này né hẳn cơ chế đóng prose không
+  đáng tin (không cần pane đóng nữa), và làm trần vật lý bám theo trần
+  logic theo cấu trúc chứ không nhờ may mắn.
+
+- **A6 — Lọc liveness cho item kẹt `doing` đủ rẻ để chạy mỗi vòng poll.**
+  *Chưa chứng minh.* Người claim rồi bỏ đi giữa chừng làm item kẹt `doing`
+  vĩnh viễn, giữ slot vĩnh viễn; D2 nói tái dùng tín hiệu `tsk-3ni`,
+  nhưng tín hiệu đó thiết kế cho *claim-conflict*, chưa phải bộ lọc đếm.
+  Áp nó vào phép đếm nghĩa là chạy `git log` + `git status` cho từng item
+  `doing`, mỗi 5 giây herdr poll — chi phí chưa ai đo.
 
 ## Supersede
 
