@@ -43,14 +43,10 @@ asserted to generalize automatically to a domain that does not exist yet.
   happens because the loaded stage-skill called its own engine verb
   (`fgos discover`/`fgos plan`/`fgos return`) — this skill only reads
   state and decides whether to loop again, exactly the same "engine's verb
-  always wins" stance `fgos-routing` itself states. **One documented
-  exception (tsk-4b2 D4):** at stage `discovery`, the loaded skill
-  (`fgos-researching`) is a stage-agnostic helper that returns a verdict
-  without ever calling an engine verb itself (its own Hard rules say so
-  directly) — see `## Discovery and exploring stages` below for how this
-  loop completes that call on its behalf. This is not a second way to
-  apply a transition; it is still the same `fgos discover` engine verb,
-  called because the invoked skill's own contract requires the caller to.
+  always wins" stance `fgos-routing` itself states. This holds for every
+  coding-domain stage without exception (tsk-tku D7 — `discovery`'s own
+  skill chủ, `fgos-coding-discovering`, calls `fgos discover` itself, the
+  same shape every other stage-skill in this loop already follows).
 - Check the ceiling BEFORE invoking the current stage's skill, never after
   (tsk-19j §3's own verified boundary — this is what lets a `ceiling:
   stage:decompose` loop stop with the item freshly landed AT `decompose`,
@@ -366,51 +362,6 @@ The invoked skill is trusted to do its own job completely (including its
 own gate question, when one is needed) before returning control here — this
 skill never second-guesses or repeats a stage-skill's own gate.
 
-## Discovery and exploring stages
-
-Two of the six coding-domain stages need special mention here (tsk-4b2
-D3/D4): they were registered in `workflow-stage-graphs.mjs` but
-structurally unreachable until `tsk-4b2` — nothing ever moved an item's
-`stage` to `discovery`/`exploring` before this item. Reachable now,
-`skillForStage` already resolves `discovery -> fgos-researching` and
-`exploring -> fgos-coding-exploring` — this loop needs no new registry lookup for
-either, only the following:
-
-- **`exploring`** needs no special handling. `fgos-coding-exploring`'s own Gate
-  already calls `fgos discover --verdict clear` (or parks via `fgos ask`)
-  once `CONTEXT.md` is locked and approved, the same "invoked skill calls
-  its own engine verb" shape every other stage-skill in this loop already
-  follows. The generic `invoke skill` step already covers it.
-- **`discovery`** is the one exception (see the Hard rule above). Its
-  resolved skill, `fgos-researching`, is a stage-agnostic helper reused
-  from several call sites (mid-`fgos-coding-exploring`, mid-`fgos-coding-planning`) — its
-  own Hard rules state plainly that it "never writes item state itself;
-  the caller... does that with the verdict this skill hands back." When
-  `skill` resolves to `fgos-researching` this turn, invoke it with the
-  goal (the item's own title/description) and everything already known
-  (its `refs`, prior `view.discovery[id]` verdicts), then apply the
-  returned `{clear, question?, verify?}` verdict yourself, through the
-  same engine verb `fgos-coding-exploring` already uses —
-  `nextDiscoveryEdge` (`src/intake/discovery.mjs`, tsk-4b2 D3/D6) resolves
-  `discovery -> exploring` through this verb when the item's `stage` is
-  already `discovery`:
-
-  ```bash
-  root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-  # clear -- --verify is required by the verb itself; pass the item's own
-  # current verify back (read fresh via `fgos list --id <id> --json`) since
-  # nextDiscoveryEdge only uses this as a fallback when work.verify isn't
-  # already real, never a new guess to overwrite an already-real one:
-  node "$root/bin/fgos.mjs" discover "<id>" --verdict clear --verify "<item's current work.verify>" --dir "$root"
-  # unclear -- fgos-researching's own question, never guessed past:
-  node "$root/bin/fgos.mjs" discover "<id>" --verdict unclear --question "<the question fgos-researching returned>" --dir "$root"
-  ```
-
-  A `clear` call advances `discovery -> exploring`; an `unclear` call parks
-  the item in `awaiting-human` with `fgos-researching`'s own question —
-  the loop's own `parkReasonForStatus == 'human-question'` stop then
-  catches it on the next fresh read, same as any other park.
-
 ## Which existing loops are this loop (D9 §3, no separate mechanisms)
 
 | Caller | `id` source | `ceiling` |
@@ -517,11 +468,6 @@ rather than legitimate scope, that is new evidence for a follow-up item —
   cross-domain evidence — both only read a per-domain field the registry
   already carries; neither asserts this loop has been exercised against a
   second domain; D10 still holds
-- invoking `fgos-researching` at stage `discovery` and treating its
-  returned verdict as informational, without applying it via `fgos
-  discover` yourself — see `## Discovery and exploring stages` above; that
-  skill's own contract refuses to write state, so skipping the follow-up
-  call leaves the item stranded at `discovery` forever
 
 Violating the letter of the rules is violating the spirit of the rules.
 

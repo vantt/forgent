@@ -186,10 +186,10 @@ test('buildPrompt omitting stage defaults to "executing", byte-identical to ever
   assert.equal(buildPrompt(sampleWork()), buildPrompt(sampleWork(), undefined, 'executing'));
 });
 
-test('buildPrompt with stage:"discovery" points the Agent skill section at fgos-researching\'s SKILL.md and selects the discovery template', () => {
+test('buildPrompt with stage:"discovery" points the Agent skill section at fgos-coding-discovering\'s SKILL.md and selects the discovery template', () => {
   const prompt = buildPrompt(sampleWork(), undefined, 'discovery');
   assert.match(prompt, /# Agent skill/);
-  assert.ok(prompt.includes('.claude/skills/fgos-researching/SKILL.md'));
+  assert.ok(prompt.includes('.claude/skills/fgos-coding-discovering/SKILL.md'));
   assert.match(prompt, /discovery stage/);
 });
 
@@ -1527,7 +1527,7 @@ test('spawnWorker logs the same templateName that buildPrompt actually rendered 
 // picking the discovery-flavored prompt/template instead of the default
 // executing one — same "never a diverging pick" proof as the test above,
 // now for the new stage-aware path.
-test('spawnWorker with opts.stage:"discovery" logs the discovery templateName and sends the fgos-researching-pointed prompt — never a diverging pick between the two call sites', async () => {
+test('spawnWorker with opts.stage:"discovery" logs the discovery templateName and sends the fgos-coding-discovering-pointed prompt — never a diverging pick between the two call sites', async () => {
   const dir = mkTempDir();
   const scriptPath = writeEchoExecutor(dir);
   const cfg = baseConfig([scriptPath, '{prompt}']);
@@ -1538,7 +1538,7 @@ test('spawnWorker with opts.stage:"discovery" logs the discovery templateName an
   assert.equal(result.templateName, 'worker-prompt-discovery.txt');
   const payload = JSON.parse(result.stdout);
   assert.equal(payload.args[0], buildPrompt(work, undefined, 'discovery'));
-  assert.ok(payload.args[0].includes('.claude/skills/fgos-researching/SKILL.md'));
+  assert.ok(payload.args[0].includes('.claude/skills/fgos-coding-discovering/SKILL.md'));
 });
 
 test('spawnWorker defaults to the standard tier when the work item omits tier', async () => {
