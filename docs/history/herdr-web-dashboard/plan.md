@@ -1,0 +1,183 @@
+# plan.md — herdr-web-dashboard (tsk-ldb)
+
+Quyết định nguồn: `CONTEXT.md` (D1-D11) cùng thư mục. Thảo luận đầy đủ:
+`DISCUSSION.md`. Kế hoạch này **không mở lại** bất kỳ D-ID nào — chỉ trích.
+
+## Mode: high-risk
+
+**8/10 flag áp dụng, trong đó 3 là hard-gate** (auth, audit/security,
+external provider):
+
+| Flag | Bằng chứng |
+|---|---|
+| auth *(hard-gate)* | D6/D8/D9 — token, cookie session, xác minh JWT |
+| audit/security *(hard-gate)* | D7 bind `0.0.0.0`; token web là **secret đầu tiên** fgOS phải lưu (`CONTEXT.md` §Bằng chứng scout) |
+| external systems *(hard-gate)* | cf-access fetch JWKS qua mạng; loạt crate mới (axum/tokio/jsonwebtoken/rust-embed) |
+| public contracts | bề mặt HTTP endpoint mới, chưa từng tồn tại trong repo |
+| existing covered behavior | **128 `#[test]`** đang có trong `herdr-plugin/src/*.rs`; thêm async runtime vào một binary thuần đồng bộ |
+| weak proof | `impact-analysis: degraded`; repo **chưa có hạ tầng test HTTP nào** |
+| multi-domain | Rust (`herdr-plugin/`) + Node (`src/setup/registrations.mjs`) + frontend asset |
+| cross-platform | `chmod 0600` của D9 là POSIX-only |
+
+**Vì sao không phải lane nhỏ hơn:** `standard` chỉ dành cho 2-3 flag và
+không có hard-gate nào. Riêng auth + secret-storage + bind-mọi-interface đã
+vượt ngưỡng; cộng thêm việc phải đưa async runtime vào một crate có 128
+test đang xanh thì `standard` là đánh giá thấp có hệ thống, không phải tiết
+kiệm ceremony.
+
+## Approach
+
+### Đường đã chọn
+
+Xây theo **5 mảnh tuần tự**, nền trước — mặt sau, và tách theo **ranh giới
+ngôn ngữ/test-suite** chứ không theo màn hình. Lý do tách như vậy: mảnh
+config phải đăng ký vào `fgos setup`/`doctor` (cổng bắt buộc của
+`AGENTS.md`) nên nó là việc **Node** (`npm test`), trong khi bốn mảnh còn
+lại là **Rust** (`cargo test`) — gộp lại thì một `verify` phải chạy cả hai
+suite và footprint trải hai ngôn ngữ.
+
+**Có tiền lệ trực tiếp ngay trong chính vùng tính năng này:** `tsk-2m5`
+("herdr-orchestrator: settings source for auto-launch toggles +
+doctor/setup registration") đã là một item RIÊNG, tách khỏi `tsk-2ja`/
+`tsk-57q` là các consumer của nó. Kế hoạch này lặp lại đúng hình dạng đó.
+
+### Phương án đã cân nhắc và loại
+
+| Phương án | Vì sao loại |
+|---|---|
+| Một item duy nhất, không tách | 8 flag/high-risk với footprint trải 3 ngôn ngữ; một `verify` duy nhất không chứng minh nổi, và không có điểm dừng an toàn nào ở giữa |
+| Tách theo màn hình (taskboard/detail/auth trộn lẫn) | Mỗi mảnh sẽ tự mang một phần auth → auth bị hiện thực rải rác, đúng thứ D8 muốn tránh; và mỗi mảnh phải sửa `Cargo.toml` |
+| Gộp config vào mảnh webserver | Trộn `npm test` với `cargo test` trong một verify; đi ngược tiền lệ `tsk-2m5` |
+| Làm cf-access ngay trong v1 bắt buộc | D8/`DISCUSSION.md` §7 chốt nó **tuỳ chọn**; lớp 1 đã đủ cho LAN |
+| Tự thiết kế scheme auth mới | D8 chốt port idiom đã kiểm chứng từ `herdr-gateway` — tự thiết kế auth là đúng loại việc không nên tự làm |
+
+### Bản đồ rủi ro
+
+`impact-analysis: degraded` (gitnexus `present` nhưng index cũ:
+`79fead3` vs HEAD `13eef94d`) — **mọi phát biểu blast-radius dưới đây là
+chưa xác nhận**, phải cross-check bằng `rg` tại `fgos-coding-validating`.
+
+| # | Thành phần | Mức | Điều gì chứng minh được |
+|---|---|---|---|
+| R1 | Đưa tokio/axum vào crate thuần đồng bộ (ratatui/crossterm) | **Cao** | `cargo test` toàn crate xanh **và** 128 test cũ không giảm số; chạy thật TUI xác nhận event loop không bị async runtime tranh chấp |
+| R2 | Xác minh chữ ký JWT cf-access | **Cao** | Test **âm tính** bắt buộc: một assertion tự ký/giả bị từ chối. Chỉ test đường xanh là vô nghĩa ở đây |
+| R3 | Secret file: quyền 0600 + không lọt git | **Trung bình** | Test quyền file sau khi sinh; `git check-ignore` xác nhận đường dẫn bị ignore; grep xác nhận không nằm trong `.fgos/config.json` |
+| R4 | Mặc định BẬT + bind `0.0.0.0` (D10+D7) | **Trung bình** | `doctor` surface được trạng thái phơi nhiễm; log cảnh báo khi bind không phải loopback |
+| R5 | Ghép cặp vị trí `askHistory[i]` ↔ answer thứ i (D2) | **Trung bình** | Chạy trên **dữ liệu thật**: `tsk-48i` có 23 ask + 23 answer — xác nhận ghép đúng cặp, không lệch một nhịp |
+| R6 | Đọc/serve `CONTEXT.md`/`plan.md` theo `docsRef` của item (D3) | **Trung bình** | `docsRef` là đường dẫn từ event log; phải canonicalize và bắt buộc nằm trong `docs/` trước khi đọc — test một `docsRef` dạng `../../` bị từ chối |
+
+R6 không nằm trong `CONTEXT.md` và không đổi scope/behavior/data shape —
+nó là chi tiết hiện thực của D3, nên được ghim làm **giả định** bên dưới
+thay vì trả ngược về `fgos-coding-exploring`.
+
+### Thứ tự và lý do
+
+`fgos graph --json`: tsk-ldb là component **cô lập** (`size 1`),
+`topUnblock` rỗng, `criticalPath` (depth 10, `tsk-4vo…tsk-19y-1`) không đi
+qua nó. Nên thứ tự **không** lấy được từ graph — nó đến từ phụ thuộc nội
+bộ giữa 5 mảnh:
+
+```
+P1 config+doctor  →  P2 webserver core + auth L1  →  P3 taskboard  →  P4 task detail
+                              └──────────────────────────────────────→  P5 cf-access (tuỳ chọn)
+```
+
+P1 trước vì P2 phải đọc toggle/bind/port từ đúng nguồn config đó. P4 là
+mục tiêu thật của cả item (lời người dùng gốc: "tập trung vào phần view
+task detail") nhưng phải đứng sau P3 vì P3 là điểm vào của nó.
+
+**Footprint chồng lấn có chủ ý:** P2/P3/P4/P5 đều chạm
+`herdr-plugin/src/web/mod.rs` (đăng ký route). Chúng **phải chạy tuần tự,
+không song song** — đây đúng loại va chạm `footprintOverlapAmong` sinh ra
+để bắt.
+
+## Shape
+
+### P1 — config + doctor/setup registration
+
+Thêm section config riêng cho web dashboard vào `.fgos/config.json` (cạnh
+`herdrOrchestrator`), đọc fail-closed từ Rust theo đúng khuôn
+`settings.rs` hiện có, **nhưng mặc định BẬT** (D10 — cố ý khác 4 toggle
+kia). Đăng ký vào `fgos setup` config-merge + `fgos doctor` check registry
+theo khuôn `herdr-launcher-configured`
+(`src/setup/registrations.mjs:1064-1112`). Thêm dòng `.gitignore` cho
+đường dẫn secret của D9.
+
+### P2 — webserver core + auth lớp 1
+
+axum + `rust-embed`/`axum-embed`, phục vụ static asset + health-check.
+Bind theo config, mặc định `0.0.0.0`, cảnh báo khi không phải loopback
+(D7). Auth lớp 1 đầy đủ theo D8/D9: resolve token (env → file 0600 tự
+sinh), `POST /api/login` với `constant_time_eq`, cookie `HttpOnly;
+SameSite=Strict`, mọi thất bại **404 câm**. Bề mặt ghi khai báo dạng
+allowlist ngay từ đây (`answer`/`approve`/`reject`), chưa cần có handler
+thật.
+
+### P3 — taskboard
+
+Danh sách work item đọc qua `WorkItemSource` đã có
+(`herdr-plugin/src/ports.rs:11-20`), không thêm nguồn dữ liệu mới.
+
+### P4 — task detail (mục tiêu chính)
+
+Ba khối: lịch sử agent đã làm (nguồn `CONTEXT.md`/`plan.md`, D3 + guard
+R6); lịch sử câu hỏi (ghép theo `seq`, D2); câu hỏi cần trả lời phủ **cả
+`ask` lẫn `gate-approve`** (D4), layout tách rõ câu-hỏi / vì-sao /
+bối-cảnh.
+
+### P5 — cf-access (tuỳ chọn)
+
+Lớp 2 của D8. Port thẳng `herdr-gateway/src/web/cf_access.rs`.
+
+### Ca cần chứng minh (theo mức high-risk)
+
+- **Rỗng/biên:** item chưa từng park (`askHistory` vắng) → khối lịch sử
+  câu hỏi rỗng, không panic. Item có `docsRef` trỏ tới thư mục không tồn
+  tại → khối lịch sử agent báo thiếu, không 500.
+- **Không được regress:** 128 test Rust hiện có vẫn xanh; TUI vẫn chạy
+  bình thường khi webserver bật.
+- **Truy cập đồng thời:** hai tab web cùng `answer` một item → cửa ghi
+  một-cửa của fgOS phải giữ, không sinh đường ghi thứ hai (D8's allowlist
+  đi qua `fgos <verb>`, không ghi thẳng `.fgos/`).
+- **Hỏng một phần:** JWKS endpoint không với tới được → cf-access từ chối
+  sạch, **không** rơi ngược về "cho qua" (fail-closed).
+- **Lệch nhịp:** item có số ask ≠ số answer (đang park, chưa trả lời) →
+  ghép cặp D2 không được lệch các cặp phía trước.
+
+## Assumptions
+
+| # | Giả định | Nếu sai thì sao |
+|---|---|---|
+| A1 | Thêm tokio vào crate ratatui không phá event loop TUI hiện tại (chạy server trên runtime riêng/thread riêng) | R1 — nếu sai, phải tách webserver thành tiến trình con, đổi hẳn hình dạng P2 |
+| A2 | `docsRef` chỉ được ghi bởi phiên local qua `fgos edit`, không bao giờ từ mạng (allowlist ghi của D8 không gồm `edit`) | R6 — nếu sai, guard canonicalize thành bắt buộc chặn, không phải phòng xa |
+| A3 | Ghép cặp theo vị trí của D2 đúng trên dữ liệu thật, vì FSM chặn hỏi-đè (S4(b) của cụm `tsk-65i`/`tsk-539`) | R5 — nếu sai, cần một khoá liên kết thật, mà D2 đã cố ý loại |
+| A4 | `.fgos/` là nơi hợp lệ cho file secret (đã có 5 tiền lệ gitignored cùng loại) | R3 |
+
+## Split
+
+Tách thành 5 item con, mỗi item mang `parent: tsk-ldb`, và `deps` nối
+tuần tự đúng thứ tự ở phần Approach (không chỉ nói trong prose — nếu để
+`deps` rỗng thì cả 5 cùng nổi lên frontier và một lượt dispatch song song
+có thể chạy P3 trước khi P2 tồn tại, đúng thứ footprint chồng lấn đã cảnh
+báo).
+
+| Mảnh | id | deps | verify |
+|---|---|---|---|
+| P1 config + doctor/setup | `tsk-48w` | — | `npm test -- test/setup && node bin/fgos.mjs doctor --json --dir . \| grep -q herdr-web` |
+| P2 webserver core + auth L1 | `tsk-k4v` | `tsk-48w` | `cargo test --manifest-path herdr-plugin/Cargo.toml && cargo build --release --manifest-path herdr-plugin/Cargo.toml` |
+| P3 taskboard | `tsk-5jr` | `tsk-k4v` | `cargo test --manifest-path herdr-plugin/Cargo.toml web_taskboard` |
+| P4 task detail *(mục tiêu chính)* | `tsk-4id` | `tsk-5jr` | `cargo test --manifest-path herdr-plugin/Cargo.toml web_task_detail web_qa_history web_gate_approve` |
+| P5 cf-access *(tuỳ chọn)* | `tsk-18to` | `tsk-k4v` | `cargo test --manifest-path herdr-plugin/Cargo.toml cf_access` |
+
+P5 nhánh song song từ P2 (không chặn P3/P4) — đúng tính chất "tuỳ chọn"
+của nó: ba mảnh kia deliver được mà không cần nó.
+
+### Companion, ngoài cây con này (D5)
+
+`tsk-539` (STR71, "ask self-sufficiency") **không** là con của tsk-ldb và
+**không** có cạnh `deps` nào tới nó — đó chính là nội dung D5. Nó được đẩy
+tiếp riêng sau khi cụm này xong.
+
+## Outstanding questions
+
+None
