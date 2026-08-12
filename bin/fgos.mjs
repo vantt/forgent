@@ -24,7 +24,7 @@ import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfigForDir } from '../src/runner/dispatch.mjs';
 import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
 import { resolveFgosDir, fgosDirFromRoot } from '../src/runner/paths.mjs';
-import { resolveDiscovery, discoverableStages } from '../src/intake/discovery.mjs';
+import { resolveDiscovery, discoverableStages, classificationPatchFromVerdict, assertCallerClassification } from '../src/intake/discovery.mjs';
 import { resolvePlan } from '../src/intake/plan.mjs';
 import { computeEntropy, computeCounts, FINAL_STATUSES } from '../src/report/entropy.mjs';
 import { findSourceCaptureIds } from '../src/report/enduser-index.mjs';
@@ -386,6 +386,25 @@ function parseDiscoverCallerVerdict(flags) {
     // silently misapply" stance for every other flag here by simply not
     // reading it on that branch.
     if (flags.force) verdict.force = true;
+    // D12: tier/kind/risk are decided AT discovery, on evidence — the
+    // headless worker already reports them in its `fgos-verdict` block, and
+    // these three flags are the interactive path's half of that same data
+    // contract, so a live session no longer has to remember a separate
+    // `fgos edit` call to record what it just judged. Read only on the clear
+    // branch, the same way `--force` is: a classification judged against
+    // evidence that turned out insufficient must never ride an unclear
+    // verdict, and simply not reading the flags there is what enforces it —
+    // the same guard the headless path runs
+    // (`classificationPatchFromVerdict`) then re-checks the resolved outcome
+    // before anything is written. Each key is present only when the caller
+    // actually passed it, so a call that omits all three produces the exact
+    // same verdict shape as before these flags existed.
+    const tier = optionalField(flags.tier, "discover --tier requires a value ('light'/'standard'/'heavy'); omit --tier entirely to leave the item's tier unchanged.");
+    const kind = optionalField(flags.kind, "discover --kind requires a value from the domain's own kind vocabulary; omit --kind entirely to leave the item's kind unchanged.");
+    const risk = optionalField(flags.risk, "discover --risk requires a value ('light'/'standard'/'heavy'); omit --risk entirely to leave the item's risk unchanged.");
+    if (tier !== undefined) verdict.tier = tier;
+    if (kind !== undefined) verdict.kind = kind;
+    if (risk !== undefined) verdict.risk = risk;
     return verdict;
   }
   if (flags.verdict === 'unclear') {
@@ -1211,7 +1230,24 @@ async function runVerb(verb, flags, positional, dir) {
         ? loadRunnerConfig(flags.config)
         : ensureRunnerConfigForDir(path.dirname(dir));
       const callerVerdict = parseDiscoverCallerVerdict(flags);
-      return resolveDiscovery(dir, id, cfg, 'session', callerVerdict);
+      // D12: refuse an out-of-vocabulary --tier/--kind/--risk BEFORE
+      // resolveDiscovery writes anything — the same validation editWork
+      // applies below, run early so a typo can never leave the item with its
+      // stage advanced and its classification rejected.
+      assertCallerClassification(work, callerVerdict);
+      const result = resolveDiscovery(dir, id, cfg, 'session', callerVerdict);
+      // The interactive half of D12's classification contract, applied
+      // through the SAME guard the headless sweep uses (loop.mjs re-exports
+      // it from discovery.mjs) rather than a second copy: only a resolved
+      // `clear` outcome carrying a clear caller verdict ever produces a
+      // patch, so an unclear verdict or a parked verify dispute applies
+      // nothing. A call that passed no classification flags leaves the patch
+      // empty, editWork is never called, and the returned payload keeps its
+      // exact pre-existing shape.
+      const classificationPatch = classificationPatchFromVerdict(result.outcome, callerVerdict);
+      if (Object.keys(classificationPatch).length === 0) return result;
+      editWork(dir, { id, patch: classificationPatch, role: 'session' });
+      return { ...result, classification: classificationPatch };
     }
 
     // The sync branch's entry point into chia-việc/split-work judgment

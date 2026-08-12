@@ -96,6 +96,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `fgos discover` accepts `--tier`, `--kind`, and `--risk` alongside
+  `--verdict clear`, so an interactive session can record the classification
+  it just judged in the same call that resolves discovery, instead of
+  remembering a separate `fgos edit`. This is the same data contract a
+  headless worker already had through its `fgos-verdict` block, and both
+  paths now run it through one shared guard: nothing is applied unless the
+  discovery outcome actually resolves clear, so an unclear verdict or a
+  parked verify dispute still changes no classification. A value outside the
+  item's own domain vocabulary is refused as a validation error (exit 4)
+  before the item moves at all, and omitting a flag leaves that field
+  untouched.
 - Repo-invariant checks now run alongside an item's own `verify`, at both
   `fgos return` and the post-merge gate of `fgos approve`. The commands are
   declared per project in `.fgos/config.json` under `invariantChecks.commands`
