@@ -1079,11 +1079,12 @@ export async function runOnce(options = {}) {
     // use (CONTEXT.md's own instruction), just pointed at `fgos-researching`
     // via `opts.stage: 'discovery'` (dispatch.mjs). Discovery is a pure
     // machine-alone pass (D3 — "pha máy-một-mình tách khỏi pha máy+người"):
-    // there is no verdict to gate the transition on here, unlike the
-    // clarify->planning engine's own edge — the worker records
-    // its findings in `RESEARCH.md` and the item unconditionally advances
-    // `discovery -> exploring` once dispatch settles; the human-facing
-    // decision-lock happens at `exploring`, not here. Sequential (mirrors
+    // the worker's own {clear, question?, verify?} verdict (parsed below,
+    // tsk-4v6) gates the transition through the same `resolveDiscovery`
+    // the interactive `discover` verb calls — the item never advances
+    // unconditionally. A `clear` verdict skips `exploring` and lands on
+    // `planning` directly; `unclear` advances to `exploring` (tsk-30v
+    // D2/D6), where the human-facing decision-lock happens. Sequential (mirrors
     // this sweep's own pre-tsk-5mj simplicity), not the parallel drain-run
     // below — that stays scoped to `stage: executing` only, unchanged. No
     // dispatch under dry-run, same rule the old sweep already followed.

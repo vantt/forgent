@@ -453,13 +453,11 @@ test('runOnce: an item already advanced to planning (via an explicit prior disco
   mkLockedContextFixture(repoRoot, docsRef, { mode: 'tiny' });
   seedItem(dir, { id: 'item-clarify', stage: 'discovery', verify: 'test -f output.txt', docsRef });
   // tsk-qod D1/D2: `clarify` is retired entirely -- a fresh item now starts
-  // at `discovery` (`stages[0]`) directly, so two explicit discover calls
-  // walk the item through the real chain (discovery->exploring->planning),
-  // the same two hops `fgos-coding-driving`'s own inline discovery/
-  // exploring handling (or, for exploring, `fgos-coding-exploring`'s own
-  // Gate) would make one at a time in a live session.
+  // at `discovery` (`stages[0]`) directly. tsk-30v D2/D6: a clear verdict at
+  // discovery now skips exploring and lands on planning directly in ONE
+  // explicit discover call (previously two hops walked
+  // discovery->exploring->planning).
   resolveDiscovery(dir, 'item-clarify', {}, 'session', { clear: true, verify: 'test -f output.txt' });
-  resolveDiscovery(dir, 'item-clarify', {}, 'session', { clear: true });
   const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
@@ -510,10 +508,9 @@ test('runOnce decompose sweep folds an unrecognized item.domain to "coding" (fai
       docsRef,
     },
   });
-  // tsk-qod D1/D2: see the earlier test's own comment -- two hops now walk
-  // discovery->exploring->planning.
+  // tsk-30v D2/D6: see the earlier test's own comment -- a clear verdict at
+  // discovery now lands on planning directly in one hop.
   resolveDiscovery(dir, 'item-clarify', {}, 'session', { clear: true, verify: 'test -f output.txt' });
-  resolveDiscovery(dir, 'item-clarify', {}, 'session', { clear: true });
   const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
   const lines = [];
   const capture = (msg) => lines.push(msg);
@@ -564,10 +561,10 @@ test('runOnce decompose sweep still fires normally for a coding-domain item adva
   const docsRef = 'docs/history/item-coding-clarify';
   mkLockedContextFixture(repoRoot, docsRef, { mode: 'tiny' });
   seedItem(dir, { id: 'item-coding-clarify', stage: 'discovery', verify: 'test -f output.txt', docsRef });
-  // tsk-qod D1/D2: see the earlier tests' own comment -- two hops now walk
-  // discovery->exploring->planning.
+  // tsk-30v D2/D6: a clear verdict at discovery now skips exploring and
+  // lands on planning directly in ONE hop (previously two hops walked
+  // discovery->exploring->planning).
   resolveDiscovery(dir, 'item-coding-clarify', {}, 'session', { clear: true, verify: 'test -f output.txt' });
-  resolveDiscovery(dir, 'item-coding-clarify', {}, 'session', { clear: true });
   const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
@@ -1723,7 +1720,7 @@ execFileSync('git', ['commit', '-q', '-m', 'worker: RESEARCH.md']);
   return scriptPath;
 }
 
-test('tsk-4v6: DISCOVERY DISPATCH sweep advances discovery -> exploring on a clear verdict, carrying the worker\'s proposed verify onto the item', async () => {
+test('tsk-30v: DISCOVERY DISPATCH sweep advances discovery -> planning on a clear verdict, skipping exploring, carrying the worker\'s proposed verify onto the item', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   // FALLBACK_VERIFY, not seedItem's default -- a fresh discovery-stage item
   // has no real verify yet, same starting shape as an item that just landed
@@ -1735,12 +1732,12 @@ test('tsk-4v6: DISCOVERY DISPATCH sweep advances discovery -> exploring on a cle
   await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   const item = listWork(dir).work['item-research-clear'];
-  assert.equal(item.stage, 'exploring', 'a clear verdict advances discovery -> exploring');
-  assert.equal(item.status, 'todo', 'exploring is a fresh todo stop, not doing/awaiting-approval');
+  assert.equal(item.stage, 'planning', 'tsk-30v D2/D6: a clear verdict skips exploring, discovery -> planning directly');
+  assert.equal(item.status, 'todo', 'planning is a fresh todo stop, not doing/awaiting-approval');
   assert.equal(item.verify, 'npm test -- research', "the worker's own proposed verify rides onto the item");
 });
 
-test('tsk-4v6: DISCOVERY DISPATCH sweep parks the item on an unclear verdict instead of advancing it, matching the interactive driver path', async () => {
+test('tsk-4v6/tsk-30v: DISCOVERY DISPATCH sweep advances the item to exploring AND parks it on an unclear verdict, matching the interactive driver path', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-research-unclear', stage: 'discovery' });
   const body = JSON.stringify({ clear: false, question: 'Which retry backoff strategy should this follow?' });
@@ -1750,7 +1747,7 @@ test('tsk-4v6: DISCOVERY DISPATCH sweep parks the item on an unclear verdict ins
 
   const view = listWork(dir);
   const item = view.work['item-research-unclear'];
-  assert.equal(item.stage, 'discovery', 'stage never advances on an unclear verdict');
+  assert.equal(item.stage, 'exploring', 'tsk-30v D2/D3: unclear no longer parks in place -- stage advances to exploring');
   assert.equal(item.status, 'awaiting-human', 'unclear verdict parks the item, matching resolveDiscovery\'s session-role behavior');
   assert.equal(view.gates?.['item-research-unclear']?.ask, 'Which retry backoff strategy should this follow?');
 });

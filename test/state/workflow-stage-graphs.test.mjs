@@ -38,13 +38,14 @@ test('DOMAINS.coding.stages: "clarify" is retired entirely (tsk-qod D1/D2) — "
   assert.deepEqual(DOMAINS.coding.stages, ['discovery', 'exploring', 'decompose', 'planning', 'executing']);
 });
 
-test('DOMAINS.coding.transitions: "clarify"-sourced edges survive ONLY as the two FSM-legality edges migrate-clarify-split.mjs needs for historical data (tsk-qod D1/D2) — no new item can ever reach them (clarify carries no stages/skillMap/stepMap entry anymore); the live chain a new item walks is discovery -> exploring -> planning -> executing, plus the legacy "decompose" drain edges (tsk-403 D18)', () => {
+test('DOMAINS.coding.transitions: "clarify"-sourced edges survive ONLY as the two FSM-legality edges migrate-clarify-split.mjs needs for historical data (tsk-qod D1/D2) — no new item can ever reach them (clarify carries no stages/skillMap/stepMap entry anymore); a new item\'s path branches on its own discovery verdict (tsk-30v D2/D6): "clear" walks discovery -> planning directly, "unclear" walks discovery -> exploring -> planning; both continue on to executing, plus the legacy "decompose" drain edges (tsk-403 D18)', () => {
   assert.deepEqual(DOMAINS.coding.transitions, [
     { from: 'clarify', to: 'discovery' },
     { from: 'clarify', to: 'exploring' },
     { from: 'decompose', to: 'executing' },
     { from: 'exploring', to: 'decompose' },
     { from: 'discovery', to: 'exploring' },
+    { from: 'discovery', to: 'planning' },
     { from: 'exploring', to: 'planning' },
     { from: 'planning', to: 'executing' },
   ]);
@@ -219,6 +220,7 @@ test('adding "synthetic" leaves DOMAINS.coding unchanged', () => {
     { from: 'decompose', to: 'executing' },
     { from: 'exploring', to: 'decompose' },
     { from: 'discovery', to: 'exploring' },
+    { from: 'discovery', to: 'planning' },
     { from: 'exploring', to: 'planning' },
     { from: 'planning', to: 'executing' },
   ]);
