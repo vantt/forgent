@@ -36,7 +36,7 @@ import { mergeReadiness, mergeTree } from '../src/state/graph-harness.mjs';
 import { paginate } from '../src/state/cursor.mjs';
 import { runGoalCheck, detachedWorktreeFgosHint, runInvariantChecks, invariantFailureAsCheck } from '../src/runner/goal-check.mjs';
 import { frozenJudgeHits, footprintDiffHits, normalizePath } from '../src/runner/frozen-judge.mjs';
-import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, buildOwnFileSet, detectTrunk, isMainWorktree } from '../src/runner/merge.mjs';
+import { classifySource, reviewDiff, mergeRunnerItem, withMergeTargetSlot, cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, buildOwnFileSet, detectTrunk, isMainWorktree } from '../src/runner/merge.mjs';
 import { createGitHubPR, mergeGitHubPR, viewGitHubPRStatus } from '../src/runner/github-adapter.mjs';
 import { assertSafeMainCheckoutReset } from '../src/runner/main-checkout-reset-guard.mjs';
 import { classifyIronLaw } from '../src/evolve/iron-law.mjs';
@@ -2086,6 +2086,30 @@ async function runVerb(verb, flags, positional, dir) {
         // reports which item and why, merges nothing, and stops — it does
         // NOT fall through to the next-ranked item (that would silently
         // change merge order semantics `merge list` already promised).
+        // tsk-xyr (absorbs tsk-1zd): decide, WITHOUT attempting a merge,
+        // whether `candidateId` provably cannot progress this turn.
+        // classifyIronLaw is a pure function of the item's own diff +
+        // description (src/evolve/iron-law.mjs) -- exactly reproducing
+        // approve's own Iron Law pre-check above (source==='runner' only;
+        // a pull/legacy item never trips it) lets the picker decide this
+        // WITHOUT running the real merge attempt approve would make, and
+        // without persisting a skip list (classifyIronLaw is cheap and
+        // recomputable every call, so there is nothing to go stale).
+        const mergeRepoRoot = flags['trust-dir'] === true ? path.dirname(dir) : process.cwd();
+        const wouldTripIronLaw = (candidateId) => {
+          if (flags['acknowledge-iron-law'] === true) return false;
+          const candidate = mergeView.work[candidateId];
+          if (!candidate || classifySource(mergeRepoRoot, candidate) !== 'runner') return false;
+          const candidateRootId = resolveRoot(mergeView, candidateId);
+          const candidateRootBranch = candidateRootId !== candidateId ? branchNameFor(candidateRootId) : null;
+          const candidateDiff = changedFiles(
+            mergeRepoRoot,
+            candidate,
+            candidateRootBranch && branchExists(mergeRepoRoot, candidateRootBranch) ? { trunk: candidateRootBranch } : {},
+          );
+          return classifyIronLaw({ filesChanged: candidateDiff, description: candidate.description }).required;
+        };
+
         const { ready, blockedOnSync } = mergeReadiness(mergeView, { drift });
         // tsk-173 (docs/history/merge-next-auto-sync-root/CONTEXT.md D1/D2):
         // before giving up, try the single top-ranked blockedOnSync root
@@ -2143,13 +2167,40 @@ async function runVerb(verb, flags, positional, dir) {
         if (ready.length === 0) {
           return { picked: null, reason: 'nothing ready to merge' };
         }
-        const id = ready[0];
+        // tsk-xyr (absorbs tsk-1zd): walk the ranked list, skipping any
+        // candidate the pure pre-check already proves can't progress this
+        // turn, instead of always returning ready[0] and letting a caller
+        // loop on the same blocked item forever (tsk-2ej's own measured 13
+        // repeats). "nothing ready" and "everything ready was skipped" are
+        // deliberately DISTINCT reasons here — merge-loop's own pool-empty
+        // stop rule depends on telling them apart (a genuinely empty ready
+        // list means stop; an all-skipped one means a human is needed on
+        // at least one of the skipped items, not that the pool is empty).
+        const skipped = [];
+        let id;
+        for (const candidateId of ready) {
+          if (wouldTripIronLaw(candidateId)) {
+            skipped.push({ id: candidateId, reason: 'iron-law' });
+            continue;
+          }
+          id = candidateId;
+          break;
+        }
+        if (id === undefined) {
+          return { picked: null, reason: 'every ready item is blocked', skipped };
+        }
         try {
           const approveResult = await runVerb('approve', flags, [id], dir);
-          return { picked: id, approve: approveResult };
+          return { picked: id, approve: approveResult, ...(skipped.length > 0 ? { skipped } : {}) };
         } catch (err) {
           if (err instanceof StoreError && err.message.includes('Iron Law')) {
-            return { picked: id, blocked: 'iron-law', message: err.message };
+            // The pure pre-check said this one was safe, but classifyIronLaw
+            // is recomputed fresh inside approve too (never cached) -- a
+            // description/diff change between the pre-check and this real
+            // attempt (another session editing the item concurrently) can
+            // still surface it here. Reported exactly as before; this is
+            // not the "provable in advance" case the pre-check targets.
+            return { picked: id, blocked: 'iron-law', message: err.message, ...(skipped.length > 0 ? { skipped } : {}) };
           }
           throw err;
         }
@@ -3142,12 +3193,23 @@ async function runVerb(verb, flags, positional, dir) {
           // mergeRunnerItem's own conflict/verify-fail outcomes already
           // leave the ephemeral checkout clean via `git merge --abort`, so
           // no cleanupMergedBranch call is needed on those paths.
-          return await withMergeEphemeralWorktree(repoRoot, rootId, async (ephemeral) => {
+          // tsk-xyr (§E): the target's own slot is held OUTSIDE
+          // withMergeEphemeralWorktree — createDetachedMergeWorktree reads
+          // the target's tip BEFORE this callback runs, so the slot must
+          // already be held by the time that read happens, not acquired
+          // from inside it (that would leave the tip read unprotected).
+          return await withMergeTargetSlot(repoRoot, rootBranch, () => withMergeEphemeralWorktree(repoRoot, rootId, async (ephemeral) => {
             // tsk-2eq: lockRoot pins the main-checkout lock to the real
             // repo root — ephemeral.path stays the git-op cwd (unchanged)
             // but is never the lock's own root, since it's a throwaway
             // worktree with no writable .fgos/ (ADR0020).
-            const result = await runMerge(() => mergeRunnerItem(ephemeral.path, item, { timeoutMs, lockRoot: repoRoot }));
+            // targetSlot:true (tsk-xyr): this merge runs entirely in the
+            // detached ephemeral worktree above, never touching the shared
+            // main checkout — main-checkout.lock protects a resource this
+            // path doesn't use, so it is skipped in favor of the target
+            // slot already held by withMergeTargetSlot around this whole
+            // call.
+            const result = await runMerge(() => mergeRunnerItem(ephemeral.path, item, { timeoutMs, lockRoot: repoRoot, targetSlot: true }));
 
             if (result.outcome === 'conflict') {
               moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-conflict', role: 'system' });
@@ -3257,6 +3319,7 @@ async function runVerb(verb, flags, positional, dir) {
                 output: result.check.output,
                 error: moveResult.error.message,
                 diagnosticLog: moveResult.diagnosticLog,
+                postLand: result.postLand,
               };
             }
             return {
@@ -3267,8 +3330,9 @@ async function runVerb(verb, flags, positional, dir) {
               branch: result.branch,
               seq: moveResult.event.seq,
               output: result.check.output,
+              postLand: result.postLand,
             };
-          });
+          }));
         }
 
         // Root merge into main — unchanged except for D8: a root that
@@ -3394,6 +3458,7 @@ async function runVerb(verb, flags, positional, dir) {
             output: result.check.output,
             error: moveResult.error.message,
             diagnosticLog: moveResult.diagnosticLog,
+            postLand: result.postLand,
           };
         }
         return {
@@ -3404,6 +3469,7 @@ async function runVerb(verb, flags, positional, dir) {
           branch: result.branch,
           seq: moveResult.event.seq,
           output: result.check.output,
+          postLand: result.postLand,
         };
       }
 
@@ -3511,8 +3577,8 @@ async function runVerb(verb, flags, positional, dir) {
       const { noWait, waitMs } = parseWaitFlags(flags, 'sync-root');
       const runMerge = (mergeFn) => (noWait ? mergeFn() : withLockRetry(mergeFn, { waitMs }));
 
-      const runAndReport = async (mergeRoot, lockRoot) => {
-        const result = await runMerge(() => mergeRunnerItem(mergeRoot, item, lockRoot ? { timeoutMs, lockRoot } : { timeoutMs }));
+      const runAndReport = async (mergeRoot, lockRoot, targetSlot = false) => {
+        const result = await runMerge(() => mergeRunnerItem(mergeRoot, item, lockRoot ? { timeoutMs, lockRoot, targetSlot } : { timeoutMs }));
 
         if (result.outcome === 'conflict') {
           addFriction(dir, {
@@ -3581,11 +3647,14 @@ async function runVerb(verb, flags, positional, dir) {
           rationale: `fgos sync-root ${id} — closes the drift window this item's own design exists to prevent`,
           id,
         });
-        return { id, mode: 'sync-root', outcome: 'synced', target: targetBranch, branch, seq: event.seq, output: result.check.output };
+        return { id, mode: 'sync-root', outcome: 'synced', target: targetBranch, branch, seq: event.seq, output: result.check.output, postLand: result.postLand };
       };
 
       if (item.parent) {
-        return await withMergeEphemeralWorktree(repoRoot, item.parent, async (ephemeral) => runAndReport(ephemeral.path, repoRoot));
+        // tsk-xyr (§E): same target-slot-outside-the-ephemeral-worktree
+        // ordering as approve's leaf-to-root path above — the slot must be
+        // held before createDetachedMergeWorktree reads the target's tip.
+        return await withMergeTargetSlot(repoRoot, targetBranch, () => withMergeEphemeralWorktree(repoRoot, item.parent, async (ephemeral) => runAndReport(ephemeral.path, repoRoot, true)));
       }
       // tsk-66t: a root with no parent merges directly on the shared main
       // checkout (runAndReport(repoRoot) below), unlike the item.parent
