@@ -85,6 +85,21 @@ own judgment.
   members**. That 5 is a maximum batch SIZE, not a ceiling of its own — the
   ceiling belongs to the engine, and the batch actually fired is
   `min(5, execution.free)`.
+
+  **`execution.free` is `null` when no ceiling is armed, and that means no
+  limit — not zero.** `workerSlots.ceiling` ships unarmed on purpose
+  (`fgos setup` writes `null`), and in that state the engine answers
+  `hasRoom: true`, `ceiling: null`, `free: null`, `reason:
+  "no-ceiling-configured"` — no ceiling exists to trim against, so the
+  batch is `min(5, batch.length)` and every candidate in it fires. Trim
+  against `execution.free` only when it is a real number, which is exactly
+  when `execution.reason` reads `room-available`. This is not a special
+  case bolted on: it is the same answer the engine gives itself, whose
+  `hasWorkerSlotRoom` grants the whole requested batch under
+  `no-ceiling-configured` (`src/state/worker-slots.mjs`). Reading
+  `free: null` as `0` fires nothing at all while the machine is wide open,
+  in the unarmed default every repo starts in:
+  never confuse absent with zero free slots.
 - **Announce every dispatch before firing it.** Print one line per
   candidate, same shape `_shared/capacity-dispatch-fallback.md`'s Step
   B.5/C.3 already use for observability parity across every dispatch path
@@ -169,8 +184,14 @@ loop:
         polling. Report the holding ids so the caller can act.
 
     # Trim, do not fire whole: the engine admits at most `free` (see the
-    # hard rule above — D8's whole-batch rule is superseded).
-    batch = the first min(batch.length, slots.execution.free) ids
+    # hard rule above — D8's whole-batch rule is superseded). A null
+    # `free` is the unarmed default, not a full lane: no ceiling exists
+    # to trim against, so the whole batch fires.
+    # Never confuse absent with zero free slots.
+    if slots.execution.free is null:      # reason: "no-ceiling-configured"
+      batch = the first batch.length ids  # i.e. all of them, already capped at 5
+    else:
+      batch = the first min(batch.length, the number in slots.execution.free) ids
     any id trimmed off stays in `ready` for the next batch — it is
       deferred, never dropped and never reported as failed
 
@@ -215,9 +236,13 @@ separate, later concern (D8) — this skill is invocable on its own with just
   candidate blindly
 - firing a batch without asking `fgos slots` first, or firing one anyway
   after the engine answered `hasRoom: false`
-- firing more than `execution.free` Agents because the batch was already
-  computed — every one past that number dies at the claim door and comes
-  back as a false failure; or letting one batch exceed 5 members
+- firing more than `execution.free` Agents, when it is a real number,
+  because the batch was already computed — every one past that number dies
+  at the claim door and comes back as a false failure; or letting one
+  batch exceed 5 members
+- reading a `null` `execution.free` as a full lane and firing nothing —
+  null is the unarmed default (`reason: "no-ceiling-configured"`), so the
+  whole batch fires; refuse only on `hasRoom: false`
 - polling a full lane forever instead of handing back to the caller once
   it is clear the lane is wedged rather than busy
 - counting the Agents this skill itself fired as if that were the

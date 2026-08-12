@@ -153,6 +153,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Parallel fan-out no longer refuses to dispatch anything when the
+  worker-slot ceiling is unarmed — which is how every project starts, since
+  `fgos setup` writes `workerSlots.ceiling: null` on purpose. In that state
+  `fgos slots` reports room available but no numeric limit
+  (`free: null`), and the fan-out launcher trimmed its batch against that
+  number anyway, reading "no limit" as "no slots" and firing nothing while
+  the machine was completely idle. It now fires the whole batch when no
+  ceiling is armed, and trims only against a real one.
 - `fgos check`'s entropy report no longer under-counts the backlog waiting
   at the front of the lifecycle. The signal filtered on the literal stage
   name `clarify`, which the coding domain retired entirely, so it reported
