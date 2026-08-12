@@ -24,7 +24,7 @@ import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfigForDir } from '../src/runner/dispatch.mjs';
 import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
 import { resolveFgosDir, fgosDirFromRoot } from '../src/runner/paths.mjs';
-import { resolveDiscovery, discoverableStages, classificationPatchFromVerdict, assertCallerClassification } from '../src/intake/discovery.mjs';
+import { resolveDiscovery, classificationPatchFromVerdict, assertCallerClassification } from '../src/intake/discovery.mjs';
 import { resolvePlan } from '../src/intake/plan.mjs';
 import { computeEntropy, computeCounts, FINAL_STATUSES } from '../src/report/entropy.mjs';
 import { findSourceCaptureIds } from '../src/report/enduser-index.mjs';
@@ -36,7 +36,7 @@ import { mergeReadiness, mergeTree } from '../src/state/graph-harness.mjs';
 import { paginate } from '../src/state/cursor.mjs';
 import { runGoalCheck, detachedWorktreeFgosHint, runInvariantChecks, invariantFailureAsCheck } from '../src/runner/goal-check.mjs';
 import { frozenJudgeHits, footprintDiffHits, normalizePath } from '../src/runner/frozen-judge.mjs';
-import { classifySource, reviewDiff, mergeRunnerItem, cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, buildOwnFileSet, detectTrunk, isMainWorktree } from '../src/runner/merge.mjs';
+import { classifySource, reviewDiff, mergeRunnerItem, withMergeTargetSlot, cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, buildOwnFileSet, detectTrunk, isMainWorktree } from '../src/runner/merge.mjs';
 import { createGitHubPR, mergeGitHubPR, viewGitHubPRStatus } from '../src/runner/github-adapter.mjs';
 import { assertSafeMainCheckoutReset } from '../src/runner/main-checkout-reset-guard.mjs';
 import { classifyIronLaw } from '../src/evolve/iron-law.mjs';
@@ -62,7 +62,7 @@ import { createSession, endSession, listSessions, reclaimOrphanedSessions, Sessi
 import { resolveRoot } from '../src/runner/root-affinity.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
-import { getDomain, stageForStep, effectiveStage } from '../src/state/workflow-stage-graphs.mjs';
+import { getDomain, stageForStep, effectiveStage, discoverableStages, resolveDomainName } from '../src/state/workflow-stage-graphs.mjs';
 import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
 import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
 import { recordInvocationFault } from '../src/cli/invocation-fault-log.mjs';
@@ -70,6 +70,7 @@ import { recordApprovePostSuccessFault } from '../src/cli/approve-fault-log.mjs'
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { DOCTOR_CHECKS, integrationScriptPath, ensureSharedConfigDefaults, runFixes } from '../src/setup/checks.mjs';
 import { sharedConfigFilePath, readSharedConfig, readInvariantCheckCommands } from '../src/config/shared-config-file.mjs';
+import { countWorkerSlots, hasWorkerSlotRoom } from '../src/state/worker-slots.mjs';
 import { assessCleanupReadiness } from '../src/state/cleanup-harness.mjs';
 import { DEFAULT_CLEANUP_TTL_DAYS, DEFAULT_CLEANUP_LEAF_TTL_DAYS } from '../src/setup/registrations.mjs';
 import { installGitHooks, uninstallGitHooks } from '../src/setup/git-hooks.mjs';
@@ -977,6 +978,100 @@ function describeCandidate(candidate) {
   return description;
 }
 
+/**
+ * tsk-4ax (D3): the git merge/verify/commit MECHANICS shared by the
+ * `catchup` verb's manual-recovery path and `approve`'s own inbound
+ * pre-check (case 'approve' below) — merges `target` into item `id`'s own
+ * branch inside a throwaway ephemeral worktree, verifies, and commits.
+ * Deliberately never touches `.fgos/` state itself (no moveWork, no dir
+ * param at all) — the two callers have DIFFERENT bookkeeping needs around
+ * this same mechanism (the verb moves `blocked -> awaiting-approval`;
+ * approve's pre-check makes no status transition at all, since the item is
+ * already `awaiting-approval` and stays there until approve's own land
+ * step finishes) and `awaiting-approval -> awaiting-approval` is not even
+ * a valid FSM edge (`src/state/status-fsm.mjs`) — there would be nothing
+ * for a shared moveWork call to do on that path anyway.
+ *
+ * Returns one of:
+ *   - `{ outcome: 'already-caught-up', catchupHead, output }` — target was
+ *     already an ancestor of the branch; no merge/commit needed, but a
+ *     fresh verify still ran (its own green run is what's being cashed in).
+ *   - `{ outcome: 'merged', catchupHead, output }` — a real merge commit
+ *     landed on the item's own branch (via a plain `git branch -f`, the
+ *     same ref-update `withMergeEphemeralWorktree`'s CAS guard already
+ *     protects).
+ *   - `{ outcome: 'verify-fail', timedOut, exitStatus, output }` — the
+ *     merge (or the already-caught-up tree) staged cleanly but the item's
+ *     own verify came back red; any merge started is aborted, the item's
+ *     branch is left exactly as it was.
+ *   - `{ outcome: 'conflict', conflictedFiles }` — a real textual conflict;
+ *     aborted cleanly, branch untouched.
+ *
+ * Never mutates `.fgos/` state and never throws for any of these defined
+ * outcomes — only for a genuinely unexpected git failure (e.g. `git merge
+ * --abort` itself failing), mirroring `mergeRunnerItem`'s own contract.
+ */
+async function performCatchUp(repoRoot, id, item, target, timeoutMs) {
+  const ownBranch = branchNameFor(id);
+  return await withMergeEphemeralWorktree(repoRoot, id, async (ephemeral) => {
+    let alreadyCaughtUp = false;
+    try {
+      execFileSync('git', ['merge-base', '--is-ancestor', target, 'HEAD'], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
+      alreadyCaughtUp = true;
+    } catch (ancestorErr) {
+      if (ancestorErr.status !== 1) {
+        throw ancestorErr;
+      }
+    }
+
+    if (alreadyCaughtUp) {
+      const caughtUpCheck = await runGoalCheck(item, ephemeral.path, timeoutMs);
+      if (!caughtUpCheck.passed) {
+        return { outcome: 'verify-fail', timedOut: caughtUpCheck.timedOut, exitStatus: caughtUpCheck.status, output: caughtUpCheck.output };
+      }
+      const catchupHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ephemeral.path, encoding: 'utf8', shell: false }).trim();
+      return { outcome: 'already-caught-up', catchupHead, output: caughtUpCheck.output };
+    }
+
+    let conflicted = false;
+    try {
+      execFileSync('git', ['merge', '--no-commit', '--no-ff', target], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
+    } catch {
+      conflicted = true;
+    }
+
+    if (conflicted) {
+      let conflictedFiles = '';
+      try {
+        conflictedFiles = execFileSync('git', ['diff', '--name-only', '--diff-filter=U'], { cwd: ephemeral.path, encoding: 'utf8', shell: false }).trim();
+      } catch {
+        // best-effort — the outcome below still reports the conflict even
+        // if listing the conflicted files itself fails.
+      }
+      try {
+        execFileSync('git', ['merge', '--abort'], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
+      } catch (abortErr) {
+        throw abortErr;
+      }
+      return { outcome: 'conflict', conflictedFiles: conflictedFiles ? conflictedFiles.split('\n').filter(Boolean) : [] };
+    }
+
+    const check = await runGoalCheck(item, ephemeral.path, timeoutMs);
+    if (!check.passed) {
+      try {
+        execFileSync('git', ['merge', '--abort'], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
+      } catch (abortErr) {
+        throw abortErr;
+      }
+      return { outcome: 'verify-fail', timedOut: check.timedOut, exitStatus: check.status, output: check.output };
+    }
+
+    execFileSync('git', ['commit', '-m', `catch-up: merge ${target} into ${ownBranch}`], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
+    const catchupHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ephemeral.path, encoding: 'utf8', shell: false }).trim();
+    return { outcome: 'merged', catchupHead, output: check.output };
+  });
+}
+
 async function runVerb(verb, flags, positional, dir) {
   switch (verb) {
     case 'init': {
@@ -1207,11 +1302,26 @@ async function runVerb(verb, flags, positional, dir) {
       // exploring (today: coding) can call `discover` from any of its own
       // three stages; a domain that never registered them (triage/
       // synthetic) keeps the original single-stage precondition unchanged.
-      const validStages = discoverableStages(getDomain(work?.domain, { onUnrecognized: () => {} }));
+      const discoverDomain = getDomain(work?.domain, { onUnrecognized: () => {} });
+      const validStages = discoverableStages(discoverDomain);
       if (!validStages.includes(stage)) {
+        // tsk-1l9: only point at `plan` when `plan` would actually take the
+        // item. Suggesting it unconditionally made the two gates refer the
+        // reader to each other in a closed loop for any stage NEITHER verb
+        // serves -- which is exactly what the three items stranded at retired
+        // `clarify` hit, leaving them with no verb-shaped way out at all.
+        const planStage = stageForStep(discoverDomain, 'Divide');
+        const planTakesIt = stage === planStage
+          || (stage === 'decompose' && discoverDomain.stages?.includes('decompose'));
         throw new StoreError(
           'validation',
-          `discover: work "${id}" is at stage "${stage}", not ${validStages.map((s) => `"${s}"`).join('/')} -- use "fgos plan ${id}" instead.`,
+          `discover: work "${id}" is at stage "${stage}", not ${validStages.map((s) => `"${s}"`).join('/')}`
+            + (planTakesIt
+              ? ` -- use "fgos plan ${id}" instead.`
+              : ` -- and "fgos plan" does not serve that stage either. No stage verb does:`
+                + ` "${stage}" is not registered by domain "${resolveDomainName(work?.domain, { onUnrecognized: () => {} })}"`
+                + ` (${JSON.stringify(discoverDomain.stages)}). Run "fgos doctor" and read the`
+                + ' work-stage-vocabulary check.'),
         );
       }
       // An explicit --config path stays a loud, unmodified failure on ENOENT
@@ -1277,7 +1387,21 @@ async function runVerb(verb, flags, positional, dir) {
       // stays a no-op for them.
       const legacyPlanStage = domain.stages?.includes('decompose') && planningStage !== 'decompose' ? 'decompose' : undefined;
       if (stage !== planningStage && stage !== legacyPlanStage) {
-        throw new StoreError('validation', `plan: work "${id}" is at stage "${stage}", not "${planningStage}"${legacyPlanStage ? ` (or legacy "${legacyPlanStage}")` : ''} -- use "fgos discover ${id}" instead.`);
+        // tsk-1l9: mirror of the discover gate above -- only refer the reader
+        // to `discover` when `discover` would actually accept the item, so
+        // the two gates can never form a closed loop around a stage neither
+        // of them serves.
+        const discoverTakesIt = discoverableStages(domain).includes(stage);
+        throw new StoreError(
+          'validation',
+          `plan: work "${id}" is at stage "${stage}", not "${planningStage}"${legacyPlanStage ? ` (or legacy "${legacyPlanStage}")` : ''}`
+            + (discoverTakesIt
+              ? ` -- use "fgos discover ${id}" instead.`
+              : ` -- and "fgos discover" does not serve that stage either. No stage verb does:`
+                + ` "${stage}" is not registered by domain "${resolveDomainName(work?.domain, { onUnrecognized: () => {} })}"`
+                + ` (${JSON.stringify(domain.stages)}). Run "fgos doctor" and read the`
+                + ' work-stage-vocabulary check.'),
+        );
       }
       // path.dirname(dir), not process.cwd() -- see the discover case above
       // for why (tsk-5hv, found by fgos-coding-implement).
@@ -2015,6 +2139,48 @@ async function runVerb(verb, flags, positional, dir) {
     // pairs of ready items whose declared file footprints overlap, so a
     // parallel dispatch would risk a file conflict. Suggests sequence/hoist/
     // re-slice; never mutates anything.
+    // Read-only worker-slot ledger: how many work items are running and
+    // whether the execution lane has room. This verb IS the port — decision
+    // 0014 makes the CLI the door, and herdr-plugin (Rust) and fgos-fanout
+    // (a prose skill) have no other way to ask the engine before they stand a
+    // worker up. Pure read: worker-slots.mjs never touches fs, and the
+    // ceiling comes from the same config resolution claimWork's own gate uses.
+    case 'slots': {
+      const slotsView = listWork(dir);
+      const ceiling = readSharedConfig(path.dirname(dir))?.workerSlots?.ceiling;
+      const counts = countWorkerSlots(slotsView);
+      const room = hasWorkerSlotRoom(slotsView, { ceiling });
+      return {
+        execution: {
+          ...counts.execution,
+          ceiling: room.ceiling,
+          free: room.free,
+          hasRoom: room.allowed,
+          reason: room.reason,
+        },
+        admin: counts.admin,
+      };
+    }
+
+    // D10: give a driver's closing report a landing place on the item, so a
+    // result is read with `fgos show <id>` instead of by watching a terminal
+    // pane nobody can afford to guard. Deliberately no new event type and no
+    // new field -- this writes through addDecision, which `show` already
+    // surfaces per item, and `source: 'driver-report'` is what tells a
+    // consumer these apart from real design decisions.
+    case 'report': {
+      const id = requireField(positional[0] ?? flags.id, 'report requires an id: fgos report <id> --text "..."');
+      const text = requireField(flags.text, 'report requires --text "..."');
+      const stopReason = optionalField(flags['stop-reason'], 'report --stop-reason requires a non-empty value (omit --stop-reason entirely to skip it)');
+      // addDecision requires a non-empty rationale, so a report that carries
+      // no stop reason still has to say why it exists rather than pass "".
+      const rationale = stopReason
+        ? `driver stop reason: ${stopReason}`
+        : 'closing report recorded on the item so results are read via `fgos show`, not a guarded terminal pane';
+      const { event } = addDecision(dir, { id, text, rationale, source: 'driver-report', kind: 'engine' });
+      return { id, stopReason: stopReason ?? null, seq: event.seq };
+    }
+
     case 'conflicts': {
       // tsk-4zj D7: footprintConflicts' candidate set now spans multiple
       // stages (tsk-4so's frontierAcrossSteps), so stageEffective is real
@@ -2086,6 +2252,30 @@ async function runVerb(verb, flags, positional, dir) {
         // reports which item and why, merges nothing, and stops — it does
         // NOT fall through to the next-ranked item (that would silently
         // change merge order semantics `merge list` already promised).
+        // tsk-xyr (absorbs tsk-1zd): decide, WITHOUT attempting a merge,
+        // whether `candidateId` provably cannot progress this turn.
+        // classifyIronLaw is a pure function of the item's own diff +
+        // description (src/evolve/iron-law.mjs) -- exactly reproducing
+        // approve's own Iron Law pre-check above (source==='runner' only;
+        // a pull/legacy item never trips it) lets the picker decide this
+        // WITHOUT running the real merge attempt approve would make, and
+        // without persisting a skip list (classifyIronLaw is cheap and
+        // recomputable every call, so there is nothing to go stale).
+        const mergeRepoRoot = flags['trust-dir'] === true ? path.dirname(dir) : process.cwd();
+        const wouldTripIronLaw = (candidateId) => {
+          if (flags['acknowledge-iron-law'] === true) return false;
+          const candidate = mergeView.work[candidateId];
+          if (!candidate || classifySource(mergeRepoRoot, candidate) !== 'runner') return false;
+          const candidateRootId = resolveRoot(mergeView, candidateId);
+          const candidateRootBranch = candidateRootId !== candidateId ? branchNameFor(candidateRootId) : null;
+          const candidateDiff = changedFiles(
+            mergeRepoRoot,
+            candidate,
+            candidateRootBranch && branchExists(mergeRepoRoot, candidateRootBranch) ? { trunk: candidateRootBranch } : {},
+          );
+          return classifyIronLaw({ filesChanged: candidateDiff, description: candidate.description }).required;
+        };
+
         const { ready, blockedOnSync } = mergeReadiness(mergeView, { drift });
         // tsk-173 (docs/history/merge-next-auto-sync-root/CONTEXT.md D1/D2):
         // before giving up, try the single top-ranked blockedOnSync root
@@ -2143,13 +2333,40 @@ async function runVerb(verb, flags, positional, dir) {
         if (ready.length === 0) {
           return { picked: null, reason: 'nothing ready to merge' };
         }
-        const id = ready[0];
+        // tsk-xyr (absorbs tsk-1zd): walk the ranked list, skipping any
+        // candidate the pure pre-check already proves can't progress this
+        // turn, instead of always returning ready[0] and letting a caller
+        // loop on the same blocked item forever (tsk-2ej's own measured 13
+        // repeats). "nothing ready" and "everything ready was skipped" are
+        // deliberately DISTINCT reasons here — merge-loop's own pool-empty
+        // stop rule depends on telling them apart (a genuinely empty ready
+        // list means stop; an all-skipped one means a human is needed on
+        // at least one of the skipped items, not that the pool is empty).
+        const skipped = [];
+        let id;
+        for (const candidateId of ready) {
+          if (wouldTripIronLaw(candidateId)) {
+            skipped.push({ id: candidateId, reason: 'iron-law' });
+            continue;
+          }
+          id = candidateId;
+          break;
+        }
+        if (id === undefined) {
+          return { picked: null, reason: 'every ready item is blocked', skipped };
+        }
         try {
           const approveResult = await runVerb('approve', flags, [id], dir);
-          return { picked: id, approve: approveResult };
+          return { picked: id, approve: approveResult, ...(skipped.length > 0 ? { skipped } : {}) };
         } catch (err) {
           if (err instanceof StoreError && err.message.includes('Iron Law')) {
-            return { picked: id, blocked: 'iron-law', message: err.message };
+            // The pure pre-check said this one was safe, but classifyIronLaw
+            // is recomputed fresh inside approve too (never cached) -- a
+            // description/diff change between the pre-check and this real
+            // attempt (another session editing the item concurrently) can
+            // still surface it here. Reported exactly as before; this is
+            // not the "provable in advance" case the pre-check targets.
+            return { picked: id, blocked: 'iron-law', message: err.message, ...(skipped.length > 0 ? { skipped } : {}) };
           }
           throw err;
         }
@@ -3142,12 +3359,75 @@ async function runVerb(verb, flags, positional, dir) {
           // mergeRunnerItem's own conflict/verify-fail outcomes already
           // leave the ephemeral checkout clean via `git merge --abort`, so
           // no cleanupMergedBranch call is needed on those paths.
-          return await withMergeEphemeralWorktree(repoRoot, rootId, async (ephemeral) => {
+          // tsk-xyr (§E): the target's own slot is held OUTSIDE
+          // withMergeEphemeralWorktree — createDetachedMergeWorktree reads
+          // the target's tip BEFORE this callback runs, so the slot must
+          // already be held by the time that read happens, not acquired
+          // from inside it (that would leave the tip read unprotected).
+          return await withMergeTargetSlot(repoRoot, rootBranch, async () => {
+            // tsk-4ax (D3): catchup as a STANDARD step, not only a recovery
+            // from `blocked` — if the target isn't yet an ancestor of the
+            // branch, catch it up FIRST, still inside the slot (so the
+            // target provably cannot move between this check and the land
+            // below — the whole invariant D3 depends on). Once caught up,
+            // the branch itself is now an ancestor and carries a commit
+            // this call JUST verified green; `effectiveItem` threads that
+            // fresh tip into the land below in-memory only (never persisted
+            // via moveWork — awaiting-approval -> awaiting-approval is not
+            // a valid FSM edge, and there is nothing to persist: this same
+            // call is about to consume the proof immediately).
+            let effectiveItem = item;
+            let alreadyAncestor = false;
+            try {
+              execFileSync('git', ['merge-base', '--is-ancestor', rootBranch, branchNameFor(id)], { cwd: repoRoot, encoding: 'utf8', shell: false });
+              alreadyAncestor = true;
+            } catch (ancestorErr) {
+              if (ancestorErr.status !== 1) throw ancestorErr;
+            }
+            if (!alreadyAncestor) {
+              const catchupResult = await performCatchUp(repoRoot, id, item, rootBranch, timeoutMs);
+              if (catchupResult.outcome === 'conflict') {
+                moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-conflict', role: 'system' });
+                addFriction(dir, {
+                  id,
+                  disposition: 'blocked',
+                  errorClass: 'merge-conflict',
+                  layer: 'state',
+                  attempts: 1,
+                  detail: `catchup (inbound gate): git merge --no-commit --no-ff ${rootBranch} into ${branchNameFor(id)} conflicted; merge aborted, ${branchNameFor(id)} unchanged`,
+                });
+                return { id, mode: 'merge', to: 'blocked', reason: 'merge-conflict', target: rootBranch, conflictedFiles: catchupResult.conflictedFiles };
+              }
+              if (catchupResult.outcome === 'verify-fail') {
+                const mergeReason = catchupResult.timedOut ? 'verify-timeout-post-merge' : 'verify-fail-post-merge';
+                moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: mergeReason, role: 'system' });
+                addFriction(dir, {
+                  id,
+                  disposition: 'blocked',
+                  errorClass: catchupResult.timedOut ? 'verify-timeout' : 'verify-miss',
+                  layer: 'verification',
+                  attempts: 1,
+                  detail: catchupResult.timedOut
+                    ? `catchup (inbound gate): goal-check timed out on staged merge into ${branchNameFor(id)} after ${timeoutMs}ms — not a verify failure; merge aborted, ${branchNameFor(id)} unchanged, rerun catchup`
+                    : `catchup (inbound gate): goal-check failed on staged merge into ${branchNameFor(id)} (exit ${catchupResult.exitStatus}); merge aborted, ${branchNameFor(id)} unchanged`,
+                });
+                return { id, mode: 'merge', to: 'blocked', reason: mergeReason, target: rootBranch, timedOut: catchupResult.timedOut, exitStatus: catchupResult.exitStatus, output: catchupResult.output };
+              }
+              // 'merged' or 'already-caught-up'.
+              effectiveItem = { ...item, branchHeadAtReturn: catchupResult.catchupHead };
+            }
+            return await withMergeEphemeralWorktree(repoRoot, rootId, async (ephemeral) => {
             // tsk-2eq: lockRoot pins the main-checkout lock to the real
             // repo root — ephemeral.path stays the git-op cwd (unchanged)
             // but is never the lock's own root, since it's a throwaway
             // worktree with no writable .fgos/ (ADR0020).
-            const result = await runMerge(() => mergeRunnerItem(ephemeral.path, item, { timeoutMs, lockRoot: repoRoot }));
+            // targetSlot:true (tsk-xyr): this merge runs entirely in the
+            // detached ephemeral worktree above, never touching the shared
+            // main checkout — main-checkout.lock protects a resource this
+            // path doesn't use, so it is skipped in favor of the target
+            // slot already held by withMergeTargetSlot around this whole
+            // call.
+            const result = await runMerge(() => mergeRunnerItem(ephemeral.path, effectiveItem, { timeoutMs, lockRoot: repoRoot, targetSlot: true }));
 
             if (result.outcome === 'conflict') {
               moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-conflict', role: 'system' });
@@ -3257,6 +3537,7 @@ async function runVerb(verb, flags, positional, dir) {
                 output: result.check.output,
                 error: moveResult.error.message,
                 diagnosticLog: moveResult.diagnosticLog,
+                postLand: result.postLand,
               };
             }
             return {
@@ -3267,7 +3548,9 @@ async function runVerb(verb, flags, positional, dir) {
               branch: result.branch,
               seq: moveResult.event.seq,
               output: result.check.output,
+              postLand: result.postLand,
             };
+            });
           });
         }
 
@@ -3394,6 +3677,7 @@ async function runVerb(verb, flags, positional, dir) {
             output: result.check.output,
             error: moveResult.error.message,
             diagnosticLog: moveResult.diagnosticLog,
+            postLand: result.postLand,
           };
         }
         return {
@@ -3404,6 +3688,7 @@ async function runVerb(verb, flags, positional, dir) {
           branch: result.branch,
           seq: moveResult.event.seq,
           output: result.check.output,
+          postLand: result.postLand,
         };
       }
 
@@ -3511,8 +3796,8 @@ async function runVerb(verb, flags, positional, dir) {
       const { noWait, waitMs } = parseWaitFlags(flags, 'sync-root');
       const runMerge = (mergeFn) => (noWait ? mergeFn() : withLockRetry(mergeFn, { waitMs }));
 
-      const runAndReport = async (mergeRoot, lockRoot) => {
-        const result = await runMerge(() => mergeRunnerItem(mergeRoot, item, lockRoot ? { timeoutMs, lockRoot } : { timeoutMs }));
+      const runAndReport = async (mergeRoot, lockRoot, targetSlot = false, itemOverride = item) => {
+        const result = await runMerge(() => mergeRunnerItem(mergeRoot, itemOverride, lockRoot ? { timeoutMs, lockRoot, targetSlot } : { timeoutMs }));
 
         if (result.outcome === 'conflict') {
           addFriction(dir, {
@@ -3581,11 +3866,55 @@ async function runVerb(verb, flags, positional, dir) {
           rationale: `fgos sync-root ${id} — closes the drift window this item's own design exists to prevent`,
           id,
         });
-        return { id, mode: 'sync-root', outcome: 'synced', target: targetBranch, branch, seq: event.seq, output: result.check.output };
+        return { id, mode: 'sync-root', outcome: 'synced', target: targetBranch, branch, seq: event.seq, output: result.check.output, postLand: result.postLand };
       };
 
       if (item.parent) {
-        return await withMergeEphemeralWorktree(repoRoot, item.parent, async (ephemeral) => runAndReport(ephemeral.path, repoRoot));
+        // tsk-xyr (§E): same target-slot-outside-the-ephemeral-worktree
+        // ordering as approve's leaf-to-root path above — the slot must be
+        // held before createDetachedMergeWorktree reads the target's tip.
+        return await withMergeTargetSlot(repoRoot, targetBranch, async () => {
+          // tsk-4ax (D3): same inbound-gate catchup as approve's leaf-to-root
+          // path — still inside the slot, so the target provably cannot
+          // move between this check and the land below.
+          let effectiveItem = item;
+          let alreadyAncestor = false;
+          try {
+            execFileSync('git', ['merge-base', '--is-ancestor', targetBranch, branch], { cwd: repoRoot, encoding: 'utf8', shell: false });
+            alreadyAncestor = true;
+          } catch (ancestorErr) {
+            if (ancestorErr.status !== 1) throw ancestorErr;
+          }
+          if (!alreadyAncestor) {
+            const catchupResult = await performCatchUp(repoRoot, id, item, targetBranch, timeoutMs);
+            if (catchupResult.outcome === 'conflict') {
+              addFriction(dir, {
+                id,
+                disposition: 'blocked',
+                errorClass: 'merge-conflict',
+                layer: 'state',
+                attempts: 1,
+                detail: `sync-root catchup (inbound gate): git merge --no-commit --no-ff ${targetBranch} into ${branch} conflicted; merge aborted, ${branch} unchanged`,
+              });
+              return { id, mode: 'sync-root', outcome: 'blocked', reason: 'merge-conflict', target: targetBranch, branch, conflictedFiles: catchupResult.conflictedFiles };
+            }
+            if (catchupResult.outcome === 'verify-fail') {
+              addFriction(dir, {
+                id,
+                disposition: 'blocked',
+                errorClass: catchupResult.timedOut ? 'verify-timeout' : 'verify-miss',
+                layer: 'verification',
+                attempts: 1,
+                detail: catchupResult.timedOut
+                  ? `sync-root catchup (inbound gate): goal-check timed out on staged merge into ${branch} after ${timeoutMs}ms — not a verify failure; merge aborted, ${branch} unchanged`
+                  : `sync-root catchup (inbound gate): goal-check failed on staged merge into ${branch} (exit ${catchupResult.exitStatus}); merge aborted, ${branch} unchanged`,
+              });
+              return { id, mode: 'sync-root', outcome: 'blocked', reason: catchupResult.timedOut ? 'verify-timeout' : 'verify-fail', timedOut: catchupResult.timedOut, target: targetBranch, branch, exitStatus: catchupResult.exitStatus, output: catchupResult.output };
+            }
+            effectiveItem = { ...item, branchHeadAtReturn: catchupResult.catchupHead };
+          }
+          return await withMergeEphemeralWorktree(repoRoot, item.parent, async (ephemeral) => runAndReport(ephemeral.path, repoRoot, true, effectiveItem));
+        });
       }
       // tsk-66t: a root with no parent merges directly on the shared main
       // checkout (runAndReport(repoRoot) below), unlike the item.parent
@@ -3851,119 +4180,21 @@ async function runVerb(verb, flags, positional, dir) {
       const rootId = resolveRoot(view, id);
       const target = rootId !== id ? branchNameFor(rootId) : 'main';
 
-      // Ephemeral worktree checked out on the item's OWN branch (confirmed
-      // to exist above, so this always takes the branch-reuse path — no
-      // baseRef needed, D17: only the branch is durable, every checkout is
-      // ephemeral). Removed on every exit path via withMergeEphemeralWorktree's
-      // own finally (worktree.mjs).
-      return await withMergeEphemeralWorktree(repoRoot, id, async (ephemeral) => {
-        // The branch can already contain the target's tip (a person merged it
-        // by hand, or a prior catch-up landed the merge and died later). The
-        // merge below is then a genuine no-op that stages nothing, so the
-        // `git commit` at the end of this function fails with "nothing to
-        // commit" and the item is stuck blocked forever — no retry can change
-        // the condition. Checked up front rather than inferred from that
-        // commit failure: the failure wording is locale/git-version
-        // dependent, `is-ancestor` is not. `HEAD` here is the item's own
-        // branch (withMergeEphemeralWorktree checks it out).
-        let alreadyCaughtUp = false;
-        try {
-          execFileSync('git', ['merge-base', '--is-ancestor', target, 'HEAD'], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
-          alreadyCaughtUp = true;
-        } catch (ancestorErr) {
-          // Exit 1 is the documented "not an ancestor" answer, not a failure;
-          // anything else (a bad ref, a broken repo) is a real error.
-          if (ancestorErr.status !== 1) {
-            throw ancestorErr;
-          }
-        }
-
-        if (alreadyCaughtUp) {
-          // Nothing to merge or commit, but the status move still has to rest
-          // on a freshly-executed check: "caught up" says nothing about
-          // whether this item deserves to leave `blocked`.
-          const caughtUpCheck = await runGoalCheck(item, ephemeral.path, timeoutMs);
-          if (!caughtUpCheck.passed) {
-            // No `git merge --abort` on this path — no merge was started, and
-            // aborting without MERGE_HEAD fails outright.
-            // tsk-53o: item stays 'blocked' either way here (no moveWork on
-            // this path) — surface `timedOut` so the CLI-facing outcome
-            // does not read as a real verify failure when it was a timeout.
-            return { id, outcome: 'verify-fail', timedOut: caughtUpCheck.timedOut, target, branch: ownBranch, exitStatus: caughtUpCheck.status, output: caughtUpCheck.output };
-          }
-          const { event } = moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'blocked', role: 'runner' });
-          return {
-            id,
-            outcome: 'already-caught-up',
-            from: 'blocked',
-            to: 'awaiting-approval',
-            target,
-            branch: ownBranch,
-            seq: event.seq,
-            output: caughtUpCheck.output,
-          };
-        }
-
-        let conflicted = false;
-        try {
-          execFileSync('git', ['merge', '--no-commit', '--no-ff', target], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
-        } catch {
-          conflicted = true;
-        }
-
-        if (conflicted) {
-          let conflictedFiles = '';
-          try {
-            conflictedFiles = execFileSync('git', ['diff', '--name-only', '--diff-filter=U'], { cwd: ephemeral.path, encoding: 'utf8', shell: false }).trim();
-          } catch {
-            // best-effort — the message below still reports the conflict
-            // even if listing the conflicted files itself fails.
-          }
-          try {
-            execFileSync('git', ['merge', '--abort'], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
-          } catch (abortErr) {
-            // A genuinely unexpected git failure (not a conflict, not a red
-            // verify) — a real bug, not a defined outcome; propagate as-is
-            // so it surfaces as "unexpected" (exit 1), never masked as a
-            // clean park.
-            throw abortErr;
-          }
-          // No automated conflict RESOLUTION per this cell's prohibitions —
-          // only detection + clean reporting; the item stays blocked
-          // (unchanged) for a human to resolve manually via the existing
-          // take/return branch flow.
-          return {
-            id,
-            outcome: 'conflict',
-            target,
-            branch: ownBranch,
-            conflictedFiles: conflictedFiles ? conflictedFiles.split('\n').filter(Boolean) : [],
-          };
-        }
-
-        // Clean merge staged (not yet committed) — the item's OWN verify
-        // runs on this staged tree BEFORE any commit, mirroring
-        // mergeRunnerItem's own verify-before-commit discipline exactly.
-        const check = await runGoalCheck(item, ephemeral.path, timeoutMs);
-        if (!check.passed) {
-          try {
-            execFileSync('git', ['merge', '--abort'], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
-          } catch (abortErr) {
-            throw abortErr;
-          }
-          // tsk-53o: item stays 'blocked' either way (no moveWork on this
-          // path) — surface `timedOut` so this outcome doesn't read as a
-          // real verify failure when it was a timeout.
-          return { id, outcome: 'verify-fail', timedOut: check.timedOut, target, branch: ownBranch, exitStatus: check.status, output: check.output };
-        }
-
-        execFileSync('git', ['commit', '-m', `catch-up: merge ${target} into ${ownBranch}`], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
-        // D18's edge: mechanical, uncounted reconcile-success — never
-        // touches 'doing', so anti-loop's visitCount never sees it. No
-        // reason/ask required on this edge (fsm.mjs).
-        const { event } = moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'blocked', role: 'runner' });
-        return { id, outcome: 'merged', from: 'blocked', to: 'awaiting-approval', target, branch: ownBranch, seq: event.seq, output: check.output };
-      });
+      // tsk-4ax: the git merge/verify/commit MECHANICS are shared with
+      // approve's own inbound pre-check below (performCatchUp) — this case
+      // owns only what's specific to the manual-recovery entry point: the
+      // blocked/CATCHUP_REASONS precondition above, and the moveWork/
+      // friction bookkeeping below.
+      const result = await performCatchUp(repoRoot, id, item, target, timeoutMs);
+      if (result.outcome === 'already-caught-up' || result.outcome === 'merged') {
+        const { event } = moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'blocked', role: 'runner', branchHeadAtReturn: result.catchupHead });
+        return { id, outcome: result.outcome, from: 'blocked', to: 'awaiting-approval', target, branch: ownBranch, seq: event.seq, output: result.output };
+      }
+      if (result.outcome === 'verify-fail') {
+        return { id, outcome: 'verify-fail', timedOut: result.timedOut, target, branch: ownBranch, exitStatus: result.exitStatus, output: result.output };
+      }
+      // 'conflict'
+      return { id, outcome: 'conflict', target, branch: ownBranch, conflictedFiles: result.conflictedFiles };
     }
 
     // Gate A — candidate ranking (self-improve-loop P13 Slice 1, D1/D3/D6):

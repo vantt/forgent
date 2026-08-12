@@ -7,7 +7,63 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Worker slots: a ceiling on how many work items may run at once. `fgos
+  slots` reports execution-lane occupancy, whether there is room, and the
+  admin lane's fixed reservation — it is the door launchers (herdr-plugin,
+  fgos-fanout) pre-check before standing a worker up. The same ceiling is
+  enforced inside every claim path (`take`, `pick`, and the runner alike),
+  which refuses with `worker-slot ceiling reached` once the lane is full.
+  Occupancy is derived from work items already at `doing`; nothing new is
+  recorded to get it. The ceiling ships UNARMED and stays that way until a
+  person sets it: `fgos setup` writes `workerSlots.ceiling: null`, which
+  refuses nothing, and a project is capped only once someone replaces that
+  with a real count. It is deliberately not armed on your behalf — `fgos
+  doctor` asks every project to run `fgos setup` as routine maintenance, so
+  a number written there would cap a repo that never asked to be capped, and
+  freeze its backlog if it was already running more items than the cap.
+- `fgos doctor` gained a `worker-slots-ceiling-usable` check. A
+  `workerSlots.ceiling` that is not a positive integer — `"8"` as a string,
+  `8.5`, `0`, `-1` — enforces nothing at all, so a project could believe it
+  was capped while running uncapped. The check names that, and reports the
+  deliberate `null` as "unarmed" rather than as a problem.
+- `fgos report <id> --text "..." [--stop-reason ...]` records a driver's
+  closing report on the item, so a result can be read with `fgos show <id>`
+  instead of by watching a terminal pane. `fgos-coding-driving` now records
+  one at every stop, which is what makes a finished worker pane safe for the
+  cockpit to reuse: the result no longer lives only on a screen somebody has
+  to guard.
+
 ### Changed
+
+- `fgos-runner` and `fgos-fanout` now ask for a worker slot before standing
+  a worker up, instead of each enforcing a ceiling of its own. The runner's
+  `runner.parallel.maxRoots`/`maxLeavesPerRoot` and fan-out's cap of 5 keep
+  their values but change role: they bound how large a batch that launcher
+  may propose, while the shared ceiling decides whether the batch runs at
+  all — so the real limit on a machine is one number rather than the sum of
+  three. A batch passes whole or not at all, never trimmed to the number of
+  free slots. With no `workerSlots.ceiling` configured, both behave exactly
+  as before. A runner that finds the lane full now ends its run cleanly
+  (`idle`, exit 0) rather than halting with a non-zero exit, and an item
+  refused for lack of room is simply left for a later poll.
+- `fgos doctor` gained a `delivered-not-on-trunk` check: it names any item
+  whose status says its work was handed over (`delivered`, `retrospective`,
+  `cleanup`, `done`) while its own `fgw/<id>` branch is still not reachable
+  from the trunk. `delivered` is reachable through a bare `fgos move`, which
+  merges nothing and asks for no proof that anything merged, so real tested
+  work could sit outside `main` with nothing reporting it — `root-drift`
+  only walks root items, and `fgos stale` waits a three-day TTL and then
+  says "forgotten", not "unmerged". The check separates the two causes: a
+  branch that merged nowhere needs its content landed, while one that landed
+  on a root branch that has not synced needs `fgos sync-root` on the root
+  instead.
+- `fgos discover` and `fgos plan` no longer send the reader to each other
+  when neither serves the item's stage. Each gate now checks whether its
+  sibling would actually accept the item; when neither does, both say so
+  plainly and point at `fgos doctor`'s stage-vocabulary check, instead of
+  forming a closed referral loop with no way out.
 
 - The `decompose` stage/verb/launcher family is renamed to `plan`: the CLI
   verb `fgos decompose` is now `fgos plan`, the slash command
@@ -128,6 +184,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   nothing runs, nothing changes. This closes the gap where a repo-wide
   invariant broken by one item could land on main and stay red across later
   merges, because no item's own narrow `verify` happened to touch it.
+
+- `fgos doctor` gained a `work-stage-vocabulary` check: it names any open
+  item sitting at a stage its own domain no longer registers. Until now
+  only `risk`/`kind` drift was surfaced this way, so an item stranded on a
+  retired stage — which no `fgos edit` can correct, since `stage` has no
+  editable door — stayed invisible until some other command tripped over
+  it. The `discover` pool now derives its candidate stages from the same
+  source the `fgos discover` verb checks against, so it can no longer offer
+  an item that the verb would then refuse.
 
 - `fgos promote-to-component` gained an opt-in `--trust-dir` flag: with an
   explicit `--dir` also passed, it can now run from inside a linked
