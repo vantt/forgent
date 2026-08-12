@@ -977,6 +977,100 @@ function describeCandidate(candidate) {
   return description;
 }
 
+/**
+ * tsk-4ax (D3): the git merge/verify/commit MECHANICS shared by the
+ * `catchup` verb's manual-recovery path and `approve`'s own inbound
+ * pre-check (case 'approve' below) — merges `target` into item `id`'s own
+ * branch inside a throwaway ephemeral worktree, verifies, and commits.
+ * Deliberately never touches `.fgos/` state itself (no moveWork, no dir
+ * param at all) — the two callers have DIFFERENT bookkeeping needs around
+ * this same mechanism (the verb moves `blocked -> awaiting-approval`;
+ * approve's pre-check makes no status transition at all, since the item is
+ * already `awaiting-approval` and stays there until approve's own land
+ * step finishes) and `awaiting-approval -> awaiting-approval` is not even
+ * a valid FSM edge (`src/state/status-fsm.mjs`) — there would be nothing
+ * for a shared moveWork call to do on that path anyway.
+ *
+ * Returns one of:
+ *   - `{ outcome: 'already-caught-up', catchupHead, output }` — target was
+ *     already an ancestor of the branch; no merge/commit needed, but a
+ *     fresh verify still ran (its own green run is what's being cashed in).
+ *   - `{ outcome: 'merged', catchupHead, output }` — a real merge commit
+ *     landed on the item's own branch (via a plain `git branch -f`, the
+ *     same ref-update `withMergeEphemeralWorktree`'s CAS guard already
+ *     protects).
+ *   - `{ outcome: 'verify-fail', timedOut, exitStatus, output }` — the
+ *     merge (or the already-caught-up tree) staged cleanly but the item's
+ *     own verify came back red; any merge started is aborted, the item's
+ *     branch is left exactly as it was.
+ *   - `{ outcome: 'conflict', conflictedFiles }` — a real textual conflict;
+ *     aborted cleanly, branch untouched.
+ *
+ * Never mutates `.fgos/` state and never throws for any of these defined
+ * outcomes — only for a genuinely unexpected git failure (e.g. `git merge
+ * --abort` itself failing), mirroring `mergeRunnerItem`'s own contract.
+ */
+async function performCatchUp(repoRoot, id, item, target, timeoutMs) {
+  const ownBranch = branchNameFor(id);
+  return await withMergeEphemeralWorktree(repoRoot, id, async (ephemeral) => {
+    let alreadyCaughtUp = false;
+    try {
+      execFileSync('git', ['merge-base', '--is-ancestor', target, 'HEAD'], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
+      alreadyCaughtUp = true;
+    } catch (ancestorErr) {
+      if (ancestorErr.status !== 1) {
+        throw ancestorErr;
+      }
+    }
+
+    if (alreadyCaughtUp) {
+      const caughtUpCheck = await runGoalCheck(item, ephemeral.path, timeoutMs);
+      if (!caughtUpCheck.passed) {
+        return { outcome: 'verify-fail', timedOut: caughtUpCheck.timedOut, exitStatus: caughtUpCheck.status, output: caughtUpCheck.output };
+      }
+      const catchupHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ephemeral.path, encoding: 'utf8', shell: false }).trim();
+      return { outcome: 'already-caught-up', catchupHead, output: caughtUpCheck.output };
+    }
+
+    let conflicted = false;
+    try {
+      execFileSync('git', ['merge', '--no-commit', '--no-ff', target], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
+    } catch {
+      conflicted = true;
+    }
+
+    if (conflicted) {
+      let conflictedFiles = '';
+      try {
+        conflictedFiles = execFileSync('git', ['diff', '--name-only', '--diff-filter=U'], { cwd: ephemeral.path, encoding: 'utf8', shell: false }).trim();
+      } catch {
+        // best-effort — the outcome below still reports the conflict even
+        // if listing the conflicted files itself fails.
+      }
+      try {
+        execFileSync('git', ['merge', '--abort'], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
+      } catch (abortErr) {
+        throw abortErr;
+      }
+      return { outcome: 'conflict', conflictedFiles: conflictedFiles ? conflictedFiles.split('\n').filter(Boolean) : [] };
+    }
+
+    const check = await runGoalCheck(item, ephemeral.path, timeoutMs);
+    if (!check.passed) {
+      try {
+        execFileSync('git', ['merge', '--abort'], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
+      } catch (abortErr) {
+        throw abortErr;
+      }
+      return { outcome: 'verify-fail', timedOut: check.timedOut, exitStatus: check.status, output: check.output };
+    }
+
+    execFileSync('git', ['commit', '-m', `catch-up: merge ${target} into ${ownBranch}`], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
+    const catchupHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ephemeral.path, encoding: 'utf8', shell: false }).trim();
+    return { outcome: 'merged', catchupHead, output: check.output };
+  });
+}
+
 async function runVerb(verb, flags, positional, dir) {
   switch (verb) {
     case 'init': {
@@ -3920,135 +4014,21 @@ async function runVerb(verb, flags, positional, dir) {
       const rootId = resolveRoot(view, id);
       const target = rootId !== id ? branchNameFor(rootId) : 'main';
 
-      // Ephemeral worktree checked out on the item's OWN branch (confirmed
-      // to exist above, so this always takes the branch-reuse path — no
-      // baseRef needed, D17: only the branch is durable, every checkout is
-      // ephemeral). Removed on every exit path via withMergeEphemeralWorktree's
-      // own finally (worktree.mjs).
-      return await withMergeEphemeralWorktree(repoRoot, id, async (ephemeral) => {
-        // The branch can already contain the target's tip (a person merged it
-        // by hand, or a prior catch-up landed the merge and died later). The
-        // merge below is then a genuine no-op that stages nothing, so the
-        // `git commit` at the end of this function fails with "nothing to
-        // commit" and the item is stuck blocked forever — no retry can change
-        // the condition. Checked up front rather than inferred from that
-        // commit failure: the failure wording is locale/git-version
-        // dependent, `is-ancestor` is not. `HEAD` here is the item's own
-        // branch (withMergeEphemeralWorktree checks it out).
-        let alreadyCaughtUp = false;
-        try {
-          execFileSync('git', ['merge-base', '--is-ancestor', target, 'HEAD'], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
-          alreadyCaughtUp = true;
-        } catch (ancestorErr) {
-          // Exit 1 is the documented "not an ancestor" answer, not a failure;
-          // anything else (a bad ref, a broken repo) is a real error.
-          if (ancestorErr.status !== 1) {
-            throw ancestorErr;
-          }
-        }
-
-        if (alreadyCaughtUp) {
-          // Nothing to merge or commit, but the status move still has to rest
-          // on a freshly-executed check: "caught up" says nothing about
-          // whether this item deserves to leave `blocked`.
-          const caughtUpCheck = await runGoalCheck(item, ephemeral.path, timeoutMs);
-          if (!caughtUpCheck.passed) {
-            // No `git merge --abort` on this path — no merge was started, and
-            // aborting without MERGE_HEAD fails outright.
-            // tsk-53o: item stays 'blocked' either way here (no moveWork on
-            // this path) — surface `timedOut` so the CLI-facing outcome
-            // does not read as a real verify failure when it was a timeout.
-            return { id, outcome: 'verify-fail', timedOut: caughtUpCheck.timedOut, target, branch: ownBranch, exitStatus: caughtUpCheck.status, output: caughtUpCheck.output };
-          }
-          // tsk-4ax (D3): record the tip this verify actually passed on, the
-          // same field `return`'s own success path already writes
-          // (`branchHeadAtReturn`). Without this, `mergedTreeAlreadyVerified`
-          // (merge.mjs:803) can never see this catchup's own green verify as
-          // proof — its second condition compares the branch's CURRENT tip
-          // to `branchHeadAtReturn`, which would still be pointing at
-          // whatever `return` last wrote, long before this catchup ran. The
-          // outbound gate would then re-run the full verify inside the lock
-          // every time, even after a catchup just proved the tree green —
-          // exactly the self-tightening loop this item exists to close.
-          const catchupHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ephemeral.path, encoding: 'utf8', shell: false }).trim();
-          const { event } = moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'blocked', role: 'runner', branchHeadAtReturn: catchupHead });
-          return {
-            id,
-            outcome: 'already-caught-up',
-            from: 'blocked',
-            to: 'awaiting-approval',
-            target,
-            branch: ownBranch,
-            seq: event.seq,
-            output: caughtUpCheck.output,
-          };
-        }
-
-        let conflicted = false;
-        try {
-          execFileSync('git', ['merge', '--no-commit', '--no-ff', target], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
-        } catch {
-          conflicted = true;
-        }
-
-        if (conflicted) {
-          let conflictedFiles = '';
-          try {
-            conflictedFiles = execFileSync('git', ['diff', '--name-only', '--diff-filter=U'], { cwd: ephemeral.path, encoding: 'utf8', shell: false }).trim();
-          } catch {
-            // best-effort — the message below still reports the conflict
-            // even if listing the conflicted files itself fails.
-          }
-          try {
-            execFileSync('git', ['merge', '--abort'], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
-          } catch (abortErr) {
-            // A genuinely unexpected git failure (not a conflict, not a red
-            // verify) — a real bug, not a defined outcome; propagate as-is
-            // so it surfaces as "unexpected" (exit 1), never masked as a
-            // clean park.
-            throw abortErr;
-          }
-          // No automated conflict RESOLUTION per this cell's prohibitions —
-          // only detection + clean reporting; the item stays blocked
-          // (unchanged) for a human to resolve manually via the existing
-          // take/return branch flow.
-          return {
-            id,
-            outcome: 'conflict',
-            target,
-            branch: ownBranch,
-            conflictedFiles: conflictedFiles ? conflictedFiles.split('\n').filter(Boolean) : [],
-          };
-        }
-
-        // Clean merge staged (not yet committed) — the item's OWN verify
-        // runs on this staged tree BEFORE any commit, mirroring
-        // mergeRunnerItem's own verify-before-commit discipline exactly.
-        const check = await runGoalCheck(item, ephemeral.path, timeoutMs);
-        if (!check.passed) {
-          try {
-            execFileSync('git', ['merge', '--abort'], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
-          } catch (abortErr) {
-            throw abortErr;
-          }
-          // tsk-53o: item stays 'blocked' either way (no moveWork on this
-          // path) — surface `timedOut` so this outcome doesn't read as a
-          // real verify failure when it was a timeout.
-          return { id, outcome: 'verify-fail', timedOut: check.timedOut, target, branch: ownBranch, exitStatus: check.status, output: check.output };
-        }
-
-        execFileSync('git', ['commit', '-m', `catch-up: merge ${target} into ${ownBranch}`], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
-        // D18's edge: mechanical, uncounted reconcile-success — never
-        // touches 'doing', so anti-loop's visitCount never sees it. No
-        // reason/ask required on this edge (fsm.mjs).
-        // tsk-4ax (D3): same branchHeadAtReturn write as the already-caught-up
-        // path above — this commit's own SHA is the tip this verify passed
-        // on, and mergedTreeAlreadyVerified needs it recorded to skip the
-        // outbound gate's redundant re-verify.
-        const catchupHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ephemeral.path, encoding: 'utf8', shell: false }).trim();
-        const { event } = moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'blocked', role: 'runner', branchHeadAtReturn: catchupHead });
-        return { id, outcome: 'merged', from: 'blocked', to: 'awaiting-approval', target, branch: ownBranch, seq: event.seq, output: check.output };
-      });
+      // tsk-4ax: the git merge/verify/commit MECHANICS are shared with
+      // approve's own inbound pre-check below (performCatchUp) — this case
+      // owns only what's specific to the manual-recovery entry point: the
+      // blocked/CATCHUP_REASONS precondition above, and the moveWork/
+      // friction bookkeeping below.
+      const result = await performCatchUp(repoRoot, id, item, target, timeoutMs);
+      if (result.outcome === 'already-caught-up' || result.outcome === 'merged') {
+        const { event } = moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'blocked', role: 'runner', branchHeadAtReturn: result.catchupHead });
+        return { id, outcome: result.outcome, from: 'blocked', to: 'awaiting-approval', target, branch: ownBranch, seq: event.seq, output: result.output };
+      }
+      if (result.outcome === 'verify-fail') {
+        return { id, outcome: 'verify-fail', timedOut: result.timedOut, target, branch: ownBranch, exitStatus: result.exitStatus, output: result.output };
+      }
+      // 'conflict'
+      return { id, outcome: 'conflict', target, branch: ownBranch, conflictedFiles: result.conflictedFiles };
     }
 
     // Gate A — candidate ranking (self-improve-loop P13 Slice 1, D1/D3/D6):
