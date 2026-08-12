@@ -6,27 +6,31 @@ herdr (đã làm), 3) web dashboard, webserver tự quản tự host frontend...
 
 ## 1. Trạng thái hiện tại
 
-Vòng 4. Thiết kế đã hội tụ về mặt chức năng từ vòng 3 (D1-D5 giữ nguyên,
-không bị lật); vòng 4 chỉ chạm phần bảo mật và làm nó chặt hơn:
+**Vòng 5 — HỘI TỤ, người dùng đã chốt chuyển sang `exploring`.**
 
-- **Vế bind của D6 bị lật**: `0.0.0.0` thay cho `127.0.0.1` (quyết định
-  người chủ sản phẩm). Bản đính chính đã ghi vào event log để phiên lạnh
-  không hiện thực nhầm. Vế token của D6 giữ nguyên và nay chịu lực hoàn
-  toàn.
-- **Phát hiện nền quan trọng**: fgOS không có tầng phân quyền nào, có chủ
-  ý (`io-contract.md`; STR38/STR48 đều chưa xây) — nên §6 bổ sung một
-  ràng buộc kỹ thuật cụ thể: bề mặt ghi qua mạng là allowlist hẹp
-  (`answer`/`approve`/`reject`), vì `verify` chạy như shell thật.
-- **cf-access** được nêu dạng "nếu cần thì" → thành task tuỳ chọn thứ 4
-  trong §7, kèm ràng buộc loại trừ với chế độ bind LAN.
+Phần chức năng ổn định từ vòng 3 (D1-D5, không vòng nào lật). Vòng 4-5 chỉ
+làm chặt phần bảo mật:
 
-§6 đã viết lại toàn bộ phần Bảo mật. §7 nay có 3 task bắt buộc + 1 tuỳ
-chọn + 1 companion item (`tsk-539`). Vế bind và cf-access **chưa mint
-D-ID** (vừa lật một lần / mới nêu) — mint ở vòng sau nếu giữ nguyên.
+- **D7** — bind mặc định `0.0.0.0` (lật vế bind của D6 ở vòng 4, giữ
+  nguyên qua vòng 5 nên đủ điều kiện mint).
+- **D8** — kiến trúc xác thực hai lớp **cộng dồn**, port idiom đã kiểm
+  chứng từ `/home/vantt/projects/herdr-gateway`: cookie-session trước
+  (token 24-byte hex → `/api/login` → cookie HttpOnly/SameSite=Strict,
+  constant-time compare, 404 câm), cf-access là credential thay thế **có
+  xác minh chữ ký JWT thật** (RS256/JWKS, require exp/iss/aud).
+- **Một kết luận của chính tôi ở vòng 4 đã bị bác** bằng prior art: "hai
+  chế độ phải loại trừ nhau" là sai, vì chữ ký JWT được verify nên
+  assertion không forge được. Ghi ở bảng "đã bị sửa" §4.
+- Nền tảng vẫn đứng: fgOS không có tầng phân quyền nào (có chủ ý,
+  `io-contract.md`, STR38/STR48 chưa xây) → bề mặt ghi qua mạng là
+  allowlist hẹp `answer`/`approve`/`reject`, vì `verify` chạy như shell
+  thật.
 
-Bước tiếp theo: người dùng xác nhận để bàn giao sang
-`fgos-coding-exploring` → `fgos-coding-planning` (native-first), sau đó
-phiên này đẩy `tsk-539` (D5).
+§6 đã viết lại toàn bộ phần Bảo mật theo prior art. §7: 3 task bắt buộc +
+1 tuỳ chọn (cf-access) + 1 companion item (`tsk-539`).
+
+**Bước tiếp theo:** bàn giao `fgos-coding-exploring` → `fgos-coding-planning`
+(native-first, cùng phiên), sau đó đẩy `tsk-539` theo D5.
 
 ## 2. Mục tiêu & đề bài
 
@@ -67,7 +71,9 @@ nguyên văn dữ liệu thô.
 | 14 | Nguồn dữ liệu narrative "lịch sử agent đã làm": `CONTEXT.md` (vùng người, git-versioned) hay `state.decisions` (vùng máy) | Rõ | Áp dụng thẳng D7 của `tsk-65i`/`tsk-539` (đã chốt nơi khác, không re-derive): `CONTEXT.md`/`plan.md` là nguồn chính; `decisions[]` chỉ hiện như chi tiết mở rộng, không phải mặc định. Không có phản đối từ người dùng ở vòng 2 — giữ nguyên đề xuất. |
 | 15 | Mở cổng HTTP đổi threat model của fgOS (hiện chỉ nghe từ terminal người dùng) | Rõ, ĐÃ SỬA ở vòng 4 | Vòng 3 người dùng chốt "thêm lớp auth tối thiểu" → D6. Vòng 4 người dùng sửa vế bind: **`0.0.0.0`**, không phải `127.0.0.1`. Vế auth token giữ nguyên và nay **chịu lực hoàn toàn** (xem hàng 17). |
 | 16 | fgOS hôm nay có tầng phân quyền nào không? | Rõ — **KHÔNG, có chủ ý** | `docs/io-contract.md` D1/D9: *"CLI local không xác thực được ai đang gọi nó — ai chạy được `fgos` thì đã ghi thẳng vào `.fgos/` được. Cổng này mua về dấu vết audit + chống nhầm giữa các phiên, **không mua về an ninh**"*; và *"caller chưa xác danh KHÔNG bị chặn"* gọi verb ghi. §"Ranh giới" của cùng file: tầng phân quyền thuộc **STR38**, cửa mạng của daemon thuộc **STR48** — cả hai **NGOÀI hợp đồng, chưa xây**. Nên mô hình tin cậy của fgOS hôm nay = ranh giới user của OS, không hơn. |
-| 17 | Hệ quả cụ thể của bind `0.0.0.0` lên bề mặt ghi | Rõ | Cơ chế chính xác (không phải lo xa chung chung): `verify` của mỗi item chạy như **lệnh shell thật** (`dispatch.mjs`). Ai ghi được trường `verify` của một item thì lệnh đó sẽ được thực thi khi verify chạy. Nên một endpoint ghi TỔNG QUÁT (kiểu proxy mọi verb, hoặc `edit` tuỳ trường) mở ra mạng = bề mặt thực thi shell từ xa. Đây là lý do §6 chốt bề mặt ghi phải là **allowlist hẹp** (`answer`/`approve`/`reject`), không phải cửa verb tổng quát. |
+| 17 | Hệ quả cụ thể của bind `0.0.0.0` lên bề mặt ghi | Rõ | Cơ chế chính xác (không phải lo xa chung chung): `verify` của mỗi item chạy như **lệnh shell thật** (`dispatch.mjs`). Ai ghi được trường `verify` của một item thì lệnh đó sẽ được thực thi khi verify chạy. Nên một endpoint ghi TỔNG QUÁT (kiểu proxy mọi verb, hoặc `edit` tuỳ trường) mở ra mạng = bề mặt thực thi shell từ xa. Đây là lý do §6 chốt bề mặt ghi phải là **allowlist hẹp** (`answer`/`approve`/`reject`), không phải cửa verb tổng quát. Prior art xác nhận idiom: herdr-gateway cũng allowlist hẹp, mọi handler nhận `AuthSession` làm extractor đầu tiên (`src/web/api.rs:72,161`). |
+| 18 | Có prior art thật cho cặp token + cf-access không? | Rõ — CÓ, đọc trực tiếp | `/home/vantt/projects/herdr-gateway` (crate `herdr-go` v0.1.14, Rust/axum) đã hiện thực đúng cặp này. Chi tiết đã kiểm ở §5 vòng 5 và §6. Điểm quyết định: nó **xác minh chữ ký JWT thật** (RS256 qua JWKS Cloudflare, bắt buộc `iss`/`aud`/`exp`/`nbf` — `src/web/cf_access.rs:195-217`), nên header `Cf-Access-Jwt-Assertion` **không giả mạo được**. |
+| 19 | Hai chế độ bảo mật (LAN-token vs cf-access) có buộc phải loại trừ nhau không? | Rõ — **KHÔNG. Vòng 4 tôi phát biểu SAI** | Vòng 4 tôi kết luận "phải chọn một, không trộn", dựa trên giả định cf-access chỉ check header có mặt (nếu vậy thì kẻ trong LAN forge header là vòng qua được). Prior art bác bỏ giả định đó: chữ ký JWT được xác minh mật mã, nên kẻ đi thẳng vào cổng **không forge được** assertion — họ rơi xuống đường token, đúng như thiết kế. Hai lớp **cộng dồn an toàn**, bật đồng thời được. Caveat còn lại (chính herdr-gateway tự ghi ở `docs/backlog.md:68`): bật cf-access KHÔNG làm mất đường token — nó thêm một cửa cho người ở xa, không đóng cửa LAN. |
 | 16 | Ranh giới tsk-ldb ↔ tsk-539 | Rõ | Người dùng chốt vòng 3: **tách rời** (phương án (a) — tsk-ldb không nuốt phạm vi, không chờ tsk-539), nhưng muốn "gom/kéo theo" tsk-539 để nó cũng được deliver — xem D5 ở §4 cho cách cụ thể (không phải `deps` chặn). |
 
 ## 4. Quyết định đã chốt
@@ -81,12 +87,16 @@ nguyên văn dữ liệu thô.
 | **D5** | **Ranh giới tsk-ldb ↔ tsk-539: tách rời, không phải `deps` chặn.** tsk-ldb render best-effort trên nội dung `ask`/`gate-approve` hiện có, kể cả khi còn brief/trích D-ID khó hiểu — khi `tsk-539` cải thiện chất lượng authoring sau này, dashboard tự động hưởng lợi mà không cần sửa lại (hai việc tách bạch theo thiết kế: authoring vs rendering). "Kéo theo deliver" thực hiện bằng cách: `tsk-539` được ghi nhận là companion item trong §7, và phiên này sẽ tiếp tục đẩy `tsk-539` (đang `todo/discovery`, không ai giữ) sang `exploring`/`planning` ngay sau khi tsk-ldb hội tụ — không phải một `deps` edge trong state. | 3 | ✅ seq 14641 |
 | **D6** | ⚠️ **VẾ BIND ĐÃ BỊ SỬA Ở VÒNG 4 — xem ghi chú dưới bảng.** ~~Bind `127.0.0.1` mặc định~~ + một lớp auth tối thiểu (token) bắt buộc ngay từ v1 — không hoãn sang sau, theo cảnh báo *"không vá sau được"* (STR38). **Vế token vẫn nguyên hiệu lực và nay chịu lực hoàn toàn.** | 3 | ✅ seq 14642, sửa bởi seq 14644 |
 
-**Đã bị sửa ở vòng 4 — chưa cấp D-ID mới (đúng luật §4: một điểm vừa bị lật
-chưa đủ vững để mint).**
+| **D7** | Bind mặc định `0.0.0.0` (cấu hình được qua cờ), cảnh báo khi bind không phải loopback. Thay vế bind của D6. Đủ điều kiện mint: nêu vòng 4, giữ nguyên qua vòng 5 không bị sửa. | 4-5 | ✅ seq 14703 |
+| **D8** | **Xác thực hai lớp cộng dồn, sao chép idiom đã kiểm chứng của `herdr-gateway`** (`/home/vantt/projects/herdr-gateway`, crate `herdr-go`): (1) **cookie-session kiểm trước** — token dài (24 byte ngẫu nhiên hex) chỉ POST một lần vào `/api/login`, đổi lấy cookie `HttpOnly; SameSite=Strict`; so sánh token bằng **constant-time compare**; mọi thất bại trả **404 câm**, không bao giờ 401. (2) **cf-access là credential thay thế** khi không có cookie hợp lệ VÀ đã cấu hình đủ `team_domain`+`aud` — **bắt buộc xác minh chữ ký JWT** (RS256 qua JWKS `{team_domain}/cdn-cgi/access/certs`, cache TTL, require `exp`/`iss`/`aud`, validate `nbf`). Hai lớp **không loại trừ nhau**. | 5 | ✅ seq 14704 |
+
+**Đã bị sửa (bằng chứng luật D-ID hoạt động đúng — giữ lại làm hồ sơ):**
 
 | Phát biểu | Vòng nêu | Vòng sửa | Sửa thành |
 |---|---|---|---|
-| D6 vế bind: `127.0.0.1` mặc định | 3 | **4** | **`0.0.0.0`** — người dùng chốt trực tiếp. Hệ quả: token không còn là lớp phòng thủ thứ hai mà là **hàng rào duy nhất**; và vì fgOS không có tầng phân quyền nào (§3 hàng 16), bề mặt ghi qua mạng phải là allowlist hẹp (§3 hàng 17). Ghi bản đính chính vào event log (seq 14644) để một phiên lạnh đọc `decisions` không hiện thực nhầm `127.0.0.1`. **Mint D-ID cho vế bind ở vòng sau nếu giữ nguyên.** |
+| D6 vế bind: `127.0.0.1` mặc định | 3 | **4** | **`0.0.0.0`** — người dùng chốt trực tiếp. Hệ quả: token không còn là lớp phòng thủ thứ hai mà là **hàng rào duy nhất**; và vì fgOS không có tầng phân quyền nào (§3 hàng 16), bề mặt ghi qua mạng phải là allowlist hẹp (§3 hàng 17). Ghi bản đính chính vào event log để một phiên lạnh đọc `decisions` không hiện thực nhầm `127.0.0.1`. Giữ nguyên qua vòng 5 → **đã mint D7**. |
+| "Chế độ LAN-token và chế độ cf-access phải loại trừ nhau, không trộn" | **4 (tôi nêu)** | **5** | **SAI — tự bác bằng prior art.** Giả định ngầm của tôi: cf-access chỉ kiểm header có mặt, nên kẻ trong LAN forge header là vòng qua Access. `herdr-gateway` xác minh chữ ký JWT thật (RS256/JWKS, `src/web/cf_access.rs:195-217`) → không forge được → hai lớp cộng dồn an toàn, bật đồng thời được. Bài học lặp lại đúng mô-típ cụm `tsk-65i`/`tsk-539` đã ghi: **phát biểu trước, kiểm sau**. Sửa thành D8. |
+| "cf-access thì bypass token" (cách người dùng mô tả) | 5 | **5** | **Thứ tự ngược, kết quả giống.** Code thật: cookie-session kiểm TRƯỚC; cf-access chỉ được thử khi KHÔNG có cookie hợp lệ, và chỉ khi đã cấu hình đủ team_domain+aud (`src/web/auth.rs:80-105`). Nên cf-access là **credential thay thế** cho bước login, không phải một nhánh bypass đặt trước token. |
 
 ## 5. Q&A log
 
@@ -281,6 +291,45 @@ Cả hai được ghi vào §3/§5 và một bản đính chính đã vào event
 phiên lạnh không hiện thực nhầm `127.0.0.1`; mint D-ID ở vòng sau nếu giữ
 nguyên.
 
+### 2026-08-12 — Vòng 5: prior art bác bỏ kết luận vòng 4 của chính tôi
+
+**Người dùng chỉ đường:** *"chổ số 3) có thể học cách
+~/project/herdr-gateway sử dụng cả token và cf-access. có cf-access thì
+by-pass token. giờ có thể đi qua exploring"*.
+
+**Scout `/home/vantt/projects/herdr-gateway`** (crate `herdr-go` v0.1.14,
+Rust/axum — đúng stack tsk-ldb sẽ dùng). Kết quả đọc code:
+
+| Câu hỏi | Kết quả |
+|---|---|
+| Chữ ký JWT có được xác minh không? | **CÓ, thật.** RS256 qua JWKS `{team_domain}/cdn-cgi/access/certs`, `set_issuer`+`set_audience`, `set_required_spec_claims(["exp","iss","aud"])`, `validate_nbf` — `src/web/cf_access.rs:195-217`. Cache TTL 3600s; `kid` lạ trả `UnknownKid` không refetch (chống DoS). |
+| Thứ tự hai lớp | cookie `hg_session` **trước**; cf-access chỉ thử khi không có cookie hợp lệ VÀ đã cấu hình đủ — `src/web/auth.rs:80-105` |
+| Token dùng thế nào | 24 byte hex, POST một lần `/api/login`, `constant_time_eq`, đổi lấy cookie `HttpOnly; SameSite=Strict; Max-Age=604800` |
+| Thất bại xác thực | **404 câm**, không bao giờ 401 — `src/web/auth.rs:40-42` |
+| Bind mặc định | `0.0.0.0:8787` (`config.example.json:2`), cảnh báo khi non-loopback (`src/main.rs:244-250`) — **trùng đúng quyết định vòng 4 của người dùng** |
+| Bề mặt ghi | allowlist hẹp, mọi handler nhận `AuthSession` extractor đầu tiên |
+
+**Hai điều tôi phải tự sửa** (ghi vào bảng "đã bị sửa" §4):
+
+1. **Kết luận "hai chế độ phải loại trừ nhau" của vòng 4 là SAI.** Nó dựa
+   trên giả định ngầm rằng tích hợp cf-access nghĩa là kiểm header có
+   mặt — nếu vậy kẻ trong LAN forge header là vòng qua Access. Nhưng chữ
+   ký được xác minh mật mã, nên không forge được; kẻ đi thẳng vào cổng
+   rơi xuống đường token như thường. Hai lớp **cộng dồn an toàn**. Đây
+   đúng mô-típ "phát biểu trước, kiểm sau" mà cụm `tsk-65i`/`tsk-539` đã
+   ghi lại nhiều lần — lần này rơi vào chính tôi.
+2. **"cf-access thì bypass token" mô tả đúng trải nghiệm, sai thứ tự.**
+   Code kiểm cookie trước; cf-access là credential thay thế cho bước
+   login, không phải nhánh đặt trước token.
+
+**Còn lại đúng từ vòng 4:** bind `0.0.0.0` + không có tầng phân quyền
+trong fgOS + allowlist ghi hẹp vì `verify` chạy như shell. Prior art củng
+cố cả ba (nó cũng bind `0.0.0.0`, cũng allowlist hẹp).
+
+**Mint D7 (bind, đã giữ qua 2 vòng) và D8 (kiến trúc hai lớp, có prior art
+làm bằng chứng).** Người dùng chốt "giờ có thể đi qua exploring" → cụm này
+hội tụ, chuyển sang `fgos-coding-exploring`.
+
 ## 6. Thiết kế đã chốt {#design}
 
 herdr-plugin hôm nay có 2/3 core component: **herdr-orchestrator** (tự
@@ -386,44 +435,70 @@ người cần làm ở dashboard: `answer` (trả lời câu hỏi treo), `appr
 dưới, vì nó chặn đúng cơ chế thực thi shell chứ không phụ thuộc việc ai
 lọt qua được cửa.
 
-**Hai chế độ triển khai — phải chọn một cách có ý thức, không trộn.**
+**Hai lớp xác thực cộng dồn — sao chép idiom đã kiểm chứng, không tự thiết
+kế (D8).**
+
+Người chủ sản phẩm chỉ tới `/home/vantt/projects/herdr-gateway` (crate
+`herdr-go`) làm mẫu. Đọc code xác nhận đây là mẫu tốt và **nó bác bỏ chính
+khẳng định của vòng 4 rằng hai chế độ phải loại trừ nhau**.
 
 ```mermaid
 flowchart TB
-    subgraph M1["Chế độ A — LAN tin cậy (v1, mặc định)"]
-      A1["bind 0.0.0.0"] --> A2["token bắt buộc<br/>random ≥128-bit, sinh lúc khởi động<br/>KHÔNG đặt trong URL query"]
-      A2 --> A3["allowlist ghi hẹp<br/>answer · approve · reject"]
-      A4["⚠ HTTP cleartext trên LAN<br/>token sniff được<br/>— chấp nhận có ý thức"]
-    end
-    subgraph M2["Chế độ B — cf-access (tuỳ chọn, 'nếu cần thì')"]
-      B1["cloudflared tunnel<br/>bind loopback"] --> B2["Cloudflare Access<br/>SSO + policy<br/>= tầng identity fgOS đang thiếu"]
-      B2 --> B3["app xác minh<br/>Cf-Access-Jwt-Assertion"]
-      B3 --> B4["allowlist ghi hẹp<br/>(giữ nguyên)"]
-    end
-    M1 -.->|"KHÔNG chạy đồng thời:<br/>còn bind 0.0.0.0 trên LAN thì<br/>ai trong LAN đi thẳng vào cổng<br/>là VÒNG QUA Access hoàn toàn"| M2
+    R["Request tới"] --> C{"có cookie hg_session<br/>hợp lệ?"}
+    C -->|"có"| OK["cho qua"]
+    C -->|"không"| CF{"cf_access đã cấu hình<br/>team_domain + aud?"}
+    CF -->|"chưa"| L["yêu cầu login<br/>POST /api/login {token}<br/>constant-time compare<br/>→ cookie HttpOnly SameSite=Strict"]
+    CF -->|"rồi"| V{"xác minh chữ ký JWT<br/>Cf-Access-Jwt-Assertion<br/>RS256 · JWKS · iss/aud/exp/nbf"}
+    V -->|"hợp lệ"| OK
+    V -->|"không"| F["404 câm<br/>(không bao giờ 401)"]
+    L --> OK
+    OK --> AL["allowlist ghi hẹp<br/>answer · approve · reject<br/>mọi handler nhận AuthSession"]
 
-    style A4 fill:#f5e2df,stroke:#9E3A30
-    style B2 fill:#e0ede2,stroke:#3B7A4B
+    style V fill:#e0ede2,stroke:#3B7A4B
+    style AL fill:#ddeded,stroke:#186E71
+    style F fill:#f2e9d8,stroke:#8E6318
 ```
 
-**Chế độ A** là v1 theo đúng quyết định của người chủ sản phẩm: bind
-`0.0.0.0` để với tới từ điện thoại/máy khác trong nhà, token bắt buộc trên
-mọi request. Điều phải khai báo thẳng thay vì giấu: HTTP cleartext trên
-LAN nghĩa là token đi qua mạng ở dạng đọc được — ai bắt được gói tin trong
-LAN đó thì có toàn quyền. Trên một LAN nhà riêng tin cậy thì đây là rủi ro
-chấp nhận được, nhưng nó phải là một sự chấp nhận có ý thức, không phải
-một giả định im lặng.
+**Vì sao hai lớp cộng dồn an toàn** — điểm mấu chốt nằm ở chỗ đa số
+implementation làm sai: `herdr-gateway` **xác minh chữ ký JWT thật**
+(`src/web/cf_access.rs:195-217` — RS256 với key lấy từ JWKS
+`{team_domain}/cdn-cgi/access/certs`, bắt buộc có `exp`/`iss`/`aud`, kiểm
+`nbf`), chứ không chỉ kiểm header có mặt. Nên kẻ đi thẳng vào cổng trong
+LAN **không giả mạo được** assertion — họ rơi xuống đường token như mọi
+người khác. Vòng 4 tôi kết luận hai chế độ phải loại trừ nhau vì đã ngầm
+giả định cf-access chỉ là check-header; giả định đó sai, và kết luận theo
+nó cũng sai (§4, bảng "đã bị sửa").
 
-**Chế độ B** (cf-access, người dùng nêu vòng 4 dưới dạng "nếu cần thì") là
-đường nâng cấp đúng khi cần với tới từ ngoài nhà: Cloudflare Access cấp
-chính xác tầng identity/authz mà fgOS chưa có, và app chỉ cần xác minh
-JWT header `Cf-Access-Jwt-Assertion` mà Access chèn vào. Nhưng nó **chỉ có
-tác dụng khi lưu lượng buộc phải đi qua Cloudflare** — chuẩn mực là chạy
-`cloudflared` tunnel (kết nối hướng ra) và bind loopback, để không còn
-đường vào trực tiếp. Nếu vừa bật cf-access vừa giữ bind `0.0.0.0` trên
-LAN thì bất kỳ ai trong LAN vẫn đi thẳng vào cổng và vòng qua Access hoàn
-toàn — cửa trước có gác, cửa sau mở toang. Đây là lý do hai chế độ được
-vẽ loại trừ nhau chứ không cộng dồn.
+**Thứ tự thật, khác cách phát biểu thông thường:** cookie kiểm **trước**;
+cf-access chỉ được thử khi không có cookie hợp lệ và đã cấu hình đủ
+(`src/web/auth.rs:80-105`). Nên cf-access là **credential thay thế cho
+bước login**, không phải một nhánh bypass đặt trước token. Kết quả với
+người dùng thì giống nhau (có cf-access thì không phải nhập token), nhưng
+thứ tự triển khai thì ngược.
+
+**Bốn chi tiết của mẫu này đáng sao chép nguyên, vì mỗi cái vá một lỗi
+kinh điển:**
+
+| Chi tiết | Vá lỗi gì |
+|---|---|
+| Token chỉ POST một lần vào `/api/login`, sau đó dùng cookie `HttpOnly; SameSite=Strict` | Token không lặp lại trên mọi request, không lọt vào URL/log/referrer |
+| `constant_time_eq` khi so token (`src/web/auth.rs:138-149`) | Timing attack |
+| Mọi thất bại xác thực trả **404 câm**, không bao giờ 401 | Không quảng cáo rằng endpoint tồn tại |
+| Bắt buộc `exp`/`iss`/`aud` (`set_required_spec_claims`) | `jsonwebtoken` mặc định chỉ kiểm claim NẾU có mặt — thiếu claim sẽ lọt |
+
+**Rủi ro còn lại, phải khai báo chứ không giấu.** (a) HTTP cleartext trên
+LAN: cookie phiên đi qua mạng ở dạng đọc được; trên LAN nhà riêng là chấp
+nhận được nhưng phải là chấp nhận có ý thức. (b) Bật cf-access **không**
+đóng đường token — chính `herdr-gateway` ghi điều này ở
+`docs/backlog.md:68`: origin vẫn phải chỉ nên với tới được qua Cloudflare
+Tunnel nếu muốn Access là cửa duy nhất, và code không tự cưỡng chế điều
+đó. Nên cf-access là **thêm một cửa cho người ở xa**, không phải một cái
+khoá cho cửa LAN.
+
+**Crate tái dùng được, đã kiểm trong mẫu:** `axum 0.7` (+ws),
+`tower-http 0.5`, `jsonwebtoken 9` (JWT/JWKS), `rust-embed 8` +
+`axum-embed 0.1` (nhúng asset — đúng yêu cầu "một binary kèm asset" của
+D1), `reqwest 0.12` (rustls-tls).
 
 ### Ranh giới tsk-ldb ↔ tsk-539 (D5)
 
@@ -444,18 +519,21 @@ lập, có lợi ích cộng dồn tự nhiên.
 
 ### {#task-webserver-core} Nền webserver trong herdr-plugin
 
-**Mục tiêu:** embed một HTTP server + frontend asset đã build vào binary
-herdr-plugin hiện có. Bind `0.0.0.0` (địa chỉ bind cấu hình được, mặc định
-`0.0.0.0` theo quyết định vòng 4), sinh token ngẫu nhiên ≥128-bit lúc khởi
-động, mọi request phải kèm token, token không bao giờ nằm trong URL query.
-Bề mặt ghi là allowlist hẹp `answer`/`approve`/`reject` — không proxy verb
-tổng quát, không `edit` tuỳ trường (§6 "Bảo mật"). Chưa có UI thật — chỉ
-bộ khung phục vụ static asset + health-check.
+**Mục tiêu:** embed một HTTP server (axum) + frontend asset đã build
+(`rust-embed`/`axum-embed`) vào binary herdr-plugin hiện có. Bind cấu hình
+được, mặc định `0.0.0.0`, cảnh báo khi không phải loopback (D7). Lớp
+xác thực 1 theo D8: token 24-byte hex sinh lúc khởi động, POST một lần vào
+`/api/login`, constant-time compare, đổi lấy cookie `HttpOnly;
+SameSite=Strict`; mọi thất bại trả 404 câm. Bề mặt ghi là allowlist hẹp
+`answer`/`approve`/`reject`, mọi handler nhận `AuthSession` làm extractor
+đầu tiên — không proxy verb tổng quát, không `edit` tuỳ trường. Chưa có UI
+thật — chỉ bộ khung phục vụ static asset + health-check.
 
 **Trích §6 áp dụng:** "Nguồn dữ liệu — không phát minh, tái dùng seam có
-sẵn" (sơ đồ HP), toàn bộ "Bảo mật" (Chế độ A).
+sẵn" (sơ đồ HP), "Bảo mật" (lớp 1 + allowlist + bảng 4 chi tiết đáng sao
+chép).
 
-**D-ID áp dụng:** D1, D6 (vế token; vế bind theo bản đính chính vòng 4).
+**D-ID áp dụng:** D1, D6 (vế token), D7, D8 (lớp 1).
 
 **Quan hệ với sibling:** nền tảng cho `#task-taskboard-view` và
 `#task-detail-history` — cả hai dựng trên webserver này.
@@ -499,27 +577,30 @@ câu-hỏi/vì-sao/bối-cảnh.
 **Draft verify:** `cargo test --manifest-path herdr-plugin/Cargo.toml
 web_task_detail_ web_qa_history_ web_gate_approve_`
 
-### {#task-cf-access} (TUỲ CHỌN) Chế độ cf-access cho truy cập ngoài LAN
+### {#task-cf-access} (TUỲ CHỌN) Lớp xác thực thứ hai: cf-access
 
-**Mục tiêu:** hỗ trợ Chế độ B của §6 "Bảo mật" — xác minh JWT header
-`Cf-Access-Jwt-Assertion` do Cloudflare Access chèn vào, cấu hình team
-domain + audience tag, và tài liệu hoá cách chạy `cloudflared` tunnel với
-bind loopback. **Kèm một guard bắt buộc:** khi chế độ cf-access bật mà
-địa chỉ bind vẫn không phải loopback, phải cảnh báo rõ (hoặc từ chối khởi
-động) — vì đó chính là cấu hình vòng-qua-Access mà §6 mô tả.
+**Mục tiêu:** lớp 2 của D8 — credential thay thế khi không có cookie hợp
+lệ và đã cấu hình đủ `team_domain`+`aud`. **Bắt buộc xác minh chữ ký JWT**
+`Cf-Access-Jwt-Assertion`: RS256 với key lấy từ JWKS
+`{team_domain}/cdn-cgi/access/certs` (có cache TTL + xử lý `kid` lạ không
+refetch, chống DoS), `set_required_spec_claims(["exp","iss","aud"])`,
+validate `nbf`. Port thẳng idiom từ
+`/home/vantt/projects/herdr-gateway/src/web/cf_access.rs` — **không tự
+thiết kế lại**. Chỉ kiểm header có mặt mà không verify chữ ký là lỗi
+nghiêm trọng (ai với tới cổng đều forge được), phải có test chứng minh
+assertion giả bị từ chối.
 
-**Trích §6 áp dụng:** "Bảo mật" — Chế độ B và ràng buộc loại trừ giữa hai
-chế độ.
+**Trích §6 áp dụng:** "Bảo mật" — sơ đồ hai lớp, đoạn "Vì sao hai lớp cộng
+dồn an toàn", và mục rủi ro còn lại (b).
 
-**D-ID áp dụng:** chưa có (cf-access nêu vòng 4 dạng "nếu cần thì", chưa
-mint D-ID — xem ghi chú cuối §4).
+**D-ID áp dụng:** D8 (lớp 2).
 
 **Quan hệ với sibling:** phụ thuộc `#task-webserver-core`; hoàn toàn tuỳ
-chọn — ba task kia deliver được mà không cần task này. Đây là lý do nó
-đứng riêng thay vì nhét vào `#task-webserver-core`.
+chọn — ba task kia deliver được mà không cần task này (lớp 1 đã đủ cho
+LAN). Đây là lý do nó đứng riêng.
 
 **Draft verify:** `cargo test --manifest-path herdr-plugin/Cargo.toml
-cf_access_`
+cf_access_` (phải gồm một test assertion-giả-bị-từ-chối)
 
 ---
 
