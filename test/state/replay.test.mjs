@@ -357,6 +357,51 @@ test('foldEvents derives a clarify-pass settlement from work.stage discovery -> 
   assert.deepEqual(view.settlements.a[0], { kind: 'clarify-pass', role: 'runner', ts: '2026-07-16T00:00:01.000Z', detail: 'npm test -- a' });
 });
 
+// tsk-31lz: since tsk-30v, an UNCLEAR discovery verdict also leaves
+// `discovery` (-> `exploring`) while the item parks in `awaiting-human`
+// with an open question. `from === 'discovery'` alone therefore no longer
+// means "settled" — the gate has to read the verdict that drove the move.
+// The verdict is already in the log as the `work.discovery` event this same
+// `resolveDiscovery` call appends immediately BEFORE its `moveStage`
+// (discovery.mjs), so the fold can read it with no new payload field and no
+// change to already-written events.
+
+test('foldEvents does NOT derive a clarify-pass settlement when the discovery verdict that drove the discovery -> exploring move was unclear', () => {
+  const events = [
+    { seq: 1, ts: '2026-08-12T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'discovery' }, v: 2 },
+    { seq: 2, ts: '2026-08-12T00:00:01.000Z', type: 'work.discovery', payload: { id: 'a', clear: false, question: 'Which auth provider?' }, v: 2 },
+    { seq: 3, ts: '2026-08-12T00:00:02.000Z', type: 'work.stage', payload: { id: 'a', from: 'discovery', to: 'exploring', verify: 'chưa xác định — bổ sung thủ công', role: 'session' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal('settlements' in view, false);
+});
+
+test('foldEvents still derives a clarify-pass settlement when the discovery verdict that drove the move was clear', () => {
+  const events = [
+    { seq: 1, ts: '2026-08-12T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'discovery' }, v: 2 },
+    { seq: 2, ts: '2026-08-12T00:00:01.000Z', type: 'work.discovery', payload: { id: 'a', clear: true }, v: 2 },
+    { seq: 3, ts: '2026-08-12T00:00:02.000Z', type: 'work.stage', payload: { id: 'a', from: 'discovery', to: 'planning', verify: 'npm test -- a', role: 'session' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.settlements.a.length, 1);
+  assert.deepEqual(view.settlements.a[0], { kind: 'clarify-pass', role: 'session', ts: '2026-08-12T00:00:02.000Z', detail: 'npm test -- a' });
+});
+
+// Legacy-log guard (RUL20: the fold never silences a settlement a real
+// historical log already earned). Every `from === 'discovery'` event in this
+// repo's own live log predates tsk-30v, when `discovery -> exploring` WAS
+// the clear path — a log line that carries no readable verdict at all must
+// keep settling exactly as it did before this fix.
+test('foldEvents still derives a clarify-pass settlement from discovery -> exploring when the log carries no work.discovery verdict at all (legacy log)', () => {
+  const events = [
+    { seq: 1, ts: '2026-08-12T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'discovery' }, v: 2 },
+    { seq: 2, ts: '2026-08-12T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'discovery', to: 'exploring', verify: 'npm test -- a', role: 'runner' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.settlements.a.length, 1);
+  assert.equal(view.settlements.a[0].kind, 'clarify-pass');
+});
+
 test('foldEvents does NOT derive a settlement from work.stage exploring -> planning (it never leaves discovery)', () => {
   const events = [
     { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'exploring' }, v: 2 },
