@@ -296,6 +296,32 @@ self-pace."
      non-retryable, and that the target is unchanged (`merge --abort`
      already ran, or the merge was never attempted).
 
+   **Playbook: merge-conflict**
+
+   - *Signal*: `{picked: <id>, approve: {blocked, reason:
+     "merge-conflict"}}` — the post-merge `git merge --no-commit --no-ff`
+     staged a real textual conflict; the merge was rolled back and the
+     target is unchanged.
+   - *What the machine tries*: one `fgos catchup <id>` (`CATCHUP_REASONS`,
+     `bin/fgos.mjs`, accepts this reason directly) — merges the item's own
+     target branch back into the item's own branch inside an ephemeral
+     worktree, re-runs the item's own `verify` there, and on green takes
+     the `blocked -> awaiting-approval` edge itself. Walk
+     `docs/how-to/recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree.md`:
+     1. Run `fgos catchup <id>` (appending whichever of `--timeout <ms>`/
+        `--no-timeout` step 1 parsed). It resolves its own repo root from
+        `--dir`, so it runs correctly from any directory — never leave or
+        enter a worktree first to make it work.
+     2. Read the returned `outcome` and act on exactly that, nothing else
+        — 4b's "reading `fgos catchup <id>`'s outcome" rule above already
+        covers all four possible outcomes; this playbook follows it
+        exactly like the three above it, never a variant of its own.
+   - *Stop condition*: 4b's once-per-id-per-run rule.
+   - *Reported on failure*: the id, the returned `conflictedFiles` list (a
+     real conflict survived the playbook) or the failing lines from
+     `output` (a real red verify on the reconciled tree), and that the
+     target is unchanged.
+
    ### 4d — The same-id-twice stop rule, for reasons with no playbook
 
    This rule fires **only for a block reason that has NO playbook** in 4c.
@@ -303,10 +329,10 @@ self-pace."
    documented, machine-runnable recovery stopped the loop and woke a
    person for nothing.
 
-   Reasons with no playbook today: `merge-conflict` (until tsk-60h's own
-   slice lands), `fgos-write-rejected`, plain `verify-fail`, and any
-   reason this file does not name at all — a reason added to the CLI later
-   correctly falls here rather than being guessed at.
+   Reasons with no playbook today: `fgos-write-rejected`, plain
+   `verify-fail`, and any reason this file does not name at all — a reason
+   added to the CLI later correctly falls here rather than being guessed
+   at.
 
    For those reasons only, compare `<id>` against the id picked (and
    blocked) on the immediately preceding iteration:

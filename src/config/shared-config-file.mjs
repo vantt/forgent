@@ -87,3 +87,26 @@ export function writeSharedConfig(dir, config) {
   fs.mkdirSync(path.dirname(sharedPath), { recursive: true });
   fs.writeFileSync(sharedPath, `${JSON.stringify(config, null, 2)}\n`);
 }
+
+/**
+ * `readSharedConfig` that degrades to `{}` instead of throwing on a file that
+ * is present but not valid JSON.
+ *
+ * The shared config is explicitly an edit-the-file-by-hand surface, so a
+ * half-typed edit is an ordinary state, not an exceptional one. A reader that
+ * only wants one optional setting should behave the way it behaves when the
+ * setting is absent — `readGateBypassLevel` has wrapped this call in exactly
+ * this try/catch since it was written, for exactly this reason.
+ *
+ * Use this for an OPTIONAL setting whose absence is already meaningful. Do NOT
+ * use it where the caller's whole job is to report on the file's health:
+ * `fgos doctor`'s own checks must see the parse failure, not a tidy empty
+ * object, or the one command that exists to name the problem would hide it.
+ */
+export function readSharedConfigOrEmpty(dir) {
+  try {
+    return readSharedConfig(dir);
+  } catch {
+    return {};
+  }
+}

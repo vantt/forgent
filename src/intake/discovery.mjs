@@ -54,7 +54,7 @@ import { judgeVerifySemanticCorrectness } from './verify-pattern-check.mjs';
 import { readLockedContext, resolveContentRoot } from './plan.mjs';
 import { DEFAULTS, validateWorkShape } from '../state/work.mjs';
 import { listWork, moveStage, addDiscovery, addDecision, putInAwaiting, editWork, StoreError } from '../state/store.mjs';
-import { getDomain, stageForStep, resolveDomainName } from '../state/workflow-stage-graphs.mjs';
+import { getDomain, stageForStep, resolveDomainName, discoverableStages } from '../state/workflow-stage-graphs.mjs';
 import { rankImpact } from '../state/impact.mjs';
 import { computeImpact, computePriority, isRecognizedRisk } from '../state/priority-formula.mjs';
 
@@ -115,23 +115,13 @@ function blocksForItem(work, view) {
 // to prove domain-agnosticism) keeps the original direct `clarify ->
 // decompose` edge unchanged, exactly as before this item.
 //
-// EXPORTED (tsk-4b2): `bin/fgos.mjs`'s own `discover` CLI case has a
-// precondition gate of its own (refusing before this function is ever
-// called) that needs the exact same domain-aware stage set -- shared here
-// rather than duplicating the `hasDiscoveryExploring` check in two files.
-//
-// tsk-qod D1/D2: `stageForStep(domain, 'Clarify')` now resolves to
-// `undefined` for a domain that retired `clarify` entirely (today: only
-// `coding`) -- `.filter(Boolean)` drops that phantom entry instead of
-// letting `undefined` leak into the CLI's own `validStages.includes(stage)`
-// precondition as if it were a real, valid stage name. A domain that still
-// has a real Clarify-mapped stage (e.g. `triage`) is unaffected -- its
-// `clarifyStage` is truthy and survives the filter unchanged.
-export function discoverableStages(domain) {
-  const clarifyStage = stageForStep(domain, 'Clarify');
-  const hasDiscoveryExploring = domain.stages?.includes('discovery') && domain.stages?.includes('exploring');
-  return (hasDiscoveryExploring ? [clarifyStage, 'discovery', 'exploring'] : [clarifyStage]).filter(Boolean);
-}
+// MOVED (tsk-64h): `discoverableStages` used to be defined right here and
+// exported for `bin/fgos.mjs`'s own `discover` precondition gate. It now
+// lives in `../state/workflow-stage-graphs.mjs` alongside `stageForStep`/
+// `effectiveStage`, because `src/state/discover-pool.mjs` needs the exact
+// same answer and cannot import a `use-case`-layer module from the
+// `domain` layer (`test/architecture.test.mjs`). Same function, same
+// behavior, one home -- imported below with the other registry lookups.
 
 // `verdict` (tsk-30v D2/D6): only the `discovery`-stage branch reads it —
 // `clear` skips `exploring` and lands on `planning` directly; `unclear`

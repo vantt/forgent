@@ -1,6 +1,9 @@
 {
   "herdrOrchestrator": {
-    "autoDiscover": true
+    "autoDiscover": true,
+    "autoMerge": false,
+    "autoRetro": false,
+    "autoCleanup": false
   },
   "runner": {
     "executor": {
@@ -78,5 +81,20 @@
       "maxRoots": 4,
       "maxLeavesPerRoot": 4
     }
+  },
+  "gateBypass": {
+    "level": "standard"
+  },
+  "cleanup": {
+    "ttlDays": 7,
+    "leafTtlDays": 0
+  },
+  "invariantChecks": {
+    "commands": [
+      "node --test test/architecture.test.mjs"
+    ]
+  },
+  "workerSlots": {
+    "ceiling": null
   }
 }

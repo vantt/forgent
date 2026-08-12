@@ -9,8 +9,8 @@ description: >-
   (fgos-coding-planning/fgos-coding-validating) and supplies the plan
   verb's verdict itself (one-door-write) — never writes .fgos/ state
   directly, and never re-derives a judgment blind. For an item at stage
-  clarify, use /fgOS:discover instead. Examples: "/fgOS:plan build-cli",
-  "/fgOS:plan tsk-3wd".
+  discovery or exploring, use /fgOS:discover instead. Examples:
+  "/fgOS:plan build-cli", "/fgOS:plan tsk-3wd".
 ---
 
 # fgOS plan
@@ -34,9 +34,11 @@ verdict-routing/CONTEXT.md` D1).
 tsk-2b0 D1 (hard split, no fallback): `plan` is the sibling of `discover`
 created by splitting the old dual-purpose verb — it only ever runs
 split-work judgment for an item at stage `planning` (or the legacy
-`decompose` alias). Use `/fgOS:discover <id>` for a `clarify`-stage item
-instead; `plan` errors if called on an item that isn't at one of those two
-stages.
+`decompose` alias). Use `/fgOS:discover <id>` for an item still at
+`discovery` or `exploring` instead; `plan` errors if called on an item that
+isn't at one of those two planning stages. `clarify` is **not** a routing
+answer here — it retired as a stage entirely (tsk-qod D1/D2), and
+`discover` refuses it for the coding domain just as `plan` does.
 
 ## Steps
 

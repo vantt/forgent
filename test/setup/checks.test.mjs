@@ -40,11 +40,12 @@ import {
   writeEnduserDoc,
   writeEnduserManifest,
 } from './helpers/setup-checks-harness.mjs';
+import { DEFAULT_WORKER_SLOT_CEILING } from '../../src/state/worker-slots.mjs';
 
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, changelog-unreleased-stale, herdr-launcher-configured, work-classification-vocabulary, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, and events-jsonl-not-truncated', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, changelog-unreleased-stale, herdr-launcher-configured, work-classification-vocabulary, work-stage-vocabulary, delivered-not-on-trunk, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, events-jsonl-not-truncated, and worker-slots-ceiling-usable', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     [
@@ -62,10 +63,13 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'changelog-unreleased-stale',
       'herdr-launcher-configured',
       'work-classification-vocabulary',
+      'work-stage-vocabulary',
+      'delivered-not-on-trunk',
       'enduser-docs-index-stale',
       'events-jsonl-contiguous',
       'invariant-checks-configured',
       'events-jsonl-not-truncated',
+      'worker-slots-ceiling-usable',
     ].sort(),
   );
 });
@@ -366,6 +370,124 @@ test('work-classification-vocabulary lists every violating id, not just the firs
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
+// ─── work-stage-vocabulary (tsk-64h) ───────────────────────────────────────
+// The stage-axis sibling of work-classification-vocabulary above: an open
+// item may sit at a stage its own domain no longer registers, and nothing
+// surfaced that until now. Same OPEN-only scoping and the same raw
+// `work.add` fixture technique, for the same reason — `validateWorkShape`
+// refuses a retired stage at the write door, so a legacy-shaped item can
+// only be constructed by appending the event directly.
+
+test('work-stage-vocabulary passes on an empty store', () => {
+  const dir = initRepo('checks-stage-vocab-empty-');
+  const fgosDir = path.join(dir, '.fgos');
+  initStore(fgosDir);
+
+  const { passed, message } = checkById('work-stage-vocabulary').check(dir);
+  assert.equal(passed, true);
+  assert.match(message, /registered by its domain/);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('work-stage-vocabulary passes for an item whose stage was never written (lazy Execute default)', () => {
+  const dir = initRepo('checks-stage-vocab-unset-');
+  const fgosDir = path.join(dir, '.fgos');
+  initStore(fgosDir);
+  addWork(fgosDir, { id: 'a', title: 'a', kind: 'feature', risk: 'light', verify: 'true', status: 'todo', deps: [], refs: [] });
+
+  const { passed, message } = checkById('work-stage-vocabulary').check(dir);
+  assert.equal(passed, true, message);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('work-stage-vocabulary passes when every open item sits at a stage its domain registers', () => {
+  const dir = initRepo('checks-stage-vocab-clean-');
+  const fgosDir = path.join(dir, '.fgos');
+  const logPath = path.join(fgosDir, 'events.jsonl');
+  appendEvent(logPath, {
+    type: 'work.add',
+    payload: { id: 'a', title: 'a', kind: 'feature', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'planning' },
+  });
+  appendEvent(logPath, {
+    type: 'work.add',
+    payload: { id: 'b', title: 'b', kind: 'feature', status: 'doing', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'executing' },
+  });
+
+  const { passed, message } = checkById('work-stage-vocabulary').check(dir);
+  assert.equal(passed, true, message);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('work-stage-vocabulary fails and names an OPEN item sitting at a stage its domain retired', () => {
+  const dir = initRepo('checks-stage-vocab-retired-');
+  const fgosDir = path.join(dir, '.fgos');
+  const logPath = path.join(fgosDir, 'events.jsonl');
+  appendEvent(logPath, {
+    type: 'work.add',
+    payload: { id: 'stranded', title: 'stranded', kind: 'feature', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'clarify' },
+  });
+
+  const { passed, message } = checkById('work-stage-vocabulary').check(dir);
+  assert.equal(passed, false);
+  assert.match(message, /stranded/);
+  assert.match(message, /stage: "clarify"/);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test("work-stage-vocabulary judges each item against its OWN domain's stages, not the default domain's", () => {
+  const dir = initRepo('checks-stage-vocab-domain-');
+  const fgosDir = path.join(dir, '.fgos');
+  const logPath = path.join(fgosDir, 'events.jsonl');
+  appendEvent(logPath, {
+    type: 'work.add',
+    payload: { id: 'triaged', title: 'triaged', kind: 'feature', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'triage', domain: 'triage' },
+  });
+  appendEvent(logPath, {
+    type: 'work.add',
+    payload: { id: 'miscoded', title: 'miscoded', kind: 'feature', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'triage' },
+  });
+
+  const { passed, message } = checkById('work-stage-vocabulary').check(dir);
+  assert.equal(passed, false);
+  assert.match(message, /miscoded/);
+  assert.doesNotMatch(message, /triaged/);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('work-stage-vocabulary passes despite a retired stage on an already-resolved (done) item', () => {
+  const dir = initRepo('checks-stage-vocab-resolved-');
+  const fgosDir = path.join(dir, '.fgos');
+  const logPath = path.join(fgosDir, 'events.jsonl');
+  appendEvent(logPath, {
+    type: 'work.add',
+    payload: { id: 'old-done', title: 'old-done', kind: 'feature', status: 'done', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'clarify' },
+  });
+
+  const { passed, message } = checkById('work-stage-vocabulary').check(dir);
+  assert.equal(passed, true, message);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('work-stage-vocabulary lists every violating id, not just the first', () => {
+  const dir = initRepo('checks-stage-vocab-multi-');
+  const fgosDir = path.join(dir, '.fgos');
+  const logPath = path.join(fgosDir, 'events.jsonl');
+  appendEvent(logPath, {
+    type: 'work.add',
+    payload: { id: 'bad-one', title: 'bad-one', kind: 'feature', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'clarify' },
+  });
+  appendEvent(logPath, {
+    type: 'work.add',
+    payload: { id: 'bad-two', title: 'bad-two', kind: 'feature', status: 'awaiting-human', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'clarify' },
+  });
+
+  const { passed, message } = checkById('work-stage-vocabulary').check(dir);
+  assert.equal(passed, false);
+  assert.match(message, /bad-one/);
+  assert.match(message, /bad-two/);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
 test('dependencies-installed passes when package.json has no dependencies field (pre-tsk-slq behavior)', () => {
   const tmp = mkTemp('fgos-deps-check-');
   fs.writeFileSync(path.join(tmp, 'package.json'), JSON.stringify({ name: 'x' }));
@@ -650,6 +772,7 @@ test('config-not-stale passes when the existing config already has every default
       cleanup: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS, leafTtlDays: DEFAULT_CLEANUP_LEAF_TTL_DAYS },
       herdrOrchestrator: DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
       invariantChecks: { commands: DEFAULT_INVARIANT_CHECK_COMMANDS },
+      workerSlots: { ceiling: null },
     }),
   );
   const { passed } = checkById('config-not-stale').check(cwd);
@@ -724,6 +847,54 @@ test('invariant-checks-configured passes and names the configured commands', () 
   assert.equal(passed, true);
   assert.match(message, /1 command\(s\)/);
   assert.match(message, /node --test test\/architecture\.test\.mjs/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('worker-slots-ceiling-usable fails when the section is missing entirely', () => {
+  const cwd = mkTemp('doctor-slots-absent-');
+  const { passed, message } = checkById('worker-slots-ceiling-usable').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /workerSlots section missing/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+// The whole point of the check: each of these silently enforces NOTHING,
+// because hasWorkerSlotRoom treats anything that is not a positive integer
+// as "no ceiling configured" and allows every claim. A project reading its
+// own config would believe it is capped.
+test('worker-slots-ceiling-usable fails on a ceiling that silently enforces nothing', () => {
+  for (const ceiling of ['8', 8.5, 0, -1, true, []]) {
+    const cwd = mkTemp('doctor-slots-malformed-');
+    fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+    fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ workerSlots: { ceiling } }));
+    const { passed, message } = checkById('worker-slots-ceiling-usable').check(cwd);
+    assert.equal(passed, false, `malformed ceiling: ${JSON.stringify(ceiling)}`);
+    assert.match(message, /enforces NOTHING/);
+    fs.rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+// `null` is the one non-number that is not a mistake -- it is exactly what
+// `fgos setup` writes, and it means "deliberately unarmed", so it must pass
+// while still saying plainly that nothing is being enforced.
+test('worker-slots-ceiling-usable passes on the unarmed null fgos setup writes, and says so', () => {
+  const cwd = mkTemp('doctor-slots-unarmed-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ workerSlots: { ceiling: null } }));
+  const { passed, message } = checkById('worker-slots-ceiling-usable').check(cwd);
+  assert.equal(passed, true);
+  assert.match(message, /unarmed/);
+  assert.match(message, new RegExp(`recommended: ${DEFAULT_WORKER_SLOT_CEILING}`));
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('worker-slots-ceiling-usable passes and names a real armed ceiling', () => {
+  const cwd = mkTemp('doctor-slots-armed-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ workerSlots: { ceiling: 6 } }));
+  const { passed, message } = checkById('worker-slots-ceiling-usable').check(cwd);
+  assert.equal(passed, true);
+  assert.match(message, /workerSlots\.ceiling = 6/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
