@@ -317,6 +317,24 @@ test('fgos report supplies its own rationale when no stop reason is given, since
   assert.ok(report.rationale.trim().length > 0);
 });
 
+// The shared config is an edit-the-file-by-hand surface, so a half-typed edit
+// is an ordinary state. Before the ceiling existed, take/pick never read that
+// file at all; reading it bare made a broken one throw an UNCATEGORIZED error
+// straight through claimWork — exit 1 with a raw stack instead of the
+// validation code, and a whole runner drain-run dying with it.
+test('a shared config that is not valid JSON leaves claiming alive: no ceiling, no crash', () => {
+  const { repoRoot, dir } = setup();
+  fs.writeFileSync(path.join(dir, 'config.json'), '{ not json');
+
+  claimWork(dir, { id: 'target', actor: 'session', isolate: false, repoRoot });
+
+  assert.equal(
+    listWork(dir).work.target.status,
+    'doing',
+    'an unreadable config must read as "no ceiling", exactly like an absent one',
+  );
+});
+
 // --- the registered config default ------------------------------------------
 
 test('the worker-slot ceiling is registered as a config default so fgos setup writes it and doctor sees it', async () => {

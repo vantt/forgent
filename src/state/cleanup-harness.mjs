@@ -248,7 +248,16 @@ function checkAncestry(repoRoot, sha, targetRef, fallbackNote) {
  */
 export function checkRetrospectiveContent(view, id, repoRoot) {
   const outcome = view?.outcomes?.[id];
-  const hasDecision = (view?.decisionsById?.[id]?.length ?? 0) > 0;
+  // `kind: 'engine'` records are the engine's own bookkeeping — a resolvePlan
+  // verdict, a discovery outcome, a stale-claim reclaim note, a driver's
+  // closing report — written by machinery as a side effect of the lifecycle,
+  // never by anyone reflecting on the work. They are exactly the
+  // "claim-lifecycle artifact ... unrelated to whether retrospective itself
+  // ran" this check was written to reject, so counting them would leave the
+  // gate permanently green for every item that ever moved through a stage.
+  // That was live: `fgos-coding-driving` records a closing report at every
+  // stop, so every driven item carried one before retrospective ran at all.
+  const hasDecision = (view?.decisionsById?.[id] ?? []).some((d) => d?.kind !== 'engine');
   if (hasDecision) {
     return { ok: true, detail: 'retrospective content found (a decision record exists)' };
   }

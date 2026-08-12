@@ -16,7 +16,7 @@ import { createClaimWorktree, branchNameFor, branchExists } from './worktree.mjs
 import { resolveRoot } from './root-affinity.mjs';
 import { lastActivityAt, isReclaimEligible } from './claim-liveness.mjs';
 import { hasWorkerSlotRoom } from '../state/worker-slots.mjs';
-import { readSharedConfig } from '../config/shared-config-file.mjs';
+import { readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
@@ -195,7 +195,7 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
     // readSharedConfig expects — resolved the same way readGateBypassLevel
     // does, rather than from `repoRoot`, which callers set independently.
     const room = hasWorkerSlotRoom(view, {
-      ceiling: readSharedConfig(path.dirname(dir))?.workerSlots?.ceiling,
+      ceiling: readSharedConfigOrEmpty(path.dirname(dir))?.workerSlots?.ceiling,
       excludeId: id,
     });
     if (!room.allowed) {
