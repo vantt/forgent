@@ -1943,7 +1943,7 @@ mod tests {
     /// tick swallows whatever `Err` it gets back, never panics, and never
     /// leaks it into `app.pick_status`.
     #[test]
-    fn auto_discover_skips_without_panic_when_agent_tabs_are_at_cap() {
+    fn auto_discover_skips_without_panic_when_no_pane_can_be_placed() {
         let mut ui = QuitAfterOneTick { calls: Cell::new(0) };
         let mut app = App::empty();
         app.orchestrator_settings.auto_discover = true;

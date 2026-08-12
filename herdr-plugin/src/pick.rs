@@ -107,27 +107,24 @@ pub fn model_flag() -> String {
 /// over which slash command (tsk-1e3 D4: `run_argv`/`discover_run_argv`
 /// below are thin wrappers over this, so both stay covered by the same
 /// id-validation and skip-permissions logic instead of duplicating it).
-/// `extra_args` (tsk-358 D1) is appended inside the same single-quoted
-/// command text, right after `<slash_command> <id>` — the only place a
-/// caller-supplied flag like `--autoClose` can land, since herdr types
-/// this whole string literally into the pane's shell.
+///
+/// tsk-1zq dropped the `extra_args` tail this used to splice in after the
+/// id: its only ever caller-supplied value was `--autoClose`, and no
+/// herdr-launched command carries that any more.
 fn run_argv_for_command(
     pane_id: &str,
     slash_command: &str,
     id: &str,
     model: &str,
     skip_permissions: bool,
-    extra_args: &str,
 ) -> Result<Vec<String>, InvalidId> {
     if !is_valid_id(id) {
         return Err(InvalidId(id.to_string()));
     }
     let command = if skip_permissions {
-        format!(
-            "claude --model {model} --dangerously-skip-permissions '{slash_command} {id}{extra_args}'"
-        )
+        format!("claude --model {model} --dangerously-skip-permissions '{slash_command} {id}'")
     } else {
-        format!("claude --model {model} '{slash_command} {id}{extra_args}'")
+        format!("claude --model {model} '{slash_command} {id}'")
     };
     Ok(vec!["pane".into(), "run".into(), pane_id.into(), command])
 }
@@ -138,16 +135,13 @@ fn run_argv_for_command(
 /// `skip_permissions` is threaded in explicitly (never read from env
 /// inside this pure function) so it stays deterministically testable —
 /// D1's actual env resolution lives in `skip_permissions_enabled` above.
-/// Never carries `--autoClose` (tsk-358 D1 is discover-only) — a person
-/// working a claimed item in this pane must never have it closed out
-/// from under them.
 pub fn run_argv(
     pane_id: &str,
     id: &str,
     model: &str,
     skip_permissions: bool,
 ) -> Result<Vec<String>, InvalidId> {
-    run_argv_for_command(pane_id, PICK_SLASH_COMMAND, id, model, skip_permissions, "")
+    run_argv_for_command(pane_id, PICK_SLASH_COMMAND, id, model, skip_permissions)
 }
 
 /// argv for launching `claude` with `/fgOS:discover <id>` (tsk-1e3 D4) —
@@ -168,7 +162,7 @@ pub fn discover_run_argv(
     model: &str,
     skip_permissions: bool,
 ) -> Result<Vec<String>, InvalidId> {
-    run_argv_for_command(pane_id, DISCOVER_SLASH_COMMAND, id, model, skip_permissions, "")
+    run_argv_for_command(pane_id, DISCOVER_SLASH_COMMAND, id, model, skip_permissions)
 }
 
 /// argv for launching `claude` with a pool-sweep slash command that takes
@@ -615,11 +609,12 @@ mod tests {
         );
     }
 
-    /// tsk-358 D1: `discover_run_argv` always carries `--autoClose`,
-    /// whether or not skip-permissions is on — mirrors the test above for
-    /// the non-skip-permissions branch of the same command format.
+    /// tsk-1zq: the per-id discover launch carries no self-close flag, on
+    /// either skip-permissions branch. Worker panes are reclaimed by the
+    /// next worker, so a session closing its own pane would destroy a slot
+    /// herdr is about to reuse.
     #[test]
-    fn discover_run_argv_always_includes_autoclose() {
+    fn discover_run_argv_never_asks_the_session_to_close_its_own_pane() {
         let argv = discover_run_argv("wS:p16", "tsk-19y-3", "sonnet", false).expect("valid id");
         assert_eq!(
             argv,
@@ -707,7 +702,7 @@ mod tests {
     }
 
     #[test]
-    fn discover_next_run_argv_always_includes_autoclose() {
+    fn discover_next_run_argv_never_asks_the_session_to_close_its_own_pane() {
         assert_eq!(
             discover_next_run_argv("wS:p16", "sonnet", true),
             vec![
