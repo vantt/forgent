@@ -34,7 +34,37 @@ Bằng chứng khảo sát: `docs/history/orchestrator-worker-slots/RESEARCH.md`
 
 ### Đường đã chọn
 
-**Một cổng, đặt tại choke point đã có; không đẻ sổ mới.**
+**Hai mặt, một nguồn sự thật; không đẻ sổ mới.**
+
+T1 phơi **hai mặt tách bạch**, không được gộp làm một:
+
+1. **Hỏi trước (read-only)** — `còn chỗ cho class này không`. Launcher gọi
+   *trước khi* dựng worker (mở pane / spawn tiến trình / bắn Agent). Rẻ,
+   không giữ chỗ, không ghi gì.
+2. **Chặn sau (cưỡng chế)** — cổng bên trong `claimWork`, để không đường
+   nào lách qua, kể cả một launcher tương lai quên gọi mặt (1).
+
+Vì sao phải cả hai: `claimWork` chỉ chạy **sau khi** worker đã dựng xong —
+chuỗi thật là `herdr mở pane → claude khởi động → /fgOS:discover-next →
+chọn item → take/pick → cổng bắn`. Nếu chỉ có mặt (2), một launcher phải
+tốn nguyên một pane mới học được "hết chỗ", đúng thứ D6 muốn tránh khi nói
+"xin slot TRƯỚC KHI dựng". Nếu chỉ có mặt (1), bất kỳ đường claim nào
+không đi qua launcher đều lọt.
+
+**Đua giữa hai mặt là chấp nhận được, có chủ ý.** Giữa "hỏi thấy còn chỗ"
+và "claim thật" có cửa sổ để một launcher khác lấy mất chỗ cuối. Không
+thêm reservation/TTL để bịt: D7/D8 vốn đã cố ý làm trần mềm, và một pane
+bị từ chối vốn đã tự đóng (`--autoClose` khi pool rỗng). Thêm machinery
+giữ chỗ là mua phức tạp để giải bài mà thiết kế đã chọn sống chung.
+
+**Cổng phục vụ đúng lane execution, không phục vụ lane admin.** Đường nào
+claim thì được cổng phủ: `/fgOS:discover` (SKILL.md bước 2: `take` rồi
+fallback `pick`), `/fgOS:plan` (`:87` `take`, `:103` `pick`),
+`/fgOS:pick`, runner, fanout (bắn Agent chạy `/fgOS:pick`). Còn
+`merge`/`retro`/`cleanup` KHÔNG claim — `merge-next` và `cleanup-next`
+không có lệnh claim nào, mọi hit chữ "pick" trong hai file đó chỉ là văn
+xuôi — nên chúng nằm ngoài cổng hoàn toàn và được đếm bằng cơ chế riêng
+của lane admin (D9).
 
 Lane execution: cổng gác trần nằm **bên trong `claimWork`**
 (`src/runner/claim-port.mjs:90`) — nơi `fgos take` (`doTake`), `fgos pick`
@@ -120,8 +150,9 @@ tiêu thụ, không sửa file đó); T2 chỉ đụng Rust; T3 chỉ đụng pr
 
 **T1 — Sổ worker slot + cổng gác trần (engine).** Thêm module thuần
 `src/state/worker-slots.mjs` (không fs, cùng kỷ luật `discover-pool.mjs`/
-`plan-pool.mjs`) export phép đếm occupancy + phép hỏi còn chỗ, gồm cả
-luật trọn-mẻ của D8. Nối cổng vào `claimWork`. Đăng ký mục config trần
+`plan-pool.mjs`) export **cả hai mặt**: phép đếm occupancy + phép hỏi còn
+chỗ (mặt read-only launcher gọi trước khi dựng worker), gồm cả luật
+trọn-mẻ của D8. Nối mặt cưỡng chế vào `claimWork`. Đăng ký mục config trần
 qua `registerConfigDefault({id, key, shape})`
 (`src/setup/registrations.mjs:97`, theo đúng vết `gateBypass` `:754` và
 `cleanup` `:776`) để `fgos setup` ghi mặc định và `fgos doctor` nhìn thấy
