@@ -97,13 +97,13 @@ field mới (D2, D6, D7).
 
 Lane admin: **chỗ dành riêng, kích thước cố định 4** (3 loại loop hôm nay
 + 1 thủ sẵn), KHÔNG đếm bằng work-item — vì lane này không bao giờ claim
-một work-item (D9, RESEARCH F-B). Liveness dùng lại khuôn `runner.lock`
-(`loop.mjs:119` `LOCK_FILE`, `:245` thu hồi khi pid chết, `:117`
-`EXIT_BUSY`): một lock file cho mỗi loại loop. Chọn khuôn này thay vì
-`sessions.json` vì nó vốn đã giải đúng bài "một tiến trình quét tại một
-thời điểm" và tự thu hồi khi pid chết — nhưng đây là điểm cần
-`fgos-coding-validating` chứng minh, không phải giả định (xem bản đồ rủi
-ro).
+một work-item (D9, RESEARCH F-B). Liveness dùng **hình dạng registry N
+entry mang pid** (như `sessions.json`, `session-identity.mjs:58` /
+`session.mjs:537`), tái dùng *kỹ thuật* pid-liveness của `runner.lock`
+(signal-0, thu hồi khi pid chết) bên trong nó. **Không** tái dùng chính
+`runner.lock`: nó là guard singleton một tiến trình, chỉ `fgos-runner`
+dùng, không phải cơ chế N slot — xem A1 để biết vì sao validating lật
+thứ tự ưu tiên này.
 
 Trần mềm (D7/D8) hiện thực bằng đúng một luật ở cổng: **còn ≥1 slot trống
 thì cho lấy trọn mẻ**. Không cộng dồn được, vì lần acquire kế tiếp thấy 0
@@ -211,9 +211,36 @@ trọn-mẻ.
 
 ## Assumptions
 
-- **A1** — Khuôn `runner.lock` (lock file + pid + thu hồi khi chết) đủ cho
-  liveness lane admin. *Chưa chứng minh* — `fgos-coding-validating` phải
-  kiểm, phương án thay thế là `sessions.json` + `isPidAlive`.
+- **A1** — Liveness lane admin. *Chưa chứng minh, và bằng chứng ở
+  validating đã lật thứ tự ưu tiên ban đầu.*
+
+  Bản đầu của plan này ưu tiên "khuôn `runner.lock`". Validating tìm ra
+  điều đó **không khớp hình dạng bài toán**: `runner.lock`
+  (`loop.mjs:119`, `acquireRunnerLock:207`) là guard **singleton một tiến
+  trình** — chỉ `fgos-runner` dùng, không ai khác — chứ không phải cơ chế
+  N slot. Lane admin cần 3-4 slot độc lập (merge/retro/cleanup + dự
+  phòng), mỗi cái liveness riêng; áp khuôn đó ra thành N file lock rời
+  rạc là vụng.
+
+  `sessions.json` (`session-identity.mjs:58`) ngược lại **đúng là một
+  registry N entry mang pid** (`session.mjs:537`: `entry.pid` +
+  `isPidAlive`), hiện đang rỗng `[]`. Hình dạng đó khớp "N slot admin"
+  hơn hẳn.
+
+  ⇒ T1 **mặc định dùng hình dạng registry**, tái dùng *kỹ thuật*
+  pid-liveness của `runner.lock` (signal-0, thu hồi khi pid chết) bên
+  trong nó — chứ không tái dùng chính file lock đó. Nếu T1 tìm được lý do
+  ngược lại thì phải nêu bằng chứng, không mặc định quay về khuôn cũ.
+
+  **Ba lock đang tồn tại, đừng lẫn** (validating xác minh):
+  `runner.lock` (chỉ runner); `main-checkout.lock`
+  (`main-checkout-lock.mjs:49` — `claimWork` `claim-port.mjs:98`,
+  `merge.mjs:720`, `fgos unlock` `fgos.mjs:4344`, identity là
+  `process.pid`); `EVENTS_LOCK_FILE` (`state/events.mjs`, chính là
+  category `lock-timeout`). Đáng ghi: `main-checkout.lock` do **engine**
+  giữ theo `process.pid`, bất kể lời gọi đến từ session tương tác hay
+  headless — cổng trần đặt trong `claimWork` vì vậy nằm sẵn dưới lock
+  này, không cần tự lo đồng bộ.
 - **A2** — Đặt cổng trong `claimWork` không làm hỏng đường claim nào hiện
   có. *Chưa chứng minh* — cần chạy thật toàn bộ test claim.
 - **A3** — `fgos move --to doing` (bypass thủ công, RESEARCH F-A) chấp
