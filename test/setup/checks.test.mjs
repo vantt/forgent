@@ -44,7 +44,7 @@ import {
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, changelog-unreleased-stale, herdr-launcher-configured, work-classification-vocabulary, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, and events-jsonl-not-truncated', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, changelog-unreleased-stale, herdr-launcher-configured, work-classification-vocabulary, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, events-jsonl-not-truncated, and cli-version-visible', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     [
@@ -66,6 +66,7 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'events-jsonl-contiguous',
       'invariant-checks-configured',
       'events-jsonl-not-truncated',
+      'cli-version-visible',
     ].sort(),
   );
 });

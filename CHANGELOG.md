@@ -68,6 +68,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- New `fgos version` verb: reports this build's own `package.json` version,
+  git commit (when resolvable), and its full dispatched verb set — a
+  hook-safe, scriptable way to tell an old globally-installed `fgos` apart
+  from a current checkout without reading `node_modules` directly. `fgos
+  doctor` gained a matching `cli-version-visible` check that surfaces the
+  same info in its own report.
+
 - Repo-invariant checks now run alongside an item's own `verify`, at both
   `fgos return` and the post-merge gate of `fgos approve`. The commands are
   declared per project in `.fgos/config.json` under `invariantChecks.commands`

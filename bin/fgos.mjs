@@ -24,6 +24,7 @@ import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfigForDir } from '../src/runner/dispatch.mjs';
 import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
 import { resolveFgosDir, fgosDirFromRoot } from '../src/runner/paths.mjs';
+import { resolveCliVersionInfo } from '../src/cli/version.mjs';
 import { resolveDiscovery, discoverableStages } from '../src/intake/discovery.mjs';
 import { resolvePlan } from '../src/intake/plan.mjs';
 import { computeEntropy, computeCounts, FINAL_STATUSES } from '../src/report/entropy.mjs';
@@ -960,6 +961,10 @@ function describeCandidate(candidate) {
 
 async function runVerb(verb, flags, positional, dir) {
   switch (verb) {
+    case 'version': {
+      return resolveCliVersionInfo();
+    }
+
     case 'init': {
       initStore(dir);
       // D4: detection/manifest writing must never fail init — a permissions
@@ -4393,7 +4398,7 @@ async function runVerb(verb, flags, positional, dir) {
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|sync-root|reject|catchup|evolve|triage|session|goal|tool|setup|doctor|unlock|lock-status|main-checkout-reset> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|sync-root|reject|catchup|evolve|triage|session|goal|tool|setup|doctor|unlock|lock-status|main-checkout-reset> ...`);
   }
 }
 
