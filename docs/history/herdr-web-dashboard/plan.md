@@ -178,6 +178,62 @@ của nó: ba mảnh kia deliver được mà không cần nó.
 **không** có cạnh `deps` nào tới nó — đó chính là nội dung D5. Nó được đẩy
 tiếp riêng sau khi cụm này xong.
 
+## Reality gate — vòng 1 (2026-08-12): **NOT READY**
+
+| Chiều | Kết quả | Bằng chứng |
+|---|---|---|
+| Mode fit | PASS | 8 flag đếm được, 3 hard-gate; `grep -c '#\[test\]' herdr-plugin/src/*.rs` → **128** test đang có, xác nhận flag "existing covered behavior" |
+| Repo fit | PASS | `ports.rs:11-20` (`WorkItemSource`, 5 method) đọc trực tiếp; `settings.rs:1-53` đọc trực tiếp; `registrations.mjs:1064-1112` grep thấy check `herdr-launcher-configured`; `herdr-gateway/src/web/cf_access.rs:195-217` **tự đọc lại** — đúng như trích, có `set_required_spec_claims(["exp","iss","aud"])` kèm comment giải thích |
+| Assumptions | PASS (A1 khai unproven) | A3 chứng minh trên dữ liệu thật (dưới); A4 chứng minh bằng 5 tiền lệ gitignore; A1 **khai là chưa chứng minh được ở stage này** |
+| Smaller path | PASS | Tiền lệ `tsk-2m5` tách settings+doctor thành item riêng khỏi consumer — kế hoạch đang theo đúng hình dạng đã có, không tự chế nhỏ hơn/lớn hơn |
+| **Proof surface** | **FAIL** | 3 lỗi cụ thể, xem dưới |
+| Impact-analysis posture | PASS | `fgos tool query` → gitnexus `present`; `.gitnexus/` vắng trong worktree; posture `degraded` mà `plan.md` ghi là khớp thực tế |
+
+### FAIL — Proof surface: 3 lỗi, đều xác minh bằng lệnh chạy thật
+
+| # | Item | Lệnh verify | Chuyện gì thật sự xảy ra |
+|---|---|---|---|
+| F1 | P1 `tsk-48w` | `npm test -- test/setup && …` | `npm test` là `node --test 'test/**/*.test.mjs'`, nên `-- test/setup` **thêm** một thư mục trần vào argv chứ không lọc. Chạy thật: `✖ test at test/setup:1:1 — 'test failed'`. Verify này **không bao giờ pass được**, kể cả khi code đúng hoàn toàn |
+| F2 | P4 `tsk-4id` | `cargo test … web_task_detail web_qa_history web_gate_approve` | `cargo test` chỉ nhận **một** `[TESTNAME]`. Chạy thật với 2 filter → `Usage: cargo test [OPTIONS] [TESTNAME]`, thoát lỗi. Cũng **không bao giờ pass được** |
+| F3 | P3 `tsk-5jr`, P5 `tsk-18to`, và P4 sau khi sửa F2 | `cargo test <manifest> <filter>` | Filter không khớp gì thì cargo vẫn **exit 0**. Đo thật: `cargo test … web_taskboard; echo $?` → **0**. Nghĩa là ba verify này **XANH NGAY HÔM NAY**, trước khi viết một dòng code nào |
+
+**F1/F2 hỏng theo kiểu fail-closed** — khó chịu nhưng an toàn, chạy phát
+biết ngay. **F3 hỏng theo kiểu fail-open** — nguy hiểm hơn hẳn: nó cho
+phép một item chưa hiện thực gì được tuyên bố là done. Đây đúng lớp lỗi
+repo này đã tự ghi lại bài học:
+
+> *"một `verify` chưa từng chạy đỏ thì chưa phải một `verify`"* — sự cố
+> vòng 8, `docs/history/gate-question-quality-and-routing/DISCUSSION.md`
+
+P2 `tsk-k4v` (`cargo test` toàn crate + `cargo build --release`) **không**
+dính F3 — nó chạy cả 128 test thật. Nhưng nó chỉ chứng minh *không
+regress*, chưa chứng minh hành vi MỚI nào; cần thêm một mệnh đề đỏ-trước.
+
+### Ma trận khả thi
+
+| Giả định | Rủi ro | Cần chứng minh gì | Bằng chứng tìm được | Kết quả |
+|---|---|---|---|---|
+| A3 / R5 — ghép cặp theo vị trí `askHistory[i]` ↔ answer thứ i | TB | Đúng trên dữ liệu thật | Chạy trên `.fgos/state.json`: `tsk-48i` có **23 ask / 23 answer**; cặp 1 và cặp 23 khớp nội dung (câu trả lời nói đúng về pattern grep của chính câu hỏi đó) | **PASS** |
+| A4 / R3 — `.fgos/` là nhà hợp lệ cho secret | TB | Có tiền lệ gitignored | `.gitignore` có 5 mục `.fgos/*` kèm lý do; `git ls-files .fgos/config.json` xác nhận config.json **bị track** → D9 đúng khi cấm để token ở đó | **PASS** |
+| R2 — xác minh chữ ký JWT cf-access | Cao | Prior art có verify chữ ký thật, không phải check header | `herdr-gateway/src/web/cf_access.rs:195-217` đọc trực tiếp: `Validation::new(RS256)` + `set_issuer` + `set_audience` + `validate_nbf` + `set_required_spec_claims(["exp","iss","aud"])` + `decode(...)` | **PASS** |
+| A1 / R1 — tokio không phá event loop ratatui | Cao | 128 test cũ xanh + TUI vẫn chạy | **Chưa chứng minh được ở stage này** — chỉ chứng minh được khi P2 chạy thật. Giảm thiểu: chạy server trên runtime/thread riêng, không đụng vòng lặp TUI. `crossterm 0.29` xác nhận trong `Cargo.lock` | **UNPROVEN — khai báo, không giấu** |
+| R6 — path traversal qua `docsRef` | TB | Guard canonicalize | Chưa hiện thực (đúng, chưa tới lúc); ghim làm A2 + proof point của P4 | Hoãn sang P4 |
+
+### Verdict
+
+```text
+NOT READY - RETURN TO PLANNING
+```
+
+Lý do: chiều **Proof surface** FAIL. Ba trong năm item con mang lệnh verify
+mà hoặc không bao giờ pass được (F1, F2), hoặc pass sẵn khi chưa làm gì
+(F3). Không hạ chuẩn cho qua: F3 là đúng cơ chế cho phép tuyên bố done giả.
+
+Việc cần làm ở `fgos-coding-planning`: sửa `verify` của `tsk-48w`,
+`tsk-4id`, `tsk-5jr`, `tsk-18to` (và siết thêm cho `tsk-k4v`) sao cho mỗi
+lệnh **chạy đỏ được hôm nay** và chỉ xanh khi hành vi mới tồn tại. Không
+đụng D1-D11, không đổi hình dạng 5 mảnh — chỉ lớp chứng minh.
+
 ## Outstanding questions
 
 None
