@@ -365,3 +365,205 @@ for this reason: there are no candidate sibling pieces to compare.
 ## Outstanding questions
 
 None
+
+---
+
+# plan.md — tsk-30v: Nhánh verdict clear/unclear cho `nextDiscoveryEdge`
+
+Mode: **standard** (2 flags: existing covered behavior —
+`test/intake/discovery.test.mjs:260-284,319-329` currently assert the OLD
+discovery-stage routing this item intentionally changes; public contracts —
+`nextDiscoveryEdge`/`resolveDiscovery` are the one shared FSM-transition
+surface both `bin/fgos.mjs`'s `discover` verb and `src/runner/loop.mjs`'s
+runner sweep depend on, so a wrong edge affects every in-flight `coding`
+item sitting at `discovery`/`exploring`, not just this feature tree).
+Fallback lane derivation used (tsk-da1): no `fgos-routing` Orient handoff
+was in this session's context (dispatched via `/fgOS:pick` → driving loop
+→ `fgos-coding-discovering` → `fgos-coding-exploring` → here, never through
+`fgos-routing` directly), and no earlier `Mode:` line existed for this item
+in this file — applied `fgos-routing`'s own Mode-gate table directly
+(`.claude/skills/fgos-routing/SKILL.md:32-66`) rather than re-deriving its
+thresholds inline. Matches the item's own `tier: "standard"` field.
+
+## Approach
+
+The three code changes are strictly ordered by compile/runtime dependency;
+the test rewrite depends on all three landing first (a red-then-green
+discipline, not a parallel-safe one — the existing tests at
+`discovery.test.mjs:260-284,319-329` would otherwise assert against
+not-yet-changed behavior and hide a broken edge).
+
+**Order** (per `CONTEXT.md`'s locked decisions, D2/D3/D6/D-local-1/D-local-2):
+
+1. **Register the new FSM edge first** — `{ from: 'discovery', to:
+   'planning' }` added to `DOMAINS.coding.transitions`
+   (`src/state/workflow-stage-graphs.mjs:123-149`), placed next to the
+   existing `discovery -> exploring` edge (line 145) with a short comment
+   naming this item and D-local-1 (repo convention: every edge in this
+   array is commented with its originating decision). This must land
+   before step 2 — `moveStage`'s CAS check (`stage-fsm.mjs`, no bypass)
+   throws on an unregistered edge, so any code that tries to route through
+   it first would immediately fail its own test.
+2. **Make `nextDiscoveryEdge` verdict-aware, `discovery`-branch only**
+   (`src/intake/discovery.mjs:136-162`). Add a second parameter
+   (`nextDiscoveryEdge(work, verdict)`); change ONLY the `work.stage ===
+   'discovery'` branch:
+   ```js
+   if (hasDiscoveryExploring && work.stage === 'discovery') {
+     return verdict?.clear
+       ? { to: planningStage, expectedStage: 'discovery' }
+       : { to: 'exploring', expectedStage: 'discovery' };
+   }
+   ```
+   The `clarify` branch (dead for `coding`, live for `triage`/other
+   domains that still register it) and the `exploring` branch stay
+   exactly as they are — D6 scopes the verdict-aware behavior to
+   `discovery` only.
+3. **Thread `verdict` through every existing `nextDiscoveryEdge(work)`
+   call site** in `resolveDiscovery` (`discovery.mjs:225-461`) — three
+   sites, all passing a verdict shape that already exists at each call:
+   - Line ~279 (`readLockedContext` trust-signal skip): synthesizes
+     `verdict = { clear: true }` two lines above (line 269's own
+     `addDiscovery(dir, { id, clear: true })`) — pass `{ clear: true }`.
+   - Line ~435 (explicit clear branch): the local `verdict` variable
+     already holds `{ clear: true, verify?, ... }` — pass it as-is.
+   - **New third site**, inside the unclear branch (today
+     `discovery.mjs:442-459`, no `nextDiscoveryEdge` call at all): add an
+     `if (work.stage === 'discovery')` special case that calls `moveStage`
+     BEFORE the existing `putInAwaiting` call:
+     ```js
+     if (work.stage === 'discovery') {
+       moveStage(dir, {
+         id,
+         ...nextDiscoveryEdge(work, verdict), // verdict.clear === false here -> { to: 'exploring' }
+         verify: hasRealVerify(work.verify) ? work.verify : FALLBACK_VERIFY,
+         role,
+       });
+     }
+     if (work.status !== 'awaiting-human') {
+       putInAwaiting(dir, { id, ask: verdict.question, statusAtAsk: work.status });
+     }
+     ```
+     Confirmed safe by `RESEARCH.md` Round 1 (tsk-30v): `moveStage`
+     touches only `stage`, `putInAwaiting` touches only `status`, no
+     cross-guard blocks this ordering, and `answerAwaiting` never touches
+     `stage` — a person answering later resumes already sitting at
+     `exploring`. The `clarify`/`exploring`-stage unclear paths (unaffected
+     by this `if`) keep today's park-in-place behavior exactly.
+4. **Fix the stale `loop.mjs` comment** (`src/runner/loop.mjs:1082-1085`)
+   — replace the "there is no verdict to gate the transition on here …
+   the item unconditionally advances discovery -> exploring" claim with
+   language matching what the code ~65 lines below it already does
+   (verdict-gated via `parseVerdictBlock` + `resolveDiscovery(...,
+   callerVerdict)`, tsk-4v6). Comment-only; the call at `loop.mjs:1132-1151`
+   is untouched — it already calls the same `resolveDiscovery` this item
+   is changing underneath it, so the fix in step 3 applies to the runner
+   sweep automatically, no separate wiring needed here.
+5. **Rewrite the two now-wrong tests, add one new test**
+   (`test/intake/discovery.test.mjs`):
+   - Line 260-273 and 275-284 (both currently assert `discovery`-stage
+     clear lands on `'exploring'`) — change the expected `stage` to
+     `'planning'` in both; keep every other assertion (verify propagation,
+     decision-log entry, `discovery` array entry) unchanged, since none of
+     that behavior is touched by this item.
+   - Line 319-329 (`'resolveDiscovery parks in awaiting-human on a
+     caller-supplied unclear verdict...'`) — `sampleWork()`'s default
+     `stage: 'discovery'` (confirmed, `RESEARCH.md` Round 1) means this
+     test IS the discovery-stage case; add an assertion that `view.work['item-x'].stage
+     === 'exploring'` alongside the existing `status === 'awaiting-human'`
+     assertion — both must now hold simultaneously, per D-local-2.
+   - New test: an unclear verdict at a NON-`discovery` stage (use
+     `sampleWork({ domain: 'triage', stage: 'clarify' })`, the same
+     domain-agnostic fixture the existing line-308 test already uses,
+     since `triage` never registers `discovery`/`exploring`) still parks
+     with `stage` UNCHANGED — proves the `if (work.stage === 'discovery')`
+     guard in step 3 is truly scoped, not accidentally global.
+
+`fgos graph --json`/`--what-if` were not consulted for ordering — this is a
+single, unsplit item with a linear intra-file dependency chain (edge
+registration -> edge-picker -> caller threading -> tests), not a
+sibling-item ordering question that tool answers.
+
+**Impact-analysis gate** (`CLAUDE.md`): `fgos tool query --capability
+impact-analysis --status present` → provider `gitnexus`, `status:
+"present"`, but `mcp__gitnexus__list_repos` shows this workspace's index
+**691 commits behind HEAD** — **degraded**, per `CLAUDE.md`'s own
+three-way framing. `impact({target: "nextDiscoveryEdge", direction:
+"upstream"})` → target not found at all (function likely postdates the
+stale index); `impact({target: "resolveDiscovery", direction:
+"upstream"})` → `impactedCount: 0, risk: LOW` — a **suspicious zero**
+per `CLAUDE.md`'s own guidance, cross-checked with `rg -n
+"resolveDiscovery" --glob '*.mjs'`: 125 real matches across 15 files,
+including the two real call sites this plan already names
+(`bin/fgos.mjs:1214`, `src/runner/loop.mjs:1150`) plus ~9 test files. The
+`rg` cross-check is the trustworthy evidence here, not the stale
+zero-count — `fgos-coding-validating` should either re-run `impact` after
+`gitnexus analyze` refreshes the index, or accept this cross-check as
+sufficient per the same degraded-posture precedent `tsk-lya`'s own
+`plan.md` already recorded for this same repo state.
+
+## Risk map
+
+| Component | Risk | Proof point (for `fgos-coding-validating`) |
+|---|---|---|
+| New FSM edge `discovery -> planning` | Medium — a missing/misordered edge registration makes `moveStage` throw at runtime for every future clear-at-discovery item, not just this test suite | `npm test` green; a dedicated assertion that `resolveDiscovery` no longer throws for `{stage: 'discovery', verdict: {clear: true}}` (already covered by the rewritten test at line 275-284) |
+| `nextDiscoveryEdge` verdict parameter | Medium — the `clarify`/`exploring` branches must stay byte-identical; a mistake there would silently break the `triage`-domain-agnostic test (line 308) or the `exploring -> planning` edge (line 286) | Full `discovery.test.mjs` suite green, including the two untouched domain-agnostic/exploring tests — a regression there is the signal this changed the wrong branch |
+| `resolveDiscovery`'s dual `moveStage`+`putInAwaiting` unclear path | Medium — first place in this codebase calling both write-door verbs on the same item in one pass (confirmed no precedent, `RESEARCH.md` Round 1); an ordering mistake (park-then-move) would leave `stage` stuck if the second call ever failed mid-operation | New test (item 3 above) asserting BOTH `status === 'awaiting-human'` AND `stage === 'exploring'` hold after one `resolveDiscovery` call; the scoped non-`discovery`-stage test proves no regression to legacy park-in-place paths |
+| `loop.mjs` comment fix | Low — comment-only, no behavior change | `! grep -q "unconditionally advances" src/runner/loop.mjs` (mechanical, addable to the item's own verify if desired — not currently in the attached command) |
+
+## Files touched
+
+- `src/state/workflow-stage-graphs.mjs` — one new `transitions` entry
+- `src/intake/discovery.mjs` — `nextDiscoveryEdge` verdict parameter +
+  discovery-branch logic; `resolveDiscovery`'s three call sites
+- `src/runner/loop.mjs` — comment fix only, lines 1082-1085
+- `test/intake/discovery.test.mjs` — 2 tests rewritten, 1 test added
+
+## Decide the split
+
+No split. This is one coherent, small piece of work — a single conjunctive
+verify (`npm test && node --test test/intake/discovery.test.mjs`) that
+only passes once the edge, the picker, the dual-write unclear path, and
+the tests all land together. `fgos graph --what-if` was not run for this
+reason: there is no candidate sibling piece to compare against.
+
+## Concrete cases worth proving
+
+- **Clear at `discovery` skips `exploring`.** `resolveDiscovery` with
+  `{stage: 'discovery', verdict: {clear: true}}` lands on `stage:
+  'planning'`, never `'exploring'` — the item's own DoD.
+- **Unclear at `discovery` both advances and parks.** `resolveDiscovery`
+  with `{stage: 'discovery', verdict: {clear: false, question}}` leaves
+  the item at BOTH `stage: 'exploring'` and `status: 'awaiting-human'` —
+  answering the park later resumes directly into `fgos-coding-exploring`,
+  never loops back through `fgos-coding-discovering` for the same
+  question.
+- **Legacy/other-domain unclear paths unregressed.** An unclear verdict at
+  any stage other than `discovery` (a `triage`-domain `clarify`-stage
+  item, the closest reachable analog since `coding`'s own `clarify` is
+  retired) still parks with `stage` unchanged — the pre-existing
+  park-in-place contract survives everywhere this item does not touch.
+- **`clarify`/`exploring` clear-verdict edges unregressed.** The existing
+  domain-agnostic test (line 308) and the `exploring -> planning` test
+  (line 286) both stay green untouched — proof the `discovery`-only scope
+  of step 2/3 above was actually honored, not silently widened.
+
+## Assumptions (unproven, pinned per fgos-coding-planning's own rule)
+
+- The new `discovery -> planning` transition's inline comment cites this
+  item's id and D-local-1 by name, matching the file's existing
+  convention (every edge in `transitions` already carries a comment
+  naming its origin) — a style choice, not a design question `CONTEXT.md`
+  needed to settle.
+- The dual-write unclear-at-discovery branch is written as a local `if
+  (work.stage === 'discovery')` guard inline in `resolveDiscovery`,
+  rather than factored into a separate helper function — `RESEARCH.md`
+  Round 1 flagged this as an open implementation/module-boundary choice
+  for this skill to settle, not a goal-clarity gap; inline is simpler for
+  a single call site and matches the function's existing style (the
+  trust-signal skip branch above it is similarly inline, not factored
+  out).
+
+## Outstanding questions
+
+None
