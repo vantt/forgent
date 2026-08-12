@@ -138,13 +138,13 @@ export const COMMAND_REGISTRY = [
   {
     name: 'discover',
     invoke: 'fgos discover',
-    description: 'Run context-discovery for an item at stage clarify, moving it forward to planning (or parking it in awaiting-human). Errors if the item is not at stage clarify -- use "plan" for a planning-stage item. --verdict lets a caller that already reasoned about clarity (e.g. a live session running fgos-coding-exploring) supply its own verdict directly, skipping the judgeDiscovery subprocess judge for this call.',
+    description: 'Run context-discovery for an item at stage discovery or exploring (the precondition is per-domain, computed by discoverableStages -- a domain that still maps a stage to the Clarify step accepts that stage too). A clear verdict moves the item forward to planning; an unclear verdict at discovery moves it on to exploring and parks it in awaiting-human. Errors if the item is at any other stage -- use "plan" for a planning-stage item. --verdict lets a caller that already reasoned about clarity (e.g. a live session running fgos-coding-exploring) supply its own verdict directly instead of relying on the committed-CONTEXT.md trust signal.',
     parameters: {
       type: 'object',
       properties: {
         id: { type: 'string', description: 'Work item id (positional or --id).' },
         config: { type: 'string', description: 'Path to the runner config (default .fgos/config.json in cwd).' },
-        verdict: { type: 'string', description: 'Optional caller-supplied verdict: "clear" or "unclear". Omit to run the normal judgeDiscovery subprocess judge (or the readLockedContext trust-signal skip, if applicable).' },
+        verdict: { type: 'string', description: 'Optional caller-supplied verdict: "clear" or "unclear". Omit it only when the item already carries a committed, non-empty CONTEXT.md under its docsRef -- that readLockedContext trust signal advances the item without a verdict. With neither, the call refuses: no subprocess judge stands behind this verb anymore.' },
         verify: { type: 'string', description: 'Required with --verdict clear: the real, runnable verify command for this item.' },
         question: { type: 'string', description: 'Required with --verdict unclear: the question to park the item on in awaiting-human.' },
         force: { type: 'boolean', description: 'Only meaningful with --verdict clear: proceed past a disputed second-pass verify judge instead of parking in awaiting-human. Always logged as a decision naming the disagreement it overrode -- never a silent bypass.' },
@@ -162,15 +162,15 @@ export const COMMAND_REGISTRY = [
   {
     name: 'plan',
     invoke: 'fgos plan',
-    description: 'Run chia-viec (split-work judgment) for an item at stage planning (renamed from decompose, tsk-403 D11 -- the legacy decompose stage alias still routes here too, D18), moving it forward to executing (pass-through or split into children) or parking it in awaiting-human. Errors if the item is not at stage planning (or the legacy decompose alias) -- use "discover" for a clarify-stage item. --verdict lets a caller that already reasoned about split-work (e.g. a live session running fgos-coding-planning) supply its own verdict directly, skipping the retired subprocess judge for this call -- downstream safety gates (heavy-risk/blast-radius/footprint-overlap) still apply unconditionally.',
+    description: 'Run chia-viec (split-work judgment) for an item at stage planning (renamed from decompose, tsk-403 D11 -- the legacy decompose stage alias still routes here too, D18), moving it forward to executing (pass-through or split into children) or parking it in awaiting-human. Errors if the item is not at stage planning (or the legacy decompose alias) -- use "discover" for an item still at stage discovery or exploring. --verdict lets a caller that already reasoned about split-work (e.g. a live session running fgos-coding-planning) supply its own verdict directly instead of relying on the plan.md tiny/small-mode trust signal -- downstream safety gates (heavy-risk/blast-radius/footprint-overlap) still apply unconditionally.',
     parameters: {
       type: 'object',
       properties: {
         id: { type: 'string', description: 'Work item id (positional or --id).' },
         config: { type: 'string', description: 'Path to the runner config (default .fgos/config.json in cwd).' },
-        verdict: { type: 'string', description: 'Optional caller-supplied verdict: "pass-through", "need-human", or "decompose" (this value name is unchanged, tsk-403 D11 -- it names an outcome, not a stage). Omit to run the normal retired subprocess judge (or the plan.md tiny/small mode skip-and-advance heuristic, if applicable).' },
+        verdict: { type: 'string', description: 'Optional caller-supplied verdict: "pass-through", "need-human", or "decompose" (this value name is unchanged, tsk-403 D11 -- it names an outcome, not a stage). Omit it only when the item\'s plan.md declares tiny/small mode -- that skip-and-advance trust signal passes the item through without a verdict. With neither, the call refuses: no subprocess judge stands behind this verb anymore.' },
         reason: { type: 'string', description: 'Required with --verdict need-human or --verdict decompose (optional with pass-through): why this call is verdicting the way it is.' },
-        children: { type: 'string', description: 'Required with --verdict decompose: JSON-encoded array of child objects ({title, verify, kind?, risk?, refs?, footprint?, deps?}), same shape the retired subprocess judge used to produce.', multiValueFormat: 'json-array' },
+        children: { type: 'string', description: 'Required with --verdict decompose: JSON-encoded array of child objects ({title, verify, kind?, risk?, refs?, footprint?, deps?}).', multiValueFormat: 'json-array' },
         force: { type: 'boolean', description: 'Only meaningful with --verdict decompose: proceed past a disputed second-pass verify judge on a child, instead of parking the whole decompose verdict in awaiting-human. Always logged as a decision naming the disagreement it overrode -- never a silent bypass. Mirrors discover --force (tsk-5cf D1b).' },
       },
       positional: ['id'],
