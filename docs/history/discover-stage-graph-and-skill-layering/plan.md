@@ -462,11 +462,19 @@ those commands (cross-item unblock ranking) do not inform.
    clear` call. An `unclear` verdict never judges classification — no
    evidence gathered yet to judge from.
 2. `plugins/fgOS/skills/submit/SKILL.md`: delete step 7 in full (the
-   re-judge block, ~line 187 onward). Reword step 4's gate condition so
-   the literal phrase "a live soul" no longer appears anywhere in the
-   file (e.g. "a live interactive session is running this") while keeping
-   its function unchanged — the `fgos-clarifying` pre-creation gate
-   `tsk-qod` (delivered) put there is unrelated to this item and stays.
+   re-judge block, ~line 187 onward). Reword step 4's gate condition at
+   BOTH its two occurrences of the phrase (line 99: "a live soul is
+   running this"; line 112: "For a live soul:") so the literal phrase "a
+   live soul" no longer appears anywhere in the file (e.g. "a live
+   interactive session is running this" / "For a live interactive
+   session:") while keeping its function unchanged — the
+   `fgos-clarifying` pre-creation gate `tsk-qod` (delivered) put there is
+   unrelated to this item and stays. Confirmed via `rg -n "live soul"
+   --glob "*.{mjs,cjs,md,sh}" -g '!docs/history/**'` that no other file
+   in the repo depends on this exact phrase (the only other hits are an
+   unrelated idiom, "soul re-deriving what a live soul already knows", in
+   `plan.mjs`/`discovery.mjs`/an explanation doc — different words,
+   different meaning, not a grep target this item's verify touches).
    Satisfies the item's own verify: `! grep -q "live soul" ...`.
 3. Optional, not verify-gated: a one-line comment in `src/intake/
    classify.mjs` near the `classify()` docstring noting its output is now
@@ -513,21 +521,23 @@ those commands (cross-item unblock ranking) do not inform.
   from `classify()`'s placeholder — unchanged, since `discovery` (not
   `submit`) is now the only place re-judging happens.
 
-## Assumptions (unproven, pinned per fgos-coding-planning's own rule)
+## Assumptions
 
-- Rewording step 4's gate condition (dropping the literal phrase "live
-  soul" while preserving its function) is a safe, behavior-preserving
-  text change. Checked so far: this item's own scout found "live soul"
-  only inside `submit/SKILL.md` itself and this feature's own docs — no
-  test asserts that literal phrase as a condition, only this item's own
-  `verify` does, which the reword is expressly designed to satisfy.
-  `fgos-coding-validating`/`fgos-coding-implement` should re-confirm before
-  relying on it.
-- An unrecognized `tier`/`kind`/`risk` value inside a headless worker's
-  `fgos-verdict` fence should be dropped silently rather than blocking the
-  discover verdict from applying at all — assumed as the safer default
-  (matches `parseVerdictBlock`'s existing "malformed → skip" discipline
-  for the whole fence), not confirmed against a product-level ruling.
+- ~~Rewording step 4's gate condition is a safe, behavior-preserving text
+  change~~ — **confirmed by `fgos-coding-validating`** (repo-wide `rg -n "live
+  soul" --glob "*.{mjs,cjs,md,sh}" -g '!docs/history/**'`): the only hits
+  outside `submit/SKILL.md`'s own three lines (99, 112, 187) are an
+  unrelated idiom ("soul re-deriving what a live soul already knows") in
+  `plan.mjs`, `discovery.mjs`, and one explanation doc — different words,
+  no coupling to submit's specific gate phrase. No longer an open
+  assumption.
+- **Remaining, pinned per `fgos-coding-planning`'s own rule**: an unrecognized
+  `tier`/`kind`/`risk` value inside a headless worker's `fgos-verdict`
+  fence should be dropped silently rather than blocking the discover
+  verdict from applying at all — assumed as the safer default (matches
+  `parseVerdictBlock`'s existing "malformed → skip" discipline for the
+  whole fence), not confirmed against a product-level ruling.
+  `fgos-coding-implement` carries this forward as a constraint on Phase 2.
 
 ## Outstanding questions
 
