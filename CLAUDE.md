@@ -9,7 +9,8 @@ context-load time. Never wrap it in backticks; that disables it.
 
 The GitNexus "Always Do" / "Never Do" rules below assume GitNexus is
 present on this machine. Before treating them as binding — and before
-`fgos-planning`/`fgos-validating`/`fgos-code-implement` decide how much
+`fgos-coding-planning`/`fgos-coding-validating`/`fgos-coding-implement`
+decide how much
 impact-analysis evidence a plan's verify/test scope needs — query the
 capability instead of assuming the tool:
 
