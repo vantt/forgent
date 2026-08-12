@@ -58,6 +58,7 @@ tên đúng khái niệm chứ không phải sơn phết.
 | Q9 | Trần đếm theo cái gì | **rõ** | → D7: theo **work-item** |
 | Q10 | Biên du di cụ thể là bao nhiêu | **rõ** | → D8: không bao giờ bẻ một mẻ đã tính sẵn |
 | Q11 | "Agent tự xử xung đột merge" có nằm trong đợt này không | **rõ** | Để ngoài. Đã mở item riêng `tsk-60h` |
+| Q12 | **Vòng đời worker: khai báo "xong và ngưng" vs "xong và đi tiếp"** | **chưa rõ — mở lại §6** | Từ vòng 6. Hệ chỉ biết vòng đời item, không biết vòng đời worker; đó là gốc của việc mọi cơ chế thu hồi chỗ đều phải đoán. Thêm khái niệm ⇒ vượt tầm planning |
 
 ## 4. Quyết định đã chốt
 
@@ -215,6 +216,52 @@ vẫn đứng nguyên, đó là D2.
 
 Không còn câu hỏi mở. `refs` của `tsk-2sj` trỏ về `#tasks`; bàn giao sang
 `fgos-coding-exploring` → `fgos-coding-planning`.
+
+### 2026-08-12 — Vòng 6 (validating trả NOT READY, người dùng đổi hướng vá)
+
+**Bối cảnh.** `fgos-coding-validating` bác một assumption plan chưa hề
+nêu: "chỗ pane vật lý luôn có khi engine nói còn slot". Bằng chứng:
+`place_new_agent_pane` chỉ tạo pane mới, không đóng/không tái dùng, không
+reaper (grep toàn `herdr-plugin/src` ra rỗng); còn `close.sh` thì 3 guard
+đều pass trong session thật, nên lý do nó "chưa bao giờ thấy chạy" không
+phải môi trường mà vì **nó là dòng cuối của một SKILL.md prose, không gì
+cưỡng chế model thực thi**. Pane tích tụ tới cap 8 rồi herdr không mở nổi
+worker dù engine báo còn chỗ.
+
+Phiên này đề xuất 3 hướng vá (tái dùng pane / reaper cưỡng chế / lai).
+**Người dùng bác cả ba và đổi hướng, đúng gốc hơn:**
+
+> "không thể cưỡng chế mọi việc cần sự rõ ràng. luồng vận hành tại mỗi
+> stage phải tường minh thông báo tôi xong và ngưng hoặc tôi xong và có
+> move on sang stage tiếp theo hay không. khi đó các đơn vị điều phối
+> khác mới thật sự rõ ràng. như vậy engine thậm chí sẽ có một list worker
+> vừa xong, xếp cũ đến mới."
+
+**Đóng khung lại vấn đề.** Cả ba hướng cũ đều là cách **suy đoán** worker
+đã xong chưa — từ status item, từ nhãn pane, từ heuristic "idle". Mọi suy
+đoán đều trượt. Thứ còn thiếu là một **lời khai báo**.
+
+**Khoảng trống thật, lần đầu gọi đúng tên:** hệ hôm nay chỉ biết vòng đời
+**item**, không biết vòng đời **worker**. `fgos return` nghĩa là "xong
+*item* này", không nói worker còn sống hay không:
+
+- session `discover-loop`: return xong → pick item kế → **item xong,
+  worker chưa xong**;
+- pane one-shot: return xong → thoát → **cả hai cùng xong**.
+
+Hai ca này hôm nay không phân biệt được, và đó là lý do gốc khiến mọi cơ
+chế thu hồi chỗ đều phải đoán.
+
+**Hướng mới.** Mỗi luồng stage kết thúc bằng một khai báo tường minh, chọn
+đúng một trong hai: *"xong và ngưng"* hoặc *"xong và đi tiếp stage sau"*.
+Engine ghi nhận ở mức **worker**, nhờ đó giữ được **danh sách worker vừa
+xong, xếp cũ→mới**. Orchestrator bất kỳ (herdr hôm nay, cmux/tmux sau
+này) thu hồi chỗ tất định: đọc danh sách, lấy cái cũ nhất, dùng lại —
+không heuristic, không reaper, không phụ thuộc dòng cuối một file prose.
+
+**Ảnh hưởng:** đây là thêm một *khái niệm* (vòng đời worker song song với
+vòng đời item), không phải chi tiết triển khai — nên nó đổi hình §6, vượt
+tầm planning. Xem §3 Q12.
 
 ## 6. Thiết kế đã chốt {#design}
 
