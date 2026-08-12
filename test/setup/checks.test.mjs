@@ -44,7 +44,7 @@ import {
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, changelog-unreleased-stale, herdr-launcher-configured, work-classification-vocabulary, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, and events-jsonl-not-truncated', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, changelog-unreleased-stale, herdr-launcher-configured, work-classification-vocabulary, work-stage-vocabulary, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, and events-jsonl-not-truncated', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     [
@@ -62,6 +62,7 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'changelog-unreleased-stale',
       'herdr-launcher-configured',
       'work-classification-vocabulary',
+      'work-stage-vocabulary',
       'enduser-docs-index-stale',
       'events-jsonl-contiguous',
       'invariant-checks-configured',
@@ -360,6 +361,124 @@ test('work-classification-vocabulary lists every violating id, not just the firs
   });
 
   const { passed, message } = checkById('work-classification-vocabulary').check(dir);
+  assert.equal(passed, false);
+  assert.match(message, /bad-one/);
+  assert.match(message, /bad-two/);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+// ─── work-stage-vocabulary (tsk-64h) ───────────────────────────────────────
+// The stage-axis sibling of work-classification-vocabulary above: an open
+// item may sit at a stage its own domain no longer registers, and nothing
+// surfaced that until now. Same OPEN-only scoping and the same raw
+// `work.add` fixture technique, for the same reason — `validateWorkShape`
+// refuses a retired stage at the write door, so a legacy-shaped item can
+// only be constructed by appending the event directly.
+
+test('work-stage-vocabulary passes on an empty store', () => {
+  const dir = initRepo('checks-stage-vocab-empty-');
+  const fgosDir = path.join(dir, '.fgos');
+  initStore(fgosDir);
+
+  const { passed, message } = checkById('work-stage-vocabulary').check(dir);
+  assert.equal(passed, true);
+  assert.match(message, /registered by its domain/);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('work-stage-vocabulary passes for an item whose stage was never written (lazy Execute default)', () => {
+  const dir = initRepo('checks-stage-vocab-unset-');
+  const fgosDir = path.join(dir, '.fgos');
+  initStore(fgosDir);
+  addWork(fgosDir, { id: 'a', title: 'a', kind: 'feature', risk: 'light', verify: 'true', status: 'todo', deps: [], refs: [] });
+
+  const { passed, message } = checkById('work-stage-vocabulary').check(dir);
+  assert.equal(passed, true, message);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('work-stage-vocabulary passes when every open item sits at a stage its domain registers', () => {
+  const dir = initRepo('checks-stage-vocab-clean-');
+  const fgosDir = path.join(dir, '.fgos');
+  const logPath = path.join(fgosDir, 'events.jsonl');
+  appendEvent(logPath, {
+    type: 'work.add',
+    payload: { id: 'a', title: 'a', kind: 'feature', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'planning' },
+  });
+  appendEvent(logPath, {
+    type: 'work.add',
+    payload: { id: 'b', title: 'b', kind: 'feature', status: 'doing', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'executing' },
+  });
+
+  const { passed, message } = checkById('work-stage-vocabulary').check(dir);
+  assert.equal(passed, true, message);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('work-stage-vocabulary fails and names an OPEN item sitting at a stage its domain retired', () => {
+  const dir = initRepo('checks-stage-vocab-retired-');
+  const fgosDir = path.join(dir, '.fgos');
+  const logPath = path.join(fgosDir, 'events.jsonl');
+  appendEvent(logPath, {
+    type: 'work.add',
+    payload: { id: 'stranded', title: 'stranded', kind: 'feature', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'clarify' },
+  });
+
+  const { passed, message } = checkById('work-stage-vocabulary').check(dir);
+  assert.equal(passed, false);
+  assert.match(message, /stranded/);
+  assert.match(message, /stage: "clarify"/);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test("work-stage-vocabulary judges each item against its OWN domain's stages, not the default domain's", () => {
+  const dir = initRepo('checks-stage-vocab-domain-');
+  const fgosDir = path.join(dir, '.fgos');
+  const logPath = path.join(fgosDir, 'events.jsonl');
+  appendEvent(logPath, {
+    type: 'work.add',
+    payload: { id: 'triaged', title: 'triaged', kind: 'feature', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'triage', domain: 'triage' },
+  });
+  appendEvent(logPath, {
+    type: 'work.add',
+    payload: { id: 'miscoded', title: 'miscoded', kind: 'feature', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'triage' },
+  });
+
+  const { passed, message } = checkById('work-stage-vocabulary').check(dir);
+  assert.equal(passed, false);
+  assert.match(message, /miscoded/);
+  assert.doesNotMatch(message, /triaged/);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('work-stage-vocabulary passes despite a retired stage on an already-resolved (done) item', () => {
+  const dir = initRepo('checks-stage-vocab-resolved-');
+  const fgosDir = path.join(dir, '.fgos');
+  const logPath = path.join(fgosDir, 'events.jsonl');
+  appendEvent(logPath, {
+    type: 'work.add',
+    payload: { id: 'old-done', title: 'old-done', kind: 'feature', status: 'done', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'clarify' },
+  });
+
+  const { passed, message } = checkById('work-stage-vocabulary').check(dir);
+  assert.equal(passed, true, message);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('work-stage-vocabulary lists every violating id, not just the first', () => {
+  const dir = initRepo('checks-stage-vocab-multi-');
+  const fgosDir = path.join(dir, '.fgos');
+  const logPath = path.join(fgosDir, 'events.jsonl');
+  appendEvent(logPath, {
+    type: 'work.add',
+    payload: { id: 'bad-one', title: 'bad-one', kind: 'feature', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'clarify' },
+  });
+  appendEvent(logPath, {
+    type: 'work.add',
+    payload: { id: 'bad-two', title: 'bad-two', kind: 'feature', status: 'awaiting-human', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'clarify' },
+  });
+
+  const { passed, message } = checkById('work-stage-vocabulary').check(dir);
   assert.equal(passed, false);
   assert.match(message, /bad-one/);
   assert.match(message, /bad-two/);

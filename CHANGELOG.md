@@ -80,6 +80,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   invariant broken by one item could land on main and stay red across later
   merges, because no item's own narrow `verify` happened to touch it.
 
+- `fgos doctor` gained a `work-stage-vocabulary` check: it names any open
+  item sitting at a stage its own domain no longer registers. Until now
+  only `risk`/`kind` drift was surfaced this way, so an item stranded on a
+  retired stage — which no `fgos edit` can correct, since `stage` has no
+  editable door — stayed invisible until some other command tripped over
+  it. The `discover` pool now derives its candidate stages from the same
+  source the `fgos discover` verb checks against, so it can no longer offer
+  an item that the verb would then refuse.
+
 - `fgos promote-to-component` gained an opt-in `--trust-dir` flag: with an
   explicit `--dir` also passed, it can now run from inside a linked
   worktree instead of refusing outright. Default behavior (no flag) is
