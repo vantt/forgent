@@ -84,6 +84,8 @@ import { runGoalCheck } from './goal-check.mjs';
 import { createWriteQueue } from './write-queue.mjs';
 import { createOwnershipStore, resolveRoot, claimRoot, steerFrontier } from './root-affinity.mjs';
 import { claimWork, ClaimError } from './claim-port.mjs';
+import { hasWorkerSlotRoom } from '../state/worker-slots.mjs';
+import { readSharedConfig } from '../config/shared-config-file.mjs';
 import { resolveRepoRoot, fgosDirFromRoot } from './paths.mjs';
 import { FALLBACK_VERIFY, resolveDiscovery } from '../intake/discovery.mjs';
 import { resolvePlan } from '../intake/plan.mjs';
@@ -122,7 +124,14 @@ export const LOCK_FILE = 'runner.lock';
  * declares no `parallel` block at all — every existing config keeps working
  * with zero changes. `maxRoots` caps concurrent ROOTS in flight; the wave a
  * single poll dispatches is bounded by `maxRoots * maxLeavesPerRoot`, and
- * `min(cap, |ready|)` throughout. */
+ * `min(cap, |ready|)` throughout.
+ *
+ * These two no longer decide how much actually runs (docs/history/
+ * orchestrator-worker-slots/DISCUSSION.md D6): they bound the BATCH SIZE
+ * this runner is allowed to propose, and the shared worker-slot ceiling
+ * answers whether that batch runs at all. Same shape `fgos-fanout`'s own
+ * max-batch-of-5 now has — three launchers, one ceiling, instead of three
+ * uncoordinated ceilings (RESEARCH.md F2). */
 export const DEFAULT_MAX_ROOTS = 4;
 export const DEFAULT_MAX_LEAVES_PER_ROOT = 4;
 
@@ -154,7 +163,14 @@ function resolveParallel(config) {
  * to `maxRoots` distinct roots (FIFO), and within each up to
  * `maxLeavesPerRoot` of its ready items (D10). Frontier FIFO order is
  * preserved — `steered` already arrives in frontier order and a `Map` keeps
- * first-insertion root order. */
+ * first-insertion root order.
+ *
+ * This still selects WHICH items are candidates, and only that. Whether the
+ * batch it returns is allowed to run is a separate question the caller asks
+ * the shared ceiling (D6) — deliberately not folded in here, because the
+ * ceiling's answer is whole-batch (D8) while this function's own axis is
+ * root affinity: trimming a wave to the number of free slots would drop a
+ * whole lineage rather than one item. */
 function selectWave(steered, view, { maxRoots, maxLeavesPerRoot }) {
   const byRoot = new Map();
   for (const item of steered) {
@@ -1043,6 +1059,22 @@ async function claimAndDispatch(ctx) {
     }
     return await dispatchClaimedItem({ ...ctx, priorVisits, rootId: decision.root });
   } catch (err) {
+    // A worker-slot refusal is an ANSWER, not a failure (D6): the launcher
+    // asked, the engine said no, and nothing was stood up. It reaches here
+    // only for the tail of a batch the pre-check above granted whole (D8) —
+    // claimWork's own enforcing gate counts per item, so between "asked, saw
+    // room" and "actually claimed" the last free slot can go to a sibling in
+    // the same wave, or to another launcher entirely. That race is accepted
+    // on purpose (worker-slots.mjs), which makes this landing load-bearing:
+    // without it, `validation` category routing below would turn the very
+    // overshoot D8 designs for into a halted drain-run with a non-zero exit.
+    // `claim-rejected` is the outcome that already means "never dispatched,
+    // left for a later poll" — the refused item keeps its place in the
+    // frontier and the next poll picks it up once a slot frees.
+    if (err instanceof ClaimError && err.code === 'worker-slot-ceiling') {
+      log(`fgos-runner: claim for "${item.id}" refused — ${err.message}; left for a later poll`);
+      return { outcome: 'claim-rejected', id: item.id, reason: 'worker-slot-ceiling', exitCode: 0 };
+    }
     const category = categoryOf(err);
     const exitCode = EXIT_CODES[category];
     if (exitCode === undefined) throw err; // a real bug — surfaces via runOnce's outer catch (exit 1)
@@ -1292,6 +1324,16 @@ export async function runOnce(options = {}) {
     const ownershipStore = createOwnershipStore();
     const ownerIdentity = options.ownerIdentity ?? RUNNER_OWNER_IDENTITY;
     const parallel = resolveParallel(config);
+    // The shared execution-lane ceiling (docs/history/orchestrator-worker-
+    // slots/plan.md §Shape T4, D6). Read once for the whole drain-run: this
+    // is CONFIGURATION, while the occupancy it is compared against is STATE
+    // — and the state half is already re-read every poll, through `view`
+    // below. `dir` is the `.fgos` directory, so its parent is the project
+    // root readSharedConfig expects — resolved the same way claimWork's own
+    // gate does (claim-port.mjs), rather than from `repoRoot`, which callers
+    // set independently. An absent `workerSlots.ceiling` means no ceiling at
+    // all, so this whole gate stays inert until a project configures one.
+    const ceiling = readSharedConfig(path.dirname(dir))?.workerSlots?.ceiling;
     const dispatched = [];
     let haltExitCode = null;
 
@@ -1324,7 +1366,20 @@ export async function runOnce(options = {}) {
       const wave = selectWave(steered, view, parallel);
       if (wave.length === 0) break; // nothing dispatchable — drain complete
 
-      const ctxBase = { repoRoot, dir, config, worktreeDir, breaker, queue, log, ownershipStore, ownerIdentity };
+      // Ask the engine for room BEFORE standing any worker up (D6). The
+      // whole pre-computed wave is offered as one batch and passes whole or
+      // not at all (D8) — never trimmed to the number of free slots, which
+      // is why `granted` is read for nothing here and only `allowed` decides.
+      // `break`, not `continue`: a drain-run is bounded (D15), so re-polling
+      // a full lane would only see it full again; `--watch`'s next cycle is
+      // where waiting belongs.
+      const room = hasWorkerSlotRoom(view, { ceiling, batchSize: wave.length });
+      if (!room.allowed) {
+        log(`fgos-runner: no worker-slot room — ${room.occupied} of ${room.ceiling} slot(s) in use; ${wave.length} ready item(s) left for a later poll`);
+        break;
+      }
+
+      const ctxBase ={ repoRoot, dir, config, worktreeDir, breaker, queue, log, ownershipStore, ownerIdentity };
       const settled = await Promise.allSettled(wave.map((item) => claimAndDispatch({ ...ctxBase, item })));
 
       let progressed = false;

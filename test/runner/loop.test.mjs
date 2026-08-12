@@ -660,6 +660,76 @@ test('two-tier cap: a root with three ready leaves dispatches maxLeavesPerRoot p
   assert.equal(countRuns(counterFile), 3);
 });
 
+// --- the shared worker-slot ceiling bounds the wave (D6/D7/D8) ------------
+
+/** Occupy `count` execution-lane slots with items parked at `doing`. `role:
+ * 'session'` keeps startupReap's own stale-claim reclaim off them (it only
+ * ever reaps a claim the runner itself made), so they stay occupied for the
+ * whole run — the same shape test/state/worker-slots.test.mjs's own
+ * occupants use. */
+function occupySlots(dir, count) {
+  for (let n = 0; n < count; n++) {
+    const id = `busy-${n}`;
+    seedItem(dir, { id });
+    moveWork(dir, { id, to: 'doing', expectedStatus: 'todo', role: 'session' });
+  }
+}
+
+function writeCeiling(repoRoot, ceiling) {
+  fs.writeFileSync(path.join(repoRoot, '.fgos', 'config.json'), JSON.stringify({ workerSlots: { ceiling } }));
+}
+
+test('no workerSlots ceiling configured leaves the drain-run exactly as it was — occupancy is not a ceiling on its own', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  occupySlots(dir, 20);
+  seedItem(dir, { id: 'root-1' });
+  const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.outcome, 'drained');
+  assert.equal(result.exitCode, 0);
+  assert.equal(listWork(dir).work['root-1'].status, 'awaiting-approval');
+  assert.equal(countRuns(counterFile), 1);
+});
+
+test('the drain-run asks for worker-slot room before dispatching: a full ceiling ends the run cleanly instead of halting on a claim refusal', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  occupySlots(dir, 2);
+  writeCeiling(repoRoot, 2);
+  seedItem(dir, { id: 'root-1' });
+  const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  // Refusal is an answer, not an error: no worker was ever stood up (D6), so
+  // there is nothing to halt on and nothing for a caller to treat as failure.
+  assert.equal(result.outcome, 'idle');
+  assert.equal(result.exitCode, 0);
+  assert.deepEqual(result.dispatched, []);
+  assert.equal(countRuns(counterFile), 0, 'no worker was spawned while the lane was full');
+  assert.equal(listWork(dir).work['root-1'].status, 'todo', 'the item is left for a later poll, never parked or blocked');
+});
+
+test('an overshooting batch lands soft: the member the ceiling gate refuses is left for a later poll, and the drain-run neither halts nor exits non-zero', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  occupySlots(dir, 2);
+  writeCeiling(repoRoot, 3); // exactly one free slot for a two-member wave
+  seedItem(dir, { id: 'root-1' });
+  seedItem(dir, { id: 'root-2' });
+  const config = { ...configFor(writeCommittingExecutor(scriptDir, counterFile)), parallel: { maxRoots: 2, maxLeavesPerRoot: 1 } };
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.exitCode, 0, 'a ceiling refusal mid-batch is not a halt');
+  assert.equal(result.dispatched.filter((d) => d.outcome === 'halted').length, 0);
+  // The refused member is not lost: the next poll finds a freed slot and
+  // dispatches it, so the whole batch still lands — just not in one wave.
+  assert.equal(listWork(dir).work['root-1'].status, 'awaiting-approval');
+  assert.equal(listWork(dir).work['root-2'].status, 'awaiting-approval');
+  assert.equal(countRuns(counterFile), 2);
+});
+
 // --- D3 branch targeting: leaf fork-from-root-tip, root branch-reuse ------
 
 test('cell fan-out-parallel-9: a leaf whose root branch already carries a planted commit forks its own worktree from that root tip, not from main', async () => {
