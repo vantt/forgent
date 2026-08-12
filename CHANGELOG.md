@@ -7,8 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Worker slots: a ceiling on how many work items may run at once. `fgos
+  slots` reports execution-lane occupancy, whether there is room, and the
+  admin lane's fixed reservation — it is the door launchers (herdr-plugin,
+  fgos-fanout) pre-check before standing a worker up. The same ceiling is
+  enforced inside every claim path (`take`, `pick`, and the runner alike),
+  which refuses with `worker-slot ceiling reached` once the lane is full.
+  Occupancy is derived from work items already at `doing`; nothing new is
+  recorded to get it. The ceiling is OFF until configured: `fgos setup`
+  writes a `workerSlots` section (`ceiling`, `adminReservation`) and `fgos
+  doctor` reports it, but a project whose config lacks that section behaves
+  exactly as before.
+- `fgos report <id> --text "..." [--stop-reason ...]` records a driver's
+  closing report on the item, so a result can be read with `fgos show <id>`
+  instead of by watching a terminal pane.
+
 ### Changed
 
+- `fgos-runner` and `fgos-fanout` now ask for a worker slot before standing
+  a worker up, instead of each enforcing a ceiling of its own. The runner's
+  `runner.parallel.maxRoots`/`maxLeavesPerRoot` and fan-out's cap of 5 keep
+  their values but change role: they bound how large a batch that launcher
+  may propose, while the shared ceiling decides whether the batch runs at
+  all — so the real limit on a machine is one number rather than the sum of
+  three. A batch passes whole or not at all, never trimmed to the number of
+  free slots. With no `workerSlots.ceiling` configured, both behave exactly
+  as before. A runner that finds the lane full now ends its run cleanly
+  (`idle`, exit 0) rather than halting with a non-zero exit, and an item
+  refused for lack of room is simply left for a later poll.
 - `fgos doctor` gained a `delivered-not-on-trunk` check: it names any item
   whose status says its work was handed over (`delivered`, `retrospective`,
   `cleanup`, `done`) while its own `fgw/<id>` branch is still not reachable

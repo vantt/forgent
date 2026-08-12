@@ -4,8 +4,9 @@ description: >-
   Run N already-decomposed children of one item concurrently instead of one
   at a time. Given a parent id and a candidate set (children of that
   parent, or a milestone's targets), waves the candidates through
-  computeSchedule, fires up to 5 Agents per wave each running /fgOS:pick
-  end to end, reads live state back (never an Agent's own narration), and
+  computeSchedule, asks the engine for worker-slot room, then fires a
+  batch of up to 5 Agents each running /fgOS:pick end to end, reads live
+  state back (never an Agent's own narration), and
   auto-approves each leaf that reaches awaiting-approval — except one whose
   title/description trips a hard-gate risk keyword, which still needs a
   person. Loops until no open child remains. Never touches the parent's own
@@ -59,12 +60,27 @@ own judgment.
 - **Every child runs `/fgOS:pick <id>` unabridged (D5).** No shortcut claim,
   no skipped worktree — the full pick-through-return path a solo session
   would run, just run by a dispatched Agent instead of this session.
-- **At most 5 Agents in flight at once (D7).** This is a hard cap, not a
-  target: even when more than 5 candidates are ready and footprint-clean,
-  never dispatch a 6th until a slot frees. `computeSchedule`'s own wave
+- **Ask the engine for a worker-slot before firing a batch, and then take
+  that batch whole** (`docs/history/orchestrator-worker-slots/
+  DISCUSSION.md` D6/D7/D8). Read `fgos slots --json` fresh before every
+  batch — that verb is the port, and per decision `0014` the CLI is the
+  only door a prose skill has into the engine (`herdr-plugin` asks through
+  the same one). A `execution.hasRoom: false` answer means the machine is
+  full: fire nothing, wait, and re-ask. The launcher never self-decides
+  past a refusal, and never substitutes its own count of Agents it
+  happens to have fired — a worker-slot is held by a running WORK ITEM
+  (D7), which is engine state, not by an Agent that has not claimed one
+  yet.
+
+  While at least one slot is free, fire the batch **whole** — never
+  trimmed down to `execution.free`. Splitting a pre-computed batch across
+  two waves is exactly what D8 forbids. `computeSchedule`'s own wave
   packing already batches by footprint; this skill additionally never lets
-  a single wave exceed 5 members — split a larger wave into batches of 5
-  before dispatching it.
+  a single batch exceed **5 members**. That 5 is a maximum batch SIZE, no
+  longer a ceiling of its own — the ceiling belongs to the engine now, and
+  5 is simply what bounds how far one whole-batch grant can overshoot it:
+  at most 4 past, and never compounding, because the next ask sees no room
+  and is refused outright.
 - **Announce every dispatch before firing it.** Print one line per
   candidate, same shape `_shared/capacity-dispatch-fallback.md`'s Step
   B.5/C.3 already use for observability parity across every dispatch path
@@ -134,7 +150,14 @@ loop:
   ready = scheduled candidates that also pass the D5 pre-check
     (frontier membership + isResolvedStatus on deps)
 
-  for each batch of up to 5 ids from `ready` (D7):
+  for each batch of up to 5 ids from `ready` (5 = max batch size, D8):
+    slots = fresh `fgos slots --json` read
+    if slots.execution.hasRoom is false:
+      fire nothing; wait, then re-read `fgos slots --json` and re-check
+      before this batch is tried again (D6 — refusal is accepted, never
+      worked around)
+    dispatch the batch WHOLE — never trimmed to slots.execution.free (D8)
+
     for each id in the batch: print its announce line
       (`<id> - native - <subagent_type> - <model>`)
     dispatch one Agent per id, single message, running in parallel
@@ -174,8 +197,13 @@ separate, later concern (D8) — this skill is invocable on its own with just
 - treating the D5 pre-check as authoritative — skipping the real
   `/fgOS:pick` claim, or retrying a pre-check-passed-but-claim-failed
   candidate blindly
-- dispatching more than 5 Agents at once, or reading state before a batch
-  has fully settled
+- firing a batch without asking `fgos slots` first, or firing one anyway
+  after the engine answered `hasRoom: false`
+- trimming a pre-computed batch down to the number of free slots instead
+  of taking it whole, or letting one batch exceed 5 members
+- counting the Agents this skill itself fired as if that were the
+  worker-slot occupancy — the engine owns that number (D2/D7)
+- reading state before a batch has fully settled
 - trusting a dispatched Agent's own claimed outcome instead of re-reading
   `fgos list --json`
 - auto-approving `parentId` itself, or any candidate that resolves to its

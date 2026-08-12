@@ -169,6 +169,13 @@ asserted to generalize automatically to a domain that does not exist yet.
 
     never call `EnterWorktree` for this branch — invoke the
     `executing`-stage skill directly at the current (main-checkout) cwd.
+- **The pane-labeling call is decoration, never a gate.** The helper
+  invoked once per drive (see `## Pane labeling: the pinned execution-lane
+  call site` below) always exits `0` and silently does nothing when no
+  `pane-labeling` provider is registered or the session is not inside a
+  labelable pane. Never stop the loop, retry, or branch on its result — and
+  never read a pane label back to decide anything, which is forbidden
+  outright (D2: labels are for humans; occupancy is engine state).
 - Every bare `fgos <verb>` this skill calls directly (`list`, to re-read
   state each iteration) is `requiresExistingStore: true` — resolve the main
   checkout root the same way every other stage-skill does and pass it
@@ -276,6 +283,7 @@ own mechanical verb covers that position, exactly as before.
 ```text
 shownItemOnce = false   # scoped to this ONE fgos-coding-driving call only,
                          # never persisted — see the display step below
+labeledPaneOnce = false # same scope, same lifetime — see the labeling step
 
 loop:
   read id's current {stage, status, domain} FRESH via `fgos list --id <id> --json`
@@ -337,6 +345,21 @@ loop:
     starts its own `shownItemOnce = false` and prints again — this is the
     intended re-orientation, not a bug.
 
+  if not labeledPaneOnce:
+    label this session's pane with `<id>` via the capability-gated helper
+    (tsk-3ac) — see `## Pane labeling: the pinned execution-lane call
+    site` below for why this call belongs here and nowhere else:
+
+    ```bash
+    root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+    bash "$root/plugins/fgOS/skills/terminal/rename.sh" "<id>" "$root"
+    ```
+
+    Set labeledPaneOnce = true right after. Never stop, retry, or branch on
+    its result: the helper always exits `0` and is a silent no-op whenever
+    no `pane-labeling` provider is registered or the session isn't inside a
+    labelable pane. It is decoration, never a gate on this loop.
+
   if skill resolves to the domain's `executing`-stage skill AND status != 'doing':
     if domain.worktreeBacked:
       claim `id` (`fgos pick`) and enter its worktree BEFORE invoking
@@ -363,6 +386,38 @@ loop:
 The invoked skill is trusted to do its own job completely (including its
 own gate question, when one is needed) before returning control here — this
 skill never second-guesses or repeats a stage-skill's own gate.
+
+## Pane labeling: the pinned execution-lane call site
+
+This loop is where the execution lane labels its own pane, and it is the
+only place that call belongs (`docs/history/orchestrator-worker-slots/
+DISCUSSION.md` §6 "Phân công đặt nhãn theo lane", D5). Two reasons, both
+structural: this loop knows the item id **earliest** — every launcher that
+drives a coding item routes through here — and it sees **every stage
+change**, so one call here replaces N launchers each having to remember
+one. `/fgOS:discover-next` used to carry its own optional rename call for
+exactly this purpose; it does not any more, because it now reaches this
+loop through `/fgOS:discover` and inherits the call.
+
+Calling it does not break this skill's "purely mechanical loop" hard rule,
+and §6 says so directly: invoking a capability-gated helper that no-ops is
+a mechanical action, not a routing judgment. The loop never reads a result
+from it, never branches on it, and never lets it fail the drive.
+
+**The gate is not in this file.** `rename.sh` itself queries the
+`pane-labeling` capability (`fgos tool query`) and no-ops silently when no
+provider is registered — see `plugins/fgOS/skills/terminal/SKILL.md`. That
+is what makes labeling adapter-swappable: a future tmux/cmux orchestrator
+is a different registered provider, not an edit to this loop.
+
+**Nothing may ever read a label back** (D2). Labels exist for a person
+looking at a screen; occupancy and "what is running" are engine state.
+This loop writes one and never reads one.
+
+`/fgOS:pick` step 3 also calls the same helper, at claim time — earlier
+than this loop, and it covers pick's own `EnterWorktree`-fallback branch
+where this loop is never invoked at all. The two calls produce the same
+label for the same id, so the overlap is redundant, never conflicting.
 
 ## Which existing loops are this loop (D9 §3, no separate mechanisms)
 
@@ -463,6 +518,9 @@ rather than legitimate scope, that is new evidence for a follow-up item —
 - claiming an item before its FIRST invocation of the `executing`-stage
   skill (e.g. at `discovery`/`exploring`/`planning`), or claiming again when the item's
   status already reads `doing`
+- treating the pane-labeling call as a gate — stopping, retrying, or
+  branching on its result — or reading a pane label back to decide
+  anything (D2)
 - asserting this loop generalizes to a domain other than `coding` without
   new evidence for that domain (D10)
 - reading the claim step's `worktreeBacked` branch, or the stop-condition

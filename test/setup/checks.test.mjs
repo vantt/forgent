@@ -40,6 +40,7 @@ import {
   writeEnduserDoc,
   writeEnduserManifest,
 } from './helpers/setup-checks-harness.mjs';
+import { DEFAULT_WORKER_SLOT_CEILING, ADMIN_LANE_RESERVATION } from '../../src/state/worker-slots.mjs';
 
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
@@ -770,6 +771,7 @@ test('config-not-stale passes when the existing config already has every default
       cleanup: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS, leafTtlDays: DEFAULT_CLEANUP_LEAF_TTL_DAYS },
       herdrOrchestrator: DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
       invariantChecks: { commands: DEFAULT_INVARIANT_CHECK_COMMANDS },
+      workerSlots: { ceiling: DEFAULT_WORKER_SLOT_CEILING, adminReservation: ADMIN_LANE_RESERVATION },
     }),
   );
   const { passed } = checkById('config-not-stale').check(cwd);

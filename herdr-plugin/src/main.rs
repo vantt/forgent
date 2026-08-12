@@ -10,7 +10,9 @@ use herdr_fgos::fgos::{self, FgosCliSource};
 use herdr_fgos::layout;
 use herdr_fgos::pane_scan::HerdrPaneScanner;
 use herdr_fgos::pick::{self, HerdrPaneAdapter};
-use herdr_fgos::ports::{PaneOrchestrator, PaneRegistry, TerminalUi, UiEvent, WorkItemSource};
+use herdr_fgos::ports::{
+    PaneOrchestrator, PaneRegistry, TerminalUi, UiEvent, WorkItemSource, WorkerLaneView,
+};
 use herdr_fgos::settings;
 use herdr_fgos::ui::RatatuiTerminalUi;
 
@@ -34,7 +36,7 @@ fn main() -> io::Result<()> {
     // uses.
     let mut cockpit_error: Option<String> = None;
     let mut operation_tab_error: Option<String> = None;
-    let mut operation_panes: Option<(String, String)> = None;
+    let mut operation_panes: Option<layout::OperationPanes> = None;
     if let (Ok(workspace_id), Ok(tab_id)) = (
         std::env::var("HERDR_WORKSPACE_ID"),
         std::env::var("HERDR_TAB_ID"),
@@ -67,10 +69,7 @@ fn main() -> io::Result<()> {
     if let Some(err) = operation_tab_error {
         app.last_error = Some(err);
     }
-    if let Some((left, right)) = operation_panes {
-        app.operation_left_pane_id = Some(left);
-        app.operation_right_pane_id = Some(right);
-    }
+    app.operation_panes = operation_panes;
     let source: Option<FgosCliSource> = match &root {
         Ok(root) => Some(FgosCliSource {
             root: root.clone(),
@@ -140,6 +139,132 @@ fn next_auto_discover_candidate(work_items: &[WorkItem]) -> Option<&WorkItem> {
     work_items
         .iter()
         .find(|item| item.status == "todo" && item.discover_eligible())
+}
+
+/// Is an unattended discovery worker already running? (tsk-1zq, D2/D5.)
+///
+/// This replaces the `fgos-auto-discover` pane label that used to serve as
+/// the launch mutex. That label was orchestrator state parked on a piece
+/// of chrome, and it failed in both directions: a session was free to
+/// rename its own pane mid-flight, silently releasing the lock and letting
+/// a second launcher in, while a session that died before renaming left it
+/// held forever, so auto-discover never fired again. D2 puts "what is
+/// running" in the engine's hands, and the answer is already sitting in
+/// the work list the poll tick fetches: an unattended discover session's
+/// whole job is to claim an item out of the discovery pool, so a live one
+/// shows up as an item at `doing` whose stage is one that
+/// `/fgOS:discover` drives.
+///
+/// The stage set is shared with `discover_eligible` via
+/// `WorkItem::in_discover_stage`, which mirrors `CANDIDATE_STAGES` in
+/// `src/state/discover-pool.mjs`. `blocked_by` is deliberately not
+/// consulted here: a claimed item is already running regardless of what
+/// it once waited on.
+fn discovery_worker_alive(work_items: &[WorkItem]) -> bool {
+    work_items
+        .iter()
+        .any(|item| item.status == "doing" && item.in_discover_stage())
+}
+
+/// The read-only worker-slot ledger, as the engine reports it.
+#[derive(Debug, Clone, Default)]
+struct WorkerSlots {
+    has_room: bool,
+}
+
+#[derive(Debug, Deserialize)]
+struct SlotsExecution {
+    #[serde(rename = "hasRoom")]
+    has_room: bool,
+}
+
+#[derive(Debug, Deserialize)]
+struct SlotsData {
+    execution: SlotsExecution,
+}
+
+#[derive(Debug, Deserialize)]
+struct SlotsEnvelope {
+    data: SlotsData,
+}
+
+/// Ask the engine whether the execution lane has room before standing a
+/// worker up (D6) — `fgos slots`, the read-only face T1 exposed precisely
+/// because decision 0014 makes the CLI the only door a Rust adapter can
+/// reach the engine through. Same `node bin/fgos.mjs ... --json --dir`
+/// shape `fgos.rs`'s own fetch functions use, mirrored here rather than
+/// reused because `fgos.rs` is outside this item's footprint.
+///
+/// `None` means the question could not be asked at all, which the caller
+/// treats as "no ceiling known" rather than "no room" — see
+/// `worker_slot_room`.
+fn fetch_worker_slots(root: &Path) -> Option<WorkerSlots> {
+    let fgos_mjs = root.join("bin/fgos.mjs");
+    let output = Command::new("node")
+        .args([
+            fgos_mjs.to_string_lossy().as_ref(),
+            "slots",
+            "--json",
+            "--dir",
+            root.to_string_lossy().as_ref(),
+        ])
+        .output()
+        .ok()?;
+    if !output.status.success() {
+        return None;
+    }
+    let envelope: SlotsEnvelope = serde_json::from_slice(&output.stdout).ok()?;
+    Some(WorkerSlots {
+        has_room: envelope.data.execution.has_room,
+    })
+}
+
+/// Fail OPEN, not closed: an unreachable or unparseable `fgos slots` means
+/// no ceiling is known, so nothing is refused.
+///
+/// This is deliberate and load-bearing. The verb ships with this feature,
+/// so it does not exist on the trunk this cockpit runs from until the
+/// whole feature merges — failing closed would freeze every launch button
+/// in the meantime. It also matches what the engine itself does with a
+/// ceiling that was never configured (`worker-slots.mjs`:
+/// `reason: 'no-ceiling-configured'` returns `allowed: true`), which in
+/// turn follows `shared-config-file.mjs`'s rule that an absent config
+/// section leaves behavior identical to before it existed.
+fn worker_slot_room(slots: Option<&WorkerSlots>) -> bool {
+    slots.map(|slots| slots.has_room).unwrap_or(true)
+}
+
+/// The one path every worker launch takes (D6): ask the engine for a slot
+/// first, hand the adapter what only the domain knows about the lane, and
+/// remember the pane that came back until its session labels itself.
+///
+/// Every launcher goes through here — the two dashboard buttons and the
+/// unattended tick alike — so no caller can quietly skip the slot check
+/// the way each of the three launchers used to keep its own private
+/// ceiling (RESEARCH F2).
+fn launch_worker<F>(app: &mut App, root: Option<&Path>, launch: F) -> Result<String, String>
+where
+    F: FnOnce(&WorkerLaneView) -> io::Result<String>,
+{
+    let slots = root.and_then(fetch_worker_slots);
+    if !worker_slot_room(slots.as_ref()) {
+        return Err("engine reports no free worker slot".to_string());
+    }
+
+    let doing_ids = app.doing_item_ids();
+    let pending = app.pending_pane_ids();
+    let lane = WorkerLaneView {
+        doing_ids: &doing_ids,
+        pending_panes: &pending,
+    };
+
+    match launch(&lane) {
+        Ok(pane_id) => {
+            app.pending_worker_panes.insert(pane_id.clone());
+            Ok(pane_id)
+        }
+        Err(err) => Err(err.to_string()),
+    }
 }
 
 fn run(
@@ -221,11 +346,13 @@ fn run(
                 // directly.
                 UiEvent::Pick => {
                     if app.detail_modal_open {
-                        app.pick_status = Some(match app.selected_id() {
-                            Some(id) => match pane_orchestrator.open_pick_pane(id) {
-                                Ok(()) => format!("opened pane for /fgOS:pick {id}"),
-                                Err(err) => format!("pick failed for {id}: {err}"),
-                            },
+                        let selected = app.selected_id().map(String::from);
+                        app.pick_status = Some(match selected {
+                            Some(id) => launch_worker(app, root, |lane| {
+                                pane_orchestrator.open_pick_pane(&id, lane)
+                            })
+                            .map(|_| format!("opened pane for /fgOS:pick {id}"))
+                            .unwrap_or_else(|err| format!("pick failed for {id}: {err}")),
                             None => "no row selected".to_string(),
                         });
                         app.detail_modal_open = false;
@@ -265,11 +392,13 @@ fn run(
                             .selected_work_item()
                             .is_some_and(|item| item.discover_eligible());
                         if is_discovery {
-                            app.pick_status = Some(match app.selected_id() {
-                                Some(id) => match pane_orchestrator.open_discover_pane(id) {
-                                    Ok(()) => format!("opened pane for /fgOS:discover {id}"),
-                                    Err(err) => format!("discover failed for {id}: {err}"),
-                                },
+                            let selected = app.selected_id().map(String::from);
+                            app.pick_status = Some(match selected {
+                                Some(id) => launch_worker(app, root, |lane| {
+                                    pane_orchestrator.open_discover_pane(&id, lane)
+                                })
+                                .map(|_| format!("opened pane for /fgOS:discover {id}"))
+                                .unwrap_or_else(|err| format!("discover failed for {id}: {err}")),
                                 None => "no row selected".to_string(),
                             });
                             app.detail_modal_open = false;
@@ -353,19 +482,22 @@ fn run(
             // `/fgOS:discover-next`, which re-picks off the same live
             // pool via `pickNextDiscoverItem`, so this check only decides
             // WHETHER to launch, never WHICH id (that stays centralized).
-            // Any failure (cap refusal, rename failure, spawn failure) is
+            //
+            // tsk-1zq: the "one at a time" guard is `discovery_worker_alive`
+            // now — the engine's own answer — where it used to be an
+            // exact-match probe for a pane label this adapter had planted
+            // itself. Any failure (no free slot, spawn failure) is
             // swallowed here — never surfaced as `app.pick_status`
             // (person-initiated actions only), never retried within the
-            // same tick, never queued; a fresh candidate read next tick
-            // is the only retry.
-            if app.orchestrator_settings.auto_discover {
-                let label = pick::auto_discover_pane_label();
-                let already_open = registry
-                    .map(|registry| registry.has_labeled_pane(&label).unwrap_or(false))
-                    .unwrap_or(false);
-                if !already_open && next_auto_discover_candidate(&app.work_items).is_some() {
-                    let _ = pane_orchestrator.open_auto_discover_pane();
-                }
+            // same tick, never queued; a fresh read next tick is the only
+            // retry.
+            if app.orchestrator_settings.auto_discover
+                && !discovery_worker_alive(&app.work_items)
+                && next_auto_discover_candidate(&app.work_items).is_some()
+            {
+                let _ = launch_worker(app, root, |lane| {
+                    pane_orchestrator.open_auto_discover_pane(lane)
+                });
             }
             // tsk-57q: same tick, so the guard check and the launch it
             // gates never straddle two ticks (poll-tick race risk row,
@@ -417,93 +549,6 @@ fn read_herdr_orchestrator_toggles(root: &Path) -> HerdrOrchestratorToggles {
     }
 }
 
-/// Which loop belongs in the right (retro/cleanup) slot of the fixed
-/// `fg:operation` tab right now (tsk-57q).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum RightPaneLoop {
-    Retro,
-    Cleanup,
-}
-
-#[derive(Debug, Deserialize)]
-struct ListWorkItemForPriority {
-    status: String,
-    priority: Option<i64>,
-}
-
-#[derive(Debug, Deserialize)]
-struct ListWorkDataForPriority {
-    work: std::collections::HashMap<String, ListWorkItemForPriority>,
-}
-
-#[derive(Debug, Deserialize)]
-struct ListEnvelopeForPriority {
-    data: ListWorkDataForPriority,
-}
-
-/// Decides which of the two right-pane loops has the more urgent ready
-/// work (tsk-57q's own "alternating by priority", never a hardcoded
-/// order): shells to `fgos list --all --json` (the same CLI-JSON idiom
-/// `fgos.rs`'s own fetch functions already use, mirrored here rather
-/// than reused since `fgos.rs` is not part of this item's own footprint)
-/// and compares each pool's own top (lowest-number) `priority` field —
-/// ascending scale, smaller number = higher priority
-/// (`src/state/priority-formula.mjs`, confirmed via `fgos.rs`'s own
-/// `TriageRow.priority` doc comment). `None` when neither pool has ready
-/// work, or the call/parse fails (fail-closed — never launches on
-/// unreadable state).
-fn pick_right_pane_loop(root: &Path) -> Option<RightPaneLoop> {
-    let fgos_mjs = root.join("bin/fgos.mjs");
-    let output = Command::new("node")
-        .args([
-            fgos_mjs.to_string_lossy().as_ref(),
-            "list",
-            "--all",
-            "--json",
-            "--dir",
-            root.to_string_lossy().as_ref(),
-        ])
-        .output()
-        .ok()?;
-    if !output.status.success() {
-        return None;
-    }
-    let envelope: ListEnvelopeForPriority = serde_json::from_slice(&output.stdout).ok()?;
-
-    let top_priority = |status: &str| -> Option<i64> {
-        envelope
-            .data
-            .work
-            .values()
-            .filter(|item| item.status == status)
-            .map(|item| item.priority.unwrap_or(i64::MAX))
-            .min()
-    };
-
-    choose_right_pane_loop(top_priority("retrospective"), top_priority("cleanup"))
-}
-
-/// Pure comparison `pick_right_pane_loop` above dispatches on — isolated
-/// so the "alternating by priority" decision stays unit-testable without
-/// a real `fgos` subprocess/store. Ascending scale: smaller number =
-/// higher priority (`src/state/priority-formula.mjs`). A pool with no
-/// ready item at all (`None`) never wins over one that has any.
-fn choose_right_pane_loop(
-    retro_top_priority: Option<i64>,
-    cleanup_top_priority: Option<i64>,
-) -> Option<RightPaneLoop> {
-    match (retro_top_priority, cleanup_top_priority) {
-        (Some(retro), Some(cleanup)) => Some(if cleanup < retro {
-            RightPaneLoop::Cleanup
-        } else {
-            RightPaneLoop::Retro
-        }),
-        (Some(_), None) => Some(RightPaneLoop::Retro),
-        (None, Some(_)) => Some(RightPaneLoop::Cleanup),
-        (None, None) => None,
-    }
-}
-
 /// The auto-merge/retro/cleanup launcher itself (tsk-57q): for each
 /// enabled toggle, guard-checks the fixed pane title, then launches —
 /// never queues, never double-launches (an unreadable guard check fails
@@ -525,75 +570,75 @@ struct AutoOperationTabLaunches {
 }
 
 /// Pure decision `auto_launch_operation_panes` below dispatches on
-/// (tsk-57q): given already-resolved toggles, which loop currently owns
-/// the right pane's priority slot, and whether each fixed guard title is
-/// already live, decides which loops to launch. Never queues, never
-/// double-launches — a title already live for a toggle that's on is
+/// (tsk-57q): given already-resolved toggles and whether each fixed guard
+/// title is already live, decides which loops to launch. Never queues,
+/// never double-launches — a title already live for a toggle that's on is
 /// `false` here, not retried.
+///
+/// tsk-1zq: each of the three loops has its own slot in the 4-pane
+/// `fg:operation` tab now, so retro and cleanup no longer compete for one
+/// pane and neither is gated on winning a priority comparison.
 fn decide_auto_operation_tab_launches(
     toggles: HerdrOrchestratorToggles,
-    right_pane_loop: Option<RightPaneLoop>,
     merge_already_running: bool,
     retro_already_running: bool,
     cleanup_already_running: bool,
 ) -> AutoOperationTabLaunches {
     AutoOperationTabLaunches {
         merge: toggles.auto_merge && !merge_already_running,
-        retro: toggles.auto_retro
-            && right_pane_loop == Some(RightPaneLoop::Retro)
-            && !retro_already_running,
-        cleanup: toggles.auto_cleanup
-            && right_pane_loop == Some(RightPaneLoop::Cleanup)
-            && !cleanup_already_running,
+        retro: toggles.auto_retro && !retro_already_running,
+        cleanup: toggles.auto_cleanup && !cleanup_already_running,
     }
 }
 
 /// The auto-merge/retro/cleanup launcher itself (tsk-57q): gathers the
-/// real settings/guard/priority state (all impure I/O — file read,
-/// subprocess, herdr pane scan) and hands it to the pure
-/// `decide_auto_operation_tab_launches` above, then acts on the result.
-/// Guard-check and launch happen synchronously within this one call —
-/// this function only ever runs once per poll tick (`run`'s own tick
-/// block above), so a launch decision is never stale by the time it acts
-/// on it (poll-tick race risk row, plan.md). A `None` fixed pane id
-/// (outside a live herdr session, or `ensure_operation_tab` failed at
-/// startup) is a no-op for that slot. An unreadable guard check
-/// (`has_labeled_pane` erroring) fails closed toward "treat as already
-/// running", i.e. skip the launch, never toward "launch anyway".
+/// real settings and guard state (impure I/O — file read, herdr pane
+/// scan) and hands it to the pure `decide_auto_operation_tab_launches`
+/// above, then acts on the result. Guard-check and launch happen
+/// synchronously within this one call — this function only ever runs once
+/// per poll tick (`run`'s own tick block above), so a launch decision is
+/// never stale by the time it acts on it (poll-tick race risk row,
+/// plan.md). A `None` slot set (outside a live herdr session, or
+/// `ensure_operation_tab` failed at startup) is a no-op. An unreadable
+/// guard check (`has_labeled_pane` erroring) fails closed toward "treat
+/// as already running", i.e. skip the launch, never toward "launch
+/// anyway".
+///
+/// tsk-1zq: with `fg:operation` grown to four slots, retro and cleanup
+/// each own a pane, so the priority comparison that used to decide which
+/// of them got the single right-hand pane is gone — along with the `fgos
+/// list --all --json` subprocess it ran every tick to make that call.
+/// These panes are never touched by the worker lane's reclaim path: loops
+/// live here, one-shot flows live there (A7).
 fn auto_launch_operation_panes(
     app: &App,
     root: &Path,
     registry: &dyn PaneRegistry,
     pane_orchestrator: &impl PaneOrchestrator,
 ) {
+    let Some(panes) = &app.operation_panes else {
+        return;
+    };
     let toggles = read_herdr_orchestrator_toggles(root);
-    let right_pane_loop = pick_right_pane_loop(root);
     let merge_already_running = registry.has_labeled_pane("fgos-auto-merge").unwrap_or(true);
     let retro_already_running = registry.has_labeled_pane("fgos-auto-retro").unwrap_or(true);
     let cleanup_already_running = registry.has_labeled_pane("fgos-auto-cleanup").unwrap_or(true);
 
     let launches = decide_auto_operation_tab_launches(
         toggles,
-        right_pane_loop,
         merge_already_running,
         retro_already_running,
         cleanup_already_running,
     );
 
     if launches.merge {
-        if let Some(left_pane) = &app.operation_left_pane_id {
-            let _ = pane_orchestrator.launch_merge_loop(left_pane);
-        }
+        let _ = pane_orchestrator.launch_merge_loop(&panes.merge);
     }
     if launches.retro {
-        if let Some(right_pane) = &app.operation_right_pane_id {
-            let _ = pane_orchestrator.launch_retro_loop(right_pane);
-        }
+        let _ = pane_orchestrator.launch_retro_loop(&panes.retro);
     }
     if launches.cleanup {
-        if let Some(right_pane) = &app.operation_right_pane_id {
-            let _ = pane_orchestrator.launch_cleanup_loop(right_pane);
-        }
+        let _ = pane_orchestrator.launch_cleanup_loop(&panes.cleanup);
     }
 }
 
@@ -601,10 +646,9 @@ fn auto_launch_operation_panes(
 mod tests {
     use super::*;
     use std::cell::Cell;
-    use std::collections::HashMap;
 
     use herdr_fgos::fgos::{DoingRow, FgosError, TriageRow};
-    use herdr_fgos::pane_scan::{PaneIdentity, PaneScanError};
+    use herdr_fgos::pane_scan::{PaneIdentity, PaneScanError, PaneSnapshot};
 
     struct CountingSource {
         calls: Cell<u32>,
@@ -638,9 +682,9 @@ mod tests {
     }
 
     impl PaneRegistry for CountingRegistry {
-        fn scan(&self) -> Result<HashMap<String, PaneIdentity>, PaneScanError> {
+        fn scan_panes(&self) -> Result<Vec<PaneSnapshot>, PaneScanError> {
             self.calls.set(self.calls.get() + 1);
-            Ok(HashMap::new())
+            Ok(Vec::new())
         }
 
         fn has_labeled_pane(&self, _label: &str) -> Result<bool, PaneScanError> {
@@ -651,12 +695,12 @@ mod tests {
     struct NoopPaneOrchestrator;
 
     impl PaneOrchestrator for NoopPaneOrchestrator {
-        fn open_pick_pane(&self, _id: &str) -> io::Result<()> {
-            Ok(())
+        fn open_pick_pane(&self, _id: &str, _lane: &WorkerLaneView) -> io::Result<String> {
+            Ok("wS:pStub".into())
         }
 
-        fn open_discover_pane(&self, _id: &str) -> io::Result<()> {
-            Ok(())
+        fn open_discover_pane(&self, _id: &str, _lane: &WorkerLaneView) -> io::Result<String> {
+            Ok("wS:pStub".into())
         }
 
         fn focus_pane(&self, _pane_id: &str) -> io::Result<()> {
@@ -675,8 +719,8 @@ mod tests {
             Ok(())
         }
 
-        fn open_auto_discover_pane(&self) -> io::Result<()> {
-            Ok(())
+        fn open_auto_discover_pane(&self, _lane: &WorkerLaneView) -> io::Result<String> {
+            Ok("wS:pStub".into())
         }
     }
 
@@ -687,12 +731,12 @@ mod tests {
     }
 
     impl PaneOrchestrator for RecordingPaneOrchestrator {
-        fn open_pick_pane(&self, _id: &str) -> io::Result<()> {
-            Ok(())
+        fn open_pick_pane(&self, _id: &str, _lane: &WorkerLaneView) -> io::Result<String> {
+            Ok("wS:pStub".into())
         }
 
-        fn open_discover_pane(&self, _id: &str) -> io::Result<()> {
-            Ok(())
+        fn open_discover_pane(&self, _id: &str, _lane: &WorkerLaneView) -> io::Result<String> {
+            Ok("wS:pStub".into())
         }
 
         fn focus_pane(&self, pane_id: &str) -> io::Result<()> {
@@ -712,8 +756,8 @@ mod tests {
             Ok(())
         }
 
-        fn open_auto_discover_pane(&self) -> io::Result<()> {
-            Ok(())
+        fn open_auto_discover_pane(&self, _lane: &WorkerLaneView) -> io::Result<String> {
+            Ok("wS:pStub".into())
         }
     }
 
@@ -733,14 +777,14 @@ mod tests {
     }
 
     impl PaneOrchestrator for RecordingPickOrchestrator {
-        fn open_pick_pane(&self, id: &str) -> io::Result<()> {
+        fn open_pick_pane(&self, id: &str, _lane: &WorkerLaneView) -> io::Result<String> {
             self.picked.borrow_mut().push(id.to_string());
-            Ok(())
+            Ok("wS:pStub".into())
         }
 
-        fn open_discover_pane(&self, id: &str) -> io::Result<()> {
+        fn open_discover_pane(&self, id: &str, _lane: &WorkerLaneView) -> io::Result<String> {
             self.discovered.borrow_mut().push(id.to_string());
-            Ok(())
+            Ok("wS:pStub".into())
         }
 
         fn focus_pane(&self, _pane_id: &str) -> io::Result<()> {
@@ -762,9 +806,9 @@ mod tests {
             Ok(())
         }
 
-        fn open_auto_discover_pane(&self) -> io::Result<()> {
+        fn open_auto_discover_pane(&self, _lane: &WorkerLaneView) -> io::Result<String> {
             *self.auto_discovered.borrow_mut() += 1;
-            Ok(())
+            Ok("wS:pStub".into())
         }
     }
 
@@ -1411,6 +1455,17 @@ mod tests {
     // the item's own recorded verify (`cargo test auto_operation_tab`)
     // filters by substring match on the full test path (plan.md).
 
+    /// The four fixed `fg:operation` slots, as `ensure_operation_tab`
+    /// resolves them once the tab holds a full 2x2 grid.
+    fn operation_panes_fixture() -> layout::OperationPanes {
+        layout::OperationPanes {
+            merge: "wS:pOpMerge".into(),
+            retro: "wS:pOpRetro".into(),
+            cleanup: "wS:pOpCleanup".into(),
+            spare: "wS:pOpSpare".into(),
+        }
+    }
+
     fn all_off() -> HerdrOrchestratorToggles {
         HerdrOrchestratorToggles::default()
     }
@@ -1438,19 +1493,13 @@ mod tests {
 
     #[test]
     fn auto_operation_tab_decision_stays_off_for_every_loop_when_every_toggle_is_off() {
-        let launches = decide_auto_operation_tab_launches(
-            all_off(),
-            Some(RightPaneLoop::Retro),
-            false,
-            false,
-            false,
-        );
+        let launches = decide_auto_operation_tab_launches(all_off(), false, false, false);
         assert_eq!(launches, AutoOperationTabLaunches::default());
     }
 
     #[test]
     fn auto_operation_tab_decision_launches_merge_when_toggle_on_and_pane_not_already_running() {
-        let launches = decide_auto_operation_tab_launches(all_on(), None, false, true, true);
+        let launches = decide_auto_operation_tab_launches(all_on(), false, true, true);
         assert!(launches.merge);
     }
 
@@ -1461,77 +1510,32 @@ mod tests {
         // second tick reads `merge_already_running: true` (the first
         // tick's own launch having registered by then) and must decide
         // the same way as any other already-live guard.
-        let launches = decide_auto_operation_tab_launches(all_on(), None, true, true, true);
+        let launches = decide_auto_operation_tab_launches(all_on(), true, true, true);
         assert!(!launches.merge);
     }
 
     #[test]
-    fn auto_operation_tab_decision_only_launches_retro_when_it_is_also_the_priority_winner() {
-        let retro_wins = decide_auto_operation_tab_launches(
-            all_on(),
-            Some(RightPaneLoop::Retro),
-            true,
-            false,
-            false,
-        );
-        assert!(retro_wins.retro);
-        assert!(!retro_wins.cleanup);
-
-        let cleanup_wins = decide_auto_operation_tab_launches(
-            all_on(),
-            Some(RightPaneLoop::Cleanup),
-            true,
-            false,
-            false,
-        );
-        assert!(!cleanup_wins.retro);
-        assert!(cleanup_wins.cleanup);
+    fn auto_operation_tab_launches_retro_and_cleanup_together_now_they_own_separate_panes() {
+        // tsk-1zq: retro and cleanup used to share the single right-hand
+        // pane, so each was gated on winning a priority comparison against
+        // the other and at most one could run. With four slots in the
+        // `fg:operation` tab they each own a pane, so both start.
+        let launches = decide_auto_operation_tab_launches(all_on(), true, false, false);
+        assert!(launches.retro);
+        assert!(launches.cleanup);
     }
 
     #[test]
-    fn auto_operation_tab_decision_skips_retro_and_cleanup_launch_when_neither_pool_has_ready_work()
-    {
-        let launches =
-            decide_auto_operation_tab_launches(all_on(), None, true, false, false);
-        assert!(!launches.retro);
-        assert!(!launches.cleanup);
-    }
-
-    #[test]
-    fn auto_operation_tab_decision_skips_the_priority_winner_when_its_own_toggle_is_off() {
+    fn auto_operation_tab_decision_skips_a_loop_whose_own_toggle_is_off() {
         let toggles = HerdrOrchestratorToggles {
             auto_merge: false,
             auto_retro: false,
             auto_cleanup: true,
         };
-        // Retro wins priority, but auto_retro is off — must stay off.
-        let launches = decide_auto_operation_tab_launches(
-            toggles,
-            Some(RightPaneLoop::Retro),
-            true,
-            false,
-            false,
-        );
+        let launches = decide_auto_operation_tab_launches(toggles, true, false, false);
+        assert!(!launches.merge);
         assert!(!launches.retro);
-        assert!(!launches.cleanup);
-    }
-
-    #[test]
-    fn auto_operation_tab_priority_prefers_the_lower_number_pool() {
-        // Ascending scale: smaller number = higher priority.
-        assert_eq!(choose_right_pane_loop(Some(100), Some(200)), Some(RightPaneLoop::Retro));
-        assert_eq!(choose_right_pane_loop(Some(200), Some(100)), Some(RightPaneLoop::Cleanup));
-    }
-
-    #[test]
-    fn auto_operation_tab_priority_falls_back_to_whichever_pool_has_any_ready_work() {
-        assert_eq!(choose_right_pane_loop(Some(100), None), Some(RightPaneLoop::Retro));
-        assert_eq!(choose_right_pane_loop(None, Some(100)), Some(RightPaneLoop::Cleanup));
-    }
-
-    #[test]
-    fn auto_operation_tab_priority_is_none_when_neither_pool_has_ready_work() {
-        assert_eq!(choose_right_pane_loop(None, None), None);
+        assert!(launches.cleanup);
     }
 
     // `tag` alone already disambiguates every call site below (each uses
@@ -1613,8 +1617,8 @@ mod tests {
     }
 
     impl PaneRegistry for StubOperationRegistry {
-        fn scan(&self) -> Result<HashMap<String, PaneIdentity>, PaneScanError> {
-            Ok(HashMap::new())
+        fn scan_panes(&self) -> Result<Vec<PaneSnapshot>, PaneScanError> {
+            Ok(Vec::new())
         }
 
         fn has_labeled_pane(&self, label: &str) -> Result<bool, PaneScanError> {
@@ -1639,8 +1643,7 @@ mod tests {
         .expect("write config");
 
         let mut app = App::empty();
-        app.operation_left_pane_id = Some("wS:pOpL".to_string());
-        app.operation_right_pane_id = Some("wS:pOpR".to_string());
+        app.operation_panes = Some(operation_panes_fixture());
 
         let registry = StubOperationRegistry {
             live_labels: std::collections::HashSet::new(),
@@ -1656,7 +1659,7 @@ mod tests {
 
         auto_launch_operation_panes(&app, &root, &registry, &pane_orchestrator);
 
-        assert_eq!(*pane_orchestrator.merge_launched.borrow(), vec!["wS:pOpL".to_string()]);
+        assert_eq!(*pane_orchestrator.merge_launched.borrow(), vec!["wS:pOpMerge".to_string()]);
         assert!(pane_orchestrator.retro_launched.borrow().is_empty());
         assert!(pane_orchestrator.cleanup_launched.borrow().is_empty());
 
@@ -1678,7 +1681,7 @@ mod tests {
         .expect("write config");
 
         let mut app = App::empty();
-        app.operation_left_pane_id = Some("wS:pOpL".to_string());
+        app.operation_panes = Some(operation_panes_fixture());
 
         let pane_orchestrator = RecordingPickOrchestrator {
             picked: std::cell::RefCell::new(Vec::new()),
@@ -1706,7 +1709,7 @@ mod tests {
 
         assert_eq!(
             *pane_orchestrator.merge_launched.borrow(),
-            vec!["wS:pOpL".to_string()],
+            vec!["wS:pOpMerge".to_string()],
             "tick 2 must not launch a second time"
         );
 
@@ -1821,32 +1824,37 @@ mod tests {
         );
     }
 
-    /// A registry whose raw pane list already carries the fixed
-    /// `fgos-auto-discover`-labeled pane — simulates a still-running
-    /// auto-launch from an earlier tick (or a previous herdr-plugin run).
-    struct RegistryWithAutoDiscoverPaneOpen {
-        label: String,
-    }
-
-    impl PaneRegistry for RegistryWithAutoDiscoverPaneOpen {
-        fn scan(&self) -> Result<HashMap<String, PaneIdentity>, PaneScanError> {
-            Ok(HashMap::new())
-        }
-
-        fn has_labeled_pane(&self, label: &str) -> Result<bool, PaneScanError> {
-            Ok(self.label == label)
+    /// A discovery-pool item the engine reports as CLAIMED — the shape a
+    /// live unattended discover worker takes once it has picked something.
+    fn discovery_doing_item(id: &str) -> WorkItem {
+        WorkItem {
+            id: id.into(),
+            title: id.into(),
+            goal_tier: "mvp".into(),
+            stage: "discovery".into(),
+            status: "doing".into(),
+            blocked_by: Vec::new(),
+            blocks: 0,
+            priority: None,
         }
     }
 
     #[test]
-    fn auto_discover_skips_when_a_pane_is_already_open() {
+    fn auto_discover_skips_when_the_engine_reports_a_discovery_worker_running() {
+        // tsk-1zq: the "one at a time" guard used to be an exact-match
+        // probe for a pane label this adapter had planted itself, which a
+        // session could silently release by renaming its own pane and a
+        // dead session could hold forever. The registry here reports NO
+        // labels at all, so the old guard would have launched — only the
+        // engine's own answer stops it now.
         let mut ui = QuitAfterOneTick { calls: Cell::new(0) };
         let mut app = App::empty();
         app.orchestrator_settings.auto_discover = true;
-        app.work_items = vec![discovery_todo_item("tsk-b")];
-        let registry = RegistryWithAutoDiscoverPaneOpen {
-            label: "fgos-auto-discover".to_string(),
-        };
+        app.work_items = vec![
+            discovery_doing_item("tsk-a"),
+            discovery_todo_item("tsk-b"),
+        ];
+        let registry = CountingRegistry { calls: Cell::new(0) };
         let pane_orchestrator = RecordingPickOrchestrator {
             picked: std::cell::RefCell::new(Vec::new()),
             discovered: std::cell::RefCell::new(Vec::new()),
@@ -1862,20 +1870,49 @@ mod tests {
         assert_eq!(
             *pane_orchestrator.auto_discovered.borrow(),
             0,
-            "an already-open auto-discover pane must not be launched again, \
-             regardless of which item is ready"
+            "a discovery worker the engine reports at `doing` must stop a \
+             second unattended launch, even with no pane label in sight"
         );
+    }
+
+    #[test]
+    fn discovery_worker_alive_reads_stage_and_status_together() {
+        // Only a claimed discovery-pool item counts. A ready-but-unclaimed
+        // one is the very thing that TRIGGERS a launch, and a claimed item
+        // at some other stage belongs to a different flow entirely.
+        assert!(discovery_worker_alive(&[discovery_doing_item("tsk-a")]));
+        assert!(!discovery_worker_alive(&[discovery_todo_item("tsk-a")]));
+        assert!(!discovery_worker_alive(&[]));
+
+        let executing = WorkItem {
+            status: "doing".into(),
+            stage: "executing".into(),
+            ..discovery_todo_item("tsk-c")
+        };
+        assert!(!discovery_worker_alive(&[executing]));
+    }
+
+    #[test]
+    fn worker_slot_room_fails_open_when_the_engine_cannot_be_asked() {
+        // `fgos slots` ships with this same feature, so it does not exist
+        // on the trunk the cockpit runs from until everything merges.
+        // Refusing on an unanswerable question would freeze every launch
+        // button in the meantime; the engine itself takes the same stance
+        // on an unconfigured ceiling.
+        assert!(worker_slot_room(None));
+        assert!(worker_slot_room(Some(&WorkerSlots { has_room: true })));
+        assert!(!worker_slot_room(Some(&WorkerSlots { has_room: false })));
     }
 
     struct AlwaysFailingPaneOrchestrator;
 
     impl PaneOrchestrator for AlwaysFailingPaneOrchestrator {
-        fn open_pick_pane(&self, _id: &str) -> io::Result<()> {
-            Ok(())
+        fn open_pick_pane(&self, _id: &str, _lane: &WorkerLaneView) -> io::Result<String> {
+            Ok("wS:pStub".into())
         }
 
-        fn open_discover_pane(&self, _id: &str) -> io::Result<()> {
-            Ok(())
+        fn open_discover_pane(&self, _id: &str, _lane: &WorkerLaneView) -> io::Result<String> {
+            Ok("wS:pStub".into())
         }
 
         fn focus_pane(&self, _pane_id: &str) -> io::Result<()> {
@@ -1894,8 +1931,8 @@ mod tests {
             Ok(())
         }
 
-        fn open_auto_discover_pane(&self) -> io::Result<()> {
-            Err(io::Error::other("simulated: fg:agents-N tabs are full"))
+        fn open_auto_discover_pane(&self, _lane: &WorkerLaneView) -> io::Result<String> {
+            Err(io::Error::other("simulated: no pane could be placed"))
         }
     }
 
@@ -1906,7 +1943,7 @@ mod tests {
     /// tick swallows whatever `Err` it gets back, never panics, and never
     /// leaks it into `app.pick_status`.
     #[test]
-    fn auto_discover_skips_without_panic_when_agent_tabs_are_at_cap() {
+    fn auto_discover_skips_without_panic_when_no_pane_can_be_placed() {
         let mut ui = QuitAfterOneTick { calls: Cell::new(0) };
         let mut app = App::empty();
         app.orchestrator_settings.auto_discover = true;
