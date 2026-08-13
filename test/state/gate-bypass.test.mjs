@@ -56,6 +56,31 @@ Still need to check this. TODO: confirm with someone.
 None
 `;
 
+const OPEN_ARTIFACT_FIXME_PAREN = `# feature — plan
+
+FIXME(alice): handle this edge case before shipping.
+
+## Outstanding questions
+
+None
+`;
+
+// The false positive this fixture exists to prove resolved: prose that
+// legitimately discusses the word "todo" — as a status literal, an enum
+// variant, or a marker-family reference — with no colon/paren following it,
+// must NOT be read as a real, unfinished TODO marker.
+const CLEAR_ARTIFACT_TODO_WORD_IN_PROSE = `# feature — plan
+
+A refused claim leaves the item at todo rather than orphaning it at doing.
+herdr-plugin's own WorkTab::Todo enum variant and the "TODO" tab label are
+unrelated to this plan. A TODO-only placeholder is never acceptable here.
+This plan discusses the TODO/FIXME marker family only as a concept.
+
+## Outstanding questions
+
+None
+`;
+
 const OPEN_ARTIFACT_REAL_QUESTION = `# feature — plan
 
 ## Outstanding questions
@@ -159,8 +184,16 @@ test('hasOpenItems: clear artifact (Outstanding questions: None) is not open', (
   assert.equal(hasOpenItems(CLEAR_ARTIFACT), false);
 });
 
-test('hasOpenItems: TODO marker anywhere flags open, even with a clean Outstanding section', () => {
+test('hasOpenItems: a real "TODO:" marker flags open, even with a clean Outstanding section', () => {
   assert.equal(hasOpenItems(OPEN_ARTIFACT_TODO), true);
+});
+
+test('hasOpenItems: a real "FIXME(name):" marker (parenthesized form) also flags open', () => {
+  assert.equal(hasOpenItems(OPEN_ARTIFACT_FIXME_PAREN), true);
+});
+
+test('hasOpenItems: prose that references "todo"/"TODO" as a status literal, enum variant, or marker-family name — never followed by a colon or paren — is NOT flagged open (false-positive regression guard)', () => {
+  assert.equal(hasOpenItems(CLEAR_ARTIFACT_TODO_WORD_IN_PROSE), false);
 });
 
 test('hasOpenItems: a real question in Outstanding questions flags open', () => {

@@ -111,16 +111,24 @@ export function isTierCovered(tier, level) {
  * D2's mechanical completeness check on a gated artifact's raw text
  * (CONTEXT.md or plan.md content). True means "not clear enough to skip the
  * gate" — the safe default. Flags on either:
- *   - a stray `TODO`/`FIXME` marker anywhere in the text, or
+ *   - a real `TODO`/`FIXME` marker — the word immediately followed
+ *     (optionally after whitespace) by `:` or `(`, the shape an actual code
+ *     marker is written in (`TODO:`, `FIXME:`, `TODO(name):`) — or
  *   - a missing `## Outstanding questions` section, or one whose body isn't
  *     exactly "None" (case-insensitive) — the convention this item's own
  *     CONTEXT.md/plan.md already follow.
  * A missing section fails closed to "has open items" rather than assuming
  * the artifact just doesn't use the convention.
+ *
+ * The colon/paren requirement exists because a bare `\b(TODO|FIXME)\b`
+ * match fires on prose that legitimately discusses fgOS's own `todo`
+ * status literal or an enum like `WorkTab::Todo`, without ever getting
+ * closer to a genuine unfinished marker. Requiring the code-marker shape
+ * resolves that class of false positive while still catching a real one.
  */
 export function hasOpenItems(artifactText) {
   const text = typeof artifactText === 'string' ? artifactText : '';
-  if (/\b(TODO|FIXME)\b/i.test(text)) return true;
+  if (/\b(TODO|FIXME)\s*[:(]/i.test(text)) return true;
 
   const match = text.match(/^##\s*Outstanding questions\s*$([\s\S]*?)(?=^##\s|$(?![\s\S]))/im);
   if (!match) return true;
