@@ -189,6 +189,22 @@ test('resolveDiscovery skip path preserves an existing real work.verify instead 
   assert.equal(view.work['item-x'].verify, 'node --test test/real-locked-item.test.mjs');
 });
 
+test('resolveDiscovery skip path treats a free-text "chưa xác định —" placeholder as fake, not real (tsk-13b: pattern match, not exact-match against the 2 known constants)', () => {
+  const storeDir = tmpStoreDir();
+  const docsRef = mkLockedContextFixture(storeDir);
+  addWork(storeDir, sampleWork({ docsRef, verify: 'chưa xác định — clarify sẽ khoá' }));
+
+  const result = resolveDiscovery(storeDir, 'item-x', {}, 'session');
+  assert.equal(result.outcome, 'clear');
+
+  const view = listWork(storeDir);
+  // A placeholder that doesn't match FALLBACK_VERIFY/RETIRED_P14_PLACEHOLDER
+  // verbatim must still be recognized as fake and replaced by the real
+  // fallback -- before tsk-13b's fix this free-text variant slipped past
+  // hasRealVerify's exact-match check and was kept as-is.
+  assert.equal(view.work['item-x'].verify, FALLBACK_VERIFY);
+});
+
 // --- resolveContentRoot end-to-end through resolveDiscovery (tsk-1ni D1) --
 
 function initTempGitRepoWithStore() {
