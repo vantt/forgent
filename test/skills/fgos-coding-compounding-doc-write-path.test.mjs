@@ -13,7 +13,9 @@ import { fileURLToPath } from 'node:url';
 // content rather than simulating an agent following it.
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const SKILL_PATH = path.resolve(__dirname, '../../.claude/skills/fgos-coding-compounding/SKILL.md');
+// tsk-1qi: reads .agents/skills, the canonical source (D5) — .claude/skills
+// is now a generated thin wrapper with no prose content of its own to check.
+const SKILL_PATH = path.resolve(__dirname, '../../.agents/skills/fgos-coding-compounding/SKILL.md');
 const skillText = fs.readFileSync(SKILL_PATH, 'utf8');
 
 function stepIndex(stepLabel) {

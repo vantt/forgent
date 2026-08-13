@@ -10,12 +10,13 @@ import { fileURLToPath } from 'node:url';
 // same commit fixed next door in fgos-coding-planning/SKILL.md. Proves the
 // assignment now lives INSIDE the same fenced block as the `fgos add`
 // call (copy-pasting just that block must actually run), not merely
-// somewhere earlier in the file — `test/skills/fgos-mirror.test.mjs`
-// already proves the two dual-root copies stay byte-identical, so this
-// only needs to check one of them.
+// somewhere earlier in the file.
+//
+// tsk-1qi: reads .agents/skills, the canonical source (D5) — .claude/skills
+// is now a generated thin wrapper with no prose content of its own to check.
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const SKILL_PATH = path.resolve(__dirname, '../../.claude/skills/fgos-coding-exploring/SKILL.md');
+const SKILL_PATH = path.resolve(__dirname, '../../.agents/skills/fgos-coding-exploring/SKILL.md');
 const skillText = fs.readFileSync(SKILL_PATH, 'utf8');
 
 function fencedBlockContaining(marker) {
