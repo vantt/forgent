@@ -38,6 +38,7 @@ import { computeEnduserDocsIndex, generateEnduserDocsIndex, manifestPathFor } fr
 import { isResolvedStatus } from '../state/frontier.mjs';
 import { getDomain, resolveDomainName, effectiveStage } from '../state/workflow-stage-graphs.mjs';
 import { readLocalStatus, classifyRegistryPosture } from '../state/tool-registry.mjs';
+import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { describeConfigAwareness } from '../config/global-config.mjs';
 import {
   sharedConfigFilePath,
@@ -237,6 +238,22 @@ export function integrationScriptPath() {
   return fs.existsSync(canonical) ? canonical : executingCopy;
 }
 
+// tsk-2ej: not a staleness detector -- `doctor` can only ever report on
+// whatever build is actually running it, so it structurally cannot tell
+// itself apart from a newer release. What this check gives is the thing
+// that friction was missing: the running build's own version/commit made
+// legible on demand, the first thing to compare when a verb comes back
+// "unknown" on some other machine, without needing to read node_modules
+// directly (blocked by this repo's own scout-block hook).
+function checkCliVersionVisible() {
+  const info = resolveCliVersionInfo();
+  if (!info.packageVersion || !Array.isArray(info.verbs) || info.verbs.length === 0) {
+    return { passed: false, message: 'fgos version did not resolve a packageVersion/verbs -- src/cli/version.mjs is broken' };
+  }
+  const commitPart = info.gitCommit ? ` (${info.gitCommit})` : ' (no git commit -- not a git checkout)';
+  return { passed: true, message: `fgos ${info.packageVersion}${commitPart} — ${info.verbs.length} verbs` };
+}
+
 function checkNodeAndGit() {
   const major = parseInt(process.version.slice(1).split('.')[0], 10);
   if (Number.isNaN(major) || major < MIN_NODE_MAJOR) {
@@ -387,6 +404,12 @@ registerCheck({
   id: 'node-version-and-git',
   description: `Node >=${MIN_NODE_MAJOR} and git available`,
   check: (cwd) => checkNodeAndGit(cwd),
+});
+
+registerCheck({
+  id: 'cli-version-visible',
+  description: 'this build\'s own package version/commit/verb-set resolve cleanly via `fgos version` (tsk-2ej)',
+  check: () => checkCliVersionVisible(),
 });
 
 registerCheck({

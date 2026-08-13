@@ -220,6 +220,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- New `fgos version` verb: reports this build's own `package.json` version,
+  git commit (when resolvable), and its full dispatched verb set — a
+  hook-safe, scriptable way to tell an old globally-installed `fgos` apart
+  from a current checkout without reading `node_modules` directly. `fgos
+  doctor` gained a matching `cli-version-visible` check that surfaces the
+  same info in its own report.
+
 - `fgos discover` accepts `--tier`, `--kind`, and `--risk` alongside
   `--verdict clear`, so an interactive session can record the classification
   it just judged in the same call that resolves discovery, instead of

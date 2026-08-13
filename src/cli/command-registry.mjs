@@ -49,6 +49,18 @@ export const MANIFEST_SCHEMA_VERSION = '2.0';
 
 export const COMMAND_REGISTRY = [
   {
+    name: 'version',
+    invoke: 'fgos version',
+    description: 'Report this build\'s own package version, git commit (when resolvable), and the full verb set it dispatches -- the hook-safe, scriptable way to tell an old install apart from a current checkout without reading node_modules directly (tsk-2ej). Works with no .fgos/ store present.',
+    parameters: { type: 'object', properties: {}, required: [] },
+    examples: ['fgos version'],
+    touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
     name: 'init',
     invoke: 'fgos init',
     description: 'Initialize the .fgos/ store in the current directory (event log, empty view, coexistence manifest).',

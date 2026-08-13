@@ -62,6 +62,7 @@
     "src/intake/plan.mjs": "use-case",
     "src/intake/verify-pattern-check.mjs": "kernel",
     "src/cli/command-registry.mjs": "kernel",
+    "src/cli/version.mjs": "kernel",
     "src/cli/invocation-fault-log.mjs": "infra",
     "src/cli/approve-fault-log.mjs": "infra",
     "src/report/entropy.mjs": "domain",
