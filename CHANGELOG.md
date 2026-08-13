@@ -32,6 +32,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `README.md`'s `## Install` now recommends installing a tagged release
+  (`npm install -g github:vantt/forgent#vX.Y.Z`) instead of always
+  resolving to whatever commit is currently on `main` — the bare `main`
+  command is kept as a documented bleeding-edge option. New how-to:
+  `docs/how-to/cut-a-fgos-release-tag.md`, the manual (repo-owner-judgment)
+  procedure for cutting a release.
 - `fgos submit --backlog` creates an item directly at the `backlog` status —
   an idea not yet committed to — instead of the default `todo`, so marking
   something as not-yet-ready no longer means submitting it and then moving

@@ -10,6 +10,19 @@ Forgent (fgOS) is the platform layer for building and running agent applications
 
 ## Install
 
+Recommended — install a specific tagged release, so a broken commit on
+`main` never breaks your install:
+
+```bash
+npm install -g github:vantt/forgent#v0.1.0
+```
+
+Replace `v0.1.0` with the [latest release tag](https://github.com/vantt/forgent/tags).
+See `docs/how-to/cut-a-fgos-release-tag.md` for how tags get cut.
+
+Bleeding-edge (always resolves to whatever commit is currently on `main`,
+useful for contributors/early-adopters who want it):
+
 ```bash
 npm install -g github:vantt/forgent
 ```
