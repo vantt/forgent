@@ -78,42 +78,54 @@ run clean, retry clean, whole-suite ~3.4x slower), and (c) the arithmetic
 case in RESEARCH.md finding 5 for why per-acquisition time (not queue
 depth) is the plausible mechanism at N=8.
 
-## Shape
+## Shape (revised during Implement — see Approach addendum below)
 
-One piece, pass-through (no split). File touched:
-`test/state/porting-store.test.mjs`.
+**Superseded by a better-evidenced mechanism found while implementing.**
+`raceAcrossProcesses` (both `store.test.mjs` and this file) already
+carries an optional `batchSize` parameter (default `nProcesses`), added
+today by a contemporaneous sibling investigation
+(`docs/history/tsk-4fx-concurrency-test-lock-timeout-flake/RESEARCH.md`)
+for the exact same underlying mechanism — too many processes contending
+for the shared `events.lock` at the same simultaneous instant — and
+already **applied and battle-tested** on both files' own
+"...on DIFFERENT ids" tests (`store.test.mjs:710`,
+`porting-store.test.mjs:284`, both `batchSize: 4`). Reusing this instead
+of the originally-planned bespoke lock-timeout-retry wrapper is strictly
+simpler (a one-argument addition to two existing call sites, zero new
+code), and keeps one established mechanism for this whole flake class
+instead of two divergent ones.
 
-```js
-// New helper, near raceAcrossProcesses:
-async function raceAcrossProcessesTolerantOfLockTimeout(makeDir, storeCall, nProcesses, maxAttempts = 3) {
-  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
-    const dir = makeDir();
-    const results = await raceAcrossProcesses(dir, storeCall, nProcesses);
-    const sawLockTimeout = results.some((r) => !r.ok && r.category === 'lock-timeout');
-    if (!sawLockTimeout || attempt === maxAttempts) return { dir, results };
-  }
-}
-```
+**Why batching is still safe for THESE two "SAME id" tests specifically**
+(the point the original plan's own concern about weakening the stampede
+was raised against): the assertion these tests make — exactly one
+success across all N processes, every other one seeing "already exists"
+(`addPorting`) or a CAS conflict (`movePorting`) — holds regardless of
+whether all N race in one simultaneous wave or in smaller sequential
+batches. Within EACH batch, `batchSize >= 2` processes still race
+genuinely simultaneously (the real read-check-append window `tsk-1jp`'s
+fix guards stays fully exercised); a later batch's processes simply find
+the id already claimed by an earlier batch's winner, which is exactly
+the same "loses the race" outcome the test already expects and asserts
+for every non-winner today. `batchSize: 4` (two batches of 4, mirroring
+the sibling tests' own chosen value) is applied to both race tests in
+this file.
 
-Both race tests call this instead of `raceAcrossProcesses` directly,
-passing a `() => tmpDir()`-shaped factory (each retry needs its own fresh
-temp dir/store) and asserting against the returned `results` exactly as
-today. `maxAttempts = 3` mirrors tsk-3wn's own "three consecutive clean
-runs" proof-of-determinism scale, applied here as a retry ceiling rather
-than a manual verification loop.
+Files touched: `test/state/porting-store.test.mjs` only (two call-site
+edits, no new function).
 
 ### Cases this needs to hold for
 
-- No `'lock-timeout'` in the results (the common case) — behaves
-  byte-identical to today, first attempt only.
-- A `'lock-timeout'` on attempt 1, clean on attempt 2 — test passes,
-  using attempt 2's results.
-- `'lock-timeout'` on every attempt up to `maxAttempts` — test fails with
-  the last attempt's own results, same assertion messages as today (never
-  silently swallowed).
-- A genuine regression (e.g. two successes, or a loser with an
-  unexpected non-lock-timeout category) — fails on attempt 1, no retry
-  triggered, identical failure surface to today.
+- Exactly one success across all 8 processes, regardless of which batch
+  it lands in — unaffected by batching (see reasoning above).
+- Every other process still reports the correct expected-loser category
+  (`'validation'` for `addPorting`, `'conflict'` for `movePorting`) —
+  unaffected; a later-batch loser sees the SAME "already exists"/CAS
+  state a same-batch loser would.
+- Peak simultaneous lock contention drops from 8 to 4, reducing (without
+  eliminating — batching narrows the window, it does not prove a defect
+  can never resurface, matching how the sibling fix itself is described)
+  the odds of exceeding `EVENTS_LOCK_TIMEOUT_MS` under heavy machine
+  load.
 
 ## Verify
 

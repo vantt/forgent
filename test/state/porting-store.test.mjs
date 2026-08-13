@@ -210,6 +210,12 @@ test('addPorting under concurrent OS processes racing the SAME id: exactly one s
     dir,
     `addPorting(dir, { id: 'race-add', title: 'Race Add' });`,
     N,
+    null,
+    4, // tsk-597: batch to reduce peak events.lock contention under load —
+    // same mechanism as the "on DIFFERENT ids" test below and its
+    // store.test.mjs sibling (tsk-4fx); still a genuine simultaneous
+    // race within each batch of 4, so the "exactly one winner" assertion
+    // below is unaffected — see raceAcrossProcesses' own comment.
   );
 
   const succeeded = results.filter((r) => r.ok);
@@ -236,6 +242,8 @@ test('movePorting under concurrent OS processes racing the SAME expectedStatus C
     dir,
     `movePorting(dir, { id: 'race-move', to: 'ported', expectedStatus: 'in-progress' });`,
     N,
+    null,
+    4, // tsk-597: batch to reduce peak events.lock contention under load — see the addPorting race test above for the same reasoning.
   );
 
   const succeeded = results.filter((r) => r.ok);
