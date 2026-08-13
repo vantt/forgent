@@ -33,7 +33,7 @@ function readRawPortingEvents(dir) {
 // `storeCall` as `process.argv[4]`, so a race test can give each child a
 // DISTINCT id instead of racing the same one.
 //
-// `batchSize` (tsk-4fx, optional, defaults to `nProcesses` — every existing
+// `batchSize` (optional, defaults to `nProcesses` — every existing
 // call site below is byte-for-byte unaffected unless it opts in): mirrors
 // store.test.mjs's own raceAcrossProcesses extension — caps how many child
 // processes are synchronized to the SAME start instant at once, reducing
@@ -281,7 +281,7 @@ for (const id of ids) {
 }`,
     N_PROC,
     idLists.map((ids) => ids.join(',')),
-    4, // tsk-4fx: batch to reduce peak events.lock contention under load — see raceAcrossProcesses' own comment
+    4, // batch to reduce peak events.lock contention under load — see raceAcrossProcesses' own comment
   );
 
   assert.deepEqual(results, Array(N_PROC).fill({ ok: true }), 'every concurrent movePorting loop on distinct ids must succeed (no CAS conflict expected across different ids)');
