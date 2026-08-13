@@ -158,13 +158,16 @@ test('resolvePlan is a no-op on an item already past stage decompose (idempotent
   assert.equal(listWork(storeDir).work['item-x'].stage, 'executing');
 });
 
-test('resolvePlan completes an interrupted decompose (children exist, root still at decompose stage) without regenerating children', () => {
+test('resolvePlan completes an interrupted decompose (children exist, a decompose decision was already logged, root still at decompose stage) without regenerating children', () => {
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork());
-  // Simulates the crash window: a child already exists with parent==root,
-  // but the root itself is still at stage `decompose` (its own
-  // moveStage never landed before the crash). No verdict is ever consulted
-  // on this path -- the hasChildren check short-circuits ahead of it.
+  // Simulates the crash window: the addWork loop already wrote the child
+  // and logDecomposeVerdict already logged the 'decompose' completion
+  // decision (plan.mjs's own ordering: decision BEFORE moveStage), but the
+  // root's own moveStage never landed before the crash (tsk-4n8: this is
+  // the real signal resolvePlan now keys its re-entrancy check on, not
+  // bare child existence -- see the "stray child" test below for the case
+  // this file used to conflate with this one).
   addWork(storeDir, {
     id: 'orphan-child-abc',
     title: 'Build parser',
@@ -176,6 +179,13 @@ test('resolvePlan completes an interrupted decompose (children exist, root still
     verify: 'npm test -- parser',
     stage: 'executing',
     parent: 'item-x',
+  });
+  addDecision(storeDir, {
+    id: 'item-x',
+    text: 'decompose verdict: decompose (1 children)',
+    source: 'resolvePlan',
+    kind: 'engine',
+    rationale: 'test fixture: simulates the crash window between addWork and moveStage',
   });
 
   const result = resolvePlan(storeDir, 'item-x', cfg, 'runner');
@@ -203,10 +213,96 @@ test('resolvePlan on the already-decomposed re-entrant path also releases a held
     stage: 'executing',
     parent: 'item-x',
   });
+  addDecision(storeDir, {
+    id: 'item-x',
+    text: 'decompose verdict: decompose (1 children)',
+    source: 'resolvePlan',
+    kind: 'engine',
+    rationale: 'test fixture: simulates the crash window between addWork and moveStage',
+  });
 
   const result = resolvePlan(storeDir, 'item-x', cfg, 'session');
   assert.equal(result.outcome, 'already-decomposed');
   assert.equal(listWork(storeDir).work['item-x'].status, 'todo');
+});
+
+// --- tsk-4n8: the bug this item exists to fix -- a stray child (no
+// decompose decision logged for it: a prior partial/superseded --children
+// submission, or a human's manual `fgos add --parent` workaround) must
+// NOT be mistaken for a completed decompose. A later decompose call must
+// still be able to run, reconciling by title against what already exists
+// instead of permanently refusing. ---
+
+test('resolvePlan does not treat a stray child (no decompose decision logged) as already-decomposed -- it can still add the missing children', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+  // A stray child: exists, but no 'decompose verdict: decompose' decision
+  // was ever logged for item-x (e.g. a human's manual `fgos add --parent`
+  // recovery step, or an unrelated write) -- this must not block a real
+  // decompose call from running.
+  addWork(storeDir, {
+    id: 'item-x-1',
+    title: 'Build parser',
+    kind: 'feature',
+    status: 'todo',
+    deps: [],
+    risk: 'standard',
+    refs: [],
+    verify: 'npm test -- parser',
+    stage: 'executing',
+    parent: 'item-x',
+  });
+
+  const result = resolvePlan(storeDir, 'item-x', cfg, 'session', {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [
+      { title: 'Build parser', verify: 'npm test -- parser', action: 'reuse the existing sibling', deps: [] },
+      { title: 'Build renderer', verify: 'npm test -- renderer', action: 'the second half of the split', deps: [] },
+    ],
+  });
+
+  assert.equal(result.outcome, 'decompose');
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'executing');
+  const children = Object.values(view.work).filter((item) => item.parent === 'item-x');
+  assert.equal(children.length, 2, 'the existing stray child is reused, one new child is added');
+  assert.ok(view.work['item-x-1'], 'the existing sibling id is reused, not recreated');
+  assert.equal(view.work['item-x-1'].title, 'Build parser');
+  const newChild = children.find((c) => c.title === 'Build renderer');
+  assert.ok(newChild, 'the missing child was created');
+  assert.equal(newChild.id, 'item-x-2', 'the new id continues past the existing sibling suffix, no collision');
+});
+
+test('resolvePlan still parks need-human when a NEW child\'s footprint collides with an EXISTING sibling\'s real footprint', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+  addWork(storeDir, {
+    id: 'item-x-1',
+    title: 'Build parser',
+    kind: 'feature',
+    status: 'todo',
+    deps: [],
+    risk: 'standard',
+    refs: [],
+    verify: 'npm test -- parser',
+    footprint: ['src/shared.mjs'],
+    stage: 'executing',
+    parent: 'item-x',
+  });
+
+  const result = resolvePlan(storeDir, 'item-x', cfg, 'session', {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [
+      { title: 'Build parser', verify: 'npm test -- parser', action: 'reuse the existing sibling', deps: [], footprint: ['src/shared.mjs'] },
+      { title: 'Build renderer', verify: 'npm test -- renderer', action: 'the second half of the split', deps: [], footprint: ['src/shared.mjs'] },
+    ],
+  });
+
+  assert.equal(result.outcome, 'need-human');
+  const children = Object.values(listWork(storeDir).work).filter((item) => item.parent === 'item-x');
+  assert.equal(children.length, 1, 'the new colliding child was never written');
 });
 
 // --- resolveCallerPlanVerdict (tsk-27y D1/D2): pure normalization

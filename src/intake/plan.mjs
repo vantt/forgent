@@ -521,13 +521,22 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
     return { outcome: 'noop', id };
   }
 
-  // RE-ENTRANCY (validating feasibility matrix, REPAIRED): a crash between
-  // writing children and moving the root to executing must not regenerate
-  // children on retry — child ids are positional (`${work.id}-<n>`), so a
-  // blind retry would hit addWork's "already exists" validation error.
-  // Detect prior children via the view instead, and only finish the root's
-  // own stage-move.
-  const hasChildren = Object.values(view.work).some((item) => item.parent === id);
+  // RE-ENTRANCY (validating feasibility matrix, REPAIRED; tsk-4n8 narrowed
+  // the signal): a crash between writing children and moving the root to
+  // executing must not regenerate children on retry. The signal for "this
+  // call's own addWork loop already finished" is a durable
+  // decompose-completion decision (`logDecomposeVerdict`'s own 'decompose'
+  // entry below, written BEFORE moveStage) — never bare child existence
+  // (tsk-4n8): a stray child (a prior partial/superseded --children
+  // submission, or a human's manual `fgos add --parent`) must not be
+  // mistaken for a completed decompose and permanently block every later
+  // decompose attempt with no supported way to add the still-missing
+  // children — the exact failure mode tsk-4n8 was filed to fix. Same
+  // `view.decisionsById?.[id] ?? []` read pattern this file already uses
+  // for `priorityOverridden` below.
+  const priorDecomposeCompleted = (view.decisionsById?.[id] ?? []).some(
+    (d) => d.source === 'resolvePlan' && typeof d.text === 'string' && d.text.startsWith('decompose verdict: decompose'),
+  );
   // Real verify (tsk-19j D1/D11, closes gap 2): `gates[id].planApprove.verify`
   // was the real command `fgos-coding-planning`'s now-retired `planApprove`
   // gate recorded (coding-planning-validating-gate-redesign D9-D11 removed
@@ -578,7 +587,7 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
     }
   }
 
-  if (hasChildren) {
+  if (priorDecomposeCompleted) {
     moveStage(dir, { id, to: stageForStep(domain, 'Execute'), expectedStage: currentStage, verify: planApproveVerify, role });
     releaseClaimOnExecuting();
     return { outcome: 'already-decomposed', id };
@@ -830,20 +839,53 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
   // grandchild falls out for free: when a child is itself later decomposed,
   // its own `work.id` (already `<root>-<m>`) becomes the base, producing
   // `<root>-<m>-<n>` with no special-case code.
-  const childIds = verdict.children.map((child, index) => `${work.id}-${index + 1}`);
+  //
+  // tsk-4n8: reconciled against any already-existing siblings first — a
+  // verdict child whose title exactly matches an existing `parent === id`
+  // item reuses that item's own real id (never re-`addWork`s it, which
+  // would throw "already exists") instead of assuming a blank slate; a
+  // verdict child with no match gets a fresh id, continuing the positional
+  // sequence PAST the highest existing sibling suffix so it can never
+  // collide with an id already taken. This is what lets a resubmission add
+  // the still-missing children of a partially-materialized decompose
+  // (priorDecomposeCompleted false, but some children already exist)
+  // instead of every id recomputing from `-1` and colliding.
+  const existingChildren = Object.values(view.work).filter((item) => item.parent === id);
+  let nextNewSuffix =
+    existingChildren.reduce((max, child) => {
+      const suffix = Number(/-(\d+)$/.exec(child.id)?.[1]);
+      return Number.isFinite(suffix) ? Math.max(max, suffix) : max;
+    }, 0) + 1;
+  const childReconciliation = verdict.children.map((child) => {
+    const normalizedTitle = child.title.trim().toLowerCase();
+    const existing = existingChildren.find((item) => item.title.trim().toLowerCase() === normalizedTitle);
+    if (existing) return { child, id: existing.id, alreadyMaterialized: true };
+    const newId = `${work.id}-${nextNewSuffix}`;
+    nextNewSuffix += 1;
+    return { child, id: newId, alreadyMaterialized: false };
+  });
+  const childIds = childReconciliation.map((entry) => entry.id);
 
-  // tsk-5e97 D1: check declared footprint overlap among the TENTATIVE
-  // children (real ids, no work-item records yet) before any of them is
-  // written -- footprintOverlapAmong already exists for exactly this
-  // pairwise-candidate shape (merge-standardization D4-revised). No
-  // bypass-detection constant here (unlike keywordRiskGate/
-  // blastRadiusGate below): those gate on a static property of the root
-  // item that never changes call to call, so without a bypass a human's
-  // `fgos answer` would re-park on the identical reason forever. This
-  // check is re-derived from the FRESH verdict every call -- once a
-  // human's answer leads the next call to propose non-overlapping
+  // tsk-5e97 D1 (tsk-4n8 widened): check declared footprint overlap over
+  // BOTH the tentative new children AND any already-materialized siblings'
+  // own real, stored footprint -- footprintOverlapAmong already exists for
+  // exactly this pairwise-candidate shape (merge-standardization
+  // D4-revised). Widening past `verdict.children` alone matters here: a
+  // resubmission that omits an already-materialized child's own spec (it
+  // only lists the still-missing ones) must still have its NEW children's
+  // footprints checked against that existing sibling's real footprint, not
+  // only against each other. No bypass-detection constant here (unlike
+  // keywordRiskGate/blastRadiusGate below): those gate on a static
+  // property of the root item that never changes call to call, so without
+  // a bypass a human's `fgos answer` would re-park on the identical reason
+  // forever. This check is re-derived from the FRESH verdict every call --
+  // once a human's answer leads the next call to propose non-overlapping
   // children, it passes on its own.
-  const footprintCandidates = verdict.children.map((child, index) => ({ id: childIds[index], footprint: child.footprint }));
+  const footprintCandidates = childReconciliation.map((entry) =>
+    entry.alreadyMaterialized
+      ? { id: entry.id, footprint: view.work[entry.id]?.footprint }
+      : { id: entry.id, footprint: entry.child.footprint },
+  );
   const footprintConflicts = footprintOverlapAmong(footprintCandidates);
   if (footprintConflicts.length > 0) {
     const reason = formatFootprintOverlapReason(footprintConflicts);
@@ -883,9 +925,12 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
     // this advisory must never abort the decompose write below.
   }
 
-  verdict.children.forEach((child, index) => {
+  childReconciliation.forEach(({ child, id: childId, alreadyMaterialized }) => {
+    // tsk-4n8: already reconciled to a real existing sibling above --
+    // never re-addWork it (would throw "already exists").
+    if (alreadyMaterialized) return;
     addWork(dir, {
-      id: childIds[index],
+      id: childId,
       title: child.title,
       kind: child.kind ?? work.kind,
       status: 'todo',
