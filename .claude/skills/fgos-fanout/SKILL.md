@@ -154,6 +154,34 @@ own judgment.
   floor or dispatching an Agent; pass it as a discrete argument/prompt
   value.
 
+## Known hazard: concurrent worktree-entering dispatch is unsafe at the harness level
+
+The Loop below fires a batch of Agents in a single message, each running
+`/fgOS:pick <id>` — which stands up and enters its own worktree
+(`EnterWorktree`) as part of its own claim step. Two independent, real
+incidents on 2026-08-13 (`docs/history/tsk-1y0`, `docs/history/tsk-2k0`)
+found that this harness's own worktree-isolation state is held at
+**session** level, not per-agent: concurrent `EnterWorktree` calls from
+sibling dispatched Agents clobber the same shared flag, so Edit/Write
+calls get refused pointing at a sibling's worktree, and the coordinating
+session's own cwd can drift into a sibling's worktree mid-run. Under
+enough concurrent contention this has produced a full deadlock (~40
+minutes). A second data point (tsk-2k0) found the Agent tool's own
+`isolation:"worktree"` parameter is not a fix either — it hard-pins a
+dispatched Agent to a fresh throwaway worktree and cannot re-enter an
+*existing* worktree `/fgOS:pick` already stood up, which is incompatible
+with this skill's own resume-in-place loop.
+
+**This is not fgOS code, and fgOS cannot patch it.** No isolation
+strategy tried so far (none, or `isolation:"worktree"`) has been found
+safe for concurrent worktree-entering dispatch at this skill's designed
+batch width. Firing a batch under the Loop below carries this risk until
+the harness itself changes or a real per-agent isolation mechanism is
+found — `tsk-1y0` (still open) is where that direction gets decided; this
+skill does not lower its own batch size as a mitigation on its own
+authority (see `tsk-1y0`'s own note for why a lower cap only reduces
+probability, it does not remove the hazard).
+
 ## Loop
 
 ```text
