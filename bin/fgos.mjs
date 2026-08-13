@@ -1958,7 +1958,24 @@ async function runVerb(verb, flags, positional, dir) {
 
     case 'gate-approve': {
       const id = requireField(positional[0] ?? flags.id, 'gate-approve requires an id: fgos gate-approve <id> --gate <name> --actor <human|bypass> --verify "..."');
-      const gate = requireField(flags.gate, 'gate-approve requires --gate <contextApprove|planApprove|validateApprove>');
+      const gate = requireField(flags.gate, 'gate-approve requires --gate <contextApprove|validateApprove>');
+      // "planApprove" retired (coding-planning-validating-gate-redesign
+      // D9-D11): fgos-coding-planning no longer owns a gate, so no live
+      // skill writes this value. recordGateApprove/GATE_APPROVE_GATES
+      // (src/state/store.mjs) deliberately still ACCEPT it at the storage
+      // layer -- test/intake/plan.test.mjs uses recordGateApprove as a
+      // fixture helper to simulate pre-redesign items that already carry
+      // a historical planApprove record, and replay.mjs's own fold is
+      // unconditionally generic (no gate-name check at all), so neither
+      // needs or wants this restriction. This CLI verb is the actual
+      // user-facing surface a confused live session would hit, so the
+      // refusal belongs here, not in the storage layer (tsk-4vz).
+      if (gate === 'planApprove') {
+        throw new StoreError(
+          'validation',
+          'gate-approve: "planApprove" is retired (coding-planning-validating-gate-redesign D9-D11) -- fgos-coding-planning no longer owns a gate. Use "validateApprove" for the single merged gate (fgos-coding-validating), or "contextApprove" for fgos-coding-exploring\'s gate. Records already carrying a historical "planApprove" value still replay correctly; this only blocks creating a NEW one.',
+        );
+      }
       const actor = requireField(flags.actor, 'gate-approve requires --actor <human|bypass>');
       const verify = requireField(flags.verify, 'gate-approve requires --verify "..."');
       const { event } = recordGateApprove(dir, { id, gate, actor, verify });
