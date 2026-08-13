@@ -2,12 +2,12 @@
 
 ## 1. Trạng thái hiện tại
 
-Round 5. D1 (2 trục độc lập bin/skill), D2 (bin resolution = 3 tầng
-deterministic, project-local giữ vì version-pinning), và D3 (mở rộng cơ
-chế shell-integration cho human — cả nội dung script lẫn logic wiring có
-lỗ hổng fail-open riêng, cùng pattern root cause #2) đã khoá — xem §6.
-Còn mở: cơ chế cụ thể cho tier 3 global (probe vs cache) và hướng sửa
-root cause #2 gốc (marketplace check).
+Round 6. D1-D4 đã khoá — D1 (2 trục độc lập), D2 (bin = 3 tầng
+deterministic), D3 (mở rộng shell-integration cho human + tự lỗ hổng
+fail-open riêng), D4 (tier 3 global = config-cache làm nguồn sự thật,
+probe làm cơ chế populate/repair, tự lành qua existsSync-staleness). Còn
+đúng 1 câu hỏi mở: hướng sửa root cause #2 gốc (marketplace check
+fail-open) — WARN thẳng hay tự phân biệt case trước.
 
 ## 2. Mục tiêu & đề bài
 
@@ -35,7 +35,7 @@ config/check của riêng nó) — không phải một bản vá cục bộ cho 
 | 2 | Root cause #2 (plugin/marketplace fail-open) đã xác nhận bằng đọc code | Rõ | `checkClaudePluginMarketplace` (`src/setup/registrations.mjs:1118-1124`) trả `passed: true` khi lệnh `claude` không có trên PATH tại thời điểm check chạy — coi là "not applicable" thay vì "chưa verify được". Fix tương ứng (`claude plugin marketplace add`/`install`, dòng ~1160-1172) vì vậy không bao giờ chạy trong tình huống này. Không có cơ chế nào tự động chạy lại doctor/setup sau đó. |
 | 3 | `claude` binary có thực sự đáng tin là "thước đo Claude Code có mặt hay không" không? | Chưa rõ | Người dùng có thể dùng Claude Code qua desktop app/IDE extension mà không có binary `claude` riêng trên PATH — lúc đó check #2 "not applicable" lại ĐÚNG theo nghĩa khác (Claude Code không dùng CLI marketplace mechanism theo cách này). Cần phân biệt "claude thật sự không áp dụng" khỏi "claude có áp dụng nhưng tạm thời không thấy trên PATH lúc check chạy" — 2 case khác nhau, hiện bị gộp làm một. |
 | 4 | Vì sao project-local cần tồn tại riêng, không gộp về global-only? | Rõ (D2) | Version-pinning/team-consistency: global-only nghĩa là mọi project trên máy dùng chung 1 version, nâng cấp cho project này làm vỡ project khác im lặng — cùng lớp vấn đề `tsk-jtb` đang giải ở tầng release tag. `node_modules/.bin` không nằm trên PATH thường (chỉ có qua `npm run`/`npx`) nên phải resolve bằng file-check, không phải PATH lookup. |
-| 5 | Hướng sửa root cause #1 (giờ chỉ còn tầng global): probe nhiều tầng hay cache path đã resolve? | Chưa rõ | 2 hướng không loại trừ nhau — đề xuất trước: cache làm nguồn sự thật, probe làm cơ chế populate. Cần người quyết định. |
+| 5 | Hướng sửa root cause #1 (tầng global): probe nhiều tầng hay cache path đã resolve? | Rõ (D4) | Cache-in-config làm nguồn sự thật (đọc rẻ, không subprocess), probe nhiều tầng chỉ chạy 1 lần trong `fgos setup`/`doctor --fix` để populate/sửa, tự lành qua `existsSync`-staleness check khi cache sai. |
 | 6 | Hướng sửa root cause #2: check nên fail loud hay tìm cách tự phân biệt "claude không áp dụng" khỏi "claude tạm thời không thấy"? | Chưa rõ | Cùng cần quyết định trước khi khoá D-ID. |
 | 7 | Root cause #3 (mới phát hiện, D3): cơ chế human-convenience (shell function) tự wiring qua `fgos setup` có lỗ hổng fail-open riêng | Rõ | `integrationScriptPath()` (`src/setup/registrations.mjs:228-239`) trả `null` khi bản đang chạy không nằm trong git checkout nào; `checkShellIntegrationSourced` (dòng 276-280) coi `null` là `passed: true` — cùng pattern silent-pass với root cause #2. Global install qua nvm tình cờ vẫn ổn (`~/.nvm` tự nó là git clone), nhưng Homebrew/system-npm/Volta/fnm thì không wire được gì, doctor vẫn báo xanh. Yêu cầu "phải trong git checkout" vốn chỉ để tránh rác 1-dòng-source-mỗi-worktree — rủi ro đó không áp dụng cho bản cài qua npm. |
 
@@ -46,6 +46,7 @@ config/check của riêng nó) — không phải một bản vá cục bộ cho 
 | D1 | Cài đặt fgOS có **2 trục độc lập, không bắc cầu tự động**: (a) trục bin — npm/pnpm/yarn global, project-local, hoặc dev-checkout self-hosting; (b) trục skill — forgentX tự-host (`.claude/skills/fgos-*`) hoặc Claude Code plugin marketplace (`plugins/fgOS/skills/*`). Cầu nối DUY NHẤT giữa 2 trục là `fgos setup`/`doctor --fix`. | Xác nhận bằng đọc `package.json` `files` allowlist (không có `plugins/`), `plugins/fgOS/.claude-plugin/plugin.json` (không có `scripts`/postinstall, đúng RUL6), và `.claude-plugin/marketplace.json` (skill của project ngoài chỉ tới được qua plugin marketplace). Nền tảng bắt buộc trước khi thiết kế bin-discovery — vì 1 project hoàn toàn có thể chỉ thoả 1 trục. |
 | D2 | Trục A (bin) resolve theo **3 tầng deterministic**, không phải nhóm "PATH-dependent vs không" mơ hồ như trước: (1) dev-checkout self-hosting — file-check `<git-root>/bin/fgos.mjs`; (2) project-local install — file-check `node_modules/.bin/fgos`, đi ngược cây thư mục từ cwd (giống Node module resolution); (3) global install — tầng DUY NHẤT thật sự cần PATH lookup hoặc config-cache. **Project-local giữ lại là chế độ riêng, không gộp về global-only.** | Global-only làm mọi project trên máy dùng chung 1 version — nâng cấp cho project A làm vỡ project B im lặng, cùng lớp vấn đề `tsk-jtb` đang giải ở tầng release tag; project-local (qua `package.json`+lockfile) pin version theo từng project/team, đúng pattern chuẩn CLI npm (eslint/prettier). `node_modules/.bin` xác nhận không nằm trên PATH ngoài context `npm run`/`npx` nên phải resolve bằng file-check, không phải PATH — thu hẹp câu hỏi probe-vs-cache trước đó xuống chỉ còn tầng global. |
 | D3 | Mở rộng cơ chế "human gõ `fgos` trần, hệ thống tự resolve" theo 2 phần: (a) nội dung `scripts/fgos-shell-integration.sh` cài đủ 3 tầng của D2 (thêm tier 2 — hiện chỉ có tier 1 → PATH fallback); (b) `integrationScriptPath()`/`checkShellIntegrationSourced` (`src/setup/registrations.mjs`) BỎ yêu cầu "phải nằm trong git checkout" đối với bản cài qua npm (global/project-local) — chỉ giữ yêu cầu đó cho dev-checkout self-hosting, nơi rủi ro rác-1-dòng-mỗi-worktree là thật; bản cài npm dùng thẳng path ổn định từ `import.meta.url`. | `checkShellIntegrationSourced` trả `passed: true` khi `integrationScriptPath()` là `null` — cùng pattern fail-open với root cause #2 (`src/setup/registrations.mjs:228-239,270-281`; `src/runner/paths.mjs:72-85`). Global install qua nvm tình cờ vẫn wire được (`~/.nvm` tự nó là git clone), nhưng Homebrew/system-npm/Volta/fnm thì không — doctor vẫn báo xanh. Yêu cầu git-checkout chỉ cần thiết để tránh rác rc-line khi xoá worktree (dev-checkout only), không áp dụng cho bản cài npm vốn đã có path ổn định sẵn. |
+| D4 | Tầng 3 (global) trong D2 dùng **config-cache làm nguồn sự thật**: `fgos setup`/`doctor --fix` chạy probe nhiều tầng (PATH thường → ép login-shell `command -v` → probe trực tiếp vị trí global-install đã biết, không qua PATH) đúng 1 lần, ghi absolute path vào `~/.fgos/config.json`. Mọi lần gọi khác đọc cache trước (rẻ, không subprocess); cache sai/thiếu (`existsSync` fail) mới trigger probe lại + ghi đè — tự lành, không trả phí probe mỗi lần gọi. | Probe-mỗi-lần tốn 2-3 subprocess/lần gọi — đắt khi 1 phiên gọi `fgos` nhiều lần. Cache-read là 1 lần đọc file rẻ. Staleness tự sửa qua `existsSync`, chỉ trả phí probe đầy đủ đúng lúc cache thật sự sai (gỡ cài/đổi package manager/đổi version nvm). Khớp pattern act-then-report đã có sẵn của `fgos setup`/`doctor --fix` (RUL10), không phát minh cơ chế mới. |
 
 ## 5. Q&A log
 
@@ -87,6 +88,12 @@ config/check của riêng nó) — không phải một bản vá cục bộ cho 
   cause #2, chặn mất cơ chế convenience này cho global install không qua
   nvm. Anh yêu cầu gộp phát hiện này vào D3 luôn — đã ghi D3, cập nhật
   §3/§4/§6.
+- **2026-08-13, vòng 6** — Anh yêu cầu "advise 1" — em khuyến nghị thẳng
+  cho câu hỏi tier-3 (§3 #5 cũ): config-cache làm nguồn sự thật, probe
+  nhiều tầng chỉ làm cơ chế populate 1 lần trong `fgos setup`/`doctor
+  --fix`, tự lành qua `existsSync`-staleness. Lý do: chi phí subprocess
+  nếu probe mỗi lần gọi, cache-read rẻ hơn nhiều bậc, khớp pattern
+  act-then-report đã có sẵn. Anh đồng ý — đã ghi D4, cập nhật §3/§4/§6.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -121,7 +128,7 @@ flowchart TB
         direction TB
         A1["Tầng 1: dev-checkout self-hosting<br/>file-check &lt;git-root&gt;/bin/fgos.mjs<br/>-- deterministic, không PATH"]
         A2["Tầng 2: project-local install<br/>file-check node_modules/.bin/fgos<br/>đi ngược cây thư mục từ cwd<br/>-- deterministic, không PATH<br/>-- lý do: version-pin theo project/team"]
-        A3["Tầng 3: global install<br/>PATH lookup / config-cache<br/>-- tầng DUY NHẤT cần bàn root cause #1"]
+        A3["Tầng 3: global install<br/>config-cache (~/.fgos/config.json) là<br/>nguồn sự thật (D4); probe nhiều tầng<br/>chỉ populate 1 lần trong setup/doctor --fix"]
     end
 
     subgraph SkillAxis["Trục B — skill /fgOS:* (Claude Code plugin)"]
@@ -148,9 +155,16 @@ flowchart TB
 Kết luận thiết kế tới thời điểm này: bất kỳ hướng sửa bin-discovery nào
 cũng phải đứng trên nền D1+D2 — tầng 1-2 giữ nguyên file-check hiện có
 (đã đúng, không cần sửa), toàn bộ nỗ lực root cause #1 chỉ tập trung vào
-tầng 3 (global). Chưa chốt cơ chế cụ thể cho tầng 3 (probe nhiều tầng vs
-cache-in-config) hay cho root cause #2 gốc (WARN vs phân biệt case) — hai
-câu hỏi này vẫn mở, chờ vòng tiếp theo.
+tầng 3 (global). **Tầng 3 đã chốt (D4): config-cache làm nguồn sự thật.**
+Còn mở duy nhất: hướng sửa root cause #2 gốc (WARN thẳng vs phân biệt
+case "claude không áp dụng" khỏi "claude tạm thời không thấy").
+
+**Tầng 3 cụ thể (D4):** `fgos setup`/`doctor --fix` chạy multi-tier probe
+đúng 1 lần (PATH thường → ép login-shell `command -v` → probe trực tiếp
+vị trí global-install đã biết), ghi absolute path vào
+`~/.fgos/config.json`. Mọi caller khác — cả JS-side (agent/skill/CI) lẫn
+shell function (D3, khi tier 1-2 đều miss) — đọc cache trước, chỉ probe
+lại khi `existsSync` phát hiện cache sai.
 
 **Lớp thứ 3 vừa thêm (D3) — convenience cho human, tách biệt khỏi
 agent/system tự resolve:** khi agent/skill/doctor tự gọi `fgos` theo D2,
