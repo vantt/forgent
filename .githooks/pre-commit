@@ -158,9 +158,74 @@ function currentFgwBranchIfMainCheckout(repoRoot) {
   return /^fgw\//.test(branch) ? branch : null;
 }
 
+// STALE-WORKTREE-INDEX (tsk-1d7, docs/history/stale-worktree-index-guard/
+// CONTEXT.md D1/D2): a linked worktree checked out on a `fgw/*` branch can
+// go stale when an external process (e.g. `approve`'s leaf->root merge)
+// force-moves that branch's ref without ever touching THIS worktree's own
+// working tree/index. `HEAD` still reads the new commit correctly (a
+// symbolic ref that follows the branch), but files-on-disk + the index are
+// still the OLD tree -- a narrowly-staged commit from here would silently
+// carry the OLD content of every other tracked file along with it,
+// reverting them (this happened for real: commit 2cb6519e).
+//
+// Read-only, never mutates -- matches src/runner/worktree.mjs's own
+// `lastSyncedCommit`/`resyncClaimWorktree` pattern (reflog, not `rev-parse
+// HEAD`, which lies once an external `git branch -f` has moved the branch
+// ref out from under a symbolic HEAD). Runs UNCONDITIONALLY, same as
+// `stagedFgosDeletions` below where it exists -- scoped to `fgw/*`
+// branches internally (the "away from home" worktree case this guard
+// protects), never gated by `hookRunsAtHome` (the main checkout is
+// separately guarded against ever sitting on a `fgw/*` branch at all, by
+// `currentFgwBranchIfMainCheckout` below).
+function staleWorktreeIndexRefusal(committingToplevel) {
+  let branch;
+  try {
+    branch = execFileSync('git', ['symbolic-ref', '--short', '-q', 'HEAD'], { cwd: committingToplevel, encoding: 'utf8' }).trim();
+  } catch {
+    return null; // detached HEAD -- no branch this guard scopes to
+  }
+  if (!/^fgw\//.test(branch)) return null;
+
+  let lastSynced;
+  try {
+    lastSynced = execFileSync('git', ['reflog', 'show', 'HEAD', '-n', '1', '--format=%H'], { cwd: committingToplevel, encoding: 'utf8' }).trim();
+  } catch {
+    lastSynced = '';
+  }
+  if (!lastSynced) {
+    return `commit refused: could not read this worktree's own HEAD reflog to determine what commit it was last synced to on "${branch}" -- refusing to commit against an unknown sync point (fail-closed). Inspect this worktree by hand.`;
+  }
+
+  let branchTip;
+  try {
+    branchTip = execFileSync('git', ['rev-parse', branch], { cwd: committingToplevel, encoding: 'utf8' }).trim();
+  } catch {
+    return null; // branch ref unreadable -- not this guard's failure mode
+  }
+  if (lastSynced === branchTip) return null; // in sync, no-op
+
+  let isAncestor = true;
+  try {
+    execFileSync('git', ['merge-base', '--is-ancestor', lastSynced, branchTip], { cwd: committingToplevel, encoding: 'utf8' });
+  } catch {
+    isAncestor = false;
+  }
+  if (!isAncestor) {
+    return `commit refused: this worktree's last-synced commit (${lastSynced}) is not an ancestor of "${branch}"'s current tip (${branchTip}) -- refusing to commit against a diverged index (fail-closed). Inspect this worktree by hand.`;
+  }
+
+  return `commit refused: "${branch}" has moved to ${branchTip} since this worktree was last synced (${lastSynced}) -- likely an external force-move (e.g. approve's merge landing a sibling child). This worktree's files/index are stale and a commit right now would silently carry the OLD content of every other tracked file, reverting them. Run "fgos resync-worktree" in this worktree to repair it, then retry the commit.`;
+}
+
 function main() {
   const repoRoot = path.resolve(__dirname, '..');
   const committingToplevel = execFileSync('git', ['rev-parse', '--path-format=absolute', '--show-toplevel'], { encoding: 'utf8' }).trim();
+
+  const staleIndexRefusal = staleWorktreeIndexRefusal(committingToplevel);
+  if (staleIndexRefusal) {
+    refuse(staleIndexRefusal);
+    return;
+  }
 
   const fgosDeletions = stagedFgosDeletions(committingToplevel);
   if (fgosDeletions.length > 0) {

@@ -1119,6 +1119,25 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'resync-worktree',
+    invoke: 'fgos resync-worktree',
+    description: 'Repairs a stale-worktree-index (tsk-1d7): a linked worktree whose branch was force-moved from outside while it still held staged content on the old tree, per .githooks/pre-commit\'s own detection guard. Extracts the worktree\'s staged content as a patch, resets to the branch\'s real tip, re-strips .fgos/ (ADR0020), then reapplies the patch. Refuses on a real merge conflict (patch preserved for manual review) or on stray uncommitted dirt beyond what was staged. Run from inside the stale worktree itself; --dir names the main checkout (branch refs and --git-common-dir resolve there, never against the worktree\'s own .git).',
+    parameters: {
+      type: 'object',
+      properties: {
+        path: { type: 'string', description: 'Path to the stale worktree to repair. Omit to use the current working directory (the normal case — run from inside the stale worktree itself).' },
+        branch: { type: 'string', description: 'The worktree\'s own checked-out branch. Omit to auto-detect via "git symbolic-ref --short HEAD" at --path/cwd.' },
+      },
+      required: [],
+    },
+    examples: ['fgos resync-worktree', 'fgos resync-worktree --dir /path/to/main-checkout'],
+    touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: true,
+    paginated: false,
+    deprecated: null,
+  },
+  {
     name: 'main-checkout-reset',
     invoke: 'fgos main-checkout-reset',
     description: 'The safe path for a destructive `git reset --hard` on the main checkout (tsk-3au). Refuses when the whole-repo tree is dirty unless --confirm is passed after reviewing the full git status printed in the refusal — closes the failure mode where a session checked only its own files and reset away another in-flight session\'s uncommitted work.',

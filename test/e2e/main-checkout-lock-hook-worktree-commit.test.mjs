@@ -127,6 +127,73 @@ test('tsk-sir: a worktree commit is wrongly refused while another session holds 
   }
 });
 
+// --- tsk-1d7: stale-worktree-index guard -----------------------------
+//
+// Reproduces the real hazard tsk-2u5/tsk-1d7 were filed against (commit
+// 2cb6519e): an external process force-moves the worktree's own `fgw/*`
+// branch ref (mirroring `approve`'s leaf->root merge -- a detached
+// ephemeral worktree, then `git branch -f`) without ever touching this
+// worktree's own files/index. A subsequent commit from the stale worktree
+// must now be REFUSED by the new guard, never silently allowed through.
+
+function forceMoveBranchForward(mainRoot, branch) {
+  const mergeDir = mkTempDir('fgos-tsk-1d7-force-move-');
+  execFileSync('git', ['worktree', 'add', '--detach', mergeDir, branch], { cwd: mainRoot });
+  const fileName = `external-${Date.now()}.txt`;
+  fs.writeFileSync(path.join(mergeDir, fileName), 'external change\n');
+  execFileSync('git', ['add', fileName], { cwd: mergeDir });
+  execFileSync('git', ['commit', '-q', '-m', 'external change landed via force-move'], { cwd: mergeDir });
+  const newTip = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: mergeDir, encoding: 'utf8' }).trim();
+  execFileSync('git', ['branch', '-f', branch, newTip], { cwd: mainRoot });
+  execFileSync('git', ['worktree', 'remove', '--force', mergeDir], { cwd: mainRoot });
+  return newTip;
+}
+
+test('tsk-1d7: a commit from a worktree whose branch was force-moved forward (ancestor, but behind) is refused, naming fgos resync-worktree', () => {
+  const { mainRoot, worktreeRoot } = initSharedAbsoluteHooksPathFixture();
+
+  // Establish a real lastSynced inside the worktree (its own HEAD reflog
+  // gains an entry) before the external force-move happens.
+  const first = commitAsSession(worktreeRoot, {});
+  assert.equal(first.status, 0, `setup: first worktree commit must succeed -- got: ${first.stderr}`);
+
+  forceMoveBranchForward(mainRoot, 'fgw/tsk-sir-repro');
+
+  const result = commitAsSession(worktreeRoot, {});
+  assert.notEqual(result.status, 0, 'a commit against a stale index must be refused, never silently allowed through');
+  assert.match(result.stderr, /commit refused/);
+  assert.match(result.stderr, /fgos resync-worktree/, 'the refusal must name the real repair command');
+});
+
+test('tsk-1d7: a worktree whose branch tip has NOT moved since last sync still commits normally (no-op, no false positive)', () => {
+  const { mainRoot, worktreeRoot } = initSharedAbsoluteHooksPathFixture();
+
+  const first = commitAsSession(worktreeRoot, {});
+  assert.equal(first.status, 0, `setup: first worktree commit must succeed -- got: ${first.stderr}`);
+
+  // No external force-move here -- a second, ordinary commit from the same
+  // worktree, still in sync with its own branch, must be unaffected.
+  const second = commitAsSession(worktreeRoot, {});
+  assert.equal(second.status, 0, `an in-sync worktree's ordinary next commit must not be refused -- got: ${second.stderr}`);
+});
+
+test('tsk-1d7: a commit from a worktree whose branch was rewritten backward (not an ancestor) is refused as diverged', () => {
+  const { mainRoot, worktreeRoot } = initSharedAbsoluteHooksPathFixture();
+
+  const first = commitAsSession(worktreeRoot, {});
+  assert.equal(first.status, 0, `setup: first worktree commit must succeed -- got: ${first.stderr}`);
+
+  // Rewrite the branch back to BEFORE the worktree's own lastSynced commit
+  // -- lastSynced is now a descendant, not an ancestor, of the new tip.
+  const rootCommit = execFileSync('git', ['rev-list', '--max-parents=0', 'HEAD'], { cwd: mainRoot, encoding: 'utf8' }).trim();
+  execFileSync('git', ['branch', '-f', 'fgw/tsk-sir-repro', rootCommit], { cwd: mainRoot });
+
+  const result = commitAsSession(worktreeRoot, {});
+  assert.notEqual(result.status, 0, 'a commit against a diverged (rewritten) branch must be refused');
+  assert.match(result.stderr, /commit refused/);
+  assert.match(result.stderr, /not an ancestor/);
+});
+
 // --- tsk-56u: staged-.fgos/-deletion guard --------------------------------
 //
 // The real near-miss this guard exists to catch: a linked worktree never
