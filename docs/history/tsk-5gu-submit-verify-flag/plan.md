@@ -87,11 +87,15 @@ is added is direct proof of both the new behavior and the unchanged
 default path. No skill-prose file touched, so
 `docs/how-to/write-verify-for-a-skill-prose-change.md` does not apply.
 
-## Outstanding questions
+## Assumptions
 
-Not material to this item's own scope (pinned as an assumption, not a
+Not material to this item's own scope (pinned here rather than asked as a
 gate question): whether `/fgOS:submit` and `fgos-submit-assist` should be
 updated to actually PASS `--verify` through when a submitter states one
 in free text — the item's own description names this as future work for
 those two callers, not this CLI-layer item. This item only builds the
 door; wiring a caller through it is out of scope here.
+
+## Outstanding questions
+
+None
