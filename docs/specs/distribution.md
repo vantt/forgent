@@ -60,8 +60,13 @@ of it).
   distribution file allowlist, and installs both CLI entry points — `fgos`
   and `fgos-runner` — into the caller's chosen install location (global or
   project-local, per the installer's own install flags), both immediately
-  executable. The install always resolves against the source repository's
-  default branch — no tagged or pinned release exists yet. The install runs
+  executable. The install resolves against whatever ref the installer's own
+  command names: a tagged release commit when the command names a tag
+  (`README.md`'s recommended path, `docs/how-to/cut-a-fgos-release-tag.md`),
+  or the source repository's default branch when it doesn't (the
+  bleeding-edge path README also documents) — tag-cutting itself stays a
+  manual, repo-owner-judgment act (tsk-jtb D1/D2), never CI-automated. The
+  install runs
   no lifecycle script of its own — there is nothing for a package manager's
   build-script policy (e.g. pnpm's `allowBuilds`) to approve or block, so the
   install succeeds the same way regardless of which of the three package
