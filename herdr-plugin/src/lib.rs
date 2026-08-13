@@ -2,6 +2,7 @@ pub mod app;
 pub mod fgos;
 pub mod gateway;
 pub mod layout;
+pub mod mcp;
 pub mod pane_scan;
 pub mod pick;
 pub mod ports;

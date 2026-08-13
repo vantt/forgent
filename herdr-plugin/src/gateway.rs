@@ -204,7 +204,7 @@ pub struct GatewayError {
 }
 
 impl GatewayError {
-    fn validation(message: impl Into<String>) -> Self {
+    pub(crate) fn validation(message: impl Into<String>) -> Self {
         GatewayError {
             category: ErrorCategory::Validation,
             message: message.into(),
@@ -689,24 +689,32 @@ pub fn build_router(gateway: Arc<dyn VerbGateway>, config: GatewayConfig, root: 
         root,
     };
 
+    // tsk-7l9-3: MCP surface (search/execute) mounted onto this SAME router,
+    // behind the SAME auth gate the REST routes already sit behind (plan.md's
+    // own Assumptions: no second auth mechanism) -- built once here so
+    // `state.gateway`/`state.root` never has to be threaded through a second
+    // composition path.
+    let mcp_service = crate::mcp::build_mcp_service(state.gateway.clone(), state.root.clone());
+
     let authenticated = Router::new()
         .route("/work", get(get_work).post(post_work))
-        .route("/work/:id", get(get_work_by_id))
-        .route("/work/:id/move", post(post_work_move))
-        .route("/work/:id/ask", post(post_work_ask))
-        .route("/work/:id/answer", post(post_work_answer))
-        .route("/work/:id/take", post(post_work_take))
-        .route("/work/:id/return", post(post_work_return))
-        .route("/work/:id/approve", post(post_work_approve))
-        .route("/work/:id/reject", post(post_work_reject))
+        .route("/work/{id}", get(get_work_by_id))
+        .route("/work/{id}/move", post(post_work_move))
+        .route("/work/{id}/ask", post(post_work_ask))
+        .route("/work/{id}/answer", post(post_work_answer))
+        .route("/work/{id}/take", post(post_work_take))
+        .route("/work/{id}/return", post(post_work_return))
+        .route("/work/{id}/approve", post(post_work_approve))
+        .route("/work/{id}/reject", post(post_work_reject))
         .route("/ready", get(get_ready))
-        .route("/rollup/:id", get(get_rollup))
+        .route("/rollup/{id}", get(get_rollup))
         .route("/graph", get(get_graph))
         .route("/state/digest", get(get_state_digest))
         .route("/sessions", post(post_sessions))
-        .route("/sessions/:sessionId", delete(delete_session))
-        .route("/sessions/:sessionId/slots", get(get_session_slots))
+        .route("/sessions/{sessionId}", delete(delete_session))
+        .route("/sessions/{sessionId}/slots", get(get_session_slots))
         .route("/runner/tick", post(post_runner_tick))
+        .nest_service("/mcp", mcp_service)
         .route_layer(middleware::from_fn_with_state(state.clone(), require_token));
 
     Router::new()
@@ -859,5 +867,52 @@ mod tests {
             .unwrap();
         assert_eq!(response.status(), StatusCode::OK);
         std::fs::remove_dir_all(&root).ok();
+    }
+
+    /// tsk-7l9-3: proves the MCP transport (`mcp.rs::build_mcp_service`) is
+    /// actually mounted on THIS router (not just exercised in isolation by
+    /// `mcp::tests`) and sits behind the SAME auth gate the REST routes do
+    /// (plan.md's own Assumption: no second auth mechanism).
+    #[tokio::test]
+    async fn mcp_route_is_mounted_on_the_same_router_and_gated_by_the_same_token() {
+        use axum::body::Body;
+        use axum::http::Request;
+        use tower::ServiceExt;
+
+        let unauth_gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({})) });
+        let unauth_app = build_router(unauth_gateway, test_config(), PathBuf::from("/tmp"));
+        let response = unauth_app
+            .oneshot(Request::builder().method("POST").uri("/mcp").body(Body::empty()).unwrap())
+            .await
+            .unwrap();
+        assert_eq!(
+            response.status(),
+            StatusCode::BAD_REQUEST,
+            "unauthenticated /mcp must be blocked by the same require_token gate as every other route"
+        );
+
+        let auth_gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({})) });
+        let auth_app = build_router(auth_gateway, test_config(), PathBuf::from("/tmp"));
+        let response = auth_app
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/mcp")
+                    .header(axum::http::header::AUTHORIZATION, "Bearer test-token")
+                    .header(axum::http::header::CONTENT_TYPE, "application/json")
+                    .header("Mcp-Protocol-Version", "2025-06-18")
+                    .header(axum::http::header::ACCEPT, "application/json, text/event-stream")
+                    .body(Body::from(
+                        r#"{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"test","version":"0"}}}"#,
+                    ))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_ne!(
+            response.status(),
+            StatusCode::NOT_FOUND,
+            "an authenticated request to /mcp must reach the MCP transport, proving it is actually mounted"
+        );
     }
 }
