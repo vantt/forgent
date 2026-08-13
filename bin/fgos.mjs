@@ -43,7 +43,7 @@ import { assertSafeMainCheckoutReset } from '../src/runner/main-checkout-reset-g
 import { classifyIronLaw } from '../src/evolve/iron-law.mjs';
 import { driftStatus } from '../src/state/drift-status.mjs';
 import { unreleasedHasEntries } from '../src/setup/registrations.mjs';
-import { branchNameFor, branchExists, withMergeEphemeralWorktree, provisionDependencies } from '../src/runner/worktree.mjs';
+import { branchNameFor, branchExists, createBranchRef, withMergeEphemeralWorktree, provisionDependencies } from '../src/runner/worktree.mjs';
 import { resolveIntegrationBranch, retargetMember } from '../src/runner/promote-engine.mjs';
 import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
 import { withLockRetry } from '../src/runner/lock-wait.mjs';
@@ -3420,9 +3420,17 @@ async function runVerb(verb, flags, positional, dir) {
 
         if (rootId !== id) {
           const rootBranch = branchNameFor(rootId);
-          // Ephemeral worktree checked out on fgw/<rootId> (guaranteed to
-          // exist by the time a leaf reaches "awaiting-approval" — dispatch-side
-          // wiring, cell fan-out-parallel-9) — never the human's own main
+          // A root only ever driven by a live session/pick (never the
+          // runner's own dispatch loop, which creates fgw/<rootId> early,
+          // D17) can reach this point before its own branch exists — seed
+          // it from main here, the same fallback createDetachedMergeWorktree
+          // already applies at its own later call site below.
+          if (!branchExists(repoRoot, rootBranch)) {
+            createBranchRef(repoRoot, rootId, { baseRef: 'main' });
+          }
+          // Ephemeral worktree checked out on fgw/<rootId> (now guaranteed to
+          // exist, either from dispatch-side wiring or the fallback just
+          // above) — never the human's own main
           // checkout, and never a literal checkout of fgw/<rootId> itself:
           // withMergeEphemeralWorktree stands up a DETACHED checkout at the
           // branch's current tip commit, merges there, then lands the

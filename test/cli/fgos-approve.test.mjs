@@ -369,6 +369,59 @@ test('approve of a leaf whose root has NOT moved: no catchup attempted at all, u
   assert.doesNotMatch(leafLog, /catch-up:/, 'no catchup commit must exist when the root never moved — the ancestor check must have short-circuited before performCatchUp was ever called');
 });
 
+test('approve of a leaf whose root branch was never created (root only ever driven by a live session/pick, never the runner dispatch loop that creates fgw/<rootId> early per D17): falls back to creating it from main instead of crashing raw on the ancestor-check', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  const dir = path.join(cwd, '.fgos');
+
+  const rootId = 'no-early-branch-root';
+  const leafId = 'no-early-branch-leaf';
+
+  addWork(dir, { id: rootId, title: `Title ${rootId}`, kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  commitPending(cwd, `state: add ${rootId}`);
+  // Deliberately no `git branch fgw/${rootId} main` here — this is the
+  // exact gap: a root only ever driven live never gets its own branch
+  // created early.
+
+  addWork(dir, {
+    id: leafId,
+    title: `Title ${leafId}`,
+    kind: 'task',
+    status: 'todo',
+    deps: [],
+    risk: 'light',
+    refs: [],
+    verify: `test -f ${leafId}-produced.txt`,
+    parent: rootId,
+  });
+  run(cwd, ['move', leafId, '--to', 'doing']);
+  commitPending(cwd, `state: claim ${leafId}`);
+
+  gitAtCwd(cwd, ['checkout', '-b', `fgw/${leafId}`, 'main']);
+  fs.writeFileSync(path.join(cwd, `${leafId}-produced.txt`), 'ok\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${leafId}`]);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  run(cwd, ['move', leafId, '--to', 'awaiting-approval']);
+  commitPendingBeforeApprove(cwd, leafId);
+
+  const branchesBefore = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
+  assert.doesNotMatch(branchesBefore, new RegExp(`fgw/${rootId}\\b`), 'fgw/<rootId> must not exist yet — the whole point of this fixture');
+
+  const result = run(cwd, ['approve', leafId]);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.to, 'delivered');
+  assert.equal(data.target, `fgw/${rootId}`);
+
+  const branchesAfter = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
+  assert.match(branchesAfter, new RegExp(`fgw/${rootId}\\b`), 'fgw/<rootId> must exist after approve — created by the fallback');
+
+  const rootTip = gitAtCwd(cwd, ['show', `fgw/${rootId}:${leafId}-produced.txt`]);
+  assert.match(rootTip, /ok/);
+});
+
 test('approve of a leaf whose inline catchup hits a real conflict: parks blocked (reason merge-conflict), the leaf stays awaiting-approval-shaped (not silently delivered), root untouched', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
