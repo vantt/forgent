@@ -99,10 +99,20 @@ impl WorkItem {
     }
 }
 
-/// tsk-64z D1/D7: the Work Items panel's 4 tabs — a pure classification
+/// tsk-64z D1/D7: the Work Items panel's 5 tabs — a pure classification
 /// over `WorkItem.status`, never a second copy of the item list.
+///
+/// `Backlog` is declared first because the tab strip mirrors the frozen
+/// category order in `STATUS_CATEGORIES` (`src/state/work.mjs`), rather
+/// than inventing a second ordering this side would have to keep in sync
+/// by hand. It is a separate tab and not a marker inside `Todo` because
+/// `backlog` carries its own `statusCategory` precisely so nothing reads a
+/// backlog item as ready (work-item-backlog-status D3), and because
+/// `backlog -> todo` is a human-only edge (D1): a person has to be able to
+/// SEE the bucket before they can promote anything out of it (D4).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WorkTab {
+    Backlog,
     Todo,
     Doing,
     Review,
@@ -110,6 +120,8 @@ pub enum WorkTab {
 }
 
 impl WorkTab {
+    /// work-item-backlog-status D3: `backlog` only — its own tab, never
+    /// folded into `Todo`, so nothing here reads it as ready.
     /// D1: `todo` only. D1: `doing`/`blocked`/`awaiting-human` — the same
     /// `in-progress` `statusCategory` grouping `workflow-stage-graphs.mjs`
     /// already uses for the `coding` domain. D1: `awaiting-approval` only.
@@ -117,6 +129,7 @@ impl WorkTab {
     /// `wontfix` (D7 explicitly folds canceled items into this tab too).
     fn matches(self, status: &str) -> bool {
         match self {
+            WorkTab::Backlog => status == "backlog",
             WorkTab::Todo => status == "todo",
             WorkTab::Doing => matches!(status, "doing" | "blocked" | "awaiting-human"),
             WorkTab::Review => status == "awaiting-approval",
@@ -129,6 +142,7 @@ impl WorkTab {
 
     pub fn label(self) -> &'static str {
         match self {
+            WorkTab::Backlog => "BACKLOG",
             WorkTab::Todo => "TODO",
             WorkTab::Doing => "DOING",
             WorkTab::Review => "REVIEW",
@@ -138,16 +152,18 @@ impl WorkTab {
 
     fn next(self) -> Self {
         match self {
+            WorkTab::Backlog => WorkTab::Todo,
             WorkTab::Todo => WorkTab::Doing,
             WorkTab::Doing => WorkTab::Review,
             WorkTab::Review => WorkTab::Done,
-            WorkTab::Done => WorkTab::Todo,
+            WorkTab::Done => WorkTab::Backlog,
         }
     }
 
     fn prev(self) -> Self {
         match self {
-            WorkTab::Todo => WorkTab::Done,
+            WorkTab::Backlog => WorkTab::Done,
+            WorkTab::Todo => WorkTab::Backlog,
             WorkTab::Doing => WorkTab::Todo,
             WorkTab::Review => WorkTab::Doing,
             WorkTab::Done => WorkTab::Review,
@@ -308,6 +324,24 @@ pub struct App {
     /// restart clears it, which is correct: nothing this adapter believed
     /// about an in-flight launch survives a restart either.
     pub pending_discover_pane: Option<String>,
+    /// The admin-lane pane this dashboard has launched an `/fgOS:merge-next`
+    /// run into but has not yet seen exit, if any (tsk-4ry). Unlike
+    /// `pending_discover_pane` above, `/fgOS:merge-next` holds no
+    /// lingering claimed-item status for its run's duration — it is one
+    /// CLI call, not a claim-and-hold — so there is no engine-truth
+    /// signal to catch up to; the pane's own presence in a fresh scan is
+    /// the only "still running" signal available. Cleared once the pane
+    /// id is no longer present in a scan (`retire_settled_pending_operation_panes`,
+    /// below) — never "claimed and doing", since there is nothing to
+    /// claim. Same in-process, never-persisted discipline as
+    /// `pending_discover_pane`: a herdr-plugin restart clears it, which
+    /// is correct, since nothing this adapter believed about an in-flight
+    /// launch survives a restart either.
+    pub pending_merge_pane: Option<String>,
+    /// Same shape as `pending_merge_pane`, for `/fgOS:retro-next`.
+    pub pending_retro_pane: Option<String>,
+    /// Same shape as `pending_merge_pane`, for `/fgOS:cleanup-next`.
+    pub pending_cleanup_pane: Option<String>,
 }
 
 impl App {
@@ -341,6 +375,9 @@ impl App {
             operation_panes: None,
             pending_worker_panes: HashSet::new(),
             pending_discover_pane: None,
+            pending_merge_pane: None,
+            pending_retro_pane: None,
+            pending_cleanup_pane: None,
         }
     }
 
@@ -654,6 +691,9 @@ impl App {
             operation_panes: None,
             pending_worker_panes: HashSet::new(),
             pending_discover_pane: None,
+            pending_merge_pane: None,
+            pending_retro_pane: None,
+            pending_cleanup_pane: None,
         }
     }
 
@@ -810,6 +850,7 @@ impl App {
                 }
                 self.retire_settled_pending_panes(&panes);
                 self.retire_settled_pending_discover_pane();
+                self.retire_settled_pending_operation_panes(&panes);
                 self.last_error = None;
             }
             Err(err) => self.last_error = Some(err.to_string()),
@@ -866,6 +907,32 @@ impl App {
             if !self.pending_worker_panes.contains(pane_id) {
                 self.pending_discover_pane = None;
             }
+        }
+    }
+
+    /// Clears `pending_merge_pane`/`pending_retro_pane`/`pending_cleanup_pane`
+    /// once each settles (tsk-4ry). Unlike `retire_settled_pending_discover_pane`
+    /// above, this cannot reuse `pending_worker_panes`'s own membership
+    /// check: the fixed `fg:operation` tab's admin panes are launched
+    /// directly by `pane_orchestrator.launch_merge_loop`/etc
+    /// (`main::auto_launch_operation_panes`), never through `launch_worker`,
+    /// so they are never inserted into `pending_worker_panes` in the first
+    /// place. And unlike the discover case, `/fgOS:merge-next`/`retro-next`/
+    /// `cleanup-next` hold no lingering claimed-item status to catch up to
+    /// (D9: the admin lane never claims a work item at all) — so "settled"
+    /// here means only "gone from the scan", the plain half of
+    /// `retire_settled_pending_panes`'s own rule, checked directly against
+    /// this same tick's fresh `panes` scan.
+    fn retire_settled_pending_operation_panes(&mut self, panes: &[PaneSnapshot]) {
+        let still_in_scan = |pane_id: &str| panes.iter().any(|pane| pane.pane_id == pane_id);
+        if self.pending_merge_pane.as_deref().is_some_and(|id| !still_in_scan(id)) {
+            self.pending_merge_pane = None;
+        }
+        if self.pending_retro_pane.as_deref().is_some_and(|id| !still_in_scan(id)) {
+            self.pending_retro_pane = None;
+        }
+        if self.pending_cleanup_pane.as_deref().is_some_and(|id| !still_in_scan(id)) {
+            self.pending_cleanup_pane = None;
         }
     }
 
@@ -1044,9 +1111,10 @@ mod tests {
     /// already uses), and `wontfix` shares `DONE` with the tail chain
     /// (D7).
     #[test]
-    fn tabs_classify_status_into_todo_doing_review_done() {
+    fn tabs_classify_status_into_backlog_todo_doing_review_done() {
         let source = FakeSource {
             triage: vec![
+                triage_row("tsk-backlog", "backlog", Some(0)),
                 triage_row("tsk-todo", "todo", Some(1)),
                 triage_row("tsk-doing", "doing", Some(2)),
                 triage_row("tsk-blocked", "blocked", Some(3)),
@@ -1059,10 +1127,18 @@ mod tests {
         let mut app = App::empty();
         app.refresh_from_fgos(&source);
 
+        app.active_tab = WorkTab::Backlog;
+        assert_eq!(
+            app.visible_work_items().iter().map(|i| i.id.as_str()).collect::<Vec<_>>(),
+            vec!["tsk-backlog"],
+            "D3: backlog gets its own tab and appears in no other"
+        );
+
         app.active_tab = WorkTab::Todo;
         assert_eq!(
             app.visible_work_items().iter().map(|i| i.id.as_str()).collect::<Vec<_>>(),
-            vec!["tsk-todo"]
+            vec!["tsk-todo"],
+            "D3: a backlog item must never be read as ready"
         );
 
         app.active_tab = WorkTab::Doing;
@@ -1091,15 +1167,20 @@ mod tests {
     #[test]
     fn next_tab_and_prev_tab_cycle_and_reset_selection() {
         let mut app = App::empty();
-        assert_eq!(app.active_tab, WorkTab::Todo);
+        assert_eq!(
+            app.active_tab,
+            WorkTab::Todo,
+            "BACKLOG leads the strip but TODO stays the landing tab"
+        );
         app.next_tab();
         assert_eq!(app.active_tab, WorkTab::Doing);
         app.next_tab();
         app.next_tab();
+        assert_eq!(app.active_tab, WorkTab::Done);
         app.next_tab();
-        assert_eq!(app.active_tab, WorkTab::Todo, "wraps around after DONE");
+        assert_eq!(app.active_tab, WorkTab::Backlog, "wraps around after DONE");
         app.prev_tab();
-        assert_eq!(app.active_tab, WorkTab::Done, "wraps around backward before TODO");
+        assert_eq!(app.active_tab, WorkTab::Done, "wraps around backward before BACKLOG");
     }
 
     /// tsk-3wl D1: `switch_panel` (Tab) must reach all 5 boxes, not just

@@ -22,8 +22,9 @@ import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs'
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfigForDir } from '../src/runner/dispatch.mjs';
-import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
+import { readGateBypassLevel, canAutoApprove, canAutoApproveMergedGate } from '../src/state/gate-bypass.mjs';
 import { resolveFgosDir, fgosDirFromRoot } from '../src/runner/paths.mjs';
+import { resolveCliVersionInfo } from '../src/cli/version.mjs';
 import { resolveDiscovery, classificationPatchFromVerdict, assertCallerClassification } from '../src/intake/discovery.mjs';
 import { resolvePlan } from '../src/intake/plan.mjs';
 import { computeEntropy, computeCounts, FINAL_STATUSES } from '../src/report/entropy.mjs';
@@ -42,7 +43,7 @@ import { assertSafeMainCheckoutReset } from '../src/runner/main-checkout-reset-g
 import { classifyIronLaw } from '../src/evolve/iron-law.mjs';
 import { driftStatus } from '../src/state/drift-status.mjs';
 import { unreleasedHasEntries } from '../src/setup/registrations.mjs';
-import { branchNameFor, branchExists, withMergeEphemeralWorktree, provisionDependencies, resyncWorktree } from '../src/runner/worktree.mjs';
+import { branchNameFor, branchExists, createBranchRef, withMergeEphemeralWorktree, provisionDependencies, resyncWorktree } from '../src/runner/worktree.mjs';
 import { resolveIntegrationBranch, retargetMember } from '../src/runner/promote-engine.mjs';
 import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
 import { withLockRetry } from '../src/runner/lock-wait.mjs';
@@ -918,7 +919,15 @@ function submitWork(dir, text, opts = {}) {
     // read the real ask instead of just the classified summary.
     description: text,
     kind,
-    status: 'todo',
+    // Per work-item-backlog-status D2: the default stays 'todo' for both
+    // `submit` and `add` -- `opts.backlog` is the opt-in escape hatch that
+    // marks an item as a not-yet-committed idea from the moment of
+    // creation, instead of requiring submit-then-move. Same independent
+    // optional-flag shape as `opts.async` below; an omitted --backlog flag
+    // leaves this byte-identical to the prior hardcoded 'todo'. `add`
+    // deliberately gains no such flag (D2, explicit human answer) -- it is
+    // for already-planned work.
+    status: opts.backlog ? 'backlog' : 'todo',
     // Per D4 (str83-fgos-slash-commands): --deps threaded from opts the
     // same way --domain/--discovered-from already are, immediately below.
     // opts.deps defaults to [] (parseListFlag's own undefined-input
@@ -1100,6 +1109,10 @@ async function performCatchUp(repoRoot, id, item, target, timeoutMs) {
 
 async function runVerb(verb, flags, positional, dir) {
   switch (verb) {
+    case 'version': {
+      return resolveCliVersionInfo();
+    }
+
     case 'init': {
       initStore(dir);
       // D4: detection/manifest writing must never fail init — a permissions
@@ -1272,6 +1285,10 @@ async function runVerb(verb, flags, positional, dir) {
       const text = requireField(positional[0], 'submit requires a free-text description: fgos submit "<description>" [--async|--unattended]');
       const opts = {
         async: Boolean(flags.async || flags.unattended),
+        // Per work-item-backlog-status D2: same independent boolean-flag
+        // shape as --async above -- creates the item directly at
+        // status: 'backlog' instead of the default 'todo'.
+        backlog: Boolean(flags.backlog),
         domain: optionalField(flags.domain, 'submit --domain requires a domain name (e.g. coding/synthetic); omit --domain entirely to use the default.'),
         // Per work-graph-intelligence S2b (producer A): two-hop like domain —
         // parsed here, threaded into submitWork's work object below.
@@ -1861,6 +1878,18 @@ async function runVerb(verb, flags, positional, dir) {
         );
       }
       const { event } = editWork(dir, { id, patch, role: 'human' });
+      if (patch.priority !== undefined) {
+        // tsk-sq9: mark this priority as human-set so plan.mjs's resolvePlan
+        // refined pass (~line 639) knows to skip its own auto-recompute
+        // instead of silently overwriting it.
+        addDecision(dir, {
+          id,
+          text: `priority set to ${patch.priority} via edit --priority`,
+          source: 'edit',
+          kind: 'priority-override',
+          rationale: "tsk-sq9: mark this as a human override so plan.mjs's refined pass does not silently overwrite it",
+        });
+      }
       return { id, fields: Object.keys(patch), seq: event.seq };
     }
 
@@ -1929,7 +1958,24 @@ async function runVerb(verb, flags, positional, dir) {
 
     case 'gate-approve': {
       const id = requireField(positional[0] ?? flags.id, 'gate-approve requires an id: fgos gate-approve <id> --gate <name> --actor <human|bypass> --verify "..."');
-      const gate = requireField(flags.gate, 'gate-approve requires --gate <contextApprove|planApprove|validateApprove>');
+      const gate = requireField(flags.gate, 'gate-approve requires --gate <contextApprove|validateApprove>');
+      // "planApprove" retired (coding-planning-validating-gate-redesign
+      // D9-D11): fgos-coding-planning no longer owns a gate, so no live
+      // skill writes this value. recordGateApprove/GATE_APPROVE_GATES
+      // (src/state/store.mjs) deliberately still ACCEPT it at the storage
+      // layer -- test/intake/plan.test.mjs uses recordGateApprove as a
+      // fixture helper to simulate pre-redesign items that already carry
+      // a historical planApprove record, and replay.mjs's own fold is
+      // unconditionally generic (no gate-name check at all), so neither
+      // needs or wants this restriction. This CLI verb is the actual
+      // user-facing surface a confused live session would hit, so the
+      // refusal belongs here, not in the storage layer (tsk-4vz).
+      if (gate === 'planApprove') {
+        throw new StoreError(
+          'validation',
+          'gate-approve: "planApprove" is retired (coding-planning-validating-gate-redesign D9-D11) -- fgos-coding-planning no longer owns a gate. Use "validateApprove" for the single merged gate (fgos-coding-validating), or "contextApprove" for fgos-coding-exploring\'s gate. Records already carrying a historical "planApprove" value still replay correctly; this only blocks creating a NEW one.',
+        );
+      }
       const actor = requireField(flags.actor, 'gate-approve requires --actor <human|bypass>');
       const verify = requireField(flags.verify, 'gate-approve requires --verify "..."');
       const { event } = recordGateApprove(dir, { id, gate, actor, verify });
@@ -2174,6 +2220,40 @@ async function runVerb(verb, flags, positional, dir) {
     // edit-the-file-by-hand pattern.
     case 'gate-bypass': {
       return { level: readGateBypassLevel(dir) };
+    }
+
+    // tsk-65q: read-only wrapper around canAutoApprove/canAutoApproveMergedGate
+    // (src/state/gate-bypass.mjs) so the two skill-embedded Gate-section
+    // checks (fgos-coding-exploring/fgos-coding-validating) can resolve this
+    // computation through the CLI's own static imports -- which already
+    // resolve correctly under any install shape (global, dev-checkout, npx)
+    // because Node resolves them against bin/fgos.mjs's own file location,
+    // never the caller's cwd or repo root. The ad hoc cwd-relative resolver
+    // those two skill files used to embed inline had no such guarantee, and
+    // crashed unconditionally on a pure global npm install of fgOS onto a
+    // different project (docs/history/tsk-65q-gate-bypass-global-install-
+    // resolution/RESEARCH.md).
+    case 'gate-check': {
+      const id = requireField(positional[0] ?? flags.id, 'gate-check requires an id: fgos gate-check <id> --gate <contextApprove|validateApprove> ...');
+      const gate = requireField(flags.gate, 'gate-check requires --gate <contextApprove|validateApprove>');
+      const item = listWork(dir).work[id];
+      if (!item) {
+        throw new StoreError('validation', `gate-check: no work item "${id}"`);
+      }
+      const level = readGateBypassLevel(dir);
+      if (gate === 'contextApprove') {
+        const artifactPath = requireField(flags.artifact, 'gate-check --gate contextApprove requires --artifact <path>');
+        const artifactText = fs.readFileSync(artifactPath, 'utf8');
+        return { canAutoApprove: canAutoApprove(item, artifactText, level) };
+      }
+      if (gate === 'validateApprove') {
+        const planPath = requireField(flags.plan, 'gate-check --gate validateApprove requires --plan <path>');
+        const planText = fs.readFileSync(planPath, 'utf8');
+        const childSpecs = flags.children !== undefined ? JSON.parse(flags.children) : [];
+        const cost = requireField(flags.cost, 'gate-check --gate validateApprove requires --cost <REVERSIBLE|EXPENSIVE>');
+        return { canAutoApprove: canAutoApproveMergedGate(item, planText, childSpecs, cost, level) };
+      }
+      throw new StoreError('validation', `gate-check: --gate must be "contextApprove" or "validateApprove", got "${gate}"`);
     }
 
     case 'stale': {
@@ -3391,9 +3471,17 @@ async function runVerb(verb, flags, positional, dir) {
 
         if (rootId !== id) {
           const rootBranch = branchNameFor(rootId);
-          // Ephemeral worktree checked out on fgw/<rootId> (guaranteed to
-          // exist by the time a leaf reaches "awaiting-approval" — dispatch-side
-          // wiring, cell fan-out-parallel-9) — never the human's own main
+          // A root only ever driven by a live session/pick (never the
+          // runner's own dispatch loop, which creates fgw/<rootId> early,
+          // D17) can reach this point before its own branch exists — seed
+          // it from main here, the same fallback createDetachedMergeWorktree
+          // already applies at its own later call site below.
+          if (!branchExists(repoRoot, rootBranch)) {
+            createBranchRef(repoRoot, rootId, { baseRef: 'main' });
+          }
+          // Ephemeral worktree checked out on fgw/<rootId> (now guaranteed to
+          // exist, either from dispatch-side wiring or the fallback just
+          // above) — never the human's own main
           // checkout, and never a literal checkout of fgw/<rootId> itself:
           // withMergeEphemeralWorktree stands up a DETACHED checkout at the
           // branch's current tip commit, merges there, then lands the
@@ -3963,6 +4051,16 @@ async function runVerb(verb, flags, positional, dir) {
           text: `sync-root: merged ${branch} into ${targetBranch} at ${currentHead(mergeRoot)}`,
           rationale: `fgos sync-root ${id} — closes the drift window this item's own design exists to prevent`,
           id,
+          // Engine bookkeeping, not reflection: a branch sync is machinery
+          // this verb performs, never someone thinking about the work. The
+          // record stays fully visible in `fgos show` (which filters
+          // decisions by id, never by kind) -- but `kind` is what stops it
+          // counting as retrospective content at the cleanup gate
+          // (`checkRetrospectiveContent`). Without it addDecision defaults
+          // to `kind: 'design'` (store.mjs), actively labelling a merge as
+          // a design decision, and any synced root could reach `done` with
+          // no retrospective document behind it.
+          kind: 'engine',
         });
         return { id, mode: 'sync-root', outcome: 'synced', target: targetBranch, branch, seq: event.seq, output: result.check.output, postLand: result.postLand };
       };
@@ -4172,6 +4270,10 @@ async function runVerb(verb, flags, positional, dir) {
         text: `promote-to-component: root "${rootId}"${rootCreated ? ' (newly created)' : ' (existing member promoted)'} — merged [${merged.join(', ') || 'none'}]${notMerged.length > 0 ? `, not merged: ${notMerged.map((r) => `${r.id} (${r.reason})`).join(', ')}` : ''}`,
         rationale: 'fgos promote-to-component — converges flat siblings into one component before merging to main, per docs/history/promote-to-component/CONTEXT.md',
         id: rootId,
+        // Same reasoning as sync-root's own record above: converging
+        // siblings into a component is machinery, so this must not read as
+        // reflection at the retrospective gate.
+        kind: 'engine',
       });
 
       return { rootId, rootCreated, results, seq: event.seq };
@@ -4779,7 +4881,7 @@ async function runVerb(verb, flags, positional, dir) {
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|sync-root|reject|catchup|evolve|triage|session|goal|tool|setup|doctor|unlock|lock-status|main-checkout-reset> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|sync-root|reject|catchup|evolve|triage|session|goal|tool|setup|doctor|unlock|lock-status|main-checkout-reset> ...`);
   }
 }
 

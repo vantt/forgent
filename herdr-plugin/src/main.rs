@@ -511,12 +511,13 @@ fn run(
             }
             // tsk-57q: same tick, so the guard check and the launch it
             // gates never straddle two ticks (poll-tick race risk row,
-            // plan.md). `None` for either `root`/`registry` (outside a
-            // real herdr-managed pane, e.g. local dev/test) skips this
-            // entirely — same degrade-gracefully shape the two refreshes
-            // above already use.
-            if let (Some(root), Some(registry)) = (root, registry) {
-                auto_launch_operation_panes(app, root, registry, pane_orchestrator);
+            // plan.md). `None` `root` (outside a real herdr-managed pane,
+            // e.g. local dev/test) skips this entirely — same
+            // degrade-gracefully shape the two refreshes above already
+            // use. tsk-4ry: no longer needs `registry` — the guard reads
+            // `app`'s own pending-pane bookkeeping instead of a pane scan.
+            if let Some(root) = root {
+                auto_launch_operation_panes(app, root, pane_orchestrator);
             }
             last_poll = Instant::now();
         }
@@ -560,15 +561,11 @@ fn read_herdr_orchestrator_toggles(root: &Path) -> HerdrOrchestratorToggles {
 }
 
 /// The auto-merge/retro/cleanup launcher itself (tsk-57q): for each
-/// enabled toggle, guard-checks the fixed pane title, then launches —
-/// never queues, never double-launches (an unreadable guard check fails
-/// closed toward "treat as already running", i.e. skip the launch,
-/// never toward "launch anyway"). Left pane is always merge-loop; right
-/// pane alternates between retro-loop/cleanup-loop by priority
-/// (`pick_right_pane_loop` above). A `None` fixed pane id (outside a
-/// live herdr session, or `ensure_operation_tab` failed at startup) is a
-/// no-op for that slot.
-/// Which of the three loops (if any) to actually launch this tick —
+/// enabled toggle, guard-checks whether that lane is already in flight,
+/// then launches — never queues, never double-launches. A `None` fixed
+/// pane id (outside a live herdr session, or `ensure_operation_tab`
+/// failed at startup) is a no-op for that slot.
+/// Which of the three lanes (if any) to actually launch this tick —
 /// isolated as a pure decision so it stays unit-testable against fixed
 /// inputs, the same separation `layout.rs`'s `find_operation_tab`/
 /// `left_right_panes` already use for the same reason.
@@ -579,76 +576,117 @@ struct AutoOperationTabLaunches {
     cleanup: bool,
 }
 
+/// Merge candidates the same way `/fgOS:merge-list`'s own ranking sources
+/// them (`src/state/graph-harness.mjs:112`): plain `awaiting-approval`
+/// status. Mirrors `next_auto_discover_candidate`'s shape above, but only
+/// existence is needed here, not a specific item — `/fgOS:merge-next`
+/// does its own picking once launched, the same centralization
+/// `next_auto_discover_candidate`'s own doc comment already describes for
+/// `/fgOS:discover-next`.
+fn merge_pool_has_candidate(work_items: &[WorkItem]) -> bool {
+    work_items.iter().any(|item| item.status == "awaiting-approval")
+}
+
+/// Retro candidates: plain `retrospective` status
+/// (`src/state/retro-pool.mjs:12`). Same shape as `merge_pool_has_candidate`.
+fn retro_pool_has_candidate(work_items: &[WorkItem]) -> bool {
+    work_items.iter().any(|item| item.status == "retrospective")
+}
+
+/// Cleanup candidates: plain `cleanup` status. `src/state/cleanup-pool.mjs`'s
+/// own TTL sub-filter is deliberately NOT replicated here — that module's
+/// own header documents it as "a SCHEDULING OPTIMIZATION, not [a
+/// correctness requirement]... a TTL-not-elapsed item is harmless either
+/// way", and the TTL check itself reads the raw event log, not anything
+/// `WorkItem` carries (tsk-4ry, confirmed at `fgos-coding-validating`). Worst
+/// case this launches an `/fgOS:cleanup-next` that finds nothing
+/// TTL-ready and exits immediately — wasted, never wrong.
+fn cleanup_pool_has_candidate(work_items: &[WorkItem]) -> bool {
+    work_items.iter().any(|item| item.status == "cleanup")
+}
+
 /// Pure decision `auto_launch_operation_panes` below dispatches on
-/// (tsk-57q): given already-resolved toggles and whether each fixed guard
-/// title is already live, decides which loops to launch. Never queues,
-/// never double-launches — a title already live for a toggle that's on is
+/// (tsk-57q): given already-resolved toggles, whether each lane is
+/// already in flight, and whether each lane's own pool still has a ready
+/// candidate, decides which lanes to launch. Never queues, never
+/// double-launches — a lane already in flight, or with an empty pool, is
 /// `false` here, not retried.
 ///
 /// tsk-1zq: each of the three loops has its own slot in the 4-pane
 /// `fg:operation` tab now, so retro and cleanup no longer compete for one
 /// pane and neither is gated on winning a priority comparison.
+///
+/// tsk-4ry: `*_already_running` used to come from `registry.has_labeled_pane`
+/// — a label no writer ever set, so this was always `false` and the guard
+/// relaunched every tick. It now comes from `App`'s own
+/// `pending_merge_pane`/`pending_retro_pane`/`pending_cleanup_pane`
+/// (pane-scan liveness, D2-consistent: never a label read). The
+/// `*_pool_ready` half is new — the old guard had no equivalent, since a
+/// `-loop` launch was safe to fire even into an empty pool (it would just
+/// exit immediately); a `-next` launch is now gated on the pool
+/// explicitly so a genuinely empty pool does not still trigger a pane
+/// launch every tick.
+#[allow(clippy::too_many_arguments)]
 fn decide_auto_operation_tab_launches(
     toggles: HerdrOrchestratorToggles,
-    merge_already_running: bool,
-    retro_already_running: bool,
-    cleanup_already_running: bool,
+    merge_in_flight: bool,
+    retro_in_flight: bool,
+    cleanup_in_flight: bool,
+    merge_pool_ready: bool,
+    retro_pool_ready: bool,
+    cleanup_pool_ready: bool,
 ) -> AutoOperationTabLaunches {
     AutoOperationTabLaunches {
-        merge: toggles.auto_merge && !merge_already_running,
-        retro: toggles.auto_retro && !retro_already_running,
-        cleanup: toggles.auto_cleanup && !cleanup_already_running,
+        merge: toggles.auto_merge && !merge_in_flight && merge_pool_ready,
+        retro: toggles.auto_retro && !retro_in_flight && retro_pool_ready,
+        cleanup: toggles.auto_cleanup && !cleanup_in_flight && cleanup_pool_ready,
     }
 }
 
 /// The auto-merge/retro/cleanup launcher itself (tsk-57q): gathers the
-/// real settings and guard state (impure I/O — file read, herdr pane
-/// scan) and hands it to the pure `decide_auto_operation_tab_launches`
-/// above, then acts on the result. Guard-check and launch happen
-/// synchronously within this one call — this function only ever runs once
-/// per poll tick (`run`'s own tick block above), so a launch decision is
-/// never stale by the time it acts on it (poll-tick race risk row,
-/// plan.md). A `None` slot set (outside a live herdr session, or
-/// `ensure_operation_tab` failed at startup) is a no-op. An unreadable
-/// guard check (`has_labeled_pane` erroring) fails closed toward "treat
-/// as already running", i.e. skip the launch, never toward "launch
-/// anyway".
+/// real settings and guard state (impure I/O — file read) and hands it to
+/// the pure `decide_auto_operation_tab_launches` above, then acts on the
+/// result — recording each fired launch's pane id into `app`'s own
+/// `pending_merge_pane`/`pending_retro_pane`/`pending_cleanup_pane`
+/// (tsk-4ry), the same "record right after firing" shape the
+/// auto-discover launch above already uses for `pending_discover_pane`.
+/// Guard-check and launch happen synchronously within this one call —
+/// this function only ever runs once per poll tick (`run`'s own tick
+/// block above), so a launch decision is never stale by the time it acts
+/// on it (poll-tick race risk row, plan.md). A `None` slot set (outside a
+/// live herdr session, or `ensure_operation_tab` failed at startup) is a
+/// no-op.
 ///
 /// tsk-1zq: with `fg:operation` grown to four slots, retro and cleanup
 /// each own a pane, so the priority comparison that used to decide which
 /// of them got the single right-hand pane is gone — along with the `fgos
 /// list --all --json` subprocess it ran every tick to make that call.
-/// These panes are never touched by the worker lane's reclaim path: loops
-/// live here, one-shot flows live there (A7).
-fn auto_launch_operation_panes(
-    app: &App,
-    root: &Path,
-    registry: &dyn PaneRegistry,
-    pane_orchestrator: &impl PaneOrchestrator,
-) {
-    let Some(panes) = &app.operation_panes else {
+/// These panes are never touched by the worker lane's reclaim path: admin
+/// launches live here, one-shot worker-lane flows live there (A7).
+fn auto_launch_operation_panes(app: &mut App, root: &Path, pane_orchestrator: &impl PaneOrchestrator) {
+    let Some(panes) = app.operation_panes.clone() else {
         return;
     };
     let toggles = read_herdr_orchestrator_toggles(root);
-    let merge_already_running = registry.has_labeled_pane("fgos-auto-merge").unwrap_or(true);
-    let retro_already_running = registry.has_labeled_pane("fgos-auto-retro").unwrap_or(true);
-    let cleanup_already_running = registry.has_labeled_pane("fgos-auto-cleanup").unwrap_or(true);
 
     let launches = decide_auto_operation_tab_launches(
         toggles,
-        merge_already_running,
-        retro_already_running,
-        cleanup_already_running,
+        app.pending_merge_pane.is_some(),
+        app.pending_retro_pane.is_some(),
+        app.pending_cleanup_pane.is_some(),
+        merge_pool_has_candidate(&app.work_items),
+        retro_pool_has_candidate(&app.work_items),
+        cleanup_pool_has_candidate(&app.work_items),
     );
 
-    if launches.merge {
-        let _ = pane_orchestrator.launch_merge_loop(&panes.merge);
+    if launches.merge && pane_orchestrator.launch_merge_loop(&panes.merge).is_ok() {
+        app.pending_merge_pane = Some(panes.merge.clone());
     }
-    if launches.retro {
-        let _ = pane_orchestrator.launch_retro_loop(&panes.retro);
+    if launches.retro && pane_orchestrator.launch_retro_loop(&panes.retro).is_ok() {
+        app.pending_retro_pane = Some(panes.retro.clone());
     }
-    if launches.cleanup {
-        let _ = pane_orchestrator.launch_cleanup_loop(&panes.cleanup);
+    if launches.cleanup && pane_orchestrator.launch_cleanup_loop(&panes.cleanup).is_ok() {
+        app.pending_cleanup_pane = Some(panes.cleanup.clone());
     }
 }
 
@@ -1501,27 +1539,60 @@ mod tests {
         }
     }
 
+    fn work_item_with_status(id: &str, status: &str) -> WorkItem {
+        WorkItem {
+            id: id.into(),
+            title: id.into(),
+            goal_tier: "mvp".into(),
+            stage: "executing".into(),
+            status: status.into(),
+            blocked_by: Vec::new(),
+            blocks: 0,
+            priority: None,
+        }
+    }
+
+    // All pool-ready flags default `true` in the decision tests below —
+    // they exercise the toggle/in-flight half of the decision, which the
+    // pool-nonempty half (tested separately below) never interferes with
+    // as long as it stays true.
+    const POOLS_READY: (bool, bool, bool) = (true, true, true);
+
     #[test]
     fn auto_operation_tab_decision_stays_off_for_every_loop_when_every_toggle_is_off() {
-        let launches = decide_auto_operation_tab_launches(all_off(), false, false, false);
+        let (m, r, c) = POOLS_READY;
+        let launches = decide_auto_operation_tab_launches(all_off(), false, false, false, m, r, c);
         assert_eq!(launches, AutoOperationTabLaunches::default());
     }
 
     #[test]
-    fn auto_operation_tab_decision_launches_merge_when_toggle_on_and_pane_not_already_running() {
-        let launches = decide_auto_operation_tab_launches(all_on(), false, true, true);
+    fn auto_operation_tab_decision_launches_merge_when_toggle_on_and_not_in_flight() {
+        let (m, r, c) = POOLS_READY;
+        let launches = decide_auto_operation_tab_launches(all_on(), false, true, true, m, r, c);
         assert!(launches.merge);
     }
 
     #[test]
-    fn auto_operation_tab_decision_skips_merge_when_the_guard_pane_is_already_live() {
+    fn auto_operation_tab_decision_skips_merge_when_already_in_flight() {
         // Also stands in for "two poll ticks close together never
-        // produce two panes for the same guard title" (plan.md): the
-        // second tick reads `merge_already_running: true` (the first
-        // tick's own launch having registered by then) and must decide
-        // the same way as any other already-live guard.
-        let launches = decide_auto_operation_tab_launches(all_on(), true, true, true);
+        // produce two panes for the same lane" (plan.md): the second
+        // tick reads `merge_in_flight: true` (the first tick's own
+        // launch having recorded a `pending_merge_pane` by then) and
+        // must decide the same way as any other in-flight lane.
+        let (m, r, c) = POOLS_READY;
+        let launches = decide_auto_operation_tab_launches(all_on(), true, true, true, m, r, c);
         assert!(!launches.merge);
+    }
+
+    #[test]
+    fn auto_operation_tab_decision_skips_merge_when_the_pool_is_empty() {
+        // tsk-4ry: the new half of the decision — a lane can be off the
+        // toggle-and-in-flight guard entirely and still not launch if its
+        // own pool has nothing ready.
+        let launches = decide_auto_operation_tab_launches(all_on(), false, false, false, false, true, true);
+        assert!(!launches.merge);
+        assert!(launches.retro);
+        assert!(launches.cleanup);
     }
 
     #[test]
@@ -1530,7 +1601,8 @@ mod tests {
         // pane, so each was gated on winning a priority comparison against
         // the other and at most one could run. With four slots in the
         // `fg:operation` tab they each own a pane, so both start.
-        let launches = decide_auto_operation_tab_launches(all_on(), true, false, false);
+        let (m, r, c) = POOLS_READY;
+        let launches = decide_auto_operation_tab_launches(all_on(), true, false, false, m, r, c);
         assert!(launches.retro);
         assert!(launches.cleanup);
     }
@@ -1542,10 +1614,38 @@ mod tests {
             auto_retro: false,
             auto_cleanup: true,
         };
-        let launches = decide_auto_operation_tab_launches(toggles, true, false, false);
+        let (m, r, c) = POOLS_READY;
+        let launches = decide_auto_operation_tab_launches(toggles, true, false, false, m, r, c);
         assert!(!launches.merge);
         assert!(!launches.retro);
         assert!(launches.cleanup);
+    }
+
+    #[test]
+    fn merge_pool_has_candidate_reads_awaiting_approval_status() {
+        assert!(!merge_pool_has_candidate(&[work_item_with_status("tsk-a", "todo")]));
+        assert!(merge_pool_has_candidate(&[work_item_with_status(
+            "tsk-a",
+            "awaiting-approval"
+        )]));
+    }
+
+    #[test]
+    fn retro_pool_has_candidate_reads_retrospective_status() {
+        assert!(!retro_pool_has_candidate(&[work_item_with_status("tsk-a", "delivered")]));
+        assert!(retro_pool_has_candidate(&[work_item_with_status("tsk-a", "retrospective")]));
+    }
+
+    #[test]
+    fn cleanup_pool_has_candidate_reads_cleanup_status_without_a_ttl_check() {
+        assert!(!cleanup_pool_has_candidate(&[work_item_with_status(
+            "tsk-a",
+            "retrospective"
+        )]));
+        // No TTL data is available client-side (tsk-4ry) — any `cleanup`
+        // item counts as a candidate, TTL-elapsed or not; `/fgOS:cleanup-next`
+        // itself safely no-ops on one that is not ready yet.
+        assert!(cleanup_pool_has_candidate(&[work_item_with_status("tsk-a", "cleanup")]));
     }
 
     // `tag` alone already disambiguates every call site below (each uses
@@ -1622,29 +1722,13 @@ mod tests {
         let _ = std::fs::remove_dir_all(&root);
     }
 
-    struct StubOperationRegistry {
-        live_labels: std::collections::HashSet<&'static str>,
-    }
-
-    impl PaneRegistry for StubOperationRegistry {
-        fn scan_panes(&self) -> Result<Vec<PaneSnapshot>, PaneScanError> {
-            Ok(Vec::new())
-        }
-
-        fn has_labeled_pane(&self, label: &str) -> Result<bool, PaneScanError> {
-            Ok(self.live_labels.contains(label))
-        }
-    }
-
     #[test]
-    fn auto_operation_tab_launcher_fires_merge_loop_into_the_left_pane_end_to_end() {
-        // Real settings read (from a real file), real guard check (via a
-        // stub registry reporting nothing live), real decision, real
-        // launch call — only the `fgos` subprocess `pick_right_pane_loop`
-        // shells out to is out of reach here (no real store at this temp
-        // root), so it fails closed to `None` and the right pane stays
-        // untouched; this test only asserts the left (merge) pane, which
-        // needs no such subprocess.
+    fn auto_operation_tab_launcher_fires_merge_next_into_the_left_pane_end_to_end() {
+        // Real settings read (from a real file), real decision, real
+        // launch call. tsk-4ry: no registry/label stub needed any more —
+        // the guard reads `app`'s own `pending_*_pane` bookkeeping
+        // (empty here, nothing in flight) and `app.work_items` for the
+        // pool-nonempty half, both plain in-memory state.
         let root = unique_temp_root("end-to-end-merge");
         std::fs::write(
             root.join(".fgos/config.json"),
@@ -1654,10 +1738,8 @@ mod tests {
 
         let mut app = App::empty();
         app.operation_panes = Some(operation_panes_fixture());
+        app.work_items = vec![work_item_with_status("tsk-ready", "awaiting-approval")];
 
-        let registry = StubOperationRegistry {
-            live_labels: std::collections::HashSet::new(),
-        };
         let pane_orchestrator = RecordingPickOrchestrator {
             picked: std::cell::RefCell::new(Vec::new()),
             discovered: std::cell::RefCell::new(Vec::new()),
@@ -1667,22 +1749,28 @@ mod tests {
             cleanup_launched: std::cell::RefCell::new(Vec::new()),
         };
 
-        auto_launch_operation_panes(&app, &root, &registry, &pane_orchestrator);
+        auto_launch_operation_panes(&mut app, &root, &pane_orchestrator);
 
         assert_eq!(*pane_orchestrator.merge_launched.borrow(), vec!["wS:pOpMerge".to_string()]);
         assert!(pane_orchestrator.retro_launched.borrow().is_empty());
         assert!(pane_orchestrator.cleanup_launched.borrow().is_empty());
+        assert_eq!(app.pending_merge_pane, Some("wS:pOpMerge".to_string()));
 
         let _ = std::fs::remove_dir_all(&root);
     }
 
     #[test]
-    fn auto_operation_tab_launcher_never_double_launches_merge_across_two_ticks() {
+    fn auto_operation_tab_launcher_never_double_launches_and_resumes_once_the_pane_retires() {
         // The concrete "two poll ticks close together" case (plan.md),
         // exercised through the real launcher function this time rather
-        // than the pure decision fn alone: tick 2's registry reports the
-        // fixed title as already live (as a real herdr scan would once
-        // tick 1's launch registers), and must not fire again.
+        // than the pure decision fn alone: tick 2 reads `pending_merge_pane`
+        // still `Some` (tick 1's own launch having recorded it, no scan
+        // pass has retired it yet) and must not fire again. Tick 3
+        // simulates that retirement directly (`retire_settled_pending_operation_panes`
+        // is exercised on its own in `app.rs`'s tests; this test only
+        // needs its observable effect: the field going back to `None`)
+        // and proves the guard resumes once it does — the D2 half a
+        // one-shot latch could never have provided.
         let root = unique_temp_root("no-double-launch");
         std::fs::write(
             root.join(".fgos/config.json"),
@@ -1692,6 +1780,7 @@ mod tests {
 
         let mut app = App::empty();
         app.operation_panes = Some(operation_panes_fixture());
+        app.work_items = vec![work_item_with_status("tsk-ready", "awaiting-approval")];
 
         let pane_orchestrator = RecordingPickOrchestrator {
             picked: std::cell::RefCell::new(Vec::new()),
@@ -1702,25 +1791,30 @@ mod tests {
             cleanup_launched: std::cell::RefCell::new(Vec::new()),
         };
 
-        // Tick 1: nothing live yet.
-        let registry_tick_1 = StubOperationRegistry {
-            live_labels: std::collections::HashSet::new(),
-        };
-        auto_launch_operation_panes(&app, &root, &registry_tick_1, &pane_orchestrator);
+        // Tick 1: nothing in flight yet.
+        auto_launch_operation_panes(&mut app, &root, &pane_orchestrator);
 
-        // Tick 2: the fixed title is now live (the real launch from tick
-        // 1 having registered).
-        let mut registry_tick_2_labels = std::collections::HashSet::new();
-        registry_tick_2_labels.insert("fgos-auto-merge");
-        let registry_tick_2 = StubOperationRegistry {
-            live_labels: registry_tick_2_labels,
-        };
-        auto_launch_operation_panes(&app, &root, &registry_tick_2, &pane_orchestrator);
+        // Tick 2: `pending_merge_pane` is still `Some` from tick 1 — no
+        // scan has retired it — so this must not launch a second time.
+        auto_launch_operation_panes(&mut app, &root, &pane_orchestrator);
 
         assert_eq!(
             *pane_orchestrator.merge_launched.borrow(),
             vec!["wS:pOpMerge".to_string()],
-            "tick 2 must not launch a second time"
+            "tick 2 must not launch a second time while the pane is still pending"
+        );
+
+        // Tick 3: the pane has settled (simulating what a real scan pass
+        // would do via `retire_settled_pending_operation_panes`) and the
+        // pool still has a candidate — the guard must allow a fresh
+        // launch.
+        app.pending_merge_pane = None;
+        auto_launch_operation_panes(&mut app, &root, &pane_orchestrator);
+
+        assert_eq!(
+            pane_orchestrator.merge_launched.borrow().len(),
+            2,
+            "tick 3 must relaunch once the pending pane has settled"
         );
 
         let _ = std::fs::remove_dir_all(&root);
@@ -1774,6 +1868,30 @@ mod tests {
         ];
         let candidate = next_auto_discover_candidate(&items).expect("tsk-b is ready");
         assert_eq!(candidate.id, "tsk-b", "the blocked item must be skipped, not picked first");
+    }
+
+    /// work-item-backlog-status D4: `backlog` is promoted to `todo` by a
+    /// person's own judgment, so an unattended discover pane must never be
+    /// opened for one. The `status == "todo"` check above already excludes
+    /// it by construction — this pins that, since a backlog item otherwise
+    /// looks maximally eligible: right stage, nothing blocking it.
+    #[test]
+    fn auto_discover_skips_a_backlog_item_even_at_an_eligible_stage() {
+        let items = vec![
+            {
+                let mut item = discovery_todo_item("tsk-backlog");
+                item.status = "backlog".into();
+                item
+            },
+        ];
+        assert!(
+            items[0].discover_eligible(),
+            "the item is otherwise fully eligible — stage matches and nothing blocks it"
+        );
+        assert!(
+            next_auto_discover_candidate(&items).is_none(),
+            "backlog -> todo is a human-only edge; never auto-discovered"
+        );
     }
 
     #[test]

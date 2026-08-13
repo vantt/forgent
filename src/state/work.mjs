@@ -76,11 +76,20 @@ export function truncateTitle(title) {
  * main tree" (the sole trigger for RUL12 dependent-open); `retrospective`
  * is the batched learning-synthesis step (formerly the `compound-learn`
  * stage, now retired); `cleanup` is a TTL-bounded worktree-reclaim park —
- * see status-fsm.mjs for the full transition edges). Owned here (schema owns
+ * see status-fsm.mjs for the full transition edges). Extended by
+ * work-item-backlog-status D1/D3 with `backlog`, placed FIRST, ahead of
+ * `todo`: an idea not yet committed to work, as opposed to `todo`'s
+ * "committed, ready to start". Like the four tail-segment statuses, it is a
+ * universal, domain-agnostic status no domain may relabel (0027's own
+ * framing, applied at the front of the lifecycle instead of the tail); it
+ * carries its own `statusCategory` (`'backlog'`, already reserved in
+ * STATUS_CATEGORIES below), which is what keeps it out of frontier's `ready`
+ * filter without any frontier-side code. Owned here (schema owns
  * domain) — status-fsm.mjs imports and re-exports this rather than defining its
  * own copy, so there is exactly one list of legal statuses.
  */
 export const STATUSES = Object.freeze([
+  'backlog',
   'todo',
   'doing',
   'blocked',
@@ -112,9 +121,11 @@ export const STATUSES = Object.freeze([
  * ordinary, editable code) could replay differently after that table
  * changes — an outcome L3 forbids.
  *
- * The full six-value set is declared upfront, Linear-style, even though
- * `backlog` and `completed` have no status mapped into either of them
- * today — 0027's own reasoning is to match Linear's pattern of a closed
+ * The full six-value set was declared upfront, Linear-style, back when
+ * `backlog` and `completed` had no status mapped into either of them —
+ * `backlog` now does (work-item-backlog-status D3 mapped the `backlog`
+ * status into it); `completed` still has none. 0027's own reasoning is
+ * exactly why that slot was already here to use: match Linear's pattern of a closed
  * category set defined up front, not "add a category only once a status
  * needs it" (which would make the set an implementation detail of whichever
  * domain happens to exist today, rather than a stable contract other

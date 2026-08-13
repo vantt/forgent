@@ -4,9 +4,10 @@ description: >-
   Use when the user wants a free-text task driven end-to-end through fgOS's
   whole lifecycle in one session — submit, discovery, planning, real
   implementation, and return — invoked as /fgOS:cook <free-text task
-  description>. Each dev-skill gate (fgos-coding-exploring/fgos-coding-planning/
-  fgos-coding-validating) auto-approves when the repo's configured gate-bypass
-  level covers it, otherwise pauses for real human approval — auto-
+  description>. Each dev-skill gate (fgos-coding-exploring's context gate,
+  fgos-coding-validating's single merged plan/proof gate) auto-approves
+  when the repo's configured gate-bypass level covers it, otherwise pauses
+  for real human approval — auto-
   implements at stage executing, and stops once the item (and every
   child it split into) reaches status awaiting-approval — final merge
   review always stays a human decision, never auto-approved, regardless
@@ -27,16 +28,20 @@ never re-implements a dev-skill's substance inline; it invokes them.
 ## Hard rules
 
 - **Never bypass a gate beyond what its own dev-skill already permits.**
-  `fgos-coding-exploring`'s CONTEXT.md gate, `fgos-coding-planning`'s plan gate, and
-  `fgos-coding-validating`'s proof gate each check the repo's configured
-  gate-bypass level themselves (`canAutoApprove`/`canAutoApproveValidate`,
-  `docs/history/gate-bypass/CONTEXT.md` D1-D6) and only skip their own
-  question when that check returns true — this skill's driver invokes
-  those dev-skills unchanged either way (see step 2 below) and never
-  second-guesses, forces, or fakes an auto-approve/human-approve record
-  on its own authority. When a gate's own check does NOT clear it, that
-  gate asks a real question — answer it for real, wait for it, and never
-  skip it because the answer "seems obvious."
+  `fgos-coding-exploring`'s CONTEXT.md gate and `fgos-coding-validating`'s
+  single merged plan/proof gate (the one gate in stage `planning`, per
+  `docs/history/coding-planning-validating-gate-redesign/CONTEXT.md` D1 —
+  `fgos-coding-planning` itself has no gate) each check the repo's
+  configured gate-bypass level themselves (`canAutoApprove`/
+  `canAutoApproveMergedGate`, `docs/history/gate-bypass/CONTEXT.md` D1-D6,
+  superseded by `coding-planning-validating-gate-redesign/CONTEXT.md`
+  D9-D11) and only skip their own question when that check returns true —
+  this skill's driver invokes those dev-skills unchanged either way (see
+  step 2 below) and never second-guesses, forces, or fakes an
+  auto-approve/human-approve record on its own authority. When a gate's
+  own check does NOT clear it, that gate asks a real question — answer it
+  for real, wait for it, and never skip it because the answer "seems
+  obvious."
 - **Stop at `awaiting-approval`, never merge.** Once `fgos return <id>` succeeds the
   id is `awaiting-approval`. That is the finish line for this skill — never call
   `fgos approve`/`fgos reject`/`fgos review` yourself; the internal PR

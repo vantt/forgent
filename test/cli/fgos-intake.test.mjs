@@ -827,6 +827,33 @@ test('submit with --unattended is treated the same as --async: mode:"async"', ()
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].mode, 'async');
 });
 
+// work-item-backlog-status D2: --backlog is the opt-in escape hatch that
+// creates an item directly at the backlog status. The default must stay
+// 'todo' for a flagless submit -- that regression guard is half of what
+// this test exists for, since D2's whole point is that the default did NOT
+// change. D3 gives backlog its own statusCategory, which is what keeps a
+// backlog item out of the ready frontier with no frontier-side code change.
+test('submit --backlog creates the item at status:"backlog" with its own category and out of ready; a flagless submit still creates status:"todo"', () => {
+  const cwd = tmpCwd();
+
+  const backlogSubmit = run(cwd, ['submit', 'Maybe rethink the settings navigation someday', '--backlog']);
+  assert.equal(backlogSubmit.status, 0);
+  const backlogId = JSON.parse(backlogSubmit.stdout).data.id;
+
+  const plainSubmit = run(cwd, ['submit', 'Investigate the sluggish overview page']);
+  assert.equal(plainSubmit.status, 0);
+  const plainId = JSON.parse(plainSubmit.stdout).data.id;
+
+  const view = envelopeData(run(cwd, ['list']).stdout);
+  assert.equal(view.work[backlogId].status, 'backlog');
+  assert.equal(view.work[backlogId].statusCategory, 'backlog');
+  assert.equal(view.work[plainId].status, 'todo');
+
+  const ready = envelopeData(run(cwd, ['ready']).stdout);
+  const readyIds = JSON.stringify(ready);
+  assert.ok(!readyIds.includes(backlogId), 'a backlog item must not appear in the ready frontier');
+});
+
 test('submit of text matching no keyword falls back to tier:"standard" and persists, exit 0', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);

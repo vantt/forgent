@@ -251,3 +251,63 @@ test('plugin-skill-cli-reachable fails when neither a local bin/fgos.mjs nor a P
     process.env.PATH = originalPath;
   }
 });
+
+// ─── cli-version-visible (tsk-2ej): the running build's own package
+// version/commit/verb-set resolve cleanly -- the "always green on a
+// healthy build" self-check pattern node-version-and-git already uses, so
+// fgos doctor's own report always surfaces the first thing worth comparing
+// when a verb comes back "unknown" on some other machine.
+
+function cliVersionVisibleCheck() {
+  const entry = DOCTOR_CHECKS.find((c) => c.id === 'cli-version-visible');
+  assert.ok(entry, 'cli-version-visible must be registered');
+  return entry.check;
+}
+
+test('cli-version-visible passes and its message embeds the resolved packageVersion', () => {
+  const result = cliVersionVisibleCheck()();
+  assert.equal(result.passed, true);
+  const { version: packageVersion } = JSON.parse(fs.readFileSync(new URL('../../package.json', import.meta.url), 'utf8'));
+  assert.ok(result.message.includes(packageVersion), `message "${result.message}" missing packageVersion "${packageVersion}"`);
+});
+
+// ─── plugin-dev-skills-packaged (tsk-32b): confirms the coding-domain
+// dev-skills plugin-skill-cli-reachable never checked (fgos-coding-driving,
+// fgos-routing, ...) are actually present in plugins/fgOS/skills/, so a
+// maintainer who adds/renames one in .claude/skills/ but forgets to copy it
+// forward gets caught at `fgos doctor` time instead of shipping silently.
+
+function pluginDevSkillsPackagedCheck() {
+  const entry = DOCTOR_CHECKS.find((c) => c.id === 'plugin-dev-skills-packaged');
+  assert.ok(entry, 'plugin-dev-skills-packaged must be registered');
+  return entry.check;
+}
+
+test('plugin-dev-skills-packaged passes cleanly when the project has no .claude/skills or plugins/fgOS/skills at all', () => {
+  const dir = mkTempDir();
+  const result = pluginDevSkillsPackagedCheck()(dir);
+  assert.equal(result.passed, true);
+  assert.match(result.message, /not a forgent checkout/);
+});
+
+test('plugin-dev-skills-packaged passes when every .claude/skills/fgos-* dev-skill has a matching plugins/fgOS/skills/ copy', () => {
+  const dir = mkTempDir();
+  fs.mkdirSync(path.join(dir, '.claude', 'skills', 'fgos-example'), { recursive: true });
+  fs.writeFileSync(path.join(dir, '.claude', 'skills', 'fgos-example', 'SKILL.md'), '# example\n');
+  fs.mkdirSync(path.join(dir, 'plugins', 'fgOS', 'skills', 'fgos-example'), { recursive: true });
+  fs.writeFileSync(path.join(dir, 'plugins', 'fgOS', 'skills', 'fgos-example', 'SKILL.md'), '# example\n');
+  const result = pluginDevSkillsPackagedCheck()(dir);
+  assert.equal(result.passed, true);
+  assert.match(result.message, /all 1 coding-domain dev-skills are packaged/);
+});
+
+test('plugin-dev-skills-packaged fails and names any .claude/skills/fgos-* dev-skill missing from plugins/fgOS/skills/', () => {
+  const dir = mkTempDir();
+  fs.mkdirSync(path.join(dir, '.claude', 'skills', 'fgos-example'), { recursive: true });
+  fs.writeFileSync(path.join(dir, '.claude', 'skills', 'fgos-example', 'SKILL.md'), '# example\n');
+  fs.mkdirSync(path.join(dir, 'plugins', 'fgOS', 'skills'), { recursive: true });
+  const result = pluginDevSkillsPackagedCheck()(dir);
+  assert.equal(result.passed, false);
+  assert.match(result.message, /fgos-example/);
+  assert.match(result.message, /Unknown skill/);
+});

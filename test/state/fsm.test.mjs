@@ -8,6 +8,7 @@ function work(status, overrides = {}) {
 
 test('STATUSES exposes the full flat status domain', () => {
   assert.deepEqual(STATUSES, [
+    'backlog',
     'todo',
     'doing',
     'blocked',
@@ -22,6 +23,10 @@ test('STATUSES exposes the full flat status domain', () => {
 });
 
 for (const [from, to] of [
+  // work-item-backlog-status D1: a plain edge — the assertion below that the
+  // event carries no payload keys beyond id/from/to is what pins "no
+  // reason/ask/answer required", the same shape blocked -> todo has.
+  ['backlog', 'todo'],
   ['todo', 'doing'],
   ['todo', 'blocked'],
   ['doing', 'blocked'],
@@ -149,6 +154,10 @@ test('reason is ignored (never appears in payload) for every edge other than awa
 // missed edge would silently pass as "still precondition" and hide it.
 test('every legal edge is exactly the declared table; every other status pair is precondition', () => {
   const legalEdges = new Set([
+    // work-item-backlog-status D1: one door out, zero doors in. The sweep
+    // below is what proves the "zero doors in" half — every other X->backlog
+    // pair must still come back precondition.
+    'backlog->todo',
     'todo->doing',
     'todo->blocked',
     'doing->blocked',

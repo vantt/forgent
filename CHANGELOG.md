@@ -7,8 +7,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Stage `planning` now asks a person **once**, not twice. The
+  `planApprove` gate is gone from `fgos-coding-planning`; the single
+  remaining gate lives in `fgos-coding-validating`, immediately before
+  split children are created. It also asks a different kind of question:
+  the agent first exhausts every action within reach, then weighs what a
+  wrong answer would cost to repair, and only stops when one of three
+  concrete triggers fires — presenting the specific thing it is stuck on
+  and its own attempt so far, rather than the whole plan plus
+  "approve?". When nothing is stuck it proceeds and posts a non-blocking
+  note. Split children are no longer created during planning: their specs
+  are written into `plan.md` and materialized in one step at that gate via
+  `fgos plan --verdict decompose --children`, so a cut that turns out
+  wrong costs nothing to change, and children arrive at `executing` with
+  no gate of their own. A mid-planning hand-back to `fgos-coding-exploring`
+  now records the gap it found, so the re-entry closes only that gap
+  instead of re-running a full exploring pass.
+  (`docs/history/coding-planning-validating-gate-redesign/CONTEXT.md`;
+  supersedes `docs/history/gate-bypass/CONTEXT.md` D6, D4, and D2's
+  never-self-report clause, and replaces the `canAutoApproveValidate`
+  export with `canAutoApproveMergedGate`.)
+
 ### Added
 
+- `README.md`'s `## Install` now recommends installing a tagged release
+  (`npm install -g github:vantt/forgent#vX.Y.Z`) instead of always
+  resolving to whatever commit is currently on `main` — the bare `main`
+  command is kept as a documented bleeding-edge option. New how-to:
+  `docs/how-to/cut-a-fgos-release-tag.md`, the manual (repo-owner-judgment)
+  procedure for cutting a release.
+- `fgos submit --backlog` creates an item directly at the `backlog` status —
+  an idea not yet committed to — instead of the default `todo`, so marking
+  something as not-yet-ready no longer means submitting it and then moving
+  it. A `backlog` item carries its own `backlog` status category, so it is
+  excluded from the ready frontier until a person promotes it to `todo`.
+  The default is unchanged: a flagless `fgos submit`, and `fgos add` in all
+  cases, still create items at `todo`.
+- herdr TUI: a `BACKLOG` tab, first in the Work Items tab strip, showing
+  items at the new `backlog` status. It is its own tab rather than a marker
+  inside `TODO`, so nothing reads a backlog item as ready, and the strip
+  renders the label even while the bucket is empty — promoting `backlog` to
+  `todo` is a person's own call, and an invisible bucket never gets one. The
+  landing tab is still `TODO`; unattended auto-discover continues to skip
+  backlog items.
 - Delivered-event merge provenance: `fgos approve`'s real merge paths (local
   root-into-main, local leaf-into-root, GitHub PR merge) now record
   `mergedSha`/`mergedInto` on the `work.move → delivered` event and the
@@ -46,6 +89,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   one at every stop, which is what makes a finished worker pane safe for the
   cockpit to reuse: the result no longer lives only on a screen somebody has
   to guard.
+
+### Fixed
+
+- The Claude Code plugin (`plugins/fgOS/`) now ships all 14 coding-domain
+  dev-skills (`fgos-coding-driving`, `fgos-routing`, `fgos-clarifying`,
+  and the rest) alongside its existing CLI-wrapper skills. Previously
+  they existed only in this repo's own `.claude/skills/`, so any project
+  that installed fgOS solely as a plugin (no forgent checkout anywhere)
+  got "Unknown skill" the moment `/fgOS:cook`/`/fgOS:discover`/
+  `/fgOS:plan`/`/fgOS:pick` tried to dispatch into one — even though the
+  `fgos` CLI itself was fully reachable the whole time. A new
+  `fgos doctor` check, `plugin-dev-skills-packaged`, catches a maintainer
+  who forgets to keep the plugin's copies in sync before a release ships.
 
 ### Changed
 
@@ -165,6 +221,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- An item whose root branch was ever synced (`fgos sync-root`), or that was
+  converged into a component (`fgos promote-to-component`), could reach
+  `done` without a retrospective ever having produced anything. Both verbs
+  recorded their merge on the item as a decision but never said it was
+  machine-written, and an untagged decision defaults to `design` — so the
+  cleanup gate read a routine branch merge as someone's reflection on the
+  work and passed the item through. Both records are now tagged as engine
+  bookkeeping. They remain fully visible in `fgos show`; they simply no
+  longer stand in for a retrospective document. Items that were relying on
+  this to pass will now be held at `cleanup` until real synthesis happens.
+
 - Parallel fan-out no longer refuses to dispatch anything when the
   worker-slot ceiling is unarmed — which is how every project starts, since
   `fgos setup` writes `workerSlots.ceiling: null` on purpose. In that state
@@ -195,6 +262,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   stands.
 
 ### Added
+
+- New `fgos version` verb: reports this build's own `package.json` version,
+  git commit (when resolvable), and its full dispatched verb set — a
+  hook-safe, scriptable way to tell an old globally-installed `fgos` apart
+  from a current checkout without reading `node_modules` directly. `fgos
+  doctor` gained a matching `cli-version-visible` check that surfaces the
+  same info in its own report.
 
 - `fgos discover` accepts `--tier`, `--kind`, and `--risk` alongside
   `--verdict clear`, so an interactive session can record the classification

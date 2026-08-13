@@ -49,6 +49,18 @@ export const MANIFEST_SCHEMA_VERSION = '2.0';
 
 export const COMMAND_REGISTRY = [
   {
+    name: 'version',
+    invoke: 'fgos version',
+    description: 'Report this build\'s own package version, git commit (when resolvable), and the full verb set it dispatches -- the hook-safe, scriptable way to tell an old install apart from a current checkout without reading node_modules directly (tsk-2ej). Works with no .fgos/ store present.',
+    parameters: { type: 'object', properties: {}, required: [] },
+    examples: ['fgos version'],
+    touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
     name: 'init',
     invoke: 'fgos init',
     description: 'Initialize the .fgos/ store in the current directory (event log, empty view, coexistence manifest).',
@@ -116,6 +128,7 @@ export const COMMAND_REGISTRY = [
       properties: {
         text: { type: 'string', description: 'Free-text description of the work (positional).' },
         async: { type: 'boolean', description: 'Mark as async/unattended (submitter does not stay to collaborate). Alias: --unattended.' },
+        backlog: { type: 'boolean', description: 'Create the item directly at status "backlog" (an idea not yet committed to) instead of the default "todo". Promoting it to todo later is a human-only decision.' },
         domain: { type: 'string', description: 'Optional domain; omit to use the store default.' },
         'discovered-from': { type: 'string', description: 'Optional id of the item this one was discovered from (provenance, not a dependency).' },
         deps: { type: 'string', description: 'Comma-separated list of dependency ids.', multiValueFormat: 'csv' },
@@ -326,7 +339,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'answer',
     invoke: 'fgos answer',
-    description: 'Record the answer to a parked question and resume the item to todo.',
+    description: 'Record the answer to a parked question and resume the item to its status before the question was asked (todo, or doing if a claim was held).',
     parameters: {
       type: 'object',
       properties: {
@@ -370,12 +383,12 @@ export const COMMAND_REGISTRY = [
   {
     name: 'gate-approve',
     invoke: 'fgos gate-approve',
-    description: 'Record a structured approve for one of the 3 skill-embedded Gates (contextApprove/planApprove/validateApprove, tsk-19j D1/D11) — separate from the awaiting-human ask/answer mechanism.',
+    description: 'Record a structured approve for one of the 2 live skill-embedded Gates (contextApprove/validateApprove, tsk-19j D1/D11, gate count reduced by coding-planning-validating-gate-redesign) — separate from the awaiting-human ask/answer mechanism. "planApprove" is still an accepted value for replaying pre-redesign historical records; no live skill writes a new one.',
     parameters: {
       type: 'object',
       properties: {
         id: { type: 'string', description: 'Work item id the Gate belongs to.' },
-        gate: { type: 'string', description: 'Which Gate was approved: "contextApprove" (fgos-coding-exploring), "planApprove" (fgos-coding-planning), or "validateApprove" (fgos-coding-validating).' },
+        gate: { type: 'string', description: 'Which Gate was approved: "contextApprove" (fgos-coding-exploring) or "validateApprove" (fgos-coding-validating, the single merged plan/proof gate — fgos-coding-planning has no gate of its own). "planApprove" is accepted only for replaying pre-redesign historical records.' },
         actor: { type: 'string', description: 'Who approved it: "human" (a person answered the Gate question) or "bypass" (gate-bypass level auto-approved it).' },
         verify: { type: 'string', description: 'The real verify command this Gate\'s artifact carries (never a placeholder).' },
       },
@@ -452,6 +465,33 @@ export const COMMAND_REGISTRY = [
     description: 'Read-only status: the configured gate-bypass level (off/light/standard/heavy) from .fgos/gate-bypass.json, defaulting to "off" when the file is missing or malformed. Determines whether skill-embedded confirmation gates may auto-approve instead of asking (docs/history/gate-bypass/CONTEXT.md D1-D5) — never the awaiting-human park. No CLI setter: edit the file by hand, mirroring .fgos/config.json\'s own no-CLI-setter pattern.',
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos gate-bypass'],
+    touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
+    name: 'gate-check',
+    invoke: 'fgos gate-check',
+    description: 'Read-only: computes whether one of the 2 live skill-embedded Gates (contextApprove/validateApprove) can auto-approve, via canAutoApprove/canAutoApproveMergedGate (src/state/gate-bypass.mjs). Exists so fgos-coding-exploring/fgos-coding-validating resolve this through the CLI\'s own static imports — which already resolve correctly under any install shape (global, dev-checkout, npx), unlike the ad hoc cwd-relative resolver those skills used to embed inline (tsk-65q, docs/history/tsk-65q-gate-bypass-global-install-resolution/).',
+    parameters: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', description: 'Work item id the Gate belongs to.' },
+        gate: { type: 'string', description: 'Which Gate to check: "contextApprove" (fgos-coding-exploring) or "validateApprove" (fgos-coding-validating).' },
+        artifact: { type: 'string', description: '--gate contextApprove only: path to the CONTEXT.md artifact to check.' },
+        plan: { type: 'string', description: '--gate validateApprove only: path to the plan.md artifact to check.' },
+        children: { type: 'string', description: '--gate validateApprove only: JSON array of child specs from plan.md step 4 (default "[]").' },
+        cost: { type: 'string', description: '--gate validateApprove only: the cost verdict from this skill\'s own Step 1 ("REVERSIBLE" or anything else meaning a trigger fired).' },
+      },
+      positional: ['id'],
+      required: ['id', 'gate'],
+    },
+    examples: [
+      'fgos gate-check tsk-19j --gate contextApprove --artifact docs/history/tsk-19j/CONTEXT.md',
+      'fgos gate-check tsk-19j --gate validateApprove --plan docs/history/tsk-19j/plan.md --children "[]" --cost REVERSIBLE',
+    ],
     touchesState: false,
     requiresExistingStore: false,
     externalEffect: false,

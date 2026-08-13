@@ -82,6 +82,17 @@ pass to keep the item moving.
 - End by presenting the gate below and handing off. A failed check returns
   the item to `fgos-coding-planning` with the failing row named — it never
   continues past a failure by lowering the bar.
+- **This skill owns the only gate in stage `planning`**
+  (`docs/history/coding-planning-validating-gate-redesign/CONTEXT.md` D1),
+  and the only point where split children are created (D7). Both
+  responsibilities moved here when `planApprove` was removed from
+  `fgos-coding-planning`; neither may be handed back, duplicated, or
+  skipped.
+- **Never lower the mechanical floor with your own judgment.** The cost
+  verdict this skill supplies to the gate can only ever escalate to
+  asking; it can never override a hard-gate hit, an uncovered tier, or an
+  open item in `plan.md` (D9). If that feels wrong for a given item, the
+  answer is to ask, never to argue the floor down.
 - Before this session (or a later one) calls `fgos plan` (tsk-2b0 D1:
   the `planning`-stage sibling of `discover`, hard split, no fallback) —
   the call that actually fires the `planning`→`executing` edge and
@@ -168,86 +179,196 @@ pass to keep the item moving.
    or re-plan any of that; a `READY` verdict only says the plan is provably
    buildable, not that this skill has re-checked how it will be built.
 
-## Gate
+## Gate — the one gate in stage `planning`
+
+This is the **single** point in stage `planning` where a person is asked
+(`docs/history/coding-planning-validating-gate-redesign/CONTEXT.md` D1).
+`fgos-coding-planning` no longer carries a gate of its own; the old
+`planApprove` was removed rather than moved. It sits here, immediately
+before children are materialized, because that is the first moment a wrong
+answer costs anything — before it, nothing has been written.
 
 A `NOT READY` verdict skips this Gate entirely; it returns to
 `fgos-coding-planning` instead of asking anything or checking bypass.
 
-For `READY` or `READY WITH CONSTRAINTS`, check whether this gate can
-auto-approve instead (`docs/history/gate-bypass/CONTEXT.md` D6 — reuses
-D1-D5's mechanism, never the `awaiting-human` park, only this
-skill-embedded question):
+### Step 1 — decide whether this gate has anything to ask
+
+Before checking bypass, decide honestly whether a person is needed at all,
+using the two-tier criterion (D3), in this order — **tier A first, always**:
+
+**Tier A — is there a valid action in reach that closes the gap?** Run the
+command, read the file, invoke `fgos-researching`, run `fgos graph
+--what-if`. If yes: **do it, then re-ask this question from the top.** Do
+not ask a person. You leave tier A only when the action does not exist,
+was tried and failed, **or is forbidden by a rule** (the locked-decision
+case: this skill may not reopen `CONTEXT.md`, so it structurally cannot
+resolve that one alone).
+
+Tier A runs first for a reason that is not stylistic: tier B weighs the
+cost of *guessing*, and until tier A is exhausted, guessing is a false
+option — the answer was available. Weighing cost before exhausting action
+is how a session rationalizes not running the check it should have run.
+
+**Tier B — for whatever survives tier A: if this turns out wrong, what does
+the repair cost?** (D4) Measure the cost of **repair when the error
+surfaces** — mid- or post-execute — not the cost of doing the work, and not
+the cost as it looks right now at this gate (right now everything is cheap,
+because nothing is materialized yet; reading it here would make every
+answer "reversible" and the gate would never ask). Repair cost includes
+damage already done in the window before anyone noticed, not just the diff
+that fixes it. It is a property of the **decision**, not of each option.
+
+- **Reversible** → pin it as a labeled assumption in `plan.md` and carry on.
+- **Expensive** → it is a candidate question.
+
+**D5, the exception worth reaching for:** when the surviving options differ
+in how reversible they are, **take the reversible one and carry on — do not
+ask.** Only ask when every live option is hard to undo, or when the
+reversible one is plainly wrong.
+
+**The three triggers that earn a question** (D6) — nothing else does:
+
+- **T1** — two or more options are still standing after a real comparison.
+- **T2** — the plan needs something a locked `CONTEXT.md` decision
+  contradicts, and citing cannot resolve it.
+- **T3** — a child spec cannot be written with a real runnable `verify`, or
+  with an `action` citing a real D-ID. The engine enforces this anyway
+  (`src/intake/plan.mjs:175-201`); being unable to write it IS the signal,
+  never a reason to invent one that passes.
+
+Deliberately **not** a trigger: "high risk with insufficient proof". The
+feasibility matrix above already handles that — a row with no accepted
+evidence is `NOT READY`, which returns to `fgos-coding-planning` rather
+than stopping for a person. Adding it here would turn a self-correcting
+loop into a wait.
+
+Record the outcome as a two-value cost verdict for the check below:
+`REVERSIBLE` when no trigger fired, anything else when one did.
+
+### Step 2 — check whether the gate can auto-approve
+
+Run the `root=$(...)` line and the `node "$root/bin/fgos.mjs" gate-check
+...` call below as two SEPARATE tool calls, never pasted together as one
+script — a worktree-isolated session's own isolation guard refuses a
+single call combining a `git`-rooted command with a following `node`
+invocation, even though each command is safe alone (tsk-3rg). Resolve
+`root` alone first, read its printed value, then substitute that literal
+path into the second, separate call — never `$root`, which does not
+survive across separate tool calls anyway.
 
 ```bash
 root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-node -e "
-var root = process.argv[1];
-function resolveModule(relPath, needed) {
-  return import(relPath).catch(() => ({})).then((local) => {
-    if (needed.every((name) => typeof local[name] === 'function')) return local;
-    return import(root + relPath.slice(1));
-  });
-}
-Promise.all([resolveModule('./src/state/store.mjs', ['listWork']), resolveModule('./src/state/gate-bypass.mjs', ['canAutoApproveValidate', 'readGateBypassLevel'])]).then(([{ listWork }, { canAutoApproveValidate, readGateBypassLevel }]) => {
-  const fgosDir = root + '/.fgos';
-  const item = listWork(fgosDir).work[process.argv[2]];
-  const level = readGateBypassLevel(fgosDir);
-  console.log(canAutoApproveValidate(item, process.argv[3], level) ? 'true' : 'false');
-});
-" -- "$root" "<item-id>" "<READY|READY WITH CONSTRAINTS>"
 ```
 
-The code (`gate-bypass.mjs`/`store.mjs`) tries the cwd-relative import first — this worktree's own branch already carries whatever version it needs, including an item that is itself modifying `gate-bypass.mjs` and needs its own in-progress code (docs/history/gate-bypass/CONTEXT.md D7) — and falls back to `$root`'s canonical copy only when the needed export is missing or the import throws (a stale `fgw/<id>` branch forked before that export existed on `main`, D7's fix for the `tsk-5lr` class of failure). Only the state lookup (`.fgos/`, gitignored and per-worktree-local) resolves to the main checkout's `.fgos/` via `git rev-parse --git-common-dir`, the same resolution `scripts/fgos-shell-integration.sh`'s `fgos` shell function already uses — a worktree's own local `.fgos/` never carries the real item record.
+```bash
+node "$root/bin/fgos.mjs" gate-check "<item-id>" --gate validateApprove --plan "docs/history/<feature>/plan.md" --children '<the child-spec JSON array from plan.md, or []>' --cost "<REVERSIBLE|EXPENSIVE>" --dir "$root"
+```
 
-`<READY|READY WITH CONSTRAINTS>` is this skill's own already-computed
-verdict from the Flow above, passed directly — never re-derived or
-re-read from a file (D6: the axis is the verdict itself, not an artifact
-scan). Treat anything other than exactly `true` on stdout — `false`, empty
-output, a thrown error — as `false`: fail closed, never skip the question
-on a check that couldn't run cleanly.
+Four axes, and every one of them can only push toward **asking**, never
+toward silence (D9). That monotone direction is what makes the
+self-reported cost verdict safe where `gate-bypass` D2 refused one: this
+skill's own judgment can raise the bar, and can never talk the mechanical
+floor below it down.
+
+- the hard-gate keyword floor, over the item's text **plus the plan's
+  structured fields** — footprint paths and child `title`/`verify`/`action`
+  (D10). Narrative prose is deliberately excluded: it would trip on 266 of
+  this repo's 318 real `plan.md` files, on words like `audit`/`auth`/
+  `security` that are everyday vocabulary here rather than a danger signal.
+- the tier ceiling (D11) — which measures **how much the person has
+  delegated**, not how risky the work is. Size and reversibility are
+  different things; do not read a covered tier as "this is safe".
+- the mechanical open-items scan of `plan.md`.
+- the cost verdict from step 1.
+
+`gate-check` (tsk-65q) wraps `canAutoApproveMergedGate`
+(`src/state/gate-bypass.mjs`) behind the CLI's own static imports —
+`bin/fgos.mjs` imports `gate-bypass.mjs` with a plain relative specifier,
+which Node resolves against `bin/fgos.mjs`'s own file location, never the
+caller's cwd or repo root. That is what lets it resolve correctly from any
+install shape (dev checkout, global npm install, npx) with zero
+special-casing — unlike the two-tier cwd-relative/`$root`-relative
+resolver this Gate section used to embed inline, which had no path back to
+the package's own install location and crashed unconditionally for a pure
+global-install consumer whose own repo carries no `src/state/*.mjs` at all
+(`docs/history/tsk-65q-gate-bypass-global-install-resolution/RESEARCH.md`).
+
+The cost verdict is this skill's own, computed in step 1 and passed
+directly — never re-derived or re-read from a file. Read the verb's
+`data.canAutoApprove` field (`true`/`false`) from its JSON output; treat
+anything else — `false`, a non-zero exit, a malformed response — as
+`false`: fail closed, never skip the question on a check that couldn't run
+cleanly.
 
 Either branch below records a structured approve record (tsk-19j D1/D11) —
 separate from, and in addition to, any `fgos decision` line this session
 already logged: `fgos gate-approve <item-id> --gate validateApprove --actor
-<human|bypass> --verify "<verify>"`. `verify` reuses `gates[id].planApprove.
-verify` (`fgos list --id <item-id> --json`'s `data.gates[id].planApprove.
-verify`, read fresh) — this skill proves the plan's existing verify still
-holds against reality, it does not design a new one (per this skill's own
-"leave execution alone" rule).
+<human|bypass> --verify "<verify>"`. The gate keeps the record name
+`validateApprove` even though it now covers both retired gates, so items
+already carrying gate history need no migration. `verify` is the item's own
+current `verify` field (`fgos list --id <item-id> --json`'s
+`data.work[id].verify`, read fresh) — this skill proves the plan's existing
+verify still holds against reality, it does not design a new one (per this
+skill's own "leave execution alone" rule).
 
 - **`true`** — skip the question. Post the non-question line
   `auto-approved: validateApprove (gate-bypass level <level>)`, log it
   (`fgos decision --text "auto-approved validateApprove gate for
   <item-id> at level <level>" --rationale "gate-bypass level <level>
-  permits auto-approval per docs/history/gate-bypass/CONTEXT.md D6"`, D3's
-  audit trail), record it (`fgos gate-approve <item-id> --gate
+  permits auto-approval per docs/history/gate-bypass/CONTEXT.md D1-D5 as
+  superseded by tsk-224"`, the same audit trail `gate-bypass` D3
+  requires), record it (`fgos gate-approve <item-id> --gate
   validateApprove --actor bypass --verify "..."`, per above), then
   continue straight to the `planning`→`executing` engine call below.
-- **`false`** — present the reality gate result and the feasibility matrix
-  in plain language — what was checked, what evidence backs it, what it
-  would cost to be wrong — with `plan.md` linked, then ask exactly:
-  "Feasibility validated. Approve moving to executing?" Once the person
-  approves, record it (`fgos gate-approve <item-id> --gate validateApprove
-  --actor human --verify "..."`, per above), then continue to the
-  `planning`→`executing` engine call below.
+
+- **`false`** — ask. **Ask to adjust the plan together, never for
+  permission** (D12). The shape of that question is the point of this
+  whole gate, so it is prescribed, not left to taste:
+
+  - Present **only the thing you are stuck on**. Do not restate the whole
+    plan and end with one closed question — that is precisely the
+    empty-gate failure this redesign exists to remove.
+  - Show **your own attempt first**: which options you compared, what
+    evidence you gathered, what tier A already ruled out. The person
+    should be editing your reasoning, not starting from nothing.
+  - Ask for **the specific input you are missing** — not "approve?".
+  - If several things are stuck, **batch them into one round**, so one
+    visit answers as much as possible (AGENTS.md priority #2).
+  - When the reality gate produced constraints but no trigger fired, name
+    the constraints plainly in the same message — they are context for the
+    question, not a question of their own.
+
+  Once the person answers, fold their answer into `plan.md`, record it
+  (`fgos gate-approve <item-id> --gate validateApprove --actor human
+  --verify "..."`, per above), then continue to the `planning`→`executing`
+  engine call below.
 
 Immediately after that gate-approve record, fire the `planning`→`executing`
 engine call itself (tsk-27y D1/D2, per the Hard rule above), reading the
 split decision straight from `plan.md`'s own step 4 (never re-derived here —
-`fgos-coding-planning`'s job, already done and already cited):
+`fgos-coding-planning`'s job, already done and already cited). **This is
+where split children first become real** — nothing created them earlier
+(`coding-planning-validating-gate-redesign/CONTEXT.md` D7):
 
 ```bash
 root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
 # plan.md's step 4 said "one honest piece" -- no split:
 node "$root/bin/fgos.mjs" plan "<item-id>" --verdict pass-through --reason "<why plan.md called this one piece>" --dir "$root"
-# plan.md's step 4 listed real child pieces instead -- each with the title
-# and verify command plan.md already recorded, formatted as the same JSON
-# shape the retired subprocess judge used to produce ({title, verify, kind?, risk?, refs?,
-# footprint?, deps?}):
-node "$root/bin/fgos.mjs" plan "<item-id>" --verdict decompose --reason "<why plan.md called for a split>" --children '<JSON array from plan.md>' --dir "$root"
-# plan.md's step 4's listed child pieces were already created as real work items during fgos-coding-planning's own step 4 (`fgos add --parent --footprint`), not a fresh `--children` blob still to be materialized -- cite them by id, never `--verdict decompose --children` here: that write is unconditional (plan.mjs's addWork loop, ~929-945) and would create duplicate positional-id children while orphaning the real ones:
-node "$root/bin/fgos.mjs" plan "<item-id>" --verdict pass-through --reason "<cite the existing child ids plan.md's step 4 already created via fgos add --parent>" --dir "$root"
+# plan.md's step 4 wrote child specs instead -- hand that same JSON block
+# through verbatim ({title, verify, action, kind?, risk?, refs?, footprint?,
+# deps?}), never a re-derived or re-worded version of it:
+node "$root/bin/fgos.mjs" plan "<item-id>" --verdict decompose --reason "<why plan.md called for a split>" --children '<the JSON array plan.md already carries>' --dir "$root"
 ```
+
+`--verdict decompose --children` is now the **only** way a split child is
+created, and it is the right one: `normalizeChild` re-validates every spec
+(rejecting the whole verdict over a missing `verify` or an `action` that
+cites no real D-ID), and `addWork` then creates each child at
+`stage: executing` carrying its `action` prose (`src/intake/plan.mjs:845-871`)
+— so children arrive ready to be built and never repeat a gate of their
+own. If the verdict is rejected, that is trigger T3 speaking: fix the spec
+in `plan.md` or take the question back to the person; never loosen the
+spec to get the write through.
 
 The verdict reached at the Gate above does not, by itself, move the item
 anywhere — it only informs which of the item's own already-registered edges
@@ -293,6 +414,27 @@ claim, and `fgos return` will simply refuse later with "is todo, not doing".
 - softening a NOT READY into a pass because the item already spent time here
 - reopening a decision `CONTEXT.md` or `plan.md` already locked, instead of
   citing it
+- **asking a person before exhausting tier A** — running the command,
+  reading the file, or calling `fgos-researching` was the answer, and a
+  question was asked instead
+- **weighing repair cost before tier A is exhausted**, which turns "I did
+  not check" into "it is probably cheap"
+- **reading repair cost as it looks at the gate** rather than when the
+  error would surface — everything is cheap here, because nothing is
+  materialized yet
+- **asking when a reversible option was available** instead of taking it
+  and carrying on (D5)
+- asking for anything other than T1/T2/T3 — in particular re-adding "high
+  risk, weak proof" as a trigger, which the feasibility matrix already
+  resolves via NOT READY without stopping for a person
+- **presenting the whole plan and ending with one closed approve/reject
+  question** instead of the stuck point, your own attempt, and the
+  specific missing input
+- asking several stuck points in separate rounds instead of one batch
+- **loosening a child spec's `action` or `verify` to get a rejected
+  `decompose` verdict through** — the rejection is trigger T3 speaking
+- creating a split child anywhere other than this gate's own
+  `--verdict decompose --children` call
 
 Violating the letter of the rules is violating the spirit of the rules.
 

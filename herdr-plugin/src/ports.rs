@@ -71,18 +71,24 @@ pub trait PaneOrchestrator {
     /// Switches herdr's focus directly to an already-running pane
     /// (tsk-1eu D2), never opening a new one.
     fn focus_pane(&self, pane_id: &str) -> io::Result<()>;
-    /// Runs `/fgOS:merge-loop` in an already-resolved pane (tsk-57q) —
-    /// unlike `open_pick_pane`/`open_discover_pane`, this never places or
-    /// reuses a pane itself: the fixed `fg:operation` tab's four slot
-    /// panes are resolved once, eagerly, at startup (`layout::
-    /// ensure_operation_tab`) and passed in directly. No id argument —
-    /// `/fgOS:merge-loop` is a pool-sweep verb, not a per-item one. This
-    /// structural split is why the worker lane can reclaim panes at all
-    /// (A7): loops live here, never there.
+    /// Runs `/fgOS:merge-next` in an already-resolved pane (tsk-57q;
+    /// single-item `-next`, not the perpetual `-loop` skill, since
+    /// tsk-4ry) — unlike `open_pick_pane`/`open_discover_pane`, this
+    /// never places or reuses a pane itself: the fixed `fg:operation`
+    /// tab's four slot panes are resolved once, eagerly, at startup
+    /// (`layout::ensure_operation_tab`) and passed in directly. No id
+    /// argument — `/fgOS:merge-next` picks its own item off the live
+    /// merge pool, the same centralization `/fgOS:discover-next` already
+    /// uses. This structural split is why the worker lane can reclaim
+    /// panes at all (A7): admin-lane launches live here, never there.
+    /// The method name keeps its `_loop` suffix (D3: this trait's public
+    /// surface is unchanged, only the launched command and the guard
+    /// deciding when to call it change) — see `main::auto_launch_operation_panes`
+    /// for that guard.
     fn launch_merge_loop(&self, pane_id: &str) -> io::Result<()>;
-    /// Same shape as `launch_merge_loop`, running `/fgOS:retro-loop`.
+    /// Same shape as `launch_merge_loop`, running `/fgOS:retro-next`.
     fn launch_retro_loop(&self, pane_id: &str) -> io::Result<()>;
-    /// Same shape as `launch_merge_loop`, running `/fgOS:cleanup-loop`.
+    /// Same shape as `launch_merge_loop`, running `/fgOS:cleanup-next`.
     fn launch_cleanup_loop(&self, pane_id: &str) -> io::Result<()>;
     /// Unattended equivalent of `open_discover_pane` (tsk-2ja) — but never
     /// for a specific id: the caller only ever knows a discoverable item

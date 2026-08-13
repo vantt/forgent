@@ -38,6 +38,7 @@ import { computeEnduserDocsIndex, generateEnduserDocsIndex, manifestPathFor } fr
 import { isResolvedStatus } from '../state/frontier.mjs';
 import { getDomain, resolveDomainName, effectiveStage } from '../state/workflow-stage-graphs.mjs';
 import { readLocalStatus, classifyRegistryPosture } from '../state/tool-registry.mjs';
+import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { describeConfigAwareness } from '../config/global-config.mjs';
 import {
   sharedConfigFilePath,
@@ -237,6 +238,22 @@ export function integrationScriptPath() {
   return fs.existsSync(canonical) ? canonical : executingCopy;
 }
 
+// tsk-2ej: not a staleness detector -- `doctor` can only ever report on
+// whatever build is actually running it, so it structurally cannot tell
+// itself apart from a newer release. What this check gives is the thing
+// that friction was missing: the running build's own version/commit made
+// legible on demand, the first thing to compare when a verb comes back
+// "unknown" on some other machine, without needing to read node_modules
+// directly (blocked by this repo's own scout-block hook).
+function checkCliVersionVisible() {
+  const info = resolveCliVersionInfo();
+  if (!info.packageVersion || !Array.isArray(info.verbs) || info.verbs.length === 0) {
+    return { passed: false, message: 'fgos version did not resolve a packageVersion/verbs -- src/cli/version.mjs is broken' };
+  }
+  const commitPart = info.gitCommit ? ` (${info.gitCommit})` : ' (no git commit -- not a git checkout)';
+  return { passed: true, message: `fgos ${info.packageVersion}${commitPart} — ${info.verbs.length} verbs` };
+}
+
 function checkNodeAndGit() {
   const major = parseInt(process.version.slice(1).split('.')[0], 10);
   if (Number.isNaN(major) || major < MIN_NODE_MAJOR) {
@@ -387,6 +404,12 @@ registerCheck({
   id: 'node-version-and-git',
   description: `Node >=${MIN_NODE_MAJOR} and git available`,
   check: (cwd) => checkNodeAndGit(cwd),
+});
+
+registerCheck({
+  id: 'cli-version-visible',
+  description: 'this build\'s own package version/commit/verb-set resolve cleanly via `fgos version` (tsk-2ej)',
+  check: () => checkCliVersionVisible(),
 });
 
 registerCheck({
@@ -1199,6 +1222,52 @@ registerCheck({
   id: 'plugin-skill-cli-reachable',
   description: 'a fgos CLI is reachable from this project (local bin/fgos.mjs or a global PATH install)',
   check: (cwd) => checkPluginSkillCliReachable(cwd),
+});
+
+// tsk-32b: `plugin-skill-cli-reachable` above only confirms the `fgos` CLI
+// binary is reachable -- it says nothing about whether the coding-domain
+// dev-skills the plugin's own slash-command skills (cook/discover/plan/
+// pick) dispatch into via the Skill tool are actually shipped in
+// plugins/fgOS/skills/ (they were not, before tsk-32b's own fix -- a
+// plugin-only consumer got "Unknown skill: fgos-coding-driving" the first
+// time cook/discover/plan/pick tried to dispatch into one, with the CLI
+// itself fully reachable the whole time). This check only ever fires
+// against THIS repo's own source tree -- it derives the expected dev-skill
+// set from `.claude/skills/fgos-*` and confirms each one also exists under
+// `plugins/fgOS/skills/`, catching a maintainer who adds/renames a
+// coding-domain dev-skill and forgets to re-copy it into the plugin before
+// a release ships (test/skills/fgos-mirror.test.mjs enforces the same
+// byte-identical content once both sides exist; this check only checks
+// presence, for a fast doctor-level signal). A downstream consumer running
+// doctor against their own project (no `.claude/skills/` of this repo's
+// own shape at their `cwd`) has nothing for this check to compare, so it
+// passes cleanly -- same "absent capability = clean skip" contract every
+// other optional check in this file already follows.
+function checkPluginDevSkillsPackaged(cwd) {
+  const claudeSkillsRoot = path.join(cwd, '.claude', 'skills');
+  const pluginSkillsRoot = path.join(cwd, 'plugins', 'fgOS', 'skills');
+  if (!fs.existsSync(claudeSkillsRoot) || !fs.existsSync(pluginSkillsRoot)) {
+    return { passed: true, message: 'not a forgent checkout (no .claude/skills or plugins/fgOS/skills at this project) -- nothing to check' };
+  }
+  const devSkillNames = fs
+    .readdirSync(claudeSkillsRoot, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && entry.name.startsWith('fgos-'))
+    .map((entry) => entry.name)
+    .sort();
+  const missing = devSkillNames.filter((name) => !fs.existsSync(path.join(pluginSkillsRoot, name, 'SKILL.md')));
+  if (missing.length === 0) {
+    return { passed: true, message: `all ${devSkillNames.length} coding-domain dev-skills are packaged in plugins/fgOS/skills/` };
+  }
+  return {
+    passed: false,
+    message: `${missing.length} coding-domain dev-skill(s) missing from plugins/fgOS/skills/ (present in .claude/skills/): ${missing.join(', ')} -- any repo installing fgOS only as a plugin will hit "Unknown skill" dispatching into these`,
+  };
+}
+
+registerCheck({
+  id: 'plugin-dev-skills-packaged',
+  description: 'every coding-domain dev-skill under .claude/skills/fgos-* is also packaged in plugins/fgOS/skills/, so a plugin-only consumer can dispatch into it',
+  check: (cwd) => checkPluginDevSkillsPackaged(cwd),
 });
 
 // tsk-3ip (docs/history/automated-changelog-compound-learn/DISCUSSION.md

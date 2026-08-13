@@ -57,10 +57,10 @@ node "$project_root/bin/fgos.mjs" tool query --capability pane-labeling --dir "$
 command -v herdr >/dev/null 2>&1 || exit 0
 [ -n "${HERDR_PANE_ID:-}" ] || exit 0
 
-# fg.ssid (D1): fgOS/bee's own session id. BEE_SESSION_ID first, else
+# fg.ssid (D1): fgOS's own session id. FGOS_SESSION_ID first, else
 # resolveWriterIdentity()'s own env/registry/pid fallback chain
 # (src/runner/session-identity.mjs) -- dropped entirely if neither resolves.
-fg_ssid="${BEE_SESSION_ID:-}"
+fg_ssid="${FGOS_SESSION_ID:-}"
 if [ -z "$fg_ssid" ] && [ -n "$project_root" ] && [ -f "$project_root/src/runner/session-identity.mjs" ]; then
   fg_ssid=$(node -e "
     import(process.argv[1]).then(({ resolveWriterIdentity }) => {
@@ -76,7 +76,7 @@ fi
 a_ssid="${CLAUDE_CODE_SESSION_ID:-}"
 
 # resolveWriterIdentity()'s own fallback chain reads CLAUDE_CODE_SESSION_ID
-# too when BEE_SESSION_ID is unset, so fg_ssid can come back equal to
+# too when FGOS_SESSION_ID is unset, so fg_ssid can come back equal to
 # a_ssid -- collapsing the two genuinely-distinct identities D1 requires.
 # Drop the duplicate rather than show the same value twice.
 if [ -n "$fg_ssid" ] && [ "$fg_ssid" = "$a_ssid" ]; then

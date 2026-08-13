@@ -175,9 +175,18 @@ shape for the other two gates.
 `canAutoApproveValidate(item, verdict, level)`, reusing exactly the first
 two axes `canAutoApprove` already used (the `HEAVY_KEYWORDS` floor, D4;
 `isTierCovered`) and swapping the third for `verdict === 'READY'`. The
-existing `canAutoApprove` — still driving `contextApprove`/`planApprove`
-— was left untouched rather than parameterized, so neither of those two
-gates' behavior could shift as a side effect.
+existing `canAutoApprove` — at the time still driving both
+`contextApprove` and `planApprove` — was left untouched rather than
+parameterized, so neither of those two gates' behavior could shift as a
+side effect.
+
+**Superseded:** `coding-planning-validating-gate-redesign/CONTEXT.md`
+D9-D11 later deleted `canAutoApproveValidate` entirely, replacing it with
+`canAutoApproveMergedGate` at the single merged gate now owned by
+`fgos-coding-validating`; `fgos-coding-planning`'s own `planApprove` gate
+was removed in the same change, so `canAutoApprove` today drives only
+`contextApprove`. This section stays as a historical record of D6's own
+reasoning at the time.
 
 ## A mechanical check is only as live as the branch importing it (D7/D8, `tsk-1vi`)
 

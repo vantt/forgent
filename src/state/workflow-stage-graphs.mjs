@@ -272,6 +272,12 @@ export const DOMAINS = Object.freeze({
     // for the L3 replay-from-zero reasoning) — this table is read exactly
     // once per write, through `statusCategoryFor` below, never at replay.
     statusLabels: Object.freeze({
+      // work-item-backlog-status D3: `backlog` maps to its OWN category,
+      // never folded into `todo`'s — that separation is the whole mechanism
+      // keeping a not-yet-committed idea out of frontier's positive-match
+      // `ready` filter (isTodoStatus, frontier.mjs) with no frontier-side
+      // code change.
+      backlog: 'backlog',
       todo: 'todo',
       doing: 'in-progress',
       blocked: 'in-progress',
@@ -450,7 +456,7 @@ export const DOMAINS = Object.freeze({
     // is the strongest real proof available within today's constraints:
     // status-fsm.mjs's TRANSITIONS is ONE shared flat table for every domain
     // (0027's own "Quyết định" section, reconfirmed by reading status-fsm.mjs
-    // and work.mjs's STATUSES directly — both are closed to the same 10
+    // and work.mjs's STATUSES directly — both are closed to the same 11
     // literal names, so no domain can introduce a genuinely new status
     // literal like a hypothetical "declined"; only D1-D3's original
     // "domain sở hữu TOÀN BỘ bảng transition" framing, explicitly REJECTED

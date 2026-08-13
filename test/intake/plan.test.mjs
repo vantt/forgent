@@ -6,7 +6,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { resolvePlan, resolveCallerPlanVerdict, resolveContentRoot, findUncoveredLockedDecisions } from '../../src/intake/plan.mjs';
 import { computeImpact, computePriority } from '../../src/state/priority-formula.mjs';
-import { addWork, listWork, StoreError, categoryOf, moveWork, readRawEvents, recordGateApprove } from '../../src/state/store.mjs';
+import { addWork, listWork, StoreError, categoryOf, moveWork, readRawEvents, recordGateApprove, addDecision } from '../../src/state/store.mjs';
 import { appendEvent } from '../../src/state/events.mjs';
 import { createWorktree } from '../../src/runner/worktree.mjs';
 
@@ -417,6 +417,34 @@ test('resolvePlan logs a decision when work.risk is present but unrecognized, ne
   assert.equal(unrecognizedDecisions.length, 1);
   assert.match(unrecognizedDecisions[0].text, /work\.risk "medium"/);
   assert.equal(recognizedDecisions.length, 0);
+});
+
+// tsk-sq9: the refined priority-write pass skips its own overwrite when a
+// human already logged a `priority-override` decision (via `edit
+// --priority`) for the item, and writes normally when it has not.
+test('resolvePlan skips its priority overwrite when a priority-override decision is on record, writes normally otherwise', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ id: 'item-overridden', priority: 42 }));
+  addWork(storeDir, sampleWork({ id: 'item-not-overridden' }));
+  addDecision(storeDir, {
+    id: 'item-overridden',
+    text: 'priority set to 42 via edit --priority',
+    source: 'edit',
+    kind: 'priority-override',
+    rationale: 'test fixture: simulate a human override recorded before the refined pass runs',
+  });
+
+  resolvePlan(storeDir, 'item-overridden', cfg, 'session', { verdict: 'pass-through' });
+  resolvePlan(storeDir, 'item-not-overridden', cfg, 'session', { verdict: 'pass-through' });
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-overridden'].priority, 42, 'the human-set value must survive the refined pass');
+  assert.notEqual(view.work['item-not-overridden'].priority, undefined, 'the refined pass still computes/writes priority when no override is on record');
+
+  const skipDecisions = (view.decisionsById?.['item-overridden'] ?? []).filter((d) => d.text.includes('skipped refined-pass overwrite'));
+  assert.equal(skipDecisions.length, 1);
+  const noSkipDecisions = (view.decisionsById?.['item-not-overridden'] ?? []).filter((d) => d.text.includes('skipped refined-pass overwrite'));
+  assert.equal(noSkipDecisions.length, 0);
 });
 
 test('resolvePlan on a caller-supplied decompose verdict writes every child with parent/deps/verify and moves the root to executing', () => {
