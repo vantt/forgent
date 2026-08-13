@@ -31,7 +31,12 @@ fgos tool query --capability impact-analysis --status present
   answer from an impact-analysis tool is worth a quick grep/rg cross-check
   before being trusted, regardless of what `fgos tool query` reports.
 - **`present`, freshly checked** — Full: the MUST rules below apply exactly
-  as written.
+  as written. A `full` posture still is not a guarantee of complete
+  per-file coverage: a genuinely fresh, non-stale index can still carry
+  zero indexed symbols for one large/complex file (tsk-38h — confirmed on
+  `bin/fgos.mjs`, 5000+ lines, zero indexed `Function` symbols even
+  immediately after a fresh reindex), a distinct mechanism from staleness
+  that the cross-check line above already covers unconditionally.
 
 This gate is prose the agent reads, never compiled logic — GitNexus is
 the first registered provider for `impact-analysis`, not the only one
