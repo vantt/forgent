@@ -266,6 +266,47 @@ directly by `fgos-coding-planning`, mid-`planning`, when that skill finds
    `stage` and get pointed at the right next skill, or hand it to
    `fgos-coding-planning` directly if the next step is already obvious.
 
+## Re-entry from `fgos-coding-planning` (mid-planning gap)
+
+`fgos-coding-planning`'s step 6 invokes this skill directly when
+`CONTEXT.md` turns out silent on something material to the plan. That
+re-entry is **not** a fresh exploring pass, and treating it as one is the
+failure this section exists to prevent
+(`docs/history/coding-planning-validating-gate-redesign/CONTEXT.md` D14).
+
+Recognize it by the `fgos decision` planning is required to write before
+handing back (D14a): a `planning->exploring hand-back:` line naming the
+gap, and a rationale naming which tier-A actions were already tried. Read
+it from `fgos list --id <id> --json`'s `data.decisions`, most recent last.
+
+When re-entering this way:
+
+- **Handle only the recorded gap.** Do not re-run step 1's scan and do not
+  generate a fresh 2-4 question set — `CONTEXT.md`'s existing decisions
+  already cover everything else, and re-asking what a prior round settled
+  is exactly what step 1's own "already-asked ground" rule forbids. The
+  tier-A actions named in that rationale were already run; do not repeat
+  them either.
+- **Append, never rewrite.** Lock the answer as a new D-ID appended to
+  `CONTEXT.md`'s existing decisions table, and leave `## Outstanding
+  questions` reading `None`.
+- **Do not run the Gate below, and do not record `contextApprove`**
+  (D14c). It already ran once for this `CONTEXT.md`; the re-entry adds one
+  decision, and asking "Approve CONTEXT.md before planning?" immediately
+  after a person has just answered the Socratic question is the empty gate
+  this redesign removes. If the gap resolved without needing a person at
+  all, the new decision still reaches one — the plan built on it goes
+  through `fgos-coding-validating`'s single gate.
+- **`item.stage` stays `planning` throughout.** There is no
+  `planning -> exploring` edge (`src/state/workflow-stage-graphs.mjs`'s
+  `DOMAINS.coding.transitions` is forward-only); this is a skill
+  invocation, never a stage move. Hand back to `fgos-coding-planning` when
+  the gap is closed.
+
+Everything below this section applies to a normal `exploring`-stage
+entry — an item that arrived here because `fgos discover` returned
+`unclear`.
+
 ## Gate
 
 Before asking, check whether this gate can auto-approve instead
@@ -351,6 +392,11 @@ node "$root/bin/fgos.mjs" discover "<item-id>" --verdict clear --verify "<the sa
 - CONTEXT.md left with placeholders, or handed off without the gate question
 - locking a "decision" from a guess instead of an answer
 - scope creep absorbed instead of marked deferred
+- on a mid-planning re-entry: re-running step 1's scan, regenerating a
+  full question set, or re-asking `contextApprove` — all three turn a
+  narrow gap-closing pass into a second gate in stage `planning`
+- re-running a tier-A action the hand-back decision already records as
+  tried
 
 Violating the letter of the rules is violating the spirit of the rules.
 
