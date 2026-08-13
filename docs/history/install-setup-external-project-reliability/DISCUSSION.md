@@ -2,12 +2,16 @@
 
 ## 1. Trạng thái hiện tại
 
-Round 6. D1-D4 đã khoá — D1 (2 trục độc lập), D2 (bin = 3 tầng
-deterministic), D3 (mở rộng shell-integration cho human + tự lỗ hổng
-fail-open riêng), D4 (tier 3 global = config-cache làm nguồn sự thật,
-probe làm cơ chế populate/repair, tự lành qua existsSync-staleness). Còn
-đúng 1 câu hỏi mở: hướng sửa root cause #2 gốc (marketplace check
-fail-open) — WARN thẳng hay tự phân biệt case trước.
+Round 8. D1-D5 đã khoá. D5 (round 7-8) là bước ngoặt: xoay hẳn kiến trúc
+trục B (skill) khỏi khung D1 ban đầu — bỏ phụ thuộc plugin marketplace
+làm cơ chế BẮT BUỘC, chuyển sang `.agents/skills` làm nguồn thật
+(orchestrator-neutral, đã tồn tại sẵn trong repo), `.claude/skills` thành
+wrapper mỏng do `fgos setup` tự generate. Root cause #2 (marketplace
+check fail-open) coi như được giải quyết bằng kiến trúc mới — không còn
+là câu hỏi "WARN hay phân biệt case" nữa, vì check đó không còn
+load-bearing cho chức năng cốt lõi. Bin-discovery (root cause #1,
+D2-D4) đã xong từ round 6. Còn lại: xác nhận không còn câu hỏi thiết kế
+nào mở trước khi handoff sang `fgos-coding-exploring`/`fgos-coding-planning`.
 
 ## 2. Mục tiêu & đề bài
 
@@ -36,8 +40,9 @@ config/check của riêng nó) — không phải một bản vá cục bộ cho 
 | 3 | `claude` binary có thực sự đáng tin là "thước đo Claude Code có mặt hay không" không? | Chưa rõ | Người dùng có thể dùng Claude Code qua desktop app/IDE extension mà không có binary `claude` riêng trên PATH — lúc đó check #2 "not applicable" lại ĐÚNG theo nghĩa khác (Claude Code không dùng CLI marketplace mechanism theo cách này). Cần phân biệt "claude thật sự không áp dụng" khỏi "claude có áp dụng nhưng tạm thời không thấy trên PATH lúc check chạy" — 2 case khác nhau, hiện bị gộp làm một. |
 | 4 | Vì sao project-local cần tồn tại riêng, không gộp về global-only? | Rõ (D2) | Version-pinning/team-consistency: global-only nghĩa là mọi project trên máy dùng chung 1 version, nâng cấp cho project này làm vỡ project khác im lặng — cùng lớp vấn đề `tsk-jtb` đang giải ở tầng release tag. `node_modules/.bin` không nằm trên PATH thường (chỉ có qua `npm run`/`npx`) nên phải resolve bằng file-check, không phải PATH lookup. |
 | 5 | Hướng sửa root cause #1 (tầng global): probe nhiều tầng hay cache path đã resolve? | Rõ (D4) | Cache-in-config làm nguồn sự thật (đọc rẻ, không subprocess), probe nhiều tầng chỉ chạy 1 lần trong `fgos setup`/`doctor --fix` để populate/sửa, tự lành qua `existsSync`-staleness check khi cache sai. |
-| 6 | Hướng sửa root cause #2: check nên fail loud hay tìm cách tự phân biệt "claude không áp dụng" khỏi "claude tạm thời không thấy"? | Chưa rõ | Cùng cần quyết định trước khi khoá D-ID. |
+| 6 | Hướng sửa root cause #2: check nên fail loud hay tìm cách tự phân biệt "claude không áp dụng" khỏi "claude tạm thời không thấy"? | Rõ (D5, khác hướng ban đầu) | Không sửa check nữa — bỏ luôn phụ thuộc `claude` CLI cho chức năng cốt lõi. Xem #8. |
 | 7 | Root cause #3 (mới phát hiện, D3): cơ chế human-convenience (shell function) tự wiring qua `fgos setup` có lỗ hổng fail-open riêng | Rõ | `integrationScriptPath()` (`src/setup/registrations.mjs:228-239`) trả `null` khi bản đang chạy không nằm trong git checkout nào; `checkShellIntegrationSourced` (dòng 276-280) coi `null` là `passed: true` — cùng pattern silent-pass với root cause #2. Global install qua nvm tình cờ vẫn ổn (`~/.nvm` tự nó là git clone), nhưng Homebrew/system-npm/Volta/fnm thì không wire được gì, doctor vẫn báo xanh. Yêu cầu "phải trong git checkout" vốn chỉ để tránh rác 1-dòng-source-mỗi-worktree — rủi ro đó không áp dụng cho bản cài qua npm. |
+| 8 | "Thật sự có cần plugin marketplace không?" (câu hỏi gốc của anh, round 7) | Rõ (D5) | Không cần cho chức năng CỐT LÕI. Bằng chứng dư thừa quan sát trực tiếp trong chính session này: 14 dev-skill load 2 lần (bản không-prefix từ `.claude/skills/`, bản `fgOS:`-prefix từ plugin) — vì forgentX vừa là nguồn `.claude/skills/` vừa tự cài plugin của mình để dogfood. `.agents/skills/` đã tồn tại sẵn (14 skill y hệt) — đúng hướng orchestrator-neutral anh muốn. Quyết: `.agents/skills` thành nguồn thật, `.claude/skills` thành wrapper mỏng do `fgos setup` tự generate cho MỌI project — plugin marketplace hạ xuống tuỳ chọn. |
 
 ## 4. Quyết định đã chốt
 
@@ -47,6 +52,7 @@ config/check của riêng nó) — không phải một bản vá cục bộ cho 
 | D2 | Trục A (bin) resolve theo **3 tầng deterministic**, không phải nhóm "PATH-dependent vs không" mơ hồ như trước: (1) dev-checkout self-hosting — file-check `<git-root>/bin/fgos.mjs`; (2) project-local install — file-check `node_modules/.bin/fgos`, đi ngược cây thư mục từ cwd (giống Node module resolution); (3) global install — tầng DUY NHẤT thật sự cần PATH lookup hoặc config-cache. **Project-local giữ lại là chế độ riêng, không gộp về global-only.** | Global-only làm mọi project trên máy dùng chung 1 version — nâng cấp cho project A làm vỡ project B im lặng, cùng lớp vấn đề `tsk-jtb` đang giải ở tầng release tag; project-local (qua `package.json`+lockfile) pin version theo từng project/team, đúng pattern chuẩn CLI npm (eslint/prettier). `node_modules/.bin` xác nhận không nằm trên PATH ngoài context `npm run`/`npx` nên phải resolve bằng file-check, không phải PATH — thu hẹp câu hỏi probe-vs-cache trước đó xuống chỉ còn tầng global. |
 | D3 | Mở rộng cơ chế "human gõ `fgos` trần, hệ thống tự resolve" theo 2 phần: (a) nội dung `scripts/fgos-shell-integration.sh` cài đủ 3 tầng của D2 (thêm tier 2 — hiện chỉ có tier 1 → PATH fallback); (b) `integrationScriptPath()`/`checkShellIntegrationSourced` (`src/setup/registrations.mjs`) BỎ yêu cầu "phải nằm trong git checkout" đối với bản cài qua npm (global/project-local) — chỉ giữ yêu cầu đó cho dev-checkout self-hosting, nơi rủi ro rác-1-dòng-mỗi-worktree là thật; bản cài npm dùng thẳng path ổn định từ `import.meta.url`. | `checkShellIntegrationSourced` trả `passed: true` khi `integrationScriptPath()` là `null` — cùng pattern fail-open với root cause #2 (`src/setup/registrations.mjs:228-239,270-281`; `src/runner/paths.mjs:72-85`). Global install qua nvm tình cờ vẫn wire được (`~/.nvm` tự nó là git clone), nhưng Homebrew/system-npm/Volta/fnm thì không — doctor vẫn báo xanh. Yêu cầu git-checkout chỉ cần thiết để tránh rác rc-line khi xoá worktree (dev-checkout only), không áp dụng cho bản cài npm vốn đã có path ổn định sẵn. |
 | D4 | Tầng 3 (global) trong D2 dùng **config-cache làm nguồn sự thật**: `fgos setup`/`doctor --fix` chạy probe nhiều tầng (PATH thường → ép login-shell `command -v` → probe trực tiếp vị trí global-install đã biết, không qua PATH) đúng 1 lần, ghi absolute path vào `~/.fgos/config.json`. Mọi lần gọi khác đọc cache trước (rẻ, không subprocess); cache sai/thiếu (`existsSync` fail) mới trigger probe lại + ghi đè — tự lành, không trả phí probe mỗi lần gọi. | Probe-mỗi-lần tốn 2-3 subprocess/lần gọi — đắt khi 1 phiên gọi `fgos` nhiều lần. Cache-read là 1 lần đọc file rẻ. Staleness tự sửa qua `existsSync`, chỉ trả phí probe đầy đủ đúng lúc cache thật sự sai (gỡ cài/đổi package manager/đổi version nvm). Khớp pattern act-then-report đã có sẵn của `fgos setup`/`doctor --fix` (RUL10), không phát minh cơ chế mới. |
+| D5 (sửa lại phần trục B của D1) | Nguồn thật cho nội dung skill chuyển sang `.agents/skills/<name>/SKILL.md` (orchestrator-neutral, đã tồn tại sẵn, hiện đang hand-mirror byte-identical vào `.claude/skills` + `plugins/fgOS/skills` qua `test/skills/fgos-mirror.test.mjs`). `.claude/skills/<name>/SKILL.md` thành **wrapper mỏng** — stub ngắn "đọc và làm theo `.agents/skills/<name>/SKILL.md`", cùng pattern dispatch-sang-skill-thật fgOS đã dùng khắp nơi (`plugins/fgOS/skills/coding-shape` → `fgos-coding-shaping`). `fgos setup` chạy ở BẤT KỲ project nào (không riêng forgentX) tự materialize `.agents/skills/*` (ship trong npm package, cần thêm `.agents/` vào `files` allowlist) + wrapper `.claude/skills/*` generate tự động — không cần `claude` CLI, không cần đăng ký plugin marketplace cho chức năng cốt lõi. Plugin/marketplace hạ xuống tuỳ chọn, chỉ cho ai muốn thêm `/fgOS:xxx` gõ tay. | Theo định hướng chủ sản phẩm: skill fgOS phải chuẩn hoá theo hướng agent điều phối không nhất thiết là Claude — `.agents/skills` đã tồn tại đúng vai trò này. Gộp 3-chân-mirror-tay hiện tại (tsk-32b) thành 1 nguồn thật + wrapper tự sinh vừa bỏ gánh nặng đồng bộ tay, vừa bỏ luôn phụ thuộc `claude` CLI — giải quyết root cause #2 bằng kiến trúc, không phải vá check. Tác động kéo theo đã ghi nhận: `test/skills/fgos-mirror.test.mjs` hiện assert byte-identical cả 3 chân — phải đổi thành assert "wrapper trỏ đúng chỗ" khi `.claude/skills` không còn là full copy. |
 
 ## 5. Q&A log
 
@@ -94,14 +100,33 @@ config/check của riêng nó) — không phải một bản vá cục bộ cho 
   --fix`, tự lành qua `existsSync`-staleness. Lý do: chi phí subprocess
   nếu probe mỗi lần gọi, cache-read rẻ hơn nhiều bậc, khớp pattern
   act-then-report đã có sẵn. Anh đồng ý — đã ghi D4, cập nhật §3/§4/§6.
+- **2026-08-13, vòng 7** — Anh hỏi thẳng: "thật sự có cần plugins không?
+  cảm thấy có gì đó dư thừa". Em phát hiện bằng chứng dư thừa THẬT ngay
+  trong session này (14 dev-skill load 2 lần, prefix và không-prefix),
+  trình bày hướng thay thế: `fgos setup` copy thẳng skill content vào
+  `.claude/skills/` của project ngoài, bỏ phụ thuộc plugin marketplace
+  làm cơ chế bắt buộc — plugin chỉ còn tuỳ chọn cho `/fgOS:xxx`. Anh nói
+  "muốn đồng ý" nhưng bổ sung định hướng quan trọng: bộ skill đang chuẩn
+  hoá để agent điều phối không nhất thiết là Claude, nên nguồn thật nên ở
+  `.agents/skills`, `.claude/skills` chỉ là wrapper mỏng.
+- **2026-08-13, vòng 8** — Em scout xác nhận `.agents/skills/` đã tồn tại
+  thật (14 skill y hệt `.claude/skills`), và `test/skills/fgos-mirror.
+  test.mjs` đã có sẵn cơ chế mirror 3 chân (`.claude/skills` ↔
+  `.agents/skills` ↔ `plugins/fgOS/skills`) — hiện maintain bằng tay,
+  `.claude/skills` là bản được sửa theo `distribution.md`. Em đề xuất
+  hình dạng wrapper cụ thể: stub ngắn kiểu dispatch-sang-skill-thật fgOS
+  đã dùng sẵn khắp nơi. Anh xác nhận đúng — đã ghi D5, cập nhật §3/§4/§6.
 
 ## 6. Thiết kế đã chốt {#design}
 
 fgOS có 2 hệ phân phối độc lập (D1) — **bin** (`fgos`/`fgos-runner`, npm
-package) và **skill** (`/fgOS:*`, Claude Code plugin) — đóng gói tách
-biệt, cài tách biệt, và không có gì tự động nối chúng lại ngoài
-`fgos setup`/`doctor --fix` (bản thân đang có 2 lỗ hổng fail-silent, xem
-§3 #1-2).
+package) và **skill** — đóng gói tách biệt, cài tách biệt. Khác với
+khung D1 ban đầu (skill chỉ tới được qua Claude Code plugin marketplace),
+D5 xoay trục B sang: **`.agents/skills` là nguồn thật (orchestrator-
+neutral), `fgos setup` tự materialize wrapper vào từng agent-harness cụ
+thể** (`.claude/skills` là wrapper đầu tiên) — không còn phụ thuộc
+`claude` CLI/plugin marketplace cho chức năng cốt lõi; xem chi tiết cuối
+mục này.
 
 Trục A (bin) tự nó không phải một khối "global hay local" đơn giản mà là
 **3 tầng deterministic, mỗi tầng một lý do tồn tại riêng và một cách
@@ -131,33 +156,33 @@ flowchart TB
         A3["Tầng 3: global install<br/>config-cache (~/.fgos/config.json) là<br/>nguồn sự thật (D4); probe nhiều tầng<br/>chỉ populate 1 lần trong setup/doctor --fix"]
     end
 
-    subgraph SkillAxis["Trục B — skill /fgOS:* (Claude Code plugin)"]
+    subgraph SkillAxis["Trục B — skill, nguồn thật .agents/skills (D5)"]
         direction TB
-        B1["forgentX tự-host<br/>.claude/skills/fgos-* có sẵn trong checkout"]
-        B2["Claude Code plugin marketplace<br/>plugins/fgOS/skills/*<br/>qua .claude-plugin/marketplace.json"]
+        B0["Nguồn thật: .agents/skills/*<br/>orchestrator-neutral, ship trong npm package"]
+        B1["Wrapper: .claude/skills/*<br/>stub mỏng, fgos setup tự generate<br/>cho MỌI project, không cần claude CLI"]
+        B2["Tuỳ chọn: Claude Code plugin marketplace<br/>plugins/fgOS/skills/*<br/>chỉ cho ai muốn /fgOS:xxx gõ tay"]
+        B0 -->|"fgos setup materialize trực tiếp"| B1
     end
 
-    Bridge["fgos setup / fgos doctor --fix<br/>(cầu nối DUY NHẤT giữa 2 trục)"]
+    Bridge["fgos setup / fgos doctor --fix<br/>(cầu nối cho cả 2 trục — bin-cache D4 + skill-materialize D5)"]
     RC1["Root cause #1 (thu hẹp còn tầng 3):<br/>sh -c non-login shell không thấy PATH<br/>của global install (nvm interactive-only)"]
-    RC2["Root cause #2:<br/>checkClaudePluginMarketplace fail-open<br/>khi claude CLI không trên PATH<br/>-- B2 không bao giờ được kích hoạt"]
 
     A3 -.->|"tsk-2qc root cause #1"| RC1
     RC1 -.-> Bridge
-    Bridge -->|"claude plugin marketplace add/install"| B2
-    Bridge -.->|"fail-open, silent pass"| RC2
-    RC2 -.-> B2
+    Bridge -->|"copy .agents/skills + generate wrapper<br/>(D5, không cần claude CLI)"| B1
+    Bridge -.->|"tuỳ chọn, không load-bearing"| B2
 
     ProjectNgoai["Project bên ngoài, chỉ làm 1 nửa hướng dẫn"] -->|"chỉ npm install -g"| A3
-    ProjectNgoai -->|"thiếu bước fgos setup thành công"| SkillMissing["Không có skill nào<br/>(Unknown skill)"]
-    A3 -.->|"PATH lookup fail (root cause #1)"| BinMissing["Không tìm ra bin<br/>dù đã cài"]
+    ProjectNgoai -->|"chạy fgos setup 1 lần"| B1
+    A3 -.->|"PATH lookup fail (root cause #1,<br/>trước khi có D4 cache)"| BinMissing["Không tìm ra bin<br/>dù đã cài"]
 ```
 
 Kết luận thiết kế tới thời điểm này: bất kỳ hướng sửa bin-discovery nào
 cũng phải đứng trên nền D1+D2 — tầng 1-2 giữ nguyên file-check hiện có
 (đã đúng, không cần sửa), toàn bộ nỗ lực root cause #1 chỉ tập trung vào
 tầng 3 (global). **Tầng 3 đã chốt (D4): config-cache làm nguồn sự thật.**
-Còn mở duy nhất: hướng sửa root cause #2 gốc (WARN thẳng vs phân biệt
-case "claude không áp dụng" khỏi "claude tạm thời không thấy").
+Root cause #2 gốc không còn là câu hỏi mở nữa — D5 giải quyết bằng kiến
+trúc (xem cuối mục này), không phải vá check.
 
 **Tầng 3 cụ thể (D4):** `fgos setup`/`doctor --fix` chạy multi-tier probe
 đúng 1 lần (PATH thường → ép login-shell `command -v` → probe trực tiếp
@@ -208,6 +233,41 @@ check, CI) — không phải việc mới, mà là đồng bộ hoá 2 chỗ hi�
 dở dang khác nhau (script hiện chỉ có tier 1+3, JS check hiện cũng chỉ có
 tier 1+3, cả 2 đều thiếu tier 2; và JS-wiring còn thêm root cause #3
 riêng của nó).
+
+**Trục B — bước ngoặt kiến trúc (D5):** ban đầu (D1) khung thiết kế coi
+Claude Code plugin marketplace là cách DUY NHẤT đưa skill tới project
+ngoài — root cause #2 khi đó chỉ là "vá cái check fail-open". Nhưng quan
+sát trực tiếp trong chính session này (14 dev-skill load 2 lần, bản
+không-prefix từ `.claude/skills/` VÀ bản `fgOS:`-prefix từ plugin, cùng
+tồn tại song song) lộ ra: bản thân việc PHẢI đi qua plugin marketplace
+mới là dư thừa, không phải chỉ cái check bị hỏng. Kết hợp với định hướng
+sản phẩm (chuẩn hoá để agent điều phối không nhất thiết là Claude),
+`.agents/skills/` — đã tồn tại sẵn trong repo, cùng 14 skill, hiện
+hand-mirror byte-identical qua `test/skills/fgos-mirror.test.mjs` — trở
+thành nguồn thật. `.claude/skills/` (và bất kỳ agent-harness nào khác
+trong tương lai) chỉ còn là wrapper mỏng, tự generate bởi `fgos setup`,
+không cần tay copy, không cần `claude` CLI.
+
+```mermaid
+flowchart TB
+    Source[".agents/skills/&lt;name&gt;/SKILL.md<br/>nguồn thật, orchestrator-neutral<br/>ship trong npm package (D5)"]
+    Setup["fgos setup<br/>chạy ở BẤT KỲ project nào"]
+    Wrapper[".claude/skills/&lt;name&gt;/SKILL.md<br/>wrapper mỏng, tự generate<br/>-- stub: 'đọc và làm theo .agents/skills/...'"]
+    Optional["Claude Code plugin marketplace<br/>-- TUỲ CHỌN, chỉ cho /fgOS:xxx gõ tay<br/>-- không load-bearing cho chức năng cốt lõi"]
+
+    Source --> Setup
+    Setup -->|"materialize trực tiếp,<br/>không cần claude CLI"| Wrapper
+    Setup -.->|"tuỳ chọn, nếu người dùng muốn<br/>+ đã có claude CLI"| Optional
+
+    OldPath["Trước D5: root cause #2<br/>checkClaudePluginMarketplace fail-open"]
+    Optional -.->|"vẫn có thể fail-open,<br/>nhưng không còn quan trọng"| OldPath
+```
+
+Tác động triển khai cần lưu ý (không phải chỉ prose): `plugins/`
+không nằm trong npm `files` allowlist hôm nay — cần thêm `.agents/` vào
+đó. `test/skills/fgos-mirror.test.mjs` hiện assert byte-identical cả 3
+chân — phải đổi bản chất assertion khi `.claude/skills` ngừng là full
+copy.
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
