@@ -76,7 +76,7 @@ only by `fgos-coding-validating`'s single gate, not here.
   },
   {
     "title": "Make .agents/skills canonical source with generated .claude/skills thin wrappers",
-    "verify": "npm run build:skills && npm test -- test/skills/",
+    "verify": "npm run build:skills && npm test -- 'test/skills/**/*.test.mjs'",
     "action": "D5/D7: add .agents/ to package.json files allowlist; write one shared generator function producing .claude/skills/<name>/SKILL.md thin-wrapper stubs from .agents/skills/<name>/SKILL.md; wire it into a new npm run build:skills script (forgentX self-dogfood) and into fgos setup's external-project materialize path (copies both .agents/skills and generated .claude/skills into the target project, sibling-relative paths, never pointing at the global install); replace test/skills/fgos-mirror.test.mjs's byte-identical assertion with a wrapper-correctness assertion",
     "footprint": ["package.json", "src/setup/skill-wrappers.mjs", ".agents/skills/", ".claude/skills/", "test/skills/fgos-mirror.test.mjs"],
     "kind": "task",
@@ -105,6 +105,13 @@ this combination makes Node's test runner report a phantom failing
 (`'test/setup/**/*.test.mjs'`) instead of the bare directory avoids the
 bug entirely — same coverage, same 3183 real tests, verified both ways.
 Fixed on the item's own `verify` field (`fgos edit --verify`) and here.
+
+**Verify fix, piece 2 (post-plan, tsk-1qi own implementation):** same
+`node --test` bare-directory-vs-glob quirk already fixed for piece 1
+(tsk-2qc-1) — `test/skills/` as a bare positional arg alongside the npm
+script's own already-active glob produces the identical phantom failing
+pseudo-test, zero real per-test failures underneath either way. Fixed the
+same way: the equivalent glob (`'test/skills/**/*.test.mjs'`).
 
 **Re-slice note (post-plan, resolving engine footprint-overlap ask):** the
 original spec had this task editing `src/setup/skill-wrappers.mjs`
