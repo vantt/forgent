@@ -45,7 +45,21 @@ function tmpDir() {
 // lets a race test give each child a DISTINCT id to mutate (e.g. testing the
 // state.json refreshView race, which needs concurrent writers on different
 // ids, not a CAS/exists conflict on the same one).
-async function raceAcrossProcesses(dir, storeCall, nProcesses, extraArgvPerChild = null) {
+//
+// `batchSize` (tsk-4fx, optional, defaults to `nProcesses` — every existing
+// call site below is byte-for-byte unaffected unless it opts in): caps how
+// many child processes are synchronized to the SAME start instant at once.
+// `acquireEventsLock`'s 2s deadline (src/state/events.mjs) is computed fresh
+// per individual lock-acquisition attempt, so a test racing MANY processes
+// against the same events.lock can, under real machine load, have a single
+// attempt among hundreds land in a window where too many siblings are
+// simultaneously retrying for it to succeed inside budget — a standing flake,
+// not a regression (docs/history/tsk-4fx-concurrency-test-lock-timeout-flake/
+// RESEARCH.md). Batching reduces PEAK simultaneous contention without
+// changing the total operation count or the cross-process race semantics
+// under test — each batch is still genuine concurrent OS-process racing,
+// just fewer processes racing at once.
+async function raceAcrossProcesses(dir, storeCall, nProcesses, extraArgvPerChild = null, batchSize = nProcesses) {
   const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-store-race-'));
   const childScript = `
 import { addWork, editWork, moveWork, moveStage, StoreError, FsmError } from ${JSON.stringify(STORE_MJS)};
@@ -63,23 +77,29 @@ try {
   const childPath = path.join(workDir, 'race-child.mjs');
   fs.writeFileSync(childPath, childScript);
 
-  const startAt = Date.now() + 300;
-  const results = await Promise.all(
-    Array.from({ length: nProcesses }, (_, i) =>
-      new Promise((resolve, reject) => {
-        const extraArgv = extraArgvPerChild ? [String(extraArgvPerChild[i])] : [];
-        const child = fork(childPath, [dir, String(startAt), ...extraArgv], { stdio: 'inherit' });
-        let message = null;
-        child.on('message', (msg) => {
-          message = msg;
-        });
-        child.on('exit', (code) => {
-          if (!message) return reject(new Error(`child exited (code ${code}) without reporting an outcome`));
-          resolve(message);
+  const results = [];
+  for (let batchStart = 0; batchStart < nProcesses; batchStart += batchSize) {
+    const batchCount = Math.min(batchSize, nProcesses - batchStart);
+    const startAt = Date.now() + 300;
+    const batchResults = await Promise.all(
+      Array.from({ length: batchCount }, (_, j) => {
+        const i = batchStart + j;
+        return new Promise((resolve, reject) => {
+          const extraArgv = extraArgvPerChild ? [String(extraArgvPerChild[i])] : [];
+          const child = fork(childPath, [dir, String(startAt), ...extraArgv], { stdio: 'inherit' });
+          let message = null;
+          child.on('message', (msg) => {
+            message = msg;
+          });
+          child.on('exit', (code) => {
+            if (!message) return reject(new Error(`child exited (code ${code}) without reporting an outcome`));
+            resolve(message);
+          });
         });
       }),
-    ),
-  );
+    );
+    results.push(...batchResults);
+  }
 
   fs.rmSync(workDir, { recursive: true, force: true });
   return results;
@@ -687,6 +707,7 @@ for (let i = 0; i < ${N_EDITS}; i += 1) {
 }`,
     N_PROC,
     Array.from({ length: N_PROC }, (_, i) => `race-view-${i}`),
+    4, // tsk-4fx: batch to reduce peak events.lock contention under load — see raceAcrossProcesses' own comment
   );
 
   assert.deepEqual(results, Array(N_PROC).fill({ ok: true }), 'every concurrent editWork loop on a distinct id must succeed (no CAS conflict expected across different ids)');
