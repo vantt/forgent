@@ -165,6 +165,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- An item whose root branch was ever synced (`fgos sync-root`), or that was
+  converged into a component (`fgos promote-to-component`), could reach
+  `done` without a retrospective ever having produced anything. Both verbs
+  recorded their merge on the item as a decision but never said it was
+  machine-written, and an untagged decision defaults to `design` — so the
+  cleanup gate read a routine branch merge as someone's reflection on the
+  work and passed the item through. Both records are now tagged as engine
+  bookkeeping. They remain fully visible in `fgos show`; they simply no
+  longer stand in for a retrospective document. Items that were relying on
+  this to pass will now be held at `cleanup` until real synthesis happens.
+
 - `fgos check`'s entropy report no longer under-counts the backlog waiting
   at the front of the lifecycle. The signal filtered on the literal stage
   name `clarify`, which the coding domain retired entirely, so it reported

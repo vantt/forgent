@@ -30,8 +30,14 @@ rejects engine bookkeeping:
 const hasDecision = (view?.decisionsById?.[id] ?? []).some((d) => d?.kind !== 'engine');
 ```
 
-Two verbs write engine bookkeeping with **no `kind` at all**, so they fold
-in as `kind: undefined` and read as real human reflection:
+Two verbs write engine bookkeeping with **no `kind` at all**. Corrected at
+implement time, and it is worse than first recorded: `addDecision` does not
+leave the field unset, it **defaults it to `'design'`**
+(`src/state/store.mjs:881`, `kind: payload.kind ?? 'design'`). So these two
+records do not merely fail to say what they are — the engine actively
+labels a mechanical branch merge as a *design decision*, which is a
+positive false claim, not an omission. Confirmed by the red test's own
+failure output: `'design' !== 'engine'`. The two sites:
 
 - `bin/fgos.mjs:3957` — `sync-root`'s closing `addDecision`
 - `bin/fgos.mjs:4161` — `promote-to-component`'s closing `addDecision`
@@ -90,12 +96,28 @@ cannot be trusted.
 
 ## Shape
 
-Phase 1 — **prove it red.** Add a test to
-`test/state/cleanup-harness.test.mjs`, in the existing
-`// --- checkRetrospectiveContent ---` block beside the tsk-qrs tests at
-:399/:412, asserting a view whose only decision is a `sync-root`-shaped
-engine record is NOT accepted. Run it against unmodified `bin/fgos.mjs`
-and confirm it fails.
+Phase 1 — **prove it red.**
+
+**Corrected at implement time.** This phase originally said to add the test
+to `test/state/cleanup-harness.test.mjs` beside the tsk-qrs tests at
+:399/:412. That would have been a **test that passes before the fix**, i.e.
+proof of nothing. `checkRetrospectiveContent` is not the defective code —
+it already rejects `kind: 'engine'` correctly. The defect is in the two
+*writers* in `bin/fgos.mjs`, so a unit test that hand-builds a `view`
+literal never exercises them and is green either way.
+
+The red-first test must run the real verb and read what it actually wrote.
+`test/cli/fgos-merge.test.mjs` already does exactly that at :213
+(`sync-root records a real decision on the root item`, driving the verb end
+to end via `makeDriftedRoot` + `run(cwd, ['sync-root', ...])` and reading
+`eventLines`), and at :459/:528 for `promote-to-component`. The new tests
+go there, asserting two things per verb:
+
+1. the decision event the verb writes carries `kind: 'engine'`;
+2. `checkRetrospectiveContent` therefore does NOT accept that item — the
+   consequence that makes the tag matter, rather than a bare shape check.
+
+Both are red against unmodified `bin/fgos.mjs` and green after.
 
 Phase 2 — **fix.** Add `kind: 'engine'` to `bin/fgos.mjs:3957` and
 `:4161`. Re-run: green.

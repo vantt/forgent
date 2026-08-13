@@ -3958,6 +3958,16 @@ async function runVerb(verb, flags, positional, dir) {
           text: `sync-root: merged ${branch} into ${targetBranch} at ${currentHead(mergeRoot)}`,
           rationale: `fgos sync-root ${id} — closes the drift window this item's own design exists to prevent`,
           id,
+          // Engine bookkeeping, not reflection: a branch sync is machinery
+          // this verb performs, never someone thinking about the work. The
+          // record stays fully visible in `fgos show` (which filters
+          // decisions by id, never by kind) -- but `kind` is what stops it
+          // counting as retrospective content at the cleanup gate
+          // (`checkRetrospectiveContent`). Without it addDecision defaults
+          // to `kind: 'design'` (store.mjs), actively labelling a merge as
+          // a design decision, and any synced root could reach `done` with
+          // no retrospective document behind it.
+          kind: 'engine',
         });
         return { id, mode: 'sync-root', outcome: 'synced', target: targetBranch, branch, seq: event.seq, output: result.check.output, postLand: result.postLand };
       };
@@ -4162,6 +4172,10 @@ async function runVerb(verb, flags, positional, dir) {
         text: `promote-to-component: root "${rootId}"${rootCreated ? ' (newly created)' : ' (existing member promoted)'} — merged [${merged.join(', ') || 'none'}]${notMerged.length > 0 ? `, not merged: ${notMerged.map((r) => `${r.id} (${r.reason})`).join(', ')}` : ''}`,
         rationale: 'fgos promote-to-component — converges flat siblings into one component before merging to main, per docs/history/promote-to-component/CONTEXT.md',
         id: rootId,
+        // Same reasoning as sync-root's own record above: converging
+        // siblings into a component is machinery, so this must not read as
+        // reflection at the retrospective gate.
+        kind: 'engine',
       });
 
       return { rootId, rootCreated, results, seq: event.seq };

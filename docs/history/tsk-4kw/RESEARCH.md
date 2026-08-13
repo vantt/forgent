@@ -60,15 +60,32 @@ correctly. So the convention is understood and applied by default — these
 two are genuine outliers, not the leading edge of a pattern nobody follows.
 Nothing else is missing a tag. The fix is complete at two call sites.
 
-**Goal 3 — no test would break.**
+**Goal 3 — no test would break, but the first answer to this was WRONG and
+is corrected here.**
 
-`rg -ln "sync-root|promote-to-component" test/` matches 8 files
-(`entropy`, `drift-status`, `checks`, `fgos-approve`, `fgos-merge`,
-`fgos-post-merge`, the CLI harness, `promote-engine`). Grepping every one
-of them for `decisions|decisionsById` returns **no output at all** — not a
-single test reads the decision records these two verbs write. They assert
-on merge outcome and status, never on the decision log. Adding a field to
-those two payloads is invisible to the existing suite.
+**Corrected at implement time (round 1 was wrong).** The original finding
+claimed "not a single test reads the decision records these two verbs
+write", based on grepping the 8 matching files for `decisions|decisionsById`
+and getting no output. That grep was too narrow: the real tests use the
+singular `e.type === 'decision'` and a variable named `decisionEvents`,
+neither of which contains the plural string `decisions`. Searching on the
+correct pattern, `rg -n "type === 'decision'" test/`, finds five:
+
+- `test/cli/fgos-merge.test.mjs:223` — `sync-root records a real decision on the root item`
+- `test/cli/fgos-merge.test.mjs:459` and `:528` — the two `promote-to-component` decision tests
+- `test/cli/fgos-merge.test.mjs:1117` — a `sync-root` blocked-path decision
+- `test/runner/claim-port.test.mjs:346` — `stale-claim-reclaim` (already tagged, unaffected)
+
+So these verbs' decisions ARE asserted on. The conclusion survives, but for
+a different reason than first recorded: every one of those assertions checks
+the decision **count** (`length === 1`) and its **text** (`assert.match`),
+never the full payload shape. Adding a `kind` field changes neither, so no
+existing test goes red. Verified by running the suite after the change.
+
+This correction matters beyond bookkeeping: `fgos-merge.test.mjs:223` is the
+one place that already drives `sync-root` end to end and reads what it
+wrote, which makes it the correct home for this item's red-first test — see
+the Shape correction in `plan.md`.
 
 **Goal 4 — `npm test`, with the red-first test in the file that already
 owns this gate.**
