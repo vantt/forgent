@@ -17,12 +17,19 @@ Depends on Piece 1 (`tsk-5vs`), already merged into this branch: the
 
 `standard`, on 2 flags:
 
-1. **Existing covered behavior changes.** The tab strip is not new surface —
-   four existing tests assert exactly the current 4-tab shape and cycle:
-   `tabs_classify_status_into_todo_doing_review_done` and
-   `next_tab_and_prev_tab_cycle_and_reset_selection` (`app.rs`),
-   `work_items_panel_renders_four_tabs_todo_doing_review_done` (`ui.rs`),
-   and `next_tab_event_cycles_the_active_tab` (`main.rs`).
+1. **Existing covered behavior changes.** The tab strip is not new surface.
+   Three existing tests assert the current 4-tab shape and must be updated:
+   `tabs_classify_status_into_todo_doing_review_done` (`app.rs:1113-1133`),
+   `next_tab_and_prev_tab_cycle_and_reset_selection` (`app.rs:1142-1154`),
+   and `work_items_panel_renders_four_tabs_todo_doing_review_done`
+   (`ui.rs:724-737`).
+
+   A fourth, `next_tab_event_cycles_the_active_tab` (`main.rs:1076-1088`),
+   was checked and needs **no** change: it steps forward twice from `Todo`
+   and asserts `Review`, and since `Backlog` is inserted before `Todo` the
+   `Todo → Doing → Review` leg is untouched — only the `Done` wrap moves. Do
+   not edit it; it should stay green as a free regression check that the
+   forward leg did not shift.
 2. **Cross-language status-literal mirror.** The Rust side re-states status
    literals that live canonically in JS (`workflow-stage-graphs.mjs`). JS-side
    correctness does not imply the Rust side stays in sync — that divergence is
@@ -103,7 +110,7 @@ conclusion drawn from them.
 | Component | Risk | What would prove it |
 |---|---|---|
 | `WorkTab::matches` (`app.rs:118-128`) | **Medium.** GitNexus upstream impact reports CRITICAL / 31 impacted / 22 processes / 4 modules. Read through, it is hub-shaped, not dangerous: `direct: 1` — the single direct caller is `App::visible_work_items` (`app.rs:373-377`), and everything at depth 2-3 reaches it only through that one funnel. | `cargo test` green. The 22 "affected processes" are themselves almost entirely this crate's own tests, so the item's own verify covers the reported radius rather than leaving it unproven. |
-| Tab cycle (`next`/`prev`, `app.rs:139-155`) | **Medium.** Going 4 → 5 changes the wrap point. Two existing tests assert the 4-cycle by construction (`next_tab_and_prev_tab_cycle_and_reset_selection` at `app.rs:1142-1154` calls `next_tab()` exactly 3 times after `Doing` and asserts a wrap to `Todo`; `next_tab_event_cycles_the_active_tab` in `main.rs`). | Both tests updated to the 5-cycle and green, with the wrap assertion still explicit rather than deleted. |
+| Tab cycle (`next`/`prev`, `app.rs:139-155`) | **Medium.** Going 4 → 5 changes the wrap point. One existing test asserts the 4-cycle by construction: `next_tab_and_prev_tab_cycle_and_reset_selection` (`app.rs:1142-1154`) steps `next_tab()` three times past `Doing` and asserts a wrap back to `Todo`, which becomes `Backlog` under the new order. | That test updated to the 5-cycle and green, with both wrap assertions (forward from `Done`, backward from `Backlog`) still explicit rather than deleted, and `main.rs`'s forward-leg test still green untouched. |
 | `TAB_ORDER` arity (`ui.rs:36`) | **Low.** Typed `[WorkTab; 4]`; the compiler rejects a 5th element until the type changes, so this cannot silently half-land. | Compiles; `work_items_panel_renders_four_tabs_todo_doing_review_done` (`ui.rs:721-735`) updated to assert all five labels. |
 | `next_auto_discover_candidate` (`main.rs:138-140`) | **Low.** No logic change needed — the literal `status == "todo"` check already excludes `backlog` by construction. The risk is silent future drift, not present incorrectness. | A new regression test: a `backlog` item at an otherwise discover-eligible stage with empty `blocked_by` is never returned as a candidate. |
 
@@ -141,7 +148,9 @@ before the next step can be written:
 1. `app.rs` — add the `Backlog` variant, its `matches` arm, its `label`, and
    its place in `next`/`prev`. Nothing else compiles until the variant exists.
 2. `ui.rs` — widen `TAB_ORDER` to `[WorkTab; 5]` with `Backlog` first.
-3. Update the four existing tests named in the Mode rationale.
+3. Update the three existing tests named in the Mode rationale (leaving
+   `main.rs`'s `next_tab_event_cycles_the_active_tab` alone, per the note
+   there).
 4. `main.rs` — add the `next_auto_discover_candidate` regression test (no
    production change in this file).
 
