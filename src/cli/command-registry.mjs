@@ -472,6 +472,33 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'gate-check',
+    invoke: 'fgos gate-check',
+    description: 'Read-only: computes whether one of the 2 live skill-embedded Gates (contextApprove/validateApprove) can auto-approve, via canAutoApprove/canAutoApproveMergedGate (src/state/gate-bypass.mjs). Exists so fgos-coding-exploring/fgos-coding-validating resolve this through the CLI\'s own static imports — which already resolve correctly under any install shape (global, dev-checkout, npx), unlike the ad hoc cwd-relative resolver those skills used to embed inline (tsk-65q, docs/history/tsk-65q-gate-bypass-global-install-resolution/).',
+    parameters: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', description: 'Work item id the Gate belongs to.' },
+        gate: { type: 'string', description: 'Which Gate to check: "contextApprove" (fgos-coding-exploring) or "validateApprove" (fgos-coding-validating).' },
+        artifact: { type: 'string', description: '--gate contextApprove only: path to the CONTEXT.md artifact to check.' },
+        plan: { type: 'string', description: '--gate validateApprove only: path to the plan.md artifact to check.' },
+        children: { type: 'string', description: '--gate validateApprove only: JSON array of child specs from plan.md step 4 (default "[]").' },
+        cost: { type: 'string', description: '--gate validateApprove only: the cost verdict from this skill\'s own Step 1 ("REVERSIBLE" or anything else meaning a trigger fired).' },
+      },
+      positional: ['id'],
+      required: ['id', 'gate'],
+    },
+    examples: [
+      'fgos gate-check tsk-19j --gate contextApprove --artifact docs/history/tsk-19j/CONTEXT.md',
+      'fgos gate-check tsk-19j --gate validateApprove --plan docs/history/tsk-19j/plan.md --children "[]" --cost REVERSIBLE',
+    ],
+    touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
     name: 'stale',
     invoke: 'fgos stale',
     description: 'Read-only advisory: items stuck in "doing" classified as stale by owner type (a person\'s claim gets far longer grace than an agent\'s). Classifies and suggests only — never reclaims.',
