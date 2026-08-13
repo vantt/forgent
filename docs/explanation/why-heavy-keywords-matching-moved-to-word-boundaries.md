@@ -79,9 +79,12 @@ other's false-positive exposure live") named exactly two consumers,
 `classifyIronLaw` and `classify()` — but a third, independent
 `HEAVY_KEYWORDS` consumer existed and was never touched:
 `src/state/gate-bypass.mjs`'s `canAutoApprove`/
-`canAutoApproveValidate` (identical `hardGateHit` blocks at :132/:152)
-kept the original raw substring scan, and didn't even import
-`matchesKeyword`:
+`canAutoApproveValidate` (identical `hardGateHit` blocks at :132/:152, as
+the file stood at the time — `canAutoApproveValidate` was later deleted by
+`coding-planning-validating-gate-redesign/CONTEXT.md` D9-D11 and replaced
+by `canAutoApproveMergedGate`, which carries the same `matchesKeyword`
+word-boundary fix this section describes) kept the original raw substring
+scan, and didn't even import `matchesKeyword`:
 
 > "The other two `HEAVY_KEYWORDS` consumers already migrated
 > (`src/intake/classify.mjs:63`, `src/evolve/iron-law.mjs:87`) —
