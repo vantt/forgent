@@ -1505,6 +1505,38 @@ async function runVerb(verb, flags, positional, dir) {
           }
         }
       }
+      // tsk-280: `return` (bin/fgos.mjs's own `case 'return'`) is the one
+      // door built to prove real progress before `doing -> awaiting-
+      // approval` — branch-advanced (or an explicit `--no-new-commits-ok`,
+      // tsk-4on), a clean working tree, and the item's own `verify`
+      // command actually passing. `move` had zero precondition for this
+      // exact edge, so it silently bypassed every one of those guarantees.
+      // Mirrors the `--to delivered` guard immediately above: refuse by
+      // default, require an explicit non-empty `--skip-return-guard`
+      // reason (never `--override-reason` — that flag's own error message
+      // is scoped specifically to the missing-merge-evidence case above,
+      // a different guarantee than "no proof of real progress"), logged
+      // to the decision log before proceeding.
+      if (to === 'awaiting-approval') {
+        const view = listWork(dir);
+        const item = view.work[id];
+        if (item?.status === 'doing') {
+          const skipReason = optionalField(flags['skip-return-guard'], 'move --to awaiting-approval --skip-return-guard requires a non-empty reason value (omit --skip-return-guard entirely when the item is not "doing", or use "fgos return" to prove real progress for real)');
+          if (!skipReason) {
+            throw new StoreError(
+              'validation',
+              `move: "${id}" is "doing" — moving it to "awaiting-approval" here would record no proof of real progress (no branch-advance check, no clean-tree check, no verify run). `
+                + `Use "fgos return ${id}" to prove it for real (pass --no-new-commits-ok if the work was already done before this claim), or pass --skip-return-guard "<why>" to force this move anyway (recorded to the decision log).`,
+            );
+          }
+          addDecision(dir, {
+            id,
+            text: `move --to awaiting-approval skip-return-guard override for "${id}": status was "doing"`,
+            rationale: skipReason,
+            kind: 'engine',
+          });
+        }
+      }
       const { event } = moveWork(dir, { id, to, expectedStatus, reason, role: 'human' });
       return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
     }

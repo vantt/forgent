@@ -211,6 +211,7 @@ export const COMMAND_REGISTRY = [
         to: { type: 'string', description: 'Target status to move to.' },
         expect: { type: 'string', description: 'Optional CAS guard: the expected current status.' },
         reason: { type: 'string', description: 'Optional reason; required by the FSM on specific edges (e.g. awaiting-approval -> blocked/todo).' },
+        'skip-return-guard': { type: 'string', description: 'Required, non-empty reason to force --to awaiting-approval on a "doing" item without going through fgos return\'s own proof-of-progress checks (branch-advance, clean tree, verify pass). Omit entirely when the item is not "doing". Logged to the decision log.' },
       },
       positional: ['id'],
       required: ['id', 'to'],
