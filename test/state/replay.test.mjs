@@ -357,6 +357,51 @@ test('foldEvents derives a clarify-pass settlement from work.stage discovery -> 
   assert.deepEqual(view.settlements.a[0], { kind: 'clarify-pass', role: 'runner', ts: '2026-07-16T00:00:01.000Z', detail: 'npm test -- a' });
 });
 
+// tsk-31lz: since tsk-30v, an UNCLEAR discovery verdict also leaves
+// `discovery` (-> `exploring`) while the item parks in `awaiting-human`
+// with an open question. `from === 'discovery'` alone therefore no longer
+// means "settled" — the gate has to read the verdict that drove the move.
+// The verdict is already in the log as the `work.discovery` event this same
+// `resolveDiscovery` call appends immediately BEFORE its `moveStage`
+// (discovery.mjs), so the fold can read it with no new payload field and no
+// change to already-written events.
+
+test('foldEvents does NOT derive a clarify-pass settlement when the discovery verdict that drove the discovery -> exploring move was unclear', () => {
+  const events = [
+    { seq: 1, ts: '2026-08-12T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'discovery' }, v: 2 },
+    { seq: 2, ts: '2026-08-12T00:00:01.000Z', type: 'work.discovery', payload: { id: 'a', clear: false, question: 'Which auth provider?' }, v: 2 },
+    { seq: 3, ts: '2026-08-12T00:00:02.000Z', type: 'work.stage', payload: { id: 'a', from: 'discovery', to: 'exploring', verify: 'chưa xác định — bổ sung thủ công', role: 'session' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal('settlements' in view, false);
+});
+
+test('foldEvents still derives a clarify-pass settlement when the discovery verdict that drove the move was clear', () => {
+  const events = [
+    { seq: 1, ts: '2026-08-12T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'discovery' }, v: 2 },
+    { seq: 2, ts: '2026-08-12T00:00:01.000Z', type: 'work.discovery', payload: { id: 'a', clear: true }, v: 2 },
+    { seq: 3, ts: '2026-08-12T00:00:02.000Z', type: 'work.stage', payload: { id: 'a', from: 'discovery', to: 'planning', verify: 'npm test -- a', role: 'session' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.settlements.a.length, 1);
+  assert.deepEqual(view.settlements.a[0], { kind: 'clarify-pass', role: 'session', ts: '2026-08-12T00:00:02.000Z', detail: 'npm test -- a' });
+});
+
+// Legacy-log guard (RUL20: the fold never silences a settlement a real
+// historical log already earned). Every `from === 'discovery'` event in this
+// repo's own live log predates tsk-30v, when `discovery -> exploring` WAS
+// the clear path — a log line that carries no readable verdict at all must
+// keep settling exactly as it did before this fix.
+test('foldEvents still derives a clarify-pass settlement from discovery -> exploring when the log carries no work.discovery verdict at all (legacy log)', () => {
+  const events = [
+    { seq: 1, ts: '2026-08-12T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'discovery' }, v: 2 },
+    { seq: 2, ts: '2026-08-12T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'discovery', to: 'exploring', verify: 'npm test -- a', role: 'runner' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.settlements.a.length, 1);
+  assert.equal(view.settlements.a[0].kind, 'clarify-pass');
+});
+
 test('foldEvents does NOT derive a settlement from work.stage exploring -> planning (it never leaves discovery)', () => {
   const events = [
     { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'exploring' }, v: 2 },
@@ -672,6 +717,41 @@ test('foldEvents ignores branchHeadAtReturn on a proposed move for an id that wa
   assert.doesNotThrow(() => foldEvents(events));
   const view = foldEvents(events);
   assert.equal('ghost' in view.work, false);
+});
+
+// `mergedSha`/`mergedInto` (tsk-5dk) fold onto the item on the SAME
+// `to: 'delivered'` edge the payload actually carries them on — never
+// inferred, never re-derived from git, straight off the event exactly like
+// headAtReturn/branchHeadAtReturn above.
+
+test('foldEvents folds mergedSha and mergedInto onto the item from a delivered move that carries them', () => {
+  const events = [
+    { seq: 1, ts: '2026-08-12T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'awaiting-approval' }, v: 2 },
+    { seq: 2, ts: '2026-08-12T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'awaiting-approval', to: 'delivered', role: 'human', mergedSha: 'deadbeefcafe', mergedInto: 'main' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.work.a.mergedSha, 'deadbeefcafe');
+  assert.equal(view.work.a.mergedInto, 'main');
+});
+
+test('foldEvents leaves mergedSha/mergedInto absent for a delivered move that never carried them (hand-typed move, or a verify-only pull-door delivery)', () => {
+  const events = [
+    { seq: 1, ts: '2026-08-12T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'awaiting-approval' }, v: 2 },
+    { seq: 2, ts: '2026-08-12T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'awaiting-approval', to: 'delivered', role: 'human' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal('mergedSha' in view.work.a, false);
+  assert.equal('mergedInto' in view.work.a, false);
+});
+
+test('foldEvents ignores mergedSha/mergedInto on a non-delivered move even when the payload carries them (only the delivered edge sets them)', () => {
+  const events = [
+    { seq: 1, ts: '2026-08-12T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
+    { seq: 2, ts: '2026-08-12T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', role: 'human', mergedSha: 'ignored-on-this-edge', mergedInto: 'ignored-on-this-edge' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal('mergedSha' in view.work.a, false);
+  assert.equal('mergedInto' in view.work.a, false);
 });
 
 // --- work-graph-intelligence S3: view revision-hash -----------------------

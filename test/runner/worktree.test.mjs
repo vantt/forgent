@@ -15,6 +15,7 @@ import {
   reclaimOrphanedCheckout,
   provisionDependencies,
   resyncClaimWorktree,
+  refreshUnstartedBranch,
   withMergeEphemeralWorktree,
   WorktreeError,
 } from '../../src/runner/worktree.mjs';
@@ -834,4 +835,116 @@ test('createWorktree stays byte-identical (no node_modules created) for a repo w
   const wt = createWorktree(repoRoot, 'item-nodeps', { worktreeDir });
 
   assert.equal(fs.existsSync(path.join(wt.path, 'node_modules')), false);
+});
+
+// --- refreshUnstartedBranch / createClaimWorktree's decompose-to-pick
+// refresh (tsk-55p) --------------------------------------------------------
+
+function rev(cwd, ref) {
+  return execFileSync('git', ['rev-parse', ref], { cwd, encoding: 'utf8' }).trim();
+}
+
+test('createClaimWorktree refreshes a branch with no commits of its own onto the target tip (tsk-55p, acceptance 1)', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  execFileSync('git', ['branch', 'fgw/root'], { cwd: repoRoot });
+  createBranchRef(repoRoot, 'leaf', { baseRef: 'fgw/root' });
+  const staleBase = rev(repoRoot, 'fgw/leaf');
+  const newTip = advanceBranchExternally(repoRoot, 'fgw/root', 'target.txt', 'moved\n');
+  assert.notEqual(staleBase, newTip);
+
+  const wt = createClaimWorktree(repoRoot, 'leaf', { worktreeDir, baseRef: 'fgw/root' });
+
+  assert.equal(wt.refresh.refreshed, true);
+  assert.equal(wt.refresh.reason, undefined);
+  assert.equal(rev(repoRoot, 'fgw/leaf'), newTip, 'the branch ref itself must now point at the target tip');
+  assert.equal(rev(wt.path, 'HEAD'), newTip, 'the checkout must reflect the refreshed tip, not the stale base');
+  assert.ok(fs.existsSync(path.join(wt.path, 'target.txt')), 'the checkout must carry the refreshed content');
+});
+
+test('createClaimWorktree never touches a branch carrying its own commits, and reports drift instead (tsk-55p acceptance 2, D2)', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  execFileSync('git', ['branch', 'fgw/root'], { cwd: repoRoot });
+  createBranchRef(repoRoot, 'leaf', { baseRef: 'fgw/root' });
+  const ownCommit = advanceBranchExternally(repoRoot, 'fgw/leaf', 'work.txt', 'mine\n');
+  advanceBranchExternally(repoRoot, 'fgw/root', 'target.txt', 'moved\n');
+
+  const wt = createClaimWorktree(repoRoot, 'leaf', { worktreeDir, baseRef: 'fgw/root' });
+
+  assert.equal(rev(repoRoot, 'fgw/leaf'), ownCommit, 'the branch must be byte-identical to before the claim — the whole point');
+  assert.equal(wt.refresh.refreshed, false);
+  assert.equal(wt.refresh.reason, 'own-commits');
+  assert.equal(wt.refresh.ahead, 1, 'leaf is 1 commit ahead of root (its own work)');
+  assert.equal(wt.refresh.behind, 1, 'leaf is 1 commit behind root (root advanced separately)');
+  assert.equal(rev(wt.path, 'HEAD'), ownCommit, 'the checkout must reflect the untouched branch, not a merged/refreshed one');
+});
+
+test('the refresh only ever fast-forwards — the pre-refresh tip survives as an ancestor of the post-refresh tip (tsk-55p acceptance 3, D2: never a rebase)', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  execFileSync('git', ['branch', 'fgw/root'], { cwd: repoRoot });
+  createBranchRef(repoRoot, 'leaf', { baseRef: 'fgw/root' });
+  const staleBase = rev(repoRoot, 'fgw/leaf');
+  advanceBranchExternally(repoRoot, 'fgw/root', 'target.txt', 'moved\n');
+
+  const wt = createClaimWorktree(repoRoot, 'leaf', { worktreeDir, baseRef: 'fgw/root' });
+
+  assert.equal(wt.refresh.from, staleBase);
+  assert.equal(wt.refresh.to, rev(repoRoot, 'fgw/leaf'));
+  // A rebase would rewrite staleBase's own history away; a real fast-forward
+  // keeps it reachable as an ancestor of the new tip. This throws if it is
+  // not — the assertion IS the ancestor check itself.
+  execFileSync('git', ['merge-base', '--is-ancestor', staleBase, rev(repoRoot, 'fgw/leaf')], { cwd: repoRoot });
+});
+
+test('createClaimWorktree with no baseRef supplied: refresh is undefined, byte-identical to every pre-tsk-55p test of this function (regression guard)', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  execFileSync('git', ['branch', 'fgw/root'], { cwd: repoRoot });
+  createBranchRef(repoRoot, 'leaf', { baseRef: 'fgw/root' });
+  advanceBranchExternally(repoRoot, 'fgw/root', 'target.txt', 'moved\n');
+
+  const wt = createClaimWorktree(repoRoot, 'leaf', { worktreeDir });
+
+  assert.equal(wt.refresh, undefined);
+  assert.equal(rev(repoRoot, 'fgw/leaf'), rev(wt.path, 'HEAD'), 'unchanged behavior: checkout stands on whatever the branch already pointed at');
+});
+
+test('refreshUnstartedBranch: branch already at the target tip reports already-current, refreshed false, no error', () => {
+  const repoRoot = initTempRepo();
+  execFileSync('git', ['branch', 'fgw/root'], { cwd: repoRoot });
+  createBranchRef(repoRoot, 'leaf', { baseRef: 'fgw/root' });
+
+  const result = refreshUnstartedBranch(repoRoot, 'fgw/leaf', 'fgw/root');
+  assert.equal(result.refreshed, false);
+  assert.equal(result.reason, 'already-current');
+  assert.equal(result.ahead, 0);
+  assert.equal(result.behind, 0);
+});
+
+test('refreshUnstartedBranch with a live checkout: refreshes in place via a real fast-forward merge, and a subsequent resyncClaimWorktree call is then a no-op', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  execFileSync('git', ['branch', 'fgw/root'], { cwd: repoRoot });
+  createBranchRef(repoRoot, 'leaf', { baseRef: 'fgw/root' });
+
+  // Stand up a real (white, unstarted) checkout first, simulating a claim
+  // taken before this item existed -- exactly the reattach case
+  // refreshUnstartedBranch's checkoutPath argument exists for.
+  const first = createClaimWorktree(repoRoot, 'leaf', { worktreeDir });
+  assert.equal(first.refresh, undefined);
+
+  const newTip = advanceBranchExternally(repoRoot, 'fgw/root', 'target.txt', 'moved\n');
+  const result = refreshUnstartedBranch(repoRoot, 'fgw/leaf', 'fgw/root', first.path);
+
+  assert.equal(result.refreshed, true);
+  assert.equal(result.to, newTip);
+  assert.equal(rev(first.path, 'HEAD'), newTip, 'the live checkout itself must reflect the merge, not just the ref');
+  assert.ok(fs.existsSync(path.join(first.path, 'target.txt')));
+
+  // resyncClaimWorktree, called after, finds the checkout already at the
+  // branch's current tip and correctly does nothing further.
+  const resync = resyncClaimWorktree(repoRoot, first.path, 'fgw/leaf');
+  assert.equal(resync.resynced, false);
 });

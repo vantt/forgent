@@ -5,13 +5,25 @@ use std::process::Command;
 
 use serde::Deserialize;
 
-/// Max panes per `fg:agents-N` tab before a new tab is created (tsk-1q3
-/// CONTEXT.md feature boundary: a 2×2 corner grid).
-const MAX_PANES_PER_TAB: usize = 4;
+use crate::pane_scan::{extract_task_id, PaneSnapshot};
 
-/// Max `fg:agents-N` tabs before pane placement refuses "no room" instead
-/// of creating a 3rd (tsk-5lr CONTEXT.md feature boundary item 1).
-const MAX_AGENT_TABS: usize = 2;
+/// How many panes one `fg:workers-N` tab holds before the next tab is
+/// created — the 2×2 corner grid `next_split_target` below builds toward
+/// (tsk-1q3 CONTEXT.md feature boundary).
+///
+/// tsk-1zq: this is grid GEOMETRY, not a ceiling. It decides where the
+/// next pane goes, never whether there is room for another worker at all
+/// — that question belongs to the engine now (`fgos slots`, D6), which is
+/// why the old `MAX_AGENT_TABS` cap and its `NoRoomForAgentTabs` refusal
+/// are gone rather than renamed: two independent ceilings that never knew
+/// about each other was exactly the problem (RESEARCH F2).
+const PANES_PER_WORKERS_TAB: usize = 4;
+
+/// Prefix of the worker lane's tab labels. tsk-1zq supersedes tsk-1q3's
+/// own pinned tab term (which named the lane after the agents in it): a
+/// slot is named apart from whatever occupies it (D1), and `worker` is
+/// the word the whole feature settled on.
+const WORKERS_TAB_PREFIX: &str = "fg:workers-";
 
 #[derive(Debug)]
 pub enum LayoutError {
@@ -19,10 +31,6 @@ pub enum LayoutError {
     ExitStatus(String),
     Parse(serde_json::Error),
     NoUsablePaneInResponse(String),
-    /// Both `fg:agents-1..fg:agents-MAX_AGENT_TABS` are full (tsk-5lr
-    /// CONTEXT.md feature boundary item 1) — never a queue, never an
-    /// auto-created 3rd tab.
-    NoRoomForAgentTabs,
 }
 
 impl std::fmt::Display for LayoutError {
@@ -34,10 +42,6 @@ impl std::fmt::Display for LayoutError {
             LayoutError::NoUsablePaneInResponse(raw) => {
                 write!(f, "herdr response had no usable pane: {raw}")
             }
-            LayoutError::NoRoomForAgentTabs => write!(
-                f,
-                "no room: fg:agents-1..fg:agents-{MAX_AGENT_TABS} are full"
-            ),
         }
     }
 }
@@ -118,7 +122,7 @@ struct PaneRow {
 /// <id>` (each row carries both `pane_id` and `tab_id` — proven live in
 /// tsk-4zo's own `pane_scan.rs`). `tab list`'s own rows never carry a
 /// pane id, only `pane_count`, so this second call is how an *existing*
-/// `fg:agents-N` tab's first usable pane is actually found.
+/// worker-lane tab's first usable pane is actually found.
 fn find_any_pane_in_tab(herdr_bin: &str, workspace_id: &str, tab_id: &str) -> Result<String, LayoutError> {
     let stdout = run_herdr(herdr_bin, &["pane", "list", "--workspace", workspace_id])?;
     let envelope: PaneListEnvelope = serde_json::from_str(&stdout).map_err(LayoutError::Parse)?;
@@ -156,19 +160,24 @@ struct LayoutPane {
 #[derive(Debug, Deserialize)]
 struct Rect {
     height: u32,
-    /// tsk-5lr CONTEXT.md D2: pane identity inside `fg:operation` is
-    /// decided by geometry — smallest `x` is the left/merge-loop slot.
+    /// Reading-order sort keys for `operation_slot_panes` (tsk-1zq,
+    /// superseding tsk-5lr D2's binary smallest-`x`-is-left rule, which
+    /// cannot address four slots).
     x: u32,
-    /// CONTEXT.md D2 extends `Rect` with `width` alongside `x`; unread by
-    /// this item's own left/right-by-`x` decision, kept for parse parity.
+    y: u32,
+    /// Unread by any current decision; kept for parse parity with the
+    /// real response.
     #[allow(dead_code)]
     width: u32,
 }
 
-/// Extracts the trailing `<N>` from a `fg:agents-<N>` label (tsk-1q3
-/// CONTEXT.md "fg:agents-N tab" pinned term).
-fn agents_tab_index(label: &str) -> Option<u32> {
-    label.strip_prefix("fg:agents-")?.parse().ok()
+/// Extracts the trailing `<N>` from a `fg:workers-<N>` label. A tab still
+/// carrying tsk-1q3's superseded label is deliberately not recognized:
+/// after tsk-1zq's rename it is simply an ordinary tab, so herdr places
+/// no new pane in it, never reuses a pane inside it, and never closes it
+/// — relabelling an operator's live workspace costs more than it fixes.
+fn workers_tab_index(label: &str) -> Option<u32> {
+    label.strip_prefix(WORKERS_TAB_PREFIX)?.parse().ok()
 }
 
 fn run_herdr<S: AsRef<OsStr>>(herdr_bin: &str, args: &[S]) -> Result<String, LayoutError> {
@@ -181,18 +190,22 @@ fn run_herdr<S: AsRef<OsStr>>(herdr_bin: &str, args: &[S]) -> Result<String, Lay
     Ok(String::from_utf8_lossy(&output.stdout).to_string())
 }
 
-/// Finds the lowest-numbered `fg:agents-N` tab with a free slot
-/// (`pane_count < 4`), or creates the next `fg:agents-(N+1)` tab if none
-/// has room. Returns `(tab_id, an_existing_pane_id_in_that_tab,
-/// pane_count)` — the pane id and count feed straight into
-/// `next_split_target` next. A freshly created tab always starts with
-/// exactly one root pane (proven live this session).
+/// Finds the lowest-numbered `fg:workers-N` tab with a free grid slot
+/// (`pane_count < PANES_PER_WORKERS_TAB`), or creates the next
+/// `fg:workers-(N+1)` tab if none has room. Returns `(tab_id,
+/// an_existing_pane_id_in_that_tab, pane_count)` — the pane id and count
+/// feed straight into `next_split_target` next. A freshly created tab
+/// always starts with exactly one root pane (proven live).
+///
+/// tsk-1zq: this never refuses any more. Tabs grow as needed, because the
+/// only ceiling that means anything now is the engine's, asked before
+/// this function is ever reached (D6).
 ///
 /// `project_root` is the cwd every pane this function creates starts in
 /// (tsk-45u D1): a new tab's root pane is a real pane a person can end up
 /// typing in, so it starts in the project too rather than inheriting
 /// whatever directory herdr happened to be launched from.
-pub fn find_agents_tab_with_room(
+pub fn find_workers_tab_with_room(
     herdr_bin: &str,
     workspace_id: &str,
     project_root: &Path,
@@ -200,23 +213,22 @@ pub fn find_agents_tab_with_room(
     let stdout = run_herdr(herdr_bin, &["tab", "list", "--workspace", workspace_id])?;
     let tabs = parse_tab_list(&stdout).map_err(LayoutError::Parse)?;
 
-    let mut agent_tabs: Vec<(u32, TabRow)> = tabs
+    let mut worker_tabs: Vec<(u32, TabRow)> = tabs
         .into_iter()
         .filter_map(|tab| {
-            let index = agents_tab_index(tab.label.as_deref()?)?;
+            let index = workers_tab_index(tab.label.as_deref()?)?;
             Some((index, tab))
         })
         .collect();
-    agent_tabs.sort_by_key(|(index, _)| *index);
+    worker_tabs.sort_by_key(|(index, _)| *index);
 
-    match decide_agent_tab_placement(&agent_tabs) {
-        AgentTabPlacement::ExistingTabWithRoom(tab) => {
+    match decide_workers_tab_placement(&worker_tabs) {
+        WorkersTabPlacement::ExistingTabWithRoom(tab) => {
             let pane_id = find_any_pane_in_tab(herdr_bin, workspace_id, &tab.tab_id)?;
             Ok((tab.tab_id.clone(), pane_id, tab.pane_count as usize))
         }
-        AgentTabPlacement::NoRoom => Err(LayoutError::NoRoomForAgentTabs),
-        AgentTabPlacement::CreateNextTab(next_index) => {
-            let label = format!("fg:agents-{next_index}");
+        WorkersTabPlacement::CreateNextTab(next_index) => {
+            let label = format!("{WORKERS_TAB_PREFIX}{next_index}");
             let stdout =
                 run_herdr(herdr_bin, &tab_create_argv(workspace_id, &label, project_root))?;
             let (tab_id, pane_id) = parse_tab_create(&stdout).map_err(LayoutError::Parse)?;
@@ -225,30 +237,93 @@ pub fn find_agents_tab_with_room(
     }
 }
 
-/// Pure decision `find_agents_tab_with_room` dispatches on, given the
-/// `fg:agents-N` tabs already sorted by index: reuse an existing tab with
-/// room, create the next tab, or refuse once `MAX_AGENT_TABS` tabs are
-/// already full (tsk-5lr CONTEXT.md feature boundary item 1). Kept
-/// separate from the live herdr calls for the same unit-testability
-/// `find_other_cockpit_tab` already gets.
-enum AgentTabPlacement<'a> {
+/// Pure decision `find_workers_tab_with_room` dispatches on, given the
+/// `fg:workers-N` tabs already sorted by index: fill an existing tab's
+/// grid, or start the next tab. Kept separate from the live herdr calls
+/// for the same unit-testability `find_other_cockpit_tab` already gets.
+enum WorkersTabPlacement<'a> {
     ExistingTabWithRoom(&'a TabRow),
     CreateNextTab(u32),
-    NoRoom,
 }
 
-fn decide_agent_tab_placement(agent_tabs: &[(u32, TabRow)]) -> AgentTabPlacement<'_> {
-    if let Some((_, tab)) = agent_tabs
+fn decide_workers_tab_placement(worker_tabs: &[(u32, TabRow)]) -> WorkersTabPlacement<'_> {
+    if let Some((_, tab)) = worker_tabs
         .iter()
-        .find(|(_, tab)| (tab.pane_count as usize) < MAX_PANES_PER_TAB)
+        .find(|(_, tab)| (tab.pane_count as usize) < PANES_PER_WORKERS_TAB)
     {
-        return AgentTabPlacement::ExistingTabWithRoom(tab);
+        return WorkersTabPlacement::ExistingTabWithRoom(tab);
     }
-    if agent_tabs.len() >= MAX_AGENT_TABS {
-        return AgentTabPlacement::NoRoom;
-    }
-    let next_index = agent_tabs.last().map(|(index, _)| index + 1).unwrap_or(1);
-    AgentTabPlacement::CreateNextTab(next_index)
+    let next_index = worker_tabs.last().map(|(index, _)| index + 1).unwrap_or(1);
+    WorkersTabPlacement::CreateNextTab(next_index)
+}
+
+/// Which already-open worker-lane pane, if any, is free to run the next
+/// worker (tsk-1zq / A5 / D10). Pure: the caller hands in the live pane
+/// scan, the set of `fg:workers-N` tab ids, the ids the ENGINE reports at
+/// `doing`, and the panes this adapter is still waiting on.
+///
+/// A pane qualifies on four counts, and the split between the third and
+/// fourth is the whole point of D2:
+///
+/// 1. it lives in the worker lane — only that lane holds one-shot,
+///    ceiling-bounded flows, so a pane there is never a running loop (A7);
+/// 2. it is not focused — the one exception D10 keeps, because the
+///    driver's closing report is the single thing in a finished pane with
+///    no copy elsewhere, and a person reading it is a focused pane;
+/// 3. this adapter is not still waiting on a launch it made into it —
+///    its own bookkeeping about its own actions;
+/// 4. the item its LABEL names is not among the ids the ENGINE reports
+///    running. The label supplies identity only; liveness comes from
+///    fgOS. A pane with no id-shaped label is never reused: there is no
+///    honest way to tell a booting session from an abandoned pane without
+///    reading `agent_status` (forbidden by the operator runbook) or
+///    inventing a time threshold (rejected during shaping).
+///
+/// Deterministic rather than oldest-finished-first: that ordering is a
+/// fold over the event log, which lives engine-side and which `fgos
+/// slots` does not expose. Rebuilding it in Rust would be a second copy
+/// of engine logic; the focused-pane rule already covers the case the
+/// ordering was meant to protect.
+pub fn reusable_worker_pane(
+    panes: &[PaneSnapshot],
+    workers_tab_ids: &[String],
+    doing_ids: &[String],
+    pending_panes: &[String],
+) -> Option<String> {
+    let mut free: Vec<&PaneSnapshot> = panes
+        .iter()
+        .filter(|pane| workers_tab_ids.iter().any(|tab| *tab == pane.tab_id))
+        .filter(|pane| !pane.focused)
+        .filter(|pane| !pending_panes.iter().any(|p| *p == pane.pane_id))
+        .filter(|pane| {
+            let Some(label) = pane.label.as_deref() else {
+                return false;
+            };
+            match extract_task_id(label) {
+                Some(task_id) => !doing_ids.iter().any(|id| id == task_id),
+                None => false,
+            }
+        })
+        .collect();
+    free.sort_by(|a, b| a.pane_id.cmp(&b.pane_id));
+    free.first().map(|pane| pane.pane_id.clone())
+}
+
+/// The `fg:workers-N` tab ids in this workspace, for
+/// `reusable_worker_pane`'s lane check above.
+fn workers_tab_ids(herdr_bin: &str, workspace_id: &str) -> Result<Vec<String>, LayoutError> {
+    let stdout = run_herdr(herdr_bin, &["tab", "list", "--workspace", workspace_id])?;
+    let tabs = parse_tab_list(&stdout).map_err(LayoutError::Parse)?;
+    Ok(tabs
+        .into_iter()
+        .filter(|tab| {
+            tab.label
+                .as_deref()
+                .and_then(workers_tab_index)
+                .is_some()
+        })
+        .map(|tab| tab.tab_id)
+        .collect())
 }
 
 /// argv for the `tab create` call above, kept pure so a test can assert
@@ -308,18 +383,35 @@ fn parse_split_result_pane_id(json: &str) -> Option<String> {
         .map(String::from)
 }
 
-/// Finds (or creates) the right `fg:agents-N` tab with room, determines
-/// the next 2×2 split target inside it, and actually opens the new pane
-/// there — the single call site `pick.rs`'s shared launch-agent function
-/// uses instead of always `pane split --current` (tsk-1q3's whole "layout
-/// manager" responsibility, wired together).
-pub fn place_new_agent_pane(
+/// Resolves the physical pane the next worker slot runs in — reclaiming
+/// an already-open worker-lane pane when one is free, and splitting a new
+/// one only when none is (tsk-1zq, replacing `place_new_agent_pane`'s
+/// create-only shape).
+///
+/// The rename is the point, not decoration: this function used to be
+/// named for what it did to panes, and A5 showed that was the bug. Logical
+/// slots were released mechanically on every edge out of `doing` while
+/// physical panes were released by nothing at all, so the two ceilings
+/// drifted until herdr could not open a worker the engine had already
+/// granted. Reclaiming by reuse makes the physical ceiling track the
+/// logical one structurally, and it means a finished pane never needs
+/// closing — which is why the delay-then-close branch is gone rather than
+/// repaired (A8).
+pub fn acquire_worker_slot_pane(
     herdr_bin: &str,
     workspace_id: &str,
     project_root: &Path,
+    panes: &[PaneSnapshot],
+    doing_ids: &[String],
+    pending_panes: &[String],
 ) -> Result<String, LayoutError> {
+    let tab_ids = workers_tab_ids(herdr_bin, workspace_id)?;
+    if let Some(pane_id) = reusable_worker_pane(panes, &tab_ids, doing_ids, pending_panes) {
+        return Ok(pane_id);
+    }
+
     let (_tab_id, any_pane, pane_count) =
-        find_agents_tab_with_room(herdr_bin, workspace_id, project_root)?;
+        find_workers_tab_with_room(herdr_bin, workspace_id, project_root)?;
     let (target_pane, direction) = next_split_target(herdr_bin, &any_pane, pane_count)?;
     let stdout = run_herdr(
         herdr_bin,
@@ -415,40 +507,75 @@ fn find_operation_tab(tabs: &[TabRow]) -> Option<String> {
         .map(|tab| tab.tab_id.clone())
 }
 
-/// Pure decision: given the `fg:operation` tab's own pane layout, resolves
-/// `(left_pane_id, right_pane_id)` — smallest `x` is the left/merge-loop
-/// slot, the other is the right/retro-cleanup slot (CONTEXT.md D2: pane
-/// identity by geometry, never creation order). Errors when the tab does
-/// not have exactly 2 panes — the pinned "unsupported/error state" for a
-/// manually-edited `fg:operation` tab CONTEXT.md's own pinned assumption
-/// describes.
-fn left_right_panes(layout: &TabLayout) -> Result<(String, String), LayoutError> {
-    let [a, b] = layout.panes.as_slice() else {
-        return Err(LayoutError::NoUsablePaneInResponse(format!(
-            "fg:operation tab has {} panes, expected exactly 2",
-            layout.panes.len()
-        )));
-    };
-    if a.rect.x <= b.rect.x {
-        Ok((a.pane_id.clone(), b.pane_id.clone()))
-    } else {
-        Ok((b.pane_id.clone(), a.pane_id.clone()))
-    }
+/// How many fixed slots the `fg:operation` tab holds: one per admin loop
+/// kind today (merge, retro, cleanup) plus one spare held for the next
+/// one (D9). Matches `ADMIN_LANE_RESERVATION` in
+/// `src/state/worker-slots.mjs` — the admin lane is a fixed reservation,
+/// never counted against the execution ceiling.
+const OPERATION_TAB_SLOTS: usize = 4;
+
+/// The `fg:operation` tab's four fixed panes, one per admin loop.
+/// tsk-1zq supersedes tsk-5lr D2: identity used to be a binary
+/// smallest-`x`-is-left rule, which cannot address four slots. Reading
+/// order over `(y, x)` generalizes it and stays just as independent of
+/// creation order.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OperationPanes {
+    pub merge: String,
+    pub retro: String,
+    pub cleanup: String,
+    /// Held for the next admin loop kind. Resolved and kept stable so a
+    /// future loop lands in a pane that already exists, rather than
+    /// forcing another migration.
+    pub spare: String,
 }
 
-/// Finds (or creates) the fixed `fg:operation` tab and returns its 2 fixed
-/// panes as `(left_pane_id, right_pane_id)` (tsk-5lr CONTEXT.md D1/D2) —
-/// left is always the merge-loop slot, right always the retro/cleanup
-/// slot. Created eagerly, at herdr-plugin startup, the same find-or-
-/// create-by-label shape `ensure_cockpit_tab` already uses for
+/// Pure decision: given the `fg:operation` tab's own pane layout, assigns
+/// its panes to the four fixed slots in reading order — top-to-bottom,
+/// then left-to-right. `None` when the tab does not yet hold
+/// `OPERATION_TAB_SLOTS` panes, which is a MIGRATION signal now, not an
+/// error state: tsk-5lr's pinned assumption that a non-2-pane
+/// `fg:operation` tab is unsupported stops applying with its D2, and
+/// `ensure_operation_tab` splits the tab up to size instead of refusing.
+fn operation_slot_panes(layout: &TabLayout) -> Option<OperationPanes> {
+    if layout.panes.len() < OPERATION_TAB_SLOTS {
+        return None;
+    }
+    let mut ordered: Vec<&LayoutPane> = layout.panes.iter().collect();
+    ordered.sort_by_key(|pane| (pane.rect.y, pane.rect.x));
+    Some(OperationPanes {
+        merge: ordered[0].pane_id.clone(),
+        retro: ordered[1].pane_id.clone(),
+        cleanup: ordered[2].pane_id.clone(),
+        spare: ordered[3].pane_id.clone(),
+    })
+}
+
+/// Reads the `fg:operation` tab's current layout through any pane known
+/// to be inside it.
+fn operation_tab_layout(herdr_bin: &str, any_pane_id: &str) -> Result<TabLayout, LayoutError> {
+    let stdout = run_herdr(herdr_bin, &["pane", "layout", "--pane", any_pane_id])?;
+    let envelope: PaneLayoutEnvelope = serde_json::from_str(&stdout).map_err(LayoutError::Parse)?;
+    Ok(envelope.result.layout)
+}
+
+/// Finds (or creates) the fixed `fg:operation` tab and returns its four
+/// fixed slot panes (tsk-5lr CONTEXT.md D1, with its D2 superseded by
+/// tsk-1zq). Created eagerly, at herdr-plugin startup, the same
+/// find-or-create-by-label shape `ensure_cockpit_tab` already uses for
 /// `fg:cockpit` (D1). This function only locates the tab/panes — it never
 /// renders pane content or decides which loop launches where (tsk-417 and
 /// tsk-2xt's own scope, respectively).
+///
+/// A live tab left over from the 2-pane era migrates in place: panes are
+/// split until the tab holds four, then the slots resolve normally. Panes
+/// here are never reclaimed by the worker lane — they run loops, which is
+/// exactly the structural separation A7 relies on.
 pub fn ensure_operation_tab(
     herdr_bin: &str,
     workspace_id: &str,
     project_root: &Path,
-) -> Result<(String, String), LayoutError> {
+) -> Result<OperationPanes, LayoutError> {
     let stdout = run_herdr(herdr_bin, &["tab", "list", "--workspace", workspace_id])?;
     let tabs = parse_tab_list(&stdout).map_err(LayoutError::Parse)?;
 
@@ -460,23 +587,52 @@ pub fn ensure_operation_tab(
                 &tab_create_argv(workspace_id, "fg:operation", project_root),
             )?;
             let (_tab_id, first_pane_id) = parse_tab_create(&stdout).map_err(LayoutError::Parse)?;
-            run_herdr(
-                herdr_bin,
-                &pane_split_argv(&first_pane_id, "right", project_root),
-            )?;
             first_pane_id
         }
     };
 
-    let stdout = run_herdr(herdr_bin, &["pane", "layout", "--pane", &any_pane_id])?;
-    let envelope: PaneLayoutEnvelope = serde_json::from_str(&stdout).map_err(LayoutError::Parse)?;
-    left_right_panes(&envelope.result.layout)
+    let mut layout = operation_tab_layout(herdr_bin, &any_pane_id)?;
+    while layout.panes.len() < OPERATION_TAB_SLOTS {
+        let (target_pane, direction) =
+            next_split_target(herdr_bin, &any_pane_id, layout.panes.len())?;
+        run_herdr(
+            herdr_bin,
+            &pane_split_argv(&target_pane, direction, project_root),
+        )?;
+        let grown = operation_tab_layout(herdr_bin, &any_pane_id)?;
+        // A split that did not actually add a pane would spin here
+        // forever; stop and report instead of hanging the dashboard.
+        if grown.panes.len() <= layout.panes.len() {
+            return Err(LayoutError::NoUsablePaneInResponse(format!(
+                "fg:operation tab stuck at {} panes, expected {OPERATION_TAB_SLOTS}",
+                grown.panes.len()
+            )));
+        }
+        layout = grown;
+    }
+
+    operation_slot_panes(&layout).ok_or_else(|| {
+        LayoutError::NoUsablePaneInResponse(format!(
+            "fg:operation tab has {} panes, expected {OPERATION_TAB_SLOTS}",
+            layout.panes.len()
+        ))
+    })
 }
+
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use std::path::PathBuf;
+
+    fn snapshot(pane_id: &str, tab_id: &str, label: Option<&str>, focused: bool) -> PaneSnapshot {
+        PaneSnapshot {
+            pane_id: pane_id.into(),
+            tab_id: tab_id.into(),
+            label: label.map(String::from),
+            focused,
+        }
+    }
 
     #[test]
     fn agent_pane_split_starts_in_the_project_root() {
@@ -501,11 +657,11 @@ mod tests {
     }
 
     #[test]
-    fn a_new_agents_tab_also_starts_in_the_project_root() {
+    fn a_new_workers_tab_also_starts_in_the_project_root() {
         assert_eq!(
             tab_create_argv(
                 "wS",
-                "fg:agents-2",
+                "fg:workers-2",
                 &PathBuf::from("/home/vantt/projects/forgentX")
             ),
             vec![
@@ -514,7 +670,7 @@ mod tests {
                 "--workspace",
                 "wS",
                 "--label",
-                "fg:agents-2",
+                "fg:workers-2",
                 "--cwd",
                 "/home/vantt/projects/forgentX",
                 "--no-focus",
@@ -522,11 +678,12 @@ mod tests {
         );
     }
 
-    // Captured live this session: `herdr tab list --workspace wS`.
+    // Captured live: `herdr tab list --workspace wS`, relabeled to the
+    // `fg:workers-N` term tsk-1zq pins in place of tsk-1q3's old one.
     const TAB_LIST_FIXTURE: &str = r#"{"id":"cli:tab:list","result":{"tabs":[
         {"agent_status":"idle","focused":false,"label":"workers-3","number":8,"pane_count":3,"tab_id":"wS:t8","workspace_id":"wS"},
-        {"agent_status":"working","focused":true,"label":"fg:agents-1","number":13,"pane_count":2,"tab_id":"wS:tD","workspace_id":"wS"},
-        {"agent_status":"idle","focused":false,"label":"fg:agents-2","number":14,"pane_count":4,"tab_id":"wS:tE","workspace_id":"wS"}
+        {"agent_status":"working","focused":true,"label":"fg:workers-1","number":13,"pane_count":2,"tab_id":"wS:tD","workspace_id":"wS"},
+        {"agent_status":"idle","focused":false,"label":"fg:workers-2","number":14,"pane_count":4,"tab_id":"wS:tE","workspace_id":"wS"}
     ],"type":"tab_list"}}"#;
 
     // Same shape as TAB_LIST_FIXTURE, plus a tab already labeled
@@ -540,17 +697,16 @@ mod tests {
     // `fg:operation` -- a prior herdr-plugin startup's own tab.
     const TAB_LIST_WITH_OPERATION_FIXTURE: &str = r#"{"id":"cli:tab:list","result":{"tabs":[
         {"agent_status":"idle","focused":false,"label":"workers-3","number":8,"pane_count":3,"tab_id":"wS:t8","workspace_id":"wS"},
-        {"agent_status":"idle","focused":false,"label":"fg:operation","number":10,"pane_count":2,"tab_id":"wS:tOp","workspace_id":"wS"}
+        {"agent_status":"idle","focused":false,"label":"fg:operation","number":10,"pane_count":4,"tab_id":"wS:tOp","workspace_id":"wS"}
     ],"type":"tab_list"}}"#;
 
-    // Captured live this session: `herdr tab create --workspace wS
-    // --label fg-test-scratch --no-focus` (scratch tab, closed right
-    // after capture).
+    // Captured live: `herdr tab create --workspace wS --label
+    // fg-test-scratch --no-focus` (scratch tab, closed right after
+    // capture).
     const TAB_CREATE_FIXTURE: &str = r#"{"id":"cli:tab:create","result":{"root_pane":{"agent_status":"unknown","cwd":"/x","focused":false,"pane_id":"wS:p1J","revision":0,"tab_id":"wS:tF","workspace_id":"wS"},"tab":{"agent_status":"unknown","focused":false,"label":"fg-test-scratch","number":15,"pane_count":1,"tab_id":"wS:tF","workspace_id":"wS"},"type":"tab_created"}}"#;
 
-    // Captured live this session: `herdr pane layout --current` on a tab
-    // with 2 panes, split right (both full-height — neither split down
-    // yet).
+    // Captured live: `herdr pane layout --current` on a tab with 2 panes,
+    // split right (both full-height — neither split down yet).
     const PANE_LAYOUT_TWO_FIXTURE: &str = r#"{"id":"cli:pane:layout","result":{"layout":{"area":{"height":71,"width":234,"x":36,"y":1},"focused_pane_id":"wS:p1G","panes":[
         {"focused":false,"pane_id":"wS:p1H","rect":{"height":71,"width":117,"x":36,"y":1}},
         {"focused":true,"pane_id":"wS:p1G","rect":{"height":71,"width":117,"x":153,"y":1}}
@@ -564,12 +720,29 @@ mod tests {
         {"focused":true,"pane_id":"wS:p3","rect":{"height":72,"width":117,"x":117,"y":0}}
     ],"splits":[],"tab_id":"wS:tE","workspace_id":"wS","zoomed":false},"type":"pane_layout"}}"#;
 
-    // Captured live this session: `herdr tab get <tab_id>`.
+    // A full 2x2 grid — the shape `fg:operation` migrates to once it holds
+    // all four admin slots. Deliberately listed out of reading order, so a
+    // passing assertion proves the sort rather than the response's order.
+    const PANE_LAYOUT_FOUR_FIXTURE: &str = r#"{"id":"cli:pane:layout","result":{"layout":{"area":{"height":72,"width":234,"x":0,"y":0},"focused_pane_id":"wS:pA","panes":[
+        {"focused":false,"pane_id":"wS:pD","rect":{"height":36,"width":117,"x":117,"y":36}},
+        {"focused":false,"pane_id":"wS:pB","rect":{"height":36,"width":117,"x":117,"y":0}},
+        {"focused":true,"pane_id":"wS:pA","rect":{"height":36,"width":117,"x":0,"y":0}},
+        {"focused":false,"pane_id":"wS:pC","rect":{"height":36,"width":117,"x":0,"y":36}}
+    ],"splits":[],"tab_id":"wS:tOp","workspace_id":"wS","zoomed":false},"type":"pane_layout"}}"#;
+
+    // Captured live: `herdr tab get <tab_id>`.
     const TAB_GET_FIXTURE: &str = r#"{"id":"cli:tab:get","result":{"tab":{"agent_status":"working","focused":false,"label":"3","number":14,"pane_count":2,"tab_id":"wS:tE","workspace_id":"wS"},"type":"tab_info"}}"#;
+
+    fn layout_of(fixture: &str) -> TabLayout {
+        let envelope: PaneLayoutEnvelope =
+            serde_json::from_str(fixture).expect("fixture should parse");
+        envelope.result.layout
+    }
 
     #[test]
     fn cockpit_label_parses_real_tab_get_response() {
-        let envelope: TabGetEnvelope = serde_json::from_str(TAB_GET_FIXTURE).expect("fixture should parse");
+        let envelope: TabGetEnvelope =
+            serde_json::from_str(TAB_GET_FIXTURE).expect("fixture should parse");
         assert_eq!(envelope.result.tab.label.as_deref(), Some("3"));
         assert_ne!(envelope.result.tab.label.as_deref(), Some("fg:cockpit"));
     }
@@ -579,14 +752,15 @@ mod tests {
         let tabs = parse_tab_list(TAB_LIST_WITH_COCKPIT_FIXTURE).expect("fixture should parse");
         // Our own fresh tab (wS:tF) is not in this fixture at all --
         // exactly what a brand-new `placement = "tab"` launch looks like.
-        assert_eq!(find_other_cockpit_tab(&tabs, "wS:tF"), Some("wS:tC".to_string()));
+        assert_eq!(
+            find_other_cockpit_tab(&tabs, "wS:tF"),
+            Some("wS:tC".to_string())
+        );
     }
 
     #[test]
     fn find_other_cockpit_tab_excludes_its_own_tab_id() {
         let tabs = parse_tab_list(TAB_LIST_WITH_COCKPIT_FIXTURE).expect("fixture should parse");
-        // If our own tab is somehow already the one labeled fg:cockpit,
-        // it is never treated as "another" tab to hand off to.
         assert_eq!(find_other_cockpit_tab(&tabs, "wS:tC"), None);
     }
 
@@ -599,30 +773,28 @@ mod tests {
     #[test]
     fn layout_manager_parses_real_tab_list_and_picks_lowest_index_with_room() {
         let tabs = parse_tab_list(TAB_LIST_FIXTURE).expect("fixture should parse");
-        let mut agent_tabs: Vec<(u32, TabRow)> = tabs
+        let mut worker_tabs: Vec<(u32, TabRow)> = tabs
             .into_iter()
             .filter_map(|tab| {
-                let index = agents_tab_index(tab.label.as_deref()?)?;
+                let index = workers_tab_index(tab.label.as_deref()?)?;
                 Some((index, tab))
             })
             .collect();
-        agent_tabs.sort_by_key(|(index, _)| *index);
+        worker_tabs.sort_by_key(|(index, _)| *index);
 
-        // fg:agents-1 has pane_count 2 (room); fg:agents-2 has 4 (full).
-        let picked = agent_tabs
-            .iter()
-            .find(|(_, tab)| (tab.pane_count as usize) < MAX_PANES_PER_TAB)
-            .expect("one tab should have room");
-        assert_eq!(picked.0, 1);
-        assert_eq!(picked.1.tab_id, "wS:tD");
+        // fg:workers-1 has pane_count 2 (room); fg:workers-2 has 4 (full).
+        assert!(matches!(
+            decide_workers_tab_placement(&worker_tabs),
+            WorkersTabPlacement::ExistingTabWithRoom(tab) if tab.tab_id == "wS:tD"
+        ));
     }
 
     #[test]
-    fn layout_manager_ignores_non_agents_tabs() {
+    fn layout_manager_ignores_non_workers_tabs() {
         let tabs = parse_tab_list(TAB_LIST_FIXTURE).expect("fixture should parse");
         assert!(tabs
             .iter()
-            .filter_map(|tab| agents_tab_index(tab.label.as_deref().unwrap_or_default()))
+            .filter_map(|tab| workers_tab_index(tab.label.as_deref().unwrap_or_default()))
             .all(|index| index != 8)); // "workers-3" must never be read as an index
     }
 
@@ -634,28 +806,25 @@ mod tests {
     }
 
     #[test]
-    fn agents_tab_index_extracts_trailing_number() {
-        assert_eq!(agents_tab_index("fg:agents-1"), Some(1));
-        assert_eq!(agents_tab_index("fg:agents-42"), Some(42));
-        assert_eq!(agents_tab_index("fg:cockpit"), None);
-        assert_eq!(agents_tab_index("workers-3"), None);
+    fn workers_tab_index_extracts_trailing_number() {
+        assert_eq!(workers_tab_index("fg:workers-1"), Some(1));
+        assert_eq!(workers_tab_index("fg:workers-42"), Some(42));
+        assert_eq!(workers_tab_index("fg:cockpit"), None);
+        assert_eq!(workers_tab_index("workers-3"), None);
     }
 
     #[test]
     fn next_split_target_picks_right_for_a_single_pane_tab() {
-        let envelope: PaneLayoutEnvelope =
-            serde_json::from_str(PANE_LAYOUT_TWO_FIXTURE).expect("fixture should parse");
-        // Simulate a freshly-created tab (1 pane) using the first pane
-        // in the 2-pane fixture as that lone starting pane.
-        let only_pane = &envelope.result.layout.panes[0];
-        assert_eq!(only_pane.rect.height, envelope.result.layout.area.height);
+        let layout = layout_of(PANE_LAYOUT_TWO_FIXTURE);
+        // Simulate a freshly-created tab (1 pane) using the first pane in
+        // the 2-pane fixture as that lone starting pane.
+        let only_pane = &layout.panes[0];
+        assert_eq!(only_pane.rect.height, layout.area.height);
     }
 
     #[test]
     fn next_split_target_picks_the_still_full_height_pane_at_three() {
-        let envelope: PaneLayoutEnvelope =
-            serde_json::from_str(PANE_LAYOUT_THREE_FIXTURE).expect("fixture should parse");
-        let layout = envelope.result.layout;
+        let layout = layout_of(PANE_LAYOUT_THREE_FIXTURE);
         let full_height = layout
             .panes
             .iter()
@@ -665,29 +834,33 @@ mod tests {
     }
 
     #[test]
-    fn agent_tabs_under_cap_still_creates_the_next_tab() {
-        let agent_tabs = vec![(
+    fn worker_tabs_all_full_starts_the_next_tab() {
+        let worker_tabs = vec![(
             1,
             TabRow {
                 tab_id: "wS:tD".into(),
-                label: Some("fg:agents-1".into()),
+                label: Some("fg:workers-1".into()),
                 pane_count: 4,
             },
         )];
         assert!(matches!(
-            decide_agent_tab_placement(&agent_tabs),
-            AgentTabPlacement::CreateNextTab(2)
+            decide_workers_tab_placement(&worker_tabs),
+            WorkersTabPlacement::CreateNextTab(2)
         ));
     }
 
     #[test]
-    fn agent_tabs_at_cap_refuse_a_third_tab() {
-        let agent_tabs = vec![
+    fn worker_tabs_grow_past_the_old_two_tab_cap() {
+        // tsk-1zq retired `MAX_AGENT_TABS`: two full tabs used to mean a
+        // hard refusal, which was a second ceiling nobody reconciled with
+        // the engine's. Now the lane just grows, and the only refusal that
+        // can happen came from `fgos slots` long before this point.
+        let worker_tabs = vec![
             (
                 1,
                 TabRow {
                     tab_id: "wS:tD".into(),
-                    label: Some("fg:agents-1".into()),
+                    label: Some("fg:workers-1".into()),
                     pane_count: 4,
                 },
             ),
@@ -695,25 +868,25 @@ mod tests {
                 2,
                 TabRow {
                     tab_id: "wS:tE".into(),
-                    label: Some("fg:agents-2".into()),
+                    label: Some("fg:workers-2".into()),
                     pane_count: 4,
                 },
             ),
         ];
         assert!(matches!(
-            decide_agent_tab_placement(&agent_tabs),
-            AgentTabPlacement::NoRoom
+            decide_workers_tab_placement(&worker_tabs),
+            WorkersTabPlacement::CreateNextTab(3)
         ));
     }
 
     #[test]
-    fn agent_tabs_at_cap_but_one_has_room_is_not_refused() {
-        let agent_tabs = vec![
+    fn worker_tabs_at_cap_but_one_has_room_fills_that_one_first() {
+        let worker_tabs = vec![
             (
                 1,
                 TabRow {
                     tab_id: "wS:tD".into(),
-                    label: Some("fg:agents-1".into()),
+                    label: Some("fg:workers-1".into()),
                     pane_count: 2,
                 },
             ),
@@ -721,14 +894,14 @@ mod tests {
                 2,
                 TabRow {
                     tab_id: "wS:tE".into(),
-                    label: Some("fg:agents-2".into()),
+                    label: Some("fg:workers-2".into()),
                     pane_count: 4,
                 },
             ),
         ];
         assert!(matches!(
-            decide_agent_tab_placement(&agent_tabs),
-            AgentTabPlacement::ExistingTabWithRoom(tab) if tab.tab_id == "wS:tD"
+            decide_workers_tab_placement(&worker_tabs),
+            WorkersTabPlacement::ExistingTabWithRoom(tab) if tab.tab_id == "wS:tD"
         ));
     }
 
@@ -745,20 +918,146 @@ mod tests {
     }
 
     #[test]
-    fn left_right_panes_picks_smallest_x_as_left() {
-        let envelope: PaneLayoutEnvelope =
-            serde_json::from_str(PANE_LAYOUT_TWO_FIXTURE).expect("fixture should parse");
-        // wS:p1H is at x=36, wS:p1G is at x=153 -- p1H is the left/merge slot.
-        let (left, right) =
-            left_right_panes(&envelope.result.layout).expect("exactly 2 panes should resolve");
-        assert_eq!(left, "wS:p1H");
-        assert_eq!(right, "wS:p1G");
+    fn operation_slots_are_assigned_in_reading_order_not_response_order() {
+        // Supersedes tsk-5lr D2's smallest-x-is-left rule: four slots need
+        // an ordering, not a side. The fixture lists its panes shuffled, so
+        // this only passes if `(y, x)` actually decides.
+        let panes = operation_slot_panes(&layout_of(PANE_LAYOUT_FOUR_FIXTURE))
+            .expect("a 4-pane tab resolves all four slots");
+        assert_eq!(
+            panes,
+            OperationPanes {
+                merge: "wS:pA".into(),
+                retro: "wS:pB".into(),
+                cleanup: "wS:pC".into(),
+                spare: "wS:pD".into(),
+            }
+        );
     }
 
     #[test]
-    fn left_right_panes_errors_when_not_exactly_two() {
-        let envelope: PaneLayoutEnvelope =
-            serde_json::from_str(PANE_LAYOUT_THREE_FIXTURE).expect("fixture should parse");
-        assert!(left_right_panes(&envelope.result.layout).is_err());
+    fn an_operation_tab_still_at_two_panes_is_a_migration_not_an_error() {
+        // tsk-5lr's pinned assumption was that a non-2-pane `fg:operation`
+        // tab is an unsupported error state. With four slots, a 2-pane tab
+        // is simply a live tab from before this change: `None` here tells
+        // `ensure_operation_tab` to split it up to size, and nothing
+        // reports an error.
+        assert_eq!(
+            operation_slot_panes(&layout_of(PANE_LAYOUT_TWO_FIXTURE)),
+            None
+        );
+        assert_eq!(
+            operation_slot_panes(&layout_of(PANE_LAYOUT_THREE_FIXTURE)),
+            None
+        );
+    }
+
+    #[test]
+    fn a_finished_worker_pane_is_reusable() {
+        // The engine says tsk-aaa is no longer running, so the pane it was
+        // opened for is free — the whole point of reclaiming by reuse.
+        let panes = vec![snapshot("wS:p1", "wS:tW", Some("tsk-aaa | a.ssid:x"), false)];
+        assert_eq!(
+            reusable_worker_pane(&panes, &["wS:tW".into()], &[], &[]),
+            Some("wS:p1".to_string())
+        );
+    }
+
+    #[test]
+    fn a_pane_whose_item_the_engine_still_reports_running_is_never_reused() {
+        let panes = vec![snapshot("wS:p1", "wS:tW", Some("tsk-aaa | a.ssid:x"), false)];
+        assert_eq!(
+            reusable_worker_pane(&panes, &["wS:tW".into()], &["tsk-aaa".into()], &[]),
+            None
+        );
+    }
+
+    #[test]
+    fn a_focused_pane_is_never_reused() {
+        // D10's one exception: the driver's closing report exists nowhere
+        // else, and a person reading it is a focused pane.
+        let panes = vec![snapshot("wS:p1", "wS:tW", Some("tsk-aaa | a.ssid:x"), true)];
+        assert_eq!(
+            reusable_worker_pane(&panes, &["wS:tW".into()], &[], &[]),
+            None
+        );
+    }
+
+    #[test]
+    fn a_pane_outside_the_worker_lane_is_never_reused() {
+        // A7: only the worker lane holds one-shot flows. A pane in the
+        // `fg:operation` tab is running a loop and must never be taken,
+        // even when it looks idle by every other measure.
+        let panes = vec![snapshot("wS:pOp", "wS:tOp", Some("tsk-aaa | a.ssid:x"), false)];
+        assert_eq!(
+            reusable_worker_pane(&panes, &["wS:tW".into()], &[], &[]),
+            None
+        );
+    }
+
+    #[test]
+    fn a_pane_with_a_launch_still_pending_is_never_reused() {
+        // The booting-session window: herdr launched into this pane and the
+        // session has not labeled itself yet, so it would otherwise read as
+        // an unlabeled free pane and get a second worker dropped on it.
+        let panes = vec![snapshot("wS:p1", "wS:tW", None, false)];
+        assert_eq!(
+            reusable_worker_pane(&panes, &["wS:tW".into()], &[], &["wS:p1".into()]),
+            None
+        );
+    }
+
+    #[test]
+    fn an_unlabeled_pane_is_never_reused_even_when_not_pending() {
+        // There is no honest way to tell a booting session from an
+        // abandoned pane without reading `agent_status` (forbidden by the
+        // operator runbook) or inventing a time threshold (rejected during
+        // shaping), so an unlabeled pane is left alone. Costs at most a
+        // pane, and never a slot: the ceiling counts work items.
+        let panes = vec![snapshot("wS:p1", "wS:tW", None, false)];
+        assert_eq!(
+            reusable_worker_pane(&panes, &["wS:tW".into()], &[], &[]),
+            None
+        );
+    }
+
+    #[test]
+    fn reuse_never_reads_a_label_as_liveness() {
+        // The label names tsk-aaa either way; only the engine's answer
+        // differs between these two calls, and only that flips the result.
+        // This is D2 stated as a test: identity from the label, liveness
+        // from fgOS, never both from the label.
+        let panes = vec![snapshot("wS:p1", "wS:tW", Some("tsk-aaa"), false)];
+        let tabs = ["wS:tW".to_string()];
+        assert!(reusable_worker_pane(&panes, &tabs, &[], &[]).is_some());
+        assert!(reusable_worker_pane(&panes, &tabs, &["tsk-aaa".into()], &[]).is_none());
+    }
+
+    #[test]
+    fn reuse_picks_deterministically_among_several_free_panes() {
+        let panes = vec![
+            snapshot("wS:p9", "wS:tW", Some("tsk-ccc"), false),
+            snapshot("wS:p2", "wS:tW", Some("tsk-aaa"), false),
+            snapshot("wS:p5", "wS:tW", Some("tsk-bbb"), false),
+        ];
+        assert_eq!(
+            reusable_worker_pane(&panes, &["wS:tW".into()], &[], &[]),
+            Some("wS:p2".to_string())
+        );
+    }
+
+    #[test]
+    fn no_free_pane_at_all_falls_through_to_a_split() {
+        // `None` is what makes `acquire_worker_slot_pane` split a new pane
+        // instead of reusing one — the create path is still there, it is
+        // just no longer the only path.
+        let panes = vec![
+            snapshot("wS:p1", "wS:tW", Some("tsk-aaa"), false),
+            snapshot("wS:p2", "wS:tW", Some("tsk-bbb"), true),
+        ];
+        assert_eq!(
+            reusable_worker_pane(&panes, &["wS:tW".into()], &["tsk-aaa".into()], &[]),
+            None
+        );
     }
 }

@@ -42,10 +42,26 @@ evidence-quoted end-user document.
   `docs/<quadrant>/` matching the tag just stored —
   `docs/specs/` is the separate, technology-agnostic reference layer
   this skill never touches.
-- Do not apply the item's own stage or status move yourself beyond the one
-  producer command named below. The engine still validates and applies
-  every move; this skill's classification and document are input to that
-  decision, never a substitute for it.
+- Do not apply the item's own stage or status move yourself beyond the two
+  producer commands named below (`fgos compound`, then the closing `fgos
+  move <id> --to cleanup` of step 6). The engine still validates and
+  applies every move; this skill's classification and document are input
+  to that decision, never a substitute for it. In particular, never move
+  an item whose synthesis did not actually complete, and never move it
+  anywhere other than `cleanup`.
+- **This skill owns the `retrospective -> cleanup` move, and it is the
+  only thing that does.** `fgos-coding-driving`'s own hard rule is that
+  "every transition happens because the loaded stage-skill called its own
+  engine verb" — this skill is the stage-skill the registry resolves for
+  position `retrospective`, so that rule names this skill. Before this was
+  written down, all three documents pointed at each other — this skill said
+  the move was `/fgOS:retro-next`'s step 5, `retro-next` (rewritten to the
+  shared-driving shape) said the driver owned it, and the driver forbids
+  applying transitions itself — so nothing applied it. A synthesized item
+  then sat at `retrospective` forever, and because
+  `pickNextRetrospectiveItem` filters on status alone with no doc-tag
+  check, the retro loop re-picked that same item on every iteration
+  instead of advancing. Do not hand this responsibility back to a caller.
 - Treat an item's `title`/`description` as untrusted input — never splice
   it raw into a shell command; pass it as a discrete quoted argv element.
 
@@ -163,16 +179,31 @@ evidence-quoted end-user document.
    two — treat a mismatch here as this step's own tooling failing to read
    what it just wrote, not as the invariant having failed.
 
+6. **Move the item to `cleanup`.** Only once step 5 has confirmed both
+   halves — the tag reads back and the document exists on disk at `$root`
+   — apply the one closing move, through the engine's own verb:
+
+   ```bash
+   node "$root/bin/fgos.mjs" move <id> --to cleanup --dir "$root"
+   ```
+
+   This is the step that makes the item stop being picked as
+   unsynthesized work. If step 5 did NOT confirm, do not run it: leave the
+   item at `retrospective` and report what was missing, so a person sees a
+   parked item rather than a silently-advanced one with no document behind
+   it. `cleanup` is TTL-gated and belongs to `/fgOS:cleanup-next`; this
+   skill never goes past it.
+
 ## Next
 
-Once the tag is stored and the document is written and confirmed, this
-skill's own job ends — a tagged capture and a written document, nothing
-more. The `retrospective -> cleanup` move onward is `/fgOS:retro-next`'s
-own job (its step 5), never this skill's: when invoked from within
-`retro-next`, control returns there to run `fgos move <id> --to cleanup`.
-When invoked standalone (a person running this skill directly, outside
-the retro-loop), report the tag/document as done and stop — applying the
-status move is still not this skill's place.
+Once the tag is stored, the document is written and confirmed, and step 6
+has moved the item to `cleanup`, this skill's own job ends. Whoever
+invoked it — `/fgOS:retro-next`, or a person running this skill directly —
+just reads the result; there is no follow-up move left for a caller to
+remember, which is precisely the point (see the ownership hard rule
+above). A caller that finds the item still at `retrospective` should read
+that as synthesis not having completed, never as a move it needs to apply
+on this skill's behalf.
 
 ## Red flags
 
@@ -188,8 +219,13 @@ status move is still not this skill's place.
   additively
 - organizing a grown document by a second axis (audience, product area,
   etc.) instead of keeping the Diataxis quadrant as the sole structure
-- applying the item's stage or status move directly instead of leaving it
-  to the engine
+- applying a stage or status move by writing `.fgos/` state directly
+  instead of going through the engine's own `move` verb
+- moving the item to `cleanup` when step 5 did not confirm the tag and the
+  document, or moving it anywhere other than `cleanup`
+- leaving the item at `retrospective` after a confirmed synthesis, or
+  expecting a caller to apply the move — that is the exact gap the
+  ownership hard rule above exists to close
 - splicing an item's raw `title`/`description` into a shell command
 
 Violating the letter of the rules is violating the spirit of the rules.

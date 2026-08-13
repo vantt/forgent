@@ -273,6 +273,40 @@ test('moveWork omits branchHeadAtTake/branchHeadAtReturn entirely from the event
   assert.equal('branchHeadAtReturn' in event.payload, false);
 });
 
+// --- delivered-event merge provenance (tsk-5dk) ---------------------------
+//
+// Same write-side gap class as branchHeadAtTake/branchHeadAtReturn above:
+// moveWork's destructure is a fixed field list, so mergedSha/mergedInto must
+// be asserted directly on the appended event's own payload, never only on a
+// later fold. Additive/optional, same stamp-only-if-defined pattern.
+
+test('moveWork stamps mergedSha and mergedInto onto the appended event payload for a doing -> delivered move that carries them', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'merge-evidence', { status: 'awaiting-approval' });
+
+  const { event } = moveWork(dir, {
+    id: 'merge-evidence',
+    to: 'delivered',
+    expectedStatus: 'awaiting-approval',
+    role: 'human',
+    mergedSha: 'deadbeefcafe',
+    mergedInto: 'main',
+  });
+
+  assert.equal(event.payload.mergedSha, 'deadbeefcafe');
+  assert.equal(event.payload.mergedInto, 'main');
+});
+
+test('moveWork omits mergedSha/mergedInto entirely from the event payload when the caller never supplies them (byte-identical to the prior shape)', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'merge-evidence-absent', { status: 'awaiting-approval' });
+
+  const { event } = moveWork(dir, { id: 'merge-evidence-absent', to: 'delivered', expectedStatus: 'awaiting-approval', role: 'human' });
+
+  assert.equal('mergedSha' in event.payload, false);
+  assert.equal('mergedInto' in event.payload, false);
+});
+
 // --- Diataxis docType tag on outcome/friction capture (CONTEXT D5/D6) -----
 //
 // docType is an OPTIONAL, additive axis on the compound-learn capture

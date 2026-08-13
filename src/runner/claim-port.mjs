@@ -15,6 +15,9 @@ import { acquireMainCheckoutLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS, formatLockDur
 import { createClaimWorktree, branchNameFor, branchExists } from './worktree.mjs';
 import { resolveRoot } from './root-affinity.mjs';
 import { lastActivityAt, isReclaimEligible } from './claim-liveness.mjs';
+import { hasWorkerSlotRoom } from '../state/worker-slots.mjs';
+import { readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';
+import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
 function git(repoRoot, args) {
@@ -62,6 +65,10 @@ const CLAIM_ERROR_CATEGORY = Object.freeze({
   'lock-held': 'lock-timeout',
   'lock-ambiguous': 'lock-timeout',
   'deps-not-merged': 'validation',
+  // Same reasoning as 'deps-not-merged': a refused claim is an ordinary,
+  // expected outcome, so the runner must halt this one item gracefully
+  // rather than crash its whole drain-run on an 'unexpected' category.
+  'worker-slot-ceiling': 'validation',
 });
 
 export class ClaimError extends Error {
@@ -165,6 +172,38 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
           `claimWork: leaf "${id}" has dep(s) not yet status:done — ${unmergedDeps.join(', ')} — forking from "${rootBranch}" now risks missing their content; approve/merge them into "${rootBranch}" first.`,
         );
       }
+    }
+
+    // Worker-slot ceiling gate (docs/history/orchestrator-worker-slots/
+    // plan.md §Shape T1, D6/D7/D8). Sits BESIDE the deps guard above, never
+    // nested inside it: that one is scoped to `isolate && isLeaf`, so it only
+    // ever fires for `pick`. A worker occupies a slot whether or not it got a
+    // worktree, so this has to fire uniformly across take/pick/runner — which
+    // is also what makes exactly one gate enough for all six pool pickers
+    // (D6): the gate never needs to know which picker chose the item, only
+    // how many are already running.
+    //
+    // Checked before moveWork for the same reason the deps guard is: refusing
+    // after the claim has durably committed would orphan the item in `doing`
+    // with no branch and no automatic recovery.
+    //
+    // An absent or malformed `workerSlots.ceiling` means no ceiling at all,
+    // so this is a no-op until a project configures one — behavior stays
+    // identical to before the gate existed, the same posture
+    // shared-config-file.mjs already documents for invariantChecks. `dir` is
+    // the `.fgos` directory, so its parent is the project root
+    // readSharedConfig expects — resolved the same way readGateBypassLevel
+    // does, rather than from `repoRoot`, which callers set independently.
+    const room = hasWorkerSlotRoom(view, {
+      ceiling: readSharedConfigOrEmpty(path.dirname(dir))?.workerSlots?.ceiling,
+      excludeId: id,
+    });
+    if (!room.allowed) {
+      throw new ClaimError(
+        'worker-slot-ceiling',
+        `claimWork: worker-slot ceiling reached — ${room.occupied} of ${room.ceiling} slots in use; finish or park a running item before claiming "${id}".`,
+        { occupied: room.occupied, ceiling: room.ceiling },
+      );
     }
 
     // Branch reuse: if branch exists, get its HEAD; otherwise use current HEAD.

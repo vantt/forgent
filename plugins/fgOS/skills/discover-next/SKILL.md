@@ -1,15 +1,15 @@
 ---
 name: discover-next
 description: >-
-  Use when the user wants the single next stage:clarify (or stage:discovery/
+  Use when the user wants the single next stage:discovery (or
   stage:exploring) fgOS work item processed now — invoked as
   /fgOS:discover-next [--autoClose]. Picks the item via the same
-  next-picker /fgOS:discover-loop uses (clarify-shaped pool ordered by
+  next-picker /fgOS:discover-loop uses (discovery-shaped pool ordered by
   blocking fan-out), claims it, and delegates to /fgOS:discover <id> — the
   launcher underneath owns claim/dispatch/ceiling for its own stage; this
   command's only job is picking. An optional trailing --autoClose token
   forwards to /fgOS:discover and also covers this command's own pool-empty
-  stop. Example: "/fgOS:discover-next", "process the next clarify item".
+  stop. Example: "/fgOS:discover-next", "process the next discovery item".
 ---
 
 # fgOS discover-next
@@ -17,7 +17,7 @@ description: >-
 Wraps `pickNextDiscoverItem` (`src/state/discover-pool.mjs`) plus
 `/fgOS:discover` so a person (or a `/fgOS:discover-loop` iteration, or
 `herdr-plugin`'s unattended auto-discover launcher) can process the single
-next clarify-shaped backlog item without hand-typing the CLI, re-deriving
+next discovery-shaped backlog item without hand-typing the CLI, re-deriving
 the pick order, or picking an id itself. Never writes `.fgos/` state
 directly, and never re-implements the pick logic itself —
 `pickNextDiscoverItem` stays exactly as it is
@@ -28,7 +28,9 @@ tsk-lya D10: this command picks, claims, and hands off — it does not
 itself claim + dispatch `fgos-coding-driving` + compute a ceiling anymore.
 `/fgOS:discover` (the launcher one tier down) owns all of that for
 whichever stage the picked item is actually at
-(`clarify`/`discovery`/`exploring`). The `decompose`/`planning` pool this
+(`discovery`/`exploring` — the pool's own candidate set still carries a
+`clarify` entry, dead for coding since that stage retired). The
+`planning` pool (with its legacy `decompose` alias) this
 command used to also pick from (a legacy from before `tsk-2b0` split the
 bottom tier) now has its own dedicated picker — see `/fgOS:plan-next`.
 
@@ -88,7 +90,7 @@ bottom tier) now has its own dedicated picker — see `/fgOS:plan-next`.
    sitting in front of.
 
 4. **Delegate to `/fgOS:discover <id>`.** The output from step 2 is
-   `{"id": "<id>", "stage": "clarify"|"discovery"|"exploring"}`. Invoke
+   `{"id": "<id>", "stage": "discovery"|"exploring"}`. Invoke
    `/fgOS:discover <id>`, appending a trailing `--autoClose` when step 1
    found one — do not claim the item here, do not dispatch
    `fgos-coding-driving` yourself, and do not compute a ceiling:
@@ -110,9 +112,9 @@ bottom tier) now has its own dedicated picker — see `/fgOS:plan-next`.
    `/fgOS:discover-loop`'s own stop rule keys on. Read the category off
    that relayed line, never off a process exit code.
 
-6. **Optional: rename the herdr pane.** Before step 4, if the `id` and
-   `stage` are already known, calling `/fgOS:terminal <id>` for
-   observability is a nice-to-have, never required — it always exits `0`
-   and does nothing when the session isn't inside a herdr-managed pane
-   (per that skill's own contract). Skip it entirely if it adds friction;
-   the core shape above works identically without it.
+Pane labeling is deliberately absent from this command (tsk-3ac). It used
+to carry an optional rename call of its own; that call is now pinned in one
+place, `fgos-coding-driving`, which `/fgOS:discover` dispatches at its own
+step 3 — so a pane launched through this command still gets labeled, one
+tier down, without this command knowing anything about panes. Do not
+reintroduce a rename call here.

@@ -223,9 +223,12 @@ stage values — the same way `fgos-routing` describes it.
    add-stage-default-gap D1/D2: a split child already inherits its
    parent's locked `CONTEXT.md`, so it lands straight at `planning` for
    `fgos-coding-validating`'s reality check instead of repeating a full
-   `clarify` Socratic pass against decisions it already has; omitting
-   `--stage` here would now default to `clarify` instead, not the old
-   implicit `executing`.)
+   `exploring` Socratic pass against decisions it already has; omitting
+   `--stage` here would default to the domain's own first stage —
+   `discovery` for coding, since `bin/fgos.mjs` resolves
+   `stageForStep(getDomain(...), 'Clarify') ?? getDomain(...).stages[0]`
+   and coding maps no stage to Clarify — not the old implicit
+   `executing`.)
 
    If one piece is honestly enough, there is no split, and the item
    proceeds as itself.
@@ -261,7 +264,7 @@ stage values — the same way `fgos-routing` describes it.
      same session: invoke its flow (Socratic lock, the same three-test
      filter, appending a new D-ID decision to `CONTEXT.md`) while
      `item.stage` stays `planning` the entire time — there is no
-     `planning -> clarify` edge in the FSM (`src/state/
+     `planning -> exploring` edge in the FSM (`src/state/
      workflow-stage-graphs.mjs`'s `DOMAINS.coding.transitions` carries no
      backward edge), so never attempt to move the item's stage back. This
      is the same no-stage-move shape `fgos-coding-validating` already uses when it
@@ -370,7 +373,7 @@ reality itself.
   handing back to `fgos-coding-exploring`, or asking a question that fails the
   material/grounded/answerable filter instead of pinning it as an
   assumption
-- moving `item.stage` back to `clarify` for a mid-planning gap — no such
+- moving `item.stage` back to `exploring` for a mid-planning gap — no such
   edge exists; hand back via direct invocation instead
 
 Violating the letter of the rules is violating the spirit of the rules.

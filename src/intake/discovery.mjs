@@ -52,9 +52,9 @@
 import path from 'node:path';
 import { judgeVerifySemanticCorrectness } from './verify-pattern-check.mjs';
 import { readLockedContext, resolveContentRoot } from './plan.mjs';
-import { DEFAULTS } from '../state/work.mjs';
+import { DEFAULTS, validateWorkShape } from '../state/work.mjs';
 import { listWork, moveStage, addDiscovery, addDecision, putInAwaiting, editWork, StoreError } from '../state/store.mjs';
-import { getDomain, stageForStep, resolveDomainName } from '../state/workflow-stage-graphs.mjs';
+import { getDomain, stageForStep, resolveDomainName, discoverableStages } from '../state/workflow-stage-graphs.mjs';
 import { rankImpact } from '../state/impact.mjs';
 import { computeImpact, computePriority, isRecognizedRisk } from '../state/priority-formula.mjs';
 
@@ -115,23 +115,13 @@ function blocksForItem(work, view) {
 // to prove domain-agnosticism) keeps the original direct `clarify ->
 // decompose` edge unchanged, exactly as before this item.
 //
-// EXPORTED (tsk-4b2): `bin/fgos.mjs`'s own `discover` CLI case has a
-// precondition gate of its own (refusing before this function is ever
-// called) that needs the exact same domain-aware stage set -- shared here
-// rather than duplicating the `hasDiscoveryExploring` check in two files.
-//
-// tsk-qod D1/D2: `stageForStep(domain, 'Clarify')` now resolves to
-// `undefined` for a domain that retired `clarify` entirely (today: only
-// `coding`) -- `.filter(Boolean)` drops that phantom entry instead of
-// letting `undefined` leak into the CLI's own `validStages.includes(stage)`
-// precondition as if it were a real, valid stage name. A domain that still
-// has a real Clarify-mapped stage (e.g. `triage`) is unaffected -- its
-// `clarifyStage` is truthy and survives the filter unchanged.
-export function discoverableStages(domain) {
-  const clarifyStage = stageForStep(domain, 'Clarify');
-  const hasDiscoveryExploring = domain.stages?.includes('discovery') && domain.stages?.includes('exploring');
-  return (hasDiscoveryExploring ? [clarifyStage, 'discovery', 'exploring'] : [clarifyStage]).filter(Boolean);
-}
+// MOVED (tsk-64h): `discoverableStages` used to be defined right here and
+// exported for `bin/fgos.mjs`'s own `discover` precondition gate. It now
+// lives in `../state/workflow-stage-graphs.mjs` alongside `stageForStep`/
+// `effectiveStage`, because `src/state/discover-pool.mjs` needs the exact
+// same answer and cannot import a `use-case`-layer module from the
+// `domain` layer (`test/architecture.test.mjs`). Same function, same
+// behavior, one home -- imported below with the other registry lookups.
 
 // `verdict` (tsk-30v D2/D6): only the `discovery`-stage branch reads it —
 // `clear` skips `exploring` and lands on `planning` directly; `unclear`
@@ -168,6 +158,54 @@ function nextDiscoveryEdge(work, verdict) {
     'validation',
     `resolveDiscovery: work "${work.id}" (domain "${resolveDomainName(work.domain)}") is at stage "${work.stage}", which this engine cannot advance from.`,
   );
+}
+
+// D12/D17: the ONE guard every discovery path runs its tier/kind/risk
+// report through. Both callers import it from here — the headless runner
+// sweep (`src/runner/loop.mjs`, which re-exports it so its own importers
+// stay unchanged) and the interactive `fgos discover --tier/--kind/--risk`
+// verb (`bin/fgos.mjs`). It lives in this module, the engine both paths
+// already call, precisely so neither can drift into a second copy of the
+// rule: D12 says classification is decided AT discovery on real evidence,
+// and one door is what makes that checkable instead of remembered.
+//
+// Never applies unless the discovery outcome actually resolved 'clear' AND
+// the caller verdict itself was clear — an 'unclear'/'verify-disputed'/
+// 'noop' outcome must never pick up a classification the caller only judged
+// conditionally on evidence that turned out insufficient. Returns an empty
+// object (never null) when there is nothing to apply, so a call site can
+// check `Object.keys(patch).length` uniformly. Extracted as its own pure
+// function so it is unit-testable without mocking a whole dispatch pipeline.
+export function classificationPatchFromVerdict(outcome, callerVerdict) {
+  if (outcome !== 'clear' || !callerVerdict?.clear) return {};
+  const patch = {};
+  if (callerVerdict.tier !== undefined) patch.tier = callerVerdict.tier;
+  if (callerVerdict.kind !== undefined) patch.kind = callerVerdict.kind;
+  if (callerVerdict.risk !== undefined) patch.risk = callerVerdict.risk;
+  return patch;
+}
+
+// The pre-flight half of that same door, for a caller whose classification
+// came from typed flags rather than untrusted worker stdout. The two cases
+// genuinely differ in what a bad value should cost: the headless sweep logs
+// and drops a rejected value, because a worker's report must never abort a
+// discovery outcome already resolved by the engine; a flag someone typed is
+// the opposite — refusing it BEFORE `resolveDiscovery` writes anything is
+// what keeps a typo from leaving the item half-advanced (stage moved,
+// classification rejected) with no obvious way back.
+//
+// Reuses `validateWorkShape` with the patch's own touched-field set — the
+// exact check `editWork` will run when the patch is applied — so the
+// vocabularies stay in one place (`TIERS` and the domain's own
+// `classificationVocabulary`, both in work.mjs) rather than being restated
+// here. Throws `WorkValidationError` (category `validation`, CLI exit 4);
+// a verdict that is unclear, or that carries no classification at all, is a
+// silent no-op.
+export function assertCallerClassification(work, callerVerdict) {
+  if (!callerVerdict?.clear) return;
+  const patch = classificationPatchFromVerdict('clear', callerVerdict);
+  if (Object.keys(patch).length === 0) return;
+  validateWorkShape({ ...work, ...patch }, new Set(Object.keys(patch)));
 }
 
 /**

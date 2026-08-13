@@ -47,8 +47,11 @@ import { branchNameFor, branchExists, reclaimOrphanedCheckout } from './worktree
 import { runGoalCheck, runInvariantChecks, invariantFailureAsCheck } from './goal-check.mjs';
 import { readInvariantCheckCommands } from '../config/shared-config-file.mjs';
 import { normalizePath } from './frozen-judge.mjs';
-import { acquireMainCheckoutLock, renewMainCheckoutLockIfOwn, HELD, AMBIGUOUS, DEFAULT_TTL_MS, formatLockDurationMs } from './main-checkout-lock.mjs';
+import { acquireMainCheckoutLock, renewMainCheckoutLockIfOwn, mergeSlotLockFile, HELD, AMBIGUOUS, DEFAULT_TTL_MS, HOLDER_PID_ENV_VAR, formatLockDurationMs } from './main-checkout-lock.mjs';
 import { resolveWriterIdentity } from './session-identity.mjs';
+import { listSessions } from './session.mjs';
+import { listWork } from '../state/store.mjs';
+import { openLeavesSharingTarget, classifyPostLandDrift } from '../state/graph-harness.mjs';
 
 /** Raised only for a genuinely unexpected git failure (e.g. `git merge
  * --abort` itself failing) — never for a conflict or a red verify, which are
@@ -77,13 +80,21 @@ export class MergeError extends Error {
 // two full-diff calls below pass an explicit, larger value: a full `git
 // diff` (unlike every `--name-only` call in this file) can exceed 1 MiB
 // once a branch is hundreds of commits stale, which throws ENOBUFS.
-function git(repoRoot, args, { maxBuffer } = {}) {
+//
+// env (tsk-70l): optional, default undefined — every existing call site
+// (none of which passes it) stays byte-identical when omitted. When
+// given, merged onto a COPY of this process's own `process.env` and
+// passed only to this one child process — never a `process.env`
+// assignment, so it can never leak into any other subprocess this
+// session spawns later. Only the `git commit` call below passes it.
+function git(repoRoot, args, { maxBuffer, env } = {}) {
   return execFileSync('git', args, {
     cwd: repoRoot,
     encoding: 'utf8',
     shell: false,
     stdio: ['ignore', 'pipe', 'pipe'],
     ...(maxBuffer === undefined ? {} : { maxBuffer }),
+    ...(env === undefined ? {} : { env: { ...process.env, ...env } }),
   });
 }
 
@@ -359,6 +370,65 @@ export function reviewDiff(repoRoot, item, opts = {}) {
  * durability ladder D4), so the approve-side Iron Law check has nothing to
  * gate. This is a confirmed, intentional boundary, not a coverage gap.
  */
+/**
+ * POST-LAND DRIFT DETECTION (tsk-2ypd, CONTEXT.md D4): after a merge lands,
+ * which still-open branches did it actually put behind? Answered by
+ * intersecting REAL changed-file sets on both sides — never declared
+ * `footprint` (`graph-metrics.mjs`'s `footprintOverlapAmong` compares that
+ * weaker, hand-filled signal; git already has the ground truth here).
+ *
+ * This is a DETECTION point, never a catchup point. Triggering catchup on
+ * "the root moved" uses a topology event as a proxy for real risk: a root
+ * landing 13 children sequentially costs ~78 catchup+verify rounds, and
+ * nearly all of them find nothing collided. So nothing in this path touches
+ * a branch, runs a verify, or writes to `.fgos/` — it runs `git diff
+ * --name-only` per candidate and returns a report. The three outcomes are
+ * `classifyPostLandDrift`'s (nothing / notify the owning session / mark
+ * stale); this function's own job is gathering the real inputs for it.
+ *
+ * `target` and `landedFiles` are supplied by the caller because they can
+ * only be read correctly BEFORE the merge: once the branch lands, `target`
+ * contains it, so `git diff target...branch` is empty and the paths this
+ * branch brought are no longer recoverable from the three-dot diff.
+ *
+ * `view` and `sessions` are passed in rather than read here, keeping this
+ * function's own I/O to git alone — and keeping this module's standing rule
+ * that state access belongs to the caller.
+ */
+export function detectPostLandDrift(repoRoot, view, landedItem, { target, landedFiles = [], sessions = [] } = {}) {
+  const sessionsByItem = new Map();
+  for (const entry of sessions) {
+    if (!entry?.itemId) continue;
+    const known = sessionsByItem.get(entry.itemId) ?? [];
+    known.push(entry.sessionId);
+    sessionsByItem.set(entry.itemId, known);
+  }
+
+  const examined = [];
+  const leaves = [];
+  for (const id of openLeavesSharingTarget(view, landedItem.id)) {
+    // A candidate whose branch is gone (deleted after its own merge, or
+    // never created) has nothing to diff — skipped rather than thrown on, so
+    // a detection pass can never turn an already-successful merge into a
+    // failure.
+    if (!branchExists(repoRoot, branchNameFor(id))) continue;
+    examined.push(id);
+    leaves.push({
+      id,
+      files: changedFiles(repoRoot, view.work[id], { trunk: target }),
+      sessionIds: sessionsByItem.get(id) ?? [],
+    });
+  }
+
+  return {
+    landed: landedItem.id,
+    target,
+    landedFiles,
+    examined,
+    ...classifyPostLandDrift({ landedFiles, leaves }),
+  };
+}
+
 export function changedFiles(repoRoot, item, opts = {}) {
   const { trunk = detectTrunk(repoRoot) } = opts;
   const source = classifySource(repoRoot, item);
@@ -676,8 +746,112 @@ export function autoResolveDecisionIndexCollision(repoRoot, branch, classificati
 // against a 180s window) even if one renew tick is delayed.
 const HEARTBEAT_INTERVAL_MS = Math.floor(DEFAULT_TTL_MS / 3);
 
-export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = repoRoot } = {}) {
+/**
+ * Holds a per-TARGET-REF slot (tsk-xyr, §E of the Merge Conductor design)
+ * across `fn` — the mutual-exclusion boundary an ephemeral-worktree merge
+ * actually needs is the target ref's own branch pointer, not the shared
+ * main checkout it never touches. Reuses `main-checkout-lock.mjs`'s own
+ * wx-atomic-create + stale-pid-reclaim + self-recognition lineage (via
+ * `mergeSlotLockFile(targetRef)` picking a distinct, collision-free lock
+ * filename per target instead of inventing a new lock primitive) — two
+ * different targets' slots never contend with each other (proven directly
+ * in main-checkout-lock.test.mjs), so parallelism emerges from however many
+ * distinct targets currently have work, per D7 (no fixed concurrency cap).
+ *
+ * Mirrors `mergeRunnerItem`'s own main-checkout-lock heartbeat/release
+ * shape below exactly (same `HEARTBEAT_INTERVAL_MS`, same
+ * `releaseOnExit: true`, same `MergeError{code:'lock-held'}` on contention)
+ * so `withLockRetry` (lock-wait.mjs), which already retries any
+ * `code:'lock-held'` throw with backoff, transparently covers this too —
+ * acceptance 1 (bounded wait, no crash) is inherited for free, not
+ * reimplemented here.
+ *
+ * MUST be held around the call that reads the target's tip (this file's own
+ * `withMergeEphemeralWorktree`, via `createDetachedMergeWorktree`, reads
+ * `startCommit` before its own `fn` runs) — acquiring the slot INSIDE that
+ * callback would leave the tip read unprotected, turning a real queue back
+ * into the same race it exists to close. Call sites (`bin/fgos.mjs`) wrap
+ * `withMergeEphemeralWorktree` itself in this, never the reverse.
+ */
+export async function withMergeTargetSlot(lockRoot, targetRef, fn) {
+  const fgosDir = path.join(lockRoot, '.fgos');
+  const identity = resolveWriterIdentity(fgosDir).id;
+  const lockFile = mergeSlotLockFile(targetRef);
+  // tsk-1wr: this slot is always released in the same call that acquired
+  // it (see `finally` below), so there is no legitimate same-identity
+  // re-entry to protect. Two OS processes can inherit the same env session
+  // id (a subagent fanout approving sibling leaves into the same target,
+  // for example) — allowSelfRecognition:false makes them contend for real
+  // instead of both reading as "the same writer".
+  const lock = acquireMainCheckoutLock(fgosDir, { identity, ttlMs: DEFAULT_TTL_MS, releaseOnExit: true, lockFile, allowSelfRecognition: false });
+  if (lock.status === HELD) {
+    const ttlPart = lock.remainingTtlMs != null
+      ? `, expires in ${formatLockDurationMs(lock.remainingTtlMs)}`
+      : ', no TTL window known';
+    throw new MergeError(
+      `cannot merge into "${targetRef}": target's merge slot is held by another live session (${lock.holderPid}, held ${formatLockDurationMs(lock.lockAgeMs)}${ttlPart}).`,
+      { targetRef, code: 'lock-held', remainingTtlMs: lock.remainingTtlMs, holderPid: lock.holderPid, lockAgeMs: lock.lockAgeMs },
+    );
+  }
+  if (lock.status === AMBIGUOUS) {
+    throw new MergeError(`cannot merge into "${targetRef}": target's merge slot lock is ambiguous (unparseable lock file) — refusing per fail-closed policy.`, { targetRef, code: 'lock-ambiguous', lockAgeMs: lock.lockAgeMs });
+  }
+
+  const heartbeat = setInterval(() => {
+    renewMainCheckoutLockIfOwn(fgosDir, identity, { lockFile });
+  }, HEARTBEAT_INTERVAL_MS);
+  heartbeat.unref();
+
+  try {
+    return await fn();
+  } finally {
+    clearInterval(heartbeat);
+    lock.release();
+  }
+}
+
+export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = repoRoot, targetSlot = false } = {}) {
   const branch = branchNameFor(item.id);
+
+  // tsk-2ypd (D4): read the paths this branch brings BEFORE merging. Once it
+  // lands, `target` contains `branch`, so `git diff target...branch` is empty
+  // and this set can no longer be recovered. Needed on BOTH paths below
+  // (targetSlot or main-checkout.lock) — post-land detection doesn't care
+  // which lock protected the merge that just landed.
+  const postLandTarget = item.parent ? branchNameFor(item.parent) : detectTrunk(repoRoot);
+  const postLandFiles = changedFiles(repoRoot, item, { trunk: postLandTarget });
+
+  // tsk-xyr: attaches postLand the same way regardless of which lock path
+  // below produced `result` — factored out once so the two paths can't
+  // silently drift apart on how they compute it.
+  const withPostLand = (result) => {
+    if (result.outcome !== 'merged') return result;
+    return {
+      ...result,
+      postLand: detectPostLandDrift(repoRoot, listWork(path.join(lockRoot, '.fgos')), item, {
+        target: postLandTarget,
+        landedFiles: postLandFiles,
+        // lockRoot, never repoRoot: a leaf->parent merge runs in an
+        // ephemeral worktree whose own `.fgos/` is stripped at setup
+        // (ADR0020, worktree.mjs's finishWorktreeSetup), so only lockRoot
+        // reaches the one real store.
+        sessions: listSessions(lockRoot),
+      }),
+    };
+  };
+
+  // targetSlot (tsk-xyr): the caller already holds the TARGET's own slot
+  // (withMergeTargetSlot, wrapped around this whole call from bin/fgos.mjs)
+  // around an ephemeral-worktree merge that never touches the shared main
+  // checkout's `.git/index` — main-checkout.lock protects a resource this
+  // path doesn't use, so acquiring it here would only add unneeded
+  // serialization against sessions doing genuinely unrelated work. Omitted
+  // (root->main approve, top-level sync-root onto trunk): the merge DOES
+  // run on the shared checkout, so main-checkout.lock IS that target's
+  // slot — behavior below is then exactly what it was before this item.
+  if (targetSlot) {
+    return withPostLand(await mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }));
+  }
 
   // The pre-commit hook only locks the final `git commit` — everything
   // before it (`git merge --no-commit`, the .fgos-write check, verify) ran
@@ -709,7 +883,20 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = re
   // fresh every call and never actually contend with the real
   // `<repoRoot>/.fgos/main-checkout.lock` a concurrent leaf merge holds.
   const fgosDir = path.join(lockRoot, '.fgos');
-  const identity = resolveWriterIdentity(fgosDir).id;
+  // tsk-70l: process.pid, not resolveWriterIdentity's session id. Two
+  // independent OS processes can inherit the same env session id (a
+  // subagent fanout approving sibling root items, for example) and would
+  // wrongly self-recognize each other as "the same writer" under a
+  // string identity, which has no liveness probe
+  // (main-checkout-lock.mjs's own numeric-vs-string branch). A numeric
+  // pid identity lets `isPidAlive` tell a live fanout sibling (real
+  // exclusion) apart from a crashed same-session holder (immediate
+  // reclaim, no waiting out the TTL) — mirrors claim-port.mjs's own
+  // `identity: process.pid` on this exact lock file. The nested
+  // pre-commit hook recognizes this process as its own holder via
+  // `HOLDER_PID_ENV_VAR`, set on the `git commit` call below — not by
+  // matching this identity itself.
+  const identity = process.pid;
   // releaseOnExit (tsk-45z point 2): approve's own job is over once this
   // process exits, so a crash/interrupt mid-merge should release the lock
   // immediately rather than leaving the next writer to wait out the TTL —
@@ -723,7 +910,7 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = re
       ? `, expires in ${formatLockDurationMs(lock.remainingTtlMs)}`
       : ', no TTL window known';
     throw new MergeError(
-      `cannot merge "${branch}": main checkout is locked by another live session (${lock.holderPid}, held ${formatLockDurationMs(lock.lockAgeMs)}${ttlPart}).`,
+      `cannot merge "${branch}": main checkout is locked by pid ${lock.holderPid} (held ${formatLockDurationMs(lock.lockAgeMs)}${ttlPart}).`,
       { branch, code: 'lock-held', remainingTtlMs: lock.remainingTtlMs, holderPid: lock.holderPid, lockAgeMs: lock.lockAgeMs },
     );
   }
@@ -747,12 +934,18 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = re
   }, HEARTBEAT_INTERVAL_MS);
   heartbeat.unref();
 
+  let result;
   try {
-    return await mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs });
+    result = await mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs });
   } finally {
     clearInterval(heartbeat);
     lock.release();
   }
+
+  // Detection runs here, AFTER the lock is released: it is read-only work
+  // that must never widen the critical section this whole design exists to
+  // narrow. Only a landed merge can have put anything behind.
+  return withPostLand(result);
 }
 
 // tsk-3yl D1: a prior `approve` run can already have landed this branch's
@@ -1080,7 +1273,16 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
   }
 
   try {
-    git(repoRoot, ['commit', '--no-edit']);
+    // HOLDER_PID_ENV_VAR (tsk-70l): scoped to this one call, not a
+    // `process.env` assignment — see `git()`'s own env passthrough
+    // above. Lets `.githooks/pre-commit`, spawned as this call's own
+    // child, recognize whichever process currently holds
+    // main-checkout.lock as its own parent (this process's pid, when the
+    // targetSlot path holds it instead — see mergeRunnerItem's own
+    // comment on `targetSlot` — the hook's own acquire simply never
+    // matches an existing main-checkout.lock record with this pid, no
+    // different from today).
+    git(repoRoot, ['commit', '--no-edit'], { env: { [HOLDER_PID_ENV_VAR]: String(process.pid) } });
   } catch (err) {
     try {
       abortMergeIfPossible(repoRoot);

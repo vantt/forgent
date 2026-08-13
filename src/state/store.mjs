@@ -484,7 +484,7 @@ export function assertAcceptanceEvidence(id, work) {
  * first's event already in the log, so its own `expectedStatus` compare
  * correctly conflicts.
  */
-export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, role, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk, claimTrigger, statusAtAsk, releaseTrigger, rationale, alternatives, source, askRationale, askAlternatives, askSource } = {}) {
+export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, role, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk, claimTrigger, statusAtAsk, releaseTrigger, rationale, alternatives, source, askRationale, askAlternatives, askSource, mergedSha, mergedInto } = {}) {
   const { logPath } = paths(dir);
   return withEventsLockAndRefresh(dir, logPath, () => {
   const before = rebuildView(logPath);
@@ -572,6 +572,18 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   }
   if (branchHeadAtReturn !== undefined) {
     rawEvent.payload.branchHeadAtReturn = branchHeadAtReturn;
+  }
+  // Merge-evidence provenance (tsk-5dk): the same additive, fsm-ignored
+  // post-transition stamp pattern as branchHeadAtTake/branchHeadAtReturn
+  // above, carried only by `approve`'s real merge/GitHub-merge call sites
+  // on the SAME `to === 'delivered'` move — a hand-typed `fgos move --to
+  // delivered` or a verify-only pull-door delivery never supplies these,
+  // so their absence from an event is itself evidence, not a gap.
+  if (mergedSha !== undefined) {
+    rawEvent.payload.mergedSha = mergedSha;
+  }
+  if (mergedInto !== undefined) {
+    rawEvent.payload.mergedInto = mergedInto;
   }
   // Claim-trigger marker (claim-lock §7, additive, NOT `claimRole`): who/what
   // dispatched this claim (e.g. `'herdr'`) — audit-only, never a safety
