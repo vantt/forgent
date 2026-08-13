@@ -16,6 +16,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, registerTool, removeTool, assertAcceptanceEvidence, assertValidDocType, recordGateApprove, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
 import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability } from '../src/state/tool-registry.mjs';
 import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs';
@@ -23,6 +24,15 @@ import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfigForDir } from '../src/runner/dispatch.mjs';
 import { readGateBypassLevel, canAutoApprove, canAutoApproveMergedGate } from '../src/state/gate-bypass.mjs';
+
+// tsk-1qi: this running copy's own package root -- the source
+// `materializeSkillsIntoProject` copies `.agents/skills/*` FROM, when
+// `fgos setup` runs in an external project whose own cwd has no
+// `.agents/skills` of its own yet. Two levels up from this file
+// (bin/fgos.mjs -> package root), the same "derive from the executing
+// copy's own on-disk location" approach `integrationScriptPath()` already
+// uses in src/setup/registrations.mjs.
+const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 import { resolveFgosDir, fgosDirFromRoot } from '../src/runner/paths.mjs';
 import { resolveCliVersionInfo } from '../src/cli/version.mjs';
 import { resolveDiscovery, classificationPatchFromVerdict, assertCallerClassification } from '../src/intake/discovery.mjs';
@@ -76,6 +86,7 @@ import { assessCleanupReadiness } from '../src/state/cleanup-harness.mjs';
 import { DEFAULT_CLEANUP_TTL_DAYS, DEFAULT_CLEANUP_LEAF_TTL_DAYS } from '../src/setup/registrations.mjs';
 import { installGitHooks, uninstallGitHooks } from '../src/setup/git-hooks.mjs';
 import { detectRcFiles, insertSourceLine, hasSourceLine } from '../src/setup/shell-rc.mjs';
+import { materializeSkillsIntoProject } from '../src/setup/skill-wrappers.mjs';
 import { formatCheck, bold } from '../src/setup/ansi.mjs';
 
 // D5: `verify` is a required non-empty field on every work item, but a
@@ -4659,6 +4670,13 @@ async function runVerb(verb, flags, positional, dir) {
       // contract for this verb; every registered fix is already required
       // idempotent/fail-soft, so running the full list here is safe.
       const fixed = runFixes(repoRoot);
+      // tsk-1qi D5/D7: materializes `.agents/skills` (canonical source) +
+      // generated `.claude/skills` thin wrappers into repoRoot -- copying
+      // from THIS running copy's own package root when repoRoot is a
+      // different (external) project, or just regenerating wrappers
+      // in-place for forgentX's own dev-checkout self-hosting run (see
+      // materializeSkillsIntoProject's own self-hosting no-copy branch).
+      const { copied: skillsSourceCopied, wrappersWritten: skillWrappersGenerated } = materializeSkillsIntoProject(PACKAGE_ROOT, repoRoot);
       return {
         rcFilesInserted,
         rcFilesAlreadyConfigured,
@@ -4672,6 +4690,8 @@ async function runVerb(verb, flags, positional, dir) {
         hooksWired,
         hooksSkippedExisting,
         fixed,
+        skillsSourceCopied,
+        skillWrappersGenerated: skillWrappersGenerated.length,
       };
     }
 
@@ -5004,6 +5024,17 @@ function renderPretty(verb, data) {
         'main-checkout lock hook',
       ),
     );
+    if (typeof data.skillWrappersGenerated === 'number') {
+      lines.push(
+        formatCheck(
+          true,
+          data.skillsSourceCopied
+            ? `copied .agents/skills and generated ${data.skillWrappersGenerated} .claude/skills wrapper(s)`
+            : `regenerated ${data.skillWrappersGenerated} .claude/skills wrapper(s)`,
+          '.agents/skills is the canonical source',
+        ),
+      );
+    }
   }
   return `${lines.join('\n')}\n`;
 }

@@ -14,6 +14,7 @@
     "bin",
     "src",
     "scripts",
+    ".agents",
     "README.md",
     "LICENSE",
     "docs/how-to",
@@ -25,7 +26,8 @@
     "setup:hooks": "node scripts/install-git-hooks.mjs",
     "cli": "node bin/fgos.mjs",
     "check:events-seq": "node scripts/check-events-seq-contiguity.mjs --log .fgos/events.jsonl",
-    "check:decision-supersession": "node scripts/check-decision-supersession.mjs"
+    "check:decision-supersession": "node scripts/check-decision-supersession.mjs",
+    "build:skills": "node scripts/build-skill-wrappers.mjs"
   },
   "exports": {
     "./state/porting": "./src/state/porting.mjs",
