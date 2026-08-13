@@ -43,7 +43,7 @@ on its generator existing; bin-discovery has no dependency on either.
 | Component | Risk | What would prove it |
 |---|---|---|
 | Bin-discovery 3-tier + config-cache (D2/D3/D4) | standard | Real doctor/setup run against a simulated PATH-less global-only environment resolves via cache; shell-integration test fixture covers all 3 tiers, not just 1+3 |
-| Skill source-of-truth migration (D5/D7) | high | Real `fgos setup` run in a scratch git repo (no `claude` CLI on PATH) produces working `.agents/skills/*` + `.claude/skills/*`; `npm test` green with mirror test's new wrapper-correctness assertion; degraded impact-analysis posture means blast-radius on `src/setup/registrations.mjs`'s existing callers is NOT independently confirmed — re-run `gitnexus analyze` before validating this piece |
+| Skill source-of-truth migration (D5/D7) | heavy | Real `fgos setup` run in a scratch git repo (no `claude` CLI on PATH) produces working `.agents/skills/*` + `.claude/skills/*`; `npm test` green with mirror test's new wrapper-correctness assertion. Blast-radius confirmed LOW risk on `checkShellIntegrationSourced`/`integrationScriptPath`/`checkClaudePluginMarketplace` (fresh `gitnexus analyze` re-run + `impact` calls, 2026-08-13) — 1 direct caller each, `Setup` module only |
 | Hide dev-skills rollout (D6) | light | Empirical platform check (not code-provable): `user-invocable: false` on 1 skill first, confirm both menu-removal and Skill-tool-dispatch-still-works, before rollout to all 14 |
 
 **Files likely touched (informs footprint below):**
@@ -80,7 +80,7 @@ only by `fgos-coding-validating`'s single gate, not here.
     "action": "D5/D7: add .agents/ to package.json files allowlist; write one shared generator function producing .claude/skills/<name>/SKILL.md thin-wrapper stubs from .agents/skills/<name>/SKILL.md; wire it into a new npm run build:skills script (forgentX self-dogfood) and into fgos setup's external-project materialize path (copies both .agents/skills and generated .claude/skills into the target project, sibling-relative paths, never pointing at the global install); replace test/skills/fgos-mirror.test.mjs's byte-identical assertion with a wrapper-correctness assertion",
     "footprint": ["package.json", "src/setup/skill-wrappers.mjs", ".agents/skills/", ".claude/skills/", "test/skills/fgos-mirror.test.mjs"],
     "kind": "task",
-    "risk": "high"
+    "risk": "heavy"
   },
   {
     "title": "Verify and roll out user-invocable:false for the 14 coding-domain dev-skills",
