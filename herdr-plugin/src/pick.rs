@@ -24,8 +24,8 @@ const DISCOVER_SLASH_COMMAND: &str = "/fgOS:discover";
 /// (`next_auto_discover_candidate` in `main.rs`, backed by `fgos triage
 /// --json`'s dependency data), then hands the actual pick off to
 /// `pickNextDiscoverItem` (`src/state/discover-pool.mjs`) via this no-id
-/// pool-sweep command — the same centralization `/fgOS:merge-loop`/
-/// `/fgOS:retro-loop`/`/fgOS:cleanup-loop` already use for their own
+/// pool-sweep command — the same centralization `/fgOS:merge-next`/
+/// `/fgOS:retro-next`/`/fgOS:cleanup-next` already use for their own
 /// pool-sweep verbs, kept in one place instead of duplicated in Rust.
 const DISCOVER_NEXT_SLASH_COMMAND: &str = "/fgOS:discover-next";
 
@@ -33,11 +33,19 @@ const DISCOVER_NEXT_SLASH_COMMAND: &str = "/fgOS:discover-next";
 /// the auto-merge launcher never calls `fgos approve`/`merge` itself, only
 /// opens a pane that types the same pool-sweep slash command a person
 /// would type by hand.
-const MERGE_LOOP_SLASH_COMMAND: &str = "/fgOS:merge-loop";
+///
+/// tsk-4ry: launches the single-item `-next` skill, not the perpetual
+/// `-loop` skill it used to. The `-loop` skills stay unchanged and
+/// callable manually; only the auto-launch target changes, so herdr's own
+/// poll tick decides whether to relaunch (via `pending_merge_pane`/
+/// `pending_retro_pane`/`pending_cleanup_pane` in `app.rs` plus each
+/// lane's pool-nonempty check in `main.rs`) instead of one pane
+/// self-repeating forever.
+const MERGE_NEXT_SLASH_COMMAND: &str = "/fgOS:merge-next";
 /// Same door-opening discipline, for the right (retro/cleanup) slot.
-const RETRO_LOOP_SLASH_COMMAND: &str = "/fgOS:retro-loop";
+const RETRO_NEXT_SLASH_COMMAND: &str = "/fgOS:retro-next";
 /// Same door-opening discipline, for the right (retro/cleanup) slot.
-const CLEANUP_LOOP_SLASH_COMMAND: &str = "/fgOS:cleanup-loop";
+const CLEANUP_NEXT_SLASH_COMMAND: &str = "/fgOS:cleanup-next";
 
 #[derive(Debug, PartialEq)]
 pub struct InvalidId(pub String);
@@ -166,13 +174,14 @@ pub fn discover_run_argv(
 }
 
 /// argv for launching `claude` with a pool-sweep slash command that takes
-/// no id argument (`/fgOS:merge-loop`/`/fgOS:retro-loop`/
-/// `/fgOS:cleanup-loop`, tsk-57q) into an already-resolved pane. Unlike
-/// `run_argv_for_command` above, there is no id to validate or
+/// no id argument (`/fgOS:merge-next`/`/fgOS:retro-next`/
+/// `/fgOS:cleanup-next` since tsk-4ry, `/fgOS:merge-loop`/`/fgOS:retro-loop`/
+/// `/fgOS:cleanup-loop` before it, tsk-57q) into an already-resolved pane.
+/// Unlike `run_argv_for_command` above, there is no id to validate or
 /// interpolate — every existing argv builder in this file assumes one,
 /// so this is deliberately a separate, smaller function rather than a
 /// third `run_argv_for_command` wrapper.
-fn loop_run_argv(pane_id: &str, slash_command: &str, model: &str, skip_permissions: bool) -> Vec<String> {
+fn no_id_run_argv(pane_id: &str, slash_command: &str, model: &str, skip_permissions: bool) -> Vec<String> {
     let command = if skip_permissions {
         format!("claude --model {model} --dangerously-skip-permissions '{slash_command}'")
     } else {
@@ -183,8 +192,8 @@ fn loop_run_argv(pane_id: &str, slash_command: &str, model: &str, skip_permissio
 
 /// argv for the unattended auto-discover launch's actual typed command,
 /// `/fgOS:discover-next` — no id (same "never interpolates or validates
-/// an id" shape `loop_run_argv` above already established for
-/// `/fgOS:merge-loop`/`/fgOS:retro-loop`/`/fgOS:cleanup-loop`), and, since
+/// an id" shape `no_id_run_argv` above already established for
+/// `/fgOS:merge-next`/`/fgOS:retro-next`/`/fgOS:cleanup-next`), and, since
 /// tsk-1zq, no `--autoClose` either, for the same reason
 /// `discover_run_argv` above dropped it: worker panes are reclaimed by
 /// reuse, never closed.
@@ -272,42 +281,44 @@ pub fn open_discover_pane(
     Ok(pane_id)
 }
 
-/// Runs `/fgOS:merge-loop` directly into an already-resolved pane
-/// (tsk-57q) — unlike `open_pick_pane`/`open_discover_pane` above, this
-/// never calls `layout::place_new_agent_pane`: the fixed `fg:operation`
-/// tab's two panes are resolved once, eagerly, at herdr-plugin startup
-/// (`layout::ensure_operation_tab`, tsk-5lr) and passed in by the caller.
-pub fn run_merge_loop(
+/// Runs `/fgOS:merge-next` directly into an already-resolved pane
+/// (tsk-57q; single-item `-next` since tsk-4ry, was the perpetual
+/// `/fgOS:merge-loop` before) — unlike `open_pick_pane`/`open_discover_pane`
+/// above, this never calls `layout::place_new_agent_pane`: the fixed
+/// `fg:operation` tab's four slot panes are resolved once, eagerly, at
+/// herdr-plugin startup (`layout::ensure_operation_tab`, tsk-5lr) and
+/// passed in by the caller.
+pub fn run_merge_next(
     herdr_bin: &str,
     pane_id: &str,
     model: &str,
     skip_permissions: bool,
 ) -> io::Result<()> {
-    let run_args = loop_run_argv(pane_id, MERGE_LOOP_SLASH_COMMAND, model, skip_permissions);
+    let run_args = no_id_run_argv(pane_id, MERGE_NEXT_SLASH_COMMAND, model, skip_permissions);
     Command::new(herdr_bin).args(run_args).spawn()?;
     Ok(())
 }
 
-/// Same shape as `run_merge_loop` above, running `/fgOS:retro-loop`.
-pub fn run_retro_loop(
+/// Same shape as `run_merge_next` above, running `/fgOS:retro-next`.
+pub fn run_retro_next(
     herdr_bin: &str,
     pane_id: &str,
     model: &str,
     skip_permissions: bool,
 ) -> io::Result<()> {
-    let run_args = loop_run_argv(pane_id, RETRO_LOOP_SLASH_COMMAND, model, skip_permissions);
+    let run_args = no_id_run_argv(pane_id, RETRO_NEXT_SLASH_COMMAND, model, skip_permissions);
     Command::new(herdr_bin).args(run_args).spawn()?;
     Ok(())
 }
 
-/// Same shape as `run_merge_loop` above, running `/fgOS:cleanup-loop`.
-pub fn run_cleanup_loop(
+/// Same shape as `run_merge_next` above, running `/fgOS:cleanup-next`.
+pub fn run_cleanup_next(
     herdr_bin: &str,
     pane_id: &str,
     model: &str,
     skip_permissions: bool,
 ) -> io::Result<()> {
-    let run_args = loop_run_argv(pane_id, CLEANUP_LOOP_SLASH_COMMAND, model, skip_permissions);
+    let run_args = no_id_run_argv(pane_id, CLEANUP_NEXT_SLASH_COMMAND, model, skip_permissions);
     Command::new(herdr_bin).args(run_args).spawn()?;
     Ok(())
 }
@@ -429,15 +440,15 @@ impl PaneOrchestrator for HerdrPaneAdapter {
     }
 
     fn launch_merge_loop(&self, pane_id: &str) -> io::Result<()> {
-        run_merge_loop(&self.herdr_bin, pane_id, &model_flag(), skip_permissions_enabled())
+        run_merge_next(&self.herdr_bin, pane_id, &model_flag(), skip_permissions_enabled())
     }
 
     fn launch_retro_loop(&self, pane_id: &str) -> io::Result<()> {
-        run_retro_loop(&self.herdr_bin, pane_id, &model_flag(), skip_permissions_enabled())
+        run_retro_next(&self.herdr_bin, pane_id, &model_flag(), skip_permissions_enabled())
     }
 
     fn launch_cleanup_loop(&self, pane_id: &str) -> io::Result<()> {
-        run_cleanup_loop(&self.herdr_bin, pane_id, &model_flag(), skip_permissions_enabled())
+        run_cleanup_next(&self.herdr_bin, pane_id, &model_flag(), skip_permissions_enabled())
     }
 
     fn open_auto_discover_pane(&self, lane: &WorkerLaneView) -> io::Result<String> {
@@ -640,19 +651,20 @@ mod tests {
     }
 
     #[test]
-    fn loop_run_argv_never_interpolates_or_validates_an_id() {
+    fn no_id_run_argv_never_interpolates_or_validates_an_id() {
         // Every other argv builder in this file (`run_argv`,
         // `discover_run_argv`) requires and validates an id — this one is
-        // the first that does not, since `/fgOS:merge-loop`/
-        // `/fgOS:retro-loop`/`/fgOS:cleanup-loop` are pool-sweep verbs
-        // with no per-item argument (tsk-57q).
+        // the first that does not, since `/fgOS:merge-next`/
+        // `/fgOS:retro-next`/`/fgOS:cleanup-next` are pool-sweep verbs
+        // with no per-item argument (tsk-57q; single-item `-next` since
+        // tsk-4ry, was the perpetual `-loop` skill before it).
         assert_eq!(
-            loop_run_argv("wS:pOpL", MERGE_LOOP_SLASH_COMMAND, "sonnet", true),
+            no_id_run_argv("wS:pOpL", MERGE_NEXT_SLASH_COMMAND, "sonnet", true),
             vec![
                 "pane",
                 "run",
                 "wS:pOpL",
-                "claude --model sonnet --dangerously-skip-permissions '/fgOS:merge-loop'",
+                "claude --model sonnet --dangerously-skip-permissions '/fgOS:merge-next'",
             ]
         );
     }
@@ -676,27 +688,27 @@ mod tests {
     }
 
     #[test]
-    fn loop_run_argv_respects_skip_permissions_false() {
+    fn no_id_run_argv_respects_skip_permissions_false() {
         assert_eq!(
-            loop_run_argv("wS:pOpR", RETRO_LOOP_SLASH_COMMAND, "sonnet", false),
+            no_id_run_argv("wS:pOpR", RETRO_NEXT_SLASH_COMMAND, "sonnet", false),
             vec![
                 "pane",
                 "run",
                 "wS:pOpR",
-                "claude --model sonnet '/fgOS:retro-loop'",
+                "claude --model sonnet '/fgOS:retro-next'",
             ]
         );
     }
 
     #[test]
-    fn loop_run_argv_builds_the_cleanup_loop_command() {
+    fn no_id_run_argv_builds_the_cleanup_next_command() {
         assert_eq!(
-            loop_run_argv("wS:pOpR", CLEANUP_LOOP_SLASH_COMMAND, "sonnet", false),
+            no_id_run_argv("wS:pOpR", CLEANUP_NEXT_SLASH_COMMAND, "sonnet", false),
             vec![
                 "pane",
                 "run",
                 "wS:pOpR",
-                "claude --model sonnet '/fgOS:cleanup-loop'",
+                "claude --model sonnet '/fgOS:cleanup-next'",
             ]
         );
     }
