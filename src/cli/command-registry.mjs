@@ -338,7 +338,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'answer',
     invoke: 'fgos answer',
-    description: 'Record the answer to a parked question and resume the item to todo.',
+    description: 'Record the answer to a parked question and resume the item to its status before the question was asked (todo, or doing if a claim was held).',
     parameters: {
       type: 'object',
       properties: {
