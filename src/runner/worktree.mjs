@@ -709,6 +709,33 @@ function stripFgosAfterReset(worktreePath, branch) {
  * (or a session runs it on the user's behalf) once notified.
  */
 export function resyncWorktree(repoRoot, worktreePath, branch) {
+  // tsk-jg4: an earlier run of THIS function can be killed in the window
+  // between the `reset --hard` below (step 2) and the patch reapply
+  // completing (step 4) -- the worktree ends up reset to the branch tip
+  // (a real reflog entry, so the NEXT run's own `lastSyncedCommit` check
+  // below reads "already in sync" and does nothing) while the staged
+  // patch it never got to reapply is still sitting on disk, orphaned and
+  // unmentioned. Detect that BEFORE anything else touches the worktree --
+  // same signal, same refusal shape the real-conflict path below already
+  // uses (a patch file on disk IS the actionable thing to point at), just
+  // checked proactively instead of only encountered reactively.
+  const gitCommonDir = git(repoRoot, ['rev-parse', '--path-format=absolute', '--git-common-dir']).trim();
+  const patchDir = path.join(gitCommonDir, 'fgos-resync-patches');
+  const branchPrefix = `${branch.replace(/\//g, '-')}-`;
+  let orphanedPatches = [];
+  try {
+    orphanedPatches = fs.readdirSync(patchDir).filter((name) => name.startsWith(branchPrefix) && name.endsWith('.patch'));
+  } catch {
+    // patchDir not created yet -- nothing to orphan.
+  }
+  if (orphanedPatches.length > 0) {
+    const orphanedPaths = orphanedPatches.map((name) => path.join(patchDir, name));
+    throw new WorktreeError(
+      `resync-worktree: refusing "${worktreePath}" on "${branch}" — a prior resync-worktree run left ${orphanedPaths.length === 1 ? 'a patch' : 'patches'} behind at ${orphanedPaths.map((p) => `"${p}"`).join(', ')}, most likely from being interrupted between its own reset and reapply. Inspect ${orphanedPaths.length === 1 ? 'it' : 'them'} by hand — the worktree may already be reset to the branch tip with this content never reapplied — then remove the file(s) before resyncing again.`,
+      { branch, worktreePath, orphanedPaths },
+    );
+  }
+
   const lastSynced = lastSyncedCommit(repoRoot, worktreePath);
   if (!lastSynced) {
     throw new WorktreeError(
@@ -752,9 +779,9 @@ export function resyncWorktree(repoRoot, worktreePath, branch) {
   // 1. Extract the staged content as a patch BEFORE touching anything,
   // saved under --git-common-dir -- never the worktree's own --git-dir,
   // which fgOS can force-remove later, losing the only copy (D3).
+  // `gitCommonDir`/`patchDir` already resolved above, by the orphaned-
+  // patch pre-check (tsk-jg4).
   const patch = git(repoRoot, ['-C', worktreePath, 'diff', '--cached', '--binary', lastSynced]);
-  const gitCommonDir = git(repoRoot, ['rev-parse', '--path-format=absolute', '--git-common-dir']).trim();
-  const patchDir = path.join(gitCommonDir, 'fgos-resync-patches');
   fs.mkdirSync(patchDir, { recursive: true });
   const patchPath = path.join(patchDir, `${branch.replace(/\//g, '-')}-${Date.now()}.patch`);
   fs.writeFileSync(patchPath, patch);

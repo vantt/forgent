@@ -933,6 +933,83 @@ test('resyncWorktree re-strips .fgos/ after its own reset --hard (tsk-1d7 bundle
   removeWorktree(repoRoot, wt.path, { force: true });
 });
 
+// --- tsk-jg4: orphaned-patch crash-window detection ---------------------
+//
+// A prior resyncWorktree run killed between its own reset and reapply
+// leaves an unremoved patch file under fgos-resync-patches/ while
+// lastSyncedCommit already reads "already in sync" -- the next run must
+// refuse loudly instead of silently proceeding past the orphaned signal.
+
+test('resyncWorktree refuses when a prior run left an orphaned patch file for this branch, without touching the worktree', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const branch = branchNameFor('resync-verb-orphaned-patch');
+  const wt = createClaimWorktree(repoRoot, 'resync-verb-orphaned-patch', { worktreeDir });
+  commitOnWorktree(wt.path, 'context.md', '# decisions\n');
+
+  advanceBranchExternally(repoRoot, branch, 'plan.md', '# plan\n');
+
+  // Simulate a prior run killed between its own reset and reapply: a
+  // leftover patch file for THIS branch, same naming shape
+  // resyncWorktree itself writes.
+  const gitCommonDir = execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  const patchDir = path.join(gitCommonDir, 'fgos-resync-patches');
+  fs.mkdirSync(patchDir, { recursive: true });
+  const orphanedPatchPath = path.join(patchDir, `${branch.replace(/\//g, '-')}-1700000000000.patch`);
+  fs.writeFileSync(orphanedPatchPath, 'diff --git a/stranded.md b/stranded.md\n');
+
+  assert.throws(
+    () => resyncWorktree(repoRoot, wt.path, branch),
+    (err) => err instanceof WorktreeError && err.message.includes(orphanedPatchPath),
+    'must throw WorktreeError naming the orphaned patch path',
+  );
+
+  // Refusing must happen before any reset/reapply -- the working tree
+  // itself is untouched (never fast-forwarded onto the branch's external
+  // advance; `plan.md` never lands), and the orphaned file itself
+  // survives (never silently cleaned up on this skill's own authority).
+  // (`git rev-parse HEAD` inside a non-detached checkout would report the
+  // branch's CURRENT tip regardless of whether a reset actually ran here
+  // -- HEAD is a symbolic ref to the branch, which advanceBranchExternally
+  // already force-moved from elsewhere -- so the working tree's real
+  // content is the only trustworthy signal that no reset happened.)
+  assert.equal(fs.existsSync(path.join(wt.path, 'plan.md')), false, 'the worktree must not be reset while an orphaned patch is unresolved');
+  assert.equal(fs.existsSync(orphanedPatchPath), true, 'the orphaned patch must be preserved for manual review, never auto-deleted');
+
+  fs.rmSync(orphanedPatchPath, { force: true });
+  removeWorktree(repoRoot, wt.path, { force: true });
+});
+
+test('resyncWorktree is unaffected by an orphaned patch file belonging to a DIFFERENT branch', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const branch = branchNameFor('resync-verb-orphan-other-branch');
+  const wt = createClaimWorktree(repoRoot, 'resync-verb-orphan-other-branch', { worktreeDir });
+  commitOnWorktree(wt.path, 'context.md', '# decisions\n');
+
+  const newTip = advanceBranchExternally(repoRoot, branch, 'plan.md', '# plan\n');
+
+  // A leftover patch for a completely unrelated branch must never trip
+  // this branch's own resync -- the filter is prefix-scoped per branch.
+  const gitCommonDir = execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  const patchDir = path.join(gitCommonDir, 'fgos-resync-patches');
+  fs.mkdirSync(patchDir, { recursive: true });
+  const unrelatedPatchPath = path.join(patchDir, 'fgw-some-other-item-1700000000000.patch');
+  fs.writeFileSync(unrelatedPatchPath, 'diff --git a/unrelated.md b/unrelated.md\n');
+
+  const result = resyncWorktree(repoRoot, wt.path, branch);
+
+  assert.equal(result.resynced, true);
+  assert.equal(
+    execFileSync('git', ['rev-parse', 'HEAD'], { cwd: wt.path, encoding: 'utf8' }).trim(),
+    newTip,
+  );
+  assert.equal(fs.existsSync(unrelatedPatchPath), true, 'an unrelated branch\'s own orphaned patch must be left alone');
+
+  fs.rmSync(unrelatedPatchPath, { force: true });
+  removeWorktree(repoRoot, wt.path, { force: true });
+});
+
 test('createClaimWorktree ignores a checkout outside its own worktreeDir (a runner dispatch checkout is never reattached to)', () => {
   const repoRoot = initTempRepo();
   const dispatchDir = mkWorktreeDir();
