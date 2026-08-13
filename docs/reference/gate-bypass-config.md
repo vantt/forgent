@@ -6,9 +6,13 @@ source_capture_ids: [tsk-6bx-1, tsk-6bx-2]
 # Gate-bypass config
 
 Reference for `.fgos/gate-bypass.json`, the `fgos gate-bypass` verb, and
-the `fgos-coding-exploring`/`fgos-coding-planning` Gate steps that consult them — the
-full mechanism that lets a skill-embedded confirmation gate auto-approve
-instead of asking (`docs/history/gate-bypass/CONTEXT.md` D1-D5).
+the `fgos-coding-exploring`/`fgos-coding-validating` Gate steps that consult
+them — the full mechanism that lets a skill-embedded confirmation gate
+auto-approve instead of asking (`docs/history/gate-bypass/CONTEXT.md`
+D1-D5, superseded for the planning-stage gate by
+`docs/history/coding-planning-validating-gate-redesign/CONTEXT.md` D1/D9-D11:
+`fgos-coding-planning` has no gate of its own; `fgos-coding-validating` owns
+the single merged gate in stage `planning`).
 
 ## `.fgos/gate-bypass.json`
 
@@ -80,11 +84,10 @@ An artifact that never adopts the `## Outstanding questions` convention
 is always treated as incomplete — this is a fail-closed default, not a
 detection gap to fix later.
 
-## Gate-step wiring (`fgos-coding-exploring`, `fgos-coding-planning`)
+## Gate-step wiring (`fgos-coding-exploring`)
 
-Both skills' Gate sections run a check before presenting their approval
-question — `fgos-coding-exploring` against `CONTEXT.md`, `fgos-coding-planning` against
-`plan.md`:
+`fgos-coding-exploring`'s Gate section runs a check before presenting its
+approval question, against `CONTEXT.md`:
 
 ```bash
 root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
@@ -122,6 +125,22 @@ stale-branch class of failure a flat cwd-only import used to hit
 Anything other than exactly `true` on stdout is treated as `false` and
 fails closed to presenting the gate normally. On `true`, the skill posts
 a non-question line (`auto-approved: CONTEXT.md (gate-bypass level
-<level>)` / `auto-approved: plan.md (gate-bypass level <level>)`) and
-logs a matching `fgos decision` entry (D3's audit trail) instead of
-asking.
+<level>)`) and logs a matching `fgos decision` entry (D3's audit trail)
+instead of asking.
+
+## Gate-step wiring (`fgos-coding-validating`)
+
+`fgos-coding-validating` owns the single merged gate in stage `planning`
+(`docs/history/coding-planning-validating-gate-redesign/CONTEXT.md` D1) —
+this replaced the old `fgos-coding-planning`-side `planApprove` gate that
+used to run the same `canAutoApprove` check shown above against `plan.md`.
+The merged gate calls a different function with a wider signature,
+`canAutoApproveMergedGate(item, planText, childSpecs, costVerdict, level)`
+(`src/state/gate-bypass.mjs`), adding the plan's child specs and the
+session's own reversibility read (`fgos-coding-validating/SKILL.md`'s Gate
+step 1) on top of the same hard-gate-keyword/tier-ceiling/open-items axes
+this section's `canAutoApprove` check already uses. See
+`fgos-coding-validating/SKILL.md`'s own "check whether the gate can
+auto-approve" step for the exact, current command — kept there rather than
+duplicated here, since the gate this doc used to describe at this point
+(`fgos-coding-planning`'s `planApprove`) is exactly the one D9-D11 removed.

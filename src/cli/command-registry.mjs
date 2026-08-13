@@ -383,12 +383,12 @@ export const COMMAND_REGISTRY = [
   {
     name: 'gate-approve',
     invoke: 'fgos gate-approve',
-    description: 'Record a structured approve for one of the 3 skill-embedded Gates (contextApprove/planApprove/validateApprove, tsk-19j D1/D11) — separate from the awaiting-human ask/answer mechanism.',
+    description: 'Record a structured approve for one of the 2 live skill-embedded Gates (contextApprove/validateApprove, tsk-19j D1/D11, gate count reduced by coding-planning-validating-gate-redesign) — separate from the awaiting-human ask/answer mechanism. "planApprove" is still an accepted value for replaying pre-redesign historical records; no live skill writes a new one.',
     parameters: {
       type: 'object',
       properties: {
         id: { type: 'string', description: 'Work item id the Gate belongs to.' },
-        gate: { type: 'string', description: 'Which Gate was approved: "contextApprove" (fgos-coding-exploring), "planApprove" (fgos-coding-planning), or "validateApprove" (fgos-coding-validating).' },
+        gate: { type: 'string', description: 'Which Gate was approved: "contextApprove" (fgos-coding-exploring) or "validateApprove" (fgos-coding-validating, the single merged plan/proof gate — fgos-coding-planning has no gate of its own). "planApprove" is accepted only for replaying pre-redesign historical records.' },
         actor: { type: 'string', description: 'Who approved it: "human" (a person answered the Gate question) or "bypass" (gate-bypass level auto-approved it).' },
         verify: { type: 'string', description: 'The real verify command this Gate\'s artifact carries (never a placeholder).' },
       },

@@ -189,7 +189,8 @@ stage values — the same way `fgos-routing` describes it.
 
    Same convention `fgos-coding-exploring`
    already writes into `CONTEXT.md`, read by the same `hasOpenItems` check
-   at this skill's own Gate below
+   at `fgos-coding-validating`'s own Gate (this skill has no gate of its
+   own — see "No gate here" below)
    (`docs/history/gate-bypass-artifact-convention/CONTEXT.md` D2). In the
    common case this reads `None`: step 6 below already routes any
    newly-discovered *material* question back into `CONTEXT.md` before this
