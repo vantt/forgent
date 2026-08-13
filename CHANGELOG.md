@@ -47,6 +47,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   cockpit to reuse: the result no longer lives only on a screen somebody has
   to guard.
 
+### Fixed
+
+- The Claude Code plugin (`plugins/fgOS/`) now ships all 14 coding-domain
+  dev-skills (`fgos-coding-driving`, `fgos-routing`, `fgos-clarifying`,
+  and the rest) alongside its existing CLI-wrapper skills. Previously
+  they existed only in this repo's own `.claude/skills/`, so any project
+  that installed fgOS solely as a plugin (no forgent checkout anywhere)
+  got "Unknown skill" the moment `/fgOS:cook`/`/fgOS:discover`/
+  `/fgOS:plan`/`/fgOS:pick` tried to dispatch into one — even though the
+  `fgos` CLI itself was fully reachable the whole time. A new
+  `fgos doctor` check, `plugin-dev-skills-packaged`, catches a maintainer
+  who forgets to keep the plugin's copies in sync before a release ships.
+
 ### Changed
 
 - `fgos-runner` and `fgos-fanout` now ask for a worker slot before standing
