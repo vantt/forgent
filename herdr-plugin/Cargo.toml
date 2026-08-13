@@ -16,3 +16,11 @@ ratatui = { version = "0.30", features = ["unstable-rendered-line-info"] }
 crossterm = "0.29"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+# tsk-7l9-2 D8: herdr-fgos's first async dependency -- the gateway's REST
+# surface (D1/D7) is what needs one; the TUI/orchestrator code stays fully
+# synchronous and untouched.
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "process", "net", "time", "fs"] }
+axum = "0.7"
+
+[dev-dependencies]
+tower = { version = "0.4", features = ["util"] }

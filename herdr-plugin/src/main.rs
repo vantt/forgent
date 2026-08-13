@@ -22,6 +22,17 @@ use herdr_fgos::ui::RatatuiTerminalUi;
 const POLL_INTERVAL: Duration = Duration::from_secs(5);
 
 fn main() -> io::Result<()> {
+    // tsk-7l9-2 D1: gateway mode is a separate launch path from the TUI's
+    // default -- `herdr-fgos gateway` never touches the terminal at all
+    // (no `RatatuiTerminalUi::init()` below), it just runs the REST server
+    // to completion. D8: same binary/process either way, chosen at launch
+    // rather than a `--role gateway`/`--role orchestrator` split across
+    // machines.
+    if std::env::args().nth(1).as_deref() == Some("gateway") {
+        let root = fgos::repo_root()?;
+        return herdr_fgos::gateway::run(root);
+    }
+
     // tsk-45u D1: resolved once, up front, so the fixed `fg:operation`
     // tab this dashboard creates at startup (below) and every pane it
     // opens later both start in the same project root.

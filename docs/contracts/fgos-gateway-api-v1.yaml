@@ -65,8 +65,32 @@ tags:
     description: Read-only frontier/rollup/graph views used for dashboards.
   - name: orchestration
     description: The two process families the daemon controls per 0014 — interactive sessions and the headless runner.
+  - name: meta
+    description: Self-description of the gateway's own API surface — lets a client discover the contract instead of hand-tracking a separate doc.
 
 paths:
+  /contract:
+    get:
+      operationId: getContract
+      tags: [meta]
+      summary: The gateway's own OpenAPI spec, verbatim (this document)
+      description: |
+        Serves this exact spec file so an agent (or any other client) can
+        read the full route/schema surface and self-implement a client
+        against it, rather than needing this doc handed to it out of band.
+        The one route NOT behind the auth gate below — a client has to be
+        able to read the contract before it can know a token is even
+        required (D4). Never wrapped in the `fgos.v1` envelope: this is the
+        spec document itself, not a poll of fgOS state.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/yaml:
+              schema:
+                type: string
+                description: This same OpenAPI document, byte-for-byte.
+
   /work:
     get:
       operationId: listWork
