@@ -94,27 +94,35 @@ D2, each becomes a two-part check: (a) the corresponding
 ready-candidate exists for that lane. For (b), mirror
 `next_auto_discover_candidate`'s shape (main.rs:138-140: filters
 `app.work_items`, which the poll tick already fetches via `fgos triage
---json`, so no extra call) — merge candidates are ranked
-`awaiting-approval` items (`/fgOS:merge-list`'s own ranking: dependency-
-wait clear, no footprint conflict), retro candidates are `delivered`
-items, cleanup candidates are `retrospective` items past their TTL
-(`src/state/cleanup-pool.mjs`'s own pre-filter). **Not yet confirmed**:
-whether `app.work_items`'/`WorkItem`'s existing fields carry enough to
-compute the cleanup TTL check client-side, or whether that needs its own
-data source — flagged in Assumptions below for `fgos-coding-validating`.
-`registry.has_labeled_pane` stops being called for these three lanes
-entirely once this lands (its only other caller, if any, is unaffected
-per D3's scope).
+--json`, so no extra call) — **confirmed at `fgos-coding-validating`** (reality
+gate, this session): merge candidates are `status == "awaiting-approval"`
+(`src/state/graph-harness.mjs:112`), retro candidates are `status ==
+"retrospective"` (`src/state/retro-pool.mjs:12`), cleanup candidates are
+`status == "cleanup"` (`src/state/cleanup-pool.mjs`'s own `pickNextCleanupItem`
+doc comment). All three are plain `WorkItem.status` string comparisons —
+the same field `next_auto_discover_candidate` already reads — no new
+fetch or field needed. Cleanup's TTL sub-filter (`checkCleanupTTLElapsed`,
+reads the raw event log, not anything `WorkItem` carries) is explicitly
+documented as a scheduling optimization only —
+`src/state/cleanup-pool.mjs`'s own header: "this filter exists only [as a
+scheduling optimization]... `case 'cleanup'` is itself now a safe no-op
+when TTL alone hasn't [elapsed]... a TTL-not-elapsed item is harmless
+either way" — so herdr's client-side check safely omits it entirely: a
+plain `status == "cleanup"` match is enough, worst case an extra harmless
+`/fgOS:cleanup-next` launch that finds nothing TTL-ready and exits
+immediately. `registry.has_labeled_pane` stops being called for these
+three lanes entirely once this lands (its only other caller, if any, is
+unaffected per D3's scope).
 
 ## Risk map
 
 | Area | Risk | Proof point |
 |---|---|---|
 | `pick.rs` launch-target swap | low | existing `never_double_launches`-style test (rewritten per below) asserts the launched command string is `/fgOS:merge-next`, not `/fgOS:merge-loop` |
-| `app.rs` new `pending_*_pane` fields + retirement | medium (new state, mirrors a proven pattern but not yet written for 3 lanes at once) | a test that launches an admin pane once, asserts a second tick (pane still in scan) does not relaunch, then asserts a third tick (pane gone from scan) allows a relaunch — same shape as defect 2's own auto-discover boot-window test in the sibling item |
+| `app.rs` new `pending_*_pane` fields + retirement | medium (new state, mirrors a proven pattern but not yet written for 3 lanes at once) — **confirmed reusable at `fgos-coding-validating`**: `pending_worker_panes: HashSet<String>` (app.rs:294) and its `retire_settled_pending_panes` scan-membership filter (app.rs:832-852) already operate on arbitrary pane ids, not discover-specific logic; `pending_discover_pane`'s own retire fn (app.rs:864-869) is a 4-line wrapper over that same generic set-membership check | a test that launches an admin pane once, asserts a second tick (pane still in scan) does not relaunch, then asserts a third tick (pane gone from scan) allows a relaunch — same shape as defect 2's own auto-discover boot-window test in the sibling item |
 | `main.rs` guard rewire (drop `has_labeled_pane`, add pool-nonempty) | medium | a test with toggle on, no pending pane, but an EMPTY pool asserts no launch fires (the other half of D2, distinct from the in-flight half) |
 | `auto_operation_tab_launcher_never_double_launches_merge_across_two_ticks` (main.rs:1680) | **must be rewritten, not just kept green** | this test's current tick-2 assertion works by stubbing the registry to report `fgos-auto-merge` as already labeled — the exact D2-violating mechanism being removed. Its replacement must simulate the new pending-pane state instead of a labeled registry, or it will silently stop testing anything real once `has_labeled_pane` is no longer read for this decision |
-| cleanup TTL data availability for the pool-nonempty check | unconfirmed | `fgos-coding-validating` reads `WorkItem`'s current fields against `src/state/cleanup-pool.mjs`'s TTL logic to confirm whether a client-side check is possible or a new fetch is needed |
+| pool-nonempty status literals per lane | resolved — `fgos-coding-validating` read `graph-harness.mjs:112`/`retro-pool.mjs:12`/`cleanup-pool.mjs` directly: `awaiting-approval`/`retrospective`/`cleanup` respectively, all plain `WorkItem.status` matches, no TTL data needed (see Approach §3) |
 
 ## Assumptions (unproven — `fgos-coding-validating` to confirm or reject)
 
@@ -123,9 +131,10 @@ per D3's scope).
   the right shape, rather than one generalized map/set — not yet checked
   against whether `retire_settled_pending_panes`'s existing logic can be
   reused as-is or needs a shared helper extracted first.
-- The cleanup lane's pool-nonempty check can reuse data already present in
-  `app.work_items` (TTL-elapsed status per `cleanup-pool.mjs`) without a
-  new per-tick fetch — unconfirmed, see risk map.
+- ~~The cleanup lane's pool-nonempty check can reuse data already present
+  in `app.work_items`...~~ — confirmed at `fgos-coding-validating` (see risk
+  map): all three lanes' pool-nonempty check is a plain `WorkItem.status`
+  match, no new fetch, no TTL data required.
 - All three lanes' guard rewiring, plus the new bookkeeping fields, ship
   in one commit under this one item (no split) — same footprint family
   (`herdr-plugin/src/main.rs`, `pick.rs`, `ports.rs`, `app.rs`), one shared
