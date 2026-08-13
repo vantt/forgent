@@ -940,7 +940,10 @@ function submitWork(dir, text, opts = {}) {
     // undefined-input shape, so an omitted --refs flag stays byte-identical
     // to the prior hardcoded refs: []).
     refs: opts.refs ?? [],
-    verify: SUBMIT_VERIFY_SENTINEL,
+    // tsk-5gu: opts.verify is the new optional --verify override (same
+    // opts.X ?? default shape as every other field-parity flag below) --
+    // omitted leaves this at the existing sentinel, unchanged.
+    verify: opts.verify ?? SUBMIT_VERIFY_SENTINEL,
     tier,
     mode: opts.async ? 'async' : 'sync',
     // Per base-workflow-model D1-D4/S2: --domain is optional, same
@@ -1310,6 +1313,13 @@ async function runVerb(verb, flags, positional, dir) {
         tier: optionalField(flags.tier, 'submit --tier requires a tier value (e.g. light/standard/heavy); omit --tier entirely to use classify()\'s derived value.'),
         kind: optionalField(flags.kind, 'submit --kind requires a kind value; omit --kind entirely to use classify()\'s derived value.'),
         risk: optionalField(flags.risk, 'submit --risk requires a risk value; omit --risk entirely to use classify()\'s derived value.'),
+        // tsk-5gu: same optionalField shape as --tier/--kind/--risk above --
+        // a submitter who already knows the real verify command (stated in
+        // free text) previously had no way to attach it at submit time,
+        // unlike `add` (which requires --verify outright). Omitted leaves
+        // this undefined so submitWork falls through to its existing
+        // SUBMIT_VERIFY_SENTINEL default, byte-identical to before.
+        verify: optionalField(flags.verify, 'submit --verify requires a non-empty command; omit --verify entirely to use the sentinel until context-discovery designs one.'),
         // Same optional non-empty-path field `add` already exposes
         // (bin/fgos.mjs's `add` case) — submit previously had no way to set
         // this at all, so an item created through the public door could
