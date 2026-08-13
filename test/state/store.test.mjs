@@ -46,7 +46,7 @@ function tmpDir() {
 // state.json refreshView race, which needs concurrent writers on different
 // ids, not a CAS/exists conflict on the same one).
 //
-// `batchSize` (tsk-4fx, optional, defaults to `nProcesses` — every existing
+// `batchSize` (optional, defaults to `nProcesses` — every existing
 // call site below is byte-for-byte unaffected unless it opts in): caps how
 // many child processes are synchronized to the SAME start instant at once.
 // `acquireEventsLock`'s 2s deadline (src/state/events.mjs) is computed fresh
@@ -707,7 +707,7 @@ for (let i = 0; i < ${N_EDITS}; i += 1) {
 }`,
     N_PROC,
     Array.from({ length: N_PROC }, (_, i) => `race-view-${i}`),
-    4, // tsk-4fx: batch to reduce peak events.lock contention under load — see raceAcrossProcesses' own comment
+    4, // batch to reduce peak events.lock contention under load — see raceAcrossProcesses' own comment
   );
 
   assert.deepEqual(results, Array(N_PROC).fill({ ok: true }), 'every concurrent editWork loop on a distinct id must succeed (no CAS conflict expected across different ids)');
