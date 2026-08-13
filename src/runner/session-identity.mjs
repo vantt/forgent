@@ -3,9 +3,8 @@
 // and names how far that identity can be trusted (D9/D15/D16, str46-io-contract).
 //
 // Layered signal:
-//   (a) a recognized agent-session env var (BEE_SESSION_ID, falling back to
-//       the legacy CLAUDE_CODE_SESSION_ID -- same precedence as
-//       .bee/bin/lib/lock.mjs's envSessionId) -> a string session identity.
+//   (a) a recognized agent-session env var (FGOS_SESSION_ID, falling back to
+//       the legacy CLAUDE_CODE_SESSION_ID) -> a string session identity.
 //       The registry at <fgosDir>/sessions.json is then consulted ONLY to
 //       CONFIRM that string: the same id is worth more when fgOS itself
 //       issued it than when anyone exported it, so a match reports source
@@ -17,7 +16,7 @@
 //
 // The registry never SUPPLIES an identity, and no process is matched to a
 // row by directory or by row pid. Such a rule would resolve two agent
-// processes holding different BEE_SESSION_ID values inside one session
+// processes holding different FGOS_SESSION_ID values inside one session
 // worktree to the same id; main-checkout-lock.mjs's self-recognition branch
 // would then admit both as the same writer -- reopening the exact collision
 // STR65 built that lock to close.
@@ -64,7 +63,7 @@ const SESSION_ID_RE = /^[A-Za-z0-9._-]+$/;
 const MAX_ID_LENGTH = 200;
 
 function envSessionId(env) {
-  for (const key of ['BEE_SESSION_ID', 'CLAUDE_CODE_SESSION_ID']) {
+  for (const key of ['FGOS_SESSION_ID', 'CLAUDE_CODE_SESSION_ID']) {
     const value = env[key];
     if (typeof value !== 'string') continue;
     const trimmed = value.trim();

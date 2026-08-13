@@ -145,7 +145,7 @@ function commitAsSession(repoRoot, envOverlay) {
       encoding: 'utf8',
       env: {
         ...process.env,
-        BEE_SESSION_ID: undefined,
+        FGOS_SESSION_ID: undefined,
         CLAUDE_CODE_SESSION_ID: undefined,
         ...envOverlay,
       },
@@ -164,7 +164,7 @@ test('a solo git commit in a checkout with no existing lock succeeds', () => {
   const repoRoot = initTempRepoWithHook();
   const before = commitCount(repoRoot);
 
-  const result = commitAsSession(repoRoot, { BEE_SESSION_ID: 'session-solo' });
+  const result = commitAsSession(repoRoot, { FGOS_SESSION_ID: 'session-solo' });
 
   assert.equal(result.status, 0, result.stderr);
   assert.equal(commitCount(repoRoot), before + 1);
@@ -177,7 +177,7 @@ test('a solo git commit in a checkout with no existing lock succeeds', () => {
 
 test("the same session's second commit a few minutes later still succeeds (self-recognition)", () => {
   const repoRoot = initTempRepoWithHook();
-  const env = { BEE_SESSION_ID: 'session-self', FGOS_MAIN_CHECKOUT_LOCK_TTL_MS: '100' };
+  const env = { FGOS_SESSION_ID: 'session-self', FGOS_MAIN_CHECKOUT_LOCK_TTL_MS: '100' };
 
   const first = commitAsSession(repoRoot, env);
   assert.equal(first.status, 0, first.stderr);
@@ -197,14 +197,14 @@ test("the same session's second commit a few minutes later still succeeds (self-
 test('a git commit is refused when a fresh lock is held under a different identity (concurrent session)', () => {
   const repoRoot = initTempRepoWithHook();
   const holder = commitAsSession(repoRoot, {
-    BEE_SESSION_ID: 'session-holder',
+    FGOS_SESSION_ID: 'session-holder',
     FGOS_MAIN_CHECKOUT_LOCK_TTL_MS: String(15 * 60 * 1000),
   });
   assert.equal(holder.status, 0, holder.stderr);
   const before = commitCount(repoRoot);
 
   const rival = commitAsSession(repoRoot, {
-    BEE_SESSION_ID: 'session-rival',
+    FGOS_SESSION_ID: 'session-rival',
     FGOS_MAIN_CHECKOUT_LOCK_TTL_MS: String(15 * 60 * 1000),
   });
 
@@ -218,7 +218,7 @@ test('a git commit is refused when a fresh lock is held under a different identi
 test('a git commit succeeds once a different-identity lock has gone stale (ttl expired)', () => {
   const repoRoot = initTempRepoWithHook();
   const holder = commitAsSession(repoRoot, {
-    BEE_SESSION_ID: 'session-holder',
+    FGOS_SESSION_ID: 'session-holder',
     FGOS_MAIN_CHECKOUT_LOCK_TTL_MS: '100',
   });
   assert.equal(holder.status, 0, holder.stderr);
@@ -227,7 +227,7 @@ test('a git commit succeeds once a different-identity lock has gone stale (ttl e
   const before = commitCount(repoRoot);
 
   const later = commitAsSession(repoRoot, {
-    BEE_SESSION_ID: 'session-later',
+    FGOS_SESSION_ID: 'session-later',
     FGOS_MAIN_CHECKOUT_LOCK_TTL_MS: '100',
   });
 
@@ -251,7 +251,7 @@ test('a git commit succeeds against a different-identity lock older than 20s but
   // No FGOS_MAIN_CHECKOUT_LOCK_TTL_MS here -- exercises resolveTtlMs()'s
   // real fallback. Under the old shared DEFAULT_TTL_MS (3 minutes) a 25s-old
   // lock would still read as HELD and this commit would be refused.
-  const later = commitAsSession(repoRoot, { BEE_SESSION_ID: 'session-later' });
+  const later = commitAsSession(repoRoot, { FGOS_SESSION_ID: 'session-later' });
 
   assert.equal(later.status, 0, later.stderr);
   assert.equal(commitCount(repoRoot), before + 1);
@@ -266,7 +266,7 @@ test('a git commit is refused when the lock file is corrupt, and the refusal nev
   fs.writeFileSync(path.join(fgosDir, 'main-checkout.lock'), 'not-json-at-all{{{');
   const before = commitCount(repoRoot);
 
-  const result = commitAsSession(repoRoot, { BEE_SESSION_ID: 'session-observer' });
+  const result = commitAsSession(repoRoot, { FGOS_SESSION_ID: 'session-observer' });
 
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /commit refused/);
@@ -289,7 +289,7 @@ test('fgos unlock clears a corrupt lock left behind by a refused commit, and the
   fs.writeFileSync(path.join(fgosDir, 'main-checkout.lock'), 'not-json-at-all{{{');
   const before = commitCount(repoRoot);
 
-  const refused = commitAsSession(repoRoot, { BEE_SESSION_ID: 'session-observer' });
+  const refused = commitAsSession(repoRoot, { FGOS_SESSION_ID: 'session-observer' });
   assert.notEqual(refused.status, 0);
   assert.equal(commitCount(repoRoot), before);
 
@@ -298,7 +298,7 @@ test('fgos unlock clears a corrupt lock left behind by a refused commit, and the
   assert.equal(JSON.parse(unlock.stdout).data.reason, 'reclaimed');
   assert.equal(fs.existsSync(path.join(fgosDir, 'main-checkout.lock')), false);
 
-  const retried = commitAsSession(repoRoot, { BEE_SESSION_ID: 'session-observer' });
+  const retried = commitAsSession(repoRoot, { FGOS_SESSION_ID: 'session-observer' });
   assert.equal(retried.status, 0, retried.stderr);
   assert.equal(commitCount(repoRoot), before + 1);
 });
@@ -312,7 +312,7 @@ test('fgos unlock clears a corrupt lock left behind by a refused commit, and the
 test('a commit inside a real detached git worktree writes the lock at the worktree\'s own .fgos, not under its hooks directory', () => {
   const worktreeRoot = initTempRepoWithDetachedWorktree();
 
-  const result = commitAsSession(worktreeRoot, { BEE_SESSION_ID: 'session-worktree' });
+  const result = commitAsSession(worktreeRoot, { FGOS_SESSION_ID: 'session-worktree' });
 
   assert.equal(result.status, 0, result.stderr);
   assert.equal(
@@ -336,7 +336,7 @@ test('a commit still succeeds after the identity shape change, and the lock reco
   const repoRoot = initTempRepoWithHook();
   const before = commitCount(repoRoot);
 
-  const first = commitAsSession(repoRoot, { BEE_SESSION_ID: 'session-shape' });
+  const first = commitAsSession(repoRoot, { FGOS_SESSION_ID: 'session-shape' });
   assert.equal(first.status, 0, first.stderr);
   assert.equal(commitCount(repoRoot), before + 1);
 
@@ -347,7 +347,7 @@ test('a commit still succeeds after the identity shape change, and the lock reco
 
   // Same session again: self-recognition still refreshes its own lock, which
   // only works because the token above is the real identity, not undefined.
-  const second = commitAsSession(repoRoot, { BEE_SESSION_ID: 'session-shape' });
+  const second = commitAsSession(repoRoot, { FGOS_SESSION_ID: 'session-shape' });
   assert.equal(second.status, 0, second.stderr);
   assert.equal(commitCount(repoRoot), before + 2);
 });
@@ -360,7 +360,7 @@ test('a git commit on the main checkout is refused when checked out to a fgw/* b
   const repoRoot = initTempRepoWithHookOnBranch('fgw/tsk-example');
   const before = commitCount(repoRoot);
 
-  const result = commitAsSession(repoRoot, { BEE_SESSION_ID: 'session-mistake' });
+  const result = commitAsSession(repoRoot, { FGOS_SESSION_ID: 'session-mistake' });
 
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /commit refused/);
@@ -376,7 +376,7 @@ test('a git commit on the main checkout is refused when checked out to a fgw/* b
 test('a git commit inside a linked (non-detached) worktree on a fgw/* branch still succeeds', () => {
   const worktreeRoot = initTempRepoWithFgwWorktree('fgw/tsk-example');
 
-  const result = commitAsSession(worktreeRoot, { BEE_SESSION_ID: 'session-worktree-fgw' });
+  const result = commitAsSession(worktreeRoot, { FGOS_SESSION_ID: 'session-worktree-fgw' });
 
   assert.equal(result.status, 0, result.stderr);
 });
