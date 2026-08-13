@@ -288,6 +288,32 @@ stage values — the same way `fgos-routing` describes it.
    comprehension, a demand the doc says verify must never be asked to
    satisfy.
 
+   **Sync a pass-through item's own `verify` field (tsk-14a).** For a
+   *pass-through* (non-split — step 4's "one piece is honestly enough"
+   branch) item only: once the one command above is named, check the
+   item's own current `verify` (`fgos list --id <item-id> --json`'s
+   `data.work[id].verify`) against the discovery-stage placeholder
+   constants (`FALLBACK_VERIFY`, `RETIRED_P14_PLACEHOLDER`,
+   `src/intake/discovery.mjs`). If it still reads one of those
+   placeholders, sync that command onto the item's own current `verify`
+   field before handing off to `fgos-coding-validating`:
+
+   ```bash
+   root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+   node "$root/bin/fgos.mjs" edit "<item-id>" --verify "<the designed proof-surface command>" --dir "$root"
+   ```
+
+   If the item already carries a real, distinct verify, do nothing — never
+   overwrite a value already set deliberately. Split children need no such
+   step: `normalizeChild` already forces a real verify onto each one at
+   creation time (`plan.mjs:175-219`). Without this sync, nothing in the
+   standard flow ever promotes this step's own designed command into
+   `work.verify` — `fgos-coding-validating`'s own gate-approve call only
+   re-records whatever `work.verify` already says, and `resolvePlan`'s
+   `planApproveVerify` fallback (`plan.mjs:543`) falls straight through to
+   that same still-placeholder value, which later gets executed literally
+   as a shell command by `fgos return`.
+
 6. **Mid-planning `CONTEXT.md` gap.** If, at any step above, `CONTEXT.md`'s
    locked decisions turn out to be silent on something this plan actually
    needs, apply the same material/grounded/answerable filter

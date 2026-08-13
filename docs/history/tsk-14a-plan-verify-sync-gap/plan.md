@@ -130,23 +130,29 @@ overwrite a value someone already set deliberately.
 
 ## Verify
 
-Per `docs/how-to/write-verify-for-a-skill-prose-change.md` (this item only
-touches a `.claude/skills/**/SKILL.md` path):
+Per `docs/how-to/write-verify-for-a-skill-prose-change.md` (this item
+touches a `.claude/skills/**/SKILL.md` path). `test/skills/fgos-mirror.test.mjs`
+(covered by `npm test`) requires every `fgos-*` dev-skill to stay
+byte-identical across `.claude/skills/`, `.agents/skills/`, and
+`plugins/fgOS/skills/` — so the edit must land in all three, and the
+scope guard below allows exactly those three plus this item's own
+`docs/history/` evidence:
 
 ```bash
 npm test && \
 grep -q 'sync that command onto the item' .claude/skills/fgos-coding-planning/SKILL.md && \
-grep -q '\-\-verify "<the designed proof-surface command>"' .claude/skills/fgos-coding-planning/SKILL.md && \
-! git diff --name-only main...HEAD | grep -qv '^\.claude/skills/fgos-coding-planning/SKILL\.md$'
+grep -q -- '--verify "<the designed proof-surface command>"' .claude/skills/fgos-coding-planning/SKILL.md && \
+! git diff --name-only main...HEAD | grep -qvE '^(\.claude/skills/fgos-coding-planning/SKILL\.md|\.agents/skills/fgos-coding-planning/SKILL\.md|plugins/fgOS/skills/fgos-coding-planning/SKILL\.md|docs/history/tsk-14a-plan-verify-sync-gap/.*)$'
 ```
 
-- `npm test` — regression floor, unchanged behavior for every other item
-  shape.
+- `npm test` — regression floor for every other item shape, and (via
+  `fgos-mirror.test.mjs`) proof the three copies are still byte-identical.
 - POSITIVE — the new sync instruction and its concrete `fgos edit --verify`
-  invocation both exist in the skill file.
-- NEGATIVE/scope-guard — nothing outside the one intended file changed
-  (this is a prose-only fix; a `src/` diff here would mean the fix drifted
-  from this plan's own scope decision above).
+  invocation both exist in the (canonical `.claude/`) skill file.
+- NEGATIVE/scope-guard — nothing outside the three mirrored skill copies
+  and this item's own docs history changed (this is a prose-only fix; a
+  `src/` diff here would mean the fix drifted from this plan's own scope
+  decision above).
 
 ## Outstanding questions
 
