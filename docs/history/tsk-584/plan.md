@@ -1,0 +1,186 @@
+# tsk-584 — herdr-plugin surfaces backlog items visibly in the TUI
+
+Mode: standard
+
+Parent: `tsk-5wr` (Piece 4 of
+`docs/history/work-item-backlog-status/plan.md:145-156`).
+Locked decisions this plan honors: `docs/history/work-item-backlog-status/CONTEXT.md`
+D3 (`backlog` gets its own `statusCategory`) and D4 (herdr-plugin fix is in
+scope, and a `backlog` item must be genuinely findable through normal TUI
+browsing, not merely non-erroring).
+
+Depends on Piece 1 (`tsk-5vs`), already merged into this branch: the
+`backlog -> 'backlog'` mapping is present at
+`src/state/workflow-stage-graphs.mjs:280`.
+
+## Mode rationale
+
+`standard`, on 2 flags:
+
+1. **Existing covered behavior changes.** The tab strip is not new surface —
+   four existing tests assert exactly the current 4-tab shape and cycle:
+   `tabs_classify_status_into_todo_doing_review_done` and
+   `next_tab_and_prev_tab_cycle_and_reset_selection` (`app.rs`),
+   `work_items_panel_renders_four_tabs_todo_doing_review_done` (`ui.rs`),
+   and `next_tab_event_cycles_the_active_tab` (`main.rs`).
+2. **Cross-language status-literal mirror.** The Rust side re-states status
+   literals that live canonically in JS (`workflow-stage-graphs.mjs`). JS-side
+   correctness does not imply the Rust side stays in sync — that divergence is
+   exactly the bug this item exists to close.
+
+Neither flag is a hard gate, and nothing here touches a locked law, so
+`high-risk` would overstate it. `small` would understate it: a `small` lane
+does not carry the phased shape needed to update four existing test
+assertions across three files without regressing the cycle behavior.
+
+## Approach
+
+### Chosen: a dedicated `BACKLOG` tab, placed first in the strip
+
+`WorkTab` (`app.rs:105-110`) gains a fifth variant, `Backlog`, matching
+`status == "backlog"`; `TAB_ORDER` (`ui.rs:36`) becomes
+`[Backlog, Todo, Doing, Review, Done]`.
+
+Why a dedicated tab and not folding `backlog` into the `Todo` tab with a
+marker:
+
+- CONTEXT.md D3 deliberately gave `backlog` its own `statusCategory` rather
+  than reusing `'todo'`'s, precisely so no consumer reads a `backlog` item as
+  ready. Folding it into the `Todo` tab would re-introduce, in the one
+  interactive surface, exactly the conflation D3 spent a decision avoiding.
+- D4's bar is that a person browsing can SEE a `backlog` item exists. The tab
+  strip renders every `TAB_ORDER` label unconditionally
+  (`ui.rs:279-280`), so an empty-but-present `BACKLOG` tab is visible on
+  screen at all times — it advertises the bucket even when nothing is in it.
+  A marker inside `Todo` is only discoverable once an item already exists,
+  and `backlog -> todo` is a human-only edge (D1): an item nobody knows to
+  look for never gets promoted.
+
+Why **first** and not last: `STATUS_CATEGORIES` (`src/state/work.mjs:127-134`)
+already declares its frozen order as `['backlog', 'todo', 'in-progress',
+'review', 'completed', 'canceled']`. Putting `BACKLOG` first makes the tab
+strip mirror the schema's own category order rather than inventing a second
+ordering the Rust side would have to keep in sync by hand.
+
+**The default active tab stays `Todo`** (`app.rs:342`, `app.rs:636`).
+`BACKLOG` being first in the strip is a layout choice; making it the landing
+tab would change what an operator sees on every launch, which is a
+regression this item was not asked for and D4 does not require — the strip
+being visible already satisfies the findable-by-browsing bar.
+
+### Rejected alternatives
+
+- **Fold into `Todo` with a marker** — rejected above (re-conflates the
+  category D3 separated; invisible until an item exists).
+- **Add the arm to `WorkTab::matches` only, no new tab** — this is the
+  literal minimum the item's own description names, and it does not work: an
+  arm with no variant to attach it to is not expressible, and any variant
+  not in `TAB_ORDER` is unreachable by `next_tab`/`prev_tab`. It would be
+  non-erroring and invisible, exactly what D4 rules out.
+- **A filter toggle instead of a tab** — a second interaction idiom for one
+  status, in a panel whose entire classification model is already tabs.
+
+### Risk map
+
+`impact-analysis: full` — `fgos tool query --capability impact-analysis
+--status present` reports the `gitnexus` provider `present` (checked this
+session). The index resolved the target exactly (`epistemic: "exact"`), and
+its answer is corroborated below by direct reads of the same files, so this
+is not a bare tool assertion.
+
+| Component | Risk | What would prove it |
+|---|---|---|
+| `WorkTab::matches` (`app.rs:118-128`) | **Medium.** GitNexus upstream impact reports CRITICAL / 31 impacted / 22 processes / 4 modules. Read through, it is hub-shaped, not dangerous: `direct: 1` — the single direct caller is `App::visible_work_items` (`app.rs:373-377`), and everything at depth 2-3 reaches it only through that one funnel. | `cargo test` green. The 22 "affected processes" are themselves almost entirely this crate's own tests, so the item's own verify covers the reported radius rather than leaving it unproven. |
+| Tab cycle (`next`/`prev`, `app.rs:139-155`) | **Medium.** Going 4 → 5 changes the wrap point. Two existing tests assert the 4-cycle by construction (`next_tab_and_prev_tab_cycle_and_reset_selection` at `app.rs:1142-1154` calls `next_tab()` exactly 3 times after `Doing` and asserts a wrap to `Todo`; `next_tab_event_cycles_the_active_tab` in `main.rs`). | Both tests updated to the 5-cycle and green, with the wrap assertion still explicit rather than deleted. |
+| `TAB_ORDER` arity (`ui.rs:36`) | **Low.** Typed `[WorkTab; 4]`; the compiler rejects a 5th element until the type changes, so this cannot silently half-land. | Compiles; `work_items_panel_renders_four_tabs_todo_doing_review_done` (`ui.rs:721-735`) updated to assert all five labels. |
+| `next_auto_discover_candidate` (`main.rs:138-140`) | **Low.** No logic change needed — the literal `status == "todo"` check already excludes `backlog` by construction. The risk is silent future drift, not present incorrectness. | A new regression test: a `backlog` item at an otherwise discover-eligible stage with empty `blocked_by` is never returned as a candidate. |
+
+Note the two Medium rows do not need a separate proof point carried to
+`fgos-coding-validating` beyond the item's own verify: both are fully
+mechanical (a Rust exhaustive `match` and a typed array), and `cargo test` is
+a real, complete check of each. What `fgos-coding-validating` should confirm
+is the assumption list below.
+
+### Footprint — widened
+
+Declared footprint on the item today is
+`herdr-plugin/src/app.rs`, `herdr-plugin/src/main.rs`. That is **incomplete**:
+`TAB_ORDER` at `ui.rs:36` is typed `[WorkTab; 4]` and the render test at
+`ui.rs:721-735` asserts exactly four labels, so a fifth tab cannot land
+without touching `ui.rs`. Corrected footprint:
+
+```
+herdr-plugin/src/app.rs
+herdr-plugin/src/main.rs
+herdr-plugin/src/ui.rs
+```
+
+`herdr-plugin/src/ui.rs` overlaps no sibling's declared footprint under
+`tsk-5wr` (`bin/fgos.mjs`, `src/state/discover-pool.mjs`).
+
+### Order of work
+
+`fgos graph --json` puts this item on neither `criticalPath` (a 10-deep path
+through `tsk-4vo…tsk-19y-1`, disjoint from this subtree) nor `topUnblock`
+(empty), so no external work is waiting on a particular piece landing first.
+The ordering below is therefore internal, driven only by what has to compile
+before the next step can be written:
+
+1. `app.rs` — add the `Backlog` variant, its `matches` arm, its `label`, and
+   its place in `next`/`prev`. Nothing else compiles until the variant exists.
+2. `ui.rs` — widen `TAB_ORDER` to `[WorkTab; 5]` with `Backlog` first.
+3. Update the four existing tests named in the Mode rationale.
+4. `main.rs` — add the `next_auto_discover_candidate` regression test (no
+   production change in this file).
+
+## Shape
+
+One honest piece of work. **No split.** All four steps are the single
+indivisible change "the TUI knows about a fifth status bucket" — splitting
+them would leave the tree non-compiling between children, and no piece has a
+runnable verify of its own separate from `cargo test`.
+
+Verify (unchanged from the item's own):
+
+```
+cd herdr-plugin && cargo test
+```
+
+### Concrete cases to prove against
+
+- **Empty/boundary** — the `BACKLOG` tab with zero matching items renders its
+  label and an empty list without panicking (this is the normal case in a
+  repo with no `backlog` items yet, and is the case D4's bar most depends on:
+  the tab must advertise itself while empty).
+- **Existing behavior that must not regress** — `todo` items still appear
+  under `TODO` and nowhere else; the `Doing`/`Review`/`Done` groupings are
+  untouched; the default landing tab is still `Todo`.
+- **Cycle wrap** — `next_tab` from `Done` wraps to `Backlog`; `prev_tab` from
+  `Backlog` wraps to `Done`. Both directions asserted, not just forward.
+- **Classification** — a `backlog` item appears under `BACKLOG` and under no
+  other tab (the existing classification test extended, not replaced).
+- **Auto-discover exclusion** — a `backlog` item at stage `discovery` with
+  empty `blocked_by` is not returned by `next_auto_discover_candidate`, even
+  though it satisfies `discover_eligible()`.
+
+### Assumptions
+
+- **A1.** `backlog` is the exact status literal the Rust side must match.
+  Grounded in `src/state/workflow-stage-graphs.mjs:280` on this branch
+  (`backlog: 'backlog'`), merged here via `tsk-5vs`.
+- **A2.** `cargo test` from `herdr-plugin/` is the complete proof surface for
+  this item. D4's sharpened bar mentions a manual TUI check
+  (`docs/history/work-item-backlog-status/plan.md:90`); the empty-tab render
+  case above is the automated stand-in for it, since `ui.rs`'s existing
+  render tests already assert against rendered buffer content
+  (`ui.rs:734-735`) rather than requiring a live terminal. Flagged as the one
+  assumption `fgos-coding-validating` should look at hardest — if a live TUI
+  check is genuinely required, that is a scope addition this plan does not
+  currently carry.
+- **A3.** No consumer outside `herdr-plugin` reads `WorkTab`'s variant count
+  or `TAB_ORDER`'s arity. Grounded in the GitNexus upstream result, whose
+  4 affected modules are all inside this crate.
+
+## Outstanding questions
+
+None
