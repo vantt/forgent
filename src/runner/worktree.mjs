@@ -665,7 +665,127 @@ export function resyncClaimWorktree(repoRoot, worktreePath, branch) {
   }
 
   git(repoRoot, ['-C', worktreePath, 'reset', '--hard', branchTip]);
+  stripFgosAfterReset(worktreePath, branch);
   return { resynced: true, from: lastSynced, to: branchTip };
+}
+
+/**
+ * tsk-1d7 (docs/history/stale-worktree-index-guard/CONTEXT.md D3): a plain
+ * `reset --hard` checks out whatever `.fgos/` the branch tip has tracked,
+ * resurrecting a stale snapshot in a worktree in violation of ADR0020
+ * (verified directly) -- the same strip `finishWorktreeSetup` already
+ * performs right after a fresh `git worktree add`, needed again after any
+ * later `reset --hard`. Shared by `resyncClaimWorktree` above and
+ * `resyncWorktree` below. Only the strip, never the rest of
+ * `finishWorktreeSetup` (dependency provisioning is out of scope for a
+ * resync, an unrelated side effect this must not add).
+ */
+function stripFgosAfterReset(worktreePath, branch) {
+  try {
+    fs.rmSync(path.join(worktreePath, '.fgos'), { recursive: true, force: true });
+  } catch (err) {
+    throw new WorktreeError(`removing checked-out .fgos in resynced worktree "${worktreePath}" failed: ${err.message}`, {
+      branch,
+      worktreePath,
+    });
+  }
+}
+
+/**
+ * The repair verb behind `fgos resync-worktree` (tsk-1d7, docs/history/
+ * stale-worktree-index-guard/CONTEXT.md D3) -- fixes exactly the failure
+ * `.githooks/pre-commit`'s own stale-index guard (D2) detects and refuses:
+ * a worktree whose branch ref was force-moved from outside (e.g. `approve`'s
+ * leaf->root merge) while this worktree still holds files/index at the OLD
+ * tree. Unlike `resyncClaimWorktree` above -- which REFUSES when the
+ * worktree has any uncommitted change, because that function exists for the
+ * routine "clean reattach" case -- this verb is invoked precisely because
+ * the worktree has real staged work worth carrying forward (the commit that
+ * was about to happen), so it captures that staged content as a patch
+ * BEFORE resetting, then reapplies it after.
+ *
+ * Never auto-invoked by the hook itself (D2: the hook only detects and
+ * refuses, printing the command to run this). A caller runs this by hand
+ * (or a session runs it on the user's behalf) once notified.
+ */
+export function resyncWorktree(repoRoot, worktreePath, branch) {
+  const lastSynced = lastSyncedCommit(repoRoot, worktreePath);
+  if (!lastSynced) {
+    throw new WorktreeError(
+      `resync-worktree: could not read "${worktreePath}"'s own HEAD reflog to determine what commit it was last synced to. Inspect "${worktreePath}" by hand.`,
+      { branch, worktreePath },
+    );
+  }
+
+  const branchTip = git(repoRoot, ['rev-parse', branch]).trim();
+  if (lastSynced === branchTip) {
+    return { resynced: false, reason: 'already-in-sync' };
+  }
+
+  let isAncestor = true;
+  try {
+    git(repoRoot, ['merge-base', '--is-ancestor', lastSynced, branchTip]);
+  } catch {
+    isAncestor = false;
+  }
+  if (!isAncestor) {
+    throw new WorktreeError(
+      `resync-worktree: refusing "${worktreePath}" on "${branch}" — its last-synced commit (${lastSynced}) is not an ancestor of the branch's current tip (${branchTip}), so a reset would risk losing commits. Inspect "${worktreePath}" and reconcile by hand.`,
+      { branch, worktreePath, lastSynced, branchTip },
+    );
+  }
+
+  // Stray dirt beyond what's staged (untracked, or unstaged changes to a
+  // tracked file) is refused outright rather than guessed into a merge
+  // (D3) -- only STAGED content is what this repair carries forward.
+  // Porcelain column 2 (working-tree status) is ' ' for a purely-staged
+  // entry; anything else means real dirt outside the index.
+  const status = git(repoRoot, ['-C', worktreePath, 'status', '--porcelain', '--', ':!.fgos']);
+  const strayLines = status.split('\n').filter((line) => line !== '' && line[1] !== ' ');
+  if (strayLines.length > 0) {
+    throw new WorktreeError(
+      `resync-worktree: refusing "${worktreePath}" on "${branch}" — stray uncommitted changes beyond what's staged (${strayLines.join(', ')}). Commit, stage, or discard them before resyncing; never guessing a merge over stray dirt.`,
+      { branch, worktreePath, strayLines },
+    );
+  }
+
+  // 1. Extract the staged content as a patch BEFORE touching anything,
+  // saved under --git-common-dir -- never the worktree's own --git-dir,
+  // which fgOS can force-remove later, losing the only copy (D3).
+  const patch = git(repoRoot, ['-C', worktreePath, 'diff', '--cached', '--binary', lastSynced]);
+  const gitCommonDir = git(repoRoot, ['rev-parse', '--path-format=absolute', '--git-common-dir']).trim();
+  const patchDir = path.join(gitCommonDir, 'fgos-resync-patches');
+  fs.mkdirSync(patchDir, { recursive: true });
+  const patchPath = path.join(patchDir, `${branch.replace(/\//g, '-')}-${Date.now()}.patch`);
+  fs.writeFileSync(patchPath, patch);
+
+  // 2. Reset to the branch's real tip.
+  git(repoRoot, ['-C', worktreePath, 'reset', '--hard', branchTip]);
+
+  // 3. Re-strip .fgos/ -- reset --hard always reintroduces it (D3).
+  stripFgosAfterReset(worktreePath, branch);
+
+  if (patch.trim() === '') {
+    // Nothing was staged -- nothing to reapply.
+    fs.rmSync(patchPath, { force: true });
+    return { resynced: true, from: lastSynced, to: branchTip, reapplied: false };
+  }
+
+  // 4. Reapply the patch, merging both index and working tree in one step
+  // -- never `--3way`, which was tested to leave unmerged/conflict state
+  // (D3). A real content conflict refuses and preserves the patch file so
+  // a person can review/apply it by hand.
+  try {
+    git(repoRoot, ['-C', worktreePath, 'apply', '--index', patchPath]);
+  } catch (err) {
+    throw new WorktreeError(
+      `resync-worktree: "${worktreePath}" was reset to "${branchTip}" but reapplying its staged changes hit a real conflict — the patch is preserved at "${patchPath}" for manual review. ${err.message}`,
+      { branch, worktreePath, patchPath },
+    );
+  }
+
+  fs.rmSync(patchPath, { force: true });
+  return { resynced: true, from: lastSynced, to: branchTip, reapplied: true };
 }
 
 /**

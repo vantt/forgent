@@ -42,7 +42,7 @@ import { assertSafeMainCheckoutReset } from '../src/runner/main-checkout-reset-g
 import { classifyIronLaw } from '../src/evolve/iron-law.mjs';
 import { driftStatus } from '../src/state/drift-status.mjs';
 import { unreleasedHasEntries } from '../src/setup/registrations.mjs';
-import { branchNameFor, branchExists, withMergeEphemeralWorktree, provisionDependencies } from '../src/runner/worktree.mjs';
+import { branchNameFor, branchExists, withMergeEphemeralWorktree, provisionDependencies, resyncWorktree } from '../src/runner/worktree.mjs';
 import { resolveIntegrationBranch, retargetMember } from '../src/runner/promote-engine.mjs';
 import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
 import { withLockRetry } from '../src/runner/lock-wait.mjs';
@@ -4713,6 +4713,22 @@ async function runVerb(verb, flags, positional, dir) {
         lockAge: status.lockAgeMs != null ? formatLockDurationMs(status.lockAgeMs) : null,
         remainingTtl: status.remainingTtlMs != null ? formatLockDurationMs(status.remainingTtlMs) : null,
       };
+    }
+
+    // tsk-1d7 (docs/history/stale-worktree-index-guard/CONTEXT.md D3): the
+    // repair verb `.githooks/pre-commit`'s own stale-index guard (D2)
+    // prints as its refuse-message command. Run FROM INSIDE the stale
+    // worktree (the same place the hook just refused a commit) — `--path`
+    // exists only so a test/caller can point this at a worktree other than
+    // its own cwd. `dir` (this verb's own `--dir`) is always the MAIN
+    // checkout, same convention as every other verb here — never the
+    // worktree itself, since branch refs and `--git-common-dir` must
+    // resolve against the shared repo, not the worktree's own (nonexistent
+    // for a linked worktree) `.git` directory contents.
+    case 'resync-worktree': {
+      const worktreePath = flags.path ? path.resolve(flags.path) : process.cwd();
+      const branch = flags.branch ?? gitAt(worktreePath, ['symbolic-ref', '--short', 'HEAD']).trim();
+      return resyncWorktree(dir, worktreePath, branch);
     }
 
     // tsk-3au: the safe path for a destructive `git reset --hard` on the
