@@ -56,7 +56,7 @@ marker:
   and `backlog -> todo` is a human-only edge (D1): an item nobody knows to
   look for never gets promoted.
 
-Why **first** and not last: `STATUS_CATEGORIES` (`src/state/work.mjs:127-134`)
+Why **first** and not last: `STATUS_CATEGORIES` (`src/state/work.mjs:138-145`)
 already declares its frozen order as `['backlog', 'todo', 'in-progress',
 'review', 'completed', 'canceled']`. Putting `BACKLOG` first makes the tab
 strip mirror the schema's own category order rather than inventing a second
@@ -82,11 +82,23 @@ being visible already satisfies the findable-by-browsing bar.
 
 ### Risk map
 
-`impact-analysis: full` — `fgos tool query --capability impact-analysis
---status present` reports the `gitnexus` provider `present` (checked this
-session). The index resolved the target exactly (`epistemic: "exact"`), and
-its answer is corroborated below by direct reads of the same files, so this
-is not a bare tool assertion.
+`impact-analysis: degraded` — `fgos tool query --capability impact-analysis
+--status present` reports the `gitnexus` provider `present`, but `present`
+only means installed, never that the index is fresh (CLAUDE.md's own gate).
+It is not fresh here: the index was last built at `79fead3`, and
+`git diff --name-only 79fead3..HEAD` shows `herdr-plugin/src/app.rs`,
+`herdr-plugin/src/ui.rs` and `herdr-plugin/src/main.rs` — precisely this
+item's three files — have all changed since. So the CRITICAL / 31 impacted /
+22 processes figures below come from a stale graph and are named here as
+weak proof, not treated as confirmed blast radius.
+
+What the plan actually leans on is corroborated independently, against the
+current tree rather than the index: `App::visible_work_items`
+(`app.rs:373-377`, read directly) is the sole caller applying
+`active_tab.matches(...)`, which is what makes the radius hub-shaped, and
+every existing test the plan names was located by direct read at its cited
+line. The stale-index gap therefore affects the reported numbers, not the
+conclusion drawn from them.
 
 | Component | Risk | What would prove it |
 |---|---|---|
@@ -168,18 +180,25 @@ cd herdr-plugin && cargo test
 - **A1.** `backlog` is the exact status literal the Rust side must match.
   Grounded in `src/state/workflow-stage-graphs.mjs:280` on this branch
   (`backlog: 'backlog'`), merged here via `tsk-5vs`.
-- **A2.** `cargo test` from `herdr-plugin/` is the complete proof surface for
-  this item. D4's sharpened bar mentions a manual TUI check
-  (`docs/history/work-item-backlog-status/plan.md:90`); the empty-tab render
-  case above is the automated stand-in for it, since `ui.rs`'s existing
-  render tests already assert against rendered buffer content
-  (`ui.rs:734-735`) rather than requiring a live terminal. Flagged as the one
-  assumption `fgos-coding-validating` should look at hardest — if a live TUI
-  check is genuinely required, that is a scope addition this plan does not
-  currently carry.
-- **A3.** No consumer outside `herdr-plugin` reads `WorkTab`'s variant count
-  or `TAB_ORDER`'s arity. Grounded in the GitNexus upstream result, whose
-  4 affected modules are all inside this crate.
+- **A2 — proven, no longer an open assumption.** `cargo test` from
+  `herdr-plugin/` is the complete proof surface for this item. D4's sharpened
+  bar mentions a manual TUI check
+  (`docs/history/work-item-backlog-status/plan.md:90`), and the automated
+  stand-in is real: `work_items_panel_renders_four_tabs_todo_doing_review_done`
+  (`ui.rs:724-737`) drives a `ratatui::backend::TestBackend`, collects the
+  rendered buffer into a string, and asserts each label appears — no live
+  terminal involved. Because `App::mock()` carries no `backlog` item, simply
+  extending that test to assert a fifth `BACKLOG` label IS the empty-tab
+  visibility proof D4 asks for; it needs no new harness.
+- **A3 — proven.** No consumer outside `herdr-plugin` reads `WorkTab`'s
+  variant count or `TAB_ORDER`'s arity. Verified against the current tree by
+  direct grep rather than the stale index: the only non-`target/` matches for
+  `WorkTab`/`TAB_ORDER` anywhere under `herdr-plugin/`, `src/`, or `bin/` are
+  `herdr-plugin/src/app.rs`, `herdr-plugin/src/ui.rs`, and
+  `herdr-plugin/src/main.rs`.
+- **A4 — baseline.** `cd herdr-plugin && cargo test` is green as of this
+  plan: 145 passed, 4 suites. Any failure after the change is therefore
+  attributable to the change itself.
 
 ## Outstanding questions
 
