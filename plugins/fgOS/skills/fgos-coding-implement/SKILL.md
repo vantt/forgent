@@ -128,7 +128,11 @@ re-shapes the work; that already happened at `discovery`/`exploring`/`planning`.
    defect from `fgos-coding-planning`; park the item and say so rather than
    inventing a check. On failure, fix the root cause and rerun the exact
    command — never weaken the command or swap in an easier one to make it
-   pass.
+   pass. If the failure is a confusing "command not found"/wrong-output
+   result rather than a clean test failure or a clean shell syntax error,
+   read `docs/how-to/preserve-shell-escapes-when-transcribing-a-verify-
+   command.md` (tsk-463) — a backslash-escaped backtick lost during an
+   earlier hand-transcription is a common, quiet cause.
 
 4. **Commit, then check Iron Law evidence (when applicable).** The Iron Law
    gate's own file-set computation (`changedFiles`, `src/runner/merge.mjs`)

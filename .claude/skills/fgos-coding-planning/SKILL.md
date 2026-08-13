@@ -314,6 +314,15 @@ stage values — the same way `fgos-routing` describes it.
    that same still-placeholder value, which later gets executed literally
    as a shell command by `fgos return`.
 
+   Whenever the verify command you are about to write with `fgos add
+   --verify`/`fgos edit --verify` (including the sync step immediately
+   above) contains a backslash-escaped backtick (or any other character an
+   outer shell layer could silently strip), read `docs/how-to/preserve-
+   shell-escapes-when-transcribing-a-verify-command.md` first — a lost
+   escape is usually still syntactically valid shell, so it fails much
+   later, at `return` time, with a confusing result instead of a clean
+   error (tsk-463).
+
 6. **Mid-planning `CONTEXT.md` gap.** If, at any step above, `CONTEXT.md`'s
    locked decisions turn out to be silent on something this plan actually
    needs, apply the same material/grounded/answerable filter
