@@ -46,7 +46,17 @@ function initSharedAbsoluteHooksPathFixture() {
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: mainRoot });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd: mainRoot });
   fs.writeFileSync(path.join(mainRoot, 'seed.txt'), 'seed\n');
-  execFileSync('git', ['add', 'seed.txt'], { cwd: mainRoot });
+  // tsk-56u: a tracked .fgos/ file, part of this SAME root commit -- before
+  // core.hooksPath is ever configured below, so this commit never triggers
+  // the real hook (which would otherwise write a real main-checkout.lock
+  // mid-setup and pollute the lock-state assertions other tests in this
+  // file make against a freshly created fixture). Mirrors this real repo's
+  // own shape (`.fgos/` is git-tracked here, ADR0020) so `git worktree add`
+  // below checks it out into the worktree the same way it would for real,
+  // before ADR0020's own fs.rmSync strip ever runs.
+  fs.mkdirSync(path.join(mainRoot, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(mainRoot, '.fgos', 'state.json'), '{}\n');
+  execFileSync('git', ['add', 'seed.txt', '.fgos/state.json'], { cwd: mainRoot });
   execFileSync('git', ['commit', '-q', '-m', 'root commit'], { cwd: mainRoot });
 
   const hooksDir = path.join(mainRoot, '.githooks');
@@ -115,4 +125,66 @@ test('tsk-sir: a worktree commit is wrongly refused while another session holds 
   } finally {
     releaseMainCheckoutLock(fgosDir);
   }
+});
+
+// --- tsk-56u: staged-.fgos/-deletion guard --------------------------------
+//
+// The real near-miss this guard exists to catch: a linked worktree never
+// keeps a working-tree copy of `.fgos/` (ADR0020's own fs.rmSync strip,
+// `src/runner/worktree.mjs`'s `createWorktree`), so a bare `git add -A`
+// there stages every `.fgos/` file as deleted. This guard must fire
+// UNCONDITIONALLY -- in the worktree (the "away from home" case
+// hookRunsAtHome would otherwise skip every other guard for) AND in the
+// main checkout -- while a normal, `.fgos/`-untouched commit stays
+// unaffected in either.
+
+test('tsk-56u: a worktree commit staging a .fgos/ deletion (git add -A after the ADR0020 strip) is refused', () => {
+  const { worktreeRoot } = initSharedAbsoluteHooksPathFixture();
+  const fgosFile = path.join(worktreeRoot, '.fgos', 'state.json');
+  assert.equal(fs.existsSync(fgosFile), true, 'setup: .fgos/state.json must be tracked and checked out into the worktree');
+
+  // ADR0020's own strip, reproduced by hand (createWorktree isn't invoked
+  // by this fixture -- it uses a plain `git worktree add`).
+  fs.rmSync(path.join(worktreeRoot, '.fgos'), { recursive: true, force: true });
+  execFileSync('git', ['add', '-A'], { cwd: worktreeRoot });
+
+  const result = spawnSync('git', ['commit', '-q', '-m', 'oops: git add -A in a worktree'], { cwd: worktreeRoot, encoding: 'utf8' });
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /commit refused/);
+  assert.match(result.stderr, /\.fgos\//);
+});
+
+test('tsk-56u: the same staged .fgos/ deletion is refused in the main checkout too, not gated by hookRunsAtHome', () => {
+  const { mainRoot } = initSharedAbsoluteHooksPathFixture();
+
+  fs.rmSync(path.join(mainRoot, '.fgos'), { recursive: true, force: true });
+  execFileSync('git', ['add', '-A'], { cwd: mainRoot });
+
+  const result = spawnSync('git', ['commit', '-q', '-m', 'oops: manual .fgos removal on main'], { cwd: mainRoot, encoding: 'utf8' });
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /commit refused/);
+});
+
+test('tsk-56u: a normal commit that never touches .fgos/ still succeeds in the worktree', () => {
+  const { worktreeRoot } = initSharedAbsoluteHooksPathFixture();
+
+  const result = commitAsSession(worktreeRoot, { FGOS_SESSION_ID: 'session-unrelated-change' });
+
+  assert.equal(result.status, 0, result.stderr);
+});
+
+test('tsk-56u: a legitimate .fgos/ addition/modification (never a deletion) is unaffected -- the guard filters --diff-filter=D only', () => {
+  const { mainRoot } = initSharedAbsoluteHooksPathFixture();
+
+  // What fgOS's own state-writing verbs do: add/modify .fgos/ content
+  // directly, never delete it. The guard must never fire here.
+  fs.writeFileSync(path.join(mainRoot, '.fgos', 'state.json'), '{"changed":true}\n');
+  fs.writeFileSync(path.join(mainRoot, '.fgos', 'new-file.json'), '{}\n');
+  execFileSync('git', ['add', '.fgos/state.json', '.fgos/new-file.json'], { cwd: mainRoot });
+
+  const result = spawnSync('git', ['commit', '-q', '-m', 'fgos: legitimate .fgos/ write'], { cwd: mainRoot, encoding: 'utf8' });
+
+  assert.equal(result.status, 0, result.stderr);
 });

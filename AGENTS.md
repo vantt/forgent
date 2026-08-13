@@ -90,6 +90,31 @@ recover it. Use `fgos main-checkout-reset --sha <sha> [--confirm]` instead
 — it prints the full whole-repo status and refuses without `--confirm`
 when the tree is dirty.
 
+**Never `git add -A` inside a linked worktree (`fgos pick`'s `fgw/<id>`
+checkout) without checking `git status` first** (tsk-56u:
+`docs/history/commit-time-fgos-deletion-guard/`) — a worktree never keeps a
+working-tree copy of `.fgos/` (ADR0020 strips it right after `git worktree
+add`, without ever `git rm`-ing it from the index), so `-A` stages every
+`.fgos/` file as deleted. Committing that silently destroys the live event
+log once the branch merges back. `.githooks/pre-commit` now refuses this
+commit outright (a staged `.fgos/` deletion, checked unconditionally, not
+only "at home" in the main checkout) — if you hit that refusal, `git
+restore --staged .fgos` before committing again.
+
+**Never `git stash` in the main checkout to clear a dirty tree without
+checking what it swept up** (tsk-56u, same history folder) — the stash
+stack is shared across every session and worktree, and stashing
+`.fgos/events.jsonl` along with everything else doesn't just hide the
+file: it rolls the whole repository's `.fgos` state back to an older
+commit for as long as the stash is held. This has already caused a real
+incident: an `approve` run misread an item's status as `doing` when it was
+really `awaiting-approval`, because the live event log was sitting in a
+stash — recovered by applying the stash back by SHA rather than popping
+it, but the same move can silently strand another session's reads too.
+There is no mechanical guard against this (git has no hook that can
+refuse a stash) — stash selectively, or use `fgos main-checkout-reset`
+above instead of stash-and-reset as a shortcut.
+
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
