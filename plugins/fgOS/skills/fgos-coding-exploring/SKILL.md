@@ -30,7 +30,14 @@ directly by `fgos-coding-planning`, mid-`planning`, when that skill finds
   dirname`) and pass `--dir "$root"` on every one of them. This session's
   cwd may already be a linked worktree, which never carries its own
   `.fgos/` by design (ADR0020) — the verb refuses (exit 4) rather than
-  silently diverge if `--dir` is omitted there (tsk-56t D1).
+  silently diverge if `--dir` is omitted there (tsk-56t D1). Run the
+  resolve and the `fgos.mjs` call as two SEPARATE tool calls, never pasted
+  together as one script — a worktree-isolated session's own isolation
+  guard refuses a single call combining a `git`-rooted command with a
+  following `node .../fgos.mjs` invocation, even though each command is
+  safe alone (tsk-3rg). Substitute `root`'s literal printed value into the
+  second call — never `$root`, which does not survive across separate
+  tool calls anyway.
 - When one of those `fgos <verb>` calls fails with a known error category,
   relay that category verbatim in the hand-back — never fold it into a
   generic "blocked" (tsk-1c6 D2/D4). Today the one category that qualifies

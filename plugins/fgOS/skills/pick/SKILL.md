@@ -165,7 +165,13 @@ state or touches git worktrees directly — every write goes through the
    - **`awaiting-approval` reached** — the item is built, verified, and
      returned; tell the user and mention the review gate
      (`fgos review`/`fgos approve`/`fgos reject`) is theirs to run next,
-     this skill never calls it.
+     this skill never calls it. `fgos approve` refuses to run from inside
+     a linked worktree ("this is a git worktree, not the repository main
+     working tree") — this session is sitting in exactly that worktree
+     (step 4 switched into it), so tell the user (or do it yourself if
+     driving on their behalf) to leave it first: `ExitWorktree` with
+     `action: "keep"`, then run `fgos approve` from the main checkout
+     (tsk-3rg).
    - **anchored by open children** — the driver's own planning pass split
      this item; tell the user which child ids are still open and that
      `/fgOS:pick <child-id>` is the way to continue on any of them.

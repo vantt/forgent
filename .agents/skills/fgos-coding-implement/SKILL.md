@@ -32,7 +32,16 @@ re-shapes the work; that already happened at `discovery`/`exploring`/`planning`.
   ```
 
   (tsk-56t D1 — the same `root` resolution `fgos-coding-exploring`'s and
-  `fgos-coding-planning`'s own gate-bypass checks already rely on).
+  `fgos-coding-planning`'s own gate-bypass checks already rely on). Run
+  these as two SEPARATE tool calls, never pasted together as one script —
+  a worktree-isolated session's own isolation guard refuses a single call
+  that combines a `git`-rooted command with a following `node
+  .../fgos.mjs ... --dir` invocation ("too complex to verify that it
+  stays inside the worktree"), even though each command is safe on its
+  own (tsk-3rg). Resolve `root` alone first, read its printed value, then
+  substitute that literal path into the following `fgos.mjs` call —
+  never `$root`, since a fresh tool call starts a new shell with no
+  memory of the previous one's variables anyway.
 - Do your own Implement work directly — reading files, writing the real
   change, running the Iron Law classify yourself — never delegate it to
   the Agent/Task tool as an ad hoc sub-dispatch. This session is already a
