@@ -211,10 +211,16 @@ gate, this skill creates nothing.
     "footprint": ["herdr-plugin/Cargo.toml", "herdr-plugin/src/mcp.rs"],
     "kind": "feature",
     "risk": "heavy",
-    "deps": ["<id of the MCP scaffolding + search piece above, once materialized>"]
+    "deps": [0]
   }
 ]
 ```
+
+`deps: [0]` is a 0-based index into this same array (`plan.mjs`'s
+`resolveCallerPlanVerdict`/`normalizeChild` resolve sibling deps by
+position within one `decompose` call, not by a materialized id — checked
+directly against `src/intake/plan.mjs:251-252` during this validating
+pass), pointing piece 2 (index 1) at piece 1 (index 0) above.
 
 ## Assumptions
 
