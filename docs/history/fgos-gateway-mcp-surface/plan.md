@@ -1,0 +1,203 @@
+# fgOS gateway MCP surface — plan
+
+Item: `tsk-7l9-3`. Builds directly on `CONTEXT.md`'s locked D1 (execute's
+generated code is Rust-native scripting, not an embedded JS engine) and the
+parent item's D7-D10 (`docs/history/fgos-interface-daemon/CONTEXT.md`) —
+gateway is the sole `fgos <verb>` chokepoint, gateway/orchestrator/TUI stay
+inside one `herdr-fgos` binary using the existing hexagonal ports, and the
+MCP surface is part of that same gateway adapter (D8: "gateway's REST/RPC/
+MCP surface"), never a separate process.
+
+Mode: **high-risk**
+
+Flag count against `fgos-routing`'s Mode gate: **audit/security** (this
+item's whole point is a new same-process code-execution surface —
+`execute` runs LLM-generated scripting code against bound Rust functions;
+D9/D1 already settled that no *new privilege* is granted over today's
+CLI/Bash trust model, but "new code-execution surface" is still the
+textbook audit/security flag and is explicitly named in the Mode gate's own
+hard-gate list — this alone forces high-risk regardless of count),
+**external systems** (three new crates never used anywhere in this repo
+today: `rmcp`, `mcpkit-axum`, and a scripting-engine crate), **public
+contracts** (a brand-new MCP tool surface — `search`/`execute` — consumed
+by external agent clients, joining the CTR family the parent's D10 already
+established for the REST contract), **weak proof around the area** (first
+MCP server and first embedded scripting engine in this codebase — no
+existing precedent to lean on, unlike the REST gateway which reused
+`tsk-3t9`'s hexagon directly). 4 flags, one of them hard-gate — high-risk
+either way (`plugins/fgOS/skills/fgos-routing/SKILL.md` Mode gate).
+
+No lane was handed off in this session's own Orient step (this session was
+dispatched directly by `fgos-coding-driving` from `fgos-coding-exploring`,
+not routed through `fgos-routing` first) and `plan.md` did not already
+exist — direct-entry fallback, `fgos-routing`'s own Mode-gate subsection
+applied fresh, as above.
+
+## Approach
+
+**Chosen path.** Extend `herdr-plugin`'s existing gateway adapter
+(`herdr-plugin/src/gateway.rs`, `tsk-7l9-2`, delivered) with a sibling
+module, `herdr-plugin/src/mcp.rs`, rather than a new process or a new
+`main.rs` launch mode. `gateway.rs`'s `build_router` already returns one
+`axum::Router` serving the REST surface on `DEFAULT_PORT` (4170); `mcp.rs`
+mounts the MCP transport onto that SAME router (`mcpkit-axum` is
+purpose-built for exactly this — "MCP-over-HTTP via Axum", matching the
+gateway's existing `axum` 0.7 stack, confirmed clear during discovery,
+`docs/history/fgos-interface-daemon/RESEARCH.md` Round 1) rather than
+spawning a second listener or a stdio-transport subprocess. This is what
+lets `herdr-fgos gateway`'s existing single-process launch (`main.rs`'s
+existing `gateway` dispatch, untouched) cover MCP for free — no new CLI
+mode, no second `AppState`, one hexagon per D8.
+
+`search` reads the same OpenAPI spec `gateway.rs`'s existing
+`get_contract` handler already serves (`docs/contracts/fgos-gateway-api-v1.yaml`,
+`CTR010`) — no new data source, just a second way to reach data the
+gateway already exposes. `execute` runs against a curated set of bound
+Rust functions that call into the SAME route handlers `gateway.rs`
+already defines (`post_work`, `get_ready`, `post_work_move`, etc.) —
+never a raw HTTP round-trip to itself and never a new path into
+`fgos <verb>` beyond `spawn_fgos_verb` (D7's chokepoint, unchanged).
+
+**Scripting crate: `rhai`, picked here** (`CONTEXT.md`'s own "Out of
+scope" note explicitly defers this exact choice to `fgos-coding-planning` —
+this is that decision, cited under D1). Two real candidates exist for a
+Rust-embeddable scripting language: `rhai` (pure Rust, no C toolchain,
+purpose-built for embedding, `#[export_module]` binding ergonomics) and
+`mlua` (Lua bindings, FFI-based, needs either a system Lua or the
+`vendored` feature that builds Lua from C source at compile time).
+`mlua`'s vendored-C dependency reintroduces exactly the "extra runtime
+layer to embed and maintain" D1 rejects a JS engine for — Rhai avoids that
+entirely and stays pure Rust end to end, consistent with D1's own
+rationale, not just its letter. The trade-off is LLM code-generation
+fluency: Lua has far more training-data representation than Rhai. This is
+mitigated, not eliminated, by Rhai's own design goal of staying
+syntactically close to Rust/JS (familiar shape to any model that already
+writes those well) and by the MCP tool description itself carrying a short
+syntax/API primer — the same shape Code Mode's own pattern already needs
+regardless of target language, since the model has never seen the
+gateway's bound-function surface before either way.
+
+**Alternatives rejected:**
+- A separate MCP server binary/process — rejected, contradicts D8
+  (gateway/orchestrator/TUI stay inside one `herdr-fgos` binary; a second
+  binary reopens the boundary `tsk-3t9`'s hexagon already closed).
+- JS/TS generated code via an embedded JS engine (`rquickjs`, narrower
+  than the `boa`/`deno_core` D9 already excludes) — rejected per this
+  item's own D1: no sandbox requirement exists to justify the extra
+  runtime layer.
+- One MCP tool per gateway REST endpoint (~16 tools mirroring
+  `build_router`'s route list) — rejected per the parent D9: Code Mode's
+  actual point is exactly 2 tools cutting round-trips, not one-tool-per-
+  endpoint.
+- `mlua` over `rhai` — rejected per the scripting-crate reasoning above
+  (vendored-C dependency contradicts D1's own "no extra runtime layer"
+  rationale).
+
+**Files likely touched:**
+- `herdr-plugin/Cargo.toml` — add `rmcp`, `mcpkit-axum`, `rhai`
+- `herdr-plugin/src/mcp.rs` — new module: MCP server scaffolding, `search`
+  tool (piece 1), `execute` tool + Rhai bound-function context (piece 2)
+- `herdr-plugin/src/lib.rs` — register `pub mod mcp;`
+- `herdr-plugin/src/gateway.rs` — mount the MCP transport onto the
+  existing router inside `build_router`
+
+**Order.** No sibling ids exist yet for this split (both pieces are new,
+never-materialized specs), so `fgos graph --what-if <id> --json` has
+nothing real to run against — noted here rather than silently skipped.
+Ordering instead follows direct dependency: piece 2 (`execute`) needs the
+MCP server scaffolding piece 1 stands up (transport, tool registration,
+`search`) to exist first; piece 1 has no dependency on piece 2 and is
+provably useful alone (an MCP client can already discover the gateway's
+capability surface via `search` before `execute` exists). `fgos graph
+--json` (whole-repo run, above) shows `tsk-7l9-3` inside a live component
+with `tsk-7l9`/`tsk-7l9-1`/`tsk-7l9-2` already delivered — nothing there
+changes this item's own internal ordering.
+
+**Impact-analysis posture:** `full` (GitNexus registered and `present`,
+checked fresh in this item's own `exploring` stage,
+`CONTEXT.md`'s Scout evidence, 2026-08-13T11:04Z — same continuing session
+lineage, well under an hour old, no index-changing commits landed on this
+branch since). Both pieces below are net-new modules with no existing
+callers, so blast-radius evidence has nothing to contradict; this posture
+is recorded for completeness, not because either proof point below leans
+on it.
+
+## Risk map
+
+| Component | Risk | Proof point (for `fgos-coding-validating`) |
+|---|---|---|
+| MCP server scaffolding (`rmcp` + `mcpkit-axum` mounted onto the existing axum router) | medium | `cargo test --manifest-path herdr-plugin/Cargo.toml` passes with a new test asserting the MCP transport advertises exactly 2 tools (`search`, `execute`); existing REST routes/tests (`tsk-7l9-2`'s) still pass unchanged |
+| `search` tool (queries the OpenAPI contract) | light | integration test: `search`'s MCP response matches the same spec `GET /contract` already serves, byte-for-byte on the parsed structure |
+| `execute`'s bound-function context (Rhai binding, D1) | high (security-adjacent — audit/security hard-gate flag) | a script calling a bound function succeeds and its effect matches calling that same `fgos <verb>` directly; a script attempting anything outside the bound-function allowlist (e.g. raw filesystem/process access Rhai doesn't expose by default) fails cleanly — proves the "no new privilege beyond today's CLI/Bash trust model" boundary D9 promises, never assumes it |
+| Scripting crate pick (`rhai`, decided above under D1) | medium | `cargo build --release --manifest-path herdr-plugin/Cargo.toml` succeeds with `rhai` added (no C toolchain / vendored-build step introduced — confirms the "pure Rust end to end" claim above); a trivial script calling one bound function runs end to end inside a `#[tokio::test]` |
+
+## Shape
+
+Two phases, matching the split below. Concrete cases to prove against,
+scaled to `high-risk`:
+
+- **Empty/boundary** — `search` with a query matching nothing returns an
+  empty result, not an error; `execute` with an empty/no-op script returns
+  cleanly rather than hanging the connection.
+- **Existing behavior** — `tsk-7l9-2`'s existing REST routes and their
+  tests are untouched; the MCP transport is additive on the same router,
+  never a replacement.
+- **Concurrent access** — multiple simultaneous `execute` calls behave the
+  same as concurrent REST requests already do today (axum's own
+  per-request handling; no new shared mutable state introduced beyond what
+  `AppState`/`spawn_fgos_verb` already serialize through).
+- **Partial failure** — a script that errors mid-run surfaces a clean MCP
+  tool-error response to the client; it never panics the gateway process
+  or leaves a half-applied `fgos <verb>` call (D7's chokepoint already
+  gives every verb call its own atomic outcome; `execute` must not bypass
+  that by, e.g., catching a panic mid-verb-spawn).
+
+## Split
+
+Two independently workable, independently verifiable pieces. Written here
+as specs only — `fgos-coding-validating` materializes them at its single
+gate, this skill creates nothing.
+
+```json
+[
+  {
+    "title": "MCP server scaffolding + search tool on the fgOS gateway",
+    "action": "D1: the MCP surface stays Rust-native end to end (rmcp + mcpkit-axum, no embedded JS engine) -- mounted onto herdr-fgos's existing axum router (herdr-plugin/src/gateway.rs's build_router) rather than a new process, matching D1's own \"no extra runtime layer to embed or maintain\" rationale. search queries the same OpenAPI contract gateway.rs's existing get_contract handler already serves.",
+    "verify": "cargo test --manifest-path herdr-plugin/Cargo.toml && cargo build --release --manifest-path herdr-plugin/Cargo.toml",
+    "footprint": ["herdr-plugin/Cargo.toml", "herdr-plugin/src/mcp.rs", "herdr-plugin/src/lib.rs", "herdr-plugin/src/gateway.rs"],
+    "kind": "feature",
+    "risk": "standard"
+  },
+  {
+    "title": "MCP execute tool: Rhai bound-function context against gateway routes",
+    "action": "D1: execute's generated code is Rust-native scripting (rhai, picked in this plan's own Approach section under D1) bound to the gateway's own route handlers, never fgOS core directly -- still funnels through gateway.rs's spawn_fgos_verb chokepoint (parent D7). No new privilege beyond today's CLI/Bash trust model (parent D9) -- the bound-function allowlist is exactly gateway.rs's existing route set, nothing wider.",
+    "verify": "cargo test --manifest-path herdr-plugin/Cargo.toml && cargo build --release --manifest-path herdr-plugin/Cargo.toml",
+    "footprint": ["herdr-plugin/Cargo.toml", "herdr-plugin/src/mcp.rs"],
+    "kind": "feature",
+    "risk": "heavy",
+    "deps": ["<id of the MCP scaffolding + search piece above, once materialized>"]
+  }
+]
+```
+
+## Assumptions
+
+- The MCP transport mounts on the SAME port/router the REST gateway
+  already serves (4170) rather than a second port -- `mcpkit-axum`'s own
+  purpose (MCP-over-HTTP via Axum) is built for exactly this composition;
+  not proven against the crate's actual API yet, flagged here rather than
+  silently assumed away, and `fgos-coding-validating`'s reality check should
+  confirm this against the crate's real docs/source before piece 1 starts.
+- `execute`'s bound-function allowlist mirrors `gateway.rs`'s existing
+  authenticated route set one-for-one (same routes `search`/REST already
+  expose) rather than a narrower or wider set -- CONTEXT.md's own D1/D9
+  give no reason to diverge, and a narrower allowlist is free to add later
+  without breaking this shape.
+- Auth: the MCP surface reuses the SAME per-machine token
+  (`~/.fgos/config.json`'s `gateway.token`, parent D4/D5) the REST surface
+  already requires via `require_token` -- no second auth mechanism, since
+  both surfaces sit on the same `AppState`/router.
+
+## Outstanding questions
+
+None
