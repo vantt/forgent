@@ -541,6 +541,43 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
   // pre-redesign items still carrying a historical `planApprove.verify`
   // replay unchanged.
   const planApproveVerify = view.gates?.[id]?.planApprove?.verify ?? work.verify;
+
+  // tsk-4m4 (narrowed, D1): `planApproveVerify` above feeds FOUR separate
+  // `moveStage` call sites below (hasChildren re-entrancy, tiny/small
+  // skip-and-advance, explicit pass-through, and the real decompose
+  // success path) with zero check on it — unlike resolveDiscovery's own
+  // caller-verdict path, which runs this same mechanical check before
+  // accepting a proposed verify. One check here, before any of those four
+  // branches, closes all of them at once. Same shape as this file's own
+  // existing per-child check below (`disputedChild`) and
+  // resolveDiscovery's own dispute-handling (discovery.mjs:402-451):
+  // mechanical-only (verify-pattern-check.mjs), park on disagreement
+  // unless `--force` (never for a mechanical disagreement, tsk-12t D6).
+  const planVerifyDispute = judgeVerifySemanticCorrectness(planApproveVerify);
+  if (!planVerifyDispute.agrees) {
+    if (callerVerdict?.force === true && planVerifyDispute.mechanical !== true) {
+      addDecision(dir, {
+        id,
+        text: `plan --force overrode a disputed planApproveVerify: "${planApproveVerify}"`,
+        source: 'resolvePlan',
+        kind: 'engine',
+        rationale: `second pass disagreed: ${planVerifyDispute.reason}`,
+      });
+    } else {
+      if (work.status === 'awaiting-human') {
+        throw new StoreError(
+          'validation',
+          `plan --force: work "${id}" is already "awaiting-human" -- run "fgos answer ${id} --text ..." to resume it before retrying --force.`,
+        );
+      }
+      const ask =
+        `Verify hiện tại của item (sẽ được stamp lúc sang executing) bị nghi ngờ ở vòng kiểm tra thứ hai: ${planVerifyDispute.reason}\n` +
+        `Verify: ${planApproveVerify}`;
+      putInAwaiting(dir, { id, ask, statusAtAsk: work.status });
+      return { outcome: 'verify-disputed', id, secondPass: planVerifyDispute };
+    }
+  }
+
   if (hasChildren) {
     moveStage(dir, { id, to: stageForStep(domain, 'Execute'), expectedStage: currentStage, verify: planApproveVerify, role });
     releaseClaimOnExecuting();

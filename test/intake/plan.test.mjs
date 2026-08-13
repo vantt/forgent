@@ -931,6 +931,55 @@ test('resolvePlan --force never overrides a MECHANICAL disagreement (tsk-12t D6)
   assert.equal(Object.values(listWork(storeDir).work).filter((item) => item.parent === 'item-x').length, 0);
 });
 
+// --- tsk-4m4 (narrowed, D1): planApproveVerify itself gets the same
+// mechanical second-pass check the per-child verify already gets above --
+// one check, before ANY of the four call sites that reuse it (hasChildren
+// re-entrancy, tiny/small skip-and-advance, explicit pass-through, real
+// decompose success). ---
+
+test('resolvePlan parks as verify-disputed (no stage move) when the item\'s own verify trips the mechanical bad-pattern check, on a pass-through verdict', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ verify: KNOWN_BAD_VERIFY }));
+
+  const result = resolvePlan(storeDir, 'item-x', cfg, 'runner', { verdict: 'pass-through', reason: 'single cohesive change' });
+  assert.equal(result.outcome, 'verify-disputed');
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'decompose', 'item left exactly where it was, never advanced to executing');
+  assert.match(view.gates['item-x'].ask, /node --test/);
+});
+
+test('resolvePlan --force never overrides a MECHANICAL planApproveVerify disagreement either (tsk-12t D6) -- still parks', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ verify: KNOWN_BAD_VERIFY }));
+
+  const result = resolvePlan(storeDir, 'item-x', cfg, 'runner', { verdict: 'pass-through', reason: 'single cohesive change', force: true });
+  assert.equal(result.outcome, 'verify-disputed');
+  assert.equal(listWork(storeDir).work['item-x'].stage, 'decompose');
+});
+
+test('resolvePlan parks as verify-disputed on the real decompose success path too, before any child is written', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ verify: KNOWN_BAD_VERIFY }));
+
+  const result = resolvePlan(storeDir, 'item-x', cfg, 'runner', {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [{ title: 'Build parser', verify: 'npm test -- parser', action: 'x' }],
+  });
+  assert.equal(result.outcome, 'verify-disputed');
+  assert.equal(Object.values(listWork(storeDir).work).filter((item) => item.parent === 'item-x').length, 0, 'no partial write -- the root\'s own verify parked before any child was considered');
+});
+
+test('resolvePlan still proceeds normally (pass-through) when planApproveVerify agrees -- undisputed verify is unaffected', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolvePlan(storeDir, 'item-x', cfg, 'runner', { verdict: 'pass-through', reason: 'single cohesive change' });
+  assert.equal(result.outcome, 'pass-through');
+  assert.equal(listWork(storeDir).work['item-x'].stage, 'executing');
+});
+
 // --- decision-trail capture (tsk-6b6): every verdict branch logs a
 // decisionsById entry via the shipped addDecision (tsk-63c). ---
 
