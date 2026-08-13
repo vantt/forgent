@@ -83,11 +83,20 @@ export const FALLBACK_VERIFY = 'chưa xác định — bổ sung thủ công';
 // unrelated placeholder literal of its own.
 export const RETIRED_P14_PLACEHOLDER = 'chưa xác định — P15 bổ sung';
 
+// tsk-13b: every placeholder verify this module (and bin/fgos.mjs's own
+// SUBMIT_VERIFY_SENTINEL) has ever produced starts with this prefix --
+// FALLBACK_VERIFY/RETIRED_P14_PLACEHOLDER above are the two canonical
+// examples, not an exhaustive list. A session writing a *different*
+// "chưa xác định — <free text>" placeholder at clarify/discovery time (a
+// live pattern found in the backlog: tsk-8v1, tsk-45f, tsk-3y2) used to
+// slip past the old exact-match check as if it were a real, runnable verify.
+const PLACEHOLDER_VERIFY_PREFIX = 'chưa xác định —';
+
 // tsk-1ni D2: an existing work.verify counts as "real" -- worth protecting
-// from an unresolved guess -- when it is set and is neither of the
-// two known placeholder shapes a verify field can carry pre-clarify.
+// from an unresolved guess -- when it is set and does not carry the
+// placeholder prefix every clarify/discovery-stage sentinel shares.
 function hasRealVerify(verify) {
-  return typeof verify === 'string' && verify.trim() && verify !== FALLBACK_VERIFY && verify !== RETIRED_P14_PLACEHOLDER;
+  return typeof verify === 'string' && verify.trim() && !verify.startsWith(PLACEHOLDER_VERIFY_PREFIX);
 }
 
 // STR8 (D4): terse mechanical graph/impact context, folded from STR43's
