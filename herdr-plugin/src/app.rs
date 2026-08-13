@@ -99,10 +99,20 @@ impl WorkItem {
     }
 }
 
-/// tsk-64z D1/D7: the Work Items panel's 4 tabs — a pure classification
+/// tsk-64z D1/D7: the Work Items panel's 5 tabs — a pure classification
 /// over `WorkItem.status`, never a second copy of the item list.
+///
+/// `Backlog` is declared first because the tab strip mirrors the frozen
+/// category order in `STATUS_CATEGORIES` (`src/state/work.mjs`), rather
+/// than inventing a second ordering this side would have to keep in sync
+/// by hand. It is a separate tab and not a marker inside `Todo` because
+/// `backlog` carries its own `statusCategory` precisely so nothing reads a
+/// backlog item as ready (work-item-backlog-status D3), and because
+/// `backlog -> todo` is a human-only edge (D1): a person has to be able to
+/// SEE the bucket before they can promote anything out of it (D4).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WorkTab {
+    Backlog,
     Todo,
     Doing,
     Review,
@@ -110,6 +120,8 @@ pub enum WorkTab {
 }
 
 impl WorkTab {
+    /// work-item-backlog-status D3: `backlog` only — its own tab, never
+    /// folded into `Todo`, so nothing here reads it as ready.
     /// D1: `todo` only. D1: `doing`/`blocked`/`awaiting-human` — the same
     /// `in-progress` `statusCategory` grouping `workflow-stage-graphs.mjs`
     /// already uses for the `coding` domain. D1: `awaiting-approval` only.
@@ -117,6 +129,7 @@ impl WorkTab {
     /// `wontfix` (D7 explicitly folds canceled items into this tab too).
     fn matches(self, status: &str) -> bool {
         match self {
+            WorkTab::Backlog => status == "backlog",
             WorkTab::Todo => status == "todo",
             WorkTab::Doing => matches!(status, "doing" | "blocked" | "awaiting-human"),
             WorkTab::Review => status == "awaiting-approval",
@@ -129,6 +142,7 @@ impl WorkTab {
 
     pub fn label(self) -> &'static str {
         match self {
+            WorkTab::Backlog => "BACKLOG",
             WorkTab::Todo => "TODO",
             WorkTab::Doing => "DOING",
             WorkTab::Review => "REVIEW",
@@ -138,16 +152,18 @@ impl WorkTab {
 
     fn next(self) -> Self {
         match self {
+            WorkTab::Backlog => WorkTab::Todo,
             WorkTab::Todo => WorkTab::Doing,
             WorkTab::Doing => WorkTab::Review,
             WorkTab::Review => WorkTab::Done,
-            WorkTab::Done => WorkTab::Todo,
+            WorkTab::Done => WorkTab::Backlog,
         }
     }
 
     fn prev(self) -> Self {
         match self {
-            WorkTab::Todo => WorkTab::Done,
+            WorkTab::Backlog => WorkTab::Done,
+            WorkTab::Todo => WorkTab::Backlog,
             WorkTab::Doing => WorkTab::Todo,
             WorkTab::Review => WorkTab::Doing,
             WorkTab::Done => WorkTab::Review,
@@ -1095,9 +1111,10 @@ mod tests {
     /// already uses), and `wontfix` shares `DONE` with the tail chain
     /// (D7).
     #[test]
-    fn tabs_classify_status_into_todo_doing_review_done() {
+    fn tabs_classify_status_into_backlog_todo_doing_review_done() {
         let source = FakeSource {
             triage: vec![
+                triage_row("tsk-backlog", "backlog", Some(0)),
                 triage_row("tsk-todo", "todo", Some(1)),
                 triage_row("tsk-doing", "doing", Some(2)),
                 triage_row("tsk-blocked", "blocked", Some(3)),
@@ -1110,10 +1127,18 @@ mod tests {
         let mut app = App::empty();
         app.refresh_from_fgos(&source);
 
+        app.active_tab = WorkTab::Backlog;
+        assert_eq!(
+            app.visible_work_items().iter().map(|i| i.id.as_str()).collect::<Vec<_>>(),
+            vec!["tsk-backlog"],
+            "D3: backlog gets its own tab and appears in no other"
+        );
+
         app.active_tab = WorkTab::Todo;
         assert_eq!(
             app.visible_work_items().iter().map(|i| i.id.as_str()).collect::<Vec<_>>(),
-            vec!["tsk-todo"]
+            vec!["tsk-todo"],
+            "D3: a backlog item must never be read as ready"
         );
 
         app.active_tab = WorkTab::Doing;
@@ -1142,15 +1167,20 @@ mod tests {
     #[test]
     fn next_tab_and_prev_tab_cycle_and_reset_selection() {
         let mut app = App::empty();
-        assert_eq!(app.active_tab, WorkTab::Todo);
+        assert_eq!(
+            app.active_tab,
+            WorkTab::Todo,
+            "BACKLOG leads the strip but TODO stays the landing tab"
+        );
         app.next_tab();
         assert_eq!(app.active_tab, WorkTab::Doing);
         app.next_tab();
         app.next_tab();
+        assert_eq!(app.active_tab, WorkTab::Done);
         app.next_tab();
-        assert_eq!(app.active_tab, WorkTab::Todo, "wraps around after DONE");
+        assert_eq!(app.active_tab, WorkTab::Backlog, "wraps around after DONE");
         app.prev_tab();
-        assert_eq!(app.active_tab, WorkTab::Done, "wraps around backward before TODO");
+        assert_eq!(app.active_tab, WorkTab::Done, "wraps around backward before BACKLOG");
     }
 
     /// tsk-3wl D1: `switch_panel` (Tab) must reach all 5 boxes, not just

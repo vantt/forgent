@@ -33,7 +33,13 @@ fn status_color(status: &str) -> Option<Color> {
     }
 }
 
-const TAB_ORDER: [WorkTab; 4] = [WorkTab::Todo, WorkTab::Doing, WorkTab::Review, WorkTab::Done];
+const TAB_ORDER: [WorkTab; 5] = [
+    WorkTab::Backlog,
+    WorkTab::Todo,
+    WorkTab::Doing,
+    WorkTab::Review,
+    WorkTab::Done,
+];
 
 /// tsk-1eu D1 / tsk-3wl D1: the same focused-vs-unfocused border style
 /// `draw()` already applies to the WorkItems/InProcess boxes, shared here
@@ -718,11 +724,17 @@ mod tests {
     use crate::pane_scan::PaneIdentity;
     use ratatui::backend::TestBackend;
 
-    /// tsk-64z D1: all 4 tab labels render, regardless of which is
+    /// tsk-64z D1: all 5 tab labels render, regardless of which is
     /// currently selected — proves the `Tabs` widget renders the full set,
     /// not just the active one.
+    ///
+    /// work-item-backlog-status D4: this doubles as the visibility proof
+    /// for `BACKLOG`. `App::mock()` carries no `backlog` item, so asserting
+    /// the label still renders is exactly the "an empty bucket must still
+    /// advertise itself" bar — a person cannot promote `backlog -> todo`
+    /// (a human-only edge) if the tab only appears once something is in it.
     #[test]
-    fn work_items_panel_renders_four_tabs_todo_doing_review_done() {
+    fn work_items_panel_renders_five_tabs_backlog_todo_doing_review_done() {
         let mut app = App::mock();
         let backend = TestBackend::new(120, 30);
         let mut terminal = Terminal::new(backend).expect("terminal init");
@@ -731,7 +743,7 @@ mod tests {
             .expect("draw should not panic");
         let buffer = terminal.backend().buffer();
         let content: String = buffer.content().iter().map(|cell| cell.symbol()).collect();
-        for label in ["TODO", "DOING", "REVIEW", "DONE"] {
+        for label in ["BACKLOG", "TODO", "DOING", "REVIEW", "DONE"] {
             assert!(content.contains(label), "missing tab label {label}: {content}");
         }
     }
