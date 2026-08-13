@@ -1870,6 +1870,30 @@ mod tests {
         assert_eq!(candidate.id, "tsk-b", "the blocked item must be skipped, not picked first");
     }
 
+    /// work-item-backlog-status D4: `backlog` is promoted to `todo` by a
+    /// person's own judgment, so an unattended discover pane must never be
+    /// opened for one. The `status == "todo"` check above already excludes
+    /// it by construction — this pins that, since a backlog item otherwise
+    /// looks maximally eligible: right stage, nothing blocking it.
+    #[test]
+    fn auto_discover_skips_a_backlog_item_even_at_an_eligible_stage() {
+        let items = vec![
+            {
+                let mut item = discovery_todo_item("tsk-backlog");
+                item.status = "backlog".into();
+                item
+            },
+        ];
+        assert!(
+            items[0].discover_eligible(),
+            "the item is otherwise fully eligible — stage matches and nothing blocks it"
+        );
+        assert!(
+            next_auto_discover_candidate(&items).is_none(),
+            "backlog -> todo is a human-only edge; never auto-discovered"
+        );
+    }
+
     #[test]
     fn auto_discover_skips_when_toggle_is_off() {
         let mut ui = QuitAfterOneTick { calls: Cell::new(0) };

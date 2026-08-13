@@ -97,6 +97,15 @@ export { STATUSES };
 // produced real content); `blocked -> delivered` above is how a
 // mechanical retry re-enters this chain.
 const TRANSITIONS = Object.freeze([
+  // work-item-backlog-status D1: `backlog` (an idea not yet committed to
+  // work) has exactly one door out, to `todo`, and zero doors in — an item
+  // is created at `backlog` or never reaches it. Plain edge, no
+  // `reason`/`ask`/`answer`, same shape as `blocked -> todo` below; D1
+  // settled that only a human fires it, and `role` is attribution-only
+  // here (never an ACL — see transitionWork), so "human-only" is enforced
+  // the way every other human-only edge in this codebase already is: the
+  // CLI verb that exposes the edge stamps `role: 'human'`, not this table.
+  Object.freeze({ from: 'backlog', to: 'todo' }),
   Object.freeze({ from: 'todo', to: 'doing' }),
   Object.freeze({ from: 'todo', to: 'blocked' }),
   Object.freeze({ from: 'doing', to: 'blocked' }),

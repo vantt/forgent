@@ -128,6 +128,7 @@ export const COMMAND_REGISTRY = [
       properties: {
         text: { type: 'string', description: 'Free-text description of the work (positional).' },
         async: { type: 'boolean', description: 'Mark as async/unattended (submitter does not stay to collaborate). Alias: --unattended.' },
+        backlog: { type: 'boolean', description: 'Create the item directly at status "backlog" (an idea not yet committed to) instead of the default "todo". Promoting it to todo later is a human-only decision.' },
         domain: { type: 'string', description: 'Optional domain; omit to use the store default.' },
         'discovered-from': { type: 'string', description: 'Optional id of the item this one was discovered from (provenance, not a dependency).' },
         deps: { type: 'string', description: 'Comma-separated list of dependency ids.', multiValueFormat: 'csv' },

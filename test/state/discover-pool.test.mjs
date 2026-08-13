@@ -165,6 +165,42 @@ test('two domains in one view resolve their candidate stages independently, per 
   assert.deepEqual(pickNextDiscoverItem(view), { id: 'triageItem', stage: 'triage' });
 });
 
+// work-item-backlog-status Piece 3 (tsk-1av): `backlog` means "an idea,
+// not yet committed to work" — clarifying such an idea is exactly what
+// should still be allowed, so this pool accepts it alongside `todo`.
+test('a stage:exploring item with status:backlog IS a candidate', () => {
+  const view = { work: { a: item('a', 'exploring', 'backlog') } };
+  assert.deepEqual(pickNextDiscoverItem(view), { id: 'a', stage: 'exploring' });
+});
+
+test('a stage:discovery item with status:backlog IS a candidate', () => {
+  const view = { work: { a: item('a', 'discovery', 'backlog') } };
+  assert.deepEqual(pickNextDiscoverItem(view), { id: 'a', stage: 'discovery' });
+});
+
+// The widening is scoped to clarify-shaped stages only. `planning` (and
+// its legacy `decompose` alias) belong to plan-pool.mjs, which keeps the
+// strict todo-only check — a backlog item must never leak into the pool
+// that feeds real dispatch, whichever side of the split it is read from.
+test('a stage:planning item with status:backlog is NOT a candidate here', () => {
+  const view = { work: { a: item('a', 'planning', 'backlog', { priority: 1 }) } };
+  assert.equal(pickNextDiscoverItem(view), null);
+});
+
+test('a stage:decompose item with status:backlog is NOT a candidate here', () => {
+  const view = { work: { a: item('a', 'decompose', 'backlog', { priority: 1 }) } };
+  assert.equal(pickNextDiscoverItem(view), null);
+});
+
+// Regression guard for the widening: only `todo`/`backlog` were opened up,
+// every other status stays excluded exactly as before.
+test('a discoverable-stage item at a status other than todo/backlog is still never picked', () => {
+  for (const status of ['doing', 'blocked', 'awaiting-human', 'awaiting-approval', 'delivered', 'done', 'wontfix']) {
+    const view = { work: { a: item('a', 'exploring', status) } };
+    assert.equal(pickNextDiscoverItem(view), null, `status:${status} must not be a candidate`);
+  }
+});
+
 test('an item anchored by an open decomposed child is never picked, even with status:todo and no unmet deps', () => {
   const view = {
     work: {
