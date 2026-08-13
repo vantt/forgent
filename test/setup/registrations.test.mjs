@@ -239,16 +239,26 @@ test('plugin-skill-cli-reachable passes when no local bin/fgos.mjs exists but fg
   }
 });
 
-test('plugin-skill-cli-reachable fails when neither a local bin/fgos.mjs nor a PATH install exists', () => {
+test('plugin-skill-cli-reachable fails when neither a local bin/fgos.mjs, a project-local install, a cached global path, nor a live PATH install exists', () => {
   const dir = mkTempDir();
+  // HOME override (tsk-2qc-1): resolveFgosBin's tier-3 cache reads
+  // ~/.fgos/config.json by default -- without this override, a real
+  // cached bin.globalFgosPath left on the machine running this test
+  // (from a real `fgos setup`/`doctor --fix` run) would make this check
+  // pass for the wrong reason. Same isolation discipline the
+  // shell-integration-sourced tests already apply via HOME (checks.test.mjs).
+  const homeDir = mkTempDir();
   const originalPath = process.env.PATH;
+  const originalHome = process.env.HOME;
   process.env.PATH = '';
+  process.env.HOME = homeDir;
   try {
     const result = pluginSkillCliReachableCheck()(dir);
     assert.equal(result.passed, false);
     assert.match(result.message, /no bin\/fgos\.mjs at .* and no global fgos install on PATH/);
   } finally {
     process.env.PATH = originalPath;
+    process.env.HOME = originalHome;
   }
 });
 

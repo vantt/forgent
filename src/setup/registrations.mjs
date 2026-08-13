@@ -40,6 +40,7 @@ import { getDomain, resolveDomainName, effectiveStage } from '../state/workflow-
 import { readLocalStatus, classifyRegistryPosture } from '../state/tool-registry.mjs';
 import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { describeConfigAwareness } from '../config/global-config.mjs';
+import { resolveFgosBin, refreshGlobalBinCache } from './bin-discovery.mjs';
 import {
   sharedConfigFilePath,
   readSharedConfig,
@@ -267,17 +268,38 @@ function checkNodeAndGit() {
   return { passed: true, message: `node ${process.version}, git available` };
 }
 
-function checkShellIntegrationSourced() {
+// tsk-2qc-1 D3: an npm-installed, non-git copy has no `fgos-shell-
+// integration.sh` rc line to check for at all -- npm's own global install
+// already links a real `fgos` binary onto PATH, no rc sourcing needed. The
+// PRE-tsk-2qc-1 behavior silently reported "nothing to check" regardless of
+// whether that PATH link (or a dev/project-local bin) actually resolved --
+// the fail-open gap D3 exists to close. What actually matters for this
+// case is whether SOME tier of `resolveFgosBin` resolves; extracted as its
+// own function so it is unit-testable without needing a genuinely
+// non-git `import.meta.url` (`integrationScriptPath()` always resolves
+// inside this repo's own git checkout when its OWN test suite runs it).
+export function describeNonGitShellIntegration(cwd) {
+  const resolved = resolveFgosBin(cwd);
+  if (resolved) {
+    return {
+      passed: true,
+      message: `not inside a git checkout — no rc sourcing needed; fgos resolved via tier ${resolved.tier} at ${resolved.path}`,
+    };
+  }
+  return {
+    passed: false,
+    message: 'not inside a git checkout and no fgos bin reachable at any of the 3 tiers (dev-checkout, project-local, global PATH) -- run "npm install -g github:vantt/forgent"',
+  };
+}
+
+function checkShellIntegrationSourced(cwd) {
   const scriptPath = integrationScriptPath();
+  if (scriptPath === null) {
+    return describeNonGitShellIntegration(cwd);
+  }
   const rcFiles = detectRcFiles(os.homedir());
   if (rcFiles.length === 0) {
     return { passed: true, message: 'no shell rc file(s) detected — nothing to check' };
-  }
-  if (scriptPath === null) {
-    return {
-      passed: true,
-      message: 'this copy of fgos is not inside a git checkout — no stable path to check for',
-    };
   }
   // Reported even when the integration itself is correctly sourced: each dead
   // line makes an interactive shell emit its own `no such file or directory`
@@ -1194,34 +1216,49 @@ registerFix({
   fix: (cwd) => fixClaudePluginMarketplace(cwd),
 });
 
-// tsk-1no D3: the plugin skill layer (`plugins/fgOS/skills/*/SKILL.md`)
-// resolves its own CLI independently of this file's other checks -- a
-// local `bin/fgos.mjs` first, else a PATH-resolved `fgos` (same fallback
-// `scripts/fgos-shell-integration.sh:29-46` already proves correct for the
-// shell-function surface). No shared PATH-lookup helper exists elsewhere in
-// this file to reuse (checkNodeAndGit's own `git` check is a one-off
-// execFileSync try/catch, not a generic utility) -- this check follows that
-// same try/catch shape rather than inventing a new one.
+// tsk-1no D3 (tsk-2qc-1 D2 widened): the plugin skill layer (`plugins/fgOS/
+// skills/*/SKILL.md`) resolves its own CLI independently of this file's
+// other checks, via the same 3-tier resolution (dev-checkout > project-
+// local > global, cache-first) `bin-discovery.mjs` gives every other
+// caller -- this check is now a thin reporting wrapper over
+// `resolveFgosBin`, not its own separate local-bin/PATH try/catch.
 function checkPluginSkillCliReachable(cwd) {
-  const localBin = path.join(cwd, 'bin', 'fgos.mjs');
-  if (fs.existsSync(localBin)) {
-    return { passed: true, message: `local bin/fgos.mjs found at ${localBin}` };
+  const resolved = resolveFgosBin(cwd);
+  if (resolved) {
+    const tierLabel = resolved.tier === 1 ? 'local bin/fgos.mjs found' : resolved.tier === 2 ? 'project-local install found' : 'fgos resolved from PATH';
+    return { passed: true, message: `${tierLabel} at ${resolved.path}` };
   }
-  try {
-    const onPath = execFileSync('sh', ['-c', 'command -v fgos'], { encoding: 'utf8' }).trim();
-    return { passed: true, message: `fgos resolved from PATH at ${onPath}` };
-  } catch {
-    return {
-      passed: false,
-      message: `no bin/fgos.mjs at ${cwd} and no global fgos install on PATH -- every /fgOS:* slash command will fail on first use (run: npm install -g github:vantt/forgent)`,
-    };
-  }
+  return {
+    passed: false,
+    message: `no bin/fgos.mjs at ${cwd}, no project-local node_modules/.bin/fgos, and no global fgos install on PATH -- every /fgOS:* slash command will fail on first use (run: npm install -g github:vantt/forgent)`,
+  };
 }
 
 registerCheck({
   id: 'plugin-skill-cli-reachable',
-  description: 'a fgos CLI is reachable from this project (local bin/fgos.mjs or a global PATH install)',
+  description: 'a fgos CLI is reachable from this project (local bin/fgos.mjs, project-local install, or a global PATH install)',
   check: (cwd) => checkPluginSkillCliReachable(cwd),
+});
+
+// tsk-2qc-1 D4: the tier-3 (global) config-cache is populated/refreshed
+// only here, from `fgos doctor --fix` -- never on every `resolveFgosBin`
+// call, which is the whole point of caching the PATH probe instead of
+// re-running it. Idempotent and always safe to re-run: a stale cached
+// path is simply overwritten with whatever `probeGlobalBin` finds now
+// (or cleared, if nothing resolves).
+function fixBinDiscoveryCache() {
+  const { resolved, changed } = refreshGlobalBinCache();
+  if (!changed) {
+    return { changed: false, message: resolved ? `global bin-discovery cache already up to date: ${resolved}` : 'global bin-discovery cache already empty (no fgos on PATH)' };
+  }
+  return resolved
+    ? { changed: true, message: `global bin-discovery cache refreshed: ${resolved}` }
+    : { changed: true, message: 'global bin-discovery cache cleared (no fgos on PATH)' };
+}
+
+registerFix({
+  id: 'bin-discovery-cache',
+  fix: () => fixBinDiscoveryCache(),
 });
 
 // tsk-32b: `plugin-skill-cli-reachable` above only confirms the `fgos` CLI
