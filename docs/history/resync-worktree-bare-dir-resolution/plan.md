@@ -75,14 +75,26 @@ Root cause and fix shape are both confirmed against current code
 | Other verbs using `path.dirname(dir)` | none — this fix only changes `resync-worktree`'s own case, no shared helper is modified | n/a |
 
 Impact-analysis capability gate (`AGENTS.md`/`CLAUDE.md`): checked
-`fgos tool query --capability impact-analysis --status present` —
-GitNexus is registered and present for this repo (per project CLAUDE.md,
-15935 symbols indexed). Posture: **full**. Given the risk map above is low
-and self-contained (one CLI case, no shared-helper edit), a
-`gitnexus impact` call on `resyncWorktree`/the `resync-worktree` case is
-still worth running at implementation time per the project's own "MUST run
-impact analysis before editing any symbol" rule — noted here so
-`fgos-coding-implement` doesn't skip it, not run redundantly during planning.
+`fgos tool query --capability impact-analysis --status present` — GitNexus
+is registered and `present`, but **flagged stale** (last indexed
+`c0cedaa`, 87 commits behind current `HEAD` — confirmed via `git rev-list
+--count c0cedaa..HEAD`). Per the project's own capability gate: `present`
++ stale = **degraded**. Every other required check still ran; this one
+proof point is weak, named plainly rather than assumed. Compensating
+evidence in place of a fresh `gitnexus impact` call: a manual grep-based
+cross-check (`RESEARCH.md` Round 1 finding 5) already confirmed the exact
+call-site count for both `resyncWorktree(` (8 references: 1 CLI call site
+in `bin/fgos.mjs`, 7 direct unit-test calls in
+`test/runner/worktree.test.mjs`) and `resync-worktree` (the same CLI case,
+plus its 2 mentions in `test/e2e/main-checkout-lock-hook-worktree-commit.
+test.mjs` and its `command-registry.mjs` entry) — the blast radius here is
+already small and fully enumerated by hand, not merely assumed clear
+because the tool reported `present`. `fgos-coding-implement` should still
+run a fresh `gitnexus impact`/`detect_changes` at implementation time per
+AGENTS.md's own unconditional "MUST run impact analysis before editing any
+symbol" / "MUST run detect_changes() before committing" rules — the
+degraded posture here only means this plan does not treat that call's
+output as the sole evidence.
 
 ## Split decision
 

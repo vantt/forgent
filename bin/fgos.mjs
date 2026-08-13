@@ -23,7 +23,7 @@ import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfigForDir } from '../src/runner/dispatch.mjs';
 import { readGateBypassLevel, canAutoApprove, canAutoApproveMergedGate } from '../src/state/gate-bypass.mjs';
-import { resolveFgosDir, fgosDirFromRoot } from '../src/runner/paths.mjs';
+import { resolveFgosDir, fgosDirFromRoot, resolveMainCheckoutRoot } from '../src/runner/paths.mjs';
 import { resolveCliVersionInfo } from '../src/cli/version.mjs';
 import { resolveDiscovery, classificationPatchFromVerdict, assertCallerClassification } from '../src/intake/discovery.mjs';
 import { resolvePlan } from '../src/intake/plan.mjs';
@@ -4864,15 +4864,26 @@ async function runVerb(verb, flags, positional, dir) {
     // prints as its refuse-message command. Run FROM INSIDE the stale
     // worktree (the same place the hook just refused a commit) — `--path`
     // exists only so a test/caller can point this at a worktree other than
-    // its own cwd. `dir` (this verb's own `--dir`) is always the MAIN
-    // checkout, same convention as every other verb here — never the
-    // worktree itself, since branch refs and `--git-common-dir` must
-    // resolve against the shared repo, not the worktree's own (nonexistent
-    // for a linked worktree) `.git` directory contents.
+    // its own cwd. `resyncWorktree`'s own `repoRoot` param must be the MAIN
+    // checkout, never the worktree itself, since branch refs and
+    // `--git-common-dir` must resolve against the shared repo (tsk-jgs:
+    // `dir` alone is NOT that root here -- `dir` is `dataDir(flags.dir)`,
+    // which for the bare/default invocation this case exists to support is
+    // cwd-strict, never git-resolved, per `dataDir`'s own doc comment
+    // above -- so it silently resolves to `<worktreePath>/.fgos`, a path
+    // that never exists on disk for a linked worktree, ADR0020). When
+    // `--dir` is given explicitly, `path.dirname(dir)` recovers the
+    // caller-supplied root correctly, same as every other verb here; when
+    // it is omitted, resolve the real main checkout the same way
+    // `dispatch.mjs`/`registrations.mjs` already do for exactly this
+    // worktree-or-main-checkout ambiguity: `resolveMainCheckoutRoot`
+    // (`src/runner/paths.mjs`), which shells `git --git-common-dir` from
+    // the worktree itself.
     case 'resync-worktree': {
       const worktreePath = flags.path ? path.resolve(flags.path) : process.cwd();
       const branch = flags.branch ?? gitAt(worktreePath, ['symbolic-ref', '--short', 'HEAD']).trim();
-      return resyncWorktree(dir, worktreePath, branch);
+      const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(worktreePath) ?? path.dirname(dir));
+      return resyncWorktree(repoRoot, worktreePath, branch);
     }
 
     // tsk-3au: the safe path for a destructive `git reset --hard` on the
