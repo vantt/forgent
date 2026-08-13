@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- herdr TUI: a `BACKLOG` tab, first in the Work Items tab strip, showing
+  items at the new `backlog` status. It is its own tab rather than a marker
+  inside `TODO`, so nothing reads a backlog item as ready, and the strip
+  renders the label even while the bucket is empty — promoting `backlog` to
+  `todo` is a person's own call, and an invisible bucket never gets one. The
+  landing tab is still `TODO`; unattended auto-discover continues to skip
+  backlog items.
+
 - Delivered-event merge provenance: `fgos approve`'s real merge paths (local
   root-into-main, local leaf-into-root, GitHub PR merge) now record
   `mergedSha`/`mergedInto` on the `work.move → delivered` event and the
