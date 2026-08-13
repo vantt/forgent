@@ -66,7 +66,7 @@ read fresh this pass). No breaking change was found for `State`,
 `middleware::from_fn_with_state`, or `Json` — the handler bodies
 (`AxPath` extraction inside each handler) are unaffected, only the
 router's own route-string literals need the `:x` → `{x}` rewrite. This
-folds into piece 1 below as a bounded, mechanical, fully test-covered
+folds into phase 1 below as a bounded, mechanical, fully test-covered
 migration (baseline confirmed this pass: `cargo test --manifest-path
 herdr-plugin/Cargo.toml` passes 152 tests across 4 suites today — the
 same suite re-run after the rewrite is the proof point that behavior did
@@ -133,15 +133,14 @@ gateway's bound-function surface before either way.
   syntax, mechanical, no handler-body changes), then mount the MCP
   transport onto the existing router inside `build_router`
 - `herdr-plugin/src/mcp.rs` — new module: MCP server scaffolding, `search`
-  tool (piece 1), `execute` tool + Rhai bound-function context (piece 2)
+  tool (phase 1), `execute` tool + Rhai bound-function context (phase 2)
 - `herdr-plugin/src/lib.rs` — register `pub mod mcp;`
 
-**Order.** No sibling ids exist yet for this split (both pieces are new,
-never-materialized specs), so `fgos graph --what-if <id> --json` has
-nothing real to run against — noted here rather than silently skipped.
-Ordering instead follows direct dependency: piece 2 (`execute`) needs the
-MCP server scaffolding piece 1 stands up (transport, tool registration,
-`search`) to exist first; piece 1 has no dependency on piece 2 and is
+**Order.** Single item, no sibling ids — `fgos graph --what-if <id> --json`
+has nothing real to run against — noted here rather than silently skipped.
+Ordering instead follows direct dependency: phase 2 (`execute`) needs the
+MCP server scaffolding phase 1 stands up (transport, tool registration,
+`search`) to exist first; phase 1 has no dependency on phase 2 and is
 provably useful alone (an MCP client can already discover the gateway's
 capability surface via `search` before `execute` exists). `fgos graph
 --json` (whole-repo run, above) shows `tsk-7l9-3` inside a live component
@@ -152,10 +151,37 @@ changes this item's own internal ordering.
 checked fresh in this item's own `exploring` stage,
 `CONTEXT.md`'s Scout evidence, 2026-08-13T11:04Z — same continuing session
 lineage, well under an hour old, no index-changing commits landed on this
-branch since). Both pieces below are net-new modules with no existing
+branch since). Both phases below are net-new modules with no existing
 callers, so blast-radius evidence has nothing to contradict; this posture
 is recorded for completeness, not because either proof point below leans
 on it.
+
+**Single-item, no split (human decision, 2026-08-13).** `fgos plan
+--verdict decompose` with the 2-piece split below (phase 1 as
+`tsk-7l9-3-1`, phase 2 as `tsk-7l9-3-2`) hit `src/intake/plan.mjs`'s
+`footprintOverlapAmong` hard gate twice in a row on the identical
+conflict: both pieces declare `herdr-plugin/Cargo.toml` and
+`herdr-plugin/src/mcp.rs` in their footprint, since phase 2 genuinely
+extends the same `mcp.rs` module phase 1 creates and adds its own crate
+line to the same `Cargo.toml`. Checked directly against
+`src/intake/plan.mjs:794-812`: this gate is re-derived fresh from
+`verdict.children`'s footprint arrays on every call, carries no
+bypass-detection constant (unlike `keywordRiskGate`/`blastRadiusGate`
+elsewhere in the same file), and its own code comment says it clears only
+once a human's answer leads the next call to propose a genuinely
+non-overlapping footprint shape — a plain confirmation to proceed cannot
+satisfy it, only a different footprint shape can. Re-slicing the
+footprint apart (e.g. hoisting `mcp.rs`/`Cargo.toml` into a third piece)
+would be artificial: the module and its one dependency line are the
+smallest real unit either phase touches. The user decided instead to stop
+splitting: this item stays a single work item (`tsk-7l9-3`, no children),
+still `high-risk` lane/review, implemented as one pass with the same two
+phases below done as two separate commits for traceability, rather than
+as two separate work items. `fgos plan --verdict pass-through` is the verb
+that carries this (`src/cli/command-registry.mjs:195`'s own example:
+`fgos plan build-cli --verdict pass-through --reason "single-piece, no
+split needed"`) — it moves the item straight to `executing` without
+touching `footprintOverlapAmong` at all, since no children are proposed.
 
 ## Risk map
 
@@ -169,8 +195,8 @@ on it.
 
 ## Shape
 
-Two phases, matching the split below. Concrete cases to prove against,
-scaled to `high-risk`:
+Two phases, matching the implementation plan below. Concrete cases to
+prove against, scaled to `high-risk`:
 
 - **Empty/boundary** — `search` with a query matching nothing returns an
   empty result, not an error; `execute` with an empty/no-op script returns
@@ -188,39 +214,53 @@ scaled to `high-risk`:
   gives every verb call its own atomic outcome; `execute` must not bypass
   that by, e.g., catching a panic mid-verb-spawn).
 
-## Split
+## Implementation plan (single item, no split)
 
-Two independently workable, independently verifiable pieces. Written here
-as specs only — `fgos-coding-validating` materializes them at its single
-gate, this skill creates nothing.
+One work item (`tsk-7l9-3`), one `executing` pass, two phases done as two
+separate commits on `fgw/tsk-7l9-3` for traceability — not two work items.
+Combined footprint across both phases: `herdr-plugin/Cargo.toml`,
+`herdr-plugin/src/mcp.rs`, `herdr-plugin/src/lib.rs`,
+`herdr-plugin/src/gateway.rs`.
 
-```json
-[
-  {
-    "title": "MCP server scaffolding + search tool on the fgOS gateway",
-    "action": "D1: the MCP surface stays Rust-native end to end (rmcp + mcpkit-axum, no embedded JS engine) -- mounted onto herdr-fgos's existing axum router (herdr-plugin/src/gateway.rs's build_router) rather than a new process, matching D1's own \"no extra runtime layer to embed or maintain\" rationale. Includes the axum 0.7->0.8 bump and the mechanical :id->{id} route-syntax rewrite mcpkit-axum requires (found during fgos-coding-validating's reality gate, cited under this same D1 since it is a prerequisite of the D1-mandated crate choice). search queries the same OpenAPI contract gateway.rs's existing get_contract handler already serves.",
-    "verify": "cargo test --manifest-path herdr-plugin/Cargo.toml && cargo build --release --manifest-path herdr-plugin/Cargo.toml",
-    "footprint": ["herdr-plugin/Cargo.toml", "herdr-plugin/src/mcp.rs", "herdr-plugin/src/lib.rs", "herdr-plugin/src/gateway.rs"],
-    "kind": "feature",
-    "risk": "standard"
-  },
-  {
-    "title": "MCP execute tool: Rhai bound-function context against gateway routes",
-    "action": "D1: execute's generated code is Rust-native scripting (rhai, picked in this plan's own Approach section under D1) bound to the gateway's own route handlers, never fgOS core directly -- still funnels through gateway.rs's spawn_fgos_verb chokepoint (parent D7). No new privilege beyond today's CLI/Bash trust model (parent D9) -- the bound-function allowlist is exactly gateway.rs's existing route set, nothing wider.",
-    "verify": "cargo test --manifest-path herdr-plugin/Cargo.toml && cargo build --release --manifest-path herdr-plugin/Cargo.toml",
-    "footprint": ["herdr-plugin/Cargo.toml", "herdr-plugin/src/mcp.rs"],
-    "kind": "feature",
-    "risk": "heavy",
-    "deps": [0]
-  }
-]
-```
+**Phase 1 (commit 1) — MCP server scaffolding + search tool on the fgOS
+gateway.** D1: the MCP surface stays Rust-native end to end (`rmcp` +
+`mcpkit-axum`, no embedded JS engine) — mounted onto `herdr-fgos`'s
+existing axum router (`herdr-plugin/src/gateway.rs`'s `build_router`)
+rather than a new process, matching D1's own "no extra runtime layer to
+embed or maintain" rationale. Includes the axum 0.7→0.8 bump and the
+mechanical `:id`→`{id}` route-syntax rewrite `mcpkit-axum` requires
+(found during `fgos-coding-validating`'s reality gate, cited under this
+same D1 since it is a prerequisite of the D1-mandated crate choice).
+`search` queries the same OpenAPI contract `gateway.rs`'s existing
+`get_contract` handler already serves.
+- Verify: `cargo test --manifest-path herdr-plugin/Cargo.toml && cargo
+  build --release --manifest-path herdr-plugin/Cargo.toml`
+- Footprint: `herdr-plugin/Cargo.toml`, `herdr-plugin/src/mcp.rs`,
+  `herdr-plugin/src/lib.rs`, `herdr-plugin/src/gateway.rs`
+- Risk: standard
 
-`deps: [0]` is a 0-based index into this same array (`plan.mjs`'s
-`resolveCallerPlanVerdict`/`normalizeChild` resolve sibling deps by
-position within one `decompose` call, not by a materialized id — checked
-directly against `src/intake/plan.mjs:251-252` during this validating
-pass), pointing piece 2 (index 1) at piece 1 (index 0) above.
+**Phase 2 (commit 2) — MCP execute tool: Rhai bound-function context
+against gateway routes.** D1: `execute`'s generated code is Rust-native
+scripting (`rhai`, picked in this plan's own Approach section under D1)
+bound to the gateway's own route handlers, never fgOS core directly —
+still funnels through `gateway.rs`'s `spawn_fgos_verb` chokepoint (parent
+D7). No new privilege beyond today's CLI/Bash trust model (parent D9) —
+the bound-function allowlist is exactly `gateway.rs`'s existing route
+set, nothing wider. Builds directly on phase 1's MCP scaffolding
+(same-commit-history dependency, not a cross-item `deps` edge, since both
+phases live in one item).
+- Verify: `cargo test --manifest-path herdr-plugin/Cargo.toml && cargo
+  build --release --manifest-path herdr-plugin/Cargo.toml`
+- Footprint: `herdr-plugin/Cargo.toml`, `herdr-plugin/src/mcp.rs`
+- Risk: heavy (security-adjacent — audit/security hard-gate flag, see
+  Mode above)
+
+Ordering follows the same direct dependency the earlier 2-piece split
+used: phase 2 (`execute`) needs the MCP server scaffolding phase 1 stands
+up (transport, tool registration, `search`) to exist first; phase 1 has
+no dependency on phase 2 and is provably useful alone (an MCP client can
+already discover the gateway's capability surface via `search` before
+`execute` exists).
 
 ## Assumptions
 
