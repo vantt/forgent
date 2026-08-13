@@ -68,7 +68,7 @@ only by `fgos-coding-validating`'s single gate, not here.
 [
   {
     "title": "Rework fgOS bin-discovery to 3-tier resolution with global-tier config-cache",
-    "verify": "npm test -- test/setup/ test/scripts/fgos-shell-integration.test.mjs",
+    "verify": "npm test -- 'test/setup/**/*.test.mjs' test/scripts/fgos-shell-integration.test.mjs",
     "action": "D2/D3/D4: implement 3-tier deterministic bin resolution (dev-checkout and project-local file-checks unchanged; global tier reads a config-cached path, multi-tier probe populates it once via fgos setup/doctor --fix); extend scripts/fgos-shell-integration.sh to cover all 3 tiers; stop integrationScriptPath()/checkShellIntegrationSourced from requiring a git checkout for npm-installed copies",
     "footprint": ["src/setup/registrations.mjs", "src/setup/shell-rc.mjs", "scripts/fgos-shell-integration.sh", "src/config/global-config.mjs", "test/setup/", "test/scripts/fgos-shell-integration.test.mjs"],
     "kind": "task",
@@ -93,6 +93,18 @@ only by `fgos-coding-validating`'s single gate, not here.
   }
 ]
 ```
+
+**Verify fix (post-plan, tsk-2qc-1 own implementation):** piece 1's
+original `verify` (`npm test -- test/setup/ test/scripts/fgos-shell-
+integration.test.mjs`) passes a bare directory (`test/setup/`) as a
+positional arg to `node --test` alongside the npm script's own already-
+active glob (`node --test 'test/**/*.test.mjs'`) — confirmed reproducible:
+this combination makes Node's test runner report a phantom failing
+`test/setup` pseudo-test with zero real per-test failures underneath
+(3183/3183 real tests pass either way). Passing the equivalent glob
+(`'test/setup/**/*.test.mjs'`) instead of the bare directory avoids the
+bug entirely — same coverage, same 3183 real tests, verified both ways.
+Fixed on the item's own `verify` field (`fgos edit --verify`) and here.
 
 **Re-slice note (post-plan, resolving engine footprint-overlap ask):** the
 original spec had this task editing `src/setup/skill-wrappers.mjs`
