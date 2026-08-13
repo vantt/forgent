@@ -43,9 +43,23 @@ function isCandidateStage(item) {
   return discoverableStages(domain).includes(item.stage);
 }
 
+// work-item-backlog-status Piece 3 (tsk-1av): a clarify-shaped stage
+// accepts `backlog` alongside `todo`, so `fgos-clarifying` can sharpen an
+// idea's own description while it still sits at `backlog` — the whole
+// point of a status meaning "not yet committed to work" is that thinking
+// about it is allowed before committing to it.
+//
+// Safe to widen HERE, and only here, because this pool is clarify-shaped
+// stages only (tsk-lya D10/D11, see the header above). The
+// `decompose`/`planning` pool that used to share this function moved to
+// `plan-pool.mjs`, whose own `isCandidate` keeps the strict
+// `status === 'todo'` check — that pool feeds real dispatch, so a
+// not-yet-committed idea must never reach it.
+const CANDIDATE_STATUSES = new Set(['todo', 'backlog']);
+
 function isCandidate(item, view) {
   return (
-    item.status === 'todo' &&
+    CANDIDATE_STATUSES.has(item.status) &&
     isCandidateStage(item) &&
     isDepsAndLineageReady(view, item.id)
   );
@@ -69,7 +83,8 @@ function compareClarifyOrder(blocksById) {
 
 /**
  * Pick the single next clarify-shaped item for a discover-loop iteration
- * to act on, or `null` when none is `status: todo`. Clarify-shaped means
+ * to act on, or `null` when none is `status: todo`/`backlog` (tsk-1av).
+ * Clarify-shaped means
  * whatever that item's OWN domain declares discoverable (tsk-64h; for
  * `coding` today: `discovery`/`exploring`) — so this pool can never offer
  * a caller an item the `discover` verb would then refuse. The returned

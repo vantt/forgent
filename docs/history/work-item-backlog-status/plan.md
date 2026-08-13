@@ -176,6 +176,16 @@ stages** (`tsk-1av`, depends on Piece 1):
   needs no new validation branch in `transitionWork`.
 - `fgos add` gets no `--backlog` flag (only `submit` does) — explicit in
   the human's own D2 answer ("`fgos add`... vẫn nên giữ default todo").
+- Piece 3's "split" is degenerate against today's code: `discover-pool.mjs`
+  no longer carries a `decompose`-stage branch at all — `tsk-lya` D10/D11
+  already extracted that pool into `plan-pool.mjs`, whose own
+  `isCandidate` keeps the strict `status === 'todo'` check. So "the
+  decompose-stage candidate stays `todo`-only, unchanged" is satisfied by
+  `plan-pool.mjs` staying outside Piece 3's footprint, and
+  `discover-pool.mjs`'s single remaining status check — which now only
+  ever serves clarify-shaped stages — is the one that widens to
+  `{todo, backlog}`. Same behavior Piece 3 describes; only the boundary
+  already sits one module over.
 
 ## Outstanding questions
 
