@@ -38,7 +38,7 @@ import {
 } from './helpers/setup-checks-harness.mjs';
 
 
-test('fgos setup wires core.hooksPath to .githooks in a real git checkout, and reports hooksWired: true', () => {
+test('fgos setup wires core.hooksPath to this checkout\'s absolute .githooks path, and reports hooksWired: true', () => {
   const cwd = mkTemp('setup-cli-hooks-');
   const homeDir = mkTemp('setup-cli-hooks-home-');
   execFileSync('git', ['init', '-q'], { cwd });
@@ -47,7 +47,7 @@ test('fgos setup wires core.hooksPath to .githooks in a real git checkout, and r
   const envelope = JSON.parse(result.stdout);
   assert.equal(envelope.data.hooksWired, true);
   const hooksPath = execFileSync('git', ['config', '--get', 'core.hooksPath'], { cwd, encoding: 'utf8' }).trim();
-  assert.equal(hooksPath, '.githooks');
+  assert.equal(hooksPath, path.join(cwd, '.githooks'), 'must be absolute -- a relative value resolves per-worktree, not to this root (tsk-2u5 D4)');
   fs.rmSync(cwd, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });
 });
