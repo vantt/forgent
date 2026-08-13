@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `fgos submit --backlog` creates an item directly at the `backlog` status —
+  an idea not yet committed to — instead of the default `todo`, so marking
+  something as not-yet-ready no longer means submitting it and then moving
+  it. A `backlog` item carries its own `backlog` status category, so it is
+  excluded from the ready frontier until a person promotes it to `todo`.
+  The default is unchanged: a flagless `fgos submit`, and `fgos add` in all
+  cases, still create items at `todo`.
 - Delivered-event merge provenance: `fgos approve`'s real merge paths (local
   root-into-main, local leaf-into-root, GitHub PR merge) now record
   `mergedSha`/`mergedInto` on the `work.move → delivered` event and the
