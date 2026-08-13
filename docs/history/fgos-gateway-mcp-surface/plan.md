@@ -41,13 +41,38 @@ module, `herdr-plugin/src/mcp.rs`, rather than a new process or a new
 `main.rs` launch mode. `gateway.rs`'s `build_router` already returns one
 `axum::Router` serving the REST surface on `DEFAULT_PORT` (4170); `mcp.rs`
 mounts the MCP transport onto that SAME router (`mcpkit-axum` is
-purpose-built for exactly this — "MCP-over-HTTP via Axum", matching the
-gateway's existing `axum` 0.7 stack, confirmed clear during discovery,
-`docs/history/fgos-interface-daemon/RESEARCH.md` Round 1) rather than
+purpose-built for exactly this — "MCP-over-HTTP via Axum", `into_router()`
+nesting it under a path like `/mcp` alongside other routes, confirmed
+against its own `docs.rs` page during this validating pass) rather than
 spawning a second listener or a stdio-transport subprocess. This is what
 lets `herdr-fgos gateway`'s existing single-process launch (`main.rs`'s
 existing `gateway` dispatch, untouched) cover MCP for free — no new CLI
 mode, no second `AppState`, one hexagon per D8.
+
+**Correction found during `fgos-coding-validating`'s reality gate:**
+`CONTEXT.md`'s own Scout evidence said `mcpkit-axum` matches "the
+gateway's existing axum 0.7 stack" — checked directly against
+`mcpkit-axum`'s `docs.rs` page here, that claim is false: it requires
+`axum ^0.8`, not `0.7`. `axum` 0.8's own release notes carry a real
+breaking change reaching beyond the MCP feature itself: route
+path-parameter syntax moved from `:id`/`*rest` to `{id}`/`{*rest}`, and
+the OLD syntax now panics at router-build time instead of silently
+working. `gateway.rs` declares 10 routes using the old syntax today
+(`/work/:id`, `/work/:id/move`, `/work/:id/ask`, `/work/:id/answer`,
+`/work/:id/take`, `/work/:id/return`, `/work/:id/approve`,
+`/work/:id/reject`, `/rollup/:id`, `/sessions/:sessionId`,
+`/sessions/:sessionId/slots` — `herdr-plugin/src/gateway.rs:693-709`,
+read fresh this pass). No breaking change was found for `State`,
+`middleware::from_fn_with_state`, or `Json` — the handler bodies
+(`AxPath` extraction inside each handler) are unaffected, only the
+router's own route-string literals need the `:x` → `{x}` rewrite. This
+folds into piece 1 below as a bounded, mechanical, fully test-covered
+migration (baseline confirmed this pass: `cargo test --manifest-path
+herdr-plugin/Cargo.toml` passes 152 tests across 4 suites today — the
+same suite re-run after the rewrite is the proof point that behavior did
+not change) — never a reason to abandon `mcpkit-axum` or the "one
+router" architecture above, just a real prerequisite step this plan did
+not originally carry.
 
 `search` reads the same OpenAPI spec `gateway.rs`'s existing
 `get_contract` handler already serves (`docs/contracts/fgos-gateway-api-v1.yaml`,
@@ -63,12 +88,19 @@ scope" note explicitly defers this exact choice to `fgos-coding-planning` —
 this is that decision, cited under D1). Two real candidates exist for a
 Rust-embeddable scripting language: `rhai` (pure Rust, no C toolchain,
 purpose-built for embedding, `#[export_module]` binding ergonomics) and
-`mlua` (Lua bindings, FFI-based, needs either a system Lua or the
-`vendored` feature that builds Lua from C source at compile time).
-`mlua`'s vendored-C dependency reintroduces exactly the "extra runtime
-layer to embed and maintain" D1 rejects a JS engine for — Rhai avoids that
-entirely and stays pure Rust end to end, consistent with D1's own
-rationale, not just its letter. The trade-off is LLM code-generation
+`mlua` (Lua bindings, FFI-based, needs either a system Lua via
+`pkg-config` or the `vendored` feature that builds Lua from C source at
+compile time). Both crate claims checked directly against their own
+GitHub READMEs during this validating pass: Rhai's dependency list is
+Rust-only (`smallvec`, `thin-vec`, `num-traits`, `once_cell`, `ahash`,
+`bitflags`, `smartstring`) with only "relatively little `unsafe` code...
+for performance reasons"; `mlua`'s own README states it "contains a huge
+amount of unsafe code" and explicitly "does not provide absolute safety
+even without using `unsafe`" — `mlua`'s vendored-C dependency (or system
+Lua requirement) reintroduces exactly the "extra runtime layer to embed
+and maintain" D1 rejects a JS engine for — Rhai avoids that entirely and
+stays pure Rust end to end, consistent with D1's own rationale, not just
+its letter. The trade-off is LLM code-generation
 fluency: Lua has far more training-data representation than Rhai. This is
 mitigated, not eliminated, by Rhai's own design goal of staying
 syntactically close to Rust/JS (familiar shape to any model that already
@@ -94,12 +126,15 @@ gateway's bound-function surface before either way.
   rationale).
 
 **Files likely touched:**
-- `herdr-plugin/Cargo.toml` — add `rmcp`, `mcpkit-axum`, `rhai`
+- `herdr-plugin/Cargo.toml` — bump `axum` `0.7` → `0.8` (required for
+  `mcpkit-axum`, see correction above), add `rmcp`, `mcpkit-axum`, `rhai`
+- `herdr-plugin/src/gateway.rs` — rewrite the 10 existing `:id`/
+  `:sessionId` route declarations to `{id}`/`{sessionId}` (axum 0.8
+  syntax, mechanical, no handler-body changes), then mount the MCP
+  transport onto the existing router inside `build_router`
 - `herdr-plugin/src/mcp.rs` — new module: MCP server scaffolding, `search`
   tool (piece 1), `execute` tool + Rhai bound-function context (piece 2)
 - `herdr-plugin/src/lib.rs` — register `pub mod mcp;`
-- `herdr-plugin/src/gateway.rs` — mount the MCP transport onto the
-  existing router inside `build_router`
 
 **Order.** No sibling ids exist yet for this split (both pieces are new,
 never-materialized specs), so `fgos graph --what-if <id> --json` has
@@ -126,6 +161,7 @@ on it.
 
 | Component | Risk | Proof point (for `fgos-coding-validating`) |
 |---|---|---|
+| `axum` 0.7 → 0.8 bump + route-syntax rewrite (required for `mcpkit-axum`, found during this validating pass — see Approach correction above) | medium (mechanical, but touches every existing route) | baseline `cargo test --manifest-path herdr-plugin/Cargo.toml` already confirmed 152/152 passing this pass; the same 152 must still pass after the `:x`→`{x}` rewrite, with no other diff in `gateway.rs` handler bodies |
 | MCP server scaffolding (`rmcp` + `mcpkit-axum` mounted onto the existing axum router) | medium | `cargo test --manifest-path herdr-plugin/Cargo.toml` passes with a new test asserting the MCP transport advertises exactly 2 tools (`search`, `execute`); existing REST routes/tests (`tsk-7l9-2`'s) still pass unchanged |
 | `search` tool (queries the OpenAPI contract) | light | integration test: `search`'s MCP response matches the same spec `GET /contract` already serves, byte-for-byte on the parsed structure |
 | `execute`'s bound-function context (Rhai binding, D1) | high (security-adjacent — audit/security hard-gate flag) | a script calling a bound function succeeds and its effect matches calling that same `fgos <verb>` directly; a script attempting anything outside the bound-function allowlist (e.g. raw filesystem/process access Rhai doesn't expose by default) fails cleanly — proves the "no new privilege beyond today's CLI/Bash trust model" boundary D9 promises, never assumes it |
@@ -162,7 +198,7 @@ gate, this skill creates nothing.
 [
   {
     "title": "MCP server scaffolding + search tool on the fgOS gateway",
-    "action": "D1: the MCP surface stays Rust-native end to end (rmcp + mcpkit-axum, no embedded JS engine) -- mounted onto herdr-fgos's existing axum router (herdr-plugin/src/gateway.rs's build_router) rather than a new process, matching D1's own \"no extra runtime layer to embed or maintain\" rationale. search queries the same OpenAPI contract gateway.rs's existing get_contract handler already serves.",
+    "action": "D1: the MCP surface stays Rust-native end to end (rmcp + mcpkit-axum, no embedded JS engine) -- mounted onto herdr-fgos's existing axum router (herdr-plugin/src/gateway.rs's build_router) rather than a new process, matching D1's own \"no extra runtime layer to embed or maintain\" rationale. Includes the axum 0.7->0.8 bump and the mechanical :id->{id} route-syntax rewrite mcpkit-axum requires (found during fgos-coding-validating's reality gate, cited under this same D1 since it is a prerequisite of the D1-mandated crate choice). search queries the same OpenAPI contract gateway.rs's existing get_contract handler already serves.",
     "verify": "cargo test --manifest-path herdr-plugin/Cargo.toml && cargo build --release --manifest-path herdr-plugin/Cargo.toml",
     "footprint": ["herdr-plugin/Cargo.toml", "herdr-plugin/src/mcp.rs", "herdr-plugin/src/lib.rs", "herdr-plugin/src/gateway.rs"],
     "kind": "feature",
@@ -183,11 +219,13 @@ gate, this skill creates nothing.
 ## Assumptions
 
 - The MCP transport mounts on the SAME port/router the REST gateway
-  already serves (4170) rather than a second port -- `mcpkit-axum`'s own
-  purpose (MCP-over-HTTP via Axum) is built for exactly this composition;
-  not proven against the crate's actual API yet, flagged here rather than
-  silently assumed away, and `fgos-coding-validating`'s reality check should
-  confirm this against the crate's real docs/source before piece 1 starts.
+  already serves (4170) rather than a second port -- confirmed during this
+  validating pass against `mcpkit-axum`'s own `docs.rs` page: it exposes
+  `into_router()` specifically to nest into an existing app under a path
+  like `/mcp`, alongside other routes. What remains unproven until piece 1
+  is actually implemented is the exact `McpRouter`/`into_router()` call
+  shape against this repo's own `AppState`/`Router<AppState>` type -- a
+  normal implementation-time detail, not a planning-level risk.
 - `execute`'s bound-function allowlist mirrors `gateway.rs`'s existing
   authenticated route set one-for-one (same routes `search`/REST already
   expose) rather than a narrower or wider set -- CONTEXT.md's own D1/D9
