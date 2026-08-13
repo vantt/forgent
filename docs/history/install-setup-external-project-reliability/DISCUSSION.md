@@ -2,10 +2,11 @@
 
 ## 1. Trạng thái hiện tại
 
-Round 1, mới mở. Đã scout xong 2 root cause cụ thể (bằng chứng ở §3), đã
-đối chiếu với 2 item liên quan đã đóng (tsk-jtb, tsk-65q — không trùng
-scope). Đang trình bày phân tích + đề xuất hướng thiết kế cho từng root
-cause, chờ người quyết định hướng trước khi khoá D-ID nào.
+Round 2. D1 đã khoá: cài đặt fgOS có 2 trục độc lập (bin vs skill), không
+bắc cầu tự động cho nhau — xem §6 cho bản đồ đầy đủ + diagram. Root cause
+#1/#2 (§3) vẫn đang chờ quyết hướng sửa, giờ đặt trên nền D1 đã chốt thay
+vì tự đứng riêng. Tiếp theo: quay lại 2 câu hỏi hướng sửa đã đặt ra ở
+cuối round trước.
 
 ## 2. Mục tiêu & đề bài
 
@@ -37,7 +38,9 @@ config/check của riêng nó) — không phải một bản vá cục bộ cho 
 
 ## 4. Quyết định đã chốt
 
-(chưa có — chưa điểm nào giữ ổn định qua hơn 1 vòng)
+| D-ID | Quyết định | Lý do |
+|------|-----------|-------|
+| D1 | Cài đặt fgOS có **2 trục độc lập, không bắc cầu tự động**: (a) trục bin — npm/pnpm/yarn global, project-local, hoặc dev-checkout self-hosting; (b) trục skill — forgentX tự-host (`.claude/skills/fgos-*`) hoặc Claude Code plugin marketplace (`plugins/fgOS/skills/*`). Cầu nối DUY NHẤT giữa 2 trục là `fgos setup`/`doctor --fix`. | Xác nhận bằng đọc `package.json` `files` allowlist (không có `plugins/`), `plugins/fgOS/.claude-plugin/plugin.json` (không có `scripts`/postinstall, đúng RUL6), và `.claude-plugin/marketplace.json` (skill của project ngoài chỉ tới được qua plugin marketplace). Nền tảng bắt buộc trước khi thiết kế bin-discovery — vì 1 project hoàn toàn có thể chỉ thoả 1 trục. |
 
 ## 5. Q&A log
 
@@ -47,10 +50,58 @@ config/check của riêng nó) — không phải một bản vá cục bộ cho 
   scout xong 2 root cause cụ thể (bằng chứng ở §3 #1-2) từ phiên thảo luận
   trước khi mở discussion này; đang trình bày 2 hướng thiết kế cho từng
   root cause trực tiếp trong hội thoại, chưa nhận câu trả lời.
+- **2026-08-13, vòng 2** — Anh yêu cầu thống nhất cơ chế cài đặt (bao
+  nhiêu chế độ, bin/skill nằm đâu mỗi chế độ, cách đóng gói) TRƯỚC khi bàn
+  bin-discovery. Em scout `package.json` `files`, `plugins/fgOS/.claude-
+  plugin/plugin.json`, `.claude-plugin/marketplace.json`, trình bày ma
+  trận 2 trục độc lập. Anh xác nhận, không thêm chế độ nào khác, yêu cầu
+  "cập nhật" — đã ghi D1, cập nhật §3/§6.
 
 ## 6. Thiết kế đã chốt {#design}
 
-(chưa có — chưa có quyết định nào ổn định để tổng hợp)
+fgOS có 2 hệ phân phối độc lập (D1) — **bin** (`fgos`/`fgos-runner`, npm
+package) và **skill** (`/fgOS:*`, Claude Code plugin) — đóng gói tách
+biệt, cài tách biệt, và không có gì tự động nối chúng lại ngoài
+`fgos setup`/`doctor --fix` (bản thân đang có 2 lỗ hổng fail-silent, xem
+§3 #1-2).
+
+```mermaid
+flowchart TB
+    subgraph BinAxis["Trục A — bin fgos/fgos-runner (npm package)"]
+        direction TB
+        A1["npm/pnpm/yarn --global<br/>bin ở global bin dir<br/>(nvm node dir / pnpm store / npm prefix)"]
+        A2["npm/pnpm/yarn project-local<br/>bin ở node_modules/.bin/fgos"]
+        A3["dev-checkout self-hosting<br/>bin ở checkout-root/bin/fgos.mjs<br/>(shell function, scripts/fgos-shell-integration.sh)"]
+    end
+
+    subgraph SkillAxis["Trục B — skill /fgOS:* (Claude Code plugin)"]
+        direction TB
+        B1["forgentX tự-host<br/>.claude/skills/fgos-* có sẵn trong checkout"]
+        B2["Claude Code plugin marketplace<br/>plugins/fgOS/skills/*<br/>qua .claude-plugin/marketplace.json"]
+    end
+
+    Bridge["fgos setup / fgos doctor --fix<br/>(cầu nối DUY NHẤT giữa 2 trục)"]
+    RC1["Root cause #1:<br/>bin-lookup qua sh -c non-login shell<br/>-- PATH của A1 không thấy được"]
+    RC2["Root cause #2:<br/>checkClaudePluginMarketplace fail-open<br/>khi claude CLI không trên PATH<br/>-- B2 không bao giờ được kích hoạt"]
+
+    A1 -.->|"tsk-2qc root cause #1"| RC1
+    RC1 -.-> Bridge
+    Bridge -->|"claude plugin marketplace add/install"| B2
+    Bridge -.->|"fail-open, silent pass"| RC2
+    RC2 -.-> B2
+
+    ProjectNgoai["Project bên ngoài, chỉ làm 1 nửa hướng dẫn"] -->|"chỉ npm install"| A1
+    ProjectNgoai -->|"thiếu bước fgos setup thành công"| SkillMissing["Không có skill nào<br/>(Unknown skill)"]
+    A1 -.->|"PATH lookup fail (root cause #1)"| BinMissing["Không tìm ra bin<br/>dù đã cài"]
+```
+
+Kết luận thiết kế tới thời điểm này: bất kỳ hướng sửa bin-discovery nào
+cũng phải đứng trên nền D1 — nghĩa là không chỉ sửa 1 hàm lookup, mà phải
+làm cho Trục A tự-verify/tự-báo được độc lập với Trục B, và cầu nối
+(`fgos setup`/`doctor --fix`) phải fail loud thay vì fail-silent ở cả 2
+đầu. Chưa chốt cơ chế cụ thể (probe nhiều tầng vs cache-in-config cho bin;
+WARN vs phân biệt case cho marketplace check) — hai câu hỏi này vẫn mở,
+chờ vòng tiếp theo.
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
