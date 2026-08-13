@@ -47,6 +47,7 @@ import {
   DEFAULT_INVARIANT_CHECK_COMMANDS,
 } from '../config/shared-config-file.mjs';
 import { DEFAULT_LEVEL, LEVELS } from '../state/gate-bypass.mjs';
+import { DEFAULT_WORKER_SLOT_CEILING } from '../state/worker-slots.mjs';
 import { checkEventsJsonlContiguity, fixEventsJsonlContiguity } from '../state/events-jsonl-contiguity.mjs';
 import { advanceEventsJsonlTruncationGuard } from '../state/events-jsonl-truncation-guard.mjs';
 
@@ -461,6 +462,15 @@ function checkRootDrift(cwd) {
   const strandedAfterClose = [];
   for (const entry of Object.entries(drift)) {
     const [id, status] = entry;
+    // tsk-1l9 follow-up: `aheadOfTarget` answers "how many commits", not "is
+    // anything stranded". A root that only merged its target back into itself
+    // is many commits ahead carrying nothing, and a branch whose commits all
+    // landed by another route is a stale ref. Both were reported here as
+    // drift needing a sync, forever, with no sync able to clear them --
+    // fgw/tsk-4n7 and fgw/tsk-19y are exactly that shape today. Skipping them
+    // is a REPORTING change only: `needsSync` itself is untouched, so `fgos
+    // merge next`'s auto-sync path behaves exactly as before.
+    if (status.carriesContent === false) continue;
     if (status.needsSync) {
       needsSync.push(entry);
     } else if (status.aheadOfTarget > 0 && COMPLETED_ROOT_STATUSES.has(view.work[id]?.status)) {
@@ -882,6 +892,86 @@ registerConfigDefault({
   id: 'cleanup',
   key: 'cleanup',
   shape: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS, leafTtlDays: DEFAULT_CLEANUP_LEAF_TTL_DAYS },
+});
+
+// docs/history/orchestrator-worker-slots/plan.md §Shape T1: the worker-slot
+// ceiling is project config, not a runner constant -- registered here so
+// `fgos setup` writes the section and `fgos doctor` can see it at all, per
+// AGENTS.md's install/setup/doctor gate.
+//
+// `ceiling` ships as `null` -- present but unarmed -- and that is the whole
+// point of this entry (tsk-1oz). Shipping the recommended NUMBER here would
+// arm the gate the moment anyone runs `fgos setup`, and `fgos doctor` asks
+// every project to run exactly that ("stale config — missing keys ... — run
+// fgos setup") as routine maintenance, never as an opt-in. A repo already
+// running more items than the recommended number would then have its very
+// next `take`/`pick` refused, freezing the whole backlog until a person
+// parked enough work by hand. `worker-slots.mjs` already refuses to treat
+// silence as a reason to start refusing work; writing a live number here
+// would have re-introduced that same trap one command away from the nag
+// that points at it. A person arms the gate by replacing `null` with a real
+// count (see DEFAULT_WORKER_SLOT_CEILING for the recommended starting
+// value), which is the only moment the intent is unambiguous.
+//
+// `adminReservation` is deliberately NOT a key here. The admin lane
+// (merge/retro/cleanup loops plus one spare) is a FIXED reservation whose
+// size is constant by definition, not a project knob -- it never claims a
+// work item, so nothing counts it and nothing could enforce a different
+// number. It lives as `ADMIN_LANE_RESERVATION` in `worker-slots.mjs` and is
+// reported by `fgos slots`; offering it as config would have been a dial
+// wired to nothing.
+registerConfigDefault({
+  id: 'workerSlots',
+  key: 'workerSlots',
+  shape: { ceiling: null },
+});
+
+// A present-but-unusable `ceiling` is the misconfiguration that actually
+// bites, and it fails SILENTLY: `hasWorkerSlotRoom` treats anything that is
+// not a positive integer as "no ceiling configured" and allows every claim,
+// so a project that believes it is capped runs uncapped. `"8"` (a string,
+// the easiest hand-edit slip), `8.5`, `0` and `-1` all land there. The
+// generic `checkConfigNotStale` above only catches a wholly-missing section,
+// exactly the same blind spot `checkInvariantChecksConfigured` was written
+// to cover for `invariantChecks`. `null` is the one non-number that is not a
+// mistake: it is what `fgos setup` writes to mean "deliberately unarmed".
+function checkWorkerSlotsCeiling(cwd) {
+  // Deliberately NOT the fail-soft reader the claim paths use: those want an
+  // unreadable file to read as "no ceiling", but naming a broken config is
+  // this check's entire job, and degrading to `{}` would report the file as
+  // merely unconfigured while every claim silently ran uncapped.
+  let section;
+  try {
+    section = readSharedConfig(cwd).workerSlots;
+  } catch (err) {
+    return { passed: false, message: `shared config cannot be parsed, so no worker-slot ceiling can be read: ${err.message}` };
+  }
+  if (section === undefined) {
+    return {
+      passed: false,
+      message: 'workerSlots section missing -- run fgos setup (no worker-slot ceiling is enforced until it exists)',
+    };
+  }
+  const { ceiling } = section;
+  if (ceiling === null || ceiling === undefined) {
+    return {
+      passed: true,
+      message: `workerSlots.ceiling is unarmed (null) -- no claim is refused; set a positive integer (recommended: ${DEFAULT_WORKER_SLOT_CEILING}) to enforce a ceiling`,
+    };
+  }
+  if (!Number.isInteger(ceiling) || ceiling <= 0) {
+    return {
+      passed: false,
+      message: `workerSlots.ceiling is ${JSON.stringify(ceiling)}, which enforces NOTHING -- expected a positive integer (recommended: ${DEFAULT_WORKER_SLOT_CEILING}) or null to mean deliberately unarmed`,
+    };
+  }
+  return { passed: true, message: `workerSlots.ceiling = ${ceiling} running work item(s)` };
+}
+
+registerCheck({
+  id: 'worker-slots-ceiling-usable',
+  description: 'workerSlots.ceiling is either a positive integer or explicitly null (a malformed value silently enforces nothing)',
+  check: (cwd) => checkWorkerSlotsCeiling(cwd),
 });
 
 // docs/history/tsk-516-approve-reverify-scope/CONTEXT.md D6: the invariant

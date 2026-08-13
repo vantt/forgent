@@ -72,7 +72,7 @@ function applyEvent(view, event) {
       break;
     }
     case 'work.move': {
-      const { id, from, to, ask, answer, role, learning, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, reason, parentSnapshotAtAsk, claimTrigger, statusAtAsk, writer, statusCategory, parkReason, rationale, alternatives, source, askRationale, askAlternatives, askSource } = event.payload ?? {};
+      const { id, from, to, ask, answer, role, learning, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, mergedSha, mergedInto, reason, parentSnapshotAtAsk, claimTrigger, statusAtAsk, writer, statusCategory, parkReason, rationale, alternatives, source, askRationale, askAlternatives, askSource } = event.payload ?? {};
       const item = view.work[id];
       if (item) {
         item.status = to;
@@ -195,6 +195,17 @@ function applyEvent(view, event) {
       // whichever field the move actually carried.
       if (item && to === 'awaiting-approval' && branchHeadAtReturn !== undefined) {
         item.branchHeadAtReturn = branchHeadAtReturn;
+      }
+      // Merge-evidence provenance (tsk-5dk), same fold-onto-item shape as
+      // headAtReturn/branchHeadAtReturn above, gated on THIS move's own
+      // `to === 'delivered'` — a hand-typed move (or a verify-only
+      // pull-door delivery) never carries these, so their absence on the
+      // folded item is itself evidence, not a gap.
+      if (item && to === 'delivered' && mergedSha !== undefined) {
+        item.mergedSha = mergedSha;
+      }
+      if (item && to === 'delivered' && mergedInto !== undefined) {
+        item.mergedInto = mergedInto;
       }
       // Human-gate ask/answer (per async-human-gate D2/D5), mirroring the
       // work.outcome lazy-key/merge-by-id precedent above: the ask (entry

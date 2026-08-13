@@ -387,3 +387,30 @@ test('unmergedDeliveries does not count merge commits as unmatched work', () => 
   // count, never the merge commit itself.
   assert.equal(unmergedDeliveries(repoRoot, view).a.unmatched, 2);
 });
+
+test('driftStatus reports carriesContent false for a root that only merged its target back in', () => {
+  const repoRoot = initRepo();
+  // The fgw/tsk-4n7 / fgw/tsk-19y shape: commits ahead by count, nothing of
+  // its own by content. `needsSync` still fires (unchanged, `fgos merge next`
+  // reads it); only the reporting signal separates the two.
+  checkoutNewBranch(repoRoot, 'fgw/root');
+  git(repoRoot, ['checkout', '-q', 'main']);
+  commitFile(repoRoot, 'trunk.txt', 'trunk');
+  git(repoRoot, ['checkout', '-q', 'fgw/root']);
+  git(repoRoot, ['merge', '-q', '--no-ff', '-m', 'merge main into fgw/root', 'main']);
+
+  const view = { work: { root: item('root'), leaf: item('leaf', { parent: 'root' }) } };
+  const result = driftStatus(repoRoot, view);
+  assert.equal(result.root.carriesContent, false);
+  assert.ok(result.root.aheadOfTarget > 0, 'still counts as ahead by commits');
+  assert.equal(result.root.needsSync, true, 'needsSync is deliberately unchanged');
+});
+
+test('driftStatus reports carriesContent true for a root with real work of its own', () => {
+  const repoRoot = initRepo();
+  checkoutNewBranch(repoRoot, 'fgw/root');
+  commitFile(repoRoot, 'own.txt', 'own');
+
+  const view = { work: { root: item('root'), leaf: item('leaf', { parent: 'root' }) } };
+  assert.equal(driftStatus(repoRoot, view).root.carriesContent, true);
+});

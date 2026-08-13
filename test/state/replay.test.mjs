@@ -719,6 +719,41 @@ test('foldEvents ignores branchHeadAtReturn on a proposed move for an id that wa
   assert.equal('ghost' in view.work, false);
 });
 
+// `mergedSha`/`mergedInto` (tsk-5dk) fold onto the item on the SAME
+// `to: 'delivered'` edge the payload actually carries them on — never
+// inferred, never re-derived from git, straight off the event exactly like
+// headAtReturn/branchHeadAtReturn above.
+
+test('foldEvents folds mergedSha and mergedInto onto the item from a delivered move that carries them', () => {
+  const events = [
+    { seq: 1, ts: '2026-08-12T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'awaiting-approval' }, v: 2 },
+    { seq: 2, ts: '2026-08-12T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'awaiting-approval', to: 'delivered', role: 'human', mergedSha: 'deadbeefcafe', mergedInto: 'main' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.work.a.mergedSha, 'deadbeefcafe');
+  assert.equal(view.work.a.mergedInto, 'main');
+});
+
+test('foldEvents leaves mergedSha/mergedInto absent for a delivered move that never carried them (hand-typed move, or a verify-only pull-door delivery)', () => {
+  const events = [
+    { seq: 1, ts: '2026-08-12T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'awaiting-approval' }, v: 2 },
+    { seq: 2, ts: '2026-08-12T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'awaiting-approval', to: 'delivered', role: 'human' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal('mergedSha' in view.work.a, false);
+  assert.equal('mergedInto' in view.work.a, false);
+});
+
+test('foldEvents ignores mergedSha/mergedInto on a non-delivered move even when the payload carries them (only the delivered edge sets them)', () => {
+  const events = [
+    { seq: 1, ts: '2026-08-12T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
+    { seq: 2, ts: '2026-08-12T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', role: 'human', mergedSha: 'ignored-on-this-edge', mergedInto: 'ignored-on-this-edge' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal('mergedSha' in view.work.a, false);
+  assert.equal('mergedInto' in view.work.a, false);
+});
+
 // --- work-graph-intelligence S3: view revision-hash -----------------------
 // A deterministic fingerprint of a folded view (C1 data_hash pattern), so a
 // consumer can tell "did the folded state change?" without re-folding — and

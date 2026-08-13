@@ -133,6 +133,11 @@ test('approve of a runner item (happy path): merges fgw/<id> into main, verifies
   // yet at this point in the sequence.
   assert.equal(view.settlements?.['approve-runner-item'], undefined);
   assert.ok(fs.existsSync(path.join(cwd, 'approve-runner-item-produced.txt')), 'the merged file must be present on main');
+  // tsk-5dk: a real approve merge now records merge evidence — mergedSha
+  // must be main's own real post-merge commit, readable straight off the
+  // delivered event, not inferred from git afterward.
+  assert.equal(view.work['approve-runner-item'].mergedInto, 'main');
+  assert.equal(view.work['approve-runner-item'].mergedSha, gitAtCwd(cwd, ['rev-parse', 'main']).trim());
 
   const branches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
   assert.match(branches, /fgw\/approve-runner-item/, 'the merged branch must survive approve — deleted later by the cleanup verb, not here');
@@ -219,6 +224,39 @@ test('approve of a runner item with a declared footprint still refuses on an unc
   assert.equal(stateView(cwd).work['approve-footprint-dirty'].status, 'awaiting-approval');
 });
 
+// tsk-kv3 (Q1): the main-checkout clean-tree gate no longer runs at all on
+// the leaf->root path — that merge happens entirely inside a DETACHED
+// ephemeral worktree (withMergeEphemeralWorktree) and never reads or
+// writes repoRoot's own working tree. Gating on it protected a resource
+// that path never touches, and could block a leaf approve on a dirty file
+// that has nothing to do with the merge actually being attempted.
+
+test('approve of a LEAF item is unaffected by a dirty main checkout, even one colliding with the leaf\'s own declared footprint path (tsk-kv3 Q1) — the root-to-main equivalent test above still refuses, this one must not', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedLeafItem(cwd, 'kv3-leaf-root', 'kv3-leaf-dirty', {
+    verify: 'test -f kv3-leaf-dirty-produced.txt',
+    footprint: 'footprint-guarded.txt',
+  });
+  commitPendingBeforeApprove(cwd, 'kv3-leaf-dirty');
+
+  // Same shape as the root/standalone test above (an uncommitted footprint
+  // path dirtying the main checkout) — for a root that still refuses (D3).
+  // For a leaf, it must NOT: this file sits in repoRoot's own working tree,
+  // which the leaf's ephemeral-worktree merge never reads or writes.
+  fs.writeFileSync(path.join(cwd, 'footprint-guarded.txt'), 'unrelated to the ephemeral merge\n');
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['approve', 'kv3-leaf-dirty']);
+  assert.equal(result.status, 0, `leaf approve must succeed despite the dirty main checkout: ${result.stdout}${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.to, 'delivered');
+  assert.equal(data.target, 'fgw/kv3-leaf-root');
+
+  assert.equal(gitHead(cwd), headBefore, 'main HEAD must be unchanged — the dirty file is still sitting there, untouched, exactly as it was');
+  assert.equal(fs.readFileSync(path.join(cwd, 'footprint-guarded.txt'), 'utf8'), 'unrelated to the ephemeral merge\n', 'the dirty file itself must survive untouched — this gate never claimed to clean it up, only to block on it');
+});
+
 test('approve of a leaf item with a clean merge lands the work on fgw/<root> (not main) via an ephemeral worktree, leaf -> delivered, fgw/<leaf> SURVIVES the approve (tsk-1p9: teardown deferred to the cleanup verb), fgw/<root> survives', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
@@ -255,6 +293,106 @@ test('approve of a leaf item with a clean merge lands the work on fgw/<root> (no
   // the merged content must actually be present on fgw/<root>'s tip.
   const rootTreeFile = gitAtCwd(cwd, ['show', 'fgw/approve-leaf-root:approve-leaf-child-produced.txt']);
   assert.match(rootTreeFile, /ok/);
+
+  // tsk-5dk: mergedSha must be the ROOT branch's own tip (resolved from
+  // repoRoot by branch name, never the ephemeral worktree's own HEAD —
+  // see resolveRefSha's comment in bin/fgos.mjs for why that distinction
+  // matters here specifically).
+  assert.equal(view.work['approve-leaf-child'].mergedInto, 'fgw/approve-leaf-root');
+  assert.equal(view.work['approve-leaf-child'].mergedSha, gitAtCwd(cwd, ['rev-parse', 'fgw/approve-leaf-root']).trim());
+});
+
+// tsk-4ax (D3): catchup as a STANDARD step of approve itself, not only a
+// manual recovery from `blocked` — the core reason this item exists. A
+// leaf whose root has moved since the leaf's own branch was cut must be
+// caught up and landed by a single `approve` call, with no separate
+// `fgos catchup` call ever needed, and the verify that ran during that
+// inline catchup must be the ONLY verify that runs for the whole call —
+// proven with a sentinel, not by timing.
+
+test('approve of a leaf whose root has moved since: auto-catches-up inline, lands successfully, and its own inline verify is the ONLY verify that runs — exactly once, not twice (tsk-4ax core acceptance)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  // Appends one line per verify invocation, so "ran exactly once" is a real
+  // count, not just an existence check that a second run would pass too.
+  const verifyLog = path.join(cwd, 'verify-runs.log');
+  makeRunnerProposedLeafItem(cwd, 'auto-catchup-root', 'auto-catchup-leaf', { verify: `echo run >> ${JSON.stringify(verifyLog)} && test -f auto-catchup-leaf-produced.txt` });
+  commitPendingBeforeApprove(cwd, 'auto-catchup-leaf');
+
+  // The root advances AFTER the leaf's own branch was cut — a genuinely
+  // non-overlapping change, simulating a sibling leaf's own approve
+  // landing on the shared root branch first.
+  gitAtCwd(cwd, ['checkout', 'fgw/auto-catchup-root']);
+  fs.writeFileSync(path.join(cwd, 'sibling-produced.txt'), 'sibling ok\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'sibling leaf merged into root first']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  const headBefore = gitHead(cwd);
+  // No `fgos catchup` call anywhere in this test — approve alone must do it.
+  const result = run(cwd, ['approve', 'auto-catchup-leaf']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.to, 'delivered');
+  assert.equal(data.target, 'fgw/auto-catchup-root');
+
+  assert.equal(gitHead(cwd), headBefore, 'main must never be touched by a leaf approve');
+  const verifyRunCount = fs.readFileSync(verifyLog, 'utf8').trim().split('\n').filter(Boolean).length;
+  assert.equal(verifyRunCount, 1, `verify must run EXACTLY once (the inline catchup) for this whole approve call, not again during the land — ran ${verifyRunCount} times`);
+
+  // Both the sibling's earlier content AND this leaf's own content must be
+  // on the root — proof the catchup merge genuinely combined them, not
+  // just fast-forwarded past one or the other.
+  const rootSiblingFile = gitAtCwd(cwd, ['show', 'fgw/auto-catchup-root:sibling-produced.txt']);
+  assert.match(rootSiblingFile, /sibling ok/);
+  const rootLeafFile = gitAtCwd(cwd, ['show', 'fgw/auto-catchup-root:auto-catchup-leaf-produced.txt']);
+  assert.match(rootLeafFile, /ok/);
+
+  // The leaf's OWN branch must also carry the catchup commit (it was
+  // caught up onto the root, then that whole thing landed).
+  const leafLog = gitAtCwd(cwd, ['log', '--oneline', 'fgw/auto-catchup-leaf']);
+  assert.match(leafLog, /catch-up: merge fgw\/auto-catchup-root into fgw\/auto-catchup-leaf/);
+});
+
+test('approve of a leaf whose root has NOT moved: no catchup attempted at all, unchanged from before this item (regression guard)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedLeafItem(cwd, 'no-catchup-root', 'no-catchup-leaf', { verify: 'test -f no-catchup-leaf-produced.txt' });
+  commitPendingBeforeApprove(cwd, 'no-catchup-leaf');
+
+  const result = run(cwd, ['approve', 'no-catchup-leaf']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.to, 'delivered');
+
+  const leafLog = gitAtCwd(cwd, ['log', '--oneline', 'fgw/no-catchup-leaf']);
+  assert.doesNotMatch(leafLog, /catch-up:/, 'no catchup commit must exist when the root never moved — the ancestor check must have short-circuited before performCatchUp was ever called');
+});
+
+test('approve of a leaf whose inline catchup hits a real conflict: parks blocked (reason merge-conflict), the leaf stays awaiting-approval-shaped (not silently delivered), root untouched', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedLeafItem(cwd, 'catchup-conflict-root', 'catchup-conflict-leaf', { verify: 'true' });
+  commitPendingBeforeApprove(cwd, 'catchup-conflict-leaf');
+
+  // Same-line conflict: the root advances with a same-named file whose
+  // content collides with what the leaf's own commit already touches.
+  gitAtCwd(cwd, ['checkout', 'fgw/catchup-conflict-root']);
+  fs.writeFileSync(path.join(cwd, 'catchup-conflict-leaf-produced.txt'), 'root-side content, different from leaf\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'root touches the same file the leaf does']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  const rootTipBefore = gitAtCwd(cwd, ['rev-parse', 'fgw/catchup-conflict-root']).trim();
+  const result = run(cwd, ['approve', 'catchup-conflict-leaf']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.to, 'blocked');
+  assert.equal(data.reason, 'merge-conflict');
+  assert.equal(data.target, 'fgw/catchup-conflict-root');
+
+  assert.equal(gitAtCwd(cwd, ['rev-parse', 'fgw/catchup-conflict-root']).trim(), rootTipBefore, 'root must be completely untouched by a failed inline catchup');
+  assert.equal(stateView(cwd).work['catchup-conflict-leaf'].status, 'blocked');
 });
 
 test('approve of a runner item that conflicts: aborts the merge, awaiting-approval -> blocked (reason merge-conflict), main left byte-for-byte unchanged (must_have: main never holds a broken merge commit)', () => {

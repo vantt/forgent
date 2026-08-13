@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Delivered-event merge provenance: `fgos approve`'s real merge paths (local
+  root-into-main, local leaf-into-root, GitHub PR merge) now record
+  `mergedSha`/`mergedInto` on the `work.move → delivered` event and the
+  item's own folded view — the sha and branch a change actually landed on,
+  readable straight through `fgos show`/`fgos list` instead of inferred
+  from git after the fact. `fgos move --to delivered` now refuses when
+  `fgw/<id>` exists and is not yet reachable from trunk (no merge evidence
+  to record), unless `--override-reason "<why>"` is given — the override is
+  logged to the item's decision log before the move proceeds. A verify-only
+  pull-door delivery, or an item with no `fgw/<id>` branch at all, is
+  unaffected either way.
+
+- Worker slots: a ceiling on how many work items may run at once. `fgos
+  slots` reports execution-lane occupancy, whether there is room, and the
+  admin lane's fixed reservation — it is the door launchers (herdr-plugin,
+  fgos-fanout) pre-check before standing a worker up. The same ceiling is
+  enforced inside every claim path (`take`, `pick`, and the runner alike),
+  which refuses with `worker-slot ceiling reached` once the lane is full.
+  Occupancy is derived from work items already at `doing`; nothing new is
+  recorded to get it. The ceiling ships UNARMED and stays that way until a
+  person sets it: `fgos setup` writes `workerSlots.ceiling: null`, which
+  refuses nothing, and a project is capped only once someone replaces that
+  with a real count. It is deliberately not armed on your behalf — `fgos
+  doctor` asks every project to run `fgos setup` as routine maintenance, so
+  a number written there would cap a repo that never asked to be capped, and
+  freeze its backlog if it was already running more items than the cap.
+- `fgos doctor` gained a `worker-slots-ceiling-usable` check. A
+  `workerSlots.ceiling` that is not a positive integer — `"8"` as a string,
+  `8.5`, `0`, `-1` — enforces nothing at all, so a project could believe it
+  was capped while running uncapped. The check names that, and reports the
+  deliberate `null` as "unarmed" rather than as a problem.
+- `fgos report <id> --text "..." [--stop-reason ...]` records a driver's
+  closing report on the item, so a result can be read with `fgos show <id>`
+  instead of by watching a terminal pane. `fgos-coding-driving` now records
+  one at every stop, which is what makes a finished worker pane safe for the
+  cockpit to reuse: the result no longer lives only on a screen somebody has
+  to guard.
+
 ### Fixed
 
 - The Claude Code plugin (`plugins/fgOS/`) now ships all 14 coding-domain
@@ -22,6 +62,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `fgos-runner` and `fgos-fanout` now ask for a worker slot before standing
+  a worker up, instead of each enforcing a ceiling of its own. The runner's
+  `runner.parallel.maxRoots`/`maxLeavesPerRoot` and fan-out's cap of 5 keep
+  their values but change role: they bound how large a batch that launcher
+  may propose, while the shared ceiling decides whether the batch runs at
+  all — so the real limit on a machine is one number rather than the sum of
+  three. A batch is trimmed to the number of free slots: the ceiling is hard,
+  and anything fired past it would be refused at the claim door anyway, so a
+  launcher stands up only what the engine granted and defers the rest to the
+  next wave. With no `workerSlots.ceiling` configured, both behave exactly
+  as before. A runner that finds the lane full now ends its run cleanly
+  (`idle`, exit 0) rather than halting with a non-zero exit, and an item
+  refused for lack of room is simply left for a later poll.
+- The runner's discovery sweep now asks for a worker slot too. It stands a
+  real research worker up but never claims the item, so that process was
+  invisible to the ceiling and ran even when the lane was full — the machine
+  could carry more workers than the configured total while `fgos slots`
+  reported fewer.
+- A runner that dispatched nothing now says which of the two happened.
+  "Frontier empty — nothing to do" and "the lane is full, work is waiting"
+  previously printed the same line and returned the same envelope; the idle
+  result now carries `reason` (`frontier-empty` or `worker-slot-ceiling`),
+  and a refusal names the item ids currently holding the slots, so a lane
+  wedged by an abandoned claim is visible instead of looking like an empty
+  backlog.
 - `fgos doctor` gained a `delivered-not-on-trunk` check: it names any item
   whose status says its work was handed over (`delivered`, `retrospective`,
   `cleanup`, `done`) while its own `fgw/<id>` branch is still not reachable
@@ -113,6 +178,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- An item whose root branch was ever synced (`fgos sync-root`), or that was
+  converged into a component (`fgos promote-to-component`), could reach
+  `done` without a retrospective ever having produced anything. Both verbs
+  recorded their merge on the item as a decision but never said it was
+  machine-written, and an untagged decision defaults to `design` — so the
+  cleanup gate read a routine branch merge as someone's reflection on the
+  work and passed the item through. Both records are now tagged as engine
+  bookkeeping. They remain fully visible in `fgos show`; they simply no
+  longer stand in for a retrospective document. Items that were relying on
+  this to pass will now be held at `cleanup` until real synthesis happens.
+
+- Parallel fan-out no longer refuses to dispatch anything when the
+  worker-slot ceiling is unarmed — which is how every project starts, since
+  `fgos setup` writes `workerSlots.ceiling: null` on purpose. In that state
+  `fgos slots` reports room available but no numeric limit
+  (`free: null`), and the fan-out launcher trimmed its batch against that
+  number anyway, reading "no limit" as "no slots" and firing nothing while
+  the machine was completely idle. It now fires the whole batch when no
+  ceiling is armed, and trims only against a real one.
 - `fgos check`'s entropy report no longer under-counts the backlog waiting
   at the front of the lifecycle. The signal filtered on the literal stage
   name `clarify`, which the coding domain retired entirely, so it reported

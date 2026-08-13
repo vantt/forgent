@@ -137,7 +137,10 @@ export async function viewGitHubPRStatus(repoRoot, prNumber, opts = {}) {
     try {
       stdout = gh(
         repoRoot,
-        ['pr', 'view', String(prNumber), '--json', 'state,mergeable,mergeStateStatus,mergedAt,closed,closedAt'],
+        // tsk-5dk D2: mergeCommit added (absent pre-merge, populated once
+        // GitHub actually merges) — additive field only, no other change
+        // to this query or its poll behavior.
+        ['pr', 'view', String(prNumber), '--json', 'state,mergeable,mergeStateStatus,mergedAt,closed,closedAt,mergeCommit'],
         opts,
       );
     } catch (err) {
@@ -167,9 +170,15 @@ export async function viewGitHubPRStatus(repoRoot, prNumber, opts = {}) {
  * call never hits the real gh when the caller supplied a fake) — but does NOT
  * read the settled mergeable value to branch on it: conflict detection is out
  * of scope for this slice. Resolves `{outcome:'merged', step:'merge',
- * prNumber}` on a clean merge. Any gh failure resolves `{outcome:'blocked',
- * step, prNumber, reason, detail}` — step is 'status' when the internal status
- * read failed, 'merge' when the merge call itself failed.
+ * prNumber, mergeCommit}` on a clean merge — `mergeCommit` is read via one
+ * more `viewGitHubPRStatus` call after the merge lands (tsk-5dk D2), reusing
+ * its existing poll-until-settled mechanism unchanged; `mergeCommit` can
+ * still read `null`/`undefined` if GitHub's own eventual consistency hasn't
+ * attached it yet by the time that poll settles on `mergeable` — an accepted
+ * rough edge (this slice), same class of gap the module already documents
+ * elsewhere, never silently retried past. Any gh failure resolves
+ * `{outcome:'blocked', step, prNumber, reason, detail}` — step is 'status'
+ * when a status read failed, 'merge' when the merge call itself failed.
  */
 export async function mergeGitHubPR(repoRoot, prNumber, opts = {}) {
   if (prNumber == null || prNumber === '') {
@@ -184,5 +193,6 @@ export async function mergeGitHubPR(repoRoot, prNumber, opts = {}) {
   } catch (err) {
     return blockedFrom('merge', prNumber, err);
   }
-  return { outcome: 'merged', step: 'merge', prNumber };
+  const postMerge = await viewGitHubPRStatus(repoRoot, prNumber, opts);
+  return { outcome: 'merged', step: 'merge', prNumber, mergeCommit: postMerge.mergeCommit };
 }
