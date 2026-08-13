@@ -919,7 +919,15 @@ function submitWork(dir, text, opts = {}) {
     // read the real ask instead of just the classified summary.
     description: text,
     kind,
-    status: 'todo',
+    // Per work-item-backlog-status D2: the default stays 'todo' for both
+    // `submit` and `add` -- `opts.backlog` is the opt-in escape hatch that
+    // marks an item as a not-yet-committed idea from the moment of
+    // creation, instead of requiring submit-then-move. Same independent
+    // optional-flag shape as `opts.async` below; an omitted --backlog flag
+    // leaves this byte-identical to the prior hardcoded 'todo'. `add`
+    // deliberately gains no such flag (D2, explicit human answer) -- it is
+    // for already-planned work.
+    status: opts.backlog ? 'backlog' : 'todo',
     // Per D4 (str83-fgos-slash-commands): --deps threaded from opts the
     // same way --domain/--discovered-from already are, immediately below.
     // opts.deps defaults to [] (parseListFlag's own undefined-input
@@ -1277,6 +1285,10 @@ async function runVerb(verb, flags, positional, dir) {
       const text = requireField(positional[0], 'submit requires a free-text description: fgos submit "<description>" [--async|--unattended]');
       const opts = {
         async: Boolean(flags.async || flags.unattended),
+        // Per work-item-backlog-status D2: same independent boolean-flag
+        // shape as --async above -- creates the item directly at
+        // status: 'backlog' instead of the default 'todo'.
+        backlog: Boolean(flags.backlog),
         domain: optionalField(flags.domain, 'submit --domain requires a domain name (e.g. coding/synthetic); omit --domain entirely to use the default.'),
         // Per work-graph-intelligence S2b (producer A): two-hop like domain —
         // parsed here, threaded into submitWork's work object below.
