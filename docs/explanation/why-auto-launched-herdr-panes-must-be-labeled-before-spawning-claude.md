@@ -6,7 +6,12 @@ source_capture_ids: [tsk-2ja, tsk-57q]
 ---
 # Why auto-launched herdr panes must be labeled before spawning `claude`, unlike person-triggered ones
 
-herdr-plugin's `fg:agents-N` launch pattern already had a working shape
+(These worker tabs carried an earlier name when the work below landed;
+the worker-slot item renamed them to `fg:workers-N`, the name used
+throughout here. The quoted passages are reproduced verbatim from that
+time.)
+
+herdr-plugin's `fg:workers-N` launch pattern already had a working shape
 for a person-triggered launch: the Discover button opens a pane, spawns
 `claude '/fgOS:discover <id>'`, and the pane's own title/label arrives
 *later*, written from inside the launched session itself once it starts
@@ -62,13 +67,13 @@ attempt.
 
 `tsk-2ja`'s guard/launch machinery (`open_auto_discover_pane`,
 `has_labeled_pane`) was built around a single-item shape: one work item
-id, one dynamically-created `fg:agents-N` pane, one id-shaped title to
+id, one dynamically-created `fg:workers-N` pane, one id-shaped title to
 scan for. The auto-merge/retro/cleanup launcher (`tsk-57q`) doesn't fit
 that shape at all — `/fgOS:merge-loop`/`/fgOS:retro-loop`/
 `/fgOS:cleanup-loop` are pool-sweep verbs with no single item id to
 launch against, and they target the *fixed*, already-resolved
 `fg:operation` tab (`tsk-5lr`) rather than a dynamically-picked
-`fg:agents-N` slot:
+`fg:workers-N` slot:
 
 > "New `PaneOrchestrator`/`PaneRegistry` trait methods for the fixed-pane
 > launch and fixed-title guard, since neither existing

@@ -68,7 +68,7 @@ the fix isn't reading the count more carefully — it's choosing an
 implementation shape that routes around the flagged symbol entirely, then
 verifying the *real* edit target separately.
 
-`tsk-5lr` (capping herdr-plugin's `fg:agents-N` tabs and adding a fixed
+`tsk-5lr` (capping herdr-plugin's `fg:workers-N` tabs and adding a fixed
 `fg:operation` tab) hit this: the natural-looking fix was adding a "no
 room" variant to the `PaneOrchestrator` trait's return type.
 
