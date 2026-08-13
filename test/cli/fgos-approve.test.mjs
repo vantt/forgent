@@ -133,6 +133,11 @@ test('approve of a runner item (happy path): merges fgw/<id> into main, verifies
   // yet at this point in the sequence.
   assert.equal(view.settlements?.['approve-runner-item'], undefined);
   assert.ok(fs.existsSync(path.join(cwd, 'approve-runner-item-produced.txt')), 'the merged file must be present on main');
+  // tsk-5dk: a real approve merge now records merge evidence — mergedSha
+  // must be main's own real post-merge commit, readable straight off the
+  // delivered event, not inferred from git afterward.
+  assert.equal(view.work['approve-runner-item'].mergedInto, 'main');
+  assert.equal(view.work['approve-runner-item'].mergedSha, gitAtCwd(cwd, ['rev-parse', 'main']).trim());
 
   const branches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
   assert.match(branches, /fgw\/approve-runner-item/, 'the merged branch must survive approve — deleted later by the cleanup verb, not here');
@@ -288,6 +293,13 @@ test('approve of a leaf item with a clean merge lands the work on fgw/<root> (no
   // the merged content must actually be present on fgw/<root>'s tip.
   const rootTreeFile = gitAtCwd(cwd, ['show', 'fgw/approve-leaf-root:approve-leaf-child-produced.txt']);
   assert.match(rootTreeFile, /ok/);
+
+  // tsk-5dk: mergedSha must be the ROOT branch's own tip (resolved from
+  // repoRoot by branch name, never the ephemeral worktree's own HEAD —
+  // see resolveRefSha's comment in bin/fgos.mjs for why that distinction
+  // matters here specifically).
+  assert.equal(view.work['approve-leaf-child'].mergedInto, 'fgw/approve-leaf-root');
+  assert.equal(view.work['approve-leaf-child'].mergedSha, gitAtCwd(cwd, ['rev-parse', 'fgw/approve-leaf-root']).trim());
 });
 
 // tsk-4ax (D3): catchup as a STANDARD step of approve itself, not only a

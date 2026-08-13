@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Delivered-event merge provenance: `fgos approve`'s real merge paths (local
+  root-into-main, local leaf-into-root, GitHub PR merge) now record
+  `mergedSha`/`mergedInto` on the `work.move → delivered` event and the
+  item's own folded view — the sha and branch a change actually landed on,
+  readable straight through `fgos show`/`fgos list` instead of inferred
+  from git after the fact. `fgos move --to delivered` now refuses when
+  `fgw/<id>` exists and is not yet reachable from trunk (no merge evidence
+  to record), unless `--override-reason "<why>"` is given — the override is
+  logged to the item's decision log before the move proceeds. A verify-only
+  pull-door delivery, or an item with no `fgw/<id>` branch at all, is
+  unaffected either way.
+
 - Worker slots: a ceiling on how many work items may run at once. `fgos
   slots` reports execution-lane occupancy, whether there is room, and the
   admin lane's fixed reservation — it is the door launchers (herdr-plugin,

@@ -122,6 +122,32 @@ function currentHead(cwd) {
   return gitAt(cwd, ['rev-parse', 'HEAD']).trim();
 }
 
+// tsk-5dk: resolves a named branch/ref's own tip sha, not "whatever HEAD
+// happens to be in some worktree's checkout" (currentHead above) — branch
+// refs are shared across every linked worktree of the same repo, so this
+// is correct to call from repoRoot even when the actual merge commit was
+// created in a different (e.g. ephemeral) worktree of the same repo, and
+// stays correct for an idempotent already-merged re-approve too (always
+// reads the target's real current tip, never a stale pre-merge snapshot).
+function resolveRefSha(cwd, ref) {
+  return gitAt(cwd, ['rev-parse', ref]).trim();
+}
+
+// tsk-5dk: ancestry probe for `move --to delivered`'s refusal check below.
+// Plain execFileSync + try/catch, not gitAt (gitAt always throws on any
+// non-zero exit; here exit 1 is a legitimate "not an ancestor" answer, not
+// an error) — same shape the upstream-branch probe a little below already
+// uses for the same reason.
+function isBranchReachableFromTrunk(cwd, branch, trunk) {
+  try {
+    execFileSync('git', ['merge-base', '--is-ancestor', `refs/heads/${branch}`, trunk], { cwd, encoding: 'utf8', shell: false });
+    return true;
+  } catch (err) {
+    if (err.status === 1) return false;
+    throw new StoreError('validation', `git merge-base --is-ancestor "${branch}" "${trunk}" failed in "${cwd}": ${err.message}`);
+  }
+}
+
 // `return`'s per-item gate — scoped to `cwd`'s OWN subtree, never the whole
 // real repo (`cwd` is the item's working directory, not necessarily the git
 // top-level: STR60 dogfood-fixture has `.fgos` under `repo/dogfood-fixture/`,
@@ -1422,6 +1448,36 @@ async function runVerb(verb, flags, positional, dir) {
       // everywhere else" — this verb just forwards whatever the caller
       // supplied.
       const reason = optionalField(flags.reason, 'move --reason requires a non-empty reason value (omit --reason entirely when not rejecting a proposal)');
+      // tsk-5dk: a hand-typed move to delivered writes no merge evidence
+      // (mergedSha/mergedInto only ever come from approve's real merge
+      // paths, src/state/store.mjs) — refuse when fgw/<id> is a live
+      // branch not yet reachable from trunk, so this door can't silently
+      // mark real, unmerged work "delivered". --override-reason keeps a
+      // real escape hatch, but only when it actually carries a reason,
+      // and only after that reason lands in the decision log first.
+      if (to === 'delivered') {
+        const repoRoot = process.cwd();
+        const branch = branchNameFor(id);
+        if (branchExists(repoRoot, branch)) {
+          const trunk = detectTrunk(repoRoot);
+          if (!isBranchReachableFromTrunk(repoRoot, branch, trunk)) {
+            const overrideReason = optionalField(flags['override-reason'], 'move --to delivered --override-reason requires a non-empty reason value (omit --override-reason entirely when the branch is already reachable, or use "fgos approve" to merge for real)');
+            if (!overrideReason) {
+              throw new StoreError(
+                'validation',
+                `move: "${id}" has a live "${branch}" branch not yet reachable from "${trunk}" — moving it to "delivered" here would record no merge evidence (mergedSha/mergedInto). `
+                  + `Use "fgos approve ${id}" to merge for real, or pass --override-reason "<why>" to force this move anyway (recorded to the decision log).`,
+              );
+            }
+            addDecision(dir, {
+              id,
+              text: `move --to delivered override for "${id}": "${branch}" not reachable from "${trunk}"`,
+              rationale: overrideReason,
+              kind: 'engine',
+            });
+          }
+        }
+      }
       const { event } = moveWork(dir, { id, to, expectedStatus, reason, role: 'human' });
       return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
     }
@@ -3006,7 +3062,7 @@ async function runVerb(verb, flags, positional, dir) {
     // `events.jsonl`) and returns `event: null` instead of throwing, so
     // every call site can still finish its own cleanup and return a
     // truthful envelope.
-    function moveDeliveredOrRecordFault(dir, id, phase) {
+    function moveDeliveredOrRecordFault(dir, id, phase, { mergedSha, mergedInto } = {}) {
       try {
         // Test-only failure seam (tsk-480 D3), same shape as
         // FGOS_GH_COMMAND (bin/fgos.mjs ghCommandOpts): an env var read
@@ -3016,7 +3072,7 @@ async function runVerb(verb, flags, positional, dir) {
         if (process.env.FGOS_TEST_FORCE_APPROVE_LOCK_TIMEOUT === id) {
           throw new EventLogError('lock-timeout', `approve: simulated lock-timeout for "${id}" (FGOS_TEST_FORCE_APPROVE_LOCK_TIMEOUT)`);
         }
-        const { event } = moveWork(dir, { id, to: 'delivered', expectedStatus: 'awaiting-approval', role: 'human' });
+        const { event } = moveWork(dir, { id, to: 'delivered', expectedStatus: 'awaiting-approval', role: 'human', mergedSha, mergedInto });
         return { event, error: null, diagnosticLog: null };
       } catch (err) {
         // Only an EventLogError (the write itself failing — e.g.
@@ -3279,7 +3335,12 @@ async function runVerb(verb, flags, positional, dir) {
           // cleanupMergedBranch runs — the local fgw/<id> branch and its pushed
           // origin copy are both left in place after a server-side merge (no
           // local cleanup mechanism exists for a branch merged on GitHub).
-          const { event } = moveWork(dir, { id, to: 'delivered', expectedStatus: 'awaiting-approval', role: 'human' });
+          // tsk-5dk D2: mergeCommit comes from mergeGitHubPR's own post-merge
+          // status read (github-adapter.mjs) — may be undefined if GitHub's
+          // eventual consistency hasn't attached it yet (accepted rough
+          // edge, same as the module's own doc comment); mergedInto matches
+          // the literal 'main' the local root-into-main path already uses.
+          const { event } = moveWork(dir, { id, to: 'delivered', expectedStatus: 'awaiting-approval', role: 'human', mergedSha: result.mergeCommit?.oid, mergedInto: 'main' });
           return { id, mode: 'github', to: 'delivered', prNumber, seq: event.seq };
         }
         // blocked — mirrors the local merge-conflict/verify-fail-post-merge
@@ -3531,7 +3592,17 @@ async function runVerb(verb, flags, positional, dir) {
             // status recording is best-effort from here regardless of
             // outcome (previously: also gated cleanup on this write
             // succeeding; cleanup no longer happens on this path at all).
-            const moveResult = moveDeliveredOrRecordFault(dir, id, 'leaf-into-root merge');
+            // tsk-5dk: read the ephemeral worktree's OWN HEAD, not
+            // rootBranch's ref on repoRoot — withMergeEphemeralWorktree
+            // (worktree.mjs) only force-moves the real branch AFTER this
+            // callback returns (`git branch -f branch endCommit`), so
+            // reading repoRoot's ref here would still see the PRE-merge
+            // sha. `ephemeral.path`'s HEAD is correct in both the fresh-
+            // merge case (it IS the just-created endCommit) and the
+            // idempotent-already-merged case (HEAD never advanced past
+            // rootBranch's existing tip, which is exactly right there too).
+            const mergedSha = currentHead(ephemeral.path);
+            const moveResult = moveDeliveredOrRecordFault(dir, id, 'leaf-into-root merge', { mergedSha, mergedInto: rootBranch });
             if (!moveResult.event) {
               return {
                 id,
@@ -3681,7 +3752,13 @@ async function runVerb(verb, flags, positional, dir) {
         // (already real and permanent) — now moot on this path, since
         // cleanup no longer happens here at all (tsk-1p9 D1: deferred to
         // the `cleanup` verb, gated by D7's TTL and D8's harness).
-        const moveResult = moveDeliveredOrRecordFault(dir, id, 'root-into-main merge');
+        // tsk-5dk: same resolveRefSha-of-the-target-branch approach as the
+        // leaf-into-root path above, kept uniform even though this merge
+        // already ran directly on repoRoot (no ephemeral worktree here) —
+        // still correct, and still robust for an idempotent already-merged
+        // re-approve (see the leaf-into-root comment above for why).
+        const mergedSha = resolveRefSha(repoRoot, 'main');
+        const moveResult = moveDeliveredOrRecordFault(dir, id, 'root-into-main merge', { mergedSha, mergedInto: 'main' });
         if (!moveResult.event) {
           return {
             id,
