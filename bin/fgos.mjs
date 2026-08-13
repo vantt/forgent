@@ -1861,6 +1861,18 @@ async function runVerb(verb, flags, positional, dir) {
         );
       }
       const { event } = editWork(dir, { id, patch, role: 'human' });
+      if (patch.priority !== undefined) {
+        // tsk-sq9: mark this priority as human-set so plan.mjs's resolvePlan
+        // refined pass (~line 639) knows to skip its own auto-recompute
+        // instead of silently overwriting it.
+        addDecision(dir, {
+          id,
+          text: `priority set to ${patch.priority} via edit --priority`,
+          source: 'edit',
+          kind: 'priority-override',
+          rationale: "tsk-sq9: mark this as a human override so plan.mjs's refined pass does not silently overwrite it",
+        });
+      }
       return { id, fields: Object.keys(patch), seq: event.seq };
     }
 

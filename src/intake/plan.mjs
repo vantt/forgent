@@ -636,7 +636,24 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
       risk: work.risk,
       blastRadius: verdict.blastRadius,
     });
-    editWork(dir, { id, patch: { priority }, role });
+    // tsk-sq9: a human's `edit --priority` logs a `priority-override`
+    // decision (bin/fgos.mjs's `edit` handler) -- if one is already on
+    // record for this item, the refined pass skips its own overwrite
+    // instead of silently clobbering the human's deliberate value. `view`
+    // was read fresh at the top of this call, so it reflects any override
+    // logged before this resolvePlan invocation.
+    const priorityOverridden = (view.decisionsById?.[id] ?? []).some((d) => d.kind === 'priority-override');
+    if (priorityOverridden) {
+      addDecision(dir, {
+        id,
+        text: 'priority: skipped refined-pass overwrite -- priority-override decision already present',
+        source: 'resolvePlan',
+        kind: 'engine',
+        rationale: 'tsk-sq9: a human already set priority via edit --priority; the refined pass would otherwise silently clobber it',
+      });
+    } else {
+      editWork(dir, { id, patch: { priority }, role });
+    }
     // tsk-4hb: see discovery.mjs's rough pass -- same observability gap,
     // same fix, the refined pass's own call site.
     if (work.risk && !isRecognizedRisk(work.risk)) {
