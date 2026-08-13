@@ -308,6 +308,24 @@ pub struct App {
     /// restart clears it, which is correct: nothing this adapter believed
     /// about an in-flight launch survives a restart either.
     pub pending_discover_pane: Option<String>,
+    /// The admin-lane pane this dashboard has launched an `/fgOS:merge-next`
+    /// run into but has not yet seen exit, if any (tsk-4ry). Unlike
+    /// `pending_discover_pane` above, `/fgOS:merge-next` holds no
+    /// lingering claimed-item status for its run's duration — it is one
+    /// CLI call, not a claim-and-hold — so there is no engine-truth
+    /// signal to catch up to; the pane's own presence in a fresh scan is
+    /// the only "still running" signal available. Cleared once the pane
+    /// id is no longer present in a scan (`retire_settled_pending_operation_panes`,
+    /// below) — never "claimed and doing", since there is nothing to
+    /// claim. Same in-process, never-persisted discipline as
+    /// `pending_discover_pane`: a herdr-plugin restart clears it, which
+    /// is correct, since nothing this adapter believed about an in-flight
+    /// launch survives a restart either.
+    pub pending_merge_pane: Option<String>,
+    /// Same shape as `pending_merge_pane`, for `/fgOS:retro-next`.
+    pub pending_retro_pane: Option<String>,
+    /// Same shape as `pending_merge_pane`, for `/fgOS:cleanup-next`.
+    pub pending_cleanup_pane: Option<String>,
 }
 
 impl App {
@@ -341,6 +359,9 @@ impl App {
             operation_panes: None,
             pending_worker_panes: HashSet::new(),
             pending_discover_pane: None,
+            pending_merge_pane: None,
+            pending_retro_pane: None,
+            pending_cleanup_pane: None,
         }
     }
 
@@ -654,6 +675,9 @@ impl App {
             operation_panes: None,
             pending_worker_panes: HashSet::new(),
             pending_discover_pane: None,
+            pending_merge_pane: None,
+            pending_retro_pane: None,
+            pending_cleanup_pane: None,
         }
     }
 
@@ -810,6 +834,7 @@ impl App {
                 }
                 self.retire_settled_pending_panes(&panes);
                 self.retire_settled_pending_discover_pane();
+                self.retire_settled_pending_operation_panes(&panes);
                 self.last_error = None;
             }
             Err(err) => self.last_error = Some(err.to_string()),
@@ -866,6 +891,32 @@ impl App {
             if !self.pending_worker_panes.contains(pane_id) {
                 self.pending_discover_pane = None;
             }
+        }
+    }
+
+    /// Clears `pending_merge_pane`/`pending_retro_pane`/`pending_cleanup_pane`
+    /// once each settles (tsk-4ry). Unlike `retire_settled_pending_discover_pane`
+    /// above, this cannot reuse `pending_worker_panes`'s own membership
+    /// check: the fixed `fg:operation` tab's admin panes are launched
+    /// directly by `pane_orchestrator.launch_merge_loop`/etc
+    /// (`main::auto_launch_operation_panes`), never through `launch_worker`,
+    /// so they are never inserted into `pending_worker_panes` in the first
+    /// place. And unlike the discover case, `/fgOS:merge-next`/`retro-next`/
+    /// `cleanup-next` hold no lingering claimed-item status to catch up to
+    /// (D9: the admin lane never claims a work item at all) — so "settled"
+    /// here means only "gone from the scan", the plain half of
+    /// `retire_settled_pending_panes`'s own rule, checked directly against
+    /// this same tick's fresh `panes` scan.
+    fn retire_settled_pending_operation_panes(&mut self, panes: &[PaneSnapshot]) {
+        let still_in_scan = |pane_id: &str| panes.iter().any(|pane| pane.pane_id == pane_id);
+        if self.pending_merge_pane.as_deref().is_some_and(|id| !still_in_scan(id)) {
+            self.pending_merge_pane = None;
+        }
+        if self.pending_retro_pane.as_deref().is_some_and(|id| !still_in_scan(id)) {
+            self.pending_retro_pane = None;
+        }
+        if self.pending_cleanup_pane.as_deref().is_some_and(|id| !still_in_scan(id)) {
+            self.pending_cleanup_pane = None;
         }
     }
 
