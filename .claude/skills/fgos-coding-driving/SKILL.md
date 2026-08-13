@@ -1,5 +1,6 @@
 ---
 name: fgos-coding-driving
+user-invocable: false
 description: >-
   Drive one coding-domain work item through its own lifecycle, one stage at
   a time, until it hits a ceiling, a question only a person can answer, or

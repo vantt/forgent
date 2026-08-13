@@ -1,5 +1,6 @@
 ---
 name: fgos-coding-validating
+user-invocable: false
 description: >-
   Prove a plan holds up against real evidence before an item is allowed onto
   the `executing` stage. Use once `fgos-coding-planning` has written and approved

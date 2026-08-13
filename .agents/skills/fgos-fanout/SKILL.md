@@ -1,5 +1,6 @@
 ---
 name: fgos-fanout
+user-invocable: false
 description: >-
   Run N already-decomposed children of one item concurrently instead of one
   at a time. Given a parent id and a candidate set (children of that

@@ -1,5 +1,6 @@
 ---
 name: fgos-clarifying
+user-invocable: false
 description: >-
   Read a raw submission's text and decide, without asking anyone, whether
   its intent is already understood — asking a person only when a genuine

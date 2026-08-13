@@ -191,3 +191,44 @@ test('.agents/skills/_shared and plugins/fgOS/skills/_shared mirror each other b
 test('.claude/skills has no _shared directory of its own (retired, tsk-1qi — every wrapper redirects to .agents/skills, whose own _shared already covers every reference)', () => {
   assert.equal(fs.existsSync(path.join(CLAUDE_SKILLS_ROOT, '_shared')), false);
 });
+
+// tsk-424n (D6): the 14 coding-domain dev-skills carry `user-invocable:
+// false` -- dispatch-only, hidden from the human-typed `/` menu but still
+// fully visible to and invocable by the model/Skill tool (Claude Code
+// docs, code.claude.com/docs/en/skills.md: "The user-invocable field only
+// controls menu visibility, not Skill tool access"). The ~35 CLI-wrapper
+// skills (the ones a human actually types) are NOT in this repo's
+// `.claude/skills`/`.agents/skills` at all -- they live only under
+// `plugins/fgOS/skills/` -- so this check only ever needs to prove the
+// dev-skills carry the field and `distill` (the one non-fgos-* entry
+// mirrored here) does not.
+
+test('every fgos-* dev-skill source in .agents/skills carries user-invocable: false', () => {
+  for (const name of listFgosSkillDirs(AGENTS_SKILLS_ROOT)) {
+    const sourceContent = fs.readFileSync(path.join(AGENTS_SKILLS_ROOT, name, 'SKILL.md'), 'utf8');
+    assert.match(
+      extractFrontmatter(sourceContent),
+      /^user-invocable: false$/m,
+      `${name}/SKILL.md is missing "user-invocable: false" in its frontmatter`,
+    );
+  }
+});
+
+test('every fgos-* dev-skill wrapper in .claude/skills inherits user-invocable: false from its source (frontmatter is copied verbatim)', () => {
+  for (const name of listFgosSkillDirs(CLAUDE_SKILLS_ROOT)) {
+    const wrapperContent = fs.readFileSync(path.join(CLAUDE_SKILLS_ROOT, name, 'SKILL.md'), 'utf8');
+    assert.match(extractFrontmatter(wrapperContent), /^user-invocable: false$/m);
+  }
+});
+
+test('every fgos-* dev-skill mirrored into plugins/fgOS/skills also carries user-invocable: false (kept byte-identical to its .agents/skills source)', () => {
+  for (const name of listFgosSkillDirs(AGENTS_SKILLS_ROOT)) {
+    const pluginContent = fs.readFileSync(path.join(PLUGIN_SKILLS_ROOT, name, 'SKILL.md'), 'utf8');
+    assert.match(extractFrontmatter(pluginContent), /^user-invocable: false$/m);
+  }
+});
+
+test('distill (the one non-fgos-* skill mirrored in .agents/skills and .claude/skills) does NOT carry user-invocable: false — only the 14 dev-skills are in scope for D6', () => {
+  const distillSource = fs.readFileSync(path.join(AGENTS_SKILLS_ROOT, 'distill', 'SKILL.md'), 'utf8');
+  assert.doesNotMatch(extractFrontmatter(distillSource), /user-invocable/);
+});

@@ -1,5 +1,6 @@
 ---
 name: fgos-coding-implement
+user-invocable: false
 description: >-
   Implement, verify, and hand back exactly one claimed coding-domain item at
   stage `executing`. Use once an item has already cleared `discovery` and
