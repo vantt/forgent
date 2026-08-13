@@ -3431,7 +3431,12 @@ async function runVerb(verb, flags, positional, dir) {
           // the target's tip BEFORE this callback runs, so the slot must
           // already be held by the time that read happens, not acquired
           // from inside it (that would leave the tip read unprotected).
-          return await withMergeTargetSlot(repoRoot, rootBranch, async () => {
+          // tsk-5k4: withLockRetry must wrap the call that can actually
+          // throw lock-held (withMergeTargetSlot's own acquire) — the
+          // runMerge below wrapping only mergeRunnerItem(...,{targetSlot:
+          // true}) never catches anything, since that path skips its own
+          // lock acquire once the caller already holds the target's slot.
+          return await runMerge(() => withMergeTargetSlot(repoRoot, rootBranch, async () => {
             // tsk-4ax (D3): catchup as a STANDARD step, not only a recovery
             // from `blocked` — if the target isn't yet an ancestor of the
             // branch, catch it up FIRST, still inside the slot (so the
@@ -3628,7 +3633,7 @@ async function runVerb(verb, flags, positional, dir) {
               postLand: result.postLand,
             };
             });
-          });
+          }));
         }
 
         // tsk-kv3 (Q1): unlike leaf->root above, THIS path genuinely merges
@@ -3966,7 +3971,12 @@ async function runVerb(verb, flags, positional, dir) {
         // tsk-xyr (§E): same target-slot-outside-the-ephemeral-worktree
         // ordering as approve's leaf-to-root path above — the slot must be
         // held before createDetachedMergeWorktree reads the target's tip.
-        return await withMergeTargetSlot(repoRoot, targetBranch, async () => {
+        // tsk-5k4: withLockRetry must wrap the call that can actually throw
+        // lock-held (withMergeTargetSlot's own acquire) — runMerge alone
+        // around the inner mergeRunnerItem(...,{targetSlot:true}) below
+        // never catches anything, since that path skips its own lock
+        // acquire entirely once the caller already holds the target's slot.
+        return await runMerge(() => withMergeTargetSlot(repoRoot, targetBranch, async () => {
           // tsk-4ax (D3): same inbound-gate catchup as approve's leaf-to-root
           // path — still inside the slot, so the target provably cannot
           // move between this check and the land below.
@@ -4007,7 +4017,7 @@ async function runVerb(verb, flags, positional, dir) {
             effectiveItem = { ...item, branchHeadAtReturn: catchupResult.catchupHead };
           }
           return await withMergeEphemeralWorktree(repoRoot, item.parent, async (ephemeral) => runAndReport(ephemeral.path, repoRoot, true, effectiveItem));
-        });
+        }));
       }
       // tsk-66t: a root with no parent merges directly on the shared main
       // checkout (runAndReport(repoRoot) below), unlike the item.parent
