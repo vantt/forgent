@@ -8,6 +8,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import {
   LEVELS,
   DEFAULT_LEVEL,
@@ -18,6 +20,7 @@ import {
   canAutoApproveMergedGate,
   COST_REVERSIBLE,
 } from '../../src/state/gate-bypass.mjs';
+import { addWork } from '../../src/state/store.mjs';
 
 function tmpDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-gate-bypass-'));
@@ -381,4 +384,61 @@ test('canAutoApproveMergedGate: D10 — word boundaries hold on footprint paths 
     footprint: ['src/authoring/index.mjs', 'test/authoring.test.mjs'],
   };
   assert.equal(canAutoApproveMergedGate(item, CLEAN_PLAN, [], COST_REVERSIBLE, 'heavy'), true);
+});
+
+// ─── fgos-coding-validating's own "check whether the gate can auto-approve"
+// snippet (tsk-blk) — the pure-function tests above always receive
+// `childSpecs` already parsed (a real JS array), so they can never exercise
+// the `JSON.parse(process.argv[4])` call the SKILL.md's own documented
+// `node -e` snippet makes on a raw string. This extracts that exact snippet
+// from the real skill file and runs it as a real subprocess, so the test
+// breaks if the doc's own snippet ever drifts from what is asserted here.
+
+const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+
+function extractGateCheckSnippet() {
+  const skillPath = path.join(REPO_ROOT, '.claude/skills/fgos-coding-validating/SKILL.md');
+  const source = fs.readFileSync(skillPath, 'utf8');
+  const match = source.match(/```bash\nroot=\$\(git rev-parse[\s\S]*?\nnode -e "\n([\s\S]*?)\n"\s*--[\s\S]*?\n```/);
+  assert.ok(match, `could not find the gate-check node -e snippet in ${skillPath} -- this test's own extraction regex needs updating to match the doc`);
+  return match[1];
+}
+
+function runGateCheckSnippet({ fgosRoot, itemId, planPath, childSpecsArg, costVerdict }) {
+  const script = extractGateCheckSnippet();
+  const result = spawnSync(
+    process.execPath,
+    ['-e', script, '--', fgosRoot, itemId, planPath, childSpecsArg, costVerdict],
+    { cwd: REPO_ROOT, encoding: 'utf8' },
+  );
+  return result;
+}
+
+function tmpGateCheckFixture() {
+  const fgosRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-gate-check-snippet-'));
+  const fgosDir = path.join(fgosRoot, '.fgos');
+  fs.mkdirSync(fgosDir, { recursive: true });
+  addWork(fgosDir, { id: 'gate-check-fixture', title: 'Fixture item', description: 'fixture, not real work', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', tier: 'light' });
+  fs.writeFileSync(path.join(fgosDir, 'gate-bypass.json'), JSON.stringify({ level: 'standard' }));
+  const planPath = path.join(fgosRoot, 'plan.md');
+  fs.writeFileSync(planPath, CLEAN_PLAN);
+  return { fgosRoot, planPath };
+}
+
+test('fgos-coding-validating gate-check snippet: valid childSpecs JSON round-trips through the real snippet', () => {
+  const { fgosRoot, planPath } = tmpGateCheckFixture();
+  const result = runGateCheckSnippet({
+    fgosRoot, itemId: 'gate-check-fixture', planPath, childSpecsArg: '[]', costVerdict: COST_REVERSIBLE,
+  });
+  assert.equal(result.status, 0, `snippet should exit 0 on valid input, got status ${result.status}, stderr:\n${result.stderr}`);
+  assert.equal(result.stdout.trim(), 'true', `expected 'true' for a clean reversible item, got stdout:\n${result.stdout}\nstderr:\n${result.stderr}`);
+});
+
+test('fgos-coding-validating gate-check snippet: malformed childSpecs JSON fails closed to "false", never an uncaught crash (tsk-blk, tsk-224 gap)', () => {
+  const { fgosRoot, planPath } = tmpGateCheckFixture();
+  const result = runGateCheckSnippet({
+    fgosRoot, itemId: 'gate-check-fixture', planPath, childSpecsArg: '[{"title": "x",]', costVerdict: COST_REVERSIBLE,
+  });
+  assert.equal(result.stdout.trim(), 'false', `expected the documented fail-closed 'false' on malformed JSON, got stdout:\n${JSON.stringify(result.stdout)}\nstderr:\n${result.stderr}`);
+  assert.equal(result.stderr.trim(), '', `expected no raw stack trace on stderr for a documented fail-closed path, got:\n${result.stderr}`);
 });

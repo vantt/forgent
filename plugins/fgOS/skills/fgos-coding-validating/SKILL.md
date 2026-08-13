@@ -264,7 +264,7 @@ Promise.all([resolveModule('./src/state/store.mjs', ['listWork']), resolveModule
   const childSpecs = JSON.parse(process.argv[4]);
   const level = readGateBypassLevel(fgosDir);
   console.log(canAutoApproveMergedGate(item, planText, childSpecs, process.argv[5], level) ? 'true' : 'false');
-});
+}).catch(() => console.log('false'));
 " -- "$root" "<item-id>" "docs/history/<feature>/plan.md" '<the child-spec JSON array from plan.md, or []>' "<REVERSIBLE|EXPENSIVE>"
 ```
 
