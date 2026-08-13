@@ -143,7 +143,7 @@ test('review of a legacy proposed item (no branch, no headAtTake/headAtReturn) d
   const cwd = tmpCwd();
   addOk(cwd, 'review-legacy-item');
   run(cwd, ['move', 'review-legacy-item', '--to', 'doing']);
-  run(cwd, ['move', 'review-legacy-item', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'review-legacy-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 
   const result = run(cwd, ['review', 'review-legacy-item']);
   assert.equal(result.status, 0, result.stderr);
@@ -812,7 +812,7 @@ test('merge next run from inside a linked worktree without --dir is refused, exi
   const { main, wt } = tmpLinkedWorktree();
   assert.equal(run(main, ['add', 'solo', '--title', 'Solo', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(run(main, ['move', 'solo', '--to', 'doing']).status, 0);
-  assert.equal(run(main, ['move', 'solo', '--to', 'awaiting-approval']).status, 0);
+  assert.equal(run(main, ['move', 'solo', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]).status, 0);
   // Confirm the real store genuinely has a ready item, so a refusal below
   // cannot be mistaken for a true "nothing ready" negative.
   assert.deepEqual(envelopeData(run(main, ['merge', 'list']).stdout).ready, ['solo']);
@@ -842,7 +842,7 @@ test('merge list: a proposed item whose dep is already done is ready', () => {
   // park it 'blocked' instead of 'done' — a false negative for this test.
   assert.equal(run(cwd, ['add', 'dep', '--title', 'Dep', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(run(cwd, ['move', 'dep', '--to', 'doing']).status, 0);
-  assert.equal(run(cwd, ['move', 'dep', '--to', 'awaiting-approval']).status, 0);
+  assert.equal(run(cwd, ['move', 'dep', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]).status, 0);
   const approveResult = envelopeData(run(cwd, ['approve', 'dep']).stdout);
   assert.equal(approveResult.to, 'delivered', `expected dep to reach delivered, got: ${JSON.stringify(approveResult)}`);
   // merge list still reads RESOLVED_STATUSES = {done, wontfix} at this point
@@ -910,7 +910,7 @@ test('merge next merges the single ready item by recursing into approve, item re
   // and-plugin-skill.md.
   assert.equal(run(cwd, ['add', 'solo', '--title', 'Solo', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(run(cwd, ['move', 'solo', '--to', 'doing']).status, 0);
-  assert.equal(run(cwd, ['move', 'solo', '--to', 'awaiting-approval']).status, 0);
+  assert.equal(run(cwd, ['move', 'solo', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]).status, 0);
 
   const result = run(cwd, ['merge', 'next']);
   assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
@@ -926,7 +926,7 @@ test('merge next picks the higher-ranked (mvp goalTier) item first when two are 
   for (const id of ['plain', 'important']) {
     assert.equal(run(cwd, ['add', id, '--title', id, '--kind', 'task', '--risk', 'light', '--verify', 'true', '--description', 'tsk-535 fixture description.', ...(id === 'important' ? ['--goal-tier', 'mvp'] : [])]).status, 0);
     assert.equal(run(cwd, ['move', id, '--to', 'doing']).status, 0);
-    assert.equal(run(cwd, ['move', id, '--to', 'awaiting-approval']).status, 0);
+    assert.equal(run(cwd, ['move', id, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]).status, 0);
   }
   const data = envelopeData(run(cwd, ['merge', 'next']).stdout);
   assert.equal(data.picked, 'important', 'the mvp-goalTier item outranks the plain one per rankImpact');
@@ -1020,7 +1020,7 @@ test('merge next auto-syncs a blockedOnSync root before giving up: drift clears,
   // item's `parent` -- a childless root is invisible to it, so it would
   // never show up in blockedOnSync at all without this.
   assert.equal(run(cwd, ['add', 'auto-sync-happy-child', '--title', 'child', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--parent', 'auto-sync-happy', '--description', 'tsk-535 fixture description.']).status, 0);
-  assert.equal(run(cwd, ['move', 'auto-sync-happy', '--to', 'awaiting-approval']).status, 0);
+  assert.equal(run(cwd, ['move', 'auto-sync-happy', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]).status, 0);
   commitPendingBeforeApprove(cwd, 'auto-sync-happy');
 
   const result = run(cwd, ['merge', 'next']);
@@ -1046,7 +1046,7 @@ test('merge next on a blockedOnSync root whose sync-root attempt hits a genuine 
   // See auto-sync-happy above: driftStatus only tracks ids that are some
   // other item's `parent`.
   assert.equal(run(cwd, ['add', 'auto-sync-conflict-child', '--title', 'child', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--parent', 'auto-sync-conflict', '--description', 'tsk-535 fixture description.']).status, 0);
-  assert.equal(run(cwd, ['move', 'auto-sync-conflict', '--to', 'awaiting-approval']).status, 0);
+  assert.equal(run(cwd, ['move', 'auto-sync-conflict', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]).status, 0);
   commitPendingBeforeApprove(cwd, 'auto-sync-conflict');
 
   const headBefore = gitHead(cwd);
@@ -1073,7 +1073,7 @@ test('merge next on a blockedOnSync root whose sync-root attempt hits a dirty ma
   // See auto-sync-happy above: driftStatus only tracks ids that are some
   // other item's `parent`.
   assert.equal(run(cwd, ['add', 'auto-sync-dirty-child', '--title', 'child', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--parent', 'auto-sync-dirty', '--description', 'tsk-66t fixture description.']).status, 0);
-  assert.equal(run(cwd, ['move', 'auto-sync-dirty', '--to', 'awaiting-approval']).status, 0);
+  assert.equal(run(cwd, ['move', 'auto-sync-dirty', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]).status, 0);
   commitPendingBeforeApprove(cwd, 'auto-sync-dirty');
   // auto-sync-dirty-produced.txt IS in this root's own fgw/auto-sync-dirty
   // diff (makeDriftedRoot committed it there) — re-dirtying that SAME path

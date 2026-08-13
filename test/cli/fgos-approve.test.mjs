@@ -95,7 +95,7 @@ function moveRootToResolved(cwd, rootId, finalStatus) {
   if (finalStatus === 'wontfix') {
     run(cwd, ['move', rootId, '--to', 'wontfix']);
   } else {
-    run(cwd, ['move', rootId, '--to', 'awaiting-approval']);
+    run(cwd, ['move', rootId, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
     run(cwd, ['move', rootId, '--to', 'delivered']);
   }
   commitPending(cwd, `state: resolve ${rootId} to ${finalStatus}`);
@@ -403,7 +403,7 @@ test('approve of a leaf whose root branch was never created (root only ever driv
   gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${leafId}`]);
   gitAtCwd(cwd, ['checkout', 'main']);
 
-  run(cwd, ['move', leafId, '--to', 'awaiting-approval']);
+  run(cwd, ['move', leafId, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
   commitPendingBeforeApprove(cwd, leafId);
 
   const branchesBefore = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
@@ -468,7 +468,7 @@ test('approve of a runner item that conflicts: aborts the merge, awaiting-approv
   gitAtCwd(cwd, ['add', 'shared.txt']);
   gitAtCwd(cwd, ['commit', '-q', '-m', 'main changes shared.txt']);
 
-  run(cwd, ['move', 'approve-conflict-item', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'approve-conflict-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
   commitPending(cwd, 'state: propose approve-conflict-item');
 
   const headBefore = gitHead(cwd);
@@ -542,7 +542,7 @@ test('approve of a root item that HAD children, whose merge into main conflicts,
   gitAtCwd(cwd, ['add', 'shared.txt']);
   gitAtCwd(cwd, ['commit', '-q', '-m', 'main changes shared.txt']);
 
-  run(cwd, ['move', 'drift-root-item', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'drift-root-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
   commitPending(cwd, 'state: propose drift-root-item');
 
   const headBefore = gitHead(cwd);
@@ -582,7 +582,7 @@ test('approve of a legacy item with a failing verify: blocked (reason verify-fai
   const cwd = tmpCwd();
   addOk(cwd, 'approve-legacy-fail-item', { verify: 'false' });
   run(cwd, ['move', 'approve-legacy-fail-item', '--to', 'doing']);
-  run(cwd, ['move', 'approve-legacy-fail-item', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'approve-legacy-fail-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 
   const result = run(cwd, ['approve', 'approve-legacy-fail-item']);
   assert.equal(result.status, 0, result.stderr);
@@ -598,7 +598,7 @@ test("approve verify-fail (legacy item): park edge stamps role 'system' (not hum
   const cwd = tmpCwd();
   addOk(cwd, 'approve-legacy-fail-role-item', { verify: 'false' });
   run(cwd, ['move', 'approve-legacy-fail-role-item', '--to', 'doing']);
-  run(cwd, ['move', 'approve-legacy-fail-role-item', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'approve-legacy-fail-role-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 
   const result = run(cwd, ['approve', 'approve-legacy-fail-role-item']);
   assert.equal(result.status, 0, result.stderr);
@@ -614,7 +614,7 @@ test('approve of a legacy item with a passing verify closes it to done — legac
   const cwd = tmpCwd();
   addOk(cwd, 'approve-legacy-ok-item', { verify: 'true' });
   run(cwd, ['move', 'approve-legacy-ok-item', '--to', 'doing']);
-  run(cwd, ['move', 'approve-legacy-ok-item', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'approve-legacy-ok-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 
   const result = run(cwd, ['approve', 'approve-legacy-ok-item']);
   assert.equal(result.status, 0, result.stderr);
@@ -628,7 +628,7 @@ test('approve --timeout and --no-timeout together are rejected as validation, ex
   const cwd = tmpCwd();
   addOk(cwd, 'approve-timeout-conflict', { verify: 'true' });
   run(cwd, ['move', 'approve-timeout-conflict', '--to', 'doing']);
-  run(cwd, ['move', 'approve-timeout-conflict', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'approve-timeout-conflict', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 
   const result = run(cwd, ['approve', 'approve-timeout-conflict', '--timeout', '1000', '--no-timeout']);
   assert.equal(result.status, 4);
@@ -640,7 +640,7 @@ test('approve twice: the second approve on an already-done item is rejected as p
   const cwd = tmpCwd();
   addOk(cwd, 'approve-twice-item', { verify: 'true' });
   run(cwd, ['move', 'approve-twice-item', '--to', 'doing']);
-  run(cwd, ['move', 'approve-twice-item', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'approve-twice-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
   assert.equal(run(cwd, ['approve', 'approve-twice-item']).status, 0);
 
   const result = run(cwd, ['approve', 'approve-twice-item']);
@@ -765,7 +765,7 @@ test('approve of a leaf item forked AFTER a sibling already merged a gated-modul
   gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${leafId}`]);
   gitAtCwd(cwd, ['checkout', 'main']);
 
-  run(cwd, ['move', leafId, '--to', 'awaiting-approval']);
+  run(cwd, ['move', leafId, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
   commitPendingBeforeApprove(cwd, leafId);
 
   const result = run(cwd, ['approve', leafId]);
@@ -799,7 +799,7 @@ test('approve of a leaf item whose OWN commit touches a gated module (src/runner
   gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${leafId}`]);
   gitAtCwd(cwd, ['checkout', 'main']);
 
-  run(cwd, ['move', leafId, '--to', 'awaiting-approval']);
+  run(cwd, ['move', leafId, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
   commitPendingBeforeApprove(cwd, leafId);
 
   const headBefore = gitHead(cwd);
@@ -870,7 +870,7 @@ test('approve of an ordinary item with no targets is completely unaffected by th
   const cwd = tmpCwd();
   addOk(cwd, 'closeout-no-targets-item', { verify: 'true' });
   run(cwd, ['move', 'closeout-no-targets-item', '--to', 'doing']);
-  run(cwd, ['move', 'closeout-no-targets-item', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'closeout-no-targets-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 
   const result = run(cwd, ['approve', 'closeout-no-targets-item']);
   assert.equal(result.status, 0, result.stderr);
@@ -1215,7 +1215,7 @@ test('approve on a proposed item with a missing-evidence acceptance clause is re
   addOk(cwd, 'approve-cos-missing', { verify: 'true' });
   run(cwd, ['edit', 'approve-cos-missing', '--acceptance', JSON.stringify([{ text: 'ship it' }])]);
   run(cwd, ['move', 'approve-cos-missing', '--to', 'doing']);
-  run(cwd, ['move', 'approve-cos-missing', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'approve-cos-missing', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 
   const before = eventLines(cwd).length;
   const result = run(cwd, ['approve', 'approve-cos-missing']);
@@ -1265,7 +1265,7 @@ test('approve (pull-door/verify-only): a simulated post-verify lock-timeout is c
   const cwd = tmpCwd();
   addOk(cwd, 'approve-lock-timeout', { verify: 'true' });
   run(cwd, ['move', 'approve-lock-timeout', '--to', 'doing']);
-  run(cwd, ['move', 'approve-lock-timeout', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'approve-lock-timeout', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 
   const before = eventLines(cwd).length;
   const result = run(cwd, ['approve', 'approve-lock-timeout'], { FGOS_TEST_FORCE_APPROVE_LOCK_TIMEOUT: 'approve-lock-timeout' });
@@ -1303,7 +1303,7 @@ test('approve (pull-door/verify-only): with no simulated failure, the same item 
   const cwd = tmpCwd();
   addOk(cwd, 'approve-lock-timeout-control', { verify: 'true' });
   run(cwd, ['move', 'approve-lock-timeout-control', '--to', 'doing']);
-  run(cwd, ['move', 'approve-lock-timeout-control', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'approve-lock-timeout-control', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 
   const result = run(cwd, ['approve', 'approve-lock-timeout-control']);
   assert.equal(result.status, 0, result.stderr);
@@ -1382,7 +1382,7 @@ test('approve of a root item, whose merge into main hits a pre-existing MERGE_HE
   gitAtCwd(cwd, ['commit', '-q', '-m', 'worker output for approve-blocked-root-item']);
   gitAtCwd(cwd, ['checkout', 'main']);
 
-  run(cwd, ['move', 'approve-blocked-root-item', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'approve-blocked-root-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
   commitPending(cwd, 'state: propose approve-blocked-root-item');
 
   gitAtCwd(cwd, ['checkout', '-b', 'fgw/other-blocker-root-item']);

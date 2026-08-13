@@ -1032,6 +1032,29 @@ test('submit --tier override alone does not change risk -- risk still mirrors cl
   assert.equal(item.risk, 'standard');
 });
 
+// --- tsk-5gu: --verify override on `submit`, same optionalField shape as ---
+// --tier/--kind/--risk above (a submitter who already stated a real verify
+// in free text can now attach it directly instead of round-tripping
+// through `fgos edit --verify` after the fact).
+
+test('submit --verify "npm test" sets the item\'s own verify to that command, not the sentinel', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['submit', 'Investigate the sluggish overview page. Verify: npm test', '--verify', 'npm test']);
+  assert.equal(result.status, 0);
+  const id = JSON.parse(result.stdout).data.id;
+  const item = envelopeData(run(cwd, ['list']).stdout).work[id];
+  assert.equal(item.verify, 'npm test');
+});
+
+test('submit without --verify leaves verify at the sentinel, byte-identical to pre-feature behavior', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);
+  assert.equal(result.status, 0);
+  const id = JSON.parse(result.stdout).data.id;
+  const item = envelopeData(run(cwd, ['list']).stdout).work[id];
+  assert.equal(item.verify, 'chưa xác định — P15 bổ sung');
+});
+
 test('submit without --docs-ref leaves docsRef unset, exit 0', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['submit', 'A task with no docs link']);

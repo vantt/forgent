@@ -417,7 +417,7 @@ test('goal focus is not auto-cleared when the focused item reaches status done',
   addGoalItem(cwd, 'goal-target-done');
   run(cwd, ['goal', 'set', 'goal-target-done']);
   run(cwd, ['move', 'goal-target-done', '--to', 'doing']);
-  run(cwd, ['move', 'goal-target-done', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'goal-target-done', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
   const moveResult = toDoneViaChain(cwd, 'goal-target-done');
   assert.equal(moveResult.status, 0);
   assert.equal(stateView(cwd).work['goal-target-done'].status, 'done');
@@ -1618,13 +1618,16 @@ test('list --all --json with NO pagination flags stays byte-identical -- herdr-p
   const data = envelopeData(result.stdout);
   // Both items' work rows present (D1: --all restores done items).
   assert.deepEqual(Object.keys(data.work).sort(), ['list-protected-done', 'list-protected-open']);
-  // Both decisions present, UNSCOPED -- this exact combination must never
-  // gain tsk-483's new scoping, matching herdr-plugin's own real,
+  // Both items' decisions present, UNSCOPED -- this exact combination must
+  // never gain tsk-483's new scoping, matching herdr-plugin's own real,
   // vendored call sites (herdr-plugin/src/fgos.rs, confirmed directly:
   // every one of its 3 call sites is exactly ["list", "--all", "--json"]).
+  // 'list-protected-done' carries TWO: its own explicit decision above,
+  // plus the tsk-280 --skip-return-guard override toProposed's own
+  // doing -> awaiting-approval move now logs.
   assert.deepEqual(
     data.decisions.map((d) => d.id).sort(),
-    ['list-protected-done', 'list-protected-open'],
+    ['list-protected-done', 'list-protected-done', 'list-protected-open'],
   );
 });
 

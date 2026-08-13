@@ -940,7 +940,10 @@ function submitWork(dir, text, opts = {}) {
     // undefined-input shape, so an omitted --refs flag stays byte-identical
     // to the prior hardcoded refs: []).
     refs: opts.refs ?? [],
-    verify: SUBMIT_VERIFY_SENTINEL,
+    // tsk-5gu: opts.verify is the new optional --verify override (same
+    // opts.X ?? default shape as every other field-parity flag below) --
+    // omitted leaves this at the existing sentinel, unchanged.
+    verify: opts.verify ?? SUBMIT_VERIFY_SENTINEL,
     tier,
     mode: opts.async ? 'async' : 'sync',
     // Per base-workflow-model D1-D4/S2: --domain is optional, same
@@ -1310,6 +1313,13 @@ async function runVerb(verb, flags, positional, dir) {
         tier: optionalField(flags.tier, 'submit --tier requires a tier value (e.g. light/standard/heavy); omit --tier entirely to use classify()\'s derived value.'),
         kind: optionalField(flags.kind, 'submit --kind requires a kind value; omit --kind entirely to use classify()\'s derived value.'),
         risk: optionalField(flags.risk, 'submit --risk requires a risk value; omit --risk entirely to use classify()\'s derived value.'),
+        // tsk-5gu: same optionalField shape as --tier/--kind/--risk above --
+        // a submitter who already knows the real verify command (stated in
+        // free text) previously had no way to attach it at submit time,
+        // unlike `add` (which requires --verify outright). Omitted leaves
+        // this undefined so submitWork falls through to its existing
+        // SUBMIT_VERIFY_SENTINEL default, byte-identical to before.
+        verify: optionalField(flags.verify, 'submit --verify requires a non-empty command; omit --verify entirely to use the sentinel until context-discovery designs one.'),
         // Same optional non-empty-path field `add` already exposes
         // (bin/fgos.mjs's `add` case) — submit previously had no way to set
         // this at all, so an item created through the public door could
@@ -1493,6 +1503,38 @@ async function runVerb(verb, flags, positional, dir) {
               kind: 'engine',
             });
           }
+        }
+      }
+      // tsk-280: `return` (bin/fgos.mjs's own `case 'return'`) is the one
+      // door built to prove real progress before `doing -> awaiting-
+      // approval` — branch-advanced (or an explicit `--no-new-commits-ok`,
+      // tsk-4on), a clean working tree, and the item's own `verify`
+      // command actually passing. `move` had zero precondition for this
+      // exact edge, so it silently bypassed every one of those guarantees.
+      // Mirrors the `--to delivered` guard immediately above: refuse by
+      // default, require an explicit non-empty `--skip-return-guard`
+      // reason (never `--override-reason` — that flag's own error message
+      // is scoped specifically to the missing-merge-evidence case above,
+      // a different guarantee than "no proof of real progress"), logged
+      // to the decision log before proceeding.
+      if (to === 'awaiting-approval') {
+        const view = listWork(dir);
+        const item = view.work[id];
+        if (item?.status === 'doing') {
+          const skipReason = optionalField(flags['skip-return-guard'], 'move --to awaiting-approval --skip-return-guard requires a non-empty reason value (omit --skip-return-guard entirely when the item is not "doing", or use "fgos return" to prove real progress for real)');
+          if (!skipReason) {
+            throw new StoreError(
+              'validation',
+              `move: "${id}" is "doing" — moving it to "awaiting-approval" here would record no proof of real progress (no branch-advance check, no clean-tree check, no verify run). `
+                + `Use "fgos return ${id}" to prove it for real (pass --no-new-commits-ok if the work was already done before this claim), or pass --skip-return-guard "<why>" to force this move anyway (recorded to the decision log).`,
+            );
+          }
+          addDecision(dir, {
+            id,
+            text: `move --to awaiting-approval skip-return-guard override for "${id}": status was "doing"`,
+            rationale: skipReason,
+            kind: 'engine',
+          });
         }
       }
       const { event } = moveWork(dir, { id, to, expectedStatus, reason, role: 'human' });
