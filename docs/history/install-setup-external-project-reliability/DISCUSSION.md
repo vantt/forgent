@@ -2,12 +2,12 @@
 
 ## 1. Trạng thái hiện tại
 
-Round 3. D1 (2 trục độc lập bin/skill) và D2 (bin resolution = 3 tầng
-deterministic, project-local giữ lại vì lý do version-pinning/team-
-consistency, không dùng PATH cho tầng 1-2) đã khoá — xem §6 cho bản đồ +
-diagram cập nhật. Câu hỏi hướng sửa root cause #1 giờ thu hẹp: chỉ còn
-tầng 3 (global) cần quyết probe-nhiều-tầng vs cache-in-config. Root cause
-#2 (marketplace fail-open) vẫn mở nguyên như cũ.
+Round 5. D1 (2 trục độc lập bin/skill), D2 (bin resolution = 3 tầng
+deterministic, project-local giữ vì version-pinning), và D3 (mở rộng cơ
+chế shell-integration cho human — cả nội dung script lẫn logic wiring có
+lỗ hổng fail-open riêng, cùng pattern root cause #2) đã khoá — xem §6.
+Còn mở: cơ chế cụ thể cho tier 3 global (probe vs cache) và hướng sửa
+root cause #2 gốc (marketplace check).
 
 ## 2. Mục tiêu & đề bài
 
@@ -37,6 +37,7 @@ config/check của riêng nó) — không phải một bản vá cục bộ cho 
 | 4 | Vì sao project-local cần tồn tại riêng, không gộp về global-only? | Rõ (D2) | Version-pinning/team-consistency: global-only nghĩa là mọi project trên máy dùng chung 1 version, nâng cấp cho project này làm vỡ project khác im lặng — cùng lớp vấn đề `tsk-jtb` đang giải ở tầng release tag. `node_modules/.bin` không nằm trên PATH thường (chỉ có qua `npm run`/`npx`) nên phải resolve bằng file-check, không phải PATH lookup. |
 | 5 | Hướng sửa root cause #1 (giờ chỉ còn tầng global): probe nhiều tầng hay cache path đã resolve? | Chưa rõ | 2 hướng không loại trừ nhau — đề xuất trước: cache làm nguồn sự thật, probe làm cơ chế populate. Cần người quyết định. |
 | 6 | Hướng sửa root cause #2: check nên fail loud hay tìm cách tự phân biệt "claude không áp dụng" khỏi "claude tạm thời không thấy"? | Chưa rõ | Cùng cần quyết định trước khi khoá D-ID. |
+| 7 | Root cause #3 (mới phát hiện, D3): cơ chế human-convenience (shell function) tự wiring qua `fgos setup` có lỗ hổng fail-open riêng | Rõ | `integrationScriptPath()` (`src/setup/registrations.mjs:228-239`) trả `null` khi bản đang chạy không nằm trong git checkout nào; `checkShellIntegrationSourced` (dòng 276-280) coi `null` là `passed: true` — cùng pattern silent-pass với root cause #2. Global install qua nvm tình cờ vẫn ổn (`~/.nvm` tự nó là git clone), nhưng Homebrew/system-npm/Volta/fnm thì không wire được gì, doctor vẫn báo xanh. Yêu cầu "phải trong git checkout" vốn chỉ để tránh rác 1-dòng-source-mỗi-worktree — rủi ro đó không áp dụng cho bản cài qua npm. |
 
 ## 4. Quyết định đã chốt
 
@@ -44,6 +45,7 @@ config/check của riêng nó) — không phải một bản vá cục bộ cho 
 |------|-----------|-------|
 | D1 | Cài đặt fgOS có **2 trục độc lập, không bắc cầu tự động**: (a) trục bin — npm/pnpm/yarn global, project-local, hoặc dev-checkout self-hosting; (b) trục skill — forgentX tự-host (`.claude/skills/fgos-*`) hoặc Claude Code plugin marketplace (`plugins/fgOS/skills/*`). Cầu nối DUY NHẤT giữa 2 trục là `fgos setup`/`doctor --fix`. | Xác nhận bằng đọc `package.json` `files` allowlist (không có `plugins/`), `plugins/fgOS/.claude-plugin/plugin.json` (không có `scripts`/postinstall, đúng RUL6), và `.claude-plugin/marketplace.json` (skill của project ngoài chỉ tới được qua plugin marketplace). Nền tảng bắt buộc trước khi thiết kế bin-discovery — vì 1 project hoàn toàn có thể chỉ thoả 1 trục. |
 | D2 | Trục A (bin) resolve theo **3 tầng deterministic**, không phải nhóm "PATH-dependent vs không" mơ hồ như trước: (1) dev-checkout self-hosting — file-check `<git-root>/bin/fgos.mjs`; (2) project-local install — file-check `node_modules/.bin/fgos`, đi ngược cây thư mục từ cwd (giống Node module resolution); (3) global install — tầng DUY NHẤT thật sự cần PATH lookup hoặc config-cache. **Project-local giữ lại là chế độ riêng, không gộp về global-only.** | Global-only làm mọi project trên máy dùng chung 1 version — nâng cấp cho project A làm vỡ project B im lặng, cùng lớp vấn đề `tsk-jtb` đang giải ở tầng release tag; project-local (qua `package.json`+lockfile) pin version theo từng project/team, đúng pattern chuẩn CLI npm (eslint/prettier). `node_modules/.bin` xác nhận không nằm trên PATH ngoài context `npm run`/`npx` nên phải resolve bằng file-check, không phải PATH — thu hẹp câu hỏi probe-vs-cache trước đó xuống chỉ còn tầng global. |
+| D3 | Mở rộng cơ chế "human gõ `fgos` trần, hệ thống tự resolve" theo 2 phần: (a) nội dung `scripts/fgos-shell-integration.sh` cài đủ 3 tầng của D2 (thêm tier 2 — hiện chỉ có tier 1 → PATH fallback); (b) `integrationScriptPath()`/`checkShellIntegrationSourced` (`src/setup/registrations.mjs`) BỎ yêu cầu "phải nằm trong git checkout" đối với bản cài qua npm (global/project-local) — chỉ giữ yêu cầu đó cho dev-checkout self-hosting, nơi rủi ro rác-1-dòng-mỗi-worktree là thật; bản cài npm dùng thẳng path ổn định từ `import.meta.url`. | `checkShellIntegrationSourced` trả `passed: true` khi `integrationScriptPath()` là `null` — cùng pattern fail-open với root cause #2 (`src/setup/registrations.mjs:228-239,270-281`; `src/runner/paths.mjs:72-85`). Global install qua nvm tình cờ vẫn wire được (`~/.nvm` tự nó là git clone), nhưng Homebrew/system-npm/Volta/fnm thì không — doctor vẫn báo xanh. Yêu cầu git-checkout chỉ cần thiết để tránh rác rc-line khi xoá worktree (dev-checkout only), không áp dụng cho bản cài npm vốn đã có path ổn định sẵn. |
 
 ## 5. Q&A log
 
@@ -67,6 +69,24 @@ config/check của riêng nó) — không phải một bản vá cục bộ cho 
   file-check, thu hẹp câu hỏi bin-discovery ban đầu xuống chỉ còn tầng
   global. Anh đồng ý, yêu cầu "cập nhật tài liệu kèm lý do tương thích
   version" — đã ghi D2, cập nhật §3/§4/§6.
+- **2026-08-13, vòng 4** — Với model 3-tầng đã chốt, anh hỏi: cho agent/
+  system tự chạy thì tự resolve path được rồi, nhưng với human gõ tay, có
+  cách tiện dùng `fgos` trần mà hệ thống vẫn tự resolve đúng theo 3 tầng
+  không? Em đề xuất mở rộng shell function có sẵn
+  (`scripts/fgos-shell-integration.sh`, hiện chỉ làm tier 1→PATH) thành
+  cài đủ 3 tầng, source 1 lần vào profile — cùng cơ chế phục vụ cả người
+  gõ tay lẫn agent qua Bash tool (đã xác nhận Bash tool session cũng có
+  function này). Anh đồng ý, hỏi lại xin quyết trước khi khoá.
+- **2026-08-13, vòng 5** — Trước khi khoá, anh nhắc: doctor đã có fix
+  chuyện wiring source này rồi (`scripts/fgos-shell-integration.sh`). Em
+  đọc lại `src/setup/shell-rc.mjs`/`registrations.mjs` — xác nhận cơ chế
+  wiring có thật (`fgos setup` tự chèn source line), NHƯNG phát hiện thêm
+  root cause #3: `integrationScriptPath()` trả `null` — và
+  `checkShellIntegrationSourced` coi đó là `passed: true` — khi bản đang
+  chạy không nằm trong git checkout nào, đúng pattern fail-open của root
+  cause #2, chặn mất cơ chế convenience này cho global install không qua
+  nvm. Anh yêu cầu gộp phát hiện này vào D3 luôn — đã ghi D3, cập nhật
+  §3/§4/§6.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -128,10 +148,52 @@ flowchart TB
 Kết luận thiết kế tới thời điểm này: bất kỳ hướng sửa bin-discovery nào
 cũng phải đứng trên nền D1+D2 — tầng 1-2 giữ nguyên file-check hiện có
 (đã đúng, không cần sửa), toàn bộ nỗ lực root cause #1 chỉ tập trung vào
-tầng 3 (global), và cầu nối (`fgos setup`/`doctor --fix`) phải fail loud
-thay vì fail-silent ở cả 2 đầu. Chưa chốt cơ chế cụ thể cho tầng 3 (probe
-nhiều tầng vs cache-in-config) hay cho root cause #2 (WARN vs phân biệt
-case) — hai câu hỏi này vẫn mở, chờ vòng tiếp theo.
+tầng 3 (global). Chưa chốt cơ chế cụ thể cho tầng 3 (probe nhiều tầng vs
+cache-in-config) hay cho root cause #2 gốc (WARN vs phân biệt case) — hai
+câu hỏi này vẫn mở, chờ vòng tiếp theo.
+
+**Lớp thứ 3 vừa thêm (D3) — convenience cho human, tách biệt khỏi
+agent/system tự resolve:** khi agent/skill/doctor tự gọi `fgos` theo D2,
+3 tầng tự resolve được (không cần PATH cho tier 1-2, chỉ tier 3 cần bàn).
+Nhưng khi HUMAN gõ `fgos` trần trong terminal, cách tiện dụng nhất là
+cùng 1 shell function đã có sẵn cho tier 1
+(`scripts/fgos-shell-integration.sh`, source 1 lần vào profile, luôn
+thắng PATH binary cùng tên) — chỉ cần MỞ RỘNG nó cài đủ cả 3 tầng thay vì
+chỉ tier 1→PATH như hiện tại. Cơ chế `fgos setup` tự wiring dòng source
+này vào `~/.bashrc`/`~/.zshrc` đã có thật (`shell-rc.mjs`), nhưng bản thân
+việc wiring lại có lỗ hổng fail-open riêng — `integrationScriptPath()`
+trả `null` khi bản đang chạy không nằm trong git checkout nào, và
+`checkShellIntegrationSourced` coi đó là "nothing to check" thay vì báo
+thiếu. Yêu cầu git-checkout đó vốn chỉ để tránh rác rc-line khi xoá
+dev-checkout worktree — không nên áp cho bản cài qua npm, vốn đã có path
+ổn định từ `import.meta.url`.
+
+```mermaid
+flowchart TB
+    subgraph HumanConv["Lớp convenience cho human (D3)"]
+        direction TB
+        Shell["scripts/fgos-shell-integration.sh<br/>shell function, source 1 lần vào profile<br/>-- mở rộng cài đủ 3 tầng D2 (thêm tier 2)"]
+        Wiring["fgos setup tự chèn source line<br/>(shell-rc.mjs, đã có thật)"]
+        RC3["Root cause #3:<br/>integrationScriptPath() = null khi<br/>không nằm trong git checkout<br/>-- checkShellIntegrationSourced fail-open<br/>-- global install non-nvm không wire được gì"]
+        Wiring -.->|"chỉ hoạt động nếu executingCopy<br/>nằm trong git checkout"| RC3
+        Wiring --> Shell
+    end
+    Human["Human gõ fgos trần trong terminal"] --> Shell
+    Shell -->|"tier 1→2→3, đúng ưu tiên D2"| Resolved["Đúng bin, đúng version"]
+
+    subgraph SystemConv["Agent/skill/doctor tự gọi (không qua shell function)"]
+        direction TB
+        JS["Logic JS độc lập, cùng thuật toán 3 tầng D2<br/>-- cần cho context không có shell profile<br/>(sh -c, execFileSync, CI)"]
+    end
+```
+
+Nguyên tắc thiết kế chốt ở đây: **1 thuật toán 3 tầng (D2), 2 nơi hiện
+thực song song** — shell function cho tiện gõ tay/agent-qua-Bash-tool, JS
+độc lập cho context non-interactive thật sự (skill gọi `sh -c`, doctor
+check, CI) — không phải việc mới, mà là đồng bộ hoá 2 chỗ hiện đang làm
+dở dang khác nhau (script hiện chỉ có tier 1+3, JS check hiện cũng chỉ có
+tier 1+3, cả 2 đều thiếu tier 2; và JS-wiring còn thêm root cause #3
+riêng của nó).
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
