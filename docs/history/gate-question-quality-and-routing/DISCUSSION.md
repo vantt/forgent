@@ -735,6 +735,22 @@ hai không cần chạm lược đồ event append-only.
 
 | **D7** | **Hai vùng lưu trữ cho hai người đọc.** `state.decisions` là nguồn **authoritative cho agent** (ngắn, đủ bằng chứng); `CONTEXT.md` tự do tối ưu **cho người** (narrative, thoáng, markdown đầy đủ). **Ràng buộc thứ tự là phần chính của quyết định**: KHÔNG nối skill vào `state.decisions` cho tới khi phép kiểm độ sạch xanh — hiện 35% là ghi-sổ máy móc và 12% quyết định thật thiếu `rationale`. | 12 (người chủ sản phẩm nêu nhu cầu, số đo xác nhận) | ✅ seq **10187** (`tsk-539`) |
 
+> **D6 đã bị supersede bởi `tsk-224`** (2026-08-13,
+> `docs/history/coding-planning-validating-gate-redesign/CONTEXT.md` D1/D8;
+> bản ghi supersede chính thức là D9 trong `docs/history/gate-bypass/
+> CONTEXT.md`, nơi D6 cũng sống). Lý do: `tsk-224` gộp `planApprove` +
+> `validateApprove` thành **đúng một** gate đặt tại
+> `fgos-coding-validating`, ngay trước lúc materialize item con — nên cái
+> gate mà trục bypass của D6 phục vụ không còn tồn tại độc lập nữa. Trục
+> verdict của D6 (`READY` → bypass, có ràng buộc → hỏi) được thay bằng
+> tiêu chí hai tầng + ba trigger của `tsk-224`, cấp cho export mới
+> `canAutoApproveMergedGate`; `canAutoApproveValidate` bị xoá.
+>
+> **Số đo của D6 không bị bác** — 94/108 (87%) không ràng buộc, 0 lần phải
+> hỏi lại vẫn đúng, và nó là trục tốt cho cái gate nó phục vụ. Chỉ là gate
+> đó không còn. Dòng D6 phía trên giữ nguyên chữ, không sửa tại chỗ (luật
+> AGENTS.md "Changing a locked law").
+
 **Ứng viên D-ID cho vòng 8** (chưa đứng đủ vững):
 
 - Bypass chết vì quy ước `## Outstanding questions` chưa được nối vào hai skill viết artifact —

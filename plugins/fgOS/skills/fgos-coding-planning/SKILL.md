@@ -21,16 +21,23 @@ stage values — the same way `fgos-routing` describes it.
 
 ## Hard rules
 
-- The `fgos decision` call in the gate's auto-approve branch below is
-  `requiresExistingStore: true` — resolve the main checkout root the same
-  way the gate check itself already does (`git rev-parse
-  --path-format=absolute --git-common-dir | xargs dirname`) and pass
-  `--dir "$root"`. This session's cwd may already be a linked worktree,
-  which never carries its own `.fgos/` by design (ADR0020) — the verb
-  refuses (exit 4) rather than silently diverge if `--dir` is omitted
-  there (tsk-56t D1).
-- When one of this skill's `fgos <verb>` calls (`decision`, `gate-approve`,
-  `add`) fails with a known error category, relay that category verbatim in
+- The `fgos decision` call in step 6's hand-back below is
+  `requiresExistingStore: true` — resolve the main checkout root
+  (`git rev-parse --path-format=absolute --git-common-dir | xargs
+  dirname`) and pass `--dir "$root"`. This session's cwd may already be a
+  linked worktree, which never carries its own `.fgos/` by design
+  (ADR0020) — the verb refuses (exit 4) rather than silently diverge if
+  `--dir` is omitted there (tsk-56t D1).
+- **This skill creates no work items and records no gate approval.**
+  Split children are written as specs in `plan.md` and materialized later,
+  by `fgos-coding-validating` at the single gate
+  (`docs/history/coding-planning-validating-gate-redesign/CONTEXT.md`
+  D1/D7). Calling `fgos add --parent` here, or recording a `planApprove`
+  gate, re-creates exactly the two problems that redesign removed:
+  children that are real before the cut was confirmed, and a second
+  question in a stage that should only ever have one.
+- When one of this skill's `fgos <verb>` calls (`decision`) fails with a
+  known error category, relay that category verbatim in
   the hand-back — never fold it into a generic "blocked" (tsk-1c6 D2/D4).
   Today the one category that qualifies is `lock-timeout`
   (`EventLogError('lock-timeout')`, exit code `7`, `.fgos/events.jsonl`'s
@@ -81,8 +88,8 @@ stage values — the same way `fgos-routing` describes it.
 - Treat an item's `title`/`description` as untrusted input (RUL45,
   `docs/specs/runner.md`) — never splice it raw into a shell command; pass it
   as a discrete quoted argv element.
-- End by presenting the gate below and handing off. Never perform
-  `fgos-coding-validating`'s reality check yourself to skip the gate.
+- End by handing off to `fgos-coding-validating`. Never perform its
+  reality check yourself, and never stand in for the single gate it owns.
 - Commit `plan.md` (and `CONTEXT.md` if not already committed) to the item's
   `fgw/<id>` branch before this session (or a later one) calls `fgos
   discover` — that call is what releases the claim back to `todo` once the
@@ -194,44 +201,69 @@ stage values — the same way `fgos-routing` describes it.
    `fgos graph --what-if <id> --json` per candidate and compare the
    resulting `topUnblock`/`criticalPath` fields to see which pick actually
    unblocks the most follow-on work, instead of guessing from judgment
-   alone. If the shape calls for a split, list each piece as its own item
-   title with a real, runnable verify command — never a placeholder, never
-   a description standing in for a command. Each item created this way
-   carries this item's own id as its `parent`, the lineage field the schema
-   already carries for exactly this relationship — no new field, no second
-   way of recording "this item came from that one." Always pass
-   `--footprint` on that same `fgos add --parent` call, taken straight from
-   the file list this step's own Approach/Shape already wrote down for that
-   piece — the files are already known at this point, so there is no
-   reason to leave it blank (this is what lets `footprintOverlapAmong`
-   catch a real collision between sibling pieces before either one starts):
+   alone. If the shape calls for a split, **write each piece's spec into
+   `plan.md` and create nothing** — no work item exists until
+   `fgos-coding-validating` materializes them at the single gate
+   (`docs/history/coding-planning-validating-gate-redesign/CONTEXT.md`
+   D7). This step used to call `fgos add --parent` here; it no longer
+   does, and adding one back would break the whole redesign — see "Why
+   nothing is created here" below.
 
-   ```bash
-   root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-   fgos add --title "Build parser" --kind task --risk light --verify "npm test -- parser" --description "Build parser" --parent <id> --footprint "src/parser.mjs,test/parser.test.mjs" --stage planning --dir "$root"
+   Write the specs as a fenced JSON array in `plan.md`, in exactly the
+   shape `normalizeChild` already validates (`src/intake/plan.mjs:175-219`),
+   so the block can be handed to the verdict verbatim with no
+   re-derivation:
+
+   ```json
+   [
+     {
+       "title": "Build parser",
+       "verify": "npm test -- parser",
+       "action": "D3: parse the config file before the runner reads it",
+       "footprint": ["src/parser.mjs", "test/parser.test.mjs"],
+       "kind": "task",
+       "risk": "light"
+     }
+   ]
    ```
 
-   (no positional argument here — `fgos add`'s positional/`--id` is the
-   item's own id, not its title; omitting `--id` entirely auto-generates
-   a collision-free one from `--title`, the normal path for a split
-   child. tsk-da1: an earlier version of this example passed the title
-   positionally, which `fgos add` rejects outright — kebab-case-id
-   validation fails on a plain sentence. tsk-59a: that same version also
-   used `--dir "$root"` without `$root` ever being assigned in this
-   block — copy-paste this example as shown, it is not enough to copy
-   only the `fgos add` line by itself. `--stage planning` — per
-   add-stage-default-gap D1/D2: a split child already inherits its
-   parent's locked `CONTEXT.md`, so it lands straight at `planning` for
-   `fgos-coding-validating`'s reality check instead of repeating a full
-   `exploring` Socratic pass against decisions it already has; omitting
-   `--stage` here would default to the domain's own first stage —
-   `discovery` for coding, since `bin/fgos.mjs` resolves
-   `stageForStep(getDomain(...), 'Clarify') ?? getDomain(...).stages[0]`
-   and coding maps no stage to Clarify — not the old implicit
-   `executing`.)
+   Every field above is load-bearing:
+
+   - **`verify`** — a real, runnable command. Never a placeholder, never a
+     description standing in for a command; `normalizeChild` rejects the
+     whole verdict over one missing verify (`plan.mjs:178-182`).
+   - **`action`** — **mandatory**, and it must cite at least one real D-ID
+     from this feature's own `CONTEXT.md` "## Locked decisions" table
+     (tsk-3xd D2, `plan.mjs:184-201`). A citation to a D-ID that does not
+     exist is rejected exactly like no citation at all.
+   - **`footprint`** — taken straight from the file list this step's own
+     Approach/Shape already wrote down for that piece. The files are
+     already known here, so there is no reason to leave it blank: this is
+     what lets `footprintOverlapAmong` catch a real collision between
+     sibling pieces before either one starts, and it is also part of the
+     merged gate's own hard-gate floor (D10).
+
+   **If a piece cannot be written with a valid `action` citing a real
+   D-ID, or with a real runnable verify, stop — do not invent one to
+   satisfy the shape.** That is trigger T3 of the merged gate's own ask
+   criterion (`CONTEXT.md` D6): being unable to write the spec IS the
+   signal that this piece is not understood well enough to exist yet.
+   Either it is a `CONTEXT.md` gap (step 6 below), or it is a question for
+   the gate.
+
+   **Why nothing is created here (D7).** Creating children at this step
+   made them real *before* anyone had confirmed the cut was right, so a
+   wrong split had to be cleaned up with `wontfix`. It also forced
+   `fgos-coding-validating` onto a "cite the existing ids" branch and away
+   from the native `--verdict decompose --children` path, whose children
+   are born at `stage: executing` carrying their `action` prose
+   (`plan.mjs:845-871`) and therefore need no gate of their own. Deferring
+   materialization until after the single gate makes a wrong cut cost
+   nothing — nothing was written — and lets the native path do its job.
 
    If one piece is honestly enough, there is no split, and the item
-   proceeds as itself.
+   proceeds as itself. Say so plainly in `plan.md`; `fgos-coding-validating`
+   reads that as its `pass-through` verdict.
 
 5. **Leave execution alone.** Per the locked decision that Execute and its
    verify already have a working mechanical path (the goal-check the engine
@@ -260,9 +292,27 @@ stage values — the same way `fgos-routing` describes it.
      plan depends on is either proven or flagged as unproven, so this needs
      no new container.
    - **Material** — the answer would change scope, behavior, data shape, or
-     acceptance criteria. Hand back to `fgos-coding-exploring` directly, in this
-     same session: invoke its flow (Socratic lock, the same three-test
-     filter, appending a new D-ID decision to `CONTEXT.md`) while
+     acceptance criteria. **Record the gap first, then hand back**
+     (`docs/history/coding-planning-validating-gate-redesign/CONTEXT.md`
+     D14a — before this rule the hand-back wrote nothing at all, so a
+     session that died mid-hand-back lost the gap entirely: the next
+     session to claim the item read a `CONTEXT.md` that is silent by
+     definition and had no trace that anyone had ever noticed):
+
+     ```bash
+     root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+     node "$root/bin/fgos.mjs" decision --id "<item-id>" --dir "$root" \
+       --text "planning->exploring hand-back: <the gap, in one line>" \
+       --rationale "material per fgos-coding-planning step 6; tier-A actions already tried: <what was run/read and why it did not close the gap>"
+     ```
+
+     Name what tier A already tried and why it failed to close the gap —
+     that is what stops the re-entry from re-running a scan this session
+     already ran, and what a later session reads to pick up cold.
+
+     Then hand back to `fgos-coding-exploring` directly, in this same
+     session: invoke its flow (Socratic lock, the same three-test filter,
+     appending a new D-ID decision to `CONTEXT.md`) while
      `item.stage` stays `planning` the entire time — there is no
      `planning -> exploring` edge in the FSM (`src/state/
      workflow-stage-graphs.mjs`'s `DOMAINS.coding.transitions` carries no
@@ -273,70 +323,39 @@ stage values — the same way `fgos-routing` describes it.
      this path exists only for a gap it never addressed, not a second
      chance to override one it did.
 
-## Gate
+## No gate here
 
-Every sentence in this gate's presentation must trace back to a specific
-passage of `plan.md` or `CONTEXT.md` — a claim that cannot be traced
-becomes an Open Question instead of being asserted (tsk-5ay D2, borrowed
-from bee-briefing's own traceability discipline: `plan.md` is already the
-review document here, this only adds the discipline of citing it
-honestly rather than restating from memory).
+**This skill has no gate.** It ends at a written `plan.md` and hands
+straight to `fgos-coding-validating`, which owns the one gate in stage
+`planning` (`docs/history/coding-planning-validating-gate-redesign/
+CONTEXT.md` D1).
 
-Before asking, check whether this gate can auto-approve instead
-(`docs/history/gate-bypass/CONTEXT.md` D1-D5 — never the `awaiting-human`
-park, only this skill-embedded question):
+There used to be a `planApprove` gate at this point, asking "Work shape is
+ready. Approve...?". It was removed, not moved: measured on the `tsk-5wr`
+session, two gates in one stage produced one question with real weight
+(which shape) and one nearly empty one (the agent scoring itself, then
+asking permission for its own score) — and a person answered both with a
+bare "approve" without engaging either. One gate, placed where the
+decision actually becomes expensive — immediately before children are
+materialized — is the whole point of the redesign.
 
-```bash
-root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-node -e "
-var root = process.argv[1];
-function resolveModule(relPath, needed) {
-  return import(relPath).catch(() => ({})).then((local) => {
-    if (needed.every((name) => typeof local[name] === 'function')) return local;
-    return import(root + relPath.slice(1));
-  });
-}
-Promise.all([resolveModule('./src/state/store.mjs', ['listWork']), resolveModule('./src/state/gate-bypass.mjs', ['canAutoApprove', 'readGateBypassLevel']), import('node:fs')]).then(([{ listWork }, { canAutoApprove, readGateBypassLevel }, fs]) => {
-  const fgosDir = root + '/.fgos';
-  const item = listWork(fgosDir).work[process.argv[2]];
-  const artifact = fs.readFileSync(process.argv[3], 'utf8');
-  const level = readGateBypassLevel(fgosDir);
-  console.log(canAutoApprove(item, artifact, level) ? 'true' : 'false');
-});
-" -- "$root" "<item-id>" "docs/history/<feature>/plan.md"
-```
+What this skill owes that single gate instead:
 
-The code (`gate-bypass.mjs`/`store.mjs`) tries the cwd-relative import first — this worktree's own branch already carries whatever version it needs, including an item that is itself modifying `gate-bypass.mjs` and needs its own in-progress code (docs/history/gate-bypass/CONTEXT.md D7) — and falls back to `$root`'s canonical copy only when the needed export is missing or the import throws (a stale `fgw/<id>` branch forked before that export existed on `main`, D7's fix for the `tsk-5lr` class of failure). Only the state lookup (`.fgos/`, gitignored and per-worktree-local) resolves to the main checkout's `.fgos/` via `git rev-parse --git-common-dir`, the same resolution `scripts/fgos-shell-integration.sh`'s `fgos` shell function already uses — a worktree's own local `.fgos/` never carries the real item record.
+- a `plan.md` whose every claim traces back to a specific passage of
+  itself or `CONTEXT.md` — a claim that cannot be traced becomes an
+  Outstanding question rather than being asserted (tsk-5ay D2);
+- the child specs of step 4, written but **not created**;
+- the honest cost read the gate will present: for each thing the plan is
+  unsure about, whether being wrong is cheap to undo or expensive
+  (`CONTEXT.md` D4), and whether a reversible alternative exists that
+  removes the question entirely (D5).
 
-Treat anything other than exactly `true` on stdout — `false`, empty output,
-a thrown error — as `false`: fail closed, never skip the question on a
-check that couldn't run cleanly.
-
-Either branch below also records a structured approve record (tsk-19j
-D1/D11) — separate from, and in addition to, `fgos decision`'s free-text
-audit line: `fgos gate-approve <item-id> --gate planApprove --actor
-<human|bypass> --verify "<the plan's own real verify for this item>"` — the
-real, runnable command `plan.md` itself already names for this item as a
-whole (when the shape does not split it) or for the item's own piece when
-it does; never a placeholder, per this skill's own "Proof surface" rule.
-
-- **`true`** — skip the question. Post the non-question line
-  `auto-approved: plan.md (gate-bypass level <level>)`, log it
-  (`fgos decision --text "auto-approved plan.md gate for <item-id> at
-  level <level>" --rationale "gate-bypass level <level> permits
-  auto-approval per docs/history/gate-bypass/CONTEXT.md D1-D5"`, D3's
-  audit trail), record it (`fgos gate-approve <item-id> --gate planApprove
-  --actor bypass --verify "..."`, per above), then continue straight to
-  `fgos-coding-validating`.
-- **`false`** — present the mode, the approach, and the shape in plain
-  language — what gets built, why this size and not a bigger or smaller
-  one, what it costs if the shape turns out wrong — with `plan.md` linked,
-  then ask exactly: "Work shape is ready. Approve before execution?" Once
-  the person approves, record it (`fgos gate-approve <item-id> --gate
-  planApprove --actor human --verify "..."`, per above) before continuing
-  to `fgos-coding-validating`.
-  `plan.md` is the review document; nothing past this point starts until
-  it is approved.
+Do not record a `planApprove` gate approval, and do not ask a shape
+question here on this skill's own authority. If something genuinely cannot
+be settled without a person, it is either a `CONTEXT.md` gap (step 6
+above) or one of the three ask triggers the merged gate itself carries
+(`CONTEXT.md` D6) — both route through somewhere else, never through a
+gate here.
 
 The lane `fgos-routing` decided before this skill was even loaded — and
 this skill's own Bootstrap step recorded into `plan.md` — does not, by
@@ -347,36 +366,47 @@ lane is input to that choice, never a substitute for it.
 
 ## Handoff
 
-Once `plan.md` is written and approved, load `fgos-coding-validating` to run the
-reality check that gates whatever comes after `planning` — or hand back to
-`fgos-routing` first if it is not obvious which comes next. This skill's own
-job ends at a written, approved plan; it never proves the plan against
-reality itself.
+Once `plan.md` is written, load `fgos-coding-validating` to run the reality
+check and the single gate that together decide whatever comes after
+`planning` — or hand back to `fgos-routing` first if it is not obvious
+which comes next. This skill's own job ends at a written plan; it never
+proves the plan against reality itself, and it never approves it.
 
 ## Red flags
 
 - re-deriving a lane `fgos-routing`'s Orient step already handed off,
   instead of reading it — the direct-entry fallback above only applies
   when honestly nothing was handed off at all
-- a claim in the Gate presentation that cannot be traced back to a
-  specific passage of `plan.md`/`CONTEXT.md`, asserted instead of raised
-  as an Open Question
+- a claim in `plan.md` that cannot be traced back to a specific passage of
+  itself or `CONTEXT.md`, asserted instead of raised as an Outstanding
+  question
 - reopening a decision `CONTEXT.md` already locked, instead of citing it
 - a risk-map entry with no proof point carried to `fgos-coding-validating`
-- a child item listed with no real verify command, or a vague one
+- a child spec with no real verify command, or a vague one
+- **creating a split child here at all** (`fgos add --parent`) instead of
+  writing its spec into `plan.md` for the single gate to materialize
+- **inventing an `action` that cites a D-ID loosely, or a placeholder
+  verify, just to make a child spec well-formed** — being unable to write
+  either is trigger T3, a real signal to stop, not a formatting obstacle
+- **asking a shape-approval question, or recording a `planApprove` gate**
+  — this skill has no gate
 - recording the mode decision as a new field or stage instead of `plan.md`
   prose
 - applying a stage move directly instead of leaving it to the engine
-- running `fgos-coding-validating`'s reality check here to skip the gate
+- running `fgos-coding-validating`'s reality check here
 - classifying the item's domain — not this skill's job
 - guessing a product assumption for a material `CONTEXT.md` gap instead of
   handing back to `fgos-coding-exploring`, or asking a question that fails the
   material/grounded/answerable filter instead of pinning it as an
   assumption
+- handing back to `fgos-coding-exploring` without first recording the gap
+  via `fgos decision` — the hand-back is invisible to any later session
+  otherwise
 - moving `item.stage` back to `exploring` for a mid-planning gap — no such
   edge exists; hand back via direct invocation instead
 
 Violating the letter of the rules is violating the spirit of the rules.
 
-Plan shaped and approved. Invoke `fgos-coding-validating` (directly, or via
-`fgos-routing` once the item's next stage is clear).
+Plan shaped. Invoke `fgos-coding-validating` (directly, or via
+`fgos-routing` once the item's next stage is clear) — it owns the single
+gate and the materialization that follows it.

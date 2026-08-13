@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Stage `planning` now asks a person **once**, not twice. The
+  `planApprove` gate is gone from `fgos-coding-planning`; the single
+  remaining gate lives in `fgos-coding-validating`, immediately before
+  split children are created. It also asks a different kind of question:
+  the agent first exhausts every action within reach, then weighs what a
+  wrong answer would cost to repair, and only stops when one of three
+  concrete triggers fires — presenting the specific thing it is stuck on
+  and its own attempt so far, rather than the whole plan plus
+  "approve?". When nothing is stuck it proceeds and posts a non-blocking
+  note. Split children are no longer created during planning: their specs
+  are written into `plan.md` and materialized in one step at that gate via
+  `fgos plan --verdict decompose --children`, so a cut that turns out
+  wrong costs nothing to change, and children arrive at `executing` with
+  no gate of their own. A mid-planning hand-back to `fgos-coding-exploring`
+  now records the gap it found, so the re-entry closes only that gap
+  instead of re-running a full exploring pass.
+  (`docs/history/coding-planning-validating-gate-redesign/CONTEXT.md`;
+  supersedes `docs/history/gate-bypass/CONTEXT.md` D6, D4, and D2's
+  never-self-report clause, and replaces the `canAutoApproveValidate`
+  export with `canAutoApproveMergedGate`.)
+
 ### Added
 
 - Delivered-event merge provenance: `fgos approve`'s real merge paths (local
