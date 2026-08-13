@@ -131,6 +131,12 @@ config/check của riêng nó) — không phải một bản vá cục bộ cho 
   thẳng với phân loại ~35-CLI-wrapper vs 14-dev-skill đã có sẵn trong
   `distribution.md` Data Dictionary #4b — không cần phân loại lại. Đã ghi
   D6, cập nhật §3/§4/§6.
+- **2026-08-13, vòng 11** — Anh yêu cầu liệt kê cụ thể 14 skill ẩn + 35
+  skill visible. Em đọc trực tiếp `.agents/skills/` + `plugins/fgOS/
+  skills/`, liệt kê đủ tên, phát hiện thêm 1 điểm: `.agents/skills/` có
+  `distill` không thuộc bộ 14 dev-skill (không prefix `fgos-`, mirror test
+  không đụng tới) — không ảnh hưởng D5/D6. Anh xác nhận đồng ý — danh sách
+  cụ thể ghi vào §7 làm tham chiếu cho việc chia task.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -297,4 +303,27 @@ dev-skill — đưa vào §7 như 1 task riêng, không giả định đã đún
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-(chưa có — chờ §6 có nội dung cụ thể)
+**Tham chiếu — danh sách skill cụ thể cho D6 (xác nhận round 11):**
+
+14 dev-skill (`.agents/skills/fgos-*`, `user-invocable: false`):
+`fgos-clarifying`, `fgos-coding-compounding`, `fgos-coding-discovering`,
+`fgos-coding-driving`, `fgos-coding-exploring`, `fgos-coding-implement`,
+`fgos-coding-planning`, `fgos-coding-shaping`, `fgos-coding-validating`,
+`fgos-fanout`, `fgos-indexing`, `fgos-researching`, `fgos-routing`,
+`fgos-unlock`.
+
+35 CLI-wrapper skill (`plugins/fgOS/skills/` trừ 14 trên + `_shared`,
+`user-invocable: true`): tạo/sửa work-item — `submit`, `ask`, `answer`,
+`move`, `unlock`; launcher/orchestrator — `pick`, `cook`, `discover`,
+`plan`, `coding-shape`, `coding-shape-distill`, `return`; vòng lặp/next —
+`discover-next`, `discover-loop`, `plan-next`, `plan-loop`, `merge-next`,
+`merge-loop`, `merge-list`, `retro-next`, `retro-loop`, `cleanup-next`,
+`cleanup-loop`; đọc/báo cáo — `list`, `show`, `ready`, `stale`, `graph`,
+`rollup`, `conflicts`, `triage`, `check`; khác — `goal`, `terminal`,
+`terminal-close`.
+
+Ghi chú: `.agents/skills/distill` KHÔNG thuộc bộ 14 — không prefix
+`fgos-`, ngoài phạm vi mirror/D5/D6.
+
+(chờ chốt xác nhận không còn câu hỏi thiết kế mở nào khác trước khi chia
+task cụ thể theo D1-D6)
