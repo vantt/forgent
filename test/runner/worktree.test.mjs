@@ -15,6 +15,7 @@ import {
   reclaimOrphanedCheckout,
   provisionDependencies,
   resyncClaimWorktree,
+  resyncWorktree,
   refreshUnstartedBranch,
   withMergeEphemeralWorktree,
   WorktreeError,
@@ -713,6 +714,223 @@ test('createClaimWorktree still reattaches a DIRTY checkout whose branch never m
   assert.equal(fs.readFileSync(path.join(first.path, 'in-progress.txt'), 'utf8'), 'not yet committed\n');
 
   removeWorktree(repoRoot, first.path, { force: true });
+});
+
+test('resyncClaimWorktree re-strips .fgos/ after its own reset --hard (tsk-1d7 bundled fix, ADR0020)', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const branch = branchNameFor('resync-fgos-restrip');
+  const first = createClaimWorktree(repoRoot, 'resync-fgos-restrip', { worktreeDir });
+  commitOnWorktree(first.path, 'context.md', '# decisions\n');
+
+  // Advance the branch externally with a commit that adds a TRACKED
+  // .fgos/ file -- mirrors this real repo's own ADR0020 premise (.fgos/
+  // is git-tracked), so `reset --hard` to the new tip resurrects it on
+  // disk unless it is stripped again afterward.
+  const startTip = execFileSync('git', ['rev-parse', branch], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  const detachedPath = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-worktree-test-detached-fgos-'));
+  execFileSync('git', ['worktree', 'add', '--detach', detachedPath, startTip], { cwd: repoRoot });
+  fs.mkdirSync(path.join(detachedPath, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(detachedPath, '.fgos', 'events.jsonl'), '{"seq":1}\n');
+  execFileSync('git', ['add', '.fgos/events.jsonl'], { cwd: detachedPath });
+  execFileSync('git', ['commit', '-q', '-m', 'external advance: tracked .fgos/'], { cwd: detachedPath });
+  const newTip = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: detachedPath, encoding: 'utf8' }).trim();
+  execFileSync('git', ['branch', '-f', branch, newTip], { cwd: repoRoot });
+  execFileSync('git', ['worktree', 'remove', '--force', detachedPath], { cwd: repoRoot });
+
+  const result = resyncClaimWorktree(repoRoot, first.path, branch);
+
+  assert.equal(result.resynced, true);
+  assert.equal(
+    fs.existsSync(path.join(first.path, '.fgos')),
+    false,
+    'resyncClaimWorktree\'s own reset --hard must not resurrect .fgos/ on disk (ADR0020)',
+  );
+
+  removeWorktree(repoRoot, first.path, { force: true });
+});
+
+// --- resync-worktree repair verb (tsk-1d7, docs/history/
+// stale-worktree-index-guard/CONTEXT.md D3) -- unlike resyncClaimWorktree
+// above, this verb is invoked precisely BECAUSE the worktree has real
+// staged content worth carrying forward (the commit that was about to
+// happen), so it must succeed where resyncClaimWorktree would refuse. ---
+
+test('resyncWorktree is a no-op when the worktree is already at its branch tip', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const branch = branchNameFor('resync-verb-same-tip');
+  const wt = createClaimWorktree(repoRoot, 'resync-verb-same-tip', { worktreeDir });
+  commitOnWorktree(wt.path, 'context.md', '# decisions\n');
+
+  const result = resyncWorktree(repoRoot, wt.path, branch);
+
+  assert.deepEqual(result, { resynced: false, reason: 'already-in-sync' });
+  removeWorktree(repoRoot, wt.path, { force: true });
+});
+
+test('resyncWorktree refuses a diverged (rewritten) branch, same as resyncClaimWorktree', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const branch = branchNameFor('resync-verb-diverged');
+  const wt = createClaimWorktree(repoRoot, 'resync-verb-diverged', { worktreeDir });
+  commitOnWorktree(wt.path, 'context.md', '# decisions\n');
+  const lastSynced = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: wt.path, encoding: 'utf8' }).trim();
+  const parentTip = execFileSync('git', ['rev-parse', `${lastSynced}^`], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  execFileSync('git', ['branch', '-f', branch, parentTip], { cwd: repoRoot });
+  advanceBranchExternally(repoRoot, branch, 'sibling.md', '# sibling\n');
+
+  assert.throws(() => resyncWorktree(repoRoot, wt.path, branch), WorktreeError);
+
+  removeWorktree(repoRoot, wt.path, { force: true });
+});
+
+test('resyncWorktree with nothing staged resets cleanly to the branch tip (reapplied: false)', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const branch = branchNameFor('resync-verb-nothing-staged');
+  const wt = createClaimWorktree(repoRoot, 'resync-verb-nothing-staged', { worktreeDir });
+  commitOnWorktree(wt.path, 'context.md', '# decisions\n');
+
+  const newTip = advanceBranchExternally(repoRoot, branch, 'plan.md', '# plan\n');
+
+  const result = resyncWorktree(repoRoot, wt.path, branch);
+
+  assert.equal(result.resynced, true);
+  assert.equal(result.reapplied, false);
+  assert.equal(
+    execFileSync('git', ['rev-parse', 'HEAD'], { cwd: wt.path, encoding: 'utf8' }).trim(),
+    newTip,
+  );
+  assert.equal(fs.existsSync(path.join(wt.path, 'plan.md')), true);
+
+  removeWorktree(repoRoot, wt.path, { force: true });
+});
+
+test('resyncWorktree reapplies staged content (a new file) after resetting to the moved branch tip', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const branch = branchNameFor('resync-verb-reapply');
+  const wt = createClaimWorktree(repoRoot, 'resync-verb-reapply', { worktreeDir });
+  commitOnWorktree(wt.path, 'context.md', '# decisions\n');
+
+  // The commit that was about to happen from this worktree -- staged, not
+  // yet committed, when the external force-move lands.
+  fs.writeFileSync(path.join(wt.path, 'my-change.md'), '# my staged change\n');
+  execFileSync('git', ['add', 'my-change.md'], { cwd: wt.path });
+
+  const newTip = advanceBranchExternally(repoRoot, branch, 'plan.md', '# plan\n');
+
+  const result = resyncWorktree(repoRoot, wt.path, branch);
+
+  assert.equal(result.resynced, true);
+  assert.equal(result.reapplied, true);
+  assert.equal(
+    execFileSync('git', ['rev-parse', 'HEAD'], { cwd: wt.path, encoding: 'utf8' }).trim(),
+    newTip,
+    'the worktree must land on the real branch tip, not stay behind',
+  );
+  assert.equal(fs.existsSync(path.join(wt.path, 'plan.md')), true, 'the branch\'s own external advance must be present');
+  assert.equal(
+    fs.readFileSync(path.join(wt.path, 'my-change.md'), 'utf8'),
+    '# my staged change\n',
+    'the worktree\'s own staged content must survive the resync',
+  );
+  const staged = execFileSync('git', ['diff', '--cached', '--name-only'], { cwd: wt.path, encoding: 'utf8' }).trim();
+  assert.equal(staged, 'my-change.md', 'the reapplied content must land back in the index, not just the working tree');
+
+  removeWorktree(repoRoot, wt.path, { force: true });
+});
+
+test('resyncWorktree refuses on a real conflict, preserving the patch file for manual review', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const branch = branchNameFor('resync-verb-conflict');
+  const wt = createClaimWorktree(repoRoot, 'resync-verb-conflict', { worktreeDir });
+  commitOnWorktree(wt.path, 'context.md', '# decisions\n');
+
+  // Stage a conflicting edit to the SAME line the external advance below
+  // also changes.
+  fs.writeFileSync(path.join(wt.path, 'seed.txt'), 'staged-from-worktree\n');
+  execFileSync('git', ['add', 'seed.txt'], { cwd: wt.path });
+
+  advanceBranchExternally(repoRoot, branch, 'unrelated.md', '# unrelated\n');
+  // advanceBranchExternally only touched a new file -- also conflict seed.txt
+  // itself via a second external commit on the same branch.
+  const detachedPath = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-worktree-test-detached-conflict-'));
+  execFileSync('git', ['worktree', 'add', '--detach', detachedPath, branch], { cwd: repoRoot });
+  fs.writeFileSync(path.join(detachedPath, 'seed.txt'), 'external-conflicting-content\n');
+  execFileSync('git', ['add', 'seed.txt'], { cwd: detachedPath });
+  execFileSync('git', ['commit', '-q', '-m', 'external conflicting edit'], { cwd: detachedPath });
+  const conflictTip = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: detachedPath, encoding: 'utf8' }).trim();
+  execFileSync('git', ['branch', '-f', branch, conflictTip], { cwd: repoRoot });
+  execFileSync('git', ['worktree', 'remove', '--force', detachedPath], { cwd: repoRoot });
+
+  const gitCommonDir = execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  const patchDirBefore = path.join(gitCommonDir, 'fgos-resync-patches');
+  const filesBefore = fs.existsSync(patchDirBefore) ? fs.readdirSync(patchDirBefore) : [];
+
+  assert.throws(() => resyncWorktree(repoRoot, wt.path, branch), WorktreeError);
+
+  const filesAfter = fs.readdirSync(patchDirBefore);
+  assert.equal(filesAfter.length, filesBefore.length + 1, 'a conflict must preserve exactly one new patch file for manual review');
+  const patchContent = fs.readFileSync(path.join(patchDirBefore, filesAfter.find((f) => !filesBefore.includes(f))), 'utf8');
+  assert.match(patchContent, /seed\.txt/, 'the preserved patch must contain the staged change that could not be reapplied');
+
+  removeWorktree(repoRoot, wt.path, { force: true });
+});
+
+test('resyncWorktree refuses on stray dirt beyond what was staged, never guessing a merge', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const branch = branchNameFor('resync-verb-stray-dirt');
+  const wt = createClaimWorktree(repoRoot, 'resync-verb-stray-dirt', { worktreeDir });
+  commitOnWorktree(wt.path, 'context.md', '# decisions\n');
+
+  fs.writeFileSync(path.join(wt.path, 'my-change.md'), '# staged\n');
+  execFileSync('git', ['add', 'my-change.md'], { cwd: wt.path });
+  // Stray dirt: an UNSTAGED, untracked file -- not part of the commit
+  // under repair.
+  fs.writeFileSync(path.join(wt.path, 'forgot-to-add.md'), '# oops\n');
+
+  advanceBranchExternally(repoRoot, branch, 'plan.md', '# plan\n');
+
+  assert.throws(() => resyncWorktree(repoRoot, wt.path, branch), WorktreeError);
+  // refusing must not have touched anything -- still behind, still dirty
+  assert.equal(fs.existsSync(path.join(wt.path, 'plan.md')), false, 'a refused resync must never partially apply');
+  assert.equal(fs.readFileSync(path.join(wt.path, 'forgot-to-add.md'), 'utf8'), '# oops\n');
+
+  removeWorktree(repoRoot, wt.path, { force: true });
+});
+
+test('resyncWorktree re-strips .fgos/ after its own reset --hard (tsk-1d7 bundled fix, ADR0020)', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const branch = branchNameFor('resync-verb-fgos-restrip');
+  const wt = createClaimWorktree(repoRoot, 'resync-verb-fgos-restrip', { worktreeDir });
+  commitOnWorktree(wt.path, 'context.md', '# decisions\n');
+
+  const startTip = execFileSync('git', ['rev-parse', branch], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  const detachedPath = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-worktree-test-detached-verb-fgos-'));
+  execFileSync('git', ['worktree', 'add', '--detach', detachedPath, startTip], { cwd: repoRoot });
+  fs.mkdirSync(path.join(detachedPath, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(detachedPath, '.fgos', 'events.jsonl'), '{"seq":1}\n');
+  execFileSync('git', ['add', '.fgos/events.jsonl'], { cwd: detachedPath });
+  execFileSync('git', ['commit', '-q', '-m', 'external advance: tracked .fgos/'], { cwd: detachedPath });
+  const newTip = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: detachedPath, encoding: 'utf8' }).trim();
+  execFileSync('git', ['branch', '-f', branch, newTip], { cwd: repoRoot });
+  execFileSync('git', ['worktree', 'remove', '--force', detachedPath], { cwd: repoRoot });
+
+  const result = resyncWorktree(repoRoot, wt.path, branch);
+
+  assert.equal(result.resynced, true);
+  assert.equal(
+    fs.existsSync(path.join(wt.path, '.fgos')),
+    false,
+    'resyncWorktree\'s own reset --hard must not resurrect .fgos/ on disk (ADR0020)',
+  );
+
+  removeWorktree(repoRoot, wt.path, { force: true });
 });
 
 test('createClaimWorktree ignores a checkout outside its own worktreeDir (a runner dispatch checkout is never reattached to)', () => {
