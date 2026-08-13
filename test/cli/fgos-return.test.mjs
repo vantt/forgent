@@ -684,7 +684,7 @@ test('reject without --reason is rejected as validation, exit 4, item stays prop
   const cwd = tmpCwd();
   addOk(cwd, 'reject-no-reason-item');
   run(cwd, ['move', 'reject-no-reason-item', '--to', 'doing']);
-  run(cwd, ['move', 'reject-no-reason-item', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'reject-no-reason-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 
   const result = run(cwd, ['reject', 'reject-no-reason-item']);
   assert.equal(result.status, 4);

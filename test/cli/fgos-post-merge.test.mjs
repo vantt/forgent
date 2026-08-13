@@ -618,7 +618,7 @@ test('catchup on an item whose target has a REAL same-line conflict leaves it bl
   gitAtCwd(cwd, ['commit', '-q', '-m', 'branch changes shared.txt']);
   gitAtCwd(cwd, ['checkout', 'main']);
 
-  run(cwd, ['move', 'catchup-conflict-item', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'catchup-conflict-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
   commitPending(cwd, 'state: propose catchup-conflict-item');
   run(cwd, ['move', 'catchup-conflict-item', '--to', 'blocked', '--reason', 'merge-conflict']);
   commitPending(cwd, 'state: park catchup-conflict-item');
@@ -686,7 +686,7 @@ test('catchup on an item blocked for an unrelated reason (e.g. anti-loop-max-vis
   const cwd = tmpCwd();
   addOk(cwd, 'catchup-unrelated-reason');
   run(cwd, ['move', 'catchup-unrelated-reason', '--to', 'doing']);
-  run(cwd, ['move', 'catchup-unrelated-reason', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'catchup-unrelated-reason', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
   run(cwd, ['move', 'catchup-unrelated-reason', '--to', 'blocked', '--reason', 'anti-loop-max-visits']);
 
   const result = run(cwd, ['catchup', 'catchup-unrelated-reason']);
@@ -702,7 +702,7 @@ test('catchup --timeout and --no-timeout together are rejected as validation, ex
   const cwd = tmpCwd();
   addOk(cwd, 'catchup-timeout-conflict');
   run(cwd, ['move', 'catchup-timeout-conflict', '--to', 'doing']);
-  run(cwd, ['move', 'catchup-timeout-conflict', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'catchup-timeout-conflict', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
   run(cwd, ['move', 'catchup-timeout-conflict', '--to', 'blocked', '--reason', 'merge-conflict']);
 
   const result = run(cwd, ['catchup', 'catchup-timeout-conflict', '--timeout', '1000', '--no-timeout']);
@@ -958,7 +958,7 @@ test('catchup accepts a blocked reason of merge-blocked-other-item as a valid pr
   gitAtCwd(cwd, ['commit', '-q', '-m', 'worker output for catchup-blocked-other-item']);
   gitAtCwd(cwd, ['checkout', 'main']);
 
-  run(cwd, ['move', 'catchup-blocked-other-item', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'catchup-blocked-other-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
   commitPending(cwd, 'state: propose catchup-blocked-other-item');
   run(cwd, ['move', 'catchup-blocked-other-item', '--to', 'blocked', '--reason', 'merge-blocked-other-item']);
   commitPending(cwd, 'state: park catchup-blocked-other-item');

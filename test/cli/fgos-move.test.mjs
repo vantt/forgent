@@ -32,7 +32,7 @@ test('move --to delivered is allowed when no fgw/<id> branch exists at all (pull
   run(cwd, ['init']);
   addOk(cwd, 'move-no-branch');
   run(cwd, ['move', 'move-no-branch', '--to', 'doing']);
-  run(cwd, ['move', 'move-no-branch', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'move-no-branch', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 
   const result = run(cwd, ['move', 'move-no-branch', '--to', 'delivered']);
   assert.equal(result.status, 0, result.stderr);
@@ -45,7 +45,7 @@ test('move --to delivered is allowed when fgw/<id> exists and IS reachable from 
   addOk(cwd, 'move-reachable');
   run(cwd, ['move', 'move-reachable', '--to', 'doing']);
   gitAtCwd(cwd, ['branch', 'fgw/move-reachable', 'main']); // branched off main, never diverged: trivially an ancestor
-  run(cwd, ['move', 'move-reachable', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'move-reachable', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 
   const result = run(cwd, ['move', 'move-reachable', '--to', 'delivered']);
   assert.equal(result.status, 0, result.stderr);
@@ -105,4 +105,71 @@ test('move --to a status other than delivered is never gated by the branch-reach
   const result = run(cwd, ['move', 'move-not-delivered', '--to', 'blocked', '--reason', 'unrelated block reason']);
   assert.equal(result.status, 0, result.stderr);
   assert.equal(stateView(cwd).work['move-not-delivered'].status, 'blocked');
+});
+
+// --- move --to awaiting-approval from doing: return's own proof-of-progress ---
+// guard bypass (tsk-280). `return` is the one door built to prove real
+// progress before doing -> awaiting-approval (branch-advanced, clean tree,
+// verify pass). `move` had zero precondition for this exact edge, silently
+// bypassing all three. Mirrors the --to delivered guard above: refuse by
+// default, require a non-empty --skip-return-guard reason, logged to the
+// decision log.
+
+test('move --to awaiting-approval on a "doing" item is REFUSED without --skip-return-guard, no event written', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  addOk(cwd, 'move-guard-doing');
+  run(cwd, ['move', 'move-guard-doing', '--to', 'doing']);
+
+  const before = stateView(cwd).work['move-guard-doing'];
+  const result = run(cwd, ['move', 'move-guard-doing', '--to', 'awaiting-approval']);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /fgos return/);
+  assert.match(result.stderr, /no proof of real progress|proof of real progress/i);
+
+  const after = stateView(cwd).work['move-guard-doing'];
+  assert.equal(after.status, before.status, 'refused move must not advance status');
+});
+
+test('move --to awaiting-approval with --skip-return-guard proceeds despite "doing" status, and logs the reason to the decision log', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  addOk(cwd, 'move-guard-override');
+  run(cwd, ['move', 'move-guard-override', '--to', 'doing']);
+
+  const result = run(cwd, ['move', 'move-guard-override', '--to', 'awaiting-approval', '--skip-return-guard', 'manual recovery, evidence in incident-99']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(envelopeData(result.stdout).to, 'awaiting-approval');
+  assert.equal(stateView(cwd).work['move-guard-override'].status, 'awaiting-approval');
+
+  const view = stateView(cwd);
+  const decisions = view.decisions.filter((d) => d.id === 'move-guard-override' || (d.text ?? '').includes('move-guard-override'));
+  assert.ok(decisions.length > 0, 'override must be recorded to the decision log');
+  assert.match(decisions.at(-1).rationale, /incident-99/);
+});
+
+test('move --to awaiting-approval on a "doing" item refuses even with an EMPTY --skip-return-guard value (validation, not a silent bypass)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  addOk(cwd, 'move-guard-empty');
+  run(cwd, ['move', 'move-guard-empty', '--to', 'doing']);
+
+  const result = run(cwd, ['move', 'move-guard-empty', '--to', 'awaiting-approval', '--skip-return-guard', '']);
+  assert.notEqual(result.status, 0);
+  assert.equal(stateView(cwd).work['move-guard-empty'].status, 'doing');
+});
+
+test('move --to awaiting-approval on a NON-"doing" item is never gated by the return-guard check', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'move-guard-not-doing', { verify: 'true' });
+  commitPendingBeforeApprove(cwd, 'move-guard-not-doing');
+  run(cwd, ['move', 'move-guard-not-doing', '--to', 'doing']);
+  run(cwd, ['move', 'move-guard-not-doing', '--to', 'blocked', '--reason', 'unrelated']);
+
+  // blocked -> awaiting-approval (catchup's own edge) is a real FSM
+  // transition never claimed by `doing`'s own precondition above.
+  const result = run(cwd, ['move', 'move-guard-not-doing', '--to', 'awaiting-approval']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(stateView(cwd).work['move-guard-not-doing'].status, 'awaiting-approval');
 });
