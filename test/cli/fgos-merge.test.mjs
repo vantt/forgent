@@ -2,6 +2,11 @@
 // từ test/cli/fgos.test.mjs (tsk-3um). Nội dung test không đổi, chỉ chỗ ở đổi.
 // Bộ đồ nghề dùng chung nằm ở ./helpers/fgos-cli-harness.mjs.
 import { test } from 'node:test';
+// The retrospective-content gate itself, so the two tests below can assert
+// the CONSEQUENCE of tagging these verbs' decisions as engine bookkeeping —
+// not merely that the field is present. Imported straight from src rather
+// than re-exported through the harness: only these two tests need it.
+import { checkRetrospectiveContent } from '../../src/state/cleanup-harness.mjs';
 import {
   ADD_BAD_FLAG_CASES,
   DEFAULT_TTL_MS,
@@ -223,6 +228,33 @@ test('sync-root records a real decision on the root item', () => {
   const decisionEvents = lines.map((l) => JSON.parse(l)).filter((e) => e.type === 'decision' && e.payload?.id === 'sync-root-decision');
   assert.equal(decisionEvents.length, 1, 'sync-root must append exactly one real decision record');
   assert.match(decisionEvents[0].payload.text, /sync-root-decision|fgw\/sync-root-decision/);
+});
+
+// A branch sync is machinery, not reflection. The record above still exists
+// and still shows in `fgos show` (which filters decisions by id, never by
+// kind) -- but it must not read as someone having thought about the work,
+// because that is the one thing standing between an item and `done`.
+// Untagged, it satisfied the retrospective gate outright: the same hole
+// tsk-qrs closed for the driver's closing report, still open through this
+// verb. Asserted end to end, on the decision the real verb actually wrote,
+// because the gate itself was never the defective half.
+test('sync-root tags its decision as engine bookkeeping, so it cannot satisfy the retrospective gate', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeDriftedRoot(cwd, 'sync-root-engine-kind', { verify: 'true' });
+  commitPendingBeforeApprove(cwd, 'sync-root-engine-kind');
+
+  const result = run(cwd, ['sync-root', 'sync-root-engine-kind']);
+  assert.equal(result.status, 0, result.stderr);
+
+  const decisionEvents = eventLines(cwd)
+    .map((l) => JSON.parse(l))
+    .filter((e) => e.type === 'decision' && e.payload?.id === 'sync-root-engine-kind');
+  assert.equal(decisionEvents.length, 1, 'still exactly one decision record -- tagging must not change how many are written');
+  assert.equal(decisionEvents[0].payload.kind, 'engine', 'a mechanical branch sync is engine bookkeeping, not a design decision');
+
+  const gate = checkRetrospectiveContent(stateView(cwd), 'sync-root-engine-kind', cwd);
+  assert.equal(gate.ok, false, 'a synced root with no retrospective document must not pass the cleanup gate on its sync record alone');
 });
 
 test('sync-root nested: a root with a parent merges into fgw/<parentId>, not main; main stays untouched; the child root\'s status stays unchanged', () => {
@@ -460,6 +492,13 @@ test('promote-to-component happy path (D1 new-item): creates a fresh root, merge
   assert.equal(decisionEvents.length, 1, 'promote-to-component must append exactly one real decision record');
   assert.match(decisionEvents[0].payload.text, /ptc-new-root-a/);
   assert.match(decisionEvents[0].payload.text, /ptc-new-root-b/);
+
+  // Same reasoning as sync-root's own engine-kind test above: converging
+  // siblings into a component is machinery, so its record must not read as
+  // reflection at the retrospective gate.
+  assert.equal(decisionEvents[0].payload.kind, 'engine', 'a mechanical component promotion is engine bookkeeping, not a design decision');
+  const gate = checkRetrospectiveContent(stateView(cwd), data.rootId, cwd);
+  assert.equal(gate.ok, false, 'a promoted root with no retrospective document must not pass the cleanup gate on its promotion record alone');
 });
 
 test('promote-to-component happy path (D1 reuse-member): promotes an existing member to root, root itself is skipped not merged', () => {
