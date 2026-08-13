@@ -11,10 +11,15 @@ diff (`changedFiles`, `src/runner/merge.mjs`, against trunk):
 item edits `fgos setup`'s own handler, so `required: true` is a correct
 match, not a false positive.
 
-Verify command (this item's own, `fgos list --id tsk-1qi --json`):
+Verify command (this item's own, `fgos list --id tsk-1qi --json`; fixed
+post-implementation, see plan.md's own "Verify fix, piece 2" note — the
+original `npm test -- test/skills/` passed a bare directory alongside the
+npm script's own already-active glob, the identical `node --test`
+phantom-failure quirk piece 1/tsk-2qc-1 already hit and fixed the same
+way):
 
 ```
-npm run build:skills && npm test -- test/skills/
+npm run build:skills && npm test -- 'test/skills/**/*.test.mjs'
 ```
 
 ## Failing before (pre-tsk-1qi commit, `3529f162`)
