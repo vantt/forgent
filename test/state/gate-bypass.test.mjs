@@ -434,11 +434,34 @@ test('fgos-coding-validating gate-check snippet: valid childSpecs JSON round-tri
   assert.equal(result.stdout.trim(), 'true', `expected 'true' for a clean reversible item, got stdout:\n${result.stdout}\nstderr:\n${result.stderr}`);
 });
 
-test('fgos-coding-validating gate-check snippet: malformed childSpecs JSON fails closed to "false", never an uncaught crash (tsk-blk, tsk-224 gap)', () => {
+test('fgos-coding-validating gate-check snippet: malformed childSpecs JSON fails closed to "false" on stdout, never an uncaught crash (tsk-blk, tsk-224 gap)', () => {
   const { fgosRoot, planPath } = tmpGateCheckFixture();
   const result = runGateCheckSnippet({
     fgosRoot, itemId: 'gate-check-fixture', planPath, childSpecsArg: '[{"title": "x",]', costVerdict: COST_REVERSIBLE,
   });
   assert.equal(result.stdout.trim(), 'false', `expected the documented fail-closed 'false' on malformed JSON, got stdout:\n${JSON.stringify(result.stdout)}\nstderr:\n${result.stderr}`);
-  assert.equal(result.stderr.trim(), '', `expected no raw stack trace on stderr for a documented fail-closed path, got:\n${result.stderr}`);
+});
+
+// tsk-13s: the .catch() added by tsk-blk originally swallowed EVERY error
+// silently (stdout 'false', stderr empty) -- indistinguishable from "the
+// gate genuinely said no" whether the JSON was malformed or the caller's
+// own command was wrong (bad item id, bad path). Now it logs the real
+// error to stderr before printing 'false' to stdout, so the fail-closed
+// stdout contract holds unchanged while stderr keeps its diagnostic value.
+test('fgos-coding-validating gate-check snippet: malformed childSpecs JSON now logs a diagnostic to stderr (tsk-13s)', () => {
+  const { fgosRoot, planPath } = tmpGateCheckFixture();
+  const result = runGateCheckSnippet({
+    fgosRoot, itemId: 'gate-check-fixture', planPath, childSpecsArg: '[{"title": "x",]', costVerdict: COST_REVERSIBLE,
+  });
+  assert.match(result.stderr, /JSON/, `expected a real diagnostic on stderr, got:\n${JSON.stringify(result.stderr)}`);
+});
+
+test('fgos-coding-validating gate-check snippet: a non-JSON error (bad plan.md path) also fails closed to "false" on stdout with a real diagnostic on stderr, not silence (tsk-13s)', () => {
+  const { fgosRoot } = tmpGateCheckFixture();
+  const badPlanPath = path.join(fgosRoot, 'no-such-plan.md');
+  const result = runGateCheckSnippet({
+    fgosRoot, itemId: 'gate-check-fixture', planPath: badPlanPath, childSpecsArg: '[]', costVerdict: COST_REVERSIBLE,
+  });
+  assert.equal(result.stdout.trim(), 'false', `expected fail-closed 'false' on stdout for a non-JSON error too, got stdout:\n${JSON.stringify(result.stdout)}\nstderr:\n${result.stderr}`);
+  assert.match(result.stderr, /ENOENT/, `expected a real diagnostic on stderr instead of silence -- this is exactly what a confused caller (wrong plan path) needs to debug their own command; got stderr:\n${JSON.stringify(result.stderr)}`);
 });
