@@ -2,16 +2,14 @@
 
 ## 1. Trạng thái hiện tại
 
-Round 10. D1-D6 đã khoá. D5 (round 7-8) là bước ngoặt: xoay hẳn kiến trúc
-trục B (skill) khỏi khung D1 ban đầu — bỏ phụ thuộc plugin marketplace
-làm cơ chế BẮT BUỘC, chuyển sang `.agents/skills` làm nguồn thật
-(orchestrator-neutral, đã tồn tại sẵn trong repo), `.claude/skills` thành
-wrapper mỏng do `fgos setup` tự generate. Root cause #2 (marketplace
-check fail-open) coi như được giải quyết bằng kiến trúc mới — không còn
-là câu hỏi "WARN hay phân biệt case" nữa, vì check đó không còn
-load-bearing cho chức năng cốt lõi. Bin-discovery (root cause #1,
-D2-D4) đã xong từ round 6. Còn lại: xác nhận không còn câu hỏi thiết kế
-nào mở trước khi handoff sang `fgos-coding-exploring`/`fgos-coding-planning`.
+Round 14. D1-D7 đã khoá, hội tụ. D7 (round 12) chốt cơ chế build: 1 hàm
+generator dùng chung cho `npm run build:skills` (forgentX tự dogfood) và
+`fgos setup` (project ngoài), wrapper luôn tự chứa trong project đích
+(copy cả `.agents/skills` + `.claude/skills`, không trỏ ngược global).
+Round 13 (câu hỏi về `upstreams/bee`) không sinh quyết định mới — xác
+nhận bee không có case tương đương để so sánh (workshop nội bộ, không
+phân phối ra ngoài). Anh xác nhận "tiếp tục" — chuyển sang §7 chia task
+cụ thể + chuẩn bị handoff sang `fgos-coding-exploring`/`fgos-coding-planning`.
 
 ## 2. Mục tiêu & đề bài
 
@@ -44,6 +42,8 @@ config/check của riêng nó) — không phải một bản vá cục bộ cho 
 | 7 | Root cause #3 (mới phát hiện, D3): cơ chế human-convenience (shell function) tự wiring qua `fgos setup` có lỗ hổng fail-open riêng | Rõ | `integrationScriptPath()` (`src/setup/registrations.mjs:228-239`) trả `null` khi bản đang chạy không nằm trong git checkout nào; `checkShellIntegrationSourced` (dòng 276-280) coi `null` là `passed: true` — cùng pattern silent-pass với root cause #2. Global install qua nvm tình cờ vẫn ổn (`~/.nvm` tự nó là git clone), nhưng Homebrew/system-npm/Volta/fnm thì không wire được gì, doctor vẫn báo xanh. Yêu cầu "phải trong git checkout" vốn chỉ để tránh rác 1-dòng-source-mỗi-worktree — rủi ro đó không áp dụng cho bản cài qua npm. |
 | 8 | "Thật sự có cần plugin marketplace không?" (câu hỏi gốc của anh, round 7) | Rõ (D5) | Không cần cho chức năng CỐT LÕI. Bằng chứng dư thừa quan sát trực tiếp trong chính session này: 14 dev-skill load 2 lần (bản không-prefix từ `.claude/skills/`, bản `fgOS:`-prefix từ plugin) — vì forgentX vừa là nguồn `.claude/skills/` vừa tự cài plugin của mình để dogfood. `.agents/skills/` đã tồn tại sẵn (14 skill y hệt) — đúng hướng orchestrator-neutral anh muốn. Quyết: `.agents/skills` thành nguồn thật, `.claude/skills` thành wrapper mỏng do `fgos setup` tự generate cho MỌI project — plugin marketplace hạ xuống tuỳ chọn. |
 | 9 | 14 dev-skill nội bộ (chỉ dùng khi fgOS tự dispatch) có cách nào không đăng ký thành `/skill` discoverable không? | Rõ (D6), còn 1 việc verify | Claude Code có frontmatter `user-invocable: false` — đúng use case ("background knowledge users shouldn't invoke directly", xác nhận qua research claude-code-guide). Chưa xác nhận 100% từ docs liệu có gỡ khỏi listing model thấy hay chỉ gỡ khỏi menu `/` người gõ tay — cần verify thực nghiệm trên 1 skill trước khi áp rộng. |
+| 10 | Build/git-flow/packaging có cần thiết kế thêm để support D5's wrapper-generation không? | Rõ (D7 cho phần build; git-flow/semver gác lại — đã có cơ chế ở `tsk-jtb`, không phải việc của item này) | Build: 1 hàm generator dùng chung cho `npm run build:skills` + `fgos setup`; wrapper luôn tự chứa trong project đích. Packaging: `.agents/` thiếu trong `files` allowlist (đã ghi D5); plugin channel có tự generate theo `.agents/skills` hay không vẫn để mở, không chặn thiết kế cốt lõi. |
+| 11 | `upstreams/bee` có cơ chế nào đáng copy cho build/wrapper không? | Rõ, không có gì để copy | `bee` là workshop nội bộ (`.bee/bin/bee.mjs`, dev-checkout self-hosting), không có `package.json`/`bin`, không có install/distribution doc nào — chưa từng cần giải bài toán "project khác cài vào dùng". Xác nhận độ khó D1-D7 đang giải là cái giá của việc fgOS chọn tái dùng được across project, không phải thiếu sót thiết kế. |
 
 ## 4. Quyết định đã chốt
 
@@ -55,6 +55,7 @@ config/check của riêng nó) — không phải một bản vá cục bộ cho 
 | D4 | Tầng 3 (global) trong D2 dùng **config-cache làm nguồn sự thật**: `fgos setup`/`doctor --fix` chạy probe nhiều tầng (PATH thường → ép login-shell `command -v` → probe trực tiếp vị trí global-install đã biết, không qua PATH) đúng 1 lần, ghi absolute path vào `~/.fgos/config.json`. Mọi lần gọi khác đọc cache trước (rẻ, không subprocess); cache sai/thiếu (`existsSync` fail) mới trigger probe lại + ghi đè — tự lành, không trả phí probe mỗi lần gọi. | Probe-mỗi-lần tốn 2-3 subprocess/lần gọi — đắt khi 1 phiên gọi `fgos` nhiều lần. Cache-read là 1 lần đọc file rẻ. Staleness tự sửa qua `existsSync`, chỉ trả phí probe đầy đủ đúng lúc cache thật sự sai (gỡ cài/đổi package manager/đổi version nvm). Khớp pattern act-then-report đã có sẵn của `fgos setup`/`doctor --fix` (RUL10), không phát minh cơ chế mới. |
 | D5 (sửa lại phần trục B của D1) | Nguồn thật cho nội dung skill chuyển sang `.agents/skills/<name>/SKILL.md` (orchestrator-neutral, đã tồn tại sẵn, hiện đang hand-mirror byte-identical vào `.claude/skills` + `plugins/fgOS/skills` qua `test/skills/fgos-mirror.test.mjs`). `.claude/skills/<name>/SKILL.md` thành **wrapper mỏng** — stub ngắn "đọc và làm theo `.agents/skills/<name>/SKILL.md`", cùng pattern dispatch-sang-skill-thật fgOS đã dùng khắp nơi (`plugins/fgOS/skills/coding-shape` → `fgos-coding-shaping`). `fgos setup` chạy ở BẤT KỲ project nào (không riêng forgentX) tự materialize `.agents/skills/*` (ship trong npm package, cần thêm `.agents/` vào `files` allowlist) + wrapper `.claude/skills/*` generate tự động — không cần `claude` CLI, không cần đăng ký plugin marketplace cho chức năng cốt lõi. Plugin/marketplace hạ xuống tuỳ chọn, chỉ cho ai muốn thêm `/fgOS:xxx` gõ tay. | Theo định hướng chủ sản phẩm: skill fgOS phải chuẩn hoá theo hướng agent điều phối không nhất thiết là Claude — `.agents/skills` đã tồn tại đúng vai trò này. Gộp 3-chân-mirror-tay hiện tại (tsk-32b) thành 1 nguồn thật + wrapper tự sinh vừa bỏ gánh nặng đồng bộ tay, vừa bỏ luôn phụ thuộc `claude` CLI — giải quyết root cause #2 bằng kiến trúc, không phải vá check. Tác động kéo theo đã ghi nhận: `test/skills/fgos-mirror.test.mjs` hiện assert byte-identical cả 3 chân — phải đổi thành assert "wrapper trỏ đúng chỗ" khi `.claude/skills` không còn là full copy. |
 | D6 | 14 dev-skill (nguồn `.agents/skills`, D5) mang frontmatter `user-invocable: false` trong wrapper `.claude/skills` — dispatch-only, không đăng ký discoverable cho human. ~35 CLI-wrapper skill (tạo work-item: submit/ask/answer/...; launcher/orchestrator: pick/cook/discover/plan/*-next/*-loop/terminal/goal/...) giữ nguyên `user-invocable: true` — đây mới là nhóm human thật sự gõ. Khớp thẳng ranh giới sẵn có trong Data Dictionary #4b (`distribution.md`), không cần phân loại lại. **Còn 1 việc verify thực nghiệm chưa xong**: chưa xác nhận `user-invocable: false` có gỡ khỏi listing model thấy hay chỉ gỡ khỏi menu `/` người gõ. | Anh chỉ rõ human chủ yếu dùng skill tạo work-item + launcher/orchestrator kiểu `loop.next` — khớp đúng ranh giới wrapper-vs-dev-skill đã có sẵn trong code. Research qua claude-code-guide xác nhận `user-invocable: false` là field đúng use case ("background knowledge users shouldn't invoke directly"), nhưng docs không xác nhận 100% phạm vi gỡ-khỏi-listing. |
+| D7 | Wrapper generation dùng **1 hàm generator dùng chung** (vd `src/setup/skill-wrappers.mjs`), gọi từ 2 nơi: (1) `npm run build:skills` — forgentX tự dogfood, giữ `.claude/skills/*` đồng bộ với `.agents/skills/*`, thay/mở rộng assertion của `test/skills/fgos-mirror.test.mjs` (byte-identical → wrapper-đúng-chỗ); (2) `fgos setup`'s external-project materialize path (D5). Cùng nguyên tắc "1 thuật toán, nhiều nơi gọi" đã áp cho D3. **Wrapper luôn tự chứa trong project đích**: `fgos setup` copy CẢ `.agents/skills/*` (nguồn) LẪN `.claude/skills/*` (wrapper sinh ra) vào project ngoài, path tương đối sibling — không bao giờ trỏ ngược về vị trí cài global (tránh lặp lại đúng loại fragility PATH/location mà D2/D4 đã giải cho bin). | Anh yêu cầu ưu tiên "build chạy đúng trước", và theo feedback chuẩn của anh (quyết khi đã thấy rõ hướng thắng, không hỏi vòng vo) — em advise thẳng thay vì hỏi lại. Dùng chung generator tránh lệch giữa bản forgentX tự dogfood và bản `fgos setup` sinh cho project ngoài. Tự chứa trong project đích tránh tái tạo đúng lớp fragility mà cả item này sinh ra để giải. |
 
 ## 5. Q&A log
 
@@ -137,6 +138,26 @@ config/check của riêng nó) — không phải một bản vá cục bộ cho 
   `distill` không thuộc bộ 14 dev-skill (không prefix `fgos-`, mirror test
   không đụng tới) — không ảnh hưởng D5/D6. Anh xác nhận đồng ý — danh sách
   cụ thể ghi vào §7 làm tham chiếu cho việc chia task.
+- **2026-08-13, vòng 12** — Anh hỏi có cần thiết kế thêm cho git-flow/
+  build/packaging để support cài đặt chuẩn không. Em scout: `git tag -l`
+  chỉ có `pre-tsk-3ce` (chưa có semver tag thật, dù `tsk-jtb` đã viết
+  runbook), pre-commit hook không trực tiếp enforce mirror (nằm ở
+  `npm test`). Trình bày 3 điểm (git-flow/semver, build, packaging). Anh
+  gác git-flow/semver sang bên ("đã có cơ chế, tag thôi mà"), yêu cầu tập
+  trung build. Em trình bày 2 việc (forgentX tự dogfood, project ngoài
+  runtime) + hỏi xác nhận trước khi khoá.
+- **2026-08-13, vòng 13** — Anh nói "em advise đi" — đúng lúc memory vừa
+  được cập nhật thêm rule "quyết khi đã thấy rõ hướng thắng, không giả vờ
+  hỏi nhiều lựa chọn". Em khoá thẳng D7 (1 generator dùng chung + wrapper
+  tự chứa) không hỏi lại. Giữa lúc ghi, anh gửi câu hỏi tangent: "bee họ
+  giải quyết chuyện này như nào, có gì hay copy không". Em scout
+  `upstreams/bee` — không có gì để copy (bee là workshop nội bộ, không
+  phân phối ra ngoài, chưa từng có case này).
+- **2026-08-13, vòng 14** — Anh hỏi tiếp "vậy sao họ vẫn chạy được cho các
+  case" — em xác nhận: vì bee chưa từng nhận lấy phạm vi "tái dùng được
+  cho project khác" mà fgOS tự đặt ra (`AGENTS.md`), nên chưa từng cần
+  giải root cause #1/#2/#3. Anh xác nhận "ok tiếp tục" — chuyển sang §7 +
+  chuẩn bị handoff.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -301,6 +322,21 @@ cho ~35 CLI-wrapper skill giữ nguyên `user-invocable: true` (mặc định).
 kiểm tra cả menu `/` lẫn listing model thấy) trước khi áp cho toàn bộ 14
 dev-skill — đưa vào §7 như 1 task riêng, không giả định đã đúng.
 
+**Build cho D5 (D7):** wrapper `.claude/skills/*` (và tương lai bất kỳ
+agent-harness nào khác) không phải sinh ra 2 lần bằng 2 logic khác nhau —
+1 hàm generator duy nhất, gọi từ `npm run build:skills` (forgentX tự
+dogfood, thay assertion byte-identical của `fgos-mirror.test.mjs` bằng
+assertion wrapper-đúng-chỗ) VÀ từ `fgos setup`'s external-materialize
+path. Wrapper luôn tự chứa: `fgos setup` copy cả `.agents/skills/*`
+(nguồn) lẫn `.claude/skills/*` (wrapper) thẳng vào project đích, path
+tương đối sibling — không bao giờ trỏ ngược vị trí cài global (tránh tái
+tạo đúng lớp fragility PATH/location D2/D4 vừa giải cho bin).
+
+Git-flow/semver (D2's giả định "pin version sạch") gác lại — thuộc phạm
+vi `tsk-jtb` (đã có runbook, chưa cắt tag thật — `git tag -l` chỉ có
+`pre-tsk-3ce`), không phải việc của item này. D2 vẫn đúng dù pin bằng
+commit SHA thay vì semver tag.
+
 ## 7. Danh mục hạng mục / task {#tasks}
 
 **Tham chiếu — danh sách skill cụ thể cho D6 (xác nhận round 11):**
@@ -325,5 +361,75 @@ dev-skill — đưa vào §7 như 1 task riêng, không giả định đã đún
 Ghi chú: `.agents/skills/distill` KHÔNG thuộc bộ 14 — không prefix
 `fgos-`, ngoài phạm vi mirror/D5/D6.
 
-(chờ chốt xác nhận không còn câu hỏi thiết kế mở nào khác trước khi chia
-task cụ thể theo D1-D6)
+---
+
+### Bin-discovery: 3-tầng + config-cache + shell-integration {#task-bin-discovery}
+
+**Mục tiêu:** `fgos` resolve đúng theo D2's 3 tầng ở MỌI nơi gọi — JS-side
+(doctor/skill/CI) và shell function (D3) — với tầng global dùng
+config-cache (D4) thay vì probe mỗi lần, và wiring convenience cho human
+không còn fail-open (root cause #3).
+
+**Excerpt §6:** "Trục A (bin)... 3 tầng deterministic" + "Tầng 3 cụ thể
+(D4)" + "Lớp thứ 3 vừa thêm (D3)".
+
+**D-ID áp dụng:** D2, D3, D4.
+
+**Quan hệ với task khác:** độc lập với 2 task dưới — không chung file
+(chỉ chạm `src/setup/registrations.mjs`, `src/setup/shell-rc.mjs`,
+`scripts/fgos-shell-integration.sh`, `src/config/global-config.mjs`),
+có thể làm song song.
+
+**Verify nháp:** test thật cho `checkPluginSkillCliReachable`/tương đương
+resolve qua config-cache khi PATH-lookup thường thất bại (giả lập máy chỉ
+có global install, không pnpm dự phòng); test cho
+`integrationScriptPath()` không còn trả `null` khi bản cài không nằm
+trong git checkout (giả lập bằng thư mục tạm không phải git repo, gắn
+copy của script); test shell function (bash) cho cả 3 tầng qua fixture.
+
+### Skill source-of-truth: `.agents/skills` + generator + wrapper {#task-skill-source-of-truth}
+
+**Mục tiêu:** `.agents/skills/*` là nguồn thật, ship trong npm package;
+1 generator dùng chung sinh `.claude/skills/*` wrapper mỏng — cho cả
+forgentX tự dogfood (`npm run build:skills`) lẫn `fgos setup` ở project
+ngoài (tự chứa, không trỏ ngược global).
+
+**Excerpt §6:** "Trục B — bước ngoặt kiến trúc (D5)" + "Build cho D5
+(D7)".
+
+**D-ID áp dụng:** D5, D7 (và phần trục B đã sửa của D1).
+
+**Quan hệ với task khác:** độc lập file với bin-discovery. Là điều kiện
+tiên quyết mềm cho task ẩn-skill bên dưới (wrapper phải tồn tại trước khi
+gắn `user-invocable: false` vào nó) — nên làm trước hoặc cùng lúc, không
+sau.
+
+**Verify nháp:** thêm `.agents/` vào `package.json` `files`; viết
+`src/setup/skill-wrappers.mjs` (hay tên tương đương) + unit test; sửa
+`test/skills/fgos-mirror.test.mjs` từ byte-identical sang assert
+wrapper-content đúng dạng redirect-stub trỏ đúng file nguồn; test thật
+`fgos setup` chạy trong 1 thư mục scratch (git repo trống, không có
+`claude` CLI trên PATH) sinh ra đủ `.agents/skills/*` + `.claude/skills/*`
+tương ứng.
+
+### Ẩn 14 dev-skill khỏi discoverable {#task-hide-dev-skills}
+
+**Mục tiêu:** 14 dev-skill mang `user-invocable: false`, không xuất hiện
+trong menu người gõ tay (và lý tưởng là cả listing model thấy) — 35
+CLI-wrapper skill giữ nguyên visible.
+
+**Excerpt §6:** "Ẩn skill nội bộ khỏi discoverable (D6)".
+
+**D-ID áp dụng:** D6.
+
+**Quan hệ với task khác:** phụ thuộc mềm vào task
+skill-source-of-truth ở trên (wrapper phải được generator sinh ra kèm
+frontmatter này, không phải sửa tay từng file). Bước ĐẦU TIÊN của task
+này là verify thực nghiệm (chưa xác nhận 100% qua docs) — làm trên 1
+skill (`fgos-unlock`, ít rủi ro nhất) trước khi áp cho cả 14.
+
+**Verify nháp:** set `user-invocable: false` trên `fgos-unlock`, restart
+session, kiểm tra thủ công: (a) biến mất khỏi menu `/`, (b) 1 skill khác
+gọi tường minh `Skill({skill: "fgos-unlock"})` vẫn thành công. Nếu cả 2
+đúng, áp cho 13 skill còn lại + test/kiểm tra generator (task trên) luôn
+sinh đúng frontmatter này cho 14 dev-skill, không cho 35 wrapper skill.
