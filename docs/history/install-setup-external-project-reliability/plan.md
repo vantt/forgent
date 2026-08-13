@@ -85,13 +85,26 @@ only by `fgos-coding-validating`'s single gate, not here.
   {
     "title": "Verify and roll out user-invocable:false for the 14 coding-domain dev-skills",
     "verify": "npm test -- test/skills/",
-    "action": "D6: empirically verify user-invocable:false on fgos-unlock first (menu removal + explicit Skill-tool dispatch still works), then have the shared generator (prior task) emit that frontmatter for all 14 fgos-* dev-skill wrappers, and only user-invocable:true (default) for the ~35 CLI-wrapper skills",
-    "footprint": ["src/setup/skill-wrappers.mjs", ".claude/skills/fgos-clarifying/SKILL.md", ".claude/skills/fgos-coding-compounding/SKILL.md", ".claude/skills/fgos-coding-discovering/SKILL.md", ".claude/skills/fgos-coding-driving/SKILL.md", ".claude/skills/fgos-coding-exploring/SKILL.md", ".claude/skills/fgos-coding-implement/SKILL.md", ".claude/skills/fgos-coding-planning/SKILL.md", ".claude/skills/fgos-coding-shaping/SKILL.md", ".claude/skills/fgos-coding-validating/SKILL.md", ".claude/skills/fgos-fanout/SKILL.md", ".claude/skills/fgos-indexing/SKILL.md", ".claude/skills/fgos-researching/SKILL.md", ".claude/skills/fgos-routing/SKILL.md", ".claude/skills/fgos-unlock/SKILL.md"],
+    "action": "D6: empirically verify user-invocable:false on fgos-unlock first (menu removal + explicit Skill-tool dispatch still works), then add that frontmatter to the SOURCE .agents/skills/fgos-*/SKILL.md files for all 14 dev-skills (re-sliced per engine footprint-overlap check against the skill-source-of-truth task: the generator copies frontmatter as-authored, never special-cases which skills are dev-skills, so this task never touches src/setup/skill-wrappers.mjs)",
+    "footprint": [".agents/skills/fgos-clarifying/SKILL.md", ".agents/skills/fgos-coding-compounding/SKILL.md", ".agents/skills/fgos-coding-discovering/SKILL.md", ".agents/skills/fgos-coding-driving/SKILL.md", ".agents/skills/fgos-coding-exploring/SKILL.md", ".agents/skills/fgos-coding-implement/SKILL.md", ".agents/skills/fgos-coding-planning/SKILL.md", ".agents/skills/fgos-coding-shaping/SKILL.md", ".agents/skills/fgos-coding-validating/SKILL.md", ".agents/skills/fgos-fanout/SKILL.md", ".agents/skills/fgos-indexing/SKILL.md", ".agents/skills/fgos-researching/SKILL.md", ".agents/skills/fgos-routing/SKILL.md", ".agents/skills/fgos-unlock/SKILL.md"],
     "kind": "task",
-    "risk": "light"
+    "risk": "light",
+    "deps": [1]
   }
 ]
 ```
+
+**Re-slice note (post-plan, resolving engine footprint-overlap ask):** the
+original spec had this task editing `src/setup/skill-wrappers.mjs`
+directly to special-case the 14 dev-skill names. Re-sliced instead: the
+generator (skill-source-of-truth task) copies frontmatter mechanically
+from `.agents/skills/*` source, with no hardcoded skill-name list; this
+task authors `user-invocable: false` directly into the 14 source files.
+Cleaner architecture (frontmatter lives with its own skill, not injected
+by the generator) and removes the file-level overlap entirely. `deps: [1]`
+kept for the empirical-verification ordering (needs the generator to
+exist to produce a real wrapper to test against), not for footprint
+reasons.
 
 ## Assumptions (not material enough to send back to exploring)
 
