@@ -194,6 +194,92 @@ test('tsk-1d7: a commit from a worktree whose branch was rewritten backward (not
   assert.match(result.stderr, /not an ancestor/);
 });
 
+// --- tsk-2cl: unreadable branch tip must fail closed, not fail open ------
+//
+// The precondition (`symbolic-ref` already succeeded, reflog already
+// succeeded, but `git rev-parse <branch>` fails moments later) is
+// genuinely a transient race in real git -- confirmed empirically that
+// any STATIC on-disk corruption of the branch ref breaks `reflog show
+// HEAD` identically to `rev-parse` (both need to resolve HEAD's current
+// target), so a real ref-level corruption can never isolate "reflog ok,
+// rev-parse not ok" the way a true concurrent race could. Reproduced here
+// instead with a fake `git` wrapper placed first on PATH: every command
+// proxies straight through to the real git binary except `rev-parse
+// <this-branch>`, which is made to fail on purpose -- deterministic,
+// no real ref corruption, and it still exercises the guard's actual catch
+// branch and the real hook subprocess end to end.
+
+// git ALWAYS prepends its own `--exec-path` (`/usr/lib/git-core`, which
+// contains the real `git` binary itself) onto PATH before spawning a hook
+// subprocess -- a deliberate git behavior, not a bug -- so a plain
+// PATH-prepend trick can never shadow `git` for a hook's own subsequent
+// `execFileSync('git', ...)` calls (confirmed empirically: the injected
+// dir landed AFTER /usr/lib/git-core in the hook's own observed PATH).
+// Mirror the real exec-path via symlinks into a fake dir, override only
+// the top-level `git` entry, then point `GIT_EXEC_PATH` (which git
+// prepends verbatim) at that fake dir instead -- every other git-core
+// helper binary (git-upload-pack, etc.) still resolves normally via the
+// symlinks, only the plain `git` lookup is redirected.
+function makeFakeGitFailingRevParseFor(branch) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-fake-git-'));
+  const realExecPath = execFileSync('git', ['--exec-path'], { encoding: 'utf8' }).trim();
+  const realGit = path.join(realExecPath, 'git');
+  for (const name of fs.readdirSync(realExecPath)) {
+    if (name === 'git') continue;
+    fs.symlinkSync(path.join(realExecPath, name), path.join(dir, name));
+  }
+  const script = [
+    '#!/bin/sh',
+    `if [ "$1" = "rev-parse" ] && [ "$2" = "${branch}" ]; then`,
+    '  echo "fatal: simulated transient ref-read race" >&2',
+    '  exit 128',
+    'fi',
+    `exec "${realGit}" "$@"`,
+    '',
+  ].join('\n');
+  const scriptPath = path.join(dir, 'git');
+  fs.writeFileSync(scriptPath, script);
+  fs.chmodSync(scriptPath, 0o755);
+  return dir;
+}
+
+test('tsk-2cl: a commit whose branch tip becomes unreadable (rev-parse fails) is refused, not silently allowed through', () => {
+  const { worktreeRoot } = initSharedAbsoluteHooksPathFixture();
+
+  // Establish a real lastSynced reflog entry first, same precondition
+  // every sibling tsk-1d7 test uses -- otherwise the reflog-unreadable
+  // branch (checked first) would fire instead of the one under test here.
+  const first = commitAsSession(worktreeRoot, {});
+  assert.equal(first.status, 0, `setup: first worktree commit must succeed -- got: ${first.stderr}`);
+
+  const fakeGitDir = makeFakeGitFailingRevParseFor('fgw/tsk-sir-repro');
+  try {
+    const result = commitAsSession(worktreeRoot, { PATH: `${fakeGitDir}:${process.env.PATH}`, GIT_EXEC_PATH: fakeGitDir });
+    assert.notEqual(result.status, 0, 'a commit whose branch tip cannot be read must be refused, never silently allowed through');
+    assert.match(result.stderr, /commit refused/);
+    assert.match(result.stderr, /unreadable branch ref/);
+  } finally {
+    fs.rmSync(fakeGitDir, { recursive: true, force: true });
+  }
+});
+
+test('tsk-2cl: a normal commit is unaffected when rev-parse succeeds (regression guard on the fake-git harness itself)', () => {
+  const { worktreeRoot } = initSharedAbsoluteHooksPathFixture();
+  const first = commitAsSession(worktreeRoot, {});
+  assert.equal(first.status, 0, `setup: first worktree commit must succeed -- got: ${first.stderr}`);
+
+  // Same fake-git harness, but targeting a branch name that does NOT
+  // match this worktree's real branch -- proves the harness only trips
+  // the intended target, not every commit.
+  const fakeGitDir = makeFakeGitFailingRevParseFor('fgw/some-other-branch');
+  try {
+    const result = commitAsSession(worktreeRoot, { PATH: `${fakeGitDir}:${process.env.PATH}`, GIT_EXEC_PATH: fakeGitDir });
+    assert.equal(result.status, 0, `an unrelated fake-git target must never affect this commit -- got: ${result.stderr}`);
+  } finally {
+    fs.rmSync(fakeGitDir, { recursive: true, force: true });
+  }
+});
+
 // --- tsk-56u: staged-.fgos/-deletion guard --------------------------------
 //
 // The real near-miss this guard exists to catch: a linked worktree never

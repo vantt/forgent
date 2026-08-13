@@ -200,7 +200,12 @@ function staleWorktreeIndexRefusal(committingToplevel) {
   try {
     branchTip = execFileSync('git', ['rev-parse', branch], { cwd: committingToplevel, encoding: 'utf8' }).trim();
   } catch {
-    return null; // branch ref unreadable -- not this guard's failure mode
+    // tsk-2cl: the branch name itself was already read successfully via
+    // symbolic-ref above, so rev-parse failing right after implies a
+    // transient ref-read race or on-disk ref corruption -- fail closed,
+    // same as an unreadable reflog (above) or a diverged branch (below),
+    // rather than silently letting the commit through unguarded.
+    return `commit refused: could not read "${branch}"'s current tip via "git rev-parse" -- refusing to commit against an unreadable branch ref (fail-closed). Inspect this worktree by hand.`;
   }
   if (lastSynced === branchTip) return null; // in sync, no-op
 
