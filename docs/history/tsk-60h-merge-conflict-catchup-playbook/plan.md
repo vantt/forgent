@@ -138,3 +138,26 @@ của phiên này từ chối mọi lệnh có `git diff` nhúng trong chuỗi. 
 ## Outstanding questions
 
 None
+
+## Addendum (2026-08-13, tsk-5x4): this item's stored verify string is no longer literally reproducible
+
+Post-hoc audit of the batch found that this item's own recorded `verify`
+field (`fgos show tsk-60h`, the exact text quoted in the `## Verify`
+section above) greps for the literal string `"catchup playbook already
+attempted"` in `plugins/fgOS/skills/merge-loop/SKILL.md` — that exact
+substring no longer exists in the file. `tsk-4xq`'s later rewrite of §4b's
+shared rule generalized the wording to just `"playbook already attempted"`
+(dropping the `catchup ` prefix, since the rule now applies to every
+playbook in §4c, not only `catchup`'s own) — this file's own risk map
+above (`## Risk map`) had already predicted this exact collision
+("chồng lấn văn bản với tsk-4xq ... bên merge sau phải merge target vào
+nhánh rồi verify lại"), but the re-verify it called for never happened.
+
+The underlying behavior this item shipped is unaffected — `fgos catchup`
+still exists, still handles `merge-conflict`, and the generalized wording
+in §4b still covers the same rule this item's own POSITIVE clause meant
+to pin. Only this item's own stored `verify` string, taken completely
+literally, would now fail if re-run against the current file. Recorded
+here so a later reader does not mistake that string for still being
+exactly reproducible — this item's own delivered record is otherwise left
+untouched (immutable historical record; not rewritten).
