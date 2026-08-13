@@ -119,13 +119,13 @@ test('return (verify passes, main-source): a live main-checkout.lock recorded un
   const sessionId = 'tsk-45z-test-session-ok';
   run(cwd, ['init']);
   addOk(cwd, 'pull-return-releases-own-lock', { verify: 'test -f proof.txt' });
-  assert.equal(run(cwd, ['take', '--id', 'pull-return-releases-own-lock'], { BEE_SESSION_ID: sessionId }).status, 0);
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-releases-own-lock'], { FGOS_SESSION_ID: sessionId }).status, 0);
   commitFile(cwd, 'proof.txt');
 
   const lockPath = path.join(cwd, '.fgos', 'main-checkout.lock');
   fs.writeFileSync(lockPath, JSON.stringify({ pid: sessionId, ts: Date.now() }));
 
-  const result = run(cwd, ['return', 'pull-return-releases-own-lock'], { BEE_SESSION_ID: sessionId });
+  const result = run(cwd, ['return', 'pull-return-releases-own-lock'], { FGOS_SESSION_ID: sessionId });
   assert.equal(result.status, 0, `return failed: ${result.stderr}`);
   assert.equal(envelopeData(result.stdout).to, 'awaiting-approval');
   assert.equal(fs.existsSync(lockPath), false, 'return must release its own live lock once verify passes and the item settles to proposed');
@@ -136,13 +136,13 @@ test('return (verify FAILS, main-source): a live own-identity lock is released t
   const sessionId = 'tsk-45z-test-session-blocked';
   run(cwd, ['init']);
   addOk(cwd, 'pull-return-own-lock-blocked', { verify: 'test -f proof.txt' });
-  assert.equal(run(cwd, ['take', '--id', 'pull-return-own-lock-blocked'], { BEE_SESSION_ID: sessionId }).status, 0);
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-own-lock-blocked'], { FGOS_SESSION_ID: sessionId }).status, 0);
   commitFile(cwd, 'wrong-file.txt'); // advances HEAD, never satisfies verify
 
   const lockPath = path.join(cwd, '.fgos', 'main-checkout.lock');
   fs.writeFileSync(lockPath, JSON.stringify({ pid: sessionId, ts: Date.now() }));
 
-  const result = run(cwd, ['return', 'pull-return-own-lock-blocked'], { BEE_SESSION_ID: sessionId });
+  const result = run(cwd, ['return', 'pull-return-own-lock-blocked'], { FGOS_SESSION_ID: sessionId });
   assert.equal(result.status, 0, `return should exit 0 for a defined blocked outcome: ${result.stderr}`);
   assert.equal(envelopeData(result.stdout).to, 'blocked');
   assert.equal(fs.existsSync(lockPath), false, 'return must release its own live lock even when verify fails and the item settles to blocked');
@@ -152,13 +152,13 @@ test('return (main-source) never touches a DIFFERENT session\'s live lock — ne
   const cwd = initGitCwd();
   run(cwd, ['init']);
   addOk(cwd, 'pull-return-other-untouched', { verify: 'test -f proof.txt' });
-  assert.equal(run(cwd, ['take', '--id', 'pull-return-other-untouched'], { BEE_SESSION_ID: 'tsk-45z-this-session' }).status, 0);
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-other-untouched'], { FGOS_SESSION_ID: 'tsk-45z-this-session' }).status, 0);
   commitFile(cwd, 'proof.txt');
 
   const lockPath = path.join(cwd, '.fgos', 'main-checkout.lock');
   fs.writeFileSync(lockPath, JSON.stringify({ pid: 'tsk-45z-a-different-live-session', ts: Date.now() }));
 
-  const result = run(cwd, ['return', 'pull-return-other-untouched'], { BEE_SESSION_ID: 'tsk-45z-this-session' });
+  const result = run(cwd, ['return', 'pull-return-other-untouched'], { FGOS_SESSION_ID: 'tsk-45z-this-session' });
   assert.equal(result.status, 0, `return failed: ${result.stderr}`);
   assert.equal(envelopeData(result.stdout).to, 'awaiting-approval');
   assert.equal(fs.existsSync(lockPath), true, 'a different session\'s live lock must survive this return untouched');
@@ -837,7 +837,7 @@ test('return on a branch-source take never touches a live main-checkout.lock (ts
   const lockPath = path.join(cwd, '.fgos', 'main-checkout.lock');
   fs.writeFileSync(lockPath, JSON.stringify({ pid: 'tsk-45z-branch-session', ts: Date.now() }));
 
-  const result = run(cwd, ['return', 'branch-return-lock-untouched'], { BEE_SESSION_ID: 'tsk-45z-branch-session' });
+  const result = run(cwd, ['return', 'branch-return-lock-untouched'], { FGOS_SESSION_ID: 'tsk-45z-branch-session' });
   assert.equal(result.status, 0, `return failed: ${result.stderr}`);
   assert.match(result.stdout, /awaiting-approval/);
   assert.equal(fs.existsSync(lockPath), true, 'a branch-source return must never touch main-checkout.lock, even one it could self-recognize');

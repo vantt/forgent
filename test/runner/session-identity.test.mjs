@@ -42,14 +42,14 @@ test('ppidOf passes a bounded timeout to execFileSync, so a hung ps command cann
   assert.ok(capturedOptions.timeout <= 500, 'timeout must stay a small fraction of events.lock\'s own 2s budget');
 });
 
-test('BEE_SESSION_ID takes precedence over CLAUDE_CODE_SESSION_ID when both set', () => {
+test('FGOS_SESSION_ID takes precedence over CLAUDE_CODE_SESSION_ID when both set', () => {
   const result = resolveWriterIdentity(undefined, {
-    env: { BEE_SESSION_ID: 'bee-session-1', CLAUDE_CODE_SESSION_ID: 'claude-session-2' },
+    env: { FGOS_SESSION_ID: 'bee-session-1', CLAUDE_CODE_SESSION_ID: 'claude-session-2' },
   });
   assert.deepEqual(result, { id: 'bee-session-1', source: ENV });
 });
 
-test('falls back to CLAUDE_CODE_SESSION_ID when BEE_SESSION_ID is unset', () => {
+test('falls back to CLAUDE_CODE_SESSION_ID when FGOS_SESSION_ID is unset', () => {
   const result = resolveWriterIdentity(undefined, { env: { CLAUDE_CODE_SESSION_ID: 'claude-session-2' } });
   assert.deepEqual(result, { id: 'claude-session-2', source: ENV });
 });
@@ -71,7 +71,7 @@ test('empty-string env values are treated as unset, same ancestor walk fallback'
     return `${chain[pid]}\n`;
   };
   const result = resolveWriterIdentity(undefined, {
-    env: { BEE_SESSION_ID: '   ', CLAUDE_CODE_SESSION_ID: '' },
+    env: { FGOS_SESSION_ID: '   ', CLAUDE_CODE_SESSION_ID: '' },
     pid: 100,
     execFile,
   });
@@ -120,13 +120,13 @@ test('identity resolves from the session registry when the env id matches a row'
       { sessionId: 'session-in-registry', worktreePath: '/tmp/mine', pid: 222 },
     ]),
   );
-  const result = resolveWriterIdentity(fgosDir, { env: { BEE_SESSION_ID: 'session-in-registry' } });
+  const result = resolveWriterIdentity(fgosDir, { env: { FGOS_SESSION_ID: 'session-in-registry' } });
   assert.deepEqual(result, { id: 'session-in-registry', source: REGISTRY });
 });
 
 test('an env id absent from the registry keeps the same value but reports env', () => {
   const fgosDir = mkFgosDir(JSON.stringify([{ sessionId: 'someone-else', worktreePath: '/tmp/other', pid: 111 }]));
-  const result = resolveWriterIdentity(fgosDir, { env: { BEE_SESSION_ID: 'not-registered' } });
+  const result = resolveWriterIdentity(fgosDir, { env: { FGOS_SESSION_ID: 'not-registered' } });
   assert.deepEqual(result, { id: 'not-registered', source: ENV });
 });
 
@@ -136,7 +136,7 @@ test('a registry row is never matched by directory or by row pid', () => {
   );
   // Same worktree, same live pid, DIFFERENT session id: two agent processes
   // sharing one worktree must not collapse onto one identity.
-  const result = resolveWriterIdentity(fgosDir, { env: { BEE_SESSION_ID: 'a-different-session' } });
+  const result = resolveWriterIdentity(fgosDir, { env: { FGOS_SESSION_ID: 'a-different-session' } });
   assert.deepEqual(result, { id: 'a-different-session', source: ENV });
 });
 
@@ -154,14 +154,14 @@ const CORRUPT_REGISTRIES = [
 for (const [label, body] of CORRUPT_REGISTRIES) {
   test(`a corrupt registry falls through to env without throwing -- ${label}`, () => {
     const fgosDir = mkFgosDir(body);
-    const result = resolveWriterIdentity(fgosDir, { env: { BEE_SESSION_ID: 'session-corrupt' } });
+    const result = resolveWriterIdentity(fgosDir, { env: { FGOS_SESSION_ID: 'session-corrupt' } });
     assert.deepEqual(result, { id: 'session-corrupt', source: ENV });
   });
 }
 
 test('a corrupt registry falls through to env without throwing -- an unreadable fgosDir path', () => {
   const result = resolveWriterIdentity('/definitely/not/a/real/fgos/dir', {
-    env: { BEE_SESSION_ID: 'session-corrupt' },
+    env: { FGOS_SESSION_ID: 'session-corrupt' },
   });
   assert.deepEqual(result, { id: 'session-corrupt', source: ENV });
 });
@@ -186,7 +186,7 @@ for (const [label, value] of MALFORMED_ENV_VALUES) {
       return `${chain[pid]}\n`;
     };
     const result = resolveWriterIdentity(undefined, {
-      env: { BEE_SESSION_ID: value },
+      env: { FGOS_SESSION_ID: value },
       pid: 100,
       execFile,
     });
@@ -196,7 +196,7 @@ for (const [label, value] of MALFORMED_ENV_VALUES) {
 
 test('a malformed env value falls through to the next source -- a valid fallback env var is still used', () => {
   const result = resolveWriterIdentity(undefined, {
-    env: { BEE_SESSION_ID: 'bad value/with spaces', CLAUDE_CODE_SESSION_ID: 'claude-session-2' },
+    env: { FGOS_SESSION_ID: 'bad value/with spaces', CLAUDE_CODE_SESSION_ID: 'claude-session-2' },
   });
   assert.deepEqual(result, { id: 'claude-session-2', source: ENV });
 });

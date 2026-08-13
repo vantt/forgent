@@ -80,7 +80,7 @@ function commitAsSession(repoRoot, envOverlay) {
       encoding: 'utf8',
       env: {
         ...process.env,
-        BEE_SESSION_ID: undefined,
+        FGOS_SESSION_ID: undefined,
         CLAUDE_CODE_SESSION_ID: undefined,
         ...envOverlay,
       },
@@ -105,7 +105,7 @@ test('tsk-sir: a worktree commit is wrongly refused while another session holds 
   assert.equal(lockResult.status, 'acquired', 'setup: the lock must actually be held for this repro to be meaningful');
 
   try {
-    const result = commitAsSession(worktreeRoot, { BEE_SESSION_ID: 'session-in-worktree' });
+    const result = commitAsSession(worktreeRoot, { FGOS_SESSION_ID: 'session-in-worktree' });
     assert.equal(
       result.status,
       0,
