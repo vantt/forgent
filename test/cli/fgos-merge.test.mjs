@@ -1116,7 +1116,7 @@ test('merge next --no-wait fails immediately on a live-held lock -- proves the f
   // `sub === 'next'` case) -- any other error from the inner `runVerb('approve', ...)`
   // rethrows as-is, so this fails exactly like a direct `approve` call does.
   assert.equal(result.status, 9, result.stderr);
-  assert.match(result.stderr, /main checkout is locked by another live session/);
+  assert.match(result.stderr, /main checkout is locked by pid \d+/);
   assert.ok(elapsed < 2000, `--no-wait forwarded through merge next must still fail fast, not wait (took ${elapsed}ms)`);
 });
 

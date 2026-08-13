@@ -122,6 +122,22 @@ export const DEFAULT_TTL_MS = 3 * 60 * 1000;
 // thinner, not eliminated.
 export const HOOK_TTL_MS = 20 * 1000;
 
+// HOLDER_PID_ENV_VAR (tsk-70l): the env var merge.mjs's root->main path
+// (mergeRunnerItem's non-targetSlot branch) sets, scoped to the one
+// `execFileSync` call that spawns the `git commit` triggering
+// `.githooks/pre-commit` -- carrying that process's own pid, the same
+// numeric identity it acquired this lock under (D6 self-recognition
+// above needs a caller's OWN identity to literally equal the record's
+// identity to recognize a refresh; a child process can never share its
+// parent's pid, so it cannot self-recognize on its own). The hook reads
+// this var when present and uses its value AS ITS OWN identity for this
+// one acquire call, letting the existing self-recognition equality
+// check above match it against the record the parent wrote -- with zero
+// change to that check's own logic. Absent (a bare `git commit`
+// unrelated to any `fgos approve`), the hook falls back to its own
+// `resolveWriterIdentity()` exactly as before this item.
+export const HOLDER_PID_ENV_VAR = 'FGOS_MAIN_LOCK_HOLDER_PID';
+
 export const ACQUIRED = 'acquired';
 export const HELD = 'held-by-live-other-pid';
 export const AMBIGUOUS = 'ambiguous';

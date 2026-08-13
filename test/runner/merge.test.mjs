@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawn, fork } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import {
   detectTrunk,
   classifySource,
@@ -22,7 +23,7 @@ import {
 } from '../../src/runner/merge.mjs';
 import { writeSharedConfig } from '../../src/config/shared-config-file.mjs';
 import { branchNameFor, withMergeEphemeralWorktree } from '../../src/runner/worktree.mjs';
-import { acquireMainCheckoutLock, mergeSlotLockFile, ACQUIRED } from '../../src/runner/main-checkout-lock.mjs';
+import { acquireMainCheckoutLock, mergeSlotLockFile, ACQUIRED, DEFAULT_TTL_MS } from '../../src/runner/main-checkout-lock.mjs';
 
 // Every test here creates its own disposable git repo (mirrors
 // worktree.test.mjs's own initTempRepo) — never this repo's own checkout.
@@ -59,6 +60,64 @@ function makeBranchWithCommit(repoRoot, branch, filename, content) {
 
 function makeItem(overrides = {}) {
   return { id: 'demo-item', verify: 'true', ...overrides };
+}
+
+// --- tsk-70l fanout-multiprocess helpers --------------------------------
+// Mirrors merge-target-slot-multiprocess.test.mjs's own rationale for
+// tsk-1wr's sibling fix: `resolveWriterIdentity` hands two real forked
+// processes that share an inherited env session id the exact SAME string
+// identity, a shape a same-process (in-memory) test cannot construct. Two
+// SEPARATE repos share only `lockRoot` (mergeRunnerItem's own parameter,
+// proven by tsk-2eq's "resolves the lock against lockRoot, not repoRoot")
+// so a wrongly-admitted second merge lands on its own repo, never racing
+// the held child's real git state.
+const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+const FANOUT_MARKER_WAIT_MS = 20_000;
+
+function makeLockRoot() {
+  const lockRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-fanout-mp-lockroot-'));
+  fs.mkdirSync(path.join(lockRoot, '.fgos'), { recursive: true });
+  return lockRoot;
+}
+
+/** A child that runs the REAL mergeRunnerItem root->main path (no
+ * targetSlot) against its own repo, with a verify command that announces
+ * itself via `heldMarker` then busy-waits for `releaseMarker` — pausing
+ * WHILE the lock is held, before any commit, the same "hold on a
+ * condition, never a sleep" discipline the target-slot precedent uses. */
+function writeFanoutHolderChild(dir) {
+  const childPath = path.join(dir, 'fanout-holder-child.mjs');
+  fs.writeFileSync(
+    childPath,
+    `import { mergeRunnerItem } from ${JSON.stringify(path.join(REPO_ROOT, 'src/runner/merge.mjs'))};
+
+const [repoRoot, lockRoot, branch, heldMarker, releaseMarker] = process.argv.slice(2);
+const verify = 'node -e ' + JSON.stringify(
+  "require('fs').writeFileSync(" + JSON.stringify(heldMarker) + ",'1');" +
+  "const s=Date.now();" +
+  "while(!require('fs').existsSync(" + JSON.stringify(releaseMarker) + ") && Date.now()-s<15000){}"
+);
+
+try {
+  const result = await mergeRunnerItem(repoRoot, { id: branch.replace('fgw/', ''), verify }, { lockRoot });
+  process.stdout.write('CHILD_OUTCOME:' + result.outcome + '\\n');
+  process.exit(0);
+} catch (err) {
+  process.stdout.write('CHILD_ERROR:' + err.message + '\\n');
+  process.exit(1);
+}
+`,
+    'utf8',
+  );
+  return childPath;
+}
+
+async function waitForFile(filePath, deadlineMs = FANOUT_MARKER_WAIT_MS) {
+  const deadline = Date.now() + deadlineMs;
+  while (!fs.existsSync(filePath)) {
+    if (Date.now() > deadline) throw new Error(`timed out waiting for ${filePath}`);
+    await new Promise((r) => setTimeout(r, 10));
+  }
 }
 
 // --- classifySource ---------------------------------------------------
@@ -716,7 +775,7 @@ test('mergeRunnerItem refuses to even attempt the merge when another identity al
   await assert.rejects(
     () => mergeRunnerItem(repoRoot, makeItem({ verify: 'true' })),
     (err) => {
-      assert.match(err.message, /cannot merge "fgw\/demo-item": main checkout is locked by another live session/);
+      assert.match(err.message, /cannot merge "fgw\/demo-item": main checkout is locked by pid a-different-live-session/);
       // tsk-6c2: a caller-side retry wrapper needs a way to tell "lock
       // contested, worth retrying" apart from a real merge conflict or
       // verify failure — errorClass/category alone can't (both are always
@@ -728,6 +787,127 @@ test('mergeRunnerItem refuses to even attempt the merge when another identity al
   );
   assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged — the merge must never even start while locked');
   assert.equal(isWorkingTreeClean(repoRoot), true, 'tree must stay clean — refusing before the merge means nothing was ever staged');
+});
+
+// tsk-70l: mergeRunnerItem's root->main path now acquires the lock under a
+// numeric process.pid identity instead of a session-id string, so isPidAlive
+// can tell a live rival apart from a crashed same-session holder. These two
+// tests exercise that against a REAL other OS process (not merely a
+// different in-memory value), the shape a same-process test cannot
+// construct — mirroring merge-target-slot-multiprocess.test.mjs's own
+// rationale for tsk-1wr's sibling fix.
+test('mergeRunnerItem refuses a REAL second root->main merge sharing the same inherited env session id — the fanout bug tsk-70l closes', async () => {
+  const lockRoot = makeLockRoot();
+  const childScriptDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-fanout-mp-child-'));
+  const childPath = writeFanoutHolderChild(childScriptDir);
+
+  const repoRootA = initRepo();
+  makeBranchWithCommit(repoRootA, 'fgw/demo-item-a', 'produced-a.txt', 'ok\n');
+  const repoRootB = initRepo();
+  makeBranchWithCommit(repoRootB, 'fgw/demo-item-b', 'produced-b.txt', 'ok\n');
+
+  const heldMarker = path.join(childScriptDir, 'held');
+  const releaseMarker = path.join(childScriptDir, 'release');
+  const sharedSessionId = 'fanout-shared-session-tsk-70l';
+
+  const child = fork(childPath, [repoRootA, lockRoot, 'fgw/demo-item-a', heldMarker, releaseMarker], {
+    stdio: 'inherit',
+    env: { ...process.env, BEE_SESSION_ID: sharedSessionId, CLAUDE_CODE_SESSION_ID: undefined },
+  });
+  const childExit = new Promise((resolve) => child.on('exit', (code) => resolve(code ?? 0)));
+
+  const savedBeeSessionId = process.env.BEE_SESSION_ID;
+  const savedClaudeSessionId = process.env.CLAUDE_CODE_SESSION_ID;
+  try {
+    await waitForFile(heldMarker);
+
+    // Same inherited env session id as the child — exactly the subagent
+    // fanout shape (docs/history/main-checkout-lock-fanout-self-
+    // recognition-gap/CONTEXT.md) two independent real processes end up
+    // sharing. Pre-fix, main-checkout-lock.mjs's self-recognition
+    // (record.pid === identity, both this string) would wrongly admit
+    // this as "the same writer" and let the merge below proceed for
+    // real, on repoRootB — reproducing the bug without racing repoRootA's
+    // own git state. Post-fix, identity is process.pid (unique per real
+    // process, tsk-70l D1), so self-recognition can never match across
+    // two genuinely separate processes and this must be refused instead.
+    process.env.BEE_SESSION_ID = sharedSessionId;
+    delete process.env.CLAUDE_CODE_SESSION_ID;
+
+    await assert.rejects(
+      () => mergeRunnerItem(repoRootB, { id: 'demo-item-b', verify: 'true' }, { lockRoot }),
+      (err) => {
+        assert.equal(err.code, 'lock-held', `expected refusal, got: ${err.message}`);
+        return true;
+      },
+    );
+    assert.equal(isWorkingTreeClean(repoRootB), true, 'repoRootB must stay untouched — refused before any git mutation');
+  } finally {
+    if (savedBeeSessionId === undefined) delete process.env.BEE_SESSION_ID; else process.env.BEE_SESSION_ID = savedBeeSessionId;
+    if (savedClaudeSessionId === undefined) delete process.env.CLAUDE_CODE_SESSION_ID; else process.env.CLAUDE_CODE_SESSION_ID = savedClaudeSessionId;
+    fs.writeFileSync(releaseMarker, 'go');
+    await childExit;
+  }
+});
+
+test('mergeRunnerItem refuses when a REAL different live process holds the main-checkout lock', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+
+  // A genuinely separate, live OS process — its own real pid, not a value
+  // this test process merely invented.
+  const holder = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: 'ignore' });
+  try {
+    await new Promise((resolve) => { holder.once('spawn', resolve); });
+
+    const fgosDir = path.join(repoRoot, '.fgos');
+    const otherLock = acquireMainCheckoutLock(fgosDir, { identity: holder.pid });
+    assert.equal(otherLock.status, ACQUIRED);
+
+    const headBefore = headOf(repoRoot);
+    await assert.rejects(
+      () => mergeRunnerItem(repoRoot, makeItem({ verify: 'true' })),
+      (err) => {
+        assert.match(err.message, new RegExp(`main checkout is locked by pid ${holder.pid}\\b`));
+        assert.equal(err.code, 'lock-held');
+        assert.equal(err.holderPid, holder.pid);
+        return true;
+      },
+    );
+    assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged — a live rival process must fully exclude this merge');
+  } finally {
+    holder.kill();
+  }
+});
+
+test('mergeRunnerItem reclaims the lock immediately (never waiting out the TTL) when its recorded pid belongs to an already-exited process', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+
+  // A real pid that genuinely existed and has now genuinely exited — proves
+  // reclaim is driven by isPidAlive, not merely "some number that never
+  // matches", and that it never waits for DEFAULT_TTL_MS just because the
+  // record's timestamp is fresh.
+  const crashed = spawn(process.execPath, ['-e', 'process.exit(0)'], { stdio: 'ignore' });
+  const deadPid = await new Promise((resolve, reject) => {
+    crashed.once('spawn', () => resolve(crashed.pid));
+    crashed.once('error', reject);
+  });
+  await new Promise((resolve) => { crashed.once('exit', resolve); });
+
+  const fgosDir = path.join(repoRoot, '.fgos');
+  // Freshly timestamped, same as a lock this process itself would have
+  // just written before crashing — a same-session retry must not need to
+  // wait out DEFAULT_TTL_MS's full 3 minutes to resume.
+  const staleLock = acquireMainCheckoutLock(fgosDir, { identity: deadPid });
+  assert.equal(staleLock.status, ACQUIRED);
+
+  const start = Date.now();
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }));
+  const elapsed = Date.now() - start;
+
+  assert.equal(result.outcome, 'merged');
+  assert.ok(elapsed < DEFAULT_TTL_MS / 2, `must reclaim promptly on a dead pid, not wait out the TTL (took ${elapsed}ms)`);
 });
 
 // tsk-2eq: a leaf approve calls mergeRunnerItem with an ephemeral,

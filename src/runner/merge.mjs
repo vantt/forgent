@@ -47,7 +47,7 @@ import { branchNameFor, branchExists, reclaimOrphanedCheckout } from './worktree
 import { runGoalCheck, runInvariantChecks, invariantFailureAsCheck } from './goal-check.mjs';
 import { readInvariantCheckCommands } from '../config/shared-config-file.mjs';
 import { normalizePath } from './frozen-judge.mjs';
-import { acquireMainCheckoutLock, renewMainCheckoutLockIfOwn, mergeSlotLockFile, HELD, AMBIGUOUS, DEFAULT_TTL_MS, formatLockDurationMs } from './main-checkout-lock.mjs';
+import { acquireMainCheckoutLock, renewMainCheckoutLockIfOwn, mergeSlotLockFile, HELD, AMBIGUOUS, DEFAULT_TTL_MS, HOLDER_PID_ENV_VAR, formatLockDurationMs } from './main-checkout-lock.mjs';
 import { resolveWriterIdentity } from './session-identity.mjs';
 import { listSessions } from './session.mjs';
 import { listWork } from '../state/store.mjs';
@@ -80,13 +80,21 @@ export class MergeError extends Error {
 // two full-diff calls below pass an explicit, larger value: a full `git
 // diff` (unlike every `--name-only` call in this file) can exceed 1 MiB
 // once a branch is hundreds of commits stale, which throws ENOBUFS.
-function git(repoRoot, args, { maxBuffer } = {}) {
+//
+// env (tsk-70l): optional, default undefined — every existing call site
+// (none of which passes it) stays byte-identical when omitted. When
+// given, merged onto a COPY of this process's own `process.env` and
+// passed only to this one child process — never a `process.env`
+// assignment, so it can never leak into any other subprocess this
+// session spawns later. Only the `git commit` call below passes it.
+function git(repoRoot, args, { maxBuffer, env } = {}) {
   return execFileSync('git', args, {
     cwd: repoRoot,
     encoding: 'utf8',
     shell: false,
     stdio: ['ignore', 'pipe', 'pipe'],
     ...(maxBuffer === undefined ? {} : { maxBuffer }),
+    ...(env === undefined ? {} : { env: { ...process.env, ...env } }),
   });
 }
 
@@ -875,7 +883,20 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = re
   // fresh every call and never actually contend with the real
   // `<repoRoot>/.fgos/main-checkout.lock` a concurrent leaf merge holds.
   const fgosDir = path.join(lockRoot, '.fgos');
-  const identity = resolveWriterIdentity(fgosDir).id;
+  // tsk-70l: process.pid, not resolveWriterIdentity's session id. Two
+  // independent OS processes can inherit the same env session id (a
+  // subagent fanout approving sibling root items, for example) and would
+  // wrongly self-recognize each other as "the same writer" under a
+  // string identity, which has no liveness probe
+  // (main-checkout-lock.mjs's own numeric-vs-string branch). A numeric
+  // pid identity lets `isPidAlive` tell a live fanout sibling (real
+  // exclusion) apart from a crashed same-session holder (immediate
+  // reclaim, no waiting out the TTL) — mirrors claim-port.mjs's own
+  // `identity: process.pid` on this exact lock file. The nested
+  // pre-commit hook recognizes this process as its own holder via
+  // `HOLDER_PID_ENV_VAR`, set on the `git commit` call below — not by
+  // matching this identity itself.
+  const identity = process.pid;
   // releaseOnExit (tsk-45z point 2): approve's own job is over once this
   // process exits, so a crash/interrupt mid-merge should release the lock
   // immediately rather than leaving the next writer to wait out the TTL —
@@ -889,7 +910,7 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = re
       ? `, expires in ${formatLockDurationMs(lock.remainingTtlMs)}`
       : ', no TTL window known';
     throw new MergeError(
-      `cannot merge "${branch}": main checkout is locked by another live session (${lock.holderPid}, held ${formatLockDurationMs(lock.lockAgeMs)}${ttlPart}).`,
+      `cannot merge "${branch}": main checkout is locked by pid ${lock.holderPid} (held ${formatLockDurationMs(lock.lockAgeMs)}${ttlPart}).`,
       { branch, code: 'lock-held', remainingTtlMs: lock.remainingTtlMs, holderPid: lock.holderPid, lockAgeMs: lock.lockAgeMs },
     );
   }
@@ -1252,7 +1273,16 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
   }
 
   try {
-    git(repoRoot, ['commit', '--no-edit']);
+    // HOLDER_PID_ENV_VAR (tsk-70l): scoped to this one call, not a
+    // `process.env` assignment — see `git()`'s own env passthrough
+    // above. Lets `.githooks/pre-commit`, spawned as this call's own
+    // child, recognize whichever process currently holds
+    // main-checkout.lock as its own parent (this process's pid, when the
+    // targetSlot path holds it instead — see mergeRunnerItem's own
+    // comment on `targetSlot` — the hook's own acquire simply never
+    // matches an existing main-checkout.lock record with this pid, no
+    // different from today).
+    git(repoRoot, ['commit', '--no-edit'], { env: { [HOLDER_PID_ENV_VAR]: String(process.pid) } });
   } catch (err) {
     try {
       abortMergeIfPossible(repoRoot);
