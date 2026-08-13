@@ -1276,7 +1276,7 @@ test('approve --no-wait fails immediately on a live-held lock, main left untouch
   // unconditionally 'merge-fail' for every failure mode (pre-existing,
   // unrelated to this item's own `code` discriminator addition).
   assert.equal(result.status, 9, result.stderr);
-  assert.match(result.stderr, /main checkout is locked by another live session/);
+  assert.match(result.stderr, /main checkout is locked by pid \d+/);
   assert.ok(elapsed < 2000, `--no-wait must fail fast (took ${elapsed}ms)`);
   assert.equal(stateView(cwd).work['wait-no-wait-approve'].status, 'awaiting-approval', 'a refused-before-merge attempt must leave the item exactly where it was');
 });

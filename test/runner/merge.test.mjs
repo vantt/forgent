@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import {
   detectTrunk,
   classifySource,
@@ -22,7 +22,7 @@ import {
 } from '../../src/runner/merge.mjs';
 import { writeSharedConfig } from '../../src/config/shared-config-file.mjs';
 import { branchNameFor, withMergeEphemeralWorktree } from '../../src/runner/worktree.mjs';
-import { acquireMainCheckoutLock, mergeSlotLockFile, ACQUIRED } from '../../src/runner/main-checkout-lock.mjs';
+import { acquireMainCheckoutLock, mergeSlotLockFile, ACQUIRED, DEFAULT_TTL_MS } from '../../src/runner/main-checkout-lock.mjs';
 
 // Every test here creates its own disposable git repo (mirrors
 // worktree.test.mjs's own initTempRepo) — never this repo's own checkout.
@@ -716,7 +716,7 @@ test('mergeRunnerItem refuses to even attempt the merge when another identity al
   await assert.rejects(
     () => mergeRunnerItem(repoRoot, makeItem({ verify: 'true' })),
     (err) => {
-      assert.match(err.message, /cannot merge "fgw\/demo-item": main checkout is locked by another live session/);
+      assert.match(err.message, /cannot merge "fgw\/demo-item": main checkout is locked by pid a-different-live-session/);
       // tsk-6c2: a caller-side retry wrapper needs a way to tell "lock
       // contested, worth retrying" apart from a real merge conflict or
       // verify failure — errorClass/category alone can't (both are always
@@ -728,6 +728,73 @@ test('mergeRunnerItem refuses to even attempt the merge when another identity al
   );
   assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged — the merge must never even start while locked');
   assert.equal(isWorkingTreeClean(repoRoot), true, 'tree must stay clean — refusing before the merge means nothing was ever staged');
+});
+
+// tsk-70l: mergeRunnerItem's root->main path now acquires the lock under a
+// numeric process.pid identity instead of a session-id string, so isPidAlive
+// can tell a live rival apart from a crashed same-session holder. These two
+// tests exercise that against a REAL other OS process (not merely a
+// different in-memory value), the shape a same-process test cannot
+// construct — mirroring merge-target-slot-multiprocess.test.mjs's own
+// rationale for tsk-1wr's sibling fix.
+test('mergeRunnerItem refuses when a REAL different live process holds the main-checkout lock', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+
+  // A genuinely separate, live OS process — its own real pid, not a value
+  // this test process merely invented.
+  const holder = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: 'ignore' });
+  try {
+    await new Promise((resolve) => { holder.once('spawn', resolve); });
+
+    const fgosDir = path.join(repoRoot, '.fgos');
+    const otherLock = acquireMainCheckoutLock(fgosDir, { identity: holder.pid });
+    assert.equal(otherLock.status, ACQUIRED);
+
+    const headBefore = headOf(repoRoot);
+    await assert.rejects(
+      () => mergeRunnerItem(repoRoot, makeItem({ verify: 'true' })),
+      (err) => {
+        assert.match(err.message, new RegExp(`main checkout is locked by pid ${holder.pid}\\b`));
+        assert.equal(err.code, 'lock-held');
+        assert.equal(err.holderPid, holder.pid);
+        return true;
+      },
+    );
+    assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged — a live rival process must fully exclude this merge');
+  } finally {
+    holder.kill();
+  }
+});
+
+test('mergeRunnerItem reclaims the lock immediately (never waiting out the TTL) when its recorded pid belongs to an already-exited process', async () => {
+  const repoRoot = initRepo();
+  makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
+
+  // A real pid that genuinely existed and has now genuinely exited — proves
+  // reclaim is driven by isPidAlive, not merely "some number that never
+  // matches", and that it never waits for DEFAULT_TTL_MS just because the
+  // record's timestamp is fresh.
+  const crashed = spawn(process.execPath, ['-e', 'process.exit(0)'], { stdio: 'ignore' });
+  const deadPid = await new Promise((resolve, reject) => {
+    crashed.once('spawn', () => resolve(crashed.pid));
+    crashed.once('error', reject);
+  });
+  await new Promise((resolve) => { crashed.once('exit', resolve); });
+
+  const fgosDir = path.join(repoRoot, '.fgos');
+  // Freshly timestamped, same as a lock this process itself would have
+  // just written before crashing — a same-session retry must not need to
+  // wait out DEFAULT_TTL_MS's full 3 minutes to resume.
+  const staleLock = acquireMainCheckoutLock(fgosDir, { identity: deadPid });
+  assert.equal(staleLock.status, ACQUIRED);
+
+  const start = Date.now();
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }));
+  const elapsed = Date.now() - start;
+
+  assert.equal(result.outcome, 'merged');
+  assert.ok(elapsed < DEFAULT_TTL_MS / 2, `must reclaim promptly on a dead pid, not wait out the TTL (took ${elapsed}ms)`);
 });
 
 // tsk-2eq: a leaf approve calls mergeRunnerItem with an ephemeral,

@@ -380,3 +380,73 @@ test('a git commit inside a linked (non-detached) worktree on a fgw/* branch sti
 
   assert.equal(result.status, 0, result.stderr);
 });
+
+// --- truth 10: FGOS_MAIN_LOCK_HOLDER_PID (tsk-70l) -------------------------
+// merge.mjs's root->main path (mergeRunnerItem's non-targetSlot branch) now
+// acquires main-checkout.lock under a numeric process.pid identity instead
+// of a session-id string, so two independent processes sharing an inherited
+// session id can no longer wrongly self-recognize each other (a pid is
+// unique per real OS process). That means the nested pre-commit hook can no
+// longer self-recognize its parent via session-id equality either -- it
+// reads FGOS_MAIN_LOCK_HOLDER_PID instead, scoped by merge.mjs to the one
+// execFileSync call that spawns the commit, and uses that value AS ITS OWN
+// identity for this one acquire, letting main-checkout-lock.mjs's existing,
+// UNCHANGED self-recognition equality check match it. These three tests
+// exercise the real hook process, not the identity-resolution function in
+// isolation -- proving the env var is what decides the outcome, not the
+// session id, which is deliberately never made to agree with the lock
+// record in any of them.
+
+function writeMainCheckoutLockRecord(repoRoot, pid, ts = Date.now()) {
+  const fgosDir = path.join(repoRoot, '.fgos');
+  fs.mkdirSync(fgosDir, { recursive: true });
+  fs.writeFileSync(path.join(fgosDir, 'main-checkout.lock'), JSON.stringify({ pid, ts }));
+}
+
+test('FGOS_MAIN_LOCK_HOLDER_PID lets the hook self-recognize a real live holder pid its own session id would never match', () => {
+  const repoRoot = initTempRepoWithHook();
+  // A real, live pid this test process can vouch for -- its own. Fresh
+  // ttl, so absent the env var below this would read HELD under the
+  // hook's normal numeric-liveness fallback (pidLive && withinTtl), not
+  // merely AMBIGUOUS or already-stale -- a deterministic refusal, not a
+  // coin flip, is what the next test proves that fallback still does.
+  writeMainCheckoutLockRecord(repoRoot, process.pid);
+  const before = commitCount(repoRoot);
+
+  const result = commitAsSession(repoRoot, {
+    BEE_SESSION_ID: 'session-unrelated-to-the-lock-record',
+    FGOS_MAIN_LOCK_HOLDER_PID: String(process.pid),
+  });
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(commitCount(repoRoot), before + 1);
+});
+
+test('the same live-pid lock record refuses the commit when FGOS_MAIN_LOCK_HOLDER_PID is absent -- the fallback path is untouched', () => {
+  const repoRoot = initTempRepoWithHook();
+  writeMainCheckoutLockRecord(repoRoot, process.pid);
+  const before = commitCount(repoRoot);
+
+  const result = commitAsSession(repoRoot, {
+    BEE_SESSION_ID: 'session-unrelated-to-the-lock-record',
+  });
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /commit refused/);
+  assert.equal(commitCount(repoRoot), before);
+});
+
+test('a non-numeric FGOS_MAIN_LOCK_HOLDER_PID is never trusted blindly -- falls back to normal session-id resolution, same refusal as absent', () => {
+  const repoRoot = initTempRepoWithHook();
+  writeMainCheckoutLockRecord(repoRoot, process.pid);
+  const before = commitCount(repoRoot);
+
+  const result = commitAsSession(repoRoot, {
+    BEE_SESSION_ID: 'session-unrelated-to-the-lock-record',
+    FGOS_MAIN_LOCK_HOLDER_PID: 'not-a-pid',
+  });
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /commit refused/);
+  assert.equal(commitCount(repoRoot), before);
+});

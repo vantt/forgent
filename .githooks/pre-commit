@@ -22,7 +22,7 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
-import { acquireMainCheckoutLock, HELD, AMBIGUOUS, HOOK_TTL_MS } from '../src/runner/main-checkout-lock.mjs';
+import { acquireMainCheckoutLock, HELD, AMBIGUOUS, HOOK_TTL_MS, HOLDER_PID_ENV_VAR } from '../src/runner/main-checkout-lock.mjs';
 import { resolveWriterIdentity } from '../src/runner/session-identity.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -39,6 +39,29 @@ function resolveTtlMs() {
   if (raw === undefined) return HOOK_TTL_MS;
   const parsed = Number(raw);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : HOOK_TTL_MS;
+}
+
+// resolveIdentity (tsk-70l): when HOLDER_PID_ENV_VAR is set to a valid
+// positive integer, this commit is a child of the process that set it --
+// merge.mjs's own root->main path (mergeRunnerItem), scoped to the one
+// `execFileSync` call that spawns this exact commit. Using ITS pid as
+// this acquire call's own identity lets main-checkout-lock.mjs's
+// existing self-recognition equality check (D6) match it against the
+// record that parent process already wrote there, with zero change to
+// that check's own logic -- this hook still cannot share its parent's
+// pid outright (a child process always gets its own), so it borrows the
+// parent's instead of trying to be recognized as itself. Anything else
+// (absent, unparseable, non-positive) falls back to this hook's own
+// resolveWriterIdentity() exactly as before this item -- a bare
+// `git commit` unrelated to any `fgos approve` never sets this var at
+// all, so that case is untouched.
+function resolveIdentity(fgosDir) {
+  const raw = process.env[HOLDER_PID_ENV_VAR];
+  if (raw !== undefined) {
+    const parsed = Number(raw);
+    if (Number.isInteger(parsed) && parsed > 0) return parsed;
+  }
+  return resolveWriterIdentity(fgosDir).id;
 }
 
 function refuse(message) {
@@ -102,7 +125,7 @@ function main() {
   }
 
   const fgosDir = path.join(repoRoot, '.fgos');
-  const { id } = resolveWriterIdentity(fgosDir);
+  const id = resolveIdentity(fgosDir);
   const ttlMs = resolveTtlMs();
 
   const result = acquireMainCheckoutLock(fgosDir, { identity: id, ttlMs });
