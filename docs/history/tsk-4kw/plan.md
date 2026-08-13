@@ -129,12 +129,19 @@ POSITIVE/NEGATIVE grep shape does not apply.
 ## Assumptions
 
 - **A1.** `addDecision` folds `kind` through to `decisionsById` unchanged.
-  Grounded: `src/state/replay.mjs:346-360` spreads the whole payload into
-  both the flat `decisions` array and the lazy `decisionsById` map.
+  Grounded: `src/state/replay.mjs:357` and `:370-371` spread the whole
+  payload (`{ ...event.payload }`) into both the flat `decisions` array
+  and the lazy `decisionsById` map, so any field on the payload survives
+  the fold.
 - **A2.** Tagging these two changes no consumer other than the gate.
   Grounded: `decisionsById` has exactly one non-test reader in the whole
   repo — `cleanup-harness.mjs:260` — and `fgos show`'s decision filter
-  (`bin/fgos.mjs:1946`) keys on `id` only.
+  (`bin/fgos.mjs:2002`) keys on `id` only.
+
+(Line citations in A1/A2 corrected at validating: both were first written
+against base `ebe5674d` and the lines had drifted on `a5a13e76`. The
+patterns themselves were re-read on this base and are unchanged — only
+the addresses moved.)
 - **A3.** No item is mid-flight at `cleanup` in a state this newly blocks.
   Grounded by measurement, not assumption: the flip probe reports 3
   affected items, at `retrospective`/`delivered`, none at `cleanup`.
