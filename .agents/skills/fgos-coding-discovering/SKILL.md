@@ -1,5 +1,6 @@
 ---
 name: fgos-coding-discovering
+user-invocable: false
 description: >-
   Own the machine-only stage `discovery`: soi ambiguity còn lại từ những gì
   đã clarify, gọi helper `fgos-researching` bao nhiêu lần tuỳ nhu cầu, rồi

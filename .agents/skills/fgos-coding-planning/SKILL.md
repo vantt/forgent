@@ -1,5 +1,6 @@
 ---
 name: fgos-coding-planning
+user-invocable: false
 description: >-
   Turn locked decisions into the smallest honest plan before an item is
   shaped into children. Use when an item claimed early in stage `planning`

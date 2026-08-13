@@ -1,5 +1,6 @@
 ---
 name: fgos-indexing
+user-invocable: false
 description: >-
   Regenerate the machine-readable, read-by-tag index of fgOS end-user
   documents after any end-user doc is written during compound-learn. Use

@@ -1,5 +1,6 @@
 ---
 name: fgos-coding-compounding
+user-invocable: false
 description: >-
   Turn a retrospective-status item's real captured signal into a Diataxis-classified,
   evidence-quoted end-user document before the item is allowed toward `done`.
