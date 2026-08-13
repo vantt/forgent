@@ -320,31 +320,38 @@ Before asking, check whether this gate can auto-approve instead
 (`docs/history/gate-bypass/CONTEXT.md` D1-D5 — never the `awaiting-human`
 park, only this skill-embedded question):
 
+Run these as two SEPARATE tool calls, never pasted together as one script —
+a worktree-isolated session's own isolation guard refuses a single call
+combining a `git`-rooted command with a following `node .../fgos.mjs`
+invocation (tsk-3rg). Resolve `root` first, read its printed value, then
+substitute that literal path into the second call.
+
 ```bash
 root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-node -e "
-var root = process.argv[1];
-function resolveModule(relPath, needed) {
-  return import(relPath).catch(() => ({})).then((local) => {
-    if (needed.every((name) => typeof local[name] === 'function')) return local;
-    return import(root + relPath.slice(1));
-  });
-}
-Promise.all([resolveModule('./src/state/store.mjs', ['listWork']), resolveModule('./src/state/gate-bypass.mjs', ['canAutoApprove', 'readGateBypassLevel']), import('node:fs')]).then(([{ listWork }, { canAutoApprove, readGateBypassLevel }, fs]) => {
-  const fgosDir = root + '/.fgos';
-  const item = listWork(fgosDir).work[process.argv[2]];
-  const artifact = fs.readFileSync(process.argv[3], 'utf8');
-  const level = readGateBypassLevel(fgosDir);
-  console.log(canAutoApprove(item, artifact, level) ? 'true' : 'false');
-});
-" -- "$root" "<item-id>" "docs/history/<feature>/CONTEXT.md"
 ```
 
-The code (`gate-bypass.mjs`/`store.mjs`) tries the cwd-relative import first — this worktree's own branch already carries whatever version it needs, including an item that is itself modifying `gate-bypass.mjs` and needs its own in-progress code (docs/history/gate-bypass/CONTEXT.md D7) — and falls back to `$root`'s canonical copy only when the needed export is missing or the import throws (a stale `fgw/<id>` branch forked before that export existed on `main`, D7's fix for the `tsk-5lr` class of failure). Only the state lookup (`.fgos/`, gitignored and per-worktree-local) resolves to the main checkout's `.fgos/` via `git rev-parse --git-common-dir`, the same resolution `scripts/fgos-shell-integration.sh`'s `fgos` shell function already uses — a worktree's own local `.fgos/` never carries the real item record.
+```bash
+node "$root/bin/fgos.mjs" gate-check "<item-id>" --gate contextApprove --artifact "docs/history/<feature>/CONTEXT.md" --dir "$root"
+```
 
-Treat anything other than exactly `true` on stdout — `false`, empty output,
-a thrown error — as `false`: fail closed, never skip the question on a
-check that couldn't run cleanly.
+`gate-check` (tsk-65q) wraps `canAutoApprove` (`src/state/gate-bypass.mjs`)
+behind the CLI's own static imports — `bin/fgos.mjs` imports
+`gate-bypass.mjs` with a plain relative specifier, which Node resolves
+against `bin/fgos.mjs`'s own file location, never the caller's cwd or repo
+root. That is what lets it resolve correctly from any install shape (dev
+checkout, global npm install, npx) with zero special-casing — unlike the
+two-tier cwd-relative/`$root`-relative resolver this Gate section used to
+embed inline, which had no path back to the package's own install location
+and crashed unconditionally for a pure global-install consumer whose own
+repo carries no `src/state/*.mjs` at all
+(`docs/history/tsk-65q-gate-bypass-global-install-resolution/RESEARCH.md`).
+Read the verb's `data.canAutoApprove` field (`true`/`false`) from its JSON
+output.
+
+Treat anything other than exactly `data.canAutoApprove === true` in the
+verb's JSON output — `false`, a non-zero exit, a malformed response — as
+`false`: fail closed, never skip the question on a check that couldn't run
+cleanly.
 
 Either branch below also records a structured approve record (tsk-19j
 D1/D11) — separate from, and in addition to, `fgos decision`'s free-text

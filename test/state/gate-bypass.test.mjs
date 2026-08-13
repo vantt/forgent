@@ -386,36 +386,29 @@ test('canAutoApproveMergedGate: D10 — word boundaries hold on footprint paths 
   assert.equal(canAutoApproveMergedGate(item, CLEAN_PLAN, [], COST_REVERSIBLE, 'heavy'), true);
 });
 
-// ─── fgos-coding-validating's own "check whether the gate can auto-approve"
-// snippet (tsk-blk) — the pure-function tests above always receive
-// `childSpecs` already parsed (a real JS array), so they can never exercise
-// the `JSON.parse(process.argv[4])` call the SKILL.md's own documented
-// `node -e` snippet makes on a raw string. This extracts that exact snippet
-// from the real skill file and runs it as a real subprocess, so the test
-// breaks if the doc's own snippet ever drifts from what is asserted here.
+// ─── the `gate-check` CLI verb (tsk-65q) — fgos-coding-exploring/
+// fgos-coding-validating's own "check whether the gate can auto-approve"
+// step now calls `fgos gate-check` instead of embedding its own
+// cwd-relative dynamic-import resolver + inline JSON.parse(argv). That
+// resolver crashed unconditionally on a pure global npm install (no local
+// src/state/*.mjs at cwd or at the calling repo's own root); routing
+// through the CLI instead inherits bin/fgos.mjs's own static imports,
+// which resolve against the CLI file's own location, never the caller's
+// cwd. See test/cli/fgos-gate-approve.test.mjs for the CLI-level
+// round-trip coverage (valid input, both gates, the no-crash-from-an-
+// unrelated-cwd regression proof); the two tests below cover what the old
+// snippet-extraction tests here used to: how a malformed --children value
+// and a bad --plan path each fail, now that fail-closed is the CALLING
+// SKILL's own responsibility (any non-`true` JSON output, including a
+// non-zero exit, reads as "false" per fgos-coding-exploring/
+// fgos-coding-validating's own Gate section prose) rather than the verb
+// itself swallowing every error into a bare `false` on stdout.
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-
-function extractGateCheckSnippet() {
-  const skillPath = path.join(REPO_ROOT, '.claude/skills/fgos-coding-validating/SKILL.md');
-  const source = fs.readFileSync(skillPath, 'utf8');
-  const match = source.match(/```bash\nroot=\$\(git rev-parse[\s\S]*?\nnode -e "\n([\s\S]*?)\n"\s*--[\s\S]*?\n```/);
-  assert.ok(match, `could not find the gate-check node -e snippet in ${skillPath} -- this test's own extraction regex needs updating to match the doc`);
-  return match[1];
-}
-
-function runGateCheckSnippet({ fgosRoot, itemId, planPath, childSpecsArg, costVerdict }) {
-  const script = extractGateCheckSnippet();
-  const result = spawnSync(
-    process.execPath,
-    ['-e', script, '--', fgosRoot, itemId, planPath, childSpecsArg, costVerdict],
-    { cwd: REPO_ROOT, encoding: 'utf8' },
-  );
-  return result;
-}
+const FGOS_BIN = path.join(REPO_ROOT, 'bin/fgos.mjs');
 
 function tmpGateCheckFixture() {
-  const fgosRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-gate-check-snippet-'));
+  const fgosRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-gate-check-cli-'));
   const fgosDir = path.join(fgosRoot, '.fgos');
   fs.mkdirSync(fgosDir, { recursive: true });
   addWork(fgosDir, { id: 'gate-check-fixture', title: 'Fixture item', description: 'fixture, not real work', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', tier: 'light' });
@@ -425,43 +418,25 @@ function tmpGateCheckFixture() {
   return { fgosRoot, planPath };
 }
 
-test('fgos-coding-validating gate-check snippet: valid childSpecs JSON round-trips through the real snippet', () => {
+test('gate-check: malformed --children JSON never crashes uncaught, and reports a real diagnostic on stderr rather than silence (tsk-65q, carries forward tsk-blk/tsk-13s\'s own regression intent)', () => {
   const { fgosRoot, planPath } = tmpGateCheckFixture();
-  const result = runGateCheckSnippet({
-    fgosRoot, itemId: 'gate-check-fixture', planPath, childSpecsArg: '[]', costVerdict: COST_REVERSIBLE,
-  });
-  assert.equal(result.status, 0, `snippet should exit 0 on valid input, got status ${result.status}, stderr:\n${result.stderr}`);
-  assert.equal(result.stdout.trim(), 'true', `expected 'true' for a clean reversible item, got stdout:\n${result.stdout}\nstderr:\n${result.stderr}`);
-});
-
-test('fgos-coding-validating gate-check snippet: malformed childSpecs JSON fails closed to "false" on stdout, never an uncaught crash (tsk-blk, tsk-224 gap)', () => {
-  const { fgosRoot, planPath } = tmpGateCheckFixture();
-  const result = runGateCheckSnippet({
-    fgosRoot, itemId: 'gate-check-fixture', planPath, childSpecsArg: '[{"title": "x",]', costVerdict: COST_REVERSIBLE,
-  });
-  assert.equal(result.stdout.trim(), 'false', `expected the documented fail-closed 'false' on malformed JSON, got stdout:\n${JSON.stringify(result.stdout)}\nstderr:\n${result.stderr}`);
-});
-
-// tsk-13s: the .catch() added by tsk-blk originally swallowed EVERY error
-// silently (stdout 'false', stderr empty) -- indistinguishable from "the
-// gate genuinely said no" whether the JSON was malformed or the caller's
-// own command was wrong (bad item id, bad path). Now it logs the real
-// error to stderr before printing 'false' to stdout, so the fail-closed
-// stdout contract holds unchanged while stderr keeps its diagnostic value.
-test('fgos-coding-validating gate-check snippet: malformed childSpecs JSON now logs a diagnostic to stderr (tsk-13s)', () => {
-  const { fgosRoot, planPath } = tmpGateCheckFixture();
-  const result = runGateCheckSnippet({
-    fgosRoot, itemId: 'gate-check-fixture', planPath, childSpecsArg: '[{"title": "x",]', costVerdict: COST_REVERSIBLE,
-  });
+  const result = spawnSync(
+    process.execPath,
+    [FGOS_BIN, 'gate-check', 'gate-check-fixture', '--gate', 'validateApprove', '--plan', planPath, '--children', '[{"title": "x",]', '--cost', COST_REVERSIBLE, '--dir', fgosRoot],
+    { encoding: 'utf8' },
+  );
+  assert.notEqual(result.status, 0, `expected a non-zero exit on malformed --children JSON, got status ${result.status}, stdout:\n${result.stdout}`);
   assert.match(result.stderr, /JSON/, `expected a real diagnostic on stderr, got:\n${JSON.stringify(result.stderr)}`);
 });
 
-test('fgos-coding-validating gate-check snippet: a non-JSON error (bad plan.md path) also fails closed to "false" on stdout with a real diagnostic on stderr, not silence (tsk-13s)', () => {
+test('gate-check: a bad --plan path also never crashes uncaught, and reports a real diagnostic on stderr rather than silence (tsk-65q, carries forward tsk-blk/tsk-13s\'s own regression intent)', () => {
   const { fgosRoot } = tmpGateCheckFixture();
   const badPlanPath = path.join(fgosRoot, 'no-such-plan.md');
-  const result = runGateCheckSnippet({
-    fgosRoot, itemId: 'gate-check-fixture', planPath: badPlanPath, childSpecsArg: '[]', costVerdict: COST_REVERSIBLE,
-  });
-  assert.equal(result.stdout.trim(), 'false', `expected fail-closed 'false' on stdout for a non-JSON error too, got stdout:\n${JSON.stringify(result.stdout)}\nstderr:\n${result.stderr}`);
+  const result = spawnSync(
+    process.execPath,
+    [FGOS_BIN, 'gate-check', 'gate-check-fixture', '--gate', 'validateApprove', '--plan', badPlanPath, '--children', '[]', '--cost', COST_REVERSIBLE, '--dir', fgosRoot],
+    { encoding: 'utf8' },
+  );
+  assert.notEqual(result.status, 0, `expected a non-zero exit on a bad --plan path, got status ${result.status}, stdout:\n${result.stdout}`);
   assert.match(result.stderr, /ENOENT/, `expected a real diagnostic on stderr instead of silence -- this is exactly what a confused caller (wrong plan path) needs to debug their own command; got stderr:\n${JSON.stringify(result.stderr)}`);
 });

@@ -22,7 +22,7 @@ import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs'
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfigForDir } from '../src/runner/dispatch.mjs';
-import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
+import { readGateBypassLevel, canAutoApprove, canAutoApproveMergedGate } from '../src/state/gate-bypass.mjs';
 import { resolveFgosDir, fgosDirFromRoot } from '../src/runner/paths.mjs';
 import { resolveCliVersionInfo } from '../src/cli/version.mjs';
 import { resolveDiscovery, classificationPatchFromVerdict, assertCallerClassification } from '../src/intake/discovery.mjs';
@@ -2220,6 +2220,40 @@ async function runVerb(verb, flags, positional, dir) {
     // edit-the-file-by-hand pattern.
     case 'gate-bypass': {
       return { level: readGateBypassLevel(dir) };
+    }
+
+    // tsk-65q: read-only wrapper around canAutoApprove/canAutoApproveMergedGate
+    // (src/state/gate-bypass.mjs) so the two skill-embedded Gate-section
+    // checks (fgos-coding-exploring/fgos-coding-validating) can resolve this
+    // computation through the CLI's own static imports -- which already
+    // resolve correctly under any install shape (global, dev-checkout, npx)
+    // because Node resolves them against bin/fgos.mjs's own file location,
+    // never the caller's cwd or repo root. The ad hoc cwd-relative resolver
+    // those two skill files used to embed inline had no such guarantee, and
+    // crashed unconditionally on a pure global npm install of fgOS onto a
+    // different project (docs/history/tsk-65q-gate-bypass-global-install-
+    // resolution/RESEARCH.md).
+    case 'gate-check': {
+      const id = requireField(positional[0] ?? flags.id, 'gate-check requires an id: fgos gate-check <id> --gate <contextApprove|validateApprove> ...');
+      const gate = requireField(flags.gate, 'gate-check requires --gate <contextApprove|validateApprove>');
+      const item = listWork(dir).work[id];
+      if (!item) {
+        throw new StoreError('validation', `gate-check: no work item "${id}"`);
+      }
+      const level = readGateBypassLevel(dir);
+      if (gate === 'contextApprove') {
+        const artifactPath = requireField(flags.artifact, 'gate-check --gate contextApprove requires --artifact <path>');
+        const artifactText = fs.readFileSync(artifactPath, 'utf8');
+        return { canAutoApprove: canAutoApprove(item, artifactText, level) };
+      }
+      if (gate === 'validateApprove') {
+        const planPath = requireField(flags.plan, 'gate-check --gate validateApprove requires --plan <path>');
+        const planText = fs.readFileSync(planPath, 'utf8');
+        const childSpecs = flags.children !== undefined ? JSON.parse(flags.children) : [];
+        const cost = requireField(flags.cost, 'gate-check --gate validateApprove requires --cost <REVERSIBLE|EXPENSIVE>');
+        return { canAutoApprove: canAutoApproveMergedGate(item, planText, childSpecs, cost, level) };
+      }
+      throw new StoreError('validation', `gate-check: --gate must be "contextApprove" or "validateApprove", got "${gate}"`);
     }
 
     case 'stale': {
