@@ -364,7 +364,14 @@ export function acquireMainCheckoutLock(dir, { identity = process.pid, ttlMs, no
           process.removeListener('SIGINT', onSignal);
           process.removeListener('SIGTERM', onSignal);
         }
-        releaseMainCheckoutLock(dir, { lockFile });
+        // tsk-22c: this closure is called after an arbitrarily long
+        // wrapped operation (mergeRunnerItem's verify, claimWork's state
+        // mutation) — by then this call can no longer assume it is still
+        // the recorded holder (TTL may have lapsed and a different session
+        // legitimately reclaimed). An unconditional unlink here would
+        // delete that live reclaimer's lock. releaseMainCheckoutLockIfOwn
+        // only unlinks when `identity` still matches what's on disk.
+        releaseMainCheckoutLockIfOwn(dir, identity, { lockFile });
       };
       let onExit;
       let onSignal;
