@@ -104,11 +104,32 @@ Touching `footprintOverlapAmong` risks the OTHER two callers that share it
 own evidence does not require. Left as a candidate follow-up item, not
 bundled here (YAGNI).
 
+## Validating-stage finding (feasibility matrix evidence)
+
+`test/intake/plan.test.mjs:161-210` — two existing tests
+(`'resolvePlan completes an interrupted decompose...'` and
+`'...also releases a held claim...'`) construct their fixture by calling
+`addWork` directly with `parent: 'item-x'` on an `'orphan-child-*'` id —
+**no decompose decision is ever logged for it** — then assert `resolvePlan`
+still returns `already-decomposed`. This is the OLD `hasChildren`
+semantics pinned as "correct": an orphan child, indistinguishable from
+this item's own reported failure mode, is currently treated as proof of
+full decomposition. These two tests must be UPDATED (not merely kept
+passing) as part of implementation: their fixtures need an explicit
+`addDecision(storeDir, { id: 'item-x', text: 'decompose verdict: decompose
+(1 children)', source: 'resolvePlan', kind: 'engine' })` call (mirroring
+the exact string `logDecomposeVerdict` writes, `plan.mjs:145`) to
+correctly model the crash-window case they claim to test — `addDecision`
+is already imported in the test file (`test/intake/plan.test.mjs:9`). New
+tests are added alongside for the now-distinguished "stray child, no
+decompose decision" case, proving the fixed behavior instead of the old
+bug.
+
 ## Risk map
 
 | Component | Risk | Proof point |
 |---|---|---|
-| `resolvePlan`'s completion check (item 1 above) | medium — changes a core engine invariant used by both the `session` (`bin/fgos.mjs:1465`) and `runner` (`src/runner/loop.mjs:1297`) callers | New test: crash-recovery re-entrancy still short-circuits to `moveStage` without re-running `addWork` (protects case 1) |
+| `resolvePlan`'s completion check (item 1 above) | medium — changes a core engine invariant used by both the `session` (`bin/fgos.mjs:1465`) and `runner` (`src/runner/loop.mjs:1297`) callers; two existing tests currently assert the OLD semantics (see finding above) and must be updated, not just kept green | Updated tests: crash-recovery re-entrancy (decision logged) still short-circuits to `moveStage` without re-running `addWork`; a NEW test proves an orphan/stray child with no decompose decision no longer permanently blocks decompose |
 | Reconciliation by title (item 2) | medium — new logic, no precedent elsewhere in the file | New test: a resubmission that includes an already-existing child (by title) does not re-`addWork` it and does not throw "already exists" |
 | Widened footprint check (item 3) | low — same `footprintOverlapAmong` call, wider candidate list | New test: a new child colliding with an EXISTING sibling's footprint still parks `need-human` |
 | Existing 88 tests in `test/intake/plan.test.mjs` | regression risk if any assume `hasChildren`'s old existence-only semantics | Full suite run (`node --test test/intake/plan.test.mjs`) before and after |
