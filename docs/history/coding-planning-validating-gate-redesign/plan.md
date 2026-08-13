@@ -24,8 +24,24 @@ lane is set by consequence, not by line count. Note this is a different
 axis from the item's `tier: light`, which per D11 measures delegation
 appetite, not risk — the two disagreeing is expected, not a contradiction.
 
-`impact-analysis: full` — `fgos tool query --capability impact-analysis
---status present` returns `gitnexus` `status: present` (2026-08-13).
+`impact-analysis: degraded` — `fgos tool query --capability impact-analysis
+--status present` returns `gitnexus` `status: present`, but its index is
+**228 commits behind HEAD** (indexed at `79fead39`, HEAD `2c9a49c3`,
+checked 2026-08-13). Per `CLAUDE.md`'s capability gate, `present` never
+means the index is fresh (tsk-j7y), so the honest posture is `degraded`.
+
+**Named plainly, per that gate's own requirement:** GitNexus's blast-radius
+answers would be stale for this branch and are **not trusted anywhere in
+this plan**. No proof point below leans on them — every caller/coupling
+claim in this plan was established by direct `grep`/`Read` against the
+working tree instead (see "Files touched" and the Approach table). Running
+`gitnexus analyze` was considered and skipped deliberately: it buys nothing
+for a plan that takes no blast-radius evidence, and a fresh index is not a
+precondition for any row of the feasibility matrix.
+
+*(Corrected after `fgos-coding-validating`'s reality gate caught the
+original `full` as stale — recorded here rather than silently amended, per
+the same honesty discipline the rest of this plan follows.)*
 
 ## Approach
 

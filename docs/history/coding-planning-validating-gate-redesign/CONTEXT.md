@@ -99,8 +99,14 @@ toàn `add-stage-default-gap` (item này tôn trọng đúng lý do của nó, c
   `executing` không có gate nào, chỉ `fgos ask` khi thật sự bí.
 - `docs/how-to/write-verify-for-a-skill-prose-change.md` — khuôn
   `npm test && POSITIVE && NEGATIVE` + 5 cái bẫy, dùng cho verify của item.
-- `impact-analysis: full` — `fgos tool query --capability impact-analysis
-  --status present` trả `gitnexus` `status: present` (2026-08-13).
+- `impact-analysis: degraded` — `fgos tool query --capability
+  impact-analysis --status present` trả `gitnexus` `status: present`,
+  nhưng index chậm **228 commit** so với HEAD (`79fead39` vs `2c9a49c3`,
+  2026-08-13). `present` không bao giờ có nghĩa index còn tươi (tsk-j7y).
+  **Đính chính một dòng bằng chứng, không phải sửa một quyết định đã
+  khoá** — dòng này ban đầu ghi `full`, bị reality gate của
+  `fgos-coding-validating` bắt; không quyết định D1-D14 nào dựa vào
+  blast-radius nên không có D-ID nào bị ảnh hưởng.
 
 ## Deferred to planning
 
