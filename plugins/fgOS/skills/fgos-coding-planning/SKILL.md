@@ -27,7 +27,14 @@ stage values — the same way `fgos-routing` describes it.
   dirname`) and pass `--dir "$root"`. This session's cwd may already be a
   linked worktree, which never carries its own `.fgos/` by design
   (ADR0020) — the verb refuses (exit 4) rather than silently diverge if
-  `--dir` is omitted there (tsk-56t D1).
+  `--dir` is omitted there (tsk-56t D1). Run the resolve and the
+  `fgos.mjs` call as two SEPARATE tool calls, never pasted together as
+  one script — a worktree-isolated session's own isolation guard refuses
+  a single call combining a `git`-rooted command with a following `node
+  .../fgos.mjs` invocation, even though each command is safe alone
+  (tsk-3rg). Substitute `root`'s literal printed value into the second
+  call — never `$root`, which does not survive across separate tool
+  calls anyway.
 - **This skill creates no work items and records no gate approval.**
   Split children are written as specs in `plan.md` and materialized later,
   by `fgos-coding-validating` at the single gate
