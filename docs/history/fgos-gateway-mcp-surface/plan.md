@@ -147,14 +147,20 @@ capability surface via `search` before `execute` exists). `fgos graph
 with `tsk-7l9`/`tsk-7l9-1`/`tsk-7l9-2` already delivered — nothing there
 changes this item's own internal ordering.
 
-**Impact-analysis posture:** `full` (GitNexus registered and `present`,
-checked fresh in this item's own `exploring` stage,
-`CONTEXT.md`'s Scout evidence, 2026-08-13T11:04Z — same continuing session
-lineage, well under an hour old, no index-changing commits landed on this
-branch since). Both phases below are net-new modules with no existing
-callers, so blast-radius evidence has nothing to contradict; this posture
-is recorded for completeness, not because either proof point below leans
-on it.
+**Impact-analysis posture:** `degraded` (re-checked at
+`fgos-coding-validating`'s re-entry pass, 2026-08-13T11:48Z: GitNexus is
+registered and `present` — `fgos tool query --capability impact-analysis
+--status present` returns the `gitnexus` provider — but its index is
+stale, flagged behind current HEAD (last indexed `c0cedaa`, 15 commits
+back, including `90274891` which added the `herdr-plugin/gateway.rs`
+surface this item's own `mcp.rs` extends). Downgraded here from the
+`full` posture an earlier pass recorded, per this repo's own
+impact-analysis capability gate — `present` alone never means fresh.
+Named plainly rather than silently carried forward: this does not block
+readiness because, as before, both phases below are net-new modules with
+no existing callers, so blast-radius evidence has nothing to contradict
+regardless of index freshness — no proof point below leans on it either
+way.
 
 **Single-item, no split (human decision, 2026-08-13).** `fgos plan
 --verdict decompose` with the 2-piece split below (phase 1 as
