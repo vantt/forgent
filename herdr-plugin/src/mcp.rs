@@ -170,6 +170,23 @@ fn call_verb(gateway: &Arc<dyn VerbGateway>, args: Vec<String>) -> Result<Dynami
     }
 }
 
+/// tsk-1qe: `on_print`/`on_debug` bound below with no cap would let
+/// `loop { print("x") }` grow this buffer without bound. Caps by total
+/// captured bytes (not line count, which a single very long `print()` call
+/// would bypass) -- once the budget is spent, further lines are silently
+/// dropped rather than erroring the whole script (an over-verbose script is
+/// still a working script; only the accidental-flood case needs bounding).
+const MCP_EXECUTE_MAX_OUTPUT_BYTES: usize = 256 * 1024;
+
+fn push_capped_output(output: &Arc<Mutex<Vec<String>>>, line: String) {
+    let mut buf = output.lock().unwrap();
+    let used: usize = buf.iter().map(|s| s.len()).sum();
+    if used >= MCP_EXECUTE_MAX_OUTPUT_BYTES {
+        return;
+    }
+    buf.push(line);
+}
+
 /// tsk-1ah: same guard `gateway.rs`'s REST handlers apply, adapted to the
 /// Rhai error type bound functions below return -- see
 /// `gateway::reject_leading_dash`'s own doc comment for why.
@@ -186,10 +203,22 @@ fn reject_leading_dash(value: &str, field: &str) -> Result<(), Box<rhai::EvalAlt
 fn build_engine(gateway: Arc<dyn VerbGateway>, output: Arc<Mutex<Vec<String>>>) -> Engine {
     let mut engine = Engine::new();
 
+    // tsk-1qe: `Engine::new()` defaults to unlimited operations
+    // (`rhai::Engine`'s own `EngineLimits::default`, `num_operations: None`)
+    // -- an ordinary generation bug like `loop { x += 1; }` (no malice
+    // needed) would otherwise wedge this thread forever. 500_000 gives wide
+    // headroom for any real Code-Mode script's own control flow (every
+    // bound function below executes in Rust, costing Rhai's own op-counter
+    // almost nothing) while failing an accidental infinite loop in well
+    // under a second. NOT a D9 sandbox-privilege reopen (`docs/history/
+    // fgos-gateway-mcp-surface/CONTEXT.md`) -- this bounds CPU time, it
+    // grants or removes no capability.
+    engine.set_max_operations(500_000);
+
     let out = output.clone();
-    engine.on_print(move |s| out.lock().unwrap().push(s.to_string()));
+    engine.on_print(move |s| push_capped_output(&out, s.to_string()));
     let out = output.clone();
-    engine.on_debug(move |s, _src, _pos| out.lock().unwrap().push(s.to_string()));
+    engine.on_debug(move |s, _src, _pos| push_capped_output(&out, s.to_string()));
 
     let gw = gateway.clone();
     engine.register_fn(
@@ -521,6 +550,40 @@ mod tests {
         let gateway = fake(Ok(json!({"ok": true})));
         let result = tokio::task::spawn_blocking(move || run_script(gateway, "")).await.unwrap();
         assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn execute_an_infinite_loop_fails_fast_instead_of_hanging_forever() {
+        let gateway = fake(Ok(json!({"ok": true})));
+        let script = "let x = 0; loop { x += 1; }";
+        let result = tokio::task::spawn_blocking(move || run_script(gateway, script)).await.unwrap();
+        assert!(result.is_err(), "an unbounded loop must be stopped by the operation limit, not run forever");
+        assert!(
+            result.unwrap_err().contains("Too many operations"),
+            "the failure should be the operation-limit error, not some other unrelated error"
+        );
+    }
+
+    #[tokio::test]
+    async fn execute_a_print_flood_does_not_grow_the_captured_output_past_the_byte_cap() {
+        let gateway = fake(Ok(json!({"ok": true})));
+        // Each iteration prints a 1024-byte line; enough iterations to
+        // exceed MCP_EXECUTE_MAX_OUTPUT_BYTES (256 KiB) well before hitting
+        // the operation limit (500_000), so this proves the byte cap fires
+        // on its own rather than being masked by the operation limit.
+        let script = r#"
+            let line = "";
+            for i in range(0, 1024) { line += "x"; }
+            for i in range(0, 500) { print(line); }
+        "#;
+        let result = tokio::task::spawn_blocking(move || run_script(gateway, script)).await.unwrap();
+        let output = result.expect("a bounded print flood should still complete successfully");
+        assert!(
+            output.len() <= MCP_EXECUTE_MAX_OUTPUT_BYTES + 4096,
+            "captured output ({} bytes) should stay near the {}-byte cap, not grow with every print call",
+            output.len(),
+            MCP_EXECUTE_MAX_OUTPUT_BYTES,
+        );
     }
 
     #[tokio::test]
