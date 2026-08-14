@@ -40,6 +40,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { resolveRoot } from '../runner/root-affinity.mjs';
 import { getDomain } from './workflow-stage-graphs.mjs';
+import { isCanceledStatus } from './frontier.mjs';
 
 // Shared with blockedItemsNowResolvable below (tsk-597z): the one detail
 // string that means "this item never claimed a git-verifiable merge in the
@@ -140,7 +141,20 @@ function git(repoRoot, args) {
  */
 export function checkMergeStillResolves(repoRoot, work, { view, id } = {}) {
   if (view && id) {
-    const children = Object.entries(view.work ?? {}).filter(([, item]) => item.parent === id);
+    // tsk-4bh: a canceled/wontfix child never had content to merge in the
+    // first place (wontfix-terminal-status-filter-consistency D1, the same
+    // settled rule claim-port.mjs's own dep-readiness guard already applies
+    // via isResolvedStatus) -- its recorded sha, if any, was never going to
+    // become an ancestor of anything, so waiting on it here is not a real
+    // check, just a permanent false failure. Filtered out BEFORE the
+    // children.length===0 check below, not inside checkChildrenResolve
+    // itself: a root whose non-canceled children have all been filtered
+    // away this way falls through to the SAME leaf-shaped ancestry check on
+    // its own recorded sha that a genuinely childless decomposed item
+    // already gets below (an existing, separate limitation this item does
+    // not change either way -- see the DECOMPOSED-PARENT FALLBACK doc
+    // above), rather than a new code path of its own.
+    const children = Object.entries(view.work ?? {}).filter(([, item]) => item.parent === id && !isCanceledStatus(item));
     if (children.length > 0) {
       const childrenResult = checkChildrenResolve(repoRoot, view, children);
       if (!childrenResult.ok) return childrenResult;

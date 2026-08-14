@@ -239,6 +239,75 @@ test('checkMergeStillResolves: a decomposed parent is ok:false when one of its c
   assert.match(result.detail, /child-d/, 'the failing detail must name the specific failing child, not a generic message');
 });
 
+// tsk-4bh (Finding 5): the EXACT failure scenario the report describes --
+// same topology as the test above (one child never merged), but this time
+// the never-merged child was legitimately REJECTED to wontfix, not lost.
+// Before this fix, checkMergeStillResolves could never tell the two cases
+// apart -- both looked identical (a child whose recorded sha isn't an
+// ancestor) and both failed the parent permanently. A canceled child has
+// no content to lose; it must be skipped, not treated as a loss.
+test('tsk-4bh: checkMergeStillResolves skips a wontfix (legacy status) child entirely -- ok:true even though its own sha was never merged anywhere', () => {
+  const repoRoot = initRepo();
+  execFileSync('git', ['checkout', '-qb', 'fgw/root-wf1'], { cwd: repoRoot });
+  commitFile(repoRoot, 'root.txt');
+  execFileSync('git', ['checkout', '-qb', 'fgw/parent-wf1'], { cwd: repoRoot });
+  const parentSha = commitFile(repoRoot, 'parent-work.txt');
+  execFileSync('git', ['checkout', '-qb', 'fgw/child-merged', 'fgw/root-wf1'], { cwd: repoRoot });
+  const childMergedSha = commitFile(repoRoot, 'child-merged.txt');
+  execFileSync('git', ['checkout', '-qb', 'fgw/child-wontfix', 'fgw/root-wf1'], { cwd: repoRoot });
+  const childWontfixSha = commitFile(repoRoot, 'child-wontfix.txt');
+  execFileSync('git', ['checkout', '-q', 'fgw/root-wf1'], { cwd: repoRoot });
+  execFileSync('git', ['merge', '--no-ff', '-q', '-m', 'merge child-merged', 'fgw/child-merged'], { cwd: repoRoot });
+  // child-wontfix's branch is deliberately NEVER merged anywhere -- it was
+  // rejected, not lost. This is the legacy status-string shape (no
+  // statusCategory field at all, matching pre-tsk-38t-2 data).
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: repoRoot });
+
+  const view = {
+    work: {
+      'root-wf1': {},
+      'parent-wf1': { parent: 'root-wf1', branchHeadAtReturn: parentSha },
+      'child-merged': { parent: 'parent-wf1', branchHeadAtReturn: childMergedSha },
+      'child-wontfix': { parent: 'parent-wf1', branchHeadAtReturn: childWontfixSha, status: 'wontfix' },
+    },
+  };
+  const result = checkMergeStillResolves(repoRoot, view.work['parent-wf1'], { view, id: 'parent-wf1' });
+  assert.equal(result.ok, true, 'a wontfix child must never permanently block the parent — it had nothing to merge');
+  assert.match(result.detail, /child-merged/, 'the real, merged child is still checked and named');
+  assert.doesNotMatch(result.detail, /child-wontfix/, 'the wontfix child is skipped entirely, never even named as passing');
+});
+
+test('tsk-4bh: checkMergeStillResolves skips a canceled (statusCategory) child entirely -- ok:true even though its own sha was never merged anywhere', () => {
+  const repoRoot = initRepo();
+  execFileSync('git', ['checkout', '-qb', 'fgw/root-wf2'], { cwd: repoRoot });
+  commitFile(repoRoot, 'root.txt');
+  execFileSync('git', ['checkout', '-qb', 'fgw/parent-wf2'], { cwd: repoRoot });
+  const parentSha = commitFile(repoRoot, 'parent-work.txt');
+  execFileSync('git', ['checkout', '-qb', 'fgw/child-merged2', 'fgw/root-wf2'], { cwd: repoRoot });
+  const childMergedSha = commitFile(repoRoot, 'child-merged2.txt');
+  execFileSync('git', ['checkout', '-qb', 'fgw/child-canceled', 'fgw/root-wf2'], { cwd: repoRoot });
+  const childCanceledSha = commitFile(repoRoot, 'child-canceled.txt');
+  execFileSync('git', ['checkout', '-q', 'fgw/root-wf2'], { cwd: repoRoot });
+  execFileSync('git', ['merge', '--no-ff', '-q', '-m', 'merge child-merged2', 'fgw/child-merged2'], { cwd: repoRoot });
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: repoRoot });
+
+  const view = {
+    work: {
+      'root-wf2': {},
+      'parent-wf2': { parent: 'root-wf2', branchHeadAtReturn: parentSha },
+      'child-merged2': { parent: 'parent-wf2', branchHeadAtReturn: childMergedSha },
+      // Modern shape: statusCategory present, wins over any literal status
+      // string (same precedence isResolvedStatus/isCanceledStatus already
+      // document).
+      'child-canceled': { parent: 'parent-wf2', branchHeadAtReturn: childCanceledSha, status: 'todo', statusCategory: 'canceled' },
+    },
+  };
+  const result = checkMergeStillResolves(repoRoot, view.work['parent-wf2'], { view, id: 'parent-wf2' });
+  assert.equal(result.ok, true, 'a canceled child must never permanently block the parent — it had nothing to merge');
+  assert.match(result.detail, /child-merged2/);
+  assert.doesNotMatch(result.detail, /child-canceled/);
+});
+
 // Multi-level: child-mid was ITSELF decomposed further (has its own child,
 // grandchild-1). Proves the children-recursion composes with itself across
 // more than one decompose level, and that child-mid's own bogus sha (also
