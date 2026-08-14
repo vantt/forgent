@@ -584,6 +584,38 @@ test('footprintOverlap: two READY items sharing a file path are flagged with the
   ]);
 });
 
+test('tsk-2jn: footprintOverlap flags a conflict even when the two items spelled the SAME path differently ("./" prefix, backslash) — normalized through normalizePath like every other footprint consumer', () => {
+  // Finding 6's exact failure scenario: item A declares "./src/runner/merge.mjs",
+  // item B declares "src/runner/merge.mjs" -- hand-filled at different times,
+  // the exact weak-signal case footprint's own doc already acknowledges.
+  // Before this fix, raw Set membership missed this pair entirely.
+  const view = {
+    work: {
+      a: item('a', { footprint: ['./src/runner/merge.mjs'] }),
+      b: item('b', { footprint: ['src/runner/merge.mjs'] }),
+    },
+  };
+  const out = footprintOverlap(view);
+  assert.deepEqual(out, [
+    { a: 'a', b: 'b', shared: ['./src/runner/merge.mjs'], suggestions: ['sequence', 'hoist', 're-slice'] },
+  ]);
+  // The reported path is A's own AS-DECLARED spelling, never silently
+  // rewritten to the normalized form -- this is a detector, not a rewriter.
+  assert.equal(out[0].shared[0], './src/runner/merge.mjs');
+});
+
+test('tsk-2jn: footprintOverlap also normalizes a backslash-spelled path (a different OS/session\'s hand-filled footprint)', () => {
+  const view = {
+    work: {
+      a: item('a', { footprint: ['src\\runner\\worktree.mjs'] }),
+      b: item('b', { footprint: ['src/runner/worktree.mjs'] }),
+    },
+  };
+  const out = footprintOverlap(view);
+  assert.deepEqual(out.map((c) => [c.a, c.b]), [['a', 'b']]);
+  assert.deepEqual(out[0].shared, ['src\\runner\\worktree.mjs']);
+});
+
 test('footprintOverlap: disjoint footprints (or no footprint) never conflict', () => {
   const view = {
     work: {
