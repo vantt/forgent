@@ -39,6 +39,14 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { resolveRoot } from '../runner/root-affinity.mjs';
+import { getDomain } from './workflow-stage-graphs.mjs';
+
+// Shared with blockedItemsNowResolvable below (tsk-597z): the one detail
+// string that means "this item never claimed a git-verifiable merge in the
+// first place", not "its ancestry check now passes" -- comparing against
+// the SAME constant both places write/read keeps the two in sync without
+// duplicating the literal.
+const NOTHING_TO_CHECK_DETAIL = 'no recorded commit to verify — nothing to check';
 
 /**
  * tsk-59x D1: which TTL applies to `id` — the leaf value when `id` has a
@@ -147,7 +155,7 @@ export function checkMergeStillResolves(repoRoot, work, { view, id } = {}) {
   }
   const sha = work?.branchHeadAtReturn ?? work?.headAtReturn ?? work?.branchHeadAtTake ?? work?.headAtTake;
   if (!sha) {
-    return { ok: true, detail: 'no recorded commit to verify — nothing to check' };
+    return { ok: true, detail: NOTHING_TO_CHECK_DETAIL };
   }
   const rootId = view && id ? resolveRoot(view, id) : id;
   const namedRef = rootId && rootId !== id ? `fgw/${rootId}` : null;
@@ -336,4 +344,57 @@ export function assessCleanupReadiness({ view, rawEvents, id, repoRoot, worktree
   }
 
   return { ready: notReadyYet.length === 0 && failed.length === 0, notReadyYet, failed };
+}
+
+/**
+ * tsk-597z: report-only sweep across every currently `status: blocked`
+ * item -- re-runs `checkMergeStillResolves` LIVE against each one instead
+ * of trusting its stored `reason`/`detail` text, the same pattern
+ * `catchup`'s own eligibility gate already uses (`bin/fgos.mjs`'s
+ * `case 'catchup'`) for exactly this reason: the `cleanup -> blocked` park
+ * path stores the FULL human-readable diagnostic in `reason` itself
+ * (possibly joined with an unrelated failure), so it can never be trusted
+ * to match by content. Re-running the check is what proves whether the
+ * item's own park-causing ancestry check would now pass -- an item stuck
+ * `blocked` from before an unrelated fix (e.g. tsk-5j0/tsk-577) landed is
+ * exactly the case this surfaces.
+ *
+ * Domain-conditional (same gate `assessCleanupReadiness` already applies,
+ * D5 above): a domain with no real git worktree/merge concept is not held
+ * to a check that assumes one. `resolvable` excludes any item for which
+ * `checkMergeStillResolves` returned the `NOTHING_TO_CHECK_DETAIL`
+ * degenerate case -- that item never claimed a git-verifiable merge in the
+ * first place, so reporting it as "would now unblock" would be
+ * misleading; it is reported separately under `notApplicable` instead.
+ *
+ * Never calls `moveWork`/`addFriction`/`addDecision` -- read-only, same as
+ * `checkMergeStillResolves` itself. Never auto-transitions anything; the
+ * item's own scope note (and the named risks in its description --
+ * fragile trigger key, flap loop, check-then-transition TOCTOU, no
+ * persistent watch daemon) rule that out for now.
+ */
+export function blockedItemsNowResolvable({ view, repoRoot }) {
+  const resolvable = [];
+  const stillBlocked = [];
+  const notApplicable = [];
+
+  for (const [id, item] of Object.entries(view.work ?? {})) {
+    if (item.status !== 'blocked') continue;
+
+    if (!getDomain(item.domain).worktreeBacked) {
+      notApplicable.push({ id, reason: 'domain-not-worktree-backed' });
+      continue;
+    }
+
+    const result = checkMergeStillResolves(repoRoot, item, { view, id });
+    if (result.detail === NOTHING_TO_CHECK_DETAIL) {
+      notApplicable.push({ id, reason: 'no-recorded-commit', detail: result.detail });
+    } else if (result.ok) {
+      resolvable.push({ id, detail: result.detail });
+    } else {
+      stillBlocked.push({ id, detail: result.detail });
+    }
+  }
+
+  return { resolvable, stillBlocked, notApplicable };
 }

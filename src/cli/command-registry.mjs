@@ -558,6 +558,18 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'recheck-blocked',
+    invoke: 'fgos recheck-blocked',
+    description: 'Read-only, report-only advisory: re-runs the merge-still-resolves ancestry check LIVE against every current status:blocked item, instead of trusting its stored reason/detail text (the same live-recheck stance fgos catchup\'s own eligibility gate already takes). Reports which blocked items would now pass that check (resolvable), which are still genuinely blocked (stillBlocked), and which the check does not apply to at all — a non-worktree-backed domain, or an item with no recorded merge commit (notApplicable). Never transitions anything; run fgos catchup <id> to actually act on a resolvable item.',
+    parameters: { type: 'object', properties: {}, required: [] },
+    examples: ['fgos recheck-blocked'],
+    touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
     name: 'schedule',
     invoke: 'fgos schedule',
     description: 'Read-only computed-parallel-wave-schedule (tsk-3c7): which frontier items can dispatch in parallel right now, packed into waves by declared-footprint conflict (a conflicting item is deferred to a later wave, never refused — same advisory stance `fgos conflicts` already has), plus `cycles` — a dep-graph cycle check over the whole work map regardless of status. Derived-never-stored, same discipline `fgos graph`/`fgos conflicts` already use.',
