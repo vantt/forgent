@@ -42,6 +42,31 @@ file's cost no matter how tightly the verify is scoped.
 The only lever that moves the number is making the slowest file stop being
 slow.
 
+## The measurement that decided whether the plan was real, before any code moved
+
+Splitting `test/cli/fgos.test.mjs` was the riskier half of the work: 547
+tests moving files, and a path deleted that 55 items referenced in their
+`verify`. That risk was accepted only because the deciding number was taken
+*first* — before a line was changed.
+
+Two measurements settled it:
+
+- **The other 116 files ran to completion in 29.70s.** That is the real
+  ceiling once the dominant file stops dominating, so a sub-45s suite was
+  achievable rather than hypothetical.
+- **Per-test cost showed the heaviest single test at 11.1s**, so 10 groups
+  would each land under the ~30s per-file threshold.
+
+Without those two numbers the split would have been a guess that moved 547
+tests and deleted a widely-referenced path for possibly nothing. This is
+the same discipline the rest of this page runs on: measure the ceiling
+before paying for the work, not after.
+
+One verify detail matters here too. The verify for this split was rewritten
+to catch a *real* regression rather than assert "0 fail" against a baseline
+that was already known to be green — an assertion that would have passed
+whether or not the split preserved anything.
+
 ## Mechanical splitting worked, then stopped working at ~50s
 
 Splitting the two dominant files (7–8 shards for `fgos.test.mjs`, 5 for
