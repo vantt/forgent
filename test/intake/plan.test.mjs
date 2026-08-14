@@ -698,6 +698,32 @@ test('resolvePlan gates to awaiting-human when tentative children declare overla
   assert.equal(children.length, 0);
 });
 
+test('resolvePlan honors a declared deps edge between tentative children as the sequence resolution for a shared footprint', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolvePlan(storeDir, 'item-x', cfg, 'runner', {
+    verdict: 'decompose',
+    reason: 'One child must finish before the other touches the same file',
+    children: [
+      { title: 'Build parser', verify: 'npm test -- parser', action: 'x', footprint: ['src/parser.mjs', 'src/shared.mjs'] },
+      {
+        title: 'Build renderer',
+        verify: 'npm test -- renderer',
+        action: 'x',
+        footprint: ['src/shared.mjs'],
+        deps: [0],
+      },
+    ],
+  });
+  assert.equal(result.outcome, 'decompose');
+  assert.equal(result.childIds.length, 2);
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'executing');
+  assert.deepEqual(view.work[result.childIds[1]].deps, [result.childIds[0]]);
+});
+
 test('resolvePlan proceeds normally when tentative children declare disjoint (or absent) footprint', () => {
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork());

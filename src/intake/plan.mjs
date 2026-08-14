@@ -886,7 +886,27 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
       ? { id: entry.id, footprint: view.work[entry.id]?.footprint }
       : { id: entry.id, footprint: entry.child.footprint },
   );
-  const footprintConflicts = footprintOverlapAmong(footprintCandidates);
+  // A pair already connected by a declared `deps` edge (either direction)
+  // can never run in parallel, so a shared footprint between them is not a
+  // real dispatch hazard -- this is the `sequence` option
+  // FOOTPRINT_CONFLICT_SUGGESTIONS already documents, honored here instead
+  // of forcing every resolution through re-slicing. Scoped to this one
+  // call site only (never touches footprintOverlapAmong itself): its other
+  // callers all source candidates from an already deps-clear set (frontier/
+  // syncClear), where this exemption would be a no-op, except one script
+  // that intentionally checks raw, unfiltered siblings -- widening the
+  // shared function would change that script's own semantics for no gain.
+  const resolvedDepsById = new Map(
+    childReconciliation.map((entry) => [
+      entry.id,
+      entry.alreadyMaterialized
+        ? (Array.isArray(view.work[entry.id]?.deps) ? view.work[entry.id].deps : [])
+        : entry.child.deps.map((depIndex) => childIds[depIndex]),
+    ]),
+  );
+  const footprintConflicts = footprintOverlapAmong(footprintCandidates).filter(
+    ({ a, b }) => !(resolvedDepsById.get(a) ?? []).includes(b) && !(resolvedDepsById.get(b) ?? []).includes(a),
+  );
   if (footprintConflicts.length > 0) {
     const reason = formatFootprintOverlapReason(footprintConflicts);
     logDecomposeVerdict(dir, id, 'need-human', reason, `${footprintConflicts.length} footprint conflicts`);
