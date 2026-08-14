@@ -21,7 +21,8 @@ use std::path::{Path, PathBuf};
 use std::process::Stdio;
 use std::sync::Arc;
 
-use axum::extract::{Path as AxPath, Query, State};
+use axum::extract::{FromRequest, FromRequestParts, Path as AxPath, Query, Request, State};
+use axum::http::request::Parts;
 use axum::http::{HeaderMap, StatusCode};
 use axum::middleware::{self, Next};
 use axum::response::{IntoResponse, Response};
@@ -227,14 +228,28 @@ impl std::fmt::Display for GatewayError {
     }
 }
 
-impl IntoResponse for GatewayError {
-    fn into_response(self) -> Response {
+impl GatewayError {
+    /// tsk-4qf: same `ErrorEnvelope` body `into_response` always builds,
+    /// with an explicit status override at THIS call site instead of the
+    /// blanket `category.http_status()` table. Lets a caller give a
+    /// distinct HTTP-layer signal (e.g. 401 for an auth failure) without
+    /// adding a new `category` value — D7 pins that enum as a closed
+    /// mirror of the CLI's own exit-code taxonomy, never widened by the
+    /// gateway itself.
+    fn into_response_with_status(self, status: StatusCode) -> Response {
         let body = json!({
             "category": self.category.as_str(),
             "message": self.message,
             "exitCode": self.exit_code,
         });
-        (self.category.http_status(), Json(body)).into_response()
+        (status, Json(body)).into_response()
+    }
+}
+
+impl IntoResponse for GatewayError {
+    fn into_response(self) -> Response {
+        let status = self.category.http_status();
+        self.into_response_with_status(status)
     }
 }
 
@@ -325,12 +340,16 @@ async fn require_token(
         Some(token) if constant_time_eq(token.as_bytes(), state.config.token.as_bytes()) => {
             next.run(request).await
         }
+        // tsk-4qf: 401, not category's own 400 -- gives a client a
+        // distinct HTTP-layer auth signal (D7 forbids a new `category`
+        // value, so the JSON body's `category` field stays "validation";
+        // the status code alone carries the distinction).
         _ => GatewayError {
             category: ErrorCategory::Validation,
             message: "missing or invalid Authorization: Bearer <token> (D4: one token per machine, see ~/.fgos/config.json's \"gateway.token\")".to_string(),
             exit_code: None,
         }
-        .into_response(),
+        .into_response_with_status(StatusCode::UNAUTHORIZED),
     }
 }
 
@@ -360,6 +379,51 @@ struct AppState {
     root: PathBuf,
 }
 
+/// tsk-4qf: axum's own `Json<T>` rejects a malformed body with a
+/// plain-text response, not this gateway's `ErrorEnvelope` -- the contract
+/// (`docs/contracts/fgos-gateway-api-v1.yaml`) tells clients to "branch on
+/// this body's `category`" for every non-2xx response, which a plain-text
+/// body can't satisfy. Wraps `axum::Json` so its own rejection (already
+/// `Display`, `axum::extract::rejection::JsonRejection`) becomes a real
+/// `GatewayError` -- `IntoResponse` for the whole route then produces the
+/// same envelope every other error already does.
+struct AppJson<T>(T);
+
+impl<S, T> FromRequest<S> for AppJson<T>
+where
+    T: serde::de::DeserializeOwned,
+    S: Send + Sync,
+{
+    type Rejection = GatewayError;
+
+    async fn from_request(req: Request, state: &S) -> Result<Self, Self::Rejection> {
+        match Json::<T>::from_request(req, state).await {
+            Ok(Json(value)) => Ok(AppJson(value)),
+            Err(rejection) => Err(GatewayError::validation(format!("{rejection}"))),
+        }
+    }
+}
+
+/// Same fix as `AppJson`, for `axum::extract::Query` — a malformed query
+/// string (`axum::extract::rejection::QueryRejection`) also defaulted to a
+/// plain-text rejection body before this item.
+struct AppQuery<T>(T);
+
+impl<S, T> FromRequestParts<S> for AppQuery<T>
+where
+    T: serde::de::DeserializeOwned,
+    S: Send + Sync,
+{
+    type Rejection = GatewayError;
+
+    async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
+        match Query::<T>::from_request_parts(parts, state).await {
+            Ok(Query(value)) => Ok(AppQuery(value)),
+            Err(rejection) => Err(GatewayError::validation(format!("{rejection}"))),
+        }
+    }
+}
+
 #[derive(Debug, Deserialize, Default)]
 struct ListWorkQuery {
     status: Option<String>,
@@ -370,7 +434,7 @@ struct ListWorkQuery {
     limit: Option<u32>,
 }
 
-async fn get_work(State(state): State<AppState>, Query(q): Query<ListWorkQuery>) -> Result<Json<Value>, GatewayError> {
+async fn get_work(State(state): State<AppState>, AppQuery(q): AppQuery<ListWorkQuery>) -> Result<Json<Value>, GatewayError> {
     let mut args = vec!["list".to_string(), "--json".to_string()];
     if let Some(status) = q.status {
         args.push("--status".to_string());
@@ -400,7 +464,7 @@ struct SubmitWorkBody {
     text: String,
 }
 
-async fn post_work(State(state): State<AppState>, Json(body): Json<SubmitWorkBody>) -> Result<Json<Value>, GatewayError> {
+async fn post_work(State(state): State<AppState>, AppJson(body): AppJson<SubmitWorkBody>) -> Result<Json<Value>, GatewayError> {
     if body.text.trim().is_empty() {
         return Err(GatewayError::validation("submitWork requires a non-empty \"text\" field"));
     }
@@ -424,7 +488,7 @@ struct MoveWorkBody {
 async fn post_work_move(
     State(state): State<AppState>,
     AxPath(id): AxPath<String>,
-    Json(body): Json<MoveWorkBody>,
+    AppJson(body): AppJson<MoveWorkBody>,
 ) -> Result<Json<Value>, GatewayError> {
     let mut args = vec!["move".to_string(), id, "--to".to_string(), body.to, "--json".to_string()];
     if let Some(expect) = body.expect {
@@ -443,7 +507,7 @@ struct TextBody {
 async fn post_work_ask(
     State(state): State<AppState>,
     AxPath(id): AxPath<String>,
-    Json(body): Json<TextBody>,
+    AppJson(body): AppJson<TextBody>,
 ) -> Result<Json<Value>, GatewayError> {
     let args = vec!["ask".to_string(), id, "--text".to_string(), body.text, "--json".to_string()];
     let data = run_verb_blocking(state.gateway, args).await?;
@@ -453,7 +517,7 @@ async fn post_work_ask(
 async fn post_work_answer(
     State(state): State<AppState>,
     AxPath(id): AxPath<String>,
-    Json(body): Json<TextBody>,
+    AppJson(body): AppJson<TextBody>,
 ) -> Result<Json<Value>, GatewayError> {
     let args = vec!["answer".to_string(), id, "--text".to_string(), body.text, "--json".to_string()];
     let data = run_verb_blocking(state.gateway, args).await?;
@@ -496,7 +560,7 @@ struct ReasonBody {
 async fn post_work_reject(
     State(state): State<AppState>,
     AxPath(id): AxPath<String>,
-    Json(body): Json<ReasonBody>,
+    AppJson(body): AppJson<ReasonBody>,
 ) -> Result<Json<Value>, GatewayError> {
     let args = vec!["reject".to_string(), id, "--reason".to_string(), body.reason, "--json".to_string()];
     let data = run_verb_blocking(state.gateway, args).await?;
@@ -509,7 +573,7 @@ struct PageQuery {
     limit: Option<u32>,
 }
 
-async fn get_ready(State(state): State<AppState>, Query(q): Query<PageQuery>) -> Result<Json<Value>, GatewayError> {
+async fn get_ready(State(state): State<AppState>, AppQuery(q): AppQuery<PageQuery>) -> Result<Json<Value>, GatewayError> {
     let mut args = vec!["ready".to_string(), "--json".to_string()];
     if let Some(cursor) = q.cursor {
         args.push("--cursor".to_string());
@@ -579,7 +643,7 @@ struct EndSessionQuery {
 async fn delete_session(
     State(state): State<AppState>,
     AxPath(session_id): AxPath<String>,
-    Query(q): Query<EndSessionQuery>,
+    AppQuery(q): AppQuery<EndSessionQuery>,
 ) -> Result<Json<Value>, GatewayError> {
     let mut args = vec!["session".to_string(), "end".to_string(), session_id, "--json".to_string()];
     if q.force {
@@ -802,7 +866,9 @@ mod tests {
             .oneshot(Request::builder().uri("/ready").body(Body::empty()).unwrap())
             .await
             .unwrap();
-        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+        // tsk-4qf: 401, not the category table's own 400 -- a distinct
+        // HTTP-layer auth signal, see require_token's own comment.
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
     }
 
     #[tokio::test]
@@ -850,6 +916,66 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn a_malformed_json_body_returns_the_same_error_envelope_every_other_error_uses() {
+        let gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({"ok": true})) });
+        let app = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+
+        use axum::body::Body;
+        use axum::http::Request;
+        use tower::ServiceExt;
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/work")
+                    .header(axum::http::header::AUTHORIZATION, "Bearer test-token")
+                    .header(axum::http::header::CONTENT_TYPE, "application/json")
+                    .body(Body::from("{not valid json"))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+
+        let body = axum::body::to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        let parsed: Value = serde_json::from_slice(&body).expect(
+            "a malformed request body must still get the JSON ErrorEnvelope, never axum's own plain-text rejection",
+        );
+        assert!(parsed.get("category").is_some(), "expected an ErrorEnvelope-shaped body, got: {parsed}");
+    }
+
+    #[tokio::test]
+    async fn a_malformed_query_string_returns_the_same_error_envelope_every_other_error_uses() {
+        let gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({"ok": true})) });
+        let app = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+
+        use axum::body::Body;
+        use axum::http::Request;
+        use tower::ServiceExt;
+
+        // `limit` is typed `u32` in `ListWorkQuery` -- a non-numeric value
+        // is what QueryRejection actually rejects on.
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/work?limit=not-a-number")
+                    .header(axum::http::header::AUTHORIZATION, "Bearer test-token")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+
+        let body = axum::body::to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        let parsed: Value = serde_json::from_slice(&body).expect(
+            "a malformed query string must still get the JSON ErrorEnvelope, never axum's own plain-text rejection",
+        );
+        assert!(parsed.get("category").is_some(), "expected an ErrorEnvelope-shaped body, got: {parsed}");
+    }
+
+    #[tokio::test]
     async fn contract_route_is_reachable_without_a_token() {
         let gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({})) });
         let root = std::env::temp_dir().join(format!("fgos-gateway-test-{}", std::process::id()));
@@ -887,7 +1013,7 @@ mod tests {
             .unwrap();
         assert_eq!(
             response.status(),
-            StatusCode::BAD_REQUEST,
+            StatusCode::UNAUTHORIZED,
             "unauthenticated /mcp must be blocked by the same require_token gate as every other route"
         );
 
