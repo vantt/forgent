@@ -194,11 +194,32 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
     // the `.fgos` directory, so its parent is the project root
     // readSharedConfig expects — resolved the same way readGateBypassLevel
     // does, rather than from `repoRoot`, which callers set independently.
+    // tsk-37t: a stale-claim reclaim (below) re-claims an item that is
+    // ALREADY `doing` — occupancy is unchanged before and after (the item
+    // held its slot under the stale claim, and holds the same slot under
+    // the fresh one), so the ceiling gate has nothing real to refuse here.
+    // Computed BEFORE the gate on purpose: `excludeId: id` already removes
+    // this item from the room-check's own occupancy count, but that count
+    // still refuses when every OTHER item alone is at or past ceiling (the
+    // exact drift this item was filed against) — which is precisely the
+    // situation a person reclaiming a stale claim is trying to clear. Same
+    // condition the reclaim block below re-derives independently as a
+    // signal-check, not a status change, so evaluating it twice (cheap:
+    // `isReclaimEligible` here decides only whether to SKIP the gate, the
+    // block below still runs its own reclaim attempt against fresh state)
+    // never lets a claim through this gate that the reclaim block itself
+    // then declines to take.
+    const isPotentialStaleClaimReclaim = isolate
+      && item.status === 'doing'
+      && (item.claimRole === 'human' || item.claimRole === 'session')
+      && (actor === 'session' || actor === 'human')
+      && isReclaimEligible(repoRoot, id, item.claimRole);
+
     const room = hasWorkerSlotRoom(view, {
       ceiling: readSharedConfigOrEmpty(path.dirname(dir))?.workerSlots?.ceiling,
       excludeId: id,
     });
-    if (!room.allowed) {
+    if (!room.allowed && !isPotentialStaleClaimReclaim) {
       throw new ClaimError(
         'worker-slot-ceiling',
         `claimWork: worker-slot ceiling reached — ${room.occupied} of ${room.ceiling} slots in use; finish or park a running item before claiming "${id}".`,

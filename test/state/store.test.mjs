@@ -142,6 +142,39 @@ test('addDecision keeps an explicit kind (e.g. "engine") unchanged', () => {
   assert.equal(last.kind, 'engine');
 });
 
+// --- tsk-37t: addDecision now validates a present `id`, matching every
+// neighbouring id-taking verb (editWork/moveWork both throw "work <id> not
+// found" first) -- a decision scoped to a nonexistent item used to write a
+// success envelope and an event `fgos show <id>` could never retrieve. ---
+
+test('tsk-37t: addDecision throws "work <id> not found" for a nonexistent id, same shape editWork/moveWork already use', () => {
+  const dir = tmpDir();
+  assert.throws(
+    () => addDecision(dir, { id: 'no-such-item', text: 'closing report', rationale: 'driver stop reason: awaiting-approval' }),
+    (err) => err instanceof StoreError && err.category === 'validation' && /work "no-such-item" not found/.test(err.message),
+  );
+  // And no event was written for the rejected call -- not silently
+  // half-applied.
+  const view = listWork(dir);
+  assert.equal(view.decisions.length, 0);
+});
+
+test('tsk-37t: addDecision still succeeds when id names a real work item', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'real-item');
+  addDecision(dir, { id: 'real-item', text: 'closing report', rationale: 'driver stop reason: awaiting-approval' });
+  const view = listWork(dir);
+  const last = view.decisions.at(-1);
+  assert.equal(last.id, 'real-item');
+});
+
+test('tsk-37t: addDecision with no id at all is still legitimate (a global decision not scoped to one item)', () => {
+  const dir = tmpDir();
+  addDecision(dir, { text: 'a global decision', rationale: 'not scoped to one item' });
+  const view = listWork(dir);
+  assert.equal(view.decisions.at(-1).text, 'a global decision');
+});
+
 test('moveWork doing->done composes a learning record reflecting the item\'s actual outcome, friction (by layer), and settlement (by kind/role)', () => {
   const dir = tmpDir();
   addSampleWork(dir, 'learn-doing');
