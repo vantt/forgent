@@ -43,8 +43,7 @@ import { selectTemplate, renderTemplate, hashTemplate } from './prompt-templates
 import { mergeConfigDefaults } from '../setup/config-merge.mjs';
 import { sharedConfigFilePath } from '../config/shared-config-file.mjs';
 import { mergeWithGlobalConfig } from '../config/global-config.mjs';
-import { KINDS, findExecutableOnPath, resolvedStatus, readLocalStatus } from '../state/tool-registry.mjs';
-import { listWork } from '../state/store.mjs';
+import { KINDS, findExecutableOnPath } from '../state/tool-registry.mjs';
 import { appendEvent } from '../state/events.mjs';
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from './paths.mjs';
 
@@ -486,15 +485,10 @@ function validateCapacityShape(capacity, label) {
   if (capacity.forceCliSpawn !== undefined && typeof capacity.forceCliSpawn !== 'boolean') {
     throw new RunnerConfigError(`runner config (${label}) "forceCliSpawn" must be a boolean when present.`);
   }
-  // D6/tsk-1o7: demand-side self-declaration, additive and optional --
-  // absent keeps every pre-tsk-1o7 capacity byte-identical (same style as
-  // every sibling optional field above). `needs` is the real match key
-  // `resolveExecutorConfig` below now consults for a `kind:"cli"`
-  // capacity's presence check; `for` has no code consumer yet (see
-  // CAPACITY_PURPOSES's own comment) and is validated here only.
-  if (capacity.needs !== undefined && (typeof capacity.needs !== 'string' || capacity.needs.length === 0)) {
-    throw new RunnerConfigError(`runner config (${label}) "needs" must be a non-empty string when present.`);
-  }
+  // tsk-5tm-1 D1: `needs` retired (was resolveExecutorConfig's own presence
+  // gate's match key, itself removed — see that function's doc comment).
+  // No longer validated; a stray `needs` on a capacity is now inert, never
+  // rejected, since the field carries no meaning to consume it.
   if (capacity.for !== undefined && !CAPACITY_PURPOSES.includes(capacity.for)) {
     throw new RunnerConfigError(`runner config (${label}) "for" must be one of ${CAPACITY_PURPOSES.join('/')}, got: ${JSON.stringify(capacity.for)}.`);
   }
@@ -597,20 +591,11 @@ export function modelForTier(cfg, tier) {
  * `executors.<tier>`/global — still ahead of that fallback in the same
  * precedence slot `command`/`adapter` already occupy.
  *
- * For a `capacities.<capacityId>` entry declaring `kind: "cli"`, presence
- * is checked via the same in-process functions `fgos tool query` already
- * uses (`listWork`/`readLocalStatus`/`resolvedStatus`, D6) instead of
- * re-probing PATH — throws `RunnerConfigError` at resolve time, before any
- * spawn, the same "fail loud" style this function already uses for a
- * malformed executor block. This check only runs when the caller supplies
- * `fgosDir` (`spawnWorker`'s optional `opts.fgosDir`); omitted `fgosDir`
- * skips it entirely — every pre-tsk-62v call site never passes it.
- *
- * US-027/D5/D6 (tsk-1o7): when the capacity also declares `needs` (the
- * capability it requires), that presence check matches by the registered
- * tool's own `capability` field, never by name coincidence with
- * `capacityId` — a capacity naming no `needs` yet keeps the pre-tsk-1o7
- * `tools[capacityId]` name lookup unchanged.
+ * Presence/staleness of a `capacities.<capacityId>` entry's own tool is no
+ * longer checked here (tsk-5tm-1 D1: retired — 2/3 real entries were
+ * `kind:"task"`, for which this never ran, and the third's `needs` added no
+ * signal beyond the OS's own ENOENT on a missing binary). Ask `fgos tool
+ * query --status present/stale` directly at the call site instead.
  *
  * Cross-provider governance (D2/D3, tsk-32n): once the winning `executor`
  * is resolved below, a `kind: "cli"` capacity whose FINAL resolved
@@ -673,51 +658,6 @@ export function resolveCapacityIdForPurpose(cfg, purpose) {
 
 function resolveExecutorConfig(cfg, tier, capacityId, fgosDir, contentCarries) {
   const capacity = capacityId && cfg && cfg.capacities && typeof cfg.capacities === 'object' ? cfg.capacities[capacityId] : undefined;
-
-  // D5/D6/tsk-1o7: US-027 -- binding matches by capability promise, never
-  // by tool name. When the capacity declares `needs`, the presence gate
-  // below searches the tools registry for a provider whose OWN declared
-  // `capability` matches `capacity.needs`, instead of assuming the
-  // capacity's own id is also the registered tool's name. A capacity
-  // naming no `needs` yet keeps today's exact `tools[capacityId]` name
-  // lookup, byte-identical -- the backward-compat seam that lets this
-  // land before any real capacity in `.fgos/config.json` actually
-  // declares `needs` (tsk-53n, split off per ADR0020).
-  //
-  // D13/tsk-592: gate widened from `kind === 'cli'` to `kind !== 'task'` --
-  // mcp/skill/http/binary capacities now get the same presence check a
-  // `cli` capacity always had (latent until a capacity of one of those
-  // kinds is registered; `kind === 'task'` still excludes the one kind
-  // with no real out-of-process provider to check presence for).
-  if (capacity && capacity.kind !== 'task' && fgosDir) {
-    const tools = listWork(fgosDir).tools ?? {};
-    if (capacity.needs) {
-      const localStatus = readLocalStatus(fgosDir);
-      const candidates = Object.values(tools).filter((tool) => tool.capability === capacity.needs);
-      if (candidates.length === 0) {
-        throw new RunnerConfigError(
-          `capacity "${capacityId}" needs capability "${capacity.needs}" but no tool is registered with that capability — run "fgos tool register --name <tool> --kind cli --command <cmd> --capability ${capacity.needs}" first.`,
-        );
-      }
-      const present = candidates.some((tool) => resolvedStatus(tool.name, localStatus) === 'present');
-      if (!present) {
-        throw new RunnerConfigError(
-          `capacity "${capacityId}" needs capability "${capacity.needs}" but no provider registered for it is present on this machine — run "fgos tool check --name <tool>" to refresh, or install one.`,
-        );
-      }
-    } else if (!tools[capacityId]) {
-      throw new RunnerConfigError(
-        `capacity "${capacityId}" declares kind "${capacity.kind}" but is not registered — run "fgos tool register --name ${capacityId} --kind ${capacity.kind} --command <cmd> --capability <label>" first.`,
-      );
-    } else {
-      const status = resolvedStatus(capacityId, readLocalStatus(fgosDir));
-      if (status !== 'present') {
-        throw new RunnerConfigError(
-          `capacity "${capacityId}" is registered but not present on this machine (status: "${status}") — run "fgos tool check --name ${capacityId}" to refresh, or install it.`,
-        );
-      }
-    }
-  }
 
   // D15/tsk-5td, first real gate — carries answers "CAI GI duoc di", never
   // "CO duoc ra ngoai khong" (allowCrossProvider's own question, checked

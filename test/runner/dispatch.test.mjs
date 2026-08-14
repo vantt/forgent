@@ -648,13 +648,13 @@ test('the committed .fgos/config.json runner section no longer declares a coding
   assert.equal(cfg.capacities?.['coding-classify-intake'], undefined, 'capacities.coding-classify-intake should no longer exist -- retired after tsk-4ns removed its only consumer');
 });
 
-test('the committed .fgos/config.json runner section declares the gather capacity (tsk-28o): for "gather", needs "prompt-completion", carries "repo-content" (D1, gather-capacity-purpose-binding CONTEXT.md), kind cli, allowCrossProvider true, well-formed {prompt}/{model} args', () => {
+test('the committed .fgos/config.json runner section declares the gather capacity (tsk-28o): for "gather", carries "repo-content" (D1, gather-capacity-purpose-binding CONTEXT.md), kind cli, allowCrossProvider true, well-formed {prompt}/{model} args, no needs field (tsk-5tm-1 D1: retired)', () => {
   const cfg = committedRunnerConfig();
   const capacity = cfg.capacities?.gather;
   assert.ok(capacity, 'capacities.gather must exist');
   assert.equal(capacity.kind, 'cli');
   assert.equal(capacity.for, 'gather');
-  assert.equal(capacity.needs, 'prompt-completion');
+  assert.equal(capacity.needs, undefined, 'needs is retired (tsk-5tm-1 D1) -- must no longer be present');
   assert.equal(capacity.carries, 'repo-content');
   assert.equal(capacity.allowCrossProvider, true);
   assert.ok(typeof capacity.command === 'string' && capacity.command.length > 0);
@@ -1160,57 +1160,14 @@ test('resolveExecutorCommand still skips both the presence check and the cross-p
   );
 });
 
-// --- capacities.<id>.needs/for (D5/D6, tsk-1o7): US-027 -- binding matches
-// by capability promise, never by tool name. A capacity that declares
-// `needs` resolves its presence check against the tools registry's own
-// `capability` field, not against whether the capacity's own id happens to
-// match a registered tool's name ---
-
-test('resolveExecutorCommand resolves a kind:"cli" capacity declaring needs+for through capability match, with no name coincidence between the capacity id and the registered tool name', () => {
-  const dir = mkTempDir();
-  initStore(dir);
-  registerTool(dir, { name: 'agy-classify', kind: 'cli', capability: 'classification', command: 'agy' });
-  writeLocalStatus(dir, { 'agy-classify': { status: 'present', checkedAt: new Date().toISOString() } });
-  const cfg = {
-    executor: { command: '/global/executor', args: ['{prompt}'] },
-    capacities: {
-      'submit-assist-classify': { kind: 'cli', needs: 'classification', for: 'judge', command: 'agy', args: ['{prompt}'], allowCrossProvider: true },
-    },
-    models: { standard: 'sonnet' },
-    timeoutMs: 5000,
-  };
-  // Old tools[capacityId] lookup would fail here: no tool is registered
-  // under the name "submit-assist-classify" at all.
-  assert.equal(Object.prototype.hasOwnProperty.call(cfg.capacities['submit-assist-classify'], 'needs'), true);
-  assert.doesNotThrow(() =>
-    resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'submit-assist-classify', fgosDir: dir }),
-  );
-});
-
-test('resolveExecutorCommand resolves a needs-declaring capacity when a second provider is registered under the same capability but a different name', () => {
-  const dir = mkTempDir();
-  initStore(dir);
-  registerTool(dir, { name: 'agy', kind: 'cli', capability: 'classification', command: 'agy' });
-  registerTool(dir, { name: 'gemini-cli', kind: 'cli', capability: 'classification', command: 'gemini' });
-  writeLocalStatus(dir, {
-    agy: { status: 'missing', checkedAt: new Date().toISOString() },
-    'gemini-cli': { status: 'present', checkedAt: new Date().toISOString() },
-  });
-  const cfg = {
-    executor: { command: '/global/executor', args: ['{prompt}'] },
-    capacities: {
-      'submit-assist-classify': { kind: 'cli', needs: 'classification', command: 'gemini', args: ['{prompt}'], allowCrossProvider: true },
-    },
-    models: { standard: 'sonnet' },
-    timeoutMs: 5000,
-  };
-  // The first-registered provider ("agy") is missing; the second one under
-  // the SAME capability ("gemini-cli") is present -- the capacity itself
-  // never had to be renamed or repointed to pick that up.
-  assert.doesNotThrow(() =>
-    resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'submit-assist-classify', fgosDir: dir }),
-  );
-});
+// capacities.<id>.needs/for presence-matching (D5/D6, tsk-1o7, US-027) was
+// retired at tsk-5tm-1 D1: resolveExecutorConfig no longer runs any
+// presence/staleness gate at all (dead code -- 2/3 real entries were
+// kind:"task", the third's needs added no signal beyond the OS's own
+// ENOENT). The 2 tests that lived here asserted that gate's own
+// capability-match behavior, which no longer exists to test -- removed
+// rather than left passing for the wrong reason (trivial doesNotThrow with
+// no gate underneath it).
 
 // --- capacities.<id>.agentType (D1/D2, tsk-3sw): kind:"task" capacity with
 // no own command/args resolves via a synthesized executor, Claude-only ---
@@ -1922,7 +1879,7 @@ test('resolveExecutorCommand with no capacities block at all never triggers cros
   assert.equal(resolved.command, 'agy');
 });
 
-test('resolveExecutorCommand throws for a non-Claude "cli" capacity even when fgosDir is given and the D6 registration/presence check already passed', () => {
+test('resolveExecutorCommand throws for a non-Claude "cli" capacity even when fgosDir is given (cross-provider governance is independent of the retired presence gate, tsk-5tm-1 D1)', () => {
   const dir = mkTempDir();
   initStore(dir);
   registerTool(dir, { name: 'fgos-code-implement', kind: 'cli', capability: 'coding', command: 'agy' });
