@@ -67,6 +67,36 @@ to catch a *real* regression rather than assert "0 fail" against a baseline
 that was already known to be green — an assertion that would have passed
 whether or not the split preserved anything.
 
+## Split by measured cost — not by test count, and not by topic
+
+The two dominant files needed different splitting rules, and only
+measurement revealed why.
+
+For `test/cli/fgos.test.mjs`, cost per test was roughly even (~0.31s across
+547 tests), so dividing by *count* was a good enough approximation.
+
+For `test/setup/checks.test.mjs` it was not. The cost distribution is
+severely skewed: **10 tests that stand up a real environment accounted for
+117.6s of the file's 120s**, at 10.66–14.27s each. Everything else was
+noise. Two consequences followed directly from those numbers:
+
+- **Grouping by count would have failed.** The only workable rule was
+  pairing two heavy tests per file for ~24.9s, safely under the ~30s
+  per-file threshold — and the two heaviest (12.2s and 10.7s) had to land
+  in *different* groups, since together they were 23s before adding
+  anything else.
+- **Grouping by topic was impossible.** Three tests sharing the config
+  topic came to 33.8s on their own — already over threshold before any
+  other test joined them. A topically tidy split would have been an
+  over-threshold split.
+
+The intuitive organizing principles — equal counts, related subject matter
+— both produce wrong answers here. Only the measured per-test cost
+produces a correct one.
+
+The first half's result, for scale: 581/581 tests matched after the move,
+and the suite went 169.76s → 133.49s from that file alone.
+
 ## Mechanical splitting worked, then stopped working at ~50s
 
 Splitting the two dominant files (7–8 shards for `fgos.test.mjs`, 5 for
