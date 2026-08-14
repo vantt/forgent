@@ -78,14 +78,14 @@ impl std::fmt::Display for GatewayConfigError {
             GatewayConfigError::NoHomeDir => write!(f, "could not resolve $HOME to locate ~/.fgos/config.json"),
             GatewayConfigError::NotFound(p) => write!(
                 f,
-                "{} not found — the gateway needs a per-machine auth token (D4). Add a \"gateway\": {{ \"token\": \"<random-string>\" }} entry to it (run \"fgos setup\" first if the file itself doesn't exist yet).",
+                "{} not found — the gateway needs a per-machine auth token (D4). Run \"fgos setup\" to create it, then \"fgos doctor --fix\" to generate and write a real token (tsk-4r1: both are now registered in the setup/doctor gate).",
                 p.display()
             ),
             GatewayConfigError::Io(p, err) => write!(f, "could not read {}: {err}", p.display()),
             GatewayConfigError::Parse(p, err) => write!(f, "could not parse {} as JSON: {err}", p.display()),
             GatewayConfigError::MissingToken(p) => write!(
                 f,
-                "{} has no \"gateway.token\" field — the gateway needs a per-machine auth token (D4). Add a \"gateway\": {{ \"token\": \"<random-string>\" }} entry to it.",
+                "{} has no \"gateway.token\" field — the gateway needs a per-machine auth token (D4). Run \"fgos doctor --fix\" to generate and write one (tsk-4r1).",
                 p.display()
             ),
         }
