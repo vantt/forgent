@@ -27,7 +27,11 @@ chưa ship, ngoài phạm vi item này); quyết định bundle 1 item hay tách
 item con — đó là phán đoán shape/size của `fgos-coding-planning`, không phải
 của pass này (xem §5).
 
-## 2. Quyết định đã chốt (kế thừa nguyên vẹn từ DISCUSSION.md, đã có trong decision log của item)
+## Locked decisions
+
+Kế thừa nguyên vẹn từ `DISCUSSION.md` §4, đã có trong decision log của item
+(`fgos list --id tsk-5tm --json`'s `data.decisions`, ghi trong phiên
+`fgos-coding-shaping`).
 
 | D-ID | Quyết định | Bằng chứng chính |
 |---|---|---|
