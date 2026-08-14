@@ -3589,10 +3589,13 @@ async function runVerb(verb, flags, positional, dir) {
           // A root only ever driven by a live session/pick (never the
           // runner's own dispatch loop, which creates fgw/<rootId> early,
           // D17) can reach this point before its own branch exists — seed
-          // it from main here, the same fallback createDetachedMergeWorktree
-          // already applies at its own later call site below.
+          // it from the repo's own detected trunk here (tsk-386: no longer
+          // a hardcoded 'main' -- createBranchRef's own default already
+          // resolves through detectTrunk(repoRoot)), the same fallback
+          // createDetachedMergeWorktree already applies at its own later
+          // call site below.
           if (!branchExists(repoRoot, rootBranch)) {
-            createBranchRef(repoRoot, rootId, { baseRef: 'main' });
+            createBranchRef(repoRoot, rootId);
           }
           // Ephemeral worktree checked out on fgw/<rootId> (now guaranteed to
           // exist, either from dispatch-side wiring or the fallback just

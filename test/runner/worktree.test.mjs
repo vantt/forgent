@@ -436,6 +436,48 @@ test('createBranchRef is idempotent: a second call on an existing branch is a no
   assert.equal(branchTip(repoRoot, 'fgw/root-b'), shaAfterFirst, 'branch must not move on idempotent no-op');
 });
 
+test('tsk-386: createBranchRef with no baseRef at all resolves through detectTrunk on a master-trunk repo, never a hardcoded "main"', () => {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-worktree-test-master-'));
+  execFileSync('git', ['init', '-q', '-b', 'master'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
+  fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
+  execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd: repoRoot });
+  const masterTip = branchTip(repoRoot, 'master');
+
+  // Finding 8's own failure scenario: the pre-fix hardcoded default would
+  // attempt `git branch fgw/<id> main` here, which throws outright -- this
+  // repo has no branch named "main" at all.
+  const result = createBranchRef(repoRoot, 'master-trunk-item');
+
+  assert.equal(result.created, true);
+  assert.equal(branchTip(repoRoot, 'fgw/master-trunk-item'), masterTip, 'branch forks from the real detected trunk (master), never a nonexistent hardcoded "main"');
+});
+
+test('tsk-386: withMergeEphemeralWorktree\'s own createBranchRef fallback resolves through detectTrunk on a master-trunk repo (the exact Finding 8 failure scenario)', async () => {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-worktree-test-master-merge-'));
+  execFileSync('git', ['init', '-q', '-b', 'master'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
+  fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
+  execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd: repoRoot });
+  const masterTip = branchTip(repoRoot, 'master');
+
+  // fgw/never-dispatched-master genuinely does not exist yet -- this is
+  // exactly the "first session-driven root merge" scenario the finding
+  // names: a host repo whose trunk is master hitting
+  // createDetachedMergeWorktree's own fallback.
+  const result = await withMergeEphemeralWorktree(repoRoot, 'never-dispatched-master', async (worktree) => {
+    assert.equal(worktree.startCommit, masterTip, 'fallback-created branch is seeded from the real detected trunk (master)');
+    return 'fn-ran';
+  });
+
+  assert.equal(result, 'fn-ran');
+  assert.equal(branchTip(repoRoot, 'fgw/never-dispatched-master'), masterTip);
+});
+
 test('withMergeEphemeralWorktree falls back to createBranchRef (seeded from main) instead of throwing when fgw/<id> was never created early', async () => {
   const repoRoot = initTempRepo();
   execFileSync('git', ['branch', '-M', 'main'], { cwd: repoRoot });
