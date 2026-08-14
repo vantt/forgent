@@ -674,6 +674,31 @@ test('createClaimWorktree refuses to resync (and never resets) a reattach that i
   removeWorktree(repoRoot, first.path, { force: true });
 });
 
+test('createClaimWorktree\'s dirty-and-behind refusal points at the stale-vs-real diagnostic recipe', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const branch = branchNameFor('resync-dirty-behind-hint');
+  const first = createClaimWorktree(repoRoot, 'resync-dirty-behind-hint', { worktreeDir });
+  commitOnWorktree(first.path, 'context.md', '# decisions\n');
+
+  advanceBranchExternally(repoRoot, branch, 'plan.md', '# plan\n');
+  fs.writeFileSync(path.join(first.path, 'in-progress.txt'), 'not yet committed\n');
+
+  let caught;
+  try {
+    createClaimWorktree(repoRoot, 'resync-dirty-behind-hint', { worktreeDir });
+  } catch (err) {
+    caught = err;
+  }
+  assert.ok(caught instanceof WorktreeError);
+  assert.match(
+    caught.message,
+    /docs\/how-to\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\.md/,
+  );
+
+  removeWorktree(repoRoot, first.path, { force: true });
+});
+
 test('createClaimWorktree refuses to resync a reattach whose last-synced commit is not an ancestor of the branch\'s current tip (a rewrite/divergence)', () => {
   const repoRoot = initTempRepo();
   const worktreeDir = mkWorktreeDir();

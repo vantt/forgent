@@ -659,7 +659,7 @@ export function resyncClaimWorktree(repoRoot, worktreePath, branch) {
 
   if (isDirtyRelativeToSync(repoRoot, worktreePath, lastSynced)) {
     throw new WorktreeError(
-      `refusing to resync claim worktree "${worktreePath}" on "${branch}" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in "${worktreePath}" before claiming "${branch}" again — never auto-reset over uncommitted work.`,
+      `refusing to resync claim worktree "${worktreePath}" on "${branch}" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in "${worktreePath}" before claiming "${branch}" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,
       { branch, worktreePath, lastSynced, branchTip },
     );
   }
