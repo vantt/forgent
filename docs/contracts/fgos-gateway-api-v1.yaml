@@ -281,9 +281,12 @@ paths:
               properties:
                 role:
                   type: string
-                  enum: [human, runner, session]
+                  enum: [human, session]
                   default: session
-                  description: Same role vocabulary as CTR001's `role` field.
+                  description: |
+                    take --role's real, deliberately-scoped vocabulary
+                    (bin/fgos.mjs's own S2-pull D1) — the pull door
+                    excludes the runner role by design, not by omission.
       responses:
         '200': { $ref: '#/components/responses/WorkOk' }
         default: { $ref: '#/components/responses/Error' }
