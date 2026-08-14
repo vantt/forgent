@@ -42,21 +42,36 @@ function runFgos(cwd, args, homeDir) {
   });
 }
 
-test('tsk-2xj: fgos doctor run bare from a linked worktree reports the same checks as an explicit --dir at the main checkout', () => {
+test('tsk-2xj: fgos doctor run bare from a linked worktree reports the same checks as running directly at the main checkout', () => {
   const { main, wt } = initGitWithWorktree('dir-resolution-doctor-cmp');
   try {
     // Same HOME for both calls -- config-awareness's own message embeds the
     // global config path, which must not differ between the two runs for
     // reasons unrelated to what this test actually checks (--dir resolution).
     const homeDir = mkTemp('dir-resolution-doctor-cmp-home-');
+    // Populate main's config first (running with cwd=main directly, never
+    // affected by any --dir/cwd resolution bug) so the two doctor runs
+    // below have real config-family state to agree or disagree about --
+    // comparing two runs against an unconfigured main would trivially
+    // "match" (both report everything missing) regardless of whether the
+    // worktree-cwd resolution bug is present.
+    const setupOnMain = runFgos(main, ['setup'], homeDir);
+    assert.equal(setupOnMain.status, 0, setupOnMain.stderr);
+
+    // The comparison itself deliberately uses cwd=main directly, never
+    // --dir: the old buggy `doctor` case ignored the parsed --dir flag
+    // entirely, so a bare-vs-explicit-`--dir` comparison could never have
+    // told a fixed doctor apart from a broken one (both would use
+    // process.cwd() either way). cwd=main is the one invocation shape that
+    // was always correct, bug or no bug, and so is a real baseline.
     const bare = runFgos(wt, ['doctor'], homeDir);
     assert.equal(bare.status, 0, bare.stderr);
-    const explicit = runFgos(wt, ['doctor', '--dir', main], homeDir);
-    assert.equal(explicit.status, 0, explicit.stderr);
+    const atMain = runFgos(main, ['doctor'], homeDir);
+    assert.equal(atMain.status, 0, atMain.stderr);
     assert.deepEqual(
       JSON.parse(bare.stdout).data.checks,
-      JSON.parse(explicit.stdout).data.checks,
-      'bare doctor from a worktree must resolve to the same main checkout an explicit --dir names',
+      JSON.parse(atMain.stdout).data.checks,
+      'bare doctor run from inside a linked worktree must resolve to the same main checkout running doctor directly at that checkout does',
     );
   } finally {
     cleanup(main, wt);
