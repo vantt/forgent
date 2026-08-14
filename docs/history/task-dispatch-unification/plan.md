@@ -95,7 +95,8 @@ D4/D9 — xem risk map).
     "action": "D1: retire field needs khoi capacities.<id> - needs la data chet 100% voi moi entry kind:task, tool-registry + fgos tool query la noi hoi staleness thay the",
     "footprint": [".fgos/config.json", "src/runner/dispatch.mjs", "test/runner/dispatch.test.mjs"],
     "kind": "task",
-    "risk": "light"
+    "risk": "light",
+    "deps": []
   },
   {
     "title": "Remove gather capacity, its tool-registry entry, and dead references",
@@ -103,7 +104,8 @@ D4/D9 — xem risk map).
     "action": "D6: xoa capacity gather khoi .fgos/config.json - con duong cross-provider duy nhat khong co ly do kien truc ghi lai, ly do song song hoa da duoc native Task-tool dap ung du",
     "footprint": [".fgos/config.json", "src/runner/dispatch.mjs", "test/runner/dispatch.test.mjs", "docs/how-to/wire-a-skill-to-a-capacity-by-purpose-not-name.md", "docs/explanation/dispatch-binding-moves-from-name-keying-to-needs-for-capability-declaration.md", ".agents/skills/fgos-researching/SKILL.md"],
     "kind": "task",
-    "risk": "standard"
+    "risk": "standard",
+    "deps": [0]
   },
   {
     "title": "Add dispatch.mjs execute subcommand for adapter-resolvable self-execution",
@@ -111,7 +113,8 @@ D4/D9 — xem risk map).
     "action": "D5: dispatch.mjs can tu thuc thi (self-execute) cho case adapter-resolvable, khop run_task() cua marketing-cockpit - EXECUTOR_ADAPTERS duoc validate nhung chi Flow B goi, Flow A luon hand-back tran",
     "footprint": ["src/runner/dispatch.mjs", "test/runner/dispatch.test.mjs"],
     "kind": "task",
-    "risk": "standard"
+    "risk": "standard",
+    "deps": [0, 1]
   },
   {
     "title": "Wire fgos-fanout to consult dispatch decision protocol before firing Agent batch",
@@ -119,7 +122,8 @@ D4/D9 — xem risk map).
     "action": "D4: tong quat hoa dispatch quanh khai niem task, mo rong pham vi da khoa cua tsk-3ik D3 - fgos-fanout hardcode Agent tool, chua tung consult decision protocol du dung pham vi tsk-3ik D3 da tuyen bo",
     "footprint": [".agents/skills/fgos-fanout/SKILL.md", "src/runner/dispatch.mjs", "test/runner/dispatch.test.mjs"],
     "kind": "task",
-    "risk": "heavy"
+    "risk": "heavy",
+    "deps": [0, 1, 2]
   },
   {
     "title": "Restructure capacities registry shape to executor-keyed invocations[]",
@@ -127,7 +131,8 @@ D4/D9 — xem risk map).
     "action": "D11: schema executor-keyed-by-name giu top-level key capacities KHONG doi thanh executors - va cham that voi cfg.executors tier-keyed da co, validate chat boi tsk-4eu",
     "footprint": [".fgos/config.json", "src/runner/dispatch.mjs", "test/runner/dispatch.test.mjs"],
     "kind": "task",
-    "risk": "standard"
+    "risk": "standard",
+    "deps": [0, 1, 2, 3]
   },
   {
     "title": "Move model/tier resolution to provider-keyed modelPolicies with 5-tier vocab and rigorOverrides",
@@ -135,10 +140,25 @@ D4/D9 — xem risk map).
     "action": "D9: doi model/tier resolution tu 1 map phang sang N-map theo provider + mo rong tier vocab 3->5 + truc rigorOverrides - modelForTier chi doc ten model Claude, executor non-Claude nhan sai ten khong throw",
     "footprint": ["src/runner/dispatch.mjs", "test/runner/dispatch.test.mjs"],
     "kind": "task",
-    "risk": "heavy"
+    "risk": "heavy",
+    "deps": [0, 1, 2, 3, 4]
   }
 ]
 ```
+
+**Deps là hàng rào chống xung đột footprint, không phải claim logic mới.**
+`fgos plan --verdict decompose` lần đầu (không có `deps`) bị engine tự động
+park `need-human` — 15/15 cặp con trùng `src/runner/dispatch.mjs` (đa số
+cũng trùng `test/runner/dispatch.test.mjs`), đúng cơ chế
+`footprintOverlapAmong` (`plan.mjs:907-915`) đã thiết kế: 1 file bị ≥2 việc
+con cùng sửa mà không có `deps` nối chúng là 1 dispatch hazard thật, không
+phải false positive. Sửa bằng full pairwise chain (mỗi child liệt kê MỌI
+index đứng trước nó) — engine's `footprintOverlapAmong` chỉ miễn trừ 1 cặp
+khi có edge TRỰC TIẾP giữa đúng cặp đó (không bắc cầu qua deps của deps),
+nên 1 chain tuyến tính không đủ, cần liệt kê đủ. Thứ tự chain giữ ĐÚNG thứ
+tự đã công bố ở "Thứ tự thực thi" phía trên (D1→D6 trước, D5→D4 sau — D5→D4
+là dependency THẬT đã chốt từ đầu — D11→D9 sau cùng) — không đảo lại bất kỳ
+quyết định nào, chỉ mã hoá nó vào `deps` field thay vì để trong prose.
 
 Ghi chú riêng cho piece cuối (`modelPolicies`, D9): `verify` ở trên là điểm
 khởi đầu (test suite hiện có phải xanh), NHƯNG DISCUSSION.md §7 tự nhận
@@ -222,6 +242,39 @@ person to confirm materializing all 6 as split, vs. pulling D4/D9 into a
 more-supervised item — person answered **go ahead, all 6 as planned**.
 Recorded via `fgos gate-approve --actor human`.
 
+### Second finding: engine's own footprint gate (independent of the human gate above)
+
+Firing `fgos plan --verdict decompose` with the original (no-`deps`)
+children came back `outcome: "need-human"` — a SEPARATE, mechanical gate
+inside `resolvePlan` itself (`plan.mjs:907-915`, `footprintOverlapAmong`),
+not the `validateApprove` gate already cleared above. All 15 pairs among
+the 6 children share `src/runner/dispatch.mjs` (most also
+`test/runner/dispatch.test.mjs`) with no `deps` edge connecting them — a
+real parallel-dispatch hazard, not a false positive, and the item got
+auto-parked `awaiting-human` (`ask` field lists all 15 pairs verbatim,
+suggestion: "sequence/hoist/re-slice").
+
+**Fix applied:** added `deps` to every child — a full pairwise chain (each
+child lists every index before it), since `footprintOverlapAmong` only
+exempts a pair with a DIRECT edge between them, not a transitive one. The
+chain order is exactly the order already published above in "Thứ tự thực
+thi" (D1→D6, then D5→D4 — D5→D4 is the one REAL dependency, already
+locked — then D11→D9) — nothing reordered, just encoded into `deps` instead
+of staying prose-only. This is the resolution `footprintOverlapAmong`
+itself documents as sanctioned (`plan.mjs:889-898`'s own comment: a
+declared `deps` edge is exactly what turns a shared footprint from a real
+hazard into a non-issue), not a workaround.
+
+**Not yet re-fired.** Per instruction: enrich fully, then stop for a
+decision — this second `fgos plan --verdict decompose` call (with `deps`
+now on every child) has NOT been run yet. The item is still parked
+`status: awaiting-human` from the first attempt.
+
 ## Outstanding questions
 
-None
+None — everything above is either locked (D1-D12), evidenced (feasibility
+matrix), or a mechanical fix already applied to `plan.md` (the `deps`
+chain). The only remaining step is re-firing `fgos plan --verdict
+decompose` with the corrected children — held for an explicit go-ahead per
+the person's own instruction mid-pass, not because anything here is still
+undecided.
