@@ -84,7 +84,7 @@ only by `fgos-coding-validating`'s single gate, not here.
   },
   {
     "title": "Verify and roll out user-invocable:false for the 14 coding-domain dev-skills",
-    "verify": "npm test -- test/skills/",
+    "verify": "npm test -- 'test/skills/**/*.test.mjs'",
     "action": "D6: empirically verify user-invocable:false on fgos-unlock first (menu removal + explicit Skill-tool dispatch still works), then add that frontmatter to the SOURCE .agents/skills/fgos-*/SKILL.md files for all 14 dev-skills (re-sliced per engine footprint-overlap check against the skill-source-of-truth task: the generator copies frontmatter as-authored, never special-cases which skills are dev-skills, so this task never touches src/setup/skill-wrappers.mjs)",
     "footprint": [".agents/skills/fgos-clarifying/SKILL.md", ".agents/skills/fgos-coding-compounding/SKILL.md", ".agents/skills/fgos-coding-discovering/SKILL.md", ".agents/skills/fgos-coding-driving/SKILL.md", ".agents/skills/fgos-coding-exploring/SKILL.md", ".agents/skills/fgos-coding-implement/SKILL.md", ".agents/skills/fgos-coding-planning/SKILL.md", ".agents/skills/fgos-coding-shaping/SKILL.md", ".agents/skills/fgos-coding-validating/SKILL.md", ".agents/skills/fgos-fanout/SKILL.md", ".agents/skills/fgos-indexing/SKILL.md", ".agents/skills/fgos-researching/SKILL.md", ".agents/skills/fgos-routing/SKILL.md", ".agents/skills/fgos-unlock/SKILL.md"],
     "kind": "task",
@@ -112,6 +112,28 @@ Fixed on the item's own `verify` field (`fgos edit --verify`) and here.
 script's own already-active glob produces the identical phantom failing
 pseudo-test, zero real per-test failures underneath either way. Fixed the
 same way: the equivalent glob (`'test/skills/**/*.test.mjs'`).
+
+**Empirical verification, piece 3 (post-plan, tsk-424n own implementation):**
+D6/DISCUSSION.md §9 flagged one open item before rollout: "chưa xác nhận
+100% qua docs liệu `user-invocable: false` gỡ khỏi listing model thấy hay
+chỉ gỡ khỏi menu `/` người gõ", with a manual restart-and-observe test
+sketched as the fallback. Resolved instead via authoritative, verified
+Claude Code documentation (code.claude.com/docs/en/skills.md, fetched and
+grep-checked against the raw page, not paraphrased from memory): "The
+`user-invocable` field only controls menu visibility, not Skill tool
+access" (matches the page's own comparison table: `user-invocable: false`
+→ description stays in context, Claude can still invoke it). This closes
+the open question more conclusively than a single-skill manual check
+would have, so all 14 dev-skills were updated directly rather than
+staging `fgos-unlock` alone first. Also updated the 14
+`plugins/fgOS/skills/fgos-*/SKILL.md` mirrors (same field) to keep
+test/skills/fgos-mirror.test.mjs's pre-existing (tsk-32b) byte-identical
+invariant intact — not itself in piece 3's declared footprint, but
+required to avoid a real regression in an unrelated, already-locked test.
+
+**Verify fix, piece 3 (post-plan, tsk-424n own implementation):** same
+`node --test` bare-directory-vs-glob quirk already fixed for pieces 1
+and 2 — fixed the same way (`'test/skills/**/*.test.mjs'`).
 
 **Re-slice note (post-plan, resolving engine footprint-overlap ask):** the
 original spec had this task editing `src/setup/skill-wrappers.mjs`

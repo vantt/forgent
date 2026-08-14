@@ -1,5 +1,6 @@
 ---
 name: fgos-researching
+user-invocable: false
 description: >-
   Turn an unresolved question into a grounded finding plus a clear/unclear
   verdict, without deciding anything a person should decide. Stage-agnostic:

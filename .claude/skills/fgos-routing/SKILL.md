@@ -1,5 +1,6 @@
 ---
 name: fgos-routing
+user-invocable: false
 description: >-
   Use at the start of every fgOS work session in this repo: orient on open
   work, claim an item through the pull door, then route to

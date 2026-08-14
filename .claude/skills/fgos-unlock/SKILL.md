@@ -1,5 +1,6 @@
 ---
 name: fgos-unlock
+user-invocable: false
 description: >-
   Recover from a stuck .fgos/main-checkout.lock when fgos take/fgos pick
   fails with "lock-held" or "lock-ambiguous" (exit 7). Use when a claim is

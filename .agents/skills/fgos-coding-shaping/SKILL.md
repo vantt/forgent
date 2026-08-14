@@ -1,5 +1,6 @@
 ---
 name: fgos-coding-shaping
+user-invocable: false
 description: >-
   Hold an open-ended, multi-day-resumable design brainstorm for one or more
   related coding-domain work items, upstream of fgos-coding-exploring/fgos-coding-planning,
