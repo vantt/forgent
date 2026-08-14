@@ -564,12 +564,33 @@ file chưa tồn tại thoát khác 0, không phải một filter rỗng thoát 
 không chứng minh nội dung dưới heading là đúng và có nguồn. Đó chính là lý
 do RA1-RA4 mang proof point đọc-lại-nội-dung, chứ không dựa vào verify.
 
+### Chốt tại cổng validateApprove (2026-08-14, chủ sản phẩm)
+
+Cổng không tự duyệt được: `gate-check` trả `canAutoApprove: false`. Chẩn
+đoán trực tiếp cho thấy tier đã được phủ (`standard` ≤ level `standard`),
+`plan.md` không còn mục mở, cost verdict `REVERSIBLE` — thứ duy nhất chặn
+là **sàn từ-khoá hard-gate** bắn trên chính bản mô tả item: `auth`,
+`authentication`, `migration`, `secret`, `delete`. Sàn này đơn điệu về
+phía hỏi người, không được lập luận hạ xuống.
+
+Hai điểm được hỏi gộp một lượt, cả hai chốt theo đề xuất:
+
+| # | Điểm | Chốt |
+|---|---|---|
+| G1 | **approve-merge từ dashboard** | **Trong scope, ghi rõ phơi nhiễm.** Spec mô tả đủ luồng approve-merge đi qua verb `fgos approve`, kèm một Open Gap nói thẳng: ai giữ token của máy thì approve được, không có phân quyền mịn hơn cho tới STR38. Bằng chứng nền: `docs/io-contract.md:170-171` (tầng phân quyền thuộc STR38, chưa xây), tsk-7l9 D4 (một token/máy), `bin/fgos.mjs:3328` (approve từ chối chạy ngoài main checkout — ràng buộc cơ học có thật, phải ghi) |
+| G2 | **"Delete a work item"** | **Retire qua `wontfix`.** Không có verb `delete` trong sổ verb; event log là truth append-only. Cửa có thật: `move <id> wontfix` (`src/state/status-fsm.mjs:156-169`). Spec viết là *retire*, không viết là *delete*; item biến khỏi danh sách đang mở, lịch sử còn nguyên |
+
+Cả hai đều đảo ngược được (sửa một tài liệu, trước khi P2-P5 viết dòng code
+nào), nên chúng là **nội dung được chốt**, không phải ràng buộc treo.
+
 ### Outstanding questions của P0a
 
 None — RA2/RA3 không phải câu hỏi treo của kế hoạch này; chúng là nội dung
 mà `## Open Gaps` của chính spec phải ghi ra, và bản mô tả item đã chỉ dẫn
 đúng cách xử lý ("flag this as an Open Gap in the spec if it cannot be
-resolved within this item's own scope").
+resolved within this item's own scope"). G1/G2 ở trên đã chốt phần mà chủ
+sản phẩm cần quyết; phần còn lại (authz mịn, hợp đồng API gateway) hạ cánh
+đúng vào `## Open Gaps` của spec.
 
 ## Outstanding questions
 
