@@ -45,7 +45,7 @@ import { DEFAULT_WORKER_SLOT_CEILING } from '../../src/state/worker-slots.mjs';
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, plugin-dev-skills-packaged, changelog-unreleased-stale, herdr-launcher-configured, work-classification-vocabulary, work-stage-vocabulary, delivered-not-on-trunk, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, events-jsonl-not-truncated, cli-version-visible, and worker-slots-ceiling-usable', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, plugin-dev-skills-packaged, changelog-unreleased-stale, herdr-launcher-configured, work-classification-vocabulary, work-stage-vocabulary, delivered-not-on-trunk, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, events-jsonl-not-truncated, cli-version-visible, worker-slots-ceiling-usable, and readme-install-tag-exists', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     [
@@ -72,6 +72,7 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'events-jsonl-not-truncated',
       'cli-version-visible',
       'worker-slots-ceiling-usable',
+      'readme-install-tag-exists',
     ].sort(),
   );
 });
