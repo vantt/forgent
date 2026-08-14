@@ -2,18 +2,22 @@
 
 ## 1. Trạng thái hiện tại
 
-Round 4 đang mở (2026-08-14). Round 3 tưởng đã hội tụ (D1/D2 chốt, §6/§7 viết
-xong) nhưng người nêu thêm 1 gray-area thật: `bin/fgos.mjs` không phải thin
-CLI adapter — nó tự tính `driftStatus` inline, tự định nghĩa predicate Iron
-Law inline, tự chứa business rule (milestone drift guard) inline, và tự
-quyết định orchestration (merge next đệ quy sang sync-root/approve) ngay
-trong file CLI — vi phạm SRP/hexagonal boundary mà D1's cắt-cycle không sửa.
-Người xác nhận mở lại scope (D3, supersede phần "no widening" của D1 —
-chỉ trên trục CLI-layer SRP cho ĐÚNG cluster verb đã có, không mở sang
-module khác). §6/§7 hiện đang STALE (viết cho scope round-3, chưa phản ánh
-D3) — sẽ regenerate sau khi round 4 (fable, đọc trọn `approve`/`sync-root`/
-`catchup`/`review`/`promote-to-component`/`reject`) đề xuất thiết kế
-use-case/application layer cụ thể.
+Round 4 (fable design pass) đã chạy xong (2026-08-14): đọc trọn cả 7 case
+block (`merge` L2423-2577, `review` L3109-3194, `approve` L3254-3985 đủ 741
+dòng, `sync-root` L3996-4199, `promote-to-component` L4210-4346, `reject`
+L4353-4365, `catchup` L4383-4490) và phân loại từng mảnh logic thành
+adapter / use-case / domain-infra. Đề xuất cụ thể nằm trọn trong §5 Round 4:
+7 file mới dưới `src/usecase/` (1 file/verb, tên trùng verb), mỗi verb 1
+use-case function nhận `ctx` (dir/cwd/repoRoot do adapter tính) + options
+(flags đã parse thành structured object), trả về đúng payload `fgos.v1`
+hiện tại. Phát hiện mới quan trọng: repo ĐÃ có tầng `use-case` khai báo sẵn
+trong `docs/architecture-manifest.json` (entry > use-case > infra > domain >
+kernel, enforce bằng `test/architecture.test.mjs`) — thiết kế này là đăng ký
+file mới vào tầng có sẵn, không phát minh tầng mới; và `bin/fgos.mjs` còn
+chứa cả một cơ chế git infra trọn vẹn (`performCatchUp` L1063-1122) mà
+round 1-3 chưa soi tới. Đang chờ người xác nhận đề xuất round 4 (đặc biệt:
+chọn chỗ ở `src/usecase/` — có tension bề mặt với lý lẽ D2) trước khi
+regenerate §6/§7 (hiện vẫn STALE, viết cho scope round-3).
 
 ## 2. Mục tiêu & đề bài
 
@@ -45,8 +49,17 @@ refactor thật.
 | 8 | `root-affinity.mjs` là file PURE (không fs, không child_process) dù nằm trong `runner/` | Rõ | Cycle là cycle cấp folder, không phải cấp purity — 2 harness import nó không kéo theo I/O nào |
 | 9 | `src/state/tool-registry.mjs` cũng shell git (`git rev-parse HEAD`, L197) | Rõ (mới, round 1 sót) | Không tạo cạnh `state→runner` (tự shell trực tiếp), nhưng phải xếp vào nhóm git-I/O khi port — không nằm trong pure cluster |
 | 10 | `session-identity.mjs` dời về đâu: `src/util/` (tái dùng, nhưng util hết còn all-pure) hay folder hạ tầng mới | **Rõ — D2** | Người quyết: `src/util/`. Contract thật của `util/` là leaf-module + không import nội bộ, không phải "100% pure" — session-identity khớp contract thật |
-| 11 | `bin/fgos.mjs` có phải thin adapter không, hay tự ôm business logic | **Rõ — D3 mở scope, thiết kế chưa có** | Có ôm thật: `driftStatus` tính inline (2 chỗ), `wouldTripIronLaw` predicate inline, milestone-drift-guard business rule inline, orchestration decision (`merge next` đệ quy) inline. Cần thiết kế use-case/application layer cụ thể — chưa có, chờ round 4 |
-| 12 | Use-case layer đặt tên/vị trí file thế nào, verb nào cần 1 use-case function riêng, hàm nào giữ nguyên ở `bin/fgos.mjs` (chỉ argv-parsing thật) | Chưa rõ — chờ round 4 | Cần đọc trọn `approve` (741 dòng, L3254-3995), `review`, `sync-root`, `catchup`, `reject`, `promote-to-component` — chưa đọc hết trong buổi round 1-3 |
+| 11 | `bin/fgos.mjs` có phải thin adapter không, hay tự ôm business logic | **Rõ — D3 mở scope** | Có ôm thật, round 4 đã đọc trọn cả 7 case block và phân loại từng mảnh — xem §5 Round 4, mục 1 |
+| 12 | Use-case layer đặt tên/vị trí file thế nào, verb nào cần 1 use-case function riêng, hàm nào giữ nguyên ở `bin/fgos.mjs` | Rõ (đề xuất round 4, chờ người xác nhận) | 7 file `src/usecase/<verb>.mjs`, 1 function/verb, ctx+options signature — chi tiết + line map ở §5 Round 4, mục 2-3 |
+| 13 | Repo ĐÃ có tầng `use-case` khai báo chính thức | Rõ (mới, round 4) | `docs/architecture-manifest.json` layers `[entry, use-case, infra, domain, kernel]`, enforce một-chiều-xuống bằng `test/architecture.test.mjs`; 7 file đang ở tầng use-case sẵn (`runner/loop.mjs`, `intake/{discovery,plan,classify}.mjs`, `setup/{checks,registrations}.mjs`, `state/cursor.mjs`) — tầng theo manifest, không theo tên folder. File mới chỉ cần thêm row `use-case`; import same-rank (use-case → use-case) hợp lệ theo chính test đó |
+| 14 | `performCatchUp` (bin/fgos.mjs L1063-1122) là git-mechanics infra trọn vẹn sống trong bin | Rõ (mới, round 4) | Merge target vào branch của item trong ephemeral worktree + verify + commit/abort — cùng contract với `mergeRunnerItem`. Đề xuất dời về `src/runner/merge.mjs` (infra), use-case gọi nó từ đó |
+| 15 | `ensureBranchPushed` (bin L264-272) là git push op sống trong bin | Rõ (mới, round 4) | Chỉ `review --github` dùng. Đề xuất dời về `runner/worktree.mjs` (đúng vai "branch shim" mà D1 đã định cho file đó); `github-adapter.mjs` vẫn không bị đụng (D1) |
+| 16 | `collectReviewTrace` (bin L593) kẹt chung 2 collector (`collectFrictionData`/`collectOutcomeEntry`) mà verb `check` (ngoài cluster) cũng dùng | Rõ (mới, round 4) | Use-case không import ngược bin được → đề xuất dời 3 collector thuần-đọc-view này sang file mới `src/report/item-trace.mjs`; `check` chỉ đổi import path, 0 đổi logic — graze duy nhất ra ngoài cluster, import-only. Alternative (adapter tự đắp `trace` vào payload sau khi gọi use-case) ghi ở §5 |
+| 17 | `merge next` forward RAW `flags` vào `runVerb('approve'/'sync-root')` — sau khi tách, forwarding phải structural | Rõ (mới, round 4) | Hazard regression thật duy nhất của thiết kế: nếu adapter của `merge` parse thiếu 1 option mà `approve` hiểu, hành vi unattended merge-next đổi âm thầm. Giải pháp: 1 parser chung `parseMergeClusterOptions` trong bin, options object truyền nguyên khối — xem §5 mục 4 |
+| 18 | `promote-to-component` đã half-extracted sẵn | Rõ (mới, round 4) | Per-member mechanics đã ở `runner/promote-engine.mjs` từ trước — tiền lệ nội bộ cho chính pattern đang đề xuất; bin chỉ còn ôm batch orchestration (validate + connectivity BFS + root resolve + loop + decision record) — phần đó dời vào use-case |
+| 19 | `reject` đã gần-thin sẵn — extract chỉ vì uniformity | Rõ (mới, round 4) | Use-case function ~10 dòng (precondition + moveWork). Vẫn extract để cả 7 verb cùng shape (stranger tìm code của `fgos <verb>` tại đúng 1 chỗ), chi phí ~0 |
+| 20 | Chính sách repoRoot KHÁC NHAU giữa các verb — adapter phải own per-verb | Rõ (mới, round 4) | `approve`/`sync-root`/`promote`: `--trust-dir` gate (mặc định `process.cwd()`); `catchup`: LUÔN `path.dirname(dir)` (tsk-5vl, không gate); `merge next`: trust-dir cho iron-law nhưng driftStatus đọc từ raw `process.cwd()` (L2433/L2499). Use-case không bao giờ tự đọc `process.cwd()`/env — nhận qua ctx/options |
+| 21 | Refuse message trong guard mang từ vựng CLI (tên flag, tên verb) sẽ theo logic vào use-case layer | Rõ (mới, round 4) | Chấp nhận trade-off: giữ nguyên message + `StoreError` throw trong use-case (tiền lệ: `store.mjs` (infra) đã throw message user-facing sẵn — `assertAcceptanceEvidence`); alternative (error code + bảng message phía adapter cho ~25 refusal) đắt và risky hơn hẳn, 0 lợi hành vi |
 
 ## 4. Quyết định đã chốt
 
@@ -350,6 +363,257 @@ item này, đúng cluster verb (`merge`/`approve`/`review`/`sync-root`/
 `catchup`/`reject`/`promote-to-component`), không mở sang module khác.
 §6/§7 dưới đây đang STALE (viết cho scope round-3) — chờ fable round 4 đọc
 trọn các case block còn lại rồi viết lại.
+
+**[Round 4 — fable design pass, 2026-08-14]**
+
+Q: Đọc trọn 7 case block, phân loại từng mảnh logic (adapter / use-case /
+domain-infra), rồi đề xuất use-case layer cụ thể: file nào, function nào,
+dòng nào dời, dòng nào ở lại?
+
+A (mọi số dòng đọc trực tiếp từ worktree `fgw/tsk-49i`, cả 7 case block đọc
+trọn vẹn, kể cả 741 dòng của `approve`):
+
+**0. Phát hiện nền tảng trước khi thiết kế — repo đã có tầng use-case:**
+
+`docs/architecture-manifest.json` khai 5 tầng `entry > use-case > infra >
+domain > kernel` và gán TỪNG file src/+bin/ vào 1 tầng;
+`test/architecture.test.mjs` enforce (a) mọi file có row, (b) import chỉ
+same-rank hoặc xuống sâu hơn. 7 file đang ở tầng `use-case` sẵn:
+`runner/loop.mjs`, `intake/{discovery,plan,classify}.mjs`,
+`setup/{checks,registrations}.mjs`, `state/cursor.mjs` — tức tầng đi theo
+manifest, không theo tên folder (đúng tinh thần D2). Thiết kế dưới đây vì
+vậy KHÔNG phát minh khái niệm mới: nó chỉ tạo file mới, đăng ký row
+`use-case`, và để chính architecture test canh một-chiều. Các file cluster
+liên quan hiện xếp: `runner/{merge,worktree,promote-engine,root-affinity,
+session,lock-wait}.mjs` + `state/{store,drift-status}.mjs` +
+`cli/approve-fault-log.mjs` = infra; `state/{graph-harness,frontier,
+cleanup-harness}.mjs` + `evolve/iron-law.mjs` = domain; `bin/fgos.mjs` =
+entry. Use-case (rank 1) import infra (2)/domain (3) là chiều xuống hợp lệ;
+use-case import use-case là same-rank, test cho qua (`rank(file) >
+rank(target)` mới là violation) — cần cho `merge next` gọi approve/sync-root
+use-case trực tiếp.
+
+**1. Kết quả phân loại từng case block** (adapter = ở lại bin; use-case =
+dời sang tầng mới; infra = dời xuống module infra có sẵn):
+
+- **`merge` (L2423-2577):** adapter chỉ có L2424 (parse sub-verb) + L2576
+  (unknown sub-verb throw) + L2466 (tính `mergeRepoRoot` từ `--trust-dir`).
+  Use-case: TOÀN BỘ còn lại — `driftStatus` compose vào
+  `mergeReadiness`/`mergeTree` (L2432-2440), predicate `wouldTripIronLaw`
+  (L2467-2479), orchestration blockedOnSync → sync-root → re-check →
+  approve (L2493-2534), skip-walk qua ranked list (L2547-2559), attempt
+  approve + phân loại StoreError Iron-Law/dirty-tree thành payload blocked
+  (L2560-2574). Đây là block use-case "sạch" nhất: gần như 100% orchestration.
+  Lưu ý L2433/L2499: driftStatus đọc từ RAW `process.cwd()` trong khi
+  iron-law đọc từ `mergeRepoRoot` — không đồng nhất nhưng là hành vi hiện
+  tại, giữ nguyên (use-case nhận cả `cwd` lẫn `repoRoot` qua ctx, không tự
+  đọc).
+- **`review` (L3109-3194):** adapter: L3110 (parse id), parse
+  `--github`/`--pr`, `ghCommandOpts()` (L255 — đọc env `FGOS_GH_COMMAND`,
+  env là input của adapter). Use-case: precondition found/status
+  (L3113-3118), nhánh github-status đọc PR (L3144-3157), nhánh
+  github-create (L3159-3178, gồm leaf-vs-root base split), local diff với
+  leaf-vs-root split + branchExists fallback (L3185-3193). Vướng thật:
+  `collectReviewTrace` (bin L593) compose 2 collector
+  (`collectOutcomeEntry`/`collectFrictionData`) mà verb `check` — NGOÀI
+  cluster D3 — cũng dùng trực tiếp; use-case không import ngược bin được
+  (test kiến trúc cấm entry←use-case). Đề xuất: dời 3 hàm thuần-đọc-view đó
+  (+ 2 hằng CAP) sang file mới `src/report/item-trace.mjs`; `check` đổi
+  đúng 1 dòng import, 0 đổi logic — graze import-only duy nhất ra ngoài
+  cluster, ghi rõ ở §3 hàng 16. Alternative rẻ hơn nữa nếu người thấy graze
+  đó vẫn quá tay: use-case trả payload không có `trace`, adapter đắp
+  `trace` vào sau khi gọi (deepEqual của test không phụ thuộc key order,
+  đã kiểm cách test parse JSON) — đổi lại use-case của review "gần thin
+  nhưng không trọn".
+- **`approve` (L3254-3985), block lớn nhất — đọc trọn:** adapter: L3255
+  (parse id), L3256 (`resolveVerifyTimeoutMs` — đọc flags + runner config),
+  L3257 (`parseWaitFlags`), L3282 (repoRoot theo `--trust-dir`), parse
+  `--github`/`--pr`/`--acknowledge-iron-law`/`--acknowledge-drift` thành
+  options. Use-case: found/status precondition (L3262-3267),
+  session-worktree guard loop qua `listSessions` (L3306-3315), structural
+  guard `isMainWorktree` (L3328-3333), milestone-targets drift guard
+  (L3347-3368 — business rule trọn vẹn: driftStatus + resolveRoot +
+  needsSync + refuse-hoặc-acknowledge), resolved-root guard (L3385-3397),
+  Iron Law gate (L3421-3448 — thay bằng gọi `ironLawForItem` của D1),
+  GitHub transport (L3467-3507: assertAcceptanceEvidence → mergeGitHubPR →
+  moveWork delivered hoặc blocked+friction), nhánh runner local:
+  leaf→root path (L3538-3791: seed root branch, `withMergeTargetSlot` →
+  ancestor check → `performCatchUp` inbound gate → `withMergeEphemeralWorktree`
+  → `mergeRunnerItem` → dispatch 6 outcome thành moveWork+friction+payload),
+  clean-tree gate root path (L3799-3801), root→main path (L3811-3944, gồm
+  `hadChildren`/integration-drift phân loại reason), pull/legacy verify-only
+  path (L3950-3984). Helper `moveDeliveredOrRecordFault` (L3211-3242) dời
+  cùng — nó là use-case bookkeeping (moveWork + approve-fault-log), cả 3
+  success path dùng. Riêng env read `FGOS_TEST_FORCE_APPROVE_LOCK_TIMEOUT`
+  (L3218, test seam tsk-480 D3): adapter đọc env rồi truyền
+  `testForceLockTimeoutId` qua options — giữ nguyên seam, giữ nguyên rule
+  "use-case không đọc env".
+- **`sync-root` (L3996-4199):** adapter: L3997 (parse id), L4015
+  (`--trust-dir`), L4047-4049 (timeout + wait flags). Use-case: found guard
+  (L4000-4002), `isMainWorktree` guard (L4016-4021), branch/target-branch
+  resolve + guards (L4023-4030), Iron Law gate (L4036-4045 → thay bằng
+  `ironLawForItem` với `baseBranch: item.parent ? targetBranch : null`),
+  closure `runAndReport` (L4051-4132: mergeRunnerItem outcome dispatch +
+  friction + decision record `kind: 'engine'`), nhánh nested-root
+  targetSlot + catchup inbound gate + ephemeral worktree (L4134-4185),
+  clean-tree gate + merge thẳng repoRoot cho root không parent
+  (L4194-4198).
+- **`promote-to-component` (L4210-4346):** adapter: L4211-4214 (parse
+  `--ids`), L4230 (`--trust-dir`), L4284/L4291 (parse
+  `--root-id`/`--root-title`), L4305 (parse `--timeout` — lưu ý: raw
+  `Number()`, KHÔNG qua `resolveVerifyTimeoutMs`, khác 4 verb kia — giữ
+  nguyên khác biệt này). Use-case: `isMainWorktree` guard (L4231-4236),
+  member validation (L4239-4247), connectivity BFS qua deps/mergeAfter
+  (L4252-4279 — pure graph logic, ứng viên dời tiếp xuống domain
+  `state/dep-graph` sau này nhưng YAGNI trong item này), root
+  resolve-or-create (L4286-4301), `resolveIntegrationBranch` +
+  retarget loop + merged-parent-rejected phân loại (L4303-4331), decision
+  record tổng kết (L4333-4345). Verb này đã half-extracted sẵn:
+  per-member mechanics nằm ở `runner/promote-engine.mjs` từ trước — tiền
+  lệ nội bộ tốt nhất cho chính pattern này.
+- **`reject` (L4353-4365):** gần thin sẵn. Use-case chỉ là precondition
+  found/status + moveWork + payload (~10 dòng). Vẫn extract — cả 7 verb
+  cùng shape, stranger tìm code của `fgos <verb>` ở đúng 1 chỗ; chi phí ~0.
+- **`catchup` (L4383-4490):** adapter: L4384 (parse id), L4385
+  (`resolveVerifyTimeoutMs`). Use-case: found/blocked precondition
+  (L4388-4394), `CATCHUP_REASONS` set + live re-run
+  `checkMergeStillResolves` eligibility (L4414-4454), branch-exists guard
+  (L4461-4466), target resolve leaf-vs-root (L4472-4473), gọi
+  `performCatchUp` + moveWork blocked→awaiting-approval bookkeeping
+  (L4480-4489). Lưu ý repoRoot: catchup LUÔN lấy `path.dirname(dir)`
+  (L4429, tsk-5vl) — không có trust-dir gate như approve/sync-root; chính
+  sách repoRoot per-verb nằm ở adapter (§3 hàng 20).
+- **Hai mảnh INFRA đang sống lạc trong bin (round 1-3 sót):**
+  `performCatchUp` (L1063-1122) — merge-target-vào-branch + verify +
+  commit/abort trong ephemeral worktree, cùng contract "never mutates
+  .fgos/, never throws for defined outcomes" với `mergeRunnerItem` — dời về
+  `src/runner/merge.mjs`; và `ensureBranchPushed` (L264-272) — probe
+  upstream + `git push -u` — dời về `runner/worktree.mjs` (đúng vai
+  branch-shim D1 đã định cho file đó; `github-adapter.mjs` vẫn không bị
+  đụng). `realpathOr` (L244-250) chỉ approve's session guard dùng — dời kèm
+  vào use-case approve.
+
+**2. Đề xuất cụ thể — 7 file `src/usecase/<verb>.mjs`, 1 function/verb:**
+
+Signature convention thống nhất: `<verb>UseCase(ctx, options)` trong đó
+`ctx` là những gì adapter TÍNH từ môi trường (`{ dir, cwd?, repoRoot? }` —
+use-case không bao giờ tự đọc `process.cwd()`/`process.env`/argv), `options`
+là flags đã parse thành structured object; trả về ĐÚNG payload data
+`fgos.v1` case block hiện trả (envelope wrap + exit-code map vẫn ở bin);
+mọi refusal vẫn throw `StoreError` y nguyên message (§3 hàng 21).
+
+- `src/usecase/merge.mjs` — `mergeList({ dir, cwd })`,
+  `mergeNext({ dir, cwd, repoRoot }, options)`. `mergeNext` import
+  `approveUseCase` + `syncRootUseCase` trực tiếp (same-rank, hợp lệ) thay
+  cho `runVerb('approve'/'sync-root')` đệ quy — hết đệ quy xuyên tầng entry.
+- `src/usecase/approve.mjs` — `approveUseCase({ dir, repoRoot }, { id,
+  timeoutMs, noWait, waitMs, github, prNumber, ghCommand,
+  acknowledgeIronLaw, acknowledgeDrift, testForceLockTimeoutId })` + helper
+  nội bộ `moveDeliveredOrRecordFault`. File lớn nhất (~600 dòng) — đây là
+  MOVE nguyên khối, không phải decompose (xem mục 5, risk 1).
+- `src/usecase/review.mjs` — `reviewUseCase({ dir, cwd }, { id, github,
+  prNumber, ghCommand })`.
+- `src/usecase/sync-root.mjs` — `syncRootUseCase({ dir, repoRoot }, { id,
+  timeoutMs, noWait, waitMs, acknowledgeIronLaw })`.
+- `src/usecase/catchup.mjs` — `catchupUseCase({ dir, repoRoot }, { id,
+  timeoutMs })`.
+- `src/usecase/reject.mjs` — `rejectUseCase({ dir }, { id, reason })`.
+- `src/usecase/promote-to-component.mjs` —
+  `promoteToComponentUseCase({ dir, repoRoot }, { ids, rootId, rootTitle,
+  timeoutMs })`.
+
+Kèm theo: `src/report/item-trace.mjs` mới (3 collector + 2 CAP dời từ bin,
+§3 hàng 16); `performCatchUp` vào `runner/merge.mjs`; `ensureBranchPushed`
+vào `runner/worktree.mjs`; manifest thêm 8 row (7 use-case + 1 cho
+item-trace). `bin/fgos.mjs` giảm ~1100 dòng; mỗi case block còn ~5-12 dòng
+parse-gọi-trả.
+
+**3. Cái gì Ở LẠI bin (adapter thật):** `parseArgs`, `requireField`/
+`optionalField`, `parseWaitFlags`, `resolveVerifyTimeoutMs` (đọc flags +
+runner config — config-read là input resolution của adapter, và nó cần verb
+name chỉ cho error message), `parseListFlag`, `ghCommandOpts` (env read),
+chính sách repoRoot per-verb (`--trust-dir` gate của approve/sync-root/
+promote; `path.dirname(dir)` vô điều kiện của catchup; raw cwd cho drift
+của merge), envelope wrap + exit-code mapping, và toàn bộ verb NGOÀI
+cluster D3 (không đụng).
+
+**4. Hazard forwarding — điểm regression thật duy nhất:** hôm nay `merge
+next` forward RAW `flags` vào `runVerb('approve', flags, ...)` — approve
+nhận nguyên mọi flag người gõ (timeout/wait/trust-dir/acknowledge-*,
+kể cả github/pr nếu ai đó truyền). Sau khi tách, forwarding phải structural:
+1 parser chung trong bin (dạng `parseMergeClusterOptions(verb, flags)`)
+build options object MỘT lần, `merge` case truyền nguyên khối cho
+`mergeNext`, `mergeNext` truyền tiếp nguyên khối cho approve/sync-root
+use-case — không re-enumerate từng option ở từng chỗ (re-enumerate = chỗ
+để quên 1 option và đổi hành vi unattended âm thầm). D7 ("never injects
+acknowledge-iron-law itself") giữ nguyên: options chỉ mang giá trị người
+đưa, mergeNext không bịa thêm.
+
+**5. Risk / awkward cases (own thẳng, không ép elegance):**
+
+1. **`approve` là move-nguyên-khối, không phải decompose.** 600 dòng
+   use-case với closure lồng 3 tầng (`withMergeTargetSlot` → catchup gate →
+   `withMergeEphemeralWorktree` → outcome dispatch) vẫn nguyên hình dạng đó
+   sau move. Tách nhỏ hơn nữa (vd. leaf-path/root-path riêng) là refactor
+   ĐẸP nhưng nhân risk hành vi lên nhiều lần với test suite 80KB đang exact-
+   match payload — đề xuất: move trước, decompose (nếu bao giờ) là item
+   khác. Test suite spawn CLI thật và parse JSON nên chính nó là safety
+   net: xanh nguyên vẹn = hành vi giữ nguyên.
+2. **Message CLI-vocabulary trong use-case** (§3 hàng 21) — chấp nhận, có
+   tiền lệ (`store.mjs` infra đã throw "Re-run with --acknowledge..." style
+   message qua `assertAcceptanceEvidence`).
+3. **`review`'s trace graze lên `check`** (§3 hàng 16) — import-only, 1
+   dòng, nhưng ĐÚNG là chạm 1 verb ngoài cluster; alternative đã ghi.
+4. **Payload shape sống trong use-case, không phải adapter.** Hexagonal
+   thuần túy sẽ bảo use-case trả result trung tính rồi adapter format —
+   nhưng payload `fgos.v1` data chính LÀ product contract mà skill/agent
+   tiêu thụ, không phải presentation; tách đôi nó ra chỉ tạo 1 lớp mapping
+   ~40 shape với 0 lợi hành vi. Envelope + exit code (phần trình bày thật)
+   vẫn ở bin.
+5. **`resolveVerifyTimeoutMs` đọc runner config** — về lý có mùi use-case
+   (đọc config resolve default), nhưng nó là input-resolution trước khi
+   nghiệp vụ chạy và cần verb name cho message; giữ ở bin làm adapter
+   work. Nếu sau này 1 caller không-CLI cần default đó, dời khi cần (YAGNI).
+
+**6. Tương thích với D1 (kiểm từng điểm):**
+
+- `iron-law-gate.mjs` (D1) GIỮ NGUYÊN thiết kế và chỗ ở `src/runner/`
+  (infra) — use-case layer là tầng riêng phía trên, KHÔNG gộp chung file:
+  gate helper là composition infra (shell git qua `changedFiles`), use-case
+  là orchestration. Chỉ có VỊ TRÍ 3 call site đổi: từ bin xuống
+  `usecase/{merge,approve,sync-root}.mjs` — vẫn đúng 3 chỗ, phần khác-nhau-
+  có-chủ-đích (chọn baseBranch, acknowledge flag, verb-name trong message)
+  vẫn ở call site như D1 định.
+- Cạnh 1 của D1 (driftStatus nhận `trunk` param): "caller thật" cập nhật —
+  bin không còn gọi driftStatus nữa; caller thành
+  `usecase/{merge,approve}.mjs` + `setup/registrations.mjs`. Cơ chế cắt
+  không đổi.
+- 2 move của D1 (`isMainWorktree`/`detectTrunk` → `worktree.mjs`): không
+  xung đột — sau D3, importer của chúng là use-case files thay vì bin.
+  `ensureBranchPushed` (mục 1) dời cùng đợt vào đúng file đó, cùng vai.
+- D2 (`session-identity.mjs` → `util/`): không giao cắt gì với tầng
+  use-case (approve dùng `listSessions` từ `session.mjs` — chỉ import, file
+  đó vẫn ngoài scope đúng D1).
+- Thứ tự làm hợp lý: D1's 4-cạnh-cắt + helper + move TRƯỚC (nhỏ, đã chốt),
+  rồi D3's use-case extraction SAU trên nền đã sạch — extraction khi đó
+  gần như thuần chuyển-dòng.
+
+**7. Câu hỏi mở cần người quyết (không tự đoán):**
+
+1. **Chỗ ở `src/usecase/` (folder mới) hay `src/runner/` (folder có sẵn)?**
+   Khuyến nghị rõ: `src/usecase/` — (a) tên verb trùng thẳng tên file
+   (`usecase/merge.mjs`) mà không đụng `runner/merge.mjs` có sẵn (ở
+   `runner/` sẽ phải đặt tên tránh né kiểu `merge-verb-usecase.mjs`), (b) 7
+   file là 1 cluster thật, khác hẳn 1-file-1-folder mà D2 đã bác, (c) tầng
+   `use-case` đã có tên chính thức trong manifest — folder cùng tên làm
+   tầng nhìn thấy được. NHƯNG lý lẽ D2 ("boundary theo layer thật, không
+   theo tên folder") bề mặt cắt ngược lại việc mở folder mới, và 7 file
+   use-case hiện có (loop.mjs, intake/*...) vẫn nằm rải — folder mới tạo
+   inconsistency "vì sao loop.mjs không ở usecase/?". Đây là taste call
+   người nên chốt, không phải máy.
+2. **Graze `check` qua `src/report/item-trace.mjs`** (mục 1, review): chấp
+   nhận import-only graze, hay ép alternative adapter-đắp-trace để tuyệt
+   đối 0 chạm ngoài cluster?
 
 ## 6. Thiết kế đã chốt {#design}
 
