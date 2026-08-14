@@ -353,10 +353,27 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
     // docs/history/pick-worktree-claim-race/CONTEXT.md D1/D3). Revert the
     // claim back to expectedStatus before rethrowing, so a failed pick
     // looks like it never happened and a retry sees ordinary CAS semantics.
+    //
+    // beforeProvision (tsk-1mn, Finding 2): releases main-checkout.lock
+    // right before createClaimWorktree's own synchronous `npm ci`/`npm
+    // install` step -- the durable state mutation above (moveWork,
+    // addOutcome) is already committed by now, and every repoRoot-touching
+    // git call this claim makes (`worktree add`/`branch`) has already run
+    // by the time this fires (worktree.mjs's own `finishWorktreeSetup` doc).
+    // A fully synchronous `execFileSync` blocks the event loop for its whole
+    // duration, so a timer-based heartbeat (the fix `withMergeTargetSlot`
+    // uses for its own async hold) literally cannot fire here -- shrinking
+    // the hold, not renewing it, is the only fix that actually closes the
+    // gap: on a cold npm cache exceeding the lock's `ttlMs`, the lock is no
+    // longer held at all by then, so there is nothing left for a concurrent
+    // writer to wrongly judge stale and reclaim. `lockResult.release()` is
+    // idempotent (tsk-45z's own closure) -- the outer `finally` below still
+    // calls it unconditionally, safe whether this callback already fired or
+    // never got the chance to (creation failed before reaching it).
     if (isolate) {
       let worktree;
       try {
-        worktree = createClaimWorktree(repoRoot, id, { worktreeDir, baseRef });
+        worktree = createClaimWorktree(repoRoot, id, { worktreeDir, baseRef, beforeProvision: () => lockResult.release() });
       } catch (err) {
         moveWork(dir, { id, to: expectedStatus, expectedStatus: 'doing', role: actor });
         throw err;

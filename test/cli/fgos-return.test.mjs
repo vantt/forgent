@@ -1014,3 +1014,40 @@ test('return succeeds unchanged from inside a real session worktree (created via
     endSession(cwd, session.sessionId, { force: true });
   }
 });
+
+test('tsk-ikd: return refuses from an ad-hoc worktree never created through "fgos session start" (main-source take) — item stays doing, never reaches awaiting-approval, exit 4', () => {
+  // The actual Finding 4 failure scenario: a main-source claim (via `take`)
+  // returned from inside a leftover/unrelated linked worktree instead of
+  // main. Before this fix, `return`'s main-source path had no guard at all
+  // (unlike `approve`/`sync-root`/`promote-to-component`, all of which
+  // already refuse here) -- it would read `currentHead`/run verify against
+  // WHATEVER cwd happens to be, record `headAtReturn` against a sha that
+  // may never actually be reachable from main's own history the way this
+  // item's claim assumes. This is deliberately the OPPOSITE fixture from
+  // the session-worktree test above: an ad-hoc worktree is never registered
+  // via "fgos session start" (no `sessions.json` entry), so it must be
+  // refused exactly like approve's own adhoc-worktree tests prove for
+  // approve.
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  commitPending(cwd, 'state: init');
+  addOk(cwd, 'return-adhoc-mainsource', { verify: 'test -f proof.txt' });
+  commitPending(cwd, 'state: add');
+  run(cwd, ['take', '--id', 'return-adhoc-mainsource']);
+  commitPending(cwd, 'state: take');
+  // Real progress actually committed to main -- would satisfy verify if this
+  // guard did not fire first, proving the refusal is structural (WHERE this
+  // runs), never a proxy for "would verify have passed anyway".
+  commitFile(cwd, 'proof.txt');
+
+  const worktreePath = addAdHocWorktree(cwd, 'adhoc-return-mainsource-branch');
+  try {
+    assert.equal(stateView(cwd).work['return-adhoc-mainsource'].status, 'doing', 'sanity: the ad-hoc worktree really does see the item (real committed events log)');
+    const result = run(worktreePath, ['return', 'return-adhoc-mainsource']);
+    assert.equal(result.status, 4, `expected a clean validation refusal, not a return recorded against an unregistered worktree: ${result.stdout}${result.stderr}`);
+    assert.match(result.stderr, /registered "fgos session start" worktree/);
+    assert.equal(stateView(cwd).work['return-adhoc-mainsource'].status, 'doing', 'item is untouched -- never reaches awaiting-approval from an unregistered worktree');
+  } finally {
+    removeAdHocWorktree(cwd, worktreePath);
+  }
+});
