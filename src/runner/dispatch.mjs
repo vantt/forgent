@@ -426,6 +426,16 @@ export const CAPACITY_CARRIES = Object.freeze(['user-text', 'repo-content']);
 export const CLAUDE_CLI_COMMANDS = Object.freeze(['claude']);
 
 /**
+ * `capacities.<id>.invocations[].via` vocabulary (tsk-5tm-4 D11): the one
+ * transport this repo resolves an invocation through today. Narrow on
+ * purpose, matching `CAPACITY_KINDS`/`CAPACITY_PURPOSES`'s own
+ * start-narrow-extend-later pattern — a real second transport (e.g. an
+ * `api`-shaped invocation talking to a headless agent's app-server) adds
+ * its own value here when a real producer needs it, never speculatively.
+ */
+export const INVOCATION_VIA = Object.freeze(['cli']);
+
+/**
  * Shape-check one `capacities.<id>` entry (D1/D2, tsk-62v; `allowCrossProvider`
  * D1, tsk-32n): requires `kind` (one of `CAPACITY_KINDS`). `command`/`args`,
  * when either is present, must satisfy the same shape `validateExecutorShape`
@@ -460,6 +470,19 @@ export const CLAUDE_CLI_COMMANDS = Object.freeze(['claude']);
  * native-eligible — read by `decideDispatchMechanism`/
  * `decideCapacityDispatchMechanism` below, never by `resolveExecutorConfig`
  * itself (which stays cli/spawn-only and unaware this field exists).
+ *
+ * `invocations`, when present, must be a non-empty array (tsk-5tm-4 D11,
+ * executor-registry.yaml-shaped, marketing-cockpit): each entry names its
+ * own `via` (one of `INVOCATION_VIA`) plus the same `command`/`args`[/
+ * `adapter`] shape `validateExecutorShape` already requires — an
+ * ADDITIVE alternative to the flat `command`/`args` above, never a
+ * replacement (a capacity with neither, or with the flat shape, keeps
+ * resolving exactly as before this field existed; `resolveExecutorConfig`
+ * below prefers `invocations[0]` over flat `command`/`args` when both are
+ * somehow present, but no real entry declares both). The top-level
+ * `capacities` field name itself is unchanged (D11) — `cfg.executors`
+ * already exists, tier-keyed and strictly validated (`tsk-4eu`), so
+ * reusing that name here would collide.
  */
 function validateCapacityShape(capacity, label) {
   if (!capacity || typeof capacity !== 'object' || Array.isArray(capacity)) {
@@ -500,6 +523,23 @@ function validateCapacityShape(capacity, label) {
   // free-string treatment `for` already gets above).
   if (capacity.carries !== undefined && !CAPACITY_CARRIES.includes(capacity.carries)) {
     throw new RunnerConfigError(`runner config (${label}) "carries" must be one of ${CAPACITY_CARRIES.join('/')}, got: ${JSON.stringify(capacity.carries)}.`);
+  }
+  if (capacity.invocations !== undefined) {
+    if (!Array.isArray(capacity.invocations) || capacity.invocations.length === 0) {
+      throw new RunnerConfigError(`runner config (${label}) "invocations" must be a non-empty array when present.`);
+    }
+    capacity.invocations.forEach((invocation, index) => {
+      const invocationLabel = `${label} invocations[${index}]`;
+      if (!invocation || typeof invocation !== 'object' || Array.isArray(invocation)) {
+        throw new RunnerConfigError(`runner config (${invocationLabel}) must be an object.`);
+      }
+      if (typeof invocation.via !== 'string' || !INVOCATION_VIA.includes(invocation.via)) {
+        throw new RunnerConfigError(
+          `runner config (${invocationLabel}) "via" must be one of ${INVOCATION_VIA.join('/')}, got: ${JSON.stringify(invocation.via)}.`,
+        );
+      }
+      validateExecutorShape(invocation, invocationLabel);
+    });
   }
 }
 
@@ -688,8 +728,14 @@ function resolveExecutorConfig(cfg, tier, capacityId, fgosDir, contentCarries) {
     }
   }
 
-  const byCapacity =
-    capacity && (capacity.adapter || capacity.command)
+  // tsk-5tm-4 D11: an invocations[]-shaped capacity resolves through its
+  // own first invocation, ahead of the flat command/args check below —
+  // real entries declare one shape or the other, never both, but
+  // invocations[] wins on the (currently hypothetical) case they do.
+  const invocation = Array.isArray(capacity?.invocations) ? capacity.invocations[0] : undefined;
+  const byCapacity = invocation
+    ? { command: invocation.command, args: invocation.args, adapter: invocation.adapter, provider: capacity.provider }
+    : capacity && (capacity.adapter || capacity.command)
       ? capacity
       : capacity && capacity.agentType && cfg && cfg.executor
         ? buildAgentTypeExecutor(cfg.executor, capacity.agentType)

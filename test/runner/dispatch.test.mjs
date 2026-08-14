@@ -27,6 +27,7 @@ import {
   DEFAULT_ADAPTER,
   CAPACITY_KINDS,
   CAPACITY_CARRIES,
+  INVOCATION_VIA,
 } from '../../src/runner/dispatch.mjs';
 import { initStore, registerTool } from '../../src/state/store.mjs';
 import { writeLocalStatus, findExecutableOnPath } from '../../src/state/tool-registry.mjs';
@@ -501,6 +502,133 @@ test('loadRunnerConfig accepts a well-formed "capacities" entry carrying its own
   );
   const cfg = loadRunnerConfig(configPath);
   assert.equal(cfg.capacities['fgos-code-implement'].command, 'agy');
+});
+
+// --- capacities.<id>.invocations[] (tsk-5tm-4 D11): executor-keyed
+// alternative to flat command/args, ADDITIVE -- capacities field name
+// itself stays unchanged (cfg.executors already means something else,
+// tier-keyed, tsk-4eu) -----------------------------------------------
+
+test('INVOCATION_VIA is exactly the one D11-locked value today, never a free string vocabulary', () => {
+  assert.deepEqual(INVOCATION_VIA, ['cli']);
+});
+
+test('loadRunnerConfig accepts a "capacities.<id>" entry using the invocations[] shape instead of flat command/args', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'invocations-ok.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: {
+        agy: {
+          kind: 'cli',
+          allowCrossProvider: true,
+          invocations: [{ via: 'cli', adapter: 'cli-spawn', command: 'agy', args: ['-p', '{prompt}', '--model', '{model}'] }],
+        },
+      },
+      models: { standard: 'sonnet' },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.doesNotThrow(() => loadRunnerConfig(configPath));
+});
+
+test('loadRunnerConfig rejects a "capacities.<id>.invocations" that is not a non-empty array', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-invocations-empty.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: { agy: { kind: 'cli', invocations: [] } },
+      models: { standard: 'sonnet' },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('loadRunnerConfig rejects a "capacities.<id>.invocations[]" entry with an unknown "via"', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-invocations-via.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: {
+        agy: { kind: 'cli', allowCrossProvider: true, invocations: [{ via: 'api', command: 'agy', args: ['{prompt}'] }] },
+      },
+      models: { standard: 'sonnet' },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('loadRunnerConfig rejects a "capacities.<id>.invocations[]" entry with a malformed command/args shape (reuses validateExecutorShape)', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-invocations-shape.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: { agy: { kind: 'cli', allowCrossProvider: true, invocations: [{ via: 'cli', command: 'agy' }] } },
+      models: { standard: 'sonnet' },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('resolveExecutorCommand resolves command/args/provider from invocations[0] for an invocations[]-shaped capacity', () => {
+  const cfg = {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: {
+      agy: {
+        kind: 'cli',
+        allowCrossProvider: true,
+        invocations: [{ via: 'cli', adapter: 'cli-spawn', command: 'agy', args: ['-p', '{prompt}', '--model', '{model}'] }],
+      },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'hello', model: 'sonnet', tier: 'standard', capacityId: 'agy' });
+  assert.equal(resolved.command, 'agy');
+  assert.deepEqual(resolved.args, ['-p', 'hello', '--model', 'sonnet']);
+  assert.equal(resolved.adapter, 'cli-spawn');
+  assert.equal(resolved.provider, 'agy');
+});
+
+test('resolveExecutorCommand still enforces cross-provider governance for an invocations[]-shaped capacity — allowCrossProvider stays required', () => {
+  const cfg = {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: {
+      agy: { kind: 'cli', invocations: [{ via: 'cli', adapter: 'cli-spawn', command: 'agy', args: ['{prompt}'] }] },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+  assert.throws(
+    () => resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'agy' }),
+    RunnerConfigError,
+  );
+});
+
+test('the committed .fgos/config.json runner section declares the agy reference capacity (tsk-5tm-4 D11): invocations[]-shaped, kind cli, allowCrossProvider true, resolves to the real installed agy binary', () => {
+  const cfg = committedRunnerConfig();
+  const capacity = cfg.capacities?.agy;
+  assert.ok(capacity, 'capacities.agy must exist');
+  assert.equal(capacity.kind, 'cli');
+  assert.equal(capacity.allowCrossProvider, true);
+  assert.ok(Array.isArray(capacity.invocations) && capacity.invocations.length === 1);
+  const invocation = capacity.invocations[0];
+  assert.equal(invocation.via, 'cli');
+  assert.equal(invocation.adapter, 'cli-spawn');
+  assert.equal(invocation.command, 'agy');
+  assert.ok(invocation.args.includes('{prompt}') && invocation.args.includes('{model}'));
+  assert.ok(invocation.args.includes('--dangerously-skip-permissions'));
 });
 
 test('loadRunnerConfig accepts a "capacities" entry naming only "kind" (metadata-only, falls through for its executor)', () => {
