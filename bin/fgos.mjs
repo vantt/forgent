@@ -1486,6 +1486,15 @@ async function runVerb(verb, flags, positional, dir) {
       // everywhere else" — this verb just forwards whatever the caller
       // supplied.
       const reason = optionalField(flags.reason, 'move --reason requires a non-empty reason value (omit --reason entirely when not rejecting a proposal)');
+      // tsk-2lc: transitionWork (status-fsm.mjs) requires a non-empty
+      // `answer` for ANY exit from awaiting-human, regardless of `to` --
+      // this verb never forwarded one, so the awaiting-human -> wontfix
+      // edge (tsk-2ub) was unreachable through `move` even though the FSM
+      // table already carries it: `fgos answer` is the only other door out
+      // of awaiting-human, and it only ever resumes to todo/doing, never
+      // wontfix. Optional here exactly like `reason` above -- ignored by
+      // transitionWork for every edge that doesn't require it.
+      const answer = optionalField(flags.answer, 'move --answer requires a non-empty value (omit --answer entirely when not resuming/closing an item out of awaiting-human)');
       // tsk-5dk: a hand-typed move to delivered writes no merge evidence
       // (mergedSha/mergedInto only ever come from approve's real merge
       // paths, src/state/store.mjs) — refuse when fgw/<id> is a live
@@ -1548,7 +1557,7 @@ async function runVerb(verb, flags, positional, dir) {
           });
         }
       }
-      const { event } = moveWork(dir, { id, to, expectedStatus, reason, role: 'human' });
+      const { event } = moveWork(dir, { id, to, expectedStatus, reason, answer, role: 'human' });
       return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
     }
 
