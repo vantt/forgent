@@ -123,6 +123,19 @@ Assumptions:
   this item reaches `executing`, the live-branch verify step degrades to
   the synthetic-repo test only; this does not change the fix itself.
 
+## Feasibility matrix (validating pass, 2026-08-14)
+
+| Assumption | Risk | Proof required | Evidence found | Result |
+|---|---|---|---|---|
+| Eligibility-gate shape (i vs ii) is cheaply/correctly implementable | Medium | Read the actual data already available at the transition/park call sites | `src/state/status-fsm.mjs:244` — every `transitionWork` call already returns `payload = { id, from, to }`, and `bin/fgos.mjs:1628`'s own `cleanup -> blocked` edge produces exactly this event with `from: 'cleanup'`. `readRawEvents` is already imported and used in the same file (`bin/fgos.mjs:1608`). **Resolved: option (ii) wins** — gate `fgos catchup`'s eligibility on "the item's most recent `work.move` event has `to: 'blocked'` and `from: 'cleanup'`", read via the same `readRawEvents` already in scope. No new field, no marker convention, no `reason`-text change needed at all — plan.md's Approach section's "(i) tag-prefix" option is dropped as unnecessary. | READY |
+| `CATCHUP_REASONS` widening must not admit unrelated `system-error` parks (e.g. `runner-crash-reclaim`) | Medium | Confirm a negative-test case is real and constructible | Since eligibility now gates on transition-origin (`from: 'cleanup'`), not on `item.reason` content at all, an unrelated `system-error` block (e.g. `doing -> blocked` via `runner-crash-reclaim`, `bin/fgos.mjs:431`) structurally CANNOT have `from: 'cleanup'` — the FSM only allows `cleanup -> blocked` from status `cleanup` itself. This closes the row by construction, not just by a test — the risk plan.md flagged is eliminated by the design chosen above, not merely tested for. | READY |
+| `performCatchUp`'s merge mechanics work against the real, live `tsk-2sr` case | Light | Confirm `fgw/tsk-2sr` is still live | Re-verified 2026-08-14 (validating pass): `git rev-parse --verify refs/heads/fgw/tsk-2sr` → `93d8e653...`, still live. | READY |
+
+No trigger fired (T1/T2/T3 — see `fgos-coding-validating`'s own Gate step
+1): the eligibility-gate shape question is resolved by a tier-A action
+(reading `status-fsm.mjs` directly), not a live open choice between two
+standing options anymore. Cost verdict: **REVERSIBLE**.
+
 ## Outstanding questions
 
 None
