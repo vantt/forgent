@@ -1012,7 +1012,7 @@ mod tests {
         let response = app
             .oneshot(
                 Request::builder()
-                    .uri("/work/--force")
+                    .uri("/v1/work/--force")
                     .header(axum::http::header::AUTHORIZATION, "Bearer test-token")
                     .body(Body::empty())
                     .unwrap(),
@@ -1110,7 +1110,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method("POST")
-                    .uri("/work")
+                    .uri("/v1/work")
                     .header(axum::http::header::AUTHORIZATION, "Bearer test-token")
                     .header(axum::http::header::CONTENT_TYPE, "application/json")
                     .body(Body::from("{not valid json"))
@@ -1141,7 +1141,7 @@ mod tests {
         let response = app
             .oneshot(
                 Request::builder()
-                    .uri("/work?limit=not-a-number")
+                    .uri("/v1/work?limit=not-a-number")
                     .header(axum::http::header::AUTHORIZATION, "Bearer test-token")
                     .body(Body::empty())
                     .unwrap(),
