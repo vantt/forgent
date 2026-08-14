@@ -187,6 +187,13 @@ fn push_capped_output(output: &Arc<Mutex<Vec<String>>>, line: String) {
     buf.push(line);
 }
 
+/// tsk-1ah: same guard `gateway.rs`'s REST handlers apply, adapted to the
+/// Rhai error type bound functions below return -- see
+/// `gateway::reject_leading_dash`'s own doc comment for why.
+fn reject_leading_dash(value: &str, field: &str) -> Result<(), Box<rhai::EvalAltResult>> {
+    crate::gateway::reject_leading_dash(value, field).map_err(|err| format!("{err}").into())
+}
+
 /// Builds a fresh Rhai engine with the work-item bound-function allowlist
 /// registered, and the given buffer wired up to capture `print`/`debug`
 /// output (Rhai's own stdlib carries no filesystem/process/network access by
@@ -219,10 +226,12 @@ fn build_engine(gateway: Arc<dyn VerbGateway>, output: Arc<Mutex<Vec<String>>>) 
         move |status: &str, stage: &str, all: bool| -> Result<Dynamic, Box<rhai::EvalAltResult>> {
             let mut args = vec!["list".to_string(), "--json".to_string()];
             if !status.is_empty() {
+                reject_leading_dash(status, "status")?;
                 args.push("--status".to_string());
                 args.push(status.to_string());
             }
             if !stage.is_empty() {
+                reject_leading_dash(stage, "stage")?;
                 args.push("--stage".to_string());
                 args.push(stage.to_string());
             }
@@ -240,6 +249,7 @@ fn build_engine(gateway: Arc<dyn VerbGateway>, output: Arc<Mutex<Vec<String>>>) 
 
     let gw = gateway.clone();
     engine.register_fn("get_work", move |id: &str| -> Result<Dynamic, Box<rhai::EvalAltResult>> {
+        reject_leading_dash(id, "id")?;
         call_verb(&gw, vec!["show".to_string(), id.to_string(), "--json".to_string()])
     });
 
@@ -247,8 +257,11 @@ fn build_engine(gateway: Arc<dyn VerbGateway>, output: Arc<Mutex<Vec<String>>>) 
     engine.register_fn(
         "move_work",
         move |id: &str, to: &str, expect: &str| -> Result<Dynamic, Box<rhai::EvalAltResult>> {
+            reject_leading_dash(id, "id")?;
+            reject_leading_dash(to, "to")?;
             let mut args = vec!["move".to_string(), id.to_string(), "--to".to_string(), to.to_string(), "--json".to_string()];
             if !expect.is_empty() {
+                reject_leading_dash(expect, "expect")?;
                 args.push("--expect".to_string());
                 args.push(expect.to_string());
             }
@@ -260,6 +273,7 @@ fn build_engine(gateway: Arc<dyn VerbGateway>, output: Arc<Mutex<Vec<String>>>) 
     engine.register_fn(
         "ask_work",
         move |id: &str, text: &str| -> Result<Dynamic, Box<rhai::EvalAltResult>> {
+            reject_leading_dash(id, "id")?;
             call_verb(&gw, vec!["ask".to_string(), id.to_string(), "--text".to_string(), text.to_string(), "--json".to_string()])
         },
     );
@@ -268,6 +282,7 @@ fn build_engine(gateway: Arc<dyn VerbGateway>, output: Arc<Mutex<Vec<String>>>) 
     engine.register_fn(
         "answer_work",
         move |id: &str, text: &str| -> Result<Dynamic, Box<rhai::EvalAltResult>> {
+            reject_leading_dash(id, "id")?;
             call_verb(&gw, vec!["answer".to_string(), id.to_string(), "--text".to_string(), text.to_string(), "--json".to_string()])
         },
     );
@@ -276,18 +291,22 @@ fn build_engine(gateway: Arc<dyn VerbGateway>, output: Arc<Mutex<Vec<String>>>) 
     engine.register_fn(
         "take_work",
         move |id: &str, role: &str| -> Result<Dynamic, Box<rhai::EvalAltResult>> {
+            reject_leading_dash(id, "id")?;
             let role = if role.is_empty() { "session" } else { role };
+            reject_leading_dash(role, "role")?;
             call_verb(&gw, vec!["take".to_string(), id.to_string(), "--role".to_string(), role.to_string(), "--json".to_string()])
         },
     );
 
     let gw = gateway.clone();
     engine.register_fn("return_work", move |id: &str| -> Result<Dynamic, Box<rhai::EvalAltResult>> {
+        reject_leading_dash(id, "id")?;
         call_verb(&gw, vec!["return".to_string(), id.to_string(), "--json".to_string()])
     });
 
     let gw = gateway.clone();
     engine.register_fn("approve_work", move |id: &str| -> Result<Dynamic, Box<rhai::EvalAltResult>> {
+        reject_leading_dash(id, "id")?;
         call_verb(&gw, vec!["approve".to_string(), id.to_string(), "--json".to_string()])
     });
 
@@ -295,6 +314,7 @@ fn build_engine(gateway: Arc<dyn VerbGateway>, output: Arc<Mutex<Vec<String>>>) 
     engine.register_fn(
         "reject_work",
         move |id: &str, reason: &str| -> Result<Dynamic, Box<rhai::EvalAltResult>> {
+            reject_leading_dash(id, "id")?;
             call_verb(&gw, vec!["reject".to_string(), id.to_string(), "--reason".to_string(), reason.to_string(), "--json".to_string()])
         },
     );
@@ -305,6 +325,7 @@ fn build_engine(gateway: Arc<dyn VerbGateway>, output: Arc<Mutex<Vec<String>>>) 
         move |cursor: &str, limit: i64| -> Result<Dynamic, Box<rhai::EvalAltResult>> {
             let mut args = vec!["ready".to_string(), "--json".to_string()];
             if !cursor.is_empty() {
+                reject_leading_dash(cursor, "cursor")?;
                 args.push("--cursor".to_string());
                 args.push(cursor.to_string());
             }
@@ -318,6 +339,7 @@ fn build_engine(gateway: Arc<dyn VerbGateway>, output: Arc<Mutex<Vec<String>>>) 
 
     let gw = gateway.clone();
     engine.register_fn("rollup", move |id: &str| -> Result<Dynamic, Box<rhai::EvalAltResult>> {
+        reject_leading_dash(id, "id")?;
         call_verb(&gw, vec!["rollup".to_string(), id.to_string(), "--json".to_string()])
     });
 
@@ -574,6 +596,17 @@ mod tests {
         let result = tokio::task::spawn_blocking(move || run_script(gateway, script)).await.unwrap();
         let output = result.unwrap();
         assert!(output.contains("tsk-1"), "expected bound function's real envelope data in output, got: {output}");
+    }
+
+    #[tokio::test]
+    async fn execute_move_work_rejects_a_dash_prefixed_to_before_it_ever_reaches_the_verb_chokepoint() {
+        let gateway = fake(Ok(json!({"ok": true})));
+        let script = r#"move_work("tsk-1", "--delivered", "")"#;
+        let result = tokio::task::spawn_blocking(move || run_script(gateway, script)).await.unwrap();
+        assert!(
+            result.is_err(),
+            "a dash-prefixed 'to' value must be refused as validation, never reach the verb chokepoint where it could be misread as a flag"
+        );
     }
 
     #[tokio::test]
