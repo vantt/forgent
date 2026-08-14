@@ -478,6 +478,31 @@ test('withMergeEphemeralWorktree leaves an already-existing fgw/<id> branch unto
   assert.equal(branchTip(repoRoot, 'fgw/already-dispatched'), advancedTip, 'branch tip is unchanged when fn makes no new commit');
 });
 
+test('tsk-4yv: withMergeEphemeralWorktree removes the detached worktree it just registered when finishWorktreeSetup fails -- never leaks an unreclaimed detached checkout', async () => {
+  // Finding 7: this is specifically the DETACHED case
+  // (createDetachedMergeWorktree, used by approve's own leaf-merge path via
+  // withMergeEphemeralWorktree) -- reclaimOrphanedCheckout/findCheckoutPath
+  // are both branch-keyed and skip a `detached` worktree stanza entirely, so
+  // unlike the branch-attached createWorktree case, nothing else in the
+  // codebase would ever reclaim a leaked detached checkout. A repeated npm
+  // registry flake during approve would accumulate full checkouts under tmp
+  // indefinitely, exactly the scenario this fix closes.
+  const repoRoot = initTempRepo();
+  execFileSync('git', ['branch', '-M', 'main'], { cwd: repoRoot });
+  // Malformed JSON forces a real, deterministic, fully offline throw inside
+  // provisionDependencies (see the createWorktree sibling test above for
+  // why a nonexistent file: dependency does NOT reliably fail npm install).
+  fs.writeFileSync(path.join(repoRoot, 'package.json'), '{not valid json');
+  execFileSync('git', ['add', 'package.json'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'commit a malformed package.json'], { cwd: repoRoot });
+  execFileSync('git', ['branch', 'fgw/broken-dep-merge-item'], { cwd: repoRoot });
+
+  await assert.rejects(() => withMergeEphemeralWorktree(repoRoot, 'broken-dep-merge-item', async () => 'unreachable'), SyntaxError);
+
+  const listing = execFileSync('git', ['worktree', 'list', '--porcelain'], { cwd: repoRoot, encoding: 'utf8' });
+  assert.doesNotMatch(listing, /broken-dep-merge-item/, 'the detached merge worktree must not remain registered after finishWorktreeSetup failed');
+});
+
 test('createWorktree with opts.baseRef forks a new branch from that ref\'s tip, not from repoRoot\'s current HEAD', () => {
   const repoRoot = initTempRepo();
   const worktreeDir = mkWorktreeDir();
@@ -1202,6 +1227,28 @@ test('tsk-1mn: createWorktree with no beforeProvision supplied stays byte-identi
   const wt = createWorktree(repoRoot, 'item-deps-nocb', { worktreeDir });
 
   assert.equal(fs.existsSync(path.join(wt.path, 'node_modules', 'fgos-test-localdep', 'package.json')), true);
+});
+
+test('tsk-4yv: createWorktree removes the worktree it just registered when finishWorktreeSetup fails (malformed package.json throws inside provisionDependencies) — never leaks a registered checkout', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  // Malformed JSON forces a real, deterministic, fully offline throw inside
+  // provisionDependencies's own `JSON.parse(fs.readFileSync(...))` call —
+  // no npm process or network behavior to rely on (a nonexistent `file:`
+  // dependency path was tried here first and found NOT to fail npm install
+  // at all in practice; this is the reliable failure trigger instead).
+  fs.writeFileSync(path.join(repoRoot, 'package.json'), '{not valid json');
+  execFileSync('git', ['add', 'package.json'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'commit a malformed package.json'], { cwd: repoRoot });
+
+  assert.throws(() => createWorktree(repoRoot, 'item-broken-dep', { worktreeDir }), SyntaxError);
+
+  // Finding 7: before this fix, `git worktree add` had already succeeded
+  // and registered the checkout by the time provisionDependencies threw --
+  // nothing removed it, so it stayed registered AND on disk indefinitely.
+  const listing = execFileSync('git', ['worktree', 'list', '--porcelain'], { cwd: repoRoot, encoding: 'utf8' });
+  assert.doesNotMatch(listing, /item-broken-dep/, 'the worktree must be fully unregistered from git, not left dangling');
+  assert.deepEqual(fs.readdirSync(worktreeDir), [], 'the checkout directory itself must be removed too, not just unregistered');
 });
 
 test('createWorktree stays byte-identical (no node_modules created) for a repo with no package.json — every existing zero-dependency caller unaffected', () => {

@@ -513,7 +513,30 @@ export function createWorktree(repoRoot, id, opts = {}) {
     }
   }
 
-  finishWorktreeSetup(worktreePath, branch, { beforeProvision: opts.beforeProvision });
+  // tsk-4yv: by this point `git worktree add` has already succeeded (or the
+  // reuse/relocate path above already reattached), so `worktreePath` is a
+  // REGISTERED worktree, unlike the two catch blocks above which only ever
+  // run before registration -- a bare fs.rmSync here would leave git's own
+  // `.git/worktrees/<name>/` bookkeeping dangling, a broken entry future
+  // `git worktree` calls would trip over. `finishWorktreeSetup` (the
+  // `.fgos/` strip, or `provisionDependencies`'s `npm ci`/`npm install`) can
+  // throw for real (a permissions error, an npm registry flake) -- nothing
+  // downstream of this call ever cleaned that up before, so a checkout
+  // stayed registered and on disk indefinitely, accumulating with every
+  // repeated flake. `removeWorktree`'s own `--force` mirrors the other
+  // cleanup attempts in this function: best-effort, swallowed if it itself
+  // fails, so a cleanup failure never masks the real error the caller needs
+  // to see.
+  try {
+    finishWorktreeSetup(worktreePath, branch, { beforeProvision: opts.beforeProvision });
+  } catch (err) {
+    try {
+      removeWorktree(repoRoot, worktreePath, { force: true });
+    } catch {
+      // best-effort — see comment above.
+    }
+    throw err;
+  }
 
   return { path: worktreePath, branch, reused };
 }
@@ -1020,7 +1043,28 @@ function createDetachedMergeWorktree(repoRoot, id) {
     });
   }
 
-  finishWorktreeSetup(worktreePath, branch);
+  // tsk-4yv: same reasoning as createWorktree's own identical wrap above --
+  // `git worktree add --detach` has already succeeded by this point, so a
+  // `finishWorktreeSetup` failure (the `.fgos/` strip, or
+  // `provisionDependencies`'s `npm ci`/`npm install`) must force-remove the
+  // now-registered worktree before rethrowing, or it leaks: this is
+  // specifically the DETACHED case (a `withMergeEphemeralWorktree` call
+  // during `approve`), which `reclaimOrphanedCheckout`/`findCheckoutPath`
+  // (both branch-keyed) never reclaim, unlike a branch-attached
+  // `createWorktree` checkout, which mostly self-heals via the
+  // relocate/reattach paths. Left unfixed, a repeated npm registry flake
+  // during `approve` accumulates full checkouts under tmp indefinitely.
+  try {
+    finishWorktreeSetup(worktreePath, branch);
+  } catch (err) {
+    try {
+      removeWorktree(repoRoot, worktreePath, { force: true });
+    } catch {
+      // best-effort — a failed cleanup here must never mask the real
+      // finishWorktreeSetup failure the caller needs to see.
+    }
+    throw err;
+  }
 
   return { path: worktreePath, branch, startCommit };
 }
