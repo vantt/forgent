@@ -395,8 +395,24 @@ export function createBranchRef(repoRoot, id, opts = {}) {
  * `.fgos/` strip (ADR0020) + dependency provisioning, shared by every
  * function in this module that stands up a fresh checkout — `createWorktree`
  * and `createDetachedMergeWorktree` below.
+ *
+ * `beforeProvision` (tsk-1mn, optional, default none): called with no
+ * arguments right after the fast `.fgos/` strip and immediately before the
+ * slow, synchronous `provisionDependencies` (`npm ci`/`npm install`) call
+ * below — the exact seam `claimWork` (claim-port.mjs) needs to release
+ * `main-checkout.lock` at. Neither this strip nor `provisionDependencies`
+ * ever touches `repoRoot`'s own `.git/index` (both operate entirely inside
+ * `worktreePath`, a directory the lock's own STR65 concern never covers —
+ * main-checkout-lock.mjs's own header: "two concurrent writers racing this
+ * checkout's own `.git/index`"), and every `repoRoot`-touching git call this
+ * module makes (`worktree add`, `branch`) already ran before this function
+ * is ever called — so releasing right here, mid-function, is provably safe
+ * regardless of which caller passes the callback. `createDetachedMergeWorktree`
+ * below never passes one: that call site's own lock hold
+ * (`withMergeTargetSlot`, merge.mjs) already has a working heartbeat, so it
+ * has no TTL-starvation gap to close and stays byte-identical.
  */
-function finishWorktreeSetup(worktreePath, branch) {
+function finishWorktreeSetup(worktreePath, branch, { beforeProvision } = {}) {
   // `.fgos/` (ADR0020): since `.fgos/` is git-tracked in this repo, a bare
   // checkout would carry a snapshot frozen at fork time — stale the moment
   // main gets another uncommitted event, and a live escape hatch into the
@@ -422,14 +438,19 @@ function finishWorktreeSetup(worktreePath, branch) {
   // scenario that exposed this whole gap: a branch merging in a new
   // dependency before that merge lands on repoRoot's own default branch)
   // would still hit ERR_MODULE_NOT_FOUND. provisionDependencies installs
-  // for THIS worktree's own declared dependencies instead, correct for
-  // that case at the cost of the install itself.
+  // for THIS worktree's own declared dependencies instead, correct at the
+  // cost of the install itself.
+  beforeProvision?.();
   provisionDependencies(worktreePath);
 }
 
 /**
  * Create (or reuse, see module doc) an isolated worktree for work item `id`
- * inside `repoRoot`. Always allocates a fresh temp directory for the
+ * inside `repoRoot`. `opts.beforeProvision` (tsk-1mn, optional): forwarded
+ * verbatim to `finishWorktreeSetup` — see that function's own doc for what
+ * it's for and why the seam is safe.
+ *
+ * Always allocates a fresh temp directory for the
  * checkout via `mkdtemp` (default base: `os.tmpdir()/fgos-worktrees`,
  * overridable via `opts.worktreeDir` — tests use this to stay inside a
  * disposable temp git repo, never the main repo). When the branch does not
@@ -492,7 +513,7 @@ export function createWorktree(repoRoot, id, opts = {}) {
     }
   }
 
-  finishWorktreeSetup(worktreePath, branch);
+  finishWorktreeSetup(worktreePath, branch, { beforeProvision: opts.beforeProvision });
 
   return { path: worktreePath, branch, reused };
 }
