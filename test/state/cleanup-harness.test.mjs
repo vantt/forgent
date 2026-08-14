@@ -10,6 +10,7 @@ import {
   checkCleanupTTLElapsed,
   assessCleanupReadiness,
   resolveTtlDaysForItem,
+  blockedItemsNowResolvable,
 } from '../../src/state/cleanup-harness.mjs';
 
 // Every test here creates its own disposable git repo (mirrors
@@ -628,4 +629,76 @@ test('assessCleanupReadiness: skips the merge-resolves check entirely when workt
   // No repoRoot passed at all -- if the merge check ran, it would throw on a missing cwd.
   const result = assessCleanupReadiness({ view, rawEvents, id: 'synth-item', repoRoot: undefined, worktreeBacked: false, ttlDays: 7, now });
   assert.equal(result.ready, true, 'must not attempt the merge-resolves check for a non-worktree-backed domain');
+});
+
+// --- blockedItemsNowResolvable (tsk-597z) ------------------------------
+
+test('blockedItemsNowResolvable: empty view reports all-empty, no error', () => {
+  const result = blockedItemsNowResolvable({ view: { work: {} }, repoRoot: '/does-not-matter' });
+  assert.deepEqual(result, { resolvable: [], stillBlocked: [], notApplicable: [] });
+});
+
+test('blockedItemsNowResolvable: a blocked item whose recorded commit is NOW an ancestor of HEAD is reported resolvable', () => {
+  const repoRoot = initRepo();
+  const sha = commitFile(repoRoot, 'now-merged.txt');
+  const view = { work: { 'tsk-a': { status: 'blocked', branchHeadAtReturn: sha } } };
+  const result = blockedItemsNowResolvable({ view, repoRoot });
+  assert.deepEqual(result.stillBlocked, []);
+  assert.deepEqual(result.notApplicable, []);
+  assert.equal(result.resolvable.length, 1);
+  assert.equal(result.resolvable[0].id, 'tsk-a');
+});
+
+test('blockedItemsNowResolvable: a blocked item whose recorded commit is still unreachable is reported stillBlocked, not resolvable', () => {
+  const repoRoot = initRepo();
+  const sha = commitFile(repoRoot, 'erased.txt');
+  execFileSync('git', ['reset', '--hard', 'HEAD~1'], { cwd: repoRoot });
+  const view = { work: { 'tsk-b': { status: 'blocked', branchHeadAtReturn: sha } } };
+  const result = blockedItemsNowResolvable({ view, repoRoot });
+  assert.deepEqual(result.resolvable, []);
+  assert.deepEqual(result.notApplicable, []);
+  assert.equal(result.stillBlocked.length, 1);
+  assert.equal(result.stillBlocked[0].id, 'tsk-b');
+});
+
+test('blockedItemsNowResolvable: a blocked item with no recorded commit at all is notApplicable, never reported resolvable', () => {
+  const repoRoot = initRepo();
+  const view = { work: { 'tsk-c': { status: 'blocked' } } };
+  const result = blockedItemsNowResolvable({ view, repoRoot });
+  assert.deepEqual(result.resolvable, []);
+  assert.deepEqual(result.stillBlocked, []);
+  assert.equal(result.notApplicable.length, 1);
+  assert.equal(result.notApplicable[0].id, 'tsk-c');
+  assert.equal(result.notApplicable[0].reason, 'no-recorded-commit');
+});
+
+test('blockedItemsNowResolvable: a blocked item in a non-worktree-backed domain is notApplicable and never re-checked', () => {
+  const view = {
+    work: {
+      // A real-looking sha here would make checkMergeStillResolves throw
+      // against a bogus repoRoot if it were ever actually called -- this
+      // item must be skipped before that happens.
+      'tsk-d': { status: 'blocked', domain: 'synthetic', branchHeadAtReturn: 'deadbeef' },
+    },
+  };
+  const result = blockedItemsNowResolvable({ view, repoRoot: '/does-not-matter' });
+  assert.deepEqual(result.resolvable, []);
+  assert.deepEqual(result.stillBlocked, []);
+  assert.equal(result.notApplicable.length, 1);
+  assert.equal(result.notApplicable[0].id, 'tsk-d');
+  assert.equal(result.notApplicable[0].reason, 'domain-not-worktree-backed');
+});
+
+test('blockedItemsNowResolvable: only status:blocked items are ever considered', () => {
+  const repoRoot = initRepo();
+  const sha = commitFile(repoRoot, 'irrelevant.txt');
+  const view = {
+    work: {
+      'tsk-e': { status: 'doing', branchHeadAtReturn: sha },
+      'tsk-f': { status: 'todo' },
+      'tsk-g': { status: 'awaiting-approval', branchHeadAtReturn: sha },
+    },
+  };
+  const result = blockedItemsNowResolvable({ view, repoRoot });
+  assert.deepEqual(result, { resolvable: [], stillBlocked: [], notApplicable: [] });
 });

@@ -82,7 +82,7 @@ import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { DOCTOR_CHECKS, integrationScriptPath, ensureSharedConfigDefaults, runFixes } from '../src/setup/checks.mjs';
 import { sharedConfigFilePath, readSharedConfig, readSharedConfigOrEmpty, readInvariantCheckCommands } from '../src/config/shared-config-file.mjs';
 import { countWorkerSlots, hasWorkerSlotRoom } from '../src/state/worker-slots.mjs';
-import { assessCleanupReadiness, checkMergeStillResolves } from '../src/state/cleanup-harness.mjs';
+import { assessCleanupReadiness, checkMergeStillResolves, blockedItemsNowResolvable } from '../src/state/cleanup-harness.mjs';
 import { DEFAULT_CLEANUP_TTL_DAYS, DEFAULT_CLEANUP_LEAF_TTL_DAYS } from '../src/setup/registrations.mjs';
 import { installGitHooks, uninstallGitHooks } from '../src/setup/git-hooks.mjs';
 import { detectRcFiles, insertSourceLine, hasSourceLine } from '../src/setup/shell-rc.mjs';
@@ -2388,6 +2388,19 @@ async function runVerb(verb, flags, positional, dir) {
         [...ids].map((id) => [id, effectiveStage(conflictsView.work[id], getDomain(conflictsView.work[id].domain))]),
       );
       return { conflicts, stageByItem };
+    }
+
+    // Read-only, report-only (tsk-597z): re-runs checkMergeStillResolves
+    // LIVE against every current status:blocked item -- the same live
+    // re-check `catchup`'s own eligibility gate already trusts over the
+    // stored `reason` text (see the comment on that gate above) -- and
+    // reports which ones would now pass their own park-causing ancestry
+    // check. Never transitions anything; a person (or `fgos catchup <id>`)
+    // still does the acting.
+    case 'recheck-blocked': {
+      const recheckView = listWork(dir);
+      const repoRoot = path.dirname(dir);
+      return blockedItemsNowResolvable({ view: recheckView, repoRoot });
     }
 
     // Read-only (tsk-3c7): which frontier items can dispatch in parallel
@@ -5175,7 +5188,7 @@ function renderPretty(verb, data) {
 // own hard refusal instead of a soft warning.
 const STORE_MISSING_WARNING_VERBS = new Set([
   'list', 'ready', 'graph', 'stale', 'check', 'rollup', 'show', 'conflicts', 'triage', 'schedule',
-  'gate-bypass', 'doc-sources', 'lock-status', 'evolve',
+  'gate-bypass', 'doc-sources', 'lock-status', 'evolve', 'recheck-blocked',
 ]);
 
 async function main() {

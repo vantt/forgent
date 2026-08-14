@@ -1544,6 +1544,76 @@ test('conflicts verb: a discovery-stage item and an executing-stage item sharing
   assert.deepEqual(data, { conflicts: [], stageByItem: {} });
 });
 
+// --- tsk-597z: `fgos recheck-blocked` -- report-only sweep re-running the
+// merge-still-resolves ancestry check LIVE against every status:blocked
+// item, instead of trusting stored reason/detail text (same live-recheck
+// stance `fgos catchup`'s own eligibility gate already takes). ------------
+
+test('recheck-blocked verb on a store with nothing blocked: all-empty envelope, exit 0, pure read (no event)', () => {
+  const cwd = tmpCwd();
+  assert.equal(run(cwd, ['init']).status, 0);
+  assert.equal(addOk(cwd, 'a').status, 0); // stays todo, never blocked
+  const before = eventLines(cwd).length;
+  const result = run(cwd, ['recheck-blocked']);
+  assert.equal(result.status, 0);
+  assert.deepEqual(envelopeData(result.stdout), { resolvable: [], stillBlocked: [], notApplicable: [] });
+  assert.equal(eventLines(cwd).length, before, 'recheck-blocked must not append any event -- report-only, never transitions anything');
+});
+
+test('recheck-blocked verb: a blocked item whose recorded commit is (still) a real ancestor of HEAD is reported resolvable, never auto-transitioned', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'catches-up', { verify: 'test -f proof.txt' });
+  // Real claim -> commit -> return shape (mirrors fgos-return.test.mjs's
+  // own happy-path fixture) so `headAtReturn` is a REAL recorded commit,
+  // never a bare `move`'s no-op -- this is what tsk-4n7 (an item stuck
+  // blocked from before an unrelated fix landed) actually looked like: a
+  // real recorded commit whose ancestry check simply needs re-running.
+  assert.equal(run(cwd, ['take', '--id', 'catches-up']).status, 0);
+  commitFile(cwd, 'proof.txt');
+  const returnResult = run(cwd, ['return', 'catches-up']);
+  assert.equal(returnResult.status, 0, returnResult.stderr);
+  // Park it by hand (as if an unrelated bug had parked it for a reason
+  // that has nothing to do with this ancestry check) -- the sweep must
+  // catch this without `reason` ever saying anything about a merge.
+  run(cwd, ['move', 'catches-up', '--to', 'blocked', '--reason', 'integration-drift']);
+
+  const data = envelopeData(run(cwd, ['recheck-blocked']).stdout);
+  assert.deepEqual(data.stillBlocked, []);
+  assert.equal(data.resolvable.length, 1);
+  assert.equal(data.resolvable[0].id, 'catches-up');
+
+  // report-only: item.status is untouched by the sweep itself.
+  const listed = envelopeData(run(cwd, ['list', '--id', 'catches-up']).stdout);
+  assert.equal(listed.work['catches-up'].status, 'blocked', 'recheck-blocked must never transition the item on its own');
+});
+
+test('recheck-blocked verb: a blocked item whose recorded commit is no longer reachable (force-pushed away) is reported stillBlocked, never resolvable', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'never-merged', { verify: 'test -f proof.txt' });
+  assert.equal(run(cwd, ['take', '--id', 'never-merged']).status, 0);
+  // Scoped `git add proof.txt` -- deliberately NOT `commitFile`'s own
+  // `git add -A` (which would sweep the still-untracked `.fgos/`
+  // directory into this commit, making it -- and the item's whole state
+  // -- vanish under the `git reset --hard` below, the same class of
+  // danger AGENTS.md's tsk-56u names for `-A` inside a worktree).
+  fs.writeFileSync(path.join(cwd, 'proof.txt'), 'work\n');
+  gitAtCwd(cwd, ['add', 'proof.txt']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'work: proof.txt']);
+  const returnResult = run(cwd, ['return', 'never-merged']);
+  assert.equal(returnResult.status, 0, returnResult.stderr);
+  run(cwd, ['move', 'never-merged', '--to', 'blocked', '--reason', 'integration-drift']);
+  // Simulate a force-push/history-rewrite that drops the recorded commit
+  // (same setup `checkMergeStillResolves`'s own unit test uses).
+  gitAtCwd(cwd, ['reset', '--hard', 'HEAD~1']);
+
+  const data = envelopeData(run(cwd, ['recheck-blocked']).stdout);
+  assert.deepEqual(data.resolvable, []);
+  assert.equal(data.stillBlocked.length, 1);
+  assert.equal(data.stillBlocked[0].id, 'never-merged');
+});
+
 test('graph verb on an empty store: zero components, still a valid envelope, exit 0', () => {
   const cwd = tmpCwd();
   assert.equal(run(cwd, ['init']).status, 0);
