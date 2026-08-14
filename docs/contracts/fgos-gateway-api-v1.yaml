@@ -27,9 +27,12 @@ info:
         a separate subsystem with its own delivery-semantics record.
         Clients poll `data_hash` on read endpoints until CTR008 lands.
       - Identity here is ATTRIBUTION, not authentication (same non-goal
-        CTR001 already states for the CLI's own `writer` field): this
-        gateway does not gate who may call it — that is STR38, explicitly
-        out of scope of 0014 itself.
+        CTR001 already states for the CLI's own `writer` field): every
+        route below other than `/contract` itself requires the shared
+        per-machine bearer token (D4, `securitySchemes.bearerAuth`) — that
+        token gates ACCESS to the gateway, not per-caller IDENTITY. Who a
+        caller claims to be beyond holding that one shared token is STR38,
+        explicitly out of scope of 0014 itself.
 
     Envelope reuse: every successful response body is the SAME `fgos.v1`
     envelope (CTR001) the CLI already emits on stdout — `{contract,
@@ -58,6 +61,13 @@ servers:
       port:
         default: "4170"
 
+# tsk-4qf: every operation inherits this (D4's real, already-enforced
+# require_token gate) unless it overrides with its own `security: []` --
+# today only `/contract` does, since a client has to read the contract
+# before it can know a token is even required.
+security:
+  - bearerAuth: []
+
 tags:
   - name: work
     description: Work-item lifecycle (read + write), one-to-one with `fgos list/show/submit/move/ask/answer` etc.
@@ -82,6 +92,7 @@ paths:
         able to read the contract before it can know a token is even
         required (D4). Never wrapped in the `fgos.v1` envelope: this is the
         spec document itself, not a poll of fgOS state.
+      security: []
       responses:
         '200':
           description: OK
@@ -567,6 +578,19 @@ paths:
           $ref: '#/components/responses/Error'
 
 components:
+  securitySchemes:
+    # tsk-4qf: matches require_token's own real enforcement (D4) -- one
+    # shared token per machine, read from ~/.fgos/config.json's
+    # gateway.token, checked as a plain Bearer header (not a per-user
+    # credential; see this document's own top-level "Identity here is
+    # ATTRIBUTION, not authentication" note).
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: |
+        The one shared per-machine token (D4). Every route below this
+        component list requires it except `/contract`, which overrides
+        with its own `security: []`.
   parameters:
     WorkId:
       name: id
