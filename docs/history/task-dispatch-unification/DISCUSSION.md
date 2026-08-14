@@ -52,7 +52,7 @@ thể nào cần sửa lại theo hướng này (`gather`, `fgos-fanout`, `fgos-
 | # | Vấn đề | Trạng thái |
 |---|---|---|
 | 1 | `judge-discovery`/`judge-decompose` cùng khai `for:"judge"` — `resolveCapacityIdForPurpose` (dispatch.mjs:666) chỉ trả entry ĐẦU TIÊN khớp, nên `judge-decompose` không bao giờ được purpose-lookup chọn, chỉ tới được qua gọi thẳng id. | **CHƯA RÕ** — cố ý (mỗi skill tự biết gọi đúng id, `for` chỉ để gom nhóm/tài liệu hoá) hay gap chưa ai để ý — cần đọc lịch sử `judge-discovery`/`judge-decompose` riêng trước khi kết luận. |
-| 2 | Cần 1 prose/skill helper CHUNG làm "ngõ vào" dispatch cho MỌI producer nội bộ (research, fanout, tương lai) — không phải mỗi producer tự viết lại logic gọi dispatch. | **MỚI NÊU (vòng 1)**, chưa qua vòng xác nhận thứ 2 — chưa mint D-ID theo đúng hard rule của skill này. Bằng chứng ủng hộ đã có: `fgos-researching` đã phải viết lại `decide --for`/`resolve --for` ngay trong SKILL.md của nó thay vì gọi `_shared/capacity-dispatch-fallback.md`, vì fragment đó viết cho `<CAPACITY_ID>` cố định, chưa support purpose-based lookup khi `tsk-2ie5` thêm `for`/`needs`. |
+| 2 | Cần 1 prose/skill helper CHUNG làm "ngõ vào" dispatch cho MỌI producer nội bộ (research, fanout, tương lai) — không phải mỗi producer tự viết lại logic gọi dispatch. | **ĐANG SHAPE (vòng 1→3)**, chưa mint D-ID — 3 phát hiện/sub-quyết định vòng 3, cần giữ qua ≥1 vòng nữa: (i) `decide` đã tự gộp "config check" (trả `unavailable` nếu không đăng ký) — Step A của fragment cũ làm lại việc thừa; fragment mới nên rút còn 3 bước (`decide` → in-process hand-back / out-of-process gọi `execute` D5) — phụ thuộc D5 landed trước mới viết đúng hình cuối, không thì phải viết lại lần 2; (ii) purpose-based lookup (`--for <purpose>`) ĐÃ có sẵn ở cả `decide`/`resolve` — chỉ cần fragment THÊM TÀI LIỆU, không cần code mới; (iii) work-item-shaped lookup (cho fanout) chưa có cửa CLI — `capacityIdForWork` module-private, Flow-B-only — **chọn hướng (a): export hàm + thêm cờ CLI mới** (`decide --work <id>`) thay vì để fanout tự tính lại logic domain→skill (rủi ro DRY-drift). |
 | 3 | Hợp đồng "muốn chạy 1 task thì gọi dispatch" nên được tuyên bố Ở TẦNG HARNESS (`AGENTS.md`), như 1 khối MUST/NEVER giống `CLAUDE.md`'s GitNexus block — để agent NGOÀI luồng 1 skill cụ thể cũng tự biết cửa vào, không cần đợi skill nạp prose. | **MỚI NÊU (vòng 1)**, ngay sau #2, cùng vòng — chưa qua vòng xác nhận riêng, chưa mint D-ID. Khác biệt với #2: #2 là producer NỘI BỘ (đã có skill chủ động gọi), #3 là phủ trường hợp CHUNG (agent bất kỳ, ngoài skill catalog fgOS). |
 
 ## 4. Quyết định đã chốt
@@ -153,6 +153,16 @@ thể nào cần sửa lại theo hướng này (`gather`, `fgos-fanout`, `fgos-
   `fgos-researching`'s SKILL.md — không giữ bảo hiểm cho 1 nhánh không còn kỳ
   vọng quay lại. 4 quyết định này gộp vào scope thực thi của D6, không mint
   D-ID riêng (chi tiết thực thi, không phải quyết định kiến trúc mới).
+- **Vòng 3, đoạn a.** Người dùng chọn đào tiếp item mở #2 (shared prose
+  helper). Scout `decideCapacityCli`/`decideCapacityDispatchMechanism`
+  (dispatch.mjs:800-825) — phát hiện `decide` đã tự gộp sẵn "config check"
+  (Step A của fragment cũ dư thừa), nhưng KHÔNG check presence (Step B vẫn cần
+  — presence chỉ nằm trong `resolve`). Trình bày phương án rút fragment còn 3
+  bước 1 khi D5 landed, xác nhận purpose-based lookup đã có sẵn (chỉ thiếu tài
+  liệu), và nêu lỗ hổng work-item-shaped lookup (`capacityIdForWork` module-
+  private) — hỏi hướng (a) export+cờ CLI mới vs (b) fanout tự tính lại.
+- **Vòng 3, đoạn b.** Người dùng chọn **(a)**. Vòng đầu của quyết định cụ thể
+  này — chưa mint D-ID, cần giữ qua ≥1 vòng nữa theo đúng hard rule.
 
 ## 6. Thiết kế đã chốt {#design}
 
