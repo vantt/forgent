@@ -2,14 +2,18 @@
 
 ## 1. Trạng thái hiện tại
 
-Round 3 xong (2026-08-14, người xác nhận trực tiếp). Cả 2 câu hỏi mở của
-round 2 đã được người quyết: (1) chốt scope đúng như fable đề xuất — làm
-refactor JS ngay, không chờ quyết định Rust, không mở rộng ra ngoài
-merge cluster; (2) `session-identity.mjs` dời vào `src/util/`. Cả 2 đã mint
-D-ID (D1, D2, §4) và ghi qua `fgos decision --id tsk-49i`. §6/§7 đã viết đầy
-đủ bên dưới. Discussion coi như hội tụ — bước kế tiếp là terminal handoff
-sang `fgos-coding-exploring` rồi `fgos-coding-planning` (native-first, cùng
-phiên) để ra plan implement thật.
+Round 4 đang mở (2026-08-14). Round 3 tưởng đã hội tụ (D1/D2 chốt, §6/§7 viết
+xong) nhưng người nêu thêm 1 gray-area thật: `bin/fgos.mjs` không phải thin
+CLI adapter — nó tự tính `driftStatus` inline, tự định nghĩa predicate Iron
+Law inline, tự chứa business rule (milestone drift guard) inline, và tự
+quyết định orchestration (merge next đệ quy sang sync-root/approve) ngay
+trong file CLI — vi phạm SRP/hexagonal boundary mà D1's cắt-cycle không sửa.
+Người xác nhận mở lại scope (D3, supersede phần "no widening" của D1 —
+chỉ trên trục CLI-layer SRP cho ĐÚNG cluster verb đã có, không mở sang
+module khác). §6/§7 hiện đang STALE (viết cho scope round-3, chưa phản ánh
+D3) — sẽ regenerate sau khi round 4 (fable, đọc trọn `approve`/`sync-root`/
+`catchup`/`review`/`promote-to-component`/`reject`) đề xuất thiết kế
+use-case/application layer cụ thể.
 
 ## 2. Mục tiêu & đề bài
 
@@ -41,13 +45,16 @@ refactor thật.
 | 8 | `root-affinity.mjs` là file PURE (không fs, không child_process) dù nằm trong `runner/` | Rõ | Cycle là cycle cấp folder, không phải cấp purity — 2 harness import nó không kéo theo I/O nào |
 | 9 | `src/state/tool-registry.mjs` cũng shell git (`git rev-parse HEAD`, L197) | Rõ (mới, round 1 sót) | Không tạo cạnh `state→runner` (tự shell trực tiếp), nhưng phải xếp vào nhóm git-I/O khi port — không nằm trong pure cluster |
 | 10 | `session-identity.mjs` dời về đâu: `src/util/` (tái dùng, nhưng util hết còn all-pure) hay folder hạ tầng mới | **Rõ — D2** | Người quyết: `src/util/`. Contract thật của `util/` là leaf-module + không import nội bộ, không phải "100% pure" — session-identity khớp contract thật |
+| 11 | `bin/fgos.mjs` có phải thin adapter không, hay tự ôm business logic | **Rõ — D3 mở scope, thiết kế chưa có** | Có ôm thật: `driftStatus` tính inline (2 chỗ), `wouldTripIronLaw` predicate inline, milestone-drift-guard business rule inline, orchestration decision (`merge next` đệ quy) inline. Cần thiết kế use-case/application layer cụ thể — chưa có, chờ round 4 |
+| 12 | Use-case layer đặt tên/vị trí file thế nào, verb nào cần 1 use-case function riêng, hàm nào giữ nguyên ở `bin/fgos.mjs` (chỉ argv-parsing thật) | Chưa rõ — chờ round 4 | Cần đọc trọn `approve` (741 dòng, L3254-3995), `review`, `sync-root`, `catchup`, `reject`, `promote-to-component` — chưa đọc hết trong buổi round 1-3 |
 
 ## 4. Quyết định đã chốt
 
 | D-ID | Quyết định | Lý do |
 |---|---|---|
-| D1 | Land đúng 4-cạnh-cắt (drift-status nhận `trunk` qua tham số; dời `session-identity.mjs`; dời `resolveRoot` về `frontier.mjs`) + helper `iron-law-gate.mjs` mới + dời `isMainWorktree`/`detectTrunk` sang `worktree.mjs` — làm NGAY như 1 refactor JS thuần, không phụ thuộc thời điểm port Rust. Không mở rộng ra ngoài merge cluster trong item này. | Thay đổi nội bộ JS thuần, 0 đổi CLI contract, tự có giá trị (giết cycle + giết copy-paste) bất kể có/khi nào port Rust. Mở rộng scope không cần thiết để đạt acyclic (fable đã verify round 2) |
+| D1 | Land đúng 4-cạnh-cắt (drift-status nhận `trunk` qua tham số; dời `session-identity.mjs`; dời `resolveRoot` về `frontier.mjs`) + helper `iron-law-gate.mjs` mới + dời `isMainWorktree`/`detectTrunk` sang `worktree.mjs` — làm NGAY như 1 refactor JS thuần, không phụ thuộc thời điểm port Rust. **Phần "không mở rộng ra ngoài merge cluster" bị D3 supersede một phần** (xem D3) — vẫn đúng cho việc KHÔNG đụng module khác (`session.mjs`, `goal-check.mjs`...), nhưng scope CLI-layer trong đúng cluster này đã mở rộng thêm. | Thay đổi nội bộ JS thuần, 0 đổi CLI contract, tự có giá trị (giết cycle + giết copy-paste) bất kể có/khi nào port Rust. Mở rộng scope không cần thiết để đạt acyclic (fable đã verify round 2) |
 | D2 | `session-identity.mjs` dời vào `src/util/`, không tách `src/platform/` mới | Contract thật của `util/` là leaf + không import nội bộ + mọi layer import được — session-identity khớp sẵn. Việc 2 file hiện có tình cờ pure không phải contract đã ghi. Ranh giới port thật (pure/fs/git-I/O, §5) độc lập với tên folder — tách `platform/` chỉ để giữ vẻ sạch cho `util/` là quay lại đúng lối tư duy "boundary theo tên folder" vừa bỏ, không đổi acyclicity. 1 file không đáng 1 folder mới (YAGNI) |
+| D3 | Mở lại scope D1 (chỉ trên trục CLI-layer SRP): `tsk-49i` giờ cũng bao gồm tách logic nghiệp vụ đang nằm inline trong `bin/fgos.mjs`'s case `merge`/`approve`/`review`/`sync-root`/`catchup`/`reject`/`promote-to-component` ra 1 tầng application/use-case riêng, để `bin/fgos.mjs` chỉ còn parse args → gọi 1 use-case function → format JSON `fgos.v1`. Ranh giới "không đụng module khác ngoài cluster" của D1 vẫn giữ nguyên. | Người phát hiện `bin/fgos.mjs` tự tính `driftStatus`, tự định nghĩa predicate Iron Law, tự chứa business rule milestone-drift, tự quyết định orchestration — D1's cắt-cycle không sửa được gray-area SRP này. Gộp vào cùng item vì cùng đúng những case block D1 đã lên kế hoạch sửa, tránh phải quét lại lần 2 |
 
 ## 5. Q&A log
 
@@ -316,7 +323,38 @@ Q: Có thể làm refactor JS trước, không chờ quyết định Rust không
 A: Xác nhận cả 2 — làm refactor JS ngay (D1), `session-identity.mjs` vào
 `src/util/` (D2). Lý do đầy đủ ghi trong §4. Discussion hội tụ.
 
+**[Round 4 — mở lại scope, người xác nhận, 2026-08-14]**
+
+Q: `bin/fgos.mjs` chỉ là verb wrapper (handle input, gọi module, format
+output), hay tự ôm business logic luôn?
+
+A (scout thật, có bằng chứng — xem §3 hàng 11):
+
+- `bin/fgos.mjs` KHÔNG phải thin adapter cho cụm verb liên quan tới merge.
+  Bằng chứng: `driftStatus` tính inline ở 2 case (`merge` L2433, `approve`
+  L3348) thay vì gọi qua 1 use-case function; `wouldTripIronLaw` (L2467) là
+  1 predicate business tự định nghĩa ngay trong case `merge`; milestone
+  drift guard (L3347-3354, case `approve`) là 1 rule nghiệp vụ trọn vẹn
+  sống thẳng trong file CLI, không nằm module nào; `merge next` tự quyết
+  định đệ quy sang `sync-root` hay `approve` — orchestration logic, không
+  phải input-handling.
+- Đúng khung hexagonal, `bin/fgos.mjs` đáng lẽ chỉ là driving adapter: parse
+  argv/flags → gọi 1 hàm application/use-case → format JSON `fgos.v1`.
+  Repo hiện KHÔNG có tầng use-case — code nhảy thẳng CLI file xuống
+  domain/infra module.
+- Case `approve` là 741 dòng (L3254-3995) — chưa đọc hết trong round 1-3,
+  cần fable round 4 đọc trọn trước khi thiết kế cụ thể.
+
+Người xác nhận: mở lại scope (D3) để gộp use-case-layer design vào cùng
+item này, đúng cluster verb (`merge`/`approve`/`review`/`sync-root`/
+`catchup`/`reject`/`promote-to-component`), không mở sang module khác.
+§6/§7 dưới đây đang STALE (viết cho scope round-3) — chờ fable round 4 đọc
+trọn các case block còn lại rồi viết lại.
+
 ## 6. Thiết kế đã chốt {#design}
+
+*(STALE — nội dung dưới đây phản ánh scope round 3, chưa gồm D3's use-case
+layer. Sẽ regenerate toàn bộ sau round 4.)*
 
 **Vấn đề.** `src/state/` và `src/runner/` cross-import 2 chiều (4 cạnh
 `state → runner`, 7 file `runner → state`) — không phải layer 1 chiều, nên
