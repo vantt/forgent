@@ -575,19 +575,28 @@ export function classifyDecisionIndexCollision(repoRoot) {
 }
 
 /** The next free 4-digit decision id after every id already present on
- * `ref`'s `docs/decisions/` (the index file itself, id "0000", excluded --
- * it is the index, never a decision record). Mirrors the how-to's own "read
- * the highest existing number on disk and add one" rule, just against
- * `ref` (always `HEAD`/main here, per this function's only caller) instead
- * of a person reading it by hand. */
-export function nextFreeDecisionId(repoRoot, ref) {
-  const files = git(repoRoot, ['ls-tree', '-r', '--name-only', ref, '--', 'docs/decisions/'])
-    .split('\n').filter(Boolean);
+ * `refs` -- a single ref, or an array of refs when more than one tree's
+ * decision files must be considered together (tsk-2iz: the auto-resolve
+ * path below needs BOTH the target's own `HEAD` and the incoming `branch`'s
+ * own new decision files, never `HEAD` alone -- a branch can carry new,
+ * non-colliding decision files ABOVE `HEAD`'s own max that `HEAD`-only
+ * would never see, minting an id that then collides with one of those
+ * files). The index file itself, id "0000", is excluded from every ref --
+ * it is the index, never a decision record. Mirrors the how-to's own "read
+ * the highest existing number on disk and add one" rule, generalized to
+ * consider every tree that could hold a colliding number, instead of a
+ * person reading just one tree by hand. */
+export function nextFreeDecisionId(repoRoot, refs) {
+  const refList = Array.isArray(refs) ? refs : [refs];
   let max = 0;
-  for (const f of files) {
-    const m = f.match(DECISION_FILE_RE);
-    if (m && m[1] !== '0000') {
-      max = Math.max(max, parseInt(m[1], 10));
+  for (const ref of refList) {
+    const files = git(repoRoot, ['ls-tree', '-r', '--name-only', ref, '--', 'docs/decisions/'])
+      .split('\n').filter(Boolean);
+    for (const f of files) {
+      const m = f.match(DECISION_FILE_RE);
+      if (m && m[1] !== '0000') {
+        max = Math.max(max, parseInt(m[1], 10));
+      }
     }
   }
   return String(max + 1).padStart(4, '0');
@@ -690,7 +699,13 @@ export function autoResolveDecisionIndexCollision(repoRoot, branch, classificati
     .split('\n').filter(Boolean);
 
   const idRenames = new Map();
-  let nextId = nextFreeDecisionId(repoRoot, 'HEAD');
+  // tsk-2iz: HEAD alone is not enough -- a branch forked when HEAD's max
+  // was 0040, writing 0041 and 0042 of its own, still collides with a 0041
+  // HEAD independently landed. nextFreeDecisionId(HEAD) alone would return
+  // 0042 and rename the branch's colliding 0041 to 0042 -- straight into
+  // the branch's OWN already-clean, non-colliding 0042. Considering both
+  // trees is what actually finds a number neither side has used yet.
+  let nextId = nextFreeDecisionId(repoRoot, ['HEAD', branch]);
   for (const oldId of classification.collidingIds) {
     const theirsFile = branchFiles.find((f) => {
       const m = f.match(DECISION_FILE_RE);
@@ -1185,8 +1200,25 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
     // attempted for any other conflict shape, and never left half-resolved
     // on any failure along this path (falls through to the exact same
     // abort below).
-    const classification = classifyDecisionIndexCollision(repoRoot);
-    if (classification && autoResolveDecisionIndexCollision(repoRoot, branch, classification)) {
+    //
+    // tsk-2iz: classifyDecisionIndexCollision/autoResolveDecisionIndexCollision
+    // both do real fs/git work (reads, `git mv`) that can throw on a genuine
+    // unexpected failure -- distinct from `autoResolveDecisionIndexCollision`
+    // RETURNING false, its own documented "doesn't match the expected shape,
+    // fall back safe" case. A throw here must never propagate straight out
+    // of this function: that would skip the abort below entirely, leaving
+    // MERGE_HEAD and any partial `git mv` renames staged in the shared main
+    // checkout for the caller to trip over later. Caught here so it falls
+    // through to the exact same abort-and-report path as every other exit.
+    let resolved = false;
+    let resolveErr = null;
+    try {
+      const classification = classifyDecisionIndexCollision(repoRoot);
+      resolved = Boolean(classification) && autoResolveDecisionIndexCollision(repoRoot, branch, classification);
+    } catch (thrown) {
+      resolveErr = thrown;
+    }
+    if (resolved) {
       selfResolved = true;
     } else {
       // tsk-18a D1: MERGE_HEAD only exists when git actually staged a real
@@ -1201,6 +1233,13 @@ async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
         abortMergeIfPossible(repoRoot);
       } catch (abortErr) {
         throw new MergeError(`merge of "${branch}" failed and "git merge --abort" itself failed: ${abortErr.message}`, { branch });
+      }
+      if (resolveErr) {
+        return {
+          outcome: 'merge-failed-unclassified',
+          branch,
+          error: { message: `decision-index auto-resolve failed: ${resolveErr.message}`, stderr: resolveErr.stderr ?? null, status: resolveErr.status ?? null },
+        };
       }
       if (genuineConflict) {
         return { outcome: 'conflict', branch };
