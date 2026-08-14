@@ -892,10 +892,19 @@ pub fn build_router(gateway: Arc<dyn VerbGateway>, config: GatewayConfig, root: 
         .nest_service("/mcp", mcp_service)
         .route_layer(middleware::from_fn_with_state(state.clone(), require_token));
 
-    Router::new()
+    // tsk-4uh: the contract's `servers.url` (docs/contracts/fgos-gateway-
+    // api-v1.yaml:54-59) and this file's own startup log (`run`, below) both
+    // already advertise `/v1` -- nesting the whole api router (contract +
+    // authenticated together) under it here is what makes the code agree
+    // with both instead of being the lone outlier. Nesting is pure path
+    // prefixing (no layer is added or removed by `.nest`), so `/contract`
+    // keeps sitting outside `authenticated`'s `require_token` layer exactly
+    // as before, just reachable at `/v1/contract` instead of `/contract`.
+    let api = Router::new()
         .route("/contract", get(get_contract))
-        .merge(authenticated)
-        .with_state(state)
+        .merge(authenticated);
+
+    Router::new().nest("/v1", api).with_state(state)
 }
 
 /// Runs the gateway to completion (i.e. forever, until the process is
@@ -1003,7 +1012,7 @@ mod tests {
         let response = app
             .oneshot(
                 Request::builder()
-                    .uri("/work/--force")
+                    .uri("/v1/work/--force")
                     .header(axum::http::header::AUTHORIZATION, "Bearer test-token")
                     .body(Body::empty())
                     .unwrap(),
@@ -1036,7 +1045,7 @@ mod tests {
         use tower::ServiceExt;
 
         let response = app
-            .oneshot(Request::builder().uri("/ready").body(Body::empty()).unwrap())
+            .oneshot(Request::builder().uri("/v1/ready").body(Body::empty()).unwrap())
             .await
             .unwrap();
         // tsk-4qf: 401, not the category table's own 400 -- a distinct
@@ -1056,7 +1065,7 @@ mod tests {
         let response = app
             .oneshot(
                 Request::builder()
-                    .uri("/ready")
+                    .uri("/v1/ready")
                     .header(axum::http::header::AUTHORIZATION, "Bearer test-token")
                     .body(Body::empty())
                     .unwrap(),
@@ -1078,7 +1087,7 @@ mod tests {
         let response = app
             .oneshot(
                 Request::builder()
-                    .uri("/ready")
+                    .uri("/v1/ready")
                     .header(axum::http::header::AUTHORIZATION, "Bearer test-token")
                     .body(Body::empty())
                     .unwrap(),
@@ -1101,7 +1110,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method("POST")
-                    .uri("/work")
+                    .uri("/v1/work")
                     .header(axum::http::header::AUTHORIZATION, "Bearer test-token")
                     .header(axum::http::header::CONTENT_TYPE, "application/json")
                     .body(Body::from("{not valid json"))
@@ -1132,7 +1141,7 @@ mod tests {
         let response = app
             .oneshot(
                 Request::builder()
-                    .uri("/work?limit=not-a-number")
+                    .uri("/v1/work?limit=not-a-number")
                     .header(axum::http::header::AUTHORIZATION, "Bearer test-token")
                     .body(Body::empty())
                     .unwrap(),
@@ -1161,7 +1170,7 @@ mod tests {
         use tower::ServiceExt;
 
         let response = app
-            .oneshot(Request::builder().uri("/contract").body(Body::empty()).unwrap())
+            .oneshot(Request::builder().uri("/v1/contract").body(Body::empty()).unwrap())
             .await
             .unwrap();
         assert_eq!(response.status(), StatusCode::OK);
@@ -1181,7 +1190,7 @@ mod tests {
         let unauth_gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({})) });
         let unauth_app = build_router(unauth_gateway, test_config(), PathBuf::from("/tmp"));
         let response = unauth_app
-            .oneshot(Request::builder().method("POST").uri("/mcp").body(Body::empty()).unwrap())
+            .oneshot(Request::builder().method("POST").uri("/v1/mcp").body(Body::empty()).unwrap())
             .await
             .unwrap();
         assert_eq!(
@@ -1196,7 +1205,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method("POST")
-                    .uri("/mcp")
+                    .uri("/v1/mcp")
                     .header(axum::http::header::AUTHORIZATION, "Bearer test-token")
                     .header(axum::http::header::CONTENT_TYPE, "application/json")
                     .header("Mcp-Protocol-Version", "2025-06-18")
