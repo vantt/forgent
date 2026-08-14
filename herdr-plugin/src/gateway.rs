@@ -316,6 +316,26 @@ fn wait_with_timeout(
     }
 }
 
+/// tsk-og6: builds the exact `Command` `spawn_fgos_verb` runs, split out so
+/// its `current_dir` is directly testable (`Command::get_current_dir`)
+/// without spawning a real `node` process. `--dir <root>` alone is not
+/// enough — `session start/end/list/gc` and `move --to delivered`'s
+/// unmerged-branch guard both resolve their own repo root from
+/// `process.cwd()` instead of reading `--dir` (`bin/fgos.mjs:4559,1497`),
+/// so the spawned child's OWN working directory has to agree with `root`
+/// too, or those two verbs silently act on wherever the gateway process
+/// happened to be launched from.
+fn build_fgos_command(root: &Path, args: &[String]) -> std::process::Command {
+    let mut cmd_args: Vec<String> = vec![root.join("bin/fgos.mjs").to_string_lossy().to_string()];
+    cmd_args.extend(args.iter().cloned());
+    cmd_args.push("--dir".to_string());
+    cmd_args.push(root.to_string_lossy().to_string());
+
+    let mut cmd = std::process::Command::new("node");
+    cmd.args(&cmd_args).current_dir(root).stdin(Stdio::null());
+    cmd
+}
+
 /// D7: the sole function that ever spawns `fgos <verb>` on the gateway's
 /// behalf. `args` is everything after the binary path (verb + its own
 /// flags) — `--dir <root>` is appended here, once, so no call site can
@@ -329,14 +349,10 @@ fn wait_with_timeout(
 /// `VERB_SPAWN_TIMEOUT` via `wait_with_timeout` instead of a bare
 /// `.output()` — a wedged verb can no longer pin this thread forever.
 pub fn spawn_fgos_verb(root: &Path, args: &[String]) -> Result<Value, GatewayError> {
-    let mut cmd_args: Vec<String> = vec![root.join("bin/fgos.mjs").to_string_lossy().to_string()];
-    cmd_args.extend(args.iter().cloned());
-    cmd_args.push("--dir".to_string());
-    cmd_args.push(root.to_string_lossy().to_string());
-
-    let child = std::process::Command::new("node")
-        .args(&cmd_args)
-        .stdin(Stdio::null())
+    // tsk-og6 + tsk-4lf combined: build_fgos_command's own current_dir(root)
+    // still applies to the piped/spawned child wait_with_timeout needs --
+    // current_dir and the timeout wrapper are orthogonal, both required.
+    let child = build_fgos_command(root, args)
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()
@@ -929,6 +945,13 @@ pub fn run(root: PathBuf) -> std::io::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn build_fgos_command_runs_in_root_not_the_ambient_process_cwd() {
+        let root = PathBuf::from("/tmp/fgos-gateway-test-root");
+        let cmd = build_fgos_command(&root, &["list".to_string()]);
+        assert_eq!(cmd.get_current_dir(), Some(root.as_path()));
+    }
 
     #[test]
     fn wait_with_timeout_kills_a_process_that_outlives_the_deadline() {
