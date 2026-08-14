@@ -416,8 +416,14 @@ function checkToolRegistryConfigured(cwd) {
   if (posture === 'full') {
     return { passed: true, message: `full — ${presentCount}/${registeredCount} registered tool(s) present` };
   }
+  // tsk-3oa2: degraded used to report passed:true, the same as full --
+  // meaning AGENTS.md's impact-analysis capability gate's own "Degraded"
+  // branch (a tool registered but not present, or present but stale) had
+  // no doctor signal a person would ever see flagged. A registered tool
+  // that is missing or was never checked here is a real gap, not a clean
+  // skip the way "nothing registered at all" (inactive) is.
   return {
-    passed: true,
+    passed: false,
     message: `degraded — ${presentCount}/${registeredCount} registered tool(s) present (${missingCount} missing, ${unknownCount} never checked — run fgos tool check)`,
   };
 }
