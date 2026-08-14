@@ -155,9 +155,6 @@ paths:
         Derives title/tier/kind/risk and auto-classifies domain. This is
         the one gateway-side write that creates state that did not exist
         before — every other write endpoint below acts on an existing id.
-      parameters:
-        - $ref: '#/components/parameters/WriterId'
-        - $ref: '#/components/parameters/WriterRole'
       requestBody:
         required: true
         content:
@@ -212,9 +209,6 @@ paths:
       operationId: moveWork
       tags: [work]
       summary: Move a work item through the status FSM (wraps `fgos move`)
-      parameters:
-        - $ref: '#/components/parameters/WriterId'
-        - $ref: '#/components/parameters/WriterRole'
       requestBody:
         required: true
         content:
@@ -236,9 +230,6 @@ paths:
       operationId: askWork
       tags: [work]
       summary: Park an item in awaiting-human with a question (wraps `fgos ask`)
-      parameters:
-        - $ref: '#/components/parameters/WriterId'
-        - $ref: '#/components/parameters/WriterRole'
       requestBody:
         required: true
         content:
@@ -259,9 +250,6 @@ paths:
       operationId: answerWork
       tags: [work]
       summary: Answer a parked question and resume the item (wraps `fgos answer`)
-      parameters:
-        - $ref: '#/components/parameters/WriterId'
-        - $ref: '#/components/parameters/WriterRole'
       requestBody:
         required: true
         content:
@@ -282,8 +270,6 @@ paths:
       operationId: takeWork
       tags: [work]
       summary: Claim an item through the pull door (wraps `fgos take`/`fgos pick`)
-      parameters:
-        - $ref: '#/components/parameters/WriterId'
       requestBody:
         content:
           application/json:
@@ -306,8 +292,6 @@ paths:
       operationId: returnWork
       tags: [work]
       summary: Complete a take — run verify, advance to awaiting-approval (wraps `fgos return`)
-      parameters:
-        - $ref: '#/components/parameters/WriterId'
       responses:
         '200': { $ref: '#/components/responses/WorkOk' }
         default: { $ref: '#/components/responses/Error' }
@@ -320,8 +304,6 @@ paths:
       tags: [work]
       summary: Merge an awaiting-approval item and move it to delivered (wraps `fgos approve`)
       description: "Carries `externalEffect: true` in the CLI's own verb registry (may open/merge a real PR) — same meaning here."
-      parameters:
-        - $ref: '#/components/parameters/WriterId'
       responses:
         '200': { $ref: '#/components/responses/WorkOk' }
         default: { $ref: '#/components/responses/Error' }
@@ -333,8 +315,6 @@ paths:
       operationId: rejectWork
       tags: [work]
       summary: Reject an awaiting-approval item back to todo (wraps `fgos reject`)
-      parameters:
-        - $ref: '#/components/parameters/WriterId'
       requestBody:
         required: true
         content:
@@ -455,8 +435,6 @@ paths:
         herdr/TUI pane does today by shelling out directly. A future
         web/desktop client drives the same lifecycle through this route
         instead of spawning its own git worktree.
-      parameters:
-        - $ref: '#/components/parameters/WriterId'
       requestBody:
         content:
           application/json:
@@ -489,7 +467,6 @@ paths:
       tags: [orchestration]
       summary: Close an interactive session worktree (wraps `fgos session end`)
       parameters:
-        - $ref: '#/components/parameters/WriterId'
         - name: force
           in: query
           schema: { type: boolean, default: false }
@@ -607,26 +584,6 @@ components:
       name: limit
       in: query
       schema: { type: integer, minimum: 1 }
-    WriterId:
-      name: X-Fgos-Writer-Id
-      in: header
-      required: false
-      schema: { type: string }
-      description: |
-        Attribution only (not authentication — see this contract's own
-        top-level description). Forwarded into the underlying CLI call's
-        `writer.id`; a caller that omits it gets whatever the daemon
-        process itself resolves (env/pid), same as an unidentified CLI
-        caller today.
-    WriterRole:
-      name: X-Fgos-Writer-Role
-      in: header
-      required: false
-      schema:
-        type: string
-        enum: [human, runner, session, system]
-      description: Forwarded into the underlying CLI call's `role` field (CTR001).
-
   responses:
     WorkOk:
       description: OK
