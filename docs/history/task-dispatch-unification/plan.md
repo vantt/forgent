@@ -170,6 +170,47 @@ resolve đúng tên model trước khi coi piece này đã có proof đầy đ�
   thành mảnh riêng, gộp vào footprint của piece đó khi thực thi (D12 tự
   nói "hệ quả tất yếu của D5, không có phương án khác").
 
+## Feasibility matrix (`fgos-coding-validating` pass)
+
+Rows for the 2 `heavy`-risk pieces (D4, D9) — the only risk-map entries
+flagged medium-or-higher. Evidence gathered live against the real repo,
+impact-analysis posture re-confirmed `full` (GitNexus `status:"present"`,
+re-queried fresh at this pass — matches the posture `fgos-coding-planning`
+already recorded, no drift). Note: GitNexus's own graph index is reported
+stale by this session's tool hook (`last indexed: c0cedaa`) — evidence below
+was gathered by direct `grep`/`Read`, the documented cross-check for exactly
+this situation (`CLAUDE.md`'s impact-analysis gate), not by trusting a
+possibly-stale `impact()` MCP call.
+
+| Assumption | Risk | Proof required | Evidence found | Result |
+|---|---|---|---|---|
+| D4: adding a `decide` call per fanout candidate before firing the Agent batch does not serialize the actual parallel dispatch | heavy | Real read of `fgos-fanout`'s own batching mechanism | `.agents/skills/fgos-fanout/SKILL.md`: batch capped at max 5 members (`hasWorkerSlotRoom`/D8's trim rule); the skill ALREADY runs a serial per-candidate step before firing ("Announce every dispatch before firing it... print one line per candidate", then "for each id in the batch: print its announce line") — the actual Agent-tool fire stays 1 batched parallel message regardless. A `decide` call slots into that same existing serial loop, bounded by the same 5-item cap; it cannot turn the already-parallel fire step sequential. | **PROVEN bounded** — real wall-clock number still needs measuring once code exists (plan.md's own proof point stands for post-implementation), but the *structural* risk ("does this force full serialization") is closed now, not deferred |
+| D9: expanding the model-policy tier vocab 3→5 does not require migrating `work.tier`'s own 3-value classification (`light/standard/heavy`) or touching `decompose.mjs`'s `HEAVY_RISK` gate | heavy | Full blast-radius grep of `modelForTier`/`cfg.models`/`work.tier` outside `dispatch.mjs`, confirm shape | `grep -rn "modelForTier\|cfg\.models\b\|work\.tier\b" src bin --include="*.mjs"` outside `dispatch.mjs`: only 4 files. `loop.mjs` — exactly ONE real `modelForTier` call site (`loop.mjs:1324`, the dry-run dispatch path); every other `tier` reference there is bookkeeping/logging of the EXISTING `work.tier` value, unchanged by this piece. `plan.mjs:974` — carries `work.tier` through to a child spec verbatim, no lookup. `work.mjs:381-383` — validates `work.tier` against `TIERS` (`work.mjs:156`, still `['light','standard','heavy']`), untouched by D9's own text (D9 targets `cfg.modelPolicies`, a NEW config field — never says `work.mjs`'s `TIERS` export changes). `graph-harness.mjs:95` is a doc-comment only, not a code read. | **PROVEN contained**, PROVIDED the 5-tier vocab lives ONLY inside `cfg.modelPolicies` as its own internal concept (decoupled from `work.tier`/`work.risk`'s shared 3-value classification, per `workflow-stage-graphs.mjs:328`'s own comment that the two are "deliberately the SAME vocabulary") — pinned as an assumption below, the reversible reading of D9's own text |
+
+Neither row required asking a person (Gate step 1, tier A): both gaps closed
+by running the real command/read. Cost verdict: **REVERSIBLE** — the D9
+reading taken is the additive, no-migration option; if a future session
+decides `work.tier`/`work.risk`'s own vocab genuinely needs to grow too,
+that is new, separate work with its own decision, not a correction of this
+one.
+
+## Pinned assumptions (added at `fgos-coding-validating`)
+
+- **D9 scope boundary:** `cfg.modelPolicies`'s 5-tier vocab
+  (`lightweight/standard/creative/analytical/critical`) is a NEW, internal
+  concept scoped to model/executor resolution inside `dispatch.mjs` —
+  `work.mjs`'s `TIERS` export (`light/standard/heavy`, shared with
+  `work.risk` per `workflow-stage-graphs.mjs:328`) is NOT touched by
+  `#task-provider-tier-policy`. Whoever executes that piece still owes a
+  mapping from a work item's existing `tier`/a capacity's `rigorOverrides`
+  onto one of the 5 model-policy tiers — that mapping's exact shape is the
+  genuinely open implementation detail, not whether `work.tier` itself
+  changes.
+- **D4 batch bound:** the `decide`-before-fire step must stay inside
+  `fgos-fanout`'s existing per-candidate serial loop (max 5 members per
+  batch, per D8's trim rule) — never a design that adds an unbounded or
+  per-wave-unbounded synchronous pass.
+
 ## Outstanding questions
 
 None
