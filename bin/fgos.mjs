@@ -3018,6 +3018,55 @@ async function runVerb(verb, flags, positional, dir) {
         return { id, from: 'doing', to: 'blocked', source: 'branch', branch, aheadCount: branchAheadCount, passed: false, timedOut: check.timedOut, exitStatus: check.status, output: check.output };
       }
 
+      // tsk-ikd (P44): the branch-source path above already returned before
+      // reaching here, so every path below is main-source -- it reads
+      // `currentHead(repoRoot)`, runs the clean-tree check, verify, and
+      // records `headAtReturn` all against whatever `repoRoot` happens to
+      // be. `approve` (:3355), `sync-root` (:4043), and
+      // `promote-to-component` (:4258) all refuse from a linked worktree for
+      // exactly this hazard class -- verifying/recording a stale or
+      // divergent tree while claiming it verified on main -- but this path
+      // had no such guard. Without it: an item claimed via `take`
+      // (main-source) returned from inside a leftover, UNREGISTERED `fgw/*`
+      // claim worktree instead of main (e.g. left over from a DIFFERENT
+      // item entirely) would pass the progress gate and verify against THAT
+      // worktree's own tree, then record `headAtReturn` as a sha that was
+      // never on main -- `approve`'s later verify-only mode re-verifies on
+      // main and finds it green (main's own HEAD, untouched), and the item
+      // goes `delivered` with its real content never actually on main.
+      // Surfaces only much later, misdiagnosed as a force-push/history-
+      // rewrite loss when cleanup's ancestry check fails.
+      //
+      // A REGISTERED session worktree (`fgos session start`) is deliberately
+      // EXEMPT -- unlike `approve`, which refuses ANY worktree including a
+      // registered session (docs/specs/runner.md: "a session worktree is
+      // structurally the wrong place for a merge-into-main to happen"),
+      // `return`'s own progress check (aheadCount + verify) is spike-proven
+      // correct from inside a session worktree and is documented there as
+      // deliberately unchanged: a session worktree's `.fgos` is a symlink to
+      // the real shared store (never copied), so state writes land
+      // correctly, and `session end` (session.mjs's own divergence guard)
+      // already refuses to silently discard a dangling commit -- that is
+      // the layer responsible for making sure returned work actually reaches
+      // main, not this one. Only an UNREGISTERED worktree (an ad-hoc `git
+      // worktree add`, or -- the actual failure scenario here -- a
+      // different item's own leftover `fgw/<id>` claim checkout) is refused.
+      // The branch-source path above needs no such guard at all (its own
+      // comment, D2: "tree người là việc của người" -- it never touches
+      // `repoRoot`'s working tree, verify runs in a disposable detached
+      // worktree).
+      const returnCwdReal = realpathOr(repoRoot);
+      const insideRegisteredSession = listSessions(repoRoot).some((session) => {
+        const wtReal = realpathOr(session.worktreePath);
+        return returnCwdReal === wtReal || returnCwdReal.startsWith(`${wtReal}${path.sep}`);
+      });
+      if (!insideRegisteredSession && !isMainWorktree(repoRoot)) {
+        throw new StoreError(
+          'validation',
+          `return: refusing to run from "${repoRoot}" — this is a git worktree (not the main checkout, and not a registered "fgos session start" worktree). Run return from the main checkout, or from inside a registered session.`,
+        );
+      }
+
       if (typeof item.headAtTake !== 'string' || !item.headAtTake) {
         throw new StoreError('validation', `return: work "${id}" has no recorded headAtTake — cannot verify progress since take.`);
       }
