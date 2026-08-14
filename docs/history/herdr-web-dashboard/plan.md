@@ -395,6 +395,203 @@ radius chưa xác nhận, cross-check bằng `rg`).
 READY WITH CONSTRAINTS
 ```
 
+## Kế hoạch riêng của P0a `tsk-54j` (2026-08-14) — area spec
+
+Con này (`docs`, `parent: tsk-ldb`, `deps: [tsk-7l9]`) được tạo sau 5 mảnh
+P1-P5 và vào thẳng stage `planning`, thừa hưởng `CONTEXT.md` của cha chứ
+không lặp lại exploring. Việc của nó: viết `docs/specs/herdr-web-dashboard.md`
+— area spec tech-agnostic, tương đương PRD của repo này — cộng một dòng trỏ
+trong `docs/specs/reading-map.md`.
+
+### Mode: high-risk
+
+**4 flag, trong đó 1 hard-gate.** Đếm lại cho đúng phạm vi con này, không
+thừa hưởng mù con số 8 flag của cha:
+
+| Flag | Bằng chứng |
+|---|---|
+| audit/security *(hard-gate)* | Bản mô tả item (bổ sung 2026-08-13) thêm 6 hành động GHI lên trên phạm vi đã khoá vốn **chỉ-đọc** 3 màn (`CONTEXT.md` §Ranh giới tính năng). D6/D8/D9 thiết kế auth cho một bề mặt chỉ-đọc; approve-merge đổi trạng thái trunk. Mô hình đe doạ được mô tả trong spec này chính là thứ P2-P5 sẽ hiện thực theo |
+| authorization | `docs/io-contract.md` (đã trích trong `CONTEXT.md` §Bằng chứng scout): fgOS **không có tầng phân quyền nào**, có chủ ý. tsk-7l9 D4: một token cho cả máy, không có định danh per-project/per-user. Không có nguyên liệu nào để trả lời "ai được approve-merge" |
+| public contracts | `docs/specs/` là state layer BA-grade; spec này là đầu vào bắt buộc của `tsk-3x6` (bản mô tả tsk-3x6, bổ sung 2026-08-14) và là mô tả sản phẩm mà P2-P5 xây theo |
+| weak proof | Hợp đồng API của gateway (tsk-7l9 D10 — OpenAPI mang số CTR + token `<name>/v<N>`) **chưa tồn tại**: `ls docs/specs/` hôm nay không có file nào như vậy. Spec này phải trỏ tới một hợp đồng chưa được viết. Kèm `impact-analysis: degraded` |
+
+**Vì sao không phải lane nhỏ hơn:** nếu chỉ là chép lại 14 D-ID đã khoá thì
+`small` là đủ. Nhưng 6 hành động ghi mới **chưa từng qua exploring, không
+mang D-ID nào**, và bản mô tả item nói thẳng chúng là *"OPEN requirements to
+spec out, not settled ones"*. Nghĩa là stage này phải tự phán một phần —
+đúng loại việc `small` giả định là không có.
+
+### Approach
+
+#### Đường đã chọn
+
+Một tài liệu, viết theo **đúng khuôn `docs/specs/distillery.md`** — spec duy
+nhất trong thư mục đang dùng trọn bộ heading mà `verify` của item đòi
+(`## Purpose` / `## Entry Points & Triggers` / `## Data Dictionary` /
+`## Behaviors & Operations` / `## Actors & Access` / `## Business Rules` /
+`## Edge Cases Settled` / `## Open Gaps` / `## Pointers`), kèm frontmatter
+`area/updated/sources/decisions/coverage`. `fgos-plugin.md` để purpose ở
+văn xuôi ngay dưới tiêu đề, **không** có heading `## Purpose` — theo khuôn
+đó thì verify đỏ vĩnh viễn. Đây là lý do chọn `distillery.md` làm khuôn.
+
+Nguyên tắc nội dung, chia làm hai lớp tách bạch, không trộn:
+
+1. **Lớp đã khoá** — trích D-ID, không diễn giải lại: 14 D của
+   `CONTEXT.md` (tsk-ldb) + D2/D4/D7/D8/D10 của
+   `docs/history/fgos-interface-daemon/CONTEXT.md` (tsk-7l9).
+2. **Lớp mới, chưa khoá** — 6 hành động ghi. Mỗi phát biểu hoặc (a) tựa
+   được vào một cơ chế CÓ THẬT trong repo hôm nay, và được ghi kèm bằng
+   chứng; hoặc (b) rơi xuống `## Open Gaps`, gọi đúng tên là chưa settled.
+   **Không có ô thứ ba.**
+
+#### Phương án đã cân nhắc và loại
+
+| Phương án | Vì sao loại |
+|---|---|
+| Chỉ spec 3 màn chỉ-đọc đã khoá, bỏ 6 hành động ghi sang item khác | Bản mô tả item liệt kê chúng là yêu cầu bắt buộc phải spec, kèm chỉ dẫn xử lý khi không settle được ("flag this as an Open Gap"). Bỏ ra ngoài là thu hẹp scope thay người |
+| Tự khoá luôn authz cho approve-merge trong spec này | Không có nguyên liệu: fgOS không có tầng phân quyền (`io-contract.md`), tsk-7l9 D4 chỉ có một token cho cả máy. Tự chế một mô hình authz ở đây là mở một quyết định sản phẩm mới dưới vỏ tài liệu |
+| Mô tả endpoint REST cụ thể của gateway trong spec này | tsk-7l9 D10 nói hợp đồng đó là artifact riêng, có số CTR. Bịa hình dạng endpoint ở đây tạo nguồn sự thật thứ hai, đúng thứ D10 dựng ra để tránh |
+| Ghi spec theo hướng embedded-server (D1 cũ của tsk-ldb) | Bản mô tả item ghi rõ nhánh đó **đã đóng** bởi tsk-7l9 D8: web là client độc lập, không nằm trong `herdr-fgos` |
+| Viết cả layout/màu/typography luôn cho gọn | Là phạm vi của `tsk-3x6` (`docs/reference/herdr-web-dashboard-layout.md`). Bản mô tả tsk-54j nói thẳng: *"the concrete visual layout itself belongs to tsk-3x6's UI spec, not here"* |
+
+#### Bản đồ rủi ro
+
+`impact-analysis: degraded` — `fgos tool query --capability impact-analysis
+--status present` hôm nay trả gitnexus `status: present`, nhưng hook trong
+chính phiên này báo index cũ (last indexed `c0cedaa`, sau HEAD đã merge
+main). Item này **không đụng một dòng code nào**, nên posture không chặn
+gì; ghi lại để người đọc sau khỏi dò lại.
+
+| # | Thành phần | Mức | Điều gì chứng minh được |
+|---|---|---|---|
+| RA1 | 6 hành động ghi được tuyên bố "settled" mà không có D-ID nào chống lưng | **Trung bình** | Đọc lại spec: mọi phát biểu trong `## Behaviors & Operations` về hành động ghi phải kèm hoặc một D-ID có thật, hoặc một đường dẫn/verb có thật trong repo; phần còn lại phải nằm dưới `## Open Gaps` |
+| RA2 | authz cho approve-merge bị tự chế | **Trung bình** | `docs/io-contract.md` xác nhận không có tầng phân quyền; tsk-7l9 D4 xác nhận một token/máy. Bằng chứng cơ học kèm theo: `bin/fgos.mjs:3328` — `approve` **từ chối chạy** khi cwd không phải main checkout. Ràng buộc này có thật, phải ghi; còn "ai được phép" thì phải là Open Gap |
+| RA3 | Bịa hình dạng API gateway trong khi hợp đồng của nó chưa tồn tại | **Trung bình** | `ls docs/specs/` hôm nay: không có file OpenAPI/contract nào của gateway. Spec chỉ được trỏ tới nó như một dependency gap đã biết |
+| RA4 | "Delete a work item" được spec như xoá thật | **Trung bình** | Sổ verb (`src/cli/command-registry.mjs`) **không có verb `delete`**; event log là truth append-only. Cửa duy nhất có thật là `move <id> wontfix` (`src/state/status-fsm.mjs:156-169`, ba cửa vào `wontfix` từ `todo`/`doing`/`blocked`, cộng `awaiting-human`). Spec phải nói retire, không nói delete |
+| RA5 | Lệch khuôn heading → verify đỏ vĩnh viễn | **Thấp** | Chính `verify` của item là bằng chứng: đã đo **exit 1** hôm nay (chưa có file); chuyển xanh khi 5 heading + dòng reading-map có mặt |
+| RA6 | Hướng Monday.com/ClickUp lấn sang phạm vi tsk-3x6 | **Thấp** | Đọc lại: nó chỉ được xuất hiện như kỳ vọng phía actor trong `## Behaviors & Operations` (nhóm theo status, thao tác nhanh tại chỗ, lọc/nhóm), tuyệt đối không có kích thước/màu/khoảng cách |
+
+RA1-RA4 đều là medium nên đều mang proof point sang `fgos-coding-validating`
+đúng chuẩn high-risk; không cái nào được để trống.
+
+#### Thứ tự
+
+`fgos graph --json`: tsk-ldb là component **cô lập** (`size 1`), như vòng
+lập kế hoạch của cha đã ghi — thứ tự không lấy được từ graph. Nó đến từ
+`deps` có thật: `tsk-7l9` (`status: retrospective`, tức đã merge) → `tsk-54j`
+→ `tsk-3x6`. P0a phải xong trước vì `tsk-3x6` khai nó là nguồn thông tin sản
+phẩm, và verify của `tsk-3x6` grep đúng đường dẫn `docs/specs/herdr-web-dashboard.md`.
+
+Không chồng lấn footprint với bất kỳ mảnh nào khác: P0a chạm 2 file
+markdown dưới `docs/specs/`, P1-P5 chạm Rust/Node.
+
+### Shape
+
+Một tài liệu, các mục theo đúng thứ tự khuôn `distillery.md`:
+
+- **Frontmatter** — `area: herdr-web-dashboard`, `updated: 2026-08-14`,
+  `sources: [tsk-ldb, tsk-54j, tsk-7l9]`, `decisions:` liệt kê D-ID nguồn,
+  `coverage: partial` (trung thực: 6 hành động ghi chưa khoá hết).
+- **`## Purpose`** — bề mặt này là gì, cho ai, vì sao tồn tại. Ghi rõ nhu
+  cầu gốc: xem/duyệt **từ điện thoại**, đúng lúc không có cockpit nào mở
+  (`CONTEXT.md` §"Vì sao D12"). Ghi rõ **không thay thế TUI**.
+- **`## Entry Points & Triggers`** — điểm vào theo góc người dùng, không
+  phải endpoint: mở dashboard từ trình duyệt (đăng nhập bằng token), mở
+  taskboard, mở một task, mở danh sách câu hỏi cần trả lời. Kèm điều kiện
+  bật/tắt (D10 mặc định BẬT, D13 port 8788, D7 bind).
+- **`## Data Dictionary`** — bảng đánh số các phần tử người dùng thấy:
+  work item, câu hỏi cần trả lời (gộp `ask` + `gate-approve`, D4), lịch sử
+  agent đã làm (D3), phiên đăng nhập, endpoint gateway đang kết nối tới
+  (số nhiều — tsk-7l9 D2, client tương lai nối N gateway).
+- **`## Behaviors & Operations`** — một mục con mỗi việc, đúng khuôn
+  `distillery.md` (**Blocked when / What changes / Side effects /
+  Afterwards**): xem taskboard (kèm kỳ vọng Monday.com/ClickUp), xem task
+  detail, trả lời một câu hỏi đang đỗ, approve-merge, thêm item, sửa item,
+  retire item. Mỗi việc ghi rõ nó đi qua verb một-cửa-ghi nào.
+- **`## Actors & Access`** — bảng năng lực. Trung thực: hôm nay chỉ có
+  **một** actor kỹ thuật ("ai giữ token của máy"), không phân vai, vì
+  fgOS không có tầng phân quyền. Vai người dùng (chủ sản phẩm xem từ điện
+  thoại) là vai **sản phẩm**, không phải vai được hệ thống cưỡng chế —
+  nói thẳng khoảng cách đó.
+- **`## Business Rules`** — R1..Rn, mỗi rule trích nguồn. Trong đó rule
+  chịu lực: mọi hành động ghi đi qua verb một-cửa-ghi của fgOS
+  (`add`/`edit`/`answer`/`approve`/`move`), web **không bao giờ** tự ghi
+  `.fgos/`; gateway là chokepoint duy nhất spawn verb (tsk-7l9 D7).
+- **`## Edge Cases Settled`** — item chưa từng đỗ hỏi lần nào; `docsRef`
+  trỏ thư mục không tồn tại; đóng cockpit không giết dashboard (D12);
+  gateway không với tới được từ client.
+- **`## Open Gaps`** — nơi hạ cánh của RA2/RA3 và mọi phần chưa khoá của 6
+  hành động ghi. Mỗi gap ghi: gap là gì, vì sao chưa trả lời được ở đây,
+  ai/item nào trả lời được.
+- **`## Pointers`** — trỏ về `CONTEXT.md`/`DISCUSSION.md`/`plan.md` của
+  tsk-ldb, `CONTEXT.md` của tsk-7l9, `docs/decisions/0014`, `io-contract.md`,
+  và `tsk-3x6` cho lớp UI.
+
+Cộng **một dòng** vào `docs/specs/reading-map.md` theo đúng nếp đang có
+(`- \`<đường dẫn>\` — <mô tả>; spec: <đường dẫn spec>`).
+
+### Assumptions
+
+| # | Giả định | Nếu sai thì sao |
+|---|---|---|
+| A5 | Khuôn `distillery.md` là khuôn đúng cho spec mới (nó là spec duy nhất dùng trọn bộ heading verify đòi) | Nếu sai thì chỉ là lệch phong cách trong `docs/specs/`, không ảnh hưởng hành vi; verify vẫn xanh |
+| A6 | `coverage: partial` được chấp nhận trong frontmatter (`fgos-plugin.md` dùng `full`) | Nếu vocabulary chỉ cho phép `full`, đổi nhãn — không đổi nội dung, và không được đổi thành `full` khi Open Gaps còn thật |
+| A7 | tsk-7l9 ở `status: retrospective` nghĩa là D1-D10 của nó đã khoá và trích được | Nếu nó bị mở lại, phần trích tsk-7l9 trong spec phải sửa theo — nhưng `retrospective` là sau merge, nên rủi ro thấp |
+
+### Split
+
+**Không tách.** Một tài liệu + một dòng index là một mảnh việc trung thực
+duy nhất; tách ra thì mảnh "dòng reading-map" không tự đứng được (verify
+của nó sẽ phải grep file mà mảnh kia mới tạo). Đây là nhánh
+*pass-through* — `tsk-54j` đi tiếp như chính nó.
+
+### Proof surface
+
+`verify` của item **đã là lệnh thật, không phải placeholder** — không sync
+đè (kỷ luật "không ghi đè giá trị đã đặt có chủ ý"). Đo hôm nay:
+
+| Mệnh đề | Hôm nay |
+|---|---|
+| Cả verify (`test -f` + 5 × `grep -q '^## …'` + `grep -q` reading-map) | **exit 1** — đỏ đúng, file chưa tồn tại |
+
+Chiều xanh có thật vì cả 7 mệnh đề đều là kiểm tra sự tồn tại của văn bản
+mà chính item này viết ra — không có mệnh đề nào phụ thuộc trạng thái ngoài
+tầm với. Không dính lỗi lớp F3 (fail-open) của vòng 1: `test -f` trên một
+file chưa tồn tại thoát khác 0, không phải một filter rỗng thoát 0.
+
+Điều verify này **không** chứng minh (mang sang reality gate của
+`fgos-coding-validating`, không giấu): nó chỉ chứng minh 5 heading có mặt,
+không chứng minh nội dung dưới heading là đúng và có nguồn. Đó chính là lý
+do RA1-RA4 mang proof point đọc-lại-nội-dung, chứ không dựa vào verify.
+
+### Chốt tại cổng validateApprove (2026-08-14, chủ sản phẩm)
+
+Cổng không tự duyệt được: `gate-check` trả `canAutoApprove: false`. Chẩn
+đoán trực tiếp cho thấy tier đã được phủ (`standard` ≤ level `standard`),
+`plan.md` không còn mục mở, cost verdict `REVERSIBLE` — thứ duy nhất chặn
+là **sàn từ-khoá hard-gate** bắn trên chính bản mô tả item: `auth`,
+`authentication`, `migration`, `secret`, `delete`. Sàn này đơn điệu về
+phía hỏi người, không được lập luận hạ xuống.
+
+Hai điểm được hỏi gộp một lượt, cả hai chốt theo đề xuất:
+
+| # | Điểm | Chốt |
+|---|---|---|
+| G1 | **approve-merge từ dashboard** | **Trong scope, ghi rõ phơi nhiễm.** Spec mô tả đủ luồng approve-merge đi qua verb `fgos approve`, kèm một Open Gap nói thẳng: ai giữ token của máy thì approve được, không có phân quyền mịn hơn cho tới STR38. Bằng chứng nền: `docs/io-contract.md:170-171` (tầng phân quyền thuộc STR38, chưa xây), tsk-7l9 D4 (một token/máy), `bin/fgos.mjs:3328` (approve từ chối chạy ngoài main checkout — ràng buộc cơ học có thật, phải ghi) |
+| G2 | **"Delete a work item"** | **Retire qua `wontfix`.** Không có verb `delete` trong sổ verb; event log là truth append-only. Cửa có thật: `move <id> wontfix` (`src/state/status-fsm.mjs:156-169`). Spec viết là *retire*, không viết là *delete*; item biến khỏi danh sách đang mở, lịch sử còn nguyên |
+
+Cả hai đều đảo ngược được (sửa một tài liệu, trước khi P2-P5 viết dòng code
+nào), nên chúng là **nội dung được chốt**, không phải ràng buộc treo.
+
+### Outstanding questions của P0a
+
+None — RA2/RA3 không phải câu hỏi treo của kế hoạch này; chúng là nội dung
+mà `## Open Gaps` của chính spec phải ghi ra, và bản mô tả item đã chỉ dẫn
+đúng cách xử lý ("flag this as an Open Gap in the spec if it cannot be
+resolved within this item's own scope"). G1/G2 ở trên đã chốt phần mà chủ
+sản phẩm cần quyết; phần còn lại (authz mịn, hợp đồng API gateway) hạ cánh
+đúng vào `## Open Gaps` của spec.
+
 ## Outstanding questions
 
 None
