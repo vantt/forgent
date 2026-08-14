@@ -22,7 +22,6 @@
     "capacities": {
       "judge-discovery": {
         "kind": "task",
-        "needs": "llm-judgment",
         "for": "judge",
         "command": "claude",
         "args": [
@@ -38,7 +37,6 @@
       },
       "judge-decompose": {
         "kind": "task",
-        "needs": "llm-judgment",
         "for": "judge",
         "command": "claude",
         "args": [
@@ -55,7 +53,6 @@
       "gather": {
         "kind": "cli",
         "for": "gather",
-        "needs": "prompt-completion",
         "carries": "repo-content",
         "adapter": "cli-spawn",
         "command": "agy",
