@@ -2,11 +2,17 @@
 
 ## 1. Trạng thái hiện tại
 
-Vừa mở discussion (tsk-49i). Một phiên trước (chat, không phải claim) đã quét
-code thật và tìm ra 4 phát hiện cụ thể (xem §5 Q&A log) — chưa có D-ID nào
-chốt, vì chưa qua round thứ 2. Việc kế tiếp: một agent (model `fable`) tiếp
-tục round này — đọc §5, đề xuất thiết kế boundary cụ thể (cạnh nào cắt, hàm
-nào dời đi đâu, thứ tự refactor), scout thêm nếu cần, rồi chốt D-ID + viết §6.
+Round 2 xong (2026-08-14, fable design pass). Toàn bộ bằng chứng round 1 đã
+được re-verify trực tiếp trên code (grep + đọc file thật), có 2 chỗ chỉnh và
+1 phát hiện mới (xem §5 Round 2). Đã có đề xuất thiết kế CỤ THỂ cho cả 4 cạnh
+`state → runner` (không phải 3 — `cleanup-harness.mjs` là cạnh thứ 4), cho
+helper Iron-Law chung, cho việc dời `isMainWorktree`/`detectTrunk` sang
+`worktree.mjs`, và cho target dependency graph acyclic (kèm Mermaid trong §5).
+CHƯA chốt D-ID nào — theo hard rule D4 của skill, đề xuất round 2 phải được
+người xác nhận ở round sau mới được mint. §6/§7 vẫn để trống chờ round đó.
+Còn 2 câu hỏi mở cần người quyết (cuối §5 Round 2): scope có mở rộng ra ngoài
+merge cluster không (§3 hàng 6), và module `session-identity.mjs` dời về đâu
+(`src/util/` hay một folder hạ tầng mới).
 
 ## 2. Mục tiêu & đề bài
 
@@ -31,9 +37,13 @@ refactor thật.
 | 1 | `state/` ↔ `runner/` có cycle thật, không phải layer 1 chiều | Rõ | Bằng chứng: `grep -rl "from '../runner/" src/state/` → 4 file; `grep -rl "from '../state/" src/runner/` → 7 file |
 | 2 | Iron Law check (`changedFiles`+`classifyIronLaw`) bị copy-paste 3 lần trong `bin/fgos.mjs` | Rõ | L2473-2478 (merge next), L3429-3436 (approve), L4036-4037 (sync-root) — chưa có helper chung |
 | 3 | `isMainWorktree` nằm trong `merge.mjs` thay vì `worktree.mjs` | Rõ | Pure worktree-identity check, 0 semantics về nội dung merge — có vẻ là oversight từ STR44 |
-| 4 | Ranh giới port-được thật sự là gì (pure vs I/O), map chi tiết | Rõ ở mức khảo sát, chưa rõ ở mức thiết kế | Đã liệt kê 2 nhóm (xem §5) nhưng chưa quyết cụ thể module/crate boundary cuối cùng |
-| 5 | Thứ tự refactor để cắt cycle mà không phá vỡ hành vi runtime | Chưa rõ | Cần thiết kế cụ thể: đảo hướng 3 cạnh `state→runner` thế nào (truyền tham số thay vì tự import) mà không đổi contract CLI hiện có |
-| 6 | Có nên gộp thêm các module liên quan khác (`session.mjs`, `session-identity.mjs`, `main-checkout-lock.mjs`, `goal-check.mjs`, `github-adapter.mjs`) vào cùng thiết kế boundary này, hay để lại phạm vi khác | Chưa rõ | Cần quyết định scope: chỉ merge cluster, hay cả `runner/` nói chung |
+| 4 | Ranh giới port-được thật sự là gì (pure vs I/O), map chi tiết | Rõ (đề xuất round 2, chờ người xác nhận) | 3 lớp: pure graph core (no fs/no shell), fs-only store, git-I/O shim — map từng file trong §5 Round 2 |
+| 5 | Thứ tự refactor để cắt cycle mà không phá vỡ hành vi runtime | Rõ (đề xuất round 2, chờ người xác nhận) | 4 cạnh cắt bằng 3 động tác: parameterize `trunk` (drift-status), dời `session-identity.mjs` xuống layer thấp (store), dời `resolveRoot` về `state/frontier.mjs` (2 harness). Không đổi contract CLI nào — toàn bộ là internal signature/import path |
+| 6 | Có nên gộp thêm các module liên quan khác (`session.mjs`, `main-checkout-lock.mjs`, `goal-check.mjs`, `github-adapter.mjs`) vào cùng thiết kế boundary này, hay để lại phạm vi khác | Chưa rõ — cần người quyết | Round 2 đề xuất: KHÔNG cần gộp để đạt acyclic (không file nào trong nhóm đó bị `state/` import); chỉ `session-identity.mjs` buộc phải dời vì cạnh `store → runner`. Phần còn lại là cleanup cohesion tuỳ chọn |
+| 7 | `state → runner` có 4 cạnh, không phải 3 | Rõ | `cleanup-harness.mjs:41` import `resolveRoot` từ `runner/root-affinity.mjs`, y hệt `graph-harness.mjs:23` — cùng 1 cách cắt |
+| 8 | `root-affinity.mjs` là file PURE (không fs, không child_process) dù nằm trong `runner/` | Rõ | Cycle là cycle cấp folder, không phải cấp purity — 2 harness import nó không kéo theo I/O nào |
+| 9 | `src/state/tool-registry.mjs` cũng shell git (`git rev-parse HEAD`, L197) | Rõ (mới, round 1 sót) | Không tạo cạnh `state→runner` (tự shell trực tiếp), nhưng phải xếp vào nhóm git-I/O khi port — không nằm trong pure cluster |
+| 10 | `session-identity.mjs` dời về đâu: `src/util/` (tái dùng, nhưng util hết còn all-pure) hay folder hạ tầng mới | Chưa rõ — cần người quyết | Round 2 khuyến nghị `src/util/` (KISS, đúng contract "leaf module, không import nội bộ"); alternative: folder mới kiểu `src/platform/` |
 
 ## 4. Quyết định đã chốt
 
@@ -86,6 +96,217 @@ A (scout thật, có bằng chứng):
 Kết luận phiên trước: cần cắt 3 cạnh `state → runner` trước (đảo hướng:
 truyền `trunk`/`writerIdentity`/`root` vào như tham số) rồi mới port được
 `state/` như một cụm acyclic độc lập.
+
+**[Round 2 — fable design pass, 2026-08-14]**
+
+Q: Re-verify bằng chứng round 1, rồi đề xuất thiết kế boundary cụ thể (cạnh
+nào cắt bằng động tác gì, helper Iron-Law đặt đâu, target graph acyclic ra
+sao)?
+
+A (mọi số dòng dưới đây đọc trực tiếp từ worktree `fgw/tsk-49i`):
+
+**1. Kết quả re-verify — round 1 đúng phần lớn, chỉnh 2 chỗ, thêm 1:**
+
+- 4 cạnh `state → runner` xác nhận bằng
+  `grep -rn "from '../runner/" src/state/`:
+  - `src/state/drift-status.mjs:18` → `detectTrunk` (`runner/merge.mjs`)
+  - `src/state/store.mjs:41` → `resolveWriterIdentity`
+    (`runner/session-identity.mjs`)
+  - `src/state/graph-harness.mjs:23` → `resolveRoot`
+    (`runner/root-affinity.mjs`)
+  - `src/state/cleanup-harness.mjs:41` → `resolveRoot` (cạnh thứ 4 round 1
+    chưa xác định rõ — cùng hàm, cùng cách cắt với graph-harness)
+- Chiều `runner → state` đúng như round 1 liệt kê (7 file), và các layer
+  khác đã kiểm chiều: `evolve → intake + report`, `intake → state`
+  (`classify.mjs:13` → `work.mjs`), `report → state` (`entropy.mjs:15-16`).
+  Không đâu import ngược vào `runner/` ngoài `bin/` và `cli/` — tức là chỉ
+  cần cắt 4 cạnh trên là toàn bộ đồ thị folder-level thành acyclic.
+- **Chỉnh 1:** `root-affinity.mjs` là file THUẦN (không `fs`, không
+  `child_process` — đọc toàn văn 130 dòng). Hai harness import nó không kéo
+  I/O nào vào `state/`; vấn đề chỉ là cạnh folder. Điều này làm cách cắt rẻ
+  hơn hẳn: chỉ cần dời 1 hàm pure, không phải đảo tham số qua call site.
+- **Chỉnh 2:** `cleanup-harness.mjs` KHÔNG pure — nó có `git()` helper riêng
+  shell git thật (`execFileSync` tại L66). Round 1 không claim nó pure,
+  nhưng khi port phải xếp nó vào nhóm git-I/O, không phải pure cluster.
+- **Thêm (round 1 sót):** `src/state/tool-registry.mjs:197` shell
+  `git rev-parse HEAD` trực tiếp. Không tạo cạnh import nào sang `runner/`
+  nên không ảnh hưởng acyclicity, nhưng là file git-chạm thứ 3 trong
+  `state/` (cùng drift-status, cleanup-harness) khi vẽ ranh giới port.
+- Iron-Law 3 call site xác nhận đúng vị trí: `bin/fgos.mjs` L2473-2478
+  (`merge next`, dạng predicate `wouldTripIronLaw`), L3429-3447 (`approve`,
+  throw `StoreError` + tái dùng `runnerOwnDiff` làm `ownFileSet`),
+  L4036-4045 (`sync-root`, throw). Cả 3 cùng công thức
+  `changedFiles(repoRoot, item, {trunk: <base>}) → classifyIronLaw(...)`,
+  chỉ khác cách chọn `<base>`: approve/merge-next đi `resolveRoot` (leaf →
+  root branch, fallback trunk khi root chưa có branch), sync-root đi thẳng
+  `item.parent` (root → parent branch hoặc trunk).
+- `isMainWorktree` (`merge.mjs` L274-286) xác nhận là pure worktree-identity
+  check (so `--show-toplevel` với parent của `--git-common-dir`), và
+  `merge.mjs` KHÔNG tự gọi nó ở đâu (chỉ xuất hiện trong doc comment) —
+  consumer thật là `bin/fgos.mjs:50` và `promote-engine.mjs:16`.
+- Một tiền lệ quan trọng cho cách cắt: `graph-harness.mjs` ĐÃ dùng đúng
+  pattern đảo-tham-số rồi — nó nhận kết quả `driftStatus()` đã tính sẵn qua
+  tham số thay vì tự gọi (comment L30-31: "This function stays PURE — it
+  never calls driftStatus itself"). Cách cắt cạnh 1 dưới đây chỉ là lặp lại
+  pattern có sẵn này.
+
+**2. Đề xuất cắt 4 cạnh — 3 động tác:**
+
+- **Cạnh 1, `drift-status → detectTrunk`: đảo thành tham số.**
+  `driftStatus(repoRoot, view, { trunk })` và
+  `unmergedDeliveries(repoRoot, view, { trunk })` nhận `trunk` là option
+  BẮT BUỘC (throw nếu thiếu, không default-import lại — default sẽ tái tạo
+  đúng cạnh vừa cắt). Caller thật chỉ có 2: `bin/fgos.mjs` (đã import
+  `detectTrunk` sẵn ở L50, zero import mới) và `src/setup/registrations.mjs`
+  (doctor check — thêm import `detectTrunk` từ runner; chiều `setup →
+  runner` là chiều xuôi, không ai import ngược `setup/`). Không đổi contract
+  CLI nào — signature này internal.
+- **Cạnh 2, `store → resolveWriterIdentity`: dời nguyên module
+  `session-identity.mjs` xuống layer đáy.** Không đảo tham số được một cách
+  KISS: `payload.writer` được đóng ở 3 điểm trong `store.mjs` (L379, L541,
+  L794) nhưng nằm sau hàng chục verb entry-point — luồn writer qua toàn bộ
+  API store là đập cửa quá rộng. Trong khi đó `session-identity.mjs` (150
+  dòng, đọc toàn văn) không import gì nội bộ cả — leaf module đúng nghĩa,
+  và về ngữ nghĩa nó là hạ tầng "ai đang ghi" dùng chung cho CẢ state
+  (stamp writer lên event) LẪN runner (STR65 main-checkout lock) LẪN cli
+  (`invocation-fault-log.mjs:37`). Đề xuất: dời sang
+  `src/util/session-identity.mjs` (contract de-facto của `util/`: leaf,
+  không import nội bộ, mọi layer import được). Sửa 4 import site:
+  `state/store.mjs:41`, `runner/merge.mjs:51`,
+  `cli/invocation-fault-log.mjs:37`, `bin/fgos.mjs:71`. Không đổi signature.
+  Lưu ý cho người quyết: `util/` hiện chỉ có 2 formatter pure; nhận
+  `session-identity` nghĩa là `util/` chứa module có I/O (`ps` shellout +
+  đọc `sessions.json`) — nếu thấy bẩn, alternative là folder mới
+  (`src/platform/`), đắt hơn 1 folder nhưng giữ `util/` all-pure.
+- **Cạnh 3+4, hai harness → `resolveRoot`: dời hàm `resolveRoot` về
+  `src/state/frontier.mjs`.** `resolveRoot` (root-affinity L66-78) là pure
+  walk theo `view.work[id].parent` — logic lineage trên work graph, không
+  có gì "runner" trong đó; chính comment của nó tự nhận seen-set backstop
+  "mirror frontier.mjs's hasOpenDescendant". Dời về `frontier.mjs` (đã là
+  module pure-graph-walk của state, đang được store/drift-status/
+  graph-harness import sẵn). Sửa 6 import site: `runner/root-affinity.mjs`
+  (giữ `claimRoot`/`steerFrontier`/`createOwnershipStore` tại chỗ, tự import
+  `resolveRoot` từ `../state/frontier.mjs` — chiều `runner → state` hợp lệ),
+  `runner/claim-port.mjs:16`, `runner/loop.mjs:85`,
+  `state/graph-harness.mjs:23`, `state/cleanup-harness.mjs:41`,
+  `bin/fgos.mjs:73`. Không để re-export shim. Alternative nếu thấy
+  `frontier.mjs` sai chỗ: file mới `src/state/lineage.mjs` — nhưng 1 hàm 12
+  dòng chưa đáng 1 file riêng (YAGNI).
+
+**3. Helper Iron-Law chung — giết 3 bản copy-paste:**
+
+File mới `src/runner/iron-law-gate.mjs`:
+
+```js
+import { changedFiles } from './merge.mjs';
+import { branchExists } from './worktree.mjs';
+import { classifyIronLaw } from '../evolve/iron-law.mjs';
+
+// -> { required, matchedFlags, matchedModules, filesChanged }
+export function ironLawForItem(repoRoot, item, { baseBranch = null } = {}) {
+  const filesChanged = changedFiles(
+    repoRoot, item,
+    baseBranch && branchExists(repoRoot, baseBranch) ? { trunk: baseBranch } : {},
+  );
+  return { ...classifyIronLaw({ filesChanged, description: item.description }), filesChanged };
+}
+```
+
+- Helper chỉ hút phần trùng thật (diff + classify + fallback-khi-base-branch
+  -không-tồn-tại); phần KHÁC NHAU có chủ đích giữ lại ở call site: cách chọn
+  `baseBranch` (approve/merge-next: `resolveRoot`; sync-root: `item.parent`
+  — hai target khác nhau thật, không phải trùng lặp), xử lý
+  `--acknowledge-iron-law`, và message refuse mang tên verb. `approve` tái
+  dùng `.filesChanged` trả về làm `runnerOwnDiff`/`ownFileSet` — không tính
+  diff 2 lần, giữ đúng tối ưu tsk-598 hiện có.
+- Vì sao KHÔNG đặt trong `src/evolve/iron-law.mjs`: header file đó tự tuyên
+  bố pure ("no fs, no Date, no network, no store import") — helper này shell
+  git, đặt vào là phá contract đã ghi. Vì sao không nhét vào `merge.mjs`:
+  được về mặt cạnh (merge → evolve vẫn xuôi), nhưng merge.mjs đã 1338 dòng
+  và helper này là composition 3 layer đáng nhìn thấy riêng.
+- Cạnh mới `runner → evolve` là cạnh xuôi: `evolve/` chỉ import
+  `intake/` + `report/` (kiểm ở mục 1), không bao giờ import `runner/` —
+  không tạo cycle mới.
+- Behavior không đổi: check `branchExists` trong helper là redundant-nhưng-
+  vô-hại với sync-root (caller đã throw sớm ở L4028 nếu parent branch không
+  tồn tại) và trùng khớp check sẵn có ở 2 site kia.
+
+**4. `isMainWorktree` dời sang `worktree.mjs` — xác nhận, kèm `detectTrunk`:**
+
+- Xác nhận đúng: `isMainWorktree` + helper riêng của nó `realpathOrSelf`
+  (merge.mjs L244-250, không ai khác dùng) dời sang `runner/worktree.mjs`.
+  `worktree.mjs` chỉ import node builtins (fs/os/path/child_process — kiểm
+  L56-59) và có `git()` helper sẵn (L107) → move không tạo cạnh mới nào.
+  Sửa 2 import site: `bin/fgos.mjs:50`, `runner/promote-engine.mjs:16`.
+- Đề xuất kèm: `detectTrunk` cũng dời sang `worktree.mjs` cùng đợt — nó là
+  repo-identity query (origin/HEAD → main/master fallback), zero semantics
+  merge-content, đứng cạnh `branchNameFor`/`branchExists` là đúng chỗ.
+  `merge.mjs` tự dùng nó 3 chỗ (L322 reviewDiff, L433 changedFiles, L821
+  mergeRunnerItem) → merge import từ worktree, chiều `merge → worktree` MỘT
+  CHIỀU sẵn có (round 1 đã xác nhận). Sau move, `worktree.mjs` = "git
+  repo/branch/worktree identity shim", `merge.mjs` = thuần thao tác
+  merge-content. Lưu ý: move này KHÔNG phải điều kiện của cạnh 1 (cạnh 1 cắt
+  bằng parameterize) — nó là cohesion cleanup độc lập, bỏ được nếu muốn thu
+  scope.
+
+**5. Target graph sau khi cắt (một chiều, acyclic):**
+
+```mermaid
+graph TD
+  bin["bin/fgos.mjs + src/cli/"]
+  runner["src/runner/<br/>merge, worktree, iron-law-gate,<br/>root-affinity, dispatch, loop, session, ..."]
+  evolve["src/evolve/ (iron-law, candidates)"]
+  intake["src/intake/"]
+  report["src/report/"]
+  state["src/state/<br/>store, frontier(+resolveRoot), graph-harness,<br/>cleanup-harness, drift-status, ..."]
+  util["src/util/<br/>session-identity (moved), formatters"]
+
+  bin --> runner
+  bin --> state
+  bin --> evolve
+  runner --> state
+  runner --> evolve
+  runner --> util
+  evolve --> intake
+  evolve --> report
+  intake --> state
+  report --> state
+  state --> util
+```
+
+`state/` sau cắt chỉ import `state/` nội bộ + `util/` + node builtins —
+zero cạnh sang `runner/`. Ranh giới port Rust theo 3 lớp thật (không theo
+tên folder):
+
+- **Cụm port đầu tiên — pure logic, không child_process, không fs:**
+  `state/{work, status-fsm, stage-fsm, workflow-stage-graphs, frontier
+  (+resolveRoot mới dời về), dep-graph, graph-metrics, graph-harness,
+  impact, priority-formula, envelope, *-pool}` + `evolve/iron-law` +
+  `intake/{risk-keywords, classify}` + `runner/frozen-judge` +
+  `runner/root-affinity` (phần còn lại sau khi resolveRoot dời đi — vẫn
+  pure). Hai file pure còn kẹt trong `runner/` (frozen-judge,
+  root-affinity) không cản acyclicity — dời chúng về đâu là câu hỏi
+  cohesion cho scope round sau, không phải điều kiện của thiết kế này.
+- **Lớp fs-only (std::fs port được, chưa cần git):** `state/{events, store,
+  replay, events-jsonl-*}` + `util/session-identity` (fs + `ps` shellout).
+- **Lớp git-I/O shim (port sau cùng, cần git2/shell):**
+  `runner/{worktree, merge, iron-law-gate, goal-check, session,
+  main-checkout-lock, github-adapter}` + `state/{drift-status,
+  cleanup-harness}` + chỗ shell git đơn lẻ trong `state/tool-registry`
+  (L197). Ba file `state/` này nằm đúng folder về data-model nhưng thuộc
+  lớp git-I/O khi port — ranh giới crate đi theo lớp, không theo folder.
+
+**6. Hai câu hỏi mở cần người quyết (không tự đoán):**
+
+1. **Scope (§3 hàng 6):** thiết kế trên đạt acyclic mà KHÔNG cần đụng
+   `session.mjs`/`main-checkout-lock.mjs`/`goal-check.mjs`/
+   `github-adapter.mjs` (không file nào trong đó bị `state/` import). Có
+   muốn round sau mở rộng sang cohesion cleanup toàn `runner/` (dời nốt
+   frozen-judge/root-affinity ra khỏi runner, phân lớp lại các file git-I/O
+   còn lại), hay chốt scope đúng 4 cạnh + helper + 2 move như trên?
+2. **Chỗ ở của `session-identity.mjs` (§3 hàng 10):** `src/util/` (khuyến
+   nghị — KISS, đúng contract leaf-module, nhưng util hết còn all-pure) hay
+   folder hạ tầng mới kiểu `src/platform/`?
 
 ## 6. Thiết kế đã chốt {#design}
 
