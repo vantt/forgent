@@ -49,23 +49,6 @@
           "--allowedTools",
           "Task,WebSearch,WebFetch,Read,Bash(rg:*),Bash(git add:*),Bash(git commit:*)"
         ]
-      },
-      "gather": {
-        "kind": "cli",
-        "for": "gather",
-        "carries": "repo-content",
-        "adapter": "cli-spawn",
-        "command": "agy",
-        "provider": "agy",
-        "args": [
-          "-p",
-          "{prompt}",
-          "--model",
-          "{model}"
-        ],
-        "tier": "light",
-        "model": "Gemini 3.5 Flash (Medium)",
-        "allowCrossProvider": true
       }
     },
     "models": {
