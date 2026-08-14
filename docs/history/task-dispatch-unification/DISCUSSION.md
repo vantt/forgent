@@ -11,13 +11,13 @@ Doctrine, 4 quy tắc chọn native-vs-cli/spawn).
 
 ## 1. Trạng thái hiện tại
 
-Vòng 2 (2026-08-14). 6 điểm đã CHỐT (D1-D6, giữ nguyên qua ≥2 vòng không bị
-đảo — D6 vừa qua ngưỡng này ở vòng 2: điều tra → hỏi thẳng lý do → chốt xoá).
-Cùng vòng 2, 4 quyết định phạm vi cụ thể cho D6 (A/B/C/D, xem `#task-remove-
-gather`) — không mint D-ID riêng, coi là chi tiết thực thi của D6 chứ không
-phải quyết định kiến trúc mới. 2 điểm MỚI NÊU ở vòng 1, chưa qua vòng xác nhận
-thứ 2 (§3, chưa mint D-ID). 1 điểm điều tra phụ vẫn mở, chưa đủ bằng chứng để
-quyết.
+Vòng 4 (2026-08-14). 8 điểm đã CHỐT (D1-D8). Item mở "shared prose helper cho
+producer nội bộ" đang shape dở (3 sub-phần, hướng (a) đã chọn cho phần
+work-item-lookup, còn 2 phần khác chưa mint D-ID riêng — xem §3 #2). Item mở
+"tuyên bố ở AGENTS.md" đã quyết XONG phần TIMING (D7, hoãn tới khi D5/`--work`
+ship) nhưng NỘI DUNG cụ thể của đoạn văn chưa viết — sẽ viết khi tới lúc, y hệt
+lý do D7. Còn 1 điểm điều tra phụ vẫn mở (`judge-discovery`/`judge-decompose`
+collision), chưa đủ bằng chứng để quyết.
 
 Phát hiện định hình lại cả buổi: khung "1 cửa dispatch chung cho mọi hình dạng
 task" **không phải ý tưởng mới** — nó là phần mở rộng đúng phạm vi đã khoá của
@@ -53,7 +53,7 @@ thể nào cần sửa lại theo hướng này (`gather`, `fgos-fanout`, `fgos-
 |---|---|---|
 | 1 | `judge-discovery`/`judge-decompose` cùng khai `for:"judge"` — `resolveCapacityIdForPurpose` (dispatch.mjs:666) chỉ trả entry ĐẦU TIÊN khớp, nên `judge-decompose` không bao giờ được purpose-lookup chọn, chỉ tới được qua gọi thẳng id. | **CHƯA RÕ** — cố ý (mỗi skill tự biết gọi đúng id, `for` chỉ để gom nhóm/tài liệu hoá) hay gap chưa ai để ý — cần đọc lịch sử `judge-discovery`/`judge-decompose` riêng trước khi kết luận. |
 | 2 | Cần 1 prose/skill helper CHUNG làm "ngõ vào" dispatch cho MỌI producer nội bộ (research, fanout, tương lai) — không phải mỗi producer tự viết lại logic gọi dispatch. | **ĐANG SHAPE (vòng 1→3)**, chưa mint D-ID — 3 phát hiện/sub-quyết định vòng 3, cần giữ qua ≥1 vòng nữa: (i) `decide` đã tự gộp "config check" (trả `unavailable` nếu không đăng ký) — Step A của fragment cũ làm lại việc thừa; fragment mới nên rút còn 3 bước (`decide` → in-process hand-back / out-of-process gọi `execute` D5) — phụ thuộc D5 landed trước mới viết đúng hình cuối, không thì phải viết lại lần 2; (ii) purpose-based lookup (`--for <purpose>`) ĐÃ có sẵn ở cả `decide`/`resolve` — chỉ cần fragment THÊM TÀI LIỆU, không cần code mới; (iii) work-item-shaped lookup (cho fanout) chưa có cửa CLI — `capacityIdForWork` module-private, Flow-B-only — **chọn hướng (a): export hàm + thêm cờ CLI mới** (`decide --work <id>`) thay vì để fanout tự tính lại logic domain→skill (rủi ro DRY-drift). |
-| 3 | Hợp đồng "muốn chạy 1 task thì gọi dispatch" nên được tuyên bố Ở TẦNG HARNESS (`AGENTS.md`), như 1 khối MUST/NEVER giống `CLAUDE.md`'s GitNexus block — để agent NGOÀI luồng 1 skill cụ thể cũng tự biết cửa vào, không cần đợi skill nạp prose. | **MỚI NÊU (vòng 1)**, ngay sau #2, cùng vòng — chưa qua vòng xác nhận riêng, chưa mint D-ID. Khác biệt với #2: #2 là producer NỘI BỘ (đã có skill chủ động gọi), #3 là phủ trường hợp CHUNG (agent bất kỳ, ngoài skill catalog fgOS). |
+| 3 | Hợp đồng "muốn chạy 1 task thì gọi dispatch" nên được tuyên bố Ở TẦNG HARNESS (`AGENTS.md`) — nội dung cụ thể của đoạn văn. | **TIMING đã chốt (D7: hoãn tới khi D5/`--work` ship)** — chỗ đặt cũng đã xác định (bold-paragraph mới trong `## fgOS Workflow`, không mô phỏng khối GitNexus). NỘI DUNG câu chữ cụ thể vẫn chưa viết, đúng chủ đích D7 — viết khi D5/`--work` thật sự tồn tại. |
 
 ## 4. Quyết định đã chốt
 
@@ -64,6 +64,7 @@ thể nào cần sửa lại theo hướng này (`gather`, `fgos-fanout`, `fgos-
 | D3 | **`for`/`needs` là 2 trục trực giao: JOB vs MECHANISM**, không phải cùng 1 khái niệm. `for` = việc được giao (job, dùng để purpose-lookup, enum `gather`/`judge`). `needs` = cơ chế phải có mặt để chạy (mechanism, dependency gate — dù D1 đã quyết retire field này khỏi capacity, trục khái niệm vẫn đúng, chỉ nơi hỏi chuyển sang tool-registry trực tiếp). Executor càng chuyên biệt (gitnexus, nếu có entry) thì `for`==`needs` càng tự nhiên trùng; executor càng tổng quát (agy, có thể phục vụ nhiều job) thì càng tách xa. Phép thử: "executor này có thể bị giao việc KHÁC mà vẫn dùng đúng cơ chế này không?" — có thì `for` phải khác mechanism-gate, không thì trùng là đúng, không phải lỗi. |
 | D4 | **Tổng quát hoá dispatch quanh khái niệm "task"** (mượn vocab marketing-cockpit), là MỞ RỘNG đúng phạm vi đã khoá của `tsk-3ik`'s D3, không phải ý tưởng mới. 4 hình dạng hiện có của fgOS (`work`-item đầy đủ lifecycle, `childwork`/exec-packet B2 còn gated chưa ship theo `two-layer-dispatch` D4, `capacity` đã đăng ký, `adhoc-packet` 6-field runtime-composed theo `two-layer-dispatch` D3/D6) đều là "task" theo nghĩa tổng quát. Tầng SẢN XUẤT (fgos-researching tính+chia việc research, fgos-fanout tính+chia wave/work-item) chỉ lo tính và chia — KHÔNG tự quyết cơ chế thực thi. Tầng DISPATCH (1 cơ chế dùng chung, đã tồn tại 1 phần qua `decideCapacityDispatchMechanism`/Native-First Dispatch Doctrine 4 quy tắc) nhận bất kỳ hình dạng task nào, quyết executor tại runtime — native subagent chỉ là 1 kết quả có thể của quyết định này (Quy tắc 2 của `docs/decisions/0026`: cùng provider + cần soul → ưu tiên native), không phải đường đi riêng nằm ngoài dispatch. Bằng chứng gap cụ thể: Flow B (`capacityIdForWork`, dispatch.mjs:1090) đã model hoá "thực thi 1 work-item" như capacity-dispatch qua domain+stage — nhưng `fgos-fanout` (Flow A, đồng bộ trong-session) hardcode thẳng Agent tool, chưa từng consult decision protocol này, dù đúng phạm vi `tsk-3ik`'s D3 đã tuyên bố phải làm. |
 | D5 | **`dispatch.mjs` cần tự thực thi (self-execute) cho case adapter-resolvable, khớp `run_task()` của marketing-cockpit** (đã đọc `task-executor.py:550-611`: tự gọi adapter, trả kết quả thật, cho mọi case `via=cli/api/task-khác-family`; CHỈ hand-back đúng 1 case `via=task` cùng-family-có-session-sống). fgOS's Flow A (`resolveCapacityCli`) hôm nay LUÔN hand-back `{command,args}` cho agent tự chạy qua Bash — kể cả case `cli` lẽ ra tự thực thi được. `EXECUTOR_ADAPTERS['cli-spawn']` được validate (dispatch.mjs:895) nhưng KHÔNG BAO GIỜ được gọi trong Flow A, chỉ Flow B (`spawnWorker`) mới tự gọi. Cần 1 subcommand mới (`execute`/`dispatch`) tự gọi `EXECUTOR_ADAPTERS[adapter](...)` ngay trong CLI cho mọi case tự làm được, chỉ trả `spawn_instruction`-shaped result cho case in-process — đây là nền tảng D4 cần để có nơi thật cho nhánh "out-of-process" của mọi hình dạng task, không riêng capacity. |
+| D8 | **Đổi tên "ad-hoc packet" thành "ad-hoc task"** trong vocab D4. Mô tả người dùng (agent tự soạn prompt lúc chạy, cần dispatch prompt đó) khớp đúng định nghĩa gốc, không đổi nghĩa. "work" va chạm với work-item (có lifecycle, id claim được) ngay trong chính bảng taxonomy D4; "task" trung tính, khớp vốn từ tổng quát D4 đã dùng cho cả 4 hình dạng. KHÔNG đổi shape `id` (`<scope>#p<n>`, vẫn invalid với `ID_PATTERN`) — thuần tuý đổi tên, không đổi ngữ nghĩa lifecycle. |
 | D7 | **Hoãn việc viết hợp đồng dispatch vào `AGENTS.md` cho tới khi D5 (`execute` subcommand) + `--work` CLI flag (item shared-helper hướng a) đã ship.** `AGENTS.md` là tài liệu luôn-nạp — viết trước khi `execute`/`--work` tồn tại sẽ trỏ vào lệnh không có thật, agent làm theo sẽ gãy. Đúng bài học đã rút ở item shared-helper: viết 1 lần đúng hình cuối, tránh sửa lại lần 2 như `fgos-researching` đã gặp với `capacity-dispatch-fallback.md`. Chỗ đặt đã xác định trước (không phải quyết định của D7, chỉ ghi lại grounding): đoạn bold-paragraph mới trong `## fgOS Workflow` (trước dòng `<!-- gitnexus:start -->`), theo đúng style 3 đoạn "Never X without Y" đã có sẵn — KHÔNG mô phỏng khối bảng GitNexus (đó là vùng auto-regen của tool ngoài, có sentinel riêng). |
 | D6 | **Xoá capacity `gather` khỏi `.fgos/config.json`.** Con đường cross-provider DUY NHẤT trong hệ; không có quyết định kiến trúc nào ghi lại lý do cần cross-provider cụ thể (plan.md gốc `tsk-2ie5` tự ghi "provider... not decided in this plan, not guessed ahead of time"). Lý do thật duy nhất có ghi lại ("song song hoá, rút ngắn wall-clock") đã được native Task-tool đáp ứng đủ. `fgos-researching`'s SKILL.md đã tự coi "không có gather capacity" là "the common/default path today" — xoá an toàn, revert về hành vi trước `tsk-2ie5`. Qua ngưỡng ≥2 vòng: điều tra bằng chứng (vòng 1) → hỏi thẳng lý do cross-provider, không tìm thấy → chốt xoá (vòng 2). |
 
@@ -164,6 +165,22 @@ thể nào cần sửa lại theo hướng này (`gather`, `fgos-fanout`, `fgos-
   private) — hỏi hướng (a) export+cờ CLI mới vs (b) fanout tự tính lại.
 - **Vòng 3, đoạn b.** Người dùng chọn **(a)**. Vòng đầu của quyết định cụ thể
   này — chưa mint D-ID, cần giữ qua ≥1 vòng nữa theo đúng hard rule.
+- **Vòng 4, đoạn a.** Người dùng chọn đào tiếp item mở #3 (AGENTS.md). Scout
+  cấu trúc thật `AGENTS.md` — phát hiện khối GitNexus là vùng auto-regen
+  (`<!-- gitnexus:start -->`), không nên bắt chước; mẫu đúng là 3 đoạn bold-
+  paragraph sẵn có trong `## fgOS Workflow`. Nêu câu hỏi timing (viết ngay vs
+  chờ D5/`--work` xong) — đề xuất chờ.
+- **Vòng 4, đoạn b (chen ngang).** Người dùng đề xuất đổi "ad-hoc packet" →
+  "ad-hoc work". Chỉ ra căng thẳng với thiết kế gốc (`id` cố tình invalid
+  `ID_PATTERN` để KHÔNG bị nhầm với work-item có lifecycle) — hỏi rõ ý định
+  (a/b/c).
+- **Vòng 4, đoạn c.** Người dùng xác nhận lại hướng "chờ" cho câu hỏi timing
+  AGENTS.md (đoạn a) — đủ vòng, chốt **D7**.
+- **Vòng 4, đoạn d.** Người dùng giải thích ý định đổi tên: "adhoc work là
+  agent tạo ra prompt và cần dispatch prompt này" — khớp đúng định nghĩa gốc,
+  rơi vào nhánh (c) (mô tả cơ chế, không cố ý đổi lifecycle). Đề xuất "ad-hoc
+  task" thay vì "ad-hoc work" — giữ đúng mô tả, tránh va chạm "work"-item,
+  khớp vocab D4. Người dùng xác nhận "ổn" → **D8**.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -184,8 +201,10 @@ dạng `run_task()` của marketing-cockpit đã đối chiếu:
   việc + chia việc thành TASK — không tự quyết cơ chế thực thi. 4 hình dạng
   task tương ứng 4 khái niệm hiện có của fgOS: `work` (work-item đầy đủ
   lifecycle), `childwork` (exec-packet B2, còn gated theo `two-layer-dispatch`
-  D4, chưa ship), `capacity` (đã đăng ký, `gather`/`judge-*`), `adhoc-packet`
-  (6-field runtime-composed, theo `two-layer-dispatch` D3/D6).
+  D4, chưa ship), `capacity` (đã đăng ký, `gather`/`judge-*`), `ad-hoc task`
+  (tên cũ "ad-hoc packet", đổi theo D8 — vẫn 6-field runtime-composed, `id`
+  vẫn `<scope>#p<n>` invalid với `ID_PATTERN`, theo `two-layer-dispatch`
+  D3/D6).
 - **Dispatch layer** (1 cơ chế dùng chung, mở rộng từ hạ tầng `tsk-3ik` đã có)
   nhận bất kỳ hình dạng task nào, áp 4 quy tắc của `docs/decisions/0026` tại
   runtime: TỰ THỰC THI (gọi `EXECUTOR_ADAPTERS[adapter]`, trả kết quả thật) cho
@@ -211,7 +230,7 @@ flowchart TD
         T1["work<br/>work-item đầy đủ lifecycle"]
         T2["childwork<br/>exec-packet B2 — GATED, chưa ship"]
         T3["capacity<br/>đã đăng ký (gather/judge-*)"]
-        T4["adhoc-packet<br/>6-field runtime-composed"]
+        T4["ad-hoc task<br/>6-field runtime-composed<br/>(id: &lt;scope&gt;#p&lt;n&gt;, invalid ID_PATTERN)"]
     end
 
     subgraph Dispatch["Tầng dispatch — 1 cửa chung, quyết tại runtime"]
