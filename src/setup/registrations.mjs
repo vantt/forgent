@@ -417,8 +417,14 @@ function checkToolRegistryConfigured(cwd) {
   if (posture === 'full') {
     return { passed: true, message: `full — ${presentCount}/${registeredCount} registered tool(s) present` };
   }
+  // tsk-3oa2: degraded used to report passed:true, the same as full --
+  // meaning AGENTS.md's impact-analysis capability gate's own "Degraded"
+  // branch (a tool registered but not present, or present but stale) had
+  // no doctor signal a person would ever see flagged. A registered tool
+  // that is missing or was never checked here is a real gap, not a clean
+  // skip the way "nothing registered at all" (inactive) is.
   return {
-    passed: true,
+    passed: false,
     message: `degraded — ${presentCount}/${registeredCount} registered tool(s) present (${missingCount} missing, ${unknownCount} never checked — run fgos tool check)`,
   };
 }
@@ -1437,6 +1443,49 @@ registerCheck({
   id: 'changelog-unreleased-stale',
   description: 'CHANGELOG.md ## [Unreleased] section has at least one pending entry (observe/remind only, never blocks merge -- tsk-3ip)',
   check: (cwd) => checkChangelogUnreleasedStale(cwd),
+});
+
+// tsk-2t8: README.md's own "## Install" section recommends `npm install -g
+// github:vantt/forgent#vX.Y.Z`, a specific pinned tag -- if that tag was
+// never actually cut (tag-cutting is a deliberate manual act by design,
+// tsk-jtb D1/D2, never automated here), every new external user's
+// recommended install command fails outright. Read-only, same "absent =
+// clean skip" convention as changelog-unreleased-stale above: no
+// README.md, or no pinned-tag line found in it, is not itself a problem
+// this check reports on.
+const README_INSTALL_TAG_PATTERN = /npm install -g github:[^#\s]+#(v\d+\.\d+\.\d+)/;
+
+function checkReadmeInstallTagExists(cwd) {
+  const mainCheckout = resolveMainCheckoutRoot(cwd) ?? cwd;
+  const readmePath = path.join(mainCheckout, 'README.md');
+  if (!fs.existsSync(readmePath)) {
+    return { passed: true, message: 'README.md not found -- nothing to check' };
+  }
+  const content = fs.readFileSync(readmePath, 'utf8');
+  const match = content.match(README_INSTALL_TAG_PATTERN);
+  if (!match) {
+    return { passed: true, message: 'README.md has no pinned-tag install command -- nothing to check' };
+  }
+  const tag = match[1];
+  let existingTags;
+  try {
+    existingTags = execFileSync('git', ['tag', '-l', tag], { cwd: mainCheckout, encoding: 'utf8' }).trim();
+  } catch {
+    return { passed: true, message: `could not list git tags -- nothing to check for "${tag}"` };
+  }
+  if (existingTags === tag) {
+    return { passed: true, message: `README.md's pinned install tag "${tag}" exists` };
+  }
+  return {
+    passed: false,
+    message: `README.md recommends installing tag "${tag}", which does not exist -- cut it per docs/how-to/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,
+  };
+}
+
+registerCheck({
+  id: 'readme-install-tag-exists',
+  description: 'README.md\'s recommended install command pins a git tag that actually exists (tsk-2t8)',
+  check: (cwd) => checkReadmeInstallTagExists(cwd),
 });
 
 // tsk-2m5 (docs/history/stage-status-driving-coordination/): the

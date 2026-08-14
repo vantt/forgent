@@ -45,7 +45,7 @@ import { DEFAULT_WORKER_SLOT_CEILING } from '../../src/state/worker-slots.mjs';
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, plugin-dev-skills-packaged, changelog-unreleased-stale, herdr-launcher-configured, work-classification-vocabulary, work-stage-vocabulary, delivered-not-on-trunk, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, events-jsonl-not-truncated, cli-version-visible, worker-slots-ceiling-usable, and gateway-token-configured', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, plugin-dev-skills-packaged, changelog-unreleased-stale, herdr-launcher-configured, work-classification-vocabulary, work-stage-vocabulary, delivered-not-on-trunk, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, events-jsonl-not-truncated, cli-version-visible, worker-slots-ceiling-usable, gateway-token-configured, and readme-install-tag-exists', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     [
@@ -73,6 +73,7 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'cli-version-visible',
       'worker-slots-ceiling-usable',
       'gateway-token-configured',
+      'readme-install-tag-exists',
     ].sort(),
   );
 });
@@ -657,10 +658,49 @@ test('fgos check (CLI e2e) reports changelogNag and appends a checkpoint to chan
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
-test('tool-registry-configured always passes — inactive is a clean skip, never a failure', () => {
-  const { passed, message } = checkById('tool-registry-configured').check(process.cwd());
+test('tool-registry-configured passes when no tool is registered at all (inactive — a clean skip, never a failure)', () => {
+  const cwd = mkTemp('fgos-tool-registry-inactive-');
+  execFileSync('git', ['init', '-q'], { cwd });
+  spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
+  const { passed, message } = checkById('tool-registry-configured').check(cwd);
   assert.equal(passed, true);
-  assert.equal(typeof message, 'string');
+  assert.match(message, /^inactive/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('tool-registry-configured passes when every registered tool is checked present (full)', () => {
+  const cwd = mkTemp('fgos-tool-registry-full-');
+  execFileSync('git', ['init', '-q'], { cwd });
+  spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
+  const register = spawnSync(process.execPath, [
+    FGOS, 'tool', 'register',
+    '--name', 'echo-tool', '--kind', 'cli', '--capability', 'test-capability', '--command', 'echo',
+  ], { cwd, encoding: 'utf8' });
+  assert.equal(register.status, 0, register.stderr);
+  const check = spawnSync(process.execPath, [FGOS, 'tool', 'check'], { cwd, encoding: 'utf8' });
+  assert.equal(check.status, 0, check.stderr);
+  const { passed, message } = checkById('tool-registry-configured').check(cwd);
+  assert.equal(passed, true);
+  assert.match(message, /^full/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('tsk-3oa2: tool-registry-configured FAILS when a registered tool is missing or never checked (degraded) -- no longer a silent passed:true', () => {
+  const cwd = mkTemp('fgos-tool-registry-degraded-');
+  execFileSync('git', ['init', '-q'], { cwd });
+  spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
+  const register = spawnSync(process.execPath, [
+    FGOS, 'tool', 'register',
+    '--name', 'never-checked-tool', '--kind', 'cli', '--capability', 'test-capability', '--command', 'echo',
+  ], { cwd, encoding: 'utf8' });
+  assert.equal(register.status, 0, register.stderr);
+  // Deliberately never runs `fgos tool check` -- the tool stays "unknown",
+  // which classifyRegistryPosture reports as degraded (never inactive).
+  const { passed, message } = checkById('tool-registry-configured').check(cwd);
+  assert.equal(passed, false, 'a registered-but-unverified tool must fail the check, not silently pass as before this fix');
+  assert.match(message, /^degraded/);
+  assert.match(message, /fgos tool check/);
+  fs.rmSync(cwd, { recursive: true, force: true });
 });
 
 test('node-version-and-git passes under the current process (real Node, real git)', () => {
