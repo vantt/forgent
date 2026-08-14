@@ -82,7 +82,7 @@ import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { DOCTOR_CHECKS, integrationScriptPath, ensureSharedConfigDefaults, runFixes } from '../src/setup/checks.mjs';
 import { sharedConfigFilePath, readSharedConfig, readSharedConfigOrEmpty, readInvariantCheckCommands } from '../src/config/shared-config-file.mjs';
 import { countWorkerSlots, hasWorkerSlotRoom } from '../src/state/worker-slots.mjs';
-import { assessCleanupReadiness } from '../src/state/cleanup-harness.mjs';
+import { assessCleanupReadiness, checkMergeStillResolves } from '../src/state/cleanup-harness.mjs';
 import { DEFAULT_CLEANUP_TTL_DAYS, DEFAULT_CLEANUP_LEAF_TTL_DAYS } from '../src/setup/registrations.mjs';
 import { installGitHooks, uninstallGitHooks } from '../src/setup/git-hooks.mjs';
 import { detectRcFiles, insertSourceLine, hasSourceLine } from '../src/setup/shell-rc.mjs';
@@ -4399,12 +4399,6 @@ async function runVerb(verb, flags, positional, dir) {
       // once that other merge finishes or gets aborted is the natural
       // recovery, not a manual rework.
       const CATCHUP_REASONS = new Set(['merge-conflict', 'verify-fail-post-merge', 'verify-timeout-post-merge', 'integration-drift', 'merge-failed-unclassified', 'merge-blocked-other-item']);
-      if (!CATCHUP_REASONS.has(item.reason)) {
-        throw new StoreError(
-          'validation',
-          `catchup: work "${id}" is blocked for reason "${item.reason ?? '(none)'}" — catchup only resolves a merge-related park (merge-conflict/verify-fail-post-merge/verify-timeout-post-merge/integration-drift/merge-failed-unclassified); use take/return for a manual rework instead.`,
-        );
-      }
 
       // repoRoot from --dir, never raw process.cwd() (tsk-5vl, same class
       // as tsk-k8u's take/pick fix): a caller running catchup from inside
@@ -4417,8 +4411,35 @@ async function runVerb(verb, flags, positional, dir) {
       // branch it is about to force-update, which git refuses ("Cannot
       // force update the current branch"). Byte-identical to today when
       // --dir is omitted (dataDir() resolves dir from process.cwd() too
-      // in that case).
+      // in that case). Computed here, before the eligibility check below,
+      // so both can share it.
       const repoRoot = path.dirname(dir);
+
+      // tsk-2q8: a `cleanup -> blocked` park caused specifically by
+      // checkMergeStillResolves (e.g. a root branch rebased-not-pruned) is
+      // ALSO catchup-eligible — re-merging the target into this item's own
+      // branch and re-verifying is exactly what recovers it (a genuinely
+      // stale commit becomes a fresh, real descendant of the target). Its
+      // `reason` is never one of the short enum values above though — the
+      // cleanup verb (see the `case 'cleanup'` block) records the FULL
+      // human-readable diagnostic text there instead (possibly joined with
+      // an UNRELATED failure like missing retrospective content), so it can
+      // never match CATCHUP_REASONS by content, and a plain "was this
+      // parked from cleanup" check would be too broad — merging fixes a
+      // stale-ancestry gap, not a missing-retrospective-content one, so it
+      // must not be trusted to resolve that second kind of park. Re-run the
+      // exact check live instead of trusting stored text: if
+      // `checkMergeStillResolves` fails for this item right now, that IS
+      // the fact catchup's own merge-and-reverify would flip, independent
+      // of whatever else `reason` says.
+      const mergeStillFails = !checkMergeStillResolves(repoRoot, item, { view, id }).ok;
+      if (!CATCHUP_REASONS.has(item.reason) && !mergeStillFails) {
+        throw new StoreError(
+          'validation',
+          `catchup: work "${id}" is blocked for reason "${item.reason ?? '(none)'}" — catchup only resolves a merge-related park (merge-conflict/verify-fail-post-merge/verify-timeout-post-merge/integration-drift/merge-failed-unclassified) or a cleanup-harness merge-ancestry park; use take/return for a manual rework instead.`,
+        );
+      }
+
       const ownBranch = branchNameFor(id);
       // Guards against a human hand-forcing an inapplicable blocked state
       // (e.g. `fgos move <id> --to blocked --reason integration-drift` on a

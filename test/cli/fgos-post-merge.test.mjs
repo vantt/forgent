@@ -945,6 +945,115 @@ test('cleanup parks cleanup -> blocked when the recorded commit no longer resolv
   assert.match(data.reason, /no longer reachable/);
 });
 
+// tsk-2q8: a `cleanup -> blocked` park caused by checkMergeStillResolves
+// (the recorded commit no longer resolving) has a REAL fgw/<id> branch —
+// unlike the merge-conflict-family reasons above, `item.reason` here is
+// never one of CATCHUP_REASONS' short enum values (the cleanup verb
+// records the full diagnostic text instead), so catchup must recognize
+// this case by live-re-checking checkMergeStillResolves, not by reason
+// text. Re-merging main into fgw/<id> and re-verifying is exactly the fix:
+// the item's own commit becomes a real descendant of main afterward.
+test('catchup recovers a cleanup-origin blocked item whose recorded commit no longer resolves, by re-merging and re-verifying (tsk-2q8)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  writeCleanupTtlConfig(cwd, 0);
+
+  gitAtCwd(cwd, ['checkout', '-b', 'fgw/cleanup-origin-recover']);
+  fs.writeFileSync(path.join(cwd, 'cleanup-origin-recover-produced.txt'), 'ok\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'worker output for cleanup-origin-recover']);
+  const staleSha = gitAtCwd(cwd, ['rev-parse', 'HEAD']).trim();
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  // main advances INDEPENDENTLY after the branch forked (a non-overlapping
+  // change, mirroring the existing `catchup-root-drift` test above) — the
+  // real shape this item exists for: `staleSha` is not (yet) reachable from
+  // main, and merging main forward requires a real merge commit, not a
+  // fast-forward/no-op (which is what a lagging-main setup would produce).
+  fs.writeFileSync(path.join(cwd, 'main-side-change.txt'), 'landed while parked\n');
+  gitAtCwd(cwd, ['add', 'main-side-change.txt']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'another root lands on main']);
+
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, {
+    id: 'cleanup-origin-recover',
+    title: 'Cleanup-origin recover',
+    kind: 'task',
+    status: 'cleanup',
+    deps: [],
+    risk: 'light',
+    refs: [],
+    verify: 'test -f cleanup-origin-recover-produced.txt',
+    branchHeadAtReturn: staleSha,
+  });
+  fs.mkdirSync(path.join(cwd, 'docs', 'how-to'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'docs', 'how-to', 'cleanup-origin-recover.md'), '# doc\n');
+  addOutcome(dir, { id: 'cleanup-origin-recover', docType: 'how-to', docPath: 'docs/how-to/cleanup-origin-recover.md' });
+
+  const cleanupResult = run(cwd, ['cleanup', 'cleanup-origin-recover']);
+  assert.equal(cleanupResult.status, 0, cleanupResult.stderr);
+  const cleanupData = envelopeData(cleanupResult.stdout);
+  assert.equal(cleanupData.to, 'blocked');
+  assert.match(cleanupData.reason, /no longer reachable/);
+  assert.equal(stateView(cwd).work['cleanup-origin-recover'].status, 'blocked');
+
+  const catchupResult = run(cwd, ['catchup', 'cleanup-origin-recover']);
+  assert.equal(catchupResult.status, 0, catchupResult.stderr);
+  const catchupData = envelopeData(catchupResult.stdout);
+  assert.equal(catchupData.to, 'awaiting-approval');
+  assert.equal(stateView(cwd).work['cleanup-origin-recover'].status, 'awaiting-approval');
+
+  const branchLog = gitAtCwd(cwd, ['log', '--oneline', 'fgw/cleanup-origin-recover']);
+  assert.match(branchLog, /catch-up: merge main into fgw\/cleanup-origin-recover/);
+});
+
+// The retrospective-content-only shape must NOT be treated as
+// catchup-eligible even though it is also a `cleanup -> blocked` park —
+// merging main into fgw/<id> does nothing to fix missing retrospective
+// docs, so admitting it here would silently wave the item toward
+// awaiting-approval without ever addressing the real gap.
+test('catchup still rejects a cleanup-origin blocked item whose recorded commit DOES resolve (missing retrospective content only, not a merge-ancestry gap) (tsk-2q8)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  writeCleanupTtlConfig(cwd, 0);
+
+  gitAtCwd(cwd, ['checkout', '-b', 'fgw/cleanup-origin-retro-only']);
+  fs.writeFileSync(path.join(cwd, 'cleanup-origin-retro-only-produced.txt'), 'ok\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'worker output for cleanup-origin-retro-only']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+  gitAtCwd(cwd, ['merge', '--no-ff', '-q', '-m', 'merge cleanup-origin-retro-only', 'fgw/cleanup-origin-retro-only']);
+  const mergedSha = gitAtCwd(cwd, ['rev-parse', 'HEAD']).trim();
+
+  const dir = path.join(cwd, '.fgos');
+  addWork(dir, {
+    id: 'cleanup-origin-retro-only',
+    title: 'Cleanup-origin retro-only',
+    kind: 'task',
+    status: 'cleanup',
+    deps: [],
+    risk: 'light',
+    refs: [],
+    verify: 'test -f cleanup-origin-retro-only-produced.txt',
+    branchHeadAtReturn: mergedSha,
+  });
+  // No outcome doc/decision recorded -- checkRetrospectiveContent fails,
+  // checkMergeStillResolves passes (mergedSha genuinely IS an ancestor of
+  // main now).
+
+  const cleanupResult = run(cwd, ['cleanup', 'cleanup-origin-retro-only']);
+  assert.equal(cleanupResult.status, 0, cleanupResult.stderr);
+  const cleanupData = envelopeData(cleanupResult.stdout);
+  assert.equal(cleanupData.to, 'blocked');
+  assert.match(cleanupData.reason, /no outcome docType\/docPath or decision record/);
+  assert.doesNotMatch(cleanupData.reason, /no longer reachable/);
+
+  const catchupResult = run(cwd, ['catchup', 'cleanup-origin-retro-only']);
+  assert.equal(catchupResult.status, 4);
+  assert.match(catchupResult.stderr, /catchup only resolves a merge-related park/);
+  assert.equal(stateView(cwd).work['cleanup-origin-retro-only'].status, 'blocked');
+});
+
 test('catchup accepts a blocked reason of merge-blocked-other-item as a valid precondition (tsk-4hj D2, mirrors tsk-18a\'s own precedent for merge-failed-unclassified)', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
