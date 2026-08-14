@@ -776,8 +776,13 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       if (rootId !== item.id) {
         // Leaf: idempotent — createBranchRef is a no-op if fgw/<rootId>
         // already exists (an earlier sibling leaf, or the root's own prior
-        // dispatch, already created it).
-        createBranchRef(repoRoot, rootId, { baseRef: 'main' });
+        // dispatch, already created it). No explicit baseRef here (tsk-386):
+        // createBranchRef's own default already resolves through
+        // detectTrunk(repoRoot) — this call site no longer needs its own
+        // copy of that resolution, and relying on the sibling function's
+        // default here (rather than a second detectTrunk call) avoids
+        // duplicating the same git call for no reason.
+        createBranchRef(repoRoot, rootId);
         wt = createDispatchWorktree(repoRoot, item.id, { worktreeDir, baseRef: branchNameFor(rootId) });
       } else {
         wt = createDispatchWorktree(repoRoot, item.id, { worktreeDir });

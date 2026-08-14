@@ -57,6 +57,15 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+// tsk-386: merge.mjs already imports branchNameFor/branchExists/
+// reclaimOrphanedCheckout FROM this module -- this makes the import
+// circular, but safely so: `detectTrunk` is only ever called from inside a
+// function body below (createBranchRef, createDetachedMergeWorktree), never
+// at this module's own top-level synchronous evaluation, so Node's ESM
+// live-binding resolution has both modules fully evaluated by the time
+// either function actually runs. Verified empirically against the full
+// existing test suite, not merely assumed safe.
+import { detectTrunk } from './merge.mjs';
 
 /** Raised for any git worktree/branch operation failure. `errorClass`
  * reuses the vocabulary declared in `recovery.mjs`'s `ERROR_CLASSES` (per
@@ -364,7 +373,10 @@ function relocateOrphanedCheckout(repoRoot, branch, targetPath) {
 /**
  * Create the integration branch `fgw/<id>` (D17: "nhánh tạo sớm, không cần
  * worktree") as a REF ONLY — no worktree/checkout is registered for it.
- * `opts.baseRef` (default `'main'`) is the ref the new branch forks from.
+ * `opts.baseRef` (default: `detectTrunk(repoRoot)`, tsk-386 — no longer a
+ * literal `'main'`; a host project whose trunk is `master` would otherwise
+ * fail `git branch fgw/<id> main` outright on this fallback, per
+ * `docs/distribution-vision.md`'s "installed into other repos" story).
  * Idempotent: if `fgw/<id>` already exists, this is a no-op — it does NOT
  * move the branch to `baseRef`, mirroring the RETRY-WITHOUT-SELF-COLLISION
  * discipline above (a retried root-dispatch must not disturb a branch that
@@ -373,7 +385,7 @@ function relocateOrphanedCheckout(repoRoot, branch, targetPath) {
  */
 export function createBranchRef(repoRoot, id, opts = {}) {
   const branch = branchNameFor(id);
-  const baseRef = opts.baseRef ?? 'main';
+  const baseRef = opts.baseRef ?? detectTrunk(repoRoot);
 
   if (branchExists(repoRoot, branch)) {
     return { branch, created: false };
@@ -1014,14 +1026,17 @@ export function refreshUnstartedBranch(repoRoot, branch, targetRef, checkoutPath
  * gets that early call, so the branch can genuinely not exist yet the
  * first time a merge needs it (docs/history/
  * tsk-6ch-merge-worktree-branch-fallback/CONTEXT.md). Falling back to
- * `createBranchRef` here — idempotent, same `baseRef: 'main'` `loop.mjs`
- * already uses for this exact early-creation step — replaces that missing
- * step instead of crashing the merge outright.
+ * `createBranchRef` here — idempotent, same early-creation step
+ * `loop.mjs` already uses — replaces that missing step instead of crashing
+ * the merge outright. No explicit `baseRef` (tsk-386): `createBranchRef`'s
+ * own default already resolves through `detectTrunk(repoRoot)`, never a
+ * hardcoded `'main'` — a host repo whose trunk is `master` would otherwise
+ * fail this exact fallback outright.
  */
 function createDetachedMergeWorktree(repoRoot, id) {
   const branch = branchNameFor(id);
   if (!branchExists(repoRoot, branch)) {
-    createBranchRef(repoRoot, id, { baseRef: 'main' });
+    createBranchRef(repoRoot, id);
   }
   const startCommit = git(repoRoot, ['rev-parse', branch]).trim();
   const baseDir = path.join(os.tmpdir(), 'fgos-worktrees');
