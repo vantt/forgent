@@ -50,7 +50,21 @@ thể nào cần sửa lại theo hướng này (`gather`, `fgos-fanout`, `fgos-
 
 | # | Vấn đề | Trạng thái |
 |---|---|---|
-| 1 | Hợp đồng "muốn chạy 1 task thì gọi dispatch" nên được tuyên bố Ở TẦNG HARNESS (`AGENTS.md`) — nội dung cụ thể của đoạn văn. | **TIMING đã chốt (D7: hoãn ĐƯA VÀO FILE tới khi D5/`--work` ship)** — nhưng CÂU CHỮ đã soạn xong ở vòng 7, sẵn sàng dán khi tới lúc (không cần soạn lại): *"Muốn dispatch 1 task (work-item, capacity, hoặc ad-hoc task) ra khỏi lượt hiện tại thì gọi `dispatch.mjs decide` trước — không tự quyết cơ chế — dispatch là nơi DUY NHẤT biết native hay out-of-process phù hợp, theo 4 quy tắc `docs/decisions/0026`. Gọi `decide <capacityId>` (đã biết id), `decide --for <purpose>` (biết việc, chưa biết id), hoặc `decide --work <id>` (dispatch 1 work-item). `mechanism: "unavailable"` là trạng thái HỢP LỆ, không phải lỗi — rơi thẳng về tự làm inline, không cần báo gì. `mechanism: "in-process"` → tự gọi Task/Agent tool với `agentType` trả về. `mechanism: "out-of-process"` → gọi `dispatch.mjs execute`, KHÔNG tự đứng ra làm thay adapter bằng Bash — dispatch tự thực thi và trả kết quả thật."* Cố ý KHÔNG cite `tsk-5tm`/`DISCUSSION.md` trong đoạn này (tài liệu làm việc nội bộ, không phải thứ agent cần mở khi dùng lệnh) — chỉ giữ `docs/decisions/0026` (ADR bền vững, đúng đối tượng "hồ sơ quyết định dài hạn cho người ngoài"). |
+| 1 | Hợp đồng "muốn chạy 1 task thì gọi dispatch" nên được tuyên bố Ở TẦNG HARNESS (`AGENTS.md`) — nội dung cụ thể của đoạn văn. | **TIMING đã chốt (D7: hoãn ĐƯA VÀO FILE tới khi D5/`--work` ship). CÂU CHỮ CUỐI đã soạn xong ở vòng 8**, format bulleted (rõ hơn hẳn bản paragraph dày đặc ở vòng 7), **0 ref doc nào** (kể cả `docs/decisions/0026` — người dùng: *"anh không hề muốn ref docs vào vì enduser không thể hiểu"*), sẵn sàng dán khi tới lúc:
+
+  > **Muốn dispatch 1 task (work-item, capacity, hoặc ad-hoc task) ra khỏi lượt hiện tại thì gọi `node src/runner/dispatch.mjs decide` trước — không tự quyết cơ chế.**
+  >
+  > 3 cách gọi `decide` — 3 tình huống khác nhau:
+  > - `decide <capacityId>` — đã biết chính xác tên capacity (vd `judge-discovery`).
+  > - `decide --for <purpose>` — biết mình cần làm VIỆC gì (vd `judge`) nhưng không biết capacity nào phục vụ việc đó.
+  > - `decide --work <id>` — có 1 work-item thật, muốn dispatch chạy nó.
+  >
+  > 3 kết quả trả về (`mechanism`) — mỗi cái phải làm khác nhau:
+  > - **`"unavailable"`** — không có gì phục vụ việc này → KHÔNG PHẢI LỖI, tự làm inline, không cần báo cáo gì.
+  > - **`"in-process"`** → dispatch trả về `agentType` — tự gọi Task/Agent tool của chính mình với `agentType` đó, dispatch không làm gì hộ (nó không có quyền gọi Task tool).
+  > - **`"out-of-process"`** → gọi tiếp `node src/runner/dispatch.mjs execute` — KHÔNG tự đứng ra chạy lệnh qua Bash — dispatch tự thực thi và trả kết quả thật.
+
+  2 lỗi bị bắt và sửa khi soạn bản cuối (không chỉ đổi format): (a) ví dụ `agentType: "researcher"` ở bản nháp trước là BỊA — grep thật xác nhận chưa có entry `capacities.<id>` nào khai `agentType` hôm nay, đã bỏ; (b) ví dụ `--for "gather"` SAI — D6's phạm vi B đã xoá `'gather'` khỏi `CAPACITY_PURPOSES` enum, không còn là giá trị hợp lệ — đổi sang `judge` (giá trị enum còn lại duy nhất, thật). |
 
 ## 4. Quyết định đã chốt
 
