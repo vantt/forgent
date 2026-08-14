@@ -47,32 +47,36 @@ changed. That's why the branch logic now lives in one shared file instead.
    and its `.agents/skills/_shared/` mirror.
 
 3. **Know what the fragment does on your behalf**, so you can read its
-   output correctly:
+   output correctly (tsk-5tm-3 D5 reduced this to 3 steps — `execute` now
+   self-executes or hands back in one call, folding what used to be a
+   separate presence check and native-vs-cli/spawn decision into it):
    - **Step A (config check)** — `not-configured` skips straight to your
      inline-fallback heading, byte-identical to before this capacity
-     existed. `configured` moves to Step B.
-   - **Step B (presence check)** — empty `providers` (registered but not
-     present) prints one visible note, then falls through to your
-     inline-fallback heading too. Exactly one present provider moves to
-     Step B.5.
-   - **Step B.5 (native-vs-cli/spawn decision, tsk-3ik-3, Native-First
-     Dispatch Doctrine)** — decide for yourself whether you (the assistant
-     reading the fragment) already have live Agent/Task tool access right
-     now (never inferred from environment or config), then run
-     `node dispatch.mjs decide <CAPACITY_ID> [--has-live-task-access]`.
-     `mechanism: "cli-spawn"` proceeds to Step C. `mechanism: "native"`
-     skips Step C entirely — print the announce line
-     `<CAPACITY_ID> - native - <agentType> - <model>`, then call your own
-     Agent/Task tool directly with `subagent_type` = the JSON's `agentType`
-     and the same `<PROMPT_TEMPLATE>` prompt Step C would have built.
-   - **Step C (cli-spawn dispatch)** — resolves real command/args via
-     `dispatch.mjs`'s own `resolveExecutorConfig` (never a second
-     argv-building implementation), prints the announce line
-     `<CAPACITY_ID> - cli-spawn - <provider> - <model>`, then runs it.
-   - **Step D (malformed-response fallback)** — a missing/unparseable/
-     unusable response falls back to your inline-fallback heading exactly
-     as if the capacity were absent; never treat a dispatched answer as
-     more trustworthy than your own reasoning would have been.
+     existed. `configured` moves to Step B. No separate presence check any
+     more (tsk-5tm-1 D1 retired the `needs` field and the gate that
+     consulted it) — a missing backend now surfaces as `execute`'s own
+     spawn failure, caught by Step C.
+   - **Step B (`execute`, self-execute or hand back)** — decide for
+     yourself whether you (the assistant reading the fragment) already
+     have live Agent/Task tool access right now (never inferred from
+     environment or config), then run `node dispatch.mjs execute
+     <CAPACITY_ID> --prompt "..." [--has-live-task-access]`. Prints one of
+     two shapes: `{"mechanism":"in-process","agentType":...,"prompt":...}`
+     — dispatch has no Task tool of its own, so this is the one case it
+     hands back; print `<CAPACITY_ID> - in-process - <agentType> -
+     <model>`, then call your own Agent/Task tool with `subagent_type` =
+     `agentType` and the same `<PROMPT_TEMPLATE>` prompt. Or
+     `{"mechanism":"out-of-process", ...real result fields}` — dispatch
+     already ran it via `EXECUTOR_ADAPTERS`, reusing
+     `resolveExecutorConfig`/`resolveExecutorCommand` internally (never a
+     second argv-building implementation); print `<CAPACITY_ID> -
+     out-of-process - <provider> - <model>` and read `stdout` — this IS
+     the real answer, nothing left to run.
+   - **Step C (malformed-response fallback)** — a missing/unparseable/
+     unusable response, or an error from Step B's own call, falls back to
+     your inline-fallback heading exactly as if the capacity were absent;
+     never treat a dispatched answer as more trustworthy than your own
+     reasoning would have been.
 
 4. **Verify the mirror still holds**:
 
@@ -122,8 +126,8 @@ selects the agent at all; persona dispatch happens via prompt text
 naming an agent defined in `.codex/agents/<name>.toml`. Any
 capacity-dispatch design resolving an `agentType` into real invocation
 args cannot assume any common flag shape across providers — this is why
-Step B.5's native-vs-cli/spawn decision is a real branch, not a detail
-to paper over.
+Step B's native-vs-cli/spawn decision (applied internally by `execute`,
+tsk-5tm-3 D5) is a real branch, not a detail to paper over.
 
 ## Related
 
@@ -133,8 +137,8 @@ to paper over.
   — the precedent this fragment's branch logic was extracted from;
   still the reference for config-entry/registration steps 1–3.
 - `docs/how-to/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md`
-  — Step B.5's own dispatch-decision mechanism in more depth.
+  — Step B's own dispatch-decision mechanism in more depth.
 - `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md`
-  — Native-First Dispatch Doctrine, the governing rules behind Step B.5.
+  — Native-First Dispatch Doctrine, the governing rules behind Step B.
 - `.claude/skills/_shared/capacity-dispatch-fallback.md` — the fragment
   itself.

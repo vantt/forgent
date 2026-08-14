@@ -1226,6 +1226,104 @@ export async function resolveCapacityCli(
 }
 
 /**
+ * `execute <capacityId>` CLI subcommand (tsk-5tm-3 D5): the self-execute
+ * counterpart to `resolve` above, matching marketing-cockpit's `run_task()`
+ * contract (`task-executor.py:550-611`) — self-execute for every case that
+ * can be, hand back only for the one case that genuinely can't. `resolve`
+ * always hands back `{command,args}` for the caller to run itself via
+ * Bash, even for a `kind:"cli"` capacity that `EXECUTOR_ADAPTERS` could
+ * already run directly (`EXECUTOR_ADAPTERS['cli-spawn']` was validated at
+ * config-load time but, before this item, only ever CALLED by `spawnWorker`
+ * — Flow A never called it). `execute` closes that gap:
+ *
+ * - **`mechanism: "in-process"`** (native, same-family, live session) —
+ *   dispatch itself has no Task/Agent tool to call (a passive CLI/library),
+ *   so this is the one case that still hands back — a `spawn_instruction`-
+ *   shaped result, `{mechanism, agentType, prompt[, capacityId]}`, for the
+ *   caller to invoke its OWN Agent/Task tool with. Same `agentType`
+ *   resolution and `hasLiveTaskAccess` self-declaration contract `decide`
+ *   already uses (never probed or inferred here).
+ * - **every other case** (`mechanism: "out-of-process"`, i.e. whatever
+ *   `EXECUTOR_ADAPTERS[adapter]` resolves to for this capacity) — self-
+ *   executes: calls the adapter directly, the same call `spawnWorker`
+ *   already makes for a work item's own dispatch, and returns the REAL
+ *   result (`{status,signal,stdout,stderr,tier,model}` from `cliSpawnAdapter`
+ *   today, plus `provider`/`command`[, `capacityId`] additive, same
+ *   shape `spawnWorker`'s own result already carries) — never the bare
+ *   `{command,args}` `resolve` hands back for the caller to run through
+ *   Bash itself.
+ *
+ * `resolveExecutorCommand` already throws if the resolved `adapter` names
+ * an unregistered `EXECUTOR_ADAPTERS` key (config-load-time validation,
+ * `validateExecutorShape`) — by the time this function reaches the
+ * self-execute branch, `EXECUTOR_ADAPTERS[adapter]` is guaranteed to
+ * exist; the explicit check below is defensive, matching `spawnWorker`'s
+ * own belt-and-braces style rather than load-bearing.
+ */
+export async function executeCapacityCli(
+  capacityIdArg,
+  {
+    prompt = '',
+    cwd = process.cwd(),
+    repoRoot,
+    model: modelOverride,
+    tier: tierOverride,
+    for: purpose,
+    carries,
+    hasLiveTaskAccess = false,
+    timeoutMs: timeoutOverride,
+    maxBuffer: maxBufferOverride,
+    onChunk,
+  } = {},
+) {
+  if (!capacityIdArg && !purpose) {
+    throw new RunnerConfigError(
+      'usage: node src/runner/dispatch.mjs execute <capacityId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] [--has-live-task-access] | execute --for <purpose> [...]',
+    );
+  }
+  // Same main-checkout resolution as resolveCapacityCli above, same reason.
+  const root = repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
+  const fgosDir = fgosDirFromRoot(root);
+  const cfg = ensureRunnerConfigForDir(root);
+  const resolvedByPurpose = !capacityIdArg;
+  const capacityId = capacityIdArg || resolveCapacityIdForPurpose(cfg, purpose);
+  if (!capacityId) {
+    throw new RunnerConfigError(
+      `no capacity registered for purpose "${purpose}" — call "decide --for ${purpose}" first to check availability before executing.`,
+    );
+  }
+
+  const mechanism = decideCapacityDispatchMechanism(cfg, capacityId, { hasLiveTaskAccess });
+  if (mechanism === 'in-process') {
+    const agentType = cfg.capacities?.[capacityId]?.agentType;
+    const base = { mechanism, agentType, prompt };
+    return resolvedByPurpose ? { ...base, capacityId } : base;
+  }
+
+  const capacity = cfg.capacities?.[capacityId];
+  const tier = tierOverride ?? capacity?.tier ?? DEFAULTS.tier;
+  const model = modelOverride ?? capacity?.model ?? modelForTier(cfg, tier);
+  const { command, args, adapter, provider } = resolveExecutorCommand(cfg, {
+    prompt,
+    model,
+    tier,
+    capacityId,
+    fgosDir,
+    contentCarries: carries,
+    attestRoot: cwd,
+  });
+  const adapterFn = EXECUTOR_ADAPTERS[adapter];
+  if (!adapterFn) {
+    throw new RunnerConfigError(`no executor adapter registered for "${adapter}".`);
+  }
+  const timeoutMs = timeoutOverride ?? cfg.timeoutMs;
+  const maxBuffer = maxBufferOverride ?? 10 * 1024 * 1024;
+  const result = await adapterFn(command, args, cwd, { timeoutMs, maxBuffer, onChunk, workId: capacityId, tier, model });
+  const base = { mechanism, ...result, provider, command };
+  return resolvedByPurpose ? { ...base, capacityId } : base;
+}
+
+/**
  * `decide <capacityId>` CLI subcommand (tsk-3ik-1): lets a task-dispatch
  * consumer skill ask, before choosing whether to `exec` the `resolve`d
  * command or call its own Task tool natively, which mechanism
@@ -1312,6 +1410,23 @@ if (import.meta.url === `file://${process.argv[1]}`) {
         process.exitCode = 1;
       },
     );
+  } else if (subcommand === 'execute') {
+    executeCapacityCli(capacityId, {
+      prompt: flagValue('--prompt') ?? '',
+      model: flagValue('--model'),
+      tier: flagValue('--tier'),
+      carries: flagValue('--carries'),
+      for: flagValue('--for'),
+      hasLiveTaskAccess: rest.includes('--has-live-task-access'),
+    }).then(
+      (executed) => {
+        process.stdout.write(`${JSON.stringify(executed)}\n`);
+      },
+      (err) => {
+        process.stderr.write(`${err.message}\n`);
+        process.exitCode = 1;
+      },
+    );
   } else if (subcommand === 'decide') {
     decideCapacityCli(capacityId, {
       hasLiveTaskAccess: rest.includes('--has-live-task-access'),
@@ -1346,7 +1461,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     }
   } else {
     process.stderr.write(
-      `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs resolve <capacityId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] | resolve --for <purpose> [...] | decide <capacityId> [--has-live-task-access] | decide --for <purpose> [--has-live-task-access] | log <capacityId> --id <id> --provider <p> --command <c> [--model <m>]\n`,
+      `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs resolve <capacityId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] | resolve --for <purpose> [...] | execute <capacityId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] [--has-live-task-access] | execute --for <purpose> [...] | decide <capacityId> [--has-live-task-access] | decide --for <purpose> [--has-live-task-access] | log <capacityId> --id <id> --provider <p> --command <c> [--model <m>]\n`,
     );
     process.exitCode = 1;
   }
