@@ -136,6 +136,19 @@ No trigger fired (T1/T2/T3 — see `fgos-coding-validating`'s own Gate step
 (reading `status-fsm.mjs` directly), not a live open choice between two
 standing options anymore. Cost verdict: **REVERSIBLE**.
 
+**Implement-time refinement (2026-08-14):** while writing the actual
+`bin/fgos.mjs` change, transition-origin-only (`from === 'cleanup'`) turned
+out too broad — a `cleanup -> blocked` park can also be caused by
+`checkRetrospectiveContent` failing (missing retrospective docs), a case
+catchup's merge-and-reverify cannot fix and must not silently wave through
+toward `awaiting-approval`. Sharpened to a live re-check of
+`checkMergeStillResolves(repoRoot, item, { view, id })` specifically
+(already imported/exported from `cleanup-harness.mjs`) instead of the
+event-log transition-origin read — same "no new marker needed" property,
+strictly narrower and correct. This is a same-shape implementation
+refinement within the already-flagged-open eligibility-gate assumption
+above, not a scope change — no new `CONTEXT.md`/`plan.md` gap.
+
 ## Outstanding questions
 
 None
