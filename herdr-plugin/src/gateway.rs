@@ -238,6 +238,26 @@ impl IntoResponse for GatewayError {
     }
 }
 
+/// tsk-og6: builds the exact `Command` `spawn_fgos_verb` runs, split out so
+/// its `current_dir` is directly testable (`Command::get_current_dir`)
+/// without spawning a real `node` process. `--dir <root>` alone is not
+/// enough — `session start/end/list/gc` and `move --to delivered`'s
+/// unmerged-branch guard both resolve their own repo root from
+/// `process.cwd()` instead of reading `--dir` (`bin/fgos.mjs:4559,1497`),
+/// so the spawned child's OWN working directory has to agree with `root`
+/// too, or those two verbs silently act on wherever the gateway process
+/// happened to be launched from.
+fn build_fgos_command(root: &Path, args: &[String]) -> std::process::Command {
+    let mut cmd_args: Vec<String> = vec![root.join("bin/fgos.mjs").to_string_lossy().to_string()];
+    cmd_args.extend(args.iter().cloned());
+    cmd_args.push("--dir".to_string());
+    cmd_args.push(root.to_string_lossy().to_string());
+
+    let mut cmd = std::process::Command::new("node");
+    cmd.args(&cmd_args).current_dir(root).stdin(Stdio::null());
+    cmd
+}
+
 /// D7: the sole function that ever spawns `fgos <verb>` on the gateway's
 /// behalf. `args` is everything after the binary path (verb + its own
 /// flags) — `--dir <root>` is appended here, once, so no call site can
@@ -249,14 +269,7 @@ impl IntoResponse for GatewayError {
 /// `tokio::task::spawn_blocking` (see `run_verb_blocking` below), never
 /// call it directly from an async handler body.
 pub fn spawn_fgos_verb(root: &Path, args: &[String]) -> Result<Value, GatewayError> {
-    let mut cmd_args: Vec<String> = vec![root.join("bin/fgos.mjs").to_string_lossy().to_string()];
-    cmd_args.extend(args.iter().cloned());
-    cmd_args.push("--dir".to_string());
-    cmd_args.push(root.to_string_lossy().to_string());
-
-    let output = std::process::Command::new("node")
-        .args(&cmd_args)
-        .stdin(Stdio::null())
+    let output = build_fgos_command(root, args)
         .output()
         .map_err(|err| GatewayError::unexpected(format!("spawning fgos CLI failed: {err}")))?;
 
@@ -745,6 +758,13 @@ pub fn run(root: PathBuf) -> std::io::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn build_fgos_command_runs_in_root_not_the_ambient_process_cwd() {
+        let root = PathBuf::from("/tmp/fgos-gateway-test-root");
+        let cmd = build_fgos_command(&root, &["list".to_string()]);
+        assert_eq!(cmd.get_current_dir(), Some(root.as_path()));
+    }
 
     struct FakeGateway {
         response: Result<Value, String>,
