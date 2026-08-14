@@ -21,6 +21,7 @@
 // exactly as before (D2 of the gate-bypass item — no default-behavior
 // change).
 
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -1079,6 +1080,83 @@ registerCheck({
 registerFix({
   id: 'gate-bypass-configured',
   fix: (cwd) => fixGateBypassConfigured(cwd),
+});
+
+// tsk-4r1 (found by the gateway audit, plans/reports/gateway-audit-
+// 260814-2110-fable-hidden-bugs-report.md Finding 9): `gateway.token`/
+// `gateway.port` (herdr-plugin/src/gateway.rs's `load_gateway_config`,
+// D4/D5) lived nowhere in this registry -- a fresh machine's `fgos setup`
+// never provisioned the section, and `fgos doctor` had no way to notice,
+// violating AGENTS.md's own install/setup/doctor gate.
+//
+// This reads/writes `os.homedir()` explicitly, NOT the `cwd` every other
+// check/fix in this file receives -- `load_gateway_config` reads
+// `~/.fgos/config.json` specifically (a machine-level secret, not a
+// per-project one), so checking/fixing `cwd`'s own `.fgos/config.json`
+// would silently target the wrong file entirely.
+const GATEWAY_HOME_CONFIG_DIR = () => os.homedir();
+
+// Matches herdr-plugin/src/gateway.rs's own `DEFAULT_PORT`.
+const DEFAULT_GATEWAY_PORT = 4170;
+
+function checkGatewayTokenConfigured() {
+  const home = GATEWAY_HOME_CONFIG_DIR();
+  const shared = readSharedConfig(home);
+  const token = shared?.gateway?.token;
+  if (typeof token !== 'string' || token.trim() === '') {
+    return {
+      passed: false,
+      message: `gateway.token missing from ${sharedConfigFilePath(home)} -- run fgos doctor --fix`,
+    };
+  }
+  return { passed: true, message: 'gateway.token present' };
+}
+
+// Idempotent (same discipline fixGateBypassConfigured above already uses):
+// an already-present token is left untouched and reported unchanged, never
+// rotated out from under a client that already has it.
+function fixGatewayTokenConfigured() {
+  const home = GATEWAY_HOME_CONFIG_DIR();
+  const shared = readSharedConfig(home);
+  const existingToken = shared?.gateway?.token;
+  if (typeof existingToken === 'string' && existingToken.trim() !== '') {
+    return { changed: false, message: 'gateway.token already present' };
+  }
+  const existingGateway =
+    shared.gateway && typeof shared.gateway === 'object' && !Array.isArray(shared.gateway) ? shared.gateway : {};
+  // 256 bits, not crypto.randomUUID()'s 122 -- this is a bearer secret,
+  // not a non-secret session id (session.mjs's own use of randomUUID is a
+  // different kind of value).
+  const token = crypto.randomBytes(32).toString('hex');
+  const merged = {
+    ...shared,
+    gateway: { port: existingGateway.port ?? DEFAULT_GATEWAY_PORT, ...existingGateway, token },
+  };
+  writeSharedConfig(home, merged);
+  return { changed: true, message: `wrote a new gateway.token to ${sharedConfigFilePath(home)}` };
+}
+
+registerConfigDefault({
+  id: 'gateway',
+  key: 'gateway',
+  // `token: null` -- present but unarmed, the same shape `workerSlots`'s
+  // own `ceiling: null` registration already uses below: shipping a real
+  // value here would mean every fresh install gets the SAME shared,
+  // predictable secret, defeating D4's whole point. A real token only
+  // ever comes from fixGatewayTokenConfigured's own crypto.randomBytes
+  // call, run explicitly via `fgos doctor --fix`.
+  shape: { port: DEFAULT_GATEWAY_PORT, token: null },
+});
+
+registerCheck({
+  id: 'gateway-token-configured',
+  description: 'gateway.token in ~/.fgos/config.json (home, not project) is present and non-empty',
+  check: () => checkGatewayTokenConfigured(),
+});
+
+registerFix({
+  id: 'gateway-token-configured',
+  fix: () => fixGatewayTokenConfigured(),
 });
 
 // tsk-4xg (docs/history/tsk-4xg-plugin-marketplace-doctor-check/): a new

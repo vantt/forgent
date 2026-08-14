@@ -27,9 +27,12 @@ info:
         a separate subsystem with its own delivery-semantics record.
         Clients poll `data_hash` on read endpoints until CTR008 lands.
       - Identity here is ATTRIBUTION, not authentication (same non-goal
-        CTR001 already states for the CLI's own `writer` field): this
-        gateway does not gate who may call it — that is STR38, explicitly
-        out of scope of 0014 itself.
+        CTR001 already states for the CLI's own `writer` field): every
+        route below other than `/contract` itself requires the shared
+        per-machine bearer token (D4, `securitySchemes.bearerAuth`) — that
+        token gates ACCESS to the gateway, not per-caller IDENTITY. Who a
+        caller claims to be beyond holding that one shared token is STR38,
+        explicitly out of scope of 0014 itself.
 
     Envelope reuse: every successful response body is the SAME `fgos.v1`
     envelope (CTR001) the CLI already emits on stdout — `{contract,
@@ -58,6 +61,13 @@ servers:
       port:
         default: "4170"
 
+# tsk-4qf: every operation inherits this (D4's real, already-enforced
+# require_token gate) unless it overrides with its own `security: []` --
+# today only `/contract` does, since a client has to read the contract
+# before it can know a token is even required.
+security:
+  - bearerAuth: []
+
 tags:
   - name: work
     description: Work-item lifecycle (read + write), one-to-one with `fgos list/show/submit/move/ask/answer` etc.
@@ -82,6 +92,7 @@ paths:
         able to read the contract before it can know a token is even
         required (D4). Never wrapped in the `fgos.v1` envelope: this is the
         spec document itself, not a poll of fgOS state.
+      security: []
       responses:
         '200':
           description: OK
@@ -144,9 +155,6 @@ paths:
         Derives title/tier/kind/risk and auto-classifies domain. This is
         the one gateway-side write that creates state that did not exist
         before — every other write endpoint below acts on an existing id.
-      parameters:
-        - $ref: '#/components/parameters/WriterId'
-        - $ref: '#/components/parameters/WriterRole'
       requestBody:
         required: true
         content:
@@ -201,9 +209,6 @@ paths:
       operationId: moveWork
       tags: [work]
       summary: Move a work item through the status FSM (wraps `fgos move`)
-      parameters:
-        - $ref: '#/components/parameters/WriterId'
-        - $ref: '#/components/parameters/WriterRole'
       requestBody:
         required: true
         content:
@@ -225,9 +230,6 @@ paths:
       operationId: askWork
       tags: [work]
       summary: Park an item in awaiting-human with a question (wraps `fgos ask`)
-      parameters:
-        - $ref: '#/components/parameters/WriterId'
-        - $ref: '#/components/parameters/WriterRole'
       requestBody:
         required: true
         content:
@@ -248,9 +250,6 @@ paths:
       operationId: answerWork
       tags: [work]
       summary: Answer a parked question and resume the item (wraps `fgos answer`)
-      parameters:
-        - $ref: '#/components/parameters/WriterId'
-        - $ref: '#/components/parameters/WriterRole'
       requestBody:
         required: true
         content:
@@ -271,8 +270,6 @@ paths:
       operationId: takeWork
       tags: [work]
       summary: Claim an item through the pull door (wraps `fgos take`/`fgos pick`)
-      parameters:
-        - $ref: '#/components/parameters/WriterId'
       requestBody:
         content:
           application/json:
@@ -281,9 +278,12 @@ paths:
               properties:
                 role:
                   type: string
-                  enum: [human, runner, session]
+                  enum: [human, session]
                   default: session
-                  description: Same role vocabulary as CTR001's `role` field.
+                  description: |
+                    take --role's real, deliberately-scoped vocabulary
+                    (bin/fgos.mjs's own S2-pull D1) — the pull door
+                    excludes the runner role by design, not by omission.
       responses:
         '200': { $ref: '#/components/responses/WorkOk' }
         default: { $ref: '#/components/responses/Error' }
@@ -295,8 +295,6 @@ paths:
       operationId: returnWork
       tags: [work]
       summary: Complete a take — run verify, advance to awaiting-approval (wraps `fgos return`)
-      parameters:
-        - $ref: '#/components/parameters/WriterId'
       responses:
         '200': { $ref: '#/components/responses/WorkOk' }
         default: { $ref: '#/components/responses/Error' }
@@ -309,8 +307,6 @@ paths:
       tags: [work]
       summary: Merge an awaiting-approval item and move it to delivered (wraps `fgos approve`)
       description: "Carries `externalEffect: true` in the CLI's own verb registry (may open/merge a real PR) — same meaning here."
-      parameters:
-        - $ref: '#/components/parameters/WriterId'
       responses:
         '200': { $ref: '#/components/responses/WorkOk' }
         default: { $ref: '#/components/responses/Error' }
@@ -322,8 +318,6 @@ paths:
       operationId: rejectWork
       tags: [work]
       summary: Reject an awaiting-approval item back to todo (wraps `fgos reject`)
-      parameters:
-        - $ref: '#/components/parameters/WriterId'
       requestBody:
         required: true
         content:
@@ -444,8 +438,6 @@ paths:
         herdr/TUI pane does today by shelling out directly. A future
         web/desktop client drives the same lifecycle through this route
         instead of spawning its own git worktree.
-      parameters:
-        - $ref: '#/components/parameters/WriterId'
       requestBody:
         content:
           application/json:
@@ -478,7 +470,6 @@ paths:
       tags: [orchestration]
       summary: Close an interactive session worktree (wraps `fgos session end`)
       parameters:
-        - $ref: '#/components/parameters/WriterId'
         - name: force
           in: query
           schema: { type: boolean, default: false }
@@ -567,6 +558,19 @@ paths:
           $ref: '#/components/responses/Error'
 
 components:
+  securitySchemes:
+    # tsk-4qf: matches require_token's own real enforcement (D4) -- one
+    # shared token per machine, read from ~/.fgos/config.json's
+    # gateway.token, checked as a plain Bearer header (not a per-user
+    # credential; see this document's own top-level "Identity here is
+    # ATTRIBUTION, not authentication" note).
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: |
+        The one shared per-machine token (D4). Every route below this
+        component list requires it except `/contract`, which overrides
+        with its own `security: []`.
   parameters:
     WorkId:
       name: id
@@ -583,26 +587,6 @@ components:
       name: limit
       in: query
       schema: { type: integer, minimum: 1 }
-    WriterId:
-      name: X-Fgos-Writer-Id
-      in: header
-      required: false
-      schema: { type: string }
-      description: |
-        Attribution only (not authentication — see this contract's own
-        top-level description). Forwarded into the underlying CLI call's
-        `writer.id`; a caller that omits it gets whatever the daemon
-        process itself resolves (env/pid), same as an unidentified CLI
-        caller today.
-    WriterRole:
-      name: X-Fgos-Writer-Role
-      in: header
-      required: false
-      schema:
-        type: string
-        enum: [human, runner, session, system]
-      description: Forwarded into the underlying CLI call's `role` field (CTR001).
-
   responses:
     WorkOk:
       description: OK
