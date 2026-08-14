@@ -4754,7 +4754,11 @@ async function runVerb(verb, flags, positional, dir) {
     // uses), so this reuses it as-is rather than adding a parallel
     // global-specific writer.
     case 'setup': {
-      const repoRoot = process.cwd();
+      // tsk-2xj: same --dir resolution as `doctor`/`uninstall` below and
+      // `resync-worktree` (:4939) — setup's writes are unconditional (tsk-5hi),
+      // so run from a linked worktree this used to materialize .fgos/config.json
+      // INSIDE the worktree (ADR0020 violation), not just report wrong.
+      const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());
       const scriptPath = integrationScriptPath();
       const rcFiles = detectRcFiles(os.homedir());
       const rcFilesInserted = [];
@@ -4863,7 +4867,8 @@ async function runVerb(verb, flags, positional, dir) {
           'fgos uninstall requires --yes to confirm — it unwires git hooks (core.hooksPath/.githooks) and reports (never deletes) the shell-rc source line. Rerun with --yes once ready.',
         );
       }
-      const repoRoot = process.cwd();
+      // tsk-2xj: same --dir resolution as `doctor`/`setup` above.
+      const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());
       const scriptPath = integrationScriptPath();
       const shellRcSourceLinesFound = scriptPath === null
         ? []
@@ -4908,9 +4913,16 @@ async function runVerb(verb, flags, positional, dir) {
     // `ensureRunnerConfig`/`ensureSharedConfigDefaults` already use. Without
     // `--fix`, behavior is byte-identical to before this flag existed.
     case 'doctor': {
-      const fixed = flags.fix ? runFixes(process.cwd()) : undefined;
+      // tsk-2xj: resolve the real main checkout the same way `resync-worktree`
+      // (:4939) already does — an explicit --dir always wins, otherwise
+      // self-detect via resolveMainCheckoutRoot so this reports/fixes the
+      // shared store even when run from a linked worktree (ADR0020: a
+      // worktree never carries its own .fgos/, so process.cwd() there was
+      // silently checking/writing the wrong tree).
+      const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());
+      const fixed = flags.fix ? runFixes(repoRoot) : undefined;
       const checks = DOCTOR_CHECKS.map(({ id, description, check }) => {
-        const { passed, message } = check(process.cwd());
+        const { passed, message } = check(repoRoot);
         return { id, description, passed, message };
       });
       return fixed === undefined ? { checks } : { fixed, checks };
