@@ -2,22 +2,20 @@
 
 ## 1. Trạng thái hiện tại
 
-Round 4 (fable design pass) đã chạy xong (2026-08-14): đọc trọn cả 7 case
-block (`merge` L2423-2577, `review` L3109-3194, `approve` L3254-3985 đủ 741
-dòng, `sync-root` L3996-4199, `promote-to-component` L4210-4346, `reject`
-L4353-4365, `catchup` L4383-4490) và phân loại từng mảnh logic thành
-adapter / use-case / domain-infra. Đề xuất cụ thể nằm trọn trong §5 Round 4:
-7 file mới dưới `src/usecase/` (1 file/verb, tên trùng verb), mỗi verb 1
-use-case function nhận `ctx` (dir/cwd/repoRoot do adapter tính) + options
-(flags đã parse thành structured object), trả về đúng payload `fgos.v1`
-hiện tại. Phát hiện mới quan trọng: repo ĐÃ có tầng `use-case` khai báo sẵn
-trong `docs/architecture-manifest.json` (entry > use-case > infra > domain >
-kernel, enforce bằng `test/architecture.test.mjs`) — thiết kế này là đăng ký
-file mới vào tầng có sẵn, không phát minh tầng mới; và `bin/fgos.mjs` còn
-chứa cả một cơ chế git infra trọn vẹn (`performCatchUp` L1063-1122) mà
-round 1-3 chưa soi tới. Đang chờ người xác nhận đề xuất round 4 (đặc biệt:
-chọn chỗ ở `src/usecase/` — có tension bề mặt với lý lẽ D2) trước khi
-regenerate §6/§7 (hiện vẫn STALE, viết cho scope round-3).
+Round 5 (fable brainstorm/advisory pass, 2026-08-14) đã chạy xong: soi lại
+bằng chứng cho đúng 2 câu hỏi mở round 4 để lại (chỗ ở use-case layer, và
+trace graze sang `check`). Kết quả chính: (a) framing "graze vào `check`"
+của round 4 KHÔNG chính xác về cơ chế — 2 collector là helper module-level
+trong bin dùng chung bởi 5 verb (review/check/show/doc-sources/evolve
+--pick), move chúng ra không đổi 1 dòng logic nào trong bất kỳ case block
+nào; lý lẽ "adapter-đắp-trace cũng không tránh được graze" của phiên điều
+phối cũng sai thực tế, nhưng kết luận (chấp nhận move `item-trace.mjs`)
+vẫn đứng vững trên căn cứ mạnh hơn; (b) cho câu hỏi chỗ ở, round 5 tìm
+thấy 1 option thứ ba chưa ai xét (`src/verbs/` — đặt tên theo LOẠI, khớp
+convention "folder theo area/kind, manifest theo layer" mà repo đang thật
+sự dùng). Chi tiết + khuyến nghị riêng của round 5 ở §5. Cả 2 câu hỏi giờ
+đủ bằng chứng cho người quyết. §6/§7 vẫn STALE (viết cho scope round-3) —
+round 5 là advisory, không đụng; regenerate sau khi người chốt 2 câu này.
 
 ## 2. Mục tiêu & đề bài
 
@@ -614,6 +612,127 @@ acknowledge-iron-law itself") giữ nguyên: options chỉ mang giá trị ngư�
 2. **Graze `check` qua `src/report/item-trace.mjs`** (mục 1, review): chấp
    nhận import-only graze, hay ép alternative adapter-đắp-trace để tuyệt
    đối 0 chạm ngoài cluster?
+
+**[Round 5 — fable brainstorm/advisory pass, 2026-08-14]**
+
+Q: Stress-test 2 câu hỏi mở round 4 để lại (chỗ ở use-case layer; trace
+graze sang `check`) — không rubber-stamp, scout lại bằng chứng, tìm option
+thứ ba nếu có, rồi đưa khuyến nghị riêng. Round này là advisory: không
+sửa §3/§4/§6/§7, không mint D-ID — người quyết ở round sau.
+
+A (mọi số dòng đọc trực tiếp từ worktree `fgw/tsk-49i`):
+
+**Câu hỏi 2 trước (trace graze) — vì scout lật ngược cả 2 framing đang có:**
+
+1. **Framing "graze vào `check`" của round 4 sai về cơ chế.** 2 collector
+   (`collectOutcomeEntry` L549, `collectFrictionData` L569) + wrapper
+   `collectReviewTrace` (L593) là hàm module-level của `bin/fgos.mjs`,
+   không phải của riêng verb nào — và consumer thật là NĂM verb, không
+   phải hai: `review` (L3193), `check` (L818-819 qua `collectCheckData`),
+   `show` (L2229-2230), `doc-sources` (L2691), `evolve --pick` (L4533).
+   Vì thế move chúng sang `src/report/item-trace.mjs` KHÔNG phải "check
+   đổi 1 dòng import" (check không có file riêng để đổi import): nó là
+   xoá ~50 dòng định nghĩa khỏi bin + thêm đúng 1 dòng import ở đầu bin —
+   cả 5 case block giữ nguyên từng ký tự, gọi đúng tên hàm cũ. Không tồn
+   tại "cú chạm vào verb ngoài cluster" ở mức code; chỉ có "khu helper
+   dùng chung của bin co lại".
+2. **Lý lẽ của phiên điều phối cho việc chấp nhận graze cũng sai thực
+   tế.** Phiên điều phối lập luận "alternative adapter-đắp-trace không
+   tránh được graze — `item-trace.mjs` vẫn phải ra đời và `check` vẫn
+   import nó". Không đúng: dưới alternative đó, các collector Ở NGUYÊN
+   trong bin, không có file mới nào, không import nào đổi — alternative
+   ấy thật sự đạt "tuyệt đối 0 chạm". Nó yếu vì lý do khác, có bằng
+   chứng:
+   - `trace` chỉ đắp lên payload mode `'local'` (đọc trọn 3 return path
+     của `review` L3144-3193: hai nhánh `github-status`/`github-create`
+     không có `trace`) — adapter muốn đắp phải soi `payload.mode` của
+     use-case, tức tầng trình bày phải hiểu cấu trúc trong của payload
+     nghiệp vụ.
+   - Use-case của review tự đọc view (`listWork(dir)`); adapter muốn tính
+     trace phải gọi `listWork` LẦN HAI (replay trọn event log — đúng cái
+     mùi double-computation mà chính discussion này đã từ chối ở approve,
+     tiền lệ tsk-598 "không tính diff 2 lần"), hoặc luồn view/trace qua
+     options một cách gượng ép.
+3. **Căn cứ mạnh hơn để vẫn chọn move:** 2 collector là pure view-reader
+   (0 fs, 0 shell — đọc toàn văn L549-598), tức là chất liệu tầng
+   `domain` theo chính live invariant của repo (sibling cùng vai:
+   `src/report/entropy.mjs`, đã đăng ký `domain`). Chúng đang NẰM SAI
+   TẦNG (entry) từ trước — move ra là cohesion hygiene đúng hướng, cùng
+   họ với các move D1 (`isMainWorktree` → worktree.mjs), không phải một
+   "graze" cần xin lỗi. Khuyến nghị kèm: đăng ký `item-trace.mjs` row
+   `domain` trong manifest (use-case rank 1 import domain rank 3 — hợp
+   lệ; entry import domain — hợp lệ).
+4. **Residual own thẳng:** họ collector còn lại (`collectSettlementData`
+   L603+, `collectLearningData` L633+, nag/changelog) VẪN ở bin sau move
+   — một family split thật. Chấp nhận (YAGNI): chúng chỉ phục vụ
+   check/show, chưa verb nào trong cluster D3 cần; nếu check/show có
+   ngày được extract thành use-case riêng thì migrate nốt khi đó.
+
+**Khuyến nghị round 5 cho câu hỏi 2 (của riêng round này):** đồng ý với
+KẾT LUẬN của round 4 + phiên điều phối (move sang `item-trace.mjs`),
+nhưng dissent với LÝ LẼ của cả hai — đề nghị round chốt reframe nó thành
+"relocate 2 pure collector đang nằm sai tầng entry về domain" (một
+cohesion move cùng họ D1), thay vì "graze tối thiểu hoá vào check". Câu
+chữ này ảnh hưởng thật đến plan: nó bỏ nhu cầu "xin phép chạm ngoài
+cluster" và thay bằng 1 dòng manifest + 1 import line, phạm vi đo được.
+
+**Câu hỏi 1 (chỗ ở use-case layer):**
+
+1. **Convention thật của repo (scout, không phỏng đoán):** folder đặt
+   tên theo AREA/chức năng, manifest đặt tên theo LAYER — hai trục độc
+   lập. Bằng chứng: 10 folder hiện có (`state/ runner/ intake/ report/
+   evolve/ setup/ cli/ util/ config/ install/`) đều là tên area, KHÔNG
+   folder nào mang tên layer; `test/architecture.test.mjs` chỉ đọc
+   manifest row, không nhìn đường dẫn; và chính
+   `docs/architecture-map.md` L331 đã mô hình hoá đúng shape đang bàn:
+   "`fgos submit` + auto-classify = verb (Entry) + use-case intake
+   (Use-case)" — tức use-case logic của verb `submit` sống trong
+   `src/intake/` (folder area), không trong folder tên tầng. 2 file
+   use-case-rank hiện có tự mô tả bằng vai area ("context-discovery
+   engine" — intake; "the sequential runner loop" — runner), rank
+   use-case của chúng là thuộc tính manifest, không phải địa chỉ.
+2. **Vậy `src/usecase/` là folder ĐẦU TIÊN mang tên layer** — mixing 2
+   taxonomy. Nó chạy được (test không quan tâm), tránh collision, làm
+   tầng nhìn thấy được; nhưng nó sẽ nuôi vĩnh viễn câu hỏi "vì sao
+   loop.mjs/intake không ở usecase/?" mà round 4 đã tự flag, vì cái tên
+   folder TỰ TUYÊN BỐ mình là tầng.
+3. **Option thứ ba chưa ai xét: `src/verbs/<verb>.mjs`** — đặt tên theo
+   LOẠI nội dung ("application logic của một CLI verb"), không theo
+   layer. "Verb" là từ vựng sản phẩm lõi của repo (architecture-map
+   L179/L271/L302/L331 nói "mỗi verb", "verbs ask/answer", "control
+   thuộc use-case/domain đứng sau verb"; AGENTS.md nói "engine verb",
+   "one-door-write verbs"). Được gì: (a) giữ nguyên convention
+   folder-theo-area/kind; (b) hết collision (`verbs/merge.mjs` ≠
+   `runner/merge.mjs`); (c) câu hỏi inconsistency gần như tan —
+   `loop.mjs` không phải verb nên không ai hỏi vì sao nó không ở đây;
+   (d) scale đúng hướng 1-2 năm: nếu pattern thành công, thứ được
+   extract tiếp (check/show/list...) đều LÀ verb — chúng có nhà sẵn tên
+   đúng. Điểm yếu thật, nói thẳng: `intake/discovery.mjs`/`plan.mjs`
+   cũng là use-case đứng sau verb (`discover`/`plan`) mà vẫn ở
+   `intake/` — câu hỏi "vì sao chúng không ở verbs/?" không biến mất
+   hẳn, chỉ nhỏ đi và có câu trả lời nguyên tắc ("area folder có sẵn
+   thì ở area folder; verbs/ cho verb logic chưa có area riêng").
+4. **Áp lực migration 1-2 năm — nên chặn bằng chữ ngay trong quyết
+   định.** Dù chọn tên nào, khuyến nghị quyết định chốt ghi RÕ "không
+   ngụ ý retroactive migration cho 7 file use-case-rank hiện có
+   (loop.mjs, intake/*, setup/*, cursor.mjs)" — không ghi thì áp lực
+   consistency sẽ tự tích tụ âm thầm, và một item "dọn cho đều" sẽ tự
+   mọc ra sau này với chi phí regression thật mà 0 lợi hành vi.
+
+**Khuyến nghị round 5 cho câu hỏi 1 (của riêng round này):** xếp hạng
+`src/verbs/` ≥ `src/usecase/` >> tên-né-collision trong `runner/`. Cả 2
+option đầu đều đứng được — khác biệt là taste call thật giữa "tên khớp từ
+vựng manifest, tầng nhìn thấy được" (usecase/) và "tên khớp convention
+folder thật của repo, khớp từ vựng sản phẩm, tự nhiên hơn khi mở rộng"
+(verbs/) — round 5 nghiêng verbs/ nhưng đây đúng là chỗ người chốt, máy
+không tự quyết. Chọn `src/usecase/` theo lean của phiên điều phối KHÔNG
+sai; option verbs/ được trình ở đây vì chưa round nào cân nó.
+
+**Kết round 5:** cả 2 câu hỏi giờ đủ bằng chứng cho người quyết; không
+câu hỏi thứ ba nào phát sinh cần người cân thêm (chi tiết layer-row
+`domain` cho `item-trace.mjs` là việc của planning, không phải quyết định
+sản phẩm). Sau khi người chốt: mint D-ID tương ứng rồi regenerate §6/§7
+theo đúng scope D3.
 
 ## 6. Thiết kế đã chốt {#design}
 
