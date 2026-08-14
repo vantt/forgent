@@ -211,6 +211,17 @@ one.
   batch, per D8's trim rule) — never a design that adds an unbounded or
   per-wave-unbounded synchronous pass.
 
+## Gate — `validateApprove`
+
+`gate-check --gate validateApprove --cost REVERSIBLE` returned
+`canAutoApprove: false` — not a content gap (cost verdict was already
+`REVERSIBLE`, no T1/T2/T3 trigger fired, both `heavy` rows closed with real
+evidence above), but the tier ceiling: 2 of 6 children are `risk: heavy`
+(D4, D9), which gate-bypass level `standard` does not cover. Asked the
+person to confirm materializing all 6 as split, vs. pulling D4/D9 into a
+more-supervised item — person answered **go ahead, all 6 as planned**.
+Recorded via `fgos gate-approve --actor human`.
+
 ## Outstanding questions
 
 None
