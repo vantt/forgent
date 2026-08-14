@@ -592,6 +592,189 @@ resolved within this item's own scope"). G1/G2 ở trên đã chốt phần mà 
 sản phẩm cần quyết; phần còn lại (authz mịn, hợp đồng API gateway) hạ cánh
 đúng vào `## Open Gaps` của spec.
 
+## Kế hoạch riêng của P0b `tsk-3x6` (2026-08-14) — UI spec + wireframe
+
+Con này (`docs`, `parent: tsk-ldb`, `deps: [tsk-54j]`) chạy ngay sau P0a và
+lấy chính output của P0a — `docs/specs/herdr-web-dashboard.md` — làm nguồn
+thông tin sản phẩm. Nhánh `fgw/tsk-3x6` fork thẳng từ commit merge P0a vào
+`fgw/tsk-ldb`, nên spec đó **có mặt sẵn trong cây làm việc** (đã kiểm:
+`docs/specs/herdr-web-dashboard.md` tồn tại tại base của nhánh này).
+
+### Mode: standard
+
+**3 flag, không flag nào hard-gate:**
+
+| Flag | Bằng chứng |
+|---|---|
+| public contracts | Tài liệu này là tiêu chí nghiệm thu của P3 (`tsk-5jr`) và P4 (`tsk-4id`). Bản mô tả item nói rõ vì sao: verify của P4 chỉ chứng minh tính đúng (ghép cặp theo seq, chặn path traversal, gộp hai kênh) — **không mệnh đề nào chạm tới tính dễ đọc**, nên P4 có thể xanh hoàn toàn mà vẫn trượt mục tiêu thật |
+| weak proof | Tiêu chí nghiệm thu thật là **chủ quan** ("câu hỏi trình bày sao cho người không có ngữ cảnh trong đầu trả lời nhanh"). Verify của item chỉ grep 3 heading + 1 trích dẫn — không đo được điều đó |
+| cross-platform | Nhu cầu gốc là **dùng từ điện thoại** (`CONTEXT.md` §"Vì sao D12"), nên bố cục phải trả lời cả desktop lẫn mobile, không phải một |
+
+**Vì sao không phải lane lớn hơn:** không có flag hard-gate nào. Item này
+không quyết định bảo mật, không đụng schema, không đụng code — mọi quyết
+định về auth/phơi nhiễm đã khoá ở P0a và chỉ được **vẽ lại**, không mở
+lại. Và không phải lane nhỏ hơn vì 3 flag vượt ngưỡng `small`.
+
+### Approach
+
+#### Đường đã chọn
+
+Hai artifact, một nguồn:
+
+1. **Spec có cấu trúc + wireframe sinh bằng kỹ năng `ui-spec`** dưới
+   `docs/ui-spec/` — đúng chỉ dẫn bổ sung 2026-08-14 của bản mô tả item
+   ("write this item's UI spec using the `ui-spec` skill … and generate the
+   wireframe with that same skill's tooling rather than hand-authoring
+   either artifact").
+2. **`docs/reference/herdr-web-dashboard-layout.md`** — tài liệu người đọc,
+   đúng đường dẫn + 3 heading mà `verify` của item đòi, trích
+   `docs/specs/herdr-web-dashboard.md` và trỏ sang artifact ở (1).
+
+Hai thứ này không trùng việc: (1) là hợp đồng tương tác máy-đọc-được +
+wireframe bấm được; (2) là bản đọc-một-lượt mà `tsk-5jr`/`tsk-4id` mở ra
+khi build, đúng vai trò tiền lệ `docs/reference/herdr-dashboard-layout-and-
+action-queues.md` đang giữ cho TUI (bản mô tả item chỉ đúng tiền lệ này).
+
+**Căng thẳng phải nói thẳng, không giấu:** `ui-spec/SKILL.md` §"When NOT to
+use" ghi rõ nó dành cho app **≥ 20 surface**, và "app đơn giản < 15 màn thì
+PRD + Figma là đủ". Bề mặt này có ~7 surface. Nghĩa là kỹ năng đang được
+dùng dưới ngưỡng nó tự khai. Vẫn làm, vì hai lý do có thật: chủ sản phẩm
+yêu cầu tường minh, và thứ thật sự cần ở đây — **một wireframe bấm được để
+soi tính dễ đọc trước khi có pixel** — chính là thứ `interpret:wf` sinh ra,
+không phụ thuộc số lượng surface. Ghi lại để phiên sau không tưởng là đã bỏ
+sót cổng của chính kỹ năng đó.
+
+#### Kiểm kê surface (từ `docs/specs/herdr-web-dashboard.md`)
+
+Lấy thẳng từ `## Behaviors & Operations` của area spec, không tự chế:
+
+| ID | Loại | Surface | Nguồn trong area spec |
+|---|---|---|---|
+| S01 | screen | Sign in | §Sign in |
+| S02 | screen | Taskboard | §View the taskboard (kỳ vọng Monday.com/ClickUp) |
+| S03 | screen | Task detail | §View a task's detail — **deliverable lõi** |
+| S04 | screen | Questions needing answer | §Entry Points, D4 (gộp `ask` + `gate-approve`) |
+| M01 | modal | Answer a parked question | §Answer a parked question |
+| M02 | modal | Approve a merge (xác nhận) | §Approve a merge — hành động duy nhất đổi trunk |
+| M03 | modal | Add / Edit work item | §Add + §Edit a work item |
+| C01 | component | Status pill + quick actions | kỳ vọng "quick actions reachable in place" |
+| F01 | flow | Trả lời một câu hỏi đang đỗ, đầu-cuối | bản mô tả item: userflow bắt buộc |
+| F02 | flow | Duyệt merge, đầu-cuối | bản mô tả item: userflow bắt buộc |
+
+"Retire a work item" không có surface riêng — nó là quick action trên C01
+cộng một xác nhận, đúng như area spec mô tả (retire, không phải delete).
+
+#### Phương án đã cân nhắc và loại
+
+| Phương án | Vì sao loại |
+|---|---|
+| Chỉ viết tay `docs/reference/...md`, bỏ `ui-spec` | Trái chỉ dẫn tường minh 2026-08-14 của bản mô tả item, và mất wireframe bấm được — thứ duy nhất soi được tiêu chí dễ đọc trước khi có pixel |
+| Chỉ sinh cây `docs/ui-spec/`, bỏ file reference | `verify` của item grep đúng `docs/reference/herdr-web-dashboard-layout.md` + 3 heading; bỏ nó thì item không bao giờ xanh, và `tsk-5jr`/`tsk-4id` mất bản đọc-một-lượt |
+| Chạy `ui-spec generate` tự động từ PRD | Pipeline `generate` giả định một PRD đơn lẻ; ở đây nguồn là area spec + 14 D-ID + 10 D-ID của tsk-7l9. Kiểm kê surface bằng tay từ `## Behaviors & Operations` là chính xác hơn và kiểm chứng được từng dòng |
+| Vẽ luôn màu/typography chi tiết mức design system | Bản mô tả item chỉ đòi "colour/typography choices", không đòi design system. Mở rộng là tự bơm scope |
+
+#### Bản đồ rủi ro
+
+`impact-analysis: degraded` — `fgos tool query` báo gitnexus `present`,
+hook trong phiên báo index cũ. Item không đụng code nên posture không chặn.
+
+| # | Thành phần | Mức | Điều gì chứng minh được |
+|---|---|---|---|
+| RB1 | Tooling `ui-spec` không chạy được trên máy này | **Đã đóng** | `tools/node_modules` vắng lúc đầu (`ERR_MODULE_NOT_FOUND` khi import `ajv`); `npm ci` trong `.claude/skills/ui-spec/tools/` chạy thật: **added 63 packages in 531ms**. Đây là dựng tooling của chính kỹ năng, không phải thêm dependency vào repo forgent |
+| RB2 | Spec cấu trúc lệch khỏi area spec (tự chế màn/hành động không có trong P0a) | **Trung bình** | Bảng kiểm kê surface ở trên trích từng mục `## Behaviors & Operations`; tại validating đọc ngược lại area spec, mỗi surface phải chỉ được về một mục có thật |
+| RB3 | Wireframe sinh ra rỗng/hỏng (contract block sai, target treo) | **Trung bình** | `npm run check` (= `validate` + `build`) phải exit 0; `npm run interpret:wf` phải sinh file HTML có thật. Cả hai đo được, không phải phán |
+| RB4 | Tài liệu reference lệch heading → verify đỏ vĩnh viễn | **Thấp** | Chính `verify` là bằng chứng: đo **exit 1** hôm nay; xanh khi 3 heading + trích dẫn có mặt |
+| RB5 | Quyết định CSS framework bị tự chốt thay người | **Trung bình** | Bản mô tả item khai đây là quyết định **còn mở** và D14 im lặng về CSS framework. Không tự chốt — đưa lên cổng validateApprove kèm so sánh thật (xem "Câu hỏi mang lên cổng") |
+| RB6 | Footprint khai thiếu → va chạm dispatch song song | **Thấp** | Footprint hiện chỉ khai 1 file; kế hoạch này chạm thêm `docs/ui-spec/**`. Sửa `footprint` của item trước khi executing |
+
+#### Thứ tự
+
+`deps` có thật: `tsk-54j` (đã `delivered`, merge vào `fgw/tsk-ldb`) →
+`tsk-3x6`. Trong item: kiểm kê surface → file cross-cutting → surface file
+(prose) → contract block → flow → `npm run check` → `interpret:wf` →
+cuối cùng mới viết `docs/reference/herdr-web-dashboard-layout.md`, vì tài
+liệu đó phải trích được kết quả wireframe chứ không phải hứa trước.
+
+### Shape
+
+**`docs/ui-spec/`** theo đúng khuôn kỹ năng: `spec.config.yaml`,
+`00-overview.md`, `20-domain-rules.md`, `30-states-and-errors.md`,
+`15-system-events.md`, rồi `screens/`, `modals/`, `components/`, `flows/`
+theo bảng kiểm kê. Domain rule lấy thẳng từ `## Business Rules` R1-R11 của
+area spec, không phát minh rule mới.
+
+**`docs/reference/herdr-web-dashboard-layout.md`** — heading bắt buộc theo
+`verify`, cộng phần bổ sung mà bản mô tả item liệt kê:
+
+- `## Userflow` — đầu-cuối: đăng nhập → taskboard → mở task → trả lời câu
+  hỏi đang đỗ → duyệt merge.
+- `## Taskboard` — bố cục kiểu Monday.com/ClickUp: nhóm theo status, pill
+  màu theo status, quick action tại chỗ, control lọc/nhóm.
+- `## Task detail` — **mục lõi**: ba vùng (câu hỏi / vì sao đang hỏi / ngữ
+  cảnh item) sắp xếp ra sao, và timeline hỏi-đáp trình bày thế nào qua
+  nhiều vòng đỗ.
+- `## Empty and error states` — item chưa từng đỗ; `docsRef` trỏ thư mục
+  không tồn tại; gateway không với tới được.
+- `## Colour and typography` — bảng màu + thang chữ, kèm lý do.
+- Trích `docs/specs/herdr-web-dashboard.md` làm nguồn sản phẩm (mệnh đề
+  thứ 5 của verify), và trỏ sang wireframe sinh được.
+
+### Câu hỏi mang lên cổng validateApprove
+
+**Quyết định CSS framework** — bản mô tả item khai là còn mở, D14 chỉ khoá
+vite + TypeScript và **im lặng về CSS**. Đã so sánh thật:
+
+| | Tailwind (kèm/không kèm stitch) | CSS viết tay |
+|---|---|---|
+| Chi phí | +1 dependency frontend, tích hợp vite là đường mòn sẵn | Không thêm dependency |
+| Hợp với mục tiêu | Board mật độ cao kiểu Monday/ClickUp đúng chỗ utility-class tiết kiệm nhiều nhất | Kiểm soát hoàn toàn, nhưng tốn công cho đúng loại UI này |
+| Đảo ngược | Utility class rải khắp markup → gỡ ra là viết lại style | Về sau muốn theo Tailwind cũng là viết lại style |
+| Tiền lệ repo | Không có tiền lệ CSS framework nào (herdr là TUI) | Cũng không có tiền lệ |
+
+Không bên nào rẻ để đảo ngược, nên **không áp dụng lối thoát "chọn cái đảo
+ngược được rồi đi tiếp"** — đây là T1 thật (hai phương án còn đứng sau khi
+so sánh), và nó ràng buộc P2-P5 chứ không chỉ tài liệu này.
+
+### Assumptions
+
+| # | Giả định | Nếu sai thì sao |
+|---|---|---|
+| A8 | Cây `docs/ui-spec/` là nơi hợp lệ cho artifact máy-đọc-được của UI (kỹ năng mặc định vào đó) | Nếu repo muốn nơi khác, di chuyển thư mục — không ảnh hưởng nội dung hay verify |
+| A9 | ~7 surface đủ phủ hết `## Behaviors & Operations` của area spec | RB2 — validating đọc ngược để bắt thiếu |
+| A10 | `npm ci` trong thư mục tools của kỹ năng là dựng tooling, không phải quyết định scope của repo forgent | Nếu sai, artifact vẫn viết được bằng tay, chỉ mất wireframe bấm được |
+
+### Split
+
+**Không tách.** Hai artifact nhưng một mạch việc: file reference phải trích
+kết quả wireframe, nên tách ra thì mảnh sau chờ mảnh trước mà không tự
+đứng được. Nhánh *pass-through*.
+
+### Proof surface
+
+`verify` của item đã là lệnh thật, không phải placeholder — không sync đè.
+Đo hôm nay:
+
+| Mệnh đề | Hôm nay |
+|---|---|
+| Cả verify (`test -f` + 3 × `grep -q '^## …'` + `grep -q` trích area spec) | **exit 1** — đỏ đúng, file chưa tồn tại |
+
+Không dính lỗi lớp fail-open: `test -f` trên file chưa tồn tại thoát khác 0.
+
+Điều verify **không** chứng minh, mang sang reality gate: nó không đo được
+tính dễ đọc — đúng điều flag "weak proof" ở trên đã khai. Bù bằng hai proof
+point cơ học mà validating chạy thật: `npm run check` exit 0 (RB3) và
+`interpret:wf` sinh HTML có thật, cộng phần đọc-ngược area spec (RB2).
+
+### Outstanding questions của P0b
+
+Một, và nó thuộc về người: quyết định CSS framework ở mục "Câu hỏi mang lên
+cổng validateApprove" — T1 thật, ràng buộc P2-P5.
+
 ## Outstanding questions
 
-None
+- **Quyết định CSS framework cho web client** (`tsk-3x6`): Tailwind (kèm
+  hoặc không kèm stitch) so với CSS viết tay. D14 khoá vite + TypeScript
+  nhưng im lặng về CSS framework; bản mô tả item khai đây là quyết định
+  còn mở, phải chốt khi viết UI spec. Không bên nào rẻ để đảo ngược, nên
+  đây là câu hỏi thật cho cổng validateApprove, không phải giả định ghim
+  được. So sánh đầy đủ ở mục "Câu hỏi mang lên cổng validateApprove".
