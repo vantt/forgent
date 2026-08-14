@@ -11,11 +11,13 @@ Doctrine, 4 quy tắc chọn native-vs-cli/spawn).
 
 ## 1. Trạng thái hiện tại
 
-Vòng 1 (2026-08-14). Toàn bộ nội dung dưới đây được đúc kết từ 1 phiên hỏi-đáp
-sống, không phải research 1 lần — đã qua nhiều vòng đề xuất → soi bằng code
-thật → xác nhận/sửa lại. 5 điểm đã CHỐT (D1-D5, giữ nguyên qua ≥2 vòng không bị
-đảo). 2 điểm MỚI NÊU, chưa qua vòng xác nhận thứ 2 (§3, chưa mint D-ID). 2 điểm
-điều tra phụ vẫn mở, chưa đủ bằng chứng để quyết.
+Vòng 2 (2026-08-14). 6 điểm đã CHỐT (D1-D6, giữ nguyên qua ≥2 vòng không bị
+đảo — D6 vừa qua ngưỡng này ở vòng 2: điều tra → hỏi thẳng lý do → chốt xoá).
+Cùng vòng 2, 4 quyết định phạm vi cụ thể cho D6 (A/B/C/D, xem `#task-remove-
+gather`) — không mint D-ID riêng, coi là chi tiết thực thi của D6 chứ không
+phải quyết định kiến trúc mới. 2 điểm MỚI NÊU ở vòng 1, chưa qua vòng xác nhận
+thứ 2 (§3, chưa mint D-ID). 1 điểm điều tra phụ vẫn mở, chưa đủ bằng chứng để
+quyết.
 
 Phát hiện định hình lại cả buổi: khung "1 cửa dispatch chung cho mọi hình dạng
 task" **không phải ý tưởng mới** — nó là phần mở rộng đúng phạm vi đã khoá của
@@ -49,10 +51,9 @@ thể nào cần sửa lại theo hướng này (`gather`, `fgos-fanout`, `fgos-
 
 | # | Vấn đề | Trạng thái |
 |---|---|---|
-| 1 | `gather` capacity (agy/Gemini) — con đường cross-provider DUY NHẤT trong hệ, nhưng không có quyết định kiến trúc nào ghi lại lý do cần cross-provider cụ thể (plan.md gốc của `tsk-2ie5` tự ghi "provider... not decided in this plan, not guessed ahead of time"). Lý do có ghi ("song song hoá") đã được native Task-tool đáp ứng đủ, không cần provider khác. | **RÕ về bằng chứng, CHƯA RÕ về quyết định** — nghiêng về xoá, nhưng người dùng chưa chốt "xoá" tường minh, chỉ đang điều tra. Không tạo task ở §7 cho tới khi chốt. |
-| 2 | `judge-discovery`/`judge-decompose` cùng khai `for:"judge"` — `resolveCapacityIdForPurpose` (dispatch.mjs:666) chỉ trả entry ĐẦU TIÊN khớp, nên `judge-decompose` không bao giờ được purpose-lookup chọn, chỉ tới được qua gọi thẳng id. | **CHƯA RÕ** — cố ý (mỗi skill tự biết gọi đúng id, `for` chỉ để gom nhóm/tài liệu hoá) hay gap chưa ai để ý — cần đọc lịch sử `judge-discovery`/`judge-decompose` riêng trước khi kết luận. |
-| 3 | Cần 1 prose/skill helper CHUNG làm "ngõ vào" dispatch cho MỌI producer nội bộ (research, fanout, tương lai) — không phải mỗi producer tự viết lại logic gọi dispatch. | **MỚI NÊU (vòng 1)**, chưa qua vòng xác nhận thứ 2 — chưa mint D-ID theo đúng hard rule của skill này. Bằng chứng ủng hộ đã có: `fgos-researching` đã phải viết lại `decide --for`/`resolve --for` ngay trong SKILL.md của nó thay vì gọi `_shared/capacity-dispatch-fallback.md`, vì fragment đó viết cho `<CAPACITY_ID>` cố định, chưa support purpose-based lookup khi `tsk-2ie5` thêm `for`/`needs`. |
-| 4 | Hợp đồng "muốn chạy 1 task thì gọi dispatch" nên được tuyên bố Ở TẦNG HARNESS (`AGENTS.md`), như 1 khối MUST/NEVER giống `CLAUDE.md`'s GitNexus block — để agent NGOÀI luồng 1 skill cụ thể cũng tự biết cửa vào, không cần đợi skill nạp prose. | **MỚI NÊU (vòng 1)**, ngay sau #3, cùng vòng — chưa qua vòng xác nhận riêng, chưa mint D-ID. Khác biệt với #3: #3 là producer NỘI BỘ (đã có skill chủ động gọi), #4 là phủ trường hợp CHUNG (agent bất kỳ, ngoài skill catalog fgOS). |
+| 1 | `judge-discovery`/`judge-decompose` cùng khai `for:"judge"` — `resolveCapacityIdForPurpose` (dispatch.mjs:666) chỉ trả entry ĐẦU TIÊN khớp, nên `judge-decompose` không bao giờ được purpose-lookup chọn, chỉ tới được qua gọi thẳng id. | **CHƯA RÕ** — cố ý (mỗi skill tự biết gọi đúng id, `for` chỉ để gom nhóm/tài liệu hoá) hay gap chưa ai để ý — cần đọc lịch sử `judge-discovery`/`judge-decompose` riêng trước khi kết luận. |
+| 2 | Cần 1 prose/skill helper CHUNG làm "ngõ vào" dispatch cho MỌI producer nội bộ (research, fanout, tương lai) — không phải mỗi producer tự viết lại logic gọi dispatch. | **MỚI NÊU (vòng 1)**, chưa qua vòng xác nhận thứ 2 — chưa mint D-ID theo đúng hard rule của skill này. Bằng chứng ủng hộ đã có: `fgos-researching` đã phải viết lại `decide --for`/`resolve --for` ngay trong SKILL.md của nó thay vì gọi `_shared/capacity-dispatch-fallback.md`, vì fragment đó viết cho `<CAPACITY_ID>` cố định, chưa support purpose-based lookup khi `tsk-2ie5` thêm `for`/`needs`. |
+| 3 | Hợp đồng "muốn chạy 1 task thì gọi dispatch" nên được tuyên bố Ở TẦNG HARNESS (`AGENTS.md`), như 1 khối MUST/NEVER giống `CLAUDE.md`'s GitNexus block — để agent NGOÀI luồng 1 skill cụ thể cũng tự biết cửa vào, không cần đợi skill nạp prose. | **MỚI NÊU (vòng 1)**, ngay sau #2, cùng vòng — chưa qua vòng xác nhận riêng, chưa mint D-ID. Khác biệt với #2: #2 là producer NỘI BỘ (đã có skill chủ động gọi), #3 là phủ trường hợp CHUNG (agent bất kỳ, ngoài skill catalog fgOS). |
 
 ## 4. Quyết định đã chốt
 
@@ -63,6 +64,7 @@ thể nào cần sửa lại theo hướng này (`gather`, `fgos-fanout`, `fgos-
 | D3 | **`for`/`needs` là 2 trục trực giao: JOB vs MECHANISM**, không phải cùng 1 khái niệm. `for` = việc được giao (job, dùng để purpose-lookup, enum `gather`/`judge`). `needs` = cơ chế phải có mặt để chạy (mechanism, dependency gate — dù D1 đã quyết retire field này khỏi capacity, trục khái niệm vẫn đúng, chỉ nơi hỏi chuyển sang tool-registry trực tiếp). Executor càng chuyên biệt (gitnexus, nếu có entry) thì `for`==`needs` càng tự nhiên trùng; executor càng tổng quát (agy, có thể phục vụ nhiều job) thì càng tách xa. Phép thử: "executor này có thể bị giao việc KHÁC mà vẫn dùng đúng cơ chế này không?" — có thì `for` phải khác mechanism-gate, không thì trùng là đúng, không phải lỗi. |
 | D4 | **Tổng quát hoá dispatch quanh khái niệm "task"** (mượn vocab marketing-cockpit), là MỞ RỘNG đúng phạm vi đã khoá của `tsk-3ik`'s D3, không phải ý tưởng mới. 4 hình dạng hiện có của fgOS (`work`-item đầy đủ lifecycle, `childwork`/exec-packet B2 còn gated chưa ship theo `two-layer-dispatch` D4, `capacity` đã đăng ký, `adhoc-packet` 6-field runtime-composed theo `two-layer-dispatch` D3/D6) đều là "task" theo nghĩa tổng quát. Tầng SẢN XUẤT (fgos-researching tính+chia việc research, fgos-fanout tính+chia wave/work-item) chỉ lo tính và chia — KHÔNG tự quyết cơ chế thực thi. Tầng DISPATCH (1 cơ chế dùng chung, đã tồn tại 1 phần qua `decideCapacityDispatchMechanism`/Native-First Dispatch Doctrine 4 quy tắc) nhận bất kỳ hình dạng task nào, quyết executor tại runtime — native subagent chỉ là 1 kết quả có thể của quyết định này (Quy tắc 2 của `docs/decisions/0026`: cùng provider + cần soul → ưu tiên native), không phải đường đi riêng nằm ngoài dispatch. Bằng chứng gap cụ thể: Flow B (`capacityIdForWork`, dispatch.mjs:1090) đã model hoá "thực thi 1 work-item" như capacity-dispatch qua domain+stage — nhưng `fgos-fanout` (Flow A, đồng bộ trong-session) hardcode thẳng Agent tool, chưa từng consult decision protocol này, dù đúng phạm vi `tsk-3ik`'s D3 đã tuyên bố phải làm. |
 | D5 | **`dispatch.mjs` cần tự thực thi (self-execute) cho case adapter-resolvable, khớp `run_task()` của marketing-cockpit** (đã đọc `task-executor.py:550-611`: tự gọi adapter, trả kết quả thật, cho mọi case `via=cli/api/task-khác-family`; CHỈ hand-back đúng 1 case `via=task` cùng-family-có-session-sống). fgOS's Flow A (`resolveCapacityCli`) hôm nay LUÔN hand-back `{command,args}` cho agent tự chạy qua Bash — kể cả case `cli` lẽ ra tự thực thi được. `EXECUTOR_ADAPTERS['cli-spawn']` được validate (dispatch.mjs:895) nhưng KHÔNG BAO GIỜ được gọi trong Flow A, chỉ Flow B (`spawnWorker`) mới tự gọi. Cần 1 subcommand mới (`execute`/`dispatch`) tự gọi `EXECUTOR_ADAPTERS[adapter](...)` ngay trong CLI cho mọi case tự làm được, chỉ trả `spawn_instruction`-shaped result cho case in-process — đây là nền tảng D4 cần để có nơi thật cho nhánh "out-of-process" của mọi hình dạng task, không riêng capacity. |
+| D6 | **Xoá capacity `gather` khỏi `.fgos/config.json`.** Con đường cross-provider DUY NHẤT trong hệ; không có quyết định kiến trúc nào ghi lại lý do cần cross-provider cụ thể (plan.md gốc `tsk-2ie5` tự ghi "provider... not decided in this plan, not guessed ahead of time"). Lý do thật duy nhất có ghi lại ("song song hoá, rút ngắn wall-clock") đã được native Task-tool đáp ứng đủ. `fgos-researching`'s SKILL.md đã tự coi "không có gather capacity" là "the common/default path today" — xoá an toàn, revert về hành vi trước `tsk-2ie5`. Qua ngưỡng ≥2 vòng: điều tra bằng chứng (vòng 1) → hỏi thẳng lý do cross-provider, không tìm thấy → chốt xoá (vòng 2). |
 
 ## 5. Q&A log
 
@@ -123,9 +125,34 @@ thể nào cần sửa lại theo hướng này (`gather`, `fgos-fanout`, `fgos-
 - **Vòng 1, đoạn l (giữa lúc ghi tài liệu).** Người dùng bổ sung thêm: hợp đồng
   này nên tuyên bố Ở TẦNG HARNESS (`AGENTS.md`), giống khối MUST/NEVER của
   GitNexus trong `CLAUDE.md`, để agent ngoài luồng skill cụ thể cũng biết cửa
-  vào → vấn đề mở #4. Đọc thêm `docs/decisions/0026` (4 quy tắc chọn dispatch)
+  vào → vấn đề mở #3. Đọc thêm `docs/decisions/0026` (4 quy tắc chọn dispatch)
   + `tsk-3ik` CONTEXT.md để grounding D4 đúng vị trí (mở rộng doctrine đã khoá,
   không phải phát minh mới).
+
+- **Vòng 2, đoạn a.** Người dùng chốt "1. xoá gather" — vấn đề mở cũ #1
+  (gather) chuyển thành **D6**. Ghi `fgos decision` D6.
+- **Vòng 2, đoạn b.** Người dùng hỏi "chỗ nào cần thảo luận" trước khi chốt
+  hẳn việc cần làm. Scout xác nhận `why-fgos-dispatch-splits-into-gather-
+  packets...md` KHÔNG bị ảnh hưởng (dùng "gather" làm tên khái niệm packet,
+  không nhắc capacity/config thật) — loại khỏi scope. Nêu 4 điểm thật sự cần
+  quyết (không chỉ xoá cơ học): (A) giữ hay xoá tool-registry entry
+  `gather`→`prompt-completion`; (B) giữ hay bỏ `'gather'` khỏi
+  `CAPACITY_PURPOSES` enum; (C) 2 doc explanation dùng `gather`/`needs` làm ví
+  dụ chính — sửa ví dụ/đánh dấu lỗi thời/để nguyên; (D) trim hay giữ đoạn
+  "check gather-purpose capacity" trong `fgos-researching`'s SKILL.md.
+- **Vòng 2, đoạn c.** Người dùng chốt cả 4: **A. xoá** (tool-registry entry đi
+  cùng capacity, không giữ speculative); **B. bỏ cả `'gather'` khỏi enum**
+  ("capacity đã là purpose rồi" — không cần giữ 1 enum value không ai dùng,
+  purpose mới sau này tự thêm lại khi có nhu cầu thật) — hệ quả cụ thể: 11 chỗ
+  trong `test/runner/dispatch.test.mjs` dùng `for: 'gather'` làm fixture, phải
+  đổi sang `for: 'judge'` (giá trị enum còn lại) khi B thực thi; **C. sửa lỗi
+  thời** (chủ động cập nhật nội dung, không chỉ đánh dấu lịch sử) — how-to đổi
+  ví dụ sang entry thật còn sống (`judge-discovery`), doc `dispatch-binding-
+  moves-from-name-keying...md` viết lại phần mô tả `needs` phản ánh đúng D1
+  (đã retire); **D. bỏ** đoạn "check gather-purpose capacity" khỏi
+  `fgos-researching`'s SKILL.md — không giữ bảo hiểm cho 1 nhánh không còn kỳ
+  vọng quay lại. 4 quyết định này gộp vào scope thực thi của D6, không mint
+  D-ID riêng (chi tiết thực thi, không phải quyết định kiến trúc mới).
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -199,9 +226,50 @@ flowchart TD
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-Chỉ tạo task cho các quyết định đã CHỐT (D1/D4/D5) — vấn đề mở (§3) chưa đủ
+Chỉ tạo task cho các quyết định đã CHỐT (D1/D4/D5/D6) — vấn đề mở (§3) chưa đủ
 chín để shape thành task, và D2/D3 là kỷ luật đặt tên/khái niệm không cần code
 mới (D2: code đã đúng sẵn; D3: đã áp dụng ngay trong quyết định retire D1).
+
+### `#task-remove-gather` (D6, phạm vi A/B/C/D đã chốt vòng 2)
+
+- **Mục tiêu:** Xoá hoàn toàn capacity `gather` và mọi thứ chỉ tồn tại để phục
+  vụ nó — không để lại config chết, enum chết, hay doc trỏ vào ví dụ không còn
+  tồn tại.
+- **Việc cụ thể:**
+  1. Xoá block `capacities.gather` khỏi `.fgos/config.json`.
+  2. (A) Xoá tool-registry entry `{"name":"gather","kind":"cli",
+     "capability":"prompt-completion","command":"agy"}` cùng lúc — không giữ
+     speculative.
+  3. (B) Bỏ `'gather'` khỏi `CAPACITY_PURPOSES` (`dispatch.mjs:406`) —
+     `Object.freeze(['gather', 'judge'])` → `Object.freeze(['judge'])`. Kéo
+     theo: 11 chỗ trong `test/runner/dispatch.test.mjs` dùng `for: 'gather'`
+     làm fixture (không phải test entry thật, chỉ mượn tên) phải đổi sang
+     `for: 'judge'` để không vỡ `validateCapacityShape`'s enum check.
+  4. Sửa test `test/runner/dispatch.test.mjs:651-657` (assert cứng "committed
+     .fgos/config.json declares the gather capacity") — xoá hẳn, không còn
+     điều đó đúng.
+  5. (C) `docs/how-to/wire-a-skill-to-a-capacity-by-purpose-not-name.md` —
+     đổi ví dụ chính sang 1 entry thật còn sống (`judge-discovery`).
+  6. (C) `docs/explanation/dispatch-binding-moves-from-name-keying-to-needs-
+     for-capability-declaration.md` — viết lại phần mô tả `needs` phản ánh
+     đúng D1 (field đã retire, tool-registry + `fgos tool query` là nơi hỏi
+     staleness trực tiếp), không chỉ đổi ví dụ.
+  7. (D) Trim đoạn "check gather-purpose capacity trước mỗi fan-out" (dòng
+     58-78) khỏi `fgos-researching`'s SKILL.md (`.agents/skills/fgos-
+     researching/SKILL.md`) — luôn native, không còn nhánh nào khác để mô tả.
+- **Trích §4:** *"`fgos-researching`'s SKILL.md đã tự coi 'không có gather
+  capacity' là 'the common/default path today' — xoá an toàn"*.
+- **D-ID áp dụng:** D6.
+- **Quan hệ:** độc lập với `#task-retire-needs`/`#task-dispatch-self-execute`/
+  `#task-fanout-consult-dispatch` — không phụ thuộc chéo, có thể làm riêng.
+  Lưu ý thứ tự nội bộ: bước 6 (sửa doc `needs`) nên làm SAU khi
+  `#task-retire-needs` (D1) đã landed, để doc phản ánh đúng field đã thật sự
+  bị xoá khỏi code, không chỉ dự đoán trước.
+- **Verify nháp:** `npm test` xanh; `grep -rn "gather" .fgos/config.json`
+  không còn khớp gì; `grep -n "'gather'" src/runner/dispatch.mjs` chỉ còn xuất
+  hiện trong comment/lịch sử, không còn trong `CAPACITY_PURPOSES`; `fgos tool
+  query --capability prompt-completion` trả rỗng (không còn provider nào đăng
+  ký).
 
 ### `#task-retire-needs` (D1)
 
@@ -257,22 +325,19 @@ mới (D2: code đã đúng sẵn; D3: đã áp dụng ngay trong quyết địn
 
 Chưa đủ chín để tạo task — cần quay lại hỏi người dùng trước khi shape:
 
-- **Vấn đề mở #1 (`gather`):** xoá hay giữ? Nếu xoá, theo đúng danh sách việc
-  cần làm đã liệt kê ở §3 hàng 1 gốc (report trước): sửa `.fgos/config.json`,
-  `test/runner/dispatch.test.mjs:651-657`, rà `docs/how-to/wire-a-skill-to-a-
-  capacity-by-purpose-not-name.md` + `docs/explanation/dispatch-binding-moves-
-  from-name-keying-to-needs-for-capability-declaration.md`.
-- **Vấn đề mở #2 (`judge-discovery`/`judge-decompose` purpose collision):** cố
+- **Vấn đề mở #1 (`judge-discovery`/`judge-decompose` purpose collision):** cố
   ý hay gap? Cần điều tra lịch sử riêng trước khi quyết có sửa
   `resolveCapacityIdForPurpose` hay không.
-- **Vấn đề mở #3 (shared prose helper cho producer nội bộ):** mở rộng
+- **Vấn đề mở #2 (shared prose helper cho producer nội bộ):** mở rộng
   `_shared/capacity-dispatch-fallback.md` support `<CAPACITY_ID>` cố định +
   `--for <purpose>` + input work-item-shaped — cần giữ qua ít nhất 1 vòng nữa
   trước khi mint D-ID, theo đúng hard rule của skill này.
-- **Vấn đề mở #4 (tuyên bố ở `AGENTS.md` tầng harness):** đặt ở `AGENTS.md` hay
+- **Vấn đề mở #3 (tuyên bố ở `AGENTS.md` tầng harness):** đặt ở `AGENTS.md` hay
   `CLAUDE.md` gốc? Nội dung cụ thể của khối MUST/NEVER trông ra sao (tham chiếu
   `CLAUDE.md`'s GitNexus block làm mẫu)? Cũng cần giữ qua ≥1 vòng nữa.
-- **Bundle hay tách item:** `#task-retire-needs` độc lập hoàn toàn, có thể tách
-  riêng ngay. `#task-dispatch-self-execute` + `#task-fanout-consult-dispatch`
-  có phụ thuộc tuần tự thật — giữ chung 1 mạch hay tách 2 item với `mergeAfter`
-  là quyết định của `fgos-coding-planning`, chưa chốt ở đây.
+- **Bundle hay tách item:** `#task-retire-needs` và `#task-remove-gather` độc
+  lập hoàn toàn, có thể tách riêng ngay (lưu ý thứ tự nội bộ nhẹ giữa 2 task
+  này — xem `#task-remove-gather`'s "Quan hệ"). `#task-dispatch-self-execute`
+  + `#task-fanout-consult-dispatch` có phụ thuộc tuần tự thật — giữ chung 1
+  mạch hay tách 2 item với `mergeAfter` là quyết định của `fgos-coding-
+  planning`, chưa chốt ở đây.
