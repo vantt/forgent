@@ -16,10 +16,12 @@
 //! creates the file itself, so a missing token is a startup refusal, not a
 //! self-provisioned default).
 
+use std::io::Read;
 use std::net::SocketAddr;
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
 use std::sync::Arc;
+use std::time::{Duration, Instant};
 
 use axum::extract::{Path as AxPath, Query, State};
 use axum::http::{HeaderMap, StatusCode};
@@ -238,6 +240,67 @@ impl IntoResponse for GatewayError {
     }
 }
 
+/// tsk-4lf: how long `spawn_fgos_verb` waits before it gives up on a still-
+/// running `fgos` subprocess and kills it. Evidenced, not guessed:
+/// `src/runner/main-checkout-lock.mjs`'s own `DEFAULT_TTL_MS` comment
+/// measures ONE `mergeRunnerItem` verify/npm-ci hold at up to ~185s in
+/// practice; `approve` can run that hold TWICE inside one call (catchup
+/// worktree + merge worktree), so ~370s is this repo's own evidenced
+/// worst-case legitimate duration for the slowest verb this chokepoint
+/// spawns. 600s leaves real margin above that without ever mattering to a
+/// lightweight route (`list`/`ready`/`graph`/...), which finishes in
+/// milliseconds either way.
+const VERB_SPAWN_TIMEOUT: Duration = Duration::from_secs(600);
+
+/// Poll interval for the `try_wait()` loop below — small enough that the
+/// timeout deadline is honored promptly, cheap enough to run for up to
+/// `VERB_SPAWN_TIMEOUT` without meaningful CPU cost.
+const VERB_SPAWN_POLL_INTERVAL: Duration = Duration::from_millis(50);
+
+/// tsk-4lf: waits on `child` up to `timeout`, killing it and returning
+/// `Err(())` if it is still running at the deadline. Drains `stdout`/
+/// `stderr` on separate threads STARTED BEFORE the wait loop begins — the
+/// same pattern `std::process::Command::output()` uses internally — so a
+/// verb whose combined output exceeds the OS pipe buffer (64KiB on Linux)
+/// can never deadlock this thread's `try_wait()` poll on a full,
+/// undrained pipe. `child` must already have `stdout`/`stderr` set to
+/// `Stdio::piped()` by the caller.
+fn wait_with_timeout(
+    mut child: std::process::Child,
+    timeout: Duration,
+    poll_interval: Duration,
+) -> Result<(std::process::ExitStatus, Vec<u8>, Vec<u8>), ()> {
+    let mut stdout_pipe = child.stdout.take().expect("caller must pipe stdout");
+    let mut stderr_pipe = child.stderr.take().expect("caller must pipe stderr");
+    let stdout_thread = std::thread::spawn(move || {
+        let mut buf = Vec::new();
+        let _ = stdout_pipe.read_to_end(&mut buf);
+        buf
+    });
+    let stderr_thread = std::thread::spawn(move || {
+        let mut buf = Vec::new();
+        let _ = stderr_pipe.read_to_end(&mut buf);
+        buf
+    });
+
+    let deadline = Instant::now() + timeout;
+    loop {
+        if let Ok(Some(status)) = child.try_wait() {
+            let stdout = stdout_thread.join().unwrap_or_default();
+            let stderr = stderr_thread.join().unwrap_or_default();
+            return Ok((status, stdout, stderr));
+        }
+        if Instant::now() >= deadline {
+            let _ = child.kill();
+            let _ = child.wait();
+            let _ = stdout_thread.join();
+            let _ = stderr_thread.join();
+            return Err(());
+        }
+        std::thread::sleep(poll_interval);
+    }
+}
+
 /// D7: the sole function that ever spawns `fgos <verb>` on the gateway's
 /// behalf. `args` is everything after the binary path (verb + its own
 /// flags) — `--dir <root>` is appended here, once, so no call site can
@@ -247,22 +310,35 @@ impl IntoResponse for GatewayError {
 /// Blocking (`std::process::Command`, matching `fgos.rs`'s own `run_fgos`
 /// convention) — callers on the async side always run this inside
 /// `tokio::task::spawn_blocking` (see `run_verb_blocking` below), never
-/// call it directly from an async handler body.
+/// call it directly from an async handler body. tsk-4lf: bounded by
+/// `VERB_SPAWN_TIMEOUT` via `wait_with_timeout` instead of a bare
+/// `.output()` — a wedged verb can no longer pin this thread forever.
 pub fn spawn_fgos_verb(root: &Path, args: &[String]) -> Result<Value, GatewayError> {
     let mut cmd_args: Vec<String> = vec![root.join("bin/fgos.mjs").to_string_lossy().to_string()];
     cmd_args.extend(args.iter().cloned());
     cmd_args.push("--dir".to_string());
     cmd_args.push(root.to_string_lossy().to_string());
 
-    let output = std::process::Command::new("node")
+    let child = std::process::Command::new("node")
         .args(&cmd_args)
         .stdin(Stdio::null())
-        .output()
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
         .map_err(|err| GatewayError::unexpected(format!("spawning fgos CLI failed: {err}")))?;
 
-    if !output.status.success() {
-        let code = output.status.code().unwrap_or(1);
-        let message = String::from_utf8_lossy(&output.stderr).trim().to_string();
+    let (status, stdout, stderr) =
+        wait_with_timeout(child, VERB_SPAWN_TIMEOUT, VERB_SPAWN_POLL_INTERVAL).map_err(|()| GatewayError {
+            category: ErrorCategory::Busy,
+            message: format!(
+                "fgos CLI did not finish within {VERB_SPAWN_TIMEOUT:?} and was killed -- try again"
+            ),
+            exit_code: None,
+        })?;
+
+    if !status.success() {
+        let code = status.code().unwrap_or(1);
+        let message = String::from_utf8_lossy(&stderr).trim().to_string();
         return Err(GatewayError {
             category: ErrorCategory::from_exit_code(code),
             message: if message.is_empty() {
@@ -274,7 +350,7 @@ pub fn spawn_fgos_verb(root: &Path, args: &[String]) -> Result<Value, GatewayErr
         });
     }
 
-    let stdout = String::from_utf8_lossy(&output.stdout);
+    let stdout = String::from_utf8_lossy(&stdout);
     let envelope: Value = serde_json::from_str(stdout.trim())
         .map_err(|err| GatewayError::unexpected(format!("fgos CLI returned unparseable JSON: {err}")))?;
     // Envelope reuse (CTR001, contract's own top-level note): the HTTP body
@@ -745,6 +821,33 @@ pub fn run(root: PathBuf) -> std::io::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn wait_with_timeout_kills_a_process_that_outlives_the_deadline() {
+        let child = std::process::Command::new("sleep")
+            .arg("30")
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .expect("sleep must be spawnable in the test environment");
+        let result = wait_with_timeout(child, Duration::from_millis(100), Duration::from_millis(10));
+        assert!(result.is_err(), "a process outliving the deadline must be reported as killed, not waited on forever");
+    }
+
+    #[test]
+    fn wait_with_timeout_returns_real_output_when_the_process_finishes_in_time() {
+        let child = std::process::Command::new("printf")
+            .arg("hello")
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .expect("printf must be spawnable in the test environment");
+        let (status, stdout, _stderr) =
+            wait_with_timeout(child, Duration::from_secs(5), Duration::from_millis(10))
+                .expect("a process finishing well before the deadline must not be treated as timed out");
+        assert!(status.success());
+        assert_eq!(stdout, b"hello");
+    }
 
     struct FakeGateway {
         response: Result<Value, String>,
