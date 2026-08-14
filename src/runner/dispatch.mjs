@@ -394,15 +394,15 @@ function validateExecutorShape(executor, label) {
  */
 export const CAPACITY_KINDS = Object.freeze([...KINDS, 'task']);
 
-/** purpose vocabulary `capacities.<id>.for` may take (D2/D6, tsk-1o7): the
- * T2 review-class split, `gather` (returns a digest) vs `judge` (returns a
- * verdict) — the demand side's own self-declared lane, alongside `needs`
- * (which provider). No code consumer resolves on this yet (`tsk-2ie5` is
- * named as the first real one) — declaring it here only lets
- * `validateCapacityShape` accept and shape-check it now, ahead of that
- * consumer landing.
+/** purpose vocabulary `capacities.<id>.for` may take (D2/D6, tsk-1o7).
+ * `gather` retired (tsk-5tm-2 D6): it was the one real cross-provider path,
+ * with no architectural reason on record for needing cross-provider at all
+ * — the one documented reason (parallelizing wall-clock) is already met by
+ * native Task-tool dispatch. `judge` (returns a verdict) is the sole
+ * remaining value; a new purpose gets added back here when a real producer
+ * actually needs one, not speculatively ahead of a consumer landing.
  */
-export const CAPACITY_PURPOSES = Object.freeze(['gather', 'judge']);
+export const CAPACITY_PURPOSES = Object.freeze(['judge']);
 
 /** value vocabulary `capacities.<id>.carries` may take (D15, `tsk-5td`,
  * first real consumer `tsk-2ie5`/`tsk-2c1`): the content class a capacity
