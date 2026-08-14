@@ -11,13 +11,15 @@ Doctrine, 4 quy tắc chọn native-vs-cli/spawn).
 
 ## 1. Trạng thái hiện tại
 
-Vòng 4 (2026-08-14). 8 điểm đã CHỐT (D1-D8). Item mở "shared prose helper cho
-producer nội bộ" đang shape dở (3 sub-phần, hướng (a) đã chọn cho phần
-work-item-lookup, còn 2 phần khác chưa mint D-ID riêng — xem §3 #2). Item mở
-"tuyên bố ở AGENTS.md" đã quyết XONG phần TIMING (D7, hoãn tới khi D5/`--work`
-ship) nhưng NỘI DUNG cụ thể của đoạn văn chưa viết — sẽ viết khi tới lúc, y hệt
-lý do D7. Còn 1 điểm điều tra phụ vẫn mở (`judge-discovery`/`judge-decompose`
-collision), chưa đủ bằng chứng để quyết.
+Vòng 5 (2026-08-14). 9 điểm đã CHỐT (D1-D9). Vấn đề mở MỚI (#0, vòng 5): đổi
+cấu trúc `capacities.<purpose>` → `executors.<name>` + `invocations[]` — đã
+trình bày schema + ví dụ `agy` verify kỹ thuật thật, nhưng CHƯA được xác nhận
+tường minh, cần quay lại chốt. Item mở "shared prose helper cho producer nội
+bộ" đang shape dở (3 sub-phần, hướng (a) đã chọn cho phần work-item-lookup,
+còn 2 phần khác chưa mint D-ID riêng — xem §3 #2). Item mở "tuyên bố ở
+AGENTS.md" đã quyết XONG phần TIMING (D7) nhưng nội dung câu chữ chưa viết,
+đúng chủ đích. Còn 1 điểm điều tra phụ vẫn mở (`judge-discovery`/`judge-
+decompose` collision), chưa đủ bằng chứng để quyết.
 
 Phát hiện định hình lại cả buổi: khung "1 cửa dispatch chung cho mọi hình dạng
 task" **không phải ý tưởng mới** — nó là phần mở rộng đúng phạm vi đã khoá của
@@ -51,6 +53,7 @@ thể nào cần sửa lại theo hướng này (`gather`, `fgos-fanout`, `fgos-
 
 | # | Vấn đề | Trạng thái |
 |---|---|---|
+| 0 | Đổi cấu trúc `capacities.<purpose>` → `executors.<name>` + mảng `invocations[]` (key theo tên executor, khớp `executor-registry.yaml` thật của marketing-cockpit) — chưa từng có D-ID riêng trong tài liệu này (chỉ D2 chốt TÊN GỌI "executor", không chốt cấu trúc). Ví dụ tham chiếu đã phác: `agy` (kind: agent, `providerModel: "gemini"`, `allowCrossProvider: true`, 1 invocation `cli`/`cli-spawn`/`command: "agy"`/`args` gồm `--dangerously-skip-permissions` — đã verify thật qua `agy --help`, không có trong entry `gather` cũ, khả năng entry cũ chưa từng chạy đúng qua đường cli-spawn thật). Không gắn `for` nào — chờ producer thật cần mới khai. | **ĐANG SHAPE**, đã trình bày schema + verify kỹ thuật, CHƯA được xác nhận tường minh là "chốt" — người dùng rẽ sang câu hỏi khác (modelPolicies) trước khi trả lời. Cần quay lại hỏi. |
 | 1 | `judge-discovery`/`judge-decompose` cùng khai `for:"judge"` — `resolveCapacityIdForPurpose` (dispatch.mjs:666) chỉ trả entry ĐẦU TIÊN khớp, nên `judge-decompose` không bao giờ được purpose-lookup chọn, chỉ tới được qua gọi thẳng id. | **CHƯA RÕ** — cố ý (mỗi skill tự biết gọi đúng id, `for` chỉ để gom nhóm/tài liệu hoá) hay gap chưa ai để ý — cần đọc lịch sử `judge-discovery`/`judge-decompose` riêng trước khi kết luận. |
 | 2 | Cần 1 prose/skill helper CHUNG làm "ngõ vào" dispatch cho MỌI producer nội bộ (research, fanout, tương lai) — không phải mỗi producer tự viết lại logic gọi dispatch. | **ĐANG SHAPE (vòng 1→3)**, chưa mint D-ID — 3 phát hiện/sub-quyết định vòng 3, cần giữ qua ≥1 vòng nữa: (i) `decide` đã tự gộp "config check" (trả `unavailable` nếu không đăng ký) — Step A của fragment cũ làm lại việc thừa; fragment mới nên rút còn 3 bước (`decide` → in-process hand-back / out-of-process gọi `execute` D5) — phụ thuộc D5 landed trước mới viết đúng hình cuối, không thì phải viết lại lần 2; (ii) purpose-based lookup (`--for <purpose>`) ĐÃ có sẵn ở cả `decide`/`resolve` — chỉ cần fragment THÊM TÀI LIỆU, không cần code mới; (iii) work-item-shaped lookup (cho fanout) chưa có cửa CLI — `capacityIdForWork` module-private, Flow-B-only — **chọn hướng (a): export hàm + thêm cờ CLI mới** (`decide --work <id>`) thay vì để fanout tự tính lại logic domain→skill (rủi ro DRY-drift). |
 | 3 | Hợp đồng "muốn chạy 1 task thì gọi dispatch" nên được tuyên bố Ở TẦNG HARNESS (`AGENTS.md`) — nội dung cụ thể của đoạn văn. | **TIMING đã chốt (D7: hoãn tới khi D5/`--work` ship)** — chỗ đặt cũng đã xác định (bold-paragraph mới trong `## fgOS Workflow`, không mô phỏng khối GitNexus). NỘI DUNG câu chữ cụ thể vẫn chưa viết, đúng chủ đích D7 — viết khi D5/`--work` thật sự tồn tại. |
@@ -64,6 +67,7 @@ thể nào cần sửa lại theo hướng này (`gather`, `fgos-fanout`, `fgos-
 | D3 | **`for`/`needs` là 2 trục trực giao: JOB vs MECHANISM**, không phải cùng 1 khái niệm. `for` = việc được giao (job, dùng để purpose-lookup, enum `gather`/`judge`). `needs` = cơ chế phải có mặt để chạy (mechanism, dependency gate — dù D1 đã quyết retire field này khỏi capacity, trục khái niệm vẫn đúng, chỉ nơi hỏi chuyển sang tool-registry trực tiếp). Executor càng chuyên biệt (gitnexus, nếu có entry) thì `for`==`needs` càng tự nhiên trùng; executor càng tổng quát (agy, có thể phục vụ nhiều job) thì càng tách xa. Phép thử: "executor này có thể bị giao việc KHÁC mà vẫn dùng đúng cơ chế này không?" — có thì `for` phải khác mechanism-gate, không thì trùng là đúng, không phải lỗi. |
 | D4 | **Tổng quát hoá dispatch quanh khái niệm "task"** (mượn vocab marketing-cockpit), là MỞ RỘNG đúng phạm vi đã khoá của `tsk-3ik`'s D3, không phải ý tưởng mới. 4 hình dạng hiện có của fgOS (`work`-item đầy đủ lifecycle, `childwork`/exec-packet B2 còn gated chưa ship theo `two-layer-dispatch` D4, `capacity` đã đăng ký, `adhoc-packet` 6-field runtime-composed theo `two-layer-dispatch` D3/D6) đều là "task" theo nghĩa tổng quát. Tầng SẢN XUẤT (fgos-researching tính+chia việc research, fgos-fanout tính+chia wave/work-item) chỉ lo tính và chia — KHÔNG tự quyết cơ chế thực thi. Tầng DISPATCH (1 cơ chế dùng chung, đã tồn tại 1 phần qua `decideCapacityDispatchMechanism`/Native-First Dispatch Doctrine 4 quy tắc) nhận bất kỳ hình dạng task nào, quyết executor tại runtime — native subagent chỉ là 1 kết quả có thể của quyết định này (Quy tắc 2 của `docs/decisions/0026`: cùng provider + cần soul → ưu tiên native), không phải đường đi riêng nằm ngoài dispatch. Bằng chứng gap cụ thể: Flow B (`capacityIdForWork`, dispatch.mjs:1090) đã model hoá "thực thi 1 work-item" như capacity-dispatch qua domain+stage — nhưng `fgos-fanout` (Flow A, đồng bộ trong-session) hardcode thẳng Agent tool, chưa từng consult decision protocol này, dù đúng phạm vi `tsk-3ik`'s D3 đã tuyên bố phải làm. |
 | D5 | **`dispatch.mjs` cần tự thực thi (self-execute) cho case adapter-resolvable, khớp `run_task()` của marketing-cockpit** (đã đọc `task-executor.py:550-611`: tự gọi adapter, trả kết quả thật, cho mọi case `via=cli/api/task-khác-family`; CHỈ hand-back đúng 1 case `via=task` cùng-family-có-session-sống). fgOS's Flow A (`resolveCapacityCli`) hôm nay LUÔN hand-back `{command,args}` cho agent tự chạy qua Bash — kể cả case `cli` lẽ ra tự thực thi được. `EXECUTOR_ADAPTERS['cli-spawn']` được validate (dispatch.mjs:895) nhưng KHÔNG BAO GIỜ được gọi trong Flow A, chỉ Flow B (`spawnWorker`) mới tự gọi. Cần 1 subcommand mới (`execute`/`dispatch`) tự gọi `EXECUTOR_ADAPTERS[adapter](...)` ngay trong CLI cho mọi case tự làm được, chỉ trả `spawn_instruction`-shaped result cho case in-process — đây là nền tảng D4 cần để có nơi thật cho nhánh "out-of-process" của mọi hình dạng task, không riêng capacity. |
+| D9 | **Đổi model/tier resolution từ 1 map phẳng sang N-map theo provider, mở rộng tier vocab 3→5, thêm trục `rigorOverrides`.** Bug cụ thể: `modelForTier` (dispatch.mjs:577) chỉ đọc `cfg.models = {light,standard,heavy}`, toàn tên model Claude — 1 executor non-Claude (agy/Gemini) gọi qua tier sẽ nhận tên model Claude sai hoàn toàn, không throw, chỉ âm thầm sai. Entry `gather` cũ từng phải hardcode đè cả `tier`+`model` để né bug này — bug tái hiện ngay khi dựng executor `agy` thật. Lấy đúng "schema kết hợp v1" đã đề xuất đầu phiên: `cfg.modelPolicies` keyed theo provider (`claude`/`gemini`), mỗi provider tự có 5 tier (`lightweight/standard/creative/analytical/critical`) + `rigorOverrides` — khớp `tier_policy_path` model của marketing-cockpit. Người dùng chọn lấy CẢ HAI phần (đổi cardinality + mở rộng vocab), không tách riêng dù vocab-mở-rộng có blast radius rộng hơn (`work.tier` đang đọc ở nhiều nơi — cần rà kỹ ở planning, không chỉ thêm field). |
 | D8 | **Đổi tên "ad-hoc packet" thành "ad-hoc task"** trong vocab D4. Mô tả người dùng (agent tự soạn prompt lúc chạy, cần dispatch prompt đó) khớp đúng định nghĩa gốc, không đổi nghĩa. "work" va chạm với work-item (có lifecycle, id claim được) ngay trong chính bảng taxonomy D4; "task" trung tính, khớp vốn từ tổng quát D4 đã dùng cho cả 4 hình dạng. KHÔNG đổi shape `id` (`<scope>#p<n>`, vẫn invalid với `ID_PATTERN`) — thuần tuý đổi tên, không đổi ngữ nghĩa lifecycle. |
 | D7 | **Hoãn việc viết hợp đồng dispatch vào `AGENTS.md` cho tới khi D5 (`execute` subcommand) + `--work` CLI flag (item shared-helper hướng a) đã ship.** `AGENTS.md` là tài liệu luôn-nạp — viết trước khi `execute`/`--work` tồn tại sẽ trỏ vào lệnh không có thật, agent làm theo sẽ gãy. Đúng bài học đã rút ở item shared-helper: viết 1 lần đúng hình cuối, tránh sửa lại lần 2 như `fgos-researching` đã gặp với `capacity-dispatch-fallback.md`. Chỗ đặt đã xác định trước (không phải quyết định của D7, chỉ ghi lại grounding): đoạn bold-paragraph mới trong `## fgOS Workflow` (trước dòng `<!-- gitnexus:start -->`), theo đúng style 3 đoạn "Never X without Y" đã có sẵn — KHÔNG mô phỏng khối bảng GitNexus (đó là vùng auto-regen của tool ngoài, có sentinel riêng). |
 | D6 | **Xoá capacity `gather` khỏi `.fgos/config.json`.** Con đường cross-provider DUY NHẤT trong hệ; không có quyết định kiến trúc nào ghi lại lý do cần cross-provider cụ thể (plan.md gốc `tsk-2ie5` tự ghi "provider... not decided in this plan, not guessed ahead of time"). Lý do thật duy nhất có ghi lại ("song song hoá, rút ngắn wall-clock") đã được native Task-tool đáp ứng đủ. `fgos-researching`'s SKILL.md đã tự coi "không có gather capacity" là "the common/default path today" — xoá an toàn, revert về hành vi trước `tsk-2ie5`. Qua ngưỡng ≥2 vòng: điều tra bằng chứng (vòng 1) → hỏi thẳng lý do cross-provider, không tìm thấy → chốt xoá (vòng 2). |
@@ -181,6 +185,24 @@ thể nào cần sửa lại theo hướng này (`gather`, `fgos-fanout`, `fgos-
   rơi vào nhánh (c) (mô tả cơ chế, không cố ý đổi lifecycle). Đề xuất "ad-hoc
   task" thay vì "ad-hoc work" — giữ đúng mô tả, tránh va chạm "work"-item,
   khớp vocab D4. Người dùng xác nhận "ổn" → **D8**.
+- **Vòng 5, đoạn a.** Người dùng đề xuất thêm 1 executor `agy` thật, học cấu
+  trúc marketing-cockpit — nêu 2 điểm cần rõ trước (cấu trúc `executors.<name>`
+  chưa từng có D-ID; tension với D6 vừa xoá `gather`). Người dùng xác nhận
+  (a): dựng ví dụ tham chiếu, không gắn purpose.
+- **Vòng 5, đoạn b.** Người dùng nhắc `--dangerously-skip-permissions` (từ
+  cmd_template thật của marketing-cockpit) — verify trực tiếp qua `agy --help`
+  trên máy, xác nhận đúng, phát hiện phụ: entry `gather` cũ thiếu cờ này, khả
+  năng chưa từng chạy đúng qua cli-spawn thật.
+- **Vòng 5, đoạn c.** Người dùng hỏi "dispatch có copy cơ chế marketing-cockpit
+  luôn không" — trình bày rõ 3 nhóm: đã/đang copy (resolver chung, self-
+  execute/hand-back, MCP bypass, cardinality N-invocations), cố tình KHÔNG
+  copy (allowCrossProvider gate, command_template string, workflow-level
+  pause-resume — đã có tương đương ở stage FSM khác tầng), và 1 lỗ hổng cũ tái
+  xuất hiện (tier/model policy, do dựng `agy` thật lộ ra).
+- **Vòng 5, đoạn d.** Người dùng nhắc: tài liệu đã bàn cách trộn config từ đầu
+  phiên rồi ("schema kết hợp v1", có `modelPolicies`). Lấy lại đúng bản gốc,
+  tách 2 phần (đổi cardinality vs mở rộng vocab 3→5 tier), hỏi lấy phần nào —
+  người dùng chọn **lấy cả 2** → **D9**.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -350,6 +372,27 @@ mới (D2: code đã đúng sẵn; D3: đã áp dụng ngay trong quyết địn
 - **Verify nháp:** đo wall-clock 1 batch fanout trước/sau — vẫn chạy song song
   thật (không tuần tự hoá); test xác nhận `decide` được gọi 1 lần mỗi candidate
   trước khi Agent tool được fire.
+
+### `#task-provider-tier-policy` (D9)
+
+- **Mục tiêu:** Đổi `cfg.models` (1 map phẳng `{light,standard,heavy}`, toàn
+  tên model Claude) sang `cfg.modelPolicies` — N-map theo provider (`claude`/
+  `gemini`), mỗi provider tự có 5 tier (`lightweight/standard/creative/
+  analytical/critical`) + `rigorOverrides`. Executor tự khai `providerModel`
+  để biết đọc đúng bảng nào.
+- **Trích §4:** *"1 executor non-Claude gọi qua tier sẽ nhận tên model Claude
+  sai hoàn toàn, không throw, chỉ âm thầm sai"*.
+- **D-ID áp dụng:** D9.
+- **Quan hệ:** liên quan tới nhưng KHÔNG phụ thuộc việc restructure
+  `capacities`→`executors`+`invocations[]` (vấn đề mở #0, chưa chốt) — có thể
+  build trước, độc lập.
+- **Rủi ro cần xử ở planning:** `work.tier` đang được đọc ở NHIỀU nơi ngoài
+  `modelForTier` — đổi vocab 3→5 không chỉ là thêm field, cần rà blast radius
+  thật (`grep -rn "work.tier\|modelForTier\|cfg.models"`) trước khi viết plan,
+  đúng cảnh báo đã có sẵn từ report gốc.
+- **Verify nháp:** chưa xác định — phụ thuộc kết quả rà blast radius; tối
+  thiểu cần test xác nhận `agy`-shaped executor resolve đúng tên model Gemini
+  thật qua tier, không lẫn tên Claude.
 
 ## Outstanding questions
 
