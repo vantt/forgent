@@ -55,71 +55,13 @@ verdict; it never guesses past a gap.
   for exactly this — contracted dispatch, never an unscoped Task call). A
   single-branch question, or branches that depend on each other's result,
   stay inline and sequential — no dispatch at all.
-- **Check for a registered `gather`-purpose capacity before every fan-out —
-  by PURPOSE, never by name (tsk-2ie5/tsk-2c1; `for`/`needs` binding,
-  D5/D6 of `tsk-5td`'s decision log).** A gather branch's prompt is
-  composed at runtime — there is never a pre-registered capacity id to
-  match by name. Resolve by purpose instead:
-
-  ```bash
-  root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-  node "$root/src/runner/dispatch.mjs" decide --for gather --has-live-task-access
-  ```
-
-  (omit `--has-live-task-access` if this session genuinely lacks live
-  Agent/Task tool access right now — never guessed, same self-declared
-  contract `_shared/capacity-dispatch-fallback.md`'s own Step B.5 uses).
-  Prints `{"mechanism": "in-process"|"out-of-process"|"unavailable"[,
-  "agentType": ..., "capacityId": ...]}`.
-
-  - **`mechanism: "unavailable"`** — no capacity declares `for: "gather"`
-    yet. Fall straight through to a native Task-tool call for every
-    branch, byte-identical to this skill's own behavior before this item —
-    no error, no note printed; this is the common/default path today.
-  - **`mechanism: "in-process"`** — call the Agent/Task tool exactly as
-    before (`subagent_type` from the result's own `agentType`), then still
-    log the dispatch (below).
-  - **`mechanism: "out-of-process"`** — resolve and dispatch through the
-    capacity instead of Task — see `../_shared/capacity-dispatch-
-    fallback.md`'s own Steps C/D for the resolve-then-exec shape and its
-    malformed-response fallback; this skill's own gather packet (the
-    six-field ad-hoc shape that same fragment already documents) is what
-    fills in for `<PROMPT_TEMPLATE>` there.
-
-- **Announce and log every branch before dispatching it — one line to the
-  transcript, one durable line to `events.jsonl`.** Print the same
-  observability-parity announce line every dispatch path in the repo
-  already uses:
-
-  ```
-  <packet id> - <mechanism> - <agentType-or-provider> - <model>
-  ```
-
-  For an `out-of-process` branch, resolve the real command first. A
-  gather packet's own `inputs` field (concrete repo paths to read, per
-  the ad-hoc-capacity section of `../_shared/capacity-dispatch-
-  fallback.md`) means every gather dispatch carries `repo-content`, never
-  `user-text` (D15, `tsk-5td`) — always declare it explicitly:
-
-  ```bash
-  node "$root/src/runner/dispatch.mjs" resolve --for gather --carries repo-content --prompt "<the six-field packet, rendered as text>"
-  ```
-
-  then run the resolved `command`/`args` via Bash, same as any other
-  out-of-process dispatch in this repo. A capacity declared `carries:
-  "user-text"` is refused here before any spawn (`dispatch.mjs` throws) —
-  treat that refusal exactly like a malformed response: fall back to a
-  native Task call for that one branch, never error the whole gather
-  round over it.
-
-  Whichever mechanism actually ran, log it — the durable record this
-  skill's own gather dispatch never had before this item (closing the gap
-  named in `docs/history/dispatch-concept-boundary/DISCUSSION.md`: "a
-  Bash-launched gather emits zero `dispatch.jsonl` rows"):
-
-  ```bash
-  node "$root/src/runner/dispatch.mjs" log <capacityId from the decide result> --id <the currently claimed item's id, or the packet's own scope> --provider <provider-or-agentType> --command <the resolved command, or "task" for in-process> --model <model>
-  ```
+- **Every fan-out branch dispatches via native Task-tool, always (tsk-5tm-2
+  D6: the `gather`-purpose capacity this section used to consult is
+  retired — no architectural reason on record for needing cross-provider
+  dispatch here, and native Task-tool already met the one documented
+  reason, parallelizing wall-clock).** No purpose check, no decide/resolve
+  round trip — a branch's six-field packet becomes the Task-tool prompt
+  directly.
 - **Record every round durably, never silently (D5).** Append findings to
   `docs/history/<feature>/RESEARCH.md` — **accumulate, never overwrite** an
   earlier round. Each call gets its own dated section: what was asked, what
@@ -153,10 +95,9 @@ verdict; it never guesses past a gap.
 
 3. **Fan out only the independent branches.** Dependent or single-branch
    work stays inline. Independent branches get dispatched as contracted
-   units (six-field shape) — check for a registered `gather`-purpose
-   capacity first (see the hard rule above), falling back to a native
-   Task-tool call when none is registered or present; gather each digest,
-   never re-read what a digest already answered.
+   units (six-field shape) via native Task-tool call (see the hard rule
+   above) — gather each digest, never re-read what a digest already
+   answered.
 
 4. **Write the round to `RESEARCH.md`**, accumulating under its own dated
    section — what was asked, what was checked, what was found (with

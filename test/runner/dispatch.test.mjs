@@ -648,17 +648,9 @@ test('the committed .fgos/config.json runner section no longer declares a coding
   assert.equal(cfg.capacities?.['coding-classify-intake'], undefined, 'capacities.coding-classify-intake should no longer exist -- retired after tsk-4ns removed its only consumer');
 });
 
-test('the committed .fgos/config.json runner section declares the gather capacity (tsk-28o): for "gather", carries "repo-content" (D1, gather-capacity-purpose-binding CONTEXT.md), kind cli, allowCrossProvider true, well-formed {prompt}/{model} args, no needs field (tsk-5tm-1 D1: retired)', () => {
+test('the committed .fgos/config.json runner section no longer declares a gather capacity (tsk-5tm-2 D6): the one cross-provider path, retired -- no architectural reason on record for cross-provider, and native Task-tool dispatch already met the one documented reason (parallelizing wall-clock)', () => {
   const cfg = committedRunnerConfig();
-  const capacity = cfg.capacities?.gather;
-  assert.ok(capacity, 'capacities.gather must exist');
-  assert.equal(capacity.kind, 'cli');
-  assert.equal(capacity.for, 'gather');
-  assert.equal(capacity.needs, undefined, 'needs is retired (tsk-5tm-1 D1) -- must no longer be present');
-  assert.equal(capacity.carries, 'repo-content');
-  assert.equal(capacity.allowCrossProvider, true);
-  assert.ok(typeof capacity.command === 'string' && capacity.command.length > 0);
-  assert.ok(Array.isArray(capacity.args) && capacity.args.includes('{prompt}') && capacity.args.includes('{model}'));
+  assert.equal(cfg.capacities?.gather, undefined, 'capacities.gather should no longer exist -- retired per D6');
 });
 
 /** Capture what's written to process.stderr during `fn()`; restores the
@@ -2052,7 +2044,7 @@ test('loadRunnerConfig accepts a "capacities.<id>" entry with a valid carries va
     configPath,
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
-      capacities: { gather: { kind: 'cli', command: 'agy', args: ['{prompt}'], for: 'gather', carries: 'repo-content', allowCrossProvider: true } },
+      capacities: { gather: { kind: 'cli', command: 'agy', args: ['{prompt}'], for: 'judge', carries: 'repo-content', allowCrossProvider: true } },
       models: { standard: 'sonnet' },
       timeoutMs: 1000,
     }),
@@ -2078,7 +2070,7 @@ test('loadRunnerConfig rejects a "capacities.<id>" entry whose carries is not on
 function carriesCfg(carries) {
   return {
     executor: { command: '/global/executor', args: ['{prompt}'] },
-    capacities: { gather: { kind: 'cli', command: 'agy', args: ['{prompt}'], for: 'gather', carries, allowCrossProvider: true } },
+    capacities: { gather: { kind: 'cli', command: 'agy', args: ['{prompt}'], for: 'judge', carries, allowCrossProvider: true } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   };
@@ -2141,23 +2133,29 @@ test('resolveExecutorCommand never triggers the carries gate for a capacity that
 // tsk-2ie5/tsk-2c1) — purpose-based binding, never by name ------------------
 
 test('resolveCapacityIdForPurpose finds the capacity whose own "for" matches the purpose, regardless of the capacity id\'s own name', () => {
+  // resolveCapacityIdForPurpose is a pure string-match over `for` -- it never
+  // validates against CAPACITY_PURPOSES itself (that enum check only runs at
+  // config-load time, validateCapacityShape) -- so a synthetic purpose value
+  // ("review") proves the real invariant (match by field, not by id name)
+  // without reviving "gather" as if it were still a live purpose (tsk-5tm-2
+  // D6: retired, CAPACITY_PURPOSES is down to its one real value, "judge").
   const cfg = {
     capacities: {
-      'totally-unrelated-name': { kind: 'cli', for: 'gather', command: 'agy' },
+      'totally-unrelated-name': { kind: 'cli', for: 'review', command: 'agy' },
       'judge-decompose': { kind: 'task', for: 'judge' },
     },
   };
-  assert.equal(resolveCapacityIdForPurpose(cfg, 'gather'), 'totally-unrelated-name');
+  assert.equal(resolveCapacityIdForPurpose(cfg, 'review'), 'totally-unrelated-name');
 });
 
 test('resolveCapacityIdForPurpose returns null when no capacity declares that purpose — a legitimate state, never thrown', () => {
   const cfg = { capacities: { 'judge-decompose': { kind: 'task', for: 'judge' } } };
-  assert.equal(resolveCapacityIdForPurpose(cfg, 'gather'), null);
+  assert.equal(resolveCapacityIdForPurpose(cfg, 'no-such-purpose-configured'), null);
 });
 
 test('resolveCapacityIdForPurpose returns null against an empty/missing capacities block', () => {
-  assert.equal(resolveCapacityIdForPurpose({}, 'gather'), null);
-  assert.equal(resolveCapacityIdForPurpose({ capacities: {} }, 'gather'), null);
+  assert.equal(resolveCapacityIdForPurpose({}, 'no-such-purpose-configured'), null);
+  assert.equal(resolveCapacityIdForPurpose({ capacities: {} }, 'no-such-purpose-configured'), null);
 });
 
 // --- resolveCapacityCli / decideCapacityCli: purpose-based (--for) binding,
@@ -2171,7 +2169,7 @@ test('decideCapacityCli resolves "unavailable" when nothing is registered for th
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   });
-  const decided = await decideCapacityCli(undefined, { repoRoot: root, for: 'gather', hasLiveTaskAccess: true });
+  const decided = await decideCapacityCli(undefined, { repoRoot: root, for: 'judge', hasLiveTaskAccess: true });
   assert.deepEqual(decided, { mechanism: 'unavailable' });
 });
 
@@ -2179,11 +2177,11 @@ test('decideCapacityCli resolves purpose-based (--for) to the same result a posi
   const root = mkTempDir();
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
-    capacities: { gather: { kind: 'cli', for: 'gather', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    capacities: { gather: { kind: 'cli', for: 'judge', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   });
-  const byPurpose = await decideCapacityCli(undefined, { repoRoot: root, for: 'gather', hasLiveTaskAccess: true });
+  const byPurpose = await decideCapacityCli(undefined, { repoRoot: root, for: 'judge', hasLiveTaskAccess: true });
   const byName = await decideCapacityCli('gather', { repoRoot: root, hasLiveTaskAccess: true });
   assert.deepEqual(byPurpose, { mechanism: 'out-of-process', capacityId: 'gather' });
   // Positional-id path stays byte-identical (no capacityId field) — every
@@ -2202,7 +2200,7 @@ test('resolveCapacityCli throws when no capacity is registered for the given pur
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   });
-  await assert.rejects(() => resolveCapacityCli(undefined, { repoRoot: root, for: 'gather', prompt: 'x' }), RunnerConfigError);
+  await assert.rejects(() => resolveCapacityCli(undefined, { repoRoot: root, for: 'judge', prompt: 'x' }), RunnerConfigError);
 });
 
 test('resolveCapacityCli resolves purpose-based (--for) to the same command a positional capacityId would, plus the resolved capacityId; carries repo-content clears the gate', async () => {
@@ -2213,11 +2211,11 @@ test('resolveCapacityCli resolves purpose-based (--for) to the same command a po
   writeLocalStatus(fgosDir, { gather: { status: 'present', checkedAt: new Date().toISOString() } });
   writeRunnerConfigFixture(root, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
-    capacities: { gather: { kind: 'cli', for: 'gather', carries: 'repo-content', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    capacities: { gather: { kind: 'cli', for: 'judge', carries: 'repo-content', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   });
-  const byPurpose = await resolveCapacityCli(undefined, { repoRoot: root, for: 'gather', carries: 'repo-content', prompt: 'p' });
+  const byPurpose = await resolveCapacityCli(undefined, { repoRoot: root, for: 'judge', carries: 'repo-content', prompt: 'p' });
   const byName = await resolveCapacityCli('gather', { repoRoot: root, carries: 'repo-content', prompt: 'p' });
   assert.deepEqual(byPurpose, { command: 'agy', args: ['p'], provider: 'agy', model: 'sonnet', capacityId: 'gather' });
   assert.deepEqual(byName, { command: 'agy', args: ['p'], provider: 'agy', model: 'sonnet' });
@@ -2227,12 +2225,12 @@ test('resolveCapacityCli propagates the carries refusal for a purpose-resolved c
   const root = mkTempDir();
   writeRunnerConfigFixture(root, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
-    capacities: { gather: { kind: 'cli', for: 'gather', carries: 'user-text', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    capacities: { gather: { kind: 'cli', for: 'judge', carries: 'user-text', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   });
   await assert.rejects(
-    () => resolveCapacityCli(undefined, { repoRoot: root, for: 'gather', carries: 'repo-content', prompt: 'p' }),
+    () => resolveCapacityCli(undefined, { repoRoot: root, for: 'judge', carries: 'repo-content', prompt: 'p' }),
     RunnerConfigError,
   );
 });
