@@ -48,7 +48,6 @@ import { runGoalCheck, runInvariantChecks, invariantFailureAsCheck } from './goa
 import { readInvariantCheckCommands } from '../config/shared-config-file.mjs';
 import { normalizePath } from './frozen-judge.mjs';
 import { acquireMainCheckoutLock, renewMainCheckoutLockIfOwn, mergeSlotLockFile, HELD, AMBIGUOUS, DEFAULT_TTL_MS, HOLDER_PID_ENV_VAR, formatLockDurationMs } from './main-checkout-lock.mjs';
-import { resolveWriterIdentity } from './session-identity.mjs';
 import { listSessions } from './session.mjs';
 import { listWork } from '../state/store.mjs';
 import { openLeavesSharingTarget, classifyPostLandDrift } from '../state/graph-harness.mjs';
@@ -775,15 +774,25 @@ const HEARTBEAT_INTERVAL_MS = Math.floor(DEFAULT_TTL_MS / 3);
  */
 export async function withMergeTargetSlot(lockRoot, targetRef, fn) {
   const fgosDir = path.join(lockRoot, '.fgos');
-  const identity = resolveWriterIdentity(fgosDir).id;
+  // tsk-18k: process.pid, not resolveWriterIdentity's session id — mirrors
+  // tsk-70l's own identical fix on the sibling main-checkout.lock call site
+  // below (mergeRunnerItem). Two independent OS processes can inherit the
+  // same env session id (a subagent fanout approving sibling leaves into
+  // the same target, for example); under a string identity, one process's
+  // release/renew (releaseMainCheckoutLockIfOwn/renewMainCheckoutLockIfOwn,
+  // main-checkout-lock.mjs) can then misidentify a DIFFERENT process's live
+  // lock as its own after a TTL reclaim and delete/overwrite it — the exact
+  // bug this fix closes. A numeric pid identity has no such collision (two
+  // real OS processes never share a pid) and needs no
+  // `allowSelfRecognition: false` override to force real contention: this
+  // slot is always released in the same call that acquired it (see
+  // `finally` below), so there is no legitimate same-identity re-entry to
+  // begin with, and `main-checkout-lock.mjs`'s own numeric-identity branch
+  // already tells a live sibling apart from a crashed same-pid holder via
+  // `isPidAlive` without any extra flag.
+  const identity = process.pid;
   const lockFile = mergeSlotLockFile(targetRef);
-  // tsk-1wr: this slot is always released in the same call that acquired
-  // it (see `finally` below), so there is no legitimate same-identity
-  // re-entry to protect. Two OS processes can inherit the same env session
-  // id (a subagent fanout approving sibling leaves into the same target,
-  // for example) — allowSelfRecognition:false makes them contend for real
-  // instead of both reading as "the same writer".
-  const lock = acquireMainCheckoutLock(fgosDir, { identity, ttlMs: DEFAULT_TTL_MS, releaseOnExit: true, lockFile, allowSelfRecognition: false });
+  const lock = acquireMainCheckoutLock(fgosDir, { identity, ttlMs: DEFAULT_TTL_MS, releaseOnExit: true, lockFile });
   if (lock.status === HELD) {
     const ttlPart = lock.remainingTtlMs != null
       ? `, expires in ${formatLockDurationMs(lock.remainingTtlMs)}`

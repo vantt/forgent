@@ -1018,26 +1018,47 @@ export async function withMergeEphemeralWorktree(repoRoot, id, fn) {
     const endCommit = git(worktree.path, ['rev-parse', 'HEAD']).trim();
     if (endCommit !== worktree.startCommit) {
       // CAS GUARD (tsk-46a, docs/history/merge-ephemeral-branch-force-race/
-      // CONTEXT.md D1): `startCommit` was captured back in
+      // CONTEXT.md D1; hardened tsk-18k): `startCommit` was captured back in
       // createDetachedMergeWorktree, before `fn` ran and before any lock was
       // held over THIS step -- a second concurrent call for the same `id`
       // (e.g. two leaf approves into the same fgw/<rootId>) can land its own
-      // `branch -f` in between, moving `branch` out from under this call
-      // without this call ever knowing. Re-reading the branch's live tip
-      // right here and refusing to move it unless it still matches
-      // `startCommit` is what closes that window -- unconditionally
-      // force-moving (the old behavior) would silently discard whichever
-      // commit landed first, with no error and no conflict. D2: fail loudly
-      // here, never retry automatically -- the caller (merge-loop, or a
-      // person re-running `fgos approve`) owns retrying against the new tip.
-      const liveTip = git(repoRoot, ['rev-parse', branch]).trim();
-      if (liveTip !== worktree.startCommit) {
+      // ref update in between, moving `branch` out from under this call
+      // without this call ever knowing.
+      //
+      // `git update-ref <ref> <new> <old>` is git's own atomic
+      // compare-and-swap on the ref: it refuses the write outright
+      // (non-zero exit, ref left completely untouched) unless the ref's
+      // CURRENT value still equals `<old>` at the exact moment of the
+      // write -- there is no separate read-then-write window left for a
+      // second caller to land in between. The prior shape here was a plain
+      // `git rev-parse` (read) followed by an unconditional `git branch -f`
+      // (write): two genuinely concurrent callers could BOTH pass that read
+      // before either one wrote, letting the second `branch -f` silently
+      // discard whichever commit the first one had just landed, with no
+      // error and no conflict. That window is exactly what tsk-18k's own
+      // bug (the merge-target-slot lock's release/renew misidentifying a
+      // sibling's live lock as its own after a TTL-starvation reclaim,
+      // fixed above in `withMergeTargetSlot`) could put two callers through
+      // at once -- confirmed still possible even after that identity fix,
+      // since a TTL-starvation reclaim can happen while the original
+      // holder's own `fn()` (this whole merge) is still running, unaware
+      // its lock was reclaimed. D2 still holds: fail loudly here, never
+      // retry automatically -- the caller (merge-loop, or a person
+      // re-running `fgos approve`) owns retrying against the new tip.
+      try {
+        git(repoRoot, ['update-ref', `refs/heads/${branch}`, endCommit, worktree.startCommit]);
+      } catch {
+        // update-ref's own error already named the mismatch on stderr; read
+        // the branch's actual current tip here only to report it back in
+        // the same message/field shape callers and tests already expect --
+        // this read is diagnostic, never the guard itself (the guard
+        // already ran, atomically, in the update-ref call above).
+        const liveTip = git(repoRoot, ['rev-parse', branch]).trim();
         throw new WorktreeError(
           `refusing to force-move "${branch}" to ${endCommit} -- its tip changed from ${worktree.startCommit} to ${liveTip} since this merge started (a concurrent merge into the same branch already landed). Retry against the new tip instead of overwriting it.`,
           { branch, expectedTip: worktree.startCommit, actualTip: liveTip, endCommit },
         );
       }
-      git(repoRoot, ['branch', '-f', branch, endCommit]);
     }
     return result;
   } finally {
