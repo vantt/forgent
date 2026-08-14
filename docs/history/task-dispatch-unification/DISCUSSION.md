@@ -228,63 +228,141 @@ thể nào cần sửa lại theo hướng này (`gather`, `fgos-fanout`, `fgos-
 
 ## 6. Thiết kế đã chốt {#design}
 
-fgOS có 1 doctrine dispatch đã khoá (`docs/decisions/0026`, Native-First
-Dispatch Doctrine): với 1 target cần "soul" (suy luận, không thuần cơ học),
-cùng provider với phiên đang chạy → ưu tiên native; khác provider → bắt buộc
-cli/spawn; config có thể ép cli/spawn cho mục đích cách ly tài nguyên (ngoại lệ
-hợp lệ). `tsk-3ik` (Phase 4) đã hiện thực hoá 1 lớp quyết định tự động áp 4 quy
-tắc này cho `capacities.<id>` (`decideCapacityDispatchMechanism`, `mechanism:
-in-process/out-of-process`) — nhưng phạm vi D3 của nó ("mọi call site Task/
-Agent-tool trực tiếp phải qua cùng decision protocol") chưa từng được thực thi
-cho `fgos-fanout`, vì skill đó chưa tồn tại lúc `tsk-3ik` viết.
+### Bối cảnh: đây là phần còn thiếu của 1 doctrine đã khoá, không phải phát minh mới
 
-Thiết kế đã chốt của phiên này là ĐÓNG đúng khoảng trống đó, theo đúng hình
-dạng `run_task()` của marketing-cockpit đã đối chiếu:
+fgOS đã có 1 doctrine dispatch khoá từ trước (`docs/decisions/0026`, Native-
+First Dispatch Doctrine): với 1 target cần "soul" (suy luận, không thuần cơ
+học), cùng provider với phiên đang chạy → ưu tiên native; khác provider → bắt
+buộc cli/spawn; config có thể ép cli/spawn cho mục đích cách ly tài nguyên
+(ngoại lệ hợp lệ, không phải bug). `tsk-3ik` (Phase 4) đã hiện thực hoá 1 lớp
+quyết định tự động áp 4 quy tắc này cho `capacities.<id>`
+(`decideCapacityDispatchMechanism`, trả `mechanism: in-process/out-of-
+process`) — nhưng phạm vi D3 của chính `tsk-3ik` ("mọi call site Task/Agent-
+tool trực tiếp phải qua cùng decision protocol") chưa từng được thực thi cho
+`fgos-fanout`, vì skill đó chưa tồn tại lúc `tsk-3ik` viết. Toàn bộ thiết kế
+dưới đây là ĐÓNG khoảng trống đó, cộng dọn sạch vài field/entry đã hết lý do
+tồn tại được phát hiện dọc đường.
 
-- **Producer layer** (fgos-researching, fgos-fanout, tương lai thêm) chỉ tính
-  việc + chia việc thành TASK — không tự quyết cơ chế thực thi. 4 hình dạng
-  task tương ứng 4 khái niệm hiện có của fgOS: `work` (work-item đầy đủ
-  lifecycle), `childwork` (exec-packet B2, còn gated theo `two-layer-dispatch`
-  D4, chưa ship), `capacity` (đã đăng ký, `gather`/`judge-*`), `ad-hoc task`
-  (tên cũ "ad-hoc packet", đổi theo D8 — vẫn 6-field runtime-composed, `id`
-  vẫn `<scope>#p<n>` invalid với `ID_PATTERN`, theo `two-layer-dispatch`
-  D3/D6).
-- **Dispatch layer** (1 cơ chế dùng chung, mở rộng từ hạ tầng `tsk-3ik` đã có)
-  nhận bất kỳ hình dạng task nào, áp 4 quy tắc của `docs/decisions/0026` tại
-  runtime: TỰ THỰC THI (gọi `EXECUTOR_ADAPTERS[adapter]`, trả kết quả thật) cho
-  mọi case adapter-resolvable (D5) — CHỈ hand-back `{agentType, prompt}` cho
-  agent tự gọi Task tool đúng 1 case: native, cùng family, có session sống.
-- **Điểm kích hoạt gốc luôn từ agent** — dispatch.mjs là CLI/thư viện thụ động,
-  không tự chủ động gọi ai. Cần đúng 1 prose/skill helper chuẩn (mở rộng
-  `_shared/capacity-dispatch-fallback.md`, hiện chỉ support `<CAPACITY_ID>` cố
-  định) làm ngõ vào DUY NHẤT cho mọi producer nội bộ — KHÔNG gộp logic
-  tính-việc riêng của từng producer, chỉ gộp điểm gọi dispatch (vấn đề mở #3).
-  Song song, cân nhắc tuyên bố hợp đồng này ở tầng harness (`AGENTS.md`, khối
-  MUST/NEVER kiểu GitNexus) để phủ agent ngoài luồng skill catalog (vấn đề mở
-  #4) — 2 tầng phủ khác nhau: #3 là nội bộ (đã chủ động), #4 là phổ quát.
+### 1. Producer layer — chỉ tính việc, chia việc, không tự quyết cơ chế
+
+`fgos-researching` (tính research branch) và `fgos-fanout` (tính wave/work-
+item) chỉ sinh ra TASK — không tự hardcode cơ chế thực thi. 4 hình dạng task
+hiện có của fgOS, mượn vocab tổng quát "task" từ marketing-cockpit (D4):
+
+| Hình dạng | Ý nghĩa | Trạng thái |
+|---|---|---|
+| `work` | work-item đầy đủ lifecycle (claim/stage/status) | sống, do `fgos-fanout` sinh |
+| `childwork` | exec-packet B2 (ghi file, id ephemeral, không lifecycle đầy đủ) | GATED theo `two-layer-dispatch` D4 — chưa ship |
+| `capacity` | đăng ký sẵn trong `capacities.<id>` | sống, do `fgos-researching`/`fgos-runner` dùng |
+| `ad-hoc task` | 6-field runtime-composed (đổi tên từ "ad-hoc packet", D8) | sống — `id` cố tình `<scope>#p<n>`, invalid với `ID_PATTERN`, không lẫn work-item thật |
+
+### 2. Dispatch layer — 1 cửa chung, tự thực thi hoặc hand-back tại runtime
+
+Nhận bất kỳ hình dạng task nào ở trên, áp 4 quy tắc `0026` tại RUNTIME (không
+phải build-time):
+
+- **Case tự thực thi được (adapter-resolvable)** — dispatch TỰ GỌI
+  `EXECUTOR_ADAPTERS[adapter](...)`, trả kết quả THẬT, khớp `run_task()` của
+  marketing-cockpit (D5). Cần 1 subcommand mới, `execute`, thay cho hành vi
+  hôm nay của Flow A (`resolve` chỉ trả `{command,args}` trần, bắt agent tự
+  đứng ra làm thay adapter qua Bash — Flow B (`spawnWorker`) đã tự gọi đúng,
+  chỉ Flow A cần sửa).
+- **Case native, cùng family, có session sống** — CHỈ case này dispatch
+  hand-back `{agentType, prompt}`, vì dispatch (1 CLI/thư viện thụ động)
+  không có quyền tự gọi Task/Agent tool — agent tự gọi tool của chính nó.
+- **`mechanism: "unavailable"`** — trạng thái HỢP LỆ (không phải lỗi) khi
+  không có gì phục vụ task đó — rơi thẳng về tự làm inline.
+
+3 cách 1 producer hỏi dispatch: theo id cố định (`decide <capacityId>`),
+theo purpose (`decide --for <purpose>`, đã hoạt động sẵn), hoặc theo work-item
+(`decide --work <id>`, MỚI — cần export `capacityIdForWork` + thêm cờ CLI,
+đây là mảnh còn thiếu để `fgos-fanout` hết là ngoại lệ chưa tuân doctrine).
+
+### 3. Registry shape — key theo tên executor, KHÔNG đổi field top-level
+
+Muốn đổi cấu trúc bên trong (key theo TÊN EXECUTOR thay vì purpose, mảng
+`invocations[]` thay vì `command`/`args` phẳng — khớp `executor-registry.yaml`
+thật của marketing-cockpit) — nhưng **field top-level VẪN LÀ `capacities`**
+(D11): `cfg.executors` đã tồn tại thật, key theo TIER (`light/standard/heavy`,
+validate chặt từ `tsk-4eu`), đổi tên trùng sẽ khiến config không load được.
+Ví dụ tham chiếu thật, verify kỹ thuật qua `agy --help` trên máy (D6/D11):
+
+```jsonc
+"capacities": {
+  "agy": {
+    "kind": "agent", "providerModel": "gemini", "allowCrossProvider": true,
+    "invocations": [{ "via": "cli", "adapter": "cli-spawn", "command": "agy",
+      "args": ["-p", "{prompt}", "--dangerously-skip-permissions", "--model", "{model}"] }]
+    // không gắn "for" nào — chờ producer thật cần mới khai
+  }
+}
+```
+
+`judge-discovery`/`judge-decompose` (key theo id cụ thể, không theo purpose)
+đã tương thích tự nhiên với shape mới — không cần migrate. `for:"judge"` trên
+cả 2 entry chỉ là nhãn gom-nhóm, chưa từng được purpose-lookup thực sự dùng
+tới — điều tra lịch sử thật (`tsk-4eu`/`tsk-5ge`) xác nhận đây vô hại, không
+phải bug (D10).
+
+### 4. Model/tier — N-map theo provider, vocab mở rộng
+
+`modelForTier` cũ chỉ đọc 1 map phẳng, toàn tên model Claude — 1 executor
+non-Claude (như `agy`) gọi qua tier sẽ nhận tên model SAI, không throw. Đổi
+sang `cfg.modelPolicies`, key theo provider, mỗi provider tự có 5 tier
+(`lightweight/standard/creative/analytical/critical`) + trục `rigorOverrides`
+(D9) — khớp `tier_policy_path` của marketing-cockpit.
+
+### 5. Đã dọn — 2 thứ hết lý do tồn tại
+
+- **Field `needs`** (D1): retire khỏi `capacities.<id>` — chết 100% với mọi
+  entry `kind:"task"`, không thêm tín hiệu gì với `kind:"cli"` ngoài việc OS
+  tự throw ENOENT. Tool-registry + `fgos tool query --status present/stale`
+  là nơi hỏi presence/staleness trực tiếp tại điểm gọi, không cần dispatch.mjs
+  tái tạo gate này.
+- **Capacity `gather`** (D6): xoá hoàn toàn — từng là con đường cross-provider
+  DUY NHẤT, không có lý do kiến trúc nào ghi lại; lý do thật duy nhất có ghi
+  (song song hoá) đã được native đáp ứng đủ. Xoá kèm: tool-registry entry,
+  `'gather'` khỏi `CAPACITY_PURPOSES` enum, test cứng vào entry thật, và đoạn
+  prose chết trong `fgos-researching`'s SKILL.md.
+
+### 6. Điểm vào — prose helper nội bộ + hợp đồng tầng harness
+
+Điểm kích hoạt gốc LUÔN LUÔN từ agent (dispatch.mjs thụ động). 2 tầng phủ
+khác nhau, không trộn (D12):
+
+- **Nội bộ, đã chủ động:** mở rộng `_shared/capacity-dispatch-fallback.md`
+  (rút còn 3 bước sau `execute` landed, thêm tài liệu cho `--for`/`--work`) —
+  MỌI producer trỏ vào ĐÚNG 1 fragment này, không tự viết lại logic gọi
+  dispatch (đúng lỗi `fgos-researching` đã mắc khi fragment cũ chưa theo kịp
+  purpose-based binding).
+- **Phổ quát, cho agent ngoài luồng skill:** 1 đoạn ở `AGENTS.md` (bold-
+  paragraph trong `## fgOS Workflow`, không mô phỏng khối auto-regen của
+  GitNexus) — câu chữ đã soạn xong (D7's target-text, vòng 8), cố ý hoãn ĐƯA
+  VÀO FILE tới khi `execute`/`--work` thật sự tồn tại, để không trỏ vào lệnh
+  chưa có thật.
 
 ```mermaid
 flowchart TD
     subgraph Producer["Tầng sản xuất — chỉ tính + chia việc"]
-        R["fgos-researching<br/>tính research branch"]
-        F["fgos-fanout<br/>tính wave"]
+        R["fgos-researching"]
+        F["fgos-fanout"]
     end
 
-    subgraph Tasks["4 hình dạng task (đều là 'task' tổng quát)"]
-        T1["work<br/>work-item đầy đủ lifecycle"]
-        T2["childwork<br/>exec-packet B2 — GATED, chưa ship"]
-        T3["capacity<br/>đã đăng ký (gather/judge-*)"]
-        T4["ad-hoc task<br/>6-field runtime-composed<br/>(id: &lt;scope&gt;#p&lt;n&gt;, invalid ID_PATTERN)"]
+    subgraph Tasks["4 hình dạng task"]
+        T1["work"]
+        T2["childwork — GATED"]
+        T3["capacity<br/>vd agy, judge-*"]
+        T4["ad-hoc task"]
     end
 
-    subgraph Dispatch["Tầng dispatch — 1 cửa chung, quyết tại runtime"]
-        D["dispatch.mjs<br/>áp 4 quy tắc 0026"]
+    subgraph Dispatch["1 cửa dispatch chung"]
+        D["dispatch.mjs decide<br/>áp 4 quy tắc 0026"]
         Rule2{"cùng provider<br/>+ cần soul?"}
     end
 
     R -->|sinh| T3
     R -->|sinh| T4
-    F -->|sinh| T1
+    F -->|sinh, qua --work| T1
 
     T1 --> D
     T2 -.->|chưa ship| D
@@ -292,8 +370,8 @@ flowchart TD
     T4 --> D
 
     D --> Rule2
-    Rule2 -->|có, D5: adapter-resolvable| SelfExec["dispatch TỰ GỌI<br/>EXECUTOR_ADAPTERS[adapter]<br/>trả kết quả thật"]
-    Rule2 -->|native, cùng family, session sống| HandBack["dispatch trả<br/>{agentType, prompt}<br/>agent TỰ gọi Task tool"]
+    Rule2 -->|"adapter-resolvable (D5)"| SelfExec["dispatch.mjs execute<br/>TỰ GỌI adapter<br/>trả kết quả thật"]
+    Rule2 -->|"native, cùng family, session sống"| HandBack["hand-back<br/>{agentType, prompt}<br/>agent TỰ gọi Task tool"]
 
     style T2 stroke-dasharray: 5 5
 ```
