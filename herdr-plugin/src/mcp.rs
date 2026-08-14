@@ -170,6 +170,30 @@ fn call_verb(gateway: &Arc<dyn VerbGateway>, args: Vec<String>) -> Result<Dynami
     }
 }
 
+/// tsk-1qe: `on_print`/`on_debug` bound below with no cap would let
+/// `loop { print("x") }` grow this buffer without bound. Caps by total
+/// captured bytes (not line count, which a single very long `print()` call
+/// would bypass) -- once the budget is spent, further lines are silently
+/// dropped rather than erroring the whole script (an over-verbose script is
+/// still a working script; only the accidental-flood case needs bounding).
+const MCP_EXECUTE_MAX_OUTPUT_BYTES: usize = 256 * 1024;
+
+fn push_capped_output(output: &Arc<Mutex<Vec<String>>>, line: String) {
+    let mut buf = output.lock().unwrap();
+    let used: usize = buf.iter().map(|s| s.len()).sum();
+    if used >= MCP_EXECUTE_MAX_OUTPUT_BYTES {
+        return;
+    }
+    buf.push(line);
+}
+
+/// tsk-1ah: same guard `gateway.rs`'s REST handlers apply, adapted to the
+/// Rhai error type bound functions below return -- see
+/// `gateway::reject_leading_dash`'s own doc comment for why.
+fn reject_leading_dash(value: &str, field: &str) -> Result<(), Box<rhai::EvalAltResult>> {
+    crate::gateway::reject_leading_dash(value, field).map_err(|err| format!("{err}").into())
+}
+
 /// Builds a fresh Rhai engine with the work-item bound-function allowlist
 /// registered, and the given buffer wired up to capture `print`/`debug`
 /// output (Rhai's own stdlib carries no filesystem/process/network access by
@@ -179,10 +203,22 @@ fn call_verb(gateway: &Arc<dyn VerbGateway>, args: Vec<String>) -> Result<Dynami
 fn build_engine(gateway: Arc<dyn VerbGateway>, output: Arc<Mutex<Vec<String>>>) -> Engine {
     let mut engine = Engine::new();
 
+    // tsk-1qe: `Engine::new()` defaults to unlimited operations
+    // (`rhai::Engine`'s own `EngineLimits::default`, `num_operations: None`)
+    // -- an ordinary generation bug like `loop { x += 1; }` (no malice
+    // needed) would otherwise wedge this thread forever. 500_000 gives wide
+    // headroom for any real Code-Mode script's own control flow (every
+    // bound function below executes in Rust, costing Rhai's own op-counter
+    // almost nothing) while failing an accidental infinite loop in well
+    // under a second. NOT a D9 sandbox-privilege reopen (`docs/history/
+    // fgos-gateway-mcp-surface/CONTEXT.md`) -- this bounds CPU time, it
+    // grants or removes no capability.
+    engine.set_max_operations(500_000);
+
     let out = output.clone();
-    engine.on_print(move |s| out.lock().unwrap().push(s.to_string()));
+    engine.on_print(move |s| push_capped_output(&out, s.to_string()));
     let out = output.clone();
-    engine.on_debug(move |s, _src, _pos| out.lock().unwrap().push(s.to_string()));
+    engine.on_debug(move |s, _src, _pos| push_capped_output(&out, s.to_string()));
 
     let gw = gateway.clone();
     engine.register_fn(
@@ -190,10 +226,12 @@ fn build_engine(gateway: Arc<dyn VerbGateway>, output: Arc<Mutex<Vec<String>>>) 
         move |status: &str, stage: &str, all: bool| -> Result<Dynamic, Box<rhai::EvalAltResult>> {
             let mut args = vec!["list".to_string(), "--json".to_string()];
             if !status.is_empty() {
+                reject_leading_dash(status, "status")?;
                 args.push("--status".to_string());
                 args.push(status.to_string());
             }
             if !stage.is_empty() {
+                reject_leading_dash(stage, "stage")?;
                 args.push("--stage".to_string());
                 args.push(stage.to_string());
             }
@@ -211,6 +249,7 @@ fn build_engine(gateway: Arc<dyn VerbGateway>, output: Arc<Mutex<Vec<String>>>) 
 
     let gw = gateway.clone();
     engine.register_fn("get_work", move |id: &str| -> Result<Dynamic, Box<rhai::EvalAltResult>> {
+        reject_leading_dash(id, "id")?;
         call_verb(&gw, vec!["show".to_string(), id.to_string(), "--json".to_string()])
     });
 
@@ -218,8 +257,11 @@ fn build_engine(gateway: Arc<dyn VerbGateway>, output: Arc<Mutex<Vec<String>>>) 
     engine.register_fn(
         "move_work",
         move |id: &str, to: &str, expect: &str| -> Result<Dynamic, Box<rhai::EvalAltResult>> {
+            reject_leading_dash(id, "id")?;
+            reject_leading_dash(to, "to")?;
             let mut args = vec!["move".to_string(), id.to_string(), "--to".to_string(), to.to_string(), "--json".to_string()];
             if !expect.is_empty() {
+                reject_leading_dash(expect, "expect")?;
                 args.push("--expect".to_string());
                 args.push(expect.to_string());
             }
@@ -231,6 +273,7 @@ fn build_engine(gateway: Arc<dyn VerbGateway>, output: Arc<Mutex<Vec<String>>>) 
     engine.register_fn(
         "ask_work",
         move |id: &str, text: &str| -> Result<Dynamic, Box<rhai::EvalAltResult>> {
+            reject_leading_dash(id, "id")?;
             call_verb(&gw, vec!["ask".to_string(), id.to_string(), "--text".to_string(), text.to_string(), "--json".to_string()])
         },
     );
@@ -239,6 +282,7 @@ fn build_engine(gateway: Arc<dyn VerbGateway>, output: Arc<Mutex<Vec<String>>>) 
     engine.register_fn(
         "answer_work",
         move |id: &str, text: &str| -> Result<Dynamic, Box<rhai::EvalAltResult>> {
+            reject_leading_dash(id, "id")?;
             call_verb(&gw, vec!["answer".to_string(), id.to_string(), "--text".to_string(), text.to_string(), "--json".to_string()])
         },
     );
@@ -247,18 +291,22 @@ fn build_engine(gateway: Arc<dyn VerbGateway>, output: Arc<Mutex<Vec<String>>>) 
     engine.register_fn(
         "take_work",
         move |id: &str, role: &str| -> Result<Dynamic, Box<rhai::EvalAltResult>> {
+            reject_leading_dash(id, "id")?;
             let role = if role.is_empty() { "session" } else { role };
+            reject_leading_dash(role, "role")?;
             call_verb(&gw, vec!["take".to_string(), id.to_string(), "--role".to_string(), role.to_string(), "--json".to_string()])
         },
     );
 
     let gw = gateway.clone();
     engine.register_fn("return_work", move |id: &str| -> Result<Dynamic, Box<rhai::EvalAltResult>> {
+        reject_leading_dash(id, "id")?;
         call_verb(&gw, vec!["return".to_string(), id.to_string(), "--json".to_string()])
     });
 
     let gw = gateway.clone();
     engine.register_fn("approve_work", move |id: &str| -> Result<Dynamic, Box<rhai::EvalAltResult>> {
+        reject_leading_dash(id, "id")?;
         call_verb(&gw, vec!["approve".to_string(), id.to_string(), "--json".to_string()])
     });
 
@@ -266,6 +314,7 @@ fn build_engine(gateway: Arc<dyn VerbGateway>, output: Arc<Mutex<Vec<String>>>) 
     engine.register_fn(
         "reject_work",
         move |id: &str, reason: &str| -> Result<Dynamic, Box<rhai::EvalAltResult>> {
+            reject_leading_dash(id, "id")?;
             call_verb(&gw, vec!["reject".to_string(), id.to_string(), "--reason".to_string(), reason.to_string(), "--json".to_string()])
         },
     );
@@ -276,6 +325,7 @@ fn build_engine(gateway: Arc<dyn VerbGateway>, output: Arc<Mutex<Vec<String>>>) 
         move |cursor: &str, limit: i64| -> Result<Dynamic, Box<rhai::EvalAltResult>> {
             let mut args = vec!["ready".to_string(), "--json".to_string()];
             if !cursor.is_empty() {
+                reject_leading_dash(cursor, "cursor")?;
                 args.push("--cursor".to_string());
                 args.push(cursor.to_string());
             }
@@ -289,6 +339,7 @@ fn build_engine(gateway: Arc<dyn VerbGateway>, output: Arc<Mutex<Vec<String>>>) 
 
     let gw = gateway.clone();
     engine.register_fn("rollup", move |id: &str| -> Result<Dynamic, Box<rhai::EvalAltResult>> {
+        reject_leading_dash(id, "id")?;
         call_verb(&gw, vec!["rollup".to_string(), id.to_string(), "--json".to_string()])
     });
 
@@ -502,6 +553,40 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn execute_an_infinite_loop_fails_fast_instead_of_hanging_forever() {
+        let gateway = fake(Ok(json!({"ok": true})));
+        let script = "let x = 0; loop { x += 1; }";
+        let result = tokio::task::spawn_blocking(move || run_script(gateway, script)).await.unwrap();
+        assert!(result.is_err(), "an unbounded loop must be stopped by the operation limit, not run forever");
+        assert!(
+            result.unwrap_err().contains("Too many operations"),
+            "the failure should be the operation-limit error, not some other unrelated error"
+        );
+    }
+
+    #[tokio::test]
+    async fn execute_a_print_flood_does_not_grow_the_captured_output_past_the_byte_cap() {
+        let gateway = fake(Ok(json!({"ok": true})));
+        // Each iteration prints a 1024-byte line; enough iterations to
+        // exceed MCP_EXECUTE_MAX_OUTPUT_BYTES (256 KiB) well before hitting
+        // the operation limit (500_000), so this proves the byte cap fires
+        // on its own rather than being masked by the operation limit.
+        let script = r#"
+            let line = "";
+            for i in range(0, 1024) { line += "x"; }
+            for i in range(0, 500) { print(line); }
+        "#;
+        let result = tokio::task::spawn_blocking(move || run_script(gateway, script)).await.unwrap();
+        let output = result.expect("a bounded print flood should still complete successfully");
+        assert!(
+            output.len() <= MCP_EXECUTE_MAX_OUTPUT_BYTES + 4096,
+            "captured output ({} bytes) should stay near the {}-byte cap, not grow with every print call",
+            output.len(),
+            MCP_EXECUTE_MAX_OUTPUT_BYTES,
+        );
+    }
+
+    #[tokio::test]
     async fn execute_bound_function_call_matches_the_same_verb_call_the_gateway_makes_directly() {
         let gateway = fake(Ok(json!({"contract": "fgos.v1", "data": {"work": {"tsk-1": {"id": "tsk-1"}}}})));
         let script = r#"
@@ -511,6 +596,17 @@ mod tests {
         let result = tokio::task::spawn_blocking(move || run_script(gateway, script)).await.unwrap();
         let output = result.unwrap();
         assert!(output.contains("tsk-1"), "expected bound function's real envelope data in output, got: {output}");
+    }
+
+    #[tokio::test]
+    async fn execute_move_work_rejects_a_dash_prefixed_to_before_it_ever_reaches_the_verb_chokepoint() {
+        let gateway = fake(Ok(json!({"ok": true})));
+        let script = r#"move_work("tsk-1", "--delivered", "")"#;
+        let result = tokio::task::spawn_blocking(move || run_script(gateway, script)).await.unwrap();
+        assert!(
+            result.is_err(),
+            "a dash-prefixed 'to' value must be refused as validation, never reach the verb chokepoint where it could be misread as a flag"
+        );
     }
 
     #[tokio::test]
