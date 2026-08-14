@@ -876,7 +876,23 @@ export function addDecision(dir, payload) {
     throw new StoreError('validation', 'decision requires a non-empty "rationale".');
   }
   const eventPayload = { ...payload, source: payload.source ?? 'session', kind: payload.kind ?? 'design' };
-  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(logPath, { type: 'decision', payload: eventPayload }));
+  return withEventsLockAndRefresh(dir, logPath, () => {
+    // tsk-37t: unlike every neighbouring id-taking verb (editWork/moveWork
+    // both throw `work "<id>" not found` first), this used to accept any
+    // id at all — a decision scoped to a nonexistent item wrote a success
+    // envelope and a durable event that `fgos show <id>` could never
+    // retrieve (it refuses an unknown id), silently losing the record.
+    // `id` stays optional here (a global decision not scoped to one item is
+    // legitimate, e.g. `fgos decision` with no --id) — only validated when
+    // present.
+    if (payload.id !== undefined && payload.id !== null) {
+      const before = rebuildView(logPath);
+      if (!before.work[payload.id]) {
+        throw new StoreError('validation', `work "${payload.id}" not found.`);
+      }
+    }
+    return appendEventLocked(logPath, { type: 'decision', payload: eventPayload });
+  });
 }
 
 // Diataxis doc-type axis (per CONTEXT D5/D6): an OPTIONAL, additive tag on
