@@ -91,3 +91,31 @@ test('SPIKE: fgos uninstall --yes --remove-package removes a real npm -g install
     fs.rmSync(home, { recursive: true, force: true });
   }
 });
+
+test('tsk-652: fgos uninstall --yes --remove-package reports "skipped", never a false "removed", when this copy is not visible under npm\'s own global node_modules', () => {
+  // Simulates the pnpm/yarn (or "no install at all") case this item was
+  // filed against: npm_config_prefix points `npm root -g` at a real but
+  // EMPTY prefix -- no "forgent" package dir exists there, the same shape
+  // a pnpm-installed copy would present to npm. Runs the dev checkout's
+  // own bin/fgos.mjs directly (real process, no mock) -- no pack/install
+  // step needed since this test is about the pre-flight detection, not
+  // about actually removing anything.
+  const emptyPrefix = mkTemp('fgos-uninstall-not-npm-prefix-');
+  const home = mkTemp('fgos-uninstall-not-npm-home-');
+  try {
+    const result = spawnSync(process.execPath, [path.join(REPO_ROOT, 'bin', 'fgos.mjs'), 'uninstall', '--yes', '--remove-package'], {
+      cwd: home,
+      encoding: 'utf8',
+      env: { ...process.env, HOME: home, npm_config_prefix: emptyPrefix },
+    });
+    assert.equal(result.status, 0, `fgos uninstall --yes --remove-package failed: ${result.stderr}`);
+    const data = JSON.parse(result.stdout).data;
+    assert.equal(data.packageRemoval.attempted, false, 'must never claim it attempted removal when npm never had this package');
+    assert.equal(data.packageRemoval.outcome, 'skipped', 'must report "skipped", never a false "removed" or a misleading "failed"');
+    assert.match(data.packageRemoval.reason, /npm's own global node_modules/);
+    assert.match(data.packageRemoval.reason, /pnpm\/yarn/);
+  } finally {
+    fs.rmSync(emptyPrefix, { recursive: true, force: true });
+    fs.rmSync(home, { recursive: true, force: true });
+  }
+});

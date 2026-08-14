@@ -4821,16 +4821,40 @@ async function runVerb(verb, flags, positional, dir) {
       const { unwired: hooksUnwired, skippedExisting: hooksSkippedExisting } = uninstallGitHooks(repoRoot);
       let packageRemoval = { attempted: false, outcome: null };
       if (flags['remove-package']) {
+        // tsk-652: `npm uninstall -g forgent` exits 0 and reports nothing
+        // wrong even when this copy was never npm-installed at all (a
+        // pnpm/yarn global install lives in a different store npm never
+        // touches) -- confirm npm's own global node_modules actually has
+        // this package BEFORE claiming success, the same "detected
+        // manager" scope tsk-4iv-2's own SPIKE locked (npm-only), never
+        // widened here to actually support pnpm/yarn removal.
+        let npmRootG = null;
         try {
-          const output = execFileSync('npm', ['uninstall', '-g', 'forgent'], { encoding: 'utf8' });
-          packageRemoval = { attempted: true, outcome: 'removed', output };
-        } catch (err) {
+          npmRootG = execFileSync('npm', ['root', '-g'], { encoding: 'utf8' }).trim();
+        } catch {
+          npmRootG = null;
+        }
+        const npmInstalled = npmRootG !== null && npmRootG !== '' && fs.existsSync(path.join(npmRootG, 'forgent'));
+        if (!npmInstalled) {
           packageRemoval = {
-            attempted: true,
-            outcome: 'failed',
-            error: err.message,
-            stderr: typeof err.stderr === 'string' ? err.stderr : (err.stderr?.toString() ?? null),
+            attempted: false,
+            outcome: 'skipped',
+            reason: npmRootG
+              ? `this copy of fgOS is not visible under npm's own global node_modules (${npmRootG}) -- --remove-package only supports npm global installs (tsk-4iv-2); if installed via pnpm/yarn, remove it with that tool's own global uninstall command instead`
+              : 'npm root -g did not resolve (npm not on PATH?) -- --remove-package only supports npm global installs (tsk-4iv-2), and could not confirm this is one',
           };
+        } else {
+          try {
+            const output = execFileSync('npm', ['uninstall', '-g', 'forgent'], { encoding: 'utf8' });
+            packageRemoval = { attempted: true, outcome: 'removed', output };
+          } catch (err) {
+            packageRemoval = {
+              attempted: true,
+              outcome: 'failed',
+              error: err.message,
+              stderr: typeof err.stderr === 'string' ? err.stderr : (err.stderr?.toString() ?? null),
+            };
+          }
         }
       }
       return {
