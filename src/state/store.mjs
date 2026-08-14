@@ -27,6 +27,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { readEvents, withEventsLock, appendEventLocked, readLastLineBefore } from './events.mjs';
 import { rebuildView, viewRevision } from './replay.mjs';
 import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, classifyStalePostDelivery, footprintOverlapAmong, goalScopedCriticalPath, goalScopedGreedyTopUnblock, computeSchedule, detectCycles } from './graph-metrics.mjs';
@@ -472,6 +473,54 @@ export function assertAcceptanceEvidence(id, work) {
 }
 
 /**
+ * tsk-2p6: a risk:heavy item reaching `delivered` with no `plan.md` in its
+ * own docs history means its risk map was never written down for evidence
+ * to be checked against (found live: tsk-4ax/tsk-55p, docs/history/<id>/
+ * carrying only iron-law-evidence.md). Same shape as
+ * `assertAcceptanceEvidence` (RUL58) immediately above — a small assert
+ * called from both `moveWork`'s `to === 'delivered'` backstop and
+ * `approve`'s pre-flight call sites (`bin/fgos.mjs`) — but NOT pure: it
+ * checks the item's own `fgw/<id>` branch via `git cat-file -e`, never a
+ * plain `fs.existsSync` on the caller's current working tree, so the same
+ * function is correct both before a merge (pre-flight, branch not yet in
+ * `repoRoot`'s checkout) and after (backstop, already merged).
+ *
+ * `risk === 'heavy'` only, not a live re-derivation of "touches an
+ * Iron-Law-gated module" — that classification is the separate, existing
+ * Iron Law gate's own job; `heavy` is this codebase's own established
+ * mechanical proxy for "this needed a written risk map" (same trigger
+ * `fgos-coding-validating`'s own heavy-risk human-confirmation gate uses).
+ *
+ * Deliberately never re-evaluates an item that reached `delivered` before
+ * this gate existed (tsk-4ax/tsk-55p stay untouched) — this only fires at
+ * the moment of a NEW transition into `delivered`, never as a standing
+ * scan over history a retroactive plan.md could never honestly satisfy.
+ */
+export function assertPlanEvidence(id, work, repoRoot) {
+  if (work.risk !== 'heavy') return;
+  const branch = `fgw/${id}`;
+  const candidates = [];
+  if (typeof work.docsRef === 'string' && work.docsRef.trim()) {
+    candidates.push(path.posix.join(work.docsRef.replace(/\/+$/, ''), 'plan.md'));
+  }
+  candidates.push(`docs/history/${id}/plan.md`);
+  const hasPlan = candidates.some((candidate) => {
+    try {
+      execFileSync('git', ['cat-file', '-e', `${branch}:${candidate}`], { cwd: repoRoot, stdio: 'ignore' });
+      return true;
+    } catch {
+      return false;
+    }
+  });
+  if (!hasPlan) {
+    throw new StoreError(
+      'precondition',
+      `work "${id}" cannot move to "delivered" — risk:heavy but no plan.md found on branch "${branch}" (checked ${candidates.join(', ')}); write one before landing.`,
+    );
+  }
+}
+
+/**
  * Move a work item to a new status. Looks the item up fresh from the log,
  * delegates the precondition/CAS decision to status-fsm.mjs (pure — never writes),
  * and only then appends the event it returns.
@@ -684,6 +733,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   // that don't go through that pre-flight.
   if (to === 'delivered') {
     assertAcceptanceEvidence(id, work);
+    assertPlanEvidence(id, work, path.dirname(dir));
   }
 
   // Câu-6 tự động (per Phase 3 S3-closeout (c), six-questions L5): BOTH doors
