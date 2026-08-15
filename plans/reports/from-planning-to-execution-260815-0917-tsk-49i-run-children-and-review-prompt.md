@@ -19,11 +19,16 @@ cha**, không bao giờ chạm `main`.
 - `docs/history/state-runner-merge-boundary/RESEARCH.md` — bằng chứng
   `file:line` cho từng danh sách import-site. §A1 là danh sách file phải
   sửa; đừng tự grep lại từ đầu, nhưng **có quyền kiểm chứng lại** trước
-  khi sửa. **Đọc luôn "Vòng 2"** ở cuối file: nhánh đã merge `main`
-  (`ba25a590`) và toàn bộ anchor của §A1 đã được kiểm lại — F1 là cạnh
-  import thứ 5 mới phát sinh, F3 là bảng toạ độ đã lệch, F4 là 2 claim
-  của §A1 nay đã sai. Chỗ nào §A1 và Vòng 2 mâu thuẫn thì **Vòng 2
+  khi sửa. **Đọc luôn "Vòng 2" và "Vòng 3"** ở cuối file: nhánh đã sync
+  `main` hai lần (`ba25a590`, rồi `305fefac` sau đợt `tsk-5tm`) và toàn bộ
+  anchor của §A1 đã được kiểm lại — F1 là cạnh import thứ 5 mới phát sinh,
+  F3/G3 là bảng toạ độ đã lệch, F4 là 2 claim của §A1 nay đã sai, F5 là 2
+  tham chiếu §A1 bỏ sót. Chỗ nào §A1 mâu thuẫn với vòng sau thì **vòng sau
   thắng**.
+- `plans/reports/from-verify-to-execution-260815-1309-tsk-49i-repo-wide-hazard-check-report.md`
+  — 5 hazard bán kính toàn repo và cách né từng cái. Mục Luật cứng và vòng
+  làm việc dưới đây là bản rút gọn của nó; đọc bản đầy đủ nếu gặp tình
+  huống lạ.
 - `docs/history/state-runner-merge-boundary/DISCUSSION.md` §6 — bản tổng
   hợp thiết kế đầy đủ.
 
@@ -47,6 +52,13 @@ cha**, không bao giờ chạm `main`.
    `runner/worktree.mjs`.
 
 Engine đã chặn thứ tự bằng `deps`; đừng cố làm con 2 trước.
+
+**Một cảnh báo về bản ghi của `tsk-49i-1` trong engine.** `title`,
+`verify`, `footprint`, `description` đã được cập nhật cho khớp 5 cạnh.
+Nhưng trường **`action` thì KHÔNG** — `fgos edit` không patch được trường
+đó (`bin/fgos.mjs:1730-1735` liệt kê đúng các field nhận patch), nên
+`action` vẫn là bản cũ nói "4 cạnh" và không nhắc `normalizePath`. Khi hai
+trường đá nhau, **`description` và `plan.md` thắng `action`**.
 
 ## Luật cứng (vi phạm là hỏng state thật)
 
