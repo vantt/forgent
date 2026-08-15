@@ -293,3 +293,88 @@ $ test -f test/cli/fgos-merge-next-no-config-write.test.mjs \
   && grep -qF resolveTimeoutMs src/verbs/merge/sync-root.mjs
 exit=0
 ```
+
+---
+
+## tsk-2fx — lazy wait-flag parsing (second half of the same regression)
+
+Found by the branch review, which read the tree at `36e85ae5` — before
+`tsk-55f` landed. Its timeout findings were already fixed by that item; this
+is the half that survived, re-confirmed against the current branch tip.
+
+**Why the gate fires.** `classifyIronLaw` over this item's own changed-file
+list:
+
+```
+{
+  "required": true,
+  "matchedFlags": [],
+  "matchedModules": [
+    "bin/fgos.mjs",
+    "src/runner/worktree.mjs"
+  ]
+}
+```
+
+**Command used as the failing-before / passing-after proof** — the item's
+own registered `verify`:
+
+```
+npm test \
+  && test -f test/cli/fgos-merge-next-idle-turn.test.mjs \
+  && grep -qF resolveWaitFlags src/verbs/merge/approve.mjs
+```
+
+### RED — reproduced by hand first, on two identical fresh repos
+
+`tsk-55f` deferred `resolveVerifyTimeoutMs` but left `parseWaitFlags` eager
+in `parseMergeClusterOptions`, so an idle `merge next` still validated
+`approve`'s wait flags before deciding it had nothing to do:
+
+```
+$ <main>/bin/fgos.mjs merge next --wait 0 --dir <repo-old>/.fgos
+{"picked": null, "reason": "nothing ready to merge"}          exit 0
+
+$ <branch>/bin/fgos.mjs merge next --wait 0 --dir <repo-new>/.fgos
+fgos: approve --wait must be a positive number of milliseconds (got "0").
+                                                              exit 4
+```
+
+That flips the shape merge-loop's own pool-empty stop rule reads: a driver
+carrying a stale `--wait` stops on an error instead of stopping cleanly.
+The `--timeout` variant was already green, confirming `tsk-55f` held.
+
+### RED — the regression test, run against the unfixed tree
+
+The fix was stashed (`git stash push -u -m tsk-2fx-fix-probe -- bin/fgos.mjs
+src/verbs/merge/approve.mjs src/verbs/merge/sync-root.mjs`), then:
+
+```
+$ node --test test/cli/fgos-merge-next-idle-turn.test.mjs
+✖ merge next with nothing ready ignores a malformed --wait and still
+  reports an empty pool (tsk-2fx)
+✖ sync-root refusing an unknown id names the item, not a --wait typo — its
+  guards run first (tsk-2fx)
+ℹ tests 4  ℹ pass 2  ℹ fail 2
+```
+
+The two `approve` cases passed even unfixed — deliberate: they prove
+laziness MOVES the parse rather than removing it, so they must be green on
+both sides. The stash was re-applied by name and dropped, never popped.
+
+### GREEN — after the change
+
+```
+$ node --test test/cli/fgos-merge-next-idle-turn.test.mjs
+ℹ tests 4  ℹ pass 4  ℹ fail 0
+
+$ npm test
+ℹ tests 3344
+ℹ pass 3339
+ℹ fail 0
+```
+
+Also folded in, both orphaned by this same branch and confirmed dead:
+`bin/fgos.mjs` no longer imports `changedFiles` (its only three call sites
+were the Iron Law checks that moved into `iron-law-gate.mjs`), and
+`worktree.mjs`'s `gitRead` doc no longer claims to be exported.

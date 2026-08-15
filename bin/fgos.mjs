@@ -48,7 +48,7 @@ import { runGoalCheck, detachedWorktreeFgosHint, runInvariantChecks, invariantFa
 import { frozenJudgeHits, footprintDiffHits } from '../src/runner/frozen-judge.mjs';
 import { normalizePath } from '../src/util/normalize-path.mjs';
 import { collectOutcomeEntry, collectFrictionData } from '../src/report/item-trace.mjs';
-import { cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, buildOwnFileSet } from '../src/runner/merge.mjs';
+import { cleanupMergedBranch, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, buildOwnFileSet } from '../src/runner/merge.mjs';
 import { assertSafeMainCheckoutReset } from '../src/runner/main-checkout-reset-guard.mjs';
 import { rejectUseCase } from '../src/verbs/merge/reject.mjs';
 import { reviewUseCase } from '../src/verbs/merge/review.mjs';
@@ -310,22 +310,30 @@ function parseWaitFlags(flags, verbName) {
 // their own refusal messages — forwarding from `merge next` therefore
 // builds the target verb's options with THAT verb's name, matching what the
 // recursive `runVerb` call produced before.
-// `resolveTimeoutMs` is a thunk, not a resolved value, and that is
-// load-bearing: `resolveVerifyTimeoutMs` falls through to
+// `resolveTimeoutMs` and `resolveWaitFlags` are thunks, not resolved
+// values, and that is load-bearing. Both of the parsers behind them can
+// refuse, and `resolveVerifyTimeoutMs` additionally falls through to
 // `ensureRunnerConfigForDir`, which WRITES a default runner config (and
-// warns on stderr) when none exists yet. Resolving it while building the
-// options would move that write ahead of every guard the use case runs —
-// `sync-root` used to resolve its timeout only after its item/worktree/
-// branch/Iron-Law guards, and `merge next` only ever resolved one by
-// actually reaching `approve`/`sync-root`, so a `{picked: null}` turn wrote
-// nothing at all. Each use case calls this at exactly the point its old
-// case block called `resolveVerifyTimeoutMs`.
+// warns on stderr) when none exists yet. Resolving either while building
+// the options would move that refusal — and that write — ahead of every
+// guard the use case runs:
+//
+//   - `sync-root` used to parse both only AFTER its item/worktree/branch/
+//     Iron-Law guards, so a refusal there named the real problem and
+//     touched nothing.
+//   - `merge next` used to reach either one ONLY by actually recursing into
+//     `approve`/`sync-root`, so an idle `{picked: null}` turn parsed no
+//     flags and wrote nothing. Parsing eagerly turned a stale `--wait` on
+//     an idle turn into exit 4, breaking the pool-empty shape merge-loop
+//     reads (tsk-2fx); the same eagerness did it for `--timeout` first
+//     (tsk-55f).
+//
+// Each use case calls these at exactly the point its old case block called
+// `parseWaitFlags`/`resolveVerifyTimeoutMs`.
 function parseMergeClusterOptions(verb, flags, dir, extra = {}) {
-  const { noWait, waitMs } = parseWaitFlags(flags, verb);
   return {
     resolveTimeoutMs: () => resolveVerifyTimeoutMs(verb, flags, path.dirname(dir)),
-    noWait,
-    waitMs,
+    resolveWaitFlags: () => parseWaitFlags(flags, verb),
     acknowledgeIronLaw: flags['acknowledge-iron-law'] === true,
     acknowledgeDrift: flags['acknowledge-drift'] === true,
     github: Boolean(flags.github),

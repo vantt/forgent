@@ -32,9 +32,9 @@ import { withLockRetry } from '../../runner/lock-wait.mjs';
 /**
  * @param {{dir: string, repoRoot: string}} ctx - `repoRoot` follows this
  *   verb's own `--trust-dir` policy, resolved by the adapter.
- * @param {{id: string, resolveTimeoutMs: () => number|undefined, noWait: boolean, waitMs: number|undefined, acknowledgeIronLaw: boolean}} options
+ * @param {{id: string, resolveTimeoutMs: () => number|undefined, resolveWaitFlags: () => {noWait: boolean, waitMs: number|undefined}, acknowledgeIronLaw: boolean}} options
  */
-export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs, noWait, waitMs, acknowledgeIronLaw }) {
+export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs, resolveWaitFlags, acknowledgeIronLaw }) {
   const view = listWork(dir);
   const item = view.work[id];
   if (!item) {
@@ -69,11 +69,14 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
     throw new StoreError('validation', ironLawRefusal('sync-root', id, ironLaw));
   }
 
-  // Resolved here and not earlier — the exact position `case 'sync-root'`
-  // resolved it in before the use-case split. It is the first thing in this
-  // verb that can WRITE (a missing runner config), so every refusal above
-  // stays side-effect-free.
+  // Both resolved here and not earlier — the exact positions
+  // `case 'sync-root'` resolved them in before the use-case split. The
+  // timeout is the first thing in this verb that can WRITE (a missing
+  // runner config), and neither parser can refuse before the guards above
+  // have had their say, so every refusal above still names the real
+  // problem and stays side-effect-free.
   const timeoutMs = resolveTimeoutMs();
+  const { noWait, waitMs } = resolveWaitFlags();
   const runMerge = (mergeFn) => (noWait ? mergeFn() : withLockRetry(mergeFn, { waitMs }));
 
   const runAndReport = async (mergeRoot, lockRoot, targetSlot = false, itemOverride = item) => {

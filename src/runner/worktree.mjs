@@ -137,8 +137,9 @@ export function realpathOrSelf(p) {
 /** `git <args>` for a plain read, with any failure (not a repo, no commits
  * yet) reported as `validation` rather than escaping as an "unexpected"
  * exit-1 — the R4 exit-code contract every other error surface follows.
- * Exported for the merge-cluster use cases (tsk-49i D3), which read refs
- * but must not carry their own git-error policy. */
+ * Private on purpose: the merge-cluster use cases read refs through the two
+ * named helpers below (tsk-49i D3) rather than carrying their own
+ * git-error policy. */
 function gitRead(repoRoot, args) {
   try {
     return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false });
