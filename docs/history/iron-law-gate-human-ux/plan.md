@@ -223,6 +223,16 @@ nhau, gộp lại thì một verify không nói được điều gì trung thự
 Phụ thuộc giữa các con: con 3 phụ thuộc con 2; con 4 phụ thuộc cả ba.
 Con 1 và con 2 độc lập, chạy song song được.
 
+**Ghi chú trung thực về cách phụ thuộc được gắn.** Khối JSON trên **không**
+mang trường `deps` — thiếu sót thật của bản nháp, phát hiện ngay sau khi
+`fgos plan --verdict decompose` tạo bốn con. Nếu để nguyên, cả bốn cùng
+vào frontier và con 3 có thể chạy trước con 2, viết prose trỏ tới một
+skill chưa tồn tại — đúng cái bug item này đang đi sửa. Đã vá bằng
+`fgos edit tsk-1y6-3 --deps tsk-1y6-2` và
+`fgos edit tsk-1y6-4 --deps tsk-1y6-1,tsk-1y6-2,tsk-1y6-3` ngay sau đó;
+`fgos ready` xác nhận frontier giờ chỉ còn con 1 và con 2. Khối JSON giữ
+nguyên như lúc thật sự được truyền vào engine, không sửa lại cho đẹp.
+
 ## Outstanding questions
 
 None
