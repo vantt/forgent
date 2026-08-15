@@ -132,3 +132,26 @@ counting the old vocabulary, a migration racing the merge that depends on
 it — got carried along. "All tests green" and "nothing was left teaching
 the old model" are different claims, and only a full audit against real
 state (not a code read of any one piece) found the gap between them here.
+
+## Confirmed: `tsk-2el` closed the entry-point prose gap (F1d/F1f/F1g/F3)
+
+The audit's own #1-ranked fix — `fgos-routing`'s "route by stage" table,
+the skill every session loads first, still teaching `discovery ->
+fgos-researching` and missing a `planning` row entirely — landed as
+`tsk-2el`, along with the sibling frontmatter/prose fixes (F1f, F1g) and
+the stale skill names in `AGENTS.md`/`CLAUDE.md` (F3). Confirmed directly
+in the current tree: `fgos-routing/SKILL.md` now names
+`fgos-coding-discovering`, and neither `CLAUDE.md` nor `AGENTS.md` still
+names a retired skill (`fgos-code-implement`, `fgos-exploring`). Its own
+footprint touched 14 files across `.claude/skills/`, `plugins/fgOS/
+skills/`, and both root docs, mirrored to `.agents/skills/` per this
+repo's own three-way skill-mirror convention.
+
+One real friction on the way: merging `fgw/tsk-2el` into the parent
+branch `fgw/tsk-5sr` conflicted on the first attempt (aborted cleanly,
+parent branch unchanged before retry) — the same structural cost
+`tsk-30v`'s own capture (in the sibling document,
+`why-clarify-split-into-clarify-discovery-and-exploring.md`) already
+named for `tsk-2mt`: landing several sibling branches on one shared
+parent branch concurrently costs real, repeatable merge friction, not a
+defect in any one child's own fix.
