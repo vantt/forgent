@@ -50,7 +50,7 @@ verdict; it never guesses past a gap.
   checking — each branch gets its own explicit unit of work: a stated goal,
   concrete inputs, a boundary, an expected result shape, a return contract —
   the same six-field discipline
-  `../_shared/capacity-dispatch-fallback.md`'s own ad-hoc packet already
+  `../_shared/capacity-dispatch-fallback.md`'s own ad-hoc task already
   uses (that fragment is the door `tsk-29i`'s delegation rule already opened
   for exactly this — contracted dispatch, never an unscoped Task call). A
   single-branch question, or branches that depend on each other's result,
