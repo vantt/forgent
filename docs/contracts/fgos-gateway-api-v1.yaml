@@ -201,6 +201,34 @@ paths:
                       data: { $ref: '#/components/schemas/WorkItem' }
         default:
           $ref: '#/components/responses/Error'
+    patch:
+      operationId: editWork
+      tags: [work]
+      summary: Partial update of an existing item's editable fields (wraps `fgos edit`)
+      description: |
+        PATCH, not PUT: only fields present in the body change (tsk-41h,
+        D1 of docs/history/herdr-web-dashboard-plan-realignment/CONTEXT.md)
+        -- this is `fgos edit`'s own partial-update semantics, never a
+        full-resource replace. Every field is optional; the request body
+        is `EditableWorkFields` (a strict subset of `WorkItem`'s own
+        properties -- `id`/`status`/`domain` are never editable through
+        this route). A field this route does not recognize is silently
+        dropped, same as an unrecognized flag on the CLI's own `edit`
+        command -- this route translates to `fgos edit`, it does not
+        re-validate what the engine already validates (area spec R2).
+        `fgos edit` itself refuses when no field actually changes; that
+        refusal reaches the caller verbatim as the same `ErrorEnvelope`
+        every other write route already uses, never swallowed or
+        replaced with a client-side check.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EditableWorkFields' }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default:
+          $ref: '#/components/responses/Error'
 
   /work/{id}/move:
     parameters:
@@ -650,6 +678,49 @@ components:
         deps: { type: array, items: { type: string } }
         footprint: { type: array, items: { type: string } }
         verify: { type: string }
+
+    EditableWorkFields:
+      type: object
+      description: |
+        tsk-41h: `PATCH /work/{id}`'s request body -- every field
+        `src/state/store.mjs`'s `EDITABLE_FIELDS` allows `fgos edit` to
+        change (21 entries, read directly from that constant, never
+        re-guessed). All optional; only fields present in the body are
+        patched. `id`/`status`/`domain`/`stage` are never editable through
+        this route (`status` moves only through `/work/{id}/move`,
+        `stage`/`domain` only through the engine's own stage-graph
+        transitions -- neither is in `EDITABLE_FIELDS`).
+      properties:
+        title: { type: string }
+        description: { type: string }
+        kind: { type: string }
+        risk: { type: string }
+        verify: { type: string }
+        tier: { type: string }
+        refs: { type: array, items: { type: string } }
+        deps: { type: array, items: { type: string } }
+        footprint: { type: array, items: { type: string } }
+        acceptance:
+          type: array
+          description: Replaces the whole array (latest-wins), never a deep merge. Each clause is `{text, evidence}`.
+          items: { type: object }
+        priority: { type: integer }
+        intent: { type: integer }
+        docsRef: { type: string, description: "Non-empty path, or omit to leave unchanged. There is no clear-to-empty form on this route." }
+        parent: { type: string, nullable: true, description: "Empty string clears (un-parents) the item." }
+        urgent:
+          type: string
+          enum: [low, medium, high, critical]
+          description: "Despite the name, a string enum (confirmed via a live `fgos edit --urgent` smoke test: the literal boolean `true` is rejected by the engine), not a boolean flag."
+        impact: { type: number }
+        effort: { type: number }
+        mergeAfter: { type: array, items: { type: string } }
+        supersededBy: { type: string, nullable: true, description: "Empty string clears." }
+        duplicates: { type: array, items: { type: string } }
+        domainFields:
+          type: object
+          description: Replaces the whole object (latest-wins) for the item's `domain`, never a deep merge of nested keys.
+        goalTier: { type: string, description: "'mvp' or 'milestone'." }
 
     Session:
       type: object

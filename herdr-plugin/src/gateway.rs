@@ -614,6 +614,137 @@ async fn get_work_by_id(State(state): State<AppState>, AxPath(id): AxPath<String
     Ok(Json(data))
 }
 
+/// tsk-41h: `PATCH /work/{id}` — partial update, matching `fgos edit`'s own
+/// partial-update semantics (only fields present in the body change,
+/// per D1 of docs/history/herdr-web-dashboard-plan-realignment/CONTEXT.md
+/// — PATCH over PUT because PUT implies a full-resource replace this
+/// endpoint never does). Accepts any subset of `src/state/store.mjs`'s
+/// `EDITABLE_FIELDS` (21 entries, read directly from that file rather than
+/// re-guessed) as a raw JSON object rather than a typed struct per field:
+/// a field this handler does not recognize is silently dropped, mirroring
+/// `bin/fgos.mjs`'s own `edit` case, which never errors on an unrecognized
+/// flag either — this handler translates, it does not validate (R2 of the
+/// area spec: validation stays at the engine, never re-implemented at a
+/// client-facing layer; `fgos edit`'s own real rejection — including "no
+/// field changed" — reaches the caller verbatim through the same
+/// `run_verb_blocking`/`GatewayError` path every other write route uses).
+async fn patch_work(
+    State(state): State<AppState>,
+    AxPath(id): AxPath<String>,
+    AppJson(body): AppJson<serde_json::Map<String, Value>>,
+) -> Result<Json<Value>, GatewayError> {
+    reject_leading_dash(&id, "id")?;
+    let mut args = vec!["edit".to_string(), id];
+
+    // Plain string fields -- `bin/fgos.mjs`'s own same-name pass-through
+    // loop (title/description/kind/risk/verify/tier), plus the fields it
+    // handles in their own one-off blocks for the same reason (kebab flag
+    // name vs camelCase JSON key): docs-ref, parent, superseded-by,
+    // goal-tier. Every one is enum/id/short-text shaped, so the same
+    // leading-dash guard the rest of this file already applies to
+    // similarly-shaped fields (`to`, `expect`, `status`, `stage`) applies
+    // here too -- title/description are the only borderline cases, kept
+    // guarded for consistency rather than carved out like `text`/`reason`
+    // (tsk-1ah's own exemption is for genuinely long free text, not a
+    // one-line title).
+    for (json_key, flag) in [
+        ("title", "--title"),
+        ("description", "--description"),
+        ("kind", "--kind"),
+        ("risk", "--risk"),
+        ("verify", "--verify"),
+        ("tier", "--tier"),
+        // `urgent` reads as boolean-shaped from its name, but the engine
+        // treats it as a string enum (`work.mjs`'s own real vocabulary:
+        // "low"/"medium"/"high"/"critical", confirmed by a live `fgos
+        // edit --urgent` smoke test at Execute -- `true` was REJECTED by
+        // the engine: "work.urgent must be one of [...] when present, got:
+        // true"). It shares this same plain pass-through shape with
+        // title/kind/risk/tier above on the CLI's own side
+        // (`bin/fgos.mjs`'s same-name loop), so it belongs here, not in a
+        // bespoke boolean branch.
+        ("urgent", "--urgent"),
+        ("docsRef", "--docs-ref"),
+        ("parent", "--parent"),
+        ("supersededBy", "--superseded-by"),
+        ("goalTier", "--goal-tier"),
+    ] {
+        if let Some(value) = body.get(json_key) {
+            let Some(s) = value.as_str() else {
+                return Err(GatewayError::validation(format!("\"{json_key}\" must be a string")));
+            };
+            reject_leading_dash(s, json_key)?;
+            args.push(flag.to_string());
+            args.push(s.to_string());
+        }
+    }
+
+    // List fields -- comma-separated, matching `parseListFlag`'s own
+    // shape (`bin/fgos.mjs:379-385`). Each element is guarded the same
+    // way a scalar field above is; a comma embedded in one element would
+    // silently re-split it on the CLI side, so this handler refuses that
+    // up front rather than producing a patch that saves something
+    // different from what was sent.
+    for (json_key, flag) in [
+        ("refs", "--refs"),
+        ("deps", "--deps"),
+        ("footprint", "--footprint"),
+        ("mergeAfter", "--merge-after"),
+        ("duplicates", "--duplicates"),
+    ] {
+        if let Some(value) = body.get(json_key) {
+            let Some(items) = value.as_array() else {
+                return Err(GatewayError::validation(format!("\"{json_key}\" must be an array of strings")));
+            };
+            let mut parts = Vec::with_capacity(items.len());
+            for item in items {
+                let Some(s) = item.as_str() else {
+                    return Err(GatewayError::validation(format!("\"{json_key}\" must be an array of strings")));
+                };
+                reject_leading_dash(s, json_key)?;
+                if s.contains(',') {
+                    return Err(GatewayError::validation(format!(
+                        "\"{json_key}\" elements must not contain \",\" -- the underlying CLI flag is comma-separated"
+                    )));
+                }
+                parts.push(s.to_string());
+            }
+            args.push(flag.to_string());
+            args.push(parts.join(","));
+        }
+    }
+
+    // JSON-encoded fields -- `parseAcceptanceFlag`'s own shape
+    // (`bin/fgos.mjs:395-405`): the CLI flag carries the value as a
+    // JSON-encoded STRING (re-parsed on the other side), because clause
+    // text/domain field values may contain commas that would corrupt the
+    // comma-separated list shape above.
+    for (json_key, flag) in [("acceptance", "--acceptance"), ("domainFields", "--domain-fields")] {
+        if let Some(value) = body.get(json_key) {
+            args.push(flag.to_string());
+            args.push(value.to_string());
+        }
+    }
+
+    // Numeric fields -- `priority`/`intent` (integers) and
+    // `impact`/`effort` (numbers, may be fractional composite scores),
+    // `bin/fgos.mjs:1826-1861`.
+    for (json_key, flag) in [("priority", "--priority"), ("intent", "--intent"), ("impact", "--impact"), ("effort", "--effort")]
+    {
+        if let Some(value) = body.get(json_key) {
+            let Some(n) = value.as_f64() else {
+                return Err(GatewayError::validation(format!("\"{json_key}\" must be a number")));
+            };
+            args.push(flag.to_string());
+            args.push(n.to_string());
+        }
+    }
+
+    args.push("--json".to_string());
+    let data = run_verb_blocking(state.gateway, args).await?;
+    Ok(Json(data))
+}
+
 #[derive(Debug, Deserialize)]
 struct MoveWorkBody {
     to: String,
@@ -911,7 +1042,7 @@ pub fn build_router(gateway: Arc<dyn VerbGateway>, config: GatewayConfig, root: 
 
     let authenticated = Router::new()
         .route("/work", get(get_work).post(post_work))
-        .route("/work/{id}", get(get_work_by_id))
+        .route("/work/{id}", get(get_work_by_id).patch(patch_work))
         .route("/work/{id}/move", post(post_work_move))
         .route("/work/{id}/ask", post(post_work_ask))
         .route("/work/{id}/answer", post(post_work_answer))
@@ -1093,6 +1224,22 @@ mod tests {
                 Ok(v) => Ok(v.clone()),
                 Err(msg) => Err(GatewayError::validation(msg.clone())),
             }
+        }
+    }
+
+    /// tsk-41h: captures the real args `patch_work` builds, so tests can
+    /// assert the exact `fgos edit` CLI invocation this route translates
+    /// to -- `FakeGateway` above only proves a response shape, never what
+    /// was actually sent.
+    struct CapturingGateway {
+        captured: std::sync::Mutex<Vec<Vec<String>>>,
+        response: Value,
+    }
+
+    impl VerbGateway for CapturingGateway {
+        fn run_verb(&self, args: &[String]) -> Result<Value, GatewayError> {
+            self.captured.lock().unwrap().push(args.to_vec());
+            Ok(self.response.clone())
         }
     }
 
@@ -1541,5 +1688,173 @@ mod tests {
             Some(b"application/json".as_slice()),
             "an authenticated /v1/ready must still return the real JSON envelope, not the SPA's text/html index.html"
         );
+    }
+
+    // tsk-41h: PATCH /work/{id} -- partial update, translating a JSON body
+    // into the exact `fgos edit` CLI invocation `bin/fgos.mjs`'s own
+    // `edit` case builds.
+
+    async fn patch_work_request(
+        app: Router,
+        id: &str,
+        body: Value,
+    ) -> axum::http::Response<axum::body::Body> {
+        use axum::body::Body;
+        use axum::http::Request;
+        use tower::ServiceExt;
+
+        app.oneshot(
+            Request::builder()
+                .method("PATCH")
+                .uri(format!("/v1/work/{id}"))
+                .header(axum::http::header::AUTHORIZATION, "Bearer test-token")
+                .header(axum::http::header::CONTENT_TYPE, "application/json")
+                .body(Body::from(serde_json::to_vec(&body).unwrap()))
+                .unwrap(),
+        )
+        .await
+        .unwrap()
+    }
+
+    #[tokio::test]
+    async fn patch_work_translates_scalar_string_fields_to_the_matching_cli_flags() {
+        let capturing = Arc::new(CapturingGateway { captured: std::sync::Mutex::new(Vec::new()), response: json!({}) });
+        let gateway: Arc<dyn VerbGateway> = capturing.clone();
+        let app = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+
+        let response = patch_work_request(app, "tsk-41h", json!({"title": "New title", "risk": "high-risk"})).await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        let calls = capturing.captured.lock().unwrap();
+        assert_eq!(calls.len(), 1);
+        let args = &calls[0];
+        assert_eq!(args[0], "edit");
+        assert_eq!(args[1], "tsk-41h");
+        assert!(args.windows(2).any(|w| w[0] == "--title" && w[1] == "New title"), "args: {args:?}");
+        assert!(args.windows(2).any(|w| w[0] == "--risk" && w[1] == "high-risk"), "args: {args:?}");
+        assert!(args.contains(&"--json".to_string()));
+    }
+
+    #[tokio::test]
+    async fn patch_work_joins_array_fields_with_commas_matching_parse_list_flag() {
+        let capturing = Arc::new(CapturingGateway { captured: std::sync::Mutex::new(Vec::new()), response: json!({}) });
+        let gateway: Arc<dyn VerbGateway> = capturing.clone();
+        let app = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+
+        patch_work_request(app, "tsk-41h", json!({"deps": ["tsk-a", "tsk-b"]})).await;
+
+        let calls = capturing.captured.lock().unwrap();
+        let args = &calls[0];
+        assert!(args.windows(2).any(|w| w[0] == "--deps" && w[1] == "tsk-a,tsk-b"), "args: {args:?}");
+    }
+
+    #[tokio::test]
+    async fn patch_work_rejects_an_array_element_containing_a_comma_instead_of_silently_corrupting_it() {
+        let capturing = Arc::new(CapturingGateway { captured: std::sync::Mutex::new(Vec::new()), response: json!({}) });
+        let gateway: Arc<dyn VerbGateway> = capturing.clone();
+        let app = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+
+        let response = patch_work_request(app, "tsk-41h", json!({"deps": ["tsk-a,tsk-b"]})).await;
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+        assert_eq!(capturing.captured.lock().unwrap().len(), 0, "must never reach the CLI with a corrupting value");
+    }
+
+    #[tokio::test]
+    async fn patch_work_json_encodes_acceptance_and_domain_fields() {
+        let capturing = Arc::new(CapturingGateway { captured: std::sync::Mutex::new(Vec::new()), response: json!({}) });
+        let gateway: Arc<dyn VerbGateway> = capturing.clone();
+        let app = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+
+        patch_work_request(
+            app,
+            "tsk-41h",
+            json!({"acceptance": [{"text": "does the thing, even with a comma", "evidence": "test.mjs:1"}]}),
+        )
+        .await;
+
+        let calls = capturing.captured.lock().unwrap();
+        let args = &calls[0];
+        let idx = args.iter().position(|a| a == "--acceptance").expect("--acceptance must be present");
+        let parsed: Value = serde_json::from_str(&args[idx + 1]).expect("--acceptance value must be valid JSON");
+        assert_eq!(parsed[0]["text"], "does the thing, even with a comma");
+    }
+
+    #[tokio::test]
+    async fn patch_work_stringifies_numeric_fields() {
+        let capturing = Arc::new(CapturingGateway { captured: std::sync::Mutex::new(Vec::new()), response: json!({}) });
+        let gateway: Arc<dyn VerbGateway> = capturing.clone();
+        let app = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+
+        patch_work_request(app, "tsk-41h", json!({"priority": 5000, "effort": 2.5})).await;
+
+        let calls = capturing.captured.lock().unwrap();
+        let args = &calls[0];
+        assert!(args.windows(2).any(|w| w[0] == "--priority" && w[1] == "5000"), "args: {args:?}");
+        assert!(args.windows(2).any(|w| w[0] == "--effort" && w[1] == "2.5"), "args: {args:?}");
+    }
+
+    #[tokio::test]
+    async fn patch_work_urgent_is_a_string_enum_not_a_boolean() {
+        // Real engine vocabulary confirmed via a live `fgos edit --urgent`
+        // smoke test at Execute time: passing the literal boolean `true`
+        // is REJECTED ("work.urgent must be one of [...] when present,
+        // got: true") -- the real values are "low"/"medium"/"high"/
+        // "critical", same plain pass-through shape as title/kind/risk.
+        let capturing = Arc::new(CapturingGateway { captured: std::sync::Mutex::new(Vec::new()), response: json!({}) });
+        let gateway: Arc<dyn VerbGateway> = capturing.clone();
+        let app = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+
+        patch_work_request(app, "tsk-41h", json!({"urgent": "high"})).await;
+
+        let calls = capturing.captured.lock().unwrap();
+        assert!(calls[0].windows(2).any(|w| w[0] == "--urgent" && w[1] == "high"), "args: {:?}", calls[0]);
+    }
+
+    #[tokio::test]
+    async fn patch_work_silently_drops_an_unrecognized_field_matching_the_cli_own_behavior() {
+        let capturing = Arc::new(CapturingGateway { captured: std::sync::Mutex::new(Vec::new()), response: json!({}) });
+        let gateway: Arc<dyn VerbGateway> = capturing.clone();
+        let app = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+
+        let response = patch_work_request(app, "tsk-41h", json!({"status": "delivered", "notAField": 1})).await;
+        assert_eq!(response.status(), StatusCode::OK, "an unrecognized field must never fail the whole patch");
+
+        let calls = capturing.captured.lock().unwrap();
+        let args = &calls[0];
+        assert!(!args.contains(&"--status".to_string()), "status is not editable through this route, args: {args:?}");
+        assert!(!args.iter().any(|a| a.contains("notAField")), "args: {args:?}");
+    }
+
+    #[tokio::test]
+    async fn patch_work_rejects_a_field_value_beginning_with_a_dash() {
+        let capturing = Arc::new(CapturingGateway { captured: std::sync::Mutex::new(Vec::new()), response: json!({}) });
+        let gateway: Arc<dyn VerbGateway> = capturing.clone();
+        let app = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+
+        let response = patch_work_request(app, "tsk-41h", json!({"kind": "--force"})).await;
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+        assert_eq!(capturing.captured.lock().unwrap().len(), 0);
+    }
+
+    #[tokio::test]
+    async fn patch_work_requires_authentication_like_every_other_v1_route() {
+        use axum::body::Body;
+        use axum::http::Request;
+        use tower::ServiceExt;
+
+        let gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({})) });
+        let app = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("PATCH")
+                    .uri("/v1/work/tsk-41h")
+                    .header(axum::http::header::CONTENT_TYPE, "application/json")
+                    .body(Body::from(serde_json::to_vec(&json!({"title": "x"})).unwrap()))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
     }
 }
