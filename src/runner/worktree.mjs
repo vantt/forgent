@@ -57,6 +57,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { StoreError } from '../state/store.mjs';
 
 /** Raised for any git worktree/branch operation failure. `errorClass`
  * reuses the vocabulary declared in `recovery.mjs`'s `ERROR_CLASSES` (per
@@ -120,12 +121,46 @@ function gitQuiet(repoRoot, args) {
   return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false, stdio: ['ignore', 'pipe', 'pipe'] });
 }
 
-function realpathOrSelf(p) {
+/** Resolve `p` through the filesystem when it exists, and fall back to a
+ * plain absolute resolve when it does not — the shape every caller
+ * comparing two checkout paths for identity needs. Exported (tsk-49i D3)
+ * because `approve`'s session-worktree guard needs the identical rule and
+ * used to carry its own byte-identical copy in bin/fgos.mjs. */
+export function realpathOrSelf(p) {
   try {
     return fs.realpathSync(p);
   } catch {
     return path.resolve(p);
   }
+}
+
+/** `git <args>` for a plain read, with any failure (not a repo, no commits
+ * yet) reported as `validation` rather than escaping as an "unexpected"
+ * exit-1 — the R4 exit-code contract every other error surface follows.
+ * Exported for the merge-cluster use cases (tsk-49i D3), which read refs
+ * but must not carry their own git-error policy. */
+function gitRead(repoRoot, args) {
+  try {
+    return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false });
+  } catch (err) {
+    throw new StoreError('validation', `git ${args.join(' ')} failed in "${repoRoot}": ${err.message}`);
+  }
+}
+
+/** The sha `repoRoot`'s own HEAD currently points at. */
+export function currentHead(repoRoot) {
+  return gitRead(repoRoot, ['rev-parse', 'HEAD']).trim();
+}
+
+/** tsk-5dk: a named branch/ref's own tip sha, not "whatever HEAD happens to
+ * be in some worktree's checkout" (`currentHead` above) — branch refs are
+ * shared across every linked worktree of the same repo, so this is correct
+ * to call from repoRoot even when the actual merge commit was created in a
+ * different (e.g. ephemeral) worktree of the same repo, and stays correct
+ * for an idempotent already-merged re-approve too (always reads the
+ * target's real current tip, never a stale pre-merge snapshot). */
+export function resolveRefSha(repoRoot, ref) {
+  return gitRead(repoRoot, ['rev-parse', ref]).trim();
 }
 
 /** Resolve `repoRoot`'s trunk branch name without assuming `'main'`: prefers
@@ -197,6 +232,23 @@ export function isMainWorktree(repoRoot) {
   const commonDirAbs = path.isAbsolute(commonDirRaw) ? commonDirRaw : path.resolve(repoRoot, commonDirRaw);
   const commonDirParent = realpathOrSelf(path.dirname(commonDirAbs));
   return toplevel === commonDirParent;
+}
+
+// Push a runner item's branch to origin unless it already tracks an upstream.
+// The upstream probe is a plain execFileSync + try/catch, NOT this module's
+// `git` helper: `review`'s own caller rethrows every git failure as
+// StoreError('validation', ...), the wrong semantic for an existence probe
+// that is *expected* to fail on a never-pushed branch. Only the push itself
+// is a real operation. Lives here rather than in bin/fgos.mjs (tsk-49i D3):
+// pushing a branch is branch mechanics, this module's own job.
+export function ensureBranchPushed(repoRoot, branch) {
+  try {
+    execFileSync('git', ['rev-parse', '--abbrev-ref', `${branch}@{upstream}`], { cwd: repoRoot, encoding: 'utf8', shell: false });
+    return; // upstream already set — nothing to push
+  } catch {
+    // no upstream yet — the normal, expected first-review case; fall through
+  }
+  execFileSync('git', ['push', '-u', 'origin', branch], { cwd: repoRoot, encoding: 'utf8', shell: false });
 }
 
 // Exported (pr-lifecycle-2): the approval-gate merge engine (merge.mjs)

@@ -17,9 +17,9 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, registerTool, removeTool, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, registerTool, removeTool, assertValidDocType, recordGateApprove, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
 import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability } from '../src/state/tool-registry.mjs';
-import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs';
+import { repairTruncatedLastLine } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfigForDir } from '../src/runner/dispatch.mjs';
@@ -42,20 +42,23 @@ import { findSourceCaptureIds } from '../src/report/enduser-index.mjs';
 import { generateEnduserDocsIndex } from '../src/report/enduser-index-generate.mjs';
 import { rankCandidates } from '../src/evolve/candidates.mjs';
 import { rankImpact } from '../src/state/impact.mjs';
-import { isResolvedStatus, resolveRoot } from '../src/state/frontier.mjs';
-import { mergeReadiness, mergeTree } from '../src/state/graph-harness.mjs';
+import { isResolvedStatus } from '../src/state/frontier.mjs';
 import { paginate } from '../src/state/cursor.mjs';
 import { runGoalCheck, detachedWorktreeFgosHint, runInvariantChecks, invariantFailureAsCheck } from '../src/runner/goal-check.mjs';
 import { frozenJudgeHits, footprintDiffHits } from '../src/runner/frozen-judge.mjs';
 import { normalizePath } from '../src/util/normalize-path.mjs';
-import { classifySource, reviewDiff, mergeRunnerItem, withMergeTargetSlot, cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, buildOwnFileSet } from '../src/runner/merge.mjs';
-import { createGitHubPR, mergeGitHubPR, viewGitHubPRStatus } from '../src/runner/github-adapter.mjs';
+import { collectOutcomeEntry, collectFrictionData } from '../src/report/item-trace.mjs';
+import { cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, buildOwnFileSet } from '../src/runner/merge.mjs';
 import { assertSafeMainCheckoutReset } from '../src/runner/main-checkout-reset-guard.mjs';
-import { ironLawForItem, ironLawRefusal } from '../src/runner/iron-law-gate.mjs';
-import { driftStatus } from '../src/state/drift-status.mjs';
+import { rejectUseCase } from '../src/verbs/merge/reject.mjs';
+import { reviewUseCase } from '../src/verbs/merge/review.mjs';
+import { syncRootUseCase } from '../src/verbs/merge/sync-root.mjs';
+import { promoteToComponentUseCase } from '../src/verbs/merge/promote-to-component.mjs';
+import { approveUseCase } from '../src/verbs/merge/approve.mjs';
+import { mergeList, mergeNext } from '../src/verbs/merge/merge.mjs';
+import { catchupUseCase } from '../src/verbs/merge/catchup.mjs';
 import { unreleasedHasEntries } from '../src/setup/registrations.mjs';
-import { branchNameFor, branchExists, createBranchRef, withMergeEphemeralWorktree, provisionDependencies, resyncWorktree, detectTrunk, isMainWorktree } from '../src/runner/worktree.mjs';
-import { resolveIntegrationBranch, retargetMember } from '../src/runner/promote-engine.mjs';
+import { branchNameFor, branchExists, provisionDependencies, resyncWorktree, detectTrunk, isMainWorktree, currentHead, realpathOrSelf as realpathOr } from '../src/runner/worktree.mjs';
 import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
 import { withLockRetry } from '../src/runner/lock-wait.mjs';
 import {
@@ -77,12 +80,11 @@ import { getDomain, stageForStep, effectiveStage, discoverableStages, resolveDom
 import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
 import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
 import { recordInvocationFault } from '../src/cli/invocation-fault-log.mjs';
-import { recordApprovePostSuccessFault } from '../src/cli/approve-fault-log.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { DOCTOR_CHECKS, integrationScriptPath, ensureSharedConfigDefaults, runFixes } from '../src/setup/checks.mjs';
 import { sharedConfigFilePath, readSharedConfig, readSharedConfigOrEmpty, readInvariantCheckCommands } from '../src/config/shared-config-file.mjs';
 import { countWorkerSlots, hasWorkerSlotRoom } from '../src/state/worker-slots.mjs';
-import { assessCleanupReadiness, checkMergeStillResolves, blockedItemsNowResolvable } from '../src/state/cleanup-harness.mjs';
+import { assessCleanupReadiness, blockedItemsNowResolvable } from '../src/state/cleanup-harness.mjs';
 import { DEFAULT_CLEANUP_TTL_DAYS, DEFAULT_CLEANUP_LEAF_TTL_DAYS } from '../src/setup/registrations.mjs';
 import { installGitHooks, uninstallGitHooks } from '../src/setup/git-hooks.mjs';
 import { detectRcFiles, insertSourceLine, hasSourceLine } from '../src/setup/shell-rc.mjs';
@@ -130,20 +132,9 @@ function gitAt(cwd, args) {
   }
 }
 
-function currentHead(cwd) {
-  return gitAt(cwd, ['rev-parse', 'HEAD']).trim();
-}
-
-// tsk-5dk: resolves a named branch/ref's own tip sha, not "whatever HEAD
-// happens to be in some worktree's checkout" (currentHead above) — branch
-// refs are shared across every linked worktree of the same repo, so this
-// is correct to call from repoRoot even when the actual merge commit was
-// created in a different (e.g. ephemeral) worktree of the same repo, and
-// stays correct for an idempotent already-merged re-approve too (always
-// reads the target's real current tip, never a stale pre-merge snapshot).
-function resolveRefSha(cwd, ref) {
-  return gitAt(cwd, ['rev-parse', ref]).trim();
-}
+// `currentHead`/`resolveRefSha` live in src/runner/worktree.mjs (tsk-49i
+// D3) — the merge-cluster use cases need the identical reads, and a use
+// case cannot import back up into this entry file.
 
 // tsk-5dk: ancestry probe for `move --to delivered`'s refusal check below.
 // Plain execFileSync + try/catch, not gitAt (gitAt always throws on any
@@ -234,41 +225,18 @@ function excludeFgosPaths(files) {
   return files.filter((f) => !FGOS_NOISE_ONLY_PATHS.test(normalizePath(f)));
 }
 
-// LOCAL copy of session.mjs's private realpathOr (session.mjs is never edited,
-// nothing is exported from it for this). A bare fs.realpathSync would throw the
-// moment any ONE registered session's worktree directory is gone from disk (a
-// crashed session hand-cleaned instead of via `fgos session end`) — crashing
-// approve for EVERY caller, including from the main checkout. The try/catch
-// fallback to path.resolve keeps one stale registry entry from taking down the
-// approval gate.
-function realpathOr(p) {
-  try {
-    return fs.realpathSync(p);
-  } catch {
-    return path.resolve(p);
-  }
-}
+// `realpathOr` is worktree.mjs's `realpathOrSelf` (imported above, tsk-49i
+// D3): a bare fs.realpathSync would throw the moment any ONE registered
+// session's worktree directory is gone from disk (a crashed session
+// hand-cleaned instead of via `fgos session end`) — crashing `return` for
+// EVERY caller, including from the main checkout. The try/catch fallback to
+// path.resolve keeps one stale registry entry from taking down the gate.
 
 // The gh binary the GitHub transport shells out to (github-adapter D2). Tests
 // substitute a fake executable through FGOS_GH_COMMAND; production leaves it
 // unset and the real `gh` on PATH is used.
 function ghCommandOpts() {
   return { ghCommand: process.env.FGOS_GH_COMMAND || 'gh' };
-}
-
-// Push a runner item's branch to origin unless it already tracks an upstream.
-// The upstream probe is a plain execFileSync + try/catch, NOT gitAt: gitAt
-// rethrows every git failure as StoreError('validation', ...), the wrong
-// semantic for an existence probe that is *expected* to fail on a
-// never-pushed branch. Only the push itself is a real operation.
-function ensureBranchPushed(repoRoot, branch) {
-  try {
-    execFileSync('git', ['rev-parse', '--abbrev-ref', `${branch}@{upstream}`], { cwd: repoRoot, encoding: 'utf8', shell: false });
-    return; // upstream already set — nothing to push
-  } catch {
-    // no upstream yet — the normal, expected first-review case; fall through
-  }
-  execFileSync('git', ['push', '-u', 'origin', branch], { cwd: repoRoot, encoding: 'utf8', shell: false });
 }
 
 // A bare `--flag` (no value) parses to boolean `true` (see parseArgs below);
@@ -330,6 +298,38 @@ function parseWaitFlags(flags, verbName) {
 // worktree-blindness fix as `discover`/`decompose` above -- `dir` already
 // reflects `--dir` when a skill passes it explicitly, `process.cwd()`
 // never does.
+// The ONE place the merge cluster's shared flags become a structured
+// options object (tsk-49i D3). `merge next` forwards this whole object down
+// to `approve`/`sync-root` unchanged rather than re-reading `flags` at each
+// hop: the old code passed the raw `flags` bag through a recursive
+// `runVerb('approve', flags, ...)` call, and re-enumerating options at each
+// new call site is exactly where one gets silently dropped and an
+// unattended run quietly changes behavior.
+//
+// `verb` names the calling verb because two of the parsers below put it in
+// their own refusal messages — forwarding from `merge next` therefore
+// builds the target verb's options with THAT verb's name, matching what the
+// recursive `runVerb` call produced before.
+function parseMergeClusterOptions(verb, flags, dir, extra = {}) {
+  const { noWait, waitMs } = parseWaitFlags(flags, verb);
+  return {
+    timeoutMs: resolveVerifyTimeoutMs(verb, flags, path.dirname(dir)),
+    noWait,
+    waitMs,
+    acknowledgeIronLaw: flags['acknowledge-iron-law'] === true,
+    acknowledgeDrift: flags['acknowledge-drift'] === true,
+    github: Boolean(flags.github),
+    prNumber: flags.pr,
+    // Test-only failure seam (tsk-480 D3), same shape as FGOS_GH_COMMAND:
+    // an env var read only in the adapter, scoped to an exact item id so it
+    // can never affect any other item in the same process, inert unless a
+    // test explicitly sets it. Production code never sets this variable.
+    testForceLockTimeoutId: process.env.FGOS_TEST_FORCE_APPROVE_LOCK_TIMEOUT ?? null,
+    ...ghCommandOpts(),
+    ...extra,
+  };
+}
+
 function resolveVerifyTimeoutMs(verb, flags, repoRoot) {
   const timeoutFlag = optionalField(
     flags.timeout,
@@ -532,70 +532,6 @@ function paginateVerbResult(items, flags, order, verbLabel) {
   const { cursor, limit } = readPaginationFlags(flags, verbLabel);
   if (cursor === undefined && limit === undefined) return items;
   return paginate(items, { cursor, limit, order });
-}
-
-// One structured entry per item, always naming both halves explicitly
-// (`predicted`/`actual`) even when a half is still missing (null) — this is
-// what makes the output real CoS evidence (per plan Approach S1) rather than
-// a bare "has outcome" flag: a reader (agent or e2e assertion) sees the
-// actual predicted/actual VALUES, not just their presence. `docType` is the
-// optional Diataxis tag (CONTEXT D5/D6): surfaced the same way — present as
-// its real value when the capture was tagged, `null` when untagged — so an
-// untagged item's output shape stays byte-identical to pre-docType logs.
-// `docPath` (CONTEXT D12/D15, bước-3) is the same additive idiom: the
-// end-user doc path the capture's `docType` was written for, surfaced as its
-// real value when supplied to `compound --doc-path` and `null` when omitted
-// — a capture with no doc-path stays byte-identical to pre-docPath logs.
-function collectOutcomeEntry(id, entry) {
-  return {
-    id,
-    predicted: entry?.predicted ?? null,
-    actual: entry?.actual ?? null,
-    docType: entry?.docType ?? null,
-    docPath: entry?.docPath ?? null,
-  };
-}
-
-// Friction report cap (per porting lesson predicted-actual-feedback-store:
-// "gợi ý luôn CAP, không xả vô hạn") — counts are always full, the record
-// list returned is only the newest few.
-const FRICTION_DISPLAY_CAP = 5;
-
-// Friction channel data (kênh 2 của capture 2 kênh — Phase 3 Slice 2):
-// per-layer counts over ALL matching records, plus the newest records capped
-// at FRICTION_DISPLAY_CAP. `frictions` is a lazy view key (replay.mjs) — a
-// log with no work.friction events has no key and this returns null, keeping
-// `check`'s data shape byte-identical to pre-friction logs.
-function collectFrictionData(view, id) {
-  const frictions = view.frictions ?? {};
-  const records = (id ? [id] : Object.keys(frictions)).flatMap((itemId) =>
-    (frictions[itemId] ?? []).map((r) => ({ ...r, id: r.id ?? itemId })),
-  );
-  if (records.length === 0) {
-    return null;
-  }
-  const byLayer = {};
-  for (const r of records) {
-    byLayer[r.layer] = (byLayer[r.layer] ?? 0) + 1;
-  }
-  const recent = records
-    .sort((a, b) => ((a.ts ?? '') < (b.ts ?? '') ? -1 : 1))
-    .slice(-FRICTION_DISPLAY_CAP)
-    .reverse();
-  return { count: records.length, byLayer, recent };
-}
-
-// `review`'s trace summary (pr-lifecycle-2 cell action: "kèm trace tóm tắt
-// (outcome/friction)"): reuses the SAME two data sources `check` already
-// returns — no new collector, no new data source — so a reviewer gets
-// exactly the outcome/friction history `fgos check <id>` would show, folded
-// into the review payload instead of requiring a second command.
-function collectReviewTrace(view, id) {
-  const outcomeEntry = view.outcomes?.[id] ?? null;
-  return {
-    outcome: outcomeEntry ? collectOutcomeEntry(id, outcomeEntry) : null,
-    friction: collectFrictionData(view, id),
-  };
 }
 
 // Settlement report cap — same "always CAP, never unbounded" rule as
@@ -1025,100 +961,6 @@ function describeCandidate(candidate) {
     description += ` ${candidate.detail}`;
   }
   return description;
-}
-
-/**
- * tsk-4ax (D3): the git merge/verify/commit MECHANICS shared by the
- * `catchup` verb's manual-recovery path and `approve`'s own inbound
- * pre-check (case 'approve' below) — merges `target` into item `id`'s own
- * branch inside a throwaway ephemeral worktree, verifies, and commits.
- * Deliberately never touches `.fgos/` state itself (no moveWork, no dir
- * param at all) — the two callers have DIFFERENT bookkeeping needs around
- * this same mechanism (the verb moves `blocked -> awaiting-approval`;
- * approve's pre-check makes no status transition at all, since the item is
- * already `awaiting-approval` and stays there until approve's own land
- * step finishes) and `awaiting-approval -> awaiting-approval` is not even
- * a valid FSM edge (`src/state/status-fsm.mjs`) — there would be nothing
- * for a shared moveWork call to do on that path anyway.
- *
- * Returns one of:
- *   - `{ outcome: 'already-caught-up', catchupHead, output }` — target was
- *     already an ancestor of the branch; no merge/commit needed, but a
- *     fresh verify still ran (its own green run is what's being cashed in).
- *   - `{ outcome: 'merged', catchupHead, output }` — a real merge commit
- *     landed on the item's own branch (via a plain `git branch -f`, the
- *     same ref-update `withMergeEphemeralWorktree`'s CAS guard already
- *     protects).
- *   - `{ outcome: 'verify-fail', timedOut, exitStatus, output }` — the
- *     merge (or the already-caught-up tree) staged cleanly but the item's
- *     own verify came back red; any merge started is aborted, the item's
- *     branch is left exactly as it was.
- *   - `{ outcome: 'conflict', conflictedFiles }` — a real textual conflict;
- *     aborted cleanly, branch untouched.
- *
- * Never mutates `.fgos/` state and never throws for any of these defined
- * outcomes — only for a genuinely unexpected git failure (e.g. `git merge
- * --abort` itself failing), mirroring `mergeRunnerItem`'s own contract.
- */
-async function performCatchUp(repoRoot, id, item, target, timeoutMs) {
-  const ownBranch = branchNameFor(id);
-  return await withMergeEphemeralWorktree(repoRoot, id, async (ephemeral) => {
-    let alreadyCaughtUp = false;
-    try {
-      execFileSync('git', ['merge-base', '--is-ancestor', target, 'HEAD'], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
-      alreadyCaughtUp = true;
-    } catch (ancestorErr) {
-      if (ancestorErr.status !== 1) {
-        throw ancestorErr;
-      }
-    }
-
-    if (alreadyCaughtUp) {
-      const caughtUpCheck = await runGoalCheck(item, ephemeral.path, timeoutMs);
-      if (!caughtUpCheck.passed) {
-        return { outcome: 'verify-fail', timedOut: caughtUpCheck.timedOut, exitStatus: caughtUpCheck.status, output: caughtUpCheck.output };
-      }
-      const catchupHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ephemeral.path, encoding: 'utf8', shell: false }).trim();
-      return { outcome: 'already-caught-up', catchupHead, output: caughtUpCheck.output };
-    }
-
-    let conflicted = false;
-    try {
-      execFileSync('git', ['merge', '--no-commit', '--no-ff', target], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
-    } catch {
-      conflicted = true;
-    }
-
-    if (conflicted) {
-      let conflictedFiles = '';
-      try {
-        conflictedFiles = execFileSync('git', ['diff', '--name-only', '--diff-filter=U'], { cwd: ephemeral.path, encoding: 'utf8', shell: false }).trim();
-      } catch {
-        // best-effort — the outcome below still reports the conflict even
-        // if listing the conflicted files itself fails.
-      }
-      try {
-        execFileSync('git', ['merge', '--abort'], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
-      } catch (abortErr) {
-        throw abortErr;
-      }
-      return { outcome: 'conflict', conflictedFiles: conflictedFiles ? conflictedFiles.split('\n').filter(Boolean) : [] };
-    }
-
-    const check = await runGoalCheck(item, ephemeral.path, timeoutMs);
-    if (!check.passed) {
-      try {
-        execFileSync('git', ['merge', '--abort'], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
-      } catch (abortErr) {
-        throw abortErr;
-      }
-      return { outcome: 'verify-fail', timedOut: check.timedOut, exitStatus: check.status, output: check.output };
-    }
-
-    execFileSync('git', ['commit', '-m', `catch-up: merge ${target} into ${ownBranch}`], { cwd: ephemeral.path, encoding: 'utf8', shell: false });
-    const catchupHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ephemeral.path, encoding: 'utf8', shell: false }).trim();
-    return { outcome: 'merged', catchupHead, output: check.output };
-  });
 }
 
 async function runVerb(verb, flags, positional, dir) {
@@ -2431,149 +2273,27 @@ async function runVerb(verb, flags, positional, dir) {
     // reimplements the ranking here.
     case 'merge': {
       const sub = requireField(positional[0], 'merge requires a sub-verb: fgos merge <list|next>');
-      // driftStatus (tsk-2u0) is computed here, once, and handed into the
-      // pure mergeReadiness as opts.drift — mergeReadiness itself never
-      // shells git (stays pure), this verb wrapper does the one real,
-      // read-only git read that populates blockedOnSync. Best-effort: a
-      // repo-less/detached cwd still returns a usable ranking (driftStatus
-      // just reports no roots), same "read never throws on a legacy
-      // shape" posture `review`'s own diff already has.
-      const mergeView = listWork(dir);
-      const drift = driftStatus(process.cwd(), mergeView, { trunk: detectTrunk(process.cwd()) });
       if (sub === 'list') {
-        // tsk-2x9k D1/D4: mergeReadiness's own return shape stays
-        // untouched (4 existing tests do an exact deepEqual against it) --
-        // `tree` is composed here, one layer up, never spread into that
-        // object directly.
-        const readiness = mergeReadiness(mergeView, { drift });
-        return { ...readiness, tree: mergeTree(mergeView, readiness, { drift }) };
+        return mergeList({ dir, cwd: process.cwd() });
       }
       if (sub === 'next') {
-        // Picks the single top-ranked ready item and merges it by recursing
-        // into the SAME `approve` case below (never a parallel merge path,
-        // D6, docs/history/merge-standardization/CONTEXT.md) — `runVerb` is
-        // a pure dispatcher (no printing/exit-code side effects), so
-        // calling it recursively is exactly as safe as any other verb call.
-        // `flags` is forwarded as-is: this never injects
-        // `acknowledge-iron-law` itself (D7) — the Iron Law gate (D16/D17)
-        // exists specifically to require a human-verified failing-test-
-        // first proof before a self-modifying diff lands, so an unattended
-        // `merge next` run must never be able to silently satisfy that
-        // proof on its own authority. If the top pick trips it, this
-        // reports which item and why, merges nothing, and stops — it does
-        // NOT fall through to the next-ranked item (that would silently
-        // change merge order semantics `merge list` already promised).
-        // tsk-xyr (absorbs tsk-1zd): decide, WITHOUT attempting a merge,
-        // whether `candidateId` provably cannot progress this turn.
-        // `ironLawForItem` is the same gate approve's own Iron Law
-        // pre-check below runs (src/runner/iron-law-gate.mjs) -- reusing it
-        // here (source==='runner' only; a pull/legacy item never trips it)
-        // lets the picker decide this WITHOUT running the real merge
-        // attempt approve would make, and without persisting a skip list
-        // (the gate is cheap and recomputable every call, so there is
-        // nothing to go stale).
+        // Same `--trust-dir` resolution `approve`/`sync-root` apply to
+        // themselves — `merge next` used to reach them by re-dispatching
+        // through runVerb with the raw flags, which re-derived exactly
+        // this value on the way in.
         const mergeRepoRoot = flags['trust-dir'] === true ? path.dirname(dir) : process.cwd();
-        const wouldTripIronLaw = (candidateId) => {
-          if (flags['acknowledge-iron-law'] === true) return false;
-          const candidate = mergeView.work[candidateId];
-          if (!candidate || classifySource(mergeRepoRoot, candidate) !== 'runner') return false;
-          return ironLawForItem(mergeRepoRoot, candidate, { view: mergeView }).required;
-        };
-
-        const { ready, blockedOnSync } = mergeReadiness(mergeView, { drift });
-        // tsk-173 (docs/history/merge-next-auto-sync-root/CONTEXT.md D1/D2):
-        // before giving up, try the single top-ranked blockedOnSync root
-        // through `sync-root` — one mutation per call, same "no parallel
-        // merge mechanism" contract the approve path below already holds.
-        // `picked` is ALWAYS the resolved root id on a real attempt here,
-        // NEVER null: `picked: null` collides with merge-loop's own
-        // frontier-empty bullet (SKILL.md step 4), which would otherwise
-        // silently swallow a real merge-conflict/Iron-Law block as if
-        // nothing were wrong — the exact invisibility this item exists to
-        // fix, one level down (validated against the real skill file during
-        // fgos-coding-validating).
-        if (ready.length === 0 && blockedOnSync.length > 0) {
-          const rootId = resolveRoot(mergeView, blockedOnSync[0]);
-          try {
-            const syncResult = await runVerb('sync-root', flags, [rootId], dir);
-            if (syncResult.outcome === 'synced') {
-              const freshView = listWork(dir);
-              const freshDrift = driftStatus(process.cwd(), freshView, { trunk: detectTrunk(process.cwd()) });
-              const { ready: readyAfterSync } = mergeReadiness(freshView, { drift: freshDrift });
-              if (readyAfterSync.length === 0) {
-                return { picked: null, reason: 'nothing ready to merge', syncRoot: { id: rootId, outcome: 'synced' } };
-              }
-              const syncedId = readyAfterSync[0];
-              try {
-                const approveResult = await runVerb('approve', flags, [syncedId], dir);
-                return { picked: syncedId, approve: approveResult, syncRoot: { id: rootId, outcome: 'synced' } };
-              } catch (err) {
-                if (err instanceof StoreError && err.message.includes('Iron Law')) {
-                  return { picked: syncedId, blocked: 'iron-law', message: err.message, syncRoot: { id: rootId, outcome: 'synced' } };
-                }
-                throw err;
-              }
-            }
-            // sync-root's own 'blocked' outcome (merge-conflict /
-            // fgos-write-rejected / verify-fail) — no retry, no fallback to
-            // a different blockedOnSync candidate (D2).
-            return { picked: rootId, blocked: syncResult.reason, syncRoot: syncResult };
-          } catch (err) {
-            if (err instanceof StoreError && err.message.includes('Iron Law')) {
-              return { picked: rootId, blocked: 'iron-law', message: err.message, syncRoot: { id: rootId } };
-            }
-            // tsk-66t: sync-root's own dirty-tree gate (below) refuses the
-            // same way Iron Law does — recognized here the same way, so an
-            // unattended `merge next`/merge-loop run gets the graceful
-            // `{picked, blocked, syncRoot}` shape merge-loop/SKILL.md's own
-            // same-id-blocked-twice rule already parses, instead of an
-            // uncaught exit-4 crash.
-            if (err instanceof StoreError && err.message.includes('is not clean')) {
-              return { picked: rootId, blocked: 'dirty-tree', message: err.message, syncRoot: { id: rootId } };
-            }
-            throw err;
-          }
-        }
-        if (ready.length === 0) {
-          return { picked: null, reason: 'nothing ready to merge' };
-        }
-        // tsk-xyr (absorbs tsk-1zd): walk the ranked list, skipping any
-        // candidate the pure pre-check already proves can't progress this
-        // turn, instead of always returning ready[0] and letting a caller
-        // loop on the same blocked item forever (tsk-2ej's own measured 13
-        // repeats). "nothing ready" and "everything ready was skipped" are
-        // deliberately DISTINCT reasons here — merge-loop's own pool-empty
-        // stop rule depends on telling them apart (a genuinely empty ready
-        // list means stop; an all-skipped one means a human is needed on
-        // at least one of the skipped items, not that the pool is empty).
-        const skipped = [];
-        let id;
-        for (const candidateId of ready) {
-          if (wouldTripIronLaw(candidateId)) {
-            skipped.push({ id: candidateId, reason: 'iron-law' });
-            continue;
-          }
-          id = candidateId;
-          break;
-        }
-        if (id === undefined) {
-          return { picked: null, reason: 'every ready item is blocked', skipped };
-        }
-        try {
-          const approveResult = await runVerb('approve', flags, [id], dir);
-          return { picked: id, approve: approveResult, ...(skipped.length > 0 ? { skipped } : {}) };
-        } catch (err) {
-          if (err instanceof StoreError && err.message.includes('Iron Law')) {
-            // The pure pre-check said this one was safe, but the gate
-            // is recomputed fresh inside approve too (never cached) -- a
-            // description/diff change between the pre-check and this real
-            // attempt (another session editing the item concurrently) can
-            // still surface it here. Reported exactly as before; this is
-            // not the "provable in advance" case the pre-check targets.
-            return { picked: id, blocked: 'iron-law', message: err.message, ...(skipped.length > 0 ? { skipped } : {}) };
-          }
-          throw err;
-        }
+        // Both option blocks are built here, once, and forwarded whole:
+        // that is the whole point of parseMergeClusterOptions (tsk-49i
+        // D3). Building them only on this branch keeps `merge list` free
+        // of the timeout/wait parsing it never did before.
+        return await mergeNext(
+          { dir, cwd: process.cwd(), repoRoot: mergeRepoRoot },
+          {
+            acknowledgeIronLaw: flags['acknowledge-iron-law'] === true,
+            approveOptions: parseMergeClusterOptions('approve', flags, dir),
+            syncRootOptions: parseMergeClusterOptions('sync-root', flags, dir),
+          },
+        );
       }
       throw new StoreError('validation', `merge: unknown sub-verb "${sub}" (known: list, next).`);
     }
@@ -3159,169 +2879,21 @@ async function runVerb(verb, flags, positional, dir) {
     // as `ready`/`list`/`check`.
     case 'review': {
       const id = requireField(positional[0] ?? flags.id, 'review requires an id: fgos review <id>');
-      const view = listWork(dir);
-      const item = view.work[id];
-      if (!item) {
-        throw new StoreError('validation', `review: work "${id}" not found.`);
-      }
-      if (item.status !== 'awaiting-approval') {
-        throw new StoreError('precondition', `review: work "${id}" is "${item.status}", not "awaiting-approval" — nothing to review.`);
-      }
-
-      // GitHub transport (github-adapter D1/D5): `review <id> --github` opens a
-      // real GitHub PR for a runner-sourced item instead of printing the local
-      // diff. Opt-in and additive — the flag's absence leaves the path below
-      // byte-identical. Stays read-only on FSM state exactly like local review:
-      // a gh failure is reported as plain output, never a moveWork/addFriction.
-      if (flags.github) {
-        const repoRoot = process.cwd();
-        const source = classifySource(repoRoot, item);
-        if (source !== 'runner') {
-          throw new StoreError('validation', `review --github: "${id}" is a ${source}-sourced item — GitHub review requires a runner-sourced item with a live fgw/${id} branch (no branch exists to attach a PR to for pull/legacy items).`);
-        }
-
-        // GitHub-close detection (github-adapter D6/D4): `review <id> --github
-        // --pr <n>` skips PR creation and reports an existing PR's live status
-        // read-only. It classifies on `closed` (boolean) + `mergedAt` (null vs
-        // timestamp) only — never on the `state` string, whose closed/merged
-        // values S1's spike never observed. Like every review path it stays
-        // read-only: no moveWork/addFriction under any outcome, because a
-        // GitHub-side close is not itself an approval or reject action (D6);
-        // only local `fgos reject` moves the item. pollTimeoutMs:0 is
-        // load-bearing: this check reads only closed/mergedAt (unrelated to
-        // GitHub's async `mergeable` computation), so it must resolve after a
-        // single `gh pr view` instead of polling up to the default 10s while
-        // `mergeable` may stay "UNKNOWN" forever on a closed PR.
-        const prNumber = optionalField(flags.pr, 'review --github --pr requires a PR number: --pr <n>');
-        if (prNumber !== undefined) {
-          const result = await viewGitHubPRStatus(repoRoot, prNumber, { ...ghCommandOpts(), pollTimeoutMs: 0 });
-          if (result.outcome === 'blocked') {
-            return { id, mode: 'github-status', prNumber, outcome: 'check-failed', reason: result.reason, detail: result.detail };
-          }
-          if (!result.closed) {
-            return { id, mode: 'github-status', prNumber, outcome: 'open' };
-          }
-          if (result.mergedAt) {
-            return { id, mode: 'github-status', prNumber, outcome: 'merged', mergedAt: result.mergedAt };
-          }
-          return { id, mode: 'github-status', prNumber, outcome: 'closed-unmerged' };
-        }
-
-        const head = branchNameFor(id);
-        const rootId = resolveRoot(view, id);
-        // Leaf-vs-root base split mirrors approve/review's local path: a root
-        // targets the repo trunk, a leaf targets its resolved root's branch.
-        // Known limitation (accepted this slice): only the leaf's own branch is
-        // pushed below — the root's branch is never pushed here, so a real
-        // `gh pr create` for a leaf would fail with base absent on origin. The
-        // fake-gh tests don't validate remote branch existence, so they pass;
-        // the leaf/root GitHub push semantics need their own follow-up slice.
-        const base = rootId !== id ? branchNameFor(rootId) : detectTrunk(repoRoot);
-        ensureBranchPushed(repoRoot, head);
-        const result = await createGitHubPR(
-          repoRoot,
-          { head, base, title: item.title, body: item.description || `Runner-proposed change (fgos work item ${id}).` },
-          ghCommandOpts(),
-        );
-        if (result.outcome === 'created') {
-          return { id, mode: 'github-create', outcome: 'created', prNumber: result.prNumber, head, base };
-        }
-        return { id, mode: 'github-create', outcome: 'failed', reason: result.reason, detail: result.detail };
-      }
-
-      // D3 leaf-vs-root split: a leaf (its resolved root is a different
-      // item) diffs against its parent's integration branch instead of
-      // main; a root (resolved root is itself) keeps the default
-      // (main) trunk — byte-for-byte unchanged.
-      const rootId = resolveRoot(view, id);
-      const rootBranchForReview = rootId !== id ? branchNameFor(rootId) : null;
-      // Same milestone-root-without-a-branch fallback as the Iron Law
-      // check above: no `fgw/<root>` ref to diff against means the trunk
-      // stays the repo trunk, not a crash on an unknown revision.
-      const { source, diff, warnings } = rootBranchForReview && branchExists(process.cwd(), rootBranchForReview)
-        ? reviewDiff(process.cwd(), item, { trunk: rootBranchForReview })
-        : reviewDiff(process.cwd(), item);
-      return { id, mode: 'local', source, warnings, diff, trace: collectReviewTrace(view, id) };
+      // `--pr` is only ever parsed on the `--github` path, exactly as
+      // before: a stray `--pr` without `--github` stays ignored rather
+      // than becoming a new validation refusal.
+      const github = Boolean(flags.github);
+      const prNumber = github ? optionalField(flags.pr, 'review --github --pr requires a PR number: --pr <n>') : undefined;
+      return await reviewUseCase({ dir, cwd: process.cwd() }, { id, github, prNumber, ...ghCommandOpts() });
     }
 
-    // tsk-480: approve's own success paths (merge landed, or verify-only
-    // passed) call `moveWork(...to:'delivered'...)` as their very last
-    // step. That write can throw on `events.lock` contention even though
-    // the precondition it's recording already succeeded permanently —
-    // without a guard, the exception would propagate uncaught, and (per
-    // `invocation-fault-log.mjs`'s own documented scope) a fault raised
-    // this deep inside a verb's handler is deliberately never recorded by
-    // that mechanism either, so nothing at all would be left to explain
-    // why a real merge landed while the item stayed `awaiting-approval`
-    // forever (CONTEXT.md D1). This wraps exactly that one call: on
-    // success, returns the real event; on failure, records a diagnostic
-    // through `approve-fault-log.mjs` (D2 — no shared lock with
-    // `events.jsonl`) and returns `event: null` instead of throwing, so
-    // every call site can still finish its own cleanup and return a
-    // truthful envelope.
-    function moveDeliveredOrRecordFault(dir, id, phase, { mergedSha, mergedInto } = {}) {
-      try {
-        // Test-only failure seam (tsk-480 D3), same shape as
-        // FGOS_GH_COMMAND (bin/fgos.mjs ghCommandOpts): an env var read
-        // only here, scoped to the exact item id so it can never affect
-        // any other item in the same process, inert unless a test
-        // explicitly sets it. Production code never sets this variable.
-        if (process.env.FGOS_TEST_FORCE_APPROVE_LOCK_TIMEOUT === id) {
-          throw new EventLogError('lock-timeout', `approve: simulated lock-timeout for "${id}" (FGOS_TEST_FORCE_APPROVE_LOCK_TIMEOUT)`);
-        }
-        const { event } = moveWork(dir, { id, to: 'delivered', expectedStatus: 'awaiting-approval', role: 'human', mergedSha, mergedInto });
-        return { event, error: null, diagnosticLog: null };
-      } catch (err) {
-        // Only an EventLogError (the write itself failing — e.g.
-        // 'lock-timeout', src/state/events.mjs) is the class of failure
-        // this guard exists for. A StoreError from transitionWork's own
-        // precondition/CAS check (e.g. a missing-evidence acceptance
-        // clause) is a legitimate refusal that must keep propagating
-        // exactly as before — swallowing it here would silently accept an
-        // item transitionWork correctly refused.
-        if (!(err instanceof EventLogError)) {
-          throw err;
-        }
-        const diagnosticLog = recordApprovePostSuccessFault(dir, { id, phase, detail: err.message });
-        process.stderr.write(
-          `fgos: warning: "${id}" ${phase} succeeded but its status write failed (${err.message}); `
-            + `item status remains "awaiting-approval" pending manual reconciliation; `
-            + `diagnostic recorded to ${diagnosticLog ?? '(unrecorded — see this stderr line)'}.\n`,
-        );
-        return { event: null, error: err, diagnosticLog };
-      }
-    }
-
-    // Cổng duyệt — approve (pr-lifecycle D3/D4): merges a runner item's
-    // branch into main (spike-proven mechanics: --no-commit --no-ff, verify
-    // on the staged tree, commit only on green — merge.mjs's mergeRunnerItem)
-    // or, for a pull-door/legacy item (code already on main), re-runs the
-    // item's OWN verify directly against the current tree. Every failure
-    // path (conflict, red verify) parks the item at `blocked` with a reason
-    // instead of leaving main mid-merge or the item silently in `proposed`
-    // (D3's "merge sạch → done tự động; conflict/đỏ → hủy sạch + blocked").
-    // `done`'s role is always "human" (D3: the person who ran approve is
-    // the settlement, the merge itself is only the mechanical consequence).
     case 'approve': {
       const id = requireField(positional[0] ?? flags.id, 'approve requires an id: fgos approve <id> [--timeout <ms>|--no-timeout]');
-      const timeoutMs = resolveVerifyTimeoutMs('approve', flags, path.dirname(dir));
-      const { noWait, waitMs } = parseWaitFlags(flags, 'approve');
-      const runMerge = (mergeFn) => (noWait ? mergeFn() : withLockRetry(mergeFn, { waitMs }));
-
-      const view = listWork(dir);
-      const item = view.work[id];
-      if (!item) {
-        throw new StoreError('validation', `approve: work "${id}" not found.`);
-      }
-      if (item.status !== 'awaiting-approval') {
-        throw new StoreError('precondition', `approve: work "${id}" is "${item.status}", not "awaiting-approval" — nothing to approve.`);
-      }
-
-      // repoRoot: process.cwd() by default -- the guards below then refuse
-      // outright when cwd is any linked/session/ad-hoc worktree, catching a
-      // merge that would otherwise land on that worktree's own (possibly
-      // stale) checkout or a goal-check that verifies stale code while
-      // claiming "verified on main" (the P44/review-260718 incident
+      // repoRoot: process.cwd() by default -- the use case's guards then
+      // refuse outright when cwd is any linked/session/ad-hoc worktree,
+      // catching a merge that would otherwise land on that worktree's own
+      // (possibly stale) checkout or a goal-check that verifies stale code
+      // while claiming "verified on main" (the P44/review-260718 incident
       // history this file's own comments already document). --trust-dir
       // (tsk-4uj) opts into deriving repoRoot from --dir instead, the same
       // substitution tsk-k8u/tsk-5vl already proved for take/pick/catchup
@@ -3331,701 +2903,10 @@ async function runVerb(verb, flags, positional, dir) {
       // behavior silently. Byte-identical to today when the flag is
       // omitted.
       const repoRoot = flags['trust-dir'] === true ? path.dirname(dir) : process.cwd();
-      const source = classifySource(repoRoot, item);
-
-      // Multi-session guard (fgos-multi-session-checkout Epic 2): approve must
-      // never run with cwd inside a registered session worktree. One refusal,
-      // covering BOTH non-github source paths, each dangerous for its own reason:
-      //   - runner: the merge below lands on the session's own detached HEAD,
-      //     never main (spike-proven) — a silent "approved" item whose code
-      //     never reaches main.
-      //   - pull/legacy: runGoalCheck below verifies whatever cwd has checked
-      //     out; a session worktree sits at its startCommit, which may predate
-      //     later advances to main, so this would verify STALE code while the
-      //     "verified on main" message claims otherwise, marking the item done
-      //     regardless — a silent false verification.
-      // Refuses BEFORE any git command or verify run: the item stays proposed,
-      // main untouched. Runs BEFORE the --github branch too (approve-worktree-
-      // guard-github-fix D1): a GitHub-side merge is server-side and never
-      // touches the local tree, but the local checkout's own IDENTITY — is
-      // this even the main worktree? — is a more fundamental precondition than
-      // which transport approve uses, so it is checked first for every source.
-      // Registry-based: an ad-hoc `git worktree add` never created through
-      // `fgos session start` is invisible to this guard (CONTEXT.md Deferred
-      // Ideas — ad-hoc unregistered worktree residual risk); the structural
-      // check right below catches that case.
-      const approveCwdReal = realpathOr(repoRoot);
-      for (const session of listSessions(repoRoot)) {
-        const wtReal = realpathOr(session.worktreePath);
-        if (approveCwdReal === wtReal || approveCwdReal.startsWith(`${wtReal}${path.sep}`)) {
-          throw new StoreError(
-            'validation',
-            `approve: refusing to run from inside session "${session.sessionId}" worktree at "${wtReal}" — approve must land on the main checkout, which a session worktree structurally is not. Run approve from the main checkout, or end the session first with "fgos session end ${session.sessionId}".`,
-          );
-        }
-      }
-
-      // Structural guard (P44): the registry loop above only catches a
-      // worktree registered via `fgos session start`. A plain `git worktree
-      // add` run by hand is invisible to sessions.json, so it slipped through
-      // untouched — same false-verification risk (merge lands on that
-      // worktree's own checkout, or goal-check verifies its own possibly-stale
-      // tree, while the item is reported "done"/"verified on main"), just
-      // unregistered instead of registered. isMainWorktree reads git's own
-      // common-dir structure, so it catches ANY linked worktree regardless of
-      // how it was created. Also runs BEFORE the --github branch, same
-      // rationale as the registry loop above (approve-worktree-guard-github-
-      // fix D1).
-      if (!isMainWorktree(repoRoot)) {
-        throw new StoreError(
-          'validation',
-          `approve: refusing to run from "${repoRoot}" — this is a git worktree, not the repository's main working tree, whether or not it was created through "fgos session start". Run approve from the main checkout.`,
-        );
-      }
-
-      // Close-out drift guard (tsk-62y, docs/history/
-      // tsk-3bn-merge-conductor-harness-v2/): tsk-3bn's own origin incident
-      // was closing a milestone (a `targets`-bearing item) while ONE of its
-      // targets' resolved root branches had drifted ahead of main from a
-      // later leaf merge — nothing warned or blocked it. `targets` is the
-      // real, already-existing field a milestone uses ("a milestone's
-      // targets are ordinary work ids", work.mjs). Only runs when `targets`
-      // is a non-empty array — an ordinary (non-milestone) approve is
-      // completely unaffected. Refuses BEFORE any git mutation, same
-      // "acknowledge to override" shape as the Iron Law gate right below —
-      // `--acknowledge-drift` is a deliberate human override, not a bypass
-      // to route around silently.
-      if (Array.isArray(item.targets) && item.targets.length > 0) {
-        const drift = driftStatus(repoRoot, view, { trunk: detectTrunk(repoRoot) });
-        const driftedTargets = [];
-        for (const targetId of item.targets) {
-          if (!view.work[targetId]) continue;
-          const targetRoot = resolveRoot(view, targetId);
-          const status = drift[targetRoot];
-          if (status?.needsSync) {
-            driftedTargets.push({ targetId, root: targetRoot, ...status });
-          }
-        }
-        if (driftedTargets.length > 0 && flags['acknowledge-drift'] !== true) {
-          const summary = driftedTargets
-            .map((d) => `${d.targetId} (root ${d.root}: ${d.branch} is ${d.aheadOfTarget} commit(s) ahead of ${d.target})`)
-            .join(', ');
-          throw new StoreError(
-            'validation',
-            `approve: "${id}" targets item(s) whose root branch has unsynced drift: ${summary}. `
-              + `Run "fgos sync-root <root-id>" first, or re-run with --acknowledge-drift to close anyway.`,
-          );
-        }
-      }
-
-      // Resolved-root guard (tsk-4s0, piece 2 of tsk-4qu's leaf-merge-into-
-      // resolved-root fix): a leaf approved after its own resolved root
-      // (walked via resolveRoot, same as the Iron Law/targets checks below)
-      // has already gone delivered/retrospective/cleanup/done/wontfix would
-      // land on a branch nothing else will ever sync to main (driftStatus's
-      // needsSync is deliberately false for a resolved root, so nothing
-      // else catches this — docs/history/leaf-merge-into-resolved-root/
-      // CONTEXT.md D2). Hoisted here, ahead of the --github branch, for the
-      // exact same reason the Iron Law gate right below was hoisted (f01):
-      // a check that only lived in the local-merge branch let --github
-      // bypass it entirely. Same "acknowledge to override" shape as the
-      // targets drift guard just above — --acknowledge-drift is reused
-      // rather than a new flag, since this is the same class of hazard
-      // (an unsynced/closed-out root branch) just keyed on the leaf's own
-      // parent chain instead of item.targets.
-      {
-        const ownRootId = resolveRoot(view, id);
-        if (ownRootId !== id) {
-          const ownRoot = view.work[ownRootId];
-          if (isResolvedStatus(ownRoot) && flags['acknowledge-drift'] !== true) {
-            throw new StoreError(
-              'validation',
-              `approve: "${id}"'s root "${ownRootId}" is already "${ownRoot?.status}" — merging into "${branchNameFor(ownRootId)}" would strand this work on a branch nothing else will sync to main. `
-                + `Run "fgos sync-root ${ownRootId}" first, or re-run with --acknowledge-drift to merge anyway.`,
-            );
-          }
-        }
-      }
-
-      // Iron Law gate (D16/D17), hoisted ahead of the --github branch —
-      // review-20260718-self-improve-loop finding f01: this check previously
-      // lived only inside the local-merge branch further below, so `approve
-      // --github` could land the exact same self-modifying diff without ever
-      // consulting it — a complete, structural bypass of the loop's own hard
-      // gate, contradicting D16's "one common point for every runner-sourced
-      // proposal, not just the local path". One check point now guards BOTH
-      // merge transports identically, before either can run. changedFiles
-      // diffs the item's own branch against its resolved root's branch (the
-      // same D3 leaf-vs-root split already used for the human-viewable diff,
-      // the GitHub PR base, the real merge target, and `catchup`'s target —
-      // never blind trunk for a leaf) so the file set reflects the item's
-      // own real diff, not every ancestor commit's files too
-      // (tsk-4voj-iron-law-leaf-scope CONTEXT.md D1; previously a leaf
-      // over-reported its file set, which is why this comment used to call
-      // that the "fail-safe direction, accepted as-is" — superseded, see
-      // CONTEXT.md D1). Refuses BEFORE any git mutation or GitHub call: the
-      // item stays `proposed`, nothing is touched, neither transport is
-      // reached. Hoisted alongside the Iron Law gate (tsk-598 D1/D2): the
-      // local-merge branch's own clean-tree check, further below, reuses
-      // this exact array as its ownFileSet source instead of recomputing
-      // the same diff a second time.
-      let runnerOwnDiff;
-      if (source === 'runner') {
-        // The gate resolves the diff base itself (iron-law-gate.mjs): the
-        // item's own resolved-root branch when it exists, the repo trunk
-        // otherwise — a resolved root without its own branch (e.g. a
-        // milestone root still at stage `clarify`/`todo`, never itself
-        // taken/executed) has no `fgw/<root>` ref to diff against.
-        const ironLaw = ironLawForItem(repoRoot, item, { view });
-        runnerOwnDiff = ironLaw.filesChanged;
-        // review-20260718-self-improve-loop finding f02: only the bare flag
-        // (parsed as boolean `true`, no following value) counts as
-        // acknowledgment; any value form (e.g. a stray "false") fails closed.
-        if (ironLaw.required && flags['acknowledge-iron-law'] !== true) {
-          throw new StoreError('validation', ironLawRefusal('approve', id, ironLaw));
-        }
-      }
-
-      // GitHub transport (github-adapter D1/D3/D5): `approve <id> --github --pr
-      // <n>` merges a prior `review --github` PR through GitHub instead of a
-      // local git merge. Dispatched BEFORE the runner block's dirty-main-tree
-      // gate: a GitHub-side merge never touches the local working tree, so
-      // `isMainTreeClean` (which exists only because a LOCAL merge mutates
-      // the tree) must not gate it. The Iron Law gate above DOES gate this
-      // branch now (hoisted, f01). The source gate is checked BEFORE the
-      // --pr presence check so a pull/legacy item always gets the
-      // runner-sourced error, never a misleading "missing --pr" message for an
-      // item that could never have a PR. Runs AFTER the worktree-identity
-      // guards above (approve-worktree-guard-github-fix D1/D3): environment
-      // validity (is this even a valid worktree to approve from) is checked
-      // before business-logic validity (is this item's source compatible with
-      // --github) — an accepted, documented precedence change for the narrow
-      // combination of --github + a non-runner-sourced item + a linked
-      // worktree, which now sees the worktree-identity refusal instead of this
-      // block's own source-mismatch message.
-      if (flags.github) {
-        if (source !== 'runner') {
-          throw new StoreError('validation', `approve --github: "${id}" is a ${source}-sourced item — GitHub approval requires a runner-sourced item with a live fgw/${id} branch (no branch exists to attach a PR to for pull/legacy items).`);
-        }
-        const prNumber = requireField(flags.pr, 'approve --github requires --pr <n> (the GitHub PR number from a prior review --github)');
-        // Acceptance-evidence pre-flight (tsk-396 D2): checked BEFORE the
-        // real GitHub-side merge, not caught after the fact inside
-        // moveWork's own `to === 'delivered'` check — a GitHub merge can't
-        // be `git merge --abort`ed the way a local one can, so this matters
-        // even more here than on the local paths above.
-        assertAcceptanceEvidence(id, item);
-        assertPlanEvidence(id, item, repoRoot);
-        const result = await mergeGitHubPR(repoRoot, prNumber, ghCommandOpts());
-        if (result.outcome === 'merged') {
-          // Accepted rough edge (this slice): unlike the local merged path, no
-          // cleanupMergedBranch runs — the local fgw/<id> branch and its pushed
-          // origin copy are both left in place after a server-side merge (no
-          // local cleanup mechanism exists for a branch merged on GitHub).
-          // tsk-5dk D2: mergeCommit comes from mergeGitHubPR's own post-merge
-          // status read (github-adapter.mjs) — may be undefined if GitHub's
-          // eventual consistency hasn't attached it yet (accepted rough
-          // edge, same as the module's own doc comment); mergedInto matches
-          // the literal 'main' the local root-into-main path already uses.
-          const { event } = moveWork(dir, { id, to: 'delivered', expectedStatus: 'awaiting-approval', role: 'human', mergedSha: result.mergeCommit?.oid, mergedInto: 'main' });
-          return { id, mode: 'github', to: 'delivered', prNumber, seq: event.seq };
-        }
-        // blocked — mirrors the local merge-conflict/verify-fail-post-merge
-        // shape: park awaiting-approval -> blocked with the classifyGhFailure reason,
-        // plus a friction record carrying the failure layer and gh's stderr.
-        const reason = result.reason;
-        const layer = { 'auth-failure': 'environment', 'rate-limited': 'environment', 'unreachable': 'environment', 'gh-invocation-failed': 'state' }[reason] || 'state';
-        moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason, role: 'system' });
-        addFriction(dir, {
-          id,
-          disposition: 'blocked',
-          errorClass: reason,
-          layer,
-          attempts: 1,
-          detail: `gh pr merge #${prNumber} failed at step ${result.step}: ${result.detail}`,
-        });
-        return { id, mode: 'github', to: 'blocked', prNumber, reason, detail: result.detail };
-      }
-
-      if (source === 'runner') {
-        // Iron Law check now runs earlier (hoisted above the --github branch,
-        // f01) so it guards both merge transports identically — see that
-        // block for the full rationale.
-        //
-        // tsk-kv3 (Q1): the main-checkout clean-tree gate USED to run here,
-        // unconditionally, covering both the leaf->root and root->main
-        // paths below. Removed for leaf->root specifically: that merge runs
-        // entirely inside a DETACHED ephemeral worktree
-        // (withMergeEphemeralWorktree, a few lines down) and never reads or
-        // writes repoRoot's own working tree at all — gating on its
-        // cleanliness protected a resource that path never touches. The
-        // gate is re-added below, scoped to the root->main branch only,
-        // which genuinely does merge onto the shared checkout.
-        const ownFileSet = buildOwnFileSet(runnerOwnDiff, item.footprint);
-
-        // Acceptance-evidence pre-flight (tsk-396 D1): covers both merge
-        // paths below (leaf->root and root->main share this one branch
-        // point) — checked BEFORE mergeRunnerItem's real git merge, not
-        // caught after the fact inside moveWork's own `to === 'delivered'`
-        // check (store.mjs). A merge that's about to be refused here never
-        // touches the target branch.
-        assertAcceptanceEvidence(id, item);
-        assertPlanEvidence(id, item, repoRoot);
-
-        // D3 leaf-vs-root split: a leaf's resolved root is a DIFFERENT item
-        // (resolveRoot walks item.parent up to the top); a root's resolved
-        // root is itself.
-        const rootId = resolveRoot(view, id);
-
-        if (rootId !== id) {
-          const rootBranch = branchNameFor(rootId);
-          // A root only ever driven by a live session/pick (never the
-          // runner's own dispatch loop, which creates fgw/<rootId> early,
-          // D17) can reach this point before its own branch exists — seed
-          // it from the repo's own detected trunk here (tsk-386: no longer
-          // a hardcoded 'main' -- createBranchRef's own default already
-          // resolves through detectTrunk(repoRoot)), the same fallback
-          // createDetachedMergeWorktree already applies at its own later
-          // call site below.
-          if (!branchExists(repoRoot, rootBranch)) {
-            createBranchRef(repoRoot, rootId);
-          }
-          // Ephemeral worktree checked out on fgw/<rootId> (now guaranteed to
-          // exist, either from dispatch-side wiring or the fallback just
-          // above) — never the human's own main
-          // checkout, and never a literal checkout of fgw/<rootId> itself:
-          // withMergeEphemeralWorktree stands up a DETACHED checkout at the
-          // branch's current tip commit, merges there, then lands the
-          // result via a plain `git branch -f` ref update (worktree.mjs,
-          // docs/history/merge-worktree-reclaim-clobbers-kept-checkout/
-          // CONTEXT.md D1 — this replaces an earlier version of this
-          // comment that attributed the race below to createWorktree's
-          // branch-reuse path force-reclaiming any existing checkout of
-          // fgw/<rootId>; that mechanism no longer runs here). This still
-          // races a concurrent approval of a sibling leaf of the same
-          // root, or the runner's own dispatch of that root — D16's
-          // per-root merge-mutex lives in the runner's write-queue, not
-          // this human-driven CLI verb, so nothing here prevents two such
-          // merges from overlapping. What changed (tsk-46a, docs/history/
-          // merge-ephemeral-branch-force-race/CONTEXT.md):
-          // withMergeEphemeralWorktree's own CAS guard now catches the
-          // overlap at the ref-move step and makes the losing side fail
-          // loudly instead of silently overwriting the winner's commit —
-          // the race can still happen, but it is no longer a silent
-          // data-loss risk; the losing `approve` call just needs a retry
-          // against the new tip. A long-lived claim worktree checked out
-          // on fgw/<rootId> falling behind this same ref update is a
-          // separate, guarded concern — see resyncClaimWorktree
-          // (worktree.mjs), which runs when that worktree is next
-          // reattached to.
-          //
-          // withMergeEphemeralWorktree's own finally (worktree.mjs) removes
-          // the checkout on every exit path below (conflict, verify-fail,
-          // merged) — per D4/D17 that never deletes the branch itself.
-          // mergeRunnerItem's own conflict/verify-fail outcomes already
-          // leave the ephemeral checkout clean via `git merge --abort`, so
-          // no cleanupMergedBranch call is needed on those paths.
-          // tsk-xyr (§E): the target's own slot is held OUTSIDE
-          // withMergeEphemeralWorktree — createDetachedMergeWorktree reads
-          // the target's tip BEFORE this callback runs, so the slot must
-          // already be held by the time that read happens, not acquired
-          // from inside it (that would leave the tip read unprotected).
-          // tsk-5k4: withLockRetry must wrap the call that can actually
-          // throw lock-held (withMergeTargetSlot's own acquire) — the
-          // runMerge below wrapping only mergeRunnerItem(...,{targetSlot:
-          // true}) never catches anything, since that path skips its own
-          // lock acquire once the caller already holds the target's slot.
-          return await runMerge(() => withMergeTargetSlot(repoRoot, rootBranch, async () => {
-            // tsk-4ax (D3): catchup as a STANDARD step, not only a recovery
-            // from `blocked` — if the target isn't yet an ancestor of the
-            // branch, catch it up FIRST, still inside the slot (so the
-            // target provably cannot move between this check and the land
-            // below — the whole invariant D3 depends on). Once caught up,
-            // the branch itself is now an ancestor and carries a commit
-            // this call JUST verified green; `effectiveItem` threads that
-            // fresh tip into the land below in-memory only (never persisted
-            // via moveWork — awaiting-approval -> awaiting-approval is not
-            // a valid FSM edge, and there is nothing to persist: this same
-            // call is about to consume the proof immediately).
-            let effectiveItem = item;
-            let alreadyAncestor = false;
-            try {
-              execFileSync('git', ['merge-base', '--is-ancestor', rootBranch, branchNameFor(id)], { cwd: repoRoot, encoding: 'utf8', shell: false });
-              alreadyAncestor = true;
-            } catch (ancestorErr) {
-              if (ancestorErr.status !== 1) throw ancestorErr;
-            }
-            if (!alreadyAncestor) {
-              const catchupResult = await performCatchUp(repoRoot, id, item, rootBranch, timeoutMs);
-              if (catchupResult.outcome === 'conflict') {
-                moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-conflict', role: 'system' });
-                addFriction(dir, {
-                  id,
-                  disposition: 'blocked',
-                  errorClass: 'merge-conflict',
-                  layer: 'state',
-                  attempts: 1,
-                  detail: `catchup (inbound gate): git merge --no-commit --no-ff ${rootBranch} into ${branchNameFor(id)} conflicted; merge aborted, ${branchNameFor(id)} unchanged`,
-                });
-                return { id, mode: 'merge', to: 'blocked', reason: 'merge-conflict', target: rootBranch, conflictedFiles: catchupResult.conflictedFiles };
-              }
-              if (catchupResult.outcome === 'verify-fail') {
-                const mergeReason = catchupResult.timedOut ? 'verify-timeout-post-merge' : 'verify-fail-post-merge';
-                moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: mergeReason, role: 'system' });
-                addFriction(dir, {
-                  id,
-                  disposition: 'blocked',
-                  errorClass: catchupResult.timedOut ? 'verify-timeout' : 'verify-miss',
-                  layer: 'verification',
-                  attempts: 1,
-                  detail: catchupResult.timedOut
-                    ? `catchup (inbound gate): goal-check timed out on staged merge into ${branchNameFor(id)} after ${timeoutMs}ms — not a verify failure; merge aborted, ${branchNameFor(id)} unchanged, rerun catchup`
-                    : `catchup (inbound gate): goal-check failed on staged merge into ${branchNameFor(id)} (exit ${catchupResult.exitStatus}); merge aborted, ${branchNameFor(id)} unchanged`,
-                });
-                return { id, mode: 'merge', to: 'blocked', reason: mergeReason, target: rootBranch, timedOut: catchupResult.timedOut, exitStatus: catchupResult.exitStatus, output: catchupResult.output };
-              }
-              // 'merged' or 'already-caught-up'.
-              effectiveItem = { ...item, branchHeadAtReturn: catchupResult.catchupHead };
-            }
-            return await withMergeEphemeralWorktree(repoRoot, rootId, async (ephemeral) => {
-            // tsk-2eq: lockRoot pins the main-checkout lock to the real
-            // repo root — ephemeral.path stays the git-op cwd (unchanged)
-            // but is never the lock's own root, since it's a throwaway
-            // worktree with no writable .fgos/ (ADR0020).
-            // targetSlot:true (tsk-xyr): this merge runs entirely in the
-            // detached ephemeral worktree above, never touching the shared
-            // main checkout — main-checkout.lock protects a resource this
-            // path doesn't use, so it is skipped in favor of the target
-            // slot already held by withMergeTargetSlot around this whole
-            // call.
-            const result = await runMerge(() => mergeRunnerItem(ephemeral.path, effectiveItem, { timeoutMs, lockRoot: repoRoot, targetSlot: true }));
-
-            if (result.outcome === 'conflict') {
-              moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-conflict', role: 'system' });
-              addFriction(dir, {
-                id,
-                disposition: 'blocked',
-                errorClass: 'merge-conflict',
-                layer: 'state',
-                attempts: 1,
-                detail: `git merge --no-commit --no-ff ${result.branch} into ${rootBranch} conflicted; merge aborted, ${rootBranch} unchanged`,
-              });
-              return { id, mode: 'merge', to: 'blocked', reason: 'merge-conflict', target: rootBranch };
-            }
-
-            if (result.outcome === 'merge-failed-unclassified') {
-              // tsk-18a D1: git merge --no-commit --no-ff failed but never
-              // created MERGE_HEAD -- not a real textual conflict, so this
-              // gets its own reason instead of being folded into
-              // 'merge-conflict'. Real stderr/exit-code carried through so
-              // this is actually diagnosable, unlike the static
-              // 'merge-conflict' detail string.
-              moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-failed-unclassified', role: 'system' });
-              addFriction(dir, {
-                id,
-                disposition: 'blocked',
-                errorClass: 'merge-failed-unclassified',
-                layer: 'state',
-                attempts: 1,
-                detail: `git merge --no-commit --no-ff ${result.branch} into ${rootBranch} failed without a real conflict (exit ${result.error.status}): ${result.error.stderr || result.error.message}; merge aborted, ${rootBranch} unchanged`,
-              });
-              return { id, mode: 'merge', to: 'blocked', reason: 'merge-failed-unclassified', target: rootBranch, error: result.error };
-            }
-
-            if (result.outcome === 'merge-blocked-other-item') {
-              // tsk-4hj D1/D2/D3: a MERGE_HEAD already existed BEFORE this
-              // call's own merge attempt ran -- a different item's
-              // in-progress or abandoned merge, not this branch's conflict.
-              // git merge --no-commit --no-ff was never attempted and
-              // git merge --abort was never called, so ${rootBranch}'s own
-              // merge state (if any) is exactly as this call found it.
-              moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-blocked-other-item', role: 'system' });
-              addFriction(dir, {
-                id,
-                disposition: 'blocked',
-                errorClass: 'merge-blocked-other-item',
-                layer: 'state',
-                attempts: 1,
-                detail: `main checkout already has a MERGE_HEAD from another item's in-progress merge; ${rootBranch}'s own merge of ${result.branch} was never attempted`,
-              });
-              return { id, mode: 'merge', to: 'blocked', reason: 'merge-blocked-other-item', target: rootBranch };
-            }
-
-            if (result.outcome === 'fgos-write-rejected') {
-              moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'fgos-write-rejected', role: 'system' });
-              addFriction(dir, {
-                id,
-                disposition: 'blocked',
-                errorClass: 'fgos-write-blocked',
-                layer: 'state',
-                attempts: 1,
-                detail: `${result.branch} staged a change under .fgos/ (${result.paths.join(', ')}); merge aborted, ${rootBranch} unchanged — ADR0020`,
-              });
-              return { id, mode: 'merge', to: 'blocked', reason: 'fgos-write-rejected', target: rootBranch, paths: result.paths };
-            }
-
-            if (result.outcome === 'verify-fail') {
-              // tsk-53o: a timeout during the post-merge check is not proof
-              // the merge is bad — park under a distinct, catchup-resolvable
-              // reason instead of the misleading merge-fail label.
-              const mergeReason = result.check.timedOut ? 'verify-timeout-post-merge' : 'verify-fail-post-merge';
-              moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: mergeReason, role: 'system' });
-              addFriction(dir, {
-                id,
-                disposition: 'blocked',
-                errorClass: result.check.timedOut ? 'verify-timeout' : 'verify-miss',
-                layer: 'verification',
-                attempts: 1,
-                detail: result.check.timedOut
-                  ? `goal-check timed out on staged merge into ${rootBranch} after ${timeoutMs}ms — not a verify failure; merge aborted, ${rootBranch} unchanged, rerun catchup`
-                  : `goal-check failed on staged merge into ${rootBranch} (exit ${result.check.status}); merge aborted, ${rootBranch} unchanged`,
-              });
-              return { id, mode: 'merge', to: 'blocked', reason: mergeReason, target: rootBranch, timedOut: result.check.timedOut, exitStatus: result.check.status, output: result.check.output };
-            }
-
-            // Merged: land the leaf's work on its root's branch. The
-            // leaf's own branch (and any stray worktree checkout of it) is
-            // NO LONGER torn down here (tsk-1p9, restore-to-decision, D1):
-            // teardown is deferred to the `cleanup` verb, gated by D7's TTL
-            // and D8's harness (which now resolves the correct root-aware
-            // git context for a leaf branch, tsk-1p9 D7/D8 — the exact
-            // constraint that used to force this call to run from the
-            // ephemeral worktree right here no longer applies, since the
-            // deferred call resolves its own correct ref).
-            // tsk-480: the merge above is already real and permanent —
-            // status recording is best-effort from here regardless of
-            // outcome (previously: also gated cleanup on this write
-            // succeeding; cleanup no longer happens on this path at all).
-            // tsk-5dk: read the ephemeral worktree's OWN HEAD, not
-            // rootBranch's ref on repoRoot — withMergeEphemeralWorktree
-            // (worktree.mjs) only force-moves the real branch AFTER this
-            // callback returns (`git branch -f branch endCommit`), so
-            // reading repoRoot's ref here would still see the PRE-merge
-            // sha. `ephemeral.path`'s HEAD is correct in both the fresh-
-            // merge case (it IS the just-created endCommit) and the
-            // idempotent-already-merged case (HEAD never advanced past
-            // rootBranch's existing tip, which is exactly right there too).
-            const mergedSha = currentHead(ephemeral.path);
-            const moveResult = moveDeliveredOrRecordFault(dir, id, 'leaf-into-root merge', { mergedSha, mergedInto: rootBranch });
-            if (!moveResult.event) {
-              return {
-                id,
-                mode: 'merge',
-                to: 'awaiting-approval',
-                deliveryUnrecorded: true,
-                target: rootBranch,
-                branch: result.branch,
-                output: result.check.output,
-                error: moveResult.error.message,
-                diagnosticLog: moveResult.diagnosticLog,
-                postLand: result.postLand,
-              };
-            }
-            return {
-              id,
-              mode: 'merge',
-              to: 'delivered',
-              target: rootBranch,
-              branch: result.branch,
-              seq: moveResult.event.seq,
-              output: result.check.output,
-              postLand: result.postLand,
-            };
-            });
-          }));
-        }
-
-        // tsk-kv3 (Q1): unlike leaf->root above, THIS path genuinely merges
-        // onto the shared main checkout (mergeRunnerItem(repoRoot, ...)
-        // just below, no ephemeral worktree) — the clean-tree gate belongs
-        // here, scoped to the item's own file set exactly as it already
-        // was before this item (tsk-598's own buildOwnFileSet narrowing,
-        // unchanged; only the GATE'S LOCATION moved, not its logic).
-        if (!isMainTreeClean(repoRoot, ownFileSet)) {
-          throw new StoreError('validation', `approve: working tree at "${repoRoot}" is not clean — commit or stash pending changes before approving "${id}".`);
-        }
-
-        // Root merge into main — unchanged except for D8: a root that
-        // actually had children (was a decomposed root, per replay.mjs's
-        // fold which never clears `parent` on a child that reached `done`)
-        // gets the distinguishing reason `integration-drift` instead of the
-        // existing reason strings on a conflict/verify-fail, plus a
-        // `main@<sha>` ref in the friction detail. A standalone (no
-        // children) root keeps today's exact reason strings and message —
-        // zero behavior change for the common case.
-        const hadChildren = Object.values(view.work).some((w) => w.parent === id);
-
-        const result = await runMerge(() => mergeRunnerItem(repoRoot, item, { timeoutMs }));
-
-        if (result.outcome === 'conflict') {
-          const reason = hadChildren ? 'integration-drift' : 'merge-conflict';
-          const detail = hadChildren
-            ? `cross-root integration drift at main@${currentHead(repoRoot)}; git merge --no-commit --no-ff ${result.branch} conflicted; merge aborted, main unchanged`
-            : `git merge --no-commit --no-ff ${result.branch} conflicted; merge aborted, main unchanged`;
-          moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason, role: 'system' });
-          addFriction(dir, {
-            id,
-            disposition: 'blocked',
-            errorClass: 'merge-conflict',
-            layer: 'state',
-            attempts: 1,
-            detail,
-          });
-          return { id, mode: 'merge', to: 'blocked', reason, target: 'main' };
-        }
-
-        if (result.outcome === 'merge-failed-unclassified') {
-          // tsk-18a D1: same non-genuine-conflict class as the leaf→root
-          // call site above — never folded into 'merge-conflict'/
-          // 'integration-drift', regardless of hadChildren, since neither
-          // reason is accurate for a failure that never staged a real
-          // conflict in the first place.
-          const detail = hadChildren
-            ? `cross-root integration attempt at main@${currentHead(repoRoot)}; git merge --no-commit --no-ff ${result.branch} failed without a real conflict (exit ${result.error.status}): ${result.error.stderr || result.error.message}; merge aborted, main unchanged`
-            : `git merge --no-commit --no-ff ${result.branch} failed without a real conflict (exit ${result.error.status}): ${result.error.stderr || result.error.message}; merge aborted, main unchanged`;
-          moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-failed-unclassified', role: 'system' });
-          addFriction(dir, {
-            id,
-            disposition: 'blocked',
-            errorClass: 'merge-failed-unclassified',
-            layer: 'state',
-            attempts: 1,
-            detail,
-          });
-          return { id, mode: 'merge', to: 'blocked', reason: 'merge-failed-unclassified', target: 'main', error: result.error };
-        }
-
-        if (result.outcome === 'merge-blocked-other-item') {
-          // tsk-4hj D1/D2/D3: same non-genuine-conflict, non-genuine-drift
-          // class as merge-failed-unclassified above — reason stays constant
-          // regardless of hadChildren, since a pre-existing MERGE_HEAD from a
-          // DIFFERENT item is neither this branch's own conflict nor cross-root
-          // integration drift. git merge --no-commit --no-ff was never
-          // attempted and git merge --abort was never called.
-          const detail = hadChildren
-            ? `cross-root integration attempt at main@${currentHead(repoRoot)}; main checkout already has a MERGE_HEAD from another item's in-progress merge; merge of ${result.branch} was never attempted`
-            : `main checkout already has a MERGE_HEAD from another item's in-progress merge; merge of ${result.branch} was never attempted`;
-          moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'merge-blocked-other-item', role: 'system' });
-          addFriction(dir, {
-            id,
-            disposition: 'blocked',
-            errorClass: 'merge-blocked-other-item',
-            layer: 'state',
-            attempts: 1,
-            detail,
-          });
-          return { id, mode: 'merge', to: 'blocked', reason: 'merge-blocked-other-item', target: 'main' };
-        }
-
-        if (result.outcome === 'fgos-write-rejected') {
-          moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: 'fgos-write-rejected', role: 'system' });
-          addFriction(dir, {
-            id,
-            disposition: 'blocked',
-            errorClass: 'fgos-write-blocked',
-            layer: 'state',
-            attempts: 1,
-            detail: `${result.branch} staged a change under .fgos/ (${result.paths.join(', ')}); merge aborted, main unchanged — ADR0020`,
-          });
-          return { id, mode: 'merge', to: 'blocked', reason: 'fgos-write-rejected', target: 'main', paths: result.paths };
-        }
-
-        if (result.outcome === 'verify-fail') {
-          // tsk-53o: a timeout is neither a real verify failure nor evidence
-          // of cross-root drift — it gets its own reason regardless of
-          // hadChildren, distinct from both branches below.
-          const reason = result.check.timedOut ? 'verify-timeout-post-merge' : hadChildren ? 'integration-drift' : 'verify-fail-post-merge';
-          const detail = result.check.timedOut
-            ? `goal-check timed out on staged merge after ${timeoutMs}ms — not a verify failure; merge aborted, main unchanged, rerun catchup`
-            : hadChildren
-              ? `cross-root integration drift at main@${currentHead(repoRoot)}; goal-check failed on staged merge (exit ${result.check.status}); merge aborted, main unchanged`
-              : `goal-check failed on staged merge (exit ${result.check.status}); merge aborted, main unchanged`;
-          moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason, role: 'system' });
-          addFriction(dir, {
-            id,
-            disposition: 'blocked',
-            errorClass: result.check.timedOut ? 'verify-timeout' : 'verify-miss',
-            layer: 'verification',
-            attempts: 1,
-            detail,
-          });
-          return { id, mode: 'merge', to: 'blocked', reason, target: 'main', timedOut: result.check.timedOut, exitStatus: result.check.status, output: result.check.output };
-        }
-
-        // tsk-480: cleanup used to run either way relative to this write
-        // (already real and permanent) — now moot on this path, since
-        // cleanup no longer happens here at all (tsk-1p9 D1: deferred to
-        // the `cleanup` verb, gated by D7's TTL and D8's harness).
-        // tsk-5dk: same resolveRefSha-of-the-target-branch approach as the
-        // leaf-into-root path above, kept uniform even though this merge
-        // already ran directly on repoRoot (no ephemeral worktree here) —
-        // still correct, and still robust for an idempotent already-merged
-        // re-approve (see the leaf-into-root comment above for why).
-        const mergedSha = resolveRefSha(repoRoot, 'main');
-        const moveResult = moveDeliveredOrRecordFault(dir, id, 'root-into-main merge', { mergedSha, mergedInto: 'main' });
-        if (!moveResult.event) {
-          return {
-            id,
-            mode: 'merge',
-            to: 'awaiting-approval',
-            deliveryUnrecorded: true,
-            target: 'main',
-            branch: result.branch,
-            output: result.check.output,
-            error: moveResult.error.message,
-            diagnosticLog: moveResult.diagnosticLog,
-            postLand: result.postLand,
-          };
-        }
-        return {
-          id,
-          mode: 'merge',
-          to: 'delivered',
-          target: 'main',
-          branch: result.branch,
-          seq: moveResult.event.seq,
-          output: result.check.output,
-          postLand: result.postLand,
-        };
-      }
-
-      // pull-door or legacy proposal: code is already on main (D4) — no
-      // merge step, just re-run the item's own verify against the current
-      // tree, exactly the goal-check contract `return` already uses.
-      const check = await runGoalCheck(item, repoRoot, timeoutMs);
-      if (!check.passed) {
-        // tsk-53o: same timeout/fail distinction as `return` — a timeout is
-        // not proof the item's verify failed.
-        moveWork(dir, { id, to: 'blocked', expectedStatus: 'awaiting-approval', reason: check.timedOut ? 'verify-timeout' : 'verify-fail', role: 'system' });
-        addFriction(dir, {
-          id,
-          disposition: 'blocked',
-          errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss',
-          layer: 'verification',
-          attempts: 1,
-          detail: check.timedOut
-            ? `goal-check on main timed out after ${timeoutMs}ms — not a verify failure, rerun approve`
-            : `goal-check failed on main (exit ${check.status})`,
-        });
-        return { id, mode: 'verify-only', to: 'blocked', reason: check.timedOut ? 'verify-timeout' : 'verify-fail', timedOut: check.timedOut, exitStatus: check.status, output: check.output };
-      }
-      // tsk-480: no real merge lands on this path (code is already on
-      // main), so a moveWork failure here only desyncs status rather than
-      // hiding a permanent mutation — still guarded for consistency with
-      // the two merge paths above (CONTEXT.md D1: all three success
-      // paths share the same silent-throw shape).
-      const moveResult = moveDeliveredOrRecordFault(dir, id, 'pull-door verify-only');
-      if (!moveResult.event) {
-        return {
-          id,
-          mode: 'verify-only',
-          to: 'awaiting-approval',
-          deliveryUnrecorded: true,
-          output: check.output,
-          error: moveResult.error.message,
-          diagnosticLog: moveResult.diagnosticLog,
-        };
-      }
-      return { id, mode: 'verify-only', to: 'delivered', seq: moveResult.event.seq, output: check.output };
+      return await approveUseCase(
+        { dir, repoRoot },
+        parseMergeClusterOptions('approve', flags, dir, { id }),
+      );
     }
 
     // sync-root (tsk-50i, docs/history/tsk-3bn-merge-conductor-harness-v2/):
@@ -4039,204 +2920,19 @@ async function runVerb(verb, flags, positional, dir) {
     // afterward: the root stays open for further leaf merges.
     case 'sync-root': {
       const id = requireField(positional[0] ?? flags.id, 'sync-root requires a root-id: fgos sync-root <root-id>');
-      const view = listWork(dir);
-      const item = view.work[id];
-      if (!item) {
-        throw new StoreError('validation', `sync-root: work "${id}" not found.`);
-      }
-
-      // repoRoot: process.cwd() by default -- isMainWorktree below then
-      // refuses outright when cwd is any linked worktree, catching a merge
-      // that would otherwise land on that worktree's own (possibly stale)
-      // checkout. --trust-dir (tsk-4uj) opts into deriving repoRoot from
-      // --dir instead, the same substitution tsk-k8u/tsk-5vl already proved
-      // for take/pick/catchup -- but gated behind this explicit flag here,
-      // never the unconditional default: unlike catchup, sync-root's guard
-      // is deliberate (mirrors approve's own discipline), so the caller
-      // must say it knows --dir is trustworthy rather than getting the
-      // relaxed behavior silently. Byte-identical to today when the flag is
-      // omitted.
+      // repoRoot: process.cwd() by default -- the use case's isMainWorktree
+      // guard then refuses outright when cwd is any linked worktree,
+      // catching a merge that would otherwise land on that worktree's own
+      // (possibly stale) checkout. --trust-dir (tsk-4uj) opts into deriving
+      // repoRoot from --dir instead, the same substitution tsk-k8u/tsk-5vl
+      // already proved for take/pick/catchup -- but gated behind this
+      // explicit flag here, never the unconditional default: unlike
+      // catchup, sync-root's guard is deliberate (mirrors approve's own
+      // discipline), so the caller must say it knows --dir is trustworthy
+      // rather than getting the relaxed behavior silently. Byte-identical
+      // to today when the flag is omitted.
       const repoRoot = flags['trust-dir'] === true ? path.dirname(dir) : process.cwd();
-      if (!isMainWorktree(repoRoot)) {
-        throw new StoreError(
-          'validation',
-          `sync-root: refusing to run from "${repoRoot}" — sync-root must land on the main checkout, which a linked worktree structurally is not.`,
-        );
-      }
-
-      const branch = branchNameFor(id);
-      if (!branchExists(repoRoot, branch)) {
-        throw new StoreError('validation', `sync-root: branch "${branch}" does not exist — nothing to sync.`);
-      }
-      const targetBranch = item.parent ? branchNameFor(item.parent) : detectTrunk(repoRoot);
-      if (item.parent && !branchExists(repoRoot, targetBranch)) {
-        throw new StoreError('validation', `sync-root: target branch "${targetBranch}" (from "${id}"'s parent "${item.parent}") does not exist.`);
-      }
-
-      // Iron Law gate — same evidence, same acknowledgment flag, same
-      // "refuse before any git mutation" discipline `approve` already
-      // applies to a runner-sourced item (source is 'runner' here by
-      // construction: branchExists(branch) just confirmed it above).
-      const ironLaw = ironLawForItem(repoRoot, item, { trunk: item.parent ? targetBranch : null });
-      // Reused further below as the clean-tree gate's `ownFileSet` source,
-      // exactly as `approve` reuses its own — one git read, not two.
-      const runnerOwnDiff = ironLaw.filesChanged;
-      if (ironLaw.required && flags['acknowledge-iron-law'] !== true) {
-        throw new StoreError('validation', ironLawRefusal('sync-root', id, ironLaw));
-      }
-
-      const timeoutMs = resolveVerifyTimeoutMs('sync-root', flags, path.dirname(dir));
-      const { noWait, waitMs } = parseWaitFlags(flags, 'sync-root');
-      const runMerge = (mergeFn) => (noWait ? mergeFn() : withLockRetry(mergeFn, { waitMs }));
-
-      const runAndReport = async (mergeRoot, lockRoot, targetSlot = false, itemOverride = item) => {
-        const result = await runMerge(() => mergeRunnerItem(mergeRoot, itemOverride, lockRoot ? { timeoutMs, lockRoot, targetSlot } : { timeoutMs }));
-
-        if (result.outcome === 'conflict') {
-          addFriction(dir, {
-            id,
-            disposition: 'blocked',
-            errorClass: 'merge-conflict',
-            layer: 'state',
-            attempts: 1,
-            detail: `sync-root: git merge --no-commit --no-ff ${branch} into ${targetBranch} conflicted; merge aborted, ${targetBranch} unchanged`,
-          });
-          return { id, mode: 'sync-root', outcome: 'blocked', reason: 'merge-conflict', target: targetBranch, branch };
-        }
-        if (result.outcome === 'fgos-write-rejected') {
-          addFriction(dir, {
-            id,
-            disposition: 'blocked',
-            errorClass: 'fgos-write-blocked',
-            layer: 'state',
-            attempts: 1,
-            detail: `sync-root: ${branch} staged a change under .fgos/ (${result.paths.join(', ')}); merge aborted, ${targetBranch} unchanged — ADR0020`,
-          });
-          return { id, mode: 'sync-root', outcome: 'blocked', reason: 'fgos-write-rejected', target: targetBranch, branch, paths: result.paths };
-        }
-        if (result.outcome === 'verify-fail') {
-          // tsk-53o: a timeout is not proof the staged merge's verify failed.
-          addFriction(dir, {
-            id,
-            disposition: 'blocked',
-            errorClass: result.check.timedOut ? 'verify-timeout' : 'verify-miss',
-            layer: 'verification',
-            attempts: 1,
-            detail: result.check.timedOut
-              ? `sync-root: goal-check timed out on staged merge of ${branch} into ${targetBranch} after ${timeoutMs}ms — not a verify failure; merge aborted, ${targetBranch} unchanged`
-              : `sync-root: goal-check failed on staged merge of ${branch} into ${targetBranch} (exit ${result.check.status}); merge aborted, ${targetBranch} unchanged`,
-          });
-          return { id, mode: 'sync-root', outcome: 'blocked', reason: result.check.timedOut ? 'verify-timeout' : 'verify-fail', timedOut: result.check.timedOut, target: targetBranch, branch, exitStatus: result.check.status, output: result.check.output };
-        }
-
-        if (result.outcome !== 'merged') {
-          // tsk-4hj D4: defensive guard against any outcome this call site
-          // does not explicitly recognize above (today:
-          // 'merge-blocked-other-item', 'merge-failed-unclassified') --
-          // without this, an unhandled outcome fell through unguarded to
-          // the success block below, and sync-root silently reported
-          // { outcome: 'synced' } for a merge that never actually
-          // completed. Deliberately never lists specific outcome strings
-          // here (unlike the named branches above) -- this guard's whole
-          // point is to catch whatever this call site doesn't already
-          // handle by name, today and for any outcome added later.
-          addFriction(dir, {
-            id,
-            disposition: 'blocked',
-            errorClass: 'sync-root-unhandled-outcome',
-            layer: 'state',
-            attempts: 1,
-            detail: `sync-root: mergeRunnerItem returned unrecognized outcome "${result.outcome}" for ${branch} into ${targetBranch} — refusing to report success`,
-          });
-          return { id, mode: 'sync-root', outcome: 'blocked', reason: result.outcome, target: targetBranch, branch };
-        }
-
-        // Success — status/stage of `id` is deliberately UNTOUCHED (the
-        // locked contract). Only a real decision record marks this sync
-        // happened, same append door `fgos decision` itself uses.
-        const { event } = addDecision(dir, {
-          text: `sync-root: merged ${branch} into ${targetBranch} at ${currentHead(mergeRoot)}`,
-          rationale: `fgos sync-root ${id} — closes the drift window this item's own design exists to prevent`,
-          id,
-          // Engine bookkeeping, not reflection: a branch sync is machinery
-          // this verb performs, never someone thinking about the work. The
-          // record stays fully visible in `fgos show` (which filters
-          // decisions by id, never by kind) -- but `kind` is what stops it
-          // counting as retrospective content at the cleanup gate
-          // (`checkRetrospectiveContent`). Without it addDecision defaults
-          // to `kind: 'design'` (store.mjs), actively labelling a merge as
-          // a design decision, and any synced root could reach `done` with
-          // no retrospective document behind it.
-          kind: 'engine',
-        });
-        return { id, mode: 'sync-root', outcome: 'synced', target: targetBranch, branch, seq: event.seq, output: result.check.output, postLand: result.postLand };
-      };
-
-      if (item.parent) {
-        // tsk-xyr (§E): same target-slot-outside-the-ephemeral-worktree
-        // ordering as approve's leaf-to-root path above — the slot must be
-        // held before createDetachedMergeWorktree reads the target's tip.
-        // tsk-5k4: withLockRetry must wrap the call that can actually throw
-        // lock-held (withMergeTargetSlot's own acquire) — runMerge alone
-        // around the inner mergeRunnerItem(...,{targetSlot:true}) below
-        // never catches anything, since that path skips its own lock
-        // acquire entirely once the caller already holds the target's slot.
-        return await runMerge(() => withMergeTargetSlot(repoRoot, targetBranch, async () => {
-          // tsk-4ax (D3): same inbound-gate catchup as approve's leaf-to-root
-          // path — still inside the slot, so the target provably cannot
-          // move between this check and the land below.
-          let effectiveItem = item;
-          let alreadyAncestor = false;
-          try {
-            execFileSync('git', ['merge-base', '--is-ancestor', targetBranch, branch], { cwd: repoRoot, encoding: 'utf8', shell: false });
-            alreadyAncestor = true;
-          } catch (ancestorErr) {
-            if (ancestorErr.status !== 1) throw ancestorErr;
-          }
-          if (!alreadyAncestor) {
-            const catchupResult = await performCatchUp(repoRoot, id, item, targetBranch, timeoutMs);
-            if (catchupResult.outcome === 'conflict') {
-              addFriction(dir, {
-                id,
-                disposition: 'blocked',
-                errorClass: 'merge-conflict',
-                layer: 'state',
-                attempts: 1,
-                detail: `sync-root catchup (inbound gate): git merge --no-commit --no-ff ${targetBranch} into ${branch} conflicted; merge aborted, ${branch} unchanged`,
-              });
-              return { id, mode: 'sync-root', outcome: 'blocked', reason: 'merge-conflict', target: targetBranch, branch, conflictedFiles: catchupResult.conflictedFiles };
-            }
-            if (catchupResult.outcome === 'verify-fail') {
-              addFriction(dir, {
-                id,
-                disposition: 'blocked',
-                errorClass: catchupResult.timedOut ? 'verify-timeout' : 'verify-miss',
-                layer: 'verification',
-                attempts: 1,
-                detail: catchupResult.timedOut
-                  ? `sync-root catchup (inbound gate): goal-check timed out on staged merge into ${branch} after ${timeoutMs}ms — not a verify failure; merge aborted, ${branch} unchanged`
-                  : `sync-root catchup (inbound gate): goal-check failed on staged merge into ${branch} (exit ${catchupResult.exitStatus}); merge aborted, ${branch} unchanged`,
-              });
-              return { id, mode: 'sync-root', outcome: 'blocked', reason: catchupResult.timedOut ? 'verify-timeout' : 'verify-fail', timedOut: catchupResult.timedOut, target: targetBranch, branch, exitStatus: catchupResult.exitStatus, output: catchupResult.output };
-            }
-            effectiveItem = { ...item, branchHeadAtReturn: catchupResult.catchupHead };
-          }
-          return await withMergeEphemeralWorktree(repoRoot, item.parent, async (ephemeral) => runAndReport(ephemeral.path, repoRoot, true, effectiveItem));
-        }));
-      }
-      // tsk-66t: a root with no parent merges directly on the shared main
-      // checkout (runAndReport(repoRoot) below), unlike the item.parent
-      // branch above which merges in a throwaway ephemeral worktree. Same
-      // clean-tree gate `approve`'s own local-merge branch already applies
-      // before any git mutation (bin/fgos.mjs's `case 'approve'`) — without
-      // it, a dirty repoRoot here means `git commit --no-edit` (merge.mjs's
-      // mergeRunnerItem) sweeps another session's staged changes into this
-      // merge commit silently.
-      const ownFileSet = buildOwnFileSet(runnerOwnDiff, item.footprint);
-      if (!isMainTreeClean(repoRoot, ownFileSet)) {
-        throw new StoreError('validation', `sync-root: working tree at "${repoRoot}" is not clean — commit or stash pending changes before syncing "${id}".`);
-      }
-      return await runAndReport(repoRoot);
+      return await syncRootUseCase({ dir, repoRoot }, parseMergeClusterOptions('sync-root', flags, dir, { id }));
     }
 
     // tsk-3gx-3: Layer 2 action — takes N flat sibling item ids (D2: caller's
@@ -4253,137 +2949,30 @@ async function runVerb(verb, flags, positional, dir) {
       if (!Array.isArray(ids) || ids.length < 2) {
         throw new StoreError('validation', 'promote-to-component requires --ids (or positional args) listing at least 2 member item ids.');
       }
-
-      // repoRoot: process.cwd() by default -- isMainWorktree below then
-      // refuses outright when cwd is any linked worktree, catching a batch
-      // promotion that would otherwise merge member branches against that
-      // worktree's own (possibly stale) checkout. --trust-dir (tsk-2bg)
-      // opts into deriving repoRoot from --dir instead, the same
-      // substitution tsk-4uj already shipped for sync-root/approve
-      // (CONTEXT.md D5/D6) -- gated behind this explicit flag here, never
-      // the unconditional default: same posture as sync-root (merges land
-      // on a runner-owned integration branch, never main directly), so the
-      // caller must say it knows --dir is trustworthy rather than getting
-      // the relaxed behavior silently. Byte-identical to today when the
-      // flag is omitted. retargetMember's own isMainWorktree check
-      // (promote-engine.mjs:54) inherits this relaxation for free -- it
-      // receives this same repoRoot value unchanged, never re-derives it.
+      // repoRoot: process.cwd() by default -- the use case's isMainWorktree
+      // guard then refuses outright when cwd is any linked worktree,
+      // catching a batch promotion that would otherwise merge member
+      // branches against that worktree's own (possibly stale) checkout.
+      // --trust-dir (tsk-2bg) opts into deriving repoRoot from --dir
+      // instead, the same substitution tsk-4uj already shipped for
+      // sync-root/approve (CONTEXT.md D5/D6) -- gated behind this explicit
+      // flag here, never the unconditional default: same posture as
+      // sync-root (merges land on a runner-owned integration branch, never
+      // main directly), so the caller must say it knows --dir is
+      // trustworthy rather than getting the relaxed behavior silently.
+      // Byte-identical to today when the flag is omitted. retargetMember's
+      // own isMainWorktree check (promote-engine.mjs) inherits this
+      // relaxation for free -- it receives this same repoRoot value
+      // unchanged, never re-derives it.
       const repoRoot = flags['trust-dir'] === true ? path.dirname(dir) : process.cwd();
-      if (!isMainWorktree(repoRoot)) {
-        throw new StoreError(
-          'validation',
-          `promote-to-component: refusing to run from "${repoRoot}" — this must run from the main checkout, which a linked worktree structurally is not.`,
-        );
-      }
-
-      const view = listWork(dir);
-      for (const id of ids) {
-        const member = view.work[id];
-        if (!member) {
-          throw new StoreError('validation', `promote-to-component: work "${id}" not found.`);
-        }
-        if (member.parent) {
-          throw new StoreError('validation', `promote-to-component: "${id}" already has parent "${member.parent}" — only flat items (no parent yet) can be promoted.`);
-        }
-      }
-      // D2 light validation: the given ids must form one connected set via
-      // deps/mergeAfter (undirected) — never re-deriving WHICH items belong
-      // together (that judgment stays outside this action), only confirming
-      // the caller's own claim is at least internally consistent.
-      const idSet = new Set(ids);
-      const adjacency = new Map(ids.map((id) => [id, new Set()]));
-      for (const id of ids) {
-        const member = view.work[id];
-        for (const other of [...(member.deps ?? []), ...(member.mergeAfter ?? [])]) {
-          if (idSet.has(other)) {
-            adjacency.get(id).add(other);
-            adjacency.get(other).add(id);
-          }
-        }
-      }
-      const visited = new Set([ids[0]]);
-      const queue = [ids[0]];
-      while (queue.length > 0) {
-        const current = queue.pop();
-        for (const neighbor of adjacency.get(current)) {
-          if (!visited.has(neighbor)) {
-            visited.add(neighbor);
-            queue.push(neighbor);
-          }
-        }
-      }
-      if (visited.size !== ids.length) {
-        throw new StoreError(
-          'validation',
-          `promote-to-component: ids [${ids.join(', ')}] are not all connected via deps/mergeAfter — not one component.`,
-        );
-      }
-
-      // D1: reuse an existing member as root (caller-designated via
-      // --root-id), or create a fresh milestone-style root item (requires
-      // --root-title) — both allowed, caller's choice.
-      let rootId = flags['root-id'];
-      let rootCreated = false;
-      if (rootId !== undefined) {
-        if (!view.work[rootId]) {
-          throw new StoreError('validation', `promote-to-component: --root-id "${rootId}" not found.`);
-        }
-      } else {
-        const rootTitle = requireField(flags['root-title'], 'promote-to-component requires --root-id (an existing member to promote) or --root-title (to create a fresh root item).');
-        rootId = generateId(rootTitle, Object.keys(view.work));
-        // A freshly created root is a pure milestone-style grouping item
-        // (tsk-5t3a precedent, no code of its own) — 'light'/'true' mirror
-        // that precedent's own minimal, trivially-true shape. 'light' is the
-        // floor of coding's declared `risk` vocabulary (DOMAINS.coding's
-        // `classification`), the same three values decompose.mjs's heavy-risk
-        // gate and priority-formula.mjs's RISK_DISCOUNTS already read.
-        addWork(dir, { id: rootId, title: rootTitle, kind: 'feature', status: 'todo', deps: [], refs: [], risk: 'light', verify: 'true' });
-        rootCreated = true;
-      }
-
-      resolveIntegrationBranch(repoRoot, rootId);
-
+      // Raw Number(), deliberately NOT resolveVerifyTimeoutMs: this verb
+      // has never read the runner config's verify timeout, and keeping it
+      // that way is the only way this stays a pure move.
       const timeoutMs = flags.timeout !== undefined ? Number(flags.timeout) : undefined;
-      const results = [];
-      for (const id of ids) {
-        if (id === rootId) {
-          results.push({ id, outcome: 'skipped', reason: 'is-root' });
-          continue;
-        }
-        const member = view.work[id];
-        const outcome = await retargetMember(repoRoot, member, rootId, timeoutMs ? { timeoutMs } : {});
-        if (outcome.outcome === 'merged') {
-          // The real git merge already landed at this point — a rejection
-          // here (e.g. a deps+parent graph cycle assertNoUnifiedCycle
-          // catches) means the bookkeeping half of "CHỈ khi git thành công
-          // thật mới set field parent" failed even though the git half
-          // truly succeeded. Report that distinctly rather than either
-          // claiming a clean 'merged' or letting the exception abort every
-          // remaining member's own processing.
-          try {
-            editWork(dir, { id, patch: { parent: rootId } });
-            results.push(outcome);
-          } catch (err) {
-            results.push({ id, outcome: 'merged-parent-rejected', reason: err.message });
-          }
-        } else {
-          results.push(outcome);
-        }
-      }
-
-      const merged = results.filter((r) => r.outcome === 'merged').map((r) => r.id);
-      const notMerged = results.filter((r) => r.outcome !== 'merged' && r.outcome !== 'skipped');
-      const { event } = addDecision(dir, {
-        text: `promote-to-component: root "${rootId}"${rootCreated ? ' (newly created)' : ' (existing member promoted)'} — merged [${merged.join(', ') || 'none'}]${notMerged.length > 0 ? `, not merged: ${notMerged.map((r) => `${r.id} (${r.reason})`).join(', ')}` : ''}`,
-        rationale: 'fgos promote-to-component — converges flat siblings into one component before merging to main, per docs/history/promote-to-component/CONTEXT.md',
-        id: rootId,
-        // Same reasoning as sync-root's own record above: converging
-        // siblings into a component is machinery, so this must not read as
-        // reflection at the retrospective gate.
-        kind: 'engine',
-      });
-
-      return { rootId, rootCreated, results, seq: event.seq };
+      return await promoteToComponentUseCase(
+        { dir, repoRoot },
+        { ids, rootId: flags['root-id'], rootTitle: flags['root-title'], timeoutMs },
+      );
     }
 
     // Cổng duyệt — reject (pr-lifecycle D4): awaiting-approval -> todo, reason
@@ -4394,66 +2983,12 @@ async function runVerb(verb, flags, positional, dir) {
     case 'reject': {
       const id = requireField(positional[0] ?? flags.id, 'reject requires an id: fgos reject <id> --reason "..."');
       const reason = requireField(flags.reason, 'reject requires --reason "..."');
-      const item = listWork(dir).work[id];
-      if (!item) {
-        throw new StoreError('validation', `reject: work "${id}" not found.`);
-      }
-      if (item.status !== 'awaiting-approval') {
-        throw new StoreError('precondition', `reject: work "${id}" is "${item.status}", not "awaiting-approval" — nothing to reject.`);
-      }
-      const { event } = moveWork(dir, { id, to: 'todo', expectedStatus: 'awaiting-approval', reason, role: 'human' });
-      return { id, from: 'awaiting-approval', to: 'todo', reason, seq: event.seq };
+      return rejectUseCase({ dir }, { id, reason });
     }
 
-    // Catch-up-by-merge (D6/D7/D11, fan-out-parallel): the unified mechanism
-    // that bounces a parked item — a root drift-parked at root->main (D7) or
-    // a leaf conflict-parked at leaf->parent (D11), same git mechanics
-    // either way per the real-conflict spike
-    // (.bee/spikes/fan-out-parallel/catchup-real-conflict-probe.sh) — by
-    // merging the current TARGET (main for a root/standalone item, the
-    // resolved parent's branch for a leaf) into the item's OWN branch,
-    // re-verifying, and either landing the merge (blocked -> awaiting-approval, D18's
-    // edge, mechanical/uncounted per D11) or aborting clean and leaving the
-    // item blocked for a human. Deliberately does NOT call mergeRunnerItem
-    // (merge.mjs) — that merges the item's branch INTO the caller's checkout,
-    // the opposite direction catchup needs, and its source ref is hardcoded
-    // to the item's own branch (main as a *source* cannot be expressed
-    // through it) — so the git sequence is written inline here instead,
-    // mirroring the spike's proven shape (merge --no-commit --no-ff ->
-    // verify -> commit-or-abort, verify strictly before any commit).
     case 'catchup': {
       const id = requireField(positional[0] ?? flags.id, 'catchup requires an id: fgos catchup <id> [--timeout <ms>|--no-timeout]');
       const timeoutMs = resolveVerifyTimeoutMs('catchup', flags, path.dirname(dir));
-
-      const view = listWork(dir);
-      const item = view.work[id];
-      if (!item) {
-        throw new StoreError('validation', `catchup: work "${id}" not found.`);
-      }
-      if (item.status !== 'blocked') {
-        throw new StoreError('precondition', `catchup: work "${id}" is "${item.status}", not "blocked" — nothing to catch up.`);
-      }
-
-      // Only a merge-related park is something this mechanism can address —
-      // any other blocked reason (e.g. anti-loop-max-visits,
-      // runner-crash-reclaim) needs a human's real take/return rework
-      // instead, never an automated catch-up. tsk-18a D1: a
-      // 'merge-failed-unclassified' park is actually the BEST fit for
-      // catchup among these four — the failure wasn't a real conflict, so
-      // simply re-attempting the merge (which is exactly what catchup
-      // does) may just succeed once whatever transient condition caused it
-      // has passed.
-      // tsk-53o: 'verify-timeout-post-merge' joins this set deliberately —
-      // a timed-out post-merge check is exactly the transient condition
-      // this comment already describes, and catchup (a retry) is the
-      // correct next step for it, not a manual rework.
-      // tsk-4hj D2: 'merge-blocked-other-item' joins this set the same way
-      // 'merge-failed-unclassified' did — the block is a DIFFERENT item's
-      // still-in-progress merge, not this item's own conflict, so a retry
-      // once that other merge finishes or gets aborted is the natural
-      // recovery, not a manual rework.
-      const CATCHUP_REASONS = new Set(['merge-conflict', 'verify-fail-post-merge', 'verify-timeout-post-merge', 'integration-drift', 'merge-failed-unclassified', 'merge-blocked-other-item']);
-
       // repoRoot from --dir, never raw process.cwd() (tsk-5vl, same class
       // as tsk-k8u's take/pick fix): a caller running catchup from inside
       // the item's own linked worktree (e.g. a session that just hit
@@ -4465,69 +3000,10 @@ async function runVerb(verb, flags, positional, dir) {
       // branch it is about to force-update, which git refuses ("Cannot
       // force update the current branch"). Byte-identical to today when
       // --dir is omitted (dataDir() resolves dir from process.cwd() too
-      // in that case). Computed here, before the eligibility check below,
-      // so both can share it.
-      const repoRoot = path.dirname(dir);
-
-      // tsk-2q8: a `cleanup -> blocked` park caused specifically by
-      // checkMergeStillResolves (e.g. a root branch rebased-not-pruned) is
-      // ALSO catchup-eligible — re-merging the target into this item's own
-      // branch and re-verifying is exactly what recovers it (a genuinely
-      // stale commit becomes a fresh, real descendant of the target). Its
-      // `reason` is never one of the short enum values above though — the
-      // cleanup verb (see the `case 'cleanup'` block) records the FULL
-      // human-readable diagnostic text there instead (possibly joined with
-      // an UNRELATED failure like missing retrospective content), so it can
-      // never match CATCHUP_REASONS by content, and a plain "was this
-      // parked from cleanup" check would be too broad — merging fixes a
-      // stale-ancestry gap, not a missing-retrospective-content one, so it
-      // must not be trusted to resolve that second kind of park. Re-run the
-      // exact check live instead of trusting stored text: if
-      // `checkMergeStillResolves` fails for this item right now, that IS
-      // the fact catchup's own merge-and-reverify would flip, independent
-      // of whatever else `reason` says.
-      const mergeStillFails = !checkMergeStillResolves(repoRoot, item, { view, id }).ok;
-      if (!CATCHUP_REASONS.has(item.reason) && !mergeStillFails) {
-        throw new StoreError(
-          'validation',
-          `catchup: work "${id}" is blocked for reason "${item.reason ?? '(none)'}" — catchup only resolves a merge-related park (merge-conflict/verify-fail-post-merge/verify-timeout-post-merge/integration-drift/merge-failed-unclassified) or a cleanup-harness merge-ancestry park; use take/return for a manual rework instead.`,
-        );
-      }
-
-      const ownBranch = branchNameFor(id);
-      // Guards against a human hand-forcing an inapplicable blocked state
-      // (e.g. `fgos move <id> --to blocked --reason integration-drift` on a
-      // branchless pull/legacy item) from silently creating a bogus branch
-      // instead of failing loudly — checked before any git operation runs.
-      if (!branchExists(repoRoot, ownBranch)) {
-        throw new StoreError(
-          'validation',
-          `catchup: work "${id}" has no live branch "${ownBranch}" — this blocked state was not produced by a merge-related park; refusing rather than creating a bogus branch.`,
-        );
-      }
-
-      // Leaf (resolved root is a DIFFERENT item) targets its parent's
-      // integration branch; a root/standalone item (resolved root is
-      // itself) targets main — the exact D3/D11 split `approve` already
-      // uses (resolveRoot).
-      const rootId = resolveRoot(view, id);
-      const target = rootId !== id ? branchNameFor(rootId) : 'main';
-
-      // tsk-4ax: the git merge/verify/commit MECHANICS are shared with
-      // approve's own inbound pre-check below (performCatchUp) — this case
-      // owns only what's specific to the manual-recovery entry point: the
-      // blocked/CATCHUP_REASONS precondition above, and the moveWork/
-      // friction bookkeeping below.
-      const result = await performCatchUp(repoRoot, id, item, target, timeoutMs);
-      if (result.outcome === 'already-caught-up' || result.outcome === 'merged') {
-        const { event } = moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'blocked', role: 'runner', branchHeadAtReturn: result.catchupHead });
-        return { id, outcome: result.outcome, from: 'blocked', to: 'awaiting-approval', target, branch: ownBranch, seq: event.seq, output: result.output };
-      }
-      if (result.outcome === 'verify-fail') {
-        return { id, outcome: 'verify-fail', timedOut: result.timedOut, target, branch: ownBranch, exitStatus: result.exitStatus, output: result.output };
-      }
-      // 'conflict'
-      return { id, outcome: 'conflict', target, branch: ownBranch, conflictedFiles: result.conflictedFiles };
+      // in that case). This verb has no `--trust-dir` gate, unlike
+      // approve/sync-root/promote-to-component — a real per-verb
+      // difference the adapter owns.
+      return await catchupUseCase({ dir, repoRoot: path.dirname(dir) }, { id, timeoutMs });
     }
 
     // Gate A — candidate ranking (self-improve-loop P13 Slice 1, D1/D3/D6):
