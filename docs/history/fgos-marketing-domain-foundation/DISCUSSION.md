@@ -2,16 +2,18 @@
 
 ## 1. Trạng thái hiện tại
 
-Vòng 2: hai scout rẻ (haiku) đã quét xong cơ chế điều phối của fgOS và của
-marketing-cockpit; tiến trình `fable` (model claude-fable-5, agent
-`brainstormer`) đã phản biện/so sánh xong (§5, §6). Kết quả đã trình bày cho
-người dùng, đang mở vòng thảo luận trực tiếp — chưa D-ID nào được chốt (§4
-còn trống, đúng như kỳ vọng của giai đoạn brainstorm mở). Câu hỏi trọng tâm
-đang chờ người dùng phản hồi: (a) có chấp nhận judge-gate (LLM-graded
-rubric) là "proof" hợp lệ cho domain marketing, đối chiếu luật L5 DoD đã
-khoá hay không; (b) có đồng ý với phạm vi "day-one" tối giản mà fable đề
-xuất (DOMAINS entry + port skill + template-stamper + cron-driven `fgos
-add`, hoãn signal bus) hay không.
+Vòng 3: sau vòng scout (haiku ×2) + phản biện fable (§5), người dùng mở
+rộng đề bài — không chỉ absorption marketing-cockpit nữa mà là mô hình
+harness tổng quát cho team đa role: FSM/routing gác đường +
+workflow-composition + checkpoint hạt mịn + signal/event bus, làm
+foundation cơ học cho một "team soul" hoạt động bên trên. Em đã đề xuất mô
+hình "mechanism vs policy" ba trục (status × stage × role/holder) + verb
+`handoff` có guard (chi tiết trong Q&A cuối §5, sơ đồ mermaid ở tin nhắn
+phiên). Chưa D-ID nào được chốt (§4 trống — đúng kỳ vọng brainstorm mở).
+Câu hỏi đang chờ người dùng: #7 (judge-gate vs luật L5 DoD), #8 (trục
+role/holder cho ping-pong đa role), #9 (bật role cho domain nào), #10
+(định nghĩa cụ thể "team soul"). §6 hiện vẫn là synthesis của vòng 2 —
+sẽ regenerate toàn bộ khi anh phản hồi vòng 3 vì shape có thể đổi lớn.
 
 ## 2. Mục tiêu & đề bài
 
@@ -38,6 +40,9 @@ cụ thể của domain "marketing" trên fgOS sẽ trông như thế nào.
 | 5 | fgOS nên port nguyên cơ chế signal/routing/priority 3-file của cockpit, hay chỉ port khái niệm và biểu diễn lại qua DOMAINS registry + event log? | Rõ (đề xuất của fable) | Routing/delegation/priority 3-file → gộp về 1 DOMAINS entry (fgOS thắng, prose-enforced protocol là liability). Signal → biểu diễn lại như event có typed payload trong `.fgos/events.jsonl` + projection theo consumer cursor, KHÔNG tạo store thứ hai — chỉ phần "frontier trở nên ready khi có signal khớp, kể cả cho item chưa tồn tại" là engine work thật (deps không biểu diễn được fan-out tới item chưa sinh ra) |
 | 6 | Domain "marketing" thật trên fgOS cần engine mới (capability thật) ở đâu, và đâu chỉ là cấu hình (thêm DOMAINS entry)? | Rõ (đề xuất của fable) | Cấu hình thuần: DOMAINS entry (stages/skillMap/statusLabels/parkReason/worktreeBacked), gate-rigor table. Engine thật: (a) signal event + consumer projection + frontier signal-readiness, (b) `fgos expand <template>` verb (workflow-template → item-tree stamper), (c) `fgos gate` judge-runner nhỏ, (d) không có scheduler — đề xuất cron ngoài gọi `fgos add` trước, chỉ xây trigger primitive nếu cron chứng minh không đủ |
 | 7 | Judge-gate (LLM-graded rubric cho brand voice/legal/factual) có được tính là "proof" hợp lệ theo luật L5 DoD (platform-foundations.md, "reproducibly verifiable result") không? | Chưa rõ — cần người quyết | Đây là rủi ro sắc nhất fable nêu: nếu không chấp nhận, mọi item marketing rơi về `awaiting-human`, frontier nghẽn ở người, "release con người" (ưu tiên #2) sụp đổ đúng domain vừa thêm, và compound-learn loop mất tín hiệu hữu ích. Cần quyết định tường minh trước khi làm, không phải phát hiện ở item thứ 30 |
+| 8 | Ping-pong đa role (review/cải thiện qua lại nhiều vòng, nhiều agent-type) biểu diễn bằng gì: trục thứ ba `role/holder` + verb `handoff` có guard, hay child-item mỗi vòng, hay loop qua status FSM? | Chưa rõ — đề xuất trục role, chờ người dùng | Vòng 3. Em đề xuất trục role vì: giữ số item không nổ (mỗi vòng review không sinh item mới), guard được "route bậy" bằng role-graph khai báo per-domain, và mỗi handoff tự nhiên là một checkpoint hạt mịn — ba yêu cầu của anh cùng lúc. Trade-off: work item thêm một trục trạng thái, event schema thêm verb |
+| 9 | Trục role bật cho domain nào: chỉ marketing trước, hay retrofit cả coding (hiện coding chỉ có 1 vòng doing ↔ awaiting-approval và đang đủ)? | Chưa rõ | YAGNI nghiêng về "chỉ domain khai báo role-graph mới có" — coding giữ nguyên tới khi thật sự cần |
+| 10 | "Team soul" bên trên harness — định nghĩa cụ thể là gì (persona/judgment per role như cockpit agents? tầng orchestrator thông minh? cả hai?) và nó sống ở đâu trong repo (skill? agent definition? DOMAINS?) | Chưa rõ — cần người mô tả thêm | Vòng 3 — anh nói soul hiện tại "khá cơ học và tuyến tính"; cần anh phác hoạ soul mong muốn để tách đúng đường ranh mechanism/policy |
 
 ## 4. Quyết định đã chốt
 
@@ -100,6 +105,32 @@ cụ thể của domain "marketing" trên fgOS sẽ trông như thế nào.
   người". Đường đi tối giản day-one: DOMAINS entry + port skill +
   template-stamper + cron-driven `fgos add`, hoãn signal bus tới khi có
   use-case fan-out cụ thể (vd brand-voice invalidation).
+
+- **2026-08-15 15:02 — Người dùng mở rộng đề bài (vòng 3)**: bối cảnh team
+  (coding hoặc marketing) có nhiều agent-type (role/title), nhiều loại
+  task, các vòng review/cải thiện đẩy việc qua lại nhiều lần — flow không
+  được giới hạn tuyến tính; agent đẩy việc qua lại tự do, nhưng FSM/routing
+  core phải gác không cho đi sai đường (agent route bậy thì bị chặn). Yêu
+  cầu: kết hợp cả bốn — FSM/routing + workflow-composition + checkpoint
+  hạt mịn + signal/event bus — thành bộ core harness cứng, cơ học, đẩy
+  việc uyển chuyển, làm foundation cho một "team soul" hoàn chỉnh hoạt
+  động bên trên (soul hiện tại còn cơ học và tuyến tính). → Phản hồi của
+  em (tóm tắt; đầy đủ ở tin nhắn phiên làm việc): đề xuất tách
+  "mechanism vs policy" — harness chỉ gác legality + ghi sự thật, soul
+  chọn edge; thêm trục thứ ba `role/holder` (trực giao với status × stage)
+  + verb `handoff` có guard theo role-graph khai báo per-domain trong
+  DOMAINS; ping-pong review = chuỗi handoff event trong CÙNG một item
+  (không phải stage mới, không phải item mới); mỗi handoff là một
+  checkpoint tự nhiên (context snapshot trong event payload + worktree
+  commit); quy tắc phân ranh: cùng item → handoff, khác item/cây → signal.
+  Cảnh giác YAGNI: coding hiện chỉ có 1 vòng ping-pong (doing ↔
+  awaiting-approval) và đang đủ — role-graph chỉ bật cho domain khai báo
+  nó, không retrofit coding ngay. Ba câu hỏi mở đã đặt cho anh: (a) chấp
+  nhận trục role/holder là trục thứ ba của work item, hay muốn biểu diễn
+  ping-pong cách khác (child-item mỗi vòng / loop qua status); (b) coding
+  có nâng cấp ngay không hay marketing dùng trước; (c) "team soul" anh
+  hình dung cụ thể là gì — persona/judgment per role như cockpit's
+  agents, hay một tầng orchestration thông minh hơn? Chưa chốt gì.
 
 ## 6. Thiết kế đã chốt {#design}
 
