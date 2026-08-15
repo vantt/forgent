@@ -43,21 +43,6 @@
           "standard": "lightweight",
           "heavy": "lightweight"
         }
-      },
-      "gitnexus": {
-        "kind": "mcp",
-        "capability": "impact-analysis",
-        "probeCommand": "mcp:gitnexus",
-        "scanTarget": ".gitnexus",
-        "responsibility": "Verification",
-        "description": "Code-graph blast radius"
-      },
-      "herdr": {
-        "kind": "cli",
-        "capability": "pane-labeling",
-        "probeCommand": "herdr",
-        "responsibility": "Chrome",
-        "description": "herdr pane label writer (herdr pane rename) for /fgOS:terminal"
       }
     },
     "timeoutMs": 900000,
