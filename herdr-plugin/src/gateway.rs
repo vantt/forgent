@@ -32,6 +32,7 @@ use axum::routing::{delete, get, post};
 use axum::{Json, Router};
 use serde::Deserialize;
 use tower_http::cors::{Any, CorsLayer};
+use tower_http::services::{ServeDir, ServeFile};
 use serde_json::{json, Value};
 
 use crate::ports::VerbGateway;
@@ -953,6 +954,61 @@ pub fn build_router(gateway: Arc<dyn VerbGateway>, config: GatewayConfig, root: 
     Router::new().nest("/v1", api).with_state(state).layer(cors)
 }
 
+/// tsk-48w (D14): `herdr-plugin/web`'s built bundle, embedded into the
+/// binary at compile time. `herdr-plugin/build.rs` guarantees `static/`
+/// exists even before `npm run bundle` has run, so this derive never
+/// fails `cargo build`/`test`/`clippy` on a fresh checkout -- it just
+/// embeds an empty directory until the bundle exists. `debug-embed`
+/// forces real embedding in every profile (not just `--release`), same
+/// choice the reference implementation herdr-gateway makes
+/// (`herdr-gateway/src/web/mod.rs:28`) and for the same reason: a debug
+/// build must be able to prove serving works, not just a release one.
+#[derive(rust_embed::RustEmbed, Clone)]
+#[folder = "static/"]
+struct WebAssets;
+
+/// tsk-48w (D14): wraps an already-built [`Router`] with the web
+/// dashboard's static-serving fallback, gated by `enabled` (the
+/// `herdrWebDashboard.staticServing` toggle, `settings::
+/// read_web_dashboard_settings`). Deliberately NOT a `build_router`
+/// parameter -- `build_router` already has 9+ existing tests (CORS, auth,
+/// error-envelope behavior) that never touch this fallback; wrapping
+/// keeps their blast radius at zero instead of forcing every one of them
+/// to learn a new argument to reach code they don't exercise.
+///
+/// When `enabled` is `false`, `router` is returned unchanged -- an
+/// unmatched route still gets axum's own default empty-body 404 (no
+/// `.fallback()` was set on `build_router`'s own output before this
+/// wrapper existed; confirmed by reading `build_router` directly, not
+/// assumed). When `true`:
+/// an on-disk `<static_dir>/index.html` (dev override, e.g. `vite`'s dev
+/// build copied next to the binary) takes priority over the embedded
+/// bundle; otherwise the compiled-in [`WebAssets`] serves. Both branches
+/// SPA-fallback an unmatched path to `index.html` with 200, matching the
+/// reference implementation's own router (`herdr-gateway/src/web/mod.rs:
+/// 97-113`) this is ported from. The fallback only ever catches a route
+/// `build_router`'s own `/v1/*` tree did NOT match -- every `/v1/*` route
+/// keeps its existing `require_token` gate untouched, since `.nest("/v1",
+/// ...)` inside `build_router` already claims that whole prefix before
+/// this fallback is ever consulted.
+pub fn with_static_serving(router: Router, enabled: bool, static_dir: &Path) -> Router {
+    if !enabled {
+        return router;
+    }
+    let index = static_dir.join("index.html");
+    if index.exists() {
+        let spa = ServeDir::new(static_dir).fallback(ServeFile::new(index));
+        router.fallback_service(spa)
+    } else {
+        let embedded = axum_embed::ServeEmbed::<WebAssets>::with_parameters(
+            Some("index.html".to_string()),
+            axum_embed::FallbackBehavior::Ok,
+            Some("index.html".to_string()),
+        );
+        router.fallback_service(embedded)
+    }
+}
+
 /// Runs the gateway to completion (i.e. forever, until the process is
 /// killed). Builds its own multi-threaded tokio runtime — the rest of
 /// `herdr-fgos` (the TUI) stays fully synchronous, so only this entry point
@@ -973,7 +1029,13 @@ pub fn run(root: PathBuf) -> std::io::Result<()> {
     }
     let addr: SocketAddr = (config.bind, config.port).into();
     let gateway: Arc<dyn VerbGateway> = Arc::new(FgosCliGateway { root: root.clone() });
+    // tsk-48w (D14): static-serving toggle read from the SAME shared
+    // config file `load_gateway_config` already reads (`~/.fgos/
+    // config.json`'s sibling section `herdrWebDashboard`), fail-open
+    // default per `settings::WebDashboardSettings`'s own doc comment.
+    let web_settings = crate::settings::read_web_dashboard_settings(&root);
     let router = build_router(gateway, config, root);
+    let router = with_static_serving(router, web_settings.static_serving, Path::new("static"));
 
     let runtime = tokio::runtime::Runtime::new()?;
     runtime.block_on(async move {
@@ -1360,6 +1422,124 @@ mod tests {
             response.headers().get(axum::http::header::ACCESS_CONTROL_ALLOW_ORIGIN),
             Some(&axum::http::HeaderValue::from_static("*")),
             "a cross-origin request must come back with an Access-Control-Allow-Origin header"
+        );
+    }
+
+    // tsk-48w: `with_static_serving` -- gated by the `herdrWebDashboard.
+    // staticServing` toggle (settings.rs), disabled per-test unless the
+    // test itself is about the enabled path.
+
+    #[tokio::test]
+    async fn static_serving_disabled_leaves_unmatched_route_as_plain_404() {
+        use axum::body::Body;
+        use axum::http::Request;
+        use tower::ServiceExt;
+
+        let gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({})) });
+        let router = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+        let router = with_static_serving(router, false, Path::new("static"));
+
+        let response = router
+            .oneshot(Request::builder().uri("/some/unmatched/path").body(Body::empty()).unwrap())
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::NOT_FOUND);
+    }
+
+    #[tokio::test]
+    async fn static_serving_enabled_serves_the_embedded_bundle_for_an_unmatched_route() {
+        use axum::body::Body;
+        use axum::http::Request;
+        use tower::ServiceExt;
+
+        let gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({})) });
+        let router = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+        // A static_dir with no index.html forces the embedded-bundle
+        // branch (WebAssets, compiled from herdr-plugin/static/) rather
+        // than the on-disk dev-override branch.
+        let empty_dir = std::env::temp_dir().join(format!("fgos-gateway-embed-test-{}", std::process::id()));
+        std::fs::create_dir_all(&empty_dir).unwrap();
+        let router = with_static_serving(router, true, &empty_dir);
+
+        let response = router
+            .oneshot(Request::builder().uri("/dashboard").body(Body::empty()).unwrap())
+            .await
+            .unwrap();
+        assert_eq!(
+            response.status(),
+            StatusCode::OK,
+            "SPA fallback must serve index.html (200), not 404, for an unmatched client route"
+        );
+        std::fs::remove_dir_all(&empty_dir).ok();
+    }
+
+    #[tokio::test]
+    async fn static_serving_enabled_prefers_the_on_disk_override_over_the_embedded_bundle() {
+        use axum::body::Body;
+        use axum::http::Request;
+        use tower::ServiceExt;
+
+        let gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({})) });
+        let router = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+        let dev_dir = std::env::temp_dir().join(format!("fgos-gateway-override-test-{}", std::process::id()));
+        std::fs::create_dir_all(&dev_dir).unwrap();
+        let marker = "FGOS_DEV_OVERRIDE_MARKER_TSK_48W";
+        std::fs::write(dev_dir.join("index.html"), format!("<html>{marker}</html>")).unwrap();
+        let router = with_static_serving(router, true, &dev_dir);
+
+        let response = router
+            .oneshot(Request::builder().uri("/dashboard").body(Body::empty()).unwrap())
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = axum::body::to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        assert!(
+            String::from_utf8_lossy(&body).contains(marker),
+            "an on-disk <static_dir>/index.html must override the embedded bundle, not the other way around"
+        );
+        std::fs::remove_dir_all(&dev_dir).ok();
+    }
+
+    #[tokio::test]
+    async fn static_serving_never_shadows_an_existing_v1_route_or_its_auth_gate() {
+        use axum::body::Body;
+        use axum::http::Request;
+        use tower::ServiceExt;
+
+        let gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({"items": []})) });
+        let router = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+        let router = with_static_serving(router, true, Path::new("static"));
+
+        // Unauthenticated -- must still be rejected by require_token, never
+        // silently served the SPA fallback instead.
+        let unauth = router
+            .clone()
+            .oneshot(Request::builder().uri("/v1/ready").body(Body::empty()).unwrap())
+            .await
+            .unwrap();
+        assert_eq!(
+            unauth.status(),
+            StatusCode::UNAUTHORIZED,
+            "the static-serving fallback must never shadow /v1/ready's own auth gate"
+        );
+
+        // Authenticated -- must reach the real handler, not the SPA
+        // fallback's index.html.
+        let auth = router
+            .oneshot(
+                Request::builder()
+                    .uri("/v1/ready")
+                    .header(axum::http::header::AUTHORIZATION, "Bearer test-token")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(auth.status(), StatusCode::OK);
+        assert_eq!(
+            auth.headers().get(axum::http::header::CONTENT_TYPE).map(|v| v.as_bytes()),
+            Some(b"application/json".as_slice()),
+            "an authenticated /v1/ready must still return the real JSON envelope, not the SPA's text/html index.html"
         );
     }
 }

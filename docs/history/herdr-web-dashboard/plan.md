@@ -466,6 +466,144 @@ radius chưa xác nhận, cross-check bằng `rg`).
 READY WITH CONSTRAINTS
 ```
 
+## NẮN LẠI P1 `tsk-48w` (2026-08-15, sau realignment D14) — supersede mục ngay trên
+
+**Đọc trước:** mục "Reality gate riêng của P1" ngay trên (2026-08-12) chốt
+`READY WITH CONSTRAINTS` cho một scope đã CHẾT một phần — nó còn giữ cụm
+D9 gốc (`.fgos/herdr-web-secret`, verify mệnh đề `git check-ignore -q
+.fgos/herdr-web-secret`). `docs/history/herdr-web-dashboard-plan-
+realignment/CONTEXT.md` D14 (2026-08-15) đã nắn: **bỏ hẳn** phần secret
+(D13 của cùng tài liệu: web client dùng Bearer có sẵn của gateway, không
+còn secret riêng nào); **giữ nguyên** phần cờ static-serving + đăng ký
+`fgos setup`/`doctor`. Mục này không mở lại D1-D11 của `CONTEXT.md` gốc —
+chỉ áp D14 vào phần shape/verify cụ thể của con `tsk-48w`.
+
+Item cũng phát hiện đang `stage: planning` với `verify` cũ còn nguyên
+mệnh đề chết (`git check-ignore -q .fgos/herdr-web-secret` — không file
+nào như vậy còn được tạo ra nữa) — verify này giờ **không bao giờ pass
+được**, đúng loại lỗi fail-closed F1/F2 mục "Reality gate — vòng 1" ở
+trên đã cảnh báo, chỉ khác nguyên nhân (drift theo thời gian, không phải
+lỗi viết ban đầu).
+
+### Mode: giữ nguyên `high-risk` (không đếm lại)
+
+Lane cũ (5 flag, 1 hard-gate audit/security — dòng `.gitignore` ngăn
+commit bundle output) vẫn đúng nguyên xi cho scope mới: vẫn thêm hình
+dạng config bền (data model), vẫn có `.gitignore` (audit/security
+hard-gate — giờ ngăn commit **bundle output**, không phải secret, nhưng
+cùng loại rủi ro "quên .gitignore thì commit thứ không nên commit"), vẫn
+đăng ký `fgos doctor` check (public contracts), vẫn dùng chung
+`registrations.mjs`/162 test `test/setup` (existing covered behavior),
+vẫn Node+Rust (multi-domain). Bớt một chi tiết (không còn "secret path"
+cụ thể) không đổi flag nào trong 5 flag đã đếm.
+
+### Approach
+
+**Cổng chịu lực (D14 chưa nói cách làm, chỉ nói "cờ + đăng ký"):** làm
+việc phục vụ static bundle THẬT, gated bởi cờ — không chỉ một field cấu
+hình chết không có tác dụng gì. Port nguyên idiom đã kiểm chứng của
+`herdr-gateway` (repo tham khảo cụm này đã dùng nhiều lần —
+`herdr-plugin/src/gateway.rs`'s CORS/bind của `tsk-54y` cũng port từ
+đây):
+
+1. **`herdr-plugin/web/package.json`** — thêm script `bundle`
+   (`"tsc -b && vite build --outDir ../static --emptyOutDir"`). Đã chạy
+   thật tại validating pass này: `npm run bundle` (sau `npm ci`) sinh
+   `herdr-plugin/static/{index.html,assets/,favicon.svg}` thật — 408ms,
+   không lỗi.
+2. **`herdr-plugin/build.rs`** (chưa tồn tại — xác nhận `find herdr-plugin
+   -maxdepth 1 -name build.rs` = rỗng, khớp D14) — port tối giản từ
+   `herdr-gateway/build.rs:1-13` (chỉ phần `create_dir_all("static")`,
+   KHÔNG port phần fingerprint/git-sha — D14 chỉ khoá phần guarantee, thứ
+   kia là tiện ích riêng của `herdr-go` chưa từng được khoá ở đây).
+3. **`herdr-plugin/Cargo.toml`** — `rust-embed = { version = "8", features
+   = ["debug-embed"] }` + `axum-embed = "0.1"` (bằng chứng thật, `cargo add
+   --dry-run` tại pass này: resolve `rust-embed v8.12.0`, `axum-embed
+   v0.1.0`, không xung đột với đồ thị dep hiện có — cùng version `rust-
+   embed` reference `herdr-gateway/Cargo.toml:37` dùng). Thêm feature `fs`
+   vào `tower-http` đã có (từ `tsk-54y`) — cần cho `ServeDir`/`ServeFile`
+   (đã probe: `cargo add tower-http --features fs --dry-run` resolve sạch
+   ở `v0.7`, khớp version hiện tại).
+4. **`.gitignore`** (root — không có `.gitignore` riêng trong
+   `herdr-plugin/`, xác nhận `find herdr-plugin -name .gitignore` = rỗng)
+   — thêm dòng `herdr-plugin/static/`.
+5. **`herdr-plugin/src/settings.rs`** — thêm `WebDashboardSettings {
+   static_serving: bool }`, đọc từ section `herdrWebDashboard`. **Khác
+   philosophy với `OrchestratorSettings` láng giềng trong CÙNG FILE**:
+   `OrchestratorSettings::default()` fail-closed (mọi toggle off) vì
+   không toggle nào trong 4 cái đó an toàn khi bật nhầm; `static_serving`
+   fail-**open** (mặc định `true`) là quyết định CÓ CHỦ Ý của D10 (cụm
+   gốc) — máy được chọn phục vụ trang mà không cần bước setup thêm. Phải
+   ghi comment rõ divergence này ngay tại chỗ để người đọc sau không tưởng
+   nhầm là bug.
+6. **`herdr-plugin/src/gateway.rs`** — struct `WebAssets` (`#[derive(
+   rust_embed::RustEmbed, Clone)] #[folder = "static/"]`) + hàm
+   `with_static_serving(router: Router, enabled: bool, static_dir: &Path)
+   -> Router`, port đúng logic dev-override/embedded-fallback của
+   `herdr-gateway/src/web/mod.rs:97-113` (nếu `<static_dir>/index.html`
+   tồn tại trên đĩa → `ServeDir` + SPA fallback cho dev; không thì
+   `axum_embed::ServeEmbed<WebAssets>` cho binary release). **Không đổi
+   chữ ký `build_router`** — hàm mới bọc NGOÀI router đã build (gọi ở
+   `run()`, sau `build_router`), để 9 test hiện có của `build_router`
+   (CORS/auth/error-envelope — đo CRITICAL risk ở `impact` scan của
+   `tsk-54y`) không bị đụng tới. Đây chính là "smaller path" của reality
+   gate: đổi chữ ký sẽ buộc sửa cả 9 test đó chỉ để thêm MỘT nhánh mới,
+   trong khi bọc ngoài không đụng gì cũ.
+7. **`src/setup/registrations.mjs`** — port nguyên khuôn
+   `checkHerdrOrchestratorConfigured`/`DEFAULT_HERDR_ORCHESTRATOR_SETTINGS`
+   (`registrations.mjs:1502-1542`, đọc trực tiếp): `DEFAULT_HERDR_WEB_
+   DASHBOARD_SETTINGS = { staticServing: true }`, `registerConfigDefault
+   ({id:'herdrWebDashboard', key:'herdrWebDashboard', shape:...})`,
+   `registerCheck({id:'herdr-web-dashboard-configured', description,
+   check})` — check chỉ xác nhận section có mặt + `staticServing` là
+   boolean (khớp đúng khuôn láng giềng, không tự chế thêm điều kiện).
+
+**Phương án đã cân nhắc và loại:**
+- Đổi chữ ký `build_router` để nhận `web_settings` — loại vì đụng cả 9
+  test hiện có (CRITICAL theo `impact` scan) chỉ để thêm một fallback,
+  trong khi bọc ngoài đạt cùng kết quả với blast radius bằng 0 lên code
+  cũ.
+- Fingerprint/git-sha đầy đủ như `herdr-gateway/build.rs` — loại vì D14
+  chỉ khoá phần `create_dir_all`, phần kia là tiện ích không ai yêu cầu ở
+  đây (YAGNI).
+
+### Bản đồ rủi ro
+
+| Thành phần | Mức | Chứng minh gì |
+|---|---|---|
+| `npm run bundle` sinh `static/` đúng hình dạng RustEmbed cần | Thấp — đã chạy thật ở pass này | Output thật: `herdr-plugin/static/{index.html,assets/,favicon.svg}` |
+| `rust-embed`/`axum-embed` build được với đồ thị dep hiện tại | Thấp — đã `cargo add --dry-run` thật | `rust-embed v8.12.0`, `axum-embed v0.1.0`, không xung đột |
+| `with_static_serving` không đụng 9 test cũ của `build_router` | Trung bình — hàm mới, chưa viết | Bọc ngoài router đã build (không sửa `build_router` signature); proof point ở Execute: `cargo test --lib gateway` (verify sẵn có của `tsk-54y`, chạy lại) vẫn 19/19 xanh sau khi thêm hàm mới |
+| `static_serving` mặc định ON không vô tình bật lộ dữ liệu | Trung bình — đây là hard-gate audit/security của lane | `ServeEmbed`/`ServeDir` chỉ phục vụ đúng `herdr-plugin/static/` (bundle công khai, không chứa secret — token vẫn nằm ở `~/.fgos/config.json`, ngoài phạm vi thư mục này); route `/v1/*` vẫn giữ `require_token` layer nguyên vẹn (fallback chỉ bắt route KHÔNG khớp `/v1/*`) |
+| `.gitignore` thật sự chặn `static/` | Thấp | `git check-ignore -q herdr-plugin/static/<file>` — mệnh đề đối chứng giống hệt khuôn F-check đã dùng ở "Đã sửa" phía trên (đo đỏ trước khi thêm dòng, xanh sau) |
+
+### Verify mới (thay verify chết)
+
+```
+cargo test --manifest-path herdr-plugin/Cargo.toml web_dashboard_settings | grep -qE '[1-9][0-9]* passed' && cargo test --manifest-path herdr-plugin/Cargo.toml static_serving | grep -qE '[1-9][0-9]* passed' && node --test 'test/setup/**/*.test.mjs' && node bin/fgos.mjs doctor --json --dir . | grep -q 'herdr-web-dashboard-configured' && git check-ignore -q herdr-plugin/static/probe-file
+```
+
+Giữ đúng khuôn `<filter> | grep -qE '[1-9][0-9]* passed'` đã học từ F3 ở
+trên (không dùng filter trần, tránh vacuous pass khi filter không khớp
+gì). Hai filter (`web_dashboard_settings`, `static_serving`) là tên hàm
+test sẽ viết ở Execute — đặt tên trước ở đây để verify không phải sửa lại
+sau.
+
+### Decide the split
+
+Một mảnh — không tách. D14 không mở lại quyết định "1 item" của cụm gốc;
+7 việc trên (bundle script, build.rs, 2 dep Cargo, gitignore, settings.rs,
+gateway.rs, registrations.mjs) đều phục vụ đúng MỘT hành vi quan sát được
+("bật cờ thì gateway phục vụ trang thật; tắt thì không, và fgos doctor
+biết cờ đó có cấu hình đúng hay không") — tách nhỏ hơn sẽ tạo trạng thái
+trung gian không tự đứng được (vd: có `build.rs` mà chưa có
+`with_static_serving` thì không chứng minh được gì).
+
+### Outstanding questions
+
+None — D14 đã trả lời câu hỏi phạm vi duy nhất còn treo (secret sống hay
+chết); phần còn lại là cách làm, có tiền lệ thật để port.
+
 ## Kế hoạch riêng của P0a `tsk-54j` (2026-08-14) — area spec
 
 Con này (`docs`, `parent: tsk-ldb`, `deps: [tsk-7l9]`) được tạo sau 5 mảnh
