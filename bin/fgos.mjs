@@ -310,10 +310,20 @@ function parseWaitFlags(flags, verbName) {
 // their own refusal messages — forwarding from `merge next` therefore
 // builds the target verb's options with THAT verb's name, matching what the
 // recursive `runVerb` call produced before.
+// `resolveTimeoutMs` is a thunk, not a resolved value, and that is
+// load-bearing: `resolveVerifyTimeoutMs` falls through to
+// `ensureRunnerConfigForDir`, which WRITES a default runner config (and
+// warns on stderr) when none exists yet. Resolving it while building the
+// options would move that write ahead of every guard the use case runs —
+// `sync-root` used to resolve its timeout only after its item/worktree/
+// branch/Iron-Law guards, and `merge next` only ever resolved one by
+// actually reaching `approve`/`sync-root`, so a `{picked: null}` turn wrote
+// nothing at all. Each use case calls this at exactly the point its old
+// case block called `resolveVerifyTimeoutMs`.
 function parseMergeClusterOptions(verb, flags, dir, extra = {}) {
   const { noWait, waitMs } = parseWaitFlags(flags, verb);
   return {
-    timeoutMs: resolveVerifyTimeoutMs(verb, flags, path.dirname(dir)),
+    resolveTimeoutMs: () => resolveVerifyTimeoutMs(verb, flags, path.dirname(dir)),
     noWait,
     waitMs,
     acknowledgeIronLaw: flags['acknowledge-iron-law'] === true,

@@ -32,9 +32,9 @@ import { withLockRetry } from '../../runner/lock-wait.mjs';
 /**
  * @param {{dir: string, repoRoot: string}} ctx - `repoRoot` follows this
  *   verb's own `--trust-dir` policy, resolved by the adapter.
- * @param {{id: string, timeoutMs: number|null, noWait: boolean, waitMs: number|undefined, acknowledgeIronLaw: boolean}} options
+ * @param {{id: string, resolveTimeoutMs: () => number|undefined, noWait: boolean, waitMs: number|undefined, acknowledgeIronLaw: boolean}} options
  */
-export async function syncRootUseCase({ dir, repoRoot }, { id, timeoutMs, noWait, waitMs, acknowledgeIronLaw }) {
+export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs, noWait, waitMs, acknowledgeIronLaw }) {
   const view = listWork(dir);
   const item = view.work[id];
   if (!item) {
@@ -69,6 +69,11 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, timeoutMs, noWait
     throw new StoreError('validation', ironLawRefusal('sync-root', id, ironLaw));
   }
 
+  // Resolved here and not earlier — the exact position `case 'sync-root'`
+  // resolved it in before the use-case split. It is the first thing in this
+  // verb that can WRITE (a missing runner config), so every refusal above
+  // stays side-effect-free.
+  const timeoutMs = resolveTimeoutMs();
   const runMerge = (mergeFn) => (noWait ? mergeFn() : withLockRetry(mergeFn, { waitMs }));
 
   const runAndReport = async (mergeRoot, lockRoot, targetSlot = false, itemOverride = item) => {
