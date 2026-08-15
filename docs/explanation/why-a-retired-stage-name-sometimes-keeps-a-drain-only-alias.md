@@ -67,6 +67,55 @@ An alias is a debt with a named payoff condition (count reaches zero), not
 a permanent second name. Writing the deletion follow-up at the same time as
 the alias is what keeps it from becoming one.
 
+### Why `clarify` had somewhere to migrate *to*
+
+The migrate-don't-alias choice was made explicitly, and the reasoning is
+worth keeping: handle it definitively by migration rather than leave behind
+another alias that someone has to clean up later. An alias is real debt,
+and this rename was in a position to avoid taking it on.
+
+That position existed because `clarify` was not merely being renamed — it
+was being **moved out of the stage axis entirely**. `fgos-clarifying` runs
+at Init now, called by the submit path *before* an item exists at all, so
+there was a well-defined stage (`discovery`) for the ninety open items to
+land on. The order mattered: migrate the ninety first, *then* delete the
+`skillMap` entry and drop `clarify` from `stages`.
+
+Contrast that with the `decompose` rename, where the four open items had no
+better place to be and two of them were waiting on a person. The rule from
+the previous section — migrate if you can move them — is really a question
+about whether a destination exists and whether you control the timing.
+
+### The forcing reason: domain has to be known before a stage does
+
+Clarification could not stay a stage, because of an ordering problem in the
+data model. `fgos-clarifying` does two things: it rewrites the submitted
+text to be clear, and it **classifies the item's domain**. And the domain is
+what selects which stage graph applies.
+
+A stage cannot be the place where the domain is decided, because the domain
+is what decides which stages exist. That circularity is the real argument
+for moving the work to Init.
+
+Nothing else was filling the gap: the deterministic keyword classifier does
+not touch domain at all, and submit-assist only infers tier, kind, and
+risk. Domain classification had no owner until it moved to Init.
+
+The clear/unclear verdict that used to live inside `fgos-clarifying` split
+off to the `discovery` stage-skill, where it belongs — that judgment *is*
+stage work, while classification is not.
+
+This also sharpens the prefix rule in the section below.
+`fgos-clarifying` takes no `coding` prefix not merely because it is a
+helper, but because it runs *before any domain exists* and is the thing
+that determines the domain. Prefixing it would name the answer to a
+question it has not asked yet.
+
+One sequencing note, since it is easy to get wrong: this change could not
+run in parallel with the item creating the `discovery` stage-skill. Both
+edit `stages` and `skillMap`, so they had to be serialized regardless of
+how independent they looked.
+
 ## Verdict values are not stage names
 
 One thing deliberately did *not* change in the rename: the verdict values
