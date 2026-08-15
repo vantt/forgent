@@ -224,3 +224,19 @@ for, since vetted) while missing roughly 65 real open items sitting at
 exists to surface. It never threw, so nobody saw it was wrong; a fresh
 `npm test` run after the fix confirms the metric now counts against the
 domain's real entry stage instead of a name nothing produces anymore.
+
+## Confirmed: `tsk-q88` closed the CHANGELOG gap (F4)
+
+The three missing `[Unreleased]` entries — `clarify` moving to Init,
+verdict-driven edge selection (the redesign's own most user-visible
+change), and tier/kind/risk classification moving down into `discovery`
+— plus the two self-contradicting lines already sitting in
+`[Unreleased]` (an `herdr` dashboard note still describing a
+`clarify`-stage auto-launch, and a `/fgOS:submit` note still claiming it
+judges `tier`/`kind`/`risk`, contradicted by `submit/SKILL.md`'s own D12
+line saying it never does) landed as `tsk-q88`. Confirmed directly in the
+current `CHANGELOG.md`: the file now describes `exploring`/`discovery`/
+`backlog` behavior consistent with the shipped code, with no entry left
+describing behavior the same release already replaced. A purely
+docs-only, mechanical fix — the last of the batch's smallest-cost, `#8`
+items on the audit's own leverage-ranked list.
