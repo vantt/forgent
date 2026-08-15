@@ -64,6 +64,7 @@ cụ thể của domain "marketing" trên fgOS sẽ trông như thế nào.
 | D5 | One-way gate theo nguyên tắc hard/soft: hard ⟺ side effect vượt ranh giới item/worktree; nội bộ item = soft, cross-back bắt buộc ghi reason | Em advise v5 theo uỷ quyền, giữ v6, người dùng đồng ý v7 | 18058 |
 | D6 | Task-spec A-lite: tách contract (task-spec, file per-domain) khỏi know-how (skill); skillMap trỏ (task-spec, skill); chưa engine enforcement | Recommend v5, giữ v6, đồng ý v7 | 18059 |
 | D7 | Hierarchy domain → N workflow → item; selector tái dùng `kind` + `workflowFor` map có default; coding un-gộp thành feature (default) / bugfix / lightweight; workflow (shape 1 item) ≠ template (composition nhiều item) | Người dùng nêu v6, đồng ý v7 | 18060 |
+| D7a | **Bổ sung cho D7 (mechanism-first).** Mảnh ② land hierarchy + selector `workflowFor` với DUY NHẤT workflow `feature` đăng ký (giữ graph hiện tại byte-for-byte, mọi `kind` map về nó) — chứng minh cơ chế ở mức rủi ro migration bằng không. Hai graph `bugfix`/`lightweight` tách thành item riêng, tạo hình sau khi có dữ liệu vận hành thật. Phần hierarchy, selector và tách bạch workflow-vs-template của D7 giữ nguyên; chỉ "un-gộp thành ba graph ngay" bị hoãn | Gate validating hỏi, người dùng chọn (b) ở v25 | 18248 |
 | D8 | Async call = handoff event đầy đủ (holder đổi); sync call trong-session = một event `call-summary` gọn, KHÔNG đổi holder. Guard invariant: holder chỉ đổi qua async handoff | Em advise v7, người dùng đồng ý v8 | 18070 |
 | D9 | Task-spec bắt buộc có section Collaboration: bảng trigger-prose per call-edge, khai báo per (workflow, stage) — khi nào gọi, reason gì, tới role nào, bóng về mang gì. Ba tầng: prose dạy (task-spec) / soul quyết / guard chặn (roleGraph); lệch pattern hiện ra ở compound-learn qua call-summary/handoff event | Người dùng nêu câu hỏi v9, em thiết kế, xác nhận v10 | 18110 |
 | D10 | Ontology 4 tầng task-spec/skill/knowledge/context (knowledge = chuyên môn domain — coding dựa model weights, marketing là tài sản file thật của cockpit; context = refs/docs sẵn có). Nở-task-trước-nở-role-sau; coding đóng ở 5 position × ~13 phiếu. Chức danh (PO/PM/TechLead/SE/Tester) = persona tầng soul: roster per-team gói positions + phiếu + thẩm quyền, không encode vào harness. PM cổ điển đã máy hoá (frontier/triage/stale/merge) | Bàn các vòng 11–14 (ontology, lợi ích tách với evidence tsk-59a + review-item 3 executor, roster, map chức danh), người dùng đồng ý v15 | 18189 |
@@ -338,6 +339,23 @@ cụ thể của domain "marketing" trên fgOS sẽ trông như thế nào.
   thì item kẹt; artifact coding là văn xuôi nên nhu cầu thấp hẳn — thêm
   một lý do A-lite đúng cho coding. (v24) người dùng đồng ý → mint D13
   (seq 18242).
+
+- **2026-08-15 23:21–23:30 — Vòng 25: validating + gate**:
+  `fgos-coding-validating` chạy thật — reality gate 6/6 PASS (mọi
+  path/function plan dựa vào đều được đọc trực tiếp có cite dòng),
+  feasibility matrix 6 dòng có bằng chứng thật + 1 dòng blast-radius ghi
+  rõ `degraded`, verdict **READY WITH CONSTRAINTS**. `gate-check --gate
+  validateApprove --cost EXPENSIVE` → `canAutoApprove: false` (hard-gate
+  keyword `schema`/`migration` trong child spec, `risk-keywords.mjs`:18–26
+  — true positive: mảnh ① thật sự tiến hoá event schema của một store
+  event-sourced). Em hỏi ĐÚNG MỘT chỗ kẹt theo D6/T1: cam kết hình dạng
+  `bugfix`/`lightweight` ngay hay để sau. Tier A đã chạy trước khi hỏi:
+  đếm backlog thật (**768 item, `bug` 363 = 47%**), đọc luật bug của repo
+  (`primary-workflow.md:17` "prove the cause before changing behavior" —
+  xác nhận D7 có cơ sở), đọc tiền lệ chi phí khi graph sai (alias
+  drain-only `decompose` + `scripts/migrate-clarify-split.mjs` migrate 90
+  item). Chính con số 47% cắt cả hai chiều nên không tự quyết được →
+  người dùng chọn **(b) mechanism-first** → mint **D7a** (seq 18248).
 
 - **2026-08-15 21:52–21:59 — Vòng 20: quan hệ toàn cục, người dùng chốt**:
   em trình sơ đồ quan hệ đầy đủ sáu khái niệm (khai báo + runtime), bảng

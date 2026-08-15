@@ -29,7 +29,8 @@ workflow lookup must not conflict with, and both touch
 `workflow-stage-graphs.mjs`.
 
 1. **Role axis + `handoff` verb** (D1, D3, D4, D5, D8) — the engine change.
-2. **Workflow multiplicity** (D7) — un-merge coding's single stage graph.
+2. **Workflow multiplicity, mechanism-first** (D7 as amended by D7a) —
+   land the hierarchy and selector with `feature` alone registered.
 3. **Task-spec A-lite** (D6, D9, D10, D12) — contract files + `claims` on
    agent definitions. Docs/config-shaped; can run parallel to 1–2.
 
@@ -198,42 +199,52 @@ leaves the existing half untouched.
 
 ---
 
-## Piece 2 — Workflow multiplicity (D7)
+## Piece 2 — Workflow multiplicity, mechanism-first (D7, D7a)
+
+**Scope, as amended (D7a).** Only ONE workflow is registered: `feature`,
+carrying today's graph byte-for-byte, with every `kind` mapping to it. The
+piece therefore proves the *mechanism* (domain → N workflow → item,
+selected by `kind`) while changing zero behavior for zero items — no new
+graph shape exists to be wrong about, so the migration risk that made this
+the gate question is structurally absent, not merely mitigated.
+
+Why the shapes wait (evidence gathered at the gate): `bug` is 363 of 768
+real items (47%), so a wrong `bugfix` shape would strand nearly half the
+backlog on stage edges that do not exist — and this repo already carries
+the price tag of that mistake (`decompose` survives as a drain-only alias;
+`scripts/migrate-clarify-split.mjs` migrated 90 items when `clarify` was
+retired). Shapes get their own item once the mechanism is live and real
+traffic shows which kinds actually strain.
 
 ### Files and exact changes
 
 | File | Change |
 |---|---|
-| `src/state/workflow-stage-graphs.mjs` | `DOMAINS.coding` gains `workflows: { feature, bugfix, lightweight }` — each `{ stages, stepMap, transitions }` — plus `workflowFor: { bug: 'bugfix', docs: 'lightweight', chore: 'lightweight' }` and `defaultWorkflow: 'feature'`. `feature` carries **today's arrays byte-for-byte**, including the legacy drain-only `decompose` alias (:90, :139-157) and the `clarify` historical edges — nothing about the current graph may shift in this piece. New helper `workflowFor(domain, kind)` → the workflow object, folding an unknown/absent kind to `defaultWorkflow`, mirroring `resolveDomainName`'s never-throw fold (:503-512). |
+| `src/state/workflow-stage-graphs.mjs` | `DOMAINS.coding` gains `workflows: { feature }` — `{ stages, stepMap, transitions }` **copied byte-for-byte from today's domain-level arrays**, including the legacy drain-only `decompose` alias (:90, :139-157) and the `clarify` historical edges — plus `defaultWorkflow: 'feature'` and `workflowFor: {}` (empty: every kind folds to the default). New helper `workflowFor(domain, kind)` → the workflow object, folding an unknown/absent kind to `defaultWorkflow`, mirroring `resolveDomainName`'s never-throw fold (:503-512). The empty map is the point: the selector is real and exercised, it simply has one destination today. |
 | `src/state/stage-fsm.mjs`, `src/state/frontier.mjs`, `src/intake/discovery.mjs`, `src/intake/plan.mjs` | Read `stages`/`stepMap`/`transitions` through the resolved workflow instead of straight off the domain. Keep the domain-level arrays as a **compat shim** (`domain.stages` continues to resolve to the default workflow's) so no caller outside this list breaks silently. |
-| `src/state/work.mjs` | `STAGES` (:190) must keep exporting the same array — it is `DOMAINS[DEFAULT_DOMAIN].stages` today; verify every consumer still sees the union it expects, or widen deliberately. |
-| `docs/specs/work-state.md` | RUL for the hierarchy + selector + default fold. |
-
-Shapes (`bugfix`: `discovery → planning → executing` with prove-cause as
-skill prose, not a new stage; `lightweight`: `discovery → executing`) are a
-starting proposal — the implementer may adjust *within* D7 as long as
-`feature` stays byte-identical and every existing item folds to it.
+| `src/state/work.mjs` | `STAGES` (:190) must keep exporting the same array — it is `DOMAINS[DEFAULT_DOMAIN].stages` today; verify every consumer still sees exactly what it saw before. |
+| `docs/specs/work-state.md` | RUL for the hierarchy + selector + default fold (note explicitly that only one workflow is registered today, and why). |
 
 ### Tests
 
-1. `kind: 'bug'` item walks the `bugfix` graph; `kind: 'feature'` walks
-   `feature`; `kind: 'docs'` walks `lightweight`.
-2. **No-migration proof**: an item created before this piece (no workflow
-   field anywhere) resolves to `feature` and every legal edge it could take
-   before is still legal — assert the resolved arrays deep-equal the
-   pre-change frozen ones.
-3. Unknown/absent `kind` → default fold, no throw (mirrors
-   `resolveDomainName`).
+1. **Identity proof (the whole point of this piece)**: the resolved
+   `feature` workflow's `stages`/`stepMap`/`transitions` deep-equal the
+   pre-change frozen domain-level arrays, element for element.
+2. **No-migration proof**: an item created before this piece resolves to
+   `feature`, and every edge legal before is still legal.
+3. Selector exercised for real: `workflowFor(domain, 'bug')`,
+   `'feature'`, `'docs'`, an unknown kind, and an absent kind all resolve
+   to `feature` today — proving the lookup runs rather than being dead
+   code waiting for a second entry.
 4. `decompose` legacy alias still drains under `feature`.
 5. `test/state/workflow-stage-graphs.test.mjs`, `fsm.test.mjs`,
-   `stage.test.mjs`, `frontier.test.mjs` — all must stay green untouched
-   where they assert current coding behavior.
+   `stage.test.mjs`, `frontier.test.mjs` — all stay green untouched where
+   they assert current coding behavior.
 6. `test/e2e/domain-aware-stage-literals.test.mjs` — the existing guard
    against hardcoded stage literals must still pass; if this piece
-   introduces a workflow-resolution path that re-hardcodes anything, this
-   is the test that catches it.
+   re-hardcodes anything in the resolution path, this test catches it.
 7. `test/e2e/fixture-marketing-domain.test.mjs` — a domain declaring no
-   `workflows` at all (the fixture) keeps working.
+   `workflows` at all (the fixture) keeps working through the compat shim.
 
 ---
 
@@ -294,7 +305,7 @@ cover concurrency, spawn and human authority.
 | # | Component | Risk | Proof at validating/implement |
 |---|---|---|---|
 | R1 | Event-schema extension vs replay-from-zero (L3) | **High** | `backward-compat.test.mjs` immutable fixture replays byte-identical; lazy-key pattern asserted |
-| R2 | Workflow lookup in stage-fsm/frontier | **High** | Pre-change frozen arrays deep-equal the resolved `feature` arrays; full `npm test` |
+| R2 | Workflow lookup in stage-fsm/frontier | **High → Medium after D7a** (only one workflow registered, so no new graph can be wrong) | Identity proof: pre-change frozen arrays deep-equal the resolved `feature` arrays; full `npm test` |
 | R3 | `holder` leaking into `EDITABLE_FIELDS` / bypass paths | Medium | Test 5 of piece 1 (invariant: only async handoff changes holder) |
 | R4 | Missing manifest row for the new file | Medium | `test/architecture.test.mjs` (already exists — just must be run) |
 | R5 | Doctor checks reading the real repo instead of a fixture | Medium | Temp-tree fixture in the check tests; RUL9 read-only |
@@ -331,9 +342,9 @@ cover concurrency, spawn and human authority.
     "risk": "heavy"
   },
   {
-    "title": "Un-gộp coding thành nhiều workflow: feature/bugfix/lightweight, selector kind qua workflowFor",
+    "title": "Hierarchy domain → N workflow + selector kind, đăng ký feature only (mechanism-first)",
     "verify": "npm test",
-    "action": "D7: hierarchy domain → N workflow → item; selector tái dùng kind qua map workflowFor có default; coding un-gộp thành feature (graph hiện tại byte-for-byte, default) / bugfix / lightweight; item cũ fold về default không migration; workflow (shape 1 item) tách bạch với template (fgos expand)",
+    "action": "D7: hierarchy domain → N workflow → item, selector tái dùng kind qua map workflowFor có default, workflow (shape 1 item) tách bạch với template (fgos expand) — bản sửa mechanism-first: CHỈ đăng ký workflow feature giữ graph hiện tại byte-for-byte, mọi kind fold về nó, rủi ro migration bằng không; hai graph bugfix/lightweight tách thành item riêng làm sau khi có dữ liệu vận hành",
     "footprint": ["src/state/workflow-stage-graphs.mjs", "src/state/stage-fsm.mjs", "src/state/frontier.mjs", "src/intake/discovery.mjs", "src/intake/plan.mjs", "docs/specs/work-state.md", "test/state/workflow-stage-graphs.test.mjs", "test/state/stage.test.mjs"],
     "kind": "feature",
     "risk": "heavy"
@@ -366,9 +377,9 @@ re-planning of Execute mechanics.
 - `holder` is optional on the work item and in handoff events; absence means
   "domain declares no roleGraph" and is the compatibility path for every
   existing item.
-- Piece 2's `bugfix`/`lightweight` stage shapes are a proposal within D7;
-  `feature` staying byte-identical is the hard constraint, not the other
-  two shapes.
+- Piece 2 registers `feature` only (D7a). `feature` staying byte-identical
+  is the hard constraint; the `bugfix`/`lightweight` shapes are deferred to
+  their own item and are explicitly NOT assumed here.
 - Task-spec bodies are migrated prose, not new policy — if writing one
   requires inventing a rule nobody has agreed to, that is a signal to stop
   and raise it, not to author policy inside a contract file.
@@ -411,11 +422,14 @@ re-planning of Execute mechanics.
 
 ### Verdict
 
-**READY WITH CONSTRAINTS** — constraints: (1) piece 2's `bugfix`/`lightweight`
-graph shapes are unproven and touch 47% of the backlog (see gate question);
-(2) blast-radius evidence is `degraded` throughout; (3) the parent item's own
-`verify` remains the discovery placeholder (`tsk-14a`'s sync step applies to
-pass-through items only, so a split parent keeps it by rule).
+**READY WITH CONSTRAINTS** — constraints: (1) piece 2's `bugfix`/
+`lightweight` graph shapes were unproven and touch 47% of the backlog —
+**resolved at the gate by D7a**: they are deferred to their own item and
+piece 2 registers `feature` only; (2) blast-radius evidence is `degraded`
+throughout, named in every row rather than dropped; (3) the parent item's
+own `verify` was the discovery placeholder — **resolved**: set to
+`npm test`, which is what the parent's completion actually means (all
+three pieces landed, suite green).
 
 ### Gate outcome
 
@@ -424,7 +438,14 @@ false`. Hard-gate keyword floor tripped on `schema` and `migration` inside
 the child specs (`HEAVY_KEYWORDS`, `src/intake/risk-keywords.mjs`:18–26) —
 arguably a true positive: piece 1 does evolve the event schema of an
 event-sourced store. Per D9 the floor may not be argued down; asked the
-person instead.
+person instead, in one batched round shaped per D12 (the stuck point, the
+attempt already made, the specific missing input).
+
+**Answered**: the person chose the mechanism-first option → **D7a**
+(seq 18248). Folded into piece 2 above, into its child spec, and into the
+risk map (R2 drops High → Medium: with one workflow registered, no new
+graph exists to be wrong). Recorded via `fgos gate-approve --gate
+validateApprove --actor human`.
 
 ## Outstanding questions
 
