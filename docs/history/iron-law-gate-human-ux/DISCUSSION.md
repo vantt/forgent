@@ -4,16 +4,17 @@ Item neo: `tsk-1y6`
 
 ## 1. Trạng thái hiện tại
 
-Hết vòng 5. Thiết kế đã hội tụ: §6 ổn định, §7 đã chia task.
+Hết vòng 8. Thiết kế đã hội tụ: §6 ổn định, §7 đã chia task. Sẵn sàng bàn
+giao sang `fgos-coding-exploring`.
 
 Đã chốt (§4): **D1** cổng chỉ hỏi ở ranh giới trunk · **D2** người quyết,
 agent thao tác · **D3** hai mức `ask`/`warn`, opt-in, key config riêng ·
 **D4** không làm field bypass trên workitem · **D5** không chặn item khác,
-và không dùng `awaiting-human` để làm việc đó.
+và không dùng `awaiting-human` để làm việc đó · **D6** Q7 ra khỏi scope,
+chuyển thành phụ thuộc `tsk-1js`.
 
-Còn treo đúng **một** điểm: **Q7** — nửa từ-khoá của `classifyIronLaw`
-mất coverage cho con khi gate dời về trunk; chọn (a) chấp nhận hay (b)
-gom mô tả con. Nằm gọn trong `#task-engine-gate`, không chặn ba task kia.
+**Không còn điểm treo trong scope này.** Q7 (hạ nửa từ-khoá xuống `warn`)
+đã tách sang `tsk-1js` — xem D6 và §3 hàng 12.
 
 ### Nền code đã xác nhận (không suy đoán)
 
@@ -64,6 +65,30 @@ gom mô tả con. Nằm gọn trong `#task-engine-gate`, không chặn ba task k
 - `docs/explanation/gate-bypass-design.md` D4: floor của `gateBypass`
   **cố ý** không bao giờ chạm Iron Law → mức `warn` phải là key config
   **riêng**, không nhét vào `gateBypass`.
+- **Đo thật trên 250 bản `docs/history/*/iron-law-evidence*.md`** (parse
+  được 204): chỉ-module 138 (68%), **chỉ-từ-khoá 42 (21%)**, cả hai 24
+  (12%). Nửa từ-khoá KHÔNG hiếm — cứ 5 ca thì 1. Trong 42 ca đó chỉ 9 tự
+  khai false positive; 33 ca không, và trong 33 ca có
+  `main-checkout-destructive-git-safety-net` (chính là `tsk-3au`, ca
+  `git reset --hard` mà AGENTS.md đang dẫn) và
+  `events-jsonl-merge-driver-recurring-write-loss` — hai ca mất-dữ-liệu
+  thật với `matchedModules` rỗng.
+- Hai phép thử hỏng theo **hai chiều ngược nhau**, không cái nào "chất
+  lượng hơn": module khớp chuỗi đường dẫn nên không thể báo bậy, nhưng
+  spec tự ghi danh sách là *"MINH HỌA, không đóng khung"* (D10) → chế độ
+  hỏng là **bỏ sót**. Từ khoá quét prose tự do → chế độ hỏng là **báo
+  bậy**, ít bỏ sót.
+- **`MODULE_RULES` đóng cứng đường dẫn của riêng fgOS, không có mặt cấu
+  hình nào.** Hằng số private trong `src/evolve/iron-law.mjs`; grep toàn
+  `src/`+`bin/` xác nhận không caller nào truyền rule vào, không key
+  config, không đọc `.fgos/config.json`. `docs/specs/distribution.md` và
+  `docs/distribution-vision.md` không nhắc Iron Law một chữ. Chạy thật
+  `classifyIronLaw` với đường dẫn project khác: Next.js
+  auth+`prisma/schema.prisma` → `required:false`; Python xoá bảng +
+  `infra/terraform/rds.tf` → `required:false`; Go
+  `.github/workflows/deploy.yml` deploy production → `required:false`;
+  cả bốn `modules: []`. → **Ngoài fgOS, nửa module chết 100%, chỉ còn
+  nửa từ-khoá.** Đã tách sang `tsk-1js` (risk `heavy`).
 - Ba chân skill (`test/skills/fgos-mirror.test.mjs:10-43`): `.agents/skills`
   là nguồn canonical cho 14 dev-skill, `.claude/skills` là wrapper sinh ra
   bởi `npm run build:skills`, còn `plugins/fgOS/skills/` giữ ~35 skill
@@ -99,9 +124,11 @@ Iron Law không" mà là "cổng này nên hỏi ở đâu, hỏi bao nhiêu l�
 | 6 | Mức `warn` = mặc định mới hay opt-in? | Rõ → **D3** | Opt-in; không cấu hình gì thì giữ `ask` |
 | 7 | Field bypass trên workitem | Rõ → **D4** | Loại khỏi scope |
 | 8 | Có tái dùng `gateBypass.level` không? | Rõ → **D3** | Không — D4 của gate-bypass-design.md cấm |
-| 9 | Nửa từ-khoá mất coverage ở con | **Chưa rõ** | **Q7**: (a) chấp nhận / (b) gom mô tả con. Điểm treo duy nhất |
+| 9 | Nửa từ-khoá mất coverage ở con | Rõ → **D6** | Q7 ra khỏi scope, phụ thuộc `tsk-1js`. (a) chấp nhận đã bị số liệu bác (21% ca là keyword-only, gồm cả ca mất-dữ-liệu thật); (b) gom mô tả thuần cũng hỏng (32% item đơn dính từ khoá → gốc 5 con ≈ 85% luôn trip) |
 | 10 | Phạm vi supersede RUL34/RUL37 | Rõ | Không thuộc platform-foundations → sửa spec tại chỗ + decision record supersede D16/D17 |
 | 11 | Cơ chế "không chặn item khác" | Rõ → **D5** | Engine đã làm sẵn; `awaiting-human` là cửa sai và cửa đó khoá |
+| 12 | Iron Law có quản được project khác dùng fgOS không? | Rõ: **KHÔNG** | Đã chứng minh thực nghiệm (§1). Tách sang `tsk-1js`, risk `heavy` — không nhét vào item UX này |
+| 13 | Làm sao khẳng định chất lượng một tín hiệu? | **Chưa rõ, thuộc `tsk-1js`** | Không khẳng định được, chỉ đo được — mà hôm nay không ai ghi lại kết quả duyệt nên chưa có nhãn nào. Hướng đã nêu chưa chốt: D2 đặt sẵn chỗ lấy nhãn gần như miễn phí (người đang trả lời trong chat), routing về sau chạy theo precision đo được thay vì theo danh sách người đoán |
 
 ## 4. Quyết định đã chốt
 
@@ -112,6 +139,7 @@ Iron Law không" mà là "cổng này nên hỏi ở đâu, hỏi bao nhiêu l�
 | D3 | Hai mức: `ask` (mặc định, và là hành vi khi không cấu hình gì) và `warn` (bật tường minh → in cảnh báo, ghi event log, merge tiếp). Key config **riêng**, không nhét vào `gateBypass`. | Opt-in giữ hành vi hiện tại nguyên vẹn cho ai không đụng config. Key riêng vì `gate-bypass-design.md` D4 khoá floor của `gateBypass` là không bao giờ chạm Iron Law — nhét vào đó là phá một quyết định đã chốt vì lý do không liên quan. | 3→4 |
 | D4 | **Không** làm field bypass trên workitem. | Nếu agent tự set được field lúc submit/implement thì cổng tự cấp phép cho chính nó — mất đúng tính chất "bên thứ hai độc lập" mà D2 dựa vào. | 2→4 |
 | D5 | Một item bị Iron Law chặn **không được chặn** item khác còn merge được. Nhưng cơ chế là *bỏ qua và đi tiếp*, item **ở nguyên `awaiting-approval`** — **không** `fgos ask`, **không** `awaiting-human`, **không** `/fgOS:answer`. | Ý "không nghẽn việc khác" khớp ưu tiên #2 AGENTS.md và engine đã làm sẵn (`bin/fgos.mjs:2557-2567`, `skipped`). Nhưng `awaiting-human` là cửa sai: FSM không có cạnh từ `awaiting-approval` (`status-fsm.mjs:146-147`), thêm cạnh phải sửa `status-fsm.mjs` — chính là module Iron Law, nên bản vá trip đúng cổng nó sửa. Và `awaiting-approval` vốn đã nghĩa là "chờ người duyệt": dựng thêm state là hai tên cho một nghĩa. | 4→5 |
+| D6 | **Q7 ra khỏi scope `tsk-1y6`**, chuyển thành phụ thuộc `tsk-1js`. Item này không đụng gì tới nửa từ-khoá — không hạ cấp, không gom mô tả con, không thêm nhóm từ khoá thảm hoạ. | Số đo bác cả hai phương án đã nêu: (a) chấp nhận mất — nhưng keyword-only là 21% số ca và gồm cả `tsk-3au` (destructive git) lẫn ca mất event log, `matchedModules` rỗng; (b) gom mô tả thuần — 32% item đơn đã dính từ khoá nên gốc 5 con trip ≈ 85%, phá sạch cái lợi của D1. Và quyết định đúng phụ thuộc một sự thật lớn hơn vừa phát hiện: ngoài fgOS nửa module chết 100%, nên nửa từ-khoá **là toàn bộ cổng** — hạ nó xuống `warn` là tắt Iron Law cho mọi người dùng fgOS. Không quyết được ở tầng item UX này. | 8 |
 
 ## 5. Q&A log
 
@@ -180,6 +208,55 @@ awaiting-human` (`status-fsm.mjs:146-147`), và thêm cạnh phải sửa
 
 **Agent —** mint D3/D4/D5, regenerate §6, chia §7. Q7 vẫn treo, nằm gọn
 trong `#task-engine-gate`.
+
+### 2026-08-15 — vòng 6
+
+**Người dùng:** "tư vấn giúp. mình đẩy ship fast, release human nhưng
+không thể bừa bãi"
+
+**Agent —** thay vì cãi, đi đo 250 bản `iron-law-evidence.md`. Kết quả
+(§1) **bác bỏ đề xuất (a) của chính agent ở vòng 2 và 3**: keyword-only là
+21% chứ không phải nhiễu, và gồm cả `tsk-3au` (destructive git) lẫn ca
+mất event log với `matchedModules` rỗng. Cũng bác (b) thuần bằng số:
+32% item đơn đã dính từ khoá → gốc 5 con trip ≈ 85%. Đề xuất (c): định
+tuyến theo loại tín hiệu (module → `ask`, từ-khoá-only → `warn`), kèm
+biến thể giữ `ask` cho nhóm từ khoá thảm hoạ.
+
+### 2026-08-15 — vòng 7
+
+**Người dùng:** "khó quyết, module là kiểm tra sao, từ khóa thì quá bậy,
+chứng mình nó không dúng, nhóm thảm họa làm sao test, như em nói chất
+lượng tín hiệu, làm sao khẳng định chật lượng tín hiệu chứ hễ là hỏi mà
+chẳng đúng sự thật thì rất bực mình."
+
+**Agent —** thừa nhận ba điểm: (1) nói "module chất lượng cao hơn" là
+ẩu — hai phép thử hỏng theo hai chiều ngược nhau (module bỏ sót, từ khoá
+báo bậy), không cái nào hơn; (2) **rút đề xuất nhóm từ khoá thảm hoạ** —
+nó đúng y hệt loại vật thể `MODULE_RULES` đang là, tức vá một danh sách
+đoán bằng một danh sách đoán khác; (3) chất lượng tín hiệu **không khẳng
+định được, chỉ đo được**, mà hôm nay chưa ai ghi lại kết quả duyệt nên
+con số 9/42 ở vòng 6 là *ước lượng từ prose*, không phải đo. Đề xuất
+hai giai đoạn: giai đoạn 1 không nới gì, chỉ thu nhãn qua chính câu trả
+lời của người ở cổng `ask` (D2 đã đặt sẵn chỗ); giai đoạn 2 routing chạy
+theo precision đo được. Chưa được chốt — người dùng chuyển hướng sang
+câu hỏi lớn hơn ở vòng 8.
+
+### 2026-08-15 — vòng 8
+
+**Người dùng:** "anh thấy siêu nghiêm trọng ở một vấn đè Iron Law. là nếu
+chúng ta dùng fgos để phát triển project khác thì iron-law có quản lý
+được không hay chỉ quản fgos?"
+
+**Agent —** chạy `classifyIronLaw` thật với đường dẫn của bốn project
+khác (§1): cả bốn `modules: []`, ba trong bốn `required: false` kể cả ca
+xoá bảng + Terraform RDS và ca deploy production. Ngoài fgOS nửa module
+chết 100%; ca duy nhất bắt được trúng nhờ may vì "thanh toán" tình cờ có
+trong `HEAVY_KEYWORDS`. Tệ hơn "không chạy": `approve` vẫn chạy gate và
+trả `required: false`, tức **báo đã kiểm và an toàn trong khi không kiểm
+gì liên quan**. Chỉ ra thứ tự bị ngược — Q7 không quyết được trước câu
+hỏi này. Đề nghị tách item riêng.
+
+**Người dùng:** "ok" → submit `tsk-1js` (risk `heavy`). Agent mint D6.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -258,18 +335,30 @@ Item không rời `awaiting-approval` một giây nào — trạng thái đó v�
 nghĩa là "chờ người duyệt". Người quay lại duyệt gom một lượt, agent chạy
 lệnh hộ theo D2.
 
+### Phạm vi thiết kế này **chỉ đúng bên trong fgOS** (D6)
+
+Lý lẽ của D1 dựa vào một sự thật chỉ đúng ở repo này: three-dot diff bảo
+đảm phép thử **module** bắt lại 100% ở ranh giới trunk, nên bỏ hỏi ở
+ranh giới con→cha không tạo lỗ hổng. Ngoài fgOS, phép thử module **luôn
+rỗng** (`MODULE_RULES` đóng cứng đường dẫn repo này, không có mặt cấu
+hình) — nên "bắt lại 100%" là bắt lại 100% của *không gì cả*.
+
+Thiết kế ở đây vì thế đúng và đáng ship **cho fgOS tự dogfood**, nhưng
+không được đọc như một phát biểu về Iron Law nói chung. Việc làm cho
+cổng này có nghĩa với project khác nằm ở `tsk-1js`, và nó lớn hơn item
+này — đụng ưu tiên #1 của AGENTS.md ("tốc độ ship của project ĐANG DÙNG
+fgOS").
+
 ### Ngoài scope, đã loại tường minh
 
 - Field bypass trên workitem (**D4**).
 - Gộp ba bản copy-paste của gate thành một helper — đã có item backlog
   riêng ghi nhận.
 - Thêm cạnh FSM `awaiting-approval → awaiting-human` (**D5**).
-
-### Còn treo
-
-**Q7** — nửa từ-khoá của `classifyIronLaw` mất coverage cho con khi gate
-dời về trunk. (a) chấp nhận, hay (b) gom mô tả gốc + mọi con đã hấp thụ
-rồi mới classify. Nằm trong `#task-engine-gate`.
+- **Mọi thay đổi lên nửa từ-khoá** (**D6**) — hạ cấp, gom mô tả con, hay
+  thêm nhóm từ khoá thảm hoạ. Sang `tsk-1js`.
+- Cơ chế đo precision của từng tín hiệu (§3 hàng 13) — nêu ở vòng 7,
+  chưa chốt, thuộc `tsk-1js`.
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
@@ -286,8 +375,10 @@ gate site — tách ra là bảo đảm xung đột footprint.
 
 - File: `bin/fgos.mjs` (~L2476 `wouldTripIronLaw`, ~L3498 `approve`,
   ~L4101 `sync-root`), `src/setup/registrations.mjs`, `.fgos/config.json`.
-- **Mang theo Q7** — phải chốt (a)/(b) trước khi viết code.
-- Anh em: không phụ thuộc task nào; T4 phụ thuộc nó.
+- **Không đụng nửa từ-khoá** (D6). Chỉ thêm nhánh rẽ theo merge target và
+  đọc mức config; `classifyIronLaw` giữ nguyên chữ ký và hành vi.
+- Anh em: không phụ thuộc task nào; T4 phụ thuộc nó. `tsk-1js` sẽ sửa
+  tiếp cùng vùng code này về sau — ghi footprint rõ để hai bên không đua.
 - Verify nháp: `node --test test/cli/fgos-approve.test.mjs
   test/cli/fgos-merge.test.mjs test/evolve/iron-law.test.mjs` + test mới
   cho hai ca: leaf→root **không** trip; root→trunk **có** trip.
