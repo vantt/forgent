@@ -2,17 +2,18 @@
 
 ## 1. Trạng thái hiện tại
 
-Vòng 16: nền chốt là **D1–D11** (§4). Sau hội tụ vòng 8, exploring +
-planning đã chạy xong (CONTEXT.md + plan.md high-risk 3 mảnh, đều
-commit); người dùng ra lệnh **dừng trước implement** rồi mở chuỗi vòng
-đào sâu 9–16: roleGraph draft coding (ghim vào plan.md), tầng
-Collaboration trigger (D9), ontology 4 tầng task/skill/knowledge/context
-(D10), position vs chức danh + roster per-team (D10), và binding
-soul↔role khi team đông hơn role (D11: pull qua frontier, sticky
-per-thread, targeted là ngoại lệ). Treo có chủ đích: #7 (judge-gate vs
-L5 — quyết ở lượt marketing), #15 (team overlay — YAGNI). Trạng thái
-máy: tsk-2t9c ở stage `planning`, chờ lệnh chạy `fgos-coding-validating`
-(gate + materialize 3 children) — **chưa implement gì**.
+Vòng 20: nền chốt là **D1–D12** (§4) — thiết kế coding-harness ĐÓNG.
+Sau hội tụ vòng 8 (exploring + planning đã chạy: CONTEXT.md + plan.md
+high-risk 3 mảnh, đều commit; người dùng ra lệnh dừng trước implement),
+chuỗi vòng đào sâu 9–20 bổ sung: roleGraph draft coding (ghim plan.md),
+Collaboration trigger (D9), ontology 4 tầng (D10), agent-type = title
+với một field `claims` duy nhất — không roster/humans/pools (D12),
+binding pull/sticky/targeted (D11), và sơ đồ quan hệ toàn cục sáu khái
+niệm + walkthrough marketing kiểm chứng đa domain (§6 cuối). Treo có
+chủ đích: #7 (judge-gate vs L5 — lượt marketing), #15 (team overlay —
+YAGNI). Trạng thái máy: tsk-2t9c ở stage `planning`, chờ lệnh chạy
+`fgos-coding-validating` (gate + materialize 3 children) — **chưa
+implement gì**.
 
 ## 2. Mục tiêu & đề bài
 
@@ -299,6 +300,16 @@ cụ thể của domain "marketing" trên fgOS sẽ trông như thế nào.
   kế: áp vào bối cảnh rộng hơn, chỉ ra quan hệ
   workflow/stage/task/skill/position/agent-type toàn cục.
 
+- **2026-08-15 21:52–21:59 — Vòng 20: quan hệ toàn cục, người dùng chốt**:
+  em trình sơ đồ quan hệ đầy đủ sáu khái niệm (khai báo + runtime), bảng
+  cardinality hai domain, và walkthrough một item marketing đi hết vòng
+  đời gọi tên đủ sáu khái niệm — kiểm chứng cùng bộ xương chở được cả
+  coding lẫn marketing. Hai bất biến cấu trúc được nêu: task-spec là
+  trục giữa; position là khớp nối duy nhất giữa graph gọi và thế giới
+  phiếu. Người dùng đồng ý → ghi vào §6 (không quyết định mới — đây là
+  cách trình bày lại D1–D12), và yêu cầu distill toàn bộ thảo luận
+  trình bày lại chi tiết.
+
 ## 6. Thiết kế đã chốt {#design}
 
 > Synthesis vòng 16. Nền: **D1–D11 đã chốt** (§4). Treo có chủ đích: #7
@@ -428,24 +439,71 @@ overlay theo team chỉ khi 2 team cùng domain cần shape khác (#15).
    knowledge, studio/brand → context) + template `fgos expand`;
    judge-gate vs L5 (#7) quyết ở bước này.
 
+### Quan hệ toàn cục sáu khái niệm (chốt v20)
+
 ```mermaid
 flowchart TD
-    subgraph decl["KHAI BÁO"]
-        DOM["domain: coding<br/>5 positions + kind vocab"]
-        DOM --> WF["workflows: feature/bugfix/lightweight<br/>(workflowFor: kind → shape)"]
-        DOM --> TS["task-specs ~13 phiếu<br/>(contract + Collaboration)"]
-        ROS["roster per-team (soul):<br/>title → positions + phiếu + authority"]
+    subgraph static["TẦNG KHAI BÁO (registry + files, ổn định)"]
+        DOM["DOMAIN<br/>(coding, marketing)"]
+        WF["WORKFLOW<br/>shape lifecycle 1 item"]
+        ST["STAGE<br/>bước trong workflow"]
+        TS["TASK-SPEC (phiếu)<br/>contract + Collaboration"]
+        SK["SKILL<br/>know-how executor"]
+        POS["POSITION (5)<br/>vị trí trong graph gọi"]
+        AT["AGENT-TYPE<br/>persona + claims:[phiếu]"]
+        KN["KNOWLEDGE<br/>chuyên môn domain"]
+        CX["CONTEXT<br/>refs/docs instance"]
     end
-    subgraph run["RUNTIME — một item"]
-        IT["item: status × stage(workflow) × holder"]
-        IT -- "call (position, phiếu)" --> FR["frontier: work-order"]
-        FR -- "pull: soul đủ điều kiện claim<br/>(sticky per thread)" --> S["soul (persona/title)"]
-        S -. "bóng về, event ghi đủ" .-> IT
+
+    DOM -- "1—N (workflowFor: kind→)" --> WF
+    WF -- "1—N, có thứ tự + gate" --> ST
+    ST -- "1—1 phiếu-stage (skillMap)" --> TS
+    POS -- "1—N phiếu-call" --> TS
+    TS -- "N—M" --> SK
+    TS -- "Collaboration: trigger →" --> POS
+    DOM -- "roleGraph: edges per stage" --> POS
+    AT -- "claims ⊆ phiếu → positions suy ra" --> TS
+    SK -.-> KN
+    SK -.-> CX
+    TS -.-> CX
+
+    subgraph runtime["TẦNG RUNTIME (event log)"]
+        IT["ITEM<br/>status × stage(workflow) × holder"]
+        CALL["CALL work-order<br/>(position, phiếu) trong frontier"]
+        SOUL["SOUL INSTANCE<br/>(sessionId, agent-type) sinh lúc claim"]
     end
-    WF -.-> IT
-    TS -.-> S
-    ROS -.-> FR
+
+    WF ==> IT
+    IT -- "trigger khớp → phát" --> CALL
+    AT ==> SOUL
+    SOUL -- "pull-claim (sticky per thread)" --> CALL
+    CALL -. "bóng về holder" .-> IT
 ```
+
+Hai bất biến cấu trúc: **task-spec là trục giữa** — stage bind nó,
+position sở hữu nó, skill thực hiện nó, agent-type claim nó,
+Collaboration của nó phát call; **position là khớp nối duy nhất** giữa
+graph gọi và thế giới phiếu — nhờ vậy roleGraph đóng ở 5 node trong khi
+phiếu/persona nở tự do.
+
+Walkthrough kiểm chứng đa domain (một item marketing đi hết vòng đời,
+gọi tên đủ sáu khái niệm): submit "viết blog về sản phẩm X" → domain
+`marketing`, kind `blog-post` → workflow `content-production`
+(briefing→producing→gating→distributing). Briefing: phiếu
+`prepare-brief`; trigger "chưa rõ đối tượng đọc" → call `advise` (human
+qua pull-door). Producing: phiếu `draft-blog-post`, holder writer;
+trigger "chưa chắc tông giọng" → call `consult` sync tới position
+researcher, agent-type `brand-guardian` (claims chứa phiếu đó) claim,
+trả finding — một event `call-summary`, holder không đổi (D8); skill
+của nó đọc knowledge (công thức copywriting, luật SEO) + context (brand
+voice của brand X). Gating: call `review` async phiếu
+`brand-voice-check`; reject vòng 1 → ping-pong trong cùng item, sticky
+về đúng brand-guardian ở vòng 2 (D11); phiếu `legal-check` → human,
+soft gate. Distributing: phiếu `publish-post` qua gate **hard** (side
+effect ra platform ngoài, D5) — một chiều, rework hậu-publish = item
+mới. Toàn bộ handoff/call-summary nằm trong event log → compound-learn
+đọc được "bài này reject brand-check 3 vòng". Thay tên phiếu/skill/
+workflow là ra đúng câu chuyện coding — cùng bộ xương, hai domain.
 ## 7. Danh mục hạng mục / task {#tasks} (đề xuất, chưa chốt)
 
 ### {#task-role-axis-coding}
