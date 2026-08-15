@@ -774,7 +774,15 @@ test('approve of a leaf item forked AFTER a sibling already merged a gated-modul
   assert.equal(stateView(cwd).work[leafId].status, 'delivered');
 });
 
-test('approve of a leaf item whose OWN commit touches a gated module (src/runner/**) still REFUSES without --acknowledge-iron-law, even with leaf-scoped diff (tsk-4voj D1 does not under-scope)', () => {
+// Superseded by docs/history/iron-law-gate-human-ux/CONTEXT.md D1: this used
+// to assert the leaf REFUSES, back when the gate fired at every merge
+// boundary. It now fires only where the target is trunk, and a leaf's target
+// is `fgw/<root>` — so what stays worth proving here is the leaf-scoped diff
+// itself (tsk-4voj D1's own subject): the leaf's own gated-module commit is
+// still SEEN, it just no longer refuses at this boundary. The refusal half
+// moved to test/cli/fgos-iron-law-gate.test.mjs, which pins the same diff
+// tripping the gate at the trunk boundary it does still guard.
+test('approve of a leaf item whose OWN commit touches a gated module (src/runner/**) PROCEEDS — the leaf lands on fgw/<root>, never trunk (iron-law-gate-human-ux D1)', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
 
@@ -802,13 +810,15 @@ test('approve of a leaf item whose OWN commit touches a gated module (src/runner
   run(cwd, ['move', leafId, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
   commitPendingBeforeApprove(cwd, leafId);
 
-  const headBefore = gitHead(cwd);
   const result = run(cwd, ['approve', leafId]);
-  assert.equal(result.status, 4, `leaf's own commit genuinely touches a gated module -- must still refuse: ${result.stdout}${result.stderr}`);
-  assert.match(result.stderr, /Iron Law/);
-  assert.match(result.stderr, /src\/runner\/iron-leaf-genuine-child-produced\.mjs/, 'the refusal must name the leaf\'s own tripped module');
-  assert.equal(gitHead(cwd), headBefore, 'a refused approve attempts no merge');
-  assert.equal(stateView(cwd).work[leafId].status, 'awaiting-approval');
+  assert.equal(result.status, 0, `a leaf never lands on trunk -- the gate must not fire here: ${result.stdout}${result.stderr}`);
+  assert.doesNotMatch(result.stdout, /Iron Law/);
+  assert.equal(stateView(cwd).work[leafId].status, 'delivered');
+  assert.match(
+    gitAtCwd(cwd, ['ls-tree', '-r', '--name-only', `fgw/${rootId}`]),
+    /src\/runner\/iron-leaf-genuine-child-produced\.mjs/,
+    "the leaf's own gated-module file really did land on the root branch -- this is the diff the trunk-boundary gate will see when the root itself merges",
+  );
 });
 
 test('approve of a milestone blocks when a targeted item\'s root has unsynced drift, exit 4, item stays awaiting-approval', () => {

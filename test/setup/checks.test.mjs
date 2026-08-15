@@ -41,11 +41,12 @@ import {
   writeEnduserManifest,
 } from './helpers/setup-checks-harness.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../../src/state/worker-slots.mjs';
+import { DEFAULT_IRON_LAW_LEVEL } from '../../src/setup/registrations.mjs';
 
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, plugin-dev-skills-packaged, changelog-unreleased-stale, herdr-launcher-configured, work-classification-vocabulary, work-stage-vocabulary, delivered-not-on-trunk, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, events-jsonl-not-truncated, cli-version-visible, worker-slots-ceiling-usable, gateway-token-configured, and readme-install-tag-exists', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, plugin-dev-skills-packaged, changelog-unreleased-stale, herdr-launcher-configured, work-classification-vocabulary, work-stage-vocabulary, delivered-not-on-trunk, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, events-jsonl-not-truncated, cli-version-visible, worker-slots-ceiling-usable, gateway-token-configured, readme-install-tag-exists, and iron-law-configured', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     [
@@ -74,6 +75,7 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'worker-slots-ceiling-usable',
       'gateway-token-configured',
       'readme-install-tag-exists',
+      'iron-law-configured',
     ].sort(),
   );
 });
@@ -817,6 +819,7 @@ test('config-not-stale passes when the existing config already has every default
       invariantChecks: { commands: DEFAULT_INVARIANT_CHECK_COMMANDS },
       workerSlots: { ceiling: null },
       gateway: { port: 4170, token: null },
+      ironLaw: { level: DEFAULT_IRON_LAW_LEVEL },
     }),
   );
   const { passed } = checkById('config-not-stale').check(cwd);
