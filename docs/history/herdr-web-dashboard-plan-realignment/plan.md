@@ -33,12 +33,44 @@ Không viết dòng code sản phẩm nào. Bốn nhóm thao tác:
 
 Vì vậy:
 
-- **Bước 1 (làm trước tất cả): đóng tsk-48w + tsk-k4v.** Đây là hành động cắt rủi ro, không phải hành động dọn dẹp. Càng để lâu càng có cửa cho một session khác đâm vào.
+- **Bước 1 (làm trước tất cả): đóng tsk-k4v, và nắn tsk-48w** (D14 — tsk-48w không còn bị đóng). Đây là hành động cắt rủi ro, không phải dọn dẹp: chừng nào tsk-k4v còn `todo` thì còn cửa cho một session khác pick nó và xây một HTTP server thứ hai vô ích.
 - Bước 2: nắn tsk-5jr, tsk-4id (D10) và tsk-18to (D8, gồm gỡ `deps` đang trỏ tsk-k4v vừa đóng).
-- Bước 3: tạo 2 item mới (D5 gateway, D6 khung client), rồi sửa `deps` của tsk-5jr/tsk-4id trỏ vào item khung client.
+- Bước 3: tạo **1** item mới (D6 khung client) và item gateway của D5 — nay chỉ còn CORS + bind cấu hình được, vì mục (c) static-serving đã về tsk-48w theo D14 — rồi sửa `deps` của tsk-5jr/tsk-4id trỏ vào item khung client.
 - Bước 4: sửa tài liệu (cụm `plan.md`, con trỏ supersede, ui-spec, area spec).
 
 Bước 2 phải sau bước 1 vì `deps` của tsk-18to trỏ vào item bước 1 đóng. Bước 3 phải sau bước 2 vì `deps` mới thay `deps` cũ. Bước 4 để cuối vì nó mô tả kết quả của ba bước trên.
+
+### Mảnh việc suýt rơi mất khi đóng tsk-48w — item D5 phải nhận
+
+Đọc `verify` và mô tả thật của tsk-48w (probe 2026-08-15) cho thấy nó KHÔNG
+trùng hoàn toàn tsk-4r1 như tên gọi gợi ý. Nó cài đặt hai quyết định của
+cụm:
+
+- **cụm D9** — token của web server riêng: env `FGOS_HERDR_WEB_SECRET`, vắng
+  thì tự sinh file gitignored dưới `.fgos/`, chmod 0600, cố ý KHÔNG nằm
+  trong `.fgos/config.json` vì file đó đang được git track.
+- **cụm D10** — toggle riêng cho web dashboard trong `.fgos/config.json`,
+  mặc định BẬT.
+
+Đối chiếu với những gì đã khoá ở `CONTEXT.md` cùng thư mục:
+
+- **cụm D9 chết thật.** D13 chốt web client xác thực bằng Bearer token của
+  chính gateway; không còn web server riêng thì không còn secret riêng. Bỏ
+  luôn, không chuyển đi đâu.
+- **cụm D10 KHÔNG chết — nó chuyển hoá.** Nhu cầu "bật/tắt việc phục vụ web"
+  vẫn còn nguyên, chỉ đổi chỗ: nó là cờ static-serving của D5(c).
+
+Người chốt tại gate `validateApprove` (2026-08-15): **tsk-48w không đóng
+nữa, nắn lại để chính nó gánh phần dư** — D14, supersede D4. Nó giữ
+nguyên id/deps/lịch sử, đổi scope thành cờ static-serving cộng việc đăng ký
+cờ đó vào `fgos setup`'s config-merge và `fgos doctor`'s check registry
+(`src/setup/registrations.mjs` / `src/setup/checks.mjs`), đúng ràng buộc
+AGENTS.md §"Install/setup/doctor gate" mà nó vốn đang gánh.
+
+Hai lý do chọn hướng này thay vì đóng rồi giao phần dư bằng văn xuôi: nó
+tránh một thao tác `wontfix` không đảo ngược được, và nó giữ sợi dây nối
+nằm trong chính item chứ không nằm trong prose mà người sau phải tình cờ
+đọc trúng.
 
 ### Một chỗ shape khác với cách đọc thẳng D1
 
@@ -56,8 +88,9 @@ Lý do, không phải reopen D1 mà là hệ quả của chính nó: contract ya
 
 | Thành phần | Mức | Cái gì chứng minh được nó đúng |
 |---|---|---|
-| Đóng tsk-48w/tsk-k4v bằng `wontfix` | **cao** — không đảo ngược được (`status-fsm.mjs:156-169` không có cạnh ra) | Trước khi `move`, đọc lại mô tả từng item và đối chiếu với item thay thế; `supersededBy` phải trỏ đúng (tsk-48w→tsk-4r1, tsk-k4v→tsk-7l9), và `validateSupersededBy` (`work.mjs:751-760`) từ chối id không tồn tại. Verify kiểm cả `status` lẫn `supersededBy` của cả hai. |
+| Đóng tsk-k4v bằng `wontfix` | **cao** — không đảo ngược được (`status-fsm.mjs:156-169` không có cạnh ra) | Trước khi `move`, đọc lại mô tả item và đối chiếu với tsk-7l9; `validateSupersededBy` (`work.mjs:751-760`) từ chối id không tồn tại. Verify kiểm cả `status` lẫn `supersededBy`. Chỉ còn MỘT item bị đóng (D14 gỡ tsk-48w khỏi diện này) — đúng bài học của chính vòng gate này: đọc mô tả thật trước khi đóng, đừng tin cái tên. |
 | `supersededBy` trỏ nhầm item | trung bình — knowledge-only, sửa lại rẻ | Verify kiểm giá trị chính xác, không chỉ kiểm có mặt. |
+| Nắn tsk-48w mà quên phần đăng ký setup/doctor | trung bình — cờ tồn tại nhưng `doctor` không thấy, đúng thứ AGENTS.md cấm | Verify kiểm mô tả tsk-48w đã mang chuỗi `static-serving`; bản thân việc đăng ký được chứng minh bởi verify của chính tsk-48w khi nó chạy, không phải ở đây. |
 | Gỡ `deps` của tsk-18to trỏ tsk-k4v | trung bình — bỏ sót thì item treo mãi trên một dep đã `wontfix` | Sau bước 2, `fgos ready` phải không còn báo tsk-18to chờ một dep đã đóng. |
 | Sửa `docs/specs/herdr-web-dashboard.md` (D12) | trung bình — vùng `check-decision-citation-drift` quét | `npm test` (drift-checker chạy trong suite). |
 | Sửa `docs/ui-spec/15-system-events.md` (D9) | thấp | Verify grep `state/digest` có mặt. |
@@ -104,6 +137,19 @@ Hai chi tiết bắt buộc, cả hai đã kiểm bằng đọc-lại field sau 
 
 - chuỗi verify phải được bao **single quote** khi truyền cho `fgos edit`, nếu không `$( )` bị shell expand ngay lúc ghi và biến thành một đường dẫn tuyệt đối cứng — verify sẽ chỉ chạy đúng trên đúng một máy;
 - `\"` trong `grep -q "\"status\": \"wontfix\""` phải sống sót nguyên vẹn vào field. Đã đọc lại và xác nhận cả hai.
+
+Cái bẫy thứ hai, bắt được bằng probe chứ không bằng suy luận: nhánh chứng
+minh "tsk-18to đã gỡ `deps` trỏ tsk-k4v" thoạt đầu viết là
+`... | grep -qv "tsk-k4v"`. **Sai và luôn xanh** — `grep -v` trả 0 khi có
+ít nhất MỘT dòng không khớp, mà output JSON thì luôn có, nên nhánh đó
+chứng minh rỗng. Probe thật xác nhận: `grep -qv` cho exit `0` ngay hôm nay
+trong khi dep vẫn còn nguyên. Bản đúng là phủ định cả pipeline:
+`! node bin/fgos.mjs list --id tsk-18to ... | grep -q "tsk-k4v"`, cho exit
+`1` hôm nay và chỉ xanh khi dep thật sự biến mất.
+
+Bài học chung cho verify: một nhánh "không được chứa X" phải được chạy thử
+ở trạng thái mà nó PHẢI đỏ. Nhánh chứng minh rỗng nguy hiểm hơn nhánh
+thiếu, vì nó trông như đã được chứng minh.
 
 Verify cố ý kiểm **state** (`status` + `supersededBy` của cả hai item bị đóng) chứ không chỉ kiểm file, vì phần rủi ro cao nhất của item này nằm ở state ops chứ không nằm ở tài liệu. `list --id <id>` scope cả `decisions`/`outcomes` theo item (đã kiểm: `decisions: []` khi list một item chưa có decision riêng), nên `grep "\"status\": \"wontfix\""` không thể ăn nhầm chữ "wontfix" trong văn bản decision.
 
