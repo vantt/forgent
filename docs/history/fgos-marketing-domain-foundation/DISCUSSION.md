@@ -2,18 +2,13 @@
 
 ## 1. Trạng thái hiện tại
 
-Vòng 7: người dùng đồng ý cụm đang chờ → **D5–D7 đã mint** (D5 hard/soft
-gate, D6 task-spec A-lite, D7 workflow-multiplicity + kind-selector —
-seq 18058–18060). Nền chốt giờ là **D1–D7** (§4). Thiết kế đã đủ đặc để
-build phần coding: §7 có thứ tự task rõ (role-axis → workflow-multiplicity
-→ task-spec song song; marketing xếp sau). Em cũng đã advise nốt #11
-theo pattern uỷ quyền: async call = handoff event đầy đủ (holder đổi);
-sync call trong-session = một event `call-summary` gọn lúc hoàn thành,
-KHÔNG đổi holder — chờ người dùng gật là thành D8. Còn mở: #11 (chờ
-gật), #7 (judge-gate vs L5 — hoãn hợp lệ tới lượt marketing), #15
-(domain/team key — YAGNI treo). Bước ra tự nhiên tiếp theo: xác nhận #11
-rồi handoff native-first sang `fgos-coding-exploring`/`fgos-coding-planning`
-cho task đầu tiên (`{#task-role-axis-coding}`).
+Vòng 8: **HỘI TỤ.** Người dùng đồng ý D8 (seq 18070) — mọi câu hỏi thiết
+kế của phần coding-harness đã đóng, nền chốt là **D1–D8** (§4). Chỉ còn
+treo có chủ đích: #7 (judge-gate vs L5 — quyết khi tới lượt marketing)
+và #15 (team overlay trên domain — YAGNI). §6 ổn định, §7 thật. Theo
+terminal-handoff của skill shaping: `refs` của tsk-2t9c đã trỏ vào
+`{#task-role-axis-coding}`, bước tiếp theo là native-first dispatch sang
+`fgos-coding-exploring` → `fgos-coding-planning` cho task đó.
 
 ## 2. Mục tiêu & đề bài
 
@@ -43,7 +38,7 @@ cụ thể của domain "marketing" trên fgOS sẽ trông như thế nào.
 | 8 | Ping-pong đa role (review/cải thiện qua lại nhiều vòng, nhiều agent-type) biểu diễn bằng gì: trục thứ ba `role/holder` + verb `handoff` có guard, hay child-item mỗi vòng, hay loop qua status FSM? | Rõ dần — trục role, người dùng xây tiếp trên đề xuất qua vòng 4 không sửa | Chưa mint D-ID — chờ giữ ổn thêm vòng nữa theo luật D4. Vòng 4 tinh chỉnh thêm: handoff tách 2 loại — **call** (round-trip, bóng về người gửi; 4 reason: advise/assist/review/consult — đúng 4 lý do người dùng nêu) và **pass** (chuyển giao theo stage, không quay lại). Tiền lệ engine: ask/answer đã là call-to-human |
 | 9 | Trục role bật cho domain nào trước? | Rõ — người dùng quyết: **coding trước**, ổn rồi mới marketing | Vòng 4. Đảo đề xuất marketing-first của em — quyết định của người dùng, và có lý riêng: coding đã có đủ 4 tương tác call ở dạng ngầm (fgos-researching/code-review/subagent/ask-answer), dogfood hằng ngày cho feedback nhanh nhất; marketing vào sau trên harness đã được chứng minh |
 | 10 | "Team soul" bên trên harness — định nghĩa cụ thể? | Rõ — người dùng trả lời: **cả hai** | Soul = agent-type hiểu vai trò mình + hiểu vấn đề + biết cần ai support → tự đẩy việc linh hoạt (advise / tay chân / phản biện / chuyên môn). Harness = an toàn, điều phối cứng theo luật/gate (vd chỗ không được quay lại). Đích: uyển chuyển hơn nhưng ổn định hơn |
-| 11 | Call trong-session (subagent, đồng bộ, vài giây) có ghi thành handoff event như call liên-session (park chờ role khác, bất đồng bộ) không, hay chỉ ghi loại async? | Rõ dần — em advise v7, chờ gật | Async call (park chờ role khác) = handoff event đầy đủ, holder đổi, checkpoint đầy đủ — bắt buộc, vì frontier/routing phụ thuộc. Sync call trong-session (subagent) = KHÔNG đổi holder (bóng chưa rời session, session vẫn chịu trách nhiệm), ghi MỘT event `call-summary` gọn lúc hoàn thành (reason, callee role, outcome ref) — không cặp start/end. Lý do: trục holder tồn tại để trả lời "ai phải hành động tiếp" qua ranh giới scheduling — subagent sync không đổi câu trả lời đó nên không phải handoff thật; nhưng "implementer đã consult researcher" là tín hiệu compound-learn quý → một event tóm tắt đủ tín hiệu học mà không nhiễu state machine. Guard invariant sạch: holder chỉ đổi qua async handoff |
+| 11 | Call trong-session (subagent, đồng bộ, vài giây) có ghi thành handoff event như call liên-session (park chờ role khác, bất đồng bộ) không, hay chỉ ghi loại async? | Rõ — **D8** (đồng ý v8) | Async call (park chờ role khác) = handoff event đầy đủ, holder đổi, checkpoint đầy đủ — bắt buộc, vì frontier/routing phụ thuộc. Sync call trong-session (subagent) = KHÔNG đổi holder (bóng chưa rời session, session vẫn chịu trách nhiệm), ghi MỘT event `call-summary` gọn lúc hoàn thành (reason, callee role, outcome ref) — không cặp start/end. Lý do: trục holder tồn tại để trả lời "ai phải hành động tiếp" qua ranh giới scheduling — subagent sync không đổi câu trả lời đó nên không phải handoff thật; nhưng "implementer đã consult researcher" là tín hiệu compound-learn quý → một event tóm tắt đủ tín hiệu học mà không nhiễu state machine. Guard invariant sạch: holder chỉ đổi qua async handoff |
 | 12 | Call lồng nhau — cho phép không, guard kiểu gì? | Rõ — người dùng quyết vòng 5: **cho phép lồng, giới hạn trần callstack** | Trần cụ thể (con số, per-domain hay global) chưa chốt — để planning quyết, không phải điểm sản phẩm |
 | 13 | Danh sách one-way gate cho coding | Rõ — **D5** (đồng ý v7) | Nguyên tắc: gate hard một-chiều ⟺ side effect đã vượt ranh giới item/worktree (merge vào main, publish ra ngoài, terminal done/wontfix, cleanup đã xoá worktree). Mọi gate nội bộ item = soft: quay lại được nhưng bắt buộc ghi reason vào event log |
 | 14 | Task-spec (contract, WHAT) tách khỏi skill (know-how, HOW) triển khai thế nào? | Rõ — **D6** (đồng ý v7) | Người dùng vòng 5 nêu task của cockpit "rất hay", fgOS đang gói contract lẫn know-how trong skill. A-lite: file task-spec khai báo riêng per-domain (như cockpit `.fgOS/tasks/`), skillMap trỏ stage → (task-spec, skill); ban đầu chỉ là read-first material qua refs, CHƯA có engine enforcement (đúng advise YAGNI của fable). Lý do chọn A thay vì nhét vào frontmatter SKILL.md hay giữ nguyên: (1) 30 task-spec của cockpit port gần verbatim khi tới marketing; (2) một contract chạy được bởi nhiều skill/role khác nhau; (3) soul nâng cấp know-how không đụng contract |
@@ -62,6 +57,7 @@ cụ thể của domain "marketing" trên fgOS sẽ trông như thế nào.
 | D5 | One-way gate theo nguyên tắc hard/soft: hard ⟺ side effect vượt ranh giới item/worktree; nội bộ item = soft, cross-back bắt buộc ghi reason | Em advise v5 theo uỷ quyền, giữ v6, người dùng đồng ý v7 | 18058 |
 | D6 | Task-spec A-lite: tách contract (task-spec, file per-domain) khỏi know-how (skill); skillMap trỏ (task-spec, skill); chưa engine enforcement | Recommend v5, giữ v6, đồng ý v7 | 18059 |
 | D7 | Hierarchy domain → N workflow → item; selector tái dùng `kind` + `workflowFor` map có default; coding un-gộp thành feature (default) / bugfix / lightweight; workflow (shape 1 item) ≠ template (composition nhiều item) | Người dùng nêu v6, đồng ý v7 | 18060 |
+| D8 | Async call = handoff event đầy đủ (holder đổi); sync call trong-session = một event `call-summary` gọn, KHÔNG đổi holder. Guard invariant: holder chỉ đổi qua async handoff | Em advise v7, người dùng đồng ý v8 | 18070 |
 
 ## 5. Q&A log
 
@@ -216,6 +212,12 @@ cụ thể của domain "marketing" trên fgOS sẽ trông như thế nào.
   lúc hoàn thành, KHÔNG đổi holder — chi tiết và lý do ở §3 #11, chờ
   gật là thành D8.
 
+- **2026-08-15 19:01 — Người dùng đồng ý D8 (vòng 8, hội tụ)**: "đồng ý
+  D8" → mint D8 (seq 18070). Mọi câu hỏi thiết kế phần coding-harness
+  đã đóng; discussion hội tụ, chuyển sang terminal handoff native-first
+  (`refs` → `{#task-role-axis-coding}`, dispatch
+  `fgos-coding-exploring` → `fgos-coding-planning`).
+
 ## 6. Thiết kế đã chốt {#design}
 
 > Synthesis vòng 7. Nền: D1–D7 đã chốt (§4). Chỉ còn #11 (call-summary,
@@ -288,6 +290,10 @@ bóng, per-domain roleGraph, opt-in).
   danh sách edge hợp lệ.
 - **Checkpoint hạt mịn miễn phí** — handoff event mang context snapshot,
   worktree commit mang artifact state.
+- **Ghi log hai mức (D8)** — async call (park chờ role khác) = handoff
+  event đầy đủ, holder đổi; sync call trong-session (subagent) = một
+  event `call-summary` gọn lúc hoàn thành (reason, callee role, outcome
+  ref), KHÔNG đổi holder. Invariant: holder chỉ đổi qua async handoff.
 
 ### One-way gate: nguyên tắc hard/soft (D5)
 
