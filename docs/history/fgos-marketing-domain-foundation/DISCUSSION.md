@@ -2,24 +2,24 @@
 
 ## 1. Trạng thái hiện tại
 
-Vòng 4: người dùng đã trả lời các câu hỏi vòng 3 — (#9) làm domain
-**coding trước**, ổn rồi mới thêm marketing (đảo lại đề xuất
-marketing-first của em, là quyết định của người dùng); (#10) soul = **cả
-hai**: agent-type trong team hiểu vai trò mình, hiểu vấn đề công việc,
-biết cần ai support — nên đẩy việc linh hoạt khi cần *advise*, cần *người
-phụ làm tay chân*, cần *đánh giá phản biện*, cần *hỏi chuyên môn*; harness
-giữ vai trò an toàn — điều phối cứng theo luật/gate, vd chỗ nào không được
-quay lại. Mục tiêu: uyển chuyển hơn hiện tại nhưng ổn định hơn. Em đã
-phản hồi: 4 lý do đó là taxonomy handoff-call (round-trip, bóng về người
-gửi), tách với handoff-pass (chuyển giao theo stage); tiền lệ engine có
-sẵn là ask/answer (call-to-human) — thiết kế chỉ tổng quát hoá nó thành
-call-to-role; coding đã có đủ 4 tương tác này ở dạng ngầm trong session
-(fgos-researching = consult, code-review = review, subagent fanout =
-assist, ask/answer = advise) — việc cần làm là nâng chúng thành move hữu
-hình có guard. §6 đã regenerate theo shape mới. Chưa mint D-ID (điểm
-role-axis mới giữ ổn qua 1 vòng; các câu trả lời vòng 4 mới 1 lần nêu —
-chờ giữ ổn thêm vòng nữa). Còn mở: #7 (judge-gate vs L5 — chỉ chạm khi
-tới lượt marketing), #11–#13 (mới, xem §3).
+Vòng 5: **4 D-ID đầu tiên đã mint** (D1 trục role/handoff-guard, D2
+coding-first, D3 mechanism/policy split, D4 call/pass taxonomy — xem §4,
+đã ghi qua `fgos decision`, seq 18029–18032) sau khi giữ ổn đủ vòng.
+Người dùng vòng 5 trả lời thêm: (#12) **cho phép call lồng nhau, giới
+hạn trần callstack**; (#13) nhờ em dùng expertise advise danh sách
+one-way gate — em đã advise nguyên tắc hard/soft gate (§6); và hai lưu ý
+mới: (a) khái niệm **task** của cockpit rất hay — hiện fgOS đang triển
+khai thứ đó như skill → mở ra tách contract (task-spec, WHAT) khỏi
+know-how (skill, HOW), em đề xuất phương án A-lite trong §6; (b) xác
+nhận ranh giới **dispatch = điều phối executor cho task, KHÔNG phải
+"agent-type nào làm gì tiếp theo"** — phần who/what-next là router/driver
+như đang dùng (fgos-routing / fgos-coding-driving). Người dùng cũng nói
+rõ: harness xác định *hình dạng cơ học các giai đoạn của một workflow*,
+mỗi team có đặc thù flow cơ học riêng (không khẳng định trùng
+routing/driving hiện tại). Còn mở: #7 (judge-gate vs L5 — hoãn tới lượt
+marketing), #11 (ghi call sync vào log?), #14 (chốt phương án task-spec),
+#15 (key khai báo shape: domain hay team), và xác nhận của người dùng cho
+nguyên tắc hard/soft gate em vừa advise.
 
 ## 2. Mục tiêu & đề bài
 
@@ -50,12 +50,20 @@ cụ thể của domain "marketing" trên fgOS sẽ trông như thế nào.
 | 9 | Trục role bật cho domain nào trước? | Rõ — người dùng quyết: **coding trước**, ổn rồi mới marketing | Vòng 4. Đảo đề xuất marketing-first của em — quyết định của người dùng, và có lý riêng: coding đã có đủ 4 tương tác call ở dạng ngầm (fgos-researching/code-review/subagent/ask-answer), dogfood hằng ngày cho feedback nhanh nhất; marketing vào sau trên harness đã được chứng minh |
 | 10 | "Team soul" bên trên harness — định nghĩa cụ thể? | Rõ — người dùng trả lời: **cả hai** | Soul = agent-type hiểu vai trò mình + hiểu vấn đề + biết cần ai support → tự đẩy việc linh hoạt (advise / tay chân / phản biện / chuyên môn). Harness = an toàn, điều phối cứng theo luật/gate (vd chỗ không được quay lại). Đích: uyển chuyển hơn nhưng ổn định hơn |
 | 11 | Call trong-session (subagent, đồng bộ, vài giây) có ghi thành handoff event như call liên-session (park chờ role khác, bất đồng bộ) không, hay chỉ ghi loại async? | Chưa rõ — trade-off hạt mịn vs nhiễu log | Vòng 4 nêu. Ghi hết thì event log thấy toàn bộ team-interaction (đẹp cho compound-learn) nhưng nhiễu; chỉ ghi async thì log gọn nhưng mù phần subagent |
-| 12 | Call lồng nhau (Reviewer đang giữ bóng lại consult Legal) — cho phép sâu bao nhiêu, guard kiểu gì (stack depth limit? cấm lồng?) | Chưa rõ | Vòng 4 nêu — cần trước khi viết roleGraph schema |
-| 13 | Danh sách one-way gate cho coding: các điểm không-quay-lại hiện có trên status FSM (approve/merge CTR005) đã đủ chưa, hay cần thêm one-way trong stage? | Chưa rõ — cần người dùng liệt kê chỗ "không được quay lại" theo ý anh | Vòng 4 nêu |
+| 12 | Call lồng nhau — cho phép không, guard kiểu gì? | Rõ — người dùng quyết vòng 5: **cho phép lồng, giới hạn trần callstack** | Trần cụ thể (con số, per-domain hay global) chưa chốt — để planning quyết, không phải điểm sản phẩm |
+| 13 | Danh sách one-way gate cho coding | Rõ dần — người dùng uỷ quyền em advise (vòng 5), em đã đề xuất nguyên tắc hard/soft (§6), chờ xác nhận | Nguyên tắc: gate hard một-chiều ⟺ side effect đã vượt ranh giới item/worktree (merge vào main, publish ra ngoài, terminal done/wontfix, cleanup đã xoá worktree). Mọi gate nội bộ item = soft: quay lại được nhưng bắt buộc ghi reason vào event log |
+| 14 | Task-spec (contract, WHAT) tách khỏi skill (know-how, HOW) triển khai thế nào? | Rõ dần — em recommend A-lite (vòng 5), chờ giữ ổn | Người dùng vòng 5 nêu task của cockpit "rất hay", fgOS đang gói contract lẫn know-how trong skill. A-lite: file task-spec khai báo riêng per-domain (như cockpit `.fgOS/tasks/`), skillMap trỏ stage → (task-spec, skill); ban đầu chỉ là read-first material qua refs, CHƯA có engine enforcement (đúng advise YAGNI của fable). Lý do chọn A thay vì nhét vào frontmatter SKILL.md hay giữ nguyên: (1) 30 task-spec của cockpit port gần verbatim khi tới marketing; (2) một contract chạy được bởi nhiều skill/role khác nhau; (3) soul nâng cấp know-how không đụng contract |
+| 15 | Key khai báo flow-shape là `domain` hay `team`? | Chưa rõ — YAGNI nghiêng domain-as-team-flow | Người dùng vòng 5: "mỗi team có thể có đặc thù cơ học flow riêng". Hiện registry key là domain; nếu sau này 2 team cùng domain cần shape khác nhau mới cần overlay theo team — chưa xây trước |
+| 16 | Ranh giới dispatch vs router/driver vs guard | Rõ — người dùng xác nhận vòng 5 | Dispatch (`src/runner/dispatch.mjs` decide/execute) = chọn executor chạy task. Router/driver (fgos-routing, fgos-coding-driving) = who/what-next. Guard (FSM + roleGraph + gate) = legality. Ba tầng không giẫm nhau |
 
 ## 4. Quyết định đã chốt
 
-(chưa có D-ID nào — còn đang ở vòng scout/brainstorm đầu tiên)
+| D-ID | Nội dung | Chốt vòng | Event seq |
+|------|----------|-----------|-----------|
+| D1 | Work item có trục thứ ba `role/holder`; verb `handoff` bị guard bởi roleGraph khai báo per-domain trong DOMAINS; route ngoài graph bị REFUSED kèm danh sách edge hợp lệ | Đề xuất v3, giữ v4–v5, mint v5 | 18029 |
+| D2 | Trình tự coding-first: nâng 4 tương tác ngầm sẵn có của coding (researching/review/fanout/ask-answer) thành handoff hữu hình trước; marketing vào sau trên harness đã chứng minh | Người dùng quyết v4, giữ v5, mint v5 | 18030 |
+| D3 | Tách mechanism/policy: harness gác legality + ghi sự thật + đánh thức đúng vai, không phán đoán; soul = agent-type hiểu vai trò/vấn đề/cần ai support, tự chọn edge hợp lệ | Người dùng chốt v4, giữ v5, mint v5 | 18031 |
+| D4 | Handoff hai loại: call (round-trip, 4 reason advise/assist/review/consult, tổng quát hoá ask/answer) và pass (một chiều theo stage); cùng item → handoff, khác item/cây → signal | Đề xuất v4 từ 4 lý do người dùng nêu, xây tiếp v5, mint v5 | 18032 |
 
 ## 5. Q&A log
 
@@ -163,148 +171,218 @@ cụ thể của domain "marketing" trên fgOS sẽ trông như thế nào.
   giẫm nhau. Câu hỏi mới nêu: #11 (ghi call sync in-session vào log
   không), #12 (call lồng nhau), #13 (danh sách one-way gate coding).
 
+- **2026-08-15 16:11 — Người dùng trả lời vòng 4 (vòng 5)**: (#12) cho
+  phép call lồng nhau, giới hạn trần callstack. (#13) uỷ quyền cho em
+  dùng expertise advise thêm. Định hình lại harness: lớp harness (có thể
+  tương ứng, không khẳng định liên quan đến routing/driving hiện tại)
+  dùng để *xác định một hình dạng cơ học về các giai đoạn của một
+  workflow*; mỗi team có thể có đặc thù cơ học riêng về flow của mình.
+  Lưu ý (a): khái niệm **task** của marketing-cockpit rất hay — thứ đó
+  fgOS hiện đang triển khai như 1 skill. Lưu ý (b): dispatch hiện tại
+  của fgOS dùng để xác định và điều phối một *executor* cho 1 task,
+  không phải là *who (agent-type nào) nên làm việc gì tiếp theo
+  (task/stage)* — phần đó nên là router/driver, giống cách đang dùng.
+  → Phản hồi của em: mint D1–D4 (đủ độ ổn theo luật D4 của skill);
+  advise nguyên tắc one-way gate hard/soft (hard ⟺ side effect vượt
+  ranh giới item/worktree — chi tiết §6); đề xuất A-lite cho task-spec
+  (tách contract khỏi know-how, file khai báo riêng per-domain, chưa
+  enforcement — chi tiết §3 #14); xác nhận và đặt tên ba tầng
+  dispatch / router-driver / guard (§3 #16); ghi nhận nuance team-vs-
+  domain làm điểm mở #15 (YAGNI: domain-as-team-flow đủ cho hiện tại).
+
 ## 6. Thiết kế đã chốt {#design}
 
-> **Lưu ý:** synthesis ĐỀ XUẤT (regenerate vòng 4) — chưa có D-ID support,
-> các điểm chính mới giữ ổn 1 vòng. Viết cho người lạ không có chat history.
+> Synthesis regenerate vòng 5. Nền tảng: D1–D4 đã chốt (§4). Các phần đánh
+> dấu *(đề xuất)* chưa có D-ID — mới nêu/giữ ổn chưa đủ vòng. Viết cho
+> người lạ không có chat history.
 
-### Bức tranh lớn
+### Bức tranh lớn (D2, D3)
 
-fgOS xây một **core harness cơ học** hai tầng cho team agent đa role, dùng
-chung cho mọi domain (coding trước, marketing là khách hàng absorption đầu
-tiên vào sau):
+fgOS xây một **core harness cơ học** cho team agent đa role, dùng chung
+cho mọi domain — coding triển khai trước (nâng cấp cái đang chạy), rồi
+marketing vào sau như khách hàng absorption đầu tiên. Harness xác định
+*hình dạng cơ học các giai đoạn của một workflow*; mỗi team/domain khai
+báo shape đặc thù riêng của mình vào registry, engine không hardcode shape
+nào.
 
 - **Mechanism (harness)** — cứng, không phán đoán: gác legality của mọi
-  move, ghi sự thật vào event log, đánh thức đúng vai kế tiếp. Không bao
-  giờ chọn đường thay agent.
+  move, ghi sự thật vào event log, đánh thức đúng vai kế tiếp.
 - **Policy (soul)** — agent-type hiểu vai trò mình, hiểu vấn đề, biết cần
-  ai support, tự chọn edge hợp lệ để đẩy việc: cần advise, cần người phụ
-  tay chân, cần phản biện, cần hỏi chuyên môn. Soul thay được, sai được,
-  nâng cấp tự do — harness đảm bảo sai không phá.
+  ai support, tự chọn edge hợp lệ: cần advise, cần tay chân, cần phản
+  biện, cần hỏi chuyên môn. Soul thay được, sai được — harness đảm bảo
+  sai không phá.
 
-Đích: flow uyển chuyển hơn hiện tại (không tuyến tính cứng) nhưng ổn định
-hơn (mọi bước lệch bị guard chặn kèm chỉ dẫn edge hợp lệ).
+### Ba tầng điều phối, không giẫm nhau (xác nhận vòng 5)
 
-### Ba trục trực giao của work item
+| Tầng | Vai trò | Hiện thân hiện tại |
+|------|---------|--------------------|
+| Router/Driver | who + what-next: vai nào, việc gì, stage nào tiếp | `fgos-routing`, `fgos-coding-driving` |
+| Guard/Harness | legality: FSM 3 trục + roleGraph + gates + event log | status-fsm/stage-fsm + phần mới |
+| Dispatch | executor nào chạy task đã quyết | `src/runner/dispatch.mjs` decide/execute (một cửa) |
 
-1. `status` — lifecycle phổ quát (giữ nguyên 11 trạng thái).
-2. `stage` — tiến độ theo domain (giữ nguyên, per-DOMAINS).
-3. `role/holder` — **mới**: ai đang cầm bóng. Khai báo per-domain trong
-   DOMAINS (`roleGraph`), chỉ domain nào khai báo mới có.
+### Ba trục trực giao của work item (D1)
 
-### Handoff: hai loại, một guard
+1. `status` — lifecycle phổ quát (11 trạng thái, giữ nguyên).
+2. `stage` — tiến độ theo domain (per-DOMAINS, giữ nguyên).
+3. `role/holder` — ai đang cầm bóng; per-domain `roleGraph`, chỉ domain
+   khai báo mới có.
 
-- **Call (round-trip)** — bóng quay về người gửi. Đúng 4 reason người
-  dùng nêu: `advise` (xin lời khuyên), `assist` (nhờ làm tay chân, trả
-  work product), `review` (xin phản biện, trả verdict), `consult` (hỏi
-  chuyên môn, trả finding). Tiền lệ engine có sẵn: `fgos ask`/`answer` +
-  `awaiting-human` chính là call-to-human — thiết kế tổng quát hoá thành
-  call-to-role, không phát minh cơ chế mới.
-- **Pass (transfer)** — chuyển giao một chiều theo stage/status, không
-  quay lại; đây là các edge stage FSM hiện có.
-- **Guard** — roleGraph per-domain khai báo edge hợp lệ (from-role,
-  to-role, reason) theo stage; one-way gate đánh dấu chỗ "không được quay
-  lại" (coding đã có sẵn: approve/merge CTR005). Route bậy → REFUSED kèm
-  danh sách edge hợp lệ (chặn và dạy tại chỗ).
+### Handoff: hai loại, một guard (D1, D4)
+
+- **Call (round-trip)** — bóng quay về người gửi. 4 reason:
+  `advise` / `assist` / `review` / `consult`. Tổng quát hoá tiền lệ
+  `fgos ask`/`answer` (call-to-human) thành call-to-role. **Cho phép call
+  lồng nhau, giới hạn trần callstack** (người dùng quyết v5; con số trần
+  để planning chọn).
+- **Pass (transfer)** — chuyển giao một chiều theo stage/status.
+- **Guard** — roleGraph khai báo edge hợp lệ (from-role, to-role, reason)
+  theo stage; route bậy → REFUSED kèm danh sách edge hợp lệ.
 - **Checkpoint hạt mịn miễn phí** — mỗi handoff event mang context
-  snapshot (đã xong gì, concern gì mở) + worktree commit mang artifact
-  state; chết session → resume ở handoff gần nhất, không làm lại cả stage.
+  snapshot + worktree commit mang artifact state; resume ở handoff gần
+  nhất.
 
-### Ranh giới giữa các cơ chế
+### One-way gate: nguyên tắc hard/soft *(đề xuất v5, em advise theo uỷ quyền)*
 
-- Cùng item → **handoff**. Khác item/cây → **signal** (event typed
-  payload + projection, hoãn tới khi có use-case fan-out thật — giữ
-  nguyên kết luận vòng 2).
-- Role ≠ capacity: roleGraph chọn *vai cầm việc*; dispatch một cửa
-  (`src/runner/dispatch.mjs` decide/execute) chọn *executor chạy việc*.
-  Hai tầng không giẫm nhau.
+**Một gate là hard một-chiều khi và chỉ khi việc vượt qua nó tạo side
+effect vượt ranh giới item/worktree.** Mọi gate nội bộ item là soft:
+quay lại được, nhưng bắt buộc ghi reason vào event log.
+
+- **Hard trong coding**: approve/merge root vào main (CTR005 — đã có);
+  terminal `done`/`wontfix` (đã có); `cleanup` đã xoá worktree/branch.
+  Toàn vùng hậu-merge là một chiều: rework sau merge = item MỚI, không
+  reopen — giữ outcome record trung thực cho compound-learn.
+- **Soft trong coding**: executing → planning (replan), awaiting-approval
+  → doing (reject — đã có), mọi handoff-call. Soft-gate cross-back có
+  reason key → rework tự nó thành tín hiệu học ("replan vì sao" đọc được
+  từ log).
+- Với marketing sau này: publish-to-platform = hard; editorial approval
+  vòng trong = soft. Nguyên tắc trên áp dụng nguyên xi, không cần luật
+  riêng.
+
+Lý do chọn nguyên tắc này thay vì liệt kê tay từng gate: worktree
+isolation làm rework nội bộ rẻ (không có lý do cơ học để cấm quay lại);
+còn side effect đã ra ngoài (main, platform ngoài) thì không thu hồi được
+bằng máy — đó mới là chỗ cần rào cứng. Over-hardening giết đúng tính uyển
+chuyển đang xây.
+
+### Task-spec: tách contract khỏi know-how *(đề xuất v5, phương án A-lite)*
+
+Người dùng nhận định khái niệm task của cockpit "rất hay" — fgOS hiện gói
+cả contract lẫn know-how trong skill. Tách ra:
+
+- **task-spec (WHAT)** — contract: input, output, gate áp dụng, verify
+  template. File khai báo riêng per-domain (mô hình cockpit
+  `.fgOS/tasks/`), skillMap trỏ stage → (task-spec, skill).
+- **skill (HOW)** — know-how thực hiện; nhiều skill/role có thể chạy cùng
+  một task-spec.
+- **work item (INSTANCE)** — như hiện có.
+
+A-lite = bắt đầu bằng file khai báo làm read-first material (refs), CHƯA
+xây engine enforcement (YAGNI). Trả cổ tức khi tới marketing: 30 task-spec
+cockpit port gần verbatim.
+
+### Ranh giới giữa các cơ chế (D4 + kết luận v2 giữ nguyên)
+
+- Cùng item → handoff; khác item/cây → signal (event typed payload +
+  projection; hoãn tới khi có use-case fan-out thật).
 - Workflow = template stamp ra cây item (`fgos expand`), không phải
-  runtime entity — giữ nguyên kết luận vòng 2.
+  runtime entity.
+- Registry key hiện là `domain`; nuance "mỗi team một shape" ghi nhận —
+  nếu 2 team cùng domain cần shape khác nhau mới cần overlay theo team
+  (#15, chưa xây).
 
-### Trình tự triển khai (quyết định người dùng vòng 4)
+### Trình tự triển khai (D2)
 
-**Coding trước** — vì coding đã chứa đủ 4 tương tác call ở dạng ngầm
-trong session, chỉ cần nâng thành move hữu hình có guard:
+Coding trước — nâng 4 tương tác ngầm sẵn có thành handoff hữu hình:
 
 | Reason | Tương tác ngầm hiện có |
 |---|---|
-| consult | `fgos-researching` gọi từ giữa exploring/planning |
-| review | `code-review` / approve-reject loop |
+| consult | `fgos-researching` gọi giữa exploring/planning |
+| review | `code-review` / vòng approve-reject |
 | assist | subagent fanout (`fgos-fanout`, Agent tool) |
 | advise | `fgos ask`/`answer` + `awaiting-human` |
 
-Ổn rồi mới thêm domain marketing: DOMAINS entry + port skill cockpit +
-`fgos expand` template (§6 vòng 2 vẫn đúng cho phần marketing, xếp sau).
-Câu hỏi judge-gate vs luật L5 DoD (#7) chỉ cần quyết khi tới lượt
+Ổn rồi mới tới marketing: DOMAINS entry + port skill/task-spec cockpit +
+`fgos expand` template. Judge-gate vs luật L5 DoD (#7) quyết khi tới lượt
 marketing.
 
 ```mermaid
 flowchart TD
     subgraph item["MỘT work item coding — dòng chính (pass) + các cú call (round-trip)"]
         direction LR
-        P1["planning<br/>holder: Implementer"] --> G1{{"gate: plan approved"}}
+        P1["planning<br/>holder: Implementer"] --> G1{{"soft gate: plan approved<br/>(quay lại được, ghi reason)"}}
         G1 --> P2["executing<br/>holder: Implementer"]
-        P2 --> G2{{"gate: approve/merge<br/>một chiều — CTR005"}}
-        G2 --> P3["delivered → retrospective"]
+        P2 --> G2{{"HARD gate: approve/merge<br/>side effect ra main — CTR005"}}
+        G2 --> P3["delivered → retrospective<br/>(vùng hậu-merge: một chiều)"]
     end
-    P2 -- "call: consult" --> RES["Researcher role<br/>(fgos-researching)"]
+    P2 -- "call: consult" --> RES["Researcher<br/>(fgos-researching)"]
     RES -. "finding → bóng về" .-> P2
-    P2 -- "call: review" --> REV["Reviewer role<br/>(code-review)"]
+    P2 -- "call: review" --> REV["Reviewer<br/>(code-review)"]
     REV -. "verdict → bóng về" .-> P2
-    P2 -- "call: assist" --> SUB["Helper role<br/>(subagent fanout)"]
+    P2 -- "call: assist" --> SUB["Helper<br/>(subagent fanout)"]
     SUB -. "work product → bóng về" .-> P2
-    P2 -- "call: advise" --> HUM["Người<br/>(ask / awaiting-human)"]
+    P2 -- "call: advise" --> HUM["Người<br/>(ask/answer)"]
     HUM -. "answer → bóng về" .-> P2
+    REV -- "call lồng: consult<br/>(trần callstack)" --> RES
 ```
 
-## 7. Danh mục hạng mục / task {#tasks} (đề xuất, chưa chốt — re-sequenced vòng 4)
+## 7. Danh mục hạng mục / task {#tasks} (đề xuất, chưa chốt)
 
 ### {#task-role-axis-coding}
-- **Mục tiêu**: thêm trục `role/holder` + verb `handoff` (call/pass, guard
-  theo roleGraph) vào engine, khai báo roleGraph đầu tiên cho domain
-  coding với 4 role: Researcher/Reviewer/Helper/Human-advisor quanh
-  Implementer; ask/answer trở thành case đặc biệt của call.
-- **Trích §6**: "Handoff: hai loại, một guard" + bảng 4 tương tác ngầm.
-- **D-ID áp dụng**: chưa có.
-- **Quan hệ**: nền cho mọi task sau; blocked bởi câu hỏi #11/#12/#13 (§3).
-- **Verify nháp**: một item coding thực hiện call review → verdict → bóng
-  về implementer, toàn bộ hiện trong event log; một handoff ngoài
-  roleGraph bị REFUSED kèm danh sách edge hợp lệ.
+- **Mục tiêu**: trục `role/holder` + verb `handoff` (call/pass, guard
+  roleGraph, trần callstack cho call lồng) vào engine; roleGraph coding
+  đầu tiên: Researcher/Reviewer/Helper/Human-advisor quanh Implementer;
+  ask/answer trở thành case đặc biệt của call; soft-gate cross-back bắt
+  buộc reason.
+- **D-ID áp dụng**: D1, D3, D4.
+- **Quan hệ**: nền cho mọi task sau; còn chờ #11 (ghi call sync?) và trần
+  callstack cụ thể (planning quyết).
+- **Verify nháp**: call review → verdict → bóng về implementer hiện đủ
+  trong event log; handoff ngoài roleGraph bị REFUSED kèm edge hợp lệ;
+  call lồng vượt trần bị REFUSED.
+
+### {#task-task-spec-convention}
+- **Mục tiêu**: đặt convention task-spec A-lite cho coding — file khai
+  báo contract per-domain (input/output/gate/verify-template), skillMap
+  trỏ (task-spec, skill); chưa enforcement.
+- **D-ID áp dụng**: chưa (chờ #14 giữ ổn).
+- **Quan hệ**: độc lập với role-axis, nên làm song song để marketing port
+  được task-spec cockpit sau này.
+- **Verify nháp**: một stage-skill coding đọc task-spec từ refs và verify
+  của item khớp verify-template của spec.
 
 ### {#task-marketing-domain-registry}
 - **Mục tiêu**: entry `marketing` thật trong DOMAINS (thay
   `fixture-marketing`): stages briefing → producing → gating →
   distributing, roleGraph marketing (writer/editor/brand/legal/
   scheduler), `worktreeBacked: true`.
-- **Trích §6**: "Trình tự triển khai" — xếp sau coding.
-- **Quan hệ**: phụ thuộc `{#task-role-axis-coding}` đã ổn.
-- **Verify nháp**: item domain=marketing đi hết 4 stage, ping-pong
-  writer↔editor qua handoff-call, không rơi về `coding` mặc định.
+- **D-ID áp dụng**: D1, D2.
+- **Quan hệ**: sau `{#task-role-axis-coding}` ổn (D2).
+- **Verify nháp**: item marketing đi hết 4 stage, ping-pong writer↔editor
+  qua handoff-call, không fold về `coding`.
 
 ### {#task-marketing-skill-port}
-- **Mục tiêu**: port tập con skill từ cockpit `.fgOS/tasks/` đủ chạy 1
-  workflow mẫu (content-creation) end-to-end trên fgOS.
-- **Quan hệ**: phụ thuộc `{#task-marketing-domain-registry}`.
-- **Verify nháp**: item marketing chạy skill port, sinh artifact thật
-  trong worktree, verify pass.
+- **Mục tiêu**: port tập con skill + task-spec từ cockpit `.fgOS/tasks/`
+  đủ chạy 1 workflow mẫu (content-creation) end-to-end.
+- **Quan hệ**: phụ thuộc `{#task-marketing-domain-registry}` và
+  `{#task-task-spec-convention}`.
+- **Verify nháp**: item marketing chạy skill port, artifact thật trong
+  worktree, verify pass.
 
 ### {#task-expand-template-verb}
-- **Mục tiêu**: `fgos expand <template>` — stamp cây item (cha + con +
-  deps prewired) từ template khai báo; 25 workflow cockpit thành
-  decomposition recipe.
-- **Quan hệ**: cần cho marketing thật; độc lập với role-axis.
-- **Verify nháp**: `fgos expand editorial-calendar --slots 3` sinh đúng
-  1 parent + 3 children deps đúng thứ tự.
+- **Mục tiêu**: `fgos expand <template>` — stamp cây item từ template
+  khai báo; 25 workflow cockpit thành decomposition recipe.
+- **Quan hệ**: cần cho marketing thật; độc lập role-axis.
+- **Verify nháp**: `fgos expand editorial-calendar --slots 3` sinh 1
+  parent + 3 children deps đúng thứ tự.
 
-### {#task-gate-runner} — BLOCKED bởi câu hỏi #7 (§3)
+### {#task-gate-runner} — BLOCKED bởi #7 (§3)
 - **Mục tiêu**: `fgos gate` judge-runner (brand/content/seo/legal/
   factual) như skill, kết quả vào event log.
-- **Quan hệ**: chỉ cần khi tới lượt marketing; quyết định judge-proof vs
-  L5 DoD phải có trước.
-- **Verify nháp**: chưa viết — phụ thuộc quyết định trên.
+- **Quan hệ**: chỉ cần khi tới lượt marketing; quyết judge-proof vs L5
+  DoD trước.
 
-### {#task-signal-bus} — hoãn, chưa cần task cụ thể
+### {#task-signal-bus} — hoãn
 - **Mục tiêu**: verb `signal` + projection consumer cursor + frontier
-  signal-readiness cho fan-out tới item chưa tồn tại.
+  signal-readiness.
 - **Quan hệ**: hoãn tới khi use-case fan-out thật xuất hiện (YAGNI).
-- **Verify nháp**: chưa viết — chưa tới lúc.
