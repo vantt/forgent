@@ -1,7 +1,7 @@
 ---
 type: explanation
 title: Why `clarify` split into `clarify`, `discovery`, and `exploring`
-source_capture_ids: [tsk-4b2, tsk-12p, tsk-4v6]
+source_capture_ids: [tsk-4b2, tsk-12p, tsk-4v6, tsk-30v]
 ---
 # Why `clarify` split into `clarify`, `discovery`, and `exploring`
 
@@ -355,3 +355,53 @@ making the dispatcher that *already* runs against that state honor the
 same contract another dispatcher already honors (`tsk-4v6`, this piece)
 — and confirming the second claim needs its own read of the dispatcher's
 code, not an inference from the first claim being fixed.
+
+## Implementation (`tsk-30v`): the edge choice itself finally reads the verdict, not just the stage
+
+Named at the time as the DoD of this whole cluster — every sibling piece
+above (`tsk-4b2`, `tsk-4v6`, and the rest) was groundwork or polish until
+this one landed. Before `tsk-30v`, `nextDiscoveryEdge` chose its edge
+**purely by stage**: a clear verdict still walked the full linear chain
+`clarify → discovery → exploring`, and an unclear verdict just parked in
+place — the verdict itself never participated in which edge got taken,
+even though both alternative edges already existed as valid FSM
+transitions (`workflow-stage-graphs.mjs`'s transitions array simply
+wasn't read that way).
+
+The fix, from the commit's own message
+(`ee0cc0215e45da4ee61456ea6ef7dbef4c8f8ce2`, `feat(discovery):
+verdict-driven edge selection at the discovery stage`):
+
+> `nextDiscoveryEdge` now reads the discovery verdict instead of picking
+> purely by stage: a clear verdict skips exploring and lands directly on
+> a newly registered discovery->planning FSM edge; an unclear verdict
+> advances stage to exploring while still parking status as
+> awaiting-human, so answering the park resumes straight into the
+> Socratic collab instead of looping back through discovery.
+
+Scope turned out smaller than the item's own original premise assumed —
+recorded as a real decision during discovery, not glossed over: the
+verdict was already being captured and passed down (`tsk-4v6`'s own work,
+`resolveDiscovery(dir, id, config, 'runner', callerVerdict)` at
+`loop.mjs:1132-1138`), so the only genuinely missing piece was the edge
+*selection* itself. The same commit also fixed a stale `loop.mjs` comment
+(around lines 1068-1074) that still claimed the DISCOVERY DISPATCH sweep
+"unconditionally advances," when the code beneath it had already gated on
+the worker's verdict since `tsk-4v6` landed — a documentation bug left
+behind by a prior piece, caught and closed in the same pass rather than
+filed separately.
+
+The change touched `src/intake/discovery.mjs`, `src/runner/loop.mjs`, and
+`src/state/workflow-stage-graphs.mjs` (the new `discovery -> planning`
+edge), plus every test that had encoded the old fixed
+`discovery -> exploring` routing, including a shared CLI test harness
+walking the old two-hop chain. It passed verify
+(`npm test && node --test test/intake/discovery.test.mjs`) on its first
+attempt. One real friction did surface, scoped to merge rather than to
+the implementation itself: merging `fgw/tsk-30v` into the parent branch
+`fgw/tsk-2mt` conflicted on the first attempt (`git merge --no-commit
+--no-ff` aborted, parent branch left unchanged) — resolved before the
+item's own outcome was recorded as `awaiting-approval`/passed, so the
+conflict was a real but non-blocking cost of landing several sibling
+pieces on the same parent branch concurrently, not a defect in the edge
+logic itself.

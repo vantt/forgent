@@ -244,11 +244,29 @@ function indexChildrenByParent(work) {
 const TAIL_RESOLVED_STATUSES = new Set(['delivered', 'retrospective', 'cleanup', 'done']);
 const LEGACY_CANCELED_STATUS = 'wontfix';
 
+/** The canceled-only half of `isResolvedStatus` below, extracted (tsk-4bh)
+ * for a caller that needs to tell "abandoned, never had content" apart from
+ * "successfully resolved" — `isResolvedStatus` itself treats both as
+ * equally fine to stop waiting on (deps-readiness, frontier lineage), but
+ * `cleanup-harness.mjs`'s own merge-still-resolves ancestry check needs the
+ * opposite split: skip a canceled/wontfix child entirely (it never had
+ * content to merge, so there is nothing to check), while STILL verifying a
+ * `done`/`delivered` child's recorded sha really is an ancestor (that
+ * verification is the whole point of the check — `isResolvedStatus` alone
+ * would wrongly skip it too). Never returns true for a tail-resolved status
+ * (`done`/`delivered`/`retrospective`/`cleanup`) — those are the opposite
+ * case this function exists to distinguish. */
+export function isCanceledStatus(item) {
+  if (!item) return false;
+  if (TAIL_RESOLVED_STATUSES.has(item.status)) return false;
+  if (item.statusCategory !== undefined) return item.statusCategory === 'canceled';
+  return item.status === LEGACY_CANCELED_STATUS;
+}
+
 export function isResolvedStatus(item) {
   if (!item) return false;
   if (TAIL_RESOLVED_STATUSES.has(item.status)) return true;
-  if (item.statusCategory !== undefined) return item.statusCategory === 'canceled';
-  return item.status === LEGACY_CANCELED_STATUS;
+  return isCanceledStatus(item);
 }
 
 // True when `id` has any descendant (direct child, or a descendant reachable

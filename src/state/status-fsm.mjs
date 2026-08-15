@@ -43,7 +43,7 @@
 // pair. It exists for fan-out-parallel's drift reconcile (CONTEXT.md
 // D7/D8/D11): a root parked via `awaiting-approval -> blocked` (reason
 // `integration-drift`) after a clean catch-up + re-verify needs to return to
-// `proposed` directly, without re-entering `doing`. Re-entering `doing`
+// `awaiting-approval` directly, without re-entering `doing`. Re-entering `doing`
 // would wrongly count as an anti-loop visit — `visitCount` in
 // `runner/anti-loop.mjs` counts any `work.move` event whose `payload.to` is
 // `'doing'`, and a mechanical reconcile retry is not the kind of rework that

@@ -21,6 +21,7 @@
 // exactly as before (D2 of the gate-bypass item — no default-behavior
 // change).
 
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -416,8 +417,14 @@ function checkToolRegistryConfigured(cwd) {
   if (posture === 'full') {
     return { passed: true, message: `full — ${presentCount}/${registeredCount} registered tool(s) present` };
   }
+  // tsk-3oa2: degraded used to report passed:true, the same as full --
+  // meaning AGENTS.md's impact-analysis capability gate's own "Degraded"
+  // branch (a tool registered but not present, or present but stale) had
+  // no doctor signal a person would ever see flagged. A registered tool
+  // that is missing or was never checked here is a real gap, not a clean
+  // skip the way "nothing registered at all" (inactive) is.
   return {
-    passed: true,
+    passed: false,
     message: `degraded — ${presentCount}/${registeredCount} registered tool(s) present (${missingCount} missing, ${unknownCount} never checked — run fgos tool check)`,
   };
 }
@@ -1075,6 +1082,83 @@ registerFix({
   fix: (cwd) => fixGateBypassConfigured(cwd),
 });
 
+// tsk-4r1 (found by the gateway audit, plans/reports/gateway-audit-
+// 260814-2110-fable-hidden-bugs-report.md Finding 9): `gateway.token`/
+// `gateway.port` (herdr-plugin/src/gateway.rs's `load_gateway_config`,
+// D4/D5) lived nowhere in this registry -- a fresh machine's `fgos setup`
+// never provisioned the section, and `fgos doctor` had no way to notice,
+// violating AGENTS.md's own install/setup/doctor gate.
+//
+// This reads/writes `os.homedir()` explicitly, NOT the `cwd` every other
+// check/fix in this file receives -- `load_gateway_config` reads
+// `~/.fgos/config.json` specifically (a machine-level secret, not a
+// per-project one), so checking/fixing `cwd`'s own `.fgos/config.json`
+// would silently target the wrong file entirely.
+const GATEWAY_HOME_CONFIG_DIR = () => os.homedir();
+
+// Matches herdr-plugin/src/gateway.rs's own `DEFAULT_PORT`.
+const DEFAULT_GATEWAY_PORT = 4170;
+
+function checkGatewayTokenConfigured() {
+  const home = GATEWAY_HOME_CONFIG_DIR();
+  const shared = readSharedConfig(home);
+  const token = shared?.gateway?.token;
+  if (typeof token !== 'string' || token.trim() === '') {
+    return {
+      passed: false,
+      message: `gateway.token missing from ${sharedConfigFilePath(home)} -- run fgos doctor --fix`,
+    };
+  }
+  return { passed: true, message: 'gateway.token present' };
+}
+
+// Idempotent (same discipline fixGateBypassConfigured above already uses):
+// an already-present token is left untouched and reported unchanged, never
+// rotated out from under a client that already has it.
+function fixGatewayTokenConfigured() {
+  const home = GATEWAY_HOME_CONFIG_DIR();
+  const shared = readSharedConfig(home);
+  const existingToken = shared?.gateway?.token;
+  if (typeof existingToken === 'string' && existingToken.trim() !== '') {
+    return { changed: false, message: 'gateway.token already present' };
+  }
+  const existingGateway =
+    shared.gateway && typeof shared.gateway === 'object' && !Array.isArray(shared.gateway) ? shared.gateway : {};
+  // 256 bits, not crypto.randomUUID()'s 122 -- this is a bearer secret,
+  // not a non-secret session id (session.mjs's own use of randomUUID is a
+  // different kind of value).
+  const token = crypto.randomBytes(32).toString('hex');
+  const merged = {
+    ...shared,
+    gateway: { port: existingGateway.port ?? DEFAULT_GATEWAY_PORT, ...existingGateway, token },
+  };
+  writeSharedConfig(home, merged);
+  return { changed: true, message: `wrote a new gateway.token to ${sharedConfigFilePath(home)}` };
+}
+
+registerConfigDefault({
+  id: 'gateway',
+  key: 'gateway',
+  // `token: null` -- present but unarmed, the same shape `workerSlots`'s
+  // own `ceiling: null` registration already uses below: shipping a real
+  // value here would mean every fresh install gets the SAME shared,
+  // predictable secret, defeating D4's whole point. A real token only
+  // ever comes from fixGatewayTokenConfigured's own crypto.randomBytes
+  // call, run explicitly via `fgos doctor --fix`.
+  shape: { port: DEFAULT_GATEWAY_PORT, token: null },
+});
+
+registerCheck({
+  id: 'gateway-token-configured',
+  description: 'gateway.token in ~/.fgos/config.json (home, not project) is present and non-empty',
+  check: () => checkGatewayTokenConfigured(),
+});
+
+registerFix({
+  id: 'gateway-token-configured',
+  fix: () => fixGatewayTokenConfigured(),
+});
+
 // tsk-4xg (docs/history/tsk-4xg-plugin-marketplace-doctor-check/): a new
 // project set up via `fgos setup` never got the fgOS Claude Code plugin
 // (`.claude-plugin/marketplace.json`, `plugins/fgOS`) registered or
@@ -1359,6 +1443,49 @@ registerCheck({
   id: 'changelog-unreleased-stale',
   description: 'CHANGELOG.md ## [Unreleased] section has at least one pending entry (observe/remind only, never blocks merge -- tsk-3ip)',
   check: (cwd) => checkChangelogUnreleasedStale(cwd),
+});
+
+// tsk-2t8: README.md's own "## Install" section recommends `npm install -g
+// github:vantt/forgent#vX.Y.Z`, a specific pinned tag -- if that tag was
+// never actually cut (tag-cutting is a deliberate manual act by design,
+// tsk-jtb D1/D2, never automated here), every new external user's
+// recommended install command fails outright. Read-only, same "absent =
+// clean skip" convention as changelog-unreleased-stale above: no
+// README.md, or no pinned-tag line found in it, is not itself a problem
+// this check reports on.
+const README_INSTALL_TAG_PATTERN = /npm install -g github:[^#\s]+#(v\d+\.\d+\.\d+)/;
+
+function checkReadmeInstallTagExists(cwd) {
+  const mainCheckout = resolveMainCheckoutRoot(cwd) ?? cwd;
+  const readmePath = path.join(mainCheckout, 'README.md');
+  if (!fs.existsSync(readmePath)) {
+    return { passed: true, message: 'README.md not found -- nothing to check' };
+  }
+  const content = fs.readFileSync(readmePath, 'utf8');
+  const match = content.match(README_INSTALL_TAG_PATTERN);
+  if (!match) {
+    return { passed: true, message: 'README.md has no pinned-tag install command -- nothing to check' };
+  }
+  const tag = match[1];
+  let existingTags;
+  try {
+    existingTags = execFileSync('git', ['tag', '-l', tag], { cwd: mainCheckout, encoding: 'utf8' }).trim();
+  } catch {
+    return { passed: true, message: `could not list git tags -- nothing to check for "${tag}"` };
+  }
+  if (existingTags === tag) {
+    return { passed: true, message: `README.md's pinned install tag "${tag}" exists` };
+  }
+  return {
+    passed: false,
+    message: `README.md recommends installing tag "${tag}", which does not exist -- cut it per docs/how-to/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,
+  };
+}
+
+registerCheck({
+  id: 'readme-install-tag-exists',
+  description: 'README.md\'s recommended install command pins a git tag that actually exists (tsk-2t8)',
+  check: (cwd) => checkReadmeInstallTagExists(cwd),
 });
 
 // tsk-2m5 (docs/history/stage-status-driving-coordination/): the

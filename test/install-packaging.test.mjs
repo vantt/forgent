@@ -42,16 +42,29 @@ function snapshotDir(root) {
   return out;
 }
 
-function diffSnapshots(before, after) {
-  const changed = [];
-  for (const [rel, content] of after) {
-    if (!before.has(rel)) changed.push(`added:${rel}`);
-    else if (!before.get(rel).equals(content)) changed.push(`modified:${rel}`);
+// tsk-1u77: this dev environment routinely runs 100+ concurrent worktree
+// sessions that all resolve to and legitimately write the SAME main-checkout
+// .fgos/events.jsonl/state.json/main-checkout.lock during this test's
+// several-second npm subprocess window -- real, ambient activity unrelated
+// to the external `fgos init` under test. A byte-identical before/after
+// snapshot diff (the prior shape of this check) misread that legitimate
+// concurrent growth as a failure -- and retrying/waiting cannot fix it,
+// since concurrent writes are durable (a real event landed), not transient.
+// `externalCwd` here is not even a git repo, so `fgos init`'s own cwd-based
+// dataDir resolution (no main-checkout walk at all) has no possible code
+// path to REPO_ROOT/.fgos regardless -- what this check can actually catch
+// is the external process's own tmp paths leaking into the source repo's
+// store, so it asserts that directly instead of byte-identical equality.
+function assertNoLeakedPaths(afterSnapshot, leakedPaths, contextLabel) {
+  for (const [rel, content] of afterSnapshot) {
+    const text = content.toString('utf8');
+    for (const leaked of leakedPaths) {
+      assert.ok(
+        !text.includes(leaked),
+        `${contextLabel} must not leak "${leaked}" into the source repo's own .fgos/${rel}`,
+      );
+    }
   }
-  for (const rel of before.keys()) {
-    if (!after.has(rel)) changed.push(`removed:${rel}`);
-  }
-  return changed;
 }
 
 test('e2e: npm pack -> npm install -g -> fgos init from a fresh external cwd', () => {
@@ -61,7 +74,6 @@ test('e2e: npm pack -> npm install -g -> fgos init from a fresh external cwd', (
   const packDir = mkTemp('fgos-pack-');
   const installPrefix = mkTemp('fgos-install-');
   const externalCwd = mkTemp('fgos-external-');
-  const repoFgosBefore = snapshotDir(path.join(REPO_ROOT, '.fgos'));
 
   try {
     // (1) npm pack into the scratch dir — never a bare `npm pack` in repo/,
@@ -136,8 +148,7 @@ test('e2e: npm pack -> npm install -g -> fgos init from a fresh external cwd', (
     assert.equal(fs.existsSync(path.join(installPrefix, '.fgos')), false, '.fgos/ must not be created inside the install prefix');
 
     const repoFgosAfter = snapshotDir(path.join(REPO_ROOT, '.fgos'));
-    const repoFgosDiff = diffSnapshots(repoFgosBefore, repoFgosAfter);
-    assert.deepEqual(repoFgosDiff, [], `fgos init from the external cwd must not touch the source repo's own .fgos/: ${repoFgosDiff.join(', ')}`);
+    assertNoLeakedPaths(repoFgosAfter, [externalCwd, installPrefix, packDir], 'fgos init from the external cwd');
   } finally {
     fs.rmSync(packDir, { recursive: true, force: true });
     fs.rmSync(installPrefix, { recursive: true, force: true });
@@ -148,4 +159,29 @@ test('e2e: npm pack -> npm install -g -> fgos init from a fresh external cwd', (
 test('no stray pack artifact is left under repo/ after packing', () => {
   const stray = fs.readdirSync(REPO_ROOT).filter((f) => f.endsWith('.tgz'));
   assert.deepEqual(stray, [], `repo/ must contain no .tgz pack artifact: ${stray.join(', ')}`);
+});
+
+// tsk-1u77: assertNoLeakedPaths directly, proving both halves of the fix
+// without paying for the full npm-pack/install e2e flow again.
+
+test('tsk-1u77: assertNoLeakedPaths tolerates unrelated concurrent-session content, the exact false-positive the old byte-diff check produced', () => {
+  // Simulates a concurrent session legitimately appending a real event to
+  // events.jsonl during the test's window -- content genuinely differs
+  // from any "before" snapshot, but names none of the external tmp paths.
+  const snapshot = new Map([
+    ['events.jsonl', Buffer.from('{"seq":9001,"type":"work.move","payload":{"id":"tsk-unrelated","to":"doing"}}\n')],
+    ['state.json', Buffer.from('{"work":{"tsk-unrelated":{"status":"doing"}}}\n')],
+  ]);
+  assert.doesNotThrow(() => assertNoLeakedPaths(snapshot, ['/tmp/fgos-external-abc123', '/tmp/fgos-install-def456', '/tmp/fgos-pack-ghi789'], 'fgos init from the external cwd'));
+});
+
+test('tsk-1u77: assertNoLeakedPaths still catches a real leak of an external tmp path', () => {
+  const externalPath = '/tmp/fgos-external-abc123';
+  const snapshot = new Map([
+    ['events.jsonl', Buffer.from(`{"seq":9001,"type":"decision","payload":{"text":"wrote from ${externalPath}"}}\n`)],
+  ]);
+  assert.throws(
+    () => assertNoLeakedPaths(snapshot, [externalPath, '/tmp/fgos-install-def456', '/tmp/fgos-pack-ghi789'], 'fgos init from the external cwd'),
+    /must not leak/,
+  );
 });

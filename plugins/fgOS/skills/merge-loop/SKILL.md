@@ -116,7 +116,7 @@ self-pace."
 
      A descendant counts as finished only when its `status` is one of
      `delivered`/`retrospective`/`cleanup`/`done`/`wontfix`
-     (`TAIL_RESOLVED_STATUSES`, `src/state/frontier.mjs`) — anything else,
+     (`isResolvedStatus`, `src/state/frontier.mjs`) — anything else,
      including `blocked` and `awaiting-approval`, is still open. Walk the
      whole chain, not just direct children: an open grandchild anchors the
      root exactly the way an open child does, the same predicate

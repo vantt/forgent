@@ -583,6 +583,97 @@ test('mergeRunnerItem self-resolves a decision-ID collision (both sides independ
   assert.equal(isWorkingTreeClean(repoRoot), true);
 });
 
+test('tsk-2iz: mergeRunnerItem\'s decision-ID auto-resolve considers the BRANCH\'s own new ids too, not just HEAD -- never mints an id that collides with the branch\'s own already-clean file', async () => {
+  // Reproduces Finding 3's exact failure scenario: branch forked when HEAD's
+  // max was 0040, and independently wrote BOTH 0041 (which collides with
+  // main's own later 0041) AND a non-colliding 0042 of its own. HEAD-only
+  // (the pre-fix computation) would return 0042 as "next free" and rename
+  // the branch's colliding 0041 straight into it -- landing on top of the
+  // branch's own already-clean 0042-branch-second.md. Considering both
+  // trees finds 0043, the first id neither side has used.
+  const repoRoot = initRepo();
+  writeDecisionFile(repoRoot, '0040', 'seed', 'Seed');
+  writeDecisionIndex(repoRoot, ['| [0040](0040-seed.md) | Seed |']);
+  git(repoRoot, ['add', 'docs/decisions']);
+  git(repoRoot, ['commit', '-q', '-m', 'seed decisions']);
+
+  git(repoRoot, ['checkout', '-b', 'fgw/demo-item']);
+  writeDecisionFile(repoRoot, '0041', 'branch-first', 'Branch first');
+  writeDecisionFile(repoRoot, '0042', 'branch-second', 'Branch second');
+  writeDecisionIndex(repoRoot, [
+    '| [0040](0040-seed.md) | Seed |',
+    '| [0041](0041-branch-first.md) | Branch first |',
+    '| [0042](0042-branch-second.md) | Branch second |',
+  ]);
+  git(repoRoot, ['add', 'docs/decisions']);
+  git(repoRoot, ['commit', '-q', '-m', 'branch: add 0041 and 0042']);
+  git(repoRoot, ['checkout', 'main']);
+
+  writeDecisionFile(repoRoot, '0041', 'main-own', 'Main own');
+  writeDecisionIndex(repoRoot, ['| [0040](0040-seed.md) | Seed |', '| [0041](0041-main-own.md) | Main own |']);
+  git(repoRoot, ['add', 'docs/decisions']);
+  git(repoRoot, ['commit', '-q', '-m', 'main: independently add 0041']);
+
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }));
+  assert.equal(result.outcome, 'merged');
+  assert.equal(result.selfResolved, true);
+
+  assert.equal(fs.existsSync(path.join(repoRoot, 'docs/decisions/0041-branch-first.md')), false, 'branch\'s colliding file must be renamed away');
+  assert.equal(fs.existsSync(path.join(repoRoot, 'docs/decisions/0042-branch-first.md')), false, 'the bug: must NEVER land on 0042, which the branch\'s own file already claims');
+  assert.equal(fs.existsSync(path.join(repoRoot, 'docs/decisions/0043-branch-first.md')), true, 'renamed to 0043 -- the real next-free id considering BOTH trees');
+  assert.equal(fs.existsSync(path.join(repoRoot, 'docs/decisions/0042-branch-second.md')), true, 'the branch\'s own already-clean file must survive untouched, never overwritten');
+
+  const ids = fs.readdirSync(path.join(repoRoot, 'docs/decisions'))
+    .map((f) => f.match(/^(\d{4})-/)?.[1])
+    .filter((id) => id && id !== '0000'); // 0000-index.md is the index itself, never a decision record
+  assert.deepEqual([...ids].sort(), ['0040', '0041', '0042', '0043'], 'every id on disk is unique -- no duplicate 4-digit prefix (the actual bug this item closes)');
+
+  const index = fs.readFileSync(path.join(repoRoot, 'docs/decisions/0000-index.md'), 'utf8');
+  assert.doesNotMatch(index, /<<<<<<</);
+  assert.equal(isWorkingTreeClean(repoRoot), true);
+});
+
+test('tsk-2iz: a real failure INSIDE the decision-ID auto-resolve attempt (not the "doesn\'t match the shape" false case) still falls through to the same abort -- never leaves MERGE_HEAD or a half-renamed file behind', async () => {
+  const repoRoot = initRepo();
+  writeDecisionFile(repoRoot, '0021', 'x', 'X');
+  writeDecisionIndex(repoRoot, ['| [0021](0021-x.md) | X |']);
+  git(repoRoot, ['add', 'docs/decisions']);
+  git(repoRoot, ['commit', '-q', '-m', 'seed decisions']);
+
+  git(repoRoot, ['checkout', '-b', 'fgw/demo-item']);
+  writeDecisionFile(repoRoot, '0022', 'branch-decision', 'Branch decision');
+  writeDecisionIndex(repoRoot, ['| [0021](0021-x.md) | X |', '| [0022](0022-branch-decision.md) | Branch decision |']);
+  git(repoRoot, ['add', 'docs/decisions']);
+  git(repoRoot, ['commit', '-q', '-m', 'branch: add 0022']);
+  git(repoRoot, ['checkout', 'main']);
+
+  writeDecisionFile(repoRoot, '0022', 'main-decision', 'Main decision');
+  writeDecisionIndex(repoRoot, ['| [0021](0021-x.md) | X |', '| [0022](0022-main-decision.md) | Main decision |']);
+  git(repoRoot, ['add', 'docs/decisions']);
+  git(repoRoot, ['commit', '-q', '-m', 'main: add 0022']);
+
+  // Force renumberDecisionFile's own `git mv` to fail for real: pre-plant an
+  // untracked file at the exact path the resolve step would rename onto
+  // (0023, the real next-free id for this fixture) -- `git mv` refuses
+  // outright when the destination already exists, a genuine execFileSync
+  // throw, never the documented "shape mismatch" false-return case.
+  fs.writeFileSync(path.join(repoRoot, 'docs/decisions/0023-branch-decision.md'), 'pre-existing garbage\n');
+
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }));
+
+  assert.equal(result.outcome, 'merge-failed-unclassified', 'a real resolve-step failure is reported, never swallowed into a generic conflict or left to throw uncaught');
+  assert.match(result.error.message, /decision-index auto-resolve failed/);
+  assert.throws(
+    () => git(repoRoot, ['rev-parse', '--verify', 'MERGE_HEAD']),
+    'MERGE_HEAD must be cleaned up -- the abort below must still run even though the resolve attempt itself threw',
+  );
+  // The planted garbage file itself is this test's own fixture debris, not
+  // evidence of anything the implementation left behind -- remove it before
+  // checking for a partial STAGED rename (the actual thing under test).
+  fs.rmSync(path.join(repoRoot, 'docs/decisions/0023-branch-decision.md'));
+  assert.equal(isWorkingTreeClean(repoRoot), true, 'no partial staged rename left behind by the failed resolve attempt');
+});
+
 test('mergeRunnerItem self-resolves a purely positional decision-index collision (two DIFFERENT, non-colliding ids inserted at the same position) without renumbering either side', async () => {
   const repoRoot = initRepo();
   writeDecisionFile(repoRoot, '0021', 'x', 'X');
