@@ -66,7 +66,8 @@ cụ thể của domain "marketing" trên fgOS sẽ trông như thế nào.
 | D8 | Async call = handoff event đầy đủ (holder đổi); sync call trong-session = một event `call-summary` gọn, KHÔNG đổi holder. Guard invariant: holder chỉ đổi qua async handoff | Em advise v7, người dùng đồng ý v8 | 18070 |
 | D9 | Task-spec bắt buộc có section Collaboration: bảng trigger-prose per call-edge, khai báo per (workflow, stage) — khi nào gọi, reason gì, tới role nào, bóng về mang gì. Ba tầng: prose dạy (task-spec) / soul quyết / guard chặn (roleGraph); lệch pattern hiện ra ở compound-learn qua call-summary/handoff event | Người dùng nêu câu hỏi v9, em thiết kế, xác nhận v10 | 18110 |
 | D10 | Ontology 4 tầng task-spec/skill/knowledge/context (knowledge = chuyên môn domain — coding dựa model weights, marketing là tài sản file thật của cockpit; context = refs/docs sẵn có). Nở-task-trước-nở-role-sau; coding đóng ở 5 position × ~13 phiếu. Chức danh (PO/PM/TechLead/SE/Tester) = persona tầng soul: roster per-team gói positions + phiếu + thẩm quyền, không encode vào harness. PM cổ điển đã máy hoá (frontier/triage/stale/merge) | Bàn các vòng 11–14 (ontology, lợi ích tách với evidence tsk-59a + review-item 3 executor, roster, map chức danh), người dùng đồng ý v15 | 18189 |
-| D11 | Binding soul↔role khi team đông hơn role: role là thuộc tính per-item, không phải ghế team. (1) Call nhắm (position, phiếu), giải quyết bằng pull qua frontier — soul đủ điều kiện (roster: position ∩ phiếu ∩ authority) tự claim, không push-assign; (2) sticky trong một call-thread — vòng sau về đúng soul giữ context, thread mới rebind; (3) targeted call (--to-soul) là ngoại lệ có chủ đích, guard vẫn chỉ check position, ghi event cho compound-learn. Solo (soul ít hơn role) thoái hoá êm: một soul nhiều title, self-review hữu hình trong log | Người dùng hỏi v16, em trình binding model, xác nhận cập nhật | 18229 |
+| D11 | Binding soul↔role khi team đông hơn role: role là thuộc tính per-item, không phải ghế team. (1) Call nhắm (position, phiếu), giải quyết bằng pull qua frontier — soul đủ điều kiện tự claim, không push-assign; (2) sticky trong một call-thread — vòng sau về đúng soul giữ context, thread mới rebind; (3) targeted call (--to-soul) là ngoại lệ có chủ đích, guard vẫn chỉ check position, ghi event cho compound-learn. Solo (soul ít hơn role) thoái hoá êm: một soul nhiều title, self-review hữu hình trong log | Người dùng hỏi v16, em trình binding model, xác nhận cập nhật | 18229 |
+| D12 | Title/persona = agent-type definition sẵn có; eligibility = MỘT field frontmatter `claims: [phiếu]` trên agent-type (positions suy ra từ phiếu); claim event ghi (sessionId, agent-type); concurrency = worker-slots sẵn có; spawn-on-demand = runner/dispatch sẵn có. Không roster file, không humans registry, không agent-pools — thẩm quyền human ở pull-door verbs tới khi có team đa người thật. Soul instance = runtime record sinh lúc claim, không phải config | Người dùng đập bản roster qua v17–18 (fix list không scale; humans/agent-pools thừa; agent-type map vào đâu), em rút gọn, đồng ý v19 | 18232 |
 
 ## 5. Q&A log
 
@@ -282,6 +283,22 @@ cụ thể của domain "marketing" trên fgOS sẽ trông như thế nào.
   "cập nhật thảo luận tới đây chưa" → xác nhận, mint D11 (seq 18229),
   regenerate §6 theo shape D1–D11.
 
+- **2026-08-15 21:27–21:52 — Vòng 17–19: đập bản roster, rút về
+  agent-type**: (v17) người dùng chỉ ra danh sách soul cố định (id
+  se-1..se-4) không scale — agent là ephemeral → em tách config
+  (titles/humans/agent-pools) khỏi runtime identity (sinh lúc claim);
+  (v18) người dùng đập tiếp: humans + agent-pools là "cố gắng quá, chưa
+  thấy lợi ích", và hỏi agent-type map vào đâu → em nhận over-engineer:
+  **agent-type CHÍNH LÀ title** — mọi mảnh còn lại đều đã tồn tại
+  (worker-slots = pool size, runner/dispatch = spawn-on-demand,
+  pull-door verbs = thẩm quyền human, session tự xưng lúc claim = soul
+  instance); config delta rút về một field frontmatter
+  `claims: [phiếu]` + claim event ghi agent-type; (v19) người dùng đồng
+  ý → mint D12 (seq 18232). Ý sống sót duy nhất của bản roster: soul
+  instance là runtime record, không phải config. Người dùng yêu cầu vòng
+  kế: áp vào bối cảnh rộng hơn, chỉ ra quan hệ
+  workflow/stage/task/skill/position/agent-type toàn cục.
+
 ## 6. Thiết kế đã chốt {#design}
 
 > Synthesis vòng 16. Nền: **D1–D11 đã chốt** (§4). Treo có chủ đích: #7
@@ -323,19 +340,26 @@ engine).
   Nguyên tắc **nở task trước, nở role sau**: chuyên hoá mới = phiếu mới
   cho position sẵn có (audit-security là phiếu của reviewer, không phải
   role mới).
-- **Chức danh (soul, roster per-team)**: PO/PM/TechLead/SE/Tester… = gói
-  {positions + phiếu allowlist + thẩm quyền}. PM cổ điển phần lớn đã máy
-  hoá (frontier/triage/stale/merge). Cockpit tách y hệt:
+- **Chức danh/persona = agent-type definition sẵn có (D12)**:
+  PO/PM/TechLead/SE/Tester hay "reviewer khó tính" đều là agent-type
+  (`.claude/agents/*.md` — persona prompt, tools, model), khai eligibility
+  bằng MỘT field frontmatter `claims: [phiếu]`; positions suy ra từ
+  phiếu. Không roster file, không humans registry, không agent-pools:
+  pool size = worker-slots sẵn có, spawn-on-demand = runner/dispatch sẵn
+  có, thẩm quyền human = pull-door verbs sẵn có (approve/answer do người
+  chạy). PM cổ điển phần lớn đã máy hoá (frontier/triage/stale/merge).
+  Cockpit tách role/agent y hệt:
   `agents: [{role: orchestrator, agent: campaign-manager}]`.
-- **Binding khi soul ≠ role (D11)**: role là thuộc tính *per-item*, không
-  phải ghế team. Cross-item: nhiều soul cùng position chạy song song
-  (parallel claims sẵn có). Trong item: call nhắm `(position, phiếu)` →
-  rơi vào frontier như work-order nhỏ → soul đủ điều kiện (position ∩
-  phiếu ∩ authority theo roster) **tự claim** (pull, không push);
-  **sticky trong một call-thread** (vòng sau về đúng soul giữ context);
-  **targeted call** (`--to-soul`) là ngoại lệ có chủ đích, ghi event.
-  Solo mode thoái hoá êm: một soul mang nhiều title, self-review vẫn hữu
-  hình trong log.
+- **Binding khi soul ≠ role (D11, D12)**: role là thuộc tính *per-item*,
+  không phải ghế team. Cross-item: nhiều soul cùng position chạy song
+  song (parallel claims sẵn có). Trong item: call nhắm `(position,
+  phiếu)` → rơi vào frontier như work-order nhỏ → session mang agent-type
+  có phiếu đó trong `claims` **tự claim** (pull, không push), claim event
+  ghi (sessionId, agent-type); **sticky trong một call-thread** (vòng sau
+  về đúng soul giữ context); **targeted call** (`--to-soul`) là ngoại lệ
+  có chủ đích, ghi event. Soul instance là runtime record sinh lúc claim
+  — không phải config. Solo mode thoái hoá êm: một soul mang nhiều
+  agent-type/verb, self-review vẫn hữu hình trong log.
 
 ### Hierarchy khai báo: domain → N workflow → item (D7)
 
