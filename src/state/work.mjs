@@ -9,7 +9,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { DOMAINS, DEFAULT_DOMAIN, getDomain, classificationVocabulary } from './workflow-stage-graphs.mjs';
+import { DOMAINS, DEFAULT_DOMAIN, getDomain, classificationVocabulary, roleGraphFor } from './workflow-stage-graphs.mjs';
 
 /** Error raised by this module. `category` is the CLI exit-code contract (R4). */
 export class WorkValidationError extends Error {
@@ -448,6 +448,27 @@ export function validateWorkShape(work, touchedFields) {
     if (!domain.stages.includes(work.stage)) {
       throw new WorkValidationError(
         `work.stage must be one of ${JSON.stringify(domain.stages)} when present, got: ${JSON.stringify(work.stage)}`,
+      );
+    }
+  }
+  // holder (tsk-2t9c D1): THIRD orthogonal axis (status x stage x
+  // role/holder), opt-in per-domain -- never in EDITABLE_FIELDS
+  // (store.mjs), moves only through the handoff verb, same exclusion
+  // stage/status/domain already get. A domain with no roleGraph must
+  // carry no holder at all (the compatibility path for every existing
+  // item and every non-role-aware domain); a domain WITH a roleGraph
+  // constrains holder to its declared roles list.
+  if (touched('holder') && work.holder !== undefined) {
+    const domain = DOMAINS[work.domain ?? DEFAULT_DOMAIN];
+    const roleGraph = roleGraphFor(domain);
+    if (!roleGraph) {
+      throw new WorkValidationError(
+        `work.holder is set but domain "${work.domain ?? DEFAULT_DOMAIN}" declares no roleGraph.`,
+      );
+    }
+    if (!roleGraph.roles.includes(work.holder)) {
+      throw new WorkValidationError(
+        `work.holder must be one of ${JSON.stringify(roleGraph.roles)} for domain "${work.domain ?? DEFAULT_DOMAIN}", got: ${JSON.stringify(work.holder)}`,
       );
     }
   }

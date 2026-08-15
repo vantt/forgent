@@ -34,7 +34,8 @@ import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyS
 import { transitionWork, FsmError } from './status-fsm.mjs';
 import { transitionStage } from './stage-fsm.mjs';
 import { validateWork, validateDomainFields, checkAcceptanceEvidenceTraceable, WorkValidationError, DEFAULTS, GOAL_TIERS, truncateTitle } from './work.mjs';
-import { getDomain, statusCategoryFor, parkReasonForStatus } from './workflow-stage-graphs.mjs';
+import { getDomain, statusCategoryFor, parkReasonForStatus, roleGraphFor } from './workflow-stage-graphs.mjs';
+import { evaluateHandoff } from './handoff.mjs';
 import { EventLogError } from './events.mjs';
 import { validateToolRegistration, ToolRegistryError } from './tool-registry.mjs';
 import { frontier, frontierAcrossSteps, isDepsAndLineageReady as depsAndLineageReadyView } from './frontier.mjs';
@@ -841,6 +842,114 @@ export function moveStage(dir, { id, to, expectedStage, verify, role } = {}) {
     // post-transition stamp as role above, but unconditional: every
     // moveStage call records who wrote it, never blocking on a malformed
     // identity (D18).
+    rawEvent.payload.writer = resolveWriterIdentity(dir);
+    return appendEventLocked(logPath, rawEvent);
+  });
+}
+
+/**
+ * Rebuild the stack of currently-open async calls on `id`'s own
+ * call-thread, purely from the log (tsk-2t9c D8/R7 — never a stored
+ * counter, which can drift; a fold cannot). A plain `handoff` (`returning`
+ * falsy) PUSHES itself as newly open; a `handoff` written by
+ * `recordCallReturn` (`returning: true`) POPS the most recently opened
+ * one — a genuine LIFO stack, not a flag compared against the current
+ * holder, which cannot tell an open call from the very return event that
+ * just closed it (both can carry the same `to`). `call-summary` entries
+ * never touch the stack — sync calls do not nest against the async
+ * callstack cap (handoff.mjs's own contract).
+ */
+function openCallStack(callThreadEntries) {
+  if (!Array.isArray(callThreadEntries)) return [];
+  const stack = [];
+  for (const entry of callThreadEntries) {
+    if (entry.kind !== 'handoff') continue;
+    if (entry.returning) {
+      stack.pop();
+    } else {
+      stack.push(entry);
+    }
+  }
+  return stack;
+}
+
+/**
+ * The single door for a role/holder call (tsk-2t9c D1/D4/D5/D8/D9): guards
+ * the proposed call through handoff.mjs's pure `evaluateHandoff`, then
+ * appends exactly the event kind the matched edge's own `mode` calls for —
+ * never a caller choice. `mode: 'async'` writes `work.handoff` (holder
+ * changes, full checkpoint); `mode: 'sync'` writes `work.call-summary`
+ * (holder untouched, compact record) — same fresh-lookup -> guard ->
+ * append shape every other mutation in this file already uses, one held
+ * lock, one critical section.
+ *
+ * A REFUSED call throws `StoreError('validation', ...)` carrying the
+ * refusal reason AND the legal edges as JSON — "chặn và dạy tại chỗ"
+ * (D1): the caller can read the legal edges straight out of the error
+ * message without a second round trip.
+ */
+export function recordCall(dir, { id, toRole, reason, note, outcome } = {}) {
+  const { logPath } = paths(dir);
+  return withEventsLockAndRefresh(dir, logPath, () => {
+    const before = rebuildView(logPath);
+    const work = before.work[id];
+    if (!work) {
+      throw new StoreError('validation', `work "${id}" not found.`);
+    }
+    const domain = getDomain(work.domain);
+    const roleGraph = roleGraphFor(domain);
+    const fromRole = work.holder ?? roleGraph?.defaultRole;
+    const stage = work.stage;
+    const openCallDepth = openCallStack(before.callThreads?.[id]).length;
+
+    const result = evaluateHandoff({ domain, stage, fromRole, toRole, reason, openCallDepth });
+    if (!result.ok) {
+      throw new StoreError(
+        'validation',
+        `handoff refused: ${result.refusal} -- legal edges: ${JSON.stringify(result.legalEdges)}`,
+      );
+    }
+
+    const rawEvent = result.edge.mode === 'async'
+      ? { type: 'work.handoff', payload: { id, from: fromRole, to: toRole, reason, mode: 'async', note } }
+      : { type: 'work.call-summary', payload: { id, calleeRole: toRole, reason, outcome } };
+    rawEvent.payload.writer = resolveWriterIdentity(dir);
+    return appendEventLocked(logPath, rawEvent);
+  });
+}
+
+/**
+ * Close the most recently opened async call on `id`'s own call-thread,
+ * returning the ball to whoever opened it (tsk-2t9c D4: "call = round-trip,
+ * ball returns to sender" -- a return is completing a call the guard
+ * ALREADY approved when it was opened, never a fresh outbound call, so it
+ * deliberately does NOT run back through `evaluateHandoff`/`roleGraph`
+ * edge-legality. Requiring a matching reverse edge for every return would
+ * double the roleGraph's own size for no real legality question -- the
+ * open call already answered "was this allowed".
+ *
+ * Refuses only when there is genuinely no open call to close (nothing in
+ * `callThreads[id]` is a `handoff` the item's current `holder` could be
+ * returning from) -- same StoreError('validation', ...) shape as every
+ * other refusal in this file.
+ */
+export function recordCallReturn(dir, { id, note } = {}) {
+  const { logPath } = paths(dir);
+  return withEventsLockAndRefresh(dir, logPath, () => {
+    const before = rebuildView(logPath);
+    const work = before.work[id];
+    if (!work) {
+      throw new StoreError('validation', `work "${id}" not found.`);
+    }
+    const stack = openCallStack(before.callThreads?.[id]);
+    const openCall = stack.at(-1);
+    if (!openCall || openCall.to !== work.holder) {
+      throw new StoreError('validation', `work "${id}" has no open call for its current holder to return from.`);
+    }
+    const rawEvent = {
+      type: 'work.handoff',
+      payload: { id, from: work.holder, to: openCall.from, reason: openCall.reason, mode: 'async', returning: true, note },
+    };
     rawEvent.payload.writer = resolveWriterIdentity(dir);
     return appendEventLocked(logPath, rawEvent);
   });

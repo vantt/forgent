@@ -346,6 +346,48 @@ export const DOMAINS = Object.freeze({
       kind: Object.freeze(['bug', 'chore', 'design', 'docs', 'feature', 'task']),
       risk: Object.freeze(['light', 'standard', 'heavy']),
     }),
+    // roleGraph (tsk-2t9c D1/D3/D4/D5/D8/D9): the multi-role team harness's
+    // legality table for coding. THIRD orthogonal axis on a work item
+    // (status x stage x role/holder), opt-in per-domain — a domain that
+    // declares no roleGraph never sees a `holder` field or a `handoff`
+    // verb (src/state/handoff.mjs reads this exact shape). `defaultRole`
+    // is what a coding item's `holder` lazily resolves to when unset,
+    // mirroring `stage`'s own D8 lazy-default precedent one field over.
+    //
+    // `edges` names every LEGAL call for a given stage: `{ from, to,
+    // reason, mode }`. This is not new behavior -- it names four
+    // interactions coding already runs today in implicit form, so this
+    // registration changes nothing about how coding is actually worked,
+    // only makes the pattern checkable and loggable:
+    //   consult (sync)  == fgos-researching, called mid exploring/planning/executing
+    //   assist  (sync)  == subagent fanout (Agent tool, fgos-fanout)
+    //   review  (async) == fgos return -> awaiting-approval, the approve/reject loop
+    //   advise  (async) == fgos ask/answer -> awaiting-human
+    // `discovery` carries no edges on purpose -- it is a machine-only pass
+    // (owned by fgos-coding-discovering), never a role interaction.
+    roleGraph: Object.freeze({
+      roles: Object.freeze(['implementer', 'researcher', 'reviewer', 'helper', 'human-advisor']),
+      defaultRole: 'implementer',
+      callstackCap: 3,
+      edges: Object.freeze({
+        exploring: Object.freeze([
+          Object.freeze({ from: 'implementer', to: 'human-advisor', reason: 'advise', mode: 'async' }),
+          Object.freeze({ from: 'implementer', to: 'researcher', reason: 'consult', mode: 'sync' }),
+        ]),
+        planning: Object.freeze([
+          Object.freeze({ from: 'implementer', to: 'researcher', reason: 'consult', mode: 'sync' }),
+          Object.freeze({ from: 'implementer', to: 'human-advisor', reason: 'advise', mode: 'async' }),
+        ]),
+        executing: Object.freeze([
+          Object.freeze({ from: 'implementer', to: 'researcher', reason: 'consult', mode: 'sync' }),
+          Object.freeze({ from: 'implementer', to: 'helper', reason: 'assist', mode: 'sync' }),
+          Object.freeze({ from: 'implementer', to: 'reviewer', reason: 'review', mode: 'async' }),
+          Object.freeze({ from: 'implementer', to: 'human-advisor', reason: 'advise', mode: 'async' }),
+          Object.freeze({ from: 'reviewer', to: 'researcher', reason: 'consult', mode: 'sync' }),
+          Object.freeze({ from: 'reviewer', to: 'human-advisor', reason: 'advise', mode: 'async' }),
+        ]),
+      }),
+    }),
   }),
   synthetic: Object.freeze({
     stages: Object.freeze(['assembling']),
@@ -565,6 +607,27 @@ export function effectiveStage(item, domain) {
  * stage is absent from the domain's `skillMap` entirely. Never throws. */
 export function skillForStage(domain, stage) {
   return (domain.skillMap && domain.skillMap[stage]) ?? null;
+}
+
+/** `domain`'s own `roleGraph`, or `undefined` when the domain declares
+ * none (tsk-2t9c D1) -- every domain but `coding` today. `undefined`,
+ * deliberately not `null`, matching `classificationVocabulary`'s own
+ * absent-key shape one field over: callers treat "this domain has no
+ * role axis at all" and "this domain declared roleGraph but left a field
+ * empty" as different questions. */
+export function roleGraphFor(domain) {
+  return domain?.roleGraph;
+}
+
+/** The legal call edges for `fromRole` at `stage` within `domain`'s
+ * `roleGraph` -- always an array, `[]` when the domain has no roleGraph,
+ * the stage has no edges declared, or `fromRole` has none at that stage.
+ * Never throws (same never-throw contract every sibling helper in this
+ * module keeps, for the same hot-dispatch-path reason). */
+export function legalCallEdges(domain, stage, fromRole) {
+  const edgesForStage = domain?.roleGraph?.edges?.[stage];
+  if (!Array.isArray(edgesForStage)) return [];
+  return edgesForStage.filter((edge) => edge.from === fromRole);
 }
 
 /** The `statusCategory` (work.mjs's STATUS_CATEGORIES) `status` maps to

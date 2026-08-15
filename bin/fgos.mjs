@@ -17,7 +17,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, registerTool, removeTool, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, registerTool, removeTool, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
 import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability } from '../src/state/tool-registry.mjs';
 import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
@@ -2005,6 +2005,36 @@ async function runVerb(verb, flags, positional, dir) {
       const alternatives = optionalField(flags.alternatives, 'answer --alternatives requires a non-empty value (omit --alternatives entirely to skip it)');
       const source = optionalField(flags.source, 'answer --source requires a non-empty value (omit --source entirely to skip it)');
       const { event } = answerAwaiting(dir, { id, answer: text, expectedStatus, role: 'human', rationale, alternatives, source });
+      return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
+    }
+
+    // Multi-role team harness (tsk-2t9c D1/D4/D5/D8/D9): a role/holder call
+    // — guarded by the item's own domain roleGraph. Which event kind
+    // actually gets written (a full `work.handoff`, holder changes; or a
+    // compact `work.call-summary`, holder untouched) is decided by the
+    // matched edge's own `mode`, never a caller flag — see recordCall's
+    // own doc comment (store.mjs). A refused call throws StoreError with
+    // both the refusal reason and the legal edges named in the message
+    // (chặn và dạy tại chỗ).
+    case 'handoff': {
+      const id = requireField(positional[0] ?? flags.id, 'handoff requires an id: fgos handoff <id> --to <role> --reason <advise|assist|review|consult> [--note ...] [--outcome ...]');
+      const toRole = requireField(flags.to, 'handoff requires --to <role>');
+      const reason = requireField(flags.reason, 'handoff requires --reason <advise|assist|review|consult>');
+      const note = optionalField(flags.note, 'handoff --note requires a non-empty value (omit --note entirely to skip it)');
+      const outcome = optionalField(flags.outcome, 'handoff --outcome requires a non-empty value (omit --outcome entirely to skip it)');
+      const { event } = recordCall(dir, { id, toRole, reason, note, outcome });
+      return { id, type: event.type, seq: event.seq };
+    }
+
+    // Closes the most recently opened async call on the item's own
+    // call-thread, sending the ball back to whoever opened it (D4: "call =
+    // round-trip"). Deliberately not gated by roleGraph edge-legality —
+    // see recordCallReturn's own doc comment for why a return needs no
+    // fresh legality check.
+    case 'handoff-return': {
+      const id = requireField(positional[0] ?? flags.id, 'handoff-return requires an id: fgos handoff-return <id> [--note ...]');
+      const note = optionalField(flags.note, 'handoff-return --note requires a non-empty value (omit --note entirely to skip it)');
+      const { event } = recordCallReturn(dir, { id, note });
       return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
     }
 
