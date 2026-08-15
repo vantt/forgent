@@ -280,3 +280,32 @@ spec-docs-lifecycle-realignment/{plan,RESEARCH}.md`. What belongs here is
 the parent-level shape and the one cross-cutting decision (the
 docs-index back-link tradeoff) that applies to all four children equally
 and would otherwise have no single home.
+
+## Confirmed: `tsk-19m` closed the interactive/headless capability gap (B7)
+
+D12 (the original redesign's own decision) says `tier`/`kind`/`risk` get
+re-judged at `discovery`, on real evidence, after research. B7's audit
+finding was that only the *headless* path actually enforced this: the
+runner worker reports the three keys in its own `fgos-verdict` block,
+`loop.mjs` parses them, and `classificationPatchFromVerdict` applies them
+— gated so the patch only lands when both the outcome and the verdict
+itself are `clear`. The *interactive* path had no equivalent data
+channel at all: `parseDiscoverCallerVerdict`
+(`bin/fgos.mjs`) accepted only `verdict`/`verify`/`question`/`force`,
+so a live session's only way to record a re-judged classification was to
+remember a separate `fgos edit` call — prose discipline, not a checked
+contract, on the one axis the repo's own stated law requires equal
+capability across both paths.
+
+`tsk-19m` closed the gap by adding `--tier`/`--kind`/`--risk` as optional
+flags directly to `fgos discover`, confirmed live in
+`parseDiscoverCallerVerdict`: each flag is read *only* on the `clear`
+branch, the same restriction `--force` already observed and the same
+guard the headless path's own `classificationPatchFromVerdict` enforces
+— a classification judged against evidence that turned out insufficient
+must never ride an `unclear` verdict through. Each key is present in the
+resulting verdict only when the caller actually passed it, so a call that
+omits all three is byte-identical to a pre-existing call — no behavior
+change for the common case. This item declared `tsk-31lz` as a real
+dependency (both touch `src/intake/discovery.mjs`) so the two landed
+without overwriting each other's edits.
