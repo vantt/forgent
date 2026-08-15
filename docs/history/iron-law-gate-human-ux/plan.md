@@ -68,7 +68,7 @@ Thứ tự bắt buộc: **3 sau 2** (prose của 3 trỏ tới skill mà 2 tạ
 
 | Thành phần | Mức | Điều gì chứng minh được |
 |---|---|---|
-| Nhánh rẽ trunk-only ở 3 gate site | **cao** | Test cặp đối xứng: leaf→`fgw/<root>` **không** trip; cùng diff đó root→trunk **có** trip. Thiếu vế thứ hai là cổng đã chết mà test vẫn xanh. |
+| Nhánh rẽ trunk-only ở 3 gate site | **cao** | Test cặp đối xứng: leaf→`fgw/<root>` **không** trip; cùng diff đó root→trunk **có** trip. Thiếu vế thứ hai là cổng đã chết mà test vẫn xanh. Cộng một ca riêng cho `sync-root` với gốc-có-ông (`item.parent` tồn tại và cha cũng có cha) để chứng minh nó dùng `!item.parent` chứ không phải `resolveRoot` — xem A1b. |
 | Mức `warn` bỏ qua cổng | **cao** | Test: `warn` cho merge đi qua VÀ ghi đúng một bản ghi `kind: engine`; `ask` (mặc định, và khi thiếu key) vẫn chặn cứng. Ca "thiếu key config" phải fail-closed về `ask`. |
 | `/fgOS:approve` tự suy verb | trung bình | Prose không assert được bằng shell (xem "Chủ sở hữu chứng-minh-runtime", `docs/how-to/write-verify-for-a-skill-prose-change.md`). Verify chỉ chứng minh deliverable tồn tại + mang câu bán kính; hành vi thật thuộc review lúc merge + smoke-test. **Bằng chứng yếu, đã khai.** |
 | merge-loop đọc `skipped` | trung bình | Cùng giới hạn prose như trên. Vế NEGATIVE chứng minh câu "dừng cả vòng lặp" đã biến mất là phần mạnh nhất shell làm được. |
@@ -146,11 +146,32 @@ thể land mảnh 1 mà chưa land mảnh 2/3, không kẹt nửa vời.
 
 ### Giả định
 
-- **A1** — `resolveRoot(view, id) === id` là dấu hiệu đủ để nói "target là
-  trunk". Dựa trên chính biểu thức đang chạy ở `bin/fgos.mjs:3481-3487`
-  và `:4090`. Chưa chứng minh cho ca gốc có `parent` mà nhánh cha chưa tồn
-  tại — code hiện fallback về trunk. Mảnh 1 phải phủ ca đó bằng test, đây
-  là giả định **chưa chứng minh**.
+- **A1 — ĐÃ CHỨNG MINH, và bản nháp trước của chính giả định này sai.**
+  Nháp cũ viết "chưa chứng minh cho ca gốc có `parent` mà nhánh cha chưa
+  tồn tại — code hiện fallback về trunk". Sai: nó lẫn **diff base** với
+  **merge target**. Đọc thật `bin/fgos.mjs:3596-3608` — khi
+  `resolveRoot(view, id) !== id`, `approve` lấy `rootBranch =
+  branchNameFor(rootId)` và nếu nhánh chưa tồn tại thì **`createBranchRef`
+  tạo nó**, chứ không lùi về trunk. Cái fallback-về-trunk (`... : {}` ở
+  `:3487`) chỉ áp cho `changedFiles`' diff base, không đụng target. Nên
+  với `approve`: `resolveRoot(view, id) === id` ⟺ target là trunk, đúng
+  vô điều kiện.
+
+- **A1b — discriminator KHÁC NHAU theo từng call site, không dùng chung
+  một biểu thức.** Đây là điểm A1 cũ che mất:
+  - `approve` (`:3596`) và `merge next`'s `wouldTripIronLaw` (`:2480`, vốn
+    là bản pre-check soi gương của `approve`) → dùng
+    `resolveRoot(view, id) === id`.
+  - `sync-root` (`:4090`) → dùng **`!item.parent`**, KHÔNG phải
+    `resolveRoot`. `sync-root` chỉ land vào **cha trực tiếp**
+    (`targetBranch = item.parent ? branchNameFor(item.parent) :
+    detectTrunk(repoRoot)`) và throw nếu nhánh cha không tồn tại. Dùng
+    `resolveRoot` ở đây sẽ SAI cho một gốc có cha mà cha lại có ông:
+    `resolveRoot` leo tới đỉnh, còn target thật chỉ lên một bậc.
+
+  Mảnh 1 phải viết hai biểu thức riêng, không refactor thành một helper
+  dùng chung — đó chính là cái bẫy mà việc "gộp ba bản copy-paste" (đã
+  loại ở trên) sẽ đẩy người ta rơi vào.
 - **A2** — Không tồn tại đường thứ tư nào gọi `classifyIronLaw`. Dựa trên
   `rg 'classifyIronLaw\('` trả đúng ba call site, chạy lại sau merge
   `main`. Đã chứng minh.
@@ -167,7 +188,7 @@ nhau, gộp lại thì một verify không nói được điều gì trung thự
   {
     "title": "Iron Law gate: chỉ chạy ở ranh giới trunk, đọc ironLaw.level, ghi bản ghi mức warn",
     "verify": "npm test && grep -q 'ironLaw' src/setup/registrations.mjs && node --test test/cli/fgos-iron-law-gate.test.mjs",
-    "action": "D1: thêm nhánh rẽ theo merge target ở cả ba call site classifyIronLaw (bin/fgos.mjs:2487/:3494/:4100) để cổng chỉ chạy khi target là trunk. D3+D7: đọc ironLaw.level (ask mặc định, warn opt-in), đăng ký check+fix vào src/setup/registrations.mjs theo khuôn gateBypass, thiếu key thì fail-closed về ask. D8: ở mức warn ghi một bản ghi qua addDecision với kind engine, không shell ra fgos decision. Không đụng src/evolve/iron-law.mjs — chữ ký classifyIronLaw giữ nguyên theo D6.",
+    "action": "D1: thêm nhánh rẽ theo merge target ở cả ba call site classifyIronLaw (bin/fgos.mjs:2487/:3494/:4100) để cổng chỉ chạy khi target là trunk. Hai biểu thức RIÊNG, không gộp thành helper chung (plan.md A1b): approve và merge-next dùng resolveRoot(view,id)===id; sync-root dùng !item.parent vì nó chỉ land vào cha trực tiếp, dùng resolveRoot ở đó sẽ sai cho gốc có ông. D3+D7: đọc ironLaw.level (ask mặc định, warn opt-in), đăng ký check+fix vào src/setup/registrations.mjs theo khuôn gateBypass, thiếu key thì fail-closed về ask. D8: ở mức warn ghi một bản ghi qua addDecision với kind engine, không shell ra fgos decision. Không đụng src/evolve/iron-law.mjs — chữ ký classifyIronLaw giữ nguyên theo D6.",
     "footprint": ["bin/fgos.mjs", "src/setup/registrations.mjs", ".fgos/config.json", "test/cli/fgos-iron-law-gate.test.mjs"],
     "kind": "task",
     "risk": "heavy"
