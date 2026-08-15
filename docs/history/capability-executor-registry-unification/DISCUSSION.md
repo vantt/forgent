@@ -59,7 +59,7 @@ nhưng chưa từng thực thi.
 |---|---|---|
 | 1 | Hợp nhất vocab "capability" giữa tool-registry và dispatch thành 1 danh mục curated dùng chung? | **CHỐT — D4.** |
 | 2 | Có nên khôi phục cầu nối "dispatch tự hỏi tool-registry lúc resolve" (`tsk-62v` D6)? | **CHỐT — D2 (không khôi phục, giữ nguyên).** |
-| 3 | Xung đột 2-namespace: `capacityIdForWork` tính job-identity (`"fgos-coding-implement"`), registry key theo executor-name — `decide --work` tra job-id vào object key-theo-tên-executor, gần như luôn miss. | **HƯỚNG GIẢI ĐÃ CHỐT — D10** (dùng `resolveCapacityIdForPurpose` có sẵn, không đổi cách key). Còn 1 câu hỏi con: hành vi miss hôm nay là bug hay cố ý — cần đọc `tsk-5tm-6` D4. |
+| 3 | Xung đột 2-namespace: `capacityIdForWork` tính job-identity (`"fgos-coding-implement"`), registry key theo executor-name — `decide --work` tra job-id vào object key-theo-tên-executor, gần như luôn miss. | **ĐÓNG HẲN — D10 + D12.** Miss là thiết kế cố ý (`dispatch.mjs:1599-1613`, `tsk-5tm-6` D4), không phải bug. D10 (purpose-lookup) là đường riêng, không mâu thuẫn. |
 | 4 | Tên field cho registry hợp nhất | **CHỐT — D3 (giữ `capacities`, không đổi `executors`).** |
 | 5 | Bỏ tool-registry event-sourced registration, gộp vào config? | **CHỐT — D1.** |
 | 6 | Presence-probe logic + local status overlay giữ làm hàm thuần, tách khỏi registry file | **CHỐT, kèm trong D1.** |
@@ -87,6 +87,7 @@ nhưng chưa từng thực thi.
 | D9 | D5 cần 3 gate sửa kèm, không thể ship thiếu: **(a)** `validateCapacityShape` không bắt buộc `command`/`args` cho MỌI invocation — tuỳ theo `via`; **(b)** `resolveExecutorConfig` phải CHỌN invocation đúng theo `via`, không lấy `invocations[0]` mù; **(c)** `resolveExecutorCommand` phải THROW khi 1 invocation không có adapter/via dispatch-được, không được âm thầm rơi về `DEFAULT_ADAPTER` (`cli-spawn`). | Không sửa thì entry `gitnexus` mà §6 vẽ ra sẽ vỡ ngay lúc load config: `validateExecutorShape` (`:609`) bắt buộc `command`+`args` cho mọi invocation — `{via:"mcp"}` không có `command` sẽ fail validate. `resolveExecutorConfig` (`:894-896`) lấy `invocations[0]` vô điều kiện — đúng khi vocab 1 giá trị, sai khi đã nhiều `via`. `adapter = executor.adapter ?? DEFAULT_ADAPTER` (`:1039`) sẽ âm thầm spawn literal `"mcp:gitnexus"` như 1 binary — cùng họ bug `judge-decompose` mà D6 đã dùng làm bằng chứng. |
 | D10 | Giải #3 (xung đột namespace job-id vs executor-name) KHÔNG bằng đổi cách key của `capacities` — registry giữ key theo TÊN EXECUTOR đúng như D3 đã chốt. Binding "job nào chạy executor nào" là 1 tra cứu TÁCH BIỆT, dùng hàm có sẵn `resolveCapacityIdForPurpose(cfg, purpose)` qua field `for`, không cần máy mới. | Marketing-cockpit's `## harness` (`marketing-cockpit.md:143`): "Orchestrator đọc `next_stage_model/executor/interface` từ `run.yaml` khi dispatch" — họ tách hẳn binding job→executor khỏi chính registry, đúng model fgOS đã có sẵn (purpose-lookup) nhưng chưa dùng cho đường `--work`. |
 | D11 | Đánh giá và TỪ CHỐI 2 mô hình marketing-cockpit — không port: **(a)** silent model-tier downgrade; **(b)** tách `model-policy.yaml` thành file riêng. | (a) fgOS đã có giải pháp TƯỜNG MINH cho đúng vấn đề (`rigorOverrides` trên `agy`, `modelForTier` throw rõ tier+provider khi thiếu) — bản chưng cất không ghi điều kiện kích hoạt downgrade, port hình dạng mà không biết ngữ nghĩa là liều lĩnh; ngược triết lý loud-failure. (b) `mergeWithGlobalConfig` đã cho đúng tính chất "sửa 1 chỗ đổi cả hệ" mà không cần đăng ký nguồn config mới vào `fgos setup`/`doctor`. |
+| D12 | Xác nhận #3's câu hỏi con: `capacityIdForWork` miss khi tra vào `capacities` (key theo executor-name) KHÔNG PHẢI bug, là thiết kế cố ý (`tsk-5tm-6` D4). | `dispatch.mjs:1599-1613` tự ghi rõ: miss = tín hiệu "không có override cấu hình" — theo Native-First Dispatch Doctrine rule 2, mọi candidate `fgos-fanout` là same-provider + cần soul nên mặc định native. Code tự trích dẫn bug thật từng xảy ra khi làm sai hướng này. D10 không mâu thuẫn — đường `--for`/purpose (D10) và đường `--work` (D12) đã tách bạch từ trước. |
 
 ## 5. Q&A log
 
@@ -171,6 +172,13 @@ nhưng chưa từng thực thi.
   `resolveCapacityIdForPurpose` có sẵn). #7 xác nhận dead qua event log.
   2 ý tưởng khác (silent downgrade, model-policy.yaml riêng) đánh giá và
   từ chối. → mint **D8/D9/D10/D11**.
+- **round s.** Người dùng hỏi lại "runtime thực thi" (marketing-cockpit's
+  `adapter`) vs "hàm transport" (fgOS's `EXECUTOR_ADAPTERS`) khác nhau ở
+  đâu — giải thích bằng ví dụ. Đào tiếp câu hỏi con của #3: đọc lại
+  chính comment `dispatch.mjs:1599-1613` (đã đọc từ đầu buổi, chưa nối
+  vào đây) — xác nhận miss là thiết kế cố ý (`tsk-5tm-6` D4), không phải
+  bug, có bug thật ADR0026 trích dẫn làm bằng chứng đối chứng → mint
+  **D12**, đóng hẳn #3.
 - **round q.** Người dùng hỏi số phận `executors.<tier>` giờ `capacities`
   đã đủ phẩm chất. Quét code: chỉ 2 điểm chạm, cả 2 trong `dispatch.mjs`
   (validate + resolve), 0 module khác đụng tới, `runner.executors` =
