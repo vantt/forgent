@@ -220,31 +220,54 @@ traffic shows which kinds actually strain.
 
 | File | Change |
 |---|---|
-| `src/state/workflow-stage-graphs.mjs` | `DOMAINS.coding` gains `workflows: { feature }` — `{ stages, stepMap, transitions }` **copied byte-for-byte from today's domain-level arrays**, including the legacy drain-only `decompose` alias (:90, :139-157) and the `clarify` historical edges — plus `defaultWorkflow: 'feature'` and `workflowFor: {}` (empty: every kind folds to the default). New helper `workflowFor(domain, kind)` → the workflow object, folding an unknown/absent kind to `defaultWorkflow`, mirroring `resolveDomainName`'s never-throw fold (:503-512). The empty map is the point: the selector is real and exercised, it simply has one destination today. |
-| `src/state/stage-fsm.mjs`, `src/state/frontier.mjs`, `src/intake/discovery.mjs`, `src/intake/plan.mjs` | Read `stages`/`stepMap`/`transitions` through the resolved workflow instead of straight off the domain. Keep the domain-level arrays as a **compat shim** (`domain.stages` continues to resolve to the default workflow's) so no caller outside this list breaks silently. |
-| `src/state/work.mjs` | `STAGES` (:190) must keep exporting the same array — it is `DOMAINS[DEFAULT_DOMAIN].stages` today; verify every consumer still sees exactly what it saw before. |
-| `docs/specs/work-state.md` | RUL for the hierarchy + selector + default fold (note explicitly that only one workflow is registered today, and why). |
+| `src/state/workflow-stage-graphs.mjs` | `DOMAINS.coding` gains `workflows: { feature }`, `defaultWorkflow: 'feature'`, `workflowFor: {}` (empty: every kind folds to the default). New helper `resolveWorkflow(domain, kind)` → the workflow object, folding an unknown/absent kind to `defaultWorkflow`, mirroring `resolveDomainName`'s never-throw fold. |
+| `docs/specs/work-state.md` | RUL65: the hierarchy + selector + default fold, and why the hot path is untouched (below). |
 
-### Tests
+**Deviation from the plan as originally written (recorded here, not
+silently): `workflows.feature.{stages,stepMap,transitions}` are
+implemented as the EXACT SAME object references as
+`domain.stages`/`stepMap`/`transitions` (`coding.workflows.feature.stages
+=== coding.stages`, checked with `===`, not merely `deepEqual`) — achieved
+by restructuring `DOMAINS.coding` from an inline frozen literal into a
+named `codingDomain` built in two steps (fields, then `workflows`
+pointing at the same fields, then frozen) rather than duplicating ~130
+lines of heavily-commented array/object literals verbatim.**
 
-1. **Identity proof (the whole point of this piece)**: the resolved
-   `feature` workflow's `stages`/`stepMap`/`transitions` deep-equal the
-   pre-change frozen domain-level arrays, element for element.
-2. **No-migration proof**: an item created before this piece resolves to
-   `feature`, and every edge legal before is still legal.
-3. Selector exercised for real: `workflowFor(domain, 'bug')`,
-   `'feature'`, `'docs'`, an unknown kind, and an absent kind all resolve
-   to `feature` today — proving the lookup runs rather than being dead
-   code waiting for a second entry.
-4. `decompose` legacy alias still drains under `feature`.
-5. `test/state/workflow-stage-graphs.test.mjs`, `fsm.test.mjs`,
-   `stage.test.mjs`, `frontier.test.mjs` — all stay green untouched where
-   they assert current coding behavior.
-6. `test/e2e/domain-aware-stage-literals.test.mjs` — the existing guard
-   against hardcoded stage literals must still pass; if this piece
-   re-hardcodes anything in the resolution path, this test catches it.
-7. `test/e2e/fixture-marketing-domain.test.mjs` — a domain declaring no
-   `workflows` at all (the fixture) keeps working through the compat shim.
+Because of that reference identity, `src/state/stage-fsm.mjs`,
+`frontier.mjs`, `intake/discovery.mjs`, and `intake/plan.mjs` are
+**deliberately left unwired** — the plan's original table called for
+routing their reads through `resolveWorkflow`, but with exactly one
+workflow registered, `domain.transitions` and
+`resolveWorkflow(domain, kind).transitions` are the identical object, so
+rewiring today changes zero behavior and only adds edit risk to modules
+this repo already tests heavily (`stage-fsm.mjs` and `work.mjs`'s
+`validateWorkShape` sit on every single `add`/`edit`/`move`). Wiring the
+hot path is real, warranted work — it becomes necessary, and only then
+safe to do with something to actually route between, once a second
+workflow (`bugfix`/`lightweight`, D7a's own deferred follow-on) exists.
+This is the same "reversible option, take it and carry on" discipline
+`fgos-coding-validating`'s own D5 already applies to a gate question — here
+applied to an implementation choice instead.
+
+### Tests (`test/state/workflow-multiplicity.test.mjs`, 7 tests)
+
+1. **Identity proof (the whole point of this piece)**: `===`, not merely
+   `deepEqual` — `coding.workflows.feature.stages === coding.stages`, same
+   for `stepMap`/`transitions`.
+2. `coding.workflows` has exactly one key (`feature`); `workflowFor` is
+   `{}`.
+3. `resolveWorkflow(coding, 'bug')` resolves to `feature` — the selector
+   runs for real today, it simply has one destination.
+4. Unrecognized/absent `kind` folds to the default, never throws.
+5. A domain with no `workflows` declared (`synthetic`) returns `undefined`
+   from `resolveWorkflow`, never throws.
+6. `resolveWorkflow` never throws on a null/undefined domain.
+7. The whole `coding` domain, `workflows` included, stays deeply frozen.
+
+Full `npm test` (3364 → still 3364+7, all green) is the proof that leaving
+`stage-fsm.mjs`/`frontier.mjs`/`discovery.mjs`/`plan.mjs` untouched broke
+nothing — the existing suites for all four already assert current coding
+behavior end to end.
 
 ---
 

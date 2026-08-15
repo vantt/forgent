@@ -49,8 +49,15 @@
  * matches today's implicit, exclusively-coding behavior (D2). */
 export const DEFAULT_DOMAIN = 'coding';
 
-export const DOMAINS = Object.freeze({
-  coding: Object.freeze({
+// tsk-2t9c D7/D7a: `codingDomain` starts as a plain (not yet frozen) object
+// so `workflows.feature` below can hold the EXACT SAME array/object
+// references as the top-level `stages`/`stepMap`/`transitions` fields —
+// reference identity, not merely deep-equality, is the strongest possible
+// proof that registering the workflow hierarchy changed zero behavior for
+// zero items (D7a: mechanism-first, `feature` carries today's graph
+// byte-for-byte, no new workflow shape exists yet to be wrong about).
+// Frozen at the bottom of this block, before it's placed into `DOMAINS`.
+const codingDomain = {
     // tsk-1w7 D10 (docs/history/fanout-and-delegation-rubric/CONTEXT.md):
     // two new stages sit between `clarify` and `decompose` — `discovery`
     // (machine-alone research; owned by `fgos-coding-discovering` since
@@ -403,7 +410,30 @@ export const DOMAINS = Object.freeze({
         ]),
       }),
     }),
+};
+
+// workflows/defaultWorkflow/workflowFor (tsk-2t9c D7/D7a): the hierarchy
+// domain -> N workflow -> item, mechanism-first. `feature` is not a copy
+// of the fields above -- it IS them, same references, so there is no
+// second place these three arrays could ever drift out of sync. Only
+// `feature` is registered today (D7a): `workflowFor` starts empty, so
+// EVERY kind resolves to `defaultWorkflow` via `resolveWorkflow` below --
+// the selector runs for real on every lookup, it simply has one
+// destination until a second workflow (e.g. `bugfix`/`lightweight`, D7a's
+// own deferred follow-on) is registered by a later item.
+codingDomain.workflows = Object.freeze({
+  feature: Object.freeze({
+    stages: codingDomain.stages,
+    stepMap: codingDomain.stepMap,
+    transitions: codingDomain.transitions,
   }),
+});
+codingDomain.defaultWorkflow = 'feature';
+codingDomain.workflowFor = Object.freeze({});
+Object.freeze(codingDomain);
+
+export const DOMAINS = Object.freeze({
+  coding: codingDomain,
   synthetic: Object.freeze({
     stages: Object.freeze(['assembling']),
     stepMap: Object.freeze({
@@ -579,6 +609,23 @@ export function getDomain(name, opts) {
  * Returns `undefined` if the domain declares no stage for that step. */
 export function stageForStep(domain, step) {
   return Object.keys(domain.stepMap).find((stage) => domain.stepMap[stage] === step);
+}
+
+/** Resolve `kind` to `domain`'s own workflow entry (tsk-2t9c D7/D7a) —
+ * `domain.workflows[domain.workflowFor[kind] ?? domain.defaultWorkflow]`,
+ * folding an absent/unrecognized kind to the default, never throwing —
+ * same never-throw fold every sibling resolver in this module keeps.
+ * `undefined` when `domain` declares no `workflows` at all (every domain
+ * but `coding` today), the same "this axis does not apply here" shape
+ * `roleGraphFor`/`classificationVocabulary` already use one field over.
+ * `domain.stages`/`stepMap`/`transitions` stay valid to read directly for
+ * a domain that HAS `workflows` too — they are the same references as
+ * `resolveWorkflow(domain, domain.defaultWorkflow).stages` etc., not a
+ * second, possibly-drifting copy. */
+export function resolveWorkflow(domain, kind) {
+  if (!domain?.workflows) return undefined;
+  const name = (kind !== undefined && domain.workflowFor?.[kind]) || domain.defaultWorkflow;
+  return domain.workflows[name] ?? domain.workflows[domain.defaultWorkflow];
 }
 
 /** The stages within `domain` that `fgos discover` can legally act on — the
