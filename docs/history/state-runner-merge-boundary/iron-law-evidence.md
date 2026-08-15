@@ -206,3 +206,90 @@ One flake seen once and not reproducible: `concurrent movePorting calls on
 DIFFERENT ids never lose a write to state.json (tsk-1q5)` failed on one
 full-suite run at 10.4s, passed alone and on the next full run. It exercises
 `movePorting`/`state.json` locking, which this item does not touch.
+
+---
+
+## tsk-55f — lazy verify-timeout resolution (regression from tsk-49i-2)
+
+Found by the branch review of `main...fgw/tsk-49i`, then reproduced by hand
+before anything was written.
+
+**Why the gate fires.** `classifyIronLaw` over this item's own changed-file
+list:
+
+```
+{
+  "required": true,
+  "matchedFlags": [],
+  "matchedModules": [
+    "bin/fgos.mjs"
+  ]
+}
+```
+
+**Command used as the failing-before / passing-after proof** — the item's
+own registered `verify`:
+
+```
+npm test \
+  && test -f test/cli/fgos-merge-next-no-config-write.test.mjs \
+  && grep -qF resolveTimeoutMs src/verbs/merge/sync-root.mjs
+```
+
+### RED — reproduced by hand first, on two identical fresh repos
+
+Two temp git repos, each with a store initialized and no runner config,
+one driven by `main`'s binary and one by the branch's:
+
+```
+$ <main>/bin/fgos.mjs sync-root nosuchid --dir <repo-old>/.fgos
+fgos: sync-root: work "nosuchid" not found.
+$ ls <repo-old>/.fgos/          # no config.json
+
+$ <branch>/bin/fgos.mjs sync-root nosuchid --dir <repo-new>/.fgos
+fgos: no runner config found — detected "claude" on PATH; wrote a default
+      (executor: claude) at …/.fgos/config.json#runner; edit .fgos/config.json
+      by hand to change.
+fgos: sync-root: work "nosuchid" not found.
+```
+
+Same split for `merge next` with nothing ready: `main` printed only
+`{"picked": null}`, the branch wrote a default runner config first.
+
+### RED — the regression test, run against the unfixed tree
+
+The fix was stashed (`git stash push -u -m tsk-55f-fix-probe -- bin/fgos.mjs
+src/verbs/merge/approve.mjs src/verbs/merge/sync-root.mjs`) and the new test
+run against the code as `tsk-49i-2` left it:
+
+```
+$ node --test test/cli/fgos-merge-next-no-config-write.test.mjs
+✖ merge next with nothing ready writes no runner config — its outcome is a
+  pure read (tsk-55f)
+  AssertionError: merge next resolved a verify timeout before deciding
+  anything, writing a default runner config
+✖ sync-root refusing an unknown id writes no runner config — the refusal is
+  side-effect-free (tsk-55f)
+  AssertionError: sync-root resolved its verify timeout before the item
+  guard, writing a default runner config
+ℹ tests 2  ℹ pass 0  ℹ fail 2
+```
+
+The stash was then re-applied by name and dropped — never popped, since the
+stash stack is shared across every worktree of this repo.
+
+### GREEN — after the change
+
+```
+$ node --test test/cli/fgos-merge-next-no-config-write.test.mjs
+ℹ tests 2  ℹ pass 2  ℹ fail 0
+
+$ npm test
+ℹ tests 3340
+ℹ pass 3335
+ℹ fail 0
+
+$ test -f test/cli/fgos-merge-next-no-config-write.test.mjs \
+  && grep -qF resolveTimeoutMs src/verbs/merge/sync-root.mjs
+exit=0
+```
