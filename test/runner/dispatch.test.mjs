@@ -652,6 +652,44 @@ test('resolveExecutorCommand resolves command/args/provider from invocations[0] 
   assert.equal(resolved.provider, 'agy');
 });
 
+test('resolveExecutorCommand picks the invocation whose "via" is "cli" even when it is not invocations[0] (D9 Gate B2 — never invocations[0] blindly)', () => {
+  const cfg = {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: {
+      agy: {
+        kind: 'agent',
+        invocations: [
+          { via: 'mcp', command: 'mcp:agy' },
+          { via: 'cli', command: 'claude', args: ['-p', '{prompt}'] },
+        ],
+      },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'hello', model: 'sonnet', tier: 'standard', capacityId: 'agy' });
+  assert.equal(resolved.command, 'claude');
+  assert.deepEqual(resolved.args, ['-p', 'hello']);
+});
+
+test('resolveExecutorCommand throws when a capacity declares "invocations" but none is dispatchable via "cli" (D9 Gate B3 — never silently falls through to the global executor)', () => {
+  const cfg = {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: {
+      agy: {
+        kind: 'tool',
+        invocations: [{ via: 'mcp', command: 'mcp:agy' }],
+      },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+  assert.throws(
+    () => resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'agy' }),
+    /declares "invocations" but none is dispatchable via "cli"/,
+  );
+});
+
 test('resolveExecutorCommand still enforces cross-provider governance for an invocations[]-shaped capacity — allowCrossProvider stays required', () => {
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
