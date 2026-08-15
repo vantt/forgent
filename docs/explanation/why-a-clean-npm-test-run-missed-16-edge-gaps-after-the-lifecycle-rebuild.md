@@ -171,3 +171,19 @@ own doc comment always claimed to provide. Verified by `cargo test
 own scope required, distinct from `npm test`, exactly because B6 named
 that gap as the reason this bug went unnoticed by the original six
 children's own green suites.
+
+## Confirmed: `tsk-31lz` closed the false-pass settlement gate (F1c)
+
+The settlement-logging bug — an `unclear` verdict's own `discovery ->
+exploring` move (introduced by `tsk-30v`'s edge-selection change) tripping
+the same gate that logs a genuine pass, because that gate gated only on
+`from === 'discovery'` and never checked the verdict itself — landed as
+`tsk-31lz`. Confirmed directly in the current tree: the gate
+(`src/state/replay.mjs`) now reads `from === 'discovery' &&
+drivingVerdict?.clear !== false` before logging a `clarify-pass`
+settlement, so a park-on-unclear item no longer gets written to the
+compound-learning log as resolved. One real friction on the way: the
+first `sync-root` attempt into the parent branch `fgw/tsk-5sr` failed its
+own goal-check (aborted cleanly, parent unchanged) before a clean retry
+landed — the same class of merge-time friction the sibling children in
+this batch also hit.
