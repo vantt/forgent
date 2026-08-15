@@ -43,9 +43,13 @@ vậy toàn bộ danh sách call-site/import-site trong plan này lấy từ
 grep/read thật (`RESEARCH.md` §A1), **không** từ code graph — và đó là lý
 do nó tìm ra 6 file mà 6 vòng shaping trước bỏ sót.
 
-**Đã sync với `main` và re-verify (2026-08-15).** Nhánh từng đứng sau
-`main` 171 commit, trong đó 14 commit chạm `src/state`/`src/runner`. Merge
-(không rebase, theo D2 `src/runner/worktree.mjs`) ra `ba25a590`, sạch.
+**Đã sync với `main` và re-verify 2 lần (2026-08-15).** Lần 1: nhánh đứng
+sau `main` 171 commit, trong đó 14 commit chạm `src/state`/`src/runner`.
+Lần 2: thêm 44 commit của đợt `tsk-5tm` (dispatch unification) — diện ảnh
+hưởng hẹp, đúng 1 file `src/runner/dispatch.mjs` đổi, không file `.mjs`
+mới, `bin/fgos.mjs` byte-identical, `test/architecture.test.mjs` xanh; chi
+tiết ở `RESEARCH.md` Vòng 3, **không đổi phạm vi gì**. Cả hai lần đều merge
+(không rebase, theo D2 `src/runner/worktree.mjs`), sạch.
 Toàn bộ anchor `file:line` của `RESEARCH.md` đã được kiểm lại trên cây
 sau merge — kết quả đầy đủ ở `RESEARCH.md` Vòng 2. Ba điều plan này đã
 sửa theo: **cạnh import thứ 5** (F1, thêm vào pha 1), toạ độ bằng chứng

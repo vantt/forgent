@@ -122,7 +122,8 @@ Kiểm chéo layer cho các move dự kiến (tự tính từ rank ở trên, qu
 - Chi phí: `npm test` = 142 file test, ~50s (đo trong
   `docs/history/tsk-25b-test-wallclock-split/CONTEXT.md` D4: 47–53s qua 3 lần);
   `node --test test/architecture.test.mjs` = 0.14s. Verify chạy dưới timeout
-  mặc định 900000ms (`bin/fgos.mjs:333` + `src/runner/dispatch.mjs:247`).
+  mặc định 900000ms (`bin/fgos.mjs:333` + `src/runner/dispatch.mjs:247` —
+  toạ độ đã lệch, xem Vòng 2 §F3 và Vòng 3 §G3).
 
 ### Verdict vòng 1
 
@@ -264,3 +265,55 @@ dòng trong `bin/fgos.mjs` và `test/runner/merge.test.mjs`. **Một thay đổi
 vi thật: cạnh thứ 5 ở F1** — phải nằm trong `tsk-49i-1` (cùng item với 4 cạnh
 kia) thì verify đã chốt mới xanh; đây là quyết định phạm vi cho người, không
 phải cho skill tự nới.
+
+---
+
+## Vòng 3 — 2026-08-15, re-verify sau đợt `tsk-5tm` (dispatch unification)
+
+**Vì sao:** `main` nhận thêm **44 commit** sau lần merge `ba25a590` — trọn đợt
+`tsk-5tm` (task-dispatch-unification, 6 con) cộng 2 commit chỉnh model map.
+Merge lần hai, sạch, không conflict.
+
+**Diện thay đổi rất hẹp so với item này.** Trong `src/`+`bin/` **đúng 1 file
+đổi**: `src/runner/dispatch.mjs` (+424/−108). **Không thêm file `.mjs` mới**
+nào dưới `src/`/`bin/`/`scripts/`. Trong `test/` chỉ 2 file:
+`test/runner/dispatch.test.mjs`, `test/scripts/project-agents.test.mjs`.
+
+**Hệ quả: `bin/fgos.mjs` byte-identical** với lần verify Vòng 2, và không file
+test nào trong footprint của 2 con bị đụng. Nên **toàn bộ anchor Vòng 2 §F2/§F3
+vẫn đúng nguyên**, không cần kiểm lại từng dòng: gate Iron Law `:3494-3503`,
+`ensureBranchPushed` `:264`/`:3227`, 3 collector `:549/:569/:593`,
+`MAX_WAIT_MS` `:304`, cả 24 call site `drift-status.test.mjs`, 2 call
+`detectTrunk` `merge.test.mjs:1511/:1554`.
+
+### G1 — Cạnh import: vẫn đúng 5, không phát sinh cạnh thứ 6
+
+`grep -rn "from '../runner/" src/state/` trả đúng 5 dòng của §F1. `dispatch.mjs`
+nằm ở phía `runner/` nên đợt này không thêm cạnh ngược nào.
+
+### G2 — Manifest và architecture test: không đổi
+
+Không có file `.mjs` mới ⇒ không cần row manifest mới.
+`node --test test/architecture.test.mjs` **xanh, 3/3 pass, 49ms** trên cây đã
+merge — invariant check của repo vẫn sạch trước khi item bắt đầu.
+
+### G3 — Anchor lệch (1 chỗ)
+
+| Vòng trước ghi | Thực tế | |
+|---|---|---|
+| `src/runner/dispatch.mjs:247` `timeoutMs: 900000` | **`:260`** | `bin/fgos.mjs:304` không đổi |
+
+### G4 — Ghi chú xuất xứ của Vòng 1 nay đã lỗi thời
+
+Vòng 1 mô tả cách nó dispatch 3 nhánh nghiên cứu song song: "`gather` capacity
+chưa đăng ký — `dispatch.mjs decide --for gather` trả
+`{"mechanism":"unavailable"}` → fallback native Task". Sau `tsk-5tm-2` (D6),
+`gather` **bị khai tử hẳn** chứ không còn là "chưa đăng ký"
+(`src/runner/dispatch.mjs:446`). Đây chỉ là ghi chú về cách vòng 1 tự chạy,
+**không phải bằng chứng nào của item** — nhưng đừng lấy nó làm hướng dẫn để
+lặp lại thí nghiệm cũ.
+
+### Verdict vòng 3
+
+Không có thay đổi phạm vi. Plan và spec 2 con **giữ nguyên như sau Vòng 2**
+(5 cạnh, footprint đã bổ sung). Sửa duy nhất: toạ độ ở §G3.
