@@ -46,6 +46,12 @@ rhai = { version = "1", features = ["serde"] }
 # (`docs/contracts/fgos-gateway-api-v1.yaml`) into a queryable operation list
 # instead of serving it as an opaque string the way `/contract` already does.
 serde_yaml = "0.9"
+# tsk-54y: CORS layer for `build_router` -- the web client (a separate
+# static bundle, D2 of docs/history/herdr-web-dashboard-plan-realignment/
+# CONTEXT.md) is not guaranteed to share origin with the gateway. Version
+# resolved by `cargo add --dry-run` against this crate's existing axum 0.8
+# dependency graph (docs/history/tsk-54y-gateway-cors-bind/plan.md).
+tower-http = { version = "0.7", features = ["cors"] }
 
 [dev-dependencies]
 tower = { version = "0.4", features = ["util"] }
