@@ -107,19 +107,21 @@ function moveDeliveredOrRecordFault(dir, id, phase, testForceLockTimeoutId, { me
 /**
  * @param {{dir: string, repoRoot: string}} ctx - `repoRoot` follows this
  *   verb's own `--trust-dir` policy, resolved by the adapter.
- * @param {{id: string, resolveTimeoutMs: () => number|undefined, noWait: boolean, waitMs: number|undefined,
+ * @param {{id: string, resolveTimeoutMs: () => number|undefined, resolveWaitFlags: () => {noWait: boolean, waitMs: number|undefined},
  *   github: boolean, prNumber: string|undefined, ghCommand: string,
  *   acknowledgeIronLaw: boolean, acknowledgeDrift: boolean,
  *   testForceLockTimeoutId: string|null}} options
  */
 export async function approveUseCase(
   { dir, repoRoot },
-  { id, resolveTimeoutMs, noWait, waitMs, github, prNumber, ghCommand, acknowledgeIronLaw, acknowledgeDrift, testForceLockTimeoutId },
+  { id, resolveTimeoutMs, resolveWaitFlags, github, prNumber, ghCommand, acknowledgeIronLaw, acknowledgeDrift, testForceLockTimeoutId },
 ) {
-  // Resolved first, before any guard — the exact position `case 'approve'`
-  // resolved it in before the use-case split, so a run that then refuses
-  // still touches the runner config exactly when it always did.
+  // Both resolved first, before any guard, and in this order — the exact
+  // positions `case 'approve'` resolved them in before the use-case split,
+  // so a run that then refuses still touches the runner config, and still
+  // refuses a malformed flag, exactly when it always did.
   const timeoutMs = resolveTimeoutMs();
+  const { noWait, waitMs } = resolveWaitFlags();
   const runMerge = (mergeFn) => (noWait ? mergeFn() : withLockRetry(mergeFn, { waitMs }));
 
   const view = listWork(dir);
