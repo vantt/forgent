@@ -238,10 +238,23 @@ export const DEFAULT_RUNNER_CONFIG = {
       'Bash(git add:*),Bash(git commit:*)',
     ],
   },
-  models: {
-    light: 'haiku',
-    standard: 'sonnet',
-    heavy: 'opus',
+  // tsk-5tm-5 D9: modelPolicies replaces the old flat `models` map --
+  // provider-keyed, each provider's own 5-tier vocab (MODEL_POLICY_TIERS
+  // below). Default here stays Claude-only (matching the default
+  // `executor.command: 'claude'` above); a project adds its own
+  // `modelPolicies.<providerModel>` block when it configures a
+  // non-Claude capacity (this repo's own committed config does, for
+  // `agy`/gemini). `creative`/`analytical` default to `sonnet` (no real
+  // consumer differentiates them from `standard` yet); `critical`
+  // defaults to `opus`, matching `heavy`'s pre-D9 model unchanged.
+  modelPolicies: {
+    claude: {
+      lightweight: 'haiku',
+      standard: 'sonnet',
+      creative: 'sonnet',
+      analytical: 'sonnet',
+      critical: 'opus',
+    },
   },
   timeoutMs: 900000,
   parallel: {
@@ -261,6 +274,28 @@ export const DEFAULT_RUNNER_CONFIG = {
  * hand.
  */
 export const SUPPORTED_EXECUTOR_TEMPLATES = { claude: DEFAULT_RUNNER_CONFIG.executor };
+
+/**
+ * tsk-5tm-5 D9: `models`/`modelPolicies` are mutually-substitutable — either
+ * alone satisfies `validateRunnerConfigShape`, and `modelForTier` prefers
+ * `modelPolicies` when present. A project's runner section that intends
+ * `models` alone (no `modelPolicies` of its own) must not have a
+ * `modelPolicies` key silently attached by ANY missing-key-fill merge this
+ * module runs — not just the `DEFAULT_RUNNER_CONFIG` merge in
+ * `ensureRunnerConfigForDir`, but also the separate `mergeWithGlobalConfig`
+ * merge both `loadRunnerConfigFromDir` and `ensureRunnerConfigForDir` run
+ * afterward, which can inject `~/.fgos/config.json`'s own `modelPolicies`
+ * just as silently. `preRunner` is the project's own runner section as it
+ * stood right before the merge being guarded; `mergedRunner` is that merge's
+ * result.
+ */
+function dropModelPoliciesInjectedOverModels(preRunner, mergedRunner) {
+  if (preRunner && preRunner.models !== undefined && preRunner.modelPolicies === undefined && mergedRunner.modelPolicies !== undefined) {
+    const { modelPolicies, ...rest } = mergedRunner;
+    return rest;
+  }
+  return mergedRunner;
+}
 
 /**
  * Resolve+validate the runner section of the shared project config file at
@@ -286,7 +321,7 @@ export function loadRunnerConfigFromDir(dir) {
     throw new RunnerConfigError(`shared config at "${sharedPath}" is not valid JSON: ${err.message}`);
   }
   const withGlobal = mergeWithGlobalConfig(parsed);
-  const runnerCfg = withGlobal.runner ?? {};
+  const runnerCfg = dropModelPoliciesInjectedOverModels(parsed.runner, withGlobal.runner ?? {});
   validateRunnerConfigShape(runnerCfg, `${sharedPath}#runner`);
   return runnerCfg;
 }
@@ -330,7 +365,19 @@ export function ensureRunnerConfigForDir(dir) {
   if (fs.existsSync(sharedPath)) {
     const parsed = JSON.parse(fs.readFileSync(sharedPath, 'utf8'));
     const existingRunner = parsed.runner ?? {};
-    const { merged, addedKeys } = mergeConfigDefaults(existingRunner, DEFAULT_RUNNER_CONFIG);
+    // tsk-5tm-5 D9: `models`/`modelPolicies` are mutually-substitutable —
+    // either alone satisfies validateRunnerConfigShape's requirement, and
+    // modelForTier prefers modelPolicies when present. Auto-filling
+    // modelPolicies from DEFAULT_RUNNER_CONFIG onto a config that already
+    // has its own `models` map would silently SHADOW that map (nothing
+    // was actually missing) — skip that one default key in exactly this
+    // case, same "don't touch what's already satisfied" spirit every
+    // other field in this merge already follows.
+    const effectiveDefaults =
+      existingRunner.models !== undefined && existingRunner.modelPolicies === undefined
+        ? Object.fromEntries(Object.entries(DEFAULT_RUNNER_CONFIG).filter(([key]) => key !== 'modelPolicies'))
+        : DEFAULT_RUNNER_CONFIG;
+    const { merged, addedKeys } = mergeConfigDefaults(existingRunner, effectiveDefaults);
     let projectShared = parsed;
     if (addedKeys.length > 0) {
       projectShared = { ...parsed, runner: merged };
@@ -340,7 +387,7 @@ export function ensureRunnerConfigForDir(dir) {
       );
     }
     const withGlobal = mergeWithGlobalConfig(projectShared);
-    const runnerCfg = withGlobal.runner ?? {};
+    const runnerCfg = dropModelPoliciesInjectedOverModels(projectShared.runner, withGlobal.runner ?? {});
     validateRunnerConfigShape(runnerCfg, `${sharedPath}#runner`);
     return runnerCfg;
   }
@@ -424,6 +471,26 @@ export const CAPACITY_CARRIES = Object.freeze(['user-text', 'repo-content']);
  * Claude-vs-non-Claude check.
  */
 export const CLAUDE_CLI_COMMANDS = Object.freeze(['claude']);
+
+/**
+ * `cfg.modelPolicies.<providerModel>` tier vocabulary (tsk-5tm-5 D9,
+ * matching marketing-cockpit's `tier_policy_path`) — deliberately its OWN
+ * 5-value vocab, distinct from `work.mjs`'s `TIERS` (`light/standard/
+ * heavy`, D9's own pinned scope boundary: that export stays untouched,
+ * shared with `work.risk`). `DEFAULT_TIER_TO_POLICY` is the default
+ * mapping from a work item's own tier onto one of these five, used
+ * whenever a capacity names no `rigorOverrides` entry for that tier —
+ * `light`/`standard` map onto their same-named policy tier directly;
+ * `heavy` maps to `critical`, the highest-rigor policy tier, matching
+ * `heavy`'s own framing elsewhere (`HEAVY_RISK`) as the most
+ * scrutiny-demanding classification. `creative`/`analytical` have no
+ * default work-tier mapped onto them yet — they exist for a capacity's
+ * own `rigorOverrides` to select explicitly (e.g. a capacity whose work
+ * is better served by a creative-leaning model even at `standard` rigor),
+ * not because this item invents a use for them.
+ */
+export const MODEL_POLICY_TIERS = Object.freeze(['lightweight', 'standard', 'creative', 'analytical', 'critical']);
+const DEFAULT_TIER_TO_POLICY = Object.freeze({ light: 'lightweight', standard: 'standard', heavy: 'critical' });
 
 /**
  * `capacities.<id>.invocations[].via` vocabulary (tsk-5tm-4 D11): the one
@@ -541,6 +608,65 @@ function validateCapacityShape(capacity, label) {
       validateExecutorShape(invocation, invocationLabel);
     });
   }
+  // tsk-5tm-5 D9: `providerModel` names which `cfg.modelPolicies` table
+  // this capacity's tier resolution reads from (absent defaults to
+  // "claude", `modelForTier`'s own default) — the field `agy` needs so
+  // its tier resolution reads the "gemini" table instead of silently
+  // borrowing Claude's model names.
+  if (capacity.providerModel !== undefined && (typeof capacity.providerModel !== 'string' || !capacity.providerModel.trim())) {
+    throw new RunnerConfigError(`runner config (${label}) "providerModel" must be a non-empty string when present.`);
+  }
+  // `rigorOverrides` (D9): per-work-tier override of the DEFAULT_TIER_TO_
+  // POLICY mapping, for a capacity with a real reason to deviate (e.g.
+  // prefers "creative" over the default "standard" policy tier even at
+  // work-tier "standard"). Optional and additive — a capacity naming none
+  // resolves through the default mapping unchanged.
+  if (capacity.rigorOverrides !== undefined) {
+    if (!capacity.rigorOverrides || typeof capacity.rigorOverrides !== 'object' || Array.isArray(capacity.rigorOverrides)) {
+      throw new RunnerConfigError(`runner config (${label}) "rigorOverrides" must be an object mapping a work tier to a policy tier when present.`);
+    }
+    for (const [workTier, policyTier] of Object.entries(capacity.rigorOverrides)) {
+      if (!TIERS.includes(workTier)) {
+        throw new RunnerConfigError(`runner config (${label}) "rigorOverrides" key must be one of ${TIERS.join('/')}, got: ${JSON.stringify(workTier)}.`);
+      }
+      if (!MODEL_POLICY_TIERS.includes(policyTier)) {
+        throw new RunnerConfigError(
+          `runner config (${label}) "rigorOverrides.${workTier}" must be one of ${MODEL_POLICY_TIERS.join('/')}, got: ${JSON.stringify(policyTier)}.`,
+        );
+      }
+    }
+  }
+}
+
+/**
+ * Shape-check `cfg.modelPolicies` (tsk-5tm-5 D9): an object mapping an
+ * arbitrary provider name (`"claude"`, `"gemini"`, ...) to a tier map,
+ * each tier map's keys drawn from `MODEL_POLICY_TIERS` and values
+ * non-empty model-name strings. Partial coverage (a provider naming fewer
+ * than all 5 tiers) is valid at load time, same lenient-at-load/strict-
+ * at-resolve philosophy the old flat `models` map already used (per
+ * `modelForTier`'s own doc comment) — a missing tier only throws once
+ * something actually asks for it.
+ */
+function validateModelPoliciesShape(modelPolicies, label) {
+  if (!modelPolicies || typeof modelPolicies !== 'object' || Array.isArray(modelPolicies)) {
+    throw new RunnerConfigError(`runner config (${label}) must be an object mapping provider -> tier -> model when present.`);
+  }
+  for (const [providerModel, tierMap] of Object.entries(modelPolicies)) {
+    if (!tierMap || typeof tierMap !== 'object' || Array.isArray(tierMap)) {
+      throw new RunnerConfigError(`runner config (${label}.${providerModel}) must be an object mapping policy tier -> model.`);
+    }
+    for (const [policyTier, model] of Object.entries(tierMap)) {
+      if (!MODEL_POLICY_TIERS.includes(policyTier)) {
+        throw new RunnerConfigError(
+          `runner config (${label}.${providerModel}) tier key must be one of ${MODEL_POLICY_TIERS.join('/')}, got: ${JSON.stringify(policyTier)}.`,
+        );
+      }
+      if (typeof model !== 'string' || !model.trim()) {
+        throw new RunnerConfigError(`runner config (${label}.${providerModel}.${policyTier}) must be a non-empty string.`);
+      }
+    }
+  }
 }
 
 function validateRunnerConfigShape(cfg, sourceLabel) {
@@ -576,8 +702,17 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
       validateCapacityShape(capacity, `${sourceLabel} capacities.${capacityId}`);
     }
   }
-  if (!cfg.models || typeof cfg.models !== 'object' || Array.isArray(cfg.models)) {
-    throw new RunnerConfigError(`runner config (${sourceLabel}) must declare a "models" object mapping tier -> model.`);
+  // tsk-5tm-5 D9: `modelPolicies` (provider-keyed, 5-tier) is the new
+  // preferred shape -- when present, it satisfies this requirement on its
+  // own; the legacy flat `models` map is only required when a project
+  // hasn't migrated. Both may coexist (modelForTier prefers modelPolicies
+  // when present); neither being present is the one invalid state.
+  if (cfg.modelPolicies !== undefined) {
+    validateModelPoliciesShape(cfg.modelPolicies, `${sourceLabel} modelPolicies`);
+  } else if (!cfg.models || typeof cfg.models !== 'object' || Array.isArray(cfg.models)) {
+    throw new RunnerConfigError(
+      `runner config (${sourceLabel}) must declare a "models" object mapping tier -> model, or a "modelPolicies" object mapping provider -> tier -> model (tsk-5tm-5 D9).`,
+    );
   }
   if (typeof cfg.timeoutMs !== 'number' || !Number.isFinite(cfg.timeoutMs) || cfg.timeoutMs <= 0) {
     throw new RunnerConfigError(`runner config (${sourceLabel}) must declare a positive numeric "timeoutMs".`);
@@ -602,13 +737,36 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
 
 /**
  * Resolve `tier` (per D6; falls back to `work.mjs`'s declared default when a
- * work item omits `tier`, per D7b) to a model name via `cfg.models`. An
- * unknown tier — one work.mjs's `TIERS` allows but this config's `models`
- * map does not cover, or any other string — is a validation error: the two
- * tables must reconcile (per work.mjs's own doc comment), and dispatch time
- * is where that drift would first bite.
+ * work item omits `tier`, per D7b) to a model name. An unknown tier — one
+ * work.mjs's `TIERS` allows but the resolved table does not cover, or any
+ * other string — is a validation error: dispatch time is where that drift
+ * would first bite (per D6's own original reasoning, unchanged by D9).
+ *
+ * tsk-5tm-5 D9: `cfg.modelPolicies` (provider-keyed, 5-tier) is preferred
+ * when present — `providerModel` (default `"claude"`, every pre-D9 call
+ * site) selects which provider's table to read, and `tier` maps onto one
+ * of `MODEL_POLICY_TIERS` via `DEFAULT_TIER_TO_POLICY`, unless
+ * `rigorOverrides` (a capacity's own override map, threaded in by the
+ * caller) names a different policy tier for this specific work tier.
+ * Falls back to the legacy flat `cfg.models[tier]` lookup, byte-identical
+ * to every pre-D9 caller, when `cfg.modelPolicies` is absent — this
+ * signature's first two positional params are UNCHANGED (D9's own
+ * constraint): `loop.mjs`'s `modelForTier(config, tier)` call site keeps
+ * working exactly as before, options object omitted entirely.
  */
-export function modelForTier(cfg, tier) {
+export function modelForTier(cfg, tier, { providerModel = 'claude', rigorOverrides } = {}) {
+  const policies = cfg && cfg.modelPolicies;
+  if (policies) {
+    const providerPolicy = policies[providerModel];
+    if (!providerPolicy || typeof providerPolicy !== 'object') {
+      throw new RunnerConfigError(`no modelPolicies configured for provider "${providerModel}".`);
+    }
+    const policyTier = (rigorOverrides && rigorOverrides[tier]) || DEFAULT_TIER_TO_POLICY[tier];
+    if (!policyTier || typeof providerPolicy[policyTier] !== 'string') {
+      throw new RunnerConfigError(`no model configured for tier "${tier}" (policy tier "${policyTier}") under provider "${providerModel}".`);
+    }
+    return providerPolicy[policyTier];
+  }
   const models = cfg && cfg.models;
   if (!models || typeof tier !== 'string' || !(tier in models)) {
     throw new RunnerConfigError(`no model configured for tier "${tier}".`);
@@ -1113,9 +1271,14 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   // exactly what dispatch.test.mjs's "throws a RunnerConfigError ... before
   // any spawn" test pins.
   const tier = work.tier ?? DEFAULTS.tier;
-  const model = modelForTier(cfg, tier);
-  const prompt = buildPrompt(work, opts.feedback, opts.stage);
+  // tsk-5tm-5 D9: capacityId computed before modelForTier (moved ahead of
+  // its pre-D9 position, right after) so a capacity's own providerModel/
+  // rigorOverrides can thread into tier resolution — never borrowing
+  // Claude's model names for a non-Claude capacity's own dispatch.
   const capacityId = capacityIdForWork(work);
+  const capacityForTier = capacityId && cfg && cfg.capacities && typeof cfg.capacities === 'object' ? cfg.capacities[capacityId] : undefined;
+  const model = modelForTier(cfg, tier, { providerModel: capacityForTier?.providerModel, rigorOverrides: capacityForTier?.rigorOverrides });
+  const prompt = buildPrompt(work, opts.feedback, opts.stage);
   const { command, args, adapter, provider, baseCommit, headRef } = resolveExecutorCommand(cfg, {
     prompt,
     model,
@@ -1254,7 +1417,7 @@ export async function resolveCapacityCli(
   }
   const capacity = cfg.capacities?.[capacityId];
   const tier = tierOverride ?? capacity?.tier ?? DEFAULTS.tier;
-  const model = modelOverride ?? capacity?.model ?? modelForTier(cfg, tier);
+  const model = modelOverride ?? capacity?.model ?? modelForTier(cfg, tier, { providerModel: capacity?.providerModel, rigorOverrides: capacity?.rigorOverrides });
   const { command, args, provider } = resolveExecutorCommand(cfg, {
     prompt,
     model,
@@ -1348,7 +1511,7 @@ export async function executeCapacityCli(
 
   const capacity = cfg.capacities?.[capacityId];
   const tier = tierOverride ?? capacity?.tier ?? DEFAULTS.tier;
-  const model = modelOverride ?? capacity?.model ?? modelForTier(cfg, tier);
+  const model = modelOverride ?? capacity?.model ?? modelForTier(cfg, tier, { providerModel: capacity?.providerModel, rigorOverrides: capacity?.rigorOverrides });
   const { command, args, adapter, provider } = resolveExecutorCommand(cfg, {
     prompt,
     model,

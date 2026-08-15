@@ -759,7 +759,14 @@ function committedRunnerConfig() {
 
 test('the committed .fgos/config.json runner section loads and is well-formed', () => {
   const cfg = committedRunnerConfig();
-  assert.deepEqual(Object.keys(cfg.models).sort(), ['heavy', 'light', 'standard']);
+  assert.deepEqual(Object.keys(cfg.modelPolicies.claude).sort(), ['analytical', 'creative', 'critical', 'lightweight', 'standard']);
+});
+
+test('the committed .fgos/config.json runner section wires the agy capacity to gemini\'s own modelPolicies, not claude\'s (D9, tsk-5tm-5 — the bug this piece fixes)', () => {
+  const cfg = committedRunnerConfig();
+  assert.equal(cfg.capacities?.agy?.providerModel, 'gemini');
+  assert.equal(typeof cfg.modelPolicies?.gemini?.lightweight, 'string');
+  assert.ok(cfg.modelPolicies.gemini.lightweight.length > 0);
 });
 
 test('the committed .fgos/config.json runner section grants the worker exactly acceptEdits + git add/commit — no wider (per spike B)', () => {
@@ -918,7 +925,18 @@ test('ensureRunnerConfigForDir on an already-complete shared file does not rewri
   fs.writeFileSync(sharedPath, JSON.stringify({ runner: DEFAULT_RUNNER_CONFIG }));
   const before = fs.statSync(sharedPath).mtimeMs;
 
-  const cfg = ensureRunnerConfigForDir(dir);
+  // Isolate from this machine's real global config (~/.fgos/config.json) —
+  // otherwise a stale real-world `models` shape gets merged in and this
+  // fixture stops looking "already complete".
+  const homeDir = mkTempDir();
+  const prevHome = process.env.HOME;
+  process.env.HOME = homeDir;
+  let cfg;
+  try {
+    cfg = ensureRunnerConfigForDir(dir);
+  } finally {
+    process.env.HOME = prevHome;
+  }
 
   assert.deepEqual(cfg, DEFAULT_RUNNER_CONFIG);
   assert.equal(fs.statSync(sharedPath).mtimeMs, before);
@@ -965,6 +983,183 @@ test('modelForTier throws a validation error for an unknown tier', () => {
     assert.equal(err.category, 'validation');
     return true;
   });
+});
+
+// --- modelForTier: modelPolicies (D9, tsk-5tm-5) -------------------------
+
+function modelPoliciesConfig() {
+  return {
+    executor: { command: process.execPath, args: ['{prompt}'] },
+    modelPolicies: {
+      claude: { lightweight: 'haiku', standard: 'sonnet', creative: 'sonnet', analytical: 'sonnet', critical: 'opus' },
+      gemini: { lightweight: 'gemini-flash', standard: 'gemini-pro', creative: 'gemini-pro', analytical: 'gemini-pro', critical: 'gemini-ultra' },
+    },
+    timeoutMs: 5000,
+  };
+}
+
+test('modelForTier resolves the default provider (claude) when no providerModel is given, same tier->model mapping as before', () => {
+  const cfg = modelPoliciesConfig();
+  assert.equal(modelForTier(cfg, 'light'), 'haiku');
+  assert.equal(modelForTier(cfg, 'standard'), 'sonnet');
+  assert.equal(modelForTier(cfg, 'heavy'), 'opus');
+});
+
+test('modelForTier resolves a non-Claude provider (e.g. agy/gemini) to that provider\'s own model name, not Claude\'s (D9\'s reported bug: executor non-Claude nhan sai ten)', () => {
+  const cfg = modelPoliciesConfig();
+  assert.equal(modelForTier(cfg, 'light', { providerModel: 'gemini' }), 'gemini-flash');
+  assert.equal(modelForTier(cfg, 'standard', { providerModel: 'gemini' }), 'gemini-pro');
+  assert.equal(modelForTier(cfg, 'heavy', { providerModel: 'gemini' }), 'gemini-ultra');
+});
+
+test('modelForTier throws when providerModel names a provider with no modelPolicies entry', () => {
+  const cfg = modelPoliciesConfig();
+  assert.throws(() => modelForTier(cfg, 'light', { providerModel: 'mistral' }), (err) => {
+    assert.ok(err instanceof RunnerConfigError);
+    assert.match(err.message, /mistral/);
+    return true;
+  });
+});
+
+test('modelForTier honors rigorOverrides, routing a work tier to a different model-policy tier than DEFAULT_TIER_TO_POLICY', () => {
+  const cfg = modelPoliciesConfig();
+  // Default: 'standard' work-tier -> 'standard' policy tier -> sonnet.
+  assert.equal(modelForTier(cfg, 'standard'), 'sonnet');
+  // Override routes 'standard' work-tier -> 'critical' policy tier -> opus.
+  assert.equal(modelForTier(cfg, 'standard', { rigorOverrides: { standard: 'critical' } }), 'opus');
+});
+
+test('modelForTier prefers modelPolicies over a legacy flat models map when both are present', () => {
+  const cfg = { ...modelPoliciesConfig(), models: { light: 'legacy-light', standard: 'legacy-standard', heavy: 'legacy-heavy' } };
+  assert.equal(modelForTier(cfg, 'standard'), 'sonnet');
+});
+
+test('modelForTier still resolves the legacy flat models map when modelPolicies is absent (backward compatible)', () => {
+  const cfg = baseConfig(['{prompt}']);
+  assert.equal(modelForTier(cfg, 'standard'), 'sonnet');
+});
+
+test('loadRunnerConfig accepts a runner config declaring modelPolicies instead of models', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'model-policies.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      modelPolicies: { claude: { standard: 'sonnet' } },
+      timeoutMs: 1000,
+    }),
+  );
+  const cfg = loadRunnerConfig(configPath);
+  assert.equal(cfg.modelPolicies.claude.standard, 'sonnet');
+});
+
+test('loadRunnerConfig rejects a config declaring neither models nor modelPolicies', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'no-models.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({ executor: { command: 'claude', args: ['{prompt}'] }, timeoutMs: 1000 }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('loadRunnerConfig rejects a modelPolicies entry with an unknown policy tier key', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-tier-key.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      modelPolicies: { claude: { 'ultra-mega': 'opus' } },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), (err) => {
+    assert.ok(err instanceof RunnerConfigError);
+    assert.match(err.message, /ultra-mega/);
+    return true;
+  });
+});
+
+test('loadRunnerConfig rejects a modelPolicies entry whose model value is not a non-empty string', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-model-value.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      modelPolicies: { claude: { standard: '' } },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('loadRunnerConfig rejects a "capacities.<id>" entry whose providerModel is not a non-empty string', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-provider-model.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: { agy: { kind: 'cli', command: 'agy', args: ['{prompt}'], providerModel: '' } },
+      modelPolicies: { claude: { standard: 'sonnet' } },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('loadRunnerConfig rejects a "capacities.<id>" entry whose rigorOverrides key is not a valid tier', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-rigor-key.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: { agy: { kind: 'cli', command: 'agy', args: ['{prompt}'], rigorOverrides: { 'not-a-tier': 'critical' } } },
+      modelPolicies: { claude: { standard: 'sonnet' } },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('loadRunnerConfig rejects a "capacities.<id>" entry whose rigorOverrides value is not one of MODEL_POLICY_TIERS', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-rigor-value.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: { agy: { kind: 'cli', command: 'agy', args: ['{prompt}'], rigorOverrides: { standard: 'ultra-mega' } } },
+      modelPolicies: { claude: { standard: 'sonnet' } },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('resolveCapacityCli resolves a cross-provider capacity\'s own providerModel through modelForTier, picking that provider\'s model over the default (claude) policy (D9\'s reported agy/Gemini bug)', async () => {
+  const root = mkTempDir();
+  const fgosDir = path.join(root, '.fgos');
+  initStore(fgosDir);
+  registerTool(fgosDir, { name: 'agy', kind: 'cli', capability: 'agy', command: 'agy' });
+  writeLocalStatus(fgosDir, { agy: { status: 'present', checkedAt: new Date().toISOString() } });
+  writeRunnerConfigFixture(root, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: {
+      agy: { kind: 'cli', command: 'agy', provider: 'agy', args: ['--model', '{model}', '{prompt}'], allowCrossProvider: true, providerModel: 'gemini' },
+    },
+    modelPolicies: {
+      claude: { standard: 'sonnet' },
+      gemini: { standard: 'gemini-pro' },
+    },
+    timeoutMs: 5000,
+  });
+  const resolved = await resolveCapacityCli('agy', { prompt: 'classify this', repoRoot: root, tier: 'standard' });
+  assert.deepEqual(resolved, { command: 'agy', args: ['--model', 'gemini-pro', 'classify this'], provider: 'agy', model: 'gemini-pro' });
 });
 
 // --- tsk-2ig: worktree-dispatch attestation (baseCommit/headRef) ---------
