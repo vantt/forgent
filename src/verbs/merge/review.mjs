@@ -55,6 +55,14 @@ export async function reviewUseCase({ dir, cwd }, { id, github, prNumber, ghComm
     // single `gh pr view` instead of polling up to the default 10s while
     // `mergeable` may stay "UNKNOWN" forever on a closed PR.
     if (prNumber !== undefined) {
+      // Same refusal `optionalField` produced in the adapter before
+      // tsk-h6r, at the same point in the sequence: an omitted `--pr` is
+      // fine (the create path below), but a bare or empty one is a
+      // validation error — and only once the guards above have had their
+      // say, so a nonexistent id is still reported as a nonexistent id.
+      if (prNumber === null || prNumber === '' || prNumber === true) {
+        throw new StoreError('validation', 'review --github --pr requires a PR number: --pr <n>');
+      }
       const result = await viewGitHubPRStatus(repoRoot, prNumber, { ghCommand, pollTimeoutMs: 0 });
       if (result.outcome === 'blocked') {
         return { id, mode: 'github-status', prNumber, outcome: 'check-failed', reason: result.reason, detail: result.detail };
