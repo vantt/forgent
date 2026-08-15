@@ -44,6 +44,7 @@ import { mergeConfigDefaults } from '../setup/config-merge.mjs';
 import { sharedConfigFilePath } from '../config/shared-config-file.mjs';
 import { mergeWithGlobalConfig } from '../config/global-config.mjs';
 import { KINDS, findExecutableOnPath } from '../state/tool-registry.mjs';
+import { listWork } from '../state/store.mjs';
 import { appendEvent } from '../state/events.mjs';
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from './paths.mjs';
 
@@ -1230,8 +1231,13 @@ export const EXECUTOR_ADAPTERS = { [DEFAULT_ADAPTER]: cliSpawnAdapter };
  * `selectTemplate` already being called a second time inside `spawnWorker`
  * below for template logging (P49's same "cheap, deterministic, no
  * duplicated LOGIC" precedent).
+ *
+ * Exported (tsk-5tm-6 D12(iii)): `decideCapacityCli`'s `--work <id>` path
+ * below is the work-item-shaped lookup `fgos-fanout` needs to consult the
+ * dispatch decision protocol before firing an Agent for a candidate,
+ * instead of hardcoding native dispatch unconditionally.
  */
-function capacityIdForWork(work) {
+export function capacityIdForWork(work) {
   const domainObj = DOMAINS[resolveDomainName(work.domain)];
   return skillForStage(domainObj, 'executing');
 }
@@ -1556,34 +1562,58 @@ export async function executeCapacityCli(
  * "cli"` capacity — `mechanism` for those always resolves
  * `"out-of-process"` anyway (rule 1/3), so no consumer ever needs
  * `agentType` in that case.
+ *
+ * `work` (tsk-5tm-6 D4/D12(iii)): a work-item id, resolved to its dispatch
+ * capacity via `capacityIdForWork` (the same executing-stage skill lookup
+ * `spawnWorker` already applies) before deciding its mechanism -- the
+ * lookup `fgos-fanout` needs to consult this protocol per-candidate before
+ * firing an Agent, instead of assuming native dispatch unconditionally.
+ * Lowest precedence of the three selectors (a real `capacityIdArg` always
+ * wins, `for` next, matching every pre-D4 caller's byte-identical
+ * behavior) since no existing caller ever passes more than one.
  */
-export async function decideCapacityCli(capacityIdArg, { cwd = process.cwd(), repoRoot, hasLiveTaskAccess = false, for: purpose } = {}) {
-  if (!capacityIdArg && !purpose) {
+export async function decideCapacityCli(
+  capacityIdArg,
+  { cwd = process.cwd(), repoRoot, hasLiveTaskAccess = false, for: purpose, work: workIdArg } = {},
+) {
+  if (!capacityIdArg && !purpose && !workIdArg) {
     throw new RunnerConfigError(
-      'usage: node src/runner/dispatch.mjs decide <capacityId> [--has-live-task-access] | decide --for <purpose> [--has-live-task-access]',
+      'usage: node src/runner/dispatch.mjs decide <capacityId> [--has-live-task-access] | decide --for <purpose> [--has-live-task-access] | decide --work <workId> [--has-live-task-access]',
     );
   }
   // Same main-checkout resolution as resolveCapacityCli above, same reason.
   const root = repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
   const cfg = ensureRunnerConfigForDir(root);
+  // Indirect binding (purpose OR work-item) each report capacityId back
+  // additively (see below) -- same byte-identical-shape reasoning as
+  // resolveCapacityCli above, generalized past purpose-only.
+  const resolvedIndirectly = !capacityIdArg;
+  let capacityId = capacityIdArg;
+  if (!capacityId && workIdArg) {
+    const fgosDir = fgosDirFromRoot(root);
+    const workItem = listWork(fgosDir).work[workIdArg];
+    if (!workItem) {
+      throw new RunnerConfigError(`no work item "${workIdArg}" found -- cannot resolve its dispatch capacity.`);
+    }
+    capacityId = capacityIdForWork(workItem);
+  }
   // Purpose-based binding, same precedence as resolveCapacityCli above. No
   // match is a legitimate "not configured yet" state for `decide`
   // specifically (unlike `resolve`, which has nothing left to do without a
-  // real capacityId) — `mechanism: "unavailable"` lets a caller like
+  // real capacityId) -- `mechanism: "unavailable"` lets a caller like
   // gather's own fan-out branch tell "fall back to native" apart from
   // "in-process"/"out-of-process" with one more enum value, never a thrown
   // error for an expected, common state.
-  const resolvedByPurpose = !capacityIdArg;
-  const capacityId = capacityIdArg || resolveCapacityIdForPurpose(cfg, purpose);
+  if (!capacityId && purpose) {
+    capacityId = resolveCapacityIdForPurpose(cfg, purpose);
+  }
   if (!capacityId) {
     return { mechanism: 'unavailable' };
   }
   const mechanism = decideCapacityDispatchMechanism(cfg, capacityId, { hasLiveTaskAccess });
   const agentType = cfg.capacities?.[capacityId]?.agentType;
   const base = typeof agentType === 'string' && agentType ? { mechanism, agentType } : { mechanism };
-  // capacityId additive ONLY on the purpose-resolved path — same
-  // byte-identical-shape reasoning as resolveCapacityCli above.
-  return resolvedByPurpose ? { ...base, capacityId } : base;
+  return resolvedIndirectly ? { ...base, capacityId } : base;
 }
 
 // CLI entry point — only runs when this file is executed directly (`node
@@ -1640,6 +1670,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     decideCapacityCli(capacityId, {
       hasLiveTaskAccess: rest.includes('--has-live-task-access'),
       for: flagValue('--for'),
+      work: flagValue('--work'),
     }).then(
       (decided) => {
         process.stdout.write(`${JSON.stringify(decided)}\n`);
