@@ -2,8 +2,22 @@
 
 ## 1. Trạng thái hiện tại
 
-**Cập nhật 2026-08-16 — ĐÃ IMPLEMENT + TỰ REVIEW + SMOKE TEST XONG CẢ 3
-MẢNH, ĐANG CHỜ NGƯỜI DÙNG DUYỆT ĐỂ MERGE.** Sau khi validating tạo 3 item
+**Cập nhật 2026-08-16 (round 2) — D14: `fgos-coding-implement` ĐÃ NỐI DÂY
+THẬT VÀO HANDOFF.** Người dùng bắt đúng chỗ báo cáo trước overclaim: "harness
+hoạt động" (mảnh ①②③) không đồng nghĩa "coding domain đã chuyển" — skill
+thật (`fgos-coding-implement`) trước đó CHƯA hề gọi `fgos handoff`. Đã sửa
+3 điểm (D14, seq 18355): Orient reclaim, 3 trigger Collaboration lúc
+Implement, và review-handoff CHỈ SAU KHI return/catchup thành công (self-
+review bắt lỗi thứ tự: gọi trước thì nhánh `blocked` vẫn ghi sai
+`holder: reviewer`). Đồng bộ `.agents/skills/` (nguồn) →
+`plugins/fgOS/skills/` (byte-identical, test xanh) → `.claude/skills/`
+wrapper (build:skills, 0 diff). Smoke test riêng xác nhận đúng chuỗi lệnh.
+`npm test` không đổi (3367/3372). **Còn lại thật sự CHƯA làm**: các skill
+khác (`fgos-coding-exploring`/`planning`/`validating`/`discovering`) vẫn
+chưa gọi `handoff`; review độc lập (ngoài self-review) vẫn chưa có.
+
+**Cập nhật 2026-08-16 (round 1) — ĐÃ IMPLEMENT + TỰ REVIEW + SMOKE TEST
+XONG CẢ 3 MẢNH, ĐANG CHỜ NGƯỜI DÙNG DUYỆT ĐỂ MERGE.** Sau khi validating tạo 3 item
 con (①②③, xem đoạn dưới), người dùng ra lệnh làm hết tới trước implement
 rồi dừng cho xem; người dùng duyệt và ra lệnh tiếp tục toàn bộ. Cả 3
 mảnh đã code, test, tự review, commit tuần tự TRÊN CHÍNH branch
