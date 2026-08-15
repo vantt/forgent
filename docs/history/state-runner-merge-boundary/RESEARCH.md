@@ -147,3 +147,120 @@ hay không.
    `infra`(2, giữ nguyên giá trị cũ) — cả hai hợp lệ với 4 importer hiện tại.
 3. **Tách `tsk-49i` thành 2 item con hay 1 item 2 phase** — §7 của DISCUSSION.md
    có 2 task với thứ tự bắt buộc; đây là shaping judgment của planning.
+
+---
+
+## Vòng 2 — 2026-08-15, re-verify sau khi merge `main` vào `fgw/tsk-49i`
+
+**Vì sao:** nhánh đứng sau `main` 171 commit lúc bắt đầu phiên, trong đó **14
+commit chạm `src/state`/`src/runner`** — đúng vùng vòng 1 lấy bằng chứng
+`file:line`. Merge (không rebase, theo D2 `src/runner/worktree.mjs`) ra commit
+`ba25a590`, sạch, không conflict. Vòng này kiểm lại từng anchor của vòng 1 trên
+cây đã merge.
+
+**Diện thay đổi `main` mang vào (`git diff be5663af ba25a590 -- src/ bin/`):**
+12 file, +631/−84, **không thêm file `.mjs` mới nào** — `bin/fgos.mjs` (+131),
+`runner/worktree.mjs` (+149), `runner/merge.mjs` (+96), `state/store.mjs` (+68),
+`setup/registrations.mjs` (+129), `runner/claim-port.mjs`, `claim-liveness.mjs`,
+`loop.mjs`, `state/cleanup-harness.mjs`, `frontier.mjs`, `graph-metrics.mjs`,
+`status-fsm.mjs`.
+
+### F1 — Cạnh `state/ → runner/` thứ 5, chưa có trong plan (BLOCKING)
+
+Vòng 1 và `plan.md` đếm **4** cạnh. Trên cây đã merge có **5**:
+
+| # | Cạnh | Trạng thái |
+|---|---|---|
+| 1 | `state/cleanup-harness.mjs:41` → `runner/root-affinity.mjs` (`resolveRoot`) | đã có trong plan |
+| 2 | `state/drift-status.mjs:18` → `runner/merge.mjs` (`detectTrunk`) | đã có trong plan |
+| 3 | `state/graph-harness.mjs:23` → `runner/root-affinity.mjs` (`resolveRoot`) | đã có trong plan |
+| 4 | `state/store.mjs:42` → `runner/session-identity.mjs` (`resolveWriterIdentity`) | đã có trong plan |
+| 5 | **`state/graph-metrics.mjs:18` → `runner/frozen-judge.mjs` (`normalizePath`)** | **MỚI, chưa có trong plan** |
+
+Cạnh 5 do commit `ac1e30f1` (`fix(tsk-2jn): footprintOverlapAmong normalizes
+both sides through normalizePath`) trên `main` thêm vào, sau khi plan được viết.
+
+**Hệ quả cứng:** clause `! grep -rqF "from '../runner/" src/state/` trong verify
+đã chốt của item **sẽ đỏ** nếu chỉ cắt 4 cạnh. Verify chặt hơn danh sách task —
+không phải chọn cắt hay không, mà là cắt thì item mới xanh.
+
+**Đường cắt rẻ nhất** (cùng khuôn với move `session-identity.mjs` đã nằm trong
+`tsk-49i-1`): `normalizePath` (`runner/frozen-judge.mjs:42`) là hàm thuần xử lý
+chuỗi path, không import gì nội bộ. Dời sang `src/util/normalize-path.mjs`.
+Consumer hiện tại: `frozen-judge.mjs:58,61,97,100`, `runner/merge.mjs:49`,
+`state/graph-metrics.mjs:18`, `bin/fgos.mjs:49`. Mọi importer rank ≤ 3 nên
+`kernel`(4) hợp lệ, khớp 2 sibling `src/util/` sẵn có.
+
+### F2 — Anchor còn đúng nguyên (không cần sửa gì)
+
+- `state/drift-status.mjs:118` `driftStatus`, `:120` `detectTrunk(`, `:210`
+  `unmergedDeliveries`, `:212` `detectTrunk(` — **cả 4 đúng từng dòng**.
+- `test/state/drift-status.test.mjs:7` import; 12 call `driftStatus` +
+  12 call `unmergedDeliveries` = **24 call site, số dòng y nguyên**
+  (`:48,:54,:63…`, `:242,:250,:256…`).
+- `test/runner/root-affinity.test.mjs` — import trong `:3-8` (thực tế `:5`),
+  call `:23,:32,:33,:34,:39,:47` — **đúng hết**.
+- `isMainWorktree`: vẫn chỉ 2 comment, `test/runner/merge.test.mjs:325` và
+  `test/cli/fgos-approve.test.mjs:1127` — **đúng cả 2**.
+- `session-identity.mjs`: `test/runner/session-identity.test.mjs:17`,
+  `test/state/store.test.mjs:22`, `.githooks/pre-commit:29`,
+  `test/e2e/main-checkout-lock-hook.test.mjs:26,48,81,121`,
+  `test/e2e/main-checkout-lock-hook-worktree-commit.test.mjs:34,68`,
+  `plugins/fgOS/skills/terminal/rename.sh:64,69` — **đúng**.
+- `ensureBranchPushed` def `bin/fgos.mjs:264` — đúng, và **vẫn đúng 1 call**.
+- Manifest: `layers` `:4-10`, index = rank; **rank của cả 10 file item này đụng
+  không đổi** (`bin/fgos.mjs` entry; `store/drift-status/session-identity/merge/
+  worktree` infra; `frontier/root-affinity/iron-law/graph-metrics/frozen-judge`
+  domain; `loop` use-case).
+- `src/util/` vẫn đúng 2 file, cả hai `kernel`; **`src/verbs/` vẫn chưa tồn tại**.
+- `test/architecture.test.mjs`: `:20` rank map, `:36` `deepEqual`, `:68` so rank
+  — **đúng**. Vẫn không có version gate.
+- `src/config/shared-config-file.mjs:60` `DEFAULT_INVARIANT_CHECK_COMMANDS` —
+  đúng từng dòng.
+- `src/intake/discovery.mjs:84` `RETIRED_P14_PLACEHOLDER` — đúng từng dòng.
+- `src/runner/dispatch.mjs:247` `timeoutMs: 900000` — đúng từng dòng.
+- `package.json`: vẫn chỉ có script `test` (`:25`), **vẫn không có
+  `devDependencies`**, không lint/typecheck/build.
+
+### F3 — Anchor đã lệch số dòng (claim vẫn đúng, chỉ sai toạ độ)
+
+| Vòng 1 ghi | Thực tế sau merge | Ghi chú |
+|---|---|---|
+| `detectTrunk` call `test/runner/merge.test.mjs:1420,:1463` | **`:1511`, `:1554`** | `main` thêm 2 khối test `detectTrunk` mới (master-trunk, origin/HEAD) — commit `c727b439` |
+| `ensureBranchPushed` call `bin/fgos.mjs:3169` | **`:3227`** | vẫn đúng 1 call duy nhất |
+| Iron Law gate `bin/fgos.mjs:3422-3447` | **`:3494-3503`** (và gate thứ 2 `:4100-4101`) | |
+| timeout mặc định `bin/fgos.mjs:333` | **`:304`** (`MAX_WAIT_MS`) | |
+| re-export lọt regex `src/setup/registrations.mjs:56` | **`:57`** | claim "re-export lọt" vẫn đúng |
+| 3 collector `bin/fgos.mjs:549-598` | `collectOutcomeEntry:549`, `collectFrictionData:569`, `collectReviewTrace:593` | vẫn nằm trong khoảng cũ |
+
+### F4 — Claim đã sai nội dung (không chỉ lệch dòng)
+
+1. **`required = matchedModules.length > 0`** — sai. Thực tế
+   `src/evolve/iron-law.mjs:93`:
+   `const required = matchedModules.length > 0 || matchedFlags.length > 0;`
+   Kết luận không đổi (gate vẫn chặn approve), nhưng prompt đang trích sai.
+2. **"`performCatchUp` không xuất hiện ở bất kỳ test nào"** — nay có 1 chỗ:
+   `test/cli/fgos-approve.test.mjs:369`, trong **chuỗi message của assert**, không
+   phải import. Hợp đồng hành vi (assert trên commit message `catch-up:`) vẫn
+   không đổi khi move thuần. Def nay ở `bin/fgos.mjs:1063`, **3 call**
+   (`:3677`, `:4219`, `:4543`).
+
+### F5 — Tham chiếu ngoài `src/`+`bin/` vòng 1 bỏ sót (không blocking)
+
+Cả hai đều là hệ quả của move `session-identity.mjs`, không test nào bắt được:
+
+- `plugins/fgOS/skills/_shared/capacity-dispatch-fallback.md:176` — trích
+  `src/runner/session-identity.mjs:129` kèm số dòng trong prose skill.
+- `scripts/check-decision-codes.baseline.json:214` — key theo đường dẫn
+  **file test** `test/runner/session-identity.test.mjs`. Nếu dời file test theo
+  module sang `test/util/`, baseline này phải đổi key, nếu không
+  `scripts/check-decision-codes` lệch baseline.
+
+### Verdict vòng 2
+
+Bằng chứng vòng 1 **vẫn dùng được**: mọi kết luận về shape (manifest, rank,
+architecture test, verify convention) đều đúng nguyên; lệch chủ yếu là toạ độ
+dòng trong `bin/fgos.mjs` và `test/runner/merge.test.mjs`. **Một thay đổi phạm
+vi thật: cạnh thứ 5 ở F1** — phải nằm trong `tsk-49i-1` (cùng item với 4 cạnh
+kia) thì verify đã chốt mới xanh; đây là quyết định phạm vi cho người, không
+phải cho skill tự nới.
