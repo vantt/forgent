@@ -207,3 +207,20 @@ this batch) later built on this by having `fgos discover`/`fgos plan`
 each check whether the other would actually accept a stage-mismatched
 item before referring to it, and pointing at this new doctor check
 instead of the closed referral loop F1's own audit section described.
+
+## Confirmed: `tsk-2t3` fixed the silently-wrong entropy metric (F5)
+
+The `entropy` report's own `countStageClarify` function — hardcoded to
+filter on `w.stage === 'clarify'` — landed as `tsk-2t3`'s fix. Confirmed
+directly in the current tree: the function (renamed `countStageEntry`,
+`src/report/entropy.mjs`) now checks `w.stage === domain.stages[0]`, the
+domain's real first stage, and the `parts` row it feeds is relabeled
+`stage-entry` to match. This is the same class of fix as `tsk-64h`'s own
+(B2) — a hardcoded literal replaced by a call to the live registry — but
+for a reporting metric rather than a pool filter: before this fix, the
+metric silently reported near-zero (the three items F1 already accounted
+for, since vetted) while missing roughly 65 real open items sitting at
+`discovery` — exactly the "not yet quality-checked" backlog this metric
+exists to surface. It never threw, so nobody saw it was wrong; a fresh
+`npm test` run after the fix confirms the metric now counts against the
+domain's real entry stage instead of a name nothing produces anymore.
