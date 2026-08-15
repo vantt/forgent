@@ -60,6 +60,15 @@
         "description": "herdr pane label writer (herdr pane rename) for /fgOS:terminal"
       }
     },
+    "capabilities": {
+      "impact-analysis": {
+        "description": "Code-graph blast radius",
+        "aliases": ["impact_analysis", "Impact Analysis"]
+      },
+      "pane-labeling": {
+        "description": "Write a session/task id onto the current terminal pane's label, for a human watching a screen"
+      }
+    },
     "timeoutMs": 900000,
     "parallel": {
       "maxRoots": 4,
