@@ -1,11 +1,16 @@
-# Prompt thực thi — Iron Law gate UX (`tsk-1y6`, bốn con)
+# Prompt thực thi — Iron Law gate UX (`tsk-1y6` × 4) + `tsk-3xog`
 
 Dán nguyên khối dưới đây vào một phiên Claude Code mới mở tại
 `/home/vantt/projects/forgentX`.
 
 ---
 
-Làm trọn bộ bốn item con của `tsk-1y6` rồi đưa lên main nếu được.
+Làm trọn bộ bốn item con của `tsk-1y6`, cộng `tsk-3xog`, rồi đưa lên main
+nếu được.
+
+`tsk-3xog` **độc lập hoàn toàn** với bốn con kia — khác file, khác nhánh,
+không phụ thuộc ai. Chạy song song ngay từ đầu, đừng xếp sau. Phần mô tả
+riêng của nó ở cuối tài liệu này.
 
 ## Bối cảnh đã có (đừng làm lại)
 
@@ -101,6 +106,10 @@ Sau khi cả bốn con `awaiting-approval`:
 1. `/fgOS:merge-loop` để gặt con vào `fgw/tsk-1y6`.
 2. Rồi `fgos sync-root tsk-1y6` để đưa gốc lên main.
 
+`tsk-3xog` là gốc riêng, không thuộc cây `tsk-1y6` — nó merge thẳng lên
+main bằng đường của chính nó và **không cần chờ** bốn con kia. Nếu nó xong
+trước thì cứ đưa lên main trước, đừng gom chung.
+
 **Điểm dừng cứng, phải tôn trọng.** Cả hai bước trên sẽ trip Iron Law vì
 diff chứa `bin/fgos.mjs`. Bạn **không được** chạy `--acknowledge-iron-law`
 trên thẩm quyền của chính mình — RUL34/RUL37 (`docs/specs/runner.md`) đòi
@@ -115,11 +124,55 @@ hỏi người**. Đừng lách, đừng chờ, đừng tự ký.
 Nếu người trả lời duyệt trong chat thì chạy lệnh hộ họ (đó chính là D2 —
 người quyết, agent thao tác), và báo lại exit code thật.
 
+## `tsk-3xog` — hợp đồng heading `## Locked decisions`
+
+Chạy song song với bốn con trên, `/fgOS:pick tsk-3xog`. **Đọc mô tả đầy đủ
+của item** (`fgos show tsk-3xog`) — nó có một phần "CẬP NHẬT ... ĐÃ LỖI
+THỜI" ở cuối. Phần đó là phần đúng; đoạn đầu trình bày ba hướng như thể
+cần cân nhắc **đã bị chính số đo trong phần cập nhật bác bỏ**. Đừng cân
+nhắc lại (a)/(b)/(c) — đã chốt.
+
+**Vấn đề.** `src/intake/plan.mjs:159` và `:344` tìm bảng quyết định bằng
+regex literal tiếng Anh `/##\s*Locked decisions/i`. Skill bên viết
+(`fgos-coding-exploring`) không ghim heading đó. Session viết tiếng Việt
+→ slice rỗng → `normalizeChild` nhảy qua cả khối kiểm citation
+(`if (lockedDecisionIds.size > 0)`), nên child cite một D-ID **không tồn
+tại** vẫn được nhận. Fail **open**, không log, không cảnh báo.
+
+**Ba việc, đã chốt phạm vi:**
+
+1. Ghim heading literal vào bước 3 của
+   `.agents/skills/fgos-coding-exploring/SKILL.md` — đây là nguồn
+   canonical. `.claude/skills/**` là bản **sinh ra**: chạy
+   `npm run build:skills` và commit cả hai, xem
+   `test/skills/fgos-mirror.test.mjs`.
+2. Thêm test canh gác cùng họ với
+   `test/scripts/check-decision-citation-drift.test.mjs` (đã có tiền lệ,
+   **không** dựng cơ chế mới): fail khi một `CONTEXT.md` có D-ID trong
+   prose mà slice `## Locked decisions` rỗng.
+3. Đổi heading 30 file cũ sang `## Locked decisions`.
+
+**Bẫy ở việc 3 — đừng sed mù.** Phép đếm ban đầu tính "D-ID xuất hiện bất
+kỳ đâu trong file", nên trong 31 file có thể lẫn dương tính giả: file chỉ
+**trích** D-ID của feature khác chứ không có bảng quyết định của riêng nó.
+Mở từng file xác nhận có bảng thật rồi mới đổi. Biến thể đã gặp gồm
+`## Quyết định đã chốt`, `## Quyết định đã khoá`, và
+`## 2. Quyết định đã khoá (D1-D10, ...)` — có cả tiền tố số.
+
+**Không làm:** nới regex bên đọc (đã bác — 0/31 file mù thuộc item còn mở,
+nên lý lẽ "sửa file cũ" đã chết, và nới là mở danh sách đoán không điểm
+dừng); thêm check vào `fgos doctor` (đây là lint tài liệu, test mới là nhà
+đúng).
+
+`tsk-3xog` **không** đụng module nào trong `MODULE_RULES`, nên nửa module
+của Iron Law sẽ không trip — merge của nó nhiều khả năng sạch, khác hẳn
+`tsk-1y6-1`.
+
 ## Không thuộc phạm vi
 
 - `tsk-1js` (Iron Law không quản được project khác) — người dùng đã quyết
   làm sau. Không đụng `src/evolve/iron-law.mjs`.
-- `tsk-3xog` (hợp đồng heading `## Locked decisions`) — item riêng.
 - Field bypass trên workitem (D4 loại), cạnh FSM
   `awaiting-approval → awaiting-human` (D5 loại), mọi thay đổi lên nửa
   từ-khoá của `classifyIronLaw` (D6 loại).
+- Backfill heading cho file thuộc item còn mở — không có cái nào (đã đo).
