@@ -765,16 +765,25 @@ tính dễ đọc — đúng điều flag "weak proof" ở trên đã khai. Bù 
 point cơ học mà validating chạy thật: `npm run check` exit 0 (RB3) và
 `interpret:wf` sinh HTML có thật, cộng phần đọc-ngược area spec (RB2).
 
+### Chốt tại cổng validateApprove (2026-08-15, chủ sản phẩm)
+
+Cổng không tự duyệt được (`canAutoApprove: false`) — đúng như dự kiến: T1
+bắn thật, và `plan.md` lúc đó còn mục mở. Câu hỏi được trình bày kèm bảng
+so sánh ở mục ngay trên; chủ sản phẩm chốt:
+
+| # | Điểm | Chốt |
+|---|---|---|
+| G3 | **CSS framework cho web client** | **Tailwind, và dùng stitch để sinh layout.** Stitch tooling sinh bố cục ban đầu rồi export Tailwind/HTML làm điểm xuất phát; Tailwind là lớp style thật của client. Đổi lại, chấp nhận một dependency frontend mới (Tailwind) cộng một tooling sinh-layout trong quy trình, và chấp nhận output của stitch phải được dọn lại chứ không dùng thô |
+
+Hệ quả phải ghi, không giấu: D14 khoá vite + TypeScript và **im lặng về
+CSS**; G3 không mở lại D14, nó lấp đúng khoảng im lặng đó. P2-P5 thừa
+hưởng quyết định này — mọi mảnh frontend sau đây viết style bằng Tailwind,
+không tự chọn lại.
+
 ### Outstanding questions của P0b
 
-Một, và nó thuộc về người: quyết định CSS framework ở mục "Câu hỏi mang lên
-cổng validateApprove" — T1 thật, ràng buộc P2-P5.
+None — G3 đã chốt câu hỏi T1 duy nhất của kế hoạch này.
 
 ## Outstanding questions
 
-- **Quyết định CSS framework cho web client** (`tsk-3x6`): Tailwind (kèm
-  hoặc không kèm stitch) so với CSS viết tay. D14 khoá vite + TypeScript
-  nhưng im lặng về CSS framework; bản mô tả item khai đây là quyết định
-  còn mở, phải chốt khi viết UI spec. Không bên nào rẻ để đảo ngược, nên
-  đây là câu hỏi thật cho cổng validateApprove, không phải giả định ghim
-  được. So sánh đầy đủ ở mục "Câu hỏi mang lên cổng validateApprove".
+None
