@@ -12,9 +12,10 @@ Use this when a plain function — not a prose skill, not `spawnWorker`'s own
 cli-dispatch — already spawns a subprocess directly (e.g. via
 `spawnSync`/`resolveExecutorCommand`) with a hardcoded `tier`, and you want
 to give it an *optional* path to resolve through `capacities.<id>` instead
-(`.fgos/config.json`'s `runner.capacities.<id>` > `executors.<tier>` >
-`executor` precedence, `tsk-62v`), while keeping today's behavior
-byte-identical when nothing is configured.
+(`.fgos/config.json`'s `runner.capacities.<id>` > `executor` precedence,
+`tsk-62v`; the intermediate `executors.<tier>` rung was retired at
+tsk-in1-2 D6), while keeping today's behavior byte-identical when nothing
+is configured.
 
 This is distinct from
 `docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-capacity.md`,
@@ -52,7 +53,7 @@ mechanism:
    of them — never insert them in the middle of an existing positional
    list, since that breaks every existing caller silently. Every
    pre-existing call site that omits the new trailing params keeps
-   resolving through `executors.<tier>` exactly as before —
+   resolving through the global `executor` exactly as before —
    `resolveExecutorConfig`'s own `capacityId && cfg.capacities?.[capacityId]`
    guard is `undefined`-safe by construction.
 
@@ -81,18 +82,17 @@ mechanism:
    this change**, unless an operator is actually ready to route to a real
    alternate backend right now. Every field involved
    (`capacities.<capacityId>`) is optional — omitting it entirely falls
-   through to `executors.<tier>` (or the global `executor`), so the wiring
-   itself ships with zero behavior change. `tsk-2yp` shipped no config
-   changes at all.
+   through to the global `executor`, so the wiring itself ships with zero
+   behavior change. `tsk-2yp` shipped no config changes at all.
 
 5. **Test the precedence and propagation directly against the function**,
    not against a skill's prose (unlike the task-dispatch how-to, a headless
    function's runtime behavior IS unit-testable normally). Real shape,
    `test/intake/judge-executor.test.mjs`:
    - a `cfg.capacities.<id>` entry with its own `command`/`args` resolves
-     ahead of `cfg.executors.<tier>`;
+     ahead of the global `cfg.executor`;
    - a `capacityId` with no matching `capacities` entry falls through to
-     `executors.<tier>` unchanged;
+     the global `cfg.executor` unchanged;
    - a `kind: "cli"` capacity with `fgosDir` given but not registered in
      the tool registry throws `RunnerConfigError`, propagating uncaught
      out of the function (fail-loud at this layer — a caller further out,

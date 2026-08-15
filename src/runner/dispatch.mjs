@@ -407,10 +407,13 @@ export function ensureRunnerConfigForDir(dir) {
 
 /**
  * Shape-check one executor block ({command, args[], adapter?}) — shared by
- * the required global `cfg.executor` and every optional `cfg.executors.<tier>`
- * entry (P41/C9 v2). An `adapter` field, when present, must name a
- * registered `EXECUTOR_ADAPTERS` key; absent defaults to `DEFAULT_ADAPTER`
- * at resolve time, not validated here.
+ * the required global `cfg.executor` and every `capacities.<capacityId>`
+ * entry naming its own `command`/`args` (P41/C9 v2). An `adapter` field,
+ * when present, must name a registered `EXECUTOR_ADAPTERS` key; absent
+ * defaults to `DEFAULT_ADAPTER` at resolve time, not validated here.
+ * (The per-tier `executors` override block, distinct from `capacities`,
+ * was retired at tsk-in1-2 D6: 0 live entries, had already caused a real
+ * bug, per tsk-5tm D10.)
  */
 function validateExecutorShape(executor, label) {
   if (
@@ -510,7 +513,8 @@ export const INVOCATION_VIA = Object.freeze(['cli']);
  * already requires for an executor block — a capacity entry naming its own
  * executor is shaped exactly like one. A capacity entry naming neither is
  * valid too: it carries only `kind`/`tier`/`target` metadata and falls
- * through to `executors.<tier>`/global for the actual command (D4).
+ * through to `executor` (global) for the actual command (D4; tsk-in1-2 D6
+ * retired the intermediate `executors.<tier>` rung).
  * `allowCrossProvider`, when present, must be a boolean — absent or `false`
  * means blocked (restrictive-by-default, D1, tsk-32n); the actual refusal
  * happens in `resolveExecutorConfig` below, not here (validation-time can't
@@ -548,9 +552,10 @@ export const INVOCATION_VIA = Object.freeze(['cli']);
  * resolving exactly as before this field existed; `resolveExecutorConfig`
  * below prefers `invocations[0]` over flat `command`/`args` when both are
  * somehow present, but no real entry declares both). The top-level
- * `capacities` field name itself is unchanged (D11) — `cfg.executors`
- * already exists, tier-keyed and strictly validated (`tsk-4eu`), so
- * reusing that name here would collide.
+ * `capacities` field name itself is unchanged (D11) — the tier-keyed
+ * per-tier override block (strictly validated, `tsk-4eu`; retired since,
+ * tsk-in1-2 D6) already occupied the obvious `executors` name at the
+ * time, so reusing it here would have collided.
  */
 function validateCapacityShape(capacity, label) {
   if (!capacity || typeof capacity !== 'object' || Array.isArray(capacity)) {
@@ -675,23 +680,6 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
     throw new RunnerConfigError(`runner config (${sourceLabel}) must be an object.`);
   }
   validateExecutorShape(cfg.executor, `${sourceLabel} executor`);
-  // OPTIONAL per-tier executor overrides (P41/D a4fe4c2b): a tier declared
-  // here dispatches through its own executor block; a tier absent from this
-  // map falls back to the global `executor` above — old configs with no
-  // `executors` block at all keep running unchanged (backward-compat).
-  if (cfg.executors !== undefined) {
-    if (!cfg.executors || typeof cfg.executors !== 'object' || Array.isArray(cfg.executors)) {
-      throw new RunnerConfigError(`runner config (${sourceLabel}) "executors" must be an object mapping tier -> executor when present.`);
-    }
-    for (const [tier, executor] of Object.entries(cfg.executors)) {
-      if (!TIERS.includes(tier)) {
-        throw new RunnerConfigError(
-          `runner config (${sourceLabel}) "executors" key "${tier}" is not a tier — valid keys are ${TIERS.join('/')}.`,
-        );
-      }
-      validateExecutorShape(executor, `${sourceLabel} executors.${tier}`);
-    }
-  }
   // OPTIONAL cfg.capacities.<capacityId> map (D1, tsk-62v): additive, same
   // style as `executors` above — absent keeps today's behavior byte-
   // identical.
@@ -777,17 +765,18 @@ export function modelForTier(cfg, tier, { providerModel = 'claude', rigorOverrid
 
 /**
  * Resolve which executor block applies for `tier`/`capacityId` (P41/D
- * a4fe4c2b, generalized capacity-aware, D4/D6 tsk-62v). Precedence (D4):
+ * a4fe4c2b, generalized capacity-aware, D4/D6 tsk-62v). Precedence (D4;
+ * tsk-in1-2 D6 retired the intermediate `executors.<tier>` rung — 0 live
+ * entries, had already caused a real bug per tsk-5tm D10):
  * `capacities.<capacityId>` (only when that entry declares its own
  * `command`/`adapter` — a capacity entry naming neither is metadata-only
- * and falls through) > `executors.<tier>` > `executor` (global). No
- * `capacityId`/`tier` given at all keeps every pre-tsk-62v call site's
- * behavior identical.
+ * and falls through) > `executor` (global). No `capacityId` given at all
+ * keeps every pre-tsk-62v call site's behavior identical.
  *
  * A `capacities.<capacityId>` entry naming no `command`/`adapter` of its
  * own but declaring `agentType` (D1/D2, tsk-3sw) resolves via
  * `buildAgentTypeExecutor` instead of falling all the way through to
- * `executors.<tier>`/global — still ahead of that fallback in the same
+ * `executor` (global) — still ahead of that fallback in the same
  * precedence slot `command`/`adapter` already occupy.
  *
  * Presence/staleness of a `capacities.<capacityId>` entry's own tool is no
@@ -803,7 +792,7 @@ export function modelForTier(cfg, tier, { providerModel = 'claude', rigorOverrid
  * `RunnerConfigError` here, before any dispatch. Checked on the resolved
  * `command` (never on `capacity.kind` alone, and never on `provider`): a
  * `kind: "cli"` capacity naming no `command`/`adapter` of its own falls
- * through to `executors.<tier>`/global (D4 above), ordinarily Claude's
+ * through to `executor` (global, D4 above), ordinarily Claude's
  * own CLI — gating on declared `kind` alone would false-positive that
  * case, and `provider` is a freely-overridable display alias, not the
  * command actually spawned.
@@ -899,8 +888,7 @@ function resolveExecutorConfig(cfg, tier, capacityId, fgosDir, contentCarries) {
       : capacity && capacity.agentType && cfg && cfg.executor
         ? buildAgentTypeExecutor(cfg.executor, capacity.agentType)
         : undefined;
-  const perTier = cfg && cfg.executors && typeof cfg.executors === 'object' ? cfg.executors[tier] : undefined;
-  const executor = byCapacity ?? perTier ?? (cfg && cfg.executor);
+  const executor = byCapacity ?? (cfg && cfg.executor);
   if (!executor || typeof executor.command !== 'string' || !Array.isArray(executor.args)) {
     throw new RunnerConfigError('runner config "executor" must have a string "command" and an "args" array.');
   }
@@ -972,10 +960,11 @@ export function decideCapacityDispatchMechanism(cfg, capacityId, { hasLiveTaskAc
 /**
  * Substitute `{prompt}` and `{model}` into the resolved executor's `args` —
  * PER ARRAY ELEMENT (never joined into one shell string, per the security
- * panel). `tier`, when given, selects a per-tier executor override (P41)
- * ahead of the global `cfg.executor`; `capacityId`/`fgosDir`, when given,
- * select a capacity override ahead of that (D4/D6, tsk-62v); every field
- * omitted keeps every pre-tsk-62v caller's behavior identical. Returns
+ * panel). `capacityId`/`fgosDir`, when given, select a capacity override
+ * ahead of the global `cfg.executor` (D4/D6, tsk-62v; the intermediate
+ * per-tier `executors.<tier>` override this comment used to describe was
+ * retired at tsk-in1-2 D6 — 0 live entries); every field omitted keeps
+ * every pre-tsk-62v caller's behavior identical. Returns
  * `{ command, args, adapter, provider }` — `adapter` names the C9 v2
  * executor interface's adapter (`EXECUTOR_ADAPTERS` key) this command
  * should run through, defaulting to `DEFAULT_ADAPTER` when the executor

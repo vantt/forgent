@@ -350,9 +350,16 @@ test('loadRunnerConfig rejects a non-positive timeoutMs', () => {
   assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
 });
 
-// --- P41: per-tier `executors` override + C9 v2 named adapter -----------
+// --- tsk-in1-2 D6: `executors.<tier>` (the per-tier override block) is
+// retired — 0 live entries, had already caused a real bug (tsk-4eu, tsk-5tm
+// D10: a non-tier key like "judge" silently fell through to the global
+// executor with no error). A config declaring one now falls straight
+// through validateRunnerConfigShape untouched, same as any other unknown
+// top-level key — never validated, never consulted for resolution. See
+// `resolveExecutorConfig`'s own dedicated coverage for the resolve-side
+// confirmation (a global `capacities` D6 test elsewhere in this file).
 
-test('loadRunnerConfig accepts a config with no "executors" block at all — pre-P41 shape, unchanged', () => {
+test('loadRunnerConfig accepts a config with no "executors" block at all', () => {
   const dir = mkTempDir();
   const configPath = path.join(dir, 'no-executors.json');
   fs.writeFileSync(
@@ -367,23 +374,7 @@ test('loadRunnerConfig accepts a config with no "executors" block at all — pre
   assert.equal(cfg.executors, undefined);
 });
 
-test('loadRunnerConfig accepts a well-formed per-tier "executors" override', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'with-executors.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { light: { command: 'cheap-cli', args: ['{prompt}'] } },
-      models: { light: 'haiku', standard: 'sonnet' },
-      timeoutMs: 1000,
-    }),
-  );
-  const cfg = loadRunnerConfig(configPath);
-  assert.equal(cfg.executors.light.command, 'cheap-cli');
-});
-
-test('loadRunnerConfig rejects an "executors" block that is not an object', () => {
+test('loadRunnerConfig never validates an "executors" block — a malformed one loads fine, inert', () => {
   const dir = mkTempDir();
   const configPath = path.join(dir, 'bad-executors-shape.json');
   fs.writeFileSync(
@@ -395,48 +386,8 @@ test('loadRunnerConfig rejects an "executors" block that is not an object', () =
       timeoutMs: 1000,
     }),
   );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
-});
-
-test('loadRunnerConfig rejects an "executors.<tier>" entry missing args', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-executors-entry.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { light: { command: 'cheap-cli' } },
-      models: {},
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
-});
-
-// --- tsk-4eu: "executors" keys must be tiers — a non-tier key (e.g. a
-// capacity id like "judge") silently fell through to the global executor
-// with no error, which is the live bug this pins.
-test('loadRunnerConfig rejects an "executors" key that is not a tier, naming the bad key and the valid tier set', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'non-tier-executors-key.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { judge: { command: 'claude', args: ['{prompt}'] } },
-      models: {},
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(
-    () => loadRunnerConfig(configPath),
-    (err) =>
-      err instanceof RunnerConfigError &&
-      err.message.includes('judge') &&
-      err.message.includes('light') &&
-      err.message.includes('standard') &&
-      err.message.includes('heavy'),
-  );
+  const cfg = loadRunnerConfig(configPath);
+  assert.equal(cfg.executors, 'nope');
 });
 
 test('loadRunnerConfig rejects an unknown "adapter" value on the global executor', () => {
@@ -446,21 +397,6 @@ test('loadRunnerConfig rejects an unknown "adapter" value on the global executor
     configPath,
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'], adapter: 'rpc' },
-      models: {},
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
-});
-
-test('loadRunnerConfig rejects an unknown "adapter" value on a per-tier executor', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-adapter-tier.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { light: { command: 'cheap-cli', args: ['{prompt}'], adapter: 'app-server' } },
       models: {},
       timeoutMs: 1000,
     }),
@@ -1278,51 +1214,37 @@ test('resolveExecutorCommand falls back to the global executor when no tier is g
   assert.equal(command, process.execPath);
 });
 
-test('resolveExecutorCommand honors an executors.<tier> override ahead of the global executor for that tier', () => {
-  const cfg = {
-    executor: { command: '/global/executor', args: ['{prompt}'] },
-    executors: { heavy: { command: '/heavy/executor', args: ['{prompt}'] } },
-    models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
-    timeoutMs: 5000,
-  };
-  const heavy = resolveExecutorCommand(cfg, { prompt: 'p', model: 'opus', tier: 'heavy' });
-  assert.equal(heavy.command, '/heavy/executor');
-  const standard = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard' });
-  assert.equal(standard.command, '/global/executor');
-});
-
 test('resolveExecutorCommand throws for an unknown adapter even on a raw config object that skipped loadRunnerConfig validation', () => {
   const cfg = { executor: { command: 'x', args: ['{prompt}'], adapter: 'not-a-real-adapter' }, models: {}, timeoutMs: 5000 };
   assert.throws(() => resolveExecutorCommand(cfg, { prompt: 'p', model: 'm' }), RunnerConfigError);
 });
 
-// --- tsk-62v: capacity-aware resolve precedence (D4) — capacities > executors.<tier> > global executor
+// --- tsk-62v: capacity-aware resolve precedence (D4) — capacities > global
+// executor (tsk-in1-2 D6 retired the intermediate executors.<tier> rung)
 
-test('resolveExecutorCommand honors a capacities.<capacityId> override ahead of executors.<tier> and the global executor', () => {
+test('resolveExecutorCommand honors a capacities.<capacityId> override ahead of the global executor', () => {
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
-    executors: { heavy: { command: '/heavy/executor', args: ['{prompt}'] } },
     capacities: { 'fgos-code-implement': { kind: 'cli', command: '/capacity/executor', args: ['{prompt}'], allowCrossProvider: true } },
     models: { heavy: 'opus' },
     timeoutMs: 5000,
   };
   const byCapacity = resolveExecutorCommand(cfg, { prompt: 'p', model: 'opus', tier: 'heavy', capacityId: 'fgos-code-implement' });
   assert.equal(byCapacity.command, '/capacity/executor');
-  // no capacityId at all -> falls back to today's tier/global precedence, unaffected
-  const byTierOnly = resolveExecutorCommand(cfg, { prompt: 'p', model: 'opus', tier: 'heavy' });
-  assert.equal(byTierOnly.command, '/heavy/executor');
+  // no capacityId at all -> falls back to the global executor, unaffected
+  const noCapacityId = resolveExecutorCommand(cfg, { prompt: 'p', model: 'opus', tier: 'heavy' });
+  assert.equal(noCapacityId.command, '/global/executor');
 });
 
-test('resolveExecutorCommand falls back to executors.<tier> when the capacities entry names no executor of its own (metadata-only)', () => {
+test('resolveExecutorCommand falls back to the global executor when the capacities entry names no executor of its own (metadata-only) — executors.<tier> is retired, no intermediate stop', () => {
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
-    executors: { heavy: { command: '/heavy/executor', args: ['{prompt}'] } },
     capacities: { 'fgos-code-implement': { kind: 'task', target: 'general-purpose', tier: 'heavy' } },
     models: { heavy: 'opus' },
     timeoutMs: 5000,
   };
   const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'opus', tier: 'heavy', capacityId: 'fgos-code-implement' });
-  assert.equal(resolved.command, '/heavy/executor');
+  assert.equal(resolved.command, '/global/executor');
 });
 
 // --- tsk-4eu: regression proof for the live symptom — "judge-decompose"
@@ -1401,18 +1323,17 @@ test('resolveExecutorCommand throws a RunnerConfigError when a kind:"cli" capaci
   );
 });
 
-test('resolveExecutorCommand resolves a kind:"cli" capacity through fgos-tool-query presence, falling through to executors.<tier> for the command, when registered and present', () => {
+test('resolveExecutorCommand resolves a metadata-only kind:"cli" capacity straight through to the global executor for the command (executors.<tier> is retired, no intermediate stop)', () => {
   const dir = mkTempDir();
   initStore(dir);
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
-    executors: { standard: { command: '/standard/executor', args: ['{prompt}'] } },
     capacities: { 'fgos-code-implement': { kind: 'cli', target: 'agy', tier: 'standard', allowCrossProvider: true } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   };
   const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-code-implement', fgosDir: dir });
-  assert.equal(resolved.command, '/standard/executor');
+  assert.equal(resolved.command, '/global/executor');
 });
 
 test('resolveExecutorCommand skips the fgos-tool-query presence check entirely when fgosDir is omitted, even with a kind:"cli" capacity present', () => {
@@ -1560,7 +1481,7 @@ test('resolveExecutorCommand still prefers a capacity\'s own command/args over a
   assert.ok(!resolved.args.includes('--agent'));
 });
 
-test('resolveExecutorCommand falls through to executors.<tier>/global (unaffected) for a capacity with neither command/args nor agentType', () => {
+test('resolveExecutorCommand falls through to the global executor for a capacity with neither command/args nor agentType', () => {
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     capacities: { 'fgos-code-implement': { kind: 'task', tier: 'standard' } },
@@ -1837,42 +1758,6 @@ test('spawnWorker defaults to the standard tier when the work item omits tier', 
   const result = await spawnWorker(sampleWork(), cfg, mkTempDir());
   assert.equal(result.tier, 'standard');
   assert.equal(result.model, 'sonnet');
-});
-
-test('spawnWorker (P41): light and heavy each dispatch through their own per-tier executor, standard falls back to the global one — all three resolved from ONE cfg object, proving mixed-tier dispatch within a single drain batch', async () => {
-  const dir = mkTempDir();
-  const lightScript = writeEchoExecutor(dir);
-  const heavyDir = mkTempDir();
-  const heavyScript = path.join(heavyDir, 'heavy-echo-executor.mjs');
-  fs.writeFileSync(
-    heavyScript,
-    `
-    const args = process.argv.slice(2);
-    process.stdout.write(JSON.stringify({ args, cwd: process.cwd(), marker: 'heavy-executor' }));
-    process.exit(0);
-    `,
-  );
-  const globalScript = writeEchoExecutor(mkTempDir());
-
-  const cfg = {
-    executor: { command: process.execPath, args: [globalScript, '{prompt}', 'via-global'] },
-    executors: {
-      light: { command: process.execPath, args: [lightScript, '{prompt}', 'via-light'] },
-      heavy: { command: process.execPath, args: [heavyScript, '{prompt}', 'via-heavy'] },
-    },
-    models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
-    timeoutMs: 5000,
-  };
-
-  const lightResult = await spawnWorker(sampleWork({ tier: 'light' }), cfg, mkTempDir());
-  const heavyResult = await spawnWorker(sampleWork({ tier: 'heavy' }), cfg, mkTempDir());
-  const standardResult = await spawnWorker(sampleWork({ tier: 'standard' }), cfg, mkTempDir());
-
-  assert.deepEqual(JSON.parse(lightResult.stdout).args.slice(-1), ['via-light']);
-  const heavyPayload = JSON.parse(heavyResult.stdout);
-  assert.deepEqual(heavyPayload.args.slice(-1), ['via-heavy']);
-  assert.equal(heavyPayload.marker, 'heavy-executor');
-  assert.deepEqual(JSON.parse(standardResult.stdout).args.slice(-1), ['via-global']);
 });
 
 // --- tsk-62v: spawnWorker's additive capacityId/provider result fields (D7) ---
@@ -2190,8 +2075,7 @@ test('resolveExecutorCommand never requires allowCrossProvider for a kind:"cli" 
 test('resolveExecutorCommand never triggers cross-provider governance for a non-"cli" kind, even with a non-Claude command', () => {
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
-    capacities: { distill: { kind: 'task', target: 'general-purpose' } },
-    executors: { standard: { command: 'agy', args: ['{prompt}'] } },
+    capacities: { distill: { kind: 'task', command: 'agy', args: ['{prompt}'] } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   };

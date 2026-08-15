@@ -18,8 +18,7 @@ plain global executor.
 
 - This is Claude-only for now (`tsk-3sw` D1) — the capacity's resolved
   executor `command` must already be `claude` (the project's own global
-  `executor.command`, or whatever `executors.<tier>` resolves to for this
-  capacity's tier). Multi-provider agent-dispatch (`agy`/Codex each have
+  `executor.command`). Multi-provider agent-dispatch (`agy`/Codex each have
   their own, differently-shaped mechanism) is `tsk-53h`'s separate,
   later scope — not available through this field yet.
 - This assumes the agent definition you want to name already exists at
