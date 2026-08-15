@@ -593,3 +593,5 @@
 {"ts":"2026-08-14T17:20:01.703Z","score":615,"counts":{"outcomes":591,"frictions":256,"settlements":854}}
 {"ts":"2026-08-14T17:20:08.442Z","score":613,"counts":{"outcomes":591,"frictions":256,"settlements":855}}
 {"ts":"2026-08-15T02:04:03.469Z","score":602,"counts":{"outcomes":593,"frictions":256,"settlements":861}}
+{"ts":"2026-08-15T02:04:11.013Z","score":602,"counts":{"outcomes":593,"frictions":256,"settlements":861}}
+{"ts":"2026-08-15T02:05:24.309Z","score":584,"counts":{"outcomes":593,"frictions":256,"settlements":868}}
