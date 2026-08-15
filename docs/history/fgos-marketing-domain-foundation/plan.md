@@ -331,6 +331,17 @@ cover concurrency, spawn and human authority.
 
 ## Split
 
+Pieces 1 and 2 share `src/state/workflow-stage-graphs.mjs` and
+`docs/specs/work-state.md` — a real, accepted sequential overlap (1 lands
+before 2 starts). It is declared **mechanically**, as `"deps": [0]` on
+child 2, not merely in prose: the engine's own footprint-conflict check
+(`src/intake/plan.mjs`:884-908) parks the whole verdict on an undeclared
+overlap and exempts exactly the pair joined by a `deps` edge — the
+`sequence` resolution its own suggestion list names. It parked this very
+verdict on the first attempt, when the ordering existed only as prose;
+that refusal was correct and is recorded here rather than worked around.
+Child `deps` are integer indices into earlier siblings (`plan.mjs`:252).
+
 ```json
 [
   {
@@ -346,6 +357,7 @@ cover concurrency, spawn and human authority.
     "verify": "npm test",
     "action": "D7: hierarchy domain → N workflow → item, selector tái dùng kind qua map workflowFor có default, workflow (shape 1 item) tách bạch với template (fgos expand) — bản sửa mechanism-first: CHỈ đăng ký workflow feature giữ graph hiện tại byte-for-byte, mọi kind fold về nó, rủi ro migration bằng không; hai graph bugfix/lightweight tách thành item riêng làm sau khi có dữ liệu vận hành",
     "footprint": ["src/state/workflow-stage-graphs.mjs", "src/state/stage-fsm.mjs", "src/state/frontier.mjs", "src/intake/discovery.mjs", "src/intake/plan.mjs", "docs/specs/work-state.md", "test/state/workflow-stage-graphs.test.mjs", "test/state/stage.test.mjs"],
+    "deps": [0],
     "kind": "feature",
     "risk": "heavy"
   },
