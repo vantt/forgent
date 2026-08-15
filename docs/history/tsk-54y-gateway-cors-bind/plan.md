@@ -36,10 +36,16 @@ both functions this item touches:
 
 ## Approach
 
-**Chosen path:** add `tower-http = { version = "0.6", features = ["cors"] }`
+**Chosen path:** add `tower-http = { version = "0.7", features = ["cors"] }`
 to `herdr-plugin/Cargo.toml` (D5a — CORS absent today, confirmed by
 `RESEARCH.md` round 1: `rg 'Cors|CorsLayer'` on `gateway.rs` = 0 hits, no
-`tower-http` dependency at all); attach a permissive `CorsLayer` (`Any`
+`tower-http` dependency at all). Version corrected from an initial `0.6`
+guess to `0.7` by a real tier-A probe at this validating pass: `cd
+herdr-plugin && cargo add tower-http --features cors --dry-run` resolved
+cleanly against this crate's existing dependency graph (axum 0.8.9, tower
+0.5.3) and picked `tower-http v0.7.0` — real cargo-resolver output, not
+model knowledge (see Feasibility matrix below). Attach a permissive
+`CorsLayer` (`Any`
 origin/method/header — no cookie-based auth exists per D13's own Bearer
 choice, so a wildcard `Access-Control-Allow-Origin` carries none of the
 credentialed-CORS risk a cookie scheme would) inside `build_router`
@@ -96,7 +102,7 @@ below) and this item has no `deps` of its own.
 
 | Component | How risky | What proves it |
 |---|---|---|
-| CORS layer attach in `build_router` | Medium — CRITICAL-risk function per impact scan, but the change itself is additive (`.layer()`), not a rewrite | All 9 existing `gateway.rs` test functions listed above still pass after the change (they already run through `build_router`); `cargo test --lib gateway` is the item's own verify and covers exactly this file |
+| CORS layer attach in `build_router` | Medium — CRITICAL-risk function per impact scan, but the change itself is additive (`.layer()`), not a rewrite | Dependency compatibility already proven at THIS validating pass: `cd herdr-plugin && cargo add tower-http --features cors --dry-run` resolves cleanly (`tower-http v0.7.0` against the existing `axum 0.8.9`/`tower 0.5.3` graph, zero conflicts reported) — real resolver output, not assumed. Remaining proof (that `.layer()` doesn't regress behavior): all 9 existing `gateway.rs` test functions listed above still pass after the change (they already run through `build_router`); `cargo test --lib gateway` is the item's own verify and covers exactly this file |
 | Bind config field shape (`GatewayConfig`/`GatewaySection`) | Low — additive struct field, `Option`-wrapped like `port` already is, defaults preserve today's `127.0.0.1` behavior when unset (herdr-gateway demo-config precedent: loopback stays the safe fallback) | A new unit test asserting `load_gateway_config` resolves the documented default (`0.0.0.0`) when the field is absent, and resolves an explicit override when present — both cheap, both in-file |
 | Non-loopback warning | Low — logging only, no behavior change | Manual/unit check that `tracing::warn!` fires when the resolved bind IP is not loopback (mirrors the reference's own test coverage pattern at `herdr-gateway/src/main.rs` if one exists — check at Execute; if the reference has no direct unit test for this, a narrow one here is still cheap and proves D7's own "cảnh báo khi không phải loopback" clause) |
 
