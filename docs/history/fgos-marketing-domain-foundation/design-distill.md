@@ -209,11 +209,61 @@ checkpoint machinery (có free từ event log + worktree commit); adapter
   `test/architecture.test.mjs` đỏ), và file đó phải PURE (cap/depth do
   caller truyền — khuôn `hasWorkerSlotRoom({ceiling})`).
 
+## VIII-a. Implementation, self-review, và smoke test (2026-08-15/16, cùng branch `fgw/tsk-2t9c`)
+
+Theo lệnh người dùng ("mọi thứ tự quyết"), ba mảnh đã implement, test, tự
+review và commit tuần tự trên CHÍNH branch này (không tách worktree con):
+
+- **`a4fbd250`** — mảnh ① role/holder axis + verb `handoff`/`handoff-return`
+  (`src/state/handoff.mjs` mới, guard thuần). 23 test mới, `npm test`
+  3356→3361 xanh.
+- **`33937a93`** — mảnh ③ task-spec A-lite: 13 file `docs/task-specs/coding/`,
+  `claims` trên agent yaml (+3 test `project-agents.test.mjs`), 2 doctor
+  check `task-specs-resolve`/`agent-claims-resolve`. Phát hiện và sửa: hai
+  test "danh sách check chuẩn" (checked-in inventory,
+  `test/setup/checks.test.mjs` + `docs/specs/distribution.md` Data
+  Dictionary #7) phải cập nhật cùng lúc — đúng kỷ luật "không rot" bài học
+  từ sự cố `claude-plugin-marketplace` cũ. Loại bỏ dependency cứng `yaml`
+  khỏi `registrations.mjs` sau khi `test/setup/checks-setup-rc-line.test.mjs`
+  chứng minh `fgos doctor` phải chạy được cả trong một bản copy chưa
+  `npm install` — thay bằng line-scan không phụ thuộc package ngoài.
+- **`a3958e60`** — mảnh ② workflow hierarchy mechanism-first (D7a):
+  `workflows.feature` là THAM CHIẾU giống hệt (`===`) các field
+  `stages`/`stepMap`/`transitions` sẵn có, không phải bản sao — tái cấu
+  trúc `DOMAINS.coding` thành `const codingDomain` build hai bước thay vì
+  chép lại ~130 dòng có comment. **Quyết định lệch khỏi plan.md gốc, ghi
+  lại công khai**: KHÔNG nối `stage-fsm.mjs`/`frontier.mjs`/
+  `intake/discovery.mjs`/`intake/plan.mjs` vào `resolveWorkflow` — vì với
+  đúng 1 workflow đăng ký, `domain.transitions` và
+  `resolveWorkflow(...).transitions` là CÙNG MỘT object, nối dây hôm nay
+  đổi 0 hành vi mà thêm rủi ro sửa vào module được test dày đặc nhất repo.
+  7 test mới.
+- **`9561340c`** — sửa bug tự review tìm ra: `recordCall` đọc `work.stage`
+  thô thay vì `effectiveStage(work, domain)`, khiến MỌI handoff trên item
+  không có `stage` tường minh (lazy default D8 — hình dạng một split
+  child sinh trực tiếp ở `executing` mang) bị từ chối sai với
+  `stage: "undefined"`. Tái hiện bằng script độc lập, sửa, thêm test hồi
+  quy.
+
+**Smoke test end-to-end** (script tạm, không phải test suite chính thức):
+tạo item thật qua `fgos submit`, chạy hết `discover --verdict clear` →
+`plan --verdict pass-through` → `executing`, gọi `fgos handoff`/
+`handoff-return` THẬT qua CLI (không gọi hàm trực tiếp) cho cả 3 tương
+tác — consult (sync, `call-summary`, holder không đổi), review (async,
+holder → reviewer), return (holder → implementer) — rồi một call ngoài
+graph bị từ chối kèm danh sách edge hợp lệ, rồi `delivered` →
+`retrospective`. `callThreads` phát lại đúng cả 3 record. `fgos doctor`
+trên project trống (không `docs/task-specs/`, không `agents/`) degrade
+SẠCH — báo `task-specs-resolve: false` với message rõ ràng, không crash.
+`npm test` cuối cùng: 3367/3372 xanh, 5 skip cũ, **0 fail** — không hồi
+quy trên toàn bộ 3372 test của repo.
+
 ## VIII. Bước kế tiếp
 
-Implement `tsk-2t9c-1` (và `tsk-2t9c-3` song song được — không trùng
-footprint, không deps), rồi `tsk-2t9c-2` sau khi ① land. Mỗi con:
-`fgos pick` → implement → `npm test` → `fgos return` → approve → merge về
-branch parent; chỉ parent merge main. Sau đó submit các item marketing +
-item tạo hình `bugfix`/`lightweight` (hoãn theo D7a) trên harness đã
-chứng minh.
+**Đã xong, chờ người dùng review**: cả 3 mảnh implement + test + tự review
++ smoke test end-to-end, tất cả commit trên `fgw/tsk-2t9c` (không push,
+không merge main — quyết định merge lên `main` để lại cho người dùng, vì
+đó là hành động khó đảo ngược trên nhánh dùng chung). Còn lại: người dùng
+review diff, quyết approve/merge; sau đó submit các item marketing + item
+tạo hình `bugfix`/`lightweight` (hoãn theo D7a) trên harness đã chứng
+minh chạy được.
