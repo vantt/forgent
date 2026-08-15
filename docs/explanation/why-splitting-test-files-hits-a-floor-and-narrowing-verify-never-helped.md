@@ -151,6 +151,87 @@ reducing *total* CPU — consolidating fixtures, spawning fewer real
 processes — which is exactly what the mechanical-split rule ruled out of
 scope, and is a separate item.
 
+## The floor was not structural — it was 10 tests shelling out to a real CLI
+
+The conclusion above ("total CPU is the only lever left, and that means
+consolidating fixtures and spawning fewer processes") was half right. It
+named the right quantity and the wrong cause. A follow-up measured the
+cost of each piece *before* changing anything, and the starting assumption
+collapsed:
+
+| Operation | Cost |
+|---|---|
+| `node` bare startup | 17 ms |
+| `node bin/fgos.mjs --help` (loads the whole CLI) | 47 ms |
+| `git init` + config + commit | 13 ms |
+| `fgos init` in a fresh tmpdir | 57 ms |
+| `fgos setup`, real `claude` CLI blocked | 126 ms |
+| `fgos setup`, real `claude` CLI **not** blocked | **11 031 ms** |
+
+**Consolidating git fixtures would have bought almost nothing** — standing
+up a real git repo costs 13ms. The thing burning 117.6s of
+`checks.test.mjs`'s 120s was 10 tests calling `fgos setup` without blocking
+the real `claude` CLI, ~11s each. The gap between blocked and unblocked is
+**87×**, measured by a probe running inside `node --test` itself.
+
+The mechanism: `checkClaudePluginMarketplace()` shells out to `claude
+--version`, `claude plugin marketplace list --json`, and `claude plugin
+list --json`, and on its fix branch also `claude plugin marketplace add
+<github source>` — downloading over the network. `claudeCommand()` returns
+`process.env.FGOS_CLAUDE_COMMAND || 'claude'`, and the machine had a real
+`claude` on `PATH`.
+
+The harness **already had `NO_CLAUDE_ENV` for exactly this**, and the test
+files already imported it. They just did not use it: all 10 tests passed
+`env: { ...process.env, HOME: homeDir }` where they meant `{
+...NO_CLAUDE_ENV, HOME: homeDir }`.
+
+### This was never only a speed bug
+
+`checks.test.mjs`'s own header states that `NO_CLAUDE_ENV` exists so the
+suite never touches "this machine's real Claude Code config as a side
+effect of running the test suite." Those 10 tests violated the stated
+intent of the very constant sitting in their own imports — and made the
+test suite **network-dependent**, which nobody chose and nothing declared.
+A fake `HOME` was the only reason it stayed harmless.
+
+A one-line fix repeated 10 times, not an architectural change. Two details
+mattered:
+
+- **Both syntactic shapes had to be covered.** Nine sites were the property
+  form `env: { ...process.env, HOME: homeDir }`; the tenth was a variable
+  binding, `const env = { ...process.env, HOME: homeDir };`. A find-replace
+  keyed on the property form matches nine and silently leaves one ~11s
+  real-CLI spawn behind — which would then read as an unexplained residue
+  and invite a wrong conclusion about the root cause.
+- **Three `fgos doctor` spawns leak the same way** and were deliberately
+  left out of scope, recorded as a boundary rather than missed —
+  `checkClaudePluginMarketplace` is registered once in the check registry,
+  so `doctor` reaches it exactly as `setup` does.
+
+### Measured result
+
+| Metric | Before | After | Delta |
+|---|---|---|---|
+| Wall-clock | ~50s | **43.70s** | −6.3s |
+| CPU (user+sys) | 429s | **374.39s** | **−54.6s (~12.7%)** |
+
+Test count held at 2878, `fail 0`.
+
+### A wall-clock saving is not a CPU saving
+
+The item predicted "429s → ~319s". That was wrong in kind, not just in
+magnitude: it subtracted a *wall-clock* saving from a *CPU* total. The
+unblocked path costs ~0.12s CPU per test — the other ~11.4s is network
+wait, which occupies wall time without consuming CPU.
+
+Validation caught the category error and corrected the estimate to ≈22s of
+CPU recovered. The real figure was **54.6s** — the correction was right
+about the confusion and still under-counted, because a per-test probe
+measured in isolation does not capture what the unblocked path costs inside
+a fully parallel run. Both estimates missed; only the post-change
+measurement was right.
+
 ## Why the acceptance threshold became relative instead of absolute
 
 The original target was an absolute `npm test` ≤ 45s. It was superseded by
@@ -190,3 +271,18 @@ measuring what it thought:
 The general lesson: a measurement inside a verify has to prove it is a
 number and has to read the right line. Otherwise it measures nothing and
 stays green.
+
+A fourth failure in the same family closed this series. One item's `verify`
+field was written as Vietnamese prose describing the thresholds to check.
+`fgos return` executes `verify` through `/bin/sh`, so it died immediately
+on the `(` in that prose — `/bin/sh: 1: Syntax error: "(" unexpected`, exit
+2 — and could never have passed no matter what the code did. It was fixed
+by making `verify` the runnable command `npm test` and moving the
+test-count / CPU / wall-clock thresholds to the review gate, read by a
+person from the measured-result table.
+
+That relocation is the honest resolution, not a workaround: `/usr/bin/time`
+reports numbers but cannot assert a threshold, so no single shell command
+could have enforced those thresholds as written. A verify field must be a
+command that runs; a threshold that only a reader can judge belongs at the
+gate, not in a string the shell will try to execute.
