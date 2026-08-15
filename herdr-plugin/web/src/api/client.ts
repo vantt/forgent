@@ -10,6 +10,8 @@ import type {
   RunnerTickData,
   Session,
   SessionSlotsData,
+  WorkDetail,
+  WorkDocsData,
   WorkItem,
 } from './types'
 
@@ -86,7 +88,14 @@ export function createApiClient(config: ApiClientConfig) {
     submitWork: (text: string) => request<WorkItem>(config, '/work', jsonBody({ text })),
 
     // GET /work/{id} (fgos-gateway-api-v1.yaml:186-203)
-    getWork: (id: string) => request<WorkItem>(config, `/work/${encodeURIComponent(id)}`),
+    // tsk-4id: corrected return type from WorkItem to WorkDetail -- the
+    // real response includes discovery/decisions/gates/outcome/friction/
+    // settlement/learning, not just the WorkItem subset (contract fixed
+    // to match, see fgos-gateway-api-v1.yaml's own WorkDetail schema).
+    getWork: (id: string) => request<WorkDetail>(config, `/work/${encodeURIComponent(id)}`),
+
+    // GET /work/{id}/docs (tsk-4id) -- CONTEXT.md/plan.md raw content.
+    getWorkDocs: (id: string) => request<WorkDocsData>(config, `/work/${encodeURIComponent(id)}/docs`),
 
     // POST /work/{id}/move (fgos-gateway-api-v1.yaml:205-224)
     moveWork: (id: string, to: string, expect?: string) =>

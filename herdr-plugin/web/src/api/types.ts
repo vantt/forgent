@@ -52,6 +52,66 @@ export interface WorkItem {
   deps?: string[]
   footprint?: string[]
   verify?: string
+  docsRef?: string | null
+}
+
+// components.schemas.WorkDetail (fgos-gateway-api-v1.yaml) -- GET
+// /work/{id}'s real `data` shape (tsk-4id).
+export interface GateApproveRecord {
+  actor: string
+  at: string
+  verify: string
+}
+
+export interface GatesInfo {
+  contextApprove?: GateApproveRecord
+  planApprove?: GateApproveRecord
+  validateApprove?: GateApproveRecord
+  ask?: string
+  askHistory?: string[]
+  answer?: string
+  statusAtAsk?: string
+}
+
+export interface Decision {
+  text: string
+  rationale?: string
+  source: string
+  id: string
+  ts: string
+  kind?: string
+}
+
+export interface SettlementEntry {
+  kind: string
+  role: string
+  ts: string
+  detail: string | null
+  id: string
+}
+
+export interface Settlement {
+  count: number
+  recent: SettlementEntry[]
+}
+
+export interface WorkDetail {
+  work: WorkItem
+  discovery?: unknown[]
+  decisions?: Decision[]
+  gates?: GatesInfo
+  outcome?: unknown
+  friction?: unknown
+  settlement?: Settlement
+  learning?: unknown
+}
+
+// GET /work/{id}/docs's own data shape (fgos-gateway-api-v1.yaml, tsk-4id).
+export interface WorkDocsData {
+  docsRef: string | null
+  contextMd: string | null
+  planMd: string | null
+  narrativeMissing?: boolean
 }
 
 // components.schemas.Session (fgos-gateway-api-v1.yaml:654-661).

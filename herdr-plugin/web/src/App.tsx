@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import { createApiClient } from './api/client'
 import { Taskboard } from './screens/Taskboard'
+import { TaskDetail } from './screens/TaskDetail'
+import { NeedsAnswer } from './screens/NeedsAnswer'
 
 // tsk-5jr: same-origin default -- the web bundle is served by the SAME
 // gateway process it talks to (tsk-48w's with_static_serving, same port
@@ -16,16 +18,18 @@ function defaultBaseUrl(): string {
 
 const TOKEN_STORAGE_KEY = 'herdr-gateway-token'
 
+type View = { name: 'board' } | { name: 'detail'; itemId: string } | { name: 'needs-answer' }
+
 // Minimal token gate -- NOT S01 (docs/ui-spec/screens/S01-sign-in.md)'s
 // real sign-in screen, which is not owned by any item in this cluster's
 // current run (same "found but not this item's scope" note as M03 in
 // Taskboard.tsx) and is itself partly stale (still references a session
 // cookie the realignment's D13 already replaced with Bearer-only). This
-// is just enough to let Taskboard receive a real, entered token.
+// is just enough to let the real screens receive a real, entered token.
 export default function App() {
   const [token, setToken] = useState<string | null>(() => window.localStorage.getItem(TOKEN_STORAGE_KEY))
   const [draftToken, setDraftToken] = useState('')
-  const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
+  const [view, setView] = useState<View>({ name: 'board' })
   const baseUrl = useMemo(defaultBaseUrl, [])
 
   if (!token) {
@@ -57,19 +61,34 @@ export default function App() {
 
   const client = createApiClient({ baseUrl, token })
 
-  if (selectedItemId) {
-    // S03 (task detail) is tsk-4id's own deliverable, not built yet --
-    // this placeholder is the reversible "smaller path" plan.md's own
-    // Approach section already chose over pulling in a router library.
+  if (view.name === 'detail') {
     return (
-      <div>
-        <button data-testid="back-to-board" onClick={() => setSelectedItemId(null)}>
-          ← Back to board
-        </button>
-        <p data-testid="task-detail-placeholder">Task detail for {selectedItemId} — tsk-4id will build this.</p>
-      </div>
+      <TaskDetail
+        client={client}
+        baseUrl={baseUrl}
+        itemId={view.itemId}
+        onBack={() => setView({ name: 'board' })}
+      />
     )
   }
 
-  return <Taskboard client={client} baseUrl={baseUrl} onSelectItem={setSelectedItemId} />
+  if (view.name === 'needs-answer') {
+    return (
+      <NeedsAnswer
+        client={client}
+        baseUrl={baseUrl}
+        onOpenItem={(id) => setView({ name: 'detail', itemId: id })}
+        onBack={() => setView({ name: 'board' })}
+      />
+    )
+  }
+
+  return (
+    <Taskboard
+      client={client}
+      baseUrl={baseUrl}
+      onSelectItem={(id) => setView({ name: 'detail', itemId: id })}
+      onOpenNeedsAnswer={() => setView({ name: 'needs-answer' })}
+    />
+  )
 }

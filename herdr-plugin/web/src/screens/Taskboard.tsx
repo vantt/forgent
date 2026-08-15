@@ -3,6 +3,7 @@ import type { ApiClient } from '../api/client'
 import { GatewayUnreachableError } from '../api/errors'
 import { pollStateDigest } from '../api/poll'
 import type { WorkItem } from '../api/types'
+import { hostOf, isNonLoopbackHost } from '../lib/network'
 
 // S02 — Taskboard (docs/ui-spec/screens/S02-taskboard.md). Statuses that
 // belong in the "needs answer" rail regardless of which group-by is
@@ -31,30 +32,6 @@ function writeCollapsed(group: string, collapsed: boolean): void {
   }
 }
 
-const LOOPBACK_HOSTNAMES = new Set(['localhost', '127.0.0.1', '::1', '[::1]'])
-
-// R5 (docs/specs/herdr-web-dashboard.md): "reachable on network" has no
-// dedicated contract field to read (confirmed: no `bind` field anywhere
-// in docs/contracts/fgos-gateway-api-v1.yaml) -- the client's own
-// configured `baseUrl` is the only observable signal. If the browser
-// reaches the gateway at a non-loopback host, the gateway is, by
-// definition, reachable beyond loopback.
-function isNonLoopbackHost(baseUrl: string): boolean {
-  try {
-    return !LOOPBACK_HOSTNAMES.has(new URL(baseUrl).hostname)
-  } catch {
-    return false
-  }
-}
-
-function hostOf(baseUrl: string): string {
-  try {
-    return new URL(baseUrl).host
-  } catch {
-    return baseUrl
-  }
-}
-
 function isPresent(value: string | undefined): value is string {
   return value !== undefined && value !== '';
 }
@@ -63,10 +40,15 @@ export interface TaskboardProps {
   client: ApiClient
   baseUrl: string
   onSelectItem: (id: string) => void
+  // A-S02-006 (S02-taskboard.md): a rail entry click navigates to S04
+  // (the needs-answer LIST), not directly to S03 -- optional, falling
+  // back to `onSelectItem` when unset, so a caller not yet wired for S04
+  // (or an existing test) keeps its prior behavior unchanged.
+  onOpenNeedsAnswer?: () => void
   pollIntervalMs?: number
 }
 
-export function Taskboard({ client, baseUrl, onSelectItem, pollIntervalMs = 5000 }: TaskboardProps) {
+export function Taskboard({ client, baseUrl, onSelectItem, onOpenNeedsAnswer, pollIntervalMs = 5000 }: TaskboardProps) {
   const [items, setItems] = useState<Record<string, WorkItem> | null>(null)
   const [loading, setLoading] = useState(true)
   // ST-DISCONNECTED (area spec Edge Cases / 30-states-and-errors.md):
@@ -236,7 +218,11 @@ export function Taskboard({ client, baseUrl, onSelectItem, pollIntervalMs = 5000
       <div data-testid="needs-answer-rail">
         <h3>Needs answer · {needsAnswer.length}</h3>
         {needsAnswer.map((item) => (
-          <div key={item.id} data-testid={`rail-item-${item.id}`} onClick={() => onSelectItem(item.id)}>
+          <div
+            key={item.id}
+            data-testid={`rail-item-${item.id}`}
+            onClick={() => (onOpenNeedsAnswer ? onOpenNeedsAnswer() : onSelectItem(item.id))}
+          >
             {item.id} — {item.title}
           </div>
         ))}
