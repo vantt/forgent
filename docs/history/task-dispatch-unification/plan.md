@@ -74,11 +74,15 @@ the existing tests don't cover the divergent behavior.
 
 Impact-analysis capability gate (`fgos tool query --capability
 impact-analysis --status present`, run fresh this session):
-`impact-analysis: full` — GitNexus registered and `status: "present"`. Per
-`CLAUDE.md`'s gate, `impact()` must be run for real (never assumed) before
-editing any symbol in `dispatch.mjs`, and its index freshness gets a
-cross-check (grep/rg) rather than blind trust, per the same gate's own
-"suspicious zero-result" clause.
+GitNexus registered and `status: "present"` — but a post-commit hook this
+same session flagged the index itself stale (`last indexed: 7bb3231`, a
+commit from well before `tsk-5tm` even merged). Per `CLAUDE.md`'s gate,
+`present` only means installed, never fresh — this is **degraded**, not
+full: `impact()` may still be run before touching any `dispatch.mjs`
+symbol, but its blast-radius answer is weak evidence until reindexed, and a
+zero-result/"not found" answer from it must be cross-checked with a plain
+grep/rg before being trusted (the gate's own unconditional clause). Naming
+this gap plainly rather than silently treating "present" as "full".
 
 `fgos graph tsk-1qn --json`: `topUnblock` was skipped (no dependent items —
 this is a leaf review item with no children to unblock), `criticalPath`
