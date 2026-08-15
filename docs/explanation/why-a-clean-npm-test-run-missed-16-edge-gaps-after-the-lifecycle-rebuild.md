@@ -240,3 +240,43 @@ current `CHANGELOG.md`: the file now describes `exploring`/`discovery`/
 describing behavior the same release already replaced. A purely
 docs-only, mechanical fix — the last of the batch's smallest-cost, `#8`
 items on the audit's own leverage-ranked list.
+
+## `tsk-5eq`: the batch's largest piece, and the one deliberate non-fix inside it
+
+The audit's own `#12` item — spec/tutorial/how-to realignment (F2, F3) —
+was also the biggest: eleven files across four doc trees, two of them
+over a thousand lines, unlike the other eight children which each landed
+straight at `executing`. `tsk-5eq` alone went through `discovery`/
+`planning` first and was itself decomposed into four children
+(one per file group, chosen specifically so their footprints stayed
+disjoint — splitting "by concern" instead, e.g. "all stage renames" as
+one child, would have made every child touch every file). All four share
+one written vocabulary map (stale name → correct name → code citation)
+so that four independently-merged children never leave four different
+phrasings of the same fix behind.
+
+**The one deliberate non-fix.** Seven `docs/how-to/*` files carry a
+retired stage/verb name directly in their own filename (e.g.
+`sweep-the-clarify-decompose-backlog-with-discover-loop.md`) — the audit
+had flagged this as part of F3's own "~28 similar points" count. The
+plan explicitly chose **not** to rename them, and the reasoning is a real
+constraint, not a preference: `.fgos/docs/enduser-docs-index.json`'s
+`sourceCaptureId` field is matched against a doc's `docPath` by folding
+the append-only event log (`src/report/enduser-index.mjs`) — a rename
+severs that back-link for 9 of the 10 affected files (the items
+`tsk-2b0`, `tsk-1ab-1`, `tsk-3uz`, `tsk-2cs`, `tsk-3xo`, `tsk-27y`,
+`tsk-3go-2`, `tsk-3go-3`, `tsk-66o` each cite one of these paths), and
+re-running `fgos docs-index` afterward cannot repair it — it only
+observes a `docPath` that no longer resolves and records
+`sourceCaptureId: null`. The fix scope was narrowed to correcting each
+file's own *content* while leaving its *name* alone; a prettier filename
+was judged not worth permanently breaking nine items' own evidence trail
+to their synthesized document.
+
+This item's own capture is otherwise thin by design — the real content
+lives in its four children's own retrospective syntheses (each processed
+separately by this same loop) and in `docs/history/
+spec-docs-lifecycle-realignment/{plan,RESEARCH}.md`. What belongs here is
+the parent-level shape and the one cross-cutting decision (the
+docs-index back-link tradeoff) that applies to all four children equally
+and would otherwise have no single home.
