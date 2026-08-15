@@ -384,6 +384,48 @@ re-planning of Execute mechanics.
   still carries); inject specs when compound-learn shows souls skipping
   them; enforce `claims` when a real multi-agent-type team mis-claims.
 
+## Validating record (2026-08-15, `fgos-coding-validating`)
+
+### Reality gate
+
+| Dimension | Verdict | Evidence |
+|---|---|---|
+| Mode fit | PASS | 4 flags counted against `fgos-routing`'s own table (data model / covered behavior / public contracts / multi-domain); 4+ → high-risk. No hard-gate flag present, so not over-built either. |
+| Repo fit | PASS | Every path/function the plan leans on read directly this session: `registrations.mjs` `registerCheck`:80 / `registerConfigDefault`:101 / `checkConfigNotStale`:377 / workerSlots entry ~:975; `workflow-stage-graphs.mjs` DOMAINS.coding :52–237, `skillForStage`:566, `resolveDomainName`:503; `work.mjs` `validateDomainFields`:698, `SCHEMA_VERSION`:210, `STAGES`:190; `replay.mjs` lazy `view.outcomes` fold :383–393; `store.mjs` `EDITABLE_FIELDS`:275, `moveStage` held-lock :816–824; `command-registry.mjs` `ask` entry :320–340; `worker-slots.mjs` `hasWorkerSlotRoom({ceiling})`:150 (purity precedent); `architecture.test.mjs` one-to-one manifest check; `agents/fgos-placeholder.yaml` + `scripts/project-agents.mjs`; `test/fixtures/phase1-events.jsonl` present (1.1K, committed). |
+| Assumptions | PASS | All four assumptions in the plan are either read-proven (holder-vs-domainFields, manifest row, purity precedent) or explicitly labeled unproven (bugfix/lightweight shapes — surfaced as the gate question below). |
+| Smaller path | PASS with finding | A genuinely smaller path exists for piece 2 (register the hierarchy with `feature` only, add the other two graphs later). It does NOT reach the same exit state — D7's exit state is three workflows — so it is a D7 amendment question for the person, not a planning defect. Raised at the gate. |
+| Proof surface | PASS | All three child specs carry `npm test`, a real runnable command; `normalizeChild` (`src/intake/plan.mjs`:175–219) would reject a placeholder outright. |
+| Impact-analysis posture | PASS | Plan records `degraded`; re-checked this session — `fgos tool query --capability impact-analysis --status present` returns gitnexus `present`, and the analyze hook reports the index behind HEAD (last indexed `7bb3231`). Recorded posture matches reality; every blast-radius claim in the plan is backed by direct reads instead. |
+
+### Feasibility matrix (every medium+ risk)
+
+| Assumption | Risk | Proof required | Evidence found | Result |
+|---|---|---|---|---|
+| R1 New event verbs do not break replay-from-zero (L3) | High | A committed pre-change log that must replay identically | `test/fixtures/phase1-events.jsonl` exists and is immutable by its own header contract; the lazy-key fold pattern it must survive is already proven in-tree by `view.outcomes` (`replay.mjs`:383–393) | PASS |
+| R2 Workflow lookup does not shift current coding behavior | High | The current arrays must be reproducible byte-for-byte | `DOMAINS.coding.stages`/`transitions`/`stepMap` read in full (:90–157); plan pins `feature` to those exact frozen arrays with a deep-equal test | PASS |
+| R3 `holder` cannot move outside the handoff door | Medium | The edit surface must exclude it | `EDITABLE_FIELDS` (`store.mjs`:275) enumerates editable keys; `stage`/`status`/`domain` are absent — the same exclusion `holder` gets | PASS |
+| R4 New file breaks the architecture test if unregistered | Medium | The check must exist and be enforcing | `test/architecture.test.mjs` asserts `deepEqual(onDisk, inManifest)`; layers `['entry','use-case','infra','domain','kernel']` confirmed; `handoff` has no row today | PASS (plan carries the row as an explicit step) |
+| R5 Doctor checks must not read the real repo | Medium | Precedent for fixture-scoped checks | `checkConfigNotStale`/`checkMainCheckoutHookWired` all take `cwd`; `test/setup/checks.test.mjs` exists as the fixture harness | PASS |
+| R7 Callstack depth must not use a stale counter | Medium | Depth must be derivable from the log | `replay.mjs` folds per-item state from events; the plan derives depth over the call-thread rather than a stored counter | PASS |
+| Blast radius via code graph | — | GitNexus | Posture `degraded` (index behind HEAD) — **gap named, not dropped**: no claim in this plan rests on graph output; each rests on a direct read cited above | ACCEPTED (degraded) |
+
+### Verdict
+
+**READY WITH CONSTRAINTS** — constraints: (1) piece 2's `bugfix`/`lightweight`
+graph shapes are unproven and touch 47% of the backlog (see gate question);
+(2) blast-radius evidence is `degraded` throughout; (3) the parent item's own
+`verify` remains the discovery placeholder (`tsk-14a`'s sync step applies to
+pass-through items only, so a split parent keeps it by rule).
+
+### Gate outcome
+
+`gate-check --gate validateApprove --cost EXPENSIVE` → `canAutoApprove:
+false`. Hard-gate keyword floor tripped on `schema` and `migration` inside
+the child specs (`HEAVY_KEYWORDS`, `src/intake/risk-keywords.mjs`:18–26) —
+arguably a true positive: piece 1 does evolve the event schema of an
+event-sourced store. Per D9 the floor may not be argued down; asked the
+person instead.
+
 ## Outstanding questions
 
 None
