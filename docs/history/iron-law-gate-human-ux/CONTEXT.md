@@ -76,6 +76,7 @@ số liệu vòng scout đầu.
 | Iron Law **không** nằm trong platform-foundations | grep `docs/platform-foundations.md` — không khớp; RUL34/RUL37 ở `docs/specs/runner.md`, truy về `D16/D17 self-improve-loop` |
 | Tiền lệ một skill dispatch hai verb | `merge-next/SKILL.md` — nhánh `approve` và nhánh `syncRoot: {id, outcome}` (tsk-173) |
 | Ba chân skill | `test/skills/fgos-mirror.test.mjs:10-43` — `.agents/skills` canonical cho 14 dev-skill, `.claude/skills` sinh bởi `npm run build:skills`, `plugins/fgOS/skills/` giữ ~35 skill bọc-CLI |
+| `fgos decision` **không có** flag `--kind` | `src/cli/command-registry.mjs` — chỉ vài verb tự set `kind` bên trong (vd `driver-report` khai `source: driver-report, kind: engine` ở `:530`); `addDecision` mặc định `kind: design`. **Hệ quả cho D8:** bản ghi mức `warn` phải do engine viết trực tiếp qua `addDecision` với `kind: 'engine'` — KHÔNG được shell ra `fgos decision`, vì đường đó không đặt được kind và sẽ tái tạo đúng lỗi mà backlog đang mở (bản ghi máy-ghi bị cổng retrospective đọc nhầm thành người-suy-ngẫm) |
 
 Số liệu định lượng (đo trên 250 bản `docs/history/*/iron-law-evidence*.md`,
 parse được 204): chỉ-module 138 (68%), chỉ-từ-khoá 42 (21%), cả hai 24
