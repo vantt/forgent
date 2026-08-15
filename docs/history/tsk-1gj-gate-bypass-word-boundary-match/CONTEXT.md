@@ -3,7 +3,7 @@
 Item: `tsk-1gj`. Written retroactively (same structural gap as this scan's
 other items).
 
-## Decisions
+## Locked decisions
 
 - **D0.** Root cause confirmed by reading `src/state/gate-bypass.mjs:132`
   and `:152` (`canAutoApprove`/`canAutoApproveValidate`, identical

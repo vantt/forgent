@@ -222,6 +222,20 @@ directly by `fgos-coding-planning`, mid-`planning`, when that skill finds
    and any outstanding questions deferred to planning. Concrete language
    only — no placeholders, no TODOs, no vague preferences.
 
+   Put that decisions table under a heading with this exact text (nothing
+   appended on that line, and not translated):
+
+   ```markdown
+   ## Locked decisions
+   ```
+
+   `src/intake/plan.mjs` slices this table with a literal-English regex on
+   that exact heading, both to check a child's cited D-IDs are real and to
+   extract footprint paths. Any other wording — a Vietnamese heading, a
+   numbered variant — makes the slice come back empty, which silently
+   disables both checks instead of erroring: a child citing a D-ID that
+   doesn't exist would still be accepted.
+
    End the doc with a section using this exact heading (nothing appended
    on that line), body `None` when every candidate question was locked or
    deferred, or a real list of what is still open for `fgos-coding-planning`

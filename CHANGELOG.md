@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The Iron Law gate now asks only where the answer can still matter: at the
+  **trunk boundary**. A leaf merging into `fgw/<root>`, and a root
+  `sync-root`-ing into its parent branch, go straight through — the gate
+  fires only when the merge actually lands on trunk. Nothing about the
+  classification itself changed (same `classifyIronLaw`, same
+  matched-flags/matched-modules evidence); what changed is where it runs.
+  Merge sweeps also no longer stall on a held item: an item the gate holds
+  is recorded, walked past, and reported once at the end of the run, while
+  it stays at `awaiting-approval`.
+  (`docs/decisions/0032-cong-iron-law-chi-hoi-o-ranh-gioi-trunk-them-muc-warn.md`,
+  which supersedes the always-hard-refuse clause of `D16/D17
+  self-improve-loop`; `docs/specs/runner.md` RUL34/RUL37/RUL64.)
 - Stage `planning` now asks a person **once**, not twice. The
   `planApprove` gate is gone from `fgos-coding-planning`; the single
   remaining gate lives in `fgos-coding-validating`, immediately before
@@ -32,6 +44,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- New config key `ironLaw.level` in `.fgos/config.json`, with two values:
+  `ask` (the default — the gate refuses until a person acknowledges) and
+  `warn` (opt-in — the gate prints what it matched, records one engine
+  decision entry, and lets the merge through). Anything that is not exactly
+  `warn` reads as `ask`, including a missing key or a malformed config, so
+  the permissive level is never reached by accident. `fgos doctor` reports a
+  missing or unrecognized level and `fgos doctor --fix` writes the `ask`
+  default. Deliberately its own key, never folded into `gateBypass`, whose
+  floor is documented as never touching the Iron Law.
+- New `/fgOS:approve <id>` skill: one command covers both `fgos approve` and
+  `fgos sync-root`, inferring which verb the id actually needs, and always
+  showing the blast radius — which verb, which target branch, how many items
+  ride along — before asking anything. When the Iron Law gate holds an item,
+  it shows `docs/history/<id>/iron-law-evidence.md` verbatim, asks once, and
+  runs the command itself on a real yes instead of handing over a line to
+  type. It never adds `--acknowledge-iron-law` on its own authority.
 - `README.md`'s `## Install` now recommends installing a tagged release
   (`npm install -g github:vantt/forgent#vX.Y.Z`) instead of always
   resolving to whatever commit is currently on `main` — the bare `main`

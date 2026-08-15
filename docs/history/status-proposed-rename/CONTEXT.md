@@ -20,7 +20,7 @@ Qua thảo luận với người dùng, hướng đổi khác đi: sửa TẬN G
 vì vá triệu chứng bằng lớp hiển thị — vì bản thân từ `proposed` là lỗi đặt
 tên thật (xem D1), không chỉ là thiếu tài liệu.
 
-## Quyết định đã khoá
+## Locked decisions
 
 | ID | Quyết định |
 |----|------------|

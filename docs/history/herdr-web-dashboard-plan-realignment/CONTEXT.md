@@ -23,7 +23,7 @@ Ngoài phạm vi: xây bất kỳ phần nào của web dashboard; đụng vào 
 gateway đã merge (tsk-7l9); mở lại quyết định đã khoá của `tsk-ldb` trừ
 đúng những chỗ ghi rõ dưới đây.
 
-## Quyết định đã khoá
+## Locked decisions
 
 | D-ID | Quyết định |
 |---|---|

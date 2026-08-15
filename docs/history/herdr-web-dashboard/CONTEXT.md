@@ -18,7 +18,7 @@ thuộc `tsk-539`, tách rời có chủ ý (D5). Cơ chế đa-project/định 
 cockpit — thuộc `tsk-3b0` (D11). Không đổi lược đồ event (D2). Không
 "launcher tổng" (D1).
 
-## Quyết định đã khoá
+## Locked decisions
 
 | D-ID | Quyết định | seq |
 |---|---|---|
