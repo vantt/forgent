@@ -19,18 +19,28 @@ cha**, không bao giờ chạm `main`.
 - `docs/history/state-runner-merge-boundary/RESEARCH.md` — bằng chứng
   `file:line` cho từng danh sách import-site. §A1 là danh sách file phải
   sửa; đừng tự grep lại từ đầu, nhưng **có quyền kiểm chứng lại** trước
-  khi sửa.
+  khi sửa. **Đọc luôn "Vòng 2"** ở cuối file: nhánh đã merge `main`
+  (`ba25a590`) và toàn bộ anchor của §A1 đã được kiểm lại — F1 là cạnh
+  import thứ 5 mới phát sinh, F3 là bảng toạ độ đã lệch, F4 là 2 claim
+  của §A1 nay đã sai. Chỗ nào §A1 và Vòng 2 mâu thuẫn thì **Vòng 2
+  thắng**.
 - `docs/history/state-runner-merge-boundary/DISCUSSION.md` §6 — bản tổng
   hợp thiết kế đầy đủ.
 
 ## Hai item cần làm, đúng thứ tự
 
-1. `tsk-49i-1` (risk heavy) — cắt 4 cạnh import `state/`↔`runner/`, gộp 3
-   bản copy-paste Iron Law vào `src/runner/iron-law-gate.mjs`, dời
+1. `tsk-49i-1` (risk heavy) — cắt **5** cạnh import `state/`↔`runner/`, gộp
+   3 bản copy-paste Iron Law vào `src/runner/iron-law-gate.mjs`, dời
    `isMainWorktree`+`detectTrunk` sang `runner/worktree.mjs`, dời
    `session-identity.mjs` sang `src/util/` **không để re-export shim**,
-   migrate 6 file ngoài `src/`+`bin/`, và bump version trong
+   dời `normalizePath` sang `src/util/normalize-path.mjs`, migrate 6 file
+   ngoài `src/`+`bin/`, và bump version trong
    `plugins/fgOS/.claude-plugin/plugin.json`.
+
+   Cạnh thứ 5 (`state/graph-metrics.mjs:18` → `runner/frozen-judge.mjs`,
+   `normalizePath`) **không có trong bản plan đầu** — `main` thêm vào ở
+   commit `ac1e30f1` sau khi plan viết xong. Nó không phải tuỳ chọn: clause
+   `! grep -rqF ../runner/ src/state/` trong verify sẽ đỏ nếu bỏ sót.
 2. `tsk-49i-2` (risk standard, `deps: ["tsk-49i-1"]`) — tách tầng use-case
    7 verb vào `src/verbs/merge/`, tạo `src/report/item-trace.mjs`, dời
    `performCatchUp` về `runner/merge.mjs` và `ensureBranchPushed` về
@@ -82,10 +92,11 @@ xem mục Iron Law bên dưới.
 
 Cả 2 con và mọi item bug đều sửa `src/runner/**`, `bin/fgos.mjs`,
 `src/state/store.mjs` — đều nằm trong `MODULE_RULES` của
-`src/evolve/iron-law.mjs`, và `required = matchedModules.length > 0`. Gate
+`src/evolve/iron-law.mjs`, và `src/evolve/iron-law.mjs:93`
+`required = matchedModules.length > 0 || matchedFlags.length > 0`. Gate
 gắn vào `source === 'runner'` chứ không gắn vào đích merge
-(`bin/fgos.mjs:3422-3447`), nên `approve` **sẽ từ chối kể cả khi merge vào
-nhánh cha**.
+(`bin/fgos.mjs:3494-3503`, và gate thứ hai `:4100-4101`), nên `approve`
+**sẽ từ chối kể cả khi merge vào nhánh cha**.
 
 **Người dùng đã acknowledge trước cho trường hợp này** — đã ghi vào
 decision log của `tsk-49i` (tra bằng `fgos show tsk-49i`). Phạm vi cho
@@ -126,8 +137,15 @@ Chạy một agent review, model `opus`, đọc toàn bộ diff của nhánh cha
   - 6 outcome dispatch của `approve` có rơi mất nhánh nào không;
   - `.githooks/pre-commit` và `plugins/fgOS/skills/terminal/rename.sh` đã
     trỏ đúng đường dẫn mới chưa;
-  - row manifest của 8 file mới có đúng tầng không (use-case=1 import được
-    infra=2/domain=3; `iron-law-gate.mjs` buộc phải ≤ rank 2).
+  - 2 tham chiếu `session-identity` mà vòng nghiên cứu đầu bỏ sót
+    (`RESEARCH.md` Vòng 2 §F5): `plugins/fgOS/skills/_shared/
+    capacity-dispatch-fallback.md:176` và key đường dẫn file test trong
+    `scripts/check-decision-codes.baseline.json:214`;
+  - `grep -rn "runner/" src/state/` phải **không còn cạnh import nào** —
+    cả 5, không phải 4;
+  - row manifest của mọi file mới có đúng tầng không (use-case=1 import
+    được infra=2/domain=3; `iron-law-gate.mjs` buộc phải ≤ rank 2;
+    `src/util/normalize-path.mjs` `kernel`=4 hợp lệ vì mọi importer ≤ 3).
 - Bắt agent trích `file:line` cho từng phát hiện, và nói rõ cái nào là bug
   thật, cái nào chỉ là ý kiến phong cách.
 

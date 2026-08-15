@@ -43,6 +43,16 @@ vậy toàn bộ danh sách call-site/import-site trong plan này lấy từ
 grep/read thật (`RESEARCH.md` §A1), **không** từ code graph — và đó là lý
 do nó tìm ra 6 file mà 6 vòng shaping trước bỏ sót.
 
+**Đã sync với `main` và re-verify (2026-08-15).** Nhánh từng đứng sau
+`main` 171 commit, trong đó 14 commit chạm `src/state`/`src/runner`. Merge
+(không rebase, theo D2 `src/runner/worktree.mjs`) ra `ba25a590`, sạch.
+Toàn bộ anchor `file:line` của `RESEARCH.md` đã được kiểm lại trên cây
+sau merge — kết quả đầy đủ ở `RESEARCH.md` Vòng 2. Ba điều plan này đã
+sửa theo: **cạnh import thứ 5** (F1, thêm vào pha 1), toạ độ bằng chứng
+của A-2 bên dưới (F3), và 2 tham chiếu `session-identity` bỏ sót (F5).
+Mọi kết luận về hình dạng (manifest, rank, 3 điều architecture test
+enforce, convention verify) vẫn đúng nguyên, không phải làm lại.
+
 ### Risk map
 
 | Thành phần | Mức | Cái gì chứng minh được |
@@ -65,10 +75,10 @@ do nó tìm ra 6 file mà 6 vòng shaping trước bỏ sót.
 - **A-2.** `npm test` xanh là bằng chứng MẠNH nhưng KHÔNG tuyệt đối cho
   "0 đổi hành vi CLI". Đã kiểm thật ở vòng validating: test spawn
   `bin/fgos.mjs` như tiến trình thật (không mock), parse JSON stdout và
-  assert trên **field cụ thể** (`test/cli/fgos-approve.test.mjs:1277-1280`
-  `data.mode`/`data.to`/`data.deliveryUnrecorded`; `:1310-1313`
-  `data.to`/`data.seq`), cộng exit code và row trong event log
-  (`:608-610`). Đây KHÔNG phải deepEqual toàn payload. Hệ quả còn lại:
+  assert trên **field cụ thể** (`test/cli/fgos-approve.test.mjs:1314,:1316`
+  `data.mode`/`data.deliveryUnrecorded`; `:1348-1349`
+  `data.deliveryUnrecorded`/`data.seq`), cộng exit code và row trong event
+  log. Đây KHÔNG phải deepEqual toàn payload. Hệ quả còn lại:
   một field nào của payload mà không test nào assert thì có thể đổi mà
   suite vẫn xanh. Ràng buộc rút ra: khi chuyển 7 case block sang tầng
   use-case, payload trả về phải được sao chép nguyên văn theo từng nhánh
@@ -77,12 +87,16 @@ do nó tìm ra 6 file mà 6 vòng shaping trước bỏ sót.
 
 ## Shape (phased)
 
-**Pha 1 — cắt cycle + dọn hàm (D1, D2).** 4 cạnh, 3 động tác:
+**Pha 1 — cắt cycle + dọn hàm (D1, D2).** 5 cạnh, 4 động tác:
 `drift-status.mjs` nhận `trunk` bắt buộc (2 caller thật:
 `bin/fgos.mjs`, `src/setup/registrations.mjs`); dời `resolveRoot` từ
 `runner/root-affinity.mjs` về `state/frontier.mjs` (6 import site); dời
 nguyên `session-identity.mjs` sang `src/util/` (4 import site trong
-`src`/`bin` + 6 file ngoài). Kèm: tạo `src/runner/iron-law-gate.mjs`
+`src`/`bin` + 6 file ngoài); dời `normalizePath` từ
+`runner/frozen-judge.mjs` sang `src/util/normalize-path.mjs` (4 consumer:
+`frozen-judge.mjs` chính nó, `runner/merge.mjs`, `state/graph-metrics.mjs`,
+`bin/fgos.mjs` — chỗ cuối phải tách import hiện đang gom chung với
+`frozenJudgeHits`/`footprintDiffHits`). Kèm: tạo `src/runner/iron-law-gate.mjs`
 (tầng `infra` — bắt buộc rank ≤ 2 vì nó import `merge.mjs`/`worktree.mjs`
 ở `infra`), 3 call site trong `bin/fgos.mjs` gọi `ironLawForItem`; dời
 `isMainWorktree` + `detectTrunk` sang `worktree.mjs` (2 import site).
@@ -111,23 +125,26 @@ Hai pha ở trên là 2 hạng mục độc lập làm được, có thứ tự 
 ```json
 [
   {
-    "title": "Cắt 4 cạnh import state/runner, gộp Iron Law check, dời isMainWorktree/detectTrunk",
-    "verify": "npm test && test -f src/runner/iron-law-gate.mjs && test -f src/util/session-identity.mjs && grep -qF ironLawForItem bin/fgos.mjs && ! grep -rqF ../runner/ src/state/ && ! grep -rqF runner/session-identity plugins/fgOS/skills/terminal/rename.sh .githooks/pre-commit && ! grep -qF 1.1.0 plugins/fgOS/.claude-plugin/plugin.json",
-    "action": "D1: drift-status.mjs nhan trunk qua tham so bat buoc; doi resolveRoot ve state/frontier.mjs; gop 3 ban copy-paste Iron Law vao src/runner/iron-law-gate.mjs o tang infra; doi isMainWorktree va detectTrunk sang runner/worktree.mjs. D2: doi session-identity.mjs sang src/util/ KHONG de lai re-export shim, migrate ca 6 file ngoai src va bin ma RESEARCH.md muc A1 liet ke (gom .githooks/pre-commit va plugins/fgOS/skills/terminal/rename.sh), va bump version trong plugins/fgOS/.claude-plugin/plugin.json de ban cache cua plugin khong tiep tuc phuc vu script tro vao duong dan cu.",
+    "title": "Cắt 5 cạnh import state/runner, gộp Iron Law check, dời isMainWorktree/detectTrunk",
+    "verify": "npm test && test -f src/runner/iron-law-gate.mjs && test -f src/util/session-identity.mjs && test -f src/util/normalize-path.mjs && grep -qF ironLawForItem bin/fgos.mjs && ! grep -rqF ../runner/ src/state/ && ! grep -rqF runner/session-identity plugins/fgOS/skills/terminal/rename.sh .githooks/pre-commit && ! grep -qF 1.1.0 plugins/fgOS/.claude-plugin/plugin.json",
+    "action": "D1: drift-status.mjs nhan trunk qua tham so bat buoc; doi resolveRoot ve state/frontier.mjs; gop 3 ban copy-paste Iron Law vao src/runner/iron-law-gate.mjs o tang infra; doi isMainWorktree va detectTrunk sang runner/worktree.mjs; doi normalizePath tu runner/frozen-judge.mjs sang src/util/normalize-path.mjs o tang kernel va sua ca 4 consumer (frozen-judge.mjs, runner/merge.mjs, state/graph-metrics.mjs, bin/fgos.mjs) — canh thu 5 nay do commit ac1e30f1 tren main them vao sau khi plan duoc viet, xem RESEARCH.md Vong 2 muc F1. D2: doi session-identity.mjs sang src/util/ KHONG de lai re-export shim, migrate ca 6 file ngoai src va bin ma RESEARCH.md muc A1 liet ke (gom .githooks/pre-commit va plugins/fgOS/skills/terminal/rename.sh), cap nhat 2 tham chieu Vong 2 muc F5 tim them (plugins/fgOS/skills/_shared/capacity-dispatch-fallback.md va scripts/check-decision-codes.baseline.json neu file test doi cho), va bump version trong plugins/fgOS/.claude-plugin/plugin.json de ban cache cua plugin khong tiep tuc phuc vu script tro vao duong dan cu.",
     "footprint": [
       "src/state/drift-status.mjs",
       "src/state/frontier.mjs",
       "src/state/graph-harness.mjs",
       "src/state/cleanup-harness.mjs",
       "src/state/store.mjs",
+      "src/state/graph-metrics.mjs",
       "src/runner/root-affinity.mjs",
       "src/runner/merge.mjs",
       "src/runner/worktree.mjs",
       "src/runner/iron-law-gate.mjs",
+      "src/runner/frozen-judge.mjs",
       "src/runner/claim-port.mjs",
       "src/runner/loop.mjs",
       "src/runner/promote-engine.mjs",
       "src/util/session-identity.mjs",
+      "src/util/normalize-path.mjs",
       "src/cli/invocation-fault-log.mjs",
       "src/setup/registrations.mjs",
       "bin/fgos.mjs",
