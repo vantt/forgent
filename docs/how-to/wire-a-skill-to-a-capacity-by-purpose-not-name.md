@@ -28,8 +28,9 @@ following this recipe.
 ## The pattern
 
 A capacity declares its purpose via `for` (a closed enum,
-`CAPACITY_PURPOSES` — e.g. `gather`/`judge`). A caller with no id to name
-resolves by that purpose instead:
+`CAPACITY_PURPOSES` — today just `judge`; `gather` was retired at
+tsk-5tm-2 D6, see the note below). A caller with no id to name resolves
+by that purpose instead:
 
 ```bash
 root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
@@ -97,25 +98,27 @@ acquires `events.jsonl`'s own cross-process lock internally — no extra
 locking needed even when several branches log concurrently (e.g. a
 fan-out's independent branches each logging their own dispatch).
 
-## Real example: `tsk-2ie5`/`tsk-2c1` — `fgos-researching`'s gather fan-out
+## Status: pattern proven, no live consumer today
 
-`fgos-researching`'s two independent research branches used to call the
-Agent/Task tool directly — no config check, no presence check, no
-cross-provider check, no dispatch log. Its prompt is composed at runtime
-per branch, so there was never a fixed `<CAPACITY_ID>` to bind to by name.
-`tsk-2c1` wired it to this purpose-based recipe: `decide --for gather`
-before every branch, falling back to the pre-existing native Task call
-when `unavailable`; `resolve --for gather --carries repo-content` for the
-`out-of-process` branch (a gather packet's own `inputs` field is always
-concrete repo paths, so `repo-content` is the correct, constant value for
-every gather dispatch, never `user-text`); and the `log` subcommand after
-either mechanism.
+`fgos-researching`'s gather fan-out (`tsk-2ie5`/`tsk-2c1`) was this
+recipe's original real example — wired to `decide --for gather` /
+`resolve --for gather --carries repo-content` before every research
+branch. `gather` was retired at `tsk-5tm-2` D6: it was the one real
+cross-provider path, with no architectural reason on record for needing
+cross-provider dispatch at all, and its one documented reason
+(parallelizing wall-clock) was already met by native Task-tool dispatch —
+`fgos-researching` now dispatches every branch natively, unconditionally
+(see that skill's own SKILL.md).
 
-`resolveCapacityIdForPurpose` itself is a straightforward scan of
-`cfg.capacities` for the first entry whose own `for` matches — proven by
-direct unit test rather than end-to-end (`test/runner/dispatch.test.mjs`,
-21 new tests covering the `carries` gate, purpose resolution, and both CLI
-flags added by this item).
+`judge-discovery`/`judge-decompose` both declare `for: "judge"`, but
+neither is actually resolved by purpose today — both callers
+(`fgos-coding-discovering`, `fgos-coding-planning`) call them by their own
+fixed id directly, never `--for judge` (confirmed by grep, `tsk-5tm`
+`CONTEXT.md` D10). So this recipe has no live production consumer right
+now — the mechanism itself stays proven by direct unit test
+(`resolveCapacityIdForPurpose` and the `carries`/`decide`/`resolve` CLI
+flags, `test/runner/dispatch.test.mjs`), ready for the next producer that
+genuinely needs to resolve a capacity without a pre-registered id to name.
 
 ## Outcome capture
 

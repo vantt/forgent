@@ -43,7 +43,7 @@ import { selectTemplate, renderTemplate, hashTemplate } from './prompt-templates
 import { mergeConfigDefaults } from '../setup/config-merge.mjs';
 import { sharedConfigFilePath } from '../config/shared-config-file.mjs';
 import { mergeWithGlobalConfig } from '../config/global-config.mjs';
-import { KINDS, findExecutableOnPath, resolvedStatus, readLocalStatus } from '../state/tool-registry.mjs';
+import { KINDS, findExecutableOnPath } from '../state/tool-registry.mjs';
 import { listWork } from '../state/store.mjs';
 import { appendEvent } from '../state/events.mjs';
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from './paths.mjs';
@@ -239,10 +239,23 @@ export const DEFAULT_RUNNER_CONFIG = {
       'Bash(git add:*),Bash(git commit:*)',
     ],
   },
-  models: {
-    light: 'haiku',
-    standard: 'sonnet',
-    heavy: 'opus',
+  // tsk-5tm-5 D9: modelPolicies replaces the old flat `models` map --
+  // provider-keyed, each provider's own 5-tier vocab (MODEL_POLICY_TIERS
+  // below). Default here stays Claude-only (matching the default
+  // `executor.command: 'claude'` above); a project adds its own
+  // `modelPolicies.<providerModel>` block when it configures a
+  // non-Claude capacity (this repo's own committed config does, for
+  // `agy`/gemini). `creative`/`analytical` default to `sonnet` (no real
+  // consumer differentiates them from `standard` yet); `critical`
+  // defaults to `opus`, matching `heavy`'s pre-D9 model unchanged.
+  modelPolicies: {
+    claude: {
+      lightweight: 'haiku',
+      standard: 'sonnet',
+      creative: 'sonnet',
+      analytical: 'sonnet',
+      critical: 'opus',
+    },
   },
   timeoutMs: 900000,
   parallel: {
@@ -262,6 +275,28 @@ export const DEFAULT_RUNNER_CONFIG = {
  * hand.
  */
 export const SUPPORTED_EXECUTOR_TEMPLATES = { claude: DEFAULT_RUNNER_CONFIG.executor };
+
+/**
+ * tsk-5tm-5 D9: `models`/`modelPolicies` are mutually-substitutable — either
+ * alone satisfies `validateRunnerConfigShape`, and `modelForTier` prefers
+ * `modelPolicies` when present. A project's runner section that intends
+ * `models` alone (no `modelPolicies` of its own) must not have a
+ * `modelPolicies` key silently attached by ANY missing-key-fill merge this
+ * module runs — not just the `DEFAULT_RUNNER_CONFIG` merge in
+ * `ensureRunnerConfigForDir`, but also the separate `mergeWithGlobalConfig`
+ * merge both `loadRunnerConfigFromDir` and `ensureRunnerConfigForDir` run
+ * afterward, which can inject `~/.fgos/config.json`'s own `modelPolicies`
+ * just as silently. `preRunner` is the project's own runner section as it
+ * stood right before the merge being guarded; `mergedRunner` is that merge's
+ * result.
+ */
+function dropModelPoliciesInjectedOverModels(preRunner, mergedRunner) {
+  if (preRunner && preRunner.models !== undefined && preRunner.modelPolicies === undefined && mergedRunner.modelPolicies !== undefined) {
+    const { modelPolicies, ...rest } = mergedRunner;
+    return rest;
+  }
+  return mergedRunner;
+}
 
 /**
  * Resolve+validate the runner section of the shared project config file at
@@ -287,7 +322,7 @@ export function loadRunnerConfigFromDir(dir) {
     throw new RunnerConfigError(`shared config at "${sharedPath}" is not valid JSON: ${err.message}`);
   }
   const withGlobal = mergeWithGlobalConfig(parsed);
-  const runnerCfg = withGlobal.runner ?? {};
+  const runnerCfg = dropModelPoliciesInjectedOverModels(parsed.runner, withGlobal.runner ?? {});
   validateRunnerConfigShape(runnerCfg, `${sharedPath}#runner`);
   return runnerCfg;
 }
@@ -331,7 +366,19 @@ export function ensureRunnerConfigForDir(dir) {
   if (fs.existsSync(sharedPath)) {
     const parsed = JSON.parse(fs.readFileSync(sharedPath, 'utf8'));
     const existingRunner = parsed.runner ?? {};
-    const { merged, addedKeys } = mergeConfigDefaults(existingRunner, DEFAULT_RUNNER_CONFIG);
+    // tsk-5tm-5 D9: `models`/`modelPolicies` are mutually-substitutable —
+    // either alone satisfies validateRunnerConfigShape's requirement, and
+    // modelForTier prefers modelPolicies when present. Auto-filling
+    // modelPolicies from DEFAULT_RUNNER_CONFIG onto a config that already
+    // has its own `models` map would silently SHADOW that map (nothing
+    // was actually missing) — skip that one default key in exactly this
+    // case, same "don't touch what's already satisfied" spirit every
+    // other field in this merge already follows.
+    const effectiveDefaults =
+      existingRunner.models !== undefined && existingRunner.modelPolicies === undefined
+        ? Object.fromEntries(Object.entries(DEFAULT_RUNNER_CONFIG).filter(([key]) => key !== 'modelPolicies'))
+        : DEFAULT_RUNNER_CONFIG;
+    const { merged, addedKeys } = mergeConfigDefaults(existingRunner, effectiveDefaults);
     let projectShared = parsed;
     if (addedKeys.length > 0) {
       projectShared = { ...parsed, runner: merged };
@@ -341,7 +388,7 @@ export function ensureRunnerConfigForDir(dir) {
       );
     }
     const withGlobal = mergeWithGlobalConfig(projectShared);
-    const runnerCfg = withGlobal.runner ?? {};
+    const runnerCfg = dropModelPoliciesInjectedOverModels(projectShared.runner, withGlobal.runner ?? {});
     validateRunnerConfigShape(runnerCfg, `${sharedPath}#runner`);
     return runnerCfg;
   }
@@ -395,15 +442,15 @@ function validateExecutorShape(executor, label) {
  */
 export const CAPACITY_KINDS = Object.freeze([...KINDS, 'task']);
 
-/** purpose vocabulary `capacities.<id>.for` may take (D2/D6, tsk-1o7): the
- * T2 review-class split, `gather` (returns a digest) vs `judge` (returns a
- * verdict) — the demand side's own self-declared lane, alongside `needs`
- * (which provider). No code consumer resolves on this yet (`tsk-2ie5` is
- * named as the first real one) — declaring it here only lets
- * `validateCapacityShape` accept and shape-check it now, ahead of that
- * consumer landing.
+/** purpose vocabulary `capacities.<id>.for` may take (D2/D6, tsk-1o7).
+ * `gather` retired (tsk-5tm-2 D6): it was the one real cross-provider path,
+ * with no architectural reason on record for needing cross-provider at all
+ * — the one documented reason (parallelizing wall-clock) is already met by
+ * native Task-tool dispatch. `judge` (returns a verdict) is the sole
+ * remaining value; a new purpose gets added back here when a real producer
+ * actually needs one, not speculatively ahead of a consumer landing.
  */
-export const CAPACITY_PURPOSES = Object.freeze(['gather', 'judge']);
+export const CAPACITY_PURPOSES = Object.freeze(['judge']);
 
 /** value vocabulary `capacities.<id>.carries` may take (D15, `tsk-5td`,
  * first real consumer `tsk-2ie5`/`tsk-2c1`): the content class a capacity
@@ -425,6 +472,36 @@ export const CAPACITY_CARRIES = Object.freeze(['user-text', 'repo-content']);
  * Claude-vs-non-Claude check.
  */
 export const CLAUDE_CLI_COMMANDS = Object.freeze(['claude']);
+
+/**
+ * `cfg.modelPolicies.<providerModel>` tier vocabulary (tsk-5tm-5 D9,
+ * matching marketing-cockpit's `tier_policy_path`) — deliberately its OWN
+ * 5-value vocab, distinct from `work.mjs`'s `TIERS` (`light/standard/
+ * heavy`, D9's own pinned scope boundary: that export stays untouched,
+ * shared with `work.risk`). `DEFAULT_TIER_TO_POLICY` is the default
+ * mapping from a work item's own tier onto one of these five, used
+ * whenever a capacity names no `rigorOverrides` entry for that tier —
+ * `light`/`standard` map onto their same-named policy tier directly;
+ * `heavy` maps to `critical`, the highest-rigor policy tier, matching
+ * `heavy`'s own framing elsewhere (`HEAVY_RISK`) as the most
+ * scrutiny-demanding classification. `creative`/`analytical` have no
+ * default work-tier mapped onto them yet — they exist for a capacity's
+ * own `rigorOverrides` to select explicitly (e.g. a capacity whose work
+ * is better served by a creative-leaning model even at `standard` rigor),
+ * not because this item invents a use for them.
+ */
+export const MODEL_POLICY_TIERS = Object.freeze(['lightweight', 'standard', 'creative', 'analytical', 'critical']);
+const DEFAULT_TIER_TO_POLICY = Object.freeze({ light: 'lightweight', standard: 'standard', heavy: 'critical' });
+
+/**
+ * `capacities.<id>.invocations[].via` vocabulary (tsk-5tm-4 D11): the one
+ * transport this repo resolves an invocation through today. Narrow on
+ * purpose, matching `CAPACITY_KINDS`/`CAPACITY_PURPOSES`'s own
+ * start-narrow-extend-later pattern — a real second transport (e.g. an
+ * `api`-shaped invocation talking to a headless agent's app-server) adds
+ * its own value here when a real producer needs it, never speculatively.
+ */
+export const INVOCATION_VIA = Object.freeze(['cli']);
 
 /**
  * Shape-check one `capacities.<id>` entry (D1/D2, tsk-62v; `allowCrossProvider`
@@ -461,6 +538,19 @@ export const CLAUDE_CLI_COMMANDS = Object.freeze(['claude']);
  * native-eligible — read by `decideDispatchMechanism`/
  * `decideCapacityDispatchMechanism` below, never by `resolveExecutorConfig`
  * itself (which stays cli/spawn-only and unaware this field exists).
+ *
+ * `invocations`, when present, must be a non-empty array (tsk-5tm-4 D11,
+ * executor-registry.yaml-shaped, marketing-cockpit): each entry names its
+ * own `via` (one of `INVOCATION_VIA`) plus the same `command`/`args`[/
+ * `adapter`] shape `validateExecutorShape` already requires — an
+ * ADDITIVE alternative to the flat `command`/`args` above, never a
+ * replacement (a capacity with neither, or with the flat shape, keeps
+ * resolving exactly as before this field existed; `resolveExecutorConfig`
+ * below prefers `invocations[0]` over flat `command`/`args` when both are
+ * somehow present, but no real entry declares both). The top-level
+ * `capacities` field name itself is unchanged (D11) — `cfg.executors`
+ * already exists, tier-keyed and strictly validated (`tsk-4eu`), so
+ * reusing that name here would collide.
  */
 function validateCapacityShape(capacity, label) {
   if (!capacity || typeof capacity !== 'object' || Array.isArray(capacity)) {
@@ -486,15 +576,10 @@ function validateCapacityShape(capacity, label) {
   if (capacity.forceCliSpawn !== undefined && typeof capacity.forceCliSpawn !== 'boolean') {
     throw new RunnerConfigError(`runner config (${label}) "forceCliSpawn" must be a boolean when present.`);
   }
-  // D6/tsk-1o7: demand-side self-declaration, additive and optional --
-  // absent keeps every pre-tsk-1o7 capacity byte-identical (same style as
-  // every sibling optional field above). `needs` is the real match key
-  // `resolveExecutorConfig` below now consults for a `kind:"cli"`
-  // capacity's presence check; `for` has no code consumer yet (see
-  // CAPACITY_PURPOSES's own comment) and is validated here only.
-  if (capacity.needs !== undefined && (typeof capacity.needs !== 'string' || capacity.needs.length === 0)) {
-    throw new RunnerConfigError(`runner config (${label}) "needs" must be a non-empty string when present.`);
-  }
+  // tsk-5tm-1 D1: `needs` retired (was resolveExecutorConfig's own presence
+  // gate's match key, itself removed — see that function's doc comment).
+  // No longer validated; a stray `needs` on a capacity is now inert, never
+  // rejected, since the field carries no meaning to consume it.
   if (capacity.for !== undefined && !CAPACITY_PURPOSES.includes(capacity.for)) {
     throw new RunnerConfigError(`runner config (${label}) "for" must be one of ${CAPACITY_PURPOSES.join('/')}, got: ${JSON.stringify(capacity.for)}.`);
   }
@@ -506,6 +591,82 @@ function validateCapacityShape(capacity, label) {
   // free-string treatment `for` already gets above).
   if (capacity.carries !== undefined && !CAPACITY_CARRIES.includes(capacity.carries)) {
     throw new RunnerConfigError(`runner config (${label}) "carries" must be one of ${CAPACITY_CARRIES.join('/')}, got: ${JSON.stringify(capacity.carries)}.`);
+  }
+  if (capacity.invocations !== undefined) {
+    if (!Array.isArray(capacity.invocations) || capacity.invocations.length === 0) {
+      throw new RunnerConfigError(`runner config (${label}) "invocations" must be a non-empty array when present.`);
+    }
+    capacity.invocations.forEach((invocation, index) => {
+      const invocationLabel = `${label} invocations[${index}]`;
+      if (!invocation || typeof invocation !== 'object' || Array.isArray(invocation)) {
+        throw new RunnerConfigError(`runner config (${invocationLabel}) must be an object.`);
+      }
+      if (typeof invocation.via !== 'string' || !INVOCATION_VIA.includes(invocation.via)) {
+        throw new RunnerConfigError(
+          `runner config (${invocationLabel}) "via" must be one of ${INVOCATION_VIA.join('/')}, got: ${JSON.stringify(invocation.via)}.`,
+        );
+      }
+      validateExecutorShape(invocation, invocationLabel);
+    });
+  }
+  // tsk-5tm-5 D9: `providerModel` names which `cfg.modelPolicies` table
+  // this capacity's tier resolution reads from (absent defaults to
+  // "claude", `modelForTier`'s own default) — the field `agy` needs so
+  // its tier resolution reads the "gemini" table instead of silently
+  // borrowing Claude's model names.
+  if (capacity.providerModel !== undefined && (typeof capacity.providerModel !== 'string' || !capacity.providerModel.trim())) {
+    throw new RunnerConfigError(`runner config (${label}) "providerModel" must be a non-empty string when present.`);
+  }
+  // `rigorOverrides` (D9): per-work-tier override of the DEFAULT_TIER_TO_
+  // POLICY mapping, for a capacity with a real reason to deviate (e.g.
+  // prefers "creative" over the default "standard" policy tier even at
+  // work-tier "standard"). Optional and additive — a capacity naming none
+  // resolves through the default mapping unchanged.
+  if (capacity.rigorOverrides !== undefined) {
+    if (!capacity.rigorOverrides || typeof capacity.rigorOverrides !== 'object' || Array.isArray(capacity.rigorOverrides)) {
+      throw new RunnerConfigError(`runner config (${label}) "rigorOverrides" must be an object mapping a work tier to a policy tier when present.`);
+    }
+    for (const [workTier, policyTier] of Object.entries(capacity.rigorOverrides)) {
+      if (!TIERS.includes(workTier)) {
+        throw new RunnerConfigError(`runner config (${label}) "rigorOverrides" key must be one of ${TIERS.join('/')}, got: ${JSON.stringify(workTier)}.`);
+      }
+      if (!MODEL_POLICY_TIERS.includes(policyTier)) {
+        throw new RunnerConfigError(
+          `runner config (${label}) "rigorOverrides.${workTier}" must be one of ${MODEL_POLICY_TIERS.join('/')}, got: ${JSON.stringify(policyTier)}.`,
+        );
+      }
+    }
+  }
+}
+
+/**
+ * Shape-check `cfg.modelPolicies` (tsk-5tm-5 D9): an object mapping an
+ * arbitrary provider name (`"claude"`, `"gemini"`, ...) to a tier map,
+ * each tier map's keys drawn from `MODEL_POLICY_TIERS` and values
+ * non-empty model-name strings. Partial coverage (a provider naming fewer
+ * than all 5 tiers) is valid at load time, same lenient-at-load/strict-
+ * at-resolve philosophy the old flat `models` map already used (per
+ * `modelForTier`'s own doc comment) — a missing tier only throws once
+ * something actually asks for it.
+ */
+function validateModelPoliciesShape(modelPolicies, label) {
+  if (!modelPolicies || typeof modelPolicies !== 'object' || Array.isArray(modelPolicies)) {
+    throw new RunnerConfigError(`runner config (${label}) must be an object mapping provider -> tier -> model when present.`);
+  }
+  for (const [providerModel, tierMap] of Object.entries(modelPolicies)) {
+    if (!tierMap || typeof tierMap !== 'object' || Array.isArray(tierMap)) {
+      throw new RunnerConfigError(`runner config (${label}.${providerModel}) must be an object mapping policy tier -> model.`);
+    }
+    for (const [policyTier, model] of Object.entries(tierMap)) {
+      if (!MODEL_POLICY_TIERS.includes(policyTier)) {
+        throw new RunnerConfigError(
+          `runner config (${label}.${providerModel}) tier key must be one of ${MODEL_POLICY_TIERS.join('/')}, got: ${JSON.stringify(policyTier)}.`,
+        );
+      }
+      if (typeof model !== 'string' || !model.trim()) {
+        throw new RunnerConfigError(`runner config (${label}.${providerModel}.${policyTier}) must be a non-empty string.`);
+      }
+    }
   }
 }
 
@@ -542,8 +703,17 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
       validateCapacityShape(capacity, `${sourceLabel} capacities.${capacityId}`);
     }
   }
-  if (!cfg.models || typeof cfg.models !== 'object' || Array.isArray(cfg.models)) {
-    throw new RunnerConfigError(`runner config (${sourceLabel}) must declare a "models" object mapping tier -> model.`);
+  // tsk-5tm-5 D9: `modelPolicies` (provider-keyed, 5-tier) is the new
+  // preferred shape -- when present, it satisfies this requirement on its
+  // own; the legacy flat `models` map is only required when a project
+  // hasn't migrated. Both may coexist (modelForTier prefers modelPolicies
+  // when present); neither being present is the one invalid state.
+  if (cfg.modelPolicies !== undefined) {
+    validateModelPoliciesShape(cfg.modelPolicies, `${sourceLabel} modelPolicies`);
+  } else if (!cfg.models || typeof cfg.models !== 'object' || Array.isArray(cfg.models)) {
+    throw new RunnerConfigError(
+      `runner config (${sourceLabel}) must declare a "models" object mapping tier -> model, or a "modelPolicies" object mapping provider -> tier -> model (tsk-5tm-5 D9).`,
+    );
   }
   if (typeof cfg.timeoutMs !== 'number' || !Number.isFinite(cfg.timeoutMs) || cfg.timeoutMs <= 0) {
     throw new RunnerConfigError(`runner config (${sourceLabel}) must declare a positive numeric "timeoutMs".`);
@@ -568,13 +738,36 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
 
 /**
  * Resolve `tier` (per D6; falls back to `work.mjs`'s declared default when a
- * work item omits `tier`, per D7b) to a model name via `cfg.models`. An
- * unknown tier — one work.mjs's `TIERS` allows but this config's `models`
- * map does not cover, or any other string — is a validation error: the two
- * tables must reconcile (per work.mjs's own doc comment), and dispatch time
- * is where that drift would first bite.
+ * work item omits `tier`, per D7b) to a model name. An unknown tier — one
+ * work.mjs's `TIERS` allows but the resolved table does not cover, or any
+ * other string — is a validation error: dispatch time is where that drift
+ * would first bite (per D6's own original reasoning, unchanged by D9).
+ *
+ * tsk-5tm-5 D9: `cfg.modelPolicies` (provider-keyed, 5-tier) is preferred
+ * when present — `providerModel` (default `"claude"`, every pre-D9 call
+ * site) selects which provider's table to read, and `tier` maps onto one
+ * of `MODEL_POLICY_TIERS` via `DEFAULT_TIER_TO_POLICY`, unless
+ * `rigorOverrides` (a capacity's own override map, threaded in by the
+ * caller) names a different policy tier for this specific work tier.
+ * Falls back to the legacy flat `cfg.models[tier]` lookup, byte-identical
+ * to every pre-D9 caller, when `cfg.modelPolicies` is absent — this
+ * signature's first two positional params are UNCHANGED (D9's own
+ * constraint): `loop.mjs`'s `modelForTier(config, tier)` call site keeps
+ * working exactly as before, options object omitted entirely.
  */
-export function modelForTier(cfg, tier) {
+export function modelForTier(cfg, tier, { providerModel = 'claude', rigorOverrides } = {}) {
+  const policies = cfg && cfg.modelPolicies;
+  if (policies) {
+    const providerPolicy = policies[providerModel];
+    if (!providerPolicy || typeof providerPolicy !== 'object') {
+      throw new RunnerConfigError(`no modelPolicies configured for provider "${providerModel}".`);
+    }
+    const policyTier = (rigorOverrides && rigorOverrides[tier]) || DEFAULT_TIER_TO_POLICY[tier];
+    if (!policyTier || typeof providerPolicy[policyTier] !== 'string') {
+      throw new RunnerConfigError(`no model configured for tier "${tier}" (policy tier "${policyTier}") under provider "${providerModel}".`);
+    }
+    return providerPolicy[policyTier];
+  }
   const models = cfg && cfg.models;
   if (!models || typeof tier !== 'string' || !(tier in models)) {
     throw new RunnerConfigError(`no model configured for tier "${tier}".`);
@@ -597,20 +790,11 @@ export function modelForTier(cfg, tier) {
  * `executors.<tier>`/global — still ahead of that fallback in the same
  * precedence slot `command`/`adapter` already occupy.
  *
- * For a `capacities.<capacityId>` entry declaring `kind: "cli"`, presence
- * is checked via the same in-process functions `fgos tool query` already
- * uses (`listWork`/`readLocalStatus`/`resolvedStatus`, D6) instead of
- * re-probing PATH — throws `RunnerConfigError` at resolve time, before any
- * spawn, the same "fail loud" style this function already uses for a
- * malformed executor block. This check only runs when the caller supplies
- * `fgosDir` (`spawnWorker`'s optional `opts.fgosDir`); omitted `fgosDir`
- * skips it entirely — every pre-tsk-62v call site never passes it.
- *
- * US-027/D5/D6 (tsk-1o7): when the capacity also declares `needs` (the
- * capability it requires), that presence check matches by the registered
- * tool's own `capability` field, never by name coincidence with
- * `capacityId` — a capacity naming no `needs` yet keeps the pre-tsk-1o7
- * `tools[capacityId]` name lookup unchanged.
+ * Presence/staleness of a `capacities.<capacityId>` entry's own tool is no
+ * longer checked here (tsk-5tm-1 D1: retired — 2/3 real entries were
+ * `kind:"task"`, for which this never ran, and the third's `needs` added no
+ * signal beyond the OS's own ENOENT on a missing binary). Ask `fgos tool
+ * query --status present/stale` directly at the call site instead.
  *
  * Cross-provider governance (D2/D3, tsk-32n): once the winning `executor`
  * is resolved below, a `kind: "cli"` capacity whose FINAL resolved
@@ -674,51 +858,6 @@ export function resolveCapacityIdForPurpose(cfg, purpose) {
 function resolveExecutorConfig(cfg, tier, capacityId, fgosDir, contentCarries) {
   const capacity = capacityId && cfg && cfg.capacities && typeof cfg.capacities === 'object' ? cfg.capacities[capacityId] : undefined;
 
-  // D5/D6/tsk-1o7: US-027 -- binding matches by capability promise, never
-  // by tool name. When the capacity declares `needs`, the presence gate
-  // below searches the tools registry for a provider whose OWN declared
-  // `capability` matches `capacity.needs`, instead of assuming the
-  // capacity's own id is also the registered tool's name. A capacity
-  // naming no `needs` yet keeps today's exact `tools[capacityId]` name
-  // lookup, byte-identical -- the backward-compat seam that lets this
-  // land before any real capacity in `.fgos/config.json` actually
-  // declares `needs` (tsk-53n, split off per ADR0020).
-  //
-  // D13/tsk-592: gate widened from `kind === 'cli'` to `kind !== 'task'` --
-  // mcp/skill/http/binary capacities now get the same presence check a
-  // `cli` capacity always had (latent until a capacity of one of those
-  // kinds is registered; `kind === 'task'` still excludes the one kind
-  // with no real out-of-process provider to check presence for).
-  if (capacity && capacity.kind !== 'task' && fgosDir) {
-    const tools = listWork(fgosDir).tools ?? {};
-    if (capacity.needs) {
-      const localStatus = readLocalStatus(fgosDir);
-      const candidates = Object.values(tools).filter((tool) => tool.capability === capacity.needs);
-      if (candidates.length === 0) {
-        throw new RunnerConfigError(
-          `capacity "${capacityId}" needs capability "${capacity.needs}" but no tool is registered with that capability — run "fgos tool register --name <tool> --kind cli --command <cmd> --capability ${capacity.needs}" first.`,
-        );
-      }
-      const present = candidates.some((tool) => resolvedStatus(tool.name, localStatus) === 'present');
-      if (!present) {
-        throw new RunnerConfigError(
-          `capacity "${capacityId}" needs capability "${capacity.needs}" but no provider registered for it is present on this machine — run "fgos tool check --name <tool>" to refresh, or install one.`,
-        );
-      }
-    } else if (!tools[capacityId]) {
-      throw new RunnerConfigError(
-        `capacity "${capacityId}" declares kind "${capacity.kind}" but is not registered — run "fgos tool register --name ${capacityId} --kind ${capacity.kind} --command <cmd> --capability <label>" first.`,
-      );
-    } else {
-      const status = resolvedStatus(capacityId, readLocalStatus(fgosDir));
-      if (status !== 'present') {
-        throw new RunnerConfigError(
-          `capacity "${capacityId}" is registered but not present on this machine (status: "${status}") — run "fgos tool check --name ${capacityId}" to refresh, or install it.`,
-        );
-      }
-    }
-  }
-
   // D15/tsk-5td, first real gate — carries answers "CAI GI duoc di", never
   // "CO duoc ra ngoai khong" (allowCrossProvider's own question, checked
   // separately below): when the capacity declares a content-permission
@@ -748,8 +887,14 @@ function resolveExecutorConfig(cfg, tier, capacityId, fgosDir, contentCarries) {
     }
   }
 
-  const byCapacity =
-    capacity && (capacity.adapter || capacity.command)
+  // tsk-5tm-4 D11: an invocations[]-shaped capacity resolves through its
+  // own first invocation, ahead of the flat command/args check below —
+  // real entries declare one shape or the other, never both, but
+  // invocations[] wins on the (currently hypothetical) case they do.
+  const invocation = Array.isArray(capacity?.invocations) ? capacity.invocations[0] : undefined;
+  const byCapacity = invocation
+    ? { command: invocation.command, args: invocation.args, adapter: invocation.adapter, provider: capacity.provider }
+    : capacity && (capacity.adapter || capacity.command)
       ? capacity
       : capacity && capacity.agentType && cfg && cfg.executor
         ? buildAgentTypeExecutor(cfg.executor, capacity.agentType)
@@ -1086,8 +1231,13 @@ export const EXECUTOR_ADAPTERS = { [DEFAULT_ADAPTER]: cliSpawnAdapter };
  * `selectTemplate` already being called a second time inside `spawnWorker`
  * below for template logging (P49's same "cheap, deterministic, no
  * duplicated LOGIC" precedent).
+ *
+ * Exported (tsk-5tm-6 D12(iii)): `decideCapacityCli`'s `--work <id>` path
+ * below is the work-item-shaped lookup `fgos-fanout` needs to consult the
+ * dispatch decision protocol before firing an Agent for a candidate,
+ * instead of hardcoding native dispatch unconditionally.
  */
-function capacityIdForWork(work) {
+export function capacityIdForWork(work) {
   const domainObj = DOMAINS[resolveDomainName(work.domain)];
   return skillForStage(domainObj, 'executing');
 }
@@ -1127,9 +1277,14 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   // exactly what dispatch.test.mjs's "throws a RunnerConfigError ... before
   // any spawn" test pins.
   const tier = work.tier ?? DEFAULTS.tier;
-  const model = modelForTier(cfg, tier);
-  const prompt = buildPrompt(work, opts.feedback, opts.stage);
+  // tsk-5tm-5 D9: capacityId computed before modelForTier (moved ahead of
+  // its pre-D9 position, right after) so a capacity's own providerModel/
+  // rigorOverrides can thread into tier resolution — never borrowing
+  // Claude's model names for a non-Claude capacity's own dispatch.
   const capacityId = capacityIdForWork(work);
+  const capacityForTier = capacityId && cfg && cfg.capacities && typeof cfg.capacities === 'object' ? cfg.capacities[capacityId] : undefined;
+  const model = modelForTier(cfg, tier, { providerModel: capacityForTier?.providerModel, rigorOverrides: capacityForTier?.rigorOverrides });
+  const prompt = buildPrompt(work, opts.feedback, opts.stage);
   const { command, args, adapter, provider, baseCommit, headRef } = resolveExecutorCommand(cfg, {
     prompt,
     model,
@@ -1268,7 +1423,7 @@ export async function resolveCapacityCli(
   }
   const capacity = cfg.capacities?.[capacityId];
   const tier = tierOverride ?? capacity?.tier ?? DEFAULTS.tier;
-  const model = modelOverride ?? capacity?.model ?? modelForTier(cfg, tier);
+  const model = modelOverride ?? capacity?.model ?? modelForTier(cfg, tier, { providerModel: capacity?.providerModel, rigorOverrides: capacity?.rigorOverrides });
   const { command, args, provider } = resolveExecutorCommand(cfg, {
     prompt,
     model,
@@ -1283,6 +1438,104 @@ export async function resolveCapacityCli(
   // caller has no other way to learn which capacity actually got picked,
   // needed for its own dispatch-log line.
   return resolvedByPurpose ? { command, args, provider, model, capacityId } : { command, args, provider, model };
+}
+
+/**
+ * `execute <capacityId>` CLI subcommand (tsk-5tm-3 D5): the self-execute
+ * counterpart to `resolve` above, matching marketing-cockpit's `run_task()`
+ * contract (`task-executor.py:550-611`) — self-execute for every case that
+ * can be, hand back only for the one case that genuinely can't. `resolve`
+ * always hands back `{command,args}` for the caller to run itself via
+ * Bash, even for a `kind:"cli"` capacity that `EXECUTOR_ADAPTERS` could
+ * already run directly (`EXECUTOR_ADAPTERS['cli-spawn']` was validated at
+ * config-load time but, before this item, only ever CALLED by `spawnWorker`
+ * — Flow A never called it). `execute` closes that gap:
+ *
+ * - **`mechanism: "in-process"`** (native, same-family, live session) —
+ *   dispatch itself has no Task/Agent tool to call (a passive CLI/library),
+ *   so this is the one case that still hands back — a `spawn_instruction`-
+ *   shaped result, `{mechanism, agentType, prompt[, capacityId]}`, for the
+ *   caller to invoke its OWN Agent/Task tool with. Same `agentType`
+ *   resolution and `hasLiveTaskAccess` self-declaration contract `decide`
+ *   already uses (never probed or inferred here).
+ * - **every other case** (`mechanism: "out-of-process"`, i.e. whatever
+ *   `EXECUTOR_ADAPTERS[adapter]` resolves to for this capacity) — self-
+ *   executes: calls the adapter directly, the same call `spawnWorker`
+ *   already makes for a work item's own dispatch, and returns the REAL
+ *   result (`{status,signal,stdout,stderr,tier,model}` from `cliSpawnAdapter`
+ *   today, plus `provider`/`command`[, `capacityId`] additive, same
+ *   shape `spawnWorker`'s own result already carries) — never the bare
+ *   `{command,args}` `resolve` hands back for the caller to run through
+ *   Bash itself.
+ *
+ * `resolveExecutorCommand` already throws if the resolved `adapter` names
+ * an unregistered `EXECUTOR_ADAPTERS` key (config-load-time validation,
+ * `validateExecutorShape`) — by the time this function reaches the
+ * self-execute branch, `EXECUTOR_ADAPTERS[adapter]` is guaranteed to
+ * exist; the explicit check below is defensive, matching `spawnWorker`'s
+ * own belt-and-braces style rather than load-bearing.
+ */
+export async function executeCapacityCli(
+  capacityIdArg,
+  {
+    prompt = '',
+    cwd = process.cwd(),
+    repoRoot,
+    model: modelOverride,
+    tier: tierOverride,
+    for: purpose,
+    carries,
+    hasLiveTaskAccess = false,
+    timeoutMs: timeoutOverride,
+    maxBuffer: maxBufferOverride,
+    onChunk,
+  } = {},
+) {
+  if (!capacityIdArg && !purpose) {
+    throw new RunnerConfigError(
+      'usage: node src/runner/dispatch.mjs execute <capacityId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] [--has-live-task-access] | execute --for <purpose> [...]',
+    );
+  }
+  // Same main-checkout resolution as resolveCapacityCli above, same reason.
+  const root = repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
+  const fgosDir = fgosDirFromRoot(root);
+  const cfg = ensureRunnerConfigForDir(root);
+  const resolvedByPurpose = !capacityIdArg;
+  const capacityId = capacityIdArg || resolveCapacityIdForPurpose(cfg, purpose);
+  if (!capacityId) {
+    throw new RunnerConfigError(
+      `no capacity registered for purpose "${purpose}" — call "decide --for ${purpose}" first to check availability before executing.`,
+    );
+  }
+
+  const mechanism = decideCapacityDispatchMechanism(cfg, capacityId, { hasLiveTaskAccess });
+  if (mechanism === 'in-process') {
+    const agentType = cfg.capacities?.[capacityId]?.agentType;
+    const base = { mechanism, agentType, prompt };
+    return resolvedByPurpose ? { ...base, capacityId } : base;
+  }
+
+  const capacity = cfg.capacities?.[capacityId];
+  const tier = tierOverride ?? capacity?.tier ?? DEFAULTS.tier;
+  const model = modelOverride ?? capacity?.model ?? modelForTier(cfg, tier, { providerModel: capacity?.providerModel, rigorOverrides: capacity?.rigorOverrides });
+  const { command, args, adapter, provider } = resolveExecutorCommand(cfg, {
+    prompt,
+    model,
+    tier,
+    capacityId,
+    fgosDir,
+    contentCarries: carries,
+    attestRoot: cwd,
+  });
+  const adapterFn = EXECUTOR_ADAPTERS[adapter];
+  if (!adapterFn) {
+    throw new RunnerConfigError(`no executor adapter registered for "${adapter}".`);
+  }
+  const timeoutMs = timeoutOverride ?? cfg.timeoutMs;
+  const maxBuffer = maxBufferOverride ?? 10 * 1024 * 1024;
+  const result = await adapterFn(command, args, cwd, { timeoutMs, maxBuffer, onChunk, workId: capacityId, tier, model });
+  const base = { mechanism, ...result, provider, command };
+  return resolvedByPurpose ? { ...base, capacityId } : base;
 }
 
 /**
@@ -1309,34 +1562,79 @@ export async function resolveCapacityCli(
  * "cli"` capacity — `mechanism` for those always resolves
  * `"out-of-process"` anyway (rule 1/3), so no consumer ever needs
  * `agentType` in that case.
+ *
+ * `work` (tsk-5tm-6 D4/D12(iii)): a work-item id, resolved to its dispatch
+ * capacity via `capacityIdForWork` (the same executing-stage skill lookup
+ * `spawnWorker` already applies) before deciding its mechanism -- the
+ * lookup `fgos-fanout` needs to consult this protocol per-candidate before
+ * firing an Agent, instead of assuming native dispatch unconditionally.
+ * Lowest precedence of the three selectors (a real `capacityIdArg` always
+ * wins, `for` next, matching every pre-D4 caller's byte-identical
+ * behavior) since no existing caller ever passes more than one.
  */
-export async function decideCapacityCli(capacityIdArg, { cwd = process.cwd(), repoRoot, hasLiveTaskAccess = false, for: purpose } = {}) {
-  if (!capacityIdArg && !purpose) {
+export async function decideCapacityCli(
+  capacityIdArg,
+  { cwd = process.cwd(), repoRoot, hasLiveTaskAccess = false, for: purpose, work: workIdArg } = {},
+) {
+  if (!capacityIdArg && !purpose && !workIdArg) {
     throw new RunnerConfigError(
-      'usage: node src/runner/dispatch.mjs decide <capacityId> [--has-live-task-access] | decide --for <purpose> [--has-live-task-access]',
+      'usage: node src/runner/dispatch.mjs decide <capacityId> [--has-live-task-access] | decide --for <purpose> [--has-live-task-access] | decide --work <workId> [--has-live-task-access]',
     );
   }
   // Same main-checkout resolution as resolveCapacityCli above, same reason.
   const root = repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
   const cfg = ensureRunnerConfigForDir(root);
+  // Indirect binding (purpose OR work-item) each report capacityId back
+  // additively (see below) -- same byte-identical-shape reasoning as
+  // resolveCapacityCli above, generalized past purpose-only.
+  const resolvedIndirectly = !capacityIdArg;
+  let capacityId = capacityIdArg;
+  if (!capacityId && workIdArg) {
+    const fgosDir = fgosDirFromRoot(root);
+    const workItem = listWork(fgosDir).work[workIdArg];
+    if (!workItem) {
+      throw new RunnerConfigError(`no work item "${workIdArg}" found -- cannot resolve its dispatch capacity.`);
+    }
+    capacityId = capacityIdForWork(workItem);
+    // tsk-5tm-6 D4: a work-item-resolved capacityId with NO explicit
+    // cfg.capacities entry means "no override configured" -- per
+    // Native-First Dispatch Doctrine (docs/decisions/0026) rule 2, every
+    // fgos-fanout candidate is a same-provider (Claude), soul-needing
+    // target (a full rootTask run through /fgOS:pick) and therefore
+    // defaults to native, NOT to decideCapacityDispatchMechanism's generic
+    // "no registered capacity -> out-of-process" fallback below (correct
+    // only for a NAMED capacity helper that may genuinely have no native
+    // equivalent, e.g. agy -- confirmed live: `resolve fgos-coding-implement`
+    // silently falls back to the bare global executor, the exact "blind
+    // cli/spawn even though the caller is already a live same-provider
+    // soul" bug 0026 itself names as the motivating gap). Deliberately
+    // narrower than the name/purpose-resolved paths below -- both keep
+    // their pre-D4 "no capacity -> out-of-process" behavior byte-identical,
+    // since naming a specific capacityId/purpose asks about that
+    // registered target specifically, not a work item's default dispatch.
+    const hasExplicitCapacity = Boolean(cfg.capacities && typeof cfg.capacities === 'object' && cfg.capacities[capacityId]);
+    if (!hasExplicitCapacity) {
+      const mechanism = decideDispatchMechanism({ hasNativeMechanism: true, hasLiveTaskAccess, forceCliSpawn: false });
+      return { mechanism, capacityId };
+    }
+  }
   // Purpose-based binding, same precedence as resolveCapacityCli above. No
   // match is a legitimate "not configured yet" state for `decide`
   // specifically (unlike `resolve`, which has nothing left to do without a
-  // real capacityId) — `mechanism: "unavailable"` lets a caller like
+  // real capacityId) -- `mechanism: "unavailable"` lets a caller like
   // gather's own fan-out branch tell "fall back to native" apart from
   // "in-process"/"out-of-process" with one more enum value, never a thrown
   // error for an expected, common state.
-  const resolvedByPurpose = !capacityIdArg;
-  const capacityId = capacityIdArg || resolveCapacityIdForPurpose(cfg, purpose);
+  if (!capacityId && purpose) {
+    capacityId = resolveCapacityIdForPurpose(cfg, purpose);
+  }
   if (!capacityId) {
     return { mechanism: 'unavailable' };
   }
   const mechanism = decideCapacityDispatchMechanism(cfg, capacityId, { hasLiveTaskAccess });
   const agentType = cfg.capacities?.[capacityId]?.agentType;
   const base = typeof agentType === 'string' && agentType ? { mechanism, agentType } : { mechanism };
-  // capacityId additive ONLY on the purpose-resolved path — same
-  // byte-identical-shape reasoning as resolveCapacityCli above.
-  return resolvedByPurpose ? { ...base, capacityId } : base;
+  return resolvedIndirectly ? { ...base, capacityId } : base;
 }
 
 // CLI entry point — only runs when this file is executed directly (`node
@@ -1372,10 +1670,28 @@ if (import.meta.url === `file://${process.argv[1]}`) {
         process.exitCode = 1;
       },
     );
+  } else if (subcommand === 'execute') {
+    executeCapacityCli(capacityId, {
+      prompt: flagValue('--prompt') ?? '',
+      model: flagValue('--model'),
+      tier: flagValue('--tier'),
+      carries: flagValue('--carries'),
+      for: flagValue('--for'),
+      hasLiveTaskAccess: rest.includes('--has-live-task-access'),
+    }).then(
+      (executed) => {
+        process.stdout.write(`${JSON.stringify(executed)}\n`);
+      },
+      (err) => {
+        process.stderr.write(`${err.message}\n`);
+        process.exitCode = 1;
+      },
+    );
   } else if (subcommand === 'decide') {
     decideCapacityCli(capacityId, {
       hasLiveTaskAccess: rest.includes('--has-live-task-access'),
       for: flagValue('--for'),
+      work: flagValue('--work'),
     }).then(
       (decided) => {
         process.stdout.write(`${JSON.stringify(decided)}\n`);
@@ -1406,7 +1722,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     }
   } else {
     process.stderr.write(
-      `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs resolve <capacityId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] | resolve --for <purpose> [...] | decide <capacityId> [--has-live-task-access] | decide --for <purpose> [--has-live-task-access] | log <capacityId> --id <id> --provider <p> --command <c> [--model <m>]\n`,
+      `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs resolve <capacityId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] | resolve --for <purpose> [...] | execute <capacityId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] [--has-live-task-access] | execute --for <purpose> [...] | decide <capacityId> [--has-live-task-access] | decide --for <purpose> [--has-live-task-access] | log <capacityId> --id <id> --provider <p> --command <c> [--model <m>]\n`,
     );
     process.exitCode = 1;
   }
