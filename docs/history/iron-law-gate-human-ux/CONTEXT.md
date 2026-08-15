@@ -24,7 +24,17 @@ một câu hỏi treo có được phép nghẽn item khác không.
   riêng.
 - Thêm cạnh FSM `awaiting-approval → awaiting-human` (D5).
 
-## Quyết định đã khoá
+## Vì sao heading dưới đây giữ tiếng Anh
+
+`src/intake/plan.mjs:159` slice bảng quyết định bằng regex literal
+`/##\s*Locked decisions/i`. Dịch heading làm `lockedDecisionIds` rỗng, và
+ba guard tắt im lặng thay vì báo lỗi — kiểm citation D-ID của child
+(`:198`), `findUncoveredLockedDecisions` (`:344`), và trích footprint từ
+cùng slice. Ghi chú này cố ý nằm NGOÀI slice: mọi đường dẫn nêu bên trong
+slice đó bị `findUncoveredLockedDecisions` đọc thành "file một quyết định
+đòi hỏi", nên nhắc `plan.mjs` bên trong sẽ sinh advisory giả.
+
+## Locked decisions
 
 | D-ID | Quyết định |
 |------|-----------|
