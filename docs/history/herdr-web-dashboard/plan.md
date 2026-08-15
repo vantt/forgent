@@ -604,6 +604,165 @@ trung gian không tự đứng được (vd: có `build.rs` mà chưa có
 None — D14 đã trả lời câu hỏi phạm vi duy nhất còn treo (secret sống hay
 chết); phần còn lại là cách làm, có tiền lệ thật để port.
 
+## NẮN LẠI P3 `tsk-5jr` (2026-08-15) — taskboard, web client thật
+
+**Đọc trước:** mục "P3 — taskboard" ở trên (2026-08-12/13) đã tự ghi chú
+"NẮN LẠI" hai điểm (khung frontend chuyển sang `tsk-yo0`; nguồn dữ liệu
+đổi sang HTTP) nhưng **chưa bao giờ áp vào chính field `footprint`/
+`verify` của item** — cả hai vẫn giữ nguyên hình dạng cũ (`herdr-plugin/
+src/web/taskboard.rs`, một MODULE RUST bên trong binary TUI, verify
+`cargo test`). Mục này áp đúng ghi chú đã có, không mở lại quyết định
+nào: màn hình là component React thật dưới `herdr-plugin/web/src/`, gọi
+gateway qua HTTP, không có dòng Rust nào.
+
+### Mode: giữ `standard` (đếm lại xác nhận)
+
+Flag: **existing covered behavior** (mở rộng `herdr-plugin/web/` đã có 10
+test của `tsk-yo0`, phải không đụng vỡ), **weak proof** (đây là màn hình
+web ĐẦU TIÊN có state/interaction thật của cụm — chưa có tiền lệ trong
+repo để so). Không có hard-gate (không auth mới, không data model mới —
+chỉ đọc qua API đã có). 2 flag → **standard**, khớp tier hiện tại của
+item, không cần nâng lên `high-risk`.
+
+### Bootstrap — đọc trực tiếp `docs/ui-spec/screens/S02-taskboard.md` (172
+dòng) + `docs/ui-spec/30-states-and-errors.md`
+
+Trích nguyên văn các điểm chịu lực, không diễn giải lại:
+
+- **Layout** (S02 §Layout): board nhóm theo status, có thể collapse, nhớ
+  trạng thái collapse; rail "NEEDS ANSWER" ghim bên phải (desktop) /
+  thành nhóm đầu tiên (mobile) — độc lập với group-by đang chọn.
+- **3 quyết định layout chịu lực** (S02, ngay dưới ASCII mock): nhóm nhớ
+  trạng thái collapse; chỉ báo phơi nhiễm mạng đứng CỐ ĐỊNH ở topbar
+  (R5 — không phải toast biến mất); gateway picker cũng ở topbar (R1 —
+  không giả định một origin cố định).
+- **States** (S02 §States + `30-states-and-errors.md`): `ST-LOADING`
+  (skeleton TRONG group header thật, đếm hiện trước nội dung),
+  `ST-EMPTY-BOARD` (không có item nào — khác `ST-EMPTY-FILTER`, có item
+  nhưng filter không khớp gì, luôn hiện filter đang áp + nút xoá),
+  `ST-DISCONNECTED` (gateway unreachable — đánh dấu dữ liệu cũ là STALE
+  tại chỗ, không xoá, có nút retry).
+- **R11** (`herdr-web-dashboard.md`): không badge/chuông ngụ ý push — số
+  đếm trong group header chỉ đúng tại thời điểm người đang nhìn.
+- **11 interaction** (S02 §Interactions, `A-S02-001..011`): click card →
+  navigate S03 (item detail — `tsk-4id`, CHƯA xây); `+Add` → mở overlay
+  M03; click group header → toggle collapse + persist; filter/group-by →
+  mutate; rail entry click → navigate S04; gateway picker change →
+  switch+reload (**deferred D11** — xem Assumptions); `work.changed` /
+  `question.opened` / `gateway.unreachable` — client-derived events, D9
+  (poll `/state/digest`, không server-push).
+
+### Approach
+
+**Chọn:** một component React `Taskboard` dưới `herdr-plugin/web/src/
+screens/Taskboard.tsx`, dùng `createApiClient` (`tsk-yo0`) gọi
+`listWork({ all: true })` (mock hiện cả nhóm DONE — mặc định `listWork`
+chỉ trả open-only, đọc đúng contract `fgos-gateway-api-v1.yaml:123-126`:
+tham số `all` mới kéo cả done/wontfix/retrospective/cleanup) và
+`pollStateDigest` (`tsk-yo0/src/api/poll.ts`) trên một `setInterval` —
+digest đổi thì refetch `listWork`, giữ nguyên D9.
+
+**Grouping mặc định:** theo `status` THẬT (không tự chế rollup 4 nhóm
+như mock ASCII ngụ ý — mock là ví dụ minh hoạ, không phải taxonomy khoá;
+grouping theo status thật đơn giản hơn, không cần bịa một tầng rollup
+không có D-ID nào chống lưng). "NEEDS ANSWER" rail là tập CẮT NGANG độc
+lập — `status ∈ {awaiting-human, awaiting-approval}` — luôn hiện, không
+phụ thuộc group-by đang chọn, đúng cấu trúc hai region tách biệt của
+Layout.
+
+**Filter/search:** client-side trên tập đã fetch — contract không có
+free-text search REST endpoint nào (1 hit thật của chữ "search" trong
+toàn file là dòng mô tả D9's tương lai "MCP search tool", không phải một
+`/work/search` hay tham số query text nào trên `/work`/`/ready`; xác
+nhận bằng đọc trực tiếp `paths:` — không path nào tên search). Filter
+theo `stage`/`risk` (đã có trong `WorkItem`, `tsk-yo0/src/api/types.ts`).
+
+**Collapse state nhớ được:** `localStorage`, key theo tên group — nhẹ,
+không cần backend, đúng "remember their state" của spec, không yêu cầu
+persist phía server (spec không nói vậy).
+
+**Chỉ báo phơi nhiễm mạng (R5):** suy ra CLIENT-SIDE từ chính `baseUrl`
+đã cấu hình — hostname không phải `localhost`/`127.0.0.1`/`[::1]` thì hiện
+cảnh báo. Không có endpoint nào trong contract trả về bind address của
+gateway (0 hit thật khi quét toàn file cho chữ đó) nên đây là tín hiệu
+duy nhất client có thể tự quan sát —
+nếu trình duyệt gọi được `baseUrl` từ một host không phải loopback thì
+đúng nghĩa "reachable on network" mà R5 mô tả.
+
+**Gateway picker:** hiện TĨNH (hostname của `baseUrl` hiện tại), không
+tương tác — D11 khoá "v1 nói chuyện với đúng MỘT gateway", phần chọn
+giữa nhiều gateway deferred sang `tsk-3b0`. Dropdown thật sẽ là việc của
+`tsk-3b0`, không phải ở đây.
+
+**`+Add` (M03):** KHÔNG có item nào trong bảy item đang chạy của cụm này
+sở hữu M03's modal thật (`docs/ui-spec/modals/M03-add-edit-item.md`, 92
+dòng, chưa gán cho item nào trong `tsk-54y/tsk-yo0/tsk-48w/tsk-5jr/
+tsk-41h/tsk-4id/tsk-18to`). Nút `+Add` hiện thật, wire tới một overlay
+placeholder tối giản ("Add item — coming soon") thay vì hiện thực M03
+đầy đủ — giữ interaction A-S02-002 có thật (không phải nút chết) mà
+không tự ý mở rộng phạm vi sang một spec 92 dòng chưa ai nhận. Ghi lại
+làm phát hiện cho cụm, không phải quyết định âm thầm.
+
+**Navigate tới S03:** `tsk-4id` (P4, bước kế trong trình tự) CHƯA xây
+S03. `Taskboard` nhận prop `onSelectItem(id: string)`; component cha
+(`App.tsx`) giữ `selectedItemId` state cục bộ, hiện một placeholder
+("Task detail — tsk-4id sẽ xây") khi có id được chọn — không tự dựng một
+router library (`react-router` etc.) khi chưa có quyết định nào khoá nó;
+props/state cục bộ là "smaller path" đủ cho một điều hướng 1-cấp, đảo
+ngược dễ khi `tsk-4id` cần thật.
+
+**Phương án đã cân nhắc và loại:**
+- Rollup 4 nhóm cố định theo đúng mock ASCII — loại vì không D-ID/tài
+  liệu nào khoá đúng 4 nhóm đó là taxonomy chính thức; group theo status
+  thật vừa đơn giản hơn vừa không bịa quy tắc.
+- Xây router library cho navigate — loại, chưa cần thiết cho một điều
+  hướng 1-cấp, có thể đổi khi `tsk-4id` thật sự cần nhiều route.
+- Hiện thực M03 đầy đủ trong item này — loại, ngoài footprint đã khai
+  của item (`taskboard.rs`/`taskboard.ts` cũ, giờ nắn lại thành màn
+  taskboard, không phải modal add/edit), và 92 dòng spec riêng của M03
+  xứng đáng item riêng.
+
+**Files chạm (nắn lại, thay `footprint` cũ):**
+`herdr-plugin/web/src/screens/Taskboard.tsx`, `herdr-plugin/web/src/
+screens/Taskboard.test.tsx`, có thể thêm `herdr-plugin/web/src/App.tsx`
+(wire `selectedItemId`). KHÔNG `herdr-plugin/src/web/taskboard.rs` (Rust
+— chết theo nắn lại), KHÔNG `herdr-plugin/web/package.json`/
+`vite.config.ts` (đã dựng ở `tsk-yo0`, D6).
+
+### Bản đồ rủi ro
+
+| Thành phần | Mức | Chứng minh gì |
+|---|---|---|
+| Grouping theo status thật + rail "needs answer" cắt ngang đúng | Trung bình — logic mới, dễ lẫn awaiting-human/awaiting-approval vào nhóm chính thay vì CHỈ ở rail | Test thật: item `status: awaiting-human` xuất hiện ở rail, KHÔNG xuất hiện lặp ở group chính (rail là view riêng, không phải filter loại khỏi group — kiểm cả hai vị trí) |
+| Poll digest → refetch đúng, không refetch thừa khi digest không đổi | Trung bình | Test thật: `pollStateDigest` trả `changed:false` → không gọi lại `listWork`; `changed:true` → gọi lại đúng 1 lần |
+| `ST-DISCONNECTED` giữ dữ liệu cũ, không xoá | Trung bình — đúng yêu cầu khoá của area spec Edge Cases, đã kiểm chứng ở `tsk-yo0` cho tầng API, giờ kiểm ở tầng UI | Test thật: fetch đầu thành công có data; fetch thứ hai ném `GatewayUnreachableError` (đã có ở `tsk-yo0/src/api/errors.ts`) → board vẫn hiện data cũ, có đánh dấu stale + nút retry, không blank |
+| Chỉ báo phơi nhiễm mạng suy từ `baseUrl` | Thấp | Test thật: `baseUrl: 'http://localhost:4170/v1'` → không cảnh báo; `baseUrl: 'http://192.168.1.5:4170/v1'` → có cảnh báo |
+
+### Verify mới (thay verify chết)
+
+```
+cd herdr-plugin/web && npm run test -- Taskboard
+```
+
+Không còn nhánh Rust nào — item này không chạm `herdr-plugin/src/*.rs`.
+`npm run test -- Taskboard` filter đúng theo tên file (vitest, không
+dính lỗi F1/F2/F3 của cargo — vitest exit non-zero khi 0 test file khớp
+pattern, khác cargo test's "0 matched vẫn exit 0"; đo thật tại Execute
+trước khi khoá verify cuối).
+
+### Decide the split
+
+Một mảnh — không tách. Board/rail/filter/poll/disconnected đều phục vụ
+đúng MỘT màn hình quan sát được (S02); tách nhỏ hơn (vd rail riêng khỏi
+board) sẽ tạo trạng thái không tự đứng được (rail không có board thì
+không chứng minh được gì có ý nghĩa).
+
+### Outstanding questions
+
+None — mọi khoảng mở (rollup taxonomy, router, M03) đã được quyết bằng
+smaller-path/reversible (D5), ghi rõ lý do, không phải câu hỏi cần
+người.
+
 ## Kế hoạch riêng của P0a `tsk-54j` (2026-08-14) — area spec
 
 Con này (`docs`, `parent: tsk-ldb`, `deps: [tsk-7l9]`) được tạo sau 5 mảnh
