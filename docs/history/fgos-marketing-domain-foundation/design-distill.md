@@ -181,8 +181,20 @@ checkpoint machinery (có free từ event log + worktree commit); adapter
 
 ## VII. Trạng thái máy tại thời điểm distill
 
-- Item `tsk-2t9c` — stage `planning`, branch `fgw/tsk-2t9c`, dừng trước
-  validating theo lệnh người dùng. Chưa item con, chưa dòng code.
+- **Validating đã chạy xong** (2026-08-15): reality gate 6/6 PASS,
+  feasibility matrix có bằng chứng thật từng dòng, verdict **READY WITH
+  CONSTRAINTS**; gate `validateApprove` hỏi người (`canAutoApprove:
+  false` — hard-gate keyword `schema`/`migration`, true positive), người
+  dùng chọn mechanism-first → **D7a** (seq 18248). `fgos plan --verdict
+  decompose` đã materialize **3 item con** ở stage `executing`:
+  `tsk-2t9c-1` (role axis, heavy), `tsk-2t9c-2` (workflow hierarchy,
+  heavy, `deps: [tsk-2t9c-1]`), `tsk-2t9c-3` (task-spec + doctor check,
+  standard). Parent về `todo`/`executing` (claim tự nhả, claim-lock §3b).
+  **Chưa dòng code nào** — dừng trước implement theo lệnh người dùng.
+- Engine đã chặn verdict lần đầu vì footprint trùng giữa ①② chỉ được khai
+  bằng văn xuôi; sửa bằng `deps: [0]` (phương án `sequence` engine tự gợi
+  ý) rồi mới qua — ghi lại trong plan.md thay vì lách.
+- Item `tsk-2t9c` — verify đã đổi từ placeholder giả sang `npm test`.
 - 13 D-ID khớp ở 3 nơi: event log (seq 18029, 18030, 18031, 18032,
   18058, 18059, 18060, 18070, 18110, 18189, 18229, 18232, 18242), bảng §4
   `DISCUSSION.md`, bảng Locked decisions `CONTEXT.md`.
@@ -199,7 +211,9 @@ checkpoint machinery (có free từ event log + worktree commit); adapter
 
 ## VIII. Bước kế tiếp
 
-`fgos-coding-validating` → single gate → materialize 3 children ở stage
-`executing` → implement mảnh ① rồi ② (③ song song) → children merge về
-parent → parent merge main → submit các item marketing trên harness đã
+Implement `tsk-2t9c-1` (và `tsk-2t9c-3` song song được — không trùng
+footprint, không deps), rồi `tsk-2t9c-2` sau khi ① land. Mỗi con:
+`fgos pick` → implement → `npm test` → `fgos return` → approve → merge về
+branch parent; chỉ parent merge main. Sau đó submit các item marketing +
+item tạo hình `bugfix`/`lightweight` (hoãn theo D7a) trên harness đã
 chứng minh.

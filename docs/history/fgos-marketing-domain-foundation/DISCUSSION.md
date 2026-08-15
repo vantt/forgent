@@ -2,6 +2,17 @@
 
 ## 1. Trạng thái hiện tại
 
+**Cập nhật vòng 25 — VALIDATING XONG, 3 ITEM CON ĐÃ TẠO.** Nền chốt:
+**D1–D13 + D7a** (§4). `fgos-coding-validating` chạy thật → READY WITH
+CONSTRAINTS; gate hỏi, người dùng chọn mechanism-first (D7a, seq 18248);
+`fgos plan --verdict decompose` tạo `tsk-2t9c-1` (role axis, heavy),
+`tsk-2t9c-2` (workflow hierarchy, heavy, deps ①), `tsk-2t9c-3`
+(task-spec + 2 doctor check, standard) — tất cả ở stage `executing`,
+verify `npm test`. Parent về `todo`, claim đã nhả. **Chưa implement gì**
+— dừng theo lệnh người dùng. Engine từng chặn verdict lần đầu vì
+footprint ①↔② chỉ khai bằng văn xuôi; đã sửa bằng `deps: [0]`
+(phương án `sequence`).
+
 Vòng 20: nền chốt là **D1–D12** (§4) — thiết kế coding-harness ĐÓNG.
 Sau hội tụ vòng 8 (exploring + planning đã chạy: CONTEXT.md + plan.md
 high-risk 3 mảnh, đều commit; người dùng ra lệnh dừng trước implement),
