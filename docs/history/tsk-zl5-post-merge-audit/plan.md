@@ -67,6 +67,41 @@ fixed by data dependency, not judgment:
 | Rescoped verify clause 4 (`main...HEAD` → `fgw/tsk-1y6...HEAD`) | Medium — if this rescoping quietly weakens what the verify actually proves, the item's own DoD claim is hollow | Re-derive both diff expressions' real semantics on a shared branch, confirm the narrower form still proves the same thing the wider one would have |
 | False-positive Iron Law trip on "schema" | Light — already human-acknowledged before merge, so the risk here is only "was the acknowledgment reasoning sound", not an unmerged gate hold | Read the actual cited description text and confirm "schema" only appears inside the example filename, never as a real schema-touching claim |
 
+## Feasibility matrix (fgos-coding-validating pass)
+
+**Reality gate** — mode fit PASS (high-risk lane matches the audit/security
+hard-gate flag this item genuinely carries); repo fit PASS (RESEARCH.md
+round 1: all 22 named files exist) **with one real caveat** (see row 1
+below — the code moved since the task text was written); assumptions PASS
+(every plan assumption below is either proven or flagged); smaller path
+PASS (no honestly smaller shape than one sequential review pass exists);
+proof surface PASS (item's own `verify` is a real runnable command, no
+split children to check); impact-analysis posture PASS
+(`.gitnexus/meta.json`'s `lastCommit` is `7bb3231`, current HEAD is
+`36e0602f` — confirmed stale, matches the `degraded` posture plan.md
+already recorded).
+
+| Assumption | Risk | Proof required | Evidence found | Result |
+|---|---|---|---|---|
+| The task's cited file:line anchors (`bin/fgos.mjs` ~2487/3494/4100) still hold | Medium | Read `bin/fgos.mjs` for `classifyIronLaw`/`wouldTripIronLaw` | **They don't.** `grep -rn classifyIronLaw` outside test files hits only `src/evolve/iron-law.mjs` (definition) and `src/runner/iron-law-gate.mjs` (one call site). `bin/fgos.mjs` has zero hits. A later item (`src/runner/iron-law-gate.mjs`'s own header comment cites `tsk-49i D1`) extracted the three call sites into `src/verbs/merge/{approve,sync-root,merge}.mjs` + a shared `src/runner/iron-law-gate.mjs`/`src/verbs/merge/iron-law-level.mjs` pair, post-dating tsk-1y6's merge | Plan updated (see Approach step 3 caveat below) — findable by symbol name, not by the task's line numbers |
+| A1b: the trunk-boundary discriminator stays two separate expressions per call site, not merged into a shared helper | Medium | Read the real call sites | `approve.mjs:282` passes `{ view }` (→ `resolveRoot(view, item.id) === item.id` inside the shared `ironLawDiffOpts`); `sync-root.mjs:65` passes `{ trunk: item.parent ? targetBranch : null }` (the literal `!item.parent` ternary, at the call site itself). The two discriminator EXPRESSIONS are still separate and call-site-local; what got shared post-tsk-1y6 (`tsk-49i D1`) is only the git-mechanics preamble (diff resolution, branch-exists check) the original CONTEXT.md never asked to keep triplicated | Confirmed checkable — real nuanced verdict, full writeup belongs in REVIEW.md |
+| D7: missing config key / unrecognized level fails closed to `ask` | Medium | Read the level resolver | `src/verbs/merge/iron-law-level.mjs:19-22`: `IRON_LAW_LEVELS.includes(level) ? level : DEFAULT_IRON_LAW_LEVEL`; `registrations.mjs:1096-1097`: `IRON_LAW_LEVELS = ['ask','warn']`, `DEFAULT_IRON_LAW_LEVEL = 'ask'` | Confirmed PASS with real evidence already in hand |
+| D8: `warn`-level skip record uses `addDecision` with `kind:'engine'` directly, never shells to `fgos decision` | Medium | Read the record-writer | `iron-law-level.mjs:34-41` (`recordIronLawSkip`): calls `addDecision(dir, {..., kind: 'engine'})` in-process; its own comment cites the exact reason the task's D8 check names (`fgos decision` has no `--kind` flag, would default to `kind:'design'`) | Confirmed PASS with real evidence already in hand |
+| tsk-3xog's heading-drift guard has no false-negative gap for an unseen heading shape | Medium | Read `scripts/check-locked-decisions-heading-drift.mjs`'s heuristic | Not yet read in this pass — file confirmed to exist (RESEARCH.md round 1); reading its actual regex/heuristic is execution-stage work | Checkable, deferred to execution (no blocker — the file exists and is readable) |
+| `tsk-1y6-4`'s verify clause 4 rescoping (`main...HEAD` → `fgw/tsk-1y6...HEAD`) is sound, not a loophole | Medium | Read the item's real verify field / event history | Not yet read in this pass — `tsk-1y6-4` may no longer exist as a live item (its children materialize then finish); real check is `fgos show tsk-1y6-4` or the event log, execution-stage work | Checkable, deferred to execution (no blocker) |
+| tsk-3xog's "schema" Iron Law trip was a real false positive | Light | Read the item's actual description text | Not yet read in this pass — item description already partly seen via `fgos show tsk-3xog` (RESEARCH.md round 1 quoted it in full); the "schema" substring itself needs a direct grep against that same text, execution-stage work | Checkable, deferred to execution (no blocker) |
+
+**Decision: READY WITH CONSTRAINTS.** The plan is provably buildable — every
+row above is checkable with real evidence, three rows are already fully
+resolved with real citations, and the remaining three have a confirmed
+real file to read with no access blocker. The one constraint: execution
+must re-locate the Iron Law gate code by symbol name
+(`classifyIronLaw`/`ironLawForItem`/`ironLawDiffOpts`/`readIronLawLevel`/
+`recordIronLawSkip`), not by the task's own `bin/fgos.mjs` line-number
+anchors, which are stale post-refactor. This does not change the item's
+scope or acceptance criteria — the locked decisions (D1-D9) being verified
+are unchanged; only their file location moved.
+
 ## Outstanding questions
 
 None
