@@ -124,7 +124,7 @@ An error from this call (a thrown `RunnerConfigError`, a spawn failure, a
 timeout) means fall straight to Step C — treat it exactly like a malformed
 response, never retry blind.
 
-## Ad-hoc capacity: a runtime-composed packet instead of `<PROMPT_TEMPLATE>`
+## Ad-hoc capacity: a runtime-composed task instead of `<PROMPT_TEMPLATE>`
 
 `docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: a capacity
 whose consuming skill has no single fixed question to ask — the parent
@@ -137,13 +137,13 @@ into Step B's own `--prompt` flag.
 What is lost by dropping the fixed template is a real guarantee — "the
 exact same question every call" — so the replacement has to be an honest
 one, not free text: **the same KIND of question every call**, via six
-required fields. Missing any one of them means the packet is malformed —
+required fields. Missing any one of them means the task is malformed —
 fall through to `<INLINE_FALLBACK_HEADING>` exactly as Step C already does
-for any other malformed response, never dispatch a partial packet:
+for any other malformed response, never dispatch a partial task:
 
 | Field | Shape | Why required |
 |---|---|---|
-| `id` | `<scope>#p<n>` | Reference id (see below) so a parent can match a returned digest back to the packet that asked for it when several are in flight at once — never a lifecycle id: no claim, no reserve, no cap, no merge (D4 stays exactly as gated as it always was). The `#` makes this id permanently invalid against `work.mjs`'s `ID_PATTERN` (`src/state/work.mjs:24`) — structurally, not by convention, so a packet id can never be mistaken for a real work item. |
+| `id` | `<scope>#p<n>` (D8: the `p` stays literal — renaming the concept never changes this shape) | Reference id (see below) so a parent can match a returned digest back to the task that asked for it when several are in flight at once — never a lifecycle id: no claim, no reserve, no cap, no merge (D4 stays exactly as gated as it always was). The `#` makes this id permanently invalid against `work.mjs`'s `ID_PATTERN` (`src/state/work.mjs:24`) — structurally, not by convention, so a task id can never be mistaken for a real work item. |
 | goal | one sentence | The one thing a worker cannot infer from the files it's handed |
 | inputs | concrete paths to read | "read exactly these; nothing else will be provided" — never "look around the repo" |
 | boundary | what must not be touched/written | Equivalent to symphony's `forbidden_paths` |
@@ -169,24 +169,24 @@ even a stable identity across process restarts. Record which tier
 produced it as `scopeSource`, the same `{id, source}` shape a work item's
 own `writer` field already carries — a pid-sourced scope is not stable
 across processes the way a registry-sourced one is, and a reader of the
-packet needs to know which kind it is looking at.
+task needs to know which kind it is looking at.
 
 `<n>` inside `id`: a counter kept in the composing session's own memory,
-restarting at 1 on every fresh session — harmless, since the packet itself
+restarting at 1 on every fresh session — harmless, since the task itself
 is ephemeral and was never meant to survive a restart. **Never back this
 counter with a file.** A counter file is state, and state is exactly the
 back door D4's "no lifecycle id for this shape" decision was drawn to
 close.
 
-Once the six-field packet is built (or the fallback triggered on a missing
-field), continue at Step B above, substituting the packet for
+Once the six-field task is built (or the fallback triggered on a missing
+field), continue at Step B above, substituting the task for
 `<PROMPT_TEMPLATE>` in the `--prompt` flag — every later step is
-unchanged. When the packet's own optional `tier`/`model` fields were
+unchanged. When the task's own optional `tier`/`model` fields were
 filled in, pass them through as `--tier <tier>`/`--model <model>` on that
 same `execute` call (`tsk-2k1`, D10) — either flag, when given, wins over
 the capacity's own declared tier/model and the computed default; omitted
 (every registered-`<CAPACITY_ID>` call that names neither) resolves
-exactly as before this plumbing existed. Which tier/model a packet SHOULD
+exactly as before this plumbing existed. Which tier/model a task SHOULD
 choose is not decided here — `#task-tier-judged-at-dispatch` — this is
 only the pass-through.
 
@@ -222,9 +222,9 @@ the exact same "soul re-deriving what a live soul already knows" waste
 spawn.md`'s own "Lớp còn thiếu" section already names for
 `judgeDiscovery`/`judgeDecompose` — spawning one here would repeat that
 mistake one layer further down the stack. The evidence to reason FROM,
-when dispatching an ad-hoc packet (see the section above), is the
-packet's own six required fields — reuse bee's three-tier rubric
-(light/standard/heavy) against the packet's `goal`/`expected shape`/
+when dispatching an ad-hoc task (see the section above), is the
+task's own six required fields — reuse bee's three-tier rubric
+(light/standard/heavy) against the task's `goal`/`expected shape`/
 `return contract`, the same rubric a work item's own `tier` is judged
 against at intake, just applied per-dispatch instead of once.
 
@@ -236,7 +236,7 @@ non-Claude command still has to clear the same `allowCrossProvider` gate
 `resolveExecutorConfig` already enforces
 (`src/runner/dispatch.mjs:703-707`) — nothing here bypasses it.
 
-Fail-safe is the INVERSE of the six-field packet's own (there, a missing
+Fail-safe is the INVERSE of the six-field task's own (there, a missing
 required field means "do not dispatch, fall back to
 `<INLINE_FALLBACK_HEADING>` — Step C above): here, failing to reach a
 confident tier/provider judgment means dispatch ANYWAY, with the
@@ -255,12 +255,12 @@ import { appendWorkerLog } from '$root/src/runner/worker-log.mjs';
 appendWorkerLog('$root', '<scope>', {
   tier: '<judged-or-default-tier>',
   model: '<judged-or-default-model>',
-  message: 'ad-hoc dispatch <packet id>: <goal>',
+  message: 'ad-hoc dispatch <task id>: <goal>',
 });
 "
 ```
 
-`<scope>` is the packet id's own `<scope>` segment (the part before the
+`<scope>` is the task id's own `<scope>` segment (the part before the
 `#` in `<scope>#p<n>`) — in the common case, the work item currently
 claimed, so this entry lands in `.fgos/logs/<scope>.log`, the exact same
 file that item's own regular dispatch entries already write to. That is
