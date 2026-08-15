@@ -763,6 +763,127 @@ None — mọi khoảng mở (rollup taxonomy, router, M03) đã được quyế
 smaller-path/reversible (D5), ghi rõ lý do, không phải câu hỏi cần
 người.
 
+## NẮN LẠI P4 `tsk-4id` (2026-08-15) — task detail, mục tiêu chính của cụm
+
+**Đọc trước:** cùng loại lệch với P3 ở trên — `footprint`/`verify` cũ vẫn
+là mảnh Rust bên trong TUI (`herdr-plugin/src/web/detail.rs`,
+`herdr-plugin/web/src/detail.ts`), trong khi mô tả item đã tự ghi rõ nắn
+lại từ D10 (web client độc lập gọi HTTP). Mục này áp đúng ghi chú đã có.
+
+### Mode: giữ `heavy` (tier hiện tại) — không đếm lại thành lane riêng
+
+Item đã ở tier `heavy`/risk `heavy` sẵn ("mục tiêu chính của cụm"); không
+cần đếm lại flag vì đây là con lớn nhất trong 7 item, đúng bản chất công
+việc (3 khối nội dung + ghép seq + guard traversal + 2 hành động ghi thật
+lên trunk-adjacent state).
+
+### Approach — 3 phát hiện thật làm lệch phạm vi gốc, mỗi cái xử lý riêng
+
+**Phát hiện 1 — `GET /work/{id}`'s schema tài liệu SAI so với thật.**
+Contract cũ khai `data: {$ref: WorkItem}`; hành vi thật (`get_work_by_id`
+gọi `show`, không phải chỉ đọc field) trả về `{work, discovery, decisions,
+gates, outcome, friction, settlement, learning}` — chính mô tả operation
+đã nói đúng ("plus every log scoped to just this id") nhưng schema tham
+chiếu sai. Sửa: thêm schema `WorkDetail` khớp thật, đổi tham chiếu của
+`/work/{id}` GET. Bằng chứng: `fgos show tsk-48i` chạy thật, xác nhận
+đúng 8 key top-level, `gates` có `{contextApprove, ask, askHistory,
+statusAtAsk, answer, planApprove, validateApprove}` (không phải chỉ gate
+records), `settlement.recent` cap **5** bản ghi mới nhất
+(`SETTLEMENT_DISPLAY_CAP`) dù `count` phản ánh tổng thật (24 cho
+tsk-48i).
+
+**Phát hiện 2 — D3 (đọc CONTEXT.md/plan.md) không có đường nào cho web
+client.** Không route gateway nào đọc nội dung file docs — `docsRef` chỉ
+là path string. Thêm `GET /work/{id}/docs` (mới, ngoài 4 file footprint
+gốc của item) — guard traversal bằng canonicalize sau khi join (không
+string-match giá trị thô), test thật với file `secret.txt` ngoài
+`docs/history/` để chứng minh guard chặn được, không chỉ chặn theo tên.
+Đây chính là proof point R6 mà verify CŨ của item đã dự trù
+(`rejects_docs_ref_path_traversal`) nhưng route đó chưa từng tồn tại
+trước item này.
+
+**Phát hiện 3 — D4 (gate-approve channel) không có state bền vững.** Sống
+qua chính việc tự chạy cả cụm 7-item trong phiên này: câu hỏi gate luôn
+hỏi/trả lời đồng bộ trong phiên sống, chưa từng thấy ghi thành trạng thái
+"đang treo" nào remote xem được. Hỏi người, chốt D15
+(`docs/history/herdr-web-dashboard/CONTEXT.md`): S03/S04 chỉ hiện lịch sử
+gate ĐÃ hoàn tất (`{actor, at, verify}`), không giả lập câu hỏi đang treo.
+Kênh `ask` (status `awaiting-human`) vẫn đầy đủ.
+
+### Thiết kế 3 khối nội dung (giữ nguyên quyết định gốc D2/D3/D4 của cụm)
+
+- **"What the agent did"** (D3): đọc từ `GET /work/{id}/docs`'s
+  `contextMd`/`planMd`, KHÔNG từ `decisions[]` — `decisions[]` chỉ hiện
+  sau disclosure kèm count, đúng D3 gốc.
+- **Lịch sử câu hỏi ghép theo seq** (D2, R9): `pairTimeline()` — ghép vị
+  trí, KHÔNG BAO GIỜ vẽ link dữ liệu không có. Tham số thứ ba
+  `isCurrentlyParked` phân biệt hai lý do khác nhau một câu hỏi cuối
+  không có trả lời: (a) vòng đang mở thật (chỉ có thể là câu hỏi CUỐI,
+  FSM chỉ cho một ask mở tại một thời điểm) — loại khỏi ghép, gán
+  `answer: null` trực tiếp; (b) trả lời có tồn tại nhưng ngoài cửa sổ cap-5
+  — ghép từ cuối lùi lại, phần thiếu do cap cũng `answer: null` nhưng vì
+  lý do khác. **Bug thật bắt được bởi chính test lúc viết**: bản đầu
+  không phân biệt hai lý do này, ghép sai câu hỏi đang mở với câu trả lời
+  của vòng TRƯỚC — sửa trước khi commit (xem Iron Law evidence).
+- **Câu hỏi cần trả lời phủ ask + gate-approve** (D4, nắn theo D15 mới):
+  ask đầy đủ (S03 hiện input trả lời thật gọi `answerWork`; S04 liệt kê
+  toàn bộ, gọi `listWork({status:'awaiting-human'})`); gate-approve chỉ
+  lịch sử đã xong.
+
+### Hành động ghi thật, không phải stub
+
+- **Answer this** (S03 + S04) — gọi thật `client.answerWork(id, text)`
+  (đã có từ `tsk-yo0`).
+- **Retire** — gọi thật `client.moveWork(id, 'wontfix')`.
+- **Approve merge** (R7) — gọi thật `client.approveWork(id)`. Không có
+  endpoint nào báo trước "gateway có đang ở main working tree không", nên
+  nút vẫn được hiện (disabled trừ khi `status === 'awaiting-approval'`) và
+  khi bấm, lỗi thật từ engine (`GatewayApiError.message`) hiện nguyên văn
+  — không dự đoán trước, không nuốt lỗi (R7: "report unavailable with the
+  reason", không phải "offered then failed" câm).
+- **Edit** (M03) — placeholder, cùng lý do M03 chưa ai nhận như `tsk-5jr`
+  đã ghi; `tsk-41h`'s `PATCH /work/{id}` tồn tại SẴN SÀNG cho M03 dùng khi
+  nó được xây, không phải việc của item này.
+
+### Điều hướng — sửa một chỗ ở `tsk-5jr`'s Taskboard
+
+A-S02-006 (S02 spec): click rail "needs answer" → navigate **S04**, không
+phải S03 trực tiếp. `Taskboard.tsx` (tsk-5jr) trước đây nối thẳng rail
+click vào `onSelectItem` (S03) vì S04 chưa tồn tại lúc đó — sửa: thêm prop
+optional `onOpenNeedsAnswer`, fallback về hành vi cũ khi không truyền (zero
+blast radius lên 12 test hiện có của `Taskboard.test.tsx`, không cái nào
+truyền prop mới nên tất cả giữ hành vi cũ nguyên xi).
+
+### Bản đồ rủi ro
+
+| Thành phần | Mức | Chứng minh gì |
+|---|---|---|
+| `pairTimeline` ghép đúng vị trí, không vẽ link giả | Trung bình — bug thật đã bắt được ở chính pass này | 5 test thật, gồm case "vòng đang mở" và case "cap-5 cắt vòng cũ", cả hai phân biệt đúng bằng `isCurrentlyParked` |
+| Guard traversal của `GET /work/{id}/docs` chặn được thật, không chỉ theo tên | Trung bình — hard-gate audit/security | Test thật: file `secret.txt` có tồn tại thật ngoài `docs/history/`, route từ chối phục vụ (400), không chỉ so chuỗi `docsRef` |
+| `WorkDetail` schema mới khớp đúng response thật | Thấp — đã chạy `fgos show` thật, không suy đoán | Trích dẫn trực tiếp output thật trong RESEARCH.md-tương-đương (mục Approach ở trên) |
+| Approve merge không nuốt lỗi thật của engine | Thấp | Test thật: lỗi 412 giả lập trả `message` nguyên văn, hiện đúng trong `approve-error` |
+
+### Verify mới (thay verify chết)
+
+```
+cd herdr-plugin && cargo test --lib gateway && cd web && npm ci && npm run test
+```
+
+Phủ cả hai phía: Rust (`get_work_docs`, guard traversal, `patch_work` từ
+`tsk-41h`) và React (`pairTimeline`, 3 screens, poll, hành động ghi).
+
+### Decide the split
+
+Một mảnh — không tách. 3 khối nội dung + 2 route gateway mới + 3 màn hình
++ điều hướng đều phục vụ đúng MỘT mục tiêu quan sát được ("mở task detail
+của một item và biết chính xác chuyện gì đang diễn ra, cần làm gì").
+
+### Outstanding questions
+
+None — D15 đã trả lời câu hỏi phạm vi gate-approve; phần còn lại là cách
+làm, có bằng chứng thật (live `fgos show`, live traversal test) cho từng
+quyết định.
+
 ## Kế hoạch riêng của P0a `tsk-54j` (2026-08-14) — area spec
 
 Con này (`docs`, `parent: tsk-ldb`, `deps: [tsk-7l9]`) được tạo sau 5 mảnh

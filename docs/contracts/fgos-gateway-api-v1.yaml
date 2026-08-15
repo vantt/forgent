@@ -198,7 +198,15 @@ paths:
                   - $ref: '#/components/schemas/Envelope'
                   - type: object
                     properties:
-                      data: { $ref: '#/components/schemas/WorkItem' }
+                      # tsk-4id: corrected from `WorkItem` -- this endpoint's
+                      # own description already said "plus every log scoped
+                      # to just this id", but the schema reference never
+                      # matched it. Confirmed via a real `fgos show` run
+                      # (docs/history/tsk-4id-task-detail-screen/RESEARCH.md):
+                      # `data` is `{work, discovery, decisions, gates,
+                      # outcome, friction, settlement, learning}`, never a
+                      # bare `WorkItem`.
+                      data: { $ref: '#/components/schemas/WorkDetail' }
         default:
           $ref: '#/components/responses/Error'
     patch:
@@ -227,6 +235,45 @@ paths:
             schema: { $ref: '#/components/schemas/EditableWorkFields' }
       responses:
         '200': { $ref: '#/components/responses/WorkOk' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /work/{id}/docs:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    get:
+      operationId: getWorkDocs
+      tags: [work]
+      summary: An item's docsRef narrative -- CONTEXT.md/plan.md raw content (tsk-4id)
+      description: |
+        The task-detail screen's own primary content source for "what the
+        agent did" (D3 of docs/history/herdr-web-dashboard/CONTEXT.md:
+        CONTEXT.md/plan.md is the human narrative, the primary account --
+        `decisions[]` on `GET /work/{id}` is expandable detail only, never
+        the default). Did not exist before this item: a browser client
+        has no filesystem access, and no other route reads an arbitrary
+        repo file. `docsRef` is canonicalized and checked to resolve
+        inside `docs/history/` before any read -- a value that escapes it
+        is refused (`category: validation`), never followed.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          docsRef: { type: string, nullable: true }
+                          contextMd: { type: string, nullable: true, description: "Raw CONTEXT.md content, or null if absent/unreadable." }
+                          planMd: { type: string, nullable: true, description: "Raw plan.md content, or null if absent/unreadable." }
+                          narrativeMissing:
+                            type: boolean
+                            description: "Present and true only when docsRef names a directory that does not exist on this machine (area spec Edge Cases: shown without its narrative, never a failure)."
         default:
           $ref: '#/components/responses/Error'
 
@@ -678,6 +725,59 @@ components:
         deps: { type: array, items: { type: string } }
         footprint: { type: array, items: { type: string } }
         verify: { type: string }
+        docsRef: { type: string, nullable: true, description: "Path under docs/history/ -- content readable via GET /work/{id}/docs (tsk-4id)." }
+
+    WorkDetail:
+      type: object
+      description: |
+        `GET /work/{id}`'s real `data` shape (tsk-4id, corrected from a
+        stale `WorkItem`-only reference -- this endpoint's own summary
+        already said "plus every log scoped to just this id"). Every
+        sub-shape below is `type: object` with `additionalProperties: true`
+        rather than fully enumerated: these are the raw work-state logs
+        (`docs/specs/work-state.md` is their authoritative shape per
+        0011's own rule against re-deriving a schema this contract does
+        not own), and the task-detail screen (tsk-4id) reads only a named
+        few real keys from each (documented per-property below) rather
+        than this contract asserting an exhaustive shape it would then
+        have to keep in lockstep with every future log field.
+      required: [work]
+      properties:
+        work: { $ref: '#/components/schemas/WorkItem' }
+        discovery: { type: array, items: { type: object }, description: Verdict history for this item's discovery stage. }
+        decisions:
+          type: array
+          description: The machine decision log -- NOT the primary "what the agent did" account (that is GET /work/{id}/docs's CONTEXT.md/plan.md); shown collapsed behind a disclosure, per its own count.
+          items: { type: object }
+        gates:
+          type: object
+          description: |
+            Keyed by gate name (`contextApprove`/`planApprove`/
+            `validateApprove`, each `{actor, at, verify}` when present)
+            PLUS the ask/answer-parking fields on the SAME object:
+            `ask` (string, most recent question), `askHistory` (string
+            array, oldest-first, every question this item was ever
+            parked with), `answer` (string, most recent answer),
+            `statusAtAsk` (string, the status the item was in when most
+            recently parked).
+          additionalProperties: true
+        outcome: { type: object }
+        friction: { type: object }
+        settlement:
+          type: object
+          description: |
+            `count` (integer, the TRUE total) and `recent` (array, capped
+            at 5 most-recent-first entries across every settlement kind --
+            `SETTLEMENT_DISPLAY_CAP`. Each entry: `{kind, role, ts,
+            detail, id}`; `kind: "answer"` entries are what pairs
+            positionally with `gates.askHistory`, oldest-available-first
+            after reversing `recent`'s own newest-first order). A round
+            older than the 5-answer window has no entry here at all --
+            this is a real, load-bearing cap, not a client-side choice.
+          properties:
+            count: { type: integer }
+            recent: { type: array, items: { type: object } }
+        learning: { type: object, nullable: true }
 
     EditableWorkFields:
       type: object

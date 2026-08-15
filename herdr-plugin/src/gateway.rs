@@ -745,6 +745,90 @@ async fn patch_work(
     Ok(Json(data))
 }
 
+/// tsk-4id: `GET /work/{id}/docs` -- the item's `docsRef` narrative
+/// (`CONTEXT.md`/`plan.md` content), the SOURCE the task-detail screen's
+/// own "what the agent did" block must read from (D3 of docs/history/
+/// herdr-web-dashboard/CONTEXT.md: CONTEXT.md/plan.md is the primary
+/// account, `decisions[]` is expandable detail only). This did not exist
+/// before this item: a browser client has no filesystem access, and no
+/// other route in this file ever reads an arbitrary repo file -- the
+/// gap this handler closes is real, not decorative (confirmed: `rg
+/// 'docsRef'` across every existing route returns only the field passing
+/// through `show`'s own JSON as a bare path STRING, never its content).
+///
+/// `docsRef` is untrusted input (an item's own field, editable via
+/// `tsk-41h`'s `PATCH /work/{id}` among other paths) -- canonicalized and
+/// checked to still resolve under `<root>/docs/history/` before any read,
+/// the same directory every `docsRef` in this repo's own convention
+/// already points into (confirmed: every real `docsRef` value observed
+/// this session, e.g. `docs/history/<feature>/`, shares this prefix).
+/// `..`/absolute-path/symlink escapes are all caught by canonicalizing
+/// AFTER joining, not by string-matching the raw value.
+async fn get_work_docs(State(state): State<AppState>, AxPath(id): AxPath<String>) -> Result<Json<Value>, GatewayError> {
+    reject_leading_dash(&id, "id")?;
+    let args = vec!["show".to_string(), id, "--json".to_string()];
+    let envelope = run_verb_blocking(state.gateway, args).await?;
+    // `envelope` is the FULL `{contract, generated_at, data_hash, data}`
+    // shape `run_verb_blocking` always returns (CTR001 envelope reuse) --
+    // `docsRef` lives at `envelope.data.work.docsRef`, not `envelope.work`.
+    let docs_ref = envelope
+        .get("data")
+        .and_then(|d| d.get("work"))
+        .and_then(|w| w.get("docsRef"))
+        .and_then(Value::as_str);
+
+    // Re-stamp this route's own custom `data` shape onto the SAME
+    // contract/generated_at/data_hash the underlying `show` call already
+    // produced -- same pattern `get_state_digest` already uses for a
+    // hand-built response.
+    let stamp = |data: Value| {
+        json!({
+            "contract": envelope.get("contract").cloned().unwrap_or(json!("fgos.v1")),
+            "generated_at": envelope.get("generated_at").cloned().unwrap_or(Value::Null),
+            "data_hash": envelope.get("data_hash").cloned().unwrap_or(Value::Null),
+            "data": data,
+        })
+    };
+
+    let Some(docs_ref) = docs_ref else {
+        return Ok(Json(stamp(json!({ "docsRef": null, "contextMd": null, "planMd": null }))));
+    };
+
+    let docs_history_root = state
+        .root
+        .join("docs")
+        .join("history")
+        .canonicalize()
+        .map_err(|err| GatewayError::unexpected(format!("could not resolve docs/history/: {err}")))?;
+
+    let candidate = state.root.join(docs_ref);
+    let resolved = match candidate.canonicalize() {
+        Ok(p) => p,
+        // A docsRef naming a directory that does not exist on this
+        // machine is a real, expected case (area spec Edge Cases: "An
+        // item whose narrative source is missing... shown without its
+        // narrative rather than failing"), not a traversal attempt.
+        Err(_) => {
+            return Ok(Json(stamp(
+                json!({ "docsRef": docs_ref, "contextMd": null, "planMd": null, "narrativeMissing": true }),
+            )));
+        }
+    };
+    if !resolved.starts_with(&docs_history_root) {
+        return Err(GatewayError::validation(
+            "docsRef must resolve inside docs/history/ -- refused (tsk-4id, path-traversal guard)",
+        ));
+    }
+
+    let read_optional = |name: &str| -> Option<String> { std::fs::read_to_string(resolved.join(name)).ok() };
+
+    Ok(Json(stamp(json!({
+        "docsRef": docs_ref,
+        "contextMd": read_optional("CONTEXT.md"),
+        "planMd": read_optional("plan.md"),
+    }))))
+}
+
 #[derive(Debug, Deserialize)]
 struct MoveWorkBody {
     to: String,
@@ -1043,6 +1127,7 @@ pub fn build_router(gateway: Arc<dyn VerbGateway>, config: GatewayConfig, root: 
     let authenticated = Router::new()
         .route("/work", get(get_work).post(post_work))
         .route("/work/{id}", get(get_work_by_id).patch(patch_work))
+        .route("/work/{id}/docs", get(get_work_docs))
         .route("/work/{id}/move", post(post_work_move))
         .route("/work/{id}/ask", post(post_work_ask))
         .route("/work/{id}/answer", post(post_work_answer))
@@ -1856,5 +1941,119 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+    }
+
+    // tsk-4id: GET /work/{id}/docs -- CONTEXT.md/plan.md content, real
+    // filesystem reads under a real temp `docs/history/<feature>/` tree
+    // (matching this repo's own real docsRef convention), never mocked.
+
+    struct ShowGateway {
+        docs_ref: Option<String>,
+    }
+
+    impl VerbGateway for ShowGateway {
+        fn run_verb(&self, _args: &[String]) -> Result<Value, GatewayError> {
+            // Real envelope shape run_verb_blocking always returns
+            // (CTR001) -- docsRef lives at data.work.docsRef, not at the
+            // envelope's own top level.
+            Ok(json!({
+                "contract": "fgos.v1",
+                "generated_at": "2026-08-15T00:00:00Z",
+                "data_hash": "h1",
+                "data": { "work": { "id": "tsk-4id", "docsRef": self.docs_ref } },
+            }))
+        }
+    }
+
+    async fn get_work_docs_request(app: Router, id: &str) -> Value {
+        use axum::body::Body;
+        use axum::http::Request;
+        use tower::ServiceExt;
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri(format!("/v1/work/{id}/docs"))
+                    .header(axum::http::header::AUTHORIZATION, "Bearer test-token")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        let body = axum::body::to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        serde_json::from_slice(&body).unwrap()
+    }
+
+    #[tokio::test]
+    async fn get_work_docs_reads_real_context_and_plan_md_from_a_real_docs_ref_directory() {
+        let root = std::env::temp_dir().join(format!("fgos-gateway-docs-test-{}", std::process::id()));
+        let feature_dir = root.join("docs/history/tsk-4id-smoke");
+        std::fs::create_dir_all(&feature_dir).unwrap();
+        std::fs::write(feature_dir.join("CONTEXT.md"), "# real context content\n").unwrap();
+        std::fs::write(feature_dir.join("plan.md"), "# real plan content\n").unwrap();
+
+        let gateway: Arc<dyn VerbGateway> =
+            Arc::new(ShowGateway { docs_ref: Some("docs/history/tsk-4id-smoke/".to_string()) });
+        let app = build_router(gateway, test_config(), root.clone());
+
+        let data = get_work_docs_request(app, "tsk-4id").await;
+        assert_eq!(data["data"]["contextMd"], "# real context content\n");
+        assert_eq!(data["data"]["planMd"], "# real plan content\n");
+        std::fs::remove_dir_all(&root).ok();
+    }
+
+    #[tokio::test]
+    async fn get_work_docs_reports_narrative_missing_without_failing_when_the_directory_does_not_exist() {
+        let root = std::env::temp_dir().join(format!("fgos-gateway-docs-missing-test-{}", std::process::id()));
+        std::fs::create_dir_all(root.join("docs/history")).unwrap();
+
+        let gateway: Arc<dyn VerbGateway> =
+            Arc::new(ShowGateway { docs_ref: Some("docs/history/does-not-exist/".to_string()) });
+        let app = build_router(gateway, test_config(), root.clone());
+
+        let data = get_work_docs_request(app, "tsk-4id").await;
+        assert_eq!(data["data"]["narrativeMissing"], true);
+        assert_eq!(data["data"]["contextMd"], Value::Null);
+        std::fs::remove_dir_all(&root).ok();
+    }
+
+    #[tokio::test]
+    async fn get_work_docs_rejects_a_docs_ref_that_escapes_docs_history_via_traversal() {
+        use axum::body::Body;
+        use axum::http::Request;
+        use tower::ServiceExt;
+
+        let root = std::env::temp_dir().join(format!("fgos-gateway-docs-traversal-test-{}", std::process::id()));
+        std::fs::create_dir_all(root.join("docs/history")).unwrap();
+        // A real target OUTSIDE docs/history/ that the traversal payload
+        // below would resolve to if the guard were only a string check.
+        std::fs::write(root.join("secret.txt"), "should never be readable through this route").unwrap();
+
+        let gateway: Arc<dyn VerbGateway> =
+            Arc::new(ShowGateway { docs_ref: Some("docs/history/../../secret.txt".to_string()) });
+        let app = build_router(gateway, test_config(), root.clone());
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/v1/work/tsk-4id/docs")
+                    .header(axum::http::header::AUTHORIZATION, "Bearer test-token")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+        std::fs::remove_dir_all(&root).ok();
+    }
+
+    #[tokio::test]
+    async fn get_work_docs_returns_nulls_when_the_item_has_no_docs_ref_at_all() {
+        let gateway: Arc<dyn VerbGateway> = Arc::new(ShowGateway { docs_ref: None });
+        let app = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+
+        let data = get_work_docs_request(app, "tsk-4id").await;
+        assert_eq!(data["data"]["docsRef"], Value::Null);
+        assert_eq!(data["data"]["contextMd"], Value::Null);
     }
 }
