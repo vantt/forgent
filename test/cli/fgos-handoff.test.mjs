@@ -33,6 +33,31 @@ function seedExecutingItem(dir, id = 'implement-thing') {
   return id;
 }
 
+// Regression: found in self-review. An item with no EXPLICIT `stage`
+// field (D8's lazy-default -- absent reads as the domain's Execute stage,
+// the shape a split child born via normalizeChild can carry) used to
+// refuse every handoff with "stage: undefined" because recordCall read
+// work.stage directly instead of through effectiveStage.
+test('regression: a handoff succeeds on an item with no explicit stage field (D8 lazy-default)', () => {
+  const dir = tmpDir();
+  const id = 'lazy-stage-item';
+  addWork(dir, {
+    id,
+    title: 'Lazy stage item',
+    kind: 'feature',
+    status: 'todo',
+    // stage: intentionally omitted -- D8 lazy default (effectiveStage
+    // resolves this to 'executing' for coding)
+    deps: [],
+    risk: 'light',
+    refs: [],
+    verify: 'true',
+  });
+  moveWork(dir, { id, to: 'doing', expectedStatus: 'todo' });
+  recordCall(dir, { id, toRole: 'reviewer', reason: 'review' });
+  assert.equal(listWork(dir).work[id].holder, 'reviewer');
+});
+
 test('async call: review changes holder, appends a full handoff event', () => {
   const dir = tmpDir();
   const id = seedExecutingItem(dir);

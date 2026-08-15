@@ -34,7 +34,7 @@ import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyS
 import { transitionWork, FsmError } from './status-fsm.mjs';
 import { transitionStage } from './stage-fsm.mjs';
 import { validateWork, validateDomainFields, checkAcceptanceEvidenceTraceable, WorkValidationError, DEFAULTS, GOAL_TIERS, truncateTitle } from './work.mjs';
-import { getDomain, statusCategoryFor, parkReasonForStatus, roleGraphFor } from './workflow-stage-graphs.mjs';
+import { getDomain, statusCategoryFor, parkReasonForStatus, roleGraphFor, effectiveStage } from './workflow-stage-graphs.mjs';
 import { evaluateHandoff } from './handoff.mjs';
 import { EventLogError } from './events.mjs';
 import { validateToolRegistration, ToolRegistryError } from './tool-registry.mjs';
@@ -899,7 +899,15 @@ export function recordCall(dir, { id, toRole, reason, note, outcome } = {}) {
     const domain = getDomain(work.domain);
     const roleGraph = roleGraphFor(domain);
     const fromRole = work.holder ?? roleGraph?.defaultRole;
-    const stage = work.stage;
+    // effectiveStage, not raw work.stage (tsk-2t9c bugfix, found in
+    // self-review): a work item's `stage` is legitimately absent under
+    // D8's lazy-default rule (workflow-stage-graphs.mjs's own
+    // effectiveStage/stage-fsm.mjs precedent) -- reading work.stage
+    // directly here made every handoff attempt on an item that never had
+    // an explicit moveStage refuse with "stage: undefined", including
+    // split children born straight at 'executing' without ever calling
+    // moveStage (src/intake/plan.mjs's normalizeChild path).
+    const stage = effectiveStage(work, domain);
     const openCallDepth = openCallStack(before.callThreads?.[id]).length;
 
     const result = evaluateHandoff({ domain, stage, fromRole, toRole, reason, openCallDepth });
