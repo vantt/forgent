@@ -9,14 +9,26 @@ review report `plans/reports/task-dispatch-system-architecture-spec-
 
 ## 1. Trạng thái hiện tại
 
-Vòng 2 (2026-08-15). **5 D-ID đã CHỐT (D1-D5)** — xem §4. Config đích đã
-rõ hình, người dùng đã xác nhận "nhớ config trên nhé" cho phần
-registry/naming (D1/D3/D4), và vừa xác nhận thêm phát hiện `kind`
-(D5). Còn 3 điểm mở thật sự (§3 #3/#7/#8-shape-chi-tiết) chưa đủ vòng để
-mint. Việc tiếp theo: rà blast radius thật của D5 (bao nhiêu chỗ đọc
-`capacity.kind`/`CAPACITY_KINDS` hôm nay sẽ vỡ khi thêm `agent`/`tool` và
-đổi nghĩa `invocations[].via`), và giải quyết xung đột namespace job-id
-vs executor-name (#3) trước khi đủ điều kiện viết `plan.md`.
+Vòng 3 (2026-08-15). **12 D-ID đã CHỐT (D1-D12, trừ D-số cũ đã đổi
+đánh số — xem bảng §4)**. Vòng 3 dùng 1 agent Opus tư vấn độc lập
+(`adapter-porting-consult`), đối chiếu marketing-cockpit's `## harness`
+(bản chưng cất, không có checkout thật) với chính code `dispatch.mjs` —
+mọi claim về fgOS đã spot-check lại bằng grep/read trực tiếp, khớp
+100%. Kết quả: KHÔNG port thêm adapter nào (0 producer thật cho http/
+binary/skill/api — event log xác nhận); nhưng D5 (kind agent/tool split)
+tự nó cần sửa (D8, bỏ `api` khỏi vocab) VÀ cần 3 gate mới mới ship được
+(D9) — nếu không, chính entry `gitnexus` §6 vẽ ra sẽ vỡ ngay lúc load
+config. #3 (namespace job-id/executor-name) đã có hướng giải (D10, dùng
+`resolveCapacityIdForPurpose` có sẵn) nhưng còn 1 câu hỏi con chưa đóng
+(bug hay thiết kế cố ý — xem Outstanding). #7 (dead reference
+`submit-assist-classify`) đã XÁC NHẬN qua event log, hết nghi ngờ. 2 ý
+tưởng marketing-cockpit khác (silent downgrade, model-policy.yaml tách
+file) đã đánh giá và TỪ CHỐI (D11).
+
+Còn 2 điểm mở trước khi viết `plan.md`: #3's câu hỏi con (bug/thiết kế
+cố ý — đọc `tsk-5tm-6` D4), và xác nhận `gitnexus`/`herdr` có bao giờ
+chạm `resolveExecutorConfig` thật không (quyết định B3/D9(c) là bug thật
+hay chỉ hardening phòng ngừa).
 
 ## 2. Mục tiêu & đề bài
 
@@ -47,14 +59,18 @@ nhưng chưa từng thực thi.
 |---|---|---|
 | 1 | Hợp nhất vocab "capability" giữa tool-registry và dispatch thành 1 danh mục curated dùng chung? | **CHỐT — D4.** |
 | 2 | Có nên khôi phục cầu nối "dispatch tự hỏi tool-registry lúc resolve" (`tsk-62v` D6)? | **CHỐT — D2 (không khôi phục, giữ nguyên).** |
-| 3 | Xung đột 2-namespace: `capacityIdForWork` tính job-identity (`"fgos-coding-implement"`), registry key theo executor-name — `decide --work` tra job-id vào object key-theo-tên-executor, gần như luôn miss. | **CÒN MỞ** — chưa đọc kỹ `tsk-5tm-6` D4 để xác nhận đây là thiết kế cố ý hay khoảng trống. |
+| 3 | Xung đột 2-namespace: `capacityIdForWork` tính job-identity (`"fgos-coding-implement"`), registry key theo executor-name — `decide --work` tra job-id vào object key-theo-tên-executor, gần như luôn miss. | **HƯỚNG GIẢI ĐÃ CHỐT — D10** (dùng `resolveCapacityIdForPurpose` có sẵn, không đổi cách key). Còn 1 câu hỏi con: hành vi miss hôm nay là bug hay cố ý — cần đọc `tsk-5tm-6` D4. |
 | 4 | Tên field cho registry hợp nhất | **CHỐT — D3 (giữ `capacities`, không đổi `executors`).** |
 | 5 | Bỏ tool-registry event-sourced registration, gộp vào config? | **CHỐT — D1.** |
 | 6 | Presence-probe logic + local status overlay giữ làm hàm thuần, tách khỏi registry file | **CHỐT, kèm trong D1.** |
-| 7 | `docs/how-to/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md`'s tham chiếu `submit-assist-classify` — dead reference, xử lý cùng lúc hay tách item? | **CÒN MỞ** — chưa xác nhận qua đọc `tsk-6ar`'s scope thật. |
+| 7 | `docs/how-to/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md`'s tham chiếu `submit-assist-classify` — dead reference? | **XÁC NHẬN — dead.** Event log: register (08-01) → remove (08-09) → re-register dưới capability khác (08-09) → remove (08-12). Sự kiện cuối cùng là `tool.remove` — entry không còn sống. Sửa doc cùng lúc với việc gộp tool-registry (D1). |
 | 8 | `kind` tách `agent`/`tool`, vocab cũ dời vào `invocations[].via` | **CHỐT — D5.** |
-| 9 | Blast radius của D5: bao nhiêu chỗ đọc `capacity.kind`/`CAPACITY_KINDS`/`INVOCATION_VIA` sẽ cần sửa khi đổi ngữ nghĩa | **CÒN MỞ** — chưa rà, cần trước khi viết `plan.md`. |
+| 9 | Blast radius của D5: bao nhiêu chỗ đọc `capacity.kind`/`CAPACITY_KINDS`/`INVOCATION_VIA` sẽ cần sửa khi đổi ngữ nghĩa | **1 phần đã rà — D8/D9** (3 gate B1/B2/B3 xác định cụ thể). Còn phần thuần liệt kê call site cho `plan.md`. |
 | 10 | Danh mục `capabilities` — hình dạng cụ thể (object có alias/description, hay tập tên đơn giản) | **CÒN MỞ**, phụ thuộc D4 nhưng chưa quyết chi tiết field. |
+| 11 | Số phận `executors.<tier>` (0 entry live, chỉ 2 điểm chạm code, đều trong `dispatch.mjs`) — giữ làm escape hatch hay xoá theo YAGNI? | **CHỐT — D6 (xoá hẳn).** |
+| 12 | Có nên thêm adapter mới (`http`/`api`/`bash`/`python`/`native`) khớp marketing-cockpit's `adapter bash/python/native/mcp`? | **CHỐT — KHÔNG (D8/D9's rationale).** 0 producer lịch sử; `bash`/`python` đã phủ bởi `cli-spawn`; `native` đã có `decideDispatchMechanism`. |
+| 13 | Silent model-tier downgrade + `model-policy.yaml` tách file (marketing-cockpit) — port? | **CHỐT — KHÔNG, D11.** |
+| 14 | Xoá `probeHttp`/`'http'` khỏi `tool-registry.mjs`/`KINDS` khi gộp? | **CÒN MỞ** — nghiêng xoá (0 registration lịch sử), chưa mint. |
 
 ## 4. Quyết định đã chốt
 
@@ -65,6 +81,12 @@ nhưng chưa từng thực thi.
 | D3 | Giữ nguyên tên field `capacities` (không đổi thành `executors`) cho registry hợp nhất; field `executors` (tier-keyed) không dời đi đâu, không đổi tên — tránh xung đột validator thật (`dispatch.mjs:521-528`). |
 | D4 | Thêm `runner.capabilities` — danh mục capability curated, predefined + đăng ký thêm được, hợp nhất vocab tool-registry (free-text) và dispatch (`CAPACITY_PURPOSES` enum đóng). |
 | D5 | `kind` tách thành 2 giá trị `agent`/`tool` (trục BẢN CHẤT), vocab cũ (`cli`/`binary`/`mcp`/`skill`/`http`/`task`) dời vào `invocations[].via` (trục CƠ CHẾ GỌI); `INVOCATION_VIA` mở rộng từ `['cli']` thành `['task','cli','mcp','api']`. Khớp ADR0027/0042 marketing-cockpit VÀ đúng thiết kế gốc `tsk-5tm` đã viết (`DISCUSSION.md` §6/§7 viết `kind:"agent"` cho `agy`) nhưng chưa từng lên code thật (`CAPACITY_KINDS` chưa từng có `agent`, config thật phải dùng `kind:"cli"` — lệch thiết kế, `tsk-1qn` không bắt được vì D2 chỉ spot-read). |
+| D6 | Xoá hẳn `executors.<tier>` (tier-keyed fallback, từ P41). Chỉ còn 2 tầng: `executor` (global default) và `capacities` (registry hợp nhất, D1/D3). | 0 entry live (`runner.executors` = `undefined` trên máy), không module nào ngoài `dispatch.mjs` đọc/ghi nó (2 điểm chạm: validate dòng 682-686, resolve dòng 902). Lịch sử đã gây bug thật: `tsk-5tm` D10 xác nhận bug `judge-decompose` (`tsk-5ge`) là do nhầm lẫn đặt nội dung vào `runner.executors.judge` tưởng đang cấu hình capacity `judge`, trong khi `executors` chỉ nhận key tier — `tsk-4eu`'s validator sinh ra để chặn đúng loại nhầm lẫn này. `capacities` không thay thế 100% về biểu đạt (mất khả năng blanket-fallback-theo-tier khi không ai gọi đích danh capacity) nhưng tính năng đó chưa từng được dùng thật — mất không tốn gì. |
+| D7 | Giữ `cfg.executor` (global default) đứng riêng, KHÔNG gộp vào `capacities.default`. | `executor` là field BẮT BUỘC (không có guard optional, khác hẳn `capacities`/`capabilities`), là hạt giống bootstrap (`ensureRunnerConfigForDir`/`DEFAULT_RUNNER_CONFIG`) và là template nguồn cho `buildAgentTypeExecutor`. Gộp vào 1 key đặc biệt `'default'` bên trong map tuỳ chọn sẽ tạo đúng loại bẫy tên-key-mang-ý-nghĩa-ngầm đã gây bug thật ở D6 (`judge`/`executors` collision). Quyết định phạm vi item này, không đồng nghĩa mãi mãi không xem lại. |
+| D8 | Sửa `INVOCATION_VIA` của D5 thành `['cli','task','mcp']` (bỏ `'api'`); bỏ hẳn `'binary'`/`'skill'`/`'http'` khỏi vocab `kind` khi gộp tool-registry vào `capacities`. | Event log thật: toàn bộ lịch sử chỉ 2 kind từng đăng ký (`cli`, `mcp`) — `http`/`binary`/`skill` = 0 lần, dead vocab. `dispatch.mjs:1104-1107` tự ghi rõ rpc/app-server adapter "deferred... until a real system needs to plug into this port". 1 capacity dispatch-được duy nhất (`agy`) dùng `via:cli`. |
+| D9 | D5 cần 3 gate sửa kèm, không thể ship thiếu: **(a)** `validateCapacityShape` không bắt buộc `command`/`args` cho MỌI invocation — tuỳ theo `via`; **(b)** `resolveExecutorConfig` phải CHỌN invocation đúng theo `via`, không lấy `invocations[0]` mù; **(c)** `resolveExecutorCommand` phải THROW khi 1 invocation không có adapter/via dispatch-được, không được âm thầm rơi về `DEFAULT_ADAPTER` (`cli-spawn`). | Không sửa thì entry `gitnexus` mà §6 vẽ ra sẽ vỡ ngay lúc load config: `validateExecutorShape` (`:609`) bắt buộc `command`+`args` cho mọi invocation — `{via:"mcp"}` không có `command` sẽ fail validate. `resolveExecutorConfig` (`:894-896`) lấy `invocations[0]` vô điều kiện — đúng khi vocab 1 giá trị, sai khi đã nhiều `via`. `adapter = executor.adapter ?? DEFAULT_ADAPTER` (`:1039`) sẽ âm thầm spawn literal `"mcp:gitnexus"` như 1 binary — cùng họ bug `judge-decompose` mà D6 đã dùng làm bằng chứng. |
+| D10 | Giải #3 (xung đột namespace job-id vs executor-name) KHÔNG bằng đổi cách key của `capacities` — registry giữ key theo TÊN EXECUTOR đúng như D3 đã chốt. Binding "job nào chạy executor nào" là 1 tra cứu TÁCH BIỆT, dùng hàm có sẵn `resolveCapacityIdForPurpose(cfg, purpose)` qua field `for`, không cần máy mới. | Marketing-cockpit's `## harness` (`marketing-cockpit.md:143`): "Orchestrator đọc `next_stage_model/executor/interface` từ `run.yaml` khi dispatch" — họ tách hẳn binding job→executor khỏi chính registry, đúng model fgOS đã có sẵn (purpose-lookup) nhưng chưa dùng cho đường `--work`. |
+| D11 | Đánh giá và TỪ CHỐI 2 mô hình marketing-cockpit — không port: **(a)** silent model-tier downgrade; **(b)** tách `model-policy.yaml` thành file riêng. | (a) fgOS đã có giải pháp TƯỜNG MINH cho đúng vấn đề (`rigorOverrides` trên `agy`, `modelForTier` throw rõ tier+provider khi thiếu) — bản chưng cất không ghi điều kiện kích hoạt downgrade, port hình dạng mà không biết ngữ nghĩa là liều lĩnh; ngược triết lý loud-failure. (b) `mergeWithGlobalConfig` đã cho đúng tính chất "sửa 1 chỗ đổi cả hệ" mà không cần đăng ký nguồn config mới vào `fgos setup`/`doctor`. |
 
 ## 5. Q&A log
 
@@ -127,40 +149,86 @@ nhưng chưa từng thực thi.
   thiết kế thật, `tsk-1qn` review không bắt (D2 chỉ spot-read). → mint
   **D4** (danh mục capabilities, đã ngầm định từ D1/round d-f) + **D5**
   (kind agent/tool split).
+- **round q'.** Người dùng hỏi "có thể bỏ luôn `executor` không, thêm 1
+  item default trong `capacities`". Quét code: `executor` BẮT BUỘC
+  (không guard optional), là hạt giống bootstrap + template cho
+  `buildAgentTypeExecutor` — khác hẳn `executors.<tier>` (optional, 0
+  live). Đề xuất giữ tách riêng — người dùng đồng ý "tạm thời để nguyên"
+  → mint **D7**.
+- **round r.** Người dùng: "port luôn cli-spawn, http của marketing-
+  cockpit... quét lại harness của nó, cái gì bất ổn/thiếu thì port qua...
+  nhờ 1 opus agent tư vấn". Spawn agent Opus độc lập
+  (`adapter-porting-consult`), brief đầy đủ: dispatch.mjs hiện tại,
+  D1-D7 đã chốt, chỉ dùng bản chưng cất marketing-cockpit (không có
+  checkout thật). Agent trả về báo cáo có cấu trúc — spot-check lại
+  3 claim quan trọng nhất (dòng `dispatch.mjs:1039`/`1104-1107`, event
+  log kind-history, `submit-assist-classify` register/remove sequence)
+  bằng grep/read trực tiếp, khớp 100%. Kết quả: 0 adapter mới cần thêm
+  (0 producer lịch sử cho http/binary/skill/api); nhưng D5 tự nó cần sửa
+  (bỏ `api`) + 3 gate mới (shape-theo-via, chọn-invocation-theo-via,
+  dispatchability-throw) mới ship được, nếu không entry `gitnexus` §6 vẽ
+  ra sẽ vỡ ngay lúc load config. #3 có hướng giải (dùng
+  `resolveCapacityIdForPurpose` có sẵn). #7 xác nhận dead qua event log.
+  2 ý tưởng khác (silent downgrade, model-policy.yaml riêng) đánh giá và
+  từ chối. → mint **D8/D9/D10/D11**.
+- **round q.** Người dùng hỏi số phận `executors.<tier>` giờ `capacities`
+  đã đủ phẩm chất. Quét code: chỉ 2 điểm chạm, cả 2 trong `dispatch.mjs`
+  (validate + resolve), 0 module khác đụng tới, `runner.executors` =
+  `undefined` trên máy hôm nay. Bằng chứng nặng: `tsk-5tm` D10's bug
+  `judge-decompose` chính là do nhầm `runner.executors.judge` với cách
+  cấu hình 1 capacity — cơ chế này đã từng GÂY NHẦM LẪN thật, không chỉ
+  "chưa ai dùng". Trình bày, người dùng chốt xoá hẳn → mint **D6**.
 
 ## 6. Thiết kế đã chốt {#design}
 
 `runner.capacities` (`.fgos/config.json`) trở thành registry executor
 DUY NHẤT — gộp cả provider cũ của tool-registry (`gitnexus`, `herdr`) lẫn
-capacity dispatch-được (`agy`). Không đổi tên field (D3) — tránh đụng
-`cfg.executors` (tier-keyed, giữ nguyên, không dời). Thêm `runner.
-capabilities` — danh mục curated, độc lập với registry executor — là nơi
-DUY NHẤT mô tả "lời hứa" (D4); mỗi entry executor tuỳ chọn gắn `for` trỏ
-vào danh mục này.
+capacity dispatch-được (`agy`), key theo TÊN EXECUTOR (D3, không đổi).
+`executors.<tier>` — cơ chế tier-keyed fallback cũ, từng gây nhầm lẫn
+thật với `capacities` (`tsk-5tm` D10) và không còn entry sống nào — bị
+XOÁ HẲN (D6). `executor` (global default) đứng riêng, không gộp vào
+`capacities` (D7 — nó là field bắt buộc + hạt giống bootstrap, khác hẳn
+tính chất optional của `executors.<tier>`). Config `runner` còn đúng 3
+field thực thi: `executor`, `capabilities` (danh mục curated, D4 — nơi
+DUY NHẤT mô tả "lời hứa", vocab đóng nhưng đăng ký thêm được), và
+`capacities` (registry hợp nhất).
 
 Mỗi entry executor tách 2 trục orthogonal (D5): `kind` (`agent`|`tool` —
-bản chất, có tự suy luận được không) và `invocations[].via` (`task`|
-`cli`|`mcp`|`api` — cơ chế gọi thật). `gitnexus` (`kind:"tool"`,
-`via:"mcp"`) và `herdr` (`kind:"tool"`, `via:"cli"`) presence-only, không
-bao giờ bị dispatch tự spawn. `agy` (`kind:"agent"`, `via:"cli"` qua
-`cli-spawn`) dispatch-được đầy đủ.
+bản chất) và `invocations[].via` — vocab đã SỬA còn `['cli','task','mcp']`
+(D8, bỏ `'api'` — 0 producer lịch sử; `'binary'`/`'skill'`/`'http'` cũng
+bỏ khi gộp, cùng lý do). `gitnexus` (`kind:"tool"`, `via:"mcp"`) và
+`herdr` (`kind:"tool"`, `via:"cli"`) presence-only, không bao giờ bị
+dispatch tự spawn. `agy` (`kind:"agent"`, `via:"cli"` qua `cli-spawn`)
+dispatch-được đầy đủ. D5 tự nó cần 3 gate đi kèm mới ship an toàn (D9):
+shape-validate theo `via` (không ép `command`/`args` cho mọi invocation),
+chọn invocation đúng theo `via` (không lấy `[0]` mù), và throw tường
+minh khi 1 invocation không dispatch-được (không âm thầm rơi về
+`cli-spawn`).
 
 Dispatch KHÔNG tự động gate presence bên trong `resolveExecutorConfig`
 (D2, giữ nguyên hiện trạng `tsk-5tm` D1 để lại) — 1 capability không
 dispatch-được (như `gitnexus`) không thể có gate trong đường dispatch,
-presence luôn hỏi ở tầng gọi.
+presence luôn hỏi ở tầng gọi. Binding "job nào chạy executor nào"
+(`decide --work`) dùng lại `resolveCapacityIdForPurpose` có sẵn (D10),
+không đổi cách key của registry.
+
+2 ý tưởng marketing-cockpit khác đã đánh giá và từ chối (D11): silent
+model-tier downgrade (fgOS đã có `rigorOverrides` tường minh hơn), và
+tách `model-policy.yaml` thành file riêng (`mergeWithGlobalConfig` đã
+cho đúng tính chất đó).
 
 ```mermaid
 flowchart TD
-    subgraph Config[".fgos/config.json — runner"]
+    subgraph Config[".fgos/config.json — runner (3 field, D6 xoá executors.tier)"]
+        GLOB["executor<br/>(global default, D7 — đứng riêng)"]
         CAP["capabilities<br/>(D4 — danh mục lời hứa, curated)"]
         REG["capacities<br/>(D1/D3 — registry executor DUY NHẤT)"]
     end
 
-    subgraph Entries["3 entry thật"]
-        GN["gitnexus<br/>kind: tool, via: mcp<br/>presence-only"]
+    subgraph Entries["3 entry thật, via: cli/task/mcp (D8)"]
+        GN["gitnexus<br/>kind: tool, via: mcp<br/>presence-only, KHÔNG dispatch (D9c)"]
         HR["herdr<br/>kind: tool, via: cli<br/>presence-only"]
-        AG["agy<br/>kind: agent, via: cli (cli-spawn)<br/>dispatch-được"]
+        AG["agy<br/>kind: agent, via: cli (cli-spawn)<br/>dispatch-được đầy đủ"]
     end
 
     REG --> GN
@@ -173,16 +241,20 @@ flowchart TD
         Gate["CLAUDE.md's gate 3-mức<br/>(presence hỏi TẠI ĐÂY, D2)"]
     end
     subgraph Dispatch["dispatch.mjs"]
-        RS["resolveExecutorConfig<br/>(KHÔNG tự gate presence, D2)"]
+        RS["resolveExecutorConfig<br/>chọn invocation theo via (D9b)<br/>throw nếu không dispatch-được (D9c)"]
+        Bind["resolveCapacityIdForPurpose<br/>(D10 — binding job→executor)"]
     end
 
     Gate -->|"agent tự hỏi trước"| GN
     AG --> RS
+    Bind -.->|"--work resolves qua for"| REG
 ```
 
-Còn treo trước khi viết `plan.md`: xung đột namespace job-id/executor-
-name (§3 #3), blast radius thật của D5 (§3 #9), dead reference
-`submit-assist-classify` (§3 #7).
+Còn treo trước khi viết `plan.md`: câu hỏi con của #3 (miss hôm nay là
+bug hay cố ý — đọc `tsk-5tm-6` D4), xác nhận `gitnexus`/`herdr` có bao
+giờ thật sự chạm `resolveExecutorConfig` (quyết định D9c là bug thật hay
+hardening phòng ngừa), số phận `probeHttp`/`'http'` trong
+`tool-registry.mjs` (§3 #14).
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
