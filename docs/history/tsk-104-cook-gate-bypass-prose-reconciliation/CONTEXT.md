@@ -3,7 +3,7 @@
 Item: `tsk-104`. Written retroactively (same structural gap as this scan's
 other items).
 
-## Decisions
+## Locked decisions
 
 - **D0.** Root cause confirmed by reading `plugins/fgOS/skills/cook/
   SKILL.md` in full: two places overclaim "always ask" —

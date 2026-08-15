@@ -4,7 +4,7 @@ Item: `tsk-1d9`. Written retroactively (same structural gap as `tsk-49u`'s
 own CONTEXT.md — `clarify` jumps straight to `decompose`, `fgos-coding-exploring`
 never runs).
 
-## Decisions
+## Locked decisions
 
 - **D0.** The item's own framing ("the hook never releases the lock, so
   every commit blocks pick/take up to 180s") is literally true but its

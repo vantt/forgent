@@ -18,7 +18,7 @@ by hand via `fgos sync-root`. See `plan.md` for the final approach
 decision (piece 2's own (a) vs (b) call, and the graph-harness.mjs
 consistency fix this uncovered).
 
-## Decisions
+## Locked decisions
 
 | ID | Decision |
 |---|---|
