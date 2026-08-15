@@ -61,6 +61,13 @@ struct GatewaySection {
     token: Option<String>,
     port: Option<u16>,
     bind: Option<String>,
+    // tsk-6arn (D8): both must be present together for cf-access to be
+    // considered configured -- see `load_gateway_config`'s own partial-
+    // config guard.
+    #[serde(rename = "cfAccessTeamDomain")]
+    cf_access_team_domain: Option<String>,
+    #[serde(rename = "cfAccessAud")]
+    cf_access_aud: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -68,6 +75,12 @@ pub struct GatewayConfig {
     pub port: u16,
     pub token: String,
     pub bind: IpAddr,
+    // tsk-6arn: `Arc` (not a bare `Option<CfAccessVerifier>`) so
+    // `GatewayConfig` stays cheaply `Clone` -- matches how `AppState`
+    // already holds this whole struct behind an `Arc` on `build_router`'s
+    // own state, but keeps `GatewayConfig` itself trivially cloneable
+    // for tests that build one directly (`test_config()`).
+    pub cf_access: Arc<Option<crate::cf_access::CfAccessVerifier>>,
 }
 
 #[derive(Debug)]
@@ -78,6 +91,7 @@ pub enum GatewayConfigError {
     Parse(PathBuf, serde_json::Error),
     MissingToken(PathBuf),
     InvalidBind(PathBuf, String),
+    PartialCfAccess(PathBuf),
 }
 
 impl std::error::Error for GatewayConfigError {}
@@ -101,6 +115,11 @@ impl std::fmt::Display for GatewayConfigError {
             GatewayConfigError::InvalidBind(p, raw) => write!(
                 f,
                 "{} has a \"gateway.bind\" value ({raw:?}) that is not a valid IP address — expected e.g. \"0.0.0.0\" or \"127.0.0.1\".",
+                p.display()
+            ),
+            GatewayConfigError::PartialCfAccess(p) => write!(
+                f,
+                "{} has only one of \"gateway.cfAccessTeamDomain\"/\"gateway.cfAccessAud\" set (tsk-6arn, D8) — both are required together for cf-access to be configured, or neither.",
                 p.display()
             ),
         }
@@ -140,10 +159,22 @@ pub fn load_gateway_config(home_dir: Option<&Path>) -> Result<GatewayConfig, Gat
             .map_err(|_| GatewayConfigError::InvalidBind(config_path.clone(), raw))?,
         None => DEFAULT_BIND,
     };
+    // tsk-6arn (D8): additive layer-2 credential, configured only when
+    // BOTH fields are present -- exactly one set is a real misconfiguration
+    // (a person who set one almost certainly meant both), not silently
+    // treated as "cf-access off".
+    let cf_access = match (section.cf_access_team_domain, section.cf_access_aud) {
+        (Some(team_domain), Some(aud)) => {
+            Some(crate::cf_access::CfAccessVerifier::new(reqwest::Client::new(), team_domain, aud))
+        }
+        (None, None) => None,
+        (Some(_), None) | (None, Some(_)) => return Err(GatewayConfigError::PartialCfAccess(config_path)),
+    };
     Ok(GatewayConfig {
         port: section.port.unwrap_or(DEFAULT_PORT),
         token,
         bind,
+        cf_access: Arc::new(cf_access),
     })
 }
 
@@ -446,25 +477,42 @@ async fn require_token(
     request: axum::extract::Request,
     next: Next,
 ) -> Response {
-    let supplied = headers
+    let bearer_ok = headers
         .get(axum::http::header::AUTHORIZATION)
         .and_then(|v| v.to_str().ok())
-        .and_then(|v| v.strip_prefix("Bearer "));
-    match supplied {
-        Some(token) if constant_time_eq(token.as_bytes(), state.config.token.as_bytes()) => {
-            next.run(request).await
-        }
-        // tsk-4qf: 401, not category's own 400 -- gives a client a
-        // distinct HTTP-layer auth signal (D7 forbids a new `category`
-        // value, so the JSON body's `category` field stays "validation";
-        // the status code alone carries the distinction).
-        _ => GatewayError {
-            category: ErrorCategory::Validation,
-            message: "missing or invalid Authorization: Bearer <token> (D4: one token per machine, see ~/.fgos/config.json's \"gateway.token\")".to_string(),
-            exit_code: None,
-        }
-        .into_response_with_status(StatusCode::UNAUTHORIZED),
+        .and_then(|v| v.strip_prefix("Bearer "))
+        .is_some_and(|token| constant_time_eq(token.as_bytes(), state.config.token.as_bytes()));
+    if bearer_ok {
+        return next.run(request).await;
     }
+
+    // tsk-6arn (D8): cf-access is an ADDITIVE alternate credential,
+    // checked only when Bearer did not already pass and the operator has
+    // configured it (`state.config.cf_access` is `Some`). Any failure
+    // here -- verifier absent, header absent, signature/claims invalid --
+    // falls through to the SAME 401 below; cf-access never gets its own,
+    // different failure response.
+    if let Some(verifier) = state.config.cf_access.as_ref() {
+        if let Some(assertion) = headers.get("Cf-Access-Jwt-Assertion").and_then(|v| v.to_str().ok()) {
+            if verifier.verify(assertion).await.is_ok() {
+                return next.run(request).await;
+            }
+        }
+    }
+
+    // tsk-4qf: 401, not category's own 400 -- gives a client a
+    // distinct HTTP-layer auth signal (D7 forbids a new `category`
+    // value, so the JSON body's `category` field stays "validation";
+    // the status code alone carries the distinction). cf-access shares
+    // this SAME status/category rather than reintroducing the "404 câm"
+    // framing tsk-18to's original description carried from a cookie-
+    // session design (tsk-k4v) that never shipped (tsk-6arn RESEARCH.md).
+    GatewayError {
+        category: ErrorCategory::Validation,
+        message: "missing or invalid Authorization: Bearer <token> (D4: one token per machine, see ~/.fgos/config.json's \"gateway.token\") -- or a valid Cf-Access-Jwt-Assertion, when cf-access is configured (D8)".to_string(),
+        exit_code: None,
+    }
+    .into_response_with_status(StatusCode::UNAUTHORIZED)
 }
 
 /// Avoids a timing side-channel on the token comparison. Small, fixed-size
@@ -1333,6 +1381,7 @@ mod tests {
             port: 0,
             token: "test-token".to_string(),
             bind: IpAddr::V4(Ipv4Addr::LOCALHOST),
+            cf_access: Arc::new(None),
         }
     }
 
@@ -1416,6 +1465,98 @@ mod tests {
     async fn authenticated_request_reaches_the_verb_chokepoint() {
         let gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({"contract": "fgos.v1", "data": {"work": {}}})) });
         let app = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+
+        use axum::body::Body;
+        use axum::http::Request;
+        use tower::ServiceExt;
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/v1/ready")
+                    .header(axum::http::header::AUTHORIZATION, "Bearer test-token")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::OK);
+    }
+
+    // tsk-6arn: cf-access wiring in `require_token` -- additive to Bearer,
+    // never a replacement (D8).
+
+    fn config_with_cf_access(verifier: crate::cf_access::CfAccessVerifier) -> GatewayConfig {
+        let mut config = test_config();
+        config.cf_access = Arc::new(Some(verifier));
+        config
+    }
+
+    #[tokio::test]
+    async fn cf_access_valid_assertion_is_accepted_when_bearer_is_absent() {
+        let (verifier, token) = crate::cf_access::test_verifier_with_valid_token();
+        let gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({"contract": "fgos.v1", "data": {"items": []}})) });
+        let app = build_router(gateway, config_with_cf_access(verifier), PathBuf::from("/tmp"));
+
+        use axum::body::Body;
+        use axum::http::Request;
+        use tower::ServiceExt;
+
+        let response = app
+            .oneshot(Request::builder().uri("/v1/ready").header("Cf-Access-Jwt-Assertion", token).body(Body::empty()).unwrap())
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::OK);
+    }
+
+    #[tokio::test]
+    async fn cf_access_invalid_assertion_still_returns_401_same_as_missing_bearer() {
+        let (verifier, _valid_token) = crate::cf_access::test_verifier_with_valid_token();
+        let gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({"ok": true})) });
+        let app = build_router(gateway, config_with_cf_access(verifier), PathBuf::from("/tmp"));
+
+        use axum::body::Body;
+        use axum::http::Request;
+        use tower::ServiceExt;
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/v1/ready")
+                    .header("Cf-Access-Jwt-Assertion", "not-a-real-jwt")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+    }
+
+    #[tokio::test]
+    async fn cf_access_header_is_ignored_entirely_when_not_configured() {
+        // Existing behavior (Bearer-only, D13) must be completely
+        // unaffected for every deployment that never sets cf-access --
+        // test_config()'s own cf_access is None.
+        let (_verifier, token) = crate::cf_access::test_verifier_with_valid_token();
+        let gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({"ok": true})) });
+        let app = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+
+        use axum::body::Body;
+        use axum::http::Request;
+        use tower::ServiceExt;
+
+        let response = app
+            .oneshot(Request::builder().uri("/v1/ready").header("Cf-Access-Jwt-Assertion", token).body(Body::empty()).unwrap())
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED, "a real, valid CF token must still be rejected when cf-access is not configured");
+    }
+
+    #[tokio::test]
+    async fn bearer_still_works_when_cf_access_is_also_configured() {
+        let (verifier, _cf_token) = crate::cf_access::test_verifier_with_valid_token();
+        let gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({"contract": "fgos.v1", "data": {"items": []}})) });
+        let app = build_router(gateway, config_with_cf_access(verifier), PathBuf::from("/tmp"));
 
         use axum::body::Body;
         use axum::http::Request;
@@ -1622,6 +1763,51 @@ mod tests {
         write_test_home_config(&home, r#","bind":"not-an-ip""#);
         let err = load_gateway_config(Some(&home)).expect_err("a malformed bind value must not silently resolve");
         assert!(matches!(err, GatewayConfigError::InvalidBind(_, ref raw) if raw == "not-an-ip"));
+        std::fs::remove_dir_all(&home).ok();
+    }
+
+    /// tsk-6arn (D8): absent cf-access fields resolve to `None`, matching
+    /// the item's own "additive, opt-in" scope -- no crash, no
+    /// misconfiguration error over something the operator never set.
+    #[test]
+    fn load_gateway_config_resolves_no_cf_access_when_absent() {
+        let home = std::env::temp_dir().join(format!("fgos-gateway-cfaccess-absent-{}", std::process::id()));
+        write_test_home_config(&home, "");
+        let config = load_gateway_config(Some(&home)).expect("a token-only config must still load");
+        assert!(config.cf_access.is_none());
+        std::fs::remove_dir_all(&home).ok();
+    }
+
+    /// tsk-6arn: both fields present resolves a real, configured verifier.
+    #[test]
+    fn load_gateway_config_resolves_cf_access_when_both_fields_present() {
+        let home = std::env::temp_dir().join(format!("fgos-gateway-cfaccess-full-{}", std::process::id()));
+        write_test_home_config(
+            &home,
+            r#","cfAccessTeamDomain":"https://team.cloudflareaccess.com","cfAccessAud":"aud-tag-123""#,
+        );
+        let config = load_gateway_config(Some(&home)).expect("a full cf-access config must load");
+        assert!(config.cf_access.is_some());
+        std::fs::remove_dir_all(&home).ok();
+    }
+
+    /// tsk-6arn: exactly one of the two fields present is a real
+    /// misconfiguration, refused rather than silently treated as "off".
+    #[test]
+    fn load_gateway_config_rejects_partial_cf_access_team_domain_only() {
+        let home = std::env::temp_dir().join(format!("fgos-gateway-cfaccess-partial-a-{}", std::process::id()));
+        write_test_home_config(&home, r#","cfAccessTeamDomain":"https://team.cloudflareaccess.com""#);
+        let err = load_gateway_config(Some(&home)).expect_err("team_domain without aud must not silently resolve to None");
+        assert!(matches!(err, GatewayConfigError::PartialCfAccess(_)));
+        std::fs::remove_dir_all(&home).ok();
+    }
+
+    #[test]
+    fn load_gateway_config_rejects_partial_cf_access_aud_only() {
+        let home = std::env::temp_dir().join(format!("fgos-gateway-cfaccess-partial-b-{}", std::process::id()));
+        write_test_home_config(&home, r#","cfAccessAud":"aud-tag-123""#);
+        let err = load_gateway_config(Some(&home)).expect_err("aud without team_domain must not silently resolve to None");
+        assert!(matches!(err, GatewayConfigError::PartialCfAccess(_)));
         std::fs::remove_dir_all(&home).ok();
     }
 

@@ -61,6 +61,24 @@ tower-http = { version = "0.7", features = ["cors", "fs"] }
 # rust-embed major line the reference implementation herdr-gateway pins.
 rust-embed = { version = "8", features = ["debug-embed"] }
 axum-embed = "0.1"
+# tsk-6arn (D8): Cloudflare Access as auth layer 2, additive to the
+# Bearer token layer already shipped (tsk-7l9). Ported from the reference
+# implementation herdr-gateway (crate herdr-go, src/web/cf_access.rs).
+# Versions resolved by real `cargo add --dry-run` against this crate's
+# existing dependency graph -- differ from the reference's own pins
+# (jsonwebtoken 9->11, reqwest 0.12->0.13; reqwest's TLS feature was
+# renamed `rustls-tls`->`rustls` between those versions, confirmed by a
+# real dry-run failure before the correction). `jsonwebtoken`'s
+# `aws_lc_rs` feature is required explicitly -- v11 ships neither crypto
+# backend by default (real runtime panic caught at Execute: "Could not
+# automatically determine the process-level CryptoProvider... make sure
+# exactly one of the 'rust_crypto' and 'aws_lc_rs' features is enabled"),
+# and `aws_lc_rs` matches the backend `reqwest`'s own `rustls` feature
+# already pulls in, avoiding a second, competing provider in the same
+# binary.
+jsonwebtoken = { version = "11", default-features = false, features = ["use_pem", "aws_lc_rs"] }
+reqwest = { version = "0.13", default-features = false, features = ["json", "rustls"] }
+base64 = "0.23"
 
 [dev-dependencies]
 tower = { version = "0.4", features = ["util"] }
