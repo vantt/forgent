@@ -17,7 +17,7 @@
 //! self-provisioned default).
 
 use std::io::Read;
-use std::net::SocketAddr;
+use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
 use std::sync::Arc;
@@ -31,6 +31,7 @@ use axum::response::{IntoResponse, Response};
 use axum::routing::{delete, get, post};
 use axum::{Json, Router};
 use serde::Deserialize;
+use tower_http::cors::{Any, CorsLayer};
 use serde_json::{json, Value};
 
 use crate::ports::VerbGateway;
@@ -38,6 +39,11 @@ use crate::ports::VerbGateway;
 /// Default listening port — same default `docs/contracts/fgos-gateway-api-v1.yaml`'s
 /// `servers.variables.port` documents.
 const DEFAULT_PORT: u16 = 4170;
+
+/// D7 of `docs/history/herdr-web-dashboard/CONTEXT.md`: bind mặc định
+/// `0.0.0.0` (reachable from other machines on a LAN/Tailscale), cấu hình
+/// được, cảnh báo khi không phải loopback (see `run`, below).
+const DEFAULT_BIND: IpAddr = IpAddr::V4(Ipv4Addr::UNSPECIFIED);
 
 // ---------------------------------------------------------------------------
 // Config (D4/D5)
@@ -53,12 +59,14 @@ struct GlobalConfigFile {
 struct GatewaySection {
     token: Option<String>,
     port: Option<u16>,
+    bind: Option<String>,
 }
 
 #[derive(Debug, Clone)]
 pub struct GatewayConfig {
     pub port: u16,
     pub token: String,
+    pub bind: IpAddr,
 }
 
 #[derive(Debug)]
@@ -68,6 +76,7 @@ pub enum GatewayConfigError {
     Io(PathBuf, std::io::Error),
     Parse(PathBuf, serde_json::Error),
     MissingToken(PathBuf),
+    InvalidBind(PathBuf, String),
 }
 
 impl std::error::Error for GatewayConfigError {}
@@ -86,6 +95,11 @@ impl std::fmt::Display for GatewayConfigError {
             GatewayConfigError::MissingToken(p) => write!(
                 f,
                 "{} has no \"gateway.token\" field — the gateway needs a per-machine auth token (D4). Run \"fgos doctor --fix\" to generate and write one (tsk-4r1).",
+                p.display()
+            ),
+            GatewayConfigError::InvalidBind(p, raw) => write!(
+                f,
+                "{} has a \"gateway.bind\" value ({raw:?}) that is not a valid IP address — expected e.g. \"0.0.0.0\" or \"127.0.0.1\".",
                 p.display()
             ),
         }
@@ -119,9 +133,16 @@ pub fn load_gateway_config(home_dir: Option<&Path>) -> Result<GatewayConfig, Gat
     if token.trim().is_empty() {
         return Err(GatewayConfigError::MissingToken(config_path));
     }
+    let bind = match section.bind {
+        Some(raw) => raw
+            .parse::<IpAddr>()
+            .map_err(|_| GatewayConfigError::InvalidBind(config_path.clone(), raw))?,
+        None => DEFAULT_BIND,
+    };
     Ok(GatewayConfig {
         port: section.port.unwrap_or(DEFAULT_PORT),
         token,
+        bind,
     })
 }
 
@@ -920,7 +941,16 @@ pub fn build_router(gateway: Arc<dyn VerbGateway>, config: GatewayConfig, root: 
         .route("/contract", get(get_contract))
         .merge(authenticated);
 
-    Router::new().nest("/v1", api).with_state(state)
+    // tsk-54y: the web client is a static bundle independent of this
+    // gateway's own origin (D2 of docs/history/herdr-web-dashboard-plan-
+    // realignment/CONTEXT.md), so cross-origin requests must be allowed.
+    // Wildcard is safe here: D13 of the same CONTEXT.md locks
+    // `Authorization: Bearer` (never a cookie), so there is no
+    // credentialed request for a wildcard `Access-Control-Allow-Origin` to
+    // put at risk the way it would for a cookie-based scheme.
+    let cors = CorsLayer::new().allow_origin(Any).allow_methods(Any).allow_headers(Any);
+
+    Router::new().nest("/v1", api).with_state(state).layer(cors)
 }
 
 /// Runs the gateway to completion (i.e. forever, until the process is
@@ -930,7 +960,18 @@ pub fn build_router(gateway: Arc<dyn VerbGateway>, config: GatewayConfig, root: 
 /// process, gateway mode chosen at launch rather than the TUI's default).
 pub fn run(root: PathBuf) -> std::io::Result<()> {
     let config = load_gateway_config(None).map_err(std::io::Error::other)?;
-    let addr: SocketAddr = ([127, 0, 0, 1], config.port).into();
+    // D7: warn, don't refuse, when the resolved bind is not loopback --
+    // this is the intended LAN/Tailscale-reachable default (DEFAULT_BIND),
+    // not a misconfiguration. `eprintln!` matches this function's own
+    // existing startup-log idiom below rather than introducing a logging
+    // crate this binary does not otherwise depend on.
+    if !config.bind.is_loopback() {
+        eprintln!(
+            "warning: fgOS gateway binding to a non-loopback address ({}) — reachable from other machines on this network",
+            config.bind
+        );
+    }
+    let addr: SocketAddr = (config.bind, config.port).into();
     let gateway: Arc<dyn VerbGateway> = Arc::new(FgosCliGateway { root: root.clone() });
     let router = build_router(gateway, config, root);
 
@@ -997,6 +1038,7 @@ mod tests {
         GatewayConfig {
             port: 0,
             token: "test-token".to_string(),
+            bind: IpAddr::V4(Ipv4Addr::LOCALHOST),
         }
     }
 
@@ -1244,6 +1286,80 @@ mod tests {
             response.status(),
             StatusCode::NOT_FOUND,
             "an authenticated request to /mcp must reach the MCP transport, proving it is actually mounted"
+        );
+    }
+
+    fn write_test_home_config(home: &Path, extra_json: &str) {
+        std::fs::create_dir_all(home.join(".fgos")).unwrap();
+        std::fs::write(
+            home.join(".fgos").join("config.json"),
+            format!(r#"{{"gateway":{{"token":"test-token"{extra_json}}}}}"#),
+        )
+        .unwrap();
+    }
+
+    /// tsk-54y (D7): a `~/.fgos/config.json` with no `gateway.bind` field
+    /// must resolve to the locked default (`0.0.0.0`, reachable from other
+    /// machines), not the old hardcoded loopback-only behavior.
+    #[test]
+    fn load_gateway_config_resolves_default_bind_when_absent() {
+        let home = std::env::temp_dir().join(format!("fgos-gateway-bind-default-{}", std::process::id()));
+        write_test_home_config(&home, "");
+        let config = load_gateway_config(Some(&home)).expect("a token-only config must still load");
+        assert_eq!(config.bind, IpAddr::V4(Ipv4Addr::UNSPECIFIED));
+        std::fs::remove_dir_all(&home).ok();
+    }
+
+    /// tsk-54y (D7): an explicit `gateway.bind` overrides the default.
+    #[test]
+    fn load_gateway_config_resolves_explicit_bind_override() {
+        let home = std::env::temp_dir().join(format!("fgos-gateway-bind-override-{}", std::process::id()));
+        write_test_home_config(&home, r#","bind":"127.0.0.1""#);
+        let config = load_gateway_config(Some(&home)).expect("a valid bind override must load");
+        assert_eq!(config.bind, IpAddr::V4(Ipv4Addr::LOCALHOST));
+        std::fs::remove_dir_all(&home).ok();
+    }
+
+    /// tsk-54y: a malformed `gateway.bind` is a typed config error, not a
+    /// silent fallback to the default -- a typo should surface loudly.
+    #[test]
+    fn load_gateway_config_rejects_invalid_bind() {
+        let home = std::env::temp_dir().join(format!("fgos-gateway-bind-invalid-{}", std::process::id()));
+        write_test_home_config(&home, r#","bind":"not-an-ip""#);
+        let err = load_gateway_config(Some(&home)).expect_err("a malformed bind value must not silently resolve");
+        assert!(matches!(err, GatewayConfigError::InvalidBind(_, ref raw) if raw == "not-an-ip"));
+        std::fs::remove_dir_all(&home).ok();
+    }
+
+    /// tsk-54y (D5a): the web client's static bundle is a separate origin
+    /// from the gateway, so a cross-origin GET must come back with CORS
+    /// headers allowing it -- proven end to end through `build_router`,
+    /// not just at the `CorsLayer` construction call.
+    #[tokio::test]
+    async fn cors_layer_allows_cross_origin_requests() {
+        use axum::body::Body;
+        use axum::http::Request;
+        use tower::ServiceExt;
+
+        let gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({})) });
+        let app = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("GET")
+                    .uri("/v1/ready")
+                    .header(axum::http::header::AUTHORIZATION, "Bearer test-token")
+                    .header(axum::http::header::ORIGIN, "http://web-client.example")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(
+            response.headers().get(axum::http::header::ACCESS_CONTROL_ALLOW_ORIGIN),
+            Some(&axum::http::HeaderValue::from_static("*")),
+            "a cross-origin request must come back with an Access-Control-Allow-Origin header"
         );
     }
 }
