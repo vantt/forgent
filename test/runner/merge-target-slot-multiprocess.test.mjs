@@ -6,14 +6,30 @@
 // lock files ...) — not with two genuinely separate OS processes". It argues
 // the underlying mechanism (`wx`-atomic create + `link(2)`) cannot tell the
 // two cases apart. That argument is sound about the syscall and still leaves
-// one thing unproven at the layer that matters: the identity the lock records
-// is NOT the pid. `resolveWriterIdentity` (session-identity.mjs:135-138)
-// returns the env session id whenever one is set, and forked children inherit
-// it byte-identically — so two real processes contend under the SAME
-// `identity` string, which is precisely the shape a same-process test cannot
-// produce. If acquisition ever grew a "this lock is already mine" shortcut,
-// a same-process test would keep passing while real concurrent merges both
-// entered the critical section. That is the regression this file exists for.
+// one thing a same-process test cannot produce: two real, independent OS
+// processes contending for real.
+//
+// tsk-18k UPDATE: before this item, `withMergeTargetSlot`'s identity was
+// `resolveWriterIdentity`'s env-derived session id, which forked children
+// inherit byte-identically — so two real processes used to contend under the
+// literal SAME `identity` string. That was Finding 1's own bug surface: a
+// string identity has no liveness probe (main-checkout-lock.mjs's dual
+// numeric/string branch), so once one holder's lock went TTL-stale and a
+// sibling reclaimed it, the original holder's own release/renew call could
+// misidentify the reclaimer's fresh lock as its own (same string) and
+// delete/overwrite it. This item switched the identity to `process.pid` —
+// two real sibling processes forked here now carry genuinely DIFFERENT
+// identities even though they share the same env session id, so that
+// particular misidentify path no longer exists for this call site. The test
+// below ("the merge-target-slot lock is keyed by the real OS pid...") proves
+// this directly. The REST of this file's original point still holds
+// independent of the identity model: only two real OS processes exercise the
+// real `isPidAlive` liveness probe (only reachable for a numeric identity in
+// the first place) and the real `wx`-atomic create/`link(2)` syscalls a
+// same-process fake cannot reach. If acquisition ever grew a "this lock is
+// already mine" shortcut, a same-process test would keep passing while real
+// concurrent merges both entered the critical section. That is the
+// regression this file exists for.
 //
 // Worth a real test rather than an argument because tsk-xyr is a self-declared
 // hard-gate data-loss item: it changes which lock protects the `git branch -f`
@@ -114,8 +130,9 @@ test('a slot held by a REAL separate process is refused in this one, under the s
   try {
     await waitForFile(heldMarker, holder.state);
 
-    // Same env, so `resolveWriterIdentity` hands both processes the SAME
-    // identity string — the case a same-process test cannot construct.
+    // Same env as the parent (a real fork), but tsk-18k switched this call
+    // site's identity to `process.pid` — the child's own real OS pid, never
+    // the shared session string the two processes still both inherit.
     let entered = false;
     const err = await withMergeTargetSlot(lockRoot, targetRef, async () => {
       entered = true;
@@ -127,6 +144,39 @@ test('a slot held by a REAL separate process is refused in this one, under the s
     assert.equal(err.targetRef, targetRef);
     assert.match(err.message, /merge slot is held by another live session/);
     assert.notEqual(err.holderPid, process.pid, 'the reported holder is the other process, not this one');
+    assert.equal(err.holderPid, holder.child.pid, 'the reported holder is the CHILD\'s own real OS pid (tsk-18k identity fix), not a shared session string');
+  } finally {
+    fs.writeFileSync(releaseMarker, 'go');
+    assert.equal(await holder.exited, 0);
+  }
+});
+
+test('tsk-18k: the merge-target-slot lock is keyed by the real OS pid, not the shared env session id — two sibling processes never collide on release/renew', async () => {
+  const lockRoot = makeLockRoot();
+  const childPath = writeHolderChild(lockRoot);
+  const heldMarker = path.join(lockRoot, 'held');
+  const releaseMarker = path.join(lockRoot, 'release');
+  const targetRef = 'fgw/tsk-identity';
+
+  const holder = forkHolder(childPath, [lockRoot, targetRef, heldMarker, releaseMarker]);
+  try {
+    await waitForFile(heldMarker, holder.state);
+
+    // Read the child's own lock record directly: before tsk-18k this held
+    // `resolveWriterIdentity`'s env session id, which the parent process
+    // (this test, forked from the same env) would ALSO have resolved to —
+    // the exact collision Finding 1 exploited once the child's lock went
+    // TTL-stale and the parent's own release/renew call, sharing that same
+    // string, could misidentify a reclaimer's fresh lock as its own. Now it
+    // must be the child's real, distinct OS pid.
+    const lockPath = path.join(lockRoot, '.fgos', mergeSlotLockFile(targetRef));
+    const record = JSON.parse(fs.readFileSync(lockPath, 'utf8'));
+    assert.equal(record.pid, holder.child.pid, "the on-disk lock record is keyed by the child's own real pid");
+    assert.notEqual(
+      record.pid,
+      process.pid,
+      'the child and this parent test process must never be recorded under the same identity, even though both were forked from the same env',
+    );
   } finally {
     fs.writeFileSync(releaseMarker, 'go');
     assert.equal(await holder.exited, 0);

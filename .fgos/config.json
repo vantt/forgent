@@ -50,33 +50,47 @@
           "Task,WebSearch,WebFetch,Read,Bash(rg:*),Bash(git add:*),Bash(git commit:*)"
         ]
       },
-      "gather": {
+      "agy": {
         "kind": "cli",
-        "for": "gather",
-        "carries": "repo-content",
-        "adapter": "cli-spawn",
-        "command": "agy",
-        "provider": "agy",
-        "args": [
-          "-p",
-          "{prompt}",
-          "--model",
-          "{model}"
+        "allowCrossProvider": true,
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "agy",
+            "args": [
+              "-p",
+              "{prompt}",
+              "--dangerously-skip-permissions",
+              "--model",
+              "{model}"
+            ]
+          }
         ],
-        "tier": "light",
-        "model": "Gemini 3.5 Flash (Medium)",
-        "allowCrossProvider": true
+        "providerModel": "gemini",
+        "rigorOverrides": {
+          "light": "lightweight",
+          "standard": "lightweight",
+          "heavy": "lightweight"
+        }
       }
-    },
-    "models": {
-      "light": "haiku",
-      "standard": "sonnet",
-      "heavy": "opus"
     },
     "timeoutMs": 900000,
     "parallel": {
       "maxRoots": 4,
       "maxLeavesPerRoot": 4
+    },
+    "modelPolicies": {
+      "claude": {
+        "lightweight": "haiku",
+        "standard": "sonnet",
+        "creative": "sonnet",
+        "analytical": "sonnet",
+        "critical": "opus"
+      },
+      "gemini": {
+        "lightweight": "Gemini 3.5 Flash (Medium)"
+      }
     }
   },
   "gateBypass": {

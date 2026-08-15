@@ -321,3 +321,72 @@ test('plugin-dev-skills-packaged fails and names any .claude/skills/fgos-* dev-s
   assert.match(result.message, /fgos-example/);
   assert.match(result.message, /Unknown skill/);
 });
+
+// ─── gateway-token-configured (tsk-4r1, found by the gateway audit,
+// Finding 9): the gateway's own token lives in ~/.fgos/config.json (home),
+// never `cwd`'s -- every test below overrides HOME so it never touches
+// this machine's real home config, mirroring plugin-skill-cli-reachable's
+// own HOME-override discipline above.
+
+function gatewayTokenConfiguredCheck() {
+  const entry = DOCTOR_CHECKS.find((c) => c.id === 'gateway-token-configured');
+  assert.ok(entry, 'gateway-token-configured must be registered');
+  return entry.check;
+}
+
+function gatewayTokenConfiguredFix() {
+  const entry = FIX_REGISTRATIONS.find((f) => f.id === 'gateway-token-configured');
+  assert.ok(entry, 'gateway-token-configured fix must be registered');
+  return entry.fix;
+}
+
+test('gateway-token-configured check fails when HOME has no gateway.token, and fix provisions a real one the check then accepts', () => {
+  const homeDir = mkTempDir();
+  const originalHome = process.env.HOME;
+  process.env.HOME = homeDir;
+  try {
+    const before = gatewayTokenConfiguredCheck()();
+    assert.equal(before.passed, false);
+    assert.match(before.message, /gateway\.token missing/);
+    assert.match(before.message, /fgos doctor --fix/);
+
+    const fixResult = gatewayTokenConfiguredFix()();
+    assert.equal(fixResult.changed, true);
+
+    const written = JSON.parse(fs.readFileSync(path.join(homeDir, '.fgos', 'config.json'), 'utf8'));
+    assert.equal(typeof written.gateway.token, 'string');
+    assert.ok(written.gateway.token.length >= 32, `expected a high-entropy token, got ${written.gateway.token.length} chars`);
+
+    const after = gatewayTokenConfiguredCheck()();
+    assert.equal(after.passed, true);
+  } finally {
+    process.env.HOME = originalHome;
+  }
+});
+
+test('gateway-token-configured fix is idempotent — an existing token is never rotated out from under a client that already has it', () => {
+  const homeDir = mkTempDir();
+  const originalHome = process.env.HOME;
+  process.env.HOME = homeDir;
+  try {
+    fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
+    fs.writeFileSync(
+      path.join(homeDir, '.fgos', 'config.json'),
+      JSON.stringify({ gateway: { port: 4170, token: 'already-set-token' } }),
+    );
+    const fixResult = gatewayTokenConfiguredFix()();
+    assert.equal(fixResult.changed, false);
+    const written = JSON.parse(fs.readFileSync(path.join(homeDir, '.fgos', 'config.json'), 'utf8'));
+    assert.equal(written.gateway.token, 'already-set-token');
+  } finally {
+    process.env.HOME = originalHome;
+  }
+});
+
+test('the gateway config-default is registered under the "gateway" key with port and an unarmed null token', () => {
+  const entry = CONFIG_DEFAULT_REGISTRATIONS.find((c) => c.id === 'gateway');
+  assert.ok(entry, 'the gateway config-default is missing from CONFIG_DEFAULT_REGISTRATIONS');
+  assert.equal(entry.key, 'gateway');
+  assert.equal(entry.shape.port, 4170);
+  assert.equal(entry.shape.token, null);
+});

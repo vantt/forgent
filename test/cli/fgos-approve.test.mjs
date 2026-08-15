@@ -1249,6 +1249,42 @@ test('approve on a runner-sourced item with a missing-evidence acceptance clause
   assert.equal(stateView(cwd).work['runner-cos-missing'].status, 'awaiting-approval');
 });
 
+// tsk-2p6: same pre-flight-before-merge shape as the acceptance-evidence
+// regression test immediately above, for the plan-evidence gate.
+test('approve on a risk:heavy runner-sourced item with no plan.md on its branch is refused BEFORE the real git merge: precondition, main HEAD unchanged, item stays awaiting-approval', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'runner-heavy-no-plan', { risk: 'heavy' });
+
+  const mainHeadBefore = gitAtCwd(cwd, ['rev-parse', 'main']).trim();
+  const result = run(cwd, ['approve', 'runner-heavy-no-plan']);
+  assert.equal(result.status, 2, result.stderr);
+  assert.match(result.stderr, /no plan\.md found on branch "fgw\/runner-heavy-no-plan"/);
+
+  assert.equal(gitAtCwd(cwd, ['rev-parse', 'main']).trim(), mainHeadBefore, 'main HEAD must be completely unchanged by a refused approve');
+  assert.equal(stateView(cwd).work['runner-heavy-no-plan'].status, 'awaiting-approval');
+});
+
+test('approve on a risk:heavy runner-sourced item that DOES carry a plan.md on its branch succeeds normally', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'runner-heavy-with-plan', { risk: 'heavy', verify: 'test -f runner-heavy-with-plan-produced.txt' });
+
+  // makeRunnerProposedItem's own commit landed on fgw/<id> while main was
+  // checked out -- add the plan.md as a follow-up commit on that same
+  // branch, mirroring how a real session commits plan.md during planning.
+  gitAtCwd(cwd, ['checkout', 'fgw/runner-heavy-with-plan']);
+  fs.mkdirSync(path.join(cwd, 'docs', 'history', 'runner-heavy-with-plan'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'docs', 'history', 'runner-heavy-with-plan', 'plan.md'), '# plan\n');
+  gitAtCwd(cwd, ['add', 'docs']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'plan']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  const result = run(cwd, ['approve', 'runner-heavy-with-plan']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(stateView(cwd).work['runner-heavy-with-plan'].status, 'delivered');
+});
+
 // --- tsk-480: approve's post-success moveWork guard ------------------------
 //
 // The bug: approve's own success paths call moveWork(...to:'delivered'...)

@@ -16,12 +16,15 @@
 //! creates the file itself, so a missing token is a startup refusal, not a
 //! self-provisioned default).
 
+use std::io::Read;
 use std::net::SocketAddr;
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
 use std::sync::Arc;
+use std::time::{Duration, Instant};
 
-use axum::extract::{Path as AxPath, Query, State};
+use axum::extract::{FromRequest, FromRequestParts, Path as AxPath, Query, Request, State};
+use axum::http::request::Parts;
 use axum::http::{HeaderMap, StatusCode};
 use axum::middleware::{self, Next};
 use axum::response::{IntoResponse, Response};
@@ -75,14 +78,14 @@ impl std::fmt::Display for GatewayConfigError {
             GatewayConfigError::NoHomeDir => write!(f, "could not resolve $HOME to locate ~/.fgos/config.json"),
             GatewayConfigError::NotFound(p) => write!(
                 f,
-                "{} not found — the gateway needs a per-machine auth token (D4). Add a \"gateway\": {{ \"token\": \"<random-string>\" }} entry to it (run \"fgos setup\" first if the file itself doesn't exist yet).",
+                "{} not found — the gateway needs a per-machine auth token (D4). Run \"fgos setup\" to create it, then \"fgos doctor --fix\" to generate and write a real token (tsk-4r1: both are now registered in the setup/doctor gate).",
                 p.display()
             ),
             GatewayConfigError::Io(p, err) => write!(f, "could not read {}: {err}", p.display()),
             GatewayConfigError::Parse(p, err) => write!(f, "could not parse {} as JSON: {err}", p.display()),
             GatewayConfigError::MissingToken(p) => write!(
                 f,
-                "{} has no \"gateway.token\" field — the gateway needs a per-machine auth token (D4). Add a \"gateway\": {{ \"token\": \"<random-string>\" }} entry to it.",
+                "{} has no \"gateway.token\" field — the gateway needs a per-machine auth token (D4). Run \"fgos doctor --fix\" to generate and write one (tsk-4r1).",
                 p.display()
             ),
         }
@@ -227,15 +230,110 @@ impl std::fmt::Display for GatewayError {
     }
 }
 
-impl IntoResponse for GatewayError {
-    fn into_response(self) -> Response {
+impl GatewayError {
+    /// tsk-4qf: same `ErrorEnvelope` body `into_response` always builds,
+    /// with an explicit status override at THIS call site instead of the
+    /// blanket `category.http_status()` table. Lets a caller give a
+    /// distinct HTTP-layer signal (e.g. 401 for an auth failure) without
+    /// adding a new `category` value — D7 pins that enum as a closed
+    /// mirror of the CLI's own exit-code taxonomy, never widened by the
+    /// gateway itself.
+    fn into_response_with_status(self, status: StatusCode) -> Response {
         let body = json!({
             "category": self.category.as_str(),
             "message": self.message,
             "exitCode": self.exit_code,
         });
-        (self.category.http_status(), Json(body)).into_response()
+        (status, Json(body)).into_response()
     }
+}
+
+impl IntoResponse for GatewayError {
+    fn into_response(self) -> Response {
+        let status = self.category.http_status();
+        self.into_response_with_status(status)
+    }
+}
+
+/// tsk-4lf: how long `spawn_fgos_verb` waits before it gives up on a still-
+/// running `fgos` subprocess and kills it. Evidenced, not guessed:
+/// `src/runner/main-checkout-lock.mjs`'s own `DEFAULT_TTL_MS` comment
+/// measures ONE `mergeRunnerItem` verify/npm-ci hold at up to ~185s in
+/// practice; `approve` can run that hold TWICE inside one call (catchup
+/// worktree + merge worktree), so ~370s is this repo's own evidenced
+/// worst-case legitimate duration for the slowest verb this chokepoint
+/// spawns. 600s leaves real margin above that without ever mattering to a
+/// lightweight route (`list`/`ready`/`graph`/...), which finishes in
+/// milliseconds either way.
+const VERB_SPAWN_TIMEOUT: Duration = Duration::from_secs(600);
+
+/// Poll interval for the `try_wait()` loop below — small enough that the
+/// timeout deadline is honored promptly, cheap enough to run for up to
+/// `VERB_SPAWN_TIMEOUT` without meaningful CPU cost.
+const VERB_SPAWN_POLL_INTERVAL: Duration = Duration::from_millis(50);
+
+/// tsk-4lf: waits on `child` up to `timeout`, killing it and returning
+/// `Err(())` if it is still running at the deadline. Drains `stdout`/
+/// `stderr` on separate threads STARTED BEFORE the wait loop begins — the
+/// same pattern `std::process::Command::output()` uses internally — so a
+/// verb whose combined output exceeds the OS pipe buffer (64KiB on Linux)
+/// can never deadlock this thread's `try_wait()` poll on a full,
+/// undrained pipe. `child` must already have `stdout`/`stderr` set to
+/// `Stdio::piped()` by the caller.
+fn wait_with_timeout(
+    mut child: std::process::Child,
+    timeout: Duration,
+    poll_interval: Duration,
+) -> Result<(std::process::ExitStatus, Vec<u8>, Vec<u8>), ()> {
+    let mut stdout_pipe = child.stdout.take().expect("caller must pipe stdout");
+    let mut stderr_pipe = child.stderr.take().expect("caller must pipe stderr");
+    let stdout_thread = std::thread::spawn(move || {
+        let mut buf = Vec::new();
+        let _ = stdout_pipe.read_to_end(&mut buf);
+        buf
+    });
+    let stderr_thread = std::thread::spawn(move || {
+        let mut buf = Vec::new();
+        let _ = stderr_pipe.read_to_end(&mut buf);
+        buf
+    });
+
+    let deadline = Instant::now() + timeout;
+    loop {
+        if let Ok(Some(status)) = child.try_wait() {
+            let stdout = stdout_thread.join().unwrap_or_default();
+            let stderr = stderr_thread.join().unwrap_or_default();
+            return Ok((status, stdout, stderr));
+        }
+        if Instant::now() >= deadline {
+            let _ = child.kill();
+            let _ = child.wait();
+            let _ = stdout_thread.join();
+            let _ = stderr_thread.join();
+            return Err(());
+        }
+        std::thread::sleep(poll_interval);
+    }
+}
+
+/// tsk-og6: builds the exact `Command` `spawn_fgos_verb` runs, split out so
+/// its `current_dir` is directly testable (`Command::get_current_dir`)
+/// without spawning a real `node` process. `--dir <root>` alone is not
+/// enough — `session start/end/list/gc` and `move --to delivered`'s
+/// unmerged-branch guard both resolve their own repo root from
+/// `process.cwd()` instead of reading `--dir` (`bin/fgos.mjs:4559,1497`),
+/// so the spawned child's OWN working directory has to agree with `root`
+/// too, or those two verbs silently act on wherever the gateway process
+/// happened to be launched from.
+fn build_fgos_command(root: &Path, args: &[String]) -> std::process::Command {
+    let mut cmd_args: Vec<String> = vec![root.join("bin/fgos.mjs").to_string_lossy().to_string()];
+    cmd_args.extend(args.iter().cloned());
+    cmd_args.push("--dir".to_string());
+    cmd_args.push(root.to_string_lossy().to_string());
+
+    let mut cmd = std::process::Command::new("node");
+    cmd.args(&cmd_args).current_dir(root).stdin(Stdio::null());
+    cmd
 }
 
 /// D7: the sole function that ever spawns `fgos <verb>` on the gateway's
@@ -247,22 +345,31 @@ impl IntoResponse for GatewayError {
 /// Blocking (`std::process::Command`, matching `fgos.rs`'s own `run_fgos`
 /// convention) — callers on the async side always run this inside
 /// `tokio::task::spawn_blocking` (see `run_verb_blocking` below), never
-/// call it directly from an async handler body.
+/// call it directly from an async handler body. tsk-4lf: bounded by
+/// `VERB_SPAWN_TIMEOUT` via `wait_with_timeout` instead of a bare
+/// `.output()` — a wedged verb can no longer pin this thread forever.
 pub fn spawn_fgos_verb(root: &Path, args: &[String]) -> Result<Value, GatewayError> {
-    let mut cmd_args: Vec<String> = vec![root.join("bin/fgos.mjs").to_string_lossy().to_string()];
-    cmd_args.extend(args.iter().cloned());
-    cmd_args.push("--dir".to_string());
-    cmd_args.push(root.to_string_lossy().to_string());
-
-    let output = std::process::Command::new("node")
-        .args(&cmd_args)
-        .stdin(Stdio::null())
-        .output()
+    // tsk-og6 + tsk-4lf combined: build_fgos_command's own current_dir(root)
+    // still applies to the piped/spawned child wait_with_timeout needs --
+    // current_dir and the timeout wrapper are orthogonal, both required.
+    let child = build_fgos_command(root, args)
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
         .map_err(|err| GatewayError::unexpected(format!("spawning fgos CLI failed: {err}")))?;
 
-    if !output.status.success() {
-        let code = output.status.code().unwrap_or(1);
-        let message = String::from_utf8_lossy(&output.stderr).trim().to_string();
+    let (status, stdout, stderr) =
+        wait_with_timeout(child, VERB_SPAWN_TIMEOUT, VERB_SPAWN_POLL_INTERVAL).map_err(|()| GatewayError {
+            category: ErrorCategory::Busy,
+            message: format!(
+                "fgos CLI did not finish within {VERB_SPAWN_TIMEOUT:?} and was killed -- try again"
+            ),
+            exit_code: None,
+        })?;
+
+    if !status.success() {
+        let code = status.code().unwrap_or(1);
+        let message = String::from_utf8_lossy(&stderr).trim().to_string();
         return Err(GatewayError {
             category: ErrorCategory::from_exit_code(code),
             message: if message.is_empty() {
@@ -274,7 +381,7 @@ pub fn spawn_fgos_verb(root: &Path, args: &[String]) -> Result<Value, GatewayErr
         });
     }
 
-    let stdout = String::from_utf8_lossy(&output.stdout);
+    let stdout = String::from_utf8_lossy(&stdout);
     let envelope: Value = serde_json::from_str(stdout.trim())
         .map_err(|err| GatewayError::unexpected(format!("fgos CLI returned unparseable JSON: {err}")))?;
     // Envelope reuse (CTR001, contract's own top-level note): the HTTP body
@@ -325,12 +432,16 @@ async fn require_token(
         Some(token) if constant_time_eq(token.as_bytes(), state.config.token.as_bytes()) => {
             next.run(request).await
         }
+        // tsk-4qf: 401, not category's own 400 -- gives a client a
+        // distinct HTTP-layer auth signal (D7 forbids a new `category`
+        // value, so the JSON body's `category` field stays "validation";
+        // the status code alone carries the distinction).
         _ => GatewayError {
             category: ErrorCategory::Validation,
             message: "missing or invalid Authorization: Bearer <token> (D4: one token per machine, see ~/.fgos/config.json's \"gateway.token\")".to_string(),
             exit_code: None,
         }
-        .into_response(),
+        .into_response_with_status(StatusCode::UNAUTHORIZED),
     }
 }
 
@@ -360,6 +471,68 @@ struct AppState {
     root: PathBuf,
 }
 
+/// tsk-4qf: axum's own `Json<T>` rejects a malformed body with a
+/// plain-text response, not this gateway's `ErrorEnvelope` -- the contract
+/// (`docs/contracts/fgos-gateway-api-v1.yaml`) tells clients to "branch on
+/// this body's `category`" for every non-2xx response, which a plain-text
+/// body can't satisfy. Wraps `axum::Json` so its own rejection (already
+/// `Display`, `axum::extract::rejection::JsonRejection`) becomes a real
+/// `GatewayError` -- `IntoResponse` for the whole route then produces the
+/// same envelope every other error already does.
+struct AppJson<T>(T);
+
+impl<S, T> FromRequest<S> for AppJson<T>
+where
+    T: serde::de::DeserializeOwned,
+    S: Send + Sync,
+{
+    type Rejection = GatewayError;
+
+    async fn from_request(req: Request, state: &S) -> Result<Self, Self::Rejection> {
+        match Json::<T>::from_request(req, state).await {
+            Ok(Json(value)) => Ok(AppJson(value)),
+            Err(rejection) => Err(GatewayError::validation(format!("{rejection}"))),
+        }
+    }
+}
+
+/// Same fix as `AppJson`, for `axum::extract::Query` — a malformed query
+/// string (`axum::extract::rejection::QueryRejection`) also defaulted to a
+/// plain-text rejection body before this item.
+struct AppQuery<T>(T);
+
+impl<S, T> FromRequestParts<S> for AppQuery<T>
+where
+    T: serde::de::DeserializeOwned,
+    S: Send + Sync,
+{
+    type Rejection = GatewayError;
+
+    async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
+        match Query::<T>::from_request_parts(parts, state).await {
+            Ok(Query(value)) => Ok(AppQuery(value)),
+            Err(rejection) => Err(GatewayError::validation(format!("{rejection}"))),
+        }
+    }
+}
+
+/// tsk-1ah: `bin/fgos.mjs`'s `parseArgs` reinterprets ANY argv element
+/// starting with `--` as a flag, regardless of position -- a value like
+/// `POST /v1/work {"text": "--force"}` would silently become a boolean
+/// `force` flag instead of `submit`'s own positional text. Every field
+/// this guards (`id`, `role`, `to`, `expect`, `status`, `stage`, `cursor`)
+/// is enum/id-shaped: no legitimate value in any of them ever begins with
+/// `-`, so rejecting one here has zero false positives. Free-text fields
+/// (`text`, `reason`) are a deliberate scope boundary -- see `plan.md`.
+pub(crate) fn reject_leading_dash(value: &str, field: &str) -> Result<(), GatewayError> {
+    if value.starts_with('-') {
+        return Err(GatewayError::validation(format!(
+            "{field} must not begin with \"-\" -- rejected to prevent it being misread as a CLI flag (tsk-1ah)"
+        )));
+    }
+    Ok(())
+}
+
 #[derive(Debug, Deserialize, Default)]
 struct ListWorkQuery {
     status: Option<String>,
@@ -370,13 +543,15 @@ struct ListWorkQuery {
     limit: Option<u32>,
 }
 
-async fn get_work(State(state): State<AppState>, Query(q): Query<ListWorkQuery>) -> Result<Json<Value>, GatewayError> {
+async fn get_work(State(state): State<AppState>, AppQuery(q): AppQuery<ListWorkQuery>) -> Result<Json<Value>, GatewayError> {
     let mut args = vec!["list".to_string(), "--json".to_string()];
     if let Some(status) = q.status {
+        reject_leading_dash(&status, "status")?;
         args.push("--status".to_string());
         args.push(status);
     }
     if let Some(stage) = q.stage {
+        reject_leading_dash(&stage, "stage")?;
         args.push("--stage".to_string());
         args.push(stage);
     }
@@ -384,6 +559,7 @@ async fn get_work(State(state): State<AppState>, Query(q): Query<ListWorkQuery>)
         args.push("--all".to_string());
     }
     if let Some(cursor) = q.cursor {
+        reject_leading_dash(&cursor, "cursor")?;
         args.push("--cursor".to_string());
         args.push(cursor);
     }
@@ -400,7 +576,7 @@ struct SubmitWorkBody {
     text: String,
 }
 
-async fn post_work(State(state): State<AppState>, Json(body): Json<SubmitWorkBody>) -> Result<Json<Value>, GatewayError> {
+async fn post_work(State(state): State<AppState>, AppJson(body): AppJson<SubmitWorkBody>) -> Result<Json<Value>, GatewayError> {
     if body.text.trim().is_empty() {
         return Err(GatewayError::validation("submitWork requires a non-empty \"text\" field"));
     }
@@ -410,6 +586,7 @@ async fn post_work(State(state): State<AppState>, Json(body): Json<SubmitWorkBod
 }
 
 async fn get_work_by_id(State(state): State<AppState>, AxPath(id): AxPath<String>) -> Result<Json<Value>, GatewayError> {
+    reject_leading_dash(&id, "id")?;
     let args = vec!["show".to_string(), id, "--json".to_string()];
     let data = run_verb_blocking(state.gateway, args).await?;
     Ok(Json(data))
@@ -424,10 +601,13 @@ struct MoveWorkBody {
 async fn post_work_move(
     State(state): State<AppState>,
     AxPath(id): AxPath<String>,
-    Json(body): Json<MoveWorkBody>,
+    AppJson(body): AppJson<MoveWorkBody>,
 ) -> Result<Json<Value>, GatewayError> {
+    reject_leading_dash(&id, "id")?;
+    reject_leading_dash(&body.to, "to")?;
     let mut args = vec!["move".to_string(), id, "--to".to_string(), body.to, "--json".to_string()];
     if let Some(expect) = body.expect {
+        reject_leading_dash(&expect, "expect")?;
         args.push("--expect".to_string());
         args.push(expect);
     }
@@ -443,8 +623,9 @@ struct TextBody {
 async fn post_work_ask(
     State(state): State<AppState>,
     AxPath(id): AxPath<String>,
-    Json(body): Json<TextBody>,
+    AppJson(body): AppJson<TextBody>,
 ) -> Result<Json<Value>, GatewayError> {
+    reject_leading_dash(&id, "id")?;
     let args = vec!["ask".to_string(), id, "--text".to_string(), body.text, "--json".to_string()];
     let data = run_verb_blocking(state.gateway, args).await?;
     Ok(Json(data))
@@ -453,8 +634,9 @@ async fn post_work_ask(
 async fn post_work_answer(
     State(state): State<AppState>,
     AxPath(id): AxPath<String>,
-    Json(body): Json<TextBody>,
+    AppJson(body): AppJson<TextBody>,
 ) -> Result<Json<Value>, GatewayError> {
+    reject_leading_dash(&id, "id")?;
     let args = vec!["answer".to_string(), id, "--text".to_string(), body.text, "--json".to_string()];
     let data = run_verb_blocking(state.gateway, args).await?;
     Ok(Json(data))
@@ -471,18 +653,22 @@ async fn post_work_take(
     body: Option<Json<TakeWorkBody>>,
 ) -> Result<Json<Value>, GatewayError> {
     let role = body.and_then(|Json(b)| b.role).unwrap_or_else(|| "session".to_string());
+    reject_leading_dash(&id, "id")?;
+    reject_leading_dash(&role, "role")?;
     let args = vec!["take".to_string(), id, "--role".to_string(), role, "--json".to_string()];
     let data = run_verb_blocking(state.gateway, args).await?;
     Ok(Json(data))
 }
 
 async fn post_work_return(State(state): State<AppState>, AxPath(id): AxPath<String>) -> Result<Json<Value>, GatewayError> {
+    reject_leading_dash(&id, "id")?;
     let args = vec!["return".to_string(), id, "--json".to_string()];
     let data = run_verb_blocking(state.gateway, args).await?;
     Ok(Json(data))
 }
 
 async fn post_work_approve(State(state): State<AppState>, AxPath(id): AxPath<String>) -> Result<Json<Value>, GatewayError> {
+    reject_leading_dash(&id, "id")?;
     let args = vec!["approve".to_string(), id, "--json".to_string()];
     let data = run_verb_blocking(state.gateway, args).await?;
     Ok(Json(data))
@@ -496,8 +682,9 @@ struct ReasonBody {
 async fn post_work_reject(
     State(state): State<AppState>,
     AxPath(id): AxPath<String>,
-    Json(body): Json<ReasonBody>,
+    AppJson(body): AppJson<ReasonBody>,
 ) -> Result<Json<Value>, GatewayError> {
+    reject_leading_dash(&id, "id")?;
     let args = vec!["reject".to_string(), id, "--reason".to_string(), body.reason, "--json".to_string()];
     let data = run_verb_blocking(state.gateway, args).await?;
     Ok(Json(data))
@@ -509,9 +696,10 @@ struct PageQuery {
     limit: Option<u32>,
 }
 
-async fn get_ready(State(state): State<AppState>, Query(q): Query<PageQuery>) -> Result<Json<Value>, GatewayError> {
+async fn get_ready(State(state): State<AppState>, AppQuery(q): AppQuery<PageQuery>) -> Result<Json<Value>, GatewayError> {
     let mut args = vec!["ready".to_string(), "--json".to_string()];
     if let Some(cursor) = q.cursor {
+        reject_leading_dash(&cursor, "cursor")?;
         args.push("--cursor".to_string());
         args.push(cursor);
     }
@@ -524,6 +712,7 @@ async fn get_ready(State(state): State<AppState>, Query(q): Query<PageQuery>) ->
 }
 
 async fn get_rollup(State(state): State<AppState>, AxPath(id): AxPath<String>) -> Result<Json<Value>, GatewayError> {
+    reject_leading_dash(&id, "id")?;
     let args = vec!["rollup".to_string(), id, "--json".to_string()];
     let data = run_verb_blocking(state.gateway, args).await?;
     Ok(Json(data))
@@ -562,6 +751,7 @@ async fn post_sessions(
     let mut args = vec!["session".to_string(), "start".to_string(), "--json".to_string()];
     if let Some(Json(b)) = body {
         if let Some(item) = b.item {
+            reject_leading_dash(&item, "item")?;
             args.push("--item".to_string());
             args.push(item);
         }
@@ -579,8 +769,9 @@ struct EndSessionQuery {
 async fn delete_session(
     State(state): State<AppState>,
     AxPath(session_id): AxPath<String>,
-    Query(q): Query<EndSessionQuery>,
+    AppQuery(q): AppQuery<EndSessionQuery>,
 ) -> Result<Json<Value>, GatewayError> {
+    reject_leading_dash(&session_id, "sessionId")?;
     let mut args = vec!["session".to_string(), "end".to_string(), session_id, "--json".to_string()];
     if q.force {
         args.push("--force".to_string());
@@ -717,10 +908,19 @@ pub fn build_router(gateway: Arc<dyn VerbGateway>, config: GatewayConfig, root: 
         .nest_service("/mcp", mcp_service)
         .route_layer(middleware::from_fn_with_state(state.clone(), require_token));
 
-    Router::new()
+    // tsk-4uh: the contract's `servers.url` (docs/contracts/fgos-gateway-
+    // api-v1.yaml:54-59) and this file's own startup log (`run`, below) both
+    // already advertise `/v1` -- nesting the whole api router (contract +
+    // authenticated together) under it here is what makes the code agree
+    // with both instead of being the lone outlier. Nesting is pure path
+    // prefixing (no layer is added or removed by `.nest`), so `/contract`
+    // keeps sitting outside `authenticated`'s `require_token` layer exactly
+    // as before, just reachable at `/v1/contract` instead of `/contract`.
+    let api = Router::new()
         .route("/contract", get(get_contract))
-        .merge(authenticated)
-        .with_state(state)
+        .merge(authenticated);
+
+    Router::new().nest("/v1", api).with_state(state)
 }
 
 /// Runs the gateway to completion (i.e. forever, until the process is
@@ -745,6 +945,40 @@ pub fn run(root: PathBuf) -> std::io::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn build_fgos_command_runs_in_root_not_the_ambient_process_cwd() {
+        let root = PathBuf::from("/tmp/fgos-gateway-test-root");
+        let cmd = build_fgos_command(&root, &["list".to_string()]);
+        assert_eq!(cmd.get_current_dir(), Some(root.as_path()));
+    }
+
+    #[test]
+    fn wait_with_timeout_kills_a_process_that_outlives_the_deadline() {
+        let child = std::process::Command::new("sleep")
+            .arg("30")
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .expect("sleep must be spawnable in the test environment");
+        let result = wait_with_timeout(child, Duration::from_millis(100), Duration::from_millis(10));
+        assert!(result.is_err(), "a process outliving the deadline must be reported as killed, not waited on forever");
+    }
+
+    #[test]
+    fn wait_with_timeout_returns_real_output_when_the_process_finishes_in_time() {
+        let child = std::process::Command::new("printf")
+            .arg("hello")
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .expect("printf must be spawnable in the test environment");
+        let (status, stdout, _stderr) =
+            wait_with_timeout(child, Duration::from_secs(5), Duration::from_millis(10))
+                .expect("a process finishing well before the deadline must not be treated as timed out");
+        assert!(status.success());
+        assert_eq!(stdout, b"hello");
+    }
 
     struct FakeGateway {
         response: Result<Value, String>,
@@ -781,6 +1015,41 @@ mod tests {
     }
 
     #[test]
+    fn reject_leading_dash_rejects_only_a_leading_dash() {
+        assert!(reject_leading_dash("-x", "id").is_err());
+        assert!(reject_leading_dash("--force", "id").is_err());
+        assert!(reject_leading_dash("tsk-123", "id").is_ok(), "a real id contains dashes, just not a LEADING one");
+        assert!(reject_leading_dash("human", "role").is_ok());
+        assert!(reject_leading_dash("", "cursor").is_ok(), "an empty value is the caller's own absent-field sentinel, not a dash");
+    }
+
+    #[tokio::test]
+    async fn a_dash_prefixed_id_is_rejected_before_it_ever_reaches_the_verb_chokepoint() {
+        let gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({"ok": true})) });
+        let app = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+
+        use axum::body::Body;
+        use axum::http::Request;
+        use tower::ServiceExt;
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/v1/work/--force")
+                    .header(axum::http::header::AUTHORIZATION, "Bearer test-token")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(
+            response.status(),
+            StatusCode::BAD_REQUEST,
+            "a dash-prefixed id must be refused as validation, never reach spawn_fgos_verb where it could be misread as a flag"
+        );
+    }
+
+    #[test]
     fn constant_time_eq_matches_only_identical_bytes() {
         assert!(constant_time_eq(b"abc", b"abc"));
         assert!(!constant_time_eq(b"abc", b"abd"));
@@ -799,10 +1068,12 @@ mod tests {
         use tower::ServiceExt;
 
         let response = app
-            .oneshot(Request::builder().uri("/ready").body(Body::empty()).unwrap())
+            .oneshot(Request::builder().uri("/v1/ready").body(Body::empty()).unwrap())
             .await
             .unwrap();
-        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+        // tsk-4qf: 401, not the category table's own 400 -- a distinct
+        // HTTP-layer auth signal, see require_token's own comment.
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
     }
 
     #[tokio::test]
@@ -817,7 +1088,7 @@ mod tests {
         let response = app
             .oneshot(
                 Request::builder()
-                    .uri("/ready")
+                    .uri("/v1/ready")
                     .header(axum::http::header::AUTHORIZATION, "Bearer test-token")
                     .body(Body::empty())
                     .unwrap(),
@@ -839,7 +1110,7 @@ mod tests {
         let response = app
             .oneshot(
                 Request::builder()
-                    .uri("/ready")
+                    .uri("/v1/ready")
                     .header(axum::http::header::AUTHORIZATION, "Bearer test-token")
                     .body(Body::empty())
                     .unwrap(),
@@ -847,6 +1118,66 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+    }
+
+    #[tokio::test]
+    async fn a_malformed_json_body_returns_the_same_error_envelope_every_other_error_uses() {
+        let gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({"ok": true})) });
+        let app = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+
+        use axum::body::Body;
+        use axum::http::Request;
+        use tower::ServiceExt;
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/v1/work")
+                    .header(axum::http::header::AUTHORIZATION, "Bearer test-token")
+                    .header(axum::http::header::CONTENT_TYPE, "application/json")
+                    .body(Body::from("{not valid json"))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+
+        let body = axum::body::to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        let parsed: Value = serde_json::from_slice(&body).expect(
+            "a malformed request body must still get the JSON ErrorEnvelope, never axum's own plain-text rejection",
+        );
+        assert!(parsed.get("category").is_some(), "expected an ErrorEnvelope-shaped body, got: {parsed}");
+    }
+
+    #[tokio::test]
+    async fn a_malformed_query_string_returns_the_same_error_envelope_every_other_error_uses() {
+        let gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({"ok": true})) });
+        let app = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+
+        use axum::body::Body;
+        use axum::http::Request;
+        use tower::ServiceExt;
+
+        // `limit` is typed `u32` in `ListWorkQuery` -- a non-numeric value
+        // is what QueryRejection actually rejects on.
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/v1/work?limit=not-a-number")
+                    .header(axum::http::header::AUTHORIZATION, "Bearer test-token")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+
+        let body = axum::body::to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        let parsed: Value = serde_json::from_slice(&body).expect(
+            "a malformed query string must still get the JSON ErrorEnvelope, never axum's own plain-text rejection",
+        );
+        assert!(parsed.get("category").is_some(), "expected an ErrorEnvelope-shaped body, got: {parsed}");
     }
 
     #[tokio::test]
@@ -862,7 +1193,7 @@ mod tests {
         use tower::ServiceExt;
 
         let response = app
-            .oneshot(Request::builder().uri("/contract").body(Body::empty()).unwrap())
+            .oneshot(Request::builder().uri("/v1/contract").body(Body::empty()).unwrap())
             .await
             .unwrap();
         assert_eq!(response.status(), StatusCode::OK);
@@ -882,12 +1213,12 @@ mod tests {
         let unauth_gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({})) });
         let unauth_app = build_router(unauth_gateway, test_config(), PathBuf::from("/tmp"));
         let response = unauth_app
-            .oneshot(Request::builder().method("POST").uri("/mcp").body(Body::empty()).unwrap())
+            .oneshot(Request::builder().method("POST").uri("/v1/mcp").body(Body::empty()).unwrap())
             .await
             .unwrap();
         assert_eq!(
             response.status(),
-            StatusCode::BAD_REQUEST,
+            StatusCode::UNAUTHORIZED,
             "unauthenticated /mcp must be blocked by the same require_token gate as every other route"
         );
 
@@ -897,7 +1228,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method("POST")
-                    .uri("/mcp")
+                    .uri("/v1/mcp")
                     .header(axum::http::header::AUTHORIZATION, "Bearer test-token")
                     .header(axum::http::header::CONTENT_TYPE, "application/json")
                     .header("Mcp-Protocol-Version", "2025-06-18")

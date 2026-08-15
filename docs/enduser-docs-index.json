@@ -779,6 +779,22 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-a-per-stage-exception-in-the-driver-meant-that-stage-had-no-owner.md",
+    "title": "Why a per-stage exception in the driver meant that stage had no owner",
+    "sourceCaptureId": "tsk-tku"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias.md",
+    "title": "Why a retired stage name sometimes keeps a drain-only alias",
+    "sourceCaptureId": "tsk-403"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/why-a-verify-command-cannot-mutate-live-work-state.md",
     "title": "Why a `verify` command cannot itself mutate live work state",
     "sourceCaptureId": "tsk-4j9-4"
@@ -1331,6 +1347,14 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-splitting-test-files-hits-a-floor-and-narrowing-verify-never-helped.md",
+    "title": "Why splitting test files hits a floor, and why narrowing verify never helped",
+    "sourceCaptureId": "tsk-25b"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/why-stage-skills-forbid-ad-hoc-task-delegation-for-their-own-reasoning.md",
     "title": "Why stage-skills forbid ad hoc Task/Agent delegation for their own reasoning",
     "sourceCaptureId": "tsk-29i"
@@ -1635,6 +1659,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/cut-a-fgos-release-tag.md",
+    "title": "How to cut a fgOS release tag",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/declare-footprint-when-fgos-planning-splits-an-item.md",
     "title": "How to declare `--footprint` when `fgos-coding-planning` splits an item",
     "sourceCaptureId": "tsk-3uz"
@@ -1803,6 +1835,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+    "title": "How to preserve shell escapes when transcribing a verify command",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/process-the-next-clarify-or-decompose-item-with-discover-next.md",
     "title": "How to process the next clarify/decompose item with `/fgOS:discover-next`",
     "sourceCaptureId": "tsk-3go-2"
@@ -1885,7 +1925,7 @@
     "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/recover-approve-sync-root-from-inside-a-worktree-with-trust-dir.md",
     "title": "How to recover `fgos approve`/`fgos sync-root` from inside a worktree with `--trust-dir`",
-    "sourceCaptureId": null
+    "sourceCaptureId": "tsk-4uj"
   },
   {
     "quadrant": "how-to",
@@ -1990,6 +2030,14 @@
     "docPath": "docs/how-to/sync-a-fgos-item-whose-fix-already-shipped-outside-the-normal-lifecycle.md",
     "title": "Sync an fgOS item whose fix already shipped outside the normal claim/return/approve lifecycle",
     "sourceCaptureId": "tsk-3w3x"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md",
+    "title": "How to tell a stale worktree index apart from real uncommitted work",
+    "sourceCaptureId": null
   },
   {
     "quadrant": "how-to",

@@ -194,11 +194,32 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
     // the `.fgos` directory, so its parent is the project root
     // readSharedConfig expects — resolved the same way readGateBypassLevel
     // does, rather than from `repoRoot`, which callers set independently.
+    // tsk-37t: a stale-claim reclaim (below) re-claims an item that is
+    // ALREADY `doing` — occupancy is unchanged before and after (the item
+    // held its slot under the stale claim, and holds the same slot under
+    // the fresh one), so the ceiling gate has nothing real to refuse here.
+    // Computed BEFORE the gate on purpose: `excludeId: id` already removes
+    // this item from the room-check's own occupancy count, but that count
+    // still refuses when every OTHER item alone is at or past ceiling (the
+    // exact drift this item was filed against) — which is precisely the
+    // situation a person reclaiming a stale claim is trying to clear. Same
+    // condition the reclaim block below re-derives independently as a
+    // signal-check, not a status change, so evaluating it twice (cheap:
+    // `isReclaimEligible` here decides only whether to SKIP the gate, the
+    // block below still runs its own reclaim attempt against fresh state)
+    // never lets a claim through this gate that the reclaim block itself
+    // then declines to take.
+    const isPotentialStaleClaimReclaim = isolate
+      && item.status === 'doing'
+      && (item.claimRole === 'human' || item.claimRole === 'session')
+      && (actor === 'session' || actor === 'human')
+      && isReclaimEligible(repoRoot, id, item.claimRole);
+
     const room = hasWorkerSlotRoom(view, {
       ceiling: readSharedConfigOrEmpty(path.dirname(dir))?.workerSlots?.ceiling,
       excludeId: id,
     });
-    if (!room.allowed) {
+    if (!room.allowed && !isPotentialStaleClaimReclaim) {
       throw new ClaimError(
         'worker-slot-ceiling',
         `claimWork: worker-slot ceiling reached — ${room.occupied} of ${room.ceiling} slots in use; finish or park a running item before claiming "${id}".`,
@@ -353,10 +374,27 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
     // docs/history/pick-worktree-claim-race/CONTEXT.md D1/D3). Revert the
     // claim back to expectedStatus before rethrowing, so a failed pick
     // looks like it never happened and a retry sees ordinary CAS semantics.
+    //
+    // beforeProvision (tsk-1mn, Finding 2): releases main-checkout.lock
+    // right before createClaimWorktree's own synchronous `npm ci`/`npm
+    // install` step -- the durable state mutation above (moveWork,
+    // addOutcome) is already committed by now, and every repoRoot-touching
+    // git call this claim makes (`worktree add`/`branch`) has already run
+    // by the time this fires (worktree.mjs's own `finishWorktreeSetup` doc).
+    // A fully synchronous `execFileSync` blocks the event loop for its whole
+    // duration, so a timer-based heartbeat (the fix `withMergeTargetSlot`
+    // uses for its own async hold) literally cannot fire here -- shrinking
+    // the hold, not renewing it, is the only fix that actually closes the
+    // gap: on a cold npm cache exceeding the lock's `ttlMs`, the lock is no
+    // longer held at all by then, so there is nothing left for a concurrent
+    // writer to wrongly judge stale and reclaim. `lockResult.release()` is
+    // idempotent (tsk-45z's own closure) -- the outer `finally` below still
+    // calls it unconditionally, safe whether this callback already fired or
+    // never got the chance to (creation failed before reaching it).
     if (isolate) {
       let worktree;
       try {
-        worktree = createClaimWorktree(repoRoot, id, { worktreeDir, baseRef });
+        worktree = createClaimWorktree(repoRoot, id, { worktreeDir, baseRef, beforeProvision: () => lockResult.release() });
       } catch (err) {
         moveWork(dir, { id, to: expectedStatus, expectedStatus: 'doing', role: actor });
         throw err;

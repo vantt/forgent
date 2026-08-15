@@ -17,7 +17,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, registerTool, removeTool, assertAcceptanceEvidence, assertValidDocType, recordGateApprove, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, registerTool, removeTool, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
 import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability } from '../src/state/tool-registry.mjs';
 import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
@@ -1486,6 +1486,15 @@ async function runVerb(verb, flags, positional, dir) {
       // everywhere else" — this verb just forwards whatever the caller
       // supplied.
       const reason = optionalField(flags.reason, 'move --reason requires a non-empty reason value (omit --reason entirely when not rejecting a proposal)');
+      // tsk-2lc: transitionWork (status-fsm.mjs) requires a non-empty
+      // `answer` for ANY exit from awaiting-human, regardless of `to` --
+      // this verb never forwarded one, so the awaiting-human -> wontfix
+      // edge (tsk-2ub) was unreachable through `move` even though the FSM
+      // table already carries it: `fgos answer` is the only other door out
+      // of awaiting-human, and it only ever resumes to todo/doing, never
+      // wontfix. Optional here exactly like `reason` above -- ignored by
+      // transitionWork for every edge that doesn't require it.
+      const answer = optionalField(flags.answer, 'move --answer requires a non-empty value (omit --answer entirely when not resuming/closing an item out of awaiting-human)');
       // tsk-5dk: a hand-typed move to delivered writes no merge evidence
       // (mergedSha/mergedInto only ever come from approve's real merge
       // paths, src/state/store.mjs) — refuse when fgw/<id> is a live
@@ -1548,7 +1557,7 @@ async function runVerb(verb, flags, positional, dir) {
           });
         }
       }
-      const { event } = moveWork(dir, { id, to, expectedStatus, reason, role: 'human' });
+      const { event } = moveWork(dir, { id, to, expectedStatus, reason, answer, role: 'human' });
       return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
     }
 
@@ -3018,6 +3027,55 @@ async function runVerb(verb, flags, positional, dir) {
         return { id, from: 'doing', to: 'blocked', source: 'branch', branch, aheadCount: branchAheadCount, passed: false, timedOut: check.timedOut, exitStatus: check.status, output: check.output };
       }
 
+      // tsk-ikd (P44): the branch-source path above already returned before
+      // reaching here, so every path below is main-source -- it reads
+      // `currentHead(repoRoot)`, runs the clean-tree check, verify, and
+      // records `headAtReturn` all against whatever `repoRoot` happens to
+      // be. `approve` (:3355), `sync-root` (:4043), and
+      // `promote-to-component` (:4258) all refuse from a linked worktree for
+      // exactly this hazard class -- verifying/recording a stale or
+      // divergent tree while claiming it verified on main -- but this path
+      // had no such guard. Without it: an item claimed via `take`
+      // (main-source) returned from inside a leftover, UNREGISTERED `fgw/*`
+      // claim worktree instead of main (e.g. left over from a DIFFERENT
+      // item entirely) would pass the progress gate and verify against THAT
+      // worktree's own tree, then record `headAtReturn` as a sha that was
+      // never on main -- `approve`'s later verify-only mode re-verifies on
+      // main and finds it green (main's own HEAD, untouched), and the item
+      // goes `delivered` with its real content never actually on main.
+      // Surfaces only much later, misdiagnosed as a force-push/history-
+      // rewrite loss when cleanup's ancestry check fails.
+      //
+      // A REGISTERED session worktree (`fgos session start`) is deliberately
+      // EXEMPT -- unlike `approve`, which refuses ANY worktree including a
+      // registered session (docs/specs/runner.md: "a session worktree is
+      // structurally the wrong place for a merge-into-main to happen"),
+      // `return`'s own progress check (aheadCount + verify) is spike-proven
+      // correct from inside a session worktree and is documented there as
+      // deliberately unchanged: a session worktree's `.fgos` is a symlink to
+      // the real shared store (never copied), so state writes land
+      // correctly, and `session end` (session.mjs's own divergence guard)
+      // already refuses to silently discard a dangling commit -- that is
+      // the layer responsible for making sure returned work actually reaches
+      // main, not this one. Only an UNREGISTERED worktree (an ad-hoc `git
+      // worktree add`, or -- the actual failure scenario here -- a
+      // different item's own leftover `fgw/<id>` claim checkout) is refused.
+      // The branch-source path above needs no such guard at all (its own
+      // comment, D2: "tree người là việc của người" -- it never touches
+      // `repoRoot`'s working tree, verify runs in a disposable detached
+      // worktree).
+      const returnCwdReal = realpathOr(repoRoot);
+      const insideRegisteredSession = listSessions(repoRoot).some((session) => {
+        const wtReal = realpathOr(session.worktreePath);
+        return returnCwdReal === wtReal || returnCwdReal.startsWith(`${wtReal}${path.sep}`);
+      });
+      if (!insideRegisteredSession && !isMainWorktree(repoRoot)) {
+        throw new StoreError(
+          'validation',
+          `return: refusing to run from "${repoRoot}" — this is a git worktree (not the main checkout, and not a registered "fgos session start" worktree). Run return from the main checkout, or from inside a registered session.`,
+        );
+      }
+
       if (typeof item.headAtTake !== 'string' || !item.headAtTake) {
         throw new StoreError('validation', `return: work "${id}" has no recorded headAtTake — cannot verify progress since take.`);
       }
@@ -3475,6 +3533,7 @@ async function runVerb(verb, flags, positional, dir) {
         // be `git merge --abort`ed the way a local one can, so this matters
         // even more here than on the local paths above.
         assertAcceptanceEvidence(id, item);
+        assertPlanEvidence(id, item, repoRoot);
         const result = await mergeGitHubPR(repoRoot, prNumber, ghCommandOpts());
         if (result.outcome === 'merged') {
           // Accepted rough edge (this slice): unlike the local merged path, no
@@ -3529,6 +3588,7 @@ async function runVerb(verb, flags, positional, dir) {
         // check (store.mjs). A merge that's about to be refused here never
         // touches the target branch.
         assertAcceptanceEvidence(id, item);
+        assertPlanEvidence(id, item, repoRoot);
 
         // D3 leaf-vs-root split: a leaf's resolved root is a DIFFERENT item
         // (resolveRoot walks item.parent up to the top); a root's resolved
@@ -3540,10 +3600,13 @@ async function runVerb(verb, flags, positional, dir) {
           // A root only ever driven by a live session/pick (never the
           // runner's own dispatch loop, which creates fgw/<rootId> early,
           // D17) can reach this point before its own branch exists — seed
-          // it from main here, the same fallback createDetachedMergeWorktree
-          // already applies at its own later call site below.
+          // it from the repo's own detected trunk here (tsk-386: no longer
+          // a hardcoded 'main' -- createBranchRef's own default already
+          // resolves through detectTrunk(repoRoot)), the same fallback
+          // createDetachedMergeWorktree already applies at its own later
+          // call site below.
           if (!branchExists(repoRoot, rootBranch)) {
-            createBranchRef(repoRoot, rootId, { baseRef: 'main' });
+            createBranchRef(repoRoot, rootId);
           }
           // Ephemeral worktree checked out on fgw/<rootId> (now guaranteed to
           // exist, either from dispatch-side wiring or the fallback just
@@ -4702,7 +4765,11 @@ async function runVerb(verb, flags, positional, dir) {
     // uses), so this reuses it as-is rather than adding a parallel
     // global-specific writer.
     case 'setup': {
-      const repoRoot = process.cwd();
+      // tsk-2xj: same --dir resolution as `doctor`/`uninstall` below and
+      // `resync-worktree` (:4939) — setup's writes are unconditional (tsk-5hi),
+      // so run from a linked worktree this used to materialize .fgos/config.json
+      // INSIDE the worktree (ADR0020 violation), not just report wrong.
+      const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());
       const scriptPath = integrationScriptPath();
       const rcFiles = detectRcFiles(os.homedir());
       const rcFilesInserted = [];
@@ -4811,7 +4878,8 @@ async function runVerb(verb, flags, positional, dir) {
           'fgos uninstall requires --yes to confirm — it unwires git hooks (core.hooksPath/.githooks) and reports (never deletes) the shell-rc source line. Rerun with --yes once ready.',
         );
       }
-      const repoRoot = process.cwd();
+      // tsk-2xj: same --dir resolution as `doctor`/`setup` above.
+      const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());
       const scriptPath = integrationScriptPath();
       const shellRcSourceLinesFound = scriptPath === null
         ? []
@@ -4821,16 +4889,40 @@ async function runVerb(verb, flags, positional, dir) {
       const { unwired: hooksUnwired, skippedExisting: hooksSkippedExisting } = uninstallGitHooks(repoRoot);
       let packageRemoval = { attempted: false, outcome: null };
       if (flags['remove-package']) {
+        // tsk-652: `npm uninstall -g forgent` exits 0 and reports nothing
+        // wrong even when this copy was never npm-installed at all (a
+        // pnpm/yarn global install lives in a different store npm never
+        // touches) -- confirm npm's own global node_modules actually has
+        // this package BEFORE claiming success, the same "detected
+        // manager" scope tsk-4iv-2's own SPIKE locked (npm-only), never
+        // widened here to actually support pnpm/yarn removal.
+        let npmRootG = null;
         try {
-          const output = execFileSync('npm', ['uninstall', '-g', 'forgent'], { encoding: 'utf8' });
-          packageRemoval = { attempted: true, outcome: 'removed', output };
-        } catch (err) {
+          npmRootG = execFileSync('npm', ['root', '-g'], { encoding: 'utf8' }).trim();
+        } catch {
+          npmRootG = null;
+        }
+        const npmInstalled = npmRootG !== null && npmRootG !== '' && fs.existsSync(path.join(npmRootG, 'forgent'));
+        if (!npmInstalled) {
           packageRemoval = {
-            attempted: true,
-            outcome: 'failed',
-            error: err.message,
-            stderr: typeof err.stderr === 'string' ? err.stderr : (err.stderr?.toString() ?? null),
+            attempted: false,
+            outcome: 'skipped',
+            reason: npmRootG
+              ? `this copy of fgOS is not visible under npm's own global node_modules (${npmRootG}) -- --remove-package only supports npm global installs (tsk-4iv-2); if installed via pnpm/yarn, remove it with that tool's own global uninstall command instead`
+              : 'npm root -g did not resolve (npm not on PATH?) -- --remove-package only supports npm global installs (tsk-4iv-2), and could not confirm this is one',
           };
+        } else {
+          try {
+            const output = execFileSync('npm', ['uninstall', '-g', 'forgent'], { encoding: 'utf8' });
+            packageRemoval = { attempted: true, outcome: 'removed', output };
+          } catch (err) {
+            packageRemoval = {
+              attempted: true,
+              outcome: 'failed',
+              error: err.message,
+              stderr: typeof err.stderr === 'string' ? err.stderr : (err.stderr?.toString() ?? null),
+            };
+          }
         }
       }
       return {
@@ -4856,9 +4948,16 @@ async function runVerb(verb, flags, positional, dir) {
     // `ensureRunnerConfig`/`ensureSharedConfigDefaults` already use. Without
     // `--fix`, behavior is byte-identical to before this flag existed.
     case 'doctor': {
-      const fixed = flags.fix ? runFixes(process.cwd()) : undefined;
+      // tsk-2xj: resolve the real main checkout the same way `resync-worktree`
+      // (:4939) already does — an explicit --dir always wins, otherwise
+      // self-detect via resolveMainCheckoutRoot so this reports/fixes the
+      // shared store even when run from a linked worktree (ADR0020: a
+      // worktree never carries its own .fgos/, so process.cwd() there was
+      // silently checking/writing the wrong tree).
+      const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());
+      const fixed = flags.fix ? runFixes(repoRoot) : undefined;
       const checks = DOCTOR_CHECKS.map(({ id, description, check }) => {
-        const { passed, message } = check(process.cwd());
+        const { passed, message } = check(repoRoot);
         return { id, description, passed, message };
       });
       return fixed === undefined ? { checks } : { fixed, checks };

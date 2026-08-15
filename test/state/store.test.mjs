@@ -15,9 +15,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { fork } from 'node:child_process';
+import { fork, execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { addWork, editWork, moveWork, moveStage, addOutcome, addFriction, addDecision, recordGateApprove, listWork, readRawEvents, setFocus, StoreError } from '../../src/state/store.mjs';
+import { addWork, editWork, moveWork, moveStage, addOutcome, addFriction, addDecision, recordGateApprove, listWork, readRawEvents, setFocus, StoreError, assertPlanEvidence } from '../../src/state/store.mjs';
 import { appendEvent } from '../../src/state/events.mjs';
 import { REGISTRY, ENV, PID, UNRESOLVED } from "../../src/runner/session-identity.mjs";
 import { MAX_TITLE_LENGTH } from '../../src/state/work.mjs';
@@ -140,6 +140,39 @@ test('addDecision keeps an explicit kind (e.g. "engine") unchanged', () => {
   const view = listWork(dir);
   const last = view.decisions.at(-1);
   assert.equal(last.kind, 'engine');
+});
+
+// --- tsk-37t: addDecision now validates a present `id`, matching every
+// neighbouring id-taking verb (editWork/moveWork both throw "work <id> not
+// found" first) -- a decision scoped to a nonexistent item used to write a
+// success envelope and an event `fgos show <id>` could never retrieve. ---
+
+test('tsk-37t: addDecision throws "work <id> not found" for a nonexistent id, same shape editWork/moveWork already use', () => {
+  const dir = tmpDir();
+  assert.throws(
+    () => addDecision(dir, { id: 'no-such-item', text: 'closing report', rationale: 'driver stop reason: awaiting-approval' }),
+    (err) => err instanceof StoreError && err.category === 'validation' && /work "no-such-item" not found/.test(err.message),
+  );
+  // And no event was written for the rejected call -- not silently
+  // half-applied.
+  const view = listWork(dir);
+  assert.equal(view.decisions.length, 0);
+});
+
+test('tsk-37t: addDecision still succeeds when id names a real work item', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'real-item');
+  addDecision(dir, { id: 'real-item', text: 'closing report', rationale: 'driver stop reason: awaiting-approval' });
+  const view = listWork(dir);
+  const last = view.decisions.at(-1);
+  assert.equal(last.id, 'real-item');
+});
+
+test('tsk-37t: addDecision with no id at all is still legitimate (a global decision not scoped to one item)', () => {
+  const dir = tmpDir();
+  addDecision(dir, { text: 'a global decision', rationale: 'not scoped to one item' });
+  const view = listWork(dir);
+  assert.equal(view.decisions.at(-1).text, 'a global decision');
 });
 
 test('moveWork doing->done composes a learning record reflecting the item\'s actual outcome, friction (by layer), and settlement (by kind/role)', () => {
@@ -837,6 +870,87 @@ test('moveWork re-reads fresh state on retry: editing in the missing evidence af
 
   const { view } = moveWork(dir, { id: 'cos-retry', to: 'delivered', expectedStatus: 'doing', role: 'human' });
   assert.equal(view.work['cos-retry'].status, 'delivered', 'the retry must re-read the just-edited evidence, not a cached refusal');
+});
+
+// --- tsk-2p6: assertPlanEvidence -- a risk:heavy item reaching `delivered`
+// must have a plan.md on its own fgw/<id> branch. Needs a REAL git repo
+// (unlike every test above, which never touches git) since the check reads
+// the item's branch content via `git cat-file -e`, never the caller's
+// current working tree -- correct both before a merge (pre-flight) and
+// after (backstop). `dir` here is always `path.join(repoRoot, '.fgos')`,
+// mirroring claim-port.test.mjs's own `setup()` shape.
+
+function gitBackedDir(prefix) {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
+  fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
+  execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd: repoRoot });
+  return { repoRoot, dir: path.join(repoRoot, '.fgos') };
+}
+
+test('tsk-2p6: moveWork refuses a doing->delivered close for a risk:heavy item with no plan.md on its own branch', () => {
+  const { repoRoot, dir } = gitBackedDir('fgos-plan-evidence-missing-');
+  execFileSync('git', ['branch', 'fgw/heavy-no-plan'], { cwd: repoRoot });
+  addSampleWork(dir, 'heavy-no-plan', { risk: 'heavy' });
+  moveWork(dir, { id: 'heavy-no-plan', to: 'doing', expectedStatus: 'todo' });
+
+  const before = readRawEvents(dir).length;
+  assert.throws(
+    () => moveWork(dir, { id: 'heavy-no-plan', to: 'delivered', expectedStatus: 'doing' }),
+    (err) => err instanceof StoreError && err.category === 'precondition' && /no plan\.md found on branch "fgw\/heavy-no-plan"/.test(err.message),
+  );
+  assert.equal(listWork(dir).work['heavy-no-plan'].status, 'doing', 'a refused close must leave the item at its prior status');
+  assert.equal(readRawEvents(dir).length, before, 'a refused close must append no event');
+});
+
+test('tsk-2p6: moveWork allows a doing->delivered close for a risk:heavy item that DOES have a plan.md on its branch (docs/history/<id>/ shape)', () => {
+  const { repoRoot, dir } = gitBackedDir('fgos-plan-evidence-present-');
+  execFileSync('git', ['checkout', '-q', '-b', 'fgw/heavy-with-plan'], { cwd: repoRoot });
+  fs.mkdirSync(path.join(repoRoot, 'docs', 'history', 'heavy-with-plan'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'docs', 'history', 'heavy-with-plan', 'plan.md'), '# plan\n');
+  execFileSync('git', ['add', 'docs'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'plan'], { cwd: repoRoot });
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: repoRoot });
+
+  addSampleWork(dir, 'heavy-with-plan', { risk: 'heavy' });
+  moveWork(dir, { id: 'heavy-with-plan', to: 'doing', expectedStatus: 'todo' });
+  const { view } = moveWork(dir, { id: 'heavy-with-plan', to: 'delivered', expectedStatus: 'doing', role: 'human' });
+  assert.equal(view.work['heavy-with-plan'].status, 'delivered');
+});
+
+test('tsk-2p6: moveWork allows a doing->delivered close for a risk:heavy item whose docsRef points straight at plan.md\'s own dir', () => {
+  const { repoRoot, dir } = gitBackedDir('fgos-plan-evidence-docsref-');
+  execFileSync('git', ['checkout', '-q', '-b', 'fgw/heavy-docsref'], { cwd: repoRoot });
+  fs.mkdirSync(path.join(repoRoot, 'docs', 'history', 'custom-feature-name'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'docs', 'history', 'custom-feature-name', 'plan.md'), '# plan\n');
+  execFileSync('git', ['add', 'docs'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'plan'], { cwd: repoRoot });
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: repoRoot });
+
+  addSampleWork(dir, 'heavy-docsref', { risk: 'heavy', docsRef: 'docs/history/custom-feature-name/' });
+  moveWork(dir, { id: 'heavy-docsref', to: 'doing', expectedStatus: 'todo' });
+  const { view } = moveWork(dir, { id: 'heavy-docsref', to: 'delivered', expectedStatus: 'doing', role: 'human' });
+  assert.equal(view.work['heavy-docsref'].status, 'delivered');
+});
+
+test('tsk-2p6: moveWork never gates a light/standard-risk item on plan.md — byte-identical to before this item', () => {
+  const { repoRoot, dir } = gitBackedDir('fgos-plan-evidence-light-');
+  execFileSync('git', ['branch', 'fgw/light-item'], { cwd: repoRoot });
+  addSampleWork(dir, 'light-item', { risk: 'light' });
+  moveWork(dir, { id: 'light-item', to: 'doing', expectedStatus: 'todo' });
+  const { view } = moveWork(dir, { id: 'light-item', to: 'delivered', expectedStatus: 'doing', role: 'human' });
+  assert.equal(view.work['light-item'].status, 'delivered');
+});
+
+test('tsk-2p6: assertPlanEvidence fails gracefully (never throws an unrelated git error) when the item\'s own branch does not exist at all', () => {
+  const { repoRoot } = gitBackedDir('fgos-plan-evidence-no-branch-');
+  assert.throws(
+    () => assertPlanEvidence('no-such-branch-item', { risk: 'heavy' }, repoRoot),
+    (err) => err instanceof StoreError && err.category === 'precondition' && /no plan\.md found on branch "fgw\/no-such-branch-item"/.test(err.message),
+  );
 });
 
 // --- `priority`/`intent` in EDITABLE_FIELDS (per str7-str8-priority-intent

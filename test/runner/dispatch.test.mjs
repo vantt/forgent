@@ -648,17 +648,9 @@ test('the committed .fgos/config.json runner section no longer declares a coding
   assert.equal(cfg.capacities?.['coding-classify-intake'], undefined, 'capacities.coding-classify-intake should no longer exist -- retired after tsk-4ns removed its only consumer');
 });
 
-test('the committed .fgos/config.json runner section declares the gather capacity (tsk-28o): for "gather", needs "prompt-completion", carries "repo-content" (D1, gather-capacity-purpose-binding CONTEXT.md), kind cli, allowCrossProvider true, well-formed {prompt}/{model} args', () => {
+test('the committed .fgos/config.json runner section no longer declares a gather capacity (tsk-5tm D6): removed as the only cross-provider path with no recorded architectural reason to keep it -- the real reason it existed (parallelization) is already covered by the native Task tool; tsk-5tm-2 removed it, tsk-5tm\'s remaining children do not reintroduce it', () => {
   const cfg = committedRunnerConfig();
-  const capacity = cfg.capacities?.gather;
-  assert.ok(capacity, 'capacities.gather must exist');
-  assert.equal(capacity.kind, 'cli');
-  assert.equal(capacity.for, 'gather');
-  assert.equal(capacity.needs, 'prompt-completion');
-  assert.equal(capacity.carries, 'repo-content');
-  assert.equal(capacity.allowCrossProvider, true);
-  assert.ok(typeof capacity.command === 'string' && capacity.command.length > 0);
-  assert.ok(Array.isArray(capacity.args) && capacity.args.includes('{prompt}') && capacity.args.includes('{model}'));
+  assert.equal(cfg.capacities?.gather, undefined, 'capacities.gather should no longer exist -- removed permanently per tsk-5tm D6');
 });
 
 /** Capture what's written to process.stderr during `fn()`; restores the

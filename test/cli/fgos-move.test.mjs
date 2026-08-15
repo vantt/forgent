@@ -173,3 +173,36 @@ test('move --to awaiting-approval on a NON-"doing" item is never gated by the re
   assert.equal(result.status, 0, result.stderr);
   assert.equal(stateView(cwd).work['move-guard-not-doing'].status, 'awaiting-approval');
 });
+
+// --- move --to wontfix from awaiting-human (tsk-2lc): the FSM table
+// (status-fsm.mjs:169, tsk-2ub) already carries this edge, but `move`
+// never forwarded an `--answer`, and transitionWork requires one for ANY
+// exit from awaiting-human -- making the edge unreachable through `move`
+// even though `fgos answer` (the other door out of awaiting-human) never
+// targets wontfix at all. ---
+
+test('move --to wontfix from awaiting-human succeeds when --answer is supplied, closing a moot question without fabricating a resume', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  addOk(cwd, 'move-wontfix-from-ask');
+  run(cwd, ['move', 'move-wontfix-from-ask', '--to', 'doing']);
+  run(cwd, ['ask', 'move-wontfix-from-ask', '--text', 'still relevant?']);
+  assert.equal(stateView(cwd).work['move-wontfix-from-ask'].status, 'awaiting-human');
+
+  const result = run(cwd, ['move', 'move-wontfix-from-ask', '--to', 'wontfix', '--answer', 'refuted by later evidence, closing']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(stateView(cwd).work['move-wontfix-from-ask'].status, 'wontfix');
+});
+
+test('move --to wontfix from awaiting-human still refuses with no --answer, same validation shape as before this item', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  addOk(cwd, 'move-wontfix-no-answer');
+  run(cwd, ['move', 'move-wontfix-no-answer', '--to', 'doing']);
+  run(cwd, ['ask', 'move-wontfix-no-answer', '--text', 'still relevant?']);
+
+  const result = run(cwd, ['move', 'move-wontfix-no-answer', '--to', 'wontfix']);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /"answer" is required/);
+  assert.equal(stateView(cwd).work['move-wontfix-no-answer'].status, 'awaiting-human', 'a refused move must leave the item parked, unchanged');
+});

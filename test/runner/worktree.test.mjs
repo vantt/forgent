@@ -12,6 +12,7 @@ import {
   removeWorktree,
   listLeftovers,
   branchNameFor,
+  branchExists,
   reclaimOrphanedCheckout,
   provisionDependencies,
   resyncClaimWorktree,
@@ -435,6 +436,48 @@ test('createBranchRef is idempotent: a second call on an existing branch is a no
   assert.equal(branchTip(repoRoot, 'fgw/root-b'), shaAfterFirst, 'branch must not move on idempotent no-op');
 });
 
+test('tsk-386: createBranchRef with no baseRef at all resolves through detectTrunk on a master-trunk repo, never a hardcoded "main"', () => {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-worktree-test-master-'));
+  execFileSync('git', ['init', '-q', '-b', 'master'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
+  fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
+  execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd: repoRoot });
+  const masterTip = branchTip(repoRoot, 'master');
+
+  // Finding 8's own failure scenario: the pre-fix hardcoded default would
+  // attempt `git branch fgw/<id> main` here, which throws outright -- this
+  // repo has no branch named "main" at all.
+  const result = createBranchRef(repoRoot, 'master-trunk-item');
+
+  assert.equal(result.created, true);
+  assert.equal(branchTip(repoRoot, 'fgw/master-trunk-item'), masterTip, 'branch forks from the real detected trunk (master), never a nonexistent hardcoded "main"');
+});
+
+test('tsk-386: withMergeEphemeralWorktree\'s own createBranchRef fallback resolves through detectTrunk on a master-trunk repo (the exact Finding 8 failure scenario)', async () => {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-worktree-test-master-merge-'));
+  execFileSync('git', ['init', '-q', '-b', 'master'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
+  fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
+  execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd: repoRoot });
+  const masterTip = branchTip(repoRoot, 'master');
+
+  // fgw/never-dispatched-master genuinely does not exist yet -- this is
+  // exactly the "first session-driven root merge" scenario the finding
+  // names: a host repo whose trunk is master hitting
+  // createDetachedMergeWorktree's own fallback.
+  const result = await withMergeEphemeralWorktree(repoRoot, 'never-dispatched-master', async (worktree) => {
+    assert.equal(worktree.startCommit, masterTip, 'fallback-created branch is seeded from the real detected trunk (master)');
+    return 'fn-ran';
+  });
+
+  assert.equal(result, 'fn-ran');
+  assert.equal(branchTip(repoRoot, 'fgw/never-dispatched-master'), masterTip);
+});
+
 test('withMergeEphemeralWorktree falls back to createBranchRef (seeded from main) instead of throwing when fgw/<id> was never created early', async () => {
   const repoRoot = initTempRepo();
   execFileSync('git', ['branch', '-M', 'main'], { cwd: repoRoot });
@@ -475,6 +518,31 @@ test('withMergeEphemeralWorktree leaves an already-existing fgw/<id> branch unto
 
   assert.equal(result, 'ok');
   assert.equal(branchTip(repoRoot, 'fgw/already-dispatched'), advancedTip, 'branch tip is unchanged when fn makes no new commit');
+});
+
+test('tsk-4yv: withMergeEphemeralWorktree removes the detached worktree it just registered when finishWorktreeSetup fails -- never leaks an unreclaimed detached checkout', async () => {
+  // Finding 7: this is specifically the DETACHED case
+  // (createDetachedMergeWorktree, used by approve's own leaf-merge path via
+  // withMergeEphemeralWorktree) -- reclaimOrphanedCheckout/findCheckoutPath
+  // are both branch-keyed and skip a `detached` worktree stanza entirely, so
+  // unlike the branch-attached createWorktree case, nothing else in the
+  // codebase would ever reclaim a leaked detached checkout. A repeated npm
+  // registry flake during approve would accumulate full checkouts under tmp
+  // indefinitely, exactly the scenario this fix closes.
+  const repoRoot = initTempRepo();
+  execFileSync('git', ['branch', '-M', 'main'], { cwd: repoRoot });
+  // Malformed JSON forces a real, deterministic, fully offline throw inside
+  // provisionDependencies (see the createWorktree sibling test above for
+  // why a nonexistent file: dependency does NOT reliably fail npm install).
+  fs.writeFileSync(path.join(repoRoot, 'package.json'), '{not valid json');
+  execFileSync('git', ['add', 'package.json'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'commit a malformed package.json'], { cwd: repoRoot });
+  execFileSync('git', ['branch', 'fgw/broken-dep-merge-item'], { cwd: repoRoot });
+
+  await assert.rejects(() => withMergeEphemeralWorktree(repoRoot, 'broken-dep-merge-item', async () => 'unreachable'), SyntaxError);
+
+  const listing = execFileSync('git', ['worktree', 'list', '--porcelain'], { cwd: repoRoot, encoding: 'utf8' });
+  assert.doesNotMatch(listing, /broken-dep-merge-item/, 'the detached merge worktree must not remain registered after finishWorktreeSetup failed');
 });
 
 test('createWorktree with opts.baseRef forks a new branch from that ref\'s tip, not from repoRoot\'s current HEAD', () => {
@@ -1146,6 +1214,83 @@ test('createWorktree provisions a declared dependency into the fresh worktree au
   const wt = createWorktree(repoRoot, 'item-deps', { worktreeDir });
 
   assert.equal(fs.existsSync(path.join(wt.path, 'node_modules', 'fgos-test-localdep', 'package.json')), true);
+});
+
+test('tsk-1mn: createWorktree calls opts.beforeProvision after all repoRoot-touching git setup completes, strictly BEFORE provisioning installs anything', () => {
+  // Finding 2: claimWork used to hold main-checkout.lock across the whole
+  // synchronous npm ci/install. The fix (claim-port.mjs) releases the lock
+  // via this exact callback, at this exact seam -- this test proves the
+  // seam's own ordering contract directly, independent of claimWork's own
+  // wiring (already covered indirectly by every existing isolate:true
+  // claimWork test, which now exercises this same callback for real).
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const localDep = mkLocalDependency();
+  fs.writeFileSync(
+    path.join(repoRoot, 'package.json'),
+    JSON.stringify({ name: 'x', version: '1.0.0', dependencies: { 'fgos-test-localdep': `file:${localDep}` } }),
+  );
+  execFileSync('git', ['add', 'package.json'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'declare a dependency'], { cwd: repoRoot });
+
+  let calls = 0;
+  let nodeModulesExistedAtCallTime;
+  let branchExistedAtCallTime;
+  const wt = createWorktree(repoRoot, 'item-deps-cb', {
+    worktreeDir,
+    beforeProvision: () => {
+      calls += 1;
+      // The temp dir mkdtemp allocated is the only entry under worktreeDir
+      // at this point -- read it back rather than assuming wt.path (not yet
+      // assigned; createWorktree itself hasn't returned).
+      const [createdDir] = fs.readdirSync(worktreeDir);
+      nodeModulesExistedAtCallTime = fs.existsSync(path.join(worktreeDir, createdDir, 'node_modules'));
+      branchExistedAtCallTime = branchExists(repoRoot, branchNameFor('item-deps-cb'));
+    },
+  });
+
+  assert.equal(calls, 1, 'beforeProvision must fire exactly once');
+  assert.equal(branchExistedAtCallTime, true, 'the branch this claim forked must already exist by the time beforeProvision fires (all repoRoot git setup already ran)');
+  assert.equal(nodeModulesExistedAtCallTime, false, 'beforeProvision must fire BEFORE provisioning installs anything -- this is the release point, not an afterthought');
+  assert.equal(fs.existsSync(path.join(wt.path, 'node_modules', 'fgos-test-localdep', 'package.json')), true, 'provisioning still actually ran afterward');
+});
+
+test('tsk-1mn: createWorktree with no beforeProvision supplied stays byte-identical (every existing caller, including createDetachedMergeWorktree, unaffected)', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const localDep = mkLocalDependency();
+  fs.writeFileSync(
+    path.join(repoRoot, 'package.json'),
+    JSON.stringify({ name: 'x', version: '1.0.0', dependencies: { 'fgos-test-localdep': `file:${localDep}` } }),
+  );
+  execFileSync('git', ['add', 'package.json'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'declare a dependency'], { cwd: repoRoot });
+
+  const wt = createWorktree(repoRoot, 'item-deps-nocb', { worktreeDir });
+
+  assert.equal(fs.existsSync(path.join(wt.path, 'node_modules', 'fgos-test-localdep', 'package.json')), true);
+});
+
+test('tsk-4yv: createWorktree removes the worktree it just registered when finishWorktreeSetup fails (malformed package.json throws inside provisionDependencies) — never leaks a registered checkout', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  // Malformed JSON forces a real, deterministic, fully offline throw inside
+  // provisionDependencies's own `JSON.parse(fs.readFileSync(...))` call —
+  // no npm process or network behavior to rely on (a nonexistent `file:`
+  // dependency path was tried here first and found NOT to fail npm install
+  // at all in practice; this is the reliable failure trigger instead).
+  fs.writeFileSync(path.join(repoRoot, 'package.json'), '{not valid json');
+  execFileSync('git', ['add', 'package.json'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'commit a malformed package.json'], { cwd: repoRoot });
+
+  assert.throws(() => createWorktree(repoRoot, 'item-broken-dep', { worktreeDir }), SyntaxError);
+
+  // Finding 7: before this fix, `git worktree add` had already succeeded
+  // and registered the checkout by the time provisionDependencies threw --
+  // nothing removed it, so it stayed registered AND on disk indefinitely.
+  const listing = execFileSync('git', ['worktree', 'list', '--porcelain'], { cwd: repoRoot, encoding: 'utf8' });
+  assert.doesNotMatch(listing, /item-broken-dep/, 'the worktree must be fully unregistered from git, not left dangling');
+  assert.deepEqual(fs.readdirSync(worktreeDir), [], 'the checkout directory itself must be removed too, not just unregistered');
 });
 
 test('createWorktree stays byte-identical (no node_modules created) for a repo with no package.json — every existing zero-dependency caller unaffected', () => {
