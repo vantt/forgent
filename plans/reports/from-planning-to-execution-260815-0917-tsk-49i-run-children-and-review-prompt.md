@@ -53,13 +53,49 @@ Engine đã chặn thứ tự bằng `deps`; đừng cố làm con 2 trước.
 - **KHÔNG BAO GIỜ chạy `fgos approve tsk-49i`.** Approve trên item gốc
   merge vào `main`. Chỉ approve 2 con (và các item bug sau này) — approve
   một leaf sẽ merge vào `fgw/tsk-49i`, đúng cái ta muốn.
+
+  Biết rõ: **không có guard máy nào** phân biệt hai việc này. Cả 8 chỗ gọi
+  `isMainWorktree` trong repo chỉ chặn *chạy verb từ worktree*, không chặn
+  *merge cái gì vào main*; Iron Law gate gắn vào `source === 'runner'` chứ
+  không gắn vào đích merge, nên `--acknowledge-iron-law` mở cả hai đường y
+  như nhau. Ranh giới này chỉ tồn tại trong đầu bạn.
+
+- **Ghi lại SHA của `main` TRƯỚC khi bắt đầu**, rồi kiểm lại sau **mỗi**
+  lần approve:
+
+  ```
+  git rev-parse main
+  ```
+
+  `main` nhích lên dù chỉ một commit do việc bạn làm = **dừng khẩn, báo
+  người ngay**, không tự sửa tiếp. Repo này đang có ~267 worktree dùng
+  chung `bin/fgos.mjs`, `store.mjs`, `session-identity.mjs` — đúng những
+  file item này viết lại. Sai ở đây không hỏng một nhánh, nó hỏng khả năng
+  chạy `fgos` của tất cả. (Nếu `main` nhích do phiên khác merge việc khác
+  thì bình thường — phân biệt bằng nội dung commit, không bằng việc SHA có
+  đổi hay không.)
 - Mọi lệnh `fgos` phải có `--dir /home/vantt/projects/forgentX`. Worktree
   không mang `.fgos/` theo thiết kế; thiếu `--dir` là verb từ chối (exit 4).
 - **Không bao giờ `git add -A` / `git add .` trong worktree** — worktree
   không có bản làm việc của `.fgos/`, nên `-A` stage nhầm việc xoá cả kho
   sự kiện. Luôn `git add <đường dẫn cụ thể>`.
 - `fgos approve` **chỉ chạy được từ main checkout** (guard
-  `isMainWorktree`). Rời worktree trước khi approve.
+  `isMainWorktree`). Rời worktree trước khi approve — và trước khi
+  `return` nữa, xem vòng làm việc bên dưới.
+- **Không cần dừng phiên nào khác đang chạy trên repo.** 2 con merge vào
+  `fgw/tsk-49i`, không vào `main`, nên không phiên nào thấy code đã sửa
+  cho tới khi `tsk-49i` land lên main — việc đó nằm ngoài prompt này.
+  Một chỗ phải sắp lịch, không phải dừng: `tsk-48w` (đang `todo`/
+  `planning`, đã claim) cũng sửa `src/setup/registrations.mjs` như con 1.
+  Ai merge vào main sau sẽ ăn conflict ở file đó — gỡ được, nhưng ghi vào
+  báo cáo cuối để người biết mà xếp thứ tự.
+- `.githooks/pre-commit` **an toàn suốt lúc thi công**: `core.hooksPath`
+  trỏ tuyệt đối về main checkout và hook import theo `import.meta.url`,
+  nên nó luôn nạp module của main, kể cả khi worktree đã xoá
+  `src/runner/session-identity.mjs`. Đừng hoảng nếu thấy file biến mất mà
+  commit vẫn chạy — đúng như thiết kế. Rủi ro thật của hook chỉ xuất hiện
+  lúc land lên main, và phải nguyên tử cùng một commit với việc dời
+  module.
 - Không sửa `docs/history/state-runner-merge-boundary/*.md` để làm verify
   dễ hơn. Verify của mỗi item đã được kiểm chứng là fail trên trạng thái
   hiện tại; nếu nó fail sau khi bạn code xong thì là code chưa đúng.
@@ -74,12 +110,33 @@ node bin/fgos.mjs pick <id> --dir /home/vantt/projects/forgentX
 Trong worktree: implement theo skill `fgos-coding-implement`. Một commit
 cho mỗi item, message theo conventional commit, không nhắc AI.
 
+Commit xong code trong worktree, **rồi ExitWorktree với `action: "keep"`
+để về main checkout TRƯỚC khi return** — đừng return từ trong worktree:
+
 ```
 node bin/fgos.mjs return <id> --dir /home/vantt/projects/forgentX
 ```
-Verify chạy thật ở bước này. Đỏ thì sửa, đừng nới verify.
 
-→ ExitWorktree với `action: "keep"` (quay về main checkout).
+Lý do (khác với `approve`, chỗ này **không** có guard nào chặn bạn, phải
+tự giữ): `--dir` chỉ đổi chỗ **dữ liệu**, không đổi chỗ **mã** — Node phân
+giải import theo vị trí `bin/fgos.mjs` đang chạy. Return từ worktree =
+lấy `store.mjs` và `resolveWriterIdentity` **đang sửa dở** để ghi vào nhật
+ký sự kiện sống mà mọi phiên khác đọc chung. Lớp lỗi này vừa xảy ra thật
+trên repo (`e2e1653f chore: strip legacy models map re-added by a
+stale-code worktree run` — phải dọn tay), và `tsk-5tm` đã ghi lại luật
+tương tự cho các con của nó
+(`docs/history/task-dispatch-unification/plan.md:216-227`): mutation vào
+MAIN thấy ngay với mọi phiên đang sống, và rollback item **không** tự
+revert nó.
+
+Verify chạy thật ở bước này. Đỏ thì sửa, đừng nới verify — **trừ đúng một
+ngoại lệ đã biết**: nếu chỗ đỏ nằm trong `test/runner/dispatch.test.mjs`,
+soi nó trước khi kết luận là regression. `committedRunnerConfig()`
+(`:621-629`) đọc thẳng `.fgos/config.json` của **MAIN checkout**, không
+phải config trong worktree — một phiên khác sửa config trong 50 giây
+`npm test` chạy là đủ làm đỏ vì lý do không liên quan gì tới refactor.
+Đây là nguồn flake có tài liệu, không phải cớ để bỏ qua verify đỏ ở chỗ
+khác.
 
 ```
 node bin/fgos.mjs approve <id> --acknowledge-iron-law --dir /home/vantt/projects/forgentX
@@ -174,7 +231,8 @@ cho tới khi review sạch, hoặc chỉ còn ý kiến phong cách.
 ## Điều kiện dừng
 
 Dừng khi: cả 2 con + mọi item bug đã merge vào `fgw/tsk-49i`, review cuối
-sạch, và `main` **chưa bị chạm**. Kiểm chứng cuối:
+sạch, và `main` **chưa bị chạm bởi việc bạn làm** (so với SHA đã ghi ở
+mục Luật cứng). Kiểm chứng cuối:
 
 ```
 git log --oneline main..fgw/tsk-49i
