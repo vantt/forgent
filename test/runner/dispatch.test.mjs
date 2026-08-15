@@ -756,7 +756,19 @@ test('EXECUTOR_ADAPTERS registers exactly one adapter today: cli-spawn (the RPC/
  * one from before a revert) would make these tests pass while the repo's
  * actual git history disagrees, exactly the gap that let D9's own
  * `modelPolicies`/`agy.providerModel` config change ship as an uncommitted
- * local edit with this test suite green the entire time. */
+ * local edit with this test suite green the entire time.
+ *
+ * Known remaining scope limit (found in the same review pass): `HEAD`
+ * resolves inside `resolveMainCheckoutRoot`'s directory -- the ONE shared
+ * main checkout every `fgos <verb>` call and worktree resolves against
+ * (ADR0020) -- so this reads whichever branch the MAIN CHECKOUT currently
+ * has checked out (typically `main`), never this test file's own branch's
+ * HEAD when run from inside a feature worktree. These tests prove "the
+ * config the main checkout currently has committed is well-formed," not
+ * "this branch's own `.fgos/config.json` change (if any) is correct" --
+ * a feature branch that touches `.fgos/config.json` still needs its own
+ * independent proof (e.g. a real merge/catchup dry-run) that its content
+ * agrees with what will actually land, since these tests cannot see it. */
 function committedRunnerConfig() {
   // Main-checkout-resolved, not `import.meta.dirname`-relative: this test
   // suite itself may be running from inside a worktree, whose `.fgos/` is
