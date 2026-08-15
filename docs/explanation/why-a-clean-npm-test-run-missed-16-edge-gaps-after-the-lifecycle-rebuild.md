@@ -187,3 +187,23 @@ first `sync-root` attempt into the parent branch `fgw/tsk-5sr` failed its
 own goal-check (aborted cleanly, parent unchanged) before a clean retry
 landed — the same class of merge-time friction the sibling children in
 this batch also hit.
+
+## Confirmed: `tsk-64h` closed B2 and B3 together
+
+The dual-source-of-truth bug (B2) and the missing stage-registration
+invariant (B3) — the two structural gaps behind F1's stuck-item class —
+landed together as `tsk-64h`. Confirmed directly in the current tree:
+`discover-pool.mjs`'s own candidate filter now calls the same
+`discoverableStages(domain)` the engine verb itself checks against
+(`return discoverableStages(domain).includes(item.stage)`), rather than
+keeping a separately-maintained literal `Set` that could drift out of
+sync with it — closing B2. A new `fgos doctor` check,
+`work-stage-vocabulary` (`src/setup/registrations.mjs`), was registered
+in the same shape as the pre-existing `work-classification-vocabulary`
+check that already caught `kind`/`risk` drift, extending that same
+invariant class to `stage` — closing B3, the audit's own named
+highest-leverage, lowest-cost fix. A follow-up item (`tsk-1l9`, outside
+this batch) later built on this by having `fgos discover`/`fgos plan`
+each check whether the other would actually accept a stage-mismatched
+item before referring to it, and pointing at this new doctor check
+instead of the closed referral loop F1's own audit section described.
