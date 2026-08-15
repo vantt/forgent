@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The per-tier `runner.executors.<tier>` config override is retired (0
+  live entries; had already caused a real bug — a non-tier key silently
+  fell through to the global executor with no error). A `capacities.<id>`
+  entry naming no `command`/`adapter`/`agentType` of its own now resolves
+  straight to the global `runner.executor`, with no intermediate stop.
+  (`docs/specs/runner.md` RUL41/RUL63)
 - `fgos tool register`/`fgos tool remove` are retired. A tool provider
   (e.g. `gitnexus`, `herdr`) is now declared directly in
   `runner.capacities.<id>` in `.fgos/config.json` — a `capability` field

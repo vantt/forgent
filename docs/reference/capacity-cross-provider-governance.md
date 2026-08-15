@@ -23,12 +23,12 @@ Only when `capacities.<id>.kind === "cli"`. Every other `kind`
 ## What "non-Claude" means
 
 Checked against the **final resolved executor `command`** — after
-`capacities.<id>` > `executors.<tier>` > `executor` precedence resolves —
-against a small known-Claude-CLI allowlist (`'claude'` today), never
-against:
+`capacities.<id>` > `executor` precedence resolves (the intermediate
+`executors.<tier>` rung was retired at tsk-in1-2 D6) — against a small
+known-Claude-CLI allowlist (`'claude'` today), never against:
 
 - the capacity's declared `kind` alone (a `kind: "cli"` capacity with no
-  `command`/`adapter` override falls through to the tier/global executor,
+  `command`/`adapter` override falls through to the global executor,
   which is ordinarily Claude's own CLI — this must not require
   `allowCrossProvider`);
 - the `provider` field (a freely-overridable display alias, not the
