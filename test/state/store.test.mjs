@@ -19,7 +19,7 @@ import { fork, execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { addWork, editWork, moveWork, moveStage, addOutcome, addFriction, addDecision, recordGateApprove, listWork, readRawEvents, setFocus, StoreError, assertPlanEvidence } from '../../src/state/store.mjs';
 import { appendEvent } from '../../src/state/events.mjs';
-import { REGISTRY, ENV, PID, UNRESOLVED } from "../../src/runner/session-identity.mjs";
+import { REGISTRY, ENV, PID, UNRESOLVED } from "../../src/util/session-identity.mjs";
 import { MAX_TITLE_LENGTH } from '../../src/state/work.mjs';
 
 const WRITER_SOURCES = new Set([REGISTRY, ENV, PID, UNRESOLVED]);

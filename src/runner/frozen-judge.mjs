@@ -13,6 +13,8 @@
 // verbatim-port for the smallest scope); the ".bee/config.json"-specific
 // entry is dropped (fgOS has no .bee/), a ".fgos/"-specific entry is a
 // noted follow-up, not in scope here.
+import { normalizePath } from '../util/normalize-path.mjs';
+
 export const FROZEN_JUDGE_PATTERNS = [
   { rule: 'test sources', pattern: /(^|\/)(tests?|__tests__|specs?)\// },
   { rule: 'test file', pattern: /\.(test|spec)\.[a-z]+$/i },
@@ -35,13 +37,6 @@ export const FROZEN_JUDGE_PATTERNS = [
     pattern: /(^|\/)(jest\.config|vitest\.config|playwright\.config|karma\.conf|pytest\.ini|tox\.ini|phpunit\.xml)[^/]*$/i,
   },
 ];
-
-/** Backslash-to-slash, strip a leading `./` — the one path shape every
- * caller comparing git-reported paths against a declared file set needs
- * (footprint matching here, own-file-set matching in merge.mjs). */
-export function normalizePath(p) {
-  return String(p).replace(/\\/g, '/').replace(/^\.\//, '').trim();
-}
 
 /**
  * Frozen-judge check: judge-pattern files changed outside the item's

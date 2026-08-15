@@ -6,7 +6,7 @@ source_capture_ids: [tsk-13m]
 ---
 # Why `ppidOf` bounds its `ps` call with a 200ms timeout
 
-`resolveWriterIdentity` (`src/runner/session-identity.mjs`) walks up to
+`resolveWriterIdentity` (`src/util/session-identity.mjs`) walks up to
 `MAX_HOPS=3` parent processes via `ppidOf`, which shells out to
 `execFileSync('ps', ...)` to resolve each hop. All 3 call sites that use
 this writer identity (`src/state/store.mjs:362`, `:524`, `:765`) run

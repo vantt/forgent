@@ -19,8 +19,7 @@
 //     than re-implemented.
 import { rankImpact } from './impact.mjs';
 import { footprintOverlapAmong } from './graph-metrics.mjs';
-import { isResolvedStatus } from './frontier.mjs';
-import { resolveRoot } from '../runner/root-affinity.mjs';
+import { isResolvedStatus, resolveRoot } from './frontier.mjs';
 import { effectiveStage, getDomain } from './workflow-stage-graphs.mjs';
 
 /**

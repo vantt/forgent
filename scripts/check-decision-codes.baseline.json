@@ -211,9 +211,6 @@
   "test/runner/prompt-templates.test.mjs": [
     "test('selectTemplate omitting stage entirely (every pre-tsk-5mj call site) still resolves to the skill-pointer template, byte-identical to before', () => {"
   ],
-  "test/runner/session-identity.test.mjs": [
-    "test('ppidOf passes a bounded timeout to execFileSync, so a hung ps command cannot block the caller forever (tsk-13m)', () => {"
-  ],
   "test/runner/worktree.test.mjs": [
     "test('reclaimOrphanedCheckout refuses (throws, does not remove) a checkout that resolves to repoRoot itself (tsk-k8u D1)', () => {",
     "test('reclaimOrphanedCheckout refuses (throws, does not remove) a checkout that is the calling session\\'s own live cwd (tsk-1tm, exact-match)', () => {",
@@ -347,5 +344,8 @@
   ],
   "test/state/working-tree-clean-unified.test.mjs": [
     "test(\"isWorkingTreeClean scope:'subtree' still threads ownFileSet through exactly like scope:'whole-repo' (tsk-598)\", () => {"
+  ],
+  "test/util/session-identity.test.mjs": [
+    "test('ppidOf passes a bounded timeout to execFileSync, so a hung ps command cannot block the caller forever (tsk-13m)', () => {"
   ]
 }

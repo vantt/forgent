@@ -14,7 +14,7 @@ import {
   ENV,
   PID,
   UNRESOLVED,
-} from '../../src/runner/session-identity.mjs';
+} from '../../src/util/session-identity.mjs';
 
 /** A disposable `.fgos`-shaped directory holding whatever raw sessions.json
  * body a case needs -- including bodies that are not valid JSON at all. */

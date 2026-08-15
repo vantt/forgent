@@ -26,7 +26,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { acquireMainCheckoutLock, HELD, AMBIGUOUS, HOOK_TTL_MS, HOLDER_PID_ENV_VAR } from '../src/runner/main-checkout-lock.mjs';
-import { resolveWriterIdentity } from '../src/runner/session-identity.mjs';
+import { resolveWriterIdentity } from '../src/util/session-identity.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

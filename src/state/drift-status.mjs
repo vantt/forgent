@@ -15,8 +15,20 @@
 // surface next to `events.jsonl`, which is already known fragile under
 // concurrency (tsk-3wq).
 import { execFileSync } from 'node:child_process';
-import { detectTrunk } from '../runner/merge.mjs';
 import { isResolvedStatus } from './frontier.mjs';
+
+// `trunk` is supplied by the caller, never detected here (tsk-49i D1): the
+// only way to name a repo's trunk is a git call that lives on the runner
+// side, and importing it back into `state/` was one of the import edges
+// that made the two folders mutually dependent. Both exported functions
+// below take it as a REQUIRED option — a silently-defaulted `'main'` would
+// route drift comparisons at the wrong branch on a master-trunk repo.
+function requireTrunk(fnName, trunk) {
+  if (typeof trunk !== 'string' || trunk === '') {
+    throw new TypeError(`${fnName}: opts.trunk is required (a non-empty branch name, e.g. detectTrunk(repoRoot))`);
+  }
+  return trunk;
+}
 
 function git(repoRoot, args) {
   return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false, stdio: ['ignore', 'pipe', 'pipe'] });
@@ -110,14 +122,15 @@ const DELIVERED_STATUSES = new Set(['delivered', 'retrospective', 'cleanup', 'do
  * branch does not exist locally (never created, or already cleaned up
  * after merge) is omitted entirely, not reported as an error.
  *
- * `target` is `main`'s real detected name (`detectTrunk`, never a
- * hardcoded `'main'` literal) unless the root itself has a `parent`
- * (a nested root), in which case its target is `fgw/<parentId>` —
- * supporting nesting deeper than one level, per the locked design.
+ * `target` is the caller-supplied `opts.trunk` — the repo's real detected
+ * trunk name (`worktree.mjs`'s `detectTrunk`), never a hardcoded `'main'`
+ * literal — unless the root itself has a `parent` (a nested root), in which
+ * case its target is `fgw/<parentId>` — supporting nesting deeper than one
+ * level, per the locked design.
  */
-export function driftStatus(repoRoot, view) {
+export function driftStatus(repoRoot, view, { trunk } = {}) {
+  requireTrunk('driftStatus', trunk);
   const work = view?.work ?? {};
-  const trunk = detectTrunk(repoRoot);
   const result = {};
 
   for (const rootId of findRootIds(work)) {
@@ -207,9 +220,9 @@ export function driftStatus(repoRoot, view) {
  * branch may simply have been cleaned up after a real merge, and this
  * function must never turn ordinary housekeeping into an alarm.
  */
-export function unmergedDeliveries(repoRoot, view) {
+export function unmergedDeliveries(repoRoot, view, { trunk } = {}) {
+  requireTrunk('unmergedDeliveries', trunk);
   const work = view?.work ?? {};
-  const trunk = detectTrunk(repoRoot);
   const result = {};
 
   for (const item of Object.values(work)) {
