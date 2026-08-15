@@ -310,6 +310,15 @@ cụ thể của domain "marketing" trên fgOS sẽ trông như thế nào.
   cách trình bày lại D1–D12), và yêu cầu distill toàn bộ thảo luận
   trình bày lại chi tiết.
 
+- **2026-08-15 22:07 — Vòng 21: chốt bản distill làm bằng chứng**:
+  người dùng duyệt bản distill toàn cục ("Đồng ý, viết lại bản distill
+  này làm bằng chứng, không là lát lại quên tùm lum") → ghi thành
+  `design-distill.md` (cùng thư mục): hành trình, D1–D12 theo cụm chủ
+  đề kèm event seq, kết luận so sánh cockpit + quy tắc port tách-bốn,
+  5 điểm treo có chủ đích, trạng thái máy, bước kế tiếp. Đây là văn bản
+  đối chiếu nhanh — DISCUSSION.md vẫn là nguồn sử liệu đầy đủ,
+  CONTEXT.md vẫn là bảng quyết định chuẩn cho stage-skills.
+
 ## 6. Thiết kế đã chốt {#design}
 
 > Synthesis vòng 16. Nền: **D1–D11 đã chốt** (§4). Treo có chủ đích: #7
