@@ -96,7 +96,14 @@ Case cần chứng minh khi thực thi (theo mode high-risk):
 - **Shape-theo-`via` (D9a):** 1 invocation `{via:"mcp"}` không có
   `command` phải load/validate được — case cụ thể đã nêu ở D9.
 
-## 4. Quyết định chia — CÓ, 6 mảnh
+## 4. Quyết định chia — CÓ, 5 mảnh
+
+**Sửa lại tại `fgos-coding-validating` (T3):** bản nháp ban đầu có 6
+mảnh — mảnh thứ 6 (`probeHttp` fate) action chỉ trích `§3 #14`
+(DISCUSSION.md's issue number), KHÔNG trích D-ID thật nào từ "##
+Locked decisions" → `normalizeChild` từ chối cả verdict. Đúng
+`DISCUSSION.md` §7's gợi ý sẵn ("có thể gộp làm cùng lúc nếu nhỏ") —
+gộp vào mảnh 1 (cùng action, cùng D1), không bịa D-ID để hợp lệ hoá.
 
 Theo đúng `DISCUSSION.md` §7 — write specs, KHÔNG tạo item ở đây (D7 của
 `fgos-coding-planning`'s own hard rule — `fgos-coding-validating` mới
@@ -107,7 +114,7 @@ materialize).
   {
     "title": "Bỏ tool-registry event-sourced registration, gộp gitnexus/herdr vào runner.capacities",
     "verify": "npm test && node bin/fgos.mjs tool query --capability impact-analysis --status present --dir . | grep -q gitnexus",
-    "action": "D1: gộp khai báo provider (gitnexus, herdr) thẳng vào runner.capacities trong .fgos/config.json, bỏ .fgos/tool-registry.json + verb fgos tool register/remove, giữ probeTool/findExecutableOnPath/isIndexStale làm hàm thuần",
+    "action": "D1: gộp khai báo provider (gitnexus, herdr) thẳng vào runner.capacities trong .fgos/config.json, bỏ .fgos/tool-registry.json + verb fgos tool register/remove, giữ probeTool/findExecutableOnPath/isIndexStale làm hàm thuần. Cùng lúc xoá probeHttp/'http' khỏi KINDS nếu xác nhận lại 0 dùng thật (DISCUSSION.md §3 #14, gộp vào đây vì nhỏ, không có D-ID riêng).",
     "footprint": ["src/state/tool-registry.mjs", ".fgos/config.json", ".fgos/tool-registry.json", "src/cli/command-registry.mjs", "docs/how-to/diagnose-a-blocked-return-from-an-unrelated-verify-failure.md"],
     "kind": "feature",
     "risk": "standard"
@@ -147,21 +154,19 @@ materialize).
   {
     "title": "Quyết số phận probeHttp/'http' trong tool-registry.mjs",
     "verify": "npm test",
-    "action": "§3 #14: xoá probeHttp/'http' khỏi KINDS nếu xác nhận 0 dùng thật (đã nghiêng xoá trong DISCUSSION.md, xác nhận lại tại planning)",
-    "footprint": ["src/state/tool-registry.mjs"],
-    "kind": "chore",
-    "risk": "light"
-  }
 ]
 ```
 
-**Quan hệ giữa 6 mảnh** (từ `DISCUSSION.md` §7's "Quan hệ", giữ nguyên):
-mảnh 1 và 2 độc lập, làm trước tiên (có thể song song). Mảnh 3 độc lập về
-code nhưng nên land trước hoặc cùng mảnh 4 (mảnh 4's `for` validate đọc
-danh mục mảnh 3 tạo). Mảnh 4 phụ thuộc mảnh 1 (cần `gitnexus`/`herdr` đã
-có mặt trong `capacities` để viết test thật cho gate B1/B2/B3). Mảnh 5
-phụ thuộc mảnh 4 (dùng chung `INVOCATION_VIA`/shape-theo-`via` vừa tổng
-quát hoá). Mảnh 6 liên quan mảnh 1, có thể gộp làm cùng lúc nếu nhỏ.
+**Quan hệ giữa 5 mảnh** (từ `DISCUSSION.md` §7's "Quan hệ", mảnh cũ #6
+đã gộp vào mảnh 1): mảnh 1 và 2 độc lập, làm trước tiên (có thể song
+song). Mảnh 3 độc lập về code nhưng nên land trước hoặc cùng mảnh 4
+(mảnh 4's `for` validate đọc danh mục mảnh 3 tạo). Mảnh 4 phụ thuộc mảnh
+1 (cần `gitnexus`/`herdr` đã có mặt trong `capacities` để viết test thật
+cho gate B1/B2/B3). Mảnh 5 phụ thuộc mảnh 4 (dùng chung
+`INVOCATION_VIA`/shape-theo-`via` vừa tổng quát hoá; ràng buộc riêng:
+KHÔNG dựa vào `impact()` cho `EXECUTOR_ADAPTERS` — false negative đã xác
+nhận qua `fgos-coding-validating`'s reality gate, dùng 4 điểm chạm grep
+được (`dispatch.mjs:429/1040/1299/1530`) làm checklist thật).
 
 ## 5. Verify
 
