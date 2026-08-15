@@ -14,7 +14,7 @@ Ngoài phạm vi: xây harness tự động spawn phiên LLM; sửa
 `judgeVerifySemanticCorrectness`; sửa `resolveDiscovery`'s callerVerdict
 fall-through (đã có item riêng — xem "Việc chuyển đi" bên dưới).
 
-## Quyết định đã khoá
+## Locked decisions
 
 | ID | Quyết định |
 |----|------------|

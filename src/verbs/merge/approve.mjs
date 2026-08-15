@@ -49,6 +49,7 @@ import {
   realpathOrSelf as realpathOr,
 } from '../../runner/worktree.mjs';
 import { ironLawForItem, ironLawRefusal } from '../../runner/iron-law-gate.mjs';
+import { readIronLawLevel, recordIronLawSkip } from './iron-law-level.mjs';
 import { withLockRetry } from '../../runner/lock-wait.mjs';
 import { listSessions } from '../../runner/session.mjs';
 import { runGoalCheck } from '../../runner/goal-check.mjs';
@@ -280,11 +281,28 @@ export async function approveUseCase(
     // taken/executed) has no `fgw/<root>` ref to diff against.
     const ironLaw = ironLawForItem(repoRoot, item, { view });
     runnerOwnDiff = ironLaw.filesChanged;
-    // review-20260718-self-improve-loop finding f02: only the bare flag
-    // (parsed as boolean `true`, no following value) counts as
-    // acknowledgment; any value form (e.g. a stray "false") fails closed.
-    if (ironLaw.required && acknowledgeIronLaw !== true) {
-      throw new StoreError('validation', ironLawRefusal('approve', id, ironLaw));
+    // Trunk-boundary scoping (docs/decisions/0032, tsk-1y6-1 D1): the gate
+    // only guards the merge that actually lands on trunk. A leaf merges
+    // into `fgw/<root>` (the `rootId !== id` path further below), where
+    // nothing reaches main and no unreviewed self-modifying diff can land
+    // — so the gate stays quiet there and asks only where it still
+    // matters. `resolveRoot(view, id) === id` is exactly the condition
+    // under which this call instead merges root-into-trunk.
+    if (resolveRoot(view, id) === id) {
+      // review-20260718-self-improve-loop finding f02: only the bare flag
+      // (parsed as boolean `true`, no following value) counts as
+      // acknowledgment; any value form (e.g. a stray "false") fails closed.
+      if (ironLaw.required && acknowledgeIronLaw !== true) {
+        if (readIronLawLevel(repoRoot) === 'warn') {
+          recordIronLawSkip(dir, { verb: 'approve', id, ironLaw });
+          process.stderr.write(
+            `fgos: approve: "${id}" trips the Iron Law, proceeding at ironLaw.level = "warn". `
+              + `Matched flags: [${ironLaw.matchedFlags.join(', ') || 'none'}]; matched modules: [${ironLaw.matchedModules.join(', ') || 'none'}].\n`,
+          );
+        } else {
+          throw new StoreError('validation', ironLawRefusal('approve', id, ironLaw));
+        }
+      }
     }
   }
 

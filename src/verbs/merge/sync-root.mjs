@@ -27,6 +27,7 @@ import {
   currentHead,
 } from '../../runner/worktree.mjs';
 import { ironLawForItem, ironLawRefusal } from '../../runner/iron-law-gate.mjs';
+import { readIronLawLevel, recordIronLawSkip } from './iron-law-level.mjs';
 import { withLockRetry } from '../../runner/lock-wait.mjs';
 
 /**
@@ -65,8 +66,26 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
   // Reused further below as the clean-tree gate's `ownFileSet` source,
   // exactly as `approve` reuses its own — one git read, not two.
   const runnerOwnDiff = ironLaw.filesChanged;
-  if (ironLaw.required && acknowledgeIronLaw !== true) {
-    throw new StoreError('validation', ironLawRefusal('sync-root', id, ironLaw));
+  // Trunk-boundary scoping (docs/decisions/0032, tsk-1y6-1 D1) —
+  // deliberately NOT `approve`'s own discriminator (resolveRoot(view,id)
+  // === id). This verb lands on the DIRECT parent: `targetBranch` above is
+  // `fgw/<item.parent>` whenever a parent exists, and only `detectTrunk`
+  // when none does. `resolveRoot` climbs to the top of the lineage instead
+  // of stopping one level up, so it answers a different question than the
+  // one this call site's own target asks; on an item whose parent id is
+  // absent from the view it would return the item itself and trip the
+  // gate on a merge that never goes near trunk. `!item.parent` is exactly
+  // the condition under which this call syncs straight onto trunk.
+  if (!item.parent && ironLaw.required && acknowledgeIronLaw !== true) {
+    if (readIronLawLevel(repoRoot) === 'warn') {
+      recordIronLawSkip(dir, { verb: 'sync-root', id, ironLaw });
+      process.stderr.write(
+        `fgos: sync-root: "${id}" trips the Iron Law, proceeding at ironLaw.level = "warn". `
+          + `Matched flags: [${ironLaw.matchedFlags.join(', ') || 'none'}]; matched modules: [${ironLaw.matchedModules.join(', ') || 'none'}].\n`,
+      );
+    } else {
+      throw new StoreError('validation', ironLawRefusal('sync-root', id, ironLaw));
+    }
   }
 
   // Both resolved here and not earlier — the exact positions

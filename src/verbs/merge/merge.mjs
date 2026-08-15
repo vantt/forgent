@@ -15,6 +15,7 @@ import { driftStatus } from '../../state/drift-status.mjs';
 import { classifySource } from '../../runner/merge.mjs';
 import { detectTrunk } from '../../runner/worktree.mjs';
 import { ironLawForItem } from '../../runner/iron-law-gate.mjs';
+import { readIronLawLevel } from './iron-law-level.mjs';
 import { approveUseCase } from './approve.mjs';
 import { syncRootUseCase } from './sync-root.mjs';
 
@@ -78,8 +79,18 @@ export async function mergeNext({ dir, cwd, repoRoot }, { acknowledgeIronLaw, ap
   // nothing to go stale).
   const wouldTripIronLaw = (candidateId) => {
     if (acknowledgeIronLaw === true) return false;
+    // Trunk-boundary scoping (docs/decisions/0032, tsk-1y6-1 D1): at
+    // `warn` the real gate inside `approveUseCase` below never refuses, so
+    // a candidate this pre-check parked would be a skip nothing was ever
+    // going to block.
+    if (readIronLawLevel(repoRoot) === 'warn') return false;
     const candidate = mergeView.work[candidateId];
     if (!candidate || classifySource(repoRoot, candidate) !== 'runner') return false;
+    // The gate only guards the trunk boundary. This mirrors `approve`'s
+    // own merge-target split — a candidate whose resolved root is some
+    // other item lands on `fgw/<root>`, so it goes straight through here
+    // exactly as it will there.
+    if (resolveRoot(mergeView, candidateId) !== candidateId) return false;
     return ironLawForItem(repoRoot, candidate, { view: mergeView }).required;
   };
 

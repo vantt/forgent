@@ -405,3 +405,46 @@ item's own outcome was recorded as `awaiting-approval`/passed, so the
 conflict was a real but non-blocking cost of landing several sibling
 pieces on the same parent branch concurrently, not a defect in the edge
 logic itself.
+
+## The umbrella (`tsk-2mt`): six children, one parent branch, repeated sync friction
+
+`tsk-2mt` is the root item that gathered this entire rebuild — "Dựng lại
+vòng đời trước planning: Init, discovery có chủ, nhánh verdict" — under
+one parent, decomposed into six children: `tsk-403` (the
+`decompose`→`plan` rename), `tsk-qod` (moving `fgos-clarifying` to Init),
+`tsk-tku` (creating `fgos-coding-discovering` as discovery's own owning
+skill), `tsk-2yo` (moving tier/kind/risk classification down into
+discovery, retiring `submit-assist-classify`), `tsk-30v` (verdict-driven
+edge selection, documented above as this cluster's own DoD), and `tsk-lya`
+(handing `discover-next` down to `discover`, spawning `plan-next`/
+`plan-loop`). The parent itself never wrote application code — its job
+was coordinating the six branches landing on one shared root branch,
+`fgw/tsk-2mt`, and closing only once every child reached a terminal
+status (`hasOpenDescendant`, the mechanical anchor every multi-child root
+in this codebase uses).
+
+**The real, repeated cost of that coordination was merge friction, not
+design friction.** `tsk-2mt`'s own event history shows two blocked
+sync-root attempts before six *successful* ones: a `verify-miss` on
+2026-08-11 (goal-check failed on a staged merge, aborted, parent
+unchanged) and a `merge-conflict` on 2026-08-12 (`git merge --no-commit
+--no-ff` on `fgw/tsk-30v` into `fgw/tsk-2mt` conflicted — the same
+conflict `tsk-30v`'s own capture above already names from the child's
+side) — followed by six clean `fgos sync-root` merges landing
+sequentially across the same day (01:38, 01:42, 01:47, 02:42, 02:52,
+02:56). This is the parent-side view of the same fact `tsk-30v`'s section
+above already recorded from the child's side: landing several sibling
+branches onto one shared parent branch concurrently costs real,
+repeatable merge friction — not a defect in any one child's own logic,
+but a structural cost of the decompose-into-many-children shape this
+whole redesign itself used to land.
+
+The six children's own detailed design rationale lives in their own
+retrospective documents (`why-a-retired-stage-name-sometimes-keeps-a-
+drain-only-alias.md` for `tsk-403`/`tsk-qod`, `why-a-per-stage-exception-
+in-the-driver-meant-that-stage-had-no-owner.md` for `tsk-tku`,
+`coding-classify-intake-capacity-lifecycle-created-then-retired-as-dead-
+config.md` for `tsk-2yo`, `why-discover-next-shrank-to-a-picker.md` for
+`tsk-lya`, and `tsk-30v`'s own section above) — this document stays the
+one place the whole cluster's shape, and the coordination cost of landing
+it as six children under one parent, is recorded together.

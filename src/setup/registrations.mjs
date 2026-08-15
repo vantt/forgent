@@ -1083,6 +1083,62 @@ registerFix({
   fix: (cwd) => fixGateBypassConfigured(cwd),
 });
 
+// ironLaw.level (docs/history/iron-law-gate-human-ux/CONTEXT.md D3/D7) — its
+// OWN key, modeled on gateBypass's three registrations immediately above but
+// deliberately never folded into that section: gateBypass's floor is
+// documented as never touching Iron Law (docs/explanation/gate-bypass-
+// design.md), and reusing its level vocabulary here would erase that line.
+//
+// `ask` is both the default this fix writes and what every unreadable value
+// degrades to at the gate itself (bin/fgos.mjs's readIronLawLevel), so a
+// project that never runs `fgos setup` gets the refusing behavior, not the
+// permissive one.
+export const IRON_LAW_LEVELS = Object.freeze(['ask', 'warn']);
+export const DEFAULT_IRON_LAW_LEVEL = 'ask';
+
+function checkIronLawConfigured(cwd) {
+  const level = readSharedConfig(cwd)?.ironLaw?.level;
+  if (typeof level !== 'string' || !IRON_LAW_LEVELS.includes(level)) {
+    return {
+      passed: false,
+      message: `ironLaw.level missing or not a recognized level (${IRON_LAW_LEVELS.join('/')}) -- run fgos doctor --fix`,
+    };
+  }
+  return { passed: true, message: `ironLaw.level = "${level}"` };
+}
+
+function fixIronLawConfigured(cwd) {
+  const shared = readSharedConfig(cwd);
+  const currentLevel = shared?.ironLaw?.level;
+  if (typeof currentLevel === 'string' && IRON_LAW_LEVELS.includes(currentLevel)) {
+    return { changed: false, message: `ironLaw.level already "${currentLevel}"` };
+  }
+  const existingIronLaw =
+    shared.ironLaw && typeof shared.ironLaw === 'object' && !Array.isArray(shared.ironLaw)
+      ? shared.ironLaw
+      : {};
+  const merged = { ...shared, ironLaw: { ...existingIronLaw, level: DEFAULT_IRON_LAW_LEVEL } };
+  writeSharedConfig(cwd, merged);
+  return { changed: true, message: `wrote ironLaw.level = "${DEFAULT_IRON_LAW_LEVEL}" to ${sharedConfigFilePath(cwd)}` };
+}
+
+registerConfigDefault({
+  id: 'ironLaw',
+  key: 'ironLaw',
+  shape: { level: DEFAULT_IRON_LAW_LEVEL },
+});
+
+registerCheck({
+  id: 'iron-law-configured',
+  description: 'ironLaw.level in the shared config file is present and a recognized level',
+  check: (cwd) => checkIronLawConfigured(cwd),
+});
+
+registerFix({
+  id: 'iron-law-configured',
+  fix: (cwd) => fixIronLawConfigured(cwd),
+});
+
 // tsk-4r1 (found by the gateway audit, plans/reports/gateway-audit-
 // 260814-2110-fable-hidden-bugs-report.md Finding 9): `gateway.token`/
 // `gateway.port` (herdr-plugin/src/gateway.rs's `load_gateway_config`,
@@ -1540,6 +1596,44 @@ registerCheck({
   id: 'herdr-launcher-configured',
   description: 'herdrOrchestrator toggles in the shared config file are present and boolean (tsk-2m5)',
   check: (cwd) => checkHerdrOrchestratorConfigured(cwd),
+});
+
+// tsk-48w (D14 of docs/history/herdr-web-dashboard-plan-realignment/
+// CONTEXT.md, carrying forward D10 of the original cluster's own
+// CONTEXT.md): the web dashboard's static-serving toggle, read fail-OPEN
+// from Rust (herdr-plugin/src/settings.rs's `WebDashboardSettings` --
+// `static_serving: true` when the section/file is missing). Same
+// registerConfigDefault + registerCheck shape as `herdrOrchestrator`
+// immediately above, deliberately with the opposite default value -- this
+// toggle exists to gate the "máy được chọn" (D2) serving the bundle it
+// already carries, out of the box, not an auto-launch toggle needing an
+// opt-in.
+export const DEFAULT_HERDR_WEB_DASHBOARD_SETTINGS = {
+  staticServing: true,
+};
+
+function checkHerdrWebDashboardConfigured(cwd) {
+  const shared = readSharedConfig(cwd);
+  const settings = shared?.herdrWebDashboard;
+  if (settings === undefined) {
+    return { passed: false, message: 'herdrWebDashboard section missing -- run fgos setup' };
+  }
+  if (typeof settings.staticServing !== 'boolean') {
+    return { passed: false, message: 'herdrWebDashboard.staticServing is not a boolean' };
+  }
+  return { passed: true, message: `herdrWebDashboard: staticServing=${settings.staticServing}` };
+}
+
+registerConfigDefault({
+  id: 'herdrWebDashboard',
+  key: 'herdrWebDashboard',
+  shape: DEFAULT_HERDR_WEB_DASHBOARD_SETTINGS,
+});
+
+registerCheck({
+  id: 'herdr-web-dashboard-configured',
+  description: 'herdrWebDashboard.staticServing in the shared config file is present and boolean (tsk-48w)',
+  check: (cwd) => checkHerdrWebDashboardConfigured(cwd),
 });
 
 // tsk-1m0 (docs/history/doctor-check-enduser-docs-index-stale/CONTEXT.md):

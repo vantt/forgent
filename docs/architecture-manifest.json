@@ -79,6 +79,7 @@
     "src/state/workflow-stage-graphs.mjs": "kernel",
     "src/intake/risk-keywords.mjs": "kernel",
     "src/verbs/merge/merge.mjs": "use-case",
+    "src/verbs/merge/iron-law-level.mjs": "use-case",
     "src/verbs/merge/approve.mjs": "use-case",
     "src/verbs/merge/review.mjs": "use-case",
     "src/verbs/merge/sync-root.mjs": "use-case",

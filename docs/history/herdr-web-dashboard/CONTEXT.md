@@ -18,24 +18,31 @@ thuộc `tsk-539`, tách rời có chủ ý (D5). Cơ chế đa-project/định 
 cockpit — thuộc `tsk-3b0` (D11). Không đổi lược đồ event (D2). Không
 "launcher tổng" (D1).
 
-## Quyết định đã khoá
+## Locked decisions
 
 | D-ID | Quyết định | seq |
 |---|---|---|
 | **D1** | Web dashboard là subsystem mới **trong binary `herdr-fgos` hiện có**, không phải tiến trình/binary riêng, không chờ launcher tổng. Chấp nhận dependency thật miễn build ra một binary kèm asset nhúng. Tái dùng `ports.rs`'s `WorkItemSource`/`PaneRegistry`. | 14637 |
+| ↳ | **Đã bị tsk-7l9 D8 đóng**, và `docs/history/herdr-web-dashboard-plan-realignment/CONTEXT.md` **D2/D10** ghi hình dạng thay thế: web client là **static bundle độc lập** gọi API gateway `/v1` qua HTTP, host trên chính gateway của một máy được chọn — không phải subsystem trong binary. | — |
 | **D2** | **Không đổi lược đồ event.** Ghép `gates[id].askHistory[i]` với bản ghi thứ i có `kind:'answer'` trong `settlements[id]`, theo thứ tự `seq`, tại tầng đọc. | 14638 |
 | **D3** | Nguồn chính của "lịch sử agent đã làm" là `CONTEXT.md`/`plan.md` (vùng-người); `state.decisions` chỉ hiện dạng chi tiết mở rộng, không mặc định. | 14639 |
 | **D4** | "Câu hỏi cần trả lời" phủ **cả hai kênh**: `ask` (gates) và `work.gate-approve` (contextApprove/planApprove/validateApprove). | 14640 |
 | **D5** | tsk-ldb (rendering) ↔ `tsk-539` (authoring) **tách rời, không `deps` chặn**; `tsk-539` là companion item được đẩy tiếp sau. | 14641 |
 | **D6** | Auth token bắt buộc ngay từ v1 (vế bind của nó bị D7 thay). | 14642 |
 | **D7** | Bind mặc định `0.0.0.0`, cấu hình được, cảnh báo khi không phải loopback. | 14703 |
+| ↳ | **Chưa được cài đặt, và gateway đã merge đi ngược nó**: `herdr-plugin/src/gateway.rs:933` hardcode `([127,0,0,1], config.port)` — chỉ port cấu hình được. D7 vẫn đúng và chưa bị thay; việc kéo thực tế về khớp nó nay thuộc **tsk-54y** (`docs/history/herdr-web-dashboard-plan-realignment/CONTEXT.md` D5). | — |
 | **D8** | **Xác thực hai lớp cộng dồn**, port idiom đã kiểm chứng từ `herdr-gateway`: (1) cookie-session trước — token hex 24-byte POST một lần `/api/login`, `constant_time_eq`, đổi lấy cookie `HttpOnly; SameSite=Strict`, mọi thất bại trả **404 câm**; (2) cf-access là credential thay thế, **bắt buộc xác minh chữ ký JWT** (RS256 qua JWKS, require `exp`/`iss`/`aud`, validate `nbf`). Hai lớp không loại trừ nhau. | 14704 |
+| ↳ | **Lớp 1 bị thay** bởi `docs/history/herdr-web-dashboard-plan-realignment/CONTEXT.md` **D13**: web client dùng `Authorization: Bearer` có sẵn của gateway (`gateway.rs:421-449`), KHÔNG thêm cookie-session/`/api/login`. Khung hai lớp cộng dồn giữ nguyên; lớp 2 (cf-access, tsk-18to) không bị đụng. Đánh đổi và ngưỡng xem lại ghi ở chính D13. | — |
 | **D9** | Token: env `FGOS_HERDR_WEB_SECRET` ưu tiên, vắng thì **tự sinh file gitignored dưới `.fgos/`, chmod 0600**. **Không bao giờ nằm trong `.fgos/config.json`** — file đó đang được git track. | 14732 |
+| ↳ | **D9 chết** theo `docs/history/herdr-web-dashboard-plan-realignment/CONTEXT.md` **D13**: không còn web server riêng thì không còn secret riêng — web client dùng token của chính gateway. Bỏ hẳn `FGOS_HERDR_WEB_SECRET` và file secret dưới `.fgos/`. | — |
 | **D10** | Web dashboard có toggle riêng trong `.fgos/config.json`, **mặc định BẬT** — cố ý khác 4 toggle `herdrOrchestrator` hiện có (đều mặc định `false`). | 14741 |
+| ↳ | **D10 không chết, chuyển hoá**: nhu cầu bật/tắt việc phục vụ web còn nguyên, nay là **cờ static-serving trên chính gateway** (realignment D2). Việc cài đặt nó cộng đăng ký `fgos setup`/`fgos doctor` vẫn thuộc **tsk-48w**, item được NẮN LẠI chứ không đóng (realignment D14, supersede realignment D4). | — |
 | **D11** | Đa-project (port/định danh) **defer sang `tsk-3b0`**; v1 giả định một tiến trình cockpit. Hướng đã ghi cho `tsk-3b0`: nên chỉ **một** tiến trình dashboard, herdr/client gửi thông tin định danh project để TUI/web nhận ra đang xem project nào. | 14742 |
 | **D12** | Webserver chạy như **tiến trình con sống lâu hơn cockpit pane**, không nằm trong tiến trình TUI. Cockpit chỉ bật/tắt; đóng cockpit **không** giết web dashboard. Vẫn một binary theo D1 — binary tự re-exec chính nó ở chế độ server, không sinh artifact thứ hai. | 14998 |
 | **D13** | Section config mang thêm field `port`, mặc định **8788** (né 8787 của `herdr-gateway` để chạy được cả hai trên một máy). | 14999 |
 | **D14** | Frontend có **toolchain thật**: vite + TypeScript + vitest dưới `herdr-plugin/web/`, bundle ra `static/` (gitignored), `rust-embed` nhúng vào binary. Thêm `herdr-plugin/build.rs` bảo đảm `static/` tồn tại để `cargo build/test/clippy` **không bao giờ phụ thuộc** việc frontend đã bundle hay chưa. Thứ tự release: `npm run bundle` → `cargo build --release`. | 15000 |
+| ↳ | **Toolchain giữ nguyên** (vite + TypeScript dưới `herdr-plugin/web/`, bundle nhúng qua `rust-embed`) — nhưng **chỗ nhúng đổi**: nay là **gateway**, không phải web server riêng của P2 (realignment D2), và bật/tắt bằng cờ config (tsk-48w). **Ai dựng khung thì bị realignment D6 thay**: `plan.md:158-161` giao `package.json`/`vite.config.ts` cho P3 (tsk-5jr); việc đó nay là item riêng **tsk-yo0**, và `deps` của tsk-5jr/tsk-4id đã trỏ vào nó. Lý do tách: khung giờ gồm cả lớp API client đọc `fgos-gateway-api-v1.yaml` và xử lý auth Bearer. | — |
+| **D15** | **Kênh gate-approve (D4) trên S03/S04 chỉ hiện LỊCH SỬ đã hoàn tất (`contextApprove`/`planApprove`/`validateApprove`, mỗi cái `{actor, at, verify}`), không hiện câu hỏi đang treo.** Xác nhận thật (tsk-4id, 2026-08-15): sống qua chính việc tự chạy cả cụm 7-item trong một phiên, mọi câu hỏi gate được hỏi/trả lời ĐỒNG BỘ ngay trong phiên đang sống (qua công cụ hỏi người trực tiếp), không bao giờ được ghi thành trạng thái bền vững nào — `fgos show`'s `gates` object chỉ có record ĐÃ hoàn tất, không field nào cho câu hỏi đang treo. Kênh `ask` (status `awaiting-human`) vẫn đầy đủ theo D4 gốc — có dữ liệu thật, bền vững, remote-quan-sát-được. Làm cho câu hỏi gate hiện được TỪ XA trong lúc còn treo là một quyết định kiến trúc rộng (cần ghi câu hỏi gate thành state bền vững), ngoài phạm vi một item màn hình web — ghi lại làm gap, không tự ý mở rộng phạm vi `tsk-4id` để lấp nó. | — |
 
 ### Vì sao D12 (bối cảnh không được để mất)
 
