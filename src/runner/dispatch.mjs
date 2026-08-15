@@ -496,20 +496,24 @@ const DEFAULT_TIER_TO_POLICY = Object.freeze({ light: 'lightweight', standard: '
 
 /**
  * `capacities.<id>.invocations[].via` vocabulary (tsk-5tm-4 D11, widened
- * D8 tsk-in1-4): the CO CHE GOI axis, orthogonal to `kind` (D5, the BAN
- * CHAT axis) — `'cli'` (spawns a real subprocess via `cli-spawn`, e.g.
- * `agy`), `'task'` (native in-session Agent/Task dispatch, no subprocess
- * argv), `'mcp'` (presence/identifier-only, e.g. `gitnexus` — never
- * actually spawned through `resolveExecutorConfig`, D2). Matches real
- * event-log evidence (D8: only `cli`/`mcp` ever registered historically,
- * `'binary'`/`'skill'`/`'http'` dropped when merged from `tool-registry.
- * mjs`'s own separate `KINDS` vocabulary, 0 real usage) plus `'task'` for
- * the in-session case `CAPACITY_KINDS` used to fold into `kind` itself.
- * `resolveExecutorConfig` only ever dispatches a `via:"cli"` invocation
- * (gate B2/B3 below) — a `via:"mcp"`/`"task"` invocation is presence/
- * native-only by construction, never fed to `cli-spawn`.
+ * D8 tsk-in1-4, `'api'` restored D13 tsk-in1-5): the CO CHE GOI axis,
+ * orthogonal to `kind` (D5, the BAN CHAT axis) — `'cli'` (spawns a real
+ * subprocess via `cli-spawn`, e.g. `agy`), `'task'` (native in-session
+ * Agent/Task dispatch, no subprocess argv), `'mcp'` (presence/identifier-
+ * only, e.g. `gitnexus` — never actually spawned through
+ * `resolveExecutorConfig`, D2), `'api'` (a real HTTP call via the `http`
+ * adapter — D8 dropped this value for 0 historical producers; D13 brings
+ * it back now that a real adapter backs it, `httpAdapter` below). Matches
+ * real event-log evidence for `cli`/`mcp`/`task`; `'binary'`/`'skill'`
+ * stay dropped (0 real usage, merged from `tool-registry.mjs`'s own
+ * separate `KINDS` vocabulary). `resolveExecutorConfig` only ever
+ * dispatches a `via:"cli"` invocation (gate B2/B3 below) — `'api'` is a
+ * real, independently-testable adapter (D13's pluggability precedent, see
+ * `httpAdapter`'s own doc comment) with 0 producer wired into that
+ * pipeline yet, same as `'mcp'`/`'task'` were before any capacity used
+ * them for real.
  */
-export const INVOCATION_VIA = Object.freeze(['cli', 'task', 'mcp']);
+export const INVOCATION_VIA = Object.freeze(['cli', 'task', 'mcp', 'api']);
 
 /**
  * Shape-check one `capacities.<id>` entry (D1/D2, tsk-62v; `allowCrossProvider`
@@ -556,9 +560,12 @@ export const INVOCATION_VIA = Object.freeze(['cli', 'task', 'mcp']);
  * requires for a real spawn; a `via:"mcp"` entry only requires a non-empty
  * `command` IDENTIFIER (never spawned, never needs `args`); a `via:"task"`
  * entry requires neither (native dispatch carries no subprocess argv at
- * all). Forcing every invocation through the cli-shaped check regardless
+ * all); a `via:"api"` entry (D13, tsk-in1-5) requires a non-empty `url`
+ * instead of `command`/`args` — shaped for `httpAdapter`, not `cli-spawn`.
+ * Forcing every invocation through the cli-shaped check regardless
  * of `via` is exactly "bẫy B1" this gate exists to close — `gitnexus`'s
- * own `via:"mcp"` invocation is not spawnable and was never meant to be.
+ * own `via:"mcp"` invocation is not spawnable and was never meant to be,
+ * same reasoning D13 applied to `'api'`'s own shape.
  * An ADDITIVE alternative to the flat `command`/`args` above, never a
  * replacement (a capacity with neither, or with the flat shape, keeps
  * resolving exactly as before this field existed). `resolveExecutorConfig`
@@ -604,6 +611,16 @@ function validateInvocationShape(invocation, label) {
   } else if (invocation.via === 'mcp') {
     if (typeof invocation.command !== 'string' || !invocation.command.trim()) {
       throw new RunnerConfigError(`runner config (${label}) "command" must be a non-empty string identifier when "via" is "mcp".`);
+    }
+  } else if (invocation.via === 'api') {
+    // D13: an 'api' invocation is shaped for `httpAdapter`, never
+    // `command`/`args` — the whole point of generalizing `EXECUTOR_
+    // ADAPTERS`' signature was to stop forcing a non-CLI invocation
+    // through that mold ("bẫy B1"). Only `url` is required; `method`/
+    // `headers`/`body` stay optional, read straight off the invocation by
+    // `httpAdapter` itself at dispatch time.
+    if (typeof invocation.url !== 'string' || !invocation.url.trim()) {
+      throw new RunnerConfigError(`runner config (${label}) "url" must be a non-empty string when "via" is "api".`);
     }
   }
   // via: 'task' needs neither `command` nor `args` — native in-session
@@ -1247,22 +1264,33 @@ function teeChunk(onChunk, stream, chunk) {
 }
 
 /**
- * C9 v2 (P41/D a4fe4c2b): the executor port is now a NAMED interface —
- * `EXECUTOR_ADAPTERS` maps an adapter name to a function
- * `(command, args, cwd, opts) => Promise<{status, signal, stdout, stderr,
- * tier, model}>`. Today exactly one adapter is registered: `cli-spawn`,
- * which is this exact process-spawning body, unchanged in every behavioral
- * detail from before this cell (timeout-on-'exit', hand-tracked maxBuffer
- * kill, onChunk teed before accounting, grandchild-SIGTERM caveat still
- * applies). An `rpc`/`app-server` adapter (e.g. talking to a headless
- * agent's app-server over RPC instead of CLI argv) is deferred — not
- * registered here — until a real system needs to plug into this port; only
- * the interface's name is bought now, not a second adapter.
+ * C9 v2 (P41/D a4fe4c2b), signature generalized D13 (tsk-in1-5): the
+ * executor port is a NAMED interface — `EXECUTOR_ADAPTERS` maps an adapter
+ * name to a function `(invocation, opts) => Promise<result>`. `invocation`
+ * is whatever shape that one adapter needs (`cliSpawnAdapter` reads
+ * `command`/`args`; `httpAdapter` below reads `method`/`url`/`headers`/
+ * `body`) — never a fixed `(command, args, cwd, opts)` argv shape, which
+ * was itself "bẫy B1": forcing a non-CLI invocation through a mold built
+ * for CLI argv. `opts` stays uniform across every adapter (`cwd`,
+ * `timeoutMs`, `maxBuffer`, `onChunk`, `workId`, `tier`, `model`) since
+ * none of those are invocation-specific — they are dispatch-level
+ * execution context every adapter equally needs. Two adapters are
+ * registered today: `cli-spawn` (this exact process-spawning body,
+ * unchanged in every behavioral detail from before this cell —
+ * timeout-on-'exit', hand-tracked maxBuffer kill, onChunk teed before
+ * accounting, grandchild-SIGTERM caveat still applies) and `http`
+ * (`httpAdapter` below, D13's real pluggability precedent — no capacity
+ * dispatches through it yet, same as `cli-spawn` before `agy` existed). An
+ * `rpc`/`app-server` adapter (e.g. talking to a headless agent's
+ * app-server over RPC instead of CLI argv) stays deferred beyond these
+ * two — this cell only proves the port is pluggable, not that every
+ * conceivable mechanism needs its own adapter yet.
  */
 export const DEFAULT_ADAPTER = 'cli-spawn';
 
-function cliSpawnAdapter(command, args, cwd, opts) {
-  const { timeoutMs, maxBuffer, onChunk, workId, tier, model } = opts;
+function cliSpawnAdapter(invocation, opts) {
+  const { command, args } = invocation;
+  const { cwd, timeoutMs, maxBuffer, onChunk, workId, tier, model } = opts;
 
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, { cwd, shell: false });
@@ -1369,8 +1397,53 @@ function cliSpawnAdapter(command, args, cwd, opts) {
   });
 }
 
+/**
+ * D13 (tsk-in1-5): the real second `EXECUTOR_ADAPTERS` implementation —
+ * proves the port generalized above is genuinely pluggable, not just
+ * documented as such. Reads `invocation.method`/`.url`/`.headers`/`.body`
+ * (never `command`/`args` — a `via:"api"` invocation is shaped for this
+ * adapter by `validateInvocationShape`'s own `api` branch above, not for
+ * `cli-spawn`). `opts.timeoutMs`, when set, aborts the request via
+ * `AbortController` — same timeout CONTRACT as `cliSpawnAdapter`
+ * (`DispatchError('worker-timeout', ...)`), not the same mechanism (no
+ * subprocess to SIGTERM here). Mirrors `cli-spawn`'s own "non-zero exit is
+ * not an error" stance (D3): a non-2xx HTTP status is returned as a normal
+ * result (`status` on the result, same field name `cli-spawn` uses for its
+ * own exit code), never thrown — only a network failure or a timeout
+ * reaching the server at all is a `DispatchError`, matching
+ * `worker-spawn-fail`/`worker-timeout`'s existing meaning ("the executor
+ * itself could not run"), not "the executor ran and reported failure".
+ */
+async function httpAdapter(invocation, opts) {
+  const { method = 'GET', url, headers, body } = invocation;
+  const { timeoutMs, workId, tier, model } = opts;
+  const controller = new AbortController();
+  const timer = timeoutMs ? setTimeout(() => controller.abort(), timeoutMs) : null;
+  let response;
+  try {
+    response = await fetch(url, { method, headers, body, signal: controller.signal });
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      throw new DispatchError(
+        'worker-timeout',
+        `executor timed out after ${timeoutMs}ms for work "${workId}".`,
+        { workId, tier, model },
+      );
+    }
+    throw new DispatchError(
+      'worker-spawn-fail',
+      `executor failed to start for work "${workId}": ${err.message}`,
+      { workId, tier, model, cause: err.message },
+    );
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+  const text = await response.text();
+  return { status: response.status, body: text, headers: Object.fromEntries(response.headers.entries()), tier, model };
+}
+
 /** C9 v2 executor-adapter registry — see `cliSpawnAdapter`'s doc comment. */
-export const EXECUTOR_ADAPTERS = { [DEFAULT_ADAPTER]: cliSpawnAdapter };
+export const EXECUTOR_ADAPTERS = { [DEFAULT_ADAPTER]: cliSpawnAdapter, http: httpAdapter };
 
 /**
  * Capacity identifier for a work item's executing-stage dispatch (D3,
@@ -1469,7 +1542,8 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   const templateName = selectTemplate({ kind: work.kind, tier, domain: work.domain, stage: opts.stage });
   const templateHash = hashTemplate(templateName);
 
-  return adapterFn(command, args, cwd, {
+  return adapterFn({ command, args }, {
+    cwd,
     timeoutMs,
     maxBuffer,
     onChunk: opts.onChunk,
@@ -1691,7 +1765,7 @@ export async function executeCapacityCli(
   }
   const timeoutMs = timeoutOverride ?? cfg.timeoutMs;
   const maxBuffer = maxBufferOverride ?? 10 * 1024 * 1024;
-  const result = await adapterFn(command, args, cwd, { timeoutMs, maxBuffer, onChunk, workId: capacityId, tier, model });
+  const result = await adapterFn({ command, args }, { cwd, timeoutMs, maxBuffer, onChunk, workId: capacityId, tier, model });
   const base = { mechanism, ...result, provider, command };
   return resolvedByPurpose ? { ...base, capacityId } : base;
 }

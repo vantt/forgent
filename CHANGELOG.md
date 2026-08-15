@@ -32,6 +32,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   so it lands together with the code that reads it, not as a separate
   advance commit. (`docs/specs/runner.md` RUL65,
   `docs/reference/forgentx-tool-registry-configuration.md`)
+- `EXECUTOR_ADAPTERS`' adapter function signature is generalized from
+  `(command, args, cwd, opts)` to `(invocation, opts)` — each adapter now
+  reads whatever fields its own invocation shape needs (`cliSpawnAdapter`
+  reads `command`/`args`; the new `httpAdapter` reads
+  `method`/`url`/`headers`/`body`) instead of every adapter being forced
+  through a CLI-argv-shaped call. A real second adapter is now registered:
+  `EXECUTOR_ADAPTERS.http`, making a real HTTP request via `fetch` (timeout
+  aborts the request; a non-2xx status is a normal result, never a thrown
+  error, matching `cli-spawn`'s own "non-zero exit is not an error"
+  stance). `INVOCATION_VIA` gets `'api'` back (dropped earlier for 0
+  historical producers; now backed by this real adapter) —
+  `capacities.<id>.invocations[]` may declare `{via: "api", url: "..."}`.
+  `resolveExecutorConfig` still only ever selects/spawns a `via:"cli"`
+  invocation — this is a pluggability precedent, not a new production
+  dispatch path; 0 capacities register `via:"api"` today.
+  (`docs/specs/runner.md` RUL66,
+  `docs/reference/forgentx-tool-registry-configuration.md`)
 - The per-tier `runner.executors.<tier>` config override is retired (0
   live entries; had already caused a real bug — a non-tier key silently
   fell through to the global executor with no error). A `capacities.<id>`
