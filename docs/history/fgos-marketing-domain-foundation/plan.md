@@ -27,6 +27,41 @@ ordering is internal to this feature):
    roleGraph names the four existing implicit interactions:
    Researcher (consult), Reviewer (review), Helper (assist),
    Human-advisor (advise) around Implementer.
+
+   Draft roleGraph for coding (reviewed with the user post-convergence;
+   implementation refines shape, not edges):
+
+   ```js
+   roleGraph: {
+     roles: ['implementer', 'researcher', 'reviewer', 'helper', 'human-advisor'],
+     defaultRole: 'implementer',
+     callstackCap: 3, // config-overridable
+     edges: {
+       exploring: [
+         { from: 'implementer', to: 'human-advisor', reason: 'advise',  mode: 'async' }, // = fgos ask/answer
+         { from: 'implementer', to: 'researcher',    reason: 'consult', mode: 'sync'  }, // = fgos-researching
+       ],
+       planning: [
+         { from: 'implementer', to: 'researcher',    reason: 'consult', mode: 'sync'  },
+         { from: 'implementer', to: 'human-advisor', reason: 'advise',  mode: 'async' },
+       ],
+       executing: [
+         { from: 'implementer', to: 'researcher',    reason: 'consult', mode: 'sync'  },
+         { from: 'implementer', to: 'helper',        reason: 'assist',  mode: 'sync'  }, // = subagent fanout
+         { from: 'implementer', to: 'reviewer',      reason: 'review',  mode: 'async' }, // = return→awaiting-approval
+         { from: 'implementer', to: 'human-advisor', reason: 'advise',  mode: 'async' },
+         { from: 'reviewer',    to: 'researcher',    reason: 'consult', mode: 'sync'  }, // legal nested call
+         { from: 'reviewer',    to: 'human-advisor', reason: 'advise',  mode: 'async' },
+       ],
+     },
+   }
+   ```
+
+   Anchor: the current coding flow maps 1-1 onto this graph
+   (return→awaiting-approval = async review call; ask/answer = async
+   advise; fgos-researching = sync consult; fanout = sync assist) — this
+   piece names and records what already runs; it does not change
+   behavior. `discovery` deliberately has no edges (machine-only pass).
 2. **Workflow multiplicity** — un-merge coding's single stage graph into
    `feature` (current graph, default) / `bugfix` / `lightweight`,
    selected by `kind` via `workflowFor` with a default fold (D7).
@@ -34,7 +69,14 @@ ordering is internal to this feature):
    Execute-stage resolution — reviewable on its own.
 3. **Task-spec A-lite convention** — contract files per domain, read-first
    via refs, no enforcement (D6). Docs-only; can run parallel to 1–2
-   (footprint disjoint from both except none).
+   (footprint disjoint from both except none). Every task-spec MUST carry
+   a `## Collaboration` section (D9): a trigger-prose table per available
+   call edge for that (workflow, stage) — when to call, which reason, to
+   which role, what the returning ball carries — migrated from where the
+   prose already lives implicitly (exploring's material/grounded/
+   answerable filter = the advise trigger; fgos-researching's own
+   description = the consult trigger). Division of labor: prose teaches,
+   soul decides, guard blocks.
 
 Rejected alternatives (each traced to the locked record):
 - Marketing-first sequencing — rejected by user decision D2.
@@ -124,7 +166,7 @@ proves out, per D2's own sequencing.
   {
     "title": "Convention task-spec A-lite cho coding: tách contract khỏi know-how",
     "verify": "test -d docs/task-specs/coding && ls docs/task-specs/coding/*.md >/dev/null",
-    "action": "D6: task-spec (contract: input/output/gate/verify-template) tách khỏi skill (know-how), file khai báo per-domain theo mô hình cockpit .fgOS/tasks/, read-first qua refs, chưa engine enforcement",
+    "action": "D6: task-spec (contract: input/output/gate/verify-template) tách khỏi skill (know-how), file khai báo per-domain theo mô hình cockpit .fgOS/tasks/, read-first qua refs, chưa engine enforcement; D9: mỗi task-spec bắt buộc có section Collaboration — bảng trigger-prose per call-edge per (workflow, stage)",
     "footprint": ["docs/task-specs/", "docs/how-to/write-a-task-spec.md"],
     "kind": "docs",
     "risk": "light"

@@ -58,6 +58,7 @@ cụ thể của domain "marketing" trên fgOS sẽ trông như thế nào.
 | D6 | Task-spec A-lite: tách contract (task-spec, file per-domain) khỏi know-how (skill); skillMap trỏ (task-spec, skill); chưa engine enforcement | Recommend v5, giữ v6, đồng ý v7 | 18059 |
 | D7 | Hierarchy domain → N workflow → item; selector tái dùng `kind` + `workflowFor` map có default; coding un-gộp thành feature (default) / bugfix / lightweight; workflow (shape 1 item) ≠ template (composition nhiều item) | Người dùng nêu v6, đồng ý v7 | 18060 |
 | D8 | Async call = handoff event đầy đủ (holder đổi); sync call trong-session = một event `call-summary` gọn, KHÔNG đổi holder. Guard invariant: holder chỉ đổi qua async handoff | Em advise v7, người dùng đồng ý v8 | 18070 |
+| D9 | Task-spec bắt buộc có section Collaboration: bảng trigger-prose per call-edge, khai báo per (workflow, stage) — khi nào gọi, reason gì, tới role nào, bóng về mang gì. Ba tầng: prose dạy (task-spec) / soul quyết / guard chặn (roleGraph); lệch pattern hiện ra ở compound-learn qua call-summary/handoff event | Người dùng nêu câu hỏi v9, em thiết kế, xác nhận v10 | 18110 |
 
 ## 5. Q&A log
 
@@ -217,6 +218,26 @@ cụ thể của domain "marketing" trên fgOS sẽ trông như thế nào.
   đã đóng; discussion hội tụ, chuyển sang terminal handoff native-first
   (`refs` → `{#task-role-axis-coding}`, dispatch
   `fgos-coding-exploring` → `fgos-coding-planning`).
+
+- **2026-08-15 19:10–19:19 — Hậu hội tụ, người dùng soi chi tiết trước
+  validating (vòng 9)**: exploring + planning đã chạy xong (CONTEXT.md,
+  plan.md high-risk 3 mảnh); người dùng ra lệnh dừng trước implement,
+  hỏi (a) ví dụ role xuất hiện trong graph cụ thể với coding — em phác
+  draft roleGraph đầu tiên: 5 role, defaultRole implementer,
+  callstackCap 3, bảng edge per-stage (exploring: advise/consult;
+  planning: advise/consult; executing: đủ 4 + edge lồng
+  reviewer→researcher/human-advisor) — điểm neo: flow hiện tại ánh xạ
+  1-1 vào graph (return→awaiting-approval = call review async, ask =
+  advise async, fgos-researching = consult sync, fanout = assist sync),
+  mảnh 1 là đặt-tên-cái-đang-chạy chứ không đổi behavior; (b) role chỉ
+  mô tả ai-gọi-được-ai — còn task nào ở stage nào, và làm sao agent
+  biết khi nào nên hỏi gì/hỏi ai (prose trigger)? → Em thiết kế tầng
+  thiếu: bảng **Collaboration** trong task-spec (D9), trigger-prose per
+  edge per (workflow, stage); prototype đã chạy thật ở dạng ngầm
+  (material/grounded/answerable = trigger advise; description
+  fgos-researching = trigger consult). Người dùng xác nhận (v10 "cập
+  nhật chưa") → mint D9 (seq 18110), roleGraph draft + Collaboration
+  requirement ghim vào plan.md.
 
 ## 6. Thiết kế đã chốt {#design}
 

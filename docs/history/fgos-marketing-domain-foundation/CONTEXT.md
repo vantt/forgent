@@ -35,6 +35,7 @@ round-by-round provenance.
 | D6 | Task-spec A-lite: contract (task-spec: input/output/gates/verify-template, declared file per domain, cockpit `.fgOS/tasks/` model) separated from know-how (skill); skillMap points stage → (task-spec, skill); initially read-first material via refs, no engine enforcement | 18059 |
 | D7 | Declaration hierarchy domain → N workflows → item; selector reuses `kind` via a `workflowFor: {kind → workflowName}` map with a default; coding un-merges into feature (current graph, default) / bugfix / lightweight; workflow (one item's shape) ≠ template (multi-item composition, `fgos expand`) | 18060 |
 | D8 | Async call (parked for another role) = full handoff event, holder changes; sync in-session call (subagent) = single compact `call-summary` event on completion, holder unchanged. Invariant: holder changes only via async handoff. Nested calls allowed with a capped callstack | 18070 |
+| D9 | Task-spec must carry a Collaboration section: a trigger-prose table per call edge, declared per (workflow, stage) — when to call, which reason, to which role, what the returning ball carries. Three-layer split: prose teaches (task-spec), soul decides (may judge not to call), guard blocks (roleGraph). Off-pattern calling is surfaced to compound-learn via call-summary/handoff events | 18110 |
 
 ## Pinned terms
 
