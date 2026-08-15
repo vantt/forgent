@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `runner.capabilities` — a curated catalog of capability names, shared
+  between the tool-registry's own `capability` field and (a later item)
+  `capacities.<id>.for`. Each entry is `{description?, aliases?}`. This
+  repo's own `.fgos/config.json` declares `impact-analysis`/`pane-labeling`.
+
 ### Changed
 
 - The per-tier `runner.executors.<tier>` config override is retired (0

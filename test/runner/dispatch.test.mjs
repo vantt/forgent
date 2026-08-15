@@ -441,6 +441,120 @@ test('loadRunnerConfig accepts a well-formed "capacities" entry carrying its own
   assert.equal(cfg.capacities['fgos-code-implement'].command, 'agy');
 });
 
+// --- tsk-in1-3: capabilities catalog (D4/D14) — curated, shared between
+// the tool-registry's own free-text `capability` field and, later,
+// capacities.<id>.for -- deliberately a DIFFERENT field from `capacities`
+// above (D3 kept that name for the executor registry; `capabilities` is
+// the catalog of WHAT a capacity can promise) --------------------------
+
+test('loadRunnerConfig accepts a config with no "capabilities" block at all', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'no-capabilities.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      models: { standard: 'sonnet' },
+      timeoutMs: 1000,
+    }),
+  );
+  const cfg = loadRunnerConfig(configPath);
+  assert.equal(cfg.capabilities, undefined);
+});
+
+test('loadRunnerConfig accepts a well-formed "capabilities" catalog entry with description and aliases', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'with-capabilities.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capabilities: { 'impact-analysis': { description: 'Code-graph blast radius', aliases: ['impact_analysis', 'Impact Analysis'] } },
+      models: { standard: 'sonnet' },
+      timeoutMs: 1000,
+    }),
+  );
+  const cfg = loadRunnerConfig(configPath);
+  assert.equal(cfg.capabilities['impact-analysis'].description, 'Code-graph blast radius');
+  assert.deepEqual(cfg.capabilities['impact-analysis'].aliases, ['impact_analysis', 'Impact Analysis']);
+});
+
+test('loadRunnerConfig accepts a "capabilities" entry naming neither description nor aliases (bare {})', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bare-capabilities.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capabilities: { 'pane-labeling': {} },
+      models: { standard: 'sonnet' },
+      timeoutMs: 1000,
+    }),
+  );
+  const cfg = loadRunnerConfig(configPath);
+  assert.deepEqual(cfg.capabilities['pane-labeling'], {});
+});
+
+test('loadRunnerConfig rejects a "capabilities" block that is not an object', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-capabilities-shape.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capabilities: 'nope',
+      models: {},
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('loadRunnerConfig rejects a "capabilities.<name>" entry that is not an object', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-capabilities-entry.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capabilities: { 'impact-analysis': 'nope' },
+      models: {},
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('loadRunnerConfig rejects a "capabilities.<name>" entry with an empty-string description', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-capabilities-description.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capabilities: { 'impact-analysis': { description: '' } },
+      models: {},
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('loadRunnerConfig rejects a "capabilities.<name>" entry whose aliases is not an array of non-empty strings', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-capabilities-aliases.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capabilities: { 'impact-analysis': { aliases: ['ok', ''] } },
+      models: {},
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
 // --- capacities.<id>.invocations[] (tsk-5tm-4 D11): executor-keyed
 // alternative to flat command/args, ADDITIVE -- capacities field name
 // itself stays unchanged (cfg.executors already means something else,
@@ -746,6 +860,13 @@ test('the committed .fgos/config.json runner section no longer declares a coding
 test('the committed .fgos/config.json runner section no longer declares a gather capacity (tsk-5tm-2 D6): the one cross-provider path, retired -- no architectural reason on record for cross-provider, and native Task-tool dispatch already met the one documented reason (parallelizing wall-clock)', () => {
   const cfg = committedRunnerConfig();
   assert.equal(cfg.capacities?.gather, undefined, 'capacities.gather should no longer exist -- retired per D6');
+});
+
+test('the committed .fgos/config.json runner section declares "impact-analysis"/"pane-labeling" in its capabilities catalog (D4/D14, tsk-in1-3)', () => {
+  const cfg = committedRunnerConfig();
+  assert.equal(typeof cfg.capabilities?.['impact-analysis']?.description, 'string');
+  assert.ok(cfg.capabilities['impact-analysis'].description.length > 0);
+  assert.equal(typeof cfg.capabilities?.['pane-labeling']?.description, 'string');
 });
 
 /** Capture what's written to process.stderr during `fn()`; restores the

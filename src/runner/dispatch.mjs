@@ -645,6 +645,42 @@ function validateCapacityShape(capacity, label) {
 }
 
 /**
+ * Shape-check `cfg.capabilities` (D4/D14, tsk-in1-3): the curated catalog
+ * of capability names both layers now share — free-text `capability` on a
+ * tool-registry entry (`toolsFromCapacities`, `src/state/tool-registry.mjs`)
+ * and `capacities.<id>.for` (a capacity's declared purpose, D15 — its own
+ * validation against this catalog is a later task's scope, not this one's).
+ * An object mapping an arbitrary capability name to `{description?,
+ * aliases?}` — both fields optional (a bare `{}` entry is valid, naming
+ * only the key itself). `description` inherits the free-text
+ * `description`/`responsibility` spirit the old tool-registry provider
+ * shape carried; `aliases` (a string array, when present) names other
+ * spellings that resolve to this same catalog entry, distinct from
+ * `normalizeCapability`'s own automatic kebab-case folding (which handles
+ * spelling/casing variance of the SAME name, not a genuinely different
+ * alias name).
+ */
+function validateCapabilitiesShape(capabilities, label) {
+  if (!capabilities || typeof capabilities !== 'object' || Array.isArray(capabilities)) {
+    throw new RunnerConfigError(`runner config (${label}) must be an object mapping a capability name -> {description?, aliases?} when present.`);
+  }
+  for (const [name, entry] of Object.entries(capabilities)) {
+    const entryLabel = `${label}.${name}`;
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+      throw new RunnerConfigError(`runner config (${entryLabel}) must be an object.`);
+    }
+    if (entry.description !== undefined && (typeof entry.description !== 'string' || !entry.description.trim())) {
+      throw new RunnerConfigError(`runner config (${entryLabel}) "description" must be a non-empty string when present.`);
+    }
+    if (entry.aliases !== undefined) {
+      if (!Array.isArray(entry.aliases) || !entry.aliases.every((alias) => typeof alias === 'string' && alias.trim())) {
+        throw new RunnerConfigError(`runner config (${entryLabel}) "aliases" must be an array of non-empty strings when present.`);
+      }
+    }
+  }
+}
+
+/**
  * Shape-check `cfg.modelPolicies` (tsk-5tm-5 D9): an object mapping an
  * arbitrary provider name (`"claude"`, `"gemini"`, ...) to a tier map,
  * each tier map's keys drawn from `MODEL_POLICY_TIERS` and values
@@ -690,6 +726,15 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
     for (const [capacityId, capacity] of Object.entries(cfg.capacities)) {
       validateCapacityShape(capacity, `${sourceLabel} capacities.${capacityId}`);
     }
+  }
+  // OPTIONAL cfg.capabilities catalog (D4/D14, tsk-in1-3): additive, same
+  // style as `capacities` above — absent keeps today's behavior byte-
+  // identical. Deliberately a DIFFERENT field from `capacities` (D3 kept
+  // that name for the executor registry) — `capabilities` is the curated
+  // catalog of WHAT a capacity can promise, `capacities` is the registry
+  // of HOW one is actually implemented.
+  if (cfg.capabilities !== undefined) {
+    validateCapabilitiesShape(cfg.capabilities, `${sourceLabel} capabilities`);
   }
   // tsk-5tm-5 D9: `modelPolicies` (provider-keyed, 5-tier) is the new
   // preferred shape -- when present, it satisfies this requirement on its
