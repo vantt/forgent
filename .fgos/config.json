@@ -66,18 +66,31 @@
               "{model}"
             ]
           }
-        ]
+        ],
+        "providerModel": "gemini",
+        "rigorOverrides": {
+          "light": "lightweight",
+          "standard": "lightweight",
+          "heavy": "lightweight"
+        }
       }
-    },
-    "models": {
-      "light": "haiku",
-      "standard": "sonnet",
-      "heavy": "opus"
     },
     "timeoutMs": 900000,
     "parallel": {
       "maxRoots": 4,
       "maxLeavesPerRoot": 4
+    },
+    "modelPolicies": {
+      "claude": {
+        "lightweight": "haiku",
+        "standard": "sonnet",
+        "creative": "sonnet",
+        "analytical": "sonnet",
+        "critical": "opus"
+      },
+      "gemini": {
+        "lightweight": "Gemini 3.5 Flash (Medium)"
+      }
     }
   },
   "gateBypass": {
