@@ -22,7 +22,12 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { DOCTOR_CHECKS, FIX_REGISTRATIONS, integrationScriptPath, mainCheckoutHookWired, resolveMainCheckout } from '../../../src/setup/checks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../../../src/runner/dispatch.mjs';
 import { DEFAULT_LEVEL } from '../../../src/state/gate-bypass.mjs';
-import { DEFAULT_CLEANUP_TTL_DAYS, DEFAULT_CLEANUP_LEAF_TTL_DAYS, DEFAULT_HERDR_ORCHESTRATOR_SETTINGS } from '../../../src/setup/registrations.mjs';
+import {
+  DEFAULT_CLEANUP_TTL_DAYS,
+  DEFAULT_CLEANUP_LEAF_TTL_DAYS,
+  DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
+  DEFAULT_HERDR_WEB_DASHBOARD_SETTINGS,
+} from '../../../src/setup/registrations.mjs';
 import { DEFAULT_INVARIANT_CHECK_COMMANDS } from '../../../src/config/shared-config-file.mjs';
 import { initStore, addWork } from '../../../src/state/store.mjs';
 import { appendEvent } from '../../../src/state/events.mjs';
@@ -107,6 +112,7 @@ export {
   DEFAULT_CLEANUP_LEAF_TTL_DAYS,
   DEFAULT_CLEANUP_TTL_DAYS,
   DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
+  DEFAULT_HERDR_WEB_DASHBOARD_SETTINGS,
   DEFAULT_INVARIANT_CHECK_COMMANDS,
   DEFAULT_LEVEL,
   DEFAULT_RUNNER_CONFIG,

@@ -51,7 +51,16 @@ serde_yaml = "0.9"
 # CONTEXT.md) is not guaranteed to share origin with the gateway. Version
 # resolved by `cargo add --dry-run` against this crate's existing axum 0.8
 # dependency graph (docs/history/tsk-54y-gateway-cors-bind/plan.md).
-tower-http = { version = "0.7", features = ["cors"] }
+tower-http = { version = "0.7", features = ["cors", "fs"] }
+# tsk-48w (D14 of docs/history/herdr-web-dashboard-plan-realignment/
+# CONTEXT.md): embeds herdr-plugin/web's built bundle into the binary so
+# the "máy được chọn" can serve it with no separate deploy step.
+# Versions resolved by real `cargo add --dry-run` against this crate's
+# existing dependency graph (docs/history/herdr-web-dashboard/plan.md,
+# "NẮN LẠI P1 tsk-48w"): rust-embed 8.12.0, axum-embed 0.1.0, same
+# rust-embed major line the reference implementation herdr-gateway pins.
+rust-embed = { version = "8", features = ["debug-embed"] }
+axum-embed = "0.1"
 
 [dev-dependencies]
 tower = { version = "0.4", features = ["util"] }
