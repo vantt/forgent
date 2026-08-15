@@ -466,6 +466,424 @@ radius chưa xác nhận, cross-check bằng `rg`).
 READY WITH CONSTRAINTS
 ```
 
+## NẮN LẠI P1 `tsk-48w` (2026-08-15, sau realignment D14) — supersede mục ngay trên
+
+**Đọc trước:** mục "Reality gate riêng của P1" ngay trên (2026-08-12) chốt
+`READY WITH CONSTRAINTS` cho một scope đã CHẾT một phần — nó còn giữ cụm
+D9 gốc (`.fgos/herdr-web-secret`, verify mệnh đề `git check-ignore -q
+.fgos/herdr-web-secret`). `docs/history/herdr-web-dashboard-plan-
+realignment/CONTEXT.md` D14 (2026-08-15) đã nắn: **bỏ hẳn** phần secret
+(D13 của cùng tài liệu: web client dùng Bearer có sẵn của gateway, không
+còn secret riêng nào); **giữ nguyên** phần cờ static-serving + đăng ký
+`fgos setup`/`doctor`. Mục này không mở lại D1-D11 của `CONTEXT.md` gốc —
+chỉ áp D14 vào phần shape/verify cụ thể của con `tsk-48w`.
+
+Item cũng phát hiện đang `stage: planning` với `verify` cũ còn nguyên
+mệnh đề chết (`git check-ignore -q .fgos/herdr-web-secret` — không file
+nào như vậy còn được tạo ra nữa) — verify này giờ **không bao giờ pass
+được**, đúng loại lỗi fail-closed F1/F2 mục "Reality gate — vòng 1" ở
+trên đã cảnh báo, chỉ khác nguyên nhân (drift theo thời gian, không phải
+lỗi viết ban đầu).
+
+### Mode: giữ nguyên `high-risk` (không đếm lại)
+
+Lane cũ (5 flag, 1 hard-gate audit/security — dòng `.gitignore` ngăn
+commit bundle output) vẫn đúng nguyên xi cho scope mới: vẫn thêm hình
+dạng config bền (data model), vẫn có `.gitignore` (audit/security
+hard-gate — giờ ngăn commit **bundle output**, không phải secret, nhưng
+cùng loại rủi ro "quên .gitignore thì commit thứ không nên commit"), vẫn
+đăng ký `fgos doctor` check (public contracts), vẫn dùng chung
+`registrations.mjs`/162 test `test/setup` (existing covered behavior),
+vẫn Node+Rust (multi-domain). Bớt một chi tiết (không còn "secret path"
+cụ thể) không đổi flag nào trong 5 flag đã đếm.
+
+### Approach
+
+**Cổng chịu lực (D14 chưa nói cách làm, chỉ nói "cờ + đăng ký"):** làm
+việc phục vụ static bundle THẬT, gated bởi cờ — không chỉ một field cấu
+hình chết không có tác dụng gì. Port nguyên idiom đã kiểm chứng của
+`herdr-gateway` (repo tham khảo cụm này đã dùng nhiều lần —
+`herdr-plugin/src/gateway.rs`'s CORS/bind của `tsk-54y` cũng port từ
+đây):
+
+1. **`herdr-plugin/web/package.json`** — thêm script `bundle`
+   (`"tsc -b && vite build --outDir ../static --emptyOutDir"`). Đã chạy
+   thật tại validating pass này: `npm run bundle` (sau `npm ci`) sinh
+   `herdr-plugin/static/{index.html,assets/,favicon.svg}` thật — 408ms,
+   không lỗi.
+2. **`herdr-plugin/build.rs`** (chưa tồn tại — xác nhận `find herdr-plugin
+   -maxdepth 1 -name build.rs` = rỗng, khớp D14) — port tối giản từ
+   `herdr-gateway/build.rs:1-13` (chỉ phần `create_dir_all("static")`,
+   KHÔNG port phần fingerprint/git-sha — D14 chỉ khoá phần guarantee, thứ
+   kia là tiện ích riêng của `herdr-go` chưa từng được khoá ở đây).
+3. **`herdr-plugin/Cargo.toml`** — `rust-embed = { version = "8", features
+   = ["debug-embed"] }` + `axum-embed = "0.1"` (bằng chứng thật, `cargo add
+   --dry-run` tại pass này: resolve `rust-embed v8.12.0`, `axum-embed
+   v0.1.0`, không xung đột với đồ thị dep hiện có — cùng version `rust-
+   embed` reference `herdr-gateway/Cargo.toml:37` dùng). Thêm feature `fs`
+   vào `tower-http` đã có (từ `tsk-54y`) — cần cho `ServeDir`/`ServeFile`
+   (đã probe: `cargo add tower-http --features fs --dry-run` resolve sạch
+   ở `v0.7`, khớp version hiện tại).
+4. **`.gitignore`** (root — không có `.gitignore` riêng trong
+   `herdr-plugin/`, xác nhận `find herdr-plugin -name .gitignore` = rỗng)
+   — thêm dòng `herdr-plugin/static/`.
+5. **`herdr-plugin/src/settings.rs`** — thêm `WebDashboardSettings {
+   static_serving: bool }`, đọc từ section `herdrWebDashboard`. **Khác
+   philosophy với `OrchestratorSettings` láng giềng trong CÙNG FILE**:
+   `OrchestratorSettings::default()` fail-closed (mọi toggle off) vì
+   không toggle nào trong 4 cái đó an toàn khi bật nhầm; `static_serving`
+   fail-**open** (mặc định `true`) là quyết định CÓ CHỦ Ý của D10 (cụm
+   gốc) — máy được chọn phục vụ trang mà không cần bước setup thêm. Phải
+   ghi comment rõ divergence này ngay tại chỗ để người đọc sau không tưởng
+   nhầm là bug.
+6. **`herdr-plugin/src/gateway.rs`** — struct `WebAssets` (`#[derive(
+   rust_embed::RustEmbed, Clone)] #[folder = "static/"]`) + hàm
+   `with_static_serving(router: Router, enabled: bool, static_dir: &Path)
+   -> Router`, port đúng logic dev-override/embedded-fallback của
+   `herdr-gateway/src/web/mod.rs:97-113` (nếu `<static_dir>/index.html`
+   tồn tại trên đĩa → `ServeDir` + SPA fallback cho dev; không thì
+   `axum_embed::ServeEmbed<WebAssets>` cho binary release). **Không đổi
+   chữ ký `build_router`** — hàm mới bọc NGOÀI router đã build (gọi ở
+   `run()`, sau `build_router`), để 9 test hiện có của `build_router`
+   (CORS/auth/error-envelope — đo CRITICAL risk ở `impact` scan của
+   `tsk-54y`) không bị đụng tới. Đây chính là "smaller path" của reality
+   gate: đổi chữ ký sẽ buộc sửa cả 9 test đó chỉ để thêm MỘT nhánh mới,
+   trong khi bọc ngoài không đụng gì cũ.
+7. **`src/setup/registrations.mjs`** — port nguyên khuôn
+   `checkHerdrOrchestratorConfigured`/`DEFAULT_HERDR_ORCHESTRATOR_SETTINGS`
+   (`registrations.mjs:1502-1542`, đọc trực tiếp): `DEFAULT_HERDR_WEB_
+   DASHBOARD_SETTINGS = { staticServing: true }`, `registerConfigDefault
+   ({id:'herdrWebDashboard', key:'herdrWebDashboard', shape:...})`,
+   `registerCheck({id:'herdr-web-dashboard-configured', description,
+   check})` — check chỉ xác nhận section có mặt + `staticServing` là
+   boolean (khớp đúng khuôn láng giềng, không tự chế thêm điều kiện).
+
+**Phương án đã cân nhắc và loại:**
+- Đổi chữ ký `build_router` để nhận `web_settings` — loại vì đụng cả 9
+  test hiện có (CRITICAL theo `impact` scan) chỉ để thêm một fallback,
+  trong khi bọc ngoài đạt cùng kết quả với blast radius bằng 0 lên code
+  cũ.
+- Fingerprint/git-sha đầy đủ như `herdr-gateway/build.rs` — loại vì D14
+  chỉ khoá phần `create_dir_all`, phần kia là tiện ích không ai yêu cầu ở
+  đây (YAGNI).
+
+### Bản đồ rủi ro
+
+| Thành phần | Mức | Chứng minh gì |
+|---|---|---|
+| `npm run bundle` sinh `static/` đúng hình dạng RustEmbed cần | Thấp — đã chạy thật ở pass này | Output thật: `herdr-plugin/static/{index.html,assets/,favicon.svg}` |
+| `rust-embed`/`axum-embed` build được với đồ thị dep hiện tại | Thấp — đã `cargo add --dry-run` thật | `rust-embed v8.12.0`, `axum-embed v0.1.0`, không xung đột |
+| `with_static_serving` không đụng 9 test cũ của `build_router` | Trung bình — hàm mới, chưa viết | Bọc ngoài router đã build (không sửa `build_router` signature); proof point ở Execute: `cargo test --lib gateway` (verify sẵn có của `tsk-54y`, chạy lại) vẫn 19/19 xanh sau khi thêm hàm mới |
+| `static_serving` mặc định ON không vô tình bật lộ dữ liệu | Trung bình — đây là hard-gate audit/security của lane | `ServeEmbed`/`ServeDir` chỉ phục vụ đúng `herdr-plugin/static/` (bundle công khai, không chứa secret — token vẫn nằm ở `~/.fgos/config.json`, ngoài phạm vi thư mục này); route `/v1/*` vẫn giữ `require_token` layer nguyên vẹn (fallback chỉ bắt route KHÔNG khớp `/v1/*`) |
+| `.gitignore` thật sự chặn `static/` | Thấp | `git check-ignore -q herdr-plugin/static/<file>` — mệnh đề đối chứng giống hệt khuôn F-check đã dùng ở "Đã sửa" phía trên (đo đỏ trước khi thêm dòng, xanh sau) |
+
+### Verify mới (thay verify chết)
+
+```
+cargo test --manifest-path herdr-plugin/Cargo.toml web_dashboard_settings | grep -qE '[1-9][0-9]* passed' && cargo test --manifest-path herdr-plugin/Cargo.toml static_serving | grep -qE '[1-9][0-9]* passed' && node --test 'test/setup/**/*.test.mjs' && node bin/fgos.mjs doctor --json --dir . | grep -q 'herdr-web-dashboard-configured' && git check-ignore -q herdr-plugin/static/probe-file
+```
+
+Giữ đúng khuôn `<filter> | grep -qE '[1-9][0-9]* passed'` đã học từ F3 ở
+trên (không dùng filter trần, tránh vacuous pass khi filter không khớp
+gì). Hai filter (`web_dashboard_settings`, `static_serving`) là tên hàm
+test sẽ viết ở Execute — đặt tên trước ở đây để verify không phải sửa lại
+sau.
+
+### Decide the split
+
+Một mảnh — không tách. D14 không mở lại quyết định "1 item" của cụm gốc;
+7 việc trên (bundle script, build.rs, 2 dep Cargo, gitignore, settings.rs,
+gateway.rs, registrations.mjs) đều phục vụ đúng MỘT hành vi quan sát được
+("bật cờ thì gateway phục vụ trang thật; tắt thì không, và fgos doctor
+biết cờ đó có cấu hình đúng hay không") — tách nhỏ hơn sẽ tạo trạng thái
+trung gian không tự đứng được (vd: có `build.rs` mà chưa có
+`with_static_serving` thì không chứng minh được gì).
+
+### Outstanding questions
+
+None — D14 đã trả lời câu hỏi phạm vi duy nhất còn treo (secret sống hay
+chết); phần còn lại là cách làm, có tiền lệ thật để port.
+
+## NẮN LẠI P3 `tsk-5jr` (2026-08-15) — taskboard, web client thật
+
+**Đọc trước:** mục "P3 — taskboard" ở trên (2026-08-12/13) đã tự ghi chú
+"NẮN LẠI" hai điểm (khung frontend chuyển sang `tsk-yo0`; nguồn dữ liệu
+đổi sang HTTP) nhưng **chưa bao giờ áp vào chính field `footprint`/
+`verify` của item** — cả hai vẫn giữ nguyên hình dạng cũ (`herdr-plugin/
+src/web/taskboard.rs`, một MODULE RUST bên trong binary TUI, verify
+`cargo test`). Mục này áp đúng ghi chú đã có, không mở lại quyết định
+nào: màn hình là component React thật dưới `herdr-plugin/web/src/`, gọi
+gateway qua HTTP, không có dòng Rust nào.
+
+### Mode: giữ `standard` (đếm lại xác nhận)
+
+Flag: **existing covered behavior** (mở rộng `herdr-plugin/web/` đã có 10
+test của `tsk-yo0`, phải không đụng vỡ), **weak proof** (đây là màn hình
+web ĐẦU TIÊN có state/interaction thật của cụm — chưa có tiền lệ trong
+repo để so). Không có hard-gate (không auth mới, không data model mới —
+chỉ đọc qua API đã có). 2 flag → **standard**, khớp tier hiện tại của
+item, không cần nâng lên `high-risk`.
+
+### Bootstrap — đọc trực tiếp `docs/ui-spec/screens/S02-taskboard.md` (172
+dòng) + `docs/ui-spec/30-states-and-errors.md`
+
+Trích nguyên văn các điểm chịu lực, không diễn giải lại:
+
+- **Layout** (S02 §Layout): board nhóm theo status, có thể collapse, nhớ
+  trạng thái collapse; rail "NEEDS ANSWER" ghim bên phải (desktop) /
+  thành nhóm đầu tiên (mobile) — độc lập với group-by đang chọn.
+- **3 quyết định layout chịu lực** (S02, ngay dưới ASCII mock): nhóm nhớ
+  trạng thái collapse; chỉ báo phơi nhiễm mạng đứng CỐ ĐỊNH ở topbar
+  (R5 — không phải toast biến mất); gateway picker cũng ở topbar (R1 —
+  không giả định một origin cố định).
+- **States** (S02 §States + `30-states-and-errors.md`): `ST-LOADING`
+  (skeleton TRONG group header thật, đếm hiện trước nội dung),
+  `ST-EMPTY-BOARD` (không có item nào — khác `ST-EMPTY-FILTER`, có item
+  nhưng filter không khớp gì, luôn hiện filter đang áp + nút xoá),
+  `ST-DISCONNECTED` (gateway unreachable — đánh dấu dữ liệu cũ là STALE
+  tại chỗ, không xoá, có nút retry).
+- **R11** (`herdr-web-dashboard.md`): không badge/chuông ngụ ý push — số
+  đếm trong group header chỉ đúng tại thời điểm người đang nhìn.
+- **11 interaction** (S02 §Interactions, `A-S02-001..011`): click card →
+  navigate S03 (item detail — `tsk-4id`, CHƯA xây); `+Add` → mở overlay
+  M03; click group header → toggle collapse + persist; filter/group-by →
+  mutate; rail entry click → navigate S04; gateway picker change →
+  switch+reload (**deferred D11** — xem Assumptions); `work.changed` /
+  `question.opened` / `gateway.unreachable` — client-derived events, D9
+  (poll `/state/digest`, không server-push).
+
+### Approach
+
+**Chọn:** một component React `Taskboard` dưới `herdr-plugin/web/src/
+screens/Taskboard.tsx`, dùng `createApiClient` (`tsk-yo0`) gọi
+`listWork({ all: true })` (mock hiện cả nhóm DONE — mặc định `listWork`
+chỉ trả open-only, đọc đúng contract `fgos-gateway-api-v1.yaml:123-126`:
+tham số `all` mới kéo cả done/wontfix/retrospective/cleanup) và
+`pollStateDigest` (`tsk-yo0/src/api/poll.ts`) trên một `setInterval` —
+digest đổi thì refetch `listWork`, giữ nguyên D9.
+
+**Grouping mặc định:** theo `status` THẬT (không tự chế rollup 4 nhóm
+như mock ASCII ngụ ý — mock là ví dụ minh hoạ, không phải taxonomy khoá;
+grouping theo status thật đơn giản hơn, không cần bịa một tầng rollup
+không có D-ID nào chống lưng). "NEEDS ANSWER" rail là tập CẮT NGANG độc
+lập — `status ∈ {awaiting-human, awaiting-approval}` — luôn hiện, không
+phụ thuộc group-by đang chọn, đúng cấu trúc hai region tách biệt của
+Layout.
+
+**Filter/search:** client-side trên tập đã fetch — contract không có
+free-text search REST endpoint nào (1 hit thật của chữ "search" trong
+toàn file là dòng mô tả D9's tương lai "MCP search tool", không phải một
+`/work/search` hay tham số query text nào trên `/work`/`/ready`; xác
+nhận bằng đọc trực tiếp `paths:` — không path nào tên search). Filter
+theo `stage`/`risk` (đã có trong `WorkItem`, `tsk-yo0/src/api/types.ts`).
+
+**Collapse state nhớ được:** `localStorage`, key theo tên group — nhẹ,
+không cần backend, đúng "remember their state" của spec, không yêu cầu
+persist phía server (spec không nói vậy).
+
+**Chỉ báo phơi nhiễm mạng (R5):** suy ra CLIENT-SIDE từ chính `baseUrl`
+đã cấu hình — hostname không phải `localhost`/`127.0.0.1`/`[::1]` thì hiện
+cảnh báo. Không có endpoint nào trong contract trả về bind address của
+gateway (0 hit thật khi quét toàn file cho chữ đó) nên đây là tín hiệu
+duy nhất client có thể tự quan sát —
+nếu trình duyệt gọi được `baseUrl` từ một host không phải loopback thì
+đúng nghĩa "reachable on network" mà R5 mô tả.
+
+**Gateway picker:** hiện TĨNH (hostname của `baseUrl` hiện tại), không
+tương tác — D11 khoá "v1 nói chuyện với đúng MỘT gateway", phần chọn
+giữa nhiều gateway deferred sang `tsk-3b0`. Dropdown thật sẽ là việc của
+`tsk-3b0`, không phải ở đây.
+
+**`+Add` (M03):** KHÔNG có item nào trong bảy item đang chạy của cụm này
+sở hữu M03's modal thật (`docs/ui-spec/modals/M03-add-edit-item.md`, 92
+dòng, chưa gán cho item nào trong `tsk-54y/tsk-yo0/tsk-48w/tsk-5jr/
+tsk-41h/tsk-4id/tsk-18to`). Nút `+Add` hiện thật, wire tới một overlay
+placeholder tối giản ("Add item — coming soon") thay vì hiện thực M03
+đầy đủ — giữ interaction A-S02-002 có thật (không phải nút chết) mà
+không tự ý mở rộng phạm vi sang một spec 92 dòng chưa ai nhận. Ghi lại
+làm phát hiện cho cụm, không phải quyết định âm thầm.
+
+**Navigate tới S03:** `tsk-4id` (P4, bước kế trong trình tự) CHƯA xây
+S03. `Taskboard` nhận prop `onSelectItem(id: string)`; component cha
+(`App.tsx`) giữ `selectedItemId` state cục bộ, hiện một placeholder
+("Task detail — tsk-4id sẽ xây") khi có id được chọn — không tự dựng một
+router library (`react-router` etc.) khi chưa có quyết định nào khoá nó;
+props/state cục bộ là "smaller path" đủ cho một điều hướng 1-cấp, đảo
+ngược dễ khi `tsk-4id` cần thật.
+
+**Phương án đã cân nhắc và loại:**
+- Rollup 4 nhóm cố định theo đúng mock ASCII — loại vì không D-ID/tài
+  liệu nào khoá đúng 4 nhóm đó là taxonomy chính thức; group theo status
+  thật vừa đơn giản hơn vừa không bịa quy tắc.
+- Xây router library cho navigate — loại, chưa cần thiết cho một điều
+  hướng 1-cấp, có thể đổi khi `tsk-4id` thật sự cần nhiều route.
+- Hiện thực M03 đầy đủ trong item này — loại, ngoài footprint đã khai
+  của item (`taskboard.rs`/`taskboard.ts` cũ, giờ nắn lại thành màn
+  taskboard, không phải modal add/edit), và 92 dòng spec riêng của M03
+  xứng đáng item riêng.
+
+**Files chạm (nắn lại, thay `footprint` cũ):**
+`herdr-plugin/web/src/screens/Taskboard.tsx`, `herdr-plugin/web/src/
+screens/Taskboard.test.tsx`, có thể thêm `herdr-plugin/web/src/App.tsx`
+(wire `selectedItemId`). KHÔNG `herdr-plugin/src/web/taskboard.rs` (Rust
+— chết theo nắn lại), KHÔNG `herdr-plugin/web/package.json`/
+`vite.config.ts` (đã dựng ở `tsk-yo0`, D6).
+
+### Bản đồ rủi ro
+
+| Thành phần | Mức | Chứng minh gì |
+|---|---|---|
+| Grouping theo status thật + rail "needs answer" cắt ngang đúng | Trung bình — logic mới, dễ lẫn awaiting-human/awaiting-approval vào nhóm chính thay vì CHỈ ở rail | Test thật: item `status: awaiting-human` xuất hiện ở rail, KHÔNG xuất hiện lặp ở group chính (rail là view riêng, không phải filter loại khỏi group — kiểm cả hai vị trí) |
+| Poll digest → refetch đúng, không refetch thừa khi digest không đổi | Trung bình | Test thật: `pollStateDigest` trả `changed:false` → không gọi lại `listWork`; `changed:true` → gọi lại đúng 1 lần |
+| `ST-DISCONNECTED` giữ dữ liệu cũ, không xoá | Trung bình — đúng yêu cầu khoá của area spec Edge Cases, đã kiểm chứng ở `tsk-yo0` cho tầng API, giờ kiểm ở tầng UI | Test thật: fetch đầu thành công có data; fetch thứ hai ném `GatewayUnreachableError` (đã có ở `tsk-yo0/src/api/errors.ts`) → board vẫn hiện data cũ, có đánh dấu stale + nút retry, không blank |
+| Chỉ báo phơi nhiễm mạng suy từ `baseUrl` | Thấp | Test thật: `baseUrl: 'http://localhost:4170/v1'` → không cảnh báo; `baseUrl: 'http://192.168.1.5:4170/v1'` → có cảnh báo |
+
+### Verify mới (thay verify chết)
+
+```
+cd herdr-plugin/web && npm run test -- Taskboard
+```
+
+Không còn nhánh Rust nào — item này không chạm `herdr-plugin/src/*.rs`.
+`npm run test -- Taskboard` filter đúng theo tên file (vitest, không
+dính lỗi F1/F2/F3 của cargo — vitest exit non-zero khi 0 test file khớp
+pattern, khác cargo test's "0 matched vẫn exit 0"; đo thật tại Execute
+trước khi khoá verify cuối).
+
+### Decide the split
+
+Một mảnh — không tách. Board/rail/filter/poll/disconnected đều phục vụ
+đúng MỘT màn hình quan sát được (S02); tách nhỏ hơn (vd rail riêng khỏi
+board) sẽ tạo trạng thái không tự đứng được (rail không có board thì
+không chứng minh được gì có ý nghĩa).
+
+### Outstanding questions
+
+None — mọi khoảng mở (rollup taxonomy, router, M03) đã được quyết bằng
+smaller-path/reversible (D5), ghi rõ lý do, không phải câu hỏi cần
+người.
+
+## NẮN LẠI P4 `tsk-4id` (2026-08-15) — task detail, mục tiêu chính của cụm
+
+**Đọc trước:** cùng loại lệch với P3 ở trên — `footprint`/`verify` cũ vẫn
+là mảnh Rust bên trong TUI (`herdr-plugin/src/web/detail.rs`,
+`herdr-plugin/web/src/detail.ts`), trong khi mô tả item đã tự ghi rõ nắn
+lại từ D10 (web client độc lập gọi HTTP). Mục này áp đúng ghi chú đã có.
+
+### Mode: giữ `heavy` (tier hiện tại) — không đếm lại thành lane riêng
+
+Item đã ở tier `heavy`/risk `heavy` sẵn ("mục tiêu chính của cụm"); không
+cần đếm lại flag vì đây là con lớn nhất trong 7 item, đúng bản chất công
+việc (3 khối nội dung + ghép seq + guard traversal + 2 hành động ghi thật
+lên trunk-adjacent state).
+
+### Approach — 3 phát hiện thật làm lệch phạm vi gốc, mỗi cái xử lý riêng
+
+**Phát hiện 1 — `GET /work/{id}`'s schema tài liệu SAI so với thật.**
+Contract cũ khai `data: {$ref: WorkItem}`; hành vi thật (`get_work_by_id`
+gọi `show`, không phải chỉ đọc field) trả về `{work, discovery, decisions,
+gates, outcome, friction, settlement, learning}` — chính mô tả operation
+đã nói đúng ("plus every log scoped to just this id") nhưng schema tham
+chiếu sai. Sửa: thêm schema `WorkDetail` khớp thật, đổi tham chiếu của
+`/work/{id}` GET. Bằng chứng: `fgos show tsk-48i` chạy thật, xác nhận
+đúng 8 key top-level, `gates` có `{contextApprove, ask, askHistory,
+statusAtAsk, answer, planApprove, validateApprove}` (không phải chỉ gate
+records), `settlement.recent` cap **5** bản ghi mới nhất
+(`SETTLEMENT_DISPLAY_CAP`) dù `count` phản ánh tổng thật (24 cho
+tsk-48i).
+
+**Phát hiện 2 — D3 (đọc CONTEXT.md/plan.md) không có đường nào cho web
+client.** Không route gateway nào đọc nội dung file docs — `docsRef` chỉ
+là path string. Thêm `GET /work/{id}/docs` (mới, ngoài 4 file footprint
+gốc của item) — guard traversal bằng canonicalize sau khi join (không
+string-match giá trị thô), test thật với file `secret.txt` ngoài
+`docs/history/` để chứng minh guard chặn được, không chỉ chặn theo tên.
+Đây chính là proof point R6 mà verify CŨ của item đã dự trù
+(`rejects_docs_ref_path_traversal`) nhưng route đó chưa từng tồn tại
+trước item này.
+
+**Phát hiện 3 — D4 (gate-approve channel) không có state bền vững.** Sống
+qua chính việc tự chạy cả cụm 7-item trong phiên này: câu hỏi gate luôn
+hỏi/trả lời đồng bộ trong phiên sống, chưa từng thấy ghi thành trạng thái
+"đang treo" nào remote xem được. Hỏi người, chốt D15
+(`docs/history/herdr-web-dashboard/CONTEXT.md`): S03/S04 chỉ hiện lịch sử
+gate ĐÃ hoàn tất (`{actor, at, verify}`), không giả lập câu hỏi đang treo.
+Kênh `ask` (status `awaiting-human`) vẫn đầy đủ.
+
+### Thiết kế 3 khối nội dung (giữ nguyên quyết định gốc D2/D3/D4 của cụm)
+
+- **"What the agent did"** (D3): đọc từ `GET /work/{id}/docs`'s
+  `contextMd`/`planMd`, KHÔNG từ `decisions[]` — `decisions[]` chỉ hiện
+  sau disclosure kèm count, đúng D3 gốc.
+- **Lịch sử câu hỏi ghép theo seq** (D2, R9): `pairTimeline()` — ghép vị
+  trí, KHÔNG BAO GIỜ vẽ link dữ liệu không có. Tham số thứ ba
+  `isCurrentlyParked` phân biệt hai lý do khác nhau một câu hỏi cuối
+  không có trả lời: (a) vòng đang mở thật (chỉ có thể là câu hỏi CUỐI,
+  FSM chỉ cho một ask mở tại một thời điểm) — loại khỏi ghép, gán
+  `answer: null` trực tiếp; (b) trả lời có tồn tại nhưng ngoài cửa sổ cap-5
+  — ghép từ cuối lùi lại, phần thiếu do cap cũng `answer: null` nhưng vì
+  lý do khác. **Bug thật bắt được bởi chính test lúc viết**: bản đầu
+  không phân biệt hai lý do này, ghép sai câu hỏi đang mở với câu trả lời
+  của vòng TRƯỚC — sửa trước khi commit (xem Iron Law evidence).
+- **Câu hỏi cần trả lời phủ ask + gate-approve** (D4, nắn theo D15 mới):
+  ask đầy đủ (S03 hiện input trả lời thật gọi `answerWork`; S04 liệt kê
+  toàn bộ, gọi `listWork({status:'awaiting-human'})`); gate-approve chỉ
+  lịch sử đã xong.
+
+### Hành động ghi thật, không phải stub
+
+- **Answer this** (S03 + S04) — gọi thật `client.answerWork(id, text)`
+  (đã có từ `tsk-yo0`).
+- **Retire** — gọi thật `client.moveWork(id, 'wontfix')`.
+- **Approve merge** (R7) — gọi thật `client.approveWork(id)`. Không có
+  endpoint nào báo trước "gateway có đang ở main working tree không", nên
+  nút vẫn được hiện (disabled trừ khi `status === 'awaiting-approval'`) và
+  khi bấm, lỗi thật từ engine (`GatewayApiError.message`) hiện nguyên văn
+  — không dự đoán trước, không nuốt lỗi (R7: "report unavailable with the
+  reason", không phải "offered then failed" câm).
+- **Edit** (M03) — placeholder, cùng lý do M03 chưa ai nhận như `tsk-5jr`
+  đã ghi; `tsk-41h`'s `PATCH /work/{id}` tồn tại SẴN SÀNG cho M03 dùng khi
+  nó được xây, không phải việc của item này.
+
+### Điều hướng — sửa một chỗ ở `tsk-5jr`'s Taskboard
+
+A-S02-006 (S02 spec): click rail "needs answer" → navigate **S04**, không
+phải S03 trực tiếp. `Taskboard.tsx` (tsk-5jr) trước đây nối thẳng rail
+click vào `onSelectItem` (S03) vì S04 chưa tồn tại lúc đó — sửa: thêm prop
+optional `onOpenNeedsAnswer`, fallback về hành vi cũ khi không truyền (zero
+blast radius lên 12 test hiện có của `Taskboard.test.tsx`, không cái nào
+truyền prop mới nên tất cả giữ hành vi cũ nguyên xi).
+
+### Bản đồ rủi ro
+
+| Thành phần | Mức | Chứng minh gì |
+|---|---|---|
+| `pairTimeline` ghép đúng vị trí, không vẽ link giả | Trung bình — bug thật đã bắt được ở chính pass này | 5 test thật, gồm case "vòng đang mở" và case "cap-5 cắt vòng cũ", cả hai phân biệt đúng bằng `isCurrentlyParked` |
+| Guard traversal của `GET /work/{id}/docs` chặn được thật, không chỉ theo tên | Trung bình — hard-gate audit/security | Test thật: file `secret.txt` có tồn tại thật ngoài `docs/history/`, route từ chối phục vụ (400), không chỉ so chuỗi `docsRef` |
+| `WorkDetail` schema mới khớp đúng response thật | Thấp — đã chạy `fgos show` thật, không suy đoán | Trích dẫn trực tiếp output thật trong RESEARCH.md-tương-đương (mục Approach ở trên) |
+| Approve merge không nuốt lỗi thật của engine | Thấp | Test thật: lỗi 412 giả lập trả `message` nguyên văn, hiện đúng trong `approve-error` |
+
+### Verify mới (thay verify chết)
+
+```
+cd herdr-plugin && cargo test --lib gateway && cd web && npm ci && npm run test
+```
+
+Phủ cả hai phía: Rust (`get_work_docs`, guard traversal, `patch_work` từ
+`tsk-41h`) và React (`pairTimeline`, 3 screens, poll, hành động ghi).
+
+### Decide the split
+
+Một mảnh — không tách. 3 khối nội dung + 2 route gateway mới + 3 màn hình
++ điều hướng đều phục vụ đúng MỘT mục tiêu quan sát được ("mở task detail
+của một item và biết chính xác chuyện gì đang diễn ra, cần làm gì").
+
+### Outstanding questions
+
+None — D15 đã trả lời câu hỏi phạm vi gate-approve; phần còn lại là cách
+làm, có bằng chứng thật (live `fgos show`, live traversal test) cho từng
+quyết định.
+
 ## Kế hoạch riêng của P0a `tsk-54j` (2026-08-14) — area spec
 
 Con này (`docs`, `parent: tsk-ldb`, `deps: [tsk-7l9]`) được tạo sau 5 mảnh

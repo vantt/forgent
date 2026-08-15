@@ -1597,6 +1597,44 @@ registerCheck({
   check: (cwd) => checkHerdrOrchestratorConfigured(cwd),
 });
 
+// tsk-48w (D14 of docs/history/herdr-web-dashboard-plan-realignment/
+// CONTEXT.md, carrying forward D10 of the original cluster's own
+// CONTEXT.md): the web dashboard's static-serving toggle, read fail-OPEN
+// from Rust (herdr-plugin/src/settings.rs's `WebDashboardSettings` --
+// `static_serving: true` when the section/file is missing). Same
+// registerConfigDefault + registerCheck shape as `herdrOrchestrator`
+// immediately above, deliberately with the opposite default value -- this
+// toggle exists to gate the "máy được chọn" (D2) serving the bundle it
+// already carries, out of the box, not an auto-launch toggle needing an
+// opt-in.
+export const DEFAULT_HERDR_WEB_DASHBOARD_SETTINGS = {
+  staticServing: true,
+};
+
+function checkHerdrWebDashboardConfigured(cwd) {
+  const shared = readSharedConfig(cwd);
+  const settings = shared?.herdrWebDashboard;
+  if (settings === undefined) {
+    return { passed: false, message: 'herdrWebDashboard section missing -- run fgos setup' };
+  }
+  if (typeof settings.staticServing !== 'boolean') {
+    return { passed: false, message: 'herdrWebDashboard.staticServing is not a boolean' };
+  }
+  return { passed: true, message: `herdrWebDashboard: staticServing=${settings.staticServing}` };
+}
+
+registerConfigDefault({
+  id: 'herdrWebDashboard',
+  key: 'herdrWebDashboard',
+  shape: DEFAULT_HERDR_WEB_DASHBOARD_SETTINGS,
+});
+
+registerCheck({
+  id: 'herdr-web-dashboard-configured',
+  description: 'herdrWebDashboard.staticServing in the shared config file is present and boolean (tsk-48w)',
+  check: (cwd) => checkHerdrWebDashboardConfigured(cwd),
+});
+
 // tsk-1m0 (docs/history/doctor-check-enduser-docs-index-stale/CONTEXT.md):
 // the fgos-indexing skill's whole job is regenerating
 // docs/enduser-docs-index.json after every compound-learn doc write, but
