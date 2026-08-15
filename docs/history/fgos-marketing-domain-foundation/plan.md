@@ -76,7 +76,15 @@ ordering is internal to this feature):
    prose already lives implicitly (exploring's material/grounded/
    answerable filter = the advise trigger; fgos-researching's own
    description = the consult trigger). Division of labor: prose teaches,
-   soul decides, guard blocks.
+   soul decides, guard blocks. Scope per D10: ~13 phiếu (6 stage tasks of
+   the implementer + 7 call-target tasks across
+   researcher/reviewer/helper/human-advisor), prioritizing specs with ≥2
+   real executors (review-item, approve-merge) or engine-parsed contracts
+   (shape-plan's `Mode:` line, lock-decisions' Outstanding-questions
+   heading). The per-team roster (titles → positions + task allowlist +
+   authority, D10/D11) is soul-layer config and NOT part of this piece —
+   it becomes real when a multi-persona team or the marketing domain
+   arrives.
 
 Rejected alternatives (each traced to the locked record):
 - Marketing-first sequencing — rejected by user decision D2.

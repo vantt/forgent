@@ -2,13 +2,17 @@
 
 ## 1. Trạng thái hiện tại
 
-Vòng 8: **HỘI TỤ.** Người dùng đồng ý D8 (seq 18070) — mọi câu hỏi thiết
-kế của phần coding-harness đã đóng, nền chốt là **D1–D8** (§4). Chỉ còn
-treo có chủ đích: #7 (judge-gate vs L5 — quyết khi tới lượt marketing)
-và #15 (team overlay trên domain — YAGNI). §6 ổn định, §7 thật. Theo
-terminal-handoff của skill shaping: `refs` của tsk-2t9c đã trỏ vào
-`{#task-role-axis-coding}`, bước tiếp theo là native-first dispatch sang
-`fgos-coding-exploring` → `fgos-coding-planning` cho task đó.
+Vòng 16: nền chốt là **D1–D11** (§4). Sau hội tụ vòng 8, exploring +
+planning đã chạy xong (CONTEXT.md + plan.md high-risk 3 mảnh, đều
+commit); người dùng ra lệnh **dừng trước implement** rồi mở chuỗi vòng
+đào sâu 9–16: roleGraph draft coding (ghim vào plan.md), tầng
+Collaboration trigger (D9), ontology 4 tầng task/skill/knowledge/context
+(D10), position vs chức danh + roster per-team (D10), và binding
+soul↔role khi team đông hơn role (D11: pull qua frontier, sticky
+per-thread, targeted là ngoại lệ). Treo có chủ đích: #7 (judge-gate vs
+L5 — quyết ở lượt marketing), #15 (team overlay — YAGNI). Trạng thái
+máy: tsk-2t9c ở stage `planning`, chờ lệnh chạy `fgos-coding-validating`
+(gate + materialize 3 children) — **chưa implement gì**.
 
 ## 2. Mục tiêu & đề bài
 
@@ -43,6 +47,8 @@ cụ thể của domain "marketing" trên fgOS sẽ trông như thế nào.
 | 13 | Danh sách one-way gate cho coding | Rõ — **D5** (đồng ý v7) | Nguyên tắc: gate hard một-chiều ⟺ side effect đã vượt ranh giới item/worktree (merge vào main, publish ra ngoài, terminal done/wontfix, cleanup đã xoá worktree). Mọi gate nội bộ item = soft: quay lại được nhưng bắt buộc ghi reason vào event log |
 | 14 | Task-spec (contract, WHAT) tách khỏi skill (know-how, HOW) triển khai thế nào? | Rõ — **D6** (đồng ý v7) | Người dùng vòng 5 nêu task của cockpit "rất hay", fgOS đang gói contract lẫn know-how trong skill. A-lite: file task-spec khai báo riêng per-domain (như cockpit `.fgOS/tasks/`), skillMap trỏ stage → (task-spec, skill); ban đầu chỉ là read-first material qua refs, CHƯA có engine enforcement (đúng advise YAGNI của fable). Lý do chọn A thay vì nhét vào frontmatter SKILL.md hay giữ nguyên: (1) 30 task-spec của cockpit port gần verbatim khi tới marketing; (2) một contract chạy được bởi nhiều skill/role khác nhau; (3) soul nâng cấp know-how không đụng contract |
 | 15 | Key khai báo flow-shape là `domain` hay `team`? | Chưa rõ — YAGNI nghiêng domain-as-team-flow | Người dùng vòng 5: "mỗi team có thể có đặc thù cơ học flow riêng". Hiện registry key là domain; nếu sau này 2 team cùng domain cần shape khác nhau mới cần overlay theo team — chưa xây trước |
+| 18 | Ontology mấy tầng, tách task/skill được gì so với giữ một? | Rõ — **D10** (đồng ý v15) | 4 tầng task-spec/skill/knowledge/context (người dùng sửa: knowledge = domain-knowledge, cái map trước đó là context). Lợi ích tách: review-item có 3 executor; engine chỉ parse được contract (tsk-59a); tần suất đổi khác nhau → gate khác nhau; có-phiếu-trước-có-tay-nghề-sau khi port cockpit. Case không đáng tách (1 executor vĩnh viễn, không engine coupling) → A-lite không tách đại trà |
+| 19 | Chức danh (PO/PM/TL/SE/Tester) và binding soul↔role khi team đông hơn role? | Rõ — **D10 + D11** (v15–16) | Chức danh = persona tầng soul (roster per-team: title → positions + phiếu + authority); harness giữ 5 position. Binding: role per-item, call nhắm (position, phiếu) → pull qua frontier, eligibility = position ∩ phiếu ∩ authority; sticky per call-thread; targeted `--to-soul` là ngoại lệ ghi event; solo mode thoái hoá êm |
 | 16 | Ranh giới dispatch vs router/driver vs guard | Rõ — người dùng xác nhận vòng 5 | Dispatch (`src/runner/dispatch.mjs` decide/execute) = chọn executor chạy task. Router/driver (fgos-routing, fgos-coding-driving) = who/what-next. Guard (FSM + roleGraph + gate) = legality. Ba tầng không giẫm nhau |
 | 17 | Mỗi domain có NHIỀU workflow (marketing rất nhiều; coding đang gộp 1 mà đúng ra là nhiều) — biểu diễn thế nào? | Rõ — **D7** (đồng ý v7) | Thêm một mức vào hierarchy khai báo: domain → N workflow (mỗi workflow = stage graph + gates + roleGraph riêng) → item. Selector: TÁI DÙNG `kind` (đã là classification per-domain: coding = bug/chore/design/docs/feature/task, intake đã phân loại sẵn) + map `workflowFor: {kind → workflowName}` có default trong DOMAINS — item KHÔNG cần field mới, không phân loại hai lần. Bằng chứng coding đang gồng vì gộp 1: discovery-verdict skip (clear → nhảy cọc exploring) là nhánh vá lên một graph duy nhất; luật "bug phải prove cause trước khi sửa" (primary-workflow) khác bản chất feature nhưng đang chung tên stage; docs/chore bị ép qua ceremony discovery→planning thừa. Phân biệt quan trọng: workflow (shape MỘT item) ≠ template (composition NHIỀU item, `fgos expand`) — 25 workflow của cockpit khi port sẽ được phân về một trong hai, tuỳ cái |
 
@@ -60,6 +66,7 @@ cụ thể của domain "marketing" trên fgOS sẽ trông như thế nào.
 | D8 | Async call = handoff event đầy đủ (holder đổi); sync call trong-session = một event `call-summary` gọn, KHÔNG đổi holder. Guard invariant: holder chỉ đổi qua async handoff | Em advise v7, người dùng đồng ý v8 | 18070 |
 | D9 | Task-spec bắt buộc có section Collaboration: bảng trigger-prose per call-edge, khai báo per (workflow, stage) — khi nào gọi, reason gì, tới role nào, bóng về mang gì. Ba tầng: prose dạy (task-spec) / soul quyết / guard chặn (roleGraph); lệch pattern hiện ra ở compound-learn qua call-summary/handoff event | Người dùng nêu câu hỏi v9, em thiết kế, xác nhận v10 | 18110 |
 | D10 | Ontology 4 tầng task-spec/skill/knowledge/context (knowledge = chuyên môn domain — coding dựa model weights, marketing là tài sản file thật của cockpit; context = refs/docs sẵn có). Nở-task-trước-nở-role-sau; coding đóng ở 5 position × ~13 phiếu. Chức danh (PO/PM/TechLead/SE/Tester) = persona tầng soul: roster per-team gói positions + phiếu + thẩm quyền, không encode vào harness. PM cổ điển đã máy hoá (frontier/triage/stale/merge) | Bàn các vòng 11–14 (ontology, lợi ích tách với evidence tsk-59a + review-item 3 executor, roster, map chức danh), người dùng đồng ý v15 | 18189 |
+| D11 | Binding soul↔role khi team đông hơn role: role là thuộc tính per-item, không phải ghế team. (1) Call nhắm (position, phiếu), giải quyết bằng pull qua frontier — soul đủ điều kiện (roster: position ∩ phiếu ∩ authority) tự claim, không push-assign; (2) sticky trong một call-thread — vòng sau về đúng soul giữ context, thread mới rebind; (3) targeted call (--to-soul) là ngoại lệ có chủ đích, guard vẫn chỉ check position, ghi event cho compound-learn. Solo (soul ít hơn role) thoái hoá êm: một soul nhiều title, self-review hữu hình trong log | Người dùng hỏi v16, em trình binding model, xác nhận cập nhật | 18229 |
 
 ## 5. Q&A log
 
@@ -263,11 +270,23 @@ cụ thể của domain "marketing" trên fgOS sẽ trông như thế nào.
   binding model (position per-item, roster eligibility, pull-claim,
   narrow bằng phiếu, sticky trong call-thread) ở vòng kế.
 
+- **2026-08-15 20:39–21:21 — Vòng 16: binding soul↔role**: em trình mô
+  hình binding với roster ví dụ 9 soul / 5 role (4 SE-agent song song,
+  3 reviewer khác persona phân hoá bằng PHIẾU chứ không nở role:
+  review-item cho rev-strict/rev-edge/anh-van, audit-security chỉ sec-1,
+  approve-merge chỉ ai có authority hard-gate) + 3 luật: pull qua
+  frontier (call = work-order nhỏ, soul đủ điều kiện tự claim — đúng
+  pull-door sẵn có), sticky per call-thread (giữ context reviewer qua
+  các vòng reject), targeted `--to-soul` là ngoại lệ ghi event. Chiều
+  solo thoái hoá êm — self-review thành hữu hình trong log. Người dùng:
+  "cập nhật thảo luận tới đây chưa" → xác nhận, mint D11 (seq 18229),
+  regenerate §6 theo shape D1–D11.
+
 ## 6. Thiết kế đã chốt {#design}
 
-> Synthesis vòng 7. Nền: D1–D7 đã chốt (§4). Chỉ còn #11 (call-summary,
-> đã advise chờ gật) và #7/#15 treo có chủ đích. Viết cho người lạ không
-> có chat history.
+> Synthesis vòng 16. Nền: **D1–D11 đã chốt** (§4). Treo có chủ đích: #7
+> (judge-gate vs L5 — quyết ở lượt marketing), #15 (team overlay — YAGNI).
+> Viết cho người lạ không có chat history.
 
 ### Bức tranh lớn (D2, D3)
 
@@ -276,130 +295,133 @@ cho mọi domain — coding triển khai trước, marketing vào sau như khác
 hàng absorption đầu tiên. Harness xác định *hình dạng cơ học các giai
 đoạn của workflow*; engine không hardcode shape nào.
 
-- **Mechanism (harness)** — cứng, không phán đoán: gác legality của mọi
-  move, ghi sự thật vào event log, đánh thức đúng vai kế tiếp.
+- **Mechanism (harness)** — cứng, không phán đoán: gác legality, ghi sự
+  thật vào event log, đánh thức đúng vai kế tiếp.
 - **Policy (soul)** — agent-type hiểu vai trò mình, hiểu vấn đề, biết cần
-  ai support, tự chọn edge hợp lệ (advise / tay chân / phản biện / chuyên
-  môn). Soul thay được, sai được — harness đảm bảo sai không phá.
+  ai support, tự chọn edge hợp lệ. Soul thay được, sai được — harness đảm
+  bảo sai không phá.
+
+### Ontology bốn tầng (D6, D9, D10)
+
+| Tầng | Là gì | Sống ở đâu |
+|---|---|---|
+| **task-spec** (WHAT) | Phiếu giao việc: input, output, gates, verify-template, **+ section Collaboration bắt buộc** (D9: bảng trigger-prose per call-edge, per workflow×stage — khi nào gọi, reason gì, tới role nào, bóng về mang gì) | `docs/task-specs/<domain>/` |
+| **skill** (HOW) | Know-how của một executor; nhiều skill/role chạy cùng một phiếu | `.agents/skills/` |
+| **knowledge** | Chuyên môn domain, đúng với mọi dự án trong lĩnh vực — coding phần lớn nằm trong model weights; marketing là tài sản file thật của cockpit (frameworks, formulas) | file knowledge per-domain (quan trọng từ đợt marketing) |
+| **context** | Bối cảnh của instance này — repo/brand/item | `refs`/`docsRef`, `docs/specs`, CONTEXT.md D-IDs, memory (sẵn có, không xây gì) |
+
+Phân công runtime: **prose dạy (task-spec) — soul quyết — guard chặn
+(roleGraph)**; lệch pattern hiện ra ở compound-learn qua
+call-summary/handoff event. Bằng chứng chi phí của việc trộn tầng: sự cố
+tsk-59a (contract `Mode:` chôn trong skill prose, đổi văn phong gãy regex
+engine).
+
+### Position vs chức danh, và binding (D10, D11)
+
+- **Position (harness, đóng ở 5)**: implementer / researcher / reviewer /
+  helper / human-advisor — vị trí trong graph gọi, bất biến theo team.
+  Nguyên tắc **nở task trước, nở role sau**: chuyên hoá mới = phiếu mới
+  cho position sẵn có (audit-security là phiếu của reviewer, không phải
+  role mới).
+- **Chức danh (soul, roster per-team)**: PO/PM/TechLead/SE/Tester… = gói
+  {positions + phiếu allowlist + thẩm quyền}. PM cổ điển phần lớn đã máy
+  hoá (frontier/triage/stale/merge). Cockpit tách y hệt:
+  `agents: [{role: orchestrator, agent: campaign-manager}]`.
+- **Binding khi soul ≠ role (D11)**: role là thuộc tính *per-item*, không
+  phải ghế team. Cross-item: nhiều soul cùng position chạy song song
+  (parallel claims sẵn có). Trong item: call nhắm `(position, phiếu)` →
+  rơi vào frontier như work-order nhỏ → soul đủ điều kiện (position ∩
+  phiếu ∩ authority theo roster) **tự claim** (pull, không push);
+  **sticky trong một call-thread** (vòng sau về đúng soul giữ context);
+  **targeted call** (`--to-soul`) là ngoại lệ có chủ đích, ghi event.
+  Solo mode thoái hoá êm: một soul mang nhiều title, self-review vẫn hữu
+  hình trong log.
 
 ### Hierarchy khai báo: domain → N workflow → item (D7)
 
-Mỗi domain có NHIỀU workflow — marketing điển hình (25 của cockpit),
-coding cũng vậy nhưng đang gộp 1 (nhận định người dùng v6, bằng chứng
-code: discovery-verdict skip là nhánh vá lên graph đơn; luật "bug phải
-prove cause" khác bản chất feature nhưng đang chung stage; docs/chore
-chịu ceremony discovery→planning thừa).
-
-- **domain (team)** — owns: roles + roleGraph vocabulary, task-spec
-  catalog, classification (`kind`/`risk`), statusLabels/parkReason.
-- **workflow (per domain, nhiều)** — một shape cơ học có tên: stage graph
-  + transitions + gates + stepMap. Ví dụ coding: `feature` (graph 4 stage
-  hiện tại, làm default), `bugfix` (prove-cause → fix → verify),
-  `lightweight` (docs/chore, bỏ ceremony thừa).
-- **item (instance)** — chọn workflow qua selector, không cần field mới.
-
-**Selector: tái dùng `kind`.** `kind` đã là classification per-domain
-(coding: bug/chore/design/docs/feature/task —
-`workflow-stage-graphs.mjs:346`), intake đã phân loại sẵn. DOMAINS thêm
-map `workflowFor: {kind → workflowName}` + default; nhiều kind chung
-được một workflow. Item cũ không workflow → default của domain (giống
-DEFAULT_DOMAIN fold — không vỡ gì).
-
-**Phân biệt hai nghĩa của "workflow"** (tránh lẫn về sau): *workflow* =
-shape lifecycle MỘT item (điều mục này nói); *template* (`fgos expand`)
-= composition NHIỀU item thành cây. 25 workflow của cockpit khi port sẽ
-phân về một trong hai, tuỳ cái — cái nào là chuỗi stage một sản phẩm thì
-thành workflow, cái nào là dây chuyền nhiều sản phẩm thì thành template.
+Mỗi domain nhiều workflow; selector tái dùng `kind` qua map `workflowFor`
+có default. Coding un-gộp thành `feature` (graph hiện tại, default) /
+`bugfix` / `lightweight`; item cũ fold về default. **workflow** = shape
+lifecycle MỘT item; **template** (`fgos expand`) = composition NHIỀU item
+— hai nghĩa tách bạch.
 
 ### Ba tầng điều phối, không giẫm nhau (v5)
 
 | Tầng | Vai trò | Hiện thân |
-|------|---------|-----------|
+|---|---|---|
 | Router/Driver | who + what-next | `fgos-routing`, `fgos-coding-driving` |
 | Guard/Harness | legality: FSM 3 trục + roleGraph + gates + event log | status-fsm/stage-fsm + phần mới |
-| Dispatch | executor nào chạy task đã quyết | `dispatch.mjs` decide/execute (một cửa) |
+| Dispatch | executor nào chạy soul đã claim | `dispatch.mjs` decide/execute (một cửa) |
 
 ### Ba trục trực giao của work item (D1)
 
-`status` (lifecycle phổ quát, 11 trạng thái) × `stage` (tiến độ — giờ
-thuộc workflow đã chọn, không thuộc thẳng domain) × `role/holder` (ai cầm
-bóng, per-domain roleGraph, opt-in).
+`status` (lifecycle phổ quát) × `stage` (thuộc workflow đã chọn) ×
+`role/holder` (ai cầm bóng — per-domain roleGraph, opt-in).
 
-### Handoff: hai loại, một guard (D1, D4)
+### Handoff: hai loại, một guard (D1, D4, D8)
 
 - **Call (round-trip)** — 4 reason `advise`/`assist`/`review`/`consult`;
-  tổng quát hoá `fgos ask`/`answer`. **Lồng được, trần callstack** (v5;
-  con số trần để planning quyết).
+  tổng quát hoá `fgos ask`/`answer`. Lồng được, trần callstack (mặc định
+  3, config override).
 - **Pass (transfer)** — một chiều theo stage/status.
 - **Guard** — roleGraph edge hợp lệ per stage; route bậy → REFUSED kèm
   danh sách edge hợp lệ.
+- **Ghi log hai mức (D8)** — async call = handoff event đầy đủ, holder
+  đổi; sync call trong-session = một event `call-summary`, holder giữ
+  nguyên. Invariant: holder chỉ đổi qua async handoff.
 - **Checkpoint hạt mịn miễn phí** — handoff event mang context snapshot,
   worktree commit mang artifact state.
-- **Ghi log hai mức (D8)** — async call (park chờ role khác) = handoff
-  event đầy đủ, holder đổi; sync call trong-session (subagent) = một
-  event `call-summary` gọn lúc hoàn thành (reason, callee role, outcome
-  ref), KHÔNG đổi holder. Invariant: holder chỉ đổi qua async handoff.
 
 ### One-way gate: nguyên tắc hard/soft (D5)
 
-**Hard một-chiều ⟺ side effect vượt ranh giới item/worktree.** Nội bộ
-item = soft: quay lại được nhưng bắt buộc ghi reason vào log.
-
-- Hard trong coding: approve/merge vào main (CTR005), terminal
-  `done`/`wontfix`, `cleanup` đã xoá worktree. Vùng hậu-merge một chiều:
-  rework sau merge = item MỚI.
-- Soft: executing → planning (replan), reject, mọi handoff-call —
-  cross-back mang reason key → rework thành tín hiệu compound-learn.
-- Marketing sau này dùng nguyên xi: publish-to-platform = hard, editorial
-  approval = soft.
-
-### Task-spec: tách contract khỏi know-how (D6, A-lite)
-
-- **task-spec (WHAT)** — contract: input, output, gate, verify template;
-  file khai báo per-domain (mô hình cockpit `.fgOS/tasks/`).
-- **skill (HOW)** — know-how; nhiều skill/role chạy được cùng contract.
-- **work item (INSTANCE)** — như hiện có.
-
-A-lite: bắt đầu là read-first material qua refs, chưa engine enforcement
-(YAGNI). Trả cổ tức khi port 30 task-spec cockpit.
+**Hard một-chiều ⟺ side effect vượt ranh giới item/worktree** (merge vào
+main CTR005, publish ra ngoài, terminal done/wontfix, cleanup đã xoá
+worktree; vùng hậu-merge một chiều — rework = item mới). Nội bộ item =
+soft: quay lại được nhưng bắt buộc ghi reason → rework thành tín hiệu
+compound-learn. Marketing dùng nguyên xi: publish = hard, editorial
+approval = soft.
 
 ### Ranh giới giữa các cơ chế (D4 + v2)
 
-Cùng item → handoff; khác item/cây → signal (hoãn tới use-case fan-out
-thật). Registry key là `domain`; overlay theo team chỉ khi 2 team cùng
-domain cần shape khác (#15, chưa xây).
+Cùng item → handoff; khác item/cây → signal (event typed payload +
+projection — hoãn tới use-case fan-out thật). Registry key là `domain`;
+overlay theo team chỉ khi 2 team cùng domain cần shape khác (#15).
 
 ### Trình tự triển khai (D2 + v6)
 
 1. **Role-axis đáp lên graph đơn hiện tại** — nâng 4 tương tác ngầm
-   (researching/review/fanout/ask-answer) thành handoff hữu hình.
-2. **Un-gộp coding** thành 2–3 workflow thật (feature = default, bugfix,
-   lightweight) — chứng minh mức workflow của hierarchy.
-3. **Marketing**: DOMAINS entry + port skill/task-spec + template
-   (`fgos expand`); judge-gate vs L5 (#7) quyết ở bước này.
+   (researching = consult, code-review = review, fanout = assist,
+   ask/answer = advise) thành handoff hữu hình. Draft roleGraph coding đã
+   ghim trong plan.md.
+2. **Un-gộp coding** thành feature/bugfix/lightweight (D7).
+3. **Task-spec A-lite** cho coding: ~13 phiếu (6 phiếu stage của
+   implementer + 7 phiếu call-target), ưu tiên phiếu có ≥2 executor
+   (review-item, approve-merge) hoặc engine đang parse (shape-plan,
+   lock-decisions). Chạy song song 1–2 được.
+4. **Marketing**: DOMAINS entry + roster writer/editor/brand/legal/
+   scheduler + port skill/task-spec/knowledge cockpit (quy tắc tách-bốn:
+   schema/gates → task-spec, process-steps → seed skill, frameworks →
+   knowledge, studio/brand → context) + template `fgos expand`;
+   judge-gate vs L5 (#7) quyết ở bước này.
 
 ```mermaid
 flowchart TD
-    subgraph decl["HIERARCHY KHAI BÁO (registry, không hardcode)"]
-        D["domain: coding<br/>roles + roleGraph + kind vocab + task-specs"]
-        D --> W1["workflow: feature (default)<br/>discovery→exploring→planning→executing"]
-        D --> W2["workflow: bugfix<br/>prove-cause→fix→verify"]
-        D --> W3["workflow: lightweight<br/>(docs/chore, bỏ ceremony)"]
-        D2m["domain: marketing<br/>writer/editor/brand/legal/scheduler"]
-        D2m --> W4["workflow: content-production"]
-        D2m --> W5["workflow: brand-identity"]
-        D2m --> W6["... (port từ 25 của cockpit)"]
+    subgraph decl["KHAI BÁO"]
+        DOM["domain: coding<br/>5 positions + kind vocab"]
+        DOM --> WF["workflows: feature/bugfix/lightweight<br/>(workflowFor: kind → shape)"]
+        DOM --> TS["task-specs ~13 phiếu<br/>(contract + Collaboration)"]
+        ROS["roster per-team (soul):<br/>title → positions + phiếu + authority"]
     end
-    K["item mới — intake phân loại kind"] -- "workflowFor[kind] → shape" --> W1
-    subgraph run["RUNTIME (một item đang chạy)"]
-        IT["item: status × stage(workflow) × role/holder"]
-        IT -- "pass (gate hard/soft)" --> IT
-        IT -- "call: advise/assist/review/consult<br/>(lồng được, trần callstack)" --> IT
+    subgraph run["RUNTIME — một item"]
+        IT["item: status × stage(workflow) × holder"]
+        IT -- "call (position, phiếu)" --> FR["frontier: work-order"]
+        FR -- "pull: soul đủ điều kiện claim<br/>(sticky per thread)" --> S["soul (persona/title)"]
+        S -. "bóng về, event ghi đủ" .-> IT
     end
-    W1 -.-> IT
-    TPL["template (fgos expand)<br/>composition NHIỀU item thành cây"] -. "stamp — khác mức với workflow" .-> K
+    WF -.-> IT
+    TS -.-> S
+    ROS -.-> FR
 ```
-
 ## 7. Danh mục hạng mục / task {#tasks} (đề xuất, chưa chốt)
 
 ### {#task-role-axis-coding}
