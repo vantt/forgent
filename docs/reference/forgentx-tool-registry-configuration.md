@@ -79,10 +79,12 @@ nhặt entry nào khai `capability`):
 "runner": {
   "capacities": {
     "<id>": {
-      "kind": "cli | binary | mcp | skill",
+      "kind": "tool",
       "capability": "<nhan>",
-      "probeCommand": "<lenh-hoac-mcp:ten>",
-      "scanTarget": "<duong-dan, chi mcp/skill>",
+      "invocations": [
+        { "via": "mcp | cli", "command": "<lenh-hoac-mcp:ten>" }
+      ],
+      "scanTarget": "<duong-dan, chi via:mcp>",
       "responsibility": "<vai-tro, optional>",
       "description": "<mo-ta, optional>"
     }
@@ -90,27 +92,47 @@ nhặt entry nào khai `capability`):
 }
 ```
 
-> `scanTarget` bắt buộc cho `kind` `mcp`/`skill` (không nằm trên `PATH`,
-> presence check bằng scan path trên đĩa thay vì `command -v`). `<id>`
-> (khoá object) đóng vai trò `--name` cũ — phải duy nhất trong
-> `capacities`, engine đã tự đảm bảo (JSON object key). `probeCommand`
-> (không phải `command`) cố ý tránh field `command`/`args` sẵn có của
-> `dispatch.mjs`'s executor shape — khai `command` cho 1 entry không có
-> `args` sẽ bị `validateCapacityShape` từ chối vì đọc nhầm thành executor
-> block. Đây là state chia sẻ chung một chỗ (`.fgos/config.json`), không
-> phải per-branch (ADR0020) — sửa trong main checkout, không phải trong
-> worktree của 1 item.
+> `scanTarget` bắt buộc khi `invocations[0].via` là `mcp` (không nằm trên
+> `PATH`, presence check bằng scan path trên đĩa thay vì `command -v`).
+> `<id>` (khoá object) đóng vai trò `--name` cũ — phải duy nhất trong
+> `capacities`, engine đã tự đảm bảo (JSON object key). Presence/probe
+> mechanism nằm ở `invocations[0].via`/`.command` — KHÔNG còn ở `kind`
+> nữa (tsk-in1-4 D5: `kind` giờ là trục BẢN CHẤT `agent`/`tool`, tách
+> khỏi trục CƠ CHẾ GỌI `invocations[].via`; xem "The curated
+> `runner.capabilities` catalog" ở trên và `docs/specs/runner.md` RUL41
+> cho toàn bộ thiết kế). `via: "mcp"` chỉ cần `command` (định danh, không
+> `args`, `validateInvocationShape`'s "gate B1" không ép hình dạng
+> executor lên nó); `via: "cli"` cần đủ `command`+`args` như 1 executor
+> block thật. Đây là state chia sẻ chung một chỗ (`.fgos/config.json`),
+> không phải per-branch (ADR0020) — sửa trong main checkout, không phải
+> trong worktree của 1 item.
 
-(`scanTarget` is required for `kind` `mcp`/`skill` — not on PATH, presence
-is checked by scanning a disk path instead of `command -v`. `<id>` (the
-object key) plays the old `--name`'s role — must be unique within
-`capacities`, which the engine already guarantees (a JSON object key).
-`probeCommand` (never `command`) deliberately avoids `dispatch.mjs`'s own
-executor-shape `command`/`args` fields — declaring `command` on an entry
-with no `args` would be rejected by `validateCapacityShape`, which would
-misread it as an executor block. This is shared state in one place
+(`scanTarget` is required when `invocations[0].via` is `mcp` — not on
+PATH, presence is checked by scanning a disk path instead of
+`command -v`. `<id>` (the object key) plays the old `--name`'s role —
+must be unique within `capacities`, which the engine already guarantees
+(a JSON object key). The presence/probe mechanism now lives in
+`invocations[0].via`/`.command` — no longer in `kind` (tsk-in1-4 D5:
+`kind` is now the BAN CHAT axis, `agent`/`tool`, separate from the CO CHE
+GOI axis `invocations[].via`; see "The curated `runner.capabilities`
+catalog" above and `docs/specs/runner.md` RUL41 for the full design).
+`via: "mcp"` only needs `command` (an identifier, never `args` —
+`validateInvocationShape`'s "gate B1" never forces the executor shape
+onto it); `via: "cli"` needs the full `command`+`args` shape a real
+executor block does. This is shared state in one place
 (`.fgos/config.json`), never per-branch (ADR0020) — edit it in the main
-checkout, not inside an item's own worktree.)
+checkout, not inside an item's own worktree.
+
+> **tsk-in1-4 open item**: this migration (`agy.kind: "cli"→"agent"`,
+> `gitnexus`/`herdr.kind: "mcp"/"cli"→"tool"` + `invocations[]`) is
+> implemented and tested (synthetic fixtures) but NOT yet applied to this
+> repo's own live `.fgos/config.json` — unlike tsk-in1-1/tsk-in1-3's
+> additive fields, this one is a breaking `kind` vocabulary change old
+> code cannot load, so it cannot land on `main` ahead of `fgw/tsk-in1`'s
+> own code merge (ADR0020's direct-commit path assumes backward
+> compatibility, which this change does not have). Whoever merges
+> `fgw/tsk-in1` to `main` must apply this data migration in the SAME
+> action, not before.)
 
 ## Probing and reading status
 

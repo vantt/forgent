@@ -52,12 +52,15 @@ function declareCapacity(cwd, id, fields) {
   fs.writeFileSync(configPath, JSON.stringify(cfg, null, 2));
 }
 
+// tsk-in1-4 D5: `kind` is now the agent/tool BAN CHAT axis, not a probe
+// mechanism — gitnexus's probe kind/command live on `invocations[0]`
+// instead (`via`, matching tool-registry.mjs's own probe-kind naming).
 function declareGitnexus(cwd, extra = {}) {
   fs.mkdirSync(path.join(cwd, '.gitnexus'), { recursive: true });
   declareCapacity(cwd, extra.name ?? 'gitnexus', {
-    kind: extra.kind ?? 'mcp',
+    kind: 'tool',
     capability: extra.capability ?? 'Impact Analysis',
-    probeCommand: extra.command ?? 'mcp:gitnexus',
+    invocations: [{ via: extra.kind ?? 'mcp', command: extra.command ?? 'mcp:gitnexus' }],
     scanTarget: extra.scan ?? '.gitnexus',
     ...(extra.responsibility ? { responsibility: extra.responsibility } : {}),
     ...(extra.description ? { description: extra.description } : {}),
@@ -97,7 +100,7 @@ test('tool check on a present mcp tool writes "present" to the local status over
 
 test('tool check on a missing mcp tool (scan target absent) still exits 0 — absence is a fact, never a CLI error', () => {
   const cwd = tmpCwd();
-  declareCapacity(cwd, 'c3', { kind: 'skill', capability: 'impact-analysis', probeCommand: 'skill:c3', scanTarget: '.c3' });
+  declareCapacity(cwd, 'c3', { kind: 'tool', capability: 'impact-analysis', invocations: [{ via: 'mcp', command: 'skill:c3' }], scanTarget: '.c3' });
   const result = run(cwd, ['tool', 'check']);
   assert.equal(result.status, 0);
   const data = envelopeData(result.stdout);
@@ -107,7 +110,7 @@ test('tool check on a missing mcp tool (scan target absent) still exits 0 — ab
 test('tool check --name only probes the named tool, leaving other declared tools\' overlay entries untouched', () => {
   const cwd = tmpCwd();
   declareGitnexus(cwd);
-  declareCapacity(cwd, 'c3', { kind: 'skill', capability: 'impact-analysis', probeCommand: 'skill:c3', scanTarget: '.c3' });
+  declareCapacity(cwd, 'c3', { kind: 'tool', capability: 'impact-analysis', invocations: [{ via: 'mcp', command: 'skill:c3' }], scanTarget: '.c3' });
   run(cwd, ['tool', 'check']); // seeds both
   const before = JSON.parse(fs.readFileSync(path.join(cwd, '.fgos', 'tool-status.local.json'), 'utf8'));
   fs.mkdirSync(path.join(cwd, '.c3'), { recursive: true }); // now present, but we only re-check gitnexus below
@@ -125,7 +128,7 @@ test('tool check --name on an undeclared capacity id is rejected as validation, 
 
 test('tool check on a capacity with no "capability" field (a plain agent/dispatch capacity, e.g. "agy") is never treated as a tool', () => {
   const cwd = tmpCwd();
-  declareCapacity(cwd, 'agy', { kind: 'cli', invocations: [{ via: 'cli', command: 'agy', args: [] }] });
+  declareCapacity(cwd, 'agy', { kind: 'agent', invocations: [{ via: 'cli', command: 'agy', args: [] }] });
   const result = run(cwd, ['tool', 'check']);
   assert.equal(result.status, 0);
   assert.deepEqual(envelopeData(result.stdout).checked, {});
@@ -156,7 +159,7 @@ test('tool query on a declared tool that was never checked on this machine repor
 
 test('tool query --status present filters out a declared-but-not-present tool after a real check', () => {
   const cwd = tmpCwd();
-  declareCapacity(cwd, 'c3', { kind: 'skill', capability: 'impact-analysis', probeCommand: 'skill:c3', scanTarget: '.c3' });
+  declareCapacity(cwd, 'c3', { kind: 'tool', capability: 'impact-analysis', invocations: [{ via: 'mcp', command: 'skill:c3' }], scanTarget: '.c3' });
   run(cwd, ['tool', 'check']); // c3's scan target does not exist -> missing
   const data = envelopeData(run(cwd, ['tool', 'query', '--capability', 'impact-analysis', '--status', 'present']).stdout);
   assert.deepEqual(data.providers, []);
@@ -165,14 +168,14 @@ test('tool query --status present filters out a declared-but-not-present tool af
 test('tool query returns multiple complementary providers for the same capability (deep-dive: gitnexus + c3 both serve impact-analysis)', () => {
   const cwd = tmpCwd();
   declareGitnexus(cwd);
-  declareCapacity(cwd, 'c3', { kind: 'skill', capability: 'impact-analysis', probeCommand: 'skill:c3', scanTarget: '.c3' });
+  declareCapacity(cwd, 'c3', { kind: 'tool', capability: 'impact-analysis', invocations: [{ via: 'mcp', command: 'skill:c3' }], scanTarget: '.c3' });
   const data = envelopeData(run(cwd, ['tool', 'query', '--capability', 'impact-analysis']).stdout);
   assert.deepEqual(data.providers.map((p) => p.name).sort(), ['c3', 'gitnexus']);
 });
 
 test('tool query never lists a capacity with no "capability" field (a plain agent/dispatch capacity, e.g. "agy")', () => {
   const cwd = tmpCwd();
-  declareCapacity(cwd, 'agy', { kind: 'cli', invocations: [{ via: 'cli', command: 'agy', args: [] }] });
+  declareCapacity(cwd, 'agy', { kind: 'agent', invocations: [{ via: 'cli', command: 'agy', args: [] }] });
   const data = envelopeData(run(cwd, ['tool', 'query']).stdout);
   assert.deepEqual(data.providers, []);
 });

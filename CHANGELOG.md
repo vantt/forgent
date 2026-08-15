@@ -10,12 +10,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `runner.capabilities` — a curated catalog of capability names, shared
-  between the tool-registry's own `capability` field and (a later item)
+  between the tool-registry's own `capability` field and
   `capacities.<id>.for`. Each entry is `{description?, aliases?}`. This
   repo's own `.fgos/config.json` declares `impact-analysis`/`pane-labeling`.
 
 ### Changed
 
+- `capacities.<id>.kind` is now the `agent`/`tool` axis (WHAT a capacity
+  is — a live persona, potentially native-dispatchable, vs a mechanical,
+  presence-only tool), separate from `invocations[].via` (HOW it's
+  invoked — `cli`/`task`/`mcp`, widened from `cli`-only). `capacities.<id>.for`
+  is now a non-empty array (was a single value) — one executor can serve
+  multiple capabilities at once, each validated against the
+  `runner.capabilities` catalog above (replaces the old, narrower
+  `CAPACITY_PURPOSES` enum). Cross-provider governance
+  (`allowCrossProvider`) now applies regardless of `kind` — only an
+  `agentType`-resolved capacity is exempt (previously any `kind:"task"`
+  capacity was, even one with its own real, non-Claude command).
+  **Not yet applied to this repo's own live `.fgos/config.json`** — this
+  is a breaking `kind`-vocabulary change (unlike the two entries above),
+  so it lands together with the code that reads it, not as a separate
+  advance commit. (`docs/specs/runner.md` RUL65,
+  `docs/reference/forgentx-tool-registry-configuration.md`)
 - The per-tier `runner.executors.<tier>` config override is retired (0
   live entries; had already caused a real bug — a non-tier key silently
   fell through to the global executor with no error). A `capacities.<id>`

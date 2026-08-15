@@ -57,20 +57,31 @@ export function normalizeCapability(raw) {
  * expect — pure, never touches fs. A capacity entry is a TOOL (as opposed to
  * an agent/dispatch capacity like `agy`) precisely when it declares its own
  * `capability` — the one field a plain dispatch capacity never carries.
- * `probeCommand` (never dispatch.mjs's own `command`/`args` executor-shape
- * fields, D1: task 1 does not touch `dispatch.mjs`'s `validateCapacityShape`)
- * maps onto the tool object's `command`, the field `probeTool` reads.
+ *
+ * tsk-in1-4 D5: `capacity.kind` stopped meaning "presence-probe mechanism"
+ * the moment `dispatch.mjs`'s own `kind` became the `agent`/`tool` BAN CHAT
+ * axis (`gitnexus`/`herdr` both read `kind: "tool"` now, which tells
+ * `probeTool` nothing about HOW to probe them). The probe mechanism and
+ * probe command now live on the entry's own `invocations[0]` instead
+ * (`via`/`command` — D8's `INVOCATION_VIA` vocabulary, `cli`/`mcp`, maps
+ * onto `probeTool`'s own `kind` naming directly) — this module never reads
+ * `capacity.kind` for probing purposes anymore. Task 1's flat
+ * `probeCommand` field is retired along with it (superseded, migrated to
+ * `invocations[0].command` in the same change that introduced `kind:
+ * "tool"`); a capacity naming no `invocations` at all is simply not
+ * probeable and is skipped, same as one naming no `capability`.
  */
 export function toolsFromCapacities(capacities) {
   const tools = {};
   for (const [id, capacity] of Object.entries(capacities ?? {})) {
     const capability = normalizeCapability(capacity?.capability);
     if (!capability) continue;
+    const invocation = Array.isArray(capacity.invocations) ? capacity.invocations[0] : undefined;
     tools[id] = {
       name: id,
-      kind: capacity.kind,
+      kind: invocation?.via,
       capability,
-      command: capacity.probeCommand,
+      command: invocation?.command,
       scanTarget: capacity.scanTarget,
       responsibility: capacity.responsibility,
       description: capacity.description,

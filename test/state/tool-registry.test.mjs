@@ -36,9 +36,16 @@ test('normalizeCapability returns "" for non-string or content-free input', () =
 
 // ─── toolsFromCapacities ─────────────────────────────────────────────────────
 
-test('toolsFromCapacities maps a capability-bearing capacity into a tool-shaped object, normalizing capability', () => {
+test('toolsFromCapacities maps a capability-bearing capacity into a tool-shaped object, normalizing capability — probe kind/command read from invocations[0], not capacity.kind (tsk-in1-4 D5)', () => {
   const capacities = {
-    gitnexus: { kind: 'mcp', capability: 'Impact Analysis', probeCommand: 'mcp:gitnexus', scanTarget: '.gitnexus', responsibility: 'Verification', description: 'Code-graph blast radius' },
+    gitnexus: {
+      kind: 'tool',
+      capability: 'Impact Analysis',
+      invocations: [{ via: 'mcp', command: 'mcp:gitnexus' }],
+      scanTarget: '.gitnexus',
+      responsibility: 'Verification',
+      description: 'Code-graph blast radius',
+    },
   };
   const tools = toolsFromCapacities(capacities);
   assert.deepEqual(Object.keys(tools), ['gitnexus']);
@@ -50,12 +57,18 @@ test('toolsFromCapacities maps a capability-bearing capacity into a tool-shaped 
 });
 
 test('toolsFromCapacities skips a capacity declaring no capability (a plain agent/dispatch capacity, e.g. "agy")', () => {
-  const capacities = { agy: { kind: 'cli', invocations: [{ via: 'cli', command: 'agy', args: [] }] } };
+  const capacities = { agy: { kind: 'agent', invocations: [{ via: 'cli', command: 'agy', args: [] }] } };
   assert.deepEqual(toolsFromCapacities(capacities), {});
 });
 
 test('toolsFromCapacities skips a capacity whose capability normalizes to empty', () => {
-  assert.deepEqual(toolsFromCapacities({ x: { kind: 'cli', capability: '---' } }), {});
+  assert.deepEqual(toolsFromCapacities({ x: { kind: 'tool', capability: '---' } }), {});
+});
+
+test('toolsFromCapacities reads "unknown" kind/command when the capacity declares a capability but no invocations at all', () => {
+  const tools = toolsFromCapacities({ x: { kind: 'tool', capability: 'foo' } });
+  assert.equal(tools.x.kind, undefined);
+  assert.equal(tools.x.command, undefined);
 });
 
 test('toolsFromCapacities on undefined/empty input returns {}', () => {
