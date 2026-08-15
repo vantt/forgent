@@ -1090,9 +1090,9 @@ registerFix({
 // design.md), and reusing its level vocabulary here would erase that line.
 //
 // `ask` is both the default this fix writes and what every unreadable value
-// degrades to at the gate itself (bin/fgos.mjs's readIronLawLevel), so a
-// project that never runs `fgos setup` gets the refusing behavior, not the
-// permissive one.
+// degrades to at the gate itself (src/verbs/merge/iron-law-level.mjs's
+// readIronLawLevel), so a project that never runs `fgos setup` gets the
+// refusing behavior, not the permissive one.
 export const IRON_LAW_LEVELS = Object.freeze(['ask', 'warn']);
 export const DEFAULT_IRON_LAW_LEVEL = 'ask';
 
