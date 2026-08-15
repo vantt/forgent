@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type FormEvent } from 'react'
 import { createApiClient } from './api/client'
+import { GatewayApiError, GatewayUnreachableError } from './api/errors'
 import { Taskboard } from './screens/Taskboard'
 import { TaskDetail } from './screens/TaskDetail'
 import { NeedsAnswer } from './screens/NeedsAnswer'
@@ -20,40 +21,84 @@ const TOKEN_STORAGE_KEY = 'herdr-gateway-token'
 
 type View = { name: 'board' } | { name: 'detail'; itemId: string } | { name: 'needs-answer' }
 
-// Minimal token gate -- NOT S01 (docs/ui-spec/screens/S01-sign-in.md)'s
-// real sign-in screen, which is not owned by any item in this cluster's
-// current run (same "found but not this item's scope" note as M03 in
-// Taskboard.tsx) and is itself partly stale (still references a session
-// cookie the realignment's D13 already replaced with Bearer-only). This
-// is just enough to let the real screens receive a real, entered token.
+// S01 — Sign in (docs/ui-spec/screens/S01-sign-in.md). "The first and
+// only door" -- one field, one credential, exchanged for a session by a
+// real request (tsk-51i, D16/D17's own design pass): a token that is
+// simply the wrong shape/value never gets stored, it is proven against
+// the gateway first (`GET /state/digest`, the cheapest authenticated
+// read that exists) so ERR-AUTH is a real rejection, not a client-side
+// guess. R3: the error message never varies with the cause.
 export default function App() {
   const [token, setToken] = useState<string | null>(() => window.localStorage.getItem(TOKEN_STORAGE_KEY))
   const [draftToken, setDraftToken] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [authError, setAuthError] = useState(false)
   const [view, setView] = useState<View>({ name: 'board' })
   const baseUrl = useMemo(defaultBaseUrl, [])
 
   if (!token) {
+    async function signIn(e: FormEvent): Promise<void> {
+      e.preventDefault()
+      if (!draftToken || submitting) return
+      setSubmitting(true)
+      setAuthError(false)
+      try {
+        await createApiClient({ baseUrl, token: draftToken }).stateDigest()
+        window.localStorage.setItem(TOKEN_STORAGE_KEY, draftToken)
+        setToken(draftToken)
+      } catch (err) {
+        // R3: one message, same words, regardless of which half of the
+        // credential was wrong or whether the gateway rejected it for a
+        // different reason -- this screen must never become an oracle.
+        if (err instanceof GatewayApiError || err instanceof GatewayUnreachableError) {
+          setAuthError(true)
+        } else {
+          throw err
+        }
+      } finally {
+        setSubmitting(false)
+      }
+    }
+
     return (
-      <div className="flex min-h-svh items-center justify-center">
+      <div className="flex min-h-svh items-center justify-center bg-bg px-4">
         <form
-          className="flex flex-col gap-2"
-          onSubmit={(e) => {
-            e.preventDefault()
-            if (!draftToken) return
-            window.localStorage.setItem(TOKEN_STORAGE_KEY, draftToken)
-            setToken(draftToken)
-          }}
+          className="flex w-full max-w-sm flex-col items-center gap-6 rounded-xl border border-border bg-surface p-8 shadow-sm"
+          onSubmit={signIn}
         >
-          <input
-            type="password"
-            data-testid="token-input"
-            value={draftToken}
-            onChange={(e) => setDraftToken(e.target.value)}
-            placeholder="Access token"
-          />
-          <button type="submit" data-testid="token-submit" disabled={!draftToken}>
-            Sign in
+          <div className="text-center">
+            <h1 className="font-mono text-2xl font-bold text-brand">herdr</h1>
+            <p className="mt-1 text-sm text-ink-muted">fgOS work dashboard</p>
+          </div>
+
+          <label className="flex w-full flex-col gap-1.5 text-sm font-medium text-ink">
+            Access token
+            <input
+              type="password"
+              data-testid="token-input"
+              className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-ink outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
+              value={draftToken}
+              onChange={(e) => setDraftToken(e.target.value)}
+              placeholder="••••••••••••••••••••••••"
+              readOnly={submitting}
+              autoFocus
+            />
+          </label>
+
+          <button
+            type="submit"
+            data-testid="token-submit"
+            disabled={!draftToken || submitting}
+            className="w-full rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-brand-contrast transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {submitting ? 'Signing in…' : 'Sign in'}
           </button>
+
+          <div className="min-h-[1.25rem] text-sm text-danger" data-testid="auth-error-slot">
+            {authError && <span data-testid="auth-error">Sign-in failed.</span>}
+          </div>
+
+          <p className="text-center text-xs text-ink-muted">Reachable beyond this machine.</p>
         </form>
       </div>
     )

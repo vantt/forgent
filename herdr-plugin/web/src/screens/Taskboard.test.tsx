@@ -223,6 +223,61 @@ describe('Taskboard', () => {
     expect(listWorkCalls).toBe(1)
   })
 
+  it('D16: view toggle switches between group view (default) and kanban view, and remembers the choice', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockImplementation(() => Promise.resolve(jsonResponse(envelope({ work: { 'tsk-1': workItem() } })))),
+    )
+    const client = createApiClient({ baseUrl: 'http://localhost:4170/v1', token: 't' })
+    const { unmount } = render(
+      <Taskboard client={client} baseUrl="http://localhost:4170/v1" onSelectItem={() => {}} pollIntervalMs={999999} />,
+    )
+    await waitFor(() => expect(screen.getByTestId('card-tsk-1')).toBeTruthy())
+    expect(screen.getByTestId('board')).toBeTruthy()
+    expect(screen.queryByTestId('board-kanban')).toBeNull()
+
+    fireEvent.click(screen.getByTestId('view-toggle-kanban'))
+    expect(screen.queryByTestId('board')).toBeNull()
+    expect(screen.getByTestId('board-kanban')).toBeTruthy()
+    expect(screen.getByTestId('kanban-column-todo')).toBeTruthy()
+    expect(screen.getByTestId('card-tsk-1')).toBeTruthy()
+    unmount()
+
+    render(<Taskboard client={client} baseUrl="http://localhost:4170/v1" onSelectItem={() => {}} pollIntervalMs={999999} />)
+    await waitFor(() => expect(screen.getByTestId('board-kanban')).toBeTruthy())
+
+    fireEvent.click(screen.getByTestId('view-toggle-group'))
+    expect(screen.getByTestId('board')).toBeTruthy()
+  })
+
+  it('D16/A-S02-013: dropping a card on a kanban column runs the one-door-write move verb and refetches the board', async () => {
+    let moveCalls = 0
+    const fetchMock = vi.fn().mockImplementation((url: string, init?: RequestInit) => {
+      if (url.includes('/move')) {
+        moveCalls += 1
+        expect(JSON.parse(init!.body as string)).toEqual({ to: 'doing' })
+        return Promise.resolve(jsonResponse(envelope(workItem({ status: 'doing' }))))
+      }
+      return Promise.resolve(
+        jsonResponse(
+          envelope({ work: { 'tsk-1': workItem(), 'tsk-2': workItem({ id: 'tsk-2', status: 'doing' }) } }),
+        ),
+      )
+    })
+    vi.stubGlobal('fetch', fetchMock)
+    const client = createApiClient({ baseUrl: 'http://localhost:4170/v1', token: 't' })
+    render(<Taskboard client={client} baseUrl="http://localhost:4170/v1" onSelectItem={() => {}} pollIntervalMs={999999} />)
+    await waitFor(() => expect(screen.getByTestId('card-tsk-1')).toBeTruthy())
+    fireEvent.click(screen.getByTestId('view-toggle-kanban'))
+    await waitFor(() => expect(screen.getByTestId('kanban-column-doing')).toBeTruthy())
+
+    const dataTransfer = { data: {} as Record<string, string>, setData(k: string, v: string) { this.data[k] = v }, getData(k: string) { return this.data[k] } }
+    fireEvent.dragStart(screen.getByTestId('card-tsk-1'), { dataTransfer })
+    fireEvent.drop(screen.getByTestId('kanban-column-doing'), { dataTransfer })
+
+    await waitFor(() => expect(moveCalls).toBe(1))
+  })
+
   it('polling with a changed digest re-fetches listWork exactly once per change', async () => {
     let listWorkCalls = 0
     let digestCalls = 0

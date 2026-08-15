@@ -88,6 +88,58 @@ describe('TaskDetail', () => {
     await waitFor(() => expect(screen.getByTestId('never-parked')).toBeTruthy())
   })
 
+  it('D17: CONTEXT renders the real WorkItem fields (description/verify/footprint/docsRef/deps/tier) when present', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockImplementation((url: string) => {
+      if (url.includes('/docs')) return Promise.resolve(jsonResponse(envelope({ docsRef: null, contextMd: null, planMd: null })))
+      return Promise.resolve(
+        jsonResponse(
+          envelope(
+            workDetail({
+              work: {
+                id: 'tsk-4id',
+                title: 'Task detail pairing',
+                kind: 'task',
+                status: 'todo',
+                domain: 'coding',
+                tier: '2',
+                deps: ['tsk-yo0', 'tsk-5jr'],
+                description: 'A person with no context should be able to answer quickly.',
+                verify: 'cargo test --lib gateway',
+                footprint: ['gateway.rs', 'TaskDetail.tsx'],
+                docsRef: 'docs/history/tsk-4id',
+              },
+            }),
+          ),
+        ),
+      )
+    }))
+    const client = createApiClient({ baseUrl: 'http://localhost:4170/v1', token: 't' })
+    render(<TaskDetail client={client} baseUrl="http://localhost:4170/v1" itemId="tsk-4id" onBack={() => {}} pollIntervalMs={999999} />)
+    await waitFor(() => expect(screen.getByTestId('item-summary')).toBeTruthy())
+
+    expect(screen.getByTestId('item-meta').textContent).toBe('coding · tier-2 · deps: tsk-yo0, tsk-5jr')
+    expect(screen.getByTestId('item-description').textContent).toBe('A person with no context should be able to answer quickly.')
+    expect(screen.getByTestId('item-verify').textContent).toBe('verify: cargo test --lib gateway')
+    expect(screen.getByTestId('item-footprint').textContent).toBe('footprint: gateway.rs, TaskDetail.tsx')
+    expect(screen.getByTestId('item-docs-link').textContent).toBe('docs/history/tsk-4id ↗')
+  })
+
+  it('D17: a field absent from the real WorkItem renders no row -- never a fabricated placeholder', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockImplementation((url: string) => {
+      if (url.includes('/docs')) return Promise.resolve(jsonResponse(envelope({ docsRef: null, contextMd: null, planMd: null })))
+      return Promise.resolve(jsonResponse(envelope(workDetail())))
+    }))
+    const client = createApiClient({ baseUrl: 'http://localhost:4170/v1', token: 't' })
+    render(<TaskDetail client={client} baseUrl="http://localhost:4170/v1" itemId="tsk-4id" onBack={() => {}} pollIntervalMs={999999} />)
+    await waitFor(() => expect(screen.getByTestId('item-summary')).toBeTruthy())
+
+    expect(screen.queryByTestId('item-meta')).toBeNull()
+    expect(screen.queryByTestId('item-description')).toBeNull()
+    expect(screen.queryByTestId('item-verify')).toBeNull()
+    expect(screen.queryByTestId('item-footprint')).toBeNull()
+    expect(screen.queryByTestId('item-docs-link')).toBeNull()
+  })
+
   it('shows the current question and answer input when the item is parked (awaiting-human)', async () => {
     vi.stubGlobal('fetch', vi.fn().mockImplementation((url: string) => {
       if (url.includes('/docs')) return Promise.resolve(jsonResponse(envelope({ docsRef: null, contextMd: null, planMd: null })))
