@@ -228,6 +228,21 @@ export const DOMAINS = Object.freeze({
       executing: 'fgos-coding-implement',
       retrospective: 'fgos-coding-compounding',
     }),
+    // taskSpecMap (tsk-2t9c D6/D9): stage -> task-spec id, the "skillMap
+    // points stage -> (task-spec, skill)" half of A-lite. Purely additive
+    // alongside skillMap (same field-independence style `classification`/
+    // `statusLabels` already use one field over) -- a stage absent here
+    // simply has no task-spec yet, never a validation error. The file each
+    // id resolves to lives at docs/task-specs/coding/<id>.md; doctor's
+    // task-specs-resolve check (src/setup/registrations.mjs) is what keeps
+    // this map and the files on disk from drifting apart silently.
+    taskSpecMap: Object.freeze({
+      discovery: 'judge-ambiguity',
+      exploring: 'lock-decisions',
+      planning: 'shape-plan',
+      executing: 'implement-item',
+      retrospective: 'compound-learn',
+    }),
     // work-item-status-delivered-retrospective-cleanup D5/D8 (deferred
     // item from CONTEXT.md): does this domain's items go through a real
     // git worktree/merge, such that cleanup-harness.mjs's
