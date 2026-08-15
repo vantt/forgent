@@ -134,6 +134,30 @@ checkout, not inside an item's own worktree.
 > `fgw/tsk-in1` to `main` must apply this data migration in the SAME
 > action, not before.)
 
+## Adapters and `invocations[].via: "api"` (D13, tsk-in1-5)
+
+`EXECUTOR_ADAPTERS` (`src/runner/dispatch.mjs`) is the pluggable port every
+`via:"cli"` invocation runs through: an adapter function
+`(invocation, opts) => Promise<result>`, where `invocation` is whatever
+shape that adapter needs — `cli-spawn` reads `command`/`args`; `http`
+(new, D13) reads `method`/`url`/`headers`/`body`. Two adapters are
+registered today: `cli-spawn` (default) and `http` — a real precedent
+proving the port is pluggable, not just a documented interface. A
+`capacities.<id>.invocations[]` entry may now declare `{via: "api", url:
+"..."}` (`INVOCATION_VIA` restored `'api'`, dropped earlier for 0
+historical producers) — `validateInvocationShape` requires only a
+non-empty `url` for it, never the `command`/`args` shape `via:"cli"`
+needs.
+
+**Not wired into production dispatch yet**: `resolveExecutorConfig` still
+only ever selects/spawns a `via:"cli"` invocation (gate B2/B3,
+tsk-in1-4) — a capacity declaring only `via:"api"` invocations is not
+dispatchable through `spawnWorker`/`executeCapacityCli` today, same as
+`gitnexus`'s `via:"mcp"` invocation never was. `httpAdapter` is tested
+directly (`EXECUTOR_ADAPTERS.http(invocation, opts)` against a real local
+test server), not through a registered capacity — 0 capacities declare
+`via:"api"` in this repo's own `.fgos/config.json` today.
+
 ## Probing and reading status
 
 > - `fgos tool check [--name x] [--json]` — probe từng tool đã đăng ký,
