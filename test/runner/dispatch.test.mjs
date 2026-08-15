@@ -2347,7 +2347,10 @@ test('the "resolve" CLI entry point honors --tier, changing which configured mod
   // read the expected model from there directly rather than hardcoding a
   // value that would silently drift from the real config.
   const cfg = committedRunnerConfig();
-  const lightModel = cfg.models.light;
+  // tsk-5tm-5 D9: the flat cfg.models map was replaced by cfg.modelPolicies
+  // -- 'light' work-tier maps to the default provider's 'lightweight'
+  // policy tier (DEFAULT_TIER_TO_POLICY, dispatch.mjs).
+  const lightModel = cfg.modelPolicies.claude.lightweight;
   const result = spawnSync(
     process.execPath,
     [dispatchPath, 'resolve', 'no-such-capacity-configured', '--prompt', 'hello', '--tier', 'light'],
