@@ -6,7 +6,7 @@ straight to `decompose` for every item (finding 6,
 — `fgos-coding-exploring`, the only stage that would normally write this file, is
 structurally unreachable. This mirrors the same gap `tsk-36i` itself hit.
 
-## Decisions
+## Locked decisions
 
 - **D0.** This item's original scope ("main is red") was refuted before
   work started — `tsk-4fk` (merged, `cc1666f`) already fixed the failing

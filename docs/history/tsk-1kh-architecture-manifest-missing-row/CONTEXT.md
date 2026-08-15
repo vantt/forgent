@@ -8,7 +8,7 @@ same missing row. Filed and worked as its own item with the user's direct
 authorization, since it blocks `fgos return` for every open item (the
 shared `npm test` verify).
 
-## Decisions
+## Locked decisions
 
 - **D0.** Root cause: `src/report/enduser-index-generate.mjs` (added by
   `70a88ff`, `feat(tsk-1m0): add enduser-docs-index-stale doctor check +

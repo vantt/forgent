@@ -20,7 +20,7 @@ playbook escalation cho ba block reason còn lại.
 sản xuất sự rời rạc từ lúc decompose (§D.4 của thiết kế gốc — người xác nhận
 KHÔNG phải ý mình, không mở hạng mục).
 
-## Quyết định đã khoá
+## Locked decisions
 
 | D-ID | Quyết định | Bằng chứng |
 |---|---|---|
