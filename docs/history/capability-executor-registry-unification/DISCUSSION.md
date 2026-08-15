@@ -88,6 +88,7 @@ nhưng chưa từng thực thi.
 | D10 | Giải #3 (xung đột namespace job-id vs executor-name) KHÔNG bằng đổi cách key của `capacities` — registry giữ key theo TÊN EXECUTOR đúng như D3 đã chốt. Binding "job nào chạy executor nào" là 1 tra cứu TÁCH BIỆT, dùng hàm có sẵn `resolveCapacityIdForPurpose(cfg, purpose)` qua field `for`, không cần máy mới. | Marketing-cockpit's `## harness` (`marketing-cockpit.md:143`): "Orchestrator đọc `next_stage_model/executor/interface` từ `run.yaml` khi dispatch" — họ tách hẳn binding job→executor khỏi chính registry, đúng model fgOS đã có sẵn (purpose-lookup) nhưng chưa dùng cho đường `--work`. |
 | D11 | Đánh giá và TỪ CHỐI 2 mô hình marketing-cockpit — không port: **(a)** silent model-tier downgrade; **(b)** tách `model-policy.yaml` thành file riêng. | (a) fgOS đã có giải pháp TƯỜNG MINH cho đúng vấn đề (`rigorOverrides` trên `agy`, `modelForTier` throw rõ tier+provider khi thiếu) — bản chưng cất không ghi điều kiện kích hoạt downgrade, port hình dạng mà không biết ngữ nghĩa là liều lĩnh; ngược triết lý loud-failure. (b) `mergeWithGlobalConfig` đã cho đúng tính chất "sửa 1 chỗ đổi cả hệ" mà không cần đăng ký nguồn config mới vào `fgos setup`/`doctor`. |
 | D12 | Xác nhận #3's câu hỏi con: `capacityIdForWork` miss khi tra vào `capacities` (key theo executor-name) KHÔNG PHẢI bug, là thiết kế cố ý (`tsk-5tm-6` D4). | `dispatch.mjs:1599-1613` tự ghi rõ: miss = tín hiệu "không có override cấu hình" — theo Native-First Dispatch Doctrine rule 2, mọi candidate `fgos-fanout` là same-provider + cần soul nên mặc định native. Code tự trích dẫn bug thật từng xảy ra khi làm sai hướng này. D10 không mâu thuẫn — đường `--for`/purpose (D10) và đường `--work` (D12) đã tách bạch từ trước. |
+| D13 | Xây 1 `http`/`api` adapter thật (`EXECUTOR_ADAPTERS['http']`) làm tiền lệ chứng minh port pluggable. Sửa lại D8: đưa `'api'` trở lại `INVOCATION_VIA`, lần này có code thật đứng sau. Tổng quát hoá chữ ký `EXECUTOR_ADAPTERS` từ `(command,args,cwd,opts)` thành nhận thẳng object `invocation`, mỗi adapter tự destructure phần mình cần. | Người dùng muốn tiền lệ THẬT (không chỉ tài liệu) để kiểm chứng port `EXECUTOR_ADAPTERS` thật sự pluggable. Chọn `http` thay vì `bash`/shell — an toàn hơn (không mở lại shell-injection surface `cli-spawn` cố tình đóng, RUL45), khác biệt bản chất thực thi đủ để chứng minh khái niệm. Chữ ký cũ định hình theo CLI — ép `http` vào sẽ lặp lại đúng bẫy B1 (gitnexus's invocation không fit `command`/`args`). Tổng quát hoá nhất quán với D9(a). |
 
 ## 5. Q&A log
 
@@ -186,6 +187,24 @@ nhưng chưa từng thực thi.
   `judge-decompose` chính là do nhầm `runner.executors.judge` với cách
   cấu hình 1 capacity — cơ chế này đã từng GÂY NHẦM LẪN thật, không chỉ
   "chưa ai dùng". Trình bày, người dùng chốt xoá hẳn → mint **D6**.
+- **round t.** Người dùng phản biện gắt: "adapter là adapter... dispatch
+  phải có/implement sẵn adapter để thực thi và trả ra kết quả... trong
+  tiến trình học chúng ta đã chấp nhận học cách này rồi". Đọc lại đúng
+  comment `dispatch.mjs:1100-1107` (đã đọc từ đầu buổi) — xác nhận
+  `EXECUTOR_ADAPTERS` VỐN ĐÃ là 1 port mở, không phải khái niệm mới.
+  Đính chính: `python` đã phủ bởi `cli-spawn` (đúng), nhưng
+  `bash`-với-ngữ-nghĩa-shell KHÔNG phủ (khác `shell:false` cố ý của
+  `cli-spawn`) — D8/D9 không sai HÀNH ĐỘNG nhưng diễn đạt sai (nghe như
+  đóng cửa mở rộng).
+- **round u.** Người dùng: "ý là anh muốn làm thêm 1 adapter để có tiền
+  lệ luôn" — xây THẬT, không chỉ ghi tài liệu. Trình bày 2 ứng viên
+  (`http`/`api` vs `bash`/shell), khuyến nghị `http` (an toàn hơn, khác
+  bản chất đủ chứng minh khái niệm) — người dùng chọn `api`. Phát hiện
+  thêm: chữ ký `EXECUTOR_ADAPTERS` hiện định hình theo CLI
+  (`command,args,cwd,opts`) — ép http vào sẽ lặp bẫy B1. Đề xuất tổng
+  quát hoá nhận `invocation` object → mint **D13**.
+- **round v.** Người dùng: "ok chốt hết rồi đó" — discussion converged,
+  chuyển sang §6/§7 + terminal handoff.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -224,6 +243,17 @@ không đổi cách key của registry.
 model-tier downgrade (fgOS đã có `rigorOverrides` tường minh hơn), và
 tách `model-policy.yaml` thành file riêng (`mergeWithGlobalConfig` đã
 cho đúng tính chất đó).
+
+`EXECUTOR_ADAPTERS` VỐN LÀ 1 port mở (không phải khái niệm mới của item
+này) — quyết định D8/D9 chỉ giữ vocab `via` được VALIDATE hẹp đúng thực
+tế hôm nay, không đóng cửa mở rộng. Item này xây 1 tiền lệ THẬT (D13):
+adapter `http` (`EXECUTOR_ADAPTERS['http']`), đưa `'api'` trở lại
+`INVOCATION_VIA` — lần này có code thật, không còn vocab chết. Đi kèm:
+tổng quát hoá chữ ký `EXECUTOR_ADAPTERS` từ `(command,args,cwd,opts)`
+(định hình theo CLI) thành nhận thẳng object `invocation` — mỗi adapter
+tự đọc field mình cần (`cliSpawnAdapter` đọc `command`/`args`;
+`httpAdapter` đọc `method`/`url`/`headers`/`body`), tránh lặp bẫy B1
+(ép 1 shape không fit vào khuôn có sẵn).
 
 ```mermaid
 flowchart TD
@@ -266,5 +296,95 @@ hardening phòng ngừa), số phận `probeHttp`/`'http'` trong
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-Chưa chia — còn 2 điểm mở (§3 #3, #9) có thể đổi shape đủ để ảnh hưởng
-ranh giới task. Vòng tiếp theo: giải quyết #3/#9 trước khi viết §7 thật.
+6 mảnh, tách theo đúng ranh giới footprint (giống cách `tsk-5tm` từng
+tách 6 con) — mỗi mảnh chạm 1 cụm file riêng, phụ thuộc tuần tự nêu rõ
+bên dưới.
+
+### `#task-retire-tool-registry` (D1)
+
+- **Mục tiêu:** Bỏ event-sourced registration (`fgos tool register`/
+  `remove`, `.fgos/tool-registry.json`'s `providers[]`); gộp `gitnexus`/
+  `herdr` thẳng vào `runner.capacities`; giữ `probeTool`/
+  `findExecutableOnPath`/`isIndexStale` làm hàm thuần đọc từ `capacities`
+  thay vì registry file riêng; giữ nguyên `tool-status.local.json`.
+- **Trích §6:** *"`runner.capacities`... trở thành registry executor DUY
+  NHẤT — gộp cả provider cũ của tool-registry"*.
+- **File:** `src/state/tool-registry.mjs`, `.fgos/config.json`,
+  `.fgos/tool-registry.json` (xoá), `src/cli/command-registry.mjs`
+  (bỏ verb `tool register`/`remove`), `docs/how-to/diagnose-a-blocked-
+  return-from-an-unrelated-verify-failure.md` (sửa dead reference #7).
+- **Quan hệ:** độc lập, có thể làm trước tiên.
+- **Verify nháp:** `npm test` xanh; `fgos tool query --capability
+  impact-analysis --status present` vẫn trả `gitnexus` (nguồn đổi, hành
+  vi CLI không đổi); `.fgos/tool-registry.json` không còn tồn tại.
+
+### `#task-drop-tier-executor` (D6, D7)
+
+- **Mục tiêu:** Xoá hẳn `executors.<tier>` (2 điểm chạm: validate dòng
+  682-686, resolve dòng 902) + test liên quan. Xác nhận `executor`
+  (global) đứng nguyên, không đổi.
+- **File:** `src/runner/dispatch.mjs`, `test/runner/dispatch.test.mjs`
+  (phần test `executors.<tier>`, ~34 dòng).
+- **Quan hệ:** độc lập, có thể song song với `#task-retire-tool-registry`.
+- **Verify nháp:** `npm test` xanh; `grep -n "cfg.executors\b"
+  src/runner/dispatch.mjs` không còn kết quả nào.
+
+### `#task-capabilities-catalog` (D4)
+
+- **Mục tiêu:** Thêm `runner.capabilities` — danh mục curated, validate
+  shape, hình dạng chi tiết field còn mở (§3 #10, quyết ở `fgos-coding-
+  planning` hoặc vòng shaping tiếp — object có alias/description hay tập
+  tên đơn giản).
+- **File:** `src/runner/dispatch.mjs` (validate mới), `.fgos/config.json`.
+- **Quan hệ:** độc lập về code, nhưng `for` validate sẽ đọc danh mục này
+  — nên land trước hoặc cùng `#task-kind-agent-tool-split`.
+- **Verify nháp:** test mới xác nhận `for` không hợp lệ (không có trong
+  `capabilities`) bị từ chối rõ ràng.
+
+### `#task-kind-agent-tool-split` (D5, D8, D9, D10, D12)
+
+- **Mục tiêu:** `CAPACITY_KINDS` → `['agent','tool']`; `INVOCATION_VIA` →
+  `['cli','task','mcp']` (D8); 3 gate D9 (shape-theo-`via`, chọn
+  invocation đúng `via` thay vì `[0]` mù, throw khi không dispatch-được);
+  sửa `decideCapacityDispatchMechanism`'s `hasNativeMechanism` đọc
+  `kind==='agent'`. Ghi lại (không sửa code) kết luận D10/D12 vào comment
+  `capacityIdForWork`/`decideCapacityCli` cho rõ — tránh người sau tưởng
+  đây là bug.
+- **Trích §6:** *"D5 tự nó cần 3 gate đi kèm mới ship an toàn"*.
+- **File:** `src/runner/dispatch.mjs` (trung tâm), `.fgos/config.json`
+  (`agy`'s `kind:"cli"`→`"agent"`), `test/runner/dispatch.test.mjs`.
+- **Quan hệ:** phụ thuộc `#task-retire-tool-registry` land trước (cần
+  `gitnexus`/`herdr` đã có mặt trong `capacities` để viết test thật cho
+  gate B1/B2/B3).
+- **Rủi ro cần xử ở planning:** blast radius đầy đủ của đổi `kind`
+  enum — liệt kê hết call site đọc `capacity.kind`/`CAPACITY_KINDS`
+  (§3 #9 phần còn lại).
+- **Verify nháp:** test mới cho từng gate (B1: entry không `command`
+  load được nếu `via` không cần; B2: chọn đúng invocation nhiều `via`;
+  B3: throw rõ ràng khi invocation không dispatch-được, không rơi
+  `cli-spawn` mù).
+
+### `#task-http-adapter-precedent` (D13)
+
+- **Mục tiêu:** Tổng quát hoá chữ ký `EXECUTOR_ADAPTERS` từ
+  `(command,args,cwd,opts)` thành nhận `invocation` object; viết
+  `httpAdapter` thật, đăng ký `EXECUTOR_ADAPTERS['http']`; test độc lập
+  (không cần capacity thật đăng ký).
+- **Trích §6:** *"xây 1 tiền lệ THẬT... mỗi adapter tự đọc field mình
+  cần"*.
+- **File:** `src/runner/dispatch.mjs` (`EXECUTOR_ADAPTERS`,
+  `cliSpawnAdapter`'s call site sửa theo chữ ký mới), test mới.
+- **Quan hệ:** phụ thuộc `#task-kind-agent-tool-split` (dùng chung
+  `INVOCATION_VIA`/shape-theo-`via` vừa tổng quát hoá) — làm SAU.
+- **Verify nháp:** test `httpAdapter` thật gọi 1 URL giả (test server
+  local hoặc mock), trả đúng shape `{status, body, ...}`; test xác nhận
+  đổi chữ ký không phá `cliSpawnAdapter` (toàn bộ test cũ vẫn xanh).
+
+### `#task-http-status-decision` (§3 #14)
+
+- **Mục tiêu:** Quyết + xoá `probeHttp`/`'http'` khỏi `KINDS` trong
+  `tool-registry.mjs` nếu xác nhận 0 dùng thật (đã nghiêng xoá, chưa
+  mint D-ID).
+- **Quan hệ:** liên quan `#task-retire-tool-registry`, có thể gộp làm
+  cùng lúc nếu nhỏ, hoặc tách nếu `fgos-coding-planning` thấy cần.
+- **Verify nháp:** `npm test` xanh sau khi xoá.
