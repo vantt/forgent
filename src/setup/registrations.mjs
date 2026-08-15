@@ -39,7 +39,7 @@ import { driftStatus, unmergedDeliveries } from '../state/drift-status.mjs';
 import { computeEnduserDocsIndex, generateEnduserDocsIndex, manifestPathFor } from '../report/enduser-index-generate.mjs';
 import { isResolvedStatus } from '../state/frontier.mjs';
 import { getDomain, resolveDomainName, effectiveStage } from '../state/workflow-stage-graphs.mjs';
-import { readLocalStatus, classifyRegistryPosture } from '../state/tool-registry.mjs';
+import { readLocalStatus, classifyRegistryPosture, toolsFromCapacities } from '../state/tool-registry.mjs';
 import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { describeConfigAwareness } from '../config/global-config.mjs';
 import { resolveFgosBin, refreshGlobalBinCache } from './bin-discovery.mjs';
@@ -403,17 +403,23 @@ function checkMainCheckoutHookWired(cwd) {
 // `passed` is always `true` here; only the message carries the posture.
 // Reports across every registered tool, never a single hardcoded capability
 // (e.g. "impact-analysis") — the registry itself never names one.
+//
+// tsk-in1-1 D1: tools are no longer event-sourced (`view.tools`) — reads
+// `runner.capacities` straight from `.fgos/config.json` (via `readSharedConfig`,
+// the same raw-read every other doctor check in this file already uses),
+// same as `fgos tool check/query` (bin/fgos.mjs) now does.
 function checkToolRegistryConfigured(cwd) {
   const mainCheckout = resolveMainCheckout(cwd);
   if (mainCheckout === null) {
     return { passed: true, message: 'not inside a git checkout — nothing to check' };
   }
   const fgosDir = path.join(mainCheckout, '.fgos');
-  const view = listWork(fgosDir);
+  const capacities = readSharedConfig(mainCheckout)?.runner?.capacities;
+  const tools = toolsFromCapacities(capacities);
   const localStatus = readLocalStatus(fgosDir);
-  const { posture, registeredCount, presentCount, missingCount, unknownCount } = classifyRegistryPosture(view.tools, localStatus);
+  const { posture, registeredCount, presentCount, missingCount, unknownCount } = classifyRegistryPosture(tools, localStatus);
   if (posture === 'inactive') {
-    return { passed: true, message: 'inactive — no tools registered (fgos tool register to add one)' };
+    return { passed: true, message: 'inactive — no tool-capable capacities declared (add one to runner.capacities in .fgos/config.json)' };
   }
   if (posture === 'full') {
     return { passed: true, message: `full — ${presentCount}/${registeredCount} registered tool(s) present` };

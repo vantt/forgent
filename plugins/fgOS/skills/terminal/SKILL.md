@@ -29,10 +29,16 @@ gated on a declared **`pane-labeling`** capability rather than assuming
 herdr (D5,
 `docs/history/orchestrator-worker-slots/DISCUSSION.md` §6 "Nhãn: session
 tự đặt qua helper skill có gate"). The capability is declared through the
-tool registry that already exists — no new mechanism:
+tool registry that already exists — no new mechanism. This project's own
+`.fgos/config.json` already carries it, as a `runner.capacities.herdr`
+entry (tsk-in1-1 D1: config-declared, not a CLI verb):
 
-```bash
-fgos tool register --name herdr --kind cli --capability pane-labeling --command herdr
+```json
+"herdr": {
+  "kind": "cli",
+  "capability": "pane-labeling",
+  "probeCommand": "herdr"
+}
 ```
 
 `rename.sh` queries it (`fgos tool query --capability pane-labeling`) before
