@@ -155,3 +155,19 @@ parent branch unchanged before retry) — the same structural cost
 named for `tsk-2mt`: landing several sibling branches on one shared
 parent branch concurrently costs real, repeatable merge friction, not a
 defect in any one child's own fix.
+
+## Confirmed: `tsk-3zi` fixed the Rust dashboard's blind spot (F1e)
+
+The one finding `npm test` structurally could not have caught on its own
+— `herdr-plugin`'s `doing_tier` function, matched against the retired
+stage literals `"decompose"`/`"clarify"`, collapsing every live stage's
+own sub-sort into one fallback bucket — landed as `tsk-3zi`. Confirmed
+directly in the current tree: `doing_tier` (`herdr-plugin/src/fgos.rs`)
+now matches `"planning" | "decompose" => 2` (`decompose` kept as the same
+drain-only alias the six original children preserved for stage
+transitions, D18), restoring the pipeline-order sub-sort the function's
+own doc comment always claimed to provide. Verified by `cargo test
+--manifest-path herdr-plugin/Cargo.toml` — the verify command this item's
+own scope required, distinct from `npm test`, exactly because B6 named
+that gap as the reason this bug went unnoticed by the original six
+children's own green suites.
