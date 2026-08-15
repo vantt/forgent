@@ -69,6 +69,7 @@ cụ thể của domain "marketing" trên fgOS sẽ trông như thế nào.
 | D10 | Ontology 4 tầng task-spec/skill/knowledge/context (knowledge = chuyên môn domain — coding dựa model weights, marketing là tài sản file thật của cockpit; context = refs/docs sẵn có). Nở-task-trước-nở-role-sau; coding đóng ở 5 position × ~13 phiếu. Chức danh (PO/PM/TechLead/SE/Tester) = persona tầng soul: roster per-team gói positions + phiếu + thẩm quyền, không encode vào harness. PM cổ điển đã máy hoá (frontier/triage/stale/merge) | Bàn các vòng 11–14 (ontology, lợi ích tách với evidence tsk-59a + review-item 3 executor, roster, map chức danh), người dùng đồng ý v15 | 18189 |
 | D11 | Binding soul↔role khi team đông hơn role: role là thuộc tính per-item, không phải ghế team. (1) Call nhắm (position, phiếu), giải quyết bằng pull qua frontier — soul đủ điều kiện tự claim, không push-assign; (2) sticky trong một call-thread — vòng sau về đúng soul giữ context, thread mới rebind; (3) targeted call (--to-soul) là ngoại lệ có chủ đích, guard vẫn chỉ check position, ghi event cho compound-learn. Solo (soul ít hơn role) thoái hoá êm: một soul nhiều title, self-review hữu hình trong log | Người dùng hỏi v16, em trình binding model, xác nhận cập nhật | 18229 |
 | D12 | Title/persona = agent-type definition sẵn có; eligibility = MỘT field frontmatter `claims: [phiếu]` trên agent-type (positions suy ra từ phiếu); claim event ghi (sessionId, agent-type); concurrency = worker-slots sẵn có; spawn-on-demand = runner/dispatch sẵn có. Không roster file, không humans registry, không agent-pools — thẩm quyền human ở pull-door verbs tới khi có team đa người thật. Soul instance = runtime record sinh lúc claim, không phải config | Người dùng đập bản roster qua v17–18 (fix list không scale; humans/agent-pools thừa; agent-type map vào đâu), em rút gọn, đồng ý v19 | 18232 |
+| D13 | Ép artifact-schema tách đôi: **harness** cấp validator + chokepoint (validate TRƯỚC dispatch để không đẻ item con mồ côi; lỗi trả về machine-readable để agent tự sửa; luôn có đường soft ghi reason, không chặn cứng), **schema là domain data** khai cạnh task-spec, không nằm trong engine. Họ declaration-schema (agent/skill/workflow/runtime) học ngay ở mảnh ③ dạng doctor check; họ artifact-schema (~33 file cockpit) đi cùng port marketing — KHÔNG làm cho coding vì artifact coding là văn xuôi | Người dùng nêu cockpit hay sai schema + hỏi bộ 41 schema (v23), em scout thật rồi phân tích, đồng ý v24 | 18242 |
 
 ## 5. Q&A log
 
@@ -299,6 +300,44 @@ cụ thể của domain "marketing" trên fgOS sẽ trông như thế nào.
   instance là runtime record, không phải config. Người dùng yêu cầu vòng
   kế: áp vào bối cảnh rộng hơn, chỉ ra quan hệ
   workflow/stage/task/skill/position/agent-type toàn cục.
+
+- **2026-08-15 22:38–23:15 — Vòng 21–24: planning chi tiết + schema**:
+  (v21) người dùng duyệt bản distill làm bằng chứng →
+  `design-distill.md`; (v22) yêu cầu planning chi tiết, đặc biệt hỏi
+  setup/config/doctor có ảnh hưởng không, test kỹ với coding trước → em
+  scout thật `src/setup/registrations.mjs`, `checks.mjs`,
+  `workflow-stage-graphs.mjs`, `work.mjs`, `replay.mjs`, `store.mjs`,
+  `command-registry.mjs`, `test/architecture.test.mjs`,
+  `docs/architecture-manifest.json`, `agents/*.yaml` và viết plan chi
+  tiết 363 dòng. Ba phát hiện đáng kể: (a) **mảnh ①② KHÔNG cần config
+  default nào** — `callstackCap` để trong DOMAINS (code) thay vì
+  `.fgos/config.json` để tránh đúng lớp lỗi present-but-unarmed mà
+  `checkWorkerSlotCeilingUsable` phải sinh ra để bắt; **mảnh ③ thì gate
+  cắn thật** → 2 doctor check mới (`task-specs-resolve`,
+  `agent-claims-resolve`) vì task-spec là file skill mong đợi tồn tại
+  lúc chạy; (b) file mới `src/state/handoff.mjs` BẮT BUỘC có row trong
+  `docs/architecture-manifest.json` nếu không `test/architecture.test.mjs`
+  đỏ, và phải pure (cap/depth do caller truyền — khuôn
+  `hasWorkerSlotRoom({ceiling})`); (c) `domainFields`+`fieldSchema` đã
+  tồn tại nhưng CỐ Ý không dùng cho `holder` — nó là payload
+  domain-opaque engine không diễn giải, còn holder thì guard/frontier/
+  router đều phải đọc. (v23) người dùng hỏi "A-lite nghĩa là sao, không
+  lite thì có gì hơn" → em trình cái thang lite→full (engine đọc phiếu,
+  ép verify-template, ép output-schema, gate data-driven, chặn input
+  thiếu, claims enforcement lúc claim) + 4 tín hiệu leo thang đọc được
+  từ event log; người dùng cho biết **cockpit thường xuyên gặp lỗi
+  không đúng schema** và hỏi bộ schema của họ dùng làm gì, có nên học →
+  em scout `.fgOS/schemas/`: 41 file JSON-Schema draft-07 có
+  `_meta.version` + ADR ref, validate bởi script tại chokepoint
+  (`validate-dispatch-brief.py` ghi rõ "catches missing required fields
+  at the dispatcher level so no orphan child runs are created"), chia
+  **hai họ**: declaration (~8: agent/skill/workflow/runtime) và artifact
+  (~33: brief/slot/calendar/persona/brand-profile). Kết luận: việc
+  cockpit hay sai schema là bằng chứng ỦNG HỘ gate cơ học cho structured
+  data do LLM sinh, đồng thời cảnh báo enforcement không có đường sửa
+  thì item kẹt; artifact coding là văn xuôi nên nhu cầu thấp hẳn — thêm
+  một lý do A-lite đúng cho coding. (v24) người dùng đồng ý → mint D13
+  (seq 18242).
 
 - **2026-08-15 21:52–21:59 — Vòng 20: quan hệ toàn cục, người dùng chốt**:
   em trình sơ đồ quan hệ đầy đủ sáu khái niệm (khai báo + runtime), bảng

@@ -1,9 +1,10 @@
 # Bản chốt thiết kế: Multi-role Team Harness & Marketing-Cockpit Absorption
 
-> Bằng chứng distill của 20 vòng thảo luận (2026-08-15, item `tsk-2t9c`),
+> Bằng chứng distill của 24 vòng thảo luận (2026-08-15, item `tsk-2t9c`),
 > người dùng duyệt từng cụm qua các vòng và duyệt bản distill này ở vòng
-> 21. Nguồn chi tiết: `DISCUSSION.md` (Q&A log + §6 synthesis),
-> `CONTEXT.md` (bảng 12 quyết định), `plan.md` (spec 3 mảnh triển khai).
+> 21 (D13 bổ sung ở vòng 24). Nguồn chi tiết: `DISCUSSION.md` (Q&A log
+> + §6 synthesis), `CONTEXT.md` (bảng 13 quyết định), `plan.md` (spec 3
+> mảnh triển khai, chi tiết per-file).
 > Mỗi D-ID dưới đây có bản ghi máy tương ứng qua `fgos decision`
 > (event seq ghi kèm) — ba nguồn phải luôn khớp nhau.
 
@@ -14,7 +15,8 @@ Xuất phát từ yêu cầu so sánh cơ chế điều phối fgOS vs marketing
 thiết kế **core harness tổng quát cho team agent đa role** — absorption
 cockpit trở thành *khách hàng đầu tiên* của harness thay vì mục tiêu duy
 nhất. Hội tụ lần 1 ở vòng 8 (D1–D8; exploring + planning đã chạy), người
-dùng dừng trước implement rồi đào sâu thêm 12 vòng ra D9–D12.
+dùng dừng trước implement rồi đào sâu thêm 16 vòng ra D9–D13, và
+planning chi tiết per-file (vòng 22).
 
 ## I. Kiến trúc nền (D1 seq 18029, D3 seq 18031)
 
@@ -53,7 +55,7 @@ dùng dừng trước implement rồi đào sâu thêm 12 vòng ra D9–D12.
   *bắt buộc ghi reason* → rework thành tín hiệu compound-learn. Áp
   nguyên xi cho marketing (publish = hard, editorial approval = soft).
 
-## III. Cấu trúc khai báo (D7 seq 18060, D6 seq 18059, D9 seq 18110, D10 seq 18189, D12 seq 18232)
+## III. Cấu trúc khai báo (D6 18059, D7 18060, D9 18110, D10 18189, D12 18232, D13 18242)
 
 - **Hierarchy: domain → N workflow → item (D7)**. Coding đang gộp 1
   workflow (bằng chứng gồng: discovery-verdict skip là nhánh vá; luật
@@ -108,6 +110,19 @@ dùng dừng trước implement rồi đào sâu thêm 12 vòng ra D9–D12.
   compound-learn soi. Soul instance là runtime record sinh lúc claim —
   không phải config. Solo mode thoái hoá êm: một soul mang nhiều
   agent-type, self-review vẫn hữu hình trong log.
+
+- **Artifact-schema (D13 seq 18242)**: ép schema tách đôi — **harness**
+  cấp validator + chokepoint (validate TRƯỚC dispatch để không đẻ item con
+  mồ côi; lỗi trả về machine-readable để agent tự sửa; luôn có đường soft
+  ghi reason, không chặn cứng), **schema là domain data** khai cạnh
+  task-spec. Cockpit ship 41 file JSON-Schema draft-07 chia hai họ:
+  declaration (~8: agent/skill/workflow/runtime — học ngay ở mảnh ③ dạng
+  doctor check) và artifact (~33: brief/slot/calendar/persona/
+  brand-profile — đi cùng port marketing). KHÔNG làm artifact-schema cho
+  coding: artifact coding là văn xuôi, không phải structured data. Việc
+  cockpit thường xuyên sai schema là bằng chứng ỦNG HỘ gate cơ học cho
+  structured data do LLM sinh, đồng thời cảnh báo enforcement không có
+  đường sửa thì item kẹt.
 
 ## IV. Trình tự triển khai (D2 seq 18030)
 
@@ -168,11 +183,19 @@ checkpoint machinery (có free từ event log + worktree commit); adapter
 
 - Item `tsk-2t9c` — stage `planning`, branch `fgw/tsk-2t9c`, dừng trước
   validating theo lệnh người dùng. Chưa item con, chưa dòng code.
-- 12 D-ID khớp ở 3 nơi: event log (seq 18029, 18030, 18031, 18032,
-  18058, 18059, 18060, 18070, 18110, 18189, 18229, 18232), bảng §4
+- 13 D-ID khớp ở 3 nơi: event log (seq 18029, 18030, 18031, 18032,
+  18058, 18059, 18060, 18070, 18110, 18189, 18229, 18232, 18242), bảng §4
   `DISCUSSION.md`, bảng Locked decisions `CONTEXT.md`.
-- `plan.md`: lane high-risk (4 flags), roleGraph draft coding ghim sẵn,
-  risk map với proof point, spec 3 mảnh dạng `normalizeChild`.
+- `plan.md` (chi tiết, 380+ dòng): lane high-risk (4 flags), roleGraph
+  draft coding, **phân tích gate setup/config/doctor từng mảnh** (①②
+  không thêm config key nào — `callstackCap` ở DOMAINS thay vì
+  `.fgos/config.json` để né lớp lỗi present-but-unarmed; ③ thêm 2 doctor
+  check), bảng file×thay-đổi từng mảnh, risk map 7 mục có proof point,
+  ma trận test (10 + 7 + 3), spec 3 mảnh dạng `normalizeChild`.
+- Hai bẫy đã ghi thành dòng riêng trong plan: `src/state/handoff.mjs`
+  phải có row trong `docs/architecture-manifest.json` (không thì
+  `test/architecture.test.mjs` đỏ), và file đó phải PURE (cap/depth do
+  caller truyền — khuôn `hasWorkerSlotRoom({ceiling})`).
 
 ## VIII. Bước kế tiếp
 

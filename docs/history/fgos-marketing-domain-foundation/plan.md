@@ -128,6 +128,21 @@ A third candidate — a `registerFix` that scaffolds missing task-spec stubs
 — is deliberately **not** in scope: `--fix` writes, and a stub contract is
 worse than an absent one (it looks authoritative while saying nothing).
 
+**Why these two checks are the right size (D13).** They are the
+*declaration-schema* family — validating static declarations a person
+wrote, cheap to fix by hand. The *artifact-schema* family (cockpit ships
+~33: brief/slot/calendar/persona/brand-profile, JSON-Schema draft-07,
+`_meta.version` + ADR refs, enforced by `validate-dispatch-brief.py` at
+the pre-dispatch chokepoint) is deliberately out of scope here: coding's
+artifacts are prose (`CONTEXT.md`, `plan.md` — the engine anchors on two
+regexes), not structured data, so schema value is low; that family lands
+with the marketing port. When it does, D13 fixes its shape in advance:
+harness supplies validator + chokepoint (validate BEFORE dispatch so no
+orphan child work is created, machine-readable structured errors so an
+agent can self-repair, always a soft path recording a reason rather than a
+hard block); the schemas themselves stay domain data beside the
+task-specs.
+
 ---
 
 ## Piece 1 — Role axis + `handoff` verb
@@ -326,7 +341,7 @@ cover concurrency, spawn and human authority.
   {
     "title": "Task-spec A-lite cho coding + claims trên agent definition + 2 doctor check",
     "verify": "npm test",
-    "action": "D6: tách contract (task-spec) khỏi know-how (skill), file khai báo per-domain, read-first qua refs, chưa engine enforcement; D9: mỗi task-spec bắt buộc có section Collaboration (bảng trigger per call-edge); D10: ~13 phiếu cho 5 position, ưu tiên phiếu ≥2 executor hoặc engine đang parse; D12: eligibility khai bằng field claims trên agents/*.yaml, không roster/humans/pools; AGENTS.md install-setup-doctor gate: đăng ký task-specs-resolve + agent-claims-resolve vào doctor check registry",
+    "action": "D6: tách contract (task-spec) khỏi know-how (skill), file khai báo per-domain, read-first qua refs, chưa engine enforcement; D9: mỗi task-spec bắt buộc có section Collaboration (bảng trigger per call-edge); D10: ~13 phiếu cho 5 position, ưu tiên phiếu ≥2 executor hoặc engine đang parse; D12: eligibility khai bằng field claims trên agents/*.yaml, không roster/humans/pools; D13: chỉ họ declaration-schema (2 doctor check), họ artifact-schema để dành cho port marketing; AGENTS.md install-setup-doctor gate: đăng ký task-specs-resolve + agent-claims-resolve vào doctor check registry",
     "footprint": ["docs/task-specs/", "docs/how-to/write-a-task-spec.md", "agents/", "scripts/project-agents.mjs", "src/setup/registrations.mjs", "test/setup/checks.test.mjs"],
     "kind": "docs",
     "risk": "standard"
@@ -357,6 +372,17 @@ re-planning of Execute mechanics.
 - Task-spec bodies are migrated prose, not new policy — if writing one
   requires inventing a rule nobody has agreed to, that is a signal to stop
   and raise it, not to author policy inside a contract file.
+- **A-lite stays lite until a symptom says otherwise.** The ladder above
+  lite (engine injects the spec; verify must match the spec's template;
+  output-schema enforced; gates data-driven; input presence enforced;
+  `claims` enforced at claim time, not just diagnosed by doctor) is
+  deliberately unbuilt. Climb one rung only on its own signal, each
+  readable from the event log being built: enforce output-schema after ≥2
+  items cross a stage with an artifact missing a required part unnoticed;
+  enforce verify-template after an item merges carrying an empty or fake
+  verify (the `"chưa xác định — P15 bổ sung"` class `tsk-2t9c` itself
+  still carries); inject specs when compound-learn shows souls skipping
+  them; enforce `claims` when a real multi-agent-type team mis-claims.
 
 ## Outstanding questions
 

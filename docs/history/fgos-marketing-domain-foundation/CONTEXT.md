@@ -2,10 +2,11 @@
 
 Locked decisions for the multi-role team-harness design and the
 marketing-cockpit foundation absorption. Full discussion history, scout
-evidence, and rationale live in `DISCUSSION.md` (same directory, 8 rounds,
-2026-08-15). This doc is the exploring-stage decision record
-`fgos-coding-planning` consumes; the first buildable slice is scoped by
-the item's `refs` anchor `DISCUSSION.md#task-role-axis-coding`.
+evidence, and rationale live in `DISCUSSION.md` (same directory,
+2026-08-15); `design-distill.md` is the quick-reference version. This doc
+is the decision record `fgos-coding-planning`/`fgos-coding-validating`
+consume; the first buildable slice is scoped by the item's `refs` anchor
+`DISCUSSION.md#task-role-axis-coding`.
 
 ## Feature boundary
 
@@ -21,9 +22,8 @@ overlay on top of domain.
 
 ## Locked decisions
 
-All eight minted via `fgos decision --id tsk-2t9c` during the shaping
-discussion (event seq in table); DISCUSSION.md §4 is the same table with
-round-by-round provenance.
+All thirteen minted via `fgos decision --id tsk-2t9c` (event seq in
+table); DISCUSSION.md §4 is the same table with round-by-round provenance.
 
 | D-ID | Decision | Seq |
 |------|----------|-----|
@@ -39,6 +39,7 @@ round-by-round provenance.
 | D10 | Four-layer ontology: task-spec (contract) / skill (executor know-how) / knowledge (domain expertise — mostly model weights for coding, real file assets for marketing) / context (instance facts — the existing refs/docs layer). Grow-tasks-before-roles principle; coding roleGraph closes at 5 positions with ~13 task-specs. Job titles (PO/PM/TechLead/SE/Tester) are soul-layer personas: a per-team roster bundles positions + task allowlist + authority per title, never encoded into the harness. Classic PM duties are already mechanized (frontier/triage/stale/merge) | 18189 |
 | D11 | Soul↔role binding for teams larger than the role set: role is a per-item attribute, not a team seat. (1) A call addresses (position, task-spec) and resolves by pull — it lands in the frontier as a small work-order; eligible souls claim it, never push-assigned. (2) Sticky within a call-thread — later rounds of the same thread return to the soul holding its context; a new thread rebinds freely. (3) Targeted calls (`--to-soul`) are a deliberate exception; the guard still checks only position legality, and the targeting is event-logged for compound-learn. Fewer souls than roles (solo) degrades gracefully: one soul carries many titles, claims its own calls, self-review stays visible in the log | 18229 |
 | D12 | Title/persona = the existing agent-type definition (`.claude/agents/*.md`, spawnable via subagent_type; fgOS already projects agent definitions). Eligibility is declared by ONE new frontmatter field `claims: [task-spec list]` on the agent-type — positions are derived from the claimed specs. The claim event records (sessionId, agent-type). Concurrency uses existing worker-slots; spawn-on-demand uses the existing runner/dispatch path. No roster file, no humans registry, no agent-pools — human authority stays in the pull-door verbs until a real multi-human team exists. Surviving idea from the roster draft: a soul instance is a runtime record born at claim, never config | 18232 |
+| D13 | Artifact-schema enforcement splits in two: the harness supplies the validator and the chokepoint (validate BEFORE dispatch so no orphan child work is created, machine-readable structured errors so an agent can self-repair, always a soft path recording a reason rather than a hard block); the schemas themselves are domain data declared beside the task-specs, never inside the engine. The declaration-schema family (agent/skill/workflow/runtime) is learned now, as piece 3's doctor checks; the artifact-schema family (~33 cockpit files: brief/slot/calendar/persona/brand-profile) arrives with the marketing port and is deliberately NOT built for coding, whose artifacts are prose, not structured data | 18242 |
 
 ## Pinned terms
 
