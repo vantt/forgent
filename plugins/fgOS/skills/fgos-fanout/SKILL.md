@@ -207,12 +207,23 @@ probability, it does not remove the hazard).
 ## Loop
 
 ```text
+dispatchUnavailable = {}  # ids reported once for a non-"in-process" decide
+  result (D4) — persists across loop iterations for this invocation only,
+  same in-memory-set shape as `firing` below. Without this, a candidate
+  whose resolved capacity never expects native dispatch would stay `todo`
+  forever (it is never claimed), re-enter `ready` every iteration, get
+  re-consulted and re-reported every time, and the outer loop would never
+  terminate — this set is what makes "report once" actually mean once.
+
 loop:
   view = fresh `fgos list --json` read
   openCandidates = candidateIds still open (status NOT IN {delivered,
-    retrospective, cleanup, done, wontfix})
+    retrospective, cleanup, done, wontfix}) AND NOT IN `dispatchUnavailable`
   if openCandidates is empty:
-    stop. Report every terminal id and its final status back to the caller.
+    stop. Report every terminal id and its final status back to the
+      caller, INCLUDING every id in `dispatchUnavailable` (still `todo` in
+      real state — reported, not delivered, so say so plainly, not as if
+      it reached a terminal status).
 
   scheduled = computeSchedule(view, openCandidates).waves[0]  # earliest
     wave over just this candidate set — never the whole frontier
@@ -253,11 +264,16 @@ loop:
       if decided.mechanism is not "in-process":
         report id back to the caller as needing a person (its own
           dispatch capacity does not expect native Task-tool dispatch —
-          this skill has no out-of-process firing path of its own); do
-          not add it to `firing`
+          this skill has no out-of-process firing path of its own); add
+          id to `dispatchUnavailable` so it is never rescheduled or
+          re-consulted again this run; do not add it to `firing`
         continue to the next id
       print its announce line (`<id> - native - <subagent_type> -
-        <model>`), `<subagent_type>` from `decided.agentType` when present
+        <model>`), `<subagent_type>` from `decided.agentType` when
+        present, else whatever Agent type this skill already uses by
+        default to fire `/fgOS:pick` (unchanged from before D4 — `decide`
+        only ever narrows this choice, never widens the set of valid
+        defaults)
       add id to `firing`
 
     dispatch one Agent per id in `firing`, single message, running in
@@ -284,7 +300,11 @@ loop:
 ## Boundary
 
 This skill's own job ends once `openCandidates` is empty — every candidate
-reached a terminal status (delivered, or blocked-and-reported). It never
+reached a terminal status (delivered, blocked-and-reported, or
+dispatch-unavailable-and-reported via `dispatchUnavailable`, D4). The last
+category stays real-state `todo` (never claimed), unlike the first two —
+this skill's own report to the caller must say so plainly, never imply the
+item advanced. It never
 decides what happens to `parentId` itself next; that is the caller's own
 next step (today: whatever already drives `parentId`'s own lifecycle,
 unchanged by this skill). Wiring THIS skill into a specific caller (e.g.
@@ -300,6 +320,11 @@ separate, later concern (D8) — this skill is invocable on its own with just
 - running the `decide --work <id>` consult as a separate synchronous pass
   over the whole batch instead of inside the existing per-candidate serial
   step — that risks turning the parallel fire step sequential
+- reporting a non-`"in-process"` candidate without adding it to
+  `dispatchUnavailable` — it stays real-state `todo` (never claimed), so
+  skipping this makes the outer loop re-schedule, re-consult, and
+  re-report the exact same id forever, with no bound (unlike the
+  slots-full branch's explicit 10-retry cap)
 - calling the runner's own root-affinity wave selector (`loop.mjs`) instead
   of `computeSchedule` for wave packing
 - treating the D5 pre-check as authoritative — skipping the real

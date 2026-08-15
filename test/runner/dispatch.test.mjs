@@ -747,14 +747,24 @@ test('EXECUTOR_ADAPTERS registers exactly one adapter today: cli-spawn (the RPC/
 /** Read the committed `.fgos/config.json`'s `runner` section directly
  * (never through `loadRunnerConfigFromDir`, which also merges in
  * `~/.fgos/config.json` -- these tests assert the REPO's own committed
- * content, not whatever a given test machine's global config adds). */
+ * content, not whatever a given test machine's global config adds).
+ *
+ * Reads via `git show HEAD:...`, NEVER `fs.readFileSync` off the working
+ * tree (tsk-5tm-6 fix, found by a real-dispatch review pass): a working-tree
+ * read only proves whatever happens to be sitting on THIS machine's disk --
+ * a contributor with an uncommitted edit to `.fgos/config.json` (or a stale
+ * one from before a revert) would make these tests pass while the repo's
+ * actual git history disagrees, exactly the gap that let D9's own
+ * `modelPolicies`/`agy.providerModel` config change ship as an uncommitted
+ * local edit with this test suite green the entire time. */
 function committedRunnerConfig() {
   // Main-checkout-resolved, not `import.meta.dirname`-relative: this test
   // suite itself may be running from inside a worktree, whose `.fgos/` is
   // unconditionally wiped (ADR0020) -- only the main checkout carries the
   // real committed `.fgos/config.json`.
   const repoRoot = resolveMainCheckoutRoot(path.resolve(import.meta.dirname, '..', '..'));
-  const parsed = JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'config.json'), 'utf8'));
+  const raw = execFileSync('git', ['show', 'HEAD:.fgos/config.json'], { cwd: repoRoot, encoding: 'utf8' });
+  const parsed = JSON.parse(raw);
   return parsed.runner;
 }
 
@@ -2677,7 +2687,7 @@ test('capacityIdForWork is exported and resolves a coding-domain (or no-domain) 
   assert.equal(capacityIdForWork(sampleWork()), 'fgos-coding-implement');
 });
 
-test('decideCapacityCli resolves work-item-based (--work) to the same result a positional capacityId would, plus the resolved capacityId', async () => {
+test('decideCapacityCli resolves work-item-based (--work) to the same result a positional capacityId would, plus the resolved capacityId -- explicit capacities.<id> override case', async () => {
   const root = mkTempDir();
   const fgosDir = path.join(root, '.fgos');
   addWork(fgosDir, {
@@ -2702,6 +2712,58 @@ test('decideCapacityCli resolves work-item-based (--work) to the same result a p
   // Positional-id path stays byte-identical (no capacityId field) -- every
   // pre-D4 caller/test already asserts this exact shape.
   assert.deepEqual(byName, { mechanism: 'in-process', agentType: 'general-purpose' });
+});
+
+test('decideCapacityCli resolves work-item-based (--work) to "in-process" by default when the resolved capacityId has NO explicit cfg.capacities entry -- the real, common fgos-fanout case (D4 fix): a coding-domain work item is a same-provider, soul-needing rootTask (0026 rule 2), never the generic "no capacity -> out-of-process" fallback a NAMED capacityId lookup keeps unchanged', async () => {
+  const root = mkTempDir();
+  const fgosDir = path.join(root, '.fgos');
+  addWork(fgosDir, {
+    id: 'tsk-fanout-unregistered',
+    title: 'Fanout candidate with no capacities.<id> override',
+    kind: 'task',
+    status: 'todo',
+    deps: [],
+    risk: 'light',
+    refs: [],
+    verify: 'npm test',
+  });
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    // No `capacities` block at all -- matches this repo's own real
+    // .fgos/config.json, where none of the 14 fgos-coding-* skills are
+    // registered as a capacities.<id> entry.
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const byWork = await decideCapacityCli(undefined, { repoRoot: root, work: 'tsk-fanout-unregistered', hasLiveTaskAccess: true });
+  assert.deepEqual(byWork, { mechanism: 'in-process', capacityId: 'fgos-coding-implement' });
+  // The SAME unregistered capacityId, looked up by NAME (not --work), keeps
+  // its pre-D4 byte-identical "no capacity -> out-of-process" behavior --
+  // only the work-item-shaped lookup gets the native-first default.
+  const byName = await decideCapacityCli('fgos-coding-implement', { repoRoot: root, hasLiveTaskAccess: true });
+  assert.deepEqual(byName, { mechanism: 'out-of-process' });
+});
+
+test('decideCapacityCli resolves work-item-based (--work) to "out-of-process" when the caller has no live Task access, even with no explicit cfg.capacities entry -- never claims in-process dishonestly', async () => {
+  const root = mkTempDir();
+  const fgosDir = path.join(root, '.fgos');
+  addWork(fgosDir, {
+    id: 'tsk-fanout-no-live-access',
+    title: 'Fanout candidate, caller declares no live Task access',
+    kind: 'task',
+    status: 'todo',
+    deps: [],
+    risk: 'light',
+    refs: [],
+    verify: 'npm test',
+  });
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const byWork = await decideCapacityCli(undefined, { repoRoot: root, work: 'tsk-fanout-no-live-access' });
+  assert.deepEqual(byWork, { mechanism: 'out-of-process', capacityId: 'fgos-coding-implement' });
 });
 
 test('decideCapacityCli throws a RunnerConfigError when --work names a work item that does not exist -- never silently "unavailable" (a typo/stale id is a real usage error, unlike an unconfigured purpose)', async () => {

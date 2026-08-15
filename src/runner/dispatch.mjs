@@ -1596,6 +1596,27 @@ export async function decideCapacityCli(
       throw new RunnerConfigError(`no work item "${workIdArg}" found -- cannot resolve its dispatch capacity.`);
     }
     capacityId = capacityIdForWork(workItem);
+    // tsk-5tm-6 D4: a work-item-resolved capacityId with NO explicit
+    // cfg.capacities entry means "no override configured" -- per
+    // Native-First Dispatch Doctrine (docs/decisions/0026) rule 2, every
+    // fgos-fanout candidate is a same-provider (Claude), soul-needing
+    // target (a full rootTask run through /fgOS:pick) and therefore
+    // defaults to native, NOT to decideCapacityDispatchMechanism's generic
+    // "no registered capacity -> out-of-process" fallback below (correct
+    // only for a NAMED capacity helper that may genuinely have no native
+    // equivalent, e.g. agy -- confirmed live: `resolve fgos-coding-implement`
+    // silently falls back to the bare global executor, the exact "blind
+    // cli/spawn even though the caller is already a live same-provider
+    // soul" bug 0026 itself names as the motivating gap). Deliberately
+    // narrower than the name/purpose-resolved paths below -- both keep
+    // their pre-D4 "no capacity -> out-of-process" behavior byte-identical,
+    // since naming a specific capacityId/purpose asks about that
+    // registered target specifically, not a work item's default dispatch.
+    const hasExplicitCapacity = Boolean(cfg.capacities && typeof cfg.capacities === 'object' && cfg.capacities[capacityId]);
+    if (!hasExplicitCapacity) {
+      const mechanism = decideDispatchMechanism({ hasNativeMechanism: true, hasLiveTaskAccess, forceCliSpawn: false });
+      return { mechanism, capacityId };
+    }
   }
   // Purpose-based binding, same precedence as resolveCapacityCli above. No
   // match is a legitimate "not configured yet" state for `decide`
