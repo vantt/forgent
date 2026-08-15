@@ -113,3 +113,96 @@ $ node --test test/architecture.test.mjs
 ✔ import một chiều xuống: không file nào import ngược lên tầng trên
 ℹ pass 3  ℹ fail 0
 ```
+
+---
+
+## tsk-49i-2 — extract the merge cluster's use-case layer
+
+**Why the gate fires.** `classifyIronLaw` over this item's own changed-file
+list, run against the real working tree before commit:
+
+```
+{
+  "required": true,
+  "matchedFlags": [],
+  "matchedModules": [
+    "bin/fgos.mjs",
+    "src/runner/merge.mjs",
+    "src/runner/worktree.mjs"
+  ]
+}
+```
+
+**Command used as the failing-before / passing-after proof** — the item's
+own registered `verify`:
+
+```
+npm test \
+  && test -d src/verbs/merge \
+  && test -f src/report/item-trace.mjs \
+  && ! grep -qF state/drift-status bin/fgos.mjs
+```
+
+### RED — before the change (worktree at `f22f1497`, parent branch tip)
+
+```
+$ test -d src/verbs/merge && test -f src/report/item-trace.mjs \
+  && ! grep -qF state/drift-status bin/fgos.mjs
+exit=1
+```
+
+All three structural clauses were red on that tree: `src/verbs/` did not
+exist at all, `src/report/item-trace.mjs` did not exist, and `bin/fgos.mjs`
+still imported `driftStatus` from `../src/state/drift-status.mjs` directly
+(the drift read is now the `merge` use case's, so the entry file no longer
+names that module).
+
+### RED — three real regressions the suite caught mid-change
+
+All three were caught by running the suite per extracted verb rather than
+once at the end:
+
+```
+✖ approve of a leaf item with a clean merge lands the work on fgw/<root> …
+  fgos: execFileSync is not defined
+```
+the moved `approve` body still shelled `git merge-base --is-ancestor`
+directly and needed its own `node:child_process` import.
+
+```
+✖ approve --github --pr on a fake gh merge success transitions the item
+  awaiting-approval -> delivered with role human
+  fgos: ghCommandOpts is not defined
+```
+the moved body still called the adapter's env reader; the gh command now
+arrives through `options.ghCommand`, keeping "a use case never reads
+process.env" intact.
+
+```
+✖ sync-root / approve: `runMerge` has already been declared
+```
+caught at `node --check` while assembling the moved bodies.
+
+### GREEN — after the change
+
+```
+$ npm test
+ℹ tests 3338
+ℹ pass 3333
+ℹ fail 0
+
+$ test -d src/verbs/merge && test -f src/report/item-trace.mjs \
+  && ! grep -qF state/drift-status bin/fgos.mjs
+exit=0
+
+$ node --test test/architecture.test.mjs
+✔ đủ sổ: file .mjs trên đĩa ↔ row trong manifest, một-một
+✔ mọi row dùng tầng đã khai trong layers
+✔ import một chiều xuống: không file nào import ngược lên tầng trên
+ℹ pass 3  ℹ fail 0
+```
+
+One flake seen once and not reproducible: `concurrent movePorting calls on
+DIFFERENT ids never lose a write to state.json (tsk-1q5)` failed on one
+full-suite run at 10.4s, passed alone and on the next full run. It exercises
+`movePorting`/`state.json` locking, which this item does not touch.
