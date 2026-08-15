@@ -157,16 +157,21 @@ materialize).
 ]
 ```
 
-**Quan hệ giữa 5 mảnh** (từ `DISCUSSION.md` §7's "Quan hệ", mảnh cũ #6
-đã gộp vào mảnh 1): mảnh 1 và 2 độc lập, làm trước tiên (có thể song
-song). Mảnh 3 độc lập về code nhưng nên land trước hoặc cùng mảnh 4
-(mảnh 4's `for` validate đọc danh mục mảnh 3 tạo). Mảnh 4 phụ thuộc mảnh
-1 (cần `gitnexus`/`herdr` đã có mặt trong `capacities` để viết test thật
-cho gate B1/B2/B3). Mảnh 5 phụ thuộc mảnh 4 (dùng chung
-`INVOCATION_VIA`/shape-theo-`via` vừa tổng quát hoá; ràng buộc riêng:
-KHÔNG dựa vào `impact()` cho `EXECUTOR_ADAPTERS` — false negative đã xác
-nhận qua `fgos-coding-validating`'s reality gate, dùng 4 điểm chạm grep
-được (`dispatch.mjs:429/1040/1299/1530`) làm checklist thật).
+**Quan hệ giữa 5 mảnh — SỬA lại tại `fgos-coding-validating`** (bản nháp
+đầu ở `DISCUSSION.md` §7 đánh giá mảnh 1/2 "có thể song song" và mảnh 3
+"độc lập về code" — engine's `footprintOverlapAmong` gate chạy thật lúc
+`--verdict decompose` bắt đúng chỗ đánh giá đó SAI: mảnh 3 chạm cả
+`dispatch.mjs` lẫn `.fgos/config.json`, đụng độ thật với 1/2/4/5; mảnh 4
+chạm `dispatch.mjs` đụng độ với 2/3 (không chỉ mảnh 1 như nháp đầu nói).
+8 xung đột footprint thật được engine liệt kê tường minh — không có cặp
+mảnh nào thực sự song song an toàn, vì `dispatch.mjs` là file dùng
+chung xuyên suốt 4/5 mảnh). **Tuần tự hoá đầy đủ** — mỗi mảnh phụ thuộc
+MỌI mảnh trước nó theo đúng thứ tự trong JSON §4 (mảnh 3 dep [0,1]; mảnh
+4 dep [0,1,2]; mảnh 5 dep [0,1,2,3]) — không mảnh nào chạy song song
+thật với mảnh khác. Ràng buộc riêng của mảnh 5: KHÔNG dựa vào `impact()`
+cho `EXECUTOR_ADAPTERS` — false negative đã xác nhận qua
+`fgos-coding-validating`'s reality gate, dùng 4 điểm chạm grep được
+(`dispatch.mjs:429/1040/1299/1530`) làm checklist thật.
 
 ## 5. Verify
 
