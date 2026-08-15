@@ -144,6 +144,68 @@ as a defined-but-unused file:
 others) and correctly left in place, exactly as `tsk-4ns`'s own earlier
 finding already established.
 
+## Step 5 (`tsk-2yo`): why intake classification had no future to be wired into
+
+Steps 1–4 trace *how* the capacity and its consumer were removed. This step
+is the reason none of it could have been rescued by wiring it up properly:
+**tier/kind/risk cannot be judged from the submitted text at all.**
+
+Difficulty is a property of the codebase, not of the sentence describing the
+work. A submission saying "add a flag" may be one line or may touch ten call
+sites across two guard layers, and nothing in the text distinguishes those.
+Judging at intake means guessing, no matter how good the judge is — the
+required evidence has not been gathered yet.
+
+So classification moved to the `discovery` stage-skill, which re-judges
+tier/kind/risk **after** research, on evidence. It reads its vocabulary
+through `getDomain` on the item's own classification rather than
+hardcoding the values.
+
+### What this changed upstream
+
+- **`/fgOS:submit` went back to being a thin wrapper**, losing its own
+  classification step and its no-soul gate entirely.
+- **`classify.mjs` kept its code but changed role.** It is no longer the
+  authority on tier/kind/risk; it produces a *provisional value at birth*,
+  later replaced by the discovery-stage judgment. Same function, demoted
+  from verdict to placeholder.
+
+### The two-tier quality crack this closed
+
+The sharper reason for the move: intake classification was only ever as
+good as whether a live session happened to be present.
+
+A submission made without one was stuck with deterministic keyword guessing
+**permanently** — including items the runner generates itself. Two items of
+identical difficulty would carry different tiers depending on how they
+entered the system, and nothing downstream could tell which had been judged
+and which had been guessed.
+
+Moving the judgment to discovery means every item is classified the same
+way, from evidence, regardless of how it arrived.
+
+### The headless path needs data, not a verb call
+
+One consequence is still load-bearing for the headless route: workers are
+forbidden from calling `fgos`. So the worker cannot apply its own
+classification — the `fgos-verdict` block's schema has to carry tier/kind/
+risk as **data**, and the runner applies it on the worker's behalf.
+
+This is the same shape as every other worker verdict: the worker reports,
+the runner writes.
+
+### Retiring the capacity needed no migration
+
+`fgos tool remove --name submit-assist-classify` was a pure retire with no
+migration step, and the reasoning generalizes: **a capacity entry describes
+how to invoke something; it holds no judgment of its own.** There is no
+accumulated state inside it to carry forward, so nothing needs migrating
+when it goes. The decision record was kept.
+
+Contrast that with retiring a *stage*, where open items are standing on the
+old name and must be migrated or aliased first. Config that only describes
+invocation can be deleted; config that items point at cannot.
+
 ## The lesson
 
 A capacity's config entry and its consuming skill's dispatch branch are
