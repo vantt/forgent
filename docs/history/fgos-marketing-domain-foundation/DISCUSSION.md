@@ -2,16 +2,26 @@
 
 ## 1. Trạng thái hiện tại
 
-**Cập nhật vòng 25 — VALIDATING XONG, 3 ITEM CON ĐÃ TẠO.** Nền chốt:
-**D1–D13 + D7a** (§4). `fgos-coding-validating` chạy thật → READY WITH
-CONSTRAINTS; gate hỏi, người dùng chọn mechanism-first (D7a, seq 18248);
-`fgos plan --verdict decompose` tạo `tsk-2t9c-1` (role axis, heavy),
-`tsk-2t9c-2` (workflow hierarchy, heavy, deps ①), `tsk-2t9c-3`
-(task-spec + 2 doctor check, standard) — tất cả ở stage `executing`,
-verify `npm test`. Parent về `todo`, claim đã nhả. **Chưa implement gì**
-— dừng theo lệnh người dùng. Engine từng chặn verdict lần đầu vì
-footprint ①↔② chỉ khai bằng văn xuôi; đã sửa bằng `deps: [0]`
-(phương án `sequence`).
+**Cập nhật 2026-08-16 — ĐÃ IMPLEMENT + TỰ REVIEW + SMOKE TEST XONG CẢ 3
+MẢNH, ĐANG CHỜ NGƯỜI DÙNG DUYỆT ĐỂ MERGE.** Sau khi validating tạo 3 item
+con (①②③, xem đoạn dưới), người dùng ra lệnh làm hết tới trước implement
+rồi dừng cho xem; người dùng duyệt và ra lệnh tiếp tục toàn bộ. Cả 3
+mảnh đã code, test, tự review, commit tuần tự TRÊN CHÍNH branch
+`fgw/tsk-2t9c` (không tách worktree con): `a4fbd250` (①), `33937a93`
+(③), `a3958e60` (②, deviation khỏi plan gốc ghi công khai — không nối
+hot-path vì `workflows.feature` là tham chiếu giống hệt domain-level
+fields, nối dây không đổi hành vi mà thêm rủi ro), `9561340c` (fix bug
+tự review tìm ra: `recordCall` đọc `work.stage` thô thay vì
+`effectiveStage`, khiến handoff trên item lazy-default stage bị từ chối
+sai). Smoke test end-to-end qua CLI thật (không gọi hàm nội bộ): item
+feature thật đi hết `submit→discover→plan→executing→delivered→
+retrospective`, cả 3 kiểu handoff (consult sync/review async/return)
+chạy đúng, refusal đúng, `fgos doctor` degrade sạch trên project trống.
+`npm test` cuối: 3367/3372 xanh, 0 fail — không hồi quy. Chi tiết đầy đủ:
+`design-distill.md` §VIII-a. **Chưa merge main, chưa push** — để người
+dùng quyết. Discussion coi như đã đạt điểm dừng tự nhiên (converge →
+explore/plan/validate/implement đã đi hết); không có câu hỏi thiết kế
+nào đang treo ngoài #7/#15 (có chủ đích, chờ lượt marketing).
 
 Vòng 20: nền chốt là **D1–D12** (§4) — thiết kế coding-harness ĐÓNG.
 Sau hội tụ vòng 8 (exploring + planning đã chạy: CONTEXT.md + plan.md
