@@ -14,6 +14,7 @@ import {
   modelForTier,
   resolveExecutorCommand,
   resolveCapacityCli,
+  executeCapacityCli,
   resolveCapacityIdForPurpose,
   logCapacityDispatch,
   decideDispatchMechanism,
@@ -26,8 +27,10 @@ import {
   DEFAULT_ADAPTER,
   CAPACITY_KINDS,
   CAPACITY_CARRIES,
+  INVOCATION_VIA,
+  capacityIdForWork,
 } from '../../src/runner/dispatch.mjs';
-import { initStore, registerTool } from '../../src/state/store.mjs';
+import { initStore, registerTool, addWork } from '../../src/state/store.mjs';
 import { writeLocalStatus, findExecutableOnPath } from '../../src/state/tool-registry.mjs';
 import { resolveMainCheckoutRoot } from '../../src/runner/paths.mjs';
 
@@ -502,6 +505,133 @@ test('loadRunnerConfig accepts a well-formed "capacities" entry carrying its own
   assert.equal(cfg.capacities['fgos-code-implement'].command, 'agy');
 });
 
+// --- capacities.<id>.invocations[] (tsk-5tm-4 D11): executor-keyed
+// alternative to flat command/args, ADDITIVE -- capacities field name
+// itself stays unchanged (cfg.executors already means something else,
+// tier-keyed, tsk-4eu) -----------------------------------------------
+
+test('INVOCATION_VIA is exactly the one D11-locked value today, never a free string vocabulary', () => {
+  assert.deepEqual(INVOCATION_VIA, ['cli']);
+});
+
+test('loadRunnerConfig accepts a "capacities.<id>" entry using the invocations[] shape instead of flat command/args', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'invocations-ok.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: {
+        agy: {
+          kind: 'cli',
+          allowCrossProvider: true,
+          invocations: [{ via: 'cli', adapter: 'cli-spawn', command: 'agy', args: ['-p', '{prompt}', '--model', '{model}'] }],
+        },
+      },
+      models: { standard: 'sonnet' },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.doesNotThrow(() => loadRunnerConfig(configPath));
+});
+
+test('loadRunnerConfig rejects a "capacities.<id>.invocations" that is not a non-empty array', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-invocations-empty.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: { agy: { kind: 'cli', invocations: [] } },
+      models: { standard: 'sonnet' },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('loadRunnerConfig rejects a "capacities.<id>.invocations[]" entry with an unknown "via"', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-invocations-via.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: {
+        agy: { kind: 'cli', allowCrossProvider: true, invocations: [{ via: 'api', command: 'agy', args: ['{prompt}'] }] },
+      },
+      models: { standard: 'sonnet' },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('loadRunnerConfig rejects a "capacities.<id>.invocations[]" entry with a malformed command/args shape (reuses validateExecutorShape)', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-invocations-shape.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: { agy: { kind: 'cli', allowCrossProvider: true, invocations: [{ via: 'cli', command: 'agy' }] } },
+      models: { standard: 'sonnet' },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('resolveExecutorCommand resolves command/args/provider from invocations[0] for an invocations[]-shaped capacity', () => {
+  const cfg = {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: {
+      agy: {
+        kind: 'cli',
+        allowCrossProvider: true,
+        invocations: [{ via: 'cli', adapter: 'cli-spawn', command: 'agy', args: ['-p', '{prompt}', '--model', '{model}'] }],
+      },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'hello', model: 'sonnet', tier: 'standard', capacityId: 'agy' });
+  assert.equal(resolved.command, 'agy');
+  assert.deepEqual(resolved.args, ['-p', 'hello', '--model', 'sonnet']);
+  assert.equal(resolved.adapter, 'cli-spawn');
+  assert.equal(resolved.provider, 'agy');
+});
+
+test('resolveExecutorCommand still enforces cross-provider governance for an invocations[]-shaped capacity — allowCrossProvider stays required', () => {
+  const cfg = {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: {
+      agy: { kind: 'cli', invocations: [{ via: 'cli', adapter: 'cli-spawn', command: 'agy', args: ['{prompt}'] }] },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+  assert.throws(
+    () => resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'agy' }),
+    RunnerConfigError,
+  );
+});
+
+test('the committed .fgos/config.json runner section declares the agy reference capacity (tsk-5tm-4 D11): invocations[]-shaped, kind cli, allowCrossProvider true, resolves to the real installed agy binary', () => {
+  const cfg = committedRunnerConfig();
+  const capacity = cfg.capacities?.agy;
+  assert.ok(capacity, 'capacities.agy must exist');
+  assert.equal(capacity.kind, 'cli');
+  assert.equal(capacity.allowCrossProvider, true);
+  assert.ok(Array.isArray(capacity.invocations) && capacity.invocations.length === 1);
+  const invocation = capacity.invocations[0];
+  assert.equal(invocation.via, 'cli');
+  assert.equal(invocation.adapter, 'cli-spawn');
+  assert.equal(invocation.command, 'agy');
+  assert.ok(invocation.args.includes('{prompt}') && invocation.args.includes('{model}'));
+  assert.ok(invocation.args.includes('--dangerously-skip-permissions'));
+});
+
 test('loadRunnerConfig accepts a "capacities" entry naming only "kind" (metadata-only, falls through for its executor)', () => {
   const dir = mkTempDir();
   const configPath = path.join(dir, 'metadata-only-capacity.json');
@@ -617,20 +747,49 @@ test('EXECUTOR_ADAPTERS registers exactly one adapter today: cli-spawn (the RPC/
 /** Read the committed `.fgos/config.json`'s `runner` section directly
  * (never through `loadRunnerConfigFromDir`, which also merges in
  * `~/.fgos/config.json` -- these tests assert the REPO's own committed
- * content, not whatever a given test machine's global config adds). */
+ * content, not whatever a given test machine's global config adds).
+ *
+ * Reads via `git show HEAD:...`, NEVER `fs.readFileSync` off the working
+ * tree (tsk-5tm-6 fix, found by a real-dispatch review pass): a working-tree
+ * read only proves whatever happens to be sitting on THIS machine's disk --
+ * a contributor with an uncommitted edit to `.fgos/config.json` (or a stale
+ * one from before a revert) would make these tests pass while the repo's
+ * actual git history disagrees, exactly the gap that let D9's own
+ * `modelPolicies`/`agy.providerModel` config change ship as an uncommitted
+ * local edit with this test suite green the entire time.
+ *
+ * Known remaining scope limit (found in the same review pass): `HEAD`
+ * resolves inside `resolveMainCheckoutRoot`'s directory -- the ONE shared
+ * main checkout every `fgos <verb>` call and worktree resolves against
+ * (ADR0020) -- so this reads whichever branch the MAIN CHECKOUT currently
+ * has checked out (typically `main`), never this test file's own branch's
+ * HEAD when run from inside a feature worktree. These tests prove "the
+ * config the main checkout currently has committed is well-formed," not
+ * "this branch's own `.fgos/config.json` change (if any) is correct" --
+ * a feature branch that touches `.fgos/config.json` still needs its own
+ * independent proof (e.g. a real merge/catchup dry-run) that its content
+ * agrees with what will actually land, since these tests cannot see it. */
 function committedRunnerConfig() {
   // Main-checkout-resolved, not `import.meta.dirname`-relative: this test
   // suite itself may be running from inside a worktree, whose `.fgos/` is
   // unconditionally wiped (ADR0020) -- only the main checkout carries the
   // real committed `.fgos/config.json`.
   const repoRoot = resolveMainCheckoutRoot(path.resolve(import.meta.dirname, '..', '..'));
-  const parsed = JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'config.json'), 'utf8'));
+  const raw = execFileSync('git', ['show', 'HEAD:.fgos/config.json'], { cwd: repoRoot, encoding: 'utf8' });
+  const parsed = JSON.parse(raw);
   return parsed.runner;
 }
 
 test('the committed .fgos/config.json runner section loads and is well-formed', () => {
   const cfg = committedRunnerConfig();
-  assert.deepEqual(Object.keys(cfg.models).sort(), ['heavy', 'light', 'standard']);
+  assert.deepEqual(Object.keys(cfg.modelPolicies.claude).sort(), ['analytical', 'creative', 'critical', 'lightweight', 'standard']);
+});
+
+test('the committed .fgos/config.json runner section wires the agy capacity to gemini\'s own modelPolicies, not claude\'s (D9, tsk-5tm-5 — the bug this piece fixes)', () => {
+  const cfg = committedRunnerConfig();
+  assert.equal(cfg.capacities?.agy?.providerModel, 'gemini');
+  assert.equal(typeof cfg.modelPolicies?.gemini?.lightweight, 'string');
+  assert.ok(cfg.modelPolicies.gemini.lightweight.length > 0);
 });
 
 test('the committed .fgos/config.json runner section grants the worker exactly acceptEdits + git add/commit — no wider (per spike B)', () => {
@@ -648,9 +807,9 @@ test('the committed .fgos/config.json runner section no longer declares a coding
   assert.equal(cfg.capacities?.['coding-classify-intake'], undefined, 'capacities.coding-classify-intake should no longer exist -- retired after tsk-4ns removed its only consumer');
 });
 
-test('the committed .fgos/config.json runner section no longer declares a gather capacity (tsk-5tm D6): removed as the only cross-provider path with no recorded architectural reason to keep it -- the real reason it existed (parallelization) is already covered by the native Task tool; tsk-5tm-2 removed it, tsk-5tm\'s remaining children do not reintroduce it', () => {
+test('the committed .fgos/config.json runner section no longer declares a gather capacity (tsk-5tm-2 D6): the one cross-provider path, retired -- no architectural reason on record for cross-provider, and native Task-tool dispatch already met the one documented reason (parallelizing wall-clock)', () => {
   const cfg = committedRunnerConfig();
-  assert.equal(cfg.capacities?.gather, undefined, 'capacities.gather should no longer exist -- removed permanently per tsk-5tm D6');
+  assert.equal(cfg.capacities?.gather, undefined, 'capacities.gather should no longer exist -- retired per D6');
 });
 
 /** Capture what's written to process.stderr during `fn()`; restores the
@@ -789,7 +948,18 @@ test('ensureRunnerConfigForDir on an already-complete shared file does not rewri
   fs.writeFileSync(sharedPath, JSON.stringify({ runner: DEFAULT_RUNNER_CONFIG }));
   const before = fs.statSync(sharedPath).mtimeMs;
 
-  const cfg = ensureRunnerConfigForDir(dir);
+  // Isolate from this machine's real global config (~/.fgos/config.json) —
+  // otherwise a stale real-world `models` shape gets merged in and this
+  // fixture stops looking "already complete".
+  const homeDir = mkTempDir();
+  const prevHome = process.env.HOME;
+  process.env.HOME = homeDir;
+  let cfg;
+  try {
+    cfg = ensureRunnerConfigForDir(dir);
+  } finally {
+    process.env.HOME = prevHome;
+  }
 
   assert.deepEqual(cfg, DEFAULT_RUNNER_CONFIG);
   assert.equal(fs.statSync(sharedPath).mtimeMs, before);
@@ -836,6 +1006,183 @@ test('modelForTier throws a validation error for an unknown tier', () => {
     assert.equal(err.category, 'validation');
     return true;
   });
+});
+
+// --- modelForTier: modelPolicies (D9, tsk-5tm-5) -------------------------
+
+function modelPoliciesConfig() {
+  return {
+    executor: { command: process.execPath, args: ['{prompt}'] },
+    modelPolicies: {
+      claude: { lightweight: 'haiku', standard: 'sonnet', creative: 'sonnet', analytical: 'sonnet', critical: 'opus' },
+      gemini: { lightweight: 'gemini-flash', standard: 'gemini-pro', creative: 'gemini-pro', analytical: 'gemini-pro', critical: 'gemini-ultra' },
+    },
+    timeoutMs: 5000,
+  };
+}
+
+test('modelForTier resolves the default provider (claude) when no providerModel is given, same tier->model mapping as before', () => {
+  const cfg = modelPoliciesConfig();
+  assert.equal(modelForTier(cfg, 'light'), 'haiku');
+  assert.equal(modelForTier(cfg, 'standard'), 'sonnet');
+  assert.equal(modelForTier(cfg, 'heavy'), 'opus');
+});
+
+test('modelForTier resolves a non-Claude provider (e.g. agy/gemini) to that provider\'s own model name, not Claude\'s (D9\'s reported bug: executor non-Claude nhan sai ten)', () => {
+  const cfg = modelPoliciesConfig();
+  assert.equal(modelForTier(cfg, 'light', { providerModel: 'gemini' }), 'gemini-flash');
+  assert.equal(modelForTier(cfg, 'standard', { providerModel: 'gemini' }), 'gemini-pro');
+  assert.equal(modelForTier(cfg, 'heavy', { providerModel: 'gemini' }), 'gemini-ultra');
+});
+
+test('modelForTier throws when providerModel names a provider with no modelPolicies entry', () => {
+  const cfg = modelPoliciesConfig();
+  assert.throws(() => modelForTier(cfg, 'light', { providerModel: 'mistral' }), (err) => {
+    assert.ok(err instanceof RunnerConfigError);
+    assert.match(err.message, /mistral/);
+    return true;
+  });
+});
+
+test('modelForTier honors rigorOverrides, routing a work tier to a different model-policy tier than DEFAULT_TIER_TO_POLICY', () => {
+  const cfg = modelPoliciesConfig();
+  // Default: 'standard' work-tier -> 'standard' policy tier -> sonnet.
+  assert.equal(modelForTier(cfg, 'standard'), 'sonnet');
+  // Override routes 'standard' work-tier -> 'critical' policy tier -> opus.
+  assert.equal(modelForTier(cfg, 'standard', { rigorOverrides: { standard: 'critical' } }), 'opus');
+});
+
+test('modelForTier prefers modelPolicies over a legacy flat models map when both are present', () => {
+  const cfg = { ...modelPoliciesConfig(), models: { light: 'legacy-light', standard: 'legacy-standard', heavy: 'legacy-heavy' } };
+  assert.equal(modelForTier(cfg, 'standard'), 'sonnet');
+});
+
+test('modelForTier still resolves the legacy flat models map when modelPolicies is absent (backward compatible)', () => {
+  const cfg = baseConfig(['{prompt}']);
+  assert.equal(modelForTier(cfg, 'standard'), 'sonnet');
+});
+
+test('loadRunnerConfig accepts a runner config declaring modelPolicies instead of models', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'model-policies.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      modelPolicies: { claude: { standard: 'sonnet' } },
+      timeoutMs: 1000,
+    }),
+  );
+  const cfg = loadRunnerConfig(configPath);
+  assert.equal(cfg.modelPolicies.claude.standard, 'sonnet');
+});
+
+test('loadRunnerConfig rejects a config declaring neither models nor modelPolicies', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'no-models.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({ executor: { command: 'claude', args: ['{prompt}'] }, timeoutMs: 1000 }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('loadRunnerConfig rejects a modelPolicies entry with an unknown policy tier key', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-tier-key.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      modelPolicies: { claude: { 'ultra-mega': 'opus' } },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), (err) => {
+    assert.ok(err instanceof RunnerConfigError);
+    assert.match(err.message, /ultra-mega/);
+    return true;
+  });
+});
+
+test('loadRunnerConfig rejects a modelPolicies entry whose model value is not a non-empty string', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-model-value.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      modelPolicies: { claude: { standard: '' } },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('loadRunnerConfig rejects a "capacities.<id>" entry whose providerModel is not a non-empty string', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-provider-model.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: { agy: { kind: 'cli', command: 'agy', args: ['{prompt}'], providerModel: '' } },
+      modelPolicies: { claude: { standard: 'sonnet' } },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('loadRunnerConfig rejects a "capacities.<id>" entry whose rigorOverrides key is not a valid tier', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-rigor-key.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: { agy: { kind: 'cli', command: 'agy', args: ['{prompt}'], rigorOverrides: { 'not-a-tier': 'critical' } } },
+      modelPolicies: { claude: { standard: 'sonnet' } },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('loadRunnerConfig rejects a "capacities.<id>" entry whose rigorOverrides value is not one of MODEL_POLICY_TIERS', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-rigor-value.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: { agy: { kind: 'cli', command: 'agy', args: ['{prompt}'], rigorOverrides: { standard: 'ultra-mega' } } },
+      modelPolicies: { claude: { standard: 'sonnet' } },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('resolveCapacityCli resolves a cross-provider capacity\'s own providerModel through modelForTier, picking that provider\'s model over the default (claude) policy (D9\'s reported agy/Gemini bug)', async () => {
+  const root = mkTempDir();
+  const fgosDir = path.join(root, '.fgos');
+  initStore(fgosDir);
+  registerTool(fgosDir, { name: 'agy', kind: 'cli', capability: 'agy', command: 'agy' });
+  writeLocalStatus(fgosDir, { agy: { status: 'present', checkedAt: new Date().toISOString() } });
+  writeRunnerConfigFixture(root, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: {
+      agy: { kind: 'cli', command: 'agy', provider: 'agy', args: ['--model', '{model}', '{prompt}'], allowCrossProvider: true, providerModel: 'gemini' },
+    },
+    modelPolicies: {
+      claude: { standard: 'sonnet' },
+      gemini: { standard: 'gemini-pro' },
+    },
+    timeoutMs: 5000,
+  });
+  const resolved = await resolveCapacityCli('agy', { prompt: 'classify this', repoRoot: root, tier: 'standard' });
+  assert.deepEqual(resolved, { command: 'agy', args: ['--model', 'gemini-pro', 'classify this'], provider: 'agy', model: 'gemini-pro' });
 });
 
 // --- tsk-2ig: worktree-dispatch attestation (baseCommit/headRef) ---------
@@ -1152,57 +1499,14 @@ test('resolveExecutorCommand still skips both the presence check and the cross-p
   );
 });
 
-// --- capacities.<id>.needs/for (D5/D6, tsk-1o7): US-027 -- binding matches
-// by capability promise, never by tool name. A capacity that declares
-// `needs` resolves its presence check against the tools registry's own
-// `capability` field, not against whether the capacity's own id happens to
-// match a registered tool's name ---
-
-test('resolveExecutorCommand resolves a kind:"cli" capacity declaring needs+for through capability match, with no name coincidence between the capacity id and the registered tool name', () => {
-  const dir = mkTempDir();
-  initStore(dir);
-  registerTool(dir, { name: 'agy-classify', kind: 'cli', capability: 'classification', command: 'agy' });
-  writeLocalStatus(dir, { 'agy-classify': { status: 'present', checkedAt: new Date().toISOString() } });
-  const cfg = {
-    executor: { command: '/global/executor', args: ['{prompt}'] },
-    capacities: {
-      'submit-assist-classify': { kind: 'cli', needs: 'classification', for: 'judge', command: 'agy', args: ['{prompt}'], allowCrossProvider: true },
-    },
-    models: { standard: 'sonnet' },
-    timeoutMs: 5000,
-  };
-  // Old tools[capacityId] lookup would fail here: no tool is registered
-  // under the name "submit-assist-classify" at all.
-  assert.equal(Object.prototype.hasOwnProperty.call(cfg.capacities['submit-assist-classify'], 'needs'), true);
-  assert.doesNotThrow(() =>
-    resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'submit-assist-classify', fgosDir: dir }),
-  );
-});
-
-test('resolveExecutorCommand resolves a needs-declaring capacity when a second provider is registered under the same capability but a different name', () => {
-  const dir = mkTempDir();
-  initStore(dir);
-  registerTool(dir, { name: 'agy', kind: 'cli', capability: 'classification', command: 'agy' });
-  registerTool(dir, { name: 'gemini-cli', kind: 'cli', capability: 'classification', command: 'gemini' });
-  writeLocalStatus(dir, {
-    agy: { status: 'missing', checkedAt: new Date().toISOString() },
-    'gemini-cli': { status: 'present', checkedAt: new Date().toISOString() },
-  });
-  const cfg = {
-    executor: { command: '/global/executor', args: ['{prompt}'] },
-    capacities: {
-      'submit-assist-classify': { kind: 'cli', needs: 'classification', command: 'gemini', args: ['{prompt}'], allowCrossProvider: true },
-    },
-    models: { standard: 'sonnet' },
-    timeoutMs: 5000,
-  };
-  // The first-registered provider ("agy") is missing; the second one under
-  // the SAME capability ("gemini-cli") is present -- the capacity itself
-  // never had to be renamed or repointed to pick that up.
-  assert.doesNotThrow(() =>
-    resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'submit-assist-classify', fgosDir: dir }),
-  );
-});
+// capacities.<id>.needs/for presence-matching (D5/D6, tsk-1o7, US-027) was
+// retired at tsk-5tm-1 D1: resolveExecutorConfig no longer runs any
+// presence/staleness gate at all (dead code -- 2/3 real entries were
+// kind:"task", the third's needs added no signal beyond the OS's own
+// ENOENT). The 2 tests that lived here asserted that gate's own
+// capability-match behavior, which no longer exists to test -- removed
+// rather than left passing for the wrong reason (trivial doesNotThrow with
+// no gate underneath it).
 
 // --- capacities.<id>.agentType (D1/D2, tsk-3sw): kind:"task" capacity with
 // no own command/args resolves via a synthesized executor, Claude-only ---
@@ -1473,12 +1777,13 @@ test('the "decide" CLI entry point exits non-zero with a usage message when capa
   assert.match(result.stderr, /usage: node src\/runner\/dispatch\.mjs decide/);
 });
 
-test('an unknown CLI subcommand still exits non-zero with a usage message naming both resolve and decide', () => {
+test('an unknown CLI subcommand still exits non-zero with a usage message naming resolve, execute, and decide (tsk-5tm-3 D5)', () => {
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
   const result = spawnSync(process.execPath, [dispatchPath, 'bogus'], { encoding: 'utf8' });
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /unknown subcommand/);
   assert.match(result.stderr, /resolve <capacityId>/);
+  assert.match(result.stderr, /execute <capacityId>/);
   assert.match(result.stderr, /decide <capacityId>/);
 });
 
@@ -1914,7 +2219,7 @@ test('resolveExecutorCommand with no capacities block at all never triggers cros
   assert.equal(resolved.command, 'agy');
 });
 
-test('resolveExecutorCommand throws for a non-Claude "cli" capacity even when fgosDir is given and the D6 registration/presence check already passed', () => {
+test('resolveExecutorCommand throws for a non-Claude "cli" capacity even when fgosDir is given (cross-provider governance is independent of the retired presence gate, tsk-5tm-1 D1)', () => {
   const dir = mkTempDir();
   initStore(dir);
   registerTool(dir, { name: 'fgos-code-implement', kind: 'cli', capability: 'coding', command: 'agy' });
@@ -2054,7 +2359,10 @@ test('the "resolve" CLI entry point honors --tier, changing which configured mod
   // read the expected model from there directly rather than hardcoding a
   // value that would silently drift from the real config.
   const cfg = committedRunnerConfig();
-  const lightModel = cfg.models.light;
+  // tsk-5tm-5 D9: the flat cfg.models map was replaced by cfg.modelPolicies
+  // -- 'light' work-tier maps to the default provider's 'lightweight'
+  // policy tier (DEFAULT_TIER_TO_POLICY, dispatch.mjs).
+  const lightModel = cfg.modelPolicies.claude.lightweight;
   const result = spawnSync(
     process.execPath,
     [dispatchPath, 'resolve', 'no-such-capacity-configured', '--prompt', 'hello', '--tier', 'light'],
@@ -2072,6 +2380,159 @@ test('the "resolve" CLI entry point exits non-zero with a usage message when cap
   assert.match(result.stderr, /usage: node src\/runner\/dispatch\.mjs resolve/);
 });
 
+// --- tsk-5tm-3 D5: `executeCapacityCli` / `execute <capacityId>` — the
+// self-execute counterpart to `resolve` above, matching marketing-cockpit's
+// `run_task()`: self-execute every adapter-resolvable case via
+// EXECUTOR_ADAPTERS, hand back {mechanism,agentType,prompt} only for the
+// one case dispatch (a passive CLI) cannot do itself (native, live
+// session) -------------------------------------------------------------
+
+test('executeCapacityCli rejects with a usage RunnerConfigError when both capacityId and --for are missing', async () => {
+  await assert.rejects(() => executeCapacityCli(undefined, { repoRoot: mkTempDir() }), RunnerConfigError);
+  await assert.rejects(() => executeCapacityCli('', { repoRoot: mkTempDir() }), RunnerConfigError);
+});
+
+test('executeCapacityCli hands back {mechanism:"in-process",agentType,prompt} for a kind:"task" capacity when the caller declares live Task access — self-executes nothing, since dispatch has no Task tool of its own to call', async () => {
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: { 'my-agent-capacity': { kind: 'task', agentType: 'code-simplifier' } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const result = await executeCapacityCli('my-agent-capacity', { repoRoot: root, prompt: 'do the thing', hasLiveTaskAccess: true });
+  assert.deepEqual(result, { mechanism: 'in-process', agentType: 'code-simplifier', prompt: 'do the thing' });
+});
+
+test('executeCapacityCli falls to out-of-process and self-executes (never hands back) for a kind:"task" capacity with no live Task access — the safe default', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeEchoExecutor(dir);
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: { 'my-agent-capacity': { kind: 'task', command: process.execPath, args: [scriptPath, '{prompt}'] } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const result = await executeCapacityCli('my-agent-capacity', { repoRoot: root, prompt: 'hello' });
+  assert.equal(result.mechanism, 'out-of-process');
+  assert.equal(result.status, 0);
+  const payload = JSON.parse(result.stdout);
+  assert.equal(payload.args[0], 'hello');
+});
+
+test('executeCapacityCli self-executes a kind:"cli" capacity via EXECUTOR_ADAPTERS and returns the real result — never the bare {command,args} shape `resolve` hands back for the caller to run itself', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeEchoExecutor(dir);
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: { 'submit-assist-classify': { kind: 'cli', command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const result = await executeCapacityCli('submit-assist-classify', { repoRoot: root, prompt: 'classify this' });
+  assert.equal(result.mechanism, 'out-of-process');
+  assert.equal(result.status, 0);
+  assert.equal(result.signal, null);
+  assert.equal(result.tier, 'standard');
+  assert.equal(result.model, 'sonnet');
+  assert.equal(result.provider, process.execPath);
+  assert.equal(result.command, process.execPath);
+  const payload = JSON.parse(result.stdout);
+  assert.equal(payload.args[0], 'classify this');
+  // No bare {command,args} shape leaking through -- this is a real result.
+  assert.equal(result.args, undefined);
+});
+
+test('executeCapacityCli resolves purpose-based (--for) the same way resolveCapacityCli does, plus the resolved capacityId, whether the result is self-executed or handed back', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeEchoExecutor(dir);
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: { 'judge-decompose': { kind: 'cli', for: 'judge', command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const byPurpose = await executeCapacityCli(undefined, { repoRoot: root, for: 'judge', prompt: 'p' });
+  const byName = await executeCapacityCli('judge-decompose', { repoRoot: root, prompt: 'p' });
+  assert.equal(byPurpose.capacityId, 'judge-decompose');
+  assert.equal(byPurpose.status, 0);
+  assert.equal(byName.capacityId, undefined);
+});
+
+test('executeCapacityCli throws when no capacity is registered for the given purpose — nothing left to execute', async () => {
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  await assert.rejects(() => executeCapacityCli(undefined, { repoRoot: root, for: 'judge', prompt: 'x' }), RunnerConfigError);
+});
+
+test('executeCapacityCli propagates resolveExecutorConfig\'s own RunnerConfigError for a kind:"cli" capacity resolving cross-provider with no allowCrossProvider', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeEchoExecutor(dir);
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: { 'submit-assist-classify': { kind: 'cli', command: scriptPath, args: ['{prompt}'] } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  await assert.rejects(() => executeCapacityCli('submit-assist-classify', { repoRoot: root, prompt: 'x' }), RunnerConfigError);
+});
+
+test('the "execute" CLI entry point self-executes a real adapter-resolvable capacity and prints the real result as JSON, never bare {command,args}', () => {
+  const { repoRoot } = mkTempGitRepo();
+  const dir = mkTempDir();
+  const scriptPath = writeEchoExecutor(dir);
+  writeRunnerConfigFixture(repoRoot, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: { 'cli-capacity': { kind: 'cli', command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
+  const result = spawnSync(process.execPath, [dispatchPath, 'execute', 'cli-capacity', '--prompt', 'hello-from-cli'], {
+    encoding: 'utf8',
+    cwd: repoRoot,
+  });
+  assert.equal(result.status, 0, result.stderr);
+  const parsed = JSON.parse(result.stdout);
+  assert.equal(parsed.mechanism, 'out-of-process');
+  assert.equal(parsed.status, 0);
+  const payload = JSON.parse(parsed.stdout);
+  assert.equal(payload.args[0], 'hello-from-cli');
+});
+
+test('the "execute" CLI entry point hands back {mechanism:"in-process",...} for a live-task-access native capacity, never spawning anything', () => {
+  const { repoRoot } = mkTempGitRepo();
+  writeRunnerConfigFixture(repoRoot, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: { 'native-capacity': { kind: 'task', agentType: 'code-simplifier' } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
+  const result = spawnSync(
+    process.execPath,
+    [dispatchPath, 'execute', 'native-capacity', '--prompt', 'do it', '--has-live-task-access'],
+    { encoding: 'utf8', cwd: repoRoot },
+  );
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(JSON.parse(result.stdout), { mechanism: 'in-process', agentType: 'code-simplifier', prompt: 'do it' });
+});
+
+test('the "execute" CLI entry point exits non-zero with a usage message when capacityId is omitted', () => {
+  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
+  const result = spawnSync(process.execPath, [dispatchPath, 'execute'], { encoding: 'utf8' });
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /usage: node src\/runner\/dispatch\.mjs execute/);
+});
+
 // --- capacities.<id>.carries (D15, tsk-5td; first real consumer tsk-2ie5/
 // tsk-2c1) — closed enum at config-load, plus a real pre-dispatch gate on
 // the ACTUAL content class a caller declares it's sending ------------------
@@ -2087,7 +2548,7 @@ test('loadRunnerConfig accepts a "capacities.<id>" entry with a valid carries va
     configPath,
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
-      capacities: { gather: { kind: 'cli', command: 'agy', args: ['{prompt}'], for: 'gather', carries: 'repo-content', allowCrossProvider: true } },
+      capacities: { gather: { kind: 'cli', command: 'agy', args: ['{prompt}'], for: 'judge', carries: 'repo-content', allowCrossProvider: true } },
       models: { standard: 'sonnet' },
       timeoutMs: 1000,
     }),
@@ -2113,7 +2574,7 @@ test('loadRunnerConfig rejects a "capacities.<id>" entry whose carries is not on
 function carriesCfg(carries) {
   return {
     executor: { command: '/global/executor', args: ['{prompt}'] },
-    capacities: { gather: { kind: 'cli', command: 'agy', args: ['{prompt}'], for: 'gather', carries, allowCrossProvider: true } },
+    capacities: { gather: { kind: 'cli', command: 'agy', args: ['{prompt}'], for: 'judge', carries, allowCrossProvider: true } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   };
@@ -2176,23 +2637,29 @@ test('resolveExecutorCommand never triggers the carries gate for a capacity that
 // tsk-2ie5/tsk-2c1) — purpose-based binding, never by name ------------------
 
 test('resolveCapacityIdForPurpose finds the capacity whose own "for" matches the purpose, regardless of the capacity id\'s own name', () => {
+  // resolveCapacityIdForPurpose is a pure string-match over `for` -- it never
+  // validates against CAPACITY_PURPOSES itself (that enum check only runs at
+  // config-load time, validateCapacityShape) -- so a synthetic purpose value
+  // ("review") proves the real invariant (match by field, not by id name)
+  // without reviving "gather" as if it were still a live purpose (tsk-5tm-2
+  // D6: retired, CAPACITY_PURPOSES is down to its one real value, "judge").
   const cfg = {
     capacities: {
-      'totally-unrelated-name': { kind: 'cli', for: 'gather', command: 'agy' },
+      'totally-unrelated-name': { kind: 'cli', for: 'review', command: 'agy' },
       'judge-decompose': { kind: 'task', for: 'judge' },
     },
   };
-  assert.equal(resolveCapacityIdForPurpose(cfg, 'gather'), 'totally-unrelated-name');
+  assert.equal(resolveCapacityIdForPurpose(cfg, 'review'), 'totally-unrelated-name');
 });
 
 test('resolveCapacityIdForPurpose returns null when no capacity declares that purpose — a legitimate state, never thrown', () => {
   const cfg = { capacities: { 'judge-decompose': { kind: 'task', for: 'judge' } } };
-  assert.equal(resolveCapacityIdForPurpose(cfg, 'gather'), null);
+  assert.equal(resolveCapacityIdForPurpose(cfg, 'no-such-purpose-configured'), null);
 });
 
 test('resolveCapacityIdForPurpose returns null against an empty/missing capacities block', () => {
-  assert.equal(resolveCapacityIdForPurpose({}, 'gather'), null);
-  assert.equal(resolveCapacityIdForPurpose({ capacities: {} }, 'gather'), null);
+  assert.equal(resolveCapacityIdForPurpose({}, 'no-such-purpose-configured'), null);
+  assert.equal(resolveCapacityIdForPurpose({ capacities: {} }, 'no-such-purpose-configured'), null);
 });
 
 // --- resolveCapacityCli / decideCapacityCli: purpose-based (--for) binding,
@@ -2206,7 +2673,7 @@ test('decideCapacityCli resolves "unavailable" when nothing is registered for th
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   });
-  const decided = await decideCapacityCli(undefined, { repoRoot: root, for: 'gather', hasLiveTaskAccess: true });
+  const decided = await decideCapacityCli(undefined, { repoRoot: root, for: 'judge', hasLiveTaskAccess: true });
   assert.deepEqual(decided, { mechanism: 'unavailable' });
 });
 
@@ -2214,16 +2681,172 @@ test('decideCapacityCli resolves purpose-based (--for) to the same result a posi
   const root = mkTempDir();
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
-    capacities: { gather: { kind: 'cli', for: 'gather', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    capacities: { gather: { kind: 'cli', for: 'judge', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   });
-  const byPurpose = await decideCapacityCli(undefined, { repoRoot: root, for: 'gather', hasLiveTaskAccess: true });
+  const byPurpose = await decideCapacityCli(undefined, { repoRoot: root, for: 'judge', hasLiveTaskAccess: true });
   const byName = await decideCapacityCli('gather', { repoRoot: root, hasLiveTaskAccess: true });
   assert.deepEqual(byPurpose, { mechanism: 'out-of-process', capacityId: 'gather' });
   // Positional-id path stays byte-identical (no capacityId field) — every
   // pre-tsk-2c1 caller/test already asserts this exact shape.
   assert.deepEqual(byName, { mechanism: 'out-of-process' });
+});
+
+// --- decideCapacityCli: work-item-shaped lookup (--work, D4/D12(iii),
+// tsk-5tm-6) -- the lookup fgos-fanout needs to consult this protocol
+// per-candidate before firing an Agent, instead of assuming native
+// dispatch unconditionally --------------------------------------------------
+
+test('capacityIdForWork is exported and resolves a coding-domain (or no-domain) work item to fgos-coding-implement, the same lookup spawnWorker already applies internally', () => {
+  assert.equal(capacityIdForWork(sampleWork()), 'fgos-coding-implement');
+});
+
+test('decideCapacityCli resolves work-item-based (--work) to the same result a positional capacityId would, plus the resolved capacityId -- explicit capacities.<id> override case', async () => {
+  const root = mkTempDir();
+  const fgosDir = path.join(root, '.fgos');
+  addWork(fgosDir, {
+    id: 'tsk-fanout-candidate',
+    title: 'Fanout candidate',
+    kind: 'task',
+    status: 'todo',
+    deps: [],
+    risk: 'light',
+    refs: [],
+    verify: 'npm test',
+  });
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capacities: { 'fgos-coding-implement': { kind: 'task', agentType: 'general-purpose' } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const byWork = await decideCapacityCli(undefined, { repoRoot: root, work: 'tsk-fanout-candidate', hasLiveTaskAccess: true });
+  const byName = await decideCapacityCli('fgos-coding-implement', { repoRoot: root, hasLiveTaskAccess: true });
+  assert.deepEqual(byWork, { mechanism: 'in-process', agentType: 'general-purpose', capacityId: 'fgos-coding-implement' });
+  // Positional-id path stays byte-identical (no capacityId field) -- every
+  // pre-D4 caller/test already asserts this exact shape.
+  assert.deepEqual(byName, { mechanism: 'in-process', agentType: 'general-purpose' });
+});
+
+test('decideCapacityCli resolves work-item-based (--work) to "in-process" by default when the resolved capacityId has NO explicit cfg.capacities entry -- the real, common fgos-fanout case (D4 fix): a coding-domain work item is a same-provider, soul-needing rootTask (0026 rule 2), never the generic "no capacity -> out-of-process" fallback a NAMED capacityId lookup keeps unchanged', async () => {
+  const root = mkTempDir();
+  const fgosDir = path.join(root, '.fgos');
+  addWork(fgosDir, {
+    id: 'tsk-fanout-unregistered',
+    title: 'Fanout candidate with no capacities.<id> override',
+    kind: 'task',
+    status: 'todo',
+    deps: [],
+    risk: 'light',
+    refs: [],
+    verify: 'npm test',
+  });
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    // No `capacities` block at all -- matches this repo's own real
+    // .fgos/config.json, where none of the 14 fgos-coding-* skills are
+    // registered as a capacities.<id> entry.
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const byWork = await decideCapacityCli(undefined, { repoRoot: root, work: 'tsk-fanout-unregistered', hasLiveTaskAccess: true });
+  assert.deepEqual(byWork, { mechanism: 'in-process', capacityId: 'fgos-coding-implement' });
+  // The SAME unregistered capacityId, looked up by NAME (not --work), keeps
+  // its pre-D4 byte-identical "no capacity -> out-of-process" behavior --
+  // only the work-item-shaped lookup gets the native-first default.
+  const byName = await decideCapacityCli('fgos-coding-implement', { repoRoot: root, hasLiveTaskAccess: true });
+  assert.deepEqual(byName, { mechanism: 'out-of-process' });
+});
+
+test('decideCapacityCli resolves work-item-based (--work) to "out-of-process" when the caller has no live Task access, even with no explicit cfg.capacities entry -- never claims in-process dishonestly', async () => {
+  const root = mkTempDir();
+  const fgosDir = path.join(root, '.fgos');
+  addWork(fgosDir, {
+    id: 'tsk-fanout-no-live-access',
+    title: 'Fanout candidate, caller declares no live Task access',
+    kind: 'task',
+    status: 'todo',
+    deps: [],
+    risk: 'light',
+    refs: [],
+    verify: 'npm test',
+  });
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const byWork = await decideCapacityCli(undefined, { repoRoot: root, work: 'tsk-fanout-no-live-access' });
+  assert.deepEqual(byWork, { mechanism: 'out-of-process', capacityId: 'fgos-coding-implement' });
+});
+
+test('decideCapacityCli throws a RunnerConfigError when --work names a work item that does not exist -- never silently "unavailable" (a typo/stale id is a real usage error, unlike an unconfigured purpose)', async () => {
+  const root = mkTempDir();
+  fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  await assert.rejects(
+    () => decideCapacityCli(undefined, { repoRoot: root, work: 'no-such-work-item' }),
+    RunnerConfigError,
+  );
+});
+
+test('a positional capacityId still wins over --work when both are somehow passed, same precedence --for already has', async () => {
+  const root = mkTempDir();
+  const fgosDir = path.join(root, '.fgos');
+  addWork(fgosDir, {
+    id: 'tsk-fanout-candidate-2',
+    title: 'Fanout candidate 2',
+    kind: 'task',
+    status: 'todo',
+    deps: [],
+    risk: 'light',
+    refs: [],
+    verify: 'npm test',
+  });
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capacities: {
+      'fgos-coding-implement': { kind: 'task', agentType: 'general-purpose' },
+      explicit: { kind: 'cli', command: 'agy', args: ['{prompt}'], allowCrossProvider: true },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const decided = await decideCapacityCli('explicit', { repoRoot: root, work: 'tsk-fanout-candidate-2', hasLiveTaskAccess: true });
+  assert.deepEqual(decided, { mechanism: 'out-of-process' });
+});
+
+test('the "decide" CLI entry point resolves --work <id> the same way as a positional capacityId', () => {
+  const { repoRoot, fgosDir } = mkTempGitRepo();
+  addWork(fgosDir, {
+    id: 'tsk-fanout-cli-candidate',
+    title: 'Fanout CLI candidate',
+    kind: 'task',
+    status: 'todo',
+    deps: [],
+    risk: 'light',
+    refs: [],
+    verify: 'npm test',
+  });
+  writeRunnerConfigFixture(repoRoot, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capacities: { 'fgos-coding-implement': { kind: 'task', agentType: 'general-purpose' } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
+  const result = spawnSync(
+    process.execPath,
+    [dispatchPath, 'decide', '--work', 'tsk-fanout-cli-candidate', '--has-live-task-access'],
+    { encoding: 'utf8', cwd: repoRoot },
+  );
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(JSON.parse(result.stdout), { mechanism: 'in-process', agentType: 'general-purpose', capacityId: 'fgos-coding-implement' });
 });
 
 test('resolveCapacityCli rejects with a usage RunnerConfigError when both capacityId and --for are missing', async () => {
@@ -2237,7 +2860,7 @@ test('resolveCapacityCli throws when no capacity is registered for the given pur
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   });
-  await assert.rejects(() => resolveCapacityCli(undefined, { repoRoot: root, for: 'gather', prompt: 'x' }), RunnerConfigError);
+  await assert.rejects(() => resolveCapacityCli(undefined, { repoRoot: root, for: 'judge', prompt: 'x' }), RunnerConfigError);
 });
 
 test('resolveCapacityCli resolves purpose-based (--for) to the same command a positional capacityId would, plus the resolved capacityId; carries repo-content clears the gate', async () => {
@@ -2248,11 +2871,11 @@ test('resolveCapacityCli resolves purpose-based (--for) to the same command a po
   writeLocalStatus(fgosDir, { gather: { status: 'present', checkedAt: new Date().toISOString() } });
   writeRunnerConfigFixture(root, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
-    capacities: { gather: { kind: 'cli', for: 'gather', carries: 'repo-content', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    capacities: { gather: { kind: 'cli', for: 'judge', carries: 'repo-content', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   });
-  const byPurpose = await resolveCapacityCli(undefined, { repoRoot: root, for: 'gather', carries: 'repo-content', prompt: 'p' });
+  const byPurpose = await resolveCapacityCli(undefined, { repoRoot: root, for: 'judge', carries: 'repo-content', prompt: 'p' });
   const byName = await resolveCapacityCli('gather', { repoRoot: root, carries: 'repo-content', prompt: 'p' });
   assert.deepEqual(byPurpose, { command: 'agy', args: ['p'], provider: 'agy', model: 'sonnet', capacityId: 'gather' });
   assert.deepEqual(byName, { command: 'agy', args: ['p'], provider: 'agy', model: 'sonnet' });
@@ -2262,12 +2885,12 @@ test('resolveCapacityCli propagates the carries refusal for a purpose-resolved c
   const root = mkTempDir();
   writeRunnerConfigFixture(root, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
-    capacities: { gather: { kind: 'cli', for: 'gather', carries: 'user-text', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    capacities: { gather: { kind: 'cli', for: 'judge', carries: 'user-text', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   });
   await assert.rejects(
-    () => resolveCapacityCli(undefined, { repoRoot: root, for: 'gather', carries: 'repo-content', prompt: 'p' }),
+    () => resolveCapacityCli(undefined, { repoRoot: root, for: 'judge', carries: 'repo-content', prompt: 'p' }),
     RunnerConfigError,
   );
 });
