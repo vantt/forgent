@@ -688,7 +688,7 @@ test('tool-registry-configured passes when every declared tool is checked presen
   const cwd = mkTemp('fgos-tool-registry-full-');
   execFileSync('git', ['init', '-q'], { cwd });
   spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
-  declareCapacity(cwd, 'echo-tool', { kind: 'cli', capability: 'test-capability', probeCommand: 'echo' });
+  declareCapacity(cwd, 'echo-tool', { kind: 'tool', capability: 'test-capability', invocations: [{ via: 'cli', command: 'echo', args: [] }] });
   const check = spawnSync(process.execPath, [FGOS, 'tool', 'check'], { cwd, encoding: 'utf8' });
   assert.equal(check.status, 0, check.stderr);
   const { passed, message } = checkById('tool-registry-configured').check(cwd);
@@ -701,7 +701,7 @@ test('tsk-3oa2: tool-registry-configured FAILS when a declared tool is missing o
   const cwd = mkTemp('fgos-tool-registry-degraded-');
   execFileSync('git', ['init', '-q'], { cwd });
   spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
-  declareCapacity(cwd, 'never-checked-tool', { kind: 'cli', capability: 'test-capability', probeCommand: 'echo' });
+  declareCapacity(cwd, 'never-checked-tool', { kind: 'tool', capability: 'test-capability', invocations: [{ via: 'cli', command: 'echo', args: [] }] });
   // Deliberately never runs `fgos tool check` -- the tool stays "unknown",
   // which classifyRegistryPosture reports as degraded (never inactive).
   const { passed, message } = checkById('tool-registry-configured').check(cwd);
