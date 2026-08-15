@@ -3,6 +3,38 @@
 Quyết định nguồn: `CONTEXT.md` (D1-D11) cùng thư mục. Thảo luận đầy đủ:
 `DISCUSSION.md`. Kế hoạch này **không mở lại** bất kỳ D-ID nào — chỉ trích.
 
+> ## ⚠ Kế hoạch này đã được NẮN LẠI (tsk-6d2, 2026-08-15) — đọc mục này trước
+>
+> Nhánh `fgw/tsk-ldb` fork từ điểm cách `main` hơn 550 commit. Trong lúc đó
+> **tsk-7l9 đã merge một API gateway REST thật** (`herdr-plugin/src/gateway.rs`:
+> 17 route dưới `/v1` + `/contract`, hợp đồng thật tại
+> `docs/contracts/fgos-gateway-api-v1.yaml`, auth `Authorization: Bearer`
+> một-token-mỗi-máy). Phần server của kế hoạch dưới đây vì thế **đã lệch thực
+> tế**. Quyết định nắn lại nằm ở
+> `docs/history/herdr-web-dashboard-plan-realignment/CONTEXT.md` (D1-D14);
+> bằng chứng ở `RESEARCH.md` cùng thư mục này.
+>
+> Trạng thái từng mảnh sau khi nắn:
+>
+> | Mảnh | Trạng thái |
+> |---|---|
+> | **P1** `tsk-48w` | **NẮN LẠI, không đóng** (realignment D14, supersede D4). Scope mới: cờ static-serving của gateway + đăng ký `fgos setup`/`doctor`. Phần secret riêng (cụm D9) bỏ hẳn. |
+> | **P2** `tsk-k4v` | **ĐÓNG** — `wontfix`, `supersededBy: tsk-7l9`. Gateway đã thay cả webserver core lẫn auth lớp 1. |
+> | **P3** `tsk-5jr` | Nắn: web client độc lập gọi `/v1` qua HTTP, trích contract yaml. Không còn dựng khung frontend. |
+> | **P4** `tsk-4id` | Nắn: như P3. Cảnh báo: **gateway chưa có route edit**, M03 edit-mode phụ thuộc route phải thêm trước. |
+> | **P5** `tsk-18to` | Giữ, vẫn optional. Lớp 1 nay là Bearer của gateway, không phải cookie-session do P2 xây. `deps` trỏ tsk-k4v đã gỡ. |
+> | *(mới)* `tsk-yo0` | Khung web client: vite + TypeScript + Tailwind dưới `herdr-plugin/web/` + lớp API client. Supersede D14 vốn giao việc này cho P3. |
+> | *(mới)* `tsk-54y` | Gateway: CORS layer + bind address cấu hình được (`gateway.rs:933` đang hardcode `127.0.0.1`, đi ngược chính D7 của cụm). |
+>
+> Hai điều toàn cục phải nhớ khi đọc phần dưới:
+>
+> - **Không có SSE/WebSocket.** Gateway chỉ có `GET /v1/state/digest` cheap-poll.
+>   Mọi chỗ trong kế hoạch này giả định server đẩy đều sai
+>   (realignment D9; `docs/ui-spec/15-system-events.md` đã sửa).
+> - **v1 nói chuyện với đúng MỘT gateway** (realignment D11). Việc chọn giữa
+>   nhiều gateway/project giữ nguyên trạng thái deferred sang `tsk-3b0`.
+>   Riêng phía server, việc một gateway quản mọi project là `tsk-2ok`.
+
 ## Mode: high-risk
 
 **8/10 flag áp dụng, trong đó 3 là hard-gate** (auth, audit/security,
@@ -95,6 +127,13 @@ không song song** — đây đúng loại va chạm `footprintOverlapAmong` sin
 
 ### P1 — config + doctor/setup registration
 
+> **NẮN LẠI (tsk-6d2)** — `tsk-48w` giữ nguyên, đổi scope thành **cờ
+> static-serving của gateway + đăng ký `fgos setup`/`doctor` cho cờ đó**.
+> Phần token/secret riêng bên dưới (cụm D9) **bỏ hẳn**: web client dùng
+> Bearer của gateway (realignment D13). Phần `bindAddress` chuyển sang
+> `tsk-54y`. Đoạn dưới giữ lại làm bối cảnh, không phải việc phải làm
+> nguyên văn.
+
 Thêm section config riêng cho web dashboard vào `.fgos/config.json` (cạnh
 `herdrOrchestrator`), đọc fail-closed từ Rust theo đúng khuôn
 `settings.rs` hiện có, **nhưng mặc định BẬT** (D10 — cố ý khác 4 toggle
@@ -120,6 +159,13 @@ existing covered behavior (`registrations.mjs` dùng chung mọi doctor check;
 `test/setup` 162 test), multi-domain (Node + Rust) = **5 flag, 1 hard-gate**.
 
 ### P2 — webserver core + auth lớp 1
+
+> **ĐÃ ĐÓNG (tsk-6d2)** — `tsk-k4v` ở `wontfix`, `supersededBy: tsk-7l9`.
+> Gateway đã có webserver thật và auth thật (`Bearer`, constant-time,
+> `gateway.rs:421-449`). **Đừng xây HTTP server thứ hai.** Phần
+> static-serving còn thiếu đã về `tsk-48w`; CORS + bind về `tsk-54y`. Cookie-session
+> `/api/login` mô tả bên dưới bị realignment D13 thay bằng Bearer. Đoạn
+> dưới chỉ còn giá trị lịch sử.
 
 axum + `rust-embed`/`axum-embed`, phục vụ static asset + health-check.
 Bind theo config, mặc định `0.0.0.0:8788` (D7 + D13), cảnh báo khi không
@@ -159,7 +205,25 @@ Frontend dựng bằng vite + TypeScript dưới `herdr-plugin/web/` (D14) —
 `package.json`/`vite.config.ts` dựng ở mảnh này vì đây là màn web đầu tiên;
 P4 dùng lại, không dựng lại.
 
+> **NẮN LẠI (tsk-6d2)** — hai chỗ:
+>
+> 1. **Khung frontend KHÔNG dựng ở đây nữa.** realignment D6 supersede D14:
+>    `package.json`/`vite.config.ts` + lớp API client là item riêng
+>    **`tsk-yo0`**; `deps` của tsk-5jr/tsk-4id đã trỏ vào nó.
+> 2. **Nguồn dữ liệu đổi.** Không đọc qua `WorkItemSource` trong binary
+>    nữa (cụm D1 đã bị tsk-7l9 D8 đóng) — đây là web client độc lập gọi
+>    `GET /v1/work` và `GET /v1/ready` qua HTTP, trích
+>    `docs/contracts/fgos-gateway-api-v1.yaml`. Làm tươi bằng cheap-poll
+>    `GET /v1/state/digest`, không phải server đẩy.
+
 ### P4 — task detail (mục tiêu chính)
+
+> **NẮN LẠI (tsk-6d2)** — web client độc lập gọi `GET /v1/work/{id}` và
+> `GET /v1/rollup/{id}`, trích contract yaml (realignment D10). Ba khối nội
+> dung (cụm D2/D3/D4) giữ nguyên. **Cảnh báo hợp đồng:** gateway hiện
+> **không có route edit** — `/work/{id}` chỉ có `get`. M03 edit-mode được
+> giữ theo realignment D1, nhưng route phải được thêm trước; đừng code
+> nhánh edit dựa trên endpoint chưa tồn tại.
 
 Ba khối: lịch sử agent đã làm (nguồn `CONTEXT.md`/`plan.md`, D3 + guard
 R6); lịch sử câu hỏi (ghép theo `seq`, D2); câu hỏi cần trả lời phủ **cả
@@ -169,6 +233,13 @@ bối-cảnh.
 ### P5 — cf-access (tuỳ chọn)
 
 Lớp 2 của D8. Port thẳng `herdr-gateway/src/web/cf_access.rs`.
+
+> **NẮN LẠI (tsk-6d2)** — `tsk-18to` giữ, **vẫn optional**. Khung hai lớp
+> cộng dồn của D8 không đổi, nhưng **lớp 1 nay là Bearer của chính
+> gateway**, không phải cookie-session do P2 xây (realignment D13 —
+> P2 đã đóng). `deps` trỏ tsk-k4v đã gỡ. Môi trường đã chốt là LAN/Tailscale
+> HTTP thuần (realignment D7) nên cf-access chưa cần ngay; nó thành cần khi
+> gateway phải phơi ra ngoài mạng riêng — đúng ngưỡng xem lại D13 ghi.
 
 ### Ca cần chứng minh (theo mức high-risk)
 

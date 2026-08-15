@@ -151,6 +151,25 @@ Bài học chung cho verify: một nhánh "không được chứa X" phải đư
 ở trạng thái mà nó PHẢI đỏ. Nhánh chứng minh rỗng nguy hiểm hơn nhánh
 thiếu, vì nó trông như đã được chứng minh.
 
+Cái bẫy thứ ba, lộ ra khi CHẠY THẬT lúc thi công: ngay cả bản phủ định
+đúng cú pháp vẫn sai về ngữ nghĩa. `! ... | grep -q "tsk-k4v"` grep TOÀN BỘ
+JSON của item, nên nó đỏ vì `description` của tsk-18to — thứ hợp lệ phải
+nhắc tsk-k4v để giải thích vì sao dep bị gỡ — chứ không phải vì `deps` còn
+dep. Bản đúng nhắm thẳng field: `grep -q "\"deps\": \[\],"`. Đây không phải
+làm yếu check mà là sửa một check không đo được thứ nó định đo; bản mới
+CHẶT hơn, vì nó khẳng định `deps` rỗng thay vì khẳng định một chuỗi vắng
+mặt ở đâu đó.
+
+Bài học chung thứ hai: grep trên JSON của cả item không phân biệt được
+field với văn bản mô tả. Muốn khẳng định về một field thì phải neo vào
+đúng khoá của field đó.
+
+Cái bẫy thứ tư, thuộc về cách CHẠY verify chứ không phải nội dung nó:
+`sh verify.sh | tail -12; echo $?` in ra exit của `tail`, không phải của
+verify — lần chạy đầu báo `0` trong khi verify thật sự đỏ. Muốn đọc kết
+quả thật thì phải redirect ra file rồi lấy `$?`, đừng bao giờ nối pipe
+trước khi đọc mã thoát.
+
 Verify cố ý kiểm **state** (`status` + `supersededBy` của cả hai item bị đóng) chứ không chỉ kiểm file, vì phần rủi ro cao nhất của item này nằm ở state ops chứ không nằm ở tài liệu. `list --id <id>` scope cả `decisions`/`outcomes` theo item (đã kiểm: `decisions: []` khi list một item chưa có decision riêng), nên `grep "\"status\": \"wontfix\""` không thể ăn nhầm chữ "wontfix" trong văn bản decision.
 
 ## Assumptions

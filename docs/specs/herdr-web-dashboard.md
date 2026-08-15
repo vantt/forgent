@@ -274,12 +274,18 @@ leaving a reader to discover them:
   needs its own item and its own decision — the authorization layer's own
   scope, not this spec's, and not something to be improvised inside the web
   client.
-- **The gateway's own API contract does not exist yet.** tsk-7l9 D10 locks
-  that gateway's API will be a real, versioned, checked-in contract carrying
-  its own contract number. It has not been written. This spec therefore
-  describes operations in product terms and deliberately invents no endpoint
-  shapes; once that contract lands, this spec should cite it instead of
-  describing the boundary in prose.
+- **The gateway's own API contract now exists** —
+  `docs/contracts/fgos-gateway-api-v1.yaml`, landed by tsk-7l9, carrying 18
+  paths that match `herdr-plugin/src/gateway.rs`'s registered routes 1-to-1.
+  This spec still describes operations in product terms rather than
+  restating endpoint shapes, but that contract — not this prose — is the
+  boundary's source of truth, and any surface built against it cites it
+  directly. Two facts from it constrain this spec's own surfaces and are
+  recorded here rather than left to be rediscovered: there is **no edit
+  route** (`/work/{id}` is `get` only), so M03's edit mode depends on a
+  route that has to be added first; and there is **no SSE or WebSocket**,
+  only a `GET /state/digest` cheap poll, which is why `15-system-events.md`
+  describes client-derived events rather than server-pushed ones.
 - **Multi-project and multi-endpoint behaviour is only half-decided.** The
   client must not assume one fixed gateway (tsk-7l9 D2, R1), but how a person
   chooses between projects and instances, and how the surface shows which one
