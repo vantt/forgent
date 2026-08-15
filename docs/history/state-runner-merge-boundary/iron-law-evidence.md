@@ -378,3 +378,65 @@ Also folded in, both orphaned by this same branch and confirmed dead:
 `bin/fgos.mjs` no longer imports `changedFiles` (its only three call sites
 were the Iron Law checks that moved into `iron-law-gate.mjs`), and
 `worktree.mjs`'s `gitRead` doc no longer claims to be exported.
+
+---
+
+## tsk-h6r — `review --pr` validated in the verb, not the adapter
+
+Last live finding from the branch review, re-confirmed against the tip after
+`tsk-2fx`.
+
+**Why the gate fires.** `classifyIronLaw` matched `bin/fgos.mjs`.
+
+**Command used as the failing-before / passing-after proof** — the item's
+own registered `verify`:
+
+```
+npm test \
+  && test -f test/cli/fgos-review-pr-precedence.test.mjs \
+  && ! grep -qF "optionalField(flags.pr" bin/fgos.mjs
+```
+
+### RED — reproduced by hand first
+
+```
+$ <main>/bin/fgos.mjs review nosuch --github --pr --dir <repo-old>/.fgos
+fgos: review: work "nosuch" not found.
+
+$ <branch>/bin/fgos.mjs review nosuch --github --pr --dir <repo-new>/.fgos
+fgos: review --github --pr requires a PR number: --pr <n>
+```
+
+Exit 4 either way, so nothing keyed on exit codes changes — the cost is that
+a caller with both a bad id and a bare `--pr` is told about the flag instead
+of the item that does not exist.
+
+### RED — the regression test, run against the unfixed tree
+
+Fix stashed (`git stash push -u -m tsk-h6r-fix-probe -- bin/fgos.mjs
+src/verbs/merge/review.mjs`):
+
+```
+$ node --test test/cli/fgos-review-pr-precedence.test.mjs
+✖ review on an unknown id reports the item, not the bare --pr flag (tsk-h6r)
+ℹ tests 3  ℹ pass 2  ℹ fail 1
+```
+
+The other two cases pass on both sides deliberately: they pin that the
+refusal still happens once the guards ahead of it pass, and that a stray
+`--pr` without `--github` stays ignored. Building that second case also
+surfaced a guard this evidence should record: the `--pr` check sits behind
+`classifySource`, so the fixture has to be runner-sourced — a legacy item is
+refused for its source first, on both main and the branch.
+
+### GREEN — after the change
+
+```
+$ node --test test/cli/fgos-review-pr-precedence.test.mjs
+ℹ tests 3  ℹ pass 3  ℹ fail 0
+
+$ npm test
+ℹ tests 3347
+ℹ pass 3342
+ℹ fail 0
+```

@@ -2897,12 +2897,17 @@ async function runVerb(verb, flags, positional, dir) {
     // as `ready`/`list`/`check`.
     case 'review': {
       const id = requireField(positional[0] ?? flags.id, 'review requires an id: fgos review <id>');
-      // `--pr` is only ever parsed on the `--github` path, exactly as
-      // before: a stray `--pr` without `--github` stays ignored rather
-      // than becoming a new validation refusal.
-      const github = Boolean(flags.github);
-      const prNumber = github ? optionalField(flags.pr, 'review --github --pr requires a PR number: --pr <n>') : undefined;
-      return await reviewUseCase({ dir, cwd: process.cwd() }, { id, github, prNumber, ...ghCommandOpts() });
+      // `--pr` is forwarded RAW and validated inside the use case, at the
+      // point the old case block validated it: after the found/status
+      // guards, inside the `--github` branch. Checking it here instead
+      // would let a bare `--pr` outrank a nonexistent id in the refusal,
+      // and would turn a stray `--pr` without `--github` — ignored before —
+      // into a new validation error. `approve` already keeps its own `--pr`
+      // check inside its use case for the same reason.
+      return await reviewUseCase(
+        { dir, cwd: process.cwd() },
+        { id, github: Boolean(flags.github), prNumber: flags.pr, ...ghCommandOpts() },
+      );
     }
 
     case 'approve': {
