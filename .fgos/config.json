@@ -89,8 +89,13 @@
         "critical": "opus"
       },
       "gemini": {
-        "lightweight": "Gemini 3.5 Flash (Medium)"
+        "lightweight": "gemini-3.6-flash-medium"
       }
+    },
+    "models": {
+      "light": "haiku",
+      "standard": "sonnet",
+      "heavy": "opus"
     }
   },
   "gateBypass": {
