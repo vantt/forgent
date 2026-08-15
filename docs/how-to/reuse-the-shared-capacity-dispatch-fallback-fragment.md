@@ -26,9 +26,10 @@ changed. That's why the branch logic now lives in one shared file instead.
 1. **Wire the config/registration steps first**, following
    `docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-capacity.md`
    steps 1–3 (unchanged, still skill-agnostic): add a `.fgos/config.json`
-   `runner.capacities.<id>` entry, `fgos tool register`
-   it, and confirm it resolves via `dispatch.mjs`'s `resolve` CLI
-   subcommand.
+   `runner.capacities.<id>` entry, declare it as a tool-registry entry too
+   (a `capability` field on that same entry, tsk-in1-1 D1 — no longer a
+   `fgos tool register` verb call), and confirm it resolves via
+   `dispatch.mjs`'s `resolve` CLI subcommand.
 
 2. **Point your `SKILL.md`'s reasoning step at the shared fragment**
    instead of inlining the branch logic:

@@ -30,8 +30,8 @@ import {
   INVOCATION_VIA,
   capacityIdForWork,
 } from '../../src/runner/dispatch.mjs';
-import { initStore, registerTool, addWork } from '../../src/state/store.mjs';
-import { writeLocalStatus, findExecutableOnPath } from '../../src/state/tool-registry.mjs';
+import { initStore, addWork } from '../../src/state/store.mjs';
+import { findExecutableOnPath } from '../../src/state/tool-registry.mjs';
 import { resolveMainCheckoutRoot } from '../../src/runner/paths.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this
@@ -471,7 +471,7 @@ test('loadRunnerConfig rejects an unknown "adapter" value on a per-tier executor
 // --- tsk-62v: capacity-aware `capacities` schema (D1/D2) -----------------
 
 test('CAPACITY_KINDS reuses tool-registry\'s KINDS verbatim plus "task" (D2) — never a separate vocabulary', () => {
-  assert.deepEqual(CAPACITY_KINDS, ['cli', 'binary', 'mcp', 'skill', 'http', 'task']);
+  assert.deepEqual(CAPACITY_KINDS, ['cli', 'binary', 'mcp', 'skill', 'task']);
 });
 
 test('loadRunnerConfig accepts a config with no "capacities" block at all — pre-tsk-62v shape, unchanged', () => {
@@ -1168,8 +1168,6 @@ test('resolveCapacityCli resolves a cross-provider capacity\'s own providerModel
   const root = mkTempDir();
   const fgosDir = path.join(root, '.fgos');
   initStore(fgosDir);
-  registerTool(fgosDir, { name: 'agy', kind: 'cli', capability: 'agy', command: 'agy' });
-  writeLocalStatus(fgosDir, { agy: { status: 'present', checkedAt: new Date().toISOString() } });
   writeRunnerConfigFixture(root, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     capacities: {
@@ -1391,8 +1389,6 @@ test('resolveExecutorCommand throws a RunnerConfigError when a kind:"cli" capaci
 test('resolveExecutorCommand throws a RunnerConfigError when a kind:"cli" capacity is registered but not present on this machine', () => {
   const dir = mkTempDir();
   initStore(dir);
-  registerTool(dir, { name: 'fgos-code-implement', kind: 'cli', capability: 'coding', command: 'agy-definitely-not-on-path-xyz' });
-  writeLocalStatus(dir, { 'fgos-code-implement': { status: 'missing', checkedAt: new Date().toISOString() } });
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     capacities: { 'fgos-code-implement': { kind: 'cli', target: 'agy-definitely-not-on-path-xyz' } },
@@ -1408,8 +1404,6 @@ test('resolveExecutorCommand throws a RunnerConfigError when a kind:"cli" capaci
 test('resolveExecutorCommand resolves a kind:"cli" capacity through fgos-tool-query presence, falling through to executors.<tier> for the command, when registered and present', () => {
   const dir = mkTempDir();
   initStore(dir);
-  registerTool(dir, { name: 'fgos-code-implement', kind: 'cli', capability: 'coding', command: 'agy' });
-  writeLocalStatus(dir, { 'fgos-code-implement': { status: 'present', checkedAt: new Date().toISOString() } });
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { standard: { command: '/standard/executor', args: ['{prompt}'] } },
@@ -1457,8 +1451,6 @@ for (const kind of ['mcp', 'skill', 'http', 'binary']) {
     const dir = mkTempDir();
     initStore(dir);
     const scanTarget = ['mcp', 'skill'].includes(kind) ? mkTempDir() : undefined;
-    registerTool(dir, { name: 'fgos-code-implement', kind, capability: 'coding', command: 'agy-definitely-not-on-path-xyz', scanTarget });
-    writeLocalStatus(dir, { 'fgos-code-implement': { status: 'missing', checkedAt: new Date().toISOString() } });
     const cfg = {
       executor: { command: '/global/executor', args: ['{prompt}'] },
       capacities: { 'fgos-code-implement': { kind, target: 'agy-definitely-not-on-path-xyz' } },
@@ -1947,8 +1939,6 @@ test('spawnWorker threads opts.fgosDir into a kind:"cli" capacity\'s presence ch
   const dir = mkTempDir();
   const fgosDir = mkTempDir();
   initStore(fgosDir);
-  registerTool(fgosDir, { name: 'fgos-coding-implement', kind: 'cli', capability: 'coding', command: 'agy' });
-  writeLocalStatus(fgosDir, { 'fgos-coding-implement': { status: 'present', checkedAt: new Date().toISOString() } });
   const scriptPath = writeEchoExecutor(dir);
   const cfg = {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
@@ -2222,8 +2212,6 @@ test('resolveExecutorCommand with no capacities block at all never triggers cros
 test('resolveExecutorCommand throws for a non-Claude "cli" capacity even when fgosDir is given (cross-provider governance is independent of the retired presence gate, tsk-5tm-1 D1)', () => {
   const dir = mkTempDir();
   initStore(dir);
-  registerTool(dir, { name: 'fgos-code-implement', kind: 'cli', capability: 'coding', command: 'agy' });
-  writeLocalStatus(dir, { 'fgos-code-implement': { status: 'present', checkedAt: new Date().toISOString() } });
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
     capacities: { 'fgos-code-implement': { kind: 'cli', command: 'agy', args: ['{prompt}'] } },
@@ -2269,8 +2257,6 @@ test('resolveCapacityCli resolves a kind:"cli" capacity through its own tier and
   const root = mkTempDir();
   const fgosDir = path.join(root, '.fgos');
   initStore(fgosDir);
-  registerTool(fgosDir, { name: 'submit-assist-classify', kind: 'cli', capability: 'submit-assist-classify', command: 'agy' });
-  writeLocalStatus(fgosDir, { 'submit-assist-classify': { status: 'present', checkedAt: new Date().toISOString() } });
   writeRunnerConfigFixture(root, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     capacities: { 'submit-assist-classify': { kind: 'cli', command: 'agy', provider: 'agy', args: ['{prompt}'], tier: 'light', allowCrossProvider: true } },
@@ -2285,8 +2271,6 @@ test('resolveCapacityCli honors a caller-supplied model override over both the c
   const root = mkTempDir();
   const fgosDir = path.join(root, '.fgos');
   initStore(fgosDir);
-  registerTool(fgosDir, { name: 'submit-assist-classify', kind: 'cli', capability: 'submit-assist-classify', command: 'agy' });
-  writeLocalStatus(fgosDir, { 'submit-assist-classify': { status: 'present', checkedAt: new Date().toISOString() } });
   writeRunnerConfigFixture(root, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     capacities: { 'submit-assist-classify': { kind: 'cli', command: 'agy', provider: 'agy', args: ['{model}:{prompt}'], tier: 'light', model: 'flash-3.5', allowCrossProvider: true } },
@@ -2867,8 +2851,6 @@ test('resolveCapacityCli resolves purpose-based (--for) to the same command a po
   const root = mkTempDir();
   const fgosDir = path.join(root, '.fgos');
   initStore(fgosDir);
-  registerTool(fgosDir, { name: 'gather', kind: 'cli', capability: 'gather', command: 'agy' });
-  writeLocalStatus(fgosDir, { gather: { status: 'present', checkedAt: new Date().toISOString() } });
   writeRunnerConfigFixture(root, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     capacities: { gather: { kind: 'cli', for: 'judge', carries: 'repo-content', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },

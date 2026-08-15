@@ -551,32 +551,12 @@ function applyEvent(view, event) {
       }
       break;
     }
-    case 'tool.register': {
-      // Additive event type (tsk-1dj, tool-registry-capability port): a full
-      // record OVERWRITE keyed by name, mirroring work.add's per-id shape —
-      // register never merges partial fields (there is no `tool.edit`).
-      // `tools` is a LAZY key exactly like `outcomes`/`frictions`/`gates`:
-      // absent from the view until the first tool.register event folds
-      // (backward-compat).
-      const tool = event.payload;
-      if (tool && typeof tool === 'object' && typeof tool.name === 'string') {
-        if (!view.tools) {
-          view.tools = {};
-        }
-        view.tools[tool.name] = { ...tool };
-      }
-      break;
-    }
-    case 'tool.remove': {
-      // Mirrors tool.register above — deletes the keyed entry outright
-      // (never a tombstone/soft-delete); a remove for a name that was never
-      // registered, or already removed, is a no-op guarded by `view.tools`.
-      const { name } = event.payload ?? {};
-      if (typeof name === 'string' && view.tools) {
-        delete view.tools[name];
-      }
-      break;
-    }
+    // tsk-in1-1 D1: `tool.register`/`tool.remove` retired — a tool provider
+    // is now declared directly in `runner.capacities.<id>` (config-edited,
+    // never event-sourced). Historical events of either type already in
+    // `.fgos/events.jsonl` fall through to `default` below and are skipped,
+    // same forward-compatible "unknown type, not an error" treatment any
+    // other retired event type gets.
     default:
       // Forward-compatible: an event type this view does not (yet) know how
       // to fold is skipped, not an error — readEvents already guarantees

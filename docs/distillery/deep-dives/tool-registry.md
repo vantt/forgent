@@ -150,11 +150,21 @@ Lấy **data model + degrade ladder của repository-harness/symphony** (vì fgO
 
 *(R/E/F giữ nguyên rubric distillery hiện có; đây là đề xuất điều chỉnh dòng đã tồn tại ở porting-log.md:34, không tạo dòng mới trùng — cần human xác nhận trước khi sửa porting-log.)*
 
-## Cấu hình forgentX hiện tại (tsk-4ad)
+## Cấu hình forgentX hiện tại (tsk-4ad; register/remove rút bởi tsk-in1-1 D1)
 
 Verb-group `fgos tool` (port của tsk-1dj) đã sống trong `bin/fgos.mjs`; mục
 này chỉ ghi lại cấu hình THẬT của repo forgentX hôm nay, và cách một người
 khác tự chỉnh/mở rộng nó mà không cần hỏi lại.
+
+> **tsk-in1-1 D1** (sau tsk-4ad): `register`/`remove` — 2 verb CLI mô tả
+> ngay dưới đây — đã bị rút. Provider giờ khai báo thẳng trong
+> `runner.capacities.<id>` (`.fgos/config.json`), sửa file config như mọi
+> `capacities` entry khác (`toolsFromCapacities`, `src/state/
+> tool-registry.mjs`, nhặt entry nào khai `capability`), không qua event-log
+> nữa. Chi tiết shape hiện tại + lý do: `docs/reference/forgentx-tool-
+> registry-configuration.md`. Phần narrative bên trên (trước mục này) là
+> ghi chép thiết kế TẠI THỜI ĐIỂM port (tsk-1dj/tsk-4ad) — giữ nguyên làm
+> lịch sử quyết định, không sửa theo đổi mới này.
 
 **Đăng ký sống** (xác nhận bằng `fgos tool query --capability impact-analysis --json`):
 

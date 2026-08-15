@@ -662,7 +662,19 @@ test('fgos check (CLI e2e) reports changelogNag and appends a checkpoint to chan
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
-test('tool-registry-configured passes when no tool is registered at all (inactive — a clean skip, never a failure)', () => {
+// tsk-in1-1 D1: a tool provider is declared directly in
+// `runner.capacities.<id>` (`.fgos/config.json`), config-edited like every
+// other capacity, never through a `fgos tool register` event.
+function declareCapacity(cwd, id, fields) {
+  const configPath = path.join(cwd, '.fgos', 'config.json');
+  const cfg = fs.existsSync(configPath) ? JSON.parse(fs.readFileSync(configPath, 'utf8')) : {};
+  cfg.runner ??= {};
+  cfg.runner.capacities ??= {};
+  cfg.runner.capacities[id] = fields;
+  fs.writeFileSync(configPath, JSON.stringify(cfg, null, 2));
+}
+
+test('tool-registry-configured passes when no tool-capable capacity is declared at all (inactive — a clean skip, never a failure)', () => {
   const cwd = mkTemp('fgos-tool-registry-inactive-');
   execFileSync('git', ['init', '-q'], { cwd });
   spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
@@ -672,15 +684,11 @@ test('tool-registry-configured passes when no tool is registered at all (inactiv
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
-test('tool-registry-configured passes when every registered tool is checked present (full)', () => {
+test('tool-registry-configured passes when every declared tool is checked present (full)', () => {
   const cwd = mkTemp('fgos-tool-registry-full-');
   execFileSync('git', ['init', '-q'], { cwd });
   spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
-  const register = spawnSync(process.execPath, [
-    FGOS, 'tool', 'register',
-    '--name', 'echo-tool', '--kind', 'cli', '--capability', 'test-capability', '--command', 'echo',
-  ], { cwd, encoding: 'utf8' });
-  assert.equal(register.status, 0, register.stderr);
+  declareCapacity(cwd, 'echo-tool', { kind: 'cli', capability: 'test-capability', probeCommand: 'echo' });
   const check = spawnSync(process.execPath, [FGOS, 'tool', 'check'], { cwd, encoding: 'utf8' });
   assert.equal(check.status, 0, check.stderr);
   const { passed, message } = checkById('tool-registry-configured').check(cwd);
@@ -689,19 +697,15 @@ test('tool-registry-configured passes when every registered tool is checked pres
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
-test('tsk-3oa2: tool-registry-configured FAILS when a registered tool is missing or never checked (degraded) -- no longer a silent passed:true', () => {
+test('tsk-3oa2: tool-registry-configured FAILS when a declared tool is missing or never checked (degraded) -- no longer a silent passed:true', () => {
   const cwd = mkTemp('fgos-tool-registry-degraded-');
   execFileSync('git', ['init', '-q'], { cwd });
   spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
-  const register = spawnSync(process.execPath, [
-    FGOS, 'tool', 'register',
-    '--name', 'never-checked-tool', '--kind', 'cli', '--capability', 'test-capability', '--command', 'echo',
-  ], { cwd, encoding: 'utf8' });
-  assert.equal(register.status, 0, register.stderr);
+  declareCapacity(cwd, 'never-checked-tool', { kind: 'cli', capability: 'test-capability', probeCommand: 'echo' });
   // Deliberately never runs `fgos tool check` -- the tool stays "unknown",
   // which classifyRegistryPosture reports as degraded (never inactive).
   const { passed, message } = checkById('tool-registry-configured').check(cwd);
-  assert.equal(passed, false, 'a registered-but-unverified tool must fail the check, not silently pass as before this fix');
+  assert.equal(passed, false, 'a declared-but-unverified tool must fail the check, not silently pass as before this fix');
   assert.match(message, /^degraded/);
   assert.match(message, /fgos tool check/);
   fs.rmSync(cwd, { recursive: true, force: true });

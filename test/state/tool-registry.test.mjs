@@ -3,13 +3,11 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import net from 'node:net';
 import { execSync } from 'node:child_process';
 import {
-  ToolRegistryError,
   KINDS,
   normalizeCapability,
-  validateToolRegistration,
+  toolsFromCapacities,
   probeTool,
   readLocalStatus,
   writeLocalStatus,
@@ -36,50 +34,33 @@ test('normalizeCapability returns "" for non-string or content-free input', () =
   assert.equal(normalizeCapability('---'), '');
 });
 
-// ─── validateToolRegistration ───────────────────────────────────────────────
+// ─── toolsFromCapacities ─────────────────────────────────────────────────────
 
-const VALID_MCP = { name: 'gitnexus', kind: 'mcp', capability: 'impact-analysis', command: 'mcp:gitnexus', scanTarget: '.gitnexus' };
-
-test('validateToolRegistration accepts a well-formed mcp registration and normalizes capability', () => {
-  const record = validateToolRegistration(VALID_MCP, []);
-  assert.equal(record.name, 'gitnexus');
-  assert.equal(record.kind, 'mcp');
-  assert.equal(record.capability, 'impact-analysis');
-  assert.equal(record.scanTarget, '.gitnexus');
+test('toolsFromCapacities maps a capability-bearing capacity into a tool-shaped object, normalizing capability', () => {
+  const capacities = {
+    gitnexus: { kind: 'mcp', capability: 'Impact Analysis', probeCommand: 'mcp:gitnexus', scanTarget: '.gitnexus', responsibility: 'Verification', description: 'Code-graph blast radius' },
+  };
+  const tools = toolsFromCapacities(capacities);
+  assert.deepEqual(Object.keys(tools), ['gitnexus']);
+  assert.equal(tools.gitnexus.name, 'gitnexus');
+  assert.equal(tools.gitnexus.kind, 'mcp');
+  assert.equal(tools.gitnexus.capability, 'impact-analysis');
+  assert.equal(tools.gitnexus.command, 'mcp:gitnexus');
+  assert.equal(tools.gitnexus.scanTarget, '.gitnexus');
 });
 
-test('validateToolRegistration rejects a duplicate name', () => {
-  assert.throws(() => validateToolRegistration(VALID_MCP, ['gitnexus']), ToolRegistryError);
+test('toolsFromCapacities skips a capacity declaring no capability (a plain agent/dispatch capacity, e.g. "agy")', () => {
+  const capacities = { agy: { kind: 'cli', invocations: [{ via: 'cli', command: 'agy', args: [] }] } };
+  assert.deepEqual(toolsFromCapacities(capacities), {});
 });
 
-test('validateToolRegistration rejects an out-of-domain kind', () => {
-  assert.throws(() => validateToolRegistration({ ...VALID_MCP, kind: 'sql' }, []), ToolRegistryError);
+test('toolsFromCapacities skips a capacity whose capability normalizes to empty', () => {
+  assert.deepEqual(toolsFromCapacities({ x: { kind: 'cli', capability: '---' } }), {});
 });
 
-test(`validateToolRegistration accepts every kind in ${KINDS.join('/')}`, () => {
-  for (const kind of KINDS) {
-    const scanRequired = kind === 'mcp' || kind === 'skill';
-    const fields = { name: `tool-${kind}`, kind, capability: 'x', command: 'x', ...(scanRequired ? { scanTarget: '.x' } : {}) };
-    assert.doesNotThrow(() => validateToolRegistration(fields, []));
-  }
-});
-
-test('validateToolRegistration rejects an empty capability', () => {
-  assert.throws(() => validateToolRegistration({ ...VALID_MCP, capability: '---' }, []), ToolRegistryError);
-});
-
-test('validateToolRegistration rejects a missing --command', () => {
-  const { command, ...rest } = VALID_MCP;
-  assert.throws(() => validateToolRegistration(rest, []), ToolRegistryError);
-});
-
-test('validateToolRegistration requires --scan for kind mcp/skill (not on PATH)', () => {
-  const { scanTarget, ...rest } = VALID_MCP;
-  assert.throws(() => validateToolRegistration(rest, []), ToolRegistryError);
-});
-
-test('validateToolRegistration does NOT require --scan for kind cli/binary/http', () => {
-  assert.doesNotThrow(() => validateToolRegistration({ name: 'linter', kind: 'cli', capability: 'lint', command: 'eslint' }, []));
+test('toolsFromCapacities on undefined/empty input returns {}', () => {
+  assert.deepEqual(toolsFromCapacities(undefined), {});
+  assert.deepEqual(toolsFromCapacities({}), {});
 });
 
 // ─── probeTool ───────────────────────────────────────────────────────────────
@@ -138,18 +119,8 @@ test('probeTool on kind mcp/skill resolves "stale" when scanTarget/meta.json las
   assert.equal(stale, 'stale');
 });
 
-test('probeTool on kind http resolves "present" when something is listening, "missing" otherwise', async () => {
-  const server = net.createServer();
-  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
-  const port = server.address().port;
-  try {
-    const present = await probeTool({ kind: 'http', command: `127.0.0.1:${port}` }, process.cwd());
-    assert.equal(present, 'present');
-  } finally {
-    server.close();
-  }
-  const missing = await probeTool({ kind: 'http', command: '127.0.0.1:1' }, process.cwd());
-  assert.equal(missing, 'missing');
+test('KINDS no longer includes "http" — 0 real usage confirmed at tsk-in1-1 time (DISCUSSION.md §3 #14)', () => {
+  assert.deepEqual(KINDS, ['cli', 'binary', 'mcp', 'skill']);
 });
 
 // ─── local status overlay ────────────────────────────────────────────────────

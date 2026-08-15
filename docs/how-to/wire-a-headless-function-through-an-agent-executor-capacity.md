@@ -57,11 +57,13 @@ mechanism:
    guard is `undefined`-safe by construction.
 
 2. **Pass `fgosDir` too when the caller already has the `.fgos/` dir in
-   scope** — it costs nothing extra and buys the same `kind: "cli"`
-   presence check `spawnWorker` (cli-dispatch) already gets: a misconfigured
-   capacity fails with a named `RunnerConfigError`
-   (`capacity "<id>" declares kind "cli" but is not registered — run "fgos
-   tool register ..."`) instead of a bare subprocess ENOENT. In tsk-2yp,
+   scope** — costs nothing extra to thread through. Note this no longer
+   buys an automatic presence check: `resolveExecutorConfig` retired its
+   own `capacities.<capacityId>` presence/staleness gate at `tsk-5tm-1` D1
+   (predating tsk-in1-1's own `fgos tool register`→config-declared
+   retirement) — a caller wanting that check now asks for it explicitly
+   with `fgos tool query --status present` at its own call site (see
+   `docs/reference/forgentx-tool-registry-configuration.md`). In tsk-2yp,
    both `resolveDiscovery(dir, id, cfg, role)` and
    `resolveDecompose(dir, id, cfg, role)` already had `dir` (the exact
    `.fgos/` path — the same value they pass to `listWork(dir)`) in scope at

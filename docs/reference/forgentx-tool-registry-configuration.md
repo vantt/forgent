@@ -3,9 +3,17 @@
 Lookup facts about the `fgos tool` registry's real, live configuration in
 this repo (`tsk-4ad`), quoted from `docs/distillery/deep-dives/tool-
 registry.md`'s "Cấu hình forgentX hiện tại (tsk-4ad)" section — the verb
-group itself (`register`/`check`/`query`/`remove`) is the `tsk-1dj` port;
-this reference covers only what is actually configured today and how to
-read/extend it without asking again.
+group itself (`check`/`query`) is the `tsk-1dj` port; this reference covers
+only what is actually configured today and how to read/extend it without
+asking again.
+
+> **tsk-in1-1 D1**: `register`/`remove` đã bị rút — provider giờ khai báo
+> thẳng trong `runner.capacities.<id>` (`.fgos/config.json`), sửa file
+> config như mọi `capacities` entry khác, không qua verb CLI riêng.
+
+(tsk-in1-1 D1: `register`/`remove` are retired — a provider is now
+declared directly in `runner.capacities.<id>` (`.fgos/config.json`), edited
+like any other `capacities` entry, no longer through a dedicated CLI verb.)
 
 ## Registered providers
 
@@ -34,30 +42,47 @@ label, the registry itself applies no policy.)
 
 ## Registering a new provider
 
-```
-fgos tool register --name <ten> --kind <cli|binary|mcp|skill|http> \
-  --capability <nhan> --command <lenh-hoac-mcp:ten> \
-  [--scan <duong-dan>] [--responsibility <vai-tro>] [--description "..."] \
-  --dir <main-checkout-root>
+Sửa thẳng `.fgos/config.json` — thêm 1 entry `runner.capacities.<id>` có
+`capability` (điểm phân biệt "tool" khỏi 1 capacity dispatch bình thường
+như `agy` — `toolsFromCapacities`, `src/state/tool-registry.mjs`, chỉ
+nhặt entry nào khai `capability`):
+
+```json
+"runner": {
+  "capacities": {
+    "<id>": {
+      "kind": "cli | binary | mcp | skill",
+      "capability": "<nhan>",
+      "probeCommand": "<lenh-hoac-mcp:ten>",
+      "scanTarget": "<duong-dan, chi mcp/skill>",
+      "responsibility": "<vai-tro, optional>",
+      "description": "<mo-ta, optional>"
+    }
+  }
+}
 ```
 
-> `--scan` bắt buộc cho `kind` `mcp`/`skill` (không nằm trên `PATH`,
-> presence check bằng scan path trên đĩa thay vì `command -v`). `--name`
-> phải duy nhất — đăng ký trùng tên bị từ chối thẳng
-> (`validateToolRegistration`); muốn thay một provider đã có, `fgos tool
-> remove --name <ten>` trước rồi `register` lại. Chạy từ một worktree
-> (không phải main checkout) luôn cần `--dir` trỏ về main checkout —
-> registry là state chia sẻ chung một chỗ, không phải per-branch
-> (ADR0020).
+> `scanTarget` bắt buộc cho `kind` `mcp`/`skill` (không nằm trên `PATH`,
+> presence check bằng scan path trên đĩa thay vì `command -v`). `<id>`
+> (khoá object) đóng vai trò `--name` cũ — phải duy nhất trong
+> `capacities`, engine đã tự đảm bảo (JSON object key). `probeCommand`
+> (không phải `command`) cố ý tránh field `command`/`args` sẵn có của
+> `dispatch.mjs`'s executor shape — khai `command` cho 1 entry không có
+> `args` sẽ bị `validateCapacityShape` từ chối vì đọc nhầm thành executor
+> block. Đây là state chia sẻ chung một chỗ (`.fgos/config.json`), không
+> phải per-branch (ADR0020) — sửa trong main checkout, không phải trong
+> worktree của 1 item.
 
-(`--scan` is required for `kind` `mcp`/`skill` — not on PATH, presence is
-checked by scanning a disk path instead of `command -v`. `--name` must be
-unique — a duplicate registration is rejected outright
-(`validateToolRegistration`); to replace an existing provider, `fgos tool
-remove --name <name>` first, then `register` again. Run from a worktree
-(not the main checkout), `--dir` must always point at the main checkout —
-the registry is shared state in one place, never per-branch, per
-ADR0020.)
+(`scanTarget` is required for `kind` `mcp`/`skill` — not on PATH, presence
+is checked by scanning a disk path instead of `command -v`. `<id>` (the
+object key) plays the old `--name`'s role — must be unique within
+`capacities`, which the engine already guarantees (a JSON object key).
+`probeCommand` (never `command`) deliberately avoids `dispatch.mjs`'s own
+executor-shape `command`/`args` fields — declaring `command` on an entry
+with no `args` would be rejected by `validateCapacityShape`, which would
+misread it as an executor block. This is shared state in one place
+(`.fgos/config.json`), never per-branch (ADR0020) — edit it in the main
+checkout, not inside an item's own worktree.)
 
 ## Probing and reading status
 
@@ -97,43 +122,42 @@ never `check`ed (`unknown`); a real gap — flag a weak-proof warning in a
 verify/plan note, but keep going on everything else. **full** — every
 registered tool is `present`; existing MUST behavior stays unchanged.)
 
-## Registering a capacity for capacity-aware dispatch (tsk-62v)
+## A tool-registry entry is never an automatic presence gate for dispatch (tsk-62v, tsk-5tm-1 D1)
 
-> The runner config's optional `capacities.<capacityId>` block (D1, in
-> `.fgos/config.json`'s `runner` section) can
-> declare `"kind": "cli"` for a capacity dispatched through `dispatch.mjs`'s
-> `resolveExecutorConfig`. When it does, presence is checked by consulting
-> this SAME registry (`fgos tool query`'s own functions, called
-> in-process) instead of re-probing PATH independently — reusing the
-> discovery layer above, not building a second one. This only works if the
-> capacity was registered first, with `--name` matching the capacity's own
-> id exactly:
+> `capacities.<capacityId>`'s own presence/staleness was checked
+> automatically by `resolveExecutorConfig` once (tsk-62v D1/D2) — retired
+> at `tsk-5tm-1` D1: 2/3 real entries were `kind:"task"`, for which it
+> never ran, and the third's signal added nothing an OS `ENOENT` on a
+> missing binary didn't already give for free. `resolveExecutorConfig`
+> never consults this registry today, for ANY `capacityId` — a `capacities`
+> entry declaring a `capability` (making it also a tool-registry entry, the
+> "Registering a new provider" section above) and one that does not
+> dispatch and probe completely independently. A caller that wants a real
+> presence gate before dispatching a specific capacity asks for it itself,
+> explicitly, at the call site:
 >
 > ```
-> fgos tool register --name <capacityId> --kind cli \
->   --capability <nhan> --command <lenh> --dir <main-checkout-root>
-> fgos tool check --name <capacityId> --dir <main-checkout-root>
+> fgos tool query --capability <nhan> --status present --dir <main-checkout-root>
 > ```
 >
-> Thiếu bước đăng ký này, `resolveExecutorConfig` từ chối thẳng
-> (`RunnerConfigError`) tại resolve-time — trước khi spawn bất cứ gì, cùng
-> phong cách "lỗi rõ ràng" executor block hiện có đã dùng cho một block
-> thiếu `command`/`args`. Đăng ký rồi nhưng `fgos tool check` chưa từng
-> chạy (hoặc trả `missing`) cũng từ chối — chỉ `status: present` mới cho
-> qua.
+> — never something `resolveExecutorConfig`/`fgos-coding-implement` does on
+> its own authority. `CLAUDE.md`'s impact-analysis capability gate is the
+> one real consumer of this pattern today (`gitnexus`).
 
-(A `capacities.<capacityId>` entry declaring `"kind":
-"cli"` (D1) has its presence checked by consulting this same registry —
-`fgos tool query`'s own functions, called in-process — instead of
-re-probing PATH independently, reusing the discovery layer above rather
-than building a second one. This only works once the capacity is
-registered, with `--name` matching the capacity's own id exactly. Skipping
-that registration step makes `resolveExecutorConfig` refuse outright
-(`RunnerConfigError`) at resolve time, before anything is spawned — the
-same "fail loud" style the existing executor-block check already uses for
-a block missing `command`/`args`. Registered but never `fgos tool check`ed
-(or checked `missing`) refuses the same way — only `status: present`
-passes.)
+(A `capacities.<capacityId>` entry's own presence/staleness used to be
+checked automatically by `resolveExecutorConfig` (tsk-62v D1/D2) — retired
+at `tsk-5tm-1` D1: 2 of the 3 real entries were `kind:"task"`, for which it
+never ran anyway, and the third's signal added nothing an OS `ENOENT` on a
+missing binary didn't already give for free. `resolveExecutorConfig` never
+consults this registry today, for any `capacityId` — a `capacities` entry
+declaring a `capability` (making it also a tool-registry entry, per the
+"Registering a new provider" section above) and one that dispatches are
+completely independent concerns. A caller that wants a real presence gate
+before dispatching a specific capacity has to ask for it explicitly at the
+call site, with `fgos tool query --status present`, never something
+`resolveExecutorConfig`/`fgos-coding-implement` does automatically.
+`CLAUDE.md`'s impact-analysis capability gate is the one real consumer of
+this pattern today, gating on `gitnexus`.)
 
 ## Explicitly out of scope for tsk-4ad
 

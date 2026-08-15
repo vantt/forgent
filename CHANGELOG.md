@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `fgos tool register`/`fgos tool remove` are retired. A tool provider
+  (e.g. `gitnexus`, `herdr`) is now declared directly in
+  `runner.capacities.<id>` in `.fgos/config.json` — a `capability` field
+  on the entry, config-edited like every other capacity, no longer through
+  the event log. `fgos tool check`/`fgos tool query` are unchanged in
+  shape and behavior, now sourced from config instead of `view.tools`.
+  `.fgos/tool-status.local.json` (the local, gitignored presence overlay)
+  is unaffected. (`docs/reference/forgentx-tool-registry-configuration.md`)
 - The Iron Law gate now asks only where the answer can still matter: at the
   **trunk boundary**. A leaf merging into `fgw/<root>`, and a root
   `sync-root`-ing into its parent branch, go straight through — the gate

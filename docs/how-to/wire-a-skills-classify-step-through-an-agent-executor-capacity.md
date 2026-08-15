@@ -48,19 +48,37 @@ nothing is configured.
    routed content there is only a short free-text ask, never repo/code
    content.
 
-2. **Register the real command** so `fgos tool query` can confirm
-   presence — this is also what makes `AGENTS.md`'s install/setup/doctor
-   gate catch the new dependency for free, with no new doctor check
-   written by hand:
+2. **Declare the real command as a tool-registry entry too** (tsk-in1-1
+   D1: no longer a `fgos tool register` verb call — add a `capability`
+   field directly onto the SAME `runner.capacities.<capacityId>` entry
+   step 1 just wrote in `.fgos/config.json`), so `fgos tool query` can
+   confirm presence — this is also what makes `AGENTS.md`'s
+   install/setup/doctor gate catch the new dependency for free, with no
+   new doctor check written by hand:
 
+   ```json
+   "capacities": {
+     "<capacityId>": {
+       "kind": "cli",
+       "capability": "<capacityId>",
+       "probeCommand": "<realCommand>",
+       "adapter": "cli-spawn",
+       ...
+     }
+   }
    ```
-   fgos tool register --name <capacityId> --kind cli --capability <capacityId> --command <realCommand>
+   ```
    fgos tool check
    ```
 
-   (`--name` must equal the capacity's own id in the config —
-   `resolveExecutorConfig`'s presence check looks up
-   `tools[capacityId]` by that exact key.)
+   (the object key doubles as the id both `fgos tool query` and
+   `resolveExecutorConfig` read — no separate `--name` to keep in sync.
+   `resolveExecutorConfig` itself never gates on this presence
+   automatically, though — that automatic check was retired at
+   `tsk-5tm-1` D1; a caller wanting a real presence gate asks for it
+   explicitly with `fgos tool query --status present` at its own call
+   site, same as `docs/reference/forgentx-tool-registry-configuration.md`
+   describes.)
 
 3. **Give the skill a way to resolve the real command/args without a
    second argv-building implementation.** If `dispatch.mjs` has no CLI

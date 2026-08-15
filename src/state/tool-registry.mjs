@@ -2,11 +2,14 @@
 // registry (tsk-1dj, ported from repository-harness's tool-registry-
 // capability per docs/distillery/deep-dives/tool-registry.md).
 //
-// PURE where it matters for the write path: `validateToolRegistration`/
-// `normalizeCapability` never touch fs, mirroring how work.mjs's
-// `validateWork` is a pure sibling to store.mjs's write door — store.mjs's
-// `registerTool`/`removeTool` are the actual event-log write door for
-// `tool.register`/`tool.remove`, never this module.
+// tsk-in1-1 D1: the event-sourced write door (`tool.register`/`tool.remove`,
+// once store.mjs's `registerTool`/`removeTool`) is retired — a tool provider
+// is now declared directly in `runner.capacities.<id>` (`.fgos/config.json`),
+// the same config-edited precedent `capacities` already was for `agy`. This
+// module keeps only the PURE read-side logic: `normalizeCapability` (never
+// touches fs) and `toolsFromCapacities` (below) turn a raw `cfg.capacities`
+// map into the tool-shaped objects `probeTool`/`classifyRegistryPosture`
+// already expected — no shape change was needed for either of those two.
 //
 // The local status overlay (`readLocalStatus`/`writeLocalStatus`/
 // `probeTool`) is a SEPARATE, deliberately non-event-sourced concern (per
@@ -18,21 +21,14 @@
 // store.mjs's own header comment describes for `worker-log.mjs`.
 
 import fs from 'node:fs';
-import net from 'node:net';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
-/** Error raised by this module. `category` is the CLI exit-code contract (R4). */
-export class ToolRegistryError extends Error {
-  constructor(category, message) {
-    super(message);
-    this.name = 'ToolRegistryError';
-    this.category = category;
-  }
-}
-
-/** The full kind domain (repository-harness's own set, ported unchanged — D2). */
-export const KINDS = Object.freeze(['cli', 'binary', 'mcp', 'skill', 'http']);
+/** The full kind domain (repository-harness's own set, minus 'http' — 0 real
+ * usage confirmed at tsk-in1-1 time (DISCUSSION.md §3 #14): no capacity ever
+ * declared kind:"http" here, so `probeHttp` (the TCP-connect presence probe
+ * for it) was dead weight and was removed alongside it. */
+export const KINDS = Object.freeze(['cli', 'binary', 'mcp', 'skill']);
 
 // mcp/skill tools are never on PATH (deep-dive §Cơ chế) — presence for
 // those two kinds is checked by scanning a path on disk instead, so a scan
@@ -56,54 +52,31 @@ export function normalizeCapability(raw) {
 }
 
 /**
- * Validate a candidate tool registration and return the normalized record
- * ready for the store to append — this function never writes anything
- * itself, mirroring porting.mjs's `transitionPorting` (decide, never write).
- *
- * `existingNames` is the caller's current `Object.keys(view.tools)`, read
- * fresh — a duplicate `name` is rejected here, before anything reaches the
- * log, the same existence-check-before-append discipline `addWork` applies.
+ * Turn `cfg.capacities` (`.fgos/config.json`'s `runner.capacities`, D1) into
+ * the tool-shaped objects `probeTool`/`classifyRegistryPosture` already
+ * expect — pure, never touches fs. A capacity entry is a TOOL (as opposed to
+ * an agent/dispatch capacity like `agy`) precisely when it declares its own
+ * `capability` — the one field a plain dispatch capacity never carries.
+ * `probeCommand` (never dispatch.mjs's own `command`/`args` executor-shape
+ * fields, D1: task 1 does not touch `dispatch.mjs`'s `validateCapacityShape`)
+ * maps onto the tool object's `command`, the field `probeTool` reads.
  */
-export function validateToolRegistration(fields, existingNames) {
-  const name = fields?.name;
-  if (typeof name !== 'string' || !name.trim()) {
-    throw new ToolRegistryError('validation', 'tool register requires a non-empty --name.');
+export function toolsFromCapacities(capacities) {
+  const tools = {};
+  for (const [id, capacity] of Object.entries(capacities ?? {})) {
+    const capability = normalizeCapability(capacity?.capability);
+    if (!capability) continue;
+    tools[id] = {
+      name: id,
+      kind: capacity.kind,
+      capability,
+      command: capacity.probeCommand,
+      scanTarget: capacity.scanTarget,
+      responsibility: capacity.responsibility,
+      description: capacity.description,
+    };
   }
-  if (existingNames.includes(name)) {
-    throw new ToolRegistryError(
-      'validation',
-      `tool "${name}" already exists — remove it first (fgos tool remove --name ${name}) or pick a different --name.`,
-    );
-  }
-  if (typeof fields.kind !== 'string' || !KINDS.includes(fields.kind)) {
-    throw new ToolRegistryError(
-      'validation',
-      `tool register requires --kind to be one of ${KINDS.join('/')}, got: ${JSON.stringify(fields.kind)}`,
-    );
-  }
-  const capability = normalizeCapability(fields.capability);
-  if (!capability) {
-    throw new ToolRegistryError('validation', 'tool register requires a non-empty --capability.');
-  }
-  if (typeof fields.command !== 'string' || !fields.command.trim()) {
-    throw new ToolRegistryError('validation', 'tool register requires a non-empty --command.');
-  }
-  if (SCAN_REQUIRED_KINDS.has(fields.kind) && (typeof fields.scanTarget !== 'string' || !fields.scanTarget.trim())) {
-    throw new ToolRegistryError(
-      'validation',
-      `tool register requires --scan for kind "${fields.kind}" (mcp/skill tools are not on PATH — presence is checked by scanning this path on disk).`,
-    );
-  }
-
-  return {
-    name: name.trim(),
-    kind: fields.kind,
-    capability,
-    command: fields.command.trim(),
-    scanTarget: typeof fields.scanTarget === 'string' && fields.scanTarget.trim() ? fields.scanTarget.trim() : undefined,
-    responsibility: typeof fields.responsibility === 'string' && fields.responsibility.trim() ? fields.responsibility.trim() : undefined,
-    description: typeof fields.description === 'string' && fields.description.trim() ? fields.description.trim() : undefined,
-  };
+  return tools;
 }
 
 // PATH resolution done by hand (fs.accessSync per PATH entry) rather than
@@ -141,38 +114,6 @@ function commandExistsOnPath(name) {
   return findExecutableOnPath([name]) !== null;
 }
 
-const HTTP_PROBE_TIMEOUT_MS = 2000;
-
-// Short TCP connect probe — "present" means something is listening, never a
-// real HTTP handshake (a full request is out of scope; the registry only
-// answers "is a provider even here").
-function probeHttp(command, timeoutMs = HTTP_PROBE_TIMEOUT_MS) {
-  return new Promise((resolve) => {
-    let host;
-    let port;
-    try {
-      const url = new URL(command.includes('://') ? command : `http://${command}`);
-      host = url.hostname;
-      port = Number(url.port) || (url.protocol === 'https:' ? 443 : 80);
-    } catch {
-      resolve('missing');
-      return;
-    }
-    const socket = net.createConnection({ host, port, timeout: timeoutMs });
-    socket.once('connect', () => {
-      socket.destroy();
-      resolve('present');
-    });
-    socket.once('timeout', () => {
-      socket.destroy();
-      resolve('missing');
-    });
-    socket.once('error', () => {
-      resolve('missing');
-    });
-  });
-}
-
 // tsk-j7y D2: `scanTarget` existing on disk only ever proved the tool was
 // installed, never that its index reflects the current repo — the exact
 // gap that let GitNexus's impact() give false blast-radius evidence during
@@ -206,11 +147,10 @@ function isIndexStale(scanPath, repoRoot) {
  * (deep-dive §Cơ chế): `cli`/`binary` resolve on `PATH`; `mcp`/`skill` check
  * `scanTarget` exists on disk (resolved against `repoRoot`), and — tsk-j7y
  * D2 — resolve `'stale'` instead of `'present'` when the tool's own
- * `meta.json` records a `lastCommit` behind the repo's current `HEAD`;
- * `http` does a short TCP connect probe. Never throws for an absent tool —
- * absence is a fact to report (`'missing'`), never a CLI error (the core
- * "absent capability = clean skip, never a failure" contract this whole
- * item ports).
+ * `meta.json` records a `lastCommit` behind the repo's current `HEAD`. Never
+ * throws for an absent tool — absence is a fact to report (`'missing'`),
+ * never a CLI error (the core "absent capability = clean skip, never a
+ * failure" contract this whole item ports).
  */
 export async function probeTool(tool, repoRoot) {
   if (tool.kind === 'cli' || tool.kind === 'binary') {
@@ -221,9 +161,6 @@ export async function probeTool(tool, repoRoot) {
     const scanPath = path.resolve(repoRoot, tool.scanTarget);
     if (!fs.existsSync(scanPath)) return 'missing';
     return isIndexStale(scanPath, repoRoot) ? 'stale' : 'present';
-  }
-  if (tool.kind === 'http') {
-    return probeHttp(tool.command);
   }
   return 'unknown';
 }
@@ -236,8 +173,8 @@ export function toolStatusPath(dir) {
 
 /**
  * Read the local, per-machine `check` status overlay — never the truth
- * about what is registered (that is `view.tools`, folded from the shared
- * event log), only what THIS machine last observed. Missing file reads as
+ * about what is registered (that is `runner.capacities` in
+ * `.fgos/config.json`, D1), only what THIS machine last observed. Missing file reads as
  * `{}` (never checked yet); a corrupt file also reads as `{}` — this is a
  * disposable local cache, regenerated by the next `tool check`, so a
  * parse failure is never fatal here the way a corrupt `events.jsonl` is.
