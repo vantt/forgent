@@ -17,7 +17,7 @@ parameters where the consuming skill's own reasoning step lives:
 
 - **`<CAPACITY_ID>`** — the `.fgos/config.json`
   `runner.capacities.<id>` key this step dispatches through (no live
-  consumer of this fragment's own Steps A-D exists today, tsk-4ns — see
+  consumer of this fragment's own Steps A-C exists today, tsk-4ns — see
   Precedent below).
 - **`<PROMPT_TEMPLATE>`** — the fixed prompt text to send (so every
   dispatch asks the model the exact same thing, never a paraphrase that
@@ -43,12 +43,8 @@ cli-spawn.
 
 ## Step A — config check
 
-Before reasoning it out yourself, check two things in order — whether
-`<CAPACITY_ID>` is configured at all, and only if it is, whether its
-registered backend is actually present on this machine. These are
-deliberately two separate checks, not one: "never configured" and
-"configured but the backend is missing" get different, distinguishable
-behavior below.
+Before reasoning it out yourself, check whether `<CAPACITY_ID>` is
+configured at all:
 
 ```bash
 root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
@@ -62,79 +58,71 @@ console.log(cfg.runner?.capacities?.['<CAPACITY_ID>'] ? 'configured' : 'not-conf
   with no note printed at all. This is the default/common path, and its
   behavior and output are byte-identical to before this capacity existed —
   nothing here changes for the common case.
-- **`configured`** — check presence next (Step B).
+- **`configured`** — dispatch through `execute` next (Step B). There is no
+  separate presence check here any more (tsk-5tm-1 D1: the field `needs`
+  this used to query by, and the gate in `dispatch.mjs` that consulted it,
+  are both retired — dead for every `kind:"task"` capacity, and no signal
+  beyond the OS's own ENOENT for the rest). A missing/absent backend now
+  surfaces as `execute`'s own spawn failure, caught by Step C below —
+  later, and cheaper to have skipped a redundant check for, than before.
 
-## Step B — presence check
+## Step B — execute (tsk-5tm-3 D5): self-execute or hand back, one call
 
-US-027/D5/D6 (tsk-1o7): query by the capacity's own declared `needs`
-(its real capability) — never by `<CAPACITY_ID>` itself, which is a
-name, not a capability. A capacity that hasn't migrated to `needs` yet
-falls back to querying `<CAPACITY_ID>` unchanged, so this step still
-works for it exactly as before.
-
-```bash
-CAPABILITY=$(node -e "
-const cfg = JSON.parse(require('node:fs').readFileSync('$root/.fgos/config.json', 'utf8'));
-const needs = cfg.runner?.capacities?.['<CAPACITY_ID>']?.needs;
-console.log(needs || '<CAPACITY_ID>');
-")
-node "$root/bin/fgos.mjs" tool query --capability "$CAPABILITY" --status present --dir "$root"
-```
-
-- **Empty `providers` array (registered but not present, or never
-  registered despite being configured)** — print one visible line
-  (`<CAPACITY_ID> is configured but its backend isn't available on this
-  machine — classifying it directly instead`), then fall through to
-  `<INLINE_FALLBACK_HEADING>`. The note is the only difference from the
-  `not-configured` case above; the reasoning itself is identical.
-- **One provider, `status: "present"`** — dispatch instead of reasoning
-  inline (Step B.5, then Step C).
-
-## Step B.5 — native-vs-cli/spawn decision (tsk-3ik-3, Native-First Dispatch
-Doctrine, `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-
-vs-cli-spawn.md`)
-
-Configured+present no longer means "always exec a subprocess" — check which
-dispatch mechanism actually applies before building anything. First decide,
-on your own (never inferred from environment or config — the same "the
-skill already self-knows its own tool manifest" pattern this whole
-optimization relies on): do you, the assistant reading this fragment right
-now, already have the Agent/Task tool available in your current tool
-manifest? Then ask:
+Before this item, this fragment's own Steps A/B/B.5/C did a config check, a
+presence check, a native-vs-cli/spawn decision, THEN built and ran the
+command by hand — because `dispatch.mjs` itself only ever handed back
+`{command,args}` for a `kind:"cli"` capacity, never ran it. `execute` now
+does all of that internally (matching marketing-cockpit's `run_task()`
+contract) — self-executing every case it can, handing back only the one
+case it structurally can't (native, same-family, live session — dispatch
+is a passive CLI, it has no Task tool of its own to call):
 
 ```bash
-root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-node "$root/src/runner/dispatch.mjs" decide <CAPACITY_ID> --has-live-task-access
+node "$root/src/runner/dispatch.mjs" execute <CAPACITY_ID> --prompt "<PROMPT_TEMPLATE built as below>" [--has-live-task-access]
 ```
 
-(Omit `--has-live-task-access` entirely if you decided above that you do
-NOT currently have live Agent/Task tool access — never pass the flag on a
-guess.) Prints `{"mechanism": "in-process"|"out-of-process"[, "agentType": "<name>"]}`.
+`--has-live-task-access` is your own self-declaration (never inferred from
+environment or config — the same "the skill already self-knows its own
+tool manifest" pattern this whole optimization relies on): do you, the
+assistant reading this fragment right now, already have the Agent/Task
+tool available in your current tool manifest? Omit the flag entirely if
+not — never pass it on a guess. This self-declaration is what the Native-
+First Dispatch Doctrine (`docs/decisions/0026-vision-orchestrator-roottask-
+capacity-native-vs-cli-spawn.md`, tsk-3ik-3) actually decides on
+underneath — same-provider + live access → native; anything else →
+cli/spawn — `execute` applies those rules for you, at runtime.
 
-- **`mechanism: "out-of-process"`** — proceed to Step C exactly as before.
-  This is every `kind:"cli"` capacity that forces cross-provider cli/spawn,
-  every `kind:"task"` capacity when you lack live Task access, and any
-  capacity whose config forces cli/spawn (`forceCliSpawn`).
-- **`mechanism: "in-process"`** — skip Step C's `exec` entirely. Print the
-  same announce line Step C.3 prints for out-of-process, so a dispatch is
-  visible on the chat transcript regardless of which branch fired
-  (observability parity — before this, only the out-of-process branch
-  announced anything):
+Prints JSON, one of two shapes:
+
+- **`{"mechanism":"in-process","agentType":"<name>","prompt":"..."[,"capacityId":"..."]}`**
+  — call YOUR OWN Agent/Task tool: `subagent_type` is this JSON's
+  `agentType`, the prompt is the `prompt` field (the exact same
+  `<PROMPT_TEMPLATE>` you passed — echoed back, never re-worded). Print the
+  announce line before calling it:
 
   ```
-  <CAPACITY_ID> - in-process - <agentType> - <model>
+  <CAPACITY_ID> - in-process - <agentType> - <model actually used>
   ```
 
   where `<model>` is whichever model the Agent/Task call actually resolves
   to (the target agent definition's own pinned `model:`, an explicit
   override you pass, or — when neither applies — the current session's own
-  model, since native dispatch is same-provider by construction). Then
-  call your own Agent/Task tool: `subagent_type` is this same JSON's
-  `agentType`, the prompt is `<PROMPT_TEMPLATE>` (the exact same prompt
-  Step C would have built — never a different or re-worded one). Read the
-  response the same way Step C's own consumer reads a dispatched answer —
-  Step D's malformed-response fallback applies identically regardless of
-  which mechanism produced the response.
+  model, since native dispatch is same-provider by construction).
+- **`{"mechanism":"out-of-process", ...real result fields (status, stdout,
+  stderr, tier, model, provider, command)}`** — this already IS the real
+  answer; nothing left to run. Print the announce line:
+
+  ```
+  <CAPACITY_ID> - out-of-process - <provider> - <model>
+  ```
+
+  Read `stdout` the same way a consumer used to read a hand-run command's
+  own output — Step C's malformed-response fallback below applies
+  identically regardless of which shape produced the answer.
+
+An error from this call (a thrown `RunnerConfigError`, a spawn failure, a
+timeout) means fall straight to Step C — treat it exactly like a malformed
+response, never retry blind.
 
 ## Ad-hoc capacity: a runtime-composed packet instead of `<PROMPT_TEMPLATE>`
 
@@ -142,15 +130,15 @@ guess.) Prints `{"mechanism": "in-process"|"out-of-process"[, "agentType": "<nam
 whose consuming skill has no single fixed question to ask — the parent
 composes a different command each time, depending on what it just decided
 to split off — cannot fill in a registered `<PROMPT_TEMPLATE>` at all.
-This is not a second dispatch mechanism: it still goes through Steps A/B/
-B.5 unchanged (config check, presence check, native-vs-cli decision), it
-only replaces where Step C.1's prompt text comes from.
+This is not a second dispatch mechanism: it still goes through Steps A/B
+unchanged (config check, then `execute`), it only replaces what text goes
+into Step B's own `--prompt` flag.
 
 What is lost by dropping the fixed template is a real guarantee — "the
 exact same question every call" — so the replacement has to be an honest
 one, not free text: **the same KIND of question every call**, via six
 required fields. Missing any one of them means the packet is malformed —
-fall through to `<INLINE_FALLBACK_HEADING>` exactly as Step D already does
+fall through to `<INLINE_FALLBACK_HEADING>` exactly as Step C already does
 for any other malformed response, never dispatch a partial packet:
 
 | Field | Shape | Why required |
@@ -191,48 +179,18 @@ back door D4's "no lifecycle id for this shape" decision was drawn to
 close.
 
 Once the six-field packet is built (or the fallback triggered on a missing
-field), continue at Step C.1 below, substituting the packet for
-`<PROMPT_TEMPLATE>` — every later step is unchanged.
+field), continue at Step B above, substituting the packet for
+`<PROMPT_TEMPLATE>` in the `--prompt` flag — every later step is
+unchanged. When the packet's own optional `tier`/`model` fields were
+filled in, pass them through as `--tier <tier>`/`--model <model>` on that
+same `execute` call (`tsk-2k1`, D10) — either flag, when given, wins over
+the capacity's own declared tier/model and the computed default; omitted
+(every registered-`<CAPACITY_ID>` call that names neither) resolves
+exactly as before this plumbing existed. Which tier/model a packet SHOULD
+choose is not decided here — `#task-tier-judged-at-dispatch` — this is
+only the pass-through.
 
-## Step C — configured-and-present dispatch (out-of-process mechanism)
-
-1. Build the prompt from `<PROMPT_TEMPLATE>` (fixed, so every dispatch
-   asks the exact same thing) — the identical prompt Step B.5's native
-   branch would also have used, built once regardless of which mechanism
-   Step B.5 picked. For an ad-hoc capacity, this is the six-field packet
-   from the section above instead — same "build once, use for whichever
-   mechanism Step B.5 picked" rule, just a different source for the text.
-
-2. Resolve the real command/args, reusing `dispatch.mjs`'s own
-   `resolveExecutorConfig`/`resolveExecutorCommand` (`tsk-62v`) — never a
-   second argv-building implementation:
-
-   ```bash
-   node "$root/src/runner/dispatch.mjs" resolve <CAPACITY_ID> --prompt "<the prompt built above>"
-   ```
-
-   This prints `{"command":...,"args":[...],"provider":...,"model":...}`
-   as JSON. When the packet's own optional `tier`/`model` fields were
-   filled in (the ad-hoc section above), pass them through as `--tier
-   <tier>`/`--model <model>` on this same call (`tsk-2k1`, D10) — either
-   flag, when given, wins over the capacity's own declared tier/model and
-   the computed default; omitted (every registered-`<CAPACITY_ID>` call
-   that names neither) resolves exactly as before this plumbing existed.
-   Which tier/model a packet SHOULD choose is not decided here —
-   `#task-tier-judged-at-dispatch` — this is only the pass-through.
-
-3. Print the announce line, then actually run the resolved
-   `command`/`args` via Bash (the JSON's `args` array is the real,
-   already-`{prompt}`-substituted argv — invoke it as-is, never
-   re-templated):
-
-   ```
-   <CAPACITY_ID> - out-of-process - <provider> - <model>
-   ```
-
-4. Read the response — Step D covers what "malformed" means for it.
-
-## Step D — malformed-response fallback
+## Step C — malformed-response fallback
 
 If the response is missing, unparseable, or doesn't map to a real value
 for the field(s) the consuming skill actually needs, fall back to
@@ -250,7 +208,7 @@ second dispatch mechanism, and it never requires splitting `work.tier`
 into a separate field (D12 picked the smaller path over a field split:
 `work.tier` keeps carrying both its existing meanings unchanged; this
 section only adds an override at dispatch TIME, resolved through the
-`--model`/`--tier` flags `dispatch.mjs resolve` already accepts,
+`--model`/`--tier` flags `dispatch.mjs execute` already accepts,
 tsk-2k1/D10). Skip this section entirely for a registered `<CAPACITY_ID>`
 dispatch with no reason to deviate from its own declared tier/model —
 nothing here changes that path.
@@ -271,16 +229,16 @@ packet's own six required fields — reuse bee's three-tier rubric
 against at intake, just applied per-dispatch instead of once.
 
 This judgment produces ONLY `provider`/`tier` — never a mechanism.
-Mechanism stays entirely `dispatch.mjs decide`'s own call, resolved
+Mechanism stays entirely `execute`'s own internal decision, resolved
 through the Native-First Dispatch Doctrine's rules 1–4 exactly as Step
-B.5 above already does; a judged `provider` that resolves to a
+B above already does; a judged `provider` that resolves to a
 non-Claude command still has to clear the same `allowCrossProvider` gate
 `resolveExecutorConfig` already enforces
-(`src/runner/dispatch.mjs:691-693`) — nothing here bypasses it.
+(`src/runner/dispatch.mjs:703-707`) — nothing here bypasses it.
 
 Fail-safe is the INVERSE of the six-field packet's own (there, a missing
 required field means "do not dispatch, fall back to
-`<INLINE_FALLBACK_HEADING>` — Step D above): here, failing to reach a
+`<INLINE_FALLBACK_HEADING>` — Step C above): here, failing to reach a
 confident tier/provider judgment means dispatch ANYWAY, with the
 capacity's own declared default (`capacity.tier`/`capacity.model`, or the
 computed `modelForTier` fallback) — an unresolved judgment is never a
@@ -319,7 +277,7 @@ scarcity signal needs the full denominator, not just the misses.
   — the how-to this fragment's own branch logic was extracted from; still
   the reference for config-entry/registration steps (1–3 there), which
   this fragment does not repeat.
-- No live consumer of this fragment's own Steps A-D remains today (tsk-4ns
+- No live consumer of this fragment's own Steps A-C remains today (tsk-4ns
   retired the standalone submit-assist skill's own dispatch to
   `submit-assist-classify` — its classify step never had a real reason to
   dispatch per the "Valid reasons to dispatch" list above: the input was
@@ -331,8 +289,9 @@ scarcity signal needs the full denominator, not just the misses.
   `fgos-coding-exploring`/`fgos-researching`) cite its "Valid reasons to dispatch"
   list directly when explaining their own never-delegate-reasoning rule,
   and it remains the ready-made pattern for the next real cross-provider
-  consumer. Step B.5's `in-process` branch is proven by
-  `src/runner/dispatch.mjs`'s own unit tests instead, per
-  `docs/history/tsk-3ik-3/iron-law-evidence.md` if applicable.
+  consumer. Step B's `in-process`/`out-of-process` branches (`execute`,
+  tsk-5tm-3 D5) are proven by `src/runner/dispatch.mjs`'s own unit tests
+  instead, per `docs/history/tsk-5tm-3/iron-law-evidence.md` if applicable.
 - `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md`
-  — Native-First Dispatch Doctrine, Step B.5's own governing rules 1/2/4.
+  — Native-First Dispatch Doctrine, Step B's own governing rules 1/2/4,
+  applied internally by `execute` now (tsk-5tm-3 D5) rather than by hand.

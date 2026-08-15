@@ -98,25 +98,66 @@ không song song** — đây đúng loại va chạm `footprintOverlapAmong` sin
 Thêm section config riêng cho web dashboard vào `.fgos/config.json` (cạnh
 `herdrOrchestrator`), đọc fail-closed từ Rust theo đúng khuôn
 `settings.rs` hiện có, **nhưng mặc định BẬT** (D10 — cố ý khác 4 toggle
-kia). Đăng ký vào `fgos setup` config-merge + `fgos doctor` check registry
+kia). Section gồm tối thiểu: cờ bật/tắt (mặc định `true`), `bindAddress`
+(mặc định `0.0.0.0`, D7) và **`port` mặc định `8788`** (D13 — né 8787 của
+`herdr-gateway` để chạy được cả hai trên một máy). Đăng ký vào `fgos setup` config-merge + `fgos doctor` check registry
 theo khuôn `herdr-launcher-configured`
-(`src/setup/registrations.mjs:1064-1112`). Thêm dòng `.gitignore` cho
-đường dẫn secret của D9.
+(`src/setup/registrations.mjs:1074-1114`: `DEFAULT_*_SETTINGS` +
+`registerConfigDefault({id,key,shape})` + `registerCheck({id,description,
+check})`). Thêm dòng `.gitignore` cho đường dẫn secret của D9.
+
+**Đường dẫn secret ghim tại đây: `.fgos/herdr-web-secret`.** D9 chỉ nói
+"một file gitignored dưới `.fgos/`" mà không đặt tên; không có tên cụ thể
+thì không verify nào assert được nó bị ignore. Ghim tên là hoàn tất D9,
+không phải mở lại nó.
+
+**Lane riêng của P1: `high-risk`** (không thừa hưởng mù từ cha). Đếm lại
+cho đúng phạm vi con này: data model (thêm hình dạng config bền), **audit/
+security — hard-gate** (dòng `.gitignore` là biện pháp ngăn commit
+credential; D9 tồn tại đúng vì `.fgos/config.json` bị git track), public
+contracts (`fgos doctor` thêm check id; `config.json` thêm section),
+existing covered behavior (`registrations.mjs` dùng chung mọi doctor check;
+`test/setup` 162 test), multi-domain (Node + Rust) = **5 flag, 1 hard-gate**.
 
 ### P2 — webserver core + auth lớp 1
 
 axum + `rust-embed`/`axum-embed`, phục vụ static asset + health-check.
-Bind theo config, mặc định `0.0.0.0`, cảnh báo khi không phải loopback
-(D7). Auth lớp 1 đầy đủ theo D8/D9: resolve token (env → file 0600 tự
-sinh), `POST /api/login` với `constant_time_eq`, cookie `HttpOnly;
-SameSite=Strict`, mọi thất bại **404 câm**. Bề mặt ghi khai báo dạng
-allowlist ngay từ đây (`answer`/`approve`/`reject`), chưa cần có handler
-thật.
+Bind theo config, mặc định `0.0.0.0:8788` (D7 + D13), cảnh báo khi không
+phải loopback. Auth lớp 1 đầy đủ theo D8/D9: resolve token (env → file
+0600 tự sinh), `POST /api/login` với `constant_time_eq`, cookie
+`HttpOnly; SameSite=Strict`, mọi thất bại **404 câm**. Bề mặt ghi khai báo
+dạng allowlist ngay từ đây (`answer`/`approve`/`reject`), chưa cần có
+handler thật.
+
+**Thêm ở vòng quyết định 2026-08-12 (D12/D14):**
+
+- **Tiến trình con, không nằm trong TUI (D12).** Binary tự re-exec chính
+  nó ở chế độ server; cockpit chỉ bật/tắt. Đóng cockpit **không** giết web
+  dashboard — đây là điều kiện để dùng được từ điện thoại, lúc mà không
+  cockpit nào đang mở.
+- **`herdr-plugin/build.rs` (chưa tồn tại hôm nay — đã kiểm) với
+  `create_dir_all("static")` (D14).** Đây là mảnh làm hai pipeline tách
+  rời: `cargo build/test/clippy` chạy được trên checkout sạch chưa từng
+  `npm run bundle`. Port thẳng từ `herdr-gateway/build.rs`.
+- **`.gitignore` thêm `herdr-plugin/static/`** (output bundle, không commit).
+- Nhúng: `#[derive(RustEmbed)] #[folder = "static/"]` + feature
+  `debug-embed`, **không** bật `compression` — trả thẳng `&'static [u8]`,
+  không copy heap mỗi request. Kèm đường override đọc từ đĩa khi
+  `<static_dir>/index.html` có mặt, để dev sửa frontend không phải rebuild
+  binary (cả hai đều theo đúng `herdr-gateway/src/web/mod.rs:25-29,95-98`).
+
+Chi phí bộ nhớ đã đo, không phỏng đoán: bundle thật của `herdr-gateway` là
+**76K** (mà phần lớn là `@xterm/xterm`, thứ dashboard này không cần). Asset
+nằm ở `.rodata`, demand-paged, file-backed sạch — RSS chỉ tăng theo phần
+thật sự được phục vụ và kernel evict được. Không phải heap.
 
 ### P3 — taskboard
 
 Danh sách work item đọc qua `WorkItemSource` đã có
 (`herdr-plugin/src/ports.rs:11-20`), không thêm nguồn dữ liệu mới.
+Frontend dựng bằng vite + TypeScript dưới `herdr-plugin/web/` (D14) —
+`package.json`/`vite.config.ts` dựng ở mảnh này vì đây là màn web đầu tiên;
+P4 dùng lại, không dựng lại.
 
 ### P4 — task detail (mục tiêu chính)
 
@@ -168,7 +209,7 @@ chạy đỏ thì chưa phải một verify"*.
 
 | Mảnh | id | deps | verify (đã sửa, đã đo đỏ) |
 |---|---|---|---|
-| P1 config + doctor/setup | `tsk-48w` | — | `node --test 'test/setup/**/*.test.mjs' && node bin/fgos.mjs doctor --json --dir . \| grep -q 'herdr-web-dashboard-configured'` |
+| P1 config + doctor/setup | `tsk-48w` | — | `node --test 'test/setup/**/*.test.mjs' && node bin/fgos.mjs doctor --json --dir . \| grep -q 'herdr-web-dashboard-configured' && git check-ignore -q .fgos/herdr-web-secret` *(mệnh đề thứ 3 thêm sau reality gate riêng của P1 — xem cuối file)* |
 | P2 webserver core + auth L1 | `tsk-k4v` | `tsk-48w` | `grep -q 'fn login_rejects_wrong_token_with_opaque_404' …/web/auth.rs && grep -q 'fn warns_when_bind_address_is_not_loopback' …/web/mod.rs && cargo test <manifest> \| grep -qE '[1-9][0-9]* passed' && cargo build --release` |
 | P3 taskboard | `tsk-5jr` | `tsk-k4v` | `grep -q 'fn taskboard_lists_work_items_through_work_item_source' …/web/taskboard.rs && cargo test <manifest> web_taskboard \| grep -qE '[1-9][0-9]* passed'` |
 | P4 task detail *(mục tiêu chính)* | `tsk-4id` | `tsk-5jr` | 3 × `grep -q 'fn …'` (`pairs_ask_history_with_answers_by_seq`, `rejects_docs_ref_path_traversal`, `lists_gate_approve_alongside_ask`) `&& cargo test <manifest> web_task_detail \| grep -qE '[1-9][0-9]* passed'` |
@@ -302,6 +343,446 @@ chứng không đổi).
 ```text
 READY WITH CONSTRAINTS
 ```
+
+## Reality gate riêng của P1 `tsk-48w` (2026-08-12)
+
+Con này được tạo với `--stage planning` để tự đi qua reality check của
+chính nó, thừa hưởng `CONTEXT.md` của cha chứ không lặp lại exploring.
+
+### Vòng 1: **NOT READY** — Proof surface FAIL
+
+Lane của P1 tự đếm lại ra `high-risk` (5 flag, hard-gate = audit/security
+— xem mục P1 ở Shape). Mà chiều high-risk đòi mọi rủi ro medium+ có proof
+point, thì đúng mệnh đề an toàn duy nhất lại **không có** proof:
+
+| | Nội dung |
+|---|---|
+| Verify cũ chứng minh | (a) `test/setup` xanh, (b) doctor check đã đăng ký |
+| Verify cũ **không** chứng minh | (c) đường dẫn secret thật sự bị git ignore |
+| Vì sao (c) không tự có | Precedent `checkHerdrOrchestratorConfigured` (`registrations.mjs:1081-1102`) chỉ kiểm *section có mặt + giá trị boolean*. Check mới theo khuôn đó cũng sẽ không đụng gitignore — nên không thể trông chờ nó phủ hộ |
+| Lỗ kèm theo | Tên file secret chưa ghim ở đâu (D9 chỉ nói "một file dưới `.fgos/`") → không có đường dẫn thì không assert được |
+
+### Đã sửa
+
+Ghim `.fgos/herdr-web-secret` (mục P1 ở Shape) và thêm mệnh đề thứ ba vào
+verify. Đo thật:
+
+| Mệnh đề | Hôm nay |
+|---|---|
+| `git check-ignore -q .fgos/herdr-web-secret` | **exit 1** — chưa ignore, đỏ đúng |
+| `git check-ignore -q .fgos/state.json` *(đối chứng)* | **exit 0** — cơ chế chạy đúng, không phải luôn-đỏ |
+| Cả verify mới | **exit 1** — đỏ |
+
+Đối chứng `state.json` là phần quan trọng: nó chứng minh `git check-ignore`
+thật sự phân biệt được ignored/không, chứ không phải một lệnh luôn fail —
+tức mệnh đề mới sẽ chuyển xanh thật khi dòng `.gitignore` được thêm.
+
+### Vòng 2: **READY WITH CONSTRAINTS**
+
+Năm chiều kia PASS: **Repo fit** — đọc trực tiếp `registrations.mjs:
+1074-1114`, đúng ba mảnh `DEFAULT_*_SETTINGS`/`registerConfigDefault`/
+`registerCheck` như plan mô tả; **Mode fit** — `high-risk` khớp phần đếm
+lại ở trên; **Smaller path** — không có, đây đã là mảnh nhỏ nhất tách theo
+ranh giới ngôn ngữ (tiền lệ `tsk-2m5`); **Assumptions** — A4 (`.fgos/` là
+nhà hợp lệ cho secret) chứng minh bằng 5 tiền lệ gitignore + đối chứng
+`state.json`; **Impact-analysis posture** — kiểm lại tươi, gitnexus vẫn
+`present`, `.gitnexus/` vẫn vắng trong worktree → `degraded` như cha ghi.
+
+Ràng buộc mang sang executing: **C2** (impact-analysis `degraded` — blast
+radius chưa xác nhận, cross-check bằng `rg`).
+
+```text
+READY WITH CONSTRAINTS
+```
+
+## Kế hoạch riêng của P0a `tsk-54j` (2026-08-14) — area spec
+
+Con này (`docs`, `parent: tsk-ldb`, `deps: [tsk-7l9]`) được tạo sau 5 mảnh
+P1-P5 và vào thẳng stage `planning`, thừa hưởng `CONTEXT.md` của cha chứ
+không lặp lại exploring. Việc của nó: viết `docs/specs/herdr-web-dashboard.md`
+— area spec tech-agnostic, tương đương PRD của repo này — cộng một dòng trỏ
+trong `docs/specs/reading-map.md`.
+
+### Mode: high-risk
+
+**4 flag, trong đó 1 hard-gate.** Đếm lại cho đúng phạm vi con này, không
+thừa hưởng mù con số 8 flag của cha:
+
+| Flag | Bằng chứng |
+|---|---|
+| audit/security *(hard-gate)* | Bản mô tả item (bổ sung 2026-08-13) thêm 6 hành động GHI lên trên phạm vi đã khoá vốn **chỉ-đọc** 3 màn (`CONTEXT.md` §Ranh giới tính năng). D6/D8/D9 thiết kế auth cho một bề mặt chỉ-đọc; approve-merge đổi trạng thái trunk. Mô hình đe doạ được mô tả trong spec này chính là thứ P2-P5 sẽ hiện thực theo |
+| authorization | `docs/io-contract.md` (đã trích trong `CONTEXT.md` §Bằng chứng scout): fgOS **không có tầng phân quyền nào**, có chủ ý. tsk-7l9 D4: một token cho cả máy, không có định danh per-project/per-user. Không có nguyên liệu nào để trả lời "ai được approve-merge" |
+| public contracts | `docs/specs/` là state layer BA-grade; spec này là đầu vào bắt buộc của `tsk-3x6` (bản mô tả tsk-3x6, bổ sung 2026-08-14) và là mô tả sản phẩm mà P2-P5 xây theo |
+| weak proof | Hợp đồng API của gateway (tsk-7l9 D10 — OpenAPI mang số CTR + token `<name>/v<N>`) **chưa tồn tại**: `ls docs/specs/` hôm nay không có file nào như vậy. Spec này phải trỏ tới một hợp đồng chưa được viết. Kèm `impact-analysis: degraded` |
+
+**Vì sao không phải lane nhỏ hơn:** nếu chỉ là chép lại 14 D-ID đã khoá thì
+`small` là đủ. Nhưng 6 hành động ghi mới **chưa từng qua exploring, không
+mang D-ID nào**, và bản mô tả item nói thẳng chúng là *"OPEN requirements to
+spec out, not settled ones"*. Nghĩa là stage này phải tự phán một phần —
+đúng loại việc `small` giả định là không có.
+
+### Approach
+
+#### Đường đã chọn
+
+Một tài liệu, viết theo **đúng khuôn `docs/specs/distillery.md`** — spec duy
+nhất trong thư mục đang dùng trọn bộ heading mà `verify` của item đòi
+(`## Purpose` / `## Entry Points & Triggers` / `## Data Dictionary` /
+`## Behaviors & Operations` / `## Actors & Access` / `## Business Rules` /
+`## Edge Cases Settled` / `## Open Gaps` / `## Pointers`), kèm frontmatter
+`area/updated/sources/decisions/coverage`. `fgos-plugin.md` để purpose ở
+văn xuôi ngay dưới tiêu đề, **không** có heading `## Purpose` — theo khuôn
+đó thì verify đỏ vĩnh viễn. Đây là lý do chọn `distillery.md` làm khuôn.
+
+Nguyên tắc nội dung, chia làm hai lớp tách bạch, không trộn:
+
+1. **Lớp đã khoá** — trích D-ID, không diễn giải lại: 14 D của
+   `CONTEXT.md` (tsk-ldb) + D2/D4/D7/D8/D10 của
+   `docs/history/fgos-interface-daemon/CONTEXT.md` (tsk-7l9).
+2. **Lớp mới, chưa khoá** — 6 hành động ghi. Mỗi phát biểu hoặc (a) tựa
+   được vào một cơ chế CÓ THẬT trong repo hôm nay, và được ghi kèm bằng
+   chứng; hoặc (b) rơi xuống `## Open Gaps`, gọi đúng tên là chưa settled.
+   **Không có ô thứ ba.**
+
+#### Phương án đã cân nhắc và loại
+
+| Phương án | Vì sao loại |
+|---|---|
+| Chỉ spec 3 màn chỉ-đọc đã khoá, bỏ 6 hành động ghi sang item khác | Bản mô tả item liệt kê chúng là yêu cầu bắt buộc phải spec, kèm chỉ dẫn xử lý khi không settle được ("flag this as an Open Gap"). Bỏ ra ngoài là thu hẹp scope thay người |
+| Tự khoá luôn authz cho approve-merge trong spec này | Không có nguyên liệu: fgOS không có tầng phân quyền (`io-contract.md`), tsk-7l9 D4 chỉ có một token cho cả máy. Tự chế một mô hình authz ở đây là mở một quyết định sản phẩm mới dưới vỏ tài liệu |
+| Mô tả endpoint REST cụ thể của gateway trong spec này | tsk-7l9 D10 nói hợp đồng đó là artifact riêng, có số CTR. Bịa hình dạng endpoint ở đây tạo nguồn sự thật thứ hai, đúng thứ D10 dựng ra để tránh |
+| Ghi spec theo hướng embedded-server (D1 cũ của tsk-ldb) | Bản mô tả item ghi rõ nhánh đó **đã đóng** bởi tsk-7l9 D8: web là client độc lập, không nằm trong `herdr-fgos` |
+| Viết cả layout/màu/typography luôn cho gọn | Là phạm vi của `tsk-3x6` (`docs/reference/herdr-web-dashboard-layout.md`). Bản mô tả tsk-54j nói thẳng: *"the concrete visual layout itself belongs to tsk-3x6's UI spec, not here"* |
+
+#### Bản đồ rủi ro
+
+`impact-analysis: degraded` — `fgos tool query --capability impact-analysis
+--status present` hôm nay trả gitnexus `status: present`, nhưng hook trong
+chính phiên này báo index cũ (last indexed `c0cedaa`, sau HEAD đã merge
+main). Item này **không đụng một dòng code nào**, nên posture không chặn
+gì; ghi lại để người đọc sau khỏi dò lại.
+
+| # | Thành phần | Mức | Điều gì chứng minh được |
+|---|---|---|---|
+| RA1 | 6 hành động ghi được tuyên bố "settled" mà không có D-ID nào chống lưng | **Trung bình** | Đọc lại spec: mọi phát biểu trong `## Behaviors & Operations` về hành động ghi phải kèm hoặc một D-ID có thật, hoặc một đường dẫn/verb có thật trong repo; phần còn lại phải nằm dưới `## Open Gaps` |
+| RA2 | authz cho approve-merge bị tự chế | **Trung bình** | `docs/io-contract.md` xác nhận không có tầng phân quyền; tsk-7l9 D4 xác nhận một token/máy. Bằng chứng cơ học kèm theo: `bin/fgos.mjs:3328` — `approve` **từ chối chạy** khi cwd không phải main checkout. Ràng buộc này có thật, phải ghi; còn "ai được phép" thì phải là Open Gap |
+| RA3 | Bịa hình dạng API gateway trong khi hợp đồng của nó chưa tồn tại | **Trung bình** | `ls docs/specs/` hôm nay: không có file OpenAPI/contract nào của gateway. Spec chỉ được trỏ tới nó như một dependency gap đã biết |
+| RA4 | "Delete a work item" được spec như xoá thật | **Trung bình** | Sổ verb (`src/cli/command-registry.mjs`) **không có verb `delete`**; event log là truth append-only. Cửa duy nhất có thật là `move <id> wontfix` (`src/state/status-fsm.mjs:156-169`, ba cửa vào `wontfix` từ `todo`/`doing`/`blocked`, cộng `awaiting-human`). Spec phải nói retire, không nói delete |
+| RA5 | Lệch khuôn heading → verify đỏ vĩnh viễn | **Thấp** | Chính `verify` của item là bằng chứng: đã đo **exit 1** hôm nay (chưa có file); chuyển xanh khi 5 heading + dòng reading-map có mặt |
+| RA6 | Hướng Monday.com/ClickUp lấn sang phạm vi tsk-3x6 | **Thấp** | Đọc lại: nó chỉ được xuất hiện như kỳ vọng phía actor trong `## Behaviors & Operations` (nhóm theo status, thao tác nhanh tại chỗ, lọc/nhóm), tuyệt đối không có kích thước/màu/khoảng cách |
+
+RA1-RA4 đều là medium nên đều mang proof point sang `fgos-coding-validating`
+đúng chuẩn high-risk; không cái nào được để trống.
+
+#### Thứ tự
+
+`fgos graph --json`: tsk-ldb là component **cô lập** (`size 1`), như vòng
+lập kế hoạch của cha đã ghi — thứ tự không lấy được từ graph. Nó đến từ
+`deps` có thật: `tsk-7l9` (`status: retrospective`, tức đã merge) → `tsk-54j`
+→ `tsk-3x6`. P0a phải xong trước vì `tsk-3x6` khai nó là nguồn thông tin sản
+phẩm, và verify của `tsk-3x6` grep đúng đường dẫn `docs/specs/herdr-web-dashboard.md`.
+
+Không chồng lấn footprint với bất kỳ mảnh nào khác: P0a chạm 2 file
+markdown dưới `docs/specs/`, P1-P5 chạm Rust/Node.
+
+### Shape
+
+Một tài liệu, các mục theo đúng thứ tự khuôn `distillery.md`:
+
+- **Frontmatter** — `area: herdr-web-dashboard`, `updated: 2026-08-14`,
+  `sources: [tsk-ldb, tsk-54j, tsk-7l9]`, `decisions:` liệt kê D-ID nguồn,
+  `coverage: partial` (trung thực: 6 hành động ghi chưa khoá hết).
+- **`## Purpose`** — bề mặt này là gì, cho ai, vì sao tồn tại. Ghi rõ nhu
+  cầu gốc: xem/duyệt **từ điện thoại**, đúng lúc không có cockpit nào mở
+  (`CONTEXT.md` §"Vì sao D12"). Ghi rõ **không thay thế TUI**.
+- **`## Entry Points & Triggers`** — điểm vào theo góc người dùng, không
+  phải endpoint: mở dashboard từ trình duyệt (đăng nhập bằng token), mở
+  taskboard, mở một task, mở danh sách câu hỏi cần trả lời. Kèm điều kiện
+  bật/tắt (D10 mặc định BẬT, D13 port 8788, D7 bind).
+- **`## Data Dictionary`** — bảng đánh số các phần tử người dùng thấy:
+  work item, câu hỏi cần trả lời (gộp `ask` + `gate-approve`, D4), lịch sử
+  agent đã làm (D3), phiên đăng nhập, endpoint gateway đang kết nối tới
+  (số nhiều — tsk-7l9 D2, client tương lai nối N gateway).
+- **`## Behaviors & Operations`** — một mục con mỗi việc, đúng khuôn
+  `distillery.md` (**Blocked when / What changes / Side effects /
+  Afterwards**): xem taskboard (kèm kỳ vọng Monday.com/ClickUp), xem task
+  detail, trả lời một câu hỏi đang đỗ, approve-merge, thêm item, sửa item,
+  retire item. Mỗi việc ghi rõ nó đi qua verb một-cửa-ghi nào.
+- **`## Actors & Access`** — bảng năng lực. Trung thực: hôm nay chỉ có
+  **một** actor kỹ thuật ("ai giữ token của máy"), không phân vai, vì
+  fgOS không có tầng phân quyền. Vai người dùng (chủ sản phẩm xem từ điện
+  thoại) là vai **sản phẩm**, không phải vai được hệ thống cưỡng chế —
+  nói thẳng khoảng cách đó.
+- **`## Business Rules`** — R1..Rn, mỗi rule trích nguồn. Trong đó rule
+  chịu lực: mọi hành động ghi đi qua verb một-cửa-ghi của fgOS
+  (`add`/`edit`/`answer`/`approve`/`move`), web **không bao giờ** tự ghi
+  `.fgos/`; gateway là chokepoint duy nhất spawn verb (tsk-7l9 D7).
+- **`## Edge Cases Settled`** — item chưa từng đỗ hỏi lần nào; `docsRef`
+  trỏ thư mục không tồn tại; đóng cockpit không giết dashboard (D12);
+  gateway không với tới được từ client.
+- **`## Open Gaps`** — nơi hạ cánh của RA2/RA3 và mọi phần chưa khoá của 6
+  hành động ghi. Mỗi gap ghi: gap là gì, vì sao chưa trả lời được ở đây,
+  ai/item nào trả lời được.
+- **`## Pointers`** — trỏ về `CONTEXT.md`/`DISCUSSION.md`/`plan.md` của
+  tsk-ldb, `CONTEXT.md` của tsk-7l9, `docs/decisions/0014`, `io-contract.md`,
+  và `tsk-3x6` cho lớp UI.
+
+Cộng **một dòng** vào `docs/specs/reading-map.md` theo đúng nếp đang có
+(`- \`<đường dẫn>\` — <mô tả>; spec: <đường dẫn spec>`).
+
+### Assumptions
+
+| # | Giả định | Nếu sai thì sao |
+|---|---|---|
+| A5 | Khuôn `distillery.md` là khuôn đúng cho spec mới (nó là spec duy nhất dùng trọn bộ heading verify đòi) | Nếu sai thì chỉ là lệch phong cách trong `docs/specs/`, không ảnh hưởng hành vi; verify vẫn xanh |
+| A6 | `coverage: partial` được chấp nhận trong frontmatter (`fgos-plugin.md` dùng `full`) | Nếu vocabulary chỉ cho phép `full`, đổi nhãn — không đổi nội dung, và không được đổi thành `full` khi Open Gaps còn thật |
+| A7 | tsk-7l9 ở `status: retrospective` nghĩa là D1-D10 của nó đã khoá và trích được | Nếu nó bị mở lại, phần trích tsk-7l9 trong spec phải sửa theo — nhưng `retrospective` là sau merge, nên rủi ro thấp |
+
+### Split
+
+**Không tách.** Một tài liệu + một dòng index là một mảnh việc trung thực
+duy nhất; tách ra thì mảnh "dòng reading-map" không tự đứng được (verify
+của nó sẽ phải grep file mà mảnh kia mới tạo). Đây là nhánh
+*pass-through* — `tsk-54j` đi tiếp như chính nó.
+
+### Proof surface
+
+`verify` của item **đã là lệnh thật, không phải placeholder** — không sync
+đè (kỷ luật "không ghi đè giá trị đã đặt có chủ ý"). Đo hôm nay:
+
+| Mệnh đề | Hôm nay |
+|---|---|
+| Cả verify (`test -f` + 5 × `grep -q '^## …'` + `grep -q` reading-map) | **exit 1** — đỏ đúng, file chưa tồn tại |
+
+Chiều xanh có thật vì cả 7 mệnh đề đều là kiểm tra sự tồn tại của văn bản
+mà chính item này viết ra — không có mệnh đề nào phụ thuộc trạng thái ngoài
+tầm với. Không dính lỗi lớp F3 (fail-open) của vòng 1: `test -f` trên một
+file chưa tồn tại thoát khác 0, không phải một filter rỗng thoát 0.
+
+Điều verify này **không** chứng minh (mang sang reality gate của
+`fgos-coding-validating`, không giấu): nó chỉ chứng minh 5 heading có mặt,
+không chứng minh nội dung dưới heading là đúng và có nguồn. Đó chính là lý
+do RA1-RA4 mang proof point đọc-lại-nội-dung, chứ không dựa vào verify.
+
+### Chốt tại cổng validateApprove (2026-08-14, chủ sản phẩm)
+
+Cổng không tự duyệt được: `gate-check` trả `canAutoApprove: false`. Chẩn
+đoán trực tiếp cho thấy tier đã được phủ (`standard` ≤ level `standard`),
+`plan.md` không còn mục mở, cost verdict `REVERSIBLE` — thứ duy nhất chặn
+là **sàn từ-khoá hard-gate** bắn trên chính bản mô tả item: `auth`,
+`authentication`, `migration`, `secret`, `delete`. Sàn này đơn điệu về
+phía hỏi người, không được lập luận hạ xuống.
+
+Hai điểm được hỏi gộp một lượt, cả hai chốt theo đề xuất:
+
+| # | Điểm | Chốt |
+|---|---|---|
+| G1 | **approve-merge từ dashboard** | **Trong scope, ghi rõ phơi nhiễm.** Spec mô tả đủ luồng approve-merge đi qua verb `fgos approve`, kèm một Open Gap nói thẳng: ai giữ token của máy thì approve được, không có phân quyền mịn hơn cho tới STR38. Bằng chứng nền: `docs/io-contract.md:170-171` (tầng phân quyền thuộc STR38, chưa xây), tsk-7l9 D4 (một token/máy), `bin/fgos.mjs:3328` (approve từ chối chạy ngoài main checkout — ràng buộc cơ học có thật, phải ghi) |
+| G2 | **"Delete a work item"** | **Retire qua `wontfix`.** Không có verb `delete` trong sổ verb; event log là truth append-only. Cửa có thật: `move <id> wontfix` (`src/state/status-fsm.mjs:156-169`). Spec viết là *retire*, không viết là *delete*; item biến khỏi danh sách đang mở, lịch sử còn nguyên |
+
+Cả hai đều đảo ngược được (sửa một tài liệu, trước khi P2-P5 viết dòng code
+nào), nên chúng là **nội dung được chốt**, không phải ràng buộc treo.
+
+### Outstanding questions của P0a
+
+None — RA2/RA3 không phải câu hỏi treo của kế hoạch này; chúng là nội dung
+mà `## Open Gaps` của chính spec phải ghi ra, và bản mô tả item đã chỉ dẫn
+đúng cách xử lý ("flag this as an Open Gap in the spec if it cannot be
+resolved within this item's own scope"). G1/G2 ở trên đã chốt phần mà chủ
+sản phẩm cần quyết; phần còn lại (authz mịn, hợp đồng API gateway) hạ cánh
+đúng vào `## Open Gaps` của spec.
+
+## Kế hoạch riêng của P0b `tsk-3x6` (2026-08-14) — UI spec + wireframe
+
+Con này (`docs`, `parent: tsk-ldb`, `deps: [tsk-54j]`) chạy ngay sau P0a và
+lấy chính output của P0a — `docs/specs/herdr-web-dashboard.md` — làm nguồn
+thông tin sản phẩm. Nhánh `fgw/tsk-3x6` fork thẳng từ commit merge P0a vào
+`fgw/tsk-ldb`, nên spec đó **có mặt sẵn trong cây làm việc** (đã kiểm:
+`docs/specs/herdr-web-dashboard.md` tồn tại tại base của nhánh này).
+
+### Mode: standard
+
+**3 flag, không flag nào hard-gate:**
+
+| Flag | Bằng chứng |
+|---|---|
+| public contracts | Tài liệu này là tiêu chí nghiệm thu của P3 (`tsk-5jr`) và P4 (`tsk-4id`). Bản mô tả item nói rõ vì sao: verify của P4 chỉ chứng minh tính đúng (ghép cặp theo seq, chặn path traversal, gộp hai kênh) — **không mệnh đề nào chạm tới tính dễ đọc**, nên P4 có thể xanh hoàn toàn mà vẫn trượt mục tiêu thật |
+| weak proof | Tiêu chí nghiệm thu thật là **chủ quan** ("câu hỏi trình bày sao cho người không có ngữ cảnh trong đầu trả lời nhanh"). Verify của item chỉ grep 3 heading + 1 trích dẫn — không đo được điều đó |
+| cross-platform | Nhu cầu gốc là **dùng từ điện thoại** (`CONTEXT.md` §"Vì sao D12"), nên bố cục phải trả lời cả desktop lẫn mobile, không phải một |
+
+**Vì sao không phải lane lớn hơn:** không có flag hard-gate nào. Item này
+không quyết định bảo mật, không đụng schema, không đụng code — mọi quyết
+định về auth/phơi nhiễm đã khoá ở P0a và chỉ được **vẽ lại**, không mở
+lại. Và không phải lane nhỏ hơn vì 3 flag vượt ngưỡng `small`.
+
+### Approach
+
+#### Đường đã chọn
+
+Hai artifact, một nguồn:
+
+1. **Spec có cấu trúc + wireframe sinh bằng kỹ năng `ui-spec`** dưới
+   `docs/ui-spec/` — đúng chỉ dẫn bổ sung 2026-08-14 của bản mô tả item
+   ("write this item's UI spec using the `ui-spec` skill … and generate the
+   wireframe with that same skill's tooling rather than hand-authoring
+   either artifact").
+2. **`docs/reference/herdr-web-dashboard-layout.md`** — tài liệu người đọc,
+   đúng đường dẫn + 3 heading mà `verify` của item đòi, trích
+   `docs/specs/herdr-web-dashboard.md` và trỏ sang artifact ở (1).
+
+Hai thứ này không trùng việc: (1) là hợp đồng tương tác máy-đọc-được +
+wireframe bấm được; (2) là bản đọc-một-lượt mà `tsk-5jr`/`tsk-4id` mở ra
+khi build, đúng vai trò tiền lệ `docs/reference/herdr-dashboard-layout-and-
+action-queues.md` đang giữ cho TUI (bản mô tả item chỉ đúng tiền lệ này).
+
+**Căng thẳng phải nói thẳng, không giấu:** `ui-spec/SKILL.md` §"When NOT to
+use" ghi rõ nó dành cho app **≥ 20 surface**, và "app đơn giản < 15 màn thì
+PRD + Figma là đủ". Bề mặt này có ~7 surface. Nghĩa là kỹ năng đang được
+dùng dưới ngưỡng nó tự khai. Vẫn làm, vì hai lý do có thật: chủ sản phẩm
+yêu cầu tường minh, và thứ thật sự cần ở đây — **một wireframe bấm được để
+soi tính dễ đọc trước khi có pixel** — chính là thứ `interpret:wf` sinh ra,
+không phụ thuộc số lượng surface. Ghi lại để phiên sau không tưởng là đã bỏ
+sót cổng của chính kỹ năng đó.
+
+#### Kiểm kê surface (từ `docs/specs/herdr-web-dashboard.md`)
+
+Lấy thẳng từ `## Behaviors & Operations` của area spec, không tự chế:
+
+| ID | Loại | Surface | Nguồn trong area spec |
+|---|---|---|---|
+| S01 | screen | Sign in | §Sign in |
+| S02 | screen | Taskboard | §View the taskboard (kỳ vọng Monday.com/ClickUp) |
+| S03 | screen | Task detail | §View a task's detail — **deliverable lõi** |
+| S04 | screen | Questions needing answer | §Entry Points, D4 (gộp `ask` + `gate-approve`) |
+| M01 | modal | Answer a parked question | §Answer a parked question |
+| M02 | modal | Approve a merge (xác nhận) | §Approve a merge — hành động duy nhất đổi trunk |
+| M03 | modal | Add / Edit work item | §Add + §Edit a work item |
+| C01 | component | Status pill + quick actions | kỳ vọng "quick actions reachable in place" |
+| F01 | flow | Trả lời một câu hỏi đang đỗ, đầu-cuối | bản mô tả item: userflow bắt buộc |
+| F02 | flow | Duyệt merge, đầu-cuối | bản mô tả item: userflow bắt buộc |
+
+"Retire a work item" không có surface riêng — nó là quick action trên C01
+cộng một xác nhận, đúng như area spec mô tả (retire, không phải delete).
+
+#### Phương án đã cân nhắc và loại
+
+| Phương án | Vì sao loại |
+|---|---|
+| Chỉ viết tay `docs/reference/...md`, bỏ `ui-spec` | Trái chỉ dẫn tường minh 2026-08-14 của bản mô tả item, và mất wireframe bấm được — thứ duy nhất soi được tiêu chí dễ đọc trước khi có pixel |
+| Chỉ sinh cây `docs/ui-spec/`, bỏ file reference | `verify` của item grep đúng `docs/reference/herdr-web-dashboard-layout.md` + 3 heading; bỏ nó thì item không bao giờ xanh, và `tsk-5jr`/`tsk-4id` mất bản đọc-một-lượt |
+| Chạy `ui-spec generate` tự động từ PRD | Pipeline `generate` giả định một PRD đơn lẻ; ở đây nguồn là area spec + 14 D-ID + 10 D-ID của tsk-7l9. Kiểm kê surface bằng tay từ `## Behaviors & Operations` là chính xác hơn và kiểm chứng được từng dòng |
+| Vẽ luôn màu/typography chi tiết mức design system | Bản mô tả item chỉ đòi "colour/typography choices", không đòi design system. Mở rộng là tự bơm scope |
+
+#### Bản đồ rủi ro
+
+`impact-analysis: degraded` — `fgos tool query` báo gitnexus `present`,
+hook trong phiên báo index cũ. Item không đụng code nên posture không chặn.
+
+| # | Thành phần | Mức | Điều gì chứng minh được |
+|---|---|---|---|
+| RB1 | Tooling `ui-spec` không chạy được trên máy này | **Đã đóng** | `tools/node_modules` vắng lúc đầu (`ERR_MODULE_NOT_FOUND` khi import `ajv`); `npm ci` trong `.claude/skills/ui-spec/tools/` chạy thật: **added 63 packages in 531ms**. Đây là dựng tooling của chính kỹ năng, không phải thêm dependency vào repo forgent |
+| RB2 | Spec cấu trúc lệch khỏi area spec (tự chế màn/hành động không có trong P0a) | **Trung bình** | Bảng kiểm kê surface ở trên trích từng mục `## Behaviors & Operations`; tại validating đọc ngược lại area spec, mỗi surface phải chỉ được về một mục có thật |
+| RB3 | Wireframe sinh ra rỗng/hỏng (contract block sai, target treo) | **Trung bình** | `npm run check` (= `validate` + `build`) phải exit 0; `npm run interpret:wf` phải sinh file HTML có thật. Cả hai đo được, không phải phán |
+| RB4 | Tài liệu reference lệch heading → verify đỏ vĩnh viễn | **Thấp** | Chính `verify` là bằng chứng: đo **exit 1** hôm nay; xanh khi 3 heading + trích dẫn có mặt |
+| RB5 | Quyết định CSS framework bị tự chốt thay người | **Trung bình** | Bản mô tả item khai đây là quyết định **còn mở** và D14 im lặng về CSS framework. Không tự chốt — đưa lên cổng validateApprove kèm so sánh thật (xem "Câu hỏi mang lên cổng") |
+| RB6 | Footprint khai thiếu → va chạm dispatch song song | **Thấp** | Footprint hiện chỉ khai 1 file; kế hoạch này chạm thêm `docs/ui-spec/**`. Sửa `footprint` của item trước khi executing |
+
+#### Thứ tự
+
+`deps` có thật: `tsk-54j` (đã `delivered`, merge vào `fgw/tsk-ldb`) →
+`tsk-3x6`. Trong item: kiểm kê surface → file cross-cutting → surface file
+(prose) → contract block → flow → `npm run check` → `interpret:wf` →
+cuối cùng mới viết `docs/reference/herdr-web-dashboard-layout.md`, vì tài
+liệu đó phải trích được kết quả wireframe chứ không phải hứa trước.
+
+### Shape
+
+**`docs/ui-spec/`** theo đúng khuôn kỹ năng: `spec.config.yaml`,
+`00-overview.md`, `20-domain-rules.md`, `30-states-and-errors.md`,
+`15-system-events.md`, rồi `screens/`, `modals/`, `components/`, `flows/`
+theo bảng kiểm kê. Domain rule lấy thẳng từ `## Business Rules` R1-R11 của
+area spec, không phát minh rule mới.
+
+**`docs/reference/herdr-web-dashboard-layout.md`** — heading bắt buộc theo
+`verify`, cộng phần bổ sung mà bản mô tả item liệt kê:
+
+- `## Userflow` — đầu-cuối: đăng nhập → taskboard → mở task → trả lời câu
+  hỏi đang đỗ → duyệt merge.
+- `## Taskboard` — bố cục kiểu Monday.com/ClickUp: nhóm theo status, pill
+  màu theo status, quick action tại chỗ, control lọc/nhóm.
+- `## Task detail` — **mục lõi**: ba vùng (câu hỏi / vì sao đang hỏi / ngữ
+  cảnh item) sắp xếp ra sao, và timeline hỏi-đáp trình bày thế nào qua
+  nhiều vòng đỗ.
+- `## Empty and error states` — item chưa từng đỗ; `docsRef` trỏ thư mục
+  không tồn tại; gateway không với tới được.
+- `## Colour and typography` — bảng màu + thang chữ, kèm lý do.
+- Trích `docs/specs/herdr-web-dashboard.md` làm nguồn sản phẩm (mệnh đề
+  thứ 5 của verify), và trỏ sang wireframe sinh được.
+
+### Câu hỏi mang lên cổng validateApprove
+
+**Quyết định CSS framework** — bản mô tả item khai là còn mở, D14 chỉ khoá
+vite + TypeScript và **im lặng về CSS**. Đã so sánh thật:
+
+| | Tailwind (kèm/không kèm stitch) | CSS viết tay |
+|---|---|---|
+| Chi phí | +1 dependency frontend, tích hợp vite là đường mòn sẵn | Không thêm dependency |
+| Hợp với mục tiêu | Board mật độ cao kiểu Monday/ClickUp đúng chỗ utility-class tiết kiệm nhiều nhất | Kiểm soát hoàn toàn, nhưng tốn công cho đúng loại UI này |
+| Đảo ngược | Utility class rải khắp markup → gỡ ra là viết lại style | Về sau muốn theo Tailwind cũng là viết lại style |
+| Tiền lệ repo | Không có tiền lệ CSS framework nào (herdr là TUI) | Cũng không có tiền lệ |
+
+Không bên nào rẻ để đảo ngược, nên **không áp dụng lối thoát "chọn cái đảo
+ngược được rồi đi tiếp"** — đây là T1 thật (hai phương án còn đứng sau khi
+so sánh), và nó ràng buộc P2-P5 chứ không chỉ tài liệu này.
+
+### Assumptions
+
+| # | Giả định | Nếu sai thì sao |
+|---|---|---|
+| A8 | Cây `docs/ui-spec/` là nơi hợp lệ cho artifact máy-đọc-được của UI (kỹ năng mặc định vào đó) | Nếu repo muốn nơi khác, di chuyển thư mục — không ảnh hưởng nội dung hay verify |
+| A9 | ~7 surface đủ phủ hết `## Behaviors & Operations` của area spec | RB2 — validating đọc ngược để bắt thiếu |
+| A10 | `npm ci` trong thư mục tools của kỹ năng là dựng tooling, không phải quyết định scope của repo forgent | Nếu sai, artifact vẫn viết được bằng tay, chỉ mất wireframe bấm được |
+
+### Split
+
+**Không tách.** Hai artifact nhưng một mạch việc: file reference phải trích
+kết quả wireframe, nên tách ra thì mảnh sau chờ mảnh trước mà không tự
+đứng được. Nhánh *pass-through*.
+
+### Proof surface
+
+`verify` của item đã là lệnh thật, không phải placeholder — không sync đè.
+Đo hôm nay:
+
+| Mệnh đề | Hôm nay |
+|---|---|
+| Cả verify (`test -f` + 3 × `grep -q '^## …'` + `grep -q` trích area spec) | **exit 1** — đỏ đúng, file chưa tồn tại |
+
+Không dính lỗi lớp fail-open: `test -f` trên file chưa tồn tại thoát khác 0.
+
+Điều verify **không** chứng minh, mang sang reality gate: nó không đo được
+tính dễ đọc — đúng điều flag "weak proof" ở trên đã khai. Bù bằng hai proof
+point cơ học mà validating chạy thật: `npm run check` exit 0 (RB3) và
+`interpret:wf` sinh HTML có thật, cộng phần đọc-ngược area spec (RB2).
+
+### Chốt tại cổng validateApprove (2026-08-15, chủ sản phẩm)
+
+Cổng không tự duyệt được (`canAutoApprove: false`) — đúng như dự kiến: T1
+bắn thật, và `plan.md` lúc đó còn mục mở. Câu hỏi được trình bày kèm bảng
+so sánh ở mục ngay trên; chủ sản phẩm chốt:
+
+| # | Điểm | Chốt |
+|---|---|---|
+| G3 | **CSS framework cho web client** | **Tailwind, và dùng stitch để sinh layout.** Stitch tooling sinh bố cục ban đầu rồi export Tailwind/HTML làm điểm xuất phát; Tailwind là lớp style thật của client. Đổi lại, chấp nhận một dependency frontend mới (Tailwind) cộng một tooling sinh-layout trong quy trình, và chấp nhận output của stitch phải được dọn lại chứ không dùng thô |
+
+Hệ quả phải ghi, không giấu: D14 khoá vite + TypeScript và **im lặng về
+CSS**; G3 không mở lại D14, nó lấp đúng khoảng im lặng đó. P2-P5 thừa
+hưởng quyết định này — mọi mảnh frontend sau đây viết style bằng Tailwind,
+không tự chọn lại.
+
+### Outstanding questions của P0b
+
+None — G3 đã chốt câu hỏi T1 duy nhất của kế hoạch này.
 
 ## Outstanding questions
 

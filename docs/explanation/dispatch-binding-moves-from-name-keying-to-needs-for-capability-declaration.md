@@ -34,20 +34,23 @@ not an edge case of it.
 
 ## The fix: two fields, two different jobs
 
-The demand side (a capacity in `.fgos/config.json`) now declares two
-independent optional fields:
+The demand side (a capacity in `.fgos/config.json`) declared two
+independent optional fields (`needs` retired since, see the closing
+section below — this section stays in past tense as the historical record
+of why the split was made, not a description of today's live code):
 
 - **`needs`** — the capability required, i.e. which *provider* can serve
-  this capacity. This is the field that actually drives binding:
-  `resolveExecutorConfig` searches the tool registry for entries whose
-  `capability` matches `needs`, requires at least one match with
-  `resolvedStatus(...) === 'present'`, and only then resolves — the same
+  this capacity. This was the field that actually drove binding:
+  `resolveExecutorConfig` searched the tool registry for entries whose
+  `capability` matched `needs`, required at least one match with
+  `resolvedStatus(...) === 'present'`, and only then resolved — the same
   two-step "registered? / present?" shape the code already used for
   name-keying, just keyed on capability instead of name.
-- **`for`** — the purpose (`gather` | `judge`), i.e. which *lane/protocol*
-  applies. This field has no functional consumer yet in this migration —
-  it's added to the schema and vocabulary so a later item
-  (`tsk-2ie5`) can consume it without a second schema migration.
+- **`for`** — the purpose (today: `judge` only, `gather` retired since —
+  see the closing section), i.e. which *lane/protocol* applies. This field
+  had no functional consumer yet in this migration — it was added to the
+  schema and vocabulary so a later item (`tsk-2ie5`) could consume it
+  without a second schema migration.
 
 The two fields don't compete for the same question — asking "which
 lane?" always resolves to `for` for a gather-style query, while "which
@@ -120,3 +123,41 @@ already-produced proof instead of re-deriving it
 (`docs/history/tsk-2c1/iron-law-evidence.md`,
 `docs/how-to/fix-fgos-write-rejected-merge-block.md`'s own new `tsk-28o`
 example).
+
+## Both fields retired (tsk-5tm-1 D1, tsk-5tm-2 D6)
+
+`needs` and `gather` — the one real pairing this whole migration was
+built for — were both retired within the same later item
+(`tsk-5tm`), for two separate but related reasons:
+
+- **`needs` (D1):** `resolveExecutorConfig`'s presence gate only ever ran
+  for `capacity.kind !== 'task'` — but 2 of the 3 real capacities that
+  ever declared `needs` (`judge-discovery`, `judge-decompose`) were
+  `kind: "task"`, so the gate never actually consulted `needs` for them;
+  it was dead data. The third (`gather`) had `needs` genuinely reachable,
+  but the gate added no signal beyond what the OS's own ENOENT already
+  gives on a missing binary. `resolveExecutorConfig`'s whole
+  presence/staleness gate was removed rather than kept half-alive — `fgos
+  tool query --status present/stale` is the sanctioned place to ask
+  presence/staleness directly at a call site, and reconstructing that same
+  check inside `dispatch.mjs` was judged not worth keeping for a signal
+  this thin.
+- **`gather` (D6):** the one capacity that ever exercised `for`'s
+  purpose-lookup mechanism end to end was also `needs`'s one live
+  consumer, and it was retired separately: `gather` was the sole
+  cross-provider dispatch path in the system, and no architectural
+  decision on record ever named a real reason cross-provider dispatch was
+  needed here (`tsk-2ie5`'s own plan.md said the provider was "not decided
+  in this plan, not guessed ahead of time"). The one documented reason
+  (parallelizing wall-clock across research branches) was already met by
+  native Task-tool dispatch, so removing `gather` cost nothing real.
+
+`for`/`resolveCapacityIdForPurpose` itself is NOT retired — the JOB vs
+MECHANISM distinction this doc's own split predicted (`for` = which lane,
+`needs` = which provider) held up as a concept even though `needs`'s own
+field is gone; `for` still resolves `judge-discovery`/`judge-decompose` by
+purpose today (unused in practice — both callers use a fixed id directly,
+per `tsk-5tm` `CONTEXT.md` D10 — but tested and ready for the next
+producer that needs it). Presence/staleness, when a future capacity
+genuinely needs that check again, goes through the tool registry directly
+at the call site, never a field on `capacities.<id>` re-litigated here.
