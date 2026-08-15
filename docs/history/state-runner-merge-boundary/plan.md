@@ -62,9 +62,18 @@ do nó tìm ra 6 file mà 6 vòng shaping trước bỏ sót.
   (`|| true`), nên đây là assumption, không phải claim đã chứng minh.
   `fgos-coding-validating` cần biết điều này là điểm yếu đã biết, không
   phải chỗ bị bỏ quên.
-- **A-2.** `npm test` xanh đủ để kết luận "0 đổi hành vi CLI". Dựa trên
-  việc test suite spawn `bin/fgos.mjs` thật và assert JSON exact-match
-  (`RESEARCH.md` §A3), không phải mock.
+- **A-2.** `npm test` xanh là bằng chứng MẠNH nhưng KHÔNG tuyệt đối cho
+  "0 đổi hành vi CLI". Đã kiểm thật ở vòng validating: test spawn
+  `bin/fgos.mjs` như tiến trình thật (không mock), parse JSON stdout và
+  assert trên **field cụ thể** (`test/cli/fgos-approve.test.mjs:1277-1280`
+  `data.mode`/`data.to`/`data.deliveryUnrecorded`; `:1310-1313`
+  `data.to`/`data.seq`), cộng exit code và row trong event log
+  (`:608-610`). Đây KHÔNG phải deepEqual toàn payload. Hệ quả còn lại:
+  một field nào của payload mà không test nào assert thì có thể đổi mà
+  suite vẫn xanh. Ràng buộc rút ra: khi chuyển 7 case block sang tầng
+  use-case, payload trả về phải được sao chép nguyên văn theo từng nhánh
+  return, không "dựng lại cho gọn" — vì suite sẽ không bắt được phần sai
+  ở field không được assert.
 
 ## Shape (phased)
 
