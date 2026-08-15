@@ -28,8 +28,9 @@ import {
   CAPACITY_KINDS,
   CAPACITY_CARRIES,
   INVOCATION_VIA,
+  capacityIdForWork,
 } from '../../src/runner/dispatch.mjs';
-import { initStore, registerTool } from '../../src/state/store.mjs';
+import { initStore, registerTool, addWork } from '../../src/state/store.mjs';
 import { writeLocalStatus, findExecutableOnPath } from '../../src/state/tool-registry.mjs';
 import { resolveMainCheckoutRoot } from '../../src/runner/paths.mjs';
 
@@ -2665,6 +2666,110 @@ test('decideCapacityCli resolves purpose-based (--for) to the same result a posi
   // Positional-id path stays byte-identical (no capacityId field) — every
   // pre-tsk-2c1 caller/test already asserts this exact shape.
   assert.deepEqual(byName, { mechanism: 'out-of-process' });
+});
+
+// --- decideCapacityCli: work-item-shaped lookup (--work, D4/D12(iii),
+// tsk-5tm-6) -- the lookup fgos-fanout needs to consult this protocol
+// per-candidate before firing an Agent, instead of assuming native
+// dispatch unconditionally --------------------------------------------------
+
+test('capacityIdForWork is exported and resolves a coding-domain (or no-domain) work item to fgos-coding-implement, the same lookup spawnWorker already applies internally', () => {
+  assert.equal(capacityIdForWork(sampleWork()), 'fgos-coding-implement');
+});
+
+test('decideCapacityCli resolves work-item-based (--work) to the same result a positional capacityId would, plus the resolved capacityId', async () => {
+  const root = mkTempDir();
+  const fgosDir = path.join(root, '.fgos');
+  addWork(fgosDir, {
+    id: 'tsk-fanout-candidate',
+    title: 'Fanout candidate',
+    kind: 'task',
+    status: 'todo',
+    deps: [],
+    risk: 'light',
+    refs: [],
+    verify: 'npm test',
+  });
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capacities: { 'fgos-coding-implement': { kind: 'task', agentType: 'general-purpose' } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const byWork = await decideCapacityCli(undefined, { repoRoot: root, work: 'tsk-fanout-candidate', hasLiveTaskAccess: true });
+  const byName = await decideCapacityCli('fgos-coding-implement', { repoRoot: root, hasLiveTaskAccess: true });
+  assert.deepEqual(byWork, { mechanism: 'in-process', agentType: 'general-purpose', capacityId: 'fgos-coding-implement' });
+  // Positional-id path stays byte-identical (no capacityId field) -- every
+  // pre-D4 caller/test already asserts this exact shape.
+  assert.deepEqual(byName, { mechanism: 'in-process', agentType: 'general-purpose' });
+});
+
+test('decideCapacityCli throws a RunnerConfigError when --work names a work item that does not exist -- never silently "unavailable" (a typo/stale id is a real usage error, unlike an unconfigured purpose)', async () => {
+  const root = mkTempDir();
+  fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  await assert.rejects(
+    () => decideCapacityCli(undefined, { repoRoot: root, work: 'no-such-work-item' }),
+    RunnerConfigError,
+  );
+});
+
+test('a positional capacityId still wins over --work when both are somehow passed, same precedence --for already has', async () => {
+  const root = mkTempDir();
+  const fgosDir = path.join(root, '.fgos');
+  addWork(fgosDir, {
+    id: 'tsk-fanout-candidate-2',
+    title: 'Fanout candidate 2',
+    kind: 'task',
+    status: 'todo',
+    deps: [],
+    risk: 'light',
+    refs: [],
+    verify: 'npm test',
+  });
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capacities: {
+      'fgos-coding-implement': { kind: 'task', agentType: 'general-purpose' },
+      explicit: { kind: 'cli', command: 'agy', args: ['{prompt}'], allowCrossProvider: true },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const decided = await decideCapacityCli('explicit', { repoRoot: root, work: 'tsk-fanout-candidate-2', hasLiveTaskAccess: true });
+  assert.deepEqual(decided, { mechanism: 'out-of-process' });
+});
+
+test('the "decide" CLI entry point resolves --work <id> the same way as a positional capacityId', () => {
+  const { repoRoot, fgosDir } = mkTempGitRepo();
+  addWork(fgosDir, {
+    id: 'tsk-fanout-cli-candidate',
+    title: 'Fanout CLI candidate',
+    kind: 'task',
+    status: 'todo',
+    deps: [],
+    risk: 'light',
+    refs: [],
+    verify: 'npm test',
+  });
+  writeRunnerConfigFixture(repoRoot, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capacities: { 'fgos-coding-implement': { kind: 'task', agentType: 'general-purpose' } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
+  const result = spawnSync(
+    process.execPath,
+    [dispatchPath, 'decide', '--work', 'tsk-fanout-cli-candidate', '--has-live-task-access'],
+    { encoding: 'utf8', cwd: repoRoot },
+  );
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(JSON.parse(result.stdout), { mechanism: 'in-process', agentType: 'general-purpose', capacityId: 'fgos-coding-implement' });
 });
 
 test('resolveCapacityCli rejects with a usage RunnerConfigError when both capacityId and --for are missing', async () => {
