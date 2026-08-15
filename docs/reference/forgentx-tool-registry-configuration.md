@@ -28,17 +28,45 @@ Confirmed via `fgos tool query --capability impact-analysis --json`:
 
 ## Capability vocabulary in use
 
-> **Capability vocab đang dùng**: đúng 1 nhãn — `impact-analysis`
-> (kebab-case, tự chuẩn hoá qua `normalizeCapability`,
-> `src/state/tool-registry.mjs`). Thêm nhãn mới không cần sửa code: chỉ
-> cần `--capability <ten-moi>` lúc `register` — consumer (một skill, hay
-> CLAUDE.md) tự quyết định có hỏi nhãn đó hay không, registry không áp
-> policy.
+> **Capability vocab đang dùng**: 2 nhãn hôm nay — `impact-analysis`
+> (gitnexus) và `pane-labeling` (herdr), cả hai kebab-case, tự chuẩn hoá
+> qua `normalizeCapability` (`src/state/tool-registry.mjs`). Thêm nhãn mới
+> không cần sửa code: khai thẳng `capability: "<ten-moi>"` trên entry
+> `runner.capacities.<id>` — consumer (một skill, hay CLAUDE.md) tự quyết
+> định có hỏi nhãn đó hay không, registry không áp policy.
 
-(Exactly one label in use today — `impact-analysis`. Adding a new label
-needs no code change: pass `--capability <new-name>` at `register` time;
-the consumer — a skill, or CLAUDE.md — decides whether to ask for that
-label, the registry itself applies no policy.)
+(2 labels in use today — `impact-analysis` (gitnexus) and `pane-labeling`
+(herdr). Adding a new label needs no code change: declare `capability:
+"<new-name>"` directly on a `runner.capacities.<id>` entry; the consumer —
+a skill, or CLAUDE.md — decides whether to ask for that label, the
+registry itself applies no policy.)
+
+## The curated `runner.capabilities` catalog (D4/D14, tsk-in1-3)
+
+> Danh mục riêng, tách khỏi cả 2 vocab trên: `runner.capabilities.<name>`
+> trong `.fgos/config.json` — mỗi entry `{description?, aliases?}`, cả 2
+> field optional (`{}` hợp lệ, chỉ cần khoá). Đây là nơi ghi CHUNG cho cả
+> tool-registry's `capability` (Tầng 1, presence/fact) lẫn — sau này —
+> `capacities.<id>.for` (Tầng 2, dispatch purpose-lookup, một task khác
+> trong cùng lineage). `aliases` khác `normalizeCapability`'s tự động
+> kebab-case: nó khai tên gọi KHÁC hẳn cùng trỏ về 1 entry (vd
+> `impact_analysis`/`Impact Analysis` cùng trỏ về `impact-analysis`).
+> Validate qua `validateCapabilitiesShape` (`src/runner/dispatch.mjs`) —
+> hiện chưa ép một `capability`/`for` phải nằm trong danh mục này (đó là
+> việc riêng của task đọc `for`).
+
+(A separate catalog from both vocabs above: `runner.capabilities.<name>`
+in `.fgos/config.json` — each entry `{description?, aliases?}`, both
+fields optional (`{}` is valid, only the key is required). This is the
+SHARED place both the tool-registry's `capability` (layer 1,
+presence/fact) and — later — `capacities.<id>.for` (layer 2, dispatch
+purpose-lookup, a separate task in the same lineage) read from. `aliases`
+differs from `normalizeCapability`'s automatic kebab-case folding: it
+names genuinely DIFFERENT spellings that all resolve to the same entry
+(e.g. `impact_analysis`/`Impact Analysis` both point at `impact-analysis`).
+Validated via `validateCapabilitiesShape` (`src/runner/dispatch.mjs`) —
+today nothing yet enforces that a `capability`/`for` value must actually
+be in this catalog; that enforcement is a separate task's job.)
 
 ## Registering a new provider
 
