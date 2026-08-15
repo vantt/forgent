@@ -59,14 +59,14 @@ command -v herdr >/dev/null 2>&1 || exit 0
 
 # fg.ssid (D1): fgOS's own session id. FGOS_SESSION_ID first, else
 # resolveWriterIdentity()'s own env/registry/pid fallback chain
-# (src/runner/session-identity.mjs) -- dropped entirely if neither resolves.
+# (src/util/session-identity.mjs) -- dropped entirely if neither resolves.
 fg_ssid="${FGOS_SESSION_ID:-}"
-if [ -z "$fg_ssid" ] && [ -n "$project_root" ] && [ -f "$project_root/src/runner/session-identity.mjs" ]; then
+if [ -z "$fg_ssid" ] && [ -n "$project_root" ] && [ -f "$project_root/src/util/session-identity.mjs" ]; then
   fg_ssid=$(node -e "
     import(process.argv[1]).then(({ resolveWriterIdentity }) => {
       process.stdout.write(String(resolveWriterIdentity().id));
     }).catch(() => {});
-  " -- "$project_root/src/runner/session-identity.mjs" 2>/dev/null || true)
+  " -- "$project_root/src/util/session-identity.mjs" 2>/dev/null || true)
 fi
 
 # a.ssid (D1): the coding agent tool's own native session id. Claude Code

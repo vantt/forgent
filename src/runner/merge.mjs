@@ -43,10 +43,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { branchNameFor, branchExists, reclaimOrphanedCheckout } from './worktree.mjs';
+import { branchNameFor, branchExists, reclaimOrphanedCheckout, detectTrunk } from './worktree.mjs';
 import { runGoalCheck, runInvariantChecks, invariantFailureAsCheck } from './goal-check.mjs';
 import { readInvariantCheckCommands } from '../config/shared-config-file.mjs';
-import { normalizePath } from './frozen-judge.mjs';
+import { normalizePath } from '../util/normalize-path.mjs';
 import { acquireMainCheckoutLock, renewMainCheckoutLockIfOwn, mergeSlotLockFile, HELD, AMBIGUOUS, DEFAULT_TTL_MS, HOLDER_PID_ENV_VAR, formatLockDurationMs } from './main-checkout-lock.mjs';
 import { listSessions } from './session.mjs';
 import { listWork } from '../state/store.mjs';
@@ -124,33 +124,6 @@ function diffFailureMessage(label, err) {
   return `computing ${label} failed: ${err.message}`;
 }
 
-/** Resolve `repoRoot`'s trunk branch name without assuming `'main'`: prefers
- * the remote `origin/HEAD` target (what the repo host itself calls its
- * default branch), then falls back to whichever of `main`/`master` exists
- * locally as a branch, then to the literal `'main'` when neither signal is
- * available (e.g. a brand-new repo with no commits yet on either name). */
-export function detectTrunk(repoRoot) {
-  try {
-    const ref = git(repoRoot, ['symbolic-ref', '--short', 'refs/remotes/origin/HEAD']).trim();
-    if (ref.startsWith('origin/')) {
-      return ref.slice('origin/'.length);
-    }
-  } catch {
-    // no origin remote, or origin/HEAD isn't set locally — fall through
-  }
-
-  for (const candidate of ['main', 'master']) {
-    try {
-      git(repoRoot, ['show-ref', '--verify', '--quiet', `refs/heads/${candidate}`]);
-      return candidate;
-    } catch {
-      // candidate branch doesn't exist locally — try the next one
-    }
-  }
-
-  return 'main';
-}
-
 /** Whether every path on a `git status --porcelain` line sits inside
  * `.fgos/` — exported so bin/fgos.mjs's own working-tree-clean check
  * (`return`'s pull-door gate) can apply the identical exclusion instead of
@@ -221,7 +194,7 @@ export function buildOwnFileSet(committedDiffPaths, footprint) {
  * file elsewhere in the repo must never block returning THIS item.
  *
  * Either way `repoRoot` is not guaranteed to be the git top-level
- * (`isMainWorktree` above tolerates a subdirectory of the main worktree;
+ * (`worktree.mjs`'s `isMainWorktree` tolerates a subdirectory of the main worktree;
  * `return`'s cwd is the item's own working directory, same reasoning), and
  * either way git still reports paths top-level-relative — verified
  * empirically for both pathspec forms — so the `.fgos/` exclusion needs the
@@ -238,50 +211,6 @@ export function isWorkingTreeClean(repoRoot, ownFileSet = null, { scope = 'whole
     .split('\n')
     .filter((line) => line.trim() !== '')
     .every((line) => isFgosOnlyStatusLine(line, prefix, ownFileSet));
-}
-
-function realpathOrSelf(p) {
-  try {
-    return fs.realpathSync(p);
-  } catch {
-    return path.resolve(p);
-  }
-}
-
-/**
- * Whether `repoRoot` IS the repo's main working tree — never a linked
- * worktree, registered through `fgos session start` (session.mjs) or ad-hoc
- * (a plain `git worktree add` run by hand, invisible to `sessions.json`).
- * `approve`'s registry-based guard only ever caught the registered case; an
- * ad-hoc worktree slipped through the exact same risk untouched — a merge
- * landing on that worktree's own checkout, or a goal-check verifying its own
- * (possibly stale/divergent) tree, while the item is still reported "done" /
- * "verified on main" (P44).
- *
- * The check is structural, not registry-based, so it catches both: a main
- * worktree's git-common-dir sits directly inside its own toplevel (its
- * parent IS the toplevel); a linked worktree's common-dir resolves to the
- * MAIN repo's `.git`, whose parent is the main repo root — never the linked
- * worktree's own toplevel.
- *
- * A `repoRoot` that is not a git repository at all (legacy-item tests, or a
- * plain directory `approve` is otherwise happy to degrade against) has no
- * worktree concept to violate — trivially "main", fail-open, matching how
- * every other legacy-source path in `approve` already tolerates a non-git
- * cwd.
- */
-export function isMainWorktree(repoRoot) {
-  let toplevelRaw;
-  try {
-    toplevelRaw = git(repoRoot, ['rev-parse', '--show-toplevel']).trim();
-  } catch {
-    return true;
-  }
-  const toplevel = realpathOrSelf(toplevelRaw);
-  const commonDirRaw = git(repoRoot, ['rev-parse', '--git-common-dir']).trim();
-  const commonDirAbs = path.isAbsolute(commonDirRaw) ? commonDirRaw : path.resolve(repoRoot, commonDirRaw);
-  const commonDirParent = realpathOrSelf(path.dirname(commonDirAbs));
-  return toplevel === commonDirParent;
 }
 
 /** Classify a proposed `item` into its diff/merge source (see module doc). */

@@ -269,6 +269,42 @@ export function isResolvedStatus(item) {
   return isCanceledStatus(item);
 }
 
+/**
+ * Resolve the root of the lineage tree `id` belongs to: walk `view.work[id].parent`
+ * upward until reaching an item with no `parent` (or whose `parent` does not
+ * resolve to a known item), and return THAT item's id. An item with no
+ * `parent` is its own root and resolves to itself.
+ *
+ * Defensive backstop, mirroring `hasOpenDescendant` below: a `seen` set
+ * guards against a cyclic or malformed parent chain turning this into an
+ * infinite walk. Should not occur on real decompose-produced data — if a
+ * cycle is detected, the walk stops and returns the current id rather than
+ * looping forever.
+ *
+ * Lives here rather than in `runner/root-affinity.mjs` (its original home,
+ * tsk-49i D1): it is a pure read over the same `view.work` parent chain the
+ * rest of this module walks, and `state/` modules needing it had to import
+ * across into `runner/` to get it — one of the import edges that made the
+ * two folders mutually dependent.
+ *
+ * @param {{work: Record<string, {parent?: string|null}>}} view
+ * @param {string} id
+ * @returns {string}
+ */
+export function resolveRoot(view, id) {
+  const work = view?.work ?? {};
+  const seen = new Set();
+  let current = id;
+  while (true) {
+    if (seen.has(current)) return current;
+    seen.add(current);
+    const item = work[current];
+    const parent = item?.parent;
+    if (!parent || !work[parent]) return current;
+    current = parent;
+  }
+}
+
 // True when `id` has any descendant (direct child, or a descendant reachable
 // through further `parent` chains below a child) whose status is not yet
 // RESOLVED. `seen` guards against a malformed/cyclic parent chain turning

@@ -57,15 +57,6 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-// tsk-386: merge.mjs already imports branchNameFor/branchExists/
-// reclaimOrphanedCheckout FROM this module -- this makes the import
-// circular, but safely so: `detectTrunk` is only ever called from inside a
-// function body below (createBranchRef, createDetachedMergeWorktree), never
-// at this module's own top-level synchronous evaluation, so Node's ESM
-// live-binding resolution has both modules fully evaluated by the time
-// either function actually runs. Verified empirically against the full
-// existing test suite, not merely assumed safe.
-import { detectTrunk } from './merge.mjs';
 
 /** Raised for any git worktree/branch operation failure. `errorClass`
  * reuses the vocabulary declared in `recovery.mjs`'s `ERROR_CLASSES` (per
@@ -115,6 +106,97 @@ export function provisionDependencies(worktreePath) {
 
 function git(repoRoot, args) {
   return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false });
+}
+
+// Same call as `git` above, but with git's own stderr swallowed rather than
+// inherited by this process. Only the two probe helpers below use it: both
+// ask questions git legitimately answers with a `fatal:` line (no origin
+// remote, no such branch, not a repository at all), and both already treat
+// that as a normal answer — printing the raw fatal to the caller's stderr
+// would turn "this directory is not a repo" into apparent breakage on a
+// path that is deliberately fail-open. Byte-identical to the `stdio` the
+// two functions had at their previous home in merge.mjs (tsk-49i D1).
+function gitQuiet(repoRoot, args) {
+  return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false, stdio: ['ignore', 'pipe', 'pipe'] });
+}
+
+function realpathOrSelf(p) {
+  try {
+    return fs.realpathSync(p);
+  } catch {
+    return path.resolve(p);
+  }
+}
+
+/** Resolve `repoRoot`'s trunk branch name without assuming `'main'`: prefers
+ * the remote `origin/HEAD` target (what the repo host itself calls its
+ * default branch), then falls back to whichever of `main`/`master` exists
+ * locally as a branch, then to the literal `'main'` when neither signal is
+ * available (e.g. a brand-new repo with no commits yet on either name).
+ *
+ * Lives here rather than in `merge.mjs` (its original home, tsk-49i D1):
+ * naming a repo's trunk branch is worktree/branch identity, with zero
+ * merge-content semantics — and keeping it here removes the circular
+ * merge.mjs <-> worktree.mjs import the old placement forced. */
+export function detectTrunk(repoRoot) {
+  try {
+    const ref = gitQuiet(repoRoot, ['symbolic-ref', '--short', 'refs/remotes/origin/HEAD']).trim();
+    if (ref.startsWith('origin/')) {
+      return ref.slice('origin/'.length);
+    }
+  } catch {
+    // no origin remote, or origin/HEAD isn't set locally — fall through
+  }
+
+  for (const candidate of ['main', 'master']) {
+    try {
+      gitQuiet(repoRoot, ['show-ref', '--verify', '--quiet', `refs/heads/${candidate}`]);
+      return candidate;
+    } catch {
+      // candidate branch doesn't exist locally — try the next one
+    }
+  }
+
+  return 'main';
+}
+
+/**
+ * Whether `repoRoot` IS the repo's main working tree — never a linked
+ * worktree, registered through `fgos session start` (session.mjs) or ad-hoc
+ * (a plain `git worktree add` run by hand, invisible to `sessions.json`).
+ * `approve`'s registry-based guard only ever caught the registered case; an
+ * ad-hoc worktree slipped through the exact same risk untouched — a merge
+ * landing on that worktree's own checkout, or a goal-check verifying its own
+ * (possibly stale/divergent) tree, while the item is still reported "done" /
+ * "verified on main" (P44).
+ *
+ * The check is structural, not registry-based, so it catches both: a main
+ * worktree's git-common-dir sits directly inside its own toplevel (its
+ * parent IS the toplevel); a linked worktree's common-dir resolves to the
+ * MAIN repo's `.git`, whose parent is the main repo root — never the linked
+ * worktree's own toplevel.
+ *
+ * A `repoRoot` that is not a git repository at all (legacy-item tests, or a
+ * plain directory `approve` is otherwise happy to degrade against) has no
+ * worktree concept to violate — trivially "main", fail-open, matching how
+ * every other legacy-source path in `approve` already tolerates a non-git
+ * cwd.
+ *
+ * Lives here rather than in `merge.mjs` (its original home, tsk-49i D1):
+ * it is a pure worktree-identity check with zero merge-content semantics.
+ */
+export function isMainWorktree(repoRoot) {
+  let toplevelRaw;
+  try {
+    toplevelRaw = gitQuiet(repoRoot, ['rev-parse', '--show-toplevel']).trim();
+  } catch {
+    return true;
+  }
+  const toplevel = realpathOrSelf(toplevelRaw);
+  const commonDirRaw = gitQuiet(repoRoot, ['rev-parse', '--git-common-dir']).trim();
+  const commonDirAbs = path.isAbsolute(commonDirRaw) ? commonDirRaw : path.resolve(repoRoot, commonDirRaw);
+  const commonDirParent = realpathOrSelf(path.dirname(commonDirAbs));
+  return toplevel === commonDirParent;
 }
 
 // Exported (pr-lifecycle-2): the approval-gate merge engine (merge.mjs)

@@ -38,9 +38,8 @@
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import { resolveRoot } from '../runner/root-affinity.mjs';
 import { getDomain } from './workflow-stage-graphs.mjs';
-import { isCanceledStatus } from './frontier.mjs';
+import { isCanceledStatus, resolveRoot } from './frontier.mjs';
 
 // Shared with blockedItemsNowResolvable below (tsk-597z): the one detail
 // string that means "this item never claimed a git-verifiable merge in the
