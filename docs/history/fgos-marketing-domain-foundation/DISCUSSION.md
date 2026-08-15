@@ -2,24 +2,20 @@
 
 ## 1. Trạng thái hiện tại
 
-Vòng 5: **4 D-ID đầu tiên đã mint** (D1 trục role/handoff-guard, D2
-coding-first, D3 mechanism/policy split, D4 call/pass taxonomy — xem §4,
-đã ghi qua `fgos decision`, seq 18029–18032) sau khi giữ ổn đủ vòng.
-Người dùng vòng 5 trả lời thêm: (#12) **cho phép call lồng nhau, giới
-hạn trần callstack**; (#13) nhờ em dùng expertise advise danh sách
-one-way gate — em đã advise nguyên tắc hard/soft gate (§6); và hai lưu ý
-mới: (a) khái niệm **task** của cockpit rất hay — hiện fgOS đang triển
-khai thứ đó như skill → mở ra tách contract (task-spec, WHAT) khỏi
-know-how (skill, HOW), em đề xuất phương án A-lite trong §6; (b) xác
-nhận ranh giới **dispatch = điều phối executor cho task, KHÔNG phải
-"agent-type nào làm gì tiếp theo"** — phần who/what-next là router/driver
-như đang dùng (fgos-routing / fgos-coding-driving). Người dùng cũng nói
-rõ: harness xác định *hình dạng cơ học các giai đoạn của một workflow*,
-mỗi team có đặc thù flow cơ học riêng (không khẳng định trùng
-routing/driving hiện tại). Còn mở: #7 (judge-gate vs L5 — hoãn tới lượt
-marketing), #11 (ghi call sync vào log?), #14 (chốt phương án task-spec),
-#15 (key khai báo shape: domain hay team), và xác nhận của người dùng cho
-nguyên tắc hard/soft gate em vừa advise.
+Vòng 6: người dùng lưu ý **mỗi domain có nhiều workflow** (marketing rất
+nhiều; coding đang gộp 1 mà đúng ra là nhiều). Em xác nhận bằng bằng
+chứng code (graph đơn của coding đang gồng — discovery-skip là nhánh vá,
+bug/docs/chore chịu chung shape với feature) và đề xuất: hierarchy khai
+báo thêm một mức **domain → N workflow → item**; selector tái dùng `kind`
++ map `workflowFor` có default (item không cần field mới); phân biệt
+workflow (shape một item) với template (composition nhiều item); trình tự
+— role-axis đáp lên graph đơn trước, rồi un-gộp coding thành
+feature/bugfix/lightweight, graph hiện tại thành workflow default. Nền đã
+chốt: **D1–D4** (§4, seq 18029–18032). Đang chờ giữ ổn/xác nhận: nguyên
+tắc hard/soft gate (v5), task-spec A-lite (v5), workflow-multiplicity +
+kind-selector (v6). Còn mở: #7 (judge-gate vs L5 — hoãn tới lượt
+marketing), #11 (ghi call sync vào log?), #15 (domain hay team làm key
+shape).
 
 ## 2. Mục tiêu & đề bài
 
@@ -55,6 +51,7 @@ cụ thể của domain "marketing" trên fgOS sẽ trông như thế nào.
 | 14 | Task-spec (contract, WHAT) tách khỏi skill (know-how, HOW) triển khai thế nào? | Rõ dần — em recommend A-lite (vòng 5), chờ giữ ổn | Người dùng vòng 5 nêu task của cockpit "rất hay", fgOS đang gói contract lẫn know-how trong skill. A-lite: file task-spec khai báo riêng per-domain (như cockpit `.fgOS/tasks/`), skillMap trỏ stage → (task-spec, skill); ban đầu chỉ là read-first material qua refs, CHƯA có engine enforcement (đúng advise YAGNI của fable). Lý do chọn A thay vì nhét vào frontmatter SKILL.md hay giữ nguyên: (1) 30 task-spec của cockpit port gần verbatim khi tới marketing; (2) một contract chạy được bởi nhiều skill/role khác nhau; (3) soul nâng cấp know-how không đụng contract |
 | 15 | Key khai báo flow-shape là `domain` hay `team`? | Chưa rõ — YAGNI nghiêng domain-as-team-flow | Người dùng vòng 5: "mỗi team có thể có đặc thù cơ học flow riêng". Hiện registry key là domain; nếu sau này 2 team cùng domain cần shape khác nhau mới cần overlay theo team — chưa xây trước |
 | 16 | Ranh giới dispatch vs router/driver vs guard | Rõ — người dùng xác nhận vòng 5 | Dispatch (`src/runner/dispatch.mjs` decide/execute) = chọn executor chạy task. Router/driver (fgos-routing, fgos-coding-driving) = who/what-next. Guard (FSM + roleGraph + gate) = legality. Ba tầng không giẫm nhau |
+| 17 | Mỗi domain có NHIỀU workflow (marketing rất nhiều; coding đang gộp 1 mà đúng ra là nhiều) — biểu diễn thế nào? | Rõ dần — người dùng nêu vòng 6, em đề xuất kiến trúc + selector, chờ giữ ổn | Thêm một mức vào hierarchy khai báo: domain → N workflow (mỗi workflow = stage graph + gates + roleGraph riêng) → item. Selector: TÁI DÙNG `kind` (đã là classification per-domain: coding = bug/chore/design/docs/feature/task, intake đã phân loại sẵn) + map `workflowFor: {kind → workflowName}` có default trong DOMAINS — item KHÔNG cần field mới, không phân loại hai lần. Bằng chứng coding đang gồng vì gộp 1: discovery-verdict skip (clear → nhảy cọc exploring) là nhánh vá lên một graph duy nhất; luật "bug phải prove cause trước khi sửa" (primary-workflow) khác bản chất feature nhưng đang chung tên stage; docs/chore bị ép qua ceremony discovery→planning thừa. Phân biệt quan trọng: workflow (shape MỘT item) ≠ template (composition NHIỀU item, `fgos expand`) — 25 workflow của cockpit khi port sẽ được phân về một trong hai, tuỳ cái |
 
 ## 4. Quyết định đã chốt
 
@@ -190,199 +187,216 @@ cụ thể của domain "marketing" trên fgOS sẽ trông như thế nào.
   dispatch / router-driver / guard (§3 #16); ghi nhận nuance team-vs-
   domain làm điểm mở #15 (YAGNI: domain-as-team-flow đủ cho hiện tại).
 
+- **2026-08-15 16:27 — Người dùng lưu ý vòng 6**: mỗi domain có thể có
+  nhiều workflow khác nhau — marketing điển hình rất nhiều; thật ra với
+  coding, chúng ta đang gộp 1 chứ đúng thì nó là nhiều workflow. → Phản
+  hồi của em: xác nhận bằng bằng chứng code rằng graph đơn của coding
+  đang gồng (discovery-verdict skip là nhánh vá; bug-prove-cause khác
+  bản chất feature nhưng chung stage; docs/chore chịu ceremony thừa).
+  Đề xuất: hierarchy khai báo thêm một mức — domain → N workflow → item;
+  selector tái dùng `kind` (classification per-domain sẵn có, xác nhận
+  trong `workflow-stage-graphs.mjs` dòng 346: coding kind =
+  bug/chore/design/docs/feature/task) + map `workflowFor` có default,
+  item không cần field mới. Phân biệt tường minh: workflow = shape một
+  item; template (`fgos expand`) = composition nhiều item. Trình tự đề
+  xuất: role-axis đáp lên graph đơn hiện tại trước (D2 giữ nguyên), rồi
+  un-gộp coding thành 2–3 workflow thật (feature / bugfix / spike-hoặc-
+  lightweight cho docs-chore). Graph hiện tại trở thành workflow
+  `feature` (default) — item cũ không vỡ, giống DEFAULT_DOMAIN fold.
+  Chưa mint (điểm mới 1 vòng).
+
 ## 6. Thiết kế đã chốt {#design}
 
-> Synthesis regenerate vòng 5. Nền tảng: D1–D4 đã chốt (§4). Các phần đánh
-> dấu *(đề xuất)* chưa có D-ID — mới nêu/giữ ổn chưa đủ vòng. Viết cho
-> người lạ không có chat history.
+> Synthesis regenerate vòng 6. Nền: D1–D4 đã chốt (§4). Phần đánh dấu
+> *(đề xuất)* chưa có D-ID. Viết cho người lạ không có chat history.
 
 ### Bức tranh lớn (D2, D3)
 
 fgOS xây một **core harness cơ học** cho team agent đa role, dùng chung
-cho mọi domain — coding triển khai trước (nâng cấp cái đang chạy), rồi
-marketing vào sau như khách hàng absorption đầu tiên. Harness xác định
-*hình dạng cơ học các giai đoạn của một workflow*; mỗi team/domain khai
-báo shape đặc thù riêng của mình vào registry, engine không hardcode shape
-nào.
+cho mọi domain — coding triển khai trước, marketing vào sau như khách
+hàng absorption đầu tiên. Harness xác định *hình dạng cơ học các giai
+đoạn của workflow*; engine không hardcode shape nào.
 
 - **Mechanism (harness)** — cứng, không phán đoán: gác legality của mọi
   move, ghi sự thật vào event log, đánh thức đúng vai kế tiếp.
 - **Policy (soul)** — agent-type hiểu vai trò mình, hiểu vấn đề, biết cần
-  ai support, tự chọn edge hợp lệ: cần advise, cần tay chân, cần phản
-  biện, cần hỏi chuyên môn. Soul thay được, sai được — harness đảm bảo
-  sai không phá.
+  ai support, tự chọn edge hợp lệ (advise / tay chân / phản biện / chuyên
+  môn). Soul thay được, sai được — harness đảm bảo sai không phá.
 
-### Ba tầng điều phối, không giẫm nhau (xác nhận vòng 5)
+### Hierarchy khai báo: domain → N workflow → item *(đề xuất v6)*
 
-| Tầng | Vai trò | Hiện thân hiện tại |
-|------|---------|--------------------|
-| Router/Driver | who + what-next: vai nào, việc gì, stage nào tiếp | `fgos-routing`, `fgos-coding-driving` |
+Mỗi domain có NHIỀU workflow — marketing điển hình (25 của cockpit),
+coding cũng vậy nhưng đang gộp 1 (nhận định người dùng v6, bằng chứng
+code: discovery-verdict skip là nhánh vá lên graph đơn; luật "bug phải
+prove cause" khác bản chất feature nhưng đang chung stage; docs/chore
+chịu ceremony discovery→planning thừa).
+
+- **domain (team)** — owns: roles + roleGraph vocabulary, task-spec
+  catalog, classification (`kind`/`risk`), statusLabels/parkReason.
+- **workflow (per domain, nhiều)** — một shape cơ học có tên: stage graph
+  + transitions + gates + stepMap. Ví dụ coding: `feature` (graph 4 stage
+  hiện tại, làm default), `bugfix` (prove-cause → fix → verify),
+  `lightweight` (docs/chore, bỏ ceremony thừa).
+- **item (instance)** — chọn workflow qua selector, không cần field mới.
+
+**Selector: tái dùng `kind`.** `kind` đã là classification per-domain
+(coding: bug/chore/design/docs/feature/task —
+`workflow-stage-graphs.mjs:346`), intake đã phân loại sẵn. DOMAINS thêm
+map `workflowFor: {kind → workflowName}` + default; nhiều kind chung
+được một workflow. Item cũ không workflow → default của domain (giống
+DEFAULT_DOMAIN fold — không vỡ gì).
+
+**Phân biệt hai nghĩa của "workflow"** (tránh lẫn về sau): *workflow* =
+shape lifecycle MỘT item (điều mục này nói); *template* (`fgos expand`)
+= composition NHIỀU item thành cây. 25 workflow của cockpit khi port sẽ
+phân về một trong hai, tuỳ cái — cái nào là chuỗi stage một sản phẩm thì
+thành workflow, cái nào là dây chuyền nhiều sản phẩm thì thành template.
+
+### Ba tầng điều phối, không giẫm nhau (v5)
+
+| Tầng | Vai trò | Hiện thân |
+|------|---------|-----------|
+| Router/Driver | who + what-next | `fgos-routing`, `fgos-coding-driving` |
 | Guard/Harness | legality: FSM 3 trục + roleGraph + gates + event log | status-fsm/stage-fsm + phần mới |
-| Dispatch | executor nào chạy task đã quyết | `src/runner/dispatch.mjs` decide/execute (một cửa) |
+| Dispatch | executor nào chạy task đã quyết | `dispatch.mjs` decide/execute (một cửa) |
 
 ### Ba trục trực giao của work item (D1)
 
-1. `status` — lifecycle phổ quát (11 trạng thái, giữ nguyên).
-2. `stage` — tiến độ theo domain (per-DOMAINS, giữ nguyên).
-3. `role/holder` — ai đang cầm bóng; per-domain `roleGraph`, chỉ domain
-   khai báo mới có.
+`status` (lifecycle phổ quát, 11 trạng thái) × `stage` (tiến độ — giờ
+thuộc workflow đã chọn, không thuộc thẳng domain) × `role/holder` (ai cầm
+bóng, per-domain roleGraph, opt-in).
 
 ### Handoff: hai loại, một guard (D1, D4)
 
-- **Call (round-trip)** — bóng quay về người gửi. 4 reason:
-  `advise` / `assist` / `review` / `consult`. Tổng quát hoá tiền lệ
-  `fgos ask`/`answer` (call-to-human) thành call-to-role. **Cho phép call
-  lồng nhau, giới hạn trần callstack** (người dùng quyết v5; con số trần
-  để planning chọn).
-- **Pass (transfer)** — chuyển giao một chiều theo stage/status.
-- **Guard** — roleGraph khai báo edge hợp lệ (from-role, to-role, reason)
-  theo stage; route bậy → REFUSED kèm danh sách edge hợp lệ.
-- **Checkpoint hạt mịn miễn phí** — mỗi handoff event mang context
-  snapshot + worktree commit mang artifact state; resume ở handoff gần
-  nhất.
+- **Call (round-trip)** — 4 reason `advise`/`assist`/`review`/`consult`;
+  tổng quát hoá `fgos ask`/`answer`. **Lồng được, trần callstack** (v5;
+  con số trần để planning quyết).
+- **Pass (transfer)** — một chiều theo stage/status.
+- **Guard** — roleGraph edge hợp lệ per stage; route bậy → REFUSED kèm
+  danh sách edge hợp lệ.
+- **Checkpoint hạt mịn miễn phí** — handoff event mang context snapshot,
+  worktree commit mang artifact state.
 
 ### One-way gate: nguyên tắc hard/soft *(đề xuất v5, em advise theo uỷ quyền)*
 
-**Một gate là hard một-chiều khi và chỉ khi việc vượt qua nó tạo side
-effect vượt ranh giới item/worktree.** Mọi gate nội bộ item là soft:
-quay lại được, nhưng bắt buộc ghi reason vào event log.
+**Hard một-chiều ⟺ side effect vượt ranh giới item/worktree.** Nội bộ
+item = soft: quay lại được nhưng bắt buộc ghi reason vào log.
 
-- **Hard trong coding**: approve/merge root vào main (CTR005 — đã có);
-  terminal `done`/`wontfix` (đã có); `cleanup` đã xoá worktree/branch.
-  Toàn vùng hậu-merge là một chiều: rework sau merge = item MỚI, không
-  reopen — giữ outcome record trung thực cho compound-learn.
-- **Soft trong coding**: executing → planning (replan), awaiting-approval
-  → doing (reject — đã có), mọi handoff-call. Soft-gate cross-back có
-  reason key → rework tự nó thành tín hiệu học ("replan vì sao" đọc được
-  từ log).
-- Với marketing sau này: publish-to-platform = hard; editorial approval
-  vòng trong = soft. Nguyên tắc trên áp dụng nguyên xi, không cần luật
-  riêng.
+- Hard trong coding: approve/merge vào main (CTR005), terminal
+  `done`/`wontfix`, `cleanup` đã xoá worktree. Vùng hậu-merge một chiều:
+  rework sau merge = item MỚI.
+- Soft: executing → planning (replan), reject, mọi handoff-call —
+  cross-back mang reason key → rework thành tín hiệu compound-learn.
+- Marketing sau này dùng nguyên xi: publish-to-platform = hard, editorial
+  approval = soft.
 
-Lý do chọn nguyên tắc này thay vì liệt kê tay từng gate: worktree
-isolation làm rework nội bộ rẻ (không có lý do cơ học để cấm quay lại);
-còn side effect đã ra ngoài (main, platform ngoài) thì không thu hồi được
-bằng máy — đó mới là chỗ cần rào cứng. Over-hardening giết đúng tính uyển
-chuyển đang xây.
+### Task-spec: tách contract khỏi know-how *(đề xuất v5, A-lite)*
 
-### Task-spec: tách contract khỏi know-how *(đề xuất v5, phương án A-lite)*
-
-Người dùng nhận định khái niệm task của cockpit "rất hay" — fgOS hiện gói
-cả contract lẫn know-how trong skill. Tách ra:
-
-- **task-spec (WHAT)** — contract: input, output, gate áp dụng, verify
-  template. File khai báo riêng per-domain (mô hình cockpit
-  `.fgOS/tasks/`), skillMap trỏ stage → (task-spec, skill).
-- **skill (HOW)** — know-how thực hiện; nhiều skill/role có thể chạy cùng
-  một task-spec.
+- **task-spec (WHAT)** — contract: input, output, gate, verify template;
+  file khai báo per-domain (mô hình cockpit `.fgOS/tasks/`).
+- **skill (HOW)** — know-how; nhiều skill/role chạy được cùng contract.
 - **work item (INSTANCE)** — như hiện có.
 
-A-lite = bắt đầu bằng file khai báo làm read-first material (refs), CHƯA
-xây engine enforcement (YAGNI). Trả cổ tức khi tới marketing: 30 task-spec
-cockpit port gần verbatim.
+A-lite: bắt đầu là read-first material qua refs, chưa engine enforcement
+(YAGNI). Trả cổ tức khi port 30 task-spec cockpit.
 
-### Ranh giới giữa các cơ chế (D4 + kết luận v2 giữ nguyên)
+### Ranh giới giữa các cơ chế (D4 + v2)
 
-- Cùng item → handoff; khác item/cây → signal (event typed payload +
-  projection; hoãn tới khi có use-case fan-out thật).
-- Workflow = template stamp ra cây item (`fgos expand`), không phải
-  runtime entity.
-- Registry key hiện là `domain`; nuance "mỗi team một shape" ghi nhận —
-  nếu 2 team cùng domain cần shape khác nhau mới cần overlay theo team
-  (#15, chưa xây).
+Cùng item → handoff; khác item/cây → signal (hoãn tới use-case fan-out
+thật). Registry key là `domain`; overlay theo team chỉ khi 2 team cùng
+domain cần shape khác (#15, chưa xây).
 
-### Trình tự triển khai (D2)
+### Trình tự triển khai (D2 + v6)
 
-Coding trước — nâng 4 tương tác ngầm sẵn có thành handoff hữu hình:
-
-| Reason | Tương tác ngầm hiện có |
-|---|---|
-| consult | `fgos-researching` gọi giữa exploring/planning |
-| review | `code-review` / vòng approve-reject |
-| assist | subagent fanout (`fgos-fanout`, Agent tool) |
-| advise | `fgos ask`/`answer` + `awaiting-human` |
-
-Ổn rồi mới tới marketing: DOMAINS entry + port skill/task-spec cockpit +
-`fgos expand` template. Judge-gate vs luật L5 DoD (#7) quyết khi tới lượt
-marketing.
+1. **Role-axis đáp lên graph đơn hiện tại** — nâng 4 tương tác ngầm
+   (researching/review/fanout/ask-answer) thành handoff hữu hình.
+2. **Un-gộp coding** thành 2–3 workflow thật (feature = default, bugfix,
+   lightweight) — chứng minh mức workflow của hierarchy.
+3. **Marketing**: DOMAINS entry + port skill/task-spec + template
+   (`fgos expand`); judge-gate vs L5 (#7) quyết ở bước này.
 
 ```mermaid
 flowchart TD
-    subgraph item["MỘT work item coding — dòng chính (pass) + các cú call (round-trip)"]
-        direction LR
-        P1["planning<br/>holder: Implementer"] --> G1{{"soft gate: plan approved<br/>(quay lại được, ghi reason)"}}
-        G1 --> P2["executing<br/>holder: Implementer"]
-        P2 --> G2{{"HARD gate: approve/merge<br/>side effect ra main — CTR005"}}
-        G2 --> P3["delivered → retrospective<br/>(vùng hậu-merge: một chiều)"]
+    subgraph decl["HIERARCHY KHAI BÁO (registry, không hardcode)"]
+        D["domain: coding<br/>roles + roleGraph + kind vocab + task-specs"]
+        D --> W1["workflow: feature (default)<br/>discovery→exploring→planning→executing"]
+        D --> W2["workflow: bugfix<br/>prove-cause→fix→verify"]
+        D --> W3["workflow: lightweight<br/>(docs/chore, bỏ ceremony)"]
+        D2m["domain: marketing<br/>writer/editor/brand/legal/scheduler"]
+        D2m --> W4["workflow: content-production"]
+        D2m --> W5["workflow: brand-identity"]
+        D2m --> W6["... (port từ 25 của cockpit)"]
     end
-    P2 -- "call: consult" --> RES["Researcher<br/>(fgos-researching)"]
-    RES -. "finding → bóng về" .-> P2
-    P2 -- "call: review" --> REV["Reviewer<br/>(code-review)"]
-    REV -. "verdict → bóng về" .-> P2
-    P2 -- "call: assist" --> SUB["Helper<br/>(subagent fanout)"]
-    SUB -. "work product → bóng về" .-> P2
-    P2 -- "call: advise" --> HUM["Người<br/>(ask/answer)"]
-    HUM -. "answer → bóng về" .-> P2
-    REV -- "call lồng: consult<br/>(trần callstack)" --> RES
+    K["item mới — intake phân loại kind"] -- "workflowFor[kind] → shape" --> W1
+    subgraph run["RUNTIME (một item đang chạy)"]
+        IT["item: status × stage(workflow) × role/holder"]
+        IT -- "pass (gate hard/soft)" --> IT
+        IT -- "call: advise/assist/review/consult<br/>(lồng được, trần callstack)" --> IT
+    end
+    W1 -.-> IT
+    TPL["template (fgos expand)<br/>composition NHIỀU item thành cây"] -. "stamp — khác mức với workflow" .-> K
 ```
 
 ## 7. Danh mục hạng mục / task {#tasks} (đề xuất, chưa chốt)
 
 ### {#task-role-axis-coding}
 - **Mục tiêu**: trục `role/holder` + verb `handoff` (call/pass, guard
-  roleGraph, trần callstack cho call lồng) vào engine; roleGraph coding
-  đầu tiên: Researcher/Reviewer/Helper/Human-advisor quanh Implementer;
-  ask/answer trở thành case đặc biệt của call; soft-gate cross-back bắt
-  buộc reason.
+  roleGraph, trần callstack) vào engine; roleGraph coding đầu tiên
+  (Researcher/Reviewer/Helper/Human-advisor quanh Implementer);
+  ask/answer thành case đặc biệt của call; soft-gate cross-back bắt buộc
+  reason.
 - **D-ID áp dụng**: D1, D3, D4.
-- **Quan hệ**: nền cho mọi task sau; còn chờ #11 (ghi call sync?) và trần
-  callstack cụ thể (planning quyết).
-- **Verify nháp**: call review → verdict → bóng về implementer hiện đủ
-  trong event log; handoff ngoài roleGraph bị REFUSED kèm edge hợp lệ;
-  call lồng vượt trần bị REFUSED.
+- **Quan hệ**: nền cho mọi task sau; còn chờ #11 và trần callstack cụ
+  thể (planning quyết). Đáp lên graph đơn hiện tại — KHÔNG chờ
+  workflow-multiplicity.
+- **Verify nháp**: call review → verdict → bóng về, đủ trong event log;
+  handoff ngoài roleGraph bị REFUSED kèm edge hợp lệ; call lồng vượt
+  trần bị REFUSED.
+
+### {#task-workflow-multiplicity}
+- **Mục tiêu**: hierarchy domain → N workflow: DOMAINS entry coding un-gộp
+  thành `feature` (graph hiện tại, default) / `bugfix` / `lightweight`;
+  selector `workflowFor: {kind → workflow}`; stage-fsm/frontier/driver
+  đọc shape qua workflow đã chọn thay vì thẳng domain.
+- **D-ID áp dụng**: chưa (v6, chờ giữ ổn).
+- **Quan hệ**: sau `{#task-role-axis-coding}`; item cũ fold về default —
+  không migration.
+- **Verify nháp**: item kind=bug đi graph bugfix, kind=feature đi graph
+  feature; item không match nào fold về default kèm warning.
 
 ### {#task-task-spec-convention}
-- **Mục tiêu**: đặt convention task-spec A-lite cho coding — file khai
-  báo contract per-domain (input/output/gate/verify-template), skillMap
-  trỏ (task-spec, skill); chưa enforcement.
-- **D-ID áp dụng**: chưa (chờ #14 giữ ổn).
-- **Quan hệ**: độc lập với role-axis, nên làm song song để marketing port
-  được task-spec cockpit sau này.
-- **Verify nháp**: một stage-skill coding đọc task-spec từ refs và verify
-  của item khớp verify-template của spec.
+- **Mục tiêu**: convention task-spec A-lite cho coding (contract file
+  per-domain, skillMap trỏ (task-spec, skill); chưa enforcement).
+- **Quan hệ**: độc lập, chạy song song được.
+- **Verify nháp**: một stage-skill coding đọc task-spec từ refs; verify
+  item khớp verify-template của spec.
 
 ### {#task-marketing-domain-registry}
-- **Mục tiêu**: entry `marketing` thật trong DOMAINS (thay
-  `fixture-marketing`): stages briefing → producing → gating →
-  distributing, roleGraph marketing (writer/editor/brand/legal/
-  scheduler), `worktreeBacked: true`.
+- **Mục tiêu**: entry `marketing` thật (thay `fixture-marketing`): bộ
+  workflow marketing đầu tiên + roleGraph
+  (writer/editor/brand/legal/scheduler), `worktreeBacked: true`.
 - **D-ID áp dụng**: D1, D2.
-- **Quan hệ**: sau `{#task-role-axis-coding}` ổn (D2).
-- **Verify nháp**: item marketing đi hết 4 stage, ping-pong writer↔editor
-  qua handoff-call, không fold về `coding`.
+- **Quan hệ**: sau role-axis + workflow-multiplicity ổn.
+- **Verify nháp**: item marketing đi hết workflow đã chọn, ping-pong
+  writer↔editor qua call, không fold về coding.
 
 ### {#task-marketing-skill-port}
-- **Mục tiêu**: port tập con skill + task-spec từ cockpit `.fgOS/tasks/`
-  đủ chạy 1 workflow mẫu (content-creation) end-to-end.
-- **Quan hệ**: phụ thuộc `{#task-marketing-domain-registry}` và
-  `{#task-task-spec-convention}`.
-- **Verify nháp**: item marketing chạy skill port, artifact thật trong
-  worktree, verify pass.
+- **Mục tiêu**: port tập con skill + task-spec cockpit đủ chạy 1 workflow
+  mẫu (content-creation) end-to-end.
+- **Quan hệ**: phụ thuộc marketing-domain-registry + task-spec-convention.
+- **Verify nháp**: artifact thật trong worktree, verify pass.
 
 ### {#task-expand-template-verb}
-- **Mục tiêu**: `fgos expand <template>` — stamp cây item từ template
-  khai báo; 25 workflow cockpit thành decomposition recipe.
+- **Mục tiêu**: `fgos expand <template>` — stamp cây item; các workflow
+  đa-sản-phẩm của cockpit thành decomposition recipe.
 - **Quan hệ**: cần cho marketing thật; độc lập role-axis.
 - **Verify nháp**: `fgos expand editorial-calendar --slots 3` sinh 1
-  parent + 3 children deps đúng thứ tự.
+  parent + 3 children deps đúng.
 
 ### {#task-gate-runner} — BLOCKED bởi #7 (§3)
-- **Mục tiêu**: `fgos gate` judge-runner (brand/content/seo/legal/
-  factual) như skill, kết quả vào event log.
-- **Quan hệ**: chỉ cần khi tới lượt marketing; quyết judge-proof vs L5
-  DoD trước.
+- **Mục tiêu**: `fgos gate` judge-runner như skill, kết quả vào event
+  log. Quyết judge-proof vs L5 DoD trước, tới lượt marketing mới cần.
 
 ### {#task-signal-bus} — hoãn
-- **Mục tiêu**: verb `signal` + projection consumer cursor + frontier
-  signal-readiness.
-- **Quan hệ**: hoãn tới khi use-case fan-out thật xuất hiện (YAGNI).
+- **Mục tiêu**: verb `signal` + projection + frontier signal-readiness.
+  Hoãn tới use-case fan-out thật (YAGNI).
