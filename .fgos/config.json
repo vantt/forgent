@@ -91,11 +91,6 @@
       "gemini": {
         "lightweight": "gemini-3.6-flash-medium"
       }
-    },
-    "models": {
-      "light": "haiku",
-      "standard": "sonnet",
-      "heavy": "opus"
     }
   },
   "gateBypass": {
