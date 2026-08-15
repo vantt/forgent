@@ -115,6 +115,27 @@ There is no mechanical guard against this (git has no hook that can
 refuse a stash) — stash selectively, or use `fgos main-checkout-reset`
 above instead of stash-and-reset as a shortcut.
 
+## Dispatch — routing work to a capacity
+
+`src/runner/dispatch.mjs` is the one door for deciding which executor a
+piece of work runs under and, where possible, running it. Its CLI surface
+(tsk-5tm) is three commands:
+
+- `decide <capacityId>` / `decide --for <purpose>` / `decide --work
+  <workId>` — resolves which executor a job should run under, without
+  running anything.
+- `execute` — runs the decided job directly for the adapter-resolvable
+  case (CLI/API/task-in-another-family); it only hands back to the caller
+  for the one case that needs a live, same-family session already
+  underway.
+
+A new in-session skill that needs to dispatch to a capacity should not
+re-derive this branching logic. Point its reasoning step at the shared
+fragment `.claude/skills/_shared/capacity-dispatch-fallback.md` (mirrored
+byte-identical at `.agents/skills/_shared/`) instead — see
+`docs/how-to/reuse-the-shared-capacity-dispatch-fallback-fragment.md` for
+the full wiring steps.
+
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
