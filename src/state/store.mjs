@@ -39,7 +39,7 @@ import { EventLogError } from './events.mjs';
 import { validateToolRegistration, ToolRegistryError } from './tool-registry.mjs';
 import { frontier, frontierAcrossSteps, isDepsAndLineageReady as depsAndLineageReadyView } from './frontier.mjs';
 import { assertNoCycle, assertNoUnifiedCycle } from './dep-graph.mjs';
-import { resolveWriterIdentity } from '../runner/session-identity.mjs';
+import { resolveWriterIdentity } from '../util/session-identity.mjs';
 
 export { FsmError, WorkValidationError, EventLogError, ToolRegistryError };
 

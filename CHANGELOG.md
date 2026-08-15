@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The fgOS plugin ships as `1.2.0`. `resolveWriterIdentity` moved from
+  `src/runner/session-identity.mjs` to `src/util/session-identity.mjs`, and
+  the plugin's `terminal/rename.sh` follows it there — a cached copy of the
+  plugin at `1.1.0` would otherwise keep loading the old path and silently
+  stop resolving the fgOS session id in pane labels. Nothing else about the
+  command surface changes: this is an internal boundary cleanup that cuts
+  every `src/state/` → `src/runner/` import, collapses three copies of the
+  Iron Law check into one `src/runner/iron-law-gate.mjs`, and moves
+  `detectTrunk`/`isMainWorktree` to `src/runner/worktree.mjs`.
+  (`docs/history/state-runner-merge-boundary/CONTEXT.md` D1/D2)
+
 - Stage `planning` now asks a person **once**, not twice. The
   `planApprove` gate is gone from `fgos-coding-planning`; the single
   remaining gate lives in `fgos-coding-validating`, immediately before

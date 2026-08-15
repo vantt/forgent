@@ -33,6 +33,7 @@ import { mergeConfigDefaults } from './config-merge.mjs';
 import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
+import { detectTrunk } from '../runner/worktree.mjs';
 import { listWork } from '../state/store.mjs';
 import { driftStatus, unmergedDeliveries } from '../state/drift-status.mjs';
 import { computeEnduserDocsIndex, generateEnduserDocsIndex, manifestPathFor } from '../report/enduser-index-generate.mjs';
@@ -196,7 +197,7 @@ export function ensureSharedConfigDefaults(dir) {
  * at the main checkout's `.git` from anywhere in the repo, so its parent is
  * the one location stable enough for a user's rc file to name. Same
  * resolution `scripts/fgos-shell-integration.sh` already uses, and the same
- * common-dir-parent shape as `merge.mjs`'s `isMainWorktree`. Delegates to
+ * common-dir-parent shape as `worktree.mjs`'s `isMainWorktree`. Delegates to
  * `paths.mjs`'s `resolveMainCheckoutRoot` (tsk-5hv: extracted there so
  * `dispatch.mjs`/`scripts/project-agents.mjs` can reuse the identical
  * resolution without a circular import back into this module) — this
@@ -505,7 +506,7 @@ function checkRootDrift(cwd) {
     return { passed: true, message: 'not inside a git checkout — nothing to check' };
   }
   const view = listWork(path.join(mainCheckout, '.fgos'));
-  const drift = driftStatus(mainCheckout, view);
+  const drift = driftStatus(mainCheckout, view, { trunk: detectTrunk(mainCheckout) });
 
   const describe = ([id, status]) =>
     `${id} (${status.branch} is ${status.aheadOfTarget} commit(s) ahead of ${status.target})`;
@@ -670,7 +671,7 @@ function checkDeliveredNotOnTrunk(cwd) {
     return { passed: true, message: 'not inside a git checkout — nothing to check' };
   }
   const view = listWork(path.join(mainCheckout, '.fgos'));
-  const stranded = unmergedDeliveries(mainCheckout, view);
+  const stranded = unmergedDeliveries(mainCheckout, view, { trunk: detectTrunk(mainCheckout) });
   const entries = Object.entries(stranded);
   if (entries.length === 0) {
     return { passed: true, message: "every handed-over item's content is on the trunk" };

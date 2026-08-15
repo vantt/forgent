@@ -42,18 +42,19 @@ import { findSourceCaptureIds } from '../src/report/enduser-index.mjs';
 import { generateEnduserDocsIndex } from '../src/report/enduser-index-generate.mjs';
 import { rankCandidates } from '../src/evolve/candidates.mjs';
 import { rankImpact } from '../src/state/impact.mjs';
-import { isResolvedStatus } from '../src/state/frontier.mjs';
+import { isResolvedStatus, resolveRoot } from '../src/state/frontier.mjs';
 import { mergeReadiness, mergeTree } from '../src/state/graph-harness.mjs';
 import { paginate } from '../src/state/cursor.mjs';
 import { runGoalCheck, detachedWorktreeFgosHint, runInvariantChecks, invariantFailureAsCheck } from '../src/runner/goal-check.mjs';
-import { frozenJudgeHits, footprintDiffHits, normalizePath } from '../src/runner/frozen-judge.mjs';
-import { classifySource, reviewDiff, mergeRunnerItem, withMergeTargetSlot, cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, buildOwnFileSet, detectTrunk, isMainWorktree } from '../src/runner/merge.mjs';
+import { frozenJudgeHits, footprintDiffHits } from '../src/runner/frozen-judge.mjs';
+import { normalizePath } from '../src/util/normalize-path.mjs';
+import { classifySource, reviewDiff, mergeRunnerItem, withMergeTargetSlot, cleanupMergedBranch, changedFiles, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, buildOwnFileSet } from '../src/runner/merge.mjs';
 import { createGitHubPR, mergeGitHubPR, viewGitHubPRStatus } from '../src/runner/github-adapter.mjs';
 import { assertSafeMainCheckoutReset } from '../src/runner/main-checkout-reset-guard.mjs';
-import { classifyIronLaw } from '../src/evolve/iron-law.mjs';
+import { ironLawForItem, ironLawRefusal } from '../src/runner/iron-law-gate.mjs';
 import { driftStatus } from '../src/state/drift-status.mjs';
 import { unreleasedHasEntries } from '../src/setup/registrations.mjs';
-import { branchNameFor, branchExists, createBranchRef, withMergeEphemeralWorktree, provisionDependencies, resyncWorktree } from '../src/runner/worktree.mjs';
+import { branchNameFor, branchExists, createBranchRef, withMergeEphemeralWorktree, provisionDependencies, resyncWorktree, detectTrunk, isMainWorktree } from '../src/runner/worktree.mjs';
 import { resolveIntegrationBranch, retargetMember } from '../src/runner/promote-engine.mjs';
 import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
 import { withLockRetry } from '../src/runner/lock-wait.mjs';
@@ -68,9 +69,8 @@ import {
   DEFAULT_TTL_MS,
   formatLockDurationMs,
 } from '../src/runner/main-checkout-lock.mjs';
-import { resolveWriterIdentity } from '../src/runner/session-identity.mjs';
+import { resolveWriterIdentity } from '../src/util/session-identity.mjs';
 import { createSession, endSession, listSessions, reclaimOrphanedSessions, SessionError } from '../src/runner/session.mjs';
-import { resolveRoot } from '../src/runner/root-affinity.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
 import { getDomain, stageForStep, effectiveStage, discoverableStages, resolveDomainName } from '../src/state/workflow-stage-graphs.mjs';
@@ -2439,7 +2439,7 @@ async function runVerb(verb, flags, positional, dir) {
       // just reports no roots), same "read never throws on a legacy
       // shape" posture `review`'s own diff already has.
       const mergeView = listWork(dir);
-      const drift = driftStatus(process.cwd(), mergeView);
+      const drift = driftStatus(process.cwd(), mergeView, { trunk: detectTrunk(process.cwd()) });
       if (sub === 'list') {
         // tsk-2x9k D1/D4: mergeReadiness's own return shape stays
         // untouched (4 existing tests do an exact deepEqual against it) --
@@ -2465,26 +2465,19 @@ async function runVerb(verb, flags, positional, dir) {
         // change merge order semantics `merge list` already promised).
         // tsk-xyr (absorbs tsk-1zd): decide, WITHOUT attempting a merge,
         // whether `candidateId` provably cannot progress this turn.
-        // classifyIronLaw is a pure function of the item's own diff +
-        // description (src/evolve/iron-law.mjs) -- exactly reproducing
-        // approve's own Iron Law pre-check above (source==='runner' only;
-        // a pull/legacy item never trips it) lets the picker decide this
-        // WITHOUT running the real merge attempt approve would make, and
-        // without persisting a skip list (classifyIronLaw is cheap and
-        // recomputable every call, so there is nothing to go stale).
+        // `ironLawForItem` is the same gate approve's own Iron Law
+        // pre-check below runs (src/runner/iron-law-gate.mjs) -- reusing it
+        // here (source==='runner' only; a pull/legacy item never trips it)
+        // lets the picker decide this WITHOUT running the real merge
+        // attempt approve would make, and without persisting a skip list
+        // (the gate is cheap and recomputable every call, so there is
+        // nothing to go stale).
         const mergeRepoRoot = flags['trust-dir'] === true ? path.dirname(dir) : process.cwd();
         const wouldTripIronLaw = (candidateId) => {
           if (flags['acknowledge-iron-law'] === true) return false;
           const candidate = mergeView.work[candidateId];
           if (!candidate || classifySource(mergeRepoRoot, candidate) !== 'runner') return false;
-          const candidateRootId = resolveRoot(mergeView, candidateId);
-          const candidateRootBranch = candidateRootId !== candidateId ? branchNameFor(candidateRootId) : null;
-          const candidateDiff = changedFiles(
-            mergeRepoRoot,
-            candidate,
-            candidateRootBranch && branchExists(mergeRepoRoot, candidateRootBranch) ? { trunk: candidateRootBranch } : {},
-          );
-          return classifyIronLaw({ filesChanged: candidateDiff, description: candidate.description }).required;
+          return ironLawForItem(mergeRepoRoot, candidate, { view: mergeView }).required;
         };
 
         const { ready, blockedOnSync } = mergeReadiness(mergeView, { drift });
@@ -2505,7 +2498,7 @@ async function runVerb(verb, flags, positional, dir) {
             const syncResult = await runVerb('sync-root', flags, [rootId], dir);
             if (syncResult.outcome === 'synced') {
               const freshView = listWork(dir);
-              const freshDrift = driftStatus(process.cwd(), freshView);
+              const freshDrift = driftStatus(process.cwd(), freshView, { trunk: detectTrunk(process.cwd()) });
               const { ready: readyAfterSync } = mergeReadiness(freshView, { drift: freshDrift });
               if (readyAfterSync.length === 0) {
                 return { picked: null, reason: 'nothing ready to merge', syncRoot: { id: rootId, outcome: 'synced' } };
@@ -2571,7 +2564,7 @@ async function runVerb(verb, flags, positional, dir) {
           return { picked: id, approve: approveResult, ...(skipped.length > 0 ? { skipped } : {}) };
         } catch (err) {
           if (err instanceof StoreError && err.message.includes('Iron Law')) {
-            // The pure pre-check said this one was safe, but classifyIronLaw
+            // The pure pre-check said this one was safe, but the gate
             // is recomputed fresh inside approve too (never cached) -- a
             // description/diff change between the pre-check and this real
             // attempt (another session editing the item concurrently) can
@@ -3403,7 +3396,7 @@ async function runVerb(verb, flags, positional, dir) {
       // `--acknowledge-drift` is a deliberate human override, not a bypass
       // to route around silently.
       if (Array.isArray(item.targets) && item.targets.length > 0) {
-        const drift = driftStatus(repoRoot, view);
+        const drift = driftStatus(repoRoot, view, { trunk: detectTrunk(repoRoot) });
         const driftedTargets = [];
         for (const targetId of item.targets) {
           if (!view.work[targetId]) continue;
@@ -3478,30 +3471,18 @@ async function runVerb(verb, flags, positional, dir) {
       // the same diff a second time.
       let runnerOwnDiff;
       if (source === 'runner') {
-        const rootIdForIronLaw = resolveRoot(view, id);
-        const rootBranchForIronLaw = rootIdForIronLaw !== id ? branchNameFor(rootIdForIronLaw) : null;
-        // A resolved root without its own branch (e.g. a milestone root
-        // still at stage `clarify`/`todo`, never itself taken/executed)
-        // has no `fgw/<root>` ref to diff against — fall back to the
-        // repo trunk instead of crashing on an unknown revision.
-        runnerOwnDiff = changedFiles(
-          repoRoot,
-          item,
-          rootBranchForIronLaw && branchExists(repoRoot, rootBranchForIronLaw)
-            ? { trunk: rootBranchForIronLaw }
-            : {},
-        );
-        const ironLaw = classifyIronLaw({ filesChanged: runnerOwnDiff, description: item.description });
+        // The gate resolves the diff base itself (iron-law-gate.mjs): the
+        // item's own resolved-root branch when it exists, the repo trunk
+        // otherwise — a resolved root without its own branch (e.g. a
+        // milestone root still at stage `clarify`/`todo`, never itself
+        // taken/executed) has no `fgw/<root>` ref to diff against.
+        const ironLaw = ironLawForItem(repoRoot, item, { view });
+        runnerOwnDiff = ironLaw.filesChanged;
         // review-20260718-self-improve-loop finding f02: only the bare flag
         // (parsed as boolean `true`, no following value) counts as
         // acknowledgment; any value form (e.g. a stray "false") fails closed.
         if (ironLaw.required && flags['acknowledge-iron-law'] !== true) {
-          throw new StoreError(
-            'validation',
-            `approve: "${id}" trips the Iron Law — a failing test must precede this self-modifying diff before it can land. `
-              + `Matched flags: [${ironLaw.matchedFlags.join(', ') || 'none'}]; matched modules: [${ironLaw.matchedModules.join(', ') || 'none'}]. `
-              + `Re-run with --acknowledge-iron-law to confirm failing-test-first proof and proceed.`,
-          );
+          throw new StoreError('validation', ironLawRefusal('approve', id, ironLaw));
         }
       }
 
@@ -4096,15 +4077,12 @@ async function runVerb(verb, flags, positional, dir) {
       // "refuse before any git mutation" discipline `approve` already
       // applies to a runner-sourced item (source is 'runner' here by
       // construction: branchExists(branch) just confirmed it above).
-      const runnerOwnDiff = changedFiles(repoRoot, item, item.parent ? { trunk: targetBranch } : {});
-      const ironLaw = classifyIronLaw({ filesChanged: runnerOwnDiff, description: item.description });
+      const ironLaw = ironLawForItem(repoRoot, item, { trunk: item.parent ? targetBranch : null });
+      // Reused further below as the clean-tree gate's `ownFileSet` source,
+      // exactly as `approve` reuses its own — one git read, not two.
+      const runnerOwnDiff = ironLaw.filesChanged;
       if (ironLaw.required && flags['acknowledge-iron-law'] !== true) {
-        throw new StoreError(
-          'validation',
-          `sync-root: "${id}" trips the Iron Law — a failing test must precede this self-modifying diff before it can land. `
-            + `Matched flags: [${ironLaw.matchedFlags.join(', ') || 'none'}]; matched modules: [${ironLaw.matchedModules.join(', ') || 'none'}]. `
-            + `Re-run with --acknowledge-iron-law to confirm failing-test-first proof and proceed.`,
-        );
+        throw new StoreError('validation', ironLawRefusal('sync-root', id, ironLaw));
       }
 
       const timeoutMs = resolveVerifyTimeoutMs('sync-root', flags, path.dirname(dir));

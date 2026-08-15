@@ -2,10 +2,12 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   createOwnershipStore,
-  resolveRoot,
   claimRoot,
   steerFrontier,
 } from '../../src/runner/root-affinity.mjs';
+// resolveRoot moved to state/frontier.mjs (tsk-49i D1) — its cases stay here,
+// next to the claimRoot/steerFrontier behavior they underpin.
+import { resolveRoot } from '../../src/state/frontier.mjs';
 
 // Pure lib — every view/store here is built in-memory; no fs, no mkdtemp, no
 // `.fgos/` writes anywhere in this file.
