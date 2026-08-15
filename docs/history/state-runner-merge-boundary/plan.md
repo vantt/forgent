@@ -112,8 +112,8 @@ Hai pha ở trên là 2 hạng mục độc lập làm được, có thứ tự 
 [
   {
     "title": "Cắt 4 cạnh import state/runner, gộp Iron Law check, dời isMainWorktree/detectTrunk",
-    "verify": "npm test && test -f src/runner/iron-law-gate.mjs && test -f src/util/session-identity.mjs && grep -qF ironLawForItem bin/fgos.mjs && ! grep -rqF ../runner/ src/state/",
-    "action": "D1: drift-status.mjs nhan trunk qua tham so bat buoc; doi resolveRoot ve state/frontier.mjs; gop 3 ban copy-paste Iron Law vao src/runner/iron-law-gate.mjs o tang infra; doi isMainWorktree va detectTrunk sang runner/worktree.mjs. D2: doi session-identity.mjs sang src/util/, sua ca 6 file ngoai src va bin ma RESEARCH.md muc A1 liet ke, gom .githooks/pre-commit va plugins/fgOS/skills/terminal/rename.sh.",
+    "verify": "npm test && test -f src/runner/iron-law-gate.mjs && test -f src/util/session-identity.mjs && grep -qF ironLawForItem bin/fgos.mjs && ! grep -rqF ../runner/ src/state/ && ! grep -rqF runner/session-identity plugins/fgOS/skills/terminal/rename.sh .githooks/pre-commit && ! grep -qF 1.1.0 plugins/fgOS/.claude-plugin/plugin.json",
+    "action": "D1: drift-status.mjs nhan trunk qua tham so bat buoc; doi resolveRoot ve state/frontier.mjs; gop 3 ban copy-paste Iron Law vao src/runner/iron-law-gate.mjs o tang infra; doi isMainWorktree va detectTrunk sang runner/worktree.mjs. D2: doi session-identity.mjs sang src/util/ KHONG de lai re-export shim, migrate ca 6 file ngoai src va bin ma RESEARCH.md muc A1 liet ke (gom .githooks/pre-commit va plugins/fgOS/skills/terminal/rename.sh), va bump version trong plugins/fgOS/.claude-plugin/plugin.json de ban cache cua plugin khong tiep tuc phuc vu script tro vao duong dan cu.",
     "footprint": [
       "src/state/drift-status.mjs",
       "src/state/frontier.mjs",
@@ -140,7 +140,8 @@ Hai pha ở trên là 2 hạng mục độc lập làm được, có thứ tự 
       "test/e2e/main-checkout-lock-hook.test.mjs",
       "test/e2e/main-checkout-lock-hook-worktree-commit.test.mjs",
       ".githooks/pre-commit",
-      "plugins/fgOS/skills/terminal/rename.sh"
+      "plugins/fgOS/skills/terminal/rename.sh",
+      "plugins/fgOS/.claude-plugin/plugin.json"
     ],
     "kind": "chore",
     "risk": "heavy"
