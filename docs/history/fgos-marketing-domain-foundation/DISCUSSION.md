@@ -59,6 +59,7 @@ cụ thể của domain "marketing" trên fgOS sẽ trông như thế nào.
 | D7 | Hierarchy domain → N workflow → item; selector tái dùng `kind` + `workflowFor` map có default; coding un-gộp thành feature (default) / bugfix / lightweight; workflow (shape 1 item) ≠ template (composition nhiều item) | Người dùng nêu v6, đồng ý v7 | 18060 |
 | D8 | Async call = handoff event đầy đủ (holder đổi); sync call trong-session = một event `call-summary` gọn, KHÔNG đổi holder. Guard invariant: holder chỉ đổi qua async handoff | Em advise v7, người dùng đồng ý v8 | 18070 |
 | D9 | Task-spec bắt buộc có section Collaboration: bảng trigger-prose per call-edge, khai báo per (workflow, stage) — khi nào gọi, reason gì, tới role nào, bóng về mang gì. Ba tầng: prose dạy (task-spec) / soul quyết / guard chặn (roleGraph); lệch pattern hiện ra ở compound-learn qua call-summary/handoff event | Người dùng nêu câu hỏi v9, em thiết kế, xác nhận v10 | 18110 |
+| D10 | Ontology 4 tầng task-spec/skill/knowledge/context (knowledge = chuyên môn domain — coding dựa model weights, marketing là tài sản file thật của cockpit; context = refs/docs sẵn có). Nở-task-trước-nở-role-sau; coding đóng ở 5 position × ~13 phiếu. Chức danh (PO/PM/TechLead/SE/Tester) = persona tầng soul: roster per-team gói positions + phiếu + thẩm quyền, không encode vào harness. PM cổ điển đã máy hoá (frontier/triage/stale/merge) | Bàn các vòng 11–14 (ontology, lợi ích tách với evidence tsk-59a + review-item 3 executor, roster, map chức danh), người dùng đồng ý v15 | 18189 |
 
 ## 5. Q&A log
 
@@ -238,6 +239,29 @@ cụ thể của domain "marketing" trên fgOS sẽ trông như thế nào.
   fgos-researching = trigger consult). Người dùng xác nhận (v10 "cập
   nhật chưa") → mint D9 (seq 18110), roleGraph draft + Collaboration
   requirement ghim vào plan.md.
+
+- **2026-08-15 19:33–20:39 — Chuỗi vòng 11–15: ontology và tầng soul**:
+  (v11) người dùng cấn "task cũng hướng dẫn, skill cũng hướng dẫn" → em
+  trình ontology 3 tầng, phát hiện cockpit trộn process-steps vào task
+  yaml; (v12) soi cụ thể coding: skill hiện tại trộn cả contract lẫn
+  knowledge/context inline — sự cố tsk-59a (đổi prose Mode→Lane gãy
+  regex engine) là evidence chi phí của việc trộn; (v13) người dùng sửa
+  đúng: knowledge = domain-knowledge, cái em map là **context** →
+  ontology thành 4 tầng; người dùng hỏi lợi ích thật của tách task/skill
+  → em đưa 4 lý do (review-item 3 executor; engine chỉ parse được
+  contract; tần suất đổi khác nhau — compound-learn rewrite skill tự do;
+  có-phiếu-trước-có-tay-nghề-sau khi port 30 task cockpit) + nói thật
+  case không đáng tách; (v14) brainstorm roster: 5 position × ~13 phiếu,
+  nguyên tắc nở-task-trước-nở-role-sau (security-auditor = Reviewer +
+  phiếu khác, không phải role mới); người dùng hỏi "sao không thấy
+  PO/PM/TechLead/SE/Tester" → em map: chức danh = persona tầng soul
+  (title = gói positions + phiếu + thẩm quyền), PM đã máy hoá bằng
+  frontier/triage/stale/merge, cockpit tách role/agent y hệt
+  (`agents: [{role: orchestrator, agent: campaign-manager}]`); (v15)
+  người dùng đồng ý → mint D10 (seq 18189), và yêu cầu bàn sâu tiếp:
+  team có số soul NHIỀU HƠN số role thì cấu hình kiểu gì — em trình
+  binding model (position per-item, roster eligibility, pull-claim,
+  narrow bằng phiếu, sticky trong call-thread) ở vòng kế.
 
 ## 6. Thiết kế đã chốt {#design}
 
