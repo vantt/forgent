@@ -83,7 +83,7 @@ import { DOCTOR_CHECKS, integrationScriptPath, ensureSharedConfigDefaults, runFi
 import { sharedConfigFilePath, readSharedConfig, readSharedConfigOrEmpty, readInvariantCheckCommands } from '../src/config/shared-config-file.mjs';
 import { countWorkerSlots, hasWorkerSlotRoom } from '../src/state/worker-slots.mjs';
 import { assessCleanupReadiness, checkMergeStillResolves, blockedItemsNowResolvable } from '../src/state/cleanup-harness.mjs';
-import { DEFAULT_CLEANUP_TTL_DAYS, DEFAULT_CLEANUP_LEAF_TTL_DAYS } from '../src/setup/registrations.mjs';
+import { DEFAULT_CLEANUP_TTL_DAYS, DEFAULT_CLEANUP_LEAF_TTL_DAYS, IRON_LAW_LEVELS, DEFAULT_IRON_LAW_LEVEL } from '../src/setup/registrations.mjs';
 import { installGitHooks, uninstallGitHooks } from '../src/setup/git-hooks.mjs';
 import { detectRcFiles, insertSourceLine, hasSourceLine } from '../src/setup/shell-rc.mjs';
 import { materializeSkillsIntoProject } from '../src/setup/skill-wrappers.mjs';
@@ -203,6 +203,41 @@ function changedFilesSince(cwd, from, to) {
 function excludeIronLawEvidence(files, id) {
   const evidencePath = `docs/history/${id}/iron-law-evidence.md`;
   return files.filter((f) => normalizePath(f) !== evidencePath);
+}
+
+// How hard the Iron Law gate pushes back (docs/history/iron-law-gate-human-ux/
+// CONTEXT.md D3/D7): `ask` refuses, `warn` prints, records, and lets the merge
+// through. Its own config key, deliberately not folded into `gateBypass`,
+// whose floor is documented as never touching Iron Law
+// (docs/explanation/gate-bypass-design.md).
+//
+// Anything that is not exactly the opt-in literal reads as `ask` — a missing
+// key, a malformed file, a typo'd value. That is the same fail-closed shape
+// `--acknowledge-iron-law` already uses for its own bare-boolean check
+// (review-20260718-self-improve-loop f02), and it matters more here: the
+// permissive level is the one that lets a self-modifying diff land unreviewed.
+function readIronLawLevel(repoRoot) {
+  const level = readSharedConfigOrEmpty(repoRoot)?.ironLaw?.level;
+  return IRON_LAW_LEVELS.includes(level) ? level : DEFAULT_IRON_LAW_LEVEL;
+}
+
+// The `warn`-level skip record (CONTEXT.md D8). Written through `addDecision`
+// directly rather than by shelling out to `fgos decision`, which has no
+// `--kind` flag (src/cli/command-registry.mjs) and would fall back to
+// addDecision's own `kind: 'design'` default — labelling a machine's gate skip
+// as human design reflection, which is what the retrospective content gate
+// reads to decide an item may reach `done`.
+//
+// Called BEFORE the merge it permits, never after: the log records "the gate
+// was skipped", not "the merge succeeded", so a merge that then fails leaves
+// this record standing correctly.
+function recordIronLawSkip(dir, { verb, id, ironLaw }) {
+  return addDecision(dir, {
+    text: `${verb}: Iron Law skipped for "${id}" at level warn — matched flags: [${ironLaw.matchedFlags.join(', ') || 'none'}]; matched modules: [${ironLaw.matchedModules.join(', ') || 'none'}]`,
+    rationale: `ironLaw.level = "warn" in .fgos/config.json — the gate warns and records instead of refusing (D3/D8)`,
+    id,
+    kind: 'engine',
+  });
 }
 
 // tsk-x5r: `.fgos/` is fgOS's own live event-sourced store, mutated by the
@@ -2475,15 +2510,18 @@ async function runVerb(verb, flags, positional, dir) {
         const mergeRepoRoot = flags['trust-dir'] === true ? path.dirname(dir) : process.cwd();
         const wouldTripIronLaw = (candidateId) => {
           if (flags['acknowledge-iron-law'] === true) return false;
+          // CONTEXT.md D3: at `warn` the real gate below never refuses, so a
+          // candidate this pre-check parked would be a skip nothing was ever
+          // going to block. Read the same level the gate itself reads.
+          if (readIronLawLevel(path.dirname(dir)) === 'warn') return false;
           const candidate = mergeView.work[candidateId];
           if (!candidate || classifySource(mergeRepoRoot, candidate) !== 'runner') return false;
-          const candidateRootId = resolveRoot(mergeView, candidateId);
-          const candidateRootBranch = candidateRootId !== candidateId ? branchNameFor(candidateRootId) : null;
-          const candidateDiff = changedFiles(
-            mergeRepoRoot,
-            candidate,
-            candidateRootBranch && branchExists(mergeRepoRoot, candidateRootBranch) ? { trunk: candidateRootBranch } : {},
-          );
+          // CONTEXT.md D1: the gate only guards the trunk boundary. This
+          // mirrors `approve`'s own merge-target split below — a candidate
+          // whose resolved root is some other item lands on `fgw/<root>`, so
+          // it goes straight through here exactly as it will there.
+          if (resolveRoot(mergeView, candidateId) !== candidateId) return false;
+          const candidateDiff = changedFiles(mergeRepoRoot, candidate, {});
           return classifyIronLaw({ filesChanged: candidateDiff, description: candidate.description }).required;
         };
 
@@ -3491,17 +3529,33 @@ async function runVerb(verb, flags, positional, dir) {
             ? { trunk: rootBranchForIronLaw }
             : {},
         );
-        const ironLaw = classifyIronLaw({ filesChanged: runnerOwnDiff, description: item.description });
-        // review-20260718-self-improve-loop finding f02: only the bare flag
-        // (parsed as boolean `true`, no following value) counts as
-        // acknowledgment; any value form (e.g. a stray "false") fails closed.
-        if (ironLaw.required && flags['acknowledge-iron-law'] !== true) {
-          throw new StoreError(
-            'validation',
-            `approve: "${id}" trips the Iron Law — a failing test must precede this self-modifying diff before it can land. `
-              + `Matched flags: [${ironLaw.matchedFlags.join(', ') || 'none'}]; matched modules: [${ironLaw.matchedModules.join(', ') || 'none'}]. `
-              + `Re-run with --acknowledge-iron-law to confirm failing-test-first proof and proceed.`,
-          );
+        // CONTEXT.md D1: the gate guards the trunk boundary only. A leaf
+        // merges into `fgw/<root>` (the `rootId !== id` path further below),
+        // where nothing reaches main and no unreviewed self-modifying diff can
+        // land — so the gate stays quiet there and asks only where it can
+        // still matter. `rootIdForIronLaw === id` is exactly the condition
+        // under which that path merges root-into-trunk instead.
+        if (rootIdForIronLaw === id) {
+          const ironLaw = classifyIronLaw({ filesChanged: runnerOwnDiff, description: item.description });
+          // review-20260718-self-improve-loop finding f02: only the bare flag
+          // (parsed as boolean `true`, no following value) counts as
+          // acknowledgment; any value form (e.g. a stray "false") fails closed.
+          if (ironLaw.required && flags['acknowledge-iron-law'] !== true) {
+            if (readIronLawLevel(path.dirname(dir)) === 'warn') {
+              recordIronLawSkip(dir, { verb: 'approve', id, ironLaw });
+              process.stderr.write(
+                `fgos: approve: "${id}" trips the Iron Law, proceeding at ironLaw.level = "warn". `
+                  + `Matched flags: [${ironLaw.matchedFlags.join(', ') || 'none'}]; matched modules: [${ironLaw.matchedModules.join(', ') || 'none'}].\n`,
+              );
+            } else {
+              throw new StoreError(
+                'validation',
+                `approve: "${id}" trips the Iron Law — a failing test must precede this self-modifying diff before it can land. `
+                  + `Matched flags: [${ironLaw.matchedFlags.join(', ') || 'none'}]; matched modules: [${ironLaw.matchedModules.join(', ') || 'none'}]. `
+                  + `Re-run with --acknowledge-iron-law to confirm failing-test-first proof and proceed.`,
+              );
+            }
+          }
         }
       }
 
@@ -4097,14 +4151,32 @@ async function runVerb(verb, flags, positional, dir) {
       // applies to a runner-sourced item (source is 'runner' here by
       // construction: branchExists(branch) just confirmed it above).
       const runnerOwnDiff = changedFiles(repoRoot, item, item.parent ? { trunk: targetBranch } : {});
-      const ironLaw = classifyIronLaw({ filesChanged: runnerOwnDiff, description: item.description });
-      if (ironLaw.required && flags['acknowledge-iron-law'] !== true) {
-        throw new StoreError(
-          'validation',
-          `sync-root: "${id}" trips the Iron Law — a failing test must precede this self-modifying diff before it can land. `
-            + `Matched flags: [${ironLaw.matchedFlags.join(', ') || 'none'}]; matched modules: [${ironLaw.matchedModules.join(', ') || 'none'}]. `
-            + `Re-run with --acknowledge-iron-law to confirm failing-test-first proof and proceed.`,
-        );
+      // CONTEXT.md D1, and deliberately NOT `approve`'s discriminator
+      // (plan.md A1b). This verb lands on the DIRECT parent — `targetBranch`
+      // three lines above is `fgw/<item.parent>` whenever a parent exists, and
+      // only `detectTrunk` when none does. `resolveRoot` climbs to the top of
+      // the lineage instead of stopping one level up, so it answers a
+      // different question than the one this call site's own target asks; on
+      // an item whose parent id is absent from the view it returns the item
+      // itself and would trip the gate on a merge that never goes near trunk.
+      if (!item.parent) {
+        const ironLaw = classifyIronLaw({ filesChanged: runnerOwnDiff, description: item.description });
+        if (ironLaw.required && flags['acknowledge-iron-law'] !== true) {
+          if (readIronLawLevel(path.dirname(dir)) === 'warn') {
+            recordIronLawSkip(dir, { verb: 'sync-root', id, ironLaw });
+            process.stderr.write(
+              `fgos: sync-root: "${id}" trips the Iron Law, proceeding at ironLaw.level = "warn". `
+                + `Matched flags: [${ironLaw.matchedFlags.join(', ') || 'none'}]; matched modules: [${ironLaw.matchedModules.join(', ') || 'none'}].\n`,
+            );
+          } else {
+            throw new StoreError(
+              'validation',
+              `sync-root: "${id}" trips the Iron Law — a failing test must precede this self-modifying diff before it can land. `
+                + `Matched flags: [${ironLaw.matchedFlags.join(', ') || 'none'}]; matched modules: [${ironLaw.matchedModules.join(', ') || 'none'}]. `
+                + `Re-run with --acknowledge-iron-law to confirm failing-test-first proof and proceed.`,
+            );
+          }
+        }
       }
 
       const timeoutMs = resolveVerifyTimeoutMs('sync-root', flags, path.dirname(dir));
