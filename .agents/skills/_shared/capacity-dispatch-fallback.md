@@ -41,84 +41,50 @@ dispatching it anyway is the same "soul re-deriving what a live soul
 already knows" waste `tsk-1ni` found in `judgeDiscovery`'s blind
 cli-spawn.
 
-## Step A — config check
-
-Before reasoning it out yourself, check whether `<CAPACITY_ID>` is
-configured at all:
+## Step A — ask `decide` (never read the config yourself)
 
 ```bash
 root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-node -e "
-const cfg = JSON.parse(require('node:fs').readFileSync('$root/.fgos/config.json', 'utf8'));
-console.log(cfg.runner?.capacities?.['<CAPACITY_ID>'] ? 'configured' : 'not-configured');
-"
+node "$root/src/runner/dispatch.mjs" decide <CAPACITY_ID> [--has-live-task-access]
+# when you have no capacity id, use the door that matches what you know:
+#   decide --for <PURPOSE>  [--has-live-task-access]
+#   decide --work <WORK_ID> [--has-live-task-access]
+#   decide --for <LABEL> --needs-soul [--has-live-task-access]
 ```
 
-- **`not-configured`** — skip straight to `<INLINE_FALLBACK_HEADING>`,
-  with no note printed at all. This is the default/common path, and its
-  behavior and output are byte-identical to before this capacity existed —
-  nothing here changes for the common case.
-- **`configured`** — dispatch through `execute` next (Step B). There is no
-  separate presence check here any more (tsk-5tm-1 D1: the field `needs`
-  this used to query by, and the gate in `dispatch.mjs` that consulted it,
-  are both retired — dead for every `kind:"task"` capacity, and no signal
-  beyond the OS's own ENOENT for the rest). A missing/absent backend now
-  surfaces as `execute`'s own spawn failure, caught by Step C below —
-  later, and cheaper to have skipped a redundant check for, than before.
+Then branch on `mechanism`:
 
-## Step B — execute (tsk-5tm-3 D5): self-execute or hand back, one call
+- **`unavailable`** — go straight to `<INLINE_FALLBACK_HEADING>`, printing
+  nothing at all. This is the default/common path, byte-identical to
+  before this capacity existed.
+- **`in-process`** — call your own Agent/Task tool with the returned
+  `agentType` (or your own default when absent). Print the announce line,
+  then read its answer through Step C.
+- **`out-of-process`** — continue to Step B.
 
-Before this item, this fragment's own Steps A/B/B.5/C did a config check, a
-presence check, a native-vs-cli/spawn decision, THEN built and ran the
-command by hand — because `dispatch.mjs` itself only ever handed back
-`{command,args}` for a `kind:"cli"` capacity, never ran it. `execute` now
-does all of that internally (matching marketing-cockpit's `run_task()`
-contract) — self-executing every case it can, handing back only the one
-case it structurally can't (native, same-family, live session — dispatch
-is a passive CLI, it has no Task tool of its own to call):
+When `--for`/`--work` resolved a `capacityId` (carried in this same JSON
+response, additive), reuse that exact value for `<CAPACITY_ID>` in every
+step below — never re-derive it.
+
+## Step B — execute (out-of-process only)
+
+Reached only when Step A's `decide` call answered `mechanism:
+"out-of-process"`. Deciding the mechanism a second time here would be
+deciding it twice — Step A already did that; this step only self-executes
+(tsk-5tm-3 D5, matching marketing-cockpit's `run_task()` contract):
 
 ```bash
 node "$root/src/runner/dispatch.mjs" execute <CAPACITY_ID> --prompt "<PROMPT_TEMPLATE built as below>" [--has-live-task-access]
 ```
 
-`--has-live-task-access` is your own self-declaration (never inferred from
-environment or config — the same "the skill already self-knows its own
-tool manifest" pattern this whole optimization relies on): do you, the
-assistant reading this fragment right now, already have the Agent/Task
-tool available in your current tool manifest? Omit the flag entirely if
-not — never pass it on a guess. This self-declaration is what the Native-
-First Dispatch Doctrine (`docs/decisions/0026-vision-orchestrator-roottask-
-capacity-native-vs-cli-spawn.md`, tsk-3ik-3) actually decides on
-underneath — same-provider + live access → native; anything else →
-cli/spawn — `execute` applies those rules for you, at runtime.
+Prints the real result as JSON — `{"mechanism":"out-of-process", ...real
+result fields (status, stdout, stderr, tier, model, provider, command)}`.
+Print the announce line, then read `stdout` the same way a consumer used
+to read a hand-run command's own output:
 
-Prints JSON, one of two shapes:
-
-- **`{"mechanism":"in-process","agentType":"<name>","prompt":"..."[,"capacityId":"..."]}`**
-  — call YOUR OWN Agent/Task tool: `subagent_type` is this JSON's
-  `agentType`, the prompt is the `prompt` field (the exact same
-  `<PROMPT_TEMPLATE>` you passed — echoed back, never re-worded). Print the
-  announce line before calling it:
-
-  ```
-  <CAPACITY_ID> - in-process - <agentType> - <model actually used>
-  ```
-
-  where `<model>` is whichever model the Agent/Task call actually resolves
-  to (the target agent definition's own pinned `model:`, an explicit
-  override you pass, or — when neither applies — the current session's own
-  model, since native dispatch is same-provider by construction).
-- **`{"mechanism":"out-of-process", ...real result fields (status, stdout,
-  stderr, tier, model, provider, command)}`** — this already IS the real
-  answer; nothing left to run. Print the announce line:
-
-  ```
-  <CAPACITY_ID> - out-of-process - <provider> - <model>
-  ```
-
-  Read `stdout` the same way a consumer used to read a hand-run command's
-  own output — Step C's malformed-response fallback below applies
-  identically regardless of which shape produced the answer.
+```
+<CAPACITY_ID> - out-of-process - <provider> - <model>
+```
 
 An error from this call (a thrown `RunnerConfigError`, a spawn failure, a
 timeout) means fall straight to Step C — treat it exactly like a malformed
@@ -131,7 +97,7 @@ whose consuming skill has no single fixed question to ask — the parent
 composes a different command each time, depending on what it just decided
 to split off — cannot fill in a registered `<PROMPT_TEMPLATE>` at all.
 This is not a second dispatch mechanism: it still goes through Steps A/B
-unchanged (config check, then `execute`), it only replaces what text goes
+unchanged (`decide`, then `execute`), it only replaces what text goes
 into Step B's own `--prompt` flag.
 
 What is lost by dropping the fixed template is a real guarantee — "the
@@ -229,9 +195,8 @@ task's own six required fields — reuse bee's three-tier rubric
 against at intake, just applied per-dispatch instead of once.
 
 This judgment produces ONLY `provider`/`tier` — never a mechanism.
-Mechanism stays entirely `execute`'s own internal decision, resolved
-through the Native-First Dispatch Doctrine's rules 1–4 exactly as Step
-B above already does; a judged `provider` that resolves to a
+Mechanism stays entirely `decide`'s own decision, already resolved at Step
+A above, never re-derived here; a judged `provider` that resolves to a
 non-Claude command still has to clear the same `allowCrossProvider` gate
 `resolveExecutorConfig` already enforces
 (`src/runner/dispatch.mjs:703-707`) — nothing here bypasses it.
@@ -289,9 +254,10 @@ scarcity signal needs the full denominator, not just the misses.
   `fgos-coding-exploring`/`fgos-researching`) cite its "Valid reasons to dispatch"
   list directly when explaining their own never-delegate-reasoning rule,
   and it remains the ready-made pattern for the next real cross-provider
-  consumer. Step B's `in-process`/`out-of-process` branches (`execute`,
+  consumer. Step A's `in-process`/`out-of-process` branching (`decide`,
+  tsk-3ik-1) and Step B's out-of-process self-execute (`execute`,
   tsk-5tm-3 D5) are proven by `src/runner/dispatch.mjs`'s own unit tests
   instead, per `docs/history/tsk-5tm-3/iron-law-evidence.md` if applicable.
 - `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md`
-  — Native-First Dispatch Doctrine, Step B's own governing rules 1/2/4,
-  applied internally by `execute` now (tsk-5tm-3 D5) rather than by hand.
+  — Native-First Dispatch Doctrine, Step A's own governing rules 1/2/4,
+  applied internally by `decide` now (tsk-3ik-1) rather than by hand.
