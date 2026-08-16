@@ -77,6 +77,27 @@ re-shapes the work; that already happened at `discovery`/`exploring`/`planning`.
 - One commit per item, with the item's id in the commit message — the same
   traceability a cap trace gives a bee cell, translated to a plain git
   habit here since fgOS has no separate cell-trace file.
+- **Multi-role team harness (tsk-2t9c D1/D4/D5/D8/D9): fire real `fgos
+  handoff`/`fgos handoff-return` calls at the points below, do not just
+  perform the underlying action silently.** (Return's own `review`
+  handoff is the one exception — the engine fires it for you as a side
+  effect of `return`/`catchup` reaching `awaiting-approval`, D18; every
+  other point below is still this skill's own job to fire.) The role/holder axis (a THIRD
+  axis, orthogonal to `status`/`stage`) only stays truthful if the session
+  actually records who is holding the item — the guard, event log, and
+  `docs/task-specs/coding/implement-item.md`'s own `## Collaboration`
+  table exist precisely so this skill's real interactions (consult a
+  researcher, get something reviewed, ask a human, hand off a scoped
+  subtask) are checkable and loggable instead of staying implicit. `fgos
+  handoff` is opt-in per-domain (only fires for a domain with a declared
+  `roleGraph` — coding today); if the item's domain declares none, skip
+  every call below silently, same as the guard itself would. A refusal
+  from `handoff` is never swallowed and never blocks the underlying
+  action it accompanies (`return`/`ask` are the real gates — the
+  role-axis call is additive tracking, not a second gate) — report the
+  refusal plainly and continue with the underlying action regardless;
+  a refusal on an edge this domain's own `roleGraph` declares is itself a
+  signal something drifted, worth naming, never worth hiding.
 
 ## Flow
 
@@ -98,6 +119,35 @@ re-shapes the work; that already happened at `discovery`/`exploring`/`planning`.
    `todo`, re-claim (`fgos pick <id>`) before Implementing — proceeding
    without a live claim risks `fgos return` refusing later with "is todo,
    not doing".
+
+   **Reclaim the ball if it isn't yours (tsk-2t9c D4/D8).** Read the
+   item's `holder` from the same `fgos list --id <id> --json` call
+   (`data.work[id].holder`). If it is set and is anything other than
+   `implementer`, this session is re-entering an item whose most recent
+   role-axis call was never closed — most commonly a `review` call a
+   reject sent back to `doing` without anyone formally returning it, or an
+   `advise` call whose `awaiting-human` park a prior session's `fgos
+   answer` already resolved on the status axis without the role axis
+   following. Close it before doing anything else:
+
+   ```bash
+   root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+   ```
+
+   ```bash
+   node "$root/bin/fgos.mjs" handoff-return "<id>" --note "reclaiming at Orient — holder was <role>" --dir "$root"
+   ```
+
+   **Repeat this call, re-reading `data.work[id].holder` fresh each time,
+   until `holder` reads `implementer`** (tsk-2t9c D16 — a nested call can
+   legitimately sit two deep, e.g. `reviewer` then `human-advisor`; one
+   `handoff-return` only pops the innermost frame). Stop the moment a call
+   refuses with "no open call" — that is the ordinary end state, not a
+   failure to relay.
+
+   (Two separate tool calls per attempt, per the Hard rules above.) Skip
+   this entirely when the item's domain declares no `roleGraph` — `holder`
+   never appears there in the first place.
 
 2. **Implement.** Make the real change the item describes, reading every
    file before editing it. Before editing a symbol, apply `CLAUDE.md`'s
@@ -121,6 +171,44 @@ re-shapes the work; that already happened at `discovery`/`exploring`/`planning`.
    A package install is the same kind of stop — it is a scope decision, not
    an implementation detail; park it the same way rather than installing on
    your own authority.
+
+   **Collaboration calls (tsk-2t9c D1/D4/D9)** — the same four
+   interactions this skill already performs implicitly, now made visible
+   through the role/holder axis per `implement-item.md`'s own
+   `## Collaboration` table. Each fires ONLY when its trigger actually
+   matches; no trigger matching means no call, same as before this
+   feature existed:
+   - **consult (sync)** — a named library/API/pattern surfaces that
+     cannot be resolved from context already in hand. After getting the
+     finding (`fgos-researching`, or your own direct read), log it:
+     ```bash
+     node "$root/bin/fgos.mjs" handoff "<id>" --to researcher --reason consult --outcome "<the finding, one line>" --dir "$root"
+     ```
+   - **assist (sync)** — an independent scoped subtask exists whose
+     footprint does not touch the file(s) you are currently editing.
+     After the subagent (`fgos-fanout`/Agent tool) hands back its work
+     product, log it:
+     ```bash
+     node "$root/bin/fgos.mjs" handoff "<id>" --to helper --reason assist --outcome "<the work product, one line>" --dir "$root"
+     ```
+   - **advise (async)** — a product decision outside the locked D-IDs is
+     needed, and the question passes the material/grounded/answerable
+     filter. This is `fgos ask`'s own async park — call `handoff` FIRST
+     (moves `holder` to `human-advisor` without touching `status`), THEN
+     `ask` (parks `status` to `awaiting-human`):
+     ```bash
+     node "$root/bin/fgos.mjs" handoff "<id>" --to human-advisor --reason advise --dir "$root"
+     ```
+     ```bash
+     node "$root/bin/fgos.mjs" ask "<id>" --text "..." --dir "$root"
+     ```
+     The role-axis side of this call closes later, at a future session's
+     Orient step (the reclaim rule above) — never assume the same session
+     that asked is the one that gets answered.
+
+   Both `--outcome`/consult/assist calls are single, after-the-fact logs
+   (`mode: sync` — the roleGraph edge decides this, never a flag you
+   pass) — there is no separate "start" call for a sync interaction.
 
 3. **Verify — proof, not assertion.** Run the item's own `verify` command
    exactly as recorded on the item (`fgos check <id>` or `fgos list --json`
@@ -185,7 +273,7 @@ re-shapes the work; that already happened at `discovery`/`exploring`/`planning`.
    write nothing; this cost is only paid for the items the gate will
    actually apply to.
 
-5. **Return.** Hand the item back with:
+5. **Return.**
 
    ```
    fgos return <id>
@@ -197,11 +285,28 @@ re-shapes the work; that already happened at `discovery`/`exploring`/`planning`.
    moves it to `blocked` instead) — it never takes the caller's word for
    it, the same "proof, not assertion" discipline bee's cap-with-evidence
    rule enforces, just applied by the engine instead of a recorded trace
-   field. If `return` itself just moved the item to `blocked` (a verify
-   failure caught while `status` was still `doing`), treat that exactly
-   like a failed verify: diagnose, fix, and return again — never re-run
-   `return` hoping the same red state passes on a retry without a real
-   change underneath it.
+   field.
+
+   **Only on success** (item now reads `awaiting-approval`) does the
+   **review** interaction from `implement-item.md`'s own Collaboration
+   table actually happen — hand the ball to `reviewer`. You do not fire
+   this yourself: `return` reaching `awaiting-approval` fires it FOR you,
+   as an engine-level side effect of that exact transition (`moveWork`,
+   `src/state/store.mjs`, tsk-2t9c D18). This is a deliberate relocation,
+   not a shortcut — a real end-to-end run found this instruction, when it
+   depended on an agent reading and acting on it, went unfired on a
+   genuinely successful return with nothing to signal the miss (no error,
+   no red test). Every door into `awaiting-approval` (`return`, `catchup`,
+   any future one) converges on that one engine call, so the guarantee
+   now holds regardless of which door an item took, without needing this
+   skill's own prose to remember, or to repeat itself once per door. If
+   `return` itself just moved the item to `blocked` instead (a verify
+   failure caught while `status` was still `doing`), nothing fires —
+   `moveWork`'s own side effect is conditioned on the SAME `to ===
+   'awaiting-approval'` transition this prose already gates on; treat a
+   `blocked` outcome exactly like a failed verify: diagnose, fix, and
+   return again — never re-run `return` hoping the same red state passes
+   on a retry without a real change underneath it.
 
    If the item is instead ALREADY `blocked` when you go to call `return`
    (e.g. `approve`'s post-merge verify-fail rollback left it
@@ -211,7 +316,9 @@ re-shapes the work; that already happened at `discovery`/`exploring`/`planning`.
    `docs/specs/work-state.md`). The correct recovery verb there is `fgos
    catchup <id>`, not another `return` call: it re-runs `verify` on a
    staged merge into the item's target branch and, on green, moves it
-   straight to `awaiting-approval`.
+   straight to `awaiting-approval` — the same `moveWork` transition, so
+   the same engine-fired review handoff applies on THIS success too, no
+   separate call needed.
 
 ## Headless
 
@@ -227,7 +334,8 @@ for the whole chain, applied here at the implementation step specifically.
 Once `fgos return <id>` reports the item moved to `awaiting-approval`, load
 `fgos-routing` to re-read its stage and continue — routing decides whether
 `compound-learn` (and `fgos-coding-compounding`) comes next; this skill's own job
-ends at a returned, verified item.
+ends at a returned, verified item (the review handoff above already fired
+as part of that same transition — nothing further to do for it here).
 
 ## Red flags
 

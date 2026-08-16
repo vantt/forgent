@@ -42,12 +42,12 @@ import {
   writeEnduserManifest,
 } from './helpers/setup-checks-harness.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../../src/state/worker-slots.mjs';
-import { DEFAULT_IRON_LAW_LEVEL } from '../../src/setup/registrations.mjs';
+import { DEFAULT_IRON_LAW_LEVEL, findDomainWorkflowSkillMapGaps } from '../../src/setup/registrations.mjs';
 
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, plugin-dev-skills-packaged, changelog-unreleased-stale, herdr-launcher-configured, herdr-web-dashboard-configured, work-classification-vocabulary, work-stage-vocabulary, delivered-not-on-trunk, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, events-jsonl-not-truncated, cli-version-visible, worker-slots-ceiling-usable, gateway-token-configured, readme-install-tag-exists, iron-law-configured, and dispatch-decide-hook-wired', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, plugin-dev-skills-packaged, changelog-unreleased-stale, herdr-launcher-configured, herdr-web-dashboard-configured, work-classification-vocabulary, work-stage-vocabulary, domain-workflow-skillmap-coverage, delivered-not-on-trunk, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, events-jsonl-not-truncated, cli-version-visible, worker-slots-ceiling-usable, gateway-token-configured, readme-install-tag-exists, iron-law-configured, task-specs-resolve, agent-claims-resolve, and dispatch-decide-hook-wired', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     [
@@ -68,6 +68,7 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'herdr-web-dashboard-configured',
       'work-classification-vocabulary',
       'work-stage-vocabulary',
+      'domain-workflow-skillmap-coverage',
       'delivered-not-on-trunk',
       'enduser-docs-index-stale',
       'events-jsonl-contiguous',
@@ -79,6 +80,8 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'readme-install-tag-exists',
       'iron-law-configured',
       'dispatch-decide-hook-wired',
+      'task-specs-resolve',
+      'agent-claims-resolve',
     ].sort(),
   );
 });
@@ -495,6 +498,77 @@ test('work-stage-vocabulary lists every violating id, not just the first', () =>
   assert.match(message, /bad-one/);
   assert.match(message, /bad-two/);
   fs.rmSync(dir, { recursive: true, force: true });
+});
+
+// ─── domain-workflow-skillmap-coverage (tsk-ogx) ───────────────────────────
+// The registry-shape sibling of work-classification-vocabulary/
+// work-stage-vocabulary above: those two catch a work ITEM drifting from
+// its domain's own declared vocabulary; this one catches the domain's own
+// DECLARATION drifting internally -- a stage name reachable through a
+// domain's registered workflow(s) with no entry at all in that domain's
+// own `skillMap` (an explicit `null` is a deliberate "no skill for this
+// stage" answer and must not be flagged).
+//
+// Pure registry check -- no cwd/on-disk state, no fixture repo needed. The
+// real `DOMAINS` registry is `Object.freeze`d and can never carry a
+// deliberately-broken fixture, so `findDomainWorkflowSkillMapGaps` accepts
+// an optional `domains` map (default: the real `DOMAINS`) purely so the
+// fail branch is testable with a synthetic domain -- production wiring
+// (`registerCheck` in registrations.mjs) always calls it zero-arg, against
+// the real registry.
+
+test('domain-workflow-skillmap-coverage passes against the real DOMAINS registry', () => {
+  const { passed, message } = checkById('domain-workflow-skillmap-coverage').check();
+  assert.equal(passed, true, message);
+  assert.match(message, /resolves to a real skillMap entry/);
+});
+
+test('findDomainWorkflowSkillMapGaps passes a domain with no workflows field, checked against its own stages', () => {
+  const domains = {
+    fixture: {
+      stages: ['alpha', 'beta'],
+      skillMap: { alpha: 'some-skill', beta: null },
+    },
+  };
+  assert.deepEqual(findDomainWorkflowSkillMapGaps(domains), []);
+});
+
+test('findDomainWorkflowSkillMapGaps names a stage missing from skillMap entirely, distinct from an explicit null', () => {
+  const domains = {
+    fixture: {
+      stages: ['alpha', 'beta'],
+      skillMap: { alpha: null }, // beta missing entirely -- explicit null on alpha is fine
+    },
+  };
+  assert.deepEqual(findDomainWorkflowSkillMapGaps(domains), ['fixture.beta']);
+});
+
+test('findDomainWorkflowSkillMapGaps walks every stage across every registered workflow, not just domain.stages', () => {
+  const domains = {
+    fixture: {
+      stages: ['alpha'], // the domain-level default -- workflows below add a second, real workflow
+      workflows: {
+        feature: { stages: ['alpha'] },
+        bugfix: { stages: ['alpha', 'gamma'] },
+      },
+      skillMap: { alpha: 'some-skill' }, // gamma missing
+    },
+  };
+  assert.deepEqual(findDomainWorkflowSkillMapGaps(domains), ['fixture.gamma']);
+});
+
+test('findDomainWorkflowSkillMapGaps skips a domain with no skillMap at all', () => {
+  const domains = { fixture: { stages: ['alpha'] } };
+  assert.deepEqual(findDomainWorkflowSkillMapGaps(domains), []);
+});
+
+test('findDomainWorkflowSkillMapGaps lists every violating domain.stage, not just the first', () => {
+  const domains = {
+    one: { stages: ['a', 'b'], skillMap: { a: null } },
+    two: { stages: ['c'], skillMap: {} },
+  };
+  const gaps = findDomainWorkflowSkillMapGaps(domains);
+  assert.deepEqual(gaps.sort(), ['one.b', 'two.c']);
 });
 
 test('dependencies-installed passes when package.json has no dependencies field (pre-tsk-slq behavior)', () => {

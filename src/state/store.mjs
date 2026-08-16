@@ -34,7 +34,8 @@ import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyS
 import { transitionWork, FsmError } from './status-fsm.mjs';
 import { transitionStage } from './stage-fsm.mjs';
 import { validateWork, validateDomainFields, checkAcceptanceEvidenceTraceable, WorkValidationError, DEFAULTS, GOAL_TIERS, truncateTitle } from './work.mjs';
-import { getDomain, statusCategoryFor, parkReasonForStatus } from './workflow-stage-graphs.mjs';
+import { getDomain, statusCategoryFor, parkReasonForStatus, roleGraphFor, effectiveStage } from './workflow-stage-graphs.mjs';
+import { evaluateHandoff } from './handoff.mjs';
 import { EventLogError } from './events.mjs';
 import { frontier, frontierAcrossSteps, isDepsAndLineageReady as depsAndLineageReadyView } from './frontier.mjs';
 import { assertNoCycle, assertNoUnifiedCycle } from './dep-graph.mjs';
@@ -310,6 +311,27 @@ export function editWork(dir, { id, patch, role } = {}) {
         );
       }
     }
+    // tsk-2t9c D16: `kind` selects which workflow's stage graph an item
+    // follows (`resolveWorkflow`, `src/state/workflow-stage-graphs.mjs`).
+    // `status: 'todo'` is the ONLY status a claimed item's `stage` is still
+    // free to move through discovery/exploring/planning under -- claim
+    // (`todo` -> `doing`) happens right before the FIRST invocation of the
+    // `executing`-stage skill, never earlier (fgos-coding-driving's own
+    // hard rule), so every stage-graph-consuming call an item makes while
+    // still `todo` already reflects `kind`'s CURRENT value at read time.
+    // Refusing this edit once `status` has left `todo` means `kind` can
+    // never drift out from under a stage graph the item is actively
+    // walking -- no separate frozen `workflow` field needed, no second
+    // write door, no validated-change verb to get subtly wrong: `kind`
+    // itself simply stops being a live variable once it would matter.
+    if (patch.kind !== undefined && work.status !== 'todo') {
+      throw new StoreError(
+        'validation',
+        `edit cannot change "kind" on work "${id}" -- status is "${work.status}", not "todo". `
+        + `kind selects the item's workflow/stage graph; it can only change while status is still todo, `
+        + `before a claim lets the item start walking that graph.`,
+      );
+    }
 
     // Per work-item-title-contract D2/D5, the same title bound addWork applies,
     // applied to the PATCH rather than to the candidate: the event this door
@@ -534,7 +556,7 @@ export function assertPlanEvidence(id, work, repoRoot) {
  */
 export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, role, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk, claimTrigger, statusAtAsk, releaseTrigger, rationale, alternatives, source, askRationale, askAlternatives, askSource, mergedSha, mergedInto } = {}) {
   const { logPath } = paths(dir);
-  return withEventsLockAndRefresh(dir, logPath, () => {
+  const result = withEventsLockAndRefresh(dir, logPath, () => {
   const before = rebuildView(logPath);
   const work = before.work[id];
   if (!work) {
@@ -764,6 +786,72 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   }
   return appendEventLocked(logPath, rawEvent); // captures the real seq; rawEvent itself has none
   });
+  // tsk-2t9c D16: `delivered` is a terminal state for the role/holder axis
+  // -- no stage skill ever re-enters an item past this point (every wired
+  // reclaim lives at a stage-skill's own entry point), so an async call
+  // left open on it (most commonly D14's own `review` handoff on the
+  // approve path: nothing calls `handoff-return` between `awaiting-
+  // approval` and `delivered`) would sit "open" forever. A read-time
+  // consumer of `callThreads` (compound-learn, retrospective) would then
+  // misread every delivered item as carrying unresolved work rather than
+  // settled history. Close every still-open frame the exact same way a
+  // live reclaim would -- one `recordCallReturn` per frame, deepest first
+  // (the LIFO order `openCallStack` already enforces) -- never inventing a
+  // second closing mechanism. Runs AFTER the lock above releases (this
+  // function is fully synchronous, so there is no nesting risk), and only
+  // when the domain actually declares a `roleGraph` -- a domain with none
+  // never opens a call in the first place, so there is nothing to close.
+  if (result.event.payload.to === 'delivered') {
+    try {
+      const domain = getDomain(result.view.work[id]?.domain);
+      if (roleGraphFor(domain)) {
+        let stack = openCallStack(result.view.callThreads?.[id]);
+        while (stack.length > 0) {
+          const closeResult = recordCallReturn(dir, { id, note: 'auto-closed at delivered (tsk-2t9c D16)' });
+          stack = openCallStack(closeResult.view.callThreads?.[id]);
+        }
+      }
+    } catch {
+      // Best-effort, same fail-safe discipline as the `learning` compose
+      // above: the item already reached `delivered` -- that transition is
+      // what matters and must never be undone or reported as failed over a
+      // cleanup step that is not itself correctness-critical.
+    }
+  }
+  // tsk-2t9c D18: found via a real end-to-end run (a fresh agent following
+  // fgos-coding-implement's own Return-step prose, verbatim, top to
+  // bottom, on a real item) that never fired `handoff --to reviewer
+  // --reason review` even though the item genuinely reached `awaiting-
+  // approval` -- the instruction is imperative and unmissable in
+  // isolation, but sits trailing after several paragraphs of blocked/
+  // catchup caveats, is duplicated once per door into this status
+  // (`return`, `catchup`, and any future one), and nothing gates on it:
+  // skipping it produces no error, no red test, no symptom the skipping
+  // agent would ever notice. Same class of gap D16 already fixed for
+  // `delivered` (a skill-remembered side effect vs. an engine-guaranteed
+  // one) -- and the same fix: every door into `awaiting-approval`
+  // converges on this one `moveWork` call, so firing the review handoff
+  // HERE covers `return`/`catchup`/anything else at once, where the
+  // prose needed a copy per door and still wasn't reliably read. This
+  // does not change what the prose already prescribes -- it relocates
+  // who is responsible for making it actually happen. `recordCall` runs
+  // its own `evaluateHandoff` guard internally (fromRole read off the
+  // item's live `holder`, defaulting to the role graph's `defaultRole`),
+  // so a domain/stage/holder combination where this edge is not legal
+  // (or that already carries a role other than the review edge's `from`)
+  // simply refuses, caught and ignored below -- same "must never block
+  // the transition" fail-safe as every sibling block in this function.
+  if (result.event.payload.to === 'awaiting-approval') {
+    try {
+      const domain = getDomain(result.view.work[id]?.domain);
+      if (roleGraphFor(domain)) {
+        recordCall(dir, { id, toRole: 'reviewer', reason: 'review', note: 'auto-fired on reaching awaiting-approval (tsk-2t9c D18)' });
+      }
+    } catch {
+      // Best-effort -- see the block's own comment above.
+    }
+  }
+  return result;
 }
 
 /**
@@ -840,6 +928,122 @@ export function moveStage(dir, { id, to, expectedStage, verify, role } = {}) {
     // post-transition stamp as role above, but unconditional: every
     // moveStage call records who wrote it, never blocking on a malformed
     // identity (D18).
+    rawEvent.payload.writer = resolveWriterIdentity(dir);
+    return appendEventLocked(logPath, rawEvent);
+  });
+}
+
+/**
+ * Rebuild the stack of currently-open async calls on `id`'s own
+ * call-thread, purely from the log (tsk-2t9c D8/R7 — never a stored
+ * counter, which can drift; a fold cannot). A plain `handoff` (`returning`
+ * falsy) PUSHES itself as newly open; a `handoff` written by
+ * `recordCallReturn` (`returning: true`) POPS the most recently opened
+ * one — a genuine LIFO stack, not a flag compared against the current
+ * holder, which cannot tell an open call from the very return event that
+ * just closed it (both can carry the same `to`). `call-summary` entries
+ * never touch the stack — sync calls do not nest against the async
+ * callstack cap (handoff.mjs's own contract).
+ */
+function openCallStack(callThreadEntries) {
+  if (!Array.isArray(callThreadEntries)) return [];
+  const stack = [];
+  for (const entry of callThreadEntries) {
+    if (entry.kind !== 'handoff') continue;
+    if (entry.returning) {
+      stack.pop();
+    } else {
+      stack.push(entry);
+    }
+  }
+  return stack;
+}
+
+/**
+ * The single door for a role/holder call (tsk-2t9c D1/D4/D5/D8/D9): guards
+ * the proposed call through handoff.mjs's pure `evaluateHandoff`, then
+ * appends exactly the event kind the matched edge's own `mode` calls for —
+ * never a caller choice. `mode: 'async'` writes `work.handoff` (holder
+ * changes, full checkpoint); `mode: 'sync'` writes `work.call-summary`
+ * (holder untouched, compact record) — same fresh-lookup -> guard ->
+ * append shape every other mutation in this file already uses, one held
+ * lock, one critical section.
+ *
+ * A REFUSED call throws `StoreError('validation', ...)` carrying the
+ * refusal reason AND the legal edges as JSON — "chặn và dạy tại chỗ"
+ * (D1): the caller can read the legal edges straight out of the error
+ * message without a second round trip.
+ */
+export function recordCall(dir, { id, toRole, reason, note, outcome } = {}) {
+  const { logPath } = paths(dir);
+  return withEventsLockAndRefresh(dir, logPath, () => {
+    const before = rebuildView(logPath);
+    const work = before.work[id];
+    if (!work) {
+      throw new StoreError('validation', `work "${id}" not found.`);
+    }
+    const domain = getDomain(work.domain);
+    const roleGraph = roleGraphFor(domain);
+    const fromRole = work.holder ?? roleGraph?.defaultRole;
+    // effectiveStage, not raw work.stage (tsk-2t9c bugfix, found in
+    // self-review): a work item's `stage` is legitimately absent under
+    // D8's lazy-default rule (workflow-stage-graphs.mjs's own
+    // effectiveStage/stage-fsm.mjs precedent) -- reading work.stage
+    // directly here made every handoff attempt on an item that never had
+    // an explicit moveStage refuse with "stage: undefined", including
+    // split children born straight at 'executing' without ever calling
+    // moveStage (src/intake/plan.mjs's normalizeChild path).
+    const stage = effectiveStage(work, domain);
+    const openCallDepth = openCallStack(before.callThreads?.[id]).length;
+
+    const result = evaluateHandoff({ domain, stage, fromRole, toRole, reason, openCallDepth });
+    if (!result.ok) {
+      throw new StoreError(
+        'validation',
+        `handoff refused: ${result.refusal} -- legal edges: ${JSON.stringify(result.legalEdges)}`,
+      );
+    }
+
+    const rawEvent = result.edge.mode === 'async'
+      ? { type: 'work.handoff', payload: { id, from: fromRole, to: toRole, reason, mode: 'async', note } }
+      : { type: 'work.call-summary', payload: { id, calleeRole: toRole, reason, outcome } };
+    rawEvent.payload.writer = resolveWriterIdentity(dir);
+    return appendEventLocked(logPath, rawEvent);
+  });
+}
+
+/**
+ * Close the most recently opened async call on `id`'s own call-thread,
+ * returning the ball to whoever opened it (tsk-2t9c D4: "call = round-trip,
+ * ball returns to sender" -- a return is completing a call the guard
+ * ALREADY approved when it was opened, never a fresh outbound call, so it
+ * deliberately does NOT run back through `evaluateHandoff`/`roleGraph`
+ * edge-legality. Requiring a matching reverse edge for every return would
+ * double the roleGraph's own size for no real legality question -- the
+ * open call already answered "was this allowed".
+ *
+ * Refuses only when there is genuinely no open call to close (nothing in
+ * `callThreads[id]` is a `handoff` the item's current `holder` could be
+ * returning from) -- same StoreError('validation', ...) shape as every
+ * other refusal in this file.
+ */
+export function recordCallReturn(dir, { id, note } = {}) {
+  const { logPath } = paths(dir);
+  return withEventsLockAndRefresh(dir, logPath, () => {
+    const before = rebuildView(logPath);
+    const work = before.work[id];
+    if (!work) {
+      throw new StoreError('validation', `work "${id}" not found.`);
+    }
+    const stack = openCallStack(before.callThreads?.[id]);
+    const openCall = stack.at(-1);
+    if (!openCall || openCall.to !== work.holder) {
+      throw new StoreError('validation', `work "${id}" has no open call for its current holder to return from.`);
+    }
+    const rawEvent = {
+      type: 'work.handoff',
+      payload: { id, from: work.holder, to: openCall.from, reason: openCall.reason, mode: 'async', returning: true, note },
+    };
     rawEvent.payload.writer = resolveWriterIdentity(dir);
     return appendEventLocked(logPath, rawEvent);
   });

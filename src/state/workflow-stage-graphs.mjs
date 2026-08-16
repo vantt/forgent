@@ -49,8 +49,23 @@
  * matches today's implicit, exclusively-coding behavior (D2). */
 export const DEFAULT_DOMAIN = 'coding';
 
-export const DOMAINS = Object.freeze({
-  coding: Object.freeze({
+// tsk-2t9c D7/D7a: `codingDomain` starts as a plain (not yet frozen) object
+// so `workflows.feature` below can hold the EXACT SAME array/object
+// references as the top-level `stages`/`stepMap`/`transitions` fields —
+// reference identity, not merely deep-equality, is the strongest possible
+// proof that registering the workflow hierarchy changed zero behavior for
+// zero items (D7a: mechanism-first, `feature` carries today's graph
+// byte-for-byte, no new workflow shape exists yet to be wrong about).
+// Frozen at the bottom of this block, before it's placed into `DOMAINS`.
+// planningEdges (tsk-2t9c D16): declared once, assigned to both
+// `roleGraph.edges.planning` and `roleGraph.edges.decompose` below by
+// reference -- see that assignment's own comment for why the legacy
+// `decompose` stage name needs the identical edge set.
+const planningEdges = Object.freeze([
+  Object.freeze({ from: 'implementer', to: 'researcher', reason: 'consult', mode: 'sync' }),
+  Object.freeze({ from: 'implementer', to: 'human-advisor', reason: 'advise', mode: 'async' }),
+]);
+const codingDomain = {
     // tsk-1w7 D10 (docs/history/fanout-and-delegation-rubric/CONTEXT.md):
     // two new stages sit between `clarify` and `decompose` — `discovery`
     // (machine-alone research; owned by `fgos-coding-discovering` since
@@ -228,6 +243,21 @@ export const DOMAINS = Object.freeze({
       executing: 'fgos-coding-implement',
       retrospective: 'fgos-coding-compounding',
     }),
+    // taskSpecMap (tsk-2t9c D6/D9): stage -> task-spec id, the "skillMap
+    // points stage -> (task-spec, skill)" half of A-lite. Purely additive
+    // alongside skillMap (same field-independence style `classification`/
+    // `statusLabels` already use one field over) -- a stage absent here
+    // simply has no task-spec yet, never a validation error. The file each
+    // id resolves to lives at docs/task-specs/coding/<id>.md; doctor's
+    // task-specs-resolve check (src/setup/registrations.mjs) is what keeps
+    // this map and the files on disk from drifting apart silently.
+    taskSpecMap: Object.freeze({
+      discovery: 'judge-ambiguity',
+      exploring: 'lock-decisions',
+      planning: 'shape-plan',
+      executing: 'implement-item',
+      retrospective: 'compound-learn',
+    }),
     // work-item-status-delivered-retrospective-cleanup D5/D8 (deferred
     // item from CONTEXT.md): does this domain's items go through a real
     // git worktree/merge, such that cleanup-harness.mjs's
@@ -346,7 +376,93 @@ export const DOMAINS = Object.freeze({
       kind: Object.freeze(['bug', 'chore', 'design', 'docs', 'feature', 'task']),
       risk: Object.freeze(['light', 'standard', 'heavy']),
     }),
+    // roleGraph (tsk-2t9c D1/D3/D4/D5/D8/D9): the multi-role team harness's
+    // legality table for coding. THIRD orthogonal axis on a work item
+    // (status x stage x role/holder), opt-in per-domain — a domain that
+    // declares no roleGraph never sees a `holder` field or a `handoff`
+    // verb (src/state/handoff.mjs reads this exact shape). `defaultRole`
+    // is what a coding item's `holder` lazily resolves to when unset,
+    // mirroring `stage`'s own D8 lazy-default precedent one field over.
+    //
+    // `edges` names every LEGAL call for a given stage: `{ from, to,
+    // reason, mode }`. This is not new behavior -- it names four
+    // interactions coding already runs today in implicit form, so this
+    // registration changes nothing about how coding is actually worked,
+    // only makes the pattern checkable and loggable:
+    //   consult (sync)  == fgos-researching, called from discovery/exploring/planning/executing
+    //   assist  (sync)  == subagent fanout (Agent tool, fgos-fanout)
+    //   review  (async) == fgos return -> awaiting-approval, the approve/reject loop
+    //   advise  (async) == fgos ask/answer -> awaiting-human
+    // `discovery` carries ONLY `consult` (tsk-2t9c D14 correction, found
+    // wiring fgos-coding-discovering: it genuinely calls fgos-researching
+    // from this stage -- the "machine-only" framing above described the
+    // ABSENCE of human interaction at this stage, never the absence of a
+    // role interaction altogether; `advise`/`ask` never fires here by the
+    // skill's own hard rule, but `consult` was a real gap, not a design
+    // choice). `edges.discovery` staying its own key (never falling back
+    // to `exploring`'s) is what lets it declare exactly this one edge and
+    // no others.
+    roleGraph: Object.freeze({
+      roles: Object.freeze(['implementer', 'researcher', 'reviewer', 'helper', 'human-advisor']),
+      defaultRole: 'implementer',
+      callstackCap: 3,
+      edges: Object.freeze({
+        discovery: Object.freeze([
+          Object.freeze({ from: 'implementer', to: 'researcher', reason: 'consult', mode: 'sync' }),
+        ]),
+        exploring: Object.freeze([
+          Object.freeze({ from: 'implementer', to: 'human-advisor', reason: 'advise', mode: 'async' }),
+          Object.freeze({ from: 'implementer', to: 'researcher', reason: 'consult', mode: 'sync' }),
+        ]),
+        planning: planningEdges,
+        executing: Object.freeze([
+          Object.freeze({ from: 'implementer', to: 'researcher', reason: 'consult', mode: 'sync' }),
+          Object.freeze({ from: 'implementer', to: 'helper', reason: 'assist', mode: 'sync' }),
+          Object.freeze({ from: 'implementer', to: 'reviewer', reason: 'review', mode: 'async' }),
+          Object.freeze({ from: 'implementer', to: 'human-advisor', reason: 'advise', mode: 'async' }),
+          Object.freeze({ from: 'reviewer', to: 'researcher', reason: 'consult', mode: 'sync' }),
+          Object.freeze({ from: 'reviewer', to: 'human-advisor', reason: 'advise', mode: 'async' }),
+        ]),
+        // tsk-2t9c D16 (independent review of D14/D15): `decompose` is the
+        // legacy pre-tsk-403-rename name for `planning`, served by the
+        // exact same skill (`skillMap.decompose === skillMap.planning ===
+        // 'fgos-coding-planning'`, below) and drain-only -- no new item is
+        // ever born there. `fgos-coding-planning`'s own consult wiring
+        // (D15) makes no distinction between the two stage names, so a
+        // legacy item still draining at `decompose` needs the identical
+        // edge set or its first consult attempt is refused with "no legal
+        // call edges ... at stage 'decompose'" purely because of which of
+        // the two names the item happens to carry. `planningEdges` below
+        // is the SAME array reference assigned twice, not a copy -- same
+        // discipline `workflows.feature.stages === codingDomain.stages`
+        // already uses further down, so the two can never drift apart.
+        decompose: planningEdges,
+      }),
+    }),
+};
+
+// workflows/defaultWorkflow/workflowFor (tsk-2t9c D7/D7a): the hierarchy
+// domain -> N workflow -> item, mechanism-first. `feature` is not a copy
+// of the fields above -- it IS them, same references, so there is no
+// second place these three arrays could ever drift out of sync. Only
+// `feature` is registered today (D7a): `workflowFor` starts empty, so
+// EVERY kind resolves to `defaultWorkflow` via `resolveWorkflow` below --
+// the selector runs for real on every lookup, it simply has one
+// destination until a second workflow (e.g. `bugfix`/`lightweight`, D7a's
+// own deferred follow-on) is registered by a later item.
+codingDomain.workflows = Object.freeze({
+  feature: Object.freeze({
+    stages: codingDomain.stages,
+    stepMap: codingDomain.stepMap,
+    transitions: codingDomain.transitions,
   }),
+});
+codingDomain.defaultWorkflow = 'feature';
+codingDomain.workflowFor = Object.freeze({});
+Object.freeze(codingDomain);
+
+export const DOMAINS = Object.freeze({
+  coding: codingDomain,
   synthetic: Object.freeze({
     stages: Object.freeze(['assembling']),
     stepMap: Object.freeze({
@@ -524,6 +640,39 @@ export function stageForStep(domain, step) {
   return Object.keys(domain.stepMap).find((stage) => domain.stepMap[stage] === step);
 }
 
+/** Resolve `kind` to `domain`'s own workflow entry (tsk-2t9c D7/D7a) —
+ * `domain.workflows[domain.workflowFor[kind] ?? domain.defaultWorkflow]`,
+ * folding an absent/unrecognized kind to the default, never throwing —
+ * same never-throw fold every sibling resolver in this module keeps.
+ * `undefined` when `domain` declares no `workflows` at all (every domain
+ * but `coding` today), the same "this axis does not apply here" shape
+ * `roleGraphFor`/`classificationVocabulary` already use one field over.
+ *
+ * `domain.stages`/`stepMap`/`transitions` stay valid to read directly
+ * even once a domain registers a SECOND, genuinely different workflow —
+ * not because they happen to be reference-identical to
+ * `resolveWorkflow(domain, domain.defaultWorkflow)` today (D16 retracts
+ * that framing; it was only ever true by coincidence of nothing else
+ * being registered yet), but because `kind` — the only thing that could
+ * make an item's own resolved workflow diverge from the domain's default
+ * — is locked the moment `status` leaves `todo` (`editWork`'s own guard,
+ * `src/state/store.mjs`). An item only ever walks a stage graph once
+ * claimed (`status: 'doing'` onward), and by then `kind` can no longer
+ * change under it — so a caller resolving an item's stage graph through
+ * `resolveWorkflow(domain, work.kind)` and a caller reading
+ * `domain.stages` directly agree for that item's ENTIRE walk, without
+ * needing a separate frozen `work.workflow` field or a second write
+ * door. This still means: a caller that genuinely needs the correct
+ * per-item graph should resolve through `resolveWorkflow`, not assume
+ * `domain.stages` is always right — the guarantee above is why direct
+ * reads happen to be SAFE today, not a license to keep skipping the
+ * resolver once a real second workflow exists to differ. */
+export function resolveWorkflow(domain, kind) {
+  if (!domain?.workflows) return undefined;
+  const name = (kind !== undefined && domain.workflowFor?.[kind]) || domain.defaultWorkflow;
+  return domain.workflows[name] ?? domain.workflows[domain.defaultWorkflow];
+}
+
 /** The stages within `domain` that `fgos discover` can legally act on — the
  * domain's own Clarify-mapped stage (if it still declares one) plus
  * `discovery`/`exploring` when the domain registers both.
@@ -565,6 +714,27 @@ export function effectiveStage(item, domain) {
  * stage is absent from the domain's `skillMap` entirely. Never throws. */
 export function skillForStage(domain, stage) {
   return (domain.skillMap && domain.skillMap[stage]) ?? null;
+}
+
+/** `domain`'s own `roleGraph`, or `undefined` when the domain declares
+ * none (tsk-2t9c D1) -- every domain but `coding` today. `undefined`,
+ * deliberately not `null`, matching `classificationVocabulary`'s own
+ * absent-key shape one field over: callers treat "this domain has no
+ * role axis at all" and "this domain declared roleGraph but left a field
+ * empty" as different questions. */
+export function roleGraphFor(domain) {
+  return domain?.roleGraph;
+}
+
+/** The legal call edges for `fromRole` at `stage` within `domain`'s
+ * `roleGraph` -- always an array, `[]` when the domain has no roleGraph,
+ * the stage has no edges declared, or `fromRole` has none at that stage.
+ * Never throws (same never-throw contract every sibling helper in this
+ * module keeps, for the same hot-dispatch-path reason). */
+export function legalCallEdges(domain, stage, fromRole) {
+  const edgesForStage = domain?.roleGraph?.edges?.[stage];
+  if (!Array.isArray(edgesForStage)) return [];
+  return edgesForStage.filter((edge) => edge.from === fromRole);
 }
 
 /** The `statusCategory` (work.mjs's STATUS_CATEGORIES) `status` maps to

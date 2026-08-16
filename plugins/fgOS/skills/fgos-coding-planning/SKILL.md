@@ -105,6 +105,16 @@ stage values — the same way `fgos-routing` describes it.
   point is invisible to whichever session re-claims the item next. Same
   one-artifact-per-stop discipline `fgos-coding-implement`'s "one commit per item"
   rule already gives Execute.
+- **Multi-role team harness (tsk-2t9c D1/D4/D9): this skill has no
+  `advise` interaction of its own.** Step 6's hand-back to
+  `fgos-coding-exploring` is a skill DISPATCH, not a park — that skill's
+  own already-wired Socratic step decides, for real, whether the gap
+  actually needs an async `fgos ask` (rare) or resolves live (the common
+  case); firing `handoff --reason advise` here, before knowing which,
+  would be wrong every time the gap resolves live. The one real
+  interaction this skill can fire directly is the same rare **consult**
+  escape hatch `fgos-coding-exploring` uses (step 2 below) — see
+  `shape-plan.md`'s own `## Collaboration` table.
 
 ## Flow
 
@@ -113,6 +123,26 @@ stage values — the same way `fgos-routing` describes it.
    locked decisions are the only source of truth for what this plan can
    assume. If a critical-patterns or prior-learnings doc exists for this
    product area, read it too; a precedent already solved beats research.
+
+   **Reclaim the ball if it isn't yours (tsk-2t9c D4/D8).** Check
+   `data.work[id].holder` (`fgos list --id <id> --json`). If it is set and
+   not `implementer` — most commonly a mid-planning gap round that parked
+   via `fgos ask` inside `fgos-coding-exploring` and was `answer`ed since
+   — reclaim before continuing:
+
+   ```bash
+   root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+   ```
+
+   ```bash
+   node "$root/bin/fgos.mjs" handoff-return "<id>" --note "reclaiming at Bootstrap — holder was <role>" --dir "$root"
+   ```
+
+   **Repeat, re-reading `holder` fresh each time, until it reads
+   `implementer`** (tsk-2t9c D16 — a nested call can sit two deep). Stop
+   when a call refuses with "no open call" — the ordinary end state.
+
+   Skip when the item's domain declares no `roleGraph`.
 
    Also read the lane `fgos-routing`'s own Orient step already decided for
    this item (tiny/small/standard/high-risk/spike, plus the flag count and
@@ -176,6 +206,14 @@ stage values — the same way `fgos-routing` describes it.
    (`impact-analysis: inactive|degraded|full`) in `plan.md` next to that
    proof point — inactive drops the requirement, degraded keeps it but
    marks the evidence weak, full keeps it exactly as before.
+
+   If a named library/precedent surfaces that neither `CONTEXT.md` nor a
+   direct read resolves, dispatch to `fgos-researching` — the rare
+   **consult** interaction (tsk-2t9c D1/D9), not the default path:
+
+   ```bash
+   node "$root/bin/fgos.mjs" handoff "<id>" --to researcher --reason consult --outcome "<finding, one line>" --dir "$root"
+   ```
 
 3. **Shape.** Write (or enrich) `plan.md` scaled to the mode: a direct note
    for `tiny`, one open question for `spike`, a short plan for `small`, a
@@ -443,6 +481,16 @@ proves the plan against reality itself, and it never approves it.
   handing back to `fgos-coding-exploring`, or asking a question that fails the
   material/grounded/answerable filter instead of pinning it as an
   assumption
+- firing `handoff --reason advise` from this task on a material gap —
+  that hand-back is a dispatch to `fgos-coding-exploring`, not a park;
+  only that skill's own re-entry decides whether a real `advise` fires
+- consulting a researcher for a real, resolvable unknown without logging
+  `handoff --reason consult` right after (when the domain has a
+  `roleGraph`), or reclaiming holder at Bootstrap when it is not already
+  `implementer`
+- reclaiming only once at Bootstrap and stopping even though `holder` has
+  not reached `implementer` yet (tsk-2t9c D16 — a depth-2 nested call
+  needs two reclaims)
 - handing back to `fgos-coding-exploring` without first recording the gap
   via `fgos decision` — the hand-back is invisible to any later session
   otherwise

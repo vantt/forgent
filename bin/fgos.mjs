@@ -17,9 +17,9 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertValidDocType, recordGateApprove, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
 import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability, toolsFromCapacities } from '../src/state/tool-registry.mjs';
-import { repairTruncatedLastLine } from '../src/state/events.mjs';
+import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfigForDir } from '../src/runner/dispatch.mjs';
@@ -1869,6 +1869,36 @@ async function runVerb(verb, flags, positional, dir) {
       return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
     }
 
+    // Multi-role team harness (tsk-2t9c D1/D4/D5/D8/D9): a role/holder call
+    // — guarded by the item's own domain roleGraph. Which event kind
+    // actually gets written (a full `work.handoff`, holder changes; or a
+    // compact `work.call-summary`, holder untouched) is decided by the
+    // matched edge's own `mode`, never a caller flag — see recordCall's
+    // own doc comment (store.mjs). A refused call throws StoreError with
+    // both the refusal reason and the legal edges named in the message
+    // (chặn và dạy tại chỗ).
+    case 'handoff': {
+      const id = requireField(positional[0] ?? flags.id, 'handoff requires an id: fgos handoff <id> --to <role> --reason <advise|assist|review|consult> [--note ...] [--outcome ...]');
+      const toRole = requireField(flags.to, 'handoff requires --to <role>');
+      const reason = requireField(flags.reason, 'handoff requires --reason <advise|assist|review|consult>');
+      const note = optionalField(flags.note, 'handoff --note requires a non-empty value (omit --note entirely to skip it)');
+      const outcome = optionalField(flags.outcome, 'handoff --outcome requires a non-empty value (omit --outcome entirely to skip it)');
+      const { event } = recordCall(dir, { id, toRole, reason, note, outcome });
+      return { id, type: event.type, seq: event.seq };
+    }
+
+    // Closes the most recently opened async call on the item's own
+    // call-thread, sending the ball back to whoever opened it (D4: "call =
+    // round-trip"). Deliberately not gated by roleGraph edge-legality —
+    // see recordCallReturn's own doc comment for why a return needs no
+    // fresh legality check.
+    case 'handoff-return': {
+      const id = requireField(positional[0] ?? flags.id, 'handoff-return requires an id: fgos handoff-return <id> [--note ...]');
+      const note = optionalField(flags.note, 'handoff-return --note requires a non-empty value (omit --note entirely to skip it)');
+      const { event } = recordCallReturn(dir, { id, note });
+      return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
+    }
+
     case 'decision': {
       const text = requireField(flags.text ?? (positional.length ? positional.join(' ') : undefined), 'decision requires --text "..."');
       const rationale = requireField(flags.rationale, 'decision requires --rationale "..."');
@@ -2802,9 +2832,21 @@ async function runVerb(verb, flags, positional, dir) {
         return returnCwdReal === wtReal || returnCwdReal.startsWith(`${wtReal}${path.sep}`);
       });
       if (!insideRegisteredSession && !isMainWorktree(repoRoot)) {
+        // tsk-2t9c D18: found via a real end-to-end run -- an item claimed
+        // through `fgos take` (never `fgos pick`, which DOES stand up a
+        // registered `fgw/<id>` worktree) into an ad-hoc worktree hits
+        // this refusal with no skill's own prose warning it could happen,
+        // and the fix (`fgos session start`) is easy to miss inside a
+        // longer explanatory sentence. Naming the exact command on its
+        // own line is the same "chặn và dạy tại chỗ" discipline
+        // `handoff`'s own refusal already applies (list the legal edges,
+        // don't just say "refused"). `session start` resolves its own
+        // repoRoot from `process.cwd()`, never `--dir` (unlike every
+        // other verb here) -- run it from THIS SAME worktree, not with a
+        // `--dir` flag pointed at it.
         throw new StoreError(
           'validation',
-          `return: refusing to run from "${repoRoot}" — this is a git worktree (not the main checkout, and not a registered "fgos session start" worktree). Run return from the main checkout, or from inside a registered session.`,
+          `return: refusing to run from "${repoRoot}" — this is a git worktree (not the main checkout, and not a registered "fgos session start" worktree). Run return from the main checkout, or register this worktree first, from right here: fgos session start --item "${id}"`,
         );
       }
 
