@@ -1534,6 +1534,17 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   const timeoutMs = opts.timeoutMs ?? cfg.timeoutMs;
   const maxBuffer = opts.maxBuffer ?? 10 * 1024 * 1024;
 
+  // Dispatch chokepoint visibility: one line per real spawn, right before it
+  // happens, so a human watching the runner's own stderr can see which job
+  // (executing-stage skill, capacityIdForWork's result — a different axis
+  // than the runner.capabilities catalog, D12) resolved to which capacity
+  // (a real cfg.capacities entry, or the global executor when none matches),
+  // through which adapter/provider/model/tier. Diagnostic-only: never read
+  // back by any caller, never part of this function's return value.
+  process.stderr.write(
+    `fgos: dispatch job=${capacityId} capacity=${cfg?.capacities?.[capacityId] ? capacityId : '(global executor)'} via=${adapter} provider=${provider} model=${model} tier=${tier}\n`,
+  );
+
   // P49: same mechanical selection buildPrompt used internally, called again
   // here (cheap, deterministic, no duplicated LOGIC) purely so the dispatch
   // log can record which template + version produced this prompt. tsk-5mj:
@@ -1740,9 +1751,19 @@ export async function executeCapacityCli(
     );
   }
 
+  // Dispatch chokepoint visibility (both branches below): "capability" is
+  // the purpose actually requested via --for when purpose-resolved, or —
+  // for a direct capacityId call — whichever capabilities that capacity
+  // itself declares serving (capacity.for, D15), so the line still answers
+  // "what is this FOR" even without a --for flag. Diagnostic-only.
+  const capabilityLabel = purpose ?? (cfg.capacities?.[capacityId]?.for?.join(',') || '(none declared)');
+
   const mechanism = decideCapacityDispatchMechanism(cfg, capacityId, { hasLiveTaskAccess });
   if (mechanism === 'in-process') {
     const agentType = cfg.capacities?.[capacityId]?.agentType;
+    process.stderr.write(
+      `fgos: dispatch capability=${capabilityLabel} capacity=${capacityId} via=in-process agentType=${agentType ?? '(none)'} provider=n/a model=n/a tier=n/a\n`,
+    );
     const base = { mechanism, agentType, prompt };
     return resolvedByPurpose ? { ...base, capacityId } : base;
   }
@@ -1765,6 +1786,9 @@ export async function executeCapacityCli(
   }
   const timeoutMs = timeoutOverride ?? cfg.timeoutMs;
   const maxBuffer = maxBufferOverride ?? 10 * 1024 * 1024;
+  process.stderr.write(
+    `fgos: dispatch capability=${capabilityLabel} capacity=${capacityId} via=${adapter} provider=${provider} model=${model} tier=${tier}\n`,
+  );
   const result = await adapterFn({ command, args }, { cwd, timeoutMs, maxBuffer, onChunk, workId: capacityId, tier, model });
   const base = { mechanism, ...result, provider, command };
   return resolvedByPurpose ? { ...base, capacityId } : base;

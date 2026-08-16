@@ -13,6 +13,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   between the tool-registry's own `capability` field and
   `capacities.<id>.for`. Each entry is `{description?, aliases?}`. This
   repo's own `.fgos/config.json` declares `impact-analysis`/`pane-labeling`.
+- A one-line `fgos: dispatch capability=... capacity=... via=... provider=...
+  model=... tier=...` diagnostic prints to stderr at every real dispatch
+  chokepoint — `spawnWorker` (the runner's own worker dispatch) and both
+  branches of `executeCapacityCli` (`execute`/`execute --for`'s in-process
+  hand-back and out-of-process real spawn) — right before the capacity is
+  actually invoked, so a human watching the terminal can see which
+  capability was requested, which capacity answered it, through which
+  mechanism/provider/model/tier. Diagnostic-only, never read back by any
+  caller.
 
 ### Changed
 

@@ -2077,6 +2077,27 @@ test('spawnWorker defaults to the standard tier when the work item omits tier', 
 
 // --- tsk-62v: spawnWorker's additive capacityId/provider result fields (D7) ---
 
+test('spawnWorker prints a "fgos: dispatch ..." chokepoint line to stderr before spawning, naming job/capacity/via/provider/model/tier', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeEchoExecutor(dir);
+  const cfg = baseConfig([scriptPath, '{prompt}']);
+
+  const original = process.stderr.write.bind(process.stderr);
+  let captured = '';
+  process.stderr.write = (chunk) => {
+    captured += chunk;
+    return true;
+  };
+  let result;
+  try {
+    result = await spawnWorker(sampleWork(), cfg, mkTempDir());
+  } finally {
+    process.stderr.write = original;
+  }
+  assert.match(captured, /fgos: dispatch job=fgos-coding-implement capacity=\(global executor\) via=cli-spawn provider=.+ model=sonnet tier=standard/);
+  assert.equal(result.status, 0);
+});
+
 test('spawnWorker result carries capacityId and provider alongside every existing field, unaffected by tier/config unrelated to capacities', async () => {
   const dir = mkTempDir();
   const scriptPath = writeEchoExecutor(dir);
@@ -2650,6 +2671,48 @@ test('executeCapacityCli self-executes a kind:"cli" capacity via EXECUTOR_ADAPTE
   assert.equal(payload.args[0], 'classify this');
   // No bare {command,args} shape leaking through -- this is a real result.
   assert.equal(result.args, undefined);
+});
+
+test('executeCapacityCli prints a "fgos: dispatch ..." chokepoint line to stderr for the in-process branch, naming capability/capacity/via/agentType', async () => {
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capabilities: { review: {} },
+    capacities: { 'my-agent-capacity': { kind: 'agent', agentType: 'code-simplifier', for: ['review'] } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const original = process.stderr.write.bind(process.stderr);
+  let captured = '';
+  process.stderr.write = (chunk) => { captured += chunk; return true; };
+  try {
+    await executeCapacityCli('my-agent-capacity', { repoRoot: root, prompt: 'do the thing', hasLiveTaskAccess: true });
+  } finally {
+    process.stderr.write = original;
+  }
+  assert.match(captured, /fgos: dispatch capability=review capacity=my-agent-capacity via=in-process agentType=code-simplifier provider=n\/a model=n\/a tier=n\/a/);
+});
+
+test('executeCapacityCli prints a "fgos: dispatch ..." chokepoint line to stderr for the out-of-process (real spawn) branch, naming capability/capacity/via/provider/model/tier', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeEchoExecutor(dir);
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capabilities: { classification: {} },
+    capacities: { 'submit-assist-classify': { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true, for: ['classification'] } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const original = process.stderr.write.bind(process.stderr);
+  let captured = '';
+  process.stderr.write = (chunk) => { captured += chunk; return true; };
+  try {
+    await executeCapacityCli('submit-assist-classify', { repoRoot: root, prompt: 'classify this' });
+  } finally {
+    process.stderr.write = original;
+  }
+  assert.match(captured, new RegExp(`fgos: dispatch capability=classification capacity=submit-assist-classify via=cli-spawn provider=${process.execPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} model=sonnet tier=standard`));
 });
 
 test('executeCapacityCli resolves purpose-based (--for) the same way resolveCapacityCli does, plus the resolved capacityId, whether the result is self-executed or handed back', async () => {
