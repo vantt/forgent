@@ -54,23 +54,27 @@ to branch on, never an error to catch.
   <capacityId>` call keeps its pre-existing exact shape, byte-identical,
   since existing callers already assert on it).
 
-Resolving the real command works the same way, `--for` instead of a
-positional id:
+Actually dispatching works the same way, `--for` instead of a positional
+id — `execute` self-executes every adapter-resolvable case (never hands
+back a bare command for you to run yourself via Bash), except the
+`in-process` case above, which hands back `{mechanism:"in-process",
+agentType, prompt[, capacityId]}` for you to call your own Agent/Task tool
+with:
 
 ```bash
-node "$root/src/runner/dispatch.mjs" resolve --for <purpose> --prompt "<the prompt built at runtime>"
+node "$root/src/runner/dispatch.mjs" execute --for <purpose> --prompt "<the prompt built at runtime>"
 ```
 
 ## Content-permission gate (`carries`, D15)
 
-If the capacity you're resolving declares `carries` (the content class it
-is permitted to receive — `user-text` or `repo-content`, a closed enum),
+If the capacity you're dispatching to declares `carries` (the content class
+it is permitted to receive — `user-text` or `repo-content`, a closed enum),
 the caller MUST self-declare what this specific dispatch actually carries,
 or `resolveExecutorConfig` throws before any spawn — this is a fail-closed
 gate, not an optional hint:
 
 ```bash
-node "$root/src/runner/dispatch.mjs" resolve --for <purpose> --carries repo-content --prompt "<prompt>"
+node "$root/src/runner/dispatch.mjs" execute --for <purpose> --carries repo-content --prompt "<prompt>"
 ```
 
 `repo-content` is the wider class (it covers `user-text` plus repo
@@ -116,7 +120,7 @@ neither is actually resolved by purpose today — both callers
 fixed id directly, never `--for judge` (confirmed by grep, `tsk-5tm`
 `CONTEXT.md` D10). So this recipe has no live production consumer right
 now — the mechanism itself stays proven by direct unit test
-(`resolveCapacityIdForPurpose` and the `carries`/`decide`/`resolve` CLI
+(`resolveCapacityIdForPurpose` and the `carries`/`decide`/`execute` CLI
 flags, `test/runner/dispatch.test.mjs`), ready for the next producer that
 genuinely needs to resolve a capacity without a pre-registered id to name.
 

@@ -86,14 +86,16 @@ nothing is configured.
    site, same as `docs/reference/forgentx-tool-registry-configuration.md`
    describes.)
 
-3. **Give the skill a way to resolve the real command/args without a
-   second argv-building implementation.** If `dispatch.mjs` has no CLI
-   entry point yet, add a thin one that calls the same
-   `resolveExecutorConfig`/`resolveExecutorCommand` cli-dispatch already
-   uses, printing `{command,args,provider,model}` as JSON (real example:
-   `node src/runner/dispatch.mjs resolve <capacityId> --prompt <text>`,
-   added in `tsk-5l2-1`). task-dispatch skills invoke this exact CLI, never a
-   parallel prompt/argv builder of their own.
+3. **Give the skill a way to dispatch through the real command/args without
+   a second argv-building implementation.** `dispatch.mjs`'s own
+   `decide`/`execute` CLI pair, both already built on the same
+   `resolveExecutorConfig`/`resolveExecutorCommand` cli-dispatch uses:
+   `node src/runner/dispatch.mjs decide <capacityId>` to learn the
+   mechanism first, then `node src/runner/dispatch.mjs execute <capacityId>
+   --prompt <text>` to actually self-execute it and hand back the real
+   result as JSON. task-dispatch skills invoke this exact `decide`→`execute`
+   pair, never a parallel prompt/argv builder of their own, and never run a
+   resolved command themselves through Bash.
 
 4. **In the skill's own `SKILL.md`, point at the shared fragment instead
    of inlining the branch logic.** `.claude/skills/_shared/capacity-
@@ -121,9 +123,9 @@ nothing is configured.
    test in this repo unit-tests a skill's runtime behavior — only the
    mirror-identity check above is structural), the acceptance proof for
    the "configured and present" path is a real, one-time manual run of
-   step 3's resolve command followed by actually invoking the resolved
-   command with a real prompt, confirmed to produce a sane, parseable
-   response. Real example (`tsk-5l2-3`, verified 2026-08-01):
+   step 3's `execute` command, confirmed to produce a sane, parseable
+   response. Real example (`tsk-5l2-3`, verified 2026-08-01) — the
+   underlying command `execute` itself runs on your behalf:
 
    ```
    $ agy -p "Classify this backlog ask's tier ... Ask: \"clean up the leftover console.log statements in the auth module\"" --model gemini-3.5-flash-low

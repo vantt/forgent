@@ -87,6 +87,7 @@ import { countWorkerSlots, hasWorkerSlotRoom } from '../src/state/worker-slots.m
 import { assessCleanupReadiness, blockedItemsNowResolvable } from '../src/state/cleanup-harness.mjs';
 import { DEFAULT_CLEANUP_TTL_DAYS, DEFAULT_CLEANUP_LEAF_TTL_DAYS } from '../src/setup/registrations.mjs';
 import { installGitHooks, uninstallGitHooks } from '../src/setup/git-hooks.mjs';
+import { installClaudeCodeHook } from '../src/setup/claude-code-hooks.mjs';
 import { detectRcFiles, insertSourceLine, hasSourceLine } from '../src/setup/shell-rc.mjs';
 import { materializeSkillsIntoProject } from '../src/setup/skill-wrappers.mjs';
 import { formatCheck, bold } from '../src/setup/ansi.mjs';
@@ -3305,6 +3306,11 @@ async function runVerb(verb, flags, positional, dir) {
       // Fill-only like the two side effects above: a pre-existing custom
       // core.hooksPath is left untouched, never silently repointed.
       const { wired: hooksWired, skippedExisting: hooksSkippedExisting } = installGitHooks(repoRoot);
+      // tsk-60f D1/D5: wires the PreToolUse dispatch-decide enforcement hook
+      // into .claude/settings.json the same fill-only way — a pre-existing
+      // hooks.SessionStart entry (or any other settings.json content) is
+      // left untouched; a malformed settings.json is left alone entirely.
+      const { wired: dispatchDecideHookWired, skippedExisting: dispatchDecideHookSkippedExisting } = installClaudeCodeHook(repoRoot);
       // tsk-5hi: setup now also runs every registered fix — the same
       // runFixes() `doctor --fix` already calls (RUL9/RUL11) — instead of
       // leaving a person to separately discover and run `doctor --fix` to
@@ -3332,6 +3338,8 @@ async function runVerb(verb, flags, positional, dir) {
         globalConfigAddedKeys: globalConfigExisted ? globalAddedKeys : [],
         hooksWired,
         hooksSkippedExisting,
+        dispatchDecideHookWired,
+        dispatchDecideHookSkippedExisting,
         fixed,
         skillsSourceCopied,
         skillWrappersGenerated: skillWrappersGenerated.length,
