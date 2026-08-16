@@ -819,6 +819,39 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
       // cleanup step that is not itself correctness-critical.
     }
   }
+  // tsk-2t9c D18: found via a real end-to-end run (a fresh agent following
+  // fgos-coding-implement's own Return-step prose, verbatim, top to
+  // bottom, on a real item) that never fired `handoff --to reviewer
+  // --reason review` even though the item genuinely reached `awaiting-
+  // approval` -- the instruction is imperative and unmissable in
+  // isolation, but sits trailing after several paragraphs of blocked/
+  // catchup caveats, is duplicated once per door into this status
+  // (`return`, `catchup`, and any future one), and nothing gates on it:
+  // skipping it produces no error, no red test, no symptom the skipping
+  // agent would ever notice. Same class of gap D16 already fixed for
+  // `delivered` (a skill-remembered side effect vs. an engine-guaranteed
+  // one) -- and the same fix: every door into `awaiting-approval`
+  // converges on this one `moveWork` call, so firing the review handoff
+  // HERE covers `return`/`catchup`/anything else at once, where the
+  // prose needed a copy per door and still wasn't reliably read. This
+  // does not change what the prose already prescribes -- it relocates
+  // who is responsible for making it actually happen. `recordCall` runs
+  // its own `evaluateHandoff` guard internally (fromRole read off the
+  // item's live `holder`, defaulting to the role graph's `defaultRole`),
+  // so a domain/stage/holder combination where this edge is not legal
+  // (or that already carries a role other than the review edge's `from`)
+  // simply refuses, caught and ignored below -- same "must never block
+  // the transition" fail-safe as every sibling block in this function.
+  if (result.event.payload.to === 'awaiting-approval') {
+    try {
+      const domain = getDomain(result.view.work[id]?.domain);
+      if (roleGraphFor(domain)) {
+        recordCall(dir, { id, toRole: 'reviewer', reason: 'review', note: 'auto-fired on reaching awaiting-approval (tsk-2t9c D18)' });
+      }
+    } catch {
+      // Best-effort -- see the block's own comment above.
+    }
+  }
   return result;
 }
 

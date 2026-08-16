@@ -2,6 +2,34 @@
 
 ## 1. Trạng thái hiện tại
 
+**Cập nhật 2026-08-16 (round 6) — D18: TEST THẬT LẦN 1 HỎNG (thí nghiệm
+rỗng), LẦN 2 BẮT ĐƯỢC BUG THẬT, ĐÃ FIX.** Người dùng: "muốn" (chạy item
+thật qua đúng skill flow, không gọi hàm hộ). Tạo `tsk-ogx` thật, bung 1
+agent mới hoàn toàn (isolation: worktree) tự claim và chạy qua
+`fgos-routing` → discovering → planning → validating → implement — thành
+công thật, `awaiting-approval`, verify 100/100 xanh. Nhưng grep event log
+thấy **0 event `work.handoff`** — nghi ngờ D14's review handoff không
+chạy. Bung Opus chẩn đoán: phát hiện agent chạy trên `main`, không phải
+`fgw/tsk-2t9c` — **thí nghiệm rỗng** (main không có verb `handoff` — verify
+lại bằng `git show main:bin/fgos.mjs`, đúng 0 kết quả). Lỗi thiết kế thí
+nghiệm của em: bung agent isolation:worktree mà quên ghim branch.
+
+Người dùng chọn: sửa engine + chạy lại đúng. Dù thí nghiệm lần 1 rỗng,
+phần chẩn đoán prose của Opus (đọc thẳng `fgos-coding-implement` trên
+`fgw/tsk-2t9c`) vẫn đúng độc lập: bước Return ra lệnh rõ ràng nhưng nằm
+cuối, lặp lại 2 lần (return/catchup), không gì kiểm tra khi bị bỏ sót.
+Áp dụng fix (b) của Opus: `moveWork` tự bắn `handoff --to reviewer
+--reason review` khi đạt `awaiting-approval` (D18), y hệt pattern D16 đã
+làm cho `delivered`. Sửa luôn prose thành mô tả thay vì ra lệnh, sửa mâu
+thuẫn ở `## Next`, và vá lỗ hổng phụ agent driver tự phát hiện (`fgos
+take` không có đường về `return`, thông báo lỗi giờ nêu thẳng `fgos
+session start`). 1 test cũ (`loop.test.mjs`) cần cập nhật danh sách event
+kỳ vọng (thêm `work.handoff:reviewer` — đúng, không phải regression).
+`npm test`: 7 lỗi còn lại trong `dispatch.test.mjs` xác nhận không liên
+quan (drift `.fgos/config.json`'s `agy` capacity, không đụng gì tới
+handoff). **Sắp chạy lại agent driver lần 2, lần này ghim đúng
+`fgw/tsk-2t9c`, để có bằng chứng thật.**
+
 **Cập nhật 2026-08-16 (round 5) — D17: FIX GỌN GÀNG HƠN CHO WORKFLOW/KIND.**
 Sau D16, người dùng hỏi tiếp: "fgos-coding-driving có nên là cross/inter-
 workflow router cho 1 domain không, hay bug/chore lại cần driving riêng".

@@ -287,11 +287,16 @@ test('runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> 
   assert.deepEqual(fs.readdirSync(worktreeDir), []);
   // one door: the log carries exactly the runner's writes — the worker
   // never touched .fgos/ (add + claim + predicted + capacity-dispatch
-  // audit (D8, tsk-62v) + propose + actual, nothing else)
+  // audit (D8, tsk-62v) + propose + actual, nothing else). The one
+  // addition since this test was first written, `work.handoff:reviewer`,
+  // is not a second writer — it is `moveWork`'s own D18 side effect,
+  // fired synchronously inside the SAME `to: 'awaiting-approval'` call
+  // the runner already made (`coding`'s default domain declares a
+  // `roleGraph`), never a write the worker or a second door performed.
   const events = readRawEvents(dir);
   assert.deepEqual(
     events.map((e) => (e.type === 'work.outcome' ? `work.outcome:${e.payload.predicted ? 'predicted' : 'actual'}` : `${e.type}:${e.payload.to ?? 'add'}`)),
-    ['work.add:add', 'work.move:doing', 'work.outcome:predicted', 'capacity.dispatch:add', 'work.move:awaiting-approval', 'work.outcome:actual'],
+    ['work.add:add', 'work.move:doing', 'work.outcome:predicted', 'capacity.dispatch:add', 'work.move:awaiting-approval', 'work.handoff:reviewer', 'work.outcome:actual'],
   );
   // predicted is written right at claim time, before dispatch ever runs
   const predictedEvent = events.find((e) => e.type === 'work.outcome' && e.payload.predicted);

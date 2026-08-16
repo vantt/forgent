@@ -79,7 +79,10 @@ re-shapes the work; that already happened at `discovery`/`exploring`/`planning`.
   habit here since fgOS has no separate cell-trace file.
 - **Multi-role team harness (tsk-2t9c D1/D4/D5/D8/D9): fire real `fgos
   handoff`/`fgos handoff-return` calls at the points below, do not just
-  perform the underlying action silently.** The role/holder axis (a THIRD
+  perform the underlying action silently.** (Return's own `review`
+  handoff is the one exception — the engine fires it for you as a side
+  effect of `return`/`catchup` reaching `awaiting-approval`, D18; every
+  other point below is still this skill's own job to fire.) The role/holder axis (a THIRD
   axis, orthogonal to `status`/`stage`) only stays truthful if the session
   actually records who is holding the item — the guard, event log, and
   `docs/task-specs/coding/implement-item.md`'s own `## Collaboration`
@@ -286,25 +289,24 @@ re-shapes the work; that already happened at `discovery`/`exploring`/`planning`.
 
    **Only on success** (item now reads `awaiting-approval`) does the
    **review** interaction from `implement-item.md`'s own Collaboration
-   table actually happen — hand the ball to `reviewer`:
-
-   ```bash
-   root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-   ```
-
-   ```bash
-   node "$root/bin/fgos.mjs" handoff "<id>" --to reviewer --reason review --dir "$root"
-   ```
-
-   Call this AFTER `return` succeeds, never before: firing it first would
-   mark `holder: reviewer` even on a run where `return` turns out to move
-   the item to `blocked` instead — the item was never actually handed to
-   anyone in that case, it stayed with the implementer to keep fixing. If
-   `return` itself just moved the item to `blocked` (a verify failure
-   caught while `status` was still `doing`), skip the handoff call, treat
-   this exactly like a failed verify: diagnose, fix, and return again —
-   never re-run `return` hoping the same red state passes on a retry
-   without a real change underneath it.
+   table actually happen — hand the ball to `reviewer`. You do not fire
+   this yourself: `return` reaching `awaiting-approval` fires it FOR you,
+   as an engine-level side effect of that exact transition (`moveWork`,
+   `src/state/store.mjs`, tsk-2t9c D18). This is a deliberate relocation,
+   not a shortcut — a real end-to-end run found this instruction, when it
+   depended on an agent reading and acting on it, went unfired on a
+   genuinely successful return with nothing to signal the miss (no error,
+   no red test). Every door into `awaiting-approval` (`return`, `catchup`,
+   any future one) converges on that one engine call, so the guarantee
+   now holds regardless of which door an item took, without needing this
+   skill's own prose to remember, or to repeat itself once per door. If
+   `return` itself just moved the item to `blocked` instead (a verify
+   failure caught while `status` was still `doing`), nothing fires —
+   `moveWork`'s own side effect is conditioned on the SAME `to ===
+   'awaiting-approval'` transition this prose already gates on; treat a
+   `blocked` outcome exactly like a failed verify: diagnose, fix, and
+   return again — never re-run `return` hoping the same red state passes
+   on a retry without a real change underneath it.
 
    If the item is instead ALREADY `blocked` when you go to call `return`
    (e.g. `approve`'s post-merge verify-fail rollback left it
@@ -314,10 +316,9 @@ re-shapes the work; that already happened at `discovery`/`exploring`/`planning`.
    `docs/specs/work-state.md`). The correct recovery verb there is `fgos
    catchup <id>`, not another `return` call: it re-runs `verify` on a
    staged merge into the item's target branch and, on green, moves it
-   straight to `awaiting-approval` — the same success outcome `return`
-   reaches above, so fire the same `handoff --to reviewer --reason
-   review` call on THIS success too, and skip it the same way on a
-   `catchup` that stays `blocked`.
+   straight to `awaiting-approval` — the same `moveWork` transition, so
+   the same engine-fired review handoff applies on THIS success too, no
+   separate call needed.
 
 ## Headless
 
@@ -333,7 +334,8 @@ for the whole chain, applied here at the implementation step specifically.
 Once `fgos return <id>` reports the item moved to `awaiting-approval`, load
 `fgos-routing` to re-read its stage and continue — routing decides whether
 `compound-learn` (and `fgos-coding-compounding`) comes next; this skill's own job
-ends at a returned, verified item.
+ends at a returned, verified item (the review handoff above already fired
+as part of that same transition — nothing further to do for it here).
 
 ## Red flags
 

@@ -157,6 +157,57 @@ test('a domain with no roleGraph refuses cleanly, never crashes', () => {
   );
 });
 
+// D18 (found by a real end-to-end run: a fresh agent following
+// fgos-coding-implement's own Return-step prose, verbatim, never fired
+// the review handoff even on a genuinely successful return -- nothing
+// gated on it, so the miss was silent). moveWork itself now fires it as
+// a side effect of reaching awaiting-approval, regardless of which door
+// (return/catchup) got there.
+test('D18: moveWork to awaiting-approval auto-fires the review handoff', () => {
+  const dir = tmpDir();
+  const id = seedExecutingItem(dir);
+  assert.equal(listWork(dir).work[id].holder, undefined);
+  moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'doing' });
+  const view = listWork(dir);
+  assert.equal(view.work[id].status, 'awaiting-approval');
+  assert.equal(view.work[id].holder, 'reviewer');
+  assert.equal(view.callThreads[id].length, 1);
+  assert.equal(view.callThreads[id][0].kind, 'handoff');
+  assert.equal(view.callThreads[id][0].reason, 'review');
+});
+
+test('D18: a domain with no roleGraph reaching awaiting-approval is unaffected (no crash, no callThreads)', () => {
+  const dir = tmpDir();
+  addWork(dir, {
+    id: 'synthetic-awaiting',
+    title: 'Synthetic awaiting',
+    kind: 'task',
+    status: 'todo',
+    stage: 'assembling',
+    deps: [],
+    risk: 'light',
+    refs: [],
+    verify: 'true',
+    domain: 'synthetic',
+  });
+  moveWork(dir, { id: 'synthetic-awaiting', to: 'doing', expectedStatus: 'todo' });
+  moveWork(dir, { id: 'synthetic-awaiting', to: 'awaiting-approval', expectedStatus: 'doing' });
+  const view = listWork(dir);
+  assert.equal(view.work['synthetic-awaiting'].status, 'awaiting-approval');
+  assert.equal(view.callThreads, undefined);
+});
+
+test('D18: awaiting-approval auto-fire composes correctly with D16 delivered auto-close — full lifecycle leaves holder back at implementer', () => {
+  const dir = tmpDir();
+  const id = seedExecutingItem(dir);
+  moveWork(dir, { id, to: 'awaiting-approval', expectedStatus: 'doing' });
+  assert.equal(listWork(dir).work[id].holder, 'reviewer');
+  moveWork(dir, { id, to: 'delivered', expectedStatus: 'awaiting-approval' });
+  const view = listWork(dir);
+  assert.equal(view.work[id].status, 'delivered');
+  assert.equal(view.work[id].holder, 'implementer');
+});
+
 // D16 (found by independent review of D14/D15): `delivered` is a terminal
 // state for the role/holder axis — nothing ever re-enters an item past it
 // to close a dangling call, so before this fix `holder` stayed `reviewer`

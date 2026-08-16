@@ -3100,9 +3100,21 @@ async function runVerb(verb, flags, positional, dir) {
         return returnCwdReal === wtReal || returnCwdReal.startsWith(`${wtReal}${path.sep}`);
       });
       if (!insideRegisteredSession && !isMainWorktree(repoRoot)) {
+        // tsk-2t9c D18: found via a real end-to-end run -- an item claimed
+        // through `fgos take` (never `fgos pick`, which DOES stand up a
+        // registered `fgw/<id>` worktree) into an ad-hoc worktree hits
+        // this refusal with no skill's own prose warning it could happen,
+        // and the fix (`fgos session start`) is easy to miss inside a
+        // longer explanatory sentence. Naming the exact command on its
+        // own line is the same "chặn và dạy tại chỗ" discipline
+        // `handoff`'s own refusal already applies (list the legal edges,
+        // don't just say "refused"). `session start` resolves its own
+        // repoRoot from `process.cwd()`, never `--dir` (unlike every
+        // other verb here) -- run it from THIS SAME worktree, not with a
+        // `--dir` flag pointed at it.
         throw new StoreError(
           'validation',
-          `return: refusing to run from "${repoRoot}" — this is a git worktree (not the main checkout, and not a registered "fgos session start" worktree). Run return from the main checkout, or from inside a registered session.`,
+          `return: refusing to run from "${repoRoot}" — this is a git worktree (not the main checkout, and not a registered "fgos session start" worktree). Run return from the main checkout, or register this worktree first, from right here: fgos session start --item "${id}"`,
         );
       }
 
