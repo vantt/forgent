@@ -124,6 +124,33 @@ stage values — the same way `fgos-routing` describes it.
    assume. If a critical-patterns or prior-learnings doc exists for this
    product area, read it too; a precedent already solved beats research.
 
+   **Register a freshly-created feature dir's `docsRef` immediately
+   (tsk-4sx).** When `docsRef` is empty — most commonly an item whose
+   discovery verdict was `clear`, which skips `exploring` and therefore
+   never gets a `CONTEXT.md`/`docsRef` written for it — this skill still
+   picks a `docs/history/<feature>/` path of its own (a descriptive
+   feature-slug is fine; nothing here forces `<feature>` to equal the item
+   id). The moment that path is decided, BEFORE writing anything into it
+   (`plan.md`, `RESEARCH.md` from a `fgos-researching` call, etc.), register
+   it on the item:
+
+   ```bash
+   root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+   node "$root/bin/fgos.mjs" edit "<item-id>" --docs-ref "docs/history/<feature>/" --dir "$root"
+   ```
+
+   Skip this call when `docsRef` is already set — never overwrite a value
+   that already points somewhere real. Without it, `fgos approve`'s own
+   heavy-tier gate (`assertPlanEvidence`, `src/state/store.mjs`) has no way
+   to find `plan.md` unless `<feature>` happens to equal the item id by
+   coincidence — a real refusal this item's own `fgw/tsk-bc7` session hit
+   live (`work "tsk-bc7" cannot move to "delivered" — risk:heavy but no
+   plan.md found... write one before landing`), worked around there with a
+   manual `git mv` to the item-id path. This is the same registration
+   `tsk-61j` independently proposes for `fgos-coding-exploring`'s own
+   CONTEXT.md-creation step — same trigger, same call, kept consistent
+   between the two sibling skills.
+
    **Reclaim the ball if it isn't yours (tsk-2t9c D4/D8).** Check
    `data.work[id].holder` (`fgos list --id <id> --json`). If it is set and
    not `implementer` — most commonly a mid-planning gap round that parked
