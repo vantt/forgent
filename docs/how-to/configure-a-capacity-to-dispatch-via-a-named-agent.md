@@ -75,10 +75,10 @@ plain global executor.
 
 4. **This works identically whether the capacity is dispatched headlessly**
    (`spawnWorker`, the `fgos-runner` loop) **or from an in-session skill**
-   (`resolveCapacityCli`, `node src/runner/dispatch.mjs resolve
-   <capacityId>`) — both call the same `resolveExecutorConfig`, so an
-   `agentType`-only capacity resolves the same real command/args either
-   way.
+   (`node src/runner/dispatch.mjs decide <capacityId>` to learn the
+   mechanism, then `execute <capacityId>` to actually run it) — both call
+   the same `resolveExecutorConfig`, so an `agentType`-only capacity
+   resolves the same real command/args either way.
 
 ## Why this exists
 

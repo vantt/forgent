@@ -535,7 +535,7 @@ export const INVOCATION_VIA = Object.freeze(['cli', 'task', 'mcp', 'api']);
  * capacity whose backend uses a different model-name vocabulary (e.g.
  * `agy`'s Gemini model strings vs. Claude's `haiku`/`sonnet`/`opus`)
  * cannot borrow that shared table without breaking Claude's own
- * tier-to-model resolution. This field lets `resolveCapacityCli`
+ * tier-to-model resolution. This field lets `executeCapacityCli`
  * (task-dispatch only, below) substitute a capacity-specific model instead.
  *
  * `agentType`, when present, must be a non-empty string (D1/D2, tsk-3sw):
@@ -1172,7 +1172,7 @@ export function decideCapacityDispatchMechanism(cfg, capacityId, { hasLiveTaskAc
  * tip), wrong for a leaf (forks from `fgw/<rootId>`, not main) or a retry
  * (the branch already carries the prior attempt's own commits).
  * `spawnWorker` passes its own worktree `cwd` as `attestRoot`;
- * `resolveCapacityCli` (task-dispatch, no worktree involved — genuinely
+ * `executeCapacityCli` (task-dispatch, no worktree involved — genuinely
  * runs against `fgosDir`'s own root) omits it, unchanged.
  *
  * Fail-safe either way: a git read that cannot resolve (detached checkout
@@ -1577,40 +1577,6 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
 }
 
 /**
- * `resolve <capacityId>` CLI subcommand (tsk-5l2-1, design doc §4.2): lets
- * task-dispatch (an in-session skill shelling out via Bash, e.g.
- * `fgos-submit-assist`) resolve a capacity's real command/args/provider/
- * model the exact same way cli-dispatch's `spawnWorker` does — reusing
- * `resolveExecutorConfig`/`resolveExecutorCommand` verbatim, no second
- * argv-building implementation. Model resolution is the one deliberate
- * divergence from `spawnWorker` (tsk-2yp follow-up): a capacity's own
- * `model`, when declared, wins over `modelForTier(cfg, tier)` — needed
- * for a cross-provider capacity whose backend doesn't share Claude's
- * model-name vocabulary; `spawnWorker` never reads `capacity.model` and
- * keeps using `modelForTier` unconditionally. Prints `{command,args,provider,
- * model}` as JSON to stdout on success; a `RunnerConfigError` (unknown
- * capacity, not registered, not present, malformed config) prints its
- * message to stderr and exits non-zero — the same errors
- * `resolveExecutorConfig` already raises for cli-dispatch, not a new error
- * vocabulary invented for this entry point.
- *
- * `repoRoot`, when given, skips the git-based main-checkout lookup
- * entirely (tests pass a plain `mkdtemp` fixture dir here, the same way
- * every other test in `dispatch.test.mjs` points `fgosDir`/config paths at
- * a temp dir rather than a real git checkout).
- *
- * `model`/`tier` (tsk-2k1, D10): an ad-hoc-packet caller's own optional
- * `provider`/`tier` fields, when supplied, win over the capacity's own
- * declared `tier`/`model` and the computed `modelForTier` default — same
- * precedence a capacity's own `model` already had over `modelForTier`
- * (the divergence this doc comment already names above), extended one
- * level further out to the caller. Omitted (every pre-tsk-2k1 call site,
- * and every registered-`<CAPACITY_ID>` dispatch that never names an
- * override) leaves resolution byte-identical to before this parameter
- * existed. This is plumbing only — which tier/model a caller SHOULD pick
- * is `tsk-503`'s own judgment, not decided here.
- */
-/**
  * Record one `capacity.dispatch` audit line for an IN-SESSION capacity
  * call (a live skill's own gather dispatch, tsk-2ie5/tsk-2c1) — the async
  * claim/dispatch cycle's own `capacity.dispatch` event (`loop.mjs`) only
@@ -1629,58 +1595,6 @@ export function logCapacityDispatch(fgosDir, { id, capacityId, provider, command
     type: 'capacity.dispatch',
     payload: { id, capacityId, provider, command, model, baseCommit: null, headRef: null },
   });
-}
-
-export async function resolveCapacityCli(
-  capacityIdArg,
-  { prompt = '', cwd = process.cwd(), repoRoot, model: modelOverride, tier: tierOverride, for: purpose, carries } = {},
-) {
-  if (!capacityIdArg && !purpose) {
-    throw new RunnerConfigError(
-      'usage: node src/runner/dispatch.mjs resolve <capacityId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] | resolve --for <purpose> [...]',
-    );
-  }
-  // MAIN CHECKOUT root, not `resolveRepoRoot`'s worktree-own root (tsk-5hv,
-  // found by fgos-coding-implement): `ensureRunnerConfigForDir` reads
-  // `.fgos/config.json`, which is unconditionally wiped from every
-  // freshly-created worktree (ADR0020) — resolving to a worktree's own
-  // root here would silently bootstrap a throwaway default config instead
-  // of the real one on every worktree-resident call. `resolveRepoRoot` is
-  // still the fallback for a non-git-common-dir environment (its own
-  // validation-error contract preserved unchanged).
-  const root = repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
-  const fgosDir = fgosDirFromRoot(root);
-  const cfg = ensureRunnerConfigForDir(root);
-  // Purpose-based binding (D5/D6, tsk-1o7; first real consumer tsk-2ie5/
-  // tsk-2c1): `capacityIdArg` still wins when given (every pre-tsk-2c1
-  // caller always names a real id, byte-identical). Only when it's
-  // omitted does `for` resolve one — a caller with no pre-registered id
-  // to match by name (a runtime-composed gather prompt) has no other way
-  // to ask for "whichever capacity declares this purpose".
-  const resolvedByPurpose = !capacityIdArg;
-  const capacityId = capacityIdArg || resolveCapacityIdForPurpose(cfg, purpose);
-  if (!capacityId) {
-    throw new RunnerConfigError(
-      `no capacity registered for purpose "${purpose}" — call "decide --for ${purpose}" first to check availability before resolving.`,
-    );
-  }
-  const capacity = cfg.capacities?.[capacityId];
-  const tier = tierOverride ?? capacity?.tier ?? DEFAULTS.tier;
-  const model = modelOverride ?? capacity?.model ?? modelForTier(cfg, tier, { providerModel: capacity?.providerModel, rigorOverrides: capacity?.rigorOverrides });
-  const { command, args, provider } = resolveExecutorCommand(cfg, {
-    prompt,
-    model,
-    tier,
-    capacityId,
-    fgosDir,
-    contentCarries: carries,
-  });
-  // capacityId is additive ONLY on the purpose-resolved path (byte-
-  // identical result shape for every pre-tsk-2c1 caller that already
-  // names a real id, per existing exact-deepEqual tests) — a purpose-only
-  // caller has no other way to learn which capacity actually got picked,
-  // needed for its own dispatch-log line.
-  return resolvedByPurpose ? { command, args, provider, model, capacityId } : { command, args, provider, model };
 }
 
 /**
@@ -1739,7 +1653,11 @@ export async function executeCapacityCli(
       'usage: node src/runner/dispatch.mjs execute <capacityId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] [--has-live-task-access] | execute --for <purpose> [...]',
     );
   }
-  // Same main-checkout resolution as resolveCapacityCli above, same reason.
+  // MAIN CHECKOUT root, not resolveRepoRoot's worktree-own root (tsk-5hv):
+  // ensureRunnerConfigForDir reads .fgos/config.json, unconditionally
+  // wiped from every freshly-created worktree (ADR0020) — resolving to a
+  // worktree's own root here would silently bootstrap a throwaway default
+  // config instead of the real one on every worktree-resident call.
   const root = repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
   const fgosDir = fgosDirFromRoot(root);
   const cfg = ensureRunnerConfigForDir(root);
@@ -1796,14 +1714,16 @@ export async function executeCapacityCli(
 
 /**
  * `decide <capacityId>` CLI subcommand (tsk-3ik-1): lets a task-dispatch
- * consumer skill ask, before choosing whether to `exec` the `resolve`d
- * command or call its own Task tool natively, which mechanism
+ * consumer skill ask, before choosing whether to `execute` the command or
+ * call its own Task tool natively, which mechanism
  * `decideCapacityDispatchMechanism` picks for this capacity right now.
  * Prints `{"mechanism": "in-process"|"out-of-process"}` as JSON to stdout — same
- * additive-sibling relationship to `resolveCapacityCli` above as
+ * additive-sibling relationship to `executeCapacityCli` above as
  * `decideCapacityDispatchMechanism` has to `resolveExecutorConfig`: reads
  * the same committed runner config, calls nothing that also feeds
- * `resolve`'s own resolution path.
+ * `execute`'s own resolution path (tsk-60f D4: the `resolve` CLI subcommand
+ * this docblock used to describe here was retired -- 0 production
+ * consumers, ~15 tests ported onto `execute`).
  *
  * `--has-live-task-access` is the caller's own self-declaration (never
  * probed or inferred here — same contract `decideDispatchMechanism` itself
@@ -1859,12 +1779,12 @@ export async function decideCapacityCli(
       'usage: node src/runner/dispatch.mjs decide <capacityId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--has-live-task-access] | decide --needs-soul [--has-live-task-access]',
     );
   }
-  // Same main-checkout resolution as resolveCapacityCli above, same reason.
+  // Same main-checkout resolution as executeCapacityCli above, same reason.
   const root = repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
   const cfg = ensureRunnerConfigForDir(root);
   // Indirect binding (purpose OR work-item) each report capacityId back
-  // additively (see below) -- same byte-identical-shape reasoning as
-  // resolveCapacityCli above, generalized past purpose-only.
+  // additively (see below) -- same byte-identical-shape reasoning
+  // `executeCapacityCli` above already uses, generalized past purpose-only.
   const resolvedIndirectly = !capacityIdArg;
   let capacityId = capacityIdArg;
   if (!capacityId && workIdArg) {
@@ -1896,10 +1816,9 @@ export async function decideCapacityCli(
       return { mechanism, capacityId, configured: false };
     }
   }
-  // Purpose-based binding, same precedence as resolveCapacityCli above. No
+  // Purpose-based binding, same precedence as executeCapacityCli above. No
   // match is a legitimate "not configured yet" state for `decide`
-  // specifically (unlike `resolve`, which has nothing left to do without a
-  // real capacityId) -- `mechanism: "unavailable"` lets a caller like
+  // specifically -- `mechanism: "unavailable"` lets a caller like
   // gather's own fan-out branch tell "fall back to native" apart from
   // "in-process"/"out-of-process" with one more enum value, never a thrown
   // error for an expected, common state.
@@ -1942,23 +1861,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     const i = rest.indexOf(name);
     return i !== -1 ? rest[i + 1] : undefined;
   };
-  if (subcommand === 'resolve') {
-    resolveCapacityCli(capacityId, {
-      prompt: flagValue('--prompt') ?? '',
-      model: flagValue('--model'),
-      tier: flagValue('--tier'),
-      carries: flagValue('--carries'),
-      for: flagValue('--for'),
-    }).then(
-      (resolved) => {
-        process.stdout.write(`${JSON.stringify(resolved)}\n`);
-      },
-      (err) => {
-        process.stderr.write(`${err.message}\n`);
-        process.exitCode = 1;
-      },
-    );
-  } else if (subcommand === 'execute') {
+  if (subcommand === 'execute') {
     executeCapacityCli(capacityId, {
       prompt: flagValue('--prompt') ?? '',
       model: flagValue('--model'),
@@ -2011,7 +1914,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     }
   } else {
     process.stderr.write(
-      `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs resolve <capacityId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] | resolve --for <purpose> [...] | execute <capacityId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] [--has-live-task-access] | execute --for <purpose> [...] | decide <capacityId> [--has-live-task-access] | decide --for <purpose> [--has-live-task-access] | log <capacityId> --id <id> --provider <p> --command <c> [--model <m>]\n`,
+      `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs execute <capacityId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] [--has-live-task-access] | execute --for <purpose> [...] | decide <capacityId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | log <capacityId> --id <id> --provider <p> --command <c> [--model <m>]\n`,
     );
     process.exitCode = 1;
   }
