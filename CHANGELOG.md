@@ -574,6 +574,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   open on any internal error (empty/malformed stdin, `decide` itself
   erroring) — never a second point of failure on top of a working dispatch
   surface.
+- `capacities.<id>.capability` (the tool-registry's own free-text field) is
+  now catalog-validated the same way `for` already was — a typo'd or
+  undeclared value used to silently make a tool invisible to `fgos tool
+  query --capability ...` with no error anywhere; it now fails config load
+  with a clear message naming the missing catalog entry.
+- `decide` hands back `mcpTool` (mutually exclusive with `agentType`) for a
+  `kind:"tool"` capacity whose `mcp` invocation declares a `tools` map
+  (`capability -> MCP tool identifier`) covering the requested purpose —
+  `mechanism` is upgraded from `out-of-process` to `in-process` in that
+  case, since dispatch has no MCP client of its own and hands the call back
+  to the caller's own live one, the same reasoning `agentType` hand-back
+  already uses for a live Agent/Task tool. Fixes a real gap: `decide --for
+  impact-analysis` used to answer `unavailable` even though `gitnexus` was
+  fully registered, because `toolsFromCapacities` (`fgos tool query`) and
+  `resolveCapacityIdForPurpose` (`decide`) read two different fields.
+
+### Changed
+
+- `toolsFromCapacities` now prefers `capacities.<id>.for[0]` over
+  `capacities.<id>.capability` when both are present, folding the two
+  previously-separate capability fields into one read path — `capability`
+  stays accepted as a tolerant fallback for a not-yet-migrated capacity,
+  never removed by this change alone.
 
 ## [0.1.0]
 

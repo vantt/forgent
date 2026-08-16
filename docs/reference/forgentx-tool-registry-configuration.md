@@ -52,21 +52,26 @@ registry itself applies no policy.)
 > kebab-case: nó khai tên gọi KHÁC hẳn cùng trỏ về 1 entry (vd
 > `impact_analysis`/`Impact Analysis` cùng trỏ về `impact-analysis`).
 > Validate qua `validateCapabilitiesShape` (`src/runner/dispatch.mjs`) —
-> hiện chưa ép một `capability`/`for` phải nằm trong danh mục này (đó là
-> việc riêng của task đọc `for`).
+> cả `capability` lẫn `for` đều bị ép phải nằm trong danh mục này
+> (`validateCapacityShape`, tsk-45f D11): một giá trị gõ nhầm/chưa khai bị
+> chặn ngay lúc load config, không còn âm thầm biến 1 tool vô hình với
+> `fgos tool query`.
 
 (A separate catalog from both vocabs above: `runner.capabilities.<name>`
 in `.fgos/config.json` — each entry `{description?, aliases?}`, both
 fields optional (`{}` is valid, only the key is required). This is the
 SHARED place both the tool-registry's `capability` (layer 1,
-presence/fact) and — later — `capacities.<id>.for` (layer 2, dispatch
-purpose-lookup, a separate task in the same lineage) read from. `aliases`
-differs from `normalizeCapability`'s automatic kebab-case folding: it
-names genuinely DIFFERENT spellings that all resolve to the same entry
-(e.g. `impact_analysis`/`Impact Analysis` both point at `impact-analysis`).
-Validated via `validateCapabilitiesShape` (`src/runner/dispatch.mjs`) —
-today nothing yet enforces that a `capability`/`for` value must actually
-be in this catalog; that enforcement is a separate task's job.)
+presence/fact) and `capacities.<id>.for` (layer 2, dispatch purpose-lookup)
+read from. `aliases` differs from `normalizeCapability`'s automatic
+kebab-case folding: it names genuinely DIFFERENT spellings that all
+resolve to the same entry (e.g. `impact_analysis`/`Impact Analysis` both
+point at `impact-analysis`) — an alias must be declared explicitly to
+count; a value that only differs by case/punctuation is not automatically
+accepted by the catalog check. Validated via `validateCapabilitiesShape`
+(`src/runner/dispatch.mjs`) — both `capability` and `for` are now enforced
+to actually be in this catalog (`validateCapacityShape`, tsk-45f D11): a
+typo'd or undeclared value is rejected at config load time instead of
+silently making a tool invisible to `fgos tool query`.)
 
 ## Registering a new provider
 
