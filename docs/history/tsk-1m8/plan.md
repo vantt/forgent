@@ -43,70 +43,76 @@ high-risk").
 
 ## Approach
 
-The dispatch mechanism already exists — no code change to
-`src/runner/dispatch.mjs`/`src/runner/loop.mjs` is needed (RESEARCH.md
-Round 1). What is missing is purely a `.fgos/config.json` entry keyed
-`"fgos-coding-implement"`, per the exact example already documented at
-`docs/reference/capacity-cross-provider-governance.md:55-73`.
+**Revised at `fgos-coding-validating`'s own Reality gate (smaller path
+found — see below).** The dispatch mechanism already exists — no code
+change to `src/runner/dispatch.mjs`/`src/runner/loop.mjs` is needed
+(RESEARCH.md Round 1). The first draft of this plan proposed mutating the
+live `.fgos/config.json` (add the capacity, prove it, revert it). That is
+NOT the smallest honest path: `spawnWorker`/`decideCapacityCli`/
+`executeCapacityCli` all take their config as a plain in-memory `cfg` (or
+an explicit `repoRoot` pointing at wherever `.fgos/config.json` lives) —
+this repo's own test suite already proves the pattern
+(`test/runner/dispatch.test.mjs`'s `writeRunnerConfigFixture(root, {...})`
++ `decideCapacityCli(undefined, {repoRoot: root, ...})`, and
+`spawnWorker(work, cfg, cwd)` with a synthetic `cfg` object spawning a
+REAL subprocess — the "echo executor" tests use a fake COMMAND but a real
+`child_process` spawn, never a mocked `spawnWorker`). Pointing that same
+pattern at the real `agy` command proves the exact mechanism end-to-end
+without ever touching the live, shared `.fgos/config.json` — eliminating
+the entire mutate/revert dance and the risk of an incomplete revert.
 
-Because the item's own text frames this explicitly as **thử nghiệm**
-(an experiment/test), not "route every future coding item's headless
-implement stage through agy from now on", this plan treats the config
-change as **scoped and temporary**, not a permanent default switch — this
-is a Not-material implementation-scope call (would not change what the
-*item itself* is proving, only how long the config edit persists), so it
-is pinned here as an assumption rather than escalated:
-
-1. **Capture the before state.** Read the current
-   `.fgos/config.json` `runner.capacities` block (main checkout —
-   `.fgos/` never exists inside this item's own `fgw/tsk-1m8` worktree,
-   ADR0020, so every step below runs with `--dir <mainCheckoutRoot>` or
-   directly against the main checkout file, never assumed present in the
-   worktree). Record it verbatim in the evidence file before touching
-   anything.
-2. **Add the entry.** Add `runner.capacities["fgos-coding-implement"]`
-   mirroring the existing `"agy"` entry's real shape (`kind: "agent"`,
-   `invocations: [{via:"cli", adapter:"cli-spawn", command:"agy",
-   args:[...]}]`, `providerModel: "gemini"`, `allowCrossProvider: true`)
-   — do not edit or remove the existing `"agy"` entry itself (RESEARCH.md
-   confirmed nothing else in the repo keys a purpose lookup to the literal
-   string `"agy"`, so the two entries coexisting is safe).
-3. **Prove resolution flips.** `node src/runner/dispatch.mjs decide
-   --work tsk-1m8 --dir <mainCheckoutRoot>` — before step 2:
-   `mechanism` native/in-process fallback (no capacity entry, confirmed
-   live in RESEARCH.md); after step 2: `mechanism: "out-of-process"`,
-   `capacityId: "fgos-coding-implement"`, `configured: true`. Record both
-   raw JSON outputs.
-4. **Prove a real dispatch runs.** Execute a real, safe, throwaway prompt
-   through the newly-configured capacity (`node src/runner/dispatch.mjs
-   execute fgos-coding-implement --prompt "<short smoke-test prompt, no
-   repo-mutating instruction>" --dir <mainCheckoutRoot>`, or the
-   equivalent `spawnWorker` call inside this item's own worktree) and
-   capture the real stdout/stderr — proving `agy` actually receives the
-   prompt and returns real output, not a spawn failure or timeout.
-5. **Revert.** Remove the `"fgos-coding-implement"` entry, restoring
-   `.fgos/config.json` to its pre-step-2 state exactly (diff against the
-   before-capture in step 1 to confirm a clean revert) — so no other
-   in-flight or future coding item's headless dispatch is ever actually
-   exposed to this experiment once it lands.
-6. **Write the evidence file** (`docs/history/tsk-1m8/iron-law-
-   evidence.md`) with the real before/after `decide` output, the real
-   `execute`/dispatch transcript, and the before/after config diff proving
-   a clean revert — the standard real-transcript convention this repo
+1. **Build a scratch config fixture**, not a live-repo edit: a throwaway
+   directory (this item's own worktree, e.g.
+   `docs/history/tsk-1m8/scratch/.fgos/config.json` deleted again after
+   the run, or a `mkTempDir()`-style location) containing only:
+   `runner.capacities["fgos-coding-implement"] = { kind: "agent",
+   invocations: [{via:"cli", adapter:"cli-spawn", command:"agy",
+   args:["-p","{prompt}","--dangerously-skip-permissions","--model",
+   "{model}"]}], providerModel: "gemini", allowCrossProvider: true }` —
+   the same shape the live `"agy"` entry already carries
+   (`.fgos/config.json`, read directly in RESEARCH.md Round 1), plus
+   `executor`/`models`/`timeoutMs` fields shaped like
+   `writeRunnerConfigFixture`'s own existing fixtures so
+   `ensureRunnerConfigForDir`/`resolveExecutorConfig` accept it without
+   inventing new fixture shape.
+2. **Prove resolution.** Call `decideCapacityCli('fgos-coding-implement',
+   {repoRoot: <scratchDir>, hasLiveTaskAccess: true})` (or the CLI
+   equivalent, `node src/runner/dispatch.mjs decide fgos-coding-implement
+   --dir <scratchDir>`) — expect `{mechanism: "out-of-process",
+   configured: true}` (kind `agent` → `hasNativeMechanism: true`, per
+   `decideCapacityCli`'s own logic already read in RESEARCH.md).
+3. **Prove a real dispatch runs.** Call `executeCapacityCli(
+   'fgos-coding-implement', {repoRoot: <scratchDir>, prompt: "<short,
+   safe, non-repo-mutating smoke-test prompt>"})` (or
+   `node src/runner/dispatch.mjs execute fgos-coding-implement --prompt
+   "..." --dir <scratchDir>`) — this really spawns `agy` (confirmed
+   present at `/home/vantt/.local/bin/agy`). Capture the real
+   stdout/stderr/exit status.
+4. **Clean up the scratch fixture** (delete the throwaway directory) —
+   trivial, since nothing was ever written to the live `.fgos/`.
+5. **Write the evidence file** (`docs/history/tsk-1m8/iron-law-
+   evidence.md`) with the real `decide`/`execute` output and the real
+   `agy` transcript — the standard real-transcript convention this repo
    already uses for this kind of proof (e.g.
    `docs/history/tsk-3ik-3/iron-law-evidence.md`).
 
-No split: one honest piece of work, contained entirely in a config
-add/revert cycle plus one evidence doc. `tsk-1m8` proceeds as itself.
+The live `.fgos/config.json` — and every other coding item's headless
+dispatch default — is **never touched at all**, at any point. This also
+means: no revert step to get wrong, and no window (however small) where a
+concurrent `fgos loop` run on another item could observe the experimental
+capacity.
+
+No split: one honest piece of work, contained entirely in a scratch-config
+proof run plus one evidence doc. `tsk-1m8` proceeds as itself.
 
 ## Risk map
 
 | Component | How risky | Proof point |
 |---|---|---|
-| Cross-provider content leaving Claude ecosystem (`agy`/Gemini) | Real — governed by `allowCrossProvider` gate | Gate already documented+tested elsewhere (`docs/reference/capacity-cross-provider-governance.md`); this item sets the flag explicitly per that doc, never bypasses it |
-| Shared dispatch chokepoint (`resolveExecutorConfig`) blast radius | Real, HIGH per GitNexus (degraded posture — stale index, cross-checked via direct source read) | Change is config-only, additive, and reverted within this same item's own execution (step 5) — no other item's dispatch is ever live-exposed |
-| Real external process spawn (`agy` binary) | Low mechanically — reuses existing `cliSpawnAdapter`'s own timeout/maxBuffer/spawn-fail handling, no new code | `command -v agy` confirmed present; adapter code already has test coverage (`test/runner/dispatch.test.mjs`) |
-| `.fgos/` not present inside this item's own worktree (ADR0020) | Real constraint on HOW steps 1-5 run, not a risk to correctness if respected | Every config-touching step above runs against the main checkout root explicitly, never assumed present at the worktree cwd |
+| Cross-provider content leaving Claude ecosystem (`agy`/Gemini) | Real — governed by `allowCrossProvider` gate | Gate already documented+tested elsewhere (`docs/reference/capacity-cross-provider-governance.md`); the scratch fixture sets the flag explicitly per that doc, never bypasses it |
+| Shared dispatch chokepoint (`resolveExecutorConfig`) blast radius | Downgraded from the first draft: the live `.fgos/config.json` is never written, so no other item's headless dispatch is ever exposed, at any point — GitNexus impact (`impact({target:"resolveExecutorConfig", direction:"upstream"})`, 2026-08-16: `impactedCount: 6`, `risk: HIGH`, degraded posture — stale index, cross-checked via direct source read) confirms the chokepoint's real reach, which is exactly why this plan now avoids touching it | Scratch-fixture isolation (this Approach); `spawnWorker`/`decideCapacityCli` already accept an in-memory/explicit-`repoRoot` cfg by design, not a new capability being relied on |
+| Real external process spawn (`agy` binary) | Low mechanically — reuses existing `cliSpawnAdapter`'s own timeout/maxBuffer/spawn-fail handling, no new code | `command -v agy` confirmed present; adapter code already has test coverage (`test/runner/dispatch.test.mjs`); `spawnWorker`'s "echo executor" tests confirm a real (non-mocked) `child_process` spawn path |
+| `.fgos/` not present inside this item's own worktree (ADR0020) | Moot for the live store (never touched) — only the scratch fixture, created and deleted entirely inside this item's own worktree, needs no `--dir <mainCheckoutRoot>` at all | Scratch fixture lives under `docs/history/tsk-1m8/scratch/` inside this item's own worktree; no main-checkout `.fgos/` access required for steps 1-4 |
 
 ## Outstanding questions
 
