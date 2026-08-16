@@ -16,6 +16,7 @@ import {
   resolveExecutorCommand,
   executeCapacityCli,
   resolveCapacityIdForPurpose,
+  resolveCapacityAndOverrides,
   logCapacityDispatch,
   decideDispatchMechanism,
   decideCapacityDispatchMechanism,
@@ -3232,6 +3233,203 @@ test('resolveCapacityIdForPurpose returns null when no capacity declares that pu
 test('resolveCapacityIdForPurpose returns null against an empty/missing capacities block', () => {
   assert.equal(resolveCapacityIdForPurpose({}, 'no-such-purpose-configured'), null);
   assert.equal(resolveCapacityIdForPurpose({ capacities: {} }, 'no-such-purpose-configured'), null);
+});
+
+// --- resolveCapacityAndOverrides (D1-D4, docs/history/capability-capacity-
+// remodel/CONTEXT.md) -- the shared resolver every real cfg.capacities[id]
+// lookup in this file now goes through: literal key first, then
+// capabilities.<name>.prefer (symmetry required), then the plain "for"
+// scan, then unconfigured -----------------------------------------------
+
+test('resolveCapacityAndOverrides resolves a literal capacityId directly, unchanged from pre-this-item behavior -- the deep-customization escape hatch', () => {
+  const cfg = { capacities: { agy: { kind: 'agent', command: 'agy' } } };
+  const result = resolveCapacityAndOverrides(cfg, 'agy');
+  assert.equal(result.capacityId, 'agy');
+  assert.equal(result.capacity, cfg.capacities.agy);
+  assert.equal(result.overrides, undefined);
+  assert.equal(result.configured, true);
+});
+
+test('resolveCapacityAndOverrides resolves via capabilities.<name>.prefer when the preferred capacity declares a matching "for" (symmetry satisfied)', () => {
+  const cfg = {
+    capacities: { agy: { kind: 'agent', command: 'agy', for: ['fgos-coding-implement'] } },
+    capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
+  };
+  const result = resolveCapacityAndOverrides(cfg, 'fgos-coding-implement');
+  assert.equal(result.capacityId, 'agy');
+  assert.equal(result.capacity, cfg.capacities.agy);
+  assert.equal(result.configured, true);
+});
+
+test('resolveCapacityAndOverrides carries capabilities.<name>.overrides through, unapplied, for the caller to merge itself', () => {
+  const cfg = {
+    capacities: { agy: { kind: 'agent', command: 'agy', for: ['fgos-coding-implement'] } },
+    capabilities: { 'fgos-coding-implement': { prefer: 'agy', overrides: { rigorOverrides: { standard: 'creative' } } } },
+  };
+  const result = resolveCapacityAndOverrides(cfg, 'fgos-coding-implement');
+  assert.deepEqual(result.overrides, { rigorOverrides: { standard: 'creative' } });
+});
+
+test('resolveCapacityAndOverrides throws when "prefer" names a capacity that does not itself declare "for" including the capability name (symmetry violation)', () => {
+  const cfg = {
+    capacities: { agy: { kind: 'agent', command: 'agy' } }, // no "for" at all
+    capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
+  };
+  assert.throws(() => resolveCapacityAndOverrides(cfg, 'fgos-coding-implement'), RunnerConfigError);
+});
+
+test('resolveCapacityAndOverrides throws when "prefer" names a capacity id that does not exist at all', () => {
+  const cfg = { capabilities: { 'fgos-coding-implement': { prefer: 'no-such-capacity' } } };
+  assert.throws(() => resolveCapacityAndOverrides(cfg, 'fgos-coding-implement'), RunnerConfigError);
+});
+
+test('resolveCapacityAndOverrides falls back to the plain "for" scan when no "prefer" is set -- unchanged resolveCapacityIdForPurpose behavior, wrapped', () => {
+  const cfg = { capacities: { 'totally-unrelated-name': { kind: 'agent', command: 'agy', for: ['review'] } } };
+  const result = resolveCapacityAndOverrides(cfg, 'review');
+  assert.equal(result.capacityId, 'totally-unrelated-name');
+  assert.equal(result.overrides, undefined);
+});
+
+test('resolveCapacityAndOverrides returns configured:false, capacityId:null when nothing resolves -- a legitimate state, never thrown', () => {
+  const result = resolveCapacityAndOverrides({}, 'no-such-purpose-or-id');
+  assert.equal(result.capacityId, null);
+  assert.equal(result.configured, false);
+});
+
+// --- capabilities.<name>.prefer/overrides shape validation (D2) -----------
+
+test('loadRunnerConfig rejects capabilities.<name>.prefer that is not a non-empty string', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-prefer.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capabilities: { 'fgos-coding-implement': { prefer: '' } },
+      modelPolicies: { claude: { standard: 'sonnet' } },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('loadRunnerConfig rejects capabilities.<name>.overrides with a key outside the allowed 4 fields -- command/args/adapter are never override-able', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-overrides-key.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: { agy: { kind: 'agent', command: 'agy', for: ['fgos-coding-implement'] } },
+      capabilities: { 'fgos-coding-implement': { prefer: 'agy', overrides: { command: 'not-allowed' } } },
+      modelPolicies: { claude: { standard: 'sonnet' } },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('loadRunnerConfig rejects capabilities.<name>.overrides.rigorOverrides via the SAME rule a capacity\'s own rigorOverrides already uses', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-overrides-rigor.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: { agy: { kind: 'agent', command: 'agy', for: ['fgos-coding-implement'] } },
+      capabilities: { 'fgos-coding-implement': { prefer: 'agy', overrides: { rigorOverrides: { standard: 'ultra-mega' } } } },
+      modelPolicies: { claude: { standard: 'sonnet' } },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('loadRunnerConfig accepts a well-formed capabilities.<name>.prefer/overrides pair, symmetry satisfied', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'good-prefer-overrides.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'] } },
+      capabilities: { 'fgos-coding-implement': { description: 'code-implement work', prefer: 'agy', overrides: { rigorOverrides: { standard: 'creative' } } } },
+      modelPolicies: { claude: { standard: 'sonnet' } },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.doesNotThrow(() => loadRunnerConfig(configPath));
+});
+
+test('loadRunnerConfig rejects a load-time symmetry violation -- "prefer" names a real capacity that does not declare the matching "for" (config-load time, ahead of resolveCapacityAndOverrides\'s own resolve-time throw)', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-symmetry.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: { agy: { kind: 'agent', command: 'agy' } }, // no "for"
+      capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
+      modelPolicies: { claude: { standard: 'sonnet' } },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+// --- End-to-end: spawnWorker/executeCapacityCli/decideCapacityCli all
+// resolve a purpose name via capabilities.<name>.prefer the same way a
+// literal capacityId already did (D3's own real migration case) ----------
+
+test('spawnWorker resolves model via capabilities.<name>.prefer + overrides -- the exact D4 gap (spawnWorker used to have its own separate lookup, distinct from resolveExecutorConfig)', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeEchoExecutor(dir);
+  const cfg = {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: {
+      agy: { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}', '--model', '{model}'], for: ['fgos-coding-implement'], providerModel: 'gemini', allowCrossProvider: true },
+    },
+    capabilities: { 'fgos-coding-implement': { prefer: 'agy', overrides: { rigorOverrides: { standard: 'lightweight' } } } },
+    modelPolicies: { claude: { standard: 'sonnet' }, gemini: { lightweight: 'gemini-flash' } },
+    timeoutMs: 5000,
+  };
+
+  const result = await spawnWorker(sampleWork({ domain: 'coding' }), cfg, mkTempDir());
+  assert.equal(result.model, 'gemini-flash');
+  const payload = JSON.parse(result.stdout);
+  assert.equal(payload.args[1], '--model');
+  assert.equal(payload.args[2], 'gemini-flash');
+});
+
+test('executeCapacityCli resolves a purpose-named capacityId via capabilities.<name>.prefer, spawning the real preferred capacity', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeEchoExecutor(dir);
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: { agy: { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}'], for: ['fgos-coding-implement'], allowCrossProvider: true } },
+    capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const result = await executeCapacityCli('fgos-coding-implement', { repoRoot: root, prompt: 'do the thing' });
+  assert.equal(result.mechanism, 'out-of-process');
+  assert.equal(result.status, 0);
+  const payload = JSON.parse(result.stdout);
+  assert.equal(payload.args[0], 'do the thing');
+});
+
+test('decideCapacityCli resolves a purpose-named capacityId via capabilities.<name>.prefer -- "configured" reads true even though no literal capacities entry of that name exists', async () => {
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capacities: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'] } },
+    capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const decided = await decideCapacityCli('fgos-coding-implement', { repoRoot: root, hasLiveTaskAccess: false });
+  assert.deepEqual(decided, { mechanism: 'out-of-process', configured: true });
 });
 
 // --- executeCapacityCli / decideCapacityCli: purpose-based (--for) binding,
