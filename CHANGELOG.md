@@ -70,6 +70,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   dispatch path; 0 capacities register `via:"api"` today.
   (`docs/specs/runner.md` RUL66,
   `docs/reference/forgentx-tool-registry-configuration.md`)
+- A `capacities.<id>` capacity that is **cli-spawn-shaped** (declares its
+  own `command`/`adapter`, or an `invocations[].via === "cli"` entry —
+  e.g. an `agy`-backed capacity) now dispatches out-of-process whenever it
+  is configured, even when the caller already has live Task-tool access.
+  Previously a live/interactive session with Task access always won
+  in-process, silently never invoking the configured command at all. A
+  capacity that is **agentType-shaped** (only `agentType`, no command of
+  its own) is unaffected — `hasLiveTaskAccess` still decides there, since
+  resolving it in-process already means honoring the configured target.
+  (`docs/decisions/0033-cli-spawn-shaped-capacity-thang-hasLiveTaskAccess.md`,
+  narrows `docs/decisions/0026` rule 2)
 - The per-tier `runner.executors.<tier>` config override is retired (0
   live entries; had already caused a real bug — a non-tier key silently
   fell through to the global executor with no error). A `capacities.<id>`

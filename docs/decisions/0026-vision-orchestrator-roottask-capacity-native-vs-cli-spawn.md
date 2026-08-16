@@ -6,7 +6,7 @@ timestamp: 2026-08-03T10:33:57.000Z
 source_capture_ids: []
 date: 2026-08-03
 status: accepted
-superseded_by: [0028, 0029]
+superseded_by: [0028, 0029, 0033]
 extends: []
 relates_specs: [runner]
 ---
@@ -100,6 +100,14 @@ implement gì).
    `--agent`). Đây là **native dispatch** — tên tổng quát hoá của
    "task-dispatch" (`tsk-53h`) ra khỏi phạm vi riêng Claude, cho MỌI
    provider có cơ chế in-process của riêng nó.
+
+   **Thu hẹp bởi `0033` (2026-08-16):** quy tắc 2 chỉ còn đúng cho
+   capacity **agentType-shaped** (chỉ có `agentType`, không có `command`/
+   `invocations` riêng — honoring nó `in-process` CHÍNH LÀ honoring cấu
+   hình). Một capacity **cli-spawn-shaped** (có `command`/`invocations`
+   riêng, ví dụ `agy`) giờ LUÔN cli/spawn khi đã cấu hình, kể cả khi
+   caller cùng provider và có sẵn native mechanism — quyết định người
+   dùng trực tiếp, xem `0033` cho lý do đầy đủ.
 
 3. **Target cần soul, KHÁC provider với rootTask đang chạy** → bắt buộc
    cli/spawn (**cli/spawn dispatch** — tên giữ nguyên nghĩa "cli-dispatch"
