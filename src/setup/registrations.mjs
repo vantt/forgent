@@ -31,6 +31,7 @@ import { fileURLToPath } from 'node:url';
 import { detectRcFiles, hasSourceLine, deadSourceLines, probeShellIntegrationInvocation } from './shell-rc.mjs';
 import { mergeConfigDefaults } from './config-merge.mjs';
 import { mainCheckoutHookWired } from './git-hooks.mjs';
+import { claudeCodeHookWired } from './claude-code-hooks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
@@ -56,6 +57,7 @@ import { checkEventsJsonlContiguity, fixEventsJsonlContiguity } from '../state/e
 import { advanceEventsJsonlTruncationGuard } from '../state/events-jsonl-truncation-guard.mjs';
 
 export { mainCheckoutHookWired } from './git-hooks.mjs';
+export { claudeCodeHookWired } from './claude-code-hooks.mjs';
 
 const MIN_NODE_MAJOR = 18;
 
@@ -396,6 +398,13 @@ function checkMainCheckoutHookWired(cwd) {
   return { passed: false, message: 'core.hooksPath not wired to .githooks — commits here are NOT guarded against concurrent-writer clobbering (str65) — run fgos setup' };
 }
 
+function checkDispatchDecideHookWired(cwd) {
+  if (claudeCodeHookWired(cwd)) {
+    return { passed: true, message: 'PreToolUse hook wired — every Agent/Task call is routed through dispatch.mjs decide first' };
+  }
+  return { passed: false, message: '.claude/settings.json has no PreToolUse dispatch-decide hook wired — Agent/Task calls can bypass the decide-first enforcement — run fgos setup' };
+}
+
 // tsk-1dj (tool-registry-capability port), CONTEXT.md D1: reports the tool
 // registry's posture (inactive/degraded/full), never a hard failure — an
 // empty or partially-present registry is never itself a problem (the core
@@ -464,6 +473,12 @@ registerCheck({
   id: 'main-checkout-hook-wired',
   description: 'core.hooksPath wired to .githooks (str65 main-checkout lock guards every commit)',
   check: (cwd) => checkMainCheckoutHookWired(cwd),
+});
+
+registerCheck({
+  id: 'dispatch-decide-hook-wired',
+  description: '.claude/settings.json PreToolUse hook enforces dispatch.mjs decide on every Agent/Task call',
+  check: (cwd) => checkDispatchDecideHookWired(cwd),
 });
 
 registerCheck({

@@ -517,6 +517,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   once at stage `discovery`, on real research evidence, for every item
   regardless of which caller created it. Use `/fgOS:submit` directly; it
   now does strictly more than this skill did.
+- The `resolve` CLI subcommand (`node src/runner/dispatch.mjs resolve`)
+  and `resolveCapacityCli`. 0 production consumers (confirmed via impact
+  analysis); `execute` already covers everything `resolve` did, and
+  actually runs the command instead of handing back `{command,args}` for
+  the caller to run itself through Bash.
+
+### Added
+
+- `decide` gains a `--needs-soul` flag: the caller's own self-declaration
+  that it is about to fire its own Agent/Task tool with no capacity or
+  work item to name. When every other lookup (capacity id, `--for`,
+  `--work`) comes up empty, `--needs-soul` defaults the answer to native
+  dispatch instead of `"unavailable"` — the same default `--work` already
+  applied for a work item with no registered capacity override, now
+  available to a bare Agent/Task call too.
+- Every `decide` result now carries `configured: true|false` — `false`
+  means nothing is registered under that name/purpose (the answer came
+  from the default); `true` means a real `capacities.<id>` entry was
+  found, whatever mechanism it resolves to. Lets a caller tell "typo'd or
+  never configured" apart from "configured, and it happens to run
+  out-of-process" — today both silently read the same
+  `mechanism: "out-of-process"`.
+- A `PreToolUse` hook (`scripts/dispatch-decide-hook.mjs`) now enforces
+  that every Agent/Task tool call goes through `decide` first: it runs
+  `decide --for <subagent_type> --needs-soul --has-live-task-access` on
+  the caller's behalf and refuses the call when the answer is anything
+  other than `in-process`, pointing at `execute` instead. Wired into
+  `.claude/settings.json` by `fgos setup` (fill-only — a pre-existing
+  `hooks.SessionStart` entry, or any other content, is left untouched);
+  reported by a new `dispatch-decide-hook-wired` `fgos doctor` check. Fails
+  open on any internal error (empty/malformed stdin, `decide` itself
+  erroring) — never a second point of failure on top of a working dispatch
+  surface.
 
 ## [0.1.0]
 
