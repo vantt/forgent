@@ -47,19 +47,28 @@
       "gitnexus": {
         "kind": "tool",
         "capability": "impact-analysis",
+        "for": [
+          "impact-analysis"
+        ],
         "scanTarget": ".gitnexus",
         "responsibility": "Verification",
         "description": "Code-graph blast radius",
         "invocations": [
           {
             "via": "mcp",
-            "command": "mcp:gitnexus"
+            "command": "mcp:gitnexus",
+            "tools": {
+              "impact-analysis": "mcp__gitnexus__impact"
+            }
           }
         ]
       },
       "herdr": {
         "kind": "tool",
         "capability": "pane-labeling",
+        "for": [
+          "pane-labeling"
+        ],
         "responsibility": "Chrome",
         "description": "herdr pane label writer (herdr pane rename) for /fgOS:terminal",
         "invocations": [
