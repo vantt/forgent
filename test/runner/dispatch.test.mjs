@@ -706,11 +706,11 @@ test('resolveExecutorCommand still enforces cross-provider governance for an inv
   );
 });
 
-test('the committed .fgos/config.json runner section declares the agy reference capacity (tsk-5tm-4 D11): invocations[]-shaped, kind cli, allowCrossProvider true, resolves to the real installed agy binary', () => {
+test('the committed .fgos/config.json runner section declares the agy reference capacity (tsk-5tm-4 D11): invocations[]-shaped, kind agent (migrated at tsk-in1-4 D5), allowCrossProvider true, resolves to the real installed agy binary', () => {
   const cfg = committedRunnerConfig();
   const capacity = cfg.capacities?.agy;
   assert.ok(capacity, 'capacities.agy must exist');
-  assert.equal(capacity.kind, 'cli');
+  assert.equal(capacity.kind, 'agent');
   assert.equal(capacity.allowCrossProvider, true);
   assert.ok(Array.isArray(capacity.invocations) && capacity.invocations.length === 1);
   const invocation = capacity.invocations[0];

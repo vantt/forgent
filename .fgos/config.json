@@ -21,7 +21,7 @@
     },
     "capacities": {
       "agy": {
-        "kind": "cli",
+        "kind": "agent",
         "allowCrossProvider": true,
         "invocations": [
           {
@@ -45,25 +45,39 @@
         }
       },
       "gitnexus": {
-        "kind": "mcp",
+        "kind": "tool",
         "capability": "impact-analysis",
-        "probeCommand": "mcp:gitnexus",
         "scanTarget": ".gitnexus",
         "responsibility": "Verification",
-        "description": "Code-graph blast radius"
+        "description": "Code-graph blast radius",
+        "invocations": [
+          {
+            "via": "mcp",
+            "command": "mcp:gitnexus"
+          }
+        ]
       },
       "herdr": {
-        "kind": "cli",
+        "kind": "tool",
         "capability": "pane-labeling",
-        "probeCommand": "herdr",
         "responsibility": "Chrome",
-        "description": "herdr pane label writer (herdr pane rename) for /fgOS:terminal"
+        "description": "herdr pane label writer (herdr pane rename) for /fgOS:terminal",
+        "invocations": [
+          {
+            "via": "cli",
+            "command": "herdr",
+            "args": []
+          }
+        ]
       }
     },
     "capabilities": {
       "impact-analysis": {
         "description": "Code-graph blast radius",
-        "aliases": ["impact_analysis", "Impact Analysis"]
+        "aliases": [
+          "impact_analysis",
+          "Impact Analysis"
+        ]
       },
       "pane-labeling": {
         "description": "Write a session/task id onto the current terminal pane's label, for a human watching a screen"
