@@ -2,6 +2,29 @@
 
 ## 1. Trạng thái hiện tại
 
+**Cập nhật 2026-08-16 (round 3) — D15: 4 SKILL CÒN LẠI ĐÃ NỐI DÂY THẬT.**
+Người dùng: "Wire the other skills too". Đã nối `fgos-coding-discovering`/
+`exploring`/`planning`/`validating` vào `handoff`/`handoff-return` cùng
+mức độ nghiêm ngặt như D14 (seq 18381). Hai lỗ hổng thật phát hiện được
+KHI nối dây, không phải lúc review thiết kế: (1) `roleGraph` không có
+cạnh nào ở stage `discovery` — giả định sai "machine-only = không tương
+tác gì", trong khi discovery thật sự gọi `fgos-researching` (consult
+thật); đã thêm cạnh, và sửa `judge-ambiguity.md` từng ghi nhầm một dòng
+`advise` ở đây. (2) `shape-plan.md` và `validate-plan.md` đều ghi nhầm
+dòng `advise (async)` cho trigger thật ra giải quyết ngay trong phiên,
+không park: gap của `CONTEXT.md` ở planning chỉ là hand-back (dispatch)
+sang exploring — chính exploring mới quyết định có park thật hay không;
+Gate của validating không hề có `fgos ask` ở đâu cả, chỉ giải quyết ngay
+qua `gate-approve --actor human` — cả hai bảng đã sửa lại. Cũng phân
+biệt rõ capacity-dispatch (đổi executor, cùng một việc) với consult-qua-
+`fgos-researching` (gọi một skill khác hẳn) sau khi suýt lẫn lộn hai cái
+lúc nối exploring. Đồng bộ cả 4 nguồn `.agents/skills/` →
+`plugins/fgOS/skills/` (byte-identical) → `.claude/skills/` wrapper
+(build:skills, 0 diff); `test/skills/fgos-mirror.test.mjs` 13/13,
+`npm test` không đổi baseline (3369/5/0, tăng so với 3367 do 2 test mới
+cho cạnh discovery). **Còn lại thật sự CHƯA làm**: review độc lập (ngoài
+self-review) toàn bộ batch D14+D15 vẫn chưa có; chưa commit.
+
 **Cập nhật 2026-08-16 (round 2) — D14: `fgos-coding-implement` ĐÃ NỐI DÂY
 THẬT VÀO HANDOFF.** Người dùng bắt đúng chỗ báo cáo trước overclaim: "harness
 hoạt động" (mảnh ①②③) không đồng nghĩa "coding domain đã chuyển" — skill

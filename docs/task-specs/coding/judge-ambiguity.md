@@ -25,6 +25,12 @@ domain: coding | stage: discovery | position: implementer
 
 | Trigger | Call | To | Reason | Bóng về mang |
 |---|---|---|---|---|
-| A named library/API/concept surfaces that cannot be resolved from context already in hand | consult (sync) | researcher | consult | finding + clear/unclear verdict |
-| The ambiguity needs a product decision, not a research answer | advise (async) | human-advisor | advise | answer, folded into the discovery verdict |
+| A named library/API/concept surfaces that cannot be resolved from context already in hand — call as many times as there are independent ambiguous points | consult (sync) | researcher | consult | finding, folded into the `clear`/`unclear` verdict |
 | No trigger matches | — self-judge and apply the verdict — | | | |
+
+**No `advise` at this stage, by the skill's own hard rule.** Discovery is
+machine-alone (D6) — it never asks a human directly. A gap needing a
+product decision is precisely what an `unclear` verdict routes to
+`exploring` for; `advise` belongs to `lock-decisions.md`'s own table, not
+here. (Corrected from an earlier draft that wrongly carried an `advise`
+row — found wiring `fgos-coding-discovering` for real, tsk-2t9c D14.)

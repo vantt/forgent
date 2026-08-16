@@ -116,6 +116,23 @@ pass to keep the item moving.
   hard rule above already requires — the CLI verb is the one sanctioned
   entry point either way; only the judge subprocess underneath it is what
   gets skipped.
+- **Multi-role team harness** (tsk-2t9c D14/D15): this whole skill runs as
+  role `implementer` on the `planning` stage's `roleGraph` — the task-spec's
+  own header (`position: reviewer`) names the *function* this task performs
+  (reviewing the plan), not the roleGraph's `reviewer` role, which the
+  domain only ever declares edges for at stage `executing`. Tier A's
+  `fgos-researching` dispatch (Step 1 below) is a real `consult`
+  interaction: log `handoff --reason consult` right after it, same as
+  every other coding-domain skill. The Gate's own "ask a person" branch
+  (Step 2, `false` case) is **not** an `advise` handoff, even though
+  `advise` is the only human-facing reason the roleGraph declares — this
+  Gate has no `fgos ask`/`fgos answer` anywhere in it; every question it
+  asks is live, in-session, resolved the same turn via `gate-approve
+  --actor human`, never a real async park. Firing `handoff --reason
+  advise` on a live question that never parks would misrecord `holder`
+  for a hand-off that never actually happened (found correcting
+  `docs/task-specs/coding/validate-plan.md`'s Collaboration table, which
+  had wrongly marked this as `advise (async)`).
 
 ## Flow
 
@@ -124,6 +141,17 @@ pass to keep the item moving.
    its shape was never presented at `fgos-coding-planning`'s own gate, stop here and
    hand the item back to `fgos-coding-planning` — an unapproved shape is never
    validated.
+
+   If the domain declares a `roleGraph` and the item's current `holder` is
+   not already `implementer`, reclaim it before anything else:
+
+   ```bash
+   root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+   ```
+
+   ```bash
+   node "$root/bin/fgos.mjs" handoff-return "<item-id>" --note "reclaiming at Bootstrap -- holder was <role>" --dir "$root"
+   ```
 
 2. **Reality gate.** Score each of these PASS or FAIL, each with a concrete
    citation (a file path, a command's real output, an existing test):
@@ -200,7 +228,15 @@ using the two-tier criterion (D3), in this order — **tier A first, always**:
 **Tier A — is there a valid action in reach that closes the gap?** Run the
 command, read the file, invoke `fgos-researching`, run `fgos graph
 --what-if`. If yes: **do it, then re-ask this question from the top.** Do
-not ask a person. You leave tier A only when the action does not exist,
+not ask a person. When the action taken was invoking `fgos-researching`
+and the domain declares a `roleGraph`, log the dispatch right after it
+returns:
+
+```bash
+node "$root/bin/fgos.mjs" handoff "<item-id>" --to researcher --reason consult --outcome "<the finding, one line>" --dir "$root"
+```
+
+You leave tier A only when the action does not exist,
 was tried and failed, **or is forbidden by a rule** (the locked-decision
 case: this skill may not reopen `CONTEXT.md`, so it structurally cannot
 resolve that one alone).
@@ -436,6 +472,13 @@ claim, and `fgos return` will simply refuse later with "is todo, not doing".
   `decompose` verdict through** — the rejection is trigger T3 speaking
 - creating a split child anywhere other than this gate's own
   `--verdict decompose --children` call
+- **firing `handoff --reason advise` on the Gate's live "ask a person"
+  branch** — that question is answered the same turn via `gate-approve
+  --actor human`, never a real async park; only a genuine `fgos ask` would
+  qualify, and this skill has none
+- invoking `fgos-researching` in tier A without logging `handoff --reason
+  consult` right after (when the domain has a `roleGraph`), or skipping
+  the reclaim at Bootstrap when holder is not already `implementer`
 
 Violating the letter of the rules is violating the spirit of the rules.
 

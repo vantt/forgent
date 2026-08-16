@@ -96,6 +96,20 @@ directly by `fgos-coding-planning`, mid-`planning`, when that skill finds
   uncommitted `CONTEXT.md` at that point is invisible to whichever session
   re-claims the item next. Same one-artifact-per-stop discipline
   `fgos-coding-implement`'s "one commit per item" rule already gives Execute.
+- **Multi-role team harness (tsk-2t9c D1/D4/D9): fire real `fgos
+  handoff`/`fgos handoff-return` at the points in Flow below — never a
+  live conversational question alone.** Per `lock-decisions.md`'s own
+  `## Collaboration` table: the live, in-session Socratic back-and-forth
+  (step 2's primary mechanism) is NOT a role-axis call — nothing parks,
+  nothing needs tracking. Only two real interactions get a call: the
+  `fgos ask`/`answer` round trip (an actual async park — `advise`), and
+  the occasional narrow research need that goes to the `fgos-researching`
+  helper — the SAME named helper `fgos-coding-discovering` calls as its
+  primary mechanism, distinct from the capacity-dispatch mechanism this
+  skill's own hard rules mention elsewhere (that one swaps EXECUTORS for
+  the same reasoning work — a different model/provider/parallel run,
+  `../_shared/capacity-dispatch-fallback.md` — never confuse the two).
+  Skip both entirely when the item's domain declares no `roleGraph`.
 
 ## Flow
 
@@ -106,6 +120,22 @@ directly by `fgos-coding-planning`, mid-`planning`, when that skill finds
    already-asked ground — a new question either builds on it (cite what
    changed) or states in one line why it no longer applies; never re-ask a
    question that verdict already covered or contradict what it settled.
+
+   **Reclaim the ball if it isn't yours (tsk-2t9c D4/D8).** Same reading,
+   check `data.work[id].holder`. If it is set and not `implementer`, this
+   session is re-entering an item whose most recent role-axis call was
+   never closed (most commonly: a prior round's `fgos ask` was already
+   `answer`ed on the status axis without the role axis following):
+
+   ```bash
+   root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+   ```
+
+   ```bash
+   node "$root/bin/fgos.mjs" handoff-return "<item-id>" --note "reclaiming at Scope — holder was <role>" --dir "$root"
+   ```
+
+   Skip when the item's domain declares no `roleGraph`.
 
    Read the item's title, `refs`, and any existing `docsRef` target. Do a
    quick scout — one keyword pass over the product source and docs for the
@@ -161,6 +191,17 @@ directly by `fgos-coding-planning`, mid-`planning`, when that skill finds
    Exclude implementation choices, performance tuning, and anything only the
    implementer would care about.
 
+   If a named library/API/pattern surfaces during scout that a direct
+   `rg`/Read pass genuinely cannot resolve (an external doc, a fact this
+   repo doesn't contain), dispatch to `fgos-researching` — this is the
+   **consult** interaction (tsk-2t9c D1/D9), the same named helper
+   `fgos-coding-discovering` already relies on, called here as the rare
+   exception rather than the default. Log it after the finding lands:
+
+   ```bash
+   node "$root/bin/fgos.mjs" handoff "<id>" --to researcher --reason consult --outcome "<finding, one line>" --dir "$root"
+   ```
+
 2. **Lock decisions Socratically.** Ask the fewest rounds the dependencies
    allow: batch every question whose answer does not change another pending
    question into one round; ask a question whose wording depends on a prior
@@ -215,6 +256,22 @@ directly by `fgos-coding-planning`, mid-`planning`, when that skill finds
    later — there is no separate synchronous shortcut, and an item is only
    legitimately blocked on a person while it actually sits in that parked
    state.
+
+   **This is the real `advise` interaction (tsk-2t9c D1/D4/D9) — call
+   `handoff` first, then `ask`, same as `implement-item.md`'s own
+   Collaboration table:**
+
+   ```bash
+   node "$root/bin/fgos.mjs" handoff "<id>" --to human-advisor --reason advise --dir "$root"
+   ```
+
+   ```bash
+   node "$root/bin/fgos.mjs" ask "<id>" --text "..." --dir "$root"
+   ```
+
+   The live conversational questions this step asks the rest of the time
+   (the common case) get no `handoff` call at all — nothing parks, there
+   is nothing to track.
 
 3. **Write the decision doc.** Write `docs/history/<feature>/CONTEXT.md`
    covering: the feature boundary, the locked decisions table with D-IDs,
@@ -412,6 +469,9 @@ node "$root/bin/fgos.mjs" discover "<item-id>" --verdict clear --verify "<the sa
   narrow gap-closing pass into a second gate in stage `planning`
 - re-running a tier-A action the hand-back decision already records as
   tried
+- calling `fgos ask` without the paired `handoff --reason advise` first
+  (when the domain has a `roleGraph`), or firing `handoff` for a live
+  conversational question that never actually parks
 
 Violating the letter of the rules is violating the spirit of the rules.
 

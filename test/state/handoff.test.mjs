@@ -15,6 +15,33 @@ test('legalCallEdges: empty for a domain with no roleGraph', () => {
   assert.deepEqual(legalCallEdges(synthetic, 'assembling', 'implementer'), []);
 });
 
+// tsk-2t9c D14: discovery is machine-alone (no human interaction) but it
+// DOES call fgos-researching for real -- this edge was a genuine gap in
+// the original roleGraph, found while wiring fgos-coding-discovering.
+test('legal call: implementer --consult--> researcher at discovery (D14 correction)', () => {
+  const result = evaluateHandoff({
+    domain: coding,
+    stage: 'discovery',
+    fromRole: 'implementer',
+    toRole: 'researcher',
+    reason: 'consult',
+  });
+  assert.equal(result.ok, true);
+  assert.equal(result.edge.mode, 'sync');
+});
+
+test('discovery declares ONLY consult -- no advise, since discovery never asks a human directly', () => {
+  const result = evaluateHandoff({
+    domain: coding,
+    stage: 'discovery',
+    fromRole: 'implementer',
+    toRole: 'human-advisor',
+    reason: 'advise',
+  });
+  assert.equal(result.ok, false);
+  assert.deepEqual(result.legalEdges.map((e) => e.reason), ['consult']);
+});
+
 test('legal call: implementer --review--> reviewer at executing', () => {
   const result = evaluateHandoff({
     domain: coding,

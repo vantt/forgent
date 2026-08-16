@@ -82,6 +82,14 @@ bước 4/5.
 - Kết thúc bằng cách tự gọi `fgos discover --verdict ...` (xem Flow) rồi
   bàn giao — không bao giờ để lại cho một lệnh `fgos discover` mù ở sau
   tự phán lại (đúng tinh thần Native-First, tsk-27y D1/D2).
+- **Multi-role team harness (tsk-2t9c D1/D4/D9/D14): mỗi lần gọi helper
+  `fgos-researching` ở bước 3 là một call `consult` (sync) thật — ghi lại
+  bằng `fgos handoff` ngay sau khi có finding, không âm thầm bỏ qua.**
+  Đây là edge DUY NHẤT `roleGraph` khai cho stage `discovery` (D14 — sửa
+  từ một giả định sai trước đó rằng discovery hoàn toàn không có tương
+  tác role nào; thực tế nó vẫn consult researcher, chỉ là không bao giờ
+  hỏi người trực tiếp). Domain không khai `roleGraph` thì bỏ qua toàn bộ
+  mục này.
 
 ## Flow
 
@@ -106,6 +114,20 @@ bước 4/5.
    `docs/history/<feature>/RESEARCH.md` (tích luỹ, không đè) và trả về
    `{clear, verify?, question?}` cho TỪNG điểm — never tự đi research trực
    tiếp thay cho nó.
+
+   Ngay sau MỖI lần gọi (không gộp chờ hết mọi điểm mới ghi một lần), log
+   call `consult` (tsk-2t9c D9/D14):
+
+   ```bash
+   root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+   ```
+
+   ```bash
+   node "$root/bin/fgos.mjs" handoff "<item-id>" --to researcher --reason consult --outcome "<finding, một dòng>" --dir "$root"
+   ```
+
+   Sync — không đổi `holder`, chỉ ghi `call-summary`. Bỏ qua bước này khi
+   domain của item không khai `roleGraph`.
 
 4. **Tự phán.** Từ TOÀN BỘ finding thật vừa thu (không phải từ suy đoán
    hợp lý), quyết:
@@ -166,6 +188,8 @@ bước 4/5.
   luôn tự gọi verb ngay sau khi tự phán, không tách hai bước ra hai caller
   khác nhau)
 - chèn thẳng `title`/`description` chưa quote vào lệnh shell
+- gọi `fgos-researching` mà không log `handoff --reason consult` ngay sau
+  (khi domain có `roleGraph`) — biến tương tác thật thành vô hình trở lại
 
 Violating the letter of the rules is violating the spirit of the rules.
 

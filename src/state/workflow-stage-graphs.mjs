@@ -381,17 +381,27 @@ const codingDomain = {
     // interactions coding already runs today in implicit form, so this
     // registration changes nothing about how coding is actually worked,
     // only makes the pattern checkable and loggable:
-    //   consult (sync)  == fgos-researching, called mid exploring/planning/executing
+    //   consult (sync)  == fgos-researching, called from discovery/exploring/planning/executing
     //   assist  (sync)  == subagent fanout (Agent tool, fgos-fanout)
     //   review  (async) == fgos return -> awaiting-approval, the approve/reject loop
     //   advise  (async) == fgos ask/answer -> awaiting-human
-    // `discovery` carries no edges on purpose -- it is a machine-only pass
-    // (owned by fgos-coding-discovering), never a role interaction.
+    // `discovery` carries ONLY `consult` (tsk-2t9c D14 correction, found
+    // wiring fgos-coding-discovering: it genuinely calls fgos-researching
+    // from this stage -- the "machine-only" framing above described the
+    // ABSENCE of human interaction at this stage, never the absence of a
+    // role interaction altogether; `advise`/`ask` never fires here by the
+    // skill's own hard rule, but `consult` was a real gap, not a design
+    // choice). `edges.discovery` staying its own key (never falling back
+    // to `exploring`'s) is what lets it declare exactly this one edge and
+    // no others.
     roleGraph: Object.freeze({
       roles: Object.freeze(['implementer', 'researcher', 'reviewer', 'helper', 'human-advisor']),
       defaultRole: 'implementer',
       callstackCap: 3,
       edges: Object.freeze({
+        discovery: Object.freeze([
+          Object.freeze({ from: 'implementer', to: 'researcher', reason: 'consult', mode: 'sync' }),
+        ]),
         exploring: Object.freeze([
           Object.freeze({ from: 'implementer', to: 'human-advisor', reason: 'advise', mode: 'async' }),
           Object.freeze({ from: 'implementer', to: 'researcher', reason: 'consult', mode: 'sync' }),

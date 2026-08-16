@@ -33,6 +33,15 @@ domain: coding | position: reviewer | reason: review
 
 | Trigger | Call | To | Reason | Bóng về mang |
 |---|---|---|---|---|
-| A precondition the reality gate needs cannot be resolved from context in hand | consult (sync) | researcher | consult | finding |
-| A trigger (T1: real option comparison, T2: locked-decision conflict, T3: unwritable spec) fires after tier A is exhausted | advise (async) | human-advisor | advise | answer, folded into plan.md |
+| A precondition the reality gate needs cannot be resolved from context in hand (tier A's `fgos-researching` dispatch) | consult (sync) | researcher | consult | finding |
 | No trigger matches | — decide and fire the planning→executing edge — | | | |
+
+**No `advise` call from this task, even when a trigger (T1/T2/T3) fires.**
+The Gate's own "ask a person" branch has no `fgos ask`/`fgos answer`
+anywhere in it — every question is live, in-session, resolved the same
+turn via `fgos gate-approve --actor human`, never a real async park.
+`position: reviewer` above names the function this task performs
+(reviewing the plan), not the roleGraph's `reviewer` role — this task
+runs as `implementer` throughout, same as every other `planning`-stage
+task (tsk-2t9c D14/D15 — found wiring this skill for real; the previous
+`advise (async)` row here was inaccurate).

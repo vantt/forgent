@@ -33,5 +33,11 @@ domain: coding | stage: planning | position: implementer
 | Trigger | Call | To | Reason | Bóng về mang |
 |---|---|---|---|---|
 | A named library/pattern/precedent the session cannot resolve from context | consult (sync) | researcher | consult | finding |
-| `CONTEXT.md` turns out silent on something material to the plan | advise (async) | human-advisor | advise | answer, appended to CONTEXT.md as a new D-ID (via the exploring hand-back path) |
 | No trigger matches | — write the plan, hand off to validate-plan — | | | |
+
+**No direct `advise` call from this task.** A material `CONTEXT.md` gap
+hands back to `lock-decisions` (a skill dispatch, not a park) — THAT
+task's own `advise` row is what fires, only if its own Socratic re-entry
+genuinely needs to park via `fgos ask`. Firing `advise` here, before
+knowing that, would be wrong on every gap that resolves live (tsk-2t9c
+D14 correction — found wiring this skill for real).
