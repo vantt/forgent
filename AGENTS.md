@@ -117,24 +117,26 @@ above instead of stash-and-reset as a shortcut.
 
 ## Dispatch — routing work to a capacity
 
-`src/runner/dispatch.mjs` is the one door for deciding which executor a
-piece of work runs under and, where possible, running it. Its CLI surface
-(tsk-5tm) is three commands:
+**Before dispatching any task out of the current turn — a work item, a registered capacity, an ad-hoc task, or your own direct Agent/Task-tool call — run `node src/runner/dispatch.mjs decide` first. Never decide the mechanism yourself.** A `PreToolUse` hook enforces this on Agent/Task-tool calls: it runs `decide` for you and refuses the call when the answer comes back as anything other than `in-process`.
 
-- `decide <capacityId>` / `decide --for <purpose>` / `decide --work
-  <workId>` — resolves which executor a job should run under, without
-  running anything.
-- `execute` — runs the decided job directly for the adapter-resolvable
-  case (CLI/API/task-in-another-family); it only hands back to the caller
-  for the one case that needs a live, same-family session already
-  underway.
+Four ways to call `decide`, for four different situations:
 
-A new in-session skill that needs to dispatch to a capacity should not
-re-derive this branching logic. Point its reasoning step at the shared
-fragment `.claude/skills/_shared/capacity-dispatch-fallback.md` (mirrored
-byte-identical at `.agents/skills/_shared/`) instead — see
-`docs/how-to/reuse-the-shared-capacity-dispatch-fallback-fragment.md` for
-the full wiring steps.
+- `decide <capacityId>` — you already know the exact capacity name (e.g. `judge-discovery`).
+- `decide --for <purpose>` — you know what JOB you need done (e.g. `judge`), but not which capacity serves it.
+- `decide --work <id>` — you have a real work item and want it dispatched.
+- `decide --for <label> --needs-soul` — you are about to fire an Agent/Task tool yourself, with no capacity or work item to name.
+
+Add `--has-live-task-access` when you already have the Agent/Task tool in your own tool manifest. This is always your own self-declaration — never probed from the environment, never guessed.
+
+Three possible `mechanism` results, each needing a different response:
+
+- **`"unavailable"`** — nothing serves this. NOT an error: do it inline yourself, and report nothing.
+- **"in-process"** — call it yourself, with your own live capability: pass the returned agentType to your Agent/Task tool, or call the returned mcpTool directly. Dispatch cannot do this for you — it has neither an Agent/Task tool nor an MCP client of its own. When neither field is returned, use whichever agent type you would have used by default.
+- **`"out-of-process"`** — run `node src/runner/dispatch.mjs execute`. Never run the resolved command yourself through Bash: `execute` invokes the adapter and hands back the real result.
+
+Every result also carries `configured: true|false` — `false` means nothing is configured for that name or job, and the answer came from the default.
+
+A skill that dispatches should not re-derive any of this. Point its reasoning step at the shared fragment `.claude/skills/_shared/capacity-dispatch-fallback.md` (mirrored byte-identical at `.agents/skills/_shared/`).
 
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
