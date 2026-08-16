@@ -1946,7 +1946,7 @@ test('decideCapacityCli resolves "in-process" for a kind:"task" capacity when ha
     timeoutMs: 5000,
   });
   const decided = await decideCapacityCli('judge-discovery', { repoRoot: root, hasLiveTaskAccess: true });
-  assert.deepEqual(decided, { mechanism: 'in-process', agentType: 'judge' });
+  assert.deepEqual(decided, { mechanism: 'in-process', agentType: 'judge', configured: true });
 });
 
 test('decideCapacityCli resolves "out-of-process" for the same kind:"task" capacity when hasLiveTaskAccess is omitted (safe default), still reporting its agentType', async () => {
@@ -1958,7 +1958,7 @@ test('decideCapacityCli resolves "out-of-process" for the same kind:"task" capac
     timeoutMs: 5000,
   });
   const decided = await decideCapacityCli('judge-discovery', { repoRoot: root });
-  assert.deepEqual(decided, { mechanism: 'out-of-process', agentType: 'judge' });
+  assert.deepEqual(decided, { mechanism: 'out-of-process', agentType: 'judge', configured: true });
 });
 
 test('decideCapacityCli omits agentType entirely for a kind:"tool" capacity that declares none (tsk-3ik-3)', async () => {
@@ -1970,8 +1970,68 @@ test('decideCapacityCli omits agentType entirely for a kind:"tool" capacity that
     timeoutMs: 5000,
   });
   const decided = await decideCapacityCli('submit-assist-classify', { repoRoot: root, hasLiveTaskAccess: true });
-  assert.deepEqual(decided, { mechanism: 'out-of-process' });
+  assert.deepEqual(decided, { mechanism: 'out-of-process', configured: true });
   assert.ok(!('agentType' in decided));
+});
+
+// --- decideCapacityCli: --needs-soul (tsk-60f D2) — the caller's own
+// self-declaration that it is about to fire its own Agent/Task tool with
+// no capacity or work item to name; only consulted once capacityId/purpose/
+// work all come up empty, and generalizes --work's own pre-existing
+// hasExplicitCapacity===false default (below) to every door ------------------
+
+test('decideCapacityCli defaults to native dispatch for a bare --needs-soul call with no capacity/purpose/work to name, honoring hasLiveTaskAccess', async () => {
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const withAccess = await decideCapacityCli(undefined, { repoRoot: root, needsSoul: true, hasLiveTaskAccess: true });
+  assert.deepEqual(withAccess, { mechanism: 'in-process', configured: false });
+  const withoutAccess = await decideCapacityCli(undefined, { repoRoot: root, needsSoul: true });
+  assert.deepEqual(withoutAccess, { mechanism: 'out-of-process', configured: false });
+});
+
+test('decideCapacityCli --needs-soul defaults to native dispatch for an unregistered --for purpose, instead of "unavailable"', async () => {
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const decided = await decideCapacityCli(undefined, { repoRoot: root, for: 'general-purpose', needsSoul: true, hasLiveTaskAccess: true });
+  assert.deepEqual(decided, { mechanism: 'in-process', configured: false });
+});
+
+test('decideCapacityCli --needs-soul never overrides a real registered purpose match -- a real capacity still wins', async () => {
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capabilities: { judge: {} },
+    capacities: { gather: { kind: 'tool', for: ['judge'], command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const decided = await decideCapacityCli(undefined, { repoRoot: root, for: 'judge', needsSoul: true, hasLiveTaskAccess: true });
+  assert.deepEqual(decided, { mechanism: 'out-of-process', capacityId: 'gather', configured: true });
+});
+
+test('decideCapacityCli throws a usage RunnerConfigError when capacityId/--for/--work/--needs-soul are all missing', async () => {
+  await assert.rejects(() => decideCapacityCli(undefined, { repoRoot: mkTempDir() }), RunnerConfigError);
+});
+
+test('the "decide" CLI entry point parses --needs-soul', () => {
+  const { repoRoot } = mkTempGitRepo();
+  writeRunnerConfigFixture(repoRoot, { executor: { command: 'claude', args: ['{prompt}'] }, models: { standard: 'sonnet' }, timeoutMs: 5000 });
+  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
+  const result = spawnSync(
+    process.execPath,
+    [dispatchPath, 'decide', '--for', 'general-purpose', '--needs-soul', '--has-live-task-access'],
+    { encoding: 'utf8', cwd: repoRoot },
+  );
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(JSON.parse(result.stdout), { mechanism: 'in-process', configured: false });
 });
 
 // tsk-in1-4: these CLI-spawn tests used to run against THIS repo's own
@@ -2952,7 +3012,7 @@ test('decideCapacityCli resolves "unavailable" when nothing is registered for th
     timeoutMs: 5000,
   });
   const decided = await decideCapacityCli(undefined, { repoRoot: root, for: 'judge', hasLiveTaskAccess: true });
-  assert.deepEqual(decided, { mechanism: 'unavailable' });
+  assert.deepEqual(decided, { mechanism: 'unavailable', configured: false });
 });
 
 test('decideCapacityCli resolves purpose-based (--for) to the same result a positional capacityId would, plus the resolved capacityId', async () => {
@@ -2966,10 +3026,10 @@ test('decideCapacityCli resolves purpose-based (--for) to the same result a posi
   });
   const byPurpose = await decideCapacityCli(undefined, { repoRoot: root, for: 'judge', hasLiveTaskAccess: true });
   const byName = await decideCapacityCli('gather', { repoRoot: root, hasLiveTaskAccess: true });
-  assert.deepEqual(byPurpose, { mechanism: 'out-of-process', capacityId: 'gather' });
+  assert.deepEqual(byPurpose, { mechanism: 'out-of-process', capacityId: 'gather', configured: true });
   // Positional-id path stays byte-identical (no capacityId field) — every
   // pre-tsk-2c1 caller/test already asserts this exact shape.
-  assert.deepEqual(byName, { mechanism: 'out-of-process' });
+  assert.deepEqual(byName, { mechanism: 'out-of-process', configured: true });
 });
 
 // --- decideCapacityCli: work-item-shaped lookup (--work, D4/D12(iii),
@@ -3002,10 +3062,10 @@ test('decideCapacityCli resolves work-item-based (--work) to the same result a p
   });
   const byWork = await decideCapacityCli(undefined, { repoRoot: root, work: 'tsk-fanout-candidate', hasLiveTaskAccess: true });
   const byName = await decideCapacityCli('fgos-coding-implement', { repoRoot: root, hasLiveTaskAccess: true });
-  assert.deepEqual(byWork, { mechanism: 'in-process', agentType: 'general-purpose', capacityId: 'fgos-coding-implement' });
+  assert.deepEqual(byWork, { mechanism: 'in-process', agentType: 'general-purpose', capacityId: 'fgos-coding-implement', configured: true });
   // Positional-id path stays byte-identical (no capacityId field) -- every
   // pre-D4 caller/test already asserts this exact shape.
-  assert.deepEqual(byName, { mechanism: 'in-process', agentType: 'general-purpose' });
+  assert.deepEqual(byName, { mechanism: 'in-process', agentType: 'general-purpose', configured: true });
 });
 
 test('decideCapacityCli resolves work-item-based (--work) to "in-process" by default when the resolved capacityId has NO explicit cfg.capacities entry -- the real, common fgos-fanout case (D4 fix): a coding-domain work item is a same-provider, soul-needing rootTask (0026 rule 2), never the generic "no capacity -> out-of-process" fallback a NAMED capacityId lookup keeps unchanged', async () => {
@@ -3030,12 +3090,12 @@ test('decideCapacityCli resolves work-item-based (--work) to "in-process" by def
     timeoutMs: 5000,
   });
   const byWork = await decideCapacityCli(undefined, { repoRoot: root, work: 'tsk-fanout-unregistered', hasLiveTaskAccess: true });
-  assert.deepEqual(byWork, { mechanism: 'in-process', capacityId: 'fgos-coding-implement' });
+  assert.deepEqual(byWork, { mechanism: 'in-process', capacityId: 'fgos-coding-implement', configured: false });
   // The SAME unregistered capacityId, looked up by NAME (not --work), keeps
   // its pre-D4 byte-identical "no capacity -> out-of-process" behavior --
   // only the work-item-shaped lookup gets the native-first default.
   const byName = await decideCapacityCli('fgos-coding-implement', { repoRoot: root, hasLiveTaskAccess: true });
-  assert.deepEqual(byName, { mechanism: 'out-of-process' });
+  assert.deepEqual(byName, { mechanism: 'out-of-process', configured: false });
 });
 
 test('decideCapacityCli resolves work-item-based (--work) to "out-of-process" when the caller has no live Task access, even with no explicit cfg.capacities entry -- never claims in-process dishonestly', async () => {
@@ -3057,7 +3117,7 @@ test('decideCapacityCli resolves work-item-based (--work) to "out-of-process" wh
     timeoutMs: 5000,
   });
   const byWork = await decideCapacityCli(undefined, { repoRoot: root, work: 'tsk-fanout-no-live-access' });
-  assert.deepEqual(byWork, { mechanism: 'out-of-process', capacityId: 'fgos-coding-implement' });
+  assert.deepEqual(byWork, { mechanism: 'out-of-process', capacityId: 'fgos-coding-implement', configured: false });
 });
 
 test('decideCapacityCli throws a RunnerConfigError when --work names a work item that does not exist -- never silently "unavailable" (a typo/stale id is a real usage error, unlike an unconfigured purpose)', async () => {
@@ -3097,7 +3157,7 @@ test('a positional capacityId still wins over --work when both are somehow passe
     timeoutMs: 5000,
   });
   const decided = await decideCapacityCli('explicit', { repoRoot: root, work: 'tsk-fanout-candidate-2', hasLiveTaskAccess: true });
-  assert.deepEqual(decided, { mechanism: 'out-of-process' });
+  assert.deepEqual(decided, { mechanism: 'out-of-process', configured: true });
 });
 
 test('the "decide" CLI entry point resolves --work <id> the same way as a positional capacityId', () => {
@@ -3125,7 +3185,7 @@ test('the "decide" CLI entry point resolves --work <id> the same way as a positi
     { encoding: 'utf8', cwd: repoRoot },
   );
   assert.equal(result.status, 0, result.stderr);
-  assert.deepEqual(JSON.parse(result.stdout), { mechanism: 'in-process', agentType: 'general-purpose', capacityId: 'fgos-coding-implement' });
+  assert.deepEqual(JSON.parse(result.stdout), { mechanism: 'in-process', agentType: 'general-purpose', capacityId: 'fgos-coding-implement', configured: true });
 });
 
 test('resolveCapacityCli rejects with a usage RunnerConfigError when both capacityId and --for are missing', async () => {
@@ -3184,7 +3244,7 @@ test('the "decide" CLI entry point resolves --for <purpose> the same way as a po
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
   const result = spawnSync(process.execPath, [dispatchPath, 'decide', '--for', 'no-such-purpose-configured'], { encoding: 'utf8', cwd: repoRoot });
   assert.equal(result.status, 0, result.stderr);
-  assert.deepEqual(JSON.parse(result.stdout), { mechanism: 'unavailable' });
+  assert.deepEqual(JSON.parse(result.stdout), { mechanism: 'unavailable', configured: false });
 });
 
 test('the "resolve" CLI entry point honors --carries, threading it through end to end', () => {

@@ -1827,14 +1827,36 @@ export async function executeCapacityCli(
  * Lowest precedence of the three selectors (a real `capacityIdArg` always
  * wins, `for` next, matching every pre-D4 caller's byte-identical
  * behavior) since no existing caller ever passes more than one.
+ *
+ * `needsSoul` (tsk-60f D2): the caller's own self-declaration that it is
+ * about to fire its own Agent/Task tool with no capacity or work item to
+ * name -- the natural fourth signal `decide` never had, distinct from a
+ * fourth lookup door (an explicit `--subtask` door was rejected: a
+ * sub-task's only natural key is a purpose label, i.e. `for`). Only
+ * consulted once every capacityId/purpose/work resolution above came up
+ * empty (a real match always wins, unchanged): when `needsSoul` is true,
+ * that empty resolution defaults to native dispatch
+ * (`hasNativeMechanism: true`) instead of `"unavailable"` -- the exact
+ * generalization of `work`'s own `hasExplicitCapacity === false` branch
+ * above, which has hardcoded this same default for every `--work` caller
+ * since tsk-5tm-6.
+ *
+ * `configured` (tsk-60f D3, additive on every returned shape): `true` when
+ * the resolved `capacityId` names a real `cfg.capacities` entry, `false`
+ * otherwise -- distinguishing "nothing registered under this name/purpose"
+ * from "registered, and its own kind resolves out-of-process", which today
+ * both silently collapse into the same `mechanism: "out-of-process"`
+ * value. Never a reason to throw (D3): a work item whose own
+ * `capacityIdForWork` result has no override configured is `configured:
+ * false` by design (tsk-in1 D12), not an error.
  */
 export async function decideCapacityCli(
   capacityIdArg,
-  { cwd = process.cwd(), repoRoot, hasLiveTaskAccess = false, for: purpose, work: workIdArg } = {},
+  { cwd = process.cwd(), repoRoot, hasLiveTaskAccess = false, for: purpose, work: workIdArg, needsSoul = false } = {},
 ) {
-  if (!capacityIdArg && !purpose && !workIdArg) {
+  if (!capacityIdArg && !purpose && !workIdArg && !needsSoul) {
     throw new RunnerConfigError(
-      'usage: node src/runner/dispatch.mjs decide <capacityId> [--has-live-task-access] | decide --for <purpose> [--has-live-task-access] | decide --work <workId> [--has-live-task-access]',
+      'usage: node src/runner/dispatch.mjs decide <capacityId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--has-live-task-access] | decide --needs-soul [--has-live-task-access]',
     );
   }
   // Same main-checkout resolution as resolveCapacityCli above, same reason.
@@ -1871,7 +1893,7 @@ export async function decideCapacityCli(
     const hasExplicitCapacity = Boolean(cfg.capacities && typeof cfg.capacities === 'object' && cfg.capacities[capacityId]);
     if (!hasExplicitCapacity) {
       const mechanism = decideDispatchMechanism({ hasNativeMechanism: true, hasLiveTaskAccess, forceCliSpawn: false });
-      return { mechanism, capacityId };
+      return { mechanism, capacityId, configured: false };
     }
   }
   // Purpose-based binding, same precedence as resolveCapacityCli above. No
@@ -1885,11 +1907,21 @@ export async function decideCapacityCli(
     capacityId = resolveCapacityIdForPurpose(cfg, purpose);
   }
   if (!capacityId) {
-    return { mechanism: 'unavailable' };
+    // needsSoul (D2): an empty resolution defaults to native dispatch
+    // instead of "unavailable" -- same default `work`'s own
+    // hasExplicitCapacity branch above already hardcodes, generalized to
+    // every door.
+    if (needsSoul) {
+      const mechanism = decideDispatchMechanism({ hasNativeMechanism: true, hasLiveTaskAccess, forceCliSpawn: false });
+      return { mechanism, configured: false };
+    }
+    return { mechanism: 'unavailable', configured: false };
   }
   const mechanism = decideCapacityDispatchMechanism(cfg, capacityId, { hasLiveTaskAccess });
-  const agentType = cfg.capacities?.[capacityId]?.agentType;
-  const base = typeof agentType === 'string' && agentType ? { mechanism, agentType } : { mechanism };
+  const capacity = cfg.capacities && typeof cfg.capacities === 'object' ? cfg.capacities[capacityId] : undefined;
+  const configured = Boolean(capacity);
+  const agentType = capacity?.agentType;
+  const base = typeof agentType === 'string' && agentType ? { mechanism, agentType, configured } : { mechanism, configured };
   return resolvedIndirectly ? { ...base, capacityId } : base;
 }
 
@@ -1948,6 +1980,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       hasLiveTaskAccess: rest.includes('--has-live-task-access'),
       for: flagValue('--for'),
       work: flagValue('--work'),
+      needsSoul: rest.includes('--needs-soul'),
     }).then(
       (decided) => {
         process.stdout.write(`${JSON.stringify(decided)}\n`);
