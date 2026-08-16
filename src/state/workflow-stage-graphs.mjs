@@ -647,10 +647,26 @@ export function stageForStep(domain, step) {
  * `undefined` when `domain` declares no `workflows` at all (every domain
  * but `coding` today), the same "this axis does not apply here" shape
  * `roleGraphFor`/`classificationVocabulary` already use one field over.
- * `domain.stages`/`stepMap`/`transitions` stay valid to read directly for
- * a domain that HAS `workflows` too — they are the same references as
- * `resolveWorkflow(domain, domain.defaultWorkflow).stages` etc., not a
- * second, possibly-drifting copy. */
+ *
+ * `domain.stages`/`stepMap`/`transitions` stay valid to read directly
+ * even once a domain registers a SECOND, genuinely different workflow —
+ * not because they happen to be reference-identical to
+ * `resolveWorkflow(domain, domain.defaultWorkflow)` today (D16 retracts
+ * that framing; it was only ever true by coincidence of nothing else
+ * being registered yet), but because `kind` — the only thing that could
+ * make an item's own resolved workflow diverge from the domain's default
+ * — is locked the moment `status` leaves `todo` (`editWork`'s own guard,
+ * `src/state/store.mjs`). An item only ever walks a stage graph once
+ * claimed (`status: 'doing'` onward), and by then `kind` can no longer
+ * change under it — so a caller resolving an item's stage graph through
+ * `resolveWorkflow(domain, work.kind)` and a caller reading
+ * `domain.stages` directly agree for that item's ENTIRE walk, without
+ * needing a separate frozen `work.workflow` field or a second write
+ * door. This still means: a caller that genuinely needs the correct
+ * per-item graph should resolve through `resolveWorkflow`, not assume
+ * `domain.stages` is always right — the guarantee above is why direct
+ * reads happen to be SAFE today, not a license to keep skipping the
+ * resolver once a real second workflow exists to differ. */
 export function resolveWorkflow(domain, kind) {
   if (!domain?.workflows) return undefined;
   const name = (kind !== undefined && domain.workflowFor?.[kind]) || domain.defaultWorkflow;

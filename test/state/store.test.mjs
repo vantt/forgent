@@ -520,6 +520,49 @@ test('a valid DAG add and a valid DAG edit are still accepted unchanged through 
   assert.deepEqual(listWork(dir).work['dag-b'].deps, ['dag-a', 'dag-c']);
 });
 
+// tsk-2t9c D16: `kind` selects an item's workflow/stage graph
+// (`resolveWorkflow`). Locking it once `status` leaves `todo` means kind
+// can never drift out from under a stage graph the item is actively
+// walking, without needing a separate frozen `workflow` field or a new
+// validated-change verb.
+test('editWork accepts a kind patch while status is still todo', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'kind-todo', { kind: 'task' });
+  editWork(dir, { id: 'kind-todo', patch: { kind: 'bug' } });
+  assert.equal(listWork(dir).work['kind-todo'].kind, 'bug');
+});
+
+test('editWork refuses a kind patch once status has left todo (doing)', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'kind-doing', { kind: 'task' });
+  moveWork(dir, { id: 'kind-doing', to: 'doing', expectedStatus: 'todo' });
+  assert.throws(
+    () => editWork(dir, { id: 'kind-doing', patch: { kind: 'bug' } }),
+    /kind.*status is "doing", not "todo"/s,
+  );
+  // the item's kind must stay unchanged — the patch never landed
+  assert.equal(listWork(dir).work['kind-doing'].kind, 'task');
+});
+
+test('editWork refuses a kind patch on a delivered item too (not just doing)', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'kind-delivered', { kind: 'task' });
+  moveWork(dir, { id: 'kind-delivered', to: 'doing', expectedStatus: 'todo' });
+  moveWork(dir, { id: 'kind-delivered', to: 'delivered', expectedStatus: 'doing' });
+  assert.throws(
+    () => editWork(dir, { id: 'kind-delivered', patch: { kind: 'bug' } }),
+    /kind.*status is "delivered", not "todo"/s,
+  );
+});
+
+test('editWork still accepts an unrelated-field patch once status has left todo — the kind lock is scoped to kind alone', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'kind-lock-scoped', { kind: 'task' });
+  moveWork(dir, { id: 'kind-lock-scoped', to: 'doing', expectedStatus: 'todo' });
+  editWork(dir, { id: 'kind-lock-scoped', patch: { priority: 5 } });
+  assert.equal(listWork(dir).work['kind-lock-scoped'].priority, 5);
+});
+
 test('a dep to an unknown id is still rejected by the existing existence check first, before the cycle guard runs', () => {
   const dir = tmpDir();
   assert.throws(

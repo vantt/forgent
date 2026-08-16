@@ -2,6 +2,36 @@
 
 ## 1. Trạng thái hiện tại
 
+**Cập nhật 2026-08-16 (round 5) — D17: FIX GỌN GÀNG HƠN CHO WORKFLOW/KIND.**
+Sau D16, người dùng hỏi tiếp: "fgos-coding-driving có nên là cross/inter-
+workflow router cho 1 domain không, hay bug/chore lại cần driving riêng".
+Bung 1 agent Opus độc lập đọc code thật, trả lời: KHÔNG cần driving riêng
+(mọi điều kiện dừng của loop nằm trên trục status dùng chung, workflow chỉ
+đổi stage graph) — nhưng phát hiện lỗ hổng khác nặng hơn: `resolveWorkflow`
+chưa có nơi nào gọi thật (0 production callers), và `kind` (thứ chọn
+workflow) nằm trong `EDITABLE_FIELDS`, sửa tự do không kiểm tra — sửa
+`kind` giữa chừng có thể âm thầm đổi cả stage graph của item.
+
+Em đề xuất "thêm field `work.workflow` ghim 1 lần + verb đổi có kiểm
+tra" — người dùng bác thẳng: verb "đổi có kiểm tra" chỉ là mở lại đúng lỗ
+hổng dưới vỏ bọc an toàn ("em đang để ra một vấn đề về security mà lại đi
+mở đường cho hưu chạy"). Người dùng tự đề xuất fix đúng: khoá `kind`
+ngay khi `status` rời `todo`, không cần field `workflow` riêng.
+
+Verify trước khi làm: `fgos-coding-driving`'s hard rule xác nhận claim
+(`todo`→`doing`) chỉ xảy ra ngay trước lần gọi đầu tiên vào skill
+`executing` — nghĩa là discovery/exploring/planning LUÔN chạy khi
+`status` còn `todo`. Grep ra đúng 3 chỗ ghi `kind`: `submit` (tạo),
+`discover` (phán lại có bằng chứng — LUÔN chạy lúc còn `todo`), `edit`
+(tự do, không kiểm soát — đây mới là lỗ hổng thật). Vậy khoá `kind` ở
+`editWork` khi `status !== 'todo'` không hề chặn nhánh `discover` hợp lệ.
+
+Đã sửa: `store.mjs`'s `editWork` (guard mới), `workflow-stage-graphs.mjs`
+(sửa lại doc comment của `resolveWorkflow` — không còn nói sai "đọc
+`domain.stages` thẳng luôn an toàn", giờ giải thích đúng là nhờ kind-lock
+chứ không phải trùng hợp). 4 test mới, `npm test`: 3379 pass/5 skip/0
+fail (tăng từ 3375). **Chưa commit.**
+
 **Cập nhật 2026-08-16 (round 4) — D16: REVIEW ĐỘC LẬP + FIX HẾT BUG.**
 Người dùng: "Get an independent review of the D14+D15 batch". Bung một
 `code-reviewer` agent hoàn toàn mới (không chia sẻ context, để review

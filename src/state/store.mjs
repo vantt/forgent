@@ -312,6 +312,27 @@ export function editWork(dir, { id, patch, role } = {}) {
         );
       }
     }
+    // tsk-2t9c D16: `kind` selects which workflow's stage graph an item
+    // follows (`resolveWorkflow`, `src/state/workflow-stage-graphs.mjs`).
+    // `status: 'todo'` is the ONLY status a claimed item's `stage` is still
+    // free to move through discovery/exploring/planning under -- claim
+    // (`todo` -> `doing`) happens right before the FIRST invocation of the
+    // `executing`-stage skill, never earlier (fgos-coding-driving's own
+    // hard rule), so every stage-graph-consuming call an item makes while
+    // still `todo` already reflects `kind`'s CURRENT value at read time.
+    // Refusing this edit once `status` has left `todo` means `kind` can
+    // never drift out from under a stage graph the item is actively
+    // walking -- no separate frozen `workflow` field needed, no second
+    // write door, no validated-change verb to get subtly wrong: `kind`
+    // itself simply stops being a live variable once it would matter.
+    if (patch.kind !== undefined && work.status !== 'todo') {
+      throw new StoreError(
+        'validation',
+        `edit cannot change "kind" on work "${id}" -- status is "${work.status}", not "todo". `
+        + `kind selects the item's workflow/stage graph; it can only change while status is still todo, `
+        + `before a claim lets the item start walking that graph.`,
+      );
+    }
 
     // Per work-item-title-contract D2/D5, the same title bound addWork applies,
     // applied to the PATCH rather than to the candidate: the event this door
