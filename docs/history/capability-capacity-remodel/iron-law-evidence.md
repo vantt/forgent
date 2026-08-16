@@ -50,6 +50,40 @@ shape validation, load-time symmetry, and end-to-end
 `spawnWorker`/`executeCapacityCli`/`decideCapacityCli` resolution via
 `capabilities.<name>.prefer`).
 
+## Self-review round — failing-test-first proof (post-return, before approval)
+
+The user asked for a deep self-review before merging (see `plan.md`'s own
+"Self-review addendum" for the 3 bugs found and fixed). Same discipline,
+one representative case (`overrides.tier`/`.model` were validated but
+never applied — the most consequential of the three):
+
+**Red** (`src/runner/dispatch.mjs` reverted to `898ebe4b~1`, the commit
+immediately before this fix round, running the new test that proves it):
+
+```
+✖ executeCapacityCli honors capabilities.<name>.overrides.tier/model directly -- found by self-review: these two fields validated as legal (validateCapabilitiesShape) but were never actually consulted anywhere until this fix
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  + 'agy-standard-model'
+  - 'agy-override-model'
+```
+
+**Green** (`git checkout HEAD -- src/runner/dispatch.mjs`, restoring the
+fix):
+
+```
+✔ executeCapacityCli honors capabilities.<name>.overrides.tier/model directly -- ...
+ℹ pass 1
+ℹ fail 0
+```
+
+`git status --short src/runner/dispatch.mjs` after restore: clean, no
+diff. Full suite after this round: 3479 pass / 0 fail (up from 3474 — 7
+new regression tests: the `--for`-vs-positional overrides parity, the
+`tier`/`model` direct-override case above, an explicit-caller-override-
+always-wins case, and the `allowCrossProvider` remediation-message
+precision fix).
+
 ## Live migration proof (D3)
 
 Real `.fgos/config.json` migrated: `capacities.fgos-coding-implement`
