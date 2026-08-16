@@ -6,7 +6,6 @@ import path from 'node:path';
 import { execFileSync, spawn, fork } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import {
-  detectTrunk,
   classifySource,
   reviewDiff,
   mergeRunnerItem,
@@ -22,7 +21,9 @@ import {
   MergeError,
 } from '../../src/runner/merge.mjs';
 import { writeSharedConfig } from '../../src/config/shared-config-file.mjs';
-import { branchNameFor, withMergeEphemeralWorktree } from '../../src/runner/worktree.mjs';
+// detectTrunk moved to runner/worktree.mjs (tsk-49i D1) — its cases stay in
+// this file, next to the merge behavior that resolves a target through it.
+import { branchNameFor, withMergeEphemeralWorktree, detectTrunk } from '../../src/runner/worktree.mjs';
 import { acquireMainCheckoutLock, mergeSlotLockFile, ACQUIRED, DEFAULT_TTL_MS } from '../../src/runner/main-checkout-lock.mjs';
 
 // Every test here creates its own disposable git repo (mirrors

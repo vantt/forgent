@@ -12,9 +12,14 @@ import { driftStatus, unmergedDeliveries } from '../../src/state/drift-status.mj
 // honest way to prove its ahead/behind math (plan.md's risk-map proof
 // point for this item).
 
+// Both exported functions take the trunk branch name as a REQUIRED option
+// (tsk-49i D1) instead of detecting it themselves — initRepo below creates
+// every fixture repo on this branch name.
+const TRUNK = 'main';
+
 function initRepo() {
   const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-drift-test-repo-'));
-  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
+  execFileSync('git', ['init', '-q', '-b', TRUNK], { cwd: repoRoot });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
   fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
@@ -45,13 +50,13 @@ function item(id, overrides = {}) {
 test('driftStatus returns empty object for a view with no roots (no item has a parent)', () => {
   const repoRoot = initRepo();
   const view = { work: { a: item('a'), b: item('b') } };
-  assert.deepEqual(driftStatus(repoRoot, view), {});
+  assert.deepEqual(driftStatus(repoRoot, view, { trunk: TRUNK }), {});
 });
 
 test('driftStatus omits a root whose fgw/<id> branch does not exist locally', () => {
   const repoRoot = initRepo();
   const view = { work: { root: item('root'), leaf: item('leaf', { parent: 'root' }) } };
-  assert.deepEqual(driftStatus(repoRoot, view), {});
+  assert.deepEqual(driftStatus(repoRoot, view, { trunk: TRUNK }), {});
 });
 
 test('driftStatus: a root branch level with main reports zero drift, needsSync false', () => {
@@ -60,7 +65,7 @@ test('driftStatus: a root branch level with main reports zero drift, needsSync f
   git(repoRoot, ['checkout', '-q', 'main']);
   const view = { work: { root: item('root'), leaf: item('leaf', { parent: 'root' }) } };
 
-  const result = driftStatus(repoRoot, view);
+  const result = driftStatus(repoRoot, view, { trunk: TRUNK });
   assert.equal(result.root.branch, 'fgw/root');
   assert.equal(result.root.target, 'main');
   assert.equal(result.root.aheadOfTarget, 0);
@@ -77,7 +82,7 @@ test('driftStatus: a root branch ahead of main is flagged needsSync (reproduces 
   git(repoRoot, ['checkout', '-q', 'main']);
   const view = { work: { root: item('root'), leaf: item('leaf', { parent: 'root' }) } };
 
-  const result = driftStatus(repoRoot, view);
+  const result = driftStatus(repoRoot, view, { trunk: TRUNK });
   assert.equal(result.root.aheadOfTarget, 2);
   assert.equal(result.root.behindTarget, 0);
   assert.equal(result.root.needsSync, true);
@@ -90,7 +95,7 @@ test('driftStatus: a resolved (delivered) root ahead of main is NOT flagged need
   git(repoRoot, ['checkout', '-q', 'main']);
   const view = { work: { root: item('root', { status: 'delivered' }), leaf: item('leaf', { parent: 'root' }) } };
 
-  const result = driftStatus(repoRoot, view);
+  const result = driftStatus(repoRoot, view, { trunk: TRUNK });
   assert.equal(result.root.aheadOfTarget, 1);
   assert.equal(result.root.needsSync, false);
 });
@@ -102,7 +107,7 @@ test('driftStatus: main ahead of an untouched root branch reports behindTarget, 
   commitFile(repoRoot, 'trunk-moved-on.txt', 'main advanced after the root branch was cut\n');
   const view = { work: { root: item('root'), leaf: item('leaf', { parent: 'root' }) } };
 
-  const result = driftStatus(repoRoot, view);
+  const result = driftStatus(repoRoot, view, { trunk: TRUNK });
   assert.equal(result.root.aheadOfTarget, 0);
   assert.equal(result.root.behindTarget, 1);
   assert.equal(result.root.needsSync, false);
@@ -122,7 +127,7 @@ test('driftStatus: a nested root targets fgw/<parentId>, not main', () => {
     },
   };
 
-  const result = driftStatus(repoRoot, view);
+  const result = driftStatus(repoRoot, view, { trunk: TRUNK });
   assert.equal(result.root.target, 'fgw/grandroot');
   assert.equal(result.root.aheadOfTarget, 1);
   assert.equal(result.root.needsSync, true);
@@ -144,7 +149,7 @@ test('driftStatus omits a nested root whose target parent branch does not exist'
       leaf: item('leaf', { parent: 'root' }),
     },
   };
-  assert.deepEqual(driftStatus(repoRoot, view), {});
+  assert.deepEqual(driftStatus(repoRoot, view, { trunk: TRUNK }), {});
 });
 
 // tsk-4qu: the invariant checkRootDrift's stranded-work report is built on.
@@ -170,7 +175,7 @@ test('driftStatus still measures aheadOfTarget for a RESOLVED root, while keepin
         leaf: item('leaf', { parent: 'root', status }),
       },
     };
-    const result = driftStatus(repoRoot, view);
+    const result = driftStatus(repoRoot, view, { trunk: TRUNK });
     assert.equal(result.root.aheadOfTarget, 1, `ahead count must stay real for a "${status}" root`);
     assert.equal(result.root.needsSync, false, `needsSync must stay false for a "${status}" root`);
   }
@@ -208,7 +213,7 @@ test('driftStatus routes to trunk once the parent root has resolved -- reproduce
     },
   };
 
-  const result = driftStatus(repoRoot, view);
+  const result = driftStatus(repoRoot, view, { trunk: TRUNK });
   assert.equal(result.child.target, 'main', 'target must be trunk once the parent has resolved, never the parent\'s own frozen branch');
   // Real numbers against main: child is ahead by its own one commit, and
   // behind by main's own --no-ff merge commit plus its one later commit --
@@ -239,7 +244,7 @@ test('unmergedDeliveries ignores items that are not handed over yet', () => {
       b: item('b', { status: 'awaiting-approval' }),
     },
   };
-  assert.deepEqual(unmergedDeliveries(repoRoot, view), {});
+  assert.deepEqual(unmergedDeliveries(repoRoot, view, { trunk: TRUNK }), {});
 });
 
 test('unmergedDeliveries ignores wontfix — an abandoned branch is meant to sit outside trunk', () => {
@@ -247,13 +252,13 @@ test('unmergedDeliveries ignores wontfix — an abandoned branch is meant to sit
   checkoutNewBranch(repoRoot, 'fgw/a');
   commitFile(repoRoot, 'a.txt', 'a');
   const view = { work: { a: item('a', { status: 'wontfix' }) } };
-  assert.deepEqual(unmergedDeliveries(repoRoot, view), {});
+  assert.deepEqual(unmergedDeliveries(repoRoot, view, { trunk: TRUNK }), {});
 });
 
 test('unmergedDeliveries omits a delivered item with no local branch — a cleaned-up branch is not an alarm', () => {
   const repoRoot = initRepo();
   const view = { work: { a: item('a', { status: 'delivered' }) } };
-  assert.deepEqual(unmergedDeliveries(repoRoot, view), {});
+  assert.deepEqual(unmergedDeliveries(repoRoot, view, { trunk: TRUNK }), {});
 });
 
 test('unmergedDeliveries omits a delivered item whose branch really did reach trunk', () => {
@@ -262,7 +267,7 @@ test('unmergedDeliveries omits a delivered item whose branch really did reach tr
   commitFile(repoRoot, 'a.txt', 'a');
   mergeBranch(repoRoot, 'fgw/a', 'main');
   const view = { work: { a: item('a', { status: 'delivered' }) } };
-  assert.deepEqual(unmergedDeliveries(repoRoot, view), {});
+  assert.deepEqual(unmergedDeliveries(repoRoot, view, { trunk: TRUNK }), {});
 });
 
 test('unmergedDeliveries reports a delivered item whose branch merged nowhere — the tsk-64h/tsk-2t5 case', () => {
@@ -270,7 +275,7 @@ test('unmergedDeliveries reports a delivered item whose branch merged nowhere �
   checkoutNewBranch(repoRoot, 'fgw/a');
   commitFile(repoRoot, 'a.txt', 'a');
   const view = { work: { a: item('a', { status: 'delivered' }) } };
-  assert.deepEqual(unmergedDeliveries(repoRoot, view), {
+  assert.deepEqual(unmergedDeliveries(repoRoot, view, { trunk: TRUNK }), {
     a: { branch: 'fgw/a', status: 'delivered', landedOn: null, unmatched: 1 },
   });
 });
@@ -288,7 +293,7 @@ test('unmergedDeliveries reports every handed-over status, not just delivered', 
       d: item('d', { status: 'done' }),
     },
   };
-  assert.deepEqual(Object.keys(unmergedDeliveries(repoRoot, view)).sort(), ['c', 'd', 'r']);
+  assert.deepEqual(Object.keys(unmergedDeliveries(repoRoot, view, { trunk: TRUNK })).sort(), ['c', 'd', 'r']);
 });
 
 test('unmergedDeliveries names the parent branch when a leaf landed there and the root has not synced', () => {
@@ -307,7 +312,7 @@ test('unmergedDeliveries names the parent branch when a leaf landed there and th
   };
   // The leaf merged correctly; only the root is behind. Re-merging the leaf
   // would be the wrong fix, so the report has to say where it landed.
-  assert.deepEqual(unmergedDeliveries(repoRoot, view), {
+  assert.deepEqual(unmergedDeliveries(repoRoot, view, { trunk: TRUNK }), {
     leaf: { branch: 'fgw/leaf', status: 'delivered', landedOn: 'fgw/root', unmatched: 2 },
   });
 });
@@ -325,7 +330,7 @@ test('unmergedDeliveries reports landedOn null for a leaf that never reached its
       leaf: item('leaf', { status: 'delivered', parent: 'root' }),
     },
   };
-  assert.equal(unmergedDeliveries(repoRoot, view).leaf.landedOn, null);
+  assert.equal(unmergedDeliveries(repoRoot, view, { trunk: TRUNK }).leaf.landedOn, null);
 });
 
 test('unmergedDeliveries omits a branch whose commits all have a patch-equivalent on trunk', () => {
@@ -341,7 +346,7 @@ test('unmergedDeliveries omits a branch whose commits all have a patch-equivalen
   git(repoRoot, ['cherry-pick', branchTip]);
 
   const view = { work: { a: item('a', { status: 'delivered' }) } };
-  assert.deepEqual(unmergedDeliveries(repoRoot, view), {});
+  assert.deepEqual(unmergedDeliveries(repoRoot, view, { trunk: TRUNK }), {});
 });
 
 test('unmergedDeliveries counts only the commits with no patch-equivalent on trunk', () => {
@@ -356,7 +361,7 @@ test('unmergedDeliveries counts only the commits with no patch-equivalent on tru
 
   const view = { work: { a: item('a', { status: 'delivered' }) } };
   // Two commits ahead, but one already landed — only the other is missing.
-  assert.equal(unmergedDeliveries(repoRoot, view).a.unmatched, 1);
+  assert.equal(unmergedDeliveries(repoRoot, view, { trunk: TRUNK }).a.unmatched, 1);
 });
 
 test('unmergedDeliveries omits a branch whose tree is identical to its fork point', () => {
@@ -371,7 +376,7 @@ test('unmergedDeliveries omits a branch whose tree is identical to its fork poin
   git(repoRoot, ['merge', '-q', '--no-ff', '-m', 'merge main into fgw/a', 'main']);
 
   const view = { work: { a: item('a', { status: 'delivered' }) } };
-  assert.deepEqual(unmergedDeliveries(repoRoot, view), {});
+  assert.deepEqual(unmergedDeliveries(repoRoot, view, { trunk: TRUNK }), {});
 });
 
 test('unmergedDeliveries does not count merge commits as unmatched work', () => {
@@ -385,7 +390,7 @@ test('unmergedDeliveries does not count merge commits as unmatched work', () => 
   const view = { work: { a: item('a', { status: 'delivered' }) } };
   // Three commits ahead (own + side + the merge); only the two real patches
   // count, never the merge commit itself.
-  assert.equal(unmergedDeliveries(repoRoot, view).a.unmatched, 2);
+  assert.equal(unmergedDeliveries(repoRoot, view, { trunk: TRUNK }).a.unmatched, 2);
 });
 
 test('driftStatus reports carriesContent false for a root that only merged its target back in', () => {
@@ -400,7 +405,7 @@ test('driftStatus reports carriesContent false for a root that only merged its t
   git(repoRoot, ['merge', '-q', '--no-ff', '-m', 'merge main into fgw/root', 'main']);
 
   const view = { work: { root: item('root'), leaf: item('leaf', { parent: 'root' }) } };
-  const result = driftStatus(repoRoot, view);
+  const result = driftStatus(repoRoot, view, { trunk: TRUNK });
   assert.equal(result.root.carriesContent, false);
   assert.ok(result.root.aheadOfTarget > 0, 'still counts as ahead by commits');
   assert.equal(result.root.needsSync, true, 'needsSync is deliberately unchanged');
@@ -412,5 +417,5 @@ test('driftStatus reports carriesContent true for a root with real work of its o
   commitFile(repoRoot, 'own.txt', 'own');
 
   const view = { work: { root: item('root'), leaf: item('leaf', { parent: 'root' }) } };
-  assert.equal(driftStatus(repoRoot, view).root.carriesContent, true);
+  assert.equal(driftStatus(repoRoot, view, { trunk: TRUNK }).root.carriesContent, true);
 });

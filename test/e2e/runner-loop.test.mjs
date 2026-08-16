@@ -910,7 +910,7 @@ test('e2e crash-idempotency: runner killed mid-item (after doing, before propose
 
 // --- --watch (str7-str8-priority-intent D8) ---------------------------------
 // Async spawn+kill pattern (not spawnSync, which blocks until exit and
-// cannot deliver a mid-run signal) mirrors test/runner/session-identity
+// cannot deliver a mid-run signal) mirrors test/util/session-identity
 // .test.mjs's real spawned-process test (~lines 87-139): spawn, await a
 // stdout marker via a Promise, act on the live child, assert, SIGKILL in a
 // `finally` so a bug here fails loudly instead of hanging the suite.

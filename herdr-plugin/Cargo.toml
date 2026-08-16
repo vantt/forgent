@@ -46,6 +46,39 @@ rhai = { version = "1", features = ["serde"] }
 # (`docs/contracts/fgos-gateway-api-v1.yaml`) into a queryable operation list
 # instead of serving it as an opaque string the way `/contract` already does.
 serde_yaml = "0.9"
+# tsk-54y: CORS layer for `build_router` -- the web client (a separate
+# static bundle, D2 of docs/history/herdr-web-dashboard-plan-realignment/
+# CONTEXT.md) is not guaranteed to share origin with the gateway. Version
+# resolved by `cargo add --dry-run` against this crate's existing axum 0.8
+# dependency graph (docs/history/tsk-54y-gateway-cors-bind/plan.md).
+tower-http = { version = "0.7", features = ["cors", "fs"] }
+# tsk-48w (D14 of docs/history/herdr-web-dashboard-plan-realignment/
+# CONTEXT.md): embeds herdr-plugin/web's built bundle into the binary so
+# the "máy được chọn" can serve it with no separate deploy step.
+# Versions resolved by real `cargo add --dry-run` against this crate's
+# existing dependency graph (docs/history/herdr-web-dashboard/plan.md,
+# "NẮN LẠI P1 tsk-48w"): rust-embed 8.12.0, axum-embed 0.1.0, same
+# rust-embed major line the reference implementation herdr-gateway pins.
+rust-embed = { version = "8", features = ["debug-embed"] }
+axum-embed = "0.1"
+# tsk-6arn (D8): Cloudflare Access as auth layer 2, additive to the
+# Bearer token layer already shipped (tsk-7l9). Ported from the reference
+# implementation herdr-gateway (crate herdr-go, src/web/cf_access.rs).
+# Versions resolved by real `cargo add --dry-run` against this crate's
+# existing dependency graph -- differ from the reference's own pins
+# (jsonwebtoken 9->11, reqwest 0.12->0.13; reqwest's TLS feature was
+# renamed `rustls-tls`->`rustls` between those versions, confirmed by a
+# real dry-run failure before the correction). `jsonwebtoken`'s
+# `aws_lc_rs` feature is required explicitly -- v11 ships neither crypto
+# backend by default (real runtime panic caught at Execute: "Could not
+# automatically determine the process-level CryptoProvider... make sure
+# exactly one of the 'rust_crypto' and 'aws_lc_rs' features is enabled"),
+# and `aws_lc_rs` matches the backend `reqwest`'s own `rustls` feature
+# already pulls in, avoiding a second, competing provider in the same
+# binary.
+jsonwebtoken = { version = "11", default-features = false, features = ["use_pem", "aws_lc_rs"] }
+reqwest = { version = "0.13", default-features = false, features = ["json", "rustls"] }
+base64 = "0.23"
 
 [dev-dependencies]
 tower = { version = "0.4", features = ["util"] }

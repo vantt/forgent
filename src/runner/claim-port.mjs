@@ -9,11 +9,10 @@
 
 import { moveWork, addOutcome, addDecision, readRawEvents, FsmError } from '../state/store.mjs';
 import { foldEvents } from '../state/replay.mjs';
-import { isResolvedStatus } from '../state/frontier.mjs';
+import { isResolvedStatus, resolveRoot } from '../state/frontier.mjs';
 import { visitCount } from './anti-loop.mjs';
 import { acquireMainCheckoutLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS, formatLockDurationMs } from './main-checkout-lock.mjs';
 import { createClaimWorktree, branchNameFor, branchExists } from './worktree.mjs';
-import { resolveRoot } from './root-affinity.mjs';
 import { lastActivityAt, isReclaimEligible } from './claim-liveness.mjs';
 import { hasWorkerSlotRoom } from '../state/worker-slots.mjs';
 import { readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';

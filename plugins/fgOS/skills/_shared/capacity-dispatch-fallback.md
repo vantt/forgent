@@ -161,7 +161,7 @@ revisited later just to add them.
 
 `<scope>` inside `id` (D11): the id of the work item currently claimed, or
 — when there is none — `s` followed by the first 8 characters of
-`resolveWriterIdentity`'s own id (`src/runner/session-identity.mjs:129`,
+`resolveWriterIdentity`'s own id (`src/util/session-identity.mjs:134`,
 its existing four-tier registry/env/pid/unresolved fallback; never a new
 identity source). The `s` prefix only matters for the pid-sourced case:
 it keeps a scope from starting with a digit, since a pid alone is not

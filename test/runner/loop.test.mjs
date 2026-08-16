@@ -364,9 +364,10 @@ test('runOnce\'s capacity.dispatch audit event records the REAL spawned command 
     executor: { command: process.execPath, args: [scriptPath, '{prompt}', '--model', '{model}'] },
     capacities: {
       'fgos-coding-implement': {
-        kind: 'task',
+        kind: 'agent',
         command: process.execPath,
         args: [scriptPath, '{prompt}', '--model', '{model}'],
+        allowCrossProvider: true,
         // a declared label that is NOT the real command -- exactly the
         // shape the item's own description warns about: a session reading
         // only `provider` back from the audit log would wrongly conclude

@@ -17,20 +17,31 @@ non-Claude backend.
 
 ## When the check applies
 
-Only when `capacities.<id>.kind === "cli"`. Every other `kind`
-(`mcp`/`http`/`skill`/`task`) is out of scope for this check.
+**Kind-independent** (revised tsk-in1-4 D5/D9 — `kind` stopped being the
+CO CHE GOI/mechanism axis; it is now only `agent`/`tool`, the BAN CHAT
+axis, orthogonal to dispatch mechanism). The check applies to every
+capacity resolution EXCEPT the one exempt path: a capacity resolved
+purely via `buildAgentTypeExecutor` (agentType-only — no own `command`/
+`adapter`/`invocations` of its own; `resolveExecutorConfig`'s internal
+`resolvedViaAgentType` flag) — that path always reuses the global
+`cfg.executor`'s own command (Claude, in practice), so the check is
+already inert for it by construction, not specially carved out. Pre-
+tsk-in1-4 this section read "only when `kind === "cli"`" — `'cli'` is no
+longer a legal `kind` value at all; a `kind: "agent"` capacity like `agy`
+dispatched via its own `via: "cli"` invocation (`invocations[].via`, the
+CO CHE GOI axis now) still clears this same gate exactly as before.
 
 ## What "non-Claude" means
 
 Checked against the **final resolved executor `command`** — after
-`capacities.<id>` > `executors.<tier>` > `executor` precedence resolves —
-against a small known-Claude-CLI allowlist (`'claude'` today), never
-against:
+`capacities.<id>` > `executor` precedence resolves (the intermediate
+`executors.<tier>` rung was retired at tsk-in1-2 D6) — against a small
+known-Claude-CLI allowlist (`'claude'` today), never against:
 
-- the capacity's declared `kind` alone (a `kind: "cli"` capacity with no
-  `command`/`adapter` override falls through to the tier/global executor,
-  which is ordinarily Claude's own CLI — this must not require
-  `allowCrossProvider`);
+- the capacity's declared `kind` alone (a capacity with no
+  `command`/`adapter`/`invocations` override of its own falls through to
+  the global executor, which is ordinarily Claude's own CLI — this must
+  not require `allowCrossProvider`);
 - the `provider` field (a freely-overridable display alias, not the
   command actually spawned — checking it would be spoofable).
 
@@ -47,7 +58,7 @@ happens.
 {
   "capacities": {
     "fgos-coding-implement": {
-      "kind": "cli",
+      "kind": "agent",
       "command": "agy",
       "args": ["{prompt}"],
       "allowCrossProvider": true

@@ -329,15 +329,6 @@ test('list --id scopes every id-keyed view section to just the requested item, e
   assert.equal(data.gates['item-a'].ask, 'question about A');
 });
 
-test('list --id leaves the tools registry untouched -- it is keyed by tool name, not by item id (tsk-2u9 D2)', () => {
-  const cwd = tmpCwd();
-  addOk(cwd, 'item-a', { title: 'Item A' });
-  assert.equal(run(cwd, ['tool', 'register', '--name', 'gitnexus', '--kind', 'mcp', '--capability', 'impact-analysis', '--command', 'mcp:gitnexus', '--scan', '.gitnexus']).status, 0);
-
-  const data = envelopeData(run(cwd, ['list', '--id', 'item-a', '--json']).stdout);
-  assert.deepEqual(Object.keys(data.tools ?? {}), ['gitnexus']);
-});
-
 test('list default keeps an awaiting-human item visible (D2: excludes only the two terminal statuses done/wontfix, per wontfix-terminal-status-filter-consistency D2 -- never a broader ad-hoc closed/parked set like awaiting-human)', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'parked-item', { title: 'Parked Item' });

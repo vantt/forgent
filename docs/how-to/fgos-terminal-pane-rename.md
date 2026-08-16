@@ -31,7 +31,7 @@ Source item: `tsk-62x-1`, `docs/history/fgos-terminal-pane-rename/CONTEXT.md`
 3. **Watch out: two "session id" sources can silently collide.** This
    feature's label has two supposedly distinct segments — `fg.ssid`
    (fgOS/bee's own session identity, from `resolveWriterIdentity()` in
-   `src/runner/session-identity.mjs`) and `a.ssid` (the coding agent
+   `src/util/session-identity.mjs`) and `a.ssid` (the coding agent
    tool's own native session id, e.g. `CLAUDE_CODE_SESSION_ID`). They
    look independent, but `resolveWriterIdentity()`'s own env-var fallback
    chain reads `CLAUDE_CODE_SESSION_ID` too when `BEE_SESSION_ID` is

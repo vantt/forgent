@@ -11,6 +11,7 @@ import {
   DEFAULT_CLEANUP_LEAF_TTL_DAYS,
   DEFAULT_CLEANUP_TTL_DAYS,
   DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
+  DEFAULT_HERDR_WEB_DASHBOARD_SETTINGS,
   DEFAULT_INVARIANT_CHECK_COMMANDS,
   DEFAULT_LEVEL,
   DEFAULT_RUNNER_CONFIG,
@@ -41,11 +42,12 @@ import {
   writeEnduserManifest,
 } from './helpers/setup-checks-harness.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../../src/state/worker-slots.mjs';
+import { DEFAULT_IRON_LAW_LEVEL } from '../../src/setup/registrations.mjs';
 
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, plugin-dev-skills-packaged, changelog-unreleased-stale, herdr-launcher-configured, work-classification-vocabulary, work-stage-vocabulary, delivered-not-on-trunk, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, events-jsonl-not-truncated, cli-version-visible, worker-slots-ceiling-usable, gateway-token-configured, readme-install-tag-exists, task-specs-resolve, and agent-claims-resolve', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, plugin-dev-skills-packaged, changelog-unreleased-stale, herdr-launcher-configured, herdr-web-dashboard-configured, work-classification-vocabulary, work-stage-vocabulary, delivered-not-on-trunk, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, events-jsonl-not-truncated, cli-version-visible, worker-slots-ceiling-usable, gateway-token-configured, readme-install-tag-exists, iron-law-configured, task-specs-resolve, and agent-claims-resolve', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     [
@@ -63,6 +65,7 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'plugin-dev-skills-packaged',
       'changelog-unreleased-stale',
       'herdr-launcher-configured',
+      'herdr-web-dashboard-configured',
       'work-classification-vocabulary',
       'work-stage-vocabulary',
       'delivered-not-on-trunk',
@@ -74,6 +77,7 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'worker-slots-ceiling-usable',
       'gateway-token-configured',
       'readme-install-tag-exists',
+      'iron-law-configured',
       'task-specs-resolve',
       'agent-claims-resolve',
     ].sort(),
@@ -660,7 +664,19 @@ test('fgos check (CLI e2e) reports changelogNag and appends a checkpoint to chan
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
-test('tool-registry-configured passes when no tool is registered at all (inactive — a clean skip, never a failure)', () => {
+// tsk-in1-1 D1: a tool provider is declared directly in
+// `runner.capacities.<id>` (`.fgos/config.json`), config-edited like every
+// other capacity, never through a `fgos tool register` event.
+function declareCapacity(cwd, id, fields) {
+  const configPath = path.join(cwd, '.fgos', 'config.json');
+  const cfg = fs.existsSync(configPath) ? JSON.parse(fs.readFileSync(configPath, 'utf8')) : {};
+  cfg.runner ??= {};
+  cfg.runner.capacities ??= {};
+  cfg.runner.capacities[id] = fields;
+  fs.writeFileSync(configPath, JSON.stringify(cfg, null, 2));
+}
+
+test('tool-registry-configured passes when no tool-capable capacity is declared at all (inactive — a clean skip, never a failure)', () => {
   const cwd = mkTemp('fgos-tool-registry-inactive-');
   execFileSync('git', ['init', '-q'], { cwd });
   spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
@@ -670,15 +686,11 @@ test('tool-registry-configured passes when no tool is registered at all (inactiv
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
-test('tool-registry-configured passes when every registered tool is checked present (full)', () => {
+test('tool-registry-configured passes when every declared tool is checked present (full)', () => {
   const cwd = mkTemp('fgos-tool-registry-full-');
   execFileSync('git', ['init', '-q'], { cwd });
   spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
-  const register = spawnSync(process.execPath, [
-    FGOS, 'tool', 'register',
-    '--name', 'echo-tool', '--kind', 'cli', '--capability', 'test-capability', '--command', 'echo',
-  ], { cwd, encoding: 'utf8' });
-  assert.equal(register.status, 0, register.stderr);
+  declareCapacity(cwd, 'echo-tool', { kind: 'tool', capability: 'test-capability', invocations: [{ via: 'cli', command: 'echo', args: [] }] });
   const check = spawnSync(process.execPath, [FGOS, 'tool', 'check'], { cwd, encoding: 'utf8' });
   assert.equal(check.status, 0, check.stderr);
   const { passed, message } = checkById('tool-registry-configured').check(cwd);
@@ -687,19 +699,15 @@ test('tool-registry-configured passes when every registered tool is checked pres
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
-test('tsk-3oa2: tool-registry-configured FAILS when a registered tool is missing or never checked (degraded) -- no longer a silent passed:true', () => {
+test('tsk-3oa2: tool-registry-configured FAILS when a declared tool is missing or never checked (degraded) -- no longer a silent passed:true', () => {
   const cwd = mkTemp('fgos-tool-registry-degraded-');
   execFileSync('git', ['init', '-q'], { cwd });
   spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
-  const register = spawnSync(process.execPath, [
-    FGOS, 'tool', 'register',
-    '--name', 'never-checked-tool', '--kind', 'cli', '--capability', 'test-capability', '--command', 'echo',
-  ], { cwd, encoding: 'utf8' });
-  assert.equal(register.status, 0, register.stderr);
+  declareCapacity(cwd, 'never-checked-tool', { kind: 'tool', capability: 'test-capability', invocations: [{ via: 'cli', command: 'echo', args: [] }] });
   // Deliberately never runs `fgos tool check` -- the tool stays "unknown",
   // which classifyRegistryPosture reports as degraded (never inactive).
   const { passed, message } = checkById('tool-registry-configured').check(cwd);
-  assert.equal(passed, false, 'a registered-but-unverified tool must fail the check, not silently pass as before this fix');
+  assert.equal(passed, false, 'a declared-but-unverified tool must fail the check, not silently pass as before this fix');
   assert.match(message, /^degraded/);
   assert.match(message, /fgos tool check/);
   fs.rmSync(cwd, { recursive: true, force: true });
@@ -816,9 +824,11 @@ test('config-not-stale passes when the existing config already has every default
       gateBypass: { level: 'off' },
       cleanup: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS, leafTtlDays: DEFAULT_CLEANUP_LEAF_TTL_DAYS },
       herdrOrchestrator: DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
+      herdrWebDashboard: DEFAULT_HERDR_WEB_DASHBOARD_SETTINGS,
       invariantChecks: { commands: DEFAULT_INVARIANT_CHECK_COMMANDS },
       workerSlots: { ceiling: null },
       gateway: { port: 4170, token: null },
+      ironLaw: { level: DEFAULT_IRON_LAW_LEVEL },
     }),
   );
   const { passed } = checkById('config-not-stale').check(cwd);
@@ -1084,6 +1094,47 @@ test('herdr-launcher-configured check passes when every toggle is a boolean', ()
   const { passed, message } = checkById('herdr-launcher-configured').check(cwd);
   assert.equal(passed, true);
   assert.match(message, /autoDiscover=true/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+// ─── herdr-web-dashboard-configured (tsk-48w, D14 of docs/history/herdr-
+// web-dashboard-plan-realignment/CONTEXT.md): the web dashboard's static-
+// serving toggle. Same check-only shape as herdr-launcher-configured
+// above -- config-not-stale already catches the whole section missing;
+// this check adds the one thing that generic staleness scan cannot: a
+// PRESENT but non-boolean value.
+
+test('herdr-web-dashboard-configured check fails when the shared file has no herdrWebDashboard key at all', () => {
+  const cwd = mkTemp('doctor-herdr-web-dashboard-absent-');
+  const { passed, message } = checkById('herdr-web-dashboard-configured').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /missing/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('herdr-web-dashboard-configured check fails when staticServing is present but not a boolean', () => {
+  const cwd = mkTemp('doctor-herdr-web-dashboard-bad-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(
+    path.join(cwd, '.fgos', 'config.json'),
+    JSON.stringify({ herdrWebDashboard: { staticServing: 'yes' } }),
+  );
+  const { passed, message } = checkById('herdr-web-dashboard-configured').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /staticServing/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('herdr-web-dashboard-configured check passes when staticServing is a boolean', () => {
+  const cwd = mkTemp('doctor-herdr-web-dashboard-ok-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(
+    path.join(cwd, '.fgos', 'config.json'),
+    JSON.stringify({ herdrWebDashboard: { staticServing: true } }),
+  );
+  const { passed, message } = checkById('herdr-web-dashboard-configured').check(cwd);
+  assert.equal(passed, true);
+  assert.match(message, /staticServing=true/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 

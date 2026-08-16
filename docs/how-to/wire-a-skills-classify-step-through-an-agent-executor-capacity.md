@@ -28,39 +28,63 @@ nothing is configured.
 
 ## Steps
 
-1. **Add the capacity to `.fgos/config.json`'s `runner.capacities`** — `kind: "cli"`,
-   `adapter: "cli-spawn"`, a real installed command (probed on the
-   machine at build time, never hardcoded from a design doc's example),
-   and a `tier` that resolves to *some* model via the existing `models`
-   map (real example: `tsk-5l2-2`'s
-   `capacities.submit-assist-classify` entry, `tier: "light"`, command
-   `agy`).
+1. **Add the capacity to `.fgos/config.json`'s `runner.capacities`** — `kind: "agent"`
+   (tsk-in1-4 D5: `kind` is now the agent/tool BAN CHAT axis, not a
+   dispatch mechanism — the CLI mechanism itself lives on
+   `invocations[].via`, see step 2), a real installed command (probed on
+   the machine at build time, never hardcoded from a design doc's
+   example), and a `tier` that resolves to *some* model via the existing
+   `models` map (real example: `tsk-5l2-2`'s
+   `capacities.submit-assist-classify` entry, command `agy`, since
+   migrated to `kind: "agent"` per D5).
 
-   If the capacity resolves to a non-Claude `kind: "cli"` command
-   (cross-provider), also set `allowCrossProvider: true` — absent or
-   `false` makes `resolveExecutorConfig` refuse at resolve time
-   (`tsk-32n` D1/D2/D3, `docs/reference/capacity-cross-provider-governance.md`).
-   This superseded an earlier, never-implemented `sensitiveData` field
-   this doc originally suggested here — that name had inverted polarity
+   If the capacity resolves to a non-Claude command (cross-provider),
+   also set `allowCrossProvider: true` — absent or `false` makes
+   `resolveExecutorConfig` refuse at resolve time (`tsk-32n` D1/D2/D3,
+   kind-independent since tsk-in1-4 D5/D9,
+   `docs/reference/capacity-cross-provider-governance.md`). This
+   superseded an earlier, never-implemented `sensitiveData` field this
+   doc originally suggested here — that name had inverted polarity
    against the restrictive-by-default requirement (absent reading as
    "not sensitive" = allowed, backwards). Real precedent:
    `allowCrossProvider: true` on `submit-assist-classify`, since the
    routed content there is only a short free-text ask, never repo/code
    content.
 
-2. **Register the real command** so `fgos tool query` can confirm
-   presence — this is also what makes `AGENTS.md`'s install/setup/doctor
-   gate catch the new dependency for free, with no new doctor check
-   written by hand:
+2. **Declare the real command as a tool-registry entry too** (tsk-in1-1
+   D1: no longer a `fgos tool register` verb call — add a `capability`
+   field directly onto the SAME `runner.capacities.<capacityId>` entry
+   step 1 just wrote in `.fgos/config.json`), so `fgos tool query` can
+   confirm presence — this is also what makes `AGENTS.md`'s
+   install/setup/doctor gate catch the new dependency for free, with no
+   new doctor check written by hand. The dispatch mechanism itself
+   (tsk-in1-4 D5/D8: `invocations[].via`, not a top-level field) carries
+   the real command:
 
+   ```json
+   "capacities": {
+     "<capacityId>": {
+       "kind": "agent",
+       "capability": "<capacityId>",
+       "invocations": [
+         { "via": "cli", "adapter": "cli-spawn", "command": "<realCommand>", "args": ["{prompt}"] }
+       ],
+       ...
+     }
+   }
    ```
-   fgos tool register --name <capacityId> --kind cli --capability <capacityId> --command <realCommand>
+   ```
    fgos tool check
    ```
 
-   (`--name` must equal the capacity's own id in the config —
-   `resolveExecutorConfig`'s presence check looks up
-   `tools[capacityId]` by that exact key.)
+   (the object key doubles as the id both `fgos tool query` and
+   `resolveExecutorConfig` read — no separate `--name` to keep in sync.
+   `resolveExecutorConfig` itself never gates on this presence
+   automatically, though — that automatic check was retired at
+   `tsk-5tm-1` D1; a caller wanting a real presence gate asks for it
+   explicitly with `fgos tool query --status present` at its own call
+   site, same as `docs/reference/forgentx-tool-registry-configuration.md`
+   describes.)
 
 3. **Give the skill a way to resolve the real command/args without a
    second argv-building implementation.** If `dispatch.mjs` has no CLI

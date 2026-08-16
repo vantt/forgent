@@ -20,38 +20,8 @@
       ]
     },
     "capacities": {
-      "judge-discovery": {
-        "kind": "task",
-        "for": "judge",
-        "command": "claude",
-        "args": [
-          "-p",
-          "{prompt}",
-          "--model",
-          "{model}",
-          "--permission-mode",
-          "acceptEdits",
-          "--allowedTools",
-          "Task,WebSearch,WebFetch,Read,Bash(rg:*),Bash(git add:*),Bash(git commit:*)"
-        ]
-      },
-      "judge-decompose": {
-        "kind": "task",
-        "for": "judge",
-        "command": "claude",
-        "args": [
-          "-p",
-          "{prompt}",
-          "--model",
-          "{model}",
-          "--permission-mode",
-          "acceptEdits",
-          "--allowedTools",
-          "Task,WebSearch,WebFetch,Read,Bash(rg:*),Bash(git add:*),Bash(git commit:*)"
-        ]
-      },
       "agy": {
-        "kind": "cli",
+        "kind": "agent",
         "allowCrossProvider": true,
         "invocations": [
           {
@@ -73,6 +43,44 @@
           "standard": "lightweight",
           "heavy": "lightweight"
         }
+      },
+      "gitnexus": {
+        "kind": "tool",
+        "capability": "impact-analysis",
+        "scanTarget": ".gitnexus",
+        "responsibility": "Verification",
+        "description": "Code-graph blast radius",
+        "invocations": [
+          {
+            "via": "mcp",
+            "command": "mcp:gitnexus"
+          }
+        ]
+      },
+      "herdr": {
+        "kind": "tool",
+        "capability": "pane-labeling",
+        "responsibility": "Chrome",
+        "description": "herdr pane label writer (herdr pane rename) for /fgOS:terminal",
+        "invocations": [
+          {
+            "via": "cli",
+            "command": "herdr",
+            "args": []
+          }
+        ]
+      }
+    },
+    "capabilities": {
+      "impact-analysis": {
+        "description": "Code-graph blast radius",
+        "aliases": [
+          "impact_analysis",
+          "Impact Analysis"
+        ]
+      },
+      "pane-labeling": {
+        "description": "Write a session/task id onto the current terminal pane's label, for a human watching a screen"
       }
     },
     "timeoutMs": 900000,

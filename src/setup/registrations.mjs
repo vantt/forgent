@@ -33,12 +33,13 @@ import { mergeConfigDefaults } from './config-merge.mjs';
 import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
+import { detectTrunk } from '../runner/worktree.mjs';
 import { listWork } from '../state/store.mjs';
 import { driftStatus, unmergedDeliveries } from '../state/drift-status.mjs';
 import { computeEnduserDocsIndex, generateEnduserDocsIndex, manifestPathFor } from '../report/enduser-index-generate.mjs';
 import { isResolvedStatus } from '../state/frontier.mjs';
 import { DOMAINS, getDomain, resolveDomainName, effectiveStage } from '../state/workflow-stage-graphs.mjs';
-import { readLocalStatus, classifyRegistryPosture } from '../state/tool-registry.mjs';
+import { readLocalStatus, classifyRegistryPosture, toolsFromCapacities } from '../state/tool-registry.mjs';
 import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { describeConfigAwareness } from '../config/global-config.mjs';
 import { resolveFgosBin, refreshGlobalBinCache } from './bin-discovery.mjs';
@@ -196,7 +197,7 @@ export function ensureSharedConfigDefaults(dir) {
  * at the main checkout's `.git` from anywhere in the repo, so its parent is
  * the one location stable enough for a user's rc file to name. Same
  * resolution `scripts/fgos-shell-integration.sh` already uses, and the same
- * common-dir-parent shape as `merge.mjs`'s `isMainWorktree`. Delegates to
+ * common-dir-parent shape as `worktree.mjs`'s `isMainWorktree`. Delegates to
  * `paths.mjs`'s `resolveMainCheckoutRoot` (tsk-5hv: extracted there so
  * `dispatch.mjs`/`scripts/project-agents.mjs` can reuse the identical
  * resolution without a circular import back into this module) — this
@@ -513,17 +514,23 @@ function checkMainCheckoutHookWired(cwd) {
 // `passed` is always `true` here; only the message carries the posture.
 // Reports across every registered tool, never a single hardcoded capability
 // (e.g. "impact-analysis") — the registry itself never names one.
+//
+// tsk-in1-1 D1: tools are no longer event-sourced (`view.tools`) — reads
+// `runner.capacities` straight from `.fgos/config.json` (via `readSharedConfig`,
+// the same raw-read every other doctor check in this file already uses),
+// same as `fgos tool check/query` (bin/fgos.mjs) now does.
 function checkToolRegistryConfigured(cwd) {
   const mainCheckout = resolveMainCheckout(cwd);
   if (mainCheckout === null) {
     return { passed: true, message: 'not inside a git checkout — nothing to check' };
   }
   const fgosDir = path.join(mainCheckout, '.fgos');
-  const view = listWork(fgosDir);
+  const capacities = readSharedConfig(mainCheckout)?.runner?.capacities;
+  const tools = toolsFromCapacities(capacities);
   const localStatus = readLocalStatus(fgosDir);
-  const { posture, registeredCount, presentCount, missingCount, unknownCount } = classifyRegistryPosture(view.tools, localStatus);
+  const { posture, registeredCount, presentCount, missingCount, unknownCount } = classifyRegistryPosture(tools, localStatus);
   if (posture === 'inactive') {
-    return { passed: true, message: 'inactive — no tools registered (fgos tool register to add one)' };
+    return { passed: true, message: 'inactive — no tool-capable capacities declared (add one to runner.capacities in .fgos/config.json)' };
   }
   if (posture === 'full') {
     return { passed: true, message: `full — ${presentCount}/${registeredCount} registered tool(s) present` };
@@ -628,7 +635,7 @@ function checkRootDrift(cwd) {
     return { passed: true, message: 'not inside a git checkout — nothing to check' };
   }
   const view = listWork(path.join(mainCheckout, '.fgos'));
-  const drift = driftStatus(mainCheckout, view);
+  const drift = driftStatus(mainCheckout, view, { trunk: detectTrunk(mainCheckout) });
 
   const describe = ([id, status]) =>
     `${id} (${status.branch} is ${status.aheadOfTarget} commit(s) ahead of ${status.target})`;
@@ -793,7 +800,7 @@ function checkDeliveredNotOnTrunk(cwd) {
     return { passed: true, message: 'not inside a git checkout — nothing to check' };
   }
   const view = listWork(path.join(mainCheckout, '.fgos'));
-  const stranded = unmergedDeliveries(mainCheckout, view);
+  const stranded = unmergedDeliveries(mainCheckout, view, { trunk: detectTrunk(mainCheckout) });
   const entries = Object.entries(stranded);
   if (entries.length === 0) {
     return { passed: true, message: "every handed-over item's content is on the trunk" };
@@ -1203,6 +1210,62 @@ registerCheck({
 registerFix({
   id: 'gate-bypass-configured',
   fix: (cwd) => fixGateBypassConfigured(cwd),
+});
+
+// ironLaw.level (docs/history/iron-law-gate-human-ux/CONTEXT.md D3/D7) — its
+// OWN key, modeled on gateBypass's three registrations immediately above but
+// deliberately never folded into that section: gateBypass's floor is
+// documented as never touching Iron Law (docs/explanation/gate-bypass-
+// design.md), and reusing its level vocabulary here would erase that line.
+//
+// `ask` is both the default this fix writes and what every unreadable value
+// degrades to at the gate itself (src/verbs/merge/iron-law-level.mjs's
+// readIronLawLevel), so a project that never runs `fgos setup` gets the
+// refusing behavior, not the permissive one.
+export const IRON_LAW_LEVELS = Object.freeze(['ask', 'warn']);
+export const DEFAULT_IRON_LAW_LEVEL = 'ask';
+
+function checkIronLawConfigured(cwd) {
+  const level = readSharedConfig(cwd)?.ironLaw?.level;
+  if (typeof level !== 'string' || !IRON_LAW_LEVELS.includes(level)) {
+    return {
+      passed: false,
+      message: `ironLaw.level missing or not a recognized level (${IRON_LAW_LEVELS.join('/')}) -- run fgos doctor --fix`,
+    };
+  }
+  return { passed: true, message: `ironLaw.level = "${level}"` };
+}
+
+function fixIronLawConfigured(cwd) {
+  const shared = readSharedConfig(cwd);
+  const currentLevel = shared?.ironLaw?.level;
+  if (typeof currentLevel === 'string' && IRON_LAW_LEVELS.includes(currentLevel)) {
+    return { changed: false, message: `ironLaw.level already "${currentLevel}"` };
+  }
+  const existingIronLaw =
+    shared.ironLaw && typeof shared.ironLaw === 'object' && !Array.isArray(shared.ironLaw)
+      ? shared.ironLaw
+      : {};
+  const merged = { ...shared, ironLaw: { ...existingIronLaw, level: DEFAULT_IRON_LAW_LEVEL } };
+  writeSharedConfig(cwd, merged);
+  return { changed: true, message: `wrote ironLaw.level = "${DEFAULT_IRON_LAW_LEVEL}" to ${sharedConfigFilePath(cwd)}` };
+}
+
+registerConfigDefault({
+  id: 'ironLaw',
+  key: 'ironLaw',
+  shape: { level: DEFAULT_IRON_LAW_LEVEL },
+});
+
+registerCheck({
+  id: 'iron-law-configured',
+  description: 'ironLaw.level in the shared config file is present and a recognized level',
+  check: (cwd) => checkIronLawConfigured(cwd),
+});
+
+registerFix({
+  id: 'iron-law-configured',
+  fix: (cwd) => fixIronLawConfigured(cwd),
 });
 
 // tsk-4r1 (found by the gateway audit, plans/reports/gateway-audit-
@@ -1662,6 +1725,44 @@ registerCheck({
   id: 'herdr-launcher-configured',
   description: 'herdrOrchestrator toggles in the shared config file are present and boolean (tsk-2m5)',
   check: (cwd) => checkHerdrOrchestratorConfigured(cwd),
+});
+
+// tsk-48w (D14 of docs/history/herdr-web-dashboard-plan-realignment/
+// CONTEXT.md, carrying forward D10 of the original cluster's own
+// CONTEXT.md): the web dashboard's static-serving toggle, read fail-OPEN
+// from Rust (herdr-plugin/src/settings.rs's `WebDashboardSettings` --
+// `static_serving: true` when the section/file is missing). Same
+// registerConfigDefault + registerCheck shape as `herdrOrchestrator`
+// immediately above, deliberately with the opposite default value -- this
+// toggle exists to gate the "máy được chọn" (D2) serving the bundle it
+// already carries, out of the box, not an auto-launch toggle needing an
+// opt-in.
+export const DEFAULT_HERDR_WEB_DASHBOARD_SETTINGS = {
+  staticServing: true,
+};
+
+function checkHerdrWebDashboardConfigured(cwd) {
+  const shared = readSharedConfig(cwd);
+  const settings = shared?.herdrWebDashboard;
+  if (settings === undefined) {
+    return { passed: false, message: 'herdrWebDashboard section missing -- run fgos setup' };
+  }
+  if (typeof settings.staticServing !== 'boolean') {
+    return { passed: false, message: 'herdrWebDashboard.staticServing is not a boolean' };
+  }
+  return { passed: true, message: `herdrWebDashboard: staticServing=${settings.staticServing}` };
+}
+
+registerConfigDefault({
+  id: 'herdrWebDashboard',
+  key: 'herdrWebDashboard',
+  shape: DEFAULT_HERDR_WEB_DASHBOARD_SETTINGS,
+});
+
+registerCheck({
+  id: 'herdr-web-dashboard-configured',
+  description: 'herdrWebDashboard.staticServing in the shared config file is present and boolean (tsk-48w)',
+  check: (cwd) => checkHerdrWebDashboardConfigured(cwd),
 });
 
 // tsk-1m0 (docs/history/doctor-check-enduser-docs-index-stale/CONTEXT.md):

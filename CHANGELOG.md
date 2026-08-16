@@ -7,8 +7,93 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `runner.capabilities` — a curated catalog of capability names, shared
+  between the tool-registry's own `capability` field and
+  `capacities.<id>.for`. Each entry is `{description?, aliases?}`. This
+  repo's own `.fgos/config.json` declares `impact-analysis`/`pane-labeling`.
+- A one-line `fgos: dispatch capability=... capacity=... via=... provider=...
+  model=... tier=...` diagnostic prints to stderr at every real dispatch
+  chokepoint — `spawnWorker` (the runner's own worker dispatch) and both
+  branches of `executeCapacityCli` (`execute`/`execute --for`'s in-process
+  hand-back and out-of-process real spawn) — right before the capacity is
+  actually invoked, so a human watching the terminal can see which
+  capability was requested, which capacity answered it, through which
+  mechanism/provider/model/tier. Diagnostic-only, never read back by any
+  caller.
+
 ### Changed
 
+- `capacities.<id>.kind` is now the `agent`/`tool` axis (WHAT a capacity
+  is — a live persona, potentially native-dispatchable, vs a mechanical,
+  presence-only tool), separate from `invocations[].via` (HOW it's
+  invoked — `cli`/`task`/`mcp`, widened from `cli`-only). `capacities.<id>.for`
+  is now a non-empty array (was a single value) — one executor can serve
+  multiple capabilities at once, each validated against the
+  `runner.capabilities` catalog above (replaces the old, narrower
+  `CAPACITY_PURPOSES` enum). Cross-provider governance
+  (`allowCrossProvider`) now applies regardless of `kind` — only an
+  `agentType`-resolved capacity is exempt (previously any `kind:"task"`
+  capacity was, even one with its own real, non-Claude command).
+  **Not yet applied to this repo's own live `.fgos/config.json`** — this
+  is a breaking `kind`-vocabulary change (unlike the two entries above),
+  so it lands together with the code that reads it, not as a separate
+  advance commit. (`docs/specs/runner.md` RUL65,
+  `docs/reference/forgentx-tool-registry-configuration.md`)
+- `EXECUTOR_ADAPTERS`' adapter function signature is generalized from
+  `(command, args, cwd, opts)` to `(invocation, opts)` — each adapter now
+  reads whatever fields its own invocation shape needs (`cliSpawnAdapter`
+  reads `command`/`args`; the new `httpAdapter` reads
+  `method`/`url`/`headers`/`body`) instead of every adapter being forced
+  through a CLI-argv-shaped call. A real second adapter is now registered:
+  `EXECUTOR_ADAPTERS.http`, making a real HTTP request via `fetch` (timeout
+  aborts the request; a non-2xx status is a normal result, never a thrown
+  error, matching `cli-spawn`'s own "non-zero exit is not an error"
+  stance). `INVOCATION_VIA` gets `'api'` back (dropped earlier for 0
+  historical producers; now backed by this real adapter) —
+  `capacities.<id>.invocations[]` may declare `{via: "api", url: "..."}`.
+  `resolveExecutorConfig` still only ever selects/spawns a `via:"cli"`
+  invocation — this is a pluggability precedent, not a new production
+  dispatch path; 0 capacities register `via:"api"` today.
+  (`docs/specs/runner.md` RUL66,
+  `docs/reference/forgentx-tool-registry-configuration.md`)
+- The per-tier `runner.executors.<tier>` config override is retired (0
+  live entries; had already caused a real bug — a non-tier key silently
+  fell through to the global executor with no error). A `capacities.<id>`
+  entry naming no `command`/`adapter`/`agentType` of its own now resolves
+  straight to the global `runner.executor`, with no intermediate stop.
+  (`docs/specs/runner.md` RUL41/RUL63)
+- `fgos tool register`/`fgos tool remove` are retired. A tool provider
+  (e.g. `gitnexus`, `herdr`) is now declared directly in
+  `runner.capacities.<id>` in `.fgos/config.json` — a `capability` field
+  on the entry, config-edited like every other capacity, no longer through
+  the event log. `fgos tool check`/`fgos tool query` are unchanged in
+  shape and behavior, now sourced from config instead of `view.tools`.
+  `.fgos/tool-status.local.json` (the local, gitignored presence overlay)
+  is unaffected. (`docs/reference/forgentx-tool-registry-configuration.md`)
+- The Iron Law gate now asks only where the answer can still matter: at the
+  **trunk boundary**. A leaf merging into `fgw/<root>`, and a root
+  `sync-root`-ing into its parent branch, go straight through — the gate
+  fires only when the merge actually lands on trunk. Nothing about the
+  classification itself changed (same `classifyIronLaw`, same
+  matched-flags/matched-modules evidence); what changed is where it runs.
+  Merge sweeps also no longer stall on a held item: an item the gate holds
+  is recorded, walked past, and reported once at the end of the run, while
+  it stays at `awaiting-approval`.
+  (`docs/decisions/0032-cong-iron-law-chi-hoi-o-ranh-gioi-trunk-them-muc-warn.md`,
+  which supersedes the always-hard-refuse clause of `D16/D17
+  self-improve-loop`; `docs/specs/runner.md` RUL34/RUL37/RUL64.)
+- The fgOS plugin ships as `1.2.0`. `resolveWriterIdentity` moved from
+  `src/runner/session-identity.mjs` to `src/util/session-identity.mjs`, and
+  the plugin's `terminal/rename.sh` follows it there — a cached copy of the
+  plugin at `1.1.0` would otherwise keep loading the old path and silently
+  stop resolving the fgOS session id in pane labels. Nothing else about the
+  command surface changes: this is an internal boundary cleanup that cuts
+  every `src/state/` → `src/runner/` import, collapses three copies of the
+  Iron Law check into one `src/runner/iron-law-gate.mjs`, and moves
+  `detectTrunk`/`isMainWorktree` to `src/runner/worktree.mjs`.
+  (`docs/history/state-runner-merge-boundary/CONTEXT.md` D1/D2)
 - Stage `planning` now asks a person **once**, not twice. The
   `planApprove` gate is gone from `fgos-coding-planning`; the single
   remaining gate lives in `fgos-coding-validating`, immediately before
@@ -44,6 +129,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   refused just as cleanly. Every existing item and every existing log
   replays byte-for-byte unaffected — `holder` and the two new event kinds
   are both fully optional/lazy, never present unless actually used.
+- New config key `ironLaw.level` in `.fgos/config.json`, with two values:
+  `ask` (the default — the gate refuses until a person acknowledges) and
+  `warn` (opt-in — the gate prints what it matched, records one engine
+  decision entry, and lets the merge through). Anything that is not exactly
+  `warn` reads as `ask`, including a missing key or a malformed config, so
+  the permissive level is never reached by accident. `fgos doctor` reports a
+  missing or unrecognized level and `fgos doctor --fix` writes the `ask`
+  default. Deliberately its own key, never folded into `gateBypass`, whose
+  floor is documented as never touching the Iron Law.
+- New `/fgOS:approve <id>` skill: one command covers both `fgos approve` and
+  `fgos sync-root`, inferring which verb the id actually needs, and always
+  showing the blast radius — which verb, which target branch, how many items
+  ride along — before asking anything. When the Iron Law gate holds an item,
+  it shows `docs/history/<id>/iron-law-evidence.md` verbatim, asks once, and
+  runs the command itself on a real yes instead of handing over a line to
+  type. It never adds `--acknowledge-iron-law` on its own authority.
 - `README.md`'s `## Install` now recommends installing a tagged release
   (`npm install -g github:vantt/forgent#vX.Y.Z`) instead of always
   resolving to whatever commit is currently on `main` — the bare `main`

@@ -37,12 +37,11 @@ import { validateWork, validateDomainFields, checkAcceptanceEvidenceTraceable, W
 import { getDomain, statusCategoryFor, parkReasonForStatus, roleGraphFor, effectiveStage } from './workflow-stage-graphs.mjs';
 import { evaluateHandoff } from './handoff.mjs';
 import { EventLogError } from './events.mjs';
-import { validateToolRegistration, ToolRegistryError } from './tool-registry.mjs';
 import { frontier, frontierAcrossSteps, isDepsAndLineageReady as depsAndLineageReadyView } from './frontier.mjs';
 import { assertNoCycle, assertNoUnifiedCycle } from './dep-graph.mjs';
-import { resolveWriterIdentity } from '../runner/session-identity.mjs';
+import { resolveWriterIdentity } from '../util/session-identity.mjs';
 
-export { FsmError, WorkValidationError, EventLogError, ToolRegistryError };
+export { FsmError, WorkValidationError, EventLogError };
 
 /** Error raised by this module. `category` is the CLI exit-code contract (R4). */
 export class StoreError extends Error {
@@ -1215,43 +1214,6 @@ export function addFriction(dir, payload) {
   }
   assertValidDocType(payload);
   return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(logPath, { type: 'work.friction', payload }));
-}
-
-/**
- * Register a new tool against the shared registry (tsk-1dj, tool-registry-
- * capability port). Same existence-check-before-append discipline as
- * `addWork`: `existingNames` is read fresh from the log inside the held
- * lock, so two processes racing a `--name` never both succeed. Validation
- * (kind enum, capability normalization, scan-target-required-for-mcp/skill)
- * is `tool-registry.mjs`'s own pure concern — this door only decides where
- * the event lands, mirroring how `addWork` defers shape validation to
- * `work.mjs`.
- */
-export function registerTool(dir, fields) {
-  const { logPath } = paths(dir);
-  return withEventsLockAndRefresh(dir, logPath, () => {
-    const before = rebuildView(logPath);
-    const existingNames = Object.keys(before.tools ?? {});
-    const record = validateToolRegistration(fields, existingNames); // ToolRegistryError: validation
-    return appendEventLocked(logPath, { type: 'tool.register', payload: record });
-  });
-}
-
-/**
- * Remove a registered tool. Looks the record up fresh from the log inside
- * the held lock (same shape as `registerTool` above) — removing a name that
- * was never registered, or already removed, is refused as `validation`
- * rather than silently no-op'd.
- */
-export function removeTool(dir, { name } = {}) {
-  const { logPath } = paths(dir);
-  return withEventsLockAndRefresh(dir, logPath, () => {
-    const before = rebuildView(logPath);
-    if (!before.tools?.[name]) {
-      throw new StoreError('validation', `tool "${name}" not found.`);
-    }
-    return appendEventLocked(logPath, { type: 'tool.remove', payload: { name } });
-  });
 }
 
 /** Read-only: the current view, rebuilt fresh from the log (never off a stale file). */
