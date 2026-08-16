@@ -771,6 +771,63 @@ registerCheck({
   check: (cwd) => checkWorkStageVocabulary(cwd),
 });
 
+// tsk-ogx: the registry-shape sibling of the two domain-vocabulary checks
+// above -- those two catch a work ITEM drifting from its domain's declared
+// vocabulary; this one catches the domain's own DECLARATION drifting
+// internally. `skillMap` stays domain-level by design, never per-workflow
+// (tsk-2t9c D7/D16/D17 -- see docs/history/domain-workflow-skillmap-
+// coverage-check/RESEARCH.md), so the real risk once a second workflow
+// registers is a stage name with no skillMap owner at all -- silent at
+// runtime (`skillForStage`, workflow-stage-graphs.mjs, deliberately folds
+// "declared null" and "key absent" to the same `null` for its own hot-path
+// caller), loud here instead.
+//
+// `domain.workflows` does not exist on `main` yet (tsk-2t9c is unmerged) --
+// a domain with no `workflows` field falls back to its own `stages` array
+// as the one implicit workflow it has today, so this check is real and
+// green on `main` right now, and automatically covers every workflow a
+// domain registers later with zero further change to this check.
+//
+// Exported (not just a private closure) so its fail branch is testable
+// against a synthetic `domains` map -- the real `DOMAINS` is
+// `Object.freeze`d top to bottom and can never carry a deliberately-broken
+// fixture the way a work-item store can.
+export function findDomainWorkflowSkillMapGaps(domains = DOMAINS) {
+  const gaps = [];
+  for (const [domainName, domain] of Object.entries(domains)) {
+    if (!domain.skillMap) continue;
+    const stages = domain.workflows
+      ? [...new Set(Object.values(domain.workflows).flatMap((workflow) => workflow.stages ?? []))]
+      : (domain.stages ?? []);
+    for (const stage of stages) {
+      if (!Object.hasOwn(domain.skillMap, stage)) {
+        gaps.push(`${domainName}.${stage}`);
+      }
+    }
+  }
+  return gaps;
+}
+
+function checkDomainWorkflowSkillMapCoverage() {
+  const gaps = findDomainWorkflowSkillMapGaps();
+  if (gaps.length === 0) {
+    return {
+      passed: true,
+      message: "every stage across every domain's registered workflow(s) resolves to a real skillMap entry (explicit null allowed)",
+    };
+  }
+  return {
+    passed: false,
+    message: `${gaps.length} stage(s) missing a skillMap entry entirely (explicit null is fine, a missing key is not): ${gaps.join(', ')}`,
+  };
+}
+
+registerCheck({
+  id: 'domain-workflow-skillmap-coverage',
+  description: "every stage name across all of a domain's registered workflows resolves to a real skillMap entry, explicit null allowed (tsk-ogx)",
+  check: () => checkDomainWorkflowSkillMapCoverage(),
+});
+
 registerCheck({
   id: 'root-drift',
   description: 'every fgw/<root> branch is in sync with its real target — no unsynced drift left over from a leaf merge (tsk-3bn)',
