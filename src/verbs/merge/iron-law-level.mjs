@@ -39,3 +39,19 @@ export function recordIronLawSkip(dir, { verb, id, ironLaw }) {
     kind: 'engine',
   });
 }
+
+// The explicit-acknowledge record — the sibling `recordIronLawSkip` above
+// was missing: written when a caller passed `--acknowledge-iron-law` on an
+// item that actually tripped the gate, so a later audit can tell "never
+// tripped" apart from "tripped, human acknowledged" instead of seeing a
+// silence in both cases (tsk-sdr). `text` says "acknowledged", never
+// "skipped" — the existing test grep (`/iron law/i`, no "skip" anchor)
+// would otherwise conflate this record with a warn-level skip.
+export function recordIronLawAcknowledge(dir, { verb, id, ironLaw }) {
+  return addDecision(dir, {
+    text: `${verb}: Iron Law acknowledged for "${id}" via --acknowledge-iron-law — matched flags: [${ironLaw.matchedFlags.join(', ') || 'none'}]; matched modules: [${ironLaw.matchedModules.join(', ') || 'none'}]`,
+    rationale: '--acknowledge-iron-law was passed and the gate required proof — the caller explicitly confirmed failing-test-first proof instead of the gate refusing or the warn-level auto-skip firing',
+    id,
+    kind: 'engine',
+  });
+}

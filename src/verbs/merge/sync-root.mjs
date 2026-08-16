@@ -27,7 +27,7 @@ import {
   currentHead,
 } from '../../runner/worktree.mjs';
 import { ironLawForItem, ironLawRefusal } from '../../runner/iron-law-gate.mjs';
-import { readIronLawLevel, recordIronLawSkip } from './iron-law-level.mjs';
+import { readIronLawLevel, recordIronLawSkip, recordIronLawAcknowledge } from './iron-law-level.mjs';
 import { withLockRetry } from '../../runner/lock-wait.mjs';
 
 /**
@@ -76,8 +76,13 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
   // absent from the view it would return the item itself and trip the
   // gate on a merge that never goes near trunk. `!item.parent` is exactly
   // the condition under which this call syncs straight onto trunk.
-  if (!item.parent && ironLaw.required && acknowledgeIronLaw !== true) {
-    if (readIronLawLevel(repoRoot) === 'warn') {
+  if (!item.parent && ironLaw.required) {
+    if (acknowledgeIronLaw === true) {
+      // tsk-sdr: the acknowledge path used to record nothing at all,
+      // leaving a later audit unable to tell "never tripped" apart from
+      // "tripped, human acknowledged" for this item.
+      recordIronLawAcknowledge(dir, { verb: 'sync-root', id, ironLaw });
+    } else if (readIronLawLevel(repoRoot) === 'warn') {
       recordIronLawSkip(dir, { verb: 'sync-root', id, ironLaw });
       process.stderr.write(
         `fgos: sync-root: "${id}" trips the Iron Law, proceeding at ironLaw.level = "warn". `
