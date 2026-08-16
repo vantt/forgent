@@ -1634,7 +1634,11 @@ test('S11: a discovery block title with embedded newlines cannot forge extra log
   // string. The bound lands before the crafted newline, which means the forged
   // suffix cannot reach the stored title either — the same property this test
   // already asserts for the log line.
-  assert.equal(discovered[0].title, 'A'.repeat(MAX_TITLE_LENGTH), 'the stored title is bounded at the write door');
+  assert.equal(
+    discovered[0].title,
+    `${'A'.repeat(MAX_TITLE_LENGTH - 1)}…`,
+    'the stored title is bounded at the write door, with a trailing ellipsis marking the cut',
+  );
   assert.ok(!discovered[0].title.includes('FORGED'), 'the bounded title never reaches the forged suffix');
   assert.equal(discovered[0].title.split('\n').length, 1, 'the stored title carries no embedded newline');
 
