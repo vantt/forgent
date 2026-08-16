@@ -6,15 +6,15 @@ item: tsk-34n
 
 ## 1. Trạng thái hiện tại
 
-Mới mở, round 1. Đã scout xong bối cảnh kỹ thuật (capacityIdForWork,
-resolveCapacityIdForPurpose, resolveExecutorConfig) và tìm ra một hệ quả
-THẬT, đang sống ngay trên repo này — không phải giả thuyết — cần người
-quyết trước khi đi tiếp: `fgos-fanout` hiện đang bị vô hiệu hoá thật cho
-mọi coding item, vì `fgos-coding-implement` → `agy` đã được cấu hình (từ
-`tsk-1m8`), và `tsk-pdg` (vừa merge) làm đúng công việc thiết kế: khiến
-`decide --work` giờ trả `out-of-process` thay vì `in-process` cho mọi
-candidate coding — điều mà `fgos-fanout`'s own logic đọc thành "báo lại
-cho caller, không tự bắn Agent". Xem §3 dòng đầu.
+Round 2. `fgos-fanout` bị vô hiệu hoá thật cho mọi coding item (config
+`fgos-coding-implement`→`agy` + `tsk-pdg`) — đã hỏi có cần gỡ config gấp
+không. **Người quyết: không cần** — team này chưa từng dùng `fgos-fanout`
+trong plan thật, nên việc nó tạm "báo cần người" cho mọi candidate không
+gây thiệt hại vận hành. Không sửa gì về việc này ngay bây giờ; sẽ tự hết
+khi remodel (§3 câu 3/4 dưới) hoàn tất, vì lúc đó `agy` sẽ tự khai `for`
+đúng cách thay vì duplicate key. Đang chờ người trả lời tiếp câu 3 (giữ
+override bằng key literal hay không) — đã trình bày phân tích, chưa có
+câu trả lời.
 
 ## 2. Mục tiêu & đề bài
 
@@ -39,6 +39,7 @@ khoá bất kỳ quyết định nào.
 | 2 | `resolveCapacityIdForPurpose` xử lý ambiguous (nhiều capacity cùng `for` trùng purpose) thế nào? | RÕ | `src/runner/dispatch.mjs:1023-1029` — vòng `for...of Object.entries`, trả `id` đầu tiên khớp, không lỗi, không cảnh báo. Thứ tự phụ thuộc thứ tự key trong object (JS: thứ tự insertion cho string key). |
 | 3 | Có nên giữ khả năng override bằng key literal không (một item tự đặt `capacities.<đúng-tên-purpose>` riêng để ép dùng backend khác)? | CHƯA RÕ | Cần người quyết — đây là câu hỏi thiết kế thật, không phải kỹ thuật thuần. |
 | 4 | Phạm vi: chỉ `fgos-coding-implement`/`agy`, hay MỌI stage-skill-tên-làm-capacityId trong tương lai (mọi domain khác `coding` sau này)? | CHƯA RÕ | `capacityIdForWork` đã tổng quát hoá theo domain (`getDomain(work.domain)`), không hardcode `coding` — nên fix ở đúng layer này tự động phủ mọi domain tương lai, không cần domain nào đặc cách. |
+| 5 | Có cần gỡ gấp config `fgos-coding-implement` khỏi `.fgos/config.json` sống trong lúc chờ remodel, để không chặn `fgos-fanout`? | **RÕ** | Người quyết (round 2): không cần — team chưa từng dùng `fgos-fanout` trong plan thật, việc nó tạm báo "cần người" không gây thiệt hại. Giữ nguyên config, đi tiếp remodel bình thường. |
 
 ## 4. Quyết định đã chốt
 
@@ -54,6 +55,10 @@ khoá bất kỳ quyết định nào.
   `decide --work`). Chạy sống `decide --work tsk-49o --has-live-task-access`
   trên repo thật, xác nhận vấn đề #1 ở bảng trên là thật, không phải suy
   đoán.
+- **2026-08-16, round 2:** Hỏi có cần gỡ gấp config `fgos-coding-implement`
+  khỏi `.fgos/config.json` sống không (chặn `fgos-fanout` cho mọi coding
+  item). Người trả lời: không cần, team chưa từng dùng `fgos-fanout`
+  trong plan thật.
 
 ## 6. Thiết kế đã chốt {#design}
 
