@@ -49,7 +49,7 @@ import {
   realpathOrSelf as realpathOr,
 } from '../../runner/worktree.mjs';
 import { ironLawForItem, ironLawRefusal } from '../../runner/iron-law-gate.mjs';
-import { readIronLawLevel, recordIronLawSkip } from './iron-law-level.mjs';
+import { readIronLawLevel, recordIronLawSkip, recordIronLawAcknowledge } from './iron-law-level.mjs';
 import { withLockRetry } from '../../runner/lock-wait.mjs';
 import { listSessions } from '../../runner/session.mjs';
 import { runGoalCheck } from '../../runner/goal-check.mjs';
@@ -292,8 +292,13 @@ export async function approveUseCase(
       // review-20260718-self-improve-loop finding f02: only the bare flag
       // (parsed as boolean `true`, no following value) counts as
       // acknowledgment; any value form (e.g. a stray "false") fails closed.
-      if (ironLaw.required && acknowledgeIronLaw !== true) {
-        if (readIronLawLevel(repoRoot) === 'warn') {
+      if (ironLaw.required) {
+        if (acknowledgeIronLaw === true) {
+          // tsk-sdr: the acknowledge path used to record nothing at all,
+          // leaving a later audit unable to tell "never tripped" apart from
+          // "tripped, human acknowledged" for this item.
+          recordIronLawAcknowledge(dir, { verb: 'approve', id, ironLaw });
+        } else if (readIronLawLevel(repoRoot) === 'warn') {
           recordIronLawSkip(dir, { verb: 'approve', id, ironLaw });
           process.stderr.write(
             `fgos: approve: "${id}" trips the Iron Law, proceeding at ironLaw.level = "warn". `
