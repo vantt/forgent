@@ -2001,6 +2001,125 @@ test('decideCapacityCli throws a usage RunnerConfigError when capacityId/--for/-
   await assert.rejects(() => decideCapacityCli(undefined, { repoRoot: mkTempDir() }), RunnerConfigError);
 });
 
+// --- decideCapacityCli: MCP hand-back (tsk-45f D10) -- a tool-kind capacity
+// with an mcp invocation's own "tools" map hands back mcpTool instead of
+// resolving out-of-process -------------------------------------------------
+
+test('decideCapacityCli hands back mcpTool (mechanism upgraded to in-process) for a --for purpose matching an mcp invocation\'s tools map -- the real gitnexus/impact-analysis case', async () => {
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capabilities: { 'impact-analysis': {} },
+    capacities: {
+      gitnexus: {
+        kind: 'tool',
+        for: ['impact-analysis'],
+        invocations: [{ via: 'mcp', command: 'mcp:gitnexus', tools: { 'impact-analysis': 'mcp__gitnexus__impact' } }],
+      },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const decided = await decideCapacityCli(undefined, { repoRoot: root, for: 'impact-analysis', hasLiveTaskAccess: true });
+  assert.deepEqual(decided, { mechanism: 'in-process', mcpTool: 'mcp__gitnexus__impact', configured: true, capacityId: 'gitnexus' });
+});
+
+test('decideCapacityCli hands back mcpTool for a direct capacityId call with no --for, using the capacity\'s own sole "for" entry', async () => {
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capabilities: { 'impact-analysis': {} },
+    capacities: {
+      gitnexus: {
+        kind: 'tool',
+        for: ['impact-analysis'],
+        invocations: [{ via: 'mcp', command: 'mcp:gitnexus', tools: { 'impact-analysis': 'mcp__gitnexus__impact' } }],
+      },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const decided = await decideCapacityCli('gitnexus', { repoRoot: root, hasLiveTaskAccess: true });
+  assert.deepEqual(decided, { mechanism: 'in-process', mcpTool: 'mcp__gitnexus__impact', configured: true });
+});
+
+test('decideCapacityCli never hands back mcpTool when the requested purpose has no entry in the invocation\'s tools map -- stays out-of-process', async () => {
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capabilities: { 'impact-analysis': {}, other: {} },
+    capacities: {
+      gitnexus: {
+        kind: 'tool',
+        for: ['impact-analysis', 'other'],
+        invocations: [{ via: 'mcp', command: 'mcp:gitnexus', tools: { 'impact-analysis': 'mcp__gitnexus__impact' } }],
+      },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const decided = await decideCapacityCli(undefined, { repoRoot: root, for: 'other', hasLiveTaskAccess: true });
+  assert.deepEqual(decided, { mechanism: 'out-of-process', capacityId: 'gitnexus', configured: true });
+});
+
+test('decideCapacityCli never hands back mcpTool for a direct capacityId call when the capacity names more than one "for" entry -- ambiguous, no purpose to disambiguate', async () => {
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capabilities: { 'impact-analysis': {}, other: {} },
+    capacities: {
+      gitnexus: {
+        kind: 'tool',
+        for: ['impact-analysis', 'other'],
+        invocations: [{ via: 'mcp', command: 'mcp:gitnexus', tools: { 'impact-analysis': 'mcp__gitnexus__impact' } }],
+      },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const decided = await decideCapacityCli('gitnexus', { repoRoot: root, hasLiveTaskAccess: true });
+  assert.deepEqual(decided, { mechanism: 'out-of-process', configured: true });
+});
+
+test('decideCapacityCli never hands back mcpTool for an agent-kind capacity -- agentType always wins, mcpTool and agentType are mutually exclusive', async () => {
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capabilities: { judge: {} },
+    capacities: { 'judge-discovery': { kind: 'agent', agentType: 'judge', for: ['judge'] } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const decided = await decideCapacityCli(undefined, { repoRoot: root, for: 'judge', hasLiveTaskAccess: true });
+  assert.deepEqual(decided, { mechanism: 'in-process', agentType: 'judge', configured: true, capacityId: 'judge-discovery' });
+  assert.equal('mcpTool' in decided, false);
+});
+
+test('the "decide" CLI entry point hands back mcpTool for --for impact-analysis against a real mcp tools map', () => {
+  const { repoRoot } = mkTempGitRepo();
+  writeRunnerConfigFixture(repoRoot, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capabilities: { 'impact-analysis': {} },
+    capacities: {
+      gitnexus: {
+        kind: 'tool',
+        for: ['impact-analysis'],
+        invocations: [{ via: 'mcp', command: 'mcp:gitnexus', tools: { 'impact-analysis': 'mcp__gitnexus__impact' } }],
+      },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
+  const result = spawnSync(
+    process.execPath,
+    [dispatchPath, 'decide', '--for', 'impact-analysis', '--has-live-task-access'],
+    { encoding: 'utf8', cwd: repoRoot },
+  );
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(JSON.parse(result.stdout), { mechanism: 'in-process', mcpTool: 'mcp__gitnexus__impact', configured: true, capacityId: 'gitnexus' });
+});
+
 test('the "decide" CLI entry point parses --needs-soul', () => {
   const { repoRoot } = mkTempGitRepo();
   writeRunnerConfigFixture(repoRoot, { executor: { command: 'claude', args: ['{prompt}'] }, models: { standard: 'sonnet' }, timeoutMs: 5000 });
