@@ -135,6 +135,11 @@ directly by `fgos-coding-planning`, mid-`planning`, when that skill finds
    node "$root/bin/fgos.mjs" handoff-return "<item-id>" --note "reclaiming at Scope — holder was <role>" --dir "$root"
    ```
 
+   **Repeat, re-reading `data.work[id].holder` fresh each time, until
+   `holder` reads `implementer`** (tsk-2t9c D16 — a nested call can sit
+   two deep). Stop when a call refuses with "no open call" — the ordinary
+   end state.
+
    Skip when the item's domain declares no `roleGraph`.
 
    Read the item's title, `refs`, and any existing `docsRef` target. Do a
@@ -196,7 +201,10 @@ directly by `fgos-coding-planning`, mid-`planning`, when that skill finds
    repo doesn't contain), dispatch to `fgos-researching` — this is the
    **consult** interaction (tsk-2t9c D1/D9), the same named helper
    `fgos-coding-discovering` already relies on, called here as the rare
-   exception rather than the default. Log it after the finding lands:
+   exception rather than the default. Log it right after the dispatch
+   returns (tsk-2t9c D16 — same "returns" moment `fgos-coding-discovering`/
+   `fgos-coding-validating` log at, whether it found something or came up
+   empty):
 
    ```bash
    node "$root/bin/fgos.mjs" handoff "<id>" --to researcher --reason consult --outcome "<finding, one line>" --dir "$root"
@@ -268,6 +276,29 @@ directly by `fgos-coding-planning`, mid-`planning`, when that skill finds
    ```bash
    node "$root/bin/fgos.mjs" ask "<id>" --text "..." --dir "$root"
    ```
+
+   **When the answer comes back immediately (same session, `fgos answer`
+   called right after `fgos ask` with no real gap between them), reclaim
+   before doing anything else** (tsk-2t9c D16 — found by independent
+   review of D14/D15): `holder` is `human-advisor` the moment the
+   `handoff` call above lands, and nothing else in this step closes it.
+   Continuing straight to a second Socratic round (this step explicitly
+   allows multiple rounds — "Ask the fewest rounds the dependencies
+   allow") with `holder` still `human-advisor` means that round's own
+   `consult`/`advise` attempt gets refused: `human-advisor` has **zero**
+   outgoing edges at stage `exploring`. This is the same reclaim shape
+   Step 1 already runs on re-entry, just run here, inline, because this
+   session never actually left:
+
+   ```bash
+   node "$root/bin/fgos.mjs" handoff-return "<id>" --note "reclaiming after an immediately-answered ask, same session" --dir "$root"
+   ```
+
+   When the answer does NOT come back immediately — the item genuinely
+   parks across sessions — this reclaim is not this session's job to run;
+   it happens automatically the next time any stage-skill is entered
+   (either this skill's own Step 1, or `fgos-coding-driving`'s per-
+   iteration reclaim, D16).
 
    The live conversational questions this step asks the rest of the time
    (the common case) get no `handoff` call at all — nothing parks, there
@@ -472,6 +503,11 @@ node "$root/bin/fgos.mjs" discover "<item-id>" --verdict clear --verify "<the sa
 - calling `fgos ask` without the paired `handoff --reason advise` first
   (when the domain has a `roleGraph`), or firing `handoff` for a live
   conversational question that never actually parks
+- continuing to a second Socratic round, or any further `consult`/
+  `advise` attempt, with `holder` still `human-advisor` after an
+  immediately-answered `ask` — reclaim first (tsk-2t9c D16)
+- reclaiming only once at Scope and stopping even though `holder` has not
+  reached `implementer` yet (a depth-2 nested call needs two reclaims)
 
 Violating the letter of the rules is violating the spirit of the rules.
 

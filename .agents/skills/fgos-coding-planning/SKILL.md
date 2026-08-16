@@ -138,6 +138,10 @@ stage values — the same way `fgos-routing` describes it.
    node "$root/bin/fgos.mjs" handoff-return "<id>" --note "reclaiming at Bootstrap — holder was <role>" --dir "$root"
    ```
 
+   **Repeat, re-reading `holder` fresh each time, until it reads
+   `implementer`** (tsk-2t9c D16 — a nested call can sit two deep). Stop
+   when a call refuses with "no open call" — the ordinary end state.
+
    Skip when the item's domain declares no `roleGraph`.
 
    Also read the lane `fgos-routing`'s own Orient step already decided for
@@ -484,6 +488,9 @@ proves the plan against reality itself, and it never approves it.
   `handoff --reason consult` right after (when the domain has a
   `roleGraph`), or reclaiming holder at Bootstrap when it is not already
   `implementer`
+- reclaiming only once at Bootstrap and stopping even though `holder` has
+  not reached `implementer` yet (tsk-2t9c D16 — a depth-2 nested call
+  needs two reclaims)
 - handing back to `fgos-coding-exploring` without first recording the gap
   via `fgos decision` — the hand-back is invisible to any later session
   otherwise

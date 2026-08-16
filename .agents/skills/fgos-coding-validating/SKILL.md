@@ -142,8 +142,9 @@ pass to keep the item moving.
    hand the item back to `fgos-coding-planning` — an unapproved shape is never
    validated.
 
-   If the domain declares a `roleGraph` and the item's current `holder` is
-   not already `implementer`, reclaim it before anything else:
+   If the domain declares a `roleGraph` and the item's current
+   `data.work[id].holder` (`fgos list --id <id> --json`) is not already
+   `implementer`, reclaim it before anything else:
 
    ```bash
    root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
@@ -152,6 +153,10 @@ pass to keep the item moving.
    ```bash
    node "$root/bin/fgos.mjs" handoff-return "<item-id>" --note "reclaiming at Bootstrap -- holder was <role>" --dir "$root"
    ```
+
+   **Repeat, re-reading `holder` fresh each time, until it reads
+   `implementer`** (tsk-2t9c D16 — a nested call can sit two deep). Stop
+   when a call refuses with "no open call" — the ordinary end state.
 
 2. **Reality gate.** Score each of these PASS or FAIL, each with a concrete
    citation (a file path, a command's real output, an existing test):
@@ -230,7 +235,8 @@ command, read the file, invoke `fgos-researching`, run `fgos graph
 --what-if`. If yes: **do it, then re-ask this question from the top.** Do
 not ask a person. When the action taken was invoking `fgos-researching`
 and the domain declares a `roleGraph`, log the dispatch right after it
-returns:
+returns — whether it found something or came up empty (tsk-2t9c D16, same
+"returns" moment `fgos-coding-discovering`/`fgos-coding-exploring` log at):
 
 ```bash
 node "$root/bin/fgos.mjs" handoff "<item-id>" --to researcher --reason consult --outcome "<the finding, one line>" --dir "$root"
@@ -479,6 +485,9 @@ claim, and `fgos return` will simply refuse later with "is todo, not doing".
 - invoking `fgos-researching` in tier A without logging `handoff --reason
   consult` right after (when the domain has a `roleGraph`), or skipping
   the reclaim at Bootstrap when holder is not already `implementer`
+- reclaiming only once at Bootstrap and stopping even though `holder` has
+  not reached `implementer` yet (tsk-2t9c D16 — a depth-2 nested call
+  needs two reclaims)
 
 Violating the letter of the rules is violating the spirit of the rules.
 

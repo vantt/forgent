@@ -32,8 +32,10 @@ via `refs`, not yet enforced by the engine.
 ## Position header
 
 Every spec names, right under the title, the domain and either a
-`stage:` (for the six task-specs a workflow stage owns directly, see
-`taskSpecMap` in `src/state/workflow-stage-graphs.mjs`) or a
+`stage:` (for the five task-specs a workflow stage owns directly, see
+`taskSpecMap` in `src/state/workflow-stage-graphs.mjs` — corrected count,
+tsk-2t9c D16: `taskSpecMap` has always had five entries, one per
+`discovery`/`exploring`/`planning`/`executing`/`retrospective`) or a
 `position: <role> | reason: <call-reason>` pair (for a task-spec reached
 only via a call). A spec may also carry `authority: <name>` when only
 some agent-types/roles may exercise it (e.g. `hard-gate` for

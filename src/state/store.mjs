@@ -536,7 +536,7 @@ export function assertPlanEvidence(id, work, repoRoot) {
  */
 export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, role, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk, claimTrigger, statusAtAsk, releaseTrigger, rationale, alternatives, source, askRationale, askAlternatives, askSource, mergedSha, mergedInto } = {}) {
   const { logPath } = paths(dir);
-  return withEventsLockAndRefresh(dir, logPath, () => {
+  const result = withEventsLockAndRefresh(dir, logPath, () => {
   const before = rebuildView(logPath);
   const work = before.work[id];
   if (!work) {
@@ -766,6 +766,39 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   }
   return appendEventLocked(logPath, rawEvent); // captures the real seq; rawEvent itself has none
   });
+  // tsk-2t9c D16: `delivered` is a terminal state for the role/holder axis
+  // -- no stage skill ever re-enters an item past this point (every wired
+  // reclaim lives at a stage-skill's own entry point), so an async call
+  // left open on it (most commonly D14's own `review` handoff on the
+  // approve path: nothing calls `handoff-return` between `awaiting-
+  // approval` and `delivered`) would sit "open" forever. A read-time
+  // consumer of `callThreads` (compound-learn, retrospective) would then
+  // misread every delivered item as carrying unresolved work rather than
+  // settled history. Close every still-open frame the exact same way a
+  // live reclaim would -- one `recordCallReturn` per frame, deepest first
+  // (the LIFO order `openCallStack` already enforces) -- never inventing a
+  // second closing mechanism. Runs AFTER the lock above releases (this
+  // function is fully synchronous, so there is no nesting risk), and only
+  // when the domain actually declares a `roleGraph` -- a domain with none
+  // never opens a call in the first place, so there is nothing to close.
+  if (result.event.payload.to === 'delivered') {
+    try {
+      const domain = getDomain(result.view.work[id]?.domain);
+      if (roleGraphFor(domain)) {
+        let stack = openCallStack(result.view.callThreads?.[id]);
+        while (stack.length > 0) {
+          const closeResult = recordCallReturn(dir, { id, note: 'auto-closed at delivered (tsk-2t9c D16)' });
+          stack = openCallStack(closeResult.view.callThreads?.[id]);
+        }
+      }
+    } catch {
+      // Best-effort, same fail-safe discipline as the `learning` compose
+      // above: the item already reached `delivered` -- that transition is
+      // what matters and must never be undone or reported as failed over a
+      // cleanup step that is not itself correctness-critical.
+    }
+  }
+  return result;
 }
 
 /**

@@ -157,6 +157,68 @@ test('a domain with no roleGraph refuses cleanly, never crashes', () => {
   );
 });
 
+// D16 (found by independent review of D14/D15): `delivered` is a terminal
+// state for the role/holder axis — nothing ever re-enters an item past it
+// to close a dangling call, so before this fix `holder` stayed `reviewer`
+// forever on every approved item whose review handoff was never returned.
+test('D16: moveWork to delivered auto-closes an open async call, resetting holder', () => {
+  const dir = tmpDir();
+  const id = seedExecutingItem(dir);
+  recordCall(dir, { id, toRole: 'reviewer', reason: 'review' });
+  assert.equal(listWork(dir).work[id].holder, 'reviewer');
+  moveWork(dir, { id, to: 'delivered', expectedStatus: 'doing' });
+  const view = listWork(dir);
+  assert.equal(view.work[id].status, 'delivered');
+  assert.equal(view.work[id].holder, 'implementer');
+  const closing = view.callThreads[id].at(-1);
+  assert.equal(closing.returning, true);
+  assert.match(closing.note, /auto-closed at delivered/);
+});
+
+test('D16: moveWork to delivered auto-closes a depth-2 nested call, one frame at a time', () => {
+  const dir = tmpDir();
+  const id = seedExecutingItem(dir);
+  recordCall(dir, { id, toRole: 'reviewer', reason: 'review' });
+  recordCall(dir, { id, toRole: 'human-advisor', reason: 'advise' });
+  assert.equal(listWork(dir).work[id].holder, 'human-advisor');
+  moveWork(dir, { id, to: 'delivered', expectedStatus: 'doing' });
+  const view = listWork(dir);
+  assert.equal(view.work[id].holder, 'implementer');
+  const returns = view.callThreads[id].filter((e) => e.returning);
+  assert.equal(returns.length, 2);
+});
+
+test('D16: moveWork to delivered with no open call is unaffected (no synthetic close event)', () => {
+  const dir = tmpDir();
+  const id = seedExecutingItem(dir);
+  moveWork(dir, { id, to: 'delivered', expectedStatus: 'doing' });
+  const view = listWork(dir);
+  assert.equal(view.work[id].status, 'delivered');
+  assert.equal(view.work[id].holder, undefined);
+  assert.equal(view.callThreads, undefined);
+});
+
+test('D16: a domain with no roleGraph reaching delivered is unaffected (no crash, no callThreads)', () => {
+  const dir = tmpDir();
+  addWork(dir, {
+    id: 'synthetic-delivered',
+    title: 'Synthetic delivered',
+    kind: 'task',
+    status: 'todo',
+    stage: 'assembling',
+    deps: [],
+    risk: 'light',
+    refs: [],
+    verify: 'true',
+    domain: 'synthetic',
+  });
+  moveWork(dir, { id: 'synthetic-delivered', to: 'doing', expectedStatus: 'todo' });
+  moveWork(dir, { id: 'synthetic-delivered', to: 'delivered', expectedStatus: 'doing' });
+  const view = listWork(dir);
+  assert.equal(view.work['synthetic-delivered'].status, 'delivered');
+  assert.equal(view.callThreads, undefined);
+});
+
 test('backward compat: replaying an existing production-shaped log with zero handoff/call-summary events is unaffected', () => {
   // test/fixtures/phase1-events.jsonl carries no callThreads/holder at all --
   // rebuildView must fold it exactly as before this feature existed. Reuses

@@ -135,8 +135,15 @@ re-shapes the work; that already happened at `discovery`/`exploring`/`planning`.
    node "$root/bin/fgos.mjs" handoff-return "<id>" --note "reclaiming at Orient — holder was <role>" --dir "$root"
    ```
 
-   (Two separate tool calls, per the Hard rules above.) Skip this
-   entirely when the item's domain declares no `roleGraph` — `holder`
+   **Repeat this call, re-reading `data.work[id].holder` fresh each time,
+   until `holder` reads `implementer`** (tsk-2t9c D16 — a nested call can
+   legitimately sit two deep, e.g. `reviewer` then `human-advisor`; one
+   `handoff-return` only pops the innermost frame). Stop the moment a call
+   refuses with "no open call" — that is the ordinary end state, not a
+   failure to relay.
+
+   (Two separate tool calls per attempt, per the Hard rules above.) Skip
+   this entirely when the item's domain declares no `roleGraph` — `holder`
    never appears there in the first place.
 
 2. **Implement.** Make the real change the item describes, reading every

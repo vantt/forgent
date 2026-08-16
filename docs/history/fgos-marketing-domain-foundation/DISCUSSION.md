@@ -2,6 +2,42 @@
 
 ## 1. Trạng thái hiện tại
 
+**Cập nhật 2026-08-16 (round 4) — D16: REVIEW ĐỘC LẬP + FIX HẾT BUG.**
+Người dùng: "Get an independent review of the D14+D15 batch". Bung một
+`code-reviewer` agent hoàn toàn mới (không chia sẻ context, để review
+thật độc lập) chạy trên `git diff 91c677b6~1..9fb5ce9d`. Kết quả: 2 HIGH,
+3 MED, 4 LOW, 1 INFO. Tự verify 2 finding HIGH trước khi tin (đọc thẳng
+file, grep `recordCallReturn`'s call site) — cả hai đều thật.
+
+Người dùng quyết: fix hết. Câu #2 (holder treo vĩnh viễn trên item
+delivered) chọn sửa engine thật. Câu #3 (nên dồn reclaim vào đâu) — người
+dùng nêu rõ vision: `fgos-routing` sẽ lo cross/inter-domain routing,
+`fgos-coding-driving` sẽ là vòng lặp điều phối trong-luồng đưa item tới
+đích — concept này có TRƯỚC cả workflow/task-spec, và giờ không chỉ
+multi-domain mà mỗi domain còn multi-workflow, output workflow A còn có
+thể thành input workflow B. Em tra lại thấy `fgos-coding-driving`'s
+SKILL.md đã có sẵn 1 quyết định D12 xác nhận đúng hướng này: thân skill
+cố ý viết THUẦN CƠ CHẾ, không lẫn coding-specific, chỉ CÁI TÊN giữ
+coding-specific vì sợ bị lạm dụng generalize sớm cho domain chưa tồn tại.
+Đồng thời phát hiện thêm: dồn vào `fgos-routing` sẽ KHÔNG fix được #1,
+vì `fgos-coding-driving` không hề gọi lại `fgos-routing` như một skill
+mỗi vòng lặp — nó tự đọc thẳng cùng bảng registry, theo đúng comment D12
+"a driver, not a router". Sửa thẳng vào `fgos-coding-driving` mới đúng
+chỗ.
+
+Đã fix toàn bộ 10 finding (chi tiết seq 18382, D16 trong CONTEXT.md):
+2 HIGH (driving-loop reclaim tổng quát theo registry + `moveWork` tự đóng
+call thread khi `delivered`), 3 MED (exploring same-session reclaim,
+reclaim lặp tới khi về `implementer`, task-spec `implement-item.md` sửa
+trigger sai), 1 MED-LOW (`roleGraph.edges.decompose` alias `planning`,
+cùng reference), 4 LOW (thống nhất cách diễn đạt 5 skill). Tiện thể sửa
+luôn 2 lỗ hổng citation phát hiện được lúc anh hỏi "task-specs có được
+dùng không" (`judge-ambiguity.md`/`compound-learn.md` đăng ký
+`taskSpecMap` nhưng chưa từng được skill trích dẫn) và 1 lỗi số liệu nhỏ
+trong `write-a-task-spec.md` ("sáu" → "năm" task-spec sở hữu stage).
+Đồng bộ + build:skills + mirror test (13/13) + full `npm test`: 3375
+pass/5 skip/0 fail (tăng từ 3369, +6 test mới). **Chưa commit.**
+
 **Cập nhật 2026-08-16 (round 3) — D15: 4 SKILL CÒN LẠI ĐÃ NỐI DÂY THẬT.**
 Người dùng: "Wire the other skills too". Đã nối `fgos-coding-discovering`/
 `exploring`/`planning`/`validating` vào `handoff`/`handoff-return` cùng

@@ -57,6 +57,14 @@ export const DEFAULT_DOMAIN = 'coding';
 // zero items (D7a: mechanism-first, `feature` carries today's graph
 // byte-for-byte, no new workflow shape exists yet to be wrong about).
 // Frozen at the bottom of this block, before it's placed into `DOMAINS`.
+// planningEdges (tsk-2t9c D16): declared once, assigned to both
+// `roleGraph.edges.planning` and `roleGraph.edges.decompose` below by
+// reference -- see that assignment's own comment for why the legacy
+// `decompose` stage name needs the identical edge set.
+const planningEdges = Object.freeze([
+  Object.freeze({ from: 'implementer', to: 'researcher', reason: 'consult', mode: 'sync' }),
+  Object.freeze({ from: 'implementer', to: 'human-advisor', reason: 'advise', mode: 'async' }),
+]);
 const codingDomain = {
     // tsk-1w7 D10 (docs/history/fanout-and-delegation-rubric/CONTEXT.md):
     // two new stages sit between `clarify` and `decompose` — `discovery`
@@ -406,10 +414,7 @@ const codingDomain = {
           Object.freeze({ from: 'implementer', to: 'human-advisor', reason: 'advise', mode: 'async' }),
           Object.freeze({ from: 'implementer', to: 'researcher', reason: 'consult', mode: 'sync' }),
         ]),
-        planning: Object.freeze([
-          Object.freeze({ from: 'implementer', to: 'researcher', reason: 'consult', mode: 'sync' }),
-          Object.freeze({ from: 'implementer', to: 'human-advisor', reason: 'advise', mode: 'async' }),
-        ]),
+        planning: planningEdges,
         executing: Object.freeze([
           Object.freeze({ from: 'implementer', to: 'researcher', reason: 'consult', mode: 'sync' }),
           Object.freeze({ from: 'implementer', to: 'helper', reason: 'assist', mode: 'sync' }),
@@ -418,6 +423,20 @@ const codingDomain = {
           Object.freeze({ from: 'reviewer', to: 'researcher', reason: 'consult', mode: 'sync' }),
           Object.freeze({ from: 'reviewer', to: 'human-advisor', reason: 'advise', mode: 'async' }),
         ]),
+        // tsk-2t9c D16 (independent review of D14/D15): `decompose` is the
+        // legacy pre-tsk-403-rename name for `planning`, served by the
+        // exact same skill (`skillMap.decompose === skillMap.planning ===
+        // 'fgos-coding-planning'`, below) and drain-only -- no new item is
+        // ever born there. `fgos-coding-planning`'s own consult wiring
+        // (D15) makes no distinction between the two stage names, so a
+        // legacy item still draining at `decompose` needs the identical
+        // edge set or its first consult attempt is refused with "no legal
+        // call edges ... at stage 'decompose'" purely because of which of
+        // the two names the item happens to carry. `planningEdges` below
+        // is the SAME array reference assigned twice, not a copy -- same
+        // discipline `workflows.feature.stages === codingDomain.stages`
+        // already uses further down, so the two can never drift apart.
+        decompose: planningEdges,
       }),
     }),
 };

@@ -42,6 +42,28 @@ test('discovery declares ONLY consult -- no advise, since discovery never asks a
   assert.deepEqual(result.legalEdges.map((e) => e.reason), ['consult']);
 });
 
+// tsk-2t9c D16: found by independent review of D14/D15. `decompose` is the
+// legacy pre-rename name for `planning` (skillMap points both at
+// fgos-coding-planning), drain-only, no new item ever lands there -- but
+// the roleGraph had no edges for it at all, so a legacy item still
+// draining at `decompose` would have its first consult attempt refused
+// purely because of which of the two stage names it happens to carry.
+test('legal call: implementer --consult--> researcher at decompose (D16 correction, same edges as planning)', () => {
+  const result = evaluateHandoff({
+    domain: coding,
+    stage: 'decompose',
+    fromRole: 'implementer',
+    toRole: 'researcher',
+    reason: 'consult',
+  });
+  assert.equal(result.ok, true);
+  assert.equal(result.edge.mode, 'sync');
+});
+
+test('decompose and planning share the exact same edge array by reference, never a copy that could drift', () => {
+  assert.equal(roleGraphFor(coding).edges.decompose, roleGraphFor(coding).edges.planning);
+});
+
 test('legal call: implementer --review--> reviewer at executing', () => {
   const result = evaluateHandoff({
     domain: coding,

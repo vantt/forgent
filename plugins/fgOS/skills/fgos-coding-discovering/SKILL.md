@@ -35,6 +35,12 @@ chứng đã research xong ở bước 3, không phải suy đoán từ text sub
 (`src/state/workflow-stage-graphs.mjs`), không hardcode mảng giá trị. Xem
 bước 4/5.
 
+Hợp đồng đầu việc: `docs/task-specs/coding/judge-ambiguity.md` (D6/D9)
+— input/output/gate/verify-template và bảng `## Collaboration` mà bước 3
+dưới đây thực thi. Đọc file đó trước khi sửa prose ở bước 3, để không
+lệch khỏi hợp đồng đã khoá (tsk-2t9c D16 — task-spec này đã tồn tại từ
+`taskSpecMap` nhưng chưa từng được trích dẫn ở đây).
+
 ## Hard rules
 
 - Mọi lệnh `fgos <verb>` skill này gọi (`decision`, `discover`) đều
@@ -99,6 +105,23 @@ bước 4/5.
    vòng `clarify`/Init trước) — không suy đoán lại những gì item đã biết
    sẵn.
 
+   **Nhận lại quả bóng nếu không phải của mình (tsk-2t9c D14/D16).** Đọc
+   `data.work[id].holder` từ chính lời gọi `fgos list` trên. Nếu có giá
+   trị và khác `implementer`, gọi `handoff-return`, lặp lại (đọc `holder`
+   lại sau mỗi lần) cho tới khi `holder` là `implementer` hoặc lời gọi từ
+   chối vì "không còn call nào đang mở" (kết cục bình thường, không phải
+   lỗi):
+
+   ```bash
+   root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+   ```
+
+   ```bash
+   node "$root/bin/fgos.mjs" handoff-return "<item-id>" --note "reclaiming at Orient — holder was <role>" --dir "$root"
+   ```
+
+   Bỏ qua bước này khi domain của item không khai `roleGraph`.
+
 2. **Soi ambiguity.** Từ thông tin đã clarify (title/description/refs),
    liệt kê cụ thể những gì còn mơ hồ — một khái niệm chưa rõ, một pattern
    chưa biết có tồn tại trong repo không, một quyết định phạm vi chưa
@@ -115,8 +138,10 @@ bước 4/5.
    `{clear, verify?, question?}` cho TỪNG điểm — never tự đi research trực
    tiếp thay cho nó.
 
-   Ngay sau MỖI lần gọi (không gộp chờ hết mọi điểm mới ghi một lần), log
-   call `consult` (tsk-2t9c D9/D14):
+   Ngay sau MỖI lần gọi trả về (dù `clear:true` hay ra `question`, không
+   gộp chờ hết mọi điểm mới ghi một lần), log call `consult` (tsk-2t9c
+   D9/D14/D16 — cùng một mốc "ngay khi lời gọi helper trả về", thống nhất
+   với `fgos-coding-exploring`/`fgos-coding-validating`):
 
    ```bash
    root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
@@ -190,6 +215,9 @@ bước 4/5.
 - chèn thẳng `title`/`description` chưa quote vào lệnh shell
 - gọi `fgos-researching` mà không log `handoff --reason consult` ngay sau
   (khi domain có `roleGraph`) — biến tương tác thật thành vô hình trở lại
+- bỏ qua reclaim ở Orient khi `holder` không phải `implementer`, hoặc chỉ
+  gọi `handoff-return` một lần rồi dừng dù `holder` vẫn chưa về
+  `implementer` (tsk-2t9c D16 — call thread lồng 2 tầng cần 2 lần gọi)
 
 Violating the letter of the rules is violating the spirit of the rules.
 
