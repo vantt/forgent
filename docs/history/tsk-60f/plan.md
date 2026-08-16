@@ -85,14 +85,24 @@ signals earlier pieces add:
 
 6. **`PreToolUse` hook enforcing decide on Agent/Task calls** (D1/D5) —
    new hook script (`scripts/dispatch-decide-hook.mjs`) registered under
-   `.claude/settings.json`'s `hooks.PreToolUse` for matcher `Agent|Task`. On
-   invocation: read `tool_input.subagent_type` (fallback to a generic label
-   when absent), call `node src/runner/dispatch.mjs decide --for
-   "<subagent_type>" --needs-soul --has-live-task-access` against the main
-   checkout, and emit the modern PreToolUse JSON contract
-   (`hookSpecificOutput.permissionDecision: "deny"` with a reason pointing at
-   `execute`, when `mechanism !== 'in-process'`; `"allow"` otherwise) — never
-   the legacy exit-2-plus-stderr shape, so the block reason renders cleanly.
+   `.claude/settings.json`'s `hooks.PreToolUse` for matcher `Agent|Task`.
+   Contract confirmed against a REAL working hook already installed on this
+   machine (`~/.claude/hooks/scout-block.cjs`, verified live: it blocked one
+   of this session's own `Bash` calls during planning) rather than assumed
+   from memory: read stdin synchronously (`fs.readFileSync(0, 'utf-8')`),
+   `JSON.parse` it, read `data.tool_name`/`data.tool_input`
+   (fail-open — `process.exit(0)` — on empty/unparseable input or an
+   unexpected `tool_name`, same as `scout-block.cjs`'s own fail-open
+   branches); block by writing a message to stderr and `process.exit(2)`;
+   allow by `process.exit(0)` with no stdout. On invocation: read
+   `tool_input.subagent_type` (fallback to a generic label when absent),
+   call `node src/runner/dispatch.mjs decide --for "<subagent_type>"
+   --needs-soul --has-live-task-access` against the main checkout, and
+   block (exit 2, stderr names `execute` as the way out) when `mechanism
+   !== 'in-process'`; allow (exit 0) otherwise. A `decide` call that itself
+   errors (e.g. lock-timeout) fails OPEN — same fail-open discipline
+   `scout-block.cjs` uses for its own unexpected-error branch — never blocks
+   every Agent/Task call in the repo because dispatch.mjs hiccuped once.
    Per AGENTS.md's install gate, this is a new infra dependency (a file that
    must exist wired into a config file), so it needs: (a) a new
    `registerCheck` entry in `src/setup/registrations.mjs` (sibling to
