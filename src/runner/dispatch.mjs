@@ -1156,22 +1156,43 @@ export function decideDispatchMechanism({ hasNativeMechanism, hasLiveTaskAccess,
  * `capacities.<id>`-specific convenience over `decideDispatchMechanism`
  * above (tsk-3ik-1): derives `hasNativeMechanism` (`capacity.kind ===
  * "agent"`, D5 tsk-in1-4 — was `"task"` before `kind` split into the
- * `agent`/`tool` BAN CHAT axis; a `kind:"agent"` capacity represents a live
- * persona genuinely capable of native dispatch, e.g. `agy`, regardless of
- * which `via` its own fallback `invocations[]` entry happens to declare —
- * `gitnexus`/`herdr` are `kind:"tool"`, mechanical and presence-only, never
- * native-eligible) and `forceCliSpawn` (`capacity.forceCliSpawn`) straight
- * from the same `cfg.capacities[capacityId]` lookup `resolveExecutorConfig`
- * already does, without calling or mutating that function — this stays a
- * read-only sibling, never a second entry into the CRITICAL-blast-radius
- * resolve path (confirmed via `impact({target: "resolveExecutorConfig",
- * direction: "upstream"})`: 6 upstream symbols, 3 execution flows, HIGH
- * risk, re-run at tsk-in1-4 time). `hasLiveTaskAccess` is never derived
- * here either — same caller-self-declares contract as
- * `decideDispatchMechanism` itself.
+ * `agent`/`tool` BAN CHAT axis) and `forceCliSpawn` (`capacity.forceCliSpawn`)
+ * straight from the same `cfg.capacities[capacityId]` lookup
+ * `resolveExecutorConfig` already does, without calling or mutating that
+ * function — this stays a read-only sibling, never a second entry into the
+ * CRITICAL-blast-radius resolve path (confirmed via
+ * `impact({target: "resolveExecutorConfig", direction: "upstream"})`: 6
+ * upstream symbols, 3 execution flows, HIGH risk, re-run at tsk-in1-4
+ * time). `hasLiveTaskAccess` is never derived here either — same
+ * caller-self-declares contract as `decideDispatchMechanism` itself.
+ *
+ * Cli-spawn-shaped capacities bypass `hasLiveTaskAccess` entirely (D1,
+ * 2026-08-16 user decision, `docs/decisions/0033-...md`, narrowing `0026`
+ * rule 2): a capacity that declares its own `command`/`adapter`, or a
+ * `invocations[].via === "cli"` entry — the same shape test
+ * `resolveExecutorConfig`'s own `resolvedViaAgentType`/`cliInvocation`
+ * logic already uses, not a new heuristic — names a real, explicitly
+ * configured, out-of-process target (e.g. `agy`). Honoring it as
+ * `in-process` used to mean silently substituting the caller's own Task
+ * tool for that target instead of ever running it; `0026` rule 2's own
+ * stated rationale ("avoid a blind soul re-deriving what a live soul
+ * already knows") never applied to this case — it is not re-derivation,
+ * it is routing to a genuinely different, operator-configured backend. A
+ * capacity that is agentType-shaped only (no command of its own, e.g.
+ * `judge-discovery: {kind:'agent', agentType:'judge'}`) keeps today's
+ * `hasLiveTaskAccess`-gated behavior unchanged: resolving it in-process
+ * already means honoring the configured target (Task tool with that
+ * `agentType`), so `0026` rule 2's reasoning still holds there.
  */
 export function decideCapacityDispatchMechanism(cfg, capacityId, { hasLiveTaskAccess = false } = {}) {
   const capacity = capacityId && cfg && cfg.capacities && typeof cfg.capacities === 'object' ? cfg.capacities[capacityId] : undefined;
+  const isCliSpawnShaped = Boolean(
+    capacity
+      && (capacity.command
+        || capacity.adapter
+        || (Array.isArray(capacity.invocations) && capacity.invocations.some((inv) => inv.via === 'cli'))),
+  );
+  if (isCliSpawnShaped) return 'out-of-process';
   return decideDispatchMechanism({
     hasNativeMechanism: Boolean(capacity && capacity.kind === 'agent'),
     hasLiveTaskAccess,
