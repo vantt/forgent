@@ -22,6 +22,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   capability was requested, which capacity answered it, through which
   mechanism/provider/model/tier. Diagnostic-only, never read back by any
   caller.
+- Multi-role team harness, first slice (coding domain): work items gain an
+  optional third axis, `holder` — orthogonal to `status` and `stage`, opt-in
+  per-domain via a new `roleGraph` declaration that names the legal
+  role-handoff edges for a domain/stage. Two new verbs, `fgos handoff <id>
+  --to <role> --reason <advise|assist|review|consult>` and `fgos
+  handoff-return <id>`, let a session make a guarded role-to-role call
+  between an implementer and a researcher/helper/reviewer/human-advisor
+  (consult a researcher, get something reviewed, ask a human, hand off a
+  scoped subtask) and record it in the event log — a call outside the
+  domain's declared graph is refused with the legal edges named in the
+  error, and a call outside a domain that declares no `roleGraph` at all is
+  refused just as cleanly.
 
 ### Changed
 
