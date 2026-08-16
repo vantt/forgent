@@ -17,7 +17,7 @@ của CLAUDE.md gate: zero-result đáng ngờ phải cross-check bằng rg).
 - `docs/history/tsk-60r4/RESEARCH.md` round 1: artifacts đã xác nhận tồn
   tại; merge commits `e268376e` (tsk-2t9c), `5236eb10` (tsk-3vk),
   `2a15a63d` (tsk-ogx); phát hiện thêm **collision số decision 0032** (2
-  file cùng prefix trong `docs/decisions/` — file 0032-multi-role là của
+  file cùng prefix trong `docs/decisions/` — file multi-role (nay `0033`) là của
   chính tsk-2t9c, nên nằm trong scope cụm này, không phải mở rộng).
 
 ## Approach
@@ -32,7 +32,8 @@ commit), đọc một lần rẻ hơn 5 lần; (b) fix-trước-đọc-sau — b
 
 1. **Đọc bằng chứng** (read-only): 4 file
    `docs/history/fgos-marketing-domain-foundation/`, decision
-   `0032-multi-role-team-harness...`, `fgos show tsk-2t9c` (D1-D18), diff
+   multi-role team harness (nay `0033-multi-role-team-harness...`),
+   `fgos show tsk-2t9c` (D1-D18), diff
    3 merge commit — tập trung 5 file resolve tay: `CHANGELOG.md`,
    `bin/fgos.mjs`, `docs/specs/distribution.md`,
    `src/setup/registrations.mjs`, `test/setup/checks.test.mjs`.
@@ -59,7 +60,7 @@ commit), đọc một lần rẻ hơn 5 lần; (b) fix-trước-đọc-sau — b
 
 | Component | Rủi ro | Proof point (validating) |
 |---|---|---|
-| Rename decision 0033 + cross-refs | light — rename file + sửa link | `rg "0032-multi-role"` sạch sau fix; npm test |
+| Rename decision 0033 + cross-refs | light — rename file + sửa link | `rg` không còn ref mồ côi tới tên file cũ sau fix; npm test |
 | Registry/CHANGELOG dedup (#3) | light — chỉ sửa nếu tìm thấy sót/lặp | đọc trực tiếp + `npm test` (checks.test.mjs cover registry) |
 | dispatch.mjs interaction (#5) | medium — 2 nhánh cùng sửa 1 file, chưa dogfood chung | targeted test: `node --test test/runner/` handoff/dispatch; bằng chứng live: các lệnh handoff của chính drive này chạy OK trên main sau merge (callThreads tsk-60r4 đã ghi) |
 
@@ -71,7 +72,7 @@ Không split — một lượt audit + fixes nhỏ là một mảnh việc thậ
 ## Assumptions
 
 - A1: "Không mở rộng scope ngoài cụm 5 item" cho phép fix collision 0032
-  vì file 0032-multi-role là artifact của chính tsk-2t9c (RESEARCH.md
+  vì file multi-role (nay `0033`) là artifact của chính tsk-2t9c (RESEARCH.md
   round 1) — không phải scope mới.
 - A2: Báo cáo đặt ở `plans/reports/` (naming convention của repo) là
   artifact judgment, không cần test riêng.

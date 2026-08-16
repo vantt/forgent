@@ -33,9 +33,10 @@ command thật cho item review này.
 
 - **Decision-number collision:** `docs/decisions/` có HAI file cùng số
   0032: `0032-cong-iron-law-chi-hoi-o-ranh-gioi-trunk-them-muc-warn.md`
-  và `0032-multi-role-team-harness-role-holder-axis-va-handoff.md` — hai
+  và `0032-multi-role-team-harness-role-holder-axis-va-handoff.md` (đã
+  rename thành `0033-...` trong chính item này) — hai
   nhánh song song (tsk-in1 cluster vs tsk-2t9c) đều lấy số 0032. Cần đưa
-  vào scope review (nó thuộc chính cụm này — file 0032-multi-role là của
+  vào scope review (nó thuộc chính cụm này — file multi-role là của
   tsk-2t9c).
 
 **Still open:** nội dung chi tiết 5 file conflict-resolve, tương tác

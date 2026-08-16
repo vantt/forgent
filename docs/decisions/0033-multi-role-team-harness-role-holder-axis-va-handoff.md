@@ -1,6 +1,6 @@
 ---
 type: explanation
-title: 0032 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption
+title: 0033 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption
 tags: []
 timestamp: 2026-08-15T00:00:00.000Z
 source_capture_ids: []
@@ -10,7 +10,14 @@ supersedes: []
 relates_specs: [work-state]
 ---
 
-# 0032 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption
+# 0033 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption
+
+> Đánh số lại từ `0032` (tsk-60r4): file này và
+> `0032-cong-iron-law-chi-hoi-o-ranh-gioi-trunk-them-muc-warn.md` được tạo
+> trên hai nhánh song song (`fgw/tsk-2t9c` và cụm `fgw/tsk-in1`) cùng lấy
+> số 0032; nhánh iron-law merge vào main trước nên giữ số, file này nhận
+> số kế tiếp. Mọi tham chiếu trần "`0032`" trong `docs/specs/runner.md` và
+> `src/verbs/merge/` đều trỏ về file iron-law, không phải file này.
 
 > Bằng chứng distill của 24 vòng thảo luận (2026-08-15, item `tsk-2t9c`),
 > người dùng duyệt từng cụm qua các vòng và duyệt bản distill này ở vòng
