@@ -6,15 +6,11 @@ item: tsk-34n
 
 ## 1. Trạng thái hiện tại
 
-Round 2. `fgos-fanout` bị vô hiệu hoá thật cho mọi coding item (config
-`fgos-coding-implement`→`agy` + `tsk-pdg`) — đã hỏi có cần gỡ config gấp
-không. **Người quyết: không cần** — team này chưa từng dùng `fgos-fanout`
-trong plan thật, nên việc nó tạm "báo cần người" cho mọi candidate không
-gây thiệt hại vận hành. Không sửa gì về việc này ngay bây giờ; sẽ tự hết
-khi remodel (§3 câu 3/4 dưới) hoàn tất, vì lúc đó `agy` sẽ tự khai `for`
-đúng cách thay vì duplicate key. Đang chờ người trả lời tiếp câu 3 (giữ
-override bằng key literal hay không) — đã trình bày phân tích, chưa có
-câu trả lời.
+**Hội tụ — round 5, mọi điểm đã chốt.** Toàn bộ 7 vấn đề ở §3 đã RÕ, 4
+D-ID đã mint ở §4. Người xác nhận cuối: đồng ý cách config capability như
+đề nghị, giữ `for` (symmetry cho `prefer`), chuyển `fgos-coding-implement`
+thành capability. Chuẩn bị bàn giao sang `fgos-coding-exploring` →
+`fgos-coding-planning` (native-first, cùng phiên này).
 
 ## 2. Mục tiêu & đề bài
 
@@ -41,11 +37,18 @@ khoá bất kỳ quyết định nào.
 | 4 | Phạm vi: chỉ `fgos-coding-implement`/`agy`, hay MỌI stage-skill-tên-làm-capacityId trong tương lai (mọi domain khác `coding` sau này)? | **RÕ** | `capacityIdForWork` đã tổng quát hoá theo domain (`getDomain(work.domain)`), không hardcode `coding` — fix ở đúng layer resolve (`decideCapacityCli`'s `--work` branch) tự động phủ mọi domain tương lai, không cần domain nào đặc cách. |
 | 5 | Có cần gỡ gấp config `fgos-coding-implement` khỏi `.fgos/config.json` sống trong lúc chờ remodel, để không chặn `fgos-fanout`? | **RÕ** | Người quyết (round 2): không cần — team chưa từng dùng `fgos-fanout` trong plan thật, việc nó tạm báo "cần người" không gây thiệt hại. Giữ nguyên config, đi tiếp remodel bình thường. |
 | 6 | `capabilities.<purpose>` có `prefer`/`overrides` — field nào được phép override? | **RÕ (round 4)** | Người chọn Hướng B. Chỉ `rigorOverrides`/`providerModel`/`tier`/`model` — KHÔNG BAO GIỜ `command`/`args`/`adapter`/`invocations` (giữ nguyên chủ nghĩa "một backend, một chỗ định danh lệnh thật" của 0026, tránh lỗ hổng sổ sách command-vs-provider từng bàn ở nơi khác). Ví dụ thật: `agy.rigorOverrides` ép mọi tier về `lightweight` (vì `modelPolicies.gemini` sống hiện chỉ khai đúng 1 policy tier) — một purpose khác dùng chung `agy` nhưng muốn leo tier cao hơn (khi `modelPolicies.gemini` có thêm tier) sẽ khai `overrides.rigorOverrides` riêng, không đụng `agy`'s default. |
-| 7 | `prefer` có bắt buộc capacity được trỏ tới vẫn phải tự khai `for` chứa đúng purpose đó không (symmetry)? | **ĐANG HỎI — có phân tích, chưa xác nhận** | Khuyến nghị: CÓ (giữ symmetry) — `prefer` chỉ là tie-breaker giữa các capacity đã tự khai `for`, không phải cách "gán" một capacity chưa từng tự nhận phục vụ purpose đó. Nhất quán với luật 2 chiều đã có (`capacity.for` phải khớp `capabilities` catalog). Nếu bỏ symmetry, `prefer` trỏ nhầm/typo vào một capacity không thật sự phục vụ purpose sẽ không bị validate bắt được. |
+| 7 | `prefer` có bắt buộc capacity được trỏ tới vẫn phải tự khai `for` chứa đúng purpose đó không (symmetry)? | **RÕ (round 5)** | Người quyết: giữ `for` — symmetry bắt buộc. `prefer` chỉ là tie-breaker giữa các capacity đã tự khai `for`, không phải cách "gán" một capacity chưa từng tự nhận phục vụ purpose đó. |
 
 ## 4. Quyết định đã chốt
 
-*(chưa có D-ID nào ổn định qua hơn 1 vòng — bảng này sẽ điền khi có)*
+| D-ID | Tóm tắt | Ghi chú |
+|---|---|---|
+| D1 | Literal-key lookup luôn thắng trước, không đổi hành vi cũ; `for`/`prefer` chỉ là fallback additive | §3 câu 3 |
+| D2 | `capabilities.<name>` thêm `prefer` (symmetry bắt buộc) + `overrides` (chỉ `rigorOverrides`/`providerModel`/`tier`/`model`, không bao giờ `command`/`args`/`adapter`) | §3 câu 6/7 |
+| D3 | Migrate `fgos-coding-implement`: xoá entry duplicate, `agy.for:["fgos-coding-implement"]`, đăng ký capability với `prefer:"agy"` | §3 câu khởi sinh cuộc thảo luận |
+| D4 | Một hàm dùng chung áp toàn bộ thứ tự resolve — cả `spawnWorker`'s own model lookup lẫn `resolveExecutorConfig`'s lookup đều gọi hàm này, không tự tra `cfg.capacities[capacityId]` riêng nữa | Phát hiện sống: `spawnWorker` có lookup riêng, sửa nửa vời sẽ lệch model/command âm thầm |
+
+Mỗi D-ID trên đã ghi qua `fgos decision --id tsk-34n` (seq 18699-18702).
 
 ## 5. Q&A log
 
@@ -74,6 +77,16 @@ khoá bất kỳ quyết định nào.
   hỏi thêm `rigorOverrides` là gì — giải thích dựa trên
   `dispatch.mjs:482-495` (`DEFAULT_TIER_TO_POLICY`,
   `MODEL_POLICY_TIERS`) và `agy`'s rigorOverrides thật trong config sống.
+- **2026-08-16, round 4b (tangent):** Người hỏi vì sao `work.tier` không
+  dùng thẳng 5 giá trị `MODEL_POLICY_TIERS` cho gọn — giải thích `TIERS`
+  (3 giá trị) dùng chung cho `gate-bypass`/`priority-formula`/`HEAVY_RISK`,
+  không riêng model dispatch. Người hỏi tiếp risk có khớp map vào tier
+  không — soát `classify.mjs`/`risk-keywords.mjs` thật, phát hiện `tier`
+  cơ học lúc submit đo RỦI RO-THEO-DOMAIN (`HEAVY_KEYWORDS`), không đo
+  quy mô — tách riêng thành `tsk-41b2` (không thuộc feature này).
+- **2026-08-16, round 5:** Người xác nhận cuối: đồng ý cách config
+  capability như đề nghị, giữ `for` (symmetry), chuyển
+  `fgos-coding-implement` thành capability. Mint D1-D4.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -114,11 +127,10 @@ hôm nay):
 ```
 
 `prefer` là tie-breaker khi nhiều capacity cùng `for` — capacity được trỏ
-tới VẪN PHẢI tự khai `for` chứa đúng purpose này (symmetry — xem §3 câu
-7, còn chờ xác nhận cuối). `overrides` merge nông lên object capacity đã
-resolve, chỉ áp dụng khi resolve qua bước 2/3 (KHÔNG áp dụng khi resolve
-qua bước 1 — literal key tự nó đã là tuỳ biến đầy đủ, không cần override
-chồng thêm).
+tới VẪN PHẢI tự khai `for` chứa đúng purpose này (symmetry, D2 — đã
+chốt). `overrides` merge nông lên object capacity đã resolve, chỉ áp
+dụng khi resolve qua bước 2/3 (KHÔNG áp dụng khi resolve qua bước 1 —
+literal key tự nó đã là tuỳ biến đầy đủ, không cần override chồng thêm).
 
 **Migration cho `fgos-coding-implement`/`agy` cụ thể** (đúng case khởi
 sinh cuộc thảo luận): xoá `capacities.fgos-coding-implement` (duplicate),
@@ -177,8 +189,7 @@ Một mảnh, không chia — toàn bộ nằm gọn trong `src/runner/dispatch.
   sang mô hình mới, xoá duplicate.
 - **§6 excerpt**: toàn bộ "Thứ tự resolve mới" + "Chỗ code cần sửa" ở
   trên.
-- **D-ID áp dụng**: *(chưa có D-ID nào mint — chờ câu #7 xác nhận trước
-  khi khoá)*
+- **D-ID áp dụng**: D1, D2, D3, D4 (toàn bộ §4)
 - **Quan hệ sibling**: không có task khác trong cùng feature này.
 - **Verify nháp**: `npm test` (regression, phải xanh) + một assertion
   sống: `resolveCapacityIdForPurpose`-mới (hoặc hàm thay thế) trả đúng
