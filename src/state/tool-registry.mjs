@@ -55,8 +55,21 @@ export function normalizeCapability(raw) {
  * Turn `cfg.capacities` (`.fgos/config.json`'s `runner.capacities`, D1) into
  * the tool-shaped objects `probeTool`/`classifyRegistryPosture` already
  * expect — pure, never touches fs. A capacity entry is a TOOL (as opposed to
- * an agent/dispatch capacity like `agy`) precisely when it declares its own
- * `capability` — the one field a plain dispatch capacity never carries.
+ * an agent/dispatch capacity like `agy`) precisely when it declares a
+ * capability, via either of the two fields below — the one thing a plain
+ * dispatch capacity never carries.
+ *
+ * tsk-45f D11: `capacity.for` (the array `decide --for`/`resolveCapacityIdForPurpose`
+ * already read) and `capacity.capability` (this function's own prior sole
+ * source) were two separate fields answering the same question — a real
+ * capacity (`gitnexus`) declared only `capability`, so `decide --for
+ * impact-analysis` always answered `unavailable` despite `fgos tool query
+ * --capability impact-analysis` finding it. `for` now wins when present
+ * (`for[0]`, the correct single-value projection of this function's own
+ * always-one-capability-per-entry shape — a capacity serving several
+ * capabilities is still one tool-registry row); `capability` remains a
+ * tolerant fallback for a capacity not yet migrated, never removed as
+ * accepted input by this change alone.
  *
  * tsk-in1-4 D5: `capacity.kind` stopped meaning "presence-probe mechanism"
  * the moment `dispatch.mjs`'s own `kind` became the `agent`/`tool` BAN CHAT
@@ -69,12 +82,14 @@ export function normalizeCapability(raw) {
  * `probeCommand` field is retired along with it (superseded, migrated to
  * `invocations[0].command` in the same change that introduced `kind:
  * "tool"`); a capacity naming no `invocations` at all is simply not
- * probeable and is skipped, same as one naming no `capability`.
+ * probeable and is skipped, same as one naming neither `for` nor
+ * `capability`.
  */
 export function toolsFromCapacities(capacities) {
   const tools = {};
   for (const [id, capacity] of Object.entries(capacities ?? {})) {
-    const capability = normalizeCapability(capacity?.capability);
+    const rawCapability = Array.isArray(capacity?.for) && capacity.for.length > 0 ? capacity.for[0] : capacity?.capability;
+    const capability = normalizeCapability(rawCapability);
     if (!capability) continue;
     const invocation = Array.isArray(capacity.invocations) ? capacity.invocations[0] : undefined;
     tools[id] = {
