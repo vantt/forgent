@@ -746,6 +746,13 @@ function declareCapacity(cwd, id, fields) {
   cfg.runner ??= {};
   cfg.runner.capacities ??= {};
   cfg.runner.capacities[id] = fields;
+  // tsk-45f D11: "capability" (like "for") is now catalog-validated against
+  // cfg.runner.capabilities -- declare it here so this raw fixture writer
+  // keeps producing a loadable config, same as a real capacity would need.
+  if (typeof fields.capability === 'string' && fields.capability) {
+    cfg.runner.capabilities ??= {};
+    cfg.runner.capabilities[fields.capability] ??= {};
+  }
   fs.writeFileSync(configPath, JSON.stringify(cfg, null, 2));
 }
 

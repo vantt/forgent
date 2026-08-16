@@ -76,6 +76,23 @@ test('toolsFromCapacities on undefined/empty input returns {}', () => {
   assert.deepEqual(toolsFromCapacities({}), {});
 });
 
+// ─── toolsFromCapacities: `for` vs `capability` (tsk-45f D11) ─────────────────
+
+test('toolsFromCapacities reads "for" over "capability" when a capacity declares both', () => {
+  const tools = toolsFromCapacities({ x: { kind: 'tool', capability: 'old-name', for: ['new-name'] } });
+  assert.equal(tools.x.capability, 'new-name');
+});
+
+test('toolsFromCapacities falls back to "capability" when "for" is absent -- unmigrated capacity keeps working', () => {
+  const tools = toolsFromCapacities({ x: { kind: 'tool', capability: 'impact-analysis' } });
+  assert.equal(tools.x.capability, 'impact-analysis');
+});
+
+test('toolsFromCapacities reads "for"\'s first entry when a capacity declares no "capability" at all -- fully migrated capacity', () => {
+  const tools = toolsFromCapacities({ x: { kind: 'tool', for: ['impact-analysis', 'other-capability'] } });
+  assert.equal(tools.x.capability, 'impact-analysis');
+});
+
 // ─── probeTool ───────────────────────────────────────────────────────────────
 
 test('probeTool on kind cli/binary resolves "present" when the command is on PATH, "missing" otherwise', async () => {
