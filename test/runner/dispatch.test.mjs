@@ -2923,6 +2923,86 @@ test('loadRunnerConfig accepts a "capacities.<id>" entry naming neither "for" no
   assert.doesNotThrow(() => loadRunnerConfig(configPath));
 });
 
+// --- tsk-45f piece 3: an mcp invocation's optional "tools" capability->tool map --
+
+test('loadRunnerConfig accepts an mcp invocation\'s "tools" map when every key is declared in "capabilities"', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'tools-map-ok.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capabilities: { 'impact-analysis': {} },
+      capacities: {
+        gitnexus: {
+          kind: 'tool',
+          for: ['impact-analysis'],
+          invocations: [{ via: 'mcp', command: 'mcp:gitnexus', tools: { 'impact-analysis': 'mcp__gitnexus__impact' } }],
+        },
+      },
+      models: { standard: 'sonnet' },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.doesNotThrow(() => loadRunnerConfig(configPath));
+});
+
+test('loadRunnerConfig rejects an mcp invocation\'s "tools" map whose key is not declared in "capabilities"', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'tools-map-bad-key.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: {
+        gitnexus: {
+          kind: 'tool',
+          invocations: [{ via: 'mcp', command: 'mcp:gitnexus', tools: { 'not-declared-anywhere': 'mcp__gitnexus__impact' } }],
+        },
+      },
+      models: { standard: 'sonnet' },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('loadRunnerConfig rejects an mcp invocation\'s "tools" map whose value is not a non-empty string', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'tools-map-bad-value.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capabilities: { 'impact-analysis': {} },
+      capacities: {
+        gitnexus: {
+          kind: 'tool',
+          invocations: [{ via: 'mcp', command: 'mcp:gitnexus', tools: { 'impact-analysis': '' } }],
+        },
+      },
+      models: { standard: 'sonnet' },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('loadRunnerConfig accepts an mcp invocation naming no "tools" at all -- purely additive field', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'no-tools-map.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capacities: { gitnexus: { kind: 'tool', invocations: [{ via: 'mcp', command: 'mcp:gitnexus' }] } },
+      models: { standard: 'sonnet' },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.doesNotThrow(() => loadRunnerConfig(configPath));
+});
+
 test('loadRunnerConfig rejects a "capacities.<id>" entry whose carries is not one of CAPACITY_CARRIES', () => {
   const dir = mkTempDir();
   const configPath = path.join(dir, 'bad-carries.json');

@@ -597,7 +597,7 @@ export const INVOCATION_VIA = Object.freeze(['cli', 'task', 'mcp', 'api']);
 // dispatches (gate B2/B3), but `mcp`/`task` invocations still get their own
 // real shape check, not a free pass — an empty/malformed `mcp` identifier
 // is still a config bug worth catching at load time.
-function validateInvocationShape(invocation, label) {
+function validateInvocationShape(invocation, label, capabilityNames) {
   if (!invocation || typeof invocation !== 'object' || Array.isArray(invocation)) {
     throw new RunnerConfigError(`runner config (${label}) must be an object.`);
   }
@@ -611,6 +611,30 @@ function validateInvocationShape(invocation, label) {
   } else if (invocation.via === 'mcp') {
     if (typeof invocation.command !== 'string' || !invocation.command.trim()) {
       throw new RunnerConfigError(`runner config (${label}) "command" must be a non-empty string identifier when "via" is "mcp".`);
+    }
+    // tsk-45f D10/piece 3: an optional capability->tool map, read only by
+    // `decideCapacityCli`'s MCP hand-back (D10) -- never by
+    // `resolveExecutorConfig`, which still never selects an mcp invocation
+    // at all (Gate B2/B3 unchanged). Each key must already be a name in
+    // `cfg.capabilities`, same discipline `capacity.for`/`capacity.capability`
+    // already carry; each value is an opaque MCP tool identifier string,
+    // never validated against a live MCP server (this module has no MCP
+    // client of its own, by design -- decide/execute self-execute what they
+    // can and hand back what they structurally can't).
+    if (invocation.tools !== undefined) {
+      if (!invocation.tools || typeof invocation.tools !== 'object' || Array.isArray(invocation.tools)) {
+        throw new RunnerConfigError(`runner config (${label}) "tools" must be an object mapping a capability name to an MCP tool identifier when present.`);
+      }
+      for (const [capabilityName, toolId] of Object.entries(invocation.tools)) {
+        if (!capabilityNames.has(capabilityName)) {
+          throw new RunnerConfigError(
+            `runner config (${label}) "tools" key "${capabilityName}" is not declared in "capabilities" — add it there first (D4/D14/D15).`,
+          );
+        }
+        if (typeof toolId !== 'string' || !toolId.trim()) {
+          throw new RunnerConfigError(`runner config (${label}) "tools.${capabilityName}" must be a non-empty string when present.`);
+        }
+      }
     }
   } else if (invocation.via === 'api') {
     // D13: an 'api' invocation is shaped for `httpAdapter`, never
@@ -711,7 +735,7 @@ function validateCapacityShape(capacity, label, capabilityNames) {
       throw new RunnerConfigError(`runner config (${label}) "invocations" must be a non-empty array when present.`);
     }
     capacity.invocations.forEach((invocation, index) => {
-      validateInvocationShape(invocation, `${label} invocations[${index}]`);
+      validateInvocationShape(invocation, `${label} invocations[${index}]`, capabilityNames);
     });
   }
   // tsk-5tm-5 D9: `providerModel` names which `cfg.modelPolicies` table
