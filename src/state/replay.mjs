@@ -470,6 +470,53 @@ function applyEvent(view, event) {
       }
       break;
     }
+    case 'work.handoff': {
+      // Additive event type (tsk-2t9c D1/D4/D8): an ASYNC call — the item
+      // parks for another role, `holder` changes. Two lazy structures,
+      // same absent-key-means-never-happened shape `view.outcomes`/
+      // `view.discovery` already use: `view.work[id].holder` is a
+      // latest-write-wins field (mirrors `item.stage` above); `callThreads`
+      // is an APPEND-only per-id log (mirrors `view.discovery`), the
+      // record a replaying reader needs to derive open-call depth for the
+      // callstack cap (src/state/handoff.mjs's own `openCallDepth` input
+      // is computed by the caller from this array, never stored as a
+      // counter field — a counter can drift from the log; a fold cannot).
+      const { id, from, to, reason, mode, returning, note } = event.payload ?? {};
+      const item = view.work[id];
+      if (item && typeof to === 'string') {
+        item.holder = to;
+      }
+      if (typeof id === 'string') {
+        if (!view.callThreads) {
+          view.callThreads = {};
+        }
+        view.callThreads[id] = [
+          ...(view.callThreads[id] ?? []),
+          { kind: 'handoff', from, to, reason, mode: mode ?? 'async', returning: Boolean(returning), note: note ?? null, ts: event.ts },
+        ];
+      }
+      break;
+    }
+    case 'work.call-summary': {
+      // Additive event type (tsk-2t9c D8): a SYNC in-session call
+      // (subagent) — the ball never leaves the session, so `holder` is
+      // deliberately left untouched here (the D8 invariant: holder
+      // changes only via work.handoff above). A compact record still
+      // folds into the same `callThreads[id]` array so compound-learn can
+      // see the full team-interaction picture without the state machine
+      // ever treating a sync call as a role change.
+      const { id, calleeRole, reason, outcome } = event.payload ?? {};
+      if (typeof id === 'string') {
+        if (!view.callThreads) {
+          view.callThreads = {};
+        }
+        view.callThreads[id] = [
+          ...(view.callThreads[id] ?? []),
+          { kind: 'call-summary', calleeRole, reason, outcome: outcome ?? null, ts: event.ts },
+        ];
+      }
+      break;
+    }
     case 'work.discovery': {
       // Additive event type (per stage-clarify D3/D6) — mirrors work.friction
       // below: each context-discovery verdict is its own occurrence (pass or

@@ -741,6 +741,7 @@ test('e2e full journey: item1 (no deps) -> awaiting-approval with a worker commi
       'work.outcome:item1:predicted',
       'capacity.dispatch:item1:add', // D8, tsk-62v: dispatch announce/audit entry
       'work.move:item1:awaiting-approval',
+      'work.handoff:item1:reviewer', // D18: moveWork's own side effect on reaching awaiting-approval, not a second writer
       'work.outcome:item1:actual',
     ],
   );

@@ -38,7 +38,7 @@ import { listWork } from '../state/store.mjs';
 import { driftStatus, unmergedDeliveries } from '../state/drift-status.mjs';
 import { computeEnduserDocsIndex, generateEnduserDocsIndex, manifestPathFor } from '../report/enduser-index-generate.mjs';
 import { isResolvedStatus } from '../state/frontier.mjs';
-import { getDomain, resolveDomainName, effectiveStage } from '../state/workflow-stage-graphs.mjs';
+import { DOMAINS, getDomain, resolveDomainName, effectiveStage } from '../state/workflow-stage-graphs.mjs';
 import { readLocalStatus, classifyRegistryPosture, toolsFromCapacities } from '../state/tool-registry.mjs';
 import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { describeConfigAwareness } from '../config/global-config.mjs';
@@ -389,6 +389,117 @@ function checkConfigNotStale(cwd) {
   return { passed: true, message: `config up to date at ${sharedPath}` };
 }
 
+// tsk-2t9c (multi-role team harness, D6/D9 task-spec A-lite convention;
+// AGENTS.md's install/setup/doctor gate): every domain's `taskSpecMap`
+// (src/state/workflow-stage-graphs.mjs) names task-spec ids a stage-skill
+// will read as read-first material at runtime -- a missing file degrades
+// that skill silently, so this makes the gap visible. Read-only (RUL9):
+// never writes, never scaffolds a stub (a stub contract is worse than an
+// absent one -- it looks authoritative while saying nothing).
+function checkTaskSpecsResolve(cwd) {
+  const missing = [];
+  for (const [domainName, domain] of Object.entries(DOMAINS)) {
+    const taskSpecMap = domain.taskSpecMap;
+    if (!taskSpecMap) continue;
+    for (const [stage, specId] of Object.entries(taskSpecMap)) {
+      const specPath = path.join(cwd, 'docs', 'task-specs', domainName, `${specId}.md`);
+      if (!fs.existsSync(specPath)) {
+        missing.push(`${domainName}.taskSpecMap.${stage} -> "${specId}" (${path.relative(cwd, specPath)} not found)`);
+      }
+    }
+  }
+  if (missing.length > 0) {
+    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };
+  }
+  return { passed: true, message: 'every domain\'s taskSpecMap entry resolves to a real docs/task-specs/ file' };
+}
+
+// Every real task-spec id across every docs/task-specs/<domain>/ directory
+// -- the resolution set checkAgentClaimsResolve validates each agent-type's
+// `claims` list against. Absent docs/task-specs/ entirely is not an error
+// (a project that has not yet adopted the convention at all).
+function allTaskSpecIds(cwd) {
+  const root = path.join(cwd, 'docs', 'task-specs');
+  const ids = new Set();
+  if (!fs.existsSync(root)) return ids;
+  for (const domainEntry of fs.readdirSync(root, { withFileTypes: true })) {
+    if (!domainEntry.isDirectory()) continue;
+    for (const file of fs.readdirSync(path.join(root, domainEntry.name))) {
+      if (file.endsWith('.md')) ids.add(file.slice(0, -'.md'.length));
+    }
+  }
+  return ids;
+}
+
+// Extracts a `claims:` list's own item strings from raw yaml SOURCE TEXT,
+// without a yaml parser dependency. Doctor (`src/setup/registrations.mjs`)
+// must keep loading in a plain unpacked copy with no `node_modules/` yet
+// (test/setup/checks-setup-rc-line.test.mjs's own "setup from a copy of
+// fgos that is not in a git checkout" case proves this is a real,
+// exercised scenario) -- a static top-level `import ... from 'yaml'`
+// would break module load there even though 'yaml' is a real dependency
+// used elsewhere (scripts/project-agents.mjs, run only after `npm
+// install`, well after this constraint applies). Supports both block-list
+// (`claims:\n  - a\n  - b`) and inline flow (`claims: [a, b]`) styles,
+// enough for a diagnostic -- the real authority on whether a source yaml
+// is well-formed is project-agents.mjs's own full parse at projection
+// time, never this heuristic.
+function extractClaimsFromYamlText(text) {
+  const inlineMatch = text.match(/^claims:\s*\[([^\]]*)\]\s*$/m);
+  if (inlineMatch) {
+    return inlineMatch[1].split(',').map((s) => s.trim()).filter(Boolean);
+  }
+  const lines = text.split('\n');
+  const claims = [];
+  let inBlock = false;
+  for (const line of lines) {
+    if (/^claims:\s*$/.test(line)) {
+      inBlock = true;
+      continue;
+    }
+    if (!inBlock) continue;
+    const item = line.match(/^\s+-\s*(\S+)\s*$/);
+    if (item) {
+      claims.push(item[1]);
+      continue;
+    }
+    if (line.trim() === '') continue; // blank line inside the block -- keep scanning
+    break; // any other non-list-item line ends the block
+  }
+  return claims;
+}
+
+// tsk-2t9c D12: eligibility for the multi-role team harness is declared by
+// an OPTIONAL `claims` list on an agent-type's own source yaml
+// (agents/*.yaml, projected by scripts/project-agents.mjs) -- a typo'd
+// claim would otherwise make that agent-type permanently ineligible for
+// any role/holder call with no error anywhere.
+function checkAgentClaimsResolve(cwd) {
+  const agentsDir = path.join(cwd, 'agents');
+  if (!fs.existsSync(agentsDir)) {
+    return { passed: true, message: 'no agents/ directory -- nothing to check' };
+  }
+  const knownSpecIds = allTaskSpecIds(cwd);
+  const problems = [];
+  for (const file of fs.readdirSync(agentsDir).filter((f) => f.endsWith('.yaml'))) {
+    let text;
+    try {
+      text = fs.readFileSync(path.join(agentsDir, file), 'utf8');
+    } catch {
+      continue;
+    }
+    for (const claim of extractClaimsFromYamlText(text)) {
+      if (!knownSpecIds.has(claim)) {
+        problems.push(`agents/${file} claims unknown task-spec "${claim}"`);
+      }
+    }
+  }
+  if (problems.length > 0) {
+    return { passed: false, message: problems.join('; ') };
+  }
+  return { passed: true, message: 'every agent-type\'s claims resolve to a real task-spec' };
+}
+
 function checkMainCheckoutHookWired(cwd) {
   if (mainCheckoutHookWired(cwd)) {
     return { passed: true, message: 'core.hooksPath = .githooks — main-checkout lock guards every commit here' };
@@ -458,6 +569,18 @@ registerCheck({
   id: 'config-not-stale',
   description: '.fgos/config.json exists and has every current registered default key',
   check: (cwd) => checkConfigNotStale(cwd),
+});
+
+registerCheck({
+  id: 'task-specs-resolve',
+  description: 'every domain\'s taskSpecMap entry resolves to a real docs/task-specs/ file (tsk-2t9c D6/D9)',
+  check: (cwd) => checkTaskSpecsResolve(cwd),
+});
+
+registerCheck({
+  id: 'agent-claims-resolve',
+  description: 'every agent-type\'s claims list (agents/*.yaml) names real task-specs (tsk-2t9c D12)',
+  check: (cwd) => checkAgentClaimsResolve(cwd),
 });
 
 registerCheck({

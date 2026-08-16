@@ -52,6 +52,17 @@ asserted to generalize automatically to a domain that does not exist yet.
   (tsk-19j §3's own verified boundary — this is what lets a `ceiling:
   stage:planning` loop stop with the item freshly landed AT `planning`,
   never one stage further, having invoked `fgos-coding-planning` first by mistake).
+- **Reclaim the role/holder ball BEFORE invoking the current stage's skill,
+  same ordering as the ceiling check above** (tsk-2t9c D16). Read this off
+  `roleGraphFor(domain)` — the same registry lookup this skill already
+  uses for everything else, so the step stays exactly as domain-neutral as
+  the rest of this body even though its own file name stays coding-
+  specific (D12, above). Every stage-skill's own reclaim block at Orient/
+  Bootstrap/Scope explicitly assumes this loop already does this before
+  invoking it; skipping this rule is what a real gap looked like before
+  D16 (holder left on `reviewer` forever after a reject sent the item back
+  to `doing`, then refused with "callstack cap reached" on the third
+  reject cycle).
 - The three person/system-shaped stops below are resolved through
   `parkReasonForStatus(domain, status)` (`src/state/workflow-stage-graphs.mjs`,
   tsk-3w3 follow-up), never a direct `status === 'awaiting-human'`-style
@@ -310,7 +321,7 @@ labeledPaneOnce = false # same scope, same lifetime — see the labeling step
 # instead — it is the more specific answer to "why did this end".
 
 loop:
-  read id's current {stage, status, domain} FRESH via `fgos list --id <id> --json`
+  read id's current {stage, status, domain, holder} FRESH via `fgos list --id <id> --json`
   iterationStartStage, iterationStartStatus = stage, status   # for the no-progress check below
   domain = getDomain(item.domain)   # resolve early — parkReasonForStatus below needs the object, not the name
   position = stage-is-live(status) ? (stage ?? <domain's own Execute-mapped stage>) : status
@@ -391,6 +402,27 @@ loop:
       claim `id` (`fgos take --role session`), no worktree, invoke at the
       main checkout
     — see the claim hard rule above.
+
+  if domain declares a `roleGraph` (`roleGraphFor(domain)`, same registry
+  this loop already reads `skillForStage`/`stages` from) AND holder is set
+  AND holder != roleGraph.defaultRole:
+    # tsk-2t9c D16 (independent review of D14/D15): every stage-skill this
+    # loop invokes carries its OWN reclaim block at its own entry point,
+    # but that block is explicitly conditioned on "did NOT arrive via the
+    # fgos-coding-driving loop" — it assumes THIS loop already closes any
+    # dangling call before invoking it. That other half was never actually
+    # built, so on the primary automated path the reclaim silently never
+    # ran. This step is that other half, written once, generically, off
+    # the registry rather than any coding-specific knowledge — the same
+    # discipline that already keeps this skill's whole body domain-neutral
+    # even though D12 kept its NAME coding-specific.
+    repeat:
+      node "$root/bin/fgos.mjs" handoff-return "<id>" --note "driving loop reclaim before <skill> — holder was <role>" --dir "$root"
+      re-read holder FRESH
+    until holder == roleGraph.defaultRole OR the call refuses with "no open
+    call" (a benign race with another session's own reclaim — stop
+    repeating, never treat this refusal as a stop-worthy error for the
+    loop itself)
 
   invoke `skill` (it runs its own Socratic/shape/implement pass, hits its
   own gate, and — once satisfied — calls the engine verb that actually
@@ -571,6 +603,13 @@ rather than legitimate scope, that is new evidence for a follow-up item —
   re-reading fresh
 - invoking a stage skill while the item is anchored by open children
   instead of stopping and reporting them
+- invoking the current stage's skill without first reclaiming a holder
+  that is not the domain's `defaultRole` (tsk-2t9c D16) — the exact same
+  ordering mistake the ceiling-check red flag above already names, on a
+  different axis
+- treating a reclaim's own "no open call" refusal as a stop-worthy error
+  for this loop — it is the ordinary, benign outcome of another session
+  already having reclaimed first
 - looping again after a stage-skill invocation left both `stage` and
   `status` unchanged, instead of stopping on the no-progress fail-safe
 - claiming an item before its FIRST invocation of the `executing`-stage

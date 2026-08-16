@@ -52,6 +52,27 @@ test('model_tier resolves through the same tier->model map the shared config fil
   assert.equal(modelLine, 'model: haiku');
 });
 
+// claims (tsk-2t9c D12): optional multi-role-harness eligibility field --
+// projects through unfiltered when present, is entirely absent from the
+// frontmatter when the source yaml never declares it (every pre-existing
+// agent-type, including the shipped fgos-placeholder.yaml, is unaffected).
+test('claims, when declared, projects into the frontmatter as a bracketed list', () => {
+  const withClaims = VALID_YAML + '\nclaims:\n  - review-item\n  - validate-plan\n';
+  const markdown = projectAgentMarkdown('test-agent', withClaims, DEFAULT_MODELS);
+  const claimsLine = markdown.split('\n').find((line) => line.startsWith('claims:'));
+  assert.equal(claimsLine, 'claims: [review-item, validate-plan]');
+});
+
+test('claims is absent from the frontmatter when the source yaml never declares it (backward compatible)', () => {
+  const markdown = projectAgentMarkdown('test-agent', VALID_YAML, DEFAULT_MODELS);
+  assert.equal(markdown.includes('claims:'), false);
+});
+
+test('a claims list containing a non-string entry is refused, not silently coerced', () => {
+  const badClaims = VALID_YAML + '\nclaims:\n  - review-item\n  - 42\n';
+  assert.throws(() => projectAgentMarkdown('test-agent', badClaims, DEFAULT_MODELS), AgentDefinitionError);
+});
+
 test('projection is idempotent -- identical source produces byte-identical output across two runs', () => {
   const first = projectAgentMarkdown('test-agent', VALID_YAML, DEFAULT_MODELS);
   const second = projectAgentMarkdown('test-agent', VALID_YAML, DEFAULT_MODELS);

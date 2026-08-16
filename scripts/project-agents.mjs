@@ -117,6 +117,12 @@ function validateDefinition(name, def) {
       `agents/${name}.yaml's model_tier "${def.model_tier}" is not one of ${Object.keys(DEFAULT_MODELS).join('/')}.`,
     );
   }
+  // claims (tsk-2t9c D12): optional, but when present must be a real list
+  // of non-empty task-spec id strings -- same shape discipline tool-scope
+  // already gets above.
+  if ('claims' in def && (!Array.isArray(def.claims) || def.claims.some((c) => typeof c !== 'string' || !c.trim()))) {
+    throw new AgentDefinitionError(`agents/${name}.yaml's claims, when present, must be a non-empty list of task-spec id strings.`);
+  }
 }
 
 /** Pure: source yaml text -> generated adapter markdown text. */
@@ -128,7 +134,19 @@ export function projectAgentMarkdown(name, sourceYamlText, models) {
   const model = models[def.model_tier];
   const tools = def['tool-scope'].join(', ');
 
-  const frontmatter = ['---', `name: ${def.name}`, `description: ${def.description}`, `model: ${model}`, `tools: ${tools}`, '---'].join('\n');
+  // claims (tsk-2t9c D12): OPTIONAL -- eligibility for the multi-role team
+  // harness, a list of task-spec ids this agent-type may claim a call for.
+  // Positions are derived from the claimed specs, never declared directly
+  // here -- an agent-type that names no claims is simply not eligible for
+  // any role/holder call, same as today (every existing agent-type). Not
+  // in REQUIRED_FIELDS -- purely additive, so every agent-type predating
+  // this field projects byte-for-byte unchanged.
+  const frontmatterLines = ['---', `name: ${def.name}`, `description: ${def.description}`, `model: ${model}`, `tools: ${tools}`];
+  if (Array.isArray(def.claims) && def.claims.length > 0) {
+    frontmatterLines.push(`claims: [${def.claims.join(', ')}]`);
+  }
+  frontmatterLines.push('---');
+  const frontmatter = frontmatterLines.join('\n');
 
   const body = [
     `# ${def.role}`,
