@@ -53,12 +53,17 @@ export const MAX_TITLE_LENGTH = 100;
  * past it. Anything already short enough — and any non-string, which
  * validateWorkShape is still the one to reject — is returned untouched, so
  * this is safe to apply ahead of validation on every path.
+ *
+ * When truncation actually fires, a trailing '…' marks the cut so a title
+ * never reads as if it finished naturally — reserved out of the bound
+ * itself (not appended on top of it), so the result stays <= MAX_TITLE_LENGTH.
  */
 export function truncateTitle(title) {
   if (typeof title !== 'string' || title.length <= MAX_TITLE_LENGTH) return title;
-  const cut = title.slice(0, MAX_TITLE_LENGTH);
+  const budget = MAX_TITLE_LENGTH - 1;
+  const cut = title.slice(0, budget);
   const lastSpace = cut.lastIndexOf(' ');
-  return (lastSpace > 0 ? cut.slice(0, lastSpace) : cut).trim();
+  return `${(lastSpace > 0 ? cut.slice(0, lastSpace) : cut).trim()}…`;
 }
 
 /**
