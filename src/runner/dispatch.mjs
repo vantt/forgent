@@ -1118,12 +1118,22 @@ export function resolveCapacityIdForPurpose(cfg, purpose) {
  *
  * `overrides` (D2, only when resolved via step 2) is returned, never
  * applied here — each call site decides what it means for ITS OWN
- * resolution (model/tier fields matter to `spawnWorker`/
- * `executeCapacityCli`, never to a caller that only needs `command`/
- * `args`), and only 4 fields are ever eligible
+ * resolution, and only 4 fields are ever eligible
  * (`rigorOverrides`/`providerModel`/`tier`/`model` — never `command`/
  * `args`/`adapter`/`invocations`, D2: a capability can retune HOW
  * strongly its capacity works, never WHAT command actually runs).
+ * `rigorOverrides`/`providerModel` matter to every model-computing call
+ * site (`spawnWorker` and `executeCapacityCli` both). `tier`/`model`
+ * (a raw, direct override — no `modelForTier` computation at all) only
+ * ever mattered for `executeCapacityCli`'s own ad hoc dispatch, the
+ * exact same pre-existing scope a plain `capacity.tier`/`capacity.model`
+ * already had before this item — `spawnWorker` resolves `tier` from the
+ * WORK ITEM's own classification (`work.tier`, a scope/effort judgment
+ * made once at Discovery, not a per-capacity opt-out) and never accepted
+ * a raw literal model override at all; a capability's `overrides.tier`/
+ * `.model` were never meant to reach that door, and self-review found
+ * (and left) that scope boundary undisturbed rather than wiring
+ * `work.tier` open to being silently overridden by dispatch config.
  */
 export function resolveCapacityAndOverrides(cfg, capacityIdOrPurpose) {
   const capacities = cfg && cfg.capacities && typeof cfg.capacities === 'object' ? cfg.capacities : {};
@@ -1148,7 +1158,19 @@ export function resolveCapacityAndOverrides(cfg, capacityIdOrPurpose) {
 }
 
 function resolveExecutorConfig(cfg, tier, capacityId, fgosDir, contentCarries) {
-  const capacity = capacityId ? resolveCapacityAndOverrides(cfg, capacityId).capacity : undefined;
+  const resolved = capacityId ? resolveCapacityAndOverrides(cfg, capacityId) : undefined;
+  const capacity = resolved?.capacity;
+  // Self-review finding: `capacityId` below is the CALLER's own requested
+  // id/purpose (e.g. "fgos-coding-implement"), never rewritten to the
+  // capacity `prefer` actually resolved (e.g. "agy") -- every error
+  // message already citing `capacityId` stays worded exactly as before
+  // (zero risk to existing message-text expectations), but the
+  // `allowCrossProvider` remediation line is the one place an imprecise
+  // id gives actively WRONG advice ("set capacities.fgos-coding-
+  // implement.allowCrossProvider" -- not a real capacities key at all
+  // when resolved via `prefer`), so that one message names the real
+  // resolved id too when it differs.
+  const realCapacityId = resolved?.capacityId;
 
   // D15/tsk-5td, first real gate — carries answers "CAI GI duoc di", never
   // "CO duoc ra ngoai khong" (allowCrossProvider's own question, checked
@@ -1229,8 +1251,10 @@ function resolveExecutorConfig(cfg, tier, capacityId, fgosDir, contentCarries) {
   // this gate — that is exactly what `allowCrossProvider` already governs
   // for it today.
   if (capacity && !resolvedViaAgentType && !CLAUDE_CLI_COMMANDS.includes(executor.command) && capacity.allowCrossProvider !== true) {
+    const remediationId = realCapacityId && realCapacityId !== capacityId ? realCapacityId : capacityId;
+    const resolvedNote = realCapacityId && realCapacityId !== capacityId ? ` (resolved via capabilities."${capacityId}".prefer to capacity "${realCapacityId}")` : '';
     throw new RunnerConfigError(
-      `capacity "${capacityId}" resolves to non-Claude command "${executor.command}" — prompt content would leave the Claude ecosystem. Set capacities.${capacityId}.allowCrossProvider: true to permit this.`,
+      `capacity "${capacityId}"${resolvedNote} resolves to non-Claude command "${executor.command}" — prompt content would leave the Claude ecosystem. Set capacities.${remediationId}.allowCrossProvider: true to permit this.`,
     );
   }
 
@@ -1848,19 +1872,47 @@ export async function executeCapacityCli(
   const fgosDir = fgosDirFromRoot(root);
   const cfg = ensureRunnerConfigForDir(root);
   const resolvedByPurpose = !capacityIdArg;
-  const capacityId = capacityIdArg || resolveCapacityIdForPurpose(cfg, purpose);
-  if (!capacityId) {
-    throw new RunnerConfigError(
-      `no capacity registered for purpose "${purpose}" — call "decide --for ${purpose}" first to check availability before executing.`,
-    );
-  }
-
   // D4 (docs/history/capability-capacity-remodel/CONTEXT.md): resolve
-  // ONCE here through the shared resolver — `capacityId` may itself be a
-  // purpose name (e.g. "fgos-coding-implement") with no literal
-  // `cfg.capacities` entry of its own, resolved instead via
-  // `capabilities.<name>.prefer`/`for`.
-  const { capacity: resolvedCapacity, overrides: capabilityOverrides } = resolveCapacityAndOverrides(cfg, capacityId);
+  // through the shared resolver on WHICHEVER key this call actually gave
+  // us — `purpose` when purpose-resolved, `capacityIdArg` when named
+  // directly (itself possibly a purpose-shaped id with no literal
+  // `cfg.capacities` entry of its own, e.g. "fgos-coding-implement"
+  // resolved via `capabilities.<name>.prefer`). A single call per door,
+  // never a second one on the already-resolved id afterward — a prior
+  // version of this fix called `resolveCapacityAndOverrides` a second
+  // time here, on `capacityId` post-resolution: for the `--for` door
+  // that id is already a literal `cfg.capacities` key by then, so the
+  // second call always hit the literal-key branch and silently dropped
+  // `capabilities.<purpose>.overrides` — found by re-reading this exact
+  // code end to end.
+  //
+  // The two doors keep their own pre-existing error contracts, proven by
+  // real tests: `--for` alone throws when nothing resolves ("no capacity
+  // registered for purpose..." — guides the caller to `decide --for`
+  // first); a named `capacityIdArg` that resolves to nothing NEVER
+  // throws here, silently falling through to the global executor
+  // (`resolvedCapacity` stays `undefined` below) — proven by
+  // `dispatch.test.mjs`'s own "executeCapacityCli falls back to the
+  // global executor when the capacityId is not in cfg.capacities at all
+  // -- never throws".
+  let capacityId = capacityIdArg;
+  let resolvedCapacity;
+  let capabilityOverrides;
+  if (!capacityId) {
+    const resolved = resolveCapacityAndOverrides(cfg, purpose);
+    if (!resolved.capacityId) {
+      throw new RunnerConfigError(
+        `no capacity registered for purpose "${purpose}" — call "decide --for ${purpose}" first to check availability before executing.`,
+      );
+    }
+    capacityId = resolved.capacityId;
+    resolvedCapacity = resolved.capacity;
+    capabilityOverrides = resolved.overrides;
+  } else {
+    const resolved = resolveCapacityAndOverrides(cfg, capacityId);
+    resolvedCapacity = resolved.capacity; // undefined when unconfigured -- falls through to the global executor below, unchanged
+    capabilityOverrides = resolved.overrides;
+  }
 
   // Dispatch chokepoint visibility (both branches below): "capability" is
   // the purpose actually requested via --for when purpose-resolved, or —
@@ -1880,8 +1932,18 @@ export async function executeCapacityCli(
   }
 
   const capacity = resolvedCapacity;
-  const tier = tierOverride ?? capacity?.tier ?? DEFAULTS.tier;
-  const model = modelOverride ?? capacity?.model ?? modelForTier(cfg, tier, {
+  // Precedence (D2): an explicit caller-supplied override always wins
+  // (tierOverride/modelOverride — e.g. a `--tier`/`--model` CLI flag);
+  // next, capabilities.<name>.overrides (this dispatch's own purpose
+  // asked for a different rigor than the capacity's own default); next,
+  // the capacity's own literal tier/model; finally the mechanical
+  // default. `capabilityOverrides?.tier`/`.model` were validated as
+  // legal fields (validateCapabilitiesShape) but never actually
+  // consulted here until this line -- found during self-review: they
+  // silently did nothing, the same class of bug D4 already found once
+  // for spawnWorker's own separate lookup.
+  const tier = tierOverride ?? capabilityOverrides?.tier ?? capacity?.tier ?? DEFAULTS.tier;
+  const model = modelOverride ?? capabilityOverrides?.model ?? capacity?.model ?? modelForTier(cfg, tier, {
     providerModel: capabilityOverrides?.providerModel ?? capacity?.providerModel,
     rigorOverrides: capabilityOverrides?.rigorOverrides ?? capacity?.rigorOverrides,
   });

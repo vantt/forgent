@@ -135,3 +135,48 @@ switches, one config migration. `tsk-34n` proceeds as itself.
 ## Outstanding questions
 
 None
+
+## Self-review addendum (post-return, before human approval)
+
+User asked for a deep self-review before merging. Found and fixed 3 real
+bugs, all with new regression tests (full suite stayed green throughout):
+
+1. **`executeCapacityCli`'s `--for` door silently dropped
+   `capabilities.<name>.overrides`.** The original implementation called
+   `resolveCapacityAndOverrides` a SECOND time on the already-resolved
+   `capacityId` — for the `--for` door, that id is already a literal
+   `cfg.capacities` key by then (the old `resolveCapacityIdForPurpose`
+   scan ran first), so the second call always hit the literal-key branch
+   and never saw `overrides` at all. Fixed by resolving ONCE, on whichever
+   key the call actually gave (`purpose` or `capacityIdArg`), preserving
+   each door's own pre-existing error contract (`--for` throws on
+   not-found; a named `capacityIdArg` never throws, falls through to the
+   global executor — both proven by existing tests).
+2. **`overrides.tier`/`overrides.model` were validated as legal fields
+   but never consulted anywhere** — dead config a person could set with
+   zero effect, no error. Wired into `executeCapacityCli`'s own tier/model
+   precedence (`tierOverride ?? capabilityOverrides?.tier ??
+   capacity?.tier ?? DEFAULTS.tier`, same shape for model) — deliberately
+   NOT wired into `spawnWorker`: `work.tier` is the work item's own
+   classification (a scope/effort judgment made at Discovery), and a
+   capability config was never meant to silently override that; this
+   scope boundary already existed for a plain `capacity.tier`/
+   `capacity.model` before this item and is left undisturbed, now
+   documented explicitly in `resolveCapacityAndOverrides`'s own docstring
+   instead of being a silent, unstated gap.
+3. **The `allowCrossProvider` error message's remediation advice was
+   wrong when resolved via `prefer`** — it told the caller to set
+   `capacities.<purpose>.allowCrossProvider`, but a purpose name is never
+   a real `capacities` key once resolved via `prefer`. Fixed to name the
+   real resolved capacity id too when it differs from the requested one.
+
+**Known, not fixed (documented, out of scope):** `resolveCapacityAndOverrides`
+and the ~10 pre-existing `cfg.capacities[capacityId]`-shaped lookups
+elsewhere in this file all do a plain bracket access on a plain object —
+a key like `"constructor"`/`"__proto__"` would resolve through the
+prototype chain to a truthy-but-nonsensical value instead of `undefined`.
+This is a pre-existing characteristic of the whole file (not introduced
+by this item), low real-world exploitability (`capacityId` values come
+from config-driven or operator-typed CLI args, not an untrusted network
+boundary), and fixing it broadly (every lookup site, not just the new
+one) is a separate, unrelated hardening item if ever worth doing.

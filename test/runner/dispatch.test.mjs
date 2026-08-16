@@ -3296,6 +3296,24 @@ test('resolveCapacityAndOverrides returns configured:false, capacityId:null when
   assert.equal(result.configured, false);
 });
 
+test('resolveExecutorCommand\'s allowCrossProvider error names the REAL resolved capacity id (via prefer), not just the requested purpose -- a self-review fix: the requested purpose is never a real "capacities.<id>" key to set the flag on', () => {
+  const cfg = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capacities: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'] } }, // no allowCrossProvider
+    capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
+    models: { standard: 'sonnet' },
+  };
+  assert.throws(
+    () => resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', capacityId: 'fgos-coding-implement' }),
+    (err) => {
+      assert.match(err.message, /capacity "fgos-coding-implement"/);
+      assert.match(err.message, /resolved via capabilities\."fgos-coding-implement"\.prefer to capacity "agy"/);
+      assert.match(err.message, /Set capacities\.agy\.allowCrossProvider: true/);
+      return true;
+    },
+  );
+});
+
 // --- capabilities.<name>.prefer/overrides shape validation (D2) -----------
 
 test('loadRunnerConfig rejects capabilities.<name>.prefer that is not a non-empty string', () => {
@@ -3419,6 +3437,61 @@ test('executeCapacityCli resolves a purpose-named capacityId via capabilities.<n
   assert.equal(payload.args[0], 'do the thing');
 });
 
+test('executeCapacityCli applies capabilities.<name>.overrides identically whether the purpose is resolved via --for or named positionally -- both doors share ONE resolveCapacityAndOverrides call, never a second one on the already-resolved id that would silently drop overrides', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeEchoExecutor(dir);
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: { agy: { kind: 'agent', command: process.execPath, args: [scriptPath, '{model}:{prompt}'], for: ['fgos-coding-implement'], providerModel: 'gemini', allowCrossProvider: true } },
+    capabilities: { 'fgos-coding-implement': { prefer: 'agy', overrides: { rigorOverrides: { standard: 'creative' } } } },
+    modelPolicies: { claude: { standard: 'sonnet' }, gemini: { standard: 'flash', creative: 'flash-creative' } },
+    timeoutMs: 5000,
+  });
+
+  const viaFor = await executeCapacityCli(undefined, { repoRoot: root, for: 'fgos-coding-implement', prompt: 'p' });
+  assert.equal(viaFor.model, 'flash-creative');
+
+  const viaPositional = await executeCapacityCli('fgos-coding-implement', { repoRoot: root, prompt: 'p' });
+  assert.equal(viaPositional.model, 'flash-creative');
+});
+
+test('executeCapacityCli honors capabilities.<name>.overrides.tier/model directly -- found by self-review: these two fields validated as legal (validateCapabilitiesShape) but were never actually consulted anywhere until this fix', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeEchoExecutor(dir);
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: { agy: { kind: 'agent', command: process.execPath, args: [scriptPath, '{model}:{prompt}'], for: ['fgos-coding-implement'], providerModel: 'gemini', allowCrossProvider: true } },
+    // Deliberately give agy its own tier/model so the assertions below can
+    // only pass if capabilityOverrides genuinely wins -- capacity.tier/
+    // .model alone would resolve to 'standard'/'agy-standard-model'.
+    capabilities: { 'fgos-coding-implement': { prefer: 'agy', overrides: { tier: 'heavy', model: 'agy-override-model' } } },
+    modelPolicies: { claude: { standard: 'sonnet' }, gemini: { standard: 'agy-standard-model', critical: 'agy-heavy-model' } },
+    timeoutMs: 5000,
+  });
+  const result = await executeCapacityCli('fgos-coding-implement', { repoRoot: root, prompt: 'p' });
+  // overrides.model wins outright (no modelForTier computation at all).
+  assert.equal(result.model, 'agy-override-model');
+  const payload = JSON.parse(result.stdout);
+  assert.equal(payload.args[0], 'agy-override-model:p');
+});
+
+test('executeCapacityCli: an explicit caller-supplied --tier/--model always wins over capabilities.<name>.overrides -- overrides are a config default, never allowed to shadow a real caller request', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeEchoExecutor(dir);
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    capacities: { agy: { kind: 'agent', command: process.execPath, args: [scriptPath, '{model}:{prompt}'], for: ['fgos-coding-implement'], allowCrossProvider: true } },
+    capabilities: { 'fgos-coding-implement': { prefer: 'agy', overrides: { model: 'should-never-win' } } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const result = await executeCapacityCli('fgos-coding-implement', { repoRoot: root, prompt: 'p', model: 'caller-explicit-model' });
+  assert.equal(result.model, 'caller-explicit-model');
+});
+
 test('decideCapacityCli resolves a purpose-named capacityId via capabilities.<name>.prefer -- "configured" reads true even though no literal capacities entry of that name exists', async () => {
   const root = mkTempDir();
   writeRunnerConfigFixture(root, {
@@ -3498,6 +3571,39 @@ test('decideCapacityCli resolves work-item-based (--work) to the same result a p
   // Positional-id path stays byte-identical (no capacityId field) -- every
   // pre-D4 caller/test already asserts this exact shape.
   assert.deepEqual(byName, { mechanism: 'in-process', agentType: 'general-purpose', configured: true });
+});
+
+test('decideCapacityCli resolves work-item-based (--work) via capabilities.fgos-coding-implement.prefer -- the real tsk-34n/D3 migration shape (no literal capacities.fgos-coding-implement entry, only agy declaring "for")', async () => {
+  const root = mkTempDir();
+  const fgosDir = path.join(root, '.fgos');
+  addWork(fgosDir, {
+    id: 'tsk-fanout-prefer-candidate',
+    title: 'Fanout candidate resolved via prefer',
+    kind: 'task',
+    status: 'todo',
+    deps: [],
+    risk: 'light',
+    refs: [],
+    verify: 'npm test',
+  });
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capacities: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'], allowCrossProvider: true } },
+    capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  // hasLiveTaskAccess:true (a live/native session) -- must still resolve
+  // out-of-process, since agy is cli-spawn-shaped (tsk-pdg D1): this is
+  // the exact real gap tsk-1m8 found live before tsk-pdg fixed it.
+  const withLiveAccess = await decideCapacityCli(undefined, { repoRoot: root, work: 'tsk-fanout-prefer-candidate', hasLiveTaskAccess: true });
+  assert.deepEqual(withLiveAccess, { mechanism: 'out-of-process', capacityId: 'fgos-coding-implement', configured: true });
+  // hasLiveTaskAccess:false (the real fgos loop headless runner) --
+  // byte-identical mechanism/configured shape either way, matching
+  // tsk-pdg's own live evidence against the real repo before this item's
+  // migration.
+  const headless = await decideCapacityCli(undefined, { repoRoot: root, work: 'tsk-fanout-prefer-candidate', hasLiveTaskAccess: false });
+  assert.deepEqual(headless, { mechanism: 'out-of-process', capacityId: 'fgos-coding-implement', configured: true });
 });
 
 test('decideCapacityCli resolves work-item-based (--work) to "in-process" by default when the resolved capacityId has NO explicit cfg.capacities entry -- the real, common fgos-fanout case (D4 fix): a coding-domain work item is a same-provider, soul-needing rootTask (0026 rule 2), never the generic "no capacity -> out-of-process" fallback a NAMED capacityId lookup keeps unchanged', async () => {
