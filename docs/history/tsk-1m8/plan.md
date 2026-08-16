@@ -90,11 +90,16 @@ the entire mutate/revert dance and the risk of an incomplete revert.
    stdout/stderr/exit status.
 4. **Clean up the scratch fixture** (delete the throwaway directory) —
    trivial, since nothing was ever written to the live `.fgos/`.
-5. **Write the evidence file** (`docs/history/tsk-1m8/iron-law-
-   evidence.md`) with the real `decide`/`execute` output and the real
-   `agy` transcript — the standard real-transcript convention this repo
-   already uses for this kind of proof (e.g.
-   `docs/history/tsk-3ik-3/iron-law-evidence.md`).
+5. **Write the evidence file** (`docs/history/tsk-1m8/dispatch-
+   experiment-evidence.md` — deliberately NOT named `iron-law-
+   evidence.md`: that name is reserved for `classifyIronLaw`'s own
+   required-evidence file, `fgos-coding-implement`'s own red flags forbid
+   writing one when `required: false`, and this change touches no `src/`
+   logic) with the real `decide`/`execute` output and the real `agy`
+   transcript — the same real-transcript convention this repo already
+   uses for that kind of proof (e.g.
+   `docs/history/tsk-3ik-3/iron-law-evidence.md`), just under this item's
+   own non-reserved filename.
 
 The live `.fgos/config.json` — and every other coding item's headless
 dispatch default — is **never touched at all**, at any point. This also
