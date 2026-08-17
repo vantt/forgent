@@ -453,6 +453,25 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'context-render',
+    invoke: 'fgos context-render',
+    description: 'Replace an item\'s docs/history/<feature>/CONTEXT.md "## Locked decisions" table with a fresh render from state.decisions (tsk-1lv-3 D3) -- closes the gap tsk-1ud left, CONTEXT.md\'s table becomes a VIEW, never a hand-typed second copy. Refuses (validation) if CONTEXT.md does not exist yet; never creates or touches any other section.',
+    parameters: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', description: 'The work item id whose CONTEXT.md Locked-Decisions table to render (positional or --id).' },
+      },
+      positional: ['id'],
+      required: ['id'],
+    },
+    examples: ['fgos context-render build-cli'],
+    touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: true,
+    paginated: false,
+    deprecated: null,
+  },
+  {
     name: 'gate-approve',
     invoke: 'fgos gate-approve',
     description: 'Record a structured approve for one of the 2 live skill-embedded Gates (contextApprove/validateApprove, tsk-19j D1/D11, gate count reduced by coding-planning-validating-gate-redesign) — separate from the awaiting-human ask/answer mechanism. "planApprove" is still an accepted value for replaying pre-redesign historical records; no live skill writes a new one.',
