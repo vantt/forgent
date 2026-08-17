@@ -25,6 +25,6 @@ metadata:
       reason: git-repo sources need a local clone for delta computation.
 ---
 
-This is a generated thin wrapper (tsk-1qi D5/D7) -- do not edit directly, edit the source instead.
+This is a generated thin wrapper (tsk-1qi) -- do not edit directly, edit the source instead.
 The real skill content lives at `../../../.agents/skills/distill/SKILL.md`, this project's own canonical skill source.
 Read that file and follow it directly.

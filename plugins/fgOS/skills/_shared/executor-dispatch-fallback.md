@@ -83,24 +83,41 @@ step below — never re-derive it.
 Reached only when Step A's `decide` call answered `mechanism:
 "out-of-process"`. Deciding the mechanism a second time here would be
 deciding it twice — Step A already did that; this step only self-executes
-(tsk-5tm-3 D5, matching marketing-cockpit's `run_task()` contract):
+(tsk-5tm-3 D5, matching marketing-cockpit's `run_task()` contract).
+
+**Run this through the Monitor tool, not a plain synchronous Bash call**
+(tsk-37ij): `dispatch.mjs`'s own `execute` CLI path already tees the
+child executor's live output to its own stderr as it happens
+(`dispatch.mjs:2154`, tsk-129's live-progress feature) — but a
+synchronous Bash call blocks until the whole subprocess exits and only
+then delivers the entire captured output as one block, so a human
+watching this session sees nothing while the executor is actually
+running. Monitor's own event stream is stdout-only, so fold the live
+stderr tee into it with `2>&1`; each line then becomes its own live
+notification while the process is still running — this is the real,
+intended relay channel for a live agent session, not a workaround:
 
 ```bash
-node "$root/src/runner/dispatch.mjs" execute <EXECUTOR_ID> --prompt "<PROMPT_TEMPLATE built as below>" [--has-live-task-access]
+node "$root/src/runner/dispatch.mjs" execute <EXECUTOR_ID> --prompt "<PROMPT_TEMPLATE built as below>" [--has-live-task-access] 2>&1
 ```
 
-Prints the real result as JSON — `{"mechanism":"out-of-process", ...real
-result fields (status, stdout, stderr, tier, model, provider, command)}`.
-Print the announce line, then read `stdout` the same way a consumer used
-to read a hand-run command's own output:
+(pass the line above as Monitor's own `command`, with a `description`
+naming the executor/purpose; a reasonable `timeout_ms` for the tier at
+hand; `persistent: false`.)
+
+Once Monitor reports the command exited, read its final line: the real
+result as JSON — `{"mechanism":"out-of-process", ...real result fields
+(status, stdout, stderr, tier, model, provider, command)}`. Print the
+announce line, then read `stdout` the same way a consumer used to read a
+hand-run command's own output:
 
 ```
 <EXECUTOR_ID> - out-of-process - <provider> - <model>
 ```
 
 An error from this call (a thrown `RunnerConfigError`, a spawn failure, a
-timeout) means fall straight to Step C — treat it exactly like a malformed
-response, never retry blind.
+timeout, or Monitor's own timeout) means fall straight to Step C — treat
+it exactly like a malformed response, never retry blind.
 
 ## Ad-hoc executor: a runtime-composed task instead of `<PROMPT_TEMPLATE>`
 

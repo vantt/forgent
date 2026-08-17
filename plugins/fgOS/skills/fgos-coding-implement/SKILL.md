@@ -43,22 +43,35 @@ re-shapes the work; that already happened at `discovery`/`exploring`/`planning`.
   substitute that literal path into the following `fgos.mjs` call —
   never `$root`, since a fresh tool call starts a new shell with no
   memory of the previous one's variables anyway.
-- Do your own Implement work directly — reading files, writing the real
-  change, running the Iron Law classify yourself — never delegate it to
-  the Agent/Task tool as an ad hoc sub-dispatch. This session is already a
-  live, same-provider soul (Native-First Dispatch Doctrine rule 2,
+- **Always call `dispatch.mjs decide` first for the Implement step —
+  never assume "I have a live Task tool, so I do it myself" as the
+  default** (`docs/decisions/0033-cli-spawn-shaped-capacity-thang-
+  hasLiveTaskAccess.md`, narrowing Native-First Dispatch Doctrine rule 2,
   `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-
-  cli-spawn.md`): spawning a nested Task subagent to implement work you
-  already have full context for (the locked decisions, the plan, the
-  item's own verify) is the same "soul re-deriving what a live soul
-  already knows" waste `tsk-1ni` found in `judgeDiscovery`'s blind
-  cli-spawn — pure overhead, not a transparency question (a Task/Agent
-  call is collapsed by default in the transcript, not hidden, unlike a
-  genuinely opaque headless `claude -p` subprocess). If a step genuinely
-  needs a different backend for a narrow helper task, route it explicitly
-  through the executor-dispatch mechanism instead — see
-  `../_shared/executor-dispatch-fallback.md` for its own list of valid
-  reasons.
+  cli-spawn.md`, to `agentType`-shaped capacities only): a `cli-spawn`-
+  shaped capacity already registered in `.fgos/config.json` (today:
+  `fgos-coding-implement` -> `agy`) resolves `out-of-process`
+  *unconditionally* once configured — `--has-live-task-access` does not
+  change that; config wins, not "I already have full context so I'll do
+  it myself". Run `node src/runner/dispatch.mjs decide --work <id>
+  --has-live-task-access` as the very first action of Implement (Flow
+  step 2 below) and branch on the real `mechanism` it returns:
+  - `unavailable` — proceed exactly as this rule used to say: do your
+    own Implement work directly — reading files, writing the real
+    change, running the Iron Law classify yourself — never spin up an ad
+    hoc Agent/Task sub-dispatch for it. This session is already a live,
+    same-provider soul (Native-First Dispatch Doctrine rule 2): doing
+    that would be the same "soul re-deriving what a live soul already
+    knows" waste `tsk-1ni` found in `judgeDiscovery`'s blind
+    cli-spawn — pure overhead, not a transparency question.
+  - `in-process` — same as `unavailable`, optionally via the returned
+    `agentType`.
+  - `out-of-process` — dispatch via `node src/runner/dispatch.mjs
+    execute <executorId> --prompt "..." --has-live-task-access` (Step
+    B, `../_shared/executor-dispatch-fallback.md`) instead of writing
+    the change yourself; read the result's `stdout` as the work
+    product, then continue this skill's own Verify/Commit/Return steps
+    unchanged.
 - Implement real behavior. No stubs, TODO-only placeholders, dead code, or
   pseudo-implementations offered as if they were done.
 - Match existing patterns in the touched files and the decisions already
@@ -149,8 +162,12 @@ re-shapes the work; that already happened at `discovery`/`exploring`/`planning`.
    this entirely when the item's domain declares no `roleGraph` — `holder`
    never appears there in the first place.
 
-2. **Implement.** Make the real change the item describes, reading every
-   file before editing it. Before editing a symbol, apply `CLAUDE.md`'s
+2. **Implement.** Run `dispatch.mjs decide` first, per the Hard rule
+   above, and branch on its answer: `unavailable`/`in-process` — make
+   the real change yourself, reading every file before editing it;
+   `out-of-process` — dispatch via `execute` instead, per the same
+   Hard rule. Either way, before editing a symbol yourself, apply
+   `CLAUDE.md`'s
    impact-analysis capability gate rather than assuming GitNexus is on this
    machine: `fgos tool query --capability impact-analysis --status present`
    decides whether the MUST-run-impact rule below is Full (present — run
