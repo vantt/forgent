@@ -1154,6 +1154,13 @@ qua `addDecision`.
   cơ học — KHÔNG có tương đương cho tsk-37i dù overlap ở đây rõ hơn. Chưa
   tự sửa vì tsk-37i là item KHÁC, branch khác, phiên khác đang giữ (đã xác
   nhận round 9 — `ListAgents` không định danh được chính xác session nào).
+  **Người dùng quyết: khai `--footprint` một chiều phía tsk-1lv (không chờ
+  phối hợp tsk-37i).** Kiểm tra: footprint hiện có của `tsk-1lv`
+  (`.agents/skills/fgos-coding-compounding/SKILL.md`, `docs/decisions`,
+  `docs/specs`, `src/state/store.mjs` — đặt lúc `fgos-coding-exploring`)
+  ĐÃ PHỦ đúng vùng overlap (`docs/decisions`, `docs/specs`) — không cần sửa
+  thêm, `fgos conflicts` bắt được từ phía này ngay khi tsk-37i khai
+  footprint của họ, dù chưa biết khi nào.
 
 ## 6. Thiết kế đã chốt {#design}
 
