@@ -6,6 +6,11 @@ item: tsk-225
 
 ## 1. Trạng thái hiện tại
 
+**Hội tụ.** D1 (executor thắng backend, full rename, no back-compat) + D2
+(1 decision record mới `0034`, annotate `0000-index.md`, không mở lại
+0026/0029/0033) đã khoá, giữ ổn định qua nhiều vòng. §6/§7 đã viết xong.
+Sẵn sàng bàn giao sang `fgos-coding-exploring`/`fgos-coding-planning`.
+
 Round 3: D1 đã khoá (executor thắng backend, full rename config+code, no
 back-compat). User chỉ ra hỏi decision-record round trước quá mơ hồ (chưa
 liệt kê nội dung thật) — đã đọc thật cả 7 file, tìm ra một phát hiện quan
@@ -64,13 +69,14 @@ backend, mà là cấu hình mặc định khi không backend nào được ch�
 | 9 | Chọn từ nào: `backend` hay `executor`? | **Rõ (round 2, cần giữ ổn định thêm 1 vòng để lên D-ID) — `executor` thắng: khớp kỹ thuật thật với `resolveExecutorConfig`'s existing return shape, đúng khung "capability=lời hứa, X=hiện thực hóa lời hứa" (executor = gốc động từ "thực thi"), backend bị loại vì là danh từ tĩnh không mang nghĩa hành động** |
 | 10 | Phạm vi rename: chỉ field config `.fgos/config.json` (`capacities`→`executors`), hay cả identifier code nội bộ (tên hàm/biến `capacity`/`capacityId` khắp `src/`)? | **Rõ (D1, round 3) — full rename, config field + code identifier, không back-compat** |
 | 11 | 7 decision record: cái nào thật sự có nội dung định nghĩa "capacity" cần xử lý, cái nào chỉ nhắc thoáng qua? | **Rõ (round 3) — chỉ 0026 (khai sinh vocabulary)/0029 (D8, định nghĩa thật)/0033 (dùng dày đặc, mechanistic) có nội dung thật; 0028/0030/0031 chỉ nhắc thoáng qua, không cần động tới** |
-| 12 | Cách xử lý 0026/0029/0033: supersede formal hay chỉ annotate vào `0000-index.md`? | **Đang chờ user xác nhận đề xuất round 3 — xem §5** |
+| 12 | Cách xử lý 0026/0029/0033: supersede formal hay chỉ annotate vào `0000-index.md`? | **Rõ (D2, round 4) — 1 decision record mới (`0034`), annotate `0000-index.md`, không mở lại nội dung còn đúng** |
 
 ## 4. Quyết định đã chốt
 
 | D-ID | Quyết định | Vòng chốt |
 |---|---|---|
 | D1 | Đổi tên toàn bộ `capacity`/`capacities` → `executor`/`executors` (thắng `backend`) — cả config field (`runner.capacities`→`runner.executors`) LẪN identifier code nội bộ (biến/hàm `capacity`/`capacityId` khắp `src/`). Không giữ back-compat/alias nào — đổi dứt điểm. | Round 2 (chọn executor, lý do kỹ thuật+ngữ nghĩa) giữ ổn định sang Round 3 (user xác nhận phạm vi full rename, "không có giữ compatible gì hết") |
+| D2 | 7 decision record: chỉ 0026/0029/0033 có nội dung thật cần xử lý (0028/0030/0031 chỉ nhắc thoáng qua, không động tới). Xử lý bằng 1 decision record MỚI (`0034`), annotate vào `0000-index.md` theo đúng tiền lệ 0028→0026, không mở lại/supersede nội dung còn đúng của 0026/0029/0033. `0034` cũng chính thức hoá việc tách capability/capacity mà 0029 D8 để ngỏ. | Round 3 (đề xuất, scout thật cả 7 file) → Round 4 (user: "agree") |
 
 ## 5. Q&A log
 
@@ -133,6 +139,10 @@ capability/capacity mà D8 để lại chưa rõ — annotate vào `0000-index.m
 theo đúng cách 0028 đã annotate vào 0026, không mở lại nội dung CÒN ĐÚNG
 của 0026/0029/0033. Đang chờ user xác nhận.
 
+**[Round 4]** — User: "agree". D2 khoá. Số quyết định tiếp theo xác nhận
+thật (`ls docs/decisions/`): `0034` (0032/0033 đã dùng). Design hội tụ đủ
+để mở §7 và bàn giao.
+
 ## 6. Thiết kế đã chốt {#design}
 
 Sau tsk-34n, `.fgos/config.json`'s runner model có 3 tầng: `capabilities`
@@ -168,11 +178,58 @@ từ "thực thi"); backend là danh từ tĩnh, không mang nghĩa hành độn
 Việc rename còn chạm tới 3 decision record có nội dung thật (0026 khai
 sinh vocabulary, 0029 D8 định nghĩa gốc — hoá ra gộp cả capability+capacity
 làm một, điều tsk-34n sau này mới tách mà chưa sửa D8, 0033 dùng dày đặc
-mechanistic) — xử lý bằng 1 decision record mới, annotate vào
-`0000-index.md`, không mở lại nội dung còn đúng (đề xuất, đang chờ xác
-nhận — xem §5 round 3).
+mechanistic). D2 khoá cách xử lý: một decision record mới, `0034`, ghi lại
+việc đổi tên VÀ chính thức hoá nốt việc tách capability/capacity mà D8 để
+ngỏ — annotate dòng tương ứng trong `0000-index.md` (theo đúng khuôn dòng
+0026 đã ghi "Đã supersede bởi 0028 lẫn 0029"), không mở lại/supersede nội
+dung còn đúng của 0026/0029/0033. 0028/0030/0031 không cần động tới (chỉ
+nhắc thoáng qua, không nội dung định nghĩa thật).
+
+Phạm vi thực thi cụ thể cho `fgos-coding-planning`: đổi `runner.capacities`
+→ `runner.executors` trong `.fgos/config.json` thật + mọi fixture test;
+đổi mọi identifier code (`capacity`, `capacityId`, `capacities`,
+`resolveCapacityAndOverrides`, v.v. — 466 chỗ trong `src/`, 500 chỗ trong
+`test/`) sang họ từ `executor`; viết `docs/decisions/0034-...md` +
+annotate `0000-index.md`; cập nhật 17 file skill prose nhắc "capacity";
+không thêm alias/back-compat nào cho tên cũ.
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-(chưa chốt shape — chưa mở task nào)
+### {#task-capacity-to-executor-rename}
+
+**Mục tiêu**: đổi tên dứt điểm `capacity`/`capacities` →
+`executor`/`executors` trong toàn bộ codebase và tài liệu, không back-
+compat, và ghi nhận lại quyết định terminology này (kèm chính thức hoá
+việc tách capability/capacity mà 0029 D8 để ngỏ) vào một decision record
+mới.
+
+**Trích §6**: xem đoạn "Phạm vi thực thi cụ thể" ở trên — đây chính là
+nội dung task này cần làm.
+
+**D-ID áp dụng**: D1 (rename target + no back-compat), D2 (cách xử lý 7
+decision record).
+
+**Quan hệ với task khác**: single-piece — không tách nhỏ, vì rename
+config field / rename identifier code / viết decision record đều phải
+land cùng một commit-set để `npm test` + `validateRunnerConfigShape`
+không rơi vào trạng thái nửa cũ nửa mới.
+
+**Verify nháp**:
+- `npm test` xanh toàn bộ (baseline hiện tại trên `main`: 3477 pass / 0
+  fail, 5 skipped, sau khi tsk-34n delivered).
+- `grep -rn "capacit" src/ test/` không còn match nào (trừ khi một match
+  là trích dẫn nguyên văn một decision record CŨ, đã supersede, trong
+  comment/docstring — nếu có trường hợp này cần liệt kê tường minh, không
+  âm thầm bỏ qua).
+- `.fgos/config.json` thật load được dưới field mới `runner.executors`,
+  hành vi dispatch bên ngoài (`decide --work`/`decide --for`) giữ nguyên
+  y hệt trước rename (đối chứng bằng cùng phép kiểm `tsk-pdg`/`tsk-34n` đã
+  dùng: `{"mechanism":"out-of-process","configured":true}` cho case
+  native, tương tự cho case headless).
+- `docs/decisions/0034-*.md` tồn tại, `0000-index.md` có dòng annotate
+  trỏ tới nó trên các dòng 0026/0029/0033 tương ứng.
+- Iron Law: `src/runner/dispatch.mjs` chắc chắn match `src/runner/` rule
+  → cần failing-before/passing-after transcript thật, theo đúng khuôn
+  tsk-34n đã để lại 4 vòng bằng chứng trong
+  `docs/history/capability-capacity-remodel/iron-law-evidence.md`.
 
