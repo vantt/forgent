@@ -202,7 +202,7 @@ npm test \
   && grep -qE '<ID>.*one-line gloss' .agents/skills/_shared/citation-format.md \
   && ! grep -q 'D2' .agents/skills/fgos-coding-shaping/SKILL.md \
   && grep -q 'never write CONTEXT.md/plan.md directly' .agents/skills/fgos-coding-shaping/SKILL.md \
-  && node scripts/check-decision-citation-drift.mjs --baseline none --decisions-dir docs/decisions --backlog docs/backlog.md --specs-dir docs/specs --skills-dir .agents/skills --skills-dir plugins/fgOS/skills
+  && node scripts/check-decision-citation-drift.mjs --decisions-dir docs/decisions --backlog docs/backlog.md --specs-dir docs/specs --skills-dir .agents/skills --skills-dir plugins/fgOS/skills
 ```
 
 - `npm test` — regression guard (existing dead-framing tests unmodified) +
@@ -219,21 +219,21 @@ npm test \
   in the file) plus a POSITIVE pinning the actual inlined content that
   replaced it (a long, distinctive phrase, per skill-prose-verify trap
   #5 — not a weak single-word grep).
-- **Fixed (was C3):** the completeness leg now runs with `--baseline none`
-  — the reserved sentinel meaning an EMPTY baseline, so every real finding
-  of every kind counts as new and the command only exits 0 when nothing
-  is left to fix. Running it against the checked-in baseline (the
-  non-`none` default) would exit 0 the instant phase 1 lands, with phase 3
-  entirely undone — that was the original, broken design. The 3 D6-deferred
-  findings are a known, accepted gap in this leg: per D6 they are
-  out of scope, so `--baseline none` will legitimately still show them as
-  "findings" unless a follow-on decision narrows this leg further. **This
-  is intentionally left as the honest state rather than silently
-  papered over** — if the implementer finds this leg still red on those 3
-  lines alone at merge time, that is D6 working as designed (a report,
-  not this item's job to silence), and the leg should be read as "zero
-  NEW-since-baseline findings, review the 3 named exceptions by hand,"
-  matching D6's own wording, not literally "zero findings of any kind."
+- **Fixed (was C3, then refined by D8):** the completeness leg runs the
+  check against the CHECKED-IN baseline (standard mode, default path — no
+  `--baseline none`). C3's real bug was a STALE baseline snapshotted
+  BEFORE any cleanup and never touched again; the fix is not "require zero
+  findings of any kind" but "the checked-in baseline must be regenerated,
+  as part of this item's own final commit, to reflect genuine post-cleanup
+  state." D8 records why: `tsk-3ch`'s own completion bar was never zero
+  violations, only zero NEW ones against a checked-in snapshot — this item
+  holds itself to the same bar its own precedent set, not a stricter one
+  invented during plan review. The real proof of "cleanup happened, not
+  skipped" lives in the baseline JSON's own commit diff (reviewable: its
+  finding count measurably shrinks from a pre-cleanup scan), not in the
+  shell verify line, matching `docs/how-to/write-verify-for-a-skill-
+  prose-change.md`'s own boundary (verify proves the mechanism works, not
+  full historical completeness — that is review's job).
 - **Fixed (was C1):** the old NEGATIVE (`! rg -P ...`) is deleted outright
   — this machine's `rg` build has no PCRE2 (`rg --pcre2-version` confirmed:
   "PCRE2 is not available"), so `-P` made the whole leg exit 2 (engine
