@@ -1107,3 +1107,1293 @@ Not applicable — không có màn hình.
 - `.githooks/pre-commit` (STR65) — hook git-native (không phải verb fgOS, không phải cấu hình riêng công cụ trợ lý nào — xem "Khóa hoạt động cây chính" trên cho hợp đồng đầy đủ): giải thư mục gốc worktree bằng `path.resolve(__dirname, '..')` (KHÔNG gọi `git rev-parse --show-toplevel` — biến môi trường `GIT_DIR` mà git tự đặt khi hook chạy TRONG một git worktree làm lời gọi đó trả sai thư mục gốc, xác nhận thật bằng tái tạo có chủ đích trước khi vá); gọi `resolveWriterIdentity()` rồi `acquireMainCheckoutLock` với `ttlMs` mặc định 300000 (5 phút, đọc đè được qua biến môi trường `FGOS_MAIN_CHECKOUT_LOCK_TTL_MS`) — số này chọn từ bằng chứng thật (khoảng cách giữa các commit thật của 3 sự cố STR65 có SHA, ~2-3.5 phút), giảm từ mức mặc định 15 phút ban đầu qua 10 phút xuống 5 phút; HELD/AMBIGUOUS → in thông điệp bằng thời gian + trỏ `docs/how-to-parallel-lanes.md`, thoát khác 0; ACQUIRED → thoát 0 im lặng.
 - `scripts/install-git-hooks.mjs` (STR65) — wire `core.hooksPath` về `.githooks` khi checkout có git thật (dev clone); vắng git (cài như dependency qua `npm install <github-url>`, không giữ lại git — xem `docs/specs/distribution.md`) thì thoát 0 im lặng, không throw; gọi qua `prepare` lifecycle script của `package.json` — chạy tự động sau `npm install` trên một clone mới, không cần bước cài tay riêng.
 - Test: `test/runner/*` (gồm `test/runner/merge.test.mjs` — unit `classifySource`/`reviewDiff`/`mergeRunnerItem`/`cleanupMergedBranch`; `test/runner/write-queue.test.mjs` — chứng minh serialize thật qua marker enter/exit không xen kẽ; `test/runner/root-affinity.test.mjs` — resolveRoot/claimRoot/steerFrontier, khuôn race 2-tác-nhân đã spike-proven; `test/runner/goal-check.test.mjs` — mới, real-fake-executor) + `test/e2e/runner-loop.test.mjs` (executor giả, repo git tạm, bao gồm 3 kịch bản stage-discovery — dispatch worker thật rồi phán quyết đủ rõ đẩy item sang `planning`, phán quyết chưa đủ rõ đẩy sang `exploring` + đậu chờ người, worker sập thì item đứng yên tại `discovery`/`todo` — cộng các kịch bản stage-clarify/stage-decompose còn lại, nay khẳng định `--once` KHÔNG tự phán ở hai tên stage đó: pass-through, chia-con-chặn-frontier, cần-người + 1 kịch bản S2-pull: `take` người + `fgos-runner --once` song song không giẫm + `return` xanh + kịch bản con fork từ tip nhánh gốc) + `test/e2e/pr-gate.test.mjs` (4 kịch bản thật qua binary + git: runner item full loop review→approve→merge→done, merge conflict thật với tree nguyên vẹn sau abort, pull-door item full loop, reject pull-door giữ commit làm lịch sử) + `test/cli/fgos.test.mjs` (unit CLI cho `take`/`return`/`review`/`approve`/`reject`/`catchup`: frontier-head claim, CAS conflict, dirty-tree/HEAD-chưa-tiến refusal, verify xanh/đỏ, main-never-holds-broken-merge cho cả conflict lẫn verify-fail, legacy degrade, leaf-vs-root branch targeting, integration-drift reason, catch-up sạch/xung-đột-thật/lý-do-không-áp-dụng-được) + `test/state/replay.test.mjs` (fold `claimRole`/`headAtTake`/`headAtReturn`) + `test/state/fsm.test.mjs` (cạnh `blocked→awaiting-approval`, D18) + `test/report/entropy.test.mjs` (entropy thuần) + kịch bản chồng-lấn-thật hai việc song song trong `test/runner/loop.test.mjs` (peak-concurrency counter, không phải suy luận thời gian tường) + `test/runner/worker-log.test.mjs` (mới — create/append, nối-không-đè qua nhiều lần thử, degrade không throw khi field vắng) + `test/runner/frozen-judge.test.mjs` (STR63 — unit `frozenJudgeHits`, mọi rule + exact-path footprint match) + benchmark ngoài suite `docs/history/phase-3-compound-learning/reports/f4-benchmark.md` (F4, real binaries, expected-delta khai trước run); 1380 test toàn suite tính tới STR63 (`cd repo && npm test`, số cũ 637 đã trôi qua nhiều feature trước đó — không phải drift do cell này)
+
+## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)
+
+Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4, D5) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc.
+
+
+### 0005 — Runner & cô lập worker
+
+#### Bối cảnh
+
+Lớp state cần một "máy" thật để vòng recovery và anti-loop được **kiểm bằng chạy
+thật**, không phải bảng chính sách treo. Đây cũng là bước đầu của hướng nhiều-agent
+chạy song song. Đồ bảo hộ phải có máy để bảo vệ.
+
+#### Quyết định
+
+- **Runner tối thiểu, vòng lặp thật:** đọc frontier → lấy một việc → dispatch →
+  thu kết quả → ghi qua `fgos`. Recovery matrix + anti-loop **sống trong runner** và
+  được test bằng vòng chạy thật.
+- **Executor = agent headless.** Prompt dựng từ chính work item (tiêu đề/loại/tham
+  chiếu/verify). **`verify` của item do RUNNER tự chạy** làm goal-check độc lập —
+  không tin lời worker tự khai.
+- **Trong vòng dispatch, runner là NGƯỜI GHI DUY NHẤT** qua `fgos`; worker **không
+  bao giờ tự gọi `fgos`**. (Giữ tiền đề single-writer của 0001 — phá là chạm ngưỡng
+  mở lại luật.) Quyền ghi của người vận hành *ngoài* vòng dispatch giữ nguyên.
+- **Worker chạy trên nhánh/worktree cô lập; kết quả là ĐỀ XUẤT** — commit trên nhánh
+  + báo cáo. Con người (hoặc một vòng review được gọi riêng) duyệt rồi mới merge.
+  **Worker không bao giờ sửa thẳng working tree chính.**
+- **tier→model:** schema `work` thêm trường `tier`; runner đọc bảng map tier→model
+  từ config khi dispatch worker (giao việc rẻ cho model rẻ).
+- **Anti-loop đọc raw events:** đếm số lần thăm một việc cần đọc event thô, nên store
+  có thêm một accessor **chỉ-đọc** trả về event thô; **cửa ghi duy nhất không đổi**.
+
+#### Hệ quả
+
+- **Sai thì vứt nhánh:** runner tự hành được mà không cần phòng tuyến hoàn hảo ngày
+  đầu — kết quả xấu nằm trên nhánh cô lập, không đụng cây chính.
+- **Recovery/anti-loop là hành vi được test,** không phải lời hứa trên giấy.
+- **Cost-tiered delegation** ngay từ vòng dispatch.
+- **Single-writer bảo toàn:** một cửa ghi trong lúc chạy tự động → không tranh ghi.
+
+Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
+
+### 0008 — Routing theo audience của từng interface
+
+#### Bối cảnh
+
+forgent có nhiều interface (giữa các bước trong một chuỗi agent, và giữa hệ thống
+với các consumer bên ngoài). Cám dỗ là chọn **một** kiểu giao tiếp (một khuôn:
+hoặc tất cả bằng văn xuôi, hoặc tất cả bằng dữ liệu cấu trúc) rồi áp toàn cục. Mỗi
+khuôn đúng cho một loại người-đọc và sai cho loại kia.
+
+#### Quyết định
+
+Chọn kiểu routing **theo audience của TỪNG interface**, không toàn cục:
+
+- **prose-handoff** (bàn giao bằng văn xuôi) cho **agent ↔ agent trong một chuỗi**:
+  người đọc là một agent hiểu ngôn ngữ, cần bối cảnh và ý định.
+- **data / exit-code / decision-table** (dữ liệu, mã thoát, bảng quyết định) cho
+  **consumer không-chắc-là-agent**: người đọc có thể là script/máy, cần hợp đồng
+  chặt và phân giải được không mơ hồ.
+
+#### Hệ quả
+
+- **Mỗi interface mang đúng hợp đồng cho người đọc nó** — không ép một agent phải
+  parse bảng cứng, cũng không ép một script phải hiểu văn xuôi.
+- **Quy tắc quyết định rõ:** hỏi "ai đọc đầu kia?" trước khi chọn định dạng, thay
+  vì áp một khuôn quen tay lên mọi biên.
+
+Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
+
+### 0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)
+
+#### Bối cảnh
+
+`tsk-1an` tái hiện: `worktree.mjs`'s `createWorktree` (dùng bởi pick/take/runner/approve
+cho nhánh `fgw/<id>`) là `git worktree add` trần — vì `.fgos/` được git-tracked trong
+repo này, fork checkout ra một BẢN CHỤP `.fgos/` đứng yên tại thời điểm fork, bỏ sót mọi
+event chưa commit trên main. `session.mjs`'s `createSession` (dùng cho phiên driver
+`fgos session start`) đã giải đúng lớp vấn đề này từ trước — xóa bản checkout rồi
+symlink `.fgos/` về thẳng kho chung (D10, trích tại `session.mjs:1-6` và
+`specs/runner.md:26`). Hai code path lệch nhau về cách xử lý `.fgos/`; `docs/distillery/
+porting-log.md:101` (`worktree-isolation-axis`, nguồn beegog `independent-feature-
+worktrees`) treo câu hỏi mở "human chọn khóa-cây hay cô-lập-cây cho fan-out fgOS".
+
+Trước khi chọn trục, đã xác minh bằng đọc code (không đoán):
+
+- Không có gì trong đường dispatch worker đọc/ghi `.fgos/` hôm nay: `dispatch.mjs`'s
+  executor spawn ở `cwd = wt.path` (`loop.mjs:699`) không hề gọi `fgos`; prompt worker
+  cấm thẳng ("Never call `fgos` yourself and never write to `.fgos/` directly" —
+  `worker-prompt-default.txt:18-21`); `dataDir()` của CLI resolve theo `process.cwd()`
+  (`bin/fgos.mjs:59-61`), không có `repoRoot` cố định.
+- Mọi transition trạng thái/stage — `doing→proposed/blocked` lẫn `proposed→done` — đều
+  ghi **từ ngoài worktree**: `loop.mjs`'s `dispatchClaimedItem` gọi `moveWork` cùng
+  process với `dir = repoRoot/.fgos` (`loop.mjs:727-815`, `store.mjs:327`); `approve`
+  (merge thật) là lệnh CLI riêng chạy ở main checkout (`bin/fgos.mjs:1507`). Cửa ghi
+  CTR001/one-door-write **chưa từng nằm trong worktree worker**, bất kể verify chạy ở
+  đâu.
+- Cơ chế duy nhất từng cho phép worker ẢNH HƯỞNG state — "discovered work" — đã đi theo
+  mẫu output-có-cấu-trúc-rồi-runner-tự-áp (`0013`), không phải access sống vào
+  `.fgos/`.
+- `worker`'s cwd có quyền `Bash(git add:*),Bash(git commit:*)` KHÔNG giới hạn path
+  (`dispatch.mjs:210-218`) — không có capability-wall thật, chỉ có lời dặn trong prompt.
+  Đúng lớp lỗi repo đã tự ghi nhận ở `capability-enforced-readonly-fanout`
+  (porting-log): "capability LÀ tường, không phải câu dặn — sự cố thật: analyst được
+  dặn 'no writes' vẫn commit source."
+
+#### Quyết định
+
+Chọn phương án thứ ba, hẹp hơn cả hai vế của câu hỏi treo — **chặn-cây**, không phải
+khóa-trong-cây (symlink) và không phải cô-lập-cây đầy đủ (bootstrap-copy + union-merge):
+
+- `worktree.mjs`'s `createWorktree`, sau `git worktree add`, xóa hẳn bản `.fgos/` vừa
+  checkout ra (không symlink, không giữ lại) — mirror bước xóa của `session.mjs:346-359`
+  nhưng KHÔNG làm bước symlink theo sau.
+- `merge.mjs` thêm một guard cơ học: một diff của nhánh `fgw/<id>` chạm bất kỳ path nào
+  dưới `.fgos/` bị `approve` từ chối cứng trước khi tin merge — wall nằm ở phía trusted
+  (mã chạy trên main), không dựa lời dặn worker.
+- `session.mjs` giữ nguyên 100% (symlink, D10) — actor khác hẳn: phiên driver được PHÉP
+  gọi `fgos`, worker thì không.
+
+##### Vì sao không khóa-trong-cây (symlink như session.mjs)
+
+Đúng pattern cho actor trusted (session), SAI cho worker: symlink trỏ RA NGOÀI worktree
+là lối thoát sandbox kinh điển — một write-guard mai sau muốn khoanh worker vào đúng cây
+của nó sẽ phải tự biết resolve symlink target mới chặn được, nếu không thì path
+`.fgos/events.jsonl` nhìn như "trong worktree" nhưng thật ra ghi thẳng ra kho sống. Hơn
+nữa symlink cấp quyền ghi SỐNG vào kho DUY NHẤT từ một execution context không có
+capability-wall thật (wildcard git add/commit, xem Bối cảnh) — một lần ghi lạc (bug,
+prompt injection, hay agent tự ý) đâm thẳng vào `.fgos/events.jsonl` thật, không qua
+review, không như code (code lỡ sai còn nằm trên nhánh vứt được). Nặng hơn cả hiện trạng
+(bản chụp cũ đứng yên, ghi lạc vào đó chỉ tự làm bẩn nhánh của chính nó, bị chặn lúc
+merge nếu commit).
+
+##### Vì sao không cô-lập-cây đầy đủ (bootstrap-copy + union-merge, kiểu beegog/symphony)
+
+Đúng pattern cho worker THẬT SỰ cần state riêng rồi hòa giải sau (repository-harness's
+`symphony-isolated-runner`: "root db never source of truth of the run", đổi trạng thái
+bền chỉ qua semantic changeset) — nhưng đó là bài **chưa ai hỏi** ở fgOS hôm nay: đã xác
+minh không nơi nào trong dispatch cần đọc/ghi `.fgos/` từ worktree (xem Bối cảnh). Build
+cả subsystem F3 (store riêng + grant read-only + resolve + union-merge lúc merge-back)
+cho nhu cầu chưa tồn tại là xây trước — ngược YAGNI (`development-rules.md`). Nó còn kéo
+thêm một mặt trận chưa có lời giải rẻ trong Node: cấp "read-only main-store" cho worktree
+mà worktree "không tự-cấp" (đúng chữ porting-log dùng) đòi cơ chế permission/bind-mount
+không cơ học đơn giản cross-platform — thêm bề mặt phải giữ đúng cho một khả năng chưa
+dùng.
+
+##### Vì sao chặn-cây
+
+Đóng cả hai rủi ro cùng lúc, chi phí nhỏ nhất:
+
+- Đóng bug tái hiện của `tsk-1an` triệt để hơn cả khóa lẫn cô-lập: không còn bản `.fgos/`
+  nào trong worktree để "thiếu" hay "cũ" — không có gì để đọc sai, vì đọc sai cần có dữ
+  liệu (dù cũ) để đọc.
+- Đóng lối thoát sandbox mà khóa-trong-cây mở ra, mà không cần xây subsystem của cô-lập.
+- Không thêm state phải đồng bộ, không thêm cửa ghi thứ hai — CTR001 one-door-write giữ
+  nguyên nghĩa đen: chỉ một nơi vật lý là `.fgos/`, đứng ở `repoRoot`.
+- Đường mở rộng vẫn còn nguyên nếu sau này worker THẬT cần ảnh hưởng state (planning
+  worker, luồng dài tự đề xuất việc): nối theo đúng mẫu `0013` (output có cấu trúc,
+  runner/main checkout tự áp qua verb) — không cần đảo quyết định này, chỉ cần thêm một
+  kênh output nữa, giống discovered-work.
+
+Không chốt cho trục điều phối rộng hơn (`worktree-isolation-axis`, đa-agent tách nhánh
+tính năng song song) — câu hỏi đó vẫn `candidate` ở `porting-log.md:101`, phạm vi rộng
+hơn hẳn bug `.fgos`-trong-`fgw/<id>` này.
+
+#### Hệ quả
+
+- `worktree.mjs`, `merge.mjs` cần sửa theo đúng hai gạch đầu dòng ở Quyết định — chưa
+  làm tại thời điểm ghi record này, đây là quyết định trục, phần thực thi đi theo sau.
+  Kiểm test: (1) tái hiện bug gốc (submit uncommitted rồi pick → xác nhận trước-sửa
+  worktree mang bản `.fgos/` cũ/thiếu), (2) sau sửa, worktree hoàn toàn không có
+  `.fgos/`, (3) `merge.mjs` từ chối một diff giả lập có chạm path `.fgos/`.
+- `tsk-3w8` (đợi trục này chốt, theo `deps`) không đổi hướng gì thêm — vấn đề của nó
+  (race main-checkout lúc `approve`/commit) là lớp coordination khác, không phải
+  DB-copy/staleness của trục này.
+- `session.mjs` không đổi — vẫn symlink, vẫn D10.
+
+Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
+
+### 0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence
+
+#### Bối cảnh
+
+`tsk-3w8` tái hiện thật (2026-07-28, dogfood tsk-veg): `approve`'s bước cuối
+(`mergeRunnerItem`'s `git commit --no-edit`, merge.mjs) fail khi 1 session
+khác commit lên main CÙNG LÚC (`.git/index` clobbering — đúng lớp lỗi
+`str65-worktree-isolation-enforcement` đặt tên). Code merge vẫn landed đúng
+lên main; chỉ bước ghi `work.move(to:'done')` sau đó rớt, item ở lại
+`proposed` dù thực tế đã xong.
+
+Trước khi chọn hướng sửa, phát hiện qua đọc code (không đoán): cơ chế giải
+đúng bài này ĐÃ CÓ SẴN, viết bởi 1 phiên khác (nhánh `str46`/`str65`/`str88`,
+hợp nhất vào main qua `git pull` cùng ngày) — `src/runner/main-checkout-lock.mjs`
+(primitive khóa) + `.githooks/pre-commit` (hook thật, acquire khóa đó cho MỌI
+`git commit` trên checkout, bất kỳ actor nào — người, agent, CI, không riêng
+verb nào của fgOS). `test/e2e/main-checkout-lock-hook.test.mjs` xanh 7/7,
+`git commit` subprocess thật, tranh chấp identity thật. Hook này, MỘT KHI
+ACTIVE, đã bảo vệ đúng bước `approve`'s `git commit --no-edit` mà `tsk-3w8`
+nêu — không cần code application-level mới.
+
+Nhưng hook KHÔNG active mặc định. Từng được wire tự động qua npm `prepare`
+(`str65-worktree-isolation-enforcement-6`), rồi bị GỠ CHỦ Ý
+(`str88-fgos-pnpm-lifecycle-1`, vì pnpm 10+ chặn `prepare` cho dependency
+git-hosted), thay bằng bước tay `npm run setup:hooks` — có ghi ở README
+nhưng `fgos setup`/`fgos doctor` chưa từng đọc/ghi tới, và không ai tự động
+hoá lại. Không có decision record nào giải thích lý do hoãn — chỉ 1 commit
+message ngắn.
+
+#### Quyết định
+
+Chọn **wire hook có sẵn vào `fgos doctor` (đọc) + `fgos setup` (ghi)** —
+KHÔNG viết app-level lock-wrap riêng trong `approve`, KHÔNG xây
+`epoch-fence-merge-gate` (CAS subsystem mới, nguồn repository-harness, ghi
+trong `porting-log.md` là "Closes tsk-3w8"):
+
+- `src/setup/git-hooks.mjs` (mới, layer `infra`) — `installGitHooks(repoRoot)`
+  (ghi, **fill-only**: không bao giờ ghi đè `core.hooksPath` đã trỏ nơi khác,
+  giống đúng nguyên tắc 2 side-effect kia của `setup` — `insertSourceLine`
+  chỉ append, `mergeConfigDefaults` không bao giờ đụng key user đã có) và
+  `mainCheckoutHookWired(cwd)` (đọc, dùng bởi cả doctor lẫn setup's report).
+- `fgos doctor` thêm check thứ 4: `main-checkout-hook-wired`.
+- `fgos setup` gọi `installGitHooks`, trả thêm `hooksWired` +
+  `hooksSkippedExisting` (giá trị custom cũ nếu có, để không âm thầm mất
+  thông tin khi từ chối ghi đè).
+- `scripts/install-git-hooks.mjs` (giữ cho `npm run setup:hooks`) trở thành
+  shim mỏng, re-export từ `src/setup/git-hooks.mjs` — logic thật phải nằm ở
+  `src/setup/` vì `scripts/` không nằm trong `package.json`'s `files` (không
+  ship theo npm package) và không nằm trong phạm vi
+  `docs/architecture-manifest.json`'s import-direction check (chỉ quét
+  `src/`+`bin/`) — `bin/fgos.mjs` import thẳng từ `scripts/` từng làm vỡ cả 2
+  (test kiến trúc + e2e `npm pack -> npm install -g`).
+
+##### Vì sao không app-level lock-wrap trong `approve`
+
+Vá sai chỗ: ca lỗi thật là 1 session KHÁC không hề gọi qua `approve` — nó tự
+`git commit` tay. Khóa chỉ đặt trong `approve` vô dụng với chính thủ phạm.
+Hook giải đúng gốc vì chặn ở TẦNG GIT, mọi commit, không riêng 1 verb.
+
+##### Vì sao không epoch-fence-merge-gate
+
+Xây subsystem mới (F2 theo phân loại distill) để giải lại bài hook ĐÃ GIẢI —
+ngược YAGNI. Chỉ đáng nếu sau này có bằng chứng mutex (khóa-độc-quyền) không
+đủ — cần nhiều writer chạy song song thật, không chỉ chặn-nhau. Chưa có bằng
+chứng đó.
+
+#### Hệ quả
+
+- **Đây là fix khả-tiếp-cận (reachability), không phải enforcement tự
+  động** — tự đánh giá trung thực, không phóng đại: một checkout clone mới
+  KHÔNG BAO GIỜ chạy `fgos setup`/`fgos doctor`/`npm run setup:hooks` (CI
+  chạy `git commit` trần, hoặc agent không gọi 2 verb đó) vẫn hở y như trước
+  quyết định này. Việc này thêm đường kích hoạt thứ 2 (không phụ thuộc npm
+  lifecycle) + cách PHÁT HIỆN khoảng hở (`fgos doctor`), không bắt buộc kích
+  hoạt.
+- Việc còn mở, chưa làm trong quyết định này: có cần ép `fgos setup`/`doctor`
+  chạy bắt buộc ở CI hay một trigger không tùy-chọn khác để đóng nốt khoảng
+  hở đó hay không — để dành thành item riêng nếu ca thật (agent/CI commit
+  không qua 2 verb này) xảy ra thường xuyên.
+- Dogfood thật trên chính checkout này: `fgos setup` đã chạy, xác nhận
+  `git config --get core.hooksPath` = `.githooks`, `fgos doctor` báo xanh.
+
+Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
+
+### 0022 — Khảo sát choke-point fgOS (quyết định lặp/lệch xuyên CLI/runner/skill)
+
+#### Bối cảnh
+
+`tsk-53f` xác nhận 1 case cụ thể: claim + worktree-isolation (`take`/`pick`
+vs runner) từng có 3 đường claim độc lập, đã hợp nhất qua `claim-port.mjs`
+(D1). `tsk-1ab` là khảo sát rộng hơn: những loại quyết định NÀO KHÁC trong
+fgOS đang bị nhiều flow (CLI verb, runner loop, skill) tự implement riêng,
+dẫn tới hành vi lệch nhau cho CÙNG một câu hỏi quyết định. Mỗi candidate
+dưới đây được xác nhận bằng cách đọc trực tiếp từng call site — không suy
+diễn từ tên/hình dạng giống nhau (yêu cầu (2) của item).
+
+#### Candidates
+
+##### Xác nhận THẬT (choke-point có bằng chứng cụ thể)
+
+###### 1. `take` vs `pick` — 2 định nghĩa khác nhau cho "item này claim được không"
+
+Cả hai đều delegate phần ghi state cho cùng `claimWork` (`claim-port.mjs`,
+đã hợp nhất đúng theo tsk-53f D1) — NHƯNG mỗi verb tự gác một lớp kiểm tra
+điều kiện claim RIÊNG, ngay trước khi gọi `claimWork`, và hai lớp gác đó
+trả lời khác nhau cho cùng 1 input (id đang ở stage `clarify`/`decompose`,
+status `todo`, chưa vào frontier):
+
+- `take --id <id>` (`bin/fgos.mjs:1233-1237`): chặn cứng — nếu
+  `status === 'todo'` và id không nằm trong `readyWork()` (frontier, tức
+  chưa tới stage `executing`), ném lỗi `"is todo but not in the frontier
+  yet (stage/deps/lineage)"`.
+- `pick --id <id>` (`bin/fgos.mjs:1272-1285`): KHÔNG có kiểm tra
+  frontier/stage — chỉ cần id tồn tại. Comment ngay tại chỗ
+  (`bin/fgos.mjs:1263-1268`) xác nhận đây là chủ ý: "the frontier-membership
+  guard removed below was a hard check at THIS verb layer, never an FSM
+  law" — nới lỏng để clarify/decompose claim qua được cửa pick.
+
+Hệ quả đã xác nhận thật, không suy đoán:
+- `plugins/fgOS/skills/fgos-routing/SKILL.md` (bản trong worktree này) tự
+  hướng dẫn dùng đúng `fgos take --role session [--id <id>]` để claim một
+  item còn ở `clarify`/`decompose` — lệnh này BỊ REJECT bởi chính guard ở
+  trên, vì `take` chưa từng được nới lỏng như `pick`.
+- `plugins/fgOS/skills/cook/SKILL.md:36-39` đã tự phát hiện đúng lỗi này
+  qua test thật ("Verified empirically against this repo... rejected"),
+  ghi thành "Known gap (flagged, not guessed around)" — nhưng chỉ vá ở
+  tầng cook's own flow, không sửa `fgos-routing`, và tự nhận "reconciling
+  fgos-routing itself is a separate, out-of-scope fix".
+- Phiên làm việc khảo sát item NÀY (tsk-1ab) tự confirm thêm 1 lần nữa:
+  `pick tsk-1ab` thành công thật khi item còn stage `clarify` (log claim
+  seq 518 (renumbered by tsk-n4i-1; was 502), `"from":"todo","to":"doing"`),
+  đúng khớp phân tích code trên.
+
+3 nguồn (code, cook's known-gap note, phiên này) đồng nhất — đây là
+choke-point rõ nhất tìm được: 1 câu hỏi quyết định ("id này claim được
+chưa"), 2 verb code trả lời khác nhau, và tài liệu skill chính thức
+(`fgos-routing`) đang hướng dẫn sai theo nhánh `take` bị chặn.
+
+**Đã sửa** (item `choke-point-take-vs-pick-claim-eligibility`): đồng bộ
+guard giữa `take`/`pick` cho nhánh `--id` tường minh, KHÔNG nới `take`'s
+no-`--id` default (D1 "take mirrors runner dispatch" giữ nguyên cho nhánh
+đó). `take`'s explicit-`--id` branch (`bin/fgos.mjs`) giờ gọi
+`isDepsAndLineageReady` (`src/state/frontier.mjs`, factored từ `frontier`'s
+own deps+lineage clause, trừ stage clause) thay vì `readyWork(dir).some(...)`
+— dep-chưa-xong và open-descendant vẫn chặn claim y như cũ (test cũ
+`pull-dep-blocked` vẫn xanh), chỉ riêng stage `clarify`/`decompose` không
+còn chặn nữa, khớp đúng hành vi `pick` đã có từ trước. `fgos-routing`'s
+prose ("claim it specifically with `--id <id>`" dùng `take --role session
+[--id <id>]`) giờ ĐÚNG với hành vi thật, không cần sửa. Regression:
+`test/cli/take-pick-claim-eligibility.test.mjs`.
+
+###### 2. Kiểm tra working-tree sạch — 2 định nghĩa độc lập cho `return` và `approve`
+
+Xác nhận lại tsk-63j D1 với citation mới (file đã đổi dòng từ lúc D1 ghi):
+
+- `bin/fgos.mjs:98` định nghĩa `isWorkingTreeClean(cwd)` riêng cho `return`
+  (gọi tại `bin/fgos.mjs:1428`) — chạy `git status --porcelain -- .`, chỉ
+  soi subtree của `cwd`.
+- `src/runner/merge.mjs:133` định nghĩa `isWorkingTreeClean(repoRoot)`
+  riêng cho `approve` (import alias `isMainTreeClean` tại
+  `bin/fgos.mjs:33`, gọi tại `bin/fgos.mjs:1714`) — chạy
+  `git status --porcelain` không pathspec, soi TOÀN repo.
+
+Cả hai dùng chung 1 helper loại trừ (`isFgosOnlyStatusLine`) nhưng hàm gác
+chính thì viết riêng 2 lần, với khác biệt phạm vi thật (subtree vs
+whole-repo) — không phải trùng tên ngẫu nhiên, là 2 implementation thật.
+
+**Đã sửa** (item `choke-point-workingtree-clean-duplication`, commit
+`3dad0c2`): hợp nhất về 1 hàm `isWorkingTreeClean(repoRoot, ownFileSet,
+{ scope })` trong `src/runner/merge.mjs`, `scope` nhận `'subtree'` (return)
+hoặc `'whole-repo'` (approve, mặc định) — cùng 1 lần tính `prefix`, cùng 1
+lần loại trừ `.fgos/`. `bin/fgos.mjs`'s own `isWorkingTreeClean(cwd,
+ownFileSet)` giờ chỉ delegate sang hàm trên với `scope: 'subtree'`.
+
+###### 3. `createWorktree` — 6 call site, mỗi nơi tự xử lý baseRef/cleanup riêng
+
+Re-verify tsk-53f's finding từ đầu theo D2 (không tái dùng report cũ) —
+xác nhận vẫn đúng 6 call site, line number đã trôi so với report cũ
+(`plans/reports/choke-point-investigation-260728-1717-claim-worktree-report.md`,
+tự nó là bằng chứng cho luận điểm của item này: tài liệu tĩnh trôi khỏi
+code rất nhanh trong repo này):
+
+| Ngữ cảnh | File:Line hôm nay | baseRef | Cleanup khi lỗi |
+|---|---|---|---|
+| `pick` | `bin/fgos.mjs` qua `claim-port.mjs:170` | HEAD hiện tại hoặc root branch (đã sửa theo baseRef truyền vào) | không có `finally`/cleanup tại call site này |
+| `approve` (leaf merge, ephemeral) | `bin/fgos.mjs:1735` | root branch | có |
+| `review` (ephemeral) | `bin/fgos.mjs:1994` | item branch | có |
+| Runner `startupReap` | `src/runner/loop.mjs:398` | mặc định (không truyền `baseRef`) | có (`finally`) |
+| Runner dispatch — LEAF | `src/runner/loop.mjs:679` | `branchNameFor(rootId)` | có |
+| Runner dispatch — ROOT | `src/runner/loop.mjs:681` | mặc định | có |
+
+`createWorktree` bản thân đã là 1 hàm dùng chung (`src/runner/worktree.mjs`)
+— phần LẶP không nằm ở việc tạo worktree, mà ở việc MỖI call site tự quyết
+`baseRef` nào truyền vào và tự viết cleanup riêng thay vì có 1 wrapper
+chung theo "loại thao tác" (claim-isolate / merge-ephemeral / runner-dispatch).
+
+##### Đã kiểm tra, KHÔNG phải choke-point (loại khỏi danh sách, có bằng chứng)
+
+Yêu cầu (2) của item đòi xác nhận thật, không chỉ giống bề ngoài — 3
+candidate sau nằm trong 4 gợi ý gốc của description nhưng khi đọc code thì
+ĐÃ hợp nhất đúng, không lặp:
+
+- **Verify run + timeout**: 1 hàm dùng chung duy nhất,
+  `runGoalCheck` (`src/runner/goal-check.mjs:20`) — gọi từ cả 8 nơi cần
+  chạy verify (`bin/fgos.mjs:1391,1440,1886,2036`, `src/runner/loop.mjs:399,727`,
+  `src/runner/merge.mjs:335`). Không có implementation thứ 2.
+- **`docType` validation**: 1 hàm dùng chung duy nhất,
+  `assertValidDocType` (`src/state/store.mjs:619`), gọi từ `bin/fgos.mjs:842`
+  và nội bộ `store.mjs` (`addOutcome`, 2 chỗ). Comment tại
+  `bin/fgos.mjs:808` tự xác nhận: "the single `DIATAXIS_DOC_TYPES` set".
+- **`docsRef` validation**: 1 helper dùng chung, `optionalField`
+  (`bin/fgos.mjs:172`), gọi 3 lần (`add`/`submit`/`edit`) với message lỗi
+  khác nhau theo verb — khác message, không khác LOGIC kiểm tra, nên
+  không tính là lặp thật.
+- **Ghi `.fgos/events.jsonl`/`state.json` ở tầng thấp**: đã có 1 cửa ghi
+  duy nhất có khóa, `withEventsLock`/`appendEventLocked`
+  (`src/state/events.mjs`, dùng bởi mọi hàm ghi trong `store.mjs`) — tầng
+  append-event tự nó KHÔNG hở, đúng như comment `store.mjs:24` tự nhận
+  ("single-write-door scope stays exactly events.jsonl + state.json").
+
+##### Ghi chú liên quan — không phải finding mới của item này
+
+`main-checkout-lock.mjs` (2 export `acquireMainCheckoutLock`/
+`releaseMainCheckoutLock`) từng bị tsk-53f's report gọi là "dead code,
+imported by NOTHING" — claim đó nay ĐÃ SAI: `src/runner/claim-port.mjs:12,73`
+import và gọi thật (wired post tsk-53f D1). Đào sâu hơn lộ ra đây là 1
+cơ chế RIÊNG với mục đích khác — khóa claim-identity tại thời điểm claim,
+không phải khóa git-commit — và cơ chế bảo vệ git-commit race (vụ `tsk-3w8`,
+`approve`'s `git commit --no-edit` xung đột) đã được quyết định RIÊNG,
+KHÔNG qua app-level lock mà qua `.githooks/pre-commit` (mọi actor, mọi
+commit) — xem `docs/decisions/0021-wire-main-checkout-hook-qua-doctor-setup.md`,
+đã accepted, có nêu rõ khoảng hở còn mở (hook không active mặc định) và
+đã tự đóng thành 1 câu hỏi để dành cho item riêng nếu có bằng chứng thật.
+Không liệt lại thành candidate riêng của tsk-1ab vì đã có quyết định +
+theo dõi sẵn — trích dẫn ở đây để không đọc nhầm 2 cơ chế cùng tên
+"main-checkout-lock" là một.
+
+#### Ranked priority
+
+1 bảng phẳng duy nhất (D4) — sort theo rủi ro lệch hành vi trước, tần suất
+gọi làm tie-break. Chỉ xếp hạng 3 candidate đã XÁC NHẬN THẬT ở trên (mục
+"Đã kiểm tra, KHÔNG phải choke-point" không vào bảng này vì không phải
+việc cần hợp nhất).
+
+| Hạng | Choke-point | Rủi ro lệch hành vi | Tần suất | Vì sao |
+|---|---|---|---|---|
+| 1 | `take` vs `pick` claim-eligibility (#1) | **Cao** — không chỉ khác hành vi ngầm, mà khiến lệnh do chính `fgos-routing` hướng dẫn literal bị CLI reject cứng, giữa chừng 1 session | Rất cao — `fgos-routing` được nạp "at the start of every fgOS work session" (chính mô tả skill), nên bất kỳ session nào theo đúng ví dụ prose sẽ dính | Sửa 1 lần (đồng bộ guard giữa `take`/`pick`, hoặc sửa lại prose `fgos-routing` theo hành vi thật của `pick`) chặn đứng lỗi lặp lại ở mọi session tương lai |
+| 2 | `isWorkingTreeClean` trùng lặp (`return` vs `approve`, #2) | Trung bình — 2 phạm vi khác nhau thật (subtree vs whole-repo) có thể khiến `return` coi là sạch trong khi `approve` sau đó lại thấy bẩn (hoặc ngược lại), lệch kỳ vọng giữa 2 verb lõi | Cao — mọi lần `return` và mọi lần `approve` đều chạy qua 1 trong 2 hàm này | Hợp nhất về 1 hàm nhận tham số phạm vi (subtree/whole-repo) thay vì 2 định nghĩa riêng, để đảm bảo cùng logic loại trừ + cùng cách tính prefix |
+| 3 | `createWorktree` 6 call site tự quyết baseRef/cleanup (#3) | Trung bình-thấp — mỗi nơi đã tự đúng theo ngữ cảnh riêng (baseRef hợp lý theo leaf/root, hầu hết đã có cleanup), rủi ro chủ yếu là worktree mồ côi khi cleanup thiếu (site `pick`), không phải state sai | Cao — 6 call site trải khắp `pick`/`approve`/`review`/runner dispatch, chạy thường xuyên | Thêm 1 wrapper theo "loại thao tác" (claim-isolate / merge-ephemeral / runner-dispatch) bọc `createWorktree` + cleanup thống nhất, thay vì sửa lẻ từng site |
+
+#### No fixes applied
+
+Đúng yêu cầu (4) của item: khảo sát này KHÔNG tự sửa bất kỳ choke-point
+nào ở trên. Mỗi dòng trong bảng xếp hạng, nếu được chọn để sửa, trở thành
+1 item riêng sau này (như cách finding của `tsk-53f` đã tách thành item
+độc lập) — không nằm trong phạm vi thi công của `tsk-1ab`/`tsk-1ab-1`/
+`tsk-1ab-2`.
+
+### 0023 — Thứ tự ưu tiên sản phẩm: ship faster > DoD (result + docs) > hoàn thiện sau ngưỡng
+
+#### Bối cảnh
+
+User nêu định hướng ưu tiên cho dự án (session `b0010842-aafa-4cf1-9a8a-
+6c7f0022d4c7`, 2026-07-28), bản gốc:
+
+1. Ship faster — phải nhanh trước hết.
+2. Better docs — thời AI, làm nhanh mà không có docs thì người khó tham gia
+   vào tiến trình đảm bảo better result.
+3. Better/stable result.
+
+Phản biện: docs không nên đứng thành 1 bậc ưu tiên riêng tách khỏi result —
+"on-eyes" (người đọc-hiểu để tham gia được) cần 2 trụ đồng thời, không phải
+xếp tầng: **legibility** (docs) và **verifiability** (kiểm được đúng-sai
+thật, không dựa lời khai — result đã verify cho được, docs không cho được).
+Tách
+riêng khiến "ship nhanh + docs tốt nhưng result chưa verify" đọc như đã đạt
+bậc 2, dù chưa đủ tin. Gộp lại thành 1 mệnh đề CoS bắt buộc — **DoD** — đúng
+kiểu STR73 đã đòi hỏi cho mọi mệnh đề CoS khác (evidence-link bắt buộc, không
+chỉ cho feature-closed). Hạ tầng đối chiếu doc↔source đã có sẵn một phần:
+`fgos doc-sources <docPath>` (`bin/fgos.mjs:1149`).
+
+#### Quyết định
+
+Thứ tự ưu tiên sản phẩm, 3 bậc:
+
+1. **Ship faster** — tốc độ đi trước.
+2. **DoD** — result đã verify VÀ docs evidence-linked, cùng một gate (không
+   phải 2 bậc riêng: docs không đứng trước hay sau result, mà là điều kiện
+   kèm result để tính "xong").
+3. **Hoàn thiện sau ngưỡng** (post-threshold polish) — làm result tốt hơn
+   mức tối thiểu DoD đã đủ tin, KHÔNG phải mở rộng tính năng/phạm vi.
+
+#### Hệ quả
+
+- Việc chỉ được coi "xong" (đủ điều kiện đóng) khi qua bậc 2 — result verify
+  + docs evidence-linked cùng lúc; thiếu 1 trong 2 không tính là DoD.
+- Bậc 3 (polish) chỉ bắt đầu SAU khi bậc 2 đã qua cho đúng lát cắt đó — không
+  trộn lẫn polish vào trong khi DoD còn treo, và polish không được mở rộng
+  scope/tính năng mới (khác biệt với feature work thật).
+
+### 0025 — Thứ tự ưu tiên sản phẩm (chi tiết hoá 0023), nạp always-loaded qua AGENTS.md
+
+#### Bối cảnh
+
+`0023` đặt 3 bậc ưu tiên nhưng bậc 1 ("ship faster") không nói rõ tốc độ gì
+— chỉ code, hay cả luồng làm việc người-agent. User chốt lại nguyên văn 3
+mục (2026-07-30) — ghi đúng, không diễn giải lại:
+
+1. **Ship Faster**: giao nhanh hơn, không đoán mò, giảm friction/better-dev-ux,
+   ít chờ đợi.
+2. **DoD**: reproducibly verifiable result + evidence-linked documentation.
+3. **Polish Sau DoD**: hoàn thiện sau ngưỡng, không mở scope.
+
+User hỏi thêm: đưa quyết định này lên đầu, luôn nạp cho mọi agent. Áp
+placement test của `0008`'s họ hàng luật L8 (`docs/platform-foundations.md`):
+"rule này có cần hold khi không workflow nào đang chạy không?" — có (thứ tự
+ưu tiên áp dụng MỌI lúc, không riêng 1 workflow) → phải nằm standing sheet
+(`AGENTS.md`, nạp mọi turn qua `CLAUDE.md`'s `@AGENTS.md`), không phải nằm
+riêng `docs/decisions/` (nạp theo nhu cầu, dễ bị bỏ qua).
+
+#### Quyết định
+
+Nguyên văn 3 mục trên là quyết định — không đổi từ ngữ. Thứ tự CỐ ĐỊNH,
+bậc dưới không được ghi đè bậc trên.
+
+Đặt pointer ngắn (3 dòng) vào `AGENTS.md` ngay đầu file, trước "Before
+touching code" — always-loaded, mọi agent thấy trước khi chạm code bất kỳ
+việc gì. Toàn văn bối cảnh/hệ quả vẫn ở record này (`docs/decisions/0025`);
+`AGENTS.md` chỉ giữ 3 dòng + link, không lặp lại lý lẽ.
+
+#### Hệ quả
+
+- `0023` không sửa tại chỗ, chỉ nhận `superseded_by: 0025`.
+- `AGENTS.md` có thêm section priority-order — mọi agent mở repo đọc được
+  ngay, không cần biết tới `docs/decisions/` mới thấy.
+- L8's rule 3 (anchor-suite: mỗi doctrine rule cần cụm từ assert tự động)
+  CHƯA làm ở record này — chưa có check tự động xác nhận `AGENTS.md` còn
+  giữ đúng 3 mục theo thời gian. Treo lại, không phải phạm vi yêu cầu hiện
+  tại.
+
+#### Làm rõ phạm vi "ai" ship faster (bổ sung 2026-08-05)
+
+Bối cảnh gốc ở trên đã tự nêu câu hỏi ("chỉ code, hay cả luồng làm việc
+người-agent") nhưng quyết định lúc đó chỉ chốt NGUYÊN VĂN 3 mục, không trả
+lời câu hỏi "ship faster — CỦA AI". Một phiên làm việc thật (`tsk-66o`, D5
+— mức miễn-kiểm cho `frozen-judge` khi item không khai footprint) hiểu sai
+thành "ship faster = fgOS tự triển khai tính năng rẻ/nhanh hơn", khuyến
+nghị theo hướng đó — SAI. User chốt lại tường minh:
+
+> "ship faster nghĩa là các project sử dụng tool này để ship phải ship
+> được faster (không loại trừ fgos) tuy nhiên nếu tập trung ship fgos
+> nhanh hơn mà làm các sản phẩm dùng nó không faster được là không đúng."
+
+**Nguyên văn 3 mục ở "Quyết định" KHÔNG đổi.** Làm rõ thêm, không diễn
+giải lại chữ:
+
+- "Ship Faster" đo tốc độ ship của **project ĐANG DÙNG fgOS** để ship sản
+  phẩm của họ (agent + người vận hành fgOS trên một repo thật) — KHÔNG
+  phải tốc độ tự thân team fgOS build/ship một tính năng của chính fgOS.
+- fgOS không bị loại trừ — khi chính fgOS là "project đang ship" (dogfood,
+  như repo này), tiêu chí vẫn áp y hệt cho NGƯỜI DÙNG fgOS-trên-fgOS.
+- Khi một lựa chọn thiết kế làm fgOS rẻ/nhanh hơn để tự triển khai NHƯNG
+  khiến agent/dev đang dùng fgOS trên project thật chậm hơn (noise đọc
+  advisory, chờ gate, friction thao tác) — **chọn cái giúp project dùng
+  fgOS nhanh hơn**, không phải cái làm fgOS rẻ hơn để build. Chi phí xây
+  dựng của chính fgOS nằm ở bậc "Effort to port"/F-score khi cân nhắc
+  triển khai, không phải ở tiêu chí Ship Faster này.
+
+Placement test giữ nguyên như bản gốc (standing sheet, `AGENTS.md`, mọi
+agent thấy trước khi chạm code) — làm rõ này áp dụng ngay khi đọc, không
+cần đợi review threshold riêng.
+
+### 0026 — Native-First Dispatch Doctrine: launcher/rootTask/capacity
+
+**Pinned term: "Native-First Dispatch Doctrine"** — dùng tên này khi
+tham chiếu tới toàn bộ vision trong quyết định này (vocabulary
+launcher/rootTask/subTask/capacity + 4 quy tắc chọn native vs
+cli/spawn dispatch bên dưới), thay vì lặp lại toàn bộ nội dung.
+
+#### Bối cảnh
+
+Trong lúc thi công `tsk-3sw` (capacity `agentType` field) và `tsk-53h`
+(generalize cli-dispatch-for-cheap-cross-provider-tasks), và trong lúc
+truy ra gap thật của `tsk-1ni` (`judgeDiscovery`/`judgeDecompose` luôn
+cli/spawn 1 judge mù, kể cả khi caller đã là 1 soul sống cùng provider),
+người dùng phát biểu 1 tầm nhìn tổng quát hơn cho toàn bộ cơ chế dispatch
+— vượt ra ngoài phạm vi hẹp của 2 item đó. Quyết định này CHỐT tầm nhìn
+đó thành văn bản chính thức (đặt tên **Native-First Dispatch Doctrine**),
+làm định hướng chung cho mọi item sau này đụng tới dispatch (không tự nó
+implement gì).
+
+#### Đơn vị vận hành (vocabulary, chốt dùng xuyên suốt từ đây)
+
+- **launcher** — tiến trình/cơ chế QUYẾT ĐỊNH kích hoạt 1 rootTask,
+  qua HOẶC 1 agent-terminal (tương tác) HOẶC 1 headless/non-interactive
+  agent process (spawn/cli). Là 1 VAI TRÒ, không phải 1 phần mềm cụ thể
+  duy nhất — nhiều cơ chế khác nhau đều đóng vai này:
+  - Người dùng tự tay mở 1 session Claude Code/Codex/agy tương tác —
+    chính người dùng là launcher.
+  - `/fgOS:pick`, `/fgOS:merge-loop`, `/fgOS:discover-loop`,
+    `/fgOS:cleanup-loop`, `/fgOS:retro-loop` — các skill lặp, chạy BÊN
+    TRONG 1 session tương tác đang sống, lần lượt kích hoạt/đưa nhiều
+    rootTask qua vòng đời của chúng.
+  - `fgos-runner` (`bin/fgos-runner.mjs`/`loop.mjs`) — launcher
+    HEADLESS, không cần người ngồi terminal — hình dung là tương lai khi
+    không cần thao tác tay nhiều nữa, tự claim + spawn worker headless
+    cho từng rootTask.
+  - `herdr-plugin` (quản lý pane/tab terminal) — hạ tầng để đứng 1
+    agent-terminal lên (tìm/mở pane), CÓ THỂ được 1 launcher dùng để
+    đứng rootTask lên, và tự nó cũng có thể được bọc thành 1 launcher
+    (ví dụ 1 automation dùng herdr mở N pane, mỗi pane chạy 1 rootTask).
+  - **Vai trò launcher KHÔNG CẦN soul** — logic chọn "item nào tiếp
+    theo" (FIFO picker, frontier, priority ranking...) giữ THUẦN CƠ HỌC,
+    đúng tinh thần "trí tuệ không cầm picker" (`fgos-routing`'s own D8
+    stance) đã có sẵn trong repo. Soul chỉ vào cuộc SAU KHI launcher
+    đã quyết định kích hoạt rootTask nào.
+
+- **rootTask** — công việc gốc đang làm, được bao bọc/vận hành bởi 1
+  agent-terminal (tương tác) hoặc 1 headless agent process. Vai trò này
+  có tính ĐỆ QUY/fractal, không cố định ở 1 tầng: bất kỳ ai đang là "host"
+  thực thi cho 1 việc, tại thời điểm nó tự kích hoạt việc con bên dưới,
+  chính nó lại đóng vai rootTask cho những việc con đó (khớp
+  `tsk-53h`'s nesting rule đã pin: 1 `claude` bị spawn qua cli/spawn, một
+  khi đã chạy, chính nó lại là 1 Claude Code agent loop thật, có thể tiếp
+  tục dispatch xuống 1 tầng nữa).
+
+- **subTask** — KHÔNG phải 1 phạm trù riêng, ĐÚNG bản chất chỉ là 1
+  **rootTask** khác, được kích hoạt đệ quy bởi rootTask hiện tại (khớp
+  đúng tính đệ quy/fractal đã nói ở trên — "subTask" chỉ là tên gọi
+  tương đối, nhìn từ góc của bên kích hoạt).
+
+- **capacity** — KHÁC bản chất với subTask: là 1 đơn vị functional/helper
+  hẹp (judge-discovery, submit-assist-classify) — không tự mang vòng đời
+  1 rootTask đầy đủ.
+
+  **subTask và capacity KHÔNG gộp thành 1 khái niệm** (đính chính lại
+  phát biểu ban đầu) — chúng khác nhau thật về bản chất (1 bên là
+  rootTask đệ quy, 1 bên là helper). Cái GIỐNG NHAU, và là điều đáng nói,
+  là **CƠ CHẾ DISPATCH/LAUNCH**: quyết định "kích hoạt bằng gì" (native
+  hay cli/spawn, theo 4 quy tắc dưới) áp dụng Y HỆT cho cả 2 — bên kích
+  hoạt không cần quan tâm target là 1 rootTask-con hay 1 helper, chỉ cần
+  biết: có cần soul không, cùng provider không, có cơ chế native tương
+  ứng không, config có ép cli/spawn không. Từ góc nhìn cơ chế dispatch
+  (không phải góc nhìn khái niệm), coi cả 2 là "đối tượng bị kích hoạt"
+  chung 1 quyết định là hợp lý — nhưng đó là hợp nhất Ở TẦNG CƠ CHẾ, chưa
+  từng có ý gộp bản chất 2 khái niệm làm một.
+
+#### Quy tắc chọn cơ chế dispatch (áp dụng y hệt cho subTask lẫn capacity)
+
+1. **Target thuần cơ học** (không cần suy luận/soul) → luôn cli/spawn.
+   Hiển nhiên, không có lựa chọn khác, không tranh cãi.
+
+2. **Target cần soul, CÙNG provider với rootTask đang chạy** → ưu tiên
+   cơ chế NATIVE của chính provider đó (Claude: Task/SubAgent/Team; agy:
+   `--agent` + cơ chế subagent nội bộ của riêng nó — xác nhận thật qua
+   changelog agy: "subagent_info payload for delegated subagents...
+   nested subagents (grandchild and deeper)" — agy có khái niệm
+   native-subagent-trong-session y hệt Claude, không chỉ mỗi CLI flag
+   `--agent`). Đây là **native dispatch** — tên tổng quát hoá của
+   "task-dispatch" (`tsk-53h`) ra khỏi phạm vi riêng Claude, cho MỌI
+   provider có cơ chế in-process của riêng nó.
+
+   **Thu hẹp bởi `0033` (2026-08-16):** quy tắc 2 chỉ còn đúng cho
+   capacity **agentType-shaped** (chỉ có `agentType`, không có `command`/
+   `invocations` riêng — honoring nó `in-process` CHÍNH LÀ honoring cấu
+   hình). Một capacity **cli-spawn-shaped** (có `command`/`invocations`
+   riêng, ví dụ `agy`) giờ LUÔN cli/spawn khi đã cấu hình, kể cả khi
+   caller cùng provider và có sẵn native mechanism — quyết định người
+   dùng trực tiếp, xem `0033` cho lý do đầy đủ.
+
+3. **Target cần soul, KHÁC provider với rootTask đang chạy** → bắt buộc
+   cli/spawn (**cli/spawn dispatch** — tên giữ nguyên nghĩa "cli-dispatch"
+   cũ). Không có ngoại lệ hôm nay — chưa provider nào hỗ trợ native
+   cross-provider (Claude's Task tool chỉ chọn được model Claude, không
+   gọi được binary khác — đã xác nhận qua `--model`/`--agent` help text
+   lẫn `tsk-53h`'s locked fact).
+
+4. **Ngoại lệ hợp lệ, không phải bug:** config có thể ép 1 target cùng
+   provider vẫn phải cli/spawn, cho mục đích riêng (ví dụ: cách ly tài
+   nguyên, cần chạy trong worktree/cwd khác, cần 1 tiến trình độc lập
+   hoàn toàn không chia sẻ context). `tsk-3sw`'s `agentType` field
+   (headless-runner spawn `claude --agent <name>`) CHÍNH LÀ case này —
+   hợp lệ, không sai, không bị tầm nhìn này phủ nhận.
+
+#### Lớp còn thiếu — LLM đủ thông minh để tự nhận ra khi nào dùng nhánh nào
+
+Hôm nay CHƯA có lớp quyết định nào tự động áp quy tắc 1-4 ở trên. Bằng
+chứng sống, cụ thể (`tsk-1ni`, truy ra trong buổi thảo luận dẫn tới quyết
+định này): `judgeDiscovery`/`judgeDecompose` — 1 capacity cần soul (helper
+functional, không phải subTask) — LUÔN cli/spawn 1 `claude -p` con, dù caller
+(chính session đang gọi `fgos discover`) đã là 1 soul sống, CÙNG provider,
+đã có sẵn context tốt hơn (đã đọc CONTEXT.md, đã tự Socratic xong). Đúng
+lẽ ra phải rơi vào nhánh 2 (native — tự suy luận tiếp, không cần spawn gì
+cả) nhưng lại rơi vào nhánh 3/4 một cách âm thầm, sai — không phải vì
+thiếu khái niệm kiến trúc, mà vì thiếu cơ chế PHÁT HIỆN "tôi đang được
+gọi từ 1 soul sống cùng provider hay không" trước khi quyết định.
+
+Lớp thiếu này cần LÀ MỘT PHÁN ĐOÁN CỦA LLM (không thuần cơ học) vì tín
+hiệu quyết định không chỉ là 1 biến môi trường boolean (`CLAUDECODE` có
+mặt hay không) — còn phải cân nhắc: capacity này có thật sự cần soul
+không, có tồn tại cơ chế native tương ứng không, config có ép cli/spawn
+không, và (khi native khả dụng) có đáng dùng native hay vẫn nên cli/spawn
+vì lý do cô lập/tài nguyên. Đây chính là "lớp LLM vừa đủ thông minh" mà
+tầm nhìn này đòi hỏi — chưa xây, chỉ mới có mầm mống ý định
+(`tsk-3sw`'s "Revised design": *"the calling skill... MAY call Task tool
+natively instead of exec'ing... if it already has live Agent/Task tool
+access"*).
+
+#### Quan hệ với việc đã khoá — không mâu thuẫn, chỉ hẹp hơn
+
+- `tsk-3sw` (agentType, Claude-only, build qua cli/spawn) — là 1 mảnh
+  ghép ĐÚNG của quy tắc 4 (ngoại lệ hợp lệ) + phần thật cần cho mọi
+  nhánh khác cũng vậy (cli/spawn primitive vẫn cần tồn tại, dùng chung
+  cho case cơ học/cross-provider/config-ép). Không bị supersede.
+- `tsk-53h`'s nesting rule + bằng chứng đa-provider (Claude/agy/Codex 3
+  shape khác nhau) — ĐÚNG NỀN TẢNG quy tắc 2/3 ở trên dựa vào, không đổi.
+- Cả 2 item đó và gap `tsk-1ni` đều chỉ là MẢNH GHÉP hẹp (cơ chế
+  `capacities.<id>` config riêng của fgOS) của bức tranh rộng hơn tầm
+  nhìn này vẽ ra (gộp cả việc tự gọi Task tool ngoài cơ chế
+  `capacities.<id>`, gộp cả khái niệm launcher tường minh).
+
+#### Ranh giới quan sát được (observability) — tránh ngộ nhận
+
+Ưu tiên native (quy tắc 2) có 2 lý do ĐỘC LẬP, không phải 1: (a) tránh
+lãng phí/sai lệch khi soul mù re-derive 1 phán đoán soul sống đã làm rồi
+(đúng bug `tsk-1ni`) — lý do này ĐÚNG ở CẢ launcher tương tác lẫn
+headless; (b) quan sát được trực tiếp (agent-terminal tương tác cho thấy
+pane/subagent sống) — lý do này CHỈ đúng khi launcher đang tương tác.
+Khi rootTask tự nó chạy headless (spawn bởi `fgos-runner`), dùng native
+bên trong nó (nested Task) VẪN tránh được lãng phí (a) nhưng KHÔNG cho
+quan sát sống (b) — vẫn chỉ ghi lại post-hoc, có điều kiện, qua
+scout-notes.md (đã trace thật trong buổi thảo luận này). Không đánh đồng
+"dùng native" với "quan sát được" — 2 lợi ích tách biệt, chỉ trùng nhau
+khi launcher vốn đã tương tác.
+
+#### Việc chưa quyết, để lại cho item build lớp quyết định thật
+
+- Tín hiệu phát hiện "launcher hiện tại có phải soul sống cùng
+  provider không" cho từng provider (Claude: `CLAUDECODE` env var đã xác
+  nhận tồn tại; agy/Codex: chưa verify tín hiệu tương đương).
+- Cơ chế tường minh nào áp CÙNG 1 quyết định dispatch (quy tắc 1-4) cho
+  cả subTask lẫn capacity trong code thật — hôm nay `capacities.<id>`
+  (fgOS config) và lời gọi Task tool trực tiếp của 1 session (kích hoạt
+  subTask) là 2 đường tách biệt hoàn toàn, chưa đi qua cùng 1 lớp quyết
+  định nào cả.
+- Địa điểm đặt lớp quyết định native-vs-cli/spawn: trong `resolveExecutorConfig`
+  bản thân nó (không thể — là hàm Node thuần, không tự gọi Task được),
+  hay ở tầng gọi nó (skill/engine-verb caller, nơi có soul thật)?
+
+#### Kế hoạch triển khai (5 pha, đã file thành work item, deps thật)
+
+| Pha | Item | Phụ thuộc | Song song được với |
+|---|---|---|---|
+| 1 | `tsk-1ni` — fix `repoRoot` (state-root/content-root lẫn nhau) + verify-overwrite | không | Pha 3 (`tsk-53h`, khác file) |
+| 2 | `tsk-27y` — protocol caller tự khai verdict cho `fgos discover`/`fgos plan` | không (chỉ overlap footprint với Pha 1, không phải dep logic) | Pha 3 (`tsk-53h`, khác file) |
+| 3 | `tsk-53h` — shared helper phát hiện native-vs-cli/spawn cho skill-facing capacity | `tsk-3sw` (đã done) | Pha 1, Pha 2 (khác file, không overlap) |
+| 4 | `tsk-3ik` — hợp nhất `capacities.<id>` config dispatch với lời gọi Task tool trực tiếp | `tsk-27y` + `tsk-53h` | không (chờ cả 2 xong) |
+| 5 | `tsk-6db` — mở rộng native detection sang `agy` (deferred, YAGNI, chưa consumer thật) | `tsk-53h` | Pha 2, Pha 4 (concern khác nhau) |
+
+#### Tham chiếu
+
+- `tsk-3sw` — `docs/history/agent-executor-capacity-kind-task-resolution/CONTEXT.md`
+- `tsk-53h` — `docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md`
+- `tsk-1ni` — gap `readLockedContext`/verify-overwrite, bằng chứng sống
+  cho lớp quyết định còn thiếu
+- `tsk-27y`, `tsk-3ik`, `tsk-6db` — Pha 2/4/5 của kế hoạch triển khai trên
+- `docs/explanation/agent-executor-capacity-aware-dispatch.md`
+
+### 0028 — Đổi tên pinned term `orchestrator` thành `launcher`
+
+#### Bối cảnh
+
+`0026` đặt tên **orchestrator** cho vai trò: tiến trình/cơ chế QUYẾT ĐỊNH
+kích hoạt 1 rootTask, đứng nó lên, rồi bước ra hoàn toàn — logic chọn "item
+nào tiếp theo" giữ THUẦN CƠ HỌC, không cần soul; soul chỉ vào cuộc SAU KHI
+vai trò này đã quyết định kích hoạt rootTask nào (`0026`'s chính văn: "Vai
+trò orchestrator KHÔNG CẦN soul").
+
+Tên này sai nghĩa ngành: "orchestrator" trong ngành (Airflow, Temporal,
+Kubernetes) chỉ định 1 tiến trình điều phối NHIỀU đơn vị theo thời gian,
+duy trì liên hệ liên tục trong lúc chạy (dependency graph, retry, giám sát,
+fan-in). Vai trò `0026` mô tả làm NGƯỢC LẠI: chọn đúng 1 item bằng logic cơ
+học, đứng nó lên, rồi bước ra hoàn toàn — không điều phối gì thêm sau đó.
+Gọi vai trò này là "orchestrator" là hứa quá: người đọc đi tìm logic điều
+phối vốn không tồn tại trong vai trò này.
+
+Người dùng chốt tên thay thế là **launcher** (2026-08-08), sau khi so sánh
+4 ứng viên: launcher/invoker/activator/commander.
+
+#### Quyết định
+
+Đổi pinned term `orchestrator` → `launcher` xuyên suốt prose fgOS tự sở
+hữu (decision doc, `docs/history/*`, `docs/how-to/*`, comment trong
+`src/runner/*.mjs`, và mọi chỗ khác dùng từ này theo đúng nghĩa vai trò
+`0026` mô tả — kiểm từng chỗ, không đổi hàng loạt mù). KHÔNG đổi:
+`herdr-plugin/src/**/*.rs`'s `PaneOrchestrator` (khái niệm Rust khác hẳn —
+trait mở/focus terminal pane, dùng từ đúng, giữ nguyên), `docs/distillery/**`
+(trích dẫn verbatim từ nguồn upstream), `plans/reports/**` (bản ghi lịch
+sử, không sửa ngược).
+
+Record này chỉ supersede TÊN GỌI của `0026`, không phải thiết kế/logic của
+vai trò đó — 4 quy tắc chọn cơ chế dispatch, khái niệm rootTask/subTask/
+capacity, và kế hoạch triển khai 5 pha trong `0026` giữ nguyên, chỉ đổi
+nhãn "orchestrator" thành "launcher" mọi nơi nó xuất hiện.
+
+Từ "orchestrator" sau khi giải phóng được ĐỂ DÀNH cho mục đích khác, CHƯA
+gán nghĩa trong record này — ứng viên đã bàn (chưa chốt): tầng điều phối
+N đơn vị chạy đồng thời + hợp nhất kết quả (`fgos-fanout`,
+`fgos-runner --watch`). Một item sau này claim nghĩa mới cho từ này, nếu
+cần.
+
+#### Hệ quả
+
+- `0026` không sửa tại chỗ — vẫn đúng nguyên văn lịch sử của phần thiết kế
+  (4 quy tắc dispatch, rootTask/subTask/capacity, kế hoạch 5 pha), chỉ đổi
+  từ "orchestrator" thành "launcher" trong chính văn của nó (đây là phần
+  ĐANG được rename, không phải phần bị đóng băng — khác với trường hợp
+  `0006`/`0024` nơi `0006` giữ nguyên 100% chữ nghĩa cũ). `0026` nhận thêm
+  `superseded_by: 0028` trong frontmatter, đúng khuôn STR72 trỏ-ngược-bắt-buộc.
+- 6 skill (`.claude/skills/` + mirror `.agents/skills/`, 12 file) đang trỏ
+  tới `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-
+  cli-spawn.md` bằng đường dẫn — **filename của `0026` không đổi**, nên 12
+  file này không cần sửa gì (đường dẫn vẫn đúng, chỉ nội dung 0026 trỏ tới
+  đã đổi từ vựng bên trong).
+- Test guard (`test/docs/launcher-vocabulary-guard.test.mjs`) chống tái
+  phạm: fail khi "orchestrator" xuất hiện trong prose fgOS tự sở hữu ngoài
+  allowlist trên.
+
+Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
+
+### 0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị
+
+#### Bối cảnh
+
+Phiên `tsk-5td` (`fgos-coding-shaping`, `docs/history/dispatch-concept-
+boundary/DISCUSSION.md`) khoá lại ranh giới khái niệm tầng dispatch sau khi
+gom bài học gather-work vs execution-work của bee, và chốt ba quyết định
+(D7, D8, D17) cùng chạm đúng **một** mục định nghĩa của `0026` — mục "Đơn vị
+vận hành (vocabulary, chốt dùng xuyên suốt từ đây)". Tiền lệ: `0028` đã
+supersede `0026` một lần cho việc đổi tên `orchestrator`→`launcher`. Vì cả
+ba quyết định lần này cũng sửa đúng mục đó, gộp chung **một** record thay vì
+ba.
+
+#### Quyết định
+
+##### D7 — bỏ `rootTask`/`subTask` khỏi từ vựng dispatch
+
+`0026` viết: *"**rootTask** — công việc gốc đang làm... **Vai trò này** có
+tính ĐỆ QUY/fractal"* và *"**subTask** — KHÔNG phải 1 phạm trù riêng, ĐÚNG
+bản chất chỉ là 1 **rootTask** khác... 'subTask' chỉ là tên gọi **tương
+đối**, nhìn từ góc của bên kích hoạt"*.
+
+Sửa: bỏ cả hai chữ khỏi từ vựng dispatch. `0026` tự khai `rootTask` là một
+**vai trò**, không phải một lớp phân loại — một item nằm backlog là `work`;
+một launcher đứng nó lên thì cùng dòng, cùng id, state không đổi một byte mà
+chỉ đổi tên gọi. Thay `rootTask` bằng **`work`** (T2, `tsk-*`) mang **vai
+trò** T1 khi được kích hoạt. `subTask` đội hai nghĩa khác tập, tách theo
+đúng nghĩa: (a) work con sinh ra bởi decompose — đã có tên và đã có field
+lưu (`work.parent`, `0012`'s cạnh parent-child) → gọi là **child work**; (b)
+target của một lần dispatch đệ quy, thoáng qua, không lưu — chỉ là một
+`work`/exec-packet khác, không cần tên riêng.
+
+##### D8 — `capacity` = một năng lực có tên (behavior-promise / functional-helper)
+
+`0026` viết: *"**capacity** — KHÁC bản chất với subTask: là 1 đơn vị
+functional/helper hẹp (judge-discovery, submit-assist-classify) — không tự
+mang vòng đời 1 rootTask đầy đủ"*.
+
+Sửa: bản chất **giữ nguyên** — vẫn là đơn vị functional/helper hẹp — nhưng
+nâng thành cặp **behavior-promise / functional-helper**: behavior-promise
+trả lời nó **hứa** gì (`digest` hay `verdict`), functional-helper trả lời nó
+**là** gì (hẹp, không authority, phục vụ mục tiêu người khác). Một mình
+functional-helper thì hụt hợp đồng — lý do `0026` từng trôi sang tiêu chí
+cấu trúc "không tự mang vòng đời rootTask đầy đủ"; một mình behavior-promise
+thì không phân biệt được với tool (tool cũng hứa hành vi). **Tiêu chí phân
+định** đổi từ cấu trúc ("không mang vòng đời rootTask đầy đủ") sang
+**authority + state effects**. `capacities.<id>` (config) là **bản khai**
+của một capacity, không phải bản thân capacity đó — cùng quan hệ giữa
+`gitnexus` và dòng registry mô tả nó.
+
+##### D17 — T1 (vai trò bên gọi) hai giá trị: `launcher`/`driver`; `orchestrator` = tầng hợp thành T0
+
+`0026` chưa từng liệt kê rõ T1 có bao nhiêu giá trị — chỉ định nghĩa
+`launcher`. `0028` chỉ đổi TÊN vai trò đó (`orchestrator`→`launcher`), chưa
+từng đụng tới SỐ giá trị; `tsk-2cw` (đã `cleanup`) tự ghi mục đích thứ hai
+trong tiêu đề của nó — *"giải phóng từ orchestrator để dành cho MỤC ĐÍCH
+KHÁC"* — rồi để trống, không nói mục đích đó là gì.
+
+Sửa: điền vào đúng chỗ trống đó. `0028` đã lập luận sẵn hai tính chất **độc
+lập** của vai trò bên gọi: **arity** (1 đơn vị hay N đơn vị) và
+**engagement** (bước ra hẳn — "buông" — hay giữ liên hệ liên tục — "ở
+lại"). Xếp thành lưới 2×2: (1, buông) = `launcher`; (1, ở lại) = `driver`;
+(N, ở lại) = **`orchestrator`** — không phải ô thứ ba của T1 mà là **tầng
+hợp thành T0**: N lần dấn thân con (mỗi lần là một `driver`) rồi hợp nhất
+kết quả (bằng chứng sống: `fgos-fanout` spawn N Agent, mỗi Agent chạy
+`/fgOS:pick` end-to-end — mỗi cái là một `driver`, tổng thể là T0); (N,
+buông) = trống **có lý do** — buông N đơn vị cùng lúc thì không còn ai hợp
+nhất kết quả, đó chỉ là `launcher` chạy N lần, không phải một vai trò mới.
+⇒ **T1 chỉ có hai giá trị.**
+
+#### Hệ quả
+
+- `0026` **không sửa tại chỗ nội dung** — chỉ frontmatter thay đổi: dòng
+  `superseded_by: 0028` thành `superseded_by: [0028, 0029]`. `0028` và
+  `0029` supersede hai phần **không chồng lấn** của `0026` (`0028` = tên gọi
+  "orchestrator"→"launcher"; `0029` = ba mệnh đề định nghĩa
+  `rootTask`/`subTask`/`capacity`/T1 ở trên), nên cả hai đều cần được trích
+  từ record cũ — một `superseded_by` dạng danh sách, không phải ghi đè.
+- `docs/decisions/0000-index.md`'s dòng của `0026` nhận thêm ghi chú trỏ tới
+  `0029` bên cạnh ghi chú `0028` đã có sẵn.
+- Không sửa code trong record này. `rg -n "rootTask|subTask" src/ bin/` vẫn
+  còn 2 hit ở `src/runner/dispatch.mjs:649,654` — prose trong docstring mô
+  tả cơ chế dispatch còn sống, không phải định danh, và nằm ngoài phạm vi
+  record này; dọn lại prose đó (nếu cần) là việc của một item khác.
+- Điền vào đúng chỗ trống `tsk-2cw` để lại — mục đích thứ hai của
+  "orchestrator" sau khi giải phóng tên gọi chính là tầng hợp thành T0.
+
+Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
+
+#### Tham chiếu
+
+- `tsk-5td` — D7, D8, D17 (`fgos show tsk-5td`; `tsk-5td` còn `status:
+  doing` trên nhánh riêng `fgw/tsk-5td` tại thời điểm record này được viết,
+  nên các quyết định trên chỉ đọc được qua `.fgos` event log dùng chung,
+  không qua file `CONTEXT.md` trên nhánh đó)
+- `docs/history/dispatch-concept-boundary/DISCUSSION.md` §6.3 (T2 · CẦU),
+  §6.4 (T3 · NĂNG LỰC CÓ TÊN — `capacity`), §6.7 (T0 và T1 — vai trò bên
+  gọi), §7.1 (Decision doc supersede `0026`)
+- `0026` — `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md`
+- `0028` — `docs/decisions/0028-doi-ten-orchestrator-thanh-launcher.md`
+- `0012` — cạnh parent-child (`work.parent`), nền cho "child work"
+
+### 0030 — Thêm bậc ưu tiên #2 "Release con người" vào thứ tự ưu tiên sản phẩm
+
+#### Bối cảnh
+
+`0025` chốt 3 bậc ưu tiên sản phẩm (Ship Faster > DoD > Polish Sau DoD),
+nạp always-loaded qua `AGENTS.md`. Trong lúc điều tra `tsk-4b2` (2 stage
+`discovery`/`exploring` không thể tới được về mặt cấu trúc), phiên làm
+việc liên tục đề xuất gộp các bước nhỏ lại cho gọn (vd gộp bước phân loại
+`tier`/`kind`/`risk` vào stage `discovery`) — user chặn lại, chỉ ra một
+bậc ưu tiên đã phát biểu nhiều lần từ những phiên làm việc đầu tiên
+("từ những ngày đầu", đặc biệt xuyên suốt 3 ngày cuối tuần thảo luận
+khái niệm launcher/dispatch/capacity dẫn tới `0026`/`0028`/
+`0029`) nhưng chưa từng được ghi thành quyết định sản phẩm đứng riêng —
+khiến câu hỏi "có nên gộp không" cứ lặp lại ở nhiều phiên khác nhau.
+
+User chốt lại nguyên văn (2026-08-10):
+
+> "số 1 của chúng ta là Ship Faster, cần phải thêm số 2 là `Release con
+> người`. Giải phóng con người khỏi việc ngồi canh và chờ trả lời. Hệ
+> thống tự phán đoán tự vận hành ở mức cao nhất có thể và khi thật sự cần
+> người sẽ hỏi người, và vì thế nó sẽ thiết kế để collect thành bộ để hỏi
+> nhằm mỗi lần con người quay lại là có thể trả lời nhiều nhất những câu
+> hỏi và đi, sau đó sẽ quay lại chứ không cần ngồi canh. Vì thế mà hệ
+> thống cần có cách hoạt động và tích lũy câu hỏi: chuyện gì làm được thì
+> làm, không rõ thì bỏ qua làm mảnh việc khác, tích lũy đủ nhiều câu hỏi
+> đợi con người quay lại — chứ không phải câu đó stuck và có những việc
+> khác của cùng item có thể giải quyết được trước thì lại không giải
+> quyết mà ngồi chờ câu trả lời. Vì vậy cần chia nhỏ tiến trình,
+> process/stages/skills thật nhỏ và mịn."
+> — real conversation, phiên `tsk-4b2`, 2026-08-10
+
+#### Quyết định
+
+Thứ tự ưu tiên sản phẩm, mở rộng từ 3 lên **4 bậc cố định** — bậc dưới
+không được ghi đè bậc trên:
+
+1. **Ship Faster** — giao nhanh hơn, không đoán mò, giảm
+   friction/better-dev-ux, ít chờ đợi. (nguyên văn `0025`, không đổi)
+2. **Release con người** — giải phóng con người khỏi việc ngồi canh chờ
+   trả lời. Hệ thống tự phán đoán, tự vận hành ở mức cao nhất có thể; chỉ
+   hỏi người khi thật sự cần, và khi hỏi thì **collect thành bộ** — để mỗi
+   lần con người quay lại có thể trả lời nhiều nhất số câu hỏi đang treo
+   rồi đi tiếp, không phải ngồi canh từng câu một. Hệ quả kỹ thuật bắt
+   buộc: một câu hỏi treo **không được** làm nghẽn toàn bộ item khi còn
+   phần việc khác của CÙNG item có thể tiến tới mà không cần câu trả lời
+   đó — process/stage/skill vì vậy phải chia **nhỏ và mịn**, mỗi mảnh tiến
+   hoặc park độc lập, thay vì gộp thành đơn vị to, thô.
+3. **DoD** — reproducibly verifiable result + evidence-linked
+   documentation. (nguyên văn `0025`, không đổi, lùi từ bậc 2 xuống bậc 3)
+4. **Polish Sau DoD** — hoàn thiện sau ngưỡng, không mở scope. (nguyên văn
+   `0025`, không đổi, lùi từ bậc 3 xuống bậc 4)
+
+Placement test giữ nguyên như `0025` đã áp (họ hàng luật L8,
+`docs/platform-foundations.md`): thứ tự ưu tiên áp dụng MỌI lúc, không
+riêng 1 workflow → phải nằm standing sheet (`AGENTS.md`, always-loaded),
+không phải chỉ nằm `docs/decisions/`.
+
+#### Hệ quả
+
+- `0025` không sửa tại chỗ, chỉ nhận `superseded_by: 0030` (đúng khuôn
+  STR72 trỏ-ngược-bắt-buộc, cùng cách `0023` → `0025` đã làm).
+- `AGENTS.md`'s pointer 4 dòng cập nhật theo thứ tự mới, trỏ `docs/decisions/0030`.
+- Bậc 2 mới này là căn cứ trực tiếp để `tsk-4b2` (wiring `discovery`/
+  `exploring`) thiết kế theo hướng stage/skill chia nhỏ, mỗi mảnh
+  park/tiến độc lập — không gộp bước phân loại `tier`/`kind`/`risk` vào
+  `discovery` dù gộp có vẻ gọn hơn (YAGNI/DRY thuần code không áp được ở
+  đây — bậc 2 này ghi đè trực tiếp bản năng "gộp cho gọn" khi thiết kế
+  stage/skill của fgOS).
+- Chưa làm ở record này (treo lại, không phải phạm vi hiện tại): một check
+  tự động xác nhận `AGENTS.md` còn giữ đúng 4 mục theo thời gian (L8 rule
+  3, cùng khoảng trống `0025` đã treo cho bậc cũ).
+
+### 0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới
+
+#### Bối cảnh
+
+`0028` đổi tên pinned term `orchestrator` → `launcher` cho vai trò `0026` mô
+tả (chọn 1 item, đứng nó lên, bước ra hẳn), vì tên cũ sai nghĩa ngành. Cùng
+record đó ghi rõ từ vừa giải phóng:
+
+> Từ "orchestrator" sau khi giải phóng được ĐỂ DÀNH cho mục đích khác,
+> **CHƯA gán nghĩa trong record này** — ứng viên đã bàn (chưa chốt): tầng
+> điều phối N đơn vị chạy đồng thời + hợp nhất kết quả.
+
+Và dựng một anti-recidivism guard (`test/docs/launcher-vocabulary-guard.
+test.mjs`) fail khi từ đó xuất hiện trong prose fgOS tự sở hữu ngoài
+allowlist. Guard đó đúng **trong đúng cửa sổ thời gian ấy**: từ chưa có
+nghĩa mới, nên mọi lần nó tái xuất đều là tái phạm nghĩa cũ.
+
+Cửa sổ ấy đã đóng. `0029` D17 điền vào đúng chỗ trống `0028` để lại:
+
+> Xếp thành lưới 2×2: (1, buông) = `launcher`; (1, ở lại) = `driver`;
+> (N, ở lại) = **`orchestrator`** — không phải ô thứ ba của T1 mà là **tầng
+> hợp thành T0** [...] Điền vào đúng chỗ trống `tsk-2cw` để lại — mục đích
+> thứ hai của "orchestrator" sau khi giải phóng tên gọi chính là tầng hợp
+> thành T0.
+
+Từ thời điểm `0029` được chấp nhận, `orchestrator` là **từ vựng fgOS hợp lệ,
+đã được định nghĩa chính thức**, chỉ tầng hợp thành T0 (N đơn vị, ở lại) —
+đúng thứ `/fgOS:retro-loop`, `/fgOS:merge-loop`, `/fgOS:discover-loop`,
+`/fgOS:cleanup-loop` và `fgos-fanout` đang làm. Guard của `0028` vẫn chặn nó,
+nên nó đang cấm fgOS dùng chính từ vựng fgOS vừa chốt.
+
+#### Quyết định
+
+Bỏ hẳn guard cấm từ `orchestrator`: xoá
+`test/docs/launcher-vocabulary-guard.test.mjs` và toàn bộ cơ chế allowlist
+đi kèm.
+
+Ba lý do, theo thứ tự sức nặng:
+
+1. **Guard mâu thuẫn với `0029`.** Nó chặn một từ mà một decision record
+   sau nó đã định nghĩa chính thức. Giữ nguyên nghĩa là để một record cũ
+   phủ quyết một record mới hơn — ngược hẳn khuôn supersede của repo này.
+
+2. **Guard là `grep` mức-từ, không phân biệt được nghĩa.** Giá trị còn lại
+   duy nhất của nó là bắt người dùng `orchestrator` theo nghĩa CŨ (vai
+   1-item). Một phép so khớp chuỗi không làm nổi việc đó: nó chặn nghĩa mới
+   hợp lệ y hệt cách nó chặn nghĩa cũ sai. Không có cách thu hẹp nào giữ
+   được phần giá trị thật.
+
+3. **Chi phí bảo trì đã vượt giá trị, có bằng chứng đếm được.**
+   `ALLOWED_FILES_ENTRIES` đã phình lên 28 entry, mỗi entry một lý do
+   hand-written riêng, cộng 3 cơ chế miễn trừ theo pattern
+   (`FROZEN_FILENAMES`, `FROZEN_PHRASES`, `IRON_LAW_EVIDENCE_META_CITATION`).
+   Ít nhất bốn item đã sinh ra **chỉ để vá allowlist này** (`tsk-2au`,
+   `tsk-2lg`, `tsk-2uo`, `tsk-4cx`). Chính `docs/decisions/0000-index.md`
+   phải viết vòng vo *"tên gọi ban đầu của `0026`"* ở hai dòng thay vì gọi
+   thẳng tên — guard đang bóp méo văn của chính fgOS.
+
+Record này chỉ supersede **mệnh đề guard** trong "Hệ quả" của `0028`. Phần
+chính của `0028` — việc đổi tên vai trò `0026` từ `orchestrator` thành
+`launcher` — **giữ nguyên hiệu lực**: `launcher` vẫn là tên đúng cho vai (1
+đơn vị, buông), và không chỗ nào được quay về dùng `orchestrator` cho nghĩa
+đó. Cùng khuôn supersede-từng-phần mà `0028` và `0029` đã dùng với `0026`
+(hai phần không chồng lấn).
+
+#### Từ vựng sau record này
+
+Lưới 2×2 của `0029` D17 là từ vựng hiện hành, dùng thẳng, không cần né:
+
+| | buông (bước ra hẳn) | ở lại (giữ liên hệ) |
+|---|---|---|
+| **1 đơn vị** | `launcher` | `driver` |
+| **N đơn vị** | trống có lý do | `orchestrator` (tầng hợp thành T0) |
+
+#### Hệ quả
+
+- Xoá `test/docs/launcher-vocabulary-guard.test.mjs`.
+- Xoá entry của file đó khỏi `scripts/check-decision-codes.baseline.json`
+  (baseline chỉ chặn phát hiện MỚI, nên entry cũ vô hại — bỏ đi để không
+  còn dữ liệu chết trỏ tới một file không tồn tại).
+- Xoá `docs/how-to/allowlist-a-historical-mention-in-launcher-vocabulary-
+  guard.md` và dòng của nó trong `docs/enduser-docs-index.json`: how-to đó
+  hướng dẫn dùng một cơ chế không còn tồn tại.
+- `0028` nhận `superseded_by: [0031]` trong frontmatter, đúng khuôn STR72
+  trỏ-ngược-bắt-buộc; `docs/decisions/0000-index.md` nhận dòng của `0031`
+  và ghi chú trên dòng `0028`.
+- Không đụng: `herdr-plugin/src/**/*.rs`'s `PaneOrchestrator` (khái niệm
+  Rust khác hẳn), `docs/distillery/**` (trích verbatim upstream),
+  `plans/reports/**` (bản ghi lịch sử). Ba nhóm này vốn đã nằm ngoài phạm
+  vi guard và không đổi gì.
+- Không sửa ngược prose cũ. Những chỗ đang né từ (ví dụ hai dòng vòng vo
+  trong `0000-index.md`) được phép viết thẳng lại khi có item chạm vào
+  chúng — không phải việc của record này.
+
+Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
+
+#### Tham chiếu
+
+- `0026` — `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md`
+- `0028` — `docs/decisions/0028-doi-ten-orchestrator-thanh-launcher.md`
+- `0029` — `docs/decisions/0029-sua-dinh-nghia-roottask-subtask-capacity-t1-cua-0026.md`
+
+### 0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người
+
+#### Bối cảnh
+
+Cổng Iron Law (`classifyIronLaw`, `src/evolve/iron-law.mjs`) hỏi một câu
+đáng hỏi: diff đang chờ merge này có NĂNG LỰC làm yếu chính kỷ luật
+gate/verify của hệ không? Câu hỏi giữ nguyên giá trị. Cách nó hỏi thì
+không.
+
+`D16/D17 self-improve-loop` — hai quyết định nội tuyến, chỉ tồn tại dưới
+dạng trích dẫn trong `docs/specs/runner.md` và trong `view.decisions` của
+nhật ký sự kiện, không phải một record đánh số dưới `docs/decisions/` —
+khoá cổng ở đúng một hình dạng: chạy trên MỌI đề xuất nguồn `runner`, và
+`required: true` mà thiếu `--acknowledge-iron-law` thì **từ chối cứng,
+không có mức nào khác**. Ba hệ quả đo được, ghi trong
+`docs/history/iron-law-gate-human-ux/DISCUSSION.md`:
+
+1. **Hỏi ở chỗ không có gì để mất.** Một leaf merge vào `fgw/<root>` không
+   đụng tới trunk, nhưng vẫn phải trả lời câu hỏi "diff này có thể làm yếu
+   gate không" y như một root land thẳng lên main. Cùng một diff bị hỏi
+   nhiều lần trên đường đi lên, và lần hỏi cuối — lần duy nhất thật sự
+   chặn được gì — chìm giữa những lần hỏi vô hại.
+2. **Không có nấc nào giữa "chặn cứng" và "gỡ hẳn".** Một người muốn xem
+   cổng bắt gì mà chưa muốn nó chặn thì không có lựa chọn nào ngoài việc
+   không dùng.
+3. **Câu hỏi treo nghẽn cả hàng.** `merge-loop` gặp một item bị Iron Law
+   giữ thì dừng cả vòng, dù những item còn lại phía sau không liên quan gì
+   — ngược thẳng bậc ưu tiên #2 "Release con người" (`0030`): một câu hỏi
+   treo không được nghẽn phần việc khác còn tiến được.
+
+Iron Law **không** nằm trong `docs/platform-foundations.md` (đã kiểm bằng
+grep, không khớp) — nên đây là sửa spec, không phải đổi một luật khoá.
+
+#### Quyết định
+
+Record này supersede **đúng mệnh đề "chặn cứng, luôn luôn, ở mọi ranh
+giới merge"** của `D16/D17 self-improve-loop`. Bốn thay đổi, tất cả đã có
+thật trong code trước khi record này được viết:
+
+1. **Cổng chỉ chạy ở ranh giới trunk** (`CONTEXT.md` D1). Leaf → `fgw/<root>`
+   và `sync-root` vào nhánh cha đi thẳng, không hỏi. Discriminator **khác
+   nhau theo từng call site**, cố ý không gộp thành helper chung
+   (`plan.md` A1b): `approve` và pre-check của `merge next` dùng
+   `resolveRoot(view, id) === id`; `sync-root` dùng `!item.parent`, vì nó
+   chỉ land vào cha TRỰC TIẾP nên `resolveRoot` — vốn leo tới đỉnh lineage
+   — sẽ trả lời sai cho một gốc có cha mà cha lại có ông.
+2. **Hai mức, key config riêng** (`CONTEXT.md` D3/D7). `ironLaw.level`:
+   `ask` (mặc định) giữ nguyên hành vi từ chối cứng của D16/D17; `warn`
+   (opt-in) in cảnh báo, ghi một bản ghi, rồi merge tiếp. Key **riêng**,
+   không nhét vào `gateBypass` — floor của `gateBypass` được ghi trong
+   `docs/explanation/gate-bypass-design.md` là không bao giờ chạm Iron Law,
+   tái dùng từ vựng level của nó sẽ xoá đúng ranh giới ấy. Mọi giá trị
+   không phải đúng chữ `warn` — thiếu key, file hỏng, gõ sai — đều đọc
+   thành `ask`; mức dễ dãi là mức để một diff tự-sửa land mà không ai xem,
+   nên nó không bao giờ được là mặc định của một lỗi.
+3. **Người quyết định, agent thao tác** (`CONTEXT.md` D2/D9). Người trả
+   lời duyệt trong chat là đủ; agent tự chạy `fgos approve <id>
+   --acknowledge-iron-law`, tự đọc exit code, tự sửa lỗi cơ học và tự
+   retry — không đẩy một dòng lệnh cho người gõ tay. Cái được giữ nguyên
+   là điều `docs/explanation/iron-law-evidence-contract-stays-human-gated.md`
+   bảo vệ: **một bên thứ hai độc lập thật sự nhìn vào bằng chứng**. Agent
+   trình `docs/history/<id>/iron-law-evidence.md` nguyên văn rồi hỏi; nó
+   không bao giờ tự thêm `--acknowledge-iron-law` trên thẩm quyền của
+   chính nó. Đổi là đổi ai gõ, không đổi ai quyết.
+4. **Item bị giữ không nghẽn item khác** (`CONTEXT.md` D5). `merge-loop`
+   đọc tín hiệu `skipped` / `every ready item is blocked` mà engine vốn đã
+   trả sẵn, ghi id vào một danh sách rồi **đi tiếp**, cuối vòng trình gom
+   một lượt kèm bằng chứng. Item ở nguyên `awaiting-approval` — không
+   `fgos ask`, không `awaiting-human`, không cạnh FSM mới.
+
+Đã cân nhắc và loại, ghi lại để không phải cãi lại:
+
+- **Field bypass trên workitem** (D4) — loại: biến một quyết định vận hành
+  thành một thuộc tính dữ liệu đi theo item mãi mãi.
+- **Thêm cạnh FSM `awaiting-approval → awaiting-human` cho D5** — loại:
+  `src/state/status-fsm.mjs` nằm trong `MODULE_RULES` của chính Iron Law,
+  nên bản vá sẽ trip đúng cái cổng nó đi sửa; và engine đã có sẵn
+  `skipped`.
+- **Nới nửa từ-khoá của `classifyIronLaw`** (D6) — ra khỏi phạm vi, chuyển
+  sang `tsk-1js`. Chữ ký và hành vi `classifyIronLaw` giữ nguyên byte-for-byte.
+
+#### Vì sao `supersedes:` trống
+
+`D16/D17 self-improve-loop` không phải record đánh số — chúng là quyết
+định nội tuyến, trích dẫn trong `docs/specs/runner.md` (RUL34, RUL37,
+Data Dictionary #10) và sống trong `view.decisions`. Không có file nào để
+gắn `superseded_by:` trỏ ngược, nên khuôn trỏ-ngược-bắt-buộc STR72
+(`scripts/check-decision-supersession.mjs`) không áp dụng được và
+`supersedes:` để trống có chủ đích, thay vì bịa một id không tồn tại.
+Việc supersede được ghi bằng văn, ở đây và tại chính RUL34/RUL37.
+
+#### Hệ quả
+
+- `docs/specs/runner.md`: RUL34 nói rõ phán quyết chỉ được TÍNH ở ranh giới
+  trunk và hệ quả của `required: true` do `ironLaw.level` quyết định;
+  RUL37 viết lại theo bốn điểm trên; RUL64 mới cho chính key
+  `ironLaw.level` (mặc định, fail-closed, đăng ký vào `fgos doctor`).
+- `.fgos/config.json` nhận `ironLaw.level` qua `fgos setup`/`fgos doctor
+  --fix`; thiếu key thì `doctor` báo, gate vẫn chạy ở `ask`.
+- `plugins/fgOS/skills/approve/SKILL.md` là bề mặt người dùng chạm vào cho
+  điểm 3; `merge-loop`/`merge-next` cho điểm 4.
+- Không đụng `src/evolve/iron-law.mjs` — phép phân loại không đổi, chỉ đổi
+  chỗ nó được gọi và chuyện gì xảy ra sau đó.
+
+Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
+
+#### Tham chiếu
+
+- `docs/history/iron-law-gate-human-ux/CONTEXT.md` — D1-D9 đã khoá
+- `docs/history/iron-law-gate-human-ux/plan.md` — A1/A1b, bản đồ rủi ro
+- `docs/history/tsk-5t3-iron-law-evidence-contract/` — hợp đồng
+  `docs/history/<id>/iron-law-evidence.md`
+- `docs/explanation/iron-law-evidence-contract-stays-human-gated.md`
+- `docs/explanation/gate-bypass-design.md`
+- `0030` — `docs/decisions/0030-them-release-con-nguoi-vao-thu-tu-uu-tien-san-pham.md`
+
+### 0033 — Capacity cli-spawn-shaped thắng hasLiveTaskAccess, thu hẹp 0026 rule 2
+
+#### Quyết định
+
+Một capacity `kind:agent` **cli-spawn-shaped** — declares `command`/
+`adapter` của riêng nó, hoặc một entry `invocations[].via === "cli"` —
+LUÔN dispatch out-of-process khi đã được cấu hình cho job đó, bất kể
+caller có `hasLiveTaskAccess:true` hay không. `0026` rule 2 (ưu tiên
+native khi caller cùng provider và có Task tool sống) vẫn đúng nguyên vẹn
+cho capacity **agentType-shaped** (chỉ có `agentType`, không `command`
+riêng — ví dụ `judge-discovery`) — quyết định này KHÔNG đảo `0026`, chỉ
+thu hẹp phạm vi rule 2 xuống đúng nửa case còn hợp lý.
+
+#### Người quyết
+
+Người dùng, trực tiếp, trong phiên làm việc 2026-08-16 (sau khi test
+sống capacity `fgos-coding-implement` → `agy`, thấy một session sống vẫn
+resolve `in-process` — tức KHÔNG bao giờ thật sự gọi `agy` — dù capacity
+đã cấu hình rõ ràng). Nguyên văn ý định: "một soul sống sẽ chọn soul khác
+phù hợp để làm việc thay nó" — tức cấu hình phải thắng, không phải mặc
+định "tự làm" chỉ vì có Task tool.
+
+#### Lý do 0026 rule 2 không áp dụng ở đây
+
+Rule 2 tự nêu lý do của chính nó (trích 0026): *"tránh lãng phí/sai lệch
+khi soul mù re-derive 1 phán đoán soul sống đã làm rồi"* — bug thật
+`tsk-1ni` (`judgeDiscovery` cli-spawn một judge mù dù caller đã tự đọc
+CONTEXT.md xong). Lý do này đúng khi target là MỘT PHIÊN BẢN KHÁC CỦA
+CHÍNH CALLER (native subagent, cùng provider, không có command riêng) —
+không đúng khi target là một BACKEND THẬT SỰ KHÁC đã được người vận hành
+đặt tên rõ ràng (`command: "agy"`). "In-process" trong case cli-spawn-
+shaped không phải "dùng native thay vì spawn mù" — nó là "âm thầm bỏ qua
+hoàn toàn config, tự làm thay". Đó không phải tối ưu hoá native-first,
+đó là bỏ qua một quyết định cấu hình.
+
+#### Cơ chế phân biệt (không phải heuristic mới)
+
+`resolveExecutorConfig` (`src/runner/dispatch.mjs`) đã sẵn có đúng phép
+thử này cho `resolvedViaAgentType`/`cliInvocation` — 2 hình dạng loại
+trừ lẫn nhau. `decideCapacityDispatchMechanism` giờ dùng lại đúng phép
+thử đó trước khi hỏi `hasLiveTaskAccess`:
+
+```js
+const isCliSpawnShaped = Boolean(
+  capacity && (capacity.command || capacity.adapter ||
+    (Array.isArray(capacity.invocations) && capacity.invocations.some((inv) => inv.via === 'cli'))),
+);
+if (isCliSpawnShaped) return 'out-of-process';
+// agentType-shaped, kind:'tool', hoặc chưa cấu hình -- giữ nguyên logic cũ
+```
+
+#### Bằng chứng đã kiểm
+
+- `tsk-1m8` (item trước, 2026-08-16): live-proved cơ chế cli-spawn ra
+  `agy` hoạt động thật (real spawn, real output) khi capacity được cấu
+  hình — nhưng chỉ test qua `hasLiveTaskAccess:false` (headless). Session
+  sống thật sự hỏi `decide --work` với `hasLiveTaskAccess:true` vẫn nhận
+  `in-process` — đây chính là gap `0033` sửa.
+- Quét toàn bộ 28 chỗ `hasLiveTaskAccess: true` trong
+  `test/runner/dispatch.test.mjs` (`docs/history/tsk-pdg/RESEARCH.md`):
+  không có test nào dùng capacity cli-spawn-shaped + `hasLiveTaskAccess:
+  true` mong đợi `in-process` — 0 test hiện có bị gãy, xác nhận thật sau
+  khi sửa (`npm test`: 3459 pass / 0 fail).
+- Xác nhận sống trên config thật của chính repo này (`.fgos/config.json`,
+  capacity `fgos-coding-implement` → `agy`):
+  ```
+  trước 0033: decide('fgos-coding-implement', {hasLiveTaskAccess:true}) -> {"mechanism":"in-process"}
+  sau  0033: decide('fgos-coding-implement', {hasLiveTaskAccess:true}) -> {"mechanism":"out-of-process","configured":true}
+  ```
+
+#### Việc chưa quyết, để lại
+
+- Có nên đổi tên/tài liệu hoá rõ hơn khái niệm "cli-spawn-shaped" thành
+  một field tường minh trên capacity (thay vì suy ra từ shape) không —
+  chưa cần, chưa có case thật đòi hỏi.
+- 6 skill (`fgos-coding-exploring`/`fgos-coding-planning`/
+  `fgos-coding-validating`/`fgos-coding-implement`/`fgos-fanout`/
+  `_shared/capacity-dispatch-fallback.md`) trích "Native-First Dispatch
+  Doctrine rule 2" làm lý do không tự dispatch Task tool tuỳ tiện — đã
+  đọc lại, không cái nào khẳng định sai sau `0033` (lý do của chúng là
+  "đừng tự tạo sub-dispatch tuỳ tiện", không phải "hasLiveTaskAccess luôn
+  thắng") — không sửa file nào trong số này.
+
+#### Tham chiếu
+
+- `0026` — quyết định gốc, rule 2 bị thu hẹp
+- `docs/history/tsk-pdg/RESEARCH.md`, `plan.md` — bằng chứng đầy đủ
+- `docs/history/tsk-1m8/` — item trước, phát hiện gap này khi live-test

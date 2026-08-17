@@ -10,9 +10,9 @@ Forgent (fgOS) is the platform layer for building and running agent applications
 - docs/specs/reading-map.md — where every doc and source path in this repo lives
 - docs/backlog.md — product backlog (PBI rows: proposed / in-flight / done)
 - docs/routing-handoff-contract.md — agent-to-agent handoff contract + trust boundary
-- docs/decisions/ — long-form decision records
+- docs/decisions/index.md — generated projection of platform/repo-wide decisions (`fgos decision-index`); narrative lives in docs/specs/<area>.md's own "Lịch sử quyết định" sections (tsk-1lv-4)
 
-## Product priority order (docs/decisions/0030)
+## Product priority order (D-ADR0030, docs/specs/runner.md)
 
 1. **Ship Faster** — giao nhanh hơn, không đoán mò, giảm friction/better-dev-ux, ít chờ đợi.
 2. **Release con người** — giải phóng con người khỏi việc ngồi canh chờ trả lời. Hệ thống tự phán đoán, tự vận hành ở mức cao nhất có thể; chỉ hỏi người khi thật sự cần, và khi hỏi thì gom thành bộ để mỗi lần người quay lại trả lời được nhiều nhất rồi đi tiếp. Một câu hỏi treo không được nghẽn phần việc khác của cùng item còn tiến được — stage/skill vì vậy phải chia nhỏ, mịn, mỗi mảnh park/tiến độc lập.
@@ -21,7 +21,7 @@ Forgent (fgOS) is the platform layer for building and running agent applications
 
 Tốc độ ở mục 1 là tốc độ ship của **project đang DÙNG fgOS** (fgOS không loại trừ khi tự dogfood) — không phải tốc độ tự thân team fgOS build một tính năng của chính fgOS. Đừng chọn phương án rẻ để fgOS tự triển khai nếu nó làm project dùng fgOS chậm hơn.
 
-Thứ tự cố định — bậc dưới không ghi đè bậc trên. Chi tiết: docs/decisions/0030 (mở rộng docs/decisions/0025).
+Thứ tự cố định — bậc dưới không ghi đè bậc trên. Chi tiết: docs/specs/runner.md's "Lịch sử quyết định" § D-ADR0030 (mở rộng D-ADR0025; narrative đầy đủ, docs/decisions/*.md corpus đã retired tsk-1lv-4).
 
 ## Before touching code
 

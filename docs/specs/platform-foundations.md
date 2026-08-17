@@ -92,3 +92,171 @@ Not applicable — không có màn hình.
 - `.bee/decisions.jsonl` — decision log mang các D-ID trích ở trên (đọc qua `node .bee/bin/bee_decisions.mjs`)
 - `plans/reports/distill-consult-260713-2323-compound-learning-stack-report.md` — chất liệu consult gốc
 - `docs/distillery/deep-dives/` — deep-dives state / compound-engineering / routing
+
+## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)
+
+Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4, D5) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc.
+
+
+### 0001 — Nhật ký sự kiện là sự thật; store/DB là bản chiếu dựng lại được
+
+#### Bối cảnh
+
+forgent cần bộ nhớ bền cho nhiều loại dữ liệu (trước hết là work-state của chính
+nó, sau này các vùng khác). Cám dỗ mặc định là đặt một cơ sở dữ liệu làm *nơi chứa
+sự thật*. Nhưng nơi-chứa-sự-thật là DB thì: khó dựng lại từ số không, khó audit,
+khó time-travel, và khoá dự án vào một engine cụ thể ngay từ đầu — trong khi tải
+thật (multi-writer, quy mô) chưa được chứng minh.
+
+#### Quyết định
+
+Mọi mẩu dữ liệu bền của forgent được **khai ngay lúc thiết kế** là một trong hai
+vật lý:
+
+1. **Sự thật (log).** Nhật ký sự kiện *append-only*, dạng JSONL, **committed vào
+   git**. Chỉ được thêm, không sửa/xoá điểm quá khứ.
+2. **Bản chiếu (view).** Trạng thái hiện hành dựng lại được từ replay toàn bộ log.
+   View **không bao giờ ghi ngược** vào sự thật.
+
+Hệ quả trực tiếp của luật này:
+
+- DB chỉ được phép xuất hiện khi đóng vai **materialized view**; graph store (nếu
+  có) là view cấp hai. **Rebuild-from-zero luôn phải khả thi** từ log.
+- Engine nặng (ví dụ SQLite) được **defer tới ngưỡng friction có bằng chứng** —
+  không thêm sớm theo phỏng đoán.
+- Ngưỡng xem lại **có tên**: khi multi-writer trở thành tải chính (mẫu "DB-as-truth"
+  cho ghi đồng thời). Chạm ngưỡng mới mở lại luật; trước đó luật bất biến.
+
+#### Hệ quả
+
+- **Audit & time-travel miễn phí:** trạng thái bất kỳ dựng lại được bằng replay.
+- **Đổi engine không mất sự thật:** view là thứ thay được, log thì không.
+- **Đơn giản hoá ghi:** một cửa ghi, một hướng chảy (log → view).
+- **Chi phí chấp nhận:** replay tốn dần khi log lớn — chịu được tới ngưỡng đã đặt
+  tên ở trên; qua ngưỡng thì xét engine, không phá luật.
+
+Đổi luật này = supersede record bằng record mới, không sửa tại chỗ.
+
+### 0009 — Chống giao thoa tiến trình lúc cài
+
+#### Bối cảnh
+
+Tách sạch *artifacts* (file, thư mục, release) giữa forgent và các bộ công cụ khác
+là **chưa đủ**. Khi fgOS có install story và được cài vào một project hoặc global
+**cạnh một harness khác**, hai bên có thể **giao thoa ở tầng tiến trình**: chặn nhầm
+thao tác ghi của nhau, hoặc khiến một agent nhận **mệnh lệnh điều phối mâu thuẫn**
+từ hai nguồn.
+
+> Ghi chú viết lại: quyết định gốc phát biểu trong bối cảnh tách kho phát triển ↔
+> sản phẩm của chính dự án. Ở đây là **yêu cầu thiết kế platform thuần của fgOS**,
+> không phụ thuộc tên harness cụ thể nào.
+
+#### Quyết định
+
+fgOS, **khi có install story**, phải được thiết kế để **không giao thoa tiến trình**
+với harness khác cùng máy. Bốn nguyên tắc:
+
+1. **Doctrine scope theo lãnh địa:** luật/hành vi của fgOS chỉ áp trong phạm vi
+   đường dẫn của chính nó.
+2. **Hook gate theo path của mình:** cổng chặn chỉ kích hoạt trên path fgOS, không
+   quơ lên path của harness khác.
+3. **Một-nhạc-trưởng-mỗi-phiên:** trong một phiên, chỉ một bên điều phối — không hai
+   nguồn cùng ra lệnh cho một agent.
+4. **Phát hiện marker harness khác lúc cài:** khi cài, nhận diện dấu hiệu của harness
+   khác đã có mặt và ứng xử nhường-nhịn thay vì đè lên.
+
+#### Hệ quả
+
+- **Đây là non-functional requirement mở, CHƯA thực thi** — ghi lại để install
+  design tương lai không bỏ sót. Việc thực thi nằm ở backlog **STR10**.
+- **Tiêu chí kiểm** khi làm: một canary chạy trong project cài **cả hai** harness —
+  hai bên không chặn nhầm write của nhau, agent không nhận mệnh lệnh điều phối mâu
+  thuẫn.
+
+Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
+
+### 0014 — Kiến trúc giao tiếp người ↔ fgOS
+
+Quyết định ở **mức interface** (hình dạng cửa giao tiếp), không phải mức
+implementation. Chốt qua thảo luận mở với người dùng 2026-07-18.
+
+#### Bối cảnh
+
+fgOS cần một lớp để người **quan sát + tương tác** với hệ (xem hệ đang làm gì,
+tạo/khám phá work-item, trả lời câu hỏi gate) — tiện, ít-phải-làm, và **remote
+được**. Câu hỏi nền bị lật ra: *cửa chuẩn để giao tiếp với người là gì?* Mặc định
+hiện tại coi CLI (`fgos <verb>`, spawn-rồi-chết, đọc envelope) là cửa. Nhưng một
+tiến trình spawn-rồi-chết **về bản chất không giữ kết nối để đẩy** — nên chiều-ra
+"chủ động báo người" (`cần bạn`) hiện **bị động**: chỉ poll + `data_hash`, còn
+attention-envelope (C8) thì hoãn "chờ lực kéo".
+
+Ba mô hình cửa được cân:
+
+1. **CLI-spawn = cửa** (hiện trạng, Host-Adapter `b2d18cc7`). Đơn giản, crash-safe,
+   log git-diffable, zero luôn-bật — nhưng không server-push được, remote gượng.
+2. **Daemon nuôi một cửa protocol chuẩn máy-đọc** (socket/JSON-RPC). Push/stream/
+   remote thành bản chất — nhưng luôn-bật, và (nếu link core) phải sở hữu đường ghi.
+   Đây đúng là kiến trúc **interface** của herdr (không phải runtime của nó).
+3. **Core-library + adapter mỏng.** Có một contract lõi; CLI và daemon là adapter;
+   daemon chỉ bật khi cần remote/push.
+
+Một nhánh phân tích quan trọng: fgOS **đã là event-sourced** (`0001` — log là sự
+thật). Trong hệ như vậy, hợp đồng thật không nằm ở một thư viện link được, mà ở
+**format của log + giao thức đọc/ghi**.
+
+#### Quyết định
+
+Chọn **mô hình (3)**, với các chốt sau — tất cả ở mức interface:
+
+1. **Contract chuẩn = SCHEMA event-log + giao thức append / read / subscribe**, KHÔNG
+   phải một lib link được. Đây là mở rộng trực tiếp của `0001`: log đã là sự thật,
+   nên *đường nói chuyện với sự thật* mới là cửa. Hệ quả: bất kỳ tiến trình nào
+   (khác ngôn ngữ cũng được) nói đúng log-format là một participant đầy đủ — chống
+   Node-monoculture, đúng định vị substrate đa-app.
+
+2. **Lib chỉ là CLIENT tham chiếu (Node) của contract**, không phải bản thân
+   contract. Tiện ích sinh/fold event cho code Node, không phải cửa.
+
+3. **CLI = adapter local, standalone.** Là cửa dùng hằng ngày; chỉ code
+   **cùng-tiến-trình** (CLI, TUI local) mới gọi lib trực tiếp. CLI cần được
+   **chuẩn hoá lại**: verb surface nhất quán + envelope + exit-code + schema
+   tự-mô-tả sinh-từ-code (nối tiếp `0011` — version tường minh cho mọi contract).
+
+4. **Daemon = NGOÀI core, là CONSUMER giao tiếp QUA CLI.** Khi có daemon, nó **không
+   link lib**: nó `spawn fgos <verb>` cho ghi + poll (`fgos list`/`rollup` +
+   `data_hash`) cho chiều-ra, và giữ kênh outbound để đẩy. Hệ quả cốt lõi: daemon
+   **thừa hưởng identity-gate + validation + single-door-lock của CLI miễn phí**, không
+   chế được đường ghi mới. Vì thế **`b2d18cc7` (Host-Adapter) được GIỮ và FULFILL,
+   KHÔNG bị supersede** — daemon chính là "lực kéo" mà C8 chờ. Core fgOS vẫn
+   **passive** (chỉ CLI + lib + log); mọi hành vi "chủ động/đẩy" sống ở consumer.
+
+5. **UI (web/mobile/remote) là client của DAEMON, không của lib.** Chỉ TUI-local mới
+   chạm lib trực tiếp; mọi UI ngoài terminal đi qua cửa mạng của daemon → daemon là
+   điều kiện cần cho bất kỳ UI ngoài terminal.
+
+6. **Kênh attention/push tách thành subsystem riêng** (backlog STR48) với
+   delivery-semantics tường minh (at-least-once, dedup, routing, ack, escalation),
+   sống ở consumer — không để nó là phần phụ của review in/out.
+
+#### Hệ quả
+
+- **Không phá luật.** Đường đã chọn (daemon-ngoài-core-qua-CLI) tuân thủ `b2d18cc7`
+  và `0001` nguyên vẹn; record này **không supersede gì**. Chỉ NẾU sau này muốn một
+  daemon **link-lib in-process** (biến thể của mô hình 2) thì mới đụng `b2d18cc7` —
+  khi đó cần một record supersession riêng.
+- **Prerequisite móng:** tách core (verb-logic) thành lib gọi được độc lập CLI — hôm
+  nay logic nằm trong CLI thì kéo ra, CLI thành client mỏng. Refactor nội bộ; đường
+  ghi single-door (C2) và lock giữ nguyên.
+- **Chưa quyết (ngoài phạm vi record này):** tầng OWNER — daemon là co-writer (đứng
+  trên cùng lock, giữ CLI thật sự standalone; đổi lại nợ đồng-thời read-modify-write,
+  backlog STR45) hay sole-writer-khi-bật — chưa chốt. Sub-choice chiều-ra: poll-qua-CLI
+  (đơn giản, nghiêng cái này trước) vs tail-event-log (push tức thì nhưng khoá
+  log-format).
+- **Gate trước khi thực thi:** review in/out (backlog STR46) và kênh push (STR48) phải
+  được cân độ ưu tiên so với nợ content đang chặn dogfood (discovery-context,
+  worker-execution, feedback-loop) — quyết định *kiến trúc* này không tự nó nâng
+  *độ ưu tiên thực thi*.
+- Chất liệu tham chiếu (xưởng): `docs/distillery/deep-dives/herdr-vs-tmux-observation.md`
+  (vì sao surface là client của cổng, không phải một runtime để adopt), và các entry
+  interface của herdr (`socket-api-control-surface`, `self-describing-protocol-schema`,
+  `session-snapshot-bootstrap-rpc`) làm mẫu thiết kế cửa.
