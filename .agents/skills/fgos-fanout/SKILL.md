@@ -111,18 +111,18 @@ own judgment.
   sequential): run `node src/runner/dispatch.mjs decide --work <id>
   --has-live-task-access` (this skill always has live Task access — it is
   what fires the Agent batch below). A `mechanism: "in-process"` result
-  confirms this candidate's dispatch capacity expects exactly what this
+  confirms this candidate's dispatch executor expects exactly what this
   skill already does (fire an Agent running `/fgOS:pick <id>`) — proceed
   to that candidate's announce line, using the result's own `agentType`
   for `<subagent_type>` when present. Any other `mechanism`
-  (`"out-of-process"`/`"unavailable"`) means this candidate's own capacity
+  (`"out-of-process"`/`"unavailable"`) means this candidate's own executor
   does NOT expect native Task-tool dispatch — this skill has no
   out-of-process firing path of its own (that is `execute`'s job, a
   different producer, D5), so report that id back to the caller as
   needing a person instead of firing an Agent for it; it does not count
   against this batch's announce/fire step below.
 - **Announce every dispatch before firing it.** Print one line per
-  candidate, same shape `_shared/capacity-dispatch-fallback.md`'s Step
+  candidate, same shape `_shared/executor-dispatch-fallback.md`'s Step
   B.5/C.3 already use for observability parity across every dispatch path
   in the repo:
 
@@ -210,7 +210,7 @@ probability, it does not remove the hazard).
 dispatchUnavailable = {}  # ids reported once for a non-"in-process" decide
   result (D4) — persists across loop iterations for this invocation only,
   same in-memory-set shape as `firing` below. Without this, a candidate
-  whose resolved capacity never expects native dispatch would stay `todo`
+  whose resolved executor never expects native dispatch would stay `todo`
   forever (it is never claimed), re-enter `ready` every iteration, get
   re-consulted and re-reported every time, and the outer loop would never
   terminate — this set is what makes "report once" actually mean once.
@@ -263,7 +263,7 @@ loop:
         --has-live-task-access`
       if decided.mechanism is not "in-process":
         report id back to the caller as needing a person (its own
-          dispatch capacity does not expect native Task-tool dispatch —
+          dispatch executor does not expect native Task-tool dispatch —
           this skill has no out-of-process firing path of its own); add
           id to `dispatchUnavailable` so it is never rescheduled or
           re-consulted again this run; do not add it to `firing`

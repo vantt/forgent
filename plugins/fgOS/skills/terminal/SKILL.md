@@ -30,7 +30,7 @@ herdr (D5,
 `docs/history/orchestrator-worker-slots/DISCUSSION.md` §6 "Nhãn: session
 tự đặt qua helper skill có gate"). The capability is declared through the
 tool registry that already exists — no new mechanism. This project's own
-`.fgos/config.json` already carries it, as a `runner.capacities.herdr`
+`.fgos/config.json` already carries it, as a `runner.executors.herdr`
 entry (tsk-in1-1 D1: config-declared, not a CLI verb):
 
 ```json

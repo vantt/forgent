@@ -3205,7 +3205,7 @@ test('resolveExecutorIdForPurpose returns null against an empty/missing executor
   assert.equal(resolveExecutorIdForPurpose({ executors: {} }, 'no-such-purpose-configured'), null);
 });
 
-// --- resolveExecutorAndOverrides (D1-D4, docs/history/capability-executor-
+// --- resolveExecutorAndOverrides (D1-D4, docs/history/capability-capacity-
 // remodel/CONTEXT.md) -- the shared resolver every real cfg.executors[id]
 // lookup in this file now goes through: literal key first, then
 // capabilities.<name>.prefer (symmetry required), then the plain "for"

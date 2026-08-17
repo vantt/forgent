@@ -739,7 +739,7 @@ function validateExecutorEntryShape(executor, label, capabilityNames) {
   }
 }
 
-// Extracted (D2, docs/history/capability-executor-remodel/CONTEXT.md) so
+// Extracted (D2, docs/history/capability-capacity-remodel/CONTEXT.md) so
 // `capabilities.<name>.overrides.rigorOverrides` (validateCapabilitiesShape
 // below) validates against the exact same rule a executor's own
 // `rigorOverrides` already does, never a second, drifting copy of it.
@@ -776,7 +776,7 @@ function validateRigorOverridesShape(rigorOverrides, label) {
  * alias name).
  */
 // Only 4 fields are ever eligible for capabilities.<name>.overrides (D2,
-// docs/history/capability-executor-remodel/CONTEXT.md): a capability can
+// docs/history/capability-capacity-remodel/CONTEXT.md): a capability can
 // retune HOW strongly its resolved executor works, never WHAT command
 // actually runs -- command/args/adapter/invocations stay owned by the
 // executor alone, never override-able from a capability.
@@ -892,7 +892,7 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
       validateExecutorEntryShape(executor, `${sourceLabel} executors.${executorId}`, capabilityNames);
     }
   }
-  // `prefer` symmetry (D2, docs/history/capability-executor-remodel/
+  // `prefer` symmetry (D2, docs/history/capability-capacity-remodel/
   // CONTEXT.md): checked here, AFTER both `capabilities` and `executors`
   // are individually known-good — a capability's own shape and a
   // executor's own shape can each be malformed independently, and this
@@ -1075,7 +1075,7 @@ export function resolveExecutorIdForPurpose(cfg, purpose) {
  * Resolve a `executorId`-OR-purpose name to its real serving executor,
  * applying `capabilities.<name>.prefer`/`overrides` (2026-08-16 user
  * decision, `docs/decisions/0033-...md`'s sibling `docs/history/
- * capability-executor-remodel/CONTEXT.md` D1/D2) — the ONE place every
+ * capability-capacity-remodel/CONTEXT.md` D1/D2) — the ONE place every
  * `cfg.executors[executorId]` lookup in this file should go through
  * instead of tracing it out ad hoc (D4: `spawnWorker` used to have its
  * own separate inline lookup for model resolution, distinct from
@@ -1284,7 +1284,7 @@ export function decideDispatchMechanism({ hasNativeMechanism, hasLiveTaskAccess,
  * "agent"`, D5 tsk-in1-4 — was `"task"` before `kind` split into the
  * `agent`/`tool` BAN CHAT axis) and `forceCliSpawn` (`executor.forceCliSpawn`)
  * from `resolveExecutorAndOverrides(cfg, executorId).executor` (D4,
- * `docs/history/capability-executor-remodel/CONTEXT.md` — the same shared
+ * `docs/history/capability-capacity-remodel/CONTEXT.md` — the same shared
  * resolver `resolveExecutorConfig` now uses too), without calling or
  * mutating `resolveExecutorConfig` itself — this stays a read-only
  * sibling, never a second entry into the
@@ -1855,7 +1855,7 @@ export async function executeExecutorCli(
   const fgosDir = fgosDirFromRoot(root);
   const cfg = ensureRunnerConfigForDir(root);
   const resolvedByPurpose = !executorIdArg;
-  // D4 (docs/history/capability-executor-remodel/CONTEXT.md): resolve
+  // D4 (docs/history/capability-capacity-remodel/CONTEXT.md): resolve
   // through the shared resolver on WHICHEVER key this call actually gave
   // us — `purpose` when purpose-resolved, `executorIdArg` when named
   // directly (itself possibly a purpose-shaped id with no literal

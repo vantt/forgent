@@ -1,4 +1,4 @@
-# Why capacity-aware backend dispatch exists
+# Why executor-aware backend dispatch exists
 
 Before this cluster, forgent's runner dispatched every unit of work
 through one hardcoded path: whatever `executor`/`executors.<tier>` a
@@ -6,23 +6,23 @@ config declared, always the same backend regardless of what kind of work
 was actually being done. Adding a cheaper or better-suited backend for
 one specific job meant editing dispatch code, not config.
 
-The goal: unify how forgent dispatches a "capacity" (an LLM/tool/composite
+The goal: unify how forgent dispatches a "executor" (an LLM/tool/composite
 unit of work) to the right backend/model/tool-scope, at the cheapest cost
-for adequate quality, through one config point — `capacities.<id>` in
+for adequate quality, through one config point — `executors.<id>` in
 `.fgos/config.json`'s `runner` section (the sole config source since
 `tsk-5hv` D1 retired the legacy fallback) — instead of per-skill hardcoded logic.
 
 ## The four pieces, and what each one actually proved
 
 - **`tsk-62v`** — the foundation. Generalized `resolveExecutorConfig` to
-  resolve `capacities.<capacityId>` ahead of `executors.<tier>` ahead of
+  resolve `executors.<executorId>` ahead of `executors.<tier>` ahead of
   the global `executor`, reusing `fgos tool registry`'s own `kind`
   vocabulary (`cli`/`binary`/`mcp`/`skill`/`http`, plus `task` for
   in-session dispatch). Everything else in this cluster builds on this
   resolution.
 - **`tsk-slq`** — a platform-agnostic canonical root for forgent's own
   agent definitions (`.fgos/agents/` projected into `.claude/agents/`),
-  needed so a capacity's own backend could be described the same way
+  needed so a executor's own backend could be described the same way
   regardless of which assistant platform is running it.
 - **`tsk-5l2`** — the first real, end-to-end proof: wired
   `fgos-submit-assist`'s tier/kind/risk classification step through the
@@ -38,18 +38,18 @@ for adequate quality, through one config point — `capacities.<id>` in
 ## The gap the design left open, and what closed it
 
 `tsk-5l2`'s own scope explicitly flagged an unresolved gap while building
-the first real cross-provider capacity: "this is the FIRST real capacity
+the first real cross-provider executor: "this is the FIRST real executor
 sending prompt content... to a third-party model; no sensitiveData/
-governance field exists yet to mark which capacities are safe to route
+governance field exists yet to mark which executors are safe to route
 outside Claude." `tsk-32n` closed this after the cluster's own children
-were already done: `capacities.<id>.allowCrossProvider`, restrictive by
-default, checked against the capacity's final resolved command (not its
+were already done: `executors.<id>.allowCrossProvider`, restrictive by
+default, checked against the executor's final resolved command (not its
 declared `kind`, not the spoofable `provider` alias) — see
-`docs/reference/capacity-cross-provider-governance.md`.
+`docs/reference/executor-cross-provider-governance.md`.
 
 ## Naming a Claude Code agent instead of a raw command (`tsk-3sw`)
 
-A `kind:"task"` capacity can now declare only `agentType` (a
+A `kind:"task"` executor can now declare only `agentType` (a
 `.claude/agents/<name>.md` agent definition name) instead of its own
 `command`/`args` — `resolveExecutorConfig` synthesizes a real `claude
 --agent <agentType>` invocation from the resolved global `executor`'s own
@@ -57,7 +57,7 @@ args template (never a hardcoded literal), stripping the `--model`
 placeholder so the named agent definition's own pinned model wins over the
 work item's `tier`. Claude-only for now (`judge-discovery`'s own
 `command`/`args`-declaring shape is unaffected and still takes precedence
-whenever a capacity names both); multi-provider `agentType` support
+whenever a executor names both); multi-provider `agentType` support
 (`agy`/Codex each have a structurally different agent-dispatch shape of
 their own) is `tsk-53h`'s separate, later scope.
 
@@ -83,22 +83,22 @@ targets were really `done`.
 
 ## Second milestone closure (`tsk-45a`)
 
-`tsk-45a` tracks the follow-on milestone — "capacity-executor safe for
+`tsk-45a` tracks the follow-on milestone — "executor-executor safe for
 real cross-provider use" — with `targets: [tsk-49o, tsk-32n, tsk-418]`,
 verified by `tsk-32n` + `tsk-418` both showing `status: done` (`tsk-49o`
 carries no captured outcome of its own — closed without one, not part of
 this verify command). `tsk-32n` is the `allowCrossProvider` governance
-field documented at `docs/reference/capacity-cross-provider-governance.md`
+field documented at `docs/reference/executor-cross-provider-governance.md`
 (see "The gap the design left open" above); `tsk-418` generalized the
-judge-retry helper for any capacity dispatch
-(`docs/how-to/generalize-a-judge-retry-helper-for-any-capacity-dispatch.md`).
+judge-retry helper for any executor dispatch
+(`docs/how-to/generalize-a-judge-retry-helper-for-any-executor-dispatch.md`).
 No friction recorded against this milestone's own closure.
 
 ## Full design record
 
 `plans/reports/distill-consult-260731-1733-agent-executor-backend-
 dispatch-report.md` (prior-art consult), `plans/reports/agent-executor-
-design-260731-1758-capacity-backend-dispatch-proposal-report.md` (the
+design-260731-1758-executor-backend-dispatch-proposal-report.md` (the
 design itself), `plans/reports/agent-executor-design-260801-1159-
 synthesis-goal-constraints-gaps-report.md` (goal/constraints/known-gaps
 synthesis).

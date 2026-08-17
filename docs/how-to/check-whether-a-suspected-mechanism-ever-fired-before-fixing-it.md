@@ -27,7 +27,7 @@ been a reasonable-looking next step.
    documentation:
 
    ```
-   grep -c "capacity.dispatch" .fgos/events.jsonl
+   grep -c "executor.dispatch" .fgos/events.jsonl
    ```
 
    (or the equivalent event-type filter for whatever mechanism is
@@ -53,7 +53,7 @@ been a reasonable-looking next step.
 > once — not a conflict between two automated mechanisms. An initial
 > hypothesis blaming `fgos-fanout`'s documented leaf-auto-approve
 > behavior was checked against real event-log evidence
-> (`capacity.dispatch` = 0 events in the entire repo history, i.e. the
+> (`executor.dispatch` = 0 events in the entire repo history, i.e. the
 > runner's automated dispatch path has never fired for real) and
 > retracted."
 > — real locked decision D5, `docs/history/merge-list-tree-bottleneck-priority/CONTEXT.md`

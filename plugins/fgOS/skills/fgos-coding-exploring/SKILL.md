@@ -69,8 +69,8 @@ directly by `fgos-coding-planning`, mid-`planning`, when that skill finds
   a person can still expand it to inspect the subagent's own trace, unlike
   a genuinely opaque headless `claude -p` subprocess). If a step
   genuinely needs a different backend for a narrow helper task, route it
-  explicitly through the capacity-dispatch mechanism instead of an ad hoc
-  Task call — see `../_shared/capacity-dispatch-fallback.md` for its own
+  explicitly through the executor-dispatch mechanism instead of an ad hoc
+  Task call — see `../_shared/executor-dispatch-fallback.md` for its own
   list of valid reasons.
 - Do not research implementation, propose architecture, or write code. If a
   candidate question only matters to whoever builds the thing, it belongs to
@@ -105,10 +105,10 @@ directly by `fgos-coding-planning`, mid-`planning`, when that skill finds
   `fgos ask`/`answer` round trip (an actual async park — `advise`), and
   the occasional narrow research need that goes to the `fgos-researching`
   helper — the SAME named helper `fgos-coding-discovering` calls as its
-  primary mechanism, distinct from the capacity-dispatch mechanism this
+  primary mechanism, distinct from the executor-dispatch mechanism this
   skill's own hard rules mention elsewhere (that one swaps EXECUTORS for
   the same reasoning work — a different model/provider/parallel run,
-  `../_shared/capacity-dispatch-fallback.md` — never confuse the two).
+  `../_shared/executor-dispatch-fallback.md` — never confuse the two).
   Skip both entirely when the item's domain declares no `roleGraph`.
 
 ## Flow
@@ -167,7 +167,7 @@ directly by `fgos-coding-planning`, mid-`planning`, when that skill finds
    check `fgos-coding-planning`/`fgos-coding-validating`/`fgos-coding-implement` already run
    (`fgos tool query --capability impact-analysis --status present`) —
    rather than assuming GitNexus is on this machine — `judgeDiscovery`'s own
-   `capacities.judge-discovery` config (`.fgos/config.json`, tsk-4rd upgrade)
+   `executors.judge-discovery` config (`.fgos/config.json`, tsk-4rd upgrade)
    now grants it `Task,WebSearch,WebFetch,Read,Bash(rg:*)` too, wider than
    `src/runner/dispatch.mjs`'s bare `git add`/`git commit` default, but that
    grant belongs to a separate subprocess call with its own posture read —
