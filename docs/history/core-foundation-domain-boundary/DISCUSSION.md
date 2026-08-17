@@ -10,6 +10,17 @@ status: open
 
 ## 1. Trạng thái hiện tại
 
+Round 7 (2026-08-17): D6 sửa lại và chốt — ghi qua `fgos decision --id
+tsk-397` (seq 19297), thay bản D6 đầu (SAI, lẫn context với knowledge).
+`docs/history/` là context (thô, feature-scoped, share, không tag
+domain) — giữ nguyên. Domain-knowledge (curated, do team bảo trì) là
+khái niệm riêng, sống tại `domains/<name>/knowledge/`, co-located theo
+tinh thần D3 — tiền lệ thật `/home/vantt/projects/beegog/expertise/`.
+5/6 mối quan tâm giờ có hình dạng chốt (harness/workflow/task/skill/
+knowledge); chỉ còn `doctrine` domain-scoped là mở thật (không giải được
+bằng tag như knowledge, vì doctrine luôn-nạp chứ không tra-theo-yêu-cầu).
+Layout (ASCII + mermaid, §6) đã đồng bộ theo D6 mới.
+
 Round 6 (2026-08-17): tầng CODE+SKILL của boundary đã chốt — D3/D4/D5,
 ghi qua `fgos decision --id tsk-397` (seq 19128-19130). Hình dạng cuối:
 `domains/<name>/` là folder tự chứa (registry.mjs + skills/ đi cùng nhau)
@@ -101,7 +112,9 @@ thi thật.
 | 12 | STR52's câu hỏi scope (share store hay cài fgOS riêng cho domain mới) — trả lời thế nào? | Chốt — D1 | (nội dung phân tích giữ nguyên, xem D1 ở §4) |
 | 13 | Domain-specific code+skill nên tổ chức theo layout nào (nested trong cây có sẵn, hay folder riêng)? | Chốt — D3/D4 | `domains/<name>/` tự chứa, top-level, mirror `plugins/fgOS/`. Đề xuất nested đầu tiên (`.agents/skills/domains/coding` + `src/domains/coding` tách rời) bị người bác — "không phát triển được dạng plugin/extension". |
 | 14 | Core (bin/, src/, herdr-plugin/) có nên di dời vào folder `core/` tường minh để đối xứng với `domains/` không? | Chốt — D5 | Không di dời vật lý — 881 tham chiếu `bin/fgos.mjs` + external install (mission 0035) khiến chi phí lớn hơn hẳn lợi ích biểu tượng. `.agents/skills/core/` là chỗ duy nhất rẻ đủ để làm tường minh. |
-| 15 | Áp ma trận 6 mối quan tâm (harness/workflow/task/knowledge/skill/doctrine) × {core, domain} — còn chỗ nào thiếu? | Rõ một phần | harness: chỉ core (D1, domain không có harness riêng). workflow/task/skill: đã chốt (D2-D4). **knowledge, doctrine: CHƯA có tiền lệ domain-scoped nào trong code — mở, chưa thiết kế.** `docs/history/` hiện scope theo feature chứ không theo domain; AGENTS.md/CLAUDE.md luôn nạp không phân domain. |
+| 15 | Áp ma trận 6 mối quan tâm (harness/workflow/task/knowledge/skill/doctrine) × {core, domain} — còn chỗ nào thiếu? | Rõ phần lớn | harness: chỉ core (D1). workflow/task/skill: đã chốt (D2-D4). knowledge: đã chốt (D6). **doctrine: vẫn mở** — không có cơ chế nạp-có-điều-kiện theo domain trong AGENTS.md/CLAUDE.md hôm nay. |
+| 16 | `docs/history/<feature>/` có phải "knowledge" không? | Chốt — sửa lại (round 7) | KHÔNG — người chỉ ra `docs/history/` là **context** (biên bản thô, append-only, theo feature), không phải knowledge. "Knowledge" đúng nghĩa = domain-knowledge, curated, do team tự bảo trì — khác hẳn context. D6 (bản đầu, gắn tag `domain` lên `docs/history/`) SAI vì lẫn 2 khái niệm — đã thay bằng D6 mới. |
+| 17 | Domain-knowledge (curated, private, do team tự bảo trì) nên sống ở đâu? | Chốt — D6 | `domains/<name>/knowledge/`, co-located cùng `skills/`, theo đúng tinh thần tự-chứa của D3. Tiền lệ thật: `/home/vantt/projects/beegog/expertise/` — hệ curated knowledge base thật (`knowledge.md` tự mô tả "craft vs project layers, harvesting from finished work, recorded trust, dated freshness, migration rot, retirement") — khác hẳn `docs/history/` (context thô). |
 
 ## 4. Quyết định đã chốt
 
@@ -112,6 +125,7 @@ thi thật.
 | D3 | Domain code+skill sống trong folder tự chứa `domains/<name>/` (registry.mjs + skills/ đi cùng nhau), top-level, không nested trong `.agents/skills/`/`src/` có sẵn. | Mirror cơ chế plugin thật đã có (`plugins/fgOS/`: manifest + skills tự chứa, thêm `dogfood-fixture` không đụng `fgOS/`). Đề xuất nested đầu (`.agents/skills/domains/coding` tách rời `src/domains/coding`) bị bác vì vẫn rải một domain qua 2 cây + cần sửa aggregator bằng tay — không phải hình dạng plugin/extension thật. |
 | D4 | `workflow-stage-graphs.mjs` chỉ còn là aggregator quét `domains/*/registry.mjs` tự động (directory scan), không phải import list sửa tay. | Điều kiện để D3 thật sự "pluggable" — thêm domain không được đụng file domain khác hay aggregator, giống hệt cách thêm `dogfood-fixture` không đụng `fgOS/`. |
 | D5 | Core (`bin/`, `src/`, `herdr-plugin/`) giữ nguyên vị trí top-level — KHÔNG di dời vào folder `core/` để đối xứng với `domains/`. Chỉ `.agents/skills/core/` (sau khi domain skill dọn ra `domains/*/skills/`) được gắn nhãn tường minh. | Grep: 881 tham chiếu `bin/fgos.mjs` trong `.md`/`.mjs` toàn repo (mọi action step skill, docs, test); fgOS đã cài global ở nhiều project khác (mission 0035) gọi thẳng path đó — di dời phá vỡ diện rộng cho lợi ích thuần biểu tượng, vì `domains/` tồn tại đã làm "không phải domains/" tự nhiên đọc là core. |
+| D6 | Domain-knowledge (curated, private, do team tự bảo trì) sống co-located tại `domains/<name>/knowledge/` — KHÔNG phải tag `domain` gắn lên `docs/history/` (bản đầu SAI, đã thay). `docs/history/<feature>/` là **context** (thô, append-only, theo feature) — giữ nguyên chỗ, không đổi. | Sửa theo người: knowledge ≠ context. Tiền lệ thật `/home/vantt/projects/beegog/expertise/` — hệ curated knowledge base có `knowledge.md` tự mô tả "harvesting from finished work, recorded trust, dated freshness, migration rot, retirement" — một hệ bảo trì chủ động, khác hẳn log thô. Theo tinh thần tự-chứa D3, domain-knowledge thuộc về folder riêng của domain đó. |
 
 ## 5. Q&A log
 
@@ -192,6 +206,23 @@ thi thật.
   doctrine) — chưa có tiền lệ domain-scoped trong code hiện tại.
 - 2026-08-17 — Round 6d: người yêu cầu "vẽ layout đi" → diagram đầy đủ ở
   §6, D3/D4/D5 ghi qua `fgos decision`.
+- 2026-08-17 — Round 7 Q&A: người hỏi "sao không vẽ ascii layout" → thêm
+  cây thư mục dạng `text` (không chỉ mermaid). Người hỏi tiếp "trong từng
+  domain không có workflow/task-specs/knowledge à?" — trợ lý sửa: workflow
+  đã có (registry.mjs), task-specs cũng ĐÃ có trong CÙNG file
+  (`fieldSchema`), riêng spec dạng văn xuôi (BA-grade) nên ở
+  `docs/specs/` (shared, không lồng domains/) để giữ `reading-map.md` là
+  1 điểm tra cứu duy nhất; knowledge lúc này chưa có tiền lệ, đề xuất D6
+  bản đầu (tag `domain` lên `docs/history/`). Người chỉ ra core cũng
+  không đối xứng — trợ lý bảo vệ D5 (881 ref), thêm bảng ánh xạ
+  concern→path cho core thay vì di dời. Người yêu cầu vẽ lại ascii —
+  redraw đủ 6 concern cho cả core lẫn domain. **Người sửa lại D6 bản đầu:
+  `docs/history/` là CONTEXT (thô, theo feature), không phải knowledge —
+  domain-knowledge là khái niệm KHÁC, curated riêng của team.** Trợ lý
+  scout `/home/vantt/projects/beegog/expertise/` (chưa xem trước đó) —
+  tìm thấy hệ curated knowledge-base thật với `knowledge.md` tự mô tả
+  đúng khái niệm người muốn (harvesting/trust/freshness/retirement, khác
+  hẳn raw log) → D6 mới: `domains/<name>/knowledge/`, co-located.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -229,10 +260,9 @@ forgentX/
 │   │   │                                 #   ở ĐÂY (shared), không lồng vào domains/ — reading-map.md
 │   │   │                                 #   là nơi duy nhất để tìm spec, splinter theo domain sẽ phá vỡ điều đó
 │   │   └── reading-map.md                # điểm vào — nên gộp thêm bảng ánh xạ 6-mối-quan-tâm này khi plan
-│   ├── decisions/                        # knowledge — quyết định nền tảng, domain-agnostic
-│   └── history/                          # knowledge — feature-scoped hôm nay; D6 (đề xuất, CHƯA khoá):
-│                                         #   thêm field `domain` vào docs/enduser-docs-index.json,
-│                                         #   share store — không tách thư mục riêng theo domain
+│   ├── decisions/                        # knowledge — quyết định nền tảng, domain-agnostic (craft, không phải domain)
+│   └── history/                          # CONTEXT, không phải knowledge (sửa round 7) — thô, append-only,
+│                                         #   theo feature, giữ nguyên chỗ, share, KHÔNG gắn tag domain
 ├── AGENTS.md / CLAUDE.md                 # doctrine — luôn nạp, KHÔNG phân domain (❓ vẫn mở, chưa có
 │                                         #   cơ chế nạp-có-điều-kiện theo domain)
 │
@@ -243,11 +273,14 @@ forgentX/
 │   │   ├── registry.mjs                  # workflow (stages/stepMap/transitions/skillMap)
 │   │   │                                 #   + task-specs (fieldSchema — CÙNG file, work.mjs đọc
 │   │   │                                 #   domain?.fieldSchema từ đây, D2)
-│   │   └── skills/                       # skill — di dời từ .agents/skills/, 8 skill nguyên trạng
-│   │       ├── discovering/  exploring/  planning/  validating/
-│   │       └── implement/    shaping/    driving/    compounding/
+│   │   ├── skills/                       # skill — di dời từ .agents/skills/, 8 skill nguyên trạng
+│   │   │   ├── discovering/  exploring/  planning/  validating/
+│   │   │   └── implement/    shaping/    driving/    compounding/
+│   │   └── knowledge/                    # ★ D6 — curated domain-knowledge, riêng của team, co-located
+│   │       # (KHÁC docs/history/ — knowledge được bảo trì chủ động, context thì thô/append-only)
+│   │       # tiền lệ thật: /home/vantt/projects/beegog/expertise/ (knowledge.md tự mô tả
+│   │       # harvesting/trust/dated-freshness/retirement — một hệ bảo trì, không phải log)
 │   │       # task (data thật): domainFields.coding.* — sống trong .fgos/events.jsonl, không phải file
-│   │       # knowledge (D6): docs/history/* + docs/enduser-docs-index.json, lọc bằng field `domain`
 │   │
 │   └── marketing/                        # ★ tương lai (STR52) — thêm vào đây, KHÔNG sửa gì trong coding/
 │       ├── registry.mjs
@@ -266,7 +299,8 @@ flowchart TB
         workflow_core["<b>workflow</b><br/>stage-fsm.mjs, status-fsm.mjs<br/>+ workflow-stage-graphs.mjs<br/><i>(aggregator, D4)</i>"]
         task_core["<b>task</b><br/>EDITABLE_FIELDS<br/>(store.mjs:275, D2)"]
         skill_core["<b>skill</b><br/>.agents/skills/core/<br/>fgos-routing, fgos-clarifying, ..."]
-        knowledge_core["<b>knowledge</b> ❓<br/>docs/decisions/,<br/>platform-foundations.md"]
+        knowledge_core["<b>knowledge</b><br/>docs/decisions/ (craft, domain-agnostic)"]
+        context_core["<i>(context ≠ knowledge)</i><br/>docs/history/&lt;feature&gt;/<br/>shared, KHÔNG gắn domain — D6"]
         doctrine_core["<b>doctrine</b> ❓<br/>AGENTS.md / CLAUDE.md<br/>(luôn nạp, mọi domain)"]
     end
 
@@ -277,7 +311,7 @@ flowchart TB
             wf_c["workflow<br/>registry.mjs"]
             tk_c["task<br/>domainFields.coding.*"]
             sk_c["skill<br/>skills/ (8 skill,<br/>di dời từ .agents/skills/)"]
-            kn_c["knowledge ❓"]
+            kn_c["<b>knowledge</b><br/>knowledge/ — curated,<br/>co-located (D6)"]
             dc_c["doctrine ❓"]
         end
         subgraph MARKETING["domains/marketing/ (STR52, chưa xây)"]
@@ -306,10 +340,18 @@ install (mission 0035) khiến di dời phá vỡ diện rộng cho lợi ích t
 biểu tượng. Chỉ `.agents/skills/core/` được gắn nhãn tường minh (rẻ,
 không có external path phụ thuộc).
 
-**Còn mở (❓ trong diagram, ngoài scope quyết định của item này trừ khi
-người chốt mở rộng):** `knowledge` và `doctrine` domain-scoped — chưa có
-tiền lệ nào trong code hôm nay (`docs/history/` scope theo feature chứ
-không theo domain; AGENTS.md/CLAUDE.md luôn nạp không phân domain). Trục
+**Domain-knowledge ≠ context (D6, sửa lại round 7).** `docs/history/` là
+CONTEXT — biên bản thô, append-only, theo feature — giữ nguyên chỗ, share,
+KHÔNG gắn tag `domain`. "Knowledge" đúng nghĩa là curated, do team chủ
+động bảo trì (harvest, đánh giá độ tin cậy, hết hạn/rút khi lỗi thời) —
+tiền lệ thật là `/home/vantt/projects/beegog/expertise/`. Domain-knowledge
+sống co-located tại `domains/<name>/knowledge/`, cùng tinh thần tự-chứa
+với `skills/` (D3).
+
+**Còn mở (❓ trong diagram):** chỉ còn `doctrine` domain-scoped — chưa có
+cơ chế nạp-có-điều-kiện theo domain nào trong AGENTS.md/CLAUDE.md hôm
+nay, và tagging (cách D6 giải cho knowledge) không áp dụng được cho thứ
+luôn-nạp. Trục
 engine-vs-prose ở tầng SKILL đã tự nhiên giải quyết qua D3 (skill sống
 trong `domains/<name>/skills/` hoặc `.agents/skills/core/`, không còn là
 câu hỏi tách riêng) — phát hiện round 5: 3 cây skill cũ (`.agents/skills`,
