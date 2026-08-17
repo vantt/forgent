@@ -74,7 +74,6 @@
         ],
         "scanTarget": ".gitnexus",
         "responsibility": "Verification",
-
         "invocations": [
           {
             "via": "mcp",
@@ -133,5 +132,15 @@
   },
   "workerSlots": {
     "ceiling": null
+  },
+  "ironLaw": {
+    "level": "ask"
+  },
+  "gateway": {
+    "port": 4170,
+    "token": null
+  },
+  "herdrWebDashboard": {
+    "staticServing": true
   }
 }
