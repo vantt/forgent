@@ -2,6 +2,15 @@
 
 ## 1. Trạng thái hiện tại
 
+Vòng 9 (2026-08-17): người dùng chỉ ra một work khác đang thảo luận song
+song — **tsk-37i** (`docs/history/self-contained-id-references/
+DISCUSSION.md`, branch `fgw/tsk-37i`, 8 round riêng, D1 đã lock) — cùng chủ
+đề trích dẫn/quyết định-outdate nhưng hẹp hơn (format trích dẫn D-ID/RUL-ID/
+ADR, không phải kiến trúc lưu trữ). Phiên tsk-37i ĐÃ TỰ ĐỌC discussion này
+(round 8 của họ, cùng mốc giờ ~10:25Z) và ghi nhận 3 điểm overlap từ phía họ
+— xác nhận lại từ phía tsk-1lv ở §5 round 9, kèm khuyến nghị phối hợp cụ
+thể. Chưa đổi D1-D6 đã lock; chỉ thêm bối cảnh phối hợp liên-item.
+
 Vòng 8 (2026-08-17): người dùng xác nhận mở rộng scope sang tầng
 compounding/Diataxis. 6 điểm đã giữ ổn định đủ round (D4) — đã mint D1-D6
 qua `fgos decision --id tsk-1lv` (seq 18961-18966), viết lại §4/§6/§7 đầy
@@ -655,6 +664,63 @@ Viết lại §4 (bảng D-ID) và §6 (tổng hợp đầy đủ + sơ đồ me
 song được. 3 điểm còn mở nêu ở §1/§6 — chưa đủ round để mint, cần hỏi tiếp
 trước khi coi discussion converge và set `refs`/handoff sang
 fgos-coding-exploring.
+
+### Round 9 — 2026-08-17T10:38Z — đối chiếu tsk-37i (work song song)
+
+**Đọc trực tiếp** `docs/history/self-contained-id-references/DISCUSSION.md`
+trên branch `fgw/tsk-37i` (không checkout, `git show`) — 336 dòng, 8 round,
+D1 đã lock (seq 18919): *"Cấu trúc 3 tầng trích dẫn hiện có của fgOS
+(global-vĩnh viễn / scope-theo-file / cục bộ-1-feature) đã xác nhận đúng,
+không phải chỗ cần sửa"* — beegog hội tụ độc lập cùng 3 tầng (short8 global
+~ ADR, `R<n>` reset-mỗi-file ~ RUL, D-local ~ D-local). Phạm vi tsk-37i:
+**format trích dẫn** (id trần → id+gloss) + **enforcement 2 lớp** (pointer-
+integrity máy-kiểm + gloss-đúng/đủ người-phán) — hẹp hơn nhiều so với tsk-1lv
+(kiến trúc lưu trữ + 267+ file Diataxis).
+
+**tsk-37i đã tự ghi nhận 3 điểm overlap ở round 8 của họ (cùng mốc giờ
+~10:25Z) — xác nhận lại từ phía tsk-1lv, không suy đoán thêm:**
+
+1. **Mảnh 4 của tsk-37i (routing close-gate, `fgos return`/`approve` chặn
+   D-ID locked mà chưa route) TRÙNG đúng "routing door" trong 4-door bundle
+   mà tsk-1lv đang thiết kế ở tầng harness chung** (§6 round 8 "Còn mở" —
+   fork #2/#3, chưa D-ID). Cả hai độc lập tìm ra CÙNG cơ chế beegog v2.7.0.
+   Nguy cơ thật nếu làm song song: 2 item cùng sửa `fgos return`/`approve`
+   theo 2 thiết kế khác nhau cho cùng 1 cửa chặn.
+2. **Mảnh 2 của tsk-37i (reversal sweep cho ADR supersede, nhắm
+   `docs/decisions/0000-index.md`) có nguy cơ lỗi thời bởi D5 đã lock ở đây**
+   — D5 retire hẳn corpus `docs/decisions/*.md`, dồn narrative vào
+   `docs/specs/<area>.md`. Nếu D5 thi công trước, mục tiêu sweep của mảnh 2
+   không còn là nguồn quyền uy nữa — xây sweep cho một corpus sắp bị retire
+   là phí công.
+3. **Cả hai item độc lập phát hiện CÙNG 2 script detection-only** đã có sẵn
+   trong repo (`check-decision-citation-drift.mjs`,
+   `check-decision-supersession.mjs`, cả hai chạy tay, không CI) — cả tsk-1lv
+   §7 task 1 (round 8) lẫn tsk-37i mảnh 1 đều định nâng cấp 2 script này.
+   Không nên làm song song trên cùng 2 file.
+
+**Không overlap, giá trị riêng thật của tsk-37i:** mảnh 1 (khuôn `<ID>
+(<gloss>)` canonical ở `.agents/skills/_shared/`) và mảnh 3 (dọn ~36-69 file
+đang vi phạm, kể cả chính `fgos-coding-shaping/SKILL.md` — D2/D4/D6 trích
+trần) đứng độc lập với mọi quyết định lưu trữ của tsk-1lv — format trích
+dẫn và dọn nợ cũ cần làm dù `state.decisions` cuối cùng có shape gì.
+
+**Khuyến nghị phối hợp (trình bày cho người dùng, chưa tự quyết — đây là
+quyết định liên-item, thuộc người dùng theo `review-audit-self-decision.md`
+"User Decisions"):**
+
+- **Mảnh 4 tsk-37i → gộp vào fgork #2/#3 còn mở của tsk-1lv** (4-door bundle
+  nên thiết kế VÀ ghép 1 lần ở `fgos approve`, không tách routing-door ra
+  làm riêng khỏi 3 door kia).
+- **Mảnh 2 tsk-37i → treo chờ D5 tsk-1lv thi công**, hoặc bỏ hẳn nếu D5 làm
+  trước (sweep nhắm đúng target sẽ bị retire).
+- **Mảnh 1 nửa-máy (pointer-integrity check) → phối hợp chung 1 lần nâng
+  cấp 2 script hiện có**, tránh 2 item cùng sửa 1 file.
+- **Mảnh 1 nửa-văn-xuôi (khuôn gloss canonical) + mảnh 3 (dọn file cũ) →
+  GIỮ NGUYÊN ở tsk-37i**, độc lập thật, không cần chờ tsk-1lv.
+- Cơ chế phối hợp cụ thể (deps field, gộp làm 1 item, hay giữ 2 item song
+  song với scope đã thu hẹp) — để người dùng quyết, chưa tự ý sửa `deps`
+  của item nào ở đây (one-door-write, ngoài phạm vi phiên đang chạy trên
+  `fgw/tsk-1lv`).
 
 ## 6. Thiết kế đã chốt {#design}
 
