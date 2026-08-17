@@ -67,6 +67,7 @@ export function findCitationDriftFindings(
           kind: 'dead-framing',
           file,
           line: ln,
+          text: line.trim(),
           id,
           supersededBy,
           message:
@@ -118,6 +119,7 @@ export function findCitationFormatFindings(sourceFiles) {
               kind: 'd-local-outside-home',
               file,
               line: ln,
+              text: line.trim(),
               id: `D${num}`,
               message:
                 `${file}:${ln}: cites D-local id D${num} ` +
@@ -133,6 +135,7 @@ export function findCitationFormatFindings(sourceFiles) {
             kind: 'bare-citation',
             file,
             line: ln,
+            text: line.trim(),
             id: `${kind}${num}`,
             message:
               `${file}:${ln}: cites ${kind}${num} with no gloss ` +
@@ -146,10 +149,21 @@ export function findCitationFormatFindings(sourceFiles) {
   return findings;
 }
 
+// Content-keyed (not line-keyed, tsk-3x8 F1): a line inserted or deleted
+// earlier in the file shifts every later `line` number, which would make
+// an already-baselined finding look "new" under a line-keyed baseline
+// (the mechanism check-decision-codes.mjs's own content-keyed baseline
+// already avoids). `id` stays in the key alongside `text` because one
+// line can carry more than one citation finding (e.g. two ids cited on
+// the same line) -- `text` alone would collapse those into one entry.
+function findingKey(f) {
+  return `${f.kind}:${f.id}:${f.text}`;
+}
+
 export function findNewFindings(findings, baseline) {
   return findings.filter((f) => {
     const known = baseline[f.file];
-    const key = `${f.kind}:${f.line}:${f.id}`;
+    const key = findingKey(f);
     return !known || !known.includes(key);
   });
 }
@@ -158,7 +172,7 @@ export function baselineFromFindings(findings) {
   const baseline = {};
   for (const f of findings) {
     if (!baseline[f.file]) baseline[f.file] = [];
-    baseline[f.file].push(`${f.kind}:${f.line}:${f.id}`);
+    baseline[f.file].push(findingKey(f));
   }
   return baseline;
 }
