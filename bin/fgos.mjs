@@ -2062,17 +2062,38 @@ async function runVerb(verb, flags, positional, dir) {
       const decisions = (view.decisions ?? []).filter((d) => d.id === id);
       const table = renderLockedDecisionsTable(decisions);
       const before = fs.readFileSync(contextPath, 'utf8');
-      // tsk-1lv review-fix F6: a render with zero rows (no state.decisions
+      // tsk-1lv review-fix F6 (fixed again after round-2 review found a
+      // real regression, B2): a render with zero rows (no state.decisions
       // logged yet for this id) always used to overwrite whatever the
       // section already held -- including a hand-typed table from a
       // pre-tsk-1lv-3 item that never ran `fgos decision --id`. Refuse
       // instead of silently blanking real rows a person can only recover
       // from git: an empty render is never a legitimate downgrade of an
       // existing table with content.
+      //
+      // The first attempt at this guard used `.split('\n').slice(2)` to
+      // skip past the table header + separator row, assuming they always
+      // sit right after the heading -- but the actual leading content is
+      // 1-2 blank lines (heading, then a blank line, then the table),
+      // so `slice(2)` dropped the blank lines instead and left the
+      // header row (`| D-ID | Quyết định |`) itself counted as "a row",
+      // making a fresh render of THIS VERB'S OWN empty-table output
+      // (header + separator, no data) refuse on its own second run --
+      // non-idempotent, contradicting fgos-coding-exploring/SKILL.md's own
+      // documented "idempotent, a no-op re-run reports changed: false".
+      // Reproduced directly, not assumed. Fixed by anchoring on the real
+      // separator row (`|---|...`) and counting only lines after it --
+      // that is the one structural marker a markdown table always has,
+      // regardless of how many blank lines precede it.
       const existingSection = /##\s*Locked decisions([\s\S]*?)(?:\n##\s|$)/i.exec(before);
-      const existingHasRows = !!existingSection && /^\s*\|.+\|.*\|\s*$/m.test(
-        existingSection[1].split('\n').slice(2).join('\n'),
-      );
+      let existingHasRows = false;
+      if (existingSection) {
+        const sectionLines = existingSection[1].split('\n');
+        const sepIdx = sectionLines.findIndex((l) => /^\s*\|[-:\s|]+\|\s*$/.test(l));
+        if (sepIdx !== -1) {
+          existingHasRows = sectionLines.slice(sepIdx + 1).some((l) => /^\s*\|.+\|.*\|\s*$/.test(l));
+        }
+      }
       if (decisions.filter((d) => d.kind !== 'engine').length === 0 && existingHasRows) {
         throw new StoreError(
           'validation',
@@ -2670,10 +2691,20 @@ async function runVerb(verb, flags, positional, dir) {
       const absQuadrantDir = path.join(repoRoot, quadrantDir);
       const candidates = [];
       let entries = [];
+      // tsk-1lv round-2 review, M1: a bad/typo'd --quadrant used to
+      // degrade silently to candidateCount:0, match:null -- exit 0,
+      // indistinguishable from "scanned real docs, none claim this
+      // topic." For a find-before-create doctrine whose entire job is
+      // preventing duplicate authoritative docs, that reads as "create a
+      // new doc" on a path typo instead of "this call was wrong."
+      // `quadrantExists` lets a caller (the compounding skill's own
+      // doctrine step) tell the two apart.
+      let quadrantExists = true;
       try {
         entries = fs.readdirSync(absQuadrantDir, { withFileTypes: true });
       } catch {
         entries = [];
+        quadrantExists = false;
       }
       for (const entry of entries) {
         if (!entry.isFile() || !entry.name.endsWith('.md')) continue;
@@ -2686,6 +2717,7 @@ async function runVerb(verb, flags, positional, dir) {
         const duplicates = findDuplicateAuthoritativeClaims(candidates);
         return {
           quadrant: quadrantDir,
+          quadrantExists,
           candidateCount: candidates.length,
           duplicateGroups: duplicates.map((group) => group.map((c) => c.path)),
         };
@@ -2697,6 +2729,7 @@ async function runVerb(verb, flags, positional, dir) {
       const match = findAuthoritativeMatch(topic, candidates);
       return {
         quadrant: quadrantDir,
+        quadrantExists,
         topic,
         candidateCount: candidates.length,
         match: match ? match.path : null,

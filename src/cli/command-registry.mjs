@@ -1061,7 +1061,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'authoritative-match',
     invoke: 'fgos authoritative-match',
-    description: 'Read-only: skeleton-match a topic against every docs/<quadrant>/*.md doc\'s own authoritative_for frontmatter (fgos-coding-compounding\'s find-before-create doctrine, tsk-1lv-6/review-fix F11 D8/D12) -- returns the matching doc path, or null when none claims the topic. --check-duplicates runs the harness-backstop scan instead: reports every group of 2+ docs claiming the same subject.',
+    description: 'Read-only: skeleton-match a topic against every docs/<quadrant>/*.md doc\'s own authoritative_for frontmatter (fgos-coding-compounding\'s find-before-create doctrine, tsk-1lv-6) -- returns the matching doc path, or null when none claims the topic. --check-duplicates runs the harness-backstop scan instead: reports every group of 2+ docs claiming the same subject.',
     parameters: {
       type: 'object',
       properties: {

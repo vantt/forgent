@@ -214,6 +214,27 @@ test('CLI: context-render is idempotent -- a second call with no new decisions r
   assert.equal(data.changed, false);
 });
 
+test('CLI: context-render on an item with ZERO logged decisions is idempotent across repeated calls -- B2 tsk-1lv round-2 regression (the header+separator this verb itself writes must never count as a "real row" the F6 guard refuses to overwrite)', () => {
+  const cwd = initCwd();
+  assert.equal(
+    run(cwd, ['add', '--id', 'host-item', '--title', 'Host', '--kind', 'task', '--risk', 'light', '--verify', 'npm test', '--description', 'fixture']).status,
+    0,
+  );
+  const docsRef = 'docs/history/host-item';
+  writeContextSkeleton(cwd, docsRef);
+
+  const first = run(cwd, ['context-render', 'host-item']);
+  assert.equal(first.status, 0, first.stderr);
+  assert.equal(JSON.parse(first.stdout).data.changed, true);
+
+  const second = run(cwd, ['context-render', 'host-item']);
+  assert.equal(second.status, 0, second.stderr);
+  assert.equal(JSON.parse(second.stdout).data.changed, false);
+
+  const third = run(cwd, ['context-render', 'host-item']);
+  assert.equal(third.status, 0, third.stderr);
+});
+
 test('CLI: context-render excludes another item\'s decisions -- only rows scoped to THIS id appear', () => {
   const cwd = initCwd();
   assert.equal(

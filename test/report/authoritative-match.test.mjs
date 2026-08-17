@@ -188,13 +188,24 @@ test('CLI: authoritative-match returns match:null when no doc claims the topic',
   assert.equal(data.match, null);
 });
 
-test('CLI: authoritative-match on a quadrant dir that does not exist yet returns match:null, never an error', () => {
+test('CLI: authoritative-match on a quadrant dir that does not exist yet returns match:null, quadrantExists:false, never an error -- M1 tsk-1lv round-2: a caller must be able to tell a typo\'d path apart from a real scan with no match', () => {
   const cwd = initCwd();
   const result = run(cwd, ['authoritative-match', '--quadrant', 'docs/how-to', '--topic', 'anything']);
   assert.equal(result.status, 0);
   const data = JSON.parse(result.stdout).data;
   assert.equal(data.match, null);
   assert.equal(data.candidateCount, 0);
+  assert.equal(data.quadrantExists, false);
+});
+
+test('CLI: authoritative-match reports quadrantExists:true when the quadrant dir is real, even with zero matching docs', () => {
+  const cwd = initCwd();
+  writeDoc(cwd, 'docs/how-to', 'pick.md', 'claiming a work item');
+  const result = run(cwd, ['authoritative-match', '--quadrant', 'docs/how-to', '--topic', 'an unrelated subject']);
+  assert.equal(result.status, 0);
+  const data = JSON.parse(result.stdout).data;
+  assert.equal(data.match, null);
+  assert.equal(data.quadrantExists, true);
 });
 
 test('CLI: authoritative-match requires --quadrant (validation, exit 4)', () => {

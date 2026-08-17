@@ -35,7 +35,7 @@ import { claudeCodeHookWired } from './claude-code-hooks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
-import { listWork } from '../state/store.mjs';
+import { listWork, StoreError } from '../state/store.mjs';
 import { driftStatus, unmergedDeliveries } from '../state/drift-status.mjs';
 import { computeEnduserDocsIndex, generateEnduserDocsIndex, manifestPathFor } from '../report/enduser-index-generate.mjs';
 import { computeDecisionIndex, generateDecisionIndex, indexPathFor } from '../report/decision-index.mjs';
@@ -1914,15 +1914,33 @@ registerFix({
 // would compute). A missing docs/decisions/index.md is a normal state for
 // any project with zero platform-scoped decisions logged yet -- same
 // "absent capability = clean skip" contract as the enduser-index check.
+// tsk-1lv round-2 review, H2: `previousContent === undefined` used to
+// always mean "nothing to check" regardless of whether real decisions
+// exist to index -- so "the index was deleted (or never generated) while
+// 36 real scope-carrying decisions sit in state.decisions" (the exact
+// drift this check exists to catch) reported passed:true, with a message
+// that asserted "no platform-scoped decisions logged yet" without ever
+// looking at whether that was true. Reproduced against the live repo,
+// not assumed. Fixed: "nothing to check" now requires BOTH the file
+// being absent AND the freshly-computed content having no real rows --
+// a missing file with real content to index is the same failure as a
+// stale one, just worded for the "never generated" case specifically.
 function checkDecisionIndexStale(cwd) {
   const mainCheckout = resolveMainCheckout(cwd);
   const root = mainCheckout ?? cwd;
   const fgosDir = path.join(root, '.fgos');
-  const { previousContent, changed } = computeDecisionIndex(root, fgosDir);
+  const { previousContent, nextContent, changed } = computeDecisionIndex(root, fgosDir);
+  const nextHasRows = /^\|.+\|.*\|\s*$/m.test(nextContent);
   if (previousContent === undefined) {
+    if (!nextHasRows) {
+      return {
+        passed: true,
+        message: `${indexPathFor(root)} not found -- nothing to check (no platform-scoped decisions logged yet)`,
+      };
+    }
     return {
-      passed: true,
-      message: `${indexPathFor(root)} not found -- nothing to check (no platform-scoped decisions logged yet)`,
+      passed: false,
+      message: `${indexPathFor(root)} not found, but state.decisions has platform-scoped decisions to index -- run fgos decision-index`,
     };
   }
   if (!changed) {
@@ -1934,20 +1952,41 @@ function checkDecisionIndexStale(cwd) {
   };
 }
 
+// tsk-1lv round-2 review, B3: generateDecisionIndex's own F12 safety
+// refusal (never overwrite real rows with an empty regenerate) escaped
+// uncaught here, and `runFixes` (src/setup/checks.mjs) maps over every
+// registered fix with no try/catch of its own -- so the throw aborted the
+// ENTIRE `fgos doctor --fix` run, discarding every other fix's result.
+// Reproduced directly: a directory with a committed, row-carrying
+// docs/decisions/index.md and no readable .fgos store (this repo's own
+// merged-to-main future state on a fresh clone before .fgos exists) hit
+// this and returned exit 4 with no report at all. A refusal here is a
+// real, legitimate "this fix can't run safely right now" outcome, not a
+// crash -- report it through the same {changed, message} contract every
+// other fix already promises, so one fix's refusal never takes down the
+// rest of `doctor --fix`'s run.
 function fixDecisionIndexStale(cwd) {
   const mainCheckout = resolveMainCheckout(cwd);
   const root = mainCheckout ?? cwd;
   const fgosDir = path.join(root, '.fgos');
-  const { path: indexRelPath, changed } = generateDecisionIndex(root, fgosDir);
-  if (!changed) {
-    return { changed: false, message: `${indexRelPath} already up to date` };
+  let result;
+  try {
+    result = generateDecisionIndex(root, fgosDir);
+  } catch (err) {
+    if (err instanceof StoreError) {
+      return { changed: false, message: `skipped -- ${err.message}` };
+    }
+    throw err;
   }
-  return { changed: true, message: `regenerated ${indexRelPath}` };
+  if (!result.changed) {
+    return { changed: false, message: `${result.path} already up to date` };
+  }
+  return { changed: true, message: `regenerated ${result.path}` };
 }
 
 registerCheck({
   id: 'decision-index-stale',
-  description: 'docs/decisions/index.md matches every scope-carrying decision in state.decisions (tsk-1lv review-fix F10)',
+  description: 'docs/decisions/index.md matches every scope-carrying decision in state.decisions (tsk-1lv-2/tsk-1lv)',
   check: (cwd) => checkDecisionIndexStale(cwd),
 });
 

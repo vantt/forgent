@@ -781,6 +781,46 @@ test('decision-index-stale fix is idempotent -- a second run reports changed:fal
   fs.rmSync(tmp, { recursive: true, force: true });
 });
 
+test('decision-index-stale check FAILS when the index is missing but state.decisions has real rows to index -- H2 tsk-1lv round-2 regression (a missing index with real decisions to project is drift, not "nothing to check")', () => {
+  const tmp = mkTemp('fgos-decision-index-check-');
+  const fgosDir = path.join(tmp, '.fgos');
+  initStore(fgosDir);
+  addDecision(fgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
+
+  const { passed, message } = checkById('decision-index-stale').check(tmp);
+  assert.equal(passed, false);
+  assert.match(message, /not found/);
+  assert.doesNotMatch(message, /nothing to check/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('decision-index-stale fix reports a graceful skip (changed:false, no throw) when generateDecisionIndex refuses to blank an existing populated index -- B3 tsk-1lv round-2 regression (a thrown StoreError here used to abort fgos doctor --fix entirely, discarding every other fix\'s result)', () => {
+  const tmp = mkTemp('fgos-decision-index-fix-');
+  const populatedFgosDir = path.join(tmp, '.fgos');
+  initStore(populatedFgosDir);
+  addDecision(populatedFgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
+  fixById('decision-index-stale').fix(tmp);
+  const before = fs.readFileSync(path.join(tmp, 'docs', 'decisions', 'index.md'), 'utf8');
+
+  // Simulate the real-world trigger: the .fgos store this check/fix pair
+  // reads from is unreadable/empty relative to an already-populated
+  // on-disk index -- exactly what a fresh clone or a worktree missing
+  // .fgos/ (ADR0020) looks like once this branch's own committed index.md
+  // lands.
+  fs.rmSync(populatedFgosDir, { recursive: true, force: true });
+
+  let result;
+  assert.doesNotThrow(() => {
+    result = fixById('decision-index-stale').fix(tmp);
+  });
+  assert.equal(result.changed, false);
+  assert.match(result.message, /skipped/);
+
+  const after = fs.readFileSync(path.join(tmp, 'docs', 'decisions', 'index.md'), 'utf8');
+  assert.equal(after, before, 'the real index must survive the refused fix untouched');
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
 test('fgos check (CLI e2e) reports changelogNag and appends a checkpoint to changelog-nag-history.jsonl', () => {
   const cwd = mkTemp('fgos-changelog-nag-cli-');
   execFileSync('git', ['init', '-q'], { cwd, encoding: 'utf8' });
