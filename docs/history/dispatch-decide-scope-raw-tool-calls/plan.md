@@ -32,7 +32,7 @@ evidence (full citations in `RESEARCH.md`):
 2. `dispatch.mjs`'s own header scopes the whole module to one question —
    spawn in-process or out-of-process — never "should this tool call
    happen." A direct `WebSearch` call is not a spawn.
-3. `capacity-dispatch-fallback.md`'s own "Valid reasons to dispatch"
+3. `executor-dispatch-fallback.md`'s own "Valid reasons to dispatch"
    section names exactly four reasons; anything else "stays inline."
 4. The closest real precedent — organized multi-branch research fan-out
    — was explicitly decided (tsk-5tm-2 D6) to bypass `decide`/`resolve`
@@ -70,6 +70,18 @@ choice to make. No other file needs to change: this fragment is the one
 place `docs/history/two-layer-dispatch/DISCUSSION.md` D2 already names as
 the single source every consuming skill points to instead of restating.
 
+**Post-merge addendum (first `fgos approve` attempt, verify-fail-post-
+merge):** tsk-225 renamed both mirrors to `executor-dispatch-fallback.md`
+(D3, `docs/history/capacity-naming-rename/CONTEXT.md`) and merged to main
+concurrently with this item's own drive. Merging main into `fgw/tsk-3k4`
+cleanly rename-tracked the paragraph into the new filenames (`git merge`,
+92% similarity, no conflict) — the two paths below are the current, real
+paths post-merge; every reference to the old `capacity-dispatch-
+fallback.md` name in this plan (and in `RESEARCH.md`, left as-is
+deliberately — that file is a dated record of what was true when the
+research call ran, same period-accuracy discipline tsk-225's own D3 gives
+`docs/history/*capacity*/`) predates that rename.
+
 This is a prose clarification of already-decided, already-shipped
 behavior — it does not reopen or reinterpret `tsk-60f`'s D1/D5 (hook
 scope) or `tsk-5tm-2`'s D6 (research fan-out bypasses `decide`); both are
@@ -96,8 +108,8 @@ landed too):
 
 ```bash
 grep -q "Agent|Task" test/setup/claude-code-hooks.test.mjs && \
-grep -q "never itself a candidate for \`decide\`" .agents/skills/_shared/capacity-dispatch-fallback.md && \
-diff .agents/skills/_shared/capacity-dispatch-fallback.md plugins/fgOS/skills/_shared/capacity-dispatch-fallback.md
+grep -q "never itself a candidate for \`decide\`" .agents/skills/_shared/executor-dispatch-fallback.md && \
+diff .agents/skills/_shared/executor-dispatch-fallback.md plugins/fgOS/skills/_shared/executor-dispatch-fallback.md
 ```
 
 No split children. This item proceeds as itself — `fgos-coding-validating`
