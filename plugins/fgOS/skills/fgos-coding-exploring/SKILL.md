@@ -313,19 +313,40 @@ directly by `fgos-coding-planning`, mid-`planning`, when that skill finds
    and any outstanding questions deferred to planning. Concrete language
    only — no placeholders, no TODOs, no vague preferences.
 
-   Put that decisions table under a heading with this exact text (nothing
-   appended on that line, and not translated):
+   Put a heading with this exact text (nothing appended on that line, and
+   not translated) directly above the decisions table:
 
    ```markdown
    ## Locked decisions
    ```
 
-   `src/intake/plan.mjs` slices this table with a literal-English regex on
-   that exact heading, both to check a child's cited D-IDs are real and to
-   extract footprint paths. Any other wording — a Vietnamese heading, a
-   numbered variant — makes the slice come back empty, which silently
-   disables both checks instead of erroring: a child citing a D-ID that
-   doesn't exist would still be accepted.
+   **Never hand-type the table itself (tsk-1lv-3 D3)** — every row already
+   exists in `state.decisions` from step 2's own `fgos decision --id`
+   calls. Leave the section under the heading empty (or whatever it
+   already holds from an earlier render), then run, once, after the last
+   decision for this pass has been logged:
+
+   ```bash
+   node "$root/bin/fgos.mjs" context-render "<item-id>" --dir "$root"
+   ```
+
+   This replaces whatever sits under the heading with a fresh render from
+   the log — CONTEXT.md's table becomes a VIEW, never a second, hand-typed
+   copy that can drift from what `fgos decision` actually recorded
+   (mirrors bee-context-locking's own stance: "it renders; it does not
+   decide"). It refuses if the file does not exist yet, so write the rest
+   of the doc (this heading included, even with nothing under it yet)
+   before the first call. Re-run it again any time a later round adds more
+   decisions — idempotent, a no-op re-run reports `changed: false`.
+
+   `src/intake/plan.mjs` slices this same section with a literal-English
+   regex on the exact heading text above (`replaceLockedDecisionsSection`,
+   the write side; `extractLockedDecisionIds`, the read side used to check
+   a child's cited D-IDs and extract footprint paths). Any other wording —
+   a Vietnamese heading, a numbered variant — makes both sides miss the
+   section entirely: the write refuses (no heading to splice under), and
+   the read silently comes back empty, disabling the check instead of
+   erroring.
 
    End the doc with a section using this exact heading (nothing appended
    on that line), body `None` when every candidate question was locked or

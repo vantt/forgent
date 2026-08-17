@@ -20,6 +20,7 @@ import { fileURLToPath } from 'node:url';
 import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf, parseDecisionRelation, decisionTextLooksLikeSupersession } from '../src/state/store.mjs';
 import { collectWideSourceFiles, findWideCitationFindings } from '../scripts/check-decision-citation-drift.mjs';
 import { computeDecisionIndex, generateDecisionIndex } from '../src/report/decision-index.mjs';
+import { renderLockedDecisionsTable } from '../src/report/context-render.mjs';
 import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability, toolsFromCapacities } from '../src/state/tool-registry.mjs';
 import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
@@ -38,7 +39,7 @@ const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 
 import { resolveFgosDir, fgosDirFromRoot, resolveMainCheckoutRoot } from '../src/runner/paths.mjs';
 import { resolveCliVersionInfo } from '../src/cli/version.mjs';
 import { resolveDiscovery, classificationPatchFromVerdict, assertCallerClassification } from '../src/intake/discovery.mjs';
-import { resolvePlan } from '../src/intake/plan.mjs';
+import { resolvePlan, replaceLockedDecisionsSection } from '../src/intake/plan.mjs';
 import { computeEntropy, computeCounts, FINAL_STATUSES } from '../src/report/entropy.mjs';
 import { findSourceCaptureIds } from '../src/report/enduser-index.mjs';
 import { generateEnduserDocsIndex } from '../src/report/enduser-index-generate.mjs';
@@ -1977,6 +1978,52 @@ async function runVerb(verb, flags, positional, dir) {
       }
       const { path: indexRelPath, changed } = generateDecisionIndex(repoRoot, dir);
       return { path: indexRelPath, changed };
+    }
+
+    // tsk-1lv-3 D3: CONTEXT.md's "## Locked decisions" table becomes a
+    // RENDER from state.decisions, closing the gap tsk-1ud left (bee-
+    // context-locking's own stance: "it renders; it does not decide").
+    // `fgos decision --id <item-id>` (tsk-63c) is already the real write
+    // door; this verb only replaces the existing table's text with a fresh
+    // render, in place -- it never creates CONTEXT.md itself (the
+    // exploring/planning/shaping skill still writes the skeleton: feature
+    // boundary, pinned terms, outstanding questions), and never touches
+    // any other section.
+    case 'context-render': {
+      const id = requireField(positional[0] ?? flags.id, 'context-render requires an id: fgos context-render <id>');
+      const repoRoot = path.dirname(dir);
+      const view = listWork(dir);
+      const item = view.work[id];
+      if (!item) {
+        throw new StoreError('validation', `work "${id}" not found.`);
+      }
+      const docsRefRaw = typeof item.docsRef === 'string' && item.docsRef.trim() ? item.docsRef.trim() : `docs/history/${id}`;
+      const contextRelPath = path.posix.join(docsRefRaw.replace(/\/+$/, ''), 'CONTEXT.md');
+      const contextPath = path.join(repoRoot, contextRelPath);
+      if (!fs.existsSync(contextPath)) {
+        throw new StoreError(
+          'validation',
+          `${contextRelPath} does not exist -- create the CONTEXT.md skeleton first (fgos-coding-exploring/-planning/-shaping own that; this verb only replaces its existing "## Locked decisions" table).`,
+        );
+      }
+      const decisions = (view.decisions ?? []).filter((d) => d.id === id);
+      const table = renderLockedDecisionsTable(decisions);
+      const before = fs.readFileSync(contextPath, 'utf8');
+      let after;
+      try {
+        after = replaceLockedDecisionsSection(before, table);
+      } catch (err) {
+        throw new StoreError('validation', `${contextRelPath}: ${err.message}`);
+      }
+      const changed = before !== after;
+      if (changed) {
+        fs.writeFileSync(contextPath, after, 'utf8');
+      }
+      return {
+        path: contextRelPath,
+        changed,
+        rowCount: decisions.filter((d) => d.kind !== 'engine').length,
+      };
     }
 
     case 'gate-approve': {
