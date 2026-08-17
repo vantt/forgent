@@ -33,6 +33,12 @@ function escapeCell(text) {
  * repo-wide surface D4 names. Sorted by scope, then chronologically, so a
  * repeat call over an unchanged log produces byte-identical output
  * (the `--check` drift mode below depends on this determinism).
+ *
+ * `type: explanation` frontmatter (tsk-1lv-4): `docs/decisions/` is a
+ * QUADRANT_DIR_ALIASES entry for the "explanation" Diataxis quadrant
+ * (`enduser-index.mjs`) — every file the retired ADR corpus held carried
+ * this same `type`, and `docs-index`/its own consistency test expect every
+ * `.md` file under this dir to keep declaring it, generated index included.
  */
 export function buildDecisionIndexMarkdown(decisions) {
   const scoped = (decisions ?? []).filter(
@@ -45,6 +51,7 @@ export function buildDecisionIndexMarkdown(decisions) {
 
   const lines = [
     '---',
+    'type: explanation',
     'title: Decisions index',
     'generated: true',
     '---',

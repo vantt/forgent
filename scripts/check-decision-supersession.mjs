@@ -133,7 +133,22 @@ function parseArgs(argv) {
 function runCli(argv, cwd) {
   const { dir } = parseArgs(argv);
   const decisionsDir = path.resolve(cwd, dir);
-  const indexContent = fs.readFileSync(path.join(decisionsDir, '0000-index.md'), 'utf8');
+  const indexPath = path.join(decisionsDir, '0000-index.md');
+  // tsk-1lv-4 D5: the hand-authored docs/decisions/*.md corpus this check
+  // was written for is retired -- docs/decisions/ is now a directory
+  // holding only the generated docs/decisions/index.md (fgos decision-index,
+  // tsk-1lv-2), which is not this file's own 0000-index.md. A missing
+  // 0000-index.md means there is no legacy corpus left to check, never a
+  // crash: this mirrors every other doctor/check-script's own "absent
+  // capability = clean skip" contract in this repo (e.g.
+  // checkEnduserDocsIndexStale's missing-manifest case) rather than
+  // throwing an unhelpful ENOENT for a file this design intentionally
+  // stopped producing.
+  if (!fs.existsSync(indexPath)) {
+    console.log('check-decision-supersession: docs/decisions/0000-index.md not found -- the ADR corpus this check covers has been retired (tsk-1lv-4); nothing to check.');
+    return 0;
+  }
+  const indexContent = fs.readFileSync(indexPath, 'utf8');
   const records = loadRecords(decisionsDir);
   const findings = findSupersessionFindings(records, indexContent);
 
