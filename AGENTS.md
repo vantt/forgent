@@ -25,22 +25,12 @@ Thứ tự cố định — bậc dưới không ghi đè bậc trên. Chi tiế
 
 ## Ranh giới sứ mệnh (docs/decisions/0035)
 
-fgOS tồn tại để (1) phát triển các project khác và (2) làm nền vận hành
-business base workflow — KHÔNG phải để (3) tự phát triển chính nó. Mission
-#3 là dogfood cần thiết trong lúc xây, không phải lý do fgOS tồn tại. Đây
-là một trục quyết định RIÊNG, đứng cạnh — không phải bậc thứ 5 của — thang
-ưu tiên ở trên: thang trên trả lời "khi hai giá trị xung đột, ưu tiên cái
-nào"; câu hỏi ở đây là "đang phục vụ ai", trả lời TRƯỚC KHI thang ưu tiên
-áp dụng được.
+fgOS tồn tại để: 
+ 1. phát triển các project khác 
+ 2. làm nền vận hành các business base workflow 
+ 
+fgOS KHÔNG phải để (3) tự phát triển chính nó. Mission #3 là dogfood cần thiết trong lúc xây, không phải lý do fgOS tồn tại.  Khi làm việc trong chính repo (nơi fgOS tự-host trên chính source của mình), đừng mặc định coi "sửa fgOS" là mục tiêu chỉ vì đó là việc trước mắt — hỏi việc đang làm có phục vụ mission #1/#2 (năng lực fgOS mang lại cho project/workflow khác) hay chỉ tiện cho chính đội fgOS (mission #3). fgOS đã cài global và đang vận hành thật trên nhiều project khác ngoài repo này — mission #1/#2 không phải lý thuyết. 
 
-Khi làm việc trong chính repo `forgentX` (nơi fgOS tự-host trên chính
-source của mình), đừng mặc định coi "sửa fgOS" là mục tiêu chỉ vì đó là
-việc trước mắt — hỏi việc đang làm có phục vụ mission #1/#2 (năng lực
-fgOS mang lại cho project/workflow khác) hay chỉ tiện cho chính đội fgOS
-(mission #3). fgOS đã cài global và đang vận hành thật trên nhiều project
-khác ngoài repo này — mission #1/#2 không phải lý thuyết. Chi tiết + ví dụ
-thiệt hại thật (Iron Law's `MODULE_RULES` chỉ nhận diện path của chính
-fgOS, `tsk-1js`): docs/decisions/0035.
 
 ## Before touching code
 
