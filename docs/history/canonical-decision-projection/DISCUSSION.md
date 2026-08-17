@@ -2,6 +2,16 @@
 
 ## 1. Trạng thái hiện tại
 
+Vòng 12 (2026-08-17): người dùng quay lại quyết phối hợp với tsk-37i (nêu
+ở round 9) — đồng ý thu hẹp tsk-37i, tách mảnh 2 (ADR reversal sweep) +
+mảnh 4 (routing close-gate) để tsk-1lv xử lý; sau khi thu hẹp, 2 item chạy
+song song, không cần `deps`. Mint D9 (seq 19033). Đã kiểm `ListAgents` —
+không xác định được chính xác session nào đang giữ `fgw/tsk-37i` trong 77
+peer session (phần lớn nhãn generic `forgentx-XX`) — KHÔNG tự ý sửa
+`DISCUSSION.md`/`deps` của tsk-37i từ phiên này (khác branch, khác claim,
+one-door-write). Ghi rõ D9 + khuyến nghị cụ thể cho phía tsk-37i, để người
+dùng hoặc phiên đang giữ tsk-37i tự áp.
+
 Vòng 11 (2026-08-17): người dùng xác nhận round 10, hỏi làm rõ: chỉ đổi
 THỜI ĐIỂM (retrospective thay vì approve), hay cả CÁCH GỌI skill cũng đổi
 theo bee? Trả lời rõ ở §5 round 11: CHỈ đổi thời điểm — cách gọi
@@ -145,6 +155,7 @@ chưa; (2) chỉ sau đó mới bàn có nên tự xây, xây gì, xây ở tầ
 | D6 | Mở rộng scope sang tầng Diataxis end-user docs (267 file, `fgos-coding-compounding`) — cho phép reconcile/retire prose cũ (sửa luật cấm hiện tại); MỤC TIÊU giữ nguyên, CƠ CHẾ tìm-trước-khi-tạo được D8 sửa lại | round 7→8 mint, cơ chế sửa bởi D8 round 11 | 18966 |
 | D7 | 4-door check + D5's narrative-sync chạy BÊN TRONG lần gọi batch hiện có của `retrospective`/`fgos-coding-compounding` (`/fgOS:retro-loop`) — cadence KHÔNG đổi (không bắt chước continuous kiểu bee); `state.decisions` vẫn ghi ngay lúc chốt; `fgos approve` KHÔNG bị gate | round 10 đề xuất → round 11 xác nhận+làm rõ → mint | 19006 |
 | D8 | Sửa cơ chế D6: tìm-trước-khi-tạo = doctrine (tra `authoritative_for` theo chủ đề, update-in-place) + harness backstop (check mechanical trong verify chain) — KHÔNG BAO GIỜ một hàm gate sống, mirror bài học thật của bee (`scribingTarget()` dead surface) | round 10 đề xuất → round 11 xác nhận → mint | 19007 |
+| D9 | Phối hợp tsk-37i: tsk-1lv nhận mảnh 2 (ADR reversal sweep, siêu hình bởi D5) + mảnh 4 (routing door, = D7); tsk-37i giữ mảnh 1 (khuôn citation) + mảnh 3 (dọn file cũ). Không cần `deps` — scope hết overlap, chạy song song | round 9 đề xuất → round 12 xác nhận → mint | 19033 |
 
 **Còn treo, CHƯA D-ID** (chưa đủ round ổn định hoặc chưa hỏi): scope 4-door
 (mọi item hay theo risk-tier — round 4 fork #2), harness đặt ở `fgos
@@ -851,6 +862,33 @@ không cần thiết khi chưa có bằng chứng đòi hỏi continuous).
 Mint D7 (reuse retrospective, cadence batch không đổi, seq 19006) và D8
 (sửa cơ chế D6 thành doctrine+backstop, seq 19007) — cả hai giữ ổn định qua
 round 10→11.
+
+### Round 12 — 2026-08-17T11:05Z — chốt phối hợp với tsk-37i
+
+Người dùng: "khoan, quay qua 4 mảnh của tsk-37i, đồng ý thu hẹp tsk-37i,
+tách mảnh 2 + mảnh 4 của họ tách ra để tsk-1lv xử lý. đã thu hẹp scope thì
+2 item song song." — xác nhận trực tiếp khuyến nghị đã trình bày ở round 9.
+Mint D9 (seq 19033).
+
+**Trạng thái sau D9, cho người đọc lạ:**
+- **tsk-1lv nhận:** mảnh 2 (ADR reversal sweep — thực chất đã bị D5 làm
+  siêu hình, vì corpus mục tiêu của sweep sẽ bị retire; tsk-1lv không xây
+  sweep riêng cho corpus sắp mất, mà giải qua D5's migration path) + mảnh 4
+  (routing close-gate — đã là D7 của tsk-1lv, chạy trong retrospective
+  batch, không phải gate approve).
+- **tsk-37i giữ lại:** mảnh 1 (khuôn citation `<ID> (<gloss>)` canonical,
+  nửa văn xuôi + nửa máy pointer-integrity) + mảnh 3 (dọn ~36-69 file đang
+  vi phạm, kể cả `fgos-coding-shaping/SKILL.md` chính nó).
+- **Không cần `deps`** giữa 2 item sau khi thu hẹp — scope không còn
+  overlap, chạy song song được.
+
+**Chưa tự sửa `DISCUSSION.md`/scope của tsk-37i từ phiên này** — đã kiểm
+`ListAgents` (77 peer session, phần lớn nhãn generic không xác định được
+đâu là phiên giữ `fgw/tsk-37i`); one-door-write + khác branch/khác claim
+nghĩa là việc cập nhật §3/§4/§6/§7 của chính tsk-37i để phản ánh D9 thuộc
+về phiên đang giữ item đó (hoặc người dùng tự relay quyết định này). D9 ở
+đây là đủ để tsk-1lv tự thiết kế không chờ tsk-37i, và để bất kỳ phiên nào
+đọc lại tsk-37i sau này thấy đúng lý do thu hẹp.
 
 ## 6. Thiết kế đã chốt {#design}
 
