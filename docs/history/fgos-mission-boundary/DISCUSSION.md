@@ -4,17 +4,16 @@ Item: tsk-4us
 
 ## 1. Trạng thái hiện tại
 
-Vòng 2. Q1 đã có câu trả lời (đứng riêng cạnh `0030`, không phải bậc #5) —
-giữ ở §3 chờ ổn định qua ≥1 vòng nữa trước khi mint D-ID, đúng luật D4. Q2
-đã được trả lời chi tiết hơn (cơ chế máy thật của bee: state-transition guard
-+ config key + digest-on-close, không chỉ prose) — xem §5 vòng 2. Q3 hoá ra
-dựa trên một giả định SAI: forgentX không phải trường hợp "chưa có host
-project" — scout thực tế cho thấy fgOS đã vận hành thật trên ≥4 project khác
-(`mdview`, `herdr-gateway`, `fgos-test-drive`, và một bản `forgent-workshop`
-đã tự triển khai đúng topology repo-divorce của bee, coi `forgentX`/`forgent`
-làm sản phẩm nested `./repo`). Q3 đã viết lại cho khớp thực tế, đang chờ
-người dùng xác nhận quan hệ `forgent-workshop` ↔ `forgentX` trước khi bàn
-tiếp.
+Vòng 3. **D1 đã chốt** (self-vs-host là trục riêng, đứng cạnh `0030`, không
+phải bậc #5). **Q3 đã chốt** (không mechanize repo-divorce — fgOS đã thử và
+chủ động bỏ mô hình workshop+repo-lồng của bee, `forgent-workshop` là thí
+nghiệm của bee-upstream, không thuộc dòng lịch sử forgentX). Đang mở **Q6**
+(mới): với repo-divorce bị loại, đề xuất ranh giới được nhận diện bằng
+design-intent per quyết định (không phải path/file) — chờ người dùng xác
+nhận trước khi viết §6. Q2 (cơ chế máy) còn treo một phần: đã biết bee làm
+gì, nhưng CHƯA quyết fgOS áp bao nhiêu trong 3 tầng đó khi path-based
+(product_root) đã loại. Q4 (tsk-1js làm case study) và Q5 (vị trí vật lý:
+decisions/ + platform-foundations L-law) vẫn mở.
 
 ## 2. Mục tiêu & đề bài
 
@@ -36,15 +35,18 @@ này phục vụ ai" trước khi làm — học theo cách upstream `beegog` (b
 
 | # | Câu hỏi | Trạng thái | Ghi chú |
 |---|---|---|---|
-| Q1 | Ranh giới self-vs-host này là bậc #5 của CÙNG danh sách ưu tiên 0030, hay một trục khác đứng riêng (role/scope) không cùng chiều với priority-ordering? | **trả lời: đứng riêng cạnh** | Người dùng chốt vòng 2: "riêng đứng cạnh". Chờ ổn định ≥1 vòng nữa trước khi mint D-ID (D4) |
-| Q2 | Cơ chế thực thi: chỉ là văn bản doctrine, hay có phần MÁY kiểm được? | **trả lời: có, chi tiết ở §5 vòng 2** | bee dùng 3 tầng: state-transition guard (`chain-integrity-guard-tail`), config key (`product_root`), digest-on-close + 2 human gate (`evolving-loop-two-gates`) |
-| Q3 | (VIẾT LẠI — Q3 gốc sai giả định) forgentX/forgent-workshop đã có sẵn ≥4 host project thật + một bản repo-divorce thật (`forgent-workshop` + `./repo`). Vision này áp cho những case ĐÃ chạy tốt đó, hay phạm vi hẹp hơn: chỉ riêng session đứng TRONG `forgentX` (nơi self-dev và product-dev là CÙNG một repo, không phân biệt được bằng cấu trúc)? | chưa rõ | Cần người dùng xác nhận quan hệ `forgent-workshop`(`.bee/`, `repo/` = `file:./repo` dep tên `forgent`) ↔ `forgentX` (package.json name `forgent`, tự nó là product) — hai bản coordinator có song song không, cái nào là canonical đường tới |
+| Q1 | ~~Ranh giới self-vs-host này là bậc #5 hay trục riêng?~~ | **CHỐT — D1** | Chuyển sang §4 |
+| Q2 | Cơ chế thực thi: chỉ là văn bản doctrine, hay có phần MÁY kiểm được? | **trả lời: có, chi tiết ở §5 vòng 2** | bee dùng 3 tầng: state-transition guard (`chain-integrity-guard-tail`), config key (`product_root`), digest-on-close + 2 human gate (`evolving-loop-two-gates`) — nhưng KHÔNG áp thẳng nguyên khối vì Q3 vừa loại bỏ hướng repo-divorce, xem Q6 |
+| Q3 | forgent-workshop ↔ forgentX quan hệ gì? | **trả lời: KHÔNG liên quan, đường đã bỏ** | `~/projects/forgent` là sản phẩm được phát triển TRONG workshop của chính bee-upstream (thí nghiệm của bee, không phải của fgOS). fgOS/forgentX CHƯA TỪNG phát triển theo mô hình workshop+repo-lồng — người dùng đã thử và tách riêng vì "quá nhiều vấn đề"; không rõ bee đã cải thiện chế độ này tới đâu. **Kết luận:** vision này KHÔNG đề xuất mechanize `product_root`/repo-divorce cho forgentX — đó là hướng đã thử và cố ý từ bỏ, không phải chưa thử tới |
 | Q4 | tsk-1js (Iron Law hard-code module path của chính fgOS, im lặng bỏ qua host project) — có nên là ví dụ neo/case-study trong tài liệu vision này không, dù không gắn dependency? | chưa rõ | Người dùng đã chọn KHÔNG gắn dependency; nhưng dùng làm ví dụ minh hoạ trong prose là việc khác |
-| Q5 | Vị trí vật lý: decision mới trong `docs/decisions/` (số kế tiếp sau 0034) + trỏ từ AGENTS.md, hay một luật L-mới trong `docs/platform-foundations.md` (cạnh L8 doctrine placement / L9 run≠merge≠durable), hay cả hai? | chưa rõ | Q1 đã nghiêng "đứng riêng cạnh" → gợi ý cả hai (decision ghi QUYẾT ĐỊNH + WHY, platform-foundations ghi LUẬT ngắn always-loaded) nhưng chưa hỏi người dùng trực tiếp |
+| Q5 | Vị trí vật lý: decision mới trong `docs/decisions/` (số kế tiếp sau 0034) + trỏ từ AGENTS.md, hay một luật L-mới trong `docs/platform-foundations.md` (cạnh L8 doctrine placement / L9 run≠merge≠durable), hay cả hai? | chưa rõ | D1 đã chốt "đứng riêng cạnh" → gợi ý cả hai (decision ghi QUYẾT ĐỊNH + WHY, platform-foundations ghi LUẬT ngắn always-loaded) nhưng chưa hỏi người dùng trực tiếp |
+| Q6 | (MỚI vòng 3) Q3 loại bỏ repo-divorce → forgentX vẫn single-repo, self-dev và host-dev sống chung file. Vậy ranh giới được nhận diện bằng gì? Đề xuất: KHÔNG phải path/file nào bị đụng, mà là **design-intent per quyết định**: một thay đổi phục vụ fgOS-khi-vận-hành-repo-khác (mission 1/2) hay chỉ tiện cho chính đội fgOS làm việc (mission 3)? tsk-1js minh hoạ đúng: Iron Law LẼ RA là năng lực mission-1/2 (bảo vệ BẤT KỲ repo nào fgOS vận hành) nhưng bị code với tầm nhìn hẹp mission-3 (chỉ nhận diện path của chính fgOS). Người dùng có đồng ý khung "design-intent, không phải path" này không? | chưa rõ | Đang chờ phản hồi — xem phân tích trình bày trong chat trước khi hỏi |
 
 ## 4. Quyết định đã chốt
 
-*(chưa có D-ID nào ổn định qua hơn một vòng — bảng này sẽ điền khi có)*
+| D-ID | Nội dung | Lý do |
+|---|---|---|
+| D1 | Ranh giới mission self-vs-host là một trục quyết định riêng, đứng CẠNH (không nối vào làm bậc #5) danh sách 4 bậc ưu tiên sản phẩm `docs/decisions/0030` | `0030` trả lời "khi hai giá trị xung đột, ưu tiên cái nào" (cùng trục, khác mức). Câu hỏi self-vs-host là phân loại đối tượng phục vụ TRƯỚC KHI bất kỳ ưu tiên nào ở trên áp dụng được — khác trục. Người dùng xác nhận vòng 2, giữ nguyên không đổi sang vòng 3 (D4: đủ điều kiện mint). Ghi máy: `fgos decision` seq 18960 |
 
 ## 5. Q&A log
 
@@ -224,3 +226,39 @@ entry, không chỉ tóm tắt compressed):
   #3 (sửa fgOS) so với lúc nào đang thật ra phục vụ #1/#2 (fgOS-cho-host
   khác) — vì trong `forgentX` hai việc này KHÔNG tách được bằng cấu trúc
   thư mục như bee làm được nhờ `product_root`.
+
+### Vòng 3 — 2026-08-17
+
+**Người dùng trả lời Q3:** "`~/projects/forgent` là sản phẩm được phát
+triển trong workshop của bee-upstream. fgOS chưa từng phát triển theo cách
+này vì lúc trước sử dụng bee theo cách này có quá nhiều vấn đề nên tôi tách
+riêng, không rõ giờ họ đã hỗ trợ chế độ này tốt chừng nào rồi."
+
+**Xử lý:** D1 mint (Q1 giữ ổn định qua vòng 2→3, không bị sửa) — `fgos
+decision` seq 18960, đã ghi ở §4. Q3 chốt: `forgent-workshop` là thí
+nghiệm của CHÍNH bee-upstream, không nằm trong dòng lịch sử fgOS/forgentX
+— fgOS đã thử mô hình workshop+repo-lồng và chủ động rút lui vì gặp vấn đề
+thật, không phải vì chưa kịp thử. Hệ quả trực tiếp: bỏ hẳn hướng "mechanize
+`product_root`/repo-divorce cho forgentX" ra khỏi phạm vi vision này — đó
+là một cửa đã đóng có chủ đích, không phải một khoảng trống chờ lấp.
+
+**Phân tích trình bày cho người dùng, dẫn tới Q6 (câu hỏi mới):**
+
+Loại bỏ repo-divorce đồng nghĩa forgentX tiếp tục là single-repo, tự-host —
+mission #3 (sửa fgOS) và mission #1/#2 (fgOS phục vụ ai đó) sống chung
+đúng một cây file, không thể tách bằng đường dẫn thư mục như bee làm được.
+Nhìn lại tsk-1js dưới góc này: Iron Law không hỏng vì code SAI ở path nào
+đó — nó hỏng vì được thiết kế với TẦM NHÌN hẹp mission-3 (chỉ hình dung
+"bảo vệ chính source fgOS") cho một năng lực mà bản chất PHẢI là mission-1/2
+(bảo vệ BẤT KỲ repo nào fgOS đang vận hành, kể cả 4 project thật đã tìm
+thấy ở vòng 2). Cùng một dòng code, cùng một file, hai cách hiểu sứ mệnh
+khác nhau ra hai hành vi khác nhau — chứng minh ranh giới cần nằm ở TẦM
+NHÌN THIẾT KẾ của quyết định (design-intent), không phải ở việc file nào
+bị đụng. Đây khớp với cách bee tự mô tả `grooming-project-first`: không
+phải phân loại theo path (`.bee/` vs "phần còn lại"), mà phân loại theo
+NGÔN NGỮ BÁO CÁO và Ý ĐỊNH (báo bằng ngôn ngữ project, không lẫn bee-jargon)
+— một phân loại ngữ nghĩa, không phải cấu trúc.
+
+→ Q6 đưa ra cho người dùng: chấp nhận khung "design-intent per quyết định"
+làm cơ chế nhận diện ranh giới (thay cho path/cấu trúc thư mục đã bị Q3
+loại), với tsk-1js làm ví dụ neo minh hoạ hậu quả khi khung này bị bỏ qua?
