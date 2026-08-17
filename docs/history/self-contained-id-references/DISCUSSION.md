@@ -38,6 +38,12 @@ người/agent lạ đọc một trích dẫn đơn lẻ mà hiểu được n�
 ngay phạm vi hiệu lực của nó (cục bộ 1 work-item hay toàn dự án) — không phải
 bắt buộc phải mở file gốc trước khi hiểu được câu đang đọc.
 
+**Cập nhật phạm vi sau D2 (round 7):** thảo luận này chỉ còn lo **HÌNH DẠNG
+của một trích dẫn đơn lẻ** (id có kèm gloss/delta không, có trỏ đúng chỗ
+không) — KHÔNG còn bàn tới nơi quyết định thật sự SỐNG hay cơ chế
+close-gate ngăn quyết định rot (2 việc đó đã giao `tsk-1lv`,
+`canonical-decision-projection`, xem D2 + §7 mảnh 2/4 moved-to-tsk-1lv).
+
 ## 3. Vấn đề rõ / chưa rõ
 
 | # | Trạng thái | Nội dung |
