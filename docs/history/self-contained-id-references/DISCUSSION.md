@@ -4,19 +4,20 @@ Item: `tsk-37i`.
 
 ## 1. Trạng thái hiện tại
 
-Round 2. Round 1 scout xong hệ thống trích dẫn nội bộ fgOS (ADR/RUL/D-local)
+Round 3. Round 1 scout xong hệ thống trích dẫn nội bộ fgOS (ADR/RUL/D-local)
 — cả ba đã có convention thành văn nhưng chỉ sửa hình dạng chữ, không đòi
 tóm tắt nội dung, và luật D-local đang bị phá ở diện rộng (xem §3 #1-3).
-Người dùng yêu cầu quét thêm upstream `bee`/`beegog` xem họ giải quyết vấn
-đề tương tự thế nào, và cập nhật lại bản clone gốc (`upstreams/bee` mô tả
-trong `docs/distillery/sources/bee.md` đã lệch **1213 commit** so với
-upstream thật — đã pull `/home/vantt/projects/beegog` về mới, cập nhật
-`docs/distillery/sources/bee.md` với 2 phát hiện trực tiếp liên quan). Kết
-quả: bee có sẵn **2 cơ chế cụ thể, đã chạy thật**, trả lời gần như trọn vẹn
-câu hỏi mở #4-#5 ở §3 — xem §5 round 2 để chi tiết, đã trình bày cho người
-dùng ở chat. Chưa có quyết định nào chốt (§4 vẫn rỗng) — round tới cần
-người dùng phản hồi hướng nào trong 2 cơ chế bee (hoặc kết hợp) muốn áp cho
-fgOS.
+Round 2 scan upstream `beegog` (bản clone cũ lệch 1213 commit, đã pull mới),
+tìm 2 cơ chế cụ thể trả lời câu hỏi #4-#5 ở §3, đăng ký thành porting
+candidate ở `docs/distillery/porting-log.md`. Round 3: người dùng hỏi
+"beegog có mấy tầng luật" rồi tự xác nhận "vẫn có 3 tầng" — **D1 vừa chốt**
+(§4): cấu trúc 3-tầng của fgOS không phải chỗ sai, beegog hội tụ độc lập về
+đúng 3 tầng đó, nên việc sửa KHÔNG cần tái cấu trúc số tầng — chỉ cần sửa
+format trích dẫn (id trần → id+gloss) và cơ chế enforce (kiểm máy phần cấu
+trúc, kỷ luật văn xuôi phần nội dung), đúng 2 candidate đã đăng ký ở round
+2. §6 vừa regenerate lần đầu theo D1. Câu hỏi mở tiếp theo: người dùng có
+đồng ý 2 candidate đó (hoặc phần nào của chúng) là hướng cụ thể để bắt đầu
+`plan` không, hay cần bàn thêm trước khi coi discussion hội tụ.
 
 ## 2. Mục tiêu & đề bài
 
@@ -51,7 +52,9 @@ bắt buộc phải mở file gốc trước khi hiểu được câu đang đ�
 
 ## 4. Quyết định đã chốt
 
-*(chưa có mục nào — round 1, đang trình bày phân tích trước khi hỏi)*
+| D-ID | Nội dung |
+|---|---|
+| D1 | Cấu trúc 3 tầng trích dẫn hiện có của fgOS (global-vĩnh viễn / scope-theo-file-reset-mỗi-file / cục bộ-1-feature) **đã được xác nhận đúng, không phải chỗ cần sửa** — beegog hội tụ độc lập về đúng 3 tầng này (short8 global ~ ADR, `R<n>` reset mỗi `docs/knowledge/areas/<x>.md` ~ RUL`<n>`, D-local ~ D-local). Phạm vi sửa của thảo luận này **không bao gồm** tái cấu trúc số tầng hay đổi id scheme hiện có — chỉ nhắm 2 chỗ: (a) format trích dẫn (bắt buộc kèm gloss, không còn id trần) và (b) cơ chế enforce (kiểm máy phần trích dẫn có trỏ đúng chỗ, kỷ luật văn xuôi phần nội dung gloss đúng/đủ). Ghi qua `fgos decision --id tsk-37i` (seq 18919). |
 
 ## 5. Q&A log
 
@@ -121,9 +124,59 @@ bắt buộc phải mở file gốc trước khi hiểu được câu đang đ�
   tầng feature-local ĐƯỢC PHÉP trích ra ngoài miễn kèm neo toàn cục
   (short8) — không cấm tuyệt đối như luật D-local của fgOS.
 
+- **2026-08-17T~09:00Z — D1 chốt (agent, theo xác nhận người dùng).** Người
+  dùng: "như vậy họ vẫn có 3 tầng" — đọc là xác nhận điểm agent đã nêu ở
+  cuối round 2 (3 tầng của fgOS không sai, chỉ chi phí thăng hạng + luật
+  trích D-local ra ngoài là khác). Điểm này đã ổn định qua ≥2 lượt (agent
+  nêu round 2 → người dùng xác nhận round 3) nên mint D1, ghi qua `fgos
+  decision --id tsk-37i` (seq 18919). §6 regenerate lần đầu theo D1 bên
+  dưới.
+
 ## 6. Thiết kế đã chốt {#design}
 
-*(chưa đủ chín — chưa có quyết định nào chốt ở §4)*
+**Không tái cấu trúc, chỉ vá 2 chỗ hẹp.** fgOS giữ nguyên 3 tầng trích dẫn
+đã có (ADR toàn cục — RUL scope-theo-spec — D-local scope-theo-feature),
+được xác nhận đúng hình dạng qua hội tụ độc lập với beegog (D1). Thiết kế
+sửa gồm đúng 2 mảnh, mỗi mảnh khớp 1 porting candidate đã đăng ký ở
+`docs/distillery/porting-log.md`:
+
+```mermaid
+flowchart TB
+    subgraph fgOS3["3 tầng trích dẫn fgOS (giữ nguyên, D1)"]
+        ADR["ADR&lt;n&gt;<br/>toàn cục, vĩnh viễn"]
+        RUL["RUL&lt;n&gt;<br/>reset mỗi docs/specs/*.md"]
+        DLOCAL["D&lt;n&gt; local<br/>1 feature, CONTEXT.md"]
+    end
+    subgraph Fix1["Mảnh 1 -- format + kiểm máy (one-line-cite-plus-local-delta)"]
+        FORMAT["Trích ngoài nhà gốc BẮT BUỘC:<br/>id + 1 dòng gloss + delta cục bộ<br/>(không bao giờ id trần)"]
+        POINTER["Check cấu trúc: trích dẫn có trỏ<br/>đúng file/heading thật không --<br/>máy kiểm, fail build"]
+        FORMAT --> POINTER
+    end
+    subgraph Fix2["Mảnh 2 -- reversal sweep (decision-citation-and-reversal-sweep)"]
+        SUPERSEDE["supersede 1 ADR"] --> SWEEP["quét docs/**+skills/**<br/>tìm mọi nơi trích id cũ"]
+        SWEEP --> RECONCILE["sửa hoặc waive-có-lý-do<br/>NGAY cùng lượt, trước khi ghi"]
+    end
+    ADR -.trích ngoài.-> FORMAT
+    RUL -.trích ngoài.-> FORMAT
+    DLOCAL -.trích ngoài, ĐANG VI PHẠM.-> FORMAT
+    ADR -.bị supersede.-> SUPERSEDE
+```
+
+- **Mảnh 1 (format + pointer-integrity)** trả lời câu hỏi #4/#5 ở §3: nội
+  dung gloss (đúng/đủ không) là kỷ luật văn xuôi, xét bởi review; CẤU TRÚC
+  trích dẫn (trỏ đúng file/heading thật không) là 1 check máy chạy trong
+  `npm test`, có negative-control tự chứng minh còn phát hiện được lỗi.
+- **Mảnh 2 (reversal sweep)** vá đúng chỗ hổng thật đang tồn tại: hôm nay
+  `docs/decisions/0000-index.md` supersede chỉ dựa kỷ luật tay (dòng
+  30-36) — không có gì bắt buộc người viết record mới đi sửa mọi chỗ đã
+  trích record cũ.
+- **D-local vẫn KHÔNG được nới lỏng** (chưa có quyết định nào đảo luật khoá
+  `0017`) — vi phạm cụ thể đã tìm thấy (`fgos-coding-shaping/SKILL.md` trích
+  trần D2/D4/D6) là việc cần dọn theo mảnh 1, không phải lý do để đổi luật
+  D-local.
+
+Còn mở: câu hỏi #6 ở §3 (phạm vi sửa ngược file cũ hay chỉ áp cho tài liệu
+mới) chưa chốt — cần người dùng trước khi §7 có thể chia task cụ thể.
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
