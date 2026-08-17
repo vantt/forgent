@@ -312,7 +312,7 @@ test('e2e: a fixture-marketing item runs the real take -> return -> delivered ->
   // decision record supplies genuine retrospective content, mirroring
   // synthetic-domain.test.mjs's own cleanup test exactly.
   assert.equal(
-    fgos(repoRoot, ['decision', '--text', 'fixture-marketing retrospective note', '--rationale', 'proves real retrospective content exists', '--id', 'fx-life']).status,
+    fgos(repoRoot, ['decision', '--text', 'fixture-marketing retrospective note', '--rationale', 'proves real retrospective content exists', '--id', 'fx-life', '--relation', 'none']).status,
     0,
   );
 

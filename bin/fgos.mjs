@@ -17,7 +17,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf, parseDecisionRelation, decisionTextLooksLikeSupersession } from '../src/state/store.mjs';
+import { collectWideSourceFiles, findWideCitationFindings } from '../scripts/check-decision-citation-drift.mjs';
 import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability, toolsFromCapacities } from '../src/state/tool-registry.mjs';
 import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
@@ -1905,8 +1906,44 @@ async function runVerb(verb, flags, positional, dir) {
       const alternatives = optionalField(flags.alternatives, 'decision --alternatives requires a non-empty value (omit --alternatives entirely to skip it)');
       const source = optionalField(flags.source, 'decision --source requires a non-empty value (omit --source entirely to skip it)');
       const id = optionalField(flags.id, 'decision --id requires a non-empty value (omit --id entirely to skip per-item scoping)');
-      const { event } = addDecision(dir, { text, rationale, alternatives, source, id });
-      return { seq: event.seq };
+      // tsk-1lv-1 D2/D8: every CLI-surface decision write declares its
+      // relation to prior decisions explicitly -- no default, no
+      // inference (STR72's own root cause: a supersession narrated only
+      // in prose that the machine never sees). Engine bookkeeping
+      // (`kind:'engine'`, resolveDiscovery/resolvePlan) writes through
+      // `addDecision` directly, not this CLI case, so it is unaffected
+      // (CONTEXT.md D4: "không đổi").
+      const relationRaw = requireField(flags.relation, 'decision requires --relation none|supersedes:<id>|touches:<id>');
+      const relation = parseDecisionRelation(relationRaw);
+      if (relation.kind !== 'supersedes' && decisionTextLooksLikeSupersession(text)) {
+        throw new StoreError(
+          'validation',
+          'decision text reads like a supersession ("supersedes/replaces/overrides/no longer applies/instead of the previous") but --relation supersedes:<id> was not declared -- declare the relation explicitly (or rephrase the text if it is not actually a supersession).',
+        );
+      }
+      const { event } = addDecision(dir, { text, rationale, alternatives, source, id, relation: relation.kind === 'none' ? 'none' : `${relation.kind}:${relation.id}` });
+      const result = { seq: event.seq, relation: relation.kind === 'none' ? 'none' : `${relation.kind}:${relation.id}` };
+      // Write-time citation sweep (D2 "sweep tươi tại write-time, không
+      // cache"): only `supersedes` has a real dangling-citation shape (a
+      // line citing the OLD id without acknowledging the new one) -- a
+      // `touches:<id>` write references `id` without replacing anything,
+      // so there is nothing for this sweep to flag as stale (round 3's
+      // "chạy CÙNG sweep này ở thời điểm log thường" is about the same
+      // machinery being exercised at every write, not a claim that
+      // `touches` produces findings). Non-blocking either way -- a
+      // dangling hit is surfaced, not refused; task 5's 4-door
+      // (retrospective-time) is the close-time gate, this is only the
+      // write-time signal (D7: "fgos approve KHÔNG bị gate ở đây").
+      if (relation.kind === 'supersedes') {
+        const repoRoot = path.dirname(dir);
+        const sourceFiles = collectWideSourceFiles(repoRoot);
+        const supersedingLabel = id ?? relation.id;
+        const findings = findWideCitationFindings(sourceFiles, relation.id, supersedingLabel);
+        if (findings.length) {
+          result.danglingCitations = findings.map((f) => f.message);
+        }
+      }
+      return result;
     }
 
     case 'gate-approve': {

@@ -359,7 +359,9 @@ skill's own "leave execution alone" rule).
   (`fgos decision --text "auto-approved validateApprove gate for
   <item-id> at level <level>" --rationale "gate-bypass level <level>
   permits auto-approval per docs/history/gate-bypass/CONTEXT.md D1-D5 as
-  superseded by tsk-224"`, the same audit trail `gate-bypass` D3
+  superseded by tsk-224" --relation supersedes:tsk-224`
+  — the text names a real supersession, so the relation flag must say so
+  too (tsk-1lv-1 D2) — the same audit trail `gate-bypass` D3
   requires), record it (`fgos gate-approve <item-id> --gate
   validateApprove --actor bypass --verify "..."`, per above), then
   continue straight to the `planning`→`executing` engine call below.

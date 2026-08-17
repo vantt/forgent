@@ -412,7 +412,8 @@ stage values — the same way `fgos-routing` describes it.
      root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
      node "$root/bin/fgos.mjs" decision --id "<item-id>" --dir "$root" \
        --text "planning->exploring hand-back: <the gap, in one line>" \
-       --rationale "material per fgos-coding-planning step 6; tier-A actions already tried: <what was run/read and why it did not close the gap>"
+       --rationale "material per fgos-coding-planning step 6; tier-A actions already tried: <what was run/read and why it did not close the gap>" \
+       --relation none
      ```
 
      Name what tier A already tried and why it failed to close the gap —

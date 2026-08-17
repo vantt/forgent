@@ -303,11 +303,11 @@ test('list --id scopes every id-keyed view section to just the requested item, e
   addOk(cwd, 'item-b', { title: 'Item B' });
 
   // Populate decisions (flat array, id-scoped) + decisionsById (dict) for BOTH items.
-  assert.equal(run(cwd, ['decision', '--id', 'item-a', '--text', 'decision about A', '--rationale', 'because A']).status, 0);
-  assert.equal(run(cwd, ['decision', '--id', 'item-b', '--text', 'decision about B', '--rationale', 'because B']).status, 0);
+  assert.equal(run(cwd, ['decision', '--id', 'item-a', '--text', 'decision about A', '--rationale', 'because A', '--relation', 'none']).status, 0);
+  assert.equal(run(cwd, ['decision', '--id', 'item-b', '--text', 'decision about B', '--rationale', 'because B', '--relation', 'none']).status, 0);
   // A decision with no --id at all (a global decision, not tied to one item) --
   // must never surface under either item's scoped result.
-  assert.equal(run(cwd, ['decision', '--text', 'global decision, no item', '--rationale', 'because global']).status, 0);
+  assert.equal(run(cwd, ['decision', '--text', 'global decision, no item', '--rationale', 'because global', '--relation', 'none']).status, 0);
 
   // Populate gates for BOTH items (ask/answer round trip).
   assert.equal(run(cwd, ['ask', 'item-a', '--text', 'question about A']).status, 0);
@@ -883,8 +883,8 @@ test('show returns the work record plus every per-item log scoped to just that i
 
   addDiscovery(dir, { id: 'show-detail-item', clear: true, verify: 'run the thing' });
   addDiscovery(dir, { id: 'other-item', clear: false, question: 'unrelated question' });
-  run(cwd, ['decision', '--id', 'show-detail-item', '--text', 'D1: scoped detail', '--rationale', 'test fixture']);
-  run(cwd, ['decision', '--id', 'other-item', '--text', 'D1: unrelated decision', '--rationale', 'test fixture']);
+  run(cwd, ['decision', '--id', 'show-detail-item', '--text', 'D1: scoped detail', '--rationale', 'test fixture', '--relation', 'none']);
+  run(cwd, ['decision', '--id', 'other-item', '--text', 'D1: unrelated decision', '--rationale', 'test fixture', '--relation', 'none']);
   run(cwd, ['ask', 'show-detail-item', '--text', 'which shape?']);
   run(cwd, ['answer', 'show-detail-item', '--text', 'this one']);
   run(cwd, ['ask', 'other-item', '--text', 'unrelated ask']);
@@ -1619,8 +1619,8 @@ test('list --limit paginates work into {items, nextCursor}, AND scopes every oth
   const cwd = tmpCwd();
   addOk(cwd, 'list-page-a');
   addOk(cwd, 'list-page-b');
-  assert.equal(run(cwd, ['decision', '--id', 'list-page-a', '--text', 'decision for a', '--rationale', 'r']).status, 0);
-  assert.equal(run(cwd, ['decision', '--id', 'list-page-b', '--text', 'decision for b', '--rationale', 'r']).status, 0);
+  assert.equal(run(cwd, ['decision', '--id', 'list-page-a', '--text', 'decision for a', '--rationale', 'r', '--relation', 'none']).status, 0);
+  assert.equal(run(cwd, ['decision', '--id', 'list-page-b', '--text', 'decision for b', '--rationale', 'r', '--relation', 'none']).status, 0);
   const result = run(cwd, ['list', '--limit', '1']);
   assert.equal(result.status, 0);
   const data = envelopeData(result.stdout);
@@ -1640,8 +1640,8 @@ test('list --all --limit combined: scopes side-logs to the paged ids too -- a co
   const cwd = tmpCwd();
   addOk(cwd, 'list-all-page-a');
   addOk(cwd, 'list-all-page-b');
-  assert.equal(run(cwd, ['decision', '--id', 'list-all-page-a', '--text', 'decision for a', '--rationale', 'r']).status, 0);
-  assert.equal(run(cwd, ['decision', '--id', 'list-all-page-b', '--text', 'decision for b', '--rationale', 'r']).status, 0);
+  assert.equal(run(cwd, ['decision', '--id', 'list-all-page-a', '--text', 'decision for a', '--rationale', 'r', '--relation', 'none']).status, 0);
+  assert.equal(run(cwd, ['decision', '--id', 'list-all-page-b', '--text', 'decision for b', '--rationale', 'r', '--relation', 'none']).status, 0);
   const result = run(cwd, ['list', '--all', '--limit', '1']);
   assert.equal(result.status, 0);
   const data = envelopeData(result.stdout);
@@ -1656,9 +1656,9 @@ test('list --all --limit combined: scopes side-logs to the paged ids too -- a co
 test('list default (no flags at all) scopes side-logs to only the open (non-done) ids -- a done item\'s own decision must not appear (tsk-483)', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'list-default-open');
-  assert.equal(run(cwd, ['decision', '--id', 'list-default-open', '--text', 'decision for open', '--rationale', 'r']).status, 0);
+  assert.equal(run(cwd, ['decision', '--id', 'list-default-open', '--text', 'decision for open', '--rationale', 'r', '--relation', 'none']).status, 0);
   toProposed(cwd, 'list-default-done');
-  assert.equal(run(cwd, ['decision', '--id', 'list-default-done', '--text', 'decision for done', '--rationale', 'r']).status, 0);
+  assert.equal(run(cwd, ['decision', '--id', 'list-default-done', '--text', 'decision for done', '--rationale', 'r', '--relation', 'none']).status, 0);
   assert.equal(toDoneViaChain(cwd, 'list-default-done').status, 0);
   const result = run(cwd, ['list']);
   assert.equal(result.status, 0);
@@ -1670,9 +1670,9 @@ test('list default (no flags at all) scopes side-logs to only the open (non-done
 test('list --all --json with NO pagination flags stays byte-identical -- herdr-plugin\'s own protected contract (tsk-483 D2)', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'list-protected-open');
-  assert.equal(run(cwd, ['decision', '--id', 'list-protected-open', '--text', 'decision for open', '--rationale', 'r']).status, 0);
+  assert.equal(run(cwd, ['decision', '--id', 'list-protected-open', '--text', 'decision for open', '--rationale', 'r', '--relation', 'none']).status, 0);
   toProposed(cwd, 'list-protected-done');
-  assert.equal(run(cwd, ['decision', '--id', 'list-protected-done', '--text', 'decision for done', '--rationale', 'r']).status, 0);
+  assert.equal(run(cwd, ['decision', '--id', 'list-protected-done', '--text', 'decision for done', '--rationale', 'r', '--relation', 'none']).status, 0);
   assert.equal(toDoneViaChain(cwd, 'list-protected-done').status, 0);
   const result = run(cwd, ['list', '--all', '--json']);
   assert.equal(result.status, 0);
