@@ -67,3 +67,38 @@ containing a bare superseded-id citation with no acknowledgement, assert
 `findWideCitationFindings` flags it — the regression test for the
 default-roots gap itself, not just the pure functions' own logic (already
 covered by existing tests).
+
+## Round 2 (tsk-12v, self-review before merge)
+
+**Found in own diff, real but low-severity:** ~15 of `.agents/skills`'s
+16 entries (all `fgos-*` dev-skills + `_shared`) are ALSO byte-identical
+mirrors under `plugins/fgOS/skills` (CI-enforced,
+`test/skills/fgos-mirror.test.mjs`). Adding `.agents/skills` to
+`WIDE_SWEEP_ROOTS` alongside the existing `plugins` root means a stale
+citation living in one of those mirrored files gets reported TWICE (once
+per root) — proven directly: a synthetic fixture with the same content
+under both `.agents/skills/sample-skill/` and
+`plugins/fgOS/skills/sample-skill/` produces 2 findings for one real
+issue.
+
+**Not the same failure class as the original gap:** the original bug
+(pre-fix) was a false NEGATIVE — a real violation silently invisible.
+This is a false-positive DUPLICATE — the same real violation reported
+twice, never zero times, since the mirror's own byte-identity is itself
+CI-enforced (a drift there would already fail `npm test` independently).
+Cosmetic noise, not a missed detection.
+
+**Decision: document, don't add exclusion complexity.** Excluding the
+mirrored subset would need either a hardcoded list of the 15 mirrored
+skill names (fragile — breaks silently the moment a new skill is added
+to one side and not yet mirrored to the other) or cross-root exclusion
+logic neither real caller (`bin/fgos.mjs`, `retrospective-doors.mjs`)
+asks for today. Disproportionate for a cosmetic double-count. Documented
+directly in the `WIDE_SWEEP_ROOTS` comment instead — a future session
+revisiting this has the real tradeoff on record, not a silent gap.
+
+`plugins/fgOS/skills` itself is NOT purely redundant, corrected from
+Round 1's own imprecise claim: only its dev-skill subset overlaps
+`.agents/skills`; its ~35 launcher/orchestrator skills
+(`cook`/`submit`/`pick`/etc.) have no `.agents/skills` counterpart at all
+and still need `plugins` in the roots to be reached.
