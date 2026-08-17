@@ -2,6 +2,16 @@
 
 ## 1. Trạng thái hiện tại
 
+Vòng 15 (2026-08-17): người dùng đồng ý cả 2 khuyến nghị round 14 (door áp
+mọi item + skeleton-match backstop) — riêng điểm 2 thêm yêu cầu: triển khai
+dạng hexagon/service để thay giải pháp khác sau này không cần đổi caller.
+Xác nhận fgOS đã có tiền lệ port/adapter thật (CTR009 executor.v1,
+`dispatch.mjs`) — tái dùng contract-style đó, không phát minh kiến trúc
+mới. Mint D11 (seq 19036) + D12 (seq 19037). **Toàn bộ D1-D12 đã khoá — cả
+2 điểm mở còn lại từ §6 "Còn mở" đều đã đóng.** Không còn điểm nào chưa
+D-ID. Sẵn sàng hỏi người dùng có coi discussion đã converge để set `refs`
++ handoff sang `fgos-coding-exploring`.
+
 Vòng 14 (2026-08-17): người dùng xác nhận đánh đổi round 13 chấp nhận
 được. Mint D10 (seq 19035). Tổng cộng D1-D10 đã khoá. Còn 2 điểm nhỏ chưa
 D-ID (door risk-tier scope, cơ chế tra "chủ đề" cụ thể cho D8) — hỏi người
@@ -172,8 +182,11 @@ chưa; (2) chỉ sau đó mới bàn có nên tự xây, xây gì, xây ở tầ
 | D7 | 4-door check + D5's narrative-sync chạy BÊN TRONG lần gọi batch hiện có của `retrospective`/`fgos-coding-compounding` (`/fgOS:retro-loop`) — cadence KHÔNG đổi (không bắt chước continuous kiểu bee); `state.decisions` vẫn ghi ngay lúc chốt; `fgos approve` KHÔNG bị gate | round 10 đề xuất → round 11 xác nhận+làm rõ → mint | 19006 |
 | D8 | Sửa cơ chế D6: tìm-trước-khi-tạo = doctrine (tra `authoritative_for` theo chủ đề, update-in-place) + harness backstop (check mechanical trong verify chain) — KHÔNG BAO GIỜ một hàm gate sống, mirror bài học thật của bee (`scribingTarget()` dead surface) | round 10 đề xuất → round 11 xác nhận → mint | 19007 |
 | D9 | Phối hợp tsk-37i: tsk-1lv nhận mảnh 2 (ADR reversal sweep, siêu hình bởi D5) + mảnh 4 (routing door, = D7); tsk-37i giữ mảnh 1 (khuôn citation) + mảnh 3 (dọn file cũ). Không cần `deps` — scope hết overlap, chạy song song | round 9 đề xuất → round 12 xác nhận → mint | 19033 |
+| D10 | Đánh đổi batch-narrative-synthesis chấp nhận được: raw capture ghi ngay (không đổi), narrative trễ có giới hạn (TTL 3 ngày, `classifyStalePostDelivery`) + có phát hiện được, doctrine bắt buộc đọc `state.decisions`/index trước khi tin prose spec | round 13 đề xuất → round 14 xác nhận → mint | 19035 |
+| D11 | Door (freshness/impact/routing/doc-deferral) áp cho MỌI item trong retrospective batch, KHÔNG scope theo risk-tier — doc-rot không phân biệt tier, door là check thuần cơ học | round 14 đề xuất → round 15 xác nhận → mint | 19036 |
+| D12 | Cơ chế tra chủ đề (D8b) = skeleton-match chuỗi (mirror bee, không semantic search), triển khai dưới dạng PORT/ADAPTER swappable — mirror CTR009 executor.v1 đã có sẵn (`dispatch.mjs`), không hardcode inline | round 14 đề xuất → round 15 xác nhận (yêu cầu port/adapter) → mint | 19037 |
 
-**Còn treo, CHƯA D-ID** (chưa đủ round ổn định hoặc chưa hỏi): scope 4-door
+**Tất cả điểm mở đã đóng — D1-D12 đầy đủ, không còn treo.** (chưa đủ round ổn định hoặc chưa hỏi): scope 4-door
 (mọi item hay theo risk-tier — round 4 fork #2), harness đặt ở `fgos
 approve` hay verb/CI riêng (round 4 fork #3), cơ chế tìm-trước-khi-tạo cho
 D6 cụ thể là gì (semantic search, fuzzy filename, hay tra `docs/specs/
@@ -974,6 +987,30 @@ ngay lập tức, không đổi; narrative trễ có giới hạn 3 ngày + có 
 qua `classifyStalePostDelivery`; doctrine bắt buộc agent đọc
 `state.decisions`/index trước khi tin prose spec) là chấp nhận được.
 
+### Round 15 — 2026-08-17T11:21Z — mint D11+D12, đóng 2 điểm mở cuối
+
+Người dùng: "1. đồng ý; 2. đồng ý, nhưng có thể triển khai theo dạng
+hexagon/service giúp replace giải pháp khác sau này không?"
+
+**Scout trước khi trả lời** (không suy đoán): `docs/architecture-map.md`
+dòng 357 xác nhận fgOS đã có port/adapter THẬT, đang sống —
+**CTR009 · executor.v1** (`dispatch.mjs`, model gateway ↔ provider, "định
+nghĩa port" tường minh trong sổ contract). Không cần phát minh khái niệm
+hexagon mới cho fgOS — chỉ cần áp LẠI đúng contract-style đã có cho
+cơ chế skeleton-match của D8(b).
+
+Mint:
+- **D11**: door áp cho MỌI item trong retrospective batch, không scope
+  theo risk-tier — doc-rot không phân biệt tier, door là check thuần cơ
+  học (không có ceremony để giảm).
+- **D12**: cơ chế tra chủ đề = skeleton-match chuỗi (mirror bee, không
+  semantic search — bee tự thừa nhận kể cả layer mạnh nhất của họ vẫn chỉ
+  group theo skeleton), triển khai dưới dạng PORT/ADAPTER swappable,
+  mirror CTR009 executor.v1 đã có sẵn — không hardcode inline, để sau này
+  thay bằng giải pháp khác (semantic search thật) mà không đổi caller.
+
+**D1-D12 đã khoá đầy đủ. Không còn điểm mở nào chưa D-ID.**
+
 ## 6. Thiết kế đã chốt {#design}
 
 ### Vấn đề
@@ -1055,13 +1092,19 @@ flowchart TB
   KHÔNG đổi (không bắt chước continuous của bee). `state.decisions` vẫn ghi
   ngay lúc chốt. `fgos approve` KHÔNG bị gate bởi cơ chế nào ở đây.
 
-### Còn mở (chưa D-ID, cần quyết trước khi viết plan thật)
+### D9-D12 (round 12→15, đã mint) — tóm tắt cho người đọc lạ
 
-- Door chặn (freshness/impact/routing/doc-deferral) áp cho MỌI item hay
-  theo risk-tier khi chạy trong retrospective batch loop?
-- Cơ chế tra "chủ đề" cụ thể cho D8 (b) là gì — so khớp chuỗi
-  (skeleton-match kiểu bee: normalize/lowercase/accent-strip) hay cần
-  semantic search thật?
+- **D9**: tsk-1lv nhận mảnh 2+4 của tsk-37i (siêu hình bởi D5, = D7); không
+  `deps` giữa 2 item.
+- **D10**: đánh đổi batch-synthesis chấp nhận được — raw capture ngay,
+  narrative trễ có giới hạn+có phát hiện.
+- **D11**: door áp mọi item, không theo risk-tier.
+- **D12**: skeleton-match, triển khai port/adapter (mirror CTR009), không
+  hardcode.
+
+### Còn mở
+
+Không còn điểm nào. D1-D12 đầy đủ.
 
 ## 7. Danh mục hạng mục / task
 
@@ -1115,21 +1158,46 @@ flowchart TB
   cá nhân (chỉ còn artifact generate nếu giữ); mọi id ADR cũ resolve được
   qua `state.decisions --scope`.
 
+### {#task-four-door-in-retrospective}
+
+- **Mục tiêu:** thêm 4 check (freshness/impact/routing/doc-deferral, mirror
+  bee v2.7.0 close-gate bundle) vào lần gọi batch hiện có của
+  `fgos-coding-compounding`/`/fgOS:retro-loop` — KHÔNG gate `fgos approve`.
+  Freshness: dangling pointer trong area đã động tới. Impact: doc còn cite
+  decision của item này chưa reconcile. Routing: D-ID locked mà không có
+  citation trong spec sống (nhận lại từ tsk-37i mảnh 4, D9). Doc-deferral:
+  prose "để sau" không trỏ trigger đã đăng ký. Mỗi door có escape hatch có
+  log (mirror bee: `*-deferral` decision naming feature). Áp cho MỌI item,
+  không theo risk-tier (D11).
+- **Trích §6:** nguyên lý "cho phép reconcile/retire" + round 3 (bee
+  doc-rot doors) + round 10/14 (reuse retrospective, mọi item).
+- **D-ID áp dụng:** D7, D9, D11.
+- **Quan hệ:** phụ thuộc `{#task-decision-relation-and-sweep}` (routing
+  door cần field `--relation` ổn định) và `{#task-retire-decisions-corpus-to-specs}`
+  (impact door cần biết đích cite là `docs/specs/<area>.md`, không còn
+  `docs/decisions/*.md`).
+- **Verify nháp:** item test có D-ID locked chưa route → retrospective
+  batch báo routing-door finding; sửa xong → lần chạy kế sạch. Item có
+  citation chưa reconcile → impact-door báo, không chặn `approve`/merge.
+
 ### {#task-compounding-anti-fork-and-reconcile}
 
-- **Mục tiêu (SỬA round 10 — không còn "1 hàm gate"):** (a) doctrine —
-  `fgos-coding-compounding` bước 3 thêm hướng dẫn tra `authoritative_for`
-  toàn `docs/<quadrant>/` theo CHỦ ĐỀ trước khi quyết path, update-in-place
-  nếu đã có chủ (giống bee-capturing's Scribe convention, KHÔNG phải gọi
-  1 hàm); (b) harness backstop — thêm field `authoritative_for` vào
-  frontmatter (`src/report/frontmatter.mjs` đã có, mở rộng) + 1 check
-  mechanical trong verify chain phát hiện 2 file cùng subject (mirror
-  `bee knowledge check`'s duplicate-authority finding, KHÔNG phải gate
-  đồng bộ lúc ghi); (c) sửa luật "never delete, shorten, restructure"
-  thành cho phép reconcile khi có capture mới mâu thuẫn bằng chứng cũ.
+- **Mục tiêu (SỬA round 10/15 — không còn "1 hàm gate", nay là port/adapter):**
+  (a) doctrine — `fgos-coding-compounding` bước 3 thêm hướng dẫn tra
+  `authoritative_for` toàn `docs/<quadrant>/` theo CHỦ ĐỀ trước khi quyết
+  path, update-in-place nếu đã có chủ (giống bee-capturing's Scribe
+  convention, KHÔNG phải gọi 1 hàm); (b) harness backstop — thêm field
+  `authoritative_for` vào frontmatter (`src/report/frontmatter.mjs` đã có,
+  mở rộng) + 1 check mechanical trong verify chain phát hiện 2 file cùng
+  subject qua **port/adapter skeleton-match** (mirror CTR009 executor.v1
+  shape — hàm so khớp đứng sau 1 interface swappable, KHÔNG hardcode
+  inline, để thay bằng semantic search thật sau này không cần đổi caller,
+  D12); (c) sửa luật "never delete, shorten, restructure" thành cho phép
+  reconcile khi có capture mới mâu thuẫn bằng chứng cũ.
 - **Trích §6:** mục "Cho phép reconcile/retire, không chỉ cấm-rồi-thêm" +
-  round 10 (OKF, `scribingTarget()` dead surface).
-- **D-ID áp dụng:** D6 (cần re-mint theo bản sửa round 10, chưa D-ID).
+  round 10 (OKF, `scribingTarget()` dead surface) + round 15 (D12,
+  port/adapter).
+- **D-ID áp dụng:** D6, D8, D12.
 - **Quan hệ:** độc lập với 4 task trên (bề mặt khác — Diataxis, không phải
   decisions) — có thể làm song song.
 - **Verify nháp:** case thật — 2 capture cùng chủ đề khác tên gọi phải hội
