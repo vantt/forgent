@@ -2,6 +2,17 @@
 
 ## 1. Trạng thái hiện tại
 
+Vòng 13 (2026-08-17): người dùng chất vấn trực tiếp D7 — bee viết
+continuous ở 4 điểm, fgOS viết 1 lần sau cùng (batch, retrospective); nếu
+không continuous, fgOS có mất thông tin xảy ra trong lúc làm việc không?
+Đây là câu hỏi threat-model thật (theo `review-audit-self-decision.md`
+"Threat Model" — phải xác định rõ cái gì thật sự bị mất trước khi trấn an),
+không phải câu hỏi tu từ. Trả lời ở §5 round 13: KHÔNG mất raw fact/decision
+(đã ghi ngay lúc chốt qua `state.decisions`, không đổi bởi D7) — nhưng CÓ
+một khoảng trễ thật, có giới hạn, có phát hiện được (không phải zero-risk)
+ở tầng NARRATIVE SYNTHESIS (`docs/specs/<area>.md`). Cần người dùng xác
+nhận khoảng trễ này chấp nhận được.
+
 Vòng 12 (2026-08-17): người dùng quay lại quyết phối hợp với tsk-37i (nêu
 ở round 9) — đồng ý thu hẹp tsk-37i, tách mảnh 2 (ADR reversal sweep) +
 mảnh 4 (routing close-gate) để tsk-1lv xử lý; sau khi thu hẹp, 2 item chạy
@@ -889,6 +900,66 @@ nghĩa là việc cập nhật §3/§4/§6/§7 của chính tsk-37i để phản
 về phiên đang giữ item đó (hoặc người dùng tự relay quyết định này). D9 ở
 đây là đủ để tsk-1lv tự thiết kế không chờ tsk-37i, và để bất kỳ phiên nào
 đọc lại tsk-37i sau này thấy đúng lý do thu hẹp.
+
+### Round 13 — 2026-08-17T11:15Z — bee 4-điểm continuous vs fgOS 1-lần: có mất gì không?
+
+**Câu hỏi thật, cần tách đúng 2 tầng đang bị gộp lẫn — giống lỗi round 10
+đã tự mắc rồi round 11 phải tách lại:**
+
+1. **RAW CAPTURE (bản ghi quyết định, ngắn, có cấu trúc)** — bee's 4 điểm
+   (sync/capture/flush/harvest) phần lớn là timing của bước NÀY: bắt sự
+   kiện "chốt" (`settlement-triggers-mandatory-capture`, round 1: các cụm
+   "chốt"/"final"/"ok ship it" bắt buộc capture NGAY CÙNG LƯỢT, không đợi).
+   **fgOS đã làm ĐÚNG timing này rồi, không đổi bởi D7**: `fgos decision
+   --id <item-id>` được gọi NGAY lúc D-ID ổn định (hard rule có sẵn của
+   chính `fgos-coding-shaping`, §4 "mỗi entry... ghi qua fgos decision...
+   ngay lúc ổn định, không đợi tới handoff"). D4/D7 không chạm bước này —
+   `state.decisions` ghi tức thời, giống hệt cadence "capture" của bee.
+2. **NARRATIVE SYNTHESIS (viết lại prose sống, `docs/specs/<area>.md`)** —
+   ĐÂY mới là chỗ khác thật: bee's Scribe cập nhật prose area NGAY (cùng
+   nhịp continuous), fgOS's D5+D7 dồn việc này vào batch `retrospective`
+   sau merge.
+
+**Vậy có mất thông tin không — trả lời trực tiếp, không suy đoán:**
+
+- **KHÔNG mất raw fact.** `state.decisions` (event-sourced,
+  `.fgos/events.jsonl`) là nguồn sự thật bền, replay-được bất kỳ lúc nào,
+  bởi bất kỳ phiên nào — đúng nguyên lý CQRS đã khoá ở D2/D3
+  ("projections can be rebuilt from the raw events at any time"). Việc
+  viết narrative sau KHÔNG PHẢI chép lại trí nhớ phiên chat (thứ dễ mất) —
+  nó là RENDER từ dữ liệu có cấu trúc đã ghi bền từ trước. Phiên viết
+  synthesis có thể hoàn toàn khác phiên đã ra quyết định, không cần lịch
+  sử chat, chỉ cần đọc `state.decisions`.
+- **CÓ một khoảng trễ thật ở `docs/specs/<area>.md`, không phải zero-risk
+  — cần nói thẳng, không giấu (theo Threat Model discipline):** giữa lúc
+  quyết định chốt và lúc `/fgOS:retro-loop` thật sự chạy (thủ công, không
+  cron), prose trong `docs/specs/<area>.md` CHƯA phản ánh quyết định mới.
+  Một agent chỉ đọc riêng file spec đó trong đúng khoảng trễ này vẫn có
+  thể thấy bản cũ.
+- **Khoảng trễ này khác về BẢN CHẤT so với bug gốc STR72 đã mở đầu cả cuộc
+  thảo luận này** — không phải cùng loại rủi ro: STR72 là staleness VÔ HẠN
+  ĐỊNH, KHÔNG AI PHÁT HIỆN (quyết định supersede, artifact nguồn không bao
+  giờ được nhắc lại). Khoảng trễ round 13 nêu là **có giới hạn VÀ có phát
+  hiện được**: `tsk-1bl`'s `classifyStalePostDelivery` (đã có sẵn, xem
+  round 10) tự đánh dấu item nằm ở `retrospective` quá 3 ngày chưa quét —
+  không tự động sửa, nhưng không để trôi vô thời hạn trong im lặng như
+  STR72 đã từng.
+- **Lối thoát thật cho agent cần sự thật NGAY trong khoảng trễ đó**: đọc
+  `state.decisions` (hoặc index generate từ D4) — nguồn LUÔN current,
+  không bị trễ theo batch — thay vì chỉ đọc `docs/specs/<area>.md` prose.
+  Đây chính là lý do "reading order" doctrine (round 4/7: index →
+  decisions → specs/history, "grep trần là fallback") quan trọng — nó là
+  cái ĐÓNG khoảng trễ này lại cho agent, không phải chỉ đẹp hình thức.
+  `docs/specs/<area>.md` là bản tiện đọc cho người, không phải nguồn duy
+  nhất agent phải tin.
+
+**Kết luận:** D7 không đổi timing của RAW CAPTURE (đã đúng, giống bee) —
+chỉ trễ NARRATIVE SYNTHESIS, có giới hạn (3 ngày, tsk-1bl), có phát hiện
+được, và có lối thoát (đọc `state.decisions` trực tiếp thay vì chỉ đọc
+spec prose). Không phải zero-risk tuyệt đối, nhưng khác hẳn loại risk đã
+gây ra STR72 — cần người dùng xác nhận đây là đánh đổi chấp nhận được,
+hay muốn siết thêm (vd rút ngắn TTL 3 ngày, hay bắt buộc agent luôn đọc
+`state.decisions` trước khi tin `docs/specs/`).
 
 ## 6. Thiết kế đã chốt {#design}
 
