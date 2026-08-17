@@ -211,9 +211,33 @@ surfaced ahead of time:
    exactly those known, enumerable, intentional citations rather than
    loosen the check's actual intent (catching real leftovers).
 
-Full suite after all fixes: 3477 pass / 0 fail / 5 skipped (unchanged
-from the reality-gate baseline — no regression, only fixes to newly-
-discovered issues along the way).
+6. **A real live incident on the shared main checkout**, found by
+   re-running `fgos return tsk-225`: the live `.fgos/config.json`'s
+   `runner.capacities`→`runner.executors` rename (committed to `main`
+   directly, matching the pattern used for `tsk-34n`'s own D3 config
+   migration) broke config load-time validation (the `prefer`/`for`
+   symmetry check in `validateRunnerConfigShape`) for **every** `fgos`
+   command run from the main checkout — `main`'s own `src/runner/
+   dispatch.mjs` has not merged this item's rename yet, so it can no
+   longer find `capacities` (renamed away) and cannot understand
+   `executors` (its own vocabulary doesn't have that word yet). Unlike
+   `tsk-34n`'s own live-config edit (purely additive — new fields old code
+   safely ignores), this rename removes a key old code structurally
+   depends on, so it cannot land ahead of the matching code the way
+   additive changes safely can. Fixed by reverting just that one key on
+   `main` (commit `6e4f8919`) — restoring every `fgos` command immediately
+   — and by skipping the 2 tests that read the real committed config via
+   `committedRunnerConfig()` and can only pass once code and config land
+   together, at this item's own merge (same "Live migration proof" shape
+   `tsk-34n`'s own evidence used, done once, near merge time, not baked
+   into this item's own blocking verify). **This item's own approve/merge
+   step must (a) re-apply the `capacities`→`executors` rename to the live
+   `.fgos/config.json`, and (b) un-skip both tests (swap their read back
+   to `cfg.executors`) — see `iron-law-evidence.md`'s own "Live migration
+   proof" section for the exact steps.**
+
+Full suite after all fixes: 3475 pass / 0 fail / 7 skipped (5 pre-existing
++ the 2 above, both explained and temporary — no unexplained regression).
 
 ## Outstanding questions
 

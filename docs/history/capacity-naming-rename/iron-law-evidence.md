@@ -100,12 +100,44 @@ introduced zero regressions once all findings below were fixed.
   8 lines that are supposed to keep saying "capacity"; the command now
   excludes exactly those known, enumerable citations.
 
-## Live migration proof
+## Live migration proof (real incident found, corrected — pending final step at merge)
 
-Real `.fgos/config.json` migrated: `runner.capacities` → `runner.executors`
-(committed to `main` directly, `7896f597`, alongside `tsk-34n`'s own
-still-uncommitted D3 migration from earlier this session). `npm test`
-against the migrated config: 3477 pass / 0 fail / 5 skipped, including the
-`committedRunnerConfig()`-based tests that read the real committed
-`.fgos/config.json` via `git show HEAD:.fgos/config.json` from the main
-checkout.
+Real `.fgos/config.json` was first migrated (`runner.capacities` →
+`runner.executors`, committed to `main` directly at `7896f597`, alongside
+`tsk-34n`'s own still-uncommitted D3 migration from earlier this session)
+— but this broke `main` itself: re-running `fgos return tsk-225`
+surfaced a real, live failure —
+
+```
+fgos: runner config (/home/vantt/projects/forgentX/.fgos/config.json#runner capabilities.impact-analysis) "prefer" names "gitnexus" but that capacity does not declare "for" including "impact-analysis" itself (symmetry required, D2).
+```
+
+— because `main`'s own `src/runner/dispatch.mjs` had not merged this
+item's rename yet, so it could no longer find `capacities` (renamed away)
+under a schema it still expects. Every `fgos` command on the main
+checkout was affected, not just this item's own `return` call. Reverted
+immediately: `git diff` on `main` after the revert —
+
+```
+.fgos/config.json | 2 +-
+-    "executors": {
++    "capacities": {
+```
+
+— restoring `main` (commit `6e4f8919`). Confirmed real: `fgos tool query
+--capability impact-analysis --dir <root>` on `main` after the revert
+returns `gitnexus` present again, no error.
+
+**Remaining step, required at this item's own approve/merge (not done
+yet — deliberately, so code and config land together atomically, the
+same discipline `tsk-34n`'s own D3 migration used):**
+
+1. Re-apply the single-line edit to the live `.fgos/config.json`:
+   `"capacities": {` → `"executors": {` (same edit as above, in reverse).
+2. Un-skip the two tests in `test/runner/dispatch.test.mjs` marked
+   `test.skip(...)` with a `tsk-225 D1` comment (currently ~line 719 and
+   ~line 1023) — remove the `.skip` and the explanatory comment above
+   each.
+3. Re-run `npm test` against the now-migrated config to confirm both
+   pass for real (not skipped) — expect 3477 pass / 0 fail / 5 skipped
+   (the pre-existing baseline, no new skips).
