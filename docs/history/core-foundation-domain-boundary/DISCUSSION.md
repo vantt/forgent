@@ -10,6 +10,18 @@ status: open
 
 ## 1. Trạng thái hiện tại
 
+Round 9 (2026-08-17): D7 (skill canonical → `core/skills/`+
+`domains/*/skills/`) và D8 (task-specs tách khỏi `docs/specs/` chung vào
+`core/specs/`+`domains/*/specs/`) đã chốt — ghi qua `fgos decision --id
+tsk-397` (seq 19342, 19349). Layout giờ đối xứng đầy đủ giữa core và
+domain cho 4/6 concern có file thật (workflow/task-schema qua registry.mjs,
+skill qua skills/, knowledge qua knowledge/, spec qua specs/) — chỉ
+`harness` (chủ đích chỉ core, D1/D5) và `doctrine` (vẫn mở) không theo
+khuôn 1-folder-mỗi-bên. D7/D8 đều KHÔNG chỉ là di dời file — cả hai đòi
+cơ chế mới (assembly step cho skill D7; cập nhật `reading-map.md` +
+AGENTS.md doctrine cho D8) trước khi implement thật, việc cho
+`fgos-coding-planning` xử lý, không phải discussion này.
+
 Round 7 (2026-08-17): D6 sửa lại và chốt — ghi qua `fgos decision --id
 tsk-397` (seq 19297), thay bản D6 đầu (SAI, lẫn context với knowledge).
 `docs/history/` là context (thô, feature-scoped, share, không tag
@@ -116,6 +128,7 @@ thi thật.
 | 16 | `docs/history/<feature>/` có phải "knowledge" không? | Chốt — sửa lại (round 7) | KHÔNG — người chỉ ra `docs/history/` là **context** (biên bản thô, append-only, theo feature), không phải knowledge. "Knowledge" đúng nghĩa = domain-knowledge, curated, do team tự bảo trì — khác hẳn context. D6 (bản đầu, gắn tag `domain` lên `docs/history/`) SAI vì lẫn 2 khái niệm — đã thay bằng D6 mới. |
 | 17 | Domain-knowledge (curated, private, do team tự bảo trì) nên sống ở đâu? | Chốt — D6 | `domains/<name>/knowledge/`, co-located cùng `skills/`, theo đúng tinh thần tự-chứa của D3. Tiền lệ thật: `/home/vantt/projects/beegog/expertise/` — hệ curated knowledge base thật (`knowledge.md` tự mô tả "craft vs project layers, harvesting from finished work, recorded trust, dated freshness, migration rot, retirement") — khác hẳn `docs/history/` (context thô). |
 | 18 | `.agents/skills/core` có nên đổi thành `core/skills/` (bỏ dấu chấm, đối xứng `domains/`)? `.agents` và `.claude` có phải thin wrapper cả hai không? | Chốt — D7 | Có, nhưng không phải rename đơn thuần. `.agents/skills/*` là canonical THEO một quyết định TRƯỚC đó (tsk-1qi D5, `skill-wrappers.mjs` tự ghi rõ "the canonical, orchestrator-neutral skill source") — và `fgos setup` vendor NGUYÊN VĂN `.agents/skills/*` vào MỌI external project (`materializeSkillsIntoProject`), nên hình dạng bên ngoài (host project nhận được gì) không được đổi. D7: canonical AUTHORING chuyển sang `core/skills/` + `domains/*/skills/`; `.agents/skills/`, `.claude/skills/`, `plugins/fgOS/skills/` CẢ BA thành render target thật (thêm bước assembly trong `skill-wrappers.mjs`) — mở rộng quyết định tsk-1qi D5 (bối cảnh mới: `domains/` chưa tồn tại lúc đó), không đảo ngược nó. |
+| 19 | Task-specs (spec văn xuôi, `docs/specs/`) có nên tách vào từng `domains/<name>/specs/` + `core/specs/` riêng, thay vì ở lại `docs/specs/` chung? | Chốt — D8 (đảo ngược đề xuất trước) | Người muốn tách — đúng, đảo ngược lý do tôi đưa ra trước (giữ `docs/specs/` chung để `reading-map.md` là 1 điểm tra cứu). Scout: cả 12 file `docs/specs/*.md` hiện tại đều là spec core/platform (work-state, runner, distribution, platform-foundations, ...) — CHƯA có spec business riêng cho domain nào (coding chưa từng có BA spec tách biệt, vì luôn là domain duy nhất). Nên tách sạch: toàn bộ file hiện có → `core/specs/`; `domains/*/specs/` khởi tạo RỖNG, chờ spec domain thật đầu tiên (marketing). Chi phí chỉ nội bộ (288 tham chiếu `docs/specs/`, gồm cả AGENTS.md) — KHÔNG vendor ra external project (khác `.agents/skills/`, D7) nên không có rủi ro breaking bên ngoài. |
 
 ## 4. Quyết định đã chốt
 
@@ -128,6 +141,7 @@ thi thật.
 | D5 | Core (`bin/`, `src/`, `herdr-plugin/`) giữ nguyên vị trí top-level — KHÔNG di dời vào folder `core/` để đối xứng với `domains/`. Chỉ `.agents/skills/core/` (sau khi domain skill dọn ra `domains/*/skills/`) được gắn nhãn tường minh. | Grep: 881 tham chiếu `bin/fgos.mjs` trong `.md`/`.mjs` toàn repo (mọi action step skill, docs, test); fgOS đã cài global ở nhiều project khác (mission 0035) gọi thẳng path đó — di dời phá vỡ diện rộng cho lợi ích thuần biểu tượng, vì `domains/` tồn tại đã làm "không phải domains/" tự nhiên đọc là core. |
 | D6 | Domain-knowledge (curated, private, do team tự bảo trì) sống co-located tại `domains/<name>/knowledge/` — KHÔNG phải tag `domain` gắn lên `docs/history/` (bản đầu SAI, đã thay). `docs/history/<feature>/` là **context** (thô, append-only, theo feature) — giữ nguyên chỗ, không đổi. | Sửa theo người: knowledge ≠ context. Tiền lệ thật `/home/vantt/projects/beegog/expertise/` — hệ curated knowledge base có `knowledge.md` tự mô tả "harvesting from finished work, recorded trust, dated freshness, migration rot, retirement" — một hệ bảo trì chủ động, khác hẳn log thô. Theo tinh thần tự-chứa D3, domain-knowledge thuộc về folder riêng của domain đó. |
 | D7 | Canonical skill-source AUTHORING chuyển sang `core/skills/` + `domains/<name>/skills/`; `.agents/skills/`, `.claude/skills/`, `plugins/fgOS/skills/` cả BA trở thành render target thật (thêm bước assembly trong `skill-wrappers.mjs`) — KHÔNG đổi thứ `fgos setup` vendor vào external project. | Mở rộng (không đảo ngược) quyết định trước đó tsk-1qi D5 (`skill-wrappers.mjs` tự ghi "`.agents/skills/*` is the canonical, orchestrator-neutral skill source") — bối cảnh mới: `domains/` (D3) chưa tồn tại lúc D5 đó chốt. `.agents/skills/*` được `fgos setup`'s `materializeSkillsIntoProject` vendor NGUYÊN VĂN vào MỌI external project — hình dạng/nội dung bên ngoài phải giữ nguyên byte-identical; chỉ chỗ maintainer sửa nguồn đổi. |
+| D8 | Task-specs (prose BA-grade) tách khỏi `docs/specs/` chung vào `core/specs/` (toàn bộ 12 file hiện có) + `domains/<name>/specs/` (rỗng, chờ spec domain thật đầu tiên). Đảo ngược đề xuất trước trong chính thảo luận này (giữ `docs/specs/` chung). | Người quyết định trực tiếp. Scout: cả 12 file `docs/specs/*.md` hôm nay đều là spec core/platform, không file nào là business spec riêng của 1 domain — nên tách sạch không mơ hồ. Hoàn tất cùng pattern co-location đã chốt cho skill (D3/D7) và knowledge (D6). Chi phí chỉ nội bộ (288 tham chiếu `docs/specs/`, gồm AGENTS.md's doctrine section) — `docs/specs/` không hề được `fgos setup` vendor ra ngoài (khác `.agents/skills/`, D7), nên không có rủi ro breaking external project. |
 
 ## 5. Q&A log
 
@@ -235,6 +249,12 @@ thi thật.
   `domains/*/skills/`, cả 3 cây cũ thành render target thật (thêm bước
   assembly), giữ nguyên hình dạng bên ngoài host project nhận được. Người
   xác nhận "ừ ghi D7 đi" → D7 chốt.
+- 2026-08-17 — Round 9 Q&A: người nói "tôi muốn tách các task-specs từ
+  docs/spec vào từng domain folder và core folder riêng luôn" — đảo ngược
+  trực tiếp đề xuất trước của trợ lý (giữ `docs/specs/` chung cho
+  `reading-map.md`). Trợ lý scout `docs/specs/` — cả 12 file hiện có đều
+  là spec core/platform, không file nào business-spec riêng domain nào →
+  D8: toàn bộ chuyển `core/specs/`, `domains/*/specs/` khởi tạo rỗng.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -264,14 +284,15 @@ forgentX/
 │   └── intake/{discovery,plan}.mjs       # workflow — dispatcher, sửa đọc DOMAINS[item.domain] thay vì hardcode
 ├── herdr-plugin/                         # harness — Rust engine
 ├── core/
-│   └── skills/                           # ★ D7 — canonical AUTHORING (thay .agents/skills/core/)
-│       ├── fgos-routing/  fgos-clarifying/  fgos-researching/
-│       └── fgos-unlock/   fgos-fanout/      fgos-indexing/   distill/
+│   ├── skills/                           # ★ D7 — canonical AUTHORING (thay .agents/skills/core/)
+│   │   ├── fgos-routing/  fgos-clarifying/  fgos-researching/
+│   │   └── fgos-unlock/   fgos-fanout/      fgos-indexing/   distill/
+│   └── specs/                            # ★ D8 — task-specs core/platform, di dời NGUYÊN 12 file từ
+│       │                                 #   docs/specs/ (work-state, runner, distribution,
+│       │                                 #   platform-foundations, system-overview, ... — TẤT CẢ đều
+│       │                                 #   core/platform-level hôm nay, không file nào business-riêng-domain)
+│       └── reading-map.md                # điểm vào, cập nhật thêm mục domains/*/specs/ khi domain thật có spec
 ├── docs/
-│   ├── specs/                            # task-specs (prose, BA-grade) — spec MỌI area, kể cả domain,
-│   │   │                                 #   ở ĐÂY (shared), không lồng vào domains/ — reading-map.md
-│   │   │                                 #   là nơi duy nhất để tìm spec, splinter theo domain sẽ phá vỡ điều đó
-│   │   └── reading-map.md                # điểm vào — nên gộp thêm bảng ánh xạ 6-mối-quan-tâm này khi plan
 │   ├── decisions/                        # knowledge — quyết định nền tảng, domain-agnostic (craft, không phải domain)
 │   └── history/                          # CONTEXT, không phải knowledge (sửa round 7) — thô, append-only,
 │                                         #   theo feature, giữ nguyên chỗ, share, KHÔNG gắn tag domain
@@ -288,16 +309,17 @@ forgentX/
 │   │   ├── skills/                       # skill — canonical AUTHORING (D7), di dời từ .agents/skills/
 │   │   │   ├── discovering/  exploring/  planning/  validating/
 │   │   │   └── implement/    shaping/    driving/    compounding/
-│   │   └── knowledge/                    # ★ D6 — curated domain-knowledge, riêng của team, co-located
-│   │       # (KHÁC docs/history/ — knowledge được bảo trì chủ động, context thì thô/append-only)
-│   │       # tiền lệ thật: /home/vantt/projects/beegog/expertise/ (knowledge.md tự mô tả
-│   │       # harvesting/trust/dated-freshness/retirement — một hệ bảo trì, không phải log)
+│   │   ├── knowledge/                    # ★ D6 — curated domain-knowledge, riêng của team, co-located
+│   │   │   # (KHÁC docs/history/ — knowledge được bảo trì chủ động, context thì thô/append-only)
+│   │   │   # tiền lệ thật: /home/vantt/projects/beegog/expertise/ (knowledge.md tự mô tả
+│   │   │   # harvesting/trust/dated-freshness/retirement — một hệ bảo trì, không phải log)
+│   │   └── specs/                        # ★ D8 — RỖNG hôm nay; chờ BA spec riêng của coding-domain
 │   │       # task (data thật): domainFields.coding.* — sống trong .fgos/events.jsonl, không phải file
 │   │
 │   └── marketing/                        # ★ tương lai (STR52) — thêm vào đây, KHÔNG sửa gì trong coding/
 │       ├── registry.mjs
-│       └── skills/
-│       # + docs/specs/marketing.md (shared docs/specs/, spec trước khi có code — theo luật AGENTS.md)
+│       ├── skills/
+│       └── specs/                        # ★ D8 — spec business trước khi có code (luật AGENTS.md)
 │
 ├── .agents/skills/                       # ★ D7 — render target (trước: canonical, tsk-1qi D5). Hình dạng/nội
 │                                         #   dung KHÔNG đổi (vẫn được fgos setup vendor nguyên văn vào
@@ -435,6 +457,30 @@ trong nguồn canonical trước khi render.
   dạng external-project-facing không đổi; thêm test mới cho riêng bước
   assembly (input `core/skills/`+`domains/*/skills/` → output
   `.agents/skills/` đúng nội dung mong đợi).
+
+### {#task-specs-split} Di dời `docs/specs/*.md` vào `core/specs/`, khởi tạo `domains/*/specs/` rỗng
+
+- **Mục tiêu:** hiện thực D8 — di dời nguyên 12 file hiện có trong
+  `docs/specs/` (work-state, runner, distribution, distillery,
+  platform-foundations, system-overview, fgos-plugin,
+  herdr-web-dashboard, enduser-docs-authoring, enduser-docs-index,
+  decision-citation-drift, reading-map) sang `core/specs/`; tạo
+  `domains/coding/specs/` và `domains/marketing/specs/` rỗng (chờ BA spec
+  domain thật đầu tiên); cập nhật `reading-map.md` thêm mục trỏ tới
+  `domains/*/specs/`; cập nhật mọi tham chiếu `docs/specs/` (288 chỗ,
+  gồm AGENTS.md §"Before touching code" và §"Definition of done" — cả
+  hai đều trích path `docs/specs/reading-map.md`/`docs/specs/<area>.md`
+  trực tiếp trong doctrine luôn-nạp).
+- **§6 excerpt áp dụng:** khối `core/specs/` + `domains/*/specs/` trong
+  ASCII tree.
+- **D-ID áp dụng:** D8.
+- **Quan hệ:** độc lập với 2 task skill ở trên (không đụng chung file);
+  vì đụng AGENTS.md (doctrine luôn-nạp) nên rủi ro cao hơn thuần tuý di
+  dời file — mọi phiên đang mở SAU khi đổi cần load lại doctrine mới.
+- **Verify nháp:** `grep -rl "docs/specs/" .` (loại `node_modules`) phải
+  về 0 sau khi sửa xong (trừ chính các dòng lịch sử/log không cần cập
+  nhật); AGENTS.md sau sửa vẫn giữ đúng 3 quy tắc L8 (platform-foundations)
+  — placement test, transport-rides-with-order, anchor-suite.
 
 ### {#task-dispatcher-domain-aware} Fix `discovery.mjs`/`plan.mjs`/`fgos-routing` đọc registry thay vì hardcode
 
