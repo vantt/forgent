@@ -4,7 +4,14 @@ Item: `tsk-37i`.
 
 ## 1. Trạng thái hiện tại
 
-Round 3. Round 1 scout xong hệ thống trích dẫn nội bộ fgOS (ADR/RUL/D-local)
+Round 4. Round 3 chốt D1 (3 tầng đúng, sửa nhắm format+enforcement). Round 4:
+người dùng trả lời câu hỏi mở #6 ở §3 — cần quét sửa lại tài liệu CŨ đang vi
+phạm, không chỉ áp luật cho tài liệu mới ("tài liệu quá dơ rồi"). Agent đo
+quy mô thật (~36/~62/~69 file across 3 tầng, xem §3 #6 + §5) trước khi coi
+câu trả lời này đã đủ cụ thể để đưa vào §7. Tất cả 3 câu hỏi mở quan trọng
+nhất (#4/#5 cơ chế, #6 phạm vi) giờ đã có hướng trả lời rõ (D1 + §3 #6) —
+discussion gần hội tụ; còn #7 (hiển thị phân biệt local/global cho người
+đọc) chưa bàn kỹ, cần xem có phải chặn hội tụ hay có thể gộp vào §7 luôn. Round 1 scout xong hệ thống trích dẫn nội bộ fgOS (ADR/RUL/D-local)
 — cả ba đã có convention thành văn nhưng chỉ sửa hình dạng chữ, không đòi
 tóm tắt nội dung, và luật D-local đang bị phá ở diện rộng (xem §3 #1-3).
 Round 2 scan upstream `beegog` (bản clone cũ lệch 1213 commit, đã pull mới),
@@ -47,7 +54,7 @@ bắt buộc phải mở file gốc trước khi hiểu được câu đang đ�
 | 3 | Rõ — bằng chứng thật, không suy đoán | Vi phạm cụ thể quan sát trực tiếp: skill đang chạy phiên thảo luận NÀY (`.agents/skills/fgos-coding-shaping/SKILL.md`) trích trần `(D2)`, `(D4)`, `(D6)` nhiều lần trong "Hard rules" — các D-ID này chỉ tồn tại trong `docs/history/fgos-coding-shaping/CONTEXT.md` (đã đọc, xác nhận D1-D6 nằm ở đó, feature cục bộ của CHÍNH skill này). SKILL.md không phải CONTEXT.md, và SKILL.md được nạp vào MỌI phiên tương lai chạy skill này — vi phạm trực tiếp luật khoá của quyết định `0017`. Đây không phải lỗi ngẫu nhiên của 1 file: `grep RUL[1-9][0-9]` trên `docs/` trả ~559 match trong 147 file, phần lớn trích trần không kèm gloss (`RUL33/RUL34`, `RUL25`, `RUL50`, `RUL58 D4` — không tên area, không tóm tắt). Ví dụ người dùng nêu (`0026, 0028-0031, 0033`) cũng đúng dạng vi phạm quy ước ADR đã có (thiếu prefix `ADR`, thiếu tóm tắt) — không phải hiện tượng cá biệt của 1 lần trả lời. |
 | 4 | Chưa rõ | Sửa ở tầng nào: (a) chỉ sửa **kỷ luật hội thoại** (agent tự nhắc mình gloss khi trích, không cần cơ chế enforce), (b) sửa **kỷ luật viết tài liệu** (skills/specs/CONTEXT.md phải tự chứa, không trích D-local/RUL/ADR trần), hay (c) cả hai — và nếu (c), có cần một cơ chế kiểm tra máy (lint/grep-check) hay thuần kỷ luật văn xuôi như `0000-index.md` dòng 30-36 đã chọn cho supersede-trỏ-ngược? |
 | 5 | Chưa rõ | Mẫu gloss tối thiểu chấp nhận được là gì — 1 cụm từ ngắn ("D2: never write CONTEXT.md/plan.md directly") hay bắt buộc kèm cả phạm vi hiệu lực ("D2, cục bộ tsk-27y, không áp dụng ngoài feature này")? Có khác nhau giữa gloss-khi-nói-chuyện (ngắn, tự nhiên) và gloss-khi-viết-tài-liệu-bền (đầy đủ hơn, vì tài liệu sống lâu hơn hội thoại)? |
-| 6 | Chưa rõ | Phạm vi sửa: chỉ áp dụng luật mới cho tài liệu MỚI viết từ nay, hay cần một đợt quét/sửa tài liệu cũ đang vi phạm (đặc biệt `fgos-coding-shaping/SKILL.md` đang chạy phiên này, và có thể các skill `fgos-coding-*` khác cùng họ)? Việc quét ngược có đáng effort so với ưu tiên Ship Faster không, hay để tự nhiên sửa khi file đó được đụng tới lần sau? |
+| 6 | Rõ | **Người dùng chốt hướng: cần quét sửa lại tài liệu CŨ, không chỉ áp luật cho tài liệu mới** — lý do nêu thẳng: "tài liệu quá dơ rồi." Quy mô thật đã đo (grep, round 3, xem §5): ~36 file (`.agents/skills/`, `docs/specs/`, `.claude/skills/` — phần lớn là bản sinh-tự-động từ `.agents/skills/` nên sửa nguồn là đủ, không sửa 2 lần) trích D-local trần ngoài CONTEXT.md gốc; ~62 file có ít nhất 1 trích RUL trần không kèm tên area; tới ~69 file khớp mẫu số 4 chữ số kiểu ADR trần ngoài `docs/decisions/`/`docs/history/` (số này CHƯA lọc false-positive, cần xác minh lại lúc lập kế hoạch thật). Đây là quy mô thật, không phải ước lượng — việc chia nhỏ/ưu tiên cụ thể (sửa hết 1 lần hay theo domain, ai làm) để `fgos-coding-planning` quyết khi item này hand-off. |
 | 7 | Chưa rõ | Câu hỏi gốc của người dùng ("id của rule/decision là local hay global") — đã trả lời được ở mức khái niệm (#1 trên) nhưng CHƯA rõ nên hiển thị phân biệt này ở đâu cho người đọc thấy ngay khi gặp 1 trích dẫn, không phải phải nhớ luật riêng biệt (vd ký hiệu tiền tố khác nhau đã đủ phân biệt global/local, hay cần cách khác)? |
 
 ## 4. Quyết định đã chốt
@@ -132,6 +139,23 @@ bắt buộc phải mở file gốc trước khi hiểu được câu đang đ�
   decision --id tsk-37i` (seq 18919). §6 regenerate lần đầu theo D1 bên
   dưới.
 
+- **2026-08-17T~09:30Z — Trả lời câu hỏi #6 (người dùng), đo quy mô (agent).**
+  Người dùng: "cần quét sửa lại tài liệu, vì tài liệu quá dơ rồi" — chốt
+  hướng bao gồm quét/sửa tài liệu CŨ, không chỉ luật cho tài liệu mới. Agent
+  đo quy mô thật bằng grep trước khi ghi vào §3 (kỷ luật scout-trước-khi-ghi):
+  `grep -rlE "\(D[0-9]+[a-z]?(,|\))" .agents/skills .claude/skills docs/specs
+  plugins` (loại `/CONTEXT.md` gốc) → 36 file; `grep -rlE "RUL[0-9]+[^ ]"`
+  (loại `docs/history`/`docs/decisions`) → 62 file; mẫu 4-chữ-số kiểu ADR
+  trần ngoài `docs/decisions`/`docs/history` → 69 file (chưa lọc
+  false-positive, cần xác minh lại lúc lập kế hoạch). Ghi chú quan trọng:
+  `.claude/skills/*` phần lớn là bản sinh-tự-động từ `.agents/skills/*`
+  (xem đầu file `fgos-coding-shaping/SKILL.md`: "generated thin wrapper...
+  edit the source instead") — sửa nguồn `.agents/skills/` là đủ, không cần
+  sửa 2 lần thủ công. Chưa mint D2 cho câu trả lời này (kỷ luật: không lock
+  D-ID từ 1 câu trả lời duy nhất) — để `fgos-coding-planning` khoá chính
+  thức lúc hand-off, cùng lúc chia nhỏ quy mô ~36-69 file thành task cụ
+  thể.
+
 ## 6. Thiết kế đã chốt {#design}
 
 **Không tái cấu trúc, chỉ vá 2 chỗ hẹp.** fgOS giữ nguyên 3 tầng trích dẫn
@@ -174,10 +198,51 @@ flowchart TB
   `0017`) — vi phạm cụ thể đã tìm thấy (`fgos-coding-shaping/SKILL.md` trích
   trần D2/D4/D6) là việc cần dọn theo mảnh 1, không phải lý do để đổi luật
   D-local.
+- **Phạm vi giờ bao gồm quét/sửa tài liệu CŨ** (§3 #6 người dùng chốt) — 3
+  mảnh việc, không phải 2: mảnh 1 (format+pointer-check), mảnh 2 (reversal
+  sweep), và mảnh 3 mới — dọn ~36-69 file đang vi phạm trên cả 3 tầng, quy
+  mô đo thật ở §5 round 4. Mảnh 3 phụ thuộc mảnh 1 (cần format/check tồn
+  tại trước để biết sửa thành gì và biết đã sửa đúng chưa).
 
-Còn mở: câu hỏi #6 ở §3 (phạm vi sửa ngược file cũ hay chỉ áp cho tài liệu
-mới) chưa chốt — cần người dùng trước khi §7 có thể chia task cụ thể.
+Còn mở, có thể không chặn hội tụ: câu hỏi #7 ở §3 (hiển thị phân biệt
+local/global cho người đọc ở đâu) — hiện đã có câu trả lời khái niệm qua D1
+(tiền tố `ADR`/`RUL(area)`/`D-local` đã đủ phân biệt), có thể gộp thẳng vào
+mảnh 1 (format mới) ở §7 thay vì cần bàn riêng.
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-*(chưa đủ chín — chờ §6)*
+### {#task-citation-format-and-pointer-check} Mảnh 1 — Format trích dẫn + pointer-integrity check
+- **Mục tiêu:** mọi trích ADR/RUL/D-local ngoài nhà gốc bắt buộc dạng
+  `<ID> (<tóm tắt 1 dòng>)`, không bao giờ id trần; thêm 1 check máy (kiểu
+  `pointer_integrity.rs` của beegog) chạy trong `npm test`, xác nhận mọi
+  trích dẫn trỏ đúng file/heading thật, có negative-control fixture.
+- **Trích §6:** "Mảnh 1 (format + pointer-integrity)".
+- **D-ID áp dụng:** D1.
+- **Quan hệ với sibling:** mảnh 3 phụ thuộc mảnh này (cần format chốt trước
+  khi dọn file cũ theo đúng khuôn).
+- **Verify nháp:** `npm test` xanh + check mới bắt được ≥1 lỗi thật đã biết
+  (`fgos-coding-shaping/SKILL.md` D2/D4/D6 trần) trước khi sửa, và hết báo
+  lỗi sau khi sửa.
+
+### {#task-adr-reversal-sweep} Mảnh 2 — Reversal sweep cho ADR supersede
+- **Mục tiêu:** khi 1 quyết định `docs/decisions/` bị supersede, quét
+  `docs/**`+`.agents/skills/**` tìm chỗ trích id cũ, bắt xử lý (sửa hoặc
+  waive-có-lý-do) trước khi ghi supersede — thay kỷ luật tay hiện tại
+  (`0000-index.md` dòng 30-36).
+- **Trích §6:** "Mảnh 2 (reversal sweep)".
+- **D-ID áp dụng:** D1.
+- **Quan hệ với sibling:** độc lập với mảnh 1/3, có thể làm song song.
+- **Verify nháp:** supersede 1 ADR test có ≥1 chỗ trích cũ → sweep bắt
+  được, chặn ghi cho tới khi reconcile/waive.
+
+### {#task-retroactive-citation-cleanup} Mảnh 3 — Dọn tài liệu cũ đang vi phạm
+- **Mục tiêu:** sửa lại ~36 file trích D-local trần, ~62 file trích RUL
+  trần không kèm area, tới ~69 file khớp mẫu ADR trần (số cần xác minh lại
+  khi lập kế hoạch) theo đúng khuôn mảnh 1. Sửa `.agents/skills/` nguồn là
+  đủ — không sửa `.claude/skills/*` (bản sinh tự động).
+- **Trích §6:** "Phạm vi giờ bao gồm quét/sửa tài liệu CŨ".
+- **D-ID áp dụng:** §3 #6 (chưa mint D-ID riêng — xem ghi chú round 4).
+- **Quan hệ với sibling:** phụ thuộc mảnh 1 (cần khuôn format tồn tại
+  trước).
+- **Verify nháp:** check máy của mảnh 1 chạy sạch trên toàn `docs/`+
+  `.agents/skills/` sau khi dọn.
