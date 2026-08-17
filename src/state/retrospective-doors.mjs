@@ -30,6 +30,18 @@ const D_ID_TEXT_PREFIX_PATTERN = /^(D\d+):/;
 // sides read as non-word) -- confirmed by direct test, not assumed.
 const DEFERRAL_PATTERN = /để sau|sẽ làm sau|\b(?:to do later|TODO|for later|deferred to)\b/i;
 const TRACKING_REF_PATTERN = /\b(tsk-[a-z0-9]+|STR\d+|ADR\d{4})\b/i;
+// tsk-1lv review-fix F7: `refs` (command-registry.mjs: "Comma-separated
+// list of reference ids/links") holds a mix of real file paths AND bare
+// work-item/tracking ids -- checkFreshnessDoor used to run
+// `fs.existsSync` against every entry unconditionally, so any tsk-*/STR*/
+// ADR-shaped id (never a path on disk) reported a false dangling-source
+// finding on every sweep (measured against the live log: 15 of 100
+// distinct refs values across the repo). A whole-string match (not
+// TRACKING_REF_PATTERN's `\b...\b` substring test above, which would also
+// wrongly skip a real path that happens to CONTAIN an id-shaped segment)
+// is the correct test here: an id reference never needs a freshness
+// check at all, a path does.
+const ID_LIKE_REF_PATTERN = /^(tsk-[a-z0-9-]+|STR\d+|ADR\d{4}|D-ADR\d{4})$/i;
 
 function docsRefDir(item) {
   return typeof item.docsRef === 'string' && item.docsRef.trim() ? item.docsRef.replace(/\/+$/, '') : null;
@@ -47,7 +59,10 @@ export function checkFreshnessDoor(item, repoRoot) {
   const docsRef = docsRefDir(item);
   if (docsRef) candidatePaths.push(docsRef);
   for (const ref of item.refs ?? []) {
-    if (typeof ref === 'string' && ref.trim()) candidatePaths.push(ref);
+    if (typeof ref !== 'string' || !ref.trim()) continue;
+    const trimmed = ref.trim();
+    if (ID_LIKE_REF_PATTERN.test(trimmed)) continue;
+    candidatePaths.push(trimmed);
   }
   for (const p of candidatePaths) {
     if (!fs.existsSync(path.join(repoRoot, p))) {
@@ -63,11 +78,26 @@ export function checkFreshnessDoor(item, repoRoot) {
 
 /**
  * Impact door (bee's "còn doc nào vẫn cite một decision của chính feature
- * chưa reconcile"): for every scope-carrying decision THIS item itself
- * logged with `--relation supersedes:<oldId>` (tsk-1lv-1), re-run the same
- * write-time widened citation sweep at close time -- a dangling citation
- * of the old id that surfaced (and may have been left unreconciled) at
- * write-time is a real, current impact-door finding now.
+ * chưa reconcile"): for every ITEM-SCOPED decision (`d.id === item.id`)
+ * THIS item itself logged with `--relation supersedes:<oldId>`
+ * (tsk-1lv-1), re-run the same write-time widened citation sweep at close
+ * time -- a dangling citation of the old id that surfaced (and may have
+ * been left unreconciled) at write-time is a real, current impact-door
+ * finding now.
+ *
+ * **Known gap (tsk-1lv review-fix F8, not fixed here):** a platform-level
+ * `--scope` decision (no `--id`, e.g. every one of tsk-1lv-4's 34 ADR-
+ * retirement writes) has no owning item, so it can never be caught by
+ * ANY item's retrospective sweep -- this door is structurally item-scoped
+ * and there is no natural item to hang a platform decision's close-time
+ * check on. The write-time sweep (`bin/fgos.mjs`'s `decision` case, F3)
+ * DOES correctly fire for `--scope` writes after the F3 fix -- that is
+ * the real, working safety net for platform-level supersessions today;
+ * this door only ever re-checks it for item-scoped ones. Building a
+ * separate, item-independent sweep for `--scope` decisions (e.g. wired
+ * into `decision-index --check` or `fgos doctor`, which already visit
+ * every scope-carrying decision) is real follow-up work, not a small fix
+ * -- out of this review round's scope.
  */
 export function checkImpactDoor(item, decisions, repoRoot) {
   const findings = [];

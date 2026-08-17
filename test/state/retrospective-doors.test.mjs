@@ -65,6 +65,20 @@ test('checkFreshnessDoor: flags a dangling ref path independently of docsRef', (
   assert.equal(findings[0].path, 'src/does-not-exist.mjs');
 });
 
+test('checkFreshnessDoor: a bare tsk-*/STR*/ADR*-shaped ref is never treated as a file path -- F7 tsk-1lv regression (refs holds a mix of ids and paths, per command-registry.mjs)', () => {
+  const repoRoot = tmpRepoRoot();
+  const item = { id: 'host-item', refs: ['tsk-53f', 'tsk-1an-2', 'STR72', 'ADR0030', 'D-ADR0030'] };
+  assert.deepEqual(checkFreshnessDoor(item, repoRoot), []);
+});
+
+test('checkFreshnessDoor: still flags a dangling real path even when refs also contains id-shaped entries', () => {
+  const repoRoot = tmpRepoRoot();
+  const item = { id: 'host-item', refs: ['tsk-53f', 'src/does-not-exist.mjs'] };
+  const findings = checkFreshnessDoor(item, repoRoot);
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0].path, 'src/does-not-exist.mjs');
+});
+
 // --- checkImpactDoor (pure) ---
 
 test('checkImpactDoor: flags a dangling citation of an old id THIS item declared it supersedes', () => {
