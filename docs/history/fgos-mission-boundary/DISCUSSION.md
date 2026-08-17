@@ -4,14 +4,17 @@ Item: tsk-4us
 
 ## 1. Trạng thái hiện tại
 
-Vòng 1 — vừa scout xong, chưa chốt gì. Đã trình bày cho người dùng: 3 pattern
-liên quan từ upstream `beegog` (đã distill sẵn, chưa port), 3 mẩu bằng chứng
-sống trong chính forgent (README's mission framing, `docs/distribution-vision.md`
-D§1, backlog STR25), và 1 bug thật đang mở (tsk-4us's dependency-candidate bị
-từ chối, `tsk-1js`) chứng minh sự lẫn lộn đang gây hại thật. Đang chờ người
-dùng phản hồi trên khung đặt câu hỏi: đây là bậc thứ 5 của CÙNG danh sách ưu
-tiên `0030`, hay một trục hoàn toàn khác (tách biệt priority-ordering khỏi
-role/scope-ownership) đứng cạnh nó?
+Vòng 2. Q1 đã có câu trả lời (đứng riêng cạnh `0030`, không phải bậc #5) —
+giữ ở §3 chờ ổn định qua ≥1 vòng nữa trước khi mint D-ID, đúng luật D4. Q2
+đã được trả lời chi tiết hơn (cơ chế máy thật của bee: state-transition guard
++ config key + digest-on-close, không chỉ prose) — xem §5 vòng 2. Q3 hoá ra
+dựa trên một giả định SAI: forgentX không phải trường hợp "chưa có host
+project" — scout thực tế cho thấy fgOS đã vận hành thật trên ≥4 project khác
+(`mdview`, `herdr-gateway`, `fgos-test-drive`, và một bản `forgent-workshop`
+đã tự triển khai đúng topology repo-divorce của bee, coi `forgentX`/`forgent`
+làm sản phẩm nested `./repo`). Q3 đã viết lại cho khớp thực tế, đang chờ
+người dùng xác nhận quan hệ `forgent-workshop` ↔ `forgentX` trước khi bàn
+tiếp.
 
 ## 2. Mục tiêu & đề bài
 
@@ -33,11 +36,11 @@ này phục vụ ai" trước khi làm — học theo cách upstream `beegog` (b
 
 | # | Câu hỏi | Trạng thái | Ghi chú |
 |---|---|---|---|
-| Q1 | Ranh giới self-vs-host này là bậc #5 của CÙNG danh sách ưu tiên 0030, hay một trục khác đứng riêng (role/scope) không cùng chiều với priority-ordering? | chưa rõ | Đang chờ người dùng — xem phân tích trong Q&A log vòng 1 |
-| Q2 | Cơ chế thực thi: chỉ là văn bản doctrine (đọc rồi tự giác), hay có phần MÁY kiểm được (như bee's `product_root` config, `evolving-loop-two-gates` — self-mod chỉ chạy khi mechanically gated)? | chưa rõ | beegog cho thấy văn bản không đủ — họ có cả config-key + gate cơ học |
-| Q3 | forgentX hiện là single-repo (fgOS vừa là harness vừa là sản phẩm) — có cần thật sự tách `product_root`/repo-divorce (bee's pattern) hay chỉ cần văn bản phân vai rõ hơn cho tới khi có host-project thật để dogfood? | chưa rõ | Liên quan STR25 (dogfood tự-phát-triển) đã ghi nhận topology "xưởng điều phối" nhưng chưa mechanize |
+| Q1 | Ranh giới self-vs-host này là bậc #5 của CÙNG danh sách ưu tiên 0030, hay một trục khác đứng riêng (role/scope) không cùng chiều với priority-ordering? | **trả lời: đứng riêng cạnh** | Người dùng chốt vòng 2: "riêng đứng cạnh". Chờ ổn định ≥1 vòng nữa trước khi mint D-ID (D4) |
+| Q2 | Cơ chế thực thi: chỉ là văn bản doctrine, hay có phần MÁY kiểm được? | **trả lời: có, chi tiết ở §5 vòng 2** | bee dùng 3 tầng: state-transition guard (`chain-integrity-guard-tail`), config key (`product_root`), digest-on-close + 2 human gate (`evolving-loop-two-gates`) |
+| Q3 | (VIẾT LẠI — Q3 gốc sai giả định) forgentX/forgent-workshop đã có sẵn ≥4 host project thật + một bản repo-divorce thật (`forgent-workshop` + `./repo`). Vision này áp cho những case ĐÃ chạy tốt đó, hay phạm vi hẹp hơn: chỉ riêng session đứng TRONG `forgentX` (nơi self-dev và product-dev là CÙNG một repo, không phân biệt được bằng cấu trúc)? | chưa rõ | Cần người dùng xác nhận quan hệ `forgent-workshop`(`.bee/`, `repo/` = `file:./repo` dep tên `forgent`) ↔ `forgentX` (package.json name `forgent`, tự nó là product) — hai bản coordinator có song song không, cái nào là canonical đường tới |
 | Q4 | tsk-1js (Iron Law hard-code module path của chính fgOS, im lặng bỏ qua host project) — có nên là ví dụ neo/case-study trong tài liệu vision này không, dù không gắn dependency? | chưa rõ | Người dùng đã chọn KHÔNG gắn dependency; nhưng dùng làm ví dụ minh hoạ trong prose là việc khác |
-| Q5 | Vị trí vật lý: decision mới trong `docs/decisions/` (số kế tiếp sau 0034) + trỏ từ AGENTS.md, hay một luật L-mới trong `docs/platform-foundations.md` (cạnh L8 doctrine placement / L9 run≠merge≠durable), hay cả hai? | chưa rõ | Phụ thuộc câu trả lời Q1 |
+| Q5 | Vị trí vật lý: decision mới trong `docs/decisions/` (số kế tiếp sau 0034) + trỏ từ AGENTS.md, hay một luật L-mới trong `docs/platform-foundations.md` (cạnh L8 doctrine placement / L9 run≠merge≠durable), hay cả hai? | chưa rõ | Q1 đã nghiêng "đứng riêng cạnh" → gợi ý cả hai (decision ghi QUYẾT ĐỊNH + WHY, platform-foundations ghi LUẬT ngắn always-loaded) nhưng chưa hỏi người dùng trực tiếp |
 
 ## 4. Quyết định đã chốt
 
@@ -136,3 +139,88 @@ hay một luật riêng — ví dụ một `docs/decisions/003x` mới + một m
 bậc, được AGENTS.md trỏ tới ngay sau đoạn "Product priority order" hiện có
 (khớp đúng nghĩa "đứng sau" người dùng dùng, mà không cần là phần tử thứ 5
 của cùng một list)?
+
+### Vòng 2 — 2026-08-17
+
+**Người dùng trả lời:**
+- Q1: "riêng đứng cạnh" — xác nhận hướng tách trục, không nối vào `0030`.
+- Q2: "nói rõ hơn bee kiểm máy như thế nào" — yêu cầu đào sâu hơn, không
+  chấp nhận mô tả rút gọn ở vòng 1.
+- Q3: "chưa hiểu là làm việc gì, vì fgos đang vận hành nhiều project khác"
+  — phản bác giả định nền của Q3 gốc.
+
+**Scout thêm cho Q2** (đọc lại `docs/distillery/sources/beegog.md` đầy đủ
+entry, không chỉ tóm tắt compressed):
+
+- `chain-integrity-guard-tail` (dòng 408-413) — đây là mảnh MÁY THẬT gần
+  nhất với "self-mod discipline" của bee, không phải `evolving-loop-two-gates`
+  đơn thuần: đuôi chain (execution → scribing → compounding → terminal)
+  được canh **tại cửa transition bằng code**, không bằng tên phase-string.
+  3 luật cụ thể: (a) phase `compounding` KHÔNG settable trực tiếp — chỉ một
+  lệnh `state scribing-run` thật sự chạy mới sinh ra được nó (producer thật,
+  không phải giá trị enum ai cũng gõ được); (b) `scribing-run` tự nó bị từ
+  chối trừ khi phase hiện tại chứng minh execution đã THẬT SỰ xảy ra; (c)
+  `compounding-complete` (trạng thái đóng) bị chặn cứng khi spec-debt > 0,
+  waiver phải ghi thành một decision bền, nêu rõ từng unit được miễn — không
+  im lặng bỏ qua. Nguồn gốc: post-mortem một phiên thật đã "giả 7 lần close"
+  bằng cách hand-edit phase string mà không hề chạy compounding — chứng
+  minh "kiểm bằng enum suông" không đủ, phải kiểm PRODUCER.
+- `evolving-loop-two-gates` (dòng 620-624, đã trích vòng 1) — vòng tự cải
+  tiến cụ thể: digest tự sinh KHÔNG TỐN CÔNG khi một feature đóng → xếp
+  hạng theo pain×frequency×corroboration → **Gate A** (người chọn cluster
+  nào để sửa, không phải máy tự chọn) → fix áp qua kỷ luật viết-skill chuẩn
+  (không sửa inline tuỳ tiện) → suite test phải xanh → **Gate B** (người
+  duyệt diff thật trước khi merge) → push lên remote là MỘT bước tay có
+  tên riêng, không tự động. Ràng buộc định vị: "chỉ chạy trong repo bee" —
+  nghĩa đen là cơ chế này (đường dẫn config/detect repo) không kích hoạt
+  khi bee đang vận hành trên MỘT project khác, chỉ khi đang vận hành trên
+  chính source của bee.
+- `product-root-repo-divorce-topology` (dòng 580-584, đã trích vòng 1) —
+  config key `product_root` trong `.bee/config.json` (hoặc tương đương):
+  khi SET, mọi lệnh cần đọc tài liệu SẢN PHẨM (`docs/backlog.md`,
+  `docs/specs/`) resolve theo path đó thay vì theo root của chính `.bee/`
+  — tách vật lý "tài liệu bee tự ghi về mình" khỏi "tài liệu về sản phẩm
+  bee đang điều phối". Khi UNSET, mặc định coi bee-root cũng là product-root
+  (trường hợp self-host, đúng tình huống forgentX hiện tại). Set mà path
+  không tồn tại → cảnh báo to (fail-loud), không âm thầm rơi về mặc định.
+- Tổng hợp cho Q2: bee không có MỘT cơ chế duy nhất, mà 3 tầng độc lập
+  chồng lên nhau — (1) transition-guard tại state machine (chặn giả-đóng),
+  (2) config-key tách đường dẫn đọc-tài-liệu (chặn nhầm tài liệu bee với
+  tài liệu sản phẩm), (3) gate-người 2 lớp + giới hạn phạm-vi-repo cho riêng
+  luồng tự-sửa-mình. Cả 3 đều KIỂM ĐƯỢC bằng code/test, không dựa vào agent
+  tự giác đọc doctrine.
+
+**Scout thêm cho Q3** (kiểm tra giả định "chưa có host project"):
+
+- `fgos list --json` không đủ — kiểm trực tiếp máy: `find ~/projects
+  -maxdepth 3 -iname ".fgos"` (không tính forgentX) → 4 kết quả thật:
+  `mdview/.fgos`, `herdr-gateway/.fgos`, `fgos-test-drive/.fgos`,
+  `forgent/repo/.fgos`. Cộng thêm `~/.fgos` (store toàn-máy) và global
+  config `~/.fgos/config.json` có `bin.globalFgosPath` trỏ pnpm global bin
+  — xác nhận fgOS ĐÃ cài global, ĐÃ chạy thật trên nhiều checkout khác
+  nhau, không phải giả thuyết tương lai.
+- `~/projects/forgent/package.json`: `{"name": "forgent-workshop", ...,
+  "dependencies": {"forgent": "file:./repo"}}` — đây LÀ một bản triển khai
+  thật của đúng topology `product-root-repo-divorce` (dù chưa chắc dùng
+  chung field `product_root`): một package "xưởng" ngoài, phụ thuộc vào
+  `./repo` (tên gói `forgent`) làm sản phẩm nested. `forgent/` còn giữ cả
+  `.bee/` lẫn `.agents/`/`.claude/`/`.codex/` — cho thấy đây có thể là một
+  bản thử nghiệm còn sống song song, không phải di tích đã bỏ.
+- `forgentX/package.json`: tên gói cũng là `"forgent"`, version `0.1.0` —
+  tức forgentX rất có thể LÀ (hoặc cùng dòng với) chính cái `forgent/repo`
+  mà `forgent-workshop` đang coi là sản phẩm nested — nhưng ở đây, trong
+  `forgentX`, không có xưởng ngoài nào bọc nó: fgOS tự vận hành trực tiếp
+  trên chính source của mình, một checkout, không phân lớp.
+- Kết luận sơ bộ cho Q3: giả định gốc ("forgentX chưa có host project để
+  test") sai — sai vì hai lý do khác nhau cùng lúc. (a) fgOS đã có nhiều
+  host project THẬT đang chạy ổn (mission 1/2 đã sống, không phải lý
+  thuyết); (b) topology repo-divorce của bee cũng đã có một bản triển khai
+  THẬT song song (`forgent-workshop`), chỉ là KHÔNG RÕ nó có phải đường
+  chính thức hiện hành hay là một nhánh thử nghiệm cũ. Câu hỏi thật sự cần
+  hỏi lại không phải "có cần mechanize không" mà là: phạm vi của vision này
+  có nên NÓI GÌ về quan hệ `forgent-workshop` ↔ `forgentX`, hay giới hạn
+  chặt vào đúng một câu hỏi hẹp hơn — khi một session đứng TRONG `forgentX`
+  (single-repo, tự-host), làm sao phân biệt được lúc nào đang làm mission
+  #3 (sửa fgOS) so với lúc nào đang thật ra phục vụ #1/#2 (fgOS-cho-host
+  khác) — vì trong `forgentX` hai việc này KHÔNG tách được bằng cấu trúc
+  thư mục như bee làm được nhờ `product_root`.
