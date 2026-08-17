@@ -97,3 +97,66 @@ above (2 baselined identical-key findings + a genuine 3rd occurrence →
 1 new reported, not 0), runnable via the same
 `node --test test/scripts/check-decision-citation-drift.test.mjs` surface
 tsk-3x8 already uses.
+
+## Round 2 (tsk-6at, deeper "unknown unknowns" pass before merge, per user direction)
+
+**Goal:** look past the already-fixed bug for anything not yet anticipated
+— multi-occurrence correctness, determinism, blast radius drift, citation
+accuracy in this item's own docs, and unrelated breakage.
+
+**Checked, correct (no bug):**
+- **Multiple new occurrences at once** (not just one): 2 baselined + 2
+  genuinely new identical-key findings → `findNewFindings` correctly
+  reports 2 new (lines 15 and 22), not 1. The fix generalizes past the
+  single-extra-occurrence case the regression test covers.
+- **Baseline regeneration determinism:** ran `--write-baseline` twice in a
+  row against the real repo tree into two separate scratch paths — the
+  two output files are byte-identical. No ordering-driven diff churn risk
+  from the duplicate-key array shape.
+- **Blast radius, re-confirmed post-implementation:** `findNewFindings`/
+  `baselineFromFindings` are still called only by this file's own
+  `runCli` and imported only by this file's own test — unchanged from the
+  planning-time grep.
+- **Citation accuracy in this item's own docs** (the exact failure class
+  the original bug report's F5 named — checked deliberately, not
+  assumed clean): `plan.md`'s gate-note citation of
+  `src/state/gate-bypass.mjs:232-233` re-read against the live file —
+  still accurate. `RESEARCH.md` Round 1's "7 files / 64 duplicate-key
+  groups" claim re-counted against the current committed baseline —
+  still exactly 7/64, unchanged (expected: the fix touches read-side
+  logic only, never the baseline's own stored shape).
+- **Full repo suite** (`node --test 'test/**/*.test.mjs'`, 154 files):
+  3504 tests, 3499 pass, 5 skipped (pre-existing, unrelated to this
+  change), 0 fail. No unrelated breakage anywhere in the repo.
+
+**Found, real but genuinely out of this item's own scope (flagged, not
+fixed):** a source file whose relative path is literally the string
+`"__proto__"` breaks `baselineFromFindings` — `baseline[file] = []`
+on a plain object attempts to reassign the object's own prototype
+instead of creating a normal property, and the following `.push()` then
+throws `TypeError: ... .push is not a function`. Confirmed:
+- **Pre-existing, not introduced by tsk-3x8 or tsk-6at** — the identical
+  `baseline[f.file]`/`baseline[file] = []` shape already existed in the
+  script at `d4a5f832` (the commit immediately before tsk-3x8's own
+  first commit).
+- **Shared by the sibling** `scripts/check-decision-codes.mjs` — same
+  plain-object-keyed-by-file-path pattern, same theoretical exposure.
+- **Not realistically exploitable here**: `file` values only ever come
+  from `path.relative(cwd, ...)` over real directory listings of
+  `docs/backlog.md`, `docs/specs/*.md`, and `--skills-dir` roots — local,
+  trusted paths this checker's own author controls, never external or
+  adversarial input. A real file literally named `__proto__` (no `.md`
+  extension survives the `.endsWith('.md')` filter, so it would need to
+  be `__proto__.md` specifically, which is even narrower) is not a
+  plausible accident.
+- **Out of this item's own scope**: fixing it would mean changing the
+  baseline's storage keying (e.g. a `Map` instead of a plain object)
+  across BOTH checker scripts, not a change to `findNewFindings`'s
+  duplicate-key counting logic this item exists to review. Named here as
+  a real, cross-cutting hardening follow-up — not silently dropped, not
+  silently rolled into this item's own diff either.
+
+**Verdict:** nothing in this item's own scope (`findNewFindings`'s
+duplicate-key handling in `check-decision-citation-drift.mjs`) needed a
+further fix this round. The one real gap found is pre-existing,
+cross-cutting, and belongs to a separate follow-up.
