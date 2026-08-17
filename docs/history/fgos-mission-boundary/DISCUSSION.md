@@ -4,20 +4,11 @@ Item: tsk-4us
 
 ## 1. Trạng thái hiện tại
 
-Vòng 4. **D1 chốt** (trục riêng, đứng cạnh `0030`). **Q3 chốt** (không
-mechanize repo-divorce). **Q6 vừa trả lời** (chờ ổn định, chưa mint D-ID):
-người dùng bác "design-intent per quyết định" (UX tệ) — cơ chế đúng là
-`purpose` khai báo MỘT LẦN lúc `fgos init`/`fgos setup` (deterministic),
-self-infer chỉ là fallback tệ-nhất-chấp-nhận-được khi thiếu khai báo. Scout
-xác nhận: cơ chế registry (`registerConfigDefault`/`registerCheck`) đã có
-sẵn, không cần phát minh mới; và tsk-1js's "hướng chưa chốt" (viết TRƯỚC
-cuộc thảo luận này, trong lúc shaping một item khác hẳn — tsk-1y6) hội tụ
-độc lập đúng khớp nguyên tắc người dùng vừa chốt. Đã đề xuất concrete 5
-điểm cho §6 (chưa chốt) trong chat, đang chờ xác nhận: (1) config key
-`purpose`, (2) doctor check cặp đôi, (3) self-infer fallback tối thiểu, (4)
-tsk-1js làm ứng viên thi công đầu tiên, (5) vị trí `docs/decisions/0035` +
-AGENTS.md pointer, không thêm L-law. Nếu người dùng xác nhận vòng tới, §6
-có thể viết và tiến tới terminal handoff.
+**HỘI TỤ.** Vòng 5, người dùng xác nhận toàn bộ 5 điểm đề xuất + chốt tên
+config key (`mission`, 2 values `self-dev`/`host`). D1-D5 đã mint (§4).
+Không còn câu hỏi mở trong §3. §6/§7 đã viết. Tiếp theo: terminal handoff
+vào `fgos-coding-exploring` cho tsk-4us, theo đúng D2 (Native-First
+Dispatch) của skill này.
 
 ## 2. Mục tiêu & đề bài
 
@@ -42,15 +33,20 @@ này phục vụ ai" trước khi làm — học theo cách upstream `beegog` (b
 | Q1 | ~~Ranh giới self-vs-host này là bậc #5 hay trục riêng?~~ | **CHỐT — D1** | Chuyển sang §4 |
 | Q2 | Cơ chế thực thi: chỉ là văn bản doctrine, hay có phần MÁY kiểm được? | **trả lời: có — declared config tại setup, xem §5 vòng 4** | Không phải bee's 3-tầng nguyên khối (loại vì Q3) — mà một config key khai báo MỘT LẦN lúc `fgos init`/`fgos setup`, qua registry sẵn có (`registerConfigDefault`/`registerCheck`, `src/setup/registrations.mjs`) |
 | Q3 | forgent-workshop ↔ forgentX quan hệ gì? | **trả lời: KHÔNG liên quan, đường đã bỏ** | `~/projects/forgent` là sản phẩm được phát triển TRONG workshop của chính bee-upstream (thí nghiệm của bee, không phải của fgOS). fgOS/forgentX CHƯA TỪNG phát triển theo mô hình workshop+repo-lồng — người dùng đã thử và tách riêng vì "quá nhiều vấn đề"; không rõ bee đã cải thiện chế độ này tới đâu. **Kết luận:** vision này KHÔNG đề xuất mechanize `product_root`/repo-divorce cho forgentX — đó là hướng đã thử và cố ý từ bỏ, không phải chưa thử tới |
-| Q4 | tsk-1js — case study? | **đề xuất: có, còn hơn thế** | tsk-1js's own "hướng chưa chốt" (MODULE_RULES thành config per-project trong `.fgos/config.json`) hội tụ ĐỘC LẬP với câu trả lời Q6 của người dùng — cùng một cơ chế. tsk-1js không chỉ là ví dụ minh hoạ, mà là ỨNG VIÊN THI CÔNG ĐẦU TIÊN thật của cơ chế này. Chờ người dùng xác nhận |
-| Q5 | Vị trí vật lý | **đề xuất: `docs/decisions/0035` + `AGENTS.md` pointer, KHÔNG thêm L-law mới** | Số kế tiếp có thật sau 0034 là 0035 (đã kiểm `ls docs/decisions/`, có 2 file cùng đánh số 0032 nhưng không chặn số mới). Đề xuất bớt lại: KHÔNG cần thêm L-law riêng trong `platform-foundations.md` — nội dung đã đủ hẹp/cụ thể để nằm gọn trong 1 decision + 1 đoạn AGENTS.md; giữ đúng KISS, không nhân đôi chỗ ghi. Chờ người dùng xác nhận |
-| Q6 | Ranh giới nhận diện bằng gì khi repo-divorce đã loại? | **trả lời vòng 4, chờ ổn định** | Người dùng bác "design-intent per quyết định" (UX quá tệ — không ép mỗi PBI tự trả lời câu hỏi mission). Thay bằng: khai báo `purpose` MỘT LẦN lúc setup/init (deterministic); tự-suy-luận (self-infer) chỉ là phương án tệ-nhất-chấp-nhận-được khi thiếu khai báo, không phải thiết kế trung tâm |
+| Q4 | tsk-1js — case study? | **CHỐT — D3** | Chuyển sang §4 |
+| Q5 | Vị trí vật lý | **CHỐT — D4** | Chuyển sang §4 |
+| Q6 | Ranh giới nhận diện bằng gì khi repo-divorce đã loại? | **CHỐT — D2** | Chuyển sang §4 |
+| Q7 | (MỚI vòng 5) Config key `mission` — bộ values là gì? | **CHỐT — D5** | Chuyển sang §4 |
 
 ## 4. Quyết định đã chốt
 
 | D-ID | Nội dung | Lý do |
 |---|---|---|
-| D1 | Ranh giới mission self-vs-host là một trục quyết định riêng, đứng CẠNH (không nối vào làm bậc #5) danh sách 4 bậc ưu tiên sản phẩm `docs/decisions/0030` | `0030` trả lời "khi hai giá trị xung đột, ưu tiên cái nào" (cùng trục, khác mức). Câu hỏi self-vs-host là phân loại đối tượng phục vụ TRƯỚC KHI bất kỳ ưu tiên nào ở trên áp dụng được — khác trục. Người dùng xác nhận vòng 2, giữ nguyên không đổi sang vòng 3 (D4: đủ điều kiện mint). Ghi máy: `fgos decision` seq 18960 |
+| D1 | Ranh giới mission self-vs-host là một trục quyết định riêng, đứng CẠNH (không nối vào làm bậc #5) danh sách 4 bậc ưu tiên sản phẩm `docs/decisions/0030` | `0030` trả lời "khi hai giá trị xung đột, ưu tiên cái nào" (cùng trục, khác mức). Câu hỏi self-vs-host là phân loại đối tượng phục vụ TRƯỚC KHI bất kỳ ưu tiên nào ở trên áp dụng được — khác trục. Người dùng xác nhận vòng 2, giữ nguyên không đổi sang vòng 3 (D4 rule của skill: đủ điều kiện mint). Ghi máy: `fgos decision` seq 18960 |
+| D2 | Cơ chế thực thi là config key `mission` khai báo MỘT LẦN lúc `fgos init`/`fgos setup` (deterministic), đăng ký qua registry sẵn có (`registerConfigDefault`/`registerCheck`, `src/setup/registrations.mjs`) — KHÔNG hỏi per-decision, KHÔNG bee-style repo-divorce | Người dùng bác khung design-intent-per-decision (UX quá tệ). Nguyên tắc chốt: khai báo một lần lúc setup là đường chính deterministic; tự-suy-luận chỉ là fallback tệ-nhất-chấp-nhận-được khi thiếu khai báo. Registry đã có sẵn, đúng cửa AGENTS.md's Install/setup/doctor gate. Ghi máy: seq 18967 |
+| D3 | tsk-1js là ứng viên thi công ĐẦU TIÊN thật của cơ chế `mission` — Iron Law's `MODULE_RULES` đọc theo `mission`: `self-dev` dùng 9 dòng hiện tại làm mặc định của fgOS, `host` đọc danh sách module nhạy cảm riêng của chính project đó (rỗng mặc định) | tsk-1js tự nó đã đề nghị hướng "MODULE_RULES thành cấu hình per-project" TRƯỚC cả cuộc thảo luận này, lúc shaping một item khác hẳn (tsk-1y6) — hội tụ độc lập đúng khớp D2. Không gắn dependency (người dùng đã từ chối vòng 1) nhưng dùng làm ví dụ neo + ứng viên thi công đầu tiên trong prose. Ghi máy: seq 18968 |
+| D4 | Vị trí vật lý: `docs/decisions/0035` (số kế tiếp thật sau 0034) + một đoạn trỏ mới trong `AGENTS.md` ngay sau "Product priority order" — KHÔNG thêm mục L-law mới vào `docs/platform-foundations.md` | Nội dung đủ hẹp/cụ thể để nằm gọn trong 1 decision + 1 đoạn AGENTS.md; thêm L-law riêng sẽ nhân đôi chỗ ghi, vi phạm KISS. D1 chốt "đứng cạnh" không bắt buộc phải có L-law riêng. Ghi máy: seq 18969 |
+| D5 | Config key tên là `mission`, bộ values tối giản 2 mức: `self-dev` \| `host` — KHÔNG tách riêng mission #1 (phát triển project khác) và #2 (vận hành business workflow) thành hai giá trị khác nhau | Tên khớp trực tiếp vocab đã dùng xuyên suốt thảo luận (mission 1/2/3 từ câu hỏi gốc người dùng), không đụng tên đã có nghĩa khác (`kind`/`tier`/`scope`). Value set tối giản vì chưa có consumer cơ học nào (Iron Law/`MODULE_RULES`) cần phân biệt 1 với 2 — cả hai đều chỉ cần biết host không phải là chính fgOS. Đúng tiền lệ STR82 (declined cho tới khi có bằng chứng dogfood thật cần tới). Ghi máy: seq 18970 |
 
 ## 5. Q&A log
 
@@ -327,3 +323,139 @@ hỏi xác nhận):**
    trong `AGENTS.md` ngay sau "Product priority order" — KHÔNG thêm mục
    L-mới vào `platform-foundations.md` (nội dung đủ hẹp để gọn trong một
    decision, tránh nhân đôi chỗ ghi, giữ KISS).
+
+### Vòng 5 — 2026-08-17
+
+**Người dùng:** "xác nhận 5 điểm. purpose, mission, type, scope?" — xác
+nhận toàn bộ 5 điểm đề xuất vòng 4, giao quyền chọn tên config key trong 4
+phương án.
+
+**Quyết định tên** (trình bày rồi chốt luôn, không hỏi lại — đã đủ căn cứ
+để quyết theo đúng nguyên tắc "quyết khi phương án đã rõ thắng"): `mission`
+— khớp trực tiếp vocab xuyên suốt thảo luận, không đụng tên đã có nghĩa
+khác trong fgOS (`kind`/`tier`; `scope` đã mang nghĩa khác ở review/gate/
+footprint). D2-D5 mint ngay (§4) vì đây là xác nhận tường minh của người
+dùng ("xác nhận 5 điểm"), không phải một câu trả lời còn có thể lung lay —
+khác `answered` thông thường, `confirm` là hành động chốt.
+
+**Người dùng hỏi giữa chừng:** "bộ values là gì" — trả lời trực tiếp trong
+chat: 2 giá trị tối giản `self-dev` \| `host`, không tách mission #1/#2
+thành hai giá trị riêng vì chưa có consumer cơ học nào cần phân biệt (D5).
+
+Tất cả Q1-Q7 đã chốt (D1-D5). Không còn câu hỏi mở. Chuyển sang viết §6/§7
+và terminal handoff.
+
+## 6. Thiết kế đã chốt {#design}
+
+fgOS được tạo ra để phục vụ hai vai trò ngoài chính nó — vận hành/phát
+triển các project khác (mission #1), và làm nền cho các business base
+workflow (mission #2) — chứ không phải để tự phát triển chính nó là sứ
+mệnh chính (mission #3, chỉ là dogfood cần thiết trong lúc xây). Bằng
+chứng thật (không phải lý thuyết): fgOS đã cài global và đang vận hành
+thật trên ≥4 checkout khác ngoài `forgentX` (`mdview`, `herdr-gateway`,
+`fgos-test-drive`, `forgent/repo`) — mission #1/#2 đã sống. Nhưng agent
+làm việc TRONG chính `forgentX` (nơi fgOS tự-host trên chính source của
+mình) liên tục rơi vào coi mission #3 là trung tâm, vì đó là công việc
+trước mắt cụ thể nhất trong repo này.
+
+**Trục quyết định (D1).** Ranh giới self-vs-host là một trục PHÂN LOẠI
+ĐỐI TƯỢNG PHỤC VỤ, khác hẳn trục ƯU TIÊN của `docs/decisions/0030` (Ship
+Faster > Release con người > DoD > Polish). `0030` trả lời "khi hai giá
+trị xung đột, ưu tiên cái nào" — cùng một trục, khác mức độ. Câu hỏi
+self-vs-host phải được trả lời TRƯỚC KHI bất kỳ bậc nào trong 4 bậc đó áp
+dụng được — nên đứng CẠNH `0030`, không nối vào làm bậc thứ 5 (tránh bị
+đọc nhầm là "yếu hơn cả Polish sau DoD", theo đúng luật "bậc dưới không
+ghi đè bậc trên" của `0030`, vốn không áp cho một trục khác).
+
+**Cơ chế nhận diện (D2, D5).** Upstream `beegog` (bee) giải bài toán này
+bằng cấu trúc thư mục — `product_root` tách vật lý coordinator khỏi sản
+phẩm nested. fgOS đã THỬ mô hình workshop+repo-lồng tương tự (chính
+`beegog` này, qua `forgent-workshop` ở máy người dùng) và CHỦ ĐỘNG rút lui
+vì gặp vấn đề thật trong thực tế — không phải chưa thử tới (D3-liên-quan
+qua Q3). forgentX vẫn tiếp tục single-repo, tự-host: mission #3 và
+mission #1/#2 sống chung một cây file, không tách được bằng path.
+
+Thay vì hỏi ý định của TỪNG quyết định (UX tệ — người dùng bác thẳng) hay
+suy luận tự động làm trung tâm (kém deterministic), ranh giới được nhận
+diện bằng một **config key khai báo một lần** — `mission`, giá trị
+`self-dev` hoặc `host` — thiết lập lúc `fgos init`/`fgos setup`, đăng ký
+qua registry sẵn có của fgOS (`registerConfigDefault`/`registerCheck`,
+`src/setup/registrations.mjs`), đúng cửa mà `AGENTS.md`'s "Install/setup/
+doctor gate" đã bắt buộc cho MỌI config default mới. `fgos doctor` báo khi
+chưa khai báo (không im lặng, theo đúng contract "absent capability =
+clean skip, never hidden" các check khác trong registry đã dùng). Khi
+chưa khai báo, fgOS tự suy luận tối thiểu (self-infer, ví dụ so khớp
+`package.json` name/cấu trúc nguồn với fingerprint của chính fgOS) — đây
+là phương án TỆ NHẤT CHẤP NHẬN ĐƯỢC, không phải đường thiết kế trung tâm;
+không đầu tư heuristic phức tạp cho tới khi có bằng chứng dogfood thật cần
+(tiền lệ STR82, declined cùng lý do).
+
+**Ứng viên thi công đầu tiên (D3).** `tsk-1js` (Iron Law's `MODULE_RULES`
+hard-code path của chính fgOS — 4 ca thực nghiệm Next.js/Python/Go/Rails
+đều `required: false` sai trên host project) là bằng chứng thiệt hại thật
+của đúng lỗ hổng này: Iron Law tự mô tả là "self-modifying-capable module
+list" (mission-#3-shaped) nhưng bị áp UNIVERSAL cho mọi repo fgOS vận
+hành. tsk-1js's ghi chú "hướng chưa chốt" — viết TRƯỚC cả cuộc thảo luận
+này, lúc shaping một item khác hẳn (tsk-1y6) — tự đề nghị đúng cơ chế
+`mission`-driven config, hội tụ độc lập. Fix: `mission=self-dev` → dùng 9
+dòng `MODULE_RULES` hiện tại làm mặc định của fgOS; `mission=host` → đọc
+danh sách module nhạy cảm riêng của project đó (rỗng mặc định, KHÔNG kế
+thừa list của fgOS). tsk-1js giữ KHÔNG gắn dependency với tsk-4us (người
+dùng từ chối vòng 1) — quan hệ là "informed by", không phải "blocked by".
+
+**Vị trí vật lý (D4).** `docs/decisions/0035` (số kế tiếp thật sau 0034)
+ghi quyết định + lý do đầy đủ; một đoạn trỏ mới trong `AGENTS.md` ngay sau
+"Product priority order" (khớp nghĩa "đứng sau" người dùng dùng ban đầu —
+đứng sau về VỊ TRÍ VĂN BẢN, không phải bậc ưu tiên thấp hơn). Không thêm
+mục L-law mới vào `docs/platform-foundations.md` — nội dung đủ hẹp để nằm
+gọn trong một decision, tránh nhân đôi chỗ ghi.
+
+```mermaid
+flowchart TB
+    subgraph priority["Trục ưu tiên (0030) -- KHI xung đột, ưu tiên gì"]
+        P1["1. Ship Faster"] --> P2["2. Release con người"] --> P3["3. DoD"] --> P4["4. Polish sau DoD"]
+    end
+    subgraph mission["Trục mission (0035, D1) -- AI đang được phục vụ"]
+        M{"mission config<br/>self-dev | host"}
+    end
+    mission -.trục khác, áp TRƯỚC.-> priority
+
+    Setup["fgos init / fgos setup"] -->|"khai báo 1 lần (D2)"| Config[(".fgos/config.json<br/>mission: self-dev|host")]
+    Config --> Doctor["fgos doctor<br/>báo khi chưa khai báo"]
+    Config -->|thiếu khai báo| Infer["self-infer fallback<br/>(tệ nhất chấp nhận được)"]
+    Infer -.-> Config
+
+    Config --> IronLaw["Iron Law MODULE_RULES<br/>(tsk-1js, D3)"]
+    IronLaw -->|self-dev| FgosRules["9 dòng mặc định của fgOS"]
+    IronLaw -->|host| HostRules["danh sách riêng của host project<br/>(rỗng mặc định)"]
+```
+
+## 7. Danh mục hạng mục / task {#tasks}
+
+### {#task-mission-boundary-vision}
+
+**Mục tiêu.** Viết `docs/decisions/0035` (quyết định + lý do đầy đủ, theo
+đúng khuôn các file `docs/decisions/00xx-*.md` hiện có) và một đoạn trỏ
+mới trong `AGENTS.md` ngay sau "Product priority order" — thiết lập
+mission #1/#2 là sứ mệnh thật, mission #3 (tự-phát-triển) là hoạt động
+dogfood có gate riêng, không phải mặc định.
+
+**Trích §6 áp dụng.** Toàn bộ — đây là §7 duy nhất, thiết kế không có
+điểm nào tách được thành một mảnh độc lập nhỏ hơn.
+
+**D-ID áp dụng.** D1 (trục riêng), D2 (cơ chế config khai báo), D3
+(tsk-1js làm ứng viên đầu tiên, nêu trong decision như một ví dụ minh hoạ
+— KHÔNG gắn dependency), D4 (vị trí vật lý), D5 (tên key + value set).
+
+**Quan hệ với item khác.** `tsk-1js` (Iron Law `MODULE_RULES` per-project)
+là follow-up TỰ NHIÊN của quyết định này khi implement — nhưng KHÔNG phải
+dependency (người dùng chọn giữ độc lập, vòng 1). Quyết định 0035 chỉ cần
+NÊU tsk-1js làm ví dụ, không cần tsk-1js đóng trước.
+
+**Verify nháp.** `test -f docs/decisions/0035-*.md && grep -q "mission"
+docs/decisions/0035-*.md && grep -q "0035" AGENTS.md && grep -q "mission"
+AGENTS.md` — kiểm decision doc tồn tại + có nội dung + AGENTS.md thật sự
+trỏ tới nó. Phạm vi có cần thêm code (`registerConfigDefault`/
+`registerCheck` cho key `mission`) hay chỉ dừng ở tài liệu quyết định là
+câu hỏi của `fgos-coding-planning` (split-work judgment), không quyết ở
+đây.
