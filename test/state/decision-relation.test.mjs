@@ -140,6 +140,24 @@ test('findWideCitationFindings: whole-word match only -- does not flag a substri
   assert.equal(findings.length, 0);
 });
 
+test(
+  'collectWideSourceFiles: default roots reach .agents/skills, a stale ' +
+    'citation there is no longer invisible (tsk-12v)',
+  () => {
+    const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-wide-sweep-skills-'));
+    fs.mkdirSync(path.join(cwd, '.agents', 'skills', 'sample-skill'), { recursive: true });
+    fs.writeFileSync(
+      path.join(cwd, '.agents', 'skills', 'sample-skill', 'SKILL.md'),
+      '---\nname: sample-skill\n---\ncites OLDID directly\n',
+    );
+    const sources = collectWideSourceFiles(cwd);
+    const skillFile = sources.find((s) => s.file.includes('sample-skill'));
+    assert.ok(skillFile, 'default roots must reach .agents/skills');
+    const findings = findWideCitationFindings([skillFile], 'OLDID', 'tsk-new');
+    assert.equal(findings.length, 1);
+  },
+);
+
 // --- CLI: `fgos decision` requires --relation ---
 
 test('CLI: decision without --relation is refused, exit 4', () => {
