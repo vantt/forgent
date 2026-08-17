@@ -4,13 +4,19 @@ Item: `tsk-37i`.
 
 ## 1. Trạng thái hiện tại
 
-Round 1. Vừa scout xong hệ thống trích dẫn (ADR/RUL/D-local) hiện có trong
-fgOS — kết quả: **cả ba hệ đều đã có convention thành văn**, nhưng convention
-chỉ sửa *hình dạng chữ* (prefix `ADR<n>`, `RUL<n>`, suffix `(area)`), không
-yêu cầu một tóm tắt-một-dòng đi kèm ngay tại chỗ trích. Hai vi phạm cụ thể đã
-xác nhận trực tiếp trong repo (không phải suy đoán) sẽ trình bày cho người
-dùng ở lượt này. Chưa có quyết định nào chốt (§4 rỗng) — đang ở giai đoạn
-trình bày phân tích trước khi hỏi hướng đi.
+Round 2. Round 1 scout xong hệ thống trích dẫn nội bộ fgOS (ADR/RUL/D-local)
+— cả ba đã có convention thành văn nhưng chỉ sửa hình dạng chữ, không đòi
+tóm tắt nội dung, và luật D-local đang bị phá ở diện rộng (xem §3 #1-3).
+Người dùng yêu cầu quét thêm upstream `bee`/`beegog` xem họ giải quyết vấn
+đề tương tự thế nào, và cập nhật lại bản clone gốc (`upstreams/bee` mô tả
+trong `docs/distillery/sources/bee.md` đã lệch **1213 commit** so với
+upstream thật — đã pull `/home/vantt/projects/beegog` về mới, cập nhật
+`docs/distillery/sources/bee.md` với 2 phát hiện trực tiếp liên quan). Kết
+quả: bee có sẵn **2 cơ chế cụ thể, đã chạy thật**, trả lời gần như trọn vẹn
+câu hỏi mở #4-#5 ở §3 — xem §5 round 2 để chi tiết, đã trình bày cho người
+dùng ở chat. Chưa có quyết định nào chốt (§4 vẫn rỗng) — round tới cần
+người dùng phản hồi hướng nào trong 2 cơ chế bee (hoặc kết hợp) muốn áp cho
+fgOS.
 
 ## 2. Mục tiêu & đề bài
 
@@ -60,6 +66,43 @@ bắt buộc phải mở file gốc trước khi hiểu được câu đang đ�
   "luật có nhưng (a) không đòi tóm tắt nội dung, chỉ đòi đúng hình dạng chữ,
   và (b) đang bị phá ở diện rộng, kể cả trong chính skill vừa dùng để mở
   cuộc thảo luận này."
+
+- **2026-08-17T~06:20Z — Scan bee/beegog upstream (agent, theo yêu cầu người
+  dùng).** Version-check trước: `upstreams/bee/` (mô tả trong
+  `docs/distillery/sources/bee.md`, cursor v1.18.3, 2026-07-28) lệch xa thực
+  tế — bản clone làm việc `/home/vantt/projects/beegog` (remote
+  `github.com/thanhsmind/beegog`) đứng sau `origin/main` **1213 commit**;
+  tag thật mới nhất là `v2.7.0` (không có `v0.2.x` nào trong lịch sử —
+  người dùng có thể đã nhớ nhầm số phiên bản). Đã `git pull --ff-only` cập
+  nhật clone, rồi đọc 2 file trong `docs/knowledge/areas/` (state layer mới
+  của bee, thay `docs/specs/` cũ) liên quan trực tiếp câu hỏi của phiên
+  này — không phải re-scan toàn bộ 1213 commit. Đã ghi lại 2 phát hiện vào
+  `docs/distillery/sources/bee.md` (mục `decision-citation-and-reversal-sweep`
+  dưới domain `context-memory`, mục `one-line-cite-plus-local-delta` dưới
+  domain `docs-style`), đã trình bày tóm tắt cho người dùng ở chat. Tóm tắt
+  2 cơ chế:
+  1. **Reversal-propagation sweep** (`docs/knowledge/areas/decision-memory/overview.md`
+     R2+R8): mọi artifact trích 1 quyết định phải kèm `short8` (hash 8 ký
+     tự, id toàn cục — không phải số nguyên nhỏ đơn thuần); khi 1 quyết
+     định bị supersede, hệ thống tự quét `docs/**` tìm mọi nơi đã trích id
+     cũ, bắt buộc sửa hoặc waive-có-lý-do NGAY trong cùng lượt trước khi
+     ghi supersede — khác hẳn cách fgOS hiện tại (supersede xong, tự nguyện
+     nhớ sửa chỗ trích cũ, không cơ chế bắt buộc).
+  2. **"One rule, one home" + pointer-integrity check**
+     (`docs/knowledge/areas/doctrine-layer/prompt-writing-standard.md` R3,
+     `.../verify-pipeline/skill-reference-pointer-integrity.md`): 1 luật chỉ
+     phát biểu đầy đủ đúng 1 lần ở nhà gốc; mọi nơi khác trích nó **bắt
+     buộc kèm 1 dòng tóm tắt + phần khác biệt cục bộ**, không bao giờ chỉ
+     trích id trần — đây chính là câu trả lời trực tiếp cho câu hỏi #5 ở
+     §3. Phần này (nội dung gloss có đúng/đủ không) vẫn là kỷ luật văn
+     xuôi, xét bởi review — nhưng phần *cấu trúc* (trích dẫn có trỏ tới 1
+     file/heading thật không) được 1 test Rust (`pointer_integrity.rs`)
+     kiểm máy trên mọi lần verify, có negative-control fixture để tự chứng
+     minh test còn phát hiện được lỗi — bắt được 3 pointer gãy thật ngay
+     lần đầu chạy, dù các file đó trước giờ vẫn "pass" mọi check khác. Đây
+     là câu trả lời cho câu hỏi #4 ở §3 (cần cơ chế kiểm máy hay thuần kỷ
+     luật): bee chọn **cả hai, chia theo đúng ranh giới máy-kiểm-được vs
+     người-phán-được** — không phải một lựa chọn nhị phân.
 
 ## 6. Thiết kế đã chốt {#design}
 
