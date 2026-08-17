@@ -4,27 +4,14 @@ Item: `tsk-37i`.
 
 ## 1. Trạng thái hiện tại
 
-Round 4. Round 3 chốt D1 (3 tầng đúng, sửa nhắm format+enforcement). Round 4:
-người dùng trả lời câu hỏi mở #6 ở §3 — cần quét sửa lại tài liệu CŨ đang vi
-phạm, không chỉ áp luật cho tài liệu mới ("tài liệu quá dơ rồi"). Agent đo
-quy mô thật (~36/~62/~69 file across 3 tầng, xem §3 #6 + §5) trước khi coi
-câu trả lời này đã đủ cụ thể để đưa vào §7. Tất cả 3 câu hỏi mở quan trọng
-nhất (#4/#5 cơ chế, #6 phạm vi) giờ đã có hướng trả lời rõ (D1 + §3 #6) —
-discussion gần hội tụ; còn #7 (hiển thị phân biệt local/global cho người
-đọc) chưa bàn kỹ, cần xem có phải chặn hội tụ hay có thể gộp vào §7 luôn. Round 1 scout xong hệ thống trích dẫn nội bộ fgOS (ADR/RUL/D-local)
-— cả ba đã có convention thành văn nhưng chỉ sửa hình dạng chữ, không đòi
-tóm tắt nội dung, và luật D-local đang bị phá ở diện rộng (xem §3 #1-3).
-Round 2 scan upstream `beegog` (bản clone cũ lệch 1213 commit, đã pull mới),
-tìm 2 cơ chế cụ thể trả lời câu hỏi #4-#5 ở §3, đăng ký thành porting
-candidate ở `docs/distillery/porting-log.md`. Round 3: người dùng hỏi
-"beegog có mấy tầng luật" rồi tự xác nhận "vẫn có 3 tầng" — **D1 vừa chốt**
-(§4): cấu trúc 3-tầng của fgOS không phải chỗ sai, beegog hội tụ độc lập về
-đúng 3 tầng đó, nên việc sửa KHÔNG cần tái cấu trúc số tầng — chỉ cần sửa
-format trích dẫn (id trần → id+gloss) và cơ chế enforce (kiểm máy phần cấu
-trúc, kỷ luật văn xuôi phần nội dung), đúng 2 candidate đã đăng ký ở round
-2. §6 vừa regenerate lần đầu theo D1. Câu hỏi mở tiếp theo: người dùng có
-đồng ý 2 candidate đó (hoặc phần nào của chúng) là hướng cụ thể để bắt đầu
-`plan` không, hay cần bàn thêm trước khi coi discussion hội tụ.
+Round 5. Round 4 chốt phạm vi (dọn tài liệu cũ, ~36-69 file) + draft §7 (3
+mảnh). Round 5: người dùng yêu cầu distill lại thành thiết kế tổng quát
+theo 3 tầng hệ thống — harness / skills-core / skills-doctrine — để thấy
+rõ ai sửa gì ở đâu. §6 regenerate lần 2 theo cách nhóm này (KHÔNG phải
+thiết kế mới, chỉ đổi cách trình bày cùng 3 mảnh đã có); §7 mỗi task thêm
+dòng "Tầng" trỏ đúng nhóm. Discussion coi như đã đủ chín để hand-off —
+đang chờ người dùng xác nhận có đọc-hiểu-được cách trình bày mới này chưa,
+hoặc còn gì cần chỉnh trước khi chuyển sang `fgos-coding-exploring`.
 
 ## 2. Mục tiêu & đề bài
 
@@ -158,56 +145,59 @@ bắt buộc phải mở file gốc trước khi hiểu được câu đang đ�
 
 ## 6. Thiết kế đã chốt {#design}
 
-**Không tái cấu trúc, chỉ vá 2 chỗ hẹp.** fgOS giữ nguyên 3 tầng trích dẫn
-đã có (ADR toàn cục — RUL scope-theo-spec — D-local scope-theo-feature),
-được xác nhận đúng hình dạng qua hội tụ độc lập với beegog (D1). Thiết kế
-sửa gồm đúng 2 mảnh, mỗi mảnh khớp 1 porting candidate đã đăng ký ở
-`docs/distillery/porting-log.md`:
+**Không tái cấu trúc, chỉ vá 2 chỗ hẹp + dọn nợ cũ.** fgOS giữ nguyên 3 tầng
+trích dẫn đã có (ADR toàn cục — RUL scope-theo-spec — D-local
+scope-theo-feature), xác nhận đúng hình dạng qua hội tụ độc lập với beegog
+(D1). Theo yêu cầu người dùng (round 5): trình bày lại theo **3 tầng hệ
+thống fgOS đang chạm tới** — harness / skills-core / skills-doctrine — thay
+vì theo "mảnh việc" như bản trước, để thấy rõ AI SỬA GÌ Ở ĐÂU. Đây là cách
+đọc thứ hai của cùng 1 thiết kế, không phải thiết kế mới — §7 (task) không
+đổi, chỉ đổi cách nhóm trình bày.
 
 ```mermaid
 flowchart TB
-    subgraph fgOS3["3 tầng trích dẫn fgOS (giữ nguyên, D1)"]
-        ADR["ADR&lt;n&gt;<br/>toàn cục, vĩnh viễn"]
-        RUL["RUL&lt;n&gt;<br/>reset mỗi docs/specs/*.md"]
-        DLOCAL["D&lt;n&gt; local<br/>1 feature, CONTEXT.md"]
+    subgraph L1["HARNESS -- code chạy, verify pipeline (src/, test/, bin/)"]
+        SWEEP["decisions supersede: quét docs/**+.agents/skills/**<br/>tìm id cũ, chặn ghi tới khi reconcile/waive<br/>(mảnh 2)"]
+        CHECK["citation pointer-check mới trong npm test:<br/>mọi &lt;ID&gt; (gloss) có trỏ đúng file/heading thật<br/>không -- có negative-control fixture (mảnh 1 nửa máy)"]
     end
-    subgraph Fix1["Mảnh 1 -- format + kiểm máy (one-line-cite-plus-local-delta)"]
-        FORMAT["Trích ngoài nhà gốc BẮT BUỘC:<br/>id + 1 dòng gloss + delta cục bộ<br/>(không bao giờ id trần)"]
-        POINTER["Check cấu trúc: trích dẫn có trỏ<br/>đúng file/heading thật không --<br/>máy kiểm, fail build"]
-        FORMAT --> POINTER
+    subgraph L2["SKILLS-CORE -- quy ước dùng chung, 1 nhà gốc (.agents/skills/_shared/)"]
+        CONV["1 tài liệu quy ước trích dẫn CANONICAL<br/>(&lt;ID&gt; + 1 dòng gloss + delta cục bộ,<br/>không bao giờ id trần) -- mọi skill khác CHỈ TRÍCH,<br/>không copy lại (mảnh 1 nửa văn xuôi)"]
     end
-    subgraph Fix2["Mảnh 2 -- reversal sweep (decision-citation-and-reversal-sweep)"]
-        SUPERSEDE["supersede 1 ADR"] --> SWEEP["quét docs/**+skills/**<br/>tìm mọi nơi trích id cũ"]
-        SWEEP --> RECONCILE["sửa hoặc waive-có-lý-do<br/>NGAY cùng lượt, trước khi ghi"]
+    subgraph L3["SKILLS-DOCTRINE -- nội dung rule bên trong từng SKILL.md"]
+        OLD["~36-69 file đang trích D-local/RUL/ADR trần<br/>(fgos-coding-shaping, fgos-coding-exploring,<br/>fgos-coding-planning, docs/specs/*...)"]
+        NEW["Sửa theo khuôn L2, verify bằng check L1<br/>(mảnh 3)"]
+        OLD --> NEW
     end
-    ADR -.trích ngoài.-> FORMAT
-    RUL -.trích ngoài.-> FORMAT
-    DLOCAL -.trích ngoài, ĐANG VI PHẠM.-> FORMAT
-    ADR -.bị supersede.-> SUPERSEDE
+    L2 -->|skill nào cũng trích, không tự bịa lại| L3
+    L1 -->|CHECK chạy trên L3 sau khi sửa| NEW
+    L1 -.chặn ghi khi ADR bị supersede.-> L3
 ```
 
-- **Mảnh 1 (format + pointer-integrity)** trả lời câu hỏi #4/#5 ở §3: nội
-  dung gloss (đúng/đủ không) là kỷ luật văn xuôi, xét bởi review; CẤU TRÚC
-  trích dẫn (trỏ đúng file/heading thật không) là 1 check máy chạy trong
-  `npm test`, có negative-control tự chứng minh còn phát hiện được lỗi.
-- **Mảnh 2 (reversal sweep)** vá đúng chỗ hổng thật đang tồn tại: hôm nay
-  `docs/decisions/0000-index.md` supersede chỉ dựa kỷ luật tay (dòng
-  30-36) — không có gì bắt buộc người viết record mới đi sửa mọi chỗ đã
-  trích record cũ.
+- **Harness** (mảnh 1 nửa máy + mảnh 2 toàn bộ): 2 việc chạy được, kiểm
+  được — check pointer-integrity (npm test) và reversal-sweep (supersede
+  verb). Đây là phần "kiểm máy" trong tách 2 tầng đã bàn round 2: cấu trúc
+  trích dẫn (trỏ đúng chỗ không) máy kiểm được; nội dung gloss (đúng/đủ
+  không) thì không — nên KHÔNG có việc "check nội dung gloss" ở tầng này,
+  chỉ có ở skills-core.
+- **Skills-core** (mảnh 1 nửa văn xuôi): đúng nguyên tắc "one rule, one
+  home" học từ beegog — quy ước trích dẫn (khuôn `<ID> (<gloss>)`) chỉ
+  sống ở ĐÚNG 1 chỗ (`.agents/skills/_shared/`, cùng họ với
+  `executor-dispatch-fallback.md` đã có), mọi SKILL.md khác trích 1 dòng
+  tới đó — không phải mỗi skill tự viết lại luật trích dẫn của riêng nó
+  (tránh chính lỗi đang sửa lặp lại ở tầng meta).
+- **Skills-doctrine** (mảnh 3): nội dung rule thật bên trong từng SKILL.md
+  — đây là nơi ~36-69 file vi phạm nằm (§3 #6, §5 round 4), kể cả chính
+  `fgos-coding-shaping/SKILL.md` đang chạy phiên này (D2/D4/D6 trần). Sửa
+  theo khuôn skills-core, verify bằng check harness — phụ thuộc cả 2 tầng
+  trên phải có trước.
 - **D-local vẫn KHÔNG được nới lỏng** (chưa có quyết định nào đảo luật khoá
-  `0017`) — vi phạm cụ thể đã tìm thấy (`fgos-coding-shaping/SKILL.md` trích
-  trần D2/D4/D6) là việc cần dọn theo mảnh 1, không phải lý do để đổi luật
-  D-local.
-- **Phạm vi giờ bao gồm quét/sửa tài liệu CŨ** (§3 #6 người dùng chốt) — 3
-  mảnh việc, không phải 2: mảnh 1 (format+pointer-check), mảnh 2 (reversal
-  sweep), và mảnh 3 mới — dọn ~36-69 file đang vi phạm trên cả 3 tầng, quy
-  mô đo thật ở §5 round 4. Mảnh 3 phụ thuộc mảnh 1 (cần format/check tồn
-  tại trước để biết sửa thành gì và biết đã sửa đúng chưa).
+  `0017`) — việc dọn ở skills-doctrine là sửa VI PHẠM luật cũ, không phải
+  đổi luật.
 
 Còn mở, có thể không chặn hội tụ: câu hỏi #7 ở §3 (hiển thị phân biệt
-local/global cho người đọc ở đâu) — hiện đã có câu trả lời khái niệm qua D1
-(tiền tố `ADR`/`RUL(area)`/`D-local` đã đủ phân biệt), có thể gộp thẳng vào
-mảnh 1 (format mới) ở §7 thay vì cần bàn riêng.
+local/global cho người đọc ở đâu) — trả lời được ngay trong khuôn
+skills-core (tiền tố `ADR`/`RUL(area)`/`D-local` đã đủ phân biệt), không
+cần bàn riêng.
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
@@ -216,6 +206,9 @@ mảnh 1 (format mới) ở §7 thay vì cần bàn riêng.
   `<ID> (<tóm tắt 1 dòng>)`, không bao giờ id trần; thêm 1 check máy (kiểu
   `pointer_integrity.rs` của beegog) chạy trong `npm test`, xác nhận mọi
   trích dẫn trỏ đúng file/heading thật, có negative-control fixture.
+- **Tầng (round 5):** nửa **harness** (check máy trong `npm test`) + nửa
+  **skills-core** (1 tài liệu quy ước canonical ở `.agents/skills/_shared/`
+  — xem §6 sơ đồ round 5).
 - **Trích §6:** "Mảnh 1 (format + pointer-integrity)".
 - **D-ID áp dụng:** D1.
 - **Quan hệ với sibling:** mảnh 3 phụ thuộc mảnh này (cần format chốt trước
@@ -229,6 +222,8 @@ mảnh 1 (format mới) ở §7 thay vì cần bàn riêng.
   `docs/**`+`.agents/skills/**` tìm chỗ trích id cũ, bắt xử lý (sửa hoặc
   waive-có-lý-do) trước khi ghi supersede — thay kỷ luật tay hiện tại
   (`0000-index.md` dòng 30-36).
+- **Tầng (round 5):** **harness** toàn bộ (đổi hành vi `decisions
+  supersede` verb, `src/` — không chạm skill nào).
 - **Trích §6:** "Mảnh 2 (reversal sweep)".
 - **D-ID áp dụng:** D1.
 - **Quan hệ với sibling:** độc lập với mảnh 1/3, có thể làm song song.
@@ -240,6 +235,8 @@ mảnh 1 (format mới) ở §7 thay vì cần bàn riêng.
   trần không kèm area, tới ~69 file khớp mẫu ADR trần (số cần xác minh lại
   khi lập kế hoạch) theo đúng khuôn mảnh 1. Sửa `.agents/skills/` nguồn là
   đủ — không sửa `.claude/skills/*` (bản sinh tự động).
+- **Tầng (round 5):** **skills-doctrine** toàn bộ (nội dung rule bên trong
+  từng `SKILL.md`, không chạm harness/skills-core — chỉ ĐỌC khuôn từ đó).
 - **Trích §6:** "Phạm vi giờ bao gồm quét/sửa tài liệu CŨ".
 - **D-ID áp dụng:** §3 #6 (chưa mint D-ID riêng — xem ghi chú round 4).
 - **Quan hệ với sibling:** phụ thuộc mảnh 1 (cần khuôn format tồn tại
