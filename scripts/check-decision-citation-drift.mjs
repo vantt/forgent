@@ -293,7 +293,12 @@ function loadSourceFiles(
   return sources;
 }
 
-const WIDE_SWEEP_ROOTS = ['docs', 'src', 'plugins'];
+// `.agents/skills` (tsk-12v): the canonical dev-skill source, not reached
+// by any other root -- neither `.claude/skills` (its generated wrapper,
+// byte-derived, never carries independent citation text) nor
+// `plugins/fgOS/skills` (already covered via `plugins` above) needs its
+// own entry, since the wrapper contributes zero new scan surface.
+const WIDE_SWEEP_ROOTS = ['docs', 'src', 'plugins', '.agents/skills'];
 const WIDE_SWEEP_EXTENSIONS = new Set(['.md', '.mjs', '.js']);
 const WIDE_SWEEP_SKIP_DIR_NAMES = new Set(['node_modules', '.git']);
 
