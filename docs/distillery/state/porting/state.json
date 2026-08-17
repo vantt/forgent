@@ -319,6 +319,10 @@
     "one-line-cite-plus-local-delta": {
       "id": "one-line-cite-plus-local-delta",
       "status": "candidate"
+    },
+    "doc-rot-close-gate-bundle": {
+      "id": "doc-rot-close-gate-bundle",
+      "status": "candidate"
     }
   }
 }

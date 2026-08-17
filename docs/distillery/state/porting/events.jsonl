@@ -95,3 +95,4 @@
 {"seq":95,"ts":"2026-07-17T16:48:02.750Z","type":"porting.add","payload":{"id":"feedback-source-sweep","status":"candidate"},"v":2}
 {"seq":96,"ts":"2026-08-17T08:54:54.892Z","type":"porting.add","payload":{"id":"decision-citation-and-reversal-sweep","status":"candidate"},"v":3}
 {"seq":97,"ts":"2026-08-17T08:54:54.893Z","type":"porting.add","payload":{"id":"one-line-cite-plus-local-delta","status":"candidate"},"v":3}
+{"seq":98,"ts":"2026-08-17T09:37:34.894Z","type":"porting.add","payload":{"id":"doc-rot-close-gate-bundle","status":"candidate"},"v":3}
