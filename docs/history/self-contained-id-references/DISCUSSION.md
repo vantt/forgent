@@ -4,14 +4,19 @@ Item: `tsk-37i`.
 
 ## 1. Trạng thái hiện tại
 
-Round 5. Round 4 chốt phạm vi (dọn tài liệu cũ, ~36-69 file) + draft §7 (3
-mảnh). Round 5: người dùng yêu cầu distill lại thành thiết kế tổng quát
-theo 3 tầng hệ thống — harness / skills-core / skills-doctrine — để thấy
-rõ ai sửa gì ở đâu. §6 regenerate lần 2 theo cách nhóm này (KHÔNG phải
-thiết kế mới, chỉ đổi cách trình bày cùng 3 mảnh đã có); §7 mỗi task thêm
-dòng "Tầng" trỏ đúng nhóm. Discussion coi như đã đủ chín để hand-off —
-đang chờ người dùng xác nhận có đọc-hiểu-được cách trình bày mới này chưa,
-hoặc còn gì cần chỉnh trước khi chuyển sang `fgos-coding-exploring`.
+Round 6. Round 5 trình bày lại §6/§7 theo 3 tầng hệ thống (harness /
+skills-core / skills-doctrine). Round 6: người dùng phát hiện agent nhớ
+nhầm số phiên bản round 2 ("1.8.3" — đúng là **1.18.3**) và yêu cầu dò lại
+TỪNG phiên bản beegog từ cursor cũ tới `v2.7.0` (57 tag) xem có gì thêm cho
+chủ đề đang bàn — không chỉ đọc state hiện tại như round 2 đã làm. Kết quả:
+tìm được 1 cơ chế MỚI, chưa từng thấy ở round 2 — **doc-rot close-gate
+bundle** (v2.7.0, landed 2026-08-03→2026-08-16, đăng ký porting candidate
+`doc-rot-close-gate-bundle`, R3 E2 F3) — trả lời đúng nửa còn thiếu của
+round 2: "quyết định D-local bị LOCK rồi không bao giờ được route đi đâu"
+(khác round 2 vốn chỉ chặn "quyết định bị SUPERSEDE mà chỗ trích cũ không
+sửa"). §6/§7 vừa cập nhật thêm mảnh 4 cho phát hiện này. Discussion gần
+hội tụ hơn nữa — chờ người dùng xác nhận có cần dò thêm hay đã đủ để
+hand-off.
 
 ## 2. Mục tiêu & đề bài
 
@@ -143,6 +148,30 @@ bắt buộc phải mở file gốc trước khi hiểu được câu đang đ�
   thức lúc hand-off, cùng lúc chia nhỏ quy mô ~36-69 file thành task cụ
   thể.
 
+- **2026-08-17T~09:35Z — Dò từng phiên bản beegog v1.18.3→v2.7.0 (agent,
+  theo yêu cầu người dùng round 6).** Người dùng chỉ ra agent nhớ nhầm số
+  phiên bản round 2 ("1.8.3" thay vì đúng **1.18.3** — đã sửa lại tại đây).
+  Thay vì đọc lại state hiện tại (round 2 đã làm), lần này grep commit log
+  có chủ đích: `git log --oneline v1.18.3..v2.7.0 --grep="citation|decision.
+  mem|doctrine|pointer.integ|self-contain|gloss|reversal|supersed" -i` trên
+  57 tag giữa 2 cursor — không replay hết 1213 commit, đúng "delta
+  discipline" của distill (nhóm theo theme, không theo từng commit). Tìm
+  được cụm feature `doc-impact-synthesis` + `knowledge-distill-trigger`,
+  landed 2026-08-03→2026-08-16, đỉnh điểm là chính commit release `v2.7.0`
+  ("doc-rot doors — impact, routing, doc-deferral, freshness") — TÊN
+  release đã tự nói đúng chủ đề đang bàn. Đọc
+  `docs/knowledge/areas/workflow-state/gates.md` (4 đoạn liên tiếp mô tả 4
+  cửa cứng), ghi vào `docs/distillery/sources/bee.md` (entry
+  `doc-rot-close-gate-bundle`, domain `quality-gates`) + đăng ký porting
+  candidate cùng tên (R3 E2 F3). Phát hiện quan trọng nhất: **"routing
+  door"** — chặn đóng feature khi 1 D-ID đã lock trong CONTEXT.md "không có
+  area-spec citation VÀ không có feature-local record" — tức 1 quyết định
+  cục bộ bị khoá rồi KHÔNG BAO GIỜ được route đi đâu bị REFUSE, không được
+  phép rot. Đây đúng là nửa còn thiếu của `decision-citation-and-reversal-
+  sweep` (round 2, chỉ chặn "supersede mà không sửa chỗ trích cũ") — và
+  đúng tình huống thật fgOS đang có: D2/D4/D6 của `fgos-coding-shaping`
+  chỉ tồn tại trong CONTEXT.md, chưa từng được route vào spec/ADR nào.
+
 ## 6. Thiết kế đã chốt {#design}
 
 **Không tái cấu trúc, chỉ vá 2 chỗ hẹp + dọn nợ cũ.** fgOS giữ nguyên 3 tầng
@@ -159,6 +188,7 @@ flowchart TB
     subgraph L1["HARNESS -- code chạy, verify pipeline (src/, test/, bin/)"]
         SWEEP["decisions supersede: quét docs/**+.agents/skills/**<br/>tìm id cũ, chặn ghi tới khi reconcile/waive<br/>(mảnh 2)"]
         CHECK["citation pointer-check mới trong npm test:<br/>mọi &lt;ID&gt; (gloss) có trỏ đúng file/heading thật<br/>không -- có negative-control fixture (mảnh 1 nửa máy)"]
+        ROUTING["fgos return/approve close gate MỚI (mảnh 4, round 6):<br/>D-ID locked trong CONTEXT.md không có area-spec<br/>citation VÀ không có feature-local record -- CHẶN close"]
     end
     subgraph L2["SKILLS-CORE -- quy ước dùng chung, 1 nhà gốc (.agents/skills/_shared/)"]
         CONV["1 tài liệu quy ước trích dẫn CANONICAL<br/>(&lt;ID&gt; + 1 dòng gloss + delta cục bộ,<br/>không bao giờ id trần) -- mọi skill khác CHỈ TRÍCH,<br/>không copy lại (mảnh 1 nửa văn xuôi)"]
@@ -171,14 +201,22 @@ flowchart TB
     L2 -->|skill nào cũng trích, không tự bịa lại| L3
     L1 -->|CHECK chạy trên L3 sau khi sửa| NEW
     L1 -.chặn ghi khi ADR bị supersede.-> L3
+    ROUTING -.chặn close khi D-local locked mà không route.-> OLD
 ```
 
-- **Harness** (mảnh 1 nửa máy + mảnh 2 toàn bộ): 2 việc chạy được, kiểm
-  được — check pointer-integrity (npm test) và reversal-sweep (supersede
-  verb). Đây là phần "kiểm máy" trong tách 2 tầng đã bàn round 2: cấu trúc
-  trích dẫn (trỏ đúng chỗ không) máy kiểm được; nội dung gloss (đúng/đủ
-  không) thì không — nên KHÔNG có việc "check nội dung gloss" ở tầng này,
-  chỉ có ở skills-core.
+- **Harness** (mảnh 1 nửa máy + mảnh 2 + mảnh 4 mới): 3 việc chạy được,
+  kiểm được — check pointer-integrity (npm test), reversal-sweep (supersede
+  verb) và routing-close-gate (`fgos return`/`approve`, round 6). Đây là
+  phần "kiểm máy" trong tách 2 tầng đã bàn round 2: cấu trúc trích dẫn
+  (trỏ đúng chỗ không, D-ID có route đi đâu chưa) máy kiểm được; nội dung
+  gloss (đúng/đủ không) thì không — nên KHÔNG có việc "check nội dung
+  gloss" ở tầng này, chỉ có ở skills-core.
+- **Mảnh 4 (routing close gate, round 6)** vá lỗ hổng khác mảnh 2: mảnh 2
+  chặn "quyết định bị supersede mà chỗ trích cũ không sửa"; mảnh 4 chặn
+  "quyết định D-local bị lock rồi không bao giờ được route đi đâu" — đúng
+  tình huống thật `fgos-coding-shaping/SKILL.md` đang có (D2/D4/D6 chỉ nằm
+  trong CONTEXT.md, chưa từng route vào spec/ADR). Độc lập với mảnh 1/2/3,
+  làm song song được.
 - **Skills-core** (mảnh 1 nửa văn xuôi): đúng nguyên tắc "one rule, one
   home" học từ beegog — quy ước trích dẫn (khuôn `<ID> (<gloss>)`) chỉ
   sống ở ĐÚNG 1 chỗ (`.agents/skills/_shared/`, cùng họ với
@@ -243,3 +281,20 @@ cần bàn riêng.
   trước).
 - **Verify nháp:** check máy của mảnh 1 chạy sạch trên toàn `docs/`+
   `.agents/skills/` sau khi dọn.
+
+### {#task-routing-close-gate} Mảnh 4 — Routing close-gate cho D-local (round 6)
+- **Mục tiêu:** `fgos return`/`fgos approve` từ chối đóng 1 item khi
+  CONTEXT.md của nó có D-ID đã lock nhưng KHÔNG có area-spec citation VÀ
+  KHÔNG có feature-local record hợp lệ — chặn đúng lỗ hổng "lock rồi bỏ
+  quên, không bao giờ route đi đâu" (khác mảnh 2, vốn chỉ chặn supersede
+  mà không sửa chỗ trích cũ).
+- **Tầng:** **harness** toàn bộ (verb `return`/`approve`, `src/`).
+- **Trích §6:** "Mảnh 4 (routing close gate, round 6)".
+- **Nguồn:** porting candidate `doc-rot-close-gate-bundle` (R3 E2 F3,
+  `docs/distillery/porting-log.md`), phần "routing door" — 3/4 cửa còn lại
+  của bundle beegog (knowledge-freshness, impact, doc-deferral) NGOÀI
+  phạm vi thảo luận này, chỉ ghi nhận làm candidate riêng cho sau.
+- **Quan hệ với sibling:** độc lập với mảnh 1/2/3, làm song song được.
+- **Verify nháp:** item test có D-ID lock trong CONTEXT.md, chưa route đi
+  đâu → `return`/`approve` từ chối, có escape hatch (kiểu
+  `routing-deferral` của beegog) khi có lý do chính đáng.
