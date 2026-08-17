@@ -4,16 +4,20 @@ Item: tsk-4us
 
 ## 1. Trạng thái hiện tại
 
-Vòng 3. **D1 đã chốt** (self-vs-host là trục riêng, đứng cạnh `0030`, không
-phải bậc #5). **Q3 đã chốt** (không mechanize repo-divorce — fgOS đã thử và
-chủ động bỏ mô hình workshop+repo-lồng của bee, `forgent-workshop` là thí
-nghiệm của bee-upstream, không thuộc dòng lịch sử forgentX). Đang mở **Q6**
-(mới): với repo-divorce bị loại, đề xuất ranh giới được nhận diện bằng
-design-intent per quyết định (không phải path/file) — chờ người dùng xác
-nhận trước khi viết §6. Q2 (cơ chế máy) còn treo một phần: đã biết bee làm
-gì, nhưng CHƯA quyết fgOS áp bao nhiêu trong 3 tầng đó khi path-based
-(product_root) đã loại. Q4 (tsk-1js làm case study) và Q5 (vị trí vật lý:
-decisions/ + platform-foundations L-law) vẫn mở.
+Vòng 4. **D1 chốt** (trục riêng, đứng cạnh `0030`). **Q3 chốt** (không
+mechanize repo-divorce). **Q6 vừa trả lời** (chờ ổn định, chưa mint D-ID):
+người dùng bác "design-intent per quyết định" (UX tệ) — cơ chế đúng là
+`purpose` khai báo MỘT LẦN lúc `fgos init`/`fgos setup` (deterministic),
+self-infer chỉ là fallback tệ-nhất-chấp-nhận-được khi thiếu khai báo. Scout
+xác nhận: cơ chế registry (`registerConfigDefault`/`registerCheck`) đã có
+sẵn, không cần phát minh mới; và tsk-1js's "hướng chưa chốt" (viết TRƯỚC
+cuộc thảo luận này, trong lúc shaping một item khác hẳn — tsk-1y6) hội tụ
+độc lập đúng khớp nguyên tắc người dùng vừa chốt. Đã đề xuất concrete 5
+điểm cho §6 (chưa chốt) trong chat, đang chờ xác nhận: (1) config key
+`purpose`, (2) doctor check cặp đôi, (3) self-infer fallback tối thiểu, (4)
+tsk-1js làm ứng viên thi công đầu tiên, (5) vị trí `docs/decisions/0035` +
+AGENTS.md pointer, không thêm L-law. Nếu người dùng xác nhận vòng tới, §6
+có thể viết và tiến tới terminal handoff.
 
 ## 2. Mục tiêu & đề bài
 
@@ -36,11 +40,11 @@ này phục vụ ai" trước khi làm — học theo cách upstream `beegog` (b
 | # | Câu hỏi | Trạng thái | Ghi chú |
 |---|---|---|---|
 | Q1 | ~~Ranh giới self-vs-host này là bậc #5 hay trục riêng?~~ | **CHỐT — D1** | Chuyển sang §4 |
-| Q2 | Cơ chế thực thi: chỉ là văn bản doctrine, hay có phần MÁY kiểm được? | **trả lời: có, chi tiết ở §5 vòng 2** | bee dùng 3 tầng: state-transition guard (`chain-integrity-guard-tail`), config key (`product_root`), digest-on-close + 2 human gate (`evolving-loop-two-gates`) — nhưng KHÔNG áp thẳng nguyên khối vì Q3 vừa loại bỏ hướng repo-divorce, xem Q6 |
+| Q2 | Cơ chế thực thi: chỉ là văn bản doctrine, hay có phần MÁY kiểm được? | **trả lời: có — declared config tại setup, xem §5 vòng 4** | Không phải bee's 3-tầng nguyên khối (loại vì Q3) — mà một config key khai báo MỘT LẦN lúc `fgos init`/`fgos setup`, qua registry sẵn có (`registerConfigDefault`/`registerCheck`, `src/setup/registrations.mjs`) |
 | Q3 | forgent-workshop ↔ forgentX quan hệ gì? | **trả lời: KHÔNG liên quan, đường đã bỏ** | `~/projects/forgent` là sản phẩm được phát triển TRONG workshop của chính bee-upstream (thí nghiệm của bee, không phải của fgOS). fgOS/forgentX CHƯA TỪNG phát triển theo mô hình workshop+repo-lồng — người dùng đã thử và tách riêng vì "quá nhiều vấn đề"; không rõ bee đã cải thiện chế độ này tới đâu. **Kết luận:** vision này KHÔNG đề xuất mechanize `product_root`/repo-divorce cho forgentX — đó là hướng đã thử và cố ý từ bỏ, không phải chưa thử tới |
-| Q4 | tsk-1js (Iron Law hard-code module path của chính fgOS, im lặng bỏ qua host project) — có nên là ví dụ neo/case-study trong tài liệu vision này không, dù không gắn dependency? | chưa rõ | Người dùng đã chọn KHÔNG gắn dependency; nhưng dùng làm ví dụ minh hoạ trong prose là việc khác |
-| Q5 | Vị trí vật lý: decision mới trong `docs/decisions/` (số kế tiếp sau 0034) + trỏ từ AGENTS.md, hay một luật L-mới trong `docs/platform-foundations.md` (cạnh L8 doctrine placement / L9 run≠merge≠durable), hay cả hai? | chưa rõ | D1 đã chốt "đứng riêng cạnh" → gợi ý cả hai (decision ghi QUYẾT ĐỊNH + WHY, platform-foundations ghi LUẬT ngắn always-loaded) nhưng chưa hỏi người dùng trực tiếp |
-| Q6 | (MỚI vòng 3) Q3 loại bỏ repo-divorce → forgentX vẫn single-repo, self-dev và host-dev sống chung file. Vậy ranh giới được nhận diện bằng gì? Đề xuất: KHÔNG phải path/file nào bị đụng, mà là **design-intent per quyết định**: một thay đổi phục vụ fgOS-khi-vận-hành-repo-khác (mission 1/2) hay chỉ tiện cho chính đội fgOS làm việc (mission 3)? tsk-1js minh hoạ đúng: Iron Law LẼ RA là năng lực mission-1/2 (bảo vệ BẤT KỲ repo nào fgOS vận hành) nhưng bị code với tầm nhìn hẹp mission-3 (chỉ nhận diện path của chính fgOS). Người dùng có đồng ý khung "design-intent, không phải path" này không? | chưa rõ | Đang chờ phản hồi — xem phân tích trình bày trong chat trước khi hỏi |
+| Q4 | tsk-1js — case study? | **đề xuất: có, còn hơn thế** | tsk-1js's own "hướng chưa chốt" (MODULE_RULES thành config per-project trong `.fgos/config.json`) hội tụ ĐỘC LẬP với câu trả lời Q6 của người dùng — cùng một cơ chế. tsk-1js không chỉ là ví dụ minh hoạ, mà là ỨNG VIÊN THI CÔNG ĐẦU TIÊN thật của cơ chế này. Chờ người dùng xác nhận |
+| Q5 | Vị trí vật lý | **đề xuất: `docs/decisions/0035` + `AGENTS.md` pointer, KHÔNG thêm L-law mới** | Số kế tiếp có thật sau 0034 là 0035 (đã kiểm `ls docs/decisions/`, có 2 file cùng đánh số 0032 nhưng không chặn số mới). Đề xuất bớt lại: KHÔNG cần thêm L-law riêng trong `platform-foundations.md` — nội dung đã đủ hẹp/cụ thể để nằm gọn trong 1 decision + 1 đoạn AGENTS.md; giữ đúng KISS, không nhân đôi chỗ ghi. Chờ người dùng xác nhận |
+| Q6 | Ranh giới nhận diện bằng gì khi repo-divorce đã loại? | **trả lời vòng 4, chờ ổn định** | Người dùng bác "design-intent per quyết định" (UX quá tệ — không ép mỗi PBI tự trả lời câu hỏi mission). Thay bằng: khai báo `purpose` MỘT LẦN lúc setup/init (deterministic); tự-suy-luận (self-infer) chỉ là phương án tệ-nhất-chấp-nhận-được khi thiếu khai báo, không phải thiết kế trung tâm |
 
 ## 4. Quyết định đã chốt
 
@@ -262,3 +266,64 @@ NGÔN NGỮ BÁO CÁO và Ý ĐỊNH (báo bằng ngôn ngữ project, không l�
 → Q6 đưa ra cho người dùng: chấp nhận khung "design-intent per quyết định"
 làm cơ chế nhận diện ranh giới (thay cho path/cấu trúc thư mục đã bị Q3
 loại), với tsk-1js làm ví dụ neo minh hoạ hậu quả khi khung này bị bỏ qua?
+
+### Vòng 4 — 2026-08-17
+
+**Người dùng bác Q6's khung "design-intent per quyết định":** "không cái
+này tạo ra ux quá tệ. điều tệ nhất có thể làm là thiết lập purpose lúc
+setup/init mà thôi, không thì tự thân fgos phải tự hiểu. tuy nhiên muốn
+deterministic thì nên thiết lập chỗ setup." Nguyên tắc chốt: (a) hỏi mỗi
+quyết định là UX tệ nhất, loại; (b) `purpose` khai báo MỘT LẦN lúc
+setup/init là phương án deterministic; (c) khi không khai báo, fgOS phải tự
+suy luận (self-infer) — chấp nhận được nhưng không phải thiết kế trung tâm.
+
+**Scout xác nhận cơ chế đã có sẵn, không cần phát minh mới:**
+
+- `src/setup/registrations.mjs` đã có registry sống: `registerConfigDefault
+  ({id, key, shape})` (vd `runner` config ở dòng 1040) và `registerCheck
+  ({id, description, check})` (vd `dependencies-installed` dòng 1076-1080,
+  theo đúng contract "absent capability = clean skip, never hidden" —
+  giống `checkToolRegistryConfigured`). Đây CHÍNH LÀ cửa AGENTS.md's
+  "Install/setup/doctor gate" đã bắt buộc cho MỌI config default mới — một
+  key `purpose` mới không cần cơ chế riêng, chỉ cần đăng ký đúng cửa có sẵn.
+- Đọc lại `src/evolve/iron-law.mjs` (nguồn gốc tsk-1js) với góc nhìn mới:
+  `MODULE_RULES` (dòng 20-35) tự mô tả là "D10+D14 self-modifying-capable
+  module list" — đây CHÍNH LÀ danh sách "cái gì nhạy cảm khi TỰ SỬA MÌNH"
+  của riêng fgOS, y hệt tinh thần bee's `evolving-loop-two-gates` (chỉ chạy
+  trong repo bee) — nhưng bị áp UNIVERSAL cho MỌI repo fgOS vận hành thay
+  vì chỉ áp khi đang tự-sửa-mình. tsk-1js's mô tả "hướng chưa chốt" (đọc
+  lại nguyên văn): *"MODULE_RULES thành cấu hình per-project trong
+  `.fgos/config.json` với 9 dòng hiện tại hạ xuống thành mặc định riêng
+  của fgOS chứ không phải luật phổ quát"* — **hội tụ độc lập, đúng khớp**
+  với nguyên tắc (b)/(c) người dùng vừa chốt ở vòng này, viết ra TRƯỚC khi
+  cuộc thảo luận này bắt đầu (phát hiện trong lúc shaping tsk-1y6, một item
+  hoàn toàn khác). Không phải trùng hợp hời hợt — cùng một sự thật kiến
+  trúc được nhìn thấy hai lần từ hai góc khác nhau.
+- `~/.fgos/config.json` (global, đã đọc vòng 1) đã có tiền lệ field
+  `ironLaw: {level: "ask"}` — Iron Law ĐÃ có một cấu hình per-install rồi,
+  chỉ chưa mở rộng sang MODULE_RULES. Thêm `purpose`/mở rộng `ironLaw` là
+  nối dài một trục cấu hình đã tồn tại, không phải trục mới.
+- `docs/backlog.md` STR82 (auto-detect CLI executor mặc định) — đã bị
+  DECLINE trước đây với đúng lý do "chỉ đáng làm khi có bằng chứng dogfood
+  thật". Tiền lệ này ủng hộ nguyên tắc (c) của người dùng: self-infer là
+  fallback tối thiểu, không đầu tư nặng vào heuristic thông minh cho tới
+  khi có bằng chứng thật cần nó.
+
+**Đề xuất cụ thể cho §6 (chưa chốt, đang trình bày trong chat trước khi
+hỏi xác nhận):**
+
+1. Config key mới (tên tạm `purpose`, tên thật chờ người dùng) đăng ký qua
+   `registerConfigDefault` — khai báo tại `fgos init`/`fgos setup`.
+2. `registerCheck` cặp đôi cho `fgos doctor` — báo khi chưa khai báo,
+   never silent.
+3. Không khai báo → fgOS tự suy luận tối thiểu (vd so khớp package.json
+   name/cấu trúc nguồn với fingerprint fgOS chính nó) — fallback, không
+   phải đường chính.
+4. tsk-1js trở thành ứng viên thi công ĐẦU TIÊN thật của cơ chế này: Iron
+   Law's `MODULE_RULES` đọc theo `purpose` — self-dev thì dùng 9 dòng hiện
+   tại làm mặc định của fgOS, host-project thì đọc danh sách module nhạy
+   cảm riêng của project đó (rỗng mặc định, không phải fgOS's list).
+5. Vị trí: `docs/decisions/0035` (số kế tiếp thật, đã kiểm) + đoạn trỏ mới
+   trong `AGENTS.md` ngay sau "Product priority order" — KHÔNG thêm mục
+   L-mới vào `platform-foundations.md` (nội dung đủ hẹp để gọn trong một
+   decision, tránh nhân đôi chỗ ghi, giữ KISS).
