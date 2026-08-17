@@ -104,17 +104,18 @@ thi thật.
 | 4 | `upstreams/` (path item liệt kê để khảo sát) có tồn tại trong repo không? | Rõ (scout, sửa lại round 1) | Có, trong main checkout (`upstreams/bee/`, `upstreams/beegog/`, gitignored) — round 1 chỉ kiểm trong worktree cô lập nên báo sai "không tồn tại". Cả hai đều là bản CŨ hơn `/home/vantt/projects/beegog/` (live). |
 | 5 | Doctrine layer (AGENTS.md/CLAUDE.md) đã có tiền lệ "luôn nạp vs nạp theo nhu cầu" nào gần với trục engine/skill chưa? | Rõ một phần (scout) | `docs/platform-foundations.md` L8 đã khoá placement test này CHO RIÊNG tầng doctrine (standing sheet vs reference nạp theo nhu cầu) — cùng tinh thần trục (b) nhưng chưa từng generalize ra toàn cây thư mục. |
 | 6 | Ranh giới cụ thể core-foundation vs domain-specific nên nằm ở đâu? | Chưa rõ (nhưng không còn speculative) | STR52 (marketing, proposed) + STR89 (done, đã định vị 4 điểm nối domain-pluggable) là chất liệu thật để thiết kế ranh giới, xem #10/#11 dưới. Vẫn cần thiết kế cụ thể layout. |
-| 7 | Engine vs skill/prose tách theo tiêu chí nào (ngôn ngữ? runtime-executable vs instruction-only? mức nạp?) | Chưa rõ | Cần thảo luận — ba cây skill hiện tại chưa nói rõ tiêu chí này bằng văn bản, chỉ có CLAUDE.md tự chú thích "generated wrapper" cho 2/3 cây. |
+| 7 | Engine vs skill/prose tách theo tiêu chí nào (ngôn ngữ? runtime-executable vs instruction-only? mức nạp?) | Chốt — D7 | `core/skills/` + `domains/*/skills/` là canonical AUTHORING; `.agents/skills/`, `.claude/skills/`, `plugins/fgOS/skills/` cả ba đều là render target (D7, mở rộng tsk-1qi D5). |
 | 8 | Mô hình plugin/extension theo domain có đáng chi phí duy trì thêm một tầng tổ chức? | Chưa rõ | Cần cân nhắc so với chi phí hiện trạng (giữ mọi thứ phẳng, domain phân biệt qua data `DOMAINS`, không qua thư mục). |
 | 9 | Nguồn so sánh bee/beegog thật nằm ở đâu, và nó có tiền lệ cho trục nào? | Rõ (scout + xác nhận người, round 2) | `/home/vantt/projects/beegog/` (live checkout, KHÁC repo-con `upstreams/beegog/` đã pull nhưng vẫn cũ) có đúng cấu trúc v2.7.0: `packages/bee-rs` (1 crate, 1 binary), `packages/bee` (vendor payload), `skills/` (9 skill, giảm từ 18/15). Không tìm thấy khái niệm multi-domain nào trong beegog (`grep -i "multi-domain\|DOMAINS\b"` không ra kết quả liên quan) — beegog là tiền lệ thật cho trục (b), KHÔNG phải tiền lệ cho trục (a). |
 | 10 | Domain thật thứ hai có tồn tại/đang chờ không? | Rõ (scout, round 4) | Có — `docs/backlog.md` STR52: "Domain thứ hai THẬT: marketing", status `proposed`, nêu 2026-07-18. Người dùng có sẵn workflow marketing ở project khác, muốn điều phối qua fgOS. Câu hỏi scope gốc của STR52 (share store hay cài fgOS riêng) — xem #12. |
 | 11 | Domain-specific cần mở những điểm nối nào trong code hiện tại? | Rõ (scout, round 4) | STR89 (done) định vị 4 điểm: (1) `DOMAINS` registry entry riêng cho domain mới (`src/state/workflow-stage-graphs.mjs`); (2) `discovery.mjs`/`decompose.mjs` retrofit — hiện hardcode literal stage-name của coding, cảnh báo sẵn trong comment `workflow-stage-graphs.mjs:29-34`; (3) `fgos-routing` domain-pluggable hoá — tự thú nhận hôm nay "the only domain this induction targets [is coding]"; (4) bộ skill nội dung riêng theo domain-extension, song song bộ coding. Thứ tự đã xác nhận: software-dev (coding) trước, marketing sau, không chặn nhau. |
 | 12 | STR52's câu hỏi scope (share store hay cài fgOS riêng cho domain mới) — trả lời thế nào? | Chốt — D1 | (nội dung phân tích giữ nguyên, xem D1 ở §4) |
 | 13 | Domain-specific code+skill nên tổ chức theo layout nào (nested trong cây có sẵn, hay folder riêng)? | Chốt — D3/D4 | `domains/<name>/` tự chứa, top-level, mirror `plugins/fgOS/`. Đề xuất nested đầu tiên (`.agents/skills/domains/coding` + `src/domains/coding` tách rời) bị người bác — "không phát triển được dạng plugin/extension". |
-| 14 | Core (bin/, src/, herdr-plugin/) có nên di dời vào folder `core/` tường minh để đối xứng với `domains/` không? | Chốt — D5 | Không di dời vật lý — 881 tham chiếu `bin/fgos.mjs` + external install (mission 0035) khiến chi phí lớn hơn hẳn lợi ích biểu tượng. `.agents/skills/core/` là chỗ duy nhất rẻ đủ để làm tường minh. |
+| 14 | Core (bin/, src/, herdr-plugin/) có nên di dời vào folder `core/` tường minh để đối xứng với `domains/` không? | Chốt — D5 (cập nhật bởi D7) | `bin/`, `src/`, `herdr-plugin/` KHÔNG di dời — 881 tham chiếu `bin/fgos.mjs` + external install (mission 0035) khiến chi phí lớn hơn hẳn lợi ích biểu tượng. Riêng SKILL thì có: canonical authoring chuyển hẳn sang `core/skills/` (D7) — rẻ hơn hẳn di dời `bin/`/`src/` vì không đụng path nào external project gọi trực tiếp, chỉ đổi chỗ maintainer sửa nguồn. |
 | 15 | Áp ma trận 6 mối quan tâm (harness/workflow/task/knowledge/skill/doctrine) × {core, domain} — còn chỗ nào thiếu? | Rõ phần lớn | harness: chỉ core (D1). workflow/task/skill: đã chốt (D2-D4). knowledge: đã chốt (D6). **doctrine: vẫn mở** — không có cơ chế nạp-có-điều-kiện theo domain trong AGENTS.md/CLAUDE.md hôm nay. |
 | 16 | `docs/history/<feature>/` có phải "knowledge" không? | Chốt — sửa lại (round 7) | KHÔNG — người chỉ ra `docs/history/` là **context** (biên bản thô, append-only, theo feature), không phải knowledge. "Knowledge" đúng nghĩa = domain-knowledge, curated, do team tự bảo trì — khác hẳn context. D6 (bản đầu, gắn tag `domain` lên `docs/history/`) SAI vì lẫn 2 khái niệm — đã thay bằng D6 mới. |
 | 17 | Domain-knowledge (curated, private, do team tự bảo trì) nên sống ở đâu? | Chốt — D6 | `domains/<name>/knowledge/`, co-located cùng `skills/`, theo đúng tinh thần tự-chứa của D3. Tiền lệ thật: `/home/vantt/projects/beegog/expertise/` — hệ curated knowledge base thật (`knowledge.md` tự mô tả "craft vs project layers, harvesting from finished work, recorded trust, dated freshness, migration rot, retirement") — khác hẳn `docs/history/` (context thô). |
+| 18 | `.agents/skills/core` có nên đổi thành `core/skills/` (bỏ dấu chấm, đối xứng `domains/`)? `.agents` và `.claude` có phải thin wrapper cả hai không? | Chốt — D7 | Có, nhưng không phải rename đơn thuần. `.agents/skills/*` là canonical THEO một quyết định TRƯỚC đó (tsk-1qi D5, `skill-wrappers.mjs` tự ghi rõ "the canonical, orchestrator-neutral skill source") — và `fgos setup` vendor NGUYÊN VĂN `.agents/skills/*` vào MỌI external project (`materializeSkillsIntoProject`), nên hình dạng bên ngoài (host project nhận được gì) không được đổi. D7: canonical AUTHORING chuyển sang `core/skills/` + `domains/*/skills/`; `.agents/skills/`, `.claude/skills/`, `plugins/fgOS/skills/` CẢ BA thành render target thật (thêm bước assembly trong `skill-wrappers.mjs`) — mở rộng quyết định tsk-1qi D5 (bối cảnh mới: `domains/` chưa tồn tại lúc đó), không đảo ngược nó. |
 
 ## 4. Quyết định đã chốt
 
@@ -126,6 +127,7 @@ thi thật.
 | D4 | `workflow-stage-graphs.mjs` chỉ còn là aggregator quét `domains/*/registry.mjs` tự động (directory scan), không phải import list sửa tay. | Điều kiện để D3 thật sự "pluggable" — thêm domain không được đụng file domain khác hay aggregator, giống hệt cách thêm `dogfood-fixture` không đụng `fgOS/`. |
 | D5 | Core (`bin/`, `src/`, `herdr-plugin/`) giữ nguyên vị trí top-level — KHÔNG di dời vào folder `core/` để đối xứng với `domains/`. Chỉ `.agents/skills/core/` (sau khi domain skill dọn ra `domains/*/skills/`) được gắn nhãn tường minh. | Grep: 881 tham chiếu `bin/fgos.mjs` trong `.md`/`.mjs` toàn repo (mọi action step skill, docs, test); fgOS đã cài global ở nhiều project khác (mission 0035) gọi thẳng path đó — di dời phá vỡ diện rộng cho lợi ích thuần biểu tượng, vì `domains/` tồn tại đã làm "không phải domains/" tự nhiên đọc là core. |
 | D6 | Domain-knowledge (curated, private, do team tự bảo trì) sống co-located tại `domains/<name>/knowledge/` — KHÔNG phải tag `domain` gắn lên `docs/history/` (bản đầu SAI, đã thay). `docs/history/<feature>/` là **context** (thô, append-only, theo feature) — giữ nguyên chỗ, không đổi. | Sửa theo người: knowledge ≠ context. Tiền lệ thật `/home/vantt/projects/beegog/expertise/` — hệ curated knowledge base có `knowledge.md` tự mô tả "harvesting from finished work, recorded trust, dated freshness, migration rot, retirement" — một hệ bảo trì chủ động, khác hẳn log thô. Theo tinh thần tự-chứa D3, domain-knowledge thuộc về folder riêng của domain đó. |
+| D7 | Canonical skill-source AUTHORING chuyển sang `core/skills/` + `domains/<name>/skills/`; `.agents/skills/`, `.claude/skills/`, `plugins/fgOS/skills/` cả BA trở thành render target thật (thêm bước assembly trong `skill-wrappers.mjs`) — KHÔNG đổi thứ `fgos setup` vendor vào external project. | Mở rộng (không đảo ngược) quyết định trước đó tsk-1qi D5 (`skill-wrappers.mjs` tự ghi "`.agents/skills/*` is the canonical, orchestrator-neutral skill source") — bối cảnh mới: `domains/` (D3) chưa tồn tại lúc D5 đó chốt. `.agents/skills/*` được `fgos setup`'s `materializeSkillsIntoProject` vendor NGUYÊN VĂN vào MỌI external project — hình dạng/nội dung bên ngoài phải giữ nguyên byte-identical; chỉ chỗ maintainer sửa nguồn đổi. |
 
 ## 5. Q&A log
 
@@ -223,6 +225,16 @@ thi thật.
   tìm thấy hệ curated knowledge-base thật với `knowledge.md` tự mô tả
   đúng khái niệm người muốn (harvesting/trust/freshness/retirement, khác
   hẳn raw log) → D6 mới: `domains/<name>/knowledge/`, co-located.
+- 2026-08-17 — Round 8 Q&A: người hỏi "`.agents/skills/core` thành
+  `core/skills/` được không? `.agents` và `.claude` là thin wrapper?"
+  Trợ lý scout `src/setup/skill-wrappers.mjs` — tìm ra `.agents/skills/*`
+  là canonical theo một quyết định TRƯỚC (tsk-1qi D5), và `fgos setup`
+  vendor nguyên văn `.agents/skills/*` vào MỌI external project
+  (`materializeSkillsIntoProject`) — không phải rename đơn giản. Trợ lý
+  đề xuất: canonical AUTHORING chuyển sang `core/skills/` +
+  `domains/*/skills/`, cả 3 cây cũ thành render target thật (thêm bước
+  assembly), giữ nguyên hình dạng bên ngoài host project nhận được. Người
+  xác nhận "ừ ghi D7 đi" → D7 chốt.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -251,8 +263,8 @@ forgentX/
 │   │                                     #   sau:   quét domains/*/registry.mjs, build DOMAINS tự động
 │   └── intake/{discovery,plan}.mjs       # workflow — dispatcher, sửa đọc DOMAINS[item.domain] thay vì hardcode
 ├── herdr-plugin/                         # harness — Rust engine
-├── .agents/skills/
-│   └── core/                             # skill — domain-agnostic (nhãn mới, D5)
+├── core/
+│   └── skills/                           # ★ D7 — canonical AUTHORING (thay .agents/skills/core/)
 │       ├── fgos-routing/  fgos-clarifying/  fgos-researching/
 │       └── fgos-unlock/   fgos-fanout/      fgos-indexing/   distill/
 ├── docs/
@@ -273,7 +285,7 @@ forgentX/
 │   │   ├── registry.mjs                  # workflow (stages/stepMap/transitions/skillMap)
 │   │   │                                 #   + task-specs (fieldSchema — CÙNG file, work.mjs đọc
 │   │   │                                 #   domain?.fieldSchema từ đây, D2)
-│   │   ├── skills/                       # skill — di dời từ .agents/skills/, 8 skill nguyên trạng
+│   │   ├── skills/                       # skill — canonical AUTHORING (D7), di dời từ .agents/skills/
 │   │   │   ├── discovering/  exploring/  planning/  validating/
 │   │   │   └── implement/    shaping/    driving/    compounding/
 │   │   └── knowledge/                    # ★ D6 — curated domain-knowledge, riêng của team, co-located
@@ -287,8 +299,11 @@ forgentX/
 │       └── skills/
 │       # + docs/specs/marketing.md (shared docs/specs/, spec trước khi có code — theo luật AGENTS.md)
 │
-├── .claude/skills/                       # render target (KHÔNG đổi cơ chế — vẫn generate từ .agents/skills/)
-└── plugins/fgOS/skills/                  # render target (KHÔNG đổi cơ chế — mirror plugins/fgOS/ tự nó)
+├── .agents/skills/                       # ★ D7 — render target (trước: canonical, tsk-1qi D5). Hình dạng/nội
+│                                         #   dung KHÔNG đổi (vẫn được fgos setup vendor nguyên văn vào
+│                                         #   external project) — chỉ nguồn sinh ra nó đổi (assembly step mới)
+├── .claude/skills/                       # render target (không đổi cơ chế — vẫn generate, nay từ core/skills/+domains/*/skills/)
+└── plugins/fgOS/skills/                  # render target (không đổi cơ chế — mirror plugins/fgOS/ tự nó)
 ```
 
 ```mermaid
@@ -298,7 +313,7 @@ flowchart TB
         harness_core["<b>harness</b><br/>bin/, src/, herdr-plugin/<br/><i>domain không có harness riêng</i>"]
         workflow_core["<b>workflow</b><br/>stage-fsm.mjs, status-fsm.mjs<br/>+ workflow-stage-graphs.mjs<br/><i>(aggregator, D4)</i>"]
         task_core["<b>task</b><br/>EDITABLE_FIELDS<br/>(store.mjs:275, D2)"]
-        skill_core["<b>skill</b><br/>.agents/skills/core/<br/>fgos-routing, fgos-clarifying, ..."]
+        skill_core["<b>skill</b><br/>core/skills/ (canonical, D7)<br/>fgos-routing, fgos-clarifying, ...<br/><i>.agents/.claude/plugins = render targets</i>"]
         knowledge_core["<b>knowledge</b><br/>docs/decisions/ (craft, domain-agnostic)"]
         context_core["<i>(context ≠ knowledge)</i><br/>docs/history/&lt;feature&gt;/<br/>shared, KHÔNG gắn domain — D6"]
         doctrine_core["<b>doctrine</b> ❓<br/>AGENTS.md / CLAUDE.md<br/>(luôn nạp, mọi domain)"]
@@ -380,26 +395,46 @@ trong nguồn canonical trước khi render.
   export vẫn xanh không đổi — export shape/consumer không đổi, chỉ đổi
   cách nội bộ build.
 
-### {#task-coding-skill-migration} Di dời 8 skill `fgos-coding-*` vào `domains/coding/skills/`
+### {#task-coding-skill-migration} Di dời 8 skill `fgos-coding-*` vào `domains/coding/skills/`, 7 skill còn lại vào `core/skills/`
 
-- **Mục tiêu:** hiện thực D3 cho tầng skill — di dời
+- **Mục tiêu:** hiện thực D3+D7 cho tầng skill — di dời
   `fgos-coding-{discovering,exploring,planning,validating,implement,
-  shaping,driving,compounding}` từ `.agents/skills/` (nguồn canonical)
-  sang `domains/coding/skills/`; cập nhật pointer trong
-  `.claude/skills/*/SKILL.md` và `plugins/fgOS/skills/*/SKILL.md` (các
-  wrapper tự ghi rõ "real skill content lives at ...") trỏ đúng vị trí
-  mới; 7 skill domain-agnostic còn lại trong `.agents/skills/` chuyển vào
-  `.agents/skills/core/` (nhãn tường minh, D5).
+  shaping,driving,compounding}` từ `.agents/skills/` sang
+  `domains/coding/skills/`; 7 skill domain-agnostic còn lại
+  (`fgos-routing`, `fgos-clarifying`, `fgos-researching`, `fgos-unlock`,
+  `fgos-fanout`, `fgos-indexing`, `distill`) sang `core/skills/`. Hai nơi
+  này trở thành nguồn canonical AUTHORING mới (D7) — `.agents/skills/`
+  không còn là nơi sửa tay.
 - **§6 excerpt áp dụng:** khối `skill` trong cả CORE và CODING subgraph.
-- **D-ID áp dụng:** D3, D5.
-- **Quan hệ:** cần quyết định thêm (chưa chốt trong item này) — canonical
-  source của domain skill có VẪN là `.agents/skills/` (chỉ đổi cấu trúc
-  con) hay chuyển hẳn thành `domains/coding/skills/` là canonical mới,
-  `.agents/skills/` chỉ còn giữ `core/`. Cần trả lời trước khi
-  `fgos-coding-planning` viết plan thật.
+- **D-ID áp dụng:** D3, D7.
+- **Quan hệ:** phụ thuộc task {#task-skill-assembly-mechanism} tồn tại
+  trước (hoặc song song) — nếu di dời trước khi assembly-step sẵn sàng,
+  `.agents/skills/` (và mọi thứ generate từ nó) sẽ trống cho tới khi cơ
+  chế mới chạy.
 - **Verify nháp:** mọi `/fgOS:*` slash-command action step vẫn resolve
   đúng skill sau khi đổi path; golden-file/snapshot test cho wrapper
   pointer nếu có.
+
+### {#task-skill-assembly-mechanism} Thêm bước assembly vào `skill-wrappers.mjs`/`build-skill-wrappers.mjs`
+
+- **Mục tiêu:** hiện thực D7 — `skill-wrappers.mjs` (và
+  `scripts/build-skill-wrappers.mjs`) hiện đọc trực tiếp
+  `.agents/skills/*` để sinh wrapper; thêm bước MỚI đứng trước: lắp ráp
+  `.agents/skills/*` từ `core/skills/*` + `domains/*/skills/*` (copy hoặc
+  symlink), rồi mới chạy generate-wrapper như cũ. `materializeSkillsIntoProject`
+  (vendor vào external project) phải chạy SAU bước lắp ráp, không đổi gì
+  ở phía external project nhận được.
+- **§6 excerpt áp dụng:** dòng `.agents/skills/` trong ASCII tree — "★ D7
+  — render target ... chỉ nguồn sinh ra nó đổi".
+- **D-ID áp dụng:** D7.
+- **Quan hệ:** phải xong TRƯỚC hoặc CÙNG lúc với task di dời skill ở
+  trên, nếu không `.agents/skills/` sẽ mồ côi giữa chừng.
+- **Verify nháp:** test coexistence/setup hiện có
+  (`test/e2e/coexistence-canary.test.mjs` và tương đương cho
+  `materializeSkillsIntoProject`) phải xanh KHÔNG ĐỔI — bằng chứng hình
+  dạng external-project-facing không đổi; thêm test mới cho riêng bước
+  assembly (input `core/skills/`+`domains/*/skills/` → output
+  `.agents/skills/` đúng nội dung mong đợi).
 
 ### {#task-dispatcher-domain-aware} Fix `discovery.mjs`/`plan.mjs`/`fgos-routing` đọc registry thay vì hardcode
 
