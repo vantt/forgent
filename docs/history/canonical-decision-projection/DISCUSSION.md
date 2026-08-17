@@ -2,6 +2,14 @@
 
 ## 1. Trạng thái hiện tại
 
+Vòng 4 (2026-08-17): người dùng yêu cầu distill thành một thiết kế tổng quát
+theo 3 tầng kiến trúc fgOS thật (harness / skills-core / skills-doctrine) để
+hình dung sẽ làm gì. Đã viết bản nháp tổng hợp ở §5 round 4 — **CHƯA lock
+vào §6** vì chưa D-ID nào giữ ổn định qua >1 round (D4) và còn ít nhất 3 fork
+kiến trúc thật chưa quyết (đơn/kép decision-store, scope theo risk-tier hay
+mọi item, harness đặt ở approve hay verb riêng). Trình bày trong chat + ghi
+lại đây, chờ người dùng chọn trước khi mint D-ID và viết §6 thật.
+
 Vòng 3 (2026-08-17): người dùng yêu cầu dò tiếp bee từ sau v1.18.3 (distillery
 cũ) lên bản mới nhất — thật ra bee đã lên **v2.7.0** (`beegog` local clone,
 `abde5ca7`, title chính "doc-rot doors — impact, routing, doc-deferral,
@@ -357,6 +365,81 @@ khác? Và với câu hỏi phạm vi đã chốt tạm ở round 1 (năng lực
 project dùng fgOS) — model 4-door này gắn ở "approve" verb vốn đã là verb
 lõi mọi project dùng fgOS đều đi qua, nên tự nhiên khớp — anh xác nhận đúng
 hướng này chứ?
+
+### Round 4 — 2026-08-17T09:33Z — bản nháp tổng hợp theo 3 tầng harness/skills-core/skills-doctrine
+
+**Scout thêm trước khi tổng hợp** (không suy đoán): `docs/decisions/0000-index.md`
+là file TAY-VIẾT (frontmatter `updated: 2026-07-18`, không script nào generate
+nó — khác hẳn `docs/decisions/index.md` của bee, byte-stable/regenerate-được).
+Có thêm `scripts/check-decision-supersession.mjs` (chưa nêu ở round 1-3, từ
+p-9fb81485): kiểm consistency 2 chiều của backward-pointer (record supersede
+có trỏ ngược đúng không) — nhưng CŨNG chỉ detection-only, chạy tay, giống
+`check-decision-citation-drift.mjs`. Xác nhận: **CẢ 2 script fgOS đang có
+đều chỉ phát hiện-sau, không có write-time refusal, không có close-time
+door nào** — đúng khoảng cách với bee v2.7.0 đã nêu ở round 3.
+
+**Bản nháp — chưa lock, sắp theo 3 tầng người dùng yêu cầu:**
+
+**1. HARNESS** (`src/state/`, `src/verbs/`, `bin/fgos.mjs` — máy, không prose):
+- Nâng `fgos decision` (đã có, đang dùng bởi fgos-coding-shaping/-planning ở
+  cấp TỪNG ITEM) và/hoặc `docs/decisions/*.md` ADR corpus (cấp PLATFORM,
+  đang tay-viết) để đòi khai quan hệ tường minh khi ghi — mirror bee's
+  `--relation supersedes:<id>|touches:<id>|none` — refuse nếu văn bản đọc
+  như supersession mà không khai flag.
+- Nâng `check-decision-citation-drift.mjs` + `check-decision-supersession.mjs`
+  từ "chạy tay, detection-only" thành hàm PURE gọi được ĐỒNG BỘ tại thời
+  điểm ghi (supersede/touches) — sweep `docs/**` tươi mỗi lần, không cache.
+- `docs/decisions/0000-index.md`: cân nhắc đổi từ tay-viết sang generate +
+  `--check` drift mode (giống `docs/enduser-docs-index.json` đã có sẵn cơ
+  chế generate tương tự trong repo này — không phải phát minh mới, chỉ áp
+  lại pattern đã có cho một file khác).
+- Registry trigger cho quyết định "để sau" (tương đương `bee triggers
+  add/list/resolve`) — chưa có gì tương đương trong fgOS hiện tại.
+- 4 "door" chặn ở điểm chuyển trạng thái gần nhất với "đóng việc" của fgOS —
+  ứng viên tự nhiên nhất: `fgos approve` (hoặc `return`→`awaiting-approval`).
+  Cần quyết fork: áp cho MỌI item hay chỉ theo risk-tier (bee dùng
+  "lane scales ceremony, never memory" — tiny/light có thể miễn).
+
+**2. SKILLS-CORE** (tầng dùng chung nhiều skill, khớp pattern
+`.claude/skills/_shared/` đã có — vd. `capacity-dispatch-fallback.md`):
+- Một fragment chung mô tả "cách đọc kết quả 4-door + cách viết một deferral
+  hợp lệ" — để `fgos-coding-validating`, `fgos-coding-implement`, và skill
+  wrapper `/fgOS:approve` không mỗi nơi tự suy diễn lại logic, giống cách
+  `capacity-dispatch-fallback.md` đang được share hiện nay.
+- Một helper chung "reconcile vs. waive" — dùng lại được bởi
+  `fgos-coding-planning` (lúc khoá D-ID) VÀ chính `fgos-coding-shaping` (kỹ
+  năng đang chạy discussion này, §4 mint D-ID) — vì §4 hiện tại CHƯA đòi
+  khai quan hệ với D-ID cũ nào, đúng lỗ hổng bee vừa đóng ở tầng của họ.
+
+**3. SKILLS — DOCTRINE** (`AGENTS.md`/`CLAUDE.md` + `SKILL.md` prose — luật,
+không phải máy):
+- Luật mới kiểu bee's AGENTS.md critical rules: "mọi `fgos decision` write
+  PHẢI khai `--relation`", "approve bị refuse nếu còn citation chưa
+  reconcile/D-ID chưa route — sửa hoặc log deferral có tên", "prose để-sau
+  PHẢI trỏ trigger đã đăng ký".
+- Cập nhật `docs/specs/reading-map.md`/`AGENTS.md`: thêm thứ tự đọc tường
+  minh "index đã generate → decisions → history/specs", với câu y hệt tinh
+  thần bee: "grep trần là fallback, không bao giờ là đường đọc chính" — đây
+  chính là câu trả lời trực tiếp cho TRIỆU CHỨNG GỐC người dùng nêu ở round
+  1 ("agent quét ra quyết định cũ").
+- Tự áp ngược lại cho CHÍNH `fgos-coding-shaping` (hard rules hiện tại) và
+  `fgos-coding-exploring`/`-planning` — 3 skill này đều tự mint D-ID, nên
+  đều là nguồn có thể gieo "quyết định mới nhưng không khai quan hệ với cái
+  cũ" nếu không tự áp luật mới lên chính mình trước.
+
+**3 fork kiến trúc thật, còn treo, cần người dùng quyết trước khi lock D-ID
+nào ở đây:**
+
+1. **Một decision-store hay hai?** fgOS hiện có 2 cơ chế decision riêng
+   biệt — `fgos decision --id <item-id>` (per-item, dùng bởi
+   shaping/exploring/planning) và `docs/decisions/*.md` (platform-level ADR
+   corpus, 33+ file, tay-viết). Bee chỉ có MỘT log (`.bee/decisions.jsonl`).
+   fgOS có nên hợp nhất, hay giữ 2 tầng riêng (item-level + platform-level)
+   nhưng áp CÙNG kỷ luật relation/sweep/door cho cả hai?
+2. **Door áp mọi item hay theo risk-tier?** (nêu ở mục HARNESS trên)
+3. **Harness đặt ở `approve` hay một verb/CI job riêng?** — `approve` khớp
+   tự nhiên nhất theo tiền lệ bee (gắn vào chỗ "đóng việc" thật), nhưng cần
+   xác nhận không xung đột với luồng review/reject hiện có của `approve`.
 
 ## 6. Thiết kế đã chốt
 
