@@ -104,7 +104,7 @@ parallel.
     "action": "D1: separate installer artifact (sh+ps1, git-hosted, curl|sh), decoupled from fgOS's own runtime, no Node/npm bootstrap dependency",
     "footprint": ["scripts/install.sh", "scripts/install.ps1", "test/scripts/install.test.mjs"],
     "kind": "feature",
-    "risk": "medium"
+    "risk": "standard"
   },
   {
     "title": "Installer downgrade-refusal + per-project fingerprint ledger (R15/R16)",
@@ -112,7 +112,7 @@ parallel.
     "action": "D2: installer refuses downgrade against the version already in the project unless forced with both versions known and readable, and writes the fingerprint ledger baseline",
     "footprint": ["src/setup/version-guard.mjs", "src/setup/fingerprint-ledger.mjs", "test/setup/version-guard.test.mjs", "test/setup/fingerprint-ledger.test.mjs"],
     "kind": "feature",
-    "risk": "high"
+    "risk": "heavy"
   },
   {
     "title": "fgos doctor drift-report check, report-only (R16)",
@@ -120,7 +120,7 @@ parallel.
     "action": "D3: fgos doctor on the project's copy is report-only for drift, never self-repairs; repair means re-running the installer",
     "footprint": ["src/setup/checks.mjs", "src/setup/registrations.mjs", "test/setup/checks.test.mjs"],
     "kind": "feature",
-    "risk": "medium"
+    "risk": "standard"
   },
   {
     "title": "Version pin + fgos upgrade / setup --latest",
@@ -128,7 +128,7 @@ parallel.
     "action": "D4: routine setup respects the recorded pin; an explicit upgrade action moves it forward; pinning older than current is still a refused downgrade",
     "footprint": ["bin/fgos.mjs", "src/cli/command-registry.mjs", "src/setup/version-guard.mjs", "test/setup/pin-upgrade.test.mjs"],
     "kind": "feature",
-    "risk": "medium",
+    "risk": "standard",
     "deps": [1]
   },
   {
@@ -137,7 +137,7 @@ parallel.
     "action": "D5: R21/R22 built from bee's rule text now, owned by the installer's own fail-closed gate, since it is the one process performing the apply",
     "footprint": ["scripts/install.sh", "scripts/install.ps1", "src/setup/parity-check.mjs", "test/scripts/install-parity.test.mjs"],
     "kind": "feature",
-    "risk": "high",
+    "risk": "heavy",
     "deps": [0]
   },
   {
