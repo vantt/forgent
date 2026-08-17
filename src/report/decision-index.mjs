@@ -15,7 +15,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { listWork } from '../state/store.mjs';
+import { listWork, StoreError } from '../state/store.mjs';
 
 export function indexPathFor(repoRoot) {
   return path.join(repoRoot, 'docs', 'decisions', 'index.md');
@@ -96,9 +96,30 @@ export function computeDecisionIndex(repoRoot, fgosDir) {
  * Regenerate and, if content actually changed, overwrite
  * docs/decisions/index.md. Idempotent: a second call with nothing new in
  * state.decisions reports `changed: false` and never touches the file.
+ *
+ * tsk-1lv review-fix F12: refuses instead of writing when the on-disk
+ * file already has real rows and the freshly-computed content would have
+ * none -- `merge.mjs`'s own comment on the removed collision-resolve
+ * mechanism argued the `fgos-write-rejected` wall makes a hostile
+ * regenerated index impossible to merge, but that wall only rejects
+ * staged changes under `.fgos/`; this file is an ordinary tracked doc.
+ * A `fgw/<id>` worktree never carries `.fgos/` (ADR0020), so running this
+ * verb there with no real store to read from computes the "no decisions
+ * yet" placeholder -- committing and merging THAT is a real, unguarded
+ * way to silently blank every platform decision's projection, same shape
+ * as F6's context-render fix. This guard closes that gap directly rather
+ * than relying on a wall that was never built to cover it.
  */
 export function generateDecisionIndex(repoRoot, fgosDir) {
-  const { indexPath, nextContent, changed } = computeDecisionIndex(repoRoot, fgosDir);
+  const { indexPath, nextContent, previousContent, changed } = computeDecisionIndex(repoRoot, fgosDir);
+  const previousHasRows = typeof previousContent === 'string' && /^\|.+\|.*\|\s*$/m.test(previousContent);
+  const nextHasRows = /^\|.+\|.*\|\s*$/m.test(nextContent);
+  if (changed && previousHasRows && !nextHasRows) {
+    throw new StoreError(
+      'validation',
+      `generateDecisionIndex: refusing to overwrite ${indexPath} -- it already has real rows and the freshly-computed content has none (a store with no decisions read, e.g. a worktree missing .fgos/ per ADR0020, or a genuine wipe -- either way this needs a person's look, not a silent overwrite).`,
+    );
+  }
   if (changed) {
     fs.mkdirSync(path.dirname(indexPath), { recursive: true });
     fs.writeFileSync(indexPath, nextContent, 'utf8');

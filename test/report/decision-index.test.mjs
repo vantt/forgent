@@ -117,6 +117,36 @@ test('generateDecisionIndex: writes the file on first call, then reports changed
   assert.equal(fs.statSync(indexPathFor(repoRoot)).mtimeMs, mtimeAfterFirst, 'unchanged content must not rewrite the file');
 });
 
+test('generateDecisionIndex: refuses to overwrite an index with real rows when the freshly-computed content has none -- F12 tsk-1lv regression (a store with no decisions read, e.g. a worktree missing .fgos/ per ADR0020)', () => {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-decision-index-io-'));
+  const emptyFgosDir = path.join(repoRoot, '.fgos-nonexistent');
+  const populatedFgosDir = path.join(repoRoot, '.fgos');
+  fs.mkdirSync(populatedFgosDir, { recursive: true });
+  addDecision(populatedFgosDir, { text: 'D1: repo-wide thing', rationale: 'r', scope: 'repo' });
+  const first = generateDecisionIndex(repoRoot, populatedFgosDir);
+  assert.equal(first.changed, true);
+  const before = fs.readFileSync(indexPathFor(repoRoot), 'utf8');
+
+  assert.throws(
+    () => generateDecisionIndex(repoRoot, emptyFgosDir),
+    /refusing to overwrite/,
+  );
+
+  const after = fs.readFileSync(indexPathFor(repoRoot), 'utf8');
+  assert.equal(after, before, 'the real index must survive the refused write untouched');
+});
+
+test('generateDecisionIndex: an empty-to-empty regenerate (nothing was ever recorded) is not a refusal -- there is no real content to lose', () => {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-decision-index-io-'));
+  const fgosDir = path.join(repoRoot, '.fgos');
+  fs.mkdirSync(fgosDir, { recursive: true });
+
+  const first = generateDecisionIndex(repoRoot, fgosDir);
+  assert.equal(first.changed, true);
+  const second = generateDecisionIndex(repoRoot, fgosDir);
+  assert.equal(second.changed, false);
+});
+
 // --- CLI: `fgos decision-index` / `--check` ---
 
 test('CLI: decision-index generates docs/decisions/index.md from a scope-carrying decision', () => {
