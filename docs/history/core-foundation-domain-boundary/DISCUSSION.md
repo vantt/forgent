@@ -10,6 +10,28 @@ status: open
 
 ## 1. Trạng thái hiện tại
 
+Round 11 (2026-08-17): **PHÁT HIỆN QUAN TRỌNG — thảo luận này đã bỏ sót
+một thiết kế đã chốt VÀ đã triển khai thật trước đó: `tsk-2t9c`
+(`docs/history/fgos-marketing-domain-foundation/`, 13 quyết định, wiring
+code thật trong `fgos-coding-implement`/`discovering`/`exploring`/
+`planning`/`validating`, có chạy end-to-end thật trên `tsk-ogx`).**
+tsk-2t9c D10 đã khoá "four-layer ontology": task-spec (contract) / skill
+(know-how) / knowledge (domain expertise) / context (fact tức thời) —
+KHÁC và chính xác hơn ma trận 6-concern của thảo luận này. "task-spec"
+đúng nghĩa (D6/D10) là hợp đồng theo TỪNG LOẠI việc (input/output/gates/
+verify-template), một file/domain/loại-việc — hoàn toàn KHÁC "task" mà
+trợ lý đã dùng xuyên suốt thảo luận này (field-schema work-item,
+`EDITABLE_FIELDS`/`domainFields`). D8 (cả bản sai lẫn bản sửa lần 1) đều
+dựa trên định nghĩa sai này. D9 ghi sửa lại — `docs/task-specs/coding/`
+(13 file thật, machine-checked bởi `registrations.mjs`'s
+`task-specs-resolve`) chuyển vào `domains/coding/task-specs/`, giữ đúng
+tên gọi đã có. tsk-2t9c CÒN có `roleGraph` (trục role/holder) và
+`taskSpecMap` trong registry entry của domain — 2 field registry.mjs của
+thảo luận này (D3/D4) chưa từng tính tới. **Câu hỏi treo cho người:**
+thảo luận này có nên coi tsk-2t9c là authoritative và chỉ tự giới hạn vào
+câu hỏi folder-layout ĐẶT LÊN TRÊN thiết kế đó, hay cần hoà giải đầy đủ
+2 thiết kế ngay trong phiên này?
+
 Round 10 (2026-08-17): D8 SỬA LẠI ngay sau khi chốt sai — bản đầu (seq
 19349) hiểu nhầm "task-specs" thành toàn bộ `docs/specs/`, di dời cả 12
 file platform/core. Người sửa ngay: chỉ tạo mới `domains/<name>/specs/`
@@ -129,7 +151,8 @@ thi thật.
 | 16 | `docs/history/<feature>/` có phải "knowledge" không? | Chốt — sửa lại (round 7) | KHÔNG — người chỉ ra `docs/history/` là **context** (biên bản thô, append-only, theo feature), không phải knowledge. "Knowledge" đúng nghĩa = domain-knowledge, curated, do team tự bảo trì — khác hẳn context. D6 (bản đầu, gắn tag `domain` lên `docs/history/`) SAI vì lẫn 2 khái niệm — đã thay bằng D6 mới. |
 | 17 | Domain-knowledge (curated, private, do team tự bảo trì) nên sống ở đâu? | Chốt — D6 | `domains/<name>/knowledge/`, co-located cùng `skills/`, theo đúng tinh thần tự-chứa của D3. Tiền lệ thật: `/home/vantt/projects/beegog/expertise/` — hệ curated knowledge base thật (`knowledge.md` tự mô tả "craft vs project layers, harvesting from finished work, recorded trust, dated freshness, migration rot, retirement") — khác hẳn `docs/history/` (context thô). |
 | 18 | `.agents/skills/core` có nên đổi thành `core/skills/` (bỏ dấu chấm, đối xứng `domains/`)? `.agents` và `.claude` có phải thin wrapper cả hai không? | Chốt — D7 | Có, nhưng không phải rename đơn thuần. `.agents/skills/*` là canonical THEO một quyết định TRƯỚC đó (tsk-1qi D5, `skill-wrappers.mjs` tự ghi rõ "the canonical, orchestrator-neutral skill source") — và `fgos setup` vendor NGUYÊN VĂN `.agents/skills/*` vào MỌI external project (`materializeSkillsIntoProject`), nên hình dạng bên ngoài (host project nhận được gì) không được đổi. D7: canonical AUTHORING chuyển sang `core/skills/` + `domains/*/skills/`; `.agents/skills/`, `.claude/skills/`, `plugins/fgOS/skills/` CẢ BA thành render target thật (thêm bước assembly trong `skill-wrappers.mjs`) — mở rộng quyết định tsk-1qi D5 (bối cảnh mới: `domains/` chưa tồn tại lúc đó), không đảo ngược nó. |
-| 19 | Task-specs nên tách vào đâu? | Chốt — D8, SỬA LẠI (round 10) | Bản D8 đầu SAI — hiểu nhầm "task-specs" thành toàn bộ `docs/specs/`, di dời cả 12 file platform/core (work-state, runner, distribution, ...) sang `core/specs/`. Người sửa: "không di dời `docs/specs/*.md`, chỉ di dời task-specs only". Đọc lại đúng ngữ cảnh gốc (round 7): "task-specs" là spec của RIÊNG concern `task` (hợp đồng field work-item) — một lát cắt hẹp trong ma trận 6-concern, không phải toàn bộ khu spec nền tảng. Core's task-contract đã tự tài liệu hoá bằng CODE (`EDITABLE_FIELDS`, D2) — không cần `core/specs/`. Chỉ CÓ MỚI: `domains/<name>/specs/` — nơi domain tự viết task-spec riêng (BA-grade) khi cần, KHÔNG đụng `docs/specs/`. |
+| 19 | Task-specs nên tách vào đâu? | SỬA LẠI LẦN 2 — D9 (round 11) | Cả bản D8 đầu (di dời toàn bộ `docs/specs/`) lẫn bản sửa lần 1 (định nghĩa task-specs = field-schema work-item) đều SAI. Người chỉ ra `docs/task-specs/coding/*.md` — 13 file THẬT ĐÃ TỒN TẠI, thuộc thiết kế đã chốt `tsk-2t9c` (D6/D10: task-spec = hợp đồng theo LOẠI việc, input/output/gates/verify-template — khác hẳn field-schema). Xem D9. |
+| 20 | tsk-2t9c (`fgos-marketing-domain-foundation`) phủ những gì, và quan hệ với thảo luận này ra sao? | Rõ (scout round 11), CHỜ NGƯỜI QUYẾT | 13 quyết định đã chốt + code đã wiring thật (fgos-coding-implement/discovering/exploring/planning/validating, chạy thật trên tsk-ogx). Khoá: 4-layer ontology (task-spec/skill/knowledge/context, D10), `roleGraph` (trục role/holder, D1), `taskSpecMap` trong registry domain (D6), workflow multiplicity theo `kind` (D7/D7a). Registry.mjs của thảo luận này (D3/D4) CHƯA tính `roleGraph`/`taskSpecMap`. Câu hỏi treo: tsk-2t9c authoritative, thảo luận này chỉ thêm lớp folder-layout lên trên — hay cần hoà giải đầy đủ ngay? |
 
 ## 4. Quyết định đã chốt
 
@@ -142,7 +165,8 @@ thi thật.
 | D5 | Core (`bin/`, `src/`, `herdr-plugin/`) giữ nguyên vị trí top-level — KHÔNG di dời vào folder `core/` để đối xứng với `domains/`. Chỉ `.agents/skills/core/` (sau khi domain skill dọn ra `domains/*/skills/`) được gắn nhãn tường minh. | Grep: 881 tham chiếu `bin/fgos.mjs` trong `.md`/`.mjs` toàn repo (mọi action step skill, docs, test); fgOS đã cài global ở nhiều project khác (mission 0035) gọi thẳng path đó — di dời phá vỡ diện rộng cho lợi ích thuần biểu tượng, vì `domains/` tồn tại đã làm "không phải domains/" tự nhiên đọc là core. |
 | D6 | Domain-knowledge (curated, private, do team tự bảo trì) sống co-located tại `domains/<name>/knowledge/` — KHÔNG phải tag `domain` gắn lên `docs/history/` (bản đầu SAI, đã thay). `docs/history/<feature>/` là **context** (thô, append-only, theo feature) — giữ nguyên chỗ, không đổi. | Sửa theo người: knowledge ≠ context. Tiền lệ thật `/home/vantt/projects/beegog/expertise/` — hệ curated knowledge base có `knowledge.md` tự mô tả "harvesting from finished work, recorded trust, dated freshness, migration rot, retirement" — một hệ bảo trì chủ động, khác hẳn log thô. Theo tinh thần tự-chứa D3, domain-knowledge thuộc về folder riêng của domain đó. |
 | D7 | Canonical skill-source AUTHORING chuyển sang `core/skills/` + `domains/<name>/skills/`; `.agents/skills/`, `.claude/skills/`, `plugins/fgOS/skills/` cả BA trở thành render target thật (thêm bước assembly trong `skill-wrappers.mjs`) — KHÔNG đổi thứ `fgos setup` vendor vào external project. | Mở rộng (không đảo ngược) quyết định trước đó tsk-1qi D5 (`skill-wrappers.mjs` tự ghi "`.agents/skills/*` is the canonical, orchestrator-neutral skill source") — bối cảnh mới: `domains/` (D3) chưa tồn tại lúc D5 đó chốt. `.agents/skills/*` được `fgos setup`'s `materializeSkillsIntoProject` vendor NGUYÊN VĂN vào MỌI external project — hình dạng/nội dung bên ngoài phải giữ nguyên byte-identical; chỉ chỗ maintainer sửa nguồn đổi. |
-| D8 | ~~Task-specs tách khỏi `docs/specs/` chung vào `core/specs/` (toàn bộ 12 file) + `domains/<name>/specs/`~~ — **SAI, đã sửa (round 10).** `docs/specs/` (12 file platform/core hiện có) **giữ nguyên, KHÔNG di dời gì cả.** Chỉ CÓ MỚI: `domains/<name>/specs/`, nơi domain tự viết task-spec riêng khi cần, rỗng cho tới lúc đó. | Hiểu nhầm ban đầu: "task-specs" ≠ toàn bộ `docs/specs/`. Đúng nghĩa (round 7): spec của RIÊNG concern `task` (hợp đồng field work-item) — core's phần đó đã là CODE tự tài liệu hoá (`EDITABLE_FIELDS`, D2), không cần file spec riêng. Không có lý do di dời 12 file platform-spec (work-state/runner/distribution/...) — chúng không liên quan tới trục domain-vs-core của item này. |
+| D8 | ~~Task-specs tách khỏi `docs/specs/` chung vào `core/specs/` (toàn bộ 12 file) + `domains/<name>/specs/`~~ — **SAI 2 LẦN, xem D9.** | (giữ lại làm lịch sử — nội dung không còn đúng, D9 thay thế hoàn toàn định nghĩa "task-specs".) |
+| D9 | "Task-spec" đúng nghĩa là khái niệm của `tsk-2t9c` (D6/D10): hợp đồng theo LOẠI việc (input/output/gates/verify-template), một file/domain/loại-việc — KHÔNG phải field-schema work-item. `docs/task-specs/coding/*.md` (13 file thật, machine-checked bởi `registrations.mjs`'s `task-specs-resolve`) chuyển vào `domains/coding/task-specs/`, giữ nguyên tên "task-specs" (không đổi thành "specs"). | Người chỉ ra folder `docs/task-specs/coding/` đã tồn tại thật — thảo luận này bỏ sót toàn bộ `tsk-2t9c` (13 quyết định đã chốt + code đã wiring thật) trong suốt các round trước. D8 (cả 2 bản) sai vì dựa trên định nghĩa "task-specs" tự chế, chưa từng đọc tsk-2t9c. Còn treo: `roleGraph`/`taskSpecMap` trong registry.mjs (D3/D4 của thảo luận này) chưa tính tới — chờ người quyết định mức hoà giải. |
 
 ## 5. Q&A log
 
@@ -262,6 +286,17 @@ thi thật.
   round 7: task-specs = spec của RIÊNG concern `task`, không phải mọi
   spec nền tảng. D8 sửa lại: `docs/specs/` giữ nguyên 100%, chỉ thêm mới
   `domains/<name>/specs/` cho task-spec riêng của domain.
+- 2026-08-17 — Round 11 Q&A: người hỏi "em có biết mình có folder
+  `docs/task-specs/coding/*.md`? cái này là move vào task-specs trong
+  domain coding." Trợ lý scout — tìm thấy 13 file thật, machine-checked
+  bởi `registrations.mjs`'s `task-specs-resolve`, thuộc thiết kế đã chốt
+  `tsk-2t9c` (`docs/history/fgos-marketing-domain-foundation/`, 13 quyết
+  định, code đã wiring thật). D10 của tsk-2t9c khoá "four-layer ontology"
+  (task-spec/skill/knowledge/context) — task-spec đúng nghĩa là hợp đồng
+  theo LOẠI việc, không phải field-schema work-item mà trợ lý hiểu nhầm
+  từ round 7. D9 (thảo luận này) sửa lại theo đúng định nghĩa gốc; câu
+  hỏi treo cho người: hoà giải registry.mjs (D3/D4, chưa có
+  `roleGraph`/`taskSpecMap`) với tsk-2t9c ở mức nào.
 
 ## 6. Thiết kế đã chốt {#design}
 
