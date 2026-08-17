@@ -67,6 +67,7 @@ export function findCitationDriftFindings(
           kind: 'dead-framing',
           file,
           line: ln,
+          text: line.trim(),
           id,
           supersededBy,
           message:
@@ -118,6 +119,7 @@ export function findCitationFormatFindings(sourceFiles) {
               kind: 'd-local-outside-home',
               file,
               line: ln,
+              text: line.trim(),
               id: `D${num}`,
               message:
                 `${file}:${ln}: cites D-local id D${num} ` +
@@ -133,6 +135,7 @@ export function findCitationFormatFindings(sourceFiles) {
             kind: 'bare-citation',
             file,
             line: ln,
+            text: line.trim(),
             id: `${kind}${num}`,
             message:
               `${file}:${ln}: cites ${kind}${num} with no gloss ` +
@@ -146,11 +149,44 @@ export function findCitationFormatFindings(sourceFiles) {
   return findings;
 }
 
+// Content-keyed (not line-keyed, tsk-3x8 F1): a line inserted or deleted
+// earlier in the file shifts every later `line` number, which would make
+// an already-baselined finding look "new" under a line-keyed baseline
+// (the mechanism check-decision-codes.mjs's own content-keyed baseline
+// already avoids). `id` stays in the key alongside `text` because one
+// line can carry more than one citation finding (e.g. two ids cited on
+// the same line) -- `text` alone would collapse those into one entry.
+function findingKey(f) {
+  return `${f.kind}:${f.id}:${f.text}`;
+}
+
+// Occurrence-count consumption (tsk-6at), not membership: a file can
+// legitimately carry two or more findings whose kind/id/text are all
+// identical (a repeated citation phrase, a templated table row). Baseline
+// membership alone (`.includes`) would treat every such repeat as
+// "already known" forever, silently missing a genuinely new Nth
+// occurrence once at least one had ever been baselined. Consuming one
+// baseline occurrence per matching finding restores the per-occurrence
+// accounting the old line-keyed formula got for free.
 export function findNewFindings(findings, baseline) {
+  const remaining = {};
+  for (const [file, keys] of Object.entries(baseline)) {
+    const counts = new Map();
+    for (const key of keys) {
+      counts.set(key, (counts.get(key) || 0) + 1);
+    }
+    remaining[file] = counts;
+  }
   return findings.filter((f) => {
-    const known = baseline[f.file];
-    const key = `${f.kind}:${f.line}:${f.id}`;
-    return !known || !known.includes(key);
+    const counts = remaining[f.file];
+    if (!counts) return true;
+    const key = findingKey(f);
+    const left = counts.get(key) || 0;
+    if (left > 0) {
+      counts.set(key, left - 1);
+      return false;
+    }
+    return true;
   });
 }
 
@@ -158,7 +194,7 @@ export function baselineFromFindings(findings) {
   const baseline = {};
   for (const f of findings) {
     if (!baseline[f.file]) baseline[f.file] = [];
-    baseline[f.file].push(`${f.kind}:${f.line}:${f.id}`);
+    baseline[f.file].push(findingKey(f));
   }
   return baseline;
 }

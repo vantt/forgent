@@ -42,7 +42,7 @@ export function generateWrapperContent(sourceContent, sourceRelativePath) {
   }
   return (
     `${frontmatter}\n` +
-    'This is a generated thin wrapper (tsk-1qi D5/D7) -- do not edit directly, edit the source instead.\n' +
+    'This is a generated thin wrapper (tsk-1qi) -- do not edit directly, edit the source instead.\n' +
     `The real skill content lives at \`${sourceRelativePath}\`, this project's own canonical skill source.\n` +
     'Read that file and follow it directly.\n'
   );

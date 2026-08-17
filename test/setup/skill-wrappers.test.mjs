@@ -58,6 +58,17 @@ test('generateWrapperContent throws when the source has no frontmatter to copy',
   assert.throws(() => generateWrapperContent('# No frontmatter\n', 'x.md'), /frontmatter/);
 });
 
+test(
+  'generateWrapperContent never cites a bare D-local id outside its own ' +
+    'CONTEXT.md (tsk-352f: decision 0017), but keeps the tsk-1qi item id',
+  () => {
+    const sourceContent = `${SAMPLE_FRONTMATTER}\n# Body\n`;
+    const wrapper = generateWrapperContent(sourceContent, 'x.md');
+    assert.doesNotMatch(wrapper, /\bD\d{1,2}\b/);
+    assert.match(wrapper, /tsk-1qi/);
+  },
+);
+
 test('generateAllSkillWrappers writes one wrapper per skill directory under agentsSkillsRoot', () => {
   const agentsSkillsRoot = mkTempDir('skill-wrappers-agents-');
   const claudeSkillsRoot = mkTempDir('skill-wrappers-claude-');
