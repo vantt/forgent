@@ -202,6 +202,49 @@ suy diễn lý thuyết — mirror đúng cơ chế plugin đã chạy thật tr
 repo này (`plugins/fgOS/`: manifest + skills tự chứa, thêm
 `dogfood-fixture` không đụng gì bên trong `fgOS/`).
 
+Layout thư mục thật (chỉ phần đổi/mới — mọi thứ khác giữ nguyên vị trí):
+
+```text
+forgentX/
+├── bin/                                  # core — harness (KHÔNG di dời, D5: 881 ref bin/fgos.mjs)
+├── src/
+│   └── state/
+│       └── workflow-stage-graphs.mjs     # core — workflow AGGREGATOR (D4)
+│                                         #   trước: chứa cả codingDomain (~390 dòng) inline
+│                                         #   sau:   quét domains/*/registry.mjs, build DOMAINS tự động
+├── herdr-plugin/                         # core — harness, Rust engine (KHÔNG di dời)
+├── .agents/skills/
+│   └── core/                             # core — skill domain-agnostic (nhãn mới, D5)
+│       ├── fgos-routing/
+│       ├── fgos-clarifying/
+│       ├── fgos-researching/
+│       ├── fgos-unlock/
+│       ├── fgos-fanout/
+│       ├── fgos-indexing/
+│       └── distill/
+│
+├── domains/                              # ★ MỚI — top-level, mỗi domain 1 folder tự chứa (D3)
+│   ├── coding/
+│   │   ├── registry.mjs                  # workflow — stages/stepMap/transitions/skillMap
+│   │   └── skills/                       # skill — di dời từ .agents/skills/, 8 skill nguyên trạng
+│   │       ├── discovering/
+│   │       ├── exploring/
+│   │       ├── planning/
+│   │       ├── validating/
+│   │       ├── implement/
+│   │       ├── shaping/
+│   │       ├── driving/
+│   │       └── compounding/
+│   │       # task: domainFields.coding.* (data, không phải file — sống trong .fgos/events.jsonl)
+│   │
+│   └── marketing/                        # ★ tương lai (STR52) — thêm vào đây, KHÔNG sửa gì trong coding/
+│       ├── registry.mjs
+│       └── skills/
+│
+├── .claude/skills/                       # render target (KHÔNG đổi cơ chế — vẫn generate từ .agents/skills/)
+└── plugins/fgOS/skills/                  # render target (KHÔNG đổi cơ chế — mirror plugins/fgOS/ tự nó)
+```
+
 ```mermaid
 flowchart TB
     subgraph CORE["core (port đóng — mọi domain dùng chung, KHÔNG di dời — D5)"]
