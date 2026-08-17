@@ -12,14 +12,26 @@
 
 **Checked:**
 - `find . -iname "executor-dispatch-fallback.md"` (run twice: once in
-  tsk-1ep's worktree, once fresh in this item's own worktree) — both
-  times returned exactly one hit:
-  `plugins/fgOS/skills/_shared/executor-dispatch-fallback.md`. No
-  `.agents/skills/_shared/` or `.claude/skills/_shared/` copy exists on
-  `main` today, despite `AGENTS.md`'s own prose describing a
-  `.claude/skills/_shared/...` + `.agents/skills/` mirror pair — that
-  mismatch is pre-existing and out of this item's scope (not introduced
-  or worsened by this fix; noted for a future item, not fixed here).
+  tsk-1ep's worktree, once fresh in this item's own worktree, right after
+  `EnterWorktree`) — both times returned exactly one hit:
+  `plugins/fgOS/skills/_shared/executor-dispatch-fallback.md`. **This was
+  wrong** — `npm test` (`test/skills/fgos-mirror.test.mjs`) caught it
+  after the implement step: `.agents/skills/_shared/executor-dispatch-
+  fallback.md` genuinely exists (`git ls-files` confirms it is tracked,
+  real commit history: `c681f353`/`cea6e219`), and is byte-identical to
+  the plugin copy per `fgos-mirror.test.mjs`'s own assertion — until this
+  item's edit landed on the plugin copy only. Root cause of the `find`
+  miss is unconfirmed (re-running the identical `find .` a third time,
+  later in the same worktree, correctly returned both files) — possibly
+  a stale directory-entry cache immediately after `EnterWorktree`'s own
+  `git worktree add`, possibly something else; not chased further since
+  the actionable fix (sync both files, verified via `fgos-mirror.test.mjs`
+  passing) does not depend on the root cause. **Lesson applied going
+  forward: run the FULL `npm test` once against a freshly claimed item's
+  branch before trusting a narrow `find`/`grep` scan to have found every
+  real file needing an edit** — the same class of gap `tsk-1ep`'s own
+  citation-drift baseline correction already surfaced once this session,
+  now confirmed as a repeatable risk, not a one-off.
 - Live-verified this same conversation, twice (tsk-52z, tsk-1ep): a
   native agent session calling `node src/runner/dispatch.mjs execute ...`
   through the plain (synchronous, foreground) Bash tool call gets the
