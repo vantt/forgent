@@ -240,3 +240,60 @@ test('CLI: context-render excludes another item\'s decisions -- only rows scoped
   assert.match(content, /host decision/);
   assert.doesNotMatch(content, /unrelated decision/);
 });
+
+test('CLI: context-render refuses (validation, exit 4) rather than blank a hand-typed table with no matching state.decisions yet -- F6 tsk-1lv regression', () => {
+  const cwd = initCwd();
+  assert.equal(
+    run(cwd, ['add', '--id', 'host-item', '--title', 'Host', '--kind', 'task', '--risk', 'light', '--verify', 'npm test', '--description', 'fixture']).status,
+    0,
+  );
+  const docsRef = 'docs/history/host-item';
+  const contextPath = path.join(cwd, docsRef, 'CONTEXT.md');
+  fs.mkdirSync(path.dirname(contextPath), { recursive: true });
+  fs.writeFileSync(
+    contextPath,
+    [
+      '# CONTEXT: Foo', '', '## Feature boundary', '', 'boundary text', '',
+      '## Locked decisions', '',
+      '| D-ID | Quyết định |', '|---|---|',
+      '| D1 | a pre-tsk-1lv-3 hand-typed row, never logged via fgos decision |',
+      '', '## Pinned terms', '', '- term', '',
+    ].join('\n'),
+  );
+
+  const result = run(cwd, ['context-render', 'host-item']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /refusing to render an empty table over an existing/);
+
+  const after = fs.readFileSync(contextPath, 'utf8');
+  assert.match(after, /a pre-tsk-1lv-3 hand-typed row, never logged via fgos decision/, 'the hand-typed row must survive the refused write untouched');
+});
+
+test('CLI: context-render finds CONTEXT.md via resolveContentRoot when the item declares a docsRef that only exists relative to process.cwd(), not --dir -- F5 tsk-1lv regression', () => {
+  const stateRoot = initCwd();
+  assert.equal(
+    run(stateRoot, ['add', '--id', 'host-item', '--title', 'Host', '--kind', 'task', '--risk', 'light', '--verify', 'npm test', '--description', 'fixture']).status,
+    0,
+  );
+  // Simulate the worktree-workflow case resolveContentRoot exists for
+  // (tsk-1ni D1): CONTEXT.md lives under a SEPARATE directory (standing in
+  // for an item's own fgw/<id> worktree), not under the state root passed
+  // via --dir. Running WITH cwd set to that separate directory is the
+  // resolveContentRoot candidate #1 (process.cwd()) this test exercises.
+  const contentRoot = tmpRepoRoot();
+  const docsRef = 'docs/history/host-item';
+  writeContextSkeleton(contentRoot, docsRef);
+  assert.equal(
+    run(stateRoot, ['decision', '--id', 'host-item', '--text', 'D1: locked from a separate content root', '--rationale', 'r', '--relation', 'none']).status,
+    0,
+  );
+
+  const result = spawnSync(process.execPath, [FGOS, 'context-render', 'host-item', '--dir', stateRoot], { cwd: contentRoot, encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr);
+  const data = JSON.parse(result.stdout).data;
+  assert.equal(data.changed, true);
+
+  const content = fs.readFileSync(path.join(contentRoot, docsRef, 'CONTEXT.md'), 'utf8');
+  assert.match(content, /\| D1 \| locked from a separate content root \|/);
+  assert.ok(!fs.existsSync(path.join(stateRoot, docsRef)), 'must never fall back to writing a stale copy at the state root when the real content root resolves elsewhere');
+});

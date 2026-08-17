@@ -40,7 +40,7 @@ const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 
 import { resolveFgosDir, fgosDirFromRoot, resolveMainCheckoutRoot } from '../src/runner/paths.mjs';
 import { resolveCliVersionInfo } from '../src/cli/version.mjs';
 import { resolveDiscovery, classificationPatchFromVerdict, assertCallerClassification } from '../src/intake/discovery.mjs';
-import { resolvePlan, replaceLockedDecisionsSection } from '../src/intake/plan.mjs';
+import { resolvePlan, replaceLockedDecisionsSection, resolveContentRoot } from '../src/intake/plan.mjs';
 import { computeEntropy, computeCounts, FINAL_STATUSES } from '../src/report/entropy.mjs';
 import { findSourceCaptureIds } from '../src/report/enduser-index.mjs';
 import { generateEnduserDocsIndex } from '../src/report/enduser-index-generate.mjs';
@@ -2030,13 +2030,25 @@ async function runVerb(verb, flags, positional, dir) {
     // any other section.
     case 'context-render': {
       const id = requireField(positional[0] ?? flags.id, 'context-render requires an id: fgos context-render <id>');
-      const repoRoot = path.dirname(dir);
       const view = listWork(dir);
       const item = view.work[id];
       if (!item) {
         throw new StoreError('validation', `work "${id}" not found.`);
       }
+      // tsk-1lv review-fix F5: was `path.dirname(dir)` (the state root,
+      // always the main checkout per ADR0020) -- but fgos-coding-exploring/
+      // -planning/-shaping commit CONTEXT.md to the item's OWN fgw/<id>
+      // branch/worktree, which never carries `.fgos/` (ADR0020), so a
+      // caller inside that worktree passing `--dir <mainRoot>` had this
+      // verb look for CONTEXT.md in the wrong tree entirely (misleading
+      // "create the CONTEXT.md skeleton first" on an item that already has
+      // one, or worse, silently writing a stale copy in the main checkout
+      // that never reaches the branch). `resolveContentRoot` (tsk-1ni D1,
+      // `src/intake/plan.mjs`) is the existing, tested helper for exactly
+      // this problem -- reuse it instead of reimplementing a narrower,
+      // wrong version of the same resolution.
       const docsRefRaw = typeof item.docsRef === 'string' && item.docsRef.trim() ? item.docsRef.trim() : `docs/history/${id}`;
+      const repoRoot = resolveContentRoot(path.dirname(dir), id, docsRefRaw);
       const contextRelPath = path.posix.join(docsRefRaw.replace(/\/+$/, ''), 'CONTEXT.md');
       const contextPath = path.join(repoRoot, contextRelPath);
       if (!fs.existsSync(contextPath)) {
@@ -2048,6 +2060,23 @@ async function runVerb(verb, flags, positional, dir) {
       const decisions = (view.decisions ?? []).filter((d) => d.id === id);
       const table = renderLockedDecisionsTable(decisions);
       const before = fs.readFileSync(contextPath, 'utf8');
+      // tsk-1lv review-fix F6: a render with zero rows (no state.decisions
+      // logged yet for this id) always used to overwrite whatever the
+      // section already held -- including a hand-typed table from a
+      // pre-tsk-1lv-3 item that never ran `fgos decision --id`. Refuse
+      // instead of silently blanking real rows a person can only recover
+      // from git: an empty render is never a legitimate downgrade of an
+      // existing table with content.
+      const existingSection = /##\s*Locked decisions([\s\S]*?)(?:\n##\s|$)/i.exec(before);
+      const existingHasRows = !!existingSection && /^\s*\|.+\|.*\|\s*$/m.test(
+        existingSection[1].split('\n').slice(2).join('\n'),
+      );
+      if (decisions.filter((d) => d.kind !== 'engine').length === 0 && existingHasRows) {
+        throw new StoreError(
+          'validation',
+          `${contextRelPath}: refusing to render an empty table over an existing "## Locked decisions" section that already has rows -- no state.decisions record exists yet for "${id}" (run "fgos decision --id ${id} ..." for each row first, or this table was hand-typed before tsk-1lv-3 and needs manual reconciliation).`,
+        );
+      }
       let after;
       try {
         after = replaceLockedDecisionsSection(before, table);
