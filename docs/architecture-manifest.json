@@ -69,6 +69,7 @@
     "src/report/entropy.mjs": "domain",
     "src/report/enduser-index.mjs": "domain",
     "src/report/enduser-index-generate.mjs": "infra",
+    "src/report/decision-index.mjs": "infra",
     "src/report/frontmatter.mjs": "domain",
     "src/evolve/candidates.mjs": "domain",
     "src/evolve/iron-law.mjs": "domain",

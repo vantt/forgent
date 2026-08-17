@@ -19,6 +19,7 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf, parseDecisionRelation, decisionTextLooksLikeSupersession } from '../src/state/store.mjs';
 import { collectWideSourceFiles, findWideCitationFindings } from '../scripts/check-decision-citation-drift.mjs';
+import { computeDecisionIndex, generateDecisionIndex } from '../src/report/decision-index.mjs';
 import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability, toolsFromCapacities } from '../src/state/tool-registry.mjs';
 import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
@@ -1906,6 +1907,14 @@ async function runVerb(verb, flags, positional, dir) {
       const alternatives = optionalField(flags.alternatives, 'decision --alternatives requires a non-empty value (omit --alternatives entirely to skip it)');
       const source = optionalField(flags.source, 'decision --source requires a non-empty value (omit --source entirely to skip it)');
       const id = optionalField(flags.id, 'decision --id requires a non-empty value (omit --id entirely to skip per-item scoping)');
+      // tsk-1lv-2 D4: a platform/repo-wide decision (no --id) carries
+      // --scope <area-slug> (e.g. "repo" for the whole codebase, or an
+      // area name matching docs/specs/<area>.md) so `fgos decision-index`
+      // can project it into docs/decisions/index.md. Purely optional and
+      // additive -- an item-scoped decision (--id set) has no use for it,
+      // and omitting it entirely is unaffected (same posture as
+      // --alternatives/--source above).
+      const scope = optionalField(flags.scope, 'decision --scope requires a non-empty value (omit --scope entirely for an item-scoped or unscoped decision)');
       // tsk-1lv-1 D2/D8: every CLI-surface decision write declares its
       // relation to prior decisions explicitly -- no default, no
       // inference (STR72's own root cause: a supersession narrated only
@@ -1921,7 +1930,7 @@ async function runVerb(verb, flags, positional, dir) {
           'decision text reads like a supersession ("supersedes/replaces/overrides/no longer applies/instead of the previous") but --relation supersedes:<id> was not declared -- declare the relation explicitly (or rephrase the text if it is not actually a supersession).',
         );
       }
-      const { event } = addDecision(dir, { text, rationale, alternatives, source, id, relation: relation.kind === 'none' ? 'none' : `${relation.kind}:${relation.id}` });
+      const { event } = addDecision(dir, { text, rationale, alternatives, source, id, scope, relation: relation.kind === 'none' ? 'none' : `${relation.kind}:${relation.id}` });
       const result = { seq: event.seq, relation: relation.kind === 'none' ? 'none' : `${relation.kind}:${relation.id}` };
       // Write-time citation sweep (D2 "sweep tươi tại write-time, không
       // cache"): only `supersedes` has a real dangling-citation shape (a
@@ -1944,6 +1953,30 @@ async function runVerb(verb, flags, positional, dir) {
         }
       }
       return result;
+    }
+
+    // tsk-1lv-2 D4: docs/decisions/index.md is a projection of
+    // state.decisions' scope-carrying records -- generated, never
+    // hand-edited (bee's own standing exemption for this exact path,
+    // mirrors `fgos docs-index`'s own generate+drift shape for
+    // docs/enduser-docs-index.json). `--check` never writes: it reports
+    // whether the on-disk file matches what a fresh regenerate would
+    // produce, refusing (validation) when it does not -- the drift-mode
+    // half of the verify draft this task's own DISCUSSION.md names.
+    case 'decision-index': {
+      const repoRoot = path.dirname(dir);
+      if (flags.check) {
+        const { indexPath, changed } = computeDecisionIndex(repoRoot, dir);
+        if (changed) {
+          throw new StoreError(
+            'validation',
+            `${path.relative(repoRoot, indexPath)} is stale (regenerating would change its content) -- run "fgos decision-index" (no --check) to refresh it.`,
+          );
+        }
+        return { path: path.relative(repoRoot, indexPath).split(path.sep).join('/'), changed: false };
+      }
+      const { path: indexRelPath, changed } = generateDecisionIndex(repoRoot, dir);
+      return { path: indexRelPath, changed };
     }
 
     case 'gate-approve': {

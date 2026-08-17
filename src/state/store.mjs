@@ -1119,6 +1119,17 @@ export function recordGateApprove(dir, { id, gate, actor, verify } = {}) {
  * (`resolveDiscovery`/`resolvePlan`, which pass `kind: 'engine'`
  * explicitly) from real design decisions without matching on `text`
  * prefixes.
+ *
+ * `scope` (tsk-1lv-2 D4): optional free text (no enum, same posture as
+ * `source`/`kind`) — an area slug (e.g. `'repo'`, or one matching
+ * `docs/specs/<area>.md`) marking a PLATFORM/repo-wide decision, as
+ * opposed to `id`'s per-item scoping. Absent entirely for an item-scoped
+ * or unscoped decision; `src/report/decision-index.mjs`'s
+ * `buildDecisionIndexMarkdown` is the one reader that filters on its
+ * presence to build `docs/decisions/index.md`. This function never
+ * validates or defaults it — same "CLI validates, store persists"
+ * split `relation` already established (see the CLI-layer comment above
+ * `parseDecisionRelation` below).
  */
 export function addDecision(dir, payload) {
   const { logPath } = paths(dir);

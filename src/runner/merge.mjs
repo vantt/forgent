@@ -651,6 +651,30 @@ export function autoResolveDecisionIndexCollision(repoRoot, branch, classificati
   return true;
 }
 
+// tsk-1lv-2: a "mirrors merge.mjs collision-resolve subsystem" auto-resolve
+// for the new GENERATED docs/decisions/index.md was attempted here and
+// removed after direct reproduction proved it structurally unreachable: a
+// `fgw/<id>` worker branch can never legitimately carry a `.fgos/`-derived
+// regenerated file through its own commit at all -- ADR0020's
+// `fgos-write-rejected` wall (below, `fgosPaths.length > 0`) permanently
+// rejects ANY branch merge that stages a change under `.fgos/`, and
+// regenerating `docs/decisions/index.md` correctly requires reading
+// `.fgos/events.jsonl`, which a worktree never carries in the first place
+// (same ADR) -- so no branch can ever produce a *meaningful* regenerated
+// version of this file to collide over via `mergeRunnerItem`. Confirmed by
+// constructing the exact scenario (two branches each committing a decision
+// + regenerated index) and observing `fgos-write-rejected`, not a resolvable
+// git conflict, cross-checked against `docs/how-to/fix-fgos-write-rejected-
+// merge-block.md`'s own documented precedent (tsk-n4i-1/tsk-5vf/tsk-4eu/
+// tsk-5ge/tsk-28o/tsk-3v2 -- six independent real occurrences, all the same
+// wall). The only real collision risk for this file is two CONCURRENT
+// direct-to-main-checkout `fgos decision-index` runs, a local file race
+// outside this module's branch-merge scope entirely, not a git merge
+// conflict `mergeRunnerItem` would ever see. `docs/decisions/0000-index.md`
+// (the OLD hand-authored corpus above) is a genuinely different case: those
+// files are ordinary tracked source a work item's own branch legitimately
+// creates as part of its real diff, never a `.fgos/`-derived regeneration.
+
 /**
  * Attempt to merge a runner item's branch into `repoRoot`'s current checkout
  * (checked clean by the caller first). The git call itself is target-
