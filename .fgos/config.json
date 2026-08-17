@@ -19,9 +19,27 @@
         "Bash(git add:*),Bash(git commit:*)"
       ]
     },
+    "capabilities": {
+      "impact-analysis": {
+        "description": "Code-graph blast radius",
+        "aliases": [
+          "impact_analysis",
+          "Impact Analysis"
+        ],
+        "prefer": "gitnexus"
+      },
+      "pane-labeling": {
+        "description": "Write a session/task id onto the current terminal pane's label, for a human watching a screen"
+      },
+      "fgos-coding-implement": {
+        "description": "code-implement work for the coding domain's executing stage",
+        "prefer": "agy"
+      }
+    },
     "executors": {
       "agy": {
         "kind": "agent",
+        "description": "Antigravity Cli",
         "allowCrossProvider": true,
         "for": [
           "fgos-coding-implement"
@@ -49,12 +67,13 @@
       },
       "gitnexus": {
         "kind": "tool",
+        "description": "Code-graph blast radius",
         "for": [
           "impact-analysis"
         ],
         "scanTarget": ".gitnexus",
         "responsibility": "Verification",
-        "description": "Code-graph blast radius",
+
         "invocations": [
           {
             "via": "mcp",
@@ -79,23 +98,6 @@
             "args": []
           }
         ]
-      }
-    },
-    "capabilities": {
-      "impact-analysis": {
-        "description": "Code-graph blast radius",
-        "aliases": [
-          "impact_analysis",
-          "Impact Analysis"
-        ],
-        "prefer": "gitnexus"
-      },
-      "pane-labeling": {
-        "description": "Write a session/task id onto the current terminal pane's label, for a human watching a screen"
-      },
-      "fgos-coding-implement": {
-        "description": "code-implement work for the coding domain's executing stage",
-        "prefer": "agy"
       }
     },
     "timeoutMs": 900000,
