@@ -19,7 +19,7 @@
         "Bash(git add:*),Bash(git commit:*)"
       ]
     },
-    "executors": {
+    "capacities": {
       "agy": {
         "kind": "agent",
         "allowCrossProvider": true,
