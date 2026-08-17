@@ -38,6 +38,7 @@ import { detectTrunk } from '../runner/worktree.mjs';
 import { listWork } from '../state/store.mjs';
 import { driftStatus, unmergedDeliveries } from '../state/drift-status.mjs';
 import { computeEnduserDocsIndex, generateEnduserDocsIndex, manifestPathFor } from '../report/enduser-index-generate.mjs';
+import { computeDecisionIndex, generateDecisionIndex, indexPathFor } from '../report/decision-index.mjs';
 import { isResolvedStatus } from '../state/frontier.mjs';
 import { DOMAINS, getDomain, resolveDomainName, effectiveStage } from '../state/workflow-stage-graphs.mjs';
 import { readLocalStatus, classifyRegistryPosture, toolsFromExecutors } from '../state/tool-registry.mjs';
@@ -1901,4 +1902,56 @@ registerCheck({
 registerFix({
   id: 'enduser-docs-index-stale',
   fix: (cwd) => fixEnduserDocsIndexStale(cwd),
+});
+
+// tsk-1lv review-fix F10: `fgos decision-index --check` (tsk-1lv-2)
+// existed as a CLI verb but nothing ever called it -- not `npm test`, not
+// `fgos doctor` -- so docs/decisions/index.md could drift silently from
+// state.decisions the exact same way docs/enduser-docs-index.json used to
+// (tsk-1m0, the direct precedent this check/fix pair mirrors: read-only
+// `computeDecisionIndex` shared by both the check and the real generate
+// path, so this can never diverge from what `fgos decision-index` itself
+// would compute). A missing docs/decisions/index.md is a normal state for
+// any project with zero platform-scoped decisions logged yet -- same
+// "absent capability = clean skip" contract as the enduser-index check.
+function checkDecisionIndexStale(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  const root = mainCheckout ?? cwd;
+  const fgosDir = path.join(root, '.fgos');
+  const { previousContent, changed } = computeDecisionIndex(root, fgosDir);
+  if (previousContent === undefined) {
+    return {
+      passed: true,
+      message: `${indexPathFor(root)} not found -- nothing to check (no platform-scoped decisions logged yet)`,
+    };
+  }
+  if (!changed) {
+    return { passed: true, message: `${indexPathFor(root)} up to date` };
+  }
+  return {
+    passed: false,
+    message: `${indexPathFor(root)} is stale relative to state.decisions -- run fgos decision-index`,
+  };
+}
+
+function fixDecisionIndexStale(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  const root = mainCheckout ?? cwd;
+  const fgosDir = path.join(root, '.fgos');
+  const { path: indexRelPath, changed } = generateDecisionIndex(root, fgosDir);
+  if (!changed) {
+    return { changed: false, message: `${indexRelPath} already up to date` };
+  }
+  return { changed: true, message: `regenerated ${indexRelPath}` };
+}
+
+registerCheck({
+  id: 'decision-index-stale',
+  description: 'docs/decisions/index.md matches every scope-carrying decision in state.decisions (tsk-1lv review-fix F10)',
+  check: (cwd) => checkDecisionIndexStale(cwd),
+});
+
+registerFix({
+  id: 'decision-index-stale',
+  fix: (cwd) => fixDecisionIndexStale(cwd),
 });
