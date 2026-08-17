@@ -415,6 +415,7 @@ export const COMMAND_REGISTRY = [
         source: { type: 'string', description: 'Free text identifying who/what made the decision (optional, defaults to "session").' },
         id: { type: 'string', description: 'Work item id to also fold this decision under (optional; omit for the global log only).' },
         relation: { type: 'string', description: 'none|supersedes:<id>|touches:<id> -- every write declares its relation to prior decisions explicitly (tsk-1lv-1 D2); text that reads like a supersession without supersedes:<id> is refused, and supersedes triggers a write-time docs/**+src/**+plugins/** citation sweep.' },
+        scope: { type: 'string', description: 'An area slug (e.g. "repo", or one matching docs/specs/<area>.md) marking this as a platform/repo-wide decision (tsk-1lv-2 D4), rendered into docs/decisions/index.md by "fgos decision-index". Optional; omit for an item-scoped (--id) or unscoped decision.' },
       },
       positional: ['text'],
       required: ['text', 'rationale', 'relation'],
@@ -423,6 +424,31 @@ export const COMMAND_REGISTRY = [
     touchesState: true,
     requiresExistingStore: true,
     externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
+    name: 'decision-index',
+    invoke: 'fgos decision-index',
+    description: '(Re)generate docs/decisions/index.md, a projection of state.decisions\' platform/repo-wide (scope-carrying) records -- never hand-edited, mirrors "fgos docs-index"\'s own generate+drift shape for docs/enduser-docs-index.json (tsk-1lv-2 D4). --check never writes: reports whether the on-disk file matches a fresh regenerate, refusing (validation) on drift.',
+    parameters: {
+      type: 'object',
+      properties: {
+        check: { type: 'boolean', description: 'Never write; refuse (validation) if the on-disk index would change on a fresh regenerate.' },
+      },
+      positional: [],
+      required: [],
+    },
+    examples: ['fgos decision-index', 'fgos decision-index --check'],
+    touchesState: false,
+    // requiresExistingStore stays false, mirroring docs-index's own
+    // documented reason (tsk-1wn D4): flipping it would need
+    // touchesState: true too (the registry's own invariant), which is
+    // false here -- listWork on a missing/uninitialized .fgos/ returns an
+    // empty view gracefully (never throws), so an absent store just
+    // produces the "no decisions yet" placeholder rather than an error.
+    requiresExistingStore: false,
+    externalEffect: true,
     paginated: false,
     deprecated: null,
   },
