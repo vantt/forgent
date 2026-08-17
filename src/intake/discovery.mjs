@@ -95,7 +95,10 @@ const PLACEHOLDER_VERIFY_PREFIX = 'chưa xác định —';
 // tsk-1ni D2: an existing work.verify counts as "real" -- worth protecting
 // from an unresolved guess -- when it is set and does not carry the
 // placeholder prefix every clarify/discovery-stage sentinel shares.
-function hasRealVerify(verify) {
+// EXPORTED (tsk-1zo): `return`'s own pre-flight validation (bin/fgos.mjs)
+// reuses this same guard so a placeholder verify refuses cleanly instead of
+// being shelled out to (a raw "<word>: not found", exit 127).
+export function hasRealVerify(verify) {
   return typeof verify === 'string' && verify.trim() && !verify.startsWith(PLACEHOLDER_VERIFY_PREFIX);
 }
 

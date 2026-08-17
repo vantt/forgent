@@ -471,6 +471,39 @@ test('return still refuses when cwd is a subdirectory and a non-.fgos file is di
   assert.equal(stateView(cwd).work['sub-return-dirty'].status, 'doing');
 });
 
+test('return refuses a main-source claim whose verify is still a discovery-stage placeholder — clean validation, exit 4, item stays doing (tsk-1zo: previously shelled out to the placeholder text itself, "<word>: not found", exit 127)', () => {
+  const cwd = initGitCwd();
+  run(cwd, ['init']);
+  addOk(cwd, 'pull-return-placeholder', { verify: 'chưa xác định — P15 bổ sung' });
+  assert.equal(run(cwd, ['take', '--id', 'pull-return-placeholder']).status, 0);
+  commitFile(cwd, 'proof.txt');
+
+  const result = run(cwd, ['return', 'pull-return-placeholder']);
+  assert.equal(result.status, 4, `expected a clean validation refusal, got: ${result.stderr}`);
+  assert.match(result.stderr, /placeholder verify/);
+  assert.doesNotMatch(result.stderr, /not found/);
+  assert.equal(stateView(cwd).work['pull-return-placeholder'].status, 'doing');
+});
+
+test('return refuses a branch-source claim whose verify is still a discovery-stage placeholder — clean validation, exit 4, item stays doing (tsk-1zo)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  addOk(cwd, 'branch-return-placeholder', { verify: 'chưa xác định — P15 bổ sung' });
+
+  const pickResult = run(cwd, ['pick', '--id', 'branch-return-placeholder']);
+  assert.equal(pickResult.status, 0, `pick failed: ${pickResult.stderr}`);
+  const pickData = envelopeData(pickResult.stdout);
+  fs.writeFileSync(path.join(pickData.worktree.path, 'proof.txt'), 'built by the pick\n');
+  execFileSync('git', ['add', '-A'], { cwd: pickData.worktree.path });
+  execFileSync('git', ['commit', '-q', '-m', 'work: proof.txt'], { cwd: pickData.worktree.path });
+
+  const result = run(cwd, ['return', 'branch-return-placeholder']);
+  assert.equal(result.status, 4, `expected a clean validation refusal, got: ${result.stderr}`);
+  assert.match(result.stderr, /placeholder verify/);
+  assert.doesNotMatch(result.stderr, /not found/);
+  assert.equal(stateView(cwd).work['branch-return-placeholder'].status, 'doing');
+});
+
 test('return refuses when HEAD has not advanced past headAtTake — a clean tree with zero real progress — as validation, exit 4, item stays doing', () => {
   // `.fgos/` entirely gitignored here (unlike initGitCwd's `.fgos/state.json`
   // only) so the tree is genuinely clean right after `take` with no commit

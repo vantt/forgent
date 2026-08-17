@@ -41,7 +41,7 @@ import { readGateBypassLevel, canAutoApprove, canAutoApproveMergedGate } from '.
 const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 import { resolveFgosDir, fgosDirFromRoot, resolveMainCheckoutRoot } from '../src/runner/paths.mjs';
 import { resolveCliVersionInfo } from '../src/cli/version.mjs';
-import { resolveDiscovery, classificationPatchFromVerdict, assertCallerClassification } from '../src/intake/discovery.mjs';
+import { resolveDiscovery, classificationPatchFromVerdict, assertCallerClassification, hasRealVerify } from '../src/intake/discovery.mjs';
 import { resolvePlan, replaceLockedDecisionsSection, resolveContentRoot } from '../src/intake/plan.mjs';
 import { computeEntropy, computeCounts, FINAL_STATUSES } from '../src/report/entropy.mjs';
 import { findSourceCaptureIds } from '../src/report/enduser-index.mjs';
@@ -2944,6 +2944,20 @@ async function runVerb(verb, flags, positional, dir) {
         throw new StoreError(
           'validation',
           `return: work "${id}" was not taken through the pull door (claimed by "${item.claimRole ?? 'runner'}") — return only completes a take.`,
+        );
+      }
+      // tsk-1zo: a verify never upgraded from its discovery/submit-stage
+      // placeholder sentinel shells out as literal text (runGoalCheck ->
+      // runCommand) and fails with a cryptic raw shell error ("<first
+      // word>: not found", exit 127) instead of a clean refusal. Checked
+      // once here, before the branch/main-source split below, so both
+      // paths — which both call runGoalCheck further down — are covered by
+      // the same guard `resolveDiscovery` already uses at discovery-stage
+      // transitions (src/intake/discovery.mjs's hasRealVerify).
+      if (!hasRealVerify(item.verify)) {
+        throw new StoreError(
+          'validation',
+          `return: work "${id}" still carries a placeholder verify ("${item.verify}") — set a real command first: fgos edit "${id}" --verify "<command>".`,
         );
       }
 
