@@ -22,6 +22,8 @@ import { collectWideSourceFiles, findWideCitationFindings } from '../scripts/che
 import { computeDecisionIndex, generateDecisionIndex } from '../src/report/decision-index.mjs';
 import { renderLockedDecisionsTable } from '../src/report/context-render.mjs';
 import { runFourDoorChecks } from '../src/state/retrospective-doors.mjs';
+import { findAuthoritativeMatch, findDuplicateAuthoritativeClaims } from '../src/report/authoritative-match.mjs';
+import { parseFrontmatter } from '../src/report/frontmatter.mjs';
 import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability, toolsFromExecutors } from '../src/state/tool-registry.mjs';
 import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
@@ -2645,6 +2647,59 @@ async function runVerb(verb, flags, positional, dir) {
         docPath,
         count: ids.length,
         captures: ids.map((id) => collectOutcomeEntry(id, outcomes[id])),
+      };
+    }
+
+    // tsk-1lv review-fix F11: fgos-coding-compounding's own D8
+    // tìm-trước-khi-tạo doctrine (SKILL.md step 3) described calling
+    // `findAuthoritativeMatch` directly as a raw Node import -- no CLI
+    // verb backed it, so it had zero real callers anywhere in the repo
+    // (confirmed by grep before this fix), and the doctrine's own worked
+    // example was unfollowable without hand-writing throwaway Node code
+    // each time. This verb IS the real, discoverable surface for both
+    // halves the module already exports: the doctrine's own find-before-
+    // create lookup (default mode), and D8's "harness backstop" duplicate-
+    // claim scan (`--check-duplicates`) -- read-only either way, never a
+    // live gate, matching CONTEXT.md D8's own "never a gate sống" line.
+    case 'authoritative-match': {
+      const quadrantDir = requireField(
+        flags.quadrant,
+        'authoritative-match requires --quadrant <docs/quadrant-dir>',
+      );
+      const repoRoot = path.dirname(dir);
+      const absQuadrantDir = path.join(repoRoot, quadrantDir);
+      const candidates = [];
+      let entries = [];
+      try {
+        entries = fs.readdirSync(absQuadrantDir, { withFileTypes: true });
+      } catch {
+        entries = [];
+      }
+      for (const entry of entries) {
+        if (!entry.isFile() || !entry.name.endsWith('.md')) continue;
+        const relPath = path.posix.join(quadrantDir, entry.name);
+        const content = fs.readFileSync(path.join(absQuadrantDir, entry.name), 'utf8');
+        const { meta } = parseFrontmatter(content);
+        candidates.push({ path: relPath, authoritativeFor: meta.authoritative_for });
+      }
+      if (flags['check-duplicates'] !== undefined) {
+        const duplicates = findDuplicateAuthoritativeClaims(candidates);
+        return {
+          quadrant: quadrantDir,
+          candidateCount: candidates.length,
+          duplicateGroups: duplicates.map((group) => group.map((c) => c.path)),
+        };
+      }
+      const topic = requireField(
+        flags.topic,
+        'authoritative-match requires --topic "<subject text>" (or pass --check-duplicates to scan for duplicate claims instead)',
+      );
+      const match = findAuthoritativeMatch(topic, candidates);
+      return {
+        quadrant: quadrantDir,
+        topic,
+        candidateCount: candidates.length,
+        match: match ? match.path : null,
       };
     }
 

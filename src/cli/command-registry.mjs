@@ -1059,6 +1059,29 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'authoritative-match',
+    invoke: 'fgos authoritative-match',
+    description: 'Read-only: skeleton-match a topic against every docs/<quadrant>/*.md doc\'s own authoritative_for frontmatter (fgos-coding-compounding\'s find-before-create doctrine, tsk-1lv-6/review-fix F11 D8/D12) -- returns the matching doc path, or null when none claims the topic. --check-duplicates runs the harness-backstop scan instead: reports every group of 2+ docs claiming the same subject.',
+    parameters: {
+      type: 'object',
+      properties: {
+        quadrant: { type: 'string', description: 'The docs/<quadrant> directory to scan (e.g. docs/how-to).' },
+        topic: { type: 'string', description: 'The subject text to skeleton-match against each doc\'s authoritative_for (required unless --check-duplicates is set).' },
+        'check-duplicates': { type: 'boolean', description: 'Scan for docs that claim the same subject instead of matching one topic.' },
+      },
+      required: ['quadrant'],
+    },
+    examples: [
+      'fgos authoritative-match --quadrant docs/how-to --topic "claiming a work item"',
+      'fgos authoritative-match --quadrant docs/how-to --check-duplicates',
+    ],
+    touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
     name: 'session',
     invoke: 'fgos session',
     description: 'Per-session git worktree lifecycle: "start" opens a detached-HEAD worktree, "end" removes it, "list" (read-only) prints the registry, "gc" reclaims entries whose worktree is gone from git or whose start-CLI pid has since exited (sparing diverged or uncommitted-work sessions).',

@@ -114,15 +114,17 @@ actually cited from this file until now).
    suy đường dẫn từ quadrant+tên file.** Trong đúng quadrant vừa chọn ở
    bước 2 (phạm vi cố ý hẹp: chỉ chống trùng chủ đề TRONG một quadrant đã
    định nghĩa rõ, không mở rộng sang audience/area — trục đó chưa tồn tại
-   trong schema hiện tại),
-   quét frontmatter `authoritative_for` của mọi doc đã có
-   (`docs/<quadrant>/*.md`, `parseFrontmatter` từ `frontmatter.mjs`) và
-   skeleton-match chủ đề của capture này (tiêu đề/chủ đề rút từ nội dung
-   thật, không phải tên file đoán) bằng
-   `findAuthoritativeMatch(topic, candidates)`
-   (`src/report/authoritative-match.mjs` — port/adapter, mirror CTR009,
-   swappable sau này mà không đổi lời gọi này). Một match thật (score cao,
-   không phải trùng ngẫu nhiên vài từ) là doc đích để **update-in-place**,
+   trong schema hiện tại), gọi
+
+   ```bash
+   node "$root/bin/fgos.mjs" authoritative-match --quadrant docs/<quadrant> --topic "<chủ đề thật của capture này, không phải tên file đoán>" --dir "$root"
+   ```
+
+   (`fgos authoritative-match` — skeleton-match `authoritative_for` của
+   mọi doc trong đúng quadrant, `src/report/authoritative-match.mjs` port/
+   adapter, mirror CTR009, swappable sau này mà không đổi lời gọi CLI
+   này). `data.match` khác `null` (score cao, không phải trùng ngẫu nhiên
+   vài từ) là doc đích để **update-in-place**,
    bất kể tên file có khớp cách đoán tự nhiên hay không — chủ đề quyết
    định đích, không phải tên file. Không có match: rơi về suy đường dẫn từ
    quadrant+tên file như trước.

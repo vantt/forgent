@@ -31,6 +31,14 @@ function normalizeSkeleton(text) {
 
 export const SKELETON_ADAPTERS = {
   'skeleton-v1': {
+    // tsk-1lv review-fix F11: `normalize` is exposed on the adapter
+    // itself (not just `matches`) so a caller grouping candidates by
+    // skeleton (findDuplicateAuthoritativeClaims below) genuinely goes
+    // through the selected adapter too -- a future adapter swapped in by
+    // name now changes BOTH functions' behavior, not just
+    // findAuthoritativeMatch's, which is what "port/adapter, swappable"
+    // (D12) actually requires.
+    normalize: normalizeSkeleton,
     matches(topic, authoritativeFor) {
       const a = normalizeSkeleton(topic);
       const b = normalizeSkeleton(authoritativeFor);
@@ -81,7 +89,7 @@ export function findDuplicateAuthoritativeClaims(candidates, { adapter = DEFAULT
   const groups = new Map();
   for (const candidate of candidates ?? []) {
     if (typeof candidate?.authoritativeFor !== 'string' || !candidate.authoritativeFor.trim()) continue;
-    const skeleton = normalizeSkeleton(candidate.authoritativeFor);
+    const skeleton = impl.normalize(candidate.authoritativeFor);
     if (!groups.has(skeleton)) groups.set(skeleton, []);
     groups.get(skeleton).push(candidate);
   }

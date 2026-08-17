@@ -305,13 +305,13 @@ fgos-mission-boundary/CONTEXT.md`.
 
 **Trục riêng, đứng cạnh, không phải bậc #5.** Ranh giới mission
 self-vs-host là một trục quyết định riêng, đứng CẠNH danh sách 4 bậc ưu
-tiên sản phẩm D-ADR0030 (Ship Faster > Release con người >
-DoD > Polish Sau DoD) — không nối vào làm bậc thứ 5. D-ADR0030 trả lời "khi
+tiên sản phẩm D-ADR0030 (thang 4 bậc Ship Faster/Release con người/DoD/Polish Sau DoD, docs/specs/runner.md)
+— không nối vào làm bậc thứ 5. Thang đó trả lời "khi
 hai giá trị xung đột, ưu tiên cái nào" (cùng một trục, khác mức độ). Câu
 hỏi self-vs-host là phân loại đối tượng phục vụ TRƯỚC KHI bất kỳ ưu tiên
 nào trong 4 bậc đó áp dụng được — khác trục, không khác mức. Ghép vào làm
 bậc #5 sẽ khiến ranh giới này bị đọc nhầm là "yếu hơn cả Polish sau DoD",
-theo đúng luật "bậc dưới không ghi đè bậc trên" của D-ADR0030 vốn không áp
+theo đúng luật "bậc dưới không ghi đè bậc trên" của thang ưu tiên đó vốn không áp
 cho một trục khác.
 
 **Cơ chế: config khai báo một lần lúc setup, không hỏi per-decision.**
