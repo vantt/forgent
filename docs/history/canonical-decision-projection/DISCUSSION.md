@@ -2,6 +2,28 @@
 
 ## 1. Trạng thái hiện tại
 
+Vòng 6 (2026-08-17): người dùng yêu cầu định nghĩa lại rõ ràng — đã có 3
+LOẠI quyết định (item-level/CONTEXT.md, engine bookkeeping, platform-level
+ADR corpus), giờ dồn về 1 store thì mỗi loại ghi GÌ vào đó. Trả lời ở §5
+round 6: loại 1+2 đã có sẵn field khớp (`id` + `kind`), loại 3 cần thêm
+dimension mới (`scope`/`area`, bee gọi là vậy) VÀ có một phát hiện cấu trúc
+sắc hơn — `docs/decisions/*.md` (1 file/quyết định, Nygard-style) có thể là
+một tầng THỪA so với shape thật của bee (bee không có "1 file/quyết định" —
+narrative sống ở `docs/knowledge/areas/` mà fgOS đã có bản tương đương là
+`docs/specs/*.md`). Đây là câu hỏi mới, chưa quyết.
+
+Vòng 5 (2026-08-17): người dùng hỏi "bee một tầng nằm đâu" — trả lời ở §5
+round 5: fgOS ĐÃ CÓ sẵn store hợp nhất kiểu bee (`state.decisions`, event
+`type: 'decision'` trong CHÍNH `.fgos/events.jsonl`, port từ bee's schema từ
+`tsk-63c`) — không phải chưa xây. Nhưng `tsk-1ud` (đã done) tự đo ra
+`state.decisions` có 1.711 bản ghi, **0 skill đọc** — mọi skill vẫn đọc
+`CONTEXT.md` (đắt hơn ~20 lần/lần đọc) — và tự xếp việc này vào đúng mẫu
+hình lặp lại 3 lần trong 1 phiên: "ghi trước, nối dây sau — dây không bao
+giờ nối". Việc wire skill đọc `state.decisions` bị CỐ TÌNH để ngoài scope
+tsk-1ud, ghi rõ là follow-up riêng — tức cuộc thảo luận này đang tiếp đúng
+follow-up đó. Sửa lại fork #1 round 4 (không còn "1 hay 2 store" — đã có 1,
+vấn đề là 3 BỀ MẶT chỉ 1 được đọc).
+
 Vòng 4 (2026-08-17): người dùng yêu cầu distill thành một thiết kế tổng quát
 theo 3 tầng kiến trúc fgOS thật (harness / skills-core / skills-doctrine) để
 hình dung sẽ làm gì. Đã viết bản nháp tổng hợp ở §5 round 4 — **CHƯA lock
@@ -440,6 +462,88 @@ nào ở đây:**
 3. **Harness đặt ở `approve` hay một verb/CI job riêng?** — `approve` khớp
    tự nhiên nhất theo tiền lệ bee (gắn vào chỗ "đóng việc" thật), nhưng cần
    xác nhận không xung đột với luồng review/reject hiện có của `approve`.
+
+### Round 5 — 2026-08-17T09:53Z — "bee một tầng nằm đâu?"
+
+**Scout thật** (không suy đoán): `src/state/store.mjs:1123` `addDecision` —
+ghi decision event NGAY VÀO `.fgos/events.jsonl` (cùng log với mọi state
+khác, qua `appendEventLocked`), không phải file riêng. Comment tại chỗ
+(tsk-63c D1-D3): *"Schema … ported from bee's live `.bee/decisions.jsonl`
+shape"* — fgOS đã port cấu trúc quyết định của bee từ trước, có sẵn field
+`rationale` (bắt buộc), `alternatives` (tuỳ chọn), `source` (mặc định
+`'session'`), `id` (tuỳ chọn — scope theo item khi có), và
+`kind: 'engine'|'design'` (tsk-1ud D7, mặc định `'design'`) — TÁCH RIÊNG
+bookkeeping máy (`resolveDiscovery`/`resolvePlan`'s own verdict) khỏi quyết
+định thiết kế thật, không match theo prefix chuỗi (đã tự tránh đúng
+anti-pattern mà cuộc thảo luận này cũng đang tránh).
+
+**Nhưng `tsk-1ud` (done, đọc trực tiếp
+`docs/explanation/state-decisions-splits-engine-bookkeeping-from-cited-design-decisions.md`)
+tự đo ra và để lại một khoảng trống rõ ràng:** 1.711 bản ghi trong
+`state.decisions`, **0 skill nào đọc** — mọi skill (`fgos-coding-planning`
+...) vẫn đọc `CONTEXT.md` (prose, ~20 lần đắt hơn mỗi lần đọc). Item tự đặt
+tên mẫu hình: *"ghi trước, nối dây sau — dây không bao giờ nối"*, liệt kê 3
+lần lặp lại trong CÙNG 1 phiên thảo luận (kể cả `state.decisions`), và tự
+nói thẳng: *"Wiring fgos-coding-planning/fgos-coding-validating to actually
+read state.decisions instead of CONTEXT.md … is a separate, hard-dependent
+follow-up item — this item only makes that future read safe, it doesn't
+perform it."* — tức cuộc thảo luận NÀY đang tiếp chính follow-up đó, không
+phải bắt đầu từ số 0.
+
+**Sửa lại fork #1 (round 4 nói sai "1 store hay 2"):** fgOS đã có ĐÚNG 1
+store hợp nhất (`state.decisions`, event-sourced, không phải file). Vấn đề
+thật không phải "gộp bao nhiêu store" mà là **3 BỀ MẶT, chỉ 1 được đọc**:
+`state.decisions` (rẻ, có sẵn, 0 consumer) / `CONTEXT.md` per-item (đắt, cái
+mọi skill đang đọc thật) / `docs/decisions/*.md` platform ADR (tay-viết,
+tách biệt hoàn toàn, còn chưa qua `addDecision` bao giờ).
+
+### Round 6 — 2026-08-17T10:05Z — 1 store thì ghi gì cho 3 loại quyết định gốc
+
+**3 loại quyết định gốc, map vào field đã có / cần thêm của `state.decisions`:**
+
+1. **Bookkeeping máy** (verdict nội bộ `resolveDiscovery`/`resolvePlan`) →
+   `kind: 'engine'`. ĐÃ CÓ, đã đúng, không cần đổi gì — chỉ cần bất kỳ
+   recall-surface/index nào sau này build ra đều LOẠI kind:engine ra khỏi
+   mặc định (giống bee's `active_decisions()` không lẫn noise vào).
+2. **Quyết định cấp item** (hiện là bảng "Locked Decisions" tay-viết trong
+   `CONTEXT.md`) → `kind: 'design'`, `id: <item-id>`. ĐÃ CÓ SẴN CƠ CHẾ GHI
+   (`fgos decision --id <item-id>`, các skill exploring/planning/shaping đã
+   gọi đúng lúc D-ID chốt) — cái CHƯA có là chiều ĐỌC: `CONTEXT.md`'s bảng
+   Locked-Decisions nên trở thành một VIEW render từ `state.decisions` lọc
+   theo `id`, giống nguyên tắc `bee-context-locking`: *"it renders; it does
+   not decide … every locked-decision row comes from the caller's resolved
+   input verbatim, never originated."* — không phải field mới, là NỐI DÂY
+   (đúng phần tsk-1ud để lại).
+3. **Quyết định cấp platform/repo-wide** (hiện là `docs/decisions/0001..
+   0033+.md`, hand-authored, Nygard-style, 1 file/quyết định) → CẦN field
+   MỚI chưa có: một `scope`/`area` dimension (bee gọi `Scope — the area
+   dimension (spec-area slug; legacy default repo)`), ghi qua `fgos
+   decision` KHÔNG `--id` + `--scope repo`/`<area>`. Đây là field thật sự
+   thiếu, không phải chỉ thiếu dây nối.
+
+**Phát hiện cấu trúc sắc hơn, đáng cân nhắc trước khi chỉ "thêm field":** đối
+chiếu lại bee thật kỹ — bee KHÔNG có khái niệm "1 file narrative/quyết
+định" nào cả. Record trong `.bee/decisions.jsonl` NGẮN VÀ CÓ CẤU TRÚC
+(`decision`, `rationale`, `alternatives`, `scope`, `confidence`, `tags[]` —
+toàn field ngắn, không phải văn bản dài); narrative dài thật sự sống ở
+`docs/knowledge/areas/<area>/*.md` (frontmatter cite `decisions: [...]` id
+ngắn, thân bài là spec sống theo AREA, không theo TỪNG quyết định). fgOS đã
+CÓ SẴN bản tương đương của tầng narrative-theo-area đó: `docs/specs/*.md`.
+Vậy `docs/decisions/0001..0033+.md` (1 file dài/quyết định, Nygard) có thể
+đang là MỘT TẦNG THỪA so với shape bee đã chứng minh chạy được — không phải
+thứ cần "thêm field vào state.decisions rồi giữ nguyên file corpus", mà là
+câu hỏi thật: **giữ 1-file-per-decision (chỉ đổi thành generated projection
+từ `state.decisions`, giống `docs/decisions/index.md` của bee), hay retire
+hẳn corpus đó và dồn narrative dài vào `docs/specs/<area>.md` (đã tồn tại,
+đã đúng vai trò area-doc), chỉ giữ lại record ngắn trong `state.decisions`
+làm nguồn sự thật?**
+
+**Câu hỏi cho người dùng:** với loại 3 (platform-level), anh muốn (A) giữ
+`docs/decisions/*.md` như hiện tại nhưng chuyển thành file GENERATED/regenerate
+được từ `state.decisions` (giữ hình dạng, đổi quyền tác giả), hay (B) đi xa
+hơn bee một bước — thấy rằng bản thân corpus 1-file/quyết định là thừa,
+retire nó, dồn narrative vào `docs/specs/<area>.md` (area đã có sẵn) và chỉ
+giữ record ngắn trong `state.decisions` làm nguồn thật?
 
 ## 6. Thiết kế đã chốt
 
