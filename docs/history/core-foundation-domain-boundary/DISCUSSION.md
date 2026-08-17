@@ -10,6 +10,15 @@ status: open
 
 ## 1. Trạng thái hiện tại
 
+Round 5 (2026-08-17): D1 (share store) và D2 (top-level = port đóng,
+`domainFields` = adapter mở) đã chốt và ghi qua `fgos decision --id
+tsk-397` (seq 19058/19059). §6 đã regenerate cho tầng STATE (data layer)
+— đây mới là MỘT lớp của hexagon (data/store), chưa phải toàn bộ
+folder-layout. Còn mở: trục (b) engine-vs-prose (tiêu chí tách + duplicate
+3 cây skill), và phần domain-specific của CODE (không chỉ data) — 4 điểm
+nối STR89 đã định vị (registry/discovery.mjs+decompose.mjs/fgos-routing/
+skill-bundle) chưa có quyết định thư mục cụ thể nào.
+
 Round 4 (2026-08-17): người xác nhận mục tiêu thật của item — tổ chức
 folder-layout để ranh giới rõ, dễ theo hexagonal/ports-adapters, dễ giữ
 contract, dễ thêm/mở rộng, VÌ sẽ có thêm domain thật (không phải suy đoán
@@ -74,7 +83,10 @@ thi thật.
 
 ## 4. Quyết định đã chốt
 
-(chưa có D-ID nào — chưa điểm nào giữ ổn định qua hơn một vòng)
+| D-ID | Quyết định | Lý do |
+|------|-----------|-------|
+| D1 | Domain share MỘT store/event-log của fgOS — không cài fgOS riêng cho domain mới (trả lời câu hỏi scope của STR52). | Field-compat đã có sẵn hạ tầng `work.domainFields.<domain>.*` (decision 0027 D6, xây trước cho "future domain"); security không có gì phải xây — chỉ filter theo `work.domain` (scalar) khi cần; performance đã chịu tải thật (`.fgos/events.jsonl` 19,037 events/8.4MB, 1 domain, `replay.mjs` có incremental+snapshot fast path, không phải linear replay toàn bộ). |
+| D2 | Field top-level là "port" đóng (core sở hữu, `EDITABLE_FIELDS` 22 key cố định, `store.mjs:275`, `edit` từ chối mọi key ngoài set); `domainFields.<domain>.*` là "adapter" mở duy nhất — domain ghi tự do không đụng core. Field domain-local mặc định vào `domainFields`; chỉ lên top-level nếu cần nghĩa giống nhau + đọc giống nhau ở MỌI domain. | `store.mjs:275/307-310`: `edit` hard-reject key ngoài `EDITABLE_FIELDS`. Thêm field top-level mới = sửa core, ảnh hưởng mọi domain; thêm field trong `domainFields` = không đụng core. |
 
 ## 5. Q&A log
 
@@ -123,7 +135,49 @@ thi thật.
 
 ## 6. Thiết kế đã chốt {#design}
 
-(chưa có — chưa hội tụ)
+Tầng STATE (data layer) của boundary hexagon đã có hình dạng cụ thể (D1,
+D2). fgOS KHÔNG chia store theo domain — mọi domain (coding hôm nay,
+marketing sắp tới per STR52) sống chung MỘT `.fgos/events.jsonl` +
+view/state.json, phân biệt nhau qua field `domain` (scalar, một item chỉ
+thuộc đúng một domain — không có ca 2 domain cùng sở hữu 1 item). Đây là
+lựa chọn có chủ đích, không phải mặc định lười: chi phí kỹ thuật của việc
+cài fgOS riêng cho mỗi domain (đồng bộ 2 store, 2 lần deploy/upgrade, mất
+khả năng cross-domain query) lớn hơn hẳn 3 rủi ro đã kiểm (field-compat/
+security/performance) — cả 3 đều đã có lời giải sẵn hoặc không phải vấn
+đề thật ở quy mô hiện tại.
+
+Ranh giới port/adapter của tầng STATE:
+
+```mermaid
+flowchart TB
+    subgraph core["CORE (port đóng — mọi domain chia sẻ)"]
+        top["Top-level work fields<br/>id · status · stage · domain · tier · ..."]
+        editable["EDITABLE_FIELDS (store.mjs:275)<br/>22 key cố định, edit reject key lạ"]
+    end
+    subgraph domainspace["DOMAIN-SPECIFIC (adapter mở — mỗi domain tự quản)"]
+        coding["domainFields.coding.*"]
+        marketing["domainFields.marketing.*<br/>(STR52, chưa xây)"]
+    end
+    top --> editable
+    editable -- "1 trong 22 key" --> domainspace
+    coding -. "namespace riêng, không đụng nhau" .- marketing
+```
+
+Quy tắc ghi field (D2): field cần cùng nghĩa + cùng cách đọc ở MỌI domain
+→ đề xuất thêm vào `EDITABLE_FIELDS` (sửa core, ảnh hưởng mọi domain,
+cần cân nhắc kỹ). Field chỉ domain đó cần → viết thẳng vào
+`domainFields.<domain>.*`, không đụng core, domain khác không thấy/không
+bị ảnh hưởng.
+
+**Chưa chốt (còn ở §3):** ranh giới tương ứng cho tầng CODE — 4 điểm nối
+STR89 đã định vị (`DOMAINS` registry, `discovery.mjs`/`decompose.mjs`,
+`fgos-routing`, skill-bundle riêng theo domain) vẫn chưa có quyết định
+thư mục cụ thể nào chọn giữa "domain-specific code sống trong `src/`
+hiện tại, phân biệt qua data/registry" (giữ phẳng, mirror đúng tinh thần
+D1) hay "domain-specific code có thư mục riêng kiểu package/extension"
+(kiểu `packages/bee-rs` của beegog, nhưng beegog không có tiền lệ
+multi-domain nên không so trực tiếp được). Trục (b) engine-vs-prose (3
+cây skill trùng lặp, tiêu chí tách nào) cũng chưa thảo luận.
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
