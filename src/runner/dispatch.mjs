@@ -2138,6 +2138,12 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     return i !== -1 ? rest[i + 1] : undefined;
   };
   if (subcommand === 'execute') {
+    // tsk-129: tee the spawned executor's own live stdout/stderr chunks to
+    // THIS process's stderr as they arrive, reusing the P39 onChunk hook
+    // executeExecutorCli already threads through to the adapter (this CLI
+    // branch was the one caller that never passed it -- RESEARCH.md).
+    // stdout is left untouched, still carrying only the single final JSON
+    // line below, so a scripted caller's JSON.parse(stdout) sees no change.
     executeExecutorCli(executorId, {
       prompt: flagValue('--prompt') ?? '',
       model: flagValue('--model'),
@@ -2145,6 +2151,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       carries: flagValue('--carries'),
       for: flagValue('--for'),
       hasLiveTaskAccess: rest.includes('--has-live-task-access'),
+      onChunk: (stream, chunk) => process.stderr.write(chunk),
     }).then(
       (executed) => {
         process.stdout.write(`${JSON.stringify(executed)}\n`);

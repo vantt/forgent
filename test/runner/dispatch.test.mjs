@@ -2176,6 +2176,38 @@ test('an unknown CLI subcommand still exits non-zero with a usage message naming
   assert.match(result.stderr, /decide <executorId>/);
 });
 
+// --- tsk-129: the "execute" CLI entry point tees live chunks to stderr ---
+// (P39's onChunk mechanism already existed and was already tested at the
+// spawnWorker/adapter layer; the CLI entrypoint's `execute` branch simply
+// never wired it in, so a real spawned `execute` call stayed silent from
+// the one "fgos: dispatch ..." line until the final JSON, however long the
+// child actually ran -- RESEARCH.md's own finding for this item.)
+
+test('the "execute" CLI entry point tees the spawned executor\'s own stdout/stderr chunks live to this process\'s stderr, and stdout still carries exactly one parseable JSON line', () => {
+  const { repoRoot } = mkTempGitRepo();
+  const scriptPath = writeMultiChunkExecutor(repoRoot);
+  writeRunnerConfigFixture(repoRoot, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: { probe: { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
+  const result = spawnSync(process.execPath, [dispatchPath, 'execute', 'probe'], { encoding: 'utf8', cwd: repoRoot });
+  assert.equal(result.status, 0, result.stderr);
+  // Live-teed chunks from the spawned child arrive on THIS process's own
+  // stderr, alongside the pre-existing "fgos: dispatch ..." chokepoint line.
+  assert.match(result.stderr, /out-chunk-1/);
+  assert.match(result.stderr, /out-chunk-2/);
+  assert.match(result.stderr, /err-chunk-1/);
+  // stdout keeps carrying exactly one line -- the final JSON result --
+  // untouched by the live tee, so a scripted caller's JSON.parse still works.
+  const lines = result.stdout.trim().split('\n');
+  assert.equal(lines.length, 1);
+  const parsed = JSON.parse(lines[0]);
+  assert.equal(parsed.status, 0);
+});
+
 // --- spawnWorker: fake executor, tier->model, cwd, timeout, spawn-fail --
 
 test('spawnWorker resolves tier -> model, runs in cwd, and passes the prompt via argv', async () => {
