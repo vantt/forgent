@@ -109,6 +109,21 @@ rounds) — this file locks only what carries forward into planning.
     proves the script already defaults to real repo paths (there is no
     missing "live mode" to build; D3's widened-scan-surface scope is the
     only real gap).
+- **`fgos-coding-validating`'s own reality gate (same session, next pass)** caught one
+  more inaccuracy introduced while fixing the plan-review findings: `plan.md`'s first
+  draft of the H1 fix claimed `check-decision-codes.mjs` already has a real-repo
+  (`npm test`-executed) CLI run to copy. Re-checked directly —
+  `grep -n cwd test/scripts/check-decision-codes.test.mjs` shows every case uses
+  `cwd: dir` against an `fs.mkdtempSync` tmp fixture, same shape as the other two
+  scripts, no exception. `package.json` does carry a
+  `"check:decision-supersession": "node scripts/check-decision-supersession.mjs"` real
+  default-args npm script, but `.github/workflows/ci.yml` runs `npm test` only — that
+  script is not CI-invoked either (read directly, confirmed). Corrected in `plan.md`'s
+  risk map: this item introduces a genuinely novel-for-this-repo enforcement pattern,
+  not a proven one. Both scripts' own existing test suites were re-run fresh as the
+  actual regression baseline this item's new tests must not break:
+  `test/scripts/check-decision-citation-drift.test.mjs` 9/9 green,
+  `test/scripts/check-decision-codes.test.mjs` 18/18 green.
 
 ## Outstanding questions
 
