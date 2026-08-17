@@ -66,7 +66,7 @@ footprint depends on the previous piece's output existing).
 | `fgos doctor` drift-report check (R16, report-only) | medium | `test/setup/checks.test.mjs` (extending the existing 75.6K suite) — asserts drift is reported, never repaired, and degrades cleanly on a missing/legacy ledger. |
 | Version pin + `fgos upgrade` (D4) | medium | `test/setup/pin-upgrade.test.mjs` — pin respected across a routine `setup` re-run; `upgrade`/`setup --latest` moves it forward; pinning older than current still refused. |
 | R21/R22 fail-closed parity gate (D5) | high | `test/scripts/install-parity.test.mjs` — real postcondition proof: install reports success only after every projection agrees + an immediate recheck comes back clean; a partial/silent success is asserted to never happen (the exact failure class bee's own "Edge Cases Settled" section names). |
-| `docs/specs/distribution.md` supersession (D6) | light | A new decision record (`docs/decisions/0035-*.md`, next free number after `0034`) explicitly superseding RUL1-RUL12's Entry Points section; `test/scripts/check-decision-supersession.test.mjs` (existing check) proves the supersession is correctly recorded. |
+| `docs/specs/distribution.md` supersession (D6) | light | A new decision record (`docs/decisions/0036-*.md`, next free number after `0035`, which landed concurrently as a mission-boundary decision, docs/decisions/0035-xac-lap-ranh-gioi-su-menh-fgos.md, unrelated to this item) explicitly superseding RUL1-RUL12's Entry Points section; `test/scripts/check-decision-supersession.test.mjs` (existing check) proves the supersession is correctly recorded. |
 
 ## Files likely touched
 
@@ -78,7 +78,7 @@ footprint depends on the previous piece's output existing).
 - `bin/fgos.mjs`, `src/cli/command-registry.mjs` (new `upgrade` verb /
   `setup --latest` flag)
 - `docs/specs/distribution.md` (superseded sections marked)
-- `docs/decisions/0035-*.md` (new supersession record)
+- `docs/decisions/0036-*.md` (new supersession record)
 - Matching `test/scripts/*.test.mjs` / `test/setup/*.test.mjs` files named
   in the risk map above.
 
@@ -144,7 +144,7 @@ parallel.
     "title": "Supersede docs/specs/distribution.md's Entry Points (RUL1-RUL12) with a new decision record",
     "verify": "npm test -- test/scripts/check-decision-supersession.test.mjs",
     "action": "D6: switching the primary install entry point supersedes the locked distribution.md spec, per AGENTS.md's Changing a locked law rule, never a silent edit",
-    "footprint": ["docs/decisions/0035-installer-supersedes-npm-global-entry-point.md", "docs/specs/distribution.md"],
+    "footprint": ["docs/decisions/0036-installer-supersedes-npm-global-entry-point.md", "docs/specs/distribution.md"],
     "kind": "task",
     "risk": "light"
   }
