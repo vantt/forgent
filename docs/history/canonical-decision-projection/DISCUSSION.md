@@ -2,6 +2,19 @@
 
 ## 1. Trạng thái hiện tại
 
+Vòng 10 (2026-08-17): người dùng nêu 2 việc — (3) cơ chế "tìm-trước-khi-tạo"
+của D6 thật sự bee làm sao, có xem xét hệ OKF của bee-upstream không; (2)
+fgOS đã có khái niệm `retrospective` (status, không phải stage), có nên
+dùng trong không gian thảo luận này không — cụ thể approve/merge tạo doc
+trước rồi merge, hay merge rồi mới tạo doc, bee làm sao. Cả 2 câu trả lời
+đều SỬA lại phần đã trình bày trước đó, không chỉ bổ sung — xem §5 round 10.
+Kết quả: (a) D6 cần viết lại — `scribingTarget()` bee dùng ở round 1 giờ là
+DEAD CODE, cơ chế thật hiện tại là doctrine-convention + mechanical-backstop-
+check, không phải 1 hàm gate sống; (b) fork #3 (round 4, "approve hay verb
+riêng") có câu trả lời rõ — KHÔNG gate ở `fgos approve` (mâu thuẫn trực
+tiếp với tsk-1ca, quyết định đã được evidence hoá 3 lần), nên REUSE
+`retrospective`/`fgos-coding-compounding` đã có sẵn.
+
 Vòng 9 (2026-08-17): người dùng chỉ ra một work khác đang thảo luận song
 song — **tsk-37i** (`docs/history/self-contained-id-references/
 DISCUSSION.md`, branch `fgw/tsk-37i`, 8 round riêng, D1 đã lock) — cùng chủ
@@ -722,6 +735,77 @@ quyết định liên-item, thuộc người dùng theo `review-audit-self-decis
   của item nào ở đây (one-door-write, ngoài phạm vi phiên đang chạy trên
   `fgw/tsk-1lv`).
 
+### Round 10 — 2026-08-17T10:55Z — hệ OKF của bee + reuse retrospective (2 sửa lớn)
+
+**(3) Đọc trực tiếp `docs/knowledge/areas/okf-profile/{overview,concept-model-and-authoring}.md`
+của beegog** (OKF = Open Knowledge Format, spec mở bên ngoài
+`github.com/GoogleCloudPlatform/knowledge-catalog`, bee xây "profile" riêng
+— lớp đóng chặt hơn — trên nền spec mở đó). Phát hiện SỬA LẠI trực tiếp
+điều đã nói ở round 1-4 về `scribingTarget()`:
+
+> *"`scribingTarget` (the scribing-target resolver) is **dead surface**,
+> kept only as a reference: it has no runtime caller, no CLI verb, and is
+> absent from the command registry... The anti-fork rule it once looked
+> like it enforced is a convention the scribe follows, not a gate."*
+> — `okf-profile/concept-model-and-authoring.md` dòng 311-316
+
+Tức bee đã TỰ THỬ xây một hàm gate sống (`scribingTarget()`) trước, rồi
+BỎ nó, thay bằng đúng 2 lớp — không phải 1 hàm chặn-ghi:
+
+1. **Doctrine (skill prose)** — `bee-capturing/SKILL.md` ("Scribe" section)
+   hướng dẫn agent: trước khi tạo `bee.area` mới, tra `bee.authoritative_for`
+   toàn bundle theo CHỦ ĐỀ; nếu đã có chủ, UPDATE IN PLACE, không tạo file
+   thứ 2. Đây chỉ là **quy ước agent tự theo**, không phải hàm được gọi.
+2. **Harness backstop (mechanical, nằm trong verify chain)** —
+   `bee knowledge check` phát hiện `duplicate_authority` (2+ concept cùng
+   claim 1 subject) như MỘT CHAIN-FAILING FINDING, tức fail `npm test`/CI
+   nếu convention ở (1) bị phá. 3-lớp anti-fork (skeleton-match chữ +
+   malformed-input fail-closed + bundle-wide backstop) áp Ở TẦNG CHECK NÀY,
+   không phải ở một gate-lúc-ghi.
+
+**Sửa D6:** không xây "hàm tìm-trước-khi-tạo" như 1 gate sống — đúng
+nguyên lý D2/D3 (không thêm cơ chế mới nếu cái cũ đủ) VÀ đúng bài học thật
+của bee (họ xây gate sống rồi bỏ). Thay vào: (a) doctrine — sửa
+`fgos-coding-compounding` bước 3, thêm hướng dẫn tra chủ đề toàn
+`docs/<quadrant>/` trước khi quyết path (giống bee-capturing); (b) harness
+backstop — thêm 1 check mới (mở rộng bộ verify hiện có, KHÔNG phải gate
+sống) phát hiện 2 file cùng chủ đề (cần thêm field kiểu `authoritative_for`
+vào frontmatter hiện có của `docs/explanation|reference|how-to|tutorials`,
+qua `src/report/frontmatter.mjs` đã tồn tại).
+
+**(2) fgOS đã có `retrospective` (status, KHÔNG phải stage) — đọc trực tiếp
+`docs/explanation/why-done-split-into-delivered-retrospective-cleanup-done.md`
+(tsk-1ca, 16 D-ID, đã evidence-hoá thêm 2 lần bởi tsk-1q1/tsk-1bl):**
+`delivered` = code đã merge thật (có mergedSha/mergedInto — xác nhận qua
+`bin/fgos.mjs:1366-1382`); `retrospective` = doc/decision-synthesis, chạy
+SAU merge, BATCH riêng (`/fgOS:retro-loop`), **cố tình KHÔNG chạy inline
+trong `return`/`approve`**. Lý do đã evidence hoá rõ: trước đây RUL50
+(doc-completeness) gate CHUNG với RUL58 (code-correctness) vào 1 `done`
+duy nhất — khiến dependent phải chờ cả doc-writing xong mới được mở, dù code
+đã merge xong an toàn. Tách ra để dependent mở sớm (đúng "Ship Faster"),
+đã bị 2 advisor-review từ chối gộp lại (5 bằng chứng cụ thể, §5 doc trên).
+
+**Đối chiếu bee:** Scribe của bee (`bee-capturing`) viết liên tục — "on
+every sync, capture, flush and harvest run" — KHÔNG đợi một bước
+retrospective riêng sau khi đóng feature. Khác ORDERING với fgOS thật —
+nhưng cả hai đều đồng ý CÙNG MỘT NGUYÊN TẮC: quyết định (ngắn, ghi ngay lúc
+chốt) và narrative-doc-sync (dài, có thể trễ) là 2 việc khác nhịp, không
+gộp chung 1 gate.
+
+**Sửa fork #3 (round 4, "harness đặt ở `fgos approve` hay verb riêng"):**
+CÓ CÂU TRẢ LỜI RÕ, không còn mở — **KHÔNG được gate ở `fgos approve`**, vì
+điều đó tái tạo đúng lỗi tsk-1ca đã sửa (gate code-correctness chung với
+doc-completeness, chặn dependent chờ vô ích) — mâu thuẫn trực tiếp một
+quyết định đã evidence hoá 3 lần (per `review-audit-self-decision.md`
+"Verified Decisions" — không đảo ngược trừ khi có bằng chứng mới, và ở đây
+bằng chứng đi NGƯỢC hướng round 3/4 đã đề xuất, không phải ủng hộ). Hướng
+đúng: **REUSE `retrospective`/`fgos-coding-compounding` đã có sẵn** — 4-door
+check (freshness/impact/routing/doc-deferral) chạy trong retrospective
+batch loop, không phải gate đồng bộ tại `approve`. `state.decisions`/D-ID
+vẫn ghi NGAY lúc chốt (giống item-level D-ID hiện tại, giống Scribe của bee)
+— chỉ NARRATIVE SYNC (docs/specs/<area>.md rewrite, D5) mới trễ theo
+retrospective.
+
 ## 6. Thiết kế đã chốt {#design}
 
 ### Vấn đề
@@ -793,15 +877,28 @@ flowchart TB
     style DOCTRINE fill:#3a1e3a,color:#fff
 ```
 
+### Cập nhật round 10 (đề xuất, CHƯA D-ID — 1 round, chờ round sau ổn định)
+
+- **D6 cần viết lại**: không phải "hàm tìm-trước-khi-tạo" mà 2 lớp — (a)
+  doctrine trong `fgos-coding-compounding` bước 3 (tra chủ đề toàn
+  `docs/<quadrant>/` trước khi quyết path, update-in-place nếu đã có chủ);
+  (b) harness backstop mechanical (check mới trong verify chain phát hiện
+  2 file cùng `authoritative_for`, KHÔNG phải gate sống) — đúng bài học bee
+  tự xây rồi bỏ `scribingTarget()`.
+- **Fork #3 (round 4) nay có câu trả lời** — 4-door KHÔNG gate ở `fgos
+  approve`; REUSE `retrospective`/`fgos-coding-compounding` đã có sẵn, vì
+  gate tại approve mâu thuẫn trực tiếp quyết định đã evidence-hoá 3 lần
+  của tsk-1ca (tách code-correctness sớm khỏi doc-completeness trễ).
+  `state.decisions`/D-ID vẫn ghi ngay lúc chốt — chỉ narrative sync
+  (docs/specs rewrite, D5) trễ theo retrospective batch.
+
 ### Còn mở (chưa D-ID, cần quyết trước khi viết plan thật)
 
-- Door chặn close (freshness/impact/routing/doc-deferral, mirror bee) áp
-  cho MỌI item hay theo risk-tier (bee: "lane scales ceremony, never
-  memory")?
-- Harness đặt ở `fgos approve` hay một verb/CI job riêng?
-- Cơ chế "tìm-trước-khi-tạo" của D6 cụ thể là gì (semantic search qua nội
-  dung, fuzzy-match tên, hay tra `reading-map.md` bằng tay như bee-scribing
-  hiện làm)?
+- Door chặn (freshness/impact/routing/doc-deferral) áp cho MỌI item hay
+  theo risk-tier khi chạy trong retrospective batch loop?
+- Cơ chế tra "chủ đề" cụ thể cho D6 (b) là gì — so khớp chuỗi
+  (skeleton-match kiểu bee: normalize/lowercase/accent-strip) hay cần
+  semantic search thật?
 
 ## 7. Danh mục hạng mục / task
 
@@ -857,15 +954,22 @@ flowchart TB
 
 ### {#task-compounding-anti-fork-and-reconcile}
 
-- **Mục tiêu:** `fgos-coding-compounding` thêm bước tìm-trước-khi-tạo theo
-  nội dung (không chỉ theo tên file) trước khi quyết `docs/<quadrant>/
-  <file>.md`; sửa luật "never delete, shorten, restructure" thành cho phép
-  reconcile khi có capture mới mâu thuẫn bằng chứng cũ.
+- **Mục tiêu (SỬA round 10 — không còn "1 hàm gate"):** (a) doctrine —
+  `fgos-coding-compounding` bước 3 thêm hướng dẫn tra `authoritative_for`
+  toàn `docs/<quadrant>/` theo CHỦ ĐỀ trước khi quyết path, update-in-place
+  nếu đã có chủ (giống bee-capturing's Scribe convention, KHÔNG phải gọi
+  1 hàm); (b) harness backstop — thêm field `authoritative_for` vào
+  frontmatter (`src/report/frontmatter.mjs` đã có, mở rộng) + 1 check
+  mechanical trong verify chain phát hiện 2 file cùng subject (mirror
+  `bee knowledge check`'s duplicate-authority finding, KHÔNG phải gate
+  đồng bộ lúc ghi); (c) sửa luật "never delete, shorten, restructure"
+  thành cho phép reconcile khi có capture mới mâu thuẫn bằng chứng cũ.
 - **Trích §6:** mục "Cho phép reconcile/retire, không chỉ cấm-rồi-thêm" +
-  nguyên lý D6.
-- **D-ID áp dụng:** D6.
+  round 10 (OKF, `scribingTarget()` dead surface).
+- **D-ID áp dụng:** D6 (cần re-mint theo bản sửa round 10, chưa D-ID).
 - **Quan hệ:** độc lập với 4 task trên (bề mặt khác — Diataxis, không phải
   decisions) — có thể làm song song.
 - **Verify nháp:** case thật — 2 capture cùng chủ đề khác tên gọi phải hội
-  tụ về 1 file, không tạo file thứ 2; 1 capture phủ định capture cũ phải
-  sửa được đoạn cũ, không chỉ append.
+  tụ về 1 file (doctrine bắt được) hoặc bị check mechanical báo trùng
+  (harness backstop bắt được nếu doctrine bị bỏ qua); 1 capture phủ định
+  capture cũ phải sửa được đoạn cũ, không chỉ append.
