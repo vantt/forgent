@@ -4,19 +4,20 @@ Item: `tsk-37i`.
 
 ## 1. Trạng thái hiện tại
 
-Round 6. Round 5 trình bày lại §6/§7 theo 3 tầng hệ thống (harness /
-skills-core / skills-doctrine). Round 6: người dùng phát hiện agent nhớ
-nhầm số phiên bản round 2 ("1.8.3" — đúng là **1.18.3**) và yêu cầu dò lại
-TỪNG phiên bản beegog từ cursor cũ tới `v2.7.0` (57 tag) xem có gì thêm cho
-chủ đề đang bàn — không chỉ đọc state hiện tại như round 2 đã làm. Kết quả:
-tìm được 1 cơ chế MỚI, chưa từng thấy ở round 2 — **doc-rot close-gate
-bundle** (v2.7.0, landed 2026-08-03→2026-08-16, đăng ký porting candidate
-`doc-rot-close-gate-bundle`, R3 E2 F3) — trả lời đúng nửa còn thiếu của
-round 2: "quyết định D-local bị LOCK rồi không bao giờ được route đi đâu"
-(khác round 2 vốn chỉ chặn "quyết định bị SUPERSEDE mà chỗ trích cũ không
-sửa"). §6/§7 vừa cập nhật thêm mảnh 4 cho phát hiện này. Discussion gần
-hội tụ hơn nữa — chờ người dùng xác nhận có cần dò thêm hay đã đủ để
-hand-off.
+Round 7. Round 6 tìm thêm mảnh 4 (routing close-gate) từ dò từng phiên bản
+beegog. Round 7: người dùng chỉ ra có 1 discussion song song, sâu hơn hẳn
+— `tsk-1lv` (feature `canonical-decision-projection`, 8 round, D1-D6 đã
+lock) — giải bài toán rộng hơn (decision/doc outdate/mâu thuẫn nói chung).
+Agent đọc file đó trên `fgw/tsk-1lv`, xác nhận overlap thật: mảnh 4 trùng
+"routing door" tsk-1lv đang tự thiết kế; mảnh 2 có nguy cơ bị D5 của
+tsk-1lv (retire `docs/decisions/*.md` corpus) làm lỗi thời. Người dùng
+đồng ý đề xuất thu hẹp — **D2 vừa chốt**: tsk-37i giữ lại đúng mảnh 1
+(format trích dẫn) + mảnh 3 (dọn tài liệu cũ), bỏ mảnh 2 + mảnh 4 —
+tsk-1lv đã xác nhận nhận 2 mảnh đó. §6/§7 vừa cập nhật theo D2: mảnh 2/4
+đánh dấu moved-to-tsk-1lv (giữ lại làm lịch sử, không xoá), §6 regenerate
+chỉ còn 2 tầng thật sự thuộc scope này. Discussion giờ đã hẹp, rõ, và
+không còn trùng công với tsk-1lv — sẵn sàng hand-off sang
+`fgos-coding-exploring`.
 
 ## 2. Mục tiêu & đề bài
 
@@ -54,6 +55,7 @@ bắt buộc phải mở file gốc trước khi hiểu được câu đang đ�
 | D-ID | Nội dung |
 |---|---|
 | D1 | Cấu trúc 3 tầng trích dẫn hiện có của fgOS (global-vĩnh viễn / scope-theo-file-reset-mỗi-file / cục bộ-1-feature) **đã được xác nhận đúng, không phải chỗ cần sửa** — beegog hội tụ độc lập về đúng 3 tầng này (short8 global ~ ADR, `R<n>` reset mỗi `docs/knowledge/areas/<x>.md` ~ RUL`<n>`, D-local ~ D-local). Phạm vi sửa của thảo luận này **không bao gồm** tái cấu trúc số tầng hay đổi id scheme hiện có — chỉ nhắm 2 chỗ: (a) format trích dẫn (bắt buộc kèm gloss, không còn id trần) và (b) cơ chế enforce (kiểm máy phần trích dẫn có trỏ đúng chỗ, kỷ luật văn xuôi phần nội dung gloss đúng/đủ). Ghi qua `fgos decision --id tsk-37i` (seq 18919). |
+| D2 | **Scope tsk-37i thu hẹp còn mảnh 1 (format trích dẫn + pointer-check) + mảnh 3 (dọn tài liệu cũ) — bỏ mảnh 2 (reversal sweep ADR) và mảnh 4 (routing close-gate)**, cả hai giao lại cho `tsk-1lv` (`canonical-decision-projection`) đang thiết kế đúng lớp kiến trúc rộng hơn (D5 retire `docs/decisions/*.md` corpus, routing-door round 3-4 của chính nó). tsk-1lv đã xác nhận nhận 2 mảnh này (§5 round 7). Ghi qua `fgos decision --id tsk-37i` (seq 19034). |
 
 ## 5. Q&A log
 
@@ -208,101 +210,112 @@ bắt buộc phải mở file gốc trước khi hiểu được câu đang đ�
   Đã trình bày cho người dùng trong chat, chờ quyết cách phối hợp (gộp, phụ
   thuộc, hay giữ tách biệt với scope thu hẹp).
 
+- **2026-08-17T~11:06Z — D2 chốt: thu hẹp scope, giao mảnh 2+4 cho tsk-1lv
+  (người dùng xác nhận).** Người dùng: "đồng ý như đề nghị, bên kia đã
+  nhận 2 mảnh bạn nói" — vừa xác nhận hướng thu hẹp agent đề xuất cuối
+  round trước, vừa xác nhận CHÉO từ phía session `tsk-1lv` đã chủ động
+  nhận mảnh 2 (reversal sweep) + mảnh 4 (routing close-gate) vào scope của
+  họ. Đủ điều kiện mint D-ID (đề xuất từ agent + xác nhận rõ ràng từ người
+  dùng + xác nhận chéo liên-item, mạnh hơn hẳn 1 câu trả lời đơn thuần) —
+  ghi D2 qua `fgos decision --id tsk-37i` (seq 19034). §6 regenerate lần 3
+  theo D2: bỏ hẳn nội dung mảnh 2/4 khỏi thiết kế của tsk-37i, chỉ giữ
+  pointer trỏ sang tsk-1lv. §7: mảnh 2/4 đánh dấu `moved-to-tsk-1lv`, giữ
+  nguyên nội dung cũ làm lịch sử (không xoá — cùng nguyên tắc D3 "một
+  quyết định bị supersede thì trỏ tới, không sửa đè" áp dụng luôn cho
+  chính DISCUSSION.md này).
+
 ## 6. Thiết kế đã chốt {#design}
 
-**Không tái cấu trúc, chỉ vá 2 chỗ hẹp + dọn nợ cũ.** fgOS giữ nguyên 3 tầng
+**Scope hẹp, 2 mảnh, không đụng tầng lưu trữ.** fgOS giữ nguyên 3 tầng
 trích dẫn đã có (ADR toàn cục — RUL scope-theo-spec — D-local
 scope-theo-feature), xác nhận đúng hình dạng qua hội tụ độc lập với beegog
-(D1). Theo yêu cầu người dùng (round 5): trình bày lại theo **3 tầng hệ
-thống fgOS đang chạm tới** — harness / skills-core / skills-doctrine — thay
-vì theo "mảnh việc" như bản trước, để thấy rõ AI SỬA GÌ Ở ĐÂU. Đây là cách
-đọc thứ hai của cùng 1 thiết kế, không phải thiết kế mới — §7 (task) không
-đổi, chỉ đổi cách nhóm trình bày.
+(D1). Sau khi phát hiện overlap với `tsk-1lv` (round 7), scope thu hẹp còn
+đúng 2 mảnh (D2) — **KHÔNG đụng tới nơi quyết định thật sự SỐNG** (đó là
+việc của tsk-1lv: unify `state.decisions`/CONTEXT.md/ADR corpus, retire
+`docs/decisions/*.md`, routing/impact/freshness/doc-deferral close-gate).
+tsk-37i chỉ lo **HÌNH DẠNG một trích dẫn đơn lẻ đọc được không**, bất kể
+trích dẫn đó cuối cùng trỏ vào đâu.
 
 ```mermaid
 flowchart TB
-    subgraph L1["HARNESS -- code chạy, verify pipeline (src/, test/, bin/)"]
-        SWEEP["decisions supersede: quét docs/**+.agents/skills/**<br/>tìm id cũ, chặn ghi tới khi reconcile/waive<br/>(mảnh 2)"]
-        CHECK["citation pointer-check mới trong npm test:<br/>mọi &lt;ID&gt; (gloss) có trỏ đúng file/heading thật<br/>không -- có negative-control fixture (mảnh 1 nửa máy)"]
-        ROUTING["fgos return/approve close gate MỚI (mảnh 4, round 6):<br/>D-ID locked trong CONTEXT.md không có area-spec<br/>citation VÀ không có feature-local record -- CHẶN close"]
+    subgraph L1["HARNESS (tsk-37i) -- chỉ 1 việc: check máy"]
+        CHECK["Mở rộng scripts/check-decision-citation-drift.mjs<br/>+ check-decision-supersession.mjs (ĐÃ CÓ, chạy tay) --<br/>wire vào npm test, thêm negative-control (mảnh 1)"]
     end
-    subgraph L2["SKILLS-CORE -- quy ước dùng chung, 1 nhà gốc (.agents/skills/_shared/)"]
-        CONV["1 tài liệu quy ước trích dẫn CANONICAL<br/>(&lt;ID&gt; + 1 dòng gloss + delta cục bộ,<br/>không bao giờ id trần) -- mọi skill khác CHỈ TRÍCH,<br/>không copy lại (mảnh 1 nửa văn xuôi)"]
+    subgraph L2["SKILLS-CORE (tsk-37i) -- quy ước dùng chung, 1 nhà gốc"]
+        CONV["1 tài liệu quy ước trích dẫn CANONICAL<br/>(&lt;ID&gt; + 1 dòng gloss + delta cục bộ,<br/>không bao giờ id trần) -- .agents/skills/_shared/ (mảnh 1)"]
     end
-    subgraph L3["SKILLS-DOCTRINE -- nội dung rule bên trong từng SKILL.md"]
-        OLD["~36-69 file đang trích D-local/RUL/ADR trần<br/>(fgos-coding-shaping, fgos-coding-exploring,<br/>fgos-coding-planning, docs/specs/*...)"]
-        NEW["Sửa theo khuôn L2, verify bằng check L1<br/>(mảnh 3)"]
+    subgraph L3["SKILLS-DOCTRINE (tsk-37i) -- nội dung rule trong SKILL.md"]
+        OLD["~36-69 file đang trích D-local/RUL/ADR trần"]
+        NEW["Sửa theo khuôn L2, verify bằng check L1 (mảnh 3)"]
         OLD --> NEW
+    end
+    subgraph OUT["NGOÀI SCOPE -- giao tsk-1lv (D2)"]
+        SWEEP["Reversal sweep khi ADR supersede<br/>(mảnh 2 CŨ -- xem §7, moved-to-tsk-1lv)"]
+        ROUTING["Routing/impact/freshness/doc-deferral<br/>close-gate trên fgos approve/return<br/>(mảnh 4 CŨ -- xem §7, moved-to-tsk-1lv)"]
+        STORE["Unify state.decisions/CONTEXT.md/<br/>docs/decisions ADR corpus (D5 tsk-1lv)"]
     end
     L2 -->|skill nào cũng trích, không tự bịa lại| L3
     L1 -->|CHECK chạy trên L3 sau khi sửa| NEW
-    L1 -.chặn ghi khi ADR bị supersede.-> L3
-    ROUTING -.chặn close khi D-local locked mà không route.-> OLD
+    OUT -.tsk-37i KHÔNG đụng vào.-> L1
 ```
 
-- **Harness** (mảnh 1 nửa máy + mảnh 2 + mảnh 4 mới): 3 việc chạy được,
-  kiểm được — check pointer-integrity (npm test), reversal-sweep (supersede
-  verb) và routing-close-gate (`fgos return`/`approve`, round 6). Đây là
-  phần "kiểm máy" trong tách 2 tầng đã bàn round 2: cấu trúc trích dẫn
-  (trỏ đúng chỗ không, D-ID có route đi đâu chưa) máy kiểm được; nội dung
-  gloss (đúng/đủ không) thì không — nên KHÔNG có việc "check nội dung
-  gloss" ở tầng này, chỉ có ở skills-core.
-- **Mảnh 4 (routing close gate, round 6)** vá lỗ hổng khác mảnh 2: mảnh 2
-  chặn "quyết định bị supersede mà chỗ trích cũ không sửa"; mảnh 4 chặn
-  "quyết định D-local bị lock rồi không bao giờ được route đi đâu" — đúng
-  tình huống thật `fgos-coding-shaping/SKILL.md` đang có (D2/D4/D6 chỉ nằm
-  trong CONTEXT.md, chưa từng route vào spec/ADR). Độc lập với mảnh 1/2/3,
-  làm song song được.
-- **Skills-core** (mảnh 1 nửa văn xuôi): đúng nguyên tắc "one rule, one
-  home" học từ beegog — quy ước trích dẫn (khuôn `<ID> (<gloss>)`) chỉ
-  sống ở ĐÚNG 1 chỗ (`.agents/skills/_shared/`, cùng họ với
-  `executor-dispatch-fallback.md` đã có), mọi SKILL.md khác trích 1 dòng
-  tới đó — không phải mỗi skill tự viết lại luật trích dẫn của riêng nó
-  (tránh chính lỗi đang sửa lặp lại ở tầng meta).
-- **Skills-doctrine** (mảnh 3): nội dung rule thật bên trong từng SKILL.md
-  — đây là nơi ~36-69 file vi phạm nằm (§3 #6, §5 round 4), kể cả chính
-  `fgos-coding-shaping/SKILL.md` đang chạy phiên này (D2/D4/D6 trần). Sửa
-  theo khuôn skills-core, verify bằng check harness — phụ thuộc cả 2 tầng
-  trên phải có trước.
+- **Harness (tsk-37i, chỉ 1 việc):** mở rộng 2 script detection-only ĐÃ CÓ
+  SẴN trong repo (`scripts/check-decision-citation-drift.mjs`,
+  `scripts/check-decision-supersession.mjs` — tìm ra ở round 7, chưa từng
+  biết tới ở round 2-6) thay vì xây `pointer_integrity.rs`-kiểu-mới từ
+  đầu như bản nháp trước — DRY thật, không phải chỉ noted. Wire vào `npm
+  test`, thêm negative-control fixture theo mẫu beegog.
+- **Skills-core:** giữ nguyên ý round 5 — quy ước `<ID> (<gloss>)` sống
+  đúng 1 chỗ (`.agents/skills/_shared/`), mọi SKILL.md khác chỉ trích, tự
+  áp nguyên tắc "one rule, one home" ngay ở tầng meta này.
+- **Skills-doctrine:** giữ nguyên ý round 5 — dọn ~36-69 file vi phạm, kể
+  cả chính `fgos-coding-shaping/SKILL.md` đang chạy phiên này (D2/D4/D6
+  trần).
 - **D-local vẫn KHÔNG được nới lỏng** (chưa có quyết định nào đảo luật khoá
-  `0017`) — việc dọn ở skills-doctrine là sửa VI PHẠM luật cũ, không phải
-  đổi luật.
+  `0017`) — dọn ở skills-doctrine là sửa VI PHẠM luật cũ, không đổi luật.
+- **Mảnh 2 + mảnh 4 (round 2, round 6) đã CHUYỂN sang `tsk-1lv`** — không
+  còn là task của tsk-37i, xem §7 để biết nội dung gốc + lý do moved.
 
-Còn mở, có thể không chặn hội tụ: câu hỏi #7 ở §3 (hiển thị phân biệt
-local/global cho người đọc ở đâu) — trả lời được ngay trong khuôn
-skills-core (tiền tố `ADR`/`RUL(area)`/`D-local` đã đủ phân biệt), không
-cần bàn riêng.
+Câu hỏi #7 ở §3 (hiển thị phân biệt local/global) trả lời được ngay trong
+khuôn skills-core (tiền tố `ADR`/`RUL(area)`/`D-local` đã đủ phân biệt),
+không cần bàn riêng.
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-### {#task-citation-format-and-pointer-check} Mảnh 1 — Format trích dẫn + pointer-integrity check
+### {#task-citation-format-and-pointer-check} Mảnh 1 — Format trích dẫn + mở rộng check drift đã có
 - **Mục tiêu:** mọi trích ADR/RUL/D-local ngoài nhà gốc bắt buộc dạng
-  `<ID> (<tóm tắt 1 dòng>)`, không bao giờ id trần; thêm 1 check máy (kiểu
-  `pointer_integrity.rs` của beegog) chạy trong `npm test`, xác nhận mọi
-  trích dẫn trỏ đúng file/heading thật, có negative-control fixture.
-- **Tầng (round 5):** nửa **harness** (check máy trong `npm test`) + nửa
-  **skills-core** (1 tài liệu quy ước canonical ở `.agents/skills/_shared/`
-  — xem §6 sơ đồ round 5).
-- **Trích §6:** "Mảnh 1 (format + pointer-integrity)".
-- **D-ID áp dụng:** D1.
+  `<ID> (<tóm tắt 1 dòng>)`, không bao giờ id trần. Cơ chế kiểm máy: **mở
+  rộng 2 script đã có sẵn trong repo** — `scripts/check-decision-citation-
+  drift.mjs` (spec `docs/specs/decision-citation-drift.md`, từ STR72) và
+  `scripts/check-decision-supersession.mjs` (từ p-9fb81485) — hiện chỉ
+  detection-only, chạy tay, không wired CI. Round 5 từng nháp xây
+  `pointer_integrity.rs`-kiểu-mới; round 7 sửa lại: KHÔNG xây mới, mở rộng
+  2 script này (DRY, tránh trùng công với chính hạ tầng fgOS đã có).
+- **Tầng (round 5, sửa nguồn round 7):** nửa **harness** (wire 2 script
+  trên vào `npm test`) + nửa **skills-core** (1 tài liệu quy ước canonical
+  ở `.agents/skills/_shared/` — xem §6 sơ đồ round 7).
+- **Trích §6:** "Harness (tsk-37i, chỉ 1 việc)".
+- **D-ID áp dụng:** D1, D2.
 - **Quan hệ với sibling:** mảnh 3 phụ thuộc mảnh này (cần format chốt trước
-  khi dọn file cũ theo đúng khuôn).
-- **Verify nháp:** `npm test` xanh + check mới bắt được ≥1 lỗi thật đã biết
-  (`fgos-coding-shaping/SKILL.md` D2/D4/D6 trần) trước khi sửa, và hết báo
-  lỗi sau khi sửa.
+  khi dọn file cũ theo đúng khuôn). Phối hợp `tsk-1lv` round 4 cũng nhắc
+  tới đúng 2 script này (round 4 của họ) — nên đồng bộ với họ trước khi
+  sửa để không dẫm chân.
+- **Verify nháp:** `npm test` xanh + 2 script mở rộng bắt được ≥1 lỗi thật
+  đã biết (`fgos-coding-shaping/SKILL.md` D2/D4/D6 trần) trước khi sửa, và
+  hết báo lỗi sau khi sửa.
 
-### {#task-adr-reversal-sweep} Mảnh 2 — Reversal sweep cho ADR supersede
-- **Mục tiêu:** khi 1 quyết định `docs/decisions/` bị supersede, quét
+### {#task-adr-reversal-sweep} Mảnh 2 — Reversal sweep cho ADR supersede (moved-to-tsk-1lv, round 7)
+> **KHÔNG còn là task của tsk-37i (D2, round 7)** — nội dung gốc giữ lại
+> làm lịch sử, không xoá. `tsk-1lv` đã nhận mảnh này vào scope kiến trúc
+> lưu trữ quyết định rộng hơn của họ (liên quan D5 của tsk-1lv: retire
+> `docs/decisions/*.md` corpus).
+- **Mục tiêu (gốc):** khi 1 quyết định `docs/decisions/` bị supersede, quét
   `docs/**`+`.agents/skills/**` tìm chỗ trích id cũ, bắt xử lý (sửa hoặc
   waive-có-lý-do) trước khi ghi supersede — thay kỷ luật tay hiện tại
   (`0000-index.md` dòng 30-36).
-- **Tầng (round 5):** **harness** toàn bộ (đổi hành vi `decisions
-  supersede` verb, `src/` — không chạm skill nào).
-- **Trích §6:** "Mảnh 2 (reversal sweep)".
-- **D-ID áp dụng:** D1.
-- **Quan hệ với sibling:** độc lập với mảnh 1/3, có thể làm song song.
-- **Verify nháp:** supersede 1 ADR test có ≥1 chỗ trích cũ → sweep bắt
-  được, chặn ghi cho tới khi reconcile/waive.
+- **Lý do moved:** trùng công với "impact door" beegog v2.7.0 mà `tsk-1lv`
+  round 3-4 đã tự thiết kế; mục tiêu sweep (`docs/decisions/0000-index.md`)
+  có thể không còn là nguồn quyền uy nếu D5 của tsk-1lv thi công.
 
 ### {#task-retroactive-citation-cleanup} Mảnh 3 — Dọn tài liệu cũ đang vi phạm
 - **Mục tiêu:** sửa lại ~36 file trích D-local trần, ~62 file trích RUL
@@ -311,26 +324,24 @@ cần bàn riêng.
   đủ — không sửa `.claude/skills/*` (bản sinh tự động).
 - **Tầng (round 5):** **skills-doctrine** toàn bộ (nội dung rule bên trong
   từng `SKILL.md`, không chạm harness/skills-core — chỉ ĐỌC khuôn từ đó).
-- **Trích §6:** "Phạm vi giờ bao gồm quét/sửa tài liệu CŨ".
-- **D-ID áp dụng:** §3 #6 (chưa mint D-ID riêng — xem ghi chú round 4).
+- **Trích §6:** "Skills-doctrine" (round 7).
+- **D-ID áp dụng:** §3 #6, D1, D2.
 - **Quan hệ với sibling:** phụ thuộc mảnh 1 (cần khuôn format tồn tại
   trước).
 - **Verify nháp:** check máy của mảnh 1 chạy sạch trên toàn `docs/`+
   `.agents/skills/` sau khi dọn.
 
-### {#task-routing-close-gate} Mảnh 4 — Routing close-gate cho D-local (round 6)
-- **Mục tiêu:** `fgos return`/`fgos approve` từ chối đóng 1 item khi
+### {#task-routing-close-gate} Mảnh 4 — Routing close-gate cho D-local (moved-to-tsk-1lv, round 7)
+> **KHÔNG còn là task của tsk-37i (D2, round 7)** — nội dung gốc giữ lại
+> làm lịch sử, không xoá. `tsk-1lv` đã nhận mảnh này vào scope 4-door
+> harness chung của họ (freshness/impact/routing/doc-deferral).
+- **Mục tiêu (gốc):** `fgos return`/`fgos approve` từ chối đóng 1 item khi
   CONTEXT.md của nó có D-ID đã lock nhưng KHÔNG có area-spec citation VÀ
   KHÔNG có feature-local record hợp lệ — chặn đúng lỗ hổng "lock rồi bỏ
   quên, không bao giờ route đi đâu" (khác mảnh 2, vốn chỉ chặn supersede
   mà không sửa chỗ trích cũ).
-- **Tầng:** **harness** toàn bộ (verb `return`/`approve`, `src/`).
-- **Trích §6:** "Mảnh 4 (routing close gate, round 6)".
 - **Nguồn:** porting candidate `doc-rot-close-gate-bundle` (R3 E2 F3,
-  `docs/distillery/porting-log.md`), phần "routing door" — 3/4 cửa còn lại
-  của bundle beegog (knowledge-freshness, impact, doc-deferral) NGOÀI
-  phạm vi thảo luận này, chỉ ghi nhận làm candidate riêng cho sau.
-- **Quan hệ với sibling:** độc lập với mảnh 1/2/3, làm song song được.
-- **Verify nháp:** item test có D-ID lock trong CONTEXT.md, chưa route đi
-  đâu → `return`/`approve` từ chối, có escape hatch (kiểu
-  `routing-deferral` của beegog) khi có lý do chính đáng.
+  `docs/distillery/porting-log.md`), phần "routing door".
+- **Lý do moved:** `tsk-1lv` round 3-4 đã tự thiết kế đúng cơ chế này —
+  không chỉ routing door mà cả bundle 4 cửa (freshness/impact/routing/
+  doc-deferral) gắn vào `fgos approve` — làm riêng ở tsk-37i sẽ trùng công.
