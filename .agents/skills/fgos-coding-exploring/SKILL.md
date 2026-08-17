@@ -245,8 +245,8 @@ directly by `fgos-coding-planning`, mid-`planning`, when that skill finds
    <one-line summary>" --rationale "see CONTEXT.md for the full scout
    evidence and reasoning" --relation none` (or `--relation
    supersedes:<old-D-ID>` when this D-ID explicitly revises an earlier one
-   already locked in this same CONTEXT.md — tsk-1lv-1 D2: every
-   `fgos decision` write declares its relation, no default) so the decision
+   already locked in this same CONTEXT.md — every `fgos decision` write
+   declares its relation, no default, tsk-1lv-1) so the decision
    also lands in the item's append-only decision log, surfaced through
    `view.decisions`/`fgos list` for machine readers — `--rationale` is
    required (tsk-63c) — this call is additive alongside writing
@@ -320,7 +320,8 @@ directly by `fgos-coding-planning`, mid-`planning`, when that skill finds
    ## Locked decisions
    ```
 
-   **Never hand-type the table itself (tsk-1lv-3 D3)** — every row already
+   **Never hand-type the table itself** (tsk-1lv-3: the table is a render
+   over the log, never a second hand-typed copy) — every row already
    exists in `state.decisions` from step 2's own `fgos decision --id`
    calls. Leave the section under the heading empty (or whatever it
    already holds from an earlier render), then run, once, after the last
@@ -508,9 +509,10 @@ node "$root/bin/fgos.mjs" discover "<item-id>" --verdict clear --verify "<the sa
   `auto-approved: CONTEXT.md (gate-bypass level <level>)`, log it
   (`fgos decision --text "auto-approved CONTEXT.md gate for <item-id> at
   level <level>" --rationale "gate-bypass level <level> permits
-  auto-approval per docs/history/gate-bypass/CONTEXT.md D1-D5" --relation
-  none`, D3's
-  audit trail), record it (`fgos gate-approve <item-id> --gate
+  auto-approval per the gate-bypass feature's own locked decisions
+  (see docs/history/gate-bypass/CONTEXT.md)" --relation
+  none`, the audit trail this bypass path needs), record it
+  (`fgos gate-approve <item-id> --gate
   contextApprove --actor bypass --verify "..."`, per above), fire the
   `fgos discover --verdict clear` call above, then continue straight to
   `fgos-coding-planning`.

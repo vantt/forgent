@@ -1972,7 +1972,21 @@ async function runVerb(verb, flags, positional, dir) {
       if (relation.kind === 'supersedes') {
         const repoRoot = path.dirname(dir);
         const sourceFiles = collectWideSourceFiles(repoRoot);
-        const supersedingLabel = id ?? relation.id;
+        // tsk-1lv (review-fix round, F3): a platform/--scope decision (no
+        // --id) has no item id to use as the "acknowledges the new
+        // decision" label -- falling back to `relation.id` here (the OLD
+        // id being superseded) made supersedingLabel === targetId, which
+        // made findWideCitationFindings's own
+        // `line.includes(supersedingLabel)` suppression guard match every
+        // single citation of the old id (the line already had to contain
+        // targetId to be a candidate at all), silently zeroing every
+        // finding for every one of tsk-1lv-4's 34 --scope writes with zero
+        // test coverage of this path. `null` here means "no acknowledgment
+        // label available" -- every citation of the old id is surfaced,
+        // never auto-suppressed, which is the correct behavior when there
+        // is nothing a citing line could plausibly reference to prove it
+        // already accounts for the supersession.
+        const supersedingLabel = id ?? null;
         const findings = findWideCitationFindings(sourceFiles, relation.id, supersedingLabel);
         if (findings.length) {
           result.danglingCitations = findings.map((f) => f.message);

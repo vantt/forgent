@@ -237,6 +237,28 @@ test('CLI: supersedes reports no dangling citations once every hit also names th
   assert.ok(!('danglingCitations' in data));
 });
 
+test('CLI: supersedes without --id (a platform/--scope decision) still surfaces dangling citations -- F3 tsk-1lv regression: supersedingLabel used to fall back to relation.id itself, making the suppression guard match every citation unconditionally', () => {
+  const cwd = initCwd();
+  fs.mkdirSync(path.join(cwd, 'docs', 'specs'), { recursive: true });
+  fs.writeFileSync(
+    path.join(cwd, 'docs', 'specs', 'example.md'),
+    'line one cites OLDID without acknowledgement\n',
+  );
+
+  const result = run(cwd, [
+    'decision',
+    '--text', 'D-ADR0099: revises OLDID scope',
+    '--rationale', 'because reasons',
+    '--scope', 'example-area',
+    '--relation', 'supersedes:OLDID',
+  ]);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  assert.ok(Array.isArray(data.danglingCitations));
+  assert.equal(data.danglingCitations.length, 1);
+  assert.match(data.danglingCitations[0], /example\.md:1/);
+});
+
 test('CLI: touches does not run the dangling-citation sweep', () => {
   const cwd = initCwd();
   fs.mkdirSync(path.join(cwd, 'docs', 'specs'), { recursive: true });

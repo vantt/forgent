@@ -103,8 +103,8 @@ see the "Distill mode" section below for how the second one differs.
    `fgos decision --text "<D-ID>: <summary>" --rationale "..." --id <item-id>
    --relation none` (or `--relation supersedes:<old-D-ID>` when this D-ID
    explicitly revises an earlier one already locked in this same
-   discussion — tsk-1lv-1 D2: every `fgos decision` write declares its
-   relation, no default) call the moment it stabilizes — never deferred to
+   discussion — every `fgos decision` write declares its relation, no
+   default, tsk-1lv-1) call the moment it stabilizes — never deferred to
    the terminal handoff. This is the machine-readable safety net for a
    cold pickup later, independent of anyone re-reading the prose correctly.
 5. **Q&A log** — append-only, timestamped, never edited after the fact.

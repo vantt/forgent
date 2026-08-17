@@ -110,9 +110,11 @@ actually cited from this file until now).
    root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
    ```
 
-   **Tìm-trước-khi-tạo (D8, tsk-1lv-6): tra `authoritative_for` trước khi
+   **Tìm-trước-khi-tạo (tsk-1lv-6): tra `authoritative_for` trước khi
    suy đường dẫn từ quadrant+tên file.** Trong đúng quadrant vừa chọn ở
-   bước 2 (D14: không mở rộng sang audience/area — trục đó chưa tồn tại),
+   bước 2 (phạm vi cố ý hẹp: chỉ chống trùng chủ đề TRONG một quadrant đã
+   định nghĩa rõ, không mở rộng sang audience/area — trục đó chưa tồn tại
+   trong schema hiện tại),
    quét frontmatter `authoritative_for` của mọi doc đã có
    (`docs/<quadrant>/*.md`, `parseFrontmatter` từ `frontmatter.mjs`) và
    skeleton-match chủ đề của capture này (tiêu đề/chủ đề rút từ nội dung
@@ -155,7 +157,8 @@ actually cited from this file until now).
      gathered capture(s) into the existing living prose as additive
      sections — append what is new by default. **Reconcile, don't just
      append, when the new capture genuinely contradicts what is already
-     there (D6)** — retire or rewrite the specific contradicted prose,
+     there** (allowed exception to the append-only default, tsk-1lv-6) —
+     retire or rewrite the specific contradicted prose,
      never leaving two mutually-exclusive claims standing side by side as
      if both were still true; state plainly, in the same commit, what
      changed and why. Deleting or shortening prose that the new capture
@@ -251,12 +254,11 @@ on this skill's behalf.
 - growing an existing document by deleting or shortening prose that was
   already there, instead of accumulating the newly gathered capture(s)
   additively — unless the new capture genuinely contradicts that specific
-  prose, in which case reconciling it is the correct move (D6) and
-  silently leaving the contradiction standing unreconciled is the red flag
-  instead
+  prose, in which case reconciling it is the correct move and silently
+  leaving the contradiction standing unreconciled is the red flag instead
 - deciding a target path from quadrant+file-name guesswork without first
   checking existing docs' `authoritative_for` frontmatter for a skeleton
-  match on this capture's real topic (D8)
+  match on this capture's real topic
 - organizing a grown document by a second axis (audience, product area,
   etc.) instead of keeping the Diataxis quadrant as the sole structure
 - applying a stage or status move by writing `.fgos/` state directly
