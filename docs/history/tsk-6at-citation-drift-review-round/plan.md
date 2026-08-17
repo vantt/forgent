@@ -1,5 +1,14 @@
 # Plan: fix findNewFindings' duplicate-key under-detection
 
+**Gate note:** the hard-gate keyword floor (`canAutoApproveMergedGate`,
+`src/state/gate-bypass.mjs:232-233`) tripped on "migration" in this
+item's own submitted description (referring to the JSON `--write-baseline`
+regen, not a schema/DB migration). Per this repo's own design that floor
+is never overridden by a session's own judgment, so this was asked
+directly in chat rather than bypassed — human confirmed proceeding on
+2026-08-17, with the prototyped fix (below) already proven against the
+real repro plus two regression cases before asking.
+
 Mode: **standard** (2 flags per fgos-routing's Mode gate — "existing
 covered behavior" (the file already has 29 passing tests that must keep
 passing) and "weak proof around the area" (this whole item exists
