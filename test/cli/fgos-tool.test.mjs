@@ -49,12 +49,16 @@ function declareCapacity(cwd, id, fields) {
   cfg.runner ??= {};
   cfg.runner.capacities ??= {};
   cfg.runner.capacities[id] = fields;
-  // tsk-45f D11: "capability" (like "for") is now catalog-validated against
-  // cfg.runner.capabilities -- declare it here so this raw fixture writer
-  // keeps producing a loadable config, same as a real capacity would need.
-  if (typeof fields.capability === 'string' && fields.capability) {
+  // tsk-45f D11 (tsk-34n retired the "capability" singular fallback --
+  // "for" is the only field read now): "for" is catalog-validated against
+  // cfg.runner.capabilities -- declare each entry here so this raw fixture
+  // writer keeps producing a loadable config, same as a real capacity
+  // would need.
+  if (Array.isArray(fields.for)) {
     cfg.runner.capabilities ??= {};
-    cfg.runner.capabilities[fields.capability] ??= {};
+    for (const purpose of fields.for) {
+      cfg.runner.capabilities[purpose] ??= {};
+    }
   }
   fs.writeFileSync(configPath, JSON.stringify(cfg, null, 2));
 }
@@ -66,7 +70,7 @@ function declareGitnexus(cwd, extra = {}) {
   fs.mkdirSync(path.join(cwd, '.gitnexus'), { recursive: true });
   declareCapacity(cwd, extra.name ?? 'gitnexus', {
     kind: 'tool',
-    capability: extra.capability ?? 'Impact Analysis',
+    for: [extra.capability ?? 'Impact Analysis'],
     invocations: [{ via: extra.kind ?? 'mcp', command: extra.command ?? 'mcp:gitnexus' }],
     scanTarget: extra.scan ?? '.gitnexus',
     ...(extra.responsibility ? { responsibility: extra.responsibility } : {}),
@@ -107,7 +111,7 @@ test('tool check on a present mcp tool writes "present" to the local status over
 
 test('tool check on a missing mcp tool (scan target absent) still exits 0 — absence is a fact, never a CLI error', () => {
   const cwd = tmpCwd();
-  declareCapacity(cwd, 'c3', { kind: 'tool', capability: 'impact-analysis', invocations: [{ via: 'mcp', command: 'skill:c3' }], scanTarget: '.c3' });
+  declareCapacity(cwd, 'c3', { kind: 'tool', for: ['impact-analysis'], invocations: [{ via: 'mcp', command: 'skill:c3' }], scanTarget: '.c3' });
   const result = run(cwd, ['tool', 'check']);
   assert.equal(result.status, 0);
   const data = envelopeData(result.stdout);
@@ -117,7 +121,7 @@ test('tool check on a missing mcp tool (scan target absent) still exits 0 — ab
 test('tool check --name only probes the named tool, leaving other declared tools\' overlay entries untouched', () => {
   const cwd = tmpCwd();
   declareGitnexus(cwd);
-  declareCapacity(cwd, 'c3', { kind: 'tool', capability: 'impact-analysis', invocations: [{ via: 'mcp', command: 'skill:c3' }], scanTarget: '.c3' });
+  declareCapacity(cwd, 'c3', { kind: 'tool', for: ['impact-analysis'], invocations: [{ via: 'mcp', command: 'skill:c3' }], scanTarget: '.c3' });
   run(cwd, ['tool', 'check']); // seeds both
   const before = JSON.parse(fs.readFileSync(path.join(cwd, '.fgos', 'tool-status.local.json'), 'utf8'));
   fs.mkdirSync(path.join(cwd, '.c3'), { recursive: true }); // now present, but we only re-check gitnexus below
@@ -166,7 +170,7 @@ test('tool query on a declared tool that was never checked on this machine repor
 
 test('tool query --status present filters out a declared-but-not-present tool after a real check', () => {
   const cwd = tmpCwd();
-  declareCapacity(cwd, 'c3', { kind: 'tool', capability: 'impact-analysis', invocations: [{ via: 'mcp', command: 'skill:c3' }], scanTarget: '.c3' });
+  declareCapacity(cwd, 'c3', { kind: 'tool', for: ['impact-analysis'], invocations: [{ via: 'mcp', command: 'skill:c3' }], scanTarget: '.c3' });
   run(cwd, ['tool', 'check']); // c3's scan target does not exist -> missing
   const data = envelopeData(run(cwd, ['tool', 'query', '--capability', 'impact-analysis', '--status', 'present']).stdout);
   assert.deepEqual(data.providers, []);
@@ -175,7 +179,7 @@ test('tool query --status present filters out a declared-but-not-present tool af
 test('tool query returns multiple complementary providers for the same capability (deep-dive: gitnexus + c3 both serve impact-analysis)', () => {
   const cwd = tmpCwd();
   declareGitnexus(cwd);
-  declareCapacity(cwd, 'c3', { kind: 'tool', capability: 'impact-analysis', invocations: [{ via: 'mcp', command: 'skill:c3' }], scanTarget: '.c3' });
+  declareCapacity(cwd, 'c3', { kind: 'tool', for: ['impact-analysis'], invocations: [{ via: 'mcp', command: 'skill:c3' }], scanTarget: '.c3' });
   const data = envelopeData(run(cwd, ['tool', 'query', '--capability', 'impact-analysis']).stdout);
   assert.deepEqual(data.providers.map((p) => p.name).sort(), ['c3', 'gitnexus']);
 });

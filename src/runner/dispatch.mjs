@@ -704,23 +704,6 @@ function validateCapacityShape(capacity, label, capabilityNames) {
       }
     }
   }
-  // tsk-45f D11: `capability` (the tool-registry's own free-text field,
-  // `toolsFromCapacities`) gets the same catalog check `for` already has
-  // above -- previously unvalidated entirely, so a typo'd/undeclared value
-  // silently made a tool invisible to `fgos tool query --capability ...`
-  // with no error anywhere. Never required alongside `for`: a capacity
-  // migrated to `for` (D11's own tolerant-fallback shape) may omit
-  // `capability` entirely.
-  if (capacity.capability !== undefined) {
-    if (typeof capacity.capability !== 'string' || !capacity.capability.trim()) {
-      throw new RunnerConfigError(`runner config (${label}) "capability" must be a non-empty string when present.`);
-    }
-    if (!capabilityNames.has(capacity.capability)) {
-      throw new RunnerConfigError(
-        `runner config (${label}) "capability" entry "${capacity.capability}" is not declared in "capabilities" — add it there first (D4/D14/D15).`,
-      );
-    }
-  }
   // D15/tsk-5td: the content-permission layer, alongside for/needs above.
   // Optional (a capacity naming no `carries` skips resolveExecutorConfig's
   // own carries gate entirely, byte-identical to every pre-D15 capacity) —
@@ -752,18 +735,26 @@ function validateCapacityShape(capacity, label, capabilityNames) {
   // work-tier "standard"). Optional and additive — a capacity naming none
   // resolves through the default mapping unchanged.
   if (capacity.rigorOverrides !== undefined) {
-    if (!capacity.rigorOverrides || typeof capacity.rigorOverrides !== 'object' || Array.isArray(capacity.rigorOverrides)) {
-      throw new RunnerConfigError(`runner config (${label}) "rigorOverrides" must be an object mapping a work tier to a policy tier when present.`);
+    validateRigorOverridesShape(capacity.rigorOverrides, `${label} "rigorOverrides"`);
+  }
+}
+
+// Extracted (D2, docs/history/capability-capacity-remodel/CONTEXT.md) so
+// `capabilities.<name>.overrides.rigorOverrides` (validateCapabilitiesShape
+// below) validates against the exact same rule a capacity's own
+// `rigorOverrides` already does, never a second, drifting copy of it.
+function validateRigorOverridesShape(rigorOverrides, label) {
+  if (!rigorOverrides || typeof rigorOverrides !== 'object' || Array.isArray(rigorOverrides)) {
+    throw new RunnerConfigError(`runner config (${label}) must be an object mapping a work tier to a policy tier when present.`);
+  }
+  for (const [workTier, policyTier] of Object.entries(rigorOverrides)) {
+    if (!TIERS.includes(workTier)) {
+      throw new RunnerConfigError(`runner config (${label}) key must be one of ${TIERS.join('/')}, got: ${JSON.stringify(workTier)}.`);
     }
-    for (const [workTier, policyTier] of Object.entries(capacity.rigorOverrides)) {
-      if (!TIERS.includes(workTier)) {
-        throw new RunnerConfigError(`runner config (${label}) "rigorOverrides" key must be one of ${TIERS.join('/')}, got: ${JSON.stringify(workTier)}.`);
-      }
-      if (!MODEL_POLICY_TIERS.includes(policyTier)) {
-        throw new RunnerConfigError(
-          `runner config (${label}) "rigorOverrides.${workTier}" must be one of ${MODEL_POLICY_TIERS.join('/')}, got: ${JSON.stringify(policyTier)}.`,
-        );
-      }
+    if (!MODEL_POLICY_TIERS.includes(policyTier)) {
+      throw new RunnerConfigError(
+        `runner config (${label}.${workTier}) must be one of ${MODEL_POLICY_TIERS.join('/')}, got: ${JSON.stringify(policyTier)}.`,
+      );
     }
   }
 }
@@ -784,9 +775,16 @@ function validateCapacityShape(capacity, label, capabilityNames) {
  * spelling/casing variance of the SAME name, not a genuinely different
  * alias name).
  */
+// Only 4 fields are ever eligible for capabilities.<name>.overrides (D2,
+// docs/history/capability-capacity-remodel/CONTEXT.md): a capability can
+// retune HOW strongly its resolved capacity works, never WHAT command
+// actually runs -- command/args/adapter/invocations stay owned by the
+// capacity alone, never override-able from a capability.
+const CAPABILITY_OVERRIDE_FIELDS = Object.freeze(['rigorOverrides', 'providerModel', 'tier', 'model']);
+
 function validateCapabilitiesShape(capabilities, label) {
   if (!capabilities || typeof capabilities !== 'object' || Array.isArray(capabilities)) {
-    throw new RunnerConfigError(`runner config (${label}) must be an object mapping a capability name -> {description?, aliases?} when present.`);
+    throw new RunnerConfigError(`runner config (${label}) must be an object mapping a capability name -> {description?, aliases?, prefer?, overrides?} when present.`);
   }
   for (const [name, entry] of Object.entries(capabilities)) {
     const entryLabel = `${label}.${name}`;
@@ -799,6 +797,31 @@ function validateCapabilitiesShape(capabilities, label) {
     if (entry.aliases !== undefined) {
       if (!Array.isArray(entry.aliases) || !entry.aliases.every((alias) => typeof alias === 'string' && alias.trim())) {
         throw new RunnerConfigError(`runner config (${entryLabel}) "aliases" must be an array of non-empty strings when present.`);
+      }
+    }
+    if (entry.prefer !== undefined && (typeof entry.prefer !== 'string' || !entry.prefer.trim())) {
+      throw new RunnerConfigError(`runner config (${entryLabel}) "prefer" must be a non-empty string (a capacity id) when present.`);
+    }
+    if (entry.overrides !== undefined) {
+      if (!entry.overrides || typeof entry.overrides !== 'object' || Array.isArray(entry.overrides)) {
+        throw new RunnerConfigError(`runner config (${entryLabel}) "overrides" must be an object when present.`);
+      }
+      for (const key of Object.keys(entry.overrides)) {
+        if (!CAPABILITY_OVERRIDE_FIELDS.includes(key)) {
+          throw new RunnerConfigError(`runner config (${entryLabel}) "overrides" key "${key}" is not one of ${CAPABILITY_OVERRIDE_FIELDS.join('/')} — command/args/adapter/invocations are never override-able from a capability (D2).`);
+        }
+      }
+      if (entry.overrides.providerModel !== undefined && (typeof entry.overrides.providerModel !== 'string' || !entry.overrides.providerModel.trim())) {
+        throw new RunnerConfigError(`runner config (${entryLabel}) "overrides.providerModel" must be a non-empty string when present.`);
+      }
+      if (entry.overrides.tier !== undefined && (typeof entry.overrides.tier !== 'string' || !entry.overrides.tier.trim())) {
+        throw new RunnerConfigError(`runner config (${entryLabel}) "overrides.tier" must be a non-empty string when present.`);
+      }
+      if (entry.overrides.model !== undefined && (typeof entry.overrides.model !== 'string' || !entry.overrides.model.trim())) {
+        throw new RunnerConfigError(`runner config (${entryLabel}) "overrides.model" must be a non-empty string when present.`);
+      }
+      if (entry.overrides.rigorOverrides !== undefined) {
+        validateRigorOverridesShape(entry.overrides.rigorOverrides, `${entryLabel}.overrides.rigorOverrides`);
       }
     }
   }
@@ -867,6 +890,26 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
     }
     for (const [capacityId, capacity] of Object.entries(cfg.capacities)) {
       validateCapacityShape(capacity, `${sourceLabel} capacities.${capacityId}`, capabilityNames);
+    }
+  }
+  // `prefer` symmetry (D2, docs/history/capability-capacity-remodel/
+  // CONTEXT.md): checked here, AFTER both `capabilities` and `capacities`
+  // are individually known-good — a capability's own shape and a
+  // capacity's own shape can each be malformed independently, and this
+  // cross-check should never be the first (confusing) error a caller
+  // sees for an unrelated shape mistake. Catches a typo'd `prefer` at
+  // config-load time, ahead of `resolveCapacityAndOverrides`'s own
+  // resolve-time throw for a `cfg` built by hand (e.g. in a test) without
+  // going through this loader at all.
+  if (cfg.capabilities !== undefined) {
+    for (const [name, entry] of Object.entries(cfg.capabilities)) {
+      if (entry.prefer === undefined) continue;
+      const preferredCapacity = cfg.capacities?.[entry.prefer];
+      if (!preferredCapacity || !Array.isArray(preferredCapacity.for) || !preferredCapacity.for.includes(name)) {
+        throw new RunnerConfigError(
+          `runner config (${sourceLabel} capabilities.${name}) "prefer" names "${entry.prefer}" but that capacity does not declare "for" including "${name}" itself (symmetry required, D2).`,
+        );
+      }
     }
   }
   // tsk-5tm-5 D9: `modelPolicies` (provider-keyed, 5-tier) is the new
@@ -1028,8 +1071,89 @@ export function resolveCapacityIdForPurpose(cfg, purpose) {
   return null;
 }
 
+/**
+ * Resolve a `capacityId`-OR-purpose name to its real serving capacity,
+ * applying `capabilities.<name>.prefer`/`overrides` (2026-08-16 user
+ * decision, `docs/decisions/0033-...md`'s sibling `docs/history/
+ * capability-capacity-remodel/CONTEXT.md` D1/D2) — the ONE place every
+ * `cfg.capacities[capacityId]` lookup in this file should go through
+ * instead of tracing it out ad hoc (D4: `spawnWorker` used to have its
+ * own separate inline lookup for model resolution, distinct from
+ * `resolveExecutorConfig`'s own internal one — fixing only one left them
+ * resolving inconsistently after a duplicate `capacities.<id>` entry is
+ * removed in favor of `for`/`prefer`).
+ *
+ * Order (D1): (1) a literal `cfg.capacities[capacityIdOrPurpose]` entry
+ * always wins first, unchanged from every pre-this-item caller's own
+ * behavior — this is the deep-customization escape-hatch (a different
+ * `command`/`args` entirely), never touched by `overrides`. (2) failing
+ * that, `cfg.capabilities[capacityIdOrPurpose].prefer` names a capacity
+ * that MUST itself declare `for` including `capacityIdOrPurpose`
+ * (symmetry, D2) — `prefer` is a tie-breaker among self-declared
+ * servers, never a way to assign serving status a capacity never opted
+ * into; a `prefer` that fails this check throws loud (`RunnerConfigError`)
+ * rather than silently falling through, matching every other shape-
+ * validation gate in this file. (3) failing that, the existing
+ * `resolveCapacityIdForPurpose` scan (unchanged, still the "first `for`
+ * match wins" behavior for a purpose with no `prefer` set). (4) nothing
+ * found — `{capacityId: null, configured: false}`, a legitimate,
+ * expected state, never thrown.
+ *
+ * `overrides` (D2, only when resolved via step 2) is returned, never
+ * applied here — each call site decides what it means for ITS OWN
+ * resolution, and only 4 fields are ever eligible
+ * (`rigorOverrides`/`providerModel`/`tier`/`model` — never `command`/
+ * `args`/`adapter`/`invocations`, D2: a capability can retune HOW
+ * strongly its capacity works, never WHAT command actually runs).
+ * `rigorOverrides`/`providerModel` matter to every model-computing call
+ * site (`spawnWorker` and `executeCapacityCli` both). `tier`/`model`
+ * (a raw, direct override — no `modelForTier` computation at all) only
+ * ever mattered for `executeCapacityCli`'s own ad hoc dispatch, the
+ * exact same pre-existing scope a plain `capacity.tier`/`capacity.model`
+ * already had before this item — `spawnWorker` resolves `tier` from the
+ * WORK ITEM's own classification (`work.tier`, a scope/effort judgment
+ * made once at Discovery, not a per-capacity opt-out) and never accepted
+ * a raw literal model override at all; a capability's `overrides.tier`/
+ * `.model` were never meant to reach that door, and self-review found
+ * (and left) that scope boundary undisturbed rather than wiring
+ * `work.tier` open to being silently overridden by dispatch config.
+ */
+export function resolveCapacityAndOverrides(cfg, capacityIdOrPurpose) {
+  const capacities = cfg && cfg.capacities && typeof cfg.capacities === 'object' ? cfg.capacities : {};
+  if (capacities[capacityIdOrPurpose]) {
+    return { capacityId: capacityIdOrPurpose, capacity: capacities[capacityIdOrPurpose], overrides: undefined, configured: true };
+  }
+  const preferred = cfg && cfg.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities[capacityIdOrPurpose]?.prefer : undefined;
+  if (preferred) {
+    const capacity = capacities[preferred];
+    if (!capacity || !Array.isArray(capacity.for) || !capacity.for.includes(capacityIdOrPurpose)) {
+      throw new RunnerConfigError(
+        `runner config capabilities.${capacityIdOrPurpose}.prefer names "${preferred}" but that capacity does not declare "for" including "${capacityIdOrPurpose}" itself (symmetry required).`,
+      );
+    }
+    return { capacityId: preferred, capacity, overrides: cfg.capabilities[capacityIdOrPurpose].overrides, configured: true };
+  }
+  const found = resolveCapacityIdForPurpose(cfg, capacityIdOrPurpose);
+  if (found) {
+    return { capacityId: found, capacity: capacities[found], overrides: undefined, configured: true };
+  }
+  return { capacityId: null, capacity: undefined, overrides: undefined, configured: false };
+}
+
 function resolveExecutorConfig(cfg, tier, capacityId, fgosDir, contentCarries) {
-  const capacity = capacityId && cfg && cfg.capacities && typeof cfg.capacities === 'object' ? cfg.capacities[capacityId] : undefined;
+  const resolved = capacityId ? resolveCapacityAndOverrides(cfg, capacityId) : undefined;
+  const capacity = resolved?.capacity;
+  // Self-review finding: `capacityId` below is the CALLER's own requested
+  // id/purpose (e.g. "fgos-coding-implement"), never rewritten to the
+  // capacity `prefer` actually resolved (e.g. "agy") -- every error
+  // message already citing `capacityId` stays worded exactly as before
+  // (zero risk to existing message-text expectations), but the
+  // `allowCrossProvider` remediation line is the one place an imprecise
+  // id gives actively WRONG advice ("set capacities.fgos-coding-
+  // implement.allowCrossProvider" -- not a real capacities key at all
+  // when resolved via `prefer`), so that one message names the real
+  // resolved id too when it differs.
+  const realCapacityId = resolved?.capacityId;
 
   // D15/tsk-5td, first real gate — carries answers "CAI GI duoc di", never
   // "CO duoc ra ngoai khong" (allowCrossProvider's own question, checked
@@ -1110,8 +1234,10 @@ function resolveExecutorConfig(cfg, tier, capacityId, fgosDir, contentCarries) {
   // this gate — that is exactly what `allowCrossProvider` already governs
   // for it today.
   if (capacity && !resolvedViaAgentType && !CLAUDE_CLI_COMMANDS.includes(executor.command) && capacity.allowCrossProvider !== true) {
+    const remediationId = realCapacityId && realCapacityId !== capacityId ? realCapacityId : capacityId;
+    const resolvedNote = realCapacityId && realCapacityId !== capacityId ? ` (resolved via capabilities."${capacityId}".prefer to capacity "${realCapacityId}")` : '';
     throw new RunnerConfigError(
-      `capacity "${capacityId}" resolves to non-Claude command "${executor.command}" — prompt content would leave the Claude ecosystem. Set capacities.${capacityId}.allowCrossProvider: true to permit this.`,
+      `capacity "${capacityId}"${resolvedNote} resolves to non-Claude command "${executor.command}" — prompt content would leave the Claude ecosystem. Set capacities.${remediationId}.allowCrossProvider: true to permit this.`,
     );
   }
 
@@ -1157,9 +1283,11 @@ export function decideDispatchMechanism({ hasNativeMechanism, hasLiveTaskAccess,
  * above (tsk-3ik-1): derives `hasNativeMechanism` (`capacity.kind ===
  * "agent"`, D5 tsk-in1-4 — was `"task"` before `kind` split into the
  * `agent`/`tool` BAN CHAT axis) and `forceCliSpawn` (`capacity.forceCliSpawn`)
- * straight from the same `cfg.capacities[capacityId]` lookup
- * `resolveExecutorConfig` already does, without calling or mutating that
- * function — this stays a read-only sibling, never a second entry into the
+ * from `resolveCapacityAndOverrides(cfg, capacityId).capacity` (D4,
+ * `docs/history/capability-capacity-remodel/CONTEXT.md` — the same shared
+ * resolver `resolveExecutorConfig` now uses too), without calling or
+ * mutating `resolveExecutorConfig` itself — this stays a read-only
+ * sibling, never a second entry into the
  * CRITICAL-blast-radius resolve path (confirmed via
  * `impact({target: "resolveExecutorConfig", direction: "upstream"})`: 6
  * upstream symbols, 3 execution flows, HIGH risk, re-run at tsk-in1-4
@@ -1185,7 +1313,7 @@ export function decideDispatchMechanism({ hasNativeMechanism, hasLiveTaskAccess,
  * `agentType`), so `0026` rule 2's reasoning still holds there.
  */
 export function decideCapacityDispatchMechanism(cfg, capacityId, { hasLiveTaskAccess = false } = {}) {
-  const capacity = capacityId && cfg && cfg.capacities && typeof cfg.capacities === 'object' ? cfg.capacities[capacityId] : undefined;
+  const capacity = capacityId ? resolveCapacityAndOverrides(cfg, capacityId).capacity : undefined;
   const isCliSpawnShaped = Boolean(
     capacity
       && (capacity.command
@@ -1575,8 +1703,11 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   // rigorOverrides can thread into tier resolution — never borrowing
   // Claude's model names for a non-Claude capacity's own dispatch.
   const capacityId = capacityIdForWork(work);
-  const capacityForTier = capacityId && cfg && cfg.capacities && typeof cfg.capacities === 'object' ? cfg.capacities[capacityId] : undefined;
-  const model = modelForTier(cfg, tier, { providerModel: capacityForTier?.providerModel, rigorOverrides: capacityForTier?.rigorOverrides });
+  const { capacityId: resolvedCapacityId, capacity: capacityForTier, overrides: capabilityOverrides } = capacityId ? resolveCapacityAndOverrides(cfg, capacityId) : {};
+  const model = modelForTier(cfg, tier, {
+    providerModel: capabilityOverrides?.providerModel ?? capacityForTier?.providerModel,
+    rigorOverrides: capabilityOverrides?.rigorOverrides ?? capacityForTier?.rigorOverrides,
+  });
   const prompt = buildPrompt(work, opts.feedback, opts.stage);
   const { command, args, adapter, provider, baseCommit, headRef } = resolveExecutorCommand(cfg, {
     prompt,
@@ -1604,7 +1735,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   // through which adapter/provider/model/tier. Diagnostic-only: never read
   // back by any caller, never part of this function's return value.
   process.stderr.write(
-    `fgos: dispatch job=${capacityId} capacity=${cfg?.capacities?.[capacityId] ? capacityId : '(global executor)'} via=${adapter} provider=${provider} model=${model} tier=${tier}\n`,
+    `fgos: dispatch job=${capacityId} capacity=${resolvedCapacityId ?? '(global executor)'} via=${adapter} provider=${provider} model=${model} tier=${tier}\n`,
   );
 
   // P49: same mechanical selection buildPrompt used internally, called again
@@ -1724,11 +1855,46 @@ export async function executeCapacityCli(
   const fgosDir = fgosDirFromRoot(root);
   const cfg = ensureRunnerConfigForDir(root);
   const resolvedByPurpose = !capacityIdArg;
-  const capacityId = capacityIdArg || resolveCapacityIdForPurpose(cfg, purpose);
+  // D4 (docs/history/capability-capacity-remodel/CONTEXT.md): resolve
+  // through the shared resolver on WHICHEVER key this call actually gave
+  // us — `purpose` when purpose-resolved, `capacityIdArg` when named
+  // directly (itself possibly a purpose-shaped id with no literal
+  // `cfg.capacities` entry of its own, e.g. "fgos-coding-implement"
+  // resolved via `capabilities.<name>.prefer`). A single call per door,
+  // never a second one on the already-resolved id afterward — a prior
+  // version of this fix called `resolveCapacityAndOverrides` a second
+  // time here, on `capacityId` post-resolution: for the `--for` door
+  // that id is already a literal `cfg.capacities` key by then, so the
+  // second call always hit the literal-key branch and silently dropped
+  // `capabilities.<purpose>.overrides` — found by re-reading this exact
+  // code end to end.
+  //
+  // The two doors keep their own pre-existing error contracts, proven by
+  // real tests: `--for` alone throws when nothing resolves ("no capacity
+  // registered for purpose..." — guides the caller to `decide --for`
+  // first); a named `capacityIdArg` that resolves to nothing NEVER
+  // throws here, silently falling through to the global executor
+  // (`resolvedCapacity` stays `undefined` below) — proven by
+  // `dispatch.test.mjs`'s own "executeCapacityCli falls back to the
+  // global executor when the capacityId is not in cfg.capacities at all
+  // -- never throws".
+  let capacityId = capacityIdArg;
+  let resolvedCapacity;
+  let capabilityOverrides;
   if (!capacityId) {
-    throw new RunnerConfigError(
-      `no capacity registered for purpose "${purpose}" — call "decide --for ${purpose}" first to check availability before executing.`,
-    );
+    const resolved = resolveCapacityAndOverrides(cfg, purpose);
+    if (!resolved.capacityId) {
+      throw new RunnerConfigError(
+        `no capacity registered for purpose "${purpose}" — call "decide --for ${purpose}" first to check availability before executing.`,
+      );
+    }
+    capacityId = resolved.capacityId;
+    resolvedCapacity = resolved.capacity;
+    capabilityOverrides = resolved.overrides;
+  } else {
+    const resolved = resolveCapacityAndOverrides(cfg, capacityId);
+    resolvedCapacity = resolved.capacity; // undefined when unconfigured -- falls through to the global executor below, unchanged
+    capabilityOverrides = resolved.overrides;
   }
 
   // Dispatch chokepoint visibility (both branches below): "capability" is
@@ -1736,11 +1902,11 @@ export async function executeCapacityCli(
   // for a direct capacityId call — whichever capabilities that capacity
   // itself declares serving (capacity.for, D15), so the line still answers
   // "what is this FOR" even without a --for flag. Diagnostic-only.
-  const capabilityLabel = purpose ?? (cfg.capacities?.[capacityId]?.for?.join(',') || '(none declared)');
+  const capabilityLabel = purpose ?? (resolvedCapacity?.for?.join(',') || '(none declared)');
 
   const mechanism = decideCapacityDispatchMechanism(cfg, capacityId, { hasLiveTaskAccess });
   if (mechanism === 'in-process') {
-    const agentType = cfg.capacities?.[capacityId]?.agentType;
+    const agentType = resolvedCapacity?.agentType;
     process.stderr.write(
       `fgos: dispatch capability=${capabilityLabel} capacity=${capacityId} via=in-process agentType=${agentType ?? '(none)'} provider=n/a model=n/a tier=n/a\n`,
     );
@@ -1748,9 +1914,22 @@ export async function executeCapacityCli(
     return resolvedByPurpose ? { ...base, capacityId } : base;
   }
 
-  const capacity = cfg.capacities?.[capacityId];
-  const tier = tierOverride ?? capacity?.tier ?? DEFAULTS.tier;
-  const model = modelOverride ?? capacity?.model ?? modelForTier(cfg, tier, { providerModel: capacity?.providerModel, rigorOverrides: capacity?.rigorOverrides });
+  const capacity = resolvedCapacity;
+  // Precedence (D2): an explicit caller-supplied override always wins
+  // (tierOverride/modelOverride — e.g. a `--tier`/`--model` CLI flag);
+  // next, capabilities.<name>.overrides (this dispatch's own purpose
+  // asked for a different rigor than the capacity's own default); next,
+  // the capacity's own literal tier/model; finally the mechanical
+  // default. `capabilityOverrides?.tier`/`.model` were validated as
+  // legal fields (validateCapabilitiesShape) but never actually
+  // consulted here until this line -- found during self-review: they
+  // silently did nothing, the same class of bug D4 already found once
+  // for spawnWorker's own separate lookup.
+  const tier = tierOverride ?? capabilityOverrides?.tier ?? capacity?.tier ?? DEFAULTS.tier;
+  const model = modelOverride ?? capabilityOverrides?.model ?? capacity?.model ?? modelForTier(cfg, tier, {
+    providerModel: capabilityOverrides?.providerModel ?? capacity?.providerModel,
+    rigorOverrides: capabilityOverrides?.rigorOverrides ?? capacity?.rigorOverrides,
+  });
   const { command, args, adapter, provider } = resolveExecutorCommand(cfg, {
     prompt,
     model,
@@ -1883,7 +2062,7 @@ export async function decideCapacityCli(
     // their pre-D4 "no capacity -> out-of-process" behavior byte-identical,
     // since naming a specific capacityId/purpose asks about that
     // registered target specifically, not a work item's default dispatch.
-    const hasExplicitCapacity = Boolean(cfg.capacities && typeof cfg.capacities === 'object' && cfg.capacities[capacityId]);
+    const hasExplicitCapacity = resolveCapacityAndOverrides(cfg, capacityId).configured;
     if (!hasExplicitCapacity) {
       const mechanism = decideDispatchMechanism({ hasNativeMechanism: true, hasLiveTaskAccess, forceCliSpawn: false });
       return { mechanism, capacityId, configured: false };
@@ -1910,8 +2089,7 @@ export async function decideCapacityCli(
     return { mechanism: 'unavailable', configured: false };
   }
   const mechanism = decideCapacityDispatchMechanism(cfg, capacityId, { hasLiveTaskAccess });
-  const capacity = cfg.capacities && typeof cfg.capacities === 'object' ? cfg.capacities[capacityId] : undefined;
-  const configured = Boolean(capacity);
+  const { capacity, configured } = resolveCapacityAndOverrides(cfg, capacityId);
   const agentType = capacity?.agentType;
 
   // tsk-45f D10: MCP hand-back -- a tool-kind capacity with an mcp
