@@ -57,14 +57,25 @@ tại trước field khác dùng được), không phải suy đoán.
 
 ### Risk map
 
+**Đã qua 1 vòng review độc lập (opus code-reviewer subagent, đọc trực tiếp
+DISCUSSION.md/CONTEXT.md/plan.md, tự re-verify claim thay vì tin theo tóm
+tắt) trước khi materialize — 8 lỗi cơ học tìm thấy và đã sửa ngay dưới đây
+(footprint thiếu file thật, risk-tier lệch giữa map và JSON, 2 mảnh tưởng
+độc lập nhưng đụng cùng file), cộng 1 điểm cần người dùng quyết (xem cuối
+file). Đã tự re-verify 3 claim nặng nhất bằng grep trực tiếp:
+`src/runner/merge.mjs:393-394` hardcode `DECISION_INDEX_PATH`/
+`DECISION_FILE_RE`; `check-decision-supersession.mjs:136` throw cứng nếu
+thiếu `0000-index.md`; `test/skills/fgos-mirror.test.mjs` enforce
+byte-identical giữa `.agents/skills/`↔`plugins/fgOS/skills/`.**
+
 | Mảnh | Rủi ro | Vì sao | Proof point cần ở `fgos-coding-validating` |
 |---|---|---|---|
-| 1. decision-relation-and-sweep | Đứng | Đổi CLI contract (`--relation` bắt buộc) — mọi caller hiện có của `fgos decision` phải cập nhật | Chạy thử `fgos decision` không `--relation` trên 1 case thật, xác nhận refuse đúng thông báo, không crash |
-| 2. scope-field-and-index-generate | Vừa | Thêm field mới, không đổi field cũ — ít rủi ro ngược tương thích hơn mảnh 1 | Generate thử `docs/decisions/index.md` từ `state.decisions` hiện có, `--check` xác nhận byte-stable |
-| 3. context-md-render | Vừa | Đổi convention authoring của CONTEXT.md — ảnh hưởng MỌI skill đang ghi CONTEXT.md (exploring/planning/shaping) | Render thử 1 CONTEXT.md thật (chính `tsk-1lv`) từ `state.decisions`, đối chiếu tay với bảng D1-D14 đã viết |
-| 4. retire-decisions-corpus | Cao | Xoá/di chuyển 35 file đang được cite ở nhiều nơi (`docs/backlog.md`, `docs/specs/*.md`, skill khác) — rủi ro gãy citation diện rộng | Chạy `check-decision-citation-drift.mjs` (đã nâng cấp ở mảnh 1) trên toàn repo SAU migrate, xác nhận 0 dangling reference |
-| 5. four-door-in-retrospective | Vừa | Thêm check mới vào batch loop hiện có — rủi ro chính là false-positive chặn nhầm item vô tội | Chạy `/fgOS:retro-loop` thật trên ≥1 item test có D-ID chưa route, xác nhận đúng 1 finding, không báo thừa trên item sạch |
-| 6. compounding-anti-fork | Thấp | Độc lập, chỉ thêm field + check mới, không đổi hành vi ghi hiện có ngoài việc BỎ luật cấm prune | Case thật: 2 capture cùng chủ đề khác tên → hội tụ 1 file; 1 capture phủ định capture cũ → sửa được đoạn cũ |
+| 1. decision-relation-and-sweep | Cao | Đổi CLI contract (`--relation` bắt buộc) — mọi caller hiện có của `fgos decision` (mọi skill + mọi project dùng fgOS, D1) phải cập nhật, breaking nếu không backward-compat. Sweep phải quét `docs/**`+`src/**`+`plugins/**` (đúng D2's "sweep docs/**"), KHÔNG chỉ `docs/backlog.md`+`docs/specs/*.md` như `check-decision-citation-drift.mjs` hiện đang quét — review tìm ra 32 hit thật trong `docs/enduser-docs-index.json` nằm NGOÀI phạm vi quét hiện tại | Chạy thử `fgos decision` không `--relation`, xác nhận refuse đúng thông báo; kiểm đếm caller hiện có (6 skill: discovering/exploring/planning/shaping/validating/coding-shape-distill+merge-loop, đã grep xác nhận) trước khi khoá breaking; xác nhận sweep mới bắt được ≥1 case thật ngoài phạm vi cũ |
+| 2. scope-field-and-index-generate | Vừa | Thêm field mới, không đổi field cũ — ít rủi ro ngược tương thích hơn mảnh 1. `docs/decisions/` VẪN LÀ MỘT THƯ MỤC sau feature này, chỉ còn chứa `index.md` generate-được (mirror bee's "standing exemption" cho `docs/decisions/index.md` — path/owner/shape giữ nguyên) | Generate thử `docs/decisions/index.md` từ `state.decisions` hiện có, `--check` xác nhận byte-stable; round-trip thật qua `addDecision` (`src/state/store.mjs:1123`) xác nhận field `scope` ghi/đọc đúng, không chỉ test index tĩnh |
+| 3. context-md-render | Vừa | Đổi convention authoring của CONTEXT.md — ảnh hưởng MỌI skill đang ghi CONTEXT.md (exploring/planning/shaping, không chỉ exploring) VÀ `src/intake/plan.mjs`'s literal-regex slice trên heading "## Locked decisions" (đã có `scripts/check-locked-decisions-heading-drift.mjs` canh riêng) | Render thử 1 CONTEXT.md thật (chính `tsk-1lv`) từ `state.decisions`, đối chiếu tay với bảng D1-D14 đã viết; xác nhận heading/table shape không đổi |
+| 4. retire-decisions-corpus | Cao | Xoá/di chuyển 35 file đang được cite RỘNG hơn ban đầu tưởng — không chỉ `docs/backlog.md`/`docs/specs/*.md`, còn `src/runner/merge.mjs` (hardcode collision-resolve subsystem ~250 dòng), `check-decision-supersession.mjs` (throw cứng nếu thiếu `0000-index.md`) | Chạy `check-decision-citation-drift.mjs` (đã nâng cấp phạm vi quét ở mảnh 1) trên TOÀN repo SAU migrate, xác nhận 0 dangling reference — proof này giờ mới thật sự đáng tin vì phạm vi quét đã mở rộng đúng |
+| 5. four-door-in-retrospective | Vừa | Thêm check mới vào batch loop hiện có (`bin/fgos.mjs`'s `retrospective` verb, dòng 1438 — xác nhận thật) — rủi ro chính là false-positive chặn nhầm item vô tội. KHÔNG chạm `fgos-coding-compounding/SKILL.md` (door là harness-only, không phải doctrine agent đọc — sửa lại từ bản trước, tránh đụng mảnh 6) | Chạy `/fgOS:retro-loop` thật trên ≥1 item test có D-ID chưa route, xác nhận đúng 1 finding, không báo thừa trên item sạch |
+| 6. compounding-anti-fork | Thấp | Độc lập THẬT (sau khi bỏ overlap với mảnh 5) — chỉ thêm field + check mới, không đổi hành vi ghi hiện có ngoài việc BỎ luật cấm prune | Case thật: 2 capture cùng chủ đề khác tên → hội tụ 1 file; 1 capture phủ định capture cũ → sửa được đoạn cũ |
 
 Mảnh 4 (Cao) là proof point nặng nhất trong high-risk lane này — cần
 `fgos-coding-validating` xác nhận thật trước khi materialize, không chỉ
@@ -99,42 +110,42 @@ None
 ```json
 [
   {
-    "title": "fgos decision requires --relation, write-time citation sweep on supersede",
+    "title": "fgos decision requires --relation, write-time citation sweep on supersede (widened scan scope)",
     "verify": "node --test test/state/decision-relation.test.mjs",
-    "action": "D2: consistency derive tai thoi diem ghi (write-time sweep), khong phai graph luu tru song song; D3: khong xay decision-store moi, nang cap store hien co",
+    "action": "D2: consistency derive tai thoi diem ghi (write-time sweep qua docs/**+src/**+plugins/**, khong chi docs/backlog.md+docs/specs/*.md nhu hien tai), khong phai graph luu tru song song; D3: khong xay decision-store moi, nang cap store hien co",
     "footprint": ["bin/fgos.mjs", "src/state/store.mjs", "scripts/check-decision-citation-drift.mjs", "scripts/check-decision-supersession.mjs", "test/state/decision-relation.test.mjs"],
-    "kind": "task",
-    "risk": "standard"
-  },
-  {
-    "title": "Add scope/area field to state.decisions, generate docs/decisions/index.md with --check",
-    "verify": "node --test test/report/decision-index.test.mjs",
-    "action": "D4: 3 loai quyet dinh goc map vao state.decisions, quyet dinh platform-level can them field moi scope/area",
-    "footprint": ["src/state/store.mjs", "src/report/decision-index.mjs", "docs/decisions/index.md", "test/report/decision-index.test.mjs"],
-    "kind": "task",
-    "risk": "standard"
-  },
-  {
-    "title": "CONTEXT.md Locked-Decisions table renders from state.decisions instead of hand-typed prose",
-    "verify": "node --test test/report/context-render.test.mjs",
-    "action": "D3: wire be mat doc (CONTEXT.md) vao state.decisions da co san, dong khoang trong tsk-1ud de lai",
-    "footprint": [".agents/skills/fgos-coding-exploring/SKILL.md", "src/report/context-render.mjs", "test/report/context-render.test.mjs"],
-    "kind": "task",
-    "risk": "light"
-  },
-  {
-    "title": "Retire docs/decisions/*.md corpus into docs/specs/<area>.md narrative + state.decisions short records",
-    "verify": "node --test test/docs/decisions-corpus-retired.test.mjs",
-    "action": "D5: retire docs/decisions/*.md corpus, narrative don vao docs/specs/<area>.md, state.decisions giu record ngan lam nguon that",
-    "footprint": ["docs/decisions", "docs/specs", "scripts/check-decision-citation-drift.mjs", "test/docs/decisions-corpus-retired.test.mjs"],
     "kind": "task",
     "risk": "high-risk"
   },
   {
-    "title": "4-door check (freshness/impact/routing/doc-deferral) inside retrospective batch loop",
+    "title": "Add scope/area field to state.decisions, generate docs/decisions/index.md with --check (directory persists, only index.md, mirrors merge.mjs collision-resolve subsystem)",
+    "verify": "node --test test/report/decision-index.test.mjs test/state/decision-scope-field.test.mjs test/runner/merge.test.mjs",
+    "action": "D4: 3 loai quyet dinh goc map vao state.decisions, quyet dinh platform-level can them field moi scope/area. docs/decisions/ van la thu muc, chi con index.md generate-duoc (mirror bee's standing exemption)",
+    "footprint": ["src/state/store.mjs", "src/report/decision-index.mjs", "docs/decisions/index.md", "src/runner/merge.mjs", "scripts/check-decision-supersession.mjs", "test/report/decision-index.test.mjs", "test/state/decision-scope-field.test.mjs", "test/runner/merge.test.mjs", "test/cli/fgos-merge.test.mjs"],
+    "kind": "task",
+    "risk": "standard"
+  },
+  {
+    "title": "CONTEXT.md Locked-Decisions table renders from state.decisions instead of hand-typed prose (exploring/planning/shaping)",
+    "verify": "node --test test/report/context-render.test.mjs",
+    "action": "D3: wire be mat doc (CONTEXT.md) vao state.decisions da co san, dong khoang trong tsk-1ud de lai. Ap dung ca 3 skill dang ghi CONTEXT.md: exploring/planning/shaping, khong chi exploring",
+    "footprint": [".agents/skills/fgos-coding-exploring/SKILL.md", ".agents/skills/fgos-coding-planning/SKILL.md", ".agents/skills/fgos-coding-shaping/SKILL.md", "plugins/fgOS/skills/fgos-coding-exploring/SKILL.md", "plugins/fgOS/skills/fgos-coding-planning/SKILL.md", "plugins/fgOS/skills/fgos-coding-shaping/SKILL.md", "src/report/context-render.mjs", "src/intake/plan.mjs", "test/report/context-render.test.mjs"],
+    "kind": "task",
+    "risk": "standard"
+  },
+  {
+    "title": "Retire docs/decisions/*.md corpus into docs/specs/<area>.md narrative + state.decisions short records (directory persists with index.md only)",
+    "verify": "node --test test/docs/decisions-corpus-retired.test.mjs",
+    "action": "D5: retire docs/decisions/*.md corpus (35 file nguoi-quyet-dinh), narrative don vao docs/specs/<area>.md, state.decisions giu record ngan lam nguon that. docs/decisions/ giu lai la thu muc, chi con index.md",
+    "footprint": ["docs/decisions", "docs/specs", "src/runner/merge.mjs", "scripts/check-decision-citation-drift.mjs", "scripts/check-decision-supersession.mjs", "test/docs/decisions-corpus-retired.test.mjs"],
+    "kind": "task",
+    "risk": "high-risk"
+  },
+  {
+    "title": "4-door check (freshness/impact/routing/doc-deferral) inside retrospective batch loop -- harness-only, no skill-prose touch",
     "verify": "node --test test/state/retrospective-doors.test.mjs",
-    "action": "D7: 4-door check chay ben trong loi goi hien co cua retrospective, khong gate fgos approve; D9: nhan mang 2+4 tu tsk-37i; D11: door ap moi item khong theo risk-tier",
-    "footprint": ["bin/fgos.mjs", "src/state/retrospective-doors.mjs", ".agents/skills/fgos-coding-compounding/SKILL.md", "test/state/retrospective-doors.test.mjs"],
+    "action": "D7: 4-door check chay ben trong loi goi hien co cua retrospective (bin/fgos.mjs case 'retrospective', dong 1438), khong gate fgos approve; D9: nhan mang 2+4 tu tsk-37i; D11: door ap moi item khong theo risk-tier",
+    "footprint": ["bin/fgos.mjs", "src/state/retrospective-doors.mjs", "test/state/retrospective-doors.test.mjs"],
     "kind": "task",
     "risk": "standard"
   },
@@ -142,7 +153,7 @@ None
     "title": "authoritative_for field + skeleton-match port/adapter + allow reconcile in fgos-coding-compounding",
     "verify": "node --test test/report/authoritative-match.test.mjs",
     "action": "D6: cho phep reconcile/retire prose cu; D8: tim-truoc-khi-tao = doctrine + harness backstop, khong phai gate song; D12: skeleton-match qua port/adapter mirror CTR009",
-    "footprint": [".agents/skills/fgos-coding-compounding/SKILL.md", "src/report/frontmatter.mjs", "src/report/authoritative-match.mjs", "test/report/authoritative-match.test.mjs"],
+    "footprint": [".agents/skills/fgos-coding-compounding/SKILL.md", "plugins/fgOS/skills/fgos-coding-compounding/SKILL.md", "src/report/frontmatter.mjs", "src/report/authoritative-match.mjs", "test/report/authoritative-match.test.mjs"],
     "kind": "task",
     "risk": "light"
   }

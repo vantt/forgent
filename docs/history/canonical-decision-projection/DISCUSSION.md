@@ -1089,6 +1089,72 @@ dimension, đó vẫn là việc CHƯA GIẢI của tsk-28x). Ghi D14 append và
 `CONTEXT.md`'s bảng Locked decisions (đúng luật "re-entry, append never
 rewrite" của `fgos-coding-exploring`, không chạy lại Gate).
 
+### `fgos-coding-planning` — viết plan.md, split 6 mảnh, high-risk lane
+
+Sau D14, vào thẳng `fgos-coding-planning` (native-first). Đếm cờ Mode-gate
+trung thực: 4 cờ áp dụng (data model, public contracts, existing covered
+behavior, weak proof — GitNexus present nhưng stale) → **high-risk**.
+`fgos graph --json` chạy (816 node, 449 component) — `tsk-1lv` là component
+riêng, `criticalPath`/`topUnblock` chưa có tín hiệu dùng được trước khi con
+thật tồn tại; thứ tự 6 mảnh suy từ chuỗi phụ thuộc DỮ LIỆU thật, không phải
+suy đoán. Viết risk map + split 6 mảnh vào `plan.md`, mỗi mảnh cite D-ID
+thật, verify command thật (`node --test <path>`).
+
+### Round 17 — 2026-08-17T11:48Z — review độc lập trước khi materialize
+
+Theo yêu cầu người dùng ("bật một opus agent... xem kỹ trước khi làm"), bật
+1 subagent `code-reviewer` (model opus) TRƯỚC khi chạy Gate của
+`fgos-coding-validating` — đọc trực tiếp DISCUSSION.md/CONTEXT.md/plan.md,
+tự re-verify claim bằng cách đọc file thật thay vì tin theo tóm tắt.
+
+**3 claim nặng nhất được review tự verify, và em xác nhận lại bằng grep
+trực tiếp — đều đúng thật:**
+- `src/runner/merge.mjs:393-394` — `DECISION_INDEX_PATH = 'docs/decisions/
+  0000-index.md'` + `DECISION_FILE_RE` — một subsystem collision-resolve
+  ~250 dòng hoàn toàn chưa được nhắc tới ở plan.md gốc.
+- `scripts/check-decision-supersession.mjs:136` — `readFileSync` KHÔNG có
+  try/catch trên `0000-index.md` — throw cứng, không fail-soft.
+- `test/skills/fgos-mirror.test.mjs` — enforce byte-identical giữa
+  `.agents/skills/`↔`plugins/fgOS/skills/` — sửa 1 bên mà quên bên kia thì
+  `npm test` đỏ ngay.
+
+**8 lỗi cơ học tìm thấy, đã tự sửa trực tiếp vào `plan.md`** (không cần hỏi
+— đều là footprint thiếu file thật hoặc risk-tier lệch giữa map và JSON,
+không phải judgment call): merge.mjs+test thiếu ở mảnh 2/4;
+check-decision-supersession.mjs thiếu ở mảnh 2/4; mảnh 5+6 cùng khai
+`fgos-coding-compounding/SKILL.md` (mâu thuẫn "mảnh 6 độc lập hoàn toàn" —
+bỏ khỏi mảnh 5, vì door là harness-only không phải doctrine agent đọc);
+thiếu skill-mirror `plugins/fgOS/skills/*` ở mảnh 3/5/6; `src/intake/
+plan.mjs` thiếu ở mảnh 3; mảnh 3's footprint chỉ khai `fgos-coding-
+exploring` trong khi risk map tự nói "MỌI skill" — thêm planning+shaping;
+risk-tier lệch (mảnh 1 map "Cao" nhưng JSON `standard` — sửa `high-risk`;
+mảnh 3 map "Vừa" nhưng JSON `light` — sửa `standard`); mảnh 2's verify chỉ
+test index tĩnh, không test chính field `scope` mới — thêm test round-trip
+qua `addDecision`.
+
+**2 điểm em tự quyết được (không phải judgment call mới, chỉ áp đúng cái
+đã quyết/tiền lệ đã có):**
+- **A — phạm vi quét của sweep**: D2 tự nói "sweep docs/**" nhưng
+  `check-decision-citation-drift.mjs` hiện tại chỉ quét `docs/backlog.md`+
+  `docs/specs/*.md` — review đo được 32 hit thật nằm ngoài phạm vi đó
+  (`docs/enduser-docs-index.json`). Sửa mảnh 1: mở rộng quét đúng
+  `docs/**`+`src/**`+`plugins/**` — đây là THI HÀNH ĐÚNG D2 đã quyết, không
+  phải quyết định mới.
+- **B — `docs/decisions/` có còn tồn tại không sau D5**: áp tiền lệ bee đã
+  trích ở round 3 — `docs/decisions/index.md` là "standing exemption",
+  path/owner/shape giữ nguyên vĩnh viễn. Quyết: thư mục VẪN TỒN TẠI, chỉ
+  còn chứa `index.md` generate-được; 35 file NGƯỜI-QUYẾT-ĐỊNH (Nygard) mới
+  là thứ bị retire, không phải cả thư mục.
+
+**1 điểm CẦN người dùng quyết, chưa tự sửa:**
+- **C — footprint tsk-37i chưa khai matching, dù overlap SẮC hơn tsk-28x.**
+  Mảnh 4 viết lại citation khắp `docs/specs` + retire corpus; tsk-37i's
+  mảnh 3 (phần họ giữ lại sau D9) dọn ~36-69 file cùng citation text đó.
+  D13 đã bắt buộc `--footprint` trùng với tsk-28x để `fgos conflicts` bắt
+  cơ học — KHÔNG có tương đương cho tsk-37i dù overlap ở đây rõ hơn. Chưa
+  tự sửa vì tsk-37i là item KHÁC, branch khác, phiên khác đang giữ (đã xác
+  nhận round 9 — `ListAgents` không định danh được chính xác session nào).
+
 ## 6. Thiết kế đã chốt {#design}
 
 ### Vấn đề
