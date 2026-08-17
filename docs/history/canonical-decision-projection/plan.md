@@ -115,7 +115,7 @@ None
     "action": "D2: consistency derive tai thoi diem ghi (write-time sweep qua docs/**+src/**+plugins/**, khong chi docs/backlog.md+docs/specs/*.md nhu hien tai), khong phai graph luu tru song song; D3: khong xay decision-store moi, nang cap store hien co",
     "footprint": ["bin/fgos.mjs", "src/state/store.mjs", "scripts/check-decision-citation-drift.mjs", "scripts/check-decision-supersession.mjs", "test/state/decision-relation.test.mjs"],
     "kind": "task",
-    "risk": "high-risk",
+    "risk": "heavy",
     "deps": []
   },
   {
@@ -142,7 +142,7 @@ None
     "action": "D5: retire docs/decisions/*.md corpus (35 file nguoi-quyet-dinh), narrative don vao docs/specs/<area>.md, state.decisions giu record ngan lam nguon that. docs/decisions/ giu lai la thu muc, chi con index.md",
     "footprint": ["docs/decisions", "docs/specs", "src/runner/merge.mjs", "scripts/check-decision-citation-drift.mjs", "scripts/check-decision-supersession.mjs", "test/docs/decisions-corpus-retired.test.mjs"],
     "kind": "task",
-    "risk": "high-risk",
+    "risk": "heavy",
     "deps": [0, 1]
   },
   {
