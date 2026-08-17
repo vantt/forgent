@@ -19,10 +19,13 @@
         "Bash(git add:*),Bash(git commit:*)"
       ]
     },
-    "capacities": {
+    "executors": {
       "agy": {
         "kind": "agent",
         "allowCrossProvider": true,
+        "for": [
+          "fgos-coding-implement"
+        ],
         "invocations": [
           {
             "via": "cli",
@@ -46,7 +49,6 @@
       },
       "gitnexus": {
         "kind": "tool",
-        "capability": "impact-analysis",
         "for": [
           "impact-analysis"
         ],
@@ -65,7 +67,6 @@
       },
       "herdr": {
         "kind": "tool",
-        "capability": "pane-labeling",
         "for": [
           "pane-labeling"
         ],
@@ -86,10 +87,15 @@
         "aliases": [
           "impact_analysis",
           "Impact Analysis"
-        ]
+        ],
+        "prefer": "gitnexus"
       },
       "pane-labeling": {
         "description": "Write a session/task id onto the current terminal pane's label, for a human watching a screen"
+      },
+      "fgos-coding-implement": {
+        "description": "code-implement work for the coding domain's executing stage",
+        "prefer": "agy"
       }
     },
     "timeoutMs": 900000,
