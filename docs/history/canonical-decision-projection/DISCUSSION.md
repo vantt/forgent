@@ -2,6 +2,11 @@
 
 ## 1. Trạng thái hiện tại
 
+Vòng 14 (2026-08-17): người dùng xác nhận đánh đổi round 13 chấp nhận
+được. Mint D10 (seq 19035). Tổng cộng D1-D10 đã khoá. Còn 2 điểm nhỏ chưa
+D-ID (door risk-tier scope, cơ chế tra "chủ đề" cụ thể cho D8) — hỏi người
+dùng có muốn giải quyết tiếp hay đủ để hand-off sang `fgos-coding-exploring`.
+
 Vòng 13 (2026-08-17): người dùng chất vấn trực tiếp D7 — bee viết
 continuous ở 4 điểm, fgOS viết 1 lần sau cùng (batch, retrospective); nếu
 không continuous, fgOS có mất thông tin xảy ra trong lúc làm việc không?
@@ -960,6 +965,14 @@ spec prose). Không phải zero-risk tuyệt đối, nhưng khác hẳn loại r
 gây ra STR72 — cần người dùng xác nhận đây là đánh đổi chấp nhận được,
 hay muốn siết thêm (vd rút ngắn TTL 3 ngày, hay bắt buộc agent luôn đọc
 `state.decisions` trước khi tin `docs/specs/`).
+
+### Round 14 — 2026-08-17T11:12Z — xác nhận đánh đổi, mint D10
+
+Người dùng: "đánh đổi chấp nhận được." Round 13→14 giữ ổn định qua 2 round
+— mint D10 (seq 19035): đánh đổi batch-narrative-synthesis (raw capture
+ngay lập tức, không đổi; narrative trễ có giới hạn 3 ngày + có phát hiện
+qua `classifyStalePostDelivery`; doctrine bắt buộc agent đọc
+`state.decisions`/index trước khi tin prose spec) là chấp nhận được.
 
 ## 6. Thiết kế đã chốt {#design}
 
