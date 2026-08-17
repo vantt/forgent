@@ -243,10 +243,13 @@ directly by `fgos-coding-planning`, mid-`planning`, when that skill finds
    After each answer, confirm the decision back and assign it a
    stable ID: `D1`, `D2`, `D3`… Then run `fgos decision --text "<D-ID>:
    <one-line summary>" --rationale "see CONTEXT.md for the full scout
-   evidence and reasoning"` so the decision also lands in the item's
-   append-only decision log, surfaced through `view.decisions`/`fgos list`
-   for machine readers — `--rationale` is required (tsk-63c) — this call
-   is additive alongside writing
+   evidence and reasoning" --relation none` (or `--relation
+   supersedes:<old-D-ID>` when this D-ID explicitly revises an earlier one
+   already locked in this same CONTEXT.md — tsk-1lv-1 D2: every
+   `fgos decision` write declares its relation, no default) so the decision
+   also lands in the item's append-only decision log, surfaced through
+   `view.decisions`/`fgos list` for machine readers — `--rationale` is
+   required (tsk-63c) — this call is additive alongside writing
    CONTEXT.md in step 3, never a replacement for it: CONTEXT.md stays the
    source of truth for the full decision, this just makes its existence
    visible outside the prose doc. When an answer settles what a fuzzy term
@@ -484,7 +487,8 @@ node "$root/bin/fgos.mjs" discover "<item-id>" --verdict clear --verify "<the sa
   `auto-approved: CONTEXT.md (gate-bypass level <level>)`, log it
   (`fgos decision --text "auto-approved CONTEXT.md gate for <item-id> at
   level <level>" --rationale "gate-bypass level <level> permits
-  auto-approval per docs/history/gate-bypass/CONTEXT.md D1-D5"`, D3's
+  auto-approval per docs/history/gate-bypass/CONTEXT.md D1-D5" --relation
+  none`, D3's
   audit trail), record it (`fgos gate-approve <item-id> --gate
   contextApprove --actor bypass --verify "..."`, per above), fire the
   `fgos discover --verdict clear` call above, then continue straight to

@@ -298,7 +298,7 @@ test('decision logs one event and appears in the view, exit 0', () => {
   const cwd = tmpCwd();
   run(cwd, ['init']);
   const before = eventLines(cwd).length;
-  const result = run(cwd, ['decision', '--text', 'locked D5 naming', '--rationale', 'avoids a naming collision with an existing verb']);
+  const result = run(cwd, ['decision', '--text', 'locked D5 naming', '--rationale', 'avoids a naming collision with an existing verb', '--relation', 'none']);
   assert.equal(result.status, 0);
   assert.equal(eventLines(cwd).length, before + 1);
   assert.equal(stateView(cwd).decisions.length, 1);
@@ -341,6 +341,7 @@ test('decision with --alternatives, --source, and --id folds all fields, exit 0'
     '--alternatives', 'option A was rejected -- needs a new package',
     '--source', 'human',
     '--id', 'item-a',
+    '--relation', 'none',
   ]);
   assert.equal(result.status, 0);
   assert.equal(eventLines(cwd).length, before + 1);

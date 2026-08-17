@@ -8,6 +8,15 @@
 // checks decisions/*.md's own internal backward-pointer
 // pair instead). Detection only — flags dead framing,
 // never fixes it.
+//
+// tsk-1lv-1 additive exports (below `runCli`): the write-time sweep
+// `fgos decision --relation supersedes:<id>|touches:<id>` runs widens
+// this file's own citation scan from backlog.md+specs/*.md-only to
+// docs/**+src/**+plugins/**, for an arbitrary relation id (not only the
+// 4-digit ADR ids `extractCitedIds` above assumes) — see
+// `collectWideSourceFiles`/`findWideCitationFindings`. These are pure,
+// additive, and never called by this file's own CLI mode above, so the
+// existing backlog/specs-only default stays byte-identical.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -109,6 +118,84 @@ function loadSourceFiles(backlogPath, specsDir) {
     }
   }
   return sources;
+}
+
+const WIDE_SWEEP_ROOTS = ['docs', 'src', 'plugins'];
+const WIDE_SWEEP_EXTENSIONS = new Set(['.md', '.mjs', '.js']);
+const WIDE_SWEEP_SKIP_DIR_NAMES = new Set(['node_modules', '.git']);
+
+function escapeRegExp(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * Recursively collect `{file, lines}` for every markdown/JS source file
+ * under `roots` (repo-root-relative), for the write-time citation sweep
+ * `fgos decision --relation supersedes:<id>|touches:<id>` runs (D2/D8's
+ * "sweep docs/**+src/**+plugins/**", not just docs/backlog.md+docs/specs/
+ * *.md like this file's own CLI mode above). `excludeRelDirs` additionally
+ * skips any file whose repo-relative path starts with one of the given
+ * prefixes — the "feature's own docs/history dir" self-citation carve-out
+ * (round 3 DISCUSSION: a feature citing its own in-flight D-IDs in its own
+ * history folder is not stale framing).
+ */
+export function collectWideSourceFiles(cwd, { roots = WIDE_SWEEP_ROOTS, excludeRelDirs = [] } = {}) {
+  const isExcluded = (relPath) =>
+    excludeRelDirs.some((prefix) => relPath === prefix || relPath.startsWith(`${prefix}/`));
+  const sources = [];
+
+  for (const root of roots) {
+    const absRoot = path.join(cwd, root);
+    if (!fs.existsSync(absRoot)) continue;
+    const stack = [absRoot];
+    while (stack.length) {
+      const current = stack.pop();
+      for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
+        const abs = path.join(current, entry.name);
+        const rel = path.relative(cwd, abs);
+        if (entry.isDirectory()) {
+          if (WIDE_SWEEP_SKIP_DIR_NAMES.has(entry.name) || isExcluded(rel)) continue;
+          stack.push(abs);
+          continue;
+        }
+        if (!entry.isFile()) continue;
+        if (!WIDE_SWEEP_EXTENSIONS.has(path.extname(entry.name))) continue;
+        if (isExcluded(rel)) continue;
+        sources.push({ file: rel, lines: fs.readFileSync(abs, 'utf8').split('\n') });
+      }
+    }
+  }
+  return sources;
+}
+
+/**
+ * Pure: whole-word literal citations of `targetId` across `sourceFiles`
+ * that do NOT also mention `supersedingLabel` on the same line — the
+ * generalized form of `findCitationDriftFindings` above, for an arbitrary
+ * relation id token (a `state.decisions` D-ID or work-item id, not only
+ * the 4-digit ADR ids `extractCitedIds`/`DECISION_ID_PATTERN` assume).
+ */
+export function findWideCitationFindings(sourceFiles, targetId, supersedingLabel) {
+  const pattern = new RegExp(`(?<![\\w-])${escapeRegExp(targetId)}(?![\\w-])`);
+  const findings = [];
+  for (const { file, lines } of sourceFiles) {
+    lines.forEach((line, idx) => {
+      if (!pattern.test(line)) return;
+      if (supersedingLabel && line.includes(supersedingLabel)) return;
+      const ln = idx + 1;
+      findings.push({
+        kind: 'dangling-citation',
+        file,
+        line: ln,
+        id: targetId,
+        supersededBy: supersedingLabel ?? null,
+        message:
+          `${file}:${ln}: cites ${targetId} without acknowledging it is ` +
+          `superseded by ${supersedingLabel ?? '(unspecified)'}`,
+      });
+    });
+  }
+  return findings;
 }
 
 function parseArgs(argv) {
