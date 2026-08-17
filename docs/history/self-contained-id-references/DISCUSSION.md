@@ -172,6 +172,42 @@ bắt buộc phải mở file gốc trước khi hiểu được câu đang đ�
   đúng tình huống thật fgOS đang có: D2/D4/D6 của `fgos-coding-shaping`
   chỉ tồn tại trong CONTEXT.md, chưa từng được route vào spec/ADR nào.
 
+- **2026-08-17T~10:25Z — Phát hiện overlap thật với tsk-1lv (agent, theo yêu
+  cầu người dùng).** Đọc `docs/history/canonical-decision-projection/
+  DISCUSSION.md` trên branch `fgw/tsk-1lv` (7 round, D1-D6 đã lock — sâu
+  hơn hẳn discussion này). tsk-1lv giải bài toán RỘNG HƠN: decision/doc bị
+  outdate/mâu thuẫn (STR72 — bằng chứng thật 2026-07-21: supersede không
+  lan về artifact nguồn), không chỉ format trích dẫn. Overlap cụ thể, không
+  suy đoán:
+  1. **Mảnh 4 của tsk-37i trùng với "routing door" của tsk-1lv round
+     3-4** — cả hai độc lập tìm ra CÙNG cơ chế beegog v2.7.0 (4-door bundle)
+     và cùng đề xuất gắn vào `fgos approve`/`return`. tsk-1lv đang thiết kế
+     nó ở tầng harness chung cho cả 4 door, không chỉ routing — làm mảnh 4
+     riêng ở đây có nguy cơ trùng công.
+  2. **Mảnh 2 (reversal sweep cho ADR supersede) có thể bị tsk-1lv's D5 làm
+     lỗi thời** — D5 đã CHỐT (round 7→8, ổn định qua 2 round): retire hẳn
+     `docs/decisions/*.md` corpus, dồn narrative vào `docs/specs/<area>.md`,
+     `state.decisions` (store event-log ĐÃ CÓ SẴN, port từ bee tsk-63c,
+     1711 bản ghi, 0 skill đọc — agent CHƯA từng biết tồn tại trước round
+     này) làm nguồn thật. Nếu D5 thi công, mục tiêu sweep của mảnh 2
+     (`docs/decisions/0000-index.md`) không còn là nguồn quyền uy nữa.
+  3. **fgOS đã có 2 script detection-only chưa từng biết tới**:
+     `scripts/check-decision-citation-drift.mjs` (spec:
+     `docs/specs/decision-citation-drift.md`, từ STR72) +
+     `scripts/check-decision-supersession.mjs` (từ p-9fb81485) — bắt đúng
+     lớp lỗi mảnh 1 định giải, nhưng CHẠY TAY, không wired CI/gate. Mảnh 1
+     (pointer-integrity check) nên MỞ RỘNG 2 script này thay vì xây mới,
+     và nên phối hợp với tsk-1lv thay vì làm song song.
+  4. **Không trùng, vẫn khác biệt thật**: tsk-37i hẹp hơn nhiều — chỉ nhắm
+     FORMAT đọc-hiểu-được của một trích dẫn đơn lẻ (id+gloss), bất kể nguồn
+     thật nằm ở đâu (state.decisions hay docs/specs hay CONTEXT.md). tsk-1lv
+     là kiến trúc tầng lưu trữ + đồng bộ, phạm vi rộng hơn nhiều (267+ file
+     Diataxis, D5 retire cả corpus). Mảnh 1 (skills-core convention) và mảnh
+     3 (dọn skill-doctrine cũ) của tsk-37i vẫn có giá trị RIÊNG, độc lập với
+     kết quả kiến trúc của tsk-1lv.
+  Đã trình bày cho người dùng trong chat, chờ quyết cách phối hợp (gộp, phụ
+  thuộc, hay giữ tách biệt với scope thu hẹp).
+
 ## 6. Thiết kế đã chốt {#design}
 
 **Không tái cấu trúc, chỉ vá 2 chỗ hẹp + dọn nợ cũ.** fgOS giữ nguyên 3 tầng
