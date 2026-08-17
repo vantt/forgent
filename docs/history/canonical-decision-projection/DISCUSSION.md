@@ -2,6 +2,17 @@
 
 ## 1. Trạng thái hiện tại
 
+Vòng 3 (2026-08-17): người dùng yêu cầu dò tiếp bee từ sau v1.18.3 (distillery
+cũ) lên bản mới nhất — thật ra bee đã lên **v2.7.0** (`beegog` local clone,
+`abde5ca7`, title chính "doc-rot doors — impact, routing, doc-deferral,
+freshness"), tức ĐÚNG package feature mới nhất của bee giải ĐÚNG bài toán
+người dùng đang hỏi, không phải một release phụ. Đã đọc trực tiếp
+`docs/knowledge/areas/decision-memory/overview.md` + `workflow-state/gates.md`
+của bee (nguồn thật, không phải distillery cũ). Phát hiện quan trọng nhất:
+bee có quyết định tường minh **R9 "No stored graph, no daemon"** — SỬA lại
+khuyến nghị graph ở vòng 2 (xem §5 round 3). Còn 2 câu hỏi treo từ vòng 2
+(a/b) — nay có thêm dữ liệu để trả lời phần (a).
+
 Vòng 2 (2026-08-17): người dùng đã trả lời vòng 1 — (1) muốn năng lực CHUNG
 cho mọi project dùng fgOS (không chỉ dogfood nội bộ); (2) đồng ý hướng ghép
 2 lớp (drift-check rẻ + LLM-compile đắt); và nêu câu hỏi mới: có nên đưa về
@@ -36,7 +47,7 @@ chưa; (2) chỉ sau đó mới bàn có nên tự xây, xây gì, xây ở tầ
 | 4 | Phạm vi mong muốn: chỉ dogfood cho fgOS tự quản trị docs của chính nó, hay là năng lực chung mọi project dùng fgOS cũng được hưởng? | người dùng trả lời vòng 1: **năng lực chung** — chưa mint D-ID (mới 1 round, chờ ổn định thêm theo D4) | Ảnh hưởng lớn tới thiết kế — AGENTS.md ưu tiên "Ship Faster" đo bằng tốc độ project DÙNG fgOS, không phải tốc độ tự thân team fgOS |
 | 5 | Cơ chế ưu tiên: mở rộng deterministic drift-check (rẻ, chỉ bắt được citation tường minh) hay thêm tầng LLM-assisted "compile lại" kiểu §6 (đắt hơn, bắt được staleness ngầm không trích id) hay cả hai theo lớp? | người dùng trả lời vòng 1: **đồng ý ghép 2 lớp** — chưa mint D-ID (chờ ổn định thêm) | Bee (xem round 2) đã tự đi xa hơn: không chỉ 2 lớp check, mà thay hẳn tầng lưu trữ prose bằng concept-graph |
 | 6 | Điểm chặn (gate) đặt ở đâu: CI/pre-commit cứng, hay advisory lúc agent sắp dùng một doc (giống GitNexus impact-check theo AGENTS.md hiện tại), hay cả hai? | CHƯA RÕ | Liên hệ "Release con người" — không nên biến mọi doc-edit thành một cổng chờ người |
-| 7 | Có nên đưa decision/doc governance về MỘT hệ graph để dễ detect (câu hỏi mới của người dùng)? | rõ phần "graph có giúp không" (có — bee đã tự làm và nó GIẢI đúng lớp bài fork/duplicate-authority) — CHƯA RÕ phần "graph nào": hệ graph MỚI kiểu bee, hay tận dụng GitNexus (đã có sẵn, sống trong repo này, nhưng hiện chỉ index CODE, chưa thấy hỗ trợ custom/non-code node trong tài liệu skill) | Xem §5 round 2 — đây là fork thiết kế thật, chưa nghiêng bên nào |
+| 7 | Có nên đưa decision/doc governance về MỘT hệ graph để dễ detect (câu hỏi mới của người dùng)? | **rõ, ĐÃ SỬA sau round 3**: bee tự trả lời KHÔNG — quyết định tường minh R9 "No stored graph, no daemon" ("a second source of truth is exactly the failure mode this area exists to kill"). Kể cả anti-fork gate cũng không dùng stored graph, chỉ scan-tại-thời-điểm-ghi. Cơ chế thật của bee: sweep tươi mỗi lần (docs/** quét lại từ đầu mỗi close, không cache) + derived index regenerate-được-check-drift + 4 "door" chặn cứng lúc đóng feature | Xem §5 round 3 — thay khuyến nghị round 2 |
 
 ## 4. Quyết định đã chốt
 
@@ -251,6 +262,101 @@ detection khỏi structured-recall cho "tìm bản mới nhất" (2 cơ chế kh
 nhau, giống bee), hay anh muốn gộp làm một hệ thống? (b) nếu chọn hướng
 graph, muốn em xác nhận khả năng non-code node của GitNexus trước khi quyết
 (A) tự xây kiểu bee hay (B) tận dụng GitNexus?
+
+### Round 3 — 2026-08-17T09:15Z — bee v2.7.0 (nguồn thật, không phải distillery cũ)
+
+**Nguồn**: `/home/vantt/projects/beegog` (bee source repo thật, local clone,
+KHÁC `docs/distillery/sources/bee.md` — file đó dừng ở v1.18.3 2026-07-28).
+`git log` xác nhận HEAD = `abde5ca7`, tag `v2.7.0`, commit message tự đặt
+tên chính xác: **"doc-rot doors — impact, routing, doc-deferral, freshness"**
+— tức đây KHÔNG phải một release phụ, mà là gói tính năng MỚI NHẤT của bee
+giải ĐÚNG bài toán người dùng đang hỏi (feature `knowledge-distill-trigger` +
+`doc-impact-synthesis`, đóng 2026-08-05 → 2026-08-16). Đọc trực tiếp
+`docs/knowledge/areas/decision-memory/overview.md` +
+`docs/knowledge/areas/workflow-state/gates.md`.
+
+**Sửa lại câu trả lời graph ở round 2:** bee có quyết định tường minh
+**R9 — "No stored graph, no daemon"**: *"All consistency is derived at
+read/mutation time; a second source of truth is exactly the failure mode
+this area exists to kill."* Ngay cả anti-fork gate (round 2 đã nêu) cũng
+KHÔNG dùng stored graph — chỉ là scan `docs/**`/bundle tại thời điểm ghi.
+Khuyến nghị "graph đáng làm cho fork-detection" ở round 2 — SAI theo bằng
+chứng mới, rút lại.
+
+**Cơ chế thật bee dùng (không graph, không daemon):**
+
+1. **Sweep tươi mỗi lần, không cache/không graph** — một `supersede` tính
+   citation sweep qua TOÀN BỘ `docs/**` (khớp full-id + word-boundary
+   short8) NGAY TRƯỚC KHI append event; mỗi hit phải reconcile cùng-lượt
+   hoặc waive tường minh kèm lý do ghi log; hit chưa reconcile tự tạo một
+   "capture stub" nên nó **tái xuất hiện ở mọi lần flush sau** — không thể
+   âm thầm biến mất. `decisions log --relation touches:<id>` chạy CÙNG
+   sweep này ở thời điểm log thường (không chỉ lúc supersede) — loại trừ
+   hợp lý: file index tự-sinh, và thư mục history của chính feature đang
+   sống (tự-trích-dẫn không tính là stale).
+2. **Mọi write BẮT BUỘC khai quan hệ — không còn chỗ trốn trong prose**
+   (R2a): `decisions log` đòi `--relation supersedes:<id>|touches:<id>|none`
+   — thiếu hoặc sai dạng bị REFUSE thẳng, kèm gợi ý tới 3 candidate cùng
+   scope/tag để sửa ngay. Văn bản decision ĐỌC NHƯ một tuyên bố supersede
+   (chứa "supersedes/replaces/overrides/no longer applies/instead of the
+   previous") mà không khai `--relation supersedes:` bị REFUSE — số liệu
+   thật họ tự audit ra: **70 decide event từng giấu supersession trong
+   prose kiểu này so với chỉ 29 supersede event khai đúng** trước khi có
+   guard này. Đây CHÍNH XÁC là root cause STR72 mà fgOS từng đào (decision
+   đổi framing nhưng chỉ "narrated in prose", máy không thấy) — bee đã đóng
+   lỗ này ở tầng CHẶN-GHI, không phải dọn dẹp sau.
+3. **Prose "để sau" cũng bị chặn tương tự** — văn bản đọc như trì hoãn
+   ("we'll handle this later"...) bị refuse trừ khi trỏ `--trigger <id>` đã
+   đăng ký (`bee triggers add --decision <id> --condition "..."` trước).
+   Trigger 2 tầng: predicate (`path-exists:`/`path-missing:`, tự
+   re-evaluate mỗi lần đọc registry, tự lật `waiting → due`) và manual
+   (không bao giờ tự bắn, chờ người xác nhận). Cùng guard này còn áp cho
+   PROSE TRONG DOC của feature đang đóng, không chỉ decision text
+   (doc-impact-synthesis D3) — "để tính sau" ghi trong spec cũng phải trỏ
+   trigger, không được lửng lơ.
+4. **Index là projection thật, regenerate-được, có --check drift mode**
+   (R5): `docs/decisions/index.md` — never hand-edited, complete by
+   construction, byte-stable cho cùng một store, search qua filter có cấu
+   trúc (`--tag/--scope/--since/--untagged/--all`), "bare substring grep is
+   fallback, never the recall path" — khớp đúng khuyến nghị round 2 (mục
+   3), bee đã làm y hệt, không đổi.
+5. **4 "door" chặn cứng lúc ĐÓNG feature** (workflow-state/gates.md) — đây
+   là điểm MỚI NHẤT, mạnh nhất, chưa từng nêu ở round 1/2:
+   - **knowledge-freshness door**: chặn close nếu `bee knowledge check` báo
+     `dangling_source`/`dangling_required_context` bên trong area feature
+     này ĐÃ ĐỘNG TỚI — feature khác không bị vạ lây.
+   - **impact door**: chặn close nếu còn doc nào trong `docs/**` vẫn cite
+     một decision CỦA CHÍNH feature đang đóng mà chưa reconcile — sweep lại
+     TỪ ĐẦU mỗi lần close (không cache), nên một doc vừa sửa xong tự động
+     hết bị chặn ở lần chạy kế.
+   - **routing door**: chặn close nếu một D-ID đã khoá trong CONTEXT.md của
+     feature KHÔNG có citation nào trong area-spec thật và cũng không có
+     record cục bộ — tức bắt đúng lỗi "quyết định khoá rồi nhưng chưa bao
+     giờ lan vào spec sống" (đúng gốc rễ STR72).
+   - **doc-deferral door**: chặn close nếu prose kiểu "để sau" trong doc đã
+     đổi của feature không trỏ trigger nào.
+   - Mỗi door đều có escape hatch TƯỜNG MINH, có log — không bao giờ âm
+     thầm bypass: `knowledge-freshness-deferral` / `impact-deferral` /
+     `routing-deferral` / `doc-deferral`, mỗi cái phải NÊU TÊN feature.
+
+**Ý nghĩa cho fgOS:** đây không còn là gợi ý kiến trúc trừu tượng — bee đã
+CHẠY THẬT 4 door này trong production của chính họ (2026-08-05→08-16, nhiều
+cell/commit thật). Với fgOS, phần tương ứng gần nhất là điểm chuyển
+`awaiting-approval → done` (hoặc `fgos approve`) — đó là nơi tự nhiên để đặt
+một "freshness door" tương tự: chặn approve nếu (a) quyết định feature này
+log ra còn bị doc nào cite mà chưa reconcile, (b) D-ID khoá trong CONTEXT.md
+không có citation nào trong spec sống. Không cần graph, không cần daemon —
+chỉ cần sweep tại đúng 2 thời điểm (log-time cho việc khai quan hệ, close/
+approve-time cho việc chặn) và một index projection có thể `--check`.
+
+**Câu hỏi cho người dùng (thay câu hỏi (b) ở round 2 — graph không còn là
+lựa chọn theo bằng chứng mới):** anh có muốn khoanh scope thiết kế theo đúng
+4-door model của bee (freshness/impact/routing/doc-deferral, gắn vào
+`fgos approve` thay vì một CI job riêng), hay anh thấy fgOS cần một hình dạng
+khác? Và với câu hỏi phạm vi đã chốt tạm ở round 1 (năng lực chung mọi
+project dùng fgOS) — model 4-door này gắn ở "approve" verb vốn đã là verb
+lõi mọi project dùng fgOS đều đi qua, nên tự nhiên khớp — anh xác nhận đúng
+hướng này chứ?
 
 ## 6. Thiết kế đã chốt
 
