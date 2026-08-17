@@ -58,6 +58,7 @@
     "src/state/discover-pool.mjs": "domain",
     "src/state/plan-pool.mjs": "domain",
     "src/state/retro-pool.mjs": "domain",
+    "src/state/retrospective-doors.mjs": "domain",
     "src/state/worker-slots.mjs": "domain",
     "src/intake/discovery.mjs": "use-case",
     "src/intake/plan.mjs": "use-case",

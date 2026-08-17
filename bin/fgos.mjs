@@ -21,6 +21,7 @@ import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFri
 import { collectWideSourceFiles, findWideCitationFindings } from '../scripts/check-decision-citation-drift.mjs';
 import { computeDecisionIndex, generateDecisionIndex } from '../src/report/decision-index.mjs';
 import { renderLockedDecisionsTable } from '../src/report/context-render.mjs';
+import { runFourDoorChecks } from '../src/state/retrospective-doors.mjs';
 import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability, toolsFromCapacities } from '../src/state/tool-registry.mjs';
 import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
@@ -1440,11 +1441,35 @@ async function runVerb(verb, flags, positional, dir) {
     // exists before it will ever reach `done`.
     case 'retrospective': {
       const view = listWork(dir);
+      const repoRoot = path.dirname(dir);
       const swept = [];
       for (const item of Object.values(view.work)) {
         if (item.status !== 'delivered') continue;
         const { event } = moveWork(dir, { id: item.id, to: 'retrospective', expectedStatus: 'delivered', role: 'system' });
-        swept.push({ id: item.id, seq: event.seq });
+        const sweptEntry = { id: item.id, seq: event.seq };
+        // tsk-1lv-5 D7/D9/D11: 4-door check runs INSIDE this existing batch
+        // sweep, for every item regardless of risk tier -- advisory only,
+        // never a reason to hold this item out of retrospective (this
+        // verb's own transition above already succeeded; see
+        // retrospective-doors.mjs's own header for why this stays
+        // non-blocking). One friction event per non-empty door, so a
+        // finding is queryable (`fgos check <id>`) without spamming one
+        // event per individual finding.
+        const doors = runFourDoorChecks(item, view, repoRoot);
+        const doorFindings = {};
+        for (const [doorName, findings] of Object.entries(doors)) {
+          if (findings.length === 0) continue;
+          doorFindings[doorName] = findings.length;
+          addFriction(dir, {
+            id: item.id,
+            disposition: 'advisory',
+            errorClass: `retrospective-door-${doorName}`,
+            layer: 'docs',
+            detail: findings.map((f) => f.message).join('\n'),
+          });
+        }
+        if (Object.keys(doorFindings).length > 0) sweptEntry.doorFindings = doorFindings;
+        swept.push(sweptEntry);
       }
       return { swept, count: swept.length };
     }
