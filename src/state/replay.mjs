@@ -599,7 +599,7 @@ function applyEvent(view, event) {
       break;
     }
     // tsk-in1-1 D1: `tool.register`/`tool.remove` retired — a tool provider
-    // is now declared directly in `runner.capacities.<id>` (config-edited,
+    // is now declared directly in `runner.executors.<id>` (config-edited,
     // never event-sourced). Historical events of either type already in
     // `.fgos/events.jsonl` fall through to `default` below and are skipped,
     // same forward-compatible "unknown type, not an error" treatment any

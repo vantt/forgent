@@ -75,8 +75,8 @@ stage values — the same way `fgos-routing` describes it.
   question (a Task/Agent call is collapsed by default in the transcript,
   not hidden, unlike a genuinely opaque headless `claude -p` subprocess).
   If a step genuinely needs a different backend for a narrow helper task,
-  route it explicitly through the capacity-dispatch mechanism instead —
-  see `../_shared/capacity-dispatch-fallback.md` for its own list of
+  route it explicitly through the executor-dispatch mechanism instead —
+  see `../_shared/executor-dispatch-fallback.md` for its own list of
   valid reasons.
 - Do not reopen or reinterpret a decision already locked in `CONTEXT.md`.
   Cite its D-ID; never override it here.

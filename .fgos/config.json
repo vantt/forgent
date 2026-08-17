@@ -19,10 +19,31 @@
         "Bash(git add:*),Bash(git commit:*)"
       ]
     },
-    "capacities": {
+    "capabilities": {
+      "impact-analysis": {
+        "description": "Code-graph blast radius",
+        "aliases": [
+          "impact_analysis",
+          "Impact Analysis"
+        ],
+        "prefer": "gitnexus"
+      },
+      "pane-labeling": {
+        "description": "Write a session/task id onto the current terminal pane's label, for a human watching a screen"
+      },
+      "fgos-coding-implement": {
+        "description": "code-implement work for the coding domain's executing stage",
+        "prefer": "agy"
+      }
+    },
+    "executors": {
       "agy": {
         "kind": "agent",
+        "description": "Antigravity Cli",
         "allowCrossProvider": true,
+        "for": [
+          "fgos-coding-implement"
+        ],
         "invocations": [
           {
             "via": "cli",
@@ -32,6 +53,7 @@
               "-p",
               "{prompt}",
               "--dangerously-skip-permissions",
+              "--new-project",
               "--model",
               "{model}"
             ]
@@ -46,13 +68,12 @@
       },
       "gitnexus": {
         "kind": "tool",
-        "capability": "impact-analysis",
+        "description": "Code-graph blast radius",
         "for": [
           "impact-analysis"
         ],
         "scanTarget": ".gitnexus",
         "responsibility": "Verification",
-        "description": "Code-graph blast radius",
         "invocations": [
           {
             "via": "mcp",
@@ -65,7 +86,6 @@
       },
       "herdr": {
         "kind": "tool",
-        "capability": "pane-labeling",
         "for": [
           "pane-labeling"
         ],
@@ -78,18 +98,6 @@
             "args": []
           }
         ]
-      }
-    },
-    "capabilities": {
-      "impact-analysis": {
-        "description": "Code-graph blast radius",
-        "aliases": [
-          "impact_analysis",
-          "Impact Analysis"
-        ]
-      },
-      "pane-labeling": {
-        "description": "Write a session/task id onto the current terminal pane's label, for a human watching a screen"
       }
     },
     "timeoutMs": 900000,
@@ -124,5 +132,15 @@
   },
   "workerSlots": {
     "ceiling": null
+  },
+  "ironLaw": {
+    "level": "ask"
+  },
+  "gateway": {
+    "port": 4170,
+    "token": null
+  },
+  "herdrWebDashboard": {
+    "staticServing": true
   }
 }

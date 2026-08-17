@@ -805,7 +805,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       // rejected proposal. Read fresh: `item` predates this claim's moves.
       const feedbackView = listWork(dir);
       const worker = await spawnWorker(item, config, wt.path, {
-        // tsk-62v D6: lets a `kind: "cli"` capacity's presence be checked
+        // tsk-62v D6: lets a `kind: "cli"` executor's presence be checked
         // via `fgos tool query`'s own functions instead of re-probing PATH.
         fgosDir: dir,
         feedback: {
@@ -820,7 +820,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       });
       lastWorkerOutput = worker.stdout ?? ''; // wgi-8: terminal-outcome discovery source (success/verify-miss)
       log(`fgos-runner: worker for "${item.id}" exited ${worker.status ?? `signal ${worker.signal}`} (tier ${worker.tier} -> ${worker.model})`);
-      // Capacity-aware dispatch announce/audit (D8, tsk-62v): one line to
+      // Executor-aware dispatch announce/audit (D8, tsk-62v): one line to
       // stderr/logs, plus one event appended to the existing `.fgos/
       // events.jsonl` one-door-write log — reused, not a new file.
       // `replay.mjs` ignores unknown event types by design (see its own
@@ -829,20 +829,20 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       // write at this call site already uses, closing the synthesis
       // report's concurrent-session write-race concern (§3) for this
       // append too.
-      log(`fgos-runner: ${worker.capacityId} — ${worker.provider} — ${worker.model}`);
+      log(`fgos-runner: ${worker.executorId} — ${worker.provider} — ${worker.model}`);
       await queue.enqueue(async () => {
         appendEvent(path.join(dir, 'events.jsonl'), {
-          type: 'capacity.dispatch',
+          type: 'executor.dispatch',
           // baseCommit/headRef (tsk-4hl, D1/D3 of docs/history/parallel-
           // decomposition-footprint-avoidance/CONTEXT.md — mức 1): the
           // dispatch-time attestation captured inside spawnWorker, now
           // actually persisted (independent review after tsk-2ig merged
           // found it captured then discarded) -- same audit-only,
           // ignored-by-replay.mjs event this call site already uses for
-          // capacityId/provider/model, no new event type invented.
+          // executorId/provider/model, no new event type invented.
           payload: {
             id: item.id,
-            capacityId: worker.capacityId,
+            executorId: worker.executorId,
             provider: worker.provider,
             // command (tsk-33w D9): the command actually spawned, alongside
             // the freely-overridable `provider` label above -- so this audit

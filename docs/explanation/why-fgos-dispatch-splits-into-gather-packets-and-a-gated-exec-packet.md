@@ -42,7 +42,7 @@ and reports back needs none of that machinery at all.
 This is the single most consequential decision in the set (D4): B2 is
 real, useful, and designed in detail — but it stays gated. No third
 category is introduced between a full work item (`rootTask`) and an
-existing dispatch `capacity` until two specific conditions both hold:
+existing dispatch `executor` until two specific conditions both hold:
 `tsk-3xd` (a real prerequisite fix to how children carry directive
 prose) had to land first, and there had to be at least two real,
 observed cases of a parent genuinely needing a child to write a file too
@@ -74,9 +74,9 @@ Concretely, the parts that shipped:
 - **A fourth valid reason to dispatch a step out of the current session**
   ("runs in parallel / shortens wall-clock time"), added alongside the
   existing reasons — recorded once and shared via
-  `_shared/capacity-dispatch-fallback.md` so every consuming skill reads
+  `_shared/executor-dispatch-fallback.md` so every consuming skill reads
   the same list rather than each re-deriving its own.
-- **An ad-hoc capacity layer** — a runtime-composed prompt packet, as
+- **An ad-hoc executor layer** — a runtime-composed prompt packet, as
   opposed to only ever dispatching against a pre-registered, fixed
   template. A dynamic packet carries six required fields (`id`, `goal`,
   `inputs`, `boundary`, `expected shape`, `return contract`). Its `id` is
@@ -107,7 +107,7 @@ Concretely, the parts that shipped:
   be.
 
 All three follow-on implementation pieces (the parallelism reason, the
-ad-hoc capacity packet shape, and the per-dispatch provider/tier
+ad-hoc executor packet shape, and the per-dispatch provider/tier
 judgment) were delivered as three separate items — `tsk-2sl`, `tsk-2k1`,
 `tsk-503` — chained by `mergeAfter` rather than bundled into one, since
 all three touch the same shared fragment file and benefit from landing
