@@ -311,6 +311,14 @@
     "feedback-source-sweep": {
       "id": "feedback-source-sweep",
       "status": "candidate"
+    },
+    "decision-citation-and-reversal-sweep": {
+      "id": "decision-citation-and-reversal-sweep",
+      "status": "candidate"
+    },
+    "one-line-cite-plus-local-delta": {
+      "id": "one-line-cite-plus-local-delta",
+      "status": "candidate"
     }
   }
 }
