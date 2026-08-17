@@ -10,6 +10,6 @@ description: >-
   what do I do now", "this item is stuck waiting on a person".
 ---
 
-This is a generated thin wrapper (tsk-1qi D5/D7) -- do not edit directly, edit the source instead.
+This is a generated thin wrapper (tsk-1qi) -- do not edit directly, edit the source instead.
 The real skill content lives at `../../../.agents/skills/fgos-routing/SKILL.md`, this project's own canonical skill source.
 Read that file and follow it directly.
