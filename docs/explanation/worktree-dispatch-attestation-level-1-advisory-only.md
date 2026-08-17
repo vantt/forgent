@@ -16,7 +16,7 @@ advisory-only.
 current branch name immediately before calling `resolveExecutorConfig`
 for a cross-provider CLI target (`agy`/`opencode`), attaching
 `{baseCommit, headRef}` to the dispatch result alongside the existing
-`capacityId`/`provider` fields. Either field folds to `null` rather than
+`executorId`/`provider` fields. Either field folds to `null` rather than
 throwing if it can't be read (e.g. detached HEAD has no `headRef`) — this
 is a snapshot for later reference, never a precondition dispatch can
 fail on.
@@ -101,7 +101,7 @@ in the newly-wired `footprintDiffHits`:
 
 - **`test/runner/loop.test.mjs` was failing on `main` at the time this
   was found** — a genuine DoD violation (`npm test` must stay green).
-  Its assertion still did a `deepEqual` against the *entire* capacity-
+  Its assertion still did a `deepEqual` against the *entire* executor-
   dispatch event payload as a fixed literal, unaware that `tsk-4hl` had
   just added `baseCommit`/`headRef` onto that same payload — the new
   fields broke the exact-equality check. Fixed by asserting shape

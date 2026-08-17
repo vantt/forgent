@@ -244,7 +244,7 @@ export const DEFAULT_RUNNER_CONFIG = {
   // below). Default here stays Claude-only (matching the default
   // `executor.command: 'claude'` above); a project adds its own
   // `modelPolicies.<providerModel>` block when it configures a
-  // non-Claude capacity (this repo's own committed config does, for
+  // non-Claude executor (this repo's own committed config does, for
   // `agy`/gemini). `creative`/`analytical` default to `sonnet` (no real
   // consumer differentiates them from `standard` yet); `critical`
   // defaults to `opus`, matching `heavy`'s pre-D9 model unchanged.
@@ -407,11 +407,11 @@ export function ensureRunnerConfigForDir(dir) {
 
 /**
  * Shape-check one executor block ({command, args[], adapter?}) — shared by
- * the required global `cfg.executor` and every `capacities.<capacityId>`
+ * the required global `cfg.executor` and every `executors.<executorId>`
  * entry naming its own `command`/`args` (P41/C9 v2). An `adapter` field,
  * when present, must name a registered `EXECUTOR_ADAPTERS` key; absent
  * defaults to `DEFAULT_ADAPTER` at resolve time, not validated here.
- * (The per-tier `executors` override block, distinct from `capacities`,
+ * (The per-tier `executors` override block, distinct from `executors`,
  * was retired at tsk-in1-2 D6: 0 live entries, had already caused a real
  * bug, per tsk-5tm D10.)
  */
@@ -436,33 +436,33 @@ function validateExecutorShape(executor, label) {
   }
 }
 
-/** kind vocabulary `capacities.<id>.kind` may take (D5, tsk-in1-4): the
+/** kind vocabulary `executors.<id>.kind` may take (D5, tsk-in1-4): the
  * BAN CHAT axis — is this executor an `agent` (a live persona, potentially
  * native-Task-dispatchable, e.g. `agy`) or a `tool` (presence-only,
  * mechanical, never actually spawned through `resolveExecutorConfig`, e.g.
  * `gitnexus`/`herdr`)? Replaces the old, doubly-overloaded vocabulary that
  * reused `tool-registry.mjs`'s own presence-probe `KINDS` (`cli`/`binary`/
- * `mcp`/`skill`) plus `'task'` — that vocabulary conflated WHAT a capacity
+ * `mcp`/`skill`) plus `'task'` — that vocabulary conflated WHAT a executor
  * is with HOW it is invoked, which is exactly what forced `gitnexus`'s
  * `kind:"mcp"` and `herdr`'s `kind:"cli"` to mean two unrelated things at
  * once (tool-registry's own probe mechanism AND dispatch's cross-provider/
  * native-mechanism gates). The invocation MECHANISM now lives entirely in
  * `invocations[].via` (`INVOCATION_VIA`, D8) — `tool-registry.mjs`'s own
- * presence-probe kind is read from there too (`toolsFromCapacities`,
+ * presence-probe kind is read from there too (`toolsFromExecutors`,
  * `src/state/tool-registry.mjs`), never from this field anymore.
  */
-export const CAPACITY_KINDS = Object.freeze(['agent', 'tool']);
+export const EXECUTOR_KINDS = Object.freeze(['agent', 'tool']);
 
-/** value vocabulary `capacities.<id>.carries` may take (D15, `tsk-5td`,
- * first real consumer `tsk-2ie5`/`tsk-2c1`): the content class a capacity
+/** value vocabulary `executors.<id>.carries` may take (D15, `tsk-5td`,
+ * first real consumer `tsk-2ie5`/`tsk-2c1`): the content class a executor
  * is permitted to receive. `user-text` = pure user-typed text only;
  * `repo-content` = may also carry repo file paths/content — the wider,
- * riskier class (a capacity declaring this accepts either class, since
+ * riskier class (a executor declaring this accepts either class, since
  * `repo-content` covers `user-text` plus more). `secrets`/credentials is
  * deliberately never a legal value here (D15: not a rung on this ladder,
  * a forbidden thing).
  */
-export const CAPACITY_CARRIES = Object.freeze(['user-text', 'repo-content']);
+export const EXECUTOR_CARRIES = Object.freeze(['user-text', 'repo-content']);
 
 /**
  * CLI commands recognized as staying within the Claude ecosystem for
@@ -481,13 +481,13 @@ export const CLAUDE_CLI_COMMANDS = Object.freeze(['claude']);
  * heavy`, D9's own pinned scope boundary: that export stays untouched,
  * shared with `work.risk`). `DEFAULT_TIER_TO_POLICY` is the default
  * mapping from a work item's own tier onto one of these five, used
- * whenever a capacity names no `rigorOverrides` entry for that tier —
+ * whenever a executor names no `rigorOverrides` entry for that tier —
  * `light`/`standard` map onto their same-named policy tier directly;
  * `heavy` maps to `critical`, the highest-rigor policy tier, matching
  * `heavy`'s own framing elsewhere (`HEAVY_RISK`) as the most
  * scrutiny-demanding classification. `creative`/`analytical` have no
- * default work-tier mapped onto them yet — they exist for a capacity's
- * own `rigorOverrides` to select explicitly (e.g. a capacity whose work
+ * default work-tier mapped onto them yet — they exist for a executor's
+ * own `rigorOverrides` to select explicitly (e.g. a executor whose work
  * is better served by a creative-leaning model even at `standard` rigor),
  * not because this item invents a use for them.
  */
@@ -495,7 +495,7 @@ export const MODEL_POLICY_TIERS = Object.freeze(['lightweight', 'standard', 'cre
 const DEFAULT_TIER_TO_POLICY = Object.freeze({ light: 'lightweight', standard: 'standard', heavy: 'critical' });
 
 /**
- * `capacities.<id>.invocations[].via` vocabulary (tsk-5tm-4 D11, widened
+ * `executors.<id>.invocations[].via` vocabulary (tsk-5tm-4 D11, widened
  * D8 tsk-in1-4, `'api'` restored D13 tsk-in1-5): the CO CHE GOI axis,
  * orthogonal to `kind` (D5, the BAN CHAT axis) — `'cli'` (spawns a real
  * subprocess via `cli-spawn`, e.g. `agy`), `'task'` (native in-session
@@ -510,17 +510,17 @@ const DEFAULT_TIER_TO_POLICY = Object.freeze({ light: 'lightweight', standard: '
  * dispatches a `via:"cli"` invocation (gate B2/B3 below) — `'api'` is a
  * real, independently-testable adapter (D13's pluggability precedent, see
  * `httpAdapter`'s own doc comment) with 0 producer wired into that
- * pipeline yet, same as `'mcp'`/`'task'` were before any capacity used
+ * pipeline yet, same as `'mcp'`/`'task'` were before any executor used
  * them for real.
  */
 export const INVOCATION_VIA = Object.freeze(['cli', 'task', 'mcp', 'api']);
 
 /**
- * Shape-check one `capacities.<id>` entry (D1/D2, tsk-62v; `allowCrossProvider`
- * D1, tsk-32n): requires `kind` (one of `CAPACITY_KINDS`). `command`/`args`,
+ * Shape-check one `executors.<id>` entry (D1/D2, tsk-62v; `allowCrossProvider`
+ * D1, tsk-32n): requires `kind` (one of `EXECUTOR_KINDS`). `command`/`args`,
  * when either is present, must satisfy the same shape `validateExecutorShape`
- * already requires for an executor block — a capacity entry naming its own
- * executor is shaped exactly like one. A capacity entry naming neither is
+ * already requires for an executor block — a executor entry naming its own
+ * executor is shaped exactly like one. A executor entry naming neither is
  * valid too: it carries only `kind`/`tier`/`target` metadata and falls
  * through to `executor` (global) for the actual command (D4; tsk-in1-2 D6
  * retired the intermediate `executors.<tier>` rung).
@@ -532,24 +532,24 @@ export const INVOCATION_VIA = Object.freeze(['cli', 'task', 'mcp', 'api']);
  * `model`, when present, must be a non-empty string (tsk-2yp follow-up):
  * `cfg.models.<tier>` is a single vocabulary shared with the Claude
  * executor's own tier dispatch (`spawnWorker`), so a cross-provider
- * capacity whose backend uses a different model-name vocabulary (e.g.
+ * executor whose backend uses a different model-name vocabulary (e.g.
  * `agy`'s Gemini model strings vs. Claude's `haiku`/`sonnet`/`opus`)
  * cannot borrow that shared table without breaking Claude's own
- * tier-to-model resolution. This field lets `executeCapacityCli`
- * (task-dispatch only, below) substitute a capacity-specific model instead.
+ * tier-to-model resolution. This field lets `executeExecutorCli`
+ * (task-dispatch only, below) substitute a executor-specific model instead.
  *
  * `agentType`, when present, must be a non-empty string (D1/D2, tsk-3sw):
  * names a Claude Code agent definition (`.claude/agents/<name>.md`) an
- * `agent`-kind capacity with no own `command`/`args` resolves into a real
+ * `agent`-kind executor with no own `command`/`args` resolves into a real
  * `claude --agent <agentType>` invocation via, `buildAgentTypeExecutor`
  * below.
  *
  * `forceCliSpawn`, when present, must be a boolean (tsk-3ik-1, Native-First
  * Dispatch Doctrine rule 4, `docs/decisions/0026-...md`): the valid
  * "config forces cli/spawn anyway" exception (isolation, a separate
- * process/worktree/cwd) for an `agent`-kind capacity that would otherwise
+ * process/worktree/cwd) for an `agent`-kind executor that would otherwise
  * be native-eligible — read by `decideDispatchMechanism`/
- * `decideCapacityDispatchMechanism` below, never by `resolveExecutorConfig`
+ * `decideExecutorDispatchMechanism` below, never by `resolveExecutorConfig`
  * itself (which stays cli/spawn-only and unaware this field exists).
  *
  * `invocations`, when present, must be a non-empty array (tsk-5tm-4 D11,
@@ -567,13 +567,13 @@ export const INVOCATION_VIA = Object.freeze(['cli', 'task', 'mcp', 'api']);
  * own `via:"mcp"` invocation is not spawnable and was never meant to be,
  * same reasoning D13 applied to `'api'`'s own shape.
  * An ADDITIVE alternative to the flat `command`/`args` above, never a
- * replacement (a capacity with neither, or with the flat shape, keeps
+ * replacement (a executor with neither, or with the flat shape, keeps
  * resolving exactly as before this field existed). `resolveExecutorConfig`
  * below selects the invocation whose `via` is `"cli"` specifically — never
  * blindly `invocations[0]` (gate B2) — and throws when `invocations` is
  * present but none is `via:"cli"` (gate B3), rather than silently falling
- * through to the global executor as if the capacity were metadata-only.
- * The top-level `capacities` field name itself is unchanged (D11) — the
+ * through to the global executor as if the executor were metadata-only.
+ * The top-level `executors` field name itself is unchanged (D11) — the
  * tier-keyed per-tier override block (strictly validated, `tsk-4eu`;
  * retired since, tsk-in1-2 D6) already occupied the obvious `executors`
  * name at the time, so reusing it here would have collided.
@@ -583,7 +583,7 @@ export const INVOCATION_VIA = Object.freeze(['cli', 'task', 'mcp', 'api']);
  * `capabilities` itself is D4/D14, tsk-in1-3) — an executor now serves
  * MULTIPLE capabilities at once (`agy` could plausibly serve both
  * `judge`-shaped dispatch AND something else later), replacing the old
- * single-value `CAPACITY_PURPOSES` enum (`['judge']`, retired here: it was
+ * single-value `EXECUTOR_PURPOSES` enum (`['judge']`, retired here: it was
  * exactly the closed, dispatch-only half of the vocab this item's own D4
  * unifies with tool-registry's free-text `capability`). Validated against
  * the SAME curated catalog `capability` on a tool-registry entry answers
@@ -613,10 +613,10 @@ function validateInvocationShape(invocation, label, capabilityNames) {
       throw new RunnerConfigError(`runner config (${label}) "command" must be a non-empty string identifier when "via" is "mcp".`);
     }
     // tsk-45f D10/piece 3: an optional capability->tool map, read only by
-    // `decideCapacityCli`'s MCP hand-back (D10) -- never by
+    // `decideExecutorCli`'s MCP hand-back (D10) -- never by
     // `resolveExecutorConfig`, which still never selects an mcp invocation
     // at all (Gate B2/B3 unchanged). Each key must already be a name in
-    // `cfg.capabilities`, same discipline `capacity.for`/`capacity.capability`
+    // `cfg.capabilities`, same discipline `executor.for`/`executor.capability`
     // already carry; each value is an opaque MCP tool identifier string,
     // never validated against a live MCP server (this module has no MCP
     // client of its own, by design -- decide/execute self-execute what they
@@ -658,45 +658,45 @@ function validateInvocationShape(invocation, label, capabilityNames) {
  * validated `cfg.capabilities` block and threaded through here, since this
  * function has no other way to see a sibling top-level field.
  */
-function validateCapacityShape(capacity, label, capabilityNames) {
-  if (!capacity || typeof capacity !== 'object' || Array.isArray(capacity)) {
+function validateExecutorEntryShape(executor, label, capabilityNames) {
+  if (!executor || typeof executor !== 'object' || Array.isArray(executor)) {
     throw new RunnerConfigError(`runner config (${label}) must be an object.`);
   }
-  if (typeof capacity.kind !== 'string' || !CAPACITY_KINDS.includes(capacity.kind)) {
+  if (typeof executor.kind !== 'string' || !EXECUTOR_KINDS.includes(executor.kind)) {
     throw new RunnerConfigError(
-      `runner config (${label}) "kind" must be one of ${CAPACITY_KINDS.join('/')}, got: ${JSON.stringify(capacity.kind)}.`,
+      `runner config (${label}) "kind" must be one of ${EXECUTOR_KINDS.join('/')}, got: ${JSON.stringify(executor.kind)}.`,
     );
   }
-  if (capacity.command !== undefined || capacity.args !== undefined) {
-    validateExecutorShape(capacity, label);
+  if (executor.command !== undefined || executor.args !== undefined) {
+    validateExecutorShape(executor, label);
   }
-  if (capacity.model !== undefined && (typeof capacity.model !== 'string' || capacity.model.length === 0)) {
+  if (executor.model !== undefined && (typeof executor.model !== 'string' || executor.model.length === 0)) {
     throw new RunnerConfigError(`runner config (${label}) "model" must be a non-empty string when present.`);
   }
-  if (capacity.allowCrossProvider !== undefined && typeof capacity.allowCrossProvider !== 'boolean') {
+  if (executor.allowCrossProvider !== undefined && typeof executor.allowCrossProvider !== 'boolean') {
     throw new RunnerConfigError(`runner config (${label}) "allowCrossProvider" must be a boolean when present.`);
   }
-  if (capacity.agentType !== undefined && (typeof capacity.agentType !== 'string' || capacity.agentType.length === 0)) {
+  if (executor.agentType !== undefined && (typeof executor.agentType !== 'string' || executor.agentType.length === 0)) {
     throw new RunnerConfigError(`runner config (${label}) "agentType" must be a non-empty string when present.`);
   }
-  if (capacity.forceCliSpawn !== undefined && typeof capacity.forceCliSpawn !== 'boolean') {
+  if (executor.forceCliSpawn !== undefined && typeof executor.forceCliSpawn !== 'boolean') {
     throw new RunnerConfigError(`runner config (${label}) "forceCliSpawn" must be a boolean when present.`);
   }
   // tsk-5tm-1 D1: `needs` retired (was resolveExecutorConfig's own presence
   // gate's match key, itself removed — see that function's doc comment).
-  // No longer validated; a stray `needs` on a capacity is now inert, never
+  // No longer validated; a stray `needs` on a executor is now inert, never
   // rejected, since the field carries no meaning to consume it.
   //
   // D15: `for` is now a non-empty string ARRAY (was a single value) — one
   // executor can serve multiple capabilities. Each element must already be
   // a name (or alias) declared in `cfg.capabilities` — replaces the old,
-  // narrower `CAPACITY_PURPOSES` enum (retired) with the SAME curated
+  // narrower `EXECUTOR_PURPOSES` enum (retired) with the SAME curated
   // catalog a tool-registry entry's own `capability` answers to.
-  if (capacity.for !== undefined) {
-    if (!Array.isArray(capacity.for) || capacity.for.length === 0 || !capacity.for.every((f) => typeof f === 'string' && f.trim())) {
+  if (executor.for !== undefined) {
+    if (!Array.isArray(executor.for) || executor.for.length === 0 || !executor.for.every((f) => typeof f === 'string' && f.trim())) {
       throw new RunnerConfigError(`runner config (${label}) "for" must be a non-empty array of non-empty strings when present.`);
     }
-    for (const purpose of capacity.for) {
+    for (const purpose of executor.for) {
       if (!capabilityNames.has(purpose)) {
         throw new RunnerConfigError(
           `runner config (${label}) "for" entry "${purpose}" is not declared in "capabilities" — add it there first (D4/D14/D15).`,
@@ -705,43 +705,43 @@ function validateCapacityShape(capacity, label, capabilityNames) {
     }
   }
   // D15/tsk-5td: the content-permission layer, alongside for/needs above.
-  // Optional (a capacity naming no `carries` skips resolveExecutorConfig's
-  // own carries gate entirely, byte-identical to every pre-D15 capacity) —
-  // but when present it must be one of CAPACITY_CARRIES, never a free
+  // Optional (a executor naming no `carries` skips resolveExecutorConfig's
+  // own carries gate entirely, byte-identical to every pre-D15 executor) —
+  // but when present it must be one of EXECUTOR_CARRIES, never a free
   // string (D15's own "TAP GIA TRI phai khai ro" rule, same enum-not-
   // free-string treatment `for` already gets above).
-  if (capacity.carries !== undefined && !CAPACITY_CARRIES.includes(capacity.carries)) {
-    throw new RunnerConfigError(`runner config (${label}) "carries" must be one of ${CAPACITY_CARRIES.join('/')}, got: ${JSON.stringify(capacity.carries)}.`);
+  if (executor.carries !== undefined && !EXECUTOR_CARRIES.includes(executor.carries)) {
+    throw new RunnerConfigError(`runner config (${label}) "carries" must be one of ${EXECUTOR_CARRIES.join('/')}, got: ${JSON.stringify(executor.carries)}.`);
   }
-  if (capacity.invocations !== undefined) {
-    if (!Array.isArray(capacity.invocations) || capacity.invocations.length === 0) {
+  if (executor.invocations !== undefined) {
+    if (!Array.isArray(executor.invocations) || executor.invocations.length === 0) {
       throw new RunnerConfigError(`runner config (${label}) "invocations" must be a non-empty array when present.`);
     }
-    capacity.invocations.forEach((invocation, index) => {
+    executor.invocations.forEach((invocation, index) => {
       validateInvocationShape(invocation, `${label} invocations[${index}]`, capabilityNames);
     });
   }
   // tsk-5tm-5 D9: `providerModel` names which `cfg.modelPolicies` table
-  // this capacity's tier resolution reads from (absent defaults to
+  // this executor's tier resolution reads from (absent defaults to
   // "claude", `modelForTier`'s own default) — the field `agy` needs so
   // its tier resolution reads the "gemini" table instead of silently
   // borrowing Claude's model names.
-  if (capacity.providerModel !== undefined && (typeof capacity.providerModel !== 'string' || !capacity.providerModel.trim())) {
+  if (executor.providerModel !== undefined && (typeof executor.providerModel !== 'string' || !executor.providerModel.trim())) {
     throw new RunnerConfigError(`runner config (${label}) "providerModel" must be a non-empty string when present.`);
   }
   // `rigorOverrides` (D9): per-work-tier override of the DEFAULT_TIER_TO_
-  // POLICY mapping, for a capacity with a real reason to deviate (e.g.
+  // POLICY mapping, for a executor with a real reason to deviate (e.g.
   // prefers "creative" over the default "standard" policy tier even at
-  // work-tier "standard"). Optional and additive — a capacity naming none
+  // work-tier "standard"). Optional and additive — a executor naming none
   // resolves through the default mapping unchanged.
-  if (capacity.rigorOverrides !== undefined) {
-    validateRigorOverridesShape(capacity.rigorOverrides, `${label} "rigorOverrides"`);
+  if (executor.rigorOverrides !== undefined) {
+    validateRigorOverridesShape(executor.rigorOverrides, `${label} "rigorOverrides"`);
   }
 }
 
 // Extracted (D2, docs/history/capability-capacity-remodel/CONTEXT.md) so
 // `capabilities.<name>.overrides.rigorOverrides` (validateCapabilitiesShape
-// below) validates against the exact same rule a capacity's own
+// below) validates against the exact same rule a executor's own
 // `rigorOverrides` already does, never a second, drifting copy of it.
 function validateRigorOverridesShape(rigorOverrides, label) {
   if (!rigorOverrides || typeof rigorOverrides !== 'object' || Array.isArray(rigorOverrides)) {
@@ -762,8 +762,8 @@ function validateRigorOverridesShape(rigorOverrides, label) {
 /**
  * Shape-check `cfg.capabilities` (D4/D14, tsk-in1-3): the curated catalog
  * of capability names both layers now share — free-text `capability` on a
- * tool-registry entry (`toolsFromCapacities`, `src/state/tool-registry.mjs`)
- * and `capacities.<id>.for` (a capacity's declared purpose, D15 — its own
+ * tool-registry entry (`toolsFromExecutors`, `src/state/tool-registry.mjs`)
+ * and `executors.<id>.for` (a executor's declared purpose, D15 — its own
  * validation against this catalog is a later task's scope, not this one's).
  * An object mapping an arbitrary capability name to `{description?,
  * aliases?}` — both fields optional (a bare `{}` entry is valid, naming
@@ -777,9 +777,9 @@ function validateRigorOverridesShape(rigorOverrides, label) {
  */
 // Only 4 fields are ever eligible for capabilities.<name>.overrides (D2,
 // docs/history/capability-capacity-remodel/CONTEXT.md): a capability can
-// retune HOW strongly its resolved capacity works, never WHAT command
+// retune HOW strongly its resolved executor works, never WHAT command
 // actually runs -- command/args/adapter/invocations stay owned by the
-// capacity alone, never override-able from a capability.
+// executor alone, never override-able from a capability.
 const CAPABILITY_OVERRIDE_FIELDS = Object.freeze(['rigorOverrides', 'providerModel', 'tier', 'model']);
 
 function validateCapabilitiesShape(capabilities, label) {
@@ -800,7 +800,7 @@ function validateCapabilitiesShape(capabilities, label) {
       }
     }
     if (entry.prefer !== undefined && (typeof entry.prefer !== 'string' || !entry.prefer.trim())) {
-      throw new RunnerConfigError(`runner config (${entryLabel}) "prefer" must be a non-empty string (a capacity id) when present.`);
+      throw new RunnerConfigError(`runner config (${entryLabel}) "prefer" must be a non-empty string (a executor id) when present.`);
     }
     if (entry.overrides !== undefined) {
       if (!entry.overrides || typeof entry.overrides !== 'object' || Array.isArray(entry.overrides)) {
@@ -864,14 +864,14 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
   }
   validateExecutorShape(cfg.executor, `${sourceLabel} executor`);
   // OPTIONAL cfg.capabilities catalog (D4/D14, tsk-in1-3): additive, same
-  // style as `capacities` below — absent keeps today's behavior byte-
-  // identical. Deliberately a DIFFERENT field from `capacities` (D3 kept
+  // style as `executors` below — absent keeps today's behavior byte-
+  // identical. Deliberately a DIFFERENT field from `executors` (D3 kept
   // that name for the executor registry) — `capabilities` is the curated
-  // catalog of WHAT a capacity can promise, `capacities` is the registry
+  // catalog of WHAT a executor can promise, `executors` is the registry
   // of HOW one is actually implemented. Validated FIRST, ahead of
-  // `capacities` below (tsk-in1-4 D15): a capacity's own `for` array
+  // `executors` below (tsk-in1-4 D15): a executor's own `for` array
   // validates against this catalog's names, so the catalog itself must
-  // already be known-good before any `capacities` entry can check against
+  // already be known-good before any `executors` entry can check against
   // it — `capabilityNames` is built here once and threaded through.
   const capabilityNames = new Set();
   if (cfg.capabilities !== undefined) {
@@ -881,33 +881,33 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
       for (const alias of entry.aliases ?? []) capabilityNames.add(alias);
     }
   }
-  // OPTIONAL cfg.capacities.<capacityId> map (D1, tsk-62v): additive, same
+  // OPTIONAL cfg.executors.<executorId> map (D1, tsk-62v): additive, same
   // style as `executors` above — absent keeps today's behavior byte-
   // identical.
-  if (cfg.capacities !== undefined) {
-    if (!cfg.capacities || typeof cfg.capacities !== 'object' || Array.isArray(cfg.capacities)) {
-      throw new RunnerConfigError(`runner config (${sourceLabel}) "capacities" must be an object mapping capacityId -> capacity entry when present.`);
+  if (cfg.executors !== undefined) {
+    if (!cfg.executors || typeof cfg.executors !== 'object' || Array.isArray(cfg.executors)) {
+      throw new RunnerConfigError(`runner config (${sourceLabel}) "executors" must be an object mapping executorId -> executor entry when present.`);
     }
-    for (const [capacityId, capacity] of Object.entries(cfg.capacities)) {
-      validateCapacityShape(capacity, `${sourceLabel} capacities.${capacityId}`, capabilityNames);
+    for (const [executorId, executor] of Object.entries(cfg.executors)) {
+      validateExecutorEntryShape(executor, `${sourceLabel} executors.${executorId}`, capabilityNames);
     }
   }
   // `prefer` symmetry (D2, docs/history/capability-capacity-remodel/
-  // CONTEXT.md): checked here, AFTER both `capabilities` and `capacities`
+  // CONTEXT.md): checked here, AFTER both `capabilities` and `executors`
   // are individually known-good — a capability's own shape and a
-  // capacity's own shape can each be malformed independently, and this
+  // executor's own shape can each be malformed independently, and this
   // cross-check should never be the first (confusing) error a caller
   // sees for an unrelated shape mistake. Catches a typo'd `prefer` at
-  // config-load time, ahead of `resolveCapacityAndOverrides`'s own
+  // config-load time, ahead of `resolveExecutorAndOverrides`'s own
   // resolve-time throw for a `cfg` built by hand (e.g. in a test) without
   // going through this loader at all.
   if (cfg.capabilities !== undefined) {
     for (const [name, entry] of Object.entries(cfg.capabilities)) {
       if (entry.prefer === undefined) continue;
-      const preferredCapacity = cfg.capacities?.[entry.prefer];
-      if (!preferredCapacity || !Array.isArray(preferredCapacity.for) || !preferredCapacity.for.includes(name)) {
+      const preferredExecutor = cfg.executors?.[entry.prefer];
+      if (!preferredExecutor || !Array.isArray(preferredExecutor.for) || !preferredExecutor.for.includes(name)) {
         throw new RunnerConfigError(
-          `runner config (${sourceLabel} capabilities.${name}) "prefer" names "${entry.prefer}" but that capacity does not declare "for" including "${name}" itself (symmetry required, D2).`,
+          `runner config (${sourceLabel} capabilities.${name}) "prefer" names "${entry.prefer}" but that executor does not declare "for" including "${name}" itself (symmetry required, D2).`,
         );
       }
     }
@@ -956,7 +956,7 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
  * when present — `providerModel` (default `"claude"`, every pre-D9 call
  * site) selects which provider's table to read, and `tier` maps onto one
  * of `MODEL_POLICY_TIERS` via `DEFAULT_TIER_TO_POLICY`, unless
- * `rigorOverrides` (a capacity's own override map, threaded in by the
+ * `rigorOverrides` (a executor's own override map, threaded in by the
  * caller) names a different policy tier for this specific work tier.
  * Falls back to the legacy flat `cfg.models[tier]` lookup, byte-identical
  * to every pre-D9 caller, when `cfg.modelPolicies` is absent — this
@@ -985,41 +985,41 @@ export function modelForTier(cfg, tier, { providerModel = 'claude', rigorOverrid
 }
 
 /**
- * Resolve which executor block applies for `tier`/`capacityId` (P41/D
- * a4fe4c2b, generalized capacity-aware, D4/D6 tsk-62v). Precedence (D4;
+ * Resolve which executor block applies for `tier`/`executorId` (P41/D
+ * a4fe4c2b, generalized executor-aware, D4/D6 tsk-62v). Precedence (D4;
  * tsk-in1-2 D6 retired the intermediate `executors.<tier>` rung — 0 live
  * entries, had already caused a real bug per tsk-5tm D10):
- * `capacities.<capacityId>` (only when that entry declares its own
- * `command`/`adapter` — a capacity entry naming neither is metadata-only
- * and falls through) > `executor` (global). No `capacityId` given at all
+ * `executors.<executorId>` (only when that entry declares its own
+ * `command`/`adapter` — a executor entry naming neither is metadata-only
+ * and falls through) > `executor` (global). No `executorId` given at all
  * keeps every pre-tsk-62v call site's behavior identical.
  *
- * A `capacities.<capacityId>` entry naming no `command`/`adapter` of its
+ * A `executors.<executorId>` entry naming no `command`/`adapter` of its
  * own but declaring `agentType` (D1/D2, tsk-3sw) resolves via
  * `buildAgentTypeExecutor` instead of falling all the way through to
  * `executor` (global) — still ahead of that fallback in the same
  * precedence slot `command`/`adapter` already occupy.
  *
- * Presence/staleness of a `capacities.<capacityId>` entry's own tool is no
+ * Presence/staleness of a `executors.<executorId>` entry's own tool is no
  * longer checked here (tsk-5tm-1 D1: retired — 2/3 real entries were
  * `kind:"task"`, for which this never ran, and the third's `needs` added no
  * signal beyond the OS's own ENOENT on a missing binary). Ask `fgos tool
  * query --status present/stale` directly at the call site instead.
  *
  * Cross-provider governance (D2/D3, tsk-32n): once the winning `executor`
- * is resolved below, a `kind: "cli"` capacity whose FINAL resolved
+ * is resolved below, a `kind: "cli"` executor whose FINAL resolved
  * `command` is not in `CLAUDE_CLI_COMMANDS` requires
- * `capacity.allowCrossProvider === true` — absent or `false` throws
+ * `executor.allowCrossProvider === true` — absent or `false` throws
  * `RunnerConfigError` here, before any dispatch. Checked on the resolved
- * `command` (never on `capacity.kind` alone, and never on `provider`): a
- * `kind: "cli"` capacity naming no `command`/`adapter` of its own falls
+ * `command` (never on `executor.kind` alone, and never on `provider`): a
+ * `kind: "cli"` executor naming no `command`/`adapter` of its own falls
  * through to `executor` (global, D4 above), ordinarily Claude's
  * own CLI — gating on declared `kind` alone would false-positive that
  * case, and `provider` is a freely-overridable display alias, not the
  * command actually spawned.
  */
 /**
- * Derive a real, spawnable executor block for a `kind:"task"` capacity that
+ * Derive a real, spawnable executor block for a `kind:"task"` executor that
  * declares only `agentType` (no own `command`/`args`) — D1/D2, tsk-3sw,
  * Claude-only for now (this item's own `CONTEXT.md`: multi-provider
  * `agentType` support is `tsk-53h`'s separate follow-on, not built here).
@@ -1028,7 +1028,7 @@ export function modelForTier(cfg, tier, { providerModel = 'claude', rigorOverrid
  * own args template verbatim — never a hardcoded literal copy of
  * `DEFAULT_RUNNER_CONFIG` — so a project's own `--allowedTools`/
  * `--permission-mode` customization carries through to its agentType
- * capacities too. Strips the `'--model','{model}'` pair (D2: the named
+ * executors too. Strips the `'--model','{model}'` pair (D2: the named
  * agent definition's own pinned `model:` frontmatter wins, never overridden
  * by the work item's `tier`) and appends `'--agent', agentType`.
  */
@@ -1046,57 +1046,57 @@ function buildAgentTypeExecutor(baseExecutor, agentType) {
 }
 
 /**
- * Resolve a capacityId from a declared PURPOSE (`for`, D5/D6, tsk-1o7) —
+ * Resolve a executorId from a declared PURPOSE (`for`, D5/D6, tsk-1o7) —
  * the purpose-based binding US-027 requires: a caller like a gather branch
- * never has a pre-registered capacityId to match by name, since its
+ * never has a pre-registered executorId to match by name, since its
  * prompt is composed at runtime (tsk-2ie5/tsk-2c1, the first real
- * consumer). Scans `cfg.capacities` for the first entry whose own `for`
+ * consumer). Scans `cfg.executors` for the first entry whose own `for`
  * ARRAY includes `purpose` (D15, tsk-in1-4: `for` widened from a single
  * value to `string[]` — one executor can serve multiple capabilities at
  * once); returns `null` when none is registered — a legitimate, expected
- * state (no gather-purpose capacity configured yet), never thrown as an
+ * state (no gather-purpose executor configured yet), never thrown as an
  * error here so a caller can cleanly fall back to its own native dispatch
  * instead of treating "not configured" as malformed config.
  *
  * (tsk-in1-4 D10: re-confirmed at shaping time — namespace conflict #3
- * between `capacityIdForWork`'s job-identity result and this registry's
+ * between `executorIdForWork`'s job-identity result and this registry's
  * own executor-name keys is resolved by reusing this exact function,
- * unchanged, never by changing how `capacities` is keyed.)
+ * unchanged, never by changing how `executors` is keyed.)
  */
-export function resolveCapacityIdForPurpose(cfg, purpose) {
-  const capacities = cfg && cfg.capacities && typeof cfg.capacities === 'object' ? cfg.capacities : {};
-  for (const [id, capacity] of Object.entries(capacities)) {
-    if (capacity && Array.isArray(capacity.for) && capacity.for.includes(purpose)) return id;
+export function resolveExecutorIdForPurpose(cfg, purpose) {
+  const executors = cfg && cfg.executors && typeof cfg.executors === 'object' ? cfg.executors : {};
+  for (const [id, executor] of Object.entries(executors)) {
+    if (executor && Array.isArray(executor.for) && executor.for.includes(purpose)) return id;
   }
   return null;
 }
 
 /**
- * Resolve a `capacityId`-OR-purpose name to its real serving capacity,
+ * Resolve a `executorId`-OR-purpose name to its real serving executor,
  * applying `capabilities.<name>.prefer`/`overrides` (2026-08-16 user
  * decision, `docs/decisions/0033-...md`'s sibling `docs/history/
  * capability-capacity-remodel/CONTEXT.md` D1/D2) — the ONE place every
- * `cfg.capacities[capacityId]` lookup in this file should go through
+ * `cfg.executors[executorId]` lookup in this file should go through
  * instead of tracing it out ad hoc (D4: `spawnWorker` used to have its
  * own separate inline lookup for model resolution, distinct from
  * `resolveExecutorConfig`'s own internal one — fixing only one left them
- * resolving inconsistently after a duplicate `capacities.<id>` entry is
+ * resolving inconsistently after a duplicate `executors.<id>` entry is
  * removed in favor of `for`/`prefer`).
  *
- * Order (D1): (1) a literal `cfg.capacities[capacityIdOrPurpose]` entry
+ * Order (D1): (1) a literal `cfg.executors[executorIdOrPurpose]` entry
  * always wins first, unchanged from every pre-this-item caller's own
  * behavior — this is the deep-customization escape-hatch (a different
  * `command`/`args` entirely), never touched by `overrides`. (2) failing
- * that, `cfg.capabilities[capacityIdOrPurpose].prefer` names a capacity
- * that MUST itself declare `for` including `capacityIdOrPurpose`
+ * that, `cfg.capabilities[executorIdOrPurpose].prefer` names a executor
+ * that MUST itself declare `for` including `executorIdOrPurpose`
  * (symmetry, D2) — `prefer` is a tie-breaker among self-declared
- * servers, never a way to assign serving status a capacity never opted
+ * servers, never a way to assign serving status a executor never opted
  * into; a `prefer` that fails this check throws loud (`RunnerConfigError`)
  * rather than silently falling through, matching every other shape-
  * validation gate in this file. (3) failing that, the existing
- * `resolveCapacityIdForPurpose` scan (unchanged, still the "first `for`
+ * `resolveExecutorIdForPurpose` scan (unchanged, still the "first `for`
  * match wins" behavior for a purpose with no `prefer` set). (4) nothing
- * found — `{capacityId: null, configured: false}`, a legitimate,
+ * found — `{executorId: null, configured: false}`, a legitimate,
  * expected state, never thrown.
  *
  * `overrides` (D2, only when resolved via step 2) is returned, never
@@ -1104,87 +1104,87 @@ export function resolveCapacityIdForPurpose(cfg, purpose) {
  * resolution, and only 4 fields are ever eligible
  * (`rigorOverrides`/`providerModel`/`tier`/`model` — never `command`/
  * `args`/`adapter`/`invocations`, D2: a capability can retune HOW
- * strongly its capacity works, never WHAT command actually runs).
+ * strongly its executor works, never WHAT command actually runs).
  * `rigorOverrides`/`providerModel` matter to every model-computing call
- * site (`spawnWorker` and `executeCapacityCli` both). `tier`/`model`
+ * site (`spawnWorker` and `executeExecutorCli` both). `tier`/`model`
  * (a raw, direct override — no `modelForTier` computation at all) only
- * ever mattered for `executeCapacityCli`'s own ad hoc dispatch, the
- * exact same pre-existing scope a plain `capacity.tier`/`capacity.model`
+ * ever mattered for `executeExecutorCli`'s own ad hoc dispatch, the
+ * exact same pre-existing scope a plain `executor.tier`/`executor.model`
  * already had before this item — `spawnWorker` resolves `tier` from the
  * WORK ITEM's own classification (`work.tier`, a scope/effort judgment
- * made once at Discovery, not a per-capacity opt-out) and never accepted
+ * made once at Discovery, not a per-executor opt-out) and never accepted
  * a raw literal model override at all; a capability's `overrides.tier`/
  * `.model` were never meant to reach that door, and self-review found
  * (and left) that scope boundary undisturbed rather than wiring
  * `work.tier` open to being silently overridden by dispatch config.
  */
-export function resolveCapacityAndOverrides(cfg, capacityIdOrPurpose) {
-  const capacities = cfg && cfg.capacities && typeof cfg.capacities === 'object' ? cfg.capacities : {};
-  if (capacities[capacityIdOrPurpose]) {
-    return { capacityId: capacityIdOrPurpose, capacity: capacities[capacityIdOrPurpose], overrides: undefined, configured: true };
+export function resolveExecutorAndOverrides(cfg, executorIdOrPurpose) {
+  const executors = cfg && cfg.executors && typeof cfg.executors === 'object' ? cfg.executors : {};
+  if (executors[executorIdOrPurpose]) {
+    return { executorId: executorIdOrPurpose, executor: executors[executorIdOrPurpose], overrides: undefined, configured: true };
   }
-  const preferred = cfg && cfg.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities[capacityIdOrPurpose]?.prefer : undefined;
+  const preferred = cfg && cfg.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities[executorIdOrPurpose]?.prefer : undefined;
   if (preferred) {
-    const capacity = capacities[preferred];
-    if (!capacity || !Array.isArray(capacity.for) || !capacity.for.includes(capacityIdOrPurpose)) {
+    const executor = executors[preferred];
+    if (!executor || !Array.isArray(executor.for) || !executor.for.includes(executorIdOrPurpose)) {
       throw new RunnerConfigError(
-        `runner config capabilities.${capacityIdOrPurpose}.prefer names "${preferred}" but that capacity does not declare "for" including "${capacityIdOrPurpose}" itself (symmetry required).`,
+        `runner config capabilities.${executorIdOrPurpose}.prefer names "${preferred}" but that executor does not declare "for" including "${executorIdOrPurpose}" itself (symmetry required).`,
       );
     }
-    return { capacityId: preferred, capacity, overrides: cfg.capabilities[capacityIdOrPurpose].overrides, configured: true };
+    return { executorId: preferred, executor, overrides: cfg.capabilities[executorIdOrPurpose].overrides, configured: true };
   }
-  const found = resolveCapacityIdForPurpose(cfg, capacityIdOrPurpose);
+  const found = resolveExecutorIdForPurpose(cfg, executorIdOrPurpose);
   if (found) {
-    return { capacityId: found, capacity: capacities[found], overrides: undefined, configured: true };
+    return { executorId: found, executor: executors[found], overrides: undefined, configured: true };
   }
-  return { capacityId: null, capacity: undefined, overrides: undefined, configured: false };
+  return { executorId: null, executor: undefined, overrides: undefined, configured: false };
 }
 
-function resolveExecutorConfig(cfg, tier, capacityId, fgosDir, contentCarries) {
-  const resolved = capacityId ? resolveCapacityAndOverrides(cfg, capacityId) : undefined;
-  const capacity = resolved?.capacity;
-  // Self-review finding: `capacityId` below is the CALLER's own requested
+function resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCarries) {
+  const resolved = executorId ? resolveExecutorAndOverrides(cfg, executorId) : undefined;
+  const executorEntry = resolved?.executor;
+  // Self-review finding: `executorId` below is the CALLER's own requested
   // id/purpose (e.g. "fgos-coding-implement"), never rewritten to the
-  // capacity `prefer` actually resolved (e.g. "agy") -- every error
-  // message already citing `capacityId` stays worded exactly as before
+  // executor `prefer` actually resolved (e.g. "agy") -- every error
+  // message already citing `executorId` stays worded exactly as before
   // (zero risk to existing message-text expectations), but the
   // `allowCrossProvider` remediation line is the one place an imprecise
-  // id gives actively WRONG advice ("set capacities.fgos-coding-
-  // implement.allowCrossProvider" -- not a real capacities key at all
+  // id gives actively WRONG advice ("set executors.fgos-coding-
+  // implement.allowCrossProvider" -- not a real executors key at all
   // when resolved via `prefer`), so that one message names the real
   // resolved id too when it differs.
-  const realCapacityId = resolved?.capacityId;
+  const realExecutorId = resolved?.executorId;
 
   // D15/tsk-5td, first real gate — carries answers "CAI GI duoc di", never
   // "CO duoc ra ngoai khong" (allowCrossProvider's own question, checked
-  // separately below): when the capacity declares a content-permission
+  // separately below): when the executor declares a content-permission
   // class, the caller must self-declare what THIS dispatch actually
   // carries (`contentCarries`) — fail closed (never silently allow) when
-  // the capacity opts into this gate but the caller passes nothing, since
+  // the executor opts into this gate but the caller passes nothing, since
   // there is then no way to prove the dispatch is safe. `repo-content` is
   // the wider, riskier class (it covers `user-text` plus repo paths/
-  // content); a capacity declaring `carries: "user-text"` refuses a
+  // content); a executor declaring `carries: "user-text"` refuses a
   // `repo-content` dispatch before any spawn (verify item 8, tsk-2c1) —
-  // a capacity declaring `carries: "repo-content"` accepts either.
-  if (capacity && capacity.carries !== undefined) {
+  // a executor declaring `carries: "repo-content"` accepts either.
+  if (executorEntry && executorEntry.carries !== undefined) {
     if (contentCarries === undefined) {
       throw new RunnerConfigError(
-        `capacity "${capacityId}" declares "carries: ${capacity.carries}" but this dispatch did not declare what content it carries — pass an explicit content class before dispatch.`,
+        `executor "${executorId}" declares "carries: ${executorEntry.carries}" but this dispatch did not declare what content it carries — pass an explicit content class before dispatch.`,
       );
     }
-    if (!CAPACITY_CARRIES.includes(contentCarries)) {
+    if (!EXECUTOR_CARRIES.includes(contentCarries)) {
       throw new RunnerConfigError(
-        `dispatch content class must be one of ${CAPACITY_CARRIES.join('/')}, got: ${JSON.stringify(contentCarries)}.`,
+        `dispatch content class must be one of ${EXECUTOR_CARRIES.join('/')}, got: ${JSON.stringify(contentCarries)}.`,
       );
     }
-    if (contentCarries === 'repo-content' && capacity.carries === 'user-text') {
+    if (contentCarries === 'repo-content' && executorEntry.carries === 'user-text') {
       throw new RunnerConfigError(
-        `capacity "${capacityId}" declares "carries: user-text" but this dispatch carries repo-content — refused before spawn (tsk-5td D15).`,
+        `executor "${executorId}" declares "carries: user-text" but this dispatch carries repo-content — refused before spawn (tsk-5td D15).`,
       );
     }
   }
 
-  // tsk-5tm-4 D11: an invocations[]-shaped capacity resolves through its
+  // tsk-5tm-4 D11: an invocations[]-shaped executor resolves through its
   // own invocation, ahead of the flat command/args check below — real
   // entries declare one shape or the other, never both, but invocations[]
   // wins on the (currently hypothetical) case they do.
@@ -1192,33 +1192,33 @@ function resolveExecutorConfig(cfg, tier, capacityId, fgosDir, contentCarries) {
   // Gate B2 (D9, tsk-in1-4): select the invocation whose `via` is `"cli"`
   // specifically — never blindly `invocations[0]` — since `cli-spawn` is
   // the only mechanism this function ever actually dispatches through; a
-  // capacity declaring, say, `[{via:"mcp",...}, {via:"cli",...}]` must
+  // executor declaring, say, `[{via:"mcp",...}, {via:"cli",...}]` must
   // still resolve the cli one regardless of array order.
   //
   // Gate B3 (D9, tsk-in1-4): when `invocations` IS present but none of
   // them is `via:"cli"` (e.g. `gitnexus`'s mcp-only entry), that is a
-  // capacity structurally incapable of being dispatched this way — throw
+  // executor structurally incapable of being dispatched this way — throw
   // explicitly rather than falling through to the global executor as if
-  // the capacity were merely metadata-only. Silently spawning the global
+  // the executor were merely metadata-only. Silently spawning the global
   // Claude executor in gitnexus's name would hide exactly the kind of
   // caller mistake this gate exists to catch ("bẫy B1" from shaping:
   // an mcp identifier misread as a spawnable command).
-  const invocations = Array.isArray(capacity?.invocations) ? capacity.invocations : undefined;
+  const invocations = Array.isArray(executorEntry?.invocations) ? executorEntry.invocations : undefined;
   const cliInvocation = invocations?.find((inv) => inv.via === 'cli');
   if (invocations && !cliInvocation) {
     throw new RunnerConfigError(
-      `capacity "${capacityId}" declares "invocations" but none is dispatchable via "cli" (has: ${invocations.map((inv) => inv.via).join('/')}) — resolveExecutorConfig only ever spawns a cli invocation; this capacity cannot be dispatched this way.`,
+      `executor "${executorId}" declares "invocations" but none is dispatchable via "cli" (has: ${invocations.map((inv) => inv.via).join('/')}) — resolveExecutorConfig only ever spawns a cli invocation; this executor cannot be dispatched this way.`,
     );
   }
-  const resolvedViaAgentType = !cliInvocation && !(capacity && (capacity.adapter || capacity.command)) && Boolean(capacity && capacity.agentType && cfg && cfg.executor);
-  const byCapacity = cliInvocation
-    ? { command: cliInvocation.command, args: cliInvocation.args, adapter: cliInvocation.adapter, provider: capacity.provider }
-    : capacity && (capacity.adapter || capacity.command)
-      ? capacity
+  const resolvedViaAgentType = !cliInvocation && !(executorEntry && (executorEntry.adapter || executorEntry.command)) && Boolean(executorEntry && executorEntry.agentType && cfg && cfg.executor);
+  const byExecutor = cliInvocation
+    ? { command: cliInvocation.command, args: cliInvocation.args, adapter: cliInvocation.adapter, provider: executorEntry.provider }
+    : executorEntry && (executorEntry.adapter || executorEntry.command)
+      ? executorEntry
       : resolvedViaAgentType
-        ? buildAgentTypeExecutor(cfg.executor, capacity.agentType)
+        ? buildAgentTypeExecutor(cfg.executor, executorEntry.agentType)
         : undefined;
-  const executor = byCapacity ?? (cfg && cfg.executor);
+  const executor = byExecutor ?? (cfg && cfg.executor);
   if (!executor || typeof executor.command !== 'string' || !Array.isArray(executor.args)) {
     throw new RunnerConfigError('runner config "executor" must have a string "command" and an "args" array.');
   }
@@ -1227,17 +1227,17 @@ function resolveExecutorConfig(cfg, tier, capacityId, fgosDir, contentCarries) {
   // agentType-resolved path (`buildAgentTypeExecutor` always reuses the
   // global `cfg.executor.command`, always Claude in practice, so the
   // check below is already inert for it) — never a broad `kind` exemption.
-  // Pre-tsk-in1-4 this read `capacity.kind !== 'task'`; `'task'` is no
+  // Pre-tsk-in1-4 this read `executor.kind !== 'task'`; `'task'` is no
   // longer a legal `kind` value at all (D5: `kind` is `agent`/`tool` now,
-  // orthogonal to invocation `via`), and a `kind:"agent"` capacity like
+  // orthogonal to invocation `via`), and a `kind:"agent"` executor like
   // `agy` dispatched via its own `via:"cli"` invocation MUST still clear
   // this gate — that is exactly what `allowCrossProvider` already governs
   // for it today.
-  if (capacity && !resolvedViaAgentType && !CLAUDE_CLI_COMMANDS.includes(executor.command) && capacity.allowCrossProvider !== true) {
-    const remediationId = realCapacityId && realCapacityId !== capacityId ? realCapacityId : capacityId;
-    const resolvedNote = realCapacityId && realCapacityId !== capacityId ? ` (resolved via capabilities."${capacityId}".prefer to capacity "${realCapacityId}")` : '';
+  if (executorEntry && !resolvedViaAgentType && !CLAUDE_CLI_COMMANDS.includes(executor.command) && executorEntry.allowCrossProvider !== true) {
+    const remediationId = realExecutorId && realExecutorId !== executorId ? realExecutorId : executorId;
+    const resolvedNote = realExecutorId && realExecutorId !== executorId ? ` (resolved via capabilities."${executorId}".prefer to executor "${realExecutorId}")` : '';
     throw new RunnerConfigError(
-      `capacity "${capacityId}"${resolvedNote} resolves to non-Claude command "${executor.command}" — prompt content would leave the Claude ecosystem. Set capacities.${remediationId}.allowCrossProvider: true to permit this.`,
+      `executor "${executorId}"${resolvedNote} resolves to non-Claude command "${executor.command}" — prompt content would leave the Claude ecosystem. Set executors.${remediationId}.allowCrossProvider: true to permit this.`,
     );
   }
 
@@ -1246,15 +1246,15 @@ function resolveExecutorConfig(cfg, tier, capacityId, fgosDir, contentCarries) {
 
 /**
  * Native-First Dispatch Doctrine rules 1/2/4 (`docs/decisions/0026-vision-
- * orchestrator-roottask-capacity-native-vs-cli-spawn.md`), as one pure
+ * orchestrator-roottask-executor-native-vs-cli-spawn.md`), as one pure
  * decision — tsk-3ik-1, Phase 4's own shared helper. Deliberately generic
- * over BOTH dispatch targets the doctrine names (a `capacities.<id>`
- * capacity, or a live session's own direct subTask/Task-tool call) — this
+ * over BOTH dispatch targets the doctrine names (a `executors.<id>`
+ * executor, or a live session's own direct subTask/Task-tool call) — this
  * function never reads `cfg`/config itself, only the three booleans any
  * caller for either target shape can derive on its own:
  *
  * - `hasNativeMechanism` — does this target have a real native-dispatch
- *   mechanism at all (a capacity declaring `kind:"task"`; a subTask the
+ *   mechanism at all (a executor declaring `kind:"task"`; a subTask the
  *   caller could invoke via its own Agent/Task tool)? Rule 1: a mechanical
  *   target with no such mechanism always cli/spawns, unconditionally.
  * - `hasLiveTaskAccess` — does the CALLING session already have live
@@ -1279,11 +1279,11 @@ export function decideDispatchMechanism({ hasNativeMechanism, hasLiveTaskAccess,
 }
 
 /**
- * `capacities.<id>`-specific convenience over `decideDispatchMechanism`
- * above (tsk-3ik-1): derives `hasNativeMechanism` (`capacity.kind ===
+ * `executors.<id>`-specific convenience over `decideDispatchMechanism`
+ * above (tsk-3ik-1): derives `hasNativeMechanism` (`executor.kind ===
  * "agent"`, D5 tsk-in1-4 — was `"task"` before `kind` split into the
- * `agent`/`tool` BAN CHAT axis) and `forceCliSpawn` (`capacity.forceCliSpawn`)
- * from `resolveCapacityAndOverrides(cfg, capacityId).capacity` (D4,
+ * `agent`/`tool` BAN CHAT axis) and `forceCliSpawn` (`executor.forceCliSpawn`)
+ * from `resolveExecutorAndOverrides(cfg, executorId).executor` (D4,
  * `docs/history/capability-capacity-remodel/CONTEXT.md` — the same shared
  * resolver `resolveExecutorConfig` now uses too), without calling or
  * mutating `resolveExecutorConfig` itself — this stays a read-only
@@ -1294,9 +1294,9 @@ export function decideDispatchMechanism({ hasNativeMechanism, hasLiveTaskAccess,
  * time). `hasLiveTaskAccess` is never derived here either — same
  * caller-self-declares contract as `decideDispatchMechanism` itself.
  *
- * Cli-spawn-shaped capacities bypass `hasLiveTaskAccess` entirely (D1,
+ * Cli-spawn-shaped executors bypass `hasLiveTaskAccess` entirely (D1,
  * 2026-08-16 user decision, `docs/decisions/0033-...md`, narrowing `0026`
- * rule 2): a capacity that declares its own `command`/`adapter`, or a
+ * rule 2): a executor that declares its own `command`/`adapter`, or a
  * `invocations[].via === "cli"` entry — the same shape test
  * `resolveExecutorConfig`'s own `resolvedViaAgentType`/`cliInvocation`
  * logic already uses, not a new heuristic — names a real, explicitly
@@ -1306,32 +1306,32 @@ export function decideDispatchMechanism({ hasNativeMechanism, hasLiveTaskAccess,
  * stated rationale ("avoid a blind soul re-deriving what a live soul
  * already knows") never applied to this case — it is not re-derivation,
  * it is routing to a genuinely different, operator-configured backend. A
- * capacity that is agentType-shaped only (no command of its own, e.g.
+ * executor that is agentType-shaped only (no command of its own, e.g.
  * `judge-discovery: {kind:'agent', agentType:'judge'}`) keeps today's
  * `hasLiveTaskAccess`-gated behavior unchanged: resolving it in-process
  * already means honoring the configured target (Task tool with that
  * `agentType`), so `0026` rule 2's reasoning still holds there.
  */
-export function decideCapacityDispatchMechanism(cfg, capacityId, { hasLiveTaskAccess = false } = {}) {
-  const capacity = capacityId ? resolveCapacityAndOverrides(cfg, capacityId).capacity : undefined;
+export function decideExecutorDispatchMechanism(cfg, executorId, { hasLiveTaskAccess = false } = {}) {
+  const executor = executorId ? resolveExecutorAndOverrides(cfg, executorId).executor : undefined;
   const isCliSpawnShaped = Boolean(
-    capacity
-      && (capacity.command
-        || capacity.adapter
-        || (Array.isArray(capacity.invocations) && capacity.invocations.some((inv) => inv.via === 'cli'))),
+    executor
+      && (executor.command
+        || executor.adapter
+        || (Array.isArray(executor.invocations) && executor.invocations.some((inv) => inv.via === 'cli'))),
   );
   if (isCliSpawnShaped) return 'out-of-process';
   return decideDispatchMechanism({
-    hasNativeMechanism: Boolean(capacity && capacity.kind === 'agent'),
+    hasNativeMechanism: Boolean(executor && executor.kind === 'agent'),
     hasLiveTaskAccess,
-    forceCliSpawn: Boolean(capacity && capacity.forceCliSpawn === true),
+    forceCliSpawn: Boolean(executor && executor.forceCliSpawn === true),
   });
 }
 
 /**
  * Substitute `{prompt}` and `{model}` into the resolved executor's `args` —
  * PER ARRAY ELEMENT (never joined into one shell string, per the security
- * panel). `capacityId`/`fgosDir`, when given, select a capacity override
+ * panel). `executorId`/`fgosDir`, when given, select a executor override
  * ahead of the global `cfg.executor` (D4/D6, tsk-62v; the intermediate
  * per-tier `executors.<tier>` override this comment used to describe was
  * retired at tsk-in1-2 D6 — 0 live entries); every field omitted keeps
@@ -1362,7 +1362,7 @@ export function decideCapacityDispatchMechanism(cfg, capacityId, { hasLiveTaskAc
  * tip), wrong for a leaf (forks from `fgw/<rootId>`, not main) or a retry
  * (the branch already carries the prior attempt's own commits).
  * `spawnWorker` passes its own worktree `cwd` as `attestRoot`;
- * `executeCapacityCli` (task-dispatch, no worktree involved — genuinely
+ * `executeExecutorCli` (task-dispatch, no worktree involved — genuinely
  * runs against `fgosDir`'s own root) omits it, unchanged.
  *
  * Fail-safe either way: a git read that cannot resolve (detached checkout
@@ -1388,14 +1388,14 @@ function captureDispatchAttestation(fgosDir, attestRoot) {
   };
 }
 
-export function resolveExecutorCommand(cfg, { prompt, model, tier, capacityId, fgosDir, attestRoot, contentCarries } = {}) {
+export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, fgosDir, attestRoot, contentCarries } = {}) {
   // Captured BEFORE resolveExecutorConfig, not after (D3) — cheap and
   // unconditional so the same call site works regardless of whether the
   // resolved executor turns out to be same-provider or cross-provider;
   // resolveExecutorConfig below is still the sole authority on which
   // executor actually gets used.
   const attestation = captureDispatchAttestation(fgosDir, attestRoot);
-  const executor = resolveExecutorConfig(cfg, tier, capacityId, fgosDir, contentCarries);
+  const executor = resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCarries);
   const adapter = executor.adapter ?? DEFAULT_ADAPTER;
   if (!(adapter in EXECUTOR_ADAPTERS)) {
     throw new RunnerConfigError(
@@ -1469,7 +1469,7 @@ function teeChunk(onChunk, stream, chunk) {
  * unchanged in every behavioral detail from before this cell —
  * timeout-on-'exit', hand-tracked maxBuffer kill, onChunk teed before
  * accounting, grandchild-SIGTERM caveat still applies) and `http`
- * (`httpAdapter` below, D13's real pluggability precedent — no capacity
+ * (`httpAdapter` below, D13's real pluggability precedent — no executor
  * dispatches through it yet, same as `cli-spawn` before `agy` existed). An
  * `rpc`/`app-server` adapter (e.g. talking to a headless agent's
  * app-server over RPC instead of CLI argv) stays deferred beyond these
@@ -1636,7 +1636,7 @@ async function httpAdapter(invocation, opts) {
 export const EXECUTOR_ADAPTERS = { [DEFAULT_ADAPTER]: cliSpawnAdapter, http: httpAdapter };
 
 /**
- * Capacity identifier for a work item's executing-stage dispatch (D3,
+ * Executor identifier for a work item's executing-stage dispatch (D3,
  * tsk-62v): the skill name executing-stage resolves to for the item's
  * domain — the same `skillForStage`/`DOMAINS` formula `buildPrompt` already
  * applies internally to build its own `skillPath` (never recomputed a
@@ -1648,17 +1648,17 @@ export const EXECUTOR_ADAPTERS = { [DEFAULT_ADAPTER]: cliSpawnAdapter, http: htt
  * below for template logging (P49's same "cheap, deterministic, no
  * duplicated LOGIC" precedent).
  *
- * Exported (tsk-5tm-6 D12(iii)): `decideCapacityCli`'s `--work <id>` path
+ * Exported (tsk-5tm-6 D12(iii)): `decideExecutorCli`'s `--work <id>` path
  * below is the work-item-shaped lookup `fgos-fanout` needs to consult the
  * dispatch decision protocol before firing an Agent for a candidate,
  * instead of hardcoding native dispatch unconditionally.
  *
- * (tsk-in1-4 D12: re-confirmed at shaping time — a `capacityIdForWork`
- * result MISSING from `cfg.capacities` (keyed by executor name, not job
- * identity) is intentional, not a bug; `decideCapacityCli`'s own `--work`
+ * (tsk-in1-4 D12: re-confirmed at shaping time — a `executorIdForWork`
+ * result MISSING from `cfg.executors` (keyed by executor name, not job
+ * identity) is intentional, not a bug; `decideExecutorCli`'s own `--work`
  * branch below already documents the fallback this design implies.)
  */
-export function capacityIdForWork(work) {
+export function executorIdForWork(work) {
   const domainObj = DOMAINS[resolveDomainName(work.domain)];
   return skillForStage(domainObj, 'executing');
 }
@@ -1667,15 +1667,15 @@ export function capacityIdForWork(work) {
  * Run the headless executor for `work` inside `cwd` (the worktree checkout
  * — this function never touches the main working tree itself; the caller
  * decides `cwd`). Builds the prompt, resolves tier -> model, resolves the
- * (possibly per-tier/per-capacity, P41/tsk-62v) executor + its C9 v2
+ * (possibly per-tier/per-executor, P41/tsk-62v) executor + its C9 v2
  * adapter, substitutes the config template, and delegates the actual spawn
  * to that adapter.
  *
  * `opts.fgosDir` (optional, tsk-62v D6): the `.fgos/` directory, needed
- * only so a `kind: "cli"` capacity's presence can be checked via
+ * only so a `kind: "cli"` executor's presence can be checked via
  * `fgos tool query`'s own functions instead of re-probing PATH. Omitted
  * (every pre-tsk-62v call site) skips that check entirely — the item's own
- * `capacities`/`executors`/`executor` precedence still resolves exactly as
+ * `executors`/`executors`/`executor` precedence still resolves exactly as
  * before.
  *
  * Throws `DispatchError('worker-timeout', ...)` when the executor is killed
@@ -1698,22 +1698,22 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   // exactly what dispatch.test.mjs's "throws a RunnerConfigError ... before
   // any spawn" test pins.
   const tier = work.tier ?? DEFAULTS.tier;
-  // tsk-5tm-5 D9: capacityId computed before modelForTier (moved ahead of
-  // its pre-D9 position, right after) so a capacity's own providerModel/
+  // tsk-5tm-5 D9: executorId computed before modelForTier (moved ahead of
+  // its pre-D9 position, right after) so a executor's own providerModel/
   // rigorOverrides can thread into tier resolution — never borrowing
-  // Claude's model names for a non-Claude capacity's own dispatch.
-  const capacityId = capacityIdForWork(work);
-  const { capacityId: resolvedCapacityId, capacity: capacityForTier, overrides: capabilityOverrides } = capacityId ? resolveCapacityAndOverrides(cfg, capacityId) : {};
+  // Claude's model names for a non-Claude executor's own dispatch.
+  const executorId = executorIdForWork(work);
+  const { executorId: resolvedExecutorId, executor: executorForTier, overrides: capabilityOverrides } = executorId ? resolveExecutorAndOverrides(cfg, executorId) : {};
   const model = modelForTier(cfg, tier, {
-    providerModel: capabilityOverrides?.providerModel ?? capacityForTier?.providerModel,
-    rigorOverrides: capabilityOverrides?.rigorOverrides ?? capacityForTier?.rigorOverrides,
+    providerModel: capabilityOverrides?.providerModel ?? executorForTier?.providerModel,
+    rigorOverrides: capabilityOverrides?.rigorOverrides ?? executorForTier?.rigorOverrides,
   });
   const prompt = buildPrompt(work, opts.feedback, opts.stage);
   const { command, args, adapter, provider, baseCommit, headRef } = resolveExecutorCommand(cfg, {
     prompt,
     model,
     tier,
-    capacityId,
+    executorId,
     fgosDir: opts.fgosDir,
     // tsk-4hl: attest THIS worker's own dispatch worktree, never fgosDir's
     // root (always the main checkout) — see captureDispatchAttestation's
@@ -1729,13 +1729,13 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
 
   // Dispatch chokepoint visibility: one line per real spawn, right before it
   // happens, so a human watching the runner's own stderr can see which job
-  // (executing-stage skill, capacityIdForWork's result — a different axis
-  // than the runner.capabilities catalog, D12) resolved to which capacity
-  // (a real cfg.capacities entry, or the global executor when none matches),
+  // (executing-stage skill, executorIdForWork's result — a different axis
+  // than the runner.capabilities catalog, D12) resolved to which executor
+  // (a real cfg.executors entry, or the global executor when none matches),
   // through which adapter/provider/model/tier. Diagnostic-only: never read
   // back by any caller, never part of this function's return value.
   process.stderr.write(
-    `fgos: dispatch job=${capacityId} capacity=${resolvedCapacityId ?? '(global executor)'} via=${adapter} provider=${provider} model=${model} tier=${tier}\n`,
+    `fgos: dispatch job=${executorId} executor=${resolvedExecutorId ?? '(global executor)'} via=${adapter} provider=${provider} model=${model} tier=${tier}\n`,
   );
 
   // P49: same mechanical selection buildPrompt used internally, called again
@@ -1755,10 +1755,10 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
     tier,
     model,
   }).then(
-    // capacityId/provider (D7, tsk-62v)/baseCommit/headRef (tsk-4hl)/command
+    // executorId/provider (D7, tsk-62v)/baseCommit/headRef (tsk-4hl)/command
     // (tsk-33w D9): additive only — every field this function already
     // returned stays exactly where it was.
-    (result) => ({ ...result, templateName, templateHash, capacityId, provider, command, baseCommit, headRef }),
+    (result) => ({ ...result, templateName, templateHash, executorId, provider, command, baseCommit, headRef }),
     (err) => {
       if (err instanceof DispatchError) {
         err.templateName = templateName;
@@ -1770,9 +1770,9 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
 }
 
 /**
- * Record one `capacity.dispatch` audit line for an IN-SESSION capacity
+ * Record one `executor.dispatch` audit line for an IN-SESSION executor
  * call (a live skill's own gather dispatch, tsk-2ie5/tsk-2c1) — the async
- * claim/dispatch cycle's own `capacity.dispatch` event (`loop.mjs`) only
+ * claim/dispatch cycle's own `executor.dispatch` event (`loop.mjs`) only
  * ever fires from inside a work item's own claim; this is the sibling
  * entry point for a call that has no claim of its own to attach to. Same
  * event `type` and `provider`/`command` shape (D9, `tsk-5td`) so a
@@ -1783,20 +1783,20 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
  * internally (`withEventsLock`, `src/state/events.mjs`) — no extra
  * locking needed here even when multiple gather branches log concurrently.
  */
-export function logCapacityDispatch(fgosDir, { id, capacityId, provider, command, model }) {
+export function logExecutorDispatch(fgosDir, { id, executorId, provider, command, model }) {
   return appendEvent(path.join(fgosDir, 'events.jsonl'), {
-    type: 'capacity.dispatch',
-    payload: { id, capacityId, provider, command, model, baseCommit: null, headRef: null },
+    type: 'executor.dispatch',
+    payload: { id, executorId, provider, command, model, baseCommit: null, headRef: null },
   });
 }
 
 /**
- * `execute <capacityId>` CLI subcommand (tsk-5tm-3 D5): the self-execute
+ * `execute <executorId>` CLI subcommand (tsk-5tm-3 D5): the self-execute
  * counterpart to `resolve` above, matching marketing-cockpit's `run_task()`
  * contract (`task-executor.py:550-611`) — self-execute for every case that
  * can be, hand back only for the one case that genuinely can't. `resolve`
  * always hands back `{command,args}` for the caller to run itself via
- * Bash, even for a `kind:"cli"` capacity that `EXECUTOR_ADAPTERS` could
+ * Bash, even for a `kind:"cli"` executor that `EXECUTOR_ADAPTERS` could
  * already run directly (`EXECUTOR_ADAPTERS['cli-spawn']` was validated at
  * config-load time but, before this item, only ever CALLED by `spawnWorker`
  * — Flow A never called it). `execute` closes that gap:
@@ -1804,16 +1804,16 @@ export function logCapacityDispatch(fgosDir, { id, capacityId, provider, command
  * - **`mechanism: "in-process"`** (native, same-family, live session) —
  *   dispatch itself has no Task/Agent tool to call (a passive CLI/library),
  *   so this is the one case that still hands back — a `spawn_instruction`-
- *   shaped result, `{mechanism, agentType, prompt[, capacityId]}`, for the
+ *   shaped result, `{mechanism, agentType, prompt[, executorId]}`, for the
  *   caller to invoke its OWN Agent/Task tool with. Same `agentType`
  *   resolution and `hasLiveTaskAccess` self-declaration contract `decide`
  *   already uses (never probed or inferred here).
  * - **every other case** (`mechanism: "out-of-process"`, i.e. whatever
- *   `EXECUTOR_ADAPTERS[adapter]` resolves to for this capacity) — self-
+ *   `EXECUTOR_ADAPTERS[adapter]` resolves to for this executor) — self-
  *   executes: calls the adapter directly, the same call `spawnWorker`
  *   already makes for a work item's own dispatch, and returns the REAL
  *   result (`{status,signal,stdout,stderr,tier,model}` from `cliSpawnAdapter`
- *   today, plus `provider`/`command`[, `capacityId`] additive, same
+ *   today, plus `provider`/`command`[, `executorId`] additive, same
  *   shape `spawnWorker`'s own result already carries) — never the bare
  *   `{command,args}` `resolve` hands back for the caller to run through
  *   Bash itself.
@@ -1825,8 +1825,8 @@ export function logCapacityDispatch(fgosDir, { id, capacityId, provider, command
  * exist; the explicit check below is defensive, matching `spawnWorker`'s
  * own belt-and-braces style rather than load-bearing.
  */
-export async function executeCapacityCli(
-  capacityIdArg,
+export async function executeExecutorCli(
+  executorIdArg,
   {
     prompt = '',
     cwd = process.cwd(),
@@ -1841,9 +1841,9 @@ export async function executeCapacityCli(
     onChunk,
   } = {},
 ) {
-  if (!capacityIdArg && !purpose) {
+  if (!executorIdArg && !purpose) {
     throw new RunnerConfigError(
-      'usage: node src/runner/dispatch.mjs execute <capacityId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] [--has-live-task-access] | execute --for <purpose> [...]',
+      'usage: node src/runner/dispatch.mjs execute <executorId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] [--has-live-task-access] | execute --for <purpose> [...]',
     );
   }
   // MAIN CHECKOUT root, not resolveRepoRoot's worktree-own root (tsk-5hv):
@@ -1854,87 +1854,87 @@ export async function executeCapacityCli(
   const root = repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
   const fgosDir = fgosDirFromRoot(root);
   const cfg = ensureRunnerConfigForDir(root);
-  const resolvedByPurpose = !capacityIdArg;
+  const resolvedByPurpose = !executorIdArg;
   // D4 (docs/history/capability-capacity-remodel/CONTEXT.md): resolve
   // through the shared resolver on WHICHEVER key this call actually gave
-  // us — `purpose` when purpose-resolved, `capacityIdArg` when named
+  // us — `purpose` when purpose-resolved, `executorIdArg` when named
   // directly (itself possibly a purpose-shaped id with no literal
-  // `cfg.capacities` entry of its own, e.g. "fgos-coding-implement"
+  // `cfg.executors` entry of its own, e.g. "fgos-coding-implement"
   // resolved via `capabilities.<name>.prefer`). A single call per door,
   // never a second one on the already-resolved id afterward — a prior
-  // version of this fix called `resolveCapacityAndOverrides` a second
-  // time here, on `capacityId` post-resolution: for the `--for` door
-  // that id is already a literal `cfg.capacities` key by then, so the
+  // version of this fix called `resolveExecutorAndOverrides` a second
+  // time here, on `executorId` post-resolution: for the `--for` door
+  // that id is already a literal `cfg.executors` key by then, so the
   // second call always hit the literal-key branch and silently dropped
   // `capabilities.<purpose>.overrides` — found by re-reading this exact
   // code end to end.
   //
   // The two doors keep their own pre-existing error contracts, proven by
-  // real tests: `--for` alone throws when nothing resolves ("no capacity
+  // real tests: `--for` alone throws when nothing resolves ("no executor
   // registered for purpose..." — guides the caller to `decide --for`
-  // first); a named `capacityIdArg` that resolves to nothing NEVER
+  // first); a named `executorIdArg` that resolves to nothing NEVER
   // throws here, silently falling through to the global executor
-  // (`resolvedCapacity` stays `undefined` below) — proven by
-  // `dispatch.test.mjs`'s own "executeCapacityCli falls back to the
-  // global executor when the capacityId is not in cfg.capacities at all
+  // (`resolvedExecutor` stays `undefined` below) — proven by
+  // `dispatch.test.mjs`'s own "executeExecutorCli falls back to the
+  // global executor when the executorId is not in cfg.executors at all
   // -- never throws".
-  let capacityId = capacityIdArg;
-  let resolvedCapacity;
+  let executorId = executorIdArg;
+  let resolvedExecutor;
   let capabilityOverrides;
-  if (!capacityId) {
-    const resolved = resolveCapacityAndOverrides(cfg, purpose);
-    if (!resolved.capacityId) {
+  if (!executorId) {
+    const resolved = resolveExecutorAndOverrides(cfg, purpose);
+    if (!resolved.executorId) {
       throw new RunnerConfigError(
-        `no capacity registered for purpose "${purpose}" — call "decide --for ${purpose}" first to check availability before executing.`,
+        `no executor registered for purpose "${purpose}" — call "decide --for ${purpose}" first to check availability before executing.`,
       );
     }
-    capacityId = resolved.capacityId;
-    resolvedCapacity = resolved.capacity;
+    executorId = resolved.executorId;
+    resolvedExecutor = resolved.executor;
     capabilityOverrides = resolved.overrides;
   } else {
-    const resolved = resolveCapacityAndOverrides(cfg, capacityId);
-    resolvedCapacity = resolved.capacity; // undefined when unconfigured -- falls through to the global executor below, unchanged
+    const resolved = resolveExecutorAndOverrides(cfg, executorId);
+    resolvedExecutor = resolved.executor; // undefined when unconfigured -- falls through to the global executor below, unchanged
     capabilityOverrides = resolved.overrides;
   }
 
   // Dispatch chokepoint visibility (both branches below): "capability" is
   // the purpose actually requested via --for when purpose-resolved, or —
-  // for a direct capacityId call — whichever capabilities that capacity
-  // itself declares serving (capacity.for, D15), so the line still answers
+  // for a direct executorId call — whichever capabilities that executor
+  // itself declares serving (executor.for, D15), so the line still answers
   // "what is this FOR" even without a --for flag. Diagnostic-only.
-  const capabilityLabel = purpose ?? (resolvedCapacity?.for?.join(',') || '(none declared)');
+  const capabilityLabel = purpose ?? (resolvedExecutor?.for?.join(',') || '(none declared)');
 
-  const mechanism = decideCapacityDispatchMechanism(cfg, capacityId, { hasLiveTaskAccess });
+  const mechanism = decideExecutorDispatchMechanism(cfg, executorId, { hasLiveTaskAccess });
   if (mechanism === 'in-process') {
-    const agentType = resolvedCapacity?.agentType;
+    const agentType = resolvedExecutor?.agentType;
     process.stderr.write(
-      `fgos: dispatch capability=${capabilityLabel} capacity=${capacityId} via=in-process agentType=${agentType ?? '(none)'} provider=n/a model=n/a tier=n/a\n`,
+      `fgos: dispatch capability=${capabilityLabel} executor=${executorId} via=in-process agentType=${agentType ?? '(none)'} provider=n/a model=n/a tier=n/a\n`,
     );
     const base = { mechanism, agentType, prompt };
-    return resolvedByPurpose ? { ...base, capacityId } : base;
+    return resolvedByPurpose ? { ...base, executorId } : base;
   }
 
-  const capacity = resolvedCapacity;
+  const executor = resolvedExecutor;
   // Precedence (D2): an explicit caller-supplied override always wins
   // (tierOverride/modelOverride — e.g. a `--tier`/`--model` CLI flag);
   // next, capabilities.<name>.overrides (this dispatch's own purpose
-  // asked for a different rigor than the capacity's own default); next,
-  // the capacity's own literal tier/model; finally the mechanical
+  // asked for a different rigor than the executor's own default); next,
+  // the executor's own literal tier/model; finally the mechanical
   // default. `capabilityOverrides?.tier`/`.model` were validated as
   // legal fields (validateCapabilitiesShape) but never actually
   // consulted here until this line -- found during self-review: they
   // silently did nothing, the same class of bug D4 already found once
   // for spawnWorker's own separate lookup.
-  const tier = tierOverride ?? capabilityOverrides?.tier ?? capacity?.tier ?? DEFAULTS.tier;
-  const model = modelOverride ?? capabilityOverrides?.model ?? capacity?.model ?? modelForTier(cfg, tier, {
-    providerModel: capabilityOverrides?.providerModel ?? capacity?.providerModel,
-    rigorOverrides: capabilityOverrides?.rigorOverrides ?? capacity?.rigorOverrides,
+  const tier = tierOverride ?? capabilityOverrides?.tier ?? executor?.tier ?? DEFAULTS.tier;
+  const model = modelOverride ?? capabilityOverrides?.model ?? executor?.model ?? modelForTier(cfg, tier, {
+    providerModel: capabilityOverrides?.providerModel ?? executor?.providerModel,
+    rigorOverrides: capabilityOverrides?.rigorOverrides ?? executor?.rigorOverrides,
   });
   const { command, args, adapter, provider } = resolveExecutorCommand(cfg, {
     prompt,
     model,
     tier,
-    capacityId,
+    executorId,
     fgosDir,
     contentCarries: carries,
     attestRoot: cwd,
@@ -1946,21 +1946,21 @@ export async function executeCapacityCli(
   const timeoutMs = timeoutOverride ?? cfg.timeoutMs;
   const maxBuffer = maxBufferOverride ?? 10 * 1024 * 1024;
   process.stderr.write(
-    `fgos: dispatch capability=${capabilityLabel} capacity=${capacityId} via=${adapter} provider=${provider} model=${model} tier=${tier}\n`,
+    `fgos: dispatch capability=${capabilityLabel} executor=${executorId} via=${adapter} provider=${provider} model=${model} tier=${tier}\n`,
   );
-  const result = await adapterFn({ command, args }, { cwd, timeoutMs, maxBuffer, onChunk, workId: capacityId, tier, model });
+  const result = await adapterFn({ command, args }, { cwd, timeoutMs, maxBuffer, onChunk, workId: executorId, tier, model });
   const base = { mechanism, ...result, provider, command };
-  return resolvedByPurpose ? { ...base, capacityId } : base;
+  return resolvedByPurpose ? { ...base, executorId } : base;
 }
 
 /**
- * `decide <capacityId>` CLI subcommand (tsk-3ik-1): lets a task-dispatch
+ * `decide <executorId>` CLI subcommand (tsk-3ik-1): lets a task-dispatch
  * consumer skill ask, before choosing whether to `execute` the command or
  * call its own Task tool natively, which mechanism
- * `decideCapacityDispatchMechanism` picks for this capacity right now.
+ * `decideExecutorDispatchMechanism` picks for this executor right now.
  * Prints `{"mechanism": "in-process"|"out-of-process"}` as JSON to stdout — same
- * additive-sibling relationship to `executeCapacityCli` above as
- * `decideCapacityDispatchMechanism` has to `resolveExecutorConfig`: reads
+ * additive-sibling relationship to `executeExecutorCli` above as
+ * `decideExecutorDispatchMechanism` has to `resolveExecutorConfig`: reads
  * the same committed runner config, calls nothing that also feeds
  * `execute`'s own resolution path (tsk-60f D4: the `resolve` CLI subcommand
  * this docblock used to describe here was retired -- 0 production
@@ -1971,48 +1971,48 @@ export async function executeCapacityCli(
  * documents) that this session already has live Agent/Task tool access.
  *
  * `agentType` (tsk-3ik-3, additive): included in the result, alongside
- * `mechanism`, whenever the capacity declares one — a `mechanism:
+ * `mechanism`, whenever the executor declares one — a `mechanism:
  * "in-process"` result is otherwise useless to a consumer skill's own
  * Agent/Task tool call, which needs a concrete `subagent_type` to invoke,
  * not just "go in-process" with no target. Omitted (`undefined`, dropped by
- * `JSON.stringify`) for a capacity with no `agentType`, e.g. every `kind:
- * "cli"` capacity — `mechanism` for those always resolves
+ * `JSON.stringify`) for a executor with no `agentType`, e.g. every `kind:
+ * "cli"` executor — `mechanism` for those always resolves
  * `"out-of-process"` anyway (rule 1/3), so no consumer ever needs
  * `agentType` in that case.
  *
  * `work` (tsk-5tm-6 D4/D12(iii)): a work-item id, resolved to its dispatch
- * capacity via `capacityIdForWork` (the same executing-stage skill lookup
+ * executor via `executorIdForWork` (the same executing-stage skill lookup
  * `spawnWorker` already applies) before deciding its mechanism -- the
  * lookup `fgos-fanout` needs to consult this protocol per-candidate before
  * firing an Agent, instead of assuming native dispatch unconditionally.
- * Lowest precedence of the three selectors (a real `capacityIdArg` always
+ * Lowest precedence of the three selectors (a real `executorIdArg` always
  * wins, `for` next, matching every pre-D4 caller's byte-identical
  * behavior) since no existing caller ever passes more than one.
  *
  * `needsSoul` (tsk-60f D2): the caller's own self-declaration that it is
- * about to fire its own Agent/Task tool with no capacity or work item to
+ * about to fire its own Agent/Task tool with no executor or work item to
  * name -- the natural fourth signal `decide` never had, distinct from a
  * fourth lookup door (an explicit `--subtask` door was rejected: a
  * sub-task's only natural key is a purpose label, i.e. `for`). Only
- * consulted once every capacityId/purpose/work resolution above came up
+ * consulted once every executorId/purpose/work resolution above came up
  * empty (a real match always wins, unchanged): when `needsSoul` is true,
  * that empty resolution defaults to native dispatch
  * (`hasNativeMechanism: true`) instead of `"unavailable"` -- the exact
- * generalization of `work`'s own `hasExplicitCapacity === false` branch
+ * generalization of `work`'s own `hasExplicitExecutor === false` branch
  * above, which has hardcoded this same default for every `--work` caller
  * since tsk-5tm-6.
  *
  * `configured` (tsk-60f D3, additive on every returned shape): `true` when
- * the resolved `capacityId` names a real `cfg.capacities` entry, `false`
+ * the resolved `executorId` names a real `cfg.executors` entry, `false`
  * otherwise -- distinguishing "nothing registered under this name/purpose"
  * from "registered, and its own kind resolves out-of-process", which today
  * both silently collapse into the same `mechanism: "out-of-process"`
  * value. Never a reason to throw (D3): a work item whose own
- * `capacityIdForWork` result has no override configured is `configured:
+ * `executorIdForWork` result has no override configured is `configured:
  * false` by design (tsk-in1 D12), not an error.
  *
  * `mcpTool` (tsk-45f D10, additive, mutually exclusive with `agentType`):
- * MCP hand-back -- a `kind:"tool"` capacity whose mcp invocation declares a
+ * MCP hand-back -- a `kind:"tool"` executor whose mcp invocation declares a
  * `tools` map (piece 3) with an entry for the requested purpose gets
  * `mechanism` upgraded from `out-of-process` to `in-process`, carrying
  * `mcpTool` instead of `agentType`. Same reasoning as the agent-kind
@@ -2020,67 +2020,67 @@ export async function executeCapacityCli(
  * OWN MCP tool directly (AGENTS.md's Dispatch section, D12). Never builds
  * an MCP client here, never touches Gate B3 (`resolveExecutorConfig`) --
  * a caller that skips `decide` and calls `execute` directly on an mcp-only
- * capacity still hits that gate exactly as before.
+ * executor still hits that gate exactly as before.
  */
-export async function decideCapacityCli(
-  capacityIdArg,
+export async function decideExecutorCli(
+  executorIdArg,
   { cwd = process.cwd(), repoRoot, hasLiveTaskAccess = false, for: purpose, work: workIdArg, needsSoul = false } = {},
 ) {
-  if (!capacityIdArg && !purpose && !workIdArg && !needsSoul) {
+  if (!executorIdArg && !purpose && !workIdArg && !needsSoul) {
     throw new RunnerConfigError(
-      'usage: node src/runner/dispatch.mjs decide <capacityId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--has-live-task-access] | decide --needs-soul [--has-live-task-access]',
+      'usage: node src/runner/dispatch.mjs decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--has-live-task-access] | decide --needs-soul [--has-live-task-access]',
     );
   }
-  // Same main-checkout resolution as executeCapacityCli above, same reason.
+  // Same main-checkout resolution as executeExecutorCli above, same reason.
   const root = repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
   const cfg = ensureRunnerConfigForDir(root);
-  // Indirect binding (purpose OR work-item) each report capacityId back
+  // Indirect binding (purpose OR work-item) each report executorId back
   // additively (see below) -- same byte-identical-shape reasoning
-  // `executeCapacityCli` above already uses, generalized past purpose-only.
-  const resolvedIndirectly = !capacityIdArg;
-  let capacityId = capacityIdArg;
-  if (!capacityId && workIdArg) {
+  // `executeExecutorCli` above already uses, generalized past purpose-only.
+  const resolvedIndirectly = !executorIdArg;
+  let executorId = executorIdArg;
+  if (!executorId && workIdArg) {
     const fgosDir = fgosDirFromRoot(root);
     const workItem = listWork(fgosDir).work[workIdArg];
     if (!workItem) {
-      throw new RunnerConfigError(`no work item "${workIdArg}" found -- cannot resolve its dispatch capacity.`);
+      throw new RunnerConfigError(`no work item "${workIdArg}" found -- cannot resolve its dispatch executor.`);
     }
-    capacityId = capacityIdForWork(workItem);
-    // tsk-5tm-6 D4: a work-item-resolved capacityId with NO explicit
-    // cfg.capacities entry means "no override configured" -- per
+    executorId = executorIdForWork(workItem);
+    // tsk-5tm-6 D4: a work-item-resolved executorId with NO explicit
+    // cfg.executors entry means "no override configured" -- per
     // Native-First Dispatch Doctrine (docs/decisions/0026) rule 2, every
     // fgos-fanout candidate is a same-provider (Claude), soul-needing
     // target (a full rootTask run through /fgOS:pick) and therefore
-    // defaults to native, NOT to decideCapacityDispatchMechanism's generic
-    // "no registered capacity -> out-of-process" fallback below (correct
-    // only for a NAMED capacity helper that may genuinely have no native
+    // defaults to native, NOT to decideExecutorDispatchMechanism's generic
+    // "no registered executor -> out-of-process" fallback below (correct
+    // only for a NAMED executor helper that may genuinely have no native
     // equivalent, e.g. agy -- confirmed live: `resolve fgos-coding-implement`
     // silently falls back to the bare global executor, the exact "blind
     // cli/spawn even though the caller is already a live same-provider
     // soul" bug 0026 itself names as the motivating gap). Deliberately
     // narrower than the name/purpose-resolved paths below -- both keep
-    // their pre-D4 "no capacity -> out-of-process" behavior byte-identical,
-    // since naming a specific capacityId/purpose asks about that
+    // their pre-D4 "no executor -> out-of-process" behavior byte-identical,
+    // since naming a specific executorId/purpose asks about that
     // registered target specifically, not a work item's default dispatch.
-    const hasExplicitCapacity = resolveCapacityAndOverrides(cfg, capacityId).configured;
-    if (!hasExplicitCapacity) {
+    const hasExplicitExecutor = resolveExecutorAndOverrides(cfg, executorId).configured;
+    if (!hasExplicitExecutor) {
       const mechanism = decideDispatchMechanism({ hasNativeMechanism: true, hasLiveTaskAccess, forceCliSpawn: false });
-      return { mechanism, capacityId, configured: false };
+      return { mechanism, executorId, configured: false };
     }
   }
-  // Purpose-based binding, same precedence as executeCapacityCli above. No
+  // Purpose-based binding, same precedence as executeExecutorCli above. No
   // match is a legitimate "not configured yet" state for `decide`
   // specifically -- `mechanism: "unavailable"` lets a caller like
   // gather's own fan-out branch tell "fall back to native" apart from
   // "in-process"/"out-of-process" with one more enum value, never a thrown
   // error for an expected, common state.
-  if (!capacityId && purpose) {
-    capacityId = resolveCapacityIdForPurpose(cfg, purpose);
+  if (!executorId && purpose) {
+    executorId = resolveExecutorIdForPurpose(cfg, purpose);
   }
-  if (!capacityId) {
+  if (!executorId) {
     // needsSoul (D2): an empty resolution defaults to native dispatch
     // instead of "unavailable" -- same default `work`'s own
-    // hasExplicitCapacity branch above already hardcodes, generalized to
+    // hasExplicitExecutor branch above already hardcodes, generalized to
     // every door.
     if (needsSoul) {
       const mechanism = decideDispatchMechanism({ hasNativeMechanism: true, hasLiveTaskAccess, forceCliSpawn: false });
@@ -2088,26 +2088,26 @@ export async function decideCapacityCli(
     }
     return { mechanism: 'unavailable', configured: false };
   }
-  const mechanism = decideCapacityDispatchMechanism(cfg, capacityId, { hasLiveTaskAccess });
-  const { capacity, configured } = resolveCapacityAndOverrides(cfg, capacityId);
-  const agentType = capacity?.agentType;
+  const mechanism = decideExecutorDispatchMechanism(cfg, executorId, { hasLiveTaskAccess });
+  const { executor, configured } = resolveExecutorAndOverrides(cfg, executorId);
+  const agentType = executor?.agentType;
 
-  // tsk-45f D10: MCP hand-back -- a tool-kind capacity with an mcp
+  // tsk-45f D10: MCP hand-back -- a tool-kind executor with an mcp
   // invocation and a matching entry in that invocation's own `tools` map
-  // (piece 3) hands back `mcpTool` the same way an agent-kind capacity
+  // (piece 3) hands back `mcpTool` the same way an agent-kind executor
   // hands back `agentType`: dispatch has neither an Agent/Task tool nor an
   // MCP client of its own (AGENTS.md's own Dispatch section, D12), so the
   // caller calls its OWN MCP tool directly. Only overrides `mechanism` when
-  // it would otherwise be `out-of-process` -- an agent-kind capacity's own
+  // it would otherwise be `out-of-process` -- an agent-kind executor's own
   // `agentType` hand-back always wins, unchanged. The purpose used to look
   // up the map is the explicit `--for` value when given, else the
-  // capacity's own sole `for` entry when it names exactly one (a direct
-  // `decide <capacityId>` call has no purpose of its own to disambiguate
+  // executor's own sole `for` entry when it names exactly one (a direct
+  // `decide <executorId>` call has no purpose of its own to disambiguate
   // among several).
   let mcpTool;
   if (mechanism === 'out-of-process') {
-    const mcpInvocation = Array.isArray(capacity?.invocations) ? capacity.invocations.find((inv) => inv.via === 'mcp') : undefined;
-    const lookupPurpose = purpose ?? (Array.isArray(capacity?.for) && capacity.for.length === 1 ? capacity.for[0] : undefined);
+    const mcpInvocation = Array.isArray(executor?.invocations) ? executor.invocations.find((inv) => inv.via === 'mcp') : undefined;
+    const lookupPurpose = purpose ?? (Array.isArray(executor?.for) && executor.for.length === 1 ? executor.for[0] : undefined);
     const candidate = lookupPurpose && mcpInvocation?.tools ? mcpInvocation.tools[lookupPurpose] : undefined;
     if (typeof candidate === 'string' && candidate) mcpTool = candidate;
   }
@@ -2117,7 +2117,7 @@ export async function decideCapacityCli(
     : typeof agentType === 'string' && agentType
       ? { mechanism, agentType, configured }
       : { mechanism, configured };
-  return resolvedIndirectly ? { ...base, capacityId } : base;
+  return resolvedIndirectly ? { ...base, executorId } : base;
 }
 
 // CLI entry point — only runs when this file is executed directly (`node
@@ -2126,19 +2126,19 @@ export async function decideCapacityCli(
 if (import.meta.url === `file://${process.argv[1]}`) {
   const [subcommand, ...afterSubcommand] = process.argv.slice(2);
   // Purpose-based binding (tsk-2c1): a caller with no pre-registered
-  // capacityId to name (a gather branch) passes `--for <purpose>` instead
+  // executorId to name (a gather branch) passes `--for <purpose>` instead
   // of a positional id — distinguished here by whether the token right
   // after the subcommand looks like a flag. Every pre-tsk-2c1 invocation
-  // always names a real, non-"--"-prefixed capacityId positionally, so
+  // always names a real, non-"--"-prefixed executorId positionally, so
   // this never changes behavior for an existing caller.
-  const capacityId = afterSubcommand[0] && !afterSubcommand[0].startsWith('--') ? afterSubcommand[0] : undefined;
-  const rest = capacityId ? afterSubcommand.slice(1) : afterSubcommand;
+  const executorId = afterSubcommand[0] && !afterSubcommand[0].startsWith('--') ? afterSubcommand[0] : undefined;
+  const rest = executorId ? afterSubcommand.slice(1) : afterSubcommand;
   const flagValue = (name) => {
     const i = rest.indexOf(name);
     return i !== -1 ? rest[i + 1] : undefined;
   };
   if (subcommand === 'execute') {
-    executeCapacityCli(capacityId, {
+    executeExecutorCli(executorId, {
       prompt: flagValue('--prompt') ?? '',
       model: flagValue('--model'),
       tier: flagValue('--tier'),
@@ -2155,7 +2155,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       },
     );
   } else if (subcommand === 'decide') {
-    decideCapacityCli(capacityId, {
+    decideExecutorCli(executorId, {
       hasLiveTaskAccess: rest.includes('--has-live-task-access'),
       for: flagValue('--for'),
       work: flagValue('--work'),
@@ -2170,27 +2170,27 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       },
     );
   } else if (subcommand === 'log') {
-    // capacityId here is the SAME shared positional above — the log
-    // line's own capacityId, e.g. whichever id `decide`'s own result
+    // executorId here is the SAME shared positional above — the log
+    // line's own executorId, e.g. whichever id `decide`'s own result
     // named, never a second parsing scheme.
     const id = flagValue('--id');
     const provider = flagValue('--provider');
     const command = flagValue('--command');
     const model = flagValue('--model');
-    if (!id || !capacityId || !provider || !command) {
+    if (!id || !executorId || !provider || !command) {
       process.stderr.write(
-        'usage: node src/runner/dispatch.mjs log <capacityId> --id <workItemId> --provider <p> --command <c> [--model <m>]\n',
+        'usage: node src/runner/dispatch.mjs log <executorId> --id <workItemId> --provider <p> --command <c> [--model <m>]\n',
       );
       process.exitCode = 1;
     } else {
       const root = resolveMainCheckoutRoot(process.cwd()) ?? resolveRepoRoot(process.cwd());
       const fgosDir = fgosDirFromRoot(root);
-      const event = logCapacityDispatch(fgosDir, { id, capacityId, provider, command, model });
+      const event = logExecutorDispatch(fgosDir, { id, executorId, provider, command, model });
       process.stdout.write(`${JSON.stringify(event)}\n`);
     }
   } else {
     process.stderr.write(
-      `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs execute <capacityId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] [--has-live-task-access] | execute --for <purpose> [...] | decide <capacityId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | log <capacityId> --id <id> --provider <p> --command <c> [--model <m>]\n`,
+      `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs execute <executorId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] [--has-live-task-access] | execute --for <purpose> [...] | decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | log <executorId> --id <id> --provider <p> --command <c> [--model <m>]\n`,
     );
     process.exitCode = 1;
   }

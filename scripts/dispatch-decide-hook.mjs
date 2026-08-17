@@ -7,14 +7,14 @@
 // definition need-soul + has-live-task-access, so the hook always passes
 // both signals -- it never has to guess.
 //
-// Calls `decideCapacityCli` directly, in-process (same "the skill already
+// Calls `decideExecutorCli` directly, in-process (same "the skill already
 // self-knows its own tool manifest" pattern `fgos-session-start-hook.mjs`
 // already uses for its own imports) -- never shells out to `dispatch.mjs`
 // as a subprocess: that would force reconstructing dispatch.mjs's own file
 // path from the resolved git root, which only happens to work when this
 // hook fires from inside fgOS's own checkout (the common case here, but
 // not a safe assumption for every future consumer, and needlessly brittle
-// even here). `decideCapacityCli` already resolves the caller's own repo
+// even here). `decideExecutorCli` already resolves the caller's own repo
 // root from `cwd` internally -- one resolution, not two.
 //
 // NEVER hangs the caller on a `decide` hiccup: any failure to read/parse
@@ -25,7 +25,7 @@
 // errors).
 
 import fs from 'node:fs';
-import { decideCapacityCli } from '../src/runner/dispatch.mjs';
+import { decideExecutorCli } from '../src/runner/dispatch.mjs';
 
 const AGENT_TOOL_NAMES = new Set(['Agent', 'Task']);
 
@@ -49,7 +49,7 @@ async function decideBlock() {
 
   let decided;
   try {
-    decided = await decideCapacityCli(undefined, { cwd: payloadCwd, for: subagentType, needsSoul: true, hasLiveTaskAccess: true });
+    decided = await decideExecutorCli(undefined, { cwd: payloadCwd, for: subagentType, needsSoul: true, hasLiveTaskAccess: true });
   } catch {
     return null;
   }
