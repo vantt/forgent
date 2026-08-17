@@ -2,6 +2,15 @@
 
 ## 1. Trạng thái hiện tại
 
+Vòng 8 (2026-08-17): người dùng xác nhận mở rộng scope sang tầng
+compounding/Diataxis. 6 điểm đã giữ ổn định đủ round (D4) — đã mint D1-D6
+qua `fgos decision --id tsk-1lv` (seq 18961-18966), viết lại §4/§6/§7 đầy
+đủ, kèm sơ đồ kiến trúc 3 tầng. Còn 3 điểm mở (door risk-tier scope, approve
+vs verb riêng, cơ chế tìm-trước-khi-tạo cụ thể) — CHƯA D-ID, cần thêm ít
+nhất 1 round nữa trước khi coi là chốt. `refs` CHƯA set (còn 3 điểm mở, và
+`fgos-coding-shaping` chỉ set `refs`/handoff khi người dùng xác nhận
+discussion đã converge — chưa tới bước đó).
+
 Vòng 7 (2026-08-17): người dùng chọn (B) — retire `docs/decisions/*.md`
 corpus, dồn narrative vào `docs/specs/<area>.md`. Đồng thời nêu vấn đề rộng
 hơn: quá nhiều tài liệu spec/doc ngày càng phình, không rõ cái nào mới
@@ -95,7 +104,20 @@ chưa; (2) chỉ sau đó mới bàn có nên tự xây, xây gì, xây ở tầ
 
 ## 4. Quyết định đã chốt
 
-(chưa có — vòng 1, chưa điểm nào giữ ổn định qua >1 round)
+| D-ID | Tóm tắt | Round chốt | fgos decision seq |
+|---|---|---|---|
+| D1 | Năng lực chung cho MỌI project dùng fgOS, không chỉ dogfood nội bộ forgentX | round 1→8 (ổn định, không đổi) | 18961 |
+| D2 | Không xây stored graph/daemon riêng — consistency derive tại write-time sweep + close-time door (mirror bee R9), không phải một graph lưu trữ song song | round 3→8 (sửa khuyến nghị sai ở round 2) | 18962 |
+| D3 | KHÔNG xây decision-store mới — fgOS đã có `state.decisions` (event-sourced, port từ bee tsk-63c); việc cần làm là WIRE bề mặt đọc (CONTEXT.md, docs/specs) vào đây | round 5→8 | 18963 |
+| D4 | 3 loại quyết định gốc map vào `state.decisions`: bookkeeping máy→`kind:engine` (đã có); quyết định cấp item→`kind:design`+`id` (ghi đã có, thiếu render); quyết định platform→cần field MỚI `scope`/`area` | round 6→8 | 18964 |
+| D5 | Retire `docs/decisions/*.md` corpus (35 file, 1-file/quyết định) — narrative dồn vào `docs/specs/<area>.md`; `state.decisions` giữ record ngắn làm nguồn thật | round 6 đề xuất → round 7 xác nhận → round 8 mint | 18965 |
+| D6 | Mở rộng scope sang tầng Diataxis end-user docs (267 file, `fgos-coding-compounding`) — thêm bước tìm-trước-khi-tạo theo nội dung + cho phép reconcile/retire prose cũ (sửa luật cấm hiện tại) | round 7 đề xuất → round 8 xác nhận → round 8 mint | 18966 |
+
+**Còn treo, CHƯA D-ID** (chưa đủ round ổn định hoặc chưa hỏi): scope 4-door
+(mọi item hay theo risk-tier — round 4 fork #2), harness đặt ở `fgos
+approve` hay verb/CI riêng (round 4 fork #3), cơ chế tìm-trước-khi-tạo cho
+D6 cụ thể là gì (semantic search, fuzzy filename, hay tra `docs/specs/
+reading-map.md` bằng tay như bee-scribing đang làm).
 
 ## 5. Q&A log
 
@@ -618,10 +640,166 @@ mới mâu thuẫn, thay vì cấm tuyệt đối như hiện tại — hay anh 
 lần này CHỈ ở docs/decisions + state.decisions, để phần compounding/Diataxis
 thành một item riêng sau?
 
-## 6. Thiết kế đã chốt
+### Round 8 — 2026-08-17T10:25Z — xác nhận mở rộng, mint D1-D6
 
-(chưa có — chưa điểm nào đủ ổn định để tổng hợp thành thiết kế)
+Người dùng trả lời "có muốn mở rộng" — xác nhận D6. Với D6 giữ ổn định qua
+round 7→8 (2 round, không đổi), cộng D1 (round 1, dùng xuyên suốt không bị
+thách thức qua 7 round sau), D2/D3 (round 3/5, dùng làm nền cho mọi round
+sau không bị revise), D4/D5 (round 6→7 xác nhận), tất cả đủ điều kiện D4
+(giữ ổn định qua >1 round) — mint 6 D-ID qua `fgos decision --id tsk-1lv`:
+D1 (seq 18961), D2 (18962), D3 (18963), D4 (18964), D5 (18965), D6 (18966).
+Viết lại §4 (bảng D-ID) và §6 (tổng hợp đầy đủ + sơ đồ mermaid) toàn bộ theo
+đúng shape hiện tại — không lắp ghép đoạn cũ. §7 mở 5 candidate task, 4 cái
+đầu phụ thuộc chuỗi (`relation/sweep` → `scope+index` → `CONTEXT.md render`
+/ `retire corpus`), task thứ 5 (compounding anti-fork) độc lập, làm song
+song được. 3 điểm còn mở nêu ở §1/§6 — chưa đủ round để mint, cần hỏi tiếp
+trước khi coi discussion converge và set `refs`/handoff sang
+fgos-coding-exploring.
+
+## 6. Thiết kế đã chốt {#design}
+
+### Vấn đề
+
+fgOS (và mọi project dùng fgOS) đang tích luỹ rule/decision/doc theo 3 kênh
+tách rời — quyết định cấp item (CONTEXT.md, prose), quyết định cấp platform
+(`docs/decisions/*.md`, 35 file Nygard-style tay-viết), và tài liệu người-
+dùng-cuối (267 file Diataxis: explanation/reference/how-to/tutorials, sinh
+bởi `fgos-coding-compounding`) — không kênh nào có cơ chế "đây là bản mới
+nhất, đúng nhất" đáng tin. Hệ quả đã xảy ra thật (STR72, 2026-07-21): một
+quyết định đổi rồi nhưng agent phiên sau vẫn đọc ra kết luận cũ, vì (a)
+không ai bắt buộc sync artifact nguồn khi supersede, và (b)
+`fgos-coding-compounding` có luật CẤM tường minh việc sửa/rút gọn prose cũ
+— khiến tài liệu chỉ có thể phình, không bao giờ tự làm sạch.
+
+### Nguyên lý thiết kế (từ bee v2.7.0, đã kiểm chứng chạy thật trong production của họ)
+
+1. **Không một store/graph mới** (D2, D3) — fgOS đã có `state.decisions`
+   (event-sourced, `.fgos/events.jsonl`). Sửa/mở rộng cái đã có, không xây
+   song song.
+2. **Mọi write khai quan hệ tường minh** — thêm `--relation
+   supersedes:<id>|touches:<id>|none` vào `fgos decision`; văn bản đọc như
+   supersession mà không khai flag bị refuse (đóng đúng lỗ STR72 đã đào —
+   bee tự đo được 70/99 decision từng giấu supersession trong prose trước
+   khi có guard này).
+3. **Sweep tươi tại write-time, không cache** — supersede/touches quét lại
+   `docs/**` mỗi lần, hit chưa reconcile tự "sống lại" ở lần flush sau.
+4. **Index là projection, generate-được, có `--check` drift mode** — không
+   còn file tay-viết đóng vai "nguồn sự thật".
+5. **Cho phép reconcile/retire, không chỉ cấm-rồi-thêm** — sửa luật hiện
+   tại của `fgos-coding-compounding` (D6) để một capture mới có thể sửa/rút
+   gọn prose cũ khi có bằng chứng mâu thuẫn, thay vì chỉ được append mãi.
+
+### Kiến trúc theo 3 tầng fgOS thật
+
+```mermaid
+flowchart TB
+    subgraph HARNESS["HARNESS (src/state, src/verbs, bin/fgos.mjs)"]
+        SD["state.decisions\n(.fgos/events.jsonl, đã có — D3)"]
+        REL["fgos decision --relation\n(MỚI — supersedes/touches/none)"]
+        SCOPE["--scope/--area field\n(MỚI — cho quyết định platform, D4)"]
+        SWEEP["sweep write-time\n(nâng cấp 2 script detection-only\nhiện có thành hàm đồng bộ)"]
+        IDX["docs/decisions/index.md\n(generate + --check, thay 0000-index.md tay-viết)"]
+        REL --> SD
+        SCOPE --> SD
+        REL --> SWEEP
+        SD --> IDX
+    end
+
+    subgraph SKILLSCORE["SKILLS-CORE (.claude/skills/_shared/)"]
+        HELPER["fragment chung:\nreconcile-vs-waive\n+ đọc kết quả sweep"]
+    end
+
+    subgraph DOCTRINE["SKILLS — DOCTRINE (SKILL.md, AGENTS.md)"]
+        SHAPING["fgos-coding-shaping/-exploring/-planning\n(tự áp luật relation lên D-ID của chính mình)"]
+        CTX["CONTEXT.md Locked-Decisions\n= render TỪ state.decisions\n(không tự viết song song)"]
+        SPECS["docs/specs/<area>.md\n= nơi narrative platform-level\nsống (thay docs/decisions/*.md — D5)"]
+        COMP["fgos-coding-compounding\n+ bước tìm-trước-khi-tạo\n+ cho phép reconcile prose cũ (D6)"]
+    end
+
+    SD --> HELPER
+    HELPER --> SHAPING
+    HELPER --> CTX
+    IDX --> SPECS
+    HELPER --> COMP
+
+    style HARNESS fill:#1e3a5f,color:#fff
+    style SKILLSCORE fill:#4a4a2e,color:#fff
+    style DOCTRINE fill:#3a1e3a,color:#fff
+```
+
+### Còn mở (chưa D-ID, cần quyết trước khi viết plan thật)
+
+- Door chặn close (freshness/impact/routing/doc-deferral, mirror bee) áp
+  cho MỌI item hay theo risk-tier (bee: "lane scales ceremony, never
+  memory")?
+- Harness đặt ở `fgos approve` hay một verb/CI job riêng?
+- Cơ chế "tìm-trước-khi-tạo" của D6 cụ thể là gì (semantic search qua nội
+  dung, fuzzy-match tên, hay tra `reading-map.md` bằng tay như bee-scribing
+  hiện làm)?
 
 ## 7. Danh mục hạng mục / task
 
-(chưa có — quá sớm để tách task khi thiết kế chưa hình thành)
+### {#task-decision-relation-and-sweep}
+
+- **Mục tiêu:** `fgos decision` đòi khai `--relation supersedes:<id>|
+  touches:<id>|none`; văn bản đọc như supersession mà không khai flag bị
+  refuse; supersede/touches chạy sweep `docs/**` đồng bộ, tạo capture-stub
+  cho hit chưa reconcile.
+- **Trích §6:** mục "Mọi write khai quan hệ tường minh" + "Sweep tươi tại
+  write-time".
+- **D-ID áp dụng:** D2, D3.
+- **Quan hệ:** nền tảng cho mọi task khác — task sau phụ thuộc field
+  `--relation`/`--scope` đã có.
+- **Verify nháp:** `node bin/fgos.mjs decision "supersedes old X" --rationale "..." ` (không `--relation`) phải bị refuse; kèm `--relation supersedes:0012` phải qua.
+
+### {#task-scope-field-and-index-generate}
+
+- **Mục tiêu:** thêm field `scope`/`area` vào schema `state.decisions`;
+  sinh `docs/decisions/index.md` (generate, thay `0000-index.md` tay-viết)
+  với `--check` drift mode.
+- **Trích §6:** mục "Index là projection, generate-được".
+- **D-ID áp dụng:** D4.
+- **Quan hệ:** phụ thuộc task trên (field `scope` cần tồn tại trước khi
+  index group theo scope).
+- **Verify nháp:** `node bin/fgos.mjs decisions index --check` exit 0 sau
+  khi generate lại, exit non-zero nếu file tay-sửa lệch.
+
+### {#task-context-md-render-from-state-decisions}
+
+- **Mục tiêu:** bảng "Locked Decisions" trong `CONTEXT.md` trở thành render
+  từ `state.decisions` lọc theo `id`, không còn viết tay song song (đóng
+  gap tsk-1ud để lại).
+- **Trích §6:** mục kiến trúc SKILLS-CORE (`HELPER`→`CTX`).
+- **D-ID áp dụng:** D3.
+- **Quan hệ:** phụ thuộc task đầu (cần field `--relation` ổn định trước khi
+  đổi authoring convention của CONTEXT.md).
+- **Verify nháp:** một D-ID mint qua `fgos decision --id` phải xuất hiện
+  đúng hàng trong `CONTEXT.md` sau lần render kế tiếp, không cần sửa tay.
+
+### {#task-retire-decisions-corpus-to-specs}
+
+- **Mục tiêu:** migrate nội dung 35 file `docs/decisions/000N-*.md` vào
+  `docs/specs/<area>.md` tương ứng (narrative) + `state.decisions` (record
+  ngắn, `scope`/`area` field); retire corpus cũ.
+- **Trích §6:** mục "Cho phép reconcile/retire" + nguyên lý D5.
+- **D-ID áp dụng:** D5.
+- **Quan hệ:** phụ thuộc `{#task-scope-field-and-index-generate}` (cần field
+  `scope` tồn tại trước khi migrate).
+- **Verify nháp:** sau migrate, `docs/decisions/` không còn file quyết định
+  cá nhân (chỉ còn artifact generate nếu giữ); mọi id ADR cũ resolve được
+  qua `state.decisions --scope`.
+
+### {#task-compounding-anti-fork-and-reconcile}
+
+- **Mục tiêu:** `fgos-coding-compounding` thêm bước tìm-trước-khi-tạo theo
+  nội dung (không chỉ theo tên file) trước khi quyết `docs/<quadrant>/
+  <file>.md`; sửa luật "never delete, shorten, restructure" thành cho phép
+  reconcile khi có capture mới mâu thuẫn bằng chứng cũ.
+- **Trích §6:** mục "Cho phép reconcile/retire, không chỉ cấm-rồi-thêm" +
+  nguyên lý D6.
+- **D-ID áp dụng:** D6.
+- **Quan hệ:** độc lập với 4 task trên (bề mặt khác — Diataxis, không phải
+  decisions) — có thể làm song song.
+- **Verify nháp:** case thật — 2 capture cùng chủ đề khác tên gọi phải hội
+  tụ về 1 file, không tạo file thứ 2; 1 capture phủ định capture cũ phải
+  sửa được đoạn cũ, không chỉ append.
