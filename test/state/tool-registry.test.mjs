@@ -36,11 +36,11 @@ test('normalizeCapability returns "" for non-string or content-free input', () =
 
 // ─── toolsFromCapacities ─────────────────────────────────────────────────────
 
-test('toolsFromCapacities maps a capability-bearing capacity into a tool-shaped object, normalizing capability — probe kind/command read from invocations[0], not capacity.kind (tsk-in1-4 D5)', () => {
+test('toolsFromCapacities maps a "for"-bearing capacity into a tool-shaped object, normalizing capability — probe kind/command read from invocations[0], not capacity.kind (tsk-in1-4 D5)', () => {
   const capacities = {
     gitnexus: {
       kind: 'tool',
-      capability: 'Impact Analysis',
+      for: ['Impact Analysis'],
       invocations: [{ via: 'mcp', command: 'mcp:gitnexus' }],
       scanTarget: '.gitnexus',
       responsibility: 'Verification',
@@ -56,17 +56,22 @@ test('toolsFromCapacities maps a capability-bearing capacity into a tool-shaped 
   assert.equal(tools.gitnexus.scanTarget, '.gitnexus');
 });
 
-test('toolsFromCapacities skips a capacity declaring no capability (a plain agent/dispatch capacity, e.g. "agy")', () => {
+test('toolsFromCapacities skips a capacity declaring no "for" (a plain agent/dispatch capacity, e.g. "agy")', () => {
   const capacities = { agy: { kind: 'agent', invocations: [{ via: 'cli', command: 'agy', args: [] }] } };
   assert.deepEqual(toolsFromCapacities(capacities), {});
 });
 
-test('toolsFromCapacities skips a capacity whose capability normalizes to empty', () => {
-  assert.deepEqual(toolsFromCapacities({ x: { kind: 'tool', capability: '---' } }), {});
+test('toolsFromCapacities skips a kind:"agent" capacity even when it DOES declare "for" -- the real regression found live: tsk-34n D3 gave "agy" its own "for" (so capabilities.<name>.prefer can resolve it), and without this gate every agent-kind capacity that migrated to "for" would incorrectly show up as tool-registry-probeable', () => {
+  const capacities = { agy: { kind: 'agent', for: ['fgos-coding-implement'], invocations: [{ via: 'cli', command: 'agy', args: [] }] } };
+  assert.deepEqual(toolsFromCapacities(capacities), {});
 });
 
-test('toolsFromCapacities reads "unknown" kind/command when the capacity declares a capability but no invocations at all', () => {
-  const tools = toolsFromCapacities({ x: { kind: 'tool', capability: 'foo' } });
+test('toolsFromCapacities skips a capacity whose "for"[0] normalizes to empty', () => {
+  assert.deepEqual(toolsFromCapacities({ x: { kind: 'tool', for: ['---'] } }), {});
+});
+
+test('toolsFromCapacities reads "unknown" kind/command when the capacity declares "for" but no invocations at all', () => {
+  const tools = toolsFromCapacities({ x: { kind: 'tool', for: ['foo'] } });
   assert.equal(tools.x.kind, undefined);
   assert.equal(tools.x.command, undefined);
 });
@@ -76,21 +81,17 @@ test('toolsFromCapacities on undefined/empty input returns {}', () => {
   assert.deepEqual(toolsFromCapacities({}), {});
 });
 
-// ─── toolsFromCapacities: `for` vs `capability` (tsk-45f D11) ─────────────────
+// ─── toolsFromCapacities: "for" is the only accepted input (tsk-34n --
+// retires tsk-45f D11's own "capability" (singular) back-compat fallback) ──
 
-test('toolsFromCapacities reads "for" over "capability" when a capacity declares both', () => {
-  const tools = toolsFromCapacities({ x: { kind: 'tool', capability: 'old-name', for: ['new-name'] } });
-  assert.equal(tools.x.capability, 'new-name');
-});
-
-test('toolsFromCapacities falls back to "capability" when "for" is absent -- unmigrated capacity keeps working', () => {
-  const tools = toolsFromCapacities({ x: { kind: 'tool', capability: 'impact-analysis' } });
-  assert.equal(tools.x.capability, 'impact-analysis');
-});
-
-test('toolsFromCapacities reads "for"\'s first entry when a capacity declares no "capability" at all -- fully migrated capacity', () => {
+test('toolsFromCapacities reads "for"\'s first entry as the capability', () => {
   const tools = toolsFromCapacities({ x: { kind: 'tool', for: ['impact-analysis', 'other-capability'] } });
   assert.equal(tools.x.capability, 'impact-analysis');
+});
+
+test('toolsFromCapacities no longer reads the legacy "capability" (singular) field at all -- a capacity declaring only it (no "for") is skipped, same as one declaring neither', () => {
+  const tools = toolsFromCapacities({ x: { kind: 'tool', capability: 'impact-analysis' } });
+  assert.deepEqual(tools, {});
 });
 
 // ─── probeTool ───────────────────────────────────────────────────────────────

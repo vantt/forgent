@@ -2979,28 +2979,12 @@ test('loadRunnerConfig accepts a "capacities.<id>" entry with a valid carries va
   assert.doesNotThrow(() => loadRunnerConfig(configPath));
 });
 
-// --- tsk-45f D11: "capability" (the tool-registry's own field) now gets the
-// same catalog check "for" already had -------------------------------------
+// --- tsk-34n: the legacy "capability" (singular) field on a capacity is no
+// longer read or validated at all -- "for" is the only recognized field ----
 
-test('loadRunnerConfig accepts a "capacities.<id>" entry whose "capability" is declared in "capabilities"', () => {
+test('loadRunnerConfig ignores a "capacities.<id>" entry\'s stray "capability" field entirely -- no longer validated against "capabilities", never throws', () => {
   const dir = mkTempDir();
-  const configPath = path.join(dir, 'capability-ok.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      capabilities: { 'impact-analysis': {} },
-      capacities: { gitnexus: { kind: 'tool', capability: 'impact-analysis', invocations: [{ via: 'mcp', command: 'mcp:gitnexus' }] } },
-      models: { standard: 'sonnet' },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.doesNotThrow(() => loadRunnerConfig(configPath));
-});
-
-test('loadRunnerConfig rejects a "capacities.<id>" entry whose "capability" is not declared in "capabilities"', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'capability-bad.json');
+  const configPath = path.join(dir, 'stray-capability.json');
   fs.writeFileSync(
     configPath,
     JSON.stringify({
@@ -3010,25 +2994,10 @@ test('loadRunnerConfig rejects a "capacities.<id>" entry whose "capability" is n
       timeoutMs: 1000,
     }),
   );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+  assert.doesNotThrow(() => loadRunnerConfig(configPath));
 });
 
-test('loadRunnerConfig rejects a "capacities.<id>" entry whose "capability" is not a non-empty string', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'capability-not-string.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      capacities: { gitnexus: { kind: 'tool', capability: 123, invocations: [{ via: 'mcp', command: 'mcp:gitnexus' }] } },
-      models: { standard: 'sonnet' },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
-});
-
-test('loadRunnerConfig accepts a "capacities.<id>" entry naming neither "for" nor "capability" (a plain dispatch capacity)', () => {
+test('loadRunnerConfig accepts a "capacities.<id>" entry naming neither "for" nor the legacy "capability" (a plain dispatch capacity)', () => {
   const dir = mkTempDir();
   const configPath = path.join(dir, 'no-capability.json');
   fs.writeFileSync(

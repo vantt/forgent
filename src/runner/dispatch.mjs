@@ -704,23 +704,6 @@ function validateCapacityShape(capacity, label, capabilityNames) {
       }
     }
   }
-  // tsk-45f D11: `capability` (the tool-registry's own free-text field,
-  // `toolsFromCapacities`) gets the same catalog check `for` already has
-  // above -- previously unvalidated entirely, so a typo'd/undeclared value
-  // silently made a tool invisible to `fgos tool query --capability ...`
-  // with no error anywhere. Never required alongside `for`: a capacity
-  // migrated to `for` (D11's own tolerant-fallback shape) may omit
-  // `capability` entirely.
-  if (capacity.capability !== undefined) {
-    if (typeof capacity.capability !== 'string' || !capacity.capability.trim()) {
-      throw new RunnerConfigError(`runner config (${label}) "capability" must be a non-empty string when present.`);
-    }
-    if (!capabilityNames.has(capacity.capability)) {
-      throw new RunnerConfigError(
-        `runner config (${label}) "capability" entry "${capacity.capability}" is not declared in "capabilities" — add it there first (D4/D14/D15).`,
-      );
-    }
-  }
   // D15/tsk-5td: the content-permission layer, alongside for/needs above.
   // Optional (a capacity naming no `carries` skips resolveExecutorConfig's
   // own carries gate entirely, byte-identical to every pre-D15 capacity) —

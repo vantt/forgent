@@ -102,3 +102,59 @@ headless --work (hasLiveTaskAccess:false): {"mechanism":"out-of-process","config
 ```
 
 Matches `tsk-pdg`'s own pre-migration evidence exactly.
+
+## Final cleanup round — failing-test-first proof (retiring `capacity.capability`)
+
+The user asked to fully retire the legacy `capacities.<id>.capability`
+(singular) back-compat field (no longer reading it, no longer validating
+it against the `capabilities` catalog) rather than keep it as a
+compatibility shim. Removing its fallback read in
+`toolsFromCapacities` (`src/state/tool-registry.mjs`) exposed a real,
+previously-latent bug: the function's only prior gate for "is this
+tool-registry-probeable" was "declares `for`" — and this item's own D3
+migration was the first time an agent-kind capacity (`agy`) started
+declaring `for` (so `capabilities.<name>.prefer` could resolve it). Without
+an explicit `kind !== 'tool'` gate, `agy` started incorrectly appearing as
+a tool-registry-probeable entry. Fixed by adding that gate before the
+capability extraction.
+
+**Red** (`src/state/tool-registry.mjs` reverted via `git stash push --
+src/state/tool-registry.mjs` to its state before this round's fix, running
+the new regression test that proves the bug):
+
+```
+✖ toolsFromCapacities skips a kind:"agent" capacity even when it DOES
+  declare "for" -- the real regression found live: tsk-34n D3 gave "agy"
+  its own "for" (so capabilities.<name>.prefer can resolve it), and
+  without this gate every agent-kind capacity that migrated to "for"
+  would incorrectly show up as tool-registry-probeable
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  + { agy: { capability: 'fgos-coding-implement', command: 'agy', kind: 'cli', name: 'agy', ... } }
+  - {}
+```
+
+(A second test in the same red run also failed for the expected reason —
+`toolsFromCapacities no longer reads the legacy "capability" (singular)
+field at all` — since the stashed file still had the old fallback read.)
+
+**Green** (`git stash pop`, restoring both the `kind !== 'tool'` gate and
+the fallback removal):
+
+```
+ℹ tests 23
+ℹ pass 23
+ℹ fail 0
+```
+
+`git status --short src/state/tool-registry.mjs` after restore: clean, no
+diff — the stash pop returned the file to its exact pre-stash content.
+
+## Full suite (final cleanup round)
+
+`npm test`: 3477 pass / 0 fail, 5 skipped (up from the self-review round's
+3479 total gross test count — 2 obsolete `capacity.capability`-catalog-
+validation tests deleted, 1 new tool-registry regression test added, net
+change reflects both). Ran clean from the worktree after all fixture/test
+updates across `test/runner/dispatch.test.mjs`, `test/state/tool-registry.
+test.mjs`, `test/cli/fgos-tool.test.mjs`, and `test/setup/checks.test.mjs`.

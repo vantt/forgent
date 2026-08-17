@@ -55,21 +55,24 @@ export function normalizeCapability(raw) {
  * Turn `cfg.capacities` (`.fgos/config.json`'s `runner.capacities`, D1) into
  * the tool-shaped objects `probeTool`/`classifyRegistryPosture` already
  * expect — pure, never touches fs. A capacity entry is a TOOL (as opposed to
- * an agent/dispatch capacity like `agy`) precisely when it declares a
- * capability, via either of the two fields below — the one thing a plain
- * dispatch capacity never carries.
+ * an agent/dispatch capacity like `agy`) precisely when it declares
+ * `kind: "tool"` — `for` alone is NOT a safe signal (tsk-34n D2/D3 gave
+ * `agy`, a `kind:"agent"` capacity, its own real `for` too, so a
+ * dispatch-only capacity can legitimately declare `for` now without
+ * becoming tool-registry-probeable).
  *
- * tsk-45f D11: `capacity.for` (the array `decide --for`/`resolveCapacityIdForPurpose`
- * already read) and `capacity.capability` (this function's own prior sole
- * source) were two separate fields answering the same question — a real
- * capacity (`gitnexus`) declared only `capability`, so `decide --for
+ * tsk-45f D11 (superseded by tsk-34n): `capacity.for` (the array `decide
+ * --for`/`resolveCapacityIdForPurpose` already read) replaced the older
+ * `capacity.capability` single-value field entirely — a real capacity
+ * (`gitnexus`) once declared only `capability`, so `decide --for
  * impact-analysis` always answered `unavailable` despite `fgos tool query
- * --capability impact-analysis` finding it. `for` now wins when present
- * (`for[0]`, the correct single-value projection of this function's own
- * always-one-capability-per-entry shape — a capacity serving several
- * capabilities is still one tool-registry row); `capability` remains a
- * tolerant fallback for a capacity not yet migrated, never removed as
- * accepted input by this change alone.
+ * --capability impact-analysis` finding it. `for[0]` is the correct
+ * single-value projection of this function's own always-one-capability-
+ * per-entry shape (a capacity serving several capabilities is still one
+ * tool-registry row). The `capability` fallback tsk-45f kept for
+ * not-yet-migrated capacities is retired (tsk-34n): every capacity in this
+ * repo's own config has carried `for` since tsk-45f itself landed, and
+ * `capability` is no longer read as input anywhere.
  *
  * tsk-in1-4 D5: `capacity.kind` stopped meaning "presence-probe mechanism"
  * the moment `dispatch.mjs`'s own `kind` became the `agent`/`tool` BAN CHAT
@@ -88,7 +91,17 @@ export function normalizeCapability(raw) {
 export function toolsFromCapacities(capacities) {
   const tools = {};
   for (const [id, capacity] of Object.entries(capacities ?? {})) {
-    const rawCapability = Array.isArray(capacity?.for) && capacity.for.length > 0 ? capacity.for[0] : capacity?.capability;
+    // tsk-34n regression found live: `agy` (kind:"agent") started
+    // declaring its own "for" (D3's migration, so `capabilities.<name>.
+    // prefer` can resolve it) -- without this gate, ANY capacity naming
+    // "for" got treated as a tool-registry-probeable "tool", conflating
+    // the dispatch registry (kind:"agent", a live persona) with the
+    // presence-probe registry (kind:"tool", mechanical, e.g. gitnexus/
+    // herdr) this function's own docstring already says are different.
+    // "for" alone was never a safe signal on its own now that both kinds
+    // legitimately declare it.
+    if (capacity?.kind !== 'tool') continue;
+    const rawCapability = Array.isArray(capacity?.for) && capacity.for.length > 0 ? capacity.for[0] : undefined;
     const capability = normalizeCapability(rawCapability);
     if (!capability) continue;
     const invocation = Array.isArray(capacity.invocations) ? capacity.invocations[0] : undefined;

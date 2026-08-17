@@ -180,3 +180,56 @@ by this item), low real-world exploitability (`capacityId` values come
 from config-driven or operator-typed CLI args, not an untrusted network
 boundary), and fixing it broadly (every lookup site, not just the new
 one) is a separate, unrelated hardening item if ever worth doing.
+
+## Final cleanup round (post-return, before merge)
+
+User asked to fully retire `capacities.<id>.capability` (singular) —
+tsk-45f-era back-compat that D3's own `for`-based model made redundant —
+rather than keep both fields alive indefinitely.
+
+1. **Removed the `capacity.capability` catalog-validation block** from
+   `validateRunnerConfigShape` in `src/runner/dispatch.mjs` (tsk-45f D11):
+   the field is no longer read or validated at all, so a config carrying
+   it now loads without error (stray key, ignored — same as any other
+   unrecognized field this validator already tolerates).
+2. **Removed the `capacity?.capability` fallback read** in
+   `toolsFromCapacities` (`src/state/tool-registry.mjs`) — `for` is now
+   the only field this function ever reads for a capacity's declared
+   capability. Single confirmed real caller: `checkToolRegistryConfigured`
+   in `src/setup/registrations.mjs:538` (feeds `fgos doctor`/`fgos tool
+   check|query`); GitNexus returned "not found" for this symbol (stale/
+   incomplete index posture, per this repo's own impact-analysis gate), so
+   this was cross-checked with a real grep sweep instead of trusted blind.
+3. **Found and fixed a real regression this removal exposed** (not a
+   pre-existing bug — a direct consequence of D3's own migration earlier
+   in this item): `toolsFromCapacities`'s only prior gate for "is this
+   tool-registry-probeable" was "declares `for`" at all. D3 gave `agy`
+   (`kind: "agent"`) its own `for` array (so `capabilities.<name>.prefer`
+   could resolve it) — the first time an agent-kind capacity ever declared
+   `for`. Without an explicit gate, `agy` started incorrectly appearing as
+   a tool-registry-probeable entry once the live config picked up D3's
+   migration. Fixed with an explicit `if (capacity?.kind !== 'tool')
+   continue;` gate before the capability extraction. Real failing-before/
+   passing-after transcript in `iron-law-evidence.md`'s "Final cleanup
+   round" section.
+4. **Test fixtures updated**, no test coverage lost: rewrote
+   `test/state/tool-registry.test.mjs`'s `toolsFromCapacities` block
+   (fixtures switched from `capability: 'X'` to `for: ['X']`; 2 obsolete
+   precedence/fallback tests removed; 2 new tests added — the regression
+   above, and confirming the legacy field is fully inert). Fixed the
+   `declareCapacity`/`declareGitnexus` fixture helpers and all direct call
+   sites in `test/cli/fgos-tool.test.mjs` and `test/setup/checks.test.mjs`
+   the same way. Deleted 3 now-obsolete `capacity.capability`-catalog-
+   validation tests from `test/runner/dispatch.test.mjs`, replacing them
+   with one test confirming a stray `capability` field is silently
+   ignored.
+5. **Live `.fgos/config.json` migrated**: removed the stray `"capability"`
+   field from the `gitnexus` and `herdr` capacity entries (both already
+   carried the real `for` array from D3's own migration, so this is a pure
+   deletion of dead config, no behavior change). Also added `"prefer":
+   "gitnexus"` to the `impact-analysis` capability in the same pass (a
+   separate, independent config edit the user requested directly —
+   `fgos-coding-implement` already had `"prefer": "agy"`).
+
+Full suite after this round: 3477 pass / 0 fail, 5 skipped — see
+`iron-law-evidence.md` for the real red/green transcript.
