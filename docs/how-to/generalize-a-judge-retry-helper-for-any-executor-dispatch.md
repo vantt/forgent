@@ -1,12 +1,12 @@
 ---
 type: how-to
-title: How to extract a judge-only retry helper into a capacity-agnostic one
-tags: [judge-executor, retry, capacity-dispatch, runner, escalation]
+title: How to extract a judge-only retry helper into a executor-agnostic one
+tags: [judge-executor, retry, executor-dispatch, runner, escalation]
 timestamp: 2026-08-01T10:10:37.000Z
 source_capture_ids: [tsk-418-1, tsk-418-2, tsk-418]
 ---
 
-# How to extract a judge-only retry helper into a capacity-agnostic one
+# How to extract a judge-only retry helper into a executor-agnostic one
 
 `src/intake/judge-executor.mjs`'s `runJudgeExecutor` grew a bounded-retry
 shape — a stricter-instruction suffix on retry, JSON-parse-or-retry — for
@@ -75,12 +75,12 @@ radius blocking reuse by any other dispatch call site.
 
 ## Why this shape, not a bigger rewrite
 
-A capacity-aware dispatch schema (`cfg.capacities.<id>`) was already being
+A executor-aware dispatch schema (`cfg.executors.<id>`) was already being
 generalized elsewhere in the same runner (`src/runner/dispatch.mjs`,
-`resolveExecutorConfig`'s tier/executors/capacities precedence). It would
+`resolveExecutorConfig`'s tier/executors/executors precedence). It would
 have been tempting to wire the new generic retry helper straight into that
-capacities schema in the same pass. That was deliberately deferred to a
-separate, dependent piece of work instead: the capacities schema wasn't yet
+executors schema in the same pass. That was deliberately deferred to a
+separate, dependent piece of work instead: the executors schema wasn't yet
 merged into this branch when the extraction happened, and bundling a
 schema-dependent feature (an opt-in escalation-to-fallback step) with a
 zero-risk parameter-threading refactor would have gated the safe change
@@ -90,7 +90,7 @@ schema state as its own following step.
 
 ## Adding an opt-in escalation-to-fallback-tier step on top
 
-Once `runRetryingExecutor` exists (above), a capacity can opt into falling
+Once `runRetryingExecutor` exists (above), a executor can opt into falling
 back to a different executor when its own attempts are exhausted — without
 touching any external config schema at all, since the fallback is just
 another parameter passed at the call site.
@@ -130,13 +130,13 @@ another parameter passed at the call site.
    push) — not a second bounded-attempts loop. If the fallback also fails,
    the whole call returns `null`, exactly like today.
 
-4. **Prove it with a non-judge capacity, as a test double — no real second
+4. **Prove it with a non-judge executor, as a test double — no real second
    consumer required.** Reusability is provable without wiring in a second
    production call site: write a test that calls `runRetryingExecutor`
    directly (not through `runJudgeExecutor`) with its own made-up tier and
    `escalateTier`, using fake executor scripts exactly like the existing
    judge tests do. This is enough to demonstrate the helper is genuinely
-   capacity-agnostic; wiring a real second capacity (e.g. a submit-time
+   executor-agnostic; wiring a real second executor (e.g. a submit-time
    classification step) in for production is separate, later work with its
    own scope and its own config.
 

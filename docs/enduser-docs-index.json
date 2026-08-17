@@ -259,6 +259,38 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/decisions/0032-cong-iron-law-chi-hoi-o-ranh-gioi-trunk-them-muc-warn.md",
+    "title": "0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/decisions/0032-multi-role-team-harness-role-holder-axis-va-handoff.md",
+    "title": "0032 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/decisions/0033-cli-spawn-shaped-capacity-thang-hasLiveTaskAccess.md",
+    "title": "0033 — Capacity cli-spawn-shaped thắng `hasLiveTaskAccess`, thu hẹp 0026 rule 2",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/decisions/0034-doi-ten-capacity-thanh-executor-chot-tach-capability.md",
+    "title": "0034 — Đổi tên `capacity`/`capacities` thành `executor`/`executors`, chốt tách `capability`",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/a-decision-doc-can-be-superseded-twice-superseded-by-becomes-a-list.md",
     "title": "A decision doc can be superseded twice — superseded_by becomes a list",
     "sourceCaptureId": "tsk-5wf"
@@ -275,9 +307,9 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
-    "docPath": "docs/explanation/agent-executor-capacity-aware-dispatch.md",
-    "title": "Why capacity-aware backend dispatch exists",
-    "sourceCaptureId": "tsk-64p"
+    "docPath": "docs/explanation/agent-executor-executor-aware-dispatch.md",
+    "title": "Why executor-aware backend dispatch exists",
+    "sourceCaptureId": null
   },
   {
     "quadrant": "explanation",
@@ -299,14 +331,6 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
-    "docPath": "docs/explanation/capacity-dispatch-audit-records-command-not-just-provider-label.md",
-    "title": "Why capacity.dispatch audits record command alongside provider",
-    "sourceCaptureId": "tsk-33w"
-  },
-  {
-    "quadrant": "explanation",
-    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
-    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/cli-invocation-fault-provenance.md",
     "title": "Why malformed CLI invocations now leave a provenance trace",
     "sourceCaptureId": "tsk-5z0"
@@ -315,9 +339,9 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
-    "docPath": "docs/explanation/coding-classify-intake-capacity-lifecycle-created-then-retired-as-dead-config.md",
-    "title": "The coding-classify-intake capacity's full lifecycle — created, never wired, retired as dead config",
-    "sourceCaptureId": "tsk-3fj"
+    "docPath": "docs/explanation/coding-classify-intake-executor-lifecycle-created-then-retired-as-dead-config.md",
+    "title": "The coding-classify-intake executor's full lifecycle — created, never wired, retired as dead config",
+    "sourceCaptureId": null
   },
   {
     "quadrant": "explanation",
@@ -406,6 +430,14 @@
     "docPath": "docs/explanation/events-jsonl-lost-update-race-under-concurrent-session-writes.md",
     "title": "Why `.fgos/events.jsonl` can silently lose lines under concurrent session writes",
     "sourceCaptureId": "tsk-2xt"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/executor-dispatch-audit-records-command-not-just-provider-label.md",
+    "title": "Why executor.dispatch audits record command alongside provider",
+    "sourceCaptureId": null
   },
   {
     "quadrant": "explanation",
@@ -779,6 +811,14 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md",
+    "title": "Why a clean `npm test` run missed 16 edge gaps after the lifecycle rebuild",
+    "sourceCaptureId": "tsk-2el"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/why-a-per-stage-exception-in-the-driver-meant-that-stage-had-no-owner.md",
     "title": "Why a per-stage exception in the driver meant that stage had no owner",
     "sourceCaptureId": "tsk-tku"
@@ -891,6 +931,22 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-backlog-is-a-new-global-status-before-todo-not-a-domain-relabel.md",
+    "title": "Why `backlog` is a new global status before `todo`, not a domain relabel",
+    "sourceCaptureId": "tsk-5wr"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-bee-prefixed-identifiers-became-fgos-prefixed.md",
+    "title": "Why `BEE_`-prefixed identifiers became `FGOS_`-prefixed (and some didn't)",
+    "sourceCaptureId": "tsk-19z"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/why-catchup-needed-its-own-already-caught-up-guard.md",
     "title": "Why `fgos catchup` needed its own already-caught-up guard",
     "sourceCaptureId": "tsk-k7i"
@@ -974,6 +1030,14 @@
     "docPath": "docs/explanation/why-decomposes-skip-and-advance-is-narrower-than-discoverys.md",
     "title": "Why `decompose`'s skip-and-advance is narrower than `discovery`'s",
     "sourceCaptureId": "tsk-19j-2"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-discover-next-shrank-to-a-picker.md",
+    "title": "Why `/fgOS:discover-next` shrank to a picker",
+    "sourceCaptureId": "tsk-lya"
   },
   {
     "quadrant": "explanation",
@@ -1086,6 +1150,14 @@
     "docPath": "docs/explanation/why-fgos-merge-safety-shipped-as-ten-items-under-one-milestone.md",
     "title": "Why fgOS's merge safety work shipped as ten items under one milestone",
     "sourceCaptureId": "tsk-5t3a"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-fgos-move-refuses-awaiting-approval-from-doing-without-skip-return-guard.md",
+    "title": "Why `fgos move --to awaiting-approval` refuses a `doing` item without `--skip-return-guard`",
+    "sourceCaptureId": "tsk-280"
   },
   {
     "quadrant": "explanation",
@@ -1259,6 +1331,14 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-plan-mjs-refined-pass-skips-priority-when-a-human-override-decision-exists.md",
+    "title": "Why `plan.mjs`'s refined pass skips its priority write when a human override decision exists",
+    "sourceCaptureId": "tsk-sq9"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/why-ppidof-bounds-its-ps-call-with-a-200ms-timeout.md",
     "title": "Why `ppidOf` bounds its `ps` call with a 200ms timeout",
     "sourceCaptureId": "tsk-13m"
@@ -1310,6 +1390,14 @@
     "docPath": "docs/explanation/why-resolvediscovery-guards-re-parking-an-already-parked-item.md",
     "title": "Why `resolveDiscovery` guards re-parking an already-parked item",
     "sourceCaptureId": "tsk-wcl"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-resolveplans-pass-through-path-now-checks-planapproveverify-before-executing.md",
+    "title": "Why `resolvePlan`'s pass-through path now checks `planApproveVerify` before `executing`",
+    "sourceCaptureId": "tsk-4m4"
   },
   {
     "quadrant": "explanation",
@@ -1435,6 +1523,14 @@
     "quadrant": "explanation",
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
+    "docPath": "docs/explanation/why-the-stage-status-driving-split-decision-got-superseded.md",
+    "title": "Why the \"stage-axis driving loop and status-axis pool-sweep stay separate\" decision got superseded",
+    "sourceCaptureId": "tsk-3cx"
+  },
+  {
+    "quadrant": "explanation",
+    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
+    "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/windows-npm-global-install-has-no-lib-or-bin-subfolder.md",
     "title": "Windows `npm install -g --prefix` has no `lib` or `bin` subfolder",
     "sourceCaptureId": "tsk-49r"
@@ -1486,6 +1582,14 @@
     "docPath": "docs/how-to/add-a-changelog-entry-for-a-user-visible-change.md",
     "title": "How to add a CHANGELOG.md entry for a user-visible change",
     "sourceCaptureId": "tsk-469"
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/add-a-drift-guard-for-cli-registry-help-prose.md",
+    "title": "How to add a drift guard for CLI registry help prose",
+    "sourceCaptureId": "tsk-2so"
   },
   {
     "quadrant": "how-to",
@@ -1643,9 +1747,9 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
-    "docPath": "docs/how-to/configure-a-capacity-to-dispatch-via-a-named-agent.md",
-    "title": "How to configure a capacity to dispatch via a named agent instead of a raw command",
-    "sourceCaptureId": "tsk-3sw"
+    "docPath": "docs/how-to/configure-an-executor-to-dispatch-via-a-named-agent.md",
+    "title": "How to configure a executor to dispatch via a named agent instead of a raw command",
+    "sourceCaptureId": null
   },
   {
     "quadrant": "how-to",
@@ -1747,9 +1851,9 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
-    "docPath": "docs/how-to/generalize-a-judge-retry-helper-for-any-capacity-dispatch.md",
-    "title": "How to extract a judge-only retry helper into a capacity-agnostic one",
-    "sourceCaptureId": "tsk-418"
+    "docPath": "docs/how-to/generalize-a-judge-retry-helper-for-any-executor-dispatch.md",
+    "title": "How to extract a judge-only retry helper into a executor-agnostic one",
+    "sourceCaptureId": null
   },
   {
     "quadrant": "how-to",
@@ -1837,7 +1941,7 @@
     "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/preserve-shell-escapes-when-transcribing-a-verify-command.md",
     "title": "How to preserve shell escapes when transcribing a verify command",
-    "sourceCaptureId": null
+    "sourceCaptureId": "tsk-463"
   },
   {
     "quadrant": "how-to",
@@ -1963,9 +2067,9 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
-    "docPath": "docs/how-to/reuse-the-shared-capacity-dispatch-fallback-fragment.md",
-    "title": "How to reuse the shared capacity-dispatch-fallback fragment in a new skill",
-    "sourceCaptureId": "tsk-53h"
+    "docPath": "docs/how-to/reuse-the-shared-executor-dispatch-fallback-fragment.md",
+    "title": "How to reuse the shared executor-dispatch-fallback fragment in a new skill",
+    "sourceCaptureId": null
   },
   {
     "quadrant": "how-to",
@@ -2014,6 +2118,14 @@
     "docPath": "docs/how-to/smoke-test-fgos-code-implement-with-a-trivial-item.md",
     "title": "How to smoke-test fgos-coding-implement with a trivial verify=true item",
     "sourceCaptureId": null
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/submit-a-work-item-with-a-known-verify-command.md",
+    "title": "Submit a work item with a known verify command",
+    "sourceCaptureId": "tsk-5gu"
   },
   {
     "quadrant": "how-to",
@@ -2091,33 +2203,33 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
-    "docPath": "docs/how-to/wire-a-headless-function-through-an-agent-executor-capacity.md",
-    "title": "How to wire a headless function through an agent-executor capacity",
-    "sourceCaptureId": "tsk-2yp"
+    "docPath": "docs/how-to/wire-a-headless-function-through-an-agent-executor-executor.md",
+    "title": "How to wire a headless function through an agent-executor executor",
+    "sourceCaptureId": null
   },
   {
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md",
-    "title": "How to wire a skill's dispatch of a capacity or subTask through the native-vs-cli/spawn decision",
+    "title": "How to wire a skill's dispatch of a executor or subTask through the native-vs-cli/spawn decision",
     "sourceCaptureId": "tsk-3ik"
   },
   {
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
-    "docPath": "docs/how-to/wire-a-skill-to-a-capacity-by-purpose-not-name.md",
-    "title": "How to wire a skill to a capacity by purpose, not by name",
-    "sourceCaptureId": "tsk-2c1"
+    "docPath": "docs/how-to/wire-a-skill-to-an-executor-by-purpose-not-name.md",
+    "title": "How to wire a skill to a executor by purpose, not by name",
+    "sourceCaptureId": null
   },
   {
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
-    "docPath": "docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-capacity.md",
-    "title": "How to wire an existing skill's inline-reasoning step through an agent-executor capacity",
-    "sourceCaptureId": "tsk-5l2-3"
+    "docPath": "docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+    "title": "How to wire an existing skill's inline-reasoning step through an agent-executor executor",
+    "sourceCaptureId": null
   },
   {
     "quadrant": "how-to",
@@ -2131,17 +2243,17 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/write-a-task-spec.md",
+    "title": "How to write a task-spec",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/write-verify-for-a-skill-prose-change.md",
     "title": "Viết verify cho một item thay đổi skill prose",
     "sourceCaptureId": "tsk-4l9"
-  },
-  {
-    "quadrant": "reference",
-    "purpose": "Describe the machinery accurately and completely for lookup.",
-    "audience": "A user who needs precise facts about a specific field/command/API.",
-    "docPath": "docs/reference/capacity-cross-provider-governance.md",
-    "title": "capacity cross-provider governance",
-    "sourceCaptureId": "tsk-32n"
   },
   {
     "quadrant": "reference",
@@ -2158,6 +2270,14 @@
     "docPath": "docs/reference/drift-status-return-shape.md",
     "title": "`driftStatus`'s real return shape",
     "sourceCaptureId": "tsk-5m7"
+  },
+  {
+    "quadrant": "reference",
+    "purpose": "Describe the machinery accurately and completely for lookup.",
+    "audience": "A user who needs precise facts about a specific field/command/API.",
+    "docPath": "docs/reference/executor-cross-provider-governance.md",
+    "title": "executor cross-provider governance",
+    "sourceCaptureId": null
   },
   {
     "quadrant": "reference",
@@ -2222,6 +2342,14 @@
     "docPath": "docs/reference/herdr-dashboard-layout-and-action-queues.md",
     "title": "herdr-plugin dashboard layout: work-items panel + action-queue boxes",
     "sourceCaptureId": "tsk-1d5"
+  },
+  {
+    "quadrant": "reference",
+    "purpose": "Describe the machinery accurately and completely for lookup.",
+    "audience": "A user who needs precise facts about a specific field/command/API.",
+    "docPath": "docs/reference/herdr-web-dashboard-layout.md",
+    "title": "herdr web dashboard: layout, userflow and visual language",
+    "sourceCaptureId": null
   },
   {
     "quadrant": "reference",

@@ -16,9 +16,9 @@
 // the source yaml's `tool-scope` list IS the authoritative, harness-enforced
 // grant for the projected agent-type's Task-tool dispatch -- it is written
 // straight into the generated .md's `tools:` frontmatter below, unfiltered.
-// This is a SEPARATE axis from tsk-62v's `capacities.<id>.allowedTools`
+// This is a SEPARATE axis from tsk-62v's `executors.<id>.allowedTools`
 // (the shared config file's `runner` section), which gates a different
-// dispatch path (domain-1 headless CLI spawn), keyed by capacityId rather
+// dispatch path (domain-1 headless CLI spawn), keyed by executorId rather
 // than agent-type name. Neither field is descriptive-only; neither is
 // dropped; they never collide because they key differently.
 //

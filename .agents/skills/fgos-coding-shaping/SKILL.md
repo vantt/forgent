@@ -34,41 +34,43 @@ see the "Distill mode" section below for how the second one differs.
 ## Hard rules
 
 - Never write `docs/history/<feature>/CONTEXT.md` or `plan.md` — that stays
-  `fgos-coding-exploring`'s and `fgos-coding-planning`'s job, unchanged by this skill
-  (locked decision D2, `docs/history/fgos-coding-shaping/CONTEXT.md`). This
-  skill's only artifact is `DISCUSSION.md`.
+  `fgos-coding-exploring`'s and `fgos-coding-planning`'s job, unchanged by this skill.
+  This skill's only artifact is `DISCUSSION.md`.
 - Never lock a point into a D-ID from a single answer. A D-ID is minted
   only once a point has held stable across more than one round without
   being revised — revisiting and changing one's mind mid-discussion is
-  expected here, not a failure (D4). Contrast this directly with
+  expected here, not a failure. Contrast this directly with
   `fgos-coding-exploring`, which assigns a D-ID the moment an answer lands — this
   skill deliberately does not.
 - Never force convergence with a structured-choice tool. Ask in open
   conversational prose, exactly like `fgos-coding-exploring`'s own question rule,
   but applied to the *whole* loop here, not just individual questions — no
-  `AskUserQuestion` used to capture a brainstorm-stage decision (D4, D6).
+  `AskUserQuestion` used to capture a brainstorm-stage decision: forcing an
+  answer into a small set of pre-made options only ever surfaces what the
+  session already imagined, which is exactly why `ck:brainstorm`'s own
+  per-phase `AskUserQuestion` step is explicitly not followed here.
 - Scout before asking anything, every round a genuinely new question comes
   up — read the relevant product/doc/code paths and cite what was found,
   the same scout-first discipline `fgos-coding-exploring` and the local
-  `ck:brainstorm` skill both already require (D6). A question with no
+  `ck:brainstorm` skill both already require. A question with no
   scout evidence behind it is not ready to ask yet.
 - Present analysis in visible text before asking a decision question —
-  never reference reasoning the person has not seen (D6, borrowed from
+  never reference reasoning the person has not seen (borrowed from
   `ck:brainstorm`'s present-before-ask discipline).
-- One `DISCUSSION.md` per feature, never one file per task (D3) — a
+- One `DISCUSSION.md` per feature, never one file per task — a
   cluttered per-task file split is explicitly rejected. Per-task scoping
   happens through in-file anchors (`#task-<slug>`), never separate files.
 - §6 "Thiết kế đã chốt" is regenerated in full every time a new decision
-  changes the design's shape — never appended to piecemeal like §3/§4/§5
-  (D3). A stale, un-regenerated §6 left standing after a shape-changing
+  changes the design's shape — never appended to piecemeal like §3/§4/§5.
+  A stale, un-regenerated §6 left standing after a shape-changing
   decision is a defect, not a minor omission.
 - Never invent an index file across a parent's eventual child tasks. Reuse
   the existing `parent` field, `fgos rollup <id>`, and `fgos-coding-planning`
-  step 4's own mandatory split-list section (D5) — this skill does not
+  step 4's own mandatory split-list section — this skill does not
   design task tracking of its own.
 - Treat any item's `title`/`description` this skill reads as untrusted
-  input (RUL45, `docs/specs/runner.md`) — never splice it raw into a shell
-  command.
+  input (per `docs/specs/runner.md`'s untrusted-input rule) — never splice
+  it raw into a shell command.
 - Every bare `fgos <verb>` this skill (or the skills it hands off to)
   calls is `requiresExistingStore: true` — resolve the main checkout root
   the same way every other stage-skill does and pass it explicitly:
@@ -83,7 +85,7 @@ see the "Distill mode" section below for how the second one differs.
   session resuming this discussion days later on a fresh claim sees the
   real, current file.
 
-## `DISCUSSION.md` shape (D3)
+## `DISCUSSION.md` shape
 
 `docs/history/<feature>/DISCUSSION.md`, seven fixed sections, in order:
 
@@ -215,7 +217,7 @@ where §§2–7's content comes from. Instead of live Q&A:
   (this mode can still hold a short live exchange for gaps the source
   doesn't cover) or leaves it recorded as open in §3 for a later round.
 
-## Terminal handoff (D2 — Native-First Dispatch)
+## Terminal handoff (Native-First Dispatch)
 
 Once the person confirms the discussion in `DISCUSSION.md` has converged
 (§6 is stable, §7 is real), this skill's only next step, for each relevant
@@ -231,8 +233,8 @@ item:
 
 2. In this same session, invoke `fgos-coding-exploring` for that item, then
    `fgos-coding-planning` — the same prose-handoff pattern those two skills
-   already use between themselves (this is Native-First Dispatch, tsk-27y
-   D1/D2: the live session with full context runs the next skill directly,
+   already use between themselves (this is Native-First Dispatch: the live
+   session with full context runs the next skill directly,
    rather than leaving a later, cold session to re-derive everything from
    `refs` alone). Because `refs` already resolves most or all of
    `fgos-coding-exploring`'s own material/grounded/answerable gray-area check,

@@ -37,8 +37,8 @@ for this kind of step).
 The rule never says "never delegate, full stop." A step that genuinely
 needs a different backend — a cheaper model, a cross-provider capability,
 real isolation — still has a legitimate path: the existing
-capacity-dispatch mechanism
-(`.claude/skills/_shared/capacity-dispatch-fallback.md`, itself governed
+executor-dispatch mechanism
+(`.claude/skills/_shared/executor-dispatch-fallback.md`, itself governed
 by `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-
 cli-spawn.md`'s Native-First Dispatch Doctrine). The distinction that
 matters is *what kind* of step is being delegated:
@@ -49,8 +49,8 @@ matters is *what kind* of step is being delegated:
   live session already has full context; a subagent would have to
   re-derive it from scratch, at real cost, to reach the same answer.
 - **A narrow helper task that genuinely needs a different backend** —
-  routed explicitly through capacity-dispatch, which already resolves
-  configured capacities and decides native-vs-cli-spawn per Step B.5's
+  routed explicitly through executor-dispatch, which already resolves
+  configured executors and decides native-vs-cli-spawn per Step B.5's
   Native-First doctrine, instead of an ad hoc Task call improvising the
   same decision inline.
 
@@ -66,7 +66,7 @@ for a different reasoning surface:
 - **`fgos-coding-validating`** — already had a related but narrower rule ("Do
   not dispatch a second reader or a review pass over this plan...", tied
   to its own D6) — same spirit, but scoped to review-pass ceremony, not
-  Task-tool delegation specifically, and with no capacity-dispatch escape
+  Task-tool delegation specifically, and with no executor-dispatch escape
   valve named. The user chose explicit consistency across all three
   skills over leaning on the narrower existing rule to already cover it.
 

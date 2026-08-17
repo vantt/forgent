@@ -1103,12 +1103,12 @@ export const COMMAND_REGISTRY = [
   {
     name: 'tool',
     invoke: 'fgos tool',
-    description: 'Tool registry (tsk-1dj, ported from repository-harness; tsk-in1-1 D1: a tool provider is declared directly in runner.capacities.<id> in .fgos/config.json — config-edited, not a CLI verb): "check" probes every declared tool\'s presence on THIS machine and writes it to a local, gitignored overlay file, never the shared event log, and always succeeds even when a probed tool is missing; "query" returns the provider set for a capability, merging the config-declared tools with the local overlay ("unknown" for one never checked here).',
+    description: 'Tool registry (tsk-1dj, ported from repository-harness; tsk-in1-1 D1: a tool provider is declared directly in runner.executors.<id> in .fgos/config.json — config-edited, not a CLI verb): "check" probes every declared tool\'s presence on THIS machine and writes it to a local, gitignored overlay file, never the shared event log, and always succeeds even when a probed tool is missing; "query" returns the provider set for a capability, merging the config-declared tools with the local overlay ("unknown" for one never checked here).',
     parameters: {
       type: 'object',
       properties: {
         sub: { type: 'string', description: 'Sub-verb (positional).', enum: ['check', 'query'] },
-        name: { type: 'string', description: '"check": optional filter, a declared tool\'s capacity id — omitted checks every tool-capable capacity.' },
+        name: { type: 'string', description: '"check": optional filter, a declared tool\'s executor id — omitted checks every tool-capable executor.' },
         capability: { type: 'string', description: '"query" only, optional filter: free-text capability label, normalized to kebab-case.' },
         status: { type: 'string', description: '"query" only, optional filter: one of present/missing/unknown/stale ("stale" is mcp/skill-only: the tool is installed but its own on-disk metadata records a commit behind the repo\'s current HEAD, tsk-j7y).' },
       },

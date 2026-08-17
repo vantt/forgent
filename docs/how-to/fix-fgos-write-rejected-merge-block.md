@@ -187,7 +187,7 @@ already-documented recipe, applied in turn.
 
 `tsk-4eu` differs from the two cases above: its own footprint legitimately
 included `.fgos/config.json` — the fix moved a config block
-(`executors.judge`) up to `capacities.judge-decompose`, so the live config
+(`executors.judge`) up to `executors.judge-decompose`, so the live config
 file itself was the intended target of the change, not an accidental
 byproduct:
 
@@ -224,13 +224,13 @@ changes to that path before re-attempting the merge.
 not ship the actual `.fgos/config.json` content change through its own
 branch. `tsk-5ge` is that follow-up: a separate item whose entire job is
 the direct main-checkout edit step 5 describes — moving
-`runner.executors.judge`'s content into `runner.capacities.judge-decompose`
+`runner.executors.judge`'s content into `runner.executors.judge-decompose`
 and deleting the `executors.judge` key, applied "as a direct, single-parent
 commit on main, exactly like every other `.fgos/config.json` change in
 this repo's history":
 
 > "Hand-edit .fgos/config.json on the main checkout: move
-> runner.executors.judge's content into runner.capacities.judge-decompose
+> runner.executors.judge's content into runner.executors.judge-decompose
 > ... It must land as a direct, single-parent commit on main ... ADR0020's
 > fgos-write-rejected guard permanently blocks any fgw/<id> branch from
 > carrying a .fgos/ change through fgos approve (see
@@ -275,7 +275,7 @@ The fix is not to silence or dispute the classifier — it's reading the
 real diff correctly, since a merge of this branch WOULD carry that file.
 The failing-test-first proof still only needs to cover what this item
 itself is actually responsible for: a new pinned test asserting the
-committed config's `capacities.gather` shape, temporarily reverted to
+committed config's `executors.gather` shape, temporarily reverted to
 `7c86305`'s own parent to prove it fails first, then restored to prove it
 passes — the same "prove it against reality, not against plausibility"
 discipline this doc's every other example already uses, just scoped
@@ -290,7 +290,7 @@ re-verify worktree; a second, unrelated pre-existing red test): a test
 asserting on the *live, shared* main-checkout `.fgos/config.json`'s
 content can go red mid-implementation because a concurrent session
 changed that file for unrelated work — `node --test
---test-skip-pattern="declares the submit-assist-classify capacity" ...`
+--test-skip-pattern="declares the submit-assist-classify executor" ...`
 was the fix here, naming the one test to skip rather than weakening the
 command wholesale.
 
@@ -299,7 +299,7 @@ command wholesale.
 `tsk-53n` is `tsk-1o7`'s own split child (same shape as `tsk-5ge`/`tsk-28o`
 above) — its whole job was hand-editing `.fgos/config.json` directly on
 the main checkout to add `needs`/`for` to the real `judge-discovery`,
-`judge-decompose`, and `submit-assist-classify` capacity blocks, per step
+`judge-decompose`, and `submit-assist-classify` executor blocks, per step
 5's rule: never through the branch's own commit.
 
 Its own `verify` needed narrowing for two separate reasons stacked
@@ -468,7 +468,7 @@ That capture's own work item is the direct follow-up that landed `tsk-4eu`'s
 config content change on main:
 
 > "Hand-edit .fgos/config.json: move runner.executors.judge into
-> runner.capacities.judge-decompose,"
+> runner.executors.judge-decompose,"
 > — real work item title, id `tsk-5ge`
 
 A fifth capture, gathered the same way (`fgos doc-sources
@@ -489,5 +489,5 @@ this same doc path:
 That capture's own work item is `tsk-2c1`'s sibling — the config-half child
 that surfaced the inherited-diff wrinkle the new example above describes:
 
-> "Hand-edit .fgos/config.json: register the gather capacity (for/needs/carries)"
+> "Hand-edit .fgos/config.json: register the gather executor (for/needs/carries)"
 > — real work item title, id `tsk-28o`

@@ -163,7 +163,7 @@ a signal to observe, not a judgment call made in advance.
 - **Amending `tsk-29i`'s anti-ad-hoc-delegation rule** — considered and
   explicitly rejected as unnecessary: that rule only forbids ad hoc
   sub-dispatch and points toward routing explicitly through the
-  capacity-dispatch mechanism — the new research skill's own contract
+  executor-dispatch mechanism — the new research skill's own contract
   *is* that mechanism, so nothing about the existing rule needed to
   change.
 
@@ -443,7 +443,7 @@ The six children's own detailed design rationale lives in their own
 retrospective documents (`why-a-retired-stage-name-sometimes-keeps-a-
 drain-only-alias.md` for `tsk-403`/`tsk-qod`, `why-a-per-stage-exception-
 in-the-driver-meant-that-stage-had-no-owner.md` for `tsk-tku`,
-`coding-classify-intake-capacity-lifecycle-created-then-retired-as-dead-
+`coding-classify-intake-executor-lifecycle-created-then-retired-as-dead-
 config.md` for `tsk-2yo`, `why-discover-next-shrank-to-a-picker.md` for
 `tsk-lya`, and `tsk-30v`'s own section above) — this document stays the
 one place the whole cluster's shape, and the coordination cost of landing

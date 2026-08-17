@@ -1,10 +1,10 @@
 ---
 name: bee
 type: living-doc
-url: local (cloned snapshot at upstreams/bee/skills/ + upstreams/bee/AGENTS.md — see distillery.md Pointers)
-local: upstreams/bee
-last_analyzed_version: 1.18.3
-last_analyzed_date: 2026-07-28
+url: local (cloned snapshot at upstreams/bee/skills/ + upstreams/bee/AGENTS.md — see distillery.md Pointers); real upstream now https://github.com/thanhsmind/beegog (project renamed bee -> beegog, Rust core added)
+local: upstreams/bee (stale, unrefreshed since 2026-07-28 — real current checkout is /home/vantt/projects/beegog, pulled fresh 2026-08-17)
+last_analyzed_version: v2.7.0 (git tag, 2026-08-17 scoped pass) — prior cursor v1.18.3 was 1213 commits / ~3 weeks behind at re-check time
+last_analyzed_date: 2026-08-17
 domains_covered: [harness, skills, hooks, workflow, orchestration, routing, integration-contract, context-memory, planning, quality-gates, docs-style, tooling, config-packaging, repo-layout, safety, self-improvement, ux, testing-evals]
 ---
 
@@ -33,6 +33,30 @@ domains_covered: [harness, skills, hooks, workflow, orchestration, routing, inte
 > per-line taxonomy doesn't fit a concern this multi-faceted anyway. It's a
 > different shape of concern (cross-session/cross-process automation) than in-session
 > fan-out tiering.
+
+> **SCOPED delta pass at v2.7.0 on 2026-08-17 (tsk-37i, triggered by a
+> citation-discipline discussion, not a scheduled full re-scan) — NOT a
+> full re-inventory.** Version-check correction: the request that triggered
+> this pass assumed bee had "released to 0.2.x" — real state per
+> `git tag`/`git log` on the live upstream (`/home/vantt/projects/beegog`,
+> remote `https://github.com/thanhsmind/beegog`) is tag `v2.7.0`, and the
+> local `upstreams/bee/` snapshot this file describes was **1213 commits**
+> behind origin/main at check time (last synced 2026-07-28; this session
+> pulled the `beegog` checkout fresh to close that gap for research
+> purposes, `upstreams/bee/` itself is untouched). No `v0.2.x` tag exists
+> anywhere in the project's history. Between v1.18.3 and v2.7.0 the project
+> changed shape, not just version: renamed bee → beegog, gained a Rust core
+> (`packages/bee-rs/`, `crates/`) alongside the original Node package, and
+> `docs/knowledge/` (announced as new at v1.18.3) is now the primary,
+> heavily-populated state layer with dozens of `areas/*.md` concept files —
+> a 1213-commit gap is not safely treated as "accumulated truth" the way
+> distill's delta discipline handled the 15-version gap above; this pass
+> deliberately reads only the two `docs/knowledge/areas/` concepts directly
+> relevant to the triggering question (decision citation/reversal
+> discipline, instruction-text citation discipline) rather than claiming
+> the same accumulated-truth coverage the 1.18.3 pass claimed. **A full
+> re-distill of beegog v2.7.0 is a separate, larger task this pass does not
+> attempt** — flagged as an open gap below, not silently skipped.
 
 ## harness
 
@@ -373,6 +397,13 @@ domains_covered: [harness, skills, hooks, workflow, orchestration, routing, inte
 - **Keywords:** workflow mailbox, HANDOFF.json, fail-safe default
 - **Seen:** 1.18.3
 
+### decision-citation-and-reversal-sweep
+- **What:** New system since v1.18.3, `docs/knowledge/areas/decision-memory/overview.md` (9 business rules). Decisions carry a global content-hash `short8` id (never a small integer alone); **R8 — Citation discipline (D3):** any artifact encoding a decision cites that short8 id, which is what makes reversal reachable. **R2 — a supersede is not finished until every citing artifact is reconciled:** before its single log append, `decisions supersede` computes a citation sweep over `docs/**` (full id + word-boundary short8 match); every hit is fixed same-turn or explicitly waived with a recorded reason, and an unreconciled hit resurfaces at every flush. `decisions log --relation touches:<id>` runs the same sweep for a non-superseding reference. Free text that reads as an inline supersession claim ("supersedes", "replaces", "no longer applies"...) is refused unless a real `--relation supersedes:<id>` resolves it — a guard added after a store audit found 70 decide events hiding a supersession in prose against 29 proper supersede events. **R5 — the recall surface is a machine-regenerated index** (`docs/decisions/index.md`, never hand-edited, grouped scope→tag, superseded entries excluded, byte-stable, "complete by construction"), with structured search (`--tag`, `--scope`, `--since`, `--untagged`) — "bare substring grep is the fallback, never the recall path."
+- **Where:** `docs/knowledge/areas/decision-memory/overview.md`, `packages/bee-rs/crates/bee/src/verbs/decisions/`.
+- **Notable:** Directly answers "how does a bare decision-id citation stay meaningful over time" — bee's answer is not a prose convention alone (R8 still requires an author to remember to cite the short8) but a **mechanical backstop**: a decision cannot be superseded/reversed without the system itself finding and forcing reconciliation of every place that cited the old truth, closing the exact failure mode ("a reversed decision lived only in the log; every artifact that stated the old conclusion kept restating it") this project's own hand-maintained `docs/decisions/0000-index.md` has no mechanism against.
+- **Keywords:** short8 citation, reversal-propagation sweep, machine-regenerated index, relation-required guard
+- **Seen:** v2.7.0 (scoped delta pass, tsk-37i, 2026-08-17 — not present at v1.18.3)
+
 ## planning
 
 ### discovery-research-levels
@@ -449,6 +480,13 @@ domains_covered: [harness, skills, hooks, workflow, orchestration, routing, inte
 - **Keywords:** review status, no re-dispatch, R6
 - **Seen:** 1.18.3
 
+### doc-rot-close-gate-bundle
+- **What:** New in v2.7.0 ("doc-rot doors — impact, routing, doc-deferral, freshness", released 2026-08-16; features `knowledge-distill-trigger` + `doc-impact-synthesis`, landed 2026-08-03→2026-08-16 — did not exist at the v1.18.3 cursor). Four HARD doors block a feature's close, run after tests/scribing-debt/judge-debt/pattern-check: **(1) knowledge-freshness** — blocks on any `dangling_source`/`dangling_required_context` warning inside the feature's own touched areas (`bee knowledge check`'s findings, scope-filtered — a sibling feature's stale pointers never tax this close). **(2) impact** — blocks when a doc still cites one of the closing feature's OWN decisions "without having been reconciled": collects the feature's decide events by structured `feature` field, sweeps `docs/**` for citations of each id, blocks on every surviving hit with file:line + remedy, re-runs fresh each close so a fixed doc self-clears. **(3) routing** — blocks when a locked D-ID in the feature's own CONTEXT.md decision table has **no area-spec citation AND no feature-local record** — i.e. a locked local decision that was never propagated into any durable doc is refused at close, not allowed to rot as an orphaned CONTEXT.md-only fact. **(4) doc-deferral** — blocks when deferral-shaped prose ("later", "TODO"-style postponement) in touched docs names no registered trigger in the two-tier trigger registry (`bee triggers add/list/resolve`; predicate-tier auto-flips `waiting→due` on a re-evaluated condition, manual-tier needs human confirm). Each door has a named, logged escape hatch (`knowledge-freshness-deferral` / `impact-deferral` / `routing-deferral` / `doc-deferral` decision) — never a silent skip.
+- **Where:** `docs/knowledge/areas/workflow-state/gates.md` ("A knowledge-freshness door...", "An impact door...", "A routing door...", "A doc-deferral door..." — 4 consecutive paragraphs); cells `kds-2`/`kds-3` (doc-impact-synthesis), `kdt-1` (knowledge-distill-trigger).
+- **Notable:** This is the single most direct answer in the whole scan to fgOS's own D-local-citation problem (tsk-37i) — but inverted from what round-2's `decision-citation-and-reversal-sweep` entry found. That entry covers "don't let a SUPERSEDED decision's old citations go stale." The **routing door** covers a different, earlier failure this project has NOT yet found a beegog analogue for: "don't let a decision get LOCKED locally and then never routed anywhere durable at all" — exactly fgOS's own `fgos-coding-shaping/SKILL.md` situation (D2/D4/D6 minted in `docs/history/fgos-coding-shaping/CONTEXT.md`, cited bare in the skill file, never formally routed/superseded into a spec or ADR). beegog's answer is not a citation-format rule but a **structural close gate**: a feature is refused as done while any of its locked decisions sits unrouted — turning "someone should route this eventually" into "the feature cannot close until it is."
+- **Keywords:** doc-rot doors, knowledge-freshness, impact door, routing door, doc-deferral, trigger registry, close gate
+- **Seen:** v2.7.0 (scoped delta pass, tsk-37i round 6, 2026-08-17 — not present at v1.18.3; landed via a targeted commit-log scan `git log v1.18.3..v2.7.0 --grep=...`, not a full 1213-commit replay)
+
 ## docs-style
 
 ### tech-agnostic-rebuild-bar
@@ -488,6 +526,14 @@ domains_covered: [harness, skills, hooks, workflow, orchestration, routing, inte
 - **Where:** `bee-scribing/SKILL.md` §Modes (bootstrap).
 - **Keywords:** bootstrap, harvest, offer-only
 - **Seen:** 1.18.3
+
+### one-line-cite-plus-local-delta
+- **What:** New since v1.18.3, `docs/knowledge/areas/doctrine-layer/prompt-writing-standard.md` — the standard every edit to bee's own instruction text is judged by. **R3 — "One rule, one home":** a boundary rule is stated in full exactly once (its canonical home document); everywhere else it appears **only as a one-line cite plus the local delta that document actually adds** — never a near-verbatim restatement, and never a bare id with no gloss. Paired with a mechanical **pointer-integrity check** (`docs/knowledge/areas/verify-pipeline/skill-reference-pointer-integrity.md`, Rust test `pointer_integrity.rs`): every citation from an instruction document to a reference document must resolve to a real file AND a real heading inside it, checked on every verify run with negative-control fixtures proving the check can still detect a broken pointer — three real broken pointers were found the first time the check ran, in documents that had "passed" every prior check for their whole existence. Separately, **R5 (deterministic-backstop preference):** an absolute rule that is structurally reachable belongs in a hook/permission, not prose — "markdown carries only what enforcement cannot reach."
+- **Where:** `docs/knowledge/areas/doctrine-layer/prompt-writing-standard.md`, `docs/knowledge/areas/verify-pipeline/skill-reference-pointer-integrity.md`, `packages/bee-rs/crates/bee/tests/pointer_integrity.rs`.
+- **Notable:** This is bee's most direct answer to "a citation should never be a bare id" — but it splits the fix into two different-strength mechanisms on purpose: the *structural* half (does the pointer even resolve to a real file/heading) is machine-enforced and fails the build; the *content* half (is the one-line gloss actually accurate/complete) stays prose discipline enforced by review, because — per this same standard's four-question line filter — whether a gloss is *faithful* is a judgment call no grep can make, only whether it *exists and resolves* can be checked mechanically.
+- **Where else relevant:** `docs/knowledge/areas/doctrine-layer/placement-and-anchoring.md` (B4 — every rule that must never disappear carries a suite-enforced anchor; a rule without one may vanish with no signal) is the same "verify reachability mechanically, verify content by discipline" split applied to whole rules instead of individual citations.
+- **Keywords:** one-rule-one-home, cite-plus-delta, pointer integrity, four-question line filter
+- **Seen:** v2.7.0 (scoped delta pass, tsk-37i, 2026-08-17 — not present at v1.18.3)
 
 ## tooling
 

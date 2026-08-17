@@ -96,7 +96,7 @@ items were worked at the same time, not sequentially.
 **A real, separate finding surfaced along the way**: `fgos-runner`'s own
 automated wave dispatch (the `Promise.allSettled` fan-out that would
 consume `computeSchedule`'s waves automatically) has zero real
-`capacity.dispatch` events in this repo's history — the demo's actual
+`executor.dispatch` events in this repo's history — the demo's actual
 parallelism came from manually spawning 2 Agent subagents against the
 computed wave, not from `fgos-runner` itself executing it. `fgos-runner`'s
 automated consumption of a computed wave remains unexercised in

@@ -1,8 +1,8 @@
 ---
-title: Why capacity.dispatch audits record command alongside provider
+title: Why executor.dispatch audits record command alongside provider
 ---
 
-# Why capacity.dispatch audits record command alongside provider
+# Why executor.dispatch audits record command alongside provider
 
 ## The gap (tsk-33w, tsk-5td D9)
 
@@ -45,11 +45,11 @@ Two additive changes, no schema migration:
   included in the object it returned. Adding it follows the function's
   own documented principle: additive only, every field it already
   returned stays exactly where it was.
-- The `capacity.dispatch` event payload (`src/runner/loop.mjs`) gained a
+- The `executor.dispatch` event payload (`src/runner/loop.mjs`) gained a
   `command` field alongside the existing `provider`, `model`,
   `baseCommit`, `headRef` fields.
 
-This was safe to do without a migration because `capacity.dispatch` is an
+This was safe to do without a migration because `executor.dispatch` is an
 audit-only event — `replay.mjs` ignores event types it doesn't recognize
 by design, and this event never participates in the FSM view. Old events
 without `command` still read fine; new consumers just have to tolerate
@@ -60,7 +60,7 @@ the field being absent on historical entries.
 - `provider` keeps its old meaning exactly — a freely-settable label. This
   fix doesn't take away the ability to set that label; it just makes sure
   the ground truth sits next to it in the same record.
-- The human-readable dispatch log line (`capacityId — provider — model`)
+- The human-readable dispatch log line (`executorId — provider — model`)
   was deliberately left alone rather than always appending `command` —
   the goal was audit-trail truth, not a longer log line for the common
   case where the two already match.
