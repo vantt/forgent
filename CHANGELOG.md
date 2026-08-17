@@ -9,6 +9,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Three new read-only verbs: `fgos decision-index [--check]` generates
+  `docs/decisions/index.md`, a projection of every platform/repo-wide
+  decision (`fgos decision --scope <area>`) from `state.decisions`;
+  `fgos context-render <id>` renders an item's `CONTEXT.md` "## Locked
+  decisions" table from `state.decisions` in place, so the table is never
+  hand-typed; `fgos authoritative-match --quadrant <docs/quadrant-dir>
+  --topic "..."` (or `--check-duplicates`) skeleton-matches a topic
+  against docs' own `authoritative_for` frontmatter, so a growing skill
+  finds an existing doc to update instead of guessing a second path.
+- `fgos decision --relation none|supersedes:<id>|touches:<id>` — every
+  decision write now declares its relation to prior decisions explicitly;
+  a `supersedes` relation runs a write-time sweep across `docs/`, `src/`,
+  `plugins/` for citations of the superseded id that don't also
+  acknowledge the new one, surfaced as `danglingCitations` on the write's
+  own response.
+- `fgos decision --scope <area>` — a platform/repo-wide decision (no
+  `--id`) that shows up in the generated `docs/decisions/index.md`.
+- `fgos doctor`/`fgos doctor --fix` gained a `decision-index-stale`
+  check+fix pair: reports and repairs drift between `docs/decisions/
+  index.md` and `state.decisions`.
+- The hand-authored `docs/decisions/000N-*.md` ADR corpus (34 files) has
+  been retired: `state.decisions` (via `fgos decision --scope`) is now the
+  source of truth for platform decisions, with full narrative migrated
+  verbatim into the relevant `docs/specs/<area>.md`'s own "Lịch sử quyết
+  định" section. `docs/decisions/index.md` (generated) replaces the old
+  hand-written `0000-index.md`.
 - `runner.capabilities` — a curated catalog of capability names, shared
   between the tool-registry's own `capability` field and
   `capacities.<id>.for`. Each entry is `{description?, aliases?}`. This
@@ -386,6 +412,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- `npm run check:decision-supersession` — the `docs/decisions/NNNN-*.md` +
+  `0000-index.md` pointer-pair format it validated is retired for good
+  along with the hand-authored ADR corpus (see Added, ADR retirement).
+  `scripts/check-decision-supersession.mjs`'s pure functions stay real and
+  unit-tested against synthetic fixtures; only the real-repo CLI mode had
+  nothing left to run against.
 - The `orchestrator` word ban (`test/docs/launcher-vocabulary-guard.test.mjs`
   and its 28-entry allowlist) is retired, per decision `0031`. Decision
   `0028` banned the term while it carried no meaning; decision `0029` D17

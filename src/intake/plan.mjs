@@ -154,6 +154,47 @@ function logDecomposeVerdict(dir, id, outcome, rationale, label) {
 // OUTSIDE that table is not a real citation.
 const D_ID_PATTERN = /\bD\d+\b/g;
 
+// tsk-1lv-3 (CONTEXT.md D3): the write-side counterpart to
+// extractLockedDecisionIds' own section-scoping regex just above --
+// `fgos context-render <id>` (bin/fgos.mjs, src/report/context-render.mjs)
+// calls this to splice a freshly-rendered table into an existing
+// CONTEXT.md, replacing whatever text currently sits under the heading
+// (hand-typed prose, an earlier render, or nothing) without touching any
+// other section. Exported so the CLI verb can call it directly rather than
+// re-deriving the same section-matching logic a second time.
+export function replaceLockedDecisionsSection(contextText, tableMarkdown) {
+  if (typeof contextText !== 'string') {
+    throw new Error('replaceLockedDecisionsSection: contextText must be a string');
+  }
+  if (typeof tableMarkdown !== 'string') {
+    throw new Error('replaceLockedDecisionsSection: tableMarkdown must be a string');
+  }
+  const headingMatch = /##\s*Locked decisions\s*\n/i.exec(contextText);
+  if (!headingMatch) {
+    throw new Error('replaceLockedDecisionsSection: no "## Locked decisions" heading found');
+  }
+  const headingEnd = headingMatch.index + headingMatch[0].length;
+  const rest = contextText.slice(headingEnd);
+  // `headingMatch`'s own trailing `\s*` is greedy (it backtracks only as
+  // far as needed to still match the required literal `\n`), so it already
+  // consumes every blank line between the heading and whatever follows --
+  // including an EMPTY section's zero-blank-line case, where the next
+  // heading sits immediately at the start of `rest` with no leading `\n`
+  // of its own left to find. Check that case explicitly before falling
+  // back to the `\n##` search below; skipping it would let `sectionEnd`
+  // run to the end of the whole document, swallowing every later section.
+  let sectionEnd;
+  if (/^##\s/.test(rest)) {
+    sectionEnd = headingEnd;
+  } else {
+    const nextHeadingMatch = /\n##\s/.exec(rest);
+    sectionEnd = nextHeadingMatch ? headingEnd + nextHeadingMatch.index + 1 : contextText.length;
+  }
+  const before = contextText.slice(0, headingEnd);
+  const after = contextText.slice(sectionEnd);
+  return `${before}${tableMarkdown.trimEnd()}\n\n${after}`;
+}
+
 function extractLockedDecisionIds(contextText) {
   if (typeof contextText !== 'string' || !contextText.trim()) return new Set();
   const section = /##\s*Locked decisions([\s\S]*?)(?:\n##\s|$)/i.exec(contextText);

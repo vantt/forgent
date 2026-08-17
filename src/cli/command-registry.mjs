@@ -414,14 +414,60 @@ export const COMMAND_REGISTRY = [
         alternatives: { type: 'string', description: 'What was considered and rejected, and why (optional).' },
         source: { type: 'string', description: 'Free text identifying who/what made the decision (optional, defaults to "session").' },
         id: { type: 'string', description: 'Work item id to also fold this decision under (optional; omit for the global log only).' },
+        relation: { type: 'string', description: 'none|supersedes:<id>|touches:<id> -- every write declares its relation to prior decisions explicitly (tsk-1lv-1 D2); text that reads like a supersession without supersedes:<id> is refused, and supersedes triggers a write-time docs/**+src/**+plugins/** citation sweep.' },
+        scope: { type: 'string', description: 'An area slug (e.g. "repo", or one matching docs/specs/<area>.md) marking this as a platform/repo-wide decision (tsk-1lv-2 D4), rendered into docs/decisions/index.md by "fgos decision-index". Optional; omit for an item-scoped (--id) or unscoped decision.' },
       },
       positional: ['text'],
-      required: ['text', 'rationale'],
+      required: ['text', 'rationale', 'relation'],
     },
-    examples: ['fgos decision --text "Use envelope wrapping at the dispatcher choke-point" --rationale "Keeps the dispatcher a pure pass-through"'],
+    examples: ['fgos decision --text "Use envelope wrapping at the dispatcher choke-point" --rationale "Keeps the dispatcher a pure pass-through" --relation none'],
     touchesState: true,
     requiresExistingStore: true,
     externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
+    name: 'decision-index',
+    invoke: 'fgos decision-index',
+    description: '(Re)generate docs/decisions/index.md, a projection of state.decisions\' platform/repo-wide (scope-carrying) records -- never hand-edited, mirrors "fgos docs-index"\'s own generate+drift shape for docs/enduser-docs-index.json (tsk-1lv-2 D4). --check never writes: reports whether the on-disk file matches a fresh regenerate, refusing (validation) on drift.',
+    parameters: {
+      type: 'object',
+      properties: {
+        check: { type: 'boolean', description: 'Never write; refuse (validation) if the on-disk index would change on a fresh regenerate.' },
+      },
+      positional: [],
+      required: [],
+    },
+    examples: ['fgos decision-index', 'fgos decision-index --check'],
+    touchesState: false,
+    // requiresExistingStore stays false, mirroring docs-index's own
+    // documented reason (tsk-1wn D4): flipping it would need
+    // touchesState: true too (the registry's own invariant), which is
+    // false here -- listWork on a missing/uninitialized .fgos/ returns an
+    // empty view gracefully (never throws), so an absent store just
+    // produces the "no decisions yet" placeholder rather than an error.
+    requiresExistingStore: false,
+    externalEffect: true,
+    paginated: false,
+    deprecated: null,
+  },
+  {
+    name: 'context-render',
+    invoke: 'fgos context-render',
+    description: 'Replace an item\'s docs/history/<feature>/CONTEXT.md "## Locked decisions" table with a fresh render from state.decisions (tsk-1lv-3 D3) -- closes the gap tsk-1ud left, CONTEXT.md\'s table becomes a VIEW, never a hand-typed second copy. Refuses (validation) if CONTEXT.md does not exist yet; never creates or touches any other section.',
+    parameters: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', description: 'The work item id whose CONTEXT.md Locked-Decisions table to render (positional or --id).' },
+      },
+      positional: ['id'],
+      required: ['id'],
+    },
+    examples: ['fgos context-render build-cli'],
+    touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: true,
     paginated: false,
     deprecated: null,
   },
@@ -1006,6 +1052,29 @@ export const COMMAND_REGISTRY = [
       required: ['doc-path'],
     },
     examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],
+    touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
+    name: 'authoritative-match',
+    invoke: 'fgos authoritative-match',
+    description: 'Read-only: skeleton-match a topic against every docs/<quadrant>/*.md doc\'s own authoritative_for frontmatter (fgos-coding-compounding\'s find-before-create doctrine, tsk-1lv-6) -- returns the matching doc path, or null when none claims the topic. --check-duplicates runs the harness-backstop scan instead: reports every group of 2+ docs claiming the same subject.',
+    parameters: {
+      type: 'object',
+      properties: {
+        quadrant: { type: 'string', description: 'The docs/<quadrant> directory to scan (e.g. docs/how-to).' },
+        topic: { type: 'string', description: 'The subject text to skeleton-match against each doc\'s authoritative_for (required unless --check-duplicates is set).' },
+        'check-duplicates': { type: 'boolean', description: 'Scan for docs that claim the same subject instead of matching one topic.' },
+      },
+      required: ['quadrant'],
+    },
+    examples: [
+      'fgos authoritative-match --quadrant docs/how-to --topic "claiming a work item"',
+      'fgos authoritative-match --quadrant docs/how-to --check-duplicates',
+    ],
     touchesState: false,
     requiresExistingStore: false,
     externalEffect: false,

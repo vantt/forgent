@@ -100,10 +100,13 @@ see the "Distill mode" section below for how the second one differs.
    showing current state).
 4. **Quyết định đã chốt** — a D-ID table, append-only. Each entry that
    lands here is also recorded via a real
-   `fgos decision --text "<D-ID>: <summary>" --rationale "..." --id <item-id>`
-   call the moment it stabilizes — never deferred to the terminal
-   handoff. This is the machine-readable safety net for a cold pickup
-   later, independent of anyone re-reading the prose correctly.
+   `fgos decision --text "<D-ID>: <summary>" --rationale "..." --id <item-id>
+   --relation none` (or `--relation supersedes:<old-D-ID>` when this D-ID
+   explicitly revises an earlier one already locked in this same
+   discussion — every `fgos decision` write declares its relation, no
+   default, tsk-1lv-1) call the moment it stabilizes — never deferred to
+   the terminal handoff. This is the machine-readable safety net for a
+   cold pickup later, independent of anyone re-reading the prose correctly.
 5. **Q&A log** — append-only, timestamped, never edited after the fact.
    The raw, chronological record — §6 exists precisely so nobody has to
    reconstruct the design by reading this section end to end.

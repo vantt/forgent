@@ -181,7 +181,8 @@ self-pace."
      ```bash
      fgos decision --id <id> \
        --text "merge-loop: attempting the <reason> playbook for <id>" \
-       --rationale "<the signal actually read from the envelope and from fgos check <id>'s friction detail>"
+       --rationale "<the signal actually read from the envelope and from fgos check <id>'s friction detail>" \
+       --relation none
      ```
 
      A playbook run that skipped this is a defect in the run, not a clean
