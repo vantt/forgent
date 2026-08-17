@@ -88,6 +88,14 @@ Six independently workable pieces, ordered by real build dependency (each
 depends on the previous piece's own output existing). Specs only — nothing
 is created here; `fgos-coding-validating` materializes them at the single gate.
 
+Piece 4 (index 3) declares `deps: [1]` on piece 2 (`version-guard.mjs`) and
+piece 5 (index 4) declares `deps: [0]` on piece 1 (`install.sh`/`.ps1`) —
+both are real footprint overlaps the engine's own `footprintOverlapAmong`
+check caught on the first `--verdict decompose` attempt
+(`tsk-1fp-1 ↔ tsk-1fp-5`, `tsk-1fp-2 ↔ tsk-1fp-4`); declaring the sequential
+dependency is what clears a conflict that is genuinely sequential, not
+parallel.
+
 ```json
 [
   {
@@ -120,7 +128,8 @@ is created here; `fgos-coding-validating` materializes them at the single gate.
     "action": "D4: routine setup respects the recorded pin; an explicit upgrade action moves it forward; pinning older than current is still a refused downgrade",
     "footprint": ["bin/fgos.mjs", "src/cli/command-registry.mjs", "src/setup/version-guard.mjs", "test/setup/pin-upgrade.test.mjs"],
     "kind": "feature",
-    "risk": "medium"
+    "risk": "medium",
+    "deps": [1]
   },
   {
     "title": "R21/R22 fail-closed parity gate owned by the installer",
@@ -128,7 +137,8 @@ is created here; `fgos-coding-validating` materializes them at the single gate.
     "action": "D5: R21/R22 built from bee's rule text now, owned by the installer's own fail-closed gate, since it is the one process performing the apply",
     "footprint": ["scripts/install.sh", "scripts/install.ps1", "src/setup/parity-check.mjs", "test/scripts/install-parity.test.mjs"],
     "kind": "feature",
-    "risk": "high"
+    "risk": "high",
+    "deps": [0]
   },
   {
     "title": "Supersede docs/specs/distribution.md's Entry Points (RUL1-RUL12) with a new decision record",
