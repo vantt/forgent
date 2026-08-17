@@ -41,6 +41,18 @@ dispatching it anyway is the same "soul re-deriving what a live soul
 already knows" waste `tsk-1ni` found in `judgeDiscovery`'s blind
 cli-spawn.
 
+A single tool call the live session makes directly inside its own
+reasoning — `WebSearch`, `Read`, `Grep`, `Bash`, or any other primitive
+the session already has — is never itself a candidate for `decide`. It
+spawns nothing of its own, so there is no in-process/out-of-process choice
+to make; it is exactly "doing it inline" in the sentence above, not a
+fifth reason to dispatch. This holds even for a burst of several such
+calls in a row (e.g. a research pass running `WebSearch` repeatedly) —
+`decide` coordinates whether a STEP a skill would otherwise do inline gets
+handed to a capacity/executor instead; it was never meant to gate the
+session's own direct tool use, the same way it has never gated a `Read` or
+a `Grep`.
+
 ## Step A — ask `decide` (never read the config yourself)
 
 ```bash
