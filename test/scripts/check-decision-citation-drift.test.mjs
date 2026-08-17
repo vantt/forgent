@@ -448,6 +448,50 @@ test(
   },
 );
 
+test(
+  'a shifted line number alone does not make a baselined finding report ' +
+    'as new (tsk-3x8 F1: content-keyed, not line-keyed)',
+  () => {
+    const original = {
+      kind: 'bare-citation',
+      file: 'a.md',
+      line: 3,
+      id: 'ADR0002',
+      text: 'see ADR0002 here',
+    };
+    const baseline = baselineFromFindings([original]);
+    const shifted = { ...original, line: original.line + 1 };
+    const result = findNewFindings([shifted], baseline);
+    assert.equal(result.length, 0);
+  },
+);
+
+test(
+  'two citations of the same id on different lines/text stay distinct',
+  () => {
+    const findings = [
+      {
+        kind: 'bare-citation',
+        file: 'a.md',
+        line: 1,
+        id: 'ADR0002',
+        text: 'see ADR0002 here',
+      },
+      {
+        kind: 'bare-citation',
+        file: 'a.md',
+        line: 5,
+        id: 'ADR0002',
+        text: 'also see ADR0002 there',
+      },
+    ];
+    const baseline = baselineFromFindings([findings[0]]);
+    const result = findNewFindings(findings, baseline);
+    assert.equal(result.length, 1);
+    assert.equal(result[0].text, 'also see ADR0002 there');
+  },
+);
+
 // --- CLI: --write-baseline self-consistency ------------
 
 test(
@@ -568,6 +612,75 @@ test(
     );
     assert.equal(rerun.status, 1);
     assert.match(rerun.stdout, /RUL42/);
+  },
+);
+
+test(
+  'a line inserted BEFORE a baselined finding does not make it report as ' +
+    'new (tsk-3x8 F1: the exact hand-verified repro, CLI level)',
+  () => {
+    const dir = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'citation-drift-baseline-'),
+    );
+    const decisionsDir = path.join(dir, 'decisions');
+    const specsDir = path.join(dir, 'specs');
+    fs.mkdirSync(decisionsDir);
+    fs.mkdirSync(specsDir);
+    fs.writeFileSync(
+      path.join(dir, 'backlog.md'),
+      'nothing here\n',
+    );
+    fs.writeFileSync(
+      path.join(specsDir, 'a.md'),
+      'see ADR0002 for the model\n',
+    );
+    const baselinePath = path.join(dir, 'baseline.json');
+
+    spawnSync(
+      process.execPath,
+      [
+        scriptPath,
+        '--decisions-dir',
+        decisionsDir,
+        '--backlog',
+        path.join(dir, 'backlog.md'),
+        '--specs-dir',
+        specsDir,
+        '--baseline',
+        baselinePath,
+        '--write-baseline',
+      ],
+      { encoding: 'utf8' },
+    );
+
+    fs.writeFileSync(
+      path.join(specsDir, 'a.md'),
+      '<!-- an unrelated inserted line -->\n' +
+        'see ADR0002 for the model\n',
+    );
+
+    const rerun = spawnSync(
+      process.execPath,
+      [
+        scriptPath,
+        '--decisions-dir',
+        decisionsDir,
+        '--backlog',
+        path.join(dir, 'backlog.md'),
+        '--specs-dir',
+        specsDir,
+        '--baseline',
+        baselinePath,
+      ],
+      { encoding: 'utf8' },
+    );
+    assert.equal(
+      rerun.status,
+      0,
+      `expected the shifted-but-unchanged finding to stay ` +
+        `baselined, got:\n${rerun.stdout}`,
+    );
+    assert.match(rerun.stdout, /no new findings/);
   },
 );
 
