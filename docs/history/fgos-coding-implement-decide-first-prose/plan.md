@@ -69,6 +69,41 @@ Two edits, applied identically to both files:
    just assert" discipline every other skill in this repo already
    follows).
 
+## Post-return correction (rejected, fixed, re-returned)
+
+`npm test` was never part of this item's own `verify` command until this
+correction — `fgos return` only re-ran the narrow grep/diff. A user-
+requested full `npm test` run against the returned branch caught 1 real
+failure: `test/scripts/check-decision-citation-drift.test.mjs`'s CLI-
+against-real-repo case. Root cause: `scripts/check-decision-citation-
+drift.baseline.json` keys findings by `kind:line:id`
+(`scripts/check-decision-citation-drift.mjs:152`) — this item's own edit
+inserted 13 lines into the Hard rules bullet and 4 more into Flow step 2,
+shifting every pre-existing, already-baselined citation below that point
+by +17 lines in both edited files. Confirmed mechanical, not a new
+citation: `230:D2`→`247:D2` (+17), `295:D18`→`312:D18` (+17),
+`315:RUL33/34`→`332:RUL33/34` (+17) — exact match.
+
+Fix: regenerate the baseline with `node scripts/check-decision-citation-
+drift.mjs --skills-dir .agents/skills --skills-dir plugins/fgOS/skills
+--write-baseline` (the exact invocation `test/scripts/check-decision-
+citation-drift.test.mjs`'s own "real repo root" case uses,
+`--skills-dir` flags required — running the script bare defaults
+`skillsDirs` to `[]`, scanning only `docs/backlog.md` + `docs/specs/*.md`
+and silently wiping every skill-file baseline entry; caught before
+committing by diffing the regenerated baseline against the checked-in one
+and finding 794 unrelated deletions across dozens of files never touched
+by this item — reverted via `git checkout --` and re-run with the correct
+flags). Confirmed the regenerated baseline only touches this item's own 2
+edited files' entries (36 changed lines, exact +17 line-shift, no content
+change) via `git diff`.
+
+Item's own `verify` widened to include the citation-drift CLI check
+itself (fast, targeted — not the full `npm test` suite, which is
+excessive for `return`'s own per-item re-verify) so a future edit to
+either mirrored file that causes the same class of drift fails at
+`return` time instead of requiring a manual full-suite run to catch.
+
 ## Concrete cases
 
 - A `coding`-domain item at `executing` whose capacity IS registered
