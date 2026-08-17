@@ -10,36 +10,50 @@ status: open
 
 ## 1. Trạng thái hiện tại
 
-Round 2 (2026-08-17): đã xác định đúng nguồn so sánh thật —
-`/home/vantt/projects/beegog/` (live checkout, KHÁC với
-`upstreams/beegog/` trong chính repo này, vốn chỉ là clone đã pull nhưng
-vẫn dừng ở bản cũ). Live checkout có đúng cấu trúc v2.7.0 item mô tả:
-`packages/bee-rs` (crate Rust duy nhất), `packages/bee` (vendor payload),
-`skills/` (9 skill). Người đã xác nhận dùng checkout này làm nguồn so
-sánh. Phát hiện mới: beegog không có khái niệm multi-domain nào giống
-`DOMAINS` của fgOS — nên nó là tiền lệ thật cho trục (b) engine-vs-prose,
-nhưng KHÔNG phải tiền lệ cho trục (a) core-foundation-vs-domain-specific.
-Vẫn đang chờ người trả lời câu hỏi mở đầu từ round 1: có nên tách hai
-trục thành hai luồng riêng — chốt trục (b) ngay (có tiền lệ thật + pain
-thật: 3 cây skill trùng lặp), park trục (a) tới khi có domain sản xuất
-thật thứ hai?
+Round 4 (2026-08-17): người xác nhận mục tiêu thật của item — tổ chức
+folder-layout để ranh giới rõ, dễ theo hexagonal/ports-adapters, dễ giữ
+contract, dễ thêm/mở rộng, VÌ sẽ có thêm domain thật (không phải suy đoán
+— STR52 backlog xác nhận domain "marketing" đã proposed). Scout tìm thấy
+STR89 (done) đã định vị sẵn 4 điểm nối domain-specific cần mở
+(registry/`discovery.mjs`+`decompose.mjs`/`fgos-routing`/skill-bundle
+riêng) — đây chính là "ports" hexagon cần thiết kế quanh, không phải suy
+diễn từ đầu. Người cũng sửa cách làm việc của trợ lý: khi có đủ chất liệu
+để phân tích, phải tự phân tích và đề xuất — không hỏi ngược lại người mà
+chưa đưa ra khuyến nghị. Áp dụng ngay: đã phân tích 3 tiêu chí người cho
+(field-compatible, security/phân vùng, performance) cho câu hỏi mở của
+STR52 (share store hay cài riêng) — cả 3 đều KHÔNG chặn share-store
+(field-compat đã có hạ tầng `domainFields` sẵn, security không có gì phải
+build vì chỉ cần filter theo `work.domain` có sẵn, performance đã chịu
+tải thật 19K events/8.4MB với incremental-replay fast path) → khuyến nghị
+**share store**, chờ người xác nhận khoá. Trục (b) engine-vs-prose vẫn có
+tiền lệ thật từ `/home/vantt/projects/beegog/` (đã xác nhận round 2-3),
+trục (a) giờ không còn "chỉ 1 domain thật" — có domain #2 (marketing)
+thật đang chờ shape.
 
 ## 2. Mục tiêu & đề bài
 
-tsk-397 muốn thảo luận và điều chỉnh ranh giới thư mục/module của fgOS
-theo hai trục độc lập: (a) core-foundation (dùng chung mọi domain) vs
-domain-specific (harness + skill riêng theo domain), và (b) engine (code
-chạy được — cả JS lẫn Rust) vs skill/prose (doctrine mà agent đọc), tham
-khảo mô hình bee upstream (packages/bee-rs = rust core, packages/bee =
-vendor payload, skills/ = prose, 9 skill sau khi hợp nhất từ 18). Đây là
-item thảo luận kiến trúc thuần tuý — không quyết định implement gì — cần
-shaping/discovery trước khi khoá bất kỳ quyết định nào. fgOS thật ra là
-multi-domain (`DOMAINS` trong `src/state/workflow-stage-graphs.mjs`) nên
-"core" không phải một lớp phẳng theo giả định ban đầu của người submit;
-mục tiêu là tìm ranh giới cụ thể trong cây thư mục hiện tại (`src/`,
-`bin/`, `plugins/`, `.claude/skills`, `.agents/skills`, `herdr-plugin/`,
-`agents/`) và cân nhắc mô hình plugin/extension theo domain có đáng chi
-phí duy trì thêm một tầng tổ chức hay không.
+Mục tiêu thật (chốt round 4, lời người): tổ chức lại folder-layout của
+fgOS sao cho ranh giới RÕ, phù hợp tư duy hexagonal/ports-and-adapters
+(port = hợp đồng cố định mọi domain phải tuân, adapter = phần domain tự
+cắm vào), giữ được contract ổn định, và dễ THÊM domain mới/mở rộng —
+không phải bài tập lý thuyết, vì fgOS có domain thật thứ hai đang chờ
+(STR52: "marketing", proposed, đã có scope draft). Việc tách hai trục
+(core-foundation vs domain-specific; engine vs skill/prose) là công cụ để
+đạt mục tiêu đó, không phải mục tiêu tự thân. Tham khảo mô hình bee
+upstream — nguồn thật đã xác nhận là `/home/vantt/projects/beegog/` (live
+checkout v2.7.0: packages/bee-rs = rust core 1 crate/1 binary,
+packages/bee = vendor payload, skills/ = 9-skill prose) — làm tiền lệ cho
+trục engine-vs-prose; bản thân beegog không có multi-domain nên KHÔNG cho
+tiền lệ trục core-foundation-vs-domain-specific — trục này phải tự thiết
+kế dựa trên chất liệu thật của fgOS: STR52 (scope marketing) + STR89 (4
+điểm nối domain-pluggable đã xác định: `DOMAINS` registry,
+`discovery.mjs`/`decompose.mjs` retrofit, `fgos-routing` domain-aware,
+skill-bundle riêng theo domain) + hạ tầng `work.domainFields` (đã xây sẵn
+làm "infrastructure for a FUTURE domain", decision 0027 D6). Đây là item
+thảo luận kiến trúc thuần tuý — không quyết định implement gì trong
+chính item này — cần shaping/discovery trước khi khoá quyết định, rồi
+handoff sang `fgos-coding-exploring`/`fgos-coding-planning` cho việc thực
+thi thật.
 
 ## 3. Vấn đề rõ / chưa rõ
 
@@ -50,10 +64,13 @@ phí duy trì thêm một tầng tổ chức hay không.
 | 3 | Cây thư mục hiện tại đã có tách engine (code chạy được) khỏi skill/prose chưa? | Rõ một phần (scout) | Có JS engine (`bin/`, `src/`) + Rust engine riêng (`herdr-plugin/`, crate độc lập, song song `src/` chứ không lồng trong nó) tách khỏi ba cây skill: `.claude/skills/` (16, generated wrapper), `.agents/skills/` (16, nguồn canonical thật — CLAUDE.md tự ghi rõ), `plugins/fgOS/skills/` (~52, cây route theo plugin manifest, chứa cả wrapper theo-verb lẫn các skill `fgos-coding-*` cốt lõi). Prose đã tách khỏi code, nhưng đang nhân bản qua 3 cây thay vì 1 nguồn + render. |
 | 4 | `upstreams/` (path item liệt kê để khảo sát) có tồn tại trong repo không? | Rõ (scout, sửa lại round 1) | Có, trong main checkout (`upstreams/bee/`, `upstreams/beegog/`, gitignored) — round 1 chỉ kiểm trong worktree cô lập nên báo sai "không tồn tại". Cả hai đều là bản CŨ hơn `/home/vantt/projects/beegog/` (live). |
 | 5 | Doctrine layer (AGENTS.md/CLAUDE.md) đã có tiền lệ "luôn nạp vs nạp theo nhu cầu" nào gần với trục engine/skill chưa? | Rõ một phần (scout) | `docs/platform-foundations.md` L8 đã khoá placement test này CHO RIÊNG tầng doctrine (standing sheet vs reference nạp theo nhu cầu) — cùng tinh thần trục (b) nhưng chưa từng generalize ra toàn cây thư mục. |
-| 6 | Ranh giới cụ thể core-foundation vs domain-specific nên nằm ở đâu? | Chưa rõ | Phụ thuộc câu hỏi mở (round 1): có đáng tách domain-specific khi mới có 1 domain thật? |
+| 6 | Ranh giới cụ thể core-foundation vs domain-specific nên nằm ở đâu? | Chưa rõ (nhưng không còn speculative) | STR52 (marketing, proposed) + STR89 (done, đã định vị 4 điểm nối domain-pluggable) là chất liệu thật để thiết kế ranh giới, xem #10/#11 dưới. Vẫn cần thiết kế cụ thể layout. |
 | 7 | Engine vs skill/prose tách theo tiêu chí nào (ngôn ngữ? runtime-executable vs instruction-only? mức nạp?) | Chưa rõ | Cần thảo luận — ba cây skill hiện tại chưa nói rõ tiêu chí này bằng văn bản, chỉ có CLAUDE.md tự chú thích "generated wrapper" cho 2/3 cây. |
 | 8 | Mô hình plugin/extension theo domain có đáng chi phí duy trì thêm một tầng tổ chức? | Chưa rõ | Cần cân nhắc so với chi phí hiện trạng (giữ mọi thứ phẳng, domain phân biệt qua data `DOMAINS`, không qua thư mục). |
 | 9 | Nguồn so sánh bee/beegog thật nằm ở đâu, và nó có tiền lệ cho trục nào? | Rõ (scout + xác nhận người, round 2) | `/home/vantt/projects/beegog/` (live checkout, KHÁC repo-con `upstreams/beegog/` đã pull nhưng vẫn cũ) có đúng cấu trúc v2.7.0: `packages/bee-rs` (1 crate, 1 binary), `packages/bee` (vendor payload), `skills/` (9 skill, giảm từ 18/15). Không tìm thấy khái niệm multi-domain nào trong beegog (`grep -i "multi-domain\|DOMAINS\b"` không ra kết quả liên quan) — beegog là tiền lệ thật cho trục (b), KHÔNG phải tiền lệ cho trục (a). |
+| 10 | Domain thật thứ hai có tồn tại/đang chờ không? | Rõ (scout, round 4) | Có — `docs/backlog.md` STR52: "Domain thứ hai THẬT: marketing", status `proposed`, nêu 2026-07-18. Người dùng có sẵn workflow marketing ở project khác, muốn điều phối qua fgOS. Câu hỏi scope gốc của STR52 (share store hay cài fgOS riêng) — xem #12. |
+| 11 | Domain-specific cần mở những điểm nối nào trong code hiện tại? | Rõ (scout, round 4) | STR89 (done) định vị 4 điểm: (1) `DOMAINS` registry entry riêng cho domain mới (`src/state/workflow-stage-graphs.mjs`); (2) `discovery.mjs`/`decompose.mjs` retrofit — hiện hardcode literal stage-name của coding, cảnh báo sẵn trong comment `workflow-stage-graphs.mjs:29-34`; (3) `fgos-routing` domain-pluggable hoá — tự thú nhận hôm nay "the only domain this induction targets [is coding]"; (4) bộ skill nội dung riêng theo domain-extension, song song bộ coding. Thứ tự đã xác nhận: software-dev (coding) trước, marketing sau, không chặn nhau. |
+| 12 | STR52's câu hỏi scope (share store hay cài fgOS riêng cho domain mới) — trả lời thế nào? | Rõ (phân tích round 4, chờ khoá) | Người cho 3 tiêu chí cân nhắc: field-compatible, security (phân vùng thông tin), performance (nhiều domain handle nổi không) — nếu giải được hết thì mặc định share (foundation càng nhiều càng tốt). Phân tích: (a) field-compat ĐÃ CÓ hạ tầng — `work.domainFields.<domain>.<key>`, validate qua `fieldSchema` per-domain tuỳ chọn (`src/state/work.mjs:699-740`), code tự chú thích "infrastructure for a FUTURE domain" (decision 0027 D6), namespace domain khác luôn được giữ nguyên không đụng tới. (b) security: không có blocker — store không có khái niệm multi-tenant/ACL, chỉ cần filter theo `work.domain` có sẵn khi cần view riêng theo domain, không phải xây mới. (c) performance: `.fgos/events.jsonl` hiện tại (1 domain, coding) đã 19,037 events/8.4MB thật, `replay.mjs` đã có incremental-rebuild + snapshot fast path (không phải full replay tuyến tính mỗi lần đọc) — thêm domain thứ hai chỉ thêm volume, không đổi độ phức tạp. → Khuyến nghị: **share store**, chờ người xác nhận khoá thành D-ID. |
 
 ## 4. Quyết định đã chốt
 
@@ -89,6 +106,20 @@ phí duy trì thêm một tầng tổ chức hay không.
   quan — beegog không có khái niệm multi-domain. Người xác nhận: dùng
   `/home/vantt/projects/beegog/` làm nguồn so sánh cho phần còn lại của
   thảo luận.
+- 2026-08-17 — Round 3 Q&A: người sửa lại mục tiêu thảo luận cho trợ lý —
+  "mục tiêu là tổ chức folder-layout để rõ boundary, dễ hexagon, dễ
+  contract, dễ thêm, dễ mở rộng, vì còn có thêm domain". Ghi nhận: đây
+  KHÔNG phải giả định — có domain thật thứ hai đang chờ (xem round 4).
+- 2026-08-17 — Round 4 Q&A: scout `docs/backlog.md` tìm STR52 (marketing
+  domain, proposed) + STR89 (done, domain-pluggable seams). Trợ lý hỏi
+  ngược người câu hỏi scope của STR52 (share store hay cài riêng) mà
+  KHÔNG tự phân tích trước — người phản hồi: đây là việc trợ lý phải tự
+  làm advisor, đưa ra 3 tiêu chí cân nhắc (field-compat, security,
+  performance) và mặc định share nếu giải được hết. Trợ lý scout
+  `src/state/work.mjs` (`validateDomainFields`, dòng 699-740) và
+  `src/state/store.mjs`/`replay.mjs` (incremental fast path) + kiểm tra
+  `.fgos/events.jsonl` thật (19,037 events/8.4MB) — cả 3 tiêu chí đều
+  không chặn share-store. Khuyến nghị: share store — chờ người khoá.
 
 ## 6. Thiết kế đã chốt {#design}
 
