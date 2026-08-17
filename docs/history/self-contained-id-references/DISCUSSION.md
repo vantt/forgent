@@ -104,6 +104,23 @@ bắt buộc phải mở file gốc trước khi hiểu được câu đang đ�
      luật): bee chọn **cả hai, chia theo đúng ranh giới máy-kiểm-được vs
      người-phán-được** — không phải một lựa chọn nhị phân.
 
+- **2026-08-17T~08:55Z — Đăng ký 2 candidate vào porting-log (agent, theo
+  yêu cầu "cập nhật tài liệu tìm được").** Thêm 2 dòng `candidate` vào
+  `docs/distillery/porting-log.md` qua `addPorting()`
+  (`src/state/porting-store.mjs`, đúng cửa ghi state layer, không tay-sửa
+  `events.jsonl`): `decision-citation-and-reversal-sweep` (R3 E2 F3) và
+  `one-line-cite-plus-local-delta` (R3 E2 F2) — cả hai nguồn `beegog`. Đây
+  là bước chính thức hoá 2 phát hiện round 2 vào hệ thống porting của
+  distillery, tách biệt với việc mô tả tính năng ở `sources/bee.md` (đã
+  làm round 2) — porting-log là nơi TRACK quyết định có port vào fgOS hay
+  không, còn `sources/bee.md` chỉ MÔ TẢ tính năng tồn tại ở nguồn. Người
+  dùng hỏi thêm: "họ (beegog) có 3 tầng luật như fgOS hay mấy tầng?" — trả
+  lời trong chat: beegog có CÙNG hình dạng 3 tầng (global decision /
+  area-scoped rule numbering-lại-mỗi-file / feature-local D-label), khác ở
+  chỗ tầng global rẻ hơn (một lệnh CLI thay vì viết tay 1 file ADR mới) và
+  tầng feature-local ĐƯỢC PHÉP trích ra ngoài miễn kèm neo toàn cục
+  (short8) — không cấm tuyệt đối như luật D-local của fgOS.
+
 ## 6. Thiết kế đã chốt {#design}
 
 *(chưa đủ chín — chưa có quyết định nào chốt ở §4)*
