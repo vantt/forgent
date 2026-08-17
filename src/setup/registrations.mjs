@@ -40,7 +40,7 @@ import { driftStatus, unmergedDeliveries } from '../state/drift-status.mjs';
 import { computeEnduserDocsIndex, generateEnduserDocsIndex, manifestPathFor } from '../report/enduser-index-generate.mjs';
 import { isResolvedStatus } from '../state/frontier.mjs';
 import { DOMAINS, getDomain, resolveDomainName, effectiveStage } from '../state/workflow-stage-graphs.mjs';
-import { readLocalStatus, classifyRegistryPosture, toolsFromCapacities } from '../state/tool-registry.mjs';
+import { readLocalStatus, classifyRegistryPosture, toolsFromExecutors } from '../state/tool-registry.mjs';
 import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { describeConfigAwareness } from '../config/global-config.mjs';
 import { resolveFgosBin, refreshGlobalBinCache } from './bin-discovery.mjs';
@@ -525,7 +525,7 @@ function checkDispatchDecideHookWired(cwd) {
 // (e.g. "impact-analysis") — the registry itself never names one.
 //
 // tsk-in1-1 D1: tools are no longer event-sourced (`view.tools`) — reads
-// `runner.capacities` straight from `.fgos/config.json` (via `readSharedConfig`,
+// `runner.executors` straight from `.fgos/config.json` (via `readSharedConfig`,
 // the same raw-read every other doctor check in this file already uses),
 // same as `fgos tool check/query` (bin/fgos.mjs) now does.
 function checkToolRegistryConfigured(cwd) {
@@ -534,12 +534,12 @@ function checkToolRegistryConfigured(cwd) {
     return { passed: true, message: 'not inside a git checkout — nothing to check' };
   }
   const fgosDir = path.join(mainCheckout, '.fgos');
-  const capacities = readSharedConfig(mainCheckout)?.runner?.capacities;
-  const tools = toolsFromCapacities(capacities);
+  const executors = readSharedConfig(mainCheckout)?.runner?.executors;
+  const tools = toolsFromExecutors(executors);
   const localStatus = readLocalStatus(fgosDir);
   const { posture, registeredCount, presentCount, missingCount, unknownCount } = classifyRegistryPosture(tools, localStatus);
   if (posture === 'inactive') {
-    return { passed: true, message: 'inactive — no tool-capable capacities declared (add one to runner.capacities in .fgos/config.json)' };
+    return { passed: true, message: 'inactive — no tool-capable executors declared (add one to runner.executors in .fgos/config.json)' };
   }
   if (posture === 'full') {
     return { passed: true, message: `full — ${presentCount}/${registeredCount} registered tool(s) present` };

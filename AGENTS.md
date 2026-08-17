@@ -115,16 +115,16 @@ There is no mechanical guard against this (git has no hook that can
 refuse a stash) — stash selectively, or use `fgos main-checkout-reset`
 above instead of stash-and-reset as a shortcut.
 
-## Dispatch — routing work to a capacity
+## Dispatch — routing work to a executor
 
-**Before dispatching any task out of the current turn — a work item, a registered capacity, an ad-hoc task, or your own direct Agent/Task-tool call — run `node src/runner/dispatch.mjs decide` first. Never decide the mechanism yourself.** A `PreToolUse` hook enforces this on Agent/Task-tool calls: it runs `decide` for you and refuses the call when the answer comes back as anything other than `in-process`.
+**Before dispatching any task out of the current turn — a work item, a registered executor, an ad-hoc task, or your own direct Agent/Task-tool call — run `node src/runner/dispatch.mjs decide` first. Never decide the mechanism yourself.** A `PreToolUse` hook enforces this on Agent/Task-tool calls: it runs `decide` for you and refuses the call when the answer comes back as anything other than `in-process`.
 
 Four ways to call `decide`, for four different situations:
 
-- `decide <capacityId>` — you already know the exact capacity name (e.g. `judge-discovery`).
-- `decide --for <purpose>` — you know what JOB you need done (e.g. `judge`), but not which capacity serves it.
+- `decide <executorId>` — you already know the exact executor name (e.g. `judge-discovery`).
+- `decide --for <purpose>` — you know what JOB you need done (e.g. `judge`), but not which executor serves it.
 - `decide --work <id>` — you have a real work item and want it dispatched.
-- `decide --for <label> --needs-soul` — you are about to fire an Agent/Task tool yourself, with no capacity or work item to name.
+- `decide --for <label> --needs-soul` — you are about to fire an Agent/Task tool yourself, with no executor or work item to name.
 
 Add `--has-live-task-access` when you already have the Agent/Task tool in your own tool manifest. This is always your own self-declaration — never probed from the environment, never guessed.
 
@@ -136,7 +136,7 @@ Three possible `mechanism` results, each needing a different response:
 
 Every result also carries `configured: true|false` — `false` means nothing is configured for that name or job, and the answer came from the default.
 
-A skill that dispatches should not re-derive any of this. Point its reasoning step at the shared fragment `.claude/skills/_shared/capacity-dispatch-fallback.md` (mirrored byte-identical at `.agents/skills/_shared/`).
+A skill that dispatches should not re-derive any of this. Point its reasoning step at the shared fragment `.claude/skills/_shared/executor-dispatch-fallback.md` (mirrored byte-identical at `.agents/skills/_shared/`).
 
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence

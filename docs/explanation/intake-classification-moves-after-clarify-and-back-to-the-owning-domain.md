@@ -18,7 +18,7 @@ submit`, with the earlier read working from worse input:
 
 - **Before submit**: `fgos-submit-assist` classified `tier`/`kind`/`risk`
   against the raw, messy ask, optionally dispatching to a
-  `submit-assist-classify` capacity.
+  `submit-assist-classify` executor.
 - **After submit, at `discovery`**: `fgos-clarifying` read the *same* text
   again, understood intent, and was already permitted to rewrite
   `title`/`description` in place (D14).
@@ -80,13 +80,13 @@ not just illustrative color.
 - The no-soul path (bare shell, cron, `dogfood-fixture:submit`, another
   agent) is untouched: keyword-derived values stand until `discovery`
   runs later, byte-identical to before this item.
-- `submit-assist-classify` — previously a bare *global* capacity —
+- `submit-assist-classify` — previously a bare *global* executor —
   becomes the coding domain's own classifier, declared through `DOMAINS`
   instead of floating as an unowned global id (this half is the piece
   `tsk-3fj` carried out as its own child item, later found to have no
   real remaining dispatch consumer and retired entirely by `tsk-4ns`/
   `tsk-49u` — see
-  `docs/explanation/coding-classify-intake-capacity-lifecycle-created-then-retired-as-dead-config.md`
+  `docs/explanation/coding-classify-intake-executor-lifecycle-created-then-retired-as-dead-config.md`
   for that full follow-on story).
 - `DOMAINS[domain]` gains a real classification vocabulary declaration
   (valid `kind`/`risk` values, a `tier` rubric) so a second domain can't
@@ -97,7 +97,7 @@ not just illustrative color.
 
 Three adjacent problems found during the same investigation were filed as
 separate items rather than folded in: making `fgos-researching`'s gather
-fan-out a real capacity, a dead `executors.judge` config entry with
+fan-out a real executor, a dead `executors.judge` config entry with
 `judge-decompose`'s cli-spawn path missing `Read`, and `sensitiveData`
 (locked at D7 of `agent-executor-submit-assist-classify` but never
 shipped). Bundling unrelated fixes into an already-heavy redesign was

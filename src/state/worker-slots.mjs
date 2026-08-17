@@ -3,7 +3,7 @@
 // `.fgos/` read, same discipline as plan-pool.mjs/cleanup-pool.mjs/
 // frontier.mjs — every caller folds the view itself and hands it in.
 //
-// The concept is a "worker slot", never "capacity": docs/decisions/0026:73-87
+// The concept is a "worker slot", never "executor": docs/decisions/0026:73-87
 // already locked that word for a narrower, unrelated thing (a subTask-scale
 // helper unit, not a rootTask lifecycle) and says explicitly that the two do
 // not merge.

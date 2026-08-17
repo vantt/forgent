@@ -1,4 +1,4 @@
-# Shared fragment: capacity-dispatch-with-fallback
+# Shared fragment: executor-dispatch-with-fallback
 
 tsk-53h: extracted from the standalone submit-assist skill's own classify
 step (`tsk-5l2-3`), the first and — until a second consumer exists — only
@@ -6,17 +6,17 @@ real wiring of this pattern. That skill has since been retired in full
 (tsk-6ar) — its dispatch to this pattern was already gone before then
 (tsk-4ns, see Precedent below). Generalized here so a second in-session
 skill with an inline-reasoning step can gain the same optional
-dispatch-to-a-capacity path without copy-pasting this branch logic into
+dispatch-to-a-executor path without copy-pasting this branch logic into
 its own `SKILL.md` (DRY — independent copies drift the next time this
 logic changes,
 `docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md` D2).
 
 Point at this file from a consumer `SKILL.md` by relative path (e.g.
-`../_shared/capacity-dispatch-fallback.md`), filling in these three
+`../_shared/executor-dispatch-fallback.md`), filling in these three
 parameters where the consuming skill's own reasoning step lives:
 
-- **`<CAPACITY_ID>`** — the `.fgos/config.json`
-  `runner.capacities.<id>` key this step dispatches through (no live
+- **`<EXECUTOR_ID>`** — the `.fgos/config.json`
+  `runner.executors.<id>` key this step dispatches through (no live
   consumer of this fragment's own Steps A-C exists today, tsk-4ns — see
   Precedent below).
 - **`<PROMPT_TEMPLATE>`** — the fixed prompt text to send (so every
@@ -57,8 +57,8 @@ a `Grep`.
 
 ```bash
 root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-node "$root/src/runner/dispatch.mjs" decide <CAPACITY_ID> [--has-live-task-access]
-# when you have no capacity id, use the door that matches what you know:
+node "$root/src/runner/dispatch.mjs" decide <EXECUTOR_ID> [--has-live-task-access]
+# when you have no executor id, use the door that matches what you know:
 #   decide --for <PURPOSE>  [--has-live-task-access]
 #   decide --work <WORK_ID> [--has-live-task-access]
 #   decide --for <LABEL> --needs-soul [--has-live-task-access]
@@ -68,14 +68,14 @@ Then branch on `mechanism`:
 
 - **`unavailable`** — go straight to `<INLINE_FALLBACK_HEADING>`, printing
   nothing at all. This is the default/common path, byte-identical to
-  before this capacity existed.
+  before this executor existed.
 - **`in-process`** — call your own Agent/Task tool with the returned
   `agentType` (or your own default when absent). Print the announce line,
   then read its answer through Step C.
 - **`out-of-process`** — continue to Step B.
 
-When `--for`/`--work` resolved a `capacityId` (carried in this same JSON
-response, additive), reuse that exact value for `<CAPACITY_ID>` in every
+When `--for`/`--work` resolved a `executorId` (carried in this same JSON
+response, additive), reuse that exact value for `<EXECUTOR_ID>` in every
 step below — never re-derive it.
 
 ## Step B — execute (out-of-process only)
@@ -86,7 +86,7 @@ deciding it twice — Step A already did that; this step only self-executes
 (tsk-5tm-3 D5, matching marketing-cockpit's `run_task()` contract):
 
 ```bash
-node "$root/src/runner/dispatch.mjs" execute <CAPACITY_ID> --prompt "<PROMPT_TEMPLATE built as below>" [--has-live-task-access]
+node "$root/src/runner/dispatch.mjs" execute <EXECUTOR_ID> --prompt "<PROMPT_TEMPLATE built as below>" [--has-live-task-access]
 ```
 
 Prints the real result as JSON — `{"mechanism":"out-of-process", ...real
@@ -95,16 +95,16 @@ Print the announce line, then read `stdout` the same way a consumer used
 to read a hand-run command's own output:
 
 ```
-<CAPACITY_ID> - out-of-process - <provider> - <model>
+<EXECUTOR_ID> - out-of-process - <provider> - <model>
 ```
 
 An error from this call (a thrown `RunnerConfigError`, a spawn failure, a
 timeout) means fall straight to Step C — treat it exactly like a malformed
 response, never retry blind.
 
-## Ad-hoc capacity: a runtime-composed task instead of `<PROMPT_TEMPLATE>`
+## Ad-hoc executor: a runtime-composed task instead of `<PROMPT_TEMPLATE>`
 
-`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: a capacity
+`docs/history/two-layer-dispatch/DISCUSSION.md` D3/D6/D6b/D10: a executor
 whose consuming skill has no single fixed question to ask — the parent
 composes a different command each time, depending on what it just decided
 to split off — cannot fill in a registered `<PROMPT_TEMPLATE>` at all.
@@ -133,7 +133,7 @@ selection logic sits behind either yet — deciding them is a separate,
 later concern — but the slots exist now on purpose: `resolveExecutorCommand`
 already threads `model`/`tier` end-to-end (`src/runner/dispatch.mjs`), and
 leaving them out at this layer would nail every ad-hoc dispatch to
-`capacity.model ?? modelForTier(cfg, work.tier)` — always the default
+`executor.model ?? modelForTier(cfg, work.tier)` — always the default
 backend — forcing every call site written against this shape to be
 revisited later just to add them.
 
@@ -162,8 +162,8 @@ field), continue at Step B above, substituting the task for
 unchanged. When the task's own optional `tier`/`model` fields were
 filled in, pass them through as `--tier <tier>`/`--model <model>` on that
 same `execute` call (`tsk-2k1`, D10) — either flag, when given, wins over
-the capacity's own declared tier/model and the computed default; omitted
-(every registered-`<CAPACITY_ID>` call that names neither) resolves
+the executor's own declared tier/model and the computed default; omitted
+(every registered-`<EXECUTOR_ID>` call that names neither) resolves
 exactly as before this plumbing existed. Which tier/model a task SHOULD
 choose is not decided here — `#task-tier-judged-at-dispatch` — this is
 only the pass-through.
@@ -172,7 +172,7 @@ only the pass-through.
 
 If the response is missing, unparseable, or doesn't map to a real value
 for the field(s) the consuming skill actually needs, fall back to
-`<INLINE_FALLBACK_HEADING>` entirely, exactly as if the capacity were
+`<INLINE_FALLBACK_HEADING>` entirely, exactly as if the executor were
 absent. Either way the output is non-authoritative: a wrong external
 suggestion is exactly as cheap to fix later as a wrong inline one — never
 treat a dispatched answer as more trustworthy than the skill's own
@@ -187,7 +187,7 @@ into a separate field (D12 picked the smaller path over a field split:
 `work.tier` keeps carrying both its existing meanings unchanged; this
 section only adds an override at dispatch TIME, resolved through the
 `--model`/`--tier` flags `dispatch.mjs execute` already accepts,
-tsk-2k1/D10). Skip this section entirely for a registered `<CAPACITY_ID>`
+tsk-2k1/D10). Skip this section entirely for a registered `<EXECUTOR_ID>`
 dispatch with no reason to deviate from its own declared tier/model —
 nothing here changes that path.
 
@@ -217,7 +217,7 @@ Fail-safe is the INVERSE of the six-field task's own (there, a missing
 required field means "do not dispatch, fall back to
 `<INLINE_FALLBACK_HEADING>` — Step C above): here, failing to reach a
 confident tier/provider judgment means dispatch ANYWAY, with the
-capacity's own declared default (`capacity.tier`/`capacity.model`, or the
+executor's own declared default (`executor.tier`/`executor.model`, or the
 computed `modelForTier` fallback) — an unresolved judgment is never a
 reason to block a dispatch that would otherwise proceed.
 
@@ -250,7 +250,7 @@ scarcity signal needs the full denominator, not just the misses.
 
 ## Precedent
 
-- `docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-capacity.md`
+- `docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-executor.md`
   — the how-to this fragment's own branch logic was extracted from; still
   the reference for config-entry/registration steps (1–3 there), which
   this fragment does not repeat.

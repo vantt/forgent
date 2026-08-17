@@ -50,13 +50,13 @@ verdict; it never guesses past a gap.
   checking — each branch gets its own explicit unit of work: a stated goal,
   concrete inputs, a boundary, an expected result shape, a return contract —
   the same six-field discipline
-  `../_shared/capacity-dispatch-fallback.md`'s own ad-hoc task already
+  `../_shared/executor-dispatch-fallback.md`'s own ad-hoc task already
   uses (that fragment is the door `tsk-29i`'s delegation rule already opened
   for exactly this — contracted dispatch, never an unscoped Task call). A
   single-branch question, or branches that depend on each other's result,
   stay inline and sequential — no dispatch at all.
 - **Every fan-out branch dispatches via native Task-tool, always (tsk-5tm-2
-  D6: the `gather`-purpose capacity this section used to consult is
+  D6: the `gather`-purpose executor this section used to consult is
   retired — no architectural reason on record for needing cross-provider
   dispatch here, and native Task-tool already met the one documented
   reason, parallelizing wall-clock).** No purpose check, no decide/resolve

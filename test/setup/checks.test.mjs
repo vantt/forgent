@@ -738,18 +738,18 @@ test('fgos check (CLI e2e) reports changelogNag and appends a checkpoint to chan
 });
 
 // tsk-in1-1 D1: a tool provider is declared directly in
-// `runner.capacities.<id>` (`.fgos/config.json`), config-edited like every
-// other capacity, never through a `fgos tool register` event.
-function declareCapacity(cwd, id, fields) {
+// `runner.executors.<id>` (`.fgos/config.json`), config-edited like every
+// other executor, never through a `fgos tool register` event.
+function declareExecutor(cwd, id, fields) {
   const configPath = path.join(cwd, '.fgos', 'config.json');
   const cfg = fs.existsSync(configPath) ? JSON.parse(fs.readFileSync(configPath, 'utf8')) : {};
   cfg.runner ??= {};
-  cfg.runner.capacities ??= {};
-  cfg.runner.capacities[id] = fields;
+  cfg.runner.executors ??= {};
+  cfg.runner.executors[id] = fields;
   // tsk-45f D11 (tsk-34n retired the "capability" singular fallback --
   // "for" is the only field read now): "for" is catalog-validated against
   // cfg.runner.capabilities -- declare each entry here so this raw fixture
-  // writer keeps producing a loadable config, same as a real capacity
+  // writer keeps producing a loadable config, same as a real executor
   // would need.
   if (Array.isArray(fields.for)) {
     cfg.runner.capabilities ??= {};
@@ -760,7 +760,7 @@ function declareCapacity(cwd, id, fields) {
   fs.writeFileSync(configPath, JSON.stringify(cfg, null, 2));
 }
 
-test('tool-registry-configured passes when no tool-capable capacity is declared at all (inactive — a clean skip, never a failure)', () => {
+test('tool-registry-configured passes when no tool-capable executor is declared at all (inactive — a clean skip, never a failure)', () => {
   const cwd = mkTemp('fgos-tool-registry-inactive-');
   execFileSync('git', ['init', '-q'], { cwd });
   spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
@@ -774,7 +774,7 @@ test('tool-registry-configured passes when every declared tool is checked presen
   const cwd = mkTemp('fgos-tool-registry-full-');
   execFileSync('git', ['init', '-q'], { cwd });
   spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
-  declareCapacity(cwd, 'echo-tool', { kind: 'tool', for: ['test-capability'], invocations: [{ via: 'cli', command: 'echo', args: [] }] });
+  declareExecutor(cwd, 'echo-tool', { kind: 'tool', for: ['test-capability'], invocations: [{ via: 'cli', command: 'echo', args: [] }] });
   const check = spawnSync(process.execPath, [FGOS, 'tool', 'check'], { cwd, encoding: 'utf8' });
   assert.equal(check.status, 0, check.stderr);
   const { passed, message } = checkById('tool-registry-configured').check(cwd);
@@ -787,7 +787,7 @@ test('tsk-3oa2: tool-registry-configured FAILS when a declared tool is missing o
   const cwd = mkTemp('fgos-tool-registry-degraded-');
   execFileSync('git', ['init', '-q'], { cwd });
   spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
-  declareCapacity(cwd, 'never-checked-tool', { kind: 'tool', for: ['test-capability'], invocations: [{ via: 'cli', command: 'echo', args: [] }] });
+  declareExecutor(cwd, 'never-checked-tool', { kind: 'tool', for: ['test-capability'], invocations: [{ via: 'cli', command: 'echo', args: [] }] });
   // Deliberately never runs `fgos tool check` -- the tool stays "unknown",
   // which classifyRegistryPosture reports as degraded (never inactive).
   const { passed, message } = checkById('tool-registry-configured').check(cwd);

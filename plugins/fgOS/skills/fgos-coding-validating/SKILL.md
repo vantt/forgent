@@ -70,8 +70,8 @@ pass to keep the item moving.
   Task/Agent call is collapsed by default in the transcript, not hidden,
   unlike a genuinely opaque headless `claude -p` subprocess). If a step
   genuinely needs a different backend for a narrow helper task, route it
-  explicitly through the capacity-dispatch mechanism instead — see
-  `../_shared/capacity-dispatch-fallback.md` for its own list of valid
+  explicitly through the executor-dispatch mechanism instead — see
+  `../_shared/executor-dispatch-fallback.md` for its own list of valid
   reasons.
 - Do not apply the `planning`→`executing` edge yourself, and do not invent a
   new edge, stage, or field to record the verdict. The verdict is prose
