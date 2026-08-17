@@ -2,6 +2,20 @@
 
 ## 1. Trạng thái hiện tại
 
+Vòng 7 (2026-08-17): người dùng chọn (B) — retire `docs/decisions/*.md`
+corpus, dồn narrative vào `docs/specs/<area>.md`. Đồng thời nêu vấn đề rộng
+hơn: quá nhiều tài liệu spec/doc ngày càng phình, không rõ cái nào mới
+nhất, không ai retire cái cũ. Đã đo thật: `docs/history/` chiếm 1157/1546
+file md toàn repo (75%, 614 feature folder — TĂNG-THEO-THIẾT-KẾ, là lịch sử,
+không phải mục tiêu sửa). Vùng THẬT ĐÁNG LO: 267 file Diataxis end-user docs
+(`explanation` 161 + `reference` 85 + `how-to` 21) do `fgos-coding-compounding`
+tự sinh — và kỹ năng đó CÓ SẴN 2 lỗ hổng đúng lớp bug đang bàn: (1) không có
+bước tìm-trước-khi-tạo (thiếu `scribingTarget()`-tương-đương), (2) CÓ MỘT
+LUẬT TƯỜNG MINH CẤM prune/rewrite prose cũ ("never delete, shorten,
+restructure") — khả năng là NGUYÊN NHÂN CƠ HỌC trực tiếp gây phình. Xem §5
+round 7. Câu hỏi: mở rộng scope thiết kế sang cả tầng compounding/Diataxis
+này, không chỉ docs/decisions?
+
 Vòng 6 (2026-08-17): người dùng yêu cầu định nghĩa lại rõ ràng — đã có 3
 LOẠI quyết định (item-level/CONTEXT.md, engine bookkeeping, platform-level
 ADR corpus), giờ dồn về 1 store thì mỗi loại ghi GÌ vào đó. Trả lời ở §5
@@ -544,6 +558,65 @@ làm nguồn sự thật?**
 hơn bee một bước — thấy rằng bản thân corpus 1-file/quyết định là thừa,
 retire nó, dồn narrative vào `docs/specs/<area>.md` (area đã có sẵn) và chỉ
 giữ record ngắn trong `state.decisions` làm nguồn thật?
+
+### Round 7 — 2026-08-17T10:20Z — người dùng chọn B, mở rộng ra toàn bộ sprawl doc
+
+Người dùng chọn (B). Đồng thời nêu: "càng ngày càng nhiều tài liệu spec ...
+không có giới hạn/tiêu chuẩn theo scope/area được rewrite, retire theo mới
+nhất — vô vàng tài liệu outdate, đọc tài liệu mới cũng không rõ cái nào."
+
+**Đo thật** (không suy đoán): `find docs -iname "*.md" | wc -l` = **1546**
+file trong toàn `docs/`. Breakdown: `history/` 1157 (614 feature folder),
+`explanation/` 161, `reference/` 85, `decisions/` 35, `how-to/` 21,
+`distillery/` 31, `task-specs/` 13, `specs/` chỉ 12 (2 file trong đó —
+`runner.md`, `work-state.md` — nặng 235KB/file, phần còn lại gọn).
+
+`docs/history/` KHÔNG phải mục tiêu — nó là lịch sử append-forever theo
+thiết kế (một feature/item một folder, giống git log, không kỳ vọng "một
+file/scope mới nhất"). `docs/specs/` đã khá kỷ luật (12 file, ít, đã có thói
+quen "one area = one file"). **Vùng thật sự khớp đúng triệu chứng người
+dùng vừa nêu: 267 file Diataxis end-user doc** (`explanation`+`reference`+
+`how-to`+`tutorials`), sinh bởi kỹ năng `fgos-coding-compounding`.
+
+**Đọc trực tiếp `.agents/skills/fgos-coding-compounding/SKILL.md` (bước 2-3)
+— tìm ra 2 lỗ hổng đúng lớp bug đang bàn, không phải suy đoán:**
+
+1. **Không có bước tìm-trước-khi-tạo.** Bước 2 chọn quadrant (Diataxis),
+   bước 3 "Decide the target path from the quadrant chosen in step 2:
+   `docs/<quadrant>/<file>.md`" — TÊN FILE do phiên agent hiện tại tự đặt,
+   KHÔNG có bước search "đã có file nào phủ đúng chủ đề này chưa, dù tên
+   khác" trước khi quyết filename. So sánh trực tiếp với bee's
+   `one-area-one-file-forever` (round 1): *"check … existing `docs/specs/
+   *.md` for an area that already covers this surface (it may be named
+   differently than you'd name it today — search by what it describes, not
+   by the name you expect)"* — đúng bước fgOS đang thiếu. Đây chính là lỗ
+   khiến 2 phiên khác nhau có thể viết 2 file khác tên cho cùng một chủ đề.
+2. **Có một luật CẤM prune/rewrite prose cũ, tường minh.** Bước 3: *"If the
+   file already exists, grow it: accumulate … append what is new, and do
+   NOT delete, shorten, or restructure prose that is already there."* — và
+   dòng 225 lặp lại luật cấm y hệt. Đây RẤT có thể là NGUYÊN NHÂN CƠ HỌC
+   trực tiếp của "vô vàng tài liệu outdate": ngay cả khi một capture mới
+   phủ định capture cũ, luật hiện tại buộc phải GIỮ NGUYÊN văn cũ, chỉ được
+   thêm — không bao giờ được sửa/rút gọn/retire đoạn đã sai. Khác hẳn tinh
+   thần bee's `bootstrap-vs-harvest` + decision-memory's R2 (reconcile
+   citing artifact khi supersede) — bee cho phép SỬA khi có bằng chứng mới,
+   fgOS hiện tại thì không.
+
+**Ý nghĩa:** đây là bằng chứng CƠ HỌC, không phải cảm tính, cho đúng câu
+người dùng mô tả từ đầu round 1 ("tài liệu outdate được dùng làm kim chỉ nam
+dù thiết kế đã đổi") — root cause nằm ngay trong SKILL ghi tài liệu, không
+chỉ ở tầng decision. Việc redesign quyết định B (docs/decisions →
+docs/specs) và việc sửa 2 lỗ hổng này ở `fgos-coding-compounding` là CÙNG
+MỘT LỚP SỬA (write-time authority check + cho phép reconcile khi có bằng
+chứng mới), chỉ khác bề mặt áp dụng.
+
+**Câu hỏi cho người dùng:** xác nhận mở rộng scope thiết kế sang cả tầng
+Diataxis/`fgos-coding-compounding` (267 file, lớn hơn hẳn 35 file
+docs/decisions), áp cùng 2 nguyên lý — (1) tìm-trước-khi-tạo theo nội dung
+chứ không theo tên, (2) cho phép reconcile/retire prose cũ khi có capture
+mới mâu thuẫn, thay vì cấm tuyệt đối như hiện tại — hay anh muốn giữ scope
+lần này CHỈ ở docs/decisions + state.decisions, để phần compounding/Diataxis
+thành một item riêng sau?
 
 ## 6. Thiết kế đã chốt
 
