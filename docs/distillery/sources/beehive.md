@@ -628,11 +628,11 @@ Plugin suite "validate-first agentic development" cho Claude Code + Codex. Chưn
 - **Seen:** 1.3.9
 
 ### gate-presentation-contract
-- **What:** Every gate question shown in chat is a plain-language layer only; the full mechanical reasoning goes into a linked report under `docs/history/<feature>/reports/`, never pasted inline.
-- **Where:** `.claude/skills/bee-hive/SKILL.md`
-- **Notable:** Separates "what the human needs to decide" from "how the agent got there" as two different artifacts with two different audiences — directly reusable for any approval-gate UX.
-- **Keywords:** gate presentation, plain-language layer, linked report
-- **Seen:** 1.3.9
+- **What:** Every gate question shown in chat is a plain-language layer only (what/why trustworthy/cost if wrong/what you decide) plus the verbatim gate sentence; the full mechanical reasoning goes into a linked report under `docs/history/<feature>/reports/`, never pasted inline. Litmus: the user can restate the approval in their own words.
+- **Where:** `.claude/skills/bee-hive/SKILL.md`, `skills/bee-hive/references/routing-and-contracts.md`
+- **Notable:** Separates "what the human needs to decide" from "how the agent got there" as two different artifacts with two different audiences — directly reusable for any approval-gate UX. Pairs with Silent Bookkeeping (rule 11): internal vocab never leaks into chat unless the user asks.
+- **Keywords:** gate presentation, plain-language layer, linked report, litmus test
+- **Seen:** 1.3.9 (bee pass) / e70602a (beegog pass — merged duplicate, was separately filed under docs-style)
 
 ### section-to-source-map
 - **What:** bee-briefing's rendered plan document traces every section to a named source artifact (CONTEXT.md / plan.md / cells); a section with no traceable source becomes an Open Question instead of being filled by guess.
@@ -917,12 +917,6 @@ Plugin suite "validate-first agentic development" cho Claude Code + Codex. Chưn
 - **What:** docs đánh số 00-vision → 07-contracts theo trục why → what → how → contract; adoption audits (08–11) ghi lại việc học từ project khác thành tài liệu chính thức (keep wholesale / change / reject + lý do từng mục).
 - **Where:** `docs/00..11-*.md`, đặc biệt `01-distillation.md`, `08/09-*-adoption.md`
 - **Notable:** 01/08/09 chính là thể loại "reference learning" forgent đang xây — có trước, đáng học format.
-- **Seen:** e70602a
-
-### gate-presentation-contract
-- **What:** Chat chỉ chứa lớp plain-language (what/why trustworthy/cost if wrong/what you decide) + câu gate verbatim; mechanical reports link chứ không paste. Litmus: user restate được approval bằng lời mình.
-- **Where:** `skills/bee-hive/references/routing-and-contracts.md`
-- **Notable:** đi cùng Silent Bookkeeping (rule 11): bee vocab không lọt vào chat trừ khi user hỏi.
 - **Seen:** e70602a
 
 ### error-why-fix-refusals
