@@ -2,6 +2,15 @@
 
 ## 1. Trạng thái hiện tại
 
+Vòng 11 (2026-08-17): người dùng xác nhận round 10, hỏi làm rõ: chỉ đổi
+THỜI ĐIỂM (retrospective thay vì approve), hay cả CÁCH GỌI skill cũng đổi
+theo bee? Trả lời rõ ở §5 round 11: CHỈ đổi thời điểm — cách gọi
+`fgos-coding-compounding` (1 lần, batch, qua `/fgOS:retro-loop`, không cron)
+giữ NGUYÊN như hiện tại, KHÔNG bắt chước cadence liên tục
+(sync/capture/flush/harvest) của bee's Scribe. Round 10→11 giữ ổn định qua
+2 round — mint D7 (seq 19006, reuse retrospective + cadence không đổi) và
+D8 (seq 19007, sửa cơ chế D6 thành doctrine+backstop, không phải gate sống).
+
 Vòng 10 (2026-08-17): người dùng nêu 2 việc — (3) cơ chế "tìm-trước-khi-tạo"
 của D6 thật sự bee làm sao, có xem xét hệ OKF của bee-upstream không; (2)
 fgOS đã có khái niệm `retrospective` (status, không phải stage), có nên
@@ -133,7 +142,9 @@ chưa; (2) chỉ sau đó mới bàn có nên tự xây, xây gì, xây ở tầ
 | D3 | KHÔNG xây decision-store mới — fgOS đã có `state.decisions` (event-sourced, port từ bee tsk-63c); việc cần làm là WIRE bề mặt đọc (CONTEXT.md, docs/specs) vào đây | round 5→8 | 18963 |
 | D4 | 3 loại quyết định gốc map vào `state.decisions`: bookkeeping máy→`kind:engine` (đã có); quyết định cấp item→`kind:design`+`id` (ghi đã có, thiếu render); quyết định platform→cần field MỚI `scope`/`area` | round 6→8 | 18964 |
 | D5 | Retire `docs/decisions/*.md` corpus (35 file, 1-file/quyết định) — narrative dồn vào `docs/specs/<area>.md`; `state.decisions` giữ record ngắn làm nguồn thật | round 6 đề xuất → round 7 xác nhận → round 8 mint | 18965 |
-| D6 | Mở rộng scope sang tầng Diataxis end-user docs (267 file, `fgos-coding-compounding`) — thêm bước tìm-trước-khi-tạo theo nội dung + cho phép reconcile/retire prose cũ (sửa luật cấm hiện tại) | round 7 đề xuất → round 8 xác nhận → round 8 mint | 18966 |
+| D6 | Mở rộng scope sang tầng Diataxis end-user docs (267 file, `fgos-coding-compounding`) — cho phép reconcile/retire prose cũ (sửa luật cấm hiện tại); MỤC TIÊU giữ nguyên, CƠ CHẾ tìm-trước-khi-tạo được D8 sửa lại | round 7→8 mint, cơ chế sửa bởi D8 round 11 | 18966 |
+| D7 | 4-door check + D5's narrative-sync chạy BÊN TRONG lần gọi batch hiện có của `retrospective`/`fgos-coding-compounding` (`/fgOS:retro-loop`) — cadence KHÔNG đổi (không bắt chước continuous kiểu bee); `state.decisions` vẫn ghi ngay lúc chốt; `fgos approve` KHÔNG bị gate | round 10 đề xuất → round 11 xác nhận+làm rõ → mint | 19006 |
+| D8 | Sửa cơ chế D6: tìm-trước-khi-tạo = doctrine (tra `authoritative_for` theo chủ đề, update-in-place) + harness backstop (check mechanical trong verify chain) — KHÔNG BAO GIỜ một hàm gate sống, mirror bài học thật của bee (`scribingTarget()` dead surface) | round 10 đề xuất → round 11 xác nhận → mint | 19007 |
 
 **Còn treo, CHƯA D-ID** (chưa đủ round ổn định hoặc chưa hỏi): scope 4-door
 (mọi item hay theo risk-tier — round 4 fork #2), harness đặt ở `fgos
@@ -806,6 +817,41 @@ vẫn ghi NGAY lúc chốt (giống item-level D-ID hiện tại, giống Scribe
 — chỉ NARRATIVE SYNC (docs/specs/<area>.md rewrite, D5) mới trễ theo
 retrospective.
 
+### Round 11 — 2026-08-17T10:58Z — làm rõ: chỉ đổi thời điểm, không đổi cách gọi
+
+Người dùng xác nhận round 10, hỏi làm rõ: "chỉ thay đổi thời điểm, còn lúc
+gọi skill thì vẫn như họ (bee)?"
+
+**Trả lời rõ, tách 2 trục độc lập đã bị gộp lẫn ở round 10:**
+
+- **Trục 1 — THỜI ĐIỂM tương đối với merge** (đã trả lời round 10): bee
+  Scribe viết TRƯỚC/TRONG LÚC làm việc (continuous); fgOS's compounding
+  viết SAU merge (`retrospective`, batch). Round 10 chốt: giữ nguyên
+  fgOS's ordering (sau merge) — không đổi, vì đổi sẽ mâu thuẫn tsk-1ca.
+- **Trục 2 — CÁCH GỌI/tần suất trigger** (CHƯA từng trả lời rõ trước round
+  11, người dùng hỏi đúng chỗ thiếu): bee's Scribe được gọi **4 điểm khác
+  nhau, liên tục trong lúc làm việc** — "on every sync, capture, flush and
+  harvest run". fgOS's `fgos-coding-compounding` được gọi **1 lần, dạng
+  batch, qua `/fgOS:retro-loop`** (thủ công, không cron — xác nhận lại từ
+  `why-done-split...md`: *"this repo has no cron/scheduler at all"*).
+
+**Xác nhận: CHỈ trục 1 giữ đúng ordering hiện tại của fgOS (không đổi gì,
+vì đã đúng theo tsk-1ca) — TRỤC 2 (cách gọi) HOÀN TOÀN KHÔNG ĐỔI, không bắt
+chước cadence liên tục của bee.** 4-door check + D5's narrative-sync là
+NHỮNG BƯỚC MỚI được thêm VÀO BÊN TRONG lần gọi batch hiện có của
+`fgos-coding-compounding` — không phải lý do để thêm điểm trigger mới hay
+đổi từ batch sang continuous. Lý do không đổi trục 2: (a) D2/D3 (không thêm
+cơ chế mới khi cái cũ đủ) áp y hệt cho tầng invocation — fgOS đã có đúng 1
+batch loop, không cần 4 trigger point riêng; (b) round 10 đã chỉ ra rule
+50/58 tách nhau CHÍNH VÌ batch-sau-merge bảo vệ dependent — đổi sang
+continuous (bắt chước bee) sẽ vô tình kéo trigger sớm hơn, có nguy cơ tái
+tạo lại đúng vấn đề tsk-1ca đã sửa (dù không hoàn toàn giống, vẫn là rủi ro
+không cần thiết khi chưa có bằng chứng đòi hỏi continuous).
+
+Mint D7 (reuse retrospective, cadence batch không đổi, seq 19006) và D8
+(sửa cơ chế D6 thành doctrine+backstop, seq 19007) — cả hai giữ ổn định qua
+round 10→11.
+
 ## 6. Thiết kế đã chốt {#design}
 
 ### Vấn đề
@@ -877,26 +923,21 @@ flowchart TB
     style DOCTRINE fill:#3a1e3a,color:#fff
 ```
 
-### Cập nhật round 10 (đề xuất, CHƯA D-ID — 1 round, chờ round sau ổn định)
+### D7/D8 (round 10→11, đã mint) — tóm tắt cho người đọc lạ
 
-- **D6 cần viết lại**: không phải "hàm tìm-trước-khi-tạo" mà 2 lớp — (a)
-  doctrine trong `fgos-coding-compounding` bước 3 (tra chủ đề toàn
-  `docs/<quadrant>/` trước khi quyết path, update-in-place nếu đã có chủ);
-  (b) harness backstop mechanical (check mới trong verify chain phát hiện
-  2 file cùng `authoritative_for`, KHÔNG phải gate sống) — đúng bài học bee
-  tự xây rồi bỏ `scribingTarget()`.
-- **Fork #3 (round 4) nay có câu trả lời** — 4-door KHÔNG gate ở `fgos
-  approve`; REUSE `retrospective`/`fgos-coding-compounding` đã có sẵn, vì
-  gate tại approve mâu thuẫn trực tiếp quyết định đã evidence-hoá 3 lần
-  của tsk-1ca (tách code-correctness sớm khỏi doc-completeness trễ).
-  `state.decisions`/D-ID vẫn ghi ngay lúc chốt — chỉ narrative sync
-  (docs/specs rewrite, D5) trễ theo retrospective batch.
+- **D6+D8**: tìm-trước-khi-tạo = doctrine (tra `authoritative_for` theo chủ
+  đề, update-in-place) + harness backstop (check mechanical trong verify
+  chain) — KHÔNG một hàm gate sống, mirror bee tự bỏ `scribingTarget()`.
+- **D7**: 4-door + D5's narrative-sync chạy TRONG lần gọi batch hiện có của
+  `retrospective`/`fgos-coding-compounding` (`/fgOS:retro-loop`), cadence
+  KHÔNG đổi (không bắt chước continuous của bee). `state.decisions` vẫn ghi
+  ngay lúc chốt. `fgos approve` KHÔNG bị gate bởi cơ chế nào ở đây.
 
 ### Còn mở (chưa D-ID, cần quyết trước khi viết plan thật)
 
 - Door chặn (freshness/impact/routing/doc-deferral) áp cho MỌI item hay
   theo risk-tier khi chạy trong retrospective batch loop?
-- Cơ chế tra "chủ đề" cụ thể cho D6 (b) là gì — so khớp chuỗi
+- Cơ chế tra "chủ đề" cụ thể cho D8 (b) là gì — so khớp chuỗi
   (skeleton-match kiểu bee: normalize/lowercase/accent-strip) hay cần
   semantic search thật?
 
