@@ -286,7 +286,7 @@ test('runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> 
   // worktree torn down, branch survives (D4 proposal artifact)
   assert.deepEqual(fs.readdirSync(worktreeDir), []);
   // one door: the log carries exactly the runner's writes — the worker
-  // never touched .fgos/ (add + claim + predicted + capacity-dispatch
+  // never touched .fgos/ (add + claim + predicted + executor-dispatch
   // audit (D8, tsk-62v) + propose + actual, nothing else). The one
   // addition since this test was first written, `work.handoff:reviewer`,
   // is not a second writer — it is `moveWork`'s own D18 side effect,
@@ -296,7 +296,7 @@ test('runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> 
   const events = readRawEvents(dir);
   assert.deepEqual(
     events.map((e) => (e.type === 'work.outcome' ? `work.outcome:${e.payload.predicted ? 'predicted' : 'actual'}` : `${e.type}:${e.payload.to ?? 'add'}`)),
-    ['work.add:add', 'work.move:doing', 'work.outcome:predicted', 'capacity.dispatch:add', 'work.move:awaiting-approval', 'work.handoff:reviewer', 'work.outcome:actual'],
+    ['work.add:add', 'work.move:doing', 'work.outcome:predicted', 'executor.dispatch:add', 'work.move:awaiting-approval', 'work.handoff:reviewer', 'work.outcome:actual'],
   );
   // predicted is written right at claim time, before dispatch ever runs
   const predictedEvent = events.find((e) => e.type === 'work.outcome' && e.payload.predicted);
@@ -309,9 +309,9 @@ test('runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> 
   assert.equal(actualEvent.payload.actual.aheadCount, 1);
 });
 
-// --- capacity-aware dispatch announce/audit (D8, tsk-62v) ---------------
+// --- executor-aware dispatch announce/audit (D8, tsk-62v) ---------------
 
-test('runOnce logs the "<capacityId> — <provider> — <model>" announce line and appends a matching capacity.dispatch audit event', async () => {
+test('runOnce logs the "<executorId> — <provider> — <model>" announce line and appends a matching executor.dispatch audit event', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-announce' });
   const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
@@ -324,8 +324,8 @@ test('runOnce logs the "<capacityId> — <provider> — <model>" announce line a
     `expected an announce line in: ${JSON.stringify(logs)}`,
   );
   const events = readRawEvents(dir);
-  const auditEvent = events.find((e) => e.type === 'capacity.dispatch');
-  assert.ok(auditEvent, 'expected a capacity.dispatch event in the log');
+  const auditEvent = events.find((e) => e.type === 'executor.dispatch');
+  assert.ok(auditEvent, 'expected a executor.dispatch event in the log');
   // baseCommit/headRef (tsk-4hl): asserted by shape, not exact value -- both
   // are real per-run git reads (a fresh worktree's own HEAD/branch), so a
   // literal SHA/branch string would be non-deterministic across runs. This
@@ -337,7 +337,7 @@ test('runOnce logs the "<capacityId> — <provider> — <model>" announce line a
   const { baseCommit, headRef, ...rest } = auditEvent.payload;
   assert.deepEqual(rest, {
     id: 'item-announce',
-    capacityId: 'fgos-coding-implement',
+    executorId: 'fgos-coding-implement',
     provider: process.execPath,
     // command (tsk-33w D9): equal to provider here because this fixture's
     // config never overrides either -- both fall back to the same resolved
@@ -353,16 +353,16 @@ test('runOnce logs the "<capacityId> — <provider> — <model>" announce line a
   assert.equal(listWork(dir).work['item-announce'].status, 'awaiting-approval');
 });
 
-test('runOnce\'s capacity.dispatch audit event records the REAL spawned command even when a capacity declares a different provider label (tsk-33w D9: the audit must not lie when the two diverge)', async () => {
+test('runOnce\'s executor.dispatch audit event records the REAL spawned command even when a executor declares a different provider label (tsk-33w D9: the audit must not lie when the two diverge)', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-command-mismatch' });
   const scriptPath = writeCommittingExecutor(scriptDir, counterFile);
-  // fgos-coding-implement is the executing-stage capacityId a plain coding
-  // work item resolves to (dispatch.mjs's capacityIdForWork) -- overriding
-  // it here is what makes byCapacity win over the global executor below.
+  // fgos-coding-implement is the executing-stage executorId a plain coding
+  // work item resolves to (dispatch.mjs's executorIdForWork) -- overriding
+  // it here is what makes byExecutor win over the global executor below.
   const config = {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}', '--model', '{model}'] },
-    capacities: {
+    executors: {
       'fgos-coding-implement': {
         kind: 'agent',
         command: process.execPath,
@@ -382,8 +382,8 @@ test('runOnce\'s capacity.dispatch audit event records the REAL spawned command 
   await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   const events = readRawEvents(dir);
-  const auditEvent = events.find((e) => e.type === 'capacity.dispatch');
-  assert.ok(auditEvent, 'expected a capacity.dispatch event in the log');
+  const auditEvent = events.find((e) => e.type === 'executor.dispatch');
+  assert.ok(auditEvent, 'expected a executor.dispatch event in the log');
   assert.equal(auditEvent.payload.provider, 'claude', 'provider stays the declared label');
   assert.equal(auditEvent.payload.command, process.execPath, 'command must be the REAL spawned executable, not the label');
   assert.notEqual(auditEvent.payload.command, auditEvent.payload.provider, 'this is precisely the divergence the item exists to close');

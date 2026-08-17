@@ -32,7 +32,7 @@ function runHook(repoRoot, payload) {
   });
 }
 
-test('allows a real Agent call with no registered capacity for its subagent_type -- resolves in-process via --needs-soul default', () => {
+test('allows a real Agent call with no registered executor for its subagent_type -- resolves in-process via --needs-soul default', () => {
   const repoRoot = mkTempGitRepo();
   writeRunnerConfigFixture(repoRoot, {
     executor: { command: 'claude', args: ['{prompt}'] },
@@ -45,12 +45,12 @@ test('allows a real Agent call with no registered capacity for its subagent_type
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 
-test('blocks a real Agent call whose subagent_type resolves to a registered out-of-process capacity', () => {
+test('blocks a real Agent call whose subagent_type resolves to a registered out-of-process executor', () => {
   const repoRoot = mkTempGitRepo();
   writeRunnerConfigFixture(repoRoot, {
     executor: { command: 'claude', args: ['{prompt}'] },
     capabilities: { blocked: {} },
-    capacities: { 'tool-only': { kind: 'tool', for: ['blocked'], command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    executors: { 'tool-only': { kind: 'tool', for: ['blocked'], command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   });

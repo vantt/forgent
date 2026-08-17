@@ -155,7 +155,7 @@ test('every fgos-* dev-skill file pair mirrored into plugins/fgOS/skills is byte
 // other mirrored skill content, so it needs the same byte-identical
 // enforcement.
 //
-// tsk-32b: 6 of the 14 dev-skills reference `../_shared/capacity-dispatch-
+// tsk-32b: 6 of the 14 dev-skills reference `../_shared/executor-dispatch-
 // fallback.md` by relative path, so plugins/fgOS/skills/_shared/ must exist
 // too or those skills break when loaded from the plugin.
 //

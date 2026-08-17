@@ -18,7 +18,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
-import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability, toolsFromCapacities } from '../src/state/tool-registry.mjs';
+import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability, toolsFromExecutors } from '../src/state/tool-registry.mjs';
 import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
@@ -3206,8 +3206,8 @@ async function runVerb(verb, flags, positional, dir) {
     // Tool registry (tsk-1dj, ported from repository-harness's
     // tool-registry-capability per docs/distillery/deep-dives/
     // tool-registry.md; tsk-in1-1 D1: `register`/`remove` retired — a tool
-    // provider is now declared directly in `runner.capacities.<id>`
-    // (`.fgos/config.json`), config-edited like every other capacity, never
+    // provider is now declared directly in `runner.executors.<id>`
+    // (`.fgos/config.json`), config-edited like every other executor, never
     // through the event log): `check` writes ONLY the local, gitignored
     // status overlay (tool-registry.mjs's readLocalStatus/writeLocalStatus)
     // — never an event, per CONTEXT.md's pinned "registered vs present"
@@ -3219,7 +3219,7 @@ async function runVerb(verb, flags, positional, dir) {
       const sub = requireField(positional[0], 'tool requires a sub-verb: fgos tool <check|query> ...');
       const repoRoot = path.dirname(dir);
       const cfg = flags.config ? loadRunnerConfig(flags.config) : ensureRunnerConfigForDir(repoRoot);
-      const tools = toolsFromCapacities(cfg.capacities);
+      const tools = toolsFromExecutors(cfg.executors);
       if (sub === 'check') {
         const name = optionalField(flags.name, 'tool check --name requires a non-empty value.');
         if (name !== undefined && !tools[name]) {
