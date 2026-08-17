@@ -115,7 +115,8 @@ None
     "action": "D2: consistency derive tai thoi diem ghi (write-time sweep qua docs/**+src/**+plugins/**, khong chi docs/backlog.md+docs/specs/*.md nhu hien tai), khong phai graph luu tru song song; D3: khong xay decision-store moi, nang cap store hien co",
     "footprint": ["bin/fgos.mjs", "src/state/store.mjs", "scripts/check-decision-citation-drift.mjs", "scripts/check-decision-supersession.mjs", "test/state/decision-relation.test.mjs"],
     "kind": "task",
-    "risk": "high-risk"
+    "risk": "high-risk",
+    "deps": []
   },
   {
     "title": "Add scope/area field to state.decisions, generate docs/decisions/index.md with --check (directory persists, only index.md, mirrors merge.mjs collision-resolve subsystem)",
@@ -123,7 +124,8 @@ None
     "action": "D4: 3 loai quyet dinh goc map vao state.decisions, quyet dinh platform-level can them field moi scope/area. docs/decisions/ van la thu muc, chi con index.md generate-duoc (mirror bee's standing exemption)",
     "footprint": ["src/state/store.mjs", "src/report/decision-index.mjs", "docs/decisions/index.md", "src/runner/merge.mjs", "scripts/check-decision-supersession.mjs", "test/report/decision-index.test.mjs", "test/state/decision-scope-field.test.mjs", "test/runner/merge.test.mjs", "test/cli/fgos-merge.test.mjs"],
     "kind": "task",
-    "risk": "standard"
+    "risk": "standard",
+    "deps": [0]
   },
   {
     "title": "CONTEXT.md Locked-Decisions table renders from state.decisions instead of hand-typed prose (exploring/planning/shaping)",
@@ -131,7 +133,8 @@ None
     "action": "D3: wire be mat doc (CONTEXT.md) vao state.decisions da co san, dong khoang trong tsk-1ud de lai. Ap dung ca 3 skill dang ghi CONTEXT.md: exploring/planning/shaping, khong chi exploring",
     "footprint": [".agents/skills/fgos-coding-exploring/SKILL.md", ".agents/skills/fgos-coding-planning/SKILL.md", ".agents/skills/fgos-coding-shaping/SKILL.md", "plugins/fgOS/skills/fgos-coding-exploring/SKILL.md", "plugins/fgOS/skills/fgos-coding-planning/SKILL.md", "plugins/fgOS/skills/fgos-coding-shaping/SKILL.md", "src/report/context-render.mjs", "src/intake/plan.mjs", "test/report/context-render.test.mjs"],
     "kind": "task",
-    "risk": "standard"
+    "risk": "standard",
+    "deps": [0]
   },
   {
     "title": "Retire docs/decisions/*.md corpus into docs/specs/<area>.md narrative + state.decisions short records (directory persists with index.md only)",
@@ -139,7 +142,8 @@ None
     "action": "D5: retire docs/decisions/*.md corpus (35 file nguoi-quyet-dinh), narrative don vao docs/specs/<area>.md, state.decisions giu record ngan lam nguon that. docs/decisions/ giu lai la thu muc, chi con index.md",
     "footprint": ["docs/decisions", "docs/specs", "src/runner/merge.mjs", "scripts/check-decision-citation-drift.mjs", "scripts/check-decision-supersession.mjs", "test/docs/decisions-corpus-retired.test.mjs"],
     "kind": "task",
-    "risk": "high-risk"
+    "risk": "high-risk",
+    "deps": [0, 1]
   },
   {
     "title": "4-door check (freshness/impact/routing/doc-deferral) inside retrospective batch loop -- harness-only, no skill-prose touch",
@@ -147,7 +151,8 @@ None
     "action": "D7: 4-door check chay ben trong loi goi hien co cua retrospective (bin/fgos.mjs case 'retrospective', dong 1438), khong gate fgos approve; D9: nhan mang 2+4 tu tsk-37i; D11: door ap moi item khong theo risk-tier",
     "footprint": ["bin/fgos.mjs", "src/state/retrospective-doors.mjs", "test/state/retrospective-doors.test.mjs"],
     "kind": "task",
-    "risk": "standard"
+    "risk": "standard",
+    "deps": [0, 3]
   },
   {
     "title": "authoritative_for field + skeleton-match port/adapter + allow reconcile in fgos-coding-compounding",
@@ -155,7 +160,8 @@ None
     "action": "D6: cho phep reconcile/retire prose cu; D8: tim-truoc-khi-tao = doctrine + harness backstop, khong phai gate song; D12: skeleton-match qua port/adapter mirror CTR009",
     "footprint": [".agents/skills/fgos-coding-compounding/SKILL.md", "plugins/fgOS/skills/fgos-coding-compounding/SKILL.md", "src/report/frontmatter.mjs", "src/report/authoritative-match.mjs", "test/report/authoritative-match.test.mjs"],
     "kind": "task",
-    "risk": "light"
+    "risk": "light",
+    "deps": []
   }
 ]
 ```
