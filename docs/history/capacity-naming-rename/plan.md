@@ -52,7 +52,14 @@ Rename `capacity`/`capacities` → `executor`/`executors` in:
   never hand-copied): `src/runner/dispatch.mjs` (the chokepoint —
   `resolveCapacityAndOverrides` → `resolveExecutorAndOverrides`, every
   `capacityId`/`capacity` local/param, `cfg.capacities` accesses,
-  `validateCapacitiesShape` → `validateExecutorsShape`, etc.),
+  `validateCapacityShape` (singular, line 661 — validates one
+  `capacities.<id>` entry) → renamed to something OTHER than
+  `validateExecutorShape`, since that exact name already exists at line
+  418 and validates a genuinely different thing (the global-default
+  `cfg.executor` shape) — collision found during `fgos-coding-validating`'s
+  reality gate; a naive full-identifier rename would have produced a
+  duplicate function declaration. Use `validateExecutorEntryShape` for the
+  renamed one, etc.),
   `src/runner/loop.mjs`, `src/state/tool-registry.mjs`,
   `src/state/worker-slots.mjs`, `src/state/replay.mjs`,
   `src/setup/registrations.mjs`, `src/cli/command-registry.mjs`.
@@ -138,6 +145,25 @@ none to compare.
 | Live `.fgos/config.json` migration | Low — same additive/renaming shape `tsk-34n`'s own D3 migration already proved safe; behavior must stay byte-identical externally | Re-run the same `decide --work`/`decide --for` native+headless proof `tsk-34n`/`tsk-pdg` both used, against the migrated config |
 | Decision record `0034` + `0000-index.md` annotation | Low — additive doc only, no code coupling | Manual read-back; no test coverage expected for prose |
 | Shared fragment rename (`_shared/capacity-dispatch-fallback.md` → `executor-dispatch-fallback.md`), 13 real reference sites | Real but mechanically bounded — a missed reference breaks a skill's own relative-path read at runtime, not silently | `grep -rl "capacity-dispatch-fallback"` returns zero after rename; a spot-check invocation of one referencing skill (`fgos-coding-exploring` or `fgos-coding-planning`) confirms it still loads |
+
+## Assumptions
+
+- **Concurrent-worktree read of the renamed live config is a reversible,
+  self-healing risk, not an expensive one.** Once Phase 1 lands, any
+  other worktree session still running pre-rename `dispatch.mjs` code
+  that reads the main checkout's `.fgos/config.json` (via `--dir`, per
+  ADR0020) will find `runner.capacities` simply absent (renamed to
+  `runner.executors`). `resolveCapacityAndOverrides`'s own guard
+  (`const capacities = cfg && cfg.capacities && typeof cfg.capacities
+  === 'object' ? cfg.capacities : {}`) already treats a missing/absent
+  `capacities` the same as an empty one — `configured: false`, falling
+  back to the global default executor, never a crash. This degrades a
+  capability preference (e.g. `agy` momentarily unavailable) until that
+  session rebases; it does not corrupt state or lose work. This is the
+  same class of consequence D1's own "no back-compat" already knowingly
+  accepted — not a new risk this plan introduces, just its concrete
+  shape spelled out (found during `fgos-coding-validating`'s reality
+  gate, D5: reversible risk, pin and carry on rather than ask).
 
 ## Outstanding questions
 
