@@ -2,6 +2,20 @@
 
 ## 1. Trạng thái hiện tại
 
+Vòng 16 (2026-08-17): NGAY SAU khi CONTEXT.md đã viết và item đã chuyển
+stage sang `planning`, người dùng chỉ ra một khoảng trống thật: Diataxis
+(4 quadrant) chỉ giải trục NHẬN THỨC (cách viết theo mức độ), KHÔNG giải
+trục ĐỐI TƯỢNG NGƯỜI ĐỌC và trục SCOPE/AREA — và nghi ngờ D6/D8 ngầm giả
+định OKF tự giải được việc này, trong khi đã có 1 lần cố gắng trước hình
+như chưa giải xong. Scout xác nhận NGAY: đúng — `docs/specs/enduser-docs-
+index.md` R4 khoá cứng `audience` "gieo từ quadrant", KHÔNG PHẢI trục độc
+lập. "Một lần đã thử" chính là **tsk-28x** — điểm D+E trong DISCUSSION.md
+của họ đều ghi CHƯA RÕ, chưa giải xong round 3-5 của họ. D6/D8 (đã lock,
+đã viết CONTEXT.md) có claim SAI PHẠM VI — ngầm coi audience/area là trục
+có sẵn để `authoritative_for` hoạt động trên đó, trong khi trục đó CHƯA
+TỒN TẠI. Sửa qua D14, append vào CONTEXT.md theo đúng "re-entry, append
+never rewrite" của `fgos-coding-exploring` — xem §5 round 16.
+
 Vòng 15 (2026-08-17): người dùng đồng ý cả 2 khuyến nghị round 14 (door áp
 mọi item + skeleton-match backstop) — riêng điểm 2 thêm yêu cầu: triển khai
 dạng hexagon/service để thay giải pháp khác sau này không cần đổi caller.
@@ -1010,6 +1024,70 @@ Mint:
   thay bằng giải pháp khác (semantic search thật) mà không đổi caller.
 
 **D1-D12 đã khoá đầy đủ. Không còn điểm mở nào chưa D-ID.**
+
+### Chuyển sang `fgos-coding-exploring` — D13 (tsk-28x cross-reference)
+
+`refs` được set trỏ `DISCUSSION.md#design`; native-first dispatch sang
+`fgos-coding-exploring` trong CÙNG phiên. Scout thêm trong lúc viết
+CONTEXT.md phát hiện **item thứ 3** cũng động vào `fgos-coding-compounding`:
+**tsk-28x** ("Extensible multi-audience artifact-producer registry"). Trình
+bày hệ quả nếu không phối hợp (nguy cơ tsk-28x tự thiết kế registry KHÔNG đi
+qua check `authoritative_for` của D8, mở lại lỗ hổng sprawl cho artifact
+type mới) — người dùng đồng ý cross-reference nhẹ (không `deps` cứng). Mint
+**D13** (seq 19040): tsk-28x's producer type mới phải route qua D8's check;
+khai `--footprint` trùng để `fgos conflicts` bắt xung đột cơ học.
+
+Viết `CONTEXT.md`, chạy Gate (`canAutoApprove: true`, level `standard`,
+auto-approved), fire `fgos discover --verdict clear` — item chuyển stage
+sang `planning`.
+
+### Round 16 — 2026-08-17T11:33Z — NGAY SAU stage chuyển: phát hiện D6/D8 claim sai phạm vi
+
+Người dùng, ngay khi thấy dòng "chuyển sang planning": *"cập nhật vào các
+bên liên quan là anh nhận thấy Diataxis chỉ mới giải vấn đề mức độ nhận
+thức của tài liệu ..., còn đối tượng người đọc và vấn đề (scope/area) liên
+quan đối tượng thì ... chưa giải quyết và đang tưởng tượng rằng okf có thể
+giải quyết. một lần chúng ta đã thử nổ lực rồi nhưng hình như chưa giải
+được."*
+
+**Scout xác nhận NGAY, không suy đoán:**
+
+- `docs/specs/enduser-docs-index.md` dòng 46-53 (Business Rule R4, ĐÃ
+  KHOÁ): `purpose`/`audience` **"gieo từ quadrant"**, KHÔNG đọc từ bên
+  trong tài liệu — "mọi tài liệu CÙNG NGĂN mang CÙNG cặp purpose/audience".
+  Diataxis quadrant là "trục cấu trúc DUY NHẤT" — audience chỉ là nhãn phái
+  sinh, KHÔNG PHẢI trục độc lập. Nói cách khác: hiện tại KHÔNG có cách nào
+  để 2 tài liệu trong cùng 1 quadrant (vd 2 bài `how-to`) mang audience
+  khác nhau — schema không có chỗ cho việc đó.
+- **"Một lần đã thử" = tsk-28x**, đọc trực tiếp
+  `docs/history/compound-learn-artifact-registry/DISCUSSION.md`: điểm D
+  ("Ai giữ 'một chủ đề một chủ sở hữu' khi số tài liệu tăng") — **CHƯA RÕ,
+  chưa bàn vòng 3**; điểm E ("Ranh giới scope tsk-28x vs tsk-12m") —
+  **CHƯA RÕ, đã đổi bản chất so với vòng 1-2**. tsk-28x's dòng 45-46 tự nêu
+  đúng nhu cầu: audience MỚI ngoài 4 quadrant kỹ thuật hiện có, ví dụ cụ
+  thể được liệt kê — đúng người đã thấy vấn đề này trước, và dừng lại chưa
+  giải được, không phải giả định của em.
+
+**Hệ quả cho D6/D8 (đã lock, đã viết vào CONTEXT.md) — SAI PHẠM VI, cần
+sửa:** D8's cơ chế "tra `authoritative_for` theo chủ đề" NGẦM GIẢ ĐỊNH
+audience/area đã là một trục có sẵn để so khớp lên trên — nhưng trục đó
+KHÔNG TỒN TẠI trong schema hiện tại (R4 khoá audience = quadrant, không
+độc lập). `authoritative_for` (mirror bee) chỉ giải đúng bài "trùng chủ đề
+TRONG một subject-space đã định nghĩa rõ" — bee có subject-space đó
+(`bee.areas`, một trục độc lập thật). fgOS's Diataxis hiện tại KHÔNG có
+trục tương đương — D8 đang cố gắn 1 cơ chế chống-trùng lên một không gian
+chưa được định nghĩa đủ để chống-trùng có ý nghĩa.
+
+**Sửa D13 (framing một chiều sai) + mint D14:** D13 trước đó coi tsk-28x
+CHỈ LÀ consumer của D8 (họ phải route qua check của mình). Thực ra quan hệ
+là HAI CHIỀU: D8's check chỉ có ý nghĩa đầy đủ SAU KHI tsk-28x (hoặc một
+quyết định khác) định nghĩa được audience/area như một trục độc lập thật
+— hiện chưa ai định nghĩa. D14 sửa lại phạm vi: D6/D8 trong tsk-1lv chỉ
+cam kết đúng những gì đã chứng minh — chống trùng/reconcile TRONG
+subject-space quadrant-scoped HIỆN CÓ (không mở rộng thêm audience-as-
+dimension, đó vẫn là việc CHƯA GIẢI của tsk-28x). Ghi D14 append vào
+`CONTEXT.md`'s bảng Locked decisions (đúng luật "re-entry, append never
+rewrite" của `fgos-coding-exploring`, không chạy lại Gate).
 
 ## 6. Thiết kế đã chốt {#design}
 

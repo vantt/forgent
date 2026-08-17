@@ -17,7 +17,12 @@ CONTEXT.md này chỉ là bản đúc kết cho `fgos-coding-planning`).
 không lặp lại lý do ở đây): xây stored graph/daemon riêng (D2); xây
 decision-store mới (D3 — `state.decisions` đã có sẵn); gate `fgos approve`
 bằng bất kỳ check nào (D7 — dùng `retrospective` đã có); semantic-search
-thật cho tìm-trước-khi-tạo (D12 — skeleton-match string là đủ, mirror bee).
+thật cho tìm-trước-khi-tạo (D12 — skeleton-match string là đủ, mirror bee);
+**định nghĩa audience/area như một trục độc lập của tài liệu Diataxis (D14
+— chưa tồn tại, hiện `audience` khoá cứng gieo từ quadrant theo `docs/specs/
+enduser-docs-index.md` R4; đây là việc CHƯA GIẢI của `tsk-28x`, tsk-1lv chỉ
+chống trùng TRONG subject-space quadrant-scoped hiện có, không tự ý mở rộng
+sang audience-as-dimension).**
 
 ## Locked decisions
 
@@ -35,7 +40,8 @@ thật cho tìm-trước-khi-tạo (D12 — skeleton-match string là đủ, mir
 | D10 | Đánh đổi batch-narrative-synthesis chấp nhận được: raw capture ghi ngay (không đổi); narrative trễ có giới hạn (TTL 3 ngày, `classifyStalePostDelivery` của tsk-1bl) + có phát hiện được; doctrine bắt buộc agent đọc `state.decisions`/index trước khi tin prose spec trong lúc chờ batch. |
 | D11 | 4-door áp cho MỌI item trong retrospective batch, KHÔNG scope theo risk-tier — doc-rot không phân biệt tier, door là check thuần cơ học (không ceremony để giảm theo tier). |
 | D12 | Cơ chế tra chủ đề (D8b) = skeleton-match chuỗi (normalize/lowercase/accent-strip/confusable-fold/punctuation-collapse, mirror bee — họ chưa bao giờ dùng semantic search thật). Triển khai dưới dạng PORT/ADAPTER swappable, mirror CTR009 executor.v1 đã có sẵn (`dispatch.mjs`) — không hardcode inline, để thay giải pháp khác sau này mà không đổi caller. |
-| D13 | Cross-reference `tsk-28x` (Extensible multi-audience artifact-producer registry cho `fgos-coding-compounding`) — không `deps` cứng, nhưng mọi producer/artifact type MỚI tsk-28x đăng ký qua registry của họ PHẢI route qua check `authoritative_for` của D8, không được miễn trừ. Khai `--footprint` trùng ở cả 2 item để `fgos conflicts` bắt xung đột file cơ học. |
+| D13 | Cross-reference `tsk-28x` (Extensible multi-audience artifact-producer registry cho `fgos-coding-compounding`) — không `deps` cứng, mọi producer/artifact type MỚI tsk-28x đăng ký qua registry của họ PHẢI route qua check `authoritative_for` của D8, không được miễn trừ. Khai `--footprint` trùng ở cả 2 item để `fgos conflicts` bắt xung đột file cơ học. **Sửa bởi D14: quan hệ là HAI CHIỀU, không chỉ một chiều.** |
+| D14 | **Sửa phạm vi D6/D8 (không đổi mục tiêu D3/D5)**: `authoritative_for` (D8) chỉ giải "trùng chủ đề TRONG một subject-space đã định nghĩa rõ" — KHÔNG mở rộng claim sang audience/area như một trục độc lập, vì trục đó CHƯA TỒN TẠI trong schema hiện tại (`docs/specs/enduser-docs-index.md` R4 khoá cứng: `audience` gieo từ quadrant, không độc lập — mọi doc cùng quadrant bắt buộc cùng audience). D6/D8 trong tsk-1lv chỉ cam kết đúng phạm vi đã chứng minh: chống trùng/reconcile trong quadrant-scoped subject-space HIỆN CÓ. Audience-as-dimension vẫn là việc CHƯA GIẢI của `tsk-28x` (điểm D+E DISCUSSION.md của họ đều "CHƯA RÕ", chưa bàn xong round 3-5 của họ) — tsk-1lv KHÔNG tự ý mở rộng để giải thay. |
 
 ## Pinned terms
 
