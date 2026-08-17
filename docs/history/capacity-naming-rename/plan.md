@@ -165,6 +165,56 @@ none to compare.
   shape spelled out (found during `fgos-coding-validating`'s reality
   gate, D5: reversible risk, pin and carry on rather than ask).
 
+## Implementation addendum (post-validating, real findings)
+
+Beyond the two reality-gate fixes recorded above (validator naming
+collision, concurrent-worktree assumption), implementation itself found
+and fixed several more real issues no amount of grep-only scouting
+surfaced ahead of time:
+
+1. **A second, more severe naming collision** inside
+   `resolveExecutorConfig`: the raw catalog entry (until this item,
+   locally named `capacity`) and the function's own final resolved
+   dispatch shape (already, independently, named `executor` before this
+   item) collided into the same identifier once the entry got mechanically
+   renamed too — a real `SyntaxError: Identifier 'executor' has already
+   been declared`, not caught by the earlier `validateExecutorEntryShape`
+   fix since it's a different function. Fixed by naming the raw entry
+   `executorEntry` throughout that function, distinct from the resolved
+   `executor` — also fixed one place (`allowCrossProvider` governance)
+   where a naive resolution would have silently read the WRONG variable
+   (the resolved shape never carries `allowCrossProvider` for
+   `invocations[]`-shaped entries like `agy`; only the raw entry does).
+2. **`bin/fgos.mjs` and `scripts/dispatch-decide-hook.mjs`/
+   `project-agents.mjs`/`check-decision-codes.baseline.json`** — real
+   callers/references outside the `src/`/`test/` scope `CONTEXT.md`'s
+   scout enumerated, found only once `npm test` exercised them.
+3. **The live `.fgos/config.json` rename target `executors` collides with
+   an already-retired, historically-inert field of the exact same name**
+   (`executors.<tier>`, a per-tier override rung retired at `tsk-in1-2`
+   D6, 0 live entries, never validated). One test asserting that inert
+   property is now categorically wrong now that D1 gives the name real,
+   validated meaning — fixed the test and its header comment to document
+   both `executors` across time rather than delete the history.
+4. **~10 corrupted historical path citations**, found across `src/`,
+   `test/`, `docs/`, and skill files: a comment/doc citing
+   `docs/decisions/0026-...md`'s own filename, or a `docs/history/
+   *capacity*/` directory name, by name — got mechanically swapped mid-
+   citation by the same rename that correctly touched everything else
+   around it, breaking the reference to a file D2/D3 deliberately never
+   renamed. Confirmed each one against real paths on disk and reverted.
+5. **The item's own `verify` command was too strict once these legitimate
+   historical citations were confirmed correct** — `grep -rqE "capacit"
+   src test` with no exceptions would forever fail against 8 lines that
+   are supposed to keep saying "capacity" (citing `docs/history/
+   capability-capacity-remodel/`, D3). Corrected the command to exclude
+   exactly those known, enumerable, intentional citations rather than
+   loosen the check's actual intent (catching real leftovers).
+
+Full suite after all fixes: 3477 pass / 0 fail / 5 skipped (unchanged
+from the reality-gate baseline — no regression, only fixes to newly-
+discovered issues along the way).
+
 ## Outstanding questions
 
 None
