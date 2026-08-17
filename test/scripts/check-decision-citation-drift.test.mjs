@@ -492,6 +492,49 @@ test(
   },
 );
 
+test(
+  'a genuinely new Nth occurrence of an already-duplicated key is not ' +
+    'silently absorbed (tsk-6at: count consumption, not membership)',
+  () => {
+    const f1 = {
+      kind: 'bare-citation',
+      file: 'a.md',
+      line: 3,
+      id: 'ADR0002',
+      text: 'see ADR0002 here',
+    };
+    const f2 = {
+      kind: 'bare-citation',
+      file: 'a.md',
+      line: 9,
+      id: 'ADR0002',
+      text: 'see ADR0002 here',
+    };
+    const baseline = baselineFromFindings([f1, f2]);
+    assert.deepEqual(baseline['a.md'], [
+      'bare-citation:ADR0002:see ADR0002 here',
+      'bare-citation:ADR0002:see ADR0002 here',
+    ]);
+
+    // Exactly the two already-baselined occurrences still report as known.
+    assert.equal(findNewFindings([f1, f2], baseline).length, 0);
+
+    // A genuine third occurrence of the identical text+id, never
+    // baselined, must report as new -- not silently absorbed because the
+    // key already appears in the baseline array for the other two.
+    const f3 = {
+      kind: 'bare-citation',
+      file: 'a.md',
+      line: 15,
+      id: 'ADR0002',
+      text: 'see ADR0002 here',
+    };
+    const result = findNewFindings([f1, f2, f3], baseline);
+    assert.equal(result.length, 1);
+    assert.equal(result[0].line, 15);
+  },
+);
+
 // --- CLI: --write-baseline self-consistency ------------
 
 test(

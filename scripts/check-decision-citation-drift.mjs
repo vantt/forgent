@@ -160,11 +160,33 @@ function findingKey(f) {
   return `${f.kind}:${f.id}:${f.text}`;
 }
 
+// Occurrence-count consumption (tsk-6at), not membership: a file can
+// legitimately carry two or more findings whose kind/id/text are all
+// identical (a repeated citation phrase, a templated table row). Baseline
+// membership alone (`.includes`) would treat every such repeat as
+// "already known" forever, silently missing a genuinely new Nth
+// occurrence once at least one had ever been baselined. Consuming one
+// baseline occurrence per matching finding restores the per-occurrence
+// accounting the old line-keyed formula got for free.
 export function findNewFindings(findings, baseline) {
+  const remaining = {};
+  for (const [file, keys] of Object.entries(baseline)) {
+    const counts = new Map();
+    for (const key of keys) {
+      counts.set(key, (counts.get(key) || 0) + 1);
+    }
+    remaining[file] = counts;
+  }
   return findings.filter((f) => {
-    const known = baseline[f.file];
+    const counts = remaining[f.file];
+    if (!counts) return true;
     const key = findingKey(f);
-    return !known || !known.includes(key);
+    const left = counts.get(key) || 0;
+    if (left > 0) {
+      counts.set(key, left - 1);
+      return false;
+    }
+    return true;
   });
 }
 
