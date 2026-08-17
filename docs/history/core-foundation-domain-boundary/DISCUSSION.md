@@ -10,6 +10,25 @@ status: open
 
 ## 1. Trạng thái hiện tại
 
+Round 6 (2026-08-17): tầng CODE+SKILL của boundary đã chốt — D3/D4/D5,
+ghi qua `fgos decision --id tsk-397` (seq 19128-19130). Hình dạng cuối:
+`domains/<name>/` là folder tự chứa (registry.mjs + skills/ đi cùng nhau)
+ở top-level, mirror đúng cơ chế plugin thật đã có trong chính repo này
+(`plugins/fgOS/` — tự chứa manifest + skills, thêm `dogfood-fixture`
+không đụng gì bên trong `fgOS/`). `workflow-stage-graphs.mjs` chỉ còn là
+aggregator quét `domains/*/registry.mjs` tự động — thêm domain không sửa
+file có sẵn nào. `core` (bin/, src/, herdr-plugin/) KHÔNG di dời vật lý —
+881 tham chiếu `bin/fgos.mjs` trong repo + fgOS đã cài global ở nhiều
+project khác (mission 0035) khiến việc di dời phá vỡ diện rộng cho lợi
+ích thuần biểu tượng; `.agents/skills/core/` là chỗ duy nhất rẻ đủ để gắn
+nhãn core tường minh. Người mở rộng khung phân tích thành ma trận 6 mối
+quan tâm (harness/workflow/task/knowledge/skill/doctrine) × {core,
+domain} — 4/6 đã có hình dạng rõ (harness chỉ ở core theo D1; workflow/
+task/skill đã chốt qua D2-D4); **knowledge và doctrine domain-scoped vẫn
+là câu hỏi MỞ, chưa thiết kế** — không có tiền lệ trong code hiện tại,
+cần quyết định có scope cho item này hay để lại khi marketing thật bắt
+tay xây. Người vừa yêu cầu vẽ layout — xem diagram đầy đủ ở §6.
+
 Round 5 (2026-08-17): D1 (share store) và D2 (top-level = port đóng,
 `domainFields` = adapter mở) đã chốt và ghi qua `fgos decision --id
 tsk-397` (seq 19058/19059). §6 đã regenerate cho tầng STATE (data layer)
@@ -79,7 +98,10 @@ thi thật.
 | 9 | Nguồn so sánh bee/beegog thật nằm ở đâu, và nó có tiền lệ cho trục nào? | Rõ (scout + xác nhận người, round 2) | `/home/vantt/projects/beegog/` (live checkout, KHÁC repo-con `upstreams/beegog/` đã pull nhưng vẫn cũ) có đúng cấu trúc v2.7.0: `packages/bee-rs` (1 crate, 1 binary), `packages/bee` (vendor payload), `skills/` (9 skill, giảm từ 18/15). Không tìm thấy khái niệm multi-domain nào trong beegog (`grep -i "multi-domain\|DOMAINS\b"` không ra kết quả liên quan) — beegog là tiền lệ thật cho trục (b), KHÔNG phải tiền lệ cho trục (a). |
 | 10 | Domain thật thứ hai có tồn tại/đang chờ không? | Rõ (scout, round 4) | Có — `docs/backlog.md` STR52: "Domain thứ hai THẬT: marketing", status `proposed`, nêu 2026-07-18. Người dùng có sẵn workflow marketing ở project khác, muốn điều phối qua fgOS. Câu hỏi scope gốc của STR52 (share store hay cài fgOS riêng) — xem #12. |
 | 11 | Domain-specific cần mở những điểm nối nào trong code hiện tại? | Rõ (scout, round 4) | STR89 (done) định vị 4 điểm: (1) `DOMAINS` registry entry riêng cho domain mới (`src/state/workflow-stage-graphs.mjs`); (2) `discovery.mjs`/`decompose.mjs` retrofit — hiện hardcode literal stage-name của coding, cảnh báo sẵn trong comment `workflow-stage-graphs.mjs:29-34`; (3) `fgos-routing` domain-pluggable hoá — tự thú nhận hôm nay "the only domain this induction targets [is coding]"; (4) bộ skill nội dung riêng theo domain-extension, song song bộ coding. Thứ tự đã xác nhận: software-dev (coding) trước, marketing sau, không chặn nhau. |
-| 12 | STR52's câu hỏi scope (share store hay cài fgOS riêng cho domain mới) — trả lời thế nào? | Rõ (phân tích round 4, chờ khoá) | Người cho 3 tiêu chí cân nhắc: field-compatible, security (phân vùng thông tin), performance (nhiều domain handle nổi không) — nếu giải được hết thì mặc định share (foundation càng nhiều càng tốt). Phân tích: (a) field-compat ĐÃ CÓ hạ tầng — `work.domainFields.<domain>.<key>`, validate qua `fieldSchema` per-domain tuỳ chọn (`src/state/work.mjs:699-740`), code tự chú thích "infrastructure for a FUTURE domain" (decision 0027 D6), namespace domain khác luôn được giữ nguyên không đụng tới. (b) security: không có blocker — store không có khái niệm multi-tenant/ACL, chỉ cần filter theo `work.domain` có sẵn khi cần view riêng theo domain, không phải xây mới. (c) performance: `.fgos/events.jsonl` hiện tại (1 domain, coding) đã 19,037 events/8.4MB thật, `replay.mjs` đã có incremental-rebuild + snapshot fast path (không phải full replay tuyến tính mỗi lần đọc) — thêm domain thứ hai chỉ thêm volume, không đổi độ phức tạp. → Khuyến nghị: **share store**, chờ người xác nhận khoá thành D-ID. |
+| 12 | STR52's câu hỏi scope (share store hay cài fgOS riêng cho domain mới) — trả lời thế nào? | Chốt — D1 | (nội dung phân tích giữ nguyên, xem D1 ở §4) |
+| 13 | Domain-specific code+skill nên tổ chức theo layout nào (nested trong cây có sẵn, hay folder riêng)? | Chốt — D3/D4 | `domains/<name>/` tự chứa, top-level, mirror `plugins/fgOS/`. Đề xuất nested đầu tiên (`.agents/skills/domains/coding` + `src/domains/coding` tách rời) bị người bác — "không phát triển được dạng plugin/extension". |
+| 14 | Core (bin/, src/, herdr-plugin/) có nên di dời vào folder `core/` tường minh để đối xứng với `domains/` không? | Chốt — D5 | Không di dời vật lý — 881 tham chiếu `bin/fgos.mjs` + external install (mission 0035) khiến chi phí lớn hơn hẳn lợi ích biểu tượng. `.agents/skills/core/` là chỗ duy nhất rẻ đủ để làm tường minh. |
+| 15 | Áp ma trận 6 mối quan tâm (harness/workflow/task/knowledge/skill/doctrine) × {core, domain} — còn chỗ nào thiếu? | Rõ một phần | harness: chỉ core (D1, domain không có harness riêng). workflow/task/skill: đã chốt (D2-D4). **knowledge, doctrine: CHƯA có tiền lệ domain-scoped nào trong code — mở, chưa thiết kế.** `docs/history/` hiện scope theo feature chứ không theo domain; AGENTS.md/CLAUDE.md luôn nạp không phân domain. |
 
 ## 4. Quyết định đã chốt
 
@@ -87,6 +109,9 @@ thi thật.
 |------|-----------|-------|
 | D1 | Domain share MỘT store/event-log của fgOS — không cài fgOS riêng cho domain mới (trả lời câu hỏi scope của STR52). | Field-compat đã có sẵn hạ tầng `work.domainFields.<domain>.*` (decision 0027 D6, xây trước cho "future domain"); security không có gì phải xây — chỉ filter theo `work.domain` (scalar) khi cần; performance đã chịu tải thật (`.fgos/events.jsonl` 19,037 events/8.4MB, 1 domain, `replay.mjs` có incremental+snapshot fast path, không phải linear replay toàn bộ). |
 | D2 | Field top-level là "port" đóng (core sở hữu, `EDITABLE_FIELDS` 22 key cố định, `store.mjs:275`, `edit` từ chối mọi key ngoài set); `domainFields.<domain>.*` là "adapter" mở duy nhất — domain ghi tự do không đụng core. Field domain-local mặc định vào `domainFields`; chỉ lên top-level nếu cần nghĩa giống nhau + đọc giống nhau ở MỌI domain. | `store.mjs:275/307-310`: `edit` hard-reject key ngoài `EDITABLE_FIELDS`. Thêm field top-level mới = sửa core, ảnh hưởng mọi domain; thêm field trong `domainFields` = không đụng core. |
+| D3 | Domain code+skill sống trong folder tự chứa `domains/<name>/` (registry.mjs + skills/ đi cùng nhau), top-level, không nested trong `.agents/skills/`/`src/` có sẵn. | Mirror cơ chế plugin thật đã có (`plugins/fgOS/`: manifest + skills tự chứa, thêm `dogfood-fixture` không đụng `fgOS/`). Đề xuất nested đầu (`.agents/skills/domains/coding` tách rời `src/domains/coding`) bị bác vì vẫn rải một domain qua 2 cây + cần sửa aggregator bằng tay — không phải hình dạng plugin/extension thật. |
+| D4 | `workflow-stage-graphs.mjs` chỉ còn là aggregator quét `domains/*/registry.mjs` tự động (directory scan), không phải import list sửa tay. | Điều kiện để D3 thật sự "pluggable" — thêm domain không được đụng file domain khác hay aggregator, giống hệt cách thêm `dogfood-fixture` không đụng `fgOS/`. |
+| D5 | Core (`bin/`, `src/`, `herdr-plugin/`) giữ nguyên vị trí top-level — KHÔNG di dời vào folder `core/` để đối xứng với `domains/`. Chỉ `.agents/skills/core/` (sau khi domain skill dọn ra `domains/*/skills/`) được gắn nhãn tường minh. | Grep: 881 tham chiếu `bin/fgos.mjs` trong `.md`/`.mjs` toàn repo (mọi action step skill, docs, test); fgOS đã cài global ở nhiều project khác (mission 0035) gọi thẳng path đó — di dời phá vỡ diện rộng cho lợi ích thuần biểu tượng, vì `domains/` tồn tại đã làm "không phải domains/" tự nhiên đọc là core. |
 
 ## 5. Q&A log
 
@@ -132,53 +157,169 @@ thi thật.
   `src/state/store.mjs`/`replay.mjs` (incremental fast path) + kiểm tra
   `.fgos/events.jsonl` thật (19,037 events/8.4MB) — cả 3 tiêu chí đều
   không chặn share-store. Khuyến nghị: share store — chờ người khoá.
+- 2026-08-17 — Round 5a Q&A: người hỏi chi tiết "domain đã ghi field
+  riêng ở vùng riêng chưa, common field ở top-level hay không cần chia vì
+  2 domain không thể cùng tác động 1 workitem?" Trợ lý xác nhận qua code
+  (`work.mjs:674-683`): `domainFields` đã shape đúng `{ [domainName]:
+  {...} }`, common field đã ở top-level tách biệt, `work.domain` là
+  scalar (không phải set) nên đúng — không có ca 2 domain cùng sở hữu 1
+  item, đã đúng cấu trúc từ đầu.
+- 2026-08-17 — Round 5b Q&A: người hỏi "vậy ghi domainFields hay
+  top-level đều ổn cả?" Trợ lý SỬA — không đúng: top-level là
+  `EDITABLE_FIELDS` (`store.mjs:275`), một Set 22 key CỐ ĐỊNH, `edit`
+  hard-reject key lạ (`store.mjs:307-310`) — domain không tự thêm được
+  field top-level mới (cần sửa core). `domainFields` mới là chỗ mở tự do
+  duy nhất. Người nói "ok ghi" → D1+D2 chốt, ghi qua `fgos decision`.
+- 2026-08-17 — Round 6a Q&A: người hỏi "cuối cùng thì suggest structure
+  như thế nào?" Trợ lý đưa layout đầu tiên: giữ nguyên mọi cây có sẵn,
+  chỉ tách `DOMAINS` registry thành file riêng + fix dispatcher. Người
+  phản hồi "như cũ rồi, đâu khác gì?" — đúng: layout đó không tạo ranh
+  giới THƯ MỤC, chỉ dựa naming convention (`fgos-coding-*`).
+- 2026-08-17 — Round 6b Q&A: trợ lý sửa — đề xuất nested
+  `.agents/skills/domains/coding` + `src/domains/coding` tách rời. Người
+  bác: "nếu làm vậy thì không phát triển được dạng plugin/extension".
+  Scout tìm ra tiền lệ thật trong chính repo: `plugins/fgOS/`
+  (`.claude-plugin/plugin.json` + `skills/` tự chứa, đăng ký qua 1 dòng
+  `marketplace.json`, thêm `dogfood-fixture` không đụng `fgOS/`) — áp
+  đúng cơ chế đó cho domain → D3/D4.
+- 2026-08-17 — Round 6c Q&A: người hỏi "đặt core vào cùng bối cảnh xem"
+  (core có nên có folder riêng đối xứng `domains/` không). Scout: 881
+  tham chiếu `bin/fgos.mjs` toàn repo + external install (mission 0035)
+  → di dời phá vỡ diện rộng, không đáng — D5. Người hỏi tiếp "nếu cả
+  core, domain đều có harness/workflow/task/knowledge/skill/doctrine thì
+  cấu trúc thế nào?" — trợ lý map 6 mối quan tâm × {core, domain}: 4/6 đã
+  có hình dạng (harness/workflow/task/skill), 2/6 mở (knowledge,
+  doctrine) — chưa có tiền lệ domain-scoped trong code hiện tại.
+- 2026-08-17 — Round 6d: người yêu cầu "vẽ layout đi" → diagram đầy đủ ở
+  §6, D3/D4/D5 ghi qua `fgos decision`.
 
 ## 6. Thiết kế đã chốt {#design}
 
-Tầng STATE (data layer) của boundary hexagon đã có hình dạng cụ thể (D1,
-D2). fgOS KHÔNG chia store theo domain — mọi domain (coding hôm nay,
-marketing sắp tới per STR52) sống chung MỘT `.fgos/events.jsonl` +
-view/state.json, phân biệt nhau qua field `domain` (scalar, một item chỉ
-thuộc đúng một domain — không có ca 2 domain cùng sở hữu 1 item). Đây là
-lựa chọn có chủ đích, không phải mặc định lười: chi phí kỹ thuật của việc
-cài fgOS riêng cho mỗi domain (đồng bộ 2 store, 2 lần deploy/upgrade, mất
-khả năng cross-domain query) lớn hơn hẳn 3 rủi ro đã kiểm (field-compat/
-security/performance) — cả 3 đều đã có lời giải sẵn hoặc không phải vấn
-đề thật ở quy mô hiện tại.
-
-Ranh giới port/adapter của tầng STATE:
+fgOS tổ chức folder-layout theo mô hình hexagonal: **core = port đóng,
+dùng chung mọi domain; `domains/<name>/` = adapter tự chứa, mỗi domain
+một folder, thêm domain mới không đụng file nào có sẵn.** Đây không phải
+suy diễn lý thuyết — mirror đúng cơ chế plugin đã chạy thật trong chính
+repo này (`plugins/fgOS/`: manifest + skills tự chứa, thêm
+`dogfood-fixture` không đụng gì bên trong `fgOS/`).
 
 ```mermaid
 flowchart TB
-    subgraph core["CORE (port đóng — mọi domain chia sẻ)"]
-        top["Top-level work fields<br/>id · status · stage · domain · tier · ..."]
-        editable["EDITABLE_FIELDS (store.mjs:275)<br/>22 key cố định, edit reject key lạ"]
+    subgraph CORE["core (port đóng — mọi domain dùng chung, KHÔNG di dời — D5)"]
+        direction LR
+        harness_core["<b>harness</b><br/>bin/, src/, herdr-plugin/<br/><i>domain không có harness riêng</i>"]
+        workflow_core["<b>workflow</b><br/>stage-fsm.mjs, status-fsm.mjs<br/>+ workflow-stage-graphs.mjs<br/><i>(aggregator, D4)</i>"]
+        task_core["<b>task</b><br/>EDITABLE_FIELDS<br/>(store.mjs:275, D2)"]
+        skill_core["<b>skill</b><br/>.agents/skills/core/<br/>fgos-routing, fgos-clarifying, ..."]
+        knowledge_core["<b>knowledge</b> ❓<br/>docs/decisions/,<br/>platform-foundations.md"]
+        doctrine_core["<b>doctrine</b> ❓<br/>AGENTS.md / CLAUDE.md<br/>(luôn nạp, mọi domain)"]
     end
-    subgraph domainspace["DOMAIN-SPECIFIC (adapter mở — mỗi domain tự quản)"]
-        coding["domainFields.coding.*"]
-        marketing["domainFields.marketing.*<br/>(STR52, chưa xây)"]
+
+    subgraph DOMAINS["domains/ (adapter mở — mỗi domain tự chứa, D3)"]
+        direction LR
+        subgraph CODING["domains/coding/"]
+            direction TB
+            wf_c["workflow<br/>registry.mjs"]
+            tk_c["task<br/>domainFields.coding.*"]
+            sk_c["skill<br/>skills/ (8 skill,<br/>di dời từ .agents/skills/)"]
+            kn_c["knowledge ❓"]
+            dc_c["doctrine ❓"]
+        end
+        subgraph MARKETING["domains/marketing/ (STR52, chưa xây)"]
+            direction TB
+            wf_m["workflow<br/>registry.mjs"]
+            tk_m["task<br/>domainFields.marketing.*"]
+            sk_m["skill<br/>skills/"]
+        end
     end
-    top --> editable
-    editable -- "1 trong 22 key" --> domainspace
-    coding -. "namespace riêng, không đụng nhau" .- marketing
+
+    workflow_core -. "quét domains/*/registry.mjs<br/>tự động (D4, không sửa tay)" .-> wf_c
+    workflow_core -.-> wf_m
+    task_core -- "domainFields là 1 trong 22 key" --> tk_c
+    task_core -.-> tk_m
 ```
 
-Quy tắc ghi field (D2): field cần cùng nghĩa + cùng cách đọc ở MỌI domain
-→ đề xuất thêm vào `EDITABLE_FIELDS` (sửa core, ảnh hưởng mọi domain,
-cần cân nhắc kỹ). Field chỉ domain đó cần → viết thẳng vào
-`domainFields.<domain>.*`, không đụng core, domain khác không thấy/không
-bị ảnh hưởng.
+**Quy tắc đặt field/code (D2-D4):** cần cùng nghĩa + cùng cách đọc ở MỌI
+domain → core (sửa `EDITABLE_FIELDS`/aggregator, ảnh hưởng mọi domain,
+cân nhắc kỹ). Chỉ một domain cần → `domains/<name>/` (registry.mjs cho
+workflow, `domainFields.<name>.*` cho task, `skills/` cho skill) — không
+đụng core, domain khác không thấy/không bị ảnh hưởng.
 
-**Chưa chốt (còn ở §3):** ranh giới tương ứng cho tầng CODE — 4 điểm nối
-STR89 đã định vị (`DOMAINS` registry, `discovery.mjs`/`decompose.mjs`,
-`fgos-routing`, skill-bundle riêng theo domain) vẫn chưa có quyết định
-thư mục cụ thể nào chọn giữa "domain-specific code sống trong `src/`
-hiện tại, phân biệt qua data/registry" (giữ phẳng, mirror đúng tinh thần
-D1) hay "domain-specific code có thư mục riêng kiểu package/extension"
-(kiểu `packages/bee-rs` của beegog, nhưng beegog không có tiền lệ
-multi-domain nên không so trực tiếp được). Trục (b) engine-vs-prose (3
-cây skill trùng lặp, tiêu chí tách nào) cũng chưa thảo luận.
+**Core KHÔNG di dời vật lý (D5).** `bin/`, `src/`, `herdr-plugin/` giữ
+nguyên vị trí — 881 tham chiếu `bin/fgos.mjs` toàn repo + external
+install (mission 0035) khiến di dời phá vỡ diện rộng cho lợi ích thuần
+biểu tượng. Chỉ `.agents/skills/core/` được gắn nhãn tường minh (rẻ,
+không có external path phụ thuộc).
+
+**Còn mở (❓ trong diagram, ngoài scope quyết định của item này trừ khi
+người chốt mở rộng):** `knowledge` và `doctrine` domain-scoped — chưa có
+tiền lệ nào trong code hôm nay (`docs/history/` scope theo feature chứ
+không theo domain; AGENTS.md/CLAUDE.md luôn nạp không phân domain). Trục
+engine-vs-prose ở tầng SKILL đã tự nhiên giải quyết qua D3 (skill sống
+trong `domains/<name>/skills/` hoặc `.agents/skills/core/`, không còn là
+câu hỏi tách riêng) — phát hiện round 5: 3 cây skill cũ (`.agents/skills`,
+`.claude/skills`, `plugins/fgOS/skills`) KHÔNG phải trùng lặp, mà là 1
+nguồn canonical + N target render (đúng cơ chế beegog tự dùng cho chính
+nó) — không cần sửa cơ chế render, chỉ cần domain skill di dời đúng chỗ
+trong nguồn canonical trước khi render.
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-(chưa có — chưa đủ hình dạng cụ thể để chia task)
+### {#task-domain-registry-split} Tách `DOMAINS` registry thành aggregator + per-domain file
+
+- **Mục tiêu:** hiện thực D3+D4 cho tầng workflow/registry — tách
+  `codingDomain` (hiện ~390/779 dòng của `workflow-stage-graphs.mjs`) ra
+  `domains/coding/registry.mjs`; `workflow-stage-graphs.mjs` chỉ còn quét
+  `domains/*/registry.mjs` (glob/readdir + dynamic import) để build
+  `DOMAINS`, giữ nguyên `synthetic`/`triage`/`fixture-marketing` (fixture,
+  có thể ở lại core hoặc cũng thành `domains/` tuỳ mức nhất quán muốn).
+- **§6 excerpt áp dụng:** khối `workflow` trong diagram + quy tắc
+  aggregator D4.
+- **D-ID áp dụng:** D3, D4.
+- **Quan hệ:** độc lập với task skill-migration bên dưới, có thể làm
+  song song hoặc trước.
+- **Verify nháp:** `test/state/domain-fields.test.mjs`,
+  `test/e2e/fixture-marketing-domain.test.mjs`, mọi test đụng `DOMAINS`
+  export vẫn xanh không đổi — export shape/consumer không đổi, chỉ đổi
+  cách nội bộ build.
+
+### {#task-coding-skill-migration} Di dời 8 skill `fgos-coding-*` vào `domains/coding/skills/`
+
+- **Mục tiêu:** hiện thực D3 cho tầng skill — di dời
+  `fgos-coding-{discovering,exploring,planning,validating,implement,
+  shaping,driving,compounding}` từ `.agents/skills/` (nguồn canonical)
+  sang `domains/coding/skills/`; cập nhật pointer trong
+  `.claude/skills/*/SKILL.md` và `plugins/fgOS/skills/*/SKILL.md` (các
+  wrapper tự ghi rõ "real skill content lives at ...") trỏ đúng vị trí
+  mới; 7 skill domain-agnostic còn lại trong `.agents/skills/` chuyển vào
+  `.agents/skills/core/` (nhãn tường minh, D5).
+- **§6 excerpt áp dụng:** khối `skill` trong cả CORE và CODING subgraph.
+- **D-ID áp dụng:** D3, D5.
+- **Quan hệ:** cần quyết định thêm (chưa chốt trong item này) — canonical
+  source của domain skill có VẪN là `.agents/skills/` (chỉ đổi cấu trúc
+  con) hay chuyển hẳn thành `domains/coding/skills/` là canonical mới,
+  `.agents/skills/` chỉ còn giữ `core/`. Cần trả lời trước khi
+  `fgos-coding-planning` viết plan thật.
+- **Verify nháp:** mọi `/fgOS:*` slash-command action step vẫn resolve
+  đúng skill sau khi đổi path; golden-file/snapshot test cho wrapper
+  pointer nếu có.
+
+### {#task-dispatcher-domain-aware} Fix `discovery.mjs`/`plan.mjs`/`fgos-routing` đọc registry thay vì hardcode
+
+- **Mục tiêu:** đóng nốt STR89 — 2 dispatcher (`src/intake/discovery.mjs`,
+  `src/intake/plan.mjs`) và skill `fgos-routing` hiện hardcode literal
+  stage-name của coding; sửa để đọc `DOMAINS[item.domain]` (đã build từ
+  aggregator ở task 1) thay vì literal.
+- **§6 excerpt áp dụng:** mũi tên `workflow_core -.-> wf_c/wf_m` trong
+  diagram — dispatcher phải theo đúng registry, không hardcode.
+- **D-ID áp dụng:** D1, D4 (đúng tinh thần "core dùng chung, đọc data
+  không hardcode literal của 1 domain").
+- **Quan hệ:** phụ thuộc task 1 (aggregator) đã build `DOMAINS` đúng
+  trước khi dispatcher đọc được.
+- **Verify nháp:** cần xác minh lại trạng thái thật của STR89 trước khi
+  plan — backlog ghi "— done" nhưng chưa rõ done ở mức "quyết định đã
+  chốt" hay "code đã sửa"; `fgos-coding-planning`/`fgos-coding-validating`
+  nên kiểm tra trực tiếp thay vì tin theo dòng backlog.
+
+**Việc CHƯA đủ hình dạng để thành task riêng:** knowledge/doctrine
+domain-scoped (câu hỏi mở #15, §3) — chờ người quyết định có nằm trong
+scope item này hay để lại khi marketing thật bắt tay xây.
