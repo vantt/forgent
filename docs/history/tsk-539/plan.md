@@ -4,10 +4,13 @@ Mode: **standard** (3 flags, direct-entry fallback — no lane handed off by
 `fgos-routing`, applied its Mode-gate table directly per
 `fgos-coding-planning`'s own Bootstrap step): **public contracts** (`ask`/
 `answer` are core CLI verbs every skill and every human operator uses),
-**existing covered behavior** (5 test files call `ask` today —
-`test/cli/fgos-read.test.mjs`, `test/cli/fgos-intake.test.mjs`,
-`test/state/awaiting-context.test.mjs`, `test/cli/fgos-move.test.mjs`,
-`test/cli/fgos-iron-law-gate.test.mjs`), **weak proof / no precedent**
+**existing covered behavior** (6 test files touch the `ask`/`awaiting-human`
+edge — `test/state/fsm.test.mjs` (direct `transitionWork` unit tests,
+including a multi-edge sweep, found at the reality gate, not the plan's
+first CLI-only scout), `test/cli/fgos-read.test.mjs`,
+`test/cli/fgos-intake.test.mjs`, `test/state/awaiting-context.test.mjs`,
+`test/cli/fgos-move.test.mjs`, `test/cli/fgos-iron-law-gate.test.mjs`),
+**weak proof / no precedent**
 (zero content-shape validation exists anywhere in this codebase today —
 confirmed in `RESEARCH.md` round 1). No hard-gate flag applies (no auth,
 no data loss, no audit/security, no external provider, nothing being
@@ -15,11 +18,21 @@ removed) — genuinely additive.
 
 ## Approach
 
-**Chosen path.** Hook a structural-completeness validator directly into
-`putInAwaiting` (`src/state/store.mjs:870`), the one function every `ask`
-call passes through regardless of caller (a skill, a human typing `fgos
-ask` by hand, a future non-coding domain) — not a skill-prose reminder,
-not an extension of `scripts/check-decision-citation-drift.mjs`. This
+**Chosen path (corrected at `fgos-coding-validating`'s reality gate —
+repo-fit FAIL on the original claim below, real evidence substituted):**
+`putInAwaiting` (`src/state/store.mjs:870`) is a thin wrapper over
+`moveWork`, itself a shared facade for every status transition, not only
+`ask` — the wrong place to add an ask-specific check. The real hook point
+is `transitionWork` (`src/state/status-fsm.mjs:211`), which already owns
+this exact edge: the `to === 'awaiting-human'` block at lines 259-267
+already throws `FsmError('validation', ...)` when `ask` is empty. Extend
+that SAME block with the structural-completeness check below, same error
+class, right after the existing non-empty check — not a new function, not
+a second validation site. This is still every `ask` call regardless of
+caller (a skill, a human typing `fgos ask` by hand, a future non-coding
+domain), since every edge into `awaiting-human` passes through
+`transitionWork` — the "no skill-prose, no citation-checker-extension"
+reasoning below is unchanged, only the exact file/function corrected. This
 satisfies D11 exactly (real machine enforcement, simple check) and — as a
 side effect, for free — also satisfies D9's Markdown requirement for the
 ask/gate-approve surface specifically, since the required structure below
@@ -68,27 +81,39 @@ non-empty content.
 
 | Component | Risk | Proof point |
 |---|---|---|
-| `putInAwaiting` validator (new) | Medium — a genuinely new code path on a hot, widely-used verb | `npm test` full suite green; a fresh `ask --text` missing either heading is rejected with a clear error naming which heading is missing (NEGATIVE); a well-formed one succeeds unchanged (POSITIVE) |
-| 5 existing test call sites | Medium — their existing `--text` fixtures will fail the new check as written | Update each fixture's `--text` to the required two-heading shape; `npm test` green proves nothing else regressed |
+| `transitionWork`'s `to === 'awaiting-human'` block (extended) | Medium — a genuinely new code path on a hot, widely-shared FSM function | `npm test` full suite green; a fresh `ask` missing either heading is rejected with a clear `FsmError('validation', ...)` naming which heading is missing (NEGATIVE); a well-formed one succeeds unchanged (POSITIVE) |
+| Existing test call sites (corrected below — repo-fit check found more than the plan's first pass) | Medium — their existing `ask`/`--text` fixtures will fail the new check as written | Update each fixture to the required two-heading shape; `npm test` green proves nothing else regressed |
 | Citation-format convention pointer (prose, `fgos-coding-exploring`/`fgos-coding-validating`/`fgos-coding-implement`/`fgos-coding-shaping`) | Low — prose-only, additive | `docs/how-to/write-verify-for-a-skill-prose-change.md`'s POSITIVE/NEGATIVE shape (grep for the pointer line present; grep for the specific old prose absent, where applicable) |
 
 Impact-analysis capability posture (`CLAUDE.md`'s gate): `fgos tool query
 --capability impact-analysis --status present` → GitNexus registered,
-`present` → **full**. `putInAwaiting`'s callers are a bounded, greppable
-set (`bin/fgos.mjs`'s `ask` case is the only direct caller in this repo);
-this is recorded for completeness, not leaned on for a proof point no
+`present` → **full**. `transitionWork`'s callers are a bounded, greppable
+set; this is recorded for completeness, not leaned on for a proof point no
 plain `rg` already covers just as well.
 
 **Files touched, in order:**
 
-1. `src/state/store.mjs` — add the two-heading structural-completeness
-   check inside `putInAwaiting`, throwing `StoreError('validation', ...)`
-   naming the missing heading(s) (same error shape `validateWork` already
-   uses elsewhere in this file — no new error class).
-2. `test/cli/fgos-read.test.mjs`, `test/cli/fgos-intake.test.mjs`,
+1. `src/state/status-fsm.mjs` — extend the existing `to === 'awaiting-human'`
+   block (lines 259-267) with the two-heading structural-completeness
+   check, throwing `FsmError('validation', ...)` naming the missing
+   heading(s) — same error class the sibling non-empty-`ask` check right
+   above it already uses, no new error class.
+2. `test/state/fsm.test.mjs` — corrected at the reality gate (missed in the
+   plan's first CLI-only scout): this file directly unit-tests
+   `transitionWork`, including a sweep test (lines 178-196) that enters
+   `awaiting-human` with bare short `ask` text (`'sweep-test ask'`,
+   `'which auth method?'`) across every `todo->awaiting-human`/
+   `doing->awaiting-human` case, plus dedicated tests for the
+   non-empty-`ask` rejection this new check sits right next to (lines
+   209-231). All these fixtures need the required two-heading shape.
+   `test/runner/anti-loop.test.mjs` also calls `transitionWork` but only
+   exercises the `answer`-leaving edge (confirmed via `grep -n "to:
+   'awaiting-human'"` → no hits) — unaffected, not touched.
+   `test/cli/fgos-read.test.mjs`, `test/cli/fgos-intake.test.mjs`,
    `test/state/awaiting-context.test.mjs`, `test/cli/fgos-move.test.mjs`,
-   `test/cli/fgos-iron-law-gate.test.mjs` — update `ask --text` fixtures to
-   the required shape; this is expected fallout from step 1, not a
+   `test/cli/fgos-iron-law-gate.test.mjs` — the original 5 CLI-level
+   files the plan's first pass found — update their `ask --text` fixtures
+   to the required shape too; this is expected fallout from step 1, not a
    separate concern.
 3. `.agents/skills/fgos-coding-exploring/SKILL.md`,
    `.agents/skills/fgos-coding-validating/SKILL.md`,
@@ -100,10 +125,12 @@ plain `rg` already covers just as well.
    self-containment decision) and naming the required two-heading shape
    above, so an author hits the guidance before hitting the new hard
    validation error, not only after.
-4. New test coverage for `putInAwaiting`'s own validator (a direct unit or
-   CLI test, not only the 5 updated fixtures) — proves the NEGATIVE case
-   explicitly (missing heading → rejected) rather than relying on the
-   updated fixtures to imply it by omission.
+4. New test coverage in `test/state/fsm.test.mjs` for the extended
+   `to === 'awaiting-human'` check (a direct `transitionWork` unit test,
+   same file and style as the existing non-empty-`ask` tests at lines
+   209-231, not only the updated fixtures elsewhere) — proves the NEGATIVE
+   case explicitly (missing heading → rejected, naming which one) rather
+   than relying on the updated fixtures to imply it by omission.
 
 No `fgos graph --what-if` run: there is exactly one buildable piece in
 this item (the pieces above are one cohesive change, not independent
@@ -127,10 +154,14 @@ Concrete cases to prove against, at `standard` depth:
   UNCHANGED (this check applies only to `ask`, per `CONTEXT.md`'s own
   framing: the complaint was about questions lacking a stated problem, not
   about answers); `expectedStatus`/CAS behavior, `parentSnapshotAtAsk`, and
-  every other `putInAwaiting` field stay exactly as they are today.
-- **Concurrent access** — no change to this function's existing lock
-  discipline (`withEventsLockAndRefresh`); the new check runs inside the
-  same lock scope as the existing validation, nothing new to prove there.
+  every other `putInAwaiting` field stay exactly as they are today —
+  `putInAwaiting` itself is untouched, only `transitionWork`, which it
+  calls into via `moveWork`, gets the new check.
+- **Concurrent access** — no change to `moveWork`'s existing lock
+  discipline (`withEventsLockAndRefresh`, `store.mjs:559`); `transitionWork`
+  already runs inside that same locked section today (`store.mjs:571`), so
+  the new check runs inside the same existing lock scope, nothing new to
+  prove there.
 - **Partial failure** — a rejected `ask` call throws before any event is
   appended, same as every other `StoreError('validation')` path in this
   file today; no new partial-write surface.
