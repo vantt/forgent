@@ -42,13 +42,13 @@ import {
   writeEnduserManifest,
 } from './helpers/setup-checks-harness.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../../src/state/worker-slots.mjs';
-import { DEFAULT_IRON_LAW_LEVEL, findDomainWorkflowSkillMapGaps } from '../../src/setup/registrations.mjs';
+import { DEFAULT_CAPABILITY_SLOTS, DEFAULT_IRON_LAW_LEVEL, findDomainWorkflowSkillMapGaps } from '../../src/setup/registrations.mjs';
 import { addDecision } from '../../src/state/store.mjs';
 
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, plugin-dev-skills-packaged, changelog-unreleased-stale, herdr-launcher-configured, herdr-web-dashboard-configured, work-classification-vocabulary, work-stage-vocabulary, domain-workflow-skillmap-coverage, delivered-not-on-trunk, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, events-jsonl-not-truncated, cli-version-visible, worker-slots-ceiling-usable, gateway-token-configured, readme-install-tag-exists, iron-law-configured, task-specs-resolve, agent-claims-resolve, dispatch-decide-hook-wired, and decision-index-stale', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, plugin-dev-skills-packaged, changelog-unreleased-stale, herdr-launcher-configured, herdr-web-dashboard-configured, work-classification-vocabulary, work-stage-vocabulary, domain-workflow-skillmap-coverage, delivered-not-on-trunk, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, events-jsonl-not-truncated, cli-version-visible, worker-slots-ceiling-usable, gateway-token-configured, readme-install-tag-exists, iron-law-configured, task-specs-resolve, agent-claims-resolve, dispatch-decide-hook-wired, advise-execute-capabilities-configured, and decision-index-stale', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     [
@@ -83,6 +83,7 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'dispatch-decide-hook-wired',
       'task-specs-resolve',
       'agent-claims-resolve',
+      'advise-execute-capabilities-configured',
       'decision-index-stale',
     ].sort(),
   );
@@ -1028,7 +1029,7 @@ test('config-not-stale passes when the existing config already has every default
   fs.writeFileSync(
     path.join(cwd, '.fgos', 'config.json'),
     JSON.stringify({
-      runner: DEFAULT_RUNNER_CONFIG,
+      runner: { ...DEFAULT_RUNNER_CONFIG, capabilities: DEFAULT_CAPABILITY_SLOTS },
       gateBypass: { level: 'off' },
       cleanup: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS, leafTtlDays: DEFAULT_CLEANUP_LEAF_TTL_DAYS },
       herdrOrchestrator: DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
@@ -1159,6 +1160,52 @@ test('worker-slots-ceiling-usable passes and names a real armed ceiling', () => 
   const { passed, message } = checkById('worker-slots-ceiling-usable').check(cwd);
   assert.equal(passed, true);
   assert.match(message, /workerSlots\.ceiling = 6/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+// ─── advise-execute-capabilities-configured (tsk-2uf-3, docs/history/
+// dispatch-activation-and-handoff-redesign/CONTEXT.md D2): same
+// generic-scan/dedicated-check split as gateway/workerSlots/invariantChecks
+// above -- config-not-stale already catches runner.capabilities (or either
+// slot) being wholly ABSENT; this check catches present-but-malformed.
+
+test('advise-execute-capabilities-configured fails when runner.capabilities is missing entirely', () => {
+  const cwd = mkTemp('doctor-capabilities-absent-');
+  const { passed, message } = checkById('advise-execute-capabilities-configured').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /runner\.capabilities section missing/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('advise-execute-capabilities-configured fails when a slot is missing or malformed', () => {
+  for (const capabilities of [
+    { advise: {} }, // execute missing
+    { execute: {} }, // advise missing
+    { advise: 'not-an-object', execute: {} },
+    { advise: [], execute: {} },
+    { advise: null, execute: {} },
+    {},
+  ]) {
+    const cwd = mkTemp('doctor-capabilities-malformed-');
+    fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+    fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities } }));
+    const { passed, message } = checkById('advise-execute-capabilities-configured').check(cwd);
+    assert.equal(passed, false, `capabilities: ${JSON.stringify(capabilities)}`);
+    assert.match(message, /missing or has a malformed slot for/);
+    fs.rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+test('advise-execute-capabilities-configured passes when both slots are declared', () => {
+  const cwd = mkTemp('doctor-capabilities-ok-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(
+    path.join(cwd, '.fgos', 'config.json'),
+    JSON.stringify({ runner: { capabilities: DEFAULT_CAPABILITY_SLOTS } }),
+  );
+  const { passed, message } = checkById('advise-execute-capabilities-configured').check(cwd);
+  assert.equal(passed, true);
+  assert.match(message, /declares both "advise" and "execute"/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
