@@ -110,6 +110,7 @@
     "src/setup/skill-wrappers.mjs": "infra",
     "src/setup/git-hooks.mjs": "infra",
     "src/setup/claude-code-hooks.mjs": "infra",
+    "src/setup/agy-permissions.mjs": "infra",
     "src/setup/checks.mjs": "use-case",
     "src/config/global-config.mjs": "infra",
     "src/setup/registrations.mjs": "use-case",
