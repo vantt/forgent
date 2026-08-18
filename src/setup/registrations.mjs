@@ -1034,6 +1034,35 @@ registerCheck({
   check: (cwd) => checkGlobalProjectAwareness(cwd),
 });
 
+// tsk-2uf-3 (docs/history/dispatch-activation-and-handoff-redesign/
+// CONTEXT.md D2): the two role-by-intelligence capability slots --
+// `advise` (value comes from disagreement, never changes state, one
+// question/one answer) and `execute` (value comes from compliance,
+// changes files, must pass verify). `decide --for <purpose>` already
+// validates a `--for` name against `runner.capabilities` (dispatch.mjs's
+// `validateCapabilitiesShape`/`resolveExecutorAndOverrides`), but the
+// shared config's `capabilities` map shipped with neither name declared,
+// so neither purpose could ever resolve. Layered onto the SAME `runner`
+// config-default below (never a second, colliding `key: 'runner'`
+// registration -- `assembleRegistryDefaults` combines registrations by
+// flat per-key assignment, not a deep merge across entries sharing a
+// key) so `DEFAULT_RUNNER_CONFIG` itself (src/runner/dispatch.mjs,
+// tsk-2uf-1's own footprint) stays untouched -- this only ADDS a
+// `capabilities` key that constant has never declared. Deliberately no
+// `prefer`/`aliases`/`overrides`: naming which executor serves a purpose
+// is a dispatch-mechanism decision, and tsk-5tm-3 D5 forbids `execute`
+// (or, by the same reasoning, this registration) re-deciding that.
+export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
+  advise: {
+    description:
+      'Async product-decision consult -- value comes from disagreement, never changes state, one question/one answer (D2, docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md)',
+  },
+  execute: {
+    description:
+      'Compliance-driven work -- value comes from following the plan, changes files, must pass verify (D2, docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md)',
+  },
+});
+
 // The runner's own config-default, registered under its key in the shared
 // file (tsk-2cs D6) — `checkConfigNotStale`/`ensureSharedConfigDefaults`
 // above are both driven by this registration generically (tsk-5vf D4), not
@@ -1041,7 +1070,43 @@ registerCheck({
 registerConfigDefault({
   id: 'runner',
   key: 'runner',
-  shape: DEFAULT_RUNNER_CONFIG,
+  shape: { ...DEFAULT_RUNNER_CONFIG, capabilities: DEFAULT_CAPABILITY_SLOTS },
+});
+
+// `checkConfigNotStale` above already catches `runner.capabilities` (or
+// either slot inside it) being wholly ABSENT, generically, via
+// `assembleRegistryDefaults`'s merge -- same "generic scan covers missing,
+// a dedicated check covers present-but-malformed" split every other
+// present-but-unusable check in this file already follows (gateway/
+// workerSlots/invariantChecks above). What slips past the generic scan is
+// a slot present as the wrong shape (a string, an array, `null`) -- never
+// "missing", so `mergeConfigDefaults` has nothing to add, and `decide
+// --for advise`/`--for execute` would still fail validateCapabilitiesShape
+// with no doctor signal pointing at why.
+function checkAdviseExecuteCapabilitiesConfigured(cwd) {
+  const capabilities = readSharedConfig(cwd)?.runner?.capabilities;
+  if (!capabilities || typeof capabilities !== 'object' || Array.isArray(capabilities)) {
+    return {
+      passed: false,
+      message: 'runner.capabilities section missing -- run fgos setup (decide --for advise/execute cannot resolve until it exists)',
+    };
+  }
+  const missing = ['advise', 'execute'].filter(
+    (name) => !capabilities[name] || typeof capabilities[name] !== 'object' || Array.isArray(capabilities[name]),
+  );
+  if (missing.length > 0) {
+    return {
+      passed: false,
+      message: `runner.capabilities is missing or has a malformed slot for: ${missing.join(', ')} -- run fgos setup`,
+    };
+  }
+  return { passed: true, message: 'runner.capabilities declares both "advise" and "execute"' };
+}
+
+registerCheck({
+  id: 'advise-execute-capabilities-configured',
+  description: 'runner.capabilities declares the "advise" and "execute" purpose slots decide --for resolves against (tsk-2uf-3)',
+  check: (cwd) => checkAdviseExecuteCapabilitiesConfigured(cwd),
 });
 
 // tsk-slq D6 (AGENTS.md's install/setup/doctor gate — a new infra

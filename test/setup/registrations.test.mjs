@@ -11,6 +11,7 @@ import path from 'node:path';
 
 import { DOCTOR_CHECKS, CONFIG_DEFAULT_REGISTRATIONS, FIX_REGISTRATIONS, registerCheck, registerConfigDefault, registerFix, runFixes, ensureSharedConfigDefaults } from '../../src/setup/checks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
+import { DEFAULT_CAPABILITY_SLOTS } from '../../src/setup/registrations.mjs';
 
 // tsk-4xg: runFixes() below invokes every registered fix, including the
 // real `claude-plugin-marketplace` one, which shells out to a real,
@@ -163,10 +164,16 @@ test('runFixes invokes every registered fix against the given cwd and reports id
 test('ensureSharedConfigDefaults on a fresh dir writes every registered entry under its own key, including the built-in "runner" one', () => {
   const dir = mkTempDir();
   const { config, addedKeys } = ensureSharedConfigDefaults(dir);
-  assert.deepEqual(config.runner, DEFAULT_RUNNER_CONFIG);
+  // tsk-2uf-3: the registered "runner" config-default layers the
+  // advise/execute capability slots onto DEFAULT_RUNNER_CONFIG (that
+  // constant itself, src/runner/dispatch.mjs, stays untouched -- see
+  // registrations.mjs's own `DEFAULT_CAPABILITY_SLOTS` composition), so
+  // the assembled "runner" section is no longer byte-identical to
+  // DEFAULT_RUNNER_CONFIG alone.
+  assert.deepEqual(config.runner, { ...DEFAULT_RUNNER_CONFIG, capabilities: DEFAULT_CAPABILITY_SLOTS });
   assert.ok(addedKeys.some((k) => k.startsWith('runner.')) || addedKeys.includes('runner'));
   const written = JSON.parse(fs.readFileSync(path.join(dir, '.fgos', 'config.json'), 'utf8'));
-  assert.deepEqual(written.runner, DEFAULT_RUNNER_CONFIG);
+  assert.deepEqual(written.runner, { ...DEFAULT_RUNNER_CONFIG, capabilities: DEFAULT_CAPABILITY_SLOTS });
 });
 
 test('ensureSharedConfigDefaults on an already-complete shared file does not rewrite it', () => {
