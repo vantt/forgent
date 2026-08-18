@@ -1866,15 +1866,25 @@ function checkEnduserDocsIndexStale(cwd) {
       message: `${manifestPathFor(root)} not found -- nothing to check (project has not generated an end-user doc index yet)`,
     };
   }
-  const indexedPaths = new Set(JSON.parse(previousContent).map((e) => e.docPath));
+  const parsedIndex = JSON.parse(previousContent);
+  const indexedPaths = new Set(parsedIndex.map((e) => e.docPath));
+  const freshPaths = new Set(entries.map((e) => e.docPath));
   const total = entries.length;
   const missing = entries.filter((e) => !indexedPaths.has(e.docPath)).length;
-  if (missing === 0) {
+  const orphans = parsedIndex.filter((e) => !freshPaths.has(e.docPath)).length;
+  if (missing === 0 && orphans === 0) {
     return { passed: true, message: `${total}/${total} tài liệu end-user có trong index -- up to date` };
+  }
+  const parts = [];
+  if (missing > 0) {
+    parts.push(`${missing}/${total} tài liệu end-user chưa có trong index`);
+  }
+  if (orphans > 0) {
+    parts.push(`${orphans} tài liệu dư thừa trong index`);
   }
   return {
     passed: false,
-    message: `${missing}/${total} tài liệu end-user chưa có trong index -- chạy fgos docs-index`,
+    message: `${parts.join(', ')} -- chạy fgos docs-index`,
   };
 }
 
