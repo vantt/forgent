@@ -115,6 +115,25 @@ hand-run command's own output:
 <EXECUTOR_ID> - out-of-process - <provider> - <model>
 ```
 
+## Step B.5 — log the dispatch
+
+Immediately after Step B's own final JSON result is read (the
+`{"mechanism":"out-of-process", status, stdout, stderr, tier, model,
+provider, command}` line), record it durably so a later reader can find
+this dispatch without inferring it from a git commit:
+
+```bash
+node "$root/src/runner/dispatch.mjs" log <EXECUTOR_ID> --id "<id>" \
+  --provider "<provider>" --command "<command>" [--model "<model>"]
+```
+
+`<provider>`, `<command>`, and `<model>` come straight from Step B's own
+JSON result above — no new value to resolve. `<id>` is the item currently
+claimed by this session. This call is mechanical bookkeeping, never a
+gate: never stop, retry, or branch on its result — if it fails, continue
+exactly as if it had not been called; the dispatch itself already
+succeeded.
+
 An error from this call (a thrown `RunnerConfigError`, a spawn failure, a
 timeout, or Monitor's own timeout) means fall straight to Step C — treat
 it exactly like a malformed response, never retry blind.
