@@ -70,7 +70,9 @@ plan.md reached for the identical shape of change).
 ## Files touched
 
 - `.fgos/config.json` — `runner.executors.agy.invocations[0].args`: append
-  `"--print-timeout"`, `"10m"`.
+  `"--print-timeout"`, `"10m"`. **Applied as a direct, single-parent commit
+  on `main`, never through `fgw/tsk-1up`** — see "Post-plan correction"
+  below.
 
 ## No split
 
@@ -78,27 +80,42 @@ Single piece — one config-array edit plus its own live-repro verify, same
 as tsk-it0's own precedent. Not separable into independently workable
 pieces.
 
+## Post-plan correction: `fgos-write-rejected`
+
+The first `fgos approve tsk-1up` attempt blocked with
+`outcome: "fgos-write-rejected"` (`paths: [".fgos/config.json"]`) — ADR0020:
+a `fgw/<id>` branch may never carry a `.fgos/` change, own commit or not.
+Known, documented wall with 6 prior precedents
+(`docs/how-to/fix-fgos-write-rejected-merge-block.md`, closest shape:
+tsk-5ge/tsk-53n/tsk-28o — a config-content fix split from its branch).
+
+Fix applied, following that doc's own steps 3-5:
+- Restored `.fgos/config.json` to its pre-fix state and dropped the
+  `.fgos/`-only commit from `fgw/tsk-1up` entirely (the commit carried
+  nothing else, so removing the `.fgos/` diff left it empty — `git reset
+  --hard` to the parent commit rather than an empty amend).
+- The real `--print-timeout 10m` config change is applied separately,
+  directly against the main checkout, as an operator action — never
+  re-attempted through this branch.
+- Narrowed this item's own `verify` (below) to drop the
+  `.fgos/config.json`-reading POSITIVE half — the same doc's step 5: a
+  branch-carried verify reading `.fgos/` can never survive `fgos return`'s
+  own detached re-verify worktree either (same ADR0020 exclusion). The
+  POSITIVE proof (config carries the new value, a live call at that value
+  succeeds) was still run manually, once, against the real main-checkout
+  config, before this correction — see the item's own decision log.
+
 ## Verify
 
 ```bash
-bash -c 'set -e
-# NEGATIVE (mechanism still real): an explicit short print-timeout still
-# trips the exact same error the fix is meant to move past 5m for.
-agy -p "Wait 8 seconds then reply with exactly: DONE" --dangerously-skip-permissions --new-project --print-timeout 2s 2>&1 | grep -q "timeout waiting for response"
-# POSITIVE (fix applied and effective): the configured agy args now carry
-# --print-timeout, and a short real call using those exact args completes
-# without hitting it.
-node -e "
-const c = require(\"./.fgos/config.json\");
-const args = c.runner.executors.agy.invocations[0].args;
-const i = args.indexOf(\"--print-timeout\");
-if (i === -1) process.exit(1);
-console.log(args[i + 1]);
-" > /tmp/agy-print-timeout-value.txt
-grep -qv "^5m" /tmp/agy-print-timeout-value.txt
-agy -p "Wait 8 seconds then reply with exactly: DONE" --dangerously-skip-permissions --new-project --print-timeout "$(cat /tmp/agy-print-timeout-value.txt)" | grep -q "^DONE$"
-'
+bash -c 'agy -p "Wait 8 seconds then reply with exactly: DONE" --dangerously-skip-permissions --new-project --print-timeout 2s 2>&1 | grep -q "timeout waiting for response"' && npm test
 ```
+
+(NEGATIVE half only — proves the mechanism agy's own `--print-timeout`
+controls, independent of any `.fgos/` file content this branch could never
+legally carry — plus the full test suite. The POSITIVE half's proof lives
+in the decision log and this doc's own correction section above, run
+manually against the real main-checkout config.)
 
 ## Outstanding questions
 
