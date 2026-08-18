@@ -22,8 +22,10 @@ was verified and where. `fgos graph --json`/`--what-if` were not run;
 neither is meaningful for a zero-code-change closeout with no ordering
 question between pieces (there is only one piece).
 
-Impact-analysis capability gate: not invoked. No blast-radius evidence is
-being leaned on here — the proof already gathered at discovery is a
+Impact-analysis capability gate: checked (`fgos tool query --capability
+impact-analysis --status present` → `providers: []`, 0 registered) —
+`impact-analysis: inactive`. Not a gap: no blast-radius evidence is being
+leaned on here at all — the proof already gathered at discovery is a
 direct source-content comparison (`git show` + `Read` of the current
 file), not a graph-based impact claim.
 
