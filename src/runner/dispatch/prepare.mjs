@@ -7,6 +7,17 @@
 // unchanged as a barrel. See `docs/history/dispatch-activation-and-handoff-
 // redesign/CONTEXT.md` D7 for the split rationale.
 //
+// TRUST INVARIANT (security panel, restored — dropped from the pre-split
+// banner during the D7 move, review-caught): `buildPrompt` below assumes
+// the `work` item it is given (title, kind, refs, and especially `verify`)
+// was authored by the repo's own user, not ingested from an untrusted
+// external source. `verify` is run by the runner as a shell command
+// (goal-check, a deliberately different and separate trust boundary from
+// `dispatch/transport.mjs`'s spawn calls); a work item from an unvetted
+// source is an injection vector before it ever reaches dispatch. Never
+// wire an external/untrusted intake path into `work` without a review
+// gate in between.
+//
 // `prepareDispatch` scope for THIS item (tsk-2uf-1) is deliberately narrow:
 // it validates call legality only — that `unit` is a real, addressable
 // dispatch target (a non-empty `id`) — never the dispatch MECHANISM
