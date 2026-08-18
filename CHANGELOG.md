@@ -63,6 +63,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   replays byte-for-byte unaffected — `holder` and the two new event kinds
   are both fully optional/lazy, never present unless actually used.
 
+### Fixed
+
+- `fgos decision` gains an optional `--kind` flag. Before this, every
+  write through the CLI verb defaulted to `addDecision`'s own `'design'`
+  kind — including `fgos-coding-validating`'s own audit line for an
+  auto-approved gate — which the retrospective/cleanup gate
+  (`checkRetrospectiveContent`) read as a human reflecting on the work,
+  letting an item satisfy that gate with no retrospective document behind
+  it. `fgos-coding-validating` now passes `--kind engine` on that line.
+
 ### Changed
 
 - `capacities.<id>.kind` is now the `agent`/`tool` axis (WHAT a capacity

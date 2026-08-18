@@ -361,11 +361,19 @@ skill's own "leave execution alone" rule).
   <item-id> at level <level>" --rationale "gate-bypass level <level>
   permits auto-approval per the gate-bypass feature's own locked
   decisions (see docs/history/gate-bypass/CONTEXT.md), per tsk-224's own gate
-  redesign" --relation touches:tsk-224`
+  redesign" --relation touches:tsk-224 --kind engine`
   — the text only cites tsk-224's own decision rather than superseding
   it, so the relation flag says `touches`; every `fgos decision` write
   still declares its relation explicitly, no default
-  (tsk-1lv-1) — the same audit trail `gate-bypass` requires), record it
+  (tsk-1lv-1) — the same audit trail `gate-bypass` requires. **`--kind
+  engine` is required on this line, never omitted** (tsk-5dn): this is the
+  machine recording its own auto-approve of its own gate, not a person's
+  design decision, and `addDecision` defaults an omitted `kind` to
+  `'design'` — which the retrospective/cleanup gate
+  (`checkRetrospectiveContent`, `src/state/cleanup-harness.mjs`) reads as a
+  human reflecting on the work, satisfying that gate on an item where
+  retrospective never ran. Omitting `--kind` here silently reopens that
+  hole.), record it
   (`fgos gate-approve <item-id> --gate
   validateApprove --actor bypass --verify "..."`, per above), then
   continue straight to the `planning`→`executing` engine call below.
@@ -463,6 +471,9 @@ claim, and `fgos return` will simply refuse later with "is todo, not doing".
 - softening a NOT READY into a pass because the item already spent time here
 - reopening a decision `CONTEXT.md` or `plan.md` already locked, instead of
   citing it
+- **logging the auto-approve `fgos decision` line without `--kind engine`**
+  (tsk-5dn) — an omitted `kind` defaults to `'design'`, which the
+  retrospective/cleanup gate reads as a human reflecting on the work
 - **asking a person before exhausting tier A** — running the command,
   reading the file, or calling `fgos-researching` was the answer, and a
   question was asked instead

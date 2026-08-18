@@ -1943,6 +1943,20 @@ async function runVerb(verb, flags, positional, dir) {
       // and omitting it entirely is unaffected (same posture as
       // --alternatives/--source above).
       const scope = optionalField(flags.scope, 'decision --scope requires a non-empty value (omit --scope entirely for an item-scoped or unscoped decision)');
+      // tsk-5dn: this CLI verb never exposed `kind` before, so every write
+      // through it defaulted to addDecision's own `'design'` default --
+      // including a session's own audit line for an auto-approved gate
+      // (fgos-coding-validating's Step 2), which the retrospective gate
+      // (checkRetrospectiveContent, src/state/cleanup-harness.mjs) then read
+      // as a human reflecting on the work. Same posture as --source/--scope
+      // above (optional free text, no enum -- store.mjs's own doc comment
+      // on addDecision already established this for the field itself; only
+      // the CLI-surface plumbing was missing). Internal engine bookkeeping
+      // (`resolveDiscovery`/`resolvePlan`, `move`'s two override branches,
+      // the Iron Law warn-skip record, `sync-root`/`promote-to-component`)
+      // still calls `addDecision` directly with a hardcoded `kind: 'engine'`
+      // and is unaffected by this flag.
+      const kind = optionalField(flags.kind, 'decision --kind requires a non-empty value (omit --kind entirely to default to "design")');
       // tsk-1lv-1 D2/D8: every CLI-surface decision write declares its
       // relation to prior decisions explicitly -- no default, no
       // inference (STR72's own root cause: a supersession narrated only
@@ -1958,7 +1972,7 @@ async function runVerb(verb, flags, positional, dir) {
           'decision text reads like a supersession ("supersedes/replaces/overrides/no longer applies/instead of the previous") but --relation supersedes:<id> was not declared -- declare the relation explicitly (or rephrase the text if it is not actually a supersession).',
         );
       }
-      const { event } = addDecision(dir, { text, rationale, alternatives, source, id, scope, relation: relation.kind === 'none' ? 'none' : `${relation.kind}:${relation.id}` });
+      const { event } = addDecision(dir, { text, rationale, alternatives, source, id, scope, kind, relation: relation.kind === 'none' ? 'none' : `${relation.kind}:${relation.id}` });
       const result = { seq: event.seq, relation: relation.kind === 'none' ? 'none' : `${relation.kind}:${relation.id}` };
       // Write-time citation sweep (D2 "sweep tươi tại write-time, không
       // cache"): only `supersedes` has a real dangling-citation shape (a
