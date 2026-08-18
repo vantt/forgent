@@ -11,7 +11,14 @@ import path from 'node:path';
 
 import { DOCTOR_CHECKS, CONFIG_DEFAULT_REGISTRATIONS, FIX_REGISTRATIONS, registerCheck, registerConfigDefault, registerFix, runFixes, ensureSharedConfigDefaults } from '../../src/setup/checks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
-import { DEFAULT_CAPABILITY_SLOTS } from '../../src/setup/registrations.mjs';
+import { DEFAULT_CAPABILITY_SLOTS, PI_EXECUTOR_DEFAULT } from '../../src/setup/registrations.mjs';
+
+const EXPECTED_RUNNER_DEFAULT = {
+  ...DEFAULT_RUNNER_CONFIG,
+  capabilities: DEFAULT_CAPABILITY_SLOTS,
+  modelPolicies: { ...DEFAULT_RUNNER_CONFIG.modelPolicies, 'openai-codex': { lightweight: 'gpt-5.5' } },
+  executors: { pi: PI_EXECUTOR_DEFAULT },
+};
 
 // tsk-4xg: runFixes() below invokes every registered fix, including the
 // real `claude-plugin-marketplace` one, which shells out to a real,
@@ -170,10 +177,10 @@ test('ensureSharedConfigDefaults on a fresh dir writes every registered entry un
   // registrations.mjs's own `DEFAULT_CAPABILITY_SLOTS` composition), so
   // the assembled "runner" section is no longer byte-identical to
   // DEFAULT_RUNNER_CONFIG alone.
-  assert.deepEqual(config.runner, { ...DEFAULT_RUNNER_CONFIG, capabilities: DEFAULT_CAPABILITY_SLOTS });
+  assert.deepEqual(config.runner, EXPECTED_RUNNER_DEFAULT);
   assert.ok(addedKeys.some((k) => k.startsWith('runner.')) || addedKeys.includes('runner'));
   const written = JSON.parse(fs.readFileSync(path.join(dir, '.fgos', 'config.json'), 'utf8'));
-  assert.deepEqual(written.runner, { ...DEFAULT_RUNNER_CONFIG, capabilities: DEFAULT_CAPABILITY_SLOTS });
+  assert.deepEqual(written.runner, EXPECTED_RUNNER_DEFAULT);
 });
 
 test('ensureSharedConfigDefaults on an already-complete shared file does not rewrite it', () => {

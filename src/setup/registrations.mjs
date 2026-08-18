@@ -1075,14 +1075,67 @@ export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
   },
 });
 
-// The runner's own config-default, registered under its key in the shared
-// file (tsk-2cs D6) — `checkConfigNotStale`/`ensureSharedConfigDefaults`
-// above are both driven by this registration generically (tsk-5vf D4), not
-// a hardcoded reference to `DEFAULT_RUNNER_CONFIG`'s shape.
+// tsk-47r: `pi` as a second `agent`-kind executor, layered onto this SAME
+// `runner` config-default for the same reason `capabilities` above is (a
+// second `key: 'runner'` registration would silently overwrite this one,
+// never merge with it). `executors.pi` mirrors `executors.agy`'s live
+// shape exactly (`.fgos/config.json`, hand-authored, not itself sourced
+// from this registration) — `mergeConfigDefaults`'s fill-missing-only
+// recursion (`config-merge.mjs`) adds `runner.executors.pi` and
+// `runner.modelPolicies["openai-codex"]` on the next `fgos setup` run
+// without touching the live `executors.agy`/`modelPolicies.claude`/
+// `modelPolicies.gemini` entries. `--provider openai-codex --model
+// gpt-5.5` and the `read,write,edit,bash,grep,find,ls` allowlist are the
+// EXACT invocation a live D4 proof-test dispatch ran and confirmed GREEN
+// (worker contract followed: layered skill-pointer chain read natively,
+// footprint honored, correct `[BLOCKED]`/`[DONE]` two-token reporting) —
+// see docs/history/pi-executor-runtime-capacity/RESEARCH.md Round 4.
+// Exported (mirrors `DEFAULT_CAPABILITY_SLOTS` below it) so the ripple
+// tests assert this exact shape instead of duplicating the literal.
+export const PI_EXECUTOR_DEFAULT = Object.freeze({
+  kind: 'agent',
+  description: 'pi coding agent (openai-codex/gpt-5.5) -- reference runtime for the coding-worker-contract, D4 proof-test GREEN (tsk-47r)',
+  allowCrossProvider: true,
+  invocations: [
+    {
+      via: 'cli',
+      adapter: 'cli-spawn',
+      command: 'pi',
+      args: [
+        '--provider',
+        'openai-codex',
+        '--tools',
+        'read,write,edit,bash,grep,find,ls',
+        '--mode',
+        'json',
+        '--approve',
+        '-p',
+        '{prompt}',
+        '--model',
+        '{model}',
+      ],
+    },
+  ],
+  providerModel: 'openai-codex',
+  rigorOverrides: {
+    light: 'lightweight',
+    standard: 'lightweight',
+    heavy: 'lightweight',
+  },
+});
+
 registerConfigDefault({
   id: 'runner',
   key: 'runner',
-  shape: { ...DEFAULT_RUNNER_CONFIG, capabilities: DEFAULT_CAPABILITY_SLOTS },
+  shape: {
+    ...DEFAULT_RUNNER_CONFIG,
+    capabilities: DEFAULT_CAPABILITY_SLOTS,
+    modelPolicies: {
+      ...DEFAULT_RUNNER_CONFIG.modelPolicies,
+      'openai-codex': { lightweight: 'gpt-5.5' },
+    },
+    executors: { pi: PI_EXECUTOR_DEFAULT },
+  },
 });
 
 // `checkConfigNotStale` above already catches `runner.capabilities` (or
