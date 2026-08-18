@@ -84,6 +84,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   startup ("Reading additional input from stdin...") and blocks
   indefinitely on a pipe nothing ever writes to or closes — found live
   wiring `codex` as an executor (`docs/history/codex-bypass-executor/`).
+- The same stdin-pipe hang also affected `runCommand`
+  (`src/runner/goal-check.mjs`), the shared verify runner behind `fgos
+  return`/`approve`/merge/dispatch's own re-verify — a `codex`-based
+  `verify` command timed out there too until the same `stdin: 'ignore'`
+  fix was applied.
 - `fgos decision` now requires `--text` explicitly. Before this, a call
   with no `--text` silently fell back to joining whatever positional
   arguments were left over (e.g. `fgos decision write "..."` stored
