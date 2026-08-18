@@ -204,7 +204,25 @@ Changelog/marketing-storytelling (Làn A/B, "bản nháp") đóng băng theo yê
 cầu chủ sản phẩm — bàn tiếp sau khi row D (trục danh tính cho Diataxis)
 rõ ràng.
 
-**Mint D-tsk28x-3 (vòng 9, cùng round).** Chủ sản phẩm tự tổng quát hoá
+**Điểm đứng cuối vòng 9 — đọc dòng này trước nếu quay lại sau nhiều ngày.**
+Row D không còn là câu hỏi mở chung chung; nó đã vỡ thành sáu câu con và
+**cả sáu đều có câu trả lời**, chỉ chờ vòng 10 xác nhận để mint (§3 dòng
+D2-D7):
+
+| Câu | Trả lời vòng 9 |
+|---|---|
+| Vocabulary lấy từ đâu | Bottom-up, suy từ 268 tài liệu thật (chủ sản phẩm chọn) |
+| 268 file cũ xử lý sao | Fold ngược toàn bộ — nhưng **chỉ thi công sau khi registry chốt** (chủ sản phẩm chọn) |
+| Phẳng hay phân cấp | **Phẳng** + field nhóm, theo đúng khuôn `work.id` + `parent` |
+| Có biến hình không | **Có, bắt buộc** — đóng cấu trúc/schema/luật-chọn-lúc-ghi, mở danh sách topic |
+| Cái gì kích hoạt tách | Doctor check đo kích thước, không phải người nhớ (thoả R6) |
+| Lưu ở đâu | Event `.fgos/` + verb `fgos topic *` (chủ sản phẩm chọn), **bắt buộc kèm ảnh cuối cùng** |
+
+Cái giá đã lộ và phải mang sang planning: tách topic làm gãy linkage
+`docPath` — `findAllSourceCaptureIds` + `fgos doc-sources` sẽ phải biết
+đến registry thay vì so khớp chuỗi thuần (§3 dòng D5).
+
+**Mint D-tsk28x-3 (vòng 9).** Chủ sản phẩm tự tổng quát hoá
 row B (§3): trục "cách viết" không chỉ nhiều *profile* trong một lưới, mà
 là registry mở của nhiều *framework* khác bản chất — Diataxis là một
 framework cụ thể (đóng, 4 quadrant), không phải bản thân trục. Đứng vững
@@ -241,6 +259,12 @@ Diataxis hiện có (không đụng, không pha trộn — hard rule của
 | B | Đóng hay mở | **ĐÃ CHỐT — D-tsk28x-3 (vòng 9)** | `struggle` KHÔNG nằm trong 4 quadrant Diataxis (Diataxis dựng từ 2 chiều hành-động/nhận-thức × tiếp-thu/vận-dụng, ra đúng 4 ô, không ô nào là struggle). Trục trạng-thái-nhận-thức ("cách viết") là **registry MỞ của nhiều FRAMEWORK**, không chỉ nhiều profile trong một lưới — Diataxis là một framework cụ thể (đóng, 4 ô); marketing-storytelling có thể cần một framework khác hẳn bản chất (cung truyện/narrative arc, không xuất phát từ lưới action×cognition của Diataxis). Mỗi framework tự đóng vocabulary riêng; trục thì mở cho framework mới gia nhập. Chủ sản phẩm tổng quát hoá đúng câu này ở vòng 9, sau khi vòng 2/3/8 đã ba lần khẳng định không ai bác |
 | C | **GHI hay ĐỀ XUẤT** | **TRẢ LỜI V3** (chưa D-ID) — câu hỏi vòng 2 đặt SAI | Không chọn một cho cả hệ thống — tách theo GIAI ĐOẠN. **Thu chất liệu: ghi thẳng, liên tục, không bao giờ dừng để hỏi** (ràng buộc chủ sản phẩm đặt: nhanh, rẻ, ít token, không cắt ngang luồng làm việc khác — loại thẳng mọi phương án gọi LLM phân loại ngay lúc capture). **Tổng hợp: nhiều pha, có triage nổi ứng viên, có người duyệt.** Lý do OKF sợ tự-ghi chỉ áp cho TÀI LIỆU (giả vờ là kết luận đã biên tập), không áp cho CHẤT LIỆU THÔ (chỉ ghi "đã xảy ra chuyện này"). Cửa gác đặt đúng chỗ chất liệu biến thành khẳng định |
 | D | Ai giữ "một chủ đề một chủ sở hữu" khi số tài liệu tăng | **ĐANG BÀN — vòng 9; hai câu hỏi con ĐÃ CÓ CÂU TRẢ LỜI CÓ BẰNG CHỨNG (chưa mint), hai câu mới mở** | `fgos-coding-compounding` grow-vs-create CHỈ bằng `fs.existsSync` — đúng luật văn bản (`docs/specs/enduser-docs-authoring.md` R4), không phải bug. Đo vòng 9 (sau khi đồng bộ `main`): `explanation` 161 / `how-to` 85 / `reference` 21 / `tutorial` 1 = **268 file**, tăng **+50 trong 7 ngày** (tree-diff `7df2b894..HEAD`) ≈ 7,1/ngày; cụm worktree/discover/decompose ~20 file rời — bằng chứng va chạm thật (R5 area spec đó tự mở khoá: "chỉ cân nhắc trục thứ hai khi tài liệu thật va chạm"). **Tiền lệ: `tsk-1lv-4` CHÍNH LÀ cuộc di cư này, đã chạy xong — 30+ file ADR → fold vào 5 đích + index sinh tự động + doctor check.** Trả lời (1): tái dùng CƠ CHẾ, không tái dùng VOCABULARY — fold ở độ mịn area đã đẻ `runner.md` 2476 dòng / `work-state.md` 2290 dòng (repo đặt `docs.maxLoc: 800`), và 223 file đo được đều dồn vào 2 area đó ⇒ 10.000+ dòng một file; D-ADR0008 (đã khoá) đòi chia theo audience của TỪNG interface. Trả lời (2): fold-mechanism làm nền CÓ; anti-fork gate KHÔNG — nó chống fork tên-gần-giống, còn fgOS fork NGỮ NGHĨA (3 file cùng chủ đề reclaim-worktree, skeleton-match bắt 0/3); thứ chặn được là vocabulary ĐÓNG tại lúc GHI. Còn mở: (a) vocabulary suy bottom-up hay liệt kê top-down; (b) 223 file cũ fold ngược toàn bộ / chỉ áp cho mới / fold dần |
+| D2 | **Hình dạng topic-registry: phẳng hay phân cấp** | **TRẢ LỜI V9** (chưa D-ID) — PHẲNG + field nhóm | Bốn tiền lệ trong repo đều phẳng: ngăn Diataxis (đo: **0 thư mục con** trong cả `how-to`/`explanation`/`reference`), Area Map (danh sách 10), decision scope (5 giá trị), và quan trọng nhất `work` item — thực thể lõi — dùng **id phẳng `tsk-<hash>` + field `parent`/`supersededBy`**, không id lồng không thư mục lồng (`src/state/work.mjs`). Hai lý do thật: (a) phân cấp biến mỗi lần ghi thành 2 quyết định, và chọn sai tầng 1 làm tài liệu BIẾN MẤT khỏi nhánh người tìm, tệ hơn hẳn chọn sai một ô trong danh sách phẳng; (b) thư mục ép chọn MỘT cách nhóm vĩnh viễn, nhưng đã biết có ÍT NHẤT HAI cách nhóm hợp lệ cùng lúc (theo area hệ thống cho người bảo trì / theo việc người dùng đang làm — D-ADR0008), field chở được cả hai. `QUADRANT_DIR_ALIASES` (`explanation`→`['decisions']`) đã tách "ngăn logic" khỏi "vị trí đĩa" từ trước |
+| D3 | **Registry có biến hình không** | **TRẢ LỜI V9** (chưa D-ID) — CÓ, và bắt buộc; nhưng chỉ một nửa được phép | Câu trả lời nằm sẵn ở §5 vòng 2 (scout OKF): **"vocabulary cấu trúc ĐÓNG + dữ liệu chủ đề MỞ"**. Áp xuống một tầng: ĐÓNG = có những trục nào (D-tsk28x-1), schema một mục topic, luật "lúc ghi phải chọn từ registry" (chỗ chặn máu). MỞ = chính danh sách topic — đẻ/tách/gộp/đổi tên/nghỉ hưu là vận hành đúng, không phải rủi ro. Chống biến hình TUỲ TIỆN bằng luật repo đã có: *supersede, không sửa tại chỗ* (AGENTS.md, `fgos decision --relation supersedes:`, `work.supersededBy`) — không phát minh ngữ nghĩa mới. Năm thao tác: `register`/`split`/`merge`/`rename`/`retire` |
+| D4 | **Cái gì KÍCH HOẠT biến hình** | **TRẢ LỜI V9** (chưa D-ID) — tín hiệu máy-đo-được, không phải người nhớ | Tách topic là đúng loại việc không ai nhớ làm, nhưng tín hiệu tách thì đo được: tài liệu của topic vượt ngưỡng độ dài. Doctor check kiểu `topic-doc-oversize` biến bảo trì registry từ "hy vọng có người để ý" thành "máy chỉ mặt" — dùng lại khuôn `enduser-docs-index-stale` (xanh 269/269) + `decision-index-stale`. Đây là cách R6 được thoả: không thêm bước cần-người-nhớ. Hệ quả đẹp: **số topic tự hiệu chỉnh theo kích thước corpus**, nên pass bottom-up (Câu A) KHÔNG cần ra danh sách hoàn hảo — chỉ cần điểm khởi đầu hợp lý. Lưu ý trung thực: 800 dòng là config công cụ của phiên, không phải luật repo đã khoá — con số chỉnh được, thứ bất biến là tín hiệu phải máy-đo-được |
+| D5 | **Cái giá của biến hình: linkage gãy** | **RÕ — nêu vòng 9, phải mang sang planning** | Topic tách ⇒ tài liệu tách ⇒ mọi capture cũ trỏ vào file đó thành trỏ sai. `findAllSourceCaptureIds` khớp `docPath` CHÍNH XÁC TỪNG KÝ TỰ (`src/report/enduser-index.mjs`). Lời giải không phải đi sửa `docPath` cũ mà là luật đã khoá **D-ADR0001** (nhật ký là sự thật, store là bản chiếu): `outcome.docPath` = **sự thật lịch sử** "lúc đó viết ở đây", đúng vĩnh viễn, không sửa; "topic X hiện sống ở file nào" = **bản chiếu hiện tại** do registry trả lời qua lineage `split`/`merge`. Hệ quả thi công phải mang theo: `findAllSourceCaptureIds` + verb `fgos doc-sources` phải biết đến registry, không còn so khớp chuỗi thuần |
+| D6 | **Registry sống ở đâu** | **CHỦ SẢN PHẨM CHỌN V9** (chưa D-ID) — event trong `.fgos/` + verb riêng, KÈM ảnh cuối cùng bắt buộc | Ba đường: (1) JSON soạn tay — đơn giản, nhưng không có lịch sử biến hình và dễ trôi như Area Map đã trôi (`herdr-web-dashboard` là area thật mang 20 quyết định mà thiếu trong danh sách); (2) event + verb `fgos topic register/split/merge/retire` — một cửa ghi, lịch sử biến hình miễn phí, đúng D-ADR0001, nặng hơn; (3) suy từ đĩa — LOẠI NGAY vì registry phải tồn tại TRƯỚC lúc ghi để cưỡng chế lựa chọn, suy-từ-đĩa là quay lại `fs.existsSync` đang hỏng. Chủ sản phẩm chọn **(2)**, kèm điều kiện: *"nhưng luôn có ảnh cuối cùng không, vì nếu ép vào store sẽ khó cảm nhận được hình dạng cuối cùng của docs"* — xem D7 |
+| D7 | **Ảnh cuối cùng (projection) của registry** | **TRẢ LỜI V9** (chưa D-ID) — HAI ảnh, theo audience | Không phải chiều lòng mà là ĐIỀU KIỆN để (2) đáng chọn: thiếu ảnh thì (2) mua lịch sử nhưng mất khả năng nhìn. Repo đã chạy khuôn này 2 lần: `docs/decisions/index.md` (sinh bởi `fgos decision-index` từ `state.decisions`, frontmatter `generated: true` + cảnh báo never-hand-edit) và `docs/enduser-docs-index.json`. Theo D-ADR0008 nên có ĐÚNG HAI ảnh: **JSON cho máy** (skill tra lúc ghi, doctor kiểm) + **Markdown cho người** (mở ra cảm nhận hình dạng). Ảnh Markdown phải cho thấy thứ `ls` KHÔNG thấy được: lineage biến hình ("`worktree-reclaim` tách từ `worktree-lifecycle`, ngày, vì vượt ngưỡng"), topic đã đăng ký mà CHƯA có tài liệu, topic đang quá ngưỡng chờ tách, topic đã nghỉ hưu + ai thay. Bắt buộc kèm `topic-index-stale` doctor check, nếu không nó trôi đúng như Area Map |
 | E | Ranh giới scope `tsk-28x` vs `tsk-12m` | **ĐÃ CHỐT — D-tsk28x-2 (vòng 7)** | Vòng 1 hỏi "thứ tự nào trước". Vòng 3 đổi câu hỏi: đường ống 5 pha (§6) rõ ràng lớn hơn cả hai item cộng lại. **Bổ sung 2026-08-09:** `tsk-12m` vòng 4 tìm ra ranh giới **quan sát/nhắc vs quyết/viết/chặn** (`docs/history/automated-changelog-compound-learn/DISCUSSION.md` §6.1) — loại quan sát/nhắc độc lập hoàn toàn với câu hỏi §6.4 ở đây và **sống sót qua mọi phương án**, nên làm được ngay, không cần chờ `tsk-28x`. **Vòng 7 (2026-08-11):** chủ sản phẩm xác nhận tách quan hệ — `tsk-28x` không còn `deps` trên `tsk-12m`; `tsk-12m` tự xây phần quan-sát/nhắc độc lập, phần ghi/registry của nó cắm vào bất cứ hình dạng `tsk-28x` chốt sau, không phải chờ ngược lại |
 | F | Hình dạng pha TRIAGE (pha 1, §6) | ĐỠ MỜ sau vòng 5 — xem J2 | Pha triage phải chấm điểm ứng viên. Bài học B6b (§5 vòng 2): tín hiệu xếp hạng phải chọn BẰNG ĐO, không bằng trực giác — trùng tag đo ra AUC 0.550 (≈ tung đồng xu), `areas` 0.500 (đúng bằng tung đồng xu). **Vòng 5 có ứng viên đầu có căn cứ: round-count trên mỗi item (J2).** Còn mở: đo nó bằng bộ nhãn nào — fgOS vẫn chưa có tập nhãn tay như bee đã có, nên chưa chạy được phép đo AUC tương đương |
 | G | ~~Chất liệu `struggle` đã có sẵn trong `friction`~~ | **RÚT LẠI — SAI** (đo lại vòng 4) | Vòng 3 kết luận "RÕ" từ ĐÚNG MỘT bản ghi (`tsk-1gn`) rồi suy rộng ra cả hệ thống. Đo toàn log: 131 friction = 81 `verify-miss` + 39 `merge-conflict` (92% telemetry máy), `detail` điển hình `goal-check failed on branch "fgw/tsk-puz" (exit null)` — ghi RẰNG hỏng, không ghi ĐÃ THỬ GÌ / VÌ SAO / CHỖ NGOẶT. Không phải chất liệu kể chuyện. Thứ làm vòng 3 phấn khích thực ra là `gates.askHistory`, KHÁC `friction` — vòng 3 lẫn hai thứ |
@@ -671,17 +695,56 @@ Diataxis hiện có (không đụng, không pha trộn — hard rule của
   ra thứ chưa ai đo trong 9 vòng — **tốc độ sinh +50 tài liệu/7 ngày**.
   Tức nếu không đồng bộ, vòng 9 đã chốt trên một corpus nhỏ hơn thực tế
   17% và bỏ mất chính con số định lượng được vấn đề gốc.
+
+  **(e) Chủ sản phẩm trả lời hai câu mở, rồi mở phần bàn sâu về chính
+  registry.** Câu A: **chọn (2) bottom-up** — suy vocabulary từ 268 tài
+  liệu thật thay vì liệt kê tay. Câu B: **chọn (a) fold ngược toàn bộ**,
+  kèm ràng buộc thời điểm: *"nhưng không làm cho tới khi mọi việc về
+  topic-registry được chốt"* — tức thi công dọn nợ bị chặn sau thiết kế,
+  không chạy song song. Rồi hỏi thẳng vào hình dạng registry: *"nó có biến
+  hình không, flat hay hierarchy"*.
+
+  Session scout trước khi trả lời, tìm được hai tiền lệ quyết định: đo
+  `find -mindepth 1 -type d` trên cả ba ngăn Diataxis ra **0 thư mục con**
+  (phẳng tuyệt đối hôm nay), và `src/state/work.mjs` cho thấy `work` —
+  thực thể lõi của repo — đã giải đúng bài phẳng-hay-phân-cấp này bằng
+  **id phẳng + field `parent`/`supersededBy`**. Bốn câu trả lời ghi ở §3
+  dòng D2/D3/D4/D5.
+
+  **(f) Chủ sản phẩm chọn phương án lưu (2) — event + verb — nhưng đặt
+  đúng một điều kiện, và điều kiện đó cứu chính phương án.** Nguyên văn:
+  *"chọn 2, nhưng luôn có ảnh cuối cùng không, vì nếu ép vào store sẽ khó
+  cảm nhận được hình dạng cuối cùng của docs"*. Đây không phải yêu cầu
+  tiện nghi: thiếu ảnh thì (2) đổi một vấn đề (trôi) lấy một vấn đề khác
+  (không nhìn được). Session xác nhận repo đã chạy khuôn ảnh-cuối-cùng hai
+  lần (`docs/decisions/index.md` sinh từ `state.decisions`;
+  `docs/enduser-docs-index.json`), và đề xuất HAI ảnh theo D-ADR0008 —
+  JSON cho máy, Markdown cho người — với danh sách cụ thể những thứ ảnh
+  phải cho thấy mà `ls` không thấy được. Xem §3 dòng D6/D7.
+
+  **Chưa mint D-ID nào cho D2-D7** — tất cả mới qua một vòng, luật D4 đòi
+  đứng vững qua hơn một vòng. Chờ vòng 10 xác nhận.
   Bốn phép đo + hai câu trả lời có bằng chứng: xem §1 vòng 9. Hai câu mới
   (vocabulary bottom-up/top-down; xử lý 223 file cũ) chờ chủ sản phẩm.
 
 ## 6. Thiết kế đã chốt {#design}
 
-**Tái sinh vòng 8.** Đã chốt thật: D-tsk28x-1 (hai trục), D-tsk28x-2
-(tách dep `tsk-12m`). §6.1-6.3 giữ nguyên từ vòng 3 — chưa vòng nào bác,
-vẫn đứng vững. **§6.4 viết lại lần hai ở vòng 8**: Làn B của vòng 6 bị
-rút, phương án 3 (per-item + ngưỡng) lên thay. **§6.6 là phần mới của
-vòng 8** — định nghĩa "bản nháp", chỗ trống suốt bốn vòng. Viết cho người
-đọc không có lịch sử hội thoại.
+**Tái sinh vòng 9.** Đã chốt thật: D-tsk28x-1 (hai trục), D-tsk28x-2
+(tách dep `tsk-12m`), **D-tsk28x-3 (trục cách viết = registry mở của
+nhiều framework)** — §6.3 viết lại theo D-tsk28x-3. §6.1-6.2 giữ nguyên
+từ vòng 3, chưa vòng nào bác. **§6.4 viết lại lần hai ở vòng 8**: Làn B
+của vòng 6 bị rút, phương án 3 (per-item + ngưỡng) lên thay. **§6.6 từ
+vòng 8** — định nghĩa "bản nháp". Viết cho người đọc không có lịch sử
+hội thoại.
+
+> **§6.7 (trục danh tính / topic-registry) CHƯA viết ở đây — cố ý.** Vòng
+> 9 đã trả lời sáu câu về hình dạng của nó (§3 dòng D2-D7: phẳng + field;
+> có biến hình, đóng-cấu-trúc/mở-danh-sách; tách kích hoạt bằng doctor
+> check đo được; `docPath` là sự thật lịch sử còn registry là bản chiếu;
+> lưu bằng event+verb; hai ảnh cuối cùng theo audience). Tất cả mới qua
+> MỘT vòng — luật D4 chưa cho mint, và §6 không được chắp vá từng mảnh
+> chưa chốt. Vòng 10 xác nhận xong thì §6 tái sinh trọn, có §6.7 đầy đủ
+> kèm sơ đồ.
 
 ### 6.1 Vấn đề gốc: một trục gánh ba việc
 
@@ -721,10 +784,26 @@ liệu marketing neo vào những trạng thái như `struggle` — một trạn
 thật, và là trạng thái không tồn tại trong Diataxis (Diataxis dựng từ hai
 chiều hành-động/nhận-thức × tiếp-thu/vận-dụng, ra đúng bốn ô).
 
-Quy tắc rút ra: **trục MỞ (thêm profile mới được), mỗi profile ĐÓNG
-(Diataxis mãi mãi đúng bốn, không bao giờ năm)**. Đây đúng là kiến trúc
-OKF v0.1 (cố ý lỏng, chỉ bắt buộc `type`) cộng Bee OKF Profile (lớp đóng
-dựng trên nó cho một miền) — không phải phát minh mới.
+Quy tắc rút ra, **bản chốt vòng 9 (D-tsk28x-3)**: trục "cách viết" là
+**registry MỞ của nhiều FRAMEWORK viết**, mỗi framework ĐÓNG vocabulary
+của chính nó (Diataxis mãi mãi đúng bốn, không bao giờ năm). Diataxis là
+MỘT framework cụ thể cắm vào trục, **không phải bản thân trục** — nên
+marketing-storytelling không cần (và không được) nhét vào ô thứ năm của
+Diataxis; nó có thể cần một framework khác hẳn bản chất, ví dụ cung truyện
+(narrative arc), thứ không xuất phát từ lưới hành-động×nhận-thức của
+Diataxis chút nào. Vòng 2/3 diễn đạt điều này hẹp hơn ("Diataxis là một
+*profile*"); vòng 9 chủ sản phẩm tổng quát hoá đúng thành *framework*.
+Đây đúng là kiến trúc OKF v0.1 (cố ý lỏng, chỉ bắt buộc `type`) cộng Bee
+OKF Profile (lớp đóng dựng trên nó cho một miền) — không phải phát minh
+mới.
+
+**Hệ quả bắt buộc, suy từ D-tsk28x-3 + xác nhận vòng 9:** Diataxis chỉ
+quyết **cách viết** (cấu trúc/trình tự/giọng văn bên trong một tài liệu đã
+chọn), KHÔNG quyết **viết cái gì** hay **bao nhiêu tài liệu**. Không có
+đường nào "mở rộng Diataxis" để giải bài toán số-lượng-tài-liệu — thử theo
+hướng đó là category error, đúng thứ hard rule của `fgos-coding-compounding`
+cấm. Cơ chế trục danh tính (§6.7, đang thiết kế) phải cắm SONG SONG với
+Diataxis, không nằm bên trong nó.
 
 Kèm theo, mượn nguyên luật chống-phình của OKF: **không bao giờ thêm một
 loại mới để mã hoá một phân biệt vốn nhét vừa vào field của loại đã có.**
