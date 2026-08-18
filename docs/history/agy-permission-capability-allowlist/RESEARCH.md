@@ -143,3 +143,62 @@ item's eventual fix — is real and does not hang):**
 ```bash
 cd /home/vantt/projects/forgentX && agy -p "/permissions" --print-timeout 15s --output-format json | grep -q '"scope":"project"'
 ```
+
+## Round 2 — 2026-08-18 (validating stage, this pass)
+
+**Asked:** does the changelog-cited "headless soft-deny, never hang" claim
+hold under a real live call using the plan's actual proposed args shape
+(`--mode accept-edits`, no `--dangerously-skip-permissions`), against a
+prompt that needs real tool calls (a file write plus a shell command) —
+not just the free `/permissions` read the Round 1 verify already covers?
+
+**Checked — live call, run from the `tsk-1xm` worktree:**
+```bash
+agy -p "Create a file named tsk-1xm-validating-probe.txt in the current \
+directory with the text 'proof' inside it, then run the shell command \
+ls tsk-1xm-validating-probe.txt to confirm it exists." \
+--mode accept-edits --print-timeout 30s --output-format json
+```
+Result: exit code 2, completed in 5.93s (`duration_seconds: 5.930422661`,
+`num_turns: 1`, real quota spent: 31909 input / 759 output tokens). stderr:
+`jetski: no output produced — a tool required the "command" permission
+that headless mode cannot prompt for, so it was auto-denied. Add an
+allow-rule under permissions.allow in settings.json (e.g.
+command(<target>)). Alternatively, re-run with
+--dangerously-skip-permissions to auto-approve all tools.` No file was
+created (`ls tsk-1xm-validating-probe.txt` afterward: not found) — the
+whole turn failed clean, no partial/silent success.
+
+**Finding 1 — CONFIRMED, not just changelog prose:** the plan's central
+"does not hang, soft-denies with a named stderr reason" claim is real,
+live-verified. This rules out the worst failure mode (a hung dispatch)
+outright.
+
+**Finding 2 — new, sharper than Round 1 anticipated:** `--mode
+accept-edits` alone does **not** cover shell/command-type tool calls —
+the agent's attempt to run `ls` (a `command`-permission tool) was
+auto-denied even under `accept-edits`. Every fgOS `agy` dispatch runs at
+least one shell command as part of its own worker contract (`git add`,
+`git commit`, the verify command) — meaning a bare `.fgos/config.json`
+args swap (drop the flag, add `--mode accept-edits`) with **no**
+`permission.allow` entry configured would make **every** subsequent `agy`
+dispatch fail outright (exit 2), not just soft-deny the parts outside an
+intended allowlist. `permission.allow` is not an optional hardening layer
+on top of `--mode accept-edits` here — it is a hard prerequisite for the
+executor to do anything at all.
+
+**Not checked this round, and structurally not checkable without touching
+the one shared config file:** which exact `permission.allow` pattern (and
+which scope — plan.md reasons `global` over `project`, not yet empirically
+confirmed) actually grants the worker contract's needed capabilities
+without over-permitting. `~/.gemini/antigravity-cli/settings.json` is the
+**only** on-disk agy settings file on this machine (confirmed: no
+per-project/workspace-scoped settings file exists anywhere in this repo or
+under `~/.gemini`), shared machine-wide across every `agy` session
+(`forgent`, `herdr-gateway`, `forgentX` are all `trustedWorkspaces` reading
+this one file), and `agy`'s own CLI surface has no `--config`/env-var
+override to isolate a test (checked `agy --help` and `agy changelog` for
+both, neither documents one). Writing a real `permission.allow` rule to
+prove the pattern syntax works IS the item's own actual intended change,
+not a throwaway test — parked at `awaiting-human` this pass rather than
+edited silently.
