@@ -51,7 +51,8 @@ bắt, và thứ sẽ gây xung đột thật nếu chạy song song:
 | P4 (`footprint` bắt buộc) | **P1** | Cả hai sửa `src/runner/dispatch.mjs` + `test/runner/dispatch.test.mjs`. Chỗ đòi `footprint` chính là cửa `execute --work` — tách ra là chia đôi một hàm |
 | P3 (token + cold-pickup) | **P2** | Cả hai sửa `fgos-coding-implement/SKILL.md` và chính file hợp đồng. Token và cold-pickup **là nội dung của hợp đồng**, không phải việc rời |
 
-P5 không gộp và cũng **không tạo child** — xem `## Outstanding questions`.
+P5 giữ nguyên thành child thứ ba, độc lập hoàn toàn — không đụng file nào
+của P1/P2. Ghi chú tier A cho nó nằm ở cuối file.
 
 ## Files likely touched
 
@@ -62,10 +63,13 @@ P5 không gộp và cũng **không tạo child** — xem `## Outstanding questio
   `src/state/workflow-stage-graphs.mjs` (seam),
   `src/runner/dispatch.mjs` (`buildPrompt`'s `skillPath` → contract),
   `test/skills/fgos-mirror.test.mjs`
+- **P3 (nguyên P5):** `src/setup/registrations.mjs`,
+  `test/setup/checks.test.mjs`
 
-Hai nhóm này giao nhau đúng một file: `src/runner/dispatch.mjs`. P1 sửa
-nhánh CLI/`executeExecutorCli`, P2 sửa `buildPrompt`'s `skillPath` — khác
-hàm, nhưng **cùng file**, nên P2 phải chạy sau P1, không song song.
+P1 và P2 giao nhau đúng một file: `src/runner/dispatch.mjs`. P1 sửa nhánh
+CLI/`executeExecutorCli`, P2 sửa `buildPrompt`'s `skillPath` — khác hàm,
+nhưng **cùng file**, nên P2 phải chạy sau P1, không song song. P3 không
+giao với cả hai, chạy song song được.
 
 ## Risk map
 
@@ -75,10 +79,14 @@ hàm, nhưng **cùng file**, nên P2 phải chạy sau P1, không song song.
 | Tách driver/worker trên skill đang dùng hằng ngày | **heavy** | `npm test` toàn bộ + `fgos-mirror.test.mjs`; và một lần chạy dispatch THẬT end-to-end sau khi tách, không chỉ test |
 | Seam per-domain trong registry đóng băng | standard | `fgos-mirror.test.mjs` + test registry hiện có; seam vắng mặt phải là no-op cho 3 domain fixture |
 | `buildPrompt`'s `skillPath` đổi đích | standard | Đây là chỗ V3 (mâu thuẫn) được sửa — verify của P2 mang vế negative đúng chỗ này |
+| Capability slot vào config qua `fgos setup` | standard | `test/setup/checks.test.mjs` + `checks-setup-config.test.mjs` |
 
 Mục **heavy** cần proof point thật ở `fgos-coding-validating`: một lần
 dispatch thật sau khi tách, chứng minh worker nạp đúng hợp đồng và trả
-token, chứ không chỉ test xanh.
+token, chứ không chỉ test xanh. Đây đúng ranh giới
+`docs/how-to/write-verify-for-a-skill-prose-change.md` đã ghim: `verify`
+không bao giờ chứng minh được prose chạy đúng lúc runtime — smoke test
+thật và event log mới sở hữu phần đó.
 
 ## Child specs
 
@@ -100,6 +108,14 @@ token, chứ không chỉ test xanh.
     "kind": "feature",
     "risk": "heavy",
     "deps": []
+  },
+  {
+    "title": "Register the advise and execute capability slots as a fgos setup configDefault plus a doctor check, so the empty capabilities map gets filled through the sanctioned door instead of a hand edit",
+    "verify": "npm test && node --test test/setup/checks.test.mjs test/setup/checks-setup-config.test.mjs",
+    "action": "D2: phân vai theo trí tuệ cần hai slot tách bạch -- advise (giá trị đến từ bất đồng, không đổi state, một hỏi một đáp) và execute (giá trị đến từ tuân thủ, sửa file, phải verify) -- gộp chung một cơ chế là một phần lý do dispatch cồng kềnh. Cửa decide --for <purpose> đã xây đủ nhưng .fgos/config.json có capabilities rỗng hoàn toàn nên chưa ai ở. KHÔNG sửa .fgos/config.json bằng tay: ADR0020 strip .fgos/ khỏi mọi worktree nên không child nào chạm được, và AGENTS.md's Install/setup/doctor gate đã bắt buộc đúng cửa còn lại -- một config default phải register vào fgos setup's config-merge VÀ fgos doctor's check registry, không được đứng một mình undiscoverable by doctor. Cơ chế đã có sẵn: configDefault registration + assembleRegistryDefaults (src/setup/registrations.mjs:163), gọi bởi ensureSharedConfigDefaults và checkConfigNotStale.",
+    "footprint": ["src/setup/registrations.mjs", "test/setup/checks.test.mjs"],
+    "kind": "feature",
+    "risk": "standard"
   }
 ]
 ```
@@ -108,32 +124,36 @@ token, chứ không chỉ test xanh.
 child thứ nhất (cùng đụng `src/runner/dispatch.mjs`, khác hàm). `deps` để
 rỗng vì id của child thứ nhất chưa tồn tại lúc viết plan này — cổng
 materialize là nơi duy nhất tạo child, nên xin nối `deps` ngay tại đó.
+Child thứ ba không giao file với hai child kia, chạy song song được.
+
+## Ghi chú tier A — câu hỏi P5 đã tự đóng
+
+Bản nháp đầu của plan này để P5 ngoài split và nêu ba hướng (a)/(b)/(c)
+chờ người chọn, vì `.fgos/config.json` **có** trong git (`git ls-files`
+xác nhận) nhưng **vắng mặt trong mọi worktree** — ADR0020 strip `.fgos/`
+ngay sau `git worktree add` (kiểm trực tiếp trong worktree của chính item
+này: `test -f .fgos/config.json` → ABSENT), và `.githooks/pre-commit` từ
+chối commit stage bất kỳ xoá nào dưới `.fgos/` (tsk-56u).
+
+`fgos-coding-validating`'s tier A ("có hành động nào trong tầm tay đóng
+được khoảng trống không? nếu có: **làm**, rồi hỏi lại từ đầu — đừng hỏi
+người") tìm ra repo **đã tự quyết** rồi, ở hai chỗ độc lập:
+
+1. `AGENTS.md`'s Install/setup/doctor gate nói thẳng: *"Does this add a
+   config default…? If yes, it must register into `fgos setup`'s
+   config-merge and `fgos doctor`'s check registry
+   (`src/setup/checks.mjs`) — not stand alone, undiscoverable by
+   `doctor`."* Tức hướng (c) không phải một lựa chọn ngang hàng — nó là
+   luật đã có sẵn.
+2. Cơ chế thi hành luật đó tồn tại thật: `configDefault` registration +
+   `assembleRegistryDefaults()` (`src/setup/registrations.mjs:163`), được
+   gọi bởi `ensureSharedConfigDefaults` và `checkConfigNotStale`.
+
+Nên P5 không phải "config change không có cửa" — nó là `src/` work bình
+thường, làm được trong worktree; và hướng (a) sửa tay trên main checkout
+đúng ra là **vi phạm** luật trên, không phải một lựa chọn hợp lệ. Không
+còn gì để hỏi người ở đây.
 
 ## Outstanding questions
 
-**P5 (tách slot advise/execute, lấp `capabilities: []`) không được tạo
-thành child — mô hình thi công của nó không khớp với worktree flow, và
-tôi không tự bịa cách vòng.**
-
-Bằng chứng: `.fgos/config.json` **có** trong git (`git ls-files` xác
-nhận) nhưng **vắng mặt trong mọi worktree** — ADR0020 strip `.fgos/` ngay
-sau `git worktree add`. Kiểm trực tiếp trong worktree của chính item này:
-`test -f .fgos/config.json` → ABSENT. Thêm nữa, `.githooks/pre-commit` từ
-chối thẳng một commit stage bất kỳ xoá nào dưới `.fgos/` (tsk-56u).
-
-Nên một child coding-domain, vốn luôn chạy trong worktree, **không có
-đường nào** sửa được `.fgos/config.json`: file không tồn tại ở đó để sửa,
-và commit lại thì vấp guard.
-
-Câu hỏi cần người quyết: một hạng mục mà deliverable duy nhất là thay đổi
-`.fgos/config.json` thì đi cửa nào? Ba hướng tôi thấy, chưa chọn hộ:
-(a) làm thẳng trên main checkout ngoài vòng đời item — nhanh nhất, nhưng
-không có audit trail của fgOS; (b) coi config-change là một domain/kind
-riêng không worktree-backed — đúng khuôn `worktreeBacked:false` registry
-đã có, nhưng là một feature mới; (c) `fgos setup`'s config-merge nhận
-thêm capabilities mặc định — hợp với "Install/setup/doctor gate" của
-`AGENTS.md`, nhưng đổi phạm vi P5 từ "config" sang "code".
-
-Đây là hạng mục **rẻ nhất và độc lập nhất** trong cả nhóm (thuần config,
-không chờ P1), nên chặn nó lại vì một câu hỏi chưa trả lời là tổn thất
-thật — nhưng đoán bừa cửa thi công còn tệ hơn.
+None
