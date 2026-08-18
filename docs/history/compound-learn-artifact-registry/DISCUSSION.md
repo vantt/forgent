@@ -213,14 +213,20 @@ D2-D7):
 |---|---|
 | Vocabulary lấy từ đâu | Bottom-up, suy từ 268 tài liệu thật (chủ sản phẩm chọn) |
 | 268 file cũ xử lý sao | Fold ngược toàn bộ — nhưng **chỉ thi công sau khi registry chốt** (chủ sản phẩm chọn) |
-| Phẳng hay phân cấp | **Phẳng** + field nhóm, theo đúng khuôn `work.id` + `parent` |
+| Phẳng hay phân cấp | **Phẳng** + field nhóm, theo đúng khuôn `work.id` + `parent` — ⚠️ phần "file nằm ở `docs/<quadrant>/`" của câu này SAI, xem D11 |
+| Quadrant có làm thư mục không | **MỞ LẠI** — chủ sản phẩm bắt lỗi; trục cách-viết không được quyết nơi lưu (§6.1). Chờ anh chọn giữa "dời file" và "thư mục thôi làm danh tính" |
 | Có biến hình không | **Có, bắt buộc** — đóng cấu trúc/schema/luật-chọn-lúc-ghi, mở danh sách topic |
 | Cái gì kích hoạt tách | Doctor check đo kích thước, không phải người nhớ (thoả R6) |
 | Lưu ở đâu | Event `.fgos/` + verb `fgos topic *` (chủ sản phẩm chọn), **bắt buộc kèm ảnh cuối cùng** |
+| Mấy nhóm vocabulary | **Hai** — Loại (ĐÓNG) + Đối tượng (MỞ); topic là CẶP `(loại, đối tượng)`, không phải slug mờ |
+| Hai trục cùng lúc hay tuần tự | **Cùng lúc** (chủ sản phẩm chốt) — bị ÉP bởi contract của skill viết, không phải lựa chọn phạm vi |
 
 Cái giá đã lộ và phải mang sang planning: tách topic làm gãy linkage
 `docPath` — `findAllSourceCaptureIds` + `fgos doc-sources` sẽ phải biết
 đến registry thay vì so khớp chuỗi thuần (§3 dòng D5).
+
+Câu vòng 4(d) treo từ 2026-08-07 ("hai trục có cần cùng lúc không") **đã
+đóng ở vòng 9** — xem §3 dòng D10.
 
 **Mint D-tsk28x-3 (vòng 9).** Chủ sản phẩm tự tổng quát hoá
 row B (§3): trục "cách viết" không chỉ nhiều *profile* trong một lưới, mà
@@ -265,6 +271,10 @@ Diataxis hiện có (không đụng, không pha trộn — hard rule của
 | D5 | **Cái giá của biến hình: linkage gãy** | **RÕ — nêu vòng 9, phải mang sang planning** | Topic tách ⇒ tài liệu tách ⇒ mọi capture cũ trỏ vào file đó thành trỏ sai. `findAllSourceCaptureIds` khớp `docPath` CHÍNH XÁC TỪNG KÝ TỰ (`src/report/enduser-index.mjs`). Lời giải không phải đi sửa `docPath` cũ mà là luật đã khoá **D-ADR0001** (nhật ký là sự thật, store là bản chiếu): `outcome.docPath` = **sự thật lịch sử** "lúc đó viết ở đây", đúng vĩnh viễn, không sửa; "topic X hiện sống ở file nào" = **bản chiếu hiện tại** do registry trả lời qua lineage `split`/`merge`. Hệ quả thi công phải mang theo: `findAllSourceCaptureIds` + verb `fgos doc-sources` phải biết đến registry, không còn so khớp chuỗi thuần |
 | D6 | **Registry sống ở đâu** | **CHỦ SẢN PHẨM CHỌN V9** (chưa D-ID) — event trong `.fgos/` + verb riêng, KÈM ảnh cuối cùng bắt buộc | Ba đường: (1) JSON soạn tay — đơn giản, nhưng không có lịch sử biến hình và dễ trôi như Area Map đã trôi (`herdr-web-dashboard` là area thật mang 20 quyết định mà thiếu trong danh sách); (2) event + verb `fgos topic register/split/merge/retire` — một cửa ghi, lịch sử biến hình miễn phí, đúng D-ADR0001, nặng hơn; (3) suy từ đĩa — LOẠI NGAY vì registry phải tồn tại TRƯỚC lúc ghi để cưỡng chế lựa chọn, suy-từ-đĩa là quay lại `fs.existsSync` đang hỏng. Chủ sản phẩm chọn **(2)**, kèm điều kiện: *"nhưng luôn có ảnh cuối cùng không, vì nếu ép vào store sẽ khó cảm nhận được hình dạng cuối cùng của docs"* — xem D7 |
 | D7 | **Ảnh cuối cùng (projection) của registry** | **TRẢ LỜI V9** (chưa D-ID) — HAI ảnh, theo audience | Không phải chiều lòng mà là ĐIỀU KIỆN để (2) đáng chọn: thiếu ảnh thì (2) mua lịch sử nhưng mất khả năng nhìn. Repo đã chạy khuôn này 2 lần: `docs/decisions/index.md` (sinh bởi `fgos decision-index` từ `state.decisions`, frontmatter `generated: true` + cảnh báo never-hand-edit) và `docs/enduser-docs-index.json`. Theo D-ADR0008 nên có ĐÚNG HAI ảnh: **JSON cho máy** (skill tra lúc ghi, doctor kiểm) + **Markdown cho người** (mở ra cảm nhận hình dạng). Ảnh Markdown phải cho thấy thứ `ls` KHÔNG thấy được: lineage biến hình ("`worktree-reclaim` tách từ `worktree-lifecycle`, ngày, vì vượt ngưỡng"), topic đã đăng ký mà CHƯA có tài liệu, topic đang quá ngưỡng chờ tách, topic đã nghỉ hưu + ai thay. Bắt buộc kèm `topic-index-stale` doctor check, nếu không nó trôi đúng như Area Map |
+| D8 | **Trục danh tính có MẤY nhóm vocabulary** | **TRẢ LỜI V9** (chưa D-ID) — ĐÚNG HAI, và OKF đã làm y hệt | Chủ sản phẩm quan sát: *"một topic thường sẽ là 2 khái niệm gộp lại: loại tài liệu và đối tượng tài liệu đó nói về"*. Đo kiểm: `how-to` (85 file) tên đều `<động từ>-<đối tượng>`, LOẠI không đổi (đều là công thức), chỉ đối tượng đổi. `explanation` (161) thì **90 file `why-*` (56%)**, 15 file `design`/`decision`/`audit`, còn lại `*-pattern`/`*-discipline`/`*-overview`/`*-gate` — nhiều loại khác nhau trong CÙNG một ngăn, không chỗ nào khai báo. **Cạm bẫy phải né:** `why-*` lặp lại đúng định nghĩa ngăn `explanation` của Diataxis ⇒ nếu vocabulary "loại" chỉ đẻ lại `why` thì nó là trục Diataxis đội lốt, vi phạm luật chống-phình OKF (§5 vòng 2: *"không thêm loại mới để mã hoá một phân biệt vốn nhét vừa vào field của loại đã có"*). Loại THẬT là phần còn lại (`design`/`audit`/`pattern`/`discipline`/`overview`) — khác nhau về VAI TRÒ TRONG DÒNG CÔNG VIỆC, không khác về trạng thái nhận thức. Kết luận: trục danh tính cần đúng hai nhóm — **Loại (ĐÓNG, nhỏ, đếm được)** + **Đối tượng (MỞ, lớn theo sản phẩm)** — chính là `9 type` + `authoritative_for`/`areas`/`tags` của OKF, và cũng chính là câu "vocabulary cấu trúc ĐÓNG + dữ liệu chủ đề MỞ" ghi ở §5 vòng 2 mà 7 vòng qua chưa ai nối vào chỗ này |
+| D9 | **Hệ quả: topic là CẶP TOẠ ĐỘ, không phải slug mờ** | **TRẢ LỜI V9** (chưa D-ID) — làm sắc D2 | Vẫn phẳng (không thư mục lồng) nhưng có cấu trúc: `(loại, đối tượng)`. Ba cái lợi cụ thể: (1) **chống fork thành ràng buộc cơ học** — duy nhất trên CẶP, hai tài liệu cùng cặp = fork, so khớp chính xác, rẻ hơn hẳn skeleton-matching 3 tầng mà D vừa loại. Kiểm thật trên 3 file worktree-reclaim: 2 file đầu cùng cặp `(rationale, worktree-reclaim)` → BẮT ĐƯỢC; file thứ ba `(rationale, session-claim-liveness)` → KHÔNG bắt được vì khai đối tượng khác ⇒ **2/3, phần còn lại phụ thuộc độ mịn vocabulary đối tượng — cải thiện lớn, không phải viên đạn bạc**; (2) **tách topic có nghĩa rõ**: loại đóng nên không tách được, thứ bị tách luôn là ĐỐI TƯỢNG; (3) nửa MỞ (đối tượng) khớp đúng nửa chịu lực tăng trưởng +7 tài liệu/ngày, nửa ĐÓNG (loại) đứng yên |
+| D10 | **Skill viết tài liệu + tại sao hai trục BUỘC phải cùng lúc** | **TRẢ LỜI V9** (chưa D-ID) — chủ sản phẩm chốt "2 trục triển khai cùng lúc" | Chủ sản phẩm mô tả: một skill viết tài liệu có **contract đầu vào rõ ràng** mô tả tài liệu sẽ viết/cập nhật; dựa vào metadata đó, skill **tự nạp một hoặc nhiều kỹ năng viết** rồi dùng expertise đó để viết. Hình dạng contract: `{loại, đối tượng}` (trục danh tính → GHI VÀO ĐÂU) + `{framework viết}` (trục cách viết → NẠP EXPERTISE NÀO) + `{capture thật}` (chất liệu). **Contract không thể well-formed nếu thiếu một trong hai trục** — chỉ danh tính thì biết ghi vào đâu mà không biết viết kiểu gì, và ngược lại. Nên "hai trục cùng lúc" KHÔNG phải lựa chọn phạm vi mà bị ÉP bởi hình dạng contract. **Session rút lại nghiêng-về-làm-tuần-tự nêu cuối vòng 9** (lý do sai: chưa nhìn ra hai trục gặp nhau tại đúng contract này) — trả lời luôn câu vòng 4(d) treo từ 2026-08-07. Cơ chế nạp expertise đã có tiền lệ chạy thật: `.agents/skills/_shared/` (`executor-dispatch-fallback.md` 18K, `citation-format.md` 4.4K) — mảnh chuyên môn dùng chung, skill trỏ vào chứ không chép lại |
+| D11 | **Quadrant Diataxis có được làm THƯ MỤC không** | **MỞ LẠI — chủ sản phẩm bắt lỗi vòng 9; session viết SAI ở dòng D2** | Chủ sản phẩm hỏi: *"em đang dùng diataxis'quadrant để làm thư mục à? anh nhớ là chúng ta dùng nó để xác định cách viết, outline, structure... cách nhìn này có đúng không"*. **Đúng — và §6.1 của chính tài liệu này đã chẩn đoán từ vòng 3**: *"Trục đó đang gánh ba việc cùng lúc: quyết định cách viết, quyết định NƠI LƯU..., và là danh sách duy nhất một tài liệu có thể thuộc về"*. Cả thiết kế sinh ra để gỡ việc 2+3 khỏi Diataxis, vậy mà dòng D2 vòng 9 vẫn viết `docs/<quadrant>/<topic>.md` — session đi ngược chính chẩn đoán của tài liệu mà không nhận ra. **Không chỉ là thiếu nhất quán khái niệm: nó chặn thẳng D-tsk28x-3 vừa mint cùng vòng** — trục cách viết là registry MỞ nhiều framework, nên khi có framework thứ hai (vd. cung truyện cho marketing) thì tài liệu đó nằm thư mục nào? Không có `docs/narrative-arc/`. Quadrant-làm-thư-mục **vỡ ngay khi có framework thứ hai**, tức mâu thuẫn nội tại chứ không phải rủi ro xa. Triệu chứng đang có thật: một đối tượng cần nhiều cách viết (`worktree-reclaim` xứng đáng có cả how-to lẫn explanation) ⇒ hôm nay thành 2 file ở 2 thư mục, không gì nối lại. **Ba đường:** (1) lưu theo ĐỐI TƯỢNG, quadrant thành metadata — đúng khái niệm nhất, gom mọi cách-viết của cùng đối tượng về một chỗ, nhưng phải dời 268 file + gãy toàn bộ `docPath` (cộng dồn với D5); (2) **giữ nguyên thư mục nhưng thư mục THÔI LÀM DANH TÍNH** — registry trả lời "đối tượng X sống ở file nào", điều hướng bằng chỉ mục; chi phí gần bằng 0 và repo ĐÃ chấp nhận nguyên tắc này qua `QUADRANT_DIR_ALIASES`; nhược: cây thư mục thành di sản, mở `docs/` bằng mắt vẫn thấy cách bày cũ; (3) phẳng hẳn — vẫn dời 268 file như (1) mà MẤT cái lợi gom-theo-đối-tượng, tệ nhất trong ba. **Session nghiêng (2)** vì sửa đúng sai lầm khái niệm với chi phí ~0 và không chồng hai việc nặng (fold 268 file vừa chốt + dời 268 file) vào cùng một lần. **Điều kiện của (2):** phải chấp nhận cây thư mục không còn là cách đọc chính, ảnh Markdown (D7) thành cửa vào thật. Câu chờ chủ sản phẩm: muốn hình dạng cảm nhận được nằm ở **cây thư mục** (⇒ trả giá (1)) hay ở **trang ảnh cuối cùng** (⇒ (2) đủ)? |
 | E | Ranh giới scope `tsk-28x` vs `tsk-12m` | **ĐÃ CHỐT — D-tsk28x-2 (vòng 7)** | Vòng 1 hỏi "thứ tự nào trước". Vòng 3 đổi câu hỏi: đường ống 5 pha (§6) rõ ràng lớn hơn cả hai item cộng lại. **Bổ sung 2026-08-09:** `tsk-12m` vòng 4 tìm ra ranh giới **quan sát/nhắc vs quyết/viết/chặn** (`docs/history/automated-changelog-compound-learn/DISCUSSION.md` §6.1) — loại quan sát/nhắc độc lập hoàn toàn với câu hỏi §6.4 ở đây và **sống sót qua mọi phương án**, nên làm được ngay, không cần chờ `tsk-28x`. **Vòng 7 (2026-08-11):** chủ sản phẩm xác nhận tách quan hệ — `tsk-28x` không còn `deps` trên `tsk-12m`; `tsk-12m` tự xây phần quan-sát/nhắc độc lập, phần ghi/registry của nó cắm vào bất cứ hình dạng `tsk-28x` chốt sau, không phải chờ ngược lại |
 | F | Hình dạng pha TRIAGE (pha 1, §6) | ĐỠ MỜ sau vòng 5 — xem J2 | Pha triage phải chấm điểm ứng viên. Bài học B6b (§5 vòng 2): tín hiệu xếp hạng phải chọn BẰNG ĐO, không bằng trực giác — trùng tag đo ra AUC 0.550 (≈ tung đồng xu), `areas` 0.500 (đúng bằng tung đồng xu). **Vòng 5 có ứng viên đầu có căn cứ: round-count trên mỗi item (J2).** Còn mở: đo nó bằng bộ nhãn nào — fgOS vẫn chưa có tập nhãn tay như bee đã có, nên chưa chạy được phép đo AUC tương đương |
 | G | ~~Chất liệu `struggle` đã có sẵn trong `friction`~~ | **RÚT LẠI — SAI** (đo lại vòng 4) | Vòng 3 kết luận "RÕ" từ ĐÚNG MỘT bản ghi (`tsk-1gn`) rồi suy rộng ra cả hệ thống. Đo toàn log: 131 friction = 81 `verify-miss` + 39 `merge-conflict` (92% telemetry máy), `detail` điển hình `goal-check failed on branch "fgw/tsk-puz" (exit null)` — ghi RẰNG hỏng, không ghi ĐÃ THỬ GÌ / VÌ SAO / CHỖ NGOẶT. Không phải chất liệu kể chuyện. Thứ làm vòng 3 phấn khích thực ra là `gates.askHistory`, KHÁC `friction` — vòng 3 lẫn hai thứ |
@@ -722,8 +732,50 @@ Diataxis hiện có (không đụng, không pha trộn — hard rule của
   JSON cho máy, Markdown cho người — với danh sách cụ thể những thứ ảnh
   phải cho thấy mà `ls` không thấy được. Xem §3 dòng D6/D7.
 
-  **Chưa mint D-ID nào cho D2-D7** — tất cả mới qua một vòng, luật D4 đòi
-  đứng vững qua hơn một vòng. Chờ vòng 10 xác nhận.
+  **(g) Chủ sản phẩm chốt hai trục CÙNG LÚC, và tự nhìn ra cấu trúc
+  hai-nhóm-vocab từ tên file.** Nguyên văn: *"2 trục triển khai cùng lúc
+  và sẽ có một skill kiểu skill viết tài liệu có contract đầu vào rõ ràng
+  mô tả về tài liệu sẽ viết/cập nhật, dựa vào metadata được cung cấp vào
+  thì 1 hoặc nhiều kỹ năng viết sẽ được nạp bởi chính skill đó rồi nó sẽ
+  sử dụng expertise đó để viết tài liệu. về vocabulary có thể có 2 hoặc
+  nhiều nhóm vocab không, tôi thấy một topic thường sẽ là 2 khái niệm gộp
+  lại: loại tài liệu và đối tượng tài liệu đó nói về"*.
+
+  Session đo kiểm quan sát này trên tên file thật trước khi đồng ý — kết
+  quả xác nhận (số liệu ở §3 dòng D8), kèm một cạm bẫy tìm ra khi đo: 90
+  file `why-*` đang lặp lại đúng định nghĩa ngăn `explanation`, nên nếu
+  vocabulary "loại" chỉ đẻ lại `why` thì nó là Diataxis đội lốt. Ba câu
+  trả lời mới ghi ở §3 dòng D8/D9/D10.
+
+  **Đáng ghi nhất của vòng này:** quan sát của chủ sản phẩm hoá ra trùng
+  khít với thứ chính thảo luận này đã chép về từ OKF ở **vòng 2** —
+  *"vocabulary cấu trúc ĐÓNG + dữ liệu chủ đề MỞ"* — nhưng suốt 7 vòng
+  không ai nối câu đó vào bài toán trục danh tính. Nó nằm im trong §5 như
+  một nhận xét chung chung. Bài học lặp lại: **chứng cứ đã có trong hồ sơ
+  vẫn có thể ngủ quên nhiều vòng nếu không ai hỏi đúng câu để đánh thức
+  nó** — khác với ba lần trước (chứng cứ lỗi thời), lần này là chứng cứ
+  ĐÚNG mà chưa được dùng.
+
+  **(h) Chủ sản phẩm bắt một lỗi thật của session, ngay trong cùng vòng.**
+  Hỏi: *"em đang dùng diataxis'quadrant để làm thư mục à? anh nhớ là chúng
+  ta dùng nó để xác định cách viết, outline, structure hoặc heirrachy
+  trong một tài liệu, cách nhìn này có đúng không"*. Đúng: dòng D2 viết
+  `docs/<quadrant>/<topic>.md`, tức vẫn để trục CÁCH VIẾT quyết NƠI LƯU —
+  đúng thứ §6.1 đã chẩn đoán là bệnh gốc từ vòng 3, và đúng thứ cả thiết
+  kế này sinh ra để chữa. Session **không tự phát hiện**, dù vừa viết lại
+  §6.3 cùng vòng.
+
+  Kiểu sai này khác ba lần trước (chứng cứ lỗi thời) và khác lần vòng 9(g)
+  (chứng cứ đúng ngủ quên): đây là **kết luận mới mâu thuẫn với chẩn đoán
+  cũ của chính tài liệu, trong khi cả hai cùng nằm trong một file đang
+  mở**. Nguyên tắc rút ra: sau khi trả lời một câu thiết kế, phải rà ngược
+  xem câu trả lời có va vào §6 hiện hành không — §6 tồn tại đúng để làm
+  việc đó, nhưng chỉ có tác dụng nếu ai đó thật sự đối chiếu. Chi tiết ba
+  đường xử lý + câu chờ chủ sản phẩm: §3 dòng D11.
+
+  **Chưa mint D-ID nào cho D2-D11** — tất cả mới qua một vòng, luật D4 đòi
+  đứng vững qua hơn một vòng. Và **D2 nay phải sửa theo kết quả D11 trước
+  khi mint** — không được mint D2 nguyên trạng.
   Bốn phép đo + hai câu trả lời có bằng chứng: xem §1 vòng 9. Hai câu mới
   (vocabulary bottom-up/top-down; xử lý 223 file cũ) chờ chủ sản phẩm.
 
