@@ -18,6 +18,34 @@ claimed item into real changes, proves them with the item's own `verify`
 command, and hands the item back through `fgos return`. It never designs or
 re-shapes the work; that already happened at `discovery`/`exploring`/`planning`.
 
+## Driver vs. worker (tsk-2uf-2)
+
+This file is split into two halves that live in two different places.
+Below this section is the **driver** half — claim status, decide the
+dispatch mechanism, verify, commit, the Iron Law check, `fgos return`, and
+every Collaboration handoff call. The **worker** half — the boundaries for
+actually doing the work, provider-neutral, shared with every other kind of
+dispatched unit — lives separately at
+`../_shared/coding-worker-contract.md`. Which half applies to you depends
+on how you got here:
+
+- **You are the driver session** — you ran `fgos pick`/arrived via
+  `fgos-routing` with a live claim on this item and the ability to call
+  `fgos` verbs against the real store. Read this whole file. At Flow step
+  2 (Implement), when you do the work yourself (`mechanism` came back
+  `unavailable`/`in-process`), you ALSO follow
+  `../_shared/coding-worker-contract.md`'s boundaries for that part — same
+  discipline an out-of-process worker follows: a session that isn't
+  dispatching still executes the worker's own half, same as `agy` would.
+- **You are an out-of-process worker** — you were dispatched here (e.g.
+  `dispatch.mjs execute`'s prompt pointed `{skillPath}` at this exact
+  file), you hold no claim on this item, and you have no `fgos` verb to
+  call against the real store. **Stop reading after this section.** Read
+  and follow only `../_shared/coding-worker-contract.md` — it is complete
+  on its own for what you need to do. Everything below (the dispatch-decide
+  Hard rule, Flow steps 1/3/4/5, the Collaboration handoff calls, `fgos
+  return`) is the driver's own job, never yours.
+
 ## Hard rules
 
 - When asking questions (`fgos ask`), format question text using self-contained citations (`../_shared/citation-format.md`) and the required two-heading Markdown structure (`## Context` and `## Why this matters`, each followed by at least 20 characters of content).
@@ -71,8 +99,18 @@ re-shapes the work; that already happened at `discovery`/`exploring`/`planning`.
     execute <executorId> --prompt "..." --has-live-task-access` (Step
     B, `../_shared/executor-dispatch-fallback.md`) instead of writing
     the change yourself; read the result's `stdout` as the work
-    product, then continue this skill's own Verify/Commit/Return steps
-    unchanged.
+    product. **Commit ownership shifts here:** per
+    `../_shared/coding-worker-contract.md`'s Layer 2 rules, the
+    dispatched worker already ran the item's own verify and committed
+    its own change before returning — you do NOT run Verify/Commit
+    yourself for this mechanism. Confirm the worker's own commit is
+    real (`git log -1` shows a new commit citing this item, `git
+    status` is clean) then skip straight to step 4's Iron Law
+    classification against that commit. If the worker returned
+    `[BLOCKED]` or the tree is not clean, that is a driver-side problem
+    to handle (park the item / retry dispatch) — never silently run
+    Verify/Commit yourself to paper over a worker that didn't finish
+    its own half.
 - Implement real behavior. No stubs, TODO-only placeholders, dead code, or
   pseudo-implementations offered as if they were done.
 - Match existing patterns in the touched files and the decisions already
@@ -165,7 +203,10 @@ re-shapes the work; that already happened at `discovery`/`exploring`/`planning`.
 
 2. **Implement.** Run `dispatch.mjs decide` first, per the Hard rule
    above, and branch on its answer: `unavailable`/`in-process` — make
-   the real change yourself, reading every file before editing it;
+   the real change yourself, reading every file before editing it, staying
+   inside `../_shared/coding-worker-contract.md`'s boundaries (footprint,
+   cold-pickup refusal) the same as a dispatched worker would (per "Driver
+   vs. worker" above);
    `out-of-process` — dispatch via `execute` instead, per the same
    Hard rule. Either way, before editing a symbol yourself, apply
    `CLAUDE.md`'s
@@ -228,9 +269,13 @@ re-shapes the work; that already happened at `discovery`/`exploring`/`planning`.
    (`mode: sync` — the roleGraph edge decides this, never a flag you
    pass) — there is no separate "start" call for a sync interaction.
 
-3. **Verify — proof, not assertion.** Run the item's own `verify` command
-   exactly as recorded on the item (`fgos check <id>` or `fgos list --json`
-   shows it). A prose description instead of a runnable command is not
+3. **Verify — proof, not assertion.** **Skip this step entirely when
+   mechanism was `out-of-process`** — the worker already ran verify
+   itself per the Hard rule above; re-running it here would be
+   redundant at best and misleading at worst if the workspace has
+   since changed. Otherwise (you did the work yourself), run the
+   item's own `verify` command exactly as recorded on the item (`fgos
+   check <id>` or `fgos list --json` shows it). A prose description instead of a runnable command is not
    this skill's problem to invent a substitute for — that is a shaping
    defect from `fgos-coding-planning`; park the item and say so rather than
    inventing a check. On failure, fix the root cause and rerun the exact
@@ -255,8 +300,17 @@ re-shapes the work; that already happened at `discovery`/`exploring`/`planning`.
    skipping `iron-law-evidence.md` and forcing a retroactive scramble to
    reconstruct proof once `approve` correctly catches it later (`tsk-2l0`,
    reproduced live on `tsk-1ne` the session immediately before this fix was
-   written). So: `git add` and `git commit` the real implementation (and
-   its now-passing verify from step 3) FIRST —
+   written). So:
+
+   **If mechanism was `out-of-process`**: the worker already committed
+   its own change per the Hard rule above — do NOT `git add`/`git
+   commit` again here (the tree is already clean; a second commit
+   attempt on a clean tree fails or no-ops). Skip straight to the
+   classification step below, against the worker's own commit.
+
+   **Otherwise** (you did the work yourself): `git add` and `git
+   commit` the real implementation (and its now-passing verify from
+   step 3) FIRST —
 
    ```bash
    git add <files this item actually changed>
