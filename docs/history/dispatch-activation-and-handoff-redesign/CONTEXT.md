@@ -95,6 +95,33 @@ khỏi phải suy lại.
 | D5 | phân loại đơn vị dispatch thành 2 lớp -- lifecycle-bearing (work + child-work, cùng shape: claim/worktree/verify/footprint) và ephemeral (ad-hoc task <scope>#p<n> + research fan-out branch: không claim, không state, trả digest). Nửa GENERIC của hợp đồng worker (chỉ là phần thực thi, ranh giới, cold-pickup refusal, token cố định, gate thuộc người) áp cho CẢ HAI lớp; nửa CODING-SPECIFIC (git commit, worktree, shell verify) chỉ áp cho lifecycle-bearing |
 | D6 | học hình dạng prepareDispatch của beehive -- MỘT builder payload duy nhất, biết kind, xuyên transport. execute --work phải là MỘT CỬA của builder đó, không phải đặc lệ cho work item, để cửa anh em (--task cho ephemeral) ghép vào được sau. Guard (hook PreToolUse) VẪN tách riêng vì nó xử lý lời gọi KHÔNG có đơn vị -- builder không có input để làm việc ở case đó |
 
+## Phép thử của D4 — vì sao "trung tính với provider" chưa được chứng minh
+
+D4 khai hợp đồng worker là *cấu trúc tổng quát, nội dung của coding*, và
+`tsk-2uf-2` viết hợp đồng đó là **trung tính với provider**. Ghi thẳng ra
+đây để không ai đọc nhầm: với đúng **một** provider (`agy`), câu đó là một
+**lời khẳng định, không phải một tính chất đã chứng minh**.
+
+Cái lõi thì đã có bằng chứng chạy thật — `tsk-3kl` và `tsk-38w` đều dispatch
+qua `agy`, sửa đúng file trong worktree, verify xanh, đã merge — và nó
+không phụ thuộc provider nào, vì hợp đồng là **con trỏ tới một file**, không
+phải cơ chế skill-loading của harness: agent nào đọc được file là thi hành
+được.
+
+Nhưng "một provider chạy được" không suy ra "mọi provider chạy được".
+**`tsk-47r` (pi) là phép thử của chính D4**, và được nối `deps: tsk-2uf-2`
+đúng vì thế: phải có hợp đồng thật rồi mới thử được.
+
+- **Xanh** → D4 được chứng minh, và fgOS có provider thứ hai chạy nguyên trạng.
+- **Đỏ** → chỉ ra chính xác chỗ hợp đồng đang lén lệ thuộc một runtime cụ
+  thể. Đây là kết quả **có giá trị**, không phải thất bại — và là lý do phép
+  thử phải chạy **sớm**, lúc hợp đồng còn đúng một consumer và còn rẻ để
+  sửa, chứ không phải sau khi đã có ba consumer bám vào.
+
+pi rẻ bất thường cho vai này vì nó đọc thẳng project `.agents/skills` đi
+ngược lên git root — đúng nơi hợp đồng sẽ nằm. Không adapter, không dịch
+format.
+
 ## Tham chiếu
 
 - `DISCUSSION.md#design` — thiết kế đầy đủ, kèm sơ đồ so sánh hình dạng
