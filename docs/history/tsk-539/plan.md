@@ -4,13 +4,13 @@ Mode: **standard** (3 flags, direct-entry fallback — no lane handed off by
 `fgos-routing`, applied its Mode-gate table directly per
 `fgos-coding-planning`'s own Bootstrap step): **public contracts** (`ask`/
 `answer` are core CLI verbs every skill and every human operator uses),
-**existing covered behavior** (6 test files touch the `ask`/`awaiting-human`
-edge — `test/state/fsm.test.mjs` (direct `transitionWork` unit tests,
-including a multi-edge sweep, found at the reality gate, not the plan's
-first CLI-only scout), `test/cli/fgos-read.test.mjs`,
-`test/cli/fgos-intake.test.mjs`, `test/state/awaiting-context.test.mjs`,
-`test/cli/fgos-move.test.mjs`, `test/cli/fgos-iron-law-gate.test.mjs`),
-**weak proof / no precedent**
+**existing covered behavior** (real, bounded, not exhaustively enumerated
+at planning time — a broadened reality-gate sweep found 15 test files
+matching `ask`/`putInAwaiting`/`to: 'awaiting-human'` patterns, up from an
+initial 6-file CLI-only scout; enumerating every one precisely is
+execution-time work `npm test` surfaces directly and mechanically, not a
+planning-time design question — see Risk map below for why this doesn't
+change the approach), **weak proof / no precedent**
 (zero content-shape validation exists anywhere in this codebase today —
 confirmed in `RESEARCH.md` round 1). No hard-gate flag applies (no auth,
 no data loss, no audit/security, no external provider, nothing being
@@ -98,23 +98,32 @@ plain `rg` already covers just as well.
    check, throwing `FsmError('validation', ...)` naming the missing
    heading(s) — same error class the sibling non-empty-`ask` check right
    above it already uses, no new error class.
-2. `test/state/fsm.test.mjs` — corrected at the reality gate (missed in the
-   plan's first CLI-only scout): this file directly unit-tests
-   `transitionWork`, including a sweep test (lines 178-196) that enters
-   `awaiting-human` with bare short `ask` text (`'sweep-test ask'`,
-   `'which auth method?'`) across every `todo->awaiting-human`/
-   `doing->awaiting-human` case, plus dedicated tests for the
-   non-empty-`ask` rejection this new check sits right next to (lines
-   209-231). All these fixtures need the required two-heading shape.
-   `test/runner/anti-loop.test.mjs` also calls `transitionWork` but only
-   exercises the `answer`-leaving edge (confirmed via `grep -n "to:
-   'awaiting-human'"` → no hits) — unaffected, not touched.
-   `test/cli/fgos-read.test.mjs`, `test/cli/fgos-intake.test.mjs`,
-   `test/state/awaiting-context.test.mjs`, `test/cli/fgos-move.test.mjs`,
-   `test/cli/fgos-iron-law-gate.test.mjs` — the original 5 CLI-level
-   files the plan's first pass found — update their `ask --text` fixtures
-   to the required shape too; this is expected fallout from step 1, not a
-   separate concern.
+2. **Every existing test fixture whose `ask`/`--text` no longer satisfies
+   the new check** — deliberately not enumerated exhaustively here.
+   Directly confirmed at the reality gate: `test/state/fsm.test.mjs`
+   directly unit-tests `transitionWork`, including a sweep test (lines
+   178-196) that enters `awaiting-human` with bare short `ask` text
+   (`'sweep-test ask'`, `'which auth method?'`) across every
+   `todo->awaiting-human`/`doing->awaiting-human` case, plus dedicated
+   tests for the non-empty-`ask` rejection this new check sits right next
+   to (lines 209-231) — the single most-affected file, confirmed by direct
+   `Read`, not grep alone (a grep pass on this same investigation was
+   caught returning a corrupted identifier for `transitionWork` — cross-
+   verified against source before trusting it, see the how-to note this
+   incident produced). `test/runner/anti-loop.test.mjs` also calls
+   `transitionWork` but only exercises the `answer`-leaving edge (confirmed
+   via `grep -n "to: 'awaiting-human'"` → no hits) — unaffected, not
+   touched. Beyond these two directly-confirmed files, a broader sweep
+   found up to 15 test files matching `ask`/`putInAwaiting`/`to:
+   'awaiting-human'` patterns; the honest, smaller path is not to hand-walk
+   all 15 now but to run `npm test` during Execute and fix each real
+   failure by adding the required two-heading shape — a uniform, mechanical
+   fix with no design choice per file, exactly the ordinary fallout `npm
+   test`'s own feedback loop exists to surface. This is not a gap in the
+   plan's proof surface: the new check is scoped strictly inside the `if
+   (to === 'awaiting-human')` block (confirmed by direct `Read` of
+   `status-fsm.mjs:259-267`), so nothing outside that one edge can regress,
+   and every regression inside it is the exact same one-line fix.
 3. `.agents/skills/fgos-coding-exploring/SKILL.md`,
    `.agents/skills/fgos-coding-validating/SKILL.md`,
    `.agents/skills/fgos-coding-implement/SKILL.md`,
