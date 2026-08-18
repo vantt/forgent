@@ -10,6 +10,20 @@ status: open
 
 ## 1. Trạng thái hiện tại
 
+Round 13 (2026-08-18): D11 (resolver function cho file-path cross-boundary
+— `resolveTaskSpecPath`) và D12 (mở rộng `architecture-manifest.json` +
+`architecture.test.mjs` thêm rule domain-siloing, so sánh với
+`upstreams/pi`'s "everything is a plugin") đã chốt — ghi qua `fgos
+decision --id tsk-397` (seq 20091, 20092). 8/8 việc chính đã có quyết
+định (share-store, field-ownership, domain-folder-shape, aggregator,
+core-vị-trí, knowledge, skill-canonical, task-spec, seam-cho-bugfix-
+workflow, cross-boundary-file-resolver, module-boundary-enforcement).
+Còn mở thật: `roleGraph`/`taskSpecMap` placement trong `registry.mjs`
+(đề xuất chưa lock: đi cùng nguyên object, không tách), `agents/*.yaml`→
+`.claude/agents/*.md` render-pair (đề xuất chưa lock: mirror D7, domain
+riêng có `domains/<name>/agents/`), và `doctrine` domain-scoped (mở từ
+đầu, chưa ai đề xuất giải pháp cụ thể).
+
 Round 12 (2026-08-18): Xác nhận `tsk-2t9c` ĐÃ MERGE VÀO MAIN (`e268376e`)
 — không phải nhánh treo. `codingDomain` thật có 10+ field (§7 task-1 đã
 cập nhật đủ danh sách). Trợ lý đề xuất drop task-3 (dispatcher wiring),
@@ -152,7 +166,7 @@ thi thật.
 | 5 | Doctrine layer (AGENTS.md/CLAUDE.md) đã có tiền lệ "luôn nạp vs nạp theo nhu cầu" nào gần với trục engine/skill chưa? | Rõ một phần (scout) | `docs/platform-foundations.md` L8 đã khoá placement test này CHO RIÊNG tầng doctrine (standing sheet vs reference nạp theo nhu cầu) — cùng tinh thần trục (b) nhưng chưa từng generalize ra toàn cây thư mục. |
 | 6 | Ranh giới cụ thể core-foundation vs domain-specific nên nằm ở đâu? | Chưa rõ (nhưng không còn speculative) | STR52 (marketing, proposed) + STR89 (done, đã định vị 4 điểm nối domain-pluggable) là chất liệu thật để thiết kế ranh giới, xem #10/#11 dưới. Vẫn cần thiết kế cụ thể layout. |
 | 7 | Engine vs skill/prose tách theo tiêu chí nào (ngôn ngữ? runtime-executable vs instruction-only? mức nạp?) | Chốt — D7 | `core/skills/` + `domains/*/skills/` là canonical AUTHORING; `.agents/skills/`, `.claude/skills/`, `plugins/fgOS/skills/` cả ba đều là render target (D7, mở rộng tsk-1qi D5). |
-| 8 | Mô hình plugin/extension theo domain có đáng chi phí duy trì thêm một tầng tổ chức? | Chưa rõ | Cần cân nhắc so với chi phí hiện trạng (giữ mọi thứ phẳng, domain phân biệt qua data `DOMAINS`, không qua thư mục). |
+| 8 | Mô hình plugin/extension theo domain có đáng chi phí duy trì thêm một tầng tổ chức? | Chốt — D3/D12 | Đáng. Chi phí thấp hơn dự đoán ban đầu — không cần package/workspace riêng (folder đủ, D3), và cơ chế enforce ranh giới đã có sẵn trong repo (`architecture-manifest.json`, chỉ cần mở rộng thêm 1 rule, D12) chứ không phải xây từ đầu. |
 | 9 | Nguồn so sánh bee/beegog thật nằm ở đâu, và nó có tiền lệ cho trục nào? | Rõ (scout + xác nhận người, round 2) | `/home/vantt/projects/beegog/` (live checkout, KHÁC repo-con `upstreams/beegog/` đã pull nhưng vẫn cũ) có đúng cấu trúc v2.7.0: `packages/bee-rs` (1 crate, 1 binary), `packages/bee` (vendor payload), `skills/` (9 skill, giảm từ 18/15). Không tìm thấy khái niệm multi-domain nào trong beegog (`grep -i "multi-domain\|DOMAINS\b"` không ra kết quả liên quan) — beegog là tiền lệ thật cho trục (b), KHÔNG phải tiền lệ cho trục (a). |
 | 10 | Domain thật thứ hai có tồn tại/đang chờ không? | Rõ (scout, round 4) | Có — `docs/backlog.md` STR52: "Domain thứ hai THẬT: marketing", status `proposed`, nêu 2026-07-18. Người dùng có sẵn workflow marketing ở project khác, muốn điều phối qua fgOS. Câu hỏi scope gốc của STR52 (share store hay cài fgOS riêng) — xem #12. |
 | 11 | Domain-specific cần mở những điểm nối nào trong code hiện tại? | Rõ (scout, round 4) | STR89 (done) định vị 4 điểm: (1) `DOMAINS` registry entry riêng cho domain mới (`src/state/workflow-stage-graphs.mjs`); (2) `discovery.mjs`/`decompose.mjs` retrofit — hiện hardcode literal stage-name của coding, cảnh báo sẵn trong comment `workflow-stage-graphs.mjs:29-34`; (3) `fgos-routing` domain-pluggable hoá — tự thú nhận hôm nay "the only domain this induction targets [is coding]"; (4) bộ skill nội dung riêng theo domain-extension, song song bộ coding. Thứ tự đã xác nhận: software-dev (coding) trước, marketing sau, không chặn nhau. |
@@ -166,6 +180,8 @@ thi thật.
 | 19 | Task-specs nên tách vào đâu? | SỬA LẠI LẦN 2 — D9 (round 11) | Cả bản D8 đầu (di dời toàn bộ `docs/specs/`) lẫn bản sửa lần 1 (định nghĩa task-specs = field-schema work-item) đều SAI. Người chỉ ra `docs/task-specs/coding/*.md` — 13 file THẬT ĐÃ TỒN TẠI, thuộc thiết kế đã chốt `tsk-2t9c` (D6/D10: task-spec = hợp đồng theo LOẠI việc, input/output/gates/verify-template — khác hẳn field-schema). Xem D9. |
 | 20 | tsk-2t9c (`fgos-marketing-domain-foundation`) phủ những gì, và quan hệ với thảo luận này ra sao? | Rõ (scout round 11-12) | tsk-2t9c ĐÃ MERGE VÀO MAIN (`e268376e`) — không còn nằm trên nhánh riêng. `codingDomain` object thật hôm nay có 10+ field (stages/stepMap/transitions/skillMap/taskSpecMap/worktreeBacked/statusLabels/parkReason/classification/roleGraph + workflows/defaultWorkflow/workflowFor), không phải 4-5 field thảo luận này giả định. Người xác nhận: `bugfix` workflow (un-merge theo D7/D7a của tsk-2t9c, đang hoãn) sắp thật, không còn giả thuyết — đây chính là LÝ DO làm domains/ split BÂY GIỜ, trước khi code bugfix-workflow viết ra, để không phải migrate 2 lần. |
 | 21 | Task-3 (dispatcher domain/workflow-aware) có nên drop khỏi scope thảo luận này không (trợ lý từng đề xuất drop)? | SỬA LẠI — D10 (round 12) | Trợ lý đề xuất drop vì tsk-2t9c đã chủ đích KHÔNG wiring dispatcher (lý do: chỉ 1 workflow đăng ký, wiring đổi 0 hành vi). Người bác: bugfix-workflow sắp landing thật — tiền đề "chỉ 1 workflow" sắp hết đúng. Task-3 GIỮ LẠI, đổi khung: không phải "sửa bug" mà "làm sẵn seam trước khi workflow thứ 2 tồn tại". |
+| 22 | Sau khi không gian đã tách (D3-D10), cơ chế cross-boundary để đọc file/giao tiếp giữa core và domain là gì? | Chốt — D11 | `workflow-stage-graphs.mjs` ĐÃ có 13 hàm resolver (`getDomain`, `skillForStage`, `resolveWorkflow`, `roleGraphFor`, ...) — đây chính là "port" ở tầng DATA, không cần xây mới. Chỗ hổng duy nhất: `registrations.mjs` (dòng 407/424) tự ghép path thô `path.join('docs','task-specs',domainName,...)`, không qua resolver nào — sau khi D9 di dời task-specs, chỗ này vỡ trước tiên. D11 thêm `resolveTaskSpecPath(domain, specId)` để đóng nốt pattern đã có. |
+| 23 | Layout nội bộ + cách kết nối module của `upstreams/pi` ("everything is a plugin") có bài học gì cho fgOS? | Chốt — D12 | Pi enforce ranh giới module bằng `package.json`'s `exports` map (path không khai = không import được, Node tự chặn) — cấp package thật, mỗi package trong workspace tự khai bề mặt công khai. fgOS là 1 package, không workspace — chuyển sang mô hình pi tốn hơn hẳn. NHƯNG fgOS đã có tương đương: `docs/architecture-manifest.json` + `test/architecture.test.mjs` (5 layer kỹ thuật: entry/use-case/infra/domain/kernel, import chỉ được xuống tầng sâu hơn, ngược tầng = test đỏ). Bài học thật: mở rộng cơ chế ĐÃ CÓ này thêm 1 rule domain-siloing, không xây cơ chế mới kiểu pi. **Lưu ý naming va chạm:** layer `"domain"` trong manifest là khái niệm DDD kỹ thuật, KHÔNG liên quan `DOMAINS` (coding/marketing) của toàn thảo luận này — cùng từ, 2 nghĩa khác nhau, cùng tồn tại trong 1 repo. |
 
 ## 4. Quyết định đã chốt
 
@@ -181,6 +197,8 @@ thi thật.
 | D8 | ~~Task-specs tách khỏi `docs/specs/` chung vào `core/specs/` (toàn bộ 12 file) + `domains/<name>/specs/`~~ — **SAI 2 LẦN, xem D9.** | (giữ lại làm lịch sử — nội dung không còn đúng, D9 thay thế hoàn toàn định nghĩa "task-specs".) |
 | D9 | "Task-spec" đúng nghĩa là khái niệm của `tsk-2t9c` (D6/D10): hợp đồng theo LOẠI việc (input/output/gates/verify-template), một file/domain/loại-việc — KHÔNG phải field-schema work-item. `docs/task-specs/coding/*.md` (13 file thật, machine-checked bởi `registrations.mjs`'s `task-specs-resolve`) chuyển vào `domains/coding/task-specs/`, giữ nguyên tên "task-specs" (không đổi thành "specs"). | Người chỉ ra folder `docs/task-specs/coding/` đã tồn tại thật — thảo luận này bỏ sót toàn bộ `tsk-2t9c` (13 quyết định đã chốt + code đã wiring thật) trong suốt các round trước. D8 (cả 2 bản) sai vì dựa trên định nghĩa "task-specs" tự chế, chưa từng đọc tsk-2t9c. Còn treo: `roleGraph`/`taskSpecMap` trong registry.mjs (D3/D4 của thảo luận này) chưa tính tới — chờ người quyết định mức hoà giải. |
 | D10 | Task-3 (dispatcher domain/workflow-aware wiring) GIỮ LẠI trong scope §7 — đảo ngược đề xuất drop của chính trợ lý (round 12). | Bugfix-workflow (un-merge `feature`/`bugfix`/`lightweight` theo D7/D7a tsk-2t9c, đang hoãn) sắp landing thật, không còn giả thuyết — tiền đề tsk-2t9c dùng để hoãn wiring dispatcher (chỉ 1 workflow đăng ký, wiring đổi 0 hành vi) sắp hết đúng. Lý do sâu hơn để làm domains/ split NGAY: code bugfix-workflow viết ra ở đâu phụ thuộc `codingDomain` đang sống ở đâu lúc đó — split trước khi code đó viết ra thì nó không bao giờ chạm `workflow-stage-graphs.mjs` cũ, tránh migrate 2 lần. |
+| D11 | Mở rộng pattern resolver-function đã có của `workflow-stage-graphs.mjs` sang cross-boundary FILE lookup — thêm `resolveTaskSpecPath(domain, specId)`, `registrations.mjs` gọi hàm này thay vì tự ghép `path.join('docs','task-specs',domainName,...)`. | Người: sau khi không gian đã tách hoàn toàn, việc quan trọng tiếp theo là cơ chế đọc file/giao tiếp cross-boundary. Scout: `workflow-stage-graphs.mjs` đã có 13 hàm resolver cho DATA (`getDomain`, `skillForStage`, ...) — pattern port đã tồn tại. `registrations.mjs` là chỗ DUY NHẤT còn tự ghép path thô, bỏ qua pattern — sau D9 di dời task-specs, đây là chỗ vỡ đầu tiên nếu không sửa. |
+| D12 | Mở rộng `docs/architecture-manifest.json` + `test/architecture.test.mjs` thêm 1 rule domain-siloing: core không import domain cụ thể nào, `domains/<name>/` không import `domains/<other>/` — tái dùng nguyên cơ chế one-directional-import đã chứng minh cho 5 layer kỹ thuật. | So sánh `upstreams/pi` ("everything is a plugin"): pi enforce ranh giới bằng `package.json`'s `exports` map (path không khai = Node tự chặn import) — cấp package thật, cần workspace. fgOS là 1 package, không workspace — chuyển hẳn sang mô hình pi tốn hơn hẳn cái đang có. fgOS đã có tương đương thật: architecture-manifest + test đỏ khi import ngược layer. Bài học từ pi không phải "xây cơ chế mới" mà "mở rộng cơ chế đã có sang trục domain". |
 
 ## 5. Q&A log
 
@@ -322,6 +340,19 @@ thi thật.
   ngay: bugfix-workflow sắp landing thật, tiền đề "chỉ 1 workflow" sắp
   hết đúng, và chính đó là lý do làm domains/ split BÂY GIỜ để không phải
   migrate 2 lần → D10, task-3 giữ lại, đổi khung.
+- 2026-08-18 — Round 13 Q&A: người yêu cầu tổng hợp toàn cục — trợ lý recap
+  D1-D10 + việc còn mở. Người giới thiệu thêm nguồn so sánh mới:
+  `upstreams/pi` ("everything is a plugin"). Trợ lý scout, tìm cơ chế
+  extension-là-package-thật + `exports` map enforce (Node tự chặn import
+  path không khai). Người làm rõ ưu tiên: folder/package không quan trọng
+  (cả 2 chỉ là cách isolate footprint) — quan trọng là tách bạch HOÀN
+  TOÀN core/domain, rồi tới cơ chế cross-boundary file/communication. →
+  D11 (resolver function `resolveTaskSpecPath`, mở rộng pattern 13 hàm đã
+  có). Người yêu cầu thêm: học layout nội bộ + module-connection của pi.
+  Trợ lý scout `packages/agent`'s `exports` field thật, rồi tìm ra fgOS
+  ĐÃ CÓ cơ chế tương đương (`architecture-manifest.json` +
+  `architecture.test.mjs`) — chỉ cần mở rộng, không xây mới → D12. Người
+  xác nhận "Đồng ý" — D11+D12 chốt.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -575,6 +606,41 @@ trong nguồn canonical trước khi render.
   xanh không đổi; thêm test riêng: đăng ký 1 workflow thứ hai giả lập
   (khác `feature`), xác nhận dispatcher chọn đúng graph theo
   `resolveWorkflow(item)` thay vì đọc `domain.transitions` mặc định.
+
+### {#task-taskspec-path-resolver} Thêm `resolveTaskSpecPath(domain, specId)`, sửa `registrations.mjs` gọi qua hàm này
+
+- **Mục tiêu:** hiện thực D11 — thêm hàm resolver mới vào
+  `workflow-stage-graphs.mjs` (cùng chỗ 13 hàm hiện có), trả về path thật
+  của 1 task-spec theo domain (`domains/<domain>/task-specs/<specId>.md`
+  sau D9, không phải `docs/task-specs/<domain>/...` cũ); sửa 2 chỗ trong
+  `registrations.mjs` (dòng 407, 424) đang tự ghép `path.join` thô để gọi
+  hàm này thay vì hardcode.
+- **§6 excerpt áp dụng:** không có sẵn — cần bổ sung vào §6 khi diagram
+  regenerate lần tới (dòng resolver-function trong khối `workflow`).
+- **D-ID áp dụng:** D11.
+- **Quan hệ:** phụ thuộc task {#task-domain-registry-split} (vị trí
+  `domains/<domain>/task-specs/` phải tồn tại thật trước khi resolver có
+  gì để trỏ tới) và D9 (định nghĩa đích path).
+- **Verify nháp:** 2 doctor check hiện có của tsk-2t9c
+  (`task-specs-resolve`, `agent-claims-resolve`) vẫn PASS sau khi đổi path
+  — đây là bằng chứng resolver đúng, không chỉ code compile được.
+
+### {#task-architecture-manifest-domain-silo} Mở rộng `architecture-manifest.json` + `architecture.test.mjs` thêm rule domain-siloing
+
+- **Mục tiêu:** hiện thực D12 — thêm 1 rule mới bên cạnh rule
+  one-directional-layer đã có: file trong `core/` không được import từ
+  bất kỳ `domains/<name>/` cụ thể nào; file trong `domains/<name>/` không
+  được import từ `domains/<other>/`. Mọi giao tiếp cross-domain phải qua
+  hàm resolver của core (D11) hoặc qua data (`work.domain`/`DOMAINS`), không
+  bao giờ import thẳng file của domain khác.
+- **§6 excerpt áp dụng:** không có sẵn — cần bổ sung vào §6.
+- **D-ID áp dụng:** D12.
+- **Quan hệ:** nên làm SAU khi `domains/` thật sự tồn tại (task 1+2) —
+  rule domain-siloing không có gì để kiểm nếu chưa có domain thứ hai
+  hoặc chưa tách folder.
+- **Verify nháp:** thêm 1 fixture-import cố tình vi phạm rule (domain A
+  import domain B), xác nhận `architecture.test.mjs` đỏ đúng lỗi mới;
+  suite hiện có (5 layer cũ) không hồi quy.
 
 **Việc CHƯA đủ hình dạng để thành task riêng:** knowledge/doctrine
 domain-scoped (câu hỏi mở #15, §3) — chờ người quyết định có nằm trong
