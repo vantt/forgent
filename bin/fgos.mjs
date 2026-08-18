@@ -18,7 +18,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf, parseDecisionRelation, decisionTextLooksLikeSupersession } from '../src/state/store.mjs';
-import { collectWideSourceFiles, findWideCitationFindings } from '../scripts/check-decision-citation-drift.mjs';
+import { collectWideSourceFiles, findWideCitationFindings, isDLocalId } from '../scripts/check-decision-citation-drift.mjs';
 import { computeDecisionIndex, generateDecisionIndex } from '../src/report/decision-index.mjs';
 import { renderLockedDecisionsTable } from '../src/report/context-render.mjs';
 import { runFourDoorChecks } from '../src/state/retrospective-doors.mjs';
@@ -1989,7 +1989,15 @@ async function runVerb(verb, flags, positional, dir) {
         // is nothing a citing line could plausibly reference to prove it
         // already accounts for the supersession.
         const supersedingLabel = id ?? null;
-        const findings = findWideCitationFindings(sourceFiles, relation.id, supersedingLabel);
+        let homeFile;
+        if (isDLocalId(relation.id)) {
+          const item = id ? listWork(dir).work[id] : null;
+          const docsRefRaw = typeof item?.docsRef === 'string' && item.docsRef.trim() ? item.docsRef.trim() : (id ? `docs/history/${id}` : null);
+          if (docsRefRaw) {
+            homeFile = path.posix.join(docsRefRaw.replace(/\/+$/, ''), 'CONTEXT.md');
+          }
+        }
+        const findings = findWideCitationFindings(sourceFiles, relation.id, supersedingLabel, homeFile);
         if (findings.length) {
           result.danglingCitations = findings.map((f) => f.message);
         }

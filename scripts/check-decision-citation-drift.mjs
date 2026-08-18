@@ -45,6 +45,10 @@ const DEFAULT_BASELINE_PATH =
 const CITATION_RE =
   /\b(ADR|RUL|D)(\d{1,4})\b(\s*(\([^)]*\)))?/g;
 
+export function isDLocalId(id) {
+  return typeof id === 'string' && /^D\d+$/.test(id);
+}
+
 export function extractCitedIds(line, knownIds) {
   const ids = new Set();
   for (const m of line.matchAll(/ADR(\d{4})/g)) {
@@ -368,10 +372,15 @@ export function collectWideSourceFiles(cwd, { roots = WIDE_SWEEP_ROOTS, excludeR
  * relation id token (a `state.decisions` D-ID or work-item id, not only
  * the 4-digit ADR ids `extractCitedIds`/`DECISION_ID_PATTERN` assume).
  */
-export function findWideCitationFindings(sourceFiles, targetId, supersedingLabel) {
+export function findWideCitationFindings(sourceFiles, targetId, supersedingLabel, homeFile) {
+  let effectiveSourceFiles = sourceFiles;
+  if (isDLocalId(targetId)) {
+    if (!homeFile) return [];
+    effectiveSourceFiles = sourceFiles.filter((s) => s.file === homeFile);
+  }
   const pattern = new RegExp(`(?<![\\w-])${escapeRegExp(targetId)}(?![\\w-])`);
   const findings = [];
-  for (const { file, lines } of sourceFiles) {
+  for (const { file, lines } of effectiveSourceFiles) {
     lines.forEach((line, idx) => {
       if (!pattern.test(line)) return;
       if (supersedingLabel && line.includes(supersedingLabel)) return;
