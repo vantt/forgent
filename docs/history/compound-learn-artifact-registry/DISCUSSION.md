@@ -76,6 +76,62 @@ hai theo D4), hai trục có cần cùng lúc không, va giữa D-tsk12m-B với
 hình mới, và một câu mới — có gộp doctor check cho index drift vào
 `tsk-3ip` hay tách riêng.
 
+**Vòng 9 (2026-08-18) — chủ sản phẩm đổi thứ tự bàn: khoá trục Diataxis+OKF
+("row D") trước, đóng băng changelog/marketing-storytelling lại đã.**
+Nguyên văn: hiện có Diataxis (nhận thức) và OKF (audience/scope/area), cần
+CƠ CHẾ xác định capture của một work-item vừa xong nên bổ sung vào tài
+liệu/nhóm tài liệu nào — không có cơ chế thì số tài liệu tăng chóng mặt
+theo số work-item, "đã từng và đang bị". Đây chính là §3 dòng D, treo từ
+vòng 3. Đo lại trước khi bàn (kỷ luật D-tsk28x đã lặp lại nhiều lần: đo
+trước khi rút ràng buộc):
+
+- `docs/explanation/` hiện có **127 file** (`how-to` 76, `reference` 19,
+  `tutorial` 1) — tăng thật, và có cụm chủ đề trùng lặp rõ: riêng nhóm
+  worktree/discover/decompose đã chiếm ~20 file rời (`discover-loop-pool-
+  ordering-and-stop-rules.md`, `why-discover-was-rewritten-...md`, `why-
+  decomposes-skip-and-advance-...md`, `orphaned-worktree-reclaim-...md`,
+  `worktree-isolation-axis-decision.md`, …) mà đúng ra nên gộp vào 2-3 tài
+  liệu sống theo chủ đề. Xác nhận bằng đọc trực tiếp `fgos-compounding`
+  SKILL.md bước 3: grow-vs-create hiện CHỈ so khớp `fs.existsSync` trên một
+  đường dẫn tự chọn TỰ DO mỗi lần — không có cách nào một phiên compound
+  biết đã có tài liệu chủ đề gần đó, nên gần như luôn "create". Đúng luật
+  đã ghi thành văn ở `docs/specs/enduser-docs-authoring.md` R4 (grow-vs-
+  create theo tồn-tại-tệp) — không phải bug, là quyết định hiện hành cần
+  bàn lại.
+- **fgOS đã có sẵn cơ chế "một chủ đề một chủ sở hữu" — không phải nhập từ
+  OKF, mà tự chạy thật, mới landing trong tuần qua (`tsk-1lv-4`).** Lớp
+  `docs/specs/` có đúng 11 AREA cố định (`system-overview.md` § Area Map),
+  mỗi area sở hữu một file spec riêng, và mục "Lịch sử quyết định" ở cuối
+  file đó GOM mọi quyết định thuộc area này — không phân biệt quyết định
+  do work-item nào tạo ra — thành PROSE TÍCH LUỸ trong đúng một file,
+  không bao giờ sinh file mới mỗi quyết định. `docs/decisions/index.md`
+  (sinh bởi `fgos decision-index`) chỉ là hình chiếu đọc-theo-tag; narrative
+  thật sống trong area spec. Đây CHÍNH LÀ mẫu OKF `authoritative_for` đòi
+  hỏi — fgOS tự làm ra một bản nhẹ hơn (không anti-fork gate 3 tầng, không
+  NFKC/confusable-fold) và nó đã chạy thật.
+  - **Lớp Diataxis (`docs/<quadrant>/`) không có gì tương đương.** Không
+    area map, không registry chủ đề nào để một phiên compound tra trước
+    khi quyết create/grow. Đây đúng là khoảng trống row D chỉ ra từ vòng 3.
+  - Cũng xác nhận `docs/specs/enduser-docs-authoring.md` (area spec của
+    CHÍNH `fgos-compounding`) đang lỗi thời: § Open Gaps còn viết "mỗi
+    đường dẫn mới có một capture liên kết" / "mới ngăn how-to có tài liệu
+    thật" — không khớp thực tế hôm nay (127/76/19/1). R5 của area spec đó
+    tự để một cửa thoát: "chỉ cân nhắc trục thứ hai khi tài liệu thật va
+    chạm (per D16)" — 127 file với cụm trùng chủ đề rõ ràng là bằng chứng
+    va chạm đã xảy ra.
+
+Câu hỏi đặt lại cho chủ sản phẩm, đang chờ trả lời: có nên tái dùng CHÍNH
+Area Map 11-area của `docs/specs/` làm trục danh tính cho tài liệu Diataxis
+luôn (một registry cho cả BA-layer lẫn end-user-layer), hay end-user docs
+cần một bộ area/chủ-đề riêng (vì góc nhìn audience khác — theo verb/skill/
+feature thay vì theo area hệ thống nội bộ)? Và: cơ chế fold-vào-section-
+sẵn-có (đã chạy thật ở `docs/specs/`) có nên là nền cho Diataxis luôn, thay
+vì xây `authoritative_for` + anti-fork gate 3 tầng của OKF từ đầu?
+
+Changelog/marketing-storytelling (Làn A/B, "bản nháp") đóng băng theo yêu
+cầu chủ sản phẩm — bàn tiếp sau khi row D (trục danh tính cho Diataxis)
+rõ ràng.
+
 ## 2. Mục tiêu & đề bài
 
 Chủ sản phẩm coi compound-learn (bước `fgos-compounding` chạy khi item ở
@@ -103,7 +159,7 @@ Diataxis hiện có (không đụng, không pha trộn — hard rule của
 | A | **Trục nào?** | **D-tsk28x-1** (vòng 3) | Hai trục, bắt buộc, hiện fgOS mới có một. Diataxis = trục TRẠNG THÁI NHẬN THỨC người đọc; OKF 9-type = trục DANH TÍNH (tài liệu này LÀ gì, của ai, về vấn đề gì). Vuông góc, một tài liệu mang cả hai nhãn |
 | B | Đóng hay mở | **TRẢ LỜI V3** (chưa D-ID) — giải bởi chữ `struggle` | `struggle` KHÔNG nằm trong 4 quadrant Diataxis (Diataxis dựng từ 2 chiều hành-động/nhận-thức × tiếp-thu/vận-dụng, ra đúng 4 ô, không ô nào là struggle). Suy ra: trục trạng-thái-nhận-thức là trục TỔNG QUÁT, Diataxis chỉ là MỘT PROFILE của trục đó (profile cho tài liệu kỹ thuật); marketing có profile riêng trên cùng trục, `struggle` là một trạng thái trong đó. **Trục MỞ (thêm profile mới được) + mỗi profile ĐÓNG (Diataxis mãi đúng 4)** — chính là kiến trúc OKF v0.1 (lỏng) + Bee Profile (đóng) đã dùng. Không phải chọn một trong hai |
 | C | **GHI hay ĐỀ XUẤT** | **TRẢ LỜI V3** (chưa D-ID) — câu hỏi vòng 2 đặt SAI | Không chọn một cho cả hệ thống — tách theo GIAI ĐOẠN. **Thu chất liệu: ghi thẳng, liên tục, không bao giờ dừng để hỏi** (ràng buộc chủ sản phẩm đặt: nhanh, rẻ, ít token, không cắt ngang luồng làm việc khác — loại thẳng mọi phương án gọi LLM phân loại ngay lúc capture). **Tổng hợp: nhiều pha, có triage nổi ứng viên, có người duyệt.** Lý do OKF sợ tự-ghi chỉ áp cho TÀI LIỆU (giả vờ là kết luận đã biên tập), không áp cho CHẤT LIỆU THÔ (chỉ ghi "đã xảy ra chuyện này"). Cửa gác đặt đúng chỗ chất liệu biến thành khẳng định |
-| D | Ai giữ "một chủ đề một chủ sở hữu" khi số tài liệu tăng | CHƯA RÕ (chưa bàn vòng 3) | `fgos-compounding` phát hiện grow-vs-create CHỈ bằng `fs.existsSync`. Không có khái niệm chủ-sở-hữu-chủ-đề. OKF trả lời bằng `authoritative_for` + anti-fork gate 3 tầng (sau khi judge độc lập phá bản 1 tầng bằng 4 cách trong một buổi). Càng nhiều profile/audience thì rủi ro 2 tài liệu cùng chủ đề càng cao — port cùng lúc hay để riêng? |
+| D | Ai giữ "một chủ đề một chủ sở hữu" khi số tài liệu tăng | **ĐANG BÀN — vòng 9, chủ sản phẩm chủ động đưa lên trước Làn A/B** | `fgos-compounding` grow-vs-create CHỈ bằng `fs.existsSync` — xác nhận đúng luật văn bản (`docs/specs/enduser-docs-authoring.md` R4), không phải bug. Đo vòng 9: `docs/explanation/` 127 file, cụm worktree/discover/decompose ~20 file rời đáng ra nên gộp — bằng chứng va chạm thật (R5 area spec đó tự đặt điều kiện "chỉ cân nhắc trục thứ hai khi tài liệu thật va chạm"). fgOS ĐÃ có tiền lệ chạy thật cho đúng bài toán này — không phải OKF, là chính `docs/specs/` (11 area, mục "Lịch sử quyết định" mỗi area gom mọi quyết định thuộc area đó, `tsk-1lv-4`, mới landing) — nhẹ hơn `authoritative_for`+anti-fork 3 tầng của OKF. Lớp Diataxis không có gì tương đương. Câu hỏi mở: tái dùng chung Area Map 11-area, hay end-user docs cần bộ area riêng theo audience? |
 | E | Ranh giới scope `tsk-28x` vs `tsk-12m` | **ĐÃ CHỐT — D-tsk28x-2 (vòng 7)** | Vòng 1 hỏi "thứ tự nào trước". Vòng 3 đổi câu hỏi: đường ống 5 pha (§6) rõ ràng lớn hơn cả hai item cộng lại. **Bổ sung 2026-08-09:** `tsk-12m` vòng 4 tìm ra ranh giới **quan sát/nhắc vs quyết/viết/chặn** (`docs/history/automated-changelog-compound-learn/DISCUSSION.md` §6.1) — loại quan sát/nhắc độc lập hoàn toàn với câu hỏi §6.4 ở đây và **sống sót qua mọi phương án**, nên làm được ngay, không cần chờ `tsk-28x`. **Vòng 7 (2026-08-11):** chủ sản phẩm xác nhận tách quan hệ — `tsk-28x` không còn `deps` trên `tsk-12m`; `tsk-12m` tự xây phần quan-sát/nhắc độc lập, phần ghi/registry của nó cắm vào bất cứ hình dạng `tsk-28x` chốt sau, không phải chờ ngược lại |
 | F | Hình dạng pha TRIAGE (pha 1, §6) | ĐỠ MỜ sau vòng 5 — xem J2 | Pha triage phải chấm điểm ứng viên. Bài học B6b (§5 vòng 2): tín hiệu xếp hạng phải chọn BẰNG ĐO, không bằng trực giác — trùng tag đo ra AUC 0.550 (≈ tung đồng xu), `areas` 0.500 (đúng bằng tung đồng xu). **Vòng 5 có ứng viên đầu có căn cứ: round-count trên mỗi item (J2).** Còn mở: đo nó bằng bộ nhãn nào — fgOS vẫn chưa có tập nhãn tay như bee đã có, nên chưa chạy được phép đo AUC tương đương |
 | G | ~~Chất liệu `struggle` đã có sẵn trong `friction`~~ | **RÚT LẠI — SAI** (đo lại vòng 4) | Vòng 3 kết luận "RÕ" từ ĐÚNG MỘT bản ghi (`tsk-1gn`) rồi suy rộng ra cả hệ thống. Đo toàn log: 131 friction = 81 `verify-miss` + 39 `merge-conflict` (92% telemetry máy), `detail` điển hình `goal-check failed on branch "fgw/tsk-puz" (exit null)` — ghi RẰNG hỏng, không ghi ĐÃ THỬ GÌ / VÌ SAO / CHỖ NGOẶT. Không phải chất liệu kể chuyện. Thứ làm vòng 3 phấn khích thực ra là `gates.askHistory`, KHÁC `friction` — vòng 3 lẫn hai thứ |
@@ -466,6 +522,42 @@ Diataxis hiện có (không đụng, không pha trộn — hard rule của
 
   **(e) Chưa mint gì.** Cả kết luận per-item lẫn nghĩa B đều mới qua một
   vòng — luật D4 đòi đứng vững qua hơn một vòng. Chờ vòng 9.
+
+- **2026-08-18 (vòng 9 — chủ sản phẩm đổi thứ tự bàn)** — Trước vòng này,
+  session trình bày lại phân tích vòng 8 (per-item+ngưỡng, nghĩa B "nháp")
+  kèm bằng chứng mới (`enduser-docs-index-stale` doctor check nay xanh
+  269/269 — xác nhận R6; `retrospective` queue lên lại 118 sau khi xuống 2
+  — xác nhận đọc bursty của vòng 6; `tsk-12m` vừa đo xong tỉ lệ quên 73.8%
+  và tự nêu đúng câu "va giữa D-tsk12m-B với mô hình mới" mà §1 đang treo
+  — đọc là đã tự giải sau khi Làn B bị rút ở vòng 8, cả changelog lẫn
+  storytelling giờ cùng chạy per-item trong `fgos-compounding`, không còn
+  population-sweep skill riêng nào để va nhau). Session cũng hỏi xác nhận
+  hai kết luận vòng 8 + đề xuất câu trả lời cho "hai trục cần cùng lúc
+  không" (không cần — changelog chỉ cần tag danh tính, không cần state
+  nhận thức mới).
+
+  **Chủ sản phẩm không trả lời các câu trên, mà đổi thứ tự bàn:** khoá
+  trục Diataxis+OKF (row D, §3) trước — nguyên văn "hiện chúng ta có
+  diataxis (nhận thức) và okf (audience, scope/area), hiện nay cần có một
+  cơ chế để xác định tài liệu/nhóm tài liệu nào là cần được tạo ra... đúng
+  thì có hệ thống xác định xem thông tin tạo ra bởi work-item vừa xong sẽ
+  được bổ xung vào tài liệu nào". Lý do nêu thẳng: không có cơ chế thì số
+  tài liệu tăng chóng mặt theo work-item — "đã từng và đang bị". Changelog/
+  marketing-storytelling đóng băng, bàn lại sau khi row D rõ.
+
+  Session scout trước khi hỏi tiếp (xem §1 vòng 9 để chi tiết đầy đủ):
+  đo thật `docs/explanation/` = 127 file với cụm chủ đề trùng lặp rõ
+  (worktree/discover/decompose ~20 file rời); đọc `fgos-compounding`
+  SKILL.md bước 3 xác nhận grow-vs-create hiện chỉ so khớp đường dẫn tự do
+  từng lần — khớp đúng luật văn bản `docs/specs/enduser-docs-authoring.md`
+  R4; và tìm ra fgOS đã có sẵn cơ chế "một chủ đề một chủ sở hữu" chạy
+  thật — không phải nhập OKF, mà chính `docs/specs/`'s Area Map 11-area +
+  mục "Lịch sử quyết định" gom-theo-area (`tsk-1lv-4`, mới landing tuần
+  này) — nhẹ hơn `authoritative_for`+anti-fork 3 tầng OKF. Đặt lại câu hỏi
+  cho chủ sản phẩm: tái dùng chung Area Map đó cho Diataxis luôn, hay
+  end-user docs cần bộ area riêng theo audience; và cơ chế fold-vào-
+  section-sẵn-có có nên làm nền thay vì xây `authoritative_for` từ đầu.
+  Chưa trả lời — chờ vòng 10.
 
 ## 6. Thiết kế đã chốt {#design}
 
