@@ -310,9 +310,9 @@ test('list --id scopes every id-keyed view section to just the requested item, e
   assert.equal(run(cwd, ['decision', '--text', 'global decision, no item', '--rationale', 'because global', '--relation', 'none']).status, 0);
 
   // Populate gates for BOTH items (ask/answer round trip).
-  assert.equal(run(cwd, ['ask', 'item-a', '--text', 'question about A']).status, 0);
+  assert.equal(run(cwd, ['ask', 'item-a', '--text', '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: question about A']).status, 0);
   assert.equal(run(cwd, ['answer', 'item-a', '--text', 'answer about A']).status, 0);
-  assert.equal(run(cwd, ['ask', 'item-b', '--text', 'question about B']).status, 0);
+  assert.equal(run(cwd, ['ask', 'item-b', '--text', '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: question about B']).status, 0);
   assert.equal(run(cwd, ['answer', 'item-b', '--text', 'answer about B']).status, 0);
 
   const data = envelopeData(run(cwd, ['list', '--id', 'item-a', '--json']).stdout);
@@ -326,13 +326,13 @@ test('list --id scopes every id-keyed view section to just the requested item, e
 
   assert.deepEqual(Object.keys(data.decisionsById ?? {}), ['item-a']);
   assert.deepEqual(Object.keys(data.gates ?? {}), ['item-a']);
-  assert.equal(data.gates['item-a'].ask, 'question about A');
+  assert.equal(data.gates['item-a'].ask, '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: question about A');
 });
 
 test('list default keeps an awaiting-human item visible (D2: excludes only the two terminal statuses done/wontfix, per wontfix-terminal-status-filter-consistency D2 -- never a broader ad-hoc closed/parked set like awaiting-human)', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'parked-item', { title: 'Parked Item' });
-  run(cwd, ['ask', 'parked-item', '--text', 'need a decision']);
+  run(cwd, ['ask', 'parked-item', '--text', '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: need a decision']);
 
   const work = envelopeData(run(cwd, ['list']).stdout).work;
   assert.equal(work['parked-item'].status, 'awaiting-human');
@@ -885,9 +885,9 @@ test('show returns the work record plus every per-item log scoped to just that i
   addDiscovery(dir, { id: 'other-item', clear: false, question: 'unrelated question' });
   run(cwd, ['decision', '--id', 'show-detail-item', '--text', 'D1: scoped detail', '--rationale', 'test fixture', '--relation', 'none']);
   run(cwd, ['decision', '--id', 'other-item', '--text', 'D1: unrelated decision', '--rationale', 'test fixture', '--relation', 'none']);
-  run(cwd, ['ask', 'show-detail-item', '--text', 'which shape?']);
+  run(cwd, ['ask', 'show-detail-item', '--text', '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: which shape?']);
   run(cwd, ['answer', 'show-detail-item', '--text', 'this one']);
-  run(cwd, ['ask', 'other-item', '--text', 'unrelated ask']);
+  run(cwd, ['ask', 'other-item', '--text', '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: unrelated ask']);
   addOutcome(dir, { id: 'show-detail-item', predicted: { tier: 'standard', deps: 0, priorVisits: 0 } });
   addOutcome(dir, { id: 'other-item', predicted: { tier: 'light', deps: 0, priorVisits: 0 } });
   addFriction(dir, { id: 'show-detail-item', disposition: 'parked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'goal-check failed' });
@@ -906,7 +906,7 @@ test('show returns the work record plus every per-item log scoped to just that i
   assert.equal(data.decisions.length, 1);
   assert.equal(data.decisions[0].text, 'D1: scoped detail');
 
-  assert.equal(data.gates.ask, 'which shape?');
+  assert.equal(data.gates.ask, '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: which shape?');
   assert.equal(data.gates.answer, 'this one');
 
   assert.equal(data.outcome.id, 'show-detail-item');
@@ -1250,7 +1250,7 @@ test('check on a second consecutive run over the same store prints a real trend 
   // Move the item out of "doing" (stale-suspect ×5) into "awaiting-human"
   // (×2) between the two checks — the score must genuinely shift, not just
   // repeat, so the delta on run 2 is real evidence of trend.
-  assert.equal(run(cwd, ['ask', 'entropy-trend-item', '--text', 'blocked on what?']).status, 0);
+  assert.equal(run(cwd, ['ask', 'entropy-trend-item', '--text', '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: blocked on what?']).status, 0);
 
   const second = run(cwd, ['check']);
   assert.equal(second.status, 0);

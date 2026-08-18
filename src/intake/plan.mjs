@@ -328,12 +328,12 @@ export function resolveCallerPlanVerdict(raw, lockedContext) {
 function formatProposalAsk(verdict, reason) {
   if (verdict.kind === 'decompose') {
     const list = verdict.children.map((c, i) => `${i + 1}. ${c.title} (verify: ${c.verify})`).join('\n');
-    return `Đề xuất chia (chưa ghi vào queue, cần xác nhận) — ${reason}\n${list}`;
+    return `## Context\n\nĐề xuất chia (chưa ghi vào queue, cần xác nhận) — ${reason}\n${list}\n\n## Why this matters\n\nCần xác nhận trước khi các việc con được ghi thật vào queue — sai sót ở đây tốn công dọn lại sau.`;
   }
   if (verdict.kind === 'pass-through') {
-    return `Đề xuất: không chia (pass-through) — ${reason}`;
+    return `## Context\n\nĐề xuất: không chia (pass-through) — ${reason}\n\n## Why this matters\n\nCần xác nhận trước khi việc này được coi là một khối duy nhất, không tách nhỏ.`;
   }
-  return `Đề xuất chia — ${reason}`;
+  return `## Context\n\nĐề xuất chia — ${reason}\n\n## Why this matters\n\nCần xác nhận trước khi các việc con được ghi thật vào queue.`;
 }
 
 // tsk-5e97 D1 (docs/history/tsk-5e97-decompose-footprint-overlap-gate/
@@ -621,8 +621,11 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
         );
       }
       const ask =
+        `## Context\n\n` +
         `Verify hiện tại của item (sẽ được stamp lúc sang executing) bị nghi ngờ ở vòng kiểm tra thứ hai: ${planVerifyDispute.reason}\n` +
-        `Verify: ${planApproveVerify}`;
+        `Verify: ${planApproveVerify}\n\n` +
+        `## Why this matters\n\n` +
+        `Cần xác nhận trước khi verify này được stamp thật vào item lúc sang executing.`;
       putInAwaiting(dir, { id, ask, statusAtAsk: work.status });
       return { outcome: 'verify-disputed', id, secondPass: planVerifyDispute };
     }

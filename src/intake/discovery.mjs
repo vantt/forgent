@@ -449,8 +449,10 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
           });
         } else {
           const ask =
+            `## Context\n\n` +
             `Đề xuất verify bị nghi ngờ (chưa ghi vào clarify->planning, cần xác nhận) — ` +
-            `vòng 1 đề xuất: ${verdict.verify}\n` +
+            `vòng 1 đề xuất: ${verdict.verify}\n\n` +
+            `## Why this matters\n\n` +
             `vòng 2 (kiểm tra độc lập) không đồng ý: ${secondPass.reason}`;
           // statusAtAsk (claim-lock §5.1): same rule as the unclear branch
           // below — read at function entry, before this park.

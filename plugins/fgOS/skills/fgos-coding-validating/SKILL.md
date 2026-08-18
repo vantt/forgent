@@ -21,6 +21,7 @@ pass to keep the item moving.
 
 ## Hard rules
 
+- When asking questions (`fgos ask`), format question text using self-contained citations (`../_shared/citation-format.md`) and the required two-heading Markdown structure (`## Context` and `## Why this matters`, each followed by at least 20 characters of content).
 - When one of this skill's `fgos <verb>` calls (`plan`, `decision`,
   `gate-approve`) fails with a known error category, relay that category
   verbatim in the hand-back — never fold it into a generic "blocked"

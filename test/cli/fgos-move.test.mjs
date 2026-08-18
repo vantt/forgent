@@ -186,7 +186,7 @@ test('move --to wontfix from awaiting-human succeeds when --answer is supplied, 
   run(cwd, ['init']);
   addOk(cwd, 'move-wontfix-from-ask');
   run(cwd, ['move', 'move-wontfix-from-ask', '--to', 'doing']);
-  run(cwd, ['ask', 'move-wontfix-from-ask', '--text', 'still relevant?']);
+  run(cwd, ['ask', 'move-wontfix-from-ask', '--text', '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: still relevant?']);
   assert.equal(stateView(cwd).work['move-wontfix-from-ask'].status, 'awaiting-human');
 
   const result = run(cwd, ['move', 'move-wontfix-from-ask', '--to', 'wontfix', '--answer', 'refuted by later evidence, closing']);
@@ -199,7 +199,7 @@ test('move --to wontfix from awaiting-human still refuses with no --answer, same
   run(cwd, ['init']);
   addOk(cwd, 'move-wontfix-no-answer');
   run(cwd, ['move', 'move-wontfix-no-answer', '--to', 'doing']);
-  run(cwd, ['ask', 'move-wontfix-no-answer', '--text', 'still relevant?']);
+  run(cwd, ['ask', 'move-wontfix-no-answer', '--text', '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: still relevant?']);
 
   const result = run(cwd, ['move', 'move-wontfix-no-answer', '--to', 'wontfix']);
   assert.notEqual(result.status, 0);

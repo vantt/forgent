@@ -24,6 +24,7 @@ directly by `fgos-coding-planning`, mid-`planning`, when that skill finds
 
 ## Hard rules
 
+- When asking questions (`fgos ask`), format question text using self-contained citations (`../_shared/citation-format.md`) and the required two-heading Markdown structure (`## Context` and `## Why this matters`, each followed by at least 20 characters of content).
 - Every bare `fgos <verb>` this skill calls (`add`, `ask`, `answer`,
   `decision`, `discover`, `tool`) is `requiresExistingStore: true` — resolve the
   main checkout root the same way the gate check below already does

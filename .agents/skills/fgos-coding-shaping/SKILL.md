@@ -33,6 +33,7 @@ see the "Distill mode" section below for how the second one differs.
 
 ## Hard rules
 
+- When asking questions (`fgos ask`), format question text using self-contained citations (`../_shared/citation-format.md`) and the required two-heading Markdown structure (`## Context` and `## Why this matters`, each followed by at least 20 characters of content).
 - Never write `docs/history/<feature>/CONTEXT.md` or `plan.md` — that stays
   `fgos-coding-exploring`'s and `fgos-coding-planning`'s job, unchanged by this skill.
   This skill's only artifact is `DISCUSSION.md`.
