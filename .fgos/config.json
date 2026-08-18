@@ -54,6 +54,8 @@
               "{prompt}",
               "--dangerously-skip-permissions",
               "--new-project",
+              "--print-timeout",
+              "10m",
               "--model",
               "{model}"
             ]
