@@ -48,7 +48,7 @@ bắt, và thứ sẽ gây xung đột thật nếu chạy song song:
 
 | §7 | Gộp vào | Vì sao |
 |---|---|---|
-| P4 (`footprint` bắt buộc) | **P1** | Cả hai sửa `src/runner/dispatch.mjs` + `test/runner/dispatch.test.mjs`. Chỗ đòi `footprint` chính là cửa `execute --work` — tách ra là chia đôi một hàm |
+| P4 (`footprint` bắt buộc) | **P1** | Chỗ đòi `footprint` chính là một nhánh refusal của `prepareDispatch` — tách ra là chia đôi một hàm |
 | P3 (token + cold-pickup) | **P2** | Cả hai sửa `fgos-coding-implement/SKILL.md` và chính file hợp đồng. Token và cold-pickup **là nội dung của hợp đồng**, không phải việc rời |
 
 P5 giữ nguyên thành child thứ ba, độc lập hoàn toàn — không đụng file nào
@@ -56,26 +56,50 @@ của P1/P2. Ghi chú tier A cho nó nằm ở cuối file.
 
 ## Files likely touched
 
-- **P1:** `src/runner/dispatch.mjs`, `test/runner/dispatch.test.mjs`
+- **P1 (đã đổi hình, D7):** gom `src/runner/dispatch.mjs` (2204 dòng) thành
+  `dispatch/{config,resolve,mechanism,transport,prepare,cli}.mjs`, giữ
+  `dispatch.mjs` làm **barrel re-export** (13 importer không đổi dòng nào),
+  + `test/runner/dispatch.test.mjs`
 - **P2:** `.agents/skills/_shared/coding-worker-contract.md` (mới) +
   bản mirror `plugins/fgOS/skills/_shared/`,
   `.agents/skills/fgos-coding-implement/SKILL.md` + 2 bản mirror,
   `src/state/workflow-stage-graphs.mjs` (seam),
-  `src/runner/dispatch.mjs` (`buildPrompt`'s `skillPath` → contract),
+  `src/runner/dispatch/prepare.mjs` (`buildPrompt`'s `skillPath` → contract;
+  P1 chuyển `buildPrompt` về module này vì nó là assembly payload),
   `test/skills/fgos-mirror.test.mjs`
 - **P3 (nguyên P5):** `src/setup/registrations.mjs`,
   `test/setup/checks.test.mjs`
 
-P1 và P2 giao nhau đúng một file: `src/runner/dispatch.mjs`. P1 sửa nhánh
-CLI/`executeExecutorCli`, P2 sửa `buildPrompt`'s `skillPath` — khác hàm,
-nhưng **cùng file**, nên P2 phải chạy sau P1, không song song. P3 không
-giao với cả hai, chạy song song được.
+P1 và P2 giao nhau đúng một file, giờ là `src/runner/dispatch/prepare.mjs`
+(P1 tạo nó; P2 đổi đích của `skillPath` trong đó) — vẫn cùng file, nên
+`deps` đã khoá P2 sau P1. P3 không giao với cả hai, chạy song song được.
+
+**Đổi hình P1 (D7).** Bản đầu là "thêm cờ `--work` vào `executeExecutorCli`"
+— tức thêm cửa thứ mười một vào một đống mười cửa rời rạc rồi gọi nó là
+*additive*. Đo thật: `dispatch.mjs` 2204 dòng chứa **6 concern** tách bạch
+được mà không có ranh giới nào (riêng config + 7 hàm `validate*Shape` đã là
+794 dòng, 36% cả file). Đó mới là chỗ tùm lum — không phải dispatch phức
+tạp, mà sáu mối quan tâm dùng chung một file nên cái nào cũng rò vào lý
+luận của cái kia. Nguyên tắc người dùng đặt: hình dạng cuối phải là
+**clear boundary, contract rõ, đổi và biến hình dễ, không chắp vá**; thấy
+tùm lum thì gom lại.
+
+`prepareDispatch(unit, opts) → {payload, transport, economics, refusal?}`
+là khái niệm có tên ở giữa, **biết kind** (D5), refusal **có kiểu và không
+ai lách** (beehive), tự ghi `executor.dispatch` (nên Step B.5 của tsk-3kl
+bị supersede), và để sẵn slot `economics` cho `tsk-492`. Mọi cửa đi qua
+nó: `execute --work`, `--task` sau này, `spawnWorker` (đường tự động), và
+hook gọi cùng lõi kiểm — lưới với khuôn đọc chung một luật.
+
+Barrel là điều kiện an toàn: 13 file import từ `runner/dispatch.mjs`, với
+barrel thì **không file nào phải sửa**, nên việc gom chứng minh được là
+behavior-neutral, và `test/runner/dispatch.test.mjs` (175K) là lưới.
 
 ## Risk map
 
 | Thành phần | Mức | Cái gì chứng minh |
 |---|---|---|
-| Cửa `execute --work` + refusal có kiểu | standard | `test/runner/dispatch.test.mjs` — case đã claim / chưa claim / thiếu `footprint` |
+| Gom `dispatch.mjs` thành module + `prepareDispatch` + refusal có kiểu | **heavy** | `npm test` toàn bộ (13 importer đi qua barrel, `dispatch.test.mjs` 175K là lưới) + case đã claim / chưa claim / thiếu `footprint` |
 | Tách driver/worker trên skill đang dùng hằng ngày | **heavy** | `npm test` toàn bộ + `fgos-mirror.test.mjs`; và một lần chạy dispatch THẬT end-to-end sau khi tách, không chỉ test |
 | Seam per-domain trong registry đóng băng | standard | `fgos-mirror.test.mjs` + test registry hiện có; seam vắng mặt phải là no-op cho 3 domain fixture |
 | `buildPrompt`'s `skillPath` đổi đích | standard | Đây là chỗ V3 (mâu thuẫn) được sửa — verify của P2 mang vế negative đúng chỗ này |
@@ -93,27 +117,50 @@ thật và event log mới sở hữu phần đó.
 ```json
 [
   {
-    "title": "Add execute --work <id> to dispatch.mjs: build the payload from the claimed item, and refuse to issue it when the item is unclaimed or carries no footprint",
-    "verify": "node --test test/runner/dispatch.test.mjs",
-    "action": "D2: mảnh đã chia phải giao được cho provider rẻ mà không cần model mạnh dựng gói prompt bằng tay -- thêm cửa --work cho executeExecutorCli để nó phân giải item rồi dựng payload qua buildPrompt đã có, đóng bất đối xứng với decide (đã có --work). Cửa này đồng thời là chỗ kiểm tính hợp lệ của lời gọi: từ chối có kiểu (không phải exception, không bao giờ lách) khi item chưa status doing, hoặc khi footprint rỗng -- footprintDiffHits miễn trừ footprint rỗng nên nếu không đòi ở đây thì kiểm tra ranh giới file im lặng vô hiệu. KHÔNG quyết định lại cơ chế dispatch (tsk-5tm-3 D5 cấm, Step A đã quyết) -- chỉ kiểm lời gọi hợp lệ.",
-    "footprint": ["src/runner/dispatch.mjs", "test/runner/dispatch.test.mjs"],
+    "title": "Gom dispatch.mjs thành module có ranh giới rõ, với prepareDispatch(unit, opts) là khái niệm có tên ở giữa; dispatch.mjs thành barrel",
+    "verify": "npm test && test -f src/runner/dispatch/prepare.mjs && grep -q \"export function prepareDispatch\" src/runner/dispatch/prepare.mjs && test $(wc -l < src/runner/dispatch.mjs) -lt 200 && ! grep -q \"function validateExecutorShape\" src/runner/dispatch.mjs",
+    "action": "D7 + D6: gom dispatch.mjs (2204 dòng, 6 concern lẫn một file) thành dispatch/{config,resolve,mechanism,transport,prepare,cli}.mjs, dispatch.mjs giữ làm barrel re-export nên 13 importer không đổi dòng nào. prepareDispatch(unit, opts) -> {payload, transport, economics, refusal?} là khái niệm có tên ở giữa: biết kind theo D5 (lifecycle-bearing vs ephemeral), refusal có kiểu không ai lách, kiểm claim-ownership và footprint rỗng tại đây, tự ghi executor.dispatch (supersede Step B.5 của tsk-3kl), để sẵn slot economics cho tsk-492. Mọi cửa đi qua nó: execute --work, --task sau này, spawnWorker, và hook gọi cùng lõi kiểm. KHÔNG quyết định lại cơ chế (tsk-5tm-3 D5), KHÔNG đổi hành vi -- gom và đặt tên, mọi named export giữ nguyên.",
+    "footprint": [
+      "src/runner/dispatch.mjs",
+      "src/runner/dispatch/config.mjs",
+      "src/runner/dispatch/resolve.mjs",
+      "src/runner/dispatch/mechanism.mjs",
+      "src/runner/dispatch/transport.mjs",
+      "src/runner/dispatch/prepare.mjs",
+      "src/runner/dispatch/cli.mjs",
+      "test/runner/dispatch.test.mjs"
+    ],
     "kind": "feature",
-    "risk": "standard"
+    "risk": "heavy"
   },
   {
     "title": "Split fgos-coding-implement into a driver half and a worker half, add the provider-neutral worker contract with fixed status tokens and cold-pickup refusal, and point the dispatch template at it through a per-domain registry seam",
     "verify": "npm test && test -f .agents/skills/_shared/coding-worker-contract.md && grep -qF 'cold-pickup' .agents/skills/_shared/coding-worker-contract.md && grep -qF '[BLOCKED]' .agents/skills/_shared/coding-worker-contract.md && ! grep -qE 'fgos (return|discover|plan) ' .agents/skills/_shared/coding-worker-contract.md",
     "action": "D3: tách fgos-coding-implement thành phần driver (claim/decide/dispatch/verify/return/Iron Law) và phần worker (làm trong ranh giới, chứng minh, báo token), để in-process và out-of-process thi hành CÙNG một hợp đồng -- phiên Claude khi không dispatch cũng theo đúng hợp đồng đó, y như agy. D4: cấu trúc tổng quát, nội dung của coding -- chỗ nối khai ở registry theo đúng khuôn opt-in per-domain của roleGraph (vắng mặt = domain đó không dispatch worker, phải là no-op cho 3 domain fixture), còn nội dung viết một bản cho coding, tên coding-specific theo tiền lệ fgos-coding-driving D12. Hợp đồng mang: nạp Execute-loop của skill được trỏ, chỉ là phần thực thi, ranh giới là footprint (file không được nêu tên là câu hỏi phạm vi cho orchestrator), cold-pickup refusal (prompt không đủ thì trả BLOCKED nêu đúng chỗ thiếu, không đoán), token trả về cố định, gate/quyết định thuộc người. Vế negative của verify khoá đúng mâu thuẫn V3: hợp đồng KHÔNG được bảo worker gọi verb ghi state. Ràng buộc cách viết (upstream pi, docs/distillery/sources/pi.md § integration-contract): token cố định là mẫu số chung thấp nhất cho executor chỉ có print-mode; viết hợp đồng sao cho KHÔNG cấm đường một kênh trả về có cấu trúc (pi's --mode json / --mode rpc phát cùng bộ AgentSessionEvent dưới dạng JSONL) khi provider có -- kênh trả về là thuộc tính của từng executor, không phải một hình dạng hardcode trong hợp đồng.",
-    "footprint": [".agents/skills/_shared/coding-worker-contract.md", "plugins/fgOS/skills/_shared/coding-worker-contract.md", ".agents/skills/fgos-coding-implement/SKILL.md", "plugins/fgOS/skills/fgos-coding-implement/SKILL.md", ".claude/skills/fgos-coding-implement/SKILL.md", "src/state/workflow-stage-graphs.mjs", "src/runner/dispatch.mjs", "test/skills/fgos-mirror.test.mjs"],
+    "footprint": [
+      ".agents/skills/_shared/coding-worker-contract.md",
+      "plugins/fgOS/skills/_shared/coding-worker-contract.md",
+      ".agents/skills/fgos-coding-implement/SKILL.md",
+      "plugins/fgOS/skills/fgos-coding-implement/SKILL.md",
+      ".claude/skills/fgos-coding-implement/SKILL.md",
+      "src/state/workflow-stage-graphs.mjs",
+      "src/runner/dispatch/prepare.mjs",
+      "test/skills/fgos-mirror.test.mjs"
+    ],
     "kind": "feature",
     "risk": "heavy",
-    "deps": [0]
+    "deps": [
+      0
+    ]
   },
   {
     "title": "Register the advise and execute capability slots as a fgos setup configDefault plus a doctor check, so the empty capabilities map gets filled through the sanctioned door instead of a hand edit",
     "verify": "npm test && node --test test/setup/checks.test.mjs test/setup/checks-setup-config.test.mjs",
     "action": "D2: phân vai theo trí tuệ cần hai slot tách bạch -- advise (giá trị đến từ bất đồng, không đổi state, một hỏi một đáp) và execute (giá trị đến từ tuân thủ, sửa file, phải verify) -- gộp chung một cơ chế là một phần lý do dispatch cồng kềnh. Cửa decide --for <purpose> đã xây đủ nhưng .fgos/config.json có capabilities rỗng hoàn toàn nên chưa ai ở. KHÔNG sửa .fgos/config.json bằng tay: ADR0020 strip .fgos/ khỏi mọi worktree nên không child nào chạm được, và AGENTS.md's Install/setup/doctor gate đã bắt buộc đúng cửa còn lại -- một config default phải register vào fgos setup's config-merge VÀ fgos doctor's check registry, không được đứng một mình undiscoverable by doctor. Cơ chế đã có sẵn: configDefault registration + assembleRegistryDefaults (src/setup/registrations.mjs:163), gọi bởi ensureSharedConfigDefaults và checkConfigNotStale.",
-    "footprint": ["src/setup/registrations.mjs", "test/setup/checks.test.mjs"],
+    "footprint": [
+      "src/setup/registrations.mjs",
+      "test/setup/checks.test.mjs"
+    ],
     "kind": "feature",
     "risk": "standard"
   }
