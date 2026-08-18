@@ -20,7 +20,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { collectWideSourceFiles, findWideCitationFindings } from '../../scripts/check-decision-citation-drift.mjs';
+import { collectWideSourceFiles, findWideCitationFindings, isDLocalId } from '../../scripts/check-decision-citation-drift.mjs';
 
 const D_ID_PATTERN = /\bD\d+\b/g;
 const D_ID_TEXT_PREFIX_PATTERN = /^(D\d+):/;
@@ -109,7 +109,20 @@ export function checkImpactDoor(item, decisions, repoRoot) {
   const sourceFiles = collectWideSourceFiles(repoRoot, { excludeRelDirs: docsRef ? [docsRef] : [] });
   for (const d of ownSupersedes) {
     const oldId = d.relation.slice('supersedes:'.length);
-    for (const hit of findWideCitationFindings(sourceFiles, oldId, item.id)) {
+    let homeFile;
+    if (isDLocalId(oldId)) {
+      if (docsRef) {
+        homeFile = path.posix.join(docsRef, 'CONTEXT.md');
+      }
+    }
+    let effectiveSourceFiles = sourceFiles;
+    if (homeFile && !effectiveSourceFiles.some((s) => s.file === homeFile)) {
+      const absHome = path.join(repoRoot, homeFile);
+      if (fs.existsSync(absHome)) {
+        effectiveSourceFiles = [...effectiveSourceFiles, { file: homeFile, lines: fs.readFileSync(absHome, 'utf8').split('\n') }];
+      }
+    }
+    for (const hit of findWideCitationFindings(effectiveSourceFiles, oldId, item.id, homeFile)) {
       findings.push({ door: 'impact', ...hit });
     }
   }

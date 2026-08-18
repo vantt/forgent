@@ -140,6 +140,25 @@ test('findWideCitationFindings: whole-word match only -- does not flag a substri
   assert.equal(findings.length, 0);
 });
 
+test('findWideCitationFindings: D-local targetId with homeFile restricts findings to homeFile only', () => {
+  const sourceFiles = [
+    { file: 'docs/history/host-item/CONTEXT.md', lines: ['this cites D8 directly'] },
+    { file: 'docs/specs/other.md', lines: ['unrelated doc also cites D8'] },
+  ];
+  const findings = findWideCitationFindings(sourceFiles, 'D8', 'host-item', 'docs/history/host-item/CONTEXT.md');
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0].file, 'docs/history/host-item/CONTEXT.md');
+});
+
+test('findWideCitationFindings: D-local targetId with homeFile omitted returns []', () => {
+  const sourceFiles = [
+    { file: 'docs/history/host-item/CONTEXT.md', lines: ['this cites D8 directly'] },
+    { file: 'docs/specs/other.md', lines: ['unrelated doc also cites D8'] },
+  ];
+  const findings = findWideCitationFindings(sourceFiles, 'D8', 'host-item');
+  assert.deepEqual(findings, []);
+});
+
 test(
   'collectWideSourceFiles: default roots reach .agents/skills, a stale ' +
     'citation there is no longer invisible (tsk-12v)',
@@ -291,4 +310,34 @@ test('CLI: touches does not run the dangling-citation sweep', () => {
   assert.equal(result.status, 0);
   const data = envelopeData(result.stdout);
   assert.ok(!('danglingCitations' in data));
+});
+
+test('CLI: supersedes with D-local id scopes sweep to host item CONTEXT.md only (tsk-679 regression)', () => {
+  const cwd = initCwd();
+  assert.equal(
+    run(cwd, ['add', '--id', 'host-item', '--title', 'Host item', '--kind', 'task', '--risk', 'light', '--verify', 'npm test', '--description', 'fixture item']).status,
+    0,
+  );
+  fs.mkdirSync(path.join(cwd, 'docs', 'history', 'host-item'), { recursive: true });
+  fs.writeFileSync(
+    path.join(cwd, 'docs', 'history', 'host-item', 'CONTEXT.md'),
+    'line one cites D8 without acknowledgement\n',
+  );
+  fs.mkdirSync(path.join(cwd, 'docs', 'specs'), { recursive: true });
+  fs.writeFileSync(
+    path.join(cwd, 'docs', 'specs', 'other.md'),
+    'unrelated line cites D8 elsewhere\n',
+  );
+
+  const result = run(cwd, [
+    'decision', '--id', 'host-item',
+    '--text', 'D9: supersedes local D8',
+    '--rationale', 'because reasons',
+    '--relation', 'supersedes:D8',
+  ]);
+  assert.equal(result.status, 0);
+  const data = envelopeData(result.stdout);
+  assert.ok(Array.isArray(data.danglingCitations));
+  assert.equal(data.danglingCitations.length, 1);
+  assert.match(data.danglingCitations[0], /host-item\/CONTEXT\.md:1/);
 });
