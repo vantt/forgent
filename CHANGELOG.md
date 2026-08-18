@@ -65,6 +65,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `fgos decision` now requires `--text` explicitly. Before this, a call
+  with no `--text` silently fell back to joining whatever positional
+  arguments were left over (e.g. `fgos decision write "..."` stored
+  "write ..." as the decision text) instead of refusing — the CLI now
+  refuses cleanly (exit 4) rather than storing corrupted decision text.
 - The `agy` (Antigravity Cli) executor no longer dispatches with
   `--dangerously-skip-permissions` (`.fgos/config.json`'s
   `runner.executors.agy`, now `--mode accept-edits`). `fgos doctor`/`fgos

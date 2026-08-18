@@ -1939,7 +1939,7 @@ async function runVerb(verb, flags, positional, dir) {
     }
 
     case 'decision': {
-      const text = requireField(flags.text ?? (positional.length ? positional.join(' ') : undefined), 'decision requires --text "..."');
+      const text = requireField(flags.text, 'decision requires --text "..."');
       const rationale = requireField(flags.rationale, 'decision requires --rationale "..."');
       const alternatives = optionalField(flags.alternatives, 'decision --alternatives requires a non-empty value (omit --alternatives entirely to skip it)');
       const source = optionalField(flags.source, 'decision --source requires a non-empty value (omit --source entirely to skip it)');
