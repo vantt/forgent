@@ -85,8 +85,15 @@ theo số work-item, "đã từng và đang bị". Đây chính là §3 dòng D,
 vòng 3. Đo lại trước khi bàn (kỷ luật D-tsk28x đã lặp lại nhiều lần: đo
 trước khi rút ràng buộc):
 
-- `docs/explanation/` hiện có **127 file** (`how-to` 76, `reference` 19,
-  `tutorial` 1) — tăng thật, và có cụm chủ đề trùng lặp rõ: riêng nhóm
+- `docs/explanation/` hiện có **161 file** (`how-to` 85, `reference` 21,
+  `tutorial` 1 — tổng **268**; số 127/223 ghi lần scout đầu là đo trên
+  worktree cũ, đã sửa sau khi đồng bộ `main`). **Tốc độ tăng đo bằng
+  tree-diff chính xác: +50 tài liệu end-user trong đúng 7 ngày**
+  (2026-08-11 13:32 → 2026-08-18, `git diff --diff-filter=A 7df2b894
+  HEAD`) ≈ **7,1 tài liệu/ngày**, tức corpus tự nhân đôi trong ~5 tuần nếu
+  không đổi gì. Đây là con số biến lời chủ sản phẩm "đã từng và đang bị"
+  thành tốc độ đo được — và 50 tài liệu đó sinh ra TRONG lúc chính thảo
+  luận này đang đỗ. Kèm cụm chủ đề trùng lặp rõ: riêng nhóm
   worktree/discover/decompose đã chiếm ~20 file rời (`discover-loop-pool-
   ordering-and-stop-rules.md`, `why-discover-was-rewritten-...md`, `why-
   decomposes-skip-and-advance-...md`, `orphaned-worktree-reclaim-...md`,
@@ -137,10 +144,10 @@ xác nhận (chưa mint):**
 - Fold ở độ mịn "area" ĐÃ tạo ra file khổng lồ, nhìn thấy được:
   `runner.md` **2476 dòng**, `work-state.md` **2290 dòng** — repo tự đặt
   `docs.maxLoc: 800`, tức vượt gấp 3, mà mới hấp thụ 15 và 12 narrative.
-- Histogram từ khoá trên 223 tên file end-user docs: `merge` 23, `verify`
+- Histogram từ khoá trên tên file end-user docs: `merge` 23, `verify`
   19, `item` 19, `approve` 13, `executor` 12, `discover` 12, `checkout`
   12, `worktree` 11, `lock` 11, `decompose` 11 — gần như tất cả rơi vào
-  đúng hai area `runner` + `work-state`. Fold 223 file vào 10 area ⇒ riêng
+  đúng hai area `runner` + `work-state`. Fold 268 file vào 10 area ⇒ riêng
   tài liệu "runner" hấp thụ 60-80 file ≈ **10.000+ dòng**. Tái tạo đúng
   thất bại đang có, chỉ đổi hình dạng từ 127 file rời sang 1 file không ai
   đọc nổi.
@@ -171,8 +178,10 @@ và tăng theo mỗi work-item.
 
 **Nguyên tắc chọn độ mịn, tính được thay vì cảm tính:** chọn số chủ đề sao
 cho tài liệu sống sau fold vẫn dưới `docs.maxLoc: 800` dòng. Ước lượng thô:
-223 tài liệu × ~50-150 dòng prose sau fold ⇒ ~6-10 nguồn mỗi đích ⇒
-**~25-35 chủ đề**. Tự hiệu chỉnh khi corpus lớn lên.
+268 tài liệu × ~50-150 dòng prose sau fold ⇒ ~8-11 nguồn mỗi đích ⇒
+**~25-35 chủ đề**. Tự hiệu chỉnh khi corpus lớn lên — và với tốc độ
++7,1/ngày đo được, "tự hiệu chỉnh" không phải tính năng xa xỉ mà là điều
+kiện sống của registry.
 
 **Một nửa cỗ máy đã xây xong và đang xanh** — Row D không phải xây từ đầu:
 `docs/enduser-docs-index.json` + `fgos docs-index` ✓; doctor check
@@ -231,7 +240,7 @@ Diataxis hiện có (không đụng, không pha trộn — hard rule của
 | A | **Trục nào?** | **D-tsk28x-1** (vòng 3) | Hai trục, bắt buộc, hiện fgOS mới có một. Diataxis = trục TRẠNG THÁI NHẬN THỨC người đọc; OKF 9-type = trục DANH TÍNH (tài liệu này LÀ gì, của ai, về vấn đề gì). Vuông góc, một tài liệu mang cả hai nhãn |
 | B | Đóng hay mở | **ĐÃ CHỐT — D-tsk28x-3 (vòng 9)** | `struggle` KHÔNG nằm trong 4 quadrant Diataxis (Diataxis dựng từ 2 chiều hành-động/nhận-thức × tiếp-thu/vận-dụng, ra đúng 4 ô, không ô nào là struggle). Trục trạng-thái-nhận-thức ("cách viết") là **registry MỞ của nhiều FRAMEWORK**, không chỉ nhiều profile trong một lưới — Diataxis là một framework cụ thể (đóng, 4 ô); marketing-storytelling có thể cần một framework khác hẳn bản chất (cung truyện/narrative arc, không xuất phát từ lưới action×cognition của Diataxis). Mỗi framework tự đóng vocabulary riêng; trục thì mở cho framework mới gia nhập. Chủ sản phẩm tổng quát hoá đúng câu này ở vòng 9, sau khi vòng 2/3/8 đã ba lần khẳng định không ai bác |
 | C | **GHI hay ĐỀ XUẤT** | **TRẢ LỜI V3** (chưa D-ID) — câu hỏi vòng 2 đặt SAI | Không chọn một cho cả hệ thống — tách theo GIAI ĐOẠN. **Thu chất liệu: ghi thẳng, liên tục, không bao giờ dừng để hỏi** (ràng buộc chủ sản phẩm đặt: nhanh, rẻ, ít token, không cắt ngang luồng làm việc khác — loại thẳng mọi phương án gọi LLM phân loại ngay lúc capture). **Tổng hợp: nhiều pha, có triage nổi ứng viên, có người duyệt.** Lý do OKF sợ tự-ghi chỉ áp cho TÀI LIỆU (giả vờ là kết luận đã biên tập), không áp cho CHẤT LIỆU THÔ (chỉ ghi "đã xảy ra chuyện này"). Cửa gác đặt đúng chỗ chất liệu biến thành khẳng định |
-| D | Ai giữ "một chủ đề một chủ sở hữu" khi số tài liệu tăng | **ĐANG BÀN — vòng 9; hai câu hỏi con ĐÃ CÓ CÂU TRẢ LỜI CÓ BẰNG CHỨNG (chưa mint), hai câu mới mở** | `fgos-coding-compounding` grow-vs-create CHỈ bằng `fs.existsSync` — đúng luật văn bản (`docs/specs/enduser-docs-authoring.md` R4), không phải bug. Đo vòng 9: `explanation` 127 / `how-to` 76 / `reference` 19 / `tutorial` 1 = 223 file; cụm worktree/discover/decompose ~20 file rời — bằng chứng va chạm thật (R5 area spec đó tự mở khoá: "chỉ cân nhắc trục thứ hai khi tài liệu thật va chạm"). **Tiền lệ: `tsk-1lv-4` CHÍNH LÀ cuộc di cư này, đã chạy xong — 30+ file ADR → fold vào 5 đích + index sinh tự động + doctor check.** Trả lời (1): tái dùng CƠ CHẾ, không tái dùng VOCABULARY — fold ở độ mịn area đã đẻ `runner.md` 2476 dòng / `work-state.md` 2290 dòng (repo đặt `docs.maxLoc: 800`), và 223 file đo được đều dồn vào 2 area đó ⇒ 10.000+ dòng một file; D-ADR0008 (đã khoá) đòi chia theo audience của TỪNG interface. Trả lời (2): fold-mechanism làm nền CÓ; anti-fork gate KHÔNG — nó chống fork tên-gần-giống, còn fgOS fork NGỮ NGHĨA (3 file cùng chủ đề reclaim-worktree, skeleton-match bắt 0/3); thứ chặn được là vocabulary ĐÓNG tại lúc GHI. Còn mở: (a) vocabulary suy bottom-up hay liệt kê top-down; (b) 223 file cũ fold ngược toàn bộ / chỉ áp cho mới / fold dần |
+| D | Ai giữ "một chủ đề một chủ sở hữu" khi số tài liệu tăng | **ĐANG BÀN — vòng 9; hai câu hỏi con ĐÃ CÓ CÂU TRẢ LỜI CÓ BẰNG CHỨNG (chưa mint), hai câu mới mở** | `fgos-coding-compounding` grow-vs-create CHỈ bằng `fs.existsSync` — đúng luật văn bản (`docs/specs/enduser-docs-authoring.md` R4), không phải bug. Đo vòng 9 (sau khi đồng bộ `main`): `explanation` 161 / `how-to` 85 / `reference` 21 / `tutorial` 1 = **268 file**, tăng **+50 trong 7 ngày** (tree-diff `7df2b894..HEAD`) ≈ 7,1/ngày; cụm worktree/discover/decompose ~20 file rời — bằng chứng va chạm thật (R5 area spec đó tự mở khoá: "chỉ cân nhắc trục thứ hai khi tài liệu thật va chạm"). **Tiền lệ: `tsk-1lv-4` CHÍNH LÀ cuộc di cư này, đã chạy xong — 30+ file ADR → fold vào 5 đích + index sinh tự động + doctor check.** Trả lời (1): tái dùng CƠ CHẾ, không tái dùng VOCABULARY — fold ở độ mịn area đã đẻ `runner.md` 2476 dòng / `work-state.md` 2290 dòng (repo đặt `docs.maxLoc: 800`), và 223 file đo được đều dồn vào 2 area đó ⇒ 10.000+ dòng một file; D-ADR0008 (đã khoá) đòi chia theo audience của TỪNG interface. Trả lời (2): fold-mechanism làm nền CÓ; anti-fork gate KHÔNG — nó chống fork tên-gần-giống, còn fgOS fork NGỮ NGHĨA (3 file cùng chủ đề reclaim-worktree, skeleton-match bắt 0/3); thứ chặn được là vocabulary ĐÓNG tại lúc GHI. Còn mở: (a) vocabulary suy bottom-up hay liệt kê top-down; (b) 223 file cũ fold ngược toàn bộ / chỉ áp cho mới / fold dần |
 | E | Ranh giới scope `tsk-28x` vs `tsk-12m` | **ĐÃ CHỐT — D-tsk28x-2 (vòng 7)** | Vòng 1 hỏi "thứ tự nào trước". Vòng 3 đổi câu hỏi: đường ống 5 pha (§6) rõ ràng lớn hơn cả hai item cộng lại. **Bổ sung 2026-08-09:** `tsk-12m` vòng 4 tìm ra ranh giới **quan sát/nhắc vs quyết/viết/chặn** (`docs/history/automated-changelog-compound-learn/DISCUSSION.md` §6.1) — loại quan sát/nhắc độc lập hoàn toàn với câu hỏi §6.4 ở đây và **sống sót qua mọi phương án**, nên làm được ngay, không cần chờ `tsk-28x`. **Vòng 7 (2026-08-11):** chủ sản phẩm xác nhận tách quan hệ — `tsk-28x` không còn `deps` trên `tsk-12m`; `tsk-12m` tự xây phần quan-sát/nhắc độc lập, phần ghi/registry của nó cắm vào bất cứ hình dạng `tsk-28x` chốt sau, không phải chờ ngược lại |
 | F | Hình dạng pha TRIAGE (pha 1, §6) | ĐỠ MỜ sau vòng 5 — xem J2 | Pha triage phải chấm điểm ứng viên. Bài học B6b (§5 vòng 2): tín hiệu xếp hạng phải chọn BẰNG ĐO, không bằng trực giác — trùng tag đo ra AUC 0.550 (≈ tung đồng xu), `areas` 0.500 (đúng bằng tung đồng xu). **Vòng 5 có ứng viên đầu có căn cứ: round-count trên mỗi item (J2).** Còn mở: đo nó bằng bộ nhãn nào — fgOS vẫn chưa có tập nhãn tay như bee đã có, nên chưa chạy được phép đo AUC tương đương |
 | G | ~~Chất liệu `struggle` đã có sẵn trong `friction`~~ | **RÚT LẠI — SAI** (đo lại vòng 4) | Vòng 3 kết luận "RÕ" từ ĐÚNG MỘT bản ghi (`tsk-1gn`) rồi suy rộng ra cả hệ thống. Đo toàn log: 131 friction = 81 `verify-miss` + 39 `merge-conflict` (92% telemetry máy), `detail` điển hình `goal-check failed on branch "fgw/tsk-puz" (exit null)` — ghi RẰNG hỏng, không ghi ĐÃ THỬ GÌ / VÌ SAO / CHỖ NGOẶT. Không phải chất liệu kể chuyện. Thứ làm vòng 3 phấn khích thực ra là `gates.askHistory`, KHÁC `friction` — vòng 3 lẫn hai thứ |
@@ -649,6 +658,19 @@ Diataxis hiện có (không đụng, không pha trộn — hard rule của
   R1 hàng đợi 54, và Làn B dòng L) — lần này nguyên nhân mới: **đọc trong
   worktree cũ thay vì `main`**. Nguyên tắc bổ sung: scout dữ-kiện-repo phải
   đọc ở `main`, không đọc trong worktree đã claim từ nhiều ngày trước.
+
+  **(d) Chủ sản phẩm yêu cầu đồng bộ worktree — làm ngay, và nó tự trả
+  công.** `fgw/tsk-28x` lùi **1438 commit** sau `main` (claim 2026-08-11).
+  Merge `main` vào nhánh: xung đột đúng một chỗ — `DISCUSSION.md` dòng D/E,
+  vì `main` giữ bản CŨ (vòng 7-9 chưa merge lên) nhưng đã áp một sweep đổi
+  tên skill `fgos-compounding` → `fgos-coding-compounding`. Giải: giữ nội
+  dung mới, áp tên mới (10 tham chiếu). `.fgos/` staged là `M` từ merge,
+  các dòng ` D` là strip ADR0020 để nguyên unstaged — không `git add -A`,
+  đúng cảnh báo tsk-56u. Đo lại sau đồng bộ thì **mọi con số đều đổi và
+  đổi theo hướng làm luận điểm mạnh hơn**: 223 → **268** tài liệu, và lộ
+  ra thứ chưa ai đo trong 9 vòng — **tốc độ sinh +50 tài liệu/7 ngày**.
+  Tức nếu không đồng bộ, vòng 9 đã chốt trên một corpus nhỏ hơn thực tế
+  17% và bỏ mất chính con số định lượng được vấn đề gốc.
   Bốn phép đo + hai câu trả lời có bằng chứng: xem §1 vòng 9. Hai câu mới
   (vocabulary bottom-up/top-down; xử lý 223 file cũ) chờ chủ sản phẩm.
 
