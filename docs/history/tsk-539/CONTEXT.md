@@ -13,10 +13,17 @@ than fighting that resolution with a custom `docsRef`.
 
 Improve the writing quality of gate/ask questions **for a human reader**:
 (1) the wording must stand alone (restate the item, name real options,
-never point at something unreachable), and (2) citations embedded in that
+never point at something unreachable), (2) citations embedded in that
 text must be self-contained too (no bare `task-id`/`D-ID`/`RUL-ID` without
-an inline gloss), and (3) the text must be Markdown, same as every other
-paragraph-shaped work-item field.
+an inline gloss), (3) the text must be Markdown, same as every other
+paragraph-shaped work-item field, and (4) — the concrete, primary machine
+check per D11 — the question must state a context/background summary AND
+explain why that context leads to the problem being asked, not a bare
+question with no setup. (4) is the one requirement explicitly slated for
+real (but simple) machine enforcement; (2) and (3)'s own enforcement
+strength (machine-checked vs. convention-only) is left to planning — D11
+narrowed WHAT gets machine-checked first, it did not drop (2)/(3) as
+requirements.
 
 Explicitly NOT this item: rewiring skills to `state.decisions` for an
 agent reader (`tsk-3uw`), reducing the volume of questions asked at
@@ -37,6 +44,12 @@ finding F6) left unresolved between those two unrelated items.
   prose, as opposed to a short label/enum value: `description`,
   `decision.text`/`rationale`/`alternatives`, and `ask`/`gate-approve`
   question text.
+- **Structurally complete question** (D11) — a gate/ask question that
+  states, at minimum, a context/background summary and an explanation of
+  why that context produces the problem being asked. The real, near-term
+  machine-enforcement target for this item — deliberately simpler than
+  citation-gloss correctness (presence of two things, not semantic
+  correctness of a citation).
 
 ## Scout evidence
 
@@ -85,6 +98,7 @@ finding F6) left unresolved between those two unrelated items.
 | D8 | gate/ask question citations get real machine enforcement (not convention-only) -- a NEW check, since no existing mechanism reaches event-log text |
 | D9 | Markdown-mandate applies to every paragraph-shaped free-text field on a work item, not only ask/gate questions -- description, decision.text/rationale/alternatives, and ask/gate-approve question text alike |
 | D10 | rewrite this item's description before planning to reflect current real scope (D8/D9 above plus both 2026-08-17 scope-expansion decisions), replacing the stale 2026-08-12 narrowed-to-core framing |
+| D11 | real machine enforcement targets STRUCTURAL COMPLETENESS of the question -- presence of a context/background summary AND an explanation of why that context leads to the problem being asked -- not citation-format correctness. Supersedes D8's framing. |
 
 ## Outstanding questions
 
