@@ -10,6 +10,18 @@ status: open
 
 ## 1. Trạng thái hiện tại
 
+Round 12 (2026-08-18): Xác nhận `tsk-2t9c` ĐÃ MERGE VÀO MAIN (`e268376e`)
+— không phải nhánh treo. `codingDomain` thật có 10+ field (§7 task-1 đã
+cập nhật đủ danh sách). Trợ lý đề xuất drop task-3 (dispatcher wiring),
+bị người bác: bugfix-workflow sắp landing thật, đây chính là lý do làm
+domains/ split BÂY GIỜ để tránh migrate 2 lần → D10, task-3 giữ lại, đổi
+khung ("làm sẵn seam" thay vì "sửa bug"). Thêm GATE bắt buộc vào task-1:
+xác nhận dynamic import giữ đúng identity `workflows.feature.stages ===
+codingDomain.stages` trước khi plan thật — nếu không giữ được, cơ chế
+aggregator (D4) phải đổi shape. Còn treo: `roleGraph`/`taskSpecMap`/
+`agents/*.yaml`→`.claude/agents/*.md` render-pair chưa có quyết định
+placement cụ thể trong `domains/coding/` — cần tiếp tục hoà giải.
+
 Round 11 (2026-08-17): **PHÁT HIỆN QUAN TRỌNG — thảo luận này đã bỏ sót
 một thiết kế đã chốt VÀ đã triển khai thật trước đó: `tsk-2t9c`
 (`docs/history/fgos-marketing-domain-foundation/`, 13 quyết định, wiring
@@ -152,7 +164,8 @@ thi thật.
 | 17 | Domain-knowledge (curated, private, do team tự bảo trì) nên sống ở đâu? | Chốt — D6 | `domains/<name>/knowledge/`, co-located cùng `skills/`, theo đúng tinh thần tự-chứa của D3. Tiền lệ thật: `/home/vantt/projects/beegog/expertise/` — hệ curated knowledge base thật (`knowledge.md` tự mô tả "craft vs project layers, harvesting from finished work, recorded trust, dated freshness, migration rot, retirement") — khác hẳn `docs/history/` (context thô). |
 | 18 | `.agents/skills/core` có nên đổi thành `core/skills/` (bỏ dấu chấm, đối xứng `domains/`)? `.agents` và `.claude` có phải thin wrapper cả hai không? | Chốt — D7 | Có, nhưng không phải rename đơn thuần. `.agents/skills/*` là canonical THEO một quyết định TRƯỚC đó (tsk-1qi D5, `skill-wrappers.mjs` tự ghi rõ "the canonical, orchestrator-neutral skill source") — và `fgos setup` vendor NGUYÊN VĂN `.agents/skills/*` vào MỌI external project (`materializeSkillsIntoProject`), nên hình dạng bên ngoài (host project nhận được gì) không được đổi. D7: canonical AUTHORING chuyển sang `core/skills/` + `domains/*/skills/`; `.agents/skills/`, `.claude/skills/`, `plugins/fgOS/skills/` CẢ BA thành render target thật (thêm bước assembly trong `skill-wrappers.mjs`) — mở rộng quyết định tsk-1qi D5 (bối cảnh mới: `domains/` chưa tồn tại lúc đó), không đảo ngược nó. |
 | 19 | Task-specs nên tách vào đâu? | SỬA LẠI LẦN 2 — D9 (round 11) | Cả bản D8 đầu (di dời toàn bộ `docs/specs/`) lẫn bản sửa lần 1 (định nghĩa task-specs = field-schema work-item) đều SAI. Người chỉ ra `docs/task-specs/coding/*.md` — 13 file THẬT ĐÃ TỒN TẠI, thuộc thiết kế đã chốt `tsk-2t9c` (D6/D10: task-spec = hợp đồng theo LOẠI việc, input/output/gates/verify-template — khác hẳn field-schema). Xem D9. |
-| 20 | tsk-2t9c (`fgos-marketing-domain-foundation`) phủ những gì, và quan hệ với thảo luận này ra sao? | Rõ (scout round 11), CHỜ NGƯỜI QUYẾT | 13 quyết định đã chốt + code đã wiring thật (fgos-coding-implement/discovering/exploring/planning/validating, chạy thật trên tsk-ogx). Khoá: 4-layer ontology (task-spec/skill/knowledge/context, D10), `roleGraph` (trục role/holder, D1), `taskSpecMap` trong registry domain (D6), workflow multiplicity theo `kind` (D7/D7a). Registry.mjs của thảo luận này (D3/D4) CHƯA tính `roleGraph`/`taskSpecMap`. Câu hỏi treo: tsk-2t9c authoritative, thảo luận này chỉ thêm lớp folder-layout lên trên — hay cần hoà giải đầy đủ ngay? |
+| 20 | tsk-2t9c (`fgos-marketing-domain-foundation`) phủ những gì, và quan hệ với thảo luận này ra sao? | Rõ (scout round 11-12) | tsk-2t9c ĐÃ MERGE VÀO MAIN (`e268376e`) — không còn nằm trên nhánh riêng. `codingDomain` object thật hôm nay có 10+ field (stages/stepMap/transitions/skillMap/taskSpecMap/worktreeBacked/statusLabels/parkReason/classification/roleGraph + workflows/defaultWorkflow/workflowFor), không phải 4-5 field thảo luận này giả định. Người xác nhận: `bugfix` workflow (un-merge theo D7/D7a của tsk-2t9c, đang hoãn) sắp thật, không còn giả thuyết — đây chính là LÝ DO làm domains/ split BÂY GIỜ, trước khi code bugfix-workflow viết ra, để không phải migrate 2 lần. |
+| 21 | Task-3 (dispatcher domain/workflow-aware) có nên drop khỏi scope thảo luận này không (trợ lý từng đề xuất drop)? | SỬA LẠI — D10 (round 12) | Trợ lý đề xuất drop vì tsk-2t9c đã chủ đích KHÔNG wiring dispatcher (lý do: chỉ 1 workflow đăng ký, wiring đổi 0 hành vi). Người bác: bugfix-workflow sắp landing thật — tiền đề "chỉ 1 workflow" sắp hết đúng. Task-3 GIỮ LẠI, đổi khung: không phải "sửa bug" mà "làm sẵn seam trước khi workflow thứ 2 tồn tại". |
 
 ## 4. Quyết định đã chốt
 
@@ -167,6 +180,7 @@ thi thật.
 | D7 | Canonical skill-source AUTHORING chuyển sang `core/skills/` + `domains/<name>/skills/`; `.agents/skills/`, `.claude/skills/`, `plugins/fgOS/skills/` cả BA trở thành render target thật (thêm bước assembly trong `skill-wrappers.mjs`) — KHÔNG đổi thứ `fgos setup` vendor vào external project. | Mở rộng (không đảo ngược) quyết định trước đó tsk-1qi D5 (`skill-wrappers.mjs` tự ghi "`.agents/skills/*` is the canonical, orchestrator-neutral skill source") — bối cảnh mới: `domains/` (D3) chưa tồn tại lúc D5 đó chốt. `.agents/skills/*` được `fgos setup`'s `materializeSkillsIntoProject` vendor NGUYÊN VĂN vào MỌI external project — hình dạng/nội dung bên ngoài phải giữ nguyên byte-identical; chỉ chỗ maintainer sửa nguồn đổi. |
 | D8 | ~~Task-specs tách khỏi `docs/specs/` chung vào `core/specs/` (toàn bộ 12 file) + `domains/<name>/specs/`~~ — **SAI 2 LẦN, xem D9.** | (giữ lại làm lịch sử — nội dung không còn đúng, D9 thay thế hoàn toàn định nghĩa "task-specs".) |
 | D9 | "Task-spec" đúng nghĩa là khái niệm của `tsk-2t9c` (D6/D10): hợp đồng theo LOẠI việc (input/output/gates/verify-template), một file/domain/loại-việc — KHÔNG phải field-schema work-item. `docs/task-specs/coding/*.md` (13 file thật, machine-checked bởi `registrations.mjs`'s `task-specs-resolve`) chuyển vào `domains/coding/task-specs/`, giữ nguyên tên "task-specs" (không đổi thành "specs"). | Người chỉ ra folder `docs/task-specs/coding/` đã tồn tại thật — thảo luận này bỏ sót toàn bộ `tsk-2t9c` (13 quyết định đã chốt + code đã wiring thật) trong suốt các round trước. D8 (cả 2 bản) sai vì dựa trên định nghĩa "task-specs" tự chế, chưa từng đọc tsk-2t9c. Còn treo: `roleGraph`/`taskSpecMap` trong registry.mjs (D3/D4 của thảo luận này) chưa tính tới — chờ người quyết định mức hoà giải. |
+| D10 | Task-3 (dispatcher domain/workflow-aware wiring) GIỮ LẠI trong scope §7 — đảo ngược đề xuất drop của chính trợ lý (round 12). | Bugfix-workflow (un-merge `feature`/`bugfix`/`lightweight` theo D7/D7a tsk-2t9c, đang hoãn) sắp landing thật, không còn giả thuyết — tiền đề tsk-2t9c dùng để hoãn wiring dispatcher (chỉ 1 workflow đăng ký, wiring đổi 0 hành vi) sắp hết đúng. Lý do sâu hơn để làm domains/ split NGAY: code bugfix-workflow viết ra ở đâu phụ thuộc `codingDomain` đang sống ở đâu lúc đó — split trước khi code đó viết ra thì nó không bao giờ chạm `workflow-stage-graphs.mjs` cũ, tránh migrate 2 lần. |
 
 ## 5. Q&A log
 
@@ -297,6 +311,17 @@ thi thật.
   từ round 7. D9 (thảo luận này) sửa lại theo đúng định nghĩa gốc; câu
   hỏi treo cho người: hoà giải registry.mjs (D3/D4, chưa có
   `roleGraph`/`taskSpecMap`) với tsk-2t9c ở mức nào.
+- 2026-08-17/18 — Round 12 Q&A: người xác nhận muốn hoà giải đầy đủ ("cần
+  xem cả 2 luôn vì anh có ý định reconstruct"). Trợ lý scout xác nhận
+  `tsk-2t9c` đã MERGE VÀO MAIN (`e268376e`), liệt kê đủ 10+ field thật của
+  `codingDomain`, tìm thêm render-pair thứ 2 chưa biết (`agents/*.yaml` →
+  `.claude/agents/*.md`, cơ chế `claims`). Trợ lý phân tích chủ động (theo
+  đúng phản hồi "advisor, not mechanical worker" — tự nghiên cứu/đề xuất
+  trước khi hỏi) và đề xuất DROP task-3 (dispatcher wiring), lý do:
+  tsk-2t9c đã chủ đích hoãn việc này vì chỉ 1 workflow đăng ký. Người bác
+  ngay: bugfix-workflow sắp landing thật, tiền đề "chỉ 1 workflow" sắp
+  hết đúng, và chính đó là lý do làm domains/ split BÂY GIỜ để không phải
+  migrate 2 lần → D10, task-3 giữ lại, đổi khung.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -443,21 +468,31 @@ trong nguồn canonical trước khi render.
 
 ### {#task-domain-registry-split} Tách `DOMAINS` registry thành aggregator + per-domain file
 
-- **Mục tiêu:** hiện thực D3+D4 cho tầng workflow/registry — tách
-  `codingDomain` (hiện ~390/779 dòng của `workflow-stage-graphs.mjs`) ra
-  `domains/coding/registry.mjs`; `workflow-stage-graphs.mjs` chỉ còn quét
-  `domains/*/registry.mjs` (glob/readdir + dynamic import) để build
-  `DOMAINS`, giữ nguyên `synthetic`/`triage`/`fixture-marketing` (fixture,
-  có thể ở lại core hoặc cũng thành `domains/` tuỳ mức nhất quán muốn).
+- **Mục tiêu (cập nhật round 11-12 — shape thật lớn hơn giả định ban
+  đầu):** tách `codingDomain` — object thật hôm nay có 10+ field
+  (`stages`/`stepMap`/`transitions`/`skillMap`/`taskSpecMap`/
+  `worktreeBacked`/`statusLabels`/`parkReason`/`classification`/
+  `roleGraph` + `workflows`/`defaultWorkflow`/`workflowFor`, KHÔNG phải
+  4-5 field giả định ban đầu) ra `domains/coding/registry.mjs`
+  NGUYÊN VẸN, không cắt bớt field nào; `workflow-stage-graphs.mjs` chỉ
+  còn quét `domains/*/registry.mjs` để build `DOMAINS`, giữ nguyên
+  `synthetic`/`triage`/`fixture-marketing` (fixture, ở lại core).
+- **★ GATE bắt buộc trước khi plan thật (round 12):** xác nhận dynamic
+  `import()` giữ đúng identity `workflows.feature.stages ===
+  codingDomain.stages` (tsk-2t9c D7a's chủ đích tránh copy ~130 dòng) —
+  nếu KHÔNG giữ được, cơ chế aggregator (D4) phải đổi từ directory-scan
+  sang static-import-list trong 1 file index nhỏ, kém "auto-discover"
+  hơn nhưng an toàn identity.
 - **§6 excerpt áp dụng:** khối `workflow` trong diagram + quy tắc
   aggregator D4.
-- **D-ID áp dụng:** D3, D4.
-- **Quan hệ:** độc lập với task skill-migration bên dưới, có thể làm
-  song song hoặc trước.
+- **D-ID áp dụng:** D3, D4, D10.
+- **Quan hệ:** nên làm TRƯỚC code bugfix-workflow (D10) — độc lập với
+  task skill-migration bên dưới, có thể làm song song.
 - **Verify nháp:** `test/state/domain-fields.test.mjs`,
   `test/e2e/fixture-marketing-domain.test.mjs`, mọi test đụng `DOMAINS`
-  export vẫn xanh không đổi — export shape/consumer không đổi, chỉ đổi
-  cách nội bộ build.
+  export vẫn xanh không đổi; test riêng cho GATE identity ở trên; test
+  cho `taskSpecMap`/`roleGraph` (test hiện có của tsk-2t9c, vd
+  `test/state/handoff.mjs`-related) không hồi quy.
 
 ### {#task-coding-skill-migration} Di dời 8 skill `fgos-coding-*` vào `domains/coding/skills/`, 7 skill còn lại vào `core/skills/`
 
@@ -516,22 +551,30 @@ trong nguồn canonical trước khi render.
 - **Verify nháp:** `git status` sau khi tạo chỉ hiện thư mục mới (rỗng,
   hoặc `.gitkeep` nếu cần), không có file `docs/specs/*` nào bị đổi.
 
-### {#task-dispatcher-domain-aware} Fix `discovery.mjs`/`plan.mjs`/`fgos-routing` đọc registry thay vì hardcode
+### {#task-dispatcher-workflow-aware} Nối `discovery.mjs`/`plan.mjs` vào `resolveWorkflow` — làm sẵn seam cho bugfix-workflow
 
-- **Mục tiêu:** đóng nốt STR89 — 2 dispatcher (`src/intake/discovery.mjs`,
-  `src/intake/plan.mjs`) và skill `fgos-routing` hiện hardcode literal
-  stage-name của coding; sửa để đọc `DOMAINS[item.domain]` (đã build từ
-  aggregator ở task 1) thay vì literal.
+- **Mục tiêu (SỬA LẠI round 12, D10):** KHÔNG phải "fix STR89" —
+  `fgos-routing` đã domain-pluggable từ trước (theo chính
+  `docs/specs/reading-map.md`'s ghi nhận str89-fgos-domain-skills). Việc
+  thật còn thiếu, và tsk-2t9c CHỦ ĐÍCH chưa làm: `src/intake/discovery.mjs`/
+  `src/intake/plan.mjs` (+ `stage-fsm.mjs`/`frontier.mjs`) chưa nối vào
+  `resolveWorkflow` — tsk-2t9c hoãn việc này vì với đúng 1 workflow
+  (`feature`) đăng ký, `domain.transitions` và
+  `resolveWorkflow(...).transitions` LÀ CÙNG MỘT object, nối dây hôm nay
+  đổi 0 hành vi. Tiền đề đó sắp hết đúng (bugfix-workflow landing thật) —
+  nối dây bây giờ là làm sẵn seam, không phải sửa bug.
 - **§6 excerpt áp dụng:** mũi tên `workflow_core -.-> wf_c/wf_m` trong
-  diagram — dispatcher phải theo đúng registry, không hardcode.
-- **D-ID áp dụng:** D1, D4 (đúng tinh thần "core dùng chung, đọc data
-  không hardcode literal của 1 domain").
-- **Quan hệ:** phụ thuộc task 1 (aggregator) đã build `DOMAINS` đúng
-  trước khi dispatcher đọc được.
-- **Verify nháp:** cần xác minh lại trạng thái thật của STR89 trước khi
-  plan — backlog ghi "— done" nhưng chưa rõ done ở mức "quyết định đã
-  chốt" hay "code đã sửa"; `fgos-coding-planning`/`fgos-coding-validating`
-  nên kiểm tra trực tiếp thay vì tin theo dòng backlog.
+  diagram — dispatcher phải đọc qua `resolveWorkflow`, không giả định
+  `domain.transitions` mãi mãi đồng nhất với workflow đang chạy.
+- **D-ID áp dụng:** D4, D10.
+- **Quan hệ:** phụ thuộc task {#task-domain-registry-split} (aggregator)
+  xong trước — và nên làm TRƯỚC khi code bugfix-workflow thật được viết,
+  đúng tinh thần D10 (seam có sẵn, không migrate 2 lần).
+- **Verify nháp:** test hiện có của `resolveWorkflow`/`workflows.feature`
+  (module test dày đặc nhất repo, theo chính ghi nhận của tsk-2t9c) phải
+  xanh không đổi; thêm test riêng: đăng ký 1 workflow thứ hai giả lập
+  (khác `feature`), xác nhận dispatcher chọn đúng graph theo
+  `resolveWorkflow(item)` thay vì đọc `domain.transitions` mặc định.
 
 **Việc CHƯA đủ hình dạng để thành task riêng:** knowledge/doctrine
 domain-scoped (câu hỏi mở #15, §3) — chờ người quyết định có nằm trong
