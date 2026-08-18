@@ -18,6 +18,34 @@ claimed item into real changes, proves them with the item's own `verify`
 command, and hands the item back through `fgos return`. It never designs or
 re-shapes the work; that already happened at `discovery`/`exploring`/`planning`.
 
+## Driver vs. worker (tsk-2uf-2)
+
+This file is split into two halves that live in two different places.
+Below this section is the **driver** half — claim status, decide the
+dispatch mechanism, verify, commit, the Iron Law check, `fgos return`, and
+every Collaboration handoff call. The **worker** half — the boundaries for
+actually doing the work, provider-neutral, shared with every other kind of
+dispatched unit — lives separately at
+`../_shared/coding-worker-contract.md`. Which half applies to you depends
+on how you got here:
+
+- **You are the driver session** — you ran `fgos pick`/arrived via
+  `fgos-routing` with a live claim on this item and the ability to call
+  `fgos` verbs against the real store. Read this whole file. At Flow step
+  2 (Implement), when you do the work yourself (`mechanism` came back
+  `unavailable`/`in-process`), you ALSO follow
+  `../_shared/coding-worker-contract.md`'s boundaries for that part — same
+  discipline an out-of-process worker follows: a session that isn't
+  dispatching still executes the worker's own half, same as `agy` would.
+- **You are an out-of-process worker** — you were dispatched here (e.g.
+  `dispatch.mjs execute`'s prompt pointed `{skillPath}` at this exact
+  file), you hold no claim on this item, and you have no `fgos` verb to
+  call against the real store. **Stop reading after this section.** Read
+  and follow only `../_shared/coding-worker-contract.md` — it is complete
+  on its own for what you need to do. Everything below (the dispatch-decide
+  Hard rule, Flow steps 1/3/4/5, the Collaboration handoff calls, `fgos
+  return`) is the driver's own job, never yours.
+
 ## Hard rules
 
 - When asking questions (`fgos ask`), format question text using self-contained citations (`../_shared/citation-format.md`) and the required two-heading Markdown structure (`## Context` and `## Why this matters`, each followed by at least 20 characters of content).
@@ -165,7 +193,10 @@ re-shapes the work; that already happened at `discovery`/`exploring`/`planning`.
 
 2. **Implement.** Run `dispatch.mjs decide` first, per the Hard rule
    above, and branch on its answer: `unavailable`/`in-process` — make
-   the real change yourself, reading every file before editing it;
+   the real change yourself, reading every file before editing it, staying
+   inside `../_shared/coding-worker-contract.md`'s boundaries (footprint,
+   cold-pickup refusal) the same as a dispatched worker would (per "Driver
+   vs. worker" above);
    `out-of-process` — dispatch via `execute` instead, per the same
    Hard rule. Either way, before editing a symbol yourself, apply
    `CLAUDE.md`'s
