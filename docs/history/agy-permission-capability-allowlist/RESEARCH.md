@@ -310,3 +310,123 @@ already established" / the `global`-scope decision) — plan.md needs
 re-opening, not just an implementation continuation, before any of
 plan.md's Order steps (config args swap, doctor/setup registration, test
 update) can proceed.
+
+## Round 4 — 2026-08-18 (schema correction + second live proof pass)
+
+**Reported schema fix (input to this round):** Round 3 wrote its rule
+block under the **singular** key `"permission"`. `agy`'s live `/config`
+dump that same round separately showed a distinct **plural** key,
+`"permissions"`, sitting at `null` throughout — the one Round 3's own
+closing section named as a not-yet-tried candidate but never wrote to.
+This round corrected that: wrote a `"permissions": {"allow": [...],
+"deny": [], "ask": []}` block (plural key) instead.
+
+**Live proof pass run this round (same discipline as Round 3 — backup
+first, md5-verified restore at the end, one tight sequence):**
+
+1. Backup taken first, md5 `1f2bf38ef13345267802f1943c5dec86` (same
+   baseline as Round 3 — no drift between rounds).
+2. `{"permissions":{"allow":["command(git)"]}}` written, live probe
+   (`git status --short` via `agy -p ... --mode accept-edits`, no
+   `--dangerously-skip-permissions`) run: **still soft-denied**, identical
+   stderr to Round 3's baseline. But `agy -p "/config"` now echoed the
+   rule back correctly under the **plural** `"permissions"` key (Round 3
+   only got it read under `"permission"`, singular) — confirms the schema
+   correction itself was real: the plural key **is** the one `agy`
+   actually parses into its live permission struct. Reading the rule
+   correctly and *acting* on it turned out to be two separate questions.
+3. Also discovered a second field, `toolPermission` (live `/config` dump,
+   default value `"request-review"`) — a distinct top-level mode
+   controlling whether tool-call permission is even consulted, separate
+   from `--mode`'s `agentMode` (`accept-edits`/`plan`, file-write pacing
+   only). Tried `"toolPermission": "strict"` + `permissions.allow`
+   (bare-token, then exact-literal `"command(git status --short)"`
+   shapes): **both still soft-denied**, identically. `"strict"` mode
+   appears to blanket-deny `command`-type calls in headless `-p` mode
+   regardless of `permissions.allow` content — consistent with the
+   changelog's "an allowlist entry ... matches nothing" and "commands
+   being auto-approved while in request-review or strict permission
+   mode" fix lines, i.e. `strict`/`request-review` are both designed to
+   *never* silently auto-approve a command in headless mode, allow-list
+   or not.
+4. Tried `"toolPermission": "always-proceed"` (the changelog's other
+   named mode) with the same `permissions.allow: ["command(git)"]`:
+   **the command ran** — `git status --short` executed for real (actual
+   process output returned, not a stub). This is the first successful
+   live command execution across every round of this item.
+5. **Critical follow-up check — is the allow-list actually gating
+   anything under `always-proceed`, or is the mode itself the sole gate?**
+   Ran the same probe shape against `whoami` — a command **not** on the
+   allow-list. **It also ran successfully**, unrestricted. This proves
+   `permissions.allow` is inert once `toolPermission` is
+   `"always-proceed"`: the mode itself auto-approves every `command`-type
+   call, allow-list or not. `always-proceed` is functionally equivalent
+   to `--dangerously-skip-permissions` for the `command` tool type, not a
+   narrower substitute for it.
+6. **Deny-list check (the remaining candidate for a real, working
+   boundary):** with `toolPermission: "always-proceed"` and
+   `permissions.deny: ["command(whoami)"]` (empty `allow`), re-ran the
+   `whoami` probe: **denied**, with a named reason —
+   `"Permission denied for command(whoami). Matches user-configured deny
+   rule."` `git status --short` (not on the deny list) was not re-tested
+   this exact pass, but Finding 3.4 above already confirms `always-proceed`
+   runs unlisted commands by default — so the deny entry is what changed
+   the outcome specifically, not some other side effect.
+
+**Finding — the real, working mechanism is a DENYLIST, not an ALLOWLIST,
+and only reachable through one specific mode:**
+`toolPermission: "always-proceed"` + `permissions.deny: [...]`. This is
+the opposite shape from what the item's own text asks for ("allowlist
+tối thiểu đủ cho một worker" — a minimal *allow*-list) and from what
+`plan.md`'s Approach section designed around. Concretely, in headless
+`-p` mode as tested:
+
+- `toolPermission: "request-review"` (the settings.json default) and
+  `toolPermission: "strict"` both blanket-deny every `command`-type call
+  regardless of `permissions.allow` content — no allow-rule syntax tried
+  across Round 3 (4 shapes) and Round 4 (2 more shapes, 6 total) changed
+  that outcome. These modes assume an interactive human to review, which
+  headless mode structurally cannot provide (matches Round 2's "soft-deny,
+  never hang" framing exactly — it fails safe, but it fails **closed for
+  everything**, not selectively).
+- `toolPermission: "always-proceed"` runs every `command`-type call
+  by default (`permissions.allow` has no effect here — confirmed inert),
+  and `permissions.deny` is the only mechanism that changes that: entries
+  there are refused with a named reason, everything else proceeds.
+
+**What this means for the item's own three framing questions
+(description's own ambiguity #1–#3):**
+
+1. *Does `agy` have a permission surface expressing an allowlist?* — Not a
+   true one, for the `command` tool type, in headless mode. It has a real,
+   machine-enforced, headless-safe **denylist** surface instead
+   (default-allow, explicit-deny) — a materially weaker security shape
+   than default-deny/explicit-allow, though still strictly better than
+   today's unconditional `--dangerously-skip-permissions` (zero boundary
+   at all).
+2. *What's the minimal ruleset sufficient for a worker's contract?* — Does
+   not apply the same way under a denylist model. The equivalent question
+   becomes: what is the minimal set of genuinely dangerous operations
+   (destructive filesystem ops, credential/secret exfiltration paths,
+   force-pushes to arbitrary remotes, network calls to untrusted hosts,
+   privilege escalation) that must be denied so a default-allow worker
+   cannot do real damage even if a prompt-injected or malfunctioning
+   dispatch tries.
+3. *If not expressible, document as provider-limitation and leave as-is?*
+   — Partially applies: a true default-deny allowlist for `command`-type
+   tools is confirmed structurally unreachable in headless `-p` mode (2
+   modes × 6 rule-shape variations, 0 successes). A default-allow denylist
+   is real and working. Whether that's "good enough" to justify dropping
+   `--dangerously-skip-permissions` — trading an unconditional bypass for
+   a narrower-but-still-open one — is a product trade-off call, not a
+   technical one; `plan.md`'s Approach section needs a full rewrite
+   around this shape (or an explicit decision to hold at
+   `--dangerously-skip-permissions` and record the allowlist path as a
+   genuine provider-limitation) rather than a continuation of the
+   original allowlist design.
+
+**Restored:** `~/.gemini/antigravity-cli/settings.json` reverted to the
+exact backed-up content, byte-for-byte (md5 `1f2bf38ef13345267802f1943c5dec86`
+confirmed before and after, same baseline Round 3 also restored to — no
+drift across rounds). Item's own verify command re-confirmed passing
+clean after restore.

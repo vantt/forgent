@@ -28,6 +28,27 @@ already gathered.
 
 ## Approach
 
+> **SUPERSEDED — RESEARCH.md Round 4 (2026-08-18).** Everything below this
+> notice describes an ALLOWLIST design (`permission.allow` /
+> `permissions.allow` gating which commands may run). Round 4's live proof
+> pass (2 `toolPermission` modes × 6 total rule-shape variants across
+> Rounds 3–4, 0 successes for allow-gating) found that no allowlist shape
+> is reachable for `command`-type tools in headless (`-p`) mode: `strict`/
+> `request-review` blanket-deny every command regardless of
+> `permissions.allow` content, and the one mode that does let commands
+> run — `toolPermission: "always-proceed"` — runs *every* command by
+> default (confirmed via an unlisted `whoami` probe succeeding) and only
+> respects `permissions.deny`, i.e. it is a **denylist**
+> (default-allow/explicit-deny), not an allowlist. This is a materially
+> different, weaker security shape than the Approach below assumes, and a
+> product trade-off call belongs to the person who owns this item's scope
+> before implementation resumes — see RESEARCH.md Round 4's closing
+> section for the three concrete framing-question answers this produces.
+> The Rejected-alternatives reasoning, risk-map shape, and doctor/setup
+> registration idea below are still structurally reusable once a
+> denylist-based Approach replaces this one; only the *mechanism* section
+> needs rewriting, not the whole plan.
+
 **What discovery already established (RESEARCH.md Round 1):** `agy` has a
 real permission-allowlist surface — `settings.json`'s `permission.allow`
 (per-command pattern rules, `project`/`shared`/`global` scoped,
