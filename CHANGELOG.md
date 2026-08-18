@@ -59,7 +59,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   scoped subtask) and record it in the event log — a call outside the
   domain's declared graph is refused with the legal edges named in the
   error, and a call outside a domain that declares no `roleGraph` at all is
-  refused just as cleanly.
+  refused just as cleanly. Every existing item and every existing log
+  replays byte-for-byte unaffected — `holder` and the two new event kinds
+  are both fully optional/lazy, never present unless actually used.
 
 ### Changed
 
@@ -166,18 +168,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Multi-role team harness, first slice (coding domain): work items gain an
-  optional third axis, `holder` — orthogonal to `status` and `stage`, opt-in
-  per-domain via a new `roleGraph` declaration. Two new verbs, `fgos handoff
-  <id> --to <role> --reason <advise|assist|review|consult>` and `fgos
-  handoff-return <id>`, let a session make a guarded role-to-role call
-  (consult a researcher, get something reviewed, ask a human, hand off a
-  scoped subtask) and record it in the event log — a call outside the
-  domain's declared graph is refused with the legal edges named in the
-  error, and a call outside a domain that declares no `roleGraph` at all is
-  refused just as cleanly. Every existing item and every existing log
-  replays byte-for-byte unaffected — `holder` and the two new event kinds
-  are both fully optional/lazy, never present unless actually used.
 - New config key `ironLaw.level` in `.fgos/config.json`, with two values:
   `ask` (the default — the gate refuses until a person acknowledges) and
   `warn` (opt-in — the gate prints what it matched, records one engine
