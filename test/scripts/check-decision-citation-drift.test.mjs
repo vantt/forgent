@@ -553,9 +553,11 @@ test(
     assert.equal(findNewFindings([finding], baseline).length, 0);
 
     // An empty baseline (no prior entry at all for "__proto__") must
-    // also treat it as a genuinely new finding, not throw.
-    const emptyBaseline = Object.create(null);
-    assert.equal(findNewFindings([finding], emptyBaseline).length, 1);
+    // also treat it as a genuinely new finding, not throw -- even when
+    // the CALLER passes a bare {} literal rather than an
+    // Object.create(null) baseline. findNewFindings' own safety never
+    // depends on the caller's baseline shape.
+    assert.equal(findNewFindings([finding], {}).length, 1);
   },
 );
 
