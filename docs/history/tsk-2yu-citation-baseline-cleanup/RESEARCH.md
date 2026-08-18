@@ -49,3 +49,42 @@ violation kind?
 real judgment call to make (how to slice 1788 findings into digestible
 children), but that is squarely in-scope for `planning`, not a gap
 `discovery`/`exploring` needs to close first.
+
+## Round 2 — 2026-08-18 (validating: proof-surface check on the child's verify command)
+
+**Asked:** does a bare `node scripts/check-decision-citation-drift.mjs
+--write-baseline` actually reproduce the real 1788/73 baseline, as
+`plan.md`'s first draft of the child verify command assumed?
+
+**Checked:** ran it for real, then diffed the committed baseline file.
+
+**Found — a real footgun, not just a documentation gap.** A bare
+`--write-baseline` (no other flags) wrote a baseline with only **1128
+findings across 12 files** — silently dropping 660 real findings across
+61 files, because the script's default scan roots (`docs/backlog.md` +
+`docs/specs/*.md` only, per `check-decision-citation-drift.mjs`'s own
+`parseArgs`) never cover `.agents/skills/**` or
+`plugins/fgOS/skills/**`, which together hold most of the remaining
+files in the real baseline. Caught before it landed: `git diff --stat`
+on the baseline file showed 782 line deletions from one dry-run command;
+reverted with `git checkout -- scripts/check-decision-citation-drift.baseline.json`
+before anything was committed.
+
+The correct invocation (found in `docs/history/self-contained-id-
+references/plan.md:205`, an existing precedent for this same script) is:
+
+```
+node scripts/check-decision-citation-drift.mjs --decisions-dir docs/decisions \
+  --backlog docs/backlog.md --specs-dir docs/specs \
+  --skills-dir .agents/skills --skills-dir plugins/fgOS/skills [--write-baseline]
+```
+
+Verified live: the bare form (no `--write-baseline`) reports "no new
+findings (1788 baselined)" (exit 0); the full form with
+`--write-baseline` reproduces the exact 1788-finding/73-file baseline
+(`git status` shows no diff afterward).
+
+**Fixed:** `plan.md`'s child verify command now uses the full flag set
+above. Any later child spec for this item's remaining backlog must use
+the same full command — never a bare `--write-baseline` — or it will
+silently corrupt the baseline the same way.

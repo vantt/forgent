@@ -52,51 +52,70 @@ to a full plan for the remaining backlog.
 The description's "top 2-3 files" framing is hedged ("a reasonable first
 slice", "very likely") — a recommendation, not a locked decision. Picking
 the single largest file (`docs/specs/work-state.md`, 425 findings, 23.8%
-of the total, both kinds represented) gives the same calibration signal
-— real per-occurrence effort, in a load-bearing spec file, across both
-finding kinds — as a 2-3-file slice would, at roughly half the risk
-surface and with a cleanly reviewable single-file diff. This keeps the
-first execution slice to one file / one commit, matching `fgos-coding-
-implement`'s own "one commit per item" convention, rather than
-front-loading an unverified effort estimate across multiple files at
-once.
+of the total) instead of 2-3 files already halves the risk surface and
+keeps the first execution slice to one file / one commit, matching
+`fgos-coding-implement`'s own "one commit per item" convention.
+
+**Validating found an even smaller honest path (reality gate, "smaller
+path" dimension).** `docs/specs/work-state.md`'s 425 findings are not one
+uniform kind: 124 `bare-citation` (add a one-line gloss — mechanical
+shape) and 301 `d-local-outside-home` (inline real content and delete the
+id — genuine research+rewrite per occurrence). Lumping both into one
+child muddies the calibration signal the item's own description asks
+for: "how long each occurrence actually takes" cannot be read cleanly off
+an average of two very different effort profiles. **Revised first slice:
+`bare-citation` findings in `docs/specs/work-state.md` only (124
+findings)** — the true smallest calibration step, with a clean,
+single-kind effort signal. The file's remaining 301
+`d-local-outside-home` findings are deferred to the same follow-on
+planning round as the other 72 files, not specced as a second child now
+(a second child touching the same file concurrently would also risk a
+footprint collision with the first, which a single-kind-then-defer split
+avoids entirely).
 
 **Risk map:**
 
 | Component | How risky | What proves it |
 |---|---|---|
-| `docs/specs/work-state.md` content edits | Low runtime risk (prose only, no code/behavior change) but real correctness risk per-occurrence (a wrong D-id inline, or a wrong gloss, silently misinforms a future reader) | The child's own verify: re-run the checker with `--write-baseline` and confirm this file's own baseline entry count drops to 0 — plus a human/agent spot-read of a sample of the actual inlined content against the D-id's real source, since the checker only detects *absence* of the citation-format defect, never *correctness* of the inlined prose |
-| Baseline ratchet (`scripts/check-decision-citation-drift.baseline.json`) | Low — `--write-baseline` mechanically re-snapshots current findings | `git diff --stat` on the baseline file after the write-baseline run should show only removals for this file's entries, no additions elsewhere |
+| `docs/specs/work-state.md` bare-citation edits (124) | Low runtime risk (prose only, no code/behavior change) but real correctness risk per-occurrence (a wrong or misleading one-line gloss silently misinforms a future reader) | The child's own verify: re-run the checker with `--write-baseline` and confirm this file's own `bare-citation` entry count drops to 0 — plus a human/agent spot-read of a sample of the actual glosses added against the real `ADR<n>`/`RUL<n>` id they describe, since the checker only detects *absence* of the citation-format defect, never *correctness* of the gloss text |
+| Baseline ratchet (`scripts/check-decision-citation-drift.baseline.json`) | Low — `--write-baseline` mechanically re-snapshots current findings | `git diff --stat` on the baseline file after the write-baseline run should show only `bare-citation` removals for this file's entries, no additions elsewhere, and the file's `d-local-outside-home` entries unchanged |
 
-Impact-analysis capability gate (`CLAUDE.md`): not invoked — this slice
+Impact-analysis capability gate (`CLAUDE.md`): checked live —
+`fgos tool query --capability impact-analysis --status present` reports
+GitNexus registered and `present` (posture `full`, not `inactive`: a
+provider IS registered on this machine). No proof point in this plan
+leans on blast-radius evidence though, and correctly so — this slice
 touches only Markdown prose in `docs/specs/work-state.md`, no
-symbol/function/behavior GitNexus indexes. `impact-analysis: inactive`
-for this plan (no blast-radius proof point depends on it).
+symbol/function GitNexus indexes exist for a citation-format edit to
+break. `impact-analysis: full (unused — no code-symbol change in this
+slice)`.
 
-**Files touched:** `docs/specs/work-state.md` (content edits, 425
-occurrences), `scripts/check-decision-citation-drift.baseline.json`
+**Files touched:** `docs/specs/work-state.md` (content edits, 124
+`bare-citation` occurrences), `scripts/check-decision-citation-drift.baseline.json`
 (regenerated via `--write-baseline` after the fixes land).
 
 ## Split
 
-One child this round — the calibration slice. The remaining 1363
-findings across 72 files are deliberately NOT specced here: the item's
-own description asks for the first slice's real effort to be known
-before the rest is planned, and inventing 72 more child specs now, before
-that signal exists, would be estimating in advance exactly what the
-description says not to do. tsk-2yu stays anchored by this one child
+One child this round — the calibration slice, revised to a single kind
+(see "Validating found an even smaller honest path" above). The
+remaining 1664 findings (301 `d-local-outside-home` in `work-state.md` +
+1363 across the other 72 files) are deliberately NOT specced here: the
+item's own description asks for the first slice's real effort to be
+known before the rest is planned, and inventing more child specs now,
+before that signal exists, would be estimating in advance exactly what
+the description says not to do. tsk-2yu stays anchored by this one child
 until it lands; the remaining backlog gets its own planning round once
 the first slice's real numbers are in.
 
 ```json
 [
   {
-    "title": "Fix citation-format violations in docs/specs/work-state.md",
-    "verify": "node scripts/check-decision-citation-drift.mjs --write-baseline && node -e \"const d=require('./scripts/check-decision-citation-drift.baseline.json'); const n=(d['docs/specs/work-state.md']||[]).length; if(n!==0){console.error('still',n,'findings in work-state.md'); process.exit(1);} console.log('work-state.md citation findings: 0');\"",
-    "action": "Fix all 425 citation-format findings in docs/specs/work-state.md per check-decision-citation-drift.mjs's own documented fix contract (script header, lines 9-20): for each bare-citation finding, add a one-line gloss right after the ADR<n>/RUL<n> id; for each d-local-outside-home finding, inline the real decision content the D<n> id refers to at the citing location and delete the id. This is tsk-2yu's own proof-of-approach slice — the largest single file (23.8% of the 1788-finding total) — chosen to calibrate real per-occurrence effort before planning the remaining 72-file backlog.",
+    "title": "Fix bare-citation findings in docs/specs/work-state.md",
+    "verify": "node scripts/check-decision-citation-drift.mjs --decisions-dir docs/decisions --backlog docs/backlog.md --specs-dir docs/specs --skills-dir .agents/skills --skills-dir plugins/fgOS/skills --write-baseline && node -e \"const d=require('./scripts/check-decision-citation-drift.baseline.json'); const remaining=(d['docs/specs/work-state.md']||[]).filter(e=>e.startsWith('bare-citation:')); if(remaining.length!==0){console.error('still',remaining.length,'bare-citation findings in work-state.md'); process.exit(1);} console.log('work-state.md bare-citation findings: 0');\"",
+    "action": "Fix the 124 bare-citation findings in docs/specs/work-state.md per check-decision-citation-drift.mjs's own documented fix contract (script header, lines 9-20): add a one-line gloss right after each bare ADR<n>/RUL<n> id, in the shape \"<ID> (<one-line gloss>)\". This is tsk-2yu's own proof-of-approach slice, narrowed at validating to the single easier kind in the largest file (work-state.md, 23.8% of the 1788-finding total) so the calibration signal is not muddied by mixing it with d-local-outside-home's much heavier real-rewrite effort. work-state.md's own 301 d-local-outside-home findings are deferred to the follow-on planning round, same as the other 72 files.",
     "footprint": ["docs/specs/work-state.md", "scripts/check-decision-citation-drift.baseline.json"],
     "kind": "chore",
-    "risk": "standard"
+    "risk": "light"
   }
 ]
 ```
