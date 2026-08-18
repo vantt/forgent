@@ -62,6 +62,23 @@
           "heavy": "lightweight"
         }
       },
+      "codex": {
+        "kind": "agent",
+        "description": "OpenAI Codex CLI (bypass-all -- no sandbox boundary, see docs/history/codex-bypass-executor/)",
+        "allowCrossProvider": true,
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "codex",
+            "args": [
+              "exec",
+              "--dangerously-bypass-approvals-and-sandbox",
+              "{prompt}"
+            ]
+          }
+        ]
+      },
       "gitnexus": {
         "kind": "tool",
         "description": "Code-graph blast radius",

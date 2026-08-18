@@ -63,8 +63,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   replays byte-for-byte unaffected — `holder` and the two new event kinds
   are both fully optional/lazy, never present unless actually used.
 
+- `codex` (OpenAI Codex CLI) wired as a new out-of-process dispatch
+  executor (`.fgos/config.json`'s `runner.executors.codex`), using
+  `codex exec --dangerously-bypass-approvals-and-sandbox` — an
+  unconditional bypass, deliberately no OS sandbox boundary. Unlike
+  `agy`'s own entry, this is not a lesser-but-real boundary: research
+  (`docs/history/codex-permission-capability-boundary/RESEARCH.md`,
+  branch `fgw/tsk-4kh`) proved `codex`'s real sandbox
+  (`-s workspace-write`) blocks the worker contract's own `git commit`
+  step outright, because this repo's `.githooks/pre-commit` spawns a
+  nested `git` subprocess the sandbox refuses with `EPERM` — a decision,
+  not an oversight, accepted explicitly after reviewing that trade-off
+  (`docs/history/codex-bypass-executor/`).
+
 ### Fixed
 
+- The `cli-spawn` dispatch adapter (`src/runner/dispatch/transport.mjs`)
+  now spawns every executor with `stdin: 'ignore'` instead of the
+  default open pipe. `codex` (unlike `agy`) checks for piped stdin on
+  startup ("Reading additional input from stdin...") and blocks
+  indefinitely on a pipe nothing ever writes to or closes — found live
+  wiring `codex` as an executor (`docs/history/codex-bypass-executor/`).
 - `fgos decision` now requires `--text` explicitly. Before this, a call
   with no `--text` silently fell back to joining whatever positional
   arguments were left over (e.g. `fgos decision write "..."` stored

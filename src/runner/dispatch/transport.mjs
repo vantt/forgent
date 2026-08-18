@@ -197,7 +197,11 @@ function cliSpawnAdapter(invocation, opts) {
   const { cwd, timeoutMs, maxBuffer, onChunk, workId, tier, model } = opts;
 
   return new Promise((resolve, reject) => {
-    const child = spawn(command, args, { cwd, shell: false });
+    // `stdin: 'ignore'` (never the 'pipe' default): an executor that checks
+    // for piped stdin (codex's own "Reading additional input from stdin..."
+    // probe, tsk-3tkc) blocks forever on an open-but-unwritten pipe here,
+    // since nothing in this adapter ever writes to or closes child.stdin.
+    const child = spawn(command, args, { cwd, shell: false, stdio: ['ignore', 'pipe', 'pipe'] });
     child.stdout.setEncoding('utf8');
     child.stderr.setEncoding('utf8');
 
