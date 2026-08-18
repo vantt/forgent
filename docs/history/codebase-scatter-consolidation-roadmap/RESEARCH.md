@@ -30,19 +30,21 @@ Drift is minor except registrations.mjs (+75) and dispatch.mjs (2204 to 61, conf
 
 | File | Top-level fns | Test lines (files) | Churn (rev-list --count) |
 |---|---|---|---|
-| bin/fgos.mjs | 46 | 13192 across 21 files (test/cli/fgos-*.test.mjs) | 353 |
-| src/setup/registrations.mjs | 59 | 399 (1 file) | 63 |
+| bin/fgos.mjs | 46 | 12666 across 22 files (test/cli/fgos-*.test.mjs) | 358 |
+| src/setup/registrations.mjs | 59 | 399 (1 file) | 65 |
 | src/runner/loop.mjs | 19 | 2017 (1 file) | 63 |
-| src/state/store.mjs | 40 | 1261 (1 file) | 90 |
-| src/runner/merge.mjs | 26 | 1852 (1 file) | 49 |
-| src/runner/worktree.mjs | 34 | 1415 (1 file) | 36 |
+| src/state/store.mjs | 39 | 1261 (1 file) | 90 |
+| src/runner/merge.mjs | 25 | 1852 (1 file) | 49 |
+| src/runner/worktree.mjs | 33 | 1415 (1 file) | 36 |
 | src/cli/command-registry.mjs | 0 (single COMMAND_REGISTRY array literal) | 138 (1 file) | 122 |
-| src/intake/plan.mjs | 12 | 1644 (1 file) | 7 |
-| src/runner/dispatch.mjs (reference point) | n-a | was the 175K-mentioned file pre-split | 69 |
+| src/intake/plan.mjs | 12 | 1644 (1 file) | 8 |
+| src/runner/dispatch.mjs (reference point) | n-a | was the 175K-mentioned file pre-split | 70 |
 
 command-registry.mjs churn (122) is HIGH but homogeneous -- every hit sampled is add-one-command-row, the single-concern data-table case the item own boundary #4 names as the wrong thing to consolidate (consolidating a registry is patching backwards). plan.mjs churn (7) is the lowest of the eight by a wide margin -- not a live pain signal today despite its size.
 
-bin/fgos.mjs is the standout on every signal at once: highest churn (353, 3-5x the next files), most fragmented test coverage (21 separate test/cli/fgos-*.test.mjs files instead of one file-matching test, for 19-plus visibly unrelated CLI verbs -- approve, claim, edit, gate-approve, handoff, help, intake, iron-law-gate, manifest, merge, move, post-merge, read, return, review-pr, setup, stage, tool, version), and the only file in the set with an already-documented tool-breakage citation (this repo own CLAUDE.md: GitNexus indexes zero Function symbols for it, tsk-38h).
+bin/fgos.mjs is the standout on every signal at once: highest churn (358, 3-5x the next files), most fragmented test coverage (22 separate test/cli/fgos-*.test.mjs files instead of one file-matching test, for 19-plus visibly unrelated CLI verbs -- approve, claim, edit, gate-approve, handoff, help, intake, iron-law-gate, manifest, merge, move, post-merge, read, return, review-pr, setup, stage, tool, version), and the only file in the set with an already-documented tool-breakage citation (this repo own CLAUDE.md: GitNexus indexes zero Function symbols for it, tsk-38h).
+
+All numbers in this table were re-verified independently (`grep`/`wc`/`git rev-list --count`) during the review pass on 2026-08-18, after an earlier round of hand-transcription introduced small drift (off-by-a-handful on several churn/function-count cells, and a 21-vs-22-file miscount on bin/fgos.mjs's own test fragmentation). Corrected in place rather than left standing, since this table's whole point is being measured, not felt.
 
 5. Where the roadmap doc belongs. No Plan Location section exists in docs/routing-handoff-contract.md (checked, not found). This repo actual live convention (dozens of examples under docs/history/feature-name/) is a feature-named folder holding CONTEXT.md / plan.md / RESEARCH.md. This item own deliverable (roadmap plus notes on what NOT to consolidate) fits that shape directly -- no new convention needed.
 
