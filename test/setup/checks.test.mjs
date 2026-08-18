@@ -48,7 +48,7 @@ import { addDecision } from '../../src/state/store.mjs';
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, plugin-dev-skills-packaged, changelog-unreleased-stale, herdr-launcher-configured, herdr-web-dashboard-configured, work-classification-vocabulary, work-stage-vocabulary, domain-workflow-skillmap-coverage, delivered-not-on-trunk, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, events-jsonl-not-truncated, cli-version-visible, worker-slots-ceiling-usable, gateway-token-configured, readme-install-tag-exists, iron-law-configured, task-specs-resolve, agent-claims-resolve, dispatch-decide-hook-wired, advise-execute-capabilities-configured, and decision-index-stale', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, plugin-dev-skills-packaged, changelog-unreleased-stale, herdr-launcher-configured, herdr-web-dashboard-configured, work-classification-vocabulary, work-stage-vocabulary, domain-workflow-skillmap-coverage, delivered-not-on-trunk, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, events-jsonl-not-truncated, cli-version-visible, worker-slots-ceiling-usable, gateway-token-configured, readme-install-tag-exists, iron-law-configured, task-specs-resolve, agent-claims-resolve, dispatch-decide-hook-wired, advise-execute-capabilities-configured, decision-index-stale, and agy-permissions-configured', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     [
@@ -85,6 +85,7 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'agent-claims-resolve',
       'advise-execute-capabilities-configured',
       'decision-index-stale',
+      'agy-permissions-configured',
     ].sort(),
   );
 });

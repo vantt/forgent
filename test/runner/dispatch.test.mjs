@@ -719,7 +719,12 @@ test('the committed .fgos/config.json runner section declares the agy reference 
   assert.equal(invocation.adapter, 'cli-spawn');
   assert.equal(invocation.command, 'agy');
   assert.ok(invocation.args.includes('{prompt}') && invocation.args.includes('{model}'));
-  assert.ok(invocation.args.includes('--dangerously-skip-permissions'));
+  // tsk-1xm: replaced the unconditional --dangerously-skip-permissions
+  // bypass with --mode accept-edits + a settings.json command denylist
+  // (src/setup/agy-permissions.mjs) — the boundary is now capability-
+  // enforced (agy's own permission engine), not just prompt prose.
+  assert.ok(!invocation.args.includes('--dangerously-skip-permissions'));
+  assert.ok(invocation.args.includes('--mode') && invocation.args.includes('accept-edits'));
 });
 
 test('loadRunnerConfig accepts a "executors" entry naming only "kind" (metadata-only, falls through for its executor)', () => {

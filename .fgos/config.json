@@ -45,7 +45,8 @@
             "args": [
               "-p",
               "{prompt}",
-              "--dangerously-skip-permissions",
+              "--mode",
+              "accept-edits",
               "--new-project",
               "--print-timeout",
               "10m",

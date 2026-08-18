@@ -32,6 +32,7 @@ import { detectRcFiles, hasSourceLine, deadSourceLines, probeShellIntegrationInv
 import { mergeConfigDefaults } from './config-merge.mjs';
 import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { claudeCodeHookWired } from './claude-code-hooks.mjs';
+import { checkAgyPermissionsConfigured, fixAgyPermissionsConfigured } from './agy-permissions.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
@@ -609,6 +610,17 @@ registerCheck({
   id: 'tool-registry-configured',
   description: 'tool registry posture — inactive/degraded/full (tsk-1dj)',
   check: (cwd) => checkToolRegistryConfigured(cwd),
+});
+
+registerCheck({
+  id: 'agy-permissions-configured',
+  description: 'agy settings.json has a working command denylist instead of relying only on --dangerously-skip-permissions (tsk-1xm)',
+  check: () => checkAgyPermissionsConfigured(),
+});
+
+registerFix({
+  id: 'agy-permissions-configured',
+  fix: () => fixAgyPermissionsConfigured(),
 });
 
 // tsk-5m7 (docs/history/tsk-3bn-merge-conductor-harness-v2/): a real
