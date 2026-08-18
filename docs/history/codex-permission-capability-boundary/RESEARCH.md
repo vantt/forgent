@@ -377,3 +377,28 @@ of it, scoped by prompt discipline rather than by the OS.
 reopens the trade-off Round 3 already presented, with new evidence)
 rather than silently reversing the wontfix this session already
 recorded on the user's own explicit instruction.
+
+**Follow-up, same pass — checked whether the two-invocation shape is
+actually cheap to build, and it is not.** Read
+`src/runner/dispatch/resolve.mjs:258-289`: `invocations[]` is a
+SELECTION mechanism today (pick the one entry whose `via === "cli"`
+among alternative TRANSPORTS, e.g. `cli` vs `mcp`) — `resolveExecutorConfig`
+only ever resolves and spawns exactly one process per dispatch call.
+There is no sequential "run A, then conditionally run B" concept
+anywhere in the dispatch pipeline. Building the two-invocation shape
+(edit under `-s workspace-write`, then a SEPARATE, narrowly-prompted
+`--dangerously-bypass-approvals-and-sandbox` commit-only call) would
+need real changes to the spawn logic itself: run the edit invocation,
+check whether it actually produced a stageable diff (not every
+dispatch produces one — a read-only or failed task has nothing to
+commit), only then conditionally invoke the commit step, and handle
+each step's own failure mode separately from the other's. This is
+genuinely new dispatch-layer scope, not a config change — unlike
+`agy`'s own fix (tsk-1xm), which touched zero runner code because
+`agy`'s single continuous session already matches today's
+one-process-per-dispatch model exactly (the agent decides internally
+when to commit, within the one spawned process).
+
+**User's final decision, with this cost now concrete: keep `wontfix`,
+do not open a follow-up item for the dispatch-layer work either.**
+Closing this line of investigation here.

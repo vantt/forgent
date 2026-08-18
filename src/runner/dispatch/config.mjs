@@ -78,6 +78,25 @@ export function loadRunnerConfig(configPath) {
  * is listed here for a clearer "found X, but no verified template" message
  * only — it has no entry in `SUPPORTED_EXECUTOR_TEMPLATES` below (no
  * verified working argv shape for this dispatch path).
+ *
+ * tsk-4kh looked into wiring `codex` as a real `agy`-shaped executor and
+ * found a genuine, live-proven blocker, not just "nobody built it yet":
+ * `codex exec -s workspace-write` (its real, OS-enforced sandbox — file
+ * writes confined to the workspace, network blocked entirely, stronger
+ * than `agy`'s own mechanism) works fine for edits, but `git commit`
+ * fails inside that same sandboxed session — this repo's own Node-based
+ * pre-commit hook spawns a nested `git` subprocess, and codex's sandbox
+ * refuses ANY nested process spawn (`EPERM`), confirmed generic via an
+ * isolated probe, not hook-specific. The only way past it is running
+ * `git commit` as its own separate, `--dangerously-bypass-approvals-and-
+ * sandbox` invocation — a real, unconditional bypass for that one step
+ * — which the dispatch pipeline below has no mechanism for today:
+ * `resolveExecutorConfig`'s `invocations[]` only ever selects ONE entry
+ * to spawn (by `via`), it never runs a sequential edit-then-commit
+ * pair. Building that would be real dispatch-layer scope, not a config
+ * change. Decided not to pursue either that scope or the whole-session
+ * bypass fallback — see `docs/history/codex-permission-capability-
+ * boundary/RESEARCH.md` for the full evidence trail.
  */
 export const KNOWN_ASSISTANT_CLI_NAMES = ['claude', 'codex'];
 
