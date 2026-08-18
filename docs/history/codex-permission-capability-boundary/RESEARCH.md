@@ -311,3 +311,69 @@ changing (`use_linux_sandbox_bwrap` already shows as a removed feature
 in this version, `exec_permission_approvals` shows as an unreleased one
 that may resolve this class of problem directly in a future codex
 release).
+
+## Round 4 — 2026-08-18 (user-supplied lead, live-tested)
+
+**Asked:** the user separately asked a live `codex` session (not this
+research pass) about the Round 2 finding. That session's own answer
+described an internal escalation schema (`sandbox_permissions:
+"require_escalated"`, a per-command tool-call field) and suggested
+running `git commit` as its own escalated step. Is that real and
+reachable from the plain `codex exec` CLI fgOS would actually dispatch
+through (not an interactive UI a headless dispatch has no access to)?
+
+**Checked — `codex --help`/`codex exec --help` for the literal terms
+that answer used:** no `sandbox_permissions` per-command CLI flag, no
+`require_escalated` value, and no persistent "approve prefix" config
+surface exists anywhere in the CLI's own documented flags. The one
+real match is `-a untrusted`'s "escalate to the user if the model
+proposes a command not in the trusted set" line — an INTERACTIVE
+concept (a human answers the escalation prompt) that has no meaning
+under `-a never`, the headless default this whole item dispatches
+under (confirmed: Round 1's own probe already showed `approval: never`
+printed with no `-a` flag passed). **Conclusion: the other session's
+answer describes codex's own internal agent/tool-call protocol for
+requesting escalation from a live human approver — not a CLI-level
+mechanism a headless `cli-spawn` dispatch (fgOS's own dispatch shape)
+can reach or configure.** The specific JSON shape it quoted did not
+match anything in this CLI's own `--help` output.
+
+**But the underlying REAL idea — "run the commit as its own separate,
+unsandboxed top-level process instead of nested inside the sandboxed
+edit session" — IS directly testable via the plain CLI, and DOES
+work:**
+```
+git add escalated-commit-probe.txt   # staged directly, outside codex
+codex exec --dangerously-bypass-approvals-and-sandbox \
+  "Run: git commit -m '...'. Then run: git log -1 --oneline."
+```
+Result: `git commit` exit code `0`, real commit landed
+(`1fd32b5a`), `git log -1 --oneline` confirmed it — the pre-commit
+hook's nested `git rev-parse` spawn succeeded this time, because the
+TOP-LEVEL process (`codex exec` itself) was unsandboxed, so its child
+processes inherit no restriction. Reverted cleanly afterward
+(`git reset --hard` back to the prior commit, `git status` confirmed
+clean before doing so, per this repo's own main-checkout-reset
+discipline).
+
+**What this changes:** the "runner commits instead of codex" option
+presented to the user (and declined) can be built WITHOUT changing the
+fgOS runner's own code at all — it can be a second, narrowly-scoped
+`codex exec --dangerously-bypass-approvals-and-sandbox` call, prompted
+to do nothing but `git add`/`git commit` the exact diff the FIRST
+(sandboxed, `-s workspace-write`) call already produced. This is a
+real two-invocation dispatch shape, not a runner-code change — but it
+is still new scope beyond "wire codex with one invocation, matching
+agy's own shape" (`.fgos/config.json`'s `invocations` array today holds
+exactly one entry for every executor; a two-step commit handshake is a
+different shape this item's own plan.md never designed for). The
+attack surface of the unsandboxed step is narrow (a fixed, mechanical
+prompt: "commit exactly the currently-staged diff", not general-purpose
+task instructions) but it is still a REAL, unconditional bypass for
+that one step — not a smaller version of the sandbox, a full absence
+of it, scoped by prompt discipline rather than by the OS.
+
+**Status: reported back to the user for a fresh decision** (this
+reopens the trade-off Round 3 already presented, with new evidence)
+rather than silently reversing the wontfix this session already
+recorded on the user's own explicit instruction.
