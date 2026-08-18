@@ -360,10 +360,11 @@ skill's own "leave execution alone" rule).
   (`fgos decision --text "auto-approved validateApprove gate for
   <item-id> at level <level>" --rationale "gate-bypass level <level>
   permits auto-approval per the gate-bypass feature's own locked
-  decisions (see docs/history/gate-bypass/CONTEXT.md), as superseded by
-  tsk-224" --relation supersedes:tsk-224`
-  — the text names a real supersession, so the relation flag must say so
-  too, every `fgos decision` write declares its relation, no default
+  decisions (see docs/history/gate-bypass/CONTEXT.md), per tsk-224's own gate
+  redesign" --relation touches:tsk-224`
+  — the text only cites tsk-224's own decision rather than superseding
+  it, so the relation flag says `touches`; every `fgos decision` write
+  still declares its relation explicitly, no default
   (tsk-1lv-1) — the same audit trail `gate-bypass` requires), record it
   (`fgos gate-approve <item-id> --gate
   validateApprove --actor bypass --verify "..."`, per above), then
