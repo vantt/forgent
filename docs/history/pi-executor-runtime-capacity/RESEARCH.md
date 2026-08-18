@@ -77,3 +77,102 @@ real provider credential. Two live options, both real:
 Routed to a person via `fgos ask` rather than guessed past — this is
 exactly the kind of external, unresolvable-alone gap `fgos-coding-
 validating`'s Gate exists to surface, not force through.
+
+## Round 3 — 2026-08-18 (D4 proof-test attempt, real credential now present)
+
+**Asked:** with a real provider credential now in `~/.pi/agent/auth.json`
+(the person logged in via `pi`'s interactive `/login` OAuth flow, per the
+item's own `answer` gate), does `pi` actually follow `.agents/skills/
+_shared/coding-worker-contract.md` — the item's stated D4 proof — on a
+genuinely disposable fgOS work item?
+
+**Setup (real, not simulated):**
+
+- `cat ~/.pi/agent/auth.json` — no longer `{}`; holds a real `anthropic`
+  OAuth `refresh`/`access` token pair. Confirmed before proceeding, per the
+  driver dispatch's own explicit gate.
+- `pi auth check --provider anthropic --json` → `{"status":"ready",
+  "provider":"anthropic","authType":"oauth"}`.
+- Created a genuinely disposable fgOS work item via the real `fgos submit`
+  door: `tsk-1nif` (`kind: chore`, `tier: light`, `risk: light`, `domain:
+  coding`, `verify: "true"`, `footprint: ["PROOF.txt"]`) — `fgos take
+  tsk-1nif --role session` (status → `doing`), then a real
+  `createClaimWorktree` call (the exact function `/fgOS:pick` itself calls)
+  provisioned `fgw/tsk-1nif` at `.claude/worktrees/tsk-1nif-7IFtq2` —
+  confirmed ADR0020's `.fgos/` strip applied (no `.fgos/` dir in the
+  worktree).
+- Built the dispatch prompt with the REAL `buildPrompt` function
+  (`src/runner/dispatch/prepare.mjs`), called directly against `tsk-1nif`'s
+  actual work object with `stage: 'executing'` (the same call
+  `dispatch/cli.mjs` makes) — not a hand-written approximation. Domain
+  `coding` + stage `executing` resolves to `worker-prompt-skill-
+  pointer.txt`, which points the executor at `.claude/skills/fgos-coding-
+  implement/SKILL.md` (a 710-byte generated thin wrapper, tsk-1qi,
+  redirecting to the canonical `.agents/skills/fgos-coding-implement/
+  SKILL.md` — which itself redirects a dispatched worker to `../_shared/
+  coding-worker-contract.md`). Saved verbatim:
+  `docs/history/pi-executor-runtime-capacity/evidence/round3-dispatch-
+  prompt.txt`.
+- Ran, from inside `tsk-1nif`'s own worktree (Layer 2's worktree-boundary
+  rule honored for real):
+  ```bash
+  pi --provider anthropic --tools read,write,edit,bash,grep,find,ls \
+     --mode json --approve -p "<the real buildPrompt output above>"
+  ```
+
+**Found (real event stream, both attempts):**
+
+- **First attempt** (`pi`'s own default model resolution → `claude-
+  opus-4-8`): `exit 0`, 10 JSON lines emitted (`session`, `agent_start`,
+  `turn_start`, `message_start`/`message_end` ×2, `turn_end`, `agent_end`,
+  `agent_settled`) — the documented `AgentSessionEvent` shape confirmed
+  again, live. But the assistant turn never produced any content or tool
+  call: `stopReason: "error"`, `errorMessage: "400 {\"type\":\"error\",
+  \"error\":{\"type\":\"invalid_request_error\",\"message\":\"You're out
+  of extra usage. Add more at claude.ai/settings/usage and keep
+  going.\"}...}"`. Saved: `evidence/round3-d4-attempt-opus-stdout.jsonl`.
+- **Retry, different model tier** (`--model claude-sonnet-5`, ruling out
+  an opus-specific overage gate): identical outcome — `exit 0`, same
+  10-event shape, same `400 ... "You're out of extra usage"` error, same
+  zero tool calls. Saved: `evidence/round3-d4-attempt-sonnet5-stdout.jsonl`.
+- No `tool_call`/`tool_result` events appear in either stream — the model
+  never got a turn to read the skill file, decide anything, or touch
+  `PROOF.txt`. `.fgos/events.jsonl` and the throwaway worktree's git log
+  show no activity from `pi` (nothing to show — no tool ran).
+
+**Root cause (confirmed, not guessed):** this is an ANTHROPIC-ACCOUNT-
+LEVEL usage cap on the same Claude subscription this session's own OAuth
+token draws from (`pi --provider anthropic` uses the identical `/login`
+credential the person just authorized) — not a `pi`-mechanism defect and
+not a worker-contract defect. Retrying with a materially cheaper model
+(`sonnet-5` vs. the default `opus-4-8`) produced the exact same 400,
+ruling out "this one model tier is specifically gated." This session's own
+`SendMessage`-addressable teammate roster at the time of this run listed
+~30+ concurrently active driver/angle agents against the same repo
+(`git worktree list` — 30+ live `agent-*`/`fgw/*` checkouts) — all almost
+certainly sharing this same Claude account's usage pool, which is the most
+plausible reason "extra usage" ran out mid-session rather than the
+person's login being broken.
+
+**Verdict: BLOCKED — not GREEN, not RED.** The mechanism is proven live
+(twice, Round 2 and Round 3) and the credential is proven real and
+`ready`, but the D4 behavioral question itself (does `pi` follow the
+worker contract's boundaries on a real task) has NO evidence either way —
+the model was never given a turn to act. Forcing a GREEN or RED verdict
+from zero tool calls would be fabricating the item's own most valuable
+output; this round records the honest third outcome instead.
+
+This is a second-order recurrence of the SAME fork Round 2's `askHistory`
+gate already presented and the person already answered once ("provide a
+credential to unblock D4, or scope down to config-only + a follow-up
+item") — except this time the blocker is account usage instead of a
+missing credential. Per that already-answered gate's own fallback branch,
+this item proceeds to config registration next using the CONFIRMED
+mechanism-level evidence (Round 1's registration pattern + Round 2/3's
+real `--tools <allowlist> --mode json --approve` CLI shape), and opens a
+follow-up item for the D4 proof-test itself once account usage is
+available again — rather than re-asking the same question a third time
+for a variant of the same answer.
+
+Cleanup: `tsk-1nif` moved to `wontfix` (never left dangling in the
+backlog, per the item's own scope) and its throwaway worktree removed.
