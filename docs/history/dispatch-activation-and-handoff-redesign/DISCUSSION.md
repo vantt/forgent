@@ -1,27 +1,37 @@
 # DISCUSSION.md — dispatch: cơ chế kích hoạt & bàn giao
 
-Item: `tsk-2uf` · bắt đầu 2026-08-18 · trạng thái: đã hội tụ phần thiết kế (vòng 5)
+Item: `tsk-2uf` · bắt đầu 2026-08-18 · trạng thái: đã chia việc, 3 child thật (vòng 6)
 
 ---
 
 ## 1. Trạng thái hiện tại
 
-Đã qua 5 vòng. Đề bài chuyển từ "dispatch có quá cồng kềnh không" (khung
-sai, do phiên này đặt ra) sang đúng khung của người dùng: **việc đẩy ra
-ngoài là ĐÚNG; chỉ cơ chế kích hoạt và bàn giao là rườm rà.**
+Đã qua 6 vòng. **Thảo luận đã kết thúc và đã chia việc thật.**
 
-**Vòng 5 chốt hai điều lớn:** tách `fgos-coding-implement` thành phần
-driver và phần worker (D3), và trả lời câu tổng quát-hay-coding: **cấu
-trúc tổng quát, nội dung của coding** (D4).
+Vòng 5 chốt hai điều lớn: tách driver/worker (D3) và trả lời tổng
+quát-hay-coding — *cấu trúc tổng quát, nội dung của coding* (D4).
 
-Bốn D-ID đã chốt (§4). Cả 12 mục ở §3 đã rõ — không còn mục nào treo.
-§6 đã regenerate theo hình dạng mới sau D3/D4. §7 còn 5 hạng mục (P6 đã
-bị gộp vào P1 ở vòng 5, xem §3 V12).
+Vòng 6: nghiên cứu upstream `pi` (`e5dde9a`), **đính chính một khẳng định
+sai của vòng 4** (xem §3 V13), rồi bàn giao qua
+`fgos-coding-exploring` → `fgos-coding-planning` → `fgos-coding-validating`.
+`CONTEXT.md` và `plan.md` đã viết, cả hai gate đã qua, và cổng-người của
+engine đã bắt đúng chỗ footprint chồng lấn mà `plan.md` mới chỉ ghi bằng
+prose — người dùng chọn `sequence`, thứ tự giờ khoá bằng `deps`
+index-based.
 
-**Vòng kế tiếp cần:** người dùng xác nhận §6/§7, rồi bàn giao sang
-`fgos-coding-exploring`/`fgos-coding-planning` cho từng hạng mục.
+**3 child đã thật:**
 
----
+| id | risk | deps | việc |
+|---|---|---|---|
+| `tsk-2uf-1` | standard | — | cửa `execute --work <id>`, kiêm chỗ đòi `footprint` |
+| `tsk-2uf-2` | heavy | `tsk-2uf-1` | tách driver/worker + hợp đồng worker + seam registry |
+| `tsk-2uf-3` | standard | — | đăng ký capability slot advise/execute qua `fgos setup` |
+
+**Đẻ thêm một item riêng:** `tsk-1xm` — ranh giới worker phải ép bằng
+capability chứ không bằng prose (phát hiện từ `pi`, xem §3 V13).
+
+Item cha `tsk-2uf` giờ neo bởi 3 child mở; nó không tự tiến được cho tới
+khi cả ba xong.
 
 ## 2. Mục tiêu & đề bài
 
@@ -60,6 +70,7 @@ giản** — không ngại phạm vi lớn, không để legacy làm tê liệt.
 | V9 | Cửa cho advise-lúc-planning có sẵn không | **Rõ — có, đang trống** | `decide --for <purpose>` đầy đủ; `.fgos/config.json` có `capabilities: []` |
 | V10 | Ticket dày hay mỏng | **Rõ — câu hỏi sai** | beehive làm **mỏng + thẩm định ở đầu nhận** (cold-pickup). fgOS còn có tầng beehive không có: `normalizeChild` ép self-contained *lúc viết*. Giữ cả hai → §6 |
 | V11 | Hợp đồng worker sống ở đâu | **Rõ — file riêng** | beehive `packages/bee/agents/bee-build.md.tmpl` chứng minh ở quy mô thật; fgOS đã sẵn kỷ luật mirror `_shared/`; nhét vào template thì rải luật ra các file còn phục vụ đường tự động |
+| V13 | Nguyên tắc "ranh giới ép bằng capability" có với tới out-of-process không | **Rõ — CÓ. Đính chính vòng 4** | Vòng 4 kết luận không, vì beehive gắn `tools:` vào frontmatter subagent native Claude còn `agy` là cli-spawn. Tiền đề đúng, kết luận sai: `pi.md` § `built-in-tool-set` cho thấy agent cli-spawn-shaped vẫn nhận allowlist qua cờ CLI (`pi --tools read,grep,find,ls -p ...`). fgOS đã có `invocations[].args`. Hệ quả: `agy` đang chạy `--dangerously-skip-permissions` là gap thật → `tsk-1xm` |
 | V12 | Có làm tầng "khuôn + lưới" riêng không | **Rõ — không cần tầng riêng** | Case của ta khác beehive: guard/prepare của họ kiểm **cùng một luật** (tier↔model khớp config) nên buộc phải gom; hook của ta kiểm *"đã hỏi decide chưa"*, khuôn kiểm *"lời gọi có hợp lệ không"* — **hai luật khác nhau, không có gì để trôi khỏi nhau**. P6 gộp vào P1 |
 
 ---
@@ -106,6 +117,39 @@ gì."*
 quát cho mọi việc sau này hay chỉ đơn thuần coding?** → D3, D4. Phiên tự
 chốt V11 (file riêng) và hạ V12 (P6 gộp vào P1) sau khi phát hiện case của
 fgOS khác case beehive về bản chất luật được kiểm.
+
+---
+
+**Vòng 6 — người dùng báo có upstream mới `pi`, hỏi có gì đáng ghép vào
+mảnh đang làm.** Phiên đọc `docs/distillery/sources/pi.md` (`e5dde9a`,
+chưng cất đúng cùng ngày). `pi` **cố ý không có sub-agent**, nên nó không
+dạy điều phối — nó dạy **một worker runtime tử tế trông như thế nào**,
+đúng câu hỏi hợp đồng worker đang hỏi. Ba thu hoạch:
+
+1. **Đính chính vòng 4 (V13).** Kết luận "không bê nguyên được nguyên tắc
+   capability của beehive" là **sai** — `pi --tools read,grep,find,ls -p
+   "..."` chứng minh agent cli-spawn-shaped vẫn nhận allowlist qua cờ CLI.
+   Nguyên tắc có với tới out-of-process, chỉ là qua `args` chứ không qua
+   frontmatter. → item riêng `tsk-1xm`, không nhét vào child nào (khác cơ
+   chế, khác file, và cần discovery thật về bề mặt permission của `agy`).
+2. **Ràng buộc cách viết cho hợp đồng.** `pi` có `--mode json`/`--mode
+   rpc` phát cùng bộ `AgentSessionEvent` dạng JSONL. Token cố định của ta
+   đúng cho hôm nay (mẫu số chung thấp nhất), nhưng hợp đồng không được
+   viết theo kiểu cấm đường một kênh có cấu trúc — kênh trả về là thuộc
+   tính của từng executor. Đã gấp vào `action` của child 2.
+3. **Chi tiết giữ cho sau:** JSONL framing phải LF-only; Node's
+   `readline` **không tuân thủ** vì tách cả U+2028/U+2029 — hai ký tự hợp
+   lệ trong chuỗi JSON.
+
+Sau đó bàn giao: `fgos-coding-exploring` viết `CONTEXT.md` (D1–D4 render
+từ log), `fgos-coding-planning` viết `plan.md` (lane high-risk, gộp 5
+hạng mục còn 3 vì footprint chồng nhau), `fgos-coding-validating` chạy
+cổng gộp. Hai chỗ vấp thật, đều đã sửa: một scout-table row của
+`CONTEXT.md` chứa nguyên văn tên heading locked-decisions khiến regex
+(không neo đầu dòng) cắt nhầm lát và verdict trả `invalid`; và `deps`
+trong child spec hoá ra **index-based**, nối được ngay lúc viết chứ không
+phải chờ id thật như bản nháp ghi. Cổng-người của engine bắt đúng chỗ
+footprint chồng lấn `tsk-2uf-1 ↔ tsk-2uf-2`; người dùng chọn `sequence`.
 
 ---
 
