@@ -45,6 +45,10 @@ const DEFAULT_BASELINE_PATH =
 const CITATION_RE =
   /\b(ADR|RUL|D)(\d{1,4})\b(\s*(\([^)]*\)))?/g;
 
+export function isDLocalId(id) {
+  return typeof id === 'string' && /^D\d+$/.test(id);
+}
+
 export function extractCitedIds(line, knownIds) {
   const ids = new Set();
   for (const m of line.matchAll(/ADR(\d{4})/g)) {
@@ -179,7 +183,11 @@ function findingKey(f) {
 // baseline occurrence per matching finding restores the per-occurrence
 // accounting the old line-keyed formula got for free.
 export function findNewFindings(findings, baseline) {
-  const remaining = {};
+  // Object.create(null) (tsk-1pf): a plain `{}` literal would let a
+  // source file path literally equal to "__proto__" return
+  // Object.prototype itself from `remaining[f.file]` below (truthy, not
+  // undefined), which then throws on `.get()`/`.set()`.
+  const remaining = Object.create(null);
   for (const [file, keys] of Object.entries(baseline)) {
     const counts = new Map();
     for (const key of keys) {
@@ -201,7 +209,10 @@ export function findNewFindings(findings, baseline) {
 }
 
 export function baselineFromFindings(findings) {
-  const baseline = {};
+  // Object.create(null) (tsk-1pf): same __proto__ guard as findNewFindings
+  // above -- `baseline[f.file] = []` on a plain `{}` would reassign the
+  // prototype instead of creating a normal property.
+  const baseline = Object.create(null);
   for (const f of findings) {
     if (!baseline[f.file]) baseline[f.file] = [];
     baseline[f.file].push(findingKey(f));
@@ -293,7 +304,20 @@ function loadSourceFiles(
   return sources;
 }
 
-const WIDE_SWEEP_ROOTS = ['docs', 'src', 'plugins'];
+// `.agents/skills` (tsk-12v): the canonical dev-skill source, not reached
+// by any other root before this. `.claude/skills` needs no entry of its
+// own -- its generated wrapper is byte-derived from `.agents/skills` and
+// never carries independent citation text (confirmed by direct read).
+// `plugins/fgOS/skills` stays in the roots too (it is NOT purely
+// redundant: ~35 launcher/orchestrator skills there -- cook/submit/pick/
+// etc. -- have no `.agents/skills` counterpart at all). Its ~15 dev-skill
+// files ARE byte-identical mirrors of `.agents/skills` (CI-enforced,
+// `test/skills/fgos-mirror.test.mjs`), so a stale citation living in one
+// of those gets reported once per root -- a known, accepted duplicate
+// (never a missed detection, since the mirror's own byte-identity is
+// test-enforced) rather than added cross-root exclusion complexity for a
+// cosmetic double-count.
+const WIDE_SWEEP_ROOTS = ['docs', 'src', 'plugins', '.agents/skills'];
 const WIDE_SWEEP_EXTENSIONS = new Set(['.md', '.mjs', '.js']);
 const WIDE_SWEEP_SKIP_DIR_NAMES = new Set(['node_modules', '.git']);
 
@@ -348,10 +372,15 @@ export function collectWideSourceFiles(cwd, { roots = WIDE_SWEEP_ROOTS, excludeR
  * relation id token (a `state.decisions` D-ID or work-item id, not only
  * the 4-digit ADR ids `extractCitedIds`/`DECISION_ID_PATTERN` assume).
  */
-export function findWideCitationFindings(sourceFiles, targetId, supersedingLabel) {
+export function findWideCitationFindings(sourceFiles, targetId, supersedingLabel, homeFile) {
+  let effectiveSourceFiles = sourceFiles;
+  if (isDLocalId(targetId)) {
+    if (!homeFile) return [];
+    effectiveSourceFiles = sourceFiles.filter((s) => s.file === homeFile);
+  }
   const pattern = new RegExp(`(?<![\\w-])${escapeRegExp(targetId)}(?![\\w-])`);
   const findings = [];
-  for (const { file, lines } of sourceFiles) {
+  for (const { file, lines } of effectiveSourceFiles) {
     lines.forEach((line, idx) => {
       if (!pattern.test(line)) return;
       if (supersedingLabel && line.includes(supersedingLabel)) return;
@@ -372,7 +401,7 @@ export function findWideCitationFindings(sourceFiles, targetId, supersedingLabel
 }
 
 function loadBaseline(baselinePath) {
-  if (!fs.existsSync(baselinePath)) return {};
+  if (!fs.existsSync(baselinePath)) return Object.create(null);
   return JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
 }
 

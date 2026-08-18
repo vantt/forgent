@@ -108,6 +108,22 @@ test('checkImpactDoor: empty when the item logged no supersedes-relation decisio
   assert.deepEqual(checkImpactDoor(item, decisions, repoRoot), []);
 });
 
+test('checkImpactDoor: scopes D-local superseded id to item docsRef CONTEXT.md only (tsk-679 regression)', () => {
+  const repoRoot = tmpRepoRoot();
+  const docsRef = 'docs/history/host-feature';
+  fs.mkdirSync(path.join(repoRoot, docsRef), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, docsRef, 'CONTEXT.md'), 'still cites D8 with no acknowledgement\n');
+  fs.mkdirSync(path.join(repoRoot, 'docs', 'specs'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'docs', 'specs', 'other.md'), 'unrelated document cites D8 here\n');
+
+  const item = { id: 'host-item', docsRef };
+  const decisions = [{ id: 'host-item', text: 'D9: revises D8', relation: 'supersedes:D8', kind: 'design' }];
+  const findings = checkImpactDoor(item, decisions, repoRoot);
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0].door, 'impact');
+  assert.equal(findings[0].file, 'docs/history/host-feature/CONTEXT.md');
+});
+
 // --- checkRoutingDoor (pure) ---
 
 function writeContext(repoRoot, docsRef, lockedTable) {

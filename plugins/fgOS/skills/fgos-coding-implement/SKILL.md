@@ -20,6 +20,7 @@ re-shapes the work; that already happened at `discovery`/`exploring`/`planning`.
 
 ## Hard rules
 
+- When asking questions (`fgos ask`), format question text using self-contained citations (`../_shared/citation-format.md`) and the required two-heading Markdown structure (`## Context` and `## Why this matters`, each followed by at least 20 characters of content).
 - This skill runs precisely while the session is inside the claimed
   item's worktree (the case tsk-56t exists for) — which never carries its
   own `.fgos/` by design (ADR0020). Every `fgos <verb>` this skill calls

@@ -164,7 +164,10 @@ lệch khỏi hợp đồng đã khoá (tsk-2t9c D16 — task-spec này đã t�
    - **`unclear`** — còn ít nhất một điểm chưa có bằng chứng giải quyết,
      hoặc bằng chứng mâu thuẫn nhau. Question: nêu đúng điểm còn mở, trích
      dẫn lại bằng chứng đã có (để người ở `exploring` không phải scout lại
-     từ đầu) — không hỏi chung chung.
+     từ đầu) — không hỏi chung chung. Định dạng `--question` theo self-contained
+     citations (`../_shared/citation-format.md`) và cấu trúc Markdown hai
+     heading bắt buộc (`## Context` và `## Why this matters`, mỗi phần ít
+     nhất 20 ký tự nội dung) — engine từ chối một `ask` thiếu cấu trúc này.
 
    **Chỉ khi `clear`: phán luôn `tier`/`kind`/`risk`** (D12, tsk-2yo) —
    trên CÙNG bằng chứng vừa thu ở bước 3, không research thêm vòng mới.

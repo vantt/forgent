@@ -10,6 +10,13 @@ import os from 'node:os';
 import path from 'node:path';
 import { addWork, moveWork, putInAwaiting, answerAwaiting, listWork, categoryOf } from '../../src/state/store.mjs';
 
+// tsk-539 D11: `ask` must contain two Markdown headings ("## Context",
+// "## Why this matters") each with >=20 characters of content — every
+// literal ask text in this file must satisfy that shape now.
+const VALID_ASK = '## Context\n\nWe need to decide the login mechanism for the new API.\n\n## Why this matters\n\nThe choice determines the SDK dependencies: OAuth or password?';
+const VALID_ASK_FIRST = '## Context\n\nFirst round of this decision, still open.\n\n## Why this matters\n\nThe first open question in this round.';
+const VALID_ASK_SECOND = '## Context\n\nSecond round of this decision, still open.\n\n## Why this matters\n\nThe second open question in this round.';
+
 // Every test gets its own mkdtemp dir — never touch the repo's .fgos/.
 function tmpDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-awaiting-'));
@@ -33,30 +40,30 @@ test('putInAwaiting then rebuild -> status awaiting-human + gates[id].ask', () =
   const dir = tmpDir();
   addSampleWork(dir);
 
-  const { view } = putInAwaiting(dir, { id: 'item-x', ask: 'OAuth or password?', expectedStatus: 'todo' });
+  const { view } = putInAwaiting(dir, { id: 'item-x', ask: VALID_ASK, expectedStatus: 'todo' });
   assert.equal(view.work['item-x'].status, 'awaiting-human');
   // askHistory (tsk-25g D1): additive alongside `ask`'s own unchanged
   // single-slot overwrite — see replay.test.mjs for the dedicated
   // accumulation coverage.
-  assert.deepEqual(view.gates['item-x'], { ask: 'OAuth or password?', askHistory: ['OAuth or password?'] });
+  assert.deepEqual(view.gates['item-x'], { ask: VALID_ASK, askHistory: [VALID_ASK] });
 
   const rebuilt = listWork(dir);
   assert.equal(rebuilt.work['item-x'].status, 'awaiting-human');
-  assert.deepEqual(rebuilt.gates['item-x'], { ask: 'OAuth or password?', askHistory: ['OAuth or password?'] });
+  assert.deepEqual(rebuilt.gates['item-x'], { ask: VALID_ASK, askHistory: [VALID_ASK] });
 });
 
 test('answerAwaiting then rebuild -> status todo + gates[id]={ask,answer}', () => {
   const dir = tmpDir();
   addSampleWork(dir);
-  putInAwaiting(dir, { id: 'item-x', ask: 'OAuth or password?', expectedStatus: 'todo' });
+  putInAwaiting(dir, { id: 'item-x', ask: VALID_ASK, expectedStatus: 'todo' });
 
   const { view } = answerAwaiting(dir, { id: 'item-x', answer: 'OAuth', expectedStatus: 'awaiting-human' });
   assert.equal(view.work['item-x'].status, 'todo');
-  assert.deepEqual(view.gates['item-x'], { ask: 'OAuth or password?', answer: 'OAuth', askHistory: ['OAuth or password?'] });
+  assert.deepEqual(view.gates['item-x'], { ask: VALID_ASK, answer: 'OAuth', askHistory: [VALID_ASK] });
 
   const rebuilt = listWork(dir);
   assert.equal(rebuilt.work['item-x'].status, 'todo');
-  assert.deepEqual(rebuilt.gates['item-x'], { ask: 'OAuth or password?', answer: 'OAuth', askHistory: ['OAuth or password?'] });
+  assert.deepEqual(rebuilt.gates['item-x'], { ask: VALID_ASK, answer: 'OAuth', askHistory: [VALID_ASK] });
 });
 
 test('putInAwaiting with a stale expectedStatus -> conflict, no event appended', () => {
@@ -66,7 +73,7 @@ test('putInAwaiting with a stale expectedStatus -> conflict, no event appended',
 
   const before = listWork(dir);
   assert.throws(
-    () => putInAwaiting(dir, { id: 'item-x', ask: 'OAuth or password?', expectedStatus: 'todo' }),
+    () => putInAwaiting(dir, { id: 'item-x', ask: VALID_ASK, expectedStatus: 'todo' }),
     (err) => categoryOf(err) === 'conflict',
   );
 
@@ -78,7 +85,7 @@ test('putInAwaiting with a stale expectedStatus -> conflict, no event appended',
 test('answerAwaiting with a stale expectedStatus -> conflict, no event appended', () => {
   const dir = tmpDir();
   addSampleWork(dir);
-  putInAwaiting(dir, { id: 'item-x', ask: 'OAuth or password?', expectedStatus: 'todo' });
+  putInAwaiting(dir, { id: 'item-x', ask: VALID_ASK, expectedStatus: 'todo' });
 
   const before = listWork(dir);
   assert.throws(
@@ -101,22 +108,22 @@ test('putInAwaiting with a parentSnapshotAtAsk -> gates[id].parentSnapshotAtAsk 
   const snapshot = { id: 'parent-x', title: 'Parent goal', status: 'todo' };
   const { view } = putInAwaiting(dir, {
     id: 'item-x',
-    ask: 'OAuth or password?',
+    ask: VALID_ASK,
     expectedStatus: 'todo',
     parentSnapshotAtAsk: snapshot,
   });
-  assert.deepEqual(view.gates['item-x'], { ask: 'OAuth or password?', parentSnapshotAtAsk: snapshot, askHistory: ['OAuth or password?'] });
+  assert.deepEqual(view.gates['item-x'], { ask: VALID_ASK, parentSnapshotAtAsk: snapshot, askHistory: [VALID_ASK] });
 
   const rebuilt = listWork(dir);
-  assert.deepEqual(rebuilt.gates['item-x'], { ask: 'OAuth or password?', parentSnapshotAtAsk: snapshot, askHistory: ['OAuth or password?'] });
+  assert.deepEqual(rebuilt.gates['item-x'], { ask: VALID_ASK, parentSnapshotAtAsk: snapshot, askHistory: [VALID_ASK] });
 });
 
 test('putInAwaiting with no parentSnapshotAtAsk -> no such key on gates[id] at all', () => {
   const dir = tmpDir();
   addSampleWork(dir);
 
-  const { view } = putInAwaiting(dir, { id: 'item-x', ask: 'OAuth or password?', expectedStatus: 'todo' });
-  assert.deepEqual(view.gates['item-x'], { ask: 'OAuth or password?', askHistory: ['OAuth or password?'] });
+  const { view } = putInAwaiting(dir, { id: 'item-x', ask: VALID_ASK, expectedStatus: 'todo' });
+  assert.deepEqual(view.gates['item-x'], { ask: VALID_ASK, askHistory: [VALID_ASK] });
   assert.ok(!('parentSnapshotAtAsk' in view.gates['item-x']));
 
   const rebuilt = listWork(dir);
@@ -129,13 +136,13 @@ test('a second ask after an answer overwrites the prior parentSnapshotAtAsk, nev
   addSampleWork(dir, { id: 'item-x', parent: 'parent-x' });
 
   const firstSnapshot = { id: 'parent-x', title: 'Parent goal', status: 'todo' };
-  putInAwaiting(dir, { id: 'item-x', ask: 'OAuth or password?', expectedStatus: 'todo', parentSnapshotAtAsk: firstSnapshot });
+  putInAwaiting(dir, { id: 'item-x', ask: VALID_ASK, expectedStatus: 'todo', parentSnapshotAtAsk: firstSnapshot });
   answerAwaiting(dir, { id: 'item-x', answer: 'OAuth', expectedStatus: 'awaiting-human' });
 
   const secondSnapshot = { id: 'parent-x', title: 'Parent goal (renamed)', status: 'doing' };
   const { view } = putInAwaiting(dir, {
     id: 'item-x',
-    ask: 'Second question?',
+    ask: VALID_ASK_SECOND,
     expectedStatus: 'todo',
     parentSnapshotAtAsk: secondSnapshot,
   });
@@ -144,11 +151,11 @@ test('a second ask after an answer overwrites the prior parentSnapshotAtAsk, nev
   // ask/answer accumulation shape, which is unrelated and untouched here):
   // the fresh ask's own `ask` text and `parentSnapshotAtAsk` must be the NEW
   // values, never the first ask's.
-  assert.equal(view.gates['item-x'].ask, 'Second question?');
+  assert.equal(view.gates['item-x'].ask, VALID_ASK_SECOND);
   assert.deepEqual(view.gates['item-x'].parentSnapshotAtAsk, secondSnapshot);
 
   const rebuilt = listWork(dir);
-  assert.equal(rebuilt.gates['item-x'].ask, 'Second question?');
+  assert.equal(rebuilt.gates['item-x'].ask, VALID_ASK_SECOND);
   assert.deepEqual(rebuilt.gates['item-x'].parentSnapshotAtAsk, secondSnapshot);
 });
 
@@ -164,21 +171,21 @@ test('putInAwaiting with a statusAtAsk -> gates[id].statusAtAsk on rebuild', () 
 
   const { view } = putInAwaiting(dir, {
     id: 'item-x',
-    ask: 'OAuth or password?',
+    ask: VALID_ASK,
     expectedStatus: 'doing',
     statusAtAsk: 'doing',
   });
-  assert.deepEqual(view.gates['item-x'], { ask: 'OAuth or password?', statusAtAsk: 'doing', askHistory: ['OAuth or password?'] });
+  assert.deepEqual(view.gates['item-x'], { ask: VALID_ASK, statusAtAsk: 'doing', askHistory: [VALID_ASK] });
 
   const rebuilt = listWork(dir);
-  assert.deepEqual(rebuilt.gates['item-x'], { ask: 'OAuth or password?', statusAtAsk: 'doing', askHistory: ['OAuth or password?'] });
+  assert.deepEqual(rebuilt.gates['item-x'], { ask: VALID_ASK, statusAtAsk: 'doing', askHistory: [VALID_ASK] });
 });
 
 test('putInAwaiting with no statusAtAsk -> no such key on gates[id] at all', () => {
   const dir = tmpDir();
   addSampleWork(dir);
 
-  const { view } = putInAwaiting(dir, { id: 'item-x', ask: 'OAuth or password?', expectedStatus: 'todo' });
+  const { view } = putInAwaiting(dir, { id: 'item-x', ask: VALID_ASK, expectedStatus: 'todo' });
   assert.ok(!('statusAtAsk' in view.gates['item-x']));
 
   const rebuilt = listWork(dir);
@@ -189,7 +196,7 @@ test('answerAwaiting resumes to statusAtAsk ("doing") instead of hardcoded "todo
   const dir = tmpDir();
   addSampleWork(dir);
   moveWork(dir, { id: 'item-x', to: 'doing', expectedStatus: 'todo', role: 'session', headAtTake: 'deadbeef' });
-  putInAwaiting(dir, { id: 'item-x', ask: 'OAuth or password?', expectedStatus: 'doing', statusAtAsk: 'doing' });
+  putInAwaiting(dir, { id: 'item-x', ask: VALID_ASK, expectedStatus: 'doing', statusAtAsk: 'doing' });
 
   const { view } = answerAwaiting(dir, { id: 'item-x', answer: 'OAuth', expectedStatus: 'awaiting-human', role: 'human' });
   assert.equal(view.work['item-x'].status, 'doing');
@@ -205,7 +212,7 @@ test('answerAwaiting resumes to statusAtAsk ("doing") instead of hardcoded "todo
 test('answerAwaiting with no statusAtAsk on the gate falls back to "todo" (backward-compat, byte-identical to the pre-§5.1 behavior)', () => {
   const dir = tmpDir();
   addSampleWork(dir);
-  putInAwaiting(dir, { id: 'item-x', ask: 'OAuth or password?', expectedStatus: 'todo' });
+  putInAwaiting(dir, { id: 'item-x', ask: VALID_ASK, expectedStatus: 'todo' });
 
   const { view } = answerAwaiting(dir, { id: 'item-x', answer: 'OAuth', expectedStatus: 'awaiting-human' });
   assert.equal(view.work['item-x'].status, 'todo');
@@ -215,12 +222,12 @@ test('a second ask after an answer overwrites the prior statusAtAsk, never merge
   const dir = tmpDir();
   addSampleWork(dir);
   moveWork(dir, { id: 'item-x', to: 'doing', expectedStatus: 'todo' });
-  putInAwaiting(dir, { id: 'item-x', ask: 'First?', expectedStatus: 'doing', statusAtAsk: 'doing' });
+  putInAwaiting(dir, { id: 'item-x', ask: VALID_ASK_FIRST, expectedStatus: 'doing', statusAtAsk: 'doing' });
   answerAwaiting(dir, { id: 'item-x', answer: 'first answer', expectedStatus: 'awaiting-human' });
 
-  putInAwaiting(dir, { id: 'item-x', ask: 'Second?', expectedStatus: 'doing', statusAtAsk: 'doing' });
+  putInAwaiting(dir, { id: 'item-x', ask: VALID_ASK_SECOND, expectedStatus: 'doing', statusAtAsk: 'doing' });
   const { view } = answerAwaiting(dir, { id: 'item-x', answer: 'second answer', expectedStatus: 'awaiting-human' });
-  assert.equal(view.gates['item-x'].ask, 'Second?');
+  assert.equal(view.gates['item-x'].ask, VALID_ASK_SECOND);
   assert.equal(view.work['item-x'].status, 'doing');
 });
 
@@ -238,7 +245,7 @@ test('putInAwaiting with rationale/alternatives/source -> all three land on gate
 
   const { view } = putInAwaiting(dir, {
     id: 'item-x',
-    ask: 'OAuth or password?',
+    ask: VALID_ASK,
     expectedStatus: 'todo',
     rationale: 'OAuth avoids storing a password hash at all',
     alternatives: 'password auth was considered, rejected for storage risk',
@@ -259,7 +266,7 @@ test('putInAwaiting with no rationale/alternatives/source -> none of the ask-che
   const dir = tmpDir();
   addSampleWork(dir);
 
-  const { view } = putInAwaiting(dir, { id: 'item-x', ask: 'OAuth or password?', expectedStatus: 'todo' });
+  const { view } = putInAwaiting(dir, { id: 'item-x', ask: VALID_ASK, expectedStatus: 'todo' });
   assert.ok(!('askRationale' in view.gates['item-x']));
   assert.ok(!('askAlternatives' in view.gates['item-x']));
   assert.ok(!('askSource' in view.gates['item-x']));
@@ -268,7 +275,7 @@ test('putInAwaiting with no rationale/alternatives/source -> none of the ask-che
 test('answerAwaiting with rationale/source -> both land on gates[id] alongside the answer', () => {
   const dir = tmpDir();
   addSampleWork(dir);
-  putInAwaiting(dir, { id: 'item-x', ask: 'OAuth or password?', expectedStatus: 'todo' });
+  putInAwaiting(dir, { id: 'item-x', ask: VALID_ASK, expectedStatus: 'todo' });
 
   const { view } = answerAwaiting(dir, {
     id: 'item-x',
@@ -278,7 +285,7 @@ test('answerAwaiting with rationale/source -> both land on gates[id] alongside t
     rationale: 'the team already has an OIDC provider available',
     source: 'human',
   });
-  assert.equal(view.gates['item-x'].ask, 'OAuth or password?');
+  assert.equal(view.gates['item-x'].ask, VALID_ASK);
   assert.equal(view.gates['item-x'].answer, 'OAuth');
   assert.equal(view.gates['item-x'].rationale, 'the team already has an OIDC provider available');
   assert.equal(view.gates['item-x'].source, 'human');
@@ -289,7 +296,7 @@ test('putInAwaiting then answerAwaiting, both carrying rationale -> checkpoint a
   addSampleWork(dir);
   putInAwaiting(dir, {
     id: 'item-x',
-    ask: 'OAuth or password?',
+    ask: VALID_ASK,
     expectedStatus: 'todo',
     rationale: 'leaning OAuth: fewer support tickets historically',
     source: 'session',

@@ -535,6 +535,32 @@ test(
   },
 );
 
+test(
+  'findNewFindings/baselineFromFindings do not throw on a "__proto__" ' +
+    'file (tsk-1pf: Object.create(null) hardening)',
+  () => {
+    const finding = {
+      kind: 'bare-citation',
+      file: '__proto__',
+      line: 1,
+      id: 'ADR0002',
+      text: 'see ADR0002 here',
+    };
+    const baseline = baselineFromFindings([finding]);
+    assert.deepEqual(baseline['__proto__'], [
+      'bare-citation:ADR0002:see ADR0002 here',
+    ]);
+    assert.equal(findNewFindings([finding], baseline).length, 0);
+
+    // An empty baseline (no prior entry at all for "__proto__") must
+    // also treat it as a genuinely new finding, not throw -- even when
+    // the CALLER passes a bare {} literal rather than an
+    // Object.create(null) baseline. findNewFindings' own safety never
+    // depends on the caller's baseline shape.
+    assert.equal(findNewFindings([finding], {}).length, 1);
+  },
+);
+
 // --- CLI: --write-baseline self-consistency ------------
 
 test(

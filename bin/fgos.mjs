@@ -18,7 +18,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf, parseDecisionRelation, decisionTextLooksLikeSupersession } from '../src/state/store.mjs';
-import { collectWideSourceFiles, findWideCitationFindings } from '../scripts/check-decision-citation-drift.mjs';
+import { collectWideSourceFiles, findWideCitationFindings, isDLocalId } from '../scripts/check-decision-citation-drift.mjs';
 import { computeDecisionIndex, generateDecisionIndex } from '../src/report/decision-index.mjs';
 import { renderLockedDecisionsTable } from '../src/report/context-render.mjs';
 import { runFourDoorChecks } from '../src/state/retrospective-doors.mjs';
@@ -41,7 +41,7 @@ import { readGateBypassLevel, canAutoApprove, canAutoApproveMergedGate } from '.
 const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 import { resolveFgosDir, fgosDirFromRoot, resolveMainCheckoutRoot } from '../src/runner/paths.mjs';
 import { resolveCliVersionInfo } from '../src/cli/version.mjs';
-import { resolveDiscovery, classificationPatchFromVerdict, assertCallerClassification } from '../src/intake/discovery.mjs';
+import { resolveDiscovery, classificationPatchFromVerdict, assertCallerClassification, hasRealVerify } from '../src/intake/discovery.mjs';
 import { resolvePlan, replaceLockedDecisionsSection, resolveContentRoot } from '../src/intake/plan.mjs';
 import { computeEntropy, computeCounts, FINAL_STATUSES } from '../src/report/entropy.mjs';
 import { findSourceCaptureIds } from '../src/report/enduser-index.mjs';
@@ -2003,7 +2003,15 @@ async function runVerb(verb, flags, positional, dir) {
         // is nothing a citing line could plausibly reference to prove it
         // already accounts for the supersession.
         const supersedingLabel = id ?? null;
-        const findings = findWideCitationFindings(sourceFiles, relation.id, supersedingLabel);
+        let homeFile;
+        if (isDLocalId(relation.id)) {
+          const item = id ? listWork(dir).work[id] : null;
+          const docsRefRaw = typeof item?.docsRef === 'string' && item.docsRef.trim() ? item.docsRef.trim() : (id ? `docs/history/${id}` : null);
+          if (docsRefRaw) {
+            homeFile = path.posix.join(docsRefRaw.replace(/\/+$/, ''), 'CONTEXT.md');
+          }
+        }
+        const findings = findWideCitationFindings(sourceFiles, relation.id, supersedingLabel, homeFile);
         if (findings.length) {
           result.danglingCitations = findings.map((f) => f.message);
         }
@@ -2958,6 +2966,20 @@ async function runVerb(verb, flags, positional, dir) {
         throw new StoreError(
           'validation',
           `return: work "${id}" was not taken through the pull door (claimed by "${item.claimRole ?? 'runner'}") — return only completes a take.`,
+        );
+      }
+      // tsk-1zo: a verify never upgraded from its discovery/submit-stage
+      // placeholder sentinel shells out as literal text (runGoalCheck ->
+      // runCommand) and fails with a cryptic raw shell error ("<first
+      // word>: not found", exit 127) instead of a clean refusal. Checked
+      // once here, before the branch/main-source split below, so both
+      // paths — which both call runGoalCheck further down — are covered by
+      // the same guard `resolveDiscovery` already uses at discovery-stage
+      // transitions (src/intake/discovery.mjs's hasRealVerify).
+      if (!hasRealVerify(item.verify)) {
+        throw new StoreError(
+          'validation',
+          `return: work "${id}" still carries a placeholder verify ("${item.verify}") — set a real command first: fgos edit "${id}" --verify "<command>".`,
         );
       }
 

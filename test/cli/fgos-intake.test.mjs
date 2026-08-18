@@ -639,11 +639,19 @@ test('move --reason on a non-rejection edge is accepted but ignored, not embedde
 // new formatter (D7); `answer` records the answer and resumes the item to
 // `todo`, at which point it is actionable again (back in `ready`).
 
+const VALID_ASK_TEXT = `## Context
+
+We need to decide on the authentication mechanism for the application endpoints.
+
+## Why this matters
+
+The chosen mechanism determines security requirements and user authentication flows.`;
+
 test('ask/answer round-trip on a todo item: park removes from ready and surfaces the ask via list, answer resumes to todo and reopens ready', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'gated-item');
 
-  const askResult = run(cwd, ['ask', 'gated-item', '--text', 'OAuth or password?']);
+  const askResult = run(cwd, ['ask', 'gated-item', '--text', VALID_ASK_TEXT]);
   assert.equal(askResult.status, 0);
   assert.deepEqual(envelopeData(askResult.stdout), { id: 'gated-item', from: 'todo', to: 'awaiting-human', seq: 2 });
   assert.equal(stateView(cwd).work['gated-item'].status, 'awaiting-human');
@@ -652,7 +660,7 @@ test('ask/answer round-trip on a todo item: park removes from ready and surfaces
   // read command/formatter — the existing `view.gates` fold carries it.
   const listedWhileAwaiting = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(listedWhileAwaiting.work['gated-item'].status, 'awaiting-human');
-  assert.equal(listedWhileAwaiting.gates['gated-item'].ask, 'OAuth or password?');
+  assert.equal(listedWhileAwaiting.gates['gated-item'].ask, VALID_ASK_TEXT);
   assert.equal(listedWhileAwaiting.gates['gated-item'].answer, undefined);
 
   // D6: a parked item is never in the ready set.
@@ -665,7 +673,7 @@ test('ask/answer round-trip on a todo item: park removes from ready and surfaces
   assert.equal(stateView(cwd).work['gated-item'].status, 'todo');
 
   const listedAfterAnswer = envelopeData(run(cwd, ['list']).stdout);
-  assert.equal(listedAfterAnswer.gates['gated-item'].ask, 'OAuth or password?');
+  assert.equal(listedAfterAnswer.gates['gated-item'].ask, VALID_ASK_TEXT);
   assert.equal(listedAfterAnswer.gates['gated-item'].answer, 'OAuth');
 
   const readyAfterAnswer = envelopeData(run(cwd, ['ready']).stdout);
@@ -680,7 +688,7 @@ test('ask --rationale and answer --rationale both persist on gates[id], neither 
   addOk(cwd, 'checkpoint-item');
 
   run(cwd, [
-    'ask', 'checkpoint-item', '--text', 'OAuth or password?',
+    'ask', 'checkpoint-item', '--text', VALID_ASK_TEXT,
     '--rationale', 'leaning OAuth: fewer support tickets historically',
     '--alternatives', 'password rejected: extra reset-flow maintenance',
     '--source', 'session',
@@ -718,7 +726,7 @@ test('ask/answer round-trip on a doing item: answer resumes to doing, preserving
   addOk(cwd, 'gated-doing-item');
   assert.equal(run(cwd, ['move', 'gated-doing-item', '--to', 'doing']).status, 0);
 
-  const askResult = run(cwd, ['ask', 'gated-doing-item', '--text', 'OAuth or password?']);
+  const askResult = run(cwd, ['ask', 'gated-doing-item', '--text', VALID_ASK_TEXT]);
   assert.equal(askResult.status, 0);
   assert.deepEqual(envelopeData(askResult.stdout), { id: 'gated-doing-item', from: 'doing', to: 'awaiting-human', seq: 3 });
   assert.equal(stateView(cwd).work['gated-doing-item'].status, 'awaiting-human');
@@ -765,7 +773,7 @@ test('ask rejects a CAS expected-status mismatch as conflict, exit 3, no event w
   run(cwd, ['move', 'cas-ask-item', '--to', 'doing']);
   const before = eventLines(cwd).length;
 
-  const result = run(cwd, ['ask', 'cas-ask-item', '--text', 'ready?', '--expect', 'todo']);
+  const result = run(cwd, ['ask', 'cas-ask-item', '--text', VALID_ASK_TEXT, '--expect', 'todo']);
   assert.equal(result.status, 3);
   assert.equal(eventLines(cwd).length, before);
   assert.equal(stateView(cwd).work['cas-ask-item'].status, 'doing');
@@ -1082,7 +1090,7 @@ test('answer via the real CLI stamps role "human" on the event payload and folds
   const cwd = tmpCwd();
   addOk(cwd, 'answer-actor-item');
   run(cwd, ['move', 'answer-actor-item', '--to', 'doing']);
-  run(cwd, ['ask', 'answer-actor-item', '--text', 'OAuth or password?']);
+  run(cwd, ['ask', 'answer-actor-item', '--text', VALID_ASK_TEXT]);
 
   const result = run(cwd, ['answer', 'answer-actor-item', '--text', 'OAuth']);
   assert.equal(result.status, 0);

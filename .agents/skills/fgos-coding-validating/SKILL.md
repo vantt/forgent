@@ -21,6 +21,7 @@ pass to keep the item moving.
 
 ## Hard rules
 
+- When asking questions (`fgos ask`), format question text using self-contained citations (`../_shared/citation-format.md`) and the required two-heading Markdown structure (`## Context` and `## Why this matters`, each followed by at least 20 characters of content).
 - When one of this skill's `fgos <verb>` calls (`plan`, `decision`,
   `gate-approve`) fails with a known error category, relay that category
   verbatim in the hand-back — never fold it into a generic "blocked"
@@ -359,10 +360,11 @@ skill's own "leave execution alone" rule).
   (`fgos decision --text "auto-approved validateApprove gate for
   <item-id> at level <level>" --rationale "gate-bypass level <level>
   permits auto-approval per the gate-bypass feature's own locked
-  decisions (see docs/history/gate-bypass/CONTEXT.md), as superseded by
-  tsk-224" --relation supersedes:tsk-224 --kind engine`
-  — the text names a real supersession, so the relation flag must say so
-  too, every `fgos decision` write declares its relation, no default
+  decisions (see docs/history/gate-bypass/CONTEXT.md), per tsk-224's own gate
+  redesign" --relation touches:tsk-224 --kind engine`
+  — the text only cites tsk-224's own decision rather than superseding
+  it, so the relation flag says `touches`; every `fgos decision` write
+  still declares its relation explicitly, no default
   (tsk-1lv-1) — the same audit trail `gate-bypass` requires. **`--kind
   engine` is required on this line, never omitted** (tsk-5dn): this is the
   machine recording its own auto-approve of its own gate, not a person's
