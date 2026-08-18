@@ -293,7 +293,20 @@ function loadSourceFiles(
   return sources;
 }
 
-const WIDE_SWEEP_ROOTS = ['docs', 'src', 'plugins'];
+// `.agents/skills` (tsk-12v): the canonical dev-skill source, not reached
+// by any other root before this. `.claude/skills` needs no entry of its
+// own -- its generated wrapper is byte-derived from `.agents/skills` and
+// never carries independent citation text (confirmed by direct read).
+// `plugins/fgOS/skills` stays in the roots too (it is NOT purely
+// redundant: ~35 launcher/orchestrator skills there -- cook/submit/pick/
+// etc. -- have no `.agents/skills` counterpart at all). Its ~15 dev-skill
+// files ARE byte-identical mirrors of `.agents/skills` (CI-enforced,
+// `test/skills/fgos-mirror.test.mjs`), so a stale citation living in one
+// of those gets reported once per root -- a known, accepted duplicate
+// (never a missed detection, since the mirror's own byte-identity is
+// test-enforced) rather than added cross-root exclusion complexity for a
+// cosmetic double-count.
+const WIDE_SWEEP_ROOTS = ['docs', 'src', 'plugins', '.agents/skills'];
 const WIDE_SWEEP_EXTENSIONS = new Set(['.md', '.mjs', '.js']);
 const WIDE_SWEEP_SKIP_DIR_NAMES = new Set(['node_modules', '.git']);
 
