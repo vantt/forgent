@@ -1104,6 +1104,8 @@ export const PI_EXECUTOR_DEFAULT = Object.freeze({
       args: [
         '--provider',
         'openai-codex',
+        '--model',
+        '{model}',
         '--tools',
         'read,write,edit,bash,grep,find,ls',
         '--mode',
@@ -1111,8 +1113,6 @@ export const PI_EXECUTOR_DEFAULT = Object.freeze({
         '--approve',
         '-p',
         '{prompt}',
-        '--model',
-        '{model}',
       ],
     },
   ],
