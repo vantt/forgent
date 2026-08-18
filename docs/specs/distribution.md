@@ -2,7 +2,7 @@
 area: distribution
 updated: 2026-07-23
 sources: [distribution-packaging, str76-runner-bootstrap, str77-79-doc-gap-fixes, str87-fgos-install-ux, str88-fgos-pnpm-lifecycle, str87-fgos-setup-doctor]
-decisions: [12aedbc8, 469f4c79, 5d669ff6, 38f7e0b8, ea8b9a8d, cbb4736a, 862ac01f, b799cbaa, 563db0a9, e52cc667, e8852403, 4cb11e46, 589eb4b0, 175cfc08, 1005dae0, 4206a0a6, 7d982955, ef531b22]
+decisions: [12aedbc8, 469f4c79, 5d669ff6, 38f7e0b8, ea8b9a8d, cbb4736a, 862ac01f, b799cbaa, 563db0a9, e52cc667, e8852403, 4cb11e46, 589eb4b0, 175cfc08, 1005dae0, 4206a0a6, 7d982955, ef531b22, 4d75c440]
 coverage: full
 ---
 
@@ -18,8 +18,7 @@ of it).
 
 ## Entry Points & Triggers
 
-- `npm install -g github:vantt/forgent` (run anywhere) → resolves and installs
-  the `fgos` command globally from the forgent GitHub repository.
+- `install.sh` / `install.ps1` git-hosted installer script (run anywhere, per D6 installer-supersedes-npm-global-entry-point / 4d75c440) → resolves target version and copies `fgos` into the target project (supersedes legacy `npm install -g github:vantt/forgent` global entry point).
 - After install, `fgos init` (run inside the target project) → the existing
   init/doctrine/marker-detection behavior, unchanged and owned by the
   coexistence area — see `docs/coexistence.md`.
@@ -245,6 +244,10 @@ of it).
   the same per-entry `{id, changed, message}` shape RUL11 already describes
   for `doctor --fix`'s own (per `tsk-5hi` D1,
   `docs/history/setup-runs-registered-fixes/CONTEXT.md`).
+
+## Lịch sử quyết định
+
+- **Installer supersedes npm global entry point** (per D6 installer-supersedes-npm-global-entry-point / 4d75c440, `docs/history/distribution-version-safety-r15-r27-port/CONTEXT.md`): switching the primary install entry point from `npm install -g github:vantt/forgent` to a git-hosted shell-script installer (`install.sh` / `install.ps1`) supersedes RUL1-RUL12's assumption of a shared-global npm install entry point.
 
 ## Edge Cases Settled
 
