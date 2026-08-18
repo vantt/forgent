@@ -65,6 +65,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- The `agy` (Antigravity Cli) executor no longer dispatches with
+  `--dangerously-skip-permissions` (`.fgos/config.json`'s
+  `runner.executors.agy`, now `--mode accept-edits`). `fgos doctor`/`fgos
+  setup` provision a real command-permission boundary in agy's own
+  settings.json instead (`agy-permissions-configured` check,
+  `src/setup/agy-permissions.mjs`): `toolPermission: "always-proceed"`
+  plus a `permissions.deny` list blocking destructive/exfiltration-prone
+  commands (`rm -rf`, `sudo`, force-push, `git reset --hard`, `git stash`,
+  raw `curl`/`wget`). This is a denylist (default-allow, explicit-deny),
+  not a true default-deny allowlist — `agy`'s headless (`-p`) mode was
+  live-proven (`docs/history/agy-permission-capability-allowlist/
+  RESEARCH.md` Round 4) to blanket-deny every command-type tool call under
+  its `strict`/`request-review` modes regardless of `permissions.allow`
+  content, so a real allowlist is not reachable there today — still
+  strictly narrower than the unconditional bypass it replaces.
 - `fgos decision` gains an optional `--kind` flag. Before this, every
   write through the CLI verb defaulted to `addDecision`'s own `'design'`
   kind — including `fgos-coding-validating`'s own audit line for an
