@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { evaluateHandoff } from '../../src/state/handoff.mjs';
-import { DOMAINS, roleGraphFor, legalCallEdges } from '../../src/state/workflow-stage-graphs.mjs';
+import { DOMAINS, roleGraphFor, legalCallEdges, workerContractFor } from '../../src/state/workflow-stage-graphs.mjs';
 
 const coding = DOMAINS.coding;
 const synthetic = DOMAINS.synthetic;
@@ -9,6 +9,15 @@ const synthetic = DOMAINS.synthetic;
 test('roleGraphFor: coding declares one, synthetic does not', () => {
   assert.ok(roleGraphFor(coding));
   assert.equal(roleGraphFor(synthetic), undefined);
+});
+
+test('workerContractFor: coding declares one, synthetic does not', () => {
+  assert.equal(workerContractFor(coding), '.agents/skills/_shared/coding-worker-contract.md');
+  assert.equal(workerContractFor(synthetic), undefined);
+});
+
+test('workerContractFor: undefined domain does not throw', () => {
+  assert.equal(workerContractFor(undefined), undefined);
 });
 
 test('legalCallEdges: empty for a domain with no roleGraph', () => {
