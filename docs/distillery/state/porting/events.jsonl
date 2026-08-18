@@ -96,3 +96,7 @@
 {"seq":96,"ts":"2026-08-17T08:54:54.892Z","type":"porting.add","payload":{"id":"decision-citation-and-reversal-sweep","status":"candidate"},"v":3}
 {"seq":97,"ts":"2026-08-17T08:54:54.893Z","type":"porting.add","payload":{"id":"one-line-cite-plus-local-delta","status":"candidate"},"v":3}
 {"seq":98,"ts":"2026-08-17T09:37:34.894Z","type":"porting.add","payload":{"id":"doc-rot-close-gate-bundle","status":"candidate"},"v":3}
+{"seq":99,"ts":"2026-08-18T16:10:16.289Z","type":"porting.add","payload":{"id":"pi-executor-runtime-capacity","status":"candidate"},"v":3}
+{"seq":100,"ts":"2026-08-18T16:10:16.319Z","type":"porting.move","payload":{"id":"pi-executor-runtime-capacity","from":"candidate","to":"planned"},"v":3}
+{"seq":101,"ts":"2026-08-18T16:10:16.355Z","type":"porting.move","payload":{"id":"pi-executor-runtime-capacity","from":"planned","to":"in-progress"},"v":3}
+{"seq":102,"ts":"2026-08-18T16:10:16.392Z","type":"porting.move","payload":{"id":"pi-executor-runtime-capacity","from":"in-progress","to":"adapted"},"v":3}

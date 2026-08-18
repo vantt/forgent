@@ -126,6 +126,21 @@ keys and never parsing worker prose — is the natural next step once a
 second consumer actually needs it; the token above is the first rung, not
 the final shape.
 
+**Live proof-test finding (tsk-47r):** dispatching real `pi`
+(`openai-codex`/`gpt-5.5`) against this contract confirmed it is followed
+provider-neutrally, not just claimed to be. `pi` read this file via the
+same layered skill-pointer chain a coding-domain worker always follows
+(`.claude/skills/fgos-coding-implement/SKILL.md` →
+`.agents/skills/fgos-coding-implement/SKILL.md` → this file), natively, no
+adapter or format translation. Given a genuinely insufficient brief (a
+"read first" footprint file that did not exist and no directive on what to
+do about it), it correctly refused per Layer 1 rule 3's cold-pickup
+refusal, naming exactly what was missing. Given a real, actionable
+directive, it completed the work, committed on the item's own branch
+touching only its declared footprint, never called `fgos` itself, and
+reported through the exact two-token vocabulary above. Full evidence:
+`docs/history/pi-executor-runtime-capacity/RESEARCH.md` Round 4.
+
 ## Precedent
 
 - `docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md` —

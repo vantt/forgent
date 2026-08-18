@@ -176,3 +176,121 @@ for a variant of the same answer.
 
 Cleanup: `tsk-1nif` moved to `wontfix` (never left dangling in the
 backlog, per the item's own scope) and its throwaway worktree removed.
+
+## Round 4 — 2026-08-18 (D4 proof-test retry, `openai-codex`/`gpt-5.5`)
+
+**Asked:** with `anthropic` blocked on account usage (Round 3), the person
+confirmed a DIFFERENT provider has working quota — "pi đã hoạt động, có
+quota khả dụng với model gpt-5.5 (provider khác, không phải Anthropic đang
+bị cap)". Does `pi` follow the worker contract when dispatched against a
+non-Anthropic model?
+
+**Setup (real, not simulated):**
+
+- `cat ~/.pi/agent/auth.json` — two live OAuth entries: `anthropic` (the
+  Round 3 capped one) and `openai-codex`. `pi auth check --provider
+  openai-codex --json` → `{"status":"ready","provider":"openai-codex",
+  "authType":"oauth"}`.
+- `pi --list-models "gpt-5.5"` confirmed the exact catalog entry:
+  `provider=openai-codex, model=gpt-5.5` (272K context, 128K max-out,
+  thinking yes, images yes) — the correct flag pair is `--provider
+  openai-codex --model gpt-5.5`, not a guessed `openai`/`gpt-5.5` pair.
+- Created a fresh genuinely disposable fgOS work item via the real `fgos
+  submit`/`fgos edit`/`fgos take` doors (`tsk-1nif` from Round 3 was
+  already closed and cleaned up): `tsk-1o8j` (`kind: chore`, `tier: light`,
+  `risk: light`, `domain: coding`, `verify: "true"`, `footprint:
+  ["PROOF.txt"]`) — `fgos take tsk-1o8j --role session`, then a real
+  `createClaimWorktree` call (the exact function `/fgOS:pick` itself
+  calls, with `worktreeDir: <repoRoot>/.claude/worktrees` — the same
+  default `bin/fgos.mjs`'s own `pick` verb passes) provisioned
+  `fgw/tsk-1o8j` at `.claude/worktrees/tsk-1o8j-Nfe8IX`.
+
+**Attempt 4a — description left as the bare title (mirrors Round 3's exact
+item shape):**
+
+- Built the dispatch prompt with the real `buildPrompt`
+  (`src/runner/dispatch/prepare.mjs`), `stage: 'executing'`. Saved:
+  `evidence/round4-dispatch-prompt.txt`.
+- Ran, from inside `tsk-1o8j`'s own worktree:
+  ```bash
+  pi --provider openai-codex --model gpt-5.5 \
+     --tools read,write,edit,bash,grep,find,ls \
+     --mode json --approve -p "<the real buildPrompt output above>"
+  ```
+- **Result: exit 0, real multi-turn tool use** (unlike Round 3's zero-tool-call
+  block) — 191 JSON lines, 7 turns. The model followed the layered skill
+  pointer chain exactly as designed: read `.claude/skills/fgos-coding-
+  implement/SKILL.md` → read `.agents/skills/fgos-coding-implement/
+  SKILL.md` → read `.agents/skills/_shared/coding-worker-contract.md` in
+  full → tried to read `PROOF.txt` (the item's own `footprint`, rendered
+  by `buildPrompt` as "Files to read first") → got `ENOENT` → ran `ls .`
+  and `find . -name PROOF.txt` to confirm the file genuinely does not
+  exist, rather than trusting one failed read → reported:
+  `[DONE]`? No — **`[BLOCKED] Required first-read file 'PROOF.txt' is
+  missing from this worktree.`**
+- This is the contract's own **Layer 1 rule 3 ("Cold-pickup refusal")**
+  working exactly as written: "judge whether what you were handed is
+  actually enough to proceed... If it is not enough, do not guess and do
+  not improvise a substitute. Report `[BLOCKED]` naming EXACTLY what is
+  missing." The item's own `description` never said what to DO with
+  `PROOF.txt` (create it? read something inside it?) — only the title
+  ("disposable item, verify true, discard after read") and an empty
+  `action` field. gpt-5.5 correctly treated a missing "read first" file
+  with no creation directive as insufficient brief, verified with two
+  independent tools before concluding, and used the EXACT two-token
+  format the contract specifies, with a specific (not vague) reason.
+  Saved: `evidence/round4-d4-attempt-gpt55-stdout.jsonl`.
+- **This is a genuine, valid Layer-1-rule-3 GREEN, but not a completion
+  proof** — the ambiguity is in how this round (and Round 3, same item
+  shape) set up the throwaway item's `description`, not a contract defect.
+  Retried with a corrected task shape (below) to also get the `[DONE]`
+  path's evidence, since Anthropic's quota cap made that impossible in
+  Round 3.
+
+**Attempt 4b — same item, `description` edited to a concrete, actionable
+directive** (`fgos edit tsk-1o8j --description "Create a file named
+PROOF.txt in this worktree containing the single line: tsk-1o8j proof
+written by pi/gpt-5.5. Then commit it on this item's own branch with a
+commit message that references tsk-1o8j."`):
+
+- Rebuilt the prompt with the real `buildPrompt` against the updated work
+  object. Saved: `evidence/round4b-dispatch-prompt.txt`.
+- Confirmed the worktree was still clean (only the expected ADR0020
+  `.fgos/` strip-deletions, no worker activity yet) before retrying.
+- Ran the identical `pi --provider openai-codex --model gpt-5.5 ...`
+  invocation shape from inside the same worktree.
+- **Result: exit 0, 310 JSON lines.** Tool calls used: `read`, `write`,
+  `bash` (never `edit`/`grep`/`find`/`ls` — it did not need them). It:
+  1. Re-read the layered skill chain (`.claude/skills/...` →
+     `.agents/skills/...` → the shared contract) again from scratch —
+     each dispatch is a fresh session, no memory carried from 4a.
+  2. Wrote `PROOF.txt` with EXACTLY the requested content: `tsk-1o8j proof
+     written by pi/gpt-5.5`.
+  3. Committed on the item's own branch: `ff21ff7b chore: add proof for
+     tsk-1o8j` — one commit, item id in the message, matching Layer 2 rule
+     3 exactly (`git show --stat ff21ff7b` → `PROOF.txt | 1 +`, nothing
+     else touched — footprint honored precisely).
+  4. Did NOT merge, push, tag, or call any `fgos` verb (confirmed: no
+     `.fgos/` activity, no branch-ref changes beyond the one commit).
+  5. Reported: **`[DONE] Created and committed \`PROOF.txt\`.\n\nCommit:
+     \`ff21ff7b chore: add proof for tsk-1o8j\``** — the exact fixed-token
+     format Layer 1 rule 4 specifies, plus the commit hash as supporting
+     detail (not required, but harmless prose after the token).
+  Saved: `evidence/round4b-d4-attempt-gpt55-stdout.jsonl`.
+
+**Verdict: GREEN — D4 is proven live.** `pi` running `openai-codex`/
+`gpt-5.5` — a materially different provider family from `agy`'s `gemini`
+and the Round 3 `anthropic` attempts — read `.agents/skills/_shared/
+coding-worker-contract.md` natively (no adapter, no format translation),
+respected the worktree/footprint boundary exactly (touched only
+`PROOF.txt`, the one file its `footprint` named), performed a real
+cold-pickup refusal per Layer 1 rule 3 when the brief was genuinely
+insufficient (4a), completed the task and committed correctly per Layer 2
+once given a real directive (4b), never called `fgos` itself, and reported
+through the contract's exact two-token vocabulary in both attempts. The
+worker contract (tsk-2uf-2) is confirmed provider-neutral against a real
+second consumer, not just an untested claim — the item's own stated
+highest-value output.
+
+Cleanup: `tsk-1o8j` moved to `wontfix` and its throwaway worktree/branch
+(`fgw/tsk-1o8j`) removed.
