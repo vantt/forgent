@@ -81,6 +81,16 @@ cài đặt/setup/doctor story. Before any change is done, ask:
 Laws in `docs/platform-foundations.md` are fixed until their named review
 threshold is hit. Changing one supersedes its decision ID — never edit it in place.
 
+## RUL11 — tùm lum, không phải nặng (D-ADR0036, docs/specs/platform-foundations.md)
+
+Việc trở nặng không vì bản chất nó lớn mà vì thiếu và quên — tên đúng của
+tình trạng đó là tùm lum, không phải nặng. Khi thấy tùm lum, gom lại — gom
+tới khi hết; quy mô không bao giờ là lý do miễn trừ. Đích của mọi lần gom
+là một hình dạng duy nhất: ranh giới rõ, contract tường minh, đổi và biến
+hình dễ, không chắp vá.
+
+khong phai no nang ma no tum lum
+
 ## fgOS Workflow
 
 A session opening in this repo to work an item through its lifecycle loads
