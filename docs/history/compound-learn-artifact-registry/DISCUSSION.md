@@ -98,6 +98,16 @@ trước khi rút ràng buộc):
   đã ghi thành văn ở `docs/specs/enduser-docs-authoring.md` R4 (grow-vs-
   create theo tồn-tại-tệp) — không phải bug, là quyết định hiện hành cần
   bàn lại.
+- **ĐÍNH CHÍNH (cùng vòng 9, sau khi đo lại trên `main`):** lần scout đầu
+  đọc nhầm vì worktree `fgw/tsk-28x` LÙI SAU `main`. Sự thật mạnh hơn nhiều
+  so với "tiền lệ gần giống": `tsk-1lv-4` **CHÍNH LÀ cuộc di cư Row D đang
+  tính làm, đã chạy xong**. Trước: 30+ file ADR, mỗi quyết định một file
+  (`docs/decisions/0001-*.md` … `0035-*.md`) — đúng hình dạng "một output
+  một file". Sau: narrative fold vào tài liệu sống có chủ, corpus retire
+  hẳn, còn đúng `index.md` sinh tự động (`fgos decision-index`) + doctor
+  check `decision-index-stale` canh tươi. Tỉ lệ fold thật: **36 quyết định
+  → 5 đích** (`runner` 15, `work-state` 12, `platform-foundations` 4,
+  `architecture-map` 3, `system-overview` 2).
 - **fgOS đã có sẵn cơ chế "một chủ đề một chủ sở hữu" — không phải nhập từ
   OKF, mà tự chạy thật, mới landing trong tuần qua (`tsk-1lv-4`).** Lớp
   `docs/specs/` có đúng 11 AREA cố định (`system-overview.md` § Area Map),
@@ -120,13 +130,66 @@ trước khi rút ràng buộc):
     chạm (per D16)" — 127 file với cụm trùng chủ đề rõ ràng là bằng chứng
     va chạm đã xảy ra.
 
-Câu hỏi đặt lại cho chủ sản phẩm, đang chờ trả lời: có nên tái dùng CHÍNH
-Area Map 11-area của `docs/specs/` làm trục danh tính cho tài liệu Diataxis
-luôn (một registry cho cả BA-layer lẫn end-user-layer), hay end-user docs
-cần một bộ area/chủ-đề riêng (vì góc nhìn audience khác — theo verb/skill/
-feature thay vì theo area hệ thống nội bộ)? Và: cơ chế fold-vào-section-
-sẵn-có (đã chạy thật ở `docs/specs/`) có nên là nền cho Diataxis luôn, thay
-vì xây `authoritative_for` + anti-fork gate 3 tầng của OKF từ đầu?
+**Trả lời hai câu hỏi mở của Row D — có bằng chứng đo, chờ chủ sản phẩm
+xác nhận (chưa mint):**
+
+**(1) Tái dùng CƠ CHẾ, KHÔNG tái dùng VOCABULARY.** Ba căn cứ:
+- Fold ở độ mịn "area" ĐÃ tạo ra file khổng lồ, nhìn thấy được:
+  `runner.md` **2476 dòng**, `work-state.md` **2290 dòng** — repo tự đặt
+  `docs.maxLoc: 800`, tức vượt gấp 3, mà mới hấp thụ 15 và 12 narrative.
+- Histogram từ khoá trên 223 tên file end-user docs: `merge` 23, `verify`
+  19, `item` 19, `approve` 13, `executor` 12, `discover` 12, `checkout`
+  12, `worktree` 11, `lock` 11, `decompose` 11 — gần như tất cả rơi vào
+  đúng hai area `runner` + `work-state`. Fold 223 file vào 10 area ⇒ riêng
+  tài liệu "runner" hấp thụ 60-80 file ≈ **10.000+ dòng**. Tái tạo đúng
+  thất bại đang có, chỉ đổi hình dạng từ 127 file rời sang 1 file không ai
+  đọc nổi.
+- **D-ADR0008 (đã khoá) trả lời thẳng:** *"chọn kiểu routing theo audience
+  của TỪNG interface, không toàn cục"*. Area Map = góc nhìn agent-đọc-
+  trước-khi-sửa-code. End-user docs = góc nhìn "tôi đang cố làm X với
+  fgos". Cùng nội dung, hai cách chia, theo một luật đã locked.
+
+**(2) Fold-mechanism làm nền: CÓ. Anti-fork gate: KHÔNG — lý do đo được.**
+LẤY ý tưởng `authoritative_for` (một chủ đề ⇒ đúng một tài liệu sở hữu).
+BỎ anti-fork gate 3 tầng (skeleton NFKC/confusable-fold), vì nó chống fork
+do **tên gần-giống-nhau**, còn thất bại thật của fgOS là fork **ngữ
+nghĩa** — tên khác hẳn, chủ đề chồng nhau. Ba file thật cùng một chủ đề
+(thu hồi worktree/session mồ côi): `orphaned-worktree-reclaim-must-check-
+for-live-uncommitted-work.md`, `why-reclaimorphanedcheckout-refuses-a-live-
+session-worktree.md`, `why-session-claim-liveness-reuses-worktree-activity-
+not-pid-or-event-age.md` — so khớp skeleton bắt được **0/3**. Port về là
+giải bài toán fgOS không có và bỏ sót bài toán fgOS đang có.
+Thứ thật sự chặn được: **vocabulary chủ đề ĐÓNG tại lúc GHI** — compound
+buộc chọn chủ đề đã đăng ký hoặc đăng ký mới tường minh, không tự bịa tên
+file. Cưỡng chế lúc viết, không phải so sánh sau khi đã viết.
+
+**Lỗ hổng thật của chính tiền lệ, phải mang theo:** `fgos decision --scope`
+hiện là **free text** (help: *"An area slug (e.g. 'repo', or one matching
+docs/specs/<area>.md)"*). Tự giữ gọn ở 5 giá trị vì mới 36 quyết định —
+đúng khuôn B6b (luật viết lúc N nhỏ, lật khi N lớn). End-user docs đã 223
+và tăng theo mỗi work-item.
+
+**Nguyên tắc chọn độ mịn, tính được thay vì cảm tính:** chọn số chủ đề sao
+cho tài liệu sống sau fold vẫn dưới `docs.maxLoc: 800` dòng. Ước lượng thô:
+223 tài liệu × ~50-150 dòng prose sau fold ⇒ ~6-10 nguồn mỗi đích ⇒
+**~25-35 chủ đề**. Tự hiệu chỉnh khi corpus lớn lên.
+
+**Một nửa cỗ máy đã xây xong và đang xanh** — Row D không phải xây từ đầu:
+`docs/enduser-docs-index.json` + `fgos docs-index` ✓; doctor check
+`enduser-docs-index-stale` xanh 269/269 ✓; móc truy ngược `fgos doc-sources`
+✓; cơ chế fold đã chạy thật (`tsk-1lv-4`) ✓. **Thiếu đúng ba mảnh:**
+registry chủ đề (đích fold), luật chọn chủ đề lúc compound, và doctor check
+canh registry trôi. Mảnh thứ ba không phải thêm cho đủ bộ: `herdr-web-
+dashboard.md` là area thật đang sống, mang 20 quyết định, mà KHÔNG có trong
+Area Map — registry tự nó cũng trôi, và R6 cấm trả lời bằng "sẽ có kỷ luật".
+
+**Hai câu còn lại cần chủ sản phẩm quyết (chưa trả lời):** (a) vocabulary
+chủ đề suy bottom-up từ 223 tài liệu đang có (lộ chủ đề thật, nhưng tốn một
+phép thử phân cụm kiểu `tsk-1hy` thứ hai) hay liệt kê top-down bằng tay
+(rẻ, nhanh, nhưng ra chủ đề mình TƯỞNG); (b) corpus 223 file cũ xử lý thế
+nào — fold ngược toàn bộ như `tsk-1lv-4` làm với 30 ADR (sạch nhất, đắt
+nhất), chỉ áp cho tài liệu MỚI (rẻ, mang nợ mãi, chỉ mục hai thế hệ), hay
+fold dần theo chủ đề khi có capture mới chạm vào (trung dung, lâu hết nợ).
 
 Changelog/marketing-storytelling (Làn A/B, "bản nháp") đóng băng theo yêu
 cầu chủ sản phẩm — bàn tiếp sau khi row D (trục danh tính cho Diataxis)
@@ -168,7 +231,7 @@ Diataxis hiện có (không đụng, không pha trộn — hard rule của
 | A | **Trục nào?** | **D-tsk28x-1** (vòng 3) | Hai trục, bắt buộc, hiện fgOS mới có một. Diataxis = trục TRẠNG THÁI NHẬN THỨC người đọc; OKF 9-type = trục DANH TÍNH (tài liệu này LÀ gì, của ai, về vấn đề gì). Vuông góc, một tài liệu mang cả hai nhãn |
 | B | Đóng hay mở | **ĐÃ CHỐT — D-tsk28x-3 (vòng 9)** | `struggle` KHÔNG nằm trong 4 quadrant Diataxis (Diataxis dựng từ 2 chiều hành-động/nhận-thức × tiếp-thu/vận-dụng, ra đúng 4 ô, không ô nào là struggle). Trục trạng-thái-nhận-thức ("cách viết") là **registry MỞ của nhiều FRAMEWORK**, không chỉ nhiều profile trong một lưới — Diataxis là một framework cụ thể (đóng, 4 ô); marketing-storytelling có thể cần một framework khác hẳn bản chất (cung truyện/narrative arc, không xuất phát từ lưới action×cognition của Diataxis). Mỗi framework tự đóng vocabulary riêng; trục thì mở cho framework mới gia nhập. Chủ sản phẩm tổng quát hoá đúng câu này ở vòng 9, sau khi vòng 2/3/8 đã ba lần khẳng định không ai bác |
 | C | **GHI hay ĐỀ XUẤT** | **TRẢ LỜI V3** (chưa D-ID) — câu hỏi vòng 2 đặt SAI | Không chọn một cho cả hệ thống — tách theo GIAI ĐOẠN. **Thu chất liệu: ghi thẳng, liên tục, không bao giờ dừng để hỏi** (ràng buộc chủ sản phẩm đặt: nhanh, rẻ, ít token, không cắt ngang luồng làm việc khác — loại thẳng mọi phương án gọi LLM phân loại ngay lúc capture). **Tổng hợp: nhiều pha, có triage nổi ứng viên, có người duyệt.** Lý do OKF sợ tự-ghi chỉ áp cho TÀI LIỆU (giả vờ là kết luận đã biên tập), không áp cho CHẤT LIỆU THÔ (chỉ ghi "đã xảy ra chuyện này"). Cửa gác đặt đúng chỗ chất liệu biến thành khẳng định |
-| D | Ai giữ "một chủ đề một chủ sở hữu" khi số tài liệu tăng | **ĐANG BÀN — vòng 9, chủ sản phẩm chủ động đưa lên trước Làn A/B** | `fgos-compounding` grow-vs-create CHỈ bằng `fs.existsSync` — xác nhận đúng luật văn bản (`docs/specs/enduser-docs-authoring.md` R4), không phải bug. Đo vòng 9: `docs/explanation/` 127 file, cụm worktree/discover/decompose ~20 file rời đáng ra nên gộp — bằng chứng va chạm thật (R5 area spec đó tự đặt điều kiện "chỉ cân nhắc trục thứ hai khi tài liệu thật va chạm"). fgOS ĐÃ có tiền lệ chạy thật cho đúng bài toán này — không phải OKF, là chính `docs/specs/` (11 area, mục "Lịch sử quyết định" mỗi area gom mọi quyết định thuộc area đó, `tsk-1lv-4`, mới landing) — nhẹ hơn `authoritative_for`+anti-fork 3 tầng của OKF. Lớp Diataxis không có gì tương đương. Câu hỏi mở: tái dùng chung Area Map 11-area, hay end-user docs cần bộ area riêng theo audience? |
+| D | Ai giữ "một chủ đề một chủ sở hữu" khi số tài liệu tăng | **ĐANG BÀN — vòng 9; hai câu hỏi con ĐÃ CÓ CÂU TRẢ LỜI CÓ BẰNG CHỨNG (chưa mint), hai câu mới mở** | `fgos-compounding` grow-vs-create CHỈ bằng `fs.existsSync` — đúng luật văn bản (`docs/specs/enduser-docs-authoring.md` R4), không phải bug. Đo vòng 9: `explanation` 127 / `how-to` 76 / `reference` 19 / `tutorial` 1 = 223 file; cụm worktree/discover/decompose ~20 file rời — bằng chứng va chạm thật (R5 area spec đó tự mở khoá: "chỉ cân nhắc trục thứ hai khi tài liệu thật va chạm"). **Tiền lệ: `tsk-1lv-4` CHÍNH LÀ cuộc di cư này, đã chạy xong — 30+ file ADR → fold vào 5 đích + index sinh tự động + doctor check.** Trả lời (1): tái dùng CƠ CHẾ, không tái dùng VOCABULARY — fold ở độ mịn area đã đẻ `runner.md` 2476 dòng / `work-state.md` 2290 dòng (repo đặt `docs.maxLoc: 800`), và 223 file đo được đều dồn vào 2 area đó ⇒ 10.000+ dòng một file; D-ADR0008 (đã khoá) đòi chia theo audience của TỪNG interface. Trả lời (2): fold-mechanism làm nền CÓ; anti-fork gate KHÔNG — nó chống fork tên-gần-giống, còn fgOS fork NGỮ NGHĨA (3 file cùng chủ đề reclaim-worktree, skeleton-match bắt 0/3); thứ chặn được là vocabulary ĐÓNG tại lúc GHI. Còn mở: (a) vocabulary suy bottom-up hay liệt kê top-down; (b) 223 file cũ fold ngược toàn bộ / chỉ áp cho mới / fold dần |
 | E | Ranh giới scope `tsk-28x` vs `tsk-12m` | **ĐÃ CHỐT — D-tsk28x-2 (vòng 7)** | Vòng 1 hỏi "thứ tự nào trước". Vòng 3 đổi câu hỏi: đường ống 5 pha (§6) rõ ràng lớn hơn cả hai item cộng lại. **Bổ sung 2026-08-09:** `tsk-12m` vòng 4 tìm ra ranh giới **quan sát/nhắc vs quyết/viết/chặn** (`docs/history/automated-changelog-compound-learn/DISCUSSION.md` §6.1) — loại quan sát/nhắc độc lập hoàn toàn với câu hỏi §6.4 ở đây và **sống sót qua mọi phương án**, nên làm được ngay, không cần chờ `tsk-28x`. **Vòng 7 (2026-08-11):** chủ sản phẩm xác nhận tách quan hệ — `tsk-28x` không còn `deps` trên `tsk-12m`; `tsk-12m` tự xây phần quan-sát/nhắc độc lập, phần ghi/registry của nó cắm vào bất cứ hình dạng `tsk-28x` chốt sau, không phải chờ ngược lại |
 | F | Hình dạng pha TRIAGE (pha 1, §6) | ĐỠ MỜ sau vòng 5 — xem J2 | Pha triage phải chấm điểm ứng viên. Bài học B6b (§5 vòng 2): tín hiệu xếp hạng phải chọn BẰNG ĐO, không bằng trực giác — trùng tag đo ra AUC 0.550 (≈ tung đồng xu), `areas` 0.500 (đúng bằng tung đồng xu). **Vòng 5 có ứng viên đầu có căn cứ: round-count trên mỗi item (J2).** Còn mở: đo nó bằng bộ nhãn nào — fgOS vẫn chưa có tập nhãn tay như bee đã có, nên chưa chạy được phép đo AUC tương đương |
 | G | ~~Chất liệu `struggle` đã có sẵn trong `friction`~~ | **RÚT LẠI — SAI** (đo lại vòng 4) | Vòng 3 kết luận "RÕ" từ ĐÚNG MỘT bản ghi (`tsk-1gn`) rồi suy rộng ra cả hệ thống. Đo toàn log: 131 friction = 81 `verify-miss` + 39 `merge-conflict` (92% telemetry máy), `detail` điển hình `goal-check failed on branch "fgw/tsk-puz" (exit null)` — ghi RẰNG hỏng, không ghi ĐÃ THỬ GÌ / VÌ SAO / CHỖ NGOẶT. Không phải chất liệu kể chuyện. Thứ làm vòng 3 phấn khích thực ra là `gates.askHistory`, KHÁC `friction` — vòng 3 lẫn hai thứ |
@@ -567,7 +630,27 @@ Diataxis hiện có (không đụng, không pha trộn — hard rule của
   cho chủ sản phẩm: tái dùng chung Area Map đó cho Diataxis luôn, hay
   end-user docs cần bộ area riêng theo audience; và cơ chế fold-vào-
   section-sẵn-có có nên làm nền thay vì xây `authoritative_for` từ đầu.
-  Chưa trả lời — chờ vòng 10.
+
+  **(b) Chủ sản phẩm xác nhận D-tsk28x-3 bằng cách tự tổng quát hoá nó.**
+  Trước đó session hỏi Diataxis có thật sự chỉ quyết "cách viết" chứ không
+  quyết số lượng/việc chọn tài liệu không — chủ sản phẩm xác nhận, rồi
+  nâng lên: *"trục cách viết sẽ có thể có nhiều framework tham gia"*, không
+  chỉ nhiều profile trong một lưới. Mint D-tsk28x-3 (§4), seq 19924.
+
+  **(c) Chủ sản phẩm yêu cầu tư vấn/brainstorm hai câu mở của Row D.**
+  Session đo bốn thứ trước khi tư vấn, và **tự đính chính lần scout đầu
+  cùng vòng**: worktree `fgw/tsk-28x` lùi sau `main`, nên lần đầu nhìn
+  `docs/decisions/` còn 30 file ADR và tưởng đó là "tiền lệ gần giống".
+  Đọc lại trên `main`: corpus đã retire hẳn, chỉ còn `index.md` sinh tự
+  động — tức `tsk-1lv-4` KHÔNG phải tiền lệ gần giống mà là **chính cuộc
+  di cư Row D đang tính làm, đã hoàn tất** (36 quyết định → 5 đích).
+  Ghi lại chỗ đọc nhầm này tường minh vì nó là lần thứ TƯ trong thảo luận
+  này một kết luận đứng trên dữ liệu lỗi thời (trước đó: `friction` dòng G,
+  R1 hàng đợi 54, và Làn B dòng L) — lần này nguyên nhân mới: **đọc trong
+  worktree cũ thay vì `main`**. Nguyên tắc bổ sung: scout dữ-kiện-repo phải
+  đọc ở `main`, không đọc trong worktree đã claim từ nhiều ngày trước.
+  Bốn phép đo + hai câu trả lời có bằng chứng: xem §1 vòng 9. Hai câu mới
+  (vocabulary bottom-up/top-down; xử lý 223 file cũ) chờ chủ sản phẩm.
 
 ## 6. Thiết kế đã chốt {#design}
 
