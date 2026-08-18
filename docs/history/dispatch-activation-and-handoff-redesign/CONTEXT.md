@@ -94,6 +94,7 @@ khỏi phải suy lại.
 | — | auto-approved validateApprove gate for tsk-2uf at level standard |
 | D5 | phân loại đơn vị dispatch thành 2 lớp -- lifecycle-bearing (work + child-work, cùng shape: claim/worktree/verify/footprint) và ephemeral (ad-hoc task <scope>#p<n> + research fan-out branch: không claim, không state, trả digest). Nửa GENERIC của hợp đồng worker (chỉ là phần thực thi, ranh giới, cold-pickup refusal, token cố định, gate thuộc người) áp cho CẢ HAI lớp; nửa CODING-SPECIFIC (git commit, worktree, shell verify) chỉ áp cho lifecycle-bearing |
 | D6 | học hình dạng prepareDispatch của beehive -- MỘT builder payload duy nhất, biết kind, xuyên transport. execute --work phải là MỘT CỬA của builder đó, không phải đặc lệ cho work item, để cửa anh em (--task cho ephemeral) ghép vào được sau. Guard (hook PreToolUse) VẪN tách riêng vì nó xử lý lời gọi KHÔNG có đơn vị -- builder không có input để làm việc ở case đó |
+| D7 | đổi hình tsk-2uf-1 từ 'thêm cờ --work' thành GOM dispatch.mjs (2204 dòng, 6 concern lẫn trong 1 file) thành các module có ranh giới rõ, với prepareDispatch(unit, opts) là khái niệm có tên ở giữa. dispatch.mjs giữ lại làm barrel re-export nên 13 importer không phải sửa dòng nào |
 
 ## Phép thử của D4 — vì sao "trung tính với provider" chưa được chứng minh
 
