@@ -272,3 +272,42 @@ under `-s workspace-write` plus a config tweak; it does not, for a
 reason specific to this repo's own tooling (a Node-spawning git hook),
 not a generic codex limitation. Returning to planning with this
 finding rather than declaring READY.
+
+## Round 3 — 2026-08-18 (user decision, closing this item)
+
+Presented the finding directly to the user with three real options: (a)
+have the fgOS runner itself run `git add`/`git commit` as a mechanical,
+unsandboxed step after codex's own dispatch turn returns (keeps the
+sandbox intact for everything codex actually does, but needs a
+codex-specific worker-contract change — new scope beyond this item);
+(b) accept `-s danger-full-access` (removes the sandbox entirely — the
+exact over-permission this item exists to avoid, no better than the
+unconditional bypass this item was trying to get away from); (c) stop
+here, document honestly as a provider-limitation for THIS repo's
+current tooling shape, and leave `codex` unwired.
+
+**User chose (c).** Keeps scope to what tsk-1xm already delivered
+(`agy`). Does not wire `codex` as an executor in `.fgos/config.json`.
+
+**Honest summary of what this item DID establish, for whoever revisits
+this later:** `codex exec -s workspace-write` is a real, working,
+OS-enforced default-deny sandbox — genuinely stronger than what `agy`
+offers for filesystem/network isolation (Round 1). The blocker is
+narrow and specific: a linked worktree's `git add` needs two
+`--add-dir` grants (Round 2, both confirmed working); `git commit`
+fails only because THIS repo's own pre-commit hook is a Node script
+that spawns a nested `git` subprocess, and codex's sandbox refuses any
+nested process spawn regardless of directory grants (Round 2, confirmed
+generic via an isolated probe, not hook-specific). **This is a real,
+narrow, well-understood gap, not a dead end** — if a future item either
+(i) rewrites `.githooks/pre-commit` to avoid spawning a subprocess (a
+legitimate change on its own merits, would fix this for every
+tool, not only codex), or (ii) accepts scope to make the runner commit
+on codex's behalf instead of codex committing for itself, this item's
+own Rounds 1-2 evidence is the starting point — re-verify the two
+`--add-dir` roots and the nested-spawn EPERM still hold before assuming
+either fix works, since codex's own sandbox implementation is actively
+changing (`use_linux_sandbox_bwrap` already shows as a removed feature
+in this version, `exec_permission_approvals` shows as an unreleased one
+that may resolve this class of problem directly in a future codex
+release).
