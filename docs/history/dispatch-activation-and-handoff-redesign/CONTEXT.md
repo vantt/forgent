@@ -33,7 +33,7 @@ automated path; không đụng merge/approve gate; không thêm domain mới.
 | File được trỏ tới lại bảo gọi `dispatch.mjs decide` và `fgos return <id>` | `.agents/skills/fgos-coding-implement/SKILL.md` (Flow 2, Flow 5) |
 | `footprintDiffHits` cờ mọi file ngoài `footprint`, **miễn trừ khi rỗng** (D5) | `src/runner/frozen-judge.mjs:69-100` |
 | `normalizeChild` ép child spec self-contained lúc viết (`verify` thật + `action` trích D-ID có thật) | `src/intake/plan.mjs:175-219` |
-| D-ID chỉ được đọc từ `CONTEXT.md`/`plan.md`, mục `## Locked decisions` | `src/intake/plan.mjs:50`, `extractLockedDecisionIds` |
+| D-ID chỉ được đọc từ `CONTEXT.md`/`plan.md`, trong mục locked-decisions (tên heading viết đúng ở dưới; regex `extractLockedDecisionIds` **không neo đầu dòng**, nên nhắc nguyên văn tên heading đó ở bất kỳ đâu phía trên sẽ cướp lát cắt — đã vấp thật khi viết file này) | `src/intake/plan.mjs:50`, `extractLockedDecisionIds` |
 | Chỉ MỘT điểm dispatch được ép bằng máy | `.claude/settings.json` → `PreToolUse` matcher `"Agent\|Task"` → `scripts/dispatch-decide-hook.mjs` |
 | `capabilities` rỗng hoàn toàn → cửa `decide --for <purpose>` chưa ai ở | `.fgos/config.json` |
 | 3 domain ngoài `coding` đều tự khai fixture, `skillMap` toàn `null`, `worktreeBacked:false`, không khai `roleGraph` | `src/state/workflow-stage-graphs.mjs:464-560` |
