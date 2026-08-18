@@ -1830,7 +1830,16 @@ async function runVerb(verb, flags, positional, dir) {
           'edit requires at least one field to change: --title/--description/--kind/--risk/--verify/--tier/--refs/--deps/--footprint/--acceptance/--priority/--intent/--docs-ref/--parent/--urgent/--impact/--effort/--merge-after/--superseded-by/--duplicates/--domain-fields/--verify-from-children/--verify-from-targets.',
         );
       }
-      const { event } = editWork(dir, { id, patch, role: 'human' });
+      // tsk-34o: mirrors `take --role`'s own pattern (see the `case 'take'`
+      // block below) -- optional, defaults to 'human' so every existing
+      // caller is unaffected, lets a caller that knows it is not a human
+      // (a session/sub-agent write) say so honestly instead of every write
+      // through this verb being indistinguishable provenance.
+      const role = optionalField(flags.role, 'edit --role requires "human" or "session" (omit --role entirely to default to human)') ?? 'human';
+      if (role !== 'human' && role !== 'session') {
+        throw new StoreError('validation', `edit --role must be "human" or "session" (got "${role}").`);
+      }
+      const { event } = editWork(dir, { id, patch, role });
       if (patch.priority !== undefined) {
         // tsk-sq9: mark this priority as human-set so plan.mjs's resolvePlan
         // refined pass (~line 639) knows to skip its own auto-recompute
