@@ -179,3 +179,96 @@ default-deny boundary, stronger than what agy could offer. The
 concrete minimal-args shape and worker-contract full verb coverage
 (git add/commit under sandbox) is planning's job, per the same
 discovery/planning split tsk-1xm's own item used.
+
+## Round 2 — 2026-08-18 (validating stage, this pass)
+
+**Asked:** does the full worker contract — file write, `git add`,
+`git commit`, a shell verify command — succeed under
+`codex exec -s workspace-write` (no bypass flag) from a REAL `fgw/<id>`
+linked worktree (not just this repo's plain top-level checkout, which
+Round 1 never specifically distinguished)?
+
+**Live proof #1 — `git add` fails at first, from a linked worktree,
+with NO `--add-dir`:** a linked worktree's `.git` file redirects to
+`<main-checkout>/.git/worktrees/<name>/` — a path structurally OUTSIDE
+`workdir` (the worktree's own directory), so `-s workspace-write`'s
+default `[workdir, /tmp, $TMPDIR]` roots do not cover it.
+`git add <file>` failed: `fatal: Unable to create
+'.../worktrees/tsk-4kh-qXtpCj/index.lock': Read-only file system`.
+
+**Live proof #2 — `--add-dir` fixes the write-path gap, but needs
+BOTH roots, not just one.** `--add-dir` (the flag `codex exec --help`
+documents as "additional directories that should be writable") does
+work in general — confirmed independently with a plain, non-git
+directory (`/home/vantt/codex-adddir-probe`), which was NOT writable by
+default and became writable once passed via `--add-dir`. For the git
+case specifically: passing only the worktree's own git-dir
+(`--git-dir`, e.g. `.git/worktrees/<name>`) still failed identically —
+`git add` also needs the shared object database, which lives under
+`--git-common-dir` (the main checkout's own top-level `.git`), NOT
+under `--git-dir` for a linked worktree. Passing only
+`--git-common-dir` ALSO still failed with the identical error — a
+single `--add-dir` value is not applied as a recursive superset the
+way expected. **Passing BOTH as two separate `--add-dir` flags** (one
+for `--git-dir`, one for `--git-common-dir`) is what actually worked:
+`git add` completed with exit code `0`, confirmed via a direct
+`git status --short` read afterward showing the file staged (`A`).
+
+**Live proof #3 — `git commit` still fails, for a DIFFERENT and
+deeper reason: nested subprocess spawning is blocked under the
+sandbox, regardless of `--add-dir`.** With both `--add-dir` roots
+already granted, `git commit` failed with exit code `1`:
+```
+node:internal/child_process:1143
+<ref *1> Error: spawnSync git EPERM
+    ...
+    at main (file:///home/vantt/projects/forgentX/.githooks/pre-commit:227:30)
+```
+This repo's own `.githooks/pre-commit` hook (a Node.js script, wired
+via `core.hooksPath` per AGENTS.md's str65 main-checkout lock) runs on
+every commit and itself spawns a `git rev-parse --path-format=absolute
+--show-toplevel` subprocess via Node's `child_process.spawnSync` — and
+THAT nested spawn is refused with `EPERM`, a process-execution
+permission error, not a filesystem-path error `--add-dir` can fix.
+
+**Confirmed this is a GENERAL nested-spawn restriction, not specific
+to git hooks:** ran a minimal isolated probe — `node -e
+"require('child_process').spawnSync('git', ['rev-parse',
+'--show-toplevel'])"` as the directly-invoked shell command (same
+`--add-dir` roots granted) — and got the **identical** `EPERM` on the
+nested `spawnSync git` call, even though the exact same `git
+rev-parse --show-toplevel` command run DIRECTLY as codex's own
+top-level shell command (not spawned from within another process)
+succeeds fine (see Round 1 and proof #2 above). This means: codex's
+Linux sandbox grants its full `-s workspace-write` policy to the
+directly-invoked shell command only — a process THAT process spawns
+(via `child_process.spawnSync`/`fork`/`exec`, not a shell built-in)
+appears to run under a stricter, different policy that blocks
+`execve`-ing `git` outright.
+
+**Finding — this is a real, load-bearing gap in the plan's
+Approach, not a config typo:** the worker contract's `git commit` step
+does not work as planned, specifically because THIS repo's own
+`.githooks/pre-commit` hook is a Node script that spawns a nested `git`
+subprocess. `-s workspace-write` + both `--add-dir` roots is proven
+sufficient for `git add` and for any DIRECTLY-invoked shell command
+(including a bare `git commit` with no hooks); it is NOT sufficient for
+a commit that trips a hook doing its own nested process spawn. Not yet
+tried: whether `--dangerously-bypass-hook-trust` (codex's own flag,
+distinct from git's hook mechanism, "run enabled hooks without
+requiring persisted hook trust") is relevant here at all (probably
+not — it governs codex's OWN hooks like `session_start`, not a target
+repo's git hooks); whether `-s danger-full-access` (removing the
+sandbox, the class of over-permission this item exists to avoid) is
+the only way past this; whether a `sandbox_permissions` TOML list value
+(`-c 'sandbox_permissions=[...]'`, seen in `codex --help`'s own
+examples but not yet enumerated for its full possible-values set) has
+an entry for process-spawn specifically, distinct from `-s`'s own
+three-value sandbox-policy axis.
+
+**Verdict for the Reality Gate:** this is a genuine FAIL on "Repo fit"
+— plan.md's Approach assumed the full worker contract would succeed
+under `-s workspace-write` plus a config tweak; it does not, for a
+reason specific to this repo's own tooling (a Node-spawning git hook),
+not a generic codex limitation. Returning to planning with this
+finding rather than declaring READY.
