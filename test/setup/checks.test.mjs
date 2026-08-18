@@ -676,6 +676,19 @@ test('enduser-docs-index-stale passes when the index already covers every on-dis
   fs.rmSync(tmp, { recursive: true, force: true });
 });
 
+test('enduser-docs-index-stale fails and reports orphan count when an index entry has no matching doc on disk', () => {
+  const tmp = mkTemp('fgos-enduser-index-check-');
+  writeEnduserDoc(tmp, 'how-to', 'sample.md', 'Sample Doc');
+  writeEnduserManifest(tmp, [
+    { quadrant: 'how-to', purpose: 'x', audience: 'y', docPath: 'docs/how-to/sample.md', title: 'Sample Doc', sourceCaptureId: null },
+    { quadrant: 'how-to', purpose: 'x', audience: 'y', docPath: 'docs/how-to/deleted.md', title: 'Deleted Doc', sourceCaptureId: null },
+  ]);
+  const { passed, message } = checkById('enduser-docs-index-stale').check(tmp);
+  assert.equal(passed, false);
+  assert.match(message, /1 tài liệu dư thừa/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
 test('enduser-docs-index-stale counts a doc under docs/decisions toward the explanation quadrant (alias, D6)', () => {
   const tmp = mkTemp('fgos-enduser-index-check-');
   writeEnduserDoc(tmp, 'decisions', '0001-example.md', 'Example Decision');
