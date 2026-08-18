@@ -40,6 +40,13 @@ automated path; không đụng merge/approve gate; không thêm domain mới.
 | Tiền lệ đặt tên coding-specific cho thân generic | `.agents/skills/fgos-coding-driving/SKILL.md` D12 + red flag D10 |
 | Upstream: hợp đồng worker là file riêng, vẫn trỏ skill; cold-pickup refusal; token cố định | `/home/vantt/projects/beegog` `v2.7.0` → `packages/bee/agents/bee-build.md.tmpl` |
 | Upstream: guard+prepare gom về một hàm thuần vì kiểm **cùng** một luật | `docs/knowledge/areas/hook-runtime/dispatch-guard.md` (beegog) |
+| Ad-hoc task id `<scope>#p<n>` **cấu trúc không hợp lệ** với id của work item — dấu `#` không nằm trong pattern; cố ý, để không bao giờ nhầm thành lifecycle id | `src/state/work.mjs:24` (`ID_PATTERN`), `_shared/executor-dispatch-fallback.md` § Ad-hoc |
+| Hook chỉ khớp `Agent`/`Task`, chạy `decide` **thay** caller (không kiểm caller đã gọi chưa), và **fail-open** khi lỗi → `dispatch.mjs execute` chạy qua Bash/Monitor **không hook nào chạm** | `scripts/dispatch-decide-hook.mjs` (`AGENT_TOOL_NAMES`, khối fail-open) |
+| Research fan-out branch **bỏ qua `decide` ở prose**: *"No purpose check, no decide/resolve round trip"* | `.agents/skills/fgos-researching/SKILL.md` (tsk-5tm-2 D6) |
+| Child sinh bởi decompose **không có `docsRef`/`refs`** → worker được dispatch không có đường tới `CONTEXT.md` để đọc chính D-ID mà `action` của nó trích | quan sát trực tiếp trên `tsk-2uf-1/2/3` ngay sau materialize; đã vá bằng `fgos edit` |
+| Upstream beehive v2.7.0 đi xa hơn token: worker trả **fenced JSON Result form** `{outcome, commit, files, tests, deviations}` **bên cạnh** status token; `cells finish --report` validate đúng 5 khoá (khoá lạ bị từ chối, khoá thiếu bị nêu tên); *"Tending reads the form, never parses worker prose"* | `docs/knowledge/areas/workflow-state/dispatch.md` (beegog) |
+| Upstream beehive v2.7.0: `dispatch wave` dùng **đúng cùng** đường claim+reserve+payload như per-cell `dispatch prepare --kind cell --claim`; output `{wave, skipped, economics}`; một refusal rơi vào `skipped` có lý do có kiểu, **không bao giờ abort cả batch** | cùng file trên |
+| Upstream pi **cố ý không có sub-agent** → không đóng góp gì cho câu hỏi đơn vị làm việc; nó là **worker runtime**, không phải orchestrator | `docs/distillery/sources/pi.md` § `minimal-core-by-design` |
 
 **Chi phí đo được, làm nền cho toàn bộ feature:** tsk-3kl tốn ~25 tool call
 + 12m52s wall-clock để chèn 19 dòng prose mà chính phiên Claude đã viết sẵn
@@ -66,6 +73,14 @@ khỏi phải suy lại.
   không đủ thì trả `[BLOCKED]` nêu đúng chỗ thiếu, tuyệt đối không đoán.
 - **chỗ nối (seam)** — field khai ở registry theo khuôn opt-in per-domain
   của `roleGraph`: vắng mặt nghĩa là domain đó không dispatch worker.
+- **lifecycle-bearing unit** (D5) — work item + child work: cùng một shape,
+  có claim/worktree/verify/footprint, đi qua merge.
+- **ephemeral unit** (D5) — ad-hoc task `<scope>#p<n>` + research fan-out
+  branch: không claim, không state, trả digest về cha. Id mang `#` nên
+  **cấu trúc** không bao giờ nhầm được thành lifecycle id.
+- **builder** (D6) — nơi duy nhất sinh payload dispatch, **biết kind**,
+  dùng chung cho mọi transport. Khác **guard** (hook): guard xử lý lời gọi
+  *không có đơn vị*, builder xử lý lời gọi *có đơn vị*.
 
 ## Locked decisions
 
@@ -75,6 +90,10 @@ khỏi phải suy lại.
 | D2 | phân vai theo trí tuệ -- model mạnh làm planning + phân mảnh task với description self-contained, provider model rẻ thực thi mảnh đã chia |
 | D3 | tách fgos-coding-implement thành phần driver (claim/decide/dispatch/verify/return/Iron Law) và phần worker (làm trong ranh giới, chứng minh, báo token); phiên Claude khi không dispatch cũng thi hành đúng phần worker đó, y như agy |
 | D4 | hop dong worker -- cau truc tong quat (chỗ nối khai ở registry theo đúng khuôn opt-in per-domain của roleGraph), nội dung cụ thể của coding (một bản, tên coding-specific theo tiền lệ fgos-coding-driving D12) |
+| — | auto-approved CONTEXT.md gate for tsk-2uf at level standard |
+| — | auto-approved validateApprove gate for tsk-2uf at level standard |
+| D5 | phân loại đơn vị dispatch thành 2 lớp -- lifecycle-bearing (work + child-work, cùng shape: claim/worktree/verify/footprint) và ephemeral (ad-hoc task <scope>#p<n> + research fan-out branch: không claim, không state, trả digest). Nửa GENERIC của hợp đồng worker (chỉ là phần thực thi, ranh giới, cold-pickup refusal, token cố định, gate thuộc người) áp cho CẢ HAI lớp; nửa CODING-SPECIFIC (git commit, worktree, shell verify) chỉ áp cho lifecycle-bearing |
+| D6 | học hình dạng prepareDispatch của beehive -- MỘT builder payload duy nhất, biết kind, xuyên transport. execute --work phải là MỘT CỬA của builder đó, không phải đặc lệ cho work item, để cửa anh em (--task cho ephemeral) ghép vào được sau. Guard (hook PreToolUse) VẪN tách riêng vì nó xử lý lời gọi KHÔNG có đơn vị -- builder không có input để làm việc ở case đó |
 
 ## Tham chiếu
 
