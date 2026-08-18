@@ -653,3 +653,38 @@ test('editing in the missing evidence after a refusal, then retrying move --to d
   assert.equal(result.status, 0, 'the retry must re-read the just-edited evidence, not a cached refusal');
   assert.equal(stateView(cwd).work['cli-cos-retry'].status, 'delivered');
 });
+
+// tsk-34o: edit --role, mirroring take --role's own optional-flag pattern --
+// role only ever lands in the raw event's payload (never projected onto
+// work[id], unlike take's claimRole), so these read eventLines directly.
+test('edit --role session tags the stored event payload.role "session" instead of the default human', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-role-session');
+
+  const result = run(cwd, ['edit', 'edit-role-session', '--risk', 'heavy', '--role', 'session']);
+  assert.equal(result.status, 0, `edit failed: ${result.stderr}`);
+
+  const last = JSON.parse(eventLines(cwd).at(-1));
+  assert.equal(last.payload.role, 'session');
+});
+
+test('edit omitting --role still stamps payload.role "human" -- unchanged default for every existing caller', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-role-default');
+
+  const result = run(cwd, ['edit', 'edit-role-default', '--risk', 'heavy']);
+  assert.equal(result.status, 0, `edit failed: ${result.stderr}`);
+
+  const last = JSON.parse(eventLines(cwd).at(-1));
+  assert.equal(last.payload.role, 'human');
+});
+
+test('edit --role with an invalid value is rejected as validation, exit 4, no event written', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'edit-role-bad');
+  const before = eventLines(cwd).length;
+
+  const result = run(cwd, ['edit', 'edit-role-bad', '--risk', 'heavy', '--role', 'robot']);
+  assert.equal(result.status, 4);
+  assert.equal(eventLines(cwd).length, before, 'an invalid --role must not append any event');
+});

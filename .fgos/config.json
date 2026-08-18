@@ -30,10 +30,6 @@
       },
       "pane-labeling": {
         "description": "Write a session/task id onto the current terminal pane's label, for a human watching a screen"
-      },
-      "fgos-coding-implement": {
-        "description": "code-implement work for the coding domain's executing stage",
-        "prefer": "agy"
       }
     },
     "executors": {
@@ -41,9 +37,6 @@
         "kind": "agent",
         "description": "Antigravity Cli",
         "allowCrossProvider": true,
-        "for": [
-          "fgos-coding-implement"
-        ],
         "invocations": [
           {
             "via": "cli",
@@ -52,7 +45,8 @@
             "args": [
               "-p",
               "{prompt}",
-              "--dangerously-skip-permissions",
+              "--mode",
+              "accept-edits",
               "--new-project",
               "--print-timeout",
               "10m",

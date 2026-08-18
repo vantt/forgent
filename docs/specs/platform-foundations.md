@@ -71,6 +71,7 @@ Vùng doctrine của forgent: 8 luật thiết kế đã khóa, đứng trên m�
 - **RUL8.** "Chạy xong ≠ đã merge ≠ đã bền" — mọi artifact khai mức bền D1–D5 tường minh (L7).
 - **RUL9.** Tầng doctrine nạp-mọi-turn tuân ba quy tắc: placement test một câu; transport đi kèm mệnh lệnh; mỗi rule có anchor phrase được check tự động assert (L8).
 - **RUL10.** Trend-history và reconsideration bookkeeping lưu policy-side, git-tracked (per ed953e09).
+- **RUL11.** Việc trở nặng không vì bản chất nó lớn mà vì thiếu và quên — tên đúng của tình trạng đó là tùm lum, không phải nặng; thấy tùm lum thì gom lại, gom tới khi hết, quy mô không bao giờ là lý do miễn trừ, đích là ranh giới rõ và contract tường minh (per D-ADR0036).
 
 ## Edge Cases Settled
 
@@ -382,3 +383,81 @@ nhân đôi chỗ ghi, vi phạm KISS.
   (không phải dependency).
 - `docs/distillery/sources/beegog.md` — nguồn upstream: `evolving-loop-
   two-gates`, `grooming-project-first`, `product-root-repo-divorce-topology`.
+
+### 0036 — Khoá RUL11: "tùm lum", không phải "nặng"
+
+#### Bối cảnh
+
+Phát biểu gốc của người dùng (2026-08-18, giữ nguyên văn làm nguồn — luật
+ở Business Rules là bản chưng, đoạn này là nguồn thật):
+
+> "anh vịn vay em nói nè, em đừng ngại heavy, ở đây không có gì nặng nếu
+> có em, chỉ là mọi việc tự nhiên trở nặng nếu em quên này quên kia,
+> thiếu này thiếu nọ, nên không phải nó nặng mà nó tùm lum, cái gì mà em
+> thấy nó tùm lum là phải làm cho đơn giản lại lại, gom lại, gom lại, có
+> em thì gom hết 1000 files em cũng làm được. mục đích của chúng ta luôn
+> hướng tói hình dạng cuối cùng là clear boundary, contract rõ ràng, thay
+> đổi được và biến hình dễ, không chấp vá."
+
+Bằng chứng đắt bằng tiền thật ngay trong phiên sinh ra quyết định này:
+`tsk-2uf-1` bản đầu được thiết kế là "thêm cờ `--work` vào
+`executeExecutorCli`" — tức thêm cửa thứ mười một vào một đống mười cửa
+rời rạc, tự trấn an bằng chữ "additive". Đo lại thì `src/runner/
+dispatch.mjs` là 2204 dòng chứa sáu concern tách bạch được mà không có
+ranh giới nào giữa chúng, riêng phần config + 7 hàm `validate*Shape` đã
+chiếm 794 dòng (36%). Không có luật thì phiên sau lại "additive" tiếp, và
+mỗi lần additive là một lần tùm lum thêm.
+
+Bằng chứng thứ hai, độc lập: `bin/fgos.mjs` 4201 dòng — CLAUDE.md của
+chính repo đã ghi nhận GitNexus không index nổi file này (tsk-38h: zero
+indexed `Function` symbols ngay sau một lần reindex sạch). Sự tùm lum đã
+đủ nặng để làm hỏng chính công cụ đọc-hiểu code của dự án.
+
+#### Quyết định
+
+Khoá thành RUL11 (`docs/specs/platform-foundations.md`'s Business Rules):
+việc trở nặng không vì bản chất nó lớn mà vì thiếu và quên — tên đúng của
+tình trạng đó là tùm lum, không phải nặng; thấy tùm lum thì gom lại, gom
+tới khi hết, quy mô không bao giờ là lý do miễn trừ; đích của mọi lần gom
+là một hình dạng duy nhất: ranh giới rõ, contract tường minh, đổi và biến
+hình dễ, không chắp vá.
+
+Đây là luật chứ không phải ghi chú, theo đúng RUL9's ba quy tắc tầng
+doctrine nạp-mọi-turn: placement test một câu ("có cần đúng cả khi không
+có workflow nào đang chạy?" — có, đây là triết lý làm việc, không phải
+thủ tục theo workflow); transport đi kèm mệnh lệnh (anchor phrase mang cả
+câu lệnh, không chỉ trỏ nguồn); anchor phrase được check tự động assert
+(`test/docs/rul11-anchor-phrase.test.mjs`, item mở đường vì RUL1-RUL10
+hiện chưa có test loại này — không để mâu thuẫn im lặng với RUL9).
+
+Anchor phrase (giữ nguyên trên một dòng không xuống hàng, để search theo
+dòng khớp được), đặt tại `AGENTS.md`:
+
+```
+khong phai no nang ma no tum lum
+```
+
+Đây là THÊM một luật, không sửa luật đã khoá — RUL1-RUL10 không đổi.
+
+#### Hệ quả
+
+- `docs/specs/platform-foundations.md`'s Business Rules nhận `**RUL11.**`
+  ngay sau RUL10.
+- `AGENTS.md` nhận một đoạn mới gần "## Changing a locked law", mang
+  anchor phrase verbatim trên một dòng.
+- `test/docs/rul11-anchor-phrase.test.mjs` (mới) assert cả hai vị trí trên
+  chứa anchor phrase, và RUL11 tồn tại đúng khuôn `**RUL11.**` — item đầu
+  tiên mở pattern anchor-phrase-assertion cho RULn, RUL1-RUL10 chưa được
+  bọc lại (không phải phạm vi item này).
+- Chứng cứ dẫn tới luật này (`tsk-2uf-1`/dispatch.mjs, `tsk-38h`/
+  bin/fgos.mjs) là bằng chứng đã có sẵn, không phải việc gom thật mới —
+  việc gom thật là phạm vi `tsk-2uf-1` và các item khảo sát mảng còn lại,
+  không phải item này.
+
+#### Tham chiếu
+
+- `tsk-7u7` — item sinh ra quyết định này.
+- `tsk-2uf-1` — bằng chứng thứ nhất (dispatch.mjs, 2204 dòng/6 concern).
+- `tsk-38h` — bằng chứng thứ hai (bin/fgos.mjs, GitNexus zero-index).
+- RUL9 (`docs/specs/platform-foundations.md`) — ba quy tắc tầng doctrine
+  mà RUL11 phải tuân để "dính" thay vì chỉ là khẩu hiệu.
