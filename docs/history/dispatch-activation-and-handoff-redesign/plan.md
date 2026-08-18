@@ -103,11 +103,11 @@ thật và event log mới sở hữu phần đó.
   {
     "title": "Split fgos-coding-implement into a driver half and a worker half, add the provider-neutral worker contract with fixed status tokens and cold-pickup refusal, and point the dispatch template at it through a per-domain registry seam",
     "verify": "npm test && test -f .agents/skills/_shared/coding-worker-contract.md && grep -qF 'cold-pickup' .agents/skills/_shared/coding-worker-contract.md && grep -qF '[BLOCKED]' .agents/skills/_shared/coding-worker-contract.md && ! grep -qE 'fgos (return|discover|plan) ' .agents/skills/_shared/coding-worker-contract.md",
-    "action": "D3: tách fgos-coding-implement thành phần driver (claim/decide/dispatch/verify/return/Iron Law) và phần worker (làm trong ranh giới, chứng minh, báo token), để in-process và out-of-process thi hành CÙNG một hợp đồng -- phiên Claude khi không dispatch cũng theo đúng hợp đồng đó, y như agy. D4: cấu trúc tổng quát, nội dung của coding -- chỗ nối khai ở registry theo đúng khuôn opt-in per-domain của roleGraph (vắng mặt = domain đó không dispatch worker, phải là no-op cho 3 domain fixture), còn nội dung viết một bản cho coding, tên coding-specific theo tiền lệ fgos-coding-driving D12. Hợp đồng mang: nạp Execute-loop của skill được trỏ, chỉ là phần thực thi, ranh giới là footprint (file không được nêu tên là câu hỏi phạm vi cho orchestrator), cold-pickup refusal (prompt không đủ thì trả BLOCKED nêu đúng chỗ thiếu, không đoán), token trả về cố định, gate/quyết định thuộc người. Vế negative của verify khoá đúng mâu thuẫn V3: hợp đồng KHÔNG được bảo worker gọi verb ghi state.",
+    "action": "D3: tách fgos-coding-implement thành phần driver (claim/decide/dispatch/verify/return/Iron Law) và phần worker (làm trong ranh giới, chứng minh, báo token), để in-process và out-of-process thi hành CÙNG một hợp đồng -- phiên Claude khi không dispatch cũng theo đúng hợp đồng đó, y như agy. D4: cấu trúc tổng quát, nội dung của coding -- chỗ nối khai ở registry theo đúng khuôn opt-in per-domain của roleGraph (vắng mặt = domain đó không dispatch worker, phải là no-op cho 3 domain fixture), còn nội dung viết một bản cho coding, tên coding-specific theo tiền lệ fgos-coding-driving D12. Hợp đồng mang: nạp Execute-loop của skill được trỏ, chỉ là phần thực thi, ranh giới là footprint (file không được nêu tên là câu hỏi phạm vi cho orchestrator), cold-pickup refusal (prompt không đủ thì trả BLOCKED nêu đúng chỗ thiếu, không đoán), token trả về cố định, gate/quyết định thuộc người. Vế negative của verify khoá đúng mâu thuẫn V3: hợp đồng KHÔNG được bảo worker gọi verb ghi state. Ràng buộc cách viết (upstream pi, docs/distillery/sources/pi.md § integration-contract): token cố định là mẫu số chung thấp nhất cho executor chỉ có print-mode; viết hợp đồng sao cho KHÔNG cấm đường một kênh trả về có cấu trúc (pi's --mode json / --mode rpc phát cùng bộ AgentSessionEvent dưới dạng JSONL) khi provider có -- kênh trả về là thuộc tính của từng executor, không phải một hình dạng hardcode trong hợp đồng.",
     "footprint": [".agents/skills/_shared/coding-worker-contract.md", "plugins/fgOS/skills/_shared/coding-worker-contract.md", ".agents/skills/fgos-coding-implement/SKILL.md", "plugins/fgOS/skills/fgos-coding-implement/SKILL.md", ".claude/skills/fgos-coding-implement/SKILL.md", "src/state/workflow-stage-graphs.mjs", "src/runner/dispatch.mjs", "test/skills/fgos-mirror.test.mjs"],
     "kind": "feature",
     "risk": "heavy",
-    "deps": []
+    "deps": [0]
   },
   {
     "title": "Register the advise and execute capability slots as a fgos setup configDefault plus a doctor check, so the empty capabilities map gets filled through the sanctioned door instead of a hand edit",
@@ -120,11 +120,14 @@ thật và event log mới sở hữu phần đó.
 ]
 ```
 
-**Ghi chú cho `fgos-coding-validating`:** child thứ hai phải chạy **sau**
-child thứ nhất (cùng đụng `src/runner/dispatch.mjs`, khác hàm). `deps` để
-rỗng vì id của child thứ nhất chưa tồn tại lúc viết plan này — cổng
-materialize là nơi duy nhất tạo child, nên xin nối `deps` ngay tại đó.
-Child thứ ba không giao file với hai child kia, chạy song song được.
+**Thứ tự đã khoá bằng máy:** child thứ hai mang `deps: [0]` — `deps` trong
+child spec là **index-based**, không phải id-based
+(`buildDecomposeChildrenVerdict` lọc `d < index`), nên nối được ngay lúc
+viết, không phải chờ id thật. Bản nháp trước ghi nhầm là phải chờ, và để
+`deps` rỗng kèm một ghi chú prose — cổng-người của engine đã bắt đúng chỗ
+chồng lấn đó (`tsk-2uf-1 ↔ tsk-2uf-2` trùng `src/runner/dispatch.mjs`) và
+người dùng chọn `sequence`. Child thứ ba không giao file với hai child
+kia, chạy song song được.
 
 ## Ghi chú tier A — câu hỏi P5 đã tự đóng
 
@@ -153,6 +156,52 @@ Nên P5 không phải "config change không có cửa" — nó là `src/` work b
 thường, làm được trong worktree; và hướng (a) sửa tay trên main checkout
 đúng ra là **vi phạm** luật trên, không phải một lựa chọn hợp lệ. Không
 còn gì để hỏi người ở đây.
+
+## Ghi chú upstream `pi` — một đính chính, một ràng buộc cách viết
+
+Nguồn: `docs/distillery/sources/pi.md` (chưng cất `e5dde9a`, 2026-08-18).
+`pi` là harness terminal tối giản, **cố ý không có sub-agent** — nên nó
+không dạy ta cách điều phối; nó dạy ta **một worker runtime tử tế trông
+như thế nào**, đúng câu hỏi hợp đồng worker đang hỏi.
+
+**Đính chính cho `DISCUSSION.md` §6.** Ở vòng 4 tôi viết beehive's
+`PINNED_AGENT_TYPE` "không bê nguyên" vì nó gắn `tools:`/`model:` vào
+frontmatter subagent native của Claude, còn executor `agy` của ta là
+cli-spawn ra tiến trình ngoài. Tiền đề đúng, **kết luận sai**: `pi` cho
+thấy một agent cli-spawn-shaped **vẫn nhận được allowlist năng lực qua
+cờ CLI** — `pi --tools read,grep,find,ls -p "Review the code"` là một
+worker read-only, ép bằng chính tiến trình, không bằng câu dặn
+(`pi.md` § `built-in-tool-set`). Vậy nguyên tắc của beehive *"ranh giới
+ép bằng CAPABILITY, không bằng câu dặn"* **có** với tới out-of-process —
+chỉ là qua `invocations[].args`, không qua frontmatter. fgOS đã có sẵn
+đúng cái xe đó.
+
+Và nó phơi ra một chỗ hỏng trong chính config hiện tại: `agy` đang chạy
+với `--dangerously-skip-permissions`. Ta đang làm **ngược** nguyên tắc
+trên — trao toàn quyền cho worker rồi trông vào prose ("ranh giới là
+`footprint`") để giữ nó trong khuôn.
+
+**Không nhét vào child nào của plan này** (khác cơ chế hoàn toàn: config
+executor args, không phải skill prose + seam registry; và không giao
+footprint với cả ba child). Cũng **không trùng `tsk-49o`** — item đó là
+sandbox mức OS (bubblewrap/firejail/sandbox-exec), tự khai là
+*"defense-in-depth **on top of allowedTools**"*, tức nó **giả định** lớp
+allowlist đã tồn tại. Lớp đó chính là thứ đang thiếu. Đi thành item
+riêng, vì còn cần discovery thật (agy có bề mặt permission diễn đạt được
+allowlist không — cờ `--dangerously-skip-permissions` hàm ý có, nhưng
+chưa kiểm).
+
+**Ràng buộc cách viết, đã gấp vào `action` của child 2.** `pi` có
+`--mode json` / `--mode rpc` phát cùng một bộ `AgentSessionEvent` dạng
+JSONL (`pi.md` § `integration-contract`). Token cố định của ta là mẫu số
+chung thấp nhất cho executor chỉ có print-mode — đúng cho hôm nay, nhưng
+hợp đồng không được viết theo kiểu **cấm đường** một kênh có cấu trúc về
+sau. Kênh trả về là thuộc tính của từng executor.
+
+Chi tiết đáng giữ cho lúc thật sự làm kênh JSONL: pi cảnh báo framing
+phải **LF-only**, và Node's `readline` **không tuân thủ** vì nó tách cả
+U+2028/U+2029 — hai ký tự hợp lệ bên trong chuỗi JSON. Đây là loại ghi
+chú chỉ xuất hiện sau một lần tích hợp hỏng thật.
 
 ## Outstanding questions
 
