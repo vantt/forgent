@@ -6,7 +6,7 @@ Mode: tiny
 ## Lane — how it was counted
 
 No prior lane hand-off existed for this session (direct-entry into
-`fgos-planning`; `fgos discover`'s caller-supplied verdict jumped
+`fgos-coding-planning`; `fgos discover`'s caller-supplied verdict jumped
 `clarify -> decompose` directly, so no Orient step ran first). Applying
 `fgos-routing`'s own Mode-gate table directly:
 
@@ -67,8 +67,8 @@ Verified independently, not taken on the item's word alone:
 - `grep -rl "fgos-submit-assist" test/` → zero hits. No test names or
   exercises this skill; nothing to update or regress.
 - `grep -rl "capacity-dispatch-fallback" .claude/skills plugins/fgOS/skills
-  test/` → 8 hits: `fgos-code-implement`, `fgos-validating`,
-  `fgos-exploring`, `fgos-researching`, `fgos-fanout`, `fgos-planning`
+  test/` → 8 hits: `fgos-coding-implement`, `fgos-coding-validating`,
+  `fgos-coding-exploring`, `fgos-researching`, `fgos-fanout`, `fgos-coding-planning`
   (this file), `test/docs/launcher-vocabulary-guard.test.mjs`, and
   `fgos-submit-assist` itself. Removing `fgos-submit-assist` leaves SIX
   other real consumers — `capacity-dispatch-fallback.md` keeps its

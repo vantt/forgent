@@ -99,4 +99,4 @@ sync-root, merge-set clustering) tracked separately in
 
 - Exact fix shape (reorder the RUL58 check ahead of `mergeRunnerItem`,
   extract it into a standalone pre-flight validator, or another
-  approach) — implementation choice, belongs to `fgos-planning`.
+  approach) — implementation choice, belongs to `fgos-coding-planning`.

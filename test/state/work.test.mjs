@@ -463,8 +463,8 @@ test('DEFAULTS.tier is itself a member of TIERS, and SCHEMA_VERSION is a positiv
   assert.ok(Number.isInteger(SCHEMA_VERSION) && SCHEMA_VERSION > 0);
 });
 
-test('STAGES includes "decompose" between clarify and executing — compound-learn is retired (D11); "discovery"/"exploring" now sit between clarify and decompose (tsk-1w7 D10)', () => {
-  assert.deepEqual(STAGES, ['clarify', 'discovery', 'exploring', 'decompose', 'executing']);
+test('STAGES: "clarify" is retired entirely (tsk-qod D1/D2) — "discovery" is stages[0], the domain\'s own entry point; "decompose" survives only as a legacy, drain-only alias (D18) ahead of "planning" (tsk-403 D11)', () => {
+  assert.deepEqual(STAGES, ['discovery', 'exploring', 'decompose', 'planning', 'executing']);
 });
 
 test('validateWork accepts every stage in STAGES', () => {
@@ -475,7 +475,7 @@ test('validateWork accepts every stage in STAGES', () => {
 
 test('validateWork rejects a stage outside the STAGES domain', () => {
   assert.throws(
-    () => validateWork(baseWork({ stage: 'planning' })),
+    () => validateWork(baseWork({ stage: 'bogus-stage' })),
     (err) => err instanceof WorkValidationError && /stage/.test(err.message),
   );
 });
@@ -919,4 +919,34 @@ test('checkAcceptanceEvidenceTraceable is a no-op when repoRoot is omitted (opt-
     acceptance: [{ text: 'root cause confirmed', evidence: 'trust me, no real citation here' }],
   });
   assert.equal(checkAcceptanceEvidenceTraceable(work, undefined), true);
+});
+
+// holder (tsk-2t9c D1): every existing item has no `holder` at all —
+// that must stay valid, since coding declares a roleGraph but the field
+// is optional/lazy-default, same as `stage` itself.
+test('validateWorkShape accepts an item with no holder at all (every existing item)', () => {
+  assert.doesNotThrow(() => validateWorkShape(baseWork()));
+});
+
+test('validateWorkShape accepts a holder that is one of coding\'s declared roles', () => {
+  assert.doesNotThrow(() => validateWorkShape(baseWork({ holder: 'reviewer' })));
+});
+
+test('validateWorkShape rejects a holder outside coding\'s declared roles', () => {
+  assert.throws(() => validateWorkShape(baseWork({ holder: 'project-manager' })), WorkValidationError);
+});
+
+test('validateWorkShape rejects any holder on a domain with no roleGraph (synthetic)', () => {
+  assert.throws(
+    () => validateWorkShape(baseWork({ domain: 'synthetic', stage: 'assembling', holder: 'implementer' })),
+    WorkValidationError,
+  );
+});
+
+test('validateWorkShape (touchedFields): an unchanged, already-invalid holder is grandfathered on edit', () => {
+  // Mirrors the exact D1/D2 (tsk-1ne) precedent this file already documents
+  // for legacy shape: a patch that never touches `holder` must not
+  // re-validate whatever value the record already carries.
+  const work = baseWork({ holder: 'some-legacy-role-no-longer-declared' });
+  assert.doesNotThrow(() => validateWorkShape(work, new Set(['title'])));
 });

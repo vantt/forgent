@@ -4,8 +4,20 @@
 // platform-agnostic content enforcement.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 
-import { projectAgentMarkdown, AgentDefinitionError, DEFAULT_MODELS } from '../../scripts/project-agents.mjs';
+import { projectAgentMarkdown, AgentDefinitionError, DEFAULT_MODELS, readRunnerModels } from '../../scripts/project-agents.mjs';
+
+function mkTempDir() {
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'project-agents-test-'));
+}
+
+function writeSharedConfig(dir, runner) {
+  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({ runner }));
+}
 
 const VALID_YAML = `
 name: test-agent
@@ -40,6 +52,27 @@ test('model_tier resolves through the same tier->model map the shared config fil
   assert.equal(modelLine, 'model: haiku');
 });
 
+// claims (tsk-2t9c D12): optional multi-role-harness eligibility field --
+// projects through unfiltered when present, is entirely absent from the
+// frontmatter when the source yaml never declares it (every pre-existing
+// agent-type, including the shipped fgos-placeholder.yaml, is unaffected).
+test('claims, when declared, projects into the frontmatter as a bracketed list', () => {
+  const withClaims = VALID_YAML + '\nclaims:\n  - review-item\n  - validate-plan\n';
+  const markdown = projectAgentMarkdown('test-agent', withClaims, DEFAULT_MODELS);
+  const claimsLine = markdown.split('\n').find((line) => line.startsWith('claims:'));
+  assert.equal(claimsLine, 'claims: [review-item, validate-plan]');
+});
+
+test('claims is absent from the frontmatter when the source yaml never declares it (backward compatible)', () => {
+  const markdown = projectAgentMarkdown('test-agent', VALID_YAML, DEFAULT_MODELS);
+  assert.equal(markdown.includes('claims:'), false);
+});
+
+test('a claims list containing a non-string entry is refused, not silently coerced', () => {
+  const badClaims = VALID_YAML + '\nclaims:\n  - review-item\n  - 42\n';
+  assert.throws(() => projectAgentMarkdown('test-agent', badClaims, DEFAULT_MODELS), AgentDefinitionError);
+});
+
 test('projection is idempotent -- identical source produces byte-identical output across two runs', () => {
   const first = projectAgentMarkdown('test-agent', VALID_YAML, DEFAULT_MODELS);
   const second = projectAgentMarkdown('test-agent', VALID_YAML, DEFAULT_MODELS);
@@ -71,4 +104,31 @@ test('an empty tool-scope is refused -- an agent-type with no declared tools is 
 test('an unrecognized model_tier is refused rather than silently falling through to undefined', () => {
   const badTier = VALID_YAML.replace('model_tier: light', 'model_tier: extreme');
   assert.throws(() => projectAgentMarkdown('test-agent', badTier, DEFAULT_MODELS), AgentDefinitionError);
+});
+
+// --- readRunnerModels: real integration coverage (tsk-5tm, D9) -- this
+// function was previously untested and read the legacy `runner.models`
+// shape directly, silently ignoring `modelPolicies` (the shape this repo's
+// own committed .fgos/config.json now uses) with no error. -------------
+
+test('readRunnerModels resolves via modelPolicies when present, not the legacy models map', () => {
+  const dir = mkTempDir();
+  writeSharedConfig(dir, {
+    modelPolicies: {
+      claude: { lightweight: 'haiku-custom', standard: 'sonnet-custom', creative: 'sonnet-custom', analytical: 'sonnet-custom', critical: 'opus-custom' },
+    },
+  });
+  assert.deepEqual(readRunnerModels(dir), { light: 'haiku-custom', standard: 'sonnet-custom', heavy: 'opus-custom' });
+});
+
+test('readRunnerModels still resolves via the legacy flat models map when modelPolicies is absent (pre-D9 config, backward compatible)', () => {
+  const dir = mkTempDir();
+  writeSharedConfig(dir, { models: { light: 'haiku-legacy', standard: 'sonnet-legacy', heavy: 'opus-legacy' } });
+  assert.deepEqual(readRunnerModels(dir), { light: 'haiku-legacy', standard: 'sonnet-legacy', heavy: 'opus-legacy' });
+});
+
+test('readRunnerModels falls back to DEFAULT_MODELS per-tier when neither modelPolicies nor models configures that tier', () => {
+  const dir = mkTempDir();
+  writeSharedConfig(dir, {});
+  assert.deepEqual(readRunnerModels(dir), DEFAULT_MODELS);
 });

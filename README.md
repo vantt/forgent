@@ -1,14 +1,27 @@
 # Forgent
 
-<!-- BEE:BACKLOG-BADGES:START -->
+<!-- FGOS:BACKLOG-BADGES:START -->
 ![backlog declined](https://img.shields.io/badge/backlog%20declined-4-red) ![backlog done](https://img.shields.io/badge/backlog%20done-86-brightgreen) ![backlog parked](https://img.shields.io/badge/backlog%20parked-0-yellow) ![backlog in-flight](https://img.shields.io/badge/backlog%20in--flight-1-blue) ![backlog proposed](https://img.shields.io/badge/backlog%20proposed-16-lightgrey)
-<!-- BEE:BACKLOG-BADGES:END -->
+<!-- FGOS:BACKLOG-BADGES:END -->
 
 **The Foundation for Generative Agents.**
 
 Forgent (fgOS) is the platform layer for building and running agent applications — the infrastructure, skills, and automation that sit beneath every agent app, so developers can forge new agents instead of building everything from scratch.
 
 ## Install
+
+Recommended — install a specific tagged release, so a broken commit on
+`main` never breaks your install:
+
+```bash
+npm install -g github:vantt/forgent#v0.1.0
+```
+
+Replace `v0.1.0` with the [latest release tag](https://github.com/vantt/forgent/tags).
+See `docs/how-to/cut-a-fgos-release-tag.md` for how tags get cut.
+
+Bleeding-edge (always resolves to whatever commit is currently on `main`,
+useful for contributors/early-adopters who want it):
 
 ```bash
 npm install -g github:vantt/forgent

@@ -1,7 +1,7 @@
 # judge fail-safe debug log
 
 `judgeDiscovery` (`src/intake/discovery.mjs`) and `judgeDecompose`
-(`src/intake/decompose.mjs`) both call the shared retry core in
+(`src/intake/plan.mjs`) both call the shared retry core in
 `src/intake/judge-executor.mjs`. Both are designed to never throw: any
 failure folds into a generic fail-safe verdict (`{clear: false, question:
 DEFAULT_UNCLEAR_QUESTION}` for discovery; the analogous unclear/invalid

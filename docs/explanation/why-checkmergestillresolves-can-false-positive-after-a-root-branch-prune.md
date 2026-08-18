@@ -185,3 +185,40 @@ ancestry against the children's own `branchHeadAtReturn`/merge commits,
 not only the parent's own branch — same diagnostic-only stance the prune
 and reset fixes above both take (never auto-unblock from an inferred
 content match, just stop misreporting a decomposed parent as blocked).
+
+## A fifth case (`tsk-5j0`): a decomposed ROOT's own branch was never checked against `main` at all
+
+`tsk-psb`'s own fix (above) replaced the parent's-own-sha check with a
+children-recursion check for *any* item with children — but for the
+**root** of a decompose tree specifically, that replacement was total, not
+additive: `checkMergeStillResolves` returned `checkChildrenResolve`'s
+result directly and never went on to check the root's own branch
+(`fgw/<rootId>`) against `main` at all. Children resolving into
+`fgw/<rootId>` says nothing about whether `fgw/<rootId>` itself ever
+merged into `main` — those are two independent facts, and only the first
+one was ever being checked.
+
+Confirmed live on `tsk-4b2` (parent of `tsk-4v6`+`tsk-12p`): `fgw/tsk-4b2`
+never merged into `main` (two failed approve attempts), yet
+`fgos cleanup tsk-4b2` returned a clean TTL noop with zero entries in
+`assessment.failed`. Left unfixed, any decomposed root whose own branch
+fails to merge into `main` — conflict, verify-miss, or any other reason —
+would eventually reach `done` and have its branch deleted by
+`cleanupMergedBranch`, with the harness reporting zero problems the whole
+way: a silent, permanent loss of the root's own content once cleanup
+deletes the branch.
+
+**Distinct from `tsk-psb`'s bug in kind**: `tsk-psb` found the check
+verifying the *wrong sha* against the *right ref* for a non-root
+decomposed node. This is the *right ref never being checked at all*, and
+only for the root specifically — a non-root decomposed node's own branch
+correctly stays unchecked (its content was never supposed to merge
+forward through it in the first place, per `tsk-psb`'s own reasoning
+above).
+
+**The fix stays additive, not a third replacement**: when an item has
+children, run the existing children-recursion check *and*, only when the
+item resolves to itself as the root, also check that root's own branch
+against `main` — combined with AND. Same diagnostic-only stance every
+fix on this page already takes: report, never auto-recover. See
+`src/state/cleanup-harness.mjs`'s `checkRootBranchResolves`.

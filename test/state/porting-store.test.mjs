@@ -32,7 +32,15 @@ function readRawPortingEvents(dir) {
 // raceAcrossProcesses extension — one value per child, available inside
 // `storeCall` as `process.argv[4]`, so a race test can give each child a
 // DISTINCT id instead of racing the same one.
-async function raceAcrossProcesses(dir, storeCall, nProcesses, extraArgvPerChild = null) {
+//
+// `batchSize` (optional, defaults to `nProcesses` — every existing
+// call site below is byte-for-byte unaffected unless it opts in): mirrors
+// store.test.mjs's own raceAcrossProcesses extension — caps how many child
+// processes are synchronized to the SAME start instant at once, reducing
+// peak simultaneous contention against the shared events.lock without
+// changing total operation count or the cross-process race semantics under
+// test (docs/history/tsk-4fx-concurrency-test-lock-timeout-flake/RESEARCH.md).
+async function raceAcrossProcesses(dir, storeCall, nProcesses, extraArgvPerChild = null, batchSize = nProcesses) {
   const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-porting-store-race-'));
   const childScript = `
 import { addPorting, movePorting } from ${JSON.stringify(PORTING_STORE_MJS)};
@@ -50,23 +58,29 @@ try {
   const childPath = path.join(workDir, 'race-child.mjs');
   fs.writeFileSync(childPath, childScript);
 
-  const startAt = Date.now() + 300;
-  const results = await Promise.all(
-    Array.from({ length: nProcesses }, (_, i) =>
-      new Promise((resolve, reject) => {
-        const extraArgv = extraArgvPerChild ? [String(extraArgvPerChild[i])] : [];
-        const child = fork(childPath, [dir, String(startAt), ...extraArgv], { stdio: 'inherit' });
-        let message = null;
-        child.on('message', (msg) => {
-          message = msg;
-        });
-        child.on('exit', (code) => {
-          if (!message) return reject(new Error(`child exited (code ${code}) without reporting an outcome`));
-          resolve(message);
+  const results = [];
+  for (let batchStart = 0; batchStart < nProcesses; batchStart += batchSize) {
+    const batchCount = Math.min(batchSize, nProcesses - batchStart);
+    const startAt = Date.now() + 300;
+    const batchResults = await Promise.all(
+      Array.from({ length: batchCount }, (_, j) => {
+        const i = batchStart + j;
+        return new Promise((resolve, reject) => {
+          const extraArgv = extraArgvPerChild ? [String(extraArgvPerChild[i])] : [];
+          const child = fork(childPath, [dir, String(startAt), ...extraArgv], { stdio: 'inherit' });
+          let message = null;
+          child.on('message', (msg) => {
+            message = msg;
+          });
+          child.on('exit', (code) => {
+            if (!message) return reject(new Error(`child exited (code ${code}) without reporting an outcome`));
+            resolve(message);
+          });
         });
       }),
-    ),
-  );
+    );
+    results.push(...batchResults);
+  }
   fs.rmSync(workDir, { recursive: true, force: true });
   return results;
 }
@@ -196,6 +210,12 @@ test('addPorting under concurrent OS processes racing the SAME id: exactly one s
     dir,
     `addPorting(dir, { id: 'race-add', title: 'Race Add' });`,
     N,
+    null,
+    4, // tsk-597: batch to reduce peak events.lock contention under load —
+    // same mechanism as the "on DIFFERENT ids" test below and its
+    // store.test.mjs sibling (tsk-4fx); still a genuine simultaneous
+    // race within each batch of 4, so the "exactly one winner" assertion
+    // below is unaffected — see raceAcrossProcesses' own comment.
   );
 
   const succeeded = results.filter((r) => r.ok);
@@ -222,6 +242,8 @@ test('movePorting under concurrent OS processes racing the SAME expectedStatus C
     dir,
     `movePorting(dir, { id: 'race-move', to: 'ported', expectedStatus: 'in-progress' });`,
     N,
+    null,
+    4, // tsk-597: batch to reduce peak events.lock contention under load — see the addPorting race test above for the same reasoning.
   );
 
   const succeeded = results.filter((r) => r.ok);
@@ -267,6 +289,7 @@ for (const id of ids) {
 }`,
     N_PROC,
     idLists.map((ids) => ids.join(',')),
+    4, // batch to reduce peak events.lock contention under load — see raceAcrossProcesses' own comment
   );
 
   assert.deepEqual(results, Array(N_PROC).fill({ ok: true }), 'every concurrent movePorting loop on distinct ids must succeed (no CAS conflict expected across different ids)');

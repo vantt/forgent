@@ -13,7 +13,7 @@ cho item này trước đó, nên áp trực tiếp từ nguồn):
 | Cờ | Áp dụng | Vì sao |
 |---|---|---|
 | data model | **có** | Thêm hai stage vào `DOMAINS.coding`; 57 item đang mở phải migrate (D10, D12) |
-| public contracts | **có** | `stage` là hợp đồng 7 file đọc; `fgos discover`/`fgos decompose` đổi mặc định sang caller-verdict (D1) |
+| public contracts | **có** | `stage` là hợp đồng 7 file đọc; `fgos discover`/`fgos plan` đổi mặc định sang caller-verdict (D1) |
 | existing covered behavior | **có** | `test/intake/judge-executor.test.mjs` + test discovery/decompose đang phủ đúng phần bị gỡ |
 | auth · authorization · audit/security · external systems · cross-platform · multi-domain | không | — |
 | weak proof around the area | không | Vùng này **có** test thật; bằng chứng không yếu |
@@ -48,13 +48,13 @@ mặt trên đĩa vì `skillForStage` phải trỏ vào file thật.
   cần đụng tới**, vì `clarify` vẫn là stage hợp lệ.
 - **Migrate 57 item bằng tay** — loại; 57 item với ba luật phân loại khác
   nhau (D12) là việc của code, không phải của người.
-- **Gộp skill `clarify` vào `fgos-exploring`** — loại. D11: hai stage khác
+- **Gộp skill `clarify` vào `fgos-coding-exploring`** — loại. D11: hai stage khác
   nhau ở chỗ *người là tác giả của thứ gì*; gộp lại thì `stage` không còn
   phân biệt được và mất đúng thứ D11 mua về.
 
 ### Risk map
 
-| Thành phần | Rủi ro | Thứ chứng minh (proof point cho `fgos-validating`) |
+| Thành phần | Rủi ro | Thứ chứng minh (proof point cho `fgos-coding-validating`) |
 |---|---|---|
 | Gỡ `judgeVerifySemanticCorrectness` | **cao** — nó là lớp chặn đã bắt lỗi thật **hai lần trong chính vòng clarify của item này** (placeholder verify, rồi regex false-negative). Gỡ mà không thay thì mất một lớp bảo vệ đang hoạt động | Chạy thử `fgos discover` với một verify cố tình hỏng, chứng minh đường thay thế vẫn bắt được. `impact-analysis: full` — chạy `impact` trên `judgeVerifySemanticCorrectness` trước khi sửa |
 | Thêm 2 stage vào `DOMAINS.coding` | **cao** — `stage` là hợp đồng công khai; `frontier`, `discover-pool`, `entropy`, `replay`, `bin/fgos.mjs` đều đọc | `npm test` xanh + `impact` trên `getDomain`/`skillForStage` trước khi sửa |
@@ -118,17 +118,17 @@ Verify skill-prose phải ghim **cụm đủ dài** (bẫy #5 trong how-to). Pla
 
 ## Split — 6 item con
 
-Tạo thật lúc `fgos-validating` (bị bỏ sót lúc planning — sửa tại chỗ):
+Tạo thật lúc `fgos-coding-validating` (bị bỏ sót lúc planning — sửa tại chỗ):
 `tsk-2t9`(P1) `tsk-v4b`(P2) `tsk-1x3`(P3) `tsk-1w7`(P4) `tsk-5mj`(P5)
 `tsk-puz`(P6), mỗi cái `--parent tsk-5kn --stage decompose`.
 
 ### P1 — `tsk-2t9` — skill `fgos-researching`
 
 - **Verify**: `npm test && test -f .claude/skills/fgos-researching/SKILL.md && grep -q "^name: fgos-researching$" .claude/skills/fgos-researching/SKILL.md && rg -q --hidden "docs/history/<feature>/RESEARCH.md" .claude/skills/fgos-researching/SKILL.md && rg -q --hidden "WebSearch/WebFetch" .claude/skills/fgos-researching/SKILL.md && ! rg -q --hidden "có biết cái này không" .claude/skills/fgos-researching/SKILL.md`
-- **Footprint**: `.claude/skills/fgos-researching/SKILL.md,.agents/skills/fgos-researching/SKILL.md` (mở rộng lúc `fgos-code-implement`: `test/skills/fgos-mirror.test.mjs` đòi mọi `.claude/skills/fgos-*/` mirror byte-identical sang `.agents/skills/fgos-*/`; bản đầu bỏ sót nhánh `.agents/`, `npm test` bắt được thật khi chạy trực tiếp — output nền bị cắt ngắn nên không thấy lỗi, phải chạy lại targeted mới lộ ra)
+- **Footprint**: `.claude/skills/fgos-researching/SKILL.md,.agents/skills/fgos-researching/SKILL.md` (mở rộng lúc `fgos-coding-implement`: `test/skills/fgos-mirror.test.mjs` đòi mọi `.claude/skills/fgos-*/` mirror byte-identical sang `.agents/skills/fgos-*/`; bản đầu bỏ sót nhánh `.agents/`, `npm test` bắt được thật khi chạy trực tiếp — output nền bị cắt ngắn nên không thấy lỗi, phải chạy lại targeted mới lộ ra)
 - **D-ID**: D4, D5, D8, D2
 
-#### Child plan (`fgos-planning`, mức riêng của `tsk-2t9`)
+#### Child plan (`fgos-coding-planning`, mức riêng của `tsk-2t9`)
 
 **Mode: tiny.** Đếm cờ mode-gate riêng cho child này (không phải phạm vi
 `tsk-5kn` tổng thể — chỉ dòng `Mode: high-risk` trên là aggregate, không có
@@ -169,7 +169,7 @@ ngay từ vòng đầu, không phải "tạo trống rồi ghi đè sau".
 - **Footprint**: `.claude/skills/fgos-clarifying/SKILL.md,.agents/skills/fgos-clarifying/SKILL.md` (bài học từ `tsk-2t9`: `test/skills/fgos-mirror.test.mjs` đòi mirror byte-identical; `npm test` trong verify đã đủ generic để bắt lỗi này, không cần sửa verify field — chỉ cần tạo cả hai file lúc implement)
 - **D-ID**: D13, D14
 
-#### Child plan (`fgos-planning`, mức riêng của `tsk-v4b`)
+#### Child plan (`fgos-coding-planning`, mức riêng của `tsk-v4b`)
 
 **Mode: tiny.** Cùng lý luận với `tsk-2t9`: 0/10 cờ ở mức child — 1 file mới
 (×2 với mirror), không public contract nào sống trỏ vào `fgos-clarifying`
@@ -183,7 +183,7 @@ Nội dung mang hai hợp đồng đã khoá:
 - **D13** — soul tự phán hiểu-hay-không-hiểu **ý định** (khác `fgos-researching`:
   đây là decide-altitude, đối thoại với người, không phải gather-altitude).
   Mặc định: đọc mô tả, tự đánh giá đã đủ để thi công chưa. **Chỉ hỏi người khi
-  không hiểu** — không phải quy trình "vào là hỏi" như `fgos-exploring` hiện
+  không hiểu** — không phải quy trình "vào là hỏi" như `fgos-coding-exploring` hiện
   tại (bước 1 của nó: một lượt `rg` rồi luôn sinh câu hỏi). Mục tiêu: tự động
   tối đa — item rõ ràng thì đi thẳng, không phiền ai.
 - **D14** — được phép viết lại `title`/`description` mơ hồ thành bản rõ hơn.
@@ -198,11 +198,11 @@ kiện để tự viết lại ⇒ hỏi đúng một câu cụ thể, park đ�
 
 ### P3 — `tsk-1x3` — verb về cửa ghi thuần, gỡ judge cả ba consumer
 
-- **Verify**: `npm test && ! rg -q "runJudgeExecutor" src/intake/discovery.mjs src/intake/decompose.mjs && ! test -f src/intake/judge-executor.mjs`
-- **Footprint**: `src/intake/discovery.mjs,src/intake/decompose.mjs,src/intake/judge-executor.mjs,src/intake/judge-fail-log.mjs,test/intake/judge-executor.test.mjs,test/intake/judge-verify-second-pass-stability.test.mjs,test/intake/discovery.test.mjs,test/intake/decompose.test.mjs` (mở rộng lúc `fgos-validating`: `rg` tìm ra 3 test file import `readScoutNotes`/`judgeVerifySemanticCorrectness` từ `judge-executor.mjs` mà bản đầu bỏ sót — `npm test` sẽ vỡ ngay nếu không sửa cùng lúc)
+- **Verify**: `npm test && ! rg -q "runJudgeExecutor" src/intake/discovery.mjs src/intake/plan.mjs && ! test -f src/intake/judge-executor.mjs`
+- **Footprint**: `src/intake/discovery.mjs,src/intake/plan.mjs,src/intake/judge-executor.mjs,src/intake/judge-fail-log.mjs,test/intake/judge-executor.test.mjs,test/intake/judge-verify-second-pass-stability.test.mjs,test/intake/discovery.test.mjs,test/intake/plan.test.mjs` (mở rộng lúc `fgos-coding-validating`: `rg` tìm ra 3 test file import `readScoutNotes`/`judgeVerifySemanticCorrectness` từ `judge-executor.mjs` mà bản đầu bỏ sót — `npm test` sẽ vỡ ngay nếu không sửa cùng lúc)
 - **D-ID**: D1, D6, D9, D16
 
-#### Child plan (`fgos-planning`, mức riêng của `tsk-1x3`)
+#### Child plan (`fgos-coding-planning`, mức riêng của `tsk-1x3`)
 
 **Mode: heavy.** Khác hẳn P1/P2 (tiny, file mới thuần). Đếm cờ mode-gate ở
 mức child này:
@@ -234,7 +234,7 @@ Hard-gate có mặt ⇒ **heavy** bất kể số đếm còn lại. `impact-ana
    (định nghĩa trong `decompose.mjs`, dùng chung cả hai file) không đụng tới:
    không phụ thuộc `runJudgeExecutor`, là nhánh B1 độc lập (`tsk-ozl`).
 4. **`judgeVerifySemanticCorrectness` — SỬA LẠI, đọc code thật lúc
-   `fgos-validating` lật ra sai lầm ở đây.** Approach bản đầu coi nó song
+   `fgos-coding-validating` lật ra sai lầm ở đây.** Approach bản đầu coi nó song
    song với `judgeDiscovery`/`judgeDecompose` (gọi khi thiếu callerVerdict).
    **Sai** — đọc `discovery.mjs:671`/`decompose.mjs:893` xác nhận nó chạy
    **KHÔNG ĐIỀU KIỆN** trên mọi `verdict.clear`, kể cả khi verdict đến từ
@@ -259,7 +259,7 @@ Hard-gate có mặt ⇒ **heavy** bất kể số đếm còn lại. `impact-ana
    false-negative theo cấu trúc) — trách nhiệm đó chuyển sang skill gọi
    verb (đọc kết quả `verify-disputed` cũ đã chứng minh cơ chế dispute vẫn
    hoạt động, chỉ là người/soul phải tự phán thay vì verb tự phán) và kỷ
-   luật `fgos-validating`'s reality gate (chính cơ chế vừa bắt ra phát
+   luật `fgos-coding-validating`'s reality gate (chính cơ chế vừa bắt ra phát
    hiện này).
 5. **Xoá `judge-executor.mjs` + `judge-fail-log.mjs`** sau khi cả ba hàm
    không còn consumer nào.
@@ -288,7 +288,7 @@ hợp đồng của 2 hàm + dọn hạ tầng dùng chung). Ca biên bắt bu�
   bắt được đúng 2 ca đã xảy ra thật: verify placeholder rỗng, và regex
   false-negative theo cấu trúc.
 
-**Giả định — trạng thái sau `fgos-validating`:**
+**Giả định — trạng thái sau `fgos-coding-validating`:**
 
 1. ~~Xoá `judge-executor.mjs`/`judge-fail-log.mjs` không để lại import
    treo~~ — **ĐÃ CHỨNG MINH**: `rg -l "judge-executor" --glob "*.mjs" .`
@@ -324,7 +324,7 @@ hợp đồng của 2 hàm + dọn hạ tầng dùng chung). Ca biên bắt bu�
 - **D-ID**: D6, D1, D7
 - **Chờ**: P1, P4
 
-**Approach (viết lúc fgos-planning tsk-5mj, chưa có trong bản shaping gốc):**
+**Approach (viết lúc fgos-coding-planning tsk-5mj, chưa có trong bản shaping gốc):**
 
 Footprint gốc (`loop.mjs` + 1 test file) không đủ để giao thật — bằng chứng
 đọc code trực tiếp:
@@ -334,11 +334,11 @@ Footprint gốc (`loop.mjs` + 1 test file) không đủ để giao thật — b�
    nào. `spawnWorker` (dòng 1068) luôn gọi `buildPrompt` nội bộ, không có
    cách nào truyền prompt khác từ ngoài. ⇒ dispatch thẳng một item
    `discovery` qua `spawnWorker` không sửa gì sẽ ra prompt SAI (bảo worker
-   chạy `fgos-code-implement`, không phải `fgos-researching`).
+   chạy `fgos-coding-implement`, không phải `fgos-researching`).
 2. `prompt-templates/worker-prompt-skill-pointer.txt` dòng 30-31: **"Never
    call `fgos` yourself... the runner is the sole writer through that door
    during this dispatch."** — worker bị CẤM tự gọi `fgos discover`. Đường
-   worker tự gọi verb (giống `fgos-code-implement` tự gọi `fgos return`)
+   worker tự gọi verb (giống `fgos-coding-implement` tự gọi `fgos return`)
    KHÔNG áp dụng được ở đây — vi phạm luật đã có.
 3. Cơ chế đúng, suy ra từ (2) + kênh `fgos-discovered` đã có sẵn (cùng
    file, dòng 35-48, "report, not write"): worker chạy `fgos-researching`,
@@ -371,10 +371,10 @@ Footprint gốc (`loop.mjs` + 1 test file) không đủ để giao thật — b�
    — `resolveDiscovery` tự quyết định stage/status tiếp theo giống mọi
    caller khác.
 5. Rủi ro: **cao** — cơ chế báo-verdict-qua-fenced-block hoàn toàn mới,
-   chưa test end-to-end thật nào. Cần `fgos-validating` tự chạy thử một
+   chưa test end-to-end thật nào. Cần `fgos-coding-validating` tự chạy thử một
    dispatch discovery thật (script giả lập worker) trước khi chốt READY.
 
-**Sửa lại lúc `fgos-code-implement` (D-ID thêm: không có verdict ở stage
+**Sửa lại lúc `fgos-coding-implement` (D-ID thêm: không có verdict ở stage
 discovery):** ý (3)/(4) ở trên (worker báo verdict qua fenced block, runner
 gọi `resolveDiscovery`) SAI — đọc lại kỹ hơn thì `resolveDiscovery` chỉ xử
 lý cạnh `clarify -> decompose`, không có hàm engine nào xử lý cạnh
@@ -402,7 +402,7 @@ script, worktree/branch thật) trong `test/e2e/runner-loop.test.mjs`.
 - **D-ID**: D12
 - **Chờ**: P4
 
-**Approach (viết lúc fgos-planning tsk-puz):**
+**Approach (viết lúc fgos-coding-planning tsk-puz):**
 
 D12: chưa ai đụng → giữ `clarify`; đã có D-ID (quyết định thật đã log) → `discovery`; đang park `awaiting-human` (giữa vòng hỏi-đáp) → `exploring`.
 
@@ -418,18 +418,18 @@ Script `scripts/migrate-clarify-split.mjs` theo đúng khuôn `migrate-status-pr
 **Reality gate riêng cho P6** (không lặp lại phần chung của tsk-5kn):
 - Repo fit PASS: `readLockedContext`/`decisionsById` đều đã export/tồn tại thật (đọc `decompose.mjs`, `store.mjs`).
 - Assumption rủi ro trung bình: "idempotent" — chứng minh bằng chính code (CAS qua `expectedStage`), không phải giả định suông.
-- Proof surface: verify `npm test` — cần test thật cho script (dry-run + apply + idempotent-rerun), viết lúc `fgos-code-implement`.
+- Proof surface: verify `npm test` — cần test thật cho script (dry-run + apply + idempotent-rerun), viết lúc `fgos-coding-implement`.
 
 Verdict: READY WITH CONSTRAINTS (constraint: thêm 1 transition edge vào P4's schema, ngoài footprint gốc nhưng cùng file P4 đã sửa — rủi ro thấp, chỉ thêm 1 dòng dữ liệu, không đổi hành vi cạnh cũ).
 
-## Giả định đã ghim (chưa chứng minh — việc của `fgos-validating`)
+## Giả định đã ghim (chưa chứng minh — việc của `fgos-coding-validating`)
 
 1. **Tên skill `fgos-clarifying`** — `CONTEXT.md` không đặt tên cho skill
    của stage `clarify`; plan này chọn theo quy ước `-ing` sẵn có
    (exploring/planning/validating/researching). Không phải quyết định sản
    phẩm, chỉ là đặt tên nhất quán — nếu sai thì đổi rẻ.
 2. **`judge-executor.mjs` xoá được hoàn toàn** sau khi cả ba consumer rời
-   đi. Chưa kiểm có consumer nào ngoài `src/intake/` không — `fgos-validating`
+   đi. Chưa kiểm có consumer nào ngoài `src/intake/` không — `fgos-coding-validating`
    phải xác nhận trước khi P3 chạy.
 3. **`judgeVerifySemanticCorrectness` chuyển thành lời gọi từ soul**, không
    phải xoá trắng. `CONTEXT.md` để ngỏ ("gỡ hẳn, hay chuyển thành lời gọi
@@ -440,7 +440,7 @@ Verdict: READY WITH CONSTRAINTS (constraint: thêm 1 transition edge vào P4's s
    để `stage` đọc lên luôn đúng ngay, không phụ thuộc item có được chạm hay
    chưa.
 
-## Reality gate (`fgos-validating`)
+## Reality gate (`fgos-coding-validating`)
 
 | Chiều | Kết quả | Bằng chứng |
 |---|---|---|
@@ -458,7 +458,7 @@ Verdict: READY WITH CONSTRAINTS (constraint: thêm 1 transition edge vào P4's s
 | Gỡ `judgeVerifySemanticCorrectness` an toàn nếu chuyển thành lời gọi từ soul | cao | Nó bắt 2 lỗi thật trong chính vòng `clarify` của item này (placeholder verify, regex false-negative) — plan chọn CHUYỂN không XOÁ, đúng giả định 3 của `CONTEXT.md` | Chấp nhận — quyết định đã có lý do, không phải đoán |
 | Thêm 2 stage không vỡ consumer hiện có | cao | Cross-check `rg` trên (xem hàng impact-analysis) | Xác nhận PASS |
 | `judge-executor.mjs` xoá được hoàn toàn | trung bình | `rg` xác nhận không consumer `src/` ngoài `intake/`; 3 test file cần sửa cùng lúc, đã thêm vào footprint P3 | PASS sau sửa |
-| Migration idempotent | trung bình | Chưa viết code — không có gì để kiểm bây giờ, để nguyên là giả định chưa chứng minh cho `fgos-code-implement` của P6 tự chứng minh qua `npm test` | Chưa chứng minh — chấp nhận được, vì P6 không nằm trên wave 1/2 |
+| Migration idempotent | trung bình | Chưa viết code — không có gì để kiểm bây giờ, để nguyên là giả định chưa chứng minh cho `fgos-coding-implement` của P6 tự chứng minh qua `npm test` | Chưa chứng minh — chấp nhận được, vì P6 không nằm trên wave 1/2 |
 
 ## Verdict
 

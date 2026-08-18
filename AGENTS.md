@@ -10,9 +10,9 @@ Forgent (fgOS) is the platform layer for building and running agent applications
 - docs/specs/reading-map.md — where every doc and source path in this repo lives
 - docs/backlog.md — product backlog (PBI rows: proposed / in-flight / done)
 - docs/routing-handoff-contract.md — agent-to-agent handoff contract + trust boundary
-- docs/decisions/ — long-form decision records
+- docs/decisions/index.md — generated projection of platform/repo-wide decisions (`fgos decision-index`); narrative lives in docs/specs/<area>.md's own "Lịch sử quyết định" sections (tsk-1lv-4)
 
-## Product priority order (docs/decisions/0030)
+## Product priority order (D-ADR0030, docs/specs/runner.md)
 
 1. **Ship Faster** — giao nhanh hơn, không đoán mò, giảm friction/better-dev-ux, ít chờ đợi.
 2. **Release con người** — giải phóng con người khỏi việc ngồi canh chờ trả lời. Hệ thống tự phán đoán, tự vận hành ở mức cao nhất có thể; chỉ hỏi người khi thật sự cần, và khi hỏi thì gom thành bộ để mỗi lần người quay lại trả lời được nhiều nhất rồi đi tiếp. Một câu hỏi treo không được nghẽn phần việc khác của cùng item còn tiến được — stage/skill vì vậy phải chia nhỏ, mịn, mỗi mảnh park/tiến độc lập.
@@ -21,7 +21,16 @@ Forgent (fgOS) is the platform layer for building and running agent applications
 
 Tốc độ ở mục 1 là tốc độ ship của **project đang DÙNG fgOS** (fgOS không loại trừ khi tự dogfood) — không phải tốc độ tự thân team fgOS build một tính năng của chính fgOS. Đừng chọn phương án rẻ để fgOS tự triển khai nếu nó làm project dùng fgOS chậm hơn.
 
-Thứ tự cố định — bậc dưới không ghi đè bậc trên. Chi tiết: docs/decisions/0030 (mở rộng docs/decisions/0025).
+Thứ tự cố định — bậc dưới không ghi đè bậc trên. Chi tiết: docs/specs/runner.md's "Lịch sử quyết định" § D-ADR0030 (mở rộng D-ADR0025; narrative đầy đủ, docs/decisions/*.md corpus đã retired tsk-1lv-4).
+
+## Ranh giới sứ mệnh (D-ADR0035, docs/specs/platform-foundations.md)
+
+fgOS tồn tại để: 
+ 1. phát triển các project khác 
+ 2. làm nền vận hành các business base workflow 
+ 
+fgOS KHÔNG phải để (3) tự phát triển chính nó. Mission #3 là dogfood cần thiết trong lúc xây, không phải lý do fgOS tồn tại.  Khi làm việc trong chính repo (nơi fgOS tự-host trên chính source của mình), đừng mặc định coi "sửa fgOS" là mục tiêu chỉ vì đó là việc trước mắt — hỏi việc đang làm có phục vụ mission #1/#2 (năng lực fgOS mang lại cho project/workflow khác) hay chỉ tiện cho chính đội fgOS (mission #3). fgOS đã cài global và đang vận hành thật trên nhiều project khác ngoài repo này — mission #1/#2 không phải lý thuyết. Chi tiết + bằng chứng: docs/specs/platform-foundations.md's "Lịch sử quyết định" § D-ADR0035 (docs/decisions/*.md corpus đã retired tsk-1lv-4).
+
 
 ## Before touching code
 
@@ -77,8 +86,8 @@ threshold is hit. Changing one supersedes its decision ID — never edit it in p
 A session opening in this repo to work an item through its lifecycle loads
 `fgos-routing` first (`.claude/skills/fgos-routing/SKILL.md`): it orients
 on open work, claims one item through the pull door, then points to
-`fgos-exploring`, `fgos-planning`, or `fgos-validating` based on where that
-item's `stage` puts it.
+`fgos-coding-discovering`, `fgos-coding-exploring`, `fgos-coding-planning`,
+or `fgos-coding-validating` based on where that item's `stage` puts it.
 
 **Never run a raw `git reset --hard` on the main checkout without a full
 `git status` first** (tsk-3au: `docs/history/main-checkout-destructive-
@@ -90,10 +99,58 @@ recover it. Use `fgos main-checkout-reset --sha <sha> [--confirm]` instead
 — it prints the full whole-repo status and refuses without `--confirm`
 when the tree is dirty.
 
+**Never `git add -A` inside a linked worktree (`fgos pick`'s `fgw/<id>`
+checkout) without checking `git status` first** (tsk-56u:
+`docs/history/commit-time-fgos-deletion-guard/`) — a worktree never keeps a
+working-tree copy of `.fgos/` (ADR0020 strips it right after `git worktree
+add`, without ever `git rm`-ing it from the index), so `-A` stages every
+`.fgos/` file as deleted. Committing that silently destroys the live event
+log once the branch merges back. `.githooks/pre-commit` now refuses this
+commit outright (a staged `.fgos/` deletion, checked unconditionally, not
+only "at home" in the main checkout) — if you hit that refusal, `git
+restore --staged .fgos` before committing again.
+
+**Never `git stash` in the main checkout to clear a dirty tree without
+checking what it swept up** (tsk-56u, same history folder) — the stash
+stack is shared across every session and worktree, and stashing
+`.fgos/events.jsonl` along with everything else doesn't just hide the
+file: it rolls the whole repository's `.fgos` state back to an older
+commit for as long as the stash is held. This has already caused a real
+incident: an `approve` run misread an item's status as `doing` when it was
+really `awaiting-approval`, because the live event log was sitting in a
+stash — recovered by applying the stash back by SHA rather than popping
+it, but the same move can silently strand another session's reads too.
+There is no mechanical guard against this (git has no hook that can
+refuse a stash) — stash selectively, or use `fgos main-checkout-reset`
+above instead of stash-and-reset as a shortcut.
+
+## Dispatch — routing work to a executor
+
+**Before dispatching any task out of the current turn — a work item, a registered executor, an ad-hoc task, or your own direct Agent/Task-tool call — run `node src/runner/dispatch.mjs decide` first. Never decide the mechanism yourself.** A `PreToolUse` hook enforces this on Agent/Task-tool calls: it runs `decide` for you and refuses the call when the answer comes back as anything other than `in-process`.
+
+Four ways to call `decide`, for four different situations:
+
+- `decide <executorId>` — you already know the exact executor name (e.g. `judge-discovery`).
+- `decide --for <purpose>` — you know what JOB you need done (e.g. `judge`), but not which executor serves it.
+- `decide --work <id>` — you have a real work item and want it dispatched.
+- `decide --for <label> --needs-soul` — you are about to fire an Agent/Task tool yourself, with no executor or work item to name.
+
+Add `--has-live-task-access` when you already have the Agent/Task tool in your own tool manifest. This is always your own self-declaration — never probed from the environment, never guessed.
+
+Three possible `mechanism` results, each needing a different response:
+
+- **`"unavailable"`** — nothing serves this. NOT an error: do it inline yourself, and report nothing.
+- **"in-process"** — call it yourself, with your own live capability: pass the returned agentType to your Agent/Task tool, or call the returned mcpTool directly. Dispatch cannot do this for you — it has neither an Agent/Task tool nor an MCP client of its own. When neither field is returned, use whichever agent type you would have used by default.
+- **`"out-of-process"`** — run `node src/runner/dispatch.mjs execute`. Never run the resolved command yourself through Bash: `execute` invokes the adapter and hands back the real result.
+
+Every result also carries `configured: true|false` — `false` means nothing is configured for that name or job, and the answer came from the default.
+
+A skill that dispatches should not re-derive any of this. Point its reasoning step at the shared fragment `.claude/skills/_shared/executor-dispatch-fallback.md` (mirrored byte-identical at `.agents/skills/_shared/`).
+
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **forgent** (12247 symbols, 17374 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **forgent** (17220 symbols, 23895 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939).
 
@@ -134,3 +191,33 @@ This project is indexed by GitNexus as **forgent** (12247 symbols, 17374 relatio
 | Index, status, clean, wiki CLI commands | `.claude/skills/gitnexus/gitnexus-cli/SKILL.md` |
 
 <!-- gitnexus:end -->
+
+<!-- mdview:START -->
+## Documentation Viewing (MDView)
+
+After creating or updating any markdown file, make it viewable in ONE call —
+no project registration step needed:
+
+### Using MCP (preferred)
+
+Call `mdview_view_file` with:
+
+- `project_root`: absolute path to the project root
+- `relative_path`: the file path relative to that root
+
+It returns a browser `url`. Tell the user: "You can view this at: `<url>`".
+The server auto-registers the project on first use and indexes the file
+immediately.
+
+### Using CLI fallback
+
+```sh
+mdview open <absolute-path-to-file.md>
+```
+
+### When to render
+
+Spin up a preview for long docs, tables, Mermaid diagrams, multi-file document
+sets, or when the user asks to "preview"/"render". Skip it for short, trivial
+snippets.
+<!-- mdview:END -->

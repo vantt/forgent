@@ -56,7 +56,7 @@ section, restated at the technical level):
 
 ### Risk map
 
-| Component | Risk | Proof point (for `fgos-validating`) |
+| Component | Risk | Proof point (for `fgos-coding-validating`) |
 |---|---|---|
 | `createWorktree`'s ephemeral-merge callers no longer literally check out `fgw/<rootId>` | Medium — touches all 4 shared call sites (`bin/fgos.mjs:2799`, `:3150`, `:3371`, `promote-engine.mjs:72`) | New regression test reproducing tsk-5yp's exact repro: pick root, `ExitWorktree keep`, approve a child merging into root, assert the root's worktree path/registration is unchanged in `git worktree list` afterward |
 | Merge result correctness (scratch-ref → fast-forward) | Medium — must produce the identical commit history a direct-checkout merge would | Existing `mergeRunnerItem` tests in `test/runner/worktree.test.mjs`/related merge tests must pass unmodified — the merge algorithm itself doesn't change, only which working tree it runs in |
@@ -99,7 +99,7 @@ Not split. The fix lives entirely in one shared primitive
 call sites — splitting it into per-call-site items would fragment a
 single-primitive fix and risk 3 of 4 call sites staying vulnerable while
 only one gets "shaped" as its own item. Proceeds as this item itself once
-`fgos-validating` clears it.
+`fgos-coding-validating` clears it.
 
 Concrete cases to prove against (depth matched to high-risk):
 - Clean, kept-open worktree on the root branch, one child approved into

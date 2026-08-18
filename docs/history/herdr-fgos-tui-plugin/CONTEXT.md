@@ -48,5 +48,5 @@ the dashboard + pick flow prove out.
 ## Deferred (out of scope, noted not absorbed)
 
 - Merge/dispatch orchestration from the TUI (D1) — a later item once dashboard + pick land.
-- Plugin implementation language/TUI library choice (Rust + a candidate like `frankentui` vs. `ratatui` vs. any other) — an implementation decision, `fgos-planning`'s call, not explored here.
+- Plugin implementation language/TUI library choice (Rust + a candidate like `frankentui` vs. `ratatui` vs. any other) — an implementation decision, `fgos-coding-planning`'s call, not explored here.
 - Exact herdr manifest shape (`[[panes]]`/`[[actions]]` field values, poll interval, pane placement) — implementation detail for planning.

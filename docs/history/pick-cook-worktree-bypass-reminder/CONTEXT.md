@@ -23,11 +23,11 @@ session reads the warning before repeating the mistake. It is NOT a code
 fix, NOT a new `doctor` check, and NOT a retroactive cleanup of the two
 branches (already resolved before this item was even submitted).
 
-# Locked decisions
+## Locked decisions
 
 | ID | Decision |
 |----|----------|
-| D1 | Deliverable is a new dated entry under `docs/journals/`, not a `docs/history/<feature>/CONTEXT.md`-style feature-decision doc. This repo already has the matching convention for exactly this shape of item — a resolved incident writeup with no code fix — e.g. `docs/journals/260728-2211-worktree-reclaim-data-loss-tsk-1os.md` (same theme: worktree/checkout mishap). This `CONTEXT.md` is only `fgos-exploring`'s own mechanical clarify-stage artifact; the actual reader-facing deliverable planning/executing produce is the journal entry. |
+| D1 | Deliverable is a new dated entry under `docs/journals/`, not a `docs/history/<feature>/CONTEXT.md`-style feature-decision doc. This repo already has the matching convention for exactly this shape of item — a resolved incident writeup with no code fix — e.g. `docs/journals/260728-2211-worktree-reclaim-data-loss-tsk-1os.md` (same theme: worktree/checkout mishap). This `CONTEXT.md` is only `fgos-coding-exploring`'s own mechanical clarify-stage artifact; the actual reader-facing deliverable planning/executing produce is the journal entry. |
 | D2 | Scope includes a concrete safeguard: add a short reminder note to `plugins/fgOS/skills/pick/SKILL.md` and `plugins/fgOS/skills/cook/SKILL.md`, warning against checking out an `fgw/*` branch directly on the main checkout instead of using the `EnterWorktree`/pick worktree flow. No `fgos doctor` check, no code-level gate — a documented reminder line only (user's own choice: "(b) note nhắc pick/cook"). |
 | D3 | The journal entry must quote the concrete reflog lines as mechanism evidence, not just paraphrase the user's own narrative: `HEAD@{29}: moving from main to fgw/retro-loop-docs-260802` and `HEAD@{15}: moving from fgw/dispatch-terminology-rename-260803 to main` (both from `git reflog show HEAD` in the main checkout, captured 2026-08-03). |
 
@@ -70,7 +70,7 @@ branches (already resolved before this item was even submitted).
 
 - Exact wording and placement of the reminder note inside each `SKILL.md`
   (which section, how prominent) is an implementation choice for
-  `fgos-planning`/`fgos-code-implement`, not locked here.
+  `fgos-coding-planning`/`fgos-coding-implement`, not locked here.
 - Exact journal entry filename (`docs/journals/<timestamp>-<slug>-tsk-4hk.md`)
   and full prose are also left to planning/executing — only its required
   content (D1, D3) is locked.

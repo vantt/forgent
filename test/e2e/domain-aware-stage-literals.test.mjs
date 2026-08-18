@@ -178,7 +178,7 @@ execFileSync('git', ['commit', '-q', '-m', \`worker: \${file}\`]);
   return scriptPath;
 }
 
-test('sync CLI: fgos discover / fgos decompose cross a "triage" fixture-domain item through its own Clarify/Divide-mapped stages (not coding\'s literal names), no throw', () => {
+test('sync CLI: fgos discover / fgos plan cross a "triage" fixture-domain item through its own Clarify/Divide-mapped stages (not coding\'s literal names), no throw', () => {
   const repoRoot = initTempRepo();
   const scriptDir = mkTempDir('fgos-domain-stage-literals-e2e-exec-');
 
@@ -208,11 +208,11 @@ test('sync CLI: fgos discover / fgos decompose cross a "triage" fixture-domain i
   assert.equal(afterDiscover.stage, 'shaping', 'discover moved the item to triage\'s OWN Divide-mapped stage ("shaping"), not the coding literal "decompose"');
 
   const decomposeResult = fgos(repoRoot, [
-    'decompose', submitted.id,
+    'plan', submitted.id,
     '--verdict', 'pass-through',
     '--reason', 'single fixture item, no split needed',
   ]);
-  assert.equal(decomposeResult.status, 0, `fgos decompose failed: ${decomposeResult.stderr}`);
+  assert.equal(decomposeResult.status, 0, `fgos plan failed: ${decomposeResult.stderr}`);
   assert.equal(envelopeData(decomposeResult.stdout).outcome, 'pass-through');
 
   const afterDecompose = stateView(repoRoot).work[submitted.id];
@@ -253,7 +253,7 @@ test('domain-aware decompose child addWork inherits parent domain+stage', () => 
   // A REAL split (--verdict decompose, not pass-through) so decompose.mjs's
   // own child-addWork branch (the exact code this item fixes) actually runs.
   const decomposeResult = fgos(repoRoot, [
-    'decompose', submitted.id,
+    'plan', submitted.id,
     '--verdict', 'decompose',
     '--reason', 'tsk-4sz regression: prove split children inherit the parent triage domain + stage, not coding literals',
     '--children', JSON.stringify([
@@ -265,7 +265,7 @@ test('domain-aware decompose child addWork inherits parent domain+stage', () => 
       },
     ]),
   ]);
-  assert.equal(decomposeResult.status, 0, `fgos decompose failed: ${decomposeResult.stderr}`);
+  assert.equal(decomposeResult.status, 0, `fgos plan failed: ${decomposeResult.stderr}`);
   assert.equal(envelopeData(decomposeResult.stdout).outcome, 'decompose');
 
   const after = stateView(repoRoot).work;
@@ -348,7 +348,7 @@ test('domain-aware discovered-from addWork inherits parent domain+stage', () => 
 
   const discovered1 = fgos(repoRoot, ['discover', triageItem.id, '--verdict', 'clear', '--verify', 'test -f triage-output.txt && echo TRIAGE_OK']);
   assert.equal(discovered1.status, 0, `discover failed: ${discovered1.stderr}`);
-  const decomposed1 = fgos(repoRoot, ['decompose', triageItem.id, '--verdict', 'pass-through', '--reason', 'single fixture item, no split needed']);
+  const decomposed1 = fgos(repoRoot, ['plan', triageItem.id, '--verdict', 'pass-through', '--reason', 'single fixture item, no split needed']);
   assert.equal(decomposed1.status, 0, `decompose failed: ${decomposed1.stderr}`);
 
   const first = runner(repoRoot, ['--once']);
@@ -390,20 +390,17 @@ test('runner sweep: a "triage" fixture-domain item at its own Clarify-mapped sta
   const triageItem = submit(repoRoot, 'Cross-domain regression fixture item', { domain: 'triage', docsRef: triageDocsRef });
   assert.equal(triageItem.stage, 'triage');
   assert.equal(fgos(repoRoot, ['discover', triageItem.id, '--verdict', 'clear', '--verify', 'test -f triage-output.txt && echo TRIAGE_OK']).status, 0);
-  assert.equal(fgos(repoRoot, ['decompose', triageItem.id, '--verdict', 'pass-through', '--reason', 'single fixture item, no split needed']).status, 0);
+  assert.equal(fgos(repoRoot, ['plan', triageItem.id, '--verdict', 'pass-through', '--reason', 'single fixture item, no split needed']).status, 0);
 
   mkLockedContextFixture(repoRoot, codingDocsRef);
   const codingItem = submit(repoRoot, 'An unrelated plain coding item, same sweep', { docsRef: codingDocsRef });
-  assert.equal(codingItem.stage, 'clarify');
-  // tsk-4b2 D3/D6: coding's own clarify clear verdict now lands on
-  // discovery, not decompose directly -- two more explicit discover calls
-  // walk it through discovery->exploring->decompose (triage above is
+  assert.equal(codingItem.stage, 'discovery');
+  // tsk-30v D2/D6: a clear verdict at `discovery` now skips `exploring` and
+  // lands directly on `planning` in ONE discover call (triage above is
   // unaffected: it has no discovery/exploring stages registered, so its
   // own single discover call still lands straight on decompose, unchanged).
   assert.equal(fgos(repoRoot, ['discover', codingItem.id, '--verdict', 'clear', '--verify', 'test -f output.txt && echo CODE_OK']).status, 0);
-  assert.equal(fgos(repoRoot, ['discover', codingItem.id, '--verdict', 'clear', '--verify', 'test -f output.txt && echo CODE_OK']).status, 0);
-  assert.equal(fgos(repoRoot, ['discover', codingItem.id, '--verdict', 'clear', '--verify', 'test -f output.txt && echo CODE_OK']).status, 0);
-  assert.equal(fgos(repoRoot, ['decompose', codingItem.id, '--verdict', 'pass-through', '--reason', 'single fixture item, no split needed']).status, 0);
+  assert.equal(fgos(repoRoot, ['plan', codingItem.id, '--verdict', 'pass-through', '--reason', 'single fixture item, no split needed']).status, 0);
 
   // Before tsk-3xo's fix: a stage-move call for the triage item would throw
   // FsmError('precondition') (neither literal is a real stage name in the

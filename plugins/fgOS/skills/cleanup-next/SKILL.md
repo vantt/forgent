@@ -26,7 +26,7 @@ boundary).
 
 1. **Ignore `$ARGUMENTS`.** This command takes no arguments — it always
    picks the single next TTL-ready item from the pool, the same way
-   `/fgOS:discover-next` always picks the single next clarify/decompose
+   `/fgOS:discover-next` always picks the single next discovery/exploring
    item. Do not pass an id or let the user pick one for this command; that
    is what running `fgos cleanup <id>` directly is for.
 
@@ -93,7 +93,21 @@ boundary).
    subprocess, not a JS import — there is no JS `Error` object to inspect
    here, only the process's own exit code and JSON stdout (success) or
    plain-text stderr (failure). Classify by exit code, per the CLI's own
-   contract (`EXIT_CODES`, `src/state/store.mjs:65-73`):
+   contract (`EXIT_CODES`, `src/state/store.mjs:65-73`).
+
+   The exit-code classification stays: this launcher runs a real subprocess
+   — unlike `/fgOS:retro-next`, which invokes a skill in-session where no
+   exit code exists and therefore reads its outcome off the driver's own
+   relayed stop line instead. Do not "fix" this branch into a driver call.
+   `cleanup` deliberately registers no skill in `skillMap` (decision record
+   `0027` D5: "pure harness, no skill ever loads for it"), so a driver
+   invoked here would resolve nothing and stop immediately — ceremony with
+   no value. Adding a verb map so the driver could run `fgos cleanup`
+   itself would add a mechanism, which is the opposite of what routing
+   launchers through the driver is for (`docs/history/
+   retro-next-shared-driving/CONTEXT.md` D4).
+
+   Classify as:
 
    - **exit `0`** — success. Read the JSON envelope's `data.to` field:
      `'done'` — the item's worktree/branch was reclaimed and it closed to
@@ -105,9 +119,19 @@ boundary).
      to look at.
    - **exit `7`** (`'lock-timeout'`) — a genuine systemic condition:
      another process is holding `.fgos/events.lock` past its timeout.
-     Report this plainly and distinctly from every other outcome — this is
-     the one result `/fgOS:cleanup-loop` stops the whole loop on, never
-     just skips.
+     Report it carrying the shared marker line verbatim, on its own line:
+
+     ```text
+     stop-reason: lock-timeout
+     ```
+
+     the same channel `fgos-coding-driving` and every other launcher use
+     for this one category (tsk-1c6 D2/D4), so a caller never has to infer
+     it from prose. This is the one result `/fgOS:cleanup-loop` stops the
+     whole loop on rather than skipping a single item — `.fgos/events.jsonl`'s
+     lock is shared by every item, so the next pick would very likely hit
+     the same stuck lock. Never emit the line for a failure that was not
+     actually a lock-timeout.
    - **exit `3`** (`'conflict'`, a per-item CAS race) or any other non-zero
      exit — scoped to this one item (a different concurrent writer raced
      this specific id, or some other one-off failure). Report it as

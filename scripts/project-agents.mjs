@@ -16,9 +16,9 @@
 // the source yaml's `tool-scope` list IS the authoritative, harness-enforced
 // grant for the projected agent-type's Task-tool dispatch -- it is written
 // straight into the generated .md's `tools:` frontmatter below, unfiltered.
-// This is a SEPARATE axis from tsk-62v's `capacities.<id>.allowedTools`
+// This is a SEPARATE axis from tsk-62v's `executors.<id>.allowedTools`
 // (the shared config file's `runner` section), which gates a different
-// dispatch path (domain-1 headless CLI spawn), keyed by capacityId rather
+// dispatch path (domain-1 headless CLI spawn), keyed by executorId rather
 // than agent-type name. Neither field is descriptive-only; neither is
 // dropped; they never collide because they key differently.
 //
@@ -32,6 +32,7 @@ import { parse as parseYaml } from 'yaml';
 
 import { resolveMainCheckoutRoot } from '../src/runner/paths.mjs';
 import { readSharedConfig } from '../src/config/shared-config-file.mjs';
+import { modelForTier } from '../src/runner/dispatch.mjs';
 
 const REPO_ROOT = path.resolve(import.meta.dirname, '..');
 const SOURCE_DIR = path.join(REPO_ROOT, 'agents');
@@ -62,14 +63,33 @@ export class AgentDefinitionError extends Error {}
 // returns a worktree's own root unchanged, not its main checkout) is the
 // one helper that actually resolves via `--git-common-dir` the way this
 // needs.
-function readRunnerModels() {
-  const mainCheckoutRoot = resolveMainCheckoutRoot(REPO_ROOT) ?? REPO_ROOT;
+// tsk-5tm D9: delegates to `modelForTier` (the one canonical tier->model
+// resolver) instead of reading `cfg.runner.models` directly -- that field
+// is the legacy flat map D9 introduced `modelPolicies` to replace, and
+// `modelForTier` already prefers `modelPolicies` when present, falling
+// back to the legacy map otherwise. Reading `cfg.runner.models` here
+// directly (this function's pre-D9 shape) meant a `modelPolicies`-only
+// config -- the shape this repo's OWN committed `.fgos/config.json` now
+// uses -- would silently fall through to DEFAULT_MODELS below with no
+// error, hiding any real customization to `modelPolicies.claude`.
+// Exported for a real integration test (tsk-5tm) -- previously this
+// function was module-private, its own root resolution not injectable, and
+// untested; the exact blind spot that let it silently keep reading the
+// legacy `models` shape unnoticed. `mainCheckoutRootOverride` is test-only
+// (every real call site omits it, resolving exactly as before).
+export function readRunnerModels(mainCheckoutRootOverride) {
+  const mainCheckoutRoot = mainCheckoutRootOverride ?? resolveMainCheckoutRoot(REPO_ROOT) ?? REPO_ROOT;
   const cfg = readSharedConfig(mainCheckoutRoot);
-  const models = cfg.runner?.models;
-  if (models && typeof models === 'object') {
-    return { ...DEFAULT_MODELS, ...models };
+  const runnerCfg = cfg.runner ?? {};
+  const models = {};
+  for (const tier of Object.keys(DEFAULT_MODELS)) {
+    try {
+      models[tier] = modelForTier(runnerCfg, tier);
+    } catch {
+      models[tier] = DEFAULT_MODELS[tier];
+    }
   }
-  return DEFAULT_MODELS;
+  return models;
 }
 
 function assertPlatformAgnostic(name, text) {
@@ -97,6 +117,12 @@ function validateDefinition(name, def) {
       `agents/${name}.yaml's model_tier "${def.model_tier}" is not one of ${Object.keys(DEFAULT_MODELS).join('/')}.`,
     );
   }
+  // claims (tsk-2t9c D12): optional, but when present must be a real list
+  // of non-empty task-spec id strings -- same shape discipline tool-scope
+  // already gets above.
+  if ('claims' in def && (!Array.isArray(def.claims) || def.claims.some((c) => typeof c !== 'string' || !c.trim()))) {
+    throw new AgentDefinitionError(`agents/${name}.yaml's claims, when present, must be a non-empty list of task-spec id strings.`);
+  }
 }
 
 /** Pure: source yaml text -> generated adapter markdown text. */
@@ -108,7 +134,19 @@ export function projectAgentMarkdown(name, sourceYamlText, models) {
   const model = models[def.model_tier];
   const tools = def['tool-scope'].join(', ');
 
-  const frontmatter = ['---', `name: ${def.name}`, `description: ${def.description}`, `model: ${model}`, `tools: ${tools}`, '---'].join('\n');
+  // claims (tsk-2t9c D12): OPTIONAL -- eligibility for the multi-role team
+  // harness, a list of task-spec ids this agent-type may claim a call for.
+  // Positions are derived from the claimed specs, never declared directly
+  // here -- an agent-type that names no claims is simply not eligible for
+  // any role/holder call, same as today (every existing agent-type). Not
+  // in REQUIRED_FIELDS -- purely additive, so every agent-type predating
+  // this field projects byte-for-byte unchanged.
+  const frontmatterLines = ['---', `name: ${def.name}`, `description: ${def.description}`, `model: ${model}`, `tools: ${tools}`];
+  if (Array.isArray(def.claims) && def.claims.length > 0) {
+    frontmatterLines.push(`claims: [${def.claims.join(', ')}]`);
+  }
+  frontmatterLines.push('---');
+  const frontmatter = frontmatterLines.join('\n');
 
   const body = [
     `# ${def.role}`,

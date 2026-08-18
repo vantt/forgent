@@ -39,7 +39,7 @@
   2. `fgos submit` — sentinel `'chưa xác định — P15 bổ sung'` (`bin/fgos.mjs:66-70`)
   3. `fgos discover` @clarify — model verdict điền; không có → `FALLBACK_VERIFY`
      (`src/intake/discovery.mjs:45,199-200`)
-  4. `fgos decompose` — mỗi item con mang verify riêng (`src/intake/decompose.mjs:120,346`)
+  4. `fgos plan` — mỗi item con mang verify riêng (`src/intake/plan.mjs:120,346`)
   5. `fgos edit --verify` (`src/state/store.mjs:186`)
 - **Không có validation** chuỗi verify chạy được hay không. Sentinel vẫn bị shell thực thi;
   lệnh không tồn tại → exit khác 0 → item park `blocked` với `errorClass: 'verify-miss'`,
@@ -117,7 +117,7 @@
 - **Độ phủ 16/95 item (17%).** done 13/41, todo 2/45, blocked 1/2, **doing 0/3, proposed 0/3**.
 - **Chất lượng kém: 9/20 đường dẫn khai báo không tồn tại.** Basename trần `loop.mjs`, `store.mjs`,
   `merge.mjs`; `src/runner/worktree.test.mjs` (test nằm ở `test/`); một item khai `"test/"` — là thư mục.
-- Được LLM decompose judge tự điền (`src/intake/decompose.mjs:143`), lọc mỗi điều kiện chuỗi không rỗng,
+- Được LLM decompose judge tự điền (`src/intake/plan.mjs:143`), lọc mỗi điều kiện chuỗi không rỗng,
   **không bao giờ đối chiếu filesystem**. `--footprint` fail-soft (`bin/fgos.mjs:712`).
 - → Input tin cậy duy nhất cho chọn test là **`git diff` vs merge base**. Muốn dùng footprint phải
   validate path lúc ghi trước.
@@ -128,8 +128,8 @@
 Mili-giây. Đường đi: `listWork` (replay events.jsonl) → `moveStage` (`store.mjs:548`) → optional
 `addOutcome`. `check` cũng thuần: replay + `computeEntropy`/`computeCounts` (zero-I/O) + 1 `appendFileSync`.
 
-**(2) Skill `fgos-compounding` — đắt.** Một lượt agent đầy đủ, 5 bước
-(`.claude/skills/fgos/fgos-compounding/SKILL.md:45-135`): `fgos check <id>` → đọc `docs/history/<feature>/`
+**(2) Skill `fgos-coding-compounding` — đắt.** Một lượt agent đầy đủ, 5 bước
+(`.claude/skills/fgos/fgos-coding-compounding/SKILL.md:45-135`): `fgos check <id>` → đọc `docs/history/<feature>/`
 → phán đoán Diataxis → `fgos compound --doc-type --doc-path` → `fgos doc-sources` →
 **viết hoặc nuôi một doc end-user thật** dưới `docs/<quadrant>/` → `fgos check` lại xác nhận.
 
@@ -149,7 +149,7 @@ Nếu domain khai bước Compound-learn mà `work.stage !== 'compound-learn'` �
   `approve` exit **2**, stderr khớp `/compound-learn/`, item nằm lại `proposed`.
 - Stage graph `src/state/workflow-stage-graphs.mjs:50`:
   `['clarify','decompose','executing','compound-learn']`; cạnh vào duy nhất
-  `{from:'executing', to:'compound-learn'}` (`:68`); skillMap `'compound-learn' → 'fgos-compounding'` (`:85`).
+  `{from:'executing', to:'compound-learn'}` (`:68`); skillMap `'compound-learn' → 'fgos-coding-compounding'` (`:85`).
 - **Verb `compound` đòi `status === 'proposed'`** (`bin/fgos.mjs:871`), gọi `moveStage(…, 'compound-learn')`
   (`:892`). Cố tình KHÔNG auto-advance từ return/approve (lý do ghi tại `bin/fgos.mjs:829-833`).
   Không có cạnh compound-learn→compound-learn, nên re-compound ném lỗi.

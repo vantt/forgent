@@ -15,7 +15,7 @@ The underlying `rankImpact` (`src/state/impact.mjs`) already returns `id`,
 data and just needs rendering. `blocked-by` is new derived data the verb
 does not currently compute; the skill/verb layer must add it in a later
 stage. This decision doc only locks what the column means and looks like,
-not how it gets computed in code — that is `fgos-planning`'s job next.
+not how it gets computed in code — that is `fgos-coding-planning`'s job next.
 
 ## Locked decisions
 
@@ -64,7 +64,7 @@ title verbatim, 7 columns, in that order.
 
 ## Outstanding questions deferred to planning
 
-None outside implementation. `fgos-planning` decides: whether
+None outside implementation. `fgos-coding-planning` decides: whether
 `blocked-by` is computed in `rankImpact` itself (extra fields on each row)
 or derived client-side in the skill from raw `deps`/`parent` fields
 (which the verb does not currently expose per-row either way), how deep a

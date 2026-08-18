@@ -46,7 +46,7 @@ tsk-2fw`, seq 1894/1895) alongside this doc.
   rendering step per D2.
 - Per-item log shapes, from `src/state/replay.mjs`/`store.mjs`:
   - `view.discovery[id]` — array, lazy key (replay.mjs, confirmed also by
-    `fgos-exploring`'s own step 1 usage).
+    `fgos-coding-exploring`'s own step 1 usage).
   - `view.decisionsById[id]` — array, lazy key (replay.mjs:283-287).
   - `view.gates[id]` — per-item (store.mjs:431/563 comments: "gates[id]
     gains the same...", "two snapshots live side by side in gates[id]").

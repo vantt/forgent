@@ -57,10 +57,10 @@ piece. Per `CONTEXT.md` D3/D4/D6/D9:
   D10): add inline, native handling for stages `discovery` and
   `exploring` under a new `## Discovery and exploring stages` section —
   same shape as the existing `clarify`/`decompose` handling: invoke
-  `fgos-researching`/`fgos-exploring` in-session (Native-First rule 2,
+  `fgos-researching`/`fgos-coding-exploring` in-session (Native-First rule 2,
   no spawn), apply the verdict directly (`clear` → `moveStage`;
   `unclear` → `fgos ask`, per D4).
-- `.claude/skills/fgos-exploring/SKILL.md` (+ `.agents/` mirror, D10):
+- `.claude/skills/fgos-coding-exploring/SKILL.md` (+ `.agents/` mirror, D10):
   fix the stale "runs while `stage` is `clarify`" framing to `exploring`
   (D9); update its Gate's engine call from `fgos discover --verdict
   clear` to the exploring->decompose mechanism piece 1 adds above.
@@ -78,37 +78,93 @@ piece. Per `CONTEXT.md` D3/D4/D6/D9:
     && grep -q "expectedStage: 'exploring'" src/intake/discovery.mjs \
     && grep -q "## Discovery and exploring stages" .claude/skills/fgos-coding-driving/SKILL.md \
     && grep -q "## Discovery and exploring stages" .agents/skills/fgos-coding-driving/SKILL.md \
-    && grep -q '`stage` is `exploring`' .claude/skills/fgos-exploring/SKILL.md \
-    && ! grep -q '`stage` is `clarify`' .claude/skills/fgos-exploring/SKILL.md
+    && grep -q '`stage` is `exploring`' .claude/skills/fgos-coding-exploring/SKILL.md \
+    && ! grep -q '`stage` is `clarify`' .claude/skills/fgos-coding-exploring/SKILL.md
   ```
   (corrected during Execute: the original grep patterns above dropped the
   backticks around `stage` itself, a genuine typo caught by running the
   verify for real before calling `fgos return` — never trust a written
   verify without running it once.)
 
-**Piece 2 (new child) — headless sweep respects the real verdict
+**Piece 2 (child `tsk-4v6`) — headless sweep respects the real verdict
 (`CONTEXT.md` D5).** `src/runner/loop.mjs`'s DISCOVERY DISPATCH sweep
 (~1030-1108) currently advances `discovery -> exploring` on any real
-commit, ignoring the worker's own `{clear, question}` verdict. Fix:
-capture the verdict from the worker's output (same
-`fgos-discovered`-block-style parsing `captureDiscoveredWork` already
-uses for a different channel — read the worker's own findings/verdict
-output, not re-invent a new channel) and branch: `clear` → the existing
-`moveStage(... to: 'exploring' ...)` call stays; `unclear` → `fgos ask`
-with the question, matching piece 1's interactive-path behavior exactly
-(`CONTEXT.md` D2's driver/launcher parity).
+commit, ignoring the worker's own `{clear, question}` verdict.
 
-  No file overlap with piece 1 (`loop.mjs` + its own test file only) — no
+  **Revised during `fgos-coding-validating`'s reality gate for `tsk-4v6`
+  (evidence, not the original guess above):** `src/intake/discovery.mjs`'s
+  own header comment (:27, added by piece 1) names this item directly —
+  *"`src/runner/loop.mjs`'s own direct `moveStage` call for `discovery ->
+  exploring`... still exists unchanged here — reconciling it to call this
+  same verb instead is tsk-4v6's own job, not this item's footprint."* The
+  "same verb" is `resolveDiscovery(dir, id, cfg, role, callerVerdict)`
+  (`src/intake/discovery.mjs:190`) — already the one function both
+  `bin/fgos.mjs`'s `discover` CLI verb and piece 1's own driver-side
+  `discovery` handling call, already implements both branches
+  (`callerVerdict.clear` → `nextDiscoveryEdge` + `moveStage` with verify
+  validation; `callerVerdict.clear === false` → park with the question),
+  and already degrades to a safe no-op for `role: 'runner'` when no
+  `callerVerdict` is supplied. This is the actual driver/launcher-parity
+  mechanism (`CONTEXT.md` D2) — calling it directly, instead of
+  hand-rolling a second `moveStage`/`fgos ask` pair in `loop.mjs`, is both
+  smaller (Reality gate "Smaller path" row) and the literal instruction
+  left in the code.
+
+  The one piece genuinely missing — confirmed by reading
+  `src/runner/prompt-templates/worker-prompt-discovery.txt` — is that the
+  discovery-stage worker is never told to emit its verdict at all today;
+  the template's own "How to finish" section says plainly *"there is
+  nothing further to decide or report back."* `captureDiscoveredWork`'s
+  `fgos-discovered` fence (:534-560) is a different channel for a
+  different purpose (surfacing NEW work items the worker stumbled on, not
+  this item's own completion verdict) and cannot be reused as-is; a
+  sibling fence is needed. Fix, three files:
+
+  - `src/runner/prompt-templates/worker-prompt-discovery.txt`: replace the
+    "nothing further to... report back" line with an instruction to emit
+    exactly one fenced block once research is done, mirroring
+    `fgos-researching`'s own `{clear, verify?, question?}` contract
+    (`.claude/skills/fgos-researching/SKILL.md` step 5):
+    ```
+    ```fgos-verdict
+    {"clear": true, "verify": "<a real, runnable command>"}
+    ```
+    ```
+    or
+    ```
+    ```fgos-verdict
+    {"clear": false, "question": "<the one concrete gap>"}
+    ```
+    ```
+  - `src/runner/loop.mjs`: add `parseVerdictBlock(output)`, a single-block
+    sibling of `parseDiscoveredBlocks` (:534-560) — same fail-safe shape
+    (malformed JSON/missing fence/wrong shape all yield `null`, never
+    throw); last well-formed block wins if a worker emits more than one.
+    Add `resolveDiscovery` to the existing `import { FALLBACK_VERIFY }
+    from '../intake/discovery.mjs'` line (:88). Replace the sweep's direct
+    `moveStage(dir, { id: item.id, to: 'exploring', expectedStage:
+    'discovery', role: 'runner' })` call (:1105) with: parse the verdict
+    from `worker.stdout` after the existing `facts.aheadCount === 0` no-op
+    check; when parsed, call `resolveDiscovery(dir, item.id, config,
+    'runner', callerVerdict)` and log its `outcome`; when absent/malformed,
+    log and leave the item exactly as today's no-commit branch already
+    does (stage `discovery`, status `todo`, for the next sweep to retry) —
+    never silently treat a missing verdict as `clear`, the exact bug this
+    item exists to fix.
+
+  No file overlap with piece 1 (`loop.mjs` + its own test file +
+  `worker-prompt-discovery.txt`, none touched by piece 1) — no
   `mergeAfter` dependency needed; can build/merge in either order relative
   to piece 1, though it is only meaningfully *testable end-to-end* once
   piece 1's stage is real (its own unit tests can still fabricate an item
-  already at `stage: 'discovery'` without needing piece 1's edge to exist).
+  already at `stage: 'discovery'` and a captured `worker.stdout` string,
+  without needing piece 1's edge to exist).
 
   Verify: `node --test test/runner/loop.test.mjs && npm test`
 
 **Piece 3 (new child) — fix the `fgos-routing` table (`CONTEXT.md`
 D8).** `.claude/skills/fgos-routing/SKILL.md:137-143`'s table currently
-says `clarify` → `fgos-exploring` (wrong; registry says
+says `clarify` → `fgos-coding-exploring` (wrong; registry says
 `fgos-clarifying`) and has no rows for `discovery`/`exploring` at all.
 Fix the wrong line, add the two missing rows. Zero code dependency on
 either other piece — this is a pure docs-table correction, true
@@ -123,7 +179,7 @@ merged first to be written correctly).
     && grep -q "\`fgos-clarifying\`" .claude/skills/fgos-routing/SKILL.md \
     && grep -q "| \`discovery\` |" .claude/skills/fgos-routing/SKILL.md \
     && grep -q "| \`exploring\` |" .claude/skills/fgos-routing/SKILL.md \
-    && ! grep -q "\`clarify\`.*\`fgos-exploring\`" .claude/skills/fgos-routing/SKILL.md
+    && ! grep -q "\`clarify\`.*\`fgos-coding-exploring\`" .claude/skills/fgos-routing/SKILL.md
   ```
 
 ## Cases sketched (high-risk depth)

@@ -59,6 +59,45 @@ That has two consequences:
   (`claude '/fgOS:pick <id>'`) as the command text, rather than typing
   `claude` alone and racing a second `pane run` against its startup time.
 
+## 2b. Pin the model explicitly — the launched session won't inherit yours
+
+A `claude` invocation built without `--model` runs on the CLI's own
+default, not on whatever the launching session happens to be using. If you
+want the pane's session pinned, every argv builder has to say so.
+
+Set `FGOS_HERDR_MODEL` to choose it; it defaults to `sonnet`:
+
+```bash
+FGOS_HERDR_MODEL=opus herdr ...   # per-launch override
+```
+
+The resulting command text looks like:
+
+```
+claude --model sonnet --dangerously-skip-permissions '/fgOS:pick tsk-19y-3'
+```
+
+Three details worth copying when you add a similar knob:
+
+- **Cover every builder, not the one you happened to be looking at.** In
+  this plugin that meant both `run_argv_for_command` (used by `/fgOS:pick`
+  and `/fgOS:discover`) *and* `loop_run_argv` (used by `merge-loop`,
+  `retro-loop`, and `cleanup-loop`). A model pinned in one path and absent
+  from the other is worse than absent from both, because the inconsistency
+  is invisible until someone compares two panes.
+- **Read the env var once per launch, then thread it in as a plain
+  argument.** Do not read the environment *inside* the argv builder. The
+  builders stay pure and unit-testable that way — the same shape
+  `skip_permissions_enabled()` already uses, where the test passes a plain
+  bool rather than manipulating process env.
+- **Default to the short alias (`sonnet`), not a full model id
+  (`claude-sonnet-5`).** This matches what the repo already does
+  everywhere else: `.fgos/config.json`'s `runner.executor.args` and
+  `executors.*.args` all use alias-shaped literals, and the event log
+  shows real executed invocations in the same form (`claude -p '...'
+  --model haiku ...`). Introducing a full-id convention here would make
+  this one call site the odd one out.
+
 ## 3. Re-validate any id before it's typed into a pane
 
 Since `pane run`'s command text has no shell-safe boundary, defensively

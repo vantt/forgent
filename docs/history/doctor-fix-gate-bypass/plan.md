@@ -126,7 +126,7 @@ Alternatives rejected:
 
 ## Risk map
 
-| Component | Risk | Proof point (→ fgos-validating) |
+| Component | Risk | Proof point (→ fgos-coding-validating) |
 |---|---|---|
 | Shared config file existed only as a plan-time assumption | **Resolved** (was High) — `tsk-5vf` merged to `main` (`af2fc64`); `.fgos/config.json` confirmed on disk, `ensureSharedConfigDefaults`/`readSharedConfig` confirmed real by direct read (CONTEXT.md D4) | Done — re-confirm at execution time that `fgw/tsk-2qz` has actually merged `main` (not just read it) before editing `registrations.mjs`/`gate-bypass.mjs`, so the branch builds against the real code, not a stale local copy |
 | Doctor's read-only-by-default behavior must survive the `--fix` addition | Medium — real regression risk on a well-tested file (RUL9's own behavior, `test/setup/doctor-fresh-run.test.mjs`) | Existing doctor tests (no `--fix` passed) must stay green unmodified in assertions; new tests only cover the `--fix` path additively |
@@ -221,7 +221,7 @@ manifest/doctor case) rather than the full suite — narrower than
 `src/runner/*`/`src/intake/*` the way `tsk-2cs`'s D6 did. Each child piece
 above also carries its own narrower verify command for faster iteration.
 
-## Assumptions (pending fgos-validating proof)
+## Assumptions (pending fgos-coding-validating proof)
 
 - ~~`tsk-2ta`'s eventual landed state provides a stable, discoverable path
   for the shared config file~~ — **resolved, true**: `.fgos/config.json`

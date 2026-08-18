@@ -111,7 +111,7 @@ of both blast radii.**
 ## Shape
 
 Concrete cases the fix must hold up against (proof points for
-`fgos-validating` and for `fgos-code-implement`'s own verify):
+`fgos-coding-validating` and for `fgos-coding-implement`'s own verify):
 
 1. **The core race, proven with a controlled clock, not a real 184.93s
    wait**: write a lock record with `pid: <live pid>, ts: <old enough to
@@ -148,7 +148,7 @@ Concrete cases the fix must hold up against (proof points for
 D1):**
 - The heartbeat interval value (45-60s) is an implementation detail sized
   for a comfortable margin under the 180s `DEFAULT_TTL_MS`, not a new
-  product decision — `fgos-validating` may adjust it if evidence during
+  product decision — `fgos-coding-validating` may adjust it if evidence during
   proving suggests otherwise.
 - No new exported constant/env var is required; `FGOS_MAIN_CHECKOUT_LOCK_TTL_MS`
   (the existing per-session override) is untouched and still works exactly

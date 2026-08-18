@@ -6,7 +6,7 @@
 porting-log). Decision 0026 (native-first dispatch) xác nhận cơ chế
 agy/opencode: luôn `cli/spawn` qua `resolveExecutorConfig`. Đã chọn
 `tsk-66o` làm gốc (thay vì submit 2 item mới trùng câu hỏi), claim, chạy
-`fgos-exploring` Socratic — cả 4 quyết định đã khoá thật (D1, D2, D3, D4,
+`fgos-coding-exploring` Socratic — cả 4 quyết định đã khoá thật (D1, D2, D3, D4,
 mỗi cái đã có `fgos decision --id tsk-66o` riêng, xem §4). Gap "bỏ sót"
 (D4 = quyết định TÁCH gap đó ra) đã filed thành `tsk-1gr`, sibling độc
 lập. `refs` của cả `tsk-66o` (→ `#design`) và `tsk-1gr` (→
@@ -14,7 +14,7 @@ lập. `refs` của cả `tsk-66o` (→ `#design`) và `tsk-1gr` (→
 ghi chú cross-reference vào `tsk-49o` (mức 3 hoãn của D3, không tự đủ
 nếu sau này chọn — vẫn cần phần base/identity-check của D3 đi kèm).
 
-**`fgos-exploring` đã xong.** `CONTEXT.md` viết (D1-D6), gate approved
+**`fgos-coding-exploring` đã xong.** `CONTEXT.md` viết (D1-D6), gate approved
 (human), title/description sửa khớp scope thật. Gặp friction thật ở bước
 cuối (`fgos discover`'s semantic-verify judge, `judgeVerifySemanticCorrectness`)
 — 8 vòng bị dispute vì item còn ở stage `decompose` sắp tới, chưa có code,
@@ -26,7 +26,7 @@ này, kẹt sẵn ở `clarify`, không phải riêng tsk-66o). Qua bằng `--fo
 nhất đã đề xuất — 3 file + 3 tên hàm mới (`computeSchedule`/`detectCycles`,
 `baseCommit` capture, `footprintDiffHits`) khớp D2/D3 đã khoá hướng, cộng
 chạy 3 test file thật liên quan. `tsk-66o` giờ ở `doing`/stage `decompose`
-— sẵn sàng cho `fgos-planning`.
+— sẵn sàng cho `fgos-coding-planning`.
 
 **Round 2 (lịch sử, không còn ảnh hưởng D nào):** main checkout dùng
 chung có phiên khác (cùng user) mid-merge (`2bc193d`) rồi commit tiếp
@@ -70,7 +70,7 @@ kém tin hơn subagent cùng nhà) mà không phá vỡ những gì đã hội t
 
 | D-ID | Tóm tắt | Nguồn / rationale |
 |---|---|---|
-| D1 | Children của tsk-66o phủ **≥ 2 CHỦ ĐỀ** — worktree-dispatch-attestation-shaped work + computed-parallel-wave-schedule-shaped work (2 candidate từ `docs/distillery/porting-log.md`, deep-dive `docs/distillery/deep-dives/parallel-decomposition-and-merge.md`). Đây là số CHỦ ĐỀ, không phải số ITEM khoá cứng — mỗi chủ đề thành 1 item hay tách nhỏ hơn (vd worktree-dispatch-attestation có sẵn 2 mảnh file tách biệt, `dispatch.mjs` vs `frozen-judge.mjs`, xem §7) là việc của `fgos-planning`, không khoá ở đây | User chốt sống trong phiên trước khi claim tsk-66o — dùng item có sẵn làm gốc thay vì submit trùng. Số item KHÔNG bị ghim ở bước này, đúng hard rule của `fgos-exploring` ("không quyết kích cỡ hay chia nhỏ"). Đã log `fgos decision --id tsk-66o` (seq 6165) |
+| D1 | Children của tsk-66o phủ **≥ 2 CHỦ ĐỀ** — worktree-dispatch-attestation-shaped work + computed-parallel-wave-schedule-shaped work (2 candidate từ `docs/distillery/porting-log.md`, deep-dive `docs/distillery/deep-dives/parallel-decomposition-and-merge.md`). Đây là số CHỦ ĐỀ, không phải số ITEM khoá cứng — mỗi chủ đề thành 1 item hay tách nhỏ hơn (vd worktree-dispatch-attestation có sẵn 2 mảnh file tách biệt, `dispatch.mjs` vs `frozen-judge.mjs`, xem §7) là việc của `fgos-coding-planning`, không khoá ở đây | User chốt sống trong phiên trước khi claim tsk-66o — dùng item có sẵn làm gốc thay vì submit trùng. Số item KHÔNG bị ghim ở bước này, đúng hard rule của `fgos-coding-exploring` ("không quyết kích cỡ hay chia nhỏ"). Đã log `fgos decision --id tsk-66o` (seq 6165) |
 | D2 | Thuật toán wave-schedule RIÊNG (Kahn+cycle-detection kiểu beegog), không tái dùng `graph-harness.mjs`'s connected-component+order logic — bài toán khác nhau thật (đếm song-song-ngay-bây-giờ vs thứ-tự-tuần-tự) | User trả lời "Riêng" khi được hỏi trực tiếp. Đã log `fgos decision --id tsk-66o` |
 | D4 | Gap "bỏ sót" (decompose không phủ hết quyết định đã khoá vào footprint con) để NGOÀI scope tsk-66o, khác bản chất với chồng-lấn — filed thành `tsk-1gr` độc lập (không dep logic, chỉ liên hệ text) | User chốt: "file luôn thành task riêng đi, gap bỏ sót phải cover luôn". Đã log `fgos decision --id tsk-66o` (seq 6181), và `tsk-1gr` đã submit thật |
 | D3 | `worktree-dispatch-attestation` chọn **MỨC 1 — advisory-only**: chụp `baseCommit`/`headRef` quanh `resolveExecutorConfig` trước dispatch + mở rộng `frozen-judge.mjs` gác diff-toàn-phần ngoài footprint (không chỉ test/CI/lockfile), CHỈ gắn cờ, không chặn merge. Mức 2 (hard-refusal) và mức 3 (cô lập OS, `tsk-49o`) hoãn lại | Code lỗi thật đã bị `merge.mjs`'s staged verify-gate chặn sẵn (không đổi) — rủi ro D3 xử lý là diff lệch phạm vi nhưng verify xanh (lớp STR63/frozen-judge), advisory nhất quán tiền lệ đã có, rẻ (F2), không risk chặn nhầm. Nâng mức sau nếu có incident thật. Đã log `fgos decision --id tsk-66o` (seq 6501), và ghi chú cross-reference vào `tsk-49o` (seq 6500) |
@@ -149,7 +149,7 @@ serialize dựa trên `rankImpact`.
    footprint (footprint vẫn optional — mức 1 không cần trả lời câu
    "không khai footprint thì sao", mức 2 mới cần).
 
-Cả hai đã đủ chi tiết để `fgos-planning` bắt tay vào — không còn D nào
+Cả hai đã đủ chi tiết để `fgos-coding-planning` bắt tay vào — không còn D nào
 mở.
 
 ```mermaid
@@ -202,7 +202,7 @@ flowchart TD
 - **Trích §6:** mục "2" ở §6.
 - **D-ID áp dụng:** D1 (là 1 trong 2 children), D3 (mức 1 — advisory-only,
   chốt), D5 (miễn kiểm khi vắng footprint, chỉ áp cho check mới). Task
-  này sẵn sàng cho `fgos-planning`.
+  này sẵn sàng cho `fgos-coding-planning`.
 - **Quan hệ sibling:** độc lập file với
   `computed-parallel-wave-schedule` (§ trên). Liên hệ (không phải dep
   logic) với `tsk-49o` — mức 2/3 hoãn, `tsk-49o` đã nhận ghi chú
@@ -228,5 +228,5 @@ flowchart TD
 - **D-ID áp dụng:** D4 (quyết định TÁCH nó ra, không phải nội dung của
   nó).
 - **Quan hệ sibling:** liên hệ text với tsk-66o, không dep logic.
-- **Draft verify:** để `fgos-exploring`/`fgos-planning` riêng của
+- **Draft verify:** để `fgos-coding-exploring`/`fgos-coding-planning` riêng của
   `tsk-1gr` tự quyết — ngoài scope discussion này.

@@ -35,7 +35,7 @@ more expensive path).
 
 Risk map:
 
-| Component | Risk | Proof point (for fgos-validating) |
+| Component | Risk | Proof point (for fgos-coding-validating) |
 |---|---|---|
 | `bin/fgos.mjs` `list` case | low | new test: default excludes a `done` item; `--all` restores it |
 | `bin/fgos.mjs` `triage` case + `rankImpact` | medium (existing ranking math must stay byte-identical for the default/no-flag path) | existing `impact.test.mjs` assertions must still pass unchanged; new test: `--all`'s done rows carry `blocks: 0`, `componentSize: 0`, `isIsolated: true`, sorted after all open rows |

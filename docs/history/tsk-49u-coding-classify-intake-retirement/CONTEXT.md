@@ -3,10 +3,10 @@
 Item: `tsk-49u`. Written retroactively (D0 below) because `clarify` jumps
 straight to `decompose` for every item (finding 6,
 `plans/reports/project-instability-scan-260809-1608-ship-faster-stability-report.md`)
-— `fgos-exploring`, the only stage that would normally write this file, is
+— `fgos-coding-exploring`, the only stage that would normally write this file, is
 structurally unreachable. This mirrors the same gap `tsk-36i` itself hit.
 
-## Decisions
+## Locked decisions
 
 - **D0.** This item's original scope ("main is red") was refuted before
   work started — `tsk-4fk` (merged, `cc1666f`) already fixed the failing
@@ -18,7 +18,7 @@ structurally unreachable. This mirrors the same gap `tsk-36i` itself hit.
 
 - **D1.** Traced the real dispatch path (`src/runner/dispatch.mjs`):
   `spawnWorker`'s own `capacityIdForWork` only ever resolves the domain's
-  `executing`-stage skill name (`fgos-code-implement` for `coding`) — it
+  `executing`-stage skill name (`fgos-coding-implement` for `coding`) — it
   never reaches a capacity by any other name. The one designed consumer
   of `coding-classify-intake` by name was `.claude/skills/fgos-submit-
   assist/SKILL.md`'s classify step, via the shared

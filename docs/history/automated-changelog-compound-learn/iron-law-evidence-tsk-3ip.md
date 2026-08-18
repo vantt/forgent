@@ -19,7 +19,7 @@ failing-test-first cycle follows below.
 ## Failing-test-first proof
 
 The implementation and its tests landed together in one commit
-(`fgos-code-implement`'s "one commit per item" rule), so getting honestly
+(`fgos-coding-implement`'s "one commit per item" rule), so getting honestly
 to red meant reverting only the two implementation files against the
 parent commit while keeping the shipped test file exactly as it ships —
 the same recipe `produce-failing-test-first-proof-for-an-iron-law-gated-
@@ -143,8 +143,8 @@ runs except for the one this item actually caused and fixed.
 ## Blast-radius cross-check (GitNexus)
 
 `fgos tool query --capability impact-analysis --status present` returned
-`gitnexus`, `status: present` (checked at `fgos-planning` and again at
-`fgos-validating`), but this session's own `impact({target:
+`gitnexus`, `status: present` (checked at `fgos-coding-planning` and again at
+`fgos-coding-validating`), but this session's own `impact({target:
 "collectCheckData", direction: "upstream"})` call returned `Target
 'collectCheckData' not found` — a suspicious zero-result the AGENTS.md
 capability gate says to cross-check rather than trust, and the repo's own

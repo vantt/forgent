@@ -25,14 +25,14 @@ function mkTempDir(prefix) {
 
 // --- installGitHooks: function form, real git checkout -------------------
 
-test('installGitHooks sets core.hooksPath to .githooks inside a real git checkout', () => {
+test('installGitHooks sets core.hooksPath to this repo root\'s absolute .githooks path inside a real git checkout', () => {
   const repoRoot = mkTempDir('install-git-hooks-fn-');
   execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
 
   installGitHooks(repoRoot);
 
   const hooksPath = execFileSync('git', ['config', '--get', 'core.hooksPath'], { cwd: repoRoot, encoding: 'utf8' }).trim();
-  assert.equal(hooksPath, '.githooks');
+  assert.equal(hooksPath, path.join(repoRoot, '.githooks'), 'must be absolute -- a relative value resolves per-worktree, not to this root, once .githooks/ is a tracked directory (tsk-2u5 D4)');
 
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
@@ -53,7 +53,7 @@ test('installGitHooks is idempotent -- running it twice does not throw and leave
   installGitHooks(repoRoot);
 
   const hooksPath = execFileSync('git', ['config', '--get', 'core.hooksPath'], { cwd: repoRoot, encoding: 'utf8' }).trim();
-  assert.equal(hooksPath, '.githooks');
+  assert.equal(hooksPath, path.join(repoRoot, '.githooks'));
 
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
@@ -115,7 +115,7 @@ function setupCliFixture() {
   return { fixtureRoot, scriptCopyPath };
 }
 
-test('CLI: running install-git-hooks.mjs inside a fresh temp git clone sets core.hooksPath to .githooks', () => {
+test('CLI: running install-git-hooks.mjs inside a fresh temp git clone sets core.hooksPath to the fixture root\'s absolute .githooks path', () => {
   const { fixtureRoot, scriptCopyPath } = setupCliFixture();
   execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: fixtureRoot });
 
@@ -123,7 +123,7 @@ test('CLI: running install-git-hooks.mjs inside a fresh temp git clone sets core
 
   assert.equal(result.status, 0, result.stderr);
   const hooksPath = execFileSync('git', ['config', '--get', 'core.hooksPath'], { cwd: fixtureRoot, encoding: 'utf8' }).trim();
-  assert.equal(hooksPath, '.githooks');
+  assert.equal(hooksPath, path.join(fixtureRoot, '.githooks'));
 
   fs.rmSync(fixtureRoot, { recursive: true, force: true });
 });

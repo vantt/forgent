@@ -54,6 +54,19 @@ export function mergeWithGlobalConfig(projectConfig, globalConfigPath = defaultG
 }
 
 /**
+ * Write `config` to the global config file, creating `~/.fgos/` if needed
+ * (tsk-2qc-1 D4 — the write half `loadGlobalConfig` never had: this file
+ * used to be read-only, since nothing needed to persist anything into it
+ * before the tier-3 bin-discovery cache). Same "the only write path in
+ * this module, callers decide WHEN to write" discipline
+ * `writeSharedConfig` already applies to the project-level file.
+ */
+export function writeGlobalConfig(config, globalConfigPath = defaultGlobalConfigPath()) {
+  fs.mkdirSync(path.dirname(globalConfigPath), { recursive: true });
+  fs.writeFileSync(globalConfigPath, `${JSON.stringify(config, null, 2)}\n`);
+}
+
+/**
  * Which config level is active for `cwd`'s project (project config wins
  * when present, per D1), and whether the other level is also present --
  * the awareness data `fgos doctor`'s config-awareness check reports on.

@@ -62,5 +62,5 @@ item does not define new behavior for that case.
   keybinding already handles it; D2 only decided this item doesn't need
   to build a second one.
 - Exact `UiEvent` variant name(s) and how `Tab`/panel-focus state thread
-  through `App`/`ui.rs`/`main.rs` — implementation detail, `fgos-planning`'s
+  through `App`/`ui.rs`/`main.rs` — implementation detail, `fgos-coding-planning`'s
   call.

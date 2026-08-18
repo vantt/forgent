@@ -91,7 +91,7 @@ trước khi rút ràng buộc):
   ordering-and-stop-rules.md`, `why-discover-was-rewritten-...md`, `why-
   decomposes-skip-and-advance-...md`, `orphaned-worktree-reclaim-...md`,
   `worktree-isolation-axis-decision.md`, …) mà đúng ra nên gộp vào 2-3 tài
-  liệu sống theo chủ đề. Xác nhận bằng đọc trực tiếp `fgos-compounding`
+  liệu sống theo chủ đề. Xác nhận bằng đọc trực tiếp `fgos-coding-compounding`
   SKILL.md bước 3: grow-vs-create hiện CHỈ so khớp `fs.existsSync` trên một
   đường dẫn tự chọn TỰ DO mỗi lần — không có cách nào một phiên compound
   biết đã có tài liệu chủ đề gần đó, nên gần như luôn "create". Đúng luật
@@ -123,7 +123,7 @@ trước khi rút ràng buộc):
     area map, không registry chủ đề nào để một phiên compound tra trước
     khi quyết create/grow. Đây đúng là khoảng trống row D chỉ ra từ vòng 3.
   - Cũng xác nhận `docs/specs/enduser-docs-authoring.md` (area spec của
-    CHÍNH `fgos-compounding`) đang lỗi thời: § Open Gaps còn viết "mỗi
+    CHÍNH `fgos-coding-compounding`) đang lỗi thời: § Open Gaps còn viết "mỗi
     đường dẫn mới có một capture liên kết" / "mới ngăn how-to có tài liệu
     thật" — không khớp thực tế hôm nay (127/76/19/1). R5 của area spec đó
     tự để một cửa thoát: "chỉ cân nhắc trục thứ hai khi tài liệu thật va
@@ -206,7 +206,7 @@ hay `authoritative_for` từ đầu) còn chờ chủ sản phẩm.
 
 ## 2. Mục tiêu & đề bài
 
-Chủ sản phẩm coi compound-learn (bước `fgos-compounding` chạy khi item ở
+Chủ sản phẩm coi compound-learn (bước `fgos-coding-compounding` chạy khi item ở
 `status: retrospective`, phân loại capture thật thành tài liệu Diataxis)
 là một hướng chiến lược quan trọng, không chỉ công cụ nội bộ. Tầm nhìn: về
 sau muốn hệ thống viết được NHIỀU LOẠI tài liệu hơn, phục vụ NHIỀU
@@ -219,19 +219,19 @@ use case CỤ THỂ đầu tiên của hướng này. Việc ở đây là thi�
 đăng ký (registry) để mỗi audience/loại-tài-liệu mới cắm vào compound-learn
 mà không phải sửa lại logic lõi mỗi lần — nhưng PHẢI giữ nguyên 4 quadrant
 Diataxis hiện có (không đụng, không pha trộn — hard rule của
-`fgos-compounding` cấm thẳng việc bịa quadrant thứ 5).
+`fgos-coding-compounding` cấm thẳng việc bịa quadrant thứ 5).
 
 ## 3. Vấn đề rõ / chưa rõ
 
 | # | Điểm | Trạng thái | Ghi chú |
 |---|---|---|---|
-| 1 | Không đụng 4 quadrant Diataxis hiện có | RÕ | Hard rule `fgos-compounding` SKILL.md, xác nhận lại từ discussion `tsk-12m` |
+| 1 | Không đụng 4 quadrant Diataxis hiện có | RÕ | Hard rule `fgos-coding-compounding` SKILL.md, xác nhận lại từ discussion `tsk-12m` |
 | 2 | Tiền lệ registry mở-rộng-được đã chạy thật trong repo | RÕ, nhưng KHÔNG còn là tiền lệ phù hợp nhất | `registerCheck`/`registerFix` (`src/setup/registrations.mjs:64/85/110`) là registry cho FUNCTION máy tự chạy. Phân loại tài liệu không phải chuyện đó — Bee OKF Profile mới là tiền lệ đúng ngành, và nó chọn NGƯỢC lại (vocabulary đóng). Xem §5 vòng 2 |
 | 3 | fgOS mới port lớp nông nhất của OKF | RÕ (scout vòng 2) | Có: `frontmatter.mjs` (codec phẳng, không nested), `fgos docs-index`. KHÔNG có: checker 2 tầng, `authoritative_for`/anti-fork, `context --budget`, `promote`. Bảng đối chiếu đầy đủ ở §5 |
 | A | **Trục nào?** | **D-tsk28x-1** (vòng 3) | Hai trục, bắt buộc, hiện fgOS mới có một. Diataxis = trục TRẠNG THÁI NHẬN THỨC người đọc; OKF 9-type = trục DANH TÍNH (tài liệu này LÀ gì, của ai, về vấn đề gì). Vuông góc, một tài liệu mang cả hai nhãn |
 | B | Đóng hay mở | **ĐÃ CHỐT — D-tsk28x-3 (vòng 9)** | `struggle` KHÔNG nằm trong 4 quadrant Diataxis (Diataxis dựng từ 2 chiều hành-động/nhận-thức × tiếp-thu/vận-dụng, ra đúng 4 ô, không ô nào là struggle). Trục trạng-thái-nhận-thức ("cách viết") là **registry MỞ của nhiều FRAMEWORK**, không chỉ nhiều profile trong một lưới — Diataxis là một framework cụ thể (đóng, 4 ô); marketing-storytelling có thể cần một framework khác hẳn bản chất (cung truyện/narrative arc, không xuất phát từ lưới action×cognition của Diataxis). Mỗi framework tự đóng vocabulary riêng; trục thì mở cho framework mới gia nhập. Chủ sản phẩm tổng quát hoá đúng câu này ở vòng 9, sau khi vòng 2/3/8 đã ba lần khẳng định không ai bác |
 | C | **GHI hay ĐỀ XUẤT** | **TRẢ LỜI V3** (chưa D-ID) — câu hỏi vòng 2 đặt SAI | Không chọn một cho cả hệ thống — tách theo GIAI ĐOẠN. **Thu chất liệu: ghi thẳng, liên tục, không bao giờ dừng để hỏi** (ràng buộc chủ sản phẩm đặt: nhanh, rẻ, ít token, không cắt ngang luồng làm việc khác — loại thẳng mọi phương án gọi LLM phân loại ngay lúc capture). **Tổng hợp: nhiều pha, có triage nổi ứng viên, có người duyệt.** Lý do OKF sợ tự-ghi chỉ áp cho TÀI LIỆU (giả vờ là kết luận đã biên tập), không áp cho CHẤT LIỆU THÔ (chỉ ghi "đã xảy ra chuyện này"). Cửa gác đặt đúng chỗ chất liệu biến thành khẳng định |
-| D | Ai giữ "một chủ đề một chủ sở hữu" khi số tài liệu tăng | **ĐANG BÀN — vòng 9; hai câu hỏi con ĐÃ CÓ CÂU TRẢ LỜI CÓ BẰNG CHỨNG (chưa mint), hai câu mới mở** | `fgos-compounding` grow-vs-create CHỈ bằng `fs.existsSync` — đúng luật văn bản (`docs/specs/enduser-docs-authoring.md` R4), không phải bug. Đo vòng 9: `explanation` 127 / `how-to` 76 / `reference` 19 / `tutorial` 1 = 223 file; cụm worktree/discover/decompose ~20 file rời — bằng chứng va chạm thật (R5 area spec đó tự mở khoá: "chỉ cân nhắc trục thứ hai khi tài liệu thật va chạm"). **Tiền lệ: `tsk-1lv-4` CHÍNH LÀ cuộc di cư này, đã chạy xong — 30+ file ADR → fold vào 5 đích + index sinh tự động + doctor check.** Trả lời (1): tái dùng CƠ CHẾ, không tái dùng VOCABULARY — fold ở độ mịn area đã đẻ `runner.md` 2476 dòng / `work-state.md` 2290 dòng (repo đặt `docs.maxLoc: 800`), và 223 file đo được đều dồn vào 2 area đó ⇒ 10.000+ dòng một file; D-ADR0008 (đã khoá) đòi chia theo audience của TỪNG interface. Trả lời (2): fold-mechanism làm nền CÓ; anti-fork gate KHÔNG — nó chống fork tên-gần-giống, còn fgOS fork NGỮ NGHĨA (3 file cùng chủ đề reclaim-worktree, skeleton-match bắt 0/3); thứ chặn được là vocabulary ĐÓNG tại lúc GHI. Còn mở: (a) vocabulary suy bottom-up hay liệt kê top-down; (b) 223 file cũ fold ngược toàn bộ / chỉ áp cho mới / fold dần |
+| D | Ai giữ "một chủ đề một chủ sở hữu" khi số tài liệu tăng | **ĐANG BÀN — vòng 9; hai câu hỏi con ĐÃ CÓ CÂU TRẢ LỜI CÓ BẰNG CHỨNG (chưa mint), hai câu mới mở** | `fgos-coding-compounding` grow-vs-create CHỈ bằng `fs.existsSync` — đúng luật văn bản (`docs/specs/enduser-docs-authoring.md` R4), không phải bug. Đo vòng 9: `explanation` 127 / `how-to` 76 / `reference` 19 / `tutorial` 1 = 223 file; cụm worktree/discover/decompose ~20 file rời — bằng chứng va chạm thật (R5 area spec đó tự mở khoá: "chỉ cân nhắc trục thứ hai khi tài liệu thật va chạm"). **Tiền lệ: `tsk-1lv-4` CHÍNH LÀ cuộc di cư này, đã chạy xong — 30+ file ADR → fold vào 5 đích + index sinh tự động + doctor check.** Trả lời (1): tái dùng CƠ CHẾ, không tái dùng VOCABULARY — fold ở độ mịn area đã đẻ `runner.md` 2476 dòng / `work-state.md` 2290 dòng (repo đặt `docs.maxLoc: 800`), và 223 file đo được đều dồn vào 2 area đó ⇒ 10.000+ dòng một file; D-ADR0008 (đã khoá) đòi chia theo audience của TỪNG interface. Trả lời (2): fold-mechanism làm nền CÓ; anti-fork gate KHÔNG — nó chống fork tên-gần-giống, còn fgOS fork NGỮ NGHĨA (3 file cùng chủ đề reclaim-worktree, skeleton-match bắt 0/3); thứ chặn được là vocabulary ĐÓNG tại lúc GHI. Còn mở: (a) vocabulary suy bottom-up hay liệt kê top-down; (b) 223 file cũ fold ngược toàn bộ / chỉ áp cho mới / fold dần |
 | E | Ranh giới scope `tsk-28x` vs `tsk-12m` | **ĐÃ CHỐT — D-tsk28x-2 (vòng 7)** | Vòng 1 hỏi "thứ tự nào trước". Vòng 3 đổi câu hỏi: đường ống 5 pha (§6) rõ ràng lớn hơn cả hai item cộng lại. **Bổ sung 2026-08-09:** `tsk-12m` vòng 4 tìm ra ranh giới **quan sát/nhắc vs quyết/viết/chặn** (`docs/history/automated-changelog-compound-learn/DISCUSSION.md` §6.1) — loại quan sát/nhắc độc lập hoàn toàn với câu hỏi §6.4 ở đây và **sống sót qua mọi phương án**, nên làm được ngay, không cần chờ `tsk-28x`. **Vòng 7 (2026-08-11):** chủ sản phẩm xác nhận tách quan hệ — `tsk-28x` không còn `deps` trên `tsk-12m`; `tsk-12m` tự xây phần quan-sát/nhắc độc lập, phần ghi/registry của nó cắm vào bất cứ hình dạng `tsk-28x` chốt sau, không phải chờ ngược lại |
 | F | Hình dạng pha TRIAGE (pha 1, §6) | ĐỠ MỜ sau vòng 5 — xem J2 | Pha triage phải chấm điểm ứng viên. Bài học B6b (§5 vòng 2): tín hiệu xếp hạng phải chọn BẰNG ĐO, không bằng trực giác — trùng tag đo ra AUC 0.550 (≈ tung đồng xu), `areas` 0.500 (đúng bằng tung đồng xu). **Vòng 5 có ứng viên đầu có căn cứ: round-count trên mỗi item (J2).** Còn mở: đo nó bằng bộ nhãn nào — fgOS vẫn chưa có tập nhãn tay như bee đã có, nên chưa chạy được phép đo AUC tương đương |
 | G | ~~Chất liệu `struggle` đã có sẵn trong `friction`~~ | **RÚT LẠI — SAI** (đo lại vòng 4) | Vòng 3 kết luận "RÕ" từ ĐÚNG MỘT bản ghi (`tsk-1gn`) rồi suy rộng ra cả hệ thống. Đo toàn log: 131 friction = 81 `verify-miss` + 39 `merge-conflict` (92% telemetry máy), `detail` điển hình `goal-check failed on branch "fgw/tsk-puz" (exit null)` — ghi RẰNG hỏng, không ghi ĐÃ THỬ GÌ / VÌ SAO / CHỖ NGOẶT. Không phải chất liệu kể chuyện. Thứ làm vòng 3 phấn khích thực ra là `gates.askHistory`, KHÁC `friction` — vòng 3 lẫn hai thứ |
@@ -266,7 +266,7 @@ Diataxis hiện có (không đụng, không pha trộn — hard rule của
   (`deps: [tsk-12m]`, dependency candidate `tsk-12m` được xác nhận bởi
   chủ sản phẩm trước khi submit). Scout tái sử dụng từ discussion
   `tsk-12m`: `src/setup/registrations.mjs:64/85/110` (tiền lệ registry),
-  `.claude/skills/fgos-compounding/SKILL.md` (hard rule không bịa
+  `.claude/skills/fgos-coding-compounding/SKILL.md` (hard rule không bịa
   quadrant thứ 5, không ghi ngoài `docs/<quadrant>/`). 3 câu hỏi mở đặt ra
   cho vòng tiếp theo (§3).
 
@@ -603,7 +603,7 @@ Diataxis hiện có (không đụng, không pha trộn — hard rule của
   — xác nhận đọc bursty của vòng 6; `tsk-12m` vừa đo xong tỉ lệ quên 73.8%
   và tự nêu đúng câu "va giữa D-tsk12m-B với mô hình mới" mà §1 đang treo
   — đọc là đã tự giải sau khi Làn B bị rút ở vòng 8, cả changelog lẫn
-  storytelling giờ cùng chạy per-item trong `fgos-compounding`, không còn
+  storytelling giờ cùng chạy per-item trong `fgos-coding-compounding`, không còn
   population-sweep skill riêng nào để va nhau). Session cũng hỏi xác nhận
   hai kết luận vòng 8 + đề xuất câu trả lời cho "hai trục cần cùng lúc
   không" (không cần — changelog chỉ cần tag danh tính, không cần state
@@ -620,7 +620,7 @@ Diataxis hiện có (không đụng, không pha trộn — hard rule của
 
   Session scout trước khi hỏi tiếp (xem §1 vòng 9 để chi tiết đầy đủ):
   đo thật `docs/explanation/` = 127 file với cụm chủ đề trùng lặp rõ
-  (worktree/discover/decompose ~20 file rời); đọc `fgos-compounding`
+  (worktree/discover/decompose ~20 file rời); đọc `fgos-coding-compounding`
   SKILL.md bước 3 xác nhận grow-vs-create hiện chỉ so khớp đường dẫn tự do
   từng lần — khớp đúng luật văn bản `docs/specs/enduser-docs-authoring.md`
   R4; và tìm ra fgOS đã có sẵn cơ chế "một chủ đề một chủ sở hữu" chạy
@@ -667,7 +667,7 @@ fgOS hôm nay phân loại tài liệu người-dùng-cuối bằng đúng một
 bốn quadrant Diataxis (`tutorial` / `how-to` / `reference` / `explanation`,
 đóng cứng trong `DIATAXIS_DOC_TYPES`, `src/state/store.mjs:846`). Trục đó
 đang gánh ba việc cùng lúc: quyết định **cách viết**, quyết định **nơi
-lưu** (hard rule của `fgos-compounding`: không viết ra ngoài
+lưu** (hard rule của `fgos-coding-compounding`: không viết ra ngoài
 `docs/<quadrant>/` khớp tag vừa lưu), và là **danh sách duy nhất** một tài
 liệu có thể thuộc về.
 

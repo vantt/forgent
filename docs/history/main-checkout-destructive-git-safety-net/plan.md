@@ -69,7 +69,7 @@ fires on `commit`) — not a viable mechanism, would require shimming the
 
 Impact-analysis posture: `fgos tool query --capability impact-analysis
 --status present` returned `gitnexus` present via MCP at clarify time —
-posture is **full**. `fgos-code-implement` must run `impact({target:
+posture is **full**. `fgos-coding-implement` must run `impact({target:
 "run", direction: "upstream"})` (or the enclosing dispatch function) on
 `bin/fgos.mjs` before editing it, per `CLAUDE.md`'s mandatory gate — this
 plan does not substitute for that live check, only flags where it applies.
@@ -111,7 +111,7 @@ worth the overhead of separate child items with their own verify commands.
 - The CLI verb's exact name (`main-checkout-reset`) is this plan's own
   choice, not re-litigating `CONTEXT.md` — `CONTEXT.md`'s outstanding
   question 1 explicitly left this to planning. Not material enough to send
-  back to `fgos-exploring` (naming a verb does not change the item's scope
+  back to `fgos-coding-exploring` (naming a verb does not change the item's scope
   or acceptance criteria).
 - "Explicit human confirmation" (`CONTEXT.md`'s outstanding question 2) is
   resolved here as a `--confirm` flag the caller must pass after seeing the

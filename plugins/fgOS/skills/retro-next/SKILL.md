@@ -5,25 +5,35 @@ description: >-
   item synthesized now — invoked as /fgOS:retro-next. First sweeps every
   delivered item to retrospective (fgos retrospective — cheap, mechanical,
   idempotent), then picks via pickNextRetrospectiveItem
-  (src/state/retro-pool.mjs, FIFO by delivered->retrospective entry time),
-  resolves the item's own domain's synthesis skill (decision record 0027
-  D5 — fgos-compounding for coding today, never hardcoded) and runs it
-  (settlement/decision/enduser-docs), and on success moves it to cleanup.
-  Example: "/fgOS:retro-next", "synthesize the next retrospective item".
+  (src/state/retro-pool.mjs, FIFO by delivered->retrospective entry time)
+  and hands that one item to fgos-coding-driving with ceiling
+  status:cleanup, relaying whatever the driver reports. Example:
+  "/fgOS:retro-next", "synthesize the next retrospective item".
 ---
 
 # fgOS retro-next
 
-Wraps the `fgos retrospective` sweep, `pickNextRetrospectiveItem`
-(`src/state/retro-pool.mjs`), the item's own domain-resolved synthesis
-skill (decision record 0027 D5 — `fgos-compounding` for `coding` today),
-and `fgos move <id> --to cleanup` so a person (or a `/fgOS:retro-loop`
-iteration) can process the single next `status:retrospective` item
-end to end without hand-typing each step or re-deriving the pick order
-every time. Never writes `.fgos/` state directly beyond what the
-resolved synthesis skill itself already does through its own producer
-surface (`fgos compound`), and never re-implements that skill's synthesis
-— this skill only sequences the existing pieces
+A launcher, in the exact sense decision record `0029` D17 pins: it
+activates one unit and lets go. It sweeps (`fgos retrospective`), picks one
+item (`pickNextRetrospectiveItem`, `src/state/retro-pool.mjs`), sets that
+item's ceiling, and hands it to `fgos-coding-driving` — the `driver` cell
+of the same grid. It never resolves which skill runs synthesis, never
+invokes it, and never moves the item afterwards; the driver owns all three,
+the same way `/fgOS:pick`, `/fgOS:discover`, `/fgOS:plan`, and
+`/fgOS:discover-next` already hand their own picked item over.
+
+Before this shape it hand-rolled that sequence inline — resolving the skill
+itself, invoking it, running the `move` verb to push the item on to
+`cleanup`, then reading a raw subprocess exit code — which left it with
+thinner park/anchor handling
+than the shared loop and no way to inherit the loop's later improvements
+(`docs/history/retro-next-shared-driving/CONTEXT.md` D3). Observable
+behavior is unchanged: synthesis runs, the item lands at `cleanup`, the run
+stops there.
+
+Never writes `.fgos/` state directly beyond what the driver and the
+synthesis skill it resolves already do through their own producer surfaces,
+and never re-implements that skill's synthesis
 (`docs/history/fgos-retro-loop/CONTEXT.md`'s own scope boundary).
 
 ## Steps
@@ -71,86 +81,74 @@ surface (`fgos compound`), and never re-implements that skill's synthesis
    empty — nothing to synthesize" and stop. This is `/fgOS:retro-loop`'s
    own pool-empty stop signal; nothing else to do here.
 
-4. **Resolve the item's synthesis skill, then run it.** Otherwise the
-   output is `{"id": "<id>"}`. Read the item's own `domain` field (`fgos
-   list --id <id> --json`, or the `view.work[id].domain` the pick step
-   already had in hand) and resolve which skill runs synthesis for it —
-   never assume `fgos-compounding` unconditionally (decision record 0027
-   D5: `retrospective` is a per-domain skillMap entry now, same lookup
-   `fgos-routing`'s own `skillForStage` uses for `stage`, just keyed by
-   the status `retrospective` instead of a stage name):
+4. **Hand the picked item to the driver with an explicit ceiling.**
+   Otherwise the output is `{"id": "<id>"}`. Invoke `fgos-coding-driving`
+   for `<id>` with:
 
-   ```bash
-   node -e "
-   import('./src/state/workflow-stage-graphs.mjs').then(({ getDomain, skillForStage }) => {
-     console.log(skillForStage(getDomain(process.argv[1]), 'retrospective') ?? 'fgos-compounding');
-   });
-   " -- "$domain"
+   ```text
+   ceiling: status:cleanup
    ```
 
-   substituting `<id>`'s own `domain` value (absent/unrecognized folds to
-   `coding` automatically, `getDomain`'s own fail-safe). The explicit
-   `?? 'fgos-compounding'` fallback mirrors `skillForStage`'s null-safe
-   shape one level up: a domain that declares no `retrospective` entry at
-   all still gets a real skill to run, never a missing-skill dead end.
-   For `coding` today this always resolves to `fgos-compounding` — zero
-   behavior change from before this lookup existed.
+   and nothing else. That is this whole step. Do not resolve the synthesis
+   skill here, do not invoke it, do not move the item afterwards — the
+   driver owns all three, the same way `/fgOS:discover-next` hands its own
+   picked item over instead of hand-rolling the stage sequence.
 
-   Then invoke the resolved skill directly (in this same session, not a
-   fresh dispatch) with `<id>` as its argument — `fgos-compounding`'s own
-   flow (the resolution for every domain today) gathers the real capture
-   (`fgos check <id>`), classifies the Diataxis quadrant, stores the tag
-   via `fgos compound <id> --doc-type <quadrant> --doc-path <path>`, and
-   grows-or-creates the end-user document. Trust the resolved skill's own
-   hard rules and red flags exactly as written there — this skill never
-   second-guesses the classification or the document it produces.
+   **Why an explicit ceiling is required, not optional.** Omitting it means
+   the driver's default ceiling, which is `awaiting-approval` — already far
+   behind a `retrospective` item, so the drive would stop before doing
+   anything. Naming `status:cleanup` says exactly how far this launcher
+   goes: run the item's synthesis, land it at `cleanup`, stop. It never
+   names a ceiling past `cleanup`: finishing that step is TTL-gated and
+   belongs to `/fgOS:cleanup-next`, and no launcher may ship a default
+   ceiling that would cross the merge gate (`fgos-coding-driving`'s own
+   named constraint, `docs/history/retro-next-shared-driving/CONTEXT.md`
+   D2/D3).
 
-5. **On synthesis success, move to cleanup.** Once the resolved skill
-   confirms the tag is stored and the document exists (`fgos-compounding`'s
-   own step 5, for the resolution every domain uses today), run:
+   The driver resolves which skill runs synthesis through the same registry
+   lookup it uses for every other position — `skillForStage(getDomain(
+   item.domain), 'retrospective')`, decision record `0027` D5, which for
+   `coding` resolves to `fgos-coding-compounding` today. This skill never
+   re-derives that mapping, and never second-guesses the classification or
+   the document the resolved skill produces.
 
-   ```
-   # fgos CLI fallback (tsk-1no D3)
-   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
-   if [ -f "$FGOS_BIN" ]; then
-     node "$FGOS_BIN" move <id> --to cleanup --dir "$root"
-   elif command -v fgos >/dev/null 2>&1; then
-     fgos move <id> --to cleanup --dir "$root"
-   else
-     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
-     exit 1
-   fi
-   ```
+5. **Report whatever the driver reported.** Relay its stop reason exactly;
+   add no separate report of your own beyond it. There is no exit code to
+   classify here — the driver runs in-session, so its own relayed stop line
+   is the channel (tsk-1c6 D2/D4), the same way `/fgOS:discover-next`
+   already reads its outcomes:
 
-   substituting `<id>` from step 2's output. Capture both the command's
-   stdout and its real process exit code.
+   - **reached ceiling at status `cleanup`** — synthesis ran and the item
+     landed at `cleanup`, ready for `fgos cleanup <id>` (or
+     `/fgOS:cleanup-loop`) to finish later, TTL permitting. This is the
+     success path.
+   - **`awaiting-human`** — the resolved synthesis skill parked on a real
+     question. Relay it exactly; a person answers via `/fgOS:answer <id>
+     <answer text>` before the item can be picked again. Never guess past
+     it.
+   - **`lock-timeout`** — the driver's stop-report carries the line
+     `stop-reason: lock-timeout` verbatim. Classify this on its own, never
+     as a plain `blocked`: `.fgos/events.jsonl`'s lock is shared by every
+     item, so the *whole* run should stop rather than this one item being
+     skipped. Report it as `lock-timeout` to `/fgOS:retro-loop`, whose own
+     step 4 stop rule keys on exactly that. Read the category off that
+     line, not off a process exit code — dispatching through the driver
+     removed that channel. Absence of the line means the failure was not a
+     lock-timeout; never infer one from a generic failure.
+   - **`blocked`** — a genuine stop carrying no known error category (e.g.
+     a CAS conflict on `.fgos/events.jsonl`). Report it plainly and as
+     scoped to this one item; never claim it is equivalent to the
+     `lock-timeout` signal above.
+   - **no-progress** — the driver invoked the synthesis skill and neither
+     `stage` nor `status` moved. Relay it plainly: the item is still
+     sitting `retrospective` and needs a person's look. Never re-run the
+     loop hoping the same read changes on a retry.
 
-6. **Classify and report the result.** `move` runs as a real CLI
-   subprocess — classify by exit code, per the CLI's own contract
-   (`EXIT_CODES`, `src/state/store.mjs:65-73`):
+   In every non-success case the item stays where it is — this skill never
+   advances an item whose synthesis did not actually complete, and only
+   `lock-timeout` is a loop-stopping condition.
 
-   - **exit `0`** — success. Report the item moved to `cleanup`, ready
-     for `fgos cleanup <id>` (or `/fgOS:cleanup-loop`) to finish later,
-     TTL permitting.
-   - **exit `7`** (`'lock-timeout'`) — a genuine systemic condition:
-     another process is holding `.fgos/events.lock` past its timeout.
-     Report this plainly and distinctly from every other outcome — this is
-     the one result `/fgOS:retro-loop` stops the whole loop on, never just
-     skips.
-   - **exit `3`** (`'conflict'`, a per-item CAS race) or any other
-     non-zero exit — scoped to this one item. Report it as skipped; this
-     never means a different item is at risk.
-   - **the resolved synthesis skill itself fails to complete**
-     (`fgos-compounding` for `coding` today — step 4 gets stuck, the tag or
-     the document ends up missing per its own step 5 confirmation) — this
-     is a real-session failure, not a clean `cleanup`-harness "blocked"
-     verdict the way `fgos cleanup <id>` produces one. Report the item
-     skipped with the concrete reason the resolved skill surfaced; never
-     run `move --to cleanup` on an item whose synthesis did not actually
-     confirm complete, and never treat this as a loop-stopping condition
-     on its own (only lock-timeout does that).
-
-7. **Optional: rename the herdr pane.** Before step 4, if the `id` is
+6. **Optional: rename the herdr pane.** Before step 4, if the `id` is
    already known, calling `/fgOS:terminal <id>` for observability is a
    nice-to-have, never required — it always exits `0` and does nothing
    when the session isn't inside a herdr-managed pane. Skip it entirely if

@@ -32,7 +32,7 @@ who can act on it.
 provider, `gitnexus`, `status: "present"` → **full** per `CLAUDE.md`'s
 capability gate. `impact({target: "createWorktree", direction: "upstream"})`
 and the same for `return`'s implementation in `bin/fgos.mjs` MUST run (and
-risk level reported) before `fgos-code-implement` edits either — `createWorktree`
+risk level reported) before `fgos-coding-implement` edits either — `createWorktree`
 in particular is called from `claim-port.mjs`, i.e. every leaf/root claim in
 the system, so a wide blast radius is expected and must be confirmed, not
 assumed away by this plan.
@@ -77,7 +77,7 @@ here only to confirm the plan didn't quietly reopen it.
 
 ## Risk map
 
-| Component | Risk | Proof point (for `fgos-validating`) |
+| Component | Risk | Proof point (for `fgos-coding-validating`) |
 |---|---|---|
 | `provisionDependencies`'s skip condition (no `package.json`, or empty deps) | Medium — a wrong skip means either unnecessary install cost (over-broad) or a silent unprovisioned worktree (under-broad, defeats the item) | New tests: (a) worktree with no `package.json` → no-op, no `npm` process spawned; (b) `package.json` present, empty `dependencies`/`devDependencies` → no-op; (c) `package.json` with a real dependency + `package-lock.json` present → `npm ci` runs, dependency ends up in that worktree's own `node_modules`; (d) same but no `package-lock.json` → `npm install` runs instead. |
 | Wiring into `bin/fgos.mjs`'s `return` | High — this is the exact path `tsk-32n` proved broken; a wrong insertion point either still fails verify or provisions AFTER `runGoalCheck` (too late) | Reproduce `tsk-32n`'s own real failure as the before/after proof (RUL34/Iron Law failing-test-first style): a real branch with a `yaml`-declaring `package.json`, `fgos return` on it fails today, passes after the fix — same real repro this item was filed from, not a synthetic stand-in. |

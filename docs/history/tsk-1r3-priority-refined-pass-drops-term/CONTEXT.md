@@ -36,7 +36,7 @@ None beyond what `priority-formula.mjs`'s own header already pins.
 
 ## Scout evidence
 
-- `src/intake/decompose.mjs:610-617`, `src/intake/discovery.mjs:289-294`,
+- `src/intake/plan.mjs:610-617`, `src/intake/discovery.mjs:289-294`,
   `src/state/replay.mjs:299-309` — read in full, cited in `RESEARCH.md`.
 
 ## Canonical references

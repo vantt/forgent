@@ -103,7 +103,7 @@ question below has nothing left to ask about.
 
 - Exact verify command for the item (currently a placeholder,
   `"chưa xác định — P15 bổ sung"`, on the item's own `verify` field) —
-  implementer-level, `fgos-planning`'s call, not a product decision.
+  implementer-level, `fgos-coding-planning`'s call, not a product decision.
 - Whether the fix also warrants updating the header comment at
   `frontier.mjs:100-107` (it already describes the *intended* correct
   behavior, which the fix makes true) — cosmetic/implementation

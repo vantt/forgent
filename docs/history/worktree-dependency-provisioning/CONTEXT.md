@@ -78,7 +78,7 @@ verify against a `node_modules`-less worktree with a real dependency in
 - `fgos tool query --capability impact-analysis --status present` → one
   provider, `gitnexus`, `status: "present"` — AGENTS.md's impact-analysis
   gate reads **full**: `impact()` MUST run (and its risk level reported)
-  before `fgos-code-implement` edits `createWorktree`/`bin/fgos.mjs`'s return
+  before `fgos-coding-implement` edits `createWorktree`/`bin/fgos.mjs`'s return
   implementation.
 
 ## Deferred to planning

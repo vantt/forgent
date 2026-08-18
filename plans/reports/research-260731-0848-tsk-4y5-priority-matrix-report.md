@@ -98,8 +98,8 @@ tính `intent` tại `clarify`, rồi derive nhãn P1-P4 CHỈ ĐỂ HIỂN TH�
 table) từ `intent` đã tính — không tạo field `priority` tự động. Việc này
 tái dùng đúng "cửa" RUL42 đã có, thay vì mở cửa thứ ba.
 
-Route tiếp: item đang ở stage `clarify` — cần `fgos-exploring` skill để lock
-các quyết định trên (Q1-Q4) trước khi sang `decompose`/`fgos-planning`.
+Route tiếp: item đang ở stage `clarify` — cần `fgos-coding-exploring` skill để lock
+các quyết định trên (Q1-Q4) trước khi sang `decompose`/`fgos-coding-planning`.
 
 ## Chưa dùng WebSearch
 
@@ -201,7 +201,7 @@ radius thật ở `clarify` nếu chưa biết target. Cần chọn 1 trong:
   chỉ đọc text + `graphMetrics`/`rankImpact` (metadata đồ thị VIỆC, không
   phải code/docs thật), gọi `claude -p` 1 lệnh JSON-only, không tool access.
 - Luật **"có-căn-cứ"** (1/3 phép thử lọc câu hỏi, `docs/specs/runner.md:804`)
-  hôm nay chỉ được thoả MUỘN — ở skill `fgos-exploring` (phiên đầy đủ, có
+  hôm nay chỉ được thoả MUỘN — ở skill `fgos-coding-exploring` (phiên đầy đủ, có
   tool), chạy SAU KHI đã park `awaiting-human`. Verdict ĐẦU TIÊN
   (`judgeDiscovery`) không hề có căn cứ gì — gap thật giữa luật đã viết và
   implementation.
@@ -225,11 +225,11 @@ bỏ qua decompose).
 | 0 | Intake (`status: todo`) | `submit` / `add` | Cơ học (`classify.mjs`, STR14, KHÔNG LLM) | Auto tier/kind/risk (đếm từ khoá) + sinh id | → `stage: clarify` |
 | 0b | Pull door (`todo→doing`) | `take` / `pick` | Người/agent tự nhấc | Claim 1 item; `pick` còn tự tạo worktree + chuyển phiên vào | Thứ tự frontier: `priority` ASC → `intent` DESC → FIFO |
 | 1 | `clarify` | `discover` | Cơ học (`judgeDiscovery`, `claude -p` 1 lệnh, **zero scout hôm nay**) | Verdict `{clear, question?, verify?, intentScore?}` | clear → `decompose`/`executing`; unclear → `awaiting-human` |
-| 1b | `clarify`, `awaiting-human` | `ask` / `answer` | Skill `fgos-exploring` (phiên đầy đủ, CÓ tool — chỗ scout thật hôm nay xảy ra) | Lọc câu hỏi qua 3 phép thử (chất-liệu/có-căn-cứ/trả-lời-được) trước khi hỏi | Người trả lời → `todo` → `discover` lại |
-| 2 | `decompose` | `discover` (cùng verb, giờ chạy `judgeDecompose`) | Cơ học + cổng `risk: heavy` bắt buộc người xác nhận | Verdict `pass-through`/`decompose` (sinh children, mỗi đứa lại vào `clarify` riêng)/`need-human` | Skill `fgos-planning` (chia-việc, nửa đầu) + `fgos-validating` (thẩm-định, nửa cuối, KHÔNG bao giờ tự nhận đã qua) |
-| 3 | `executing` | (runner tự dispatch, hoặc phiên `pick`-thủ-công) | Skill `fgos-code-implement` | Vòng cài-đặt→kiểm-chứng→`return` | `return` chạy `verify` thật (không tin exit code worker) → `awaiting-approval` (xanh) hoặc `blocked` (đỏ) |
+| 1b | `clarify`, `awaiting-human` | `ask` / `answer` | Skill `fgos-coding-exploring` (phiên đầy đủ, CÓ tool — chỗ scout thật hôm nay xảy ra) | Lọc câu hỏi qua 3 phép thử (chất-liệu/có-căn-cứ/trả-lời-được) trước khi hỏi | Người trả lời → `todo` → `discover` lại |
+| 2 | `decompose` | `discover` (cùng verb, giờ chạy `judgeDecompose`) | Cơ học + cổng `risk: heavy` bắt buộc người xác nhận | Verdict `pass-through`/`decompose` (sinh children, mỗi đứa lại vào `clarify` riêng)/`need-human` | Skill `fgos-coding-planning` (chia-việc, nửa đầu) + `fgos-coding-validating` (thẩm-định, nửa cuối, KHÔNG bao giờ tự nhận đã qua) |
+| 3 | `executing` | (runner tự dispatch, hoặc phiên `pick`-thủ-công) | Skill `fgos-coding-implement` | Vòng cài-đặt→kiểm-chứng→`return` | `return` chạy `verify` thật (không tin exit code worker) → `awaiting-approval` (xanh) hoặc `blocked` (đỏ) |
 | 4 | `awaiting-approval` | `review`, `approve`/`reject` | Người/agent + khoá main-checkout (RUL49/50) | Xem diff/PR, merge | approve → cạnh `executing→compound-learn` bật; reject → quay lại, không tự động |
-| 5 | `compound-learn` | `compound` | Skill `fgos-compounding` | Tổng hợp tín hiệu thật thành doc Diataxis có trích dẫn bằng chứng | → `done`; kéo theo `fgos-indexing` refresh `docs/enduser-docs-index.json` |
+| 5 | `compound-learn` | `compound` | Skill `fgos-coding-compounding` | Tổng hợp tín hiệu thật thành doc Diataxis có trích dẫn bằng chứng | → `done`; kéo theo `fgos-indexing` refresh `docs/enduser-docs-index.json` |
 | 6 | `done` | — | — | Trạng thái cuối | — |
 
 Verb hỗ trợ xuyên suốt (không nằm trên đường thẳng): `edit` (ghi field
@@ -252,25 +252,25 @@ Nằm ĐÚNG tại hàng #1 (`clarify`, verb `discover`) — đây là verb hi�
   đã có, 2 verb 1 luồng). Hợp lý nếu scout tốn thời gian/đắt và muốn tách
   khỏi vòng judge lặp lại.
 
-## Round 7 — 2 cơ chế chia-con song song (judgeDecompose vs fgos-planning), đọc trực tiếp 2 SKILL.md
+## Round 7 — 2 cơ chế chia-con song song (judgeDecompose vs fgos-coding-planning), đọc trực tiếp 2 SKILL.md
 
-`.claude/skills/fgos-planning/SKILL.md` bước 5 ("Decide the split, if any"):
+`.claude/skills/fgos-coding-planning/SKILL.md` bước 5 ("Decide the split, if any"):
 tự TẠO item con thật, nối bằng field **`parent`**, dùng `fgos graph
 --what-if <id>` so sánh ứng viên trước khi chọn.
 
-`.claude/skills/fgos-validating/SKILL.md` (Handoff, dòng 50-57, 126-131):
+`.claude/skills/fgos-coding-validating/SKILL.md` (Handoff, dòng 50-57, 126-131):
 xác nhận `fgos discover` — verb ENGINE — mới là lệnh THẬT SỰ bắn cạnh
 `decompose→executing`, và verb này chạy DÙ session đã qua đủ
-`fgos-planning`+`fgos-validating` hay chưa. Tức `judgeDecompose` (chạy bên
+`fgos-coding-planning`+`fgos-coding-validating` hay chưa. Tức `judgeDecompose` (chạy bên
 trong `discover`) KHÔNG bị bỏ qua kể cả khi phiên người đã tự quyết xong —
 nó vẫn tự chạy, tự sinh verdict + children RIÊNG, nối bằng field **`deps`**
-(`src/intake/decompose.mjs`).
+(`src/intake/plan.mjs`).
 
 **=> 2 nguồn quyết "có chia không", 2 field nối khác nhau (`parent` vs
 `deps`), từng đá nhau thật (bug `tsk-1wd`, đã vá 1 phần bằng cách bắt
 `judgeDecompose` đọc `docsRef`→CONTEXT.md/plan.md làm căn cứ) — nhưng
 KHÔNG rõ liệu vá đó đã loại hết trùng lặp, hay `judgeDecompose` vẫn có thể
-tự sinh 1 bộ children KHÁC với cái `fgos-planning` đã tạo trước đó.
+tự sinh 1 bộ children KHÁC với cái `fgos-coding-planning` đã tạo trước đó.
 Chưa verify bằng test/transcript thật — đây là NGHI VẤN mở, không phải kết
 luận chắc.
 
@@ -280,8 +280,8 @@ Cùng 1 HÌNH DẠNG xảy ra ở CẢ `clarify` VÀ `decompose`:
 
 | | Engine judge (mechanical, luôn tự chạy qua `discover`) | Skill session (chỉ chạy khi có người/agent claim) |
 |---|---|---|
-| `clarify` | `judgeDiscovery` — zero scout, closed-book | `fgos-exploring` — có tool, scout thật, lọc câu hỏi 3 phép thử |
-| `decompose` | `judgeDecompose` — closed-book (đã vá đọc plan.md, vẫn zero scout code/repo thật) | `fgos-planning`+`fgos-validating` — có tool (`fgos graph --what-if`), bằng-chứng-thật bắt buộc từng dòng matrix |
+| `clarify` | `judgeDiscovery` — zero scout, closed-book | `fgos-coding-exploring` — có tool, scout thật, lọc câu hỏi 3 phép thử |
+| `decompose` | `judgeDecompose` — closed-book (đã vá đọc plan.md, vẫn zero scout code/repo thật) | `fgos-coding-planning`+`fgos-coding-validating` — có tool (`fgos graph --what-if`), bằng-chứng-thật bắt buộc từng dòng matrix |
 
 Cả 2 stage: engine judge là bên KÉM CĂN CỨ HƠN nhưng lại là bên THỰC SỰ
 bắn cạnh chuyển-stage (RUL42/RUL46: chỉ verb máy được áp cạnh). Skill
@@ -299,7 +299,7 @@ lặp/đá nhau đã thấy ở `tsk-1wd`.
 Trước round này, nhiều kết luận dựa vào mô tả gián tiếp (doc trích dẫn,
 1-dòng mô tả skill) thay vì đọc trực tiếp. Đóng lại từng cái:
 
-- **`fgos-exploring/SKILL.md`** (chưa đọc trước đó) — xác nhận scout THẬT
+- **`fgos-coding-exploring/SKILL.md`** (chưa đọc trước đó) — xác nhận scout THẬT
   có tồn tại (bước 1), nhưng CHỈ là **"one keyword pass"** qua `rg`
   (ripgrep) — 1 lệnh grep 1 từ khoá, KHÔNG phải quét sâu. 3 phép thử
   material/grounded/answerable xác nhận đúng nguyên văn trong CHÍNH skill
@@ -314,7 +314,7 @@ Trước round này, nhiều kết luận dựa vào mô tả gián tiếp (doc 
   luận từ việc code không gọi grep.**
 - **`fgos-routing/SKILL.md`** — khớp 100% với "Precedence: the engine's
   verb always wins" đã trích trước đó.
-- **`fgos-code-implement/SKILL.md`** — khớp mô tả cũ (cài-đặt→verify→return),
+- **`fgos-coding-implement/SKILL.md`** — khớp mô tả cũ (cài-đặt→verify→return),
   cộng thêm 2 phát hiện mới liên quan trực tiếp chủ đề gốc:
   - `fgos tool query --capability impact-analysis --status present` —
     cơ chế CAPABILITY-CHECK đã build sẵn (Full/Degraded/Inactive), dùng ở
@@ -324,7 +324,7 @@ Trước round này, nhiều kết luận dựa vào mô tả gián tiếp (doc 
   - `classifyIronLaw` (`src/evolve/iron-law.mjs`) — 1 risk classifier THỨ
     BA trong hệ (khác `risk` field/HEAVY_KEYWORDS của classify.mjs, khác
     HEAVY_RISK gate của decompose.mjs), dùng ở bước approve-gate.
-- **`fgos-compounding/SKILL.md`** — khớp hoàn toàn mô tả cũ.
+- **`fgos-coding-compounding/SKILL.md`** — khớp hoàn toàn mô tả cũ.
 - **`src/state/impact.mjs`, `src/state/graph-metrics.mjs`** (source, chưa
   đọc trước đó) — khớp đúng 2 doc reference đã trích (rankImpact,
   connectedComponents, criticalPath). 1 chi tiết nhỏ: comment gốc trong
@@ -350,7 +350,7 @@ BỘ (`judgeDecompose`'s auto-split, gọi thẳng store function — hợp lệ
 đó là code tầng ENGINE, không phải phiên/skill, không vi phạm one-door-
 write vì chính nó LÀ 1 phần của cửa ghi CTR001).
 
-**Hệ quả:** `fgos-planning` SKILL.md bước 5 — *"list each piece as its
+**Hệ quả:** `fgos-coding-planning` SKILL.md bước 5 — *"list each piece as its
 own item title... carries this item's own id as its parent"* — mô tả 1
 khả năng KHÔNG TỒN TẠI trên CLI. 1 phiên theo đúng skill này, giữ đúng kỷ
 luật one-door-write (không được bypass CLI gọi thẳng `addWork`), KHÔNG CÓ
@@ -359,7 +359,7 @@ CÁCH set `--parent` khi tạo children qua `fgos add`.
 **Sửa lại kết luận Round 7:** KHÔNG PHẢI "2 cơ chế chia-con song song, có
 thể đá nhau" — mà là **1 cơ chế THẬT SỰ CHẠY ĐƯỢC** (`judgeDecompose`,
 field `deps`, engine tự ghi) và **1 cơ chế được TÀI LIỆU MÔ TẢ nhưng
-KHÔNG THI CÔNG ĐƯỢC qua CLI** (`fgos-planning` bước 5, field `parent`) —
+KHÔNG THI CÔNG ĐƯỢC qua CLI** (`fgos-coding-planning` bước 5, field `parent`) —
 do thiếu `--parent` flag. Đây là gap thật, xác nhận bằng grep + đọc code
 trực tiếp, không phải suy diễn.
 
@@ -367,14 +367,14 @@ trực tiếp, không phải suy diễn.
 
 **A (xác nhận có thật):**
 - `fgos graph --what-if <id>` — verb thật (`command-registry.mjs:325-341`),
-  đúng behavior `fgos-planning` mô tả.
+  đúng behavior `fgos-coding-planning` mô tả.
 - `fgos tool query --capability <label> [--status present]` — verb thật,
   nhóm `fgos tool` (register/check/query/remove, `command-registry.mjs:
   756-781`) — registry TỔNG QUÁT, không riêng GitNexus.
 
 **B (không thấy đúng bằng chứng nhưng ra phát hiện khác giá trị hơn):**
 `STR92` (`docs/backlog.md:132`, audit thật 2026-07-23, quét `--help` 31
-verb + đọc toàn bộ 18 SKILL.md) xác nhận `fgos-planning` "tạo item con
+verb + đọc toàn bộ 18 SKILL.md) xác nhận `fgos-coding-planning` "tạo item con
 qua `parent`" nhưng CHỈ bắt lỗi thiếu `--footprint` — KHÔNG bắt lỗi thiếu
 `--parent` hoàn toàn (Round 10). Audit chính thức của repo cũng lọt gap
 này — Round 10 finding đứng vững, giá trị hơn vì audit trước cũng bỏ sót.
@@ -389,7 +389,7 @@ inject — ai gọi nó ở bước nào là quyết định của prose (skill/
 
 ## Round 12 — SỬA Round 11: tsk-1e4 đã merge, NGAY TRONG lúc research này
 
-Kết luận ban đầu ở Round 11 ("fgos-planning/fgos-validating CHƯA hỏi
+Kết luận ban đầu ở Round 11 ("fgos-coding-planning/fgos-coding-validating CHƯA hỏi
 capability, đó là tsk-1e4 CHƯA LÀM") **SAI — dựa vào 1 doc đã CŨ**
 (`tool-registry-capability-is-a-prose-contract-not-compiled-logic.md`,
 viết TRƯỚC khi tsk-1e4 merge). Người dùng chỉ ra tsk-1e4 đã merge; xác
@@ -398,23 +398,23 @@ settlement `close/human` lúc 2026-07-31T04:04 — ĐÚNG khung giờ buổi
 research này đang chạy (merge xảy ra GIỮA lúc đang bàn).
 
 Grep lại NGAY tại thời điểm ghi report này, xác nhận THẬT:
-- `.claude/skills/fgos-planning/SKILL.md:95-98` — ĐÃ gọi
+- `.claude/skills/fgos-coding-planning/SKILL.md:95-98` — ĐÃ gọi
   `fgos tool query --capability impact-analysis --status present`, ghi
   posture vào `plan.md`.
-- `.claude/skills/fgos-validating/SKILL.md:81-86` — ĐÃ re-query, đối
+- `.claude/skills/fgos-coding-validating/SKILL.md:81-86` — ĐÃ re-query, đối
   chiếu posture ghi trong plan.md với thực tế máy đang chạy.
 - `CLAUDE.md:10-33` — thêm prose capability-gate đứng trước block
   GitNexus cũ.
 
-`tsk-1e4`'s `refs`: `fgos-planning`, `fgos-validating`, `fgos-code-implement`,
-`CLAUDE.md` — **KHÔNG có `fgos-exploring`**. Vậy:
-- `decompose` (`fgos-planning`+`fgos-validating`) VÀ `executing`
-  (`fgos-code-implement`) — capability-gate `impact-analysis` đã chạy THẬT, có
+`tsk-1e4`'s `refs`: `fgos-coding-planning`, `fgos-coding-validating`, `fgos-coding-implement`,
+`CLAUDE.md` — **KHÔNG có `fgos-coding-exploring`**. Vậy:
+- `decompose` (`fgos-coding-planning`+`fgos-coding-validating`) VÀ `executing`
+  (`fgos-coding-implement`) — capability-gate `impact-analysis` đã chạy THẬT, có
   mẫu prose cụ thể để copy nguyên xi.
-- `clarify` (`fgos-exploring`) — VẪN CHƯA có capability-gate này. Xác
+- `clarify` (`fgos-coding-exploring`) — VẪN CHƯA có capability-gate này. Xác
   nhận lại đúng hướng ưu tiên round 4-8 (scout ở clarify là gap ưu tiên
   #1), nhưng giờ có SẴN 1 mẫu prose đã chạy thật (chứ không phải thiết kế
-  từ đầu) để làm theo cho `fgos-exploring`.
+  từ đầu) để làm theo cho `fgos-coding-exploring`.
 
 **Bài học tự-kiểm-tra:** 1 tài liệu docs/explanation/ (hand-authored,
 không tự làm mới) có thể LỖI THỜI ngay giữa 1 phiên nếu có merge xảy ra

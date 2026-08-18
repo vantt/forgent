@@ -114,7 +114,7 @@ longer needed and costs the preserved `branchHeadAtTake`
 | `git worktree list --porcelain` parsing on the reattach path (stale registration, path gone from disk) | medium | a test where the registration exists but the directory does not — must fall through to today's prune-then-add, not return a nonexistent path |
 | the §3b `branchHeadAtTake` preservation (`claim-port.mjs:184-199`) regressing | low | `test/cli/fgos.test.mjs:4997-5019` and the `claim-reclaim-branchhead-reset` coverage green, unmodified — this plan touches the worktree step, not the branchHead computation |
 
-Both **high** rows carry to `fgos-validating` as proof points, not
+Both **high** rows carry to `fgos-coding-validating` as proof points, not
 assumptions.
 
 ## Cases worth proving (high-risk depth)
@@ -200,7 +200,7 @@ the §3b second-pick test. It asserts `from`, `branchHeadAtTake`,
 under reattach, so it stays green unmodified, and the path-identity
 assertion belongs there.
 
-## Open questions for `fgos-validating`
+## Open questions for `fgos-coding-validating`
 
 - Does any caller need to distinguish a reattached existing checkout from a
   freshly added one, or does `reused: true` suffice — specifically

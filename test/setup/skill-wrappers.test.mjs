@@ -1,0 +1,149 @@
+// skill-wrappers.test.mjs — the shared generator behind `npm run
+// build:skills` and `fgos setup`'s external-project materialize path
+// (tsk-1qi, D5/D7 of docs/history/install-setup-external-project-
+// reliability/CONTEXT.md).
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+
+import {
+  extractFrontmatter,
+  generateWrapperContent,
+  generateAllSkillWrappers,
+  materializeSkillsIntoProject,
+} from '../../src/setup/skill-wrappers.mjs';
+
+function mkTempDir(prefix) {
+  return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+}
+
+function writeSkill(skillsRoot, name, frontmatter, body) {
+  const dir = path.join(skillsRoot, name);
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'SKILL.md'), `${frontmatter}\n${body}`);
+}
+
+const SAMPLE_FRONTMATTER = '---\nname: sample-skill\ndescription: A sample skill for testing.\n---\n';
+
+test('extractFrontmatter returns the --- fenced block verbatim, including both fences', () => {
+  const content = `${SAMPLE_FRONTMATTER}\n# Body\nSome instructions.\n`;
+  assert.equal(extractFrontmatter(content), SAMPLE_FRONTMATTER);
+});
+
+test('extractFrontmatter returns an empty string when the content has no frontmatter block', () => {
+  assert.equal(extractFrontmatter('# Just a heading\nNo frontmatter here.\n'), '');
+});
+
+test('generateWrapperContent keeps the source frontmatter byte-identical', () => {
+  const sourceContent = `${SAMPLE_FRONTMATTER}\n# Body\nSome real instructions here.\n`;
+  const wrapper = generateWrapperContent(sourceContent, '../../../.agents/skills/sample-skill/SKILL.md');
+  assert.ok(wrapper.startsWith(SAMPLE_FRONTMATTER));
+});
+
+test('generateWrapperContent names the given relative path in its redirect body', () => {
+  const sourceContent = `${SAMPLE_FRONTMATTER}\n# Body\n`;
+  const wrapper = generateWrapperContent(sourceContent, '../../../.agents/skills/sample-skill/SKILL.md');
+  assert.match(wrapper, /\.agents\/skills\/sample-skill\/SKILL\.md/);
+});
+
+test('generateWrapperContent never includes the source body content — genuinely thin, not a copy', () => {
+  const sourceContent = `${SAMPLE_FRONTMATTER}\n# Body\nA VERY DISTINCTIVE SENTENCE THAT MUST NOT LEAK INTO THE WRAPPER.\n`;
+  const wrapper = generateWrapperContent(sourceContent, 'x.md');
+  assert.doesNotMatch(wrapper, /VERY DISTINCTIVE SENTENCE/);
+});
+
+test('generateWrapperContent throws when the source has no frontmatter to copy', () => {
+  assert.throws(() => generateWrapperContent('# No frontmatter\n', 'x.md'), /frontmatter/);
+});
+
+test(
+  'generateWrapperContent never cites a bare D-local id outside its own ' +
+    'CONTEXT.md (tsk-352f: decision 0017), but keeps the tsk-1qi item id',
+  () => {
+    const sourceContent = `${SAMPLE_FRONTMATTER}\n# Body\n`;
+    const wrapper = generateWrapperContent(sourceContent, 'x.md');
+    assert.doesNotMatch(wrapper, /\bD\d{1,2}\b/);
+    assert.match(wrapper, /tsk-1qi/);
+  },
+);
+
+test('generateAllSkillWrappers writes one wrapper per skill directory under agentsSkillsRoot', () => {
+  const agentsSkillsRoot = mkTempDir('skill-wrappers-agents-');
+  const claudeSkillsRoot = mkTempDir('skill-wrappers-claude-');
+  writeSkill(agentsSkillsRoot, 'skill-a', SAMPLE_FRONTMATTER, '# Body A\n');
+  writeSkill(agentsSkillsRoot, 'skill-b', SAMPLE_FRONTMATTER, '# Body B\n');
+
+  const written = generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot);
+
+  assert.equal(written.length, 2);
+  assert.ok(fs.existsSync(path.join(claudeSkillsRoot, 'skill-a', 'SKILL.md')));
+  assert.ok(fs.existsSync(path.join(claudeSkillsRoot, 'skill-b', 'SKILL.md')));
+});
+
+test('generateAllSkillWrappers skips _shared (a fragment folder, not a dispatchable skill with its own frontmatter)', () => {
+  const agentsSkillsRoot = mkTempDir('skill-wrappers-shared-agents-');
+  const claudeSkillsRoot = mkTempDir('skill-wrappers-shared-claude-');
+  writeSkill(agentsSkillsRoot, 'skill-a', SAMPLE_FRONTMATTER, '# Body A\n');
+  fs.mkdirSync(path.join(agentsSkillsRoot, '_shared'), { recursive: true });
+  fs.writeFileSync(path.join(agentsSkillsRoot, '_shared', 'fragment.md'), 'referenced content\n');
+
+  const written = generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot);
+
+  assert.equal(written.length, 1);
+  assert.equal(fs.existsSync(path.join(claudeSkillsRoot, '_shared')), false);
+});
+
+test('generateAllSkillWrappers skips a directory with no SKILL.md inside it', () => {
+  const agentsSkillsRoot = mkTempDir('skill-wrappers-nofile-agents-');
+  const claudeSkillsRoot = mkTempDir('skill-wrappers-nofile-claude-');
+  fs.mkdirSync(path.join(agentsSkillsRoot, 'not-a-skill'), { recursive: true });
+  fs.writeFileSync(path.join(agentsSkillsRoot, 'not-a-skill', 'README.md'), 'not a skill file\n');
+
+  const written = generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot);
+  assert.equal(written.length, 0);
+});
+
+test('generateAllSkillWrappers is a no-op returning [] when agentsSkillsRoot does not exist at all', () => {
+  const claudeSkillsRoot = mkTempDir('skill-wrappers-missing-claude-');
+  const written = generateAllSkillWrappers(path.join(mkTempDir('skill-wrappers-missing-'), 'does-not-exist'), claudeSkillsRoot);
+  assert.deepEqual(written, []);
+});
+
+test('materializeSkillsIntoProject copies .agents/skills into an external target project, then generates wrappers there', () => {
+  const packageRoot = mkTempDir('skill-wrappers-materialize-pkg-');
+  writeSkill(path.join(packageRoot, '.agents', 'skills'), 'skill-a', SAMPLE_FRONTMATTER, '# Body A\n');
+  const targetRoot = mkTempDir('skill-wrappers-materialize-target-');
+
+  const { copied, wrappersWritten } = materializeSkillsIntoProject(packageRoot, targetRoot);
+
+  assert.equal(copied, true);
+  assert.equal(wrappersWritten.length, 1);
+  assert.ok(fs.existsSync(path.join(targetRoot, '.agents', 'skills', 'skill-a', 'SKILL.md')), 'source must be copied into the target project');
+  assert.ok(fs.existsSync(path.join(targetRoot, '.claude', 'skills', 'skill-a', 'SKILL.md')), 'wrapper must be generated in the target project');
+  // Sibling-relative, D7: the generated wrapper must point at the TARGET
+  // project's own copy, never back at packageRoot.
+  const wrapperContent = fs.readFileSync(path.join(targetRoot, '.claude', 'skills', 'skill-a', 'SKILL.md'), 'utf8');
+  assert.doesNotMatch(wrapperContent, new RegExp(packageRoot.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), 'wrapper must never point back at the global package install location');
+});
+
+test('materializeSkillsIntoProject self-hosting: when packageRoot equals targetRoot, it regenerates wrappers in place without copying', () => {
+  const root = mkTempDir('skill-wrappers-materialize-selfhost-');
+  writeSkill(path.join(root, '.agents', 'skills'), 'skill-a', SAMPLE_FRONTMATTER, '# Body A\n');
+
+  const { copied, wrappersWritten } = materializeSkillsIntoProject(root, root);
+
+  assert.equal(copied, false);
+  assert.equal(wrappersWritten.length, 1);
+  assert.ok(fs.existsSync(path.join(root, '.claude', 'skills', 'skill-a', 'SKILL.md')));
+});
+
+test('materializeSkillsIntoProject is a no-op when packageRoot has no .agents/skills at all', () => {
+  const packageRoot = mkTempDir('skill-wrappers-materialize-none-pkg-');
+  const targetRoot = mkTempDir('skill-wrappers-materialize-none-target-');
+  const { copied, wrappersWritten } = materializeSkillsIntoProject(packageRoot, targetRoot);
+  assert.equal(copied, false);
+  assert.deepEqual(wrappersWritten, []);
+  assert.equal(fs.existsSync(path.join(targetRoot, '.agents')), false);
+});

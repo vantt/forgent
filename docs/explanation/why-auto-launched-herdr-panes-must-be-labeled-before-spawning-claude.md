@@ -6,7 +6,12 @@ source_capture_ids: [tsk-2ja, tsk-57q]
 ---
 # Why auto-launched herdr panes must be labeled before spawning `claude`, unlike person-triggered ones
 
-herdr-plugin's `fg:agents-N` launch pattern already had a working shape
+(These worker tabs carried an earlier name when the work below landed;
+the worker-slot item renamed them to `fg:workers-N`, the name used
+throughout here. The quoted passages are reproduced verbatim from that
+time.)
+
+herdr-plugin's `fg:workers-N` launch pattern already had a working shape
 for a person-triggered launch: the Discover button opens a pane, spawns
 `claude '/fgOS:discover <id>'`, and the pane's own title/label arrives
 *later*, written from inside the launched session itself once it starts
@@ -62,13 +67,13 @@ attempt.
 
 `tsk-2ja`'s guard/launch machinery (`open_auto_discover_pane`,
 `has_labeled_pane`) was built around a single-item shape: one work item
-id, one dynamically-created `fg:agents-N` pane, one id-shaped title to
+id, one dynamically-created `fg:workers-N` pane, one id-shaped title to
 scan for. The auto-merge/retro/cleanup launcher (`tsk-57q`) doesn't fit
 that shape at all — `/fgOS:merge-loop`/`/fgOS:retro-loop`/
 `/fgOS:cleanup-loop` are pool-sweep verbs with no single item id to
 launch against, and they target the *fixed*, already-resolved
 `fg:operation` tab (`tsk-5lr`) rather than a dynamically-picked
-`fg:agents-N` slot:
+`fg:workers-N` slot:
 
 > "New `PaneOrchestrator`/`PaneRegistry` trait methods for the fixed-pane
 > launch and fixed-title guard, since neither existing
@@ -89,6 +94,75 @@ non-conflicting with the human-gate policy wall
 launcher only ever shells out to the existing `/fgOS:merge-loop` command,
 never touching `bin/fgos.mjs`'s `approve`/`merge` cases or `store.mjs`'s
 `moveWork` directly.
+
+## The two mechanisms collapsed back into one (`tsk-3fk`)
+
+The section above ends with "a no-id, fixed-pane variant sitting alongside
+the id-shaped, dynamic-pane variant, rather than one mechanism trying to
+serve both shapes." That split did not survive contact with the next
+requirement, and the fixed-pane half was retired.
+
+What went away specifically is **pane resolution by geometry**: the design
+where the left pane of `fg:operation` is always the merge-loop slot and the
+right pane is always the retro/cleanup slot, resolved by x-coordinate. In
+its place, `fg:operation`'s panes became **on-demand, one per active
+loop** — split a pane, rename it to `fgos-auto-merge` / `fgos-auto-retro` /
+`fgos-auto-cleanup`, *then* spawn `claude`. That is precisely the
+label-before-spawn sequence this page already describes for auto-discover.
+
+The `fg:operation` **tab** is unaffected — it is still found-or-created by
+label. Only the by-geometry pane resolution inside it was retired.
+
+So the label-before-spawn ordering and the reserved `fgos-auto-*` namespace
+were never the part that needed two variants. The only real difference
+between the two launchers is what the label says — an id for a worker pane,
+a fixed loop name for an operation pane. Once pane *placement* stopped
+being special, the second mechanism had nothing left to do.
+
+### The mutual exclusion was an artifact of the fixed slot
+
+Retro and cleanup used to be arbitrated: only one of them could run at a
+time, chosen by priority. That was never a product rule about retro and
+cleanup — it existed *only* because both were forced to share the single
+fixed "right" slot.
+
+With a pane per active loop, both toggles being on simultaneously is valid
+and expected. The arbitration machinery
+(`choose_right_pane_loop`/`pick_right_pane_loop`/`RightPaneLoop`) became
+dead code to delete, not constraints to keep designing around.
+
+This is the reusable observation: when a layout constraint disappears, look
+for the *behavior* rules that were only ever standing in for it. An
+arbitration rule with no reason left to exist will keep working, silently,
+and keep looking intentional.
+
+### Closing a pane stopped conflicting with the layout
+
+The same removal resolved a conflict that had been blocking `--autoClose`
+here. `/fgOS:terminal-close`'s real `herdr pane close` could not be used on
+a fixed operation-tab pane, because closing one would strand the tab in its
+own documented "tab exists, fewer than 2 panes" unsupported state.
+
+That was fixed by removing the invariant, not by avoiding the close. Each
+of the three loop skills now takes the same optional trailing `--autoClose`
+token that `/fgOS:pick` and `/fgOS:discover` already parse, and calls
+`/fgOS:terminal-close` as its literal last action — but **only on a genuine
+natural-finish stop** (frontier empty). Never on a block, an Iron Law trip,
+a no-progress read, or a same-id-blocked-twice stop: on any error the pane
+stays open so a person can see what happened.
+
+### A cap, and rewritten tests
+
+`fg:operation` holds at most 4 concurrent panes. A launch beyond the cap is
+refused and swallowed on the same swallow-and-retry-next-tick convention
+auto-discover's own cap already uses — skip this tick, try again next, no
+error surfaced. Today's three loop types fit with headroom for one more;
+the constant is a locked product decision, not a value derived from the
+current loop count.
+
+The tests that asserted the fixed-2-pane shape were rewritten rather than
+left green. A passing test for a retired design is worse than no test: it
+reports that a shape nothing implements any more is still guaranteed.
 
 ## Related
 

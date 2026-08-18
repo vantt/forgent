@@ -1,6 +1,6 @@
 # Why auto-decompose children now carry `action` + `read_first` directive prose
 
-`tsk-3xd` fixed a real gap: `src/intake/decompose.mjs`'s auto-decompose
+`tsk-3xd` fixed a real gap: `src/intake/plan.mjs`'s auto-decompose
 dispatched children with an empty directive — the executor only got
 `title` + `refs` + `verify`, no prose saying what to do, which files to
 read first, or which locked decision it had to obey. Children were
@@ -26,7 +26,7 @@ ran blind.
 ## Why this is a contract gap, not a model-quality problem
 
 `buildDecomposeChildrenVerdict` — the function both the LLM auto-
-decompose branch and the native, caller-supplied `fgos decompose
+decompose branch and the native, caller-supplied `fgos plan
 --children` branch call (`tsk-27y` D1) — uses the same `normalizeChild`.
 That means even a live session with full context, reasoning through its
 own split by hand, had no path to hand real directive prose down to the
@@ -73,7 +73,7 @@ that kept the prose grounded without either failure mode.
 
 ## Scope: fixes both decompose paths, deliberately excludes `fgos add --parent`
 
-Because both the auto-decompose LLM path and the native `fgos decompose
+Because both the auto-decompose LLM path and the native `fgos plan
 --children` path share `normalizeChild`/`addWork`, fixing `decompose.mjs`
 alone covers both for free. The manual `fgos add --parent` CLI path is a
 separate surface with zero description-shaped flag today — confirmed by

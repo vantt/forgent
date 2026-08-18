@@ -19,9 +19,32 @@ working tree, another branch, or another worktree. Relevant refs: {refs}.
 Research the goal above per the skill's own flow: search this repo first,
 look up anything not found in it externally, record every round in
 `docs/history/<feature>/RESEARCH.md` (accumulate, never overwrite), and
-commit that file on this branch. Discovery is a machine-alone pass with no
-question to ask a person — when you are done recording your findings, your
-job here ends; there is nothing further to decide or report back.
+commit that file on this branch. Once you are done recording your findings,
+report your verdict as DATA ONLY by emitting exactly one fenced block:
+
+```fgos-verdict
+{"clear": true, "verify": "<a real, runnable command that proves the goal>", "tier": "<optional>", "kind": "<optional>", "risk": "<optional>"}
+```
+
+`tier`/`kind`/`risk` are optional (D12/D17, tsk-2yo): when the skill's own
+flow judged them from the same evidence, report them here as DATA so the
+runner can apply them — you still MUST NOT call `fgos edit` yourself. Pick
+`kind`/`risk` from the domain's own declared vocabulary
+(`classificationVocabulary(domain, field)`,
+`src/state/workflow-stage-graphs.mjs`) and `tier` from the global `TIERS`
+(`src/state/work.mjs`) — never invent a value outside either list, and
+omit a field entirely rather than guess when the evidence does not
+support a judgment for it.
+
+or, if you could not resolve the goal from the evidence you gathered:
+
+```fgos-verdict
+{"clear": false, "question": "<the one concrete gap that is blocking you>"}
+```
+
+This is a report, not a write — you still MUST NOT call `fgos` or touch
+`.fgos/`. The runner reads this block after you finish and applies the
+verdict itself.
 
 # Constraints
 Never call `fgos` yourself and never write to `.fgos/` directly — the

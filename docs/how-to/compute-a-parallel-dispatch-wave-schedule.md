@@ -86,7 +86,7 @@ to test whether a computed wave (no footprint overlap, so both eligible
 for the same wave per step 2 above) results in genuinely concurrent
 execution, not just an advisory schedule nobody actually dispatches in
 parallel. Dispatched via 2 concurrent Agent subagents, each running
-`/fgOS:pick` + `fgos-code-implement` independently.
+`/fgOS:pick` + `fgos-coding-implement` independently.
 
 Measured directly from `.fgos/events.jsonl`, not simulated: `tsk-30z`/
 `tsk-50ic` claims landed 2s apart, returns landed 5s apart, with ~184s of
@@ -96,7 +96,7 @@ items were worked at the same time, not sequentially.
 **A real, separate finding surfaced along the way**: `fgos-runner`'s own
 automated wave dispatch (the `Promise.allSettled` fan-out that would
 consume `computeSchedule`'s waves automatically) has zero real
-`capacity.dispatch` events in this repo's history — the demo's actual
+`executor.dispatch` events in this repo's history — the demo's actual
 parallelism came from manually spawning 2 Agent subagents against the
 computed wave, not from `fgos-runner` itself executing it. `fgos-runner`'s
 automated consumption of a computed wave remains unexercised in

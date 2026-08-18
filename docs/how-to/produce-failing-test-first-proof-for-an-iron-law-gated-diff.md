@@ -25,10 +25,10 @@ own committed `docs/history/tsk-62v/iron-law-evidence.md`.
    Running the test command now against pre-implementation code produces
    real failures — not invented ones. In this item's case: one test file
    failed to even load (`SyntaxError: ... does not provide an export
-   named 'CAPACITY_KINDS'`) because the test imports a symbol the
+   named 'EXECUTOR_KINDS'`) because the test imports a symbol the
    implementation hasn't created yet; two other test files had real
    assertion mismatches (`actual` vs `expected` event sequences missing
-   the new `capacity.dispatch` event). Paste the real stderr/assertion
+   the new `executor.dispatch` event). Paste the real stderr/assertion
    output into the evidence file — never a paraphrase or a "would have
    failed because...".
 
@@ -54,7 +54,7 @@ own committed `docs/history/tsk-62v/iron-law-evidence.md`.
 
 6. Write all of the above into `docs/history/<id>/iron-law-evidence.md`
    and commit it in the same commit as the implementation
-   (`fgos-code-implement`'s "one commit per item" rule) — before `fgos return`.
+   (`fgos-coding-implement`'s "one commit per item" rule) — before `fgos return`.
 
 ## Why the stash-and-restore shape, not two separate branches or commits
 
@@ -69,7 +69,7 @@ implementation is what makes the new tests pass.
 
 ## Watch out for: running `classifyIronLaw` before committing gives a false "not required" negative
 
-`tsk-2l0` found a real timing bug in `fgos-code-implement`'s own Execute-
+`tsk-2l0` found a real timing bug in `fgos-coding-implement`'s own Execute-
 stage step 4: the skill instructed running the Iron Law check, but never
 said this had to happen *after* `git add`/`git commit` — and
 `classifyIronLaw`'s own `changedFiles()` reads the real committed diff.
@@ -95,7 +95,7 @@ less careful session, this gap could tempt passing
 bare, unverified assertion silently defeating the whole failing-test-
 first proof requirement this gate exists to enforce.
 
-**The fix**: `fgos-code-implement`'s step 4 now says explicitly to run
+**The fix**: `fgos-coding-implement`'s step 4 now says explicitly to run
 `classifyIronLaw` *after* `git add`/`git commit` (or otherwise ensure
 `changedFiles()` reflects the real diff), never right after writing code
 and before it's committed. Run the check too early in your own session

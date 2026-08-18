@@ -38,12 +38,35 @@ rather than one large piece:
   content hash of the log bytes `[0, offset)`; `rebuildView` re-hashes
   that range before trusting the offset, falling back to a full read on
   any mismatch (never wrong, only ever loses the perf win for that one
-  call). Requires `fgos-validating`'s feasibility matrix to prove the
+  call). Requires `fgos-coding-validating`'s feasibility matrix to prove the
   anchor-hash invalidation against all 3 rewrite paths named above before
   implementation proceeds, not just plausibility.
 
 Piece 2 depends on Piece 1 landing first (the lock-scope fix must be in
 place before more logic gets added to the same write path).
+
+**D4 — Correction found while implementing Piece 1 (tsk-4mx): the
+"unlocked write" half of D3's own defect list is wrong.** Re-reading
+`store.mjs` line by line during implementation: `withEventsLockAndRefresh`
+(`:125-133`) already wraps `refreshView`'s call — including `writeView`'s
+write to `state.json` — INSIDE the same `withEventsLock` callback used for
+the append. A comment right there (`:114-124`, citing `tsk-1q5`) documents
+this was already fixed once: "every mutation below used to call
+refreshView(dir) AFTER releasing withEventsLock... Folding refreshView
+into the SAME held lock... closes that window structurally." The original
+scout evidence below (citing "lock-scope boundary at :673-674") mistook
+this historical fix-description comment for a description of CURRENT,
+still-broken behavior — a misread, not new evidence of a real gap. Every
+routine mutation (`moveWork`, `addWork`, `addDecision`, `addOutcome`,
+`registerTool`, everything using `withEventsLockAndRefresh`) already
+writes `state.json` under lock. The only two callers of `refreshView` that
+genuinely bypass the lock are `initStore` (one-time bootstrap) and
+`rebuild` (an explicit, rare, operator-invoked recovery command,
+`store.mjs:1140-1142`) — confirmed via `grep -n "refreshView(" src/state/
+store.mjs`, exactly 3 call sites total. User confirmed (asked directly):
+Piece 1 narrows to the atomic-write fix only; the lock-scope claim is
+dropped from Piece 1's own scope, `initStore`/`rebuild`'s narrower gap
+stays unaddressed (not the routine-mutation race originally described).
 
 ## Scout evidence
 

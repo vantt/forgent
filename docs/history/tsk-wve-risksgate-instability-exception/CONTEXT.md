@@ -10,12 +10,12 @@ only fire when the proposal is genuinely unstable, not by risk tier alone.
 
 ## Feature boundary
 
-- **In scope:** `keywordRiskGate` (`src/intake/decompose.mjs:660`, fires on
+- **In scope:** `keywordRiskGate` (`src/intake/plan.mjs:660`, fires on
   `work.risk === 'heavy'` alone) — narrowing when it fires.
 - **Out of scope (D2):** `blastRadiusGate`/`BLAST_RADIUS_GATE_THRESHOLD`
   (`decompose.mjs:117-119, 668-669`) — confirmed structurally dead code
   (see D2 below), a separate concern from this item's own ask.
-- **Out of scope:** anything about `fgos-exploring`'s or `fgos-planning`'s
+- **Out of scope:** anything about `fgos-coding-exploring`'s or `fgos-coding-planning`'s
   own Approve gates, or the `.fgos/gate-bypass.json` mechanical-bypass
   config (`docs/history/gate-bypass/CONTEXT.md` D1-D8) — that feature
   governs the OTHER two skill-embedded gates and explicitly treats this
@@ -27,14 +27,14 @@ only fire when the proposal is genuinely unstable, not by risk tier alone.
 
 | ID | Decision |
 |----|----------|
-| D1 | `keywordRiskGate` narrows from an unconditional floor ("risk=heavy always asks, regardless of what the verdict said" — `decompose.mjs:106-109`, D3(b)) to firing only when the verdict/`reason` does NOT show real evidence. The exact mechanical evidence-check (what "shows real evidence" means, checked how) is left to `fgos-planning` — a real implementation choice, not decided here. |
-| D2 | `blastRadiusGate`/`BLAST_RADIUS_GATE_THRESHOLD` stays untouched — out of this item's scope. Confirmed structurally dead code: `verdict.blastRadius` was only ever populated by `judgeDecompose`, retired in tsk-1x3; the live `fgos decompose --verdict ...` CLI (`parseDecomposeCallerVerdict`, `bin/fgos.mjs`) has no `--blast-radius` flag and `resolveCallerDecomposeVerdict` never sets the field — `test/intake/decompose.test.mjs:39-45` documents this directly as one of "THREE REAL DEAD-CODE FINDINGS", "structurally unreachable... harmless". Cleanup, if wanted, is a separate item. |
+| D1 | `keywordRiskGate` narrows from an unconditional floor ("risk=heavy always asks, regardless of what the verdict said" — `decompose.mjs:106-109`, D3(b)) to firing only when the verdict/`reason` does NOT show real evidence. The exact mechanical evidence-check (what "shows real evidence" means, checked how) is left to `fgos-coding-planning` — a real implementation choice, not decided here. |
+| D2 | `blastRadiusGate`/`BLAST_RADIUS_GATE_THRESHOLD` stays untouched — out of this item's scope. Confirmed structurally dead code: `verdict.blastRadius` was only ever populated by `judgeDecompose`, retired in tsk-1x3; the live `fgos plan --verdict ...` CLI (`parseDecomposeCallerVerdict`, `bin/fgos.mjs`) has no `--blast-radius` flag and `resolveCallerDecomposeVerdict` never sets the field — `test/intake/plan.test.mjs:39-45` documents this directly as one of "THREE REAL DEAD-CODE FINDINGS", "structurally unreachable... harmless". Cleanup, if wanted, is a separate item. |
 
 ## Pinned terms
 
 - **"genuinely unstable" / "real evidence"** (the item's own wording) —
   pinned by D1 to mean: the verdict/reason `keywordRiskGate` currently
-  checks nothing about, beyond `work.risk`. `fgos-planning` designs the
+  checks nothing about, beyond `work.risk`. `fgos-coding-planning` designs the
   actual mechanical check; this doc only locks that the check must read
   the VERDICT'S OWN CONTENT (not a static item property like risk tier) —
   same "mechanical, not the session's own confidence/vibe read" discipline
@@ -70,15 +70,15 @@ locked here, not full removal (declined) and not the status quo (declined).
 
 ## Scout evidence cited
 
-- `src/intake/decompose.mjs:106-119` — `HEAVY_RISK`/`DEFAULT_RISK_GATE_REASON`
+- `src/intake/plan.mjs:106-119` — `HEAVY_RISK`/`DEFAULT_RISK_GATE_REASON`
   and `BLAST_RADIUS_GATE_THRESHOLD`/`DEFAULT_BLAST_RADIUS_GATE_REASON`
   definitions, with D3(b)'s own rationale comment.
-- `src/intake/decompose.mjs:654-682` — `keywordRiskGate`/`blastRadiusGate`/
+- `src/intake/plan.mjs:654-682` — `keywordRiskGate`/`blastRadiusGate`/
   `risksGate` computation and the `need-human` branch that applies them.
-- `src/intake/decompose.mjs:467-470, 588-599` — `judgeDecompose` retirement
+- `src/intake/plan.mjs:467-470, 588-599` — `judgeDecompose` retirement
   (tsk-1x3) and the resulting hard requirement that a live session supply
   `--verdict` itself; no automatic verdict generation remains.
-- `test/intake/decompose.test.mjs:20-45` — existing coverage for
+- `test/intake/plan.test.mjs:20-45` — existing coverage for
   `need-human`/heavy-risk/blast-radius paths, and the file's own
   "THREE REAL DEAD-CODE FINDINGS" section confirming `blastRadiusGate` is
   structurally unreachable today.
@@ -93,7 +93,7 @@ locked here, not full removal (declined) and not the status quo (declined).
   --capability impact-analysis --status present` → 1 provider (`gitnexus`),
   `status: "present"` → **full**. Informational only; this doc changes no
   code, so no impact-analysis run was needed for exploring itself —
-  `fgos-planning`/`fgos-code-implement` run their own fresh check per the
+  `fgos-coding-planning`/`fgos-coding-implement` run their own fresh check per the
   same gate.
 
 ## Outstanding questions

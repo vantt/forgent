@@ -26,6 +26,12 @@
 // write-queue (D16), exactly as the spike proved is required for genuine
 // mutual exclusion under async interleaving. This module supplies the
 // decision logic only; it has no opinion about the queue.
+//
+// `resolveRoot` — the lineage walk both functions below start from — lives in
+// `state/frontier.mjs` (tsk-49i D1), not here: `state/` modules need the same
+// walk, and importing it back out of `runner/` was one of the import edges
+// that made the two folders mutually dependent.
+import { resolveRoot } from '../state/frontier.mjs';
 
 /**
  * Create a fresh in-memory ownership store: one Map from root item id to the
@@ -45,36 +51,6 @@ export function createOwnershipStore() {
       owners.set(rootId, ownerIdentity);
     },
   };
-}
-
-/**
- * Resolve the root of the lineage tree `id` belongs to: walk `view.work[id].parent`
- * upward until reaching an item with no `parent` (or whose `parent` does not
- * resolve to a known item), and return THAT item's id. An item with no
- * `parent` is its own root and resolves to itself.
- *
- * Defensive backstop, mirroring `frontier.mjs`'s `hasOpenDescendant`: a
- * `seen` set guards against a cyclic or malformed parent chain turning this
- * into an infinite walk. Should not occur on real decompose-produced data —
- * if a cycle is detected, the walk stops and returns the current id rather
- * than looping forever.
- *
- * @param {{work: Record<string, {parent?: string|null}>}} view
- * @param {string} id
- * @returns {string}
- */
-export function resolveRoot(view, id) {
-  const work = view?.work ?? {};
-  const seen = new Set();
-  let current = id;
-  while (true) {
-    if (seen.has(current)) return current;
-    seen.add(current);
-    const item = work[current];
-    const parent = item?.parent;
-    if (!parent || !work[parent]) return current;
-    current = parent;
-  }
 }
 
 /**

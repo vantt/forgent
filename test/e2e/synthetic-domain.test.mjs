@@ -221,8 +221,14 @@ test('e2e synthetic domain: add --domain synthetic (no --stage) dispatches throu
   // status-delivered-retrospective-cleanup D5: the chain is genuinely
   // domain-agnostic, status-fsm.mjs never reads work.domain — no domain is exempt
   // or special-cased at the FSM layer).
+  // --override-reason (tsk-5dk): coding-item carries a real, unmerged
+  // fgw/coding-item branch (asserted above) — this loop proves the status
+  // FSM chain is domain-agnostic, not that either item's branch content
+  // ever lands on trunk, so the move-refusal check's override escape
+  // hatch applies here (harmless no-op for synth-item, which has no
+  // branch to begin with).
   for (const id of ['synth-item', 'coding-item']) {
-    assert.equal(fgos(repoRoot, ['move', id, '--to', 'delivered']).status, 0);
+    assert.equal(fgos(repoRoot, ['move', id, '--to', 'delivered', '--override-reason', 'e2e fixture: FSM lifecycle-chain test, not a real merge']).status, 0);
     assert.equal(fgos(repoRoot, ['move', id, '--to', 'retrospective']).status, 0);
     assert.equal(fgos(repoRoot, ['move', id, '--to', 'cleanup']).status, 0);
     assert.equal(fgos(repoRoot, ['move', id, '--to', 'done']).status, 0);
@@ -253,7 +259,7 @@ test("e2e synthetic domain: the real 'fgos cleanup' verb closes a synthetic item
   assert.equal(fgos(repoRoot, ['move', 'synth-cleanup-item', '--to', 'delivered']).status, 0);
   assert.equal(fgos(repoRoot, ['move', 'synth-cleanup-item', '--to', 'retrospective']).status, 0);
   assert.equal(
-    fgos(repoRoot, ['decision', '--text', 'synthetic retrospective note', '--rationale', 'proves real content exists', '--id', 'synth-cleanup-item']).status,
+    fgos(repoRoot, ['decision', '--text', 'synthetic retrospective note', '--rationale', 'proves real content exists', '--id', 'synth-cleanup-item', '--relation', 'none']).status,
     0,
   );
   assert.equal(fgos(repoRoot, ['move', 'synth-cleanup-item', '--to', 'cleanup']).status, 0);
@@ -265,7 +271,7 @@ test("e2e synthetic domain: the real 'fgos cleanup' verb closes a synthetic item
   assert.equal(stateView(repoRoot).work['synth-cleanup-item'].status, 'done');
 });
 
-test('e2e synthetic domain: submit --domain synthetic is deliberately NOT the entry door for this domain — this proof exercises add, not submit; a plain submit (no --domain) is completely unaffected, still landing in stage clarify, domain coding', () => {
+test('e2e synthetic domain: submit --domain synthetic is deliberately NOT the entry door for this domain — this proof exercises add, not submit; a plain submit (no --domain) is completely unaffected, still landing in stage discovery, domain coding', () => {
   const repoRoot = initTempRepo();
   assert.equal(fgos(repoRoot, ['init']).status, 0);
 
@@ -277,12 +283,12 @@ test('e2e synthetic domain: submit --domain synthetic is deliberately NOT the en
   // plain `submit` (no --domain at all) stays byte-for-byte unchanged by
   // this feature's existence.
   const submitted = submit(repoRoot, 'Investigate the sluggish overview page');
-  assert.equal(submitted.stage, 'clarify', 'a plain submit still lands in stage clarify, unaffected by the synthetic domain');
+  assert.equal(submitted.stage, 'discovery', 'a plain submit still lands in stage discovery, unaffected by the synthetic domain');
   assert.equal(submitted.domain, undefined, 'a plain submit carries no explicit domain field — it lazily defaults to coding');
 
   const view = stateView(repoRoot);
   const item = view.work[submitted.id];
-  assert.equal(item.stage, 'clarify');
+  assert.equal(item.stage, 'discovery');
   assert.equal(item.domain, undefined);
 });
 

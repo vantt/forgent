@@ -30,10 +30,16 @@ import { spawn } from 'node:child_process';
 // like the rest of this contract: `passed`/`status`/`output` keep their
 // existing meaning unchanged, and every caller must now read `timedOut`
 // before treating a `!passed` result as proof the item's own verify failed.
-export function runGoalCheck(item, cwd, timeoutMs) {
+// tsk-516: the same spawn/timeout/capture contract, addressed by a literal
+// command string instead of an item. `runGoalCheck` below is now a thin
+// wrapper over this, so the item's own verify and the repo-invariant checks
+// (docs/history/tsk-516-approve-reverify-scope/CONTEXT.md D3) share ONE
+// implementation of the timeout semantics tsk-53o pinned -- a second copy
+// would be a second place for `timedOut` to drift.
+export function runCommand(command, cwd, timeoutMs) {
   const maxBuffer = 10 * 1024 * 1024;
   return new Promise((resolve) => {
-    const child = spawn(item.verify, { shell: true, cwd });
+    const child = spawn(command, { shell: true, cwd });
     child.stdout.setEncoding('utf8');
     child.stderr.setEncoding('utf8');
 
@@ -120,4 +126,48 @@ export function detachedWorktreeFgosHint(output) {
   if (typeof output !== 'string') return null;
   if (!FGOS_HINT_RE.test(output) || !MISSING_RE.test(output)) return null;
   return "hint: this verify command's output mentions .fgos/ together with a missing-file signal -- a detached worktree (bin/fgos.mjs's return re-verify) never carries .fgos/ (ADR0020); if that is the real cause, redesign this item's verify to check real code/behavior instead of .fgos/ presence.";
+}
+
+export function runGoalCheck(item, cwd, timeoutMs) {
+  return runCommand(item.verify, cwd, timeoutMs);
+}
+
+/**
+ * Run the repo-invariant checks in order, stopping at the first failure
+ * (docs/history/tsk-516-approve-reverify-scope/CONTEXT.md D3/D4). Resolves
+ * the same `{passed, status, timedOut, output}` shape `runCommand` does,
+ * plus the `command` that actually failed so a caller can name it instead
+ * of reporting an anonymous red.
+ *
+ * An empty `commands` list passes trivially -- that is the configured-off
+ * path (an absent `invariantChecks` section), and it MUST stay behaviorally
+ * identical to before this existed, for every repo that never opted in.
+ */
+export async function runInvariantChecks(commands, cwd, timeoutMs) {
+  for (const command of commands) {
+    const result = await runCommand(command, cwd, timeoutMs);
+    if (!result.passed) return { ...result, command };
+  }
+  return { passed: true, status: 0, timedOut: false, output: '', command: null };
+}
+
+/**
+ * Report a failed invariant check through the SAME
+ * `{passed, status, timedOut, output}` shape a failed verify already
+ * carries, so every downstream branch (the blocked move, the friction row,
+ * the outcome, the merge abort, the exit status) keeps working unchanged
+ * instead of growing a parallel failure path.
+ *
+ * The failing command is named in `output`: without it, a person reading a
+ * red return or a refused merge cannot tell a repo-invariant failure apart
+ * from their own item's verify failing — and that distinction is the whole
+ * reason this gate is actionable rather than just another red.
+ */
+export function invariantFailureAsCheck(invariant) {
+  return {
+    passed: false,
+    status: invariant.status,
+    timedOut: invariant.timedOut,
+    output: `repo-invariant check failed: ${invariant.command}\n${invariant.output}`,
+  };
 }

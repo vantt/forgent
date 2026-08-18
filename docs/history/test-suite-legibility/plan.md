@@ -60,7 +60,7 @@ here since there's no split to compare candidates against.
 
 ### Risk map
 
-| Component | Risk | Proof point (→ fgos-validating) |
+| Component | Risk | Proof point (→ fgos-coding-validating) |
 |---|---|---|
 | Renamed test descriptions | Low — pure string change | Full suite stays green after each batch |
 | Merged/removed duplicate tests | Medium — could silently drop a real invariant | Coverage-diff (D1) shows no line/branch regression after each batch, not just at the end |

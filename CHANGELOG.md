@@ -9,6 +9,483 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Three new read-only verbs: `fgos decision-index [--check]` generates
+  `docs/decisions/index.md`, a projection of every platform/repo-wide
+  decision (`fgos decision --scope <area>`) from `state.decisions`;
+  `fgos context-render <id>` renders an item's `CONTEXT.md` "## Locked
+  decisions" table from `state.decisions` in place, so the table is never
+  hand-typed; `fgos authoritative-match --quadrant <docs/quadrant-dir>
+  --topic "..."` (or `--check-duplicates`) skeleton-matches a topic
+  against docs' own `authoritative_for` frontmatter, so a growing skill
+  finds an existing doc to update instead of guessing a second path.
+- `fgos decision --relation none|supersedes:<id>|touches:<id>` — every
+  decision write now declares its relation to prior decisions explicitly;
+  a `supersedes` relation runs a write-time sweep across `docs/`, `src/`,
+  `plugins/` for citations of the superseded id that don't also
+  acknowledge the new one, surfaced as `danglingCitations` on the write's
+  own response.
+- `fgos decision --scope <area>` — a platform/repo-wide decision (no
+  `--id`) that shows up in the generated `docs/decisions/index.md`.
+- `fgos doctor`/`fgos doctor --fix` gained a `decision-index-stale`
+  check+fix pair: reports and repairs drift between `docs/decisions/
+  index.md` and `state.decisions`.
+- The hand-authored `docs/decisions/000N-*.md` ADR corpus (34 files) has
+  been retired: `state.decisions` (via `fgos decision --scope`) is now the
+  source of truth for platform decisions, with full narrative migrated
+  verbatim into the relevant `docs/specs/<area>.md`'s own "Lịch sử quyết
+  định" section. `docs/decisions/index.md` (generated) replaces the old
+  hand-written `0000-index.md`.
+- `runner.capabilities` — a curated catalog of capability names, shared
+  between the tool-registry's own `capability` field and
+  `capacities.<id>.for`. Each entry is `{description?, aliases?}`. This
+  repo's own `.fgos/config.json` declares `impact-analysis`/`pane-labeling`.
+- A one-line `fgos: dispatch capability=... capacity=... via=... provider=...
+  model=... tier=...` diagnostic prints to stderr at every real dispatch
+  chokepoint — `spawnWorker` (the runner's own worker dispatch) and both
+  branches of `executeCapacityCli` (`execute`/`execute --for`'s in-process
+  hand-back and out-of-process real spawn) — right before the capacity is
+  actually invoked, so a human watching the terminal can see which
+  capability was requested, which capacity answered it, through which
+  mechanism/provider/model/tier. Diagnostic-only, never read back by any
+  caller.
+- Multi-role team harness, first slice (coding domain): work items gain an
+  optional third axis, `holder` — orthogonal to `status` and `stage`, opt-in
+  per-domain via a new `roleGraph` declaration that names the legal
+  role-handoff edges for a domain/stage. Two new verbs, `fgos handoff <id>
+  --to <role> --reason <advise|assist|review|consult>` and `fgos
+  handoff-return <id>`, let a session make a guarded role-to-role call
+  between an implementer and a researcher/helper/reviewer/human-advisor
+  (consult a researcher, get something reviewed, ask a human, hand off a
+  scoped subtask) and record it in the event log — a call outside the
+  domain's declared graph is refused with the legal edges named in the
+  error, and a call outside a domain that declares no `roleGraph` at all is
+  refused just as cleanly. Every existing item and every existing log
+  replays byte-for-byte unaffected — `holder` and the two new event kinds
+  are both fully optional/lazy, never present unless actually used.
+
+### Fixed
+
+- `fgos decision` gains an optional `--kind` flag. Before this, every
+  write through the CLI verb defaulted to `addDecision`'s own `'design'`
+  kind — including `fgos-coding-validating`'s own audit line for an
+  auto-approved gate — which the retrospective/cleanup gate
+  (`checkRetrospectiveContent`) read as a human reflecting on the work,
+  letting an item satisfy that gate with no retrospective document behind
+  it. `fgos-coding-validating` now passes `--kind engine` on that line.
+
+### Changed
+
+- `capacities.<id>.kind` is now the `agent`/`tool` axis (WHAT a capacity
+  is — a live persona, potentially native-dispatchable, vs a mechanical,
+  presence-only tool), separate from `invocations[].via` (HOW it's
+  invoked — `cli`/`task`/`mcp`, widened from `cli`-only). `capacities.<id>.for`
+  is now a non-empty array (was a single value) — one executor can serve
+  multiple capabilities at once, each validated against the
+  `runner.capabilities` catalog above (replaces the old, narrower
+  `CAPACITY_PURPOSES` enum). Cross-provider governance
+  (`allowCrossProvider`) now applies regardless of `kind` — only an
+  `agentType`-resolved capacity is exempt (previously any `kind:"task"`
+  capacity was, even one with its own real, non-Claude command).
+  **Not yet applied to this repo's own live `.fgos/config.json`** — this
+  is a breaking `kind`-vocabulary change (unlike the two entries above),
+  so it lands together with the code that reads it, not as a separate
+  advance commit. (`docs/specs/runner.md` RUL65,
+  `docs/reference/forgentx-tool-registry-configuration.md`)
+- `EXECUTOR_ADAPTERS`' adapter function signature is generalized from
+  `(command, args, cwd, opts)` to `(invocation, opts)` — each adapter now
+  reads whatever fields its own invocation shape needs (`cliSpawnAdapter`
+  reads `command`/`args`; the new `httpAdapter` reads
+  `method`/`url`/`headers`/`body`) instead of every adapter being forced
+  through a CLI-argv-shaped call. A real second adapter is now registered:
+  `EXECUTOR_ADAPTERS.http`, making a real HTTP request via `fetch` (timeout
+  aborts the request; a non-2xx status is a normal result, never a thrown
+  error, matching `cli-spawn`'s own "non-zero exit is not an error"
+  stance). `INVOCATION_VIA` gets `'api'` back (dropped earlier for 0
+  historical producers; now backed by this real adapter) —
+  `capacities.<id>.invocations[]` may declare `{via: "api", url: "..."}`.
+  `resolveExecutorConfig` still only ever selects/spawns a `via:"cli"`
+  invocation — this is a pluggability precedent, not a new production
+  dispatch path; 0 capacities register `via:"api"` today.
+  (`docs/specs/runner.md` RUL66,
+  `docs/reference/forgentx-tool-registry-configuration.md`)
+- A `capacities.<id>` capacity that is **cli-spawn-shaped** (declares its
+  own `command`/`adapter`, or an `invocations[].via === "cli"` entry —
+  e.g. an `agy`-backed capacity) now dispatches out-of-process whenever it
+  is configured, even when the caller already has live Task-tool access.
+  Previously a live/interactive session with Task access always won
+  in-process, silently never invoking the configured command at all. A
+  capacity that is **agentType-shaped** (only `agentType`, no command of
+  its own) is unaffected — `hasLiveTaskAccess` still decides there, since
+  resolving it in-process already means honoring the configured target.
+  (`docs/decisions/0033-cli-spawn-shaped-capacity-thang-hasLiveTaskAccess.md`,
+  narrows `docs/decisions/0026` rule 2)
+- The per-tier `runner.executors.<tier>` config override is retired (0
+  live entries; had already caused a real bug — a non-tier key silently
+  fell through to the global executor with no error). A `capacities.<id>`
+  entry naming no `command`/`adapter`/`agentType` of its own now resolves
+  straight to the global `runner.executor`, with no intermediate stop.
+  (`docs/specs/runner.md` RUL41/RUL63)
+- `fgos tool register`/`fgos tool remove` are retired. A tool provider
+  (e.g. `gitnexus`, `herdr`) is now declared directly in
+  `runner.capacities.<id>` in `.fgos/config.json` — a `capability` field
+  on the entry, config-edited like every other capacity, no longer through
+  the event log. `fgos tool check`/`fgos tool query` are unchanged in
+  shape and behavior, now sourced from config instead of `view.tools`.
+  `.fgos/tool-status.local.json` (the local, gitignored presence overlay)
+  is unaffected. (`docs/reference/forgentx-tool-registry-configuration.md`)
+- The Iron Law gate now asks only where the answer can still matter: at the
+  **trunk boundary**. A leaf merging into `fgw/<root>`, and a root
+  `sync-root`-ing into its parent branch, go straight through — the gate
+  fires only when the merge actually lands on trunk. Nothing about the
+  classification itself changed (same `classifyIronLaw`, same
+  matched-flags/matched-modules evidence); what changed is where it runs.
+  Merge sweeps also no longer stall on a held item: an item the gate holds
+  is recorded, walked past, and reported once at the end of the run, while
+  it stays at `awaiting-approval`.
+  (`docs/decisions/0032-cong-iron-law-chi-hoi-o-ranh-gioi-trunk-them-muc-warn.md`,
+  which supersedes the always-hard-refuse clause of `D16/D17
+  self-improve-loop`; `docs/specs/runner.md` RUL34/RUL37/RUL64.)
+- The fgOS plugin ships as `1.2.0`. `resolveWriterIdentity` moved from
+  `src/runner/session-identity.mjs` to `src/util/session-identity.mjs`, and
+  the plugin's `terminal/rename.sh` follows it there — a cached copy of the
+  plugin at `1.1.0` would otherwise keep loading the old path and silently
+  stop resolving the fgOS session id in pane labels. Nothing else about the
+  command surface changes: this is an internal boundary cleanup that cuts
+  every `src/state/` → `src/runner/` import, collapses three copies of the
+  Iron Law check into one `src/runner/iron-law-gate.mjs`, and moves
+  `detectTrunk`/`isMainWorktree` to `src/runner/worktree.mjs`.
+  (`docs/history/state-runner-merge-boundary/CONTEXT.md` D1/D2)
+- Stage `planning` now asks a person **once**, not twice. The
+  `planApprove` gate is gone from `fgos-coding-planning`; the single
+  remaining gate lives in `fgos-coding-validating`, immediately before
+  split children are created. It also asks a different kind of question:
+  the agent first exhausts every action within reach, then weighs what a
+  wrong answer would cost to repair, and only stops when one of three
+  concrete triggers fires — presenting the specific thing it is stuck on
+  and its own attempt so far, rather than the whole plan plus
+  "approve?". When nothing is stuck it proceeds and posts a non-blocking
+  note. Split children are no longer created during planning: their specs
+  are written into `plan.md` and materialized in one step at that gate via
+  `fgos plan --verdict decompose --children`, so a cut that turns out
+  wrong costs nothing to change, and children arrive at `executing` with
+  no gate of their own. A mid-planning hand-back to `fgos-coding-exploring`
+  now records the gap it found, so the re-entry closes only that gap
+  instead of re-running a full exploring pass.
+  (`docs/history/coding-planning-validating-gate-redesign/CONTEXT.md`;
+  supersedes `docs/history/gate-bypass/CONTEXT.md` D6, D4, and D2's
+  never-self-report clause, and replaces the `canAutoApproveValidate`
+  export with `canAutoApproveMergedGate`.)
+
+### Added
+
+- New config key `ironLaw.level` in `.fgos/config.json`, with two values:
+  `ask` (the default — the gate refuses until a person acknowledges) and
+  `warn` (opt-in — the gate prints what it matched, records one engine
+  decision entry, and lets the merge through). Anything that is not exactly
+  `warn` reads as `ask`, including a missing key or a malformed config, so
+  the permissive level is never reached by accident. `fgos doctor` reports a
+  missing or unrecognized level and `fgos doctor --fix` writes the `ask`
+  default. Deliberately its own key, never folded into `gateBypass`, whose
+  floor is documented as never touching the Iron Law.
+- New `/fgOS:approve <id>` skill: one command covers both `fgos approve` and
+  `fgos sync-root`, inferring which verb the id actually needs, and always
+  showing the blast radius — which verb, which target branch, how many items
+  ride along — before asking anything. When the Iron Law gate holds an item,
+  it shows `docs/history/<id>/iron-law-evidence.md` verbatim, asks once, and
+  runs the command itself on a real yes instead of handing over a line to
+  type. It never adds `--acknowledge-iron-law` on its own authority.
+- `README.md`'s `## Install` now recommends installing a tagged release
+  (`npm install -g github:vantt/forgent#vX.Y.Z`) instead of always
+  resolving to whatever commit is currently on `main` — the bare `main`
+  command is kept as a documented bleeding-edge option. New how-to:
+  `docs/how-to/cut-a-fgos-release-tag.md`, the manual (repo-owner-judgment)
+  procedure for cutting a release.
+- `fgos submit --backlog` creates an item directly at the `backlog` status —
+  an idea not yet committed to — instead of the default `todo`, so marking
+  something as not-yet-ready no longer means submitting it and then moving
+  it. A `backlog` item carries its own `backlog` status category, so it is
+  excluded from the ready frontier until a person promotes it to `todo`.
+  The default is unchanged: a flagless `fgos submit`, and `fgos add` in all
+  cases, still create items at `todo`.
+- herdr TUI: a `BACKLOG` tab, first in the Work Items tab strip, showing
+  items at the new `backlog` status. It is its own tab rather than a marker
+  inside `TODO`, so nothing reads a backlog item as ready, and the strip
+  renders the label even while the bucket is empty — promoting `backlog` to
+  `todo` is a person's own call, and an invisible bucket never gets one. The
+  landing tab is still `TODO`; unattended auto-discover continues to skip
+  backlog items.
+- Delivered-event merge provenance: `fgos approve`'s real merge paths (local
+  root-into-main, local leaf-into-root, GitHub PR merge) now record
+  `mergedSha`/`mergedInto` on the `work.move → delivered` event and the
+  item's own folded view — the sha and branch a change actually landed on,
+  readable straight through `fgos show`/`fgos list` instead of inferred
+  from git after the fact. `fgos move --to delivered` now refuses when
+  `fgw/<id>` exists and is not yet reachable from trunk (no merge evidence
+  to record), unless `--override-reason "<why>"` is given — the override is
+  logged to the item's decision log before the move proceeds. A verify-only
+  pull-door delivery, or an item with no `fgw/<id>` branch at all, is
+  unaffected either way.
+
+- Worker slots: a ceiling on how many work items may run at once. `fgos
+  slots` reports execution-lane occupancy, whether there is room, and the
+  admin lane's fixed reservation — it is the door launchers (herdr-plugin,
+  fgos-fanout) pre-check before standing a worker up. The same ceiling is
+  enforced inside every claim path (`take`, `pick`, and the runner alike),
+  which refuses with `worker-slot ceiling reached` once the lane is full.
+  Occupancy is derived from work items already at `doing`; nothing new is
+  recorded to get it. The ceiling ships UNARMED and stays that way until a
+  person sets it: `fgos setup` writes `workerSlots.ceiling: null`, which
+  refuses nothing, and a project is capped only once someone replaces that
+  with a real count. It is deliberately not armed on your behalf — `fgos
+  doctor` asks every project to run `fgos setup` as routine maintenance, so
+  a number written there would cap a repo that never asked to be capped, and
+  freeze its backlog if it was already running more items than the cap.
+- `fgos doctor` gained a `worker-slots-ceiling-usable` check. A
+  `workerSlots.ceiling` that is not a positive integer — `"8"` as a string,
+  `8.5`, `0`, `-1` — enforces nothing at all, so a project could believe it
+  was capped while running uncapped. The check names that, and reports the
+  deliberate `null` as "unarmed" rather than as a problem.
+- `fgos report <id> --text "..." [--stop-reason ...]` records a driver's
+  closing report on the item, so a result can be read with `fgos show <id>`
+  instead of by watching a terminal pane. `fgos-coding-driving` now records
+  one at every stop, which is what makes a finished worker pane safe for the
+  cockpit to reuse: the result no longer lives only on a screen somebody has
+  to guard.
+
+### Fixed
+
+- The Claude Code plugin (`plugins/fgOS/`) now ships all 14 coding-domain
+  dev-skills (`fgos-coding-driving`, `fgos-routing`, `fgos-clarifying`,
+  and the rest) alongside its existing CLI-wrapper skills. Previously
+  they existed only in this repo's own `.claude/skills/`, so any project
+  that installed fgOS solely as a plugin (no forgent checkout anywhere)
+  got "Unknown skill" the moment `/fgOS:cook`/`/fgOS:discover`/
+  `/fgOS:plan`/`/fgOS:pick` tried to dispatch into one — even though the
+  `fgos` CLI itself was fully reachable the whole time. A new
+  `fgos doctor` check, `plugin-dev-skills-packaged`, catches a maintainer
+  who forgets to keep the plugin's copies in sync before a release ships.
+
+### Changed
+
+- `fgos-runner` and `fgos-fanout` now ask for a worker slot before standing
+  a worker up, instead of each enforcing a ceiling of its own. The runner's
+  `runner.parallel.maxRoots`/`maxLeavesPerRoot` and fan-out's cap of 5 keep
+  their values but change role: they bound how large a batch that launcher
+  may propose, while the shared ceiling decides whether the batch runs at
+  all — so the real limit on a machine is one number rather than the sum of
+  three. A batch is trimmed to the number of free slots: the ceiling is hard,
+  and anything fired past it would be refused at the claim door anyway, so a
+  launcher stands up only what the engine granted and defers the rest to the
+  next wave. With no `workerSlots.ceiling` configured, both behave exactly
+  as before. A runner that finds the lane full now ends its run cleanly
+  (`idle`, exit 0) rather than halting with a non-zero exit, and an item
+  refused for lack of room is simply left for a later poll.
+- The runner's discovery sweep now asks for a worker slot too. It stands a
+  real research worker up but never claims the item, so that process was
+  invisible to the ceiling and ran even when the lane was full — the machine
+  could carry more workers than the configured total while `fgos slots`
+  reported fewer.
+- A runner that dispatched nothing now says which of the two happened.
+  "Frontier empty — nothing to do" and "the lane is full, work is waiting"
+  previously printed the same line and returned the same envelope; the idle
+  result now carries `reason` (`frontier-empty` or `worker-slot-ceiling`),
+  and a refusal names the item ids currently holding the slots, so a lane
+  wedged by an abandoned claim is visible instead of looking like an empty
+  backlog.
+- `fgos doctor` gained a `delivered-not-on-trunk` check: it names any item
+  whose status says its work was handed over (`delivered`, `retrospective`,
+  `cleanup`, `done`) while its own `fgw/<id>` branch is still not reachable
+  from the trunk. `delivered` is reachable through a bare `fgos move`, which
+  merges nothing and asks for no proof that anything merged, so real tested
+  work could sit outside `main` with nothing reporting it — `root-drift`
+  only walks root items, and `fgos stale` waits a three-day TTL and then
+  says "forgotten", not "unmerged". The check separates the two causes: a
+  branch that merged nowhere needs its content landed, while one that landed
+  on a root branch that has not synced needs `fgos sync-root` on the root
+  instead.
+- `fgos discover` and `fgos plan` no longer send the reader to each other
+  when neither serves the item's stage. Each gate now checks whether its
+  sibling would actually accept the item; when neither does, both say so
+  plainly and point at `fgos doctor`'s stage-vocabulary check, instead of
+  forming a closed referral loop with no way out.
+
+- The `decompose` stage/verb/launcher family is renamed to `plan`: the CLI
+  verb `fgos decompose` is now `fgos plan`, the slash command
+  `/fgOS:decompose` is now `/fgOS:plan`, and the stage a coding-domain item
+  sits at while being shaped is now called `planning`. The verdict values
+  (`pass-through` / `need-human` / `decompose`) are unchanged — they name
+  an outcome, not a stage. `decompose` itself survives as a legacy,
+  drain-only stage alias so items already parked there before this change
+  keep advancing through their existing edges; no new item can land on it.
+  Five stage skills gain a `coding-` prefix to match the domain-prefix
+  convention every other stage skill already follows:
+  `fgos-exploring`→`fgos-coding-exploring`, `fgos-planning`→
+  `fgos-coding-planning`, `fgos-validating`→`fgos-coding-validating`,
+  `fgos-compounding`→`fgos-coding-compounding`, `fgos-code-implement`→
+  `fgos-coding-implement`.
+- The `clarify` stage is retired entirely — it is no longer a stage at
+  all. The understand-the-ask pass it used to run moved to an Init-time
+  helper (`fgos-clarifying`) that `/fgOS:submit` calls BEFORE the item is
+  created, so an item is now born with the cleaned-up title/description
+  and its domain already settled. Unlike `decompose`, no drain-only alias
+  is kept: every item still open on `clarify` was migrated onto a real
+  stage first, so nothing is stranded. `discovery` is now the coding
+  domain's first stage, and no item can be created at, or moved to,
+  `clarify` anymore.
+- A `discovery` verdict now picks WHICH EDGE the item takes, instead of
+  every item walking one fixed chain. `clear` skips `exploring` entirely
+  and lands the item straight on `planning`; `unclear` advances it to
+  `exploring` and parks it there for a person, so whoever answers resumes
+  already sitting at the stage where the Socratic pass happens instead of
+  looping back through discovery on the same unresolved question.
+  Previously an unclear verdict parked the item in place, at whatever
+  stage it was already on.
+- `tier`/`kind`/`risk` are no longer judged from the raw submit text. The
+  `fgos submit` verb still stamps its mechanical keyword-derived values,
+  but those are now explicitly a temporary placeholder: stage
+  `discovery`'s own skill (`fgos-coding-discovering`) makes the real call
+  once, on the research evidence it just gathered, reading each domain's
+  declared `kind`/`risk` vocabulary rather than a hardcoded list. No
+  caller re-judges them at intake anymore — a wrong placeholder is
+  corrected later by discovery's own judgment, not earlier by guessing
+  harder at the ask. The `submit-assist-classify` capacity is retired
+  outright, with no migration: it only ever described how to call a
+  helper, never held a judgment that needed handing over.
+- `/fgOS:retro-next` is now a launcher in the strict sense: it sweeps,
+  picks one item, and hands it to `fgos-coding-driving` with an explicit
+  `ceiling: status:cleanup`, relaying whatever the driver reports. It no
+  longer resolves the synthesis skill, invokes it, moves the item, or reads
+  a subprocess exit code itself. Observable behavior is unchanged —
+  synthesis runs, the item lands at `cleanup`, the run stops there — but it
+  now inherits the driver's park/anchor handling and its
+  `stop-reason: lock-timeout` relay instead of duplicating thinner versions.
+- `fgos-coding-driving` now resolves each iteration's next step from the
+  item's **position** rather than always from `stage`: `stage` while it is
+  live, `status` once it freezes at `awaiting-approval`. This makes the
+  driver able to carry an item through the post-merge chain
+  (`retrospective` → `cleanup`) that previously needed hand-rolled
+  sequencing in each launcher. No registry or code change was required —
+  `skillMap` has mixed stage and status keys since decision `0027` D5.
+- `/fgOS:cleanup-next` now reports a stuck shared lock with the same
+  `stop-reason: lock-timeout` marker line every other launcher and the
+  driver already use, instead of describing that condition only in prose —
+  so `/fgOS:cleanup-loop` reads the one loop-stopping category off a line
+  rather than inferring it. Its exit-code classification is unchanged and
+  documented as deliberate: unlike `/fgOS:retro-next`, it runs a real CLI
+  subprocess, so an exit code genuinely exists to read.
+- `awaiting-approval` changes from an unconditional stop into the driver's
+  **default, overridable ceiling**. A caller that supplies no ceiling stops
+  there exactly as before, so existing behavior is unchanged; a caller that
+  deliberately passes a further `status:*` ceiling can drive past it. The
+  merge gate stays a human decision, now protected by a named launcher
+  convention (no launcher ships a default ceiling past `awaiting-approval`)
+  rather than by the driver refusing structurally.
+
+### Fixed
+
+- An item whose root branch was ever synced (`fgos sync-root`), or that was
+  converged into a component (`fgos promote-to-component`), could reach
+  `done` without a retrospective ever having produced anything. Both verbs
+  recorded their merge on the item as a decision but never said it was
+  machine-written, and an untagged decision defaults to `design` — so the
+  cleanup gate read a routine branch merge as someone's reflection on the
+  work and passed the item through. Both records are now tagged as engine
+  bookkeeping. They remain fully visible in `fgos show`; they simply no
+  longer stand in for a retrospective document. Items that were relying on
+  this to pass will now be held at `cleanup` until real synthesis happens.
+
+- Parallel fan-out no longer refuses to dispatch anything when the
+  worker-slot ceiling is unarmed — which is how every project starts, since
+  `fgos setup` writes `workerSlots.ceiling: null` on purpose. In that state
+  `fgos slots` reports room available but no numeric limit
+  (`free: null`), and the fan-out launcher trimmed its batch against that
+  number anyway, reading "no limit" as "no slots" and firing nothing while
+  the machine was completely idle. It now fires the whole batch when no
+  ceiling is armed, and trims only against a real one.
+- `fgos check`'s entropy report no longer under-counts the backlog waiting
+  at the front of the lifecycle. The signal filtered on the literal stage
+  name `clarify`, which the coding domain retired entirely, so it reported
+  0 forever while every open item genuinely parked at the domain's real
+  entry stage (`discovery`) went uncounted. It now resolves each item's own
+  domain entry stage, and the row is labelled `stage-entry` instead of
+  `stage-clarify` to match what it actually counts.
+
+### Removed
+
+- `npm run check:decision-supersession` — the `docs/decisions/NNNN-*.md` +
+  `0000-index.md` pointer-pair format it validated is retired for good
+  along with the hand-authored ADR corpus (see Added, ADR retirement).
+  `scripts/check-decision-supersession.mjs`'s pure functions stay real and
+  unit-tested against synthetic fixtures; only the real-repo CLI mode had
+  nothing left to run against.
+- The `orchestrator` word ban (`test/docs/launcher-vocabulary-guard.test.mjs`
+  and its 28-entry allowlist) is retired, per decision `0031`. Decision
+  `0028` banned the term while it carried no meaning; decision `0029` D17
+  then assigned it one — the T0 aggregate layer (N units, stays engaged),
+  the role `/fgOS:*-loop` and `fgos-fanout` actually play. The guard was
+  left blocking fgOS's own current vocabulary, and a word-level grep cannot
+  tell the retired sense from the assigned one. Writing `orchestrator` in
+  that assigned sense no longer fails the suite. `launcher` remains the only
+  correct name for the one-unit, fire-and-forget role — that half of `0028`
+  stands.
+
+### Added
+
+- New `fgos version` verb: reports this build's own `package.json` version,
+  git commit (when resolvable), and its full dispatched verb set — a
+  hook-safe, scriptable way to tell an old globally-installed `fgos` apart
+  from a current checkout without reading `node_modules` directly. `fgos
+  doctor` gained a matching `cli-version-visible` check that surfaces the
+  same info in its own report.
+
+- `fgos discover` accepts `--tier`, `--kind`, and `--risk` alongside
+  `--verdict clear`, so an interactive session can record the classification
+  it just judged in the same call that resolves discovery, instead of
+  remembering a separate `fgos edit`. This is the same data contract a
+  headless worker already had through its `fgos-verdict` block, and both
+  paths now run it through one shared guard: nothing is applied unless the
+  discovery outcome actually resolves clear, so an unclear verdict or a
+  parked verify dispute still changes no classification. A value outside the
+  item's own domain vocabulary is refused as a validation error (exit 4)
+  before the item moves at all, and omitting a flag leaves that field
+  untouched.
+- Repo-invariant checks now run alongside an item's own `verify`, at both
+  `fgos return` and the post-merge gate of `fgos approve`. The commands are
+  declared per project in `.fgos/config.json` under `invariantChecks.commands`
+  (this repo's default: `node --test test/architecture.test.mjs`), registered
+  into `fgos setup`'s config-merge and visible to `fgos doctor` as the new
+  `invariant-checks-configured` check. They are a hard gate: a red invariant
+  blocks the return and aborts the merge, naming the command that failed.
+  A project with no `invariantChecks` section behaves exactly as before —
+  nothing runs, nothing changes. This closes the gap where a repo-wide
+  invariant broken by one item could land on main and stay red across later
+  merges, because no item's own narrow `verify` happened to touch it.
+
+- `fgos doctor` gained a `work-stage-vocabulary` check: it names any open
+  item sitting at a stage its own domain no longer registers. Until now
+  only `risk`/`kind` drift was surfaced this way, so an item stranded on a
+  retired stage — which no `fgos edit` can correct, since `stage` has no
+  editable door — stayed invisible until some other command tripped over
+  it. The `discover` pool now derives its candidate stages from the same
+  source the `fgos discover` verb checks against, so it can no longer offer
+  an item that the verb would then refuse.
+
+- `fgos promote-to-component` gained an opt-in `--trust-dir` flag: with an
+  explicit `--dir` also passed, it can now run from inside a linked
+  worktree instead of refusing outright. Default behavior (no flag) is
+  unchanged. See `docs/how-to/recover-approve-sync-root-from-inside-a-
+  worktree-with-trust-dir.md`'s new `promote-to-component` section.
+
+### Changed
+
+- `fgos approve` no longer re-runs an item's checks when the tree it is about
+  to merge is provably the exact tree `return` already verified green (main
+  has not advanced past the fork, and the branch tip still matches the SHA
+  recorded at return). In that case both the item's `verify` and the
+  invariant checks are skipped, and the merge report says so explicitly.
+  Whenever main HAS advanced, the merged tree is genuinely different and
+  every check runs as before.
+
 - `fgos doctor` gained a new check, `events-jsonl-contiguous`: the shared
   `.fgos/events.jsonl` is now checked for seq breaks/duplicates that an
   ordinary git merge can leave behind (a new `.gitattributes` entry routes
@@ -44,8 +521,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   as every other registered config default.
 
 - The herdr-plugin dashboard auto-launches a guarded agent pane running
-  `/fgOS:discover <id>` for the first `clarify`-stage, `todo`-status item
-  it finds, once per poll tick, when `herdrOrchestrator.autoDiscover` is
+  `/fgOS:discover <id>` for the first `discovery`-stage, `todo`-status
+  item it finds, once per poll tick, when `herdrOrchestrator.autoDiscover` is
   on (off by default). Guarded against double-launching the same item via
   a dedicated pane label, kept separate from the dashboard's existing
   In-Process pane tracking so it never shows up there as a phantom task.
@@ -60,17 +537,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- `/fgOS:submit` run from a live session now continues into the item's
-  `discovery` stage in the same session: it clarifies the title/description
-  first, then judges `tier`/`kind`/`risk` against the cleaned-up text
-  instead of the raw ask. Any question it needs to ask is asked while you
-  are still in the conversation, rather than days later at a discovery
-  sweep. The `fgos submit` verb itself is unchanged — still mechanical,
+- `/fgOS:submit` run from a live session now clarifies the ask before the
+  item is created: `fgos-clarifying` reads the raw text and hands back the
+  cleaned-up title/description and the domain, and `fgos submit` is called
+  with those. It never judges `tier`/`kind`/`risk` itself — stage
+  `discovery` does that, once, on real evidence. Any question it needs to
+  ask is asked while you are still in the conversation, rather than days
+  later at a discovery sweep. The `fgos submit` verb itself is unchanged — still mechanical,
   still no model call — so a bare shell, cron, another agent, or the
   dogfood fixture replay all behave exactly as before.
 
 ### Fixed
 
+- An item parked for a person after being judged NOT clear at `discovery`
+  was still recorded in the settlement channel as having passed, because
+  the settlement record keyed only on the item leaving `discovery` — which
+  an unclear verdict now also does. Where the item had no real verify yet,
+  the record's detail read as the literal "chưa xác định — bổ sung thủ
+  công" placeholder. A settlement is now recorded only when the verdict
+  that drove the move was clear. Records already written for real clear
+  passes are unaffected; nothing is re-derived or silenced retroactively.
 - Items could be stored with a `risk` value nothing in the system reads
   (`low`/`medium`/`high`), which silently disabled two behaviors rather
   than failing: the human-confirmation gate that fires before a
@@ -94,10 +580,66 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The standalone `fgos-submit-assist` skill. Its own steps had no reason
   left to exist on their own: title derivation always lived in the
-  `submit` verb itself, and its tier/kind/risk classification is now done
-  automatically — on cleaner, post-clarify text — by `/fgOS:submit`'s own
-  step 6 for any live session. Use `/fgOS:submit` directly; it now does
-  strictly more than this skill did.
+  `submit` verb itself, and its tier/kind/risk classification now happens
+  once at stage `discovery`, on real research evidence, for every item
+  regardless of which caller created it. Use `/fgOS:submit` directly; it
+  now does strictly more than this skill did.
+- The `resolve` CLI subcommand (`node src/runner/dispatch.mjs resolve`)
+  and `resolveCapacityCli`. 0 production consumers (confirmed via impact
+  analysis); `execute` already covers everything `resolve` did, and
+  actually runs the command instead of handing back `{command,args}` for
+  the caller to run itself through Bash.
+
+### Added
+
+- `decide` gains a `--needs-soul` flag: the caller's own self-declaration
+  that it is about to fire its own Agent/Task tool with no capacity or
+  work item to name. When every other lookup (capacity id, `--for`,
+  `--work`) comes up empty, `--needs-soul` defaults the answer to native
+  dispatch instead of `"unavailable"` — the same default `--work` already
+  applied for a work item with no registered capacity override, now
+  available to a bare Agent/Task call too.
+- Every `decide` result now carries `configured: true|false` — `false`
+  means nothing is registered under that name/purpose (the answer came
+  from the default); `true` means a real `capacities.<id>` entry was
+  found, whatever mechanism it resolves to. Lets a caller tell "typo'd or
+  never configured" apart from "configured, and it happens to run
+  out-of-process" — today both silently read the same
+  `mechanism: "out-of-process"`.
+- A `PreToolUse` hook (`scripts/dispatch-decide-hook.mjs`) now enforces
+  that every Agent/Task tool call goes through `decide` first: it runs
+  `decide --for <subagent_type> --needs-soul --has-live-task-access` on
+  the caller's behalf and refuses the call when the answer is anything
+  other than `in-process`, pointing at `execute` instead. Wired into
+  `.claude/settings.json` by `fgos setup` (fill-only — a pre-existing
+  `hooks.SessionStart` entry, or any other content, is left untouched);
+  reported by a new `dispatch-decide-hook-wired` `fgos doctor` check. Fails
+  open on any internal error (empty/malformed stdin, `decide` itself
+  erroring) — never a second point of failure on top of a working dispatch
+  surface.
+- `capacities.<id>.capability` (the tool-registry's own free-text field) is
+  now catalog-validated the same way `for` already was — a typo'd or
+  undeclared value used to silently make a tool invisible to `fgos tool
+  query --capability ...` with no error anywhere; it now fails config load
+  with a clear message naming the missing catalog entry.
+- `decide` hands back `mcpTool` (mutually exclusive with `agentType`) for a
+  `kind:"tool"` capacity whose `mcp` invocation declares a `tools` map
+  (`capability -> MCP tool identifier`) covering the requested purpose —
+  `mechanism` is upgraded from `out-of-process` to `in-process` in that
+  case, since dispatch has no MCP client of its own and hands the call back
+  to the caller's own live one, the same reasoning `agentType` hand-back
+  already uses for a live Agent/Task tool. Fixes a real gap: `decide --for
+  impact-analysis` used to answer `unavailable` even though `gitnexus` was
+  fully registered, because `toolsFromCapacities` (`fgos tool query`) and
+  `resolveCapacityIdForPurpose` (`decide`) read two different fields.
+
+### Changed
+
+- `toolsFromCapacities` now prefers `capacities.<id>.for[0]` over
+  `capacities.<id>.capability` when both are present, folding the two
+  previously-separate capability fields into one read path — `capability`
+  stays accepted as a tolerant fallback for a not-yet-migrated capacity,
+  never removed by this change alone.
 
 ## [0.1.0]
 

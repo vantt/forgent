@@ -72,11 +72,11 @@ Sequence within the single piece, per this repo's Iron Law
 2. Apply the 1-line fix in `frontier.mjs`.
 3. Re-run the full file and confirm all cases (old + new) pass.
 4. Capture the failing-then-passing evidence the same way `tsk-2j9`'s
-   history does, per whatever `fgos-code-implement` requires at that stage.
+   history does, per whatever `fgos-coding-implement` requires at that stage.
 
 ## Risk map
 
-| Component | How risky | Proof point (carried to fgos-validating) |
+| Component | How risky | Proof point (carried to fgos-coding-validating) |
 |---|---|---|
 | `isDepsAndLineageReady` (`frontier.mjs:108-115`) | Medium (item's own `risk` field) — sole gate for `take --id` on every `todo` item, system-wide per CONTEXT.md's own risk callout | New test: dep at `status: 'delivered'` (and one other `RESOLVED_STATUSES` member, e.g. `wontfix`) → `take --id` on the dependent succeeds. |
 | Regression on the existing negative-path guard | Low — must not accidentally let a genuinely unresolved dep through | Existing test already covers dep at `status: 'todo'` (unmet) → still rejects; re-run unchanged, must still pass after the fix. |
@@ -98,8 +98,8 @@ coverage, in the same existing files. No child items created.
 
 - The item's own `verify` field (currently the placeholder
   `"chưa xác định — P15 bổ sung"`) will be set by whoever runs
-  `fgos-code-implement` to something runnable against the touched test file,
+  `fgos-coding-implement` to something runnable against the touched test file,
   e.g. `node --test test/cli/take-pick-claim-eligibility.test.mjs` — not
-  decided here since `fgos-planning` doesn't own the item's verify field
-  directly; `fgos-code-implement`/`fgos-validating` set it when the plan's
+  decided here since `fgos-coding-planning` doesn't own the item's verify field
+  directly; `fgos-coding-implement`/`fgos-coding-validating` set it when the plan's
   proof points are turned into a real command.

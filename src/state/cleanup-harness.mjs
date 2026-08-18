@@ -38,7 +38,15 @@
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import { resolveRoot } from '../runner/root-affinity.mjs';
+import { getDomain } from './workflow-stage-graphs.mjs';
+import { isCanceledStatus, resolveRoot } from './frontier.mjs';
+
+// Shared with blockedItemsNowResolvable below (tsk-597z): the one detail
+// string that means "this item never claimed a git-verifiable merge in the
+// first place", not "its ancestry check now passes" -- comparing against
+// the SAME constant both places write/read keeps the two in sync without
+// duplicating the literal.
+const NOTHING_TO_CHECK_DETAIL = 'no recorded commit to verify — nothing to check';
 
 /**
  * tsk-59x D1: which TTL applies to `id` — the leaf value when `id` has a
@@ -132,14 +140,35 @@ function git(repoRoot, args) {
  */
 export function checkMergeStillResolves(repoRoot, work, { view, id } = {}) {
   if (view && id) {
-    const children = Object.entries(view.work ?? {}).filter(([, item]) => item.parent === id);
+    // tsk-4bh: a canceled/wontfix child never had content to merge in the
+    // first place (wontfix-terminal-status-filter-consistency D1, the same
+    // settled rule claim-port.mjs's own dep-readiness guard already applies
+    // via isResolvedStatus) -- its recorded sha, if any, was never going to
+    // become an ancestor of anything, so waiting on it here is not a real
+    // check, just a permanent false failure. Filtered out BEFORE the
+    // children.length===0 check below, not inside checkChildrenResolve
+    // itself: a root whose non-canceled children have all been filtered
+    // away this way falls through to the SAME leaf-shaped ancestry check on
+    // its own recorded sha that a genuinely childless decomposed item
+    // already gets below (an existing, separate limitation this item does
+    // not change either way -- see the DECOMPOSED-PARENT FALLBACK doc
+    // above), rather than a new code path of its own.
+    const children = Object.entries(view.work ?? {}).filter(([, item]) => item.parent === id && !isCanceledStatus(item));
     if (children.length > 0) {
-      return checkChildrenResolve(repoRoot, view, children);
+      const childrenResult = checkChildrenResolve(repoRoot, view, children);
+      if (!childrenResult.ok) return childrenResult;
+      // tsk-5j0: children resolving into THIS item's branch says nothing
+      // about whether THIS item's own branch ever reached main -- only
+      // matters for the true root, since a non-root decomposed node's own
+      // branch is never itself merged forward (tsk-psb).
+      return resolveRoot(view, id) === id
+        ? checkRootBranchResolves(repoRoot, id, childrenResult)
+        : childrenResult;
     }
   }
   const sha = work?.branchHeadAtReturn ?? work?.headAtReturn ?? work?.branchHeadAtTake ?? work?.headAtTake;
   if (!sha) {
-    return { ok: true, detail: 'no recorded commit to verify — nothing to check' };
+    return { ok: true, detail: NOTHING_TO_CHECK_DETAIL };
   }
   const rootId = view && id ? resolveRoot(view, id) : id;
   const namedRef = rootId && rootId !== id ? `fgw/${rootId}` : null;
@@ -163,6 +192,37 @@ function checkChildrenResolve(repoRoot, view, children) {
   return {
     ok: true,
     detail: `decomposed parent: all ${children.length} child item(s) (${children.map(([childId]) => childId).join(', ')}) resolve as ancestors of their own target ref`,
+  };
+}
+
+/**
+ * A decomposed ROOT's own branch (`fgw/<id>`) never merges into anything
+ * via the children-recursion above -- children merge directly into it, but
+ * nothing checks whether `fgw/<id>` itself ever merged into `main`. Combined
+ * with `childrenResult` via AND (tsk-5j0 D2): `ok:true` only when children
+ * resolve AND the root's own branch also reached `main`. Diagnostic-only,
+ * same posture as every other check in this file -- never auto-recovers,
+ * just stops silently reporting ok when it isn't.
+ */
+function checkRootBranchResolves(repoRoot, id, childrenResult) {
+  const namedRef = `fgw/${id}`;
+  if (!refExists(repoRoot, namedRef)) {
+    return {
+      ok: false,
+      detail: `${childrenResult.detail} — but this root's own branch ${namedRef} no longer exists, so whether it ever reached HEAD cannot be confirmed`,
+    };
+  }
+  const tipSha = git(repoRoot, ['rev-parse', namedRef]);
+  const rootAncestry = checkAncestry(repoRoot, tipSha, 'HEAD');
+  if (!rootAncestry.ok) {
+    return {
+      ok: false,
+      detail: `${childrenResult.detail} — but this root's own branch ${namedRef} was never merged into HEAD: ${rootAncestry.detail}`,
+    };
+  }
+  return {
+    ok: true,
+    detail: `${childrenResult.detail}; root's own branch ${namedRef} is also an ancestor of HEAD`,
   };
 }
 
@@ -209,7 +269,16 @@ function checkAncestry(repoRoot, sha, targetRef, fallbackNote) {
  */
 export function checkRetrospectiveContent(view, id, repoRoot) {
   const outcome = view?.outcomes?.[id];
-  const hasDecision = (view?.decisionsById?.[id]?.length ?? 0) > 0;
+  // `kind: 'engine'` records are the engine's own bookkeeping — a resolvePlan
+  // verdict, a discovery outcome, a stale-claim reclaim note, a driver's
+  // closing report — written by machinery as a side effect of the lifecycle,
+  // never by anyone reflecting on the work. They are exactly the
+  // "claim-lifecycle artifact ... unrelated to whether retrospective itself
+  // ran" this check was written to reject, so counting them would leave the
+  // gate permanently green for every item that ever moved through a stage.
+  // That was live: `fgos-coding-driving` records a closing report at every
+  // stop, so every driven item carried one before retrospective ran at all.
+  const hasDecision = (view?.decisionsById?.[id] ?? []).some((d) => d?.kind !== 'engine');
   if (hasDecision) {
     return { ok: true, detail: 'retrospective content found (a decision record exists)' };
   }
@@ -288,4 +357,57 @@ export function assessCleanupReadiness({ view, rawEvents, id, repoRoot, worktree
   }
 
   return { ready: notReadyYet.length === 0 && failed.length === 0, notReadyYet, failed };
+}
+
+/**
+ * tsk-597z: report-only sweep across every currently `status: blocked`
+ * item -- re-runs `checkMergeStillResolves` LIVE against each one instead
+ * of trusting its stored `reason`/`detail` text, the same pattern
+ * `catchup`'s own eligibility gate already uses (`bin/fgos.mjs`'s
+ * `case 'catchup'`) for exactly this reason: the `cleanup -> blocked` park
+ * path stores the FULL human-readable diagnostic in `reason` itself
+ * (possibly joined with an unrelated failure), so it can never be trusted
+ * to match by content. Re-running the check is what proves whether the
+ * item's own park-causing ancestry check would now pass -- an item stuck
+ * `blocked` from before an unrelated fix (e.g. tsk-5j0/tsk-577) landed is
+ * exactly the case this surfaces.
+ *
+ * Domain-conditional (same gate `assessCleanupReadiness` already applies,
+ * D5 above): a domain with no real git worktree/merge concept is not held
+ * to a check that assumes one. `resolvable` excludes any item for which
+ * `checkMergeStillResolves` returned the `NOTHING_TO_CHECK_DETAIL`
+ * degenerate case -- that item never claimed a git-verifiable merge in the
+ * first place, so reporting it as "would now unblock" would be
+ * misleading; it is reported separately under `notApplicable` instead.
+ *
+ * Never calls `moveWork`/`addFriction`/`addDecision` -- read-only, same as
+ * `checkMergeStillResolves` itself. Never auto-transitions anything; the
+ * item's own scope note (and the named risks in its description --
+ * fragile trigger key, flap loop, check-then-transition TOCTOU, no
+ * persistent watch daemon) rule that out for now.
+ */
+export function blockedItemsNowResolvable({ view, repoRoot }) {
+  const resolvable = [];
+  const stillBlocked = [];
+  const notApplicable = [];
+
+  for (const [id, item] of Object.entries(view.work ?? {})) {
+    if (item.status !== 'blocked') continue;
+
+    if (!getDomain(item.domain).worktreeBacked) {
+      notApplicable.push({ id, reason: 'domain-not-worktree-backed' });
+      continue;
+    }
+
+    const result = checkMergeStillResolves(repoRoot, item, { view, id });
+    if (result.detail === NOTHING_TO_CHECK_DETAIL) {
+      notApplicable.push({ id, reason: 'no-recorded-commit', detail: result.detail });
+    } else if (result.ok) {
+      resolvable.push({ id, detail: result.detail });
+    } else {
+      stillBlocked.push({ id, detail: result.detail });
+    }
+  }
+
+  return { resolvable, stillBlocked, notApplicable };
 }

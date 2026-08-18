@@ -24,12 +24,12 @@ test assertions, then ran the file. Real transcript (failing assertion):
 
 ```
 test at test/state/workflow-stage-graphs.test.mjs:97:1
-✖ skillForStage(DOMAINS.coding, "retrospective") resolves fgos-compounding — skillForStage is a generic skillMap[key] lookup, not scoped to `stage` names by implementation, only by its usual callers (0.208037ms)
+✖ skillForStage(DOMAINS.coding, "retrospective") resolves fgos-coding-compounding — skillForStage is a generic skillMap[key] lookup, not scoped to `stage` names by implementation, only by its usual callers (0.208037ms)
   AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
   + actual - expected
 
   + null
-  - 'fgos-compounding'
+  - 'fgos-coding-compounding'
 
       at TestContext.<anonymous> (file:///home/vantt/projects/forgentX/.claude/worktrees/agent-a19834736f9af57d2/test/state/workflow-stage-graphs.test.mjs:103:10)
       at Test.runInAsyncScope (node:async_hooks:227:14)
@@ -37,13 +37,13 @@ test at test/state/workflow-stage-graphs.test.mjs:97:1
     generatedMessage: true,
     code: 'ERR_ASSERTION',
     actual: null,
-    expected: 'fgos-compounding',
+    expected: 'fgos-coding-compounding',
     operator: 'strictEqual',
     diff: 'simple'
 ```
 
 (The first new assertion, `DOMAINS.coding.skillMap.retrospective is
-'fgos-compounding'`, fails identically for the same reason — the key does
+'fgos-coding-compounding'`, fails identically for the same reason — the key does
 not exist pre-fix; this second assertion's transcript is shown because it
 was the one captured in full.)
 

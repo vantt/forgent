@@ -50,11 +50,20 @@ remaining caller that wants the flag-less version).
   (`discover_run_argv_includes_skip_permissions_by_default`, pick.rs:486)
   gets its expected string updated to include ` --autoClose`
   (`discover_run_argv_rejects_ids_fgos_itself_would_reject`, pick.rs:500,
-  only checks `Ok`/`Err` and needs no change). One new test asserts
-  `auto_discover_launch_argv_sequence`'s `run_argv` element also carries
-  the flag (proving the auto-launcher, not just the manual button, picked
-  up the change through the one shared function — no second edit needed
-  for tsk-2ja's own call site).
+  only checks `Ok`/`Err` and needs no change). One new test covers the
+  non-skip-permissions branch of `discover_run_argv` explicitly.
+
+**Correction, recorded post-implementation:** this section originally
+planned a NEW test to prove `auto_discover_launch_argv_sequence`'s
+`run_argv` element also carries the flag. Running the real `verify`
+command during implementation surfaced a PRE-EXISTING test neither this
+plan's own research nor `fgos-validating`'s reality-gate citation check
+had caught — `auto_discover_launch_sets_label_before_spawning_claude`
+(pick.rs:580) — which already asserts that exact element and failed
+against the old flag-less string. Its expected string was corrected in
+place instead of adding a duplicate new test; a research/citation gap in
+this plan, not a defect in the shipped code — real `cargo test` output
+caught it before `fgos return`, exactly as the reality gate is meant to.
 
 No other file needs a change: `ports.rs`'s trait signatures are unchanged,
 `main.rs`'s call sites are unchanged, and the fgOS skill side
@@ -67,11 +76,11 @@ CONTEXT.md's scout evidence.
 | Component | Risk | Proof point |
 |---|---|---|
 | `run_argv`/pick's own command shape | Low — must stay byte-identical | `cargo test launch_agent_run_argv` (existing tests, unmodified, must still pass with their exact original expected strings) |
-| `discover_run_argv`'s two callers (`open_discover_pane`, `open_auto_discover_pane`) both actually receive the flag | Low — mechanical, but must be proven for BOTH, not just one | New test on `auto_discover_launch_argv_sequence`'s output, alongside the updated `discover_run_argv` tests |
+| `discover_run_argv`'s two callers (`open_discover_pane`, `open_auto_discover_pane`) both actually receive the flag | Low — mechanical, but must be proven for BOTH, not just one | `auto_discover_launch_sets_label_before_spawning_claude`'s existing assertion on `auto_discover_launch_argv_sequence`'s output (corrected in place, see note above), alongside the updated `discover_run_argv` tests |
 | Skill-level D2 close-gate | None — explicitly unchanged, already correct (CONTEXT.md scout evidence) | No new proof needed; verified by inspection already recorded in CONTEXT.md |
 
 Impact-analysis posture: `full` (GitNexus present, freshly checked at
-`fgos-exploring` — see CONTEXT.md). Implementation must run `impact` on
+`fgos-coding-exploring` — see CONTEXT.md). Implementation must run `impact` on
 `discover_run_argv`/`run_argv_for_command` before editing, per CLAUDE.md's
 gate, to confirm no other caller beyond the two named above exists.
 

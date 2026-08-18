@@ -23,9 +23,9 @@ Toàn bộ quyết định sản phẩm dưới đây được chốt qua 1 phi�
 (`fgos-coding-shaping`, 12 vòng, 2026-08-04) — xem
 `docs/history/phase-2-status-category-schema/DISCUSSION.md` cho đầy đủ
 scout evidence, lý luận từng bước, và log Q&A nguyên văn. File này chỉ tóm
-tắt kết quả đã ổn định cho `fgos-planning` dùng, không lặp lại lý luận.
+tắt kết quả đã ổn định cho `fgos-coding-planning` dùng, không lặp lại lý luận.
 
-## Quyết định đã chốt (D1-D6)
+## Locked decisions (D1-D6)
 
 | D-ID | Tóm tắt |
 |---|---|
@@ -56,7 +56,7 @@ Toàn bộ 6 D-ID đã ghi qua `fgos decision --id tsk-38t` (seq 5571, 5585,
 - `plans/reports/research-260730-0931-work-item-schema-multi-domain-upgrade-report.md` — report gốc, 10+ vòng phân tích, nguồn của D2/D6 (distill).
 - `src/state/status-fsm.mjs` — bảng transition 10 status thật hôm nay (khác 7 status report gốc giả định — report đã lỗi thời ở điểm này).
 - `src/state/frontier.mjs:186` (`RESOLVED_STATUSES`) — bằng chứng sống category đã tồn tại ngầm.
-- `src/state/retro-pool.mjs`, `bin/fgos.mjs:1012/1088` — xác nhận `fgos-compounding` gọi cứng, không theo domain (nguồn D5).
+- `src/state/retro-pool.mjs`, `bin/fgos.mjs:1012/1088` — xác nhận `fgos-coding-compounding` gọi cứng, không theo domain (nguồn D5).
 - `.claude/skills/fgos-routing/SKILL.md` dòng 109-111 — tự xác nhận `retrospective` không đi qua `skillMap` domain-aware (nguồn D5).
 - `docs/history/status-proposed-rename/CONTEXT.md` D3 — luật "1 status cấp cao mới chỉ khi có hiệu ứng cấu trúc trên frontier/dependency graph" (nguồn D3).
 - `docs/platform-foundations.md` L3 — luật khoá "DB là view, rebuild từ zero bằng replay" (nguồn D4).
@@ -70,11 +70,11 @@ Toàn bộ 6 D-ID đã ghi qua `fgos decision --id tsk-38t` (seq 5571, 5585,
 - `docs/history/phase-2-status-category-schema/DISCUSSION.md` — toàn bộ lý luận, Q&A log, §6 synthesis kèm sơ đồ, §7 task breakdown (8 task, mỗi task có mục tiêu/D-ID/quan hệ/verify nháp riêng).
 - `docs/decisions/0024-doi-ten-status-proposed-thanh-awaiting-approval.md` — khuôn supersede cần theo khi viết decision record mới cho base-workflow-model D1-D3.
 
-## Câu hỏi để lại cho `fgos-planning` (deferred)
+## Câu hỏi để lại cho `fgos-coding-planning` (deferred)
 
 - **Shaping quyết định:** `tsk-38t` có nên split thành các item con khớp 8
   task ở DISCUSSION.md §7 hay giữ 1 item chạy tuần tự — đây là phán đoán
-  của `fgos-planning`, không phải của skill này.
+  của `fgos-coding-planning`, không phải của skill này.
 - **`verify` command cho item** — CHƯA xác định được, và đã thử 4 lần qua
   `fgos discover --verdict clear` (2026-08-04), cả 4 đều bị second-pass
   judge bác vì lý do đúng: không lệnh shell 1 dòng nào chứng minh được các
@@ -83,21 +83,21 @@ Toàn bộ 6 D-ID đã ghi qua `fgos decision --id tsk-38t` (seq 5571, 5585,
   domainFields validate qua fieldSchema, decision record supersede 0006)
   khi CHƯA có test thật. Đây đúng là giới hạn cấu trúc của việc gọi
   `discover` cho 1 item pre-decompose, phức tạp — thuộc đúng phạm vi
-  `fgos-planning` (viết test plan thật theo §7 DISCUSSION.md, mỗi task có
-  verify riêng), không phải việc đoán thêm ở `fgos-exploring`. `verify`
+  `fgos-coding-planning` (viết test plan thật theo §7 DISCUSSION.md, mỗi task có
+  verify riêng), không phải việc đoán thêm ở `fgos-coding-exploring`. `verify`
   field của item cha hiện để tạm `npm test` (rào hồi quy tối thiểu),
-  `fgos-planning` cần thay bằng verify thật khi tách task/child item.
+  `fgos-coding-planning` cần thay bằng verify thật khi tách task/child item.
 - **§3 #6 (doc `triage-table-columns.md` lệch code)** và **§3 #7 (`DOMAINS`
-  registry runtime-addable)** — cả 2 độc lập, không chặn, để `fgos-planning`
+  registry runtime-addable)** — cả 2 độc lập, không chặn, để `fgos-coding-planning`
   quyết có gộp vào cùng đợt hay tách riêng.
 - **Acceptance criteria hiện tại của `tsk-38t`** (9 clause, viết trước
   D1-D6) — một số đã lỗi thời (clause 5: gộp explore với `tsk-3p1`, nay
   `wontfix`) hoặc cần viết lại khớp D1-D6 (clause 1 giả định 6 category cố
-  định cho MỌI status, D1 đã thu hẹp). `fgos-planning` nên viết lại
+  định cho MỌI status, D1 đã thu hẹp). `fgos-coding-planning` nên viết lại
   acceptance dựa trên D1-D6, không dùng nguyên bản cũ.
 - **Rủi ro footprint trùng với `tsk-f38` (ghi nhận lúc approve gate,
   2026-08-04, người dùng báo trực tiếp):** `tsk-f38` đang ở `executing`,
-  sẽ đổi tên skill `fgos-executing` → `fgos-code-implement`. Tên
+  sẽ đổi tên skill `fgos-executing` → `fgos-coding-implement`. Tên
   `fgos-executing` hiện là 1 GIÁ TRỊ literal trong `skillMap` của
   `DOMAINS.coding` (`workflow-stage-graphs.mjs`: `executing:
   'fgos-executing'`) — CÙNG FILE mà task `skillMap['retrospective']` (D5,
@@ -105,7 +105,7 @@ Toàn bộ 6 D-ID đã ghi qua `fgos decision --id tsk-38t` (seq 5571, 5585,
   `#task-schema-status-category`) của `tsk-38t` cũng sẽ sửa. Rủi ro: 2
   việc sửa cùng vùng `DOMAINS.coding` trong `workflow-stage-graphs.mjs`
   song song, không phải conflict logic (khác key: `executing` vs
-  `retrospective`/`statusLabels`) nhưng CÙNG FILE — `fgos-planning` nên
+  `retrospective`/`statusLabels`) nhưng CÙNG FILE — `fgos-coding-planning` nên
   kiểm `fgos conflicts` trước khi bắt đầu code, và **đợi `tsk-f38` merge
   xong rồi validate lại 1 lần** (đúng yêu cầu người dùng) xem đổi tên skill
   có ảnh hưởng gì tới `#task-skillmap-retrospective` hay không (khả năng

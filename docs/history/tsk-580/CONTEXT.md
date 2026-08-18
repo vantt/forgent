@@ -11,7 +11,7 @@ thật, tài liệu trong 2 how-to doc hiện có). Không đổi bất kỳ gat
 claim-verify-return-approve nào của item cha — phạm vi giới hạn nghiêm ngặt
 ở việc sinh giá trị cho 1 field.
 
-## Quyết định đã chốt
+## Locked decisions
 
 Toàn bộ thiết kế đã chốt qua phiên `fgos-coding-shaping` trước khi item này
 được submit — xem
@@ -79,7 +79,7 @@ KHÔNG sinh command — tránh vacuous truth của jq `all()` trên mảng rỗn
   `docs/how-to/close-out-a-decomposed-root-item-after-all-children-are-done.md`
   — 2 ví dụ command thật (tsk-u9k strict-done, tsk-2jc resolved-set) làm
   precedent cho D3; cả 2 doc nên được cập nhật để trỏ sang 2 flag mới thay
-  vì hướng dẫn viết tay, một khi flag đã tồn tại (theo dõi ở `fgos-planning`).
+  vì hướng dẫn viết tay, một khi flag đã tồn tại (theo dõi ở `fgos-coding-planning`).
 
 ## Impact-analysis posture
 
@@ -93,6 +93,6 @@ CLI verb tự chứa trong 1 file, rủi ro lan toả thấp.
 ## Câu hỏi còn mở
 
 Không có — thiết kế đã chốt đầy đủ qua `fgos-coding-shaping` trước khi
-submit; không phát sinh gray-area mới ở bước `fgos-exploring` này. Chi
+submit; không phát sinh gray-area mới ở bước `fgos-coding-exploring` này. Chi
 tiết implementation (tên biến, chỗ thêm `const view = listWork(dir)` trong
-case `edit`, vị trí test) là việc của `fgos-planning`, không chốt ở đây.
+case `edit`, vị trí test) là việc của `fgos-coding-planning`, không chốt ở đây.

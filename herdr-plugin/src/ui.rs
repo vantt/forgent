@@ -33,7 +33,13 @@ fn status_color(status: &str) -> Option<Color> {
     }
 }
 
-const TAB_ORDER: [WorkTab; 4] = [WorkTab::Todo, WorkTab::Doing, WorkTab::Review, WorkTab::Done];
+const TAB_ORDER: [WorkTab; 5] = [
+    WorkTab::Backlog,
+    WorkTab::Todo,
+    WorkTab::Doing,
+    WorkTab::Review,
+    WorkTab::Done,
+];
 
 /// tsk-1eu D1 / tsk-3wl D1: the same focused-vs-unfocused border style
 /// `draw()` already applies to the WorkItems/InProcess boxes, shared here
@@ -599,8 +605,9 @@ fn draw_after_deliver_box(frame: &mut Frame, app: &App, area: Rect) {
 /// A blocking dialog for the selected work item — opened by Enter on the
 /// "Work items" panel instead of picking directly. Two fixed actions
 /// (tsk-1e3 D4): Pick (Enter, unconditional) and Discover (`d`, disabled/
-/// dimmed — never hidden, so the layout never shifts — when the item's
-/// `stage != "clarify"`, since `/fgOS:discover` only applies there).
+/// dimmed — never hidden, so the layout never shifts — unless
+/// `WorkItem::discover_eligible()` says the item is both the right stage
+/// AND dependency-ready).
 fn draw_detail_modal(frame: &mut Frame, app: &mut App, item: &crate::app::WorkItem) {
     // tsk-2x9: bumped from 40% to 70% height -- 8 detail lines (was 4) plus
     // the block's own 2 border rows plus the fixed 3-row button strip need
@@ -643,7 +650,7 @@ fn draw_detail_modal(frame: &mut Frame, app: &mut App, item: &crate::app::WorkIt
     );
     frame.render_widget(detail, sections[0]);
 
-    let discover_enabled = item.stage == "clarify";
+    let discover_enabled = item.discover_eligible();
     let button_cells = Layout::default()
         .direction(Direction::Horizontal)
         .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
@@ -677,7 +684,7 @@ fn draw_detail_modal(frame: &mut Frame, app: &mut App, item: &crate::app::WorkIt
         .block(
             Block::default()
                 .borders(Borders::ALL)
-                .title(if discover_enabled { "d: discover" } else { "d: discover (stage != clarify)" }),
+                .title(if discover_enabled { "d: discover" } else { "d: discover (wrong stage or blocked)" }),
         );
     frame.render_widget(discover_button, button_cells[1]);
     app.discover_button_rect = Some(crate::app::ButtonRect {
@@ -717,11 +724,17 @@ mod tests {
     use crate::pane_scan::PaneIdentity;
     use ratatui::backend::TestBackend;
 
-    /// tsk-64z D1: all 4 tab labels render, regardless of which is
+    /// tsk-64z D1: all 5 tab labels render, regardless of which is
     /// currently selected — proves the `Tabs` widget renders the full set,
     /// not just the active one.
+    ///
+    /// work-item-backlog-status D4: this doubles as the visibility proof
+    /// for `BACKLOG`. `App::mock()` carries no `backlog` item, so asserting
+    /// the label still renders is exactly the "an empty bucket must still
+    /// advertise itself" bar — a person cannot promote `backlog -> todo`
+    /// (a human-only edge) if the tab only appears once something is in it.
     #[test]
-    fn work_items_panel_renders_four_tabs_todo_doing_review_done() {
+    fn work_items_panel_renders_five_tabs_backlog_todo_doing_review_done() {
         let mut app = App::mock();
         let backend = TestBackend::new(120, 30);
         let mut terminal = Terminal::new(backend).expect("terminal init");
@@ -730,14 +743,17 @@ mod tests {
             .expect("draw should not panic");
         let buffer = terminal.backend().buffer();
         let content: String = buffer.content().iter().map(|cell| cell.symbol()).collect();
-        for label in ["TODO", "DOING", "REVIEW", "DONE"] {
+        for label in ["BACKLOG", "TODO", "DOING", "REVIEW", "DONE"] {
             assert!(content.contains(label), "missing tab label {label}: {content}");
         }
     }
 
     /// tsk-4cxl D2: the Work Items table renders a `Stage` column right
     /// after `Status`, carrying each row's own `stage` value — `App::mock`'s
-    /// default TODO-tab row (`tsk-19y-1`) has `stage: "clarify"`.
+    /// default TODO-tab row (`tsk-19y-1`) has `stage: "discovery"`, the
+    /// coding domain's real entry stage (tsk-1l9: the fixture used to say
+    /// `clarify`, a stage retired out of the registry entirely, so the mock
+    /// rendered a value no live item could hold).
     #[test]
     fn work_items_table_renders_stage_column_next_to_status() {
         let mut app = App::mock();
@@ -749,7 +765,7 @@ mod tests {
         let buffer = terminal.backend().buffer();
         let content: String = buffer.content().iter().map(|cell| cell.symbol()).collect();
         assert!(content.contains("Stage"), "missing Stage header: {content}");
-        assert!(content.contains("clarify"), "missing row's stage value: {content}");
+        assert!(content.contains("discovery"), "missing row's stage value: {content}");
     }
 
     /// tsk-417 D3: NEED ANSWER, MERGE LIST, AFTER DELIVER render as 3
@@ -846,7 +862,7 @@ mod tests {
 
     /// tsk-1e3 D4: both buttons always render, regardless of stage — only
     /// Discover's color changes (see
-    /// `discover_button_disabled_when_stage_not_clarify` below).
+    /// `discover_button_disabled_when_stage_not_eligible` below).
     #[test]
     fn detail_modal_renders_pick_and_discover_buttons() {
         let buffer = render_modal_buffer("clarify");
@@ -908,10 +924,10 @@ mod tests {
     }
 
     /// tsk-1e3 D4 / tsk-jo1 D1: Discover renders `Color::DarkGray` (never
-    /// hidden, never a layout shift) when the item's stage isn't
-    /// `clarify`.
+    /// hidden, never a layout shift) when the item's stage is outside
+    /// `discover_eligible`'s set (`clarify`/`discovery`/`exploring`).
     #[test]
-    fn discover_button_disabled_when_stage_not_clarify() {
+    fn discover_button_disabled_when_stage_not_eligible() {
         let buffer = render_modal_buffer("executing");
         let discover_is_dimmed = buffer
             .content()
@@ -919,7 +935,7 @@ mod tests {
             .any(|cell| cell.symbol() == "D" && cell.fg == Color::DarkGray);
         assert!(
             discover_is_dimmed,
-            "Discover button must render Color::DarkGray when stage != clarify"
+            "Discover button must render Color::DarkGray when stage is not discover-eligible"
         );
 
         let buffer = render_modal_buffer("clarify");
@@ -929,7 +945,34 @@ mod tests {
             .any(|cell| cell.symbol() == "D" && cell.fg == Color::DarkGray);
         assert!(
             !discover_is_dimmed_when_enabled,
-            "Discover button must not render dimmed when stage == clarify"
+            "Discover button must not render dimmed when stage == clarify and not blocked"
+        );
+    }
+
+    /// Companion to `discover_button_disabled_when_stage_not_eligible`:
+    /// a right-stage item still renders Discover dimmed when it has an
+    /// unmet dependency (`blocked_by` non-empty) — the gap that let
+    /// herdr open a discover pane for an item `fgos take` would go on to
+    /// refuse.
+    #[test]
+    fn discover_button_disabled_when_blocked_even_at_eligible_stage() {
+        let buffer = render_modal_buffer_with_item(WorkItem {
+            id: "tsk-a".into(),
+            title: "A".into(),
+            goal_tier: "mvp".into(),
+            stage: "clarify".into(),
+            status: "todo".into(),
+            blocked_by: vec!["tsk-dep".into()],
+            blocks: 0,
+            priority: None,
+        });
+        let discover_is_dimmed = buffer
+            .content()
+            .iter()
+            .any(|cell| cell.symbol() == "D" && cell.fg == Color::DarkGray);
+        assert!(
+            discover_is_dimmed,
+            "Discover button must render Color::DarkGray when blocked_by is non-empty"
         );
     }
 

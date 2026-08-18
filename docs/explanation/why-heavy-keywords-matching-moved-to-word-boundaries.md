@@ -79,9 +79,12 @@ other's false-positive exposure live") named exactly two consumers,
 `classifyIronLaw` and `classify()` — but a third, independent
 `HEAVY_KEYWORDS` consumer existed and was never touched:
 `src/state/gate-bypass.mjs`'s `canAutoApprove`/
-`canAutoApproveValidate` (identical `hardGateHit` blocks at :132/:152)
-kept the original raw substring scan, and didn't even import
-`matchesKeyword`:
+`canAutoApproveValidate` (identical `hardGateHit` blocks at :132/:152, as
+the file stood at the time — `canAutoApproveValidate` was later deleted by
+`coding-planning-validating-gate-redesign/CONTEXT.md` D9-D11 and replaced
+by `canAutoApproveMergedGate`, which carries the same `matchesKeyword`
+word-boundary fix this section describes) kept the original raw substring
+scan, and didn't even import `matchesKeyword`:
 
 > "The other two `HEAVY_KEYWORDS` consumers already migrated
 > (`src/intake/classify.mjs:63`, `src/evolve/iron-law.mjs:87`) —
@@ -98,7 +101,7 @@ returns `false` unconditionally on a hit, regardless of tier — so these
 21 items could never auto-approve at any tier, 12 of them despite
 already having a `tier` that `standard` mode would otherwise have
 covered. Each item pays this gate at up to 3 separate checkpoints
-(`fgos-planning`'s auto-approve, `fgos-validating`'s auto-approve,
+(`fgos-coding-planning`'s auto-approve, `fgos-coding-validating`'s auto-approve,
 `fgos-fanout`'s inherited floor, which shares the same function) — up to
 63 unnecessary human-asks total, for exactly the class of prose this
 project's own risk vocabulary says should never trigger one.

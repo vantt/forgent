@@ -10,7 +10,7 @@ no gray areas.
 ## Approach
 
 Locked by `docs/history/tsk-2l0-iron-law-check-commit-ordering/CONTEXT.md`
-D1 (cited, not reopened): edit `.claude/skills/fgos-code-implement/SKILL.md`
+D1 (cited, not reopened): edit `.claude/skills/fgos-coding-implement/SKILL.md`
 step 4 so its own text explicitly instructs committing the implementation
 (and passing tests) BEFORE running the `classifyIronLaw` check, and update
 its example bash snippet's surrounding prose to say so. No code change
@@ -18,7 +18,7 @@ its example bash snippet's surrounding prose to say so. No code change
 correct and must stay that way; `approve`/`sync-root`'s gate logic is
 locked by `tsk-5t3` D4 and stays untouched).
 
-File touched: `.claude/skills/fgos-code-implement/SKILL.md` only.
+File touched: `.claude/skills/fgos-coding-implement/SKILL.md` only.
 
 `impact-analysis: degraded` (index stale, `251d0b5`) — not load-bearing
 here: a prose-only skill-file edit changes no symbol GitNexus tracks, so
@@ -37,7 +37,7 @@ command below, not just by a human re-reading the prose.
 Proof command for the item:
 
 ```
-awk '/git add/{c=NR} /git commit/{c=NR} /classifyIronLaw/{i=NR; if (c && c<i) print "ok"; exit}' .claude/skills/fgos-code-implement/SKILL.md | grep -q ok
+awk '/git add/{c=NR} /git commit/{c=NR} /classifyIronLaw/{i=NR; if (c && c<i) print "ok"; exit}' .claude/skills/fgos-coding-implement/SKILL.md | grep -q ok
 ```
 
 (same command already recorded via `gate-approve`/`discover` on this item).

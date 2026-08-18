@@ -65,7 +65,7 @@ below for machine-readable visibility (`view.decisions`).
 
 - **capacityId** — for this item's own scope (domain 1, `executing` stage),
   always `skillForStage(getDomain(work.domain), 'executing')` — e.g.
-  `"fgos-code-implement"` for the default `coding` domain today. The design
+  `"fgos-coding-implement"` for the default `coding` domain today. The design
   doc's more general "skill name or `domain:stage`" identity (design §3)
   exists for the config schema broadly; tsk-62v's own resolve call site
   only ever needs this one instantiation of it.
@@ -81,7 +81,7 @@ below for machine-readable visibility (`view.decisions`).
 - `src/state/tool-registry.mjs:34` (`KINDS`), `:112` (`commandExistsOnPath`)
   — read this session.
 - `src/state/workflow-stage-graphs.mjs:143-145` (`skillForStage`), `:44-101`
-  (`DOMAINS.coding.skillMap`, `executing` → `fgos-code-implement`) — read this
+  (`DOMAINS.coding.skillMap`, `executing` → `fgos-coding-implement`) — read this
   session; confirms D3's identity is already a real, existing call, not a
   hypothetical.
 - `src/state/store.mjs:1-24` — `.fgos/events.jsonl` is normally the
@@ -90,7 +90,7 @@ below for machine-readable visibility (`view.decisions`).
   into `state.json`. D8's audit entry is a *different* kind of append (an
   observation, not an FSM transition) — whether it needs its own event
   `type` that `replay.mjs` safely ignores, or some other shape, is **not**
-  decided here; it is real evidence for `fgos-planning`/`fgos-validating`
+  decided here; it is real evidence for `fgos-coding-planning`/`fgos-coding-validating`
   to prove safe before building, not an assumption to carry forward
   silently.
 - `.fgos-runner.json` (current, read this session) — already has
@@ -103,7 +103,7 @@ below for machine-readable visibility (`view.decisions`).
   gate reads **full**: `impact()` MUST be run (and its risk level reported)
   before editing any of `resolveExecutorConfig`, `resolveExecutorCommand`,
   `spawnWorker`, `buildPrompt`, `commandExistsOnPath`, `detectAssistantCli`
-  once this item reaches `fgos-code-implement`.
+  once this item reaches `fgos-coding-implement`.
 
 ## Deferred to planning
 

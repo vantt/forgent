@@ -9,7 +9,7 @@ của `tsk-sir` bằng đọc code + verify lệnh thật, và tự nhận diệ
 còn mở (§3 dưới). Thiết kế (§6) đã đủ cụ thể để build — 1 mảnh việc duy
 nhất, không tách con.
 
-**Cập nhật (fgos-exploring re-scout, cùng ngày):** D1's giải thích cơ chế
+**Cập nhật (fgos-coding-exploring re-scout, cùng ngày):** D1's giải thích cơ chế
 gốc (relative path resolve về main working tree) SAI — kiểm tra lại bằng
 1 thực nghiệm cô lập cho thấy hooksPath relative thật ra resolve theo
 worktree's own top-level, không phải main's. Cơ chế đúng: hooksPath trên
@@ -19,7 +19,7 @@ checkout thật này đang là 1 đường TUYỆT ĐỐI (không phải relativ
 "not wired" trên chính checkout này dù hook rõ ràng đang chặn — bug khác,
 không thuộc scope tsk-sir). Fix đề xuất D4 KHÔNG đổi — nó nhắm vào hành vi
 của hook một khi đã chạy, không phụ thuộc cơ chế nào đưa nó tới đó. Bước
-kế: `fgos-exploring` tiếp tục cho `tsk-sir`.
+kế: `fgos-coding-exploring` tiếp tục cho `tsk-sir`.
 
 ## 2. Mục tiêu & đề bài
 
@@ -41,8 +41,8 @@ không mở rộng scope sang việc khác (vd: cô lập `.fgos` per-worktree, 
 | 1 | Vì sao worktree commit resolve về lock của main checkout | Rõ (đã sửa, xem D7) | `core.hooksPath` trên checkout thật này là 1 đường TUYỆT ĐỐI trỏ về main checkout's `.githooks` (verify: `git config --get --show-origin`), KHÔNG phải relative `.githooks` như code `installGitHooks` ghi. Giả thuyết ban đầu ("relative resolve theo main working tree") đã bị phủ nhận bằng thực nghiệm cô lập — relative hooksPath thật ra resolve theo worktree's own top-level, hook không chạy từ worktree trong case đó. Vì giá trị thật là tuyệt đối, mọi worktree đều trỏ về đúng 1 file vật lý ở main — kết quả quan sát được (hook luôn check lock main) không đổi, chỉ cơ chế giải thích đổi |
 | 2 | Đây có phải thiết kế sai | Rõ (kết luận: nhiều khả năng là gap) | 3 bằng chứng: decision 0021 không hề bàn worktree; mỗi worktree có `.git/index` riêng nên hazard thật không áp dụng cơ học; guard 2 cùng file đã biết phân biệt worktree/main mà guard 1 (lock acquire) thì không |
 | 3 | tsk-45y có giải bài này chưa | Rõ — KHÔNG | tsk-45y bàn lớp khác (fgOS state-write qua events.lock), đã đóng wontfix vì premise sai (worktree không có `.fgos` ghi được). Scout evidence của tsk-45y không hề grep `.githooks/` — blind spot thật, không phải đã xét rồi bác bỏ |
-| 4 | Có bug thật nào từng bị ảnh hưởng bởi việc này trước tsk-sir chưa | Chưa rõ | Report chưa grep `.fgos/events.jsonl` cho case cụ thể; để `fgos-exploring` quyết có cần scout thêm hay không |
-| 5 | Fix đúng có phải chỉ thêm `gitDir !== gitCommonDir` check vào hook, hay có race scenario ẩn nào đó vẫn cần lock áp cho worktree commit | Chưa rõ | Chưa tìm thấy bằng chứng nào cho race ẩn, nhưng chưa loại trừ hết — cần `fgos-planning` cân nhắc khi viết test plan |
+| 4 | Có bug thật nào từng bị ảnh hưởng bởi việc này trước tsk-sir chưa | Chưa rõ | Report chưa grep `.fgos/events.jsonl` cho case cụ thể; để `fgos-coding-exploring` quyết có cần scout thêm hay không |
+| 5 | Fix đúng có phải chỉ thêm `gitDir !== gitCommonDir` check vào hook, hay có race scenario ẩn nào đó vẫn cần lock áp cho worktree commit | Chưa rõ | Chưa tìm thấy bằng chứng nào cho race ẩn, nhưng chưa loại trừ hết — cần `fgos-coding-planning` cân nhắc khi viết test plan |
 
 ## 4. Quyết định đã chốt
 
@@ -52,8 +52,8 @@ không mở rộng scope sang việc khác (vd: cô lập `.fgos` per-worktree, 
 | D2 | Đây là gap thiết kế, không phải quyết định cân nhắc — decision 0021 (lý do hook tồn tại) chỉ bàn race trên main's `.git/index`, không hề xét worktree; mỗi worktree có index riêng nên hazard đó không áp dụng cơ học cho worktree commit; guard 2 cùng file (`currentFgwBranchIfMainCheckout`) đã phân biệt worktree/main còn guard 1 (`acquireMainCheckoutLock`) thì không — bất đối xứng trong cùng 1 file |
 | D3 | tsk-45y không giải bài này — khác lớp (fgOS state-write qua `events.lock` vs git-commit hook qua `main-checkout.lock`), và bằng chứng đóng của tsk-45y có blind spot thật (chưa grep `.githooks/`) |
 | D4 | Hướng fix đề xuất: thêm check `gitDir !== gitCommonDir` (mirror guard 2's logic) NGAY TRƯỚC bước gọi `acquireMainCheckoutLock` trong hook's `main()` — skip lock check khi đang chạy từ linked worktree. Không sửa `acquireMainCheckoutLock` primitive chính nó, vì nó dùng chung cho claim-port.mjs/merge.mjs — chỉ call site trong hook mới cần phân biệt worktree |
-| D5 | (fgos-exploring re-scout) `acquireMainCheckoutLock` chỉ có 3 call site thật trong `src`/`bin` — `claimWork`, `mergeRunnerItem`, `fgos unlock` verb — không cái nào khác bị ảnh hưởng bởi D4's fix |
-| D6 | (fgos-exploring re-scout) GitNexus's own call-graph cũng miss `.githooks/pre-commit` làm caller — corroborate D3, không phủ nhận D1/D7 (đã verify bằng đọc code + lệnh git thật) |
+| D5 | (fgos-coding-exploring re-scout) `acquireMainCheckoutLock` chỉ có 3 call site thật trong `src`/`bin` — `claimWork`, `mergeRunnerItem`, `fgos unlock` verb — không cái nào khác bị ảnh hưởng bởi D4's fix |
+| D6 | (fgos-coding-exploring re-scout) GitNexus's own call-graph cũng miss `.githooks/pre-commit` làm caller — corroborate D3, không phủ nhận D1/D7 (đã verify bằng đọc code + lệnh git thật) |
 | D7 | **Sửa D1**: cơ chế thật là `core.hooksPath` trên checkout này bị set thành 1 đường TUYỆT ĐỐI (`git config --get --show-origin` xác nhận), không phải relative `.githooks` mà `installGitHooks`/toàn bộ test suite kỳ vọng. Thực nghiệm cô lập (`scratchpad/hookspath-experiment.sh`, `hookspath-experiment2.sh`) chứng minh: khi hooksPath THẬT SỰ là relative, hook KHÔNG chạy từ worktree (resolve theo worktree's own top-level, không tồn tại ở đó) — phủ nhận D1's giả thuyết gốc. Vì `installGitHooks` là fill-only (không bao giờ ghi đè), và decision 0021 tự ghi nhận checkout này CÒN là relative `.githooks` lúc 2026-07-28 (doctor xanh), một thứ gì đó đã ghi đè thành tuyệt đối SAU thời điểm đó — nguyên nhân chưa xác định, ngoài phạm vi item này. D4's hướng fix KHÔNG đổi. |
 | D8 | Phát hiện phụ, ngoài scope tsk-sir: `mainCheckoutHookWired`/`installGitHooks` (`src/setup/git-hooks.mjs`) so khớp CHUỖI CHÍNH XÁC với `.githooks` — nên giá trị tuyệt đối-nhưng-tương-đương đọc thành "chưa wired". Xác nhận sống: `fgos doctor` trên chính checkout này BÁO SAI "not wired" dù hook rõ ràng đang chặn commit (2 lần thật trong session này). Nên tách thành work item riêng, không sửa trong tsk-sir. |
 
@@ -157,9 +157,9 @@ tương-đương. Đây là 1 false negative thật trên chính safety check c�
   (item khác, tình cờ cùng lúc phát hiện bug này). D8 (doctor false
   negative) là phát hiện phụ, tách thành work item riêng, không phải
   con/sibling của tsk-sir.
-- **Việc còn mở cho `fgos-planning` cân nhắc:** §3 dòng 4 (có bug thật nào
+- **Việc còn mở cho `fgos-coding-planning` cân nhắc:** §3 dòng 4 (có bug thật nào
   từng bị ảnh hưởng chưa) và dòng 5 (có race ẩn nào cần giữ lock cho
-  worktree không) — nếu không tìm thêm bằng chứng, `fgos-planning` nên tự
+  worktree không) — nếu không tìm thêm bằng chứng, `fgos-coding-planning` nên tự
   quyết dựa trên D1-D4 đã đủ vững, không cần chặn lại vì 2 điểm này.
 - **Draft verify:** mirror shape của `test/e2e/main-checkout-lock-hook.test.mjs`
   (dùng `git commit` subprocess thật) — thêm case: main checkout giữ lock

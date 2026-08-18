@@ -139,7 +139,7 @@ Nguồn: `.fgos/state.json` (`gates`, `work`, `frictions`, `settlements`), đo n
 
 ### Đã rõ — bảy vấn đề cấu trúc của `ask`/`answer` (vòng 2, đọc code trực tiếp)
 
-Nguồn: `src/state/replay.mjs:196-230` (fold gate), `src/intake/decompose.mjs:625-655` (bypass),
+Nguồn: `src/state/replay.mjs:196-230` (fold gate), `src/intake/plan.mjs:625-655` (bypass),
 grep toàn `src/`.
 
 | # | Vấn đề cấu trúc | Bằng chứng |
@@ -290,7 +290,7 @@ sau còn nguyên; R9 còn nhưng đổi nguyên nhân. Prose vẫn không ép đ
 
 > *"this file does **NOT** catch the class of defect the old LLM branch caught **twice, live** — a
 > verify that is syntactically fine shell but targets the wrong claim. That responsibility now
-> belongs to whichever skill calls `fgos discover`/`fgos decompose`, backed by `fgos-validating`'s
+> belongs to whichever skill calls `fgos discover`/`fgos plan`, backed by `fgos-coding-validating`'s
 > own reality-gate discipline."*
 
 Trách nhiệm **chuyển**, không biến mất — từ một subprocess mù sang một phiên sống (vốn hỏi tốt hơn
@@ -327,7 +327,7 @@ tier light+standard ≈ 82% item). Nhưng `canAutoApprove` đòi ba điều ki�
 gần hết: nó yêu cầu artifact có mục **đúng chữ** `## Outstanding questions` với body **đúng chữ**
 `None`.
 
-**Nguyên nhân gốc:** `fgos-exploring/SKILL.md` và `fgos-planning/SKILL.md` **không hề nhắc tới
+**Nguyên nhân gốc:** `fgos-coding-exploring/SKILL.md` và `fgos-coding-planning/SKILL.md` **không hề nhắc tới
 `Outstanding questions`**. Skill viết artifact không biết mình phải viết mục đó.
 `gate-bypass.mjs` tự ghi *"the convention this item's own CONTEXT.md/plan.md already follow"* —
 tác giả tưởng quy ước đã được tuân thủ; thực tế 89% `CONTEXT.md` và **99% `plan.md`** không có.
@@ -425,7 +425,7 @@ gate contextApprove (người duyệt)
 Người bị hỏi *"context đủ chưa"* đúng **một lần**; năm lần sau là bị kéo lại vì một judge **khác**
 chặn ở downstream, và mỗi lần quay lại thì gate bị đóng dấu lại từ đầu.
 
-**Trả lời câu hỏi "context đầy đủ sau bước nào":** sau bước 3 của `fgos-exploring` — gate đặt
+**Trả lời câu hỏi "context đầy đủ sau bước nào":** sau bước 3 của `fgos-coding-exploring` — gate đặt
 **đúng chỗ**. Thứ chưa đủ không phải context mà là lệnh `verify`. Khớp với `validateApprove`
 **0/108 lần lặp** — tới đó verify đã chốt.
 
@@ -447,7 +447,7 @@ Người chủ sản phẩm bác: *"validate này là shape để execute thôi 
 
 - Câu hỏi nguyên văn: *"**Feasibility** validated. Approve moving to executing?"*
 - **Dùng lại** `planApprove.verify`, *"does not design a new one"*
-- `NOT READY` **bỏ qua câu hỏi hoàn toàn**, trả về `fgos-planning`
+- `NOT READY` **bỏ qua câu hỏi hoàn toàn**, trả về `fgos-coding-planning`
 
 Quyết định sản phẩm đã chốt ở `contextApprove`; hình dạng ở `planApprove`. Tới đây chỉ còn *"bằng
 chứng có đủ không"* — phán đoán **kỹ thuật/bằng chứng**, không phải sản phẩm.
@@ -556,7 +556,7 @@ Người chủ sản phẩm quay về nhu cầu gốc của cả phiên, và tá
 
 | Vùng | Kích thước | Ai đọc |
 |---|---|---|
-| `CONTEXT.md` (người) | 199 file · **~1.973 token**/file · cao nhất 4.978 | **mọi skill** — `fgos-planning`, `fgos-validating` |
+| `CONTEXT.md` (người) | 199 file · **~1.973 token**/file · cao nhất 4.978 | **mọi skill** — `fgos-coding-planning`, `fgos-coding-validating` |
 | `state.decisions` (máy) | **1.711 bản ghi** · ~100 token/bản | **0 skill** — chỉ `fgos show` (`bin/fgos.mjs:1700`) và một bộ đếm (`:2015`) |
 
 Chênh **~20 lần**. Chi phí token **đang bị trả rồi**: mỗi lượt clarify/planning, agent nuốt ~2.000
@@ -688,7 +688,7 @@ hai không cần chạm lược đồ event append-only.
 | **Q17** | **Nối quy ước `## Outstanding questions` vào hai skill viết artifact — đủ chưa, hay `hasOpenItems` cũng cần nới?** | Sửa phía skill là đúng hướng (giữ nguyên fail-closed). Nhưng chưa rõ: quy ước tiếng Anh cứng có hợp lý trong repo viết artifact bằng tiếng Việt không? Và `plan.md` có nên dùng cùng một mục với `CONTEXT.md`, hay mục riêng? |
 | **Q18** | **Trục cơ học nào cho phép `validateApprove` bypass?** *(viết lại ở vòng 10 — bản cũ hỏi "có đáng luôn cần người không" và gọi nhầm là quyết định sản phẩm)* | Không phải cổng sản phẩm: nó kiểm **khả thi**, dùng lại `planApprove.verify`, `NOT READY` bỏ qua câu hỏi. Hai cổng kia có `hasOpenItems` làm trục cơ học; cổng này **không có gì tương đương** nên nhảy thẳng sang "luôn hỏi người". Phân loại 13 ràng buộc (§3-E): ~9 máy làm được, ~3 cần người — và cả ba đều có dấu hiệu máy đọc được. Cần chốt: bộ trục cụ thể, và có cưỡng chế "verify phải chạy xanh thật" không. |
 | ~~Q16~~ | ~~Cái giá `tsk-1x3` khai báo có thành hiện thực không?~~ | ✅ **ĐÓNG ở vòng 10 — chưa.** `verify-miss`/item delivered: trước **0,45** → sau **0,43**, phẳng. Judge đó là chi phí thuần. Phạm vi: 28 item, ~1,5 ngày. Chi tiết §3-B. |
-| ~~Q16-cũ~~ | ~~(bản gốc, giữ để tra ngược)~~ — bản thay thế cơ học tự khai KHÔNG bắt được "verify đúng cú pháp nhưng nhắm sai mục tiêu"; trách nhiệm chuyển sang skill gọi + `fgos-validating`. | Thay Q12. Đo bằng xu hướng `verify-miss` (nền: 87/141 = 62% friction, tính tới 2026-08-08). Nếu tăng sau vài ngày ⇒ việc chuyển trách nhiệm chưa được đỡ. **Chỉ đo được bằng thời gian**, không đọc code ra được. |
+| ~~Q16-cũ~~ | ~~(bản gốc, giữ để tra ngược)~~ — bản thay thế cơ học tự khai KHÔNG bắt được "verify đúng cú pháp nhưng nhắm sai mục tiêu"; trách nhiệm chuyển sang skill gọi + `fgos-coding-validating`. | Thay Q12. Đo bằng xu hướng `verify-miss` (nền: 87/141 = 62% friction, tính tới 2026-08-08). Nếu tăng sau vài ngày ⇒ việc chuyển trách nhiệm chưa được đỡ. **Chỉ đo được bằng thời gian**, không đọc code ra được. |
 | ~~Q13~~ | ~~Web UI nên là Rust thứ hai hay tiến trình Node cạnh CLI?~~ | ✅ **ĐÓNG ở vòng 9 — câu hỏi đặt sai tiền đề.** Lựa chọn **không** phụ thuộc `p-09351985` như vòng 4 giả định: theo `0014` chốt 4, kể cả chọn Node thì web server vẫn phải spawn `fgos <verb>`, **không được link lib**. Ngôn ngữ hoàn toàn tự do — tiêu chí thật chỉ là tái dùng `ports.rs`/`WorkItemSource` đã có. Chi tiết §3 "Làm rõ ở vòng 9". |
 | **Q14** | **"Một item một lần" nghĩa là một-tiến-trình-một-item (vẫn song song), hay tuần tự thật?** | Config đang khai `parallel: {maxRoots:4, maxLeavesPerRoot:4}` và `fgos schedule` đã tính sẵn sóng song song theo footprint. Tuần tự thật làm hai thứ đó chết và tụt throughput (~40 item/ngày hiện tại) — chấp nhận được nếu là lựa chọn có ý thức, không phải hệ quả phụ. Đề xuất: một tiến trình một item, nhiều tiến trình song song theo `schedule`. |
 | **Q15** | **Launcher có tự chạy mặc định không?** | Tự chạy gỡ được tắc nghẽn nhưng biến nó thành thứ hành động không ai giám sát trên repo thật — mà `p-73d99989` (force-xoá worktree, hạng CRITICAL) **vẫn chưa vá**. |
@@ -734,6 +734,22 @@ hai không cần chạm lược đồ event append-only.
 | **D6** | **`validateApprove` bypass khi reality gate KHÔNG sinh ra ràng buộc nào; có bất kỳ ràng buộc nào → hỏi người.** Khớp chính xác dữ liệu: 94/108 (87%) không ràng buộc, 13 ca có ràng buộc đúng là những ca đáng hỏi, 0 lần phải hỏi lại. Chọn một-trục-tự-báo-cáo thay vì năm-trục-đoán-trước, vì hai trong ba ca cần phán đoán (#2, #4) **không phát hiện được từ trước** — chúng chỉ lộ khi skill viết verdict, mà chính skill là bên biết. Tái dùng nguyên `canAutoApprove`, chỉ thay `hasOpenItems`. | 10 (người chủ sản phẩm chọn phương án 5) | ✅ seq **9891** (`tsk-539`) |
 
 | **D7** | **Hai vùng lưu trữ cho hai người đọc.** `state.decisions` là nguồn **authoritative cho agent** (ngắn, đủ bằng chứng); `CONTEXT.md` tự do tối ưu **cho người** (narrative, thoáng, markdown đầy đủ). **Ràng buộc thứ tự là phần chính của quyết định**: KHÔNG nối skill vào `state.decisions` cho tới khi phép kiểm độ sạch xanh — hiện 35% là ghi-sổ máy móc và 12% quyết định thật thiếu `rationale`. | 12 (người chủ sản phẩm nêu nhu cầu, số đo xác nhận) | ✅ seq **10187** (`tsk-539`) |
+
+> **D6 đã bị supersede bởi `tsk-224`** (2026-08-13,
+> `docs/history/coding-planning-validating-gate-redesign/CONTEXT.md` D1/D8;
+> bản ghi supersede chính thức là D9 trong `docs/history/gate-bypass/
+> CONTEXT.md`, nơi D6 cũng sống). Lý do: `tsk-224` gộp `planApprove` +
+> `validateApprove` thành **đúng một** gate đặt tại
+> `fgos-coding-validating`, ngay trước lúc materialize item con — nên cái
+> gate mà trục bypass của D6 phục vụ không còn tồn tại độc lập nữa. Trục
+> verdict của D6 (`READY` → bypass, có ràng buộc → hỏi) được thay bằng
+> tiêu chí hai tầng + ba trigger của `tsk-224`, cấp cho export mới
+> `canAutoApproveMergedGate`; `canAutoApproveValidate` bị xoá.
+>
+> **Số đo của D6 không bị bác** — 94/108 (87%) không ràng buộc, 0 lần phải
+> hỏi lại vẫn đúng, và nó là trục tốt cho cái gate nó phục vụ. Chỉ là gate
+> đó không còn. Dòng D6 phía trên giữ nguyên chữ, không sửa tại chỗ (luật
+> AGENTS.md "Changing a locked law").
 
 **Ứng viên D-ID cho vòng 8** (chưa đứng đủ vững):
 
@@ -852,7 +868,7 @@ giả thuyết — nó đã xảy ra, đúng trong khu vực này, và đang ch�
 > *"như vậy phát sinh mấy vấn đề lớn phải giải quyết liên quan đến việc ask/answer?"*
 
 **Scout: đọc code thật thay vì suy đoán.** `src/state/replay.mjs:196-230` (fold gate),
-`src/intake/decompose.mjs:625-655` (bypass), grep `answerHistory` toàn `src/`.
+`src/intake/plan.mjs:625-655` (bypass), grep `answerHistory` toàn `src/`.
 
 **Kết quả: bảy vấn đề cấu trúc S1–S7** (bảng ở §3). Điểm quan trọng nhất không phải số lượng mà là
 **vị trí**: cả bảy nằm ở **lược đồ dữ liệu**, dưới tầng nội dung câu hỏi mà vòng 1 đang bàn.
@@ -1251,7 +1267,7 @@ nó là **hạ tầng của launcher**, và S8/S9/S10 chính là thứ tiến tr
 | # | Việc | Phụ thuộc | Vì sao ở vị trí này |
 |---|---|---|---|
 | 0 | Vá `p-73d99989` (force-xoá worktree) | — | CRITICAL, chưa vá; launcher tự chạy sẽ tăng tần suất gặp (Q15) |
-| **0b** | **Nối quy ước `## Outstanding questions` vào `fgos-exploring` + `fgos-planning`** — **`tsk-5hg`** | — | ⭐ **Đòn bẩy tốt nhất của cả bảng.** Chạm 48/54 lượt hỏi gần đây, chi phí gần bằng không, không nới luật an toàn nào. Q17 đi kèm item, trả lời lúc clarify |
+| **0b** | **Nối quy ước `## Outstanding questions` vào `fgos-coding-exploring` + `fgos-coding-planning`** — **`tsk-5hg`** | — | ⭐ **Đòn bẩy tốt nhất của cả bảng.** Chạm 48/54 lượt hỏi gần đây, chi phí gần bằng không, không nới luật an toàn nào. Q17 đi kèm item, trả lời lúc clarify |
 | ~~1~~ | ~~Kiểm Q12~~ | — | ✅ **xong ở vòng 6** — judge đã bị gỡ từ trước, không có gì để sửa |
 | 2 | Launcher chạy `cleanup-loop` | — | Thuần cơ học, gỡ 112 item, không đụng gate |
 | 3 | Headless `code-implement` | — | Median 0,3h, chỉ 9 park — chạy được ngay |
@@ -1309,7 +1325,7 @@ flowchart LR
     W["Lúc làm việc<br/>skill lock một quyết định"]
     W -->|"~100 token<br/>có D-ID, có rationale trích được"| M[("state.decisions<br/>VÙNG MÁY<br/>authoritative cho agent")]
     W -->|"dài tuỳ nội dung<br/>narrative, thoáng"| H[("CONTEXT.md<br/>VÙNG NGƯỜI<br/>git-versioned")]
-    M -->|"skill đọc — SAU khi sạch"| S["fgos-planning<br/>fgos-validating"]
+    M -->|"skill đọc — SAU khi sạch"| S["fgos-coding-planning<br/>fgos-coding-validating"]
     H -->|"người duyệt đọc"| P["Người ở gate"]
     H -->|"render sau này"| U["Web UI"]
 
@@ -1342,7 +1358,7 @@ flowchart LR
 2. Cưỡng chế rationale ở tầng store
 3. Thêm kiểm "rationale có trích dẫn kiểm được không"
 4. Chạy kiểm — phải XANH trên toàn bộ 1.119 quyết định thật   ← CỔNG
-5. Chỉ khi đó mới đổi fgos-planning sang đọc state.decisions
+5. Chỉ khi đó mới đổi fgos-coding-planning sang đọc state.decisions
 6. Giải phóng CONTEXT.md cho người
 ```
 
@@ -1427,7 +1443,7 @@ hiện nó đã được sửa. Chi tiết §3 "Bị lật ở vòng 6".
 - **D-ID áp dụng:** **D6** (seq 9891).
 - **Tái dùng:** nguyên `canAutoApprove` (`src/state/gate-bypass.mjs`), chỉ thay `hasOpenItems` bằng
   trục "verdict có ràng buộc không". Không luật mới, không lược đồ mới.
-- **Sửa ở:** `.claude/skills/fgos-validating/SKILL.md` khối `## Gate` (hiện hardcode
+- **Sửa ở:** `.claude/skills/fgos-coding-validating/SKILL.md` khối `## Gate` (hiện hardcode
   `--actor human`, dòng 182-184).
 - **Giữ nguyên, không đụng:** `NOT READY` vẫn bỏ qua câu hỏi và trả về planning; từ khoá rủi ro
   vẫn override; tier vẫn phải được phủ.
@@ -1465,7 +1481,7 @@ hiện nó đã được sửa. Chi tiết §3 "Bị lật ở vòng 6".
 ### Chưa có item · Theo dõi cái giá của `tsk-1x3` {#task-verify-miss-watch}
 
 - **Mục tiêu:** trả lời Q16 — bản thay thế cơ học tự khai KHÔNG bắt được "verify đúng cú pháp nhưng
-  nhắm sai mục tiêu"; trách nhiệm chuyển sang skill gọi + `fgos-validating`. Cái giá đó có thành
+  nhắm sai mục tiêu"; trách nhiệm chuyển sang skill gọi + `fgos-coding-validating`. Cái giá đó có thành
   hiện thực không?
 - **Nền để so:** `verify-miss` 87/141 = 62% toàn bộ friction, tính tới 2026-08-08.
 - **Quan hệ anh em:** không chặn gì, chạy song song mọi thứ.
@@ -1519,7 +1535,7 @@ hiện nó đã được sửa. Chi tiết §3 "Bị lật ở vòng 6".
 
 ### `tsk-3uw` · Nối skill vào vùng máy (D7 bước 5+6) {#task-wire-machine-zone}
 
-- **Mục tiêu:** `fgos-planning`/`fgos-validating` đọc quyết định từ `state.decisions` thay vì parse
+- **Mục tiêu:** `fgos-coding-planning`/`fgos-coding-validating` đọc quyết định từ `state.decisions` thay vì parse
   `CONTEXT.md`. Cắt ~1.900 token mỗi lượt.
 - **Phụ thuộc CỨNG:** `#task-clean-machine-zone` phải xanh trước. Nối sớm = agent nhận 35% nhiễu.
 - **Kéo theo:** `CONTEXT.md` được giải phóng — viết narrative, thoáng, markdown đầy đủ, dài tuỳ nội
@@ -1548,7 +1564,7 @@ hiện nó đã được sửa. Chi tiết §3 "Bị lật ở vòng 6".
 - **Câu hỏi mở riêng:** Q8 (riêng hay tiên quyết), Q9 (có bump CTR004 không, theo L10 và `0011`),
   Q10 (hình dạng cơ chế giải phóng), Q11 (STR70a đã giải quyết bao nhiêu phần của S7).
 - **Rủi ro riêng:** đây là thay đổi lược đồ event trên một log append-only bất khả xoá (L3/RUL11) —
-  không sửa lại được sau khi phát hành. Cần `fgos-validating` thật sự, không chỉ plan.
+  không sửa lại được sau khi phát hành. Cần `fgos-coding-validating` thật sự, không chỉ plan.
 - **Chưa submit** — chờ Q8.
 - **Draft verify:** chưa xác định — chờ Q9 (phạm vi hợp đồng quyết định cái gì kiểm được).
 

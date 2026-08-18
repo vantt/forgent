@@ -29,8 +29,8 @@ stage-to-skill lookup or the claim-timing logic itself.
 - **This skill still never claims before stage `executing`** — now enforced
   by `fgos-coding-driving`'s own claim-timing hard rule (tsk-19j-4), not by
   this skill's own manual step ordering.
-- **Reuse, never duplicate.** `fgos-exploring`, `fgos-planning`,
-  `fgos-validating`, and `fgos-coding-driving` (tsk-19j-4) already define
+- **Reuse, never duplicate.** `fgos-coding-exploring`, `fgos-coding-planning`,
+  `fgos-coding-validating`, and `fgos-coding-driving` (tsk-19j-4) already define
   the Socratic/shaping/proving/driving substance — invoke them (Skill tool)
   for their real work; this skill only owns the id QUEUE the driver has no
   concept of.
@@ -42,9 +42,9 @@ stage-to-skill lookup or the claim-timing logic itself.
 2. **Drain the queue, one id at a time, via `fgos-coding-driving`
    (tsk-19j-4).** While the queue is non-empty, take the id at its front and
    invoke the `fgos-coding-driving` skill for it, no `ceiling` (omit it —
-   the driver's own implicit stops already cover everything this step used
-   to hand-roll: `awaiting-approval`, an anchor by open children, a
-   person-shaped stop, or a no-progress read). This skill never re-derives
+   the driver's own stops already cover everything this step used to
+   hand-roll: `awaiting-approval` as the default ceiling, an anchor by open
+   children, a person-shaped stop, or a no-progress read). This skill never re-derives
    which skill a stage maps to, never applies a stage/status transition
    itself, and never decides claim-timing on its own — the driver already
    owns all three (its own hard rules: registry-only stage lookup, "engine's

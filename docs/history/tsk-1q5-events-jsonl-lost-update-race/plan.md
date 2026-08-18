@@ -84,7 +84,7 @@ does on its own.
 
 - Proof point: this is a git-operational hazard, not a pure code bug — it
   cannot be proven by a unit test the way A can. Two options, to be
-  decided at `fgos-validating`: (1) correlate the incident window against
+  decided at `fgos-coding-validating`: (1) correlate the incident window against
   `git reflog`/`git log -g` on the main checkout for a checkout/reset/
   merge event overlapping the observed loss, if that history is still
   available; or (2) treat it as already-sufficient evidence (root cause B
@@ -106,7 +106,7 @@ does on its own.
   `test/state/events.test.mjs` — new fork-based concurrent-mutation
   reproduction test(s), same technique as the existing append-race test.
 - Root cause B has no code file to touch yet — its own proof/scope
-  decision happens at `fgos-validating`, per the Outstanding question
+  decision happens at `fgos-coding-validating`, per the Outstanding question
   below.
 
 ## Order
@@ -114,7 +114,7 @@ does on its own.
 Root cause A first: mechanical, fully testable, matches the item's own
 original suspicion location (the write path), and is a self-contained
 code fix with a clear proof point. Root cause B second: needs
-`fgos-validating`'s reality check to decide whether it is provable now or
+`fgos-coding-validating`'s reality check to decide whether it is provable now or
 becomes a follow-up item — spending investigation time on it before A is
 proven would risk the whole item stalling on the harder, less-provable
 half.
@@ -141,14 +141,14 @@ instances of *raw log lines going missing*, not a derived-cache staleness
 — this strengthens root cause B (events.jsonl git-tracked in the shared
 main checkout, clobbered by another session's git operation) as the more
 likely dominant cause relative to root cause A alone. Scope stays as
-decided at `fgos-validating` (A only, this item; B logged as a decision on
+decided at `fgos-coding-validating` (A only, this item; B logged as a decision on
 `tsk-3wq`) — recorded here so a future reader sees the full evidence
 trail without re-deriving it.
 
 ## Outstanding questions
 
 - Root cause B (git-tracked `events.jsonl` in the shared main checkout)
-  has no test-provable fix the way A does. `fgos-validating` should decide
+  has no test-provable fix the way A does. `fgos-coding-validating` should decide
   whether this item's scope covers a concrete hardening step (e.g.
   auto-commit `events.jsonl` more aggressively, or protect it the same way
   `fgos main-checkout-reset` already protects the wider tree) or whether B

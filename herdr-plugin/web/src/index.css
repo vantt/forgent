@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+/* Design tokens extracted from the stitch-generated mockups (D16/D17,
+   docs/history/herdr-web-dashboard/CONTEXT.md; herdr-plugin/web/
+   stitch-exports/{S01,S02,S03,S04}/design.html's own Tailwind config) --
+   a light Monday.com/ClickUp-style SaaS palette, not the dark-terminal
+   look the first design pass wrongly defaulted to. */
+@theme {
+  --color-brand: #7c3aed;
+  --color-brand-dark: #5a00c6;
+  --color-brand-contrast: #ffffff;
+
+  --color-bg: #f9f9ff;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f3f4f9;
+  --color-border: #e2e5ee;
+
+  --color-ink: #151c27;
+  --color-ink-muted: #5b6472;
+
+  --color-danger: #ba1a1a;
+  --color-danger-bg: #ffdad6;
+
+  /* Status colors -- match S02's group-header bars exactly (amber =
+     needs-answer, blue = in-progress, slate = todo, green = done). */
+  --color-status-needs-answer: #b45309;
+  --color-status-needs-answer-bg: #fdf1e0;
+  --color-status-needs-answer-bar: #f5a524;
+  --color-status-in-progress: #1d4ed8;
+  --color-status-in-progress-bg: #eaf1fd;
+  --color-status-in-progress-bar: #3b82f6;
+  --color-status-todo: #475569;
+  --color-status-todo-bg: #f1f2f6;
+  --color-status-todo-bar: #94a3b8;
+  --color-status-done: #15803d;
+  --color-status-done-bg: #e9f9ee;
+  --color-status-done-bar: #22c55e;
+
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}

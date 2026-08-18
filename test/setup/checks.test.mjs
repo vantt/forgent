@@ -1,55 +1,54 @@
-// checks.test.mjs — fgos doctor's check registry (str87-fgos-setup-doctor
-// D2) plus CLI-level proof that `fgos setup`/`fgos doctor` (with/without
-// --pretty) actually behave as CTR001/D7 require. Mirrors
-// test/cli/fgos-manifest.test.mjs's/test/install-packaging.test.mjs's real
-// spawnSync harness — no mocking the CLI process itself.
+// checks.test.mjs -- registry check của `fgos doctor` cùng phần chứng minh ở
+// mức CLI rằng `fgos doctor` (có/không --pretty) hành xử đúng CTR001/D7.
+// Harness spawnSync thật, không mock chính process CLI.
+//
+// tsk-67g: 10 test dựng môi trường thật cho `fgos setup` đã dọn sang các file
+// checks-setup-*.test.mjs bên cạnh -- chúng chiếm 117.6s trong 120s của file
+// này và một mình quyết định wall-clock của cả bộ test. Phần ở lại đây chạy
+// hết trong khoảng 2.5s.
 import { test } from 'node:test';
-import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { execFileSync, spawnSync } from 'node:child_process';
+import {
+  DEFAULT_CLEANUP_LEAF_TTL_DAYS,
+  DEFAULT_CLEANUP_TTL_DAYS,
+  DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
+  DEFAULT_HERDR_WEB_DASHBOARD_SETTINGS,
+  DEFAULT_INVARIANT_CHECK_COMMANDS,
+  DEFAULT_LEVEL,
+  DEFAULT_RUNNER_CONFIG,
+  DOCTOR_CHECKS,
+  FGOS,
+  FIX_REGISTRATIONS,
+  NO_CLAUDE_ENV,
+  __dirname,
+  addWork,
+  appendEvent,
+  assert,
+  checkById,
+  execFileSync,
+  fileURLToPath,
+  fixById,
+  fs,
+  initRepo,
+  initStore,
+  integrationScriptPath,
+  mainCheckoutHookWired,
+  mkTemp,
+  os,
+  path,
+  resolveMainCheckout,
+  spawnSync,
+  withHome,
+  writeEnduserDoc,
+  writeEnduserManifest,
+} from './helpers/setup-checks-harness.mjs';
+import { DEFAULT_WORKER_SLOT_CEILING } from '../../src/state/worker-slots.mjs';
+import { DEFAULT_IRON_LAW_LEVEL, findDomainWorkflowSkillMapGaps } from '../../src/setup/registrations.mjs';
+import { addDecision } from '../../src/state/store.mjs';
 
-import { DOCTOR_CHECKS, FIX_REGISTRATIONS, integrationScriptPath, mainCheckoutHookWired, resolveMainCheckout } from '../../src/setup/checks.mjs';
-import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
-import { DEFAULT_LEVEL } from '../../src/state/gate-bypass.mjs';
-import { DEFAULT_CLEANUP_TTL_DAYS, DEFAULT_CLEANUP_LEAF_TTL_DAYS, DEFAULT_HERDR_ORCHESTRATOR_SETTINGS } from '../../src/setup/registrations.mjs';
-import { initStore, addWork } from '../../src/state/store.mjs';
-import { appendEvent } from '../../src/state/events.mjs';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
-
-// tsk-4xg: `doctor --fix` now runs the real `claude-plugin-marketplace` fix
-// too, which shells out to a real, mutating external CLI (`claude plugin
-// marketplace add`/`install`) when the `claude` binary is present --
-// FGOS_CLAUDE_COMMAND (registrations.mjs's own test-only seam, mirroring
-// bin/fgos.mjs's FGOS_GH_COMMAND for `gh`) points it at a path that never
-// exists, so every `doctor --fix` spawned below sees "claude CLI not
-// found" and no-ops that fix, never touching this machine's real Claude
-// Code config as a side effect of running the test suite.
-const NO_CLAUDE_ENV = { ...process.env, FGOS_CLAUDE_COMMAND: '/nonexistent/fgos-test-claude-binary' };
-
-function mkTemp(prefix) {
-  return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
-}
-
-function checkById(id) {
-  const entry = DOCTOR_CHECKS.find((c) => c.id === id);
-  assert.ok(entry, `DOCTOR_CHECKS is missing "${id}"`);
-  return entry;
-}
-
-function fixById(id) {
-  const entry = FIX_REGISTRATIONS.find((f) => f.id === id);
-  assert.ok(entry, `FIX_REGISTRATIONS is missing "${id}"`);
-  return entry;
-}
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, changelog-unreleased-stale, herdr-launcher-configured, work-classification-vocabulary, enduser-docs-index-stale, and events-jsonl-contiguous', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, plugin-dev-skills-packaged, changelog-unreleased-stale, herdr-launcher-configured, herdr-web-dashboard-configured, work-classification-vocabulary, work-stage-vocabulary, domain-workflow-skillmap-coverage, delivered-not-on-trunk, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, events-jsonl-not-truncated, cli-version-visible, worker-slots-ceiling-usable, gateway-token-configured, readme-install-tag-exists, iron-law-configured, task-specs-resolve, agent-claims-resolve, dispatch-decide-hook-wired, and decision-index-stale', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     [
@@ -64,11 +63,27 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'root-drift',
       'claude-plugin-marketplace',
       'plugin-skill-cli-reachable',
+      'plugin-dev-skills-packaged',
       'changelog-unreleased-stale',
       'herdr-launcher-configured',
+      'herdr-web-dashboard-configured',
       'work-classification-vocabulary',
+      'work-stage-vocabulary',
+      'domain-workflow-skillmap-coverage',
+      'delivered-not-on-trunk',
       'enduser-docs-index-stale',
       'events-jsonl-contiguous',
+      'invariant-checks-configured',
+      'events-jsonl-not-truncated',
+      'cli-version-visible',
+      'worker-slots-ceiling-usable',
+      'gateway-token-configured',
+      'readme-install-tag-exists',
+      'iron-law-configured',
+      'dispatch-decide-hook-wired',
+      'task-specs-resolve',
+      'agent-claims-resolve',
+      'decision-index-stale',
     ].sort(),
   );
 });
@@ -220,6 +235,51 @@ test('events-jsonl-contiguous fix is a no-op when the log is already contiguous'
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
+// ─── events-jsonl-not-truncated (tsk-cgg) ──────────────────────────────────
+
+test('events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)', () => {
+  assert.equal(
+    FIX_REGISTRATIONS.some((f) => f.id === 'events-jsonl-not-truncated'),
+    false,
+  );
+});
+
+test('events-jsonl-not-truncated passes and bootstraps a mark on first run against a healthy log', () => {
+  const dir = initRepo('checks-truncguard-bootstrap-');
+  const fgosDir = path.join(dir, '.fgos');
+  initStore(fgosDir);
+  addWork(fgosDir, { id: 'a', title: 'a', kind: 'feature', risk: 'light', verify: 'true', status: 'todo', deps: [], refs: [] });
+
+  const { passed, message } = checkById('events-jsonl-not-truncated').check(dir);
+  assert.equal(passed, true);
+  assert.match(message, /truncation guard holds/);
+  assert.equal(fs.existsSync(path.join(fgosDir, 'events-jsonl.truncation-guard.json')), true, 'a passing check advances/bootstraps the mark');
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('events-jsonl-not-truncated fails when the log was truncated then reappended past the old mark', () => {
+  const dir = initRepo('checks-truncguard-break-');
+  const fgosDir = path.join(dir, '.fgos');
+  initStore(fgosDir);
+  const logPath = path.join(fgosDir, 'events.jsonl');
+  fs.appendFileSync(logPath, `${JSON.stringify({ seq: 1, ts: '2026-01-01T00:00:00.000Z', type: 'orig', payload: null })}\n`);
+  fs.appendFileSync(logPath, `${JSON.stringify({ seq: 2, ts: '2026-01-01T00:00:01.000Z', type: 'orig', payload: null })}\n`);
+
+  const first = checkById('events-jsonl-not-truncated').check(dir);
+  assert.equal(first.passed, true, 'first run bootstraps clean');
+
+  // Simulate a stash-style truncation: revert to just line 1, then append a
+  // DIFFERENT event reusing seq 2.
+  fs.writeFileSync(logPath, `${JSON.stringify({ seq: 1, ts: '2026-01-01T00:00:00.000Z', type: 'orig', payload: null })}\n`, 'utf8');
+  fs.appendFileSync(logPath, `${JSON.stringify({ seq: 2, ts: '2026-01-01T09:00:00.000Z', type: 'post-truncation', payload: null })}\n`);
+
+  const { passed, message } = checkById('events-jsonl-not-truncated').check(dir);
+  assert.equal(passed, false);
+  assert.match(message, /truncation detected/);
+  assert.match(message, /resolve-an-events-jsonl-truncation/);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
 // ─── work-classification-vocabulary (tsk-6ax) ──────────────────────────────
 // Scoped to OPEN items only (matches the item's own "no open item may carry
 // risk/kind outside its domain's vocabulary" wording) — a resolved item's
@@ -324,6 +384,195 @@ test('work-classification-vocabulary lists every violating id, not just the firs
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
+// ─── work-stage-vocabulary (tsk-64h) ───────────────────────────────────────
+// The stage-axis sibling of work-classification-vocabulary above: an open
+// item may sit at a stage its own domain no longer registers, and nothing
+// surfaced that until now. Same OPEN-only scoping and the same raw
+// `work.add` fixture technique, for the same reason — `validateWorkShape`
+// refuses a retired stage at the write door, so a legacy-shaped item can
+// only be constructed by appending the event directly.
+
+test('work-stage-vocabulary passes on an empty store', () => {
+  const dir = initRepo('checks-stage-vocab-empty-');
+  const fgosDir = path.join(dir, '.fgos');
+  initStore(fgosDir);
+
+  const { passed, message } = checkById('work-stage-vocabulary').check(dir);
+  assert.equal(passed, true);
+  assert.match(message, /registered by its domain/);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('work-stage-vocabulary passes for an item whose stage was never written (lazy Execute default)', () => {
+  const dir = initRepo('checks-stage-vocab-unset-');
+  const fgosDir = path.join(dir, '.fgos');
+  initStore(fgosDir);
+  addWork(fgosDir, { id: 'a', title: 'a', kind: 'feature', risk: 'light', verify: 'true', status: 'todo', deps: [], refs: [] });
+
+  const { passed, message } = checkById('work-stage-vocabulary').check(dir);
+  assert.equal(passed, true, message);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('work-stage-vocabulary passes when every open item sits at a stage its domain registers', () => {
+  const dir = initRepo('checks-stage-vocab-clean-');
+  const fgosDir = path.join(dir, '.fgos');
+  const logPath = path.join(fgosDir, 'events.jsonl');
+  appendEvent(logPath, {
+    type: 'work.add',
+    payload: { id: 'a', title: 'a', kind: 'feature', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'planning' },
+  });
+  appendEvent(logPath, {
+    type: 'work.add',
+    payload: { id: 'b', title: 'b', kind: 'feature', status: 'doing', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'executing' },
+  });
+
+  const { passed, message } = checkById('work-stage-vocabulary').check(dir);
+  assert.equal(passed, true, message);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('work-stage-vocabulary fails and names an OPEN item sitting at a stage its domain retired', () => {
+  const dir = initRepo('checks-stage-vocab-retired-');
+  const fgosDir = path.join(dir, '.fgos');
+  const logPath = path.join(fgosDir, 'events.jsonl');
+  appendEvent(logPath, {
+    type: 'work.add',
+    payload: { id: 'stranded', title: 'stranded', kind: 'feature', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'clarify' },
+  });
+
+  const { passed, message } = checkById('work-stage-vocabulary').check(dir);
+  assert.equal(passed, false);
+  assert.match(message, /stranded/);
+  assert.match(message, /stage: "clarify"/);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test("work-stage-vocabulary judges each item against its OWN domain's stages, not the default domain's", () => {
+  const dir = initRepo('checks-stage-vocab-domain-');
+  const fgosDir = path.join(dir, '.fgos');
+  const logPath = path.join(fgosDir, 'events.jsonl');
+  appendEvent(logPath, {
+    type: 'work.add',
+    payload: { id: 'triaged', title: 'triaged', kind: 'feature', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'triage', domain: 'triage' },
+  });
+  appendEvent(logPath, {
+    type: 'work.add',
+    payload: { id: 'miscoded', title: 'miscoded', kind: 'feature', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'triage' },
+  });
+
+  const { passed, message } = checkById('work-stage-vocabulary').check(dir);
+  assert.equal(passed, false);
+  assert.match(message, /miscoded/);
+  assert.doesNotMatch(message, /triaged/);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('work-stage-vocabulary passes despite a retired stage on an already-resolved (done) item', () => {
+  const dir = initRepo('checks-stage-vocab-resolved-');
+  const fgosDir = path.join(dir, '.fgos');
+  const logPath = path.join(fgosDir, 'events.jsonl');
+  appendEvent(logPath, {
+    type: 'work.add',
+    payload: { id: 'old-done', title: 'old-done', kind: 'feature', status: 'done', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'clarify' },
+  });
+
+  const { passed, message } = checkById('work-stage-vocabulary').check(dir);
+  assert.equal(passed, true, message);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('work-stage-vocabulary lists every violating id, not just the first', () => {
+  const dir = initRepo('checks-stage-vocab-multi-');
+  const fgosDir = path.join(dir, '.fgos');
+  const logPath = path.join(fgosDir, 'events.jsonl');
+  appendEvent(logPath, {
+    type: 'work.add',
+    payload: { id: 'bad-one', title: 'bad-one', kind: 'feature', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'clarify' },
+  });
+  appendEvent(logPath, {
+    type: 'work.add',
+    payload: { id: 'bad-two', title: 'bad-two', kind: 'feature', status: 'awaiting-human', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'clarify' },
+  });
+
+  const { passed, message } = checkById('work-stage-vocabulary').check(dir);
+  assert.equal(passed, false);
+  assert.match(message, /bad-one/);
+  assert.match(message, /bad-two/);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+// ─── domain-workflow-skillmap-coverage (tsk-ogx) ───────────────────────────
+// The registry-shape sibling of work-classification-vocabulary/
+// work-stage-vocabulary above: those two catch a work ITEM drifting from
+// its domain's own declared vocabulary; this one catches the domain's own
+// DECLARATION drifting internally -- a stage name reachable through a
+// domain's registered workflow(s) with no entry at all in that domain's
+// own `skillMap` (an explicit `null` is a deliberate "no skill for this
+// stage" answer and must not be flagged).
+//
+// Pure registry check -- no cwd/on-disk state, no fixture repo needed. The
+// real `DOMAINS` registry is `Object.freeze`d and can never carry a
+// deliberately-broken fixture, so `findDomainWorkflowSkillMapGaps` accepts
+// an optional `domains` map (default: the real `DOMAINS`) purely so the
+// fail branch is testable with a synthetic domain -- production wiring
+// (`registerCheck` in registrations.mjs) always calls it zero-arg, against
+// the real registry.
+
+test('domain-workflow-skillmap-coverage passes against the real DOMAINS registry', () => {
+  const { passed, message } = checkById('domain-workflow-skillmap-coverage').check();
+  assert.equal(passed, true, message);
+  assert.match(message, /resolves to a real skillMap entry/);
+});
+
+test('findDomainWorkflowSkillMapGaps passes a domain with no workflows field, checked against its own stages', () => {
+  const domains = {
+    fixture: {
+      stages: ['alpha', 'beta'],
+      skillMap: { alpha: 'some-skill', beta: null },
+    },
+  };
+  assert.deepEqual(findDomainWorkflowSkillMapGaps(domains), []);
+});
+
+test('findDomainWorkflowSkillMapGaps names a stage missing from skillMap entirely, distinct from an explicit null', () => {
+  const domains = {
+    fixture: {
+      stages: ['alpha', 'beta'],
+      skillMap: { alpha: null }, // beta missing entirely -- explicit null on alpha is fine
+    },
+  };
+  assert.deepEqual(findDomainWorkflowSkillMapGaps(domains), ['fixture.beta']);
+});
+
+test('findDomainWorkflowSkillMapGaps walks every stage across every registered workflow, not just domain.stages', () => {
+  const domains = {
+    fixture: {
+      stages: ['alpha'], // the domain-level default -- workflows below add a second, real workflow
+      workflows: {
+        feature: { stages: ['alpha'] },
+        bugfix: { stages: ['alpha', 'gamma'] },
+      },
+      skillMap: { alpha: 'some-skill' }, // gamma missing
+    },
+  };
+  assert.deepEqual(findDomainWorkflowSkillMapGaps(domains), ['fixture.gamma']);
+});
+
+test('findDomainWorkflowSkillMapGaps skips a domain with no skillMap at all', () => {
+  const domains = { fixture: { stages: ['alpha'] } };
+  assert.deepEqual(findDomainWorkflowSkillMapGaps(domains), []);
+});
+
+test('findDomainWorkflowSkillMapGaps lists every violating domain.stage, not just the first', () => {
+  const domains = {
+    one: { stages: ['a', 'b'], skillMap: { a: null } },
+    two: { stages: ['c'], skillMap: {} },
+  };
+  const gaps = findDomainWorkflowSkillMapGaps(domains);
+  assert.deepEqual(gaps.sort(), ['one.b', 'two.c']);
+});
+
 test('dependencies-installed passes when package.json has no dependencies field (pre-tsk-slq behavior)', () => {
   const tmp = mkTemp('fgos-deps-check-');
   fs.writeFileSync(path.join(tmp, 'package.json'), JSON.stringify({ name: 'x' }));
@@ -392,23 +641,6 @@ test('changelog-unreleased-stale passes when ## [Unreleased] has a pending entry
   fs.rmSync(tmp, { recursive: true, force: true });
 });
 
-// ─── enduser-docs-index-stale (tsk-1m0, docs/history/doctor-check-enduser- ──
-// docs-index-stale/CONTEXT.md): D1 count-only message, D2 one-directional
-// (missing-from-index only), D3 read-only check sharing the same
-// generation path as the fix, D5 missing-manifest is normal, D6
-// QUADRANT_DIR_ALIASES (docs/decisions -> explanation) honored.
-
-function writeEnduserDoc(tmp, quadrantDir, filename, h1) {
-  const dirPath = path.join(tmp, 'docs', quadrantDir);
-  fs.mkdirSync(dirPath, { recursive: true });
-  fs.writeFileSync(path.join(dirPath, filename), `# ${h1}\n\nbody\n`);
-}
-
-function writeEnduserManifest(tmp, entries) {
-  fs.mkdirSync(path.join(tmp, 'docs'), { recursive: true });
-  fs.writeFileSync(path.join(tmp, 'docs', 'enduser-docs-index.json'), `${JSON.stringify(entries, null, 2)}\n`);
-}
-
 test('enduser-docs-index-stale passes when docs/enduser-docs-index.json does not exist yet', () => {
   const tmp = mkTemp('fgos-enduser-index-check-');
   writeEnduserDoc(tmp, 'how-to', 'sample.md', 'Sample Doc');
@@ -441,6 +673,19 @@ test('enduser-docs-index-stale passes when the index already covers every on-dis
   const { passed, message } = checkById('enduser-docs-index-stale').check(tmp);
   assert.equal(passed, true);
   assert.match(message, /1\/1/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('enduser-docs-index-stale fails and reports orphan count when an index entry has no matching doc on disk', () => {
+  const tmp = mkTemp('fgos-enduser-index-check-');
+  writeEnduserDoc(tmp, 'how-to', 'sample.md', 'Sample Doc');
+  writeEnduserManifest(tmp, [
+    { quadrant: 'how-to', purpose: 'x', audience: 'y', docPath: 'docs/how-to/sample.md', title: 'Sample Doc', sourceCaptureId: null },
+    { quadrant: 'how-to', purpose: 'x', audience: 'y', docPath: 'docs/how-to/deleted.md', title: 'Deleted Doc', sourceCaptureId: null },
+  ]);
+  const { passed, message } = checkById('enduser-docs-index-stale').check(tmp);
+  assert.equal(passed, false);
+  assert.match(message, /1 tài liệu dư thừa/);
   fs.rmSync(tmp, { recursive: true, force: true });
 });
 
@@ -480,6 +725,115 @@ test('enduser-docs-index-stale fix is idempotent -- a second run reports changed
   fs.rmSync(tmp, { recursive: true, force: true });
 });
 
+test('decision-index-stale passes when docs/decisions/index.md does not exist yet (tsk-1lv review-fix F10)', () => {
+  const tmp = mkTemp('fgos-decision-index-check-');
+  const fgosDir = path.join(tmp, '.fgos');
+  initStore(fgosDir);
+  const { passed, message } = checkById('decision-index-stale').check(tmp);
+  assert.equal(passed, true);
+  assert.match(message, /not found/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('decision-index-stale fails when state.decisions has a scope-carrying decision the on-disk index does not reflect', () => {
+  const tmp = mkTemp('fgos-decision-index-check-');
+  const fgosDir = path.join(tmp, '.fgos');
+  initStore(fgosDir);
+  fs.mkdirSync(path.join(tmp, 'docs', 'decisions'), { recursive: true });
+  fs.writeFileSync(path.join(tmp, 'docs', 'decisions', 'index.md'), '# Decisions index\n\n_No platform/repo-wide decisions recorded yet._\n');
+  addDecision(fgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
+
+  const { passed, message } = checkById('decision-index-stale').check(tmp);
+  assert.equal(passed, false);
+  assert.match(message, /stale/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('decision-index-stale passes when the on-disk index already matches state.decisions', () => {
+  const tmp = mkTemp('fgos-decision-index-check-');
+  const fgosDir = path.join(tmp, '.fgos');
+  initStore(fgosDir);
+  addDecision(fgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
+  fixById('decision-index-stale').fix(tmp);
+
+  const { passed, message } = checkById('decision-index-stale').check(tmp);
+  assert.equal(passed, true);
+  assert.match(message, /up to date/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('decision-index-stale fix regenerates the index via the same path fgos decision-index uses, resolving the drift', () => {
+  const tmp = mkTemp('fgos-decision-index-fix-');
+  const fgosDir = path.join(tmp, '.fgos');
+  initStore(fgosDir);
+  fs.mkdirSync(path.join(tmp, 'docs', 'decisions'), { recursive: true });
+  fs.writeFileSync(path.join(tmp, 'docs', 'decisions', 'index.md'), '# Decisions index\n\n_No platform/repo-wide decisions recorded yet._\n');
+  addDecision(fgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
+  assert.equal(checkById('decision-index-stale').check(tmp).passed, false);
+
+  const { changed, message } = fixById('decision-index-stale').fix(tmp);
+  assert.equal(changed, true);
+  assert.match(message, /regenerated/);
+
+  const after = checkById('decision-index-stale').check(tmp);
+  assert.equal(after.passed, true);
+  const indexContent = fs.readFileSync(path.join(tmp, 'docs', 'decisions', 'index.md'), 'utf8');
+  assert.match(indexContent, /D-ADR9999: example/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('decision-index-stale fix is idempotent -- a second run reports changed:false', () => {
+  const tmp = mkTemp('fgos-decision-index-fix-');
+  const fgosDir = path.join(tmp, '.fgos');
+  initStore(fgosDir);
+  addDecision(fgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
+  fixById('decision-index-stale').fix(tmp);
+  const second = fixById('decision-index-stale').fix(tmp);
+  assert.equal(second.changed, false);
+  assert.match(second.message, /already up to date/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('decision-index-stale check FAILS when the index is missing but state.decisions has real rows to index -- H2 tsk-1lv round-2 regression (a missing index with real decisions to project is drift, not "nothing to check")', () => {
+  const tmp = mkTemp('fgos-decision-index-check-');
+  const fgosDir = path.join(tmp, '.fgos');
+  initStore(fgosDir);
+  addDecision(fgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
+
+  const { passed, message } = checkById('decision-index-stale').check(tmp);
+  assert.equal(passed, false);
+  assert.match(message, /not found/);
+  assert.doesNotMatch(message, /nothing to check/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('decision-index-stale fix reports a graceful skip (changed:false, no throw) when generateDecisionIndex refuses to blank an existing populated index -- B3 tsk-1lv round-2 regression (a thrown StoreError here used to abort fgos doctor --fix entirely, discarding every other fix\'s result)', () => {
+  const tmp = mkTemp('fgos-decision-index-fix-');
+  const populatedFgosDir = path.join(tmp, '.fgos');
+  initStore(populatedFgosDir);
+  addDecision(populatedFgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
+  fixById('decision-index-stale').fix(tmp);
+  const before = fs.readFileSync(path.join(tmp, 'docs', 'decisions', 'index.md'), 'utf8');
+
+  // Simulate the real-world trigger: the .fgos store this check/fix pair
+  // reads from is unreadable/empty relative to an already-populated
+  // on-disk index -- exactly what a fresh clone or a worktree missing
+  // .fgos/ (ADR0020) looks like once this branch's own committed index.md
+  // lands.
+  fs.rmSync(populatedFgosDir, { recursive: true, force: true });
+
+  let result;
+  assert.doesNotThrow(() => {
+    result = fixById('decision-index-stale').fix(tmp);
+  });
+  assert.equal(result.changed, false);
+  assert.match(result.message, /skipped/);
+
+  const after = fs.readFileSync(path.join(tmp, 'docs', 'decisions', 'index.md'), 'utf8');
+  assert.equal(after, before, 'the real index must survive the refused fix untouched');
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
 test('fgos check (CLI e2e) reports changelogNag and appends a checkpoint to changelog-nag-history.jsonl', () => {
   const cwd = mkTemp('fgos-changelog-nag-cli-');
   execFileSync('git', ['init', '-q'], { cwd, encoding: 'utf8' });
@@ -507,10 +861,64 @@ test('fgos check (CLI e2e) reports changelogNag and appends a checkpoint to chan
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
-test('tool-registry-configured always passes — inactive is a clean skip, never a failure', () => {
-  const { passed, message } = checkById('tool-registry-configured').check(process.cwd());
+// tsk-in1-1 D1: a tool provider is declared directly in
+// `runner.executors.<id>` (`.fgos/config.json`), config-edited like every
+// other executor, never through a `fgos tool register` event.
+function declareExecutor(cwd, id, fields) {
+  const configPath = path.join(cwd, '.fgos', 'config.json');
+  const cfg = fs.existsSync(configPath) ? JSON.parse(fs.readFileSync(configPath, 'utf8')) : {};
+  cfg.runner ??= {};
+  cfg.runner.executors ??= {};
+  cfg.runner.executors[id] = fields;
+  // tsk-45f D11 (tsk-34n retired the "capability" singular fallback --
+  // "for" is the only field read now): "for" is catalog-validated against
+  // cfg.runner.capabilities -- declare each entry here so this raw fixture
+  // writer keeps producing a loadable config, same as a real executor
+  // would need.
+  if (Array.isArray(fields.for)) {
+    cfg.runner.capabilities ??= {};
+    for (const purpose of fields.for) {
+      cfg.runner.capabilities[purpose] ??= {};
+    }
+  }
+  fs.writeFileSync(configPath, JSON.stringify(cfg, null, 2));
+}
+
+test('tool-registry-configured passes when no tool-capable executor is declared at all (inactive — a clean skip, never a failure)', () => {
+  const cwd = mkTemp('fgos-tool-registry-inactive-');
+  execFileSync('git', ['init', '-q'], { cwd });
+  spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
+  const { passed, message } = checkById('tool-registry-configured').check(cwd);
   assert.equal(passed, true);
-  assert.equal(typeof message, 'string');
+  assert.match(message, /^inactive/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('tool-registry-configured passes when every declared tool is checked present (full)', () => {
+  const cwd = mkTemp('fgos-tool-registry-full-');
+  execFileSync('git', ['init', '-q'], { cwd });
+  spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
+  declareExecutor(cwd, 'echo-tool', { kind: 'tool', for: ['test-capability'], invocations: [{ via: 'cli', command: 'echo', args: [] }] });
+  const check = spawnSync(process.execPath, [FGOS, 'tool', 'check'], { cwd, encoding: 'utf8' });
+  assert.equal(check.status, 0, check.stderr);
+  const { passed, message } = checkById('tool-registry-configured').check(cwd);
+  assert.equal(passed, true);
+  assert.match(message, /^full/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('tsk-3oa2: tool-registry-configured FAILS when a declared tool is missing or never checked (degraded) -- no longer a silent passed:true', () => {
+  const cwd = mkTemp('fgos-tool-registry-degraded-');
+  execFileSync('git', ['init', '-q'], { cwd });
+  spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
+  declareExecutor(cwd, 'never-checked-tool', { kind: 'tool', for: ['test-capability'], invocations: [{ via: 'cli', command: 'echo', args: [] }] });
+  // Deliberately never runs `fgos tool check` -- the tool stays "unknown",
+  // which classifyRegistryPosture reports as degraded (never inactive).
+  const { passed, message } = checkById('tool-registry-configured').check(cwd);
+  assert.equal(passed, false, 'a declared-but-unverified tool must fail the check, not silently pass as before this fix');
+  assert.match(message, /^degraded/);
+  assert.match(message, /fgos tool check/);
+  fs.rmSync(cwd, { recursive: true, force: true });
 });
 
 test('node-version-and-git passes under the current process (real Node, real git)', () => {
@@ -624,6 +1032,11 @@ test('config-not-stale passes when the existing config already has every default
       gateBypass: { level: 'off' },
       cleanup: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS, leafTtlDays: DEFAULT_CLEANUP_LEAF_TTL_DAYS },
       herdrOrchestrator: DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
+      herdrWebDashboard: DEFAULT_HERDR_WEB_DASHBOARD_SETTINGS,
+      invariantChecks: { commands: DEFAULT_INVARIANT_CHECK_COMMANDS },
+      workerSlots: { ceiling: null },
+      gateway: { port: 4170, token: null },
+      ironLaw: { level: DEFAULT_IRON_LAW_LEVEL },
     }),
   );
   const { passed } = checkById('config-not-stale').check(cwd);
@@ -657,6 +1070,97 @@ test('config-not-stale fails when the existing config is missing a default key',
 // keyed to "is config.gateBypass.level present and a recognized LEVEL",
 // deliberately distinct from config-not-stale's generic "key present at
 // all" scan above (a malformed-but-present level is never "missing").
+
+// ─── invariant-checks-configured (docs/history/tsk-516-approve-reverify-
+// scope/CONTEXT.md D6): same check+configDefault registry shape as
+// gate-bypass below. The check deliberately never EXECUTES the configured
+// commands — they are arbitrary project-supplied shell strings, and doctor
+// is a cheap, side-effect-free diagnosis — so what it can and does answer is
+// the misconfiguration that actually bites: a present-but-unusable section
+// reads as zero commands at return/merge, silently disabling the gate while
+// looking configured.
+
+test('invariant-checks-configured fails when the section is missing entirely', () => {
+  const cwd = mkTemp('doctor-invariant-absent-');
+  const { passed, message } = checkById('invariant-checks-configured').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /invariantChecks section missing/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('invariant-checks-configured fails when the section is present but yields no runnable command', () => {
+  for (const malformed of [{ commands: [] }, { commands: 'not-a-list' }, {}, { commands: ['', '  '] }]) {
+    const cwd = mkTemp('doctor-invariant-malformed-');
+    fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+    fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ invariantChecks: malformed }));
+    const { passed, message } = checkById('invariant-checks-configured').check(cwd);
+    assert.equal(passed, false, `malformed: ${JSON.stringify(malformed)}`);
+    assert.match(message, /present but yields no runnable command/);
+    fs.rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+test('invariant-checks-configured passes and names the configured commands', () => {
+  const cwd = mkTemp('doctor-invariant-ok-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(
+    path.join(cwd, '.fgos', 'config.json'),
+    JSON.stringify({ invariantChecks: { commands: ['node --test test/architecture.test.mjs'] } }),
+  );
+  const { passed, message } = checkById('invariant-checks-configured').check(cwd);
+  assert.equal(passed, true);
+  assert.match(message, /1 command\(s\)/);
+  assert.match(message, /node --test test\/architecture\.test\.mjs/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('worker-slots-ceiling-usable fails when the section is missing entirely', () => {
+  const cwd = mkTemp('doctor-slots-absent-');
+  const { passed, message } = checkById('worker-slots-ceiling-usable').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /workerSlots section missing/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+// The whole point of the check: each of these silently enforces NOTHING,
+// because hasWorkerSlotRoom treats anything that is not a positive integer
+// as "no ceiling configured" and allows every claim. A project reading its
+// own config would believe it is capped.
+test('worker-slots-ceiling-usable fails on a ceiling that silently enforces nothing', () => {
+  for (const ceiling of ['8', 8.5, 0, -1, true, []]) {
+    const cwd = mkTemp('doctor-slots-malformed-');
+    fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+    fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ workerSlots: { ceiling } }));
+    const { passed, message } = checkById('worker-slots-ceiling-usable').check(cwd);
+    assert.equal(passed, false, `malformed ceiling: ${JSON.stringify(ceiling)}`);
+    assert.match(message, /enforces NOTHING/);
+    fs.rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+// `null` is the one non-number that is not a mistake -- it is exactly what
+// `fgos setup` writes, and it means "deliberately unarmed", so it must pass
+// while still saying plainly that nothing is being enforced.
+test('worker-slots-ceiling-usable passes on the unarmed null fgos setup writes, and says so', () => {
+  const cwd = mkTemp('doctor-slots-unarmed-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ workerSlots: { ceiling: null } }));
+  const { passed, message } = checkById('worker-slots-ceiling-usable').check(cwd);
+  assert.equal(passed, true);
+  assert.match(message, /unarmed/);
+  assert.match(message, new RegExp(`recommended: ${DEFAULT_WORKER_SLOT_CEILING}`));
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('worker-slots-ceiling-usable passes and names a real armed ceiling', () => {
+  const cwd = mkTemp('doctor-slots-armed-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ workerSlots: { ceiling: 6 } }));
+  const { passed, message } = checkById('worker-slots-ceiling-usable').check(cwd);
+  assert.equal(passed, true);
+  assert.match(message, /workerSlots\.ceiling = 6/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
 
 test('gate-bypass-configured check fails when the shared file has no gateBypass key at all', () => {
   const cwd = mkTemp('doctor-gatebypass-absent-');
@@ -801,23 +1305,46 @@ test('herdr-launcher-configured check passes when every toggle is a boolean', ()
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
-// ─── config-awareness (docs/history/global-project-config-awareness/ ──────
-// CONTEXT.md D1): always passes (informational, read-only, same contract as
-// tool-registry-configured) -- only the message and `active` distinguish
-// which level is in play. Every case overrides HOME (same pattern the
-// shell-integration-sourced tests above already use) so this never touches
-// the real ~/.fgos/config.json; project config is checked at the temp cwd's
-// own .fgos/config.json, matching describeConfigAwareness's real defaults.
+// ─── herdr-web-dashboard-configured (tsk-48w, D14 of docs/history/herdr-
+// web-dashboard-plan-realignment/CONTEXT.md): the web dashboard's static-
+// serving toggle. Same check-only shape as herdr-launcher-configured
+// above -- config-not-stale already catches the whole section missing;
+// this check adds the one thing that generic staleness scan cannot: a
+// PRESENT but non-boolean value.
 
-function withHome(homeDir, fn) {
-  const prevHome = process.env.HOME;
-  process.env.HOME = homeDir;
-  try {
-    return fn();
-  } finally {
-    process.env.HOME = prevHome;
-  }
-}
+test('herdr-web-dashboard-configured check fails when the shared file has no herdrWebDashboard key at all', () => {
+  const cwd = mkTemp('doctor-herdr-web-dashboard-absent-');
+  const { passed, message } = checkById('herdr-web-dashboard-configured').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /missing/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('herdr-web-dashboard-configured check fails when staticServing is present but not a boolean', () => {
+  const cwd = mkTemp('doctor-herdr-web-dashboard-bad-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(
+    path.join(cwd, '.fgos', 'config.json'),
+    JSON.stringify({ herdrWebDashboard: { staticServing: 'yes' } }),
+  );
+  const { passed, message } = checkById('herdr-web-dashboard-configured').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /staticServing/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('herdr-web-dashboard-configured check passes when staticServing is a boolean', () => {
+  const cwd = mkTemp('doctor-herdr-web-dashboard-ok-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(
+    path.join(cwd, '.fgos', 'config.json'),
+    JSON.stringify({ herdrWebDashboard: { staticServing: true } }),
+  );
+  const { passed, message } = checkById('herdr-web-dashboard-configured').check(cwd);
+  assert.equal(passed, true);
+  assert.match(message, /staticServing=true/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
 
 test('config-awareness is registered on DOCTOR_CHECKS and always passes', () => {
   const { passed, message } = checkById('config-awareness').check(process.cwd());
@@ -960,113 +1487,6 @@ test('main-checkout-hook-wired doctor check reports passed/failed matching mainC
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
-// ─── CLI-level tests: real spawned `fgos setup` / `fgos doctor` ───────────
-
-test('fgos setup (no flags) produces valid wrapEnvelope-shaped JSON on stdout', () => {
-  const cwd = mkTemp('setup-cli-json-');
-  const homeDir = mkTemp('setup-cli-json-home-');
-  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
-  assert.equal(result.status, 0, result.stderr);
-  const envelope = JSON.parse(result.stdout);
-  assert.equal(typeof envelope.contract, 'string');
-  assert.ok('data' in envelope);
-  fs.rmSync(cwd, { recursive: true, force: true });
-  fs.rmSync(homeDir, { recursive: true, force: true });
-});
-
-test('fgos setup wires core.hooksPath to .githooks in a real git checkout, and reports hooksWired: true', () => {
-  const cwd = mkTemp('setup-cli-hooks-');
-  const homeDir = mkTemp('setup-cli-hooks-home-');
-  execFileSync('git', ['init', '-q'], { cwd });
-  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
-  assert.equal(result.status, 0, result.stderr);
-  const envelope = JSON.parse(result.stdout);
-  assert.equal(envelope.data.hooksWired, true);
-  const hooksPath = execFileSync('git', ['config', '--get', 'core.hooksPath'], { cwd, encoding: 'utf8' }).trim();
-  assert.equal(hooksPath, '.githooks');
-  fs.rmSync(cwd, { recursive: true, force: true });
-  fs.rmSync(homeDir, { recursive: true, force: true });
-});
-
-test('fgos setup in a cwd with no .git reports hooksWired: false and does not throw', () => {
-  const cwd = mkTemp('setup-cli-no-git-');
-  const homeDir = mkTemp('setup-cli-no-git-home-');
-  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
-  assert.equal(result.status, 0, result.stderr);
-  const envelope = JSON.parse(result.stdout);
-  assert.equal(envelope.data.hooksWired, false);
-  fs.rmSync(cwd, { recursive: true, force: true });
-  fs.rmSync(homeDir, { recursive: true, force: true });
-});
-
-test('fgos setup leaves a pre-existing custom core.hooksPath untouched — fill-only, never silently repoint someone else\'s hooks', () => {
-  const cwd = mkTemp('setup-cli-custom-hooks-');
-  const homeDir = mkTemp('setup-cli-custom-hooks-home-');
-  execFileSync('git', ['init', '-q'], { cwd });
-  execFileSync('git', ['config', 'core.hooksPath', 'my-own-hooks'], { cwd });
-  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
-  assert.equal(result.status, 0, result.stderr);
-  const envelope = JSON.parse(result.stdout);
-  assert.equal(envelope.data.hooksWired, false);
-  assert.equal(envelope.data.hooksSkippedExisting, 'my-own-hooks');
-  const hooksPath = execFileSync('git', ['config', '--get', 'core.hooksPath'], { cwd, encoding: 'utf8' }).trim();
-  assert.equal(hooksPath, 'my-own-hooks', 'must not be silently repointed to .githooks');
-  fs.rmSync(cwd, { recursive: true, force: true });
-  fs.rmSync(homeDir, { recursive: true, force: true });
-});
-
-test('fgos setup initializes ~/.fgos/config.json with the full default shape (tsk-1ri D1) when it does not exist', () => {
-  const cwd = mkTemp('setup-cli-global-config-');
-  const homeDir = mkTemp('setup-cli-global-config-home-');
-  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
-  assert.equal(result.status, 0, result.stderr);
-  const envelope = JSON.parse(result.stdout);
-  const expectedGlobalPath = path.join(homeDir, '.fgos', 'config.json');
-  assert.equal(envelope.data.globalConfigPath, expectedGlobalPath);
-  assert.equal(envelope.data.globalConfigCreated, true);
-  assert.ok(fs.existsSync(expectedGlobalPath));
-  const written = JSON.parse(fs.readFileSync(expectedGlobalPath, 'utf8'));
-  assert.deepEqual(written.runner, DEFAULT_RUNNER_CONFIG);
-  fs.rmSync(cwd, { recursive: true, force: true });
-  fs.rmSync(homeDir, { recursive: true, force: true });
-});
-
-test('fgos setup run twice does not rewrite an already-complete ~/.fgos/config.json (tsk-1ri D2, fill-missing-only)', () => {
-  const cwd = mkTemp('setup-cli-global-config-repeat-');
-  const homeDir = mkTemp('setup-cli-global-config-repeat-home-');
-  const env = { ...process.env, HOME: homeDir };
-  const first = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env });
-  assert.equal(first.status, 0, first.stderr);
-  const globalPath = JSON.parse(first.stdout).data.globalConfigPath;
-  const mtimeBefore = fs.statSync(globalPath).mtimeMs;
-
-  const second = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env });
-  assert.equal(second.status, 0, second.stderr);
-  const envelope = JSON.parse(second.stdout);
-  assert.equal(envelope.data.globalConfigCreated, false);
-  assert.deepEqual(envelope.data.globalConfigAddedKeys, []);
-  assert.equal(fs.statSync(globalPath).mtimeMs, mtimeBefore, 'must not rewrite a file that already has every default key');
-  fs.rmSync(cwd, { recursive: true, force: true });
-  fs.rmSync(homeDir, { recursive: true, force: true });
-});
-
-test('fgos setup fills a missing default key into an existing ~/.fgos/config.json without touching a key the user already customized (tsk-1ri D1)', () => {
-  const cwd = mkTemp('setup-cli-global-config-fill-');
-  const homeDir = mkTemp('setup-cli-global-config-fill-home-');
-  const globalDir = path.join(homeDir, '.fgos');
-  fs.mkdirSync(globalDir, { recursive: true });
-  const globalPath = path.join(globalDir, 'config.json');
-  const customized = { runner: { ...DEFAULT_RUNNER_CONFIG, executor: { command: 'my-custom-cli', args: ['{prompt}'] } } };
-  fs.writeFileSync(globalPath, `${JSON.stringify(customized, null, 2)}\n`);
-
-  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
-  assert.equal(result.status, 0, result.stderr);
-  const written = JSON.parse(fs.readFileSync(globalPath, 'utf8'));
-  assert.equal(written.runner.executor.command, 'my-custom-cli', 'a value the user already customized must never be overwritten');
-  fs.rmSync(cwd, { recursive: true, force: true });
-  fs.rmSync(homeDir, { recursive: true, force: true });
-});
-
 test('fgos doctor (no flags) produces valid wrapEnvelope-shaped JSON on stdout', () => {
   const cwd = mkTemp('doctor-cli-json-');
   const homeDir = mkTemp('doctor-cli-json-home-');
@@ -1091,18 +1511,6 @@ test('fgos doctor --pretty prints colored ANSI text, not JSON', () => {
   fs.rmSync(homeDir, { recursive: true, force: true });
 });
 
-test('fgos setup --pretty prints colored ANSI text describing what it did, not JSON', () => {
-  const cwd = mkTemp('setup-cli-pretty-');
-  const homeDir = mkTemp('setup-cli-pretty-home-');
-  const result = spawnSync(process.execPath, [FGOS, 'setup', '--pretty'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
-  assert.equal(result.status, 0, result.stderr);
-  assert.ok(result.stdout.includes('\x1b['), 'expected ANSI escape codes in --pretty output');
-  assert.throws(() => JSON.parse(result.stdout), 'expected --pretty output to NOT be valid JSON');
-  assert.ok(result.stdout.includes('.fgos/config.json'), 'expected --pretty output to describe the config file it touched');
-  fs.rmSync(cwd, { recursive: true, force: true });
-  fs.rmSync(homeDir, { recursive: true, force: true });
-});
-
 test('fgos doctor against a fresh cwd with no runner config never creates the shared config file (read-only proof)', () => {
   const cwd = mkTemp('doctor-cli-readonly-');
   const homeDir = mkTemp('doctor-cli-readonly-home-');
@@ -1117,19 +1525,6 @@ test('fgos doctor against a fresh cwd with no runner config never creates the sh
   fs.rmSync(cwd, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });
 });
-
-// ─── D2/D3: the shell-integration path is canonicalized to the main checkout ─
-
-function initRepo(prefix) {
-  const dir = mkTemp(prefix);
-  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: dir });
-  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: dir });
-  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: dir });
-  fs.writeFileSync(path.join(dir, 'seed.txt'), 'seed\n');
-  execFileSync('git', ['add', 'seed.txt'], { cwd: dir });
-  execFileSync('git', ['commit', '-qm', 'seed'], { cwd: dir });
-  return dir;
-}
 
 test('resolveMainCheckout from inside a linked worktree resolves the main checkout, not the worktree', () => {
   const main = initRepo('checks-main-');
@@ -1233,65 +1628,6 @@ test('shell-integration-sourced still passes when every rc file has only the liv
     else process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT = prevProbe;
     fs.rmSync(homeDir, { recursive: true, force: true });
   }
-});
-
-test('setup from a copy of fgos that is not in a git checkout declines the rc write and says why', () => {
-  // The `/tmp/tmp.XXXXXXXX` shape observed in the wild: an unpacked copy with
-  // no `.git` of its own. Its path is ephemeral, so writing it into a shell
-  // profile leaves a `source` line that outlives the directory.
-  const copyRoot = mkTemp('checks-nongit-copy-');
-  const repoRoot = path.resolve(__dirname, '../..');
-  for (const entry of ['bin', 'src', 'scripts', 'package.json']) {
-    fs.cpSync(path.join(repoRoot, entry), path.join(copyRoot, entry), { recursive: true });
-  }
-  assert.equal(fs.existsSync(path.join(copyRoot, '.git')), false);
-
-  const homeDir = mkTemp('checks-nongit-home-');
-  const rcFile = path.join(homeDir, '.bashrc');
-  fs.writeFileSync(rcFile, 'echo hi\n');
-
-  const result = spawnSync(process.execPath, [path.join(copyRoot, 'bin', 'fgos.mjs'), 'setup'], {
-    cwd: copyRoot,
-    encoding: 'utf8',
-    env: { ...process.env, HOME: homeDir },
-  });
-
-  assert.equal(result.status, 0, `setup failed: ${result.stderr}`);
-  const { data } = JSON.parse(result.stdout);
-  assert.deepEqual(data.rcFilesInserted, []);
-  assert.deepEqual(data.rcFilesAlreadyConfigured, []);
-  assert.ok(
-    /not inside a git checkout/.test(data.rcWriteDeclinedReason ?? ''),
-    `expected a stated reason, got: ${JSON.stringify(data.rcWriteDeclinedReason)}`,
-  );
-  // The whole point: nothing was appended to the profile.
-  assert.equal(fs.readFileSync(rcFile, 'utf8'), 'echo hi\n');
-  // Setup's other work still happened.
-  assert.equal(fs.existsSync(path.join(copyRoot, '.fgos', 'config.json')), true);
-
-  fs.rmSync(copyRoot, { recursive: true, force: true });
-  fs.rmSync(homeDir, { recursive: true, force: true });
-});
-
-test('setup from a real checkout still writes the rc line and reports no declined reason', () => {
-  const homeDir = mkTemp('checks-git-home-');
-  fs.writeFileSync(path.join(homeDir, '.bashrc'), 'echo hi\n');
-  const cwd = initRepo('checks-git-cwd-');
-
-  const result = spawnSync(process.execPath, [FGOS, 'setup'], {
-    cwd,
-    encoding: 'utf8',
-    env: { ...process.env, HOME: homeDir },
-  });
-
-  assert.equal(result.status, 0, `setup failed: ${result.stderr}`);
-  const { data } = JSON.parse(result.stdout);
-  assert.equal(data.rcWriteDeclinedReason, undefined);
-  assert.deepEqual(data.rcFilesInserted, [path.join(homeDir, '.bashrc')]);
-  assert.ok(fs.readFileSync(path.join(homeDir, '.bashrc'), 'utf8').includes('fgos-shell-integration.sh'));
-
-  fs.rmSync(cwd, { recursive: true, force: true });
-  fs.rmSync(homeDir, { recursive: true, force: true });
 });
 
 test('shell-integration-sourced samples dead paths instead of printing all of them', () => {

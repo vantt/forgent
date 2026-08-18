@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>herdr - Sign In</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Plus+Jakarta+Sans:wght@100..900&display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#d2bbff",
+                    "surface-container-highest": "#d9e3f6",
+                    "on-tertiary": "#ffffff",
+                    "primary-fixed": "#eaddff",
+                    "on-secondary-fixed": "#002113",
+                    "tertiary": "#004ba4",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-container": "#ede0ff",
+                    "on-surface": "#121c2a",
+                    "surface-container-low": "#eff4ff",
+                    "outline-variant": "#ccc3d8",
+                    "on-secondary-fixed-variant": "#005236",
+                    "secondary-container": "#6cf8bb",
+                    "on-background": "#121c2a",
+                    "primary": "#630ed4",
+                    "on-secondary-container": "#00714d",
+                    "tertiary-fixed-dim": "#adc6ff",
+                    "inverse-surface": "#27313f",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-surface-variant": "#4a4455",
+                    "on-primary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "surface-container": "#e6eeff",
+                    "on-error": "#ffffff",
+                    "on-primary-fixed-variant": "#5a00c6",
+                    "tertiary-fixed": "#d8e2ff",
+                    "on-primary-fixed": "#25005a",
+                    "on-tertiary-fixed-variant": "#004395",
+                    "surface-bright": "#f8f9ff",
+                    "on-secondary": "#ffffff",
+                    "surface": "#f8f9ff",
+                    "surface-dim": "#d0dbed",
+                    "inverse-primary": "#d2bbff",
+                    "on-tertiary-container": "#dce5ff",
+                    "outline": "#7b7487",
+                    "surface-container-high": "#dee9fc",
+                    "background": "#f8f9ff",
+                    "surface-variant": "#d9e3f6",
+                    "surface-tint": "#732ee4",
+                    "on-error-container": "#93000a",
+                    "tertiary-container": "#0062d2",
+                    "error": "#ba1a1a",
+                    "secondary-fixed": "#6ffbbe",
+                    "on-tertiary-fixed": "#001a42",
+                    "secondary": "#006c49",
+                    "primary-container": "#7c3aed",
+                    "secondary-fixed-dim": "#4edea3"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "sm": "8px",
+                    "gutter": "24px",
+                    "lg": "24px",
+                    "margin-desktop": "32px",
+                    "margin-mobile": "16px",
+                    "md": "16px",
+                    "xs": "4px",
+                    "xl": "32px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Inter"],
+                    "headline-lg-mobile": ["Plus Jakarta Sans"],
+                    "label-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "title-lg": ["Inter"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "display": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "title-lg": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+      body {
+        background-color: #f9fafb; /* Level 0 Floor */
+      }
+      .card-shadow {
+        box-shadow: 0px 1px 3px rgba(0,0,0,0.05), 0px 10px 15px -3px rgba(0,0,0,0.03);
+      }
+      .input-glow:focus-within {
+        border-color: #630ed4;
+        box-shadow: 0 0 0 3px rgba(99, 14, 212, 0.15);
+      }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center font-body-md text-on-surface">
+<!-- Main Container -->
+<main class="w-full max-w-[400px] px-margin-mobile md:px-0 flex flex-col items-center z-10">
+<!-- Brand Header -->
+<div class="mb-xl text-center w-full">
+<h1 class="font-display text-display text-primary tracking-tight">herdr</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-xs">fgOS work dashboard</p>
+</div>
+<!-- Login Card -->
+<div class="bg-surface-container-lowest rounded-xl p-lg md:p-margin-desktop w-full card-shadow border border-[#f3f4f6]">
+<form class="flex flex-col gap-lg" onsubmit="event.preventDefault(); document.getElementById('error-message').classList.remove('hidden');">
+<!-- Input Field Group -->
+<div class="flex flex-col gap-sm">
+<label class="font-label-md text-label-md text-on-surface" for="access-token">Access token</label>
+<div class="relative input-glow rounded transition-shadow duration-200">
+<input class="w-full h-[48px] px-md border border-[#e5e7eb] rounded outline-none font-body-lg text-body-lg bg-surface-container-lowest text-on-surface placeholder:text-outline-variant focus:border-transparent focus:ring-0" id="access-token" name="access-token" placeholder="••••••••" required="" type="password"/>
+</div>
+</div>
+<!-- Action Button -->
+<button class="w-full h-[48px] bg-primary-container text-on-primary rounded-lg font-title-lg text-title-lg transition-all duration-200 hover:opacity-90 hover:shadow-md flex items-center justify-center gap-sm mt-sm" type="submit">
+                    Sign in
+                </button>
+<!-- Hidden Error State -->
+<div class="hidden text-center transition-opacity duration-300" id="error-message">
+<p class="font-label-md text-label-md text-error flex items-center justify-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">error</span>
+                        Sign-in failed. Please check your token.
+                    </p>
+</div>
+</form>
+</div>
+</main>
+<!-- Contextual Footer (Transactional Page - no global nav) -->
+<footer class="fixed bottom-0 w-full flex flex-col items-center pb-lg px-margin-mobile">
+<p class="font-label-sm text-label-sm text-outline tracking-wider uppercase opacity-60">Reachable beyond this machine.</p>
+</footer>
+</body></html>

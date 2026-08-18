@@ -29,7 +29,7 @@ by 3 loop constructs = **-16 call sites** (19 - 3).
 
 Also checked the other 6 test files the plan named as scan targets
 (`test/state/replay.test.mjs`, `test/runner/dispatch.test.mjs`,
-`test/runner/loop.test.mjs`, `test/intake/decompose.test.mjs`,
+`test/runner/loop.test.mjs`, `test/intake/plan.test.mjs`,
 `test/intake/discovery.test.mjs`, `test/state/store.test.mjs`) for the same
 kind of duplication — none dominate the way `fgos.test.mjs` does (34-63
 tests each) and none showed a comparable repeated-shape cluster worth

@@ -1,6 +1,6 @@
 # Plan: platform-agnostic canonical root for forgent's own agent definitions (tsk-slq)
 
-Status: built (D5 relocated the canonical root mid-`executing`, D6 registered the new dependency + fixed `verify`; see Revision notes below). Final paths: `agents/fgos-placeholder.yaml`, `scripts/project-agents.mjs` (not `project-agent-definitions.mjs` as first drafted — renamed to match the engine's own `judgeDiscovery`-generated `verify` command literally, per fgos-code-implement's "run the verify command exactly as recorded" rule). Final `verify`: `npm install && npm test && node scripts/project-agents.mjs && git diff --exit-code -- .claude/agents/`.
+Status: built (D5 relocated the canonical root mid-`executing`, D6 registered the new dependency + fixed `verify`; see Revision notes below). Final paths: `agents/fgos-placeholder.yaml`, `scripts/project-agents.mjs` (not `project-agent-definitions.mjs` as first drafted — renamed to match the engine's own `judgeDiscovery`-generated `verify` command literally, per fgos-coding-implement's "run the verify command exactly as recorded" rule). Final `verify`: `npm install && npm test && node scripts/project-agents.mjs && git diff --exit-code -- .claude/agents/`.
 Decisions: `docs/history/agent-executor-agent-definitions/CONTEXT.md` (D1, D2, D3, D4, D5, D6).
 
 ## Revision note 3 (post-executing, D6)
@@ -16,7 +16,7 @@ disposable detached-worktree goal-check never runs `npm install`, so
 ## Revision note 2 (post-executing)
 
 D5 moved the canonical root from `.fgos/agents/<name>.yaml` to
-`agents/<name>.yaml` — discovered live during `fgos-code-implement`, not
+`agents/<name>.yaml` — discovered live during `fgos-coding-implement`, not
 predicted here: `.fgos/` is structurally reserved for runner state
 (`src/runner/worktree.mjs` wipes it on every worktree checkout,
 `src/runner/merge.mjs` rejects any merge touching it). Every `.fgos/agents/`
@@ -27,11 +27,11 @@ the Status line above are what actually shipped. See `CONTEXT.md`'s
 ## Revision note (post-validating)
 
 The first pass of this plan assumed a hand-rolled YAML parser without
-verifying the repo's dependency posture. `fgos-validating` FAILed that
+verifying the repo's dependency posture. `fgos-coding-validating` FAILed that
 assumption: `package.json` has zero `dependencies`/`devDependencies` today
 (confirmed by reading it) and no built-in Node YAML support exists. This
 was material (changes data shape / dependency footprint), so it went back
-through `fgos-exploring` to lock **D4**: keep the `.yaml` extension as
+through `fgos-coding-exploring` to lock **D4**: keep the `.yaml` extension as
 originally named, and take on a real YAML npm dependency — forgent's
 first-ever — by explicit user choice. Every section below reflects D4;
 `git log`/diff between the two `plan.md` commits shows exactly what
@@ -125,7 +125,7 @@ acceptance criteria explicitly require.
 
 ## Risk map
 
-| component | risk | proof point (carried to `fgos-validating`) |
+| component | risk | proof point (carried to `fgos-coding-validating`) |
 |---|---|---|
 | `tool-scope` → `tools:` frontmatter mapping (D1) | high (security) | test asserting the projected `.md`'s `tools:` field exactly matches the source yaml's `tool-scope` list — no silent add, no silent drop |
 | Projection idempotency | medium | test running the script twice over an unchanged source, asserting byte-identical output (acceptance's own wording) |

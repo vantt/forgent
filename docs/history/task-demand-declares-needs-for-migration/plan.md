@@ -17,7 +17,7 @@ not re-derived from a hand-off that never happened.
 `tsk-1o7` carries no `docsRef`/`CONTEXT.md` of its own. Its full description
 is a condensed copy of §7.2 of `docs/history/dispatch-concept-boundary/
 DISCUSSION.md` (owned by `tsk-5td`, anchor `#task-demand-declares`) — a
-`fgos-coding-shaping` document, not a `fgos-exploring` one. That doc's own
+`fgos-coding-shaping` document, not a `fgos-coding-exploring` one. That doc's own
 §4 ("Quyết định đã chốt") is the locked-decision source this plan cites,
 since `fgos-clarifying` already found this item's intent clear enough to
 skip a Socratic pass:

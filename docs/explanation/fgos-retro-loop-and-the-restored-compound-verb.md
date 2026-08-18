@@ -29,13 +29,13 @@ items the sweep surfaces: `/fgOS:retro-loop`.
 
 ## The synthesis step it was supposed to wrap didn't actually work
 
-Planning for the retargeted item assumed `fgos-compounding` (the skill
+Planning for the retargeted item assumed `fgos-coding-compounding` (the skill
 that classifies a Diataxis quadrant and writes the end-user document)
 already worked, and only needed a stale trigger-description fixed — it
 still said "runs while stage reads `compound-learn`", a stage retired
 weeks earlier.
 
-`fgos-validating`'s reality gate caught something bigger: `fgos-
+`fgos-coding-validating`'s reality gate caught something bigger: `fgos-
 compounding`'s own producer step —
 `fgos compound <id> --doc-type <quadrant> --doc-path <path>` — called a
 CLI verb that no longer existed. `git log -S"case 'compound'" --
@@ -49,7 +49,7 @@ That commit's own message explained the intended replacement: "Rewrites
 every test... to use `addOutcome` directly for docType/docPath capture."
 But `addOutcome` (`src/state/store.mjs`) is a plain JS function, reachable
 from test code via a direct import — no CLI verb ever exposed it to a
-real session. So the one thing `fgos-compounding` needs to do to finish
+real session. So the one thing `fgos-coding-compounding` needs to do to finish
 its job had no command a session could actually run. Confirmed live: 24
 items sat at `delivered` and 5 at `retrospective` with nothing sweeping
 or synthesizing them, because the tooling to do the second half was gone.
@@ -78,7 +78,7 @@ and the `retro-next`/`retro-loop` skill pair mirror `cleanup-loop`'s file
 shape closely. One deliberate difference: `cleanup-next`'s own per-item
 step is a purely mechanical TTL/content/merge check, so `cleanup-loop`
 never needed an iteration cap. `retro-next`'s own per-item step runs
-`fgos-compounding` — real LLM judgment, the same cost profile
+`fgos-coding-compounding` — real LLM judgment, the same cost profile
 `discover-loop`'s cap-of-15 exists to bound. `retro-loop` follows that
 shape instead: pool-empty, lock-timeout, or a 15-iteration cap, whichever
 comes first.

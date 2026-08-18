@@ -82,14 +82,14 @@ skipped.
 version of this same override. The second-pass judge wanted the verify to
 concretely check that `description` ends up non-empty — a fair ask in
 principle — but writing the concrete test assertions for that belongs to
-`fgos-planning`, not `fgos-exploring`:
+`fgos-coding-planning`, not `fgos-coding-exploring`:
 
 > "Verify chưa xác định phải kiểm được description non-empty, đúng như
-> second-pass nói. Nhưng viết test cụ thể là việc của `fgos-planning`,
-> không phải `fgos-exploring` (SKILL.md: 'do not research implementation').
+> second-pass nói. Nhưng viết test cụ thể là việc của `fgos-coding-planning`,
+> không phải `fgos-coding-exploring` (SKILL.md: 'do not research implementation').
 > Force qua, xem quyết định log."
 
-`fgos-exploring`'s own `SKILL.md` draws this boundary directly: locking
+`fgos-coding-exploring`'s own `SKILL.md` draws this boundary directly: locking
 product decisions is exploring's job; researching and writing the
 implementation-level specifics (including exact test shape) is planning's.
 When a second-pass dispute is correct about *what* the verify should

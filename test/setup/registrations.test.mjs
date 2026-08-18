@@ -239,15 +239,154 @@ test('plugin-skill-cli-reachable passes when no local bin/fgos.mjs exists but fg
   }
 });
 
-test('plugin-skill-cli-reachable fails when neither a local bin/fgos.mjs nor a PATH install exists', () => {
+test('plugin-skill-cli-reachable fails when neither a local bin/fgos.mjs, a project-local install, a cached global path, nor a live PATH install exists', () => {
   const dir = mkTempDir();
+  // HOME override (tsk-2qc-1): resolveFgosBin's tier-3 cache reads
+  // ~/.fgos/config.json by default -- without this override, a real
+  // cached bin.globalFgosPath left on the machine running this test
+  // (from a real `fgos setup`/`doctor --fix` run) would make this check
+  // pass for the wrong reason. Same isolation discipline the
+  // shell-integration-sourced tests already apply via HOME (checks.test.mjs).
+  const homeDir = mkTempDir();
   const originalPath = process.env.PATH;
+  const originalHome = process.env.HOME;
   process.env.PATH = '';
+  process.env.HOME = homeDir;
   try {
     const result = pluginSkillCliReachableCheck()(dir);
     assert.equal(result.passed, false);
     assert.match(result.message, /no bin\/fgos\.mjs at .* and no global fgos install on PATH/);
   } finally {
     process.env.PATH = originalPath;
+    process.env.HOME = originalHome;
   }
+});
+
+// ─── cli-version-visible (tsk-2ej): the running build's own package
+// version/commit/verb-set resolve cleanly -- the "always green on a
+// healthy build" self-check pattern node-version-and-git already uses, so
+// fgos doctor's own report always surfaces the first thing worth comparing
+// when a verb comes back "unknown" on some other machine.
+
+function cliVersionVisibleCheck() {
+  const entry = DOCTOR_CHECKS.find((c) => c.id === 'cli-version-visible');
+  assert.ok(entry, 'cli-version-visible must be registered');
+  return entry.check;
+}
+
+test('cli-version-visible passes and its message embeds the resolved packageVersion', () => {
+  const result = cliVersionVisibleCheck()();
+  assert.equal(result.passed, true);
+  const { version: packageVersion } = JSON.parse(fs.readFileSync(new URL('../../package.json', import.meta.url), 'utf8'));
+  assert.ok(result.message.includes(packageVersion), `message "${result.message}" missing packageVersion "${packageVersion}"`);
+});
+
+// ─── plugin-dev-skills-packaged (tsk-32b): confirms the coding-domain
+// dev-skills plugin-skill-cli-reachable never checked (fgos-coding-driving,
+// fgos-routing, ...) are actually present in plugins/fgOS/skills/, so a
+// maintainer who adds/renames one in .claude/skills/ but forgets to copy it
+// forward gets caught at `fgos doctor` time instead of shipping silently.
+
+function pluginDevSkillsPackagedCheck() {
+  const entry = DOCTOR_CHECKS.find((c) => c.id === 'plugin-dev-skills-packaged');
+  assert.ok(entry, 'plugin-dev-skills-packaged must be registered');
+  return entry.check;
+}
+
+test('plugin-dev-skills-packaged passes cleanly when the project has no .claude/skills or plugins/fgOS/skills at all', () => {
+  const dir = mkTempDir();
+  const result = pluginDevSkillsPackagedCheck()(dir);
+  assert.equal(result.passed, true);
+  assert.match(result.message, /not a forgent checkout/);
+});
+
+test('plugin-dev-skills-packaged passes when every .claude/skills/fgos-* dev-skill has a matching plugins/fgOS/skills/ copy', () => {
+  const dir = mkTempDir();
+  fs.mkdirSync(path.join(dir, '.claude', 'skills', 'fgos-example'), { recursive: true });
+  fs.writeFileSync(path.join(dir, '.claude', 'skills', 'fgos-example', 'SKILL.md'), '# example\n');
+  fs.mkdirSync(path.join(dir, 'plugins', 'fgOS', 'skills', 'fgos-example'), { recursive: true });
+  fs.writeFileSync(path.join(dir, 'plugins', 'fgOS', 'skills', 'fgos-example', 'SKILL.md'), '# example\n');
+  const result = pluginDevSkillsPackagedCheck()(dir);
+  assert.equal(result.passed, true);
+  assert.match(result.message, /all 1 coding-domain dev-skills are packaged/);
+});
+
+test('plugin-dev-skills-packaged fails and names any .claude/skills/fgos-* dev-skill missing from plugins/fgOS/skills/', () => {
+  const dir = mkTempDir();
+  fs.mkdirSync(path.join(dir, '.claude', 'skills', 'fgos-example'), { recursive: true });
+  fs.writeFileSync(path.join(dir, '.claude', 'skills', 'fgos-example', 'SKILL.md'), '# example\n');
+  fs.mkdirSync(path.join(dir, 'plugins', 'fgOS', 'skills'), { recursive: true });
+  const result = pluginDevSkillsPackagedCheck()(dir);
+  assert.equal(result.passed, false);
+  assert.match(result.message, /fgos-example/);
+  assert.match(result.message, /Unknown skill/);
+});
+
+// ─── gateway-token-configured (tsk-4r1, found by the gateway audit,
+// Finding 9): the gateway's own token lives in ~/.fgos/config.json (home),
+// never `cwd`'s -- every test below overrides HOME so it never touches
+// this machine's real home config, mirroring plugin-skill-cli-reachable's
+// own HOME-override discipline above.
+
+function gatewayTokenConfiguredCheck() {
+  const entry = DOCTOR_CHECKS.find((c) => c.id === 'gateway-token-configured');
+  assert.ok(entry, 'gateway-token-configured must be registered');
+  return entry.check;
+}
+
+function gatewayTokenConfiguredFix() {
+  const entry = FIX_REGISTRATIONS.find((f) => f.id === 'gateway-token-configured');
+  assert.ok(entry, 'gateway-token-configured fix must be registered');
+  return entry.fix;
+}
+
+test('gateway-token-configured check fails when HOME has no gateway.token, and fix provisions a real one the check then accepts', () => {
+  const homeDir = mkTempDir();
+  const originalHome = process.env.HOME;
+  process.env.HOME = homeDir;
+  try {
+    const before = gatewayTokenConfiguredCheck()();
+    assert.equal(before.passed, false);
+    assert.match(before.message, /gateway\.token missing/);
+    assert.match(before.message, /fgos doctor --fix/);
+
+    const fixResult = gatewayTokenConfiguredFix()();
+    assert.equal(fixResult.changed, true);
+
+    const written = JSON.parse(fs.readFileSync(path.join(homeDir, '.fgos', 'config.json'), 'utf8'));
+    assert.equal(typeof written.gateway.token, 'string');
+    assert.ok(written.gateway.token.length >= 32, `expected a high-entropy token, got ${written.gateway.token.length} chars`);
+
+    const after = gatewayTokenConfiguredCheck()();
+    assert.equal(after.passed, true);
+  } finally {
+    process.env.HOME = originalHome;
+  }
+});
+
+test('gateway-token-configured fix is idempotent — an existing token is never rotated out from under a client that already has it', () => {
+  const homeDir = mkTempDir();
+  const originalHome = process.env.HOME;
+  process.env.HOME = homeDir;
+  try {
+    fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
+    fs.writeFileSync(
+      path.join(homeDir, '.fgos', 'config.json'),
+      JSON.stringify({ gateway: { port: 4170, token: 'already-set-token' } }),
+    );
+    const fixResult = gatewayTokenConfiguredFix()();
+    assert.equal(fixResult.changed, false);
+    const written = JSON.parse(fs.readFileSync(path.join(homeDir, '.fgos', 'config.json'), 'utf8'));
+    assert.equal(written.gateway.token, 'already-set-token');
+  } finally {
+    process.env.HOME = originalHome;
+  }
+});
+
+test('the gateway config-default is registered under the "gateway" key with port and an unarmed null token', () => {
+  const entry = CONFIG_DEFAULT_REGISTRATIONS.find((c) => c.id === 'gateway');
+  assert.ok(entry, 'the gateway config-default is missing from CONFIG_DEFAULT_REGISTRATIONS');
+  assert.equal(entry.key, 'gateway');
+  assert.equal(entry.shape.port, 4170);
+  assert.equal(entry.shape.token, null);
 });

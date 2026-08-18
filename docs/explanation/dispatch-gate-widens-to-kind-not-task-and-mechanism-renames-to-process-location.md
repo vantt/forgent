@@ -9,7 +9,7 @@ title: Why the dispatch gate widened to `kind !== 'task'` and mechanism values r
 ### The gate predicate was too narrow
 
 `dispatch.mjs`'s presence-check and cross-provider-check gate used `kind
-=== 'cli'` to decide which capacities got checked. That predicate quietly
+=== 'cli'` to decide which executors got checked. That predicate quietly
 let every other non-`task` kind — `mcp`, `skill`, `http`, `binary` —
 dispatch with **zero** presence check and **zero** cross-provider check.
 The fix widens the gate to `kind !== 'task'`: everything that isn't a
@@ -52,7 +52,7 @@ Changing the returned strings is a breaking change for every consumer
 comparing against the literal `'native'`/`'cli-spawn'` values — not just
 `dispatch.mjs` itself. The fix required grepping every comparison site,
 including the `dispatch.mjs decide` CLI's own JSON output
-(`{"mechanism": ...}`) and `.claude/skills/_shared/capacity-dispatch-fallback.md`
+(`{"mechanism": ...}`) and `.claude/skills/_shared/executor-dispatch-fallback.md`
 Step B.5, which branches on exactly these two strings. All of these had
 to move to the new values in the same change — a rename that misses one
 comparison site doesn't fail loudly, it just makes that one site branch
@@ -61,8 +61,8 @@ on a string that no longer appears anywhere in the real output.
 ## Sequencing with related work
 
 This item was sequenced to land before or together with `tsk-2ie5`,
-since `tsk-2ie5` is expected to be the first item to create a capacity
+since `tsk-2ie5` is expected to be the first item to create a executor
 `kind` outside `cli` — exactly the case the widened gate exists to catch.
 Landing the gate widening first (or alongside) means that first
-non-`cli` capacity is gated from the moment it exists, rather than
+non-`cli` executor is gated from the moment it exists, rather than
 repeating the same silent-gap history this item itself was fixing.

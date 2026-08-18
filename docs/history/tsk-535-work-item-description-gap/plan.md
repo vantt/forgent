@@ -14,7 +14,7 @@ data, not auth/data-loss/audit/external-provider/removed-validation — so
 
 ## Proof surface (whole item)
 
-`node --test test/cli/fgos.test.mjs test/intake/decompose.test.mjs
+`node --test test/cli/fgos.test.mjs test/intake/plan.test.mjs
 test/runner/loop.test.mjs` — real, runnable, verified passing today
 (52/52 in `loop.test.mjs` alone, confirmed this session; the other two
 files' current counts are already proven green earlier this session via
@@ -63,7 +63,7 @@ slip back into the broken count while the backfill runs).
    handler, same pattern `add --title`'s own id-generation step already
    uses.
 
-2. **Decompose-child `description` (D2).** `src/intake/decompose.mjs`'s
+2. **Decompose-child `description` (D2).** `src/intake/plan.mjs`'s
    `addWork` loop (~line 988, right where tsk-3xd's own `action` field was
    just added) gets one more field: `description: child.title`. No schema
    change — `description` already exists as an optional field
@@ -92,13 +92,13 @@ slip back into the broken count while the backfill runs).
    state item) and its event-log writes.
 
 5. **Update the 3 live in-repo examples that would break under D1
-   (`fgos-validating` finding, mid-planning).** Real evidence: these
+   (`fgos-coding-validating` finding, mid-planning).** Real evidence: these
    `fgos add --title ...` examples are executable prose a session
    literally copies and runs — none currently pass `--description`, so
    D1's required flag would break every one of them:
-   - `.claude/skills/fgos-exploring/SKILL.md:212` (docsRef-creation
+   - `.claude/skills/fgos-coding-exploring/SKILL.md:212` (docsRef-creation
      example)
-   - `.claude/skills/fgos-planning/SKILL.md:193` (split-child creation
+   - `.claude/skills/fgos-coding-planning/SKILL.md:193` (split-child creation
      example — this very skill's own canonical `fgos add --parent`
      command)
    - `docs/how-to/set-or-clear-a-work-items-parent-lineage-via-cli.md:24`
@@ -127,23 +127,23 @@ rests on the write-before-backfill dependency above, not graph priority.
 
 ## Risk map
 
-| Component | Risk | Proof point (for fgos-validating) |
+| Component | Risk | Proof point (for fgos-coding-validating) |
 |---|---|---|
 | `fgos add --description` required, CLI-handler-only enforcement | MEDIUM — a breaking CLI change; any existing script/caller that invokes `add` without `--description` now fails | Unit test: `add` without `--description` exits non-zero with a clear message (mirrors existing `add` without `--title` test in `test/cli/fgos.test.mjs`); `add` WITH `--description` succeeds and the item carries it. |
 | `description` stays schema-optional (not added to `validateWorkShape`) | LOW — the two other legitimate callers (`loop.mjs` before D4's own fix lands, `promote-to-component`) keep working unchanged | Existing `test/state/work.test.mjs` coverage for `validateWork` continues passing unmodified — no new assertion needed here, only that nothing regresses. |
 | Decompose-child `description = title` | LOW — mechanical call-site addition, same shape as tsk-3xd's own `action: child.action` line it sits beside | Unit test mirroring tsk-3xd's own `resolveDecompose writes action on every child` test: a decompose child's `description` equals its `title` after `resolveDecompose`. |
 | Discovered-work fallback (`block.description \|\| block.title`) | MEDIUM — touches a real runtime path (`loop.mjs`'s discovered-work capture), and must not regress the common case where a worker DOES supply a real description | Two tests: worker supplies `description` → item carries the worker's own text unchanged (regression guard); worker omits it → item carries `title` instead of `undefined`. |
-| Backfill (112 items, `description = title` via `edit`) | MEDIUM — writes to all 112 items in one pass; a bug corrupts a large slice of the live backlog in one run, same class of risk tsk-4zg's own risk map named for its re-derive pass | `fgos-validating`: confirm the backfill goes through the `edit` door (event-log append, `rebuild()` recovery intact) and dry-run the diff (list of ids + old/new description) before writing, same "dry-run first" discipline tsk-4zg's own plan.md used for its re-derive phase. |
+| Backfill (112 items, `description = title` via `edit`) | MEDIUM — writes to all 112 items in one pass; a bug corrupts a large slice of the live backlog in one run, same class of risk tsk-4zg's own risk map named for its re-derive pass | `fgos-coding-validating`: confirm the backfill goes through the `edit` door (event-log append, `rebuild()` recovery intact) and dry-run the diff (list of ids + old/new description) before writing, same "dry-run first" discipline tsk-4zg's own plan.md used for its re-derive phase. |
 | 3 live in-repo doc examples missing `--description` (piece 5) | LOW — pure prose edits, no runtime behavior, no test coverage exists or is needed for doc text | Direct read of each file post-edit: the example command now includes a real `--description` value. |
 
-## Assumptions (unproven, flagged for fgos-validating)
+## Assumptions (unproven, flagged for fgos-coding-validating)
 
 - ~~No existing script or CI job outside this repo invokes `fgos add`
   without `--description`~~ — **checked mid-planning, real evidence
   found**: 3 in-repo files DID rely on the old optional shape (piece 5
   above, added as a direct result). Whether any caller OUTSIDE this repo
   exists remains genuinely unverifiable from inside it — flagged as the
-  one residual unproven piece of this assumption for `fgos-validating`.
+  one residual unproven piece of this assumption for `fgos-coding-validating`.
 - `block.title` is always a reasonable stand-in for `description` when a
   worker omits the latter — same reasoning D2 already accepted for
   decompose children (mirrors that precedent rather than re-deriving it).

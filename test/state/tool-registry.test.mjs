@@ -3,13 +3,11 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import net from 'node:net';
 import { execSync } from 'node:child_process';
 import {
-  ToolRegistryError,
   KINDS,
   normalizeCapability,
-  validateToolRegistration,
+  toolsFromExecutors,
   probeTool,
   readLocalStatus,
   writeLocalStatus,
@@ -36,50 +34,64 @@ test('normalizeCapability returns "" for non-string or content-free input', () =
   assert.equal(normalizeCapability('---'), '');
 });
 
-// ─── validateToolRegistration ───────────────────────────────────────────────
+// ─── toolsFromExecutors ─────────────────────────────────────────────────────
 
-const VALID_MCP = { name: 'gitnexus', kind: 'mcp', capability: 'impact-analysis', command: 'mcp:gitnexus', scanTarget: '.gitnexus' };
-
-test('validateToolRegistration accepts a well-formed mcp registration and normalizes capability', () => {
-  const record = validateToolRegistration(VALID_MCP, []);
-  assert.equal(record.name, 'gitnexus');
-  assert.equal(record.kind, 'mcp');
-  assert.equal(record.capability, 'impact-analysis');
-  assert.equal(record.scanTarget, '.gitnexus');
+test('toolsFromExecutors maps a "for"-bearing executor into a tool-shaped object, normalizing capability — probe kind/command read from invocations[0], not executor.kind (tsk-in1-4 D5)', () => {
+  const executors = {
+    gitnexus: {
+      kind: 'tool',
+      for: ['Impact Analysis'],
+      invocations: [{ via: 'mcp', command: 'mcp:gitnexus' }],
+      scanTarget: '.gitnexus',
+      responsibility: 'Verification',
+      description: 'Code-graph blast radius',
+    },
+  };
+  const tools = toolsFromExecutors(executors);
+  assert.deepEqual(Object.keys(tools), ['gitnexus']);
+  assert.equal(tools.gitnexus.name, 'gitnexus');
+  assert.equal(tools.gitnexus.kind, 'mcp');
+  assert.equal(tools.gitnexus.capability, 'impact-analysis');
+  assert.equal(tools.gitnexus.command, 'mcp:gitnexus');
+  assert.equal(tools.gitnexus.scanTarget, '.gitnexus');
 });
 
-test('validateToolRegistration rejects a duplicate name', () => {
-  assert.throws(() => validateToolRegistration(VALID_MCP, ['gitnexus']), ToolRegistryError);
+test('toolsFromExecutors skips a executor declaring no "for" (a plain agent/dispatch executor, e.g. "agy")', () => {
+  const executors = { agy: { kind: 'agent', invocations: [{ via: 'cli', command: 'agy', args: [] }] } };
+  assert.deepEqual(toolsFromExecutors(executors), {});
 });
 
-test('validateToolRegistration rejects an out-of-domain kind', () => {
-  assert.throws(() => validateToolRegistration({ ...VALID_MCP, kind: 'sql' }, []), ToolRegistryError);
+test('toolsFromExecutors skips a kind:"agent" executor even when it DOES declare "for" -- the real regression found live: tsk-34n D3 gave "agy" its own "for" (so capabilities.<name>.prefer can resolve it), and without this gate every agent-kind executor that migrated to "for" would incorrectly show up as tool-registry-probeable', () => {
+  const executors = { agy: { kind: 'agent', for: ['fgos-coding-implement'], invocations: [{ via: 'cli', command: 'agy', args: [] }] } };
+  assert.deepEqual(toolsFromExecutors(executors), {});
 });
 
-test(`validateToolRegistration accepts every kind in ${KINDS.join('/')}`, () => {
-  for (const kind of KINDS) {
-    const scanRequired = kind === 'mcp' || kind === 'skill';
-    const fields = { name: `tool-${kind}`, kind, capability: 'x', command: 'x', ...(scanRequired ? { scanTarget: '.x' } : {}) };
-    assert.doesNotThrow(() => validateToolRegistration(fields, []));
-  }
+test('toolsFromExecutors skips a executor whose "for"[0] normalizes to empty', () => {
+  assert.deepEqual(toolsFromExecutors({ x: { kind: 'tool', for: ['---'] } }), {});
 });
 
-test('validateToolRegistration rejects an empty capability', () => {
-  assert.throws(() => validateToolRegistration({ ...VALID_MCP, capability: '---' }, []), ToolRegistryError);
+test('toolsFromExecutors reads "unknown" kind/command when the executor declares "for" but no invocations at all', () => {
+  const tools = toolsFromExecutors({ x: { kind: 'tool', for: ['foo'] } });
+  assert.equal(tools.x.kind, undefined);
+  assert.equal(tools.x.command, undefined);
 });
 
-test('validateToolRegistration rejects a missing --command', () => {
-  const { command, ...rest } = VALID_MCP;
-  assert.throws(() => validateToolRegistration(rest, []), ToolRegistryError);
+test('toolsFromExecutors on undefined/empty input returns {}', () => {
+  assert.deepEqual(toolsFromExecutors(undefined), {});
+  assert.deepEqual(toolsFromExecutors({}), {});
 });
 
-test('validateToolRegistration requires --scan for kind mcp/skill (not on PATH)', () => {
-  const { scanTarget, ...rest } = VALID_MCP;
-  assert.throws(() => validateToolRegistration(rest, []), ToolRegistryError);
+// ─── toolsFromExecutors: "for" is the only accepted input (tsk-34n --
+// retires tsk-45f D11's own "capability" (singular) back-compat fallback) ──
+
+test('toolsFromExecutors reads "for"\'s first entry as the capability', () => {
+  const tools = toolsFromExecutors({ x: { kind: 'tool', for: ['impact-analysis', 'other-capability'] } });
+  assert.equal(tools.x.capability, 'impact-analysis');
 });
 
-test('validateToolRegistration does NOT require --scan for kind cli/binary/http', () => {
-  assert.doesNotThrow(() => validateToolRegistration({ name: 'linter', kind: 'cli', capability: 'lint', command: 'eslint' }, []));
+test('toolsFromExecutors no longer reads the legacy "capability" (singular) field at all -- a executor declaring only it (no "for") is skipped, same as one declaring neither', () => {
+  const tools = toolsFromExecutors({ x: { kind: 'tool', capability: 'impact-analysis' } });
+  assert.deepEqual(tools, {});
 });
 
 // ─── probeTool ───────────────────────────────────────────────────────────────
@@ -138,18 +150,8 @@ test('probeTool on kind mcp/skill resolves "stale" when scanTarget/meta.json las
   assert.equal(stale, 'stale');
 });
 
-test('probeTool on kind http resolves "present" when something is listening, "missing" otherwise', async () => {
-  const server = net.createServer();
-  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
-  const port = server.address().port;
-  try {
-    const present = await probeTool({ kind: 'http', command: `127.0.0.1:${port}` }, process.cwd());
-    assert.equal(present, 'present');
-  } finally {
-    server.close();
-  }
-  const missing = await probeTool({ kind: 'http', command: '127.0.0.1:1' }, process.cwd());
-  assert.equal(missing, 'missing');
+test('KINDS no longer includes "http" — 0 real usage confirmed at tsk-in1-1 time (DISCUSSION.md §3 #14)', () => {
+  assert.deepEqual(KINDS, ['cli', 'binary', 'mcp', 'skill']);
 });
 
 // ─── local status overlay ────────────────────────────────────────────────────

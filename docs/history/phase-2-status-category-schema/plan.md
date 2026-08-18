@@ -15,7 +15,7 @@ timestamp: 2026-08-04T00:00:00.000Z
 | Data model | YES | Adds `statusCategory` + `domainFields` to the core work-item schema. |
 | Public contract | YES | `statusCategory` becomes a new contract every domain-agnostic consumer (frontier, rollup, outcome/friction, discovery-judge) reads. |
 | Existing covered behavior | YES | Touches `status-fsm.mjs`, `frontier.mjs`, `retro-pool.mjs` — all covered by existing suites (`test/state/fsm.test.mjs`, `test/e2e/synthetic-domain.test.mjs`, `test/cli/fgos.test.mjs`) that must stay green (0 regression for coding). |
-| Weak proof around the area | YES | Confirmed directly: 4 `fgos discover` attempts during `fgos-exploring` were disputed because no shell one-liner can prove these invariants pre-implementation (`CONTEXT.md`'s verify note). |
+| Weak proof around the area | YES | Confirmed directly: 4 `fgos discover` attempts during `fgos-coding-exploring` were disputed because no shell one-liner can prove these invariants pre-implementation (`CONTEXT.md`'s verify note). |
 | Multi-domain | YES | The entire point of the item. |
 | Auth / authorization / audit-security / external systems / cross-platform | no | none apply |
 
@@ -45,13 +45,13 @@ from GitNexus alone.
 
 **Risk map:**
 
-| Component | Risk | What proves it (→ `fgos-validating`) |
+| Component | Risk | What proves it (→ `fgos-coding-validating`) |
 |---|---|---|
 | `docs/decisions/` supersede record | Medium | Record exists, `supersedes` cites the base-workflow-model source, lists every real `status-fsm.mjs`/`STATUSES` consumer (not a partial list). |
 | Schema (`work.mjs`, `workflow-stage-graphs.mjs`, `store.mjs`) | High | `STATUS_CATEGORIES` frozen constant exists; `statusCategory` written on `work.move`/`work.add` and never re-derived on replay (L3). |
 | Backfill migration | High | Dry-run report matches real event count; `git diff` on `.fgos/events.jsonl` after a real run touches ONLY `statusCategory`, no other field/value. |
 | Consumer migration (`frontier.mjs`, rollup, outcome/friction, discovery-judge) | High | Full `npm test` green (0 regression, per D1's promise) + new tests with a second, differently-labeled domain proving category-based reads work. |
-| `skillMap.retrospective` | Low | `DOMAINS.coding.skillMap.retrospective` resolves; `fgOS:retro-next` loads the domain's configured skill, not `fgos-compounding` unconditionally. |
+| `skillMap.retrospective` | Low | `DOMAINS.coding.skillMap.retrospective` resolves; `fgOS:retro-next` loads the domain's configured skill, not `fgos-coding-compounding` unconditionally. |
 | `domainFields` | Low-Medium | `EDITABLE_FIELDS` includes it; `fieldSchema`-based validation rejects a bad shape for a domain that declares one, accepts absence for one that doesn't. |
 
 **Files likely touched:** `docs/decisions/<new>.md`, `src/state/work.mjs`,
@@ -95,14 +95,14 @@ combined one). Created (2026-08-04), each `parent: tsk-38t`:
 8. **`tsk-38t-8`** (no deps) — Doc gap: triage-table-columns.md
    verify: `grep -q "delivered" docs/reference/triage-table-columns.md`
 
-## Assumptions (unproven, flagged for `fgos-validating`)
+## Assumptions (unproven, flagged for `fgos-coding-validating`)
 
 - The exact filename/id the decision-record piece picks is not fixed here
   — verify checks for the source content-hash `2ae492d8` (already cited
   in `work-state.md`/`frontier.mjs` comments as base-workflow-model's own
   ID), not a guessed filename.
 - **RESOLVED (2026-08-04):** `tsk-f38`'s rename of skill `fgos-executing` →
-  `fgos-code-implement` merged to `main` (588bfb2). Confirmed for real
+  `fgos-coding-implement` merged to `main` (588bfb2). Confirmed for real
   (not assumed): the rename only changes the VALUE of the existing
   `executing` key in `DOMAINS.coding.skillMap`
   (`workflow-stage-graphs.mjs:90`) — no structural change, no key overlap

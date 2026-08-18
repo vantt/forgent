@@ -15,8 +15,8 @@ return `false`, which in turn requires the artifact (`CONTEXT.md` or
 `plan.md`) to carry a section whose heading matches
 `/^##\s*Outstanding questions\s*$/im` exactly (nothing appended on that
 line) with a body starting `None` (case-insensitive). Neither
-`.claude/skills/fgos-exploring/SKILL.md` nor
-`.claude/skills/fgos-planning/SKILL.md` — the two skills that actually write
+`.claude/skills/fgos-coding-exploring/SKILL.md` nor
+`.claude/skills/fgos-coding-planning/SKILL.md` — the two skills that actually write
 `CONTEXT.md`/`plan.md` — ever instructed the writing session to include this
 section. Result: the bypass mechanism is enabled (`level: standard`) but
 almost never fires (6/366 = 1.6% of history, 0 since 2026-08-07).
@@ -34,7 +34,7 @@ an intentional, already-decided design (D2/D4,
 | ID | Decision |
 |----|----------|
 | D1 | The `## Outstanding questions` heading stays literal English, unchanged, in both `CONTEXT.md` and `plan.md` — never translated or reworded. `hasOpenItems`'s regex is fixed (out of this item's scope to edit) and already the dominant convention: 128/197 existing `CONTEXT.md` files match it exactly, including `docs/history/gate-bypass/CONTEXT.md` itself (the mechanism's own decision doc). The one near-miss found in scout (`docs/history/context-md-enforcement-scope/CONTEXT.md:83`, `## Outstanding, deferred to a follow-up item`) is a pre-existing outlier that never matched the regex either — left untouched, not this item's footprint. |
-| D2 | `plan.md` follows the identical section shape as `CONTEXT.md`: a trailing `## Outstanding questions` heading (nothing appended on that line) with body `None` when nothing is outstanding, or a list of real open items otherwise. `hasOpenItems` is the same generic function applied to whichever artifact text is passed — there is no separate convention to invent for `plan.md`. Only 1/189 `plan.md` files match today (`docs/history/gate-approve-vs-movenext-semantics/plan.md`); the near-miss `docs/history/tsk-49a-runner-claim-race/plan.md` uses `## Outstanding questions carried to fgos-validating`, which fails the regex's end-of-line anchor — direct proof the heading must be literal, not merely "start with the phrase." In the common case this section reads `None` in `plan.md`, since `fgos-planning`'s own step 6 (Mid-planning `CONTEXT.md` gap) already routes any newly-discovered *material* question back into `CONTEXT.md`'s decision log before `plan.md`'s own gate is reached; only non-material, un-Assumption-worthy leftovers would ever populate this section with real content. |
+| D2 | `plan.md` follows the identical section shape as `CONTEXT.md`: a trailing `## Outstanding questions` heading (nothing appended on that line) with body `None` when nothing is outstanding, or a list of real open items otherwise. `hasOpenItems` is the same generic function applied to whichever artifact text is passed — there is no separate convention to invent for `plan.md`. Only 1/189 `plan.md` files match today (`docs/history/gate-approve-vs-movenext-semantics/plan.md`); the near-miss `docs/history/tsk-49a-runner-claim-race/plan.md` uses `## Outstanding questions carried to fgos-coding-validating`, which fails the regex's end-of-line anchor — direct proof the heading must be literal, not merely "start with the phrase." In the common case this section reads `None` in `plan.md`, since `fgos-coding-planning`'s own step 6 (Mid-planning `CONTEXT.md` gap) already routes any newly-discovered *material* question back into `CONTEXT.md`'s decision log before `plan.md`'s own gate is reached; only non-material, un-Assumption-worthy leftovers would ever populate this section with real content. |
 | D3 | Tighten the item's `verify` field to match `docs/how-to/write-verify-for-a-skill-prose-change.md`'s required shape (`npm test && POSITIVE && NEGATIVE`), since this item edits `.claude/skills/**/SKILL.md` paths: `npm test` (full suite — the glob `test/**/*.test.mjs` already includes `test/state/gate-bypass.test.mjs`, so the item's original narrower `node --test test/state/gate-bypass.test.mjs` added nothing `npm test` doesn't already cover, and `npm test` is this repo's standard DoD proof per `AGENTS.md`) `&&` a heading-anchored grep in each `SKILL.md` `&&` a NEGATIVE proving `src/state/gate-bypass.mjs` itself was never touched by this item's diff — a mechanical, verifiable enforcement of this item's own "never loosen `hasOpenItems`" constraint, not just a stated intent. |
 
 **Implementation-time correction to D3:** the heading-anchored grep first
@@ -59,8 +59,8 @@ never inside a numbered list), so it was never affected by this bug.
   optionally followed by more prose on the same line, e.g. `None — all
   material product decisions locked`) when nothing is outstanding, or a real
   list of open items otherwise.
-- **Artifact** — either `CONTEXT.md` (written by `fgos-exploring`) or
-  `plan.md` (written by `fgos-planning`); `hasOpenItems` is generic over
+- **Artifact** — either `CONTEXT.md` (written by `fgos-coding-exploring`) or
+  `plan.md` (written by `fgos-coding-planning`); `hasOpenItems` is generic over
   both, the two `SKILL.md` files just never taught their own writer to
   produce the section.
 
@@ -70,14 +70,14 @@ never inside a numbered list), so it was never affected by this bug.
   (`/^##\s*Outstanding questions\s*$([\s\S]*?)(?=^##\s|$(?![\s\S]))/im`) and
   the `/^none\b/i` body check. `canAutoApprove` (line 130) short-circuits to
   `false` whenever `hasOpenItems` returns `true`.
-- `grep -n "Outstanding" .claude/skills/fgos-exploring/SKILL.md
-  .claude/skills/fgos-planning/SKILL.md` — zero matches in either file
+- `grep -n "Outstanding" .claude/skills/fgos-coding-exploring/SKILL.md
+  .claude/skills/fgos-coding-planning/SKILL.md` — zero matches in either file
   today, confirming the item's stated root cause.
 - `rg -l "^## Outstanding questions" docs/history --glob "CONTEXT.md" | wc -l`
   → 128; same for `--glob "plan.md"` → 2, but only
   `docs/history/gate-approve-vs-movenext-semantics/plan.md` matches the
   regex exactly — `docs/history/tsk-49a-runner-claim-race/plan.md`'s
-  `## Outstanding questions carried to fgos-validating` fails the anchor,
+  `## Outstanding questions carried to fgos-coding-validating` fails the anchor,
   confirmed by direct regex test.
 - `docs/history/context-md-enforcement-scope/CONTEXT.md:83` — the one
   pre-existing heading-wording variant found (`## Outstanding, deferred to

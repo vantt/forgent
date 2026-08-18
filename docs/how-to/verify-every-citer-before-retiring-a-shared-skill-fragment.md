@@ -17,13 +17,13 @@ file once that one consumer is stripped.
 An item's own description can be wrong about how many consumers a
 shared fragment has — it was written before anyone actually checked.
 `tsk-4ns`'s own description said: "if that was
-`capacity-dispatch-fallback.md`'s only remaining consumer, retire that
+`executor-dispatch-fallback.md`'s only remaining consumer, retire that
 shared fragment too." A repo-wide grep at planning time found this
 assumption false:
 
 > "Checked with a repo-wide grep: it is NOT the only consumer. Six
-> other stage skills (`fgos-validating`, `fgos-code-implement`,
-> `fgos-fanout`, `fgos-planning`, `fgos-exploring`, `fgos-researching`)
+> other stage skills (`fgos-coding-validating`, `fgos-coding-implement`,
+> `fgos-fanout`, `fgos-coding-planning`, `fgos-coding-exploring`, `fgos-researching`)
 > cite this fragment's "Valid reasons to dispatch" list directly, in
 > their own never-delegate-reasoning rule. Deleting the file would
 > leave all six pointing at nothing."
@@ -39,7 +39,7 @@ broken six unrelated skills' own citations.
    consumer named in the item's description:
 
    ```
-   grep -rln capacity-dispatch-fallback .claude/skills
+   grep -rln executor-dispatch-fallback .claude/skills
    ```
 
 2. Read each hit. Sort them into two groups: the consumer this item is
@@ -51,7 +51,7 @@ broken six unrelated skills' own citations.
    claim (e.g. "the one real live consumer today"). Do not delete a
    file six other skills still point to.
 
-   > "Revised scope: `capacity-dispatch-fallback.md` stays. Only the
+   > "Revised scope: `executor-dispatch-fallback.md` stays. Only the
    > three literal mentions of `submit-assist-classify` inside it (an
    > illustrative example, a "one real live consumer" claim, and the
    > Precedent section's own retelling) get updated to stop asserting a
@@ -75,9 +75,9 @@ skills is not.
 
 - `docs/how-to/find-every-caller-before-requiring-a-cli-flag.md` — the
   same shape one layer down (code-level CLI callers instead of
-  skill-level doc citers), at the `fgos-validating` stage instead of
+  skill-level doc citers), at the `fgos-coding-validating` stage instead of
   planning.
-- `docs/how-to/reuse-the-shared-capacity-dispatch-fallback-fragment.md`
+- `docs/how-to/reuse-the-shared-executor-dispatch-fallback-fragment.md`
   — the fragment this example is drawn from, and how to wire a new
   consumer onto it.
 - `docs/history/strip-submit-assist-classify-dispatch/plan.md` — the

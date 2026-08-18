@@ -87,7 +87,7 @@ if the same gap is confirmed there.
   --capability impact-analysis --status present` returns gitnexus as
   `present` → posture is **full**. Informational only for this
   clarify-stage pass (no code edited here); the `MUST run impact` rule
-  applies in full once `fgos-code-implement` starts editing `moveWork` callers
+  applies in full once `fgos-coding-implement` starts editing `moveWork` callers
   in `bin/fgos.mjs`.
 
 ## Canonical references

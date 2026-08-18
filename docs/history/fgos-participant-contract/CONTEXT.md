@@ -39,7 +39,7 @@ no refactor of `bin/fgos.mjs`.
   `priority-formula-and-intent-retirement.md` contain Vietnamese text.
   `docs/reference/work-item-pipeline-stages-verbs-and-handoffs.md` is a
   directly comparable precedent: hand-authored (not generated via
-  `fgos-compounding`/`fgos-indexing`, `sourceCaptureId: null` in
+  `fgos-coding-compounding`/`fgos-indexing`, `sourceCaptureId: null` in
   `docs/enduser-docs-index.json`), English, same `docs/reference/` folder.
 - The page's real audience is "someone writing an fgOS client in a
   language other than Node" — not necessarily a Vietnamese speaker.
@@ -103,7 +103,7 @@ the doc's actual audience over the language of its source material.
   `sourceCaptureId: null` (see `work-item-pipeline-stages-verbs-and-
   handoffs.md`'s entry). This item's own footprint already names
   `docs/enduser-docs-index.json` as a file to touch — adding an entry in
-  this same shape is an implementation detail for `fgos-planning`, not a
+  this same shape is an implementation detail for `fgos-coding-planning`, not a
   clarify-stage question.
 
 Impact-analysis capability gate (per `CLAUDE.md`): `fgos tool query

@@ -22,7 +22,7 @@ separate filing, not fixed here.
 |----|----------|
 | D1 | tsk-2eq proceeds now, unblocked by `tsk-45y`. The item's own description flags an unresolved design tension against `tsk-45y` ("worktrees should not be blocked by `.fgos` locking at all") as needing a human tie-break before this fix lands (per an older 2026-08-01 research report's explicit sequencing). A same-day 2026-08-02 report (`plans/reports/internal-design-260802-0907-merge-harness-v2-locked-decisions-report.md`, its own D3) re-scanned the code and found the framing wrong: `main-checkout.lock` and `events.lock` are, and always have been, two separate lock files; `main-checkout.lock` only ever guards the `claim` moment and the merge/verify/commit window, never ordinary state writes; ADR0020 already gives every dispatch worktree zero writable `.fgos` path. tsk-45y's actual complaint matches a different, already-fixed item (`tsk-56t`, done — `EnterWorktree` + cwd-relative `dataDir()` could recreate a divergent local `.fgos/events.jsonl`), not this lock. User confirmed: proceed now rather than wait for a separate tsk-45y resolution pass. |
 
-## Pinned assumptions (deferred to `fgos-planning`)
+## Pinned assumptions (deferred to `fgos-coding-planning`)
 
 - The fix mechanism itself — e.g. splitting a `lockRoot` parameter from the
   git-operation `cwd` inside `mergeRunnerItem`/`mergeRunnerItemLocked` — is
@@ -85,7 +85,7 @@ separate filing, not fixed here.
 - `impact-analysis: full` — GitNexus registered and `present`
   (`fgos tool query --capability impact-analysis --status present`), so the
   CLAUDE.md impact-analysis gate applies at its normal strength once
-  implementation starts (`fgos-planning`/`fgos-code-implement`'s concern, not
+  implementation starts (`fgos-coding-planning`/`fgos-coding-implement`'s concern, not
   this skill's).
 
 ## Canonical references

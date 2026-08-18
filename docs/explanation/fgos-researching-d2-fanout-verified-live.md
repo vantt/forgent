@@ -11,7 +11,7 @@ dispatch, never ad hoc" — a rule about how the skill is *supposed* to
 behave when a question splits into independent branches. `tsk-o4l`
 existed to answer a narrower question: does that rule actually fire on a
 live run, and is the native-branch announce line added in
-`.claude/skills/_shared/capacity-dispatch-fallback.md` Step B.5 (commit
+`.claude/skills/_shared/executor-dispatch-fallback.md` Step B.5 (commit
 `1c741c7`) genuinely visible on the transcript — not just correct on
 paper?
 
@@ -38,9 +38,11 @@ D2's fan-out rule requires before it fires at all.
 
 ## What the live run actually produced
 
-Both branches dispatched through separate ad-hoc packets
-(`tsk-o4l#p1`, `tsk-o4l#p2`) rather than staying inline in one
-reasoning pass, per `RESEARCH.md`:
+Both branches dispatched through separate ad-hoc tasks
+(`tsk-o4l#p1`, `tsk-o4l#p2`, D8: the `#p<n>` id shape stays literal —
+this was captured before the rename) rather than staying inline in one
+reasoning pass, per `RESEARCH.md` (quoted verbatim below, so it still
+says "packet" — the term current at the time this run happened):
 
 > - P1 — repo search (packet `tsk-o4l#p1`, dispatched native/Explore):
 >   `resolveWriterIdentity` (`src/runner/session-identity.mjs`) call/reference
@@ -67,7 +69,7 @@ records no open follow-up for either branch:
 D2's fan-out rule is not just a written constraint that a skill's prose
 happens to state — on a real run with two genuinely independent
 branches, the dispatch mechanism actually split the work into two
-separate contracted packets instead of answering both questions inline
+separate contracted tasks instead of answering both questions inline
 in one pass. The outcome record for `tsk-o4l` closed clean on the first
 attempt (`outcome: awaiting-approval`, `passed: true`, `attempts: 1`),
 with the item's own verify (`test -f

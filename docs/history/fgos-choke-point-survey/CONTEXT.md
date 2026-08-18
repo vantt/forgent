@@ -54,5 +54,5 @@ own item.
 
 ## Outstanding questions deferred to planning
 
-- Whether the survey needs to spawn child work items immediately for each ranked choke-point (as tsk-53f became its own item), or whether that split happens in a later planning/decompose pass — this is a shaping/sizing judgment call, not a clarify-stage decision (fgos-exploring hard rule: does not decide how to split work).
+- Whether the survey needs to spawn child work items immediately for each ranked choke-point (as tsk-53f became its own item), or whether that split happens in a later planning/decompose pass — this is a shaping/sizing judgment call, not a clarify-stage decision (fgos-coding-exploring hard rule: does not decide how to split work).
 - Whether `docs/decisions/` gets one combined decision record for the whole survey, or one record per confirmed choke-point — a shaping/format detail for planning, not gated here.

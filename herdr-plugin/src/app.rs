@@ -1,5 +1,8 @@
+use std::collections::HashSet;
+
 use crate::fgos::{merge_tree_line_count, MergeListSummary, MergeTreeNode};
-use crate::pane_scan::PaneIdentity;
+use crate::layout::OperationPanes;
+use crate::pane_scan::{task_id_map, PaneIdentity, PaneSnapshot};
 use crate::ports::{PaneRegistry, WorkItemSource};
 use crate::settings::OrchestratorSettings;
 
@@ -45,8 +48,8 @@ pub struct WorkItem {
     pub id: String,
     pub title: String,
     pub goal_tier: String,
-    /// tsk-1e3 D4: gates the detail modal's Discover button — enabled only
-    /// at `"clarify"`.
+    /// Gates the detail modal's Discover button — see `discover_eligible`
+    /// below for the actual enablement rule.
     pub stage: String,
     /// tsk-64z D1: raw status literal — drives the Status column and the
     /// tab membership check (`WorkTab::matches`, below).
@@ -59,10 +62,57 @@ pub struct WorkItem {
     pub priority: Option<i64>,
 }
 
-/// tsk-64z D1/D7: the Work Items panel's 4 tabs — a pure classification
+impl WorkItem {
+    /// Whether `/fgOS:discover` actually applies to this item right now —
+    /// the single shared definition `ui.rs` (button render) and `main.rs`
+    /// (button click handler, auto-discover candidate filter) must both
+    /// use, so they can never drift apart the way a `stage == "clarify"`
+    /// render-side check and a `stage == "discovery"` handler-side check
+    /// once did.
+    ///
+    /// Mirrors `CANDIDATE_STAGES` in `src/state/discover-pool.mjs`
+    /// (`clarify`/`discovery`/`exploring` — the stages `/fgOS:discover`
+    /// itself drives) plus that same module's `isDepsAndLineageReady`
+    /// gate, approximated here via `blocked_by`: it is sourced from
+    /// `fgos triage --json`'s `blockedBy`, which walks the identical
+    /// unified dependency+lineage graph (`rankImpact`/`buildUnifiedEdges`,
+    /// tsk-dus D1/D2) that `isDepsAndLineageReady` itself queries — a
+    /// non-empty `blocked_by` means `fgos take`/`pick` would refuse this
+    /// item today, so herdr must never open a discover pane for it.
+    pub fn discover_eligible(&self) -> bool {
+        self.in_discover_stage() && self.blocked_by.is_empty()
+    }
+
+    /// The stage half of `discover_eligible` on its own — the stages
+    /// `/fgOS:discover` drives, mirroring `CANDIDATE_STAGES` in
+    /// `src/state/discover-pool.mjs`.
+    ///
+    /// Split out for `main::discovery_worker_alive` (tsk-1zq), which asks
+    /// whether a discovery worker is ALREADY RUNNING and so must not also
+    /// require `blocked_by` to be empty: a claimed item is running no
+    /// matter what it once waited on. Sharing the stage list rather than
+    /// copying it is deliberate — a render-side `stage == "clarify"` and a
+    /// handler-side `stage == "discovery"` drifting apart is a bug this
+    /// file has already had once.
+    pub fn in_discover_stage(&self) -> bool {
+        matches!(self.stage.as_str(), "clarify" | "discovery" | "exploring")
+    }
+}
+
+/// tsk-64z D1/D7: the Work Items panel's 5 tabs — a pure classification
 /// over `WorkItem.status`, never a second copy of the item list.
+///
+/// `Backlog` is declared first because the tab strip mirrors the frozen
+/// category order in `STATUS_CATEGORIES` (`src/state/work.mjs`), rather
+/// than inventing a second ordering this side would have to keep in sync
+/// by hand. It is a separate tab and not a marker inside `Todo` because
+/// `backlog` carries its own `statusCategory` precisely so nothing reads a
+/// backlog item as ready (work-item-backlog-status D3), and because
+/// `backlog -> todo` is a human-only edge (D1): a person has to be able to
+/// SEE the bucket before they can promote anything out of it (D4).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WorkTab {
+    Backlog,
     Todo,
     Doing,
     Review,
@@ -70,6 +120,8 @@ pub enum WorkTab {
 }
 
 impl WorkTab {
+    /// work-item-backlog-status D3: `backlog` only — its own tab, never
+    /// folded into `Todo`, so nothing here reads it as ready.
     /// D1: `todo` only. D1: `doing`/`blocked`/`awaiting-human` — the same
     /// `in-progress` `statusCategory` grouping `workflow-stage-graphs.mjs`
     /// already uses for the `coding` domain. D1: `awaiting-approval` only.
@@ -77,6 +129,7 @@ impl WorkTab {
     /// `wontfix` (D7 explicitly folds canceled items into this tab too).
     fn matches(self, status: &str) -> bool {
         match self {
+            WorkTab::Backlog => status == "backlog",
             WorkTab::Todo => status == "todo",
             WorkTab::Doing => matches!(status, "doing" | "blocked" | "awaiting-human"),
             WorkTab::Review => status == "awaiting-approval",
@@ -89,6 +142,7 @@ impl WorkTab {
 
     pub fn label(self) -> &'static str {
         match self {
+            WorkTab::Backlog => "BACKLOG",
             WorkTab::Todo => "TODO",
             WorkTab::Doing => "DOING",
             WorkTab::Review => "REVIEW",
@@ -98,16 +152,18 @@ impl WorkTab {
 
     fn next(self) -> Self {
         match self {
+            WorkTab::Backlog => WorkTab::Todo,
             WorkTab::Todo => WorkTab::Doing,
             WorkTab::Doing => WorkTab::Review,
             WorkTab::Review => WorkTab::Done,
-            WorkTab::Done => WorkTab::Todo,
+            WorkTab::Done => WorkTab::Backlog,
         }
     }
 
     fn prev(self) -> Self {
         match self {
-            WorkTab::Todo => WorkTab::Done,
+            WorkTab::Backlog => WorkTab::Done,
+            WorkTab::Todo => WorkTab::Backlog,
             WorkTab::Doing => WorkTab::Todo,
             WorkTab::Review => WorkTab::Doing,
             WorkTab::Done => WorkTab::Review,
@@ -232,13 +288,60 @@ pub struct App {
     /// (`settings::read_settings`). Storing only — acting on an enabled
     /// toggle is a sibling launcher item's own footprint (tsk-2ja/tsk-57q).
     pub orchestrator_settings: OrchestratorSettings,
-    /// tsk-5lr CONTEXT.md D1/D2: the fixed `fg:operation` tab's left
-    /// (merge-loop) pane id, `None` until `main()`'s startup call to
-    /// `layout::ensure_operation_tab` resolves it. A plain data carrier —
-    /// which loop launches into it is tsk-2xt's own scope, not this item's.
-    pub operation_left_pane_id: Option<String>,
-    /// Same as `operation_left_pane_id`, for the right (retro/cleanup) slot.
-    pub operation_right_pane_id: Option<String>,
+    /// The fixed `fg:operation` tab's four slot panes (tsk-5lr CONTEXT.md
+    /// D1; its D2's left/right geometry superseded by tsk-1zq), `None`
+    /// until `main()`'s startup call to `layout::ensure_operation_tab`
+    /// resolves them. A plain data carrier — which loop launches into
+    /// which slot is tsk-2xt's own scope, not this item's.
+    pub operation_panes: Option<OperationPanes>,
+    /// Worker-lane panes this dashboard has launched into but has not yet
+    /// seen label themselves (tsk-1zq). A launched session sets its own
+    /// label through T3's capability-gated helper (D5), so between the
+    /// launch and that write the pane looks unlabeled and would otherwise
+    /// read as free — reusing it there would drop a second worker on top
+    /// of a booting one.
+    ///
+    /// Deliberately in-process and never persisted: this is the adapter's
+    /// bookkeeping about its own actions, not orchestrator state (which
+    /// D2 puts in the engine). Being in-process is also what keeps it from
+    /// becoming the very bug this item removes — a herdr-plugin restart
+    /// clears it, whereas the pane label it replaces could stay stuck
+    /// forever.
+    pub pending_worker_panes: HashSet<String>,
+    /// The one auto-discover pane this dashboard has launched but not yet
+    /// seen claim land, if any (tsk-3q8z). `discovery_worker_alive` only
+    /// answers true once the launched session actually runs `fgos take`/
+    /// `fgos discover` against its item, so between launch and that claim
+    /// the poll-tick auto-discover condition (`main.rs::run`) would
+    /// otherwise re-fire every tick for the whole boot+claim window.
+    /// Deliberately separate from `pending_worker_panes` above: that set is
+    /// shared with the execution lane's own launches, and gating
+    /// auto-discover on "any pending pane at all" would wrongly block a
+    /// fresh discover launch behind an unrelated execution-lane one. Only
+    /// ever holds at most one pane id, since `next_auto_discover_candidate`
+    /// picks at most one candidate per tick. Same in-process, never-
+    /// persisted discipline as `pending_worker_panes` — a herdr-plugin
+    /// restart clears it, which is correct: nothing this adapter believed
+    /// about an in-flight launch survives a restart either.
+    pub pending_discover_pane: Option<String>,
+    /// The admin-lane pane this dashboard has launched an `/fgOS:merge-next`
+    /// run into but has not yet seen exit, if any (tsk-4ry). Unlike
+    /// `pending_discover_pane` above, `/fgOS:merge-next` holds no
+    /// lingering claimed-item status for its run's duration — it is one
+    /// CLI call, not a claim-and-hold — so there is no engine-truth
+    /// signal to catch up to; the pane's own presence in a fresh scan is
+    /// the only "still running" signal available. Cleared once the pane
+    /// id is no longer present in a scan (`retire_settled_pending_operation_panes`,
+    /// below) — never "claimed and doing", since there is nothing to
+    /// claim. Same in-process, never-persisted discipline as
+    /// `pending_discover_pane`: a herdr-plugin restart clears it, which
+    /// is correct, since nothing this adapter believed about an in-flight
+    /// launch survives a restart either.
+    pub pending_merge_pane: Option<String>,
+    /// Same shape as `pending_merge_pane`, for `/fgOS:retro-next`.
+    pub pending_retro_pane: Option<String>,
+    /// Same shape as `pending_merge_pane`, for `/fgOS:cleanup-next`.
+    pub pending_cleanup_pane: Option<String>,
 }
 
 impl App {
@@ -269,8 +372,12 @@ impl App {
             merge_list_rect: None,
             after_deliver_rect: None,
             orchestrator_settings: OrchestratorSettings::default(),
-            operation_left_pane_id: None,
-            operation_right_pane_id: None,
+            operation_panes: None,
+            pending_worker_panes: HashSet::new(),
+            pending_discover_pane: None,
+            pending_merge_pane: None,
+            pending_retro_pane: None,
+            pending_cleanup_pane: None,
         }
     }
 
@@ -504,7 +611,7 @@ impl App {
                     id: "tsk-19y-1".into(),
                     title: "Herdr plugin scaffold + mock/static dashboard TUI".into(),
                     goal_tier: "mvp".into(),
-                    stage: "clarify".into(),
+                    stage: "discovery".into(),
                     status: "todo".into(),
                     blocked_by: Vec::new(),
                     blocks: 0,
@@ -514,7 +621,7 @@ impl App {
                     id: "tsk-19y-2".into(),
                     title: "Wire real fgOS data into the dashboard".into(),
                     goal_tier: "mvp".into(),
-                    stage: "decompose".into(),
+                    stage: "planning".into(),
                     status: "doing".into(),
                     blocked_by: Vec::new(),
                     blocks: 1,
@@ -581,8 +688,12 @@ impl App {
             merge_list_rect: None,
             after_deliver_rect: None,
             orchestrator_settings: OrchestratorSettings::default(),
-            operation_left_pane_id: None,
-            operation_right_pane_id: None,
+            operation_panes: None,
+            pending_worker_panes: HashSet::new(),
+            pending_discover_pane: None,
+            pending_merge_pane: None,
+            pending_retro_pane: None,
+            pending_cleanup_pane: None,
         }
     }
 
@@ -731,15 +842,115 @@ impl App {
     /// the failure is surfaced via `last_error` — same transient-failure
     /// discipline `refresh_from_fgos` already uses.
     pub fn refresh_pane_state(&mut self, registry: &dyn PaneRegistry) {
-        match registry.scan() {
-            Ok(map) => {
+        match registry.scan_panes() {
+            Ok(panes) => {
+                let map = task_id_map(&panes);
                 for task in &mut self.in_process {
                     task.pane = map.get(&task.id).cloned();
                 }
+                self.retire_settled_pending_panes(&panes);
+                self.retire_settled_pending_discover_pane();
+                self.retire_settled_pending_operation_panes(&panes);
                 self.last_error = None;
             }
             Err(err) => self.last_error = Some(err.to_string()),
         }
+    }
+
+    /// A pending pane stops being pending once it settles: gone from the
+    /// scan entirely (a closed pane is nothing to hold open for), or
+    /// carrying a label whose task id the engine actually reports at
+    /// `doing` — that write only happens from inside a launched session
+    /// (D5) that has genuinely claimed its item, which is the real proof
+    /// the worker booted (tsk-3q8z). A pane that carries a label for an id
+    /// that is NOT `doing` stays pending: on a REUSED pane, the previous
+    /// occupant's stale label is still sitting there the instant the new
+    /// worker's pane is opened, before the new worker has booted at all —
+    /// checking against `doing_item_ids()` here (not just "any label at
+    /// all") is what keeps that stale label from retiring the pane one
+    /// tick too early and letting herdr stack a second launch on top of
+    /// the first.
+    fn retire_settled_pending_panes(&mut self, panes: &[PaneSnapshot]) {
+        let labeled = task_id_map(panes);
+        let doing: HashSet<&str> = self
+            .work_items
+            .iter()
+            .filter(|item| item.status == "doing")
+            .map(|item| item.id.as_str())
+            .collect();
+        let still_pending: HashSet<String> = self
+            .pending_worker_panes
+            .iter()
+            .filter(|pane_id| panes.iter().any(|pane| pane.pane_id == **pane_id))
+            .filter(|pane_id| {
+                match labeled.iter().find(|(_, identity)| identity.pane_id == **pane_id) {
+                    None => true,
+                    Some((task_id, _)) => !doing.contains(task_id.as_str()),
+                }
+            })
+            .cloned()
+            .collect();
+        self.pending_worker_panes = still_pending;
+    }
+
+    /// Clears `pending_discover_pane` once it settles (tsk-3q8z). Reuses
+    /// `retire_settled_pending_panes`'s own "gone from scan, or claimed and
+    /// doing" verdict rather than re-deriving it: every pane
+    /// `launch_worker` opens — including an auto-discover launch — is
+    /// inserted into `pending_worker_panes` too, so once this pane id is no
+    /// longer present there, it has already settled by the same rule.
+    /// Called right after `retire_settled_pending_panes` in the same
+    /// `refresh_pane_state` pass, so both fields stay consistent within one
+    /// poll tick.
+    fn retire_settled_pending_discover_pane(&mut self) {
+        if let Some(pane_id) = &self.pending_discover_pane {
+            if !self.pending_worker_panes.contains(pane_id) {
+                self.pending_discover_pane = None;
+            }
+        }
+    }
+
+    /// Clears `pending_merge_pane`/`pending_retro_pane`/`pending_cleanup_pane`
+    /// once each settles (tsk-4ry). Unlike `retire_settled_pending_discover_pane`
+    /// above, this cannot reuse `pending_worker_panes`'s own membership
+    /// check: the fixed `fg:operation` tab's admin panes are launched
+    /// directly by `pane_orchestrator.launch_merge_loop`/etc
+    /// (`main::auto_launch_operation_panes`), never through `launch_worker`,
+    /// so they are never inserted into `pending_worker_panes` in the first
+    /// place. And unlike the discover case, `/fgOS:merge-next`/`retro-next`/
+    /// `cleanup-next` hold no lingering claimed-item status to catch up to
+    /// (D9: the admin lane never claims a work item at all) — so "settled"
+    /// here means only "gone from the scan", the plain half of
+    /// `retire_settled_pending_panes`'s own rule, checked directly against
+    /// this same tick's fresh `panes` scan.
+    fn retire_settled_pending_operation_panes(&mut self, panes: &[PaneSnapshot]) {
+        let still_in_scan = |pane_id: &str| panes.iter().any(|pane| pane.pane_id == pane_id);
+        if self.pending_merge_pane.as_deref().is_some_and(|id| !still_in_scan(id)) {
+            self.pending_merge_pane = None;
+        }
+        if self.pending_retro_pane.as_deref().is_some_and(|id| !still_in_scan(id)) {
+            self.pending_retro_pane = None;
+        }
+        if self.pending_cleanup_pane.as_deref().is_some_and(|id| !still_in_scan(id)) {
+            self.pending_cleanup_pane = None;
+        }
+    }
+
+    /// The ids the engine currently reports at `status: doing` — the
+    /// liveness half of every worker-lane decision (D2). Read straight off
+    /// the work list the poll tick already fetched via `fgos triage
+    /// --json`, so this costs no extra call.
+    pub fn doing_item_ids(&self) -> Vec<String> {
+        self.work_items
+            .iter()
+            .filter(|item| item.status == "doing")
+            .map(|item| item.id.clone())
+            .collect()
+    }
+
+    /// `pending_worker_panes` as the slice the `WorkerLaneView` port takes.
+    pub fn pending_pane_ids(&self) -> Vec<String> {
+        self.pending_worker_panes.iter().cloned().collect()
     }
 }
 
@@ -900,9 +1111,10 @@ mod tests {
     /// already uses), and `wontfix` shares `DONE` with the tail chain
     /// (D7).
     #[test]
-    fn tabs_classify_status_into_todo_doing_review_done() {
+    fn tabs_classify_status_into_backlog_todo_doing_review_done() {
         let source = FakeSource {
             triage: vec![
+                triage_row("tsk-backlog", "backlog", Some(0)),
                 triage_row("tsk-todo", "todo", Some(1)),
                 triage_row("tsk-doing", "doing", Some(2)),
                 triage_row("tsk-blocked", "blocked", Some(3)),
@@ -915,10 +1127,18 @@ mod tests {
         let mut app = App::empty();
         app.refresh_from_fgos(&source);
 
+        app.active_tab = WorkTab::Backlog;
+        assert_eq!(
+            app.visible_work_items().iter().map(|i| i.id.as_str()).collect::<Vec<_>>(),
+            vec!["tsk-backlog"],
+            "D3: backlog gets its own tab and appears in no other"
+        );
+
         app.active_tab = WorkTab::Todo;
         assert_eq!(
             app.visible_work_items().iter().map(|i| i.id.as_str()).collect::<Vec<_>>(),
-            vec!["tsk-todo"]
+            vec!["tsk-todo"],
+            "D3: a backlog item must never be read as ready"
         );
 
         app.active_tab = WorkTab::Doing;
@@ -947,15 +1167,20 @@ mod tests {
     #[test]
     fn next_tab_and_prev_tab_cycle_and_reset_selection() {
         let mut app = App::empty();
-        assert_eq!(app.active_tab, WorkTab::Todo);
+        assert_eq!(
+            app.active_tab,
+            WorkTab::Todo,
+            "BACKLOG leads the strip but TODO stays the landing tab"
+        );
         app.next_tab();
         assert_eq!(app.active_tab, WorkTab::Doing);
         app.next_tab();
         app.next_tab();
+        assert_eq!(app.active_tab, WorkTab::Done);
         app.next_tab();
-        assert_eq!(app.active_tab, WorkTab::Todo, "wraps around after DONE");
+        assert_eq!(app.active_tab, WorkTab::Backlog, "wraps around after DONE");
         app.prev_tab();
-        assert_eq!(app.active_tab, WorkTab::Done, "wraps around backward before TODO");
+        assert_eq!(app.active_tab, WorkTab::Done, "wraps around backward before BACKLOG");
     }
 
     /// tsk-3wl D1: `switch_panel` (Tab) must reach all 5 boxes, not just
@@ -1055,8 +1280,17 @@ mod tests {
     struct FakeRegistry(HashMap<String, PaneIdentity>);
 
     impl PaneRegistry for FakeRegistry {
-        fn scan(&self) -> Result<HashMap<String, PaneIdentity>, crate::pane_scan::PaneScanError> {
-            Ok(self.0.clone())
+        fn scan_panes(&self) -> Result<Vec<PaneSnapshot>, crate::pane_scan::PaneScanError> {
+            Ok(self
+                .0
+                .iter()
+                .map(|(task_id, identity)| PaneSnapshot {
+                    pane_id: identity.pane_id.clone(),
+                    tab_id: identity.tab_id.clone(),
+                    label: Some(task_id.clone()),
+                    focused: false,
+                })
+                .collect())
         }
 
         fn has_labeled_pane(&self, _label: &str) -> Result<bool, crate::pane_scan::PaneScanError> {
@@ -1099,5 +1333,122 @@ mod tests {
             })
         );
         assert_eq!(app.in_process[1].pane, None);
+    }
+
+    struct FixedLabelRegistry(Vec<PaneSnapshot>);
+
+    impl PaneRegistry for FixedLabelRegistry {
+        fn scan_panes(&self) -> Result<Vec<PaneSnapshot>, crate::pane_scan::PaneScanError> {
+            Ok(self.0.clone())
+        }
+
+        fn has_labeled_pane(&self, _label: &str) -> Result<bool, crate::pane_scan::PaneScanError> {
+            Ok(false)
+        }
+    }
+
+    /// tsk-3q8z defect 1: a REUSED pane still carries the previous
+    /// occupant's label the instant it is scanned, before the new worker
+    /// boots. That stale label's task id is no longer `doing` (the old
+    /// item already moved on), so the pane must stay pending — retiring it
+    /// here is exactly the bug that let herdr stack a second launch on top.
+    #[test]
+    fn retire_settled_pending_panes_keeps_a_reused_panes_stale_label_pending() {
+        let mut app = App::empty();
+        app.pending_worker_panes.insert("wS:pReused".to_string());
+        // No item is `doing` -- the old occupant already returned.
+        let registry = FixedLabelRegistry(vec![PaneSnapshot {
+            pane_id: "wS:pReused".into(),
+            tab_id: "wS:t1".into(),
+            label: Some("tsk-old-occupant".into()),
+            focused: false,
+        }]);
+
+        app.refresh_pane_state(&registry);
+
+        assert!(
+            app.pending_pane_ids().contains(&"wS:pReused".to_string()),
+            "a pane labeled with a non-doing id must stay pending, not retire"
+        );
+    }
+
+    /// The fresh-claim case: once the label's task id IS `doing`, the pane
+    /// has genuinely settled and retires.
+    #[test]
+    fn retire_settled_pending_panes_drops_a_pane_once_its_label_is_doing() {
+        let mut app = App::empty();
+        app.pending_worker_panes.insert("wS:pNew".to_string());
+        app.refresh_from_fgos(&FakeSource {
+            triage: vec![triage_row("tsk-new-claim", "doing", Some(1))],
+        });
+        let registry = FixedLabelRegistry(vec![PaneSnapshot {
+            pane_id: "wS:pNew".into(),
+            tab_id: "wS:t1".into(),
+            label: Some("tsk-new-claim".into()),
+            focused: false,
+        }]);
+
+        app.refresh_pane_state(&registry);
+
+        assert!(
+            !app.pending_pane_ids().contains(&"wS:pNew".to_string()),
+            "a pane labeled with a doing id has genuinely settled and must retire"
+        );
+    }
+
+    /// A pane that vanished from the scan entirely (closed) still retires,
+    /// same as before this fix.
+    #[test]
+    fn retire_settled_pending_panes_drops_a_pane_that_vanished_from_the_scan() {
+        let mut app = App::empty();
+        app.pending_worker_panes.insert("wS:pGone".to_string());
+        let registry = FixedLabelRegistry(vec![]);
+
+        app.refresh_pane_state(&registry);
+
+        assert!(!app.pending_pane_ids().contains(&"wS:pGone".to_string()));
+    }
+
+    /// tsk-3q8z defect 2: `pending_discover_pane` settles by the same rule
+    /// as `pending_worker_panes` -- once the pane id it names is no longer
+    /// tracked there (gone from the scan, or its label resolved to a real
+    /// `doing` claim), it clears too.
+    #[test]
+    fn retire_settled_pending_discover_pane_clears_once_the_shared_pane_settles() {
+        let mut app = App::empty();
+        app.pending_worker_panes.insert("wS:pDiscover".to_string());
+        app.pending_discover_pane = Some("wS:pDiscover".to_string());
+        // The pane vanished from the scan -- retire_settled_pending_panes
+        // drops it from pending_worker_panes, and the discover-specific
+        // field must follow.
+        let registry = FixedLabelRegistry(vec![]);
+
+        app.refresh_pane_state(&registry);
+
+        assert_eq!(app.pending_discover_pane, None);
+    }
+
+    /// While the shared pane is still genuinely pending, the discover-
+    /// specific field must not clear early.
+    #[test]
+    fn retire_settled_pending_discover_pane_stays_set_while_the_shared_pane_is_still_pending() {
+        let mut app = App::empty();
+        app.pending_worker_panes.insert("wS:pDiscover".to_string());
+        app.pending_discover_pane = Some("wS:pDiscover".to_string());
+        let registry = FixedLabelRegistry(vec![PaneSnapshot {
+            pane_id: "wS:pDiscover".into(),
+            tab_id: "wS:t1".into(),
+            label: Some("fgos-auto-discover-tsk-2ja".into()),
+            focused: false,
+        }]);
+
+        app.refresh_pane_state(&registry);
+
+        assert_eq!(
+            app.pending_discover_pane,
+            Some("wS:pDiscover".to_string()),
+            "the synthetic auto-discover label never maps to a real task id, so it never appears \
+             in doing_item_ids() -- the pane must stay pending until the real launched session claims"
+        );
     }
 }

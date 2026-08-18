@@ -1,4 +1,10 @@
 {
+  "herdrOrchestrator": {
+    "autoDiscover": true,
+    "autoMerge": false,
+    "autoRetro": false,
+    "autoCleanup": false
+  },
   "runner": {
     "executor": {
       "command": "claude",
@@ -13,67 +19,130 @@
         "Bash(git add:*),Bash(git commit:*)"
       ]
     },
-    "capacities": {
-      "judge-discovery": {
-        "kind": "task",
-        "needs": "llm-judgment",
-        "for": "judge",
-        "command": "claude",
-        "args": [
-          "-p",
-          "{prompt}",
-          "--model",
-          "{model}",
-          "--permission-mode",
-          "acceptEdits",
-          "--allowedTools",
-          "Task,WebSearch,WebFetch,Read,Bash(rg:*),Bash(git add:*),Bash(git commit:*)"
-        ]
-      },
-      "judge-decompose": {
-        "kind": "task",
-        "needs": "llm-judgment",
-        "for": "judge",
-        "command": "claude",
-        "args": [
-          "-p",
-          "{prompt}",
-          "--model",
-          "{model}",
-          "--permission-mode",
-          "acceptEdits",
-          "--allowedTools",
-          "Task,WebSearch,WebFetch,Read,Bash(rg:*),Bash(git add:*),Bash(git commit:*)"
-        ]
-      },
-      "gather": {
-        "kind": "cli",
-        "for": "gather",
-        "needs": "prompt-completion",
-        "carries": "repo-content",
-        "adapter": "cli-spawn",
-        "command": "agy",
-        "provider": "agy",
-        "args": [
-          "-p",
-          "{prompt}",
-          "--model",
-          "{model}"
+    "capabilities": {
+      "impact-analysis": {
+        "description": "Code-graph blast radius",
+        "aliases": [
+          "impact_analysis",
+          "Impact Analysis"
         ],
-        "tier": "light",
-        "model": "Gemini 3.5 Flash (Medium)",
-        "allowCrossProvider": true
+        "prefer": "gitnexus"
+      },
+      "pane-labeling": {
+        "description": "Write a session/task id onto the current terminal pane's label, for a human watching a screen"
+      },
+      "fgos-coding-implement": {
+        "description": "code-implement work for the coding domain's executing stage",
+        "prefer": "agy"
       }
     },
-    "models": {
-      "light": "haiku",
-      "standard": "sonnet",
-      "heavy": "opus"
+    "executors": {
+      "agy": {
+        "kind": "agent",
+        "description": "Antigravity Cli",
+        "allowCrossProvider": true,
+        "for": [
+          "fgos-coding-implement"
+        ],
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "agy",
+            "args": [
+              "-p",
+              "{prompt}",
+              "--dangerously-skip-permissions",
+              "--new-project",
+              "--print-timeout",
+              "10m",
+              "--model",
+              "{model}"
+            ]
+          }
+        ],
+        "providerModel": "gemini",
+        "rigorOverrides": {
+          "light": "lightweight",
+          "standard": "lightweight",
+          "heavy": "lightweight"
+        }
+      },
+      "gitnexus": {
+        "kind": "tool",
+        "description": "Code-graph blast radius",
+        "for": [
+          "impact-analysis"
+        ],
+        "scanTarget": ".gitnexus",
+        "responsibility": "Verification",
+        "invocations": [
+          {
+            "via": "mcp",
+            "command": "mcp:gitnexus",
+            "tools": {
+              "impact-analysis": "mcp__gitnexus__impact"
+            }
+          }
+        ]
+      },
+      "herdr": {
+        "kind": "tool",
+        "for": [
+          "pane-labeling"
+        ],
+        "responsibility": "Chrome",
+        "description": "herdr pane label writer (herdr pane rename) for /fgOS:terminal",
+        "invocations": [
+          {
+            "via": "cli",
+            "command": "herdr",
+            "args": []
+          }
+        ]
+      }
     },
     "timeoutMs": 900000,
     "parallel": {
       "maxRoots": 4,
       "maxLeavesPerRoot": 4
+    },
+    "modelPolicies": {
+      "claude": {
+        "lightweight": "haiku",
+        "standard": "sonnet",
+        "creative": "sonnet",
+        "analytical": "sonnet",
+        "critical": "opus"
+      },
+      "gemini": {
+        "lightweight": "gemini-3.6-flash-medium"
+      }
     }
+  },
+  "gateBypass": {
+    "level": "standard"
+  },
+  "cleanup": {
+    "ttlDays": 7,
+    "leafTtlDays": 0
+  },
+  "invariantChecks": {
+    "commands": [
+      "node --test test/architecture.test.mjs"
+    ]
+  },
+  "workerSlots": {
+    "ceiling": null
+  },
+  "ironLaw": {
+    "level": "ask"
+  },
+  "gateway": {
+    "port": 4170,
+    "token": null
+  },
+  "herdrWebDashboard": {
+    "staticServing": true
   }
 }

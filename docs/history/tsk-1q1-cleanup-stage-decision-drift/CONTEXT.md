@@ -6,9 +6,9 @@ realized: 3 children (`tsk-4jf`, `tsk-1p9`, `tsk-558`) — all with
 validated, implemented, verified, and merged into this item's own branch
 (`fgw/tsk-1q1`). This item's `stage` field lagged behind that reality
 (still read `clarify`, never advanced), which this CONTEXT.md and the
-`fgos discover`/`fgos decompose` calls that follow correct mechanically —
+`fgos discover`/`fgos plan` calls that follow correct mechanically —
 `resolveDecompose`'s own idempotent `hasChildren` path
-(`src/intake/decompose.mjs:533-546`) is exactly the mechanism designed for
+(`src/intake/plan.mjs:533-546`) is exactly the mechanism designed for
 this: detect the existing children and advance the root straight to
 `executing` without re-creating anything.
 

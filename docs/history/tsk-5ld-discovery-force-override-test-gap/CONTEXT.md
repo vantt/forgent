@@ -51,7 +51,7 @@ proved for `resolveDecompose`'s parallel `--force` logic (commit
   test: the `addDecision(...)` success path (line 686) and the
   already-`awaiting-human` `throw new StoreError(...)` refusal (line
   680-684).
-- `test/intake/decompose.test.mjs:1315-1418` (tsk-25g, commit `cd0cc56`,
+- `test/intake/plan.test.mjs:1315-1418` (tsk-25g, commit `cd0cc56`,
   merged to `main`) — the exact two analogous tests for `resolveDecompose`'s
   parallel `--force` logic, proven pattern to mirror: same `callerVerdict`
   shape (`{verdict, reason, children, force: true}` for decompose;

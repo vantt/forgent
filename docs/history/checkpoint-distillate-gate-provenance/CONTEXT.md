@@ -23,7 +23,7 @@ exchange milestones get captured.
 Out of scope: `STR70b` (raw-transcript backstop, blocked on Q1 in
 `gate-dialogue-continuity/CONTEXT.md`, filed separately as `tsk-5dj`);
 `STR71` (ask self-sufficiency, filed separately as `tsk-539`); the exact CLI
-flag names/verb shape for any new fields (implementer's call, `fgos-planning`);
+flag names/verb shape for any new fields (implementer's call, `fgos-coding-planning`);
 `tsk-4op`'s own batch-compound redesign (this item only unblocks it, per
 `tsk-4op`'s own `deps`).
 
@@ -81,7 +81,7 @@ flag names/verb shape for any new fields (implementer's call, `fgos-planning`);
   `computeAwaitingContext` returns `{parent, changedSinceAsk?, ask?}`
   only; no `rationale`/`alternatives`/`source` projection exists yet —
   the exact gap D4 closes.
-- `test/intake/decompose.test.mjs` (tsk-6b6's own tests, e.g.
+- `test/intake/plan.test.mjs` (tsk-6b6's own tests, e.g.
   `resolveDecompose logs a decisionsById entry on a need-human verdict`)
   — precedent test shape for D1's reuse of `addDecision`/
   `view.decisionsById[id]`.
@@ -106,7 +106,7 @@ flag names/verb shape for any new fields (implementer's call, `fgos-planning`);
 - Whether `awaitingContext`'s projection of the two checkpoints needs any
   shape beyond a flat spread of the new fields (e.g. explicit
   `{checkpoint: {...}, answer: {...}}` nesting vs. flat keys) — an
-  implementation/readability call, `fgos-planning`'s to size.
+  implementation/readability call, `fgos-coding-planning`'s to size.
 - Whether `awaitingContext` should also surface a summary (e.g. count) of
   `view.decisionsById[id]` entries for the item, so the exchange-milestone
   trail (D1) is visible without a separate `fgos check` call — real

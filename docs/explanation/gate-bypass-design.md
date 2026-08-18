@@ -19,13 +19,13 @@ target. Discussion during clarify surfaced the real complaint: fgOS
 already has a legitimate unclear-stop (`awaiting-human`, via `fgos
 ask`/`answer`) that intentionally-unattended flows rely on — that one is
 working as designed. The actual friction was the *other* kind of stop:
-skill-embedded confirmation prompts (`fgos-exploring`'s "Approve
-CONTEXT.md?", `fgos-planning`'s "Approve work shape?") firing
+skill-embedded confirmation prompts (`fgos-coding-exploring`'s "Approve
+CONTEXT.md?", `fgos-coding-planning`'s "Approve work shape?") firing
 unconditionally, even when the artifact behind them was already clearly
 complete and there was no real decision left for a human to make.
 
 This reframing (**D1**) is why the feature touches exactly two files
-(`fgos-exploring`/`fgos-planning`'s Gate sections) and not the
+(`fgos-coding-exploring`/`fgos-coding-planning`'s Gate sections) and not the
 `awaiting-human` state machine at all. A design that started from the
 literal "add a bypass toggle" reading would have touched the wrong
 mechanism entirely.
@@ -99,8 +99,8 @@ D2's `hasOpenItems` check is mechanical, but mechanical still means it
 reads something a producer wrote — and for months after this design
 shipped, nothing wrote it. `tsk-5hg` found and fixed a real gap: the
 skills that actually write `CONTEXT.md`/`plan.md`
-(`.claude/skills/fgos-exploring/SKILL.md`,
-`.claude/skills/fgos-planning/SKILL.md`) never mentioned the `##
+(`.claude/skills/fgos-coding-exploring/SKILL.md`,
+`.claude/skills/fgos-coding-planning/SKILL.md`) never mentioned the `##
 Outstanding questions` convention `hasOpenItems` depends on —
 `gate-bypass.mjs` itself asserts it's "the convention this item's own
 CONTEXT.md/plan.md already follow," but nothing wired that convention
@@ -128,9 +128,9 @@ assumed from the check's own code comment.
 
 ## The third gate needed a different axis, not the same one reused (D6, tsk-1ds)
 
-`validateApprove` (`fgos-validating`'s own Gate) was, until `tsk-1ds`, the
+`validateApprove` (`fgos-coding-validating`'s own Gate) was, until `tsk-1ds`, the
 one gate of the three skill gates with no bypass path at all —
-`.claude/skills/fgos-validating/SKILL.md` used to hardcode "No
+`.claude/skills/fgos-coding-validating/SKILL.md` used to hardcode "No
 auto-approve path exists for this Gate today ... actor is always human
 here," even after `contextApprove` and `planApprove` both gained
 `canAutoApprove`.
@@ -159,12 +159,12 @@ a constraint. A self-reported axis was judged more honest than five axes
 that would have had to guess ahead of time.
 
 **The mechanism.** Not a content-inspection check like `hasOpenItems` —
-the axis is `fgos-validating`'s own already-computed verdict:
+the axis is `fgos-coding-validating`'s own already-computed verdict:
 
 - verdict `READY` (no constraints) → bypass, `actor: bypass`
 - verdict `READY WITH CONSTRAINTS` → ask a human, `actor: human`
 - verdict `NOT READY` → unchanged: skip the question entirely, return to
-  `fgos-planning`
+  `fgos-coding-planning`
 
 This keeps the same self-reported trade-off `hasOpenItems` already
 carries (a skill could under-report constraints to earn a bypass) rather
@@ -175,9 +175,18 @@ shape for the other two gates.
 `canAutoApproveValidate(item, verdict, level)`, reusing exactly the first
 two axes `canAutoApprove` already used (the `HEAVY_KEYWORDS` floor, D4;
 `isTierCovered`) and swapping the third for `verdict === 'READY'`. The
-existing `canAutoApprove` — still driving `contextApprove`/`planApprove`
-— was left untouched rather than parameterized, so neither of those two
-gates' behavior could shift as a side effect.
+existing `canAutoApprove` — at the time still driving both
+`contextApprove` and `planApprove` — was left untouched rather than
+parameterized, so neither of those two gates' behavior could shift as a
+side effect.
+
+**Superseded:** `coding-planning-validating-gate-redesign/CONTEXT.md`
+D9-D11 later deleted `canAutoApproveValidate` entirely, replacing it with
+`canAutoApproveMergedGate` at the single merged gate now owned by
+`fgos-coding-validating`; `fgos-coding-planning`'s own `planApprove` gate
+was removed in the same change, so `canAutoApprove` today drives only
+`contextApprove`. This section stays as a historical record of D6's own
+reasoning at the time.
 
 ## A mechanical check is only as live as the branch importing it (D7/D8, `tsk-1vi`)
 
@@ -189,7 +198,7 @@ sections' inline `node -e` scripts import `gate-bypass.mjs`/`store.mjs`
 cwd-relative, from the claimed item's own `fgw/<id>` worktree, not from
 the main checkout.
 
-That choice was deliberate for `fgos-exploring`/`fgos-planning`'s own
+That choice was deliberate for `fgos-coding-exploring`/`fgos-coding-planning`'s own
 Gate sections, which document it explicitly: "this worktree's own branch
 already carries whatever version it needs" — protecting the case where
 an item is itself modifying `gate-bypass.mjs` (as this feature's own
@@ -235,3 +244,71 @@ the second silently assumed a worktree's cwd-relative import always
 resolves against fresh code, which held for every case this feature was
 originally built and tested against, and broke the moment a branch
 outlived the code it imports.
+
+## The global-install crash D8 split off (tsk-65q)
+
+D8 deliberately left one failure shape unfixed: a pure global `npm
+install` of fgOS onto a *different product's* repo has no repo-local
+`src/state/*.mjs` at either `./` (cwd-relative) or `$root` (the calling
+repo's own git root) — both of D7's fallback tiers look inside the
+*consuming* repo, and neither ever looks at where the `fgos` package
+itself is actually installed. Unlike D7's stale-branch case, this crashes
+**unconditionally, for every item**, not just some. It happened to fail
+closed by the same accident as D7's bug — "anything but `true` is
+`false`" — but the whole gate-bypass feature was silently a permanent
+no-op for anyone using a pure global install, not a rare edge case.
+
+**Root cause and the precedent that was already sitting in the repo.**
+The Gate-section checks in `fgos-coding-exploring`/`fgos-coding-validating` each
+reimplemented their own two-tier module resolver inline (an embedded
+`node -e` script) — neither tier ever consulted where the `fgos` package
+itself resolves from. But `bin/fgos.mjs` already had a *working*,
+in-repo precedent for exactly this: its own static relative imports
+resolve against the *importing file's own location*
+(`import.meta.url`), not cwd — so the installed CLI itself already
+resolved `gate-bypass.mjs`/`store.mjs` correctly from any install shape,
+with zero special-casing, the whole time. The bug was never in Node's
+module resolution; it was that the Gate-section checks bypassed the one
+file that already got this right and re-derived their own, incomplete
+version.
+
+**The fix: route through the CLI instead of re-deriving resolution.** A
+new read-only verb, `fgos gate-check <id> --gate <contextApprove|
+validateApprove> ...`, was added to `bin/fgos.mjs` itself
+(`case 'gate-check'`) — a thin wrapper around the already-imported,
+already-tested `canAutoApprove`/`canAutoApproveMergedGate`. Both Gate
+sections' inline `node -e` resolver blocks were replaced with a call to
+this verb. This inherits `bin/fgos.mjs`'s already-correct resolution for
+free: no new resolution logic to write or prove, only a thin verb around
+functions the CLI already imports.
+
+**Rejected alternative: teach the inline resolver a third tier** (walk up
+from `process.execPath`, or use `import.meta.resolve('forgent/...')`
+relative to the `node -e` script). Rejected because it would have
+duplicated resolution logic `bin/fgos.mjs` already had correct, in two
+more places that would each need the same proof burden all over again —
+the entire point of routing through the CLI is that Node's own module
+resolution does the work exactly once, in the one file that ships with
+the package and is guaranteed to resolve correctly regardless of install
+shape.
+
+**Why this was flagged high-risk despite being a small, mechanical
+change.** The path touched (`canAutoApprove`/`canAutoApproveMergedGate`)
+decides whether a work item's gate is auto-approved without a human. The
+bug failed closed by accident — global-install users always got asked.
+Making the check actually *run* for that population is a real behavior
+change: those same users will, once the fix lands, get real
+auto-approve/deny answers per their configured bypass level instead of
+always being asked. That is a genuine audit/security-flagged change on
+its own, even though the code delta is small and mechanical.
+
+**Proof burden matched to the actual regression.** The regression this
+item exists to fix only reproduces from a cwd with no local
+`src/state/*.mjs` at all — calling the new verb from inside forgentX
+itself would pass even with the old broken resolver, since forgentX *is*
+the dev checkout the old cwd-relative tier worked by accident. The test
+added (`test/cli/fgos-gate-approve.test.mjs`) therefore invokes the new
+verb from a scratch tmp directory that has no local state modules,
+simulating a real global-install consumer's repo, and asserts it returns
+the same answer `canAutoApprove` would give directly — proof against the
+actual failure condition, not just proof the verb exists.

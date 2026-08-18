@@ -60,6 +60,10 @@ function add(cwd, id, extra = {}) {
 function move(cwd, id, to, expect) {
   const args = ['move', id, '--to', to];
   if (expect !== undefined) args.push('--expect', expect);
+  // tsk-280: doing -> awaiting-approval via move now requires an explicit
+  // reason (return's own proof-of-progress checks are the real door) --
+  // this e2e test walks the FSM directly, not exercising that guard.
+  if (to === 'awaiting-approval') args.push('--skip-return-guard', "e2e fixture: FSM lifecycle-chain test, not exercising return's own guard");
   return run(cwd, args);
 }
 
@@ -95,7 +99,7 @@ test('rebuild-determinism: init, add work with deps + unicode title, move throug
   assert.equal(move(cwd, 'c', 'blocked', 'todo').status, 0);
   assert.equal(move(cwd, 'c', 'todo', 'blocked').status, 0);
 
-  assert.equal(run(cwd, ['decision', '--text', 'locked D3: event log is truth, view is rebuilt', '--rationale', 'keeps the log the single source of truth']).status, 0);
+  assert.equal(run(cwd, ['decision', '--text', 'locked D3: event log is truth, view is rebuilt', '--rationale', 'keeps the log the single source of truth', '--relation', 'none']).status, 0);
 
   // `ready` (per phase-2-routing-5): a pure read, exercised mid-journey —
   // it must reflect the frontier at this exact point (only `a` is `done`;
@@ -116,7 +120,10 @@ test('rebuild-determinism: init, add work with deps + unicode title, move throug
   assert.equal(before.work.c.status, 'todo');
   assert.equal(before.work.b.title, 'Tiêu đề tiếng Việt — 日本語タイトル 🎉');
   assert.deepEqual(before.work.c.deps, ['a', 'b']);
-  assert.equal(before.decisions.length, 1);
+  // 2, not 1: the explicit decision above, plus the tsk-280
+  // --skip-return-guard override the move() helper logs for item 'a's own
+  // doing -> awaiting-approval step (line 85).
+  assert.equal(before.decisions.length, 2);
 
   fs.rmSync(viewPath(cwd));
   assert.ok(!fs.existsSync(viewPath(cwd)));

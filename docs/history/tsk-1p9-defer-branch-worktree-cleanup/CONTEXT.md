@@ -77,7 +77,7 @@ both the branch and any live checkout of it, the moment a merge lands.
   a `fgos pick` session worktree (`source: 'branch', role: 'session'` —
   the shape both `tsk-4jf` and this item itself were claimed under). No
   overlap, nothing to change there.
-- **Mid-planning discovery (material, surfaced back from `fgos-planning`,
+- **Mid-planning discovery (material, surfaced back from `fgos-coding-planning`,
   user confirmed expanding scope rather than filing separately): the
   EXISTING `cleanup` verb's own `cleanupMergedBranch(repoRoot, branch)`
   call (`bin/fgos.mjs:1092`, already shipped by the sibling item
