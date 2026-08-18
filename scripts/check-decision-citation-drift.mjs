@@ -179,7 +179,11 @@ function findingKey(f) {
 // baseline occurrence per matching finding restores the per-occurrence
 // accounting the old line-keyed formula got for free.
 export function findNewFindings(findings, baseline) {
-  const remaining = {};
+  // Object.create(null) (tsk-1pf): a plain `{}` literal would let a
+  // source file path literally equal to "__proto__" return
+  // Object.prototype itself from `remaining[f.file]` below (truthy, not
+  // undefined), which then throws on `.get()`/`.set()`.
+  const remaining = Object.create(null);
   for (const [file, keys] of Object.entries(baseline)) {
     const counts = new Map();
     for (const key of keys) {
@@ -201,7 +205,10 @@ export function findNewFindings(findings, baseline) {
 }
 
 export function baselineFromFindings(findings) {
-  const baseline = {};
+  // Object.create(null) (tsk-1pf): same __proto__ guard as findNewFindings
+  // above -- `baseline[f.file] = []` on a plain `{}` would reassign the
+  // prototype instead of creating a normal property.
+  const baseline = Object.create(null);
   for (const f of findings) {
     if (!baseline[f.file]) baseline[f.file] = [];
     baseline[f.file].push(findingKey(f));
@@ -385,7 +392,7 @@ export function findWideCitationFindings(sourceFiles, targetId, supersedingLabel
 }
 
 function loadBaseline(baselinePath) {
-  if (!fs.existsSync(baselinePath)) return {};
+  if (!fs.existsSync(baselinePath)) return Object.create(null);
   return JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
 }
 
