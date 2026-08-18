@@ -65,6 +65,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `fgos decision` now requires `--text` explicitly. Before this, a call
+  with no `--text` silently fell back to joining whatever positional
+  arguments were left over (e.g. `fgos decision write "..."` stored
+  "write ..." as the decision text) instead of refusing — the CLI now
+  refuses cleanly (exit 4) rather than storing corrupted decision text.
 - `fgos decision` gains an optional `--kind` flag. Before this, every
   write through the CLI verb defaulted to `addDecision`'s own `'design'`
   kind — including `fgos-coding-validating`'s own audit line for an
