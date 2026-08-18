@@ -7,7 +7,7 @@ import { execSync } from 'node:child_process';
 import {
   KINDS,
   normalizeCapability,
-  toolsFromCapacities,
+  toolsFromExecutors,
   probeTool,
   readLocalStatus,
   writeLocalStatus,
@@ -34,20 +34,20 @@ test('normalizeCapability returns "" for non-string or content-free input', () =
   assert.equal(normalizeCapability('---'), '');
 });
 
-// ─── toolsFromCapacities ─────────────────────────────────────────────────────
+// ─── toolsFromExecutors ─────────────────────────────────────────────────────
 
-test('toolsFromCapacities maps a capability-bearing capacity into a tool-shaped object, normalizing capability — probe kind/command read from invocations[0], not capacity.kind (tsk-in1-4 D5)', () => {
-  const capacities = {
+test('toolsFromExecutors maps a "for"-bearing executor into a tool-shaped object, normalizing capability — probe kind/command read from invocations[0], not executor.kind (tsk-in1-4 D5)', () => {
+  const executors = {
     gitnexus: {
       kind: 'tool',
-      capability: 'Impact Analysis',
+      for: ['Impact Analysis'],
       invocations: [{ via: 'mcp', command: 'mcp:gitnexus' }],
       scanTarget: '.gitnexus',
       responsibility: 'Verification',
       description: 'Code-graph blast radius',
     },
   };
-  const tools = toolsFromCapacities(capacities);
+  const tools = toolsFromExecutors(executors);
   assert.deepEqual(Object.keys(tools), ['gitnexus']);
   assert.equal(tools.gitnexus.name, 'gitnexus');
   assert.equal(tools.gitnexus.kind, 'mcp');
@@ -56,24 +56,42 @@ test('toolsFromCapacities maps a capability-bearing capacity into a tool-shaped 
   assert.equal(tools.gitnexus.scanTarget, '.gitnexus');
 });
 
-test('toolsFromCapacities skips a capacity declaring no capability (a plain agent/dispatch capacity, e.g. "agy")', () => {
-  const capacities = { agy: { kind: 'agent', invocations: [{ via: 'cli', command: 'agy', args: [] }] } };
-  assert.deepEqual(toolsFromCapacities(capacities), {});
+test('toolsFromExecutors skips a executor declaring no "for" (a plain agent/dispatch executor, e.g. "agy")', () => {
+  const executors = { agy: { kind: 'agent', invocations: [{ via: 'cli', command: 'agy', args: [] }] } };
+  assert.deepEqual(toolsFromExecutors(executors), {});
 });
 
-test('toolsFromCapacities skips a capacity whose capability normalizes to empty', () => {
-  assert.deepEqual(toolsFromCapacities({ x: { kind: 'tool', capability: '---' } }), {});
+test('toolsFromExecutors skips a kind:"agent" executor even when it DOES declare "for" -- the real regression found live: tsk-34n D3 gave "agy" its own "for" (so capabilities.<name>.prefer can resolve it), and without this gate every agent-kind executor that migrated to "for" would incorrectly show up as tool-registry-probeable', () => {
+  const executors = { agy: { kind: 'agent', for: ['fgos-coding-implement'], invocations: [{ via: 'cli', command: 'agy', args: [] }] } };
+  assert.deepEqual(toolsFromExecutors(executors), {});
 });
 
-test('toolsFromCapacities reads "unknown" kind/command when the capacity declares a capability but no invocations at all', () => {
-  const tools = toolsFromCapacities({ x: { kind: 'tool', capability: 'foo' } });
+test('toolsFromExecutors skips a executor whose "for"[0] normalizes to empty', () => {
+  assert.deepEqual(toolsFromExecutors({ x: { kind: 'tool', for: ['---'] } }), {});
+});
+
+test('toolsFromExecutors reads "unknown" kind/command when the executor declares "for" but no invocations at all', () => {
+  const tools = toolsFromExecutors({ x: { kind: 'tool', for: ['foo'] } });
   assert.equal(tools.x.kind, undefined);
   assert.equal(tools.x.command, undefined);
 });
 
-test('toolsFromCapacities on undefined/empty input returns {}', () => {
-  assert.deepEqual(toolsFromCapacities(undefined), {});
-  assert.deepEqual(toolsFromCapacities({}), {});
+test('toolsFromExecutors on undefined/empty input returns {}', () => {
+  assert.deepEqual(toolsFromExecutors(undefined), {});
+  assert.deepEqual(toolsFromExecutors({}), {});
+});
+
+// ─── toolsFromExecutors: "for" is the only accepted input (tsk-34n --
+// retires tsk-45f D11's own "capability" (singular) back-compat fallback) ──
+
+test('toolsFromExecutors reads "for"\'s first entry as the capability', () => {
+  const tools = toolsFromExecutors({ x: { kind: 'tool', for: ['impact-analysis', 'other-capability'] } });
+  assert.equal(tools.x.capability, 'impact-analysis');
+});
+
+test('toolsFromExecutors no longer reads the legacy "capability" (singular) field at all -- a executor declaring only it (no "for") is skipped, same as one declaring neither', () => {
+  const tools = toolsFromExecutors({ x: { kind: 'tool', capability: 'impact-analysis' } });
+  assert.deepEqual(tools, {});
 });
 
 // ─── probeTool ───────────────────────────────────────────────────────────────

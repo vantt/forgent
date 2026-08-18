@@ -129,7 +129,7 @@ dispatch demo family kept as living evidence).
   full decision record and scout evidence.
 - `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md`
   — Native-First Dispatch Doctrine; this item is Phase 2 of 5 (Phase 1:
-  `tsk-1ni`'s repoRoot fix; Phase 3: `tsk-53h`'s shared capacity-dispatch
+  `tsk-1ni`'s repoRoot fix; Phase 3: `tsk-53h`'s shared executor-dispatch
   helper).
 - `docs/explanation/discovery-decompose-reporoot-verify-overwrite.md` —
   the repoRoot bug and verify-overwrite guard this item's caller-verdict

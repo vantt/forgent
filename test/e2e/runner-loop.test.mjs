@@ -327,7 +327,7 @@ test('e2e stage-clarify+stage-decompose (a) clear+pass-through: --once safely no
 test('e2e stage-clarify (b) unclear verdict: an explicit discover --verdict unclear parks the item in awaiting-human with the exact question; answering resumes it to todo, and --once still never re-judges clarify on its own (D16)', () => {
   const repoRoot = initTempRepo();
   const scriptDir = mkTempDir('fgos-runner-e2e-discovery-unclear-');
-  const question = 'Bạn muốn ưu tiên hiệu năng hay độ chính xác?';
+  const question = '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: Bạn muốn ưu tiên hiệu năng hay độ chính xác?';
 
   assert.equal(fgos(repoRoot, ['init']).status, 0);
   // tsk-qod D1/D2: a fresh item now starts at `discovery` (stages[0])
@@ -566,7 +566,7 @@ test('e2e stage-discovery: --once advances the item to exploring and parks it in
   const featureDir = 'docs/history/discovery-dispatch-unclear-item';
 
   assert.equal(fgos(repoRoot, ['init']).status, 0);
-  writeRunnerConfig(repoRoot, writeResearchWorkerExecutor(scriptDir, featureDir, { clear: false, question: 'Which retry backoff strategy?' }));
+  writeRunnerConfig(repoRoot, writeResearchWorkerExecutor(scriptDir, featureDir, { clear: false, question: '## Context\n\nThe worker needs to pick a retry backoff strategy for the research step.\n\n## Why this matters\n\nThis directly affects the outcome: which retry backoff strategy?' }));
 
   add(repoRoot, 'item-research-unclear', { stage: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
 
@@ -577,7 +577,7 @@ test('e2e stage-discovery: --once advances the item to exploring and parks it in
   const item = view.work['item-research-unclear'];
   assert.equal(item.stage, 'exploring', 'tsk-30v D2/D3: unclear no longer parks in place -- it advances stage to exploring');
   assert.equal(item.status, 'awaiting-human', 'an unclear verdict parks the item, matching the interactive driver path');
-  assert.equal(view.gates['item-research-unclear'].ask, 'Which retry backoff strategy?');
+  assert.equal(view.gates['item-research-unclear'].ask, '## Context\n\nThe worker needs to pick a retry backoff strategy for the research step.\n\n## Why this matters\n\nThis directly affects the outcome: which retry backoff strategy?');
 });
 
 test('e2e stage-discovery fail-safe: a worker that crashes leaves the item at stage:discovery, status:todo for the next sweep to retry -- never stuck, never silently advanced', () => {
@@ -739,7 +739,7 @@ test('e2e full journey: item1 (no deps) -> awaiting-approval with a worker commi
       'work.add:item2:add',
       'work.move:item1:doing',
       'work.outcome:item1:predicted',
-      'capacity.dispatch:item1:add', // D8, tsk-62v: dispatch announce/audit entry
+      'executor.dispatch:item1:add', // D8, tsk-62v: dispatch announce/audit entry
       'work.move:item1:awaiting-approval',
       'work.handoff:item1:reviewer', // D18: moveWork's own side effect on reaching awaiting-approval, not a second writer
       'work.outcome:item1:actual',
@@ -836,8 +836,8 @@ test('e2e verify-red: a worker that commits the wrong thing fails goal-check on 
     'work.outcome:predicted',
     // D8, tsk-62v: one dispatch announce/audit entry per attempt — two
     // retry attempts run before the item parks to blocked.
-    'capacity.dispatch:item-red',
-    'capacity.dispatch:item-red',
+    'executor.dispatch:item-red',
+    'executor.dispatch:item-red',
     'work.move:blocked',
     'work.outcome:actual',
     'work.friction:item-red',

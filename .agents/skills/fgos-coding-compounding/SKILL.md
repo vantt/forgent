@@ -110,10 +110,30 @@ actually cited from this file until now).
    root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
    ```
 
-   Decide the target path from the quadrant chosen in step 2:
-   `docs/<quadrant>/<file>.md` — this is the same path step 4 tags next.
-   Before writing, gather *every* capture already linked to that path —
-   not just this item's own:
+   **Tìm-trước-khi-tạo (tsk-1lv-6): tra `authoritative_for` trước khi
+   suy đường dẫn từ quadrant+tên file.** Trong đúng quadrant vừa chọn ở
+   bước 2 (phạm vi cố ý hẹp: chỉ chống trùng chủ đề TRONG một quadrant đã
+   định nghĩa rõ, không mở rộng sang audience/area — trục đó chưa tồn tại
+   trong schema hiện tại), gọi
+
+   ```bash
+   node "$root/bin/fgos.mjs" authoritative-match --quadrant docs/<quadrant> --topic "<chủ đề thật của capture này, không phải tên file đoán>" --dir "$root"
+   ```
+
+   (`fgos authoritative-match` — skeleton-match `authoritative_for` của
+   mọi doc trong đúng quadrant, `src/report/authoritative-match.mjs` port/
+   adapter, mirror CTR009, swappable sau này mà không đổi lời gọi CLI
+   này). `data.match` khác `null` (score cao, không phải trùng ngẫu nhiên
+   vài từ) là doc đích để **update-in-place**,
+   bất kể tên file có khớp cách đoán tự nhiên hay không — chủ đề quyết
+   định đích, không phải tên file. Không có match: rơi về suy đường dẫn từ
+   quadrant+tên file như trước.
+
+   Decide the target path from the quadrant chosen in step 2 (when no
+   `authoritative_for` match was found above): `docs/<quadrant>/<file>.md`
+   — this is the same path step 4 tags next. Before writing, gather
+   *every* capture already linked to that path — not just this item's
+   own:
 
    ```bash
    node "$root/bin/fgos.mjs" doc-sources docs/<quadrant>/<file>.md --dir "$root"
@@ -124,17 +144,28 @@ actually cited from this file until now).
    already has that capture in hand from step 1. `doc-sources` here only
    supplies *other* items' prior captures already linked to the same
    path, for the no-loss gather below.
-   - **Detect grow-vs-create by file existence at `$root`** — no extra
-     flag, no capture-record marker. If `$root/docs/<quadrant>/<file>.md`
-     does not yet exist, **create** it fresh from the gathered
-     capture(s) plus this item's own (from step 1), quoted, never
-     paraphrased.
-   - If the file already exists, **grow** it: accumulate the newly
+   - **Detect grow-vs-create by file existence at `$root` (or by the
+     `authoritative_for` match found above, when there was one)** — no
+     extra flag, no capture-record marker. If the target file does not
+     yet exist (no match above, and nothing at
+     `$root/docs/<quadrant>/<file>.md`), **create** it fresh from the
+     gathered capture(s) plus this item's own (from step 1), quoted, never
+     paraphrased — and give it a real `authoritative_for: <topic>`
+     frontmatter line (via `renderFrontmatter`, `frontmatter.mjs`) so a
+     later capture on the same subject finds it through the
+     tìm-trước-khi-tạo step above instead of guessing a second path for
+     the same topic.
+   - If the target file already exists, **grow** it: accumulate the newly
      gathered capture(s) into the existing living prose as additive
-     sections — append what is new, and do not delete, shorten, or
-     restructure prose that is already there. The document keeps every
-     prior detail and structural section it already had (no loss) while
-     gaining whatever the new capture(s) add.
+     sections — append what is new by default. **Reconcile, don't just
+     append, when the new capture genuinely contradicts what is already
+     there** (allowed exception to the append-only default, tsk-1lv-6) —
+     retire or rewrite the specific contradicted prose,
+     never leaving two mutually-exclusive claims standing side by side as
+     if both were still true; state plainly, in the same commit, what
+     changed and why. Deleting or shortening prose that the new capture
+     does NOT actually contradict is still the red flag it always
+     was — reconcile is a targeted correction, not a licence to prune.
    Match the quadrant's own shape either way: a tutorial reads as ordered
    steps, a how-to as a recipe for one goal, a reference as a lookup table
    or list, an explanation as prose discussion. The Diataxis quadrant
@@ -224,7 +255,12 @@ on this skill's behalf.
   just stored
 - growing an existing document by deleting or shortening prose that was
   already there, instead of accumulating the newly gathered capture(s)
-  additively
+  additively — unless the new capture genuinely contradicts that specific
+  prose, in which case reconciling it is the correct move and silently
+  leaving the contradiction standing unreconciled is the red flag instead
+- deciding a target path from quadrant+file-name guesswork without first
+  checking existing docs' `authoritative_for` frontmatter for a skeleton
+  match on this capture's real topic
 - organizing a grown document by a second axis (audience, product area,
   etc.) instead of keeping the Diataxis quadrant as the sole structure
 - applying a stage or status move by writing `.fgos/` state directly

@@ -17,6 +17,6 @@ description: >-
   tsk-umc's split concurrently", "dispatch this candidate set".
 ---
 
-This is a generated thin wrapper (tsk-1qi D5/D7) -- do not edit directly, edit the source instead.
+This is a generated thin wrapper (tsk-1qi) -- do not edit directly, edit the source instead.
 The real skill content lives at `../../../.agents/skills/fgos-fanout/SKILL.md`, this project's own canonical skill source.
 Read that file and follow it directly.

@@ -154,6 +154,47 @@ function logDecomposeVerdict(dir, id, outcome, rationale, label) {
 // OUTSIDE that table is not a real citation.
 const D_ID_PATTERN = /\bD\d+\b/g;
 
+// tsk-1lv-3 (CONTEXT.md D3): the write-side counterpart to
+// extractLockedDecisionIds' own section-scoping regex just above --
+// `fgos context-render <id>` (bin/fgos.mjs, src/report/context-render.mjs)
+// calls this to splice a freshly-rendered table into an existing
+// CONTEXT.md, replacing whatever text currently sits under the heading
+// (hand-typed prose, an earlier render, or nothing) without touching any
+// other section. Exported so the CLI verb can call it directly rather than
+// re-deriving the same section-matching logic a second time.
+export function replaceLockedDecisionsSection(contextText, tableMarkdown) {
+  if (typeof contextText !== 'string') {
+    throw new Error('replaceLockedDecisionsSection: contextText must be a string');
+  }
+  if (typeof tableMarkdown !== 'string') {
+    throw new Error('replaceLockedDecisionsSection: tableMarkdown must be a string');
+  }
+  const headingMatch = /##\s*Locked decisions\s*\n/i.exec(contextText);
+  if (!headingMatch) {
+    throw new Error('replaceLockedDecisionsSection: no "## Locked decisions" heading found');
+  }
+  const headingEnd = headingMatch.index + headingMatch[0].length;
+  const rest = contextText.slice(headingEnd);
+  // `headingMatch`'s own trailing `\s*` is greedy (it backtracks only as
+  // far as needed to still match the required literal `\n`), so it already
+  // consumes every blank line between the heading and whatever follows --
+  // including an EMPTY section's zero-blank-line case, where the next
+  // heading sits immediately at the start of `rest` with no leading `\n`
+  // of its own left to find. Check that case explicitly before falling
+  // back to the `\n##` search below; skipping it would let `sectionEnd`
+  // run to the end of the whole document, swallowing every later section.
+  let sectionEnd;
+  if (/^##\s/.test(rest)) {
+    sectionEnd = headingEnd;
+  } else {
+    const nextHeadingMatch = /\n##\s/.exec(rest);
+    sectionEnd = nextHeadingMatch ? headingEnd + nextHeadingMatch.index + 1 : contextText.length;
+  }
+  const before = contextText.slice(0, headingEnd);
+  const after = contextText.slice(sectionEnd);
+  return `${before}${tableMarkdown.trimEnd()}\n\n${after}`;
+}
+
 function extractLockedDecisionIds(contextText) {
   if (typeof contextText !== 'string' || !contextText.trim()) return new Set();
   const section = /##\s*Locked decisions([\s\S]*?)(?:\n##\s|$)/i.exec(contextText);
@@ -287,12 +328,12 @@ export function resolveCallerPlanVerdict(raw, lockedContext) {
 function formatProposalAsk(verdict, reason) {
   if (verdict.kind === 'decompose') {
     const list = verdict.children.map((c, i) => `${i + 1}. ${c.title} (verify: ${c.verify})`).join('\n');
-    return `Đề xuất chia (chưa ghi vào queue, cần xác nhận) — ${reason}\n${list}`;
+    return `## Context\n\nĐề xuất chia (chưa ghi vào queue, cần xác nhận) — ${reason}\n${list}\n\n## Why this matters\n\nCần xác nhận trước khi các việc con được ghi thật vào queue — sai sót ở đây tốn công dọn lại sau.`;
   }
   if (verdict.kind === 'pass-through') {
-    return `Đề xuất: không chia (pass-through) — ${reason}`;
+    return `## Context\n\nĐề xuất: không chia (pass-through) — ${reason}\n\n## Why this matters\n\nCần xác nhận trước khi việc này được coi là một khối duy nhất, không tách nhỏ.`;
   }
-  return `Đề xuất chia — ${reason}`;
+  return `## Context\n\nĐề xuất chia — ${reason}\n\n## Why this matters\n\nCần xác nhận trước khi các việc con được ghi thật vào queue.`;
 }
 
 // tsk-5e97 D1 (docs/history/tsk-5e97-decompose-footprint-overlap-gate/
@@ -580,8 +621,11 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
         );
       }
       const ask =
+        `## Context\n\n` +
         `Verify hiện tại của item (sẽ được stamp lúc sang executing) bị nghi ngờ ở vòng kiểm tra thứ hai: ${planVerifyDispute.reason}\n` +
-        `Verify: ${planApproveVerify}`;
+        `Verify: ${planApproveVerify}\n\n` +
+        `## Why this matters\n\n` +
+        `Cần xác nhận trước khi verify này được stamp thật vào item lúc sang executing.`;
       putInAwaiting(dir, { id, ask, statusAtAsk: work.status });
       return { outcome: 'verify-disputed', id, secondPass: planVerifyDispute };
     }

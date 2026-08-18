@@ -21,6 +21,7 @@ pass to keep the item moving.
 
 ## Hard rules
 
+- When asking questions (`fgos ask`), format question text using self-contained citations (`../_shared/citation-format.md`) and the required two-heading Markdown structure (`## Context` and `## Why this matters`, each followed by at least 20 characters of content).
 - When one of this skill's `fgos <verb>` calls (`plan`, `decision`,
   `gate-approve`) fails with a known error category, relay that category
   verbatim in the hand-back — never fold it into a generic "blocked"
@@ -70,8 +71,8 @@ pass to keep the item moving.
   Task/Agent call is collapsed by default in the transcript, not hidden,
   unlike a genuinely opaque headless `claude -p` subprocess). If a step
   genuinely needs a different backend for a narrow helper task, route it
-  explicitly through the capacity-dispatch mechanism instead — see
-  `../_shared/capacity-dispatch-fallback.md` for its own list of valid
+  explicitly through the executor-dispatch mechanism instead — see
+  `../_shared/executor-dispatch-fallback.md` for its own list of valid
   reasons.
 - Do not apply the `planning`→`executing` edge yourself, and do not invent a
   new edge, stage, or field to record the verdict. The verdict is prose
@@ -358,9 +359,13 @@ skill's own "leave execution alone" rule).
   `auto-approved: validateApprove (gate-bypass level <level>)`, log it
   (`fgos decision --text "auto-approved validateApprove gate for
   <item-id> at level <level>" --rationale "gate-bypass level <level>
-  permits auto-approval per docs/history/gate-bypass/CONTEXT.md D1-D5 as
-  superseded by tsk-224"`, the same audit trail `gate-bypass` D3
-  requires), record it (`fgos gate-approve <item-id> --gate
+  permits auto-approval per the gate-bypass feature's own locked
+  decisions (see docs/history/gate-bypass/CONTEXT.md), as superseded by
+  tsk-224" --relation supersedes:tsk-224`
+  — the text names a real supersession, so the relation flag must say so
+  too, every `fgos decision` write declares its relation, no default
+  (tsk-1lv-1) — the same audit trail `gate-bypass` requires), record it
+  (`fgos gate-approve <item-id> --gate
   validateApprove --actor bypass --verify "..."`, per above), then
   continue straight to the `planning`→`executing` engine call below.
 

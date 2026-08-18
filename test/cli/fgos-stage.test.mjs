@@ -191,14 +191,14 @@ test('discover on an unclear verdict parks the submitted item in awaiting-human 
   const cwd = tmpCwd();
   const id = JSON.parse(run(cwd, ['submit', 'Do the ambiguous work']).stdout).data.id;
 
-  const result = run(cwd, ['discover', id, '--verdict', 'unclear', '--question', 'Which service?']);
+  const result = run(cwd, ['discover', id, '--verdict', 'unclear', '--question', '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: Which service?']);
   assert.equal(result.status, 0);
   assert.equal(JSON.parse(result.stdout).data.outcome, 'unclear');
 
   const view = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(view.work[id].status, 'awaiting-human');
   assert.equal(view.work[id].stage, 'exploring');
-  assert.equal(view.gates[id].ask, 'Which service?');
+  assert.equal(view.gates[id].ask, '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: Which service?');
 });
 
 test('discover with no id is rejected as validation, exit 4', () => {
@@ -271,14 +271,14 @@ test('discover --verdict unclear --question parks in awaiting-human with that ex
   writeRunnerConfig(cwd, { clear: true, verify: 'SHOULD NEVER SURFACE' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
-  const result = run(cwd, ['discover', id, '--verdict', 'unclear', '--question', 'Which provider?']);
+  const result = run(cwd, ['discover', id, '--verdict', 'unclear', '--question', '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: Which provider?']);
   assert.equal(result.status, 0);
   assert.equal(JSON.parse(result.stdout).data.outcome, 'unclear');
 
   const view = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(view.work[id].status, 'awaiting-human');
   assert.equal(view.work[id].stage, 'exploring');
-  assert.equal(view.gates[id].ask, 'Which provider?');
+  assert.equal(view.gates[id].ask, '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: Which provider?');
 });
 
 test('discover --verdict clear with no --verify is rejected as validation, exit 4', () => {
@@ -337,7 +337,7 @@ test('discover --verdict unclear never applies classification — the same guard
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
   const before = envelopeData(run(cwd, ['list']).stdout).work[id];
 
-  const result = run(cwd, ['discover', id, '--verdict', 'unclear', '--question', 'Which provider?', '--tier', 'heavy', '--kind', 'bug', '--risk', 'heavy']);
+  const result = run(cwd, ['discover', id, '--verdict', 'unclear', '--question', '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: Which provider?', '--tier', 'heavy', '--kind', 'bug', '--risk', 'heavy']);
   assert.equal(result.status, 0);
   assert.equal(JSON.parse(result.stdout).data.outcome, 'unclear');
 

@@ -43,11 +43,12 @@ import {
 } from './helpers/setup-checks-harness.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../../src/state/worker-slots.mjs';
 import { DEFAULT_IRON_LAW_LEVEL, findDomainWorkflowSkillMapGaps } from '../../src/setup/registrations.mjs';
+import { addDecision } from '../../src/state/store.mjs';
 
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, plugin-dev-skills-packaged, changelog-unreleased-stale, herdr-launcher-configured, herdr-web-dashboard-configured, work-classification-vocabulary, work-stage-vocabulary, domain-workflow-skillmap-coverage, delivered-not-on-trunk, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, events-jsonl-not-truncated, cli-version-visible, worker-slots-ceiling-usable, gateway-token-configured, readme-install-tag-exists, iron-law-configured, task-specs-resolve, agent-claims-resolve, and dispatch-decide-hook-wired', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, plugin-dev-skills-packaged, changelog-unreleased-stale, herdr-launcher-configured, herdr-web-dashboard-configured, work-classification-vocabulary, work-stage-vocabulary, domain-workflow-skillmap-coverage, delivered-not-on-trunk, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, events-jsonl-not-truncated, cli-version-visible, worker-slots-ceiling-usable, gateway-token-configured, readme-install-tag-exists, iron-law-configured, task-specs-resolve, agent-claims-resolve, dispatch-decide-hook-wired, and decision-index-stale', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     [
@@ -82,6 +83,7 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'dispatch-decide-hook-wired',
       'task-specs-resolve',
       'agent-claims-resolve',
+      'decision-index-stale',
     ].sort(),
   );
 });
@@ -710,6 +712,115 @@ test('enduser-docs-index-stale fix is idempotent -- a second run reports changed
   fs.rmSync(tmp, { recursive: true, force: true });
 });
 
+test('decision-index-stale passes when docs/decisions/index.md does not exist yet (tsk-1lv review-fix F10)', () => {
+  const tmp = mkTemp('fgos-decision-index-check-');
+  const fgosDir = path.join(tmp, '.fgos');
+  initStore(fgosDir);
+  const { passed, message } = checkById('decision-index-stale').check(tmp);
+  assert.equal(passed, true);
+  assert.match(message, /not found/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('decision-index-stale fails when state.decisions has a scope-carrying decision the on-disk index does not reflect', () => {
+  const tmp = mkTemp('fgos-decision-index-check-');
+  const fgosDir = path.join(tmp, '.fgos');
+  initStore(fgosDir);
+  fs.mkdirSync(path.join(tmp, 'docs', 'decisions'), { recursive: true });
+  fs.writeFileSync(path.join(tmp, 'docs', 'decisions', 'index.md'), '# Decisions index\n\n_No platform/repo-wide decisions recorded yet._\n');
+  addDecision(fgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
+
+  const { passed, message } = checkById('decision-index-stale').check(tmp);
+  assert.equal(passed, false);
+  assert.match(message, /stale/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('decision-index-stale passes when the on-disk index already matches state.decisions', () => {
+  const tmp = mkTemp('fgos-decision-index-check-');
+  const fgosDir = path.join(tmp, '.fgos');
+  initStore(fgosDir);
+  addDecision(fgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
+  fixById('decision-index-stale').fix(tmp);
+
+  const { passed, message } = checkById('decision-index-stale').check(tmp);
+  assert.equal(passed, true);
+  assert.match(message, /up to date/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('decision-index-stale fix regenerates the index via the same path fgos decision-index uses, resolving the drift', () => {
+  const tmp = mkTemp('fgos-decision-index-fix-');
+  const fgosDir = path.join(tmp, '.fgos');
+  initStore(fgosDir);
+  fs.mkdirSync(path.join(tmp, 'docs', 'decisions'), { recursive: true });
+  fs.writeFileSync(path.join(tmp, 'docs', 'decisions', 'index.md'), '# Decisions index\n\n_No platform/repo-wide decisions recorded yet._\n');
+  addDecision(fgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
+  assert.equal(checkById('decision-index-stale').check(tmp).passed, false);
+
+  const { changed, message } = fixById('decision-index-stale').fix(tmp);
+  assert.equal(changed, true);
+  assert.match(message, /regenerated/);
+
+  const after = checkById('decision-index-stale').check(tmp);
+  assert.equal(after.passed, true);
+  const indexContent = fs.readFileSync(path.join(tmp, 'docs', 'decisions', 'index.md'), 'utf8');
+  assert.match(indexContent, /D-ADR9999: example/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('decision-index-stale fix is idempotent -- a second run reports changed:false', () => {
+  const tmp = mkTemp('fgos-decision-index-fix-');
+  const fgosDir = path.join(tmp, '.fgos');
+  initStore(fgosDir);
+  addDecision(fgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
+  fixById('decision-index-stale').fix(tmp);
+  const second = fixById('decision-index-stale').fix(tmp);
+  assert.equal(second.changed, false);
+  assert.match(second.message, /already up to date/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('decision-index-stale check FAILS when the index is missing but state.decisions has real rows to index -- H2 tsk-1lv round-2 regression (a missing index with real decisions to project is drift, not "nothing to check")', () => {
+  const tmp = mkTemp('fgos-decision-index-check-');
+  const fgosDir = path.join(tmp, '.fgos');
+  initStore(fgosDir);
+  addDecision(fgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
+
+  const { passed, message } = checkById('decision-index-stale').check(tmp);
+  assert.equal(passed, false);
+  assert.match(message, /not found/);
+  assert.doesNotMatch(message, /nothing to check/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('decision-index-stale fix reports a graceful skip (changed:false, no throw) when generateDecisionIndex refuses to blank an existing populated index -- B3 tsk-1lv round-2 regression (a thrown StoreError here used to abort fgos doctor --fix entirely, discarding every other fix\'s result)', () => {
+  const tmp = mkTemp('fgos-decision-index-fix-');
+  const populatedFgosDir = path.join(tmp, '.fgos');
+  initStore(populatedFgosDir);
+  addDecision(populatedFgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
+  fixById('decision-index-stale').fix(tmp);
+  const before = fs.readFileSync(path.join(tmp, 'docs', 'decisions', 'index.md'), 'utf8');
+
+  // Simulate the real-world trigger: the .fgos store this check/fix pair
+  // reads from is unreadable/empty relative to an already-populated
+  // on-disk index -- exactly what a fresh clone or a worktree missing
+  // .fgos/ (ADR0020) looks like once this branch's own committed index.md
+  // lands.
+  fs.rmSync(populatedFgosDir, { recursive: true, force: true });
+
+  let result;
+  assert.doesNotThrow(() => {
+    result = fixById('decision-index-stale').fix(tmp);
+  });
+  assert.equal(result.changed, false);
+  assert.match(result.message, /skipped/);
+
+  const after = fs.readFileSync(path.join(tmp, 'docs', 'decisions', 'index.md'), 'utf8');
+  assert.equal(after, before, 'the real index must survive the refused fix untouched');
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
 test('fgos check (CLI e2e) reports changelogNag and appends a checkpoint to changelog-nag-history.jsonl', () => {
   const cwd = mkTemp('fgos-changelog-nag-cli-');
   execFileSync('git', ['init', '-q'], { cwd, encoding: 'utf8' });
@@ -738,18 +849,29 @@ test('fgos check (CLI e2e) reports changelogNag and appends a checkpoint to chan
 });
 
 // tsk-in1-1 D1: a tool provider is declared directly in
-// `runner.capacities.<id>` (`.fgos/config.json`), config-edited like every
-// other capacity, never through a `fgos tool register` event.
-function declareCapacity(cwd, id, fields) {
+// `runner.executors.<id>` (`.fgos/config.json`), config-edited like every
+// other executor, never through a `fgos tool register` event.
+function declareExecutor(cwd, id, fields) {
   const configPath = path.join(cwd, '.fgos', 'config.json');
   const cfg = fs.existsSync(configPath) ? JSON.parse(fs.readFileSync(configPath, 'utf8')) : {};
   cfg.runner ??= {};
-  cfg.runner.capacities ??= {};
-  cfg.runner.capacities[id] = fields;
+  cfg.runner.executors ??= {};
+  cfg.runner.executors[id] = fields;
+  // tsk-45f D11 (tsk-34n retired the "capability" singular fallback --
+  // "for" is the only field read now): "for" is catalog-validated against
+  // cfg.runner.capabilities -- declare each entry here so this raw fixture
+  // writer keeps producing a loadable config, same as a real executor
+  // would need.
+  if (Array.isArray(fields.for)) {
+    cfg.runner.capabilities ??= {};
+    for (const purpose of fields.for) {
+      cfg.runner.capabilities[purpose] ??= {};
+    }
+  }
   fs.writeFileSync(configPath, JSON.stringify(cfg, null, 2));
 }
 
-test('tool-registry-configured passes when no tool-capable capacity is declared at all (inactive — a clean skip, never a failure)', () => {
+test('tool-registry-configured passes when no tool-capable executor is declared at all (inactive — a clean skip, never a failure)', () => {
   const cwd = mkTemp('fgos-tool-registry-inactive-');
   execFileSync('git', ['init', '-q'], { cwd });
   spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
@@ -763,7 +885,7 @@ test('tool-registry-configured passes when every declared tool is checked presen
   const cwd = mkTemp('fgos-tool-registry-full-');
   execFileSync('git', ['init', '-q'], { cwd });
   spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
-  declareCapacity(cwd, 'echo-tool', { kind: 'tool', capability: 'test-capability', invocations: [{ via: 'cli', command: 'echo', args: [] }] });
+  declareExecutor(cwd, 'echo-tool', { kind: 'tool', for: ['test-capability'], invocations: [{ via: 'cli', command: 'echo', args: [] }] });
   const check = spawnSync(process.execPath, [FGOS, 'tool', 'check'], { cwd, encoding: 'utf8' });
   assert.equal(check.status, 0, check.stderr);
   const { passed, message } = checkById('tool-registry-configured').check(cwd);
@@ -776,7 +898,7 @@ test('tsk-3oa2: tool-registry-configured FAILS when a declared tool is missing o
   const cwd = mkTemp('fgos-tool-registry-degraded-');
   execFileSync('git', ['init', '-q'], { cwd });
   spawnSync(process.execPath, [FGOS, 'init'], { cwd, encoding: 'utf8' });
-  declareCapacity(cwd, 'never-checked-tool', { kind: 'tool', capability: 'test-capability', invocations: [{ via: 'cli', command: 'echo', args: [] }] });
+  declareExecutor(cwd, 'never-checked-tool', { kind: 'tool', for: ['test-capability'], invocations: [{ via: 'cli', command: 'echo', args: [] }] });
   // Deliberately never runs `fgos tool check` -- the tool stays "unknown",
   // which classifyRegistryPosture reports as degraded (never inactive).
   const { passed, message } = checkById('tool-registry-configured').check(cwd);

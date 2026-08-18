@@ -17,8 +17,14 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf } from '../src/state/store.mjs';
-import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability, toolsFromCapacities } from '../src/state/tool-registry.mjs';
+import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf, parseDecisionRelation, decisionTextLooksLikeSupersession } from '../src/state/store.mjs';
+import { collectWideSourceFiles, findWideCitationFindings } from '../scripts/check-decision-citation-drift.mjs';
+import { computeDecisionIndex, generateDecisionIndex } from '../src/report/decision-index.mjs';
+import { renderLockedDecisionsTable } from '../src/report/context-render.mjs';
+import { runFourDoorChecks } from '../src/state/retrospective-doors.mjs';
+import { findAuthoritativeMatch, findDuplicateAuthoritativeClaims } from '../src/report/authoritative-match.mjs';
+import { parseFrontmatter } from '../src/report/frontmatter.mjs';
+import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability, toolsFromExecutors } from '../src/state/tool-registry.mjs';
 import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
@@ -35,8 +41,8 @@ import { readGateBypassLevel, canAutoApprove, canAutoApproveMergedGate } from '.
 const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 import { resolveFgosDir, fgosDirFromRoot, resolveMainCheckoutRoot } from '../src/runner/paths.mjs';
 import { resolveCliVersionInfo } from '../src/cli/version.mjs';
-import { resolveDiscovery, classificationPatchFromVerdict, assertCallerClassification } from '../src/intake/discovery.mjs';
-import { resolvePlan } from '../src/intake/plan.mjs';
+import { resolveDiscovery, classificationPatchFromVerdict, assertCallerClassification, hasRealVerify } from '../src/intake/discovery.mjs';
+import { resolvePlan, replaceLockedDecisionsSection, resolveContentRoot } from '../src/intake/plan.mjs';
 import { computeEntropy, computeCounts, FINAL_STATUSES } from '../src/report/entropy.mjs';
 import { findSourceCaptureIds } from '../src/report/enduser-index.mjs';
 import { generateEnduserDocsIndex } from '../src/report/enduser-index-generate.mjs';
@@ -1437,11 +1443,35 @@ async function runVerb(verb, flags, positional, dir) {
     // exists before it will ever reach `done`.
     case 'retrospective': {
       const view = listWork(dir);
+      const repoRoot = path.dirname(dir);
       const swept = [];
       for (const item of Object.values(view.work)) {
         if (item.status !== 'delivered') continue;
         const { event } = moveWork(dir, { id: item.id, to: 'retrospective', expectedStatus: 'delivered', role: 'system' });
-        swept.push({ id: item.id, seq: event.seq });
+        const sweptEntry = { id: item.id, seq: event.seq };
+        // tsk-1lv-5 D7/D9/D11: 4-door check runs INSIDE this existing batch
+        // sweep, for every item regardless of risk tier -- advisory only,
+        // never a reason to hold this item out of retrospective (this
+        // verb's own transition above already succeeded; see
+        // retrospective-doors.mjs's own header for why this stays
+        // non-blocking). One friction event per non-empty door, so a
+        // finding is queryable (`fgos check <id>`) without spamming one
+        // event per individual finding.
+        const doors = runFourDoorChecks(item, view, repoRoot);
+        const doorFindings = {};
+        for (const [doorName, findings] of Object.entries(doors)) {
+          if (findings.length === 0) continue;
+          doorFindings[doorName] = findings.length;
+          addFriction(dir, {
+            id: item.id,
+            disposition: 'advisory',
+            errorClass: `retrospective-door-${doorName}`,
+            layer: 'docs',
+            detail: findings.map((f) => f.message).join('\n'),
+          });
+        }
+        if (Object.keys(doorFindings).length > 0) sweptEntry.doorFindings = doorFindings;
+        swept.push(sweptEntry);
       }
       return { swept, count: swept.length };
     }
@@ -1905,8 +1935,186 @@ async function runVerb(verb, flags, positional, dir) {
       const alternatives = optionalField(flags.alternatives, 'decision --alternatives requires a non-empty value (omit --alternatives entirely to skip it)');
       const source = optionalField(flags.source, 'decision --source requires a non-empty value (omit --source entirely to skip it)');
       const id = optionalField(flags.id, 'decision --id requires a non-empty value (omit --id entirely to skip per-item scoping)');
-      const { event } = addDecision(dir, { text, rationale, alternatives, source, id });
-      return { seq: event.seq };
+      // tsk-1lv-2 D4: a platform/repo-wide decision (no --id) carries
+      // --scope <area-slug> (e.g. "repo" for the whole codebase, or an
+      // area name matching docs/specs/<area>.md) so `fgos decision-index`
+      // can project it into docs/decisions/index.md. Purely optional and
+      // additive -- an item-scoped decision (--id set) has no use for it,
+      // and omitting it entirely is unaffected (same posture as
+      // --alternatives/--source above).
+      const scope = optionalField(flags.scope, 'decision --scope requires a non-empty value (omit --scope entirely for an item-scoped or unscoped decision)');
+      // tsk-1lv-1 D2/D8: every CLI-surface decision write declares its
+      // relation to prior decisions explicitly -- no default, no
+      // inference (STR72's own root cause: a supersession narrated only
+      // in prose that the machine never sees). Engine bookkeeping
+      // (`kind:'engine'`, resolveDiscovery/resolvePlan) writes through
+      // `addDecision` directly, not this CLI case, so it is unaffected
+      // (CONTEXT.md D4: "không đổi").
+      const relationRaw = requireField(flags.relation, 'decision requires --relation none|supersedes:<id>|touches:<id>');
+      const relation = parseDecisionRelation(relationRaw);
+      if (relation.kind !== 'supersedes' && decisionTextLooksLikeSupersession(text)) {
+        throw new StoreError(
+          'validation',
+          'decision text reads like a supersession ("supersedes/replaces/overrides/no longer applies/instead of the previous") but --relation supersedes:<id> was not declared -- declare the relation explicitly (or rephrase the text if it is not actually a supersession).',
+        );
+      }
+      const { event } = addDecision(dir, { text, rationale, alternatives, source, id, scope, relation: relation.kind === 'none' ? 'none' : `${relation.kind}:${relation.id}` });
+      const result = { seq: event.seq, relation: relation.kind === 'none' ? 'none' : `${relation.kind}:${relation.id}` };
+      // Write-time citation sweep (D2 "sweep tươi tại write-time, không
+      // cache"): only `supersedes` has a real dangling-citation shape (a
+      // line citing the OLD id without acknowledging the new one) -- a
+      // `touches:<id>` write references `id` without replacing anything,
+      // so there is nothing for this sweep to flag as stale (round 3's
+      // "chạy CÙNG sweep này ở thời điểm log thường" is about the same
+      // machinery being exercised at every write, not a claim that
+      // `touches` produces findings). Non-blocking either way -- a
+      // dangling hit is surfaced, not refused; task 5's 4-door
+      // (retrospective-time) is the close-time gate, this is only the
+      // write-time signal (D7: "fgos approve KHÔNG bị gate ở đây").
+      if (relation.kind === 'supersedes') {
+        const repoRoot = path.dirname(dir);
+        const sourceFiles = collectWideSourceFiles(repoRoot);
+        // tsk-1lv (review-fix round, F3): a platform/--scope decision (no
+        // --id) has no item id to use as the "acknowledges the new
+        // decision" label -- falling back to `relation.id` here (the OLD
+        // id being superseded) made supersedingLabel === targetId, which
+        // made findWideCitationFindings's own
+        // `line.includes(supersedingLabel)` suppression guard match every
+        // single citation of the old id (the line already had to contain
+        // targetId to be a candidate at all), silently zeroing every
+        // finding for every one of tsk-1lv-4's 34 --scope writes with zero
+        // test coverage of this path. `null` here means "no acknowledgment
+        // label available" -- every citation of the old id is surfaced,
+        // never auto-suppressed, which is the correct behavior when there
+        // is nothing a citing line could plausibly reference to prove it
+        // already accounts for the supersession.
+        const supersedingLabel = id ?? null;
+        const findings = findWideCitationFindings(sourceFiles, relation.id, supersedingLabel);
+        if (findings.length) {
+          result.danglingCitations = findings.map((f) => f.message);
+        }
+      }
+      return result;
+    }
+
+    // tsk-1lv-2 D4: docs/decisions/index.md is a projection of
+    // state.decisions' scope-carrying records -- generated, never
+    // hand-edited (bee's own standing exemption for this exact path,
+    // mirrors `fgos docs-index`'s own generate+drift shape for
+    // docs/enduser-docs-index.json). `--check` never writes: it reports
+    // whether the on-disk file matches what a fresh regenerate would
+    // produce, refusing (validation) when it does not -- the drift-mode
+    // half of the verify draft this task's own DISCUSSION.md names.
+    case 'decision-index': {
+      const repoRoot = path.dirname(dir);
+      if (flags.check) {
+        const { indexPath, changed } = computeDecisionIndex(repoRoot, dir);
+        if (changed) {
+          throw new StoreError(
+            'validation',
+            `${path.relative(repoRoot, indexPath)} is stale (regenerating would change its content) -- run "fgos decision-index" (no --check) to refresh it.`,
+          );
+        }
+        return { path: path.relative(repoRoot, indexPath).split(path.sep).join('/'), changed: false };
+      }
+      const { path: indexRelPath, changed } = generateDecisionIndex(repoRoot, dir);
+      return { path: indexRelPath, changed };
+    }
+
+    // tsk-1lv-3 D3: CONTEXT.md's "## Locked decisions" table becomes a
+    // RENDER from state.decisions, closing the gap tsk-1ud left (bee-
+    // context-locking's own stance: "it renders; it does not decide").
+    // `fgos decision --id <item-id>` (tsk-63c) is already the real write
+    // door; this verb only replaces the existing table's text with a fresh
+    // render, in place -- it never creates CONTEXT.md itself (the
+    // exploring/planning/shaping skill still writes the skeleton: feature
+    // boundary, pinned terms, outstanding questions), and never touches
+    // any other section.
+    case 'context-render': {
+      const id = requireField(positional[0] ?? flags.id, 'context-render requires an id: fgos context-render <id>');
+      const view = listWork(dir);
+      const item = view.work[id];
+      if (!item) {
+        throw new StoreError('validation', `work "${id}" not found.`);
+      }
+      // tsk-1lv review-fix F5: was `path.dirname(dir)` (the state root,
+      // always the main checkout per ADR0020) -- but fgos-coding-exploring/
+      // -planning/-shaping commit CONTEXT.md to the item's OWN fgw/<id>
+      // branch/worktree, which never carries `.fgos/` (ADR0020), so a
+      // caller inside that worktree passing `--dir <mainRoot>` had this
+      // verb look for CONTEXT.md in the wrong tree entirely (misleading
+      // "create the CONTEXT.md skeleton first" on an item that already has
+      // one, or worse, silently writing a stale copy in the main checkout
+      // that never reaches the branch). `resolveContentRoot` (tsk-1ni D1,
+      // `src/intake/plan.mjs`) is the existing, tested helper for exactly
+      // this problem -- reuse it instead of reimplementing a narrower,
+      // wrong version of the same resolution.
+      const docsRefRaw = typeof item.docsRef === 'string' && item.docsRef.trim() ? item.docsRef.trim() : `docs/history/${id}`;
+      const repoRoot = resolveContentRoot(path.dirname(dir), id, docsRefRaw);
+      const contextRelPath = path.posix.join(docsRefRaw.replace(/\/+$/, ''), 'CONTEXT.md');
+      const contextPath = path.join(repoRoot, contextRelPath);
+      if (!fs.existsSync(contextPath)) {
+        throw new StoreError(
+          'validation',
+          `${contextRelPath} does not exist -- create the CONTEXT.md skeleton first (fgos-coding-exploring/-planning/-shaping own that; this verb only replaces its existing "## Locked decisions" table).`,
+        );
+      }
+      const decisions = (view.decisions ?? []).filter((d) => d.id === id);
+      const table = renderLockedDecisionsTable(decisions);
+      const before = fs.readFileSync(contextPath, 'utf8');
+      // tsk-1lv review-fix F6 (fixed again after round-2 review found a
+      // real regression, B2): a render with zero rows (no state.decisions
+      // logged yet for this id) always used to overwrite whatever the
+      // section already held -- including a hand-typed table from a
+      // pre-tsk-1lv-3 item that never ran `fgos decision --id`. Refuse
+      // instead of silently blanking real rows a person can only recover
+      // from git: an empty render is never a legitimate downgrade of an
+      // existing table with content.
+      //
+      // The first attempt at this guard used `.split('\n').slice(2)` to
+      // skip past the table header + separator row, assuming they always
+      // sit right after the heading -- but the actual leading content is
+      // 1-2 blank lines (heading, then a blank line, then the table),
+      // so `slice(2)` dropped the blank lines instead and left the
+      // header row (`| D-ID | Quyết định |`) itself counted as "a row",
+      // making a fresh render of THIS VERB'S OWN empty-table output
+      // (header + separator, no data) refuse on its own second run --
+      // non-idempotent, contradicting fgos-coding-exploring/SKILL.md's own
+      // documented "idempotent, a no-op re-run reports changed: false".
+      // Reproduced directly, not assumed. Fixed by anchoring on the real
+      // separator row (`|---|...`) and counting only lines after it --
+      // that is the one structural marker a markdown table always has,
+      // regardless of how many blank lines precede it.
+      const existingSection = /##\s*Locked decisions([\s\S]*?)(?:\n##\s|$)/i.exec(before);
+      let existingHasRows = false;
+      if (existingSection) {
+        const sectionLines = existingSection[1].split('\n');
+        const sepIdx = sectionLines.findIndex((l) => /^\s*\|[-:\s|]+\|\s*$/.test(l));
+        if (sepIdx !== -1) {
+          existingHasRows = sectionLines.slice(sepIdx + 1).some((l) => /^\s*\|.+\|.*\|\s*$/.test(l));
+        }
+      }
+      if (decisions.filter((d) => d.kind !== 'engine').length === 0 && existingHasRows) {
+        throw new StoreError(
+          'validation',
+          `${contextRelPath}: refusing to render an empty table over an existing "## Locked decisions" section that already has rows -- no state.decisions record exists yet for "${id}" (run "fgos decision --id ${id} ..." for each row first, or this table was hand-typed before tsk-1lv-3 and needs manual reconciliation).`,
+        );
+      }
+      let after;
+      try {
+        after = replaceLockedDecisionsSection(before, table);
+      } catch (err) {
+        throw new StoreError('validation', `${contextRelPath}: ${err.message}`);
+      }
+      const changed = before !== after;
+      if (changed) {
+        fs.writeFileSync(contextPath, after, 'utf8');
+      }
+      return {
+        path: contextRelPath,
+        changed,
+        rowCount: decisions.filter((d) => d.kind !== 'engine').length,
+      };
     }
 
     case 'gate-approve': {
@@ -2463,6 +2671,71 @@ async function runVerb(verb, flags, positional, dir) {
       };
     }
 
+    // tsk-1lv review-fix F11: fgos-coding-compounding's own D8
+    // tìm-trước-khi-tạo doctrine (SKILL.md step 3) described calling
+    // `findAuthoritativeMatch` directly as a raw Node import -- no CLI
+    // verb backed it, so it had zero real callers anywhere in the repo
+    // (confirmed by grep before this fix), and the doctrine's own worked
+    // example was unfollowable without hand-writing throwaway Node code
+    // each time. This verb IS the real, discoverable surface for both
+    // halves the module already exports: the doctrine's own find-before-
+    // create lookup (default mode), and D8's "harness backstop" duplicate-
+    // claim scan (`--check-duplicates`) -- read-only either way, never a
+    // live gate, matching CONTEXT.md D8's own "never a gate sống" line.
+    case 'authoritative-match': {
+      const quadrantDir = requireField(
+        flags.quadrant,
+        'authoritative-match requires --quadrant <docs/quadrant-dir>',
+      );
+      const repoRoot = path.dirname(dir);
+      const absQuadrantDir = path.join(repoRoot, quadrantDir);
+      const candidates = [];
+      let entries = [];
+      // tsk-1lv round-2 review, M1: a bad/typo'd --quadrant used to
+      // degrade silently to candidateCount:0, match:null -- exit 0,
+      // indistinguishable from "scanned real docs, none claim this
+      // topic." For a find-before-create doctrine whose entire job is
+      // preventing duplicate authoritative docs, that reads as "create a
+      // new doc" on a path typo instead of "this call was wrong."
+      // `quadrantExists` lets a caller (the compounding skill's own
+      // doctrine step) tell the two apart.
+      let quadrantExists = true;
+      try {
+        entries = fs.readdirSync(absQuadrantDir, { withFileTypes: true });
+      } catch {
+        entries = [];
+        quadrantExists = false;
+      }
+      for (const entry of entries) {
+        if (!entry.isFile() || !entry.name.endsWith('.md')) continue;
+        const relPath = path.posix.join(quadrantDir, entry.name);
+        const content = fs.readFileSync(path.join(absQuadrantDir, entry.name), 'utf8');
+        const { meta } = parseFrontmatter(content);
+        candidates.push({ path: relPath, authoritativeFor: meta.authoritative_for });
+      }
+      if (flags['check-duplicates'] !== undefined) {
+        const duplicates = findDuplicateAuthoritativeClaims(candidates);
+        return {
+          quadrant: quadrantDir,
+          quadrantExists,
+          candidateCount: candidates.length,
+          duplicateGroups: duplicates.map((group) => group.map((c) => c.path)),
+        };
+      }
+      const topic = requireField(
+        flags.topic,
+        'authoritative-match requires --topic "<subject text>" (or pass --check-duplicates to scan for duplicate claims instead)',
+      );
+      const match = findAuthoritativeMatch(topic, candidates);
+      return {
+        quadrant: quadrantDir,
+        quadrantExists,
+        topic,
+        candidateCount: candidates.length,
+        match: match ? match.path : null,
+      };
+    }
+
     // Cửa pull — take (stage-decompose S2-pull D1): a tác nhân ngoài runner
     // (human by default, session for a live agent) claims exactly one item.
     // No `--id` → the frontier head (readyWork — the EXACT set the runner
@@ -2671,6 +2944,20 @@ async function runVerb(verb, flags, positional, dir) {
         throw new StoreError(
           'validation',
           `return: work "${id}" was not taken through the pull door (claimed by "${item.claimRole ?? 'runner'}") — return only completes a take.`,
+        );
+      }
+      // tsk-1zo: a verify never upgraded from its discovery/submit-stage
+      // placeholder sentinel shells out as literal text (runGoalCheck ->
+      // runCommand) and fails with a cryptic raw shell error ("<first
+      // word>: not found", exit 127) instead of a clean refusal. Checked
+      // once here, before the branch/main-source split below, so both
+      // paths — which both call runGoalCheck further down — are covered by
+      // the same guard `resolveDiscovery` already uses at discovery-stage
+      // transitions (src/intake/discovery.mjs's hasRealVerify).
+      if (!hasRealVerify(item.verify)) {
+        throw new StoreError(
+          'validation',
+          `return: work "${id}" still carries a placeholder verify ("${item.verify}") — set a real command first: fgos edit "${id}" --verify "<command>".`,
         );
       }
 
@@ -3206,8 +3493,8 @@ async function runVerb(verb, flags, positional, dir) {
     // Tool registry (tsk-1dj, ported from repository-harness's
     // tool-registry-capability per docs/distillery/deep-dives/
     // tool-registry.md; tsk-in1-1 D1: `register`/`remove` retired — a tool
-    // provider is now declared directly in `runner.capacities.<id>`
-    // (`.fgos/config.json`), config-edited like every other capacity, never
+    // provider is now declared directly in `runner.executors.<id>`
+    // (`.fgos/config.json`), config-edited like every other executor, never
     // through the event log): `check` writes ONLY the local, gitignored
     // status overlay (tool-registry.mjs's readLocalStatus/writeLocalStatus)
     // — never an event, per CONTEXT.md's pinned "registered vs present"
@@ -3219,7 +3506,7 @@ async function runVerb(verb, flags, positional, dir) {
       const sub = requireField(positional[0], 'tool requires a sub-verb: fgos tool <check|query> ...');
       const repoRoot = path.dirname(dir);
       const cfg = flags.config ? loadRunnerConfig(flags.config) : ensureRunnerConfigForDir(repoRoot);
-      const tools = toolsFromCapacities(cfg.capacities);
+      const tools = toolsFromExecutors(cfg.executors);
       if (sub === 'check') {
         const name = optionalField(flags.name, 'tool check --name requires a non-empty value.');
         if (name !== undefined && !tools[name]) {

@@ -9,6 +9,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Three new read-only verbs: `fgos decision-index [--check]` generates
+  `docs/decisions/index.md`, a projection of every platform/repo-wide
+  decision (`fgos decision --scope <area>`) from `state.decisions`;
+  `fgos context-render <id>` renders an item's `CONTEXT.md` "## Locked
+  decisions" table from `state.decisions` in place, so the table is never
+  hand-typed; `fgos authoritative-match --quadrant <docs/quadrant-dir>
+  --topic "..."` (or `--check-duplicates`) skeleton-matches a topic
+  against docs' own `authoritative_for` frontmatter, so a growing skill
+  finds an existing doc to update instead of guessing a second path.
+- `fgos decision --relation none|supersedes:<id>|touches:<id>` — every
+  decision write now declares its relation to prior decisions explicitly;
+  a `supersedes` relation runs a write-time sweep across `docs/`, `src/`,
+  `plugins/` for citations of the superseded id that don't also
+  acknowledge the new one, surfaced as `danglingCitations` on the write's
+  own response.
+- `fgos decision --scope <area>` — a platform/repo-wide decision (no
+  `--id`) that shows up in the generated `docs/decisions/index.md`.
+- `fgos doctor`/`fgos doctor --fix` gained a `decision-index-stale`
+  check+fix pair: reports and repairs drift between `docs/decisions/
+  index.md` and `state.decisions`.
+- The hand-authored `docs/decisions/000N-*.md` ADR corpus (34 files) has
+  been retired: `state.decisions` (via `fgos decision --scope`) is now the
+  source of truth for platform decisions, with full narrative migrated
+  verbatim into the relevant `docs/specs/<area>.md`'s own "Lịch sử quyết
+  định" section. `docs/decisions/index.md` (generated) replaces the old
+  hand-written `0000-index.md`.
 - `runner.capabilities` — a curated catalog of capability names, shared
   between the tool-registry's own `capability` field and
   `capacities.<id>.for`. Each entry is `{description?, aliases?}`. This
@@ -72,6 +98,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   dispatch path; 0 capacities register `via:"api"` today.
   (`docs/specs/runner.md` RUL66,
   `docs/reference/forgentx-tool-registry-configuration.md`)
+- A `capacities.<id>` capacity that is **cli-spawn-shaped** (declares its
+  own `command`/`adapter`, or an `invocations[].via === "cli"` entry —
+  e.g. an `agy`-backed capacity) now dispatches out-of-process whenever it
+  is configured, even when the caller already has live Task-tool access.
+  Previously a live/interactive session with Task access always won
+  in-process, silently never invoking the configured command at all. A
+  capacity that is **agentType-shaped** (only `agentType`, no command of
+  its own) is unaffected — `hasLiveTaskAccess` still decides there, since
+  resolving it in-process already means honoring the configured target.
+  (`docs/decisions/0033-cli-spawn-shaped-capacity-thang-hasLiveTaskAccess.md`,
+  narrows `docs/decisions/0026` rule 2)
 - The per-tier `runner.executors.<tier>` config override is retired (0
   live entries; had already caused a real bug — a non-tier key silently
   fell through to the global executor with no error). A `capacities.<id>`
@@ -365,6 +402,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- `npm run check:decision-supersession` — the `docs/decisions/NNNN-*.md` +
+  `0000-index.md` pointer-pair format it validated is retired for good
+  along with the hand-authored ADR corpus (see Added, ADR retirement).
+  `scripts/check-decision-supersession.mjs`'s pure functions stay real and
+  unit-tested against synthetic fixtures; only the real-repo CLI mode had
+  nothing left to run against.
 - The `orchestrator` word ban (`test/docs/launcher-vocabulary-guard.test.mjs`
   and its 28-entry allowlist) is retired, per decision `0031`. Decision
   `0028` banned the term while it carried no meaning; decision `0029` D17
@@ -564,6 +607,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   open on any internal error (empty/malformed stdin, `decide` itself
   erroring) — never a second point of failure on top of a working dispatch
   surface.
+- `capacities.<id>.capability` (the tool-registry's own free-text field) is
+  now catalog-validated the same way `for` already was — a typo'd or
+  undeclared value used to silently make a tool invisible to `fgos tool
+  query --capability ...` with no error anywhere; it now fails config load
+  with a clear message naming the missing catalog entry.
+- `decide` hands back `mcpTool` (mutually exclusive with `agentType`) for a
+  `kind:"tool"` capacity whose `mcp` invocation declares a `tools` map
+  (`capability -> MCP tool identifier`) covering the requested purpose —
+  `mechanism` is upgraded from `out-of-process` to `in-process` in that
+  case, since dispatch has no MCP client of its own and hands the call back
+  to the caller's own live one, the same reasoning `agentType` hand-back
+  already uses for a live Agent/Task tool. Fixes a real gap: `decide --for
+  impact-analysis` used to answer `unavailable` even though `gitnexus` was
+  fully registered, because `toolsFromCapacities` (`fgos tool query`) and
+  `resolveCapacityIdForPurpose` (`decide`) read two different fields.
+
+### Changed
+
+- `toolsFromCapacities` now prefers `capacities.<id>.for[0]` over
+  `capacities.<id>.capability` when both are present, folding the two
+  previously-separate capability fields into one read path — `capability`
+  stays accepted as a tolerant fallback for a not-yet-migrated capacity,
+  never removed by this change alone.
 
 ## [0.1.0]
 

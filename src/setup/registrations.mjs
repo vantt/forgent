@@ -35,12 +35,13 @@ import { claudeCodeHookWired } from './claude-code-hooks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
-import { listWork } from '../state/store.mjs';
+import { listWork, StoreError } from '../state/store.mjs';
 import { driftStatus, unmergedDeliveries } from '../state/drift-status.mjs';
 import { computeEnduserDocsIndex, generateEnduserDocsIndex, manifestPathFor } from '../report/enduser-index-generate.mjs';
+import { computeDecisionIndex, generateDecisionIndex, indexPathFor } from '../report/decision-index.mjs';
 import { isResolvedStatus } from '../state/frontier.mjs';
 import { DOMAINS, getDomain, resolveDomainName, effectiveStage } from '../state/workflow-stage-graphs.mjs';
-import { readLocalStatus, classifyRegistryPosture, toolsFromCapacities } from '../state/tool-registry.mjs';
+import { readLocalStatus, classifyRegistryPosture, toolsFromExecutors } from '../state/tool-registry.mjs';
 import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { describeConfigAwareness } from '../config/global-config.mjs';
 import { resolveFgosBin, refreshGlobalBinCache } from './bin-discovery.mjs';
@@ -525,7 +526,7 @@ function checkDispatchDecideHookWired(cwd) {
 // (e.g. "impact-analysis") — the registry itself never names one.
 //
 // tsk-in1-1 D1: tools are no longer event-sourced (`view.tools`) — reads
-// `runner.capacities` straight from `.fgos/config.json` (via `readSharedConfig`,
+// `runner.executors` straight from `.fgos/config.json` (via `readSharedConfig`,
 // the same raw-read every other doctor check in this file already uses),
 // same as `fgos tool check/query` (bin/fgos.mjs) now does.
 function checkToolRegistryConfigured(cwd) {
@@ -534,12 +535,12 @@ function checkToolRegistryConfigured(cwd) {
     return { passed: true, message: 'not inside a git checkout — nothing to check' };
   }
   const fgosDir = path.join(mainCheckout, '.fgos');
-  const capacities = readSharedConfig(mainCheckout)?.runner?.capacities;
-  const tools = toolsFromCapacities(capacities);
+  const executors = readSharedConfig(mainCheckout)?.runner?.executors;
+  const tools = toolsFromExecutors(executors);
   const localStatus = readLocalStatus(fgosDir);
   const { posture, registeredCount, presentCount, missingCount, unknownCount } = classifyRegistryPosture(tools, localStatus);
   if (posture === 'inactive') {
-    return { passed: true, message: 'inactive — no tool-capable capacities declared (add one to runner.capacities in .fgos/config.json)' };
+    return { passed: true, message: 'inactive — no tool-capable executors declared (add one to runner.executors in .fgos/config.json)' };
   }
   if (posture === 'full') {
     return { passed: true, message: `full — ${presentCount}/${registeredCount} registered tool(s) present` };
@@ -1901,4 +1902,95 @@ registerCheck({
 registerFix({
   id: 'enduser-docs-index-stale',
   fix: (cwd) => fixEnduserDocsIndexStale(cwd),
+});
+
+// tsk-1lv review-fix F10: `fgos decision-index --check` (tsk-1lv-2)
+// existed as a CLI verb but nothing ever called it -- not `npm test`, not
+// `fgos doctor` -- so docs/decisions/index.md could drift silently from
+// state.decisions the exact same way docs/enduser-docs-index.json used to
+// (tsk-1m0, the direct precedent this check/fix pair mirrors: read-only
+// `computeDecisionIndex` shared by both the check and the real generate
+// path, so this can never diverge from what `fgos decision-index` itself
+// would compute). A missing docs/decisions/index.md is a normal state for
+// any project with zero platform-scoped decisions logged yet -- same
+// "absent capability = clean skip" contract as the enduser-index check.
+// tsk-1lv round-2 review, H2: `previousContent === undefined` used to
+// always mean "nothing to check" regardless of whether real decisions
+// exist to index -- so "the index was deleted (or never generated) while
+// 36 real scope-carrying decisions sit in state.decisions" (the exact
+// drift this check exists to catch) reported passed:true, with a message
+// that asserted "no platform-scoped decisions logged yet" without ever
+// looking at whether that was true. Reproduced against the live repo,
+// not assumed. Fixed: "nothing to check" now requires BOTH the file
+// being absent AND the freshly-computed content having no real rows --
+// a missing file with real content to index is the same failure as a
+// stale one, just worded for the "never generated" case specifically.
+function checkDecisionIndexStale(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  const root = mainCheckout ?? cwd;
+  const fgosDir = path.join(root, '.fgos');
+  const { previousContent, nextContent, changed } = computeDecisionIndex(root, fgosDir);
+  const nextHasRows = /^\|.+\|.*\|\s*$/m.test(nextContent);
+  if (previousContent === undefined) {
+    if (!nextHasRows) {
+      return {
+        passed: true,
+        message: `${indexPathFor(root)} not found -- nothing to check (no platform-scoped decisions logged yet)`,
+      };
+    }
+    return {
+      passed: false,
+      message: `${indexPathFor(root)} not found, but state.decisions has platform-scoped decisions to index -- run fgos decision-index`,
+    };
+  }
+  if (!changed) {
+    return { passed: true, message: `${indexPathFor(root)} up to date` };
+  }
+  return {
+    passed: false,
+    message: `${indexPathFor(root)} is stale relative to state.decisions -- run fgos decision-index`,
+  };
+}
+
+// tsk-1lv round-2 review, B3: generateDecisionIndex's own F12 safety
+// refusal (never overwrite real rows with an empty regenerate) escaped
+// uncaught here, and `runFixes` (src/setup/checks.mjs) maps over every
+// registered fix with no try/catch of its own -- so the throw aborted the
+// ENTIRE `fgos doctor --fix` run, discarding every other fix's result.
+// Reproduced directly: a directory with a committed, row-carrying
+// docs/decisions/index.md and no readable .fgos store (this repo's own
+// merged-to-main future state on a fresh clone before .fgos exists) hit
+// this and returned exit 4 with no report at all. A refusal here is a
+// real, legitimate "this fix can't run safely right now" outcome, not a
+// crash -- report it through the same {changed, message} contract every
+// other fix already promises, so one fix's refusal never takes down the
+// rest of `doctor --fix`'s run.
+function fixDecisionIndexStale(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  const root = mainCheckout ?? cwd;
+  const fgosDir = path.join(root, '.fgos');
+  let result;
+  try {
+    result = generateDecisionIndex(root, fgosDir);
+  } catch (err) {
+    if (err instanceof StoreError) {
+      return { changed: false, message: `skipped -- ${err.message}` };
+    }
+    throw err;
+  }
+  if (!result.changed) {
+    return { changed: false, message: `${result.path} already up to date` };
+  }
+  return { changed: true, message: `regenerated ${result.path}` };
+}
+
+registerCheck({
+  id: 'decision-index-stale',
+  description: 'docs/decisions/index.md matches every scope-carrying decision in state.decisions (tsk-1lv-2/tsk-1lv)',
+  check: (cwd) => checkDecisionIndexStale(cwd),
+});
+
+registerFix({
+  id: 'decision-index-stale',
+  fix: (cwd) => fixDecisionIndexStale(cwd),
 });

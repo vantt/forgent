@@ -13,6 +13,6 @@ description: >-
   awaiting-approval", "run the discovery-only loop on this item".
 ---
 
-This is a generated thin wrapper (tsk-1qi D5/D7) -- do not edit directly, edit the source instead.
+This is a generated thin wrapper (tsk-1qi) -- do not edit directly, edit the source instead.
 The real skill content lives at `../../../.agents/skills/fgos-coding-driving/SKILL.md`, this project's own canonical skill source.
 Read that file and follow it directly.

@@ -107,3 +107,9 @@ an agent doing grooming/scribing).
 - `scripts/check-decision-supersession.mjs` — the sibling check this one
   mirrors in structure; it checks a decision record's own internal
   backward-pointer instead of backlog/spec citations (a different area).
+  **Retired against the real repo (tsk-1lv-4/review-fix F9):** the
+  `docs/decisions/NNNN-*.md` + `0000-index.md` pointer-pair format it
+  validates was retired for good along with the hand-authored ADR corpus
+  -- no longer wired into `npm run check:*` (removed from `package.json`).
+  Its pure functions stay real and unit-tested against synthetic
+  fixtures; only the real-repo CLI mode has nothing left to run against.

@@ -24,6 +24,7 @@ directly by `fgos-coding-planning`, mid-`planning`, when that skill finds
 
 ## Hard rules
 
+- When asking questions (`fgos ask`), format question text using self-contained citations (`../_shared/citation-format.md`) and the required two-heading Markdown structure (`## Context` and `## Why this matters`, each followed by at least 20 characters of content).
 - Every bare `fgos <verb>` this skill calls (`add`, `ask`, `answer`,
   `decision`, `discover`, `tool`) is `requiresExistingStore: true` — resolve the
   main checkout root the same way the gate check below already does
@@ -69,8 +70,8 @@ directly by `fgos-coding-planning`, mid-`planning`, when that skill finds
   a person can still expand it to inspect the subagent's own trace, unlike
   a genuinely opaque headless `claude -p` subprocess). If a step
   genuinely needs a different backend for a narrow helper task, route it
-  explicitly through the capacity-dispatch mechanism instead of an ad hoc
-  Task call — see `../_shared/capacity-dispatch-fallback.md` for its own
+  explicitly through the executor-dispatch mechanism instead of an ad hoc
+  Task call — see `../_shared/executor-dispatch-fallback.md` for its own
   list of valid reasons.
 - Do not research implementation, propose architecture, or write code. If a
   candidate question only matters to whoever builds the thing, it belongs to
@@ -105,10 +106,10 @@ directly by `fgos-coding-planning`, mid-`planning`, when that skill finds
   `fgos ask`/`answer` round trip (an actual async park — `advise`), and
   the occasional narrow research need that goes to the `fgos-researching`
   helper — the SAME named helper `fgos-coding-discovering` calls as its
-  primary mechanism, distinct from the capacity-dispatch mechanism this
+  primary mechanism, distinct from the executor-dispatch mechanism this
   skill's own hard rules mention elsewhere (that one swaps EXECUTORS for
   the same reasoning work — a different model/provider/parallel run,
-  `../_shared/capacity-dispatch-fallback.md` — never confuse the two).
+  `../_shared/executor-dispatch-fallback.md` — never confuse the two).
   Skip both entirely when the item's domain declares no `roleGraph`.
 
 ## Flow
@@ -167,7 +168,7 @@ directly by `fgos-coding-planning`, mid-`planning`, when that skill finds
    check `fgos-coding-planning`/`fgos-coding-validating`/`fgos-coding-implement` already run
    (`fgos tool query --capability impact-analysis --status present`) —
    rather than assuming GitNexus is on this machine — `judgeDiscovery`'s own
-   `capacities.judge-discovery` config (`.fgos/config.json`, tsk-4rd upgrade)
+   `executors.judge-discovery` config (`.fgos/config.json`, tsk-4rd upgrade)
    now grants it `Task,WebSearch,WebFetch,Read,Bash(rg:*)` too, wider than
    `src/runner/dispatch.mjs`'s bare `git add`/`git commit` default, but that
    grant belongs to a separate subprocess call with its own posture read —
@@ -243,10 +244,13 @@ directly by `fgos-coding-planning`, mid-`planning`, when that skill finds
    After each answer, confirm the decision back and assign it a
    stable ID: `D1`, `D2`, `D3`… Then run `fgos decision --text "<D-ID>:
    <one-line summary>" --rationale "see CONTEXT.md for the full scout
-   evidence and reasoning"` so the decision also lands in the item's
-   append-only decision log, surfaced through `view.decisions`/`fgos list`
-   for machine readers — `--rationale` is required (tsk-63c) — this call
-   is additive alongside writing
+   evidence and reasoning" --relation none` (or `--relation
+   supersedes:<old-D-ID>` when this D-ID explicitly revises an earlier one
+   already locked in this same CONTEXT.md — every `fgos decision` write
+   declares its relation, no default, tsk-1lv-1) so the decision
+   also lands in the item's append-only decision log, surfaced through
+   `view.decisions`/`fgos list` for machine readers — `--rationale` is
+   required (tsk-63c) — this call is additive alongside writing
    CONTEXT.md in step 3, never a replacement for it: CONTEXT.md stays the
    source of truth for the full decision, this just makes its existence
    visible outside the prose doc. When an answer settles what a fuzzy term
@@ -310,19 +314,41 @@ directly by `fgos-coding-planning`, mid-`planning`, when that skill finds
    and any outstanding questions deferred to planning. Concrete language
    only — no placeholders, no TODOs, no vague preferences.
 
-   Put that decisions table under a heading with this exact text (nothing
-   appended on that line, and not translated):
+   Put a heading with this exact text (nothing appended on that line, and
+   not translated) directly above the decisions table:
 
    ```markdown
    ## Locked decisions
    ```
 
-   `src/intake/plan.mjs` slices this table with a literal-English regex on
-   that exact heading, both to check a child's cited D-IDs are real and to
-   extract footprint paths. Any other wording — a Vietnamese heading, a
-   numbered variant — makes the slice come back empty, which silently
-   disables both checks instead of erroring: a child citing a D-ID that
-   doesn't exist would still be accepted.
+   **Never hand-type the table itself** (tsk-1lv-3: the table is a render
+   over the log, never a second hand-typed copy) — every row already
+   exists in `state.decisions` from step 2's own `fgos decision --id`
+   calls. Leave the section under the heading empty (or whatever it
+   already holds from an earlier render), then run, once, after the last
+   decision for this pass has been logged:
+
+   ```bash
+   node "$root/bin/fgos.mjs" context-render "<item-id>" --dir "$root"
+   ```
+
+   This replaces whatever sits under the heading with a fresh render from
+   the log — CONTEXT.md's table becomes a VIEW, never a second, hand-typed
+   copy that can drift from what `fgos decision` actually recorded
+   (mirrors bee-context-locking's own stance: "it renders; it does not
+   decide"). It refuses if the file does not exist yet, so write the rest
+   of the doc (this heading included, even with nothing under it yet)
+   before the first call. Re-run it again any time a later round adds more
+   decisions — idempotent, a no-op re-run reports `changed: false`.
+
+   `src/intake/plan.mjs` slices this same section with a literal-English
+   regex on the exact heading text above (`replaceLockedDecisionsSection`,
+   the write side; `extractLockedDecisionIds`, the read side used to check
+   a child's cited D-IDs and extract footprint paths). Any other wording —
+   a Vietnamese heading, a numbered variant — makes both sides miss the
+   section entirely: the write refuses (no heading to splice under), and
+   the read silently comes back empty, disabling the check instead of
+   erroring.
 
    End the doc with a section using this exact heading (nothing appended
    on that line), body `None` when every candidate question was locked or
@@ -484,8 +510,10 @@ node "$root/bin/fgos.mjs" discover "<item-id>" --verdict clear --verify "<the sa
   `auto-approved: CONTEXT.md (gate-bypass level <level>)`, log it
   (`fgos decision --text "auto-approved CONTEXT.md gate for <item-id> at
   level <level>" --rationale "gate-bypass level <level> permits
-  auto-approval per docs/history/gate-bypass/CONTEXT.md D1-D5"`, D3's
-  audit trail), record it (`fgos gate-approve <item-id> --gate
+  auto-approval per the gate-bypass feature's own locked decisions
+  (see docs/history/gate-bypass/CONTEXT.md)" --relation
+  none`, the audit trail this bypass path needs), record it
+  (`fgos gate-approve <item-id> --gate
   contextApprove --actor bypass --verify "..."`, per above), fire the
   `fgos discover --verdict clear` call above, then continue straight to
   `fgos-coding-planning`.

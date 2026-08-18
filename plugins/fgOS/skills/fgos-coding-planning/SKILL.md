@@ -75,8 +75,8 @@ stage values — the same way `fgos-routing` describes it.
   question (a Task/Agent call is collapsed by default in the transcript,
   not hidden, unlike a genuinely opaque headless `claude -p` subprocess).
   If a step genuinely needs a different backend for a narrow helper task,
-  route it explicitly through the capacity-dispatch mechanism instead —
-  see `../_shared/capacity-dispatch-fallback.md` for its own list of
+  route it explicitly through the executor-dispatch mechanism instead —
+  see `../_shared/executor-dispatch-fallback.md` for its own list of
   valid reasons.
 - Do not reopen or reinterpret a decision already locked in `CONTEXT.md`.
   Cite its D-ID; never override it here.
@@ -123,6 +123,33 @@ stage values — the same way `fgos-routing` describes it.
    locked decisions are the only source of truth for what this plan can
    assume. If a critical-patterns or prior-learnings doc exists for this
    product area, read it too; a precedent already solved beats research.
+
+   **Register a freshly-created feature dir's `docsRef` immediately
+   (tsk-4sx).** When `docsRef` is empty — most commonly an item whose
+   discovery verdict was `clear`, which skips `exploring` and therefore
+   never gets a `CONTEXT.md`/`docsRef` written for it — this skill still
+   picks a `docs/history/<feature>/` path of its own (a descriptive
+   feature-slug is fine; nothing here forces `<feature>` to equal the item
+   id). The moment that path is decided, BEFORE writing anything into it
+   (`plan.md`, `RESEARCH.md` from a `fgos-researching` call, etc.), register
+   it on the item:
+
+   ```bash
+   root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+   node "$root/bin/fgos.mjs" edit "<item-id>" --docs-ref "docs/history/<feature>/" --dir "$root"
+   ```
+
+   Skip this call when `docsRef` is already set — never overwrite a value
+   that already points somewhere real. Without it, `fgos approve`'s own
+   heavy-tier gate (`assertPlanEvidence`, `src/state/store.mjs`) has no way
+   to find `plan.md` unless `<feature>` happens to equal the item id by
+   coincidence — a real refusal this item's own `fgw/tsk-bc7` session hit
+   live (`work "tsk-bc7" cannot move to "delivered" — risk:heavy but no
+   plan.md found... write one before landing`), worked around there with a
+   manual `git mv` to the item-id path. This is the same registration
+   `tsk-61j` independently proposes for `fgos-coding-exploring`'s own
+   CONTEXT.md-creation step — same trigger, same call, kept consistent
+   between the two sibling skills.
 
    **Reclaim the ball if it isn't yours (tsk-2t9c D4/D8).** Check
    `data.work[id].holder` (`fgos list --id <id> --json`). If it is set and
@@ -385,7 +412,8 @@ stage values — the same way `fgos-routing` describes it.
      root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
      node "$root/bin/fgos.mjs" decision --id "<item-id>" --dir "$root" \
        --text "planning->exploring hand-back: <the gap, in one line>" \
-       --rationale "material per fgos-coding-planning step 6; tier-A actions already tried: <what was run/read and why it did not close the gap>"
+       --rationale "material per fgos-coding-planning step 6; tier-A actions already tried: <what was run/read and why it did not close the gap>" \
+       --relation none
      ```
 
      Name what tier A already tried and why it failed to close the gap —

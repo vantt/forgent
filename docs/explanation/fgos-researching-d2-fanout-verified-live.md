@@ -11,7 +11,7 @@ dispatch, never ad hoc" — a rule about how the skill is *supposed* to
 behave when a question splits into independent branches. `tsk-o4l`
 existed to answer a narrower question: does that rule actually fire on a
 live run, and is the native-branch announce line added in
-`.claude/skills/_shared/capacity-dispatch-fallback.md` Step B.5 (commit
+`.claude/skills/_shared/executor-dispatch-fallback.md` Step B.5 (commit
 `1c741c7`) genuinely visible on the transcript — not just correct on
 paper?
 

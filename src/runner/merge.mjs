@@ -651,6 +651,40 @@ export function autoResolveDecisionIndexCollision(repoRoot, branch, classificati
   return true;
 }
 
+// tsk-1lv-2: a "mirrors merge.mjs collision-resolve subsystem" auto-resolve
+// for the new GENERATED docs/decisions/index.md was attempted here and
+// removed after direct reproduction proved it structurally unreachable for
+// the specific scenario tested (two branches each committing a decision +
+// regenerated index): a `fgw/<id>` worker branch can never legitimately
+// carry a `.fgos/`-derived regenerated file through its own commit,
+// because regenerating `docs/decisions/index.md` correctly requires
+// reading `.fgos/events.jsonl`, which a worktree never carries in the
+// first place (ADR0020) -- so no branch can produce a *meaningful*
+// regenerated version to collide over via `mergeRunnerItem` for a normal,
+// well-formed regenerate. Cross-checked against `docs/how-to/fix-fgos-
+// write-rejected-merge-block.md`'s own documented precedent (tsk-n4i-1/
+// tsk-5vf/tsk-4eu/tsk-5ge/tsk-28o/tsk-3v2 -- six independent real
+// occurrences of the SAME `.fgos/`-staged wall, a different scenario from
+// this one).
+//
+// **This does NOT make a hostile or accidental regeneration impossible to
+// merge (tsk-1lv review-fix F12, corrected here)** -- `fgos-write-rejected`
+// (below, `fgosPaths.length > 0`) only rejects a diff that stages a change
+// under `.fgos/`; `docs/decisions/index.md` itself is an ordinary tracked
+// doc file, not a `.fgos/` path, so that wall never inspects it at all. A
+// worktree running `fgos decision-index` with no real store to read from
+// (the exact ADR0020 gap above) computes the "no decisions yet" placeholder
+// -- committing and merging THAT is a real, ordinary git merge
+// `mergeRunnerItem` would happily accept, silently blanking every platform
+// decision's projection. The actual fix is a guard at the write site, not
+// a merge-time collision-resolve: `generateDecisionIndex`
+// (`src/report/decision-index.mjs`) now refuses to overwrite an index that
+// already has real rows with freshly-computed content that has none.
+// `docs/decisions/0000-index.md` (the OLD hand-authored corpus above) is a
+// genuinely different case: those files are ordinary tracked source a work
+// item's own branch legitimately creates as part of its real diff, never a
+// `.fgos/`-derived regeneration.
+
 /**
  * Attempt to merge a runner item's branch into `repoRoot`'s current checkout
  * (checked clean by the caller first). The git call itself is target-

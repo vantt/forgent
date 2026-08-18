@@ -337,8 +337,13 @@ test('fgos docs-index reads BOTH the docs/decisions/ alias and the primary docs/
     assert.equal(entry.purpose, QUADRANT_META.explanation.purpose);
     assert.equal(entry.audience, QUADRANT_META.explanation.audience);
   }
-  const adr0001 = explanationEntries.find((e) => e.docPath === 'docs/decisions/0001-event-log-la-su-that.md');
-  assert.ok(adr0001, 'ADR0001 must appear in the manifest via the alias');
+  // tsk-1lv-4: the hand-authored ADR corpus (including 0001) was retired --
+  // docs/decisions/ now holds only the generated index.md (fgos
+  // decision-index, tsk-1lv-2), which is itself an explanation-quadrant doc
+  // via the same alias (it carries `type: explanation` frontmatter for
+  // exactly this reason -- see the next test below).
+  const generatedIndex = explanationEntries.find((e) => e.docPath === 'docs/decisions/index.md');
+  assert.ok(generatedIndex, 'the generated docs/decisions/index.md must appear in the manifest via the alias');
   const primaryDoc = explanationEntries.find((e) => e.docPath.startsWith('docs/explanation/'));
   assert.ok(primaryDoc, 'at least one backfilled docs/explanation/ doc must appear via the primary dir');
 });
@@ -360,11 +365,15 @@ test('fgos docs-index is idempotent — re-running yields the same entries, no d
 
 // --- retrofitted OKF frontmatter on the backfilled ADRs + the existing
 // how-to demo doc (str64-backfill, CONTEXT.md D3) ---------------------------
+// tsk-1lv-4: the hand-authored ADR corpus this section originally covered
+// is retired -- docs/decisions/ now holds only the generated index.md
+// (fgos decision-index), which keeps this same invariant alive under its
+// own `type: explanation` frontmatter (src/report/decision-index.mjs).
 
 test('every repo/docs/decisions/*.md file parses with parseFrontmatter to a non-empty meta.type', () => {
   const decisionsDir = path.join(REPO_ROOT, 'docs', 'decisions');
   const files = fs.readdirSync(decisionsDir).filter((f) => f.endsWith('.md'));
-  assert.ok(files.length > 0, 'expected at least one ADR file under docs/decisions/');
+  assert.ok(files.length > 0, 'expected at least one .md file under docs/decisions/ (today: the generated index.md)');
   for (const file of files) {
     const content = fs.readFileSync(path.join(decisionsDir, file), 'utf8');
     const { meta } = parseFrontmatter(content);

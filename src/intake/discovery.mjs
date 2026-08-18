@@ -95,7 +95,10 @@ const PLACEHOLDER_VERIFY_PREFIX = 'chưa xác định —';
 // tsk-1ni D2: an existing work.verify counts as "real" -- worth protecting
 // from an unresolved guess -- when it is set and does not carry the
 // placeholder prefix every clarify/discovery-stage sentinel shares.
-function hasRealVerify(verify) {
+// EXPORTED (tsk-1zo): `return`'s own pre-flight validation (bin/fgos.mjs)
+// reuses this same guard so a placeholder verify refuses cleanly instead of
+// being shelled out to (a raw "<word>: not found", exit 127).
+export function hasRealVerify(verify) {
   return typeof verify === 'string' && verify.trim() && !verify.startsWith(PLACEHOLDER_VERIFY_PREFIX);
 }
 
@@ -449,8 +452,10 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
           });
         } else {
           const ask =
+            `## Context\n\n` +
             `Đề xuất verify bị nghi ngờ (chưa ghi vào clarify->planning, cần xác nhận) — ` +
-            `vòng 1 đề xuất: ${verdict.verify}\n` +
+            `vòng 1 đề xuất: ${verdict.verify}\n\n` +
+            `## Why this matters\n\n` +
             `vòng 2 (kiểm tra độc lập) không đồng ý: ${secondPass.reason}`;
           // statusAtAsk (claim-lock §5.1): same rule as the unclear branch
           // below — read at function entry, before this park.

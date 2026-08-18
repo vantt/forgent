@@ -251,3 +251,43 @@ test('merge next at level warn does NOT skip an Iron-Law item — the pure pre-c
   assert.equal(data.picked, 'gate-merge-next-warn', 'at warn the candidate is merged, never parked in `skipped`');
   assert.equal(data.skipped, undefined);
 });
+
+// ─── tsk-sdr: the acknowledge-path record ──────────────────────────────────
+//
+// Before this, `--acknowledge-iron-law` on an item that actually tripped
+// the gate proceeded silently — no record of any kind distinguished "never
+// tripped" from "tripped, human acknowledged". These pin the new record and
+// its own distinct wording (never "skipped") against the SAME loose
+// `/iron law/i` grep `ironLawSkipRecords` already uses.
+
+test('approve with --acknowledge-iron-law on a gated ROOT proceeds AND writes exactly one "acknowledged" decision record with kind engine, never "skipped" (tsk-sdr)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeGatedRoot(cwd, 'gate-ack-approve');
+
+  const result = run(cwd, ['approve', 'gate-ack-approve', '--acknowledge-iron-law']);
+  assert.equal(result.status, 0, `an explicit acknowledgment must let the merge through: ${result.stdout}${result.stderr}`);
+  assert.equal(stateView(cwd).work['gate-ack-approve'].status, 'delivered');
+
+  const records = ironLawSkipRecords(cwd, 'gate-ack-approve');
+  assert.equal(records.length, 1, `expected exactly one Iron Law record, got ${records.length}`);
+  assert.equal(records[0].payload.kind, 'engine', 'a machine-written record must be kind engine');
+  assert.match(records[0].payload.text, /acknowledged/i);
+  assert.doesNotMatch(records[0].payload.text, /skipped/i, 'must stay distinguishable from a warn-level skip record');
+});
+
+test('sync-root with --acknowledge-iron-law on a gated root (no parent) proceeds AND writes exactly one "acknowledged" decision record with kind engine, never "skipped" (tsk-sdr)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeGatedSyncRoot(cwd, 'gate-ack-sync');
+
+  const result = run(cwd, ['sync-root', 'gate-ack-sync', '--acknowledge-iron-law']);
+  assert.equal(result.status, 0, `an explicit acknowledgment must let the sync through: ${result.stdout}${result.stderr}`);
+  assert.equal(envelopeData(result.stdout).outcome, 'synced', result.stdout);
+
+  const records = ironLawSkipRecords(cwd, 'gate-ack-sync');
+  assert.equal(records.length, 1, `expected exactly one Iron Law record, got ${records.length}`);
+  assert.equal(records[0].payload.kind, 'engine', 'a machine-written record must be kind engine');
+  assert.match(records[0].payload.text, /acknowledged/i);
+  assert.doesNotMatch(records[0].payload.text, /skipped/i, 'must stay distinguishable from a warn-level skip record');
+});

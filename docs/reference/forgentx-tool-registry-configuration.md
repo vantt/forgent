@@ -8,12 +8,12 @@ only what is actually configured today and how to read/extend it without
 asking again.
 
 > **tsk-in1-1 D1**: `register`/`remove` đã bị rút — provider giờ khai báo
-> thẳng trong `runner.capacities.<id>` (`.fgos/config.json`), sửa file
-> config như mọi `capacities` entry khác, không qua verb CLI riêng.
+> thẳng trong `runner.executors.<id>` (`.fgos/config.json`), sửa file
+> config như mọi `executors` entry khác, không qua verb CLI riêng.
 
 (tsk-in1-1 D1: `register`/`remove` are retired — a provider is now
-declared directly in `runner.capacities.<id>` (`.fgos/config.json`), edited
-like any other `capacities` entry, no longer through a dedicated CLI verb.)
+declared directly in `runner.executors.<id>` (`.fgos/config.json`), edited
+like any other `executors` entry, no longer through a dedicated CLI verb.)
 
 ## Registered providers
 
@@ -32,12 +32,12 @@ Confirmed via `fgos tool query --capability impact-analysis --json`:
 > (gitnexus) và `pane-labeling` (herdr), cả hai kebab-case, tự chuẩn hoá
 > qua `normalizeCapability` (`src/state/tool-registry.mjs`). Thêm nhãn mới
 > không cần sửa code: khai thẳng `capability: "<ten-moi>"` trên entry
-> `runner.capacities.<id>` — consumer (một skill, hay CLAUDE.md) tự quyết
+> `runner.executors.<id>` — consumer (một skill, hay CLAUDE.md) tự quyết
 > định có hỏi nhãn đó hay không, registry không áp policy.
 
 (2 labels in use today — `impact-analysis` (gitnexus) and `pane-labeling`
 (herdr). Adding a new label needs no code change: declare `capability:
-"<new-name>"` directly on a `runner.capacities.<id>` entry; the consumer —
+"<new-name>"` directly on a `runner.executors.<id>` entry; the consumer —
 a skill, or CLAUDE.md — decides whether to ask for that label, the
 registry itself applies no policy.)
 
@@ -47,37 +47,42 @@ registry itself applies no policy.)
 > trong `.fgos/config.json` — mỗi entry `{description?, aliases?}`, cả 2
 > field optional (`{}` hợp lệ, chỉ cần khoá). Đây là nơi ghi CHUNG cho cả
 > tool-registry's `capability` (Tầng 1, presence/fact) lẫn — sau này —
-> `capacities.<id>.for` (Tầng 2, dispatch purpose-lookup, một task khác
+> `executors.<id>.for` (Tầng 2, dispatch purpose-lookup, một task khác
 > trong cùng lineage). `aliases` khác `normalizeCapability`'s tự động
 > kebab-case: nó khai tên gọi KHÁC hẳn cùng trỏ về 1 entry (vd
 > `impact_analysis`/`Impact Analysis` cùng trỏ về `impact-analysis`).
 > Validate qua `validateCapabilitiesShape` (`src/runner/dispatch.mjs`) —
-> hiện chưa ép một `capability`/`for` phải nằm trong danh mục này (đó là
-> việc riêng của task đọc `for`).
+> cả `capability` lẫn `for` đều bị ép phải nằm trong danh mục này
+> (`validateExecutorEntryShape`, tsk-45f D11): một giá trị gõ nhầm/chưa khai bị
+> chặn ngay lúc load config, không còn âm thầm biến 1 tool vô hình với
+> `fgos tool query`.
 
 (A separate catalog from both vocabs above: `runner.capabilities.<name>`
 in `.fgos/config.json` — each entry `{description?, aliases?}`, both
 fields optional (`{}` is valid, only the key is required). This is the
 SHARED place both the tool-registry's `capability` (layer 1,
-presence/fact) and — later — `capacities.<id>.for` (layer 2, dispatch
-purpose-lookup, a separate task in the same lineage) read from. `aliases`
-differs from `normalizeCapability`'s automatic kebab-case folding: it
-names genuinely DIFFERENT spellings that all resolve to the same entry
-(e.g. `impact_analysis`/`Impact Analysis` both point at `impact-analysis`).
-Validated via `validateCapabilitiesShape` (`src/runner/dispatch.mjs`) —
-today nothing yet enforces that a `capability`/`for` value must actually
-be in this catalog; that enforcement is a separate task's job.)
+presence/fact) and `executors.<id>.for` (layer 2, dispatch purpose-lookup)
+read from. `aliases` differs from `normalizeCapability`'s automatic
+kebab-case folding: it names genuinely DIFFERENT spellings that all
+resolve to the same entry (e.g. `impact_analysis`/`Impact Analysis` both
+point at `impact-analysis`) — an alias must be declared explicitly to
+count; a value that only differs by case/punctuation is not automatically
+accepted by the catalog check. Validated via `validateCapabilitiesShape`
+(`src/runner/dispatch.mjs`) — both `capability` and `for` are now enforced
+to actually be in this catalog (`validateExecutorEntryShape`, tsk-45f D11): a
+typo'd or undeclared value is rejected at config load time instead of
+silently making a tool invisible to `fgos tool query`.)
 
 ## Registering a new provider
 
-Sửa thẳng `.fgos/config.json` — thêm 1 entry `runner.capacities.<id>` có
-`capability` (điểm phân biệt "tool" khỏi 1 capacity dispatch bình thường
-như `agy` — `toolsFromCapacities`, `src/state/tool-registry.mjs`, chỉ
+Sửa thẳng `.fgos/config.json` — thêm 1 entry `runner.executors.<id>` có
+`capability` (điểm phân biệt "tool" khỏi 1 executor dispatch bình thường
+như `agy` — `toolsFromExecutors`, `src/state/tool-registry.mjs`, chỉ
 nhặt entry nào khai `capability`):
 
 ```json
 "runner": {
-  "capacities": {
+  "executors": {
     "<id>": {
       "kind": "tool",
       "capability": "<nhan>",
@@ -95,7 +100,7 @@ nhặt entry nào khai `capability`):
 > `scanTarget` bắt buộc khi `invocations[0].via` là `mcp` (không nằm trên
 > `PATH`, presence check bằng scan path trên đĩa thay vì `command -v`).
 > `<id>` (khoá object) đóng vai trò `--name` cũ — phải duy nhất trong
-> `capacities`, engine đã tự đảm bảo (JSON object key). Presence/probe
+> `executors`, engine đã tự đảm bảo (JSON object key). Presence/probe
 > mechanism nằm ở `invocations[0].via`/`.command` — KHÔNG còn ở `kind`
 > nữa (tsk-in1-4 D5: `kind` giờ là trục BẢN CHẤT `agent`/`tool`, tách
 > khỏi trục CƠ CHẾ GỌI `invocations[].via`; xem "The curated
@@ -110,7 +115,7 @@ nhặt entry nào khai `capability`):
 (`scanTarget` is required when `invocations[0].via` is `mcp` — not on
 PATH, presence is checked by scanning a disk path instead of
 `command -v`. `<id>` (the object key) plays the old `--name`'s role —
-must be unique within `capacities`, which the engine already guarantees
+must be unique within `executors`, which the engine already guarantees
 (a JSON object key). The presence/probe mechanism now lives in
 `invocations[0].via`/`.command` — no longer in `kind` (tsk-in1-4 D5:
 `kind` is now the BAN CHAT axis, `agent`/`tool`, separate from the CO CHE
@@ -143,7 +148,7 @@ shape that adapter needs — `cli-spawn` reads `command`/`args`; `http`
 (new, D13) reads `method`/`url`/`headers`/`body`. Two adapters are
 registered today: `cli-spawn` (default) and `http` — a real precedent
 proving the port is pluggable, not just a documented interface. A
-`capacities.<id>.invocations[]` entry may now declare `{via: "api", url:
+`executors.<id>.invocations[]` entry may now declare `{via: "api", url:
 "..."}` (`INVOCATION_VIA` restored `'api'`, dropped earlier for 0
 historical producers) — `validateInvocationShape` requires only a
 non-empty `url` for it, never the `command`/`args` shape `via:"cli"`
@@ -151,11 +156,11 @@ needs.
 
 **Not wired into production dispatch yet**: `resolveExecutorConfig` still
 only ever selects/spawns a `via:"cli"` invocation (gate B2/B3,
-tsk-in1-4) — a capacity declaring only `via:"api"` invocations is not
-dispatchable through `spawnWorker`/`executeCapacityCli` today, same as
+tsk-in1-4) — a executor declaring only `via:"api"` invocations is not
+dispatchable through `spawnWorker`/`executeExecutorCli` today, same as
 `gitnexus`'s `via:"mcp"` invocation never was. `httpAdapter` is tested
 directly (`EXECUTOR_ADAPTERS.http(invocation, opts)` against a real local
-test server), not through a registered capacity — 0 capacities declare
+test server), not through a registered executor — 0 executors declare
 `via:"api"` in this repo's own `.fgos/config.json` today.
 
 ## Probing and reading status
@@ -198,16 +203,16 @@ registered tool is `present`; existing MUST behavior stays unchanged.)
 
 ## A tool-registry entry is never an automatic presence gate for dispatch (tsk-62v, tsk-5tm-1 D1)
 
-> `capacities.<capacityId>`'s own presence/staleness was checked
+> `executors.<executorId>`'s own presence/staleness was checked
 > automatically by `resolveExecutorConfig` once (tsk-62v D1/D2) — retired
 > at `tsk-5tm-1` D1: 2/3 real entries were `kind:"task"`, for which it
 > never ran, and the third's signal added nothing an OS `ENOENT` on a
 > missing binary didn't already give for free. `resolveExecutorConfig`
-> never consults this registry today, for ANY `capacityId` — a `capacities`
+> never consults this registry today, for ANY `executorId` — a `executors`
 > entry declaring a `capability` (making it also a tool-registry entry, the
 > "Registering a new provider" section above) and one that does not
 > dispatch and probe completely independently. A caller that wants a real
-> presence gate before dispatching a specific capacity asks for it itself,
+> presence gate before dispatching a specific executor asks for it itself,
 > explicitly, at the call site:
 >
 > ```
@@ -218,16 +223,16 @@ registered tool is `present`; existing MUST behavior stays unchanged.)
 > its own authority. `CLAUDE.md`'s impact-analysis capability gate is the
 > one real consumer of this pattern today (`gitnexus`).
 
-(A `capacities.<capacityId>` entry's own presence/staleness used to be
+(A `executors.<executorId>` entry's own presence/staleness used to be
 checked automatically by `resolveExecutorConfig` (tsk-62v D1/D2) — retired
 at `tsk-5tm-1` D1: 2 of the 3 real entries were `kind:"task"`, for which it
 never ran anyway, and the third's signal added nothing an OS `ENOENT` on a
 missing binary didn't already give for free. `resolveExecutorConfig` never
-consults this registry today, for any `capacityId` — a `capacities` entry
+consults this registry today, for any `executorId` — a `executors` entry
 declaring a `capability` (making it also a tool-registry entry, per the
 "Registering a new provider" section above) and one that dispatches are
 completely independent concerns. A caller that wants a real presence gate
-before dispatching a specific capacity has to ask for it explicitly at the
+before dispatching a specific executor has to ask for it explicitly at the
 call site, with `fgos tool query --status present`, never something
 `resolveExecutorConfig`/`fgos-coding-implement` does automatically.
 `CLAUDE.md`'s impact-analysis capability gate is the one real consumer of

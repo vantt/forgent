@@ -93,7 +93,7 @@ Three details worth copying when you add a similar knob:
 - **Default to the short alias (`sonnet`), not a full model id
   (`claude-sonnet-5`).** This matches what the repo already does
   everywhere else: `.fgos/config.json`'s `runner.executor.args` and
-  `capacities.*.args` all use alias-shaped literals, and the event log
+  `executors.*.args` all use alias-shaped literals, and the event log
   shows real executed invocations in the same form (`claude -p '...'
   --model haiku ...`). Introducing a full-id convention here would make
   this one call site the odd one out.

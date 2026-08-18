@@ -7,7 +7,7 @@ repository-harness's tool-registry-capability
 
 > **Superseded (tsk-in1-1 D1):** the worked example's own `register`/
 > `remove` verbs (event-log-backed, sections 2/5/6 below) were retired — a
-> tool provider is now declared directly in `runner.capacities.<id>`
+> tool provider is now declared directly in `runner.executors.<id>`
 > (`.fgos/config.json`), config-edited, never through the event log. The
 > general lessons in sections 1 (team-decision vs per-machine-fact), 3
 > (scan-not-shell presence), 4 (doctor posture check), and 7 (test layers)

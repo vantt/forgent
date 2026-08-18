@@ -11,7 +11,7 @@ human, and only *then* judge clear vs. unclear.
 ## What shipped — Route A
 
 > Route A shipped for discover research-and-clean recipe:
-> `capacities.judge-discovery` widened (Task/WebSearch/WebFetch/Read
+> `executors.judge-discovery` widened (Task/WebSearch/WebFetch/Read
 > allowedTools), `buildDiscoveryPrompt` rewritten as 5-step recipe
 > (clean ask, enrich real dep content, self-assess, self-research before
 > parking, degrade with no tools), verdict gains optional

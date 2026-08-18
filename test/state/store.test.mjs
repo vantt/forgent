@@ -1087,7 +1087,8 @@ test('addWork truncates an over-length title instead of rejecting the write', ()
   const stored = listWork(dir).work['long-add'];
   assert.ok(stored, 'the write went through rather than throwing');
   assert.ok(stored.title.length <= MAX_TITLE_LENGTH);
-  assert.equal(long.startsWith(stored.title), true);
+  assert.equal(stored.title.endsWith('…'), true);
+  assert.equal(long.startsWith(stored.title.slice(0, -1)), true);
 });
 
 test('addWork leaves a title already within the bound byte-identical', () => {
