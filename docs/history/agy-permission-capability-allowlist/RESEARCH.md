@@ -202,3 +202,111 @@ both, neither documents one). Writing a real `permission.allow` rule to
 prove the pattern syntax works IS the item's own actual intended change,
 not a throwaway test — parked at `awaiting-human` this pass rather than
 edited silently.
+
+## Round 3 — 2026-08-18 (live proof pass, human-authorized)
+
+**Authorized:** add a `permission.allow` block to
+`~/.gemini/antigravity-cli/settings.json` for a live proof pass, starting
+narrow (`command(git:*)` plus whatever the verify command needs), with a
+byte-for-byte backup taken first and an immediate revert if anything looked
+wrong, done as one tight sequence.
+
+**Backup taken first (byte-for-byte, confirmed by md5sum before/after):**
+```json
+{
+  "trustedWorkspaces": [
+    "/home/vantt/projects/forgent",
+    "/home/vantt/projects/herdr-gateway",
+    "/home/vantt/projects/forgentX"
+  ]
+}
+```
+md5: `1f2bf38ef13345267802f1943c5dec86` (saved to a scratchpad file outside
+the repo before any edit, restored from that exact file at the end — same
+md5 confirmed after restore).
+
+**Schema confirmed real via `strings` on the installed `agy` binary
+(`/home/vantt/.local/bin/agy`) and a live `agy -p "/config"` dump:** the
+settings struct has a `permission` field (`json:"permission"`) with nested
+`allow`/`deny` arrays (`json:"allow,omitempty"`, `json:"deny,omitempty"`,
+Go type names `PermissionConfig`/`GetPermissionConfig`/
+`initializePermissionConfig`). A literal embedded example string found in
+the binary: `"permissionOverrides": ["command(npm test)"]`. `agy -p
+"/config" --output-format json` echoed our written rule back correctly
+under a `permission` key each time, confirming the file is read into the
+live config — this part of the plan's technical claim was NOT wrong.
+
+**Four rule shapes tried, live, each followed immediately by the same
+Round-2-shape probe (`git status --short` via `--mode accept-edits`, no
+`--dangerously-skip-permissions`) — all four still soft-denied with the
+identical generic stderr (`a tool required the "command" permission... was
+auto-denied`):**
+
+1. `"command(git:*)"` + `"command(npm:*)"` — Claude-style colon-wildcard
+   suffix. Denied.
+2. `"command(regex:^git )"` + `"command(regex:^npm )"` — the changelog's
+   own documented `regex:` opt-in prefix ("Improved command permission
+   security by making 'Always Approve' rule matching strict (non-regex) by
+   default, while allowing users to explicitly opt-in to regex matching by
+   prepending rules with `regex:`"). Denied.
+3. `"command(git)"` + `"command(npm)"` — bare executable name only (no
+   args), reasoning from the changelog's "an allowlist entry that
+   tokenizes to zero command words... matches every command" bug
+   description implying token-count-sensitive matching. Denied.
+4. `"command(git status --short)"` — exact literal full command string,
+   matching the binary's own embedded example format
+   (`command(npm test)`) as closely as possible, run against the exact
+   same literal probe command. Denied.
+
+Each probe completed in 3-4.5s (`num_turns: 1`, real quota spent each
+time, `duration_seconds` in the 2.9-4.5s range) — never hung, consistent
+with Round 2's "soft-deny, don't hang" finding holding. But none of the
+four rule shapes changed the outcome from Round 2's baseline (no
+`permission.allow` block at all).
+
+**Finding 3 — the plan's central technical claim does not hold as
+written.** `permission.allow` in `~/.gemini/antigravity-cli/settings.json`
+is real, is read by `agy` (confirmed via `/config`), but does **not**
+appear to gate the `"command"` tool type through any of the four
+plausible syntaxes tried. Re-reading the Round 1 changelog citation more
+carefully: the exact wording was "Changed the default mode to respect
+**write_file** permissions allowlisted in `settings.json` under
+`permission.allow`" — Round 1 generalized this to "a capability-allowlist
+surface" without noticing the citation names `write_file` specifically,
+not `command`. The two tool types (`write_file`, `command`) may be gated
+by genuinely different mechanisms, and the one this item's whole verify
+condition and worker-contract needs (`command`) is not the one
+`permission.allow` was shown, in Round 1's own changelog citation, to
+cover.
+
+**Not yet identified:** the real gating mechanism for the `command` tool
+type in headless mode without `--dangerously-skip-permissions`. Candidates
+not ruled out: the plural `"permissions"` settings key (distinct from
+singular `"permission"`, present in the `/config` dump as `null`,
+possibly scope-keyed `global`/`project`/`shared` the way the `/permissions`
+panel lists three scopes); the `--agent`-selected custom `agent.md`
+frontmatter's `commandExecutionPolicy` (flagged as a candidate in Round 1,
+rejected in planning only because it requires shipping a new artifact —
+not because it was shown not to work); the `toolPermission` config field
+itself (`"request-review"` in the live dump) might need a different mode
+value with no headless equivalent to interactive approval at all, meaning
+`command`-type tools may be structurally unreachable in headless mode
+short of `--dangerously-skip-permissions`, independent of any
+`permission.allow` rule shape.
+
+**Restored:** `~/.gemini/antigravity-cli/settings.json` reverted to the
+exact backed-up content, byte-for-byte (md5 `1f2bf38ef13345267802f1943c5dec86`
+before and after). Baseline re-verified after restore: the item's own
+verify command (`agy -p "/permissions" ... | grep -q '"scope":"project"'`)
+passes clean.
+
+**Verdict:** live proof did **not** succeed. Per the authorization's own
+stop condition ("If anything about the live test looks wrong... restore...
+and report rather than iterating further live on a machine-shared file"),
+stopping here rather than trying further syntaxes or the two remaining
+candidate mechanisms live. This is a new, load-bearing finding that
+falsifies plan.md's Approach section's central claim (§"What discovery
+already established" / the `global`-scope decision) — plan.md needs
+re-opening, not just an implementation continuation, before any of
+plan.md's Order steps (config args swap, doctor/setup registration, test
+update) can proceed.
