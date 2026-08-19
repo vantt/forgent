@@ -10,6 +10,21 @@ status: open
 
 ## 1. Trạng thái hiện tại
 
+Round 19 tiếp lần nữa (2026-08-19), D24: Người hỏi "giải thích nốt việc
+cuối cùng là gì" (`agents/*.yaml` render-pair). Trợ lý giải thích lại đề
+xuất round trước (giữ top-level `agents/`, KHÔNG tách domain — lý do
+D20 làm agent-type domain-agnostic-by-thiết-kế). **Người bác LẦN THỨ 2**:
+"có chứ mỗi domain sẽ có bộ agents riêng phù hợp chứ". Trợ lý soi lại,
+nhận ra đã lẫn "cơ chế eligibility D20 domain-agnostic" (đúng) với "chỗ
+CHỨA file cũng phải domain-agnostic" (SAI, non-sequitur) — chính tiền lệ
+`skill` (D7) đã bác bỏ điều này từ trước: skill CŨNG load xuyên domain
+được về mặt cơ chế, nhưng D7 vẫn tách `core/skills/`+`domains/*/skills/`
+theo ai VIẾT/SỞ HỮU cho domain nào, không theo "có bị chặn cross-domain
+hay không". Áp đúng công thức D7 cho `agents/*.yaml` → **D24** (seq
+21174): `core/agents/` (domain-agnostic thật) + `domains/<name>/agents/`
+(viết riêng theo flavor domain). 24/24 quyết định đã chốt — **HẾT** cả 2
+việc mở cũ (doctrine D23, render-pair D24).
+
 Round 19 tiếp nữa (2026-08-19), D23: Người hỏi "doctrine domain-scoped
 là gì" — trợ lý giải thích + nhắc lại đề xuất round trước ("cố ý CHƯA
 XÂY", vì tưởng chưa có nội dung doctrine domain-thật). **Người bác
@@ -349,7 +364,7 @@ thi thật.
 | 25 | Skill có cần thiết phải hardcode load task-spec không, hay nên tách? | Chốt — D14 | Không nên hardcode trong prose (3 chỗ ở `fgos-coding-implement` dòng 88/177/291 đã hardcode literal path). `bundleForStage(domain, stage)` trả `{skill, taskSpec}` cùng lúc, sống ở tầng DRIVING (D13) — `skillMap`/`taskSpecMap` đã nằm cạnh nhau cùng object, cùng key stage, hàm này chỉ bọc lại dữ liệu có sẵn. |
 | 26 | Agent-type/persona/team-collab đặt vào đâu trong cơ chế dispatch, và "2 flow nối tiếp" (PO+BA rồi Tech-Lead+SWE+Tester) có cần 2 workflow riêng? | Chốt — D15 | Không cần 2 workflow. Persona resolve theo `(domain, stage, role)` thay vì chỉ `(domain, role)` — cùng roleGraph, cùng role (`implementer`), khác persona theo cụm stage. Team-hợp-tác = chuỗi sync call (holder không đổi, D8) tới nhiều persona, KHÔNG multi-holder cùng lúc; song song thật = decompose ra item con (`fgos-fanout`, có sẵn). **[Round 19: câu so sánh marketing-cockpit gốc ở đây đã LỖI THỜI so với D20 — xem §6 subsection "Eligibility declaration" cho bản đã sửa; tóm tắt: `claims` không phải "đi xa hơn", D20 đã đảo ngược chính hướng đó.]** CỐ Ý CHƯA XÂY: ranh giới stage-đổi-persona-ngầm có nên cũng dừng driving — chưa có bằng chứng đa dạng persona thật. |
 | 27 | Workflow definition sống ở đâu — có file riêng không, hay chỉ là key lồng trong registry.mjs? | Chốt — D18 | Chưa có file riêng hôm nay (chỉ `codingDomain.workflows.feature`, reference-sharing với top-level field, D7a). `domains/<name>/workflows/<name>.mjs` là nơi ở chính thức mới — `registry.mjs` thành aggregator cho map `workflows` của chính nó, mirror D4 một tầng sâu hơn. |
-| 28 | `agents/*.yaml`→`.claude/agents/*.md` render-pair (như skill's D7) nên tách vào `domains/<name>/agents/` hay giữ nguyên top-level `agents/`? | Chưa rõ (đề xuất round 19, chờ xác nhận) | Scout thật: `scripts/project-agents.mjs` chiếu `agents/*.yaml` (SOURCE_DIR top-level) → `.claude/agents/*.md` (TARGET_DIR), độc lập hoàn toàn cơ chế skill-wrapper. Đề xuất: GIỮ top-level — D20 làm agent-type identity domain-agnostic-by-thiết-kế (1 agent-type đủ điều kiện xuyên domain qua `skills` dùng chung), khác skill/task-spec/knowledge vốn thật sự thuộc sở hữu 1 domain (lý do D3's tự-chứa không áp dụng ở đây). Xem §6. |
+| 28 | `agents/*.yaml`→`.claude/agents/*.md` render-pair (như skill's D7) nên tách vào `domains/<name>/agents/` hay giữ nguyên top-level `agents/`? | Chốt — D24 | Scout thật: `scripts/project-agents.mjs` chiếu `agents/*.yaml` (SOURCE_DIR top-level) → `.claude/agents/*.md` (TARGET_DIR). Đề xuất đầu (giữ top-level) bị người bác 2 lần — SAI vì lẫn "eligibility domain-agnostic" với "chỗ chứa file domain-agnostic". Chốt: tách ĐÚNG công thức D7 — `core/agents/` (thật domain-agnostic) + `domains/<name>/agents/` (viết riêng theo flavor domain). Xem §6. |
 | 29 | Diagram 3-tầng DISPATCH/ROUTING/DRIVING (D13) có bố cục đúng không — và stage-entry (discover/exploring/planning/executing) có phải ứng viên dispatch như dòng Collaboration không? | Chốt — D22 | KHÔNG đúng ở 2 điểm: (1) session-origin có 2 đường ngang hàng (root-spawn CHỈ runner-không-người, người tự mở session là đường khác NGOÀI `dispatch.mjs`), không chỉ 1; (2) stage-entry LÀ ứng viên dispatch, dùng CHUNG phép khớp `requires-skill`/`skills` (D20) với dòng Collaboration — nhìn no-op hôm nay chỉ vì thiếu dữ liệu (1 role xuyên mọi stage, chưa ai viết `requires-skill` khác nhau), không phải khác cơ chế. Xem §6 diagram mới. |
 
 ## 4. Quyết định đã chốt
@@ -379,6 +394,7 @@ thi thật.
 | D21 | 3 tầng dispatch (D13) map THẲNG vào 3 cơ chế fgOS ĐÃ CÓ TÊN, ĐÃ BUILD — không phải khái niệm mới. DISPATCH = chính `src/runner/dispatch.mjs` (mở rộng theo D20 để resolve `agentType` qua khớp-skill thay vì đọc config tĩnh). ROUTING = chính `fgos-routing`. DRIVING = chính `fgos-coding-driving`. Rút lại đề xuất đổi tên "CASTING". | Người: đã có concept quan trọng (routing, driver) thì dùng, chế thêm từ mới không hay. Xem lại: `dispatch.mjs` đã có sẵn `buildAgentTypeExecutor(baseExecutor, agentType)` — 1 chỗ ĐÃ CHỜ SẴN để nhận `agentType` — D20 chỉ nâng cấp CÁCH giá trị đó được resolve, không phải thêm 1 tầng song song. Đóng góp thật của mô hình 3 tầng là gọi tên ĐÚNG THỨ TỰ 3 cơ chế có sẵn ghép lại, và LÝ DO (soul không hoán đổi giữa chừng session) — không phải phát minh khái niệm mới. |
 | D22 | DISPATCH's eligibility-check là 1 CƠ CHẾ THỐNG NHẤT, xảy ra ở MỌI điểm cần role — không chỉ dòng Collaboration. Stage-entry (`bundleForStage`, D14, role CHÍNH) và dòng Collaboration (consult/assist/review/advise, role PHỤ) đều khớp qua CÙNG phép match D20 (`requires-skill`/`assignable-to` của task-spec ↔ `skills` của agent-type) — khác nhau chỉ ở task-spec NÀO đang được khớp. Stage-entry nhìn như no-op hôm nay CHỈ VÌ `roleGraph` có 1 role xuyên mọi stage + chưa ai viết `requires-skill` khác nhau cho từng task-spec — KHÔNG PHẢI vì cơ chế khác dòng Collaboration. Session-origin cũng có 2 đường ngang hàng dẫn vào CÙNG 1 downstream ROUTING/DRIVING: root-spawn (`spawnWorker`, chỉ runner-không-người) HOẶC người tự mở Claude Code trực tiếp (hoàn toàn ngoài code `dispatch.mjs`). | Người bác bỏ đúng phát biểu sai của trợ lý ("stage transition tự nó KHÔNG dispatch") bằng câu hỏi ngược: "nếu không phải thì thiết kế workflow/stage/task-spec/agent/skill dispatch (bundle mix load) làm gì?". Scout xác nhận `judge-ambiguity.md`/`lock-decisions.md`/`implement-item.md` đều `position: implementer` (role đứng yên mọi stage hôm nay) — nhưng role (seat, `roleGraph`) và skill (năng lực, `requires-skill` D20) là 2 TRỤC khác nhau; `bundleForStage`'s task-spec riêng mỗi stage, một khi mang `requires-skill` (D20), khiến stage-entry trở thành 1 phép khớp dispatch THẬT, chỉ suy biến thành no-op hôm nay vì thiếu đa dạng persona/skill, không phải khác biệt thiết kế. |
 | D23 | Doctrine domain-scoped sống tại `domains/<name>/AGENTS.md` — CÙNG LOẠI file với root `AGENTS.md` (standing doctrine), chỉ hẹp phạm vi lại, KHÔNG phải khái niệm mới như knowledge/specs/task-specs. Root `AGENTS.md`/`CLAUDE.md` chỉ giữ phần THẬT domain-agnostic (Dispatch, priority order, DoD 6-câu-hỏi, doctor/setup gate); mục "fgOS Workflow" (hard-code tên `fgos-coding-*`) và toàn bộ "GitNexus — Code Intelligence" chuyển vào `domains/coding/AGENTS.md` — migration thật đầu tiên. Cơ chế NẠP ĐƯỢC ĐẢM BẢO: `fgos-routing` tự Read `domains/<domain>/AGENTS.md` ngay khi domain đã resolve (cùng pattern `bundleForStage` D14, một tầng cao hơn — cấp DOMAIN thay vì cấp STAGE) — KHÔNG dựa vào auto-discovery AGENTS.md lồng thư mục (chưa kiểm chứng Claude Code có hỗ trợ hay không). | Người bác đề xuất "cố ý CHƯA XÂY" của trợ lý — `coding` ĐÃ có doctrine riêng thật hôm nay, hard-mix vào `AGENTS.md` gốc (mục "fgOS Workflow" gọi thẳng tên `fgos-coding-*`, mục GitNexus toàn code-symbol-specific), không phải giả thuyết tương lai. Người đòi thẳng "1 cơ chế dẫn dắt để agent biết mà tìm đến doctrine riêng của từng domain" — trợ lý grounding bằng `@import` tĩnh (nạp trước khi biết domain, không điều kiện hoá được), đề xuất routing tự Read tường minh thay vì auto-import, đúng pattern `bundleForStage` (D14) một tầng cao hơn. Người chọn tên `AGENTS.md` thay vì `doctrine.md` — cùng loại file với root, không bịa từ mới — sau khi trợ lý nêu trade-off tên gọi + cảnh báo chưa kiểm chứng auto-discovery. |
+| D24 | `agents/*.yaml` tách theo ĐÚNG công thức D7 đã dùng cho skill: `core/agents/` (agent-type THẬT domain-agnostic, VD `fgos-placeholder`) + `domains/<name>/agents/` (agent-type viết RIÊNG cho flavor domain đó, VD `domains/coding/agents/tech-lead.yaml`). `scripts/project-agents.mjs`'s `SOURCE_DIR` mở rộng quét CẢ 2 nơi (mirror cơ chế assembly D7 đã đặt cho skill), chiếu ra `.claude/agents/` không đổi. Eligibility (D20) KHÔNG bị ảnh hưởng bởi vị trí file — 1 agent-type ở `domains/coding/agents/` VẪN đủ điều kiện cho task-spec `marketing` nếu khớp `skills`, y hệt cách `core/skills/` không ngăn domain khác gọi nó. Chỗ chứa phản ánh AI VIẾT/SỞ HỮU CHO DOMAIN NÀO, không phải hàng rào giới hạn dùng. | Người bác đề xuất "giữ top-level" của trợ lý LẦN THỨ 2: "có chứ mỗi domain sẽ có bộ agents riêng phù hợp chứ". Trợ lý soi lại: đã lẫn "cơ chế eligibility D20 domain-agnostic" với "chỗ chứa file cũng phải domain-agnostic" — non-sequitur, chính tiền lệ `skill` (D7) đã bác bỏ: skill CŨNG load được xuyên domain về mặt cơ chế, nhưng D7 VẪN tách `core/skills/`+`domains/*/skills/` theo ai viết/sở hữu, không theo "có bị chặn cross-domain hay không" (chưa bao giờ chặn). |
 
 ## 5. Q&A log
 
@@ -616,6 +632,14 @@ thi thật.
   (cùng loại file root, không bịa khái niệm mới) kèm cảnh báo cơ chế nạp
   phải dựa routing tự Read, không giả định auto-discovery. Người chốt →
   D23 (seq 21094).
+- 2026-08-19 — Round 19 tiếp lần nữa, D24: người hỏi giải thích việc mở
+  cuối cùng (`agents/*.yaml` render-pair). Trợ lý nhắc lại đề xuất giữ
+  top-level. **Người bác lần 2**: "có chứ mỗi domain sẽ có bộ agents
+  riêng phù hợp chứ". Trợ lý nhận ra lỗi lập luận: lẫn "eligibility
+  domain-agnostic" (D20, đúng) với "chỗ chứa file phải domain-agnostic"
+  (sai) — tiền lệ `skill` D7 đã bác bỏ điều này (skill cũng load xuyên
+  domain được nhưng vẫn tách core/domain theo ai viết). Áp lại đúng công
+  thức D7 cho agent-type → D24 (seq 21174).
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -645,9 +669,11 @@ forgentX/
 │   └── intake/{discovery,plan}.mjs       # workflow — dispatcher, sửa đọc DOMAINS[item.domain] thay vì hardcode
 ├── herdr-plugin/                         # harness — Rust engine
 ├── core/
-│   └── skills/                           # ★ D7 — canonical AUTHORING (thay .agents/skills/core/)
-│       ├── fgos-routing/  fgos-clarifying/  fgos-researching/
-│       └── fgos-unlock/   fgos-fanout/      fgos-indexing/   distill/
+│   ├── skills/                           # ★ D7 — canonical AUTHORING (thay .agents/skills/core/)
+│   │   ├── fgos-routing/  fgos-clarifying/  fgos-researching/
+│   │   └── fgos-unlock/   fgos-fanout/      fgos-indexing/   distill/
+│   └── agents/                           # ★ D24 — agent-type THẬT domain-agnostic (mirror skill's D7)
+│       └── fgos-placeholder.yaml         # di dời từ agents/ top-level (chỉ file thật hôm nay)
 ├── docs/
 │   ├── specs/                            # ★ D8 SỬA LẠI — GIỮ NGUYÊN, KHÔNG di dời (bản D8 đầu sai, đã sửa).
 │   │   │                                 #   12 file platform/core (work-state, runner, distribution, ...)
@@ -677,6 +703,8 @@ forgentX/
 │   │   │   # harvesting/trust/dated-freshness/retirement — một hệ bảo trì, không phải log)
 │   │   ├── specs/                        # ★ D8 — RỖNG hôm nay; chờ BA spec riêng của coding-domain
 │   │   │   # task (data thật): domainFields.coding.* — sống trong .fgos/events.jsonl, không phải file
+│   │   ├── agents/                       # ★ D24 — agent-type viết RIÊNG cho flavor coding
+│   │   │   └── tech-lead.yaml            # ví dụ minh hoạ (chưa file thật — chỉ agents/fgos-placeholder.yaml tồn tại)
 │   │   └── AGENTS.md                     # ★ D23 — doctrine RIÊNG coding, cùng loại file root AGENTS.md
 │   │       # nhận "fgOS Workflow" + "GitNexus — Code Intelligence" dời từ root sang (migration đầu)
 │   │       # nạp bởi fgos-routing tự Read khi domain=coding đã resolve, KHÔNG auto-discovery
@@ -685,12 +713,14 @@ forgentX/
 │       ├── registry.mjs
 │       ├── skills/
 │       ├── specs/                        # ★ D8 — spec business trước khi có code (luật AGENTS.md)
+│       ├── agents/                       # ★ D24 — agent-type viết riêng cho flavor marketing (viết khi xây)
 │       └── AGENTS.md                     # ★ D23 — doctrine riêng marketing (viết khi domain đó thật xây)
 │
 ├── .agents/skills/                       # ★ D7 — render target (trước: canonical, tsk-1qi D5). Hình dạng/nội
 │                                         #   dung KHÔNG đổi (vẫn được fgos setup vendor nguyên văn vào
 │                                         #   external project) — chỉ nguồn sinh ra nó đổi (assembly step mới)
 ├── .claude/skills/                       # render target (không đổi cơ chế — vẫn generate, nay từ core/skills/+domains/*/skills/)
+├── .claude/agents/                       # ★ D24 — render target CHO agents (project-agents.mjs, quét core/agents/+domains/*/agents/)
 └── plugins/fgOS/skills/                  # render target (không đổi cơ chế — mirror plugins/fgOS/ tự nó)
 ```
 
@@ -702,6 +732,7 @@ flowchart TB
         workflow_core["<b>workflow</b><br/>stage-fsm.mjs, status-fsm.mjs<br/>+ workflow-stage-graphs.mjs<br/><i>(aggregator, D4)</i>"]
         task_core["<b>task</b><br/>EDITABLE_FIELDS<br/>(store.mjs:275, D2)"]
         skill_core["<b>skill</b><br/>core/skills/ (canonical, D7)<br/>fgos-routing, fgos-clarifying, ...<br/><i>.agents/.claude/plugins = render targets</i>"]
+        agent_core["<b>agent-type</b> — ★ D24<br/>core/agents/ (mirror D7)<br/>fgos-placeholder<br/><i>.claude/agents = render target</i>"]
         knowledge_core["<b>knowledge</b><br/>docs/decisions/ (craft, domain-agnostic)"]
         context_core["<i>(context ≠ knowledge)</i><br/>docs/history/&lt;feature&gt;/<br/>shared, KHÔNG gắn domain — D6"]
         doctrine_core["<b>doctrine</b> — ★ D23<br/>AGENTS.md / CLAUDE.md<br/>(luôn nạp, CHỈ phần domain-agnostic)"]
@@ -714,6 +745,7 @@ flowchart TB
             wf_c["workflow<br/>registry.mjs"]
             tk_c["task<br/>domainFields.coding.*"]
             sk_c["skill<br/>skills/ (8 skill,<br/>di dời từ .agents/skills/)"]
+            ag_c["agent-type — ★ D24<br/>agents/ (flavor coding)"]
             kn_c["<b>knowledge</b><br/>knowledge/ — curated,<br/>co-located (D6)"]
             dc_c["<b>doctrine</b> — ★ D23<br/>AGENTS.md<br/>(nhận fgOS Workflow + GitNexus)"]
         end
@@ -722,11 +754,14 @@ flowchart TB
             wf_m["workflow<br/>registry.mjs"]
             tk_m["task<br/>domainFields.marketing.*"]
             sk_m["skill<br/>skills/"]
+            ag_m["agent-type — ★ D24<br/>agents/ (flavor marketing)"]
             dc_m["doctrine — ★ D23<br/>AGENTS.md (viết khi xây)"]
         end
     end
 
     doctrine_core -. "fgos-routing tự Read khi<br/>domain đã resolve — D23" .-> dc_c
+    agent_core === |"project-agents.mjs quét CẢ 2,<br/>gộp chung 1 roster — D24<br/>(không phải phụ thuộc thứ tự)"| ag_c
+    agent_core === ag_m
     doctrine_core -.-> dc_m
 
     workflow_core -. "quét domains/*/registry.mjs<br/>tự động (D4, không sửa tay)" .-> wf_c
@@ -816,6 +851,35 @@ giả định** Claude Code có auto-discovery `AGENTS.md` lồng thư mục con
 (chưa kiểm chứng) — nếu tooling sau này có hỗ trợ thật, đặt tên
 `AGENTS.md` sẵn thì hưởng miễn phí, nhưng cơ chế ĐẢM BẢO hôm nay vẫn phải
 là routing tự Read tường minh.
+
+### `agents/*.yaml` — `core/agents/` + `domains/<name>/agents/` (D24, round 19)
+
+**Rút lại đề xuất "giữ top-level" — SAI, bị bác 2 lần.** Lỗi lập luận:
+lẫn "eligibility (D20) domain-agnostic" với "chỗ CHỨA file cũng phải
+domain-agnostic" — 2 chuyện khác nhau. Chính tiền lệ `skill` (D7) đã bác
+bỏ: skill CŨNG load được xuyên domain về mặt cơ chế (ROUTING/DRIVING
+không hề bị chặn gọi 1 skill "core" hay skill domain khác), nhưng D7 VẪN
+tách `core/skills/`+`domains/*/skills/` — theo AI VIẾT/SỞ HỮU cho domain
+nào, không theo "cơ chế có chặn cross-domain hay không" (chưa bao giờ
+chặn).
+
+**Quyết định (D24):** áp ĐÚNG công thức D7 cho `agents/*.yaml`:
+- `core/agents/` — agent-type THẬT domain-agnostic (hôm nay chỉ có
+  `fgos-placeholder.yaml`).
+- `domains/<name>/agents/` — agent-type VIẾT RIÊNG cho flavor domain đó
+  (VD `tech-lead` mang giọng/quyết định kiểu engineering cho `coding`).
+
+`scripts/project-agents.mjs`'s `SOURCE_DIR` (hôm nay chỉ quét
+`agents/` phẳng) mở rộng quét CẢ `core/agents/` lẫn `domains/*/agents/`
+— mirror đúng cơ chế assembly D7 đã đặt cho skill
+({#task-skill-assembly-mechanism}) — rồi chiếu ra `.claude/agents/`
+KHÔNG đổi (render target, hình dạng ngoài giữ nguyên).
+
+**Eligibility (D20) không bị ảnh hưởng bởi vị trí file.** 1 agent-type
+sống ở `domains/coding/agents/tech-lead.yaml` VẪN đủ điều kiện cho 1
+task-spec `marketing` nếu `skills` khớp `requires-skill` — phép khớp D20
+là DỮ LIỆU (`skills` field), không phải ĐƯỜNG DẪN. Chỗ chứa chỉ phản ánh
+ai viết/sở hữu ban đầu, không phải hàng rào giới hạn dùng.
 
 ### Tầng DISPATCH/ROUTING/DRIVING — điều phối workflow/stage/taskSpec/skill/persona (D13-D15, D20-D22, sắp lại round 19)
 
@@ -1269,8 +1333,34 @@ lượt riêng, để chỉ đụng `stage-fsm.mjs` (module test dày đặc nh�
   `domains/coding/AGENTS.md` (log hoặc tường thuật của session xác nhận
   đã đọc file đó) trước khi vào DRIVING.
 
+### {#task-agent-domain-split} Tách `agents/*.yaml` thành `core/agents/` + `domains/<name>/agents/`, mở rộng `project-agents.mjs` quét cả 2
+
+- **Mục tiêu:** hiện thực D24 — 2 việc, 1 lượt:
+  1. Di dời `agents/fgos-placeholder.yaml` (file thật DUY NHẤT hôm nay)
+     sang `core/agents/fgos-placeholder.yaml` — nội dung không đổi, chỉ
+     đổi chỗ.
+  2. `scripts/project-agents.mjs`: `SOURCE_DIR` (hôm nay `path.join(REPO_ROOT,
+     'agents')`, phẳng) đổi thành quét CẢ `core/agents/` lẫn
+     `domains/*/agents/` — mirror đúng cơ chế assembly D7 đã đặt cho
+     skill ({#task-skill-assembly-mechanism}); `TARGET_DIR`
+     (`.claude/agents/`) không đổi, mọi agent-type từ CẢ 2 nguồn chiếu
+     vào CHUNG 1 chỗ, không phân biệt domain ở output.
+- **§6 excerpt áp dụng:** subsection "`agents/*.yaml` — `core/agents/` +
+  `domains/<name>/agents/` (D24)" + dòng `core/agents/`/
+  `domains/<name>/agents/` trong ASCII tree + node `agent_core`/`ag_c`/
+  `ag_m` trong mermaid.
+- **D-ID áp dụng:** D24.
+- **Quan hệ:** độc lập — có thể làm bất cứ lúc nào, không phụ thuộc
+  registry-split hay skill-migration; nên làm CÙNG lúc hoặc SAU
+  {#task-eligibility-inversion} (D20) để `skills` field trên
+  `agents/*.yaml` đã tồn tại trước khi di dời, tránh 2 lượt sửa file.
+- **Verify nháp:** `test/scripts/project-agents.test.mjs` cập nhật
+  `SOURCE_DIR` giả lập (2 thư mục thay vì 1), xác nhận
+  `projectAgentMarkdown` vẫn chiếu đúng cho agent-type ở CẢ `core/agents/`
+  lẫn `domains/*/agents/`; `.claude/agents/fgos-placeholder.md` sinh ra
+  byte-identical với trước khi di dời (hình dạng output không đổi).
+
 **Việc CHƯA đủ hình dạng để thành task riêng:** ranh giới
-stage-đổi-persona-ngầm có nên dừng driving (D15's phần cố ý chưa xây),
-`agents/*.yaml`→`.claude/agents/*.md` render-pair placement — round 19
-đề xuất GIỮ NGUYÊN top-level `agents/` (xem §6), chờ người xác nhận
-trước khi khoá D-ID và coi là "đã có hình dạng".
+stage-đổi-persona-ngầm có nên dừng driving (D15's phần cố ý chưa xây) —
+duy nhất còn lại, chờ bằng chứng persona đa dạng thật, không phải chờ
+xác nhận từ người (khác 2 việc doctrine/render-pair đã chốt D23/D24).
