@@ -21,6 +21,7 @@ import {
   decideDispatchMechanism,
   decideExecutorDispatchMechanism,
   decideExecutorCli,
+  fanoutBatchExecutorCli,
   spawnWorker,
   RunnerConfigError,
   DispatchError,
@@ -4345,4 +4346,57 @@ test('dispatch CLI decide subcommand respects --cwd flag', () => {
   const res = JSON.parse(out);
   assert.equal(res.mechanism, 'in-process');
   assert.equal(res.agentType, 'test');
+});
+
+// --- fanout-batch and fgos schedule --candidates -------------------------
+
+test('fanoutBatchExecutorCli returns slotsFull when worker slots ceiling is full', async () => {
+  const repo = mkTempGitRepo();
+  const fgosDir = repo.fgosDir;
+  initStore(fgosDir);
+  // Write shared config with ceiling = 1 into .fgos/config.json
+  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ workerSlots: { ceiling: 1 } }));
+  // Add 1 doing item to consume the slot
+  addWork(fgosDir, { id: 't1', title: 'Running Item', kind: 'task', status: 'doing', domain: 'coding', stage: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
+
+  const result = await fanoutBatchExecutorCli(['c1', 'c2'], { repoRoot: repo.repoRoot });
+  assert.equal(result.slotsFull, true);
+  assert.deepEqual(result.deferred, ['c1', 'c2']);
+  assert.deepEqual(result.fired, []);
+});
+
+test('fanoutBatchExecutorCli trims candidates to free slots when ceiling is configured', async () => {
+  const repo = mkTempGitRepo();
+  const fgosDir = repo.fgosDir;
+  initStore(fgosDir);
+  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ workerSlots: { ceiling: 1 } }));
+
+  addWork(fgosDir, { id: 'c1', title: 'Cand 1', kind: 'task', status: 'todo', domain: 'coding', stage: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
+  addWork(fgosDir, { id: 'c2', title: 'Cand 2', kind: 'task', status: 'todo', domain: 'coding', stage: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
+
+  const result = await fanoutBatchExecutorCli(['c1', 'c2'], { repoRoot: repo.repoRoot, hasLiveTaskAccess: true });
+  assert.equal(result.slotsFull, undefined);
+  assert.deepEqual(result.deferred, ['c2']);
+  assert.equal(result.mechanismChanged.length, 1);
+  assert.equal(result.mechanismChanged[0].id, 'c1');
+});
+
+test('fgos schedule --candidates filters schedule to specified candidates', () => {
+  const repo = mkTempGitRepo();
+  const fgosDir = repo.fgosDir;
+  initStore(fgosDir);
+  addWork(fgosDir, { id: 'w1', title: 'Item 1', kind: 'task', status: 'todo', domain: 'coding', stage: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
+  addWork(fgosDir, { id: 'w2', title: 'Item 2', kind: 'task', status: 'todo', domain: 'coding', stage: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
+  const fgosScript = path.resolve(process.cwd(), 'bin/fgos.mjs');
+
+  const outAll = execFileSync(process.execPath, [fgosScript, 'schedule', '--json', '--dir', repo.repoRoot], { encoding: 'utf8' });
+  const schedAll = JSON.parse(outAll);
+  const wavesAll = schedAll.data ? schedAll.data.waves : schedAll.waves;
+  assert.ok(wavesAll[0].includes('w1'));
+  assert.ok(wavesAll[0].includes('w2'));
+
+  const outScoped = execFileSync(process.execPath, [fgosScript, 'schedule', '--candidates', 'w1', '--json', '--dir', repo.repoRoot], { encoding: 'utf8' });
+  const schedScoped = JSON.parse(outScoped);
+  const wavesScoped = schedScoped.data ? schedScoped.data.waves : schedScoped.waves;
+  assert.deepEqual(wavesScoped, [['w1']]);
 });

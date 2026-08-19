@@ -47,6 +47,7 @@ export {
   logExecutorDispatch,
   executeExecutorCli,
   decideExecutorCli,
+  fanoutBatchExecutorCli,
 } from './dispatch/cli.mjs';
 
 import { runDispatchCli } from './dispatch/cli.mjs';
