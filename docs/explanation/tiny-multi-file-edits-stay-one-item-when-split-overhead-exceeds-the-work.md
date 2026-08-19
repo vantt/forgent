@@ -2,7 +2,7 @@
 type: explanation
 title: Tiny multi-file edits stay one item when split overhead exceeds the work
 tags: [decompose, planning, footprint, lifecycle-cost]
-source_capture_ids: [tsk-3j1]
+source_capture_ids: [tsk-3j1, tsk-1xn]
 authoritative_for: keeping a multi-file small-edit item unsplit because each child's worktree/merge-gate lifecycle overhead would exceed the actual edit work
 ---
 # Tiny multi-file edits stay one item when split overhead exceeds the work
@@ -46,10 +46,30 @@ positions across four files sharing one vocabulary axis reads as one
 coherent unit of work, not four (or twelve) separate units each needing
 its own full item lifecycle.
 
+## A second instance, same axis
+
+`tsk-1xn` — a sibling under the same milestone, touching three disjoint
+Markdown files (a tutorial, `distribution-vision.md`, `backlog.md`) that
+share one vocabulary map — reached the identical conclusion by the
+identical reasoning:
+
+> "plan-tsk-1xn.md step 4: one honest piece — three Markdown files,
+> disjoint from every sibling's footprint, sharing one vocabulary map;
+> splitting further would give three items too small to park
+> independently and would not shrink any risk."
+> — real `work.decision` capture, id `tsk-1xn`
+
+"Too small to park independently" and "would not shrink any risk" name
+the same cost/value judgment `tsk-3j1` reached — not a coincidence: both
+items are children of the same `tsk-5eq` spec-docs-lifecycle-realignment
+milestone, splitting the same underlying vocabulary-map work across
+disjoint file sets, so the same "one shared axis, several small
+positions" shape recurs by design, not by chance.
+
 ## Related
 
 - `docs/explanation/why-decompose-checks-footprint-overlap-before-creating-children.md`
   — the footprint-collision half of "why not split"
 - `docs/history/spec-docs-lifecycle-realignment/plan.md` — the shared
   vocabulary table and per-file plan this item and its siblings
-  (`tsk-1uw`, `tsk-2t5`) executed against
+  (`tsk-1uw`, `tsk-2t5`, `tsk-1xn`) executed against
