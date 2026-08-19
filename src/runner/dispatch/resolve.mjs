@@ -153,13 +153,16 @@ export function resolveExecutorIdForPurpose(cfg, purpose) {
  * always wins first, unchanged from every pre-this-item caller's own
  * behavior — this is the deep-customization escape-hatch (a different
  * `command`/`args` entirely), never touched by `overrides`. (2) failing
- * that, `cfg.capabilities[executorIdOrPurpose].prefer` names a executor
- * that MUST itself declare `for` including `executorIdOrPurpose`
- * (symmetry, D2) — `prefer` is a tie-breaker among self-declared
- * servers, never a way to assign serving status a executor never opted
- * into; a `prefer` that fails this check throws loud (`RunnerConfigError`)
- * rather than silently falling through, matching every other shape-
- * validation gate in this file. (3) failing that, the existing
+ * that, `cfg.capabilities[executorIdOrPurpose].prefer` names a real
+ * registered executor directly — no requirement that the executor also
+ * self-declare a matching `for` entry (D5, `docs/history/capability-
+ * capacity-remodel/CONTEXT.md`, supersedes D2's own symmetry requirement:
+ * the reverse check forced a second config edit per wiring decision
+ * without a proportional safety benefit — a careless `prefer` edit could
+ * add a careless `for` entry just as easily). `prefer` naming an executor
+ * id that does not exist at all still throws loud (`RunnerConfigError`),
+ * matching every other shape-validation gate in this file. (3) failing
+ * that, the existing
  * `resolveExecutorIdForPurpose` scan (unchanged, still the "first `for`
  * match wins" behavior for a purpose with no `prefer` set). (4) nothing
  * found — `{executorId: null, configured: false}`, a legitimate,
@@ -192,9 +195,9 @@ export function resolveExecutorAndOverrides(cfg, executorIdOrPurpose) {
   const preferred = cfg && cfg.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities[executorIdOrPurpose]?.prefer : undefined;
   if (preferred) {
     const executor = executors[preferred];
-    if (!executor || !Array.isArray(executor.for) || !executor.for.includes(executorIdOrPurpose)) {
+    if (!executor) {
       throw new RunnerConfigError(
-        `runner config capabilities.${executorIdOrPurpose}.prefer names "${preferred}" but that executor does not declare "for" including "${executorIdOrPurpose}" itself (symmetry required).`,
+        `runner config capabilities.${executorIdOrPurpose}.prefer names "${preferred}" but no such executor is registered.`,
       );
     }
     return { executorId: preferred, executor, overrides: cfg.capabilities[executorIdOrPurpose].overrides, configured: true };
