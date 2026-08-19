@@ -8,8 +8,11 @@ driven straight through by `fgos-coding-driving`). Flags counted per
 `.agents/skills/_shared/executor-dispatch-fallback.md`, the shared
 fragment six coding-domain skills point at) and **existing covered
 behavior** (`scripts/`/`test/scripts/` is an established, tested
-convention this item extends). 2 flags → standard. No hard-gate flag
-(no auth/data-loss/audit/external-provider/validation-removal) — not
+convention this item extends). 2 flags → standard. This item only adds a
+new dev-tooling script, a test, and a doc-pointer edit — it does not
+touch identity/access control, losing stored data, a compliance review
+surface, an outside service dependency, or removing an existing safety
+check, so none of the mode-gate's hard-gate categories apply here — not
 high-risk. No single yes/no question decides plan realism — not a spike.
 
 No CONTEXT.md exists — discovery's verdict was `clear`, skipping
@@ -52,7 +55,7 @@ confirms the guard trips on general shell-syntax complexity (pipe/
 substitution/multi-statement), not something specific to
 `dispatch.mjs execute`'s own `--prompt "$(cat ...)"` shape — a narrower
 `--prompt-file` flag on `dispatch.mjs` would not have helped the other
-real cases the scratchpad audit found (`run-verify.sh`, `run-gate-
+real cases the scratchpad sweep found (`run-verify.sh`, `run-gate-
 check.sh`, `codex-*-test.sh` probes, none of which are dispatch prompts
 at all). A single general helper covers all of them with one file.
 
@@ -86,7 +89,7 @@ boundary" discipline applied to a script instead of a dispatched worker.
    This alternative was never actually buildable, not merely
    undesirable.
 3. Leave the pattern undocumented-but-tolerated (do nothing) — rejected:
-   the scratchpad audit (12+ sessions, 2026-08-14 through 2026-08-19)
+   the scratchpad sweep (12+ sessions, 2026-08-14 through 2026-08-19)
    shows this recurs constantly and costs "2 extra tool calls plus a
    stray file to clean up, every time" (tsk-38w's own words), a real,
    measured, recurring cost this item exists to reduce.
