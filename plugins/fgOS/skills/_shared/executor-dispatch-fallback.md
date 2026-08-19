@@ -123,9 +123,10 @@ tsk-3rg's own finding that this guard is a harness-level built-in this
 repo cannot change). Unlike the `root=$(...)` + `node ... --dir "$root"`
 pattern tsk-3rg fixed by splitting into two tool calls, this line is one
 logical action (dispatch + live-tee, per the Monitor rule above) that
-cannot be split without losing the live-tee. When refused, write the
-exact command into a small wrapper script file inside the worktree and
-invoke that single file path through Monitor instead — a single-file
+cannot be split without losing the live-tee. When refused, run
+`node scripts/write-wrapper-script.mjs --command "<full shell command>" --dir "$root"`
+to produce the wrapper script file inside the worktree, and invoke that
+returned single file path through Monitor instead — a single-file
 invocation carries no compound shell syntax for the guard to flag.
 
 (pass the line above as Monitor's own `command`, with a `description`

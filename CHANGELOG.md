@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `scripts/write-wrapper-script.mjs` — reusable helper CLI script to write executable wrapper shell scripts for multi-statement commands that trip worktree isolation guards.
 - Dispatch-execute reliability pass (`src/runner/dispatch/transport.mjs`,
   `src/runner/recovery.mjs`): the `cli-spawn` adapter now caps nested
   out-of-process dispatch at 3 levels deep (an executor that itself
