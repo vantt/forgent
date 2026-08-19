@@ -63,12 +63,14 @@ dùng chung 3 nơi) lẫn nhóm "coding"/CLI-wrapper (~35 skill chỉ có trong
 | 15 | Rõ | Đo lại theo chuẩn 300 dòng: **7 skill vượt chuẩn**, không chỉ 2 skill nhúng pseudocode — `fgos-coding-driving` 645 (2.15x), `fgos-coding-exploring` 557 (1.86x), `fgos-coding-planning` 532 (1.77x), `fgos-coding-validating` 513 (1.71x), `merge-loop` 437 (1.46x, CLI-wrapper, không thuộc 14 dev-skill core), `fgos-coding-implement` 436 (1.45x), `fgos-fanout` 358 (1.19x). |
 | 12 | **Rõ — D1** | Giải pháp cho #6: xem D1 ở §4. Ranh giới không phải "loại ID" mà là "vai trò sản xuất của artifact". Nhóm process/build-time (`docs/history`, `docs/decisions`, `docs/backlog.md`, text task/`CONTEXT.md`, `docs/specs`) giữ nguyên luật `tsk-37i` (ADR/RUL kèm gloss, D-local chỉ trong `CONTEXT.md` gốc). Nhóm product/shippable (`.agents/skills/*/SKILL.md` — nguồn thật, đã xác nhận byte-identical với `plugins/fgOS/skills/*` — + `references/*.md` của nó) **không giữ ID governance nào cả**, glossed hay không cũng không giữ — lý do viết thẳng thành câu văn, áp dụng ngay tại nguồn `.agents/skills`, không chờ tới bản copy. Căn cứ: `plugins/fgOS/.claude-plugin` chỉ có `plugin.json`+`skills/`, không mang `docs/` nào theo khi publish qua marketplace (xác minh bằng `ls`); đối chiếu bee upstream cho thấy bee giữ citation trong skill prose CHỈ KHI tài liệu bền đi kèm gói phân phối (gloss + pointer-integrity check + target durable) — điều kiện đó không thoả với kênh publish thật của fgOS nên mô hình bee không áp dụng được. `.claude/skills/*` (thin wrapper 3 dòng) không thuộc phạm vi vì không có thân bài. |
 | 16 | **Rõ — D5** | Xem D5 ở §4. |
+| 17 | **Rõ — D6** | Xem D6 ở §4. `tsk-2sp` (không phải tsk-56w's con) từng định sửa citation cho đúng 61 file skill mà tsk-56w cũng đang sửa — đã tách phạm vi, không còn trùng. |
 | 13 | **Rõ — giải quyết bởi item khác** | Đồng bộ `.agents/skills`+`plugins/fgOS/skills`: không cần quyết định thủ tục "sửa 2 lần cùng commit" nữa — đã submit `tsk-5zi` (độc lập, không phụ thuộc tsk-56w) để mở rộng `npm run build:skills` tự động copy `.agents/skills/<name>` → `plugins/fgOS/skills/<name>`, dùng lại `copyDirRecursive` sẵn có trong `materializeSkillsIntoProject`. Một khi `tsk-5zi` xong, mọi child task của tsk-56w chỉ cần sửa `.agents/skills`, chạy `npm run build:skills`, xong — không cần review diff 2 chỗ. |
 
 ## 4. Quyết định đã chốt
 
 | D-ID | Nội dung |
 |---|---|
+| D6 | Thu hẹp phạm vi `tsk-2sp` ("fix remaining 1664 citation-format violations" từ baseline `tsk-2yu`), giao 61/73 file skill (660 violation) trong `scripts/check-decision-citation-drift.baseline.json` cho `tsk-56w` sở hữu — `tsk-2sp` chỉ còn 12 file không-phải-skill (`docs/specs/*.md` + `docs/backlog.md`, 1019 violation). Lý do: `tsk-2sp` định sửa theo luật `tsk-37i` GỐC (thêm gloss) cho toàn bộ 73 file, nhưng 61 file đó đúng là nhóm product/shippable mà D1 đã khoá luật chặt hơn (xoá hết ID, không gloss) — nếu `tsk-2sp` chạy trước sẽ thêm gloss sai chỗ, `tsk-56w` phải xoá lại, có thể đụng cùng 1 dòng (conflict merge thật). Đã sửa description `tsk-2sp` (`fgos edit`, seq 20280). Sau khi tách, 2 item không cần dependency, chạy song song được. Số liệu đo thật cho 6 skill vượt chuẩn của D4: `fgos-coding-driving` 32, `fgos-coding-exploring` 35, `fgos-coding-planning` 29, `fgos-coding-validating` 34, `fgos-coding-implement` 20, `fgos-fanout` 23 violation (cộng ~35 CLI-wrapper skill còn lại trong 660). Ghi qua `fgos decision --id tsk-56w` (seq 20281). |
 | D5 | Quy trình đảm bảo chất lượng cho mọi child task sửa skill prose của tsk-56w — ghép 2 tài liệu chuẩn có sẵn (không bịa mới) + D2 làm lưới an toàn cuối: (1) `verify` field theo đúng khuôn `docs/how-to/write-verify-for-a-skill-prose-change.md` — `npm test && POSITIVE && NEGATIVE`, POSITIVE chứng minh nội dung mới tồn tại, NEGATIVE chứng minh pattern cũ biến mất, luôn `--hidden` khi `rg`/quét đường dẫn `.claude/skills`/`.agents/skills` (rg mặc định bỏ qua thư mục ẩn — bẫy #4 thật từ `tsk-f38`); verify KHÔNG được yêu cầu chứng minh "prose có mạch lạc/dùng đúng không nếu làm theo" — thuộc review người + `fgos-coding-validating`'s reality-check. (2) Sau khi sửa xong 1 skill, chạy smoke-test thật theo mẫu `docs/how-to/smoke-test-fgos-code-implement-with-a-trivial-item.md` (tổng quát hoá cho cả 7 skill, không chỉ `fgos-coding-implement`): item `chore` vứt đi, `verify: "true"`, claim để skill BẢN ĐÃ SỬA chạy thật, đọc `.fgos/events.jsonl`/`fgos check` kỳ vọng `attempts: 1`, `errorClass: null`, trước khi coi task xong. (3) D2 là lưới an toàn cuối nếu cả smoke-test lẫn review đều lọt mà production sau này lộ lỗi. Người dùng xác nhận. Ghi qua `fgos decision --id tsk-56w` (seq 20275). |
 | D4 | Áp dụng chuẩn `skill-creator` (`SKILL.md` <300 dòng, mỗi `references/*.md` <300 dòng, không trùng lặp nội dung giữa 2 nơi, viết imperative form) cho **toàn bộ 7 skill fgOS đang vượt chuẩn** — không giới hạn riêng 2 skill nhúng pseudocode. Danh sách: `fgos-coding-driving` (645d), `fgos-coding-exploring` (557d), `fgos-coding-planning` (532d), `fgos-coding-validating` (513d), `merge-loop` (437d), `fgos-coding-implement` (436d), `fgos-fanout` (358d). Pseudocode/thuật toán viết lại theo Pattern 1 "Sequential Workflow Orchestration" (`skill-design-patterns.md`) — Step 1/Step 2 đánh số, không biến/nhãn `loop:`. Người dùng xác nhận trực tiếp: "áp dụng hết", và yêu cầu dựa trên nguồn chuẩn thật thay vì đoán — nguồn dùng: `~/.claude/skills/skill-creator/references/*` (Anthropic's own skill-authoring doctrine). Ghi qua `fgos decision --id tsk-56w` (seq 20258). |
 | D2 | `git tag pre-skill-prose-cleanup-tsk-56w` trên `main` tại SHA hiện tại, bắt buộc trước khi item con đầu tiên của tsk-56w vào `executing`. Người dùng xác nhận 2 lần (yêu cầu ban đầu + nhắc lại kèm lý do lần này): thời điểm đổi skill có thể ảnh hưởng lớn toàn hệ thống (skill là thứ được dùng lại mỗi phiên), cần mốc để trace/so sánh/khôi phục nếu sửa làm hỏng tác dụng skill. Ghi qua `fgos decision --id tsk-56w` (seq 20229). |
@@ -156,6 +158,16 @@ dùng chung 3 nơi) lẫn nhóm "coding"/CLI-wrapper (~35 skill chỉ có trong
   code-implement-with-a-trivial-item.md`) — cả 2 đều rút từ va chạm thật
   (`tsk-f38`, case study `str89`), ghép với D2 đã có → đề xuất D5, người
   dùng xác nhận "đồng ý".
+- Người dùng hỏi thêm về `tsk-397` (đang "in discuss") — agent tra, kết
+  luận song song được (tsk-397 còn discovery, chưa khoá gì, không đụng
+  cấu trúc mirror tsk-56w giữ nguyên).
+- Người dùng hỏi tiếp về `tsk-2sp` — agent tra ra trùng phạm vi THẬT (61/
+  73 file trong baseline `check-decision-citation-drift.baseline.json`
+  của tsk-2sp chính là các skill tsk-56w đang sửa, 660/1679 violation).
+  Người dùng: "thu hẹp phạm vi tsk-2sp, nhớ cập nhật rõ chi tiết phân
+  việc cho cả 2 bên." Agent sửa description `tsk-2sp` (`fgos edit`, seq
+  20280) chỉ còn 12 file non-skill, khoá D6 ghi lại việc giao 660
+  violation cho tsk-56w, gắn số liệu thật vào từng task §7.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -284,7 +296,7 @@ flowchart TD
 ## 7. Danh mục hạng mục / task (nháp, chưa khoá)
 
 ### {#task-split-driving} fgos-coding-driving: tách SKILL.md/references, bỏ pseudocode
-- **Vấn đề**: 645 dòng (2.15x chuẩn). Có 1 khối fenced-code 133 dòng viết
+- **Vấn đề**: 645 dòng (2.15x chuẩn), **32 violation citation** (D6, baseline `check-decision-citation-drift.baseline.json` — phần này giờ thuộc `tsk-56w`, không phải `tsk-2sp`). Có 1 khối fenced-code 133 dòng viết
   dạng thuật toán thật (biến `shownItemOnce`, nhãn `loop:`, if/else lồng
   nhau) thay vì mô tả bằng câu văn, trộn thêm trích dẫn trần `tsk-2t9c
   D16` giữa dòng code.
@@ -302,7 +314,7 @@ flowchart TD
   còn fenced code >=3 dòng kiểu thuật toán, không còn ID governance trần.
 
 ### {#task-split-fanout} fgos-fanout: tách SKILL.md/references, bỏ pseudocode
-- **Vấn đề**: 358 dòng (1.19x chuẩn). Khối "text" 88 dòng, nhãn `loop:`,
+- **Vấn đề**: 358 dòng (1.19x chuẩn), **23 violation citation** (D6). Khối "text" 88 dòng, nhãn `loop:`,
   trích dẫn trần `(D4)` — cùng dạng lỗi với `fgos-coding-driving`.
 - **Đề xuất**: cùng cách tiếp cận với task trên, KHÔNG điều kiện theo độ
   dài — tiêu chí tách xuống `references/` là LOẠI nội dung (step-by-step
@@ -315,7 +327,8 @@ flowchart TD
 - Verify nháp: cùng task trên.
 
 ### {#task-split-exploring} fgos-coding-exploring: tách SKILL.md/references
-- **Vấn đề**: 557 dòng (1.86x chuẩn). Không có pseudocode kiểu code-fence
+- **Vấn đề**: 557 dòng (1.86x chuẩn), **35 violation citation** (D6 — nhiều
+  nhất trong 7 skill). Không có pseudocode kiểu code-fence
   (§3 mục 7 — nội dung thật, không dư thừa) nhưng mật độ trích dẫn ID
   trần cao nhất (25 lượt `tsk-…`).
 - **Đề xuất**: giữ `SKILL.md` là flow cấp cao (Hard rules + tóm tắt 6
@@ -325,7 +338,8 @@ flowchart TD
 - Verify nháp: cùng khuôn với task driving.
 
 ### {#task-split-planning} fgos-coding-planning: tách SKILL.md/references
-- **Vấn đề**: 532 dòng (1.77x chuẩn), 25 lượt `tsk-…` trần.
+- **Vấn đề**: 532 dòng (1.77x chuẩn), 25 lượt `tsk-…` trần, **29 violation
+  citation** (D6).
 - **Đề xuất**: cùng khuôn — tham khảo thêm bee (`bee-planning`, xem §6
   "Nguồn tham khảo") cho cách trình bày phần review-wave/reality-check
   nếu có đoạn tương đương đang dài dòng trong `fgos-coding-planning`
@@ -333,7 +347,8 @@ flowchart TD
 - Verify nháp: cùng khuôn với task driving.
 
 ### {#task-split-validating} fgos-coding-validating: tách SKILL.md/references
-- **Vấn đề**: 513 dòng (1.71x chuẩn), 21 lượt `tsk-…`.
+- **Vấn đề**: 513 dòng (1.71x chuẩn), 21 lượt `tsk-…`, **34 violation
+  citation** (D6).
 - **Đề xuất**: cùng khuôn. Vì bee gộp validating vào planning (§6), khi
   viết lại có thể nhân tiện soát xem 2 skill này có đoạn trùng lặp thật
   (không phải chỉ trùng ý) đáng gộp về `_shared/` hay không — quan sát
@@ -341,14 +356,16 @@ flowchart TD
 - Verify nháp: cùng khuôn với task driving.
 
 ### {#task-split-implement} fgos-coding-implement: tách SKILL.md/references
-- **Vấn đề**: 436 dòng (1.45x chuẩn), 14 lượt `tsk-…`.
+- **Vấn đề**: 436 dòng (1.45x chuẩn), 14 lượt `tsk-…`, **20 violation
+  citation** (D6).
 - **Đề xuất**: tham khảo trực tiếp `ck:cook` (§6) — copy đúng khuôn
   `SKILL.md` <300d + `references/*.md` theo mối quan tâm + mục
   `## References`/`## Workflow Position` ở cuối file.
 - Verify nháp: cùng khuôn với task driving.
 
 ### {#task-split-merge-loop} merge-loop: tách SKILL.md/references
-- **Vấn đề**: 437 dòng (1.46x chuẩn) — CLI-wrapper skill (chỉ có trong
+- **Vấn đề**: 437 dòng (1.46x chuẩn), **13 violation citation** (D6) —
+  CLI-wrapper skill (chỉ có trong
   `plugins/fgOS/skills`, không thuộc 14 dev-skill core), không bị
   double-maintenance như nhóm core.
 - **Đề xuất**: cùng khuôn tách SKILL.md/references. Không cần chờ
@@ -372,7 +389,11 @@ flowchart TD
   citation vào chính task tách SKILL.md/references của chúng ở trên
   (§7, D1 áp dụng khi viết lại). Task này chỉ còn phần KHÔNG cần tách
   file — skill dưới 300 dòng nhưng vẫn có ID trần: `fgos-routing` (6
-  `tsk-…` + 5 `RUL…`), `approve` (4 `RUL…`), `pick` (11 `tsk-…`).
+  `tsk-…` + 5 `RUL…`, **15 violation** theo D6), `approve` (4 `RUL…`,
+  **12 violation**), `pick` (11 `tsk-…`, **4 violation**). Cộng
+  `merge-loop` 13, 6 skill split ở trên (32+23+35+29+34+20=173) và phần
+  còn lại rải trong ~30 CLI-wrapper skill nhỏ khác → tổng khớp 660
+  violation D6 giao cho tsk-56w.
 - **Đề xuất (D1)**: sửa tại nguồn — `fgos-routing` ở `.agents/skills`;
   `approve`/`pick` chỉ có ở `plugins/fgOS/skills` (CLI-wrapper, không
   mirror) nên sửa thẳng ở đó. Xoá mọi `ADR<n>`/`RUL<n>`/`D<n>`/`tsk-…`,
