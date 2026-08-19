@@ -2,7 +2,7 @@
 type: explanation
 title: Worker slot is the engine-owned occupancy unit across every launcher
 tags: [worker-slot, occupancy, herdr-plugin, fgos-runner, fgos-fanout, ceiling]
-source_capture_ids: [tsk-2sj, tsk-1zq]
+source_capture_ids: [tsk-2sj, tsk-1zq, tsk-3jk]
 authoritative_for: worker slot concept and engine-wide worker occupancy ceiling shared by herdr-plugin, fgos-runner, fgos-fanout
 ---
 # Worker slot is the engine-owned occupancy unit across every launcher
@@ -249,6 +249,25 @@ Both supersessions follow this repo's own discipline of leaving the
 original decision record untouched rather than editing it in place
 (AGENTS.md's "Changing a locked law" rule, generalized here to any
 locked decision, not only a platform law).
+
+## `fgos-runner` and `fgos-fanout` close out the three-launcher set
+
+`tsk-3jk` adopted the same D6 ask-before-standing-up rule in the two
+remaining launchers, closing what its own capture calls the
+"three-independent-ceilings gap": `runner.parallel.maxRoots` and
+`maxLeavesPerRoot` (`src/runner/loop.mjs`) stopped being a ceiling of
+their own and became inputs to the shared engine ceiling instead, and
+`fgos-fanout`'s pre-existing D7 hard cap of 5 was restated in terms of
+that same shared ceiling plus D7/D8's whole-batch overflow rule above —
+rather than three launchers (herdr-plugin, `fgos-runner`, `fgos-fanout`)
+each still policing its own separate number.
+
+Both launchers now ask the engine for a slot before standing a worker up
+and accept refusal when there is no room, the same `fgos slots`
+pre-check the herdr-plugin adapter above uses. The item deliberately
+consumed the config section `tsk-3dt` registered without touching
+`src/setup/registrations.mjs` itself, keeping the two items' footprints
+disjoint even though they share one config shape.
 
 ## What actually happened building this
 
