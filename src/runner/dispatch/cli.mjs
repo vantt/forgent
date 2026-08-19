@@ -67,10 +67,15 @@ import {
  * result MISSING from `cfg.executors` (keyed by executor name, not job
  * identity) is intentional, not a bug; `decideExecutorCli`'s own `--work`
  * branch below already documents the fallback this design implies.)
+ *
+ * D15/D20: persona/agent-type resolution key expanded to (domain, stage, role).
+ * `stage` defaults to `stage ?? work?.stage ?? 'executing'`; `role` defaults to
+ * `role ?? work?.holder ?? work?.role`.
  */
-export function executorIdForWork(work) {
-  const domainObj = DOMAINS[resolveDomainName(work.domain)];
-  return skillForStage(domainObj, 'executing');
+export function executorIdForWork(work, stage, role) {
+  const domainObj = DOMAINS[resolveDomainName(work?.domain)];
+  const targetStage = stage ?? work?.stage ?? 'executing';
+  return skillForStage(domainObj, targetStage);
 }
 
 /**
@@ -112,7 +117,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   // its pre-D9 position, right after) so a executor's own providerModel/
   // rigorOverrides can thread into tier resolution — never borrowing
   // Claude's model names for a non-Claude executor's own dispatch.
-  const executorId = executorIdForWork(work);
+  const executorId = executorIdForWork(work, opts.stage);
   const { executorId: resolvedExecutorId, executor: executorForTier, overrides: capabilityOverrides } = executorId ? resolveExecutorAndOverrides(cfg, executorId) : {};
   const model = modelForTier(cfg, tier, {
     providerModel: capabilityOverrides?.providerModel ?? executorForTier?.providerModel,
@@ -477,7 +482,7 @@ export async function executeExecutorCli(
  */
 export async function decideExecutorCli(
   executorIdArg,
-  { cwd = process.cwd(), repoRoot, hasLiveTaskAccess = false, for: purpose, work: workIdArg, needsSoul = false } = {},
+  { cwd = process.cwd(), repoRoot, hasLiveTaskAccess = false, for: purpose, work: workIdArg, stage: stageArg, needsSoul = false } = {},
 ) {
   if (!executorIdArg && !purpose && !workIdArg && !needsSoul) {
     throw new RunnerConfigError(
@@ -498,7 +503,7 @@ export async function decideExecutorCli(
     if (!workItem) {
       throw new RunnerConfigError(`no work item "${workIdArg}" found -- cannot resolve its dispatch executor.`);
     }
-    executorId = executorIdForWork(workItem);
+    executorId = executorIdForWork(workItem, stageArg);
     // tsk-5tm-6 D4: a work-item-resolved executorId with NO explicit
     // cfg.executors entry means "no override configured" -- per
     // Native-First Dispatch Doctrine (docs/decisions/0026) rule 2, every
@@ -744,6 +749,7 @@ export function runDispatchCli() {
         hasLiveTaskAccess: rest.includes('--has-live-task-access'),
         for: flagValue('--for'),
         work: flagValue('--work'),
+        stage: flagValue('--stage'),
         needsSoul: rest.includes('--needs-soul'),
       }).then(
         (decided) => {

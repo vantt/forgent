@@ -3991,6 +3991,13 @@ test('executorIdForWork is exported and resolves a coding-domain (or no-domain) 
   assert.equal(executorIdForWork(sampleWork()), 'fgos-coding-implement');
 });
 
+test('executorIdForWork expands key to (domain, stage, role) and respects stage parameter and work.stage property', () => {
+  assert.equal(executorIdForWork(sampleWork(), 'discovery'), 'fgos-coding-discovering');
+  assert.equal(executorIdForWork(sampleWork(), 'planning'), 'fgos-coding-planning');
+  assert.equal(executorIdForWork({ domain: 'coding', stage: 'exploring' }), 'fgos-coding-exploring');
+  assert.equal(executorIdForWork({ domain: 'coding', stage: 'planning' }, null, 'implementer'), 'fgos-coding-planning');
+});
+
 test('decideExecutorCli resolves work-item-based (--work) to the same result a positional executorId would, plus the resolved executorId -- explicit executors.<id> override case', async () => {
   const root = mkTempDir();
   const fgosDir = path.join(root, '.fgos');
