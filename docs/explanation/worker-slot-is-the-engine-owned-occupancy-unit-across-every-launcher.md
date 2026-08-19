@@ -2,7 +2,7 @@
 type: explanation
 title: Worker slot is the engine-owned occupancy unit across every launcher
 tags: [worker-slot, occupancy, herdr-plugin, fgos-runner, fgos-fanout, ceiling]
-source_capture_ids: [tsk-2sj]
+source_capture_ids: [tsk-2sj, tsk-1zq]
 authoritative_for: worker slot concept and engine-wide worker occupancy ceiling shared by herdr-plugin, fgos-runner, fgos-fanout
 ---
 # Worker slot is the engine-owned occupancy unit across every launcher
@@ -198,6 +198,58 @@ never actually ran, because it lived at the tail of a `SKILL.md` with
 nothing forcing execution. Once a pane is reusable on demand, there is
 no remaining reason to close it proactively.
 
+## The herdr-plugin adapter: reuse by polling the engine, never a pane label
+
+`tsk-1zq`, a child of this design (D5/D10 above put into practice on the
+Rust side), switched `herdr-plugin` from counting worker panes for itself
+to asking the engine for a slot via the `fgos slots` read verb before
+opening one, and fixed the `fgos-auto-discover` bug D2 named from the
+read side too — asking the engine whether an auto-discover worker is
+alive instead of probing a pane label.
+
+**Reclaim by reuse, never by closing.** Each poll, a pane whose bound
+session no longer holds a `doing` item is free — the next worker runs
+into that pane instead of splitting a new one, except a pane that is
+currently focused (`focused_pane_id`, the same legitimate chrome-level
+signal D10 already named, never the forbidden `agent_status`). This
+applies only to the worker lane, which holds solely one-shot,
+ceiling-bounded flows — the admin lane's loops live in the separate,
+fixed `fg:operation` lane and are never subject to reuse. The
+delayed-close path (`terminal-close`, the same mechanism D10 already
+found unreliable in this same design session) was dropped entirely:
+once a pane is reusable on demand, there is no remaining reason to close
+it proactively.
+
+**Two prior, separately-locked decisions were superseded, not extended:**
+
+> "Supersedes tsk-5lr D2: pane identity inside fg:operation is no longer
+> decided by left/right geometry (smallest x = left = merge-loop). The
+> tab grows from 2 to 4 panes -- merge, retro, cleanup, plus one spare
+> for a future admin loop -- and each slot is resolved by reading order,
+> panes sorted by (y, x) [...] tsk-5lr's own pinned assumption, that an
+> fg:operation tab without exactly 2 panes is an unsupported error state,
+> stops applying with it."
+> — real `work.decision` capture, id `tsk-1zq`
+
+A binary left/right-by-x rule cannot address four slots, so the geometry
+rule was replaced rather than stretched to fit — the same "migrate what
+can move" instinct as the alias-vs-migrate choice
+`docs/explanation/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias.md`
+documents, applied here to layout logic instead of a stage name.
+
+> "Supersedes tsk-1q3's pinned term fg:agents-N: the worker lane's tabs
+> are named fg:workers-N from now on [...] A tab still carrying the old
+> fg:agents-N label is deliberately NOT migrated: after the rename it is
+> simply a normal tab, so herdr places no new pane in it, never reuses a
+> pane inside it, and never closes it -- relabelling an operator's live
+> workspace costs more than it fixes."
+> — real `work.decision` capture, id `tsk-1zq`
+
+Both supersessions follow this repo's own discipline of leaving the
+original decision record untouched rather than editing it in place
+(AGENTS.md's "Changing a locked law" rule, generalized here to any
+locked decision, not only a platform law).
+
 ## What actually happened building this
 
 The item's own outcome recorded `passed: true` reaching
@@ -215,6 +267,8 @@ the single source of truth for what is actually running or landed.
 
 ## Related
 
+- `docs/reference/fgos-slots-verb-output-fields.md` — the `fgos slots`
+  CLI verb's real output shape, the read-only half of this design
 - `docs/history/orchestrator-worker-slots/DISCUSSION.md` — the full
   shaping discussion this design was distilled from
 - `docs/history/orchestrator-worker-slots/RESEARCH.md` — the discovery
