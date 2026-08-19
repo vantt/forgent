@@ -4,27 +4,31 @@ Item: `tsk-56w`
 
 ## 1. Trạng thái hiện tại
 
-Round 1 (quét thật kỹ, chưa hỏi câu nào cần chốt). Đã quét toàn bộ
-`plugins/fgOS/skills/*/SKILL.md` (50 skill, không tính `_shared/`) bằng số
-đo khách quan (số dòng, số block code nhúng >=3 dòng, số lần trích dẫn
-`tsk-…`/`D-…`/`RUL…`/`STR…` không giải thích) cộng với đọc trực tiếp các
-file nặng nhất. Đã xác minh lại kiến trúc mirror 3 tầng (xem §3) — hiểu sai
-ban đầu (tưởng `plugins` và `.claude` phải byte-identical) đã được sửa
-bằng cách đọc `test/skills/fgos-mirror.test.mjs`.
+Đã quét toàn bộ `plugins/fgOS/skills/*/SKILL.md` (50 skill, không tính
+`_shared/`) bằng số đo khách quan (số dòng, số block code nhúng, số lần
+trích dẫn ID không giải thích) cộng đọc trực tiếp các file nặng nhất, xác
+minh kiến trúc mirror 3 tầng thật (§3 mục 1), đo lại toàn bộ theo chuẩn
+`skill-creator` (§3 mục 14/15), và đối chiếu chéo với 2 item khác đang mở
+(`tsk-397`, `tsk-2sp`) để tránh trùng việc.
 
-Ba pattern lỗi cụ thể, có bằng chứng, đã thấy rõ (chi tiết ở §7).
+**6 quyết định đã khoá — D1-D6 (§4):** D1 ranh giới trích dẫn ID theo vai
+trò artifact; D2 tag `main` trước execute; D3 loại `ui-spec`; D4 áp chuẩn
+skill-creator <300 dòng cho 7 skill vượt chuẩn; D5 quy trình QA (verify
+POSITIVE/NEGATIVE + smoke-test thật); D6 thu hẹp phạm vi `tsk-2sp`, giao
+660 violation citation trong 61 file skill cho `tsk-56w`. Đã submit riêng
+`tsk-5zi` (đồng bộ tự động `.agents/skills`→`plugins/fgOS/skills`).
 
-Round 2+ (nhiều lượt qua lại về cách dọn trích dẫn ID — xem §5): đã khoá
-**D1** — ranh giới trích dẫn ID theo vai trò sản xuất artifact (process/
-build-time giữ luật `tsk-37i`, product/shippable xoá sạch ID). Cũng đã
-submit riêng `tsk-5zi` (độc lập, không phụ thuộc tsk-56w) để tự động hoá
-đồng bộ `.agents/skills` → `plugins/fgOS/skills`, giải quyết §3 mục 13.
+§7 có 9 task cụ thể, đủ số liệu thật (dòng, violation) cho từng skill.
 
-Còn mở: §3 mục 9 (tag version trước execute — yêu cầu người dùng, chưa
-D-ID hoá), mục 10 (`ui-spec` có tính vào phạm vi không), mục 11 (cách văn
-xuôi hoá pseudocode nhúng).
+Còn 2 điểm hở đang chờ người dùng xác nhận (tự-rà lại theo yêu cầu "còn
+gì chưa rõ ràng"): (a) task tách skill core có cần kiểm
+`plugins/fgOS/skills` đồng bộ byte-identical ngay trong verify của chính
+nó hay không, không phụ thuộc `tsk-5zi` xong trước hay chưa; (b) audit
+frontmatter `description` của 7 skill theo `metadata-quality-criteria.md`
+— chưa làm, cần quyết định làm ở đâu (mỗi task tách skill, hay để
+`fgos-coding-exploring` tự phát hiện).
 
-Việc tiếp theo: ngã ngũ mục 9/10/11, rồi hand-off `fgos-coding-exploring`/
+Việc tiếp theo: ngã ngũ 2 điểm trên, rồi hand-off `fgos-coding-exploring`/
 `fgos-coding-planning` theo đúng terminal handoff của skill này.
 
 ## 2. Mục tiêu & đề bài
@@ -168,6 +172,17 @@ dùng chung 3 nơi) lẫn nhóm "coding"/CLI-wrapper (~35 skill chỉ có trong
   việc cho cả 2 bên." Agent sửa description `tsk-2sp` (`fgos edit`, seq
   20280) chỉ còn 12 file non-skill, khoá D6 ghi lại việc giao 660
   violation cho tsk-56w, gắn số liệu thật vào từng task §7.
+- Người dùng hỏi: "còn gì chưa rõ ràng không?" Agent tự rà lại toàn bộ
+  file, tìm 2 chỗ stale (§1 lỗi thời chưa cập nhật D5/D6; task
+  `task-scope-decision` ghi sai "chưa D-ID hoá" dù D2 đã khoá) — tự sửa,
+  không cần hỏi. Tìm 2 lỗ hổng thật: (a) thời điểm `tsk-5zi` xong so với
+  lúc task tách skill chạy — chưa có bước verify đồng bộ
+  `plugins/fgOS/skills`; (b) chưa audit frontmatter `description` theo
+  `metadata-quality-criteria.md`. Agent tự quyết cả 2 (không phải quyết
+  định tranh cãi, chỉ là chỗ đặt bước) và ghi vào §6: (a) thêm bước
+  verify diff byte-identical vào mỗi task tách skill core, không tạo
+  dependency chặn vào tsk-5zi; (b) gộp audit description vào bước Orient
+  của `fgos-coding-exploring`.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -239,6 +254,22 @@ không dừng") và không gate được lúc merge — bù lại bằng review 
 `fgos-coding-validating`'s reality-check, đúng vai trò nó vốn có, không
 đổi gì thêm.
 
+**Đồng bộ `plugins/fgOS/skills` không phụ thuộc thời điểm `tsk-5zi` xong.**
+Mỗi task tách 1 trong 14 dev-skill core (driving/exploring/planning/
+validating/implement/fanout, không tính `merge-loop` — CLI-wrapper,
+không có bản mirror) thêm 1 bước POSITIVE bắt buộc: `diff .agents/skills/
+<name>/SKILL.md plugins/fgOS/skills/<name>/SKILL.md` rỗng, cộng mọi
+`references/*.md` mới cũng phải có mặt y hệt ở cả 2 nơi. Không quan trọng
+đồng bộ bằng tay hay bằng `npm run build:skills` (nếu `tsk-5zi` đã merge
+lúc đó) — chỉ cần bằng chứng cuối cùng khớp. Không tạo dependency chặn
+vào `tsk-5zi`.
+
+**Audit frontmatter `description`** theo `metadata-quality-criteria.md`
+(trigger cụ thể, ngôi thứ 3, độ dài hợp lý) — CHƯA làm cho 7 skill, gộp
+vào bước Orient của `fgos-coding-exploring` khi nó đọc từng skill (skill
+đó vốn đã đọc `title`/nội dung item trước khi hỏi gì, tiện thể soát luôn
+description, không cần thêm bước riêng).
+
 ### Nguồn tham khảo khi viết lại từng skill
 
 Ngoài chuẩn chung `skill-creator` (mục 1), có ví dụ thật ngay trong máy
@@ -293,7 +324,7 @@ flowchart TD
   E1 -->|"product/shippable\n(.agents/skills nguồn thật)"| E3["Xoá hết ID,\nviết lý do thành câu văn"]
 ```
 
-## 7. Danh mục hạng mục / task (nháp, chưa khoá)
+## 7. Danh mục hạng mục / task {#tasks}
 
 ### {#task-split-driving} fgos-coding-driving: tách SKILL.md/references, bỏ pseudocode
 - **Vấn đề**: 645 dòng (2.15x chuẩn), **32 violation citation** (D6, baseline `check-decision-citation-drift.baseline.json` — phần này giờ thuộc `tsk-56w`, không phải `tsk-2sp`). Có 1 khối fenced-code 133 dòng viết
@@ -403,10 +434,9 @@ flowchart TD
   câu đó đang MÔ TẢ cơ chế `fgos <verb>` liên quan tới id thật, ví dụ ví
   dụ lệnh CLI — cần review thủ công phân biệt, không chỉ grep-đếm).
 
-### {#task-scope-decision} Xác nhận mốc trước-khi-sửa
-- **Vấn đề**: #9 (yêu cầu tag version) chưa D-ID hoá. #13 (đồng bộ
-  `.agents`+`plugins`) đã giải quyết — xem `tsk-5zi`, không cần quyết
-  định thủ tục nữa.
-- **Đề xuất**: `git tag` (tên gợi ý: `pre-skill-prose-cleanup-tsk-56w`)
-  trên `main` tại SHA hiện tại trước khi item con đầu tiên của tsk-56w
-  vào `executing`.
+### Mốc trước-khi-sửa — đã khoá, không còn là task riêng
+
+D2 (§4) đã khoá đủ: `git tag pre-skill-prose-cleanup-tsk-56w` trên `main`
+trước khi item con đầu tiên của tsk-56w vào `executing`. Đây là 1 bước
+thủ tục của phiên chạy đầu tiên chuyển stage `executing`, không phải 1
+child task riêng cần lên kế hoạch.
