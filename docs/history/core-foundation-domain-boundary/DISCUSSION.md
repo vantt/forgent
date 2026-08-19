@@ -10,6 +10,23 @@ status: open
 
 ## 1. Trạng thái hiện tại
 
+Round 19 tiếp nữa (2026-08-19), D23: Người hỏi "doctrine domain-scoped
+là gì" — trợ lý giải thích + nhắc lại đề xuất round trước ("cố ý CHƯA
+XÂY", vì tưởng chưa có nội dung doctrine domain-thật). **Người bác
+thẳng**: `coding` ĐÃ có doctrine riêng thật rồi (không phải tương lai) —
+đòi fgOS phải có cơ chế dẫn dắt agent tìm đến doctrine riêng từng domain.
+Trợ lý grounding lại bằng chính nội dung `AGENTS.md` gốc: mục "fgOS
+Workflow" gọi thẳng tên `fgos-coding-*`, mục "GitNexus — Code
+Intelligence" toàn bộ code-symbol-specific — xác nhận đúng, không phải
+giả thuyết. Đề xuất cơ chế: `domains/<name>/doctrine.md` + routing tự
+Read khi domain đã biết (vì `@import` tĩnh của `CLAUDE.md` không điều
+kiện hoá theo domain được — nạp trước khi biết domain). Người hỏi tiếp
+tên file `doctrine.md` hay `domains/<name>/AGENTS.md` — trợ lý so sánh,
+đề xuất `AGENTS.md` (cùng loại file với root, không bịa khái niệm mới) +
+cảnh báo cơ chế nạp PHẢI dựa vào routing tự Read tường minh, không giả
+định auto-discovery AGENTS.md lồng thư mục (chưa kiểm chứng). Người
+chốt `AGENTS.md` → **D23** (seq 21094). 23/23 quyết định đã chốt.
+
 Round 19 tiếp (2026-08-19), D22: Sau khi làm xong việc dở dang round 18
 (xem đoạn dưới), người đặt câu hỏi mới: đã gom DISPATCH thành 1 khái
 niệm dùng chung (D21) rồi thì bố cục 3-tầng DISPATCH/ROUTING/DRIVING vẽ
@@ -319,7 +336,7 @@ thi thật.
 | 12 | STR52's câu hỏi scope (share store hay cài fgOS riêng cho domain mới) — trả lời thế nào? | Chốt — D1 | (nội dung phân tích giữ nguyên, xem D1 ở §4) |
 | 13 | Domain-specific code+skill nên tổ chức theo layout nào (nested trong cây có sẵn, hay folder riêng)? | Chốt — D3/D4 | `domains/<name>/` tự chứa, top-level, mirror `plugins/fgOS/`. Đề xuất nested đầu tiên (`.agents/skills/domains/coding` + `src/domains/coding` tách rời) bị người bác — "không phát triển được dạng plugin/extension". |
 | 14 | Core (bin/, src/, herdr-plugin/) có nên di dời vào folder `core/` tường minh để đối xứng với `domains/` không? | Chốt — D5 (cập nhật bởi D7) | `bin/`, `src/`, `herdr-plugin/` KHÔNG di dời — 881 tham chiếu `bin/fgos.mjs` + external install (mission 0035) khiến chi phí lớn hơn hẳn lợi ích biểu tượng. Riêng SKILL thì có: canonical authoring chuyển hẳn sang `core/skills/` (D7) — rẻ hơn hẳn di dời `bin/`/`src/` vì không đụng path nào external project gọi trực tiếp, chỉ đổi chỗ maintainer sửa nguồn. |
-| 15 | Áp ma trận 6 mối quan tâm (harness/workflow/task/knowledge/skill/doctrine) × {core, domain} — còn chỗ nào thiếu? | Rõ phần lớn | harness: chỉ core (D1). workflow/task/skill: đã chốt (D2-D4). knowledge: đã chốt (D6). **doctrine: vẫn mở** — không có cơ chế nạp-có-điều-kiện theo domain trong AGENTS.md/CLAUDE.md hôm nay. Round 19 đề xuất (chưa khoá D-ID): đánh dấu "cố ý CHƯA XÂY" cùng lớp D15 — chưa có nội dung doctrine domain-thật để thiết kế theo (marketing vẫn `proposed`). |
+| 15 | Áp ma trận 6 mối quan tâm (harness/workflow/task/knowledge/skill/doctrine) × {core, domain} — còn chỗ nào thiếu? | Chốt — D23 | harness: chỉ core (D1). workflow/task/skill: đã chốt (D2-D4). knowledge: đã chốt (D6). **doctrine: Chốt — D23** — `domains/<name>/AGENTS.md`, routing tự Read khi domain đã biết. Cả 6/6 mối quan tâm giờ đã có hình dạng chốt. |
 | 16 | `docs/history/<feature>/` có phải "knowledge" không? | Chốt — sửa lại (round 7) | KHÔNG — người chỉ ra `docs/history/` là **context** (biên bản thô, append-only, theo feature), không phải knowledge. "Knowledge" đúng nghĩa = domain-knowledge, curated, do team tự bảo trì — khác hẳn context. D6 (bản đầu, gắn tag `domain` lên `docs/history/`) SAI vì lẫn 2 khái niệm — đã thay bằng D6 mới. |
 | 17 | Domain-knowledge (curated, private, do team tự bảo trì) nên sống ở đâu? | Chốt — D6 | `domains/<name>/knowledge/`, co-located cùng `skills/`, theo đúng tinh thần tự-chứa của D3. Tiền lệ thật: `/home/vantt/projects/beegog/expertise/` — hệ curated knowledge base thật (`knowledge.md` tự mô tả "craft vs project layers, harvesting from finished work, recorded trust, dated freshness, migration rot, retirement") — khác hẳn `docs/history/` (context thô). |
 | 18 | `.agents/skills/core` có nên đổi thành `core/skills/` (bỏ dấu chấm, đối xứng `domains/`)? `.agents` và `.claude` có phải thin wrapper cả hai không? | Chốt — D7 | Có, nhưng không phải rename đơn thuần. `.agents/skills/*` là canonical THEO một quyết định TRƯỚC đó (tsk-1qi D5, `skill-wrappers.mjs` tự ghi rõ "the canonical, orchestrator-neutral skill source") — và `fgos setup` vendor NGUYÊN VĂN `.agents/skills/*` vào MỌI external project (`materializeSkillsIntoProject`), nên hình dạng bên ngoài (host project nhận được gì) không được đổi. D7: canonical AUTHORING chuyển sang `core/skills/` + `domains/*/skills/`; `.agents/skills/`, `.claude/skills/`, `plugins/fgOS/skills/` CẢ BA thành render target thật (thêm bước assembly trong `skill-wrappers.mjs`) — mở rộng quyết định tsk-1qi D5 (bối cảnh mới: `domains/` chưa tồn tại lúc đó), không đảo ngược nó. |
@@ -361,6 +378,7 @@ thi thật.
 | D20 | Đảo hướng khai báo eligibility. Agent-type CHỈ khai `soul` (persona) + `skills` (năng lực của chính nó) — KHÔNG còn `claims: [task-spec-ids]`. Task-spec khai `assignable-to: [tên agent cụ thể]` HOẶC tối thiểu `requires-skill: [...]`. Eligibility = khớp giữa cái task-spec CẦN và cái agent-type CÓ, không phải danh sách agent-type tự liệt kê. | Người bác thẳng model `claims` của tsk-2t9c D12 (đã code thật, đã merge) — thêm 1 task-spec mới theo model cũ phải sửa MỌI agent-type liên quan (chi phí N×M); theo model mới thì KHÔNG đụng agent-type nào, chỉ khai task-spec cần skill gì. Khớp đúng ví dụ cũ "marketing-lead và tech-lead đều làm được PM" — cả 2 tự nhiên đủ điều kiện qua skill `pm` chung, không cần liệt kê tay ở 2 nơi. Đây là ĐẢO NGƯỢC thật 1 phần D12 đã shipped — cần việc thực thi riêng ngoài scope discussion này. |
 | D21 | 3 tầng dispatch (D13) map THẲNG vào 3 cơ chế fgOS ĐÃ CÓ TÊN, ĐÃ BUILD — không phải khái niệm mới. DISPATCH = chính `src/runner/dispatch.mjs` (mở rộng theo D20 để resolve `agentType` qua khớp-skill thay vì đọc config tĩnh). ROUTING = chính `fgos-routing`. DRIVING = chính `fgos-coding-driving`. Rút lại đề xuất đổi tên "CASTING". | Người: đã có concept quan trọng (routing, driver) thì dùng, chế thêm từ mới không hay. Xem lại: `dispatch.mjs` đã có sẵn `buildAgentTypeExecutor(baseExecutor, agentType)` — 1 chỗ ĐÃ CHỜ SẴN để nhận `agentType` — D20 chỉ nâng cấp CÁCH giá trị đó được resolve, không phải thêm 1 tầng song song. Đóng góp thật của mô hình 3 tầng là gọi tên ĐÚNG THỨ TỰ 3 cơ chế có sẵn ghép lại, và LÝ DO (soul không hoán đổi giữa chừng session) — không phải phát minh khái niệm mới. |
 | D22 | DISPATCH's eligibility-check là 1 CƠ CHẾ THỐNG NHẤT, xảy ra ở MỌI điểm cần role — không chỉ dòng Collaboration. Stage-entry (`bundleForStage`, D14, role CHÍNH) và dòng Collaboration (consult/assist/review/advise, role PHỤ) đều khớp qua CÙNG phép match D20 (`requires-skill`/`assignable-to` của task-spec ↔ `skills` của agent-type) — khác nhau chỉ ở task-spec NÀO đang được khớp. Stage-entry nhìn như no-op hôm nay CHỈ VÌ `roleGraph` có 1 role xuyên mọi stage + chưa ai viết `requires-skill` khác nhau cho từng task-spec — KHÔNG PHẢI vì cơ chế khác dòng Collaboration. Session-origin cũng có 2 đường ngang hàng dẫn vào CÙNG 1 downstream ROUTING/DRIVING: root-spawn (`spawnWorker`, chỉ runner-không-người) HOẶC người tự mở Claude Code trực tiếp (hoàn toàn ngoài code `dispatch.mjs`). | Người bác bỏ đúng phát biểu sai của trợ lý ("stage transition tự nó KHÔNG dispatch") bằng câu hỏi ngược: "nếu không phải thì thiết kế workflow/stage/task-spec/agent/skill dispatch (bundle mix load) làm gì?". Scout xác nhận `judge-ambiguity.md`/`lock-decisions.md`/`implement-item.md` đều `position: implementer` (role đứng yên mọi stage hôm nay) — nhưng role (seat, `roleGraph`) và skill (năng lực, `requires-skill` D20) là 2 TRỤC khác nhau; `bundleForStage`'s task-spec riêng mỗi stage, một khi mang `requires-skill` (D20), khiến stage-entry trở thành 1 phép khớp dispatch THẬT, chỉ suy biến thành no-op hôm nay vì thiếu đa dạng persona/skill, không phải khác biệt thiết kế. |
+| D23 | Doctrine domain-scoped sống tại `domains/<name>/AGENTS.md` — CÙNG LOẠI file với root `AGENTS.md` (standing doctrine), chỉ hẹp phạm vi lại, KHÔNG phải khái niệm mới như knowledge/specs/task-specs. Root `AGENTS.md`/`CLAUDE.md` chỉ giữ phần THẬT domain-agnostic (Dispatch, priority order, DoD 6-câu-hỏi, doctor/setup gate); mục "fgOS Workflow" (hard-code tên `fgos-coding-*`) và toàn bộ "GitNexus — Code Intelligence" chuyển vào `domains/coding/AGENTS.md` — migration thật đầu tiên. Cơ chế NẠP ĐƯỢC ĐẢM BẢO: `fgos-routing` tự Read `domains/<domain>/AGENTS.md` ngay khi domain đã resolve (cùng pattern `bundleForStage` D14, một tầng cao hơn — cấp DOMAIN thay vì cấp STAGE) — KHÔNG dựa vào auto-discovery AGENTS.md lồng thư mục (chưa kiểm chứng Claude Code có hỗ trợ hay không). | Người bác đề xuất "cố ý CHƯA XÂY" của trợ lý — `coding` ĐÃ có doctrine riêng thật hôm nay, hard-mix vào `AGENTS.md` gốc (mục "fgOS Workflow" gọi thẳng tên `fgos-coding-*`, mục GitNexus toàn code-symbol-specific), không phải giả thuyết tương lai. Người đòi thẳng "1 cơ chế dẫn dắt để agent biết mà tìm đến doctrine riêng của từng domain" — trợ lý grounding bằng `@import` tĩnh (nạp trước khi biết domain, không điều kiện hoá được), đề xuất routing tự Read tường minh thay vì auto-import, đúng pattern `bundleForStage` (D14) một tầng cao hơn. Người chọn tên `AGENTS.md` thay vì `doctrine.md` — cùng loại file với root, không bịa từ mới — sau khi trợ lý nêu trade-off tên gọi + cảnh báo chưa kiểm chứng auto-discovery. |
 
 ## 5. Q&A log
 
@@ -585,6 +603,19 @@ thi thật.
   chế khớp cho CẢ stage-entry, chỉ no-op vì thiếu dữ liệu → D22 (seq
   20826, ghi qua `fgos decision --id tsk-397`). Người xác nhận: "đồng ý,
   mãi mới thấy rõ chổ này."
+- 2026-08-19 — Round 19 tiếp nữa, D23: người hỏi "doctrine domain-scoped
+  là gì" — trợ lý giải thích + nhắc lại đề xuất "cố ý CHƯA XÂY" từ round
+  trước. Người bác: "có chứ phải xây, vì làm gì thì coding cũng có
+  doctrine của riêng nó... fgos ở agents phải có một cơ chế dẫn dắt".
+  Trợ lý grounding lại bằng nội dung `AGENTS.md` gốc thật (mục "fgOS
+  Workflow" hard-code `fgos-coding-*`, mục GitNexus code-symbol-specific)
+  — xác nhận đúng, rút lại đề xuất cũ. Đề xuất `domains/<name>/doctrine.md`
+  + routing tự Read khi domain đã biết (giải thích `@import` tĩnh không
+  điều kiện hoá theo domain được). Người hỏi tên file `doctrine.md` hay
+  `domains/<name>/AGENTS.md` — trợ lý so trade-off, đề xuất `AGENTS.md`
+  (cùng loại file root, không bịa khái niệm mới) kèm cảnh báo cơ chế nạp
+  phải dựa routing tự Read, không giả định auto-discovery. Người chốt →
+  D23 (seq 21094).
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -626,8 +657,9 @@ forgentX/
 │   ├── decisions/                        # knowledge — quyết định nền tảng, domain-agnostic (craft, không phải domain)
 │   └── history/                          # CONTEXT, không phải knowledge (sửa round 7) — thô, append-only,
 │                                         #   theo feature, giữ nguyên chỗ, share, KHÔNG gắn tag domain
-├── AGENTS.md / CLAUDE.md                 # doctrine — luôn nạp, KHÔNG phân domain (❓ vẫn mở, chưa có
-│                                         #   cơ chế nạp-có-điều-kiện theo domain)
+├── AGENTS.md / CLAUDE.md                 # doctrine core — ★ D23, CHỈ phần THẬT domain-agnostic
+│                                         #   (Dispatch, priority order, DoD 6-câu-hỏi, doctor/setup gate)
+│                                         #   "fgOS Workflow" + "GitNexus" (coding-only hôm nay) dời ra
 │
 │ ── DOMAINS (adapter mở — mỗi domain 1 folder tự chứa, D3) ──
 │
@@ -643,13 +675,17 @@ forgentX/
 │   │   │   # (KHÁC docs/history/ — knowledge được bảo trì chủ động, context thì thô/append-only)
 │   │   │   # tiền lệ thật: /home/vantt/projects/beegog/expertise/ (knowledge.md tự mô tả
 │   │   │   # harvesting/trust/dated-freshness/retirement — một hệ bảo trì, không phải log)
-│   │   └── specs/                        # ★ D8 — RỖNG hôm nay; chờ BA spec riêng của coding-domain
-│   │       # task (data thật): domainFields.coding.* — sống trong .fgos/events.jsonl, không phải file
+│   │   ├── specs/                        # ★ D8 — RỖNG hôm nay; chờ BA spec riêng của coding-domain
+│   │   │   # task (data thật): domainFields.coding.* — sống trong .fgos/events.jsonl, không phải file
+│   │   └── AGENTS.md                     # ★ D23 — doctrine RIÊNG coding, cùng loại file root AGENTS.md
+│   │       # nhận "fgOS Workflow" + "GitNexus — Code Intelligence" dời từ root sang (migration đầu)
+│   │       # nạp bởi fgos-routing tự Read khi domain=coding đã resolve, KHÔNG auto-discovery
 │   │
 │   └── marketing/                        # ★ tương lai (STR52) — thêm vào đây, KHÔNG sửa gì trong coding/
 │       ├── registry.mjs
 │       ├── skills/
-│       └── specs/                        # ★ D8 — spec business trước khi có code (luật AGENTS.md)
+│       ├── specs/                        # ★ D8 — spec business trước khi có code (luật AGENTS.md)
+│       └── AGENTS.md                     # ★ D23 — doctrine riêng marketing (viết khi domain đó thật xây)
 │
 ├── .agents/skills/                       # ★ D7 — render target (trước: canonical, tsk-1qi D5). Hình dạng/nội
 │                                         #   dung KHÔNG đổi (vẫn được fgos setup vendor nguyên văn vào
@@ -668,7 +704,7 @@ flowchart TB
         skill_core["<b>skill</b><br/>core/skills/ (canonical, D7)<br/>fgos-routing, fgos-clarifying, ...<br/><i>.agents/.claude/plugins = render targets</i>"]
         knowledge_core["<b>knowledge</b><br/>docs/decisions/ (craft, domain-agnostic)"]
         context_core["<i>(context ≠ knowledge)</i><br/>docs/history/&lt;feature&gt;/<br/>shared, KHÔNG gắn domain — D6"]
-        doctrine_core["<b>doctrine</b> ❓<br/>AGENTS.md / CLAUDE.md<br/>(luôn nạp, mọi domain)"]
+        doctrine_core["<b>doctrine</b> — ★ D23<br/>AGENTS.md / CLAUDE.md<br/>(luôn nạp, CHỈ phần domain-agnostic)"]
     end
 
     subgraph DOMAINS["domains/ (adapter mở — mỗi domain tự chứa, D3)"]
@@ -679,15 +715,19 @@ flowchart TB
             tk_c["task<br/>domainFields.coding.*"]
             sk_c["skill<br/>skills/ (8 skill,<br/>di dời từ .agents/skills/)"]
             kn_c["<b>knowledge</b><br/>knowledge/ — curated,<br/>co-located (D6)"]
-            dc_c["doctrine ❓"]
+            dc_c["<b>doctrine</b> — ★ D23<br/>AGENTS.md<br/>(nhận fgOS Workflow + GitNexus)"]
         end
         subgraph MARKETING["domains/marketing/ (STR52, chưa xây)"]
             direction TB
             wf_m["workflow<br/>registry.mjs"]
             tk_m["task<br/>domainFields.marketing.*"]
             sk_m["skill<br/>skills/"]
+            dc_m["doctrine — ★ D23<br/>AGENTS.md (viết khi xây)"]
         end
     end
+
+    doctrine_core -. "fgos-routing tự Read khi<br/>domain đã resolve — D23" .-> dc_c
+    doctrine_core -.-> dc_m
 
     workflow_core -. "quét domains/*/registry.mjs<br/>tự động (D4, không sửa tay)" .-> wf_c
     workflow_core -.-> wf_m
@@ -727,7 +767,8 @@ nguồn canonical + N target render (đúng cơ chế beegog tự dùng cho chí
 nó) — không cần sửa cơ chế render, chỉ cần domain skill di dời đúng chỗ
 trong nguồn canonical trước khi render.
 
-**Còn mở, ĐỀ XUẤT round 19 (chưa khoá D-ID, chờ người xác nhận):**
+**Còn mở, ĐỀ XUẤT round 19 (chưa khoá D-ID, chờ người xác nhận) — chỉ
+còn 1 việc, doctrine đã chốt D23 ở dưới:**
 
 - `agents/*.yaml`→`.claude/agents/*.md` render-pair NÊN giữ nguyên
   top-level `agents/` (KHÔNG tách vào `domains/<name>/agents/`, khác
@@ -740,13 +781,41 @@ trong nguồn canonical trước khi render.
   `domains/<name>/agents/` sẽ ép 1 agent-type đa-domain phải chọn "nhà"
   giả tạo, hoặc nhân bản file — không mirror đúng D3's lý do tự-chứa
   (self-contained vì thật sự chỉ 1 domain dùng).
-- `doctrine` domain-scoped NÊN đánh dấu "cố ý CHƯA XÂY" — cùng lớp với
-  phần treo có chủ đích của D15 (chờ bằng chứng thật, không thiết kế
-  trước). Lý do: chưa có nội dung doctrine domain-thật nào tồn tại để
-  thiết kế theo (`marketing` vẫn `proposed`, chưa có `AGENTS.md`/
-  `CLAUDE.md` riêng nào cần nạp-có-điều-kiện) — ép thiết kế bây giờ là
-  suy diễn không có chất liệu, khác hẳn 5 mối quan tâm còn lại đều có
-  tiền lệ/nhu cầu thật (STR52/STR89/tsk-2t9c) để dựa vào.
+
+### Doctrine domain-scoped — `domains/<name>/AGENTS.md` (D23, round 19)
+
+**Rút lại đề xuất "cố ý CHƯA XÂY" — SAI, đã bị người bác đúng.** Lý do
+sai: giả định "chưa có nội dung doctrine domain-thật" — KHÔNG đúng. Root
+`AGENTS.md` hôm nay đã hard-mix 2 loại nội dung:
+- **Thật domain-agnostic** (giữ ở core): mục "Dispatch — routing work to
+  a executor", product priority order, DoD 6-câu-hỏi, install/setup/
+  doctor gate.
+- **Thật CODING-only, đã tồn tại, không phải giả thuyết** (phải dời):
+  mục "fgOS Workflow" (gọi thẳng tên `fgos-coding-discovering`/
+  `-exploring`/`-planning`/`-validating`) và toàn bộ "# GitNexus — Code
+  Intelligence" (impact-analysis/symbol/call-graph — vô nghĩa với
+  `marketing`).
+
+**Quyết định (D23):** `domains/<name>/AGENTS.md` — CÙNG LOẠI file với
+root `AGENTS.md` (standing doctrine), chỉ hẹp phạm vi lại, KHÔNG phải
+khái niệm mới như `knowledge/`/`specs/`/`task-specs/` (đặt tên
+`AGENTS.md`, không phải `doctrine.md`, theo đúng lý do đó). Root
+`AGENTS.md`/`CLAUDE.md` chỉ giữ phần domain-agnostic; 2 mục coding-only ở
+trên dời sang `domains/coding/AGENTS.md` — migration thật đầu tiên.
+
+**Cơ chế nạp — ĐÂY LÀ PHẦN QUAN TRỌNG NHẤT, không được bỏ qua:**
+`CLAUDE.md`'s `@AGENTS.md` là `@import` TĨNH, nạp lúc context-load, TRƯỚC
+khi bất kỳ item nào được claim — chưa biết domain lúc đó, KHÔNG điều
+kiện hoá theo domain được bằng `@import`. Cơ chế thật: `fgos-routing` —
+đúng lớp đã biết domain đầu tiên (D13) — tự `Read` (lệnh đọc file
+thường, như đọc skill/task-spec) `domains/<domain>/AGENTS.md` ngay khi
+domain đã resolve. Cùng công thức `bundleForStage` (D14) — chỉ một tầng
+cao hơn: doctrine ở cấp DOMAIN (routing resolve 1 lần/session), skill/
+task-spec ở cấp STAGE (driving resolve mỗi lần vào stage mới). **Không
+giả định** Claude Code có auto-discovery `AGENTS.md` lồng thư mục con
+(chưa kiểm chứng) — nếu tooling sau này có hỗ trợ thật, đặt tên
+`AGENTS.md` sẵn thì hưởng miễn phí, nhưng cơ chế ĐẢM BẢO hôm nay vẫn phải
+là routing tự Read tường minh.
 
 ### Tầng DISPATCH/ROUTING/DRIVING — điều phối workflow/stage/taskSpec/skill/persona (D13-D15, D20-D22, sắp lại round 19)
 
@@ -1146,8 +1215,9 @@ lượt riêng, để chỉ đụng `stage-fsm.mjs` (module test dày đặc nh�
   5. `src/runner/dispatch.mjs`: mở rộng (D21) để `agentType` trong
      `buildAgentTypeExecutor` resolve qua skill-match thay vì đọc
      `claims` tĩnh — điểm chạm DISPATCH thật của toàn bộ đảo hướng này.
-- **§6 excerpt áp dụng:** subsection "Eligibility declaration — đảo
-  hướng (D20/D21, round 19)" + mermaid so sánh cũ/mới trong khối đó.
+- **§6 excerpt áp dụng:** subsection "Tầng DISPATCH/ROUTING/DRIVING"
+  (đoạn "Eligibility declaration (D20)" bên trong) + mermaid so sánh
+  cũ/mới ngay dưới đoạn đó.
 - **D-ID áp dụng:** D20, D21, D22 (D22: phép khớp `requires-skill` phải
   áp dụng cho task-spec CHÍNH của stage — không chỉ task-spec của dòng
   Collaboration — để stage-entry dispatch thật sự quan sát được).
@@ -1166,10 +1236,41 @@ lượt riêng, để chỉ đụng `stage-fsm.mjs` (module test dày đặc nh�
   hẳn, vì đây là đảo ngược hành vi đã ship, không phải thêm mới thuần
   tuý).
 
-**Việc CHƯA đủ hình dạng để thành task riêng:** knowledge/doctrine
-domain-scoped (câu hỏi mở #15, §3 — round 19 đề xuất đánh dấu "cố ý
-CHƯA XÂY", chờ xác nhận, xem §6), ranh giới stage-đổi-persona-ngầm có
-nên dừng driving (D15's phần cố ý chưa xây), `agents/*.yaml`→
-`.claude/agents/*.md` render-pair placement — round 19 đề xuất GIỮ
-NGUYÊN top-level `agents/` (xem §6), chờ người xác nhận trước khi khoá
-D-ID và coi là "đã có hình dạng".
+### {#task-doctrine-domain-split} Tách doctrine core/domain: `AGENTS.md` gốc rút gọn, `domains/coding/AGENTS.md` mới, routing tự Read
+
+- **Mục tiêu:** hiện thực D23 — 3 việc, 1 lượt:
+  1. Root `AGENTS.md`: cắt bỏ mục "## fgOS Workflow" (gọi thẳng
+     `fgos-coding-discovering`/`-exploring`/`-planning`/`-validating`) và
+     toàn bộ "# GitNexus — Code Intelligence" (Always/Never Do,
+     Resources, CLI table) — giữ lại phần domain-agnostic (Dispatch,
+     priority order, DoD 6-câu-hỏi, install/setup/doctor gate).
+  2. Tạo `domains/coding/AGENTS.md` mới, nhận nguyên 2 mục vừa cắt —
+     nội dung KHÔNG đổi, chỉ đổi CHỖ ở.
+  3. `fgos-routing` (skill, không phải code lõi — đây là 1 dòng sửa
+     prose trong `SKILL.md` của nó): thêm bước đọc `domains/<domain>/
+     AGENTS.md` NGAY SAU KHI domain đã resolve (route xong tới
+     `fgos-coding-*`), TRƯỚC khi hand-off vào DRIVING — bảo đảm nạp
+     thật, không dựa auto-discovery chưa kiểm chứng.
+- **§6 excerpt áp dụng:** subsection "Doctrine domain-scoped —
+  `domains/<name>/AGENTS.md` (D23)" + dòng `doctrine_core`/`dc_c` trong
+  mermaid + dòng `AGENTS.md` trong ASCII tree (cả core lẫn
+  `domains/coding/`).
+- **D-ID áp dụng:** D23.
+- **Quan hệ:** độc lập với mọi task khác — không đụng `codingDomain`/
+  `registry.mjs`/`agents/*.yaml`; có thể làm bất cứ lúc nào, kể cả trước
+  {#task-domain-registry-split} (không phụ thuộc `domains/coding/` đã
+  tồn tại từ registry-split, item này TỰ tạo `domains/coding/` nếu chưa
+  có — dù thực tế nên làm SAU registry-split để không tạo `domains/
+  coding/` 2 lần từ 2 task khác nhau).
+- **Verify nháp:** `grep "fgos-coding-" AGENTS.md` (root) phải về 0 sau
+  khi sửa; `domains/coding/AGENTS.md` chứa đúng 2 mục đã cắt, byte-diff
+  với bản gốc (trừ vị trí) = 0; test/kiểm tra thủ công: 1 session mới mở
+  chạy `/fgOS:pick` 1 item `coding` thật, xác nhận `fgos-routing` có đọc
+  `domains/coding/AGENTS.md` (log hoặc tường thuật của session xác nhận
+  đã đọc file đó) trước khi vào DRIVING.
+
+**Việc CHƯA đủ hình dạng để thành task riêng:** ranh giới
+stage-đổi-persona-ngầm có nên dừng driving (D15's phần cố ý chưa xây),
+`agents/*.yaml`→`.claude/agents/*.md` render-pair placement — round 19
+đề xuất GIỮ NGUYÊN top-level `agents/` (xem §6), chờ người xác nhận
+trước khi khoá D-ID và coi là "đã có hình dạng".
