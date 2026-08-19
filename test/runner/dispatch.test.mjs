@@ -727,6 +727,47 @@ test('the committed .fgos/config.json runner section declares the agy reference 
   assert.ok(invocation.args.includes('--mode') && invocation.args.includes('accept-edits'));
 });
 
+// Synthetic cfg, not committedRunnerConfig() (tsk-1cn): committedRunnerConfig()
+// resolves against the MAIN CHECKOUT's own committed HEAD (see its own
+// docstring above) -- a feature branch's own .fgos/config.json edit is
+// invisible to it until merge, so a test asserting a branch's own change
+// through that helper would fail here and only start passing post-merge.
+// This mirrors the entry actually added to runner.executors.claude.
+function claudeExecutorCfg() {
+  return {
+    executor: { command: 'claude', args: ['-p', '{prompt}', '--model', '{model}', '--permission-mode', 'acceptEdits'] },
+    executors: {
+      claude: {
+        kind: 'agent',
+        invocations: [{ via: 'cli', adapter: 'cli-spawn', command: 'claude', args: ['-p', '{prompt}', '--model', '{model}', '--permission-mode', 'acceptEdits'] }],
+      },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+}
+
+test('resolveExecutorCommand resolves the named "claude" executor to the same command/args the top-level "executor" default already produces (tsk-1cn: addressability, not new behavior)', () => {
+  const cfg = claudeExecutorCfg();
+  const named = resolveExecutorCommand(cfg, { prompt: 'hello', model: 'sonnet', tier: 'standard', executorId: 'claude' });
+  const unnamed = resolveExecutorCommand(cfg, { prompt: 'hello', model: 'sonnet', tier: 'standard' });
+  assert.equal(named.command, unnamed.command);
+  assert.deepEqual(named.args, unnamed.args);
+});
+
+test('resolveExecutorCommand never requires allowCrossProvider for the named "claude" executor, since its resolved command is already in CLAUDE_CLI_COMMANDS (tsk-1cn, unlike agy/codex/pi)', () => {
+  const cfg = claudeExecutorCfg();
+  assert.equal(cfg.executors.claude.allowCrossProvider, undefined);
+  assert.doesNotThrow(() => resolveExecutorCommand(cfg, { prompt: 'hello', model: 'sonnet', tier: 'standard', executorId: 'claude' }));
+});
+
+test('resolveExecutorAndOverrides resolves "claude" as a literal registered executor id (tsk-1cn: no longer configured:false)', () => {
+  const cfg = claudeExecutorCfg();
+  const resolved = resolveExecutorAndOverrides(cfg, 'claude');
+  assert.equal(resolved.configured, true);
+  assert.equal(resolved.executorId, 'claude');
+});
+
 test('loadRunnerConfig accepts a "executors" entry naming only "kind" (metadata-only, falls through for its executor)', () => {
   const dir = mkTempDir();
   const configPath = path.join(dir, 'metadata-only-executor.json');
