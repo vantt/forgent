@@ -8,6 +8,10 @@
     "domain",
     "kernel"
   ],
+  "rules": [
+    "one-directional-layer",
+    "domain-siloing"
+  ],
   "files": {
     "bin/fgos.mjs": "entry",
     "bin/fgos-runner.mjs": "entry",
