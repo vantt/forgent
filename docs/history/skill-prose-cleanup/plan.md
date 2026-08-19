@@ -68,7 +68,7 @@ materialize trực tiếp, không cần suy diễn thêm:
 [
   {
     "title": "fgos-coding-driving: tách SKILL.md/references, bỏ pseudocode, xoá citation trần",
-    "verify": "npm test && test -f .agents/skills/fgos-coding-driving/SKILL.md && [ \"$(wc -l < .agents/skills/fgos-coding-driving/SKILL.md)\" -lt 300 ] && ls .agents/skills/fgos-coding-driving/references/*.md >/dev/null && ! rg --hidden -q '^loop:' .agents/skills/fgos-coding-driving/SKILL.md && ! rg --hidden -qP '\\b(ADR|RUL|D)\\d{1,4}\\b|\\btsk-[0-9a-z]+(-[0-9]+)?\\b' .agents/skills/fgos-coding-driving/SKILL.md .agents/skills/fgos-coding-driving/references/*.md && diff -q .agents/skills/fgos-coding-driving/SKILL.md plugins/fgOS/skills/fgos-coding-driving/SKILL.md",
+    "verify": "npm test && test -f .agents/skills/fgos-coding-driving/SKILL.md && [ \"$(wc -l < .agents/skills/fgos-coding-driving/SKILL.md)\" -lt 300 ] && ls .agents/skills/fgos-coding-driving/references/*.md >/dev/null && ! rg --hidden -q '^loop:' .agents/skills/fgos-coding-driving/SKILL.md && ! rg --hidden -q '\\b(ADR|RUL|D)\\d{1,4}\\b|\\btsk-[0-9a-z]+(-[0-9]+)?\\b' .agents/skills/fgos-coding-driving/SKILL.md .agents/skills/fgos-coding-driving/references/*.md && diff -q .agents/skills/fgos-coding-driving/SKILL.md plugins/fgOS/skills/fgos-coding-driving/SKILL.md",
     "action": "D4: apply skill-creator SKILL.md<300+references split; D1: remove all governance-id citations at the .agents/skills source",
     "footprint": [".agents/skills/fgos-coding-driving/SKILL.md", ".agents/skills/fgos-coding-driving/references/", "plugins/fgOS/skills/fgos-coding-driving/SKILL.md"],
     "kind": "docs",
@@ -76,7 +76,7 @@ materialize trực tiếp, không cần suy diễn thêm:
   },
   {
     "title": "fgos-fanout: tách SKILL.md/references, bỏ pseudocode, xoá citation trần",
-    "verify": "npm test && test -f .agents/skills/fgos-fanout/SKILL.md && [ \"$(wc -l < .agents/skills/fgos-fanout/SKILL.md)\" -lt 300 ] && ls .agents/skills/fgos-fanout/references/*.md >/dev/null && ! rg --hidden -q '^loop:' .agents/skills/fgos-fanout/SKILL.md && ! rg --hidden -qP '\\b(ADR|RUL|D)\\d{1,4}\\b|\\btsk-[0-9a-z]+(-[0-9]+)?\\b' .agents/skills/fgos-fanout/SKILL.md .agents/skills/fgos-fanout/references/*.md && diff -q .agents/skills/fgos-fanout/SKILL.md plugins/fgOS/skills/fgos-fanout/SKILL.md",
+    "verify": "npm test && test -f .agents/skills/fgos-fanout/SKILL.md && [ \"$(wc -l < .agents/skills/fgos-fanout/SKILL.md)\" -lt 300 ] && ls .agents/skills/fgos-fanout/references/*.md >/dev/null && ! rg --hidden -q '^loop:' .agents/skills/fgos-fanout/SKILL.md && ! rg --hidden -q '\\b(ADR|RUL|D)\\d{1,4}\\b|\\btsk-[0-9a-z]+(-[0-9]+)?\\b' .agents/skills/fgos-fanout/SKILL.md .agents/skills/fgos-fanout/references/*.md && diff -q .agents/skills/fgos-fanout/SKILL.md plugins/fgOS/skills/fgos-fanout/SKILL.md",
     "action": "D4: apply skill-creator SKILL.md<300+references split (content-type criterion, not length-conditional per DISCUSSION.md fanout-consistency fix); D1: remove all governance-id citations at source",
     "footprint": [".agents/skills/fgos-fanout/SKILL.md", ".agents/skills/fgos-fanout/references/", "plugins/fgOS/skills/fgos-fanout/SKILL.md"],
     "kind": "docs",
@@ -84,7 +84,7 @@ materialize trực tiếp, không cần suy diễn thêm:
   },
   {
     "title": "fgos-coding-exploring: tách SKILL.md/references, xoá citation trần",
-    "verify": "npm test && test -f .agents/skills/fgos-coding-exploring/SKILL.md && [ \"$(wc -l < .agents/skills/fgos-coding-exploring/SKILL.md)\" -lt 300 ] && ls .agents/skills/fgos-coding-exploring/references/*.md >/dev/null && ! rg --hidden -qP '\\b(ADR|RUL|D)\\d{1,4}\\b|\\btsk-[0-9a-z]+(-[0-9]+)?\\b' .agents/skills/fgos-coding-exploring/SKILL.md .agents/skills/fgos-coding-exploring/references/*.md && diff -q .agents/skills/fgos-coding-exploring/SKILL.md plugins/fgOS/skills/fgos-coding-exploring/SKILL.md",
+    "verify": "npm test && test -f .agents/skills/fgos-coding-exploring/SKILL.md && [ \"$(wc -l < .agents/skills/fgos-coding-exploring/SKILL.md)\" -lt 300 ] && ls .agents/skills/fgos-coding-exploring/references/*.md >/dev/null && ! rg --hidden -q '\\b(ADR|RUL|D)\\d{1,4}\\b|\\btsk-[0-9a-z]+(-[0-9]+)?\\b' .agents/skills/fgos-coding-exploring/SKILL.md .agents/skills/fgos-coding-exploring/references/*.md && diff -q .agents/skills/fgos-coding-exploring/SKILL.md plugins/fgOS/skills/fgos-coding-exploring/SKILL.md",
     "action": "D4: apply skill-creator SKILL.md<300+references split; D1: remove all governance-id citations at source",
     "footprint": [".agents/skills/fgos-coding-exploring/SKILL.md", ".agents/skills/fgos-coding-exploring/references/", "plugins/fgOS/skills/fgos-coding-exploring/SKILL.md"],
     "kind": "docs",
@@ -92,7 +92,7 @@ materialize trực tiếp, không cần suy diễn thêm:
   },
   {
     "title": "fgos-coding-planning: tách SKILL.md/references, xoá citation trần",
-    "verify": "npm test && test -f .agents/skills/fgos-coding-planning/SKILL.md && [ \"$(wc -l < .agents/skills/fgos-coding-planning/SKILL.md)\" -lt 300 ] && ls .agents/skills/fgos-coding-planning/references/*.md >/dev/null && ! rg --hidden -qP '\\b(ADR|RUL|D)\\d{1,4}\\b|\\btsk-[0-9a-z]+(-[0-9]+)?\\b' .agents/skills/fgos-coding-planning/SKILL.md .agents/skills/fgos-coding-planning/references/*.md && diff -q .agents/skills/fgos-coding-planning/SKILL.md plugins/fgOS/skills/fgos-coding-planning/SKILL.md",
+    "verify": "npm test && test -f .agents/skills/fgos-coding-planning/SKILL.md && [ \"$(wc -l < .agents/skills/fgos-coding-planning/SKILL.md)\" -lt 300 ] && ls .agents/skills/fgos-coding-planning/references/*.md >/dev/null && ! rg --hidden -q '\\b(ADR|RUL|D)\\d{1,4}\\b|\\btsk-[0-9a-z]+(-[0-9]+)?\\b' .agents/skills/fgos-coding-planning/SKILL.md .agents/skills/fgos-coding-planning/references/*.md && diff -q .agents/skills/fgos-coding-planning/SKILL.md plugins/fgOS/skills/fgos-coding-planning/SKILL.md",
     "action": "D4: apply skill-creator SKILL.md<300+references split; D1: remove all governance-id citations at source",
     "footprint": [".agents/skills/fgos-coding-planning/SKILL.md", ".agents/skills/fgos-coding-planning/references/", "plugins/fgOS/skills/fgos-coding-planning/SKILL.md"],
     "kind": "docs",
@@ -100,7 +100,7 @@ materialize trực tiếp, không cần suy diễn thêm:
   },
   {
     "title": "fgos-coding-validating: tách SKILL.md/references, xoá citation trần",
-    "verify": "npm test && test -f .agents/skills/fgos-coding-validating/SKILL.md && [ \"$(wc -l < .agents/skills/fgos-coding-validating/SKILL.md)\" -lt 300 ] && ls .agents/skills/fgos-coding-validating/references/*.md >/dev/null && ! rg --hidden -qP '\\b(ADR|RUL|D)\\d{1,4}\\b|\\btsk-[0-9a-z]+(-[0-9]+)?\\b' .agents/skills/fgos-coding-validating/SKILL.md .agents/skills/fgos-coding-validating/references/*.md && diff -q .agents/skills/fgos-coding-validating/SKILL.md plugins/fgOS/skills/fgos-coding-validating/SKILL.md",
+    "verify": "npm test && test -f .agents/skills/fgos-coding-validating/SKILL.md && [ \"$(wc -l < .agents/skills/fgos-coding-validating/SKILL.md)\" -lt 300 ] && ls .agents/skills/fgos-coding-validating/references/*.md >/dev/null && ! rg --hidden -q '\\b(ADR|RUL|D)\\d{1,4}\\b|\\btsk-[0-9a-z]+(-[0-9]+)?\\b' .agents/skills/fgos-coding-validating/SKILL.md .agents/skills/fgos-coding-validating/references/*.md && diff -q .agents/skills/fgos-coding-validating/SKILL.md plugins/fgOS/skills/fgos-coding-validating/SKILL.md",
     "action": "D4: apply skill-creator SKILL.md<300+references split; D1: remove all governance-id citations at source",
     "footprint": [".agents/skills/fgos-coding-validating/SKILL.md", ".agents/skills/fgos-coding-validating/references/", "plugins/fgOS/skills/fgos-coding-validating/SKILL.md"],
     "kind": "docs",
@@ -108,7 +108,7 @@ materialize trực tiếp, không cần suy diễn thêm:
   },
   {
     "title": "fgos-coding-implement: tách SKILL.md/references (mẫu ck:cook), xoá citation trần",
-    "verify": "npm test && test -f .agents/skills/fgos-coding-implement/SKILL.md && [ \"$(wc -l < .agents/skills/fgos-coding-implement/SKILL.md)\" -lt 300 ] && ls .agents/skills/fgos-coding-implement/references/*.md >/dev/null && ! rg --hidden -qP '\\b(ADR|RUL|D)\\d{1,4}\\b|\\btsk-[0-9a-z]+(-[0-9]+)?\\b' .agents/skills/fgos-coding-implement/SKILL.md .agents/skills/fgos-coding-implement/references/*.md && diff -q .agents/skills/fgos-coding-implement/SKILL.md plugins/fgOS/skills/fgos-coding-implement/SKILL.md",
+    "verify": "npm test && test -f .agents/skills/fgos-coding-implement/SKILL.md && [ \"$(wc -l < .agents/skills/fgos-coding-implement/SKILL.md)\" -lt 300 ] && ls .agents/skills/fgos-coding-implement/references/*.md >/dev/null && ! rg --hidden -q '\\b(ADR|RUL|D)\\d{1,4}\\b|\\btsk-[0-9a-z]+(-[0-9]+)?\\b' .agents/skills/fgos-coding-implement/SKILL.md .agents/skills/fgos-coding-implement/references/*.md && diff -q .agents/skills/fgos-coding-implement/SKILL.md plugins/fgOS/skills/fgos-coding-implement/SKILL.md",
     "action": "D4: apply skill-creator SKILL.md<300+references split (ck:cook as concrete template per DISCUSSION.md); D1: remove all governance-id citations at source",
     "footprint": [".agents/skills/fgos-coding-implement/SKILL.md", ".agents/skills/fgos-coding-implement/references/", "plugins/fgOS/skills/fgos-coding-implement/SKILL.md"],
     "kind": "docs",
@@ -116,7 +116,7 @@ materialize trực tiếp, không cần suy diễn thêm:
   },
   {
     "title": "merge-loop: tách SKILL.md/references, xoá citation trần",
-    "verify": "test -f plugins/fgOS/skills/merge-loop/SKILL.md && [ \"$(wc -l < plugins/fgOS/skills/merge-loop/SKILL.md)\" -lt 300 ] && ls plugins/fgOS/skills/merge-loop/references/*.md >/dev/null && ! rg --hidden -qP '\\b(ADR|RUL|D)\\d{1,4}\\b|\\btsk-[0-9a-z]+(-[0-9]+)?\\b' plugins/fgOS/skills/merge-loop/SKILL.md plugins/fgOS/skills/merge-loop/references/*.md",
+    "verify": "test -f plugins/fgOS/skills/merge-loop/SKILL.md && [ \"$(wc -l < plugins/fgOS/skills/merge-loop/SKILL.md)\" -lt 300 ] && ls plugins/fgOS/skills/merge-loop/references/*.md >/dev/null && ! rg --hidden -q '\\b(ADR|RUL|D)\\d{1,4}\\b|\\btsk-[0-9a-z]+(-[0-9]+)?\\b' plugins/fgOS/skills/merge-loop/SKILL.md plugins/fgOS/skills/merge-loop/references/*.md",
     "action": "D4: apply skill-creator SKILL.md<300+references split",
     "footprint": ["plugins/fgOS/skills/merge-loop/SKILL.md", "plugins/fgOS/skills/merge-loop/references/"],
     "kind": "docs",
@@ -132,7 +132,7 @@ materialize trực tiếp, không cần suy diễn thêm:
   },
   {
     "title": "Dọn citation trần còn lại: fgos-routing, approve, pick",
-    "verify": "! rg --hidden -qP '\\b(ADR|RUL|D)\\d{1,4}\\b|\\btsk-[0-9a-z]+(-[0-9]+)?\\b' .agents/skills/fgos-routing/SKILL.md plugins/fgOS/skills/approve/SKILL.md plugins/fgOS/skills/pick/SKILL.md && diff -q .agents/skills/fgos-routing/SKILL.md plugins/fgOS/skills/fgos-routing/SKILL.md",
+    "verify": "! rg --hidden -q '\\b(ADR|RUL|D)\\d{1,4}\\b|\\btsk-[0-9a-z]+(-[0-9]+)?\\b' .agents/skills/fgos-routing/SKILL.md plugins/fgOS/skills/approve/SKILL.md plugins/fgOS/skills/pick/SKILL.md && diff -q .agents/skills/fgos-routing/SKILL.md plugins/fgOS/skills/fgos-routing/SKILL.md",
     "action": "D1: remove all governance-id citations at the .agents/skills source (and the plugins-only wrapper skills it does not mirror)",
     "footprint": [".agents/skills/fgos-routing/SKILL.md", "plugins/fgOS/skills/fgos-routing/SKILL.md", "plugins/fgOS/skills/approve/SKILL.md", "plugins/fgOS/skills/pick/SKILL.md"],
     "kind": "docs",
