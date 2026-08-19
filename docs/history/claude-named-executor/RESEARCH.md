@@ -144,3 +144,135 @@ open question the item exists to answer; nothing here blocks proceeding.
 by a CI-style command, per tsk-47r's own precedent) — proof lives in this
 file's own Round 3 below (once run), read by the human approver at
 `awaiting-approval`.
+
+## Round 3 — 2026-08-19 (tsk-1jt, D4 proof-test, real dispatch)
+
+**Asked:** does the named `claude` executor (`runner.executors.claude`,
+landed `10847668`), dispatched out-of-process via the literal
+`executorId`-named path, actually follow `.agents/skills/_shared/
+coding-worker-contract.md` on a real throwaway work item?
+
+**Setup (real, not simulated):**
+
+- Confirmed `decideExecutorDispatchMechanism` resolves `claude` to
+  `out-of-process` unconditionally regardless of `--has-live-task-access`
+  (D-ADR0033: config wins — `runner.executors.claude` is
+  `invocations[].via === 'cli'`-shaped, `src/runner/dispatch/
+  mechanism.mjs:82-96`) — confirmed live, not just read: the actual
+  `executeExecutorCli('claude', {hasLiveTaskAccess: true, ...})` call
+  below printed `mechanism=out-of-process ... via=cli-spawn
+  provider=claude model=sonnet tier=standard` to stderr.
+- Created a genuinely disposable fgOS work item via the real
+  `fgos submit`/`fgos edit`/`fgos pick` doors: `tsk-4l8p` (`kind: chore`,
+  `tier: light`, `risk: light`, `domain: coding`, `verify: "test -f
+  PROOF.txt"`, `footprint: ["PROOF.txt"]`, `description`: a concrete,
+  actionable directive — "create PROOF.txt containing the line 'tsk-1jt
+  proof written by claude', then commit it referencing this item's own
+  id" — mirroring `pi`'s own Round 4b shape directly (the concrete-directive
+  version), skipping the ambiguous-description round since that specific
+  scenario (cold-pickup refusal on a vague brief) was already proven
+  provider-neutral once by `pi`'s own Round 4a and is not this round's own
+  open question).
+- `fgos pick tsk-4l8p` provisioned `fgw/tsk-4l8p` at
+  `.claude/worktrees/tsk-4l8p-8Jlm9T` — confirmed clean (only the expected
+  ADR0020 `.fgos/` strip-deletions) before dispatch.
+- Built the real dispatch prompt with the REAL `buildPrompt`
+  (`src/runner/dispatch/prepare.mjs`), called directly against `tsk-4l8p`'s
+  actual work object, `stage: 'executing'` (the same call `dispatch/cli.mjs`
+  makes internally) — not a hand-written approximation. Saved verbatim:
+  `evidence/round3-dispatch-prompt.txt`.
+- Ran, from inside `tsk-4l8p`'s own worktree, via a one-off script
+  calling `executeExecutorCli('claude', {prompt, cwd: <tsk-4l8p worktree>,
+  hasLiveTaskAccess: true})` directly (the exact function `dispatch.mjs
+  execute claude --prompt ... --has-live-task-access` runs under the hood
+  — used the direct import instead of the CLI's own shell-argv parsing
+  only because this session's own worktree-isolation guard refuses a
+  single Bash call combining command substitution with a multi-line prompt
+  string; the dispatch call itself is byte-identical either way). Full
+  result saved: `evidence/round3-d4-attempt-claude-result.json`.
+
+**Found (real event stream + real worktree state, both confirmed
+independently):**
+
+- `status: 0`, `signal: null` — the process exited cleanly, no crash/hang.
+- Real stdout (741 chars, not fabricated): claude reports it wrote
+  `PROOF.txt` successfully, but that **every git command (`git status`,
+  `git add`, `git commit`) was denied by the permission-approval gate in
+  this session — even with `dangerouslyDisableSandbox`, and even a plain
+  `git status` read** — and asks the (nonexistent, headless) human to
+  approve a pending git permission prompt.
+- **Cross-checked against real worktree state, not just the self-report**:
+  `PROOF.txt` exists, content is EXACTLY `tsk-1jt proof written by claude`
+  (matches the directive precisely) — `git status --short` in
+  `tsk-4l8p`'s own worktree shows it `??` (untracked). `git log --oneline`
+  shows NO new commit on top of `10847668` — the commit never happened,
+  confirming the self-report rather than contradicting it.
+- Logged the real `executor.dispatch` event:
+  `{"seq":20273,"type":"executor.dispatch","payload":{"id":"tsk-4l8p",
+  "executorId":"claude","provider":"claude","command":"claude",
+  "model":"sonnet",...}}` (`.fgos/events.jsonl`).
+
+**Root cause (diagnosed, not guessed):** `runner.executors.claude`'s
+invocation args are `--permission-mode acceptEdits --allowedTools
+"Bash(git add:*),Bash(git commit:*)"` — identical to the top-level
+`runner.executor` default. `claude --help` confirms both flags exist with
+this exact spelling, and its own `--allowedTools` example uses a
+SPACE-separated pattern (`"Bash(git *)"`), not the colon-scoped
+subcommand form (`"Bash(git add:*)"`) this config uses — a plausible,
+though not confirmed without a further isolated retry, syntax mismatch.
+Independently of that specific syntax question, `PROOF.txt`'s successful
+write (an Edit-class tool) against total Bash denial (git-add/git-commit,
+Bash-class tools) is consistent with `acceptEdits` auto-approving only
+edit-class tools and leaving Bash-class tools gated regardless of
+`--allowedTools` content in a headless (`-p`, no TTY) session — this repo's
+own `.fgos/events.jsonl` carries ZERO prior `executor.dispatch` events for
+provider `claude` (checked: `grep -c executor.dispatch` → 33 total events,
+none naming `claude`), so this is the FIRST real out-of-process `claude`
+dispatch in this repo's history — there is no prior successful precedent
+to compare against, and no evidence either reading is wrong.
+
+**A second, independent contract deviation**, worth naming separately
+from the git-permission finding: claude's report did not use the
+contract's fixed two-token vocabulary (`[DONE]`/`[BLOCKED]`) at all — it
+asked a live question to a human ("Could you approve the pending git
+permission prompt...?"), which a genuinely headless dispatch (no one to
+answer) cannot resolve. Layer 1 rule 4 calls for `[BLOCKED] <precise
+reason>` in exactly this situation; the contract's own vocabulary was
+available and was not used.
+
+**Verdict: RED — the D4 claim is disproven for the CURRENT config, with
+two precisely-named findings**, not a vague failure:
+1. `runner.executors.claude`'s (and, since the args are byte-identical,
+   the top-level `runner.executor`'s own) `--permission-mode acceptEdits
+   --allowedTools "Bash(git add:*),Bash(git commit:*)"` does not grant
+   Bash-tool execution in a headless (`-p`) non-interactive session —
+   Layer 2 rule 3 ("commit before return") cannot be satisfied with this
+   invocation shape as configured today.
+2. When genuinely blocked, `claude` asked a live question instead of
+   reporting `[BLOCKED] <reason>` per Layer 1 rule 4's exact fixed-token
+   contract — a second, independent deviation from a headless worker's
+   required behavior.
+
+Both findings are about `claude`'s CURRENT invocation config and CLI
+behavior, not about whether `claude` can comprehend or attempt the
+contract — it read the layered skill-pointer chain correctly and executed
+the file-write step exactly as directed, which is real positive signal
+the config/permission gap sits on top of.
+
+**Not retried with an adjusted permission mode this round** — deliberately:
+the config under test IS `runner.executors.claude` as it actually landed
+(`10847668`); testing a hypothetical fixed config would answer a different
+question than this item's own scope (prove/disprove the CURRENT config's
+D4 compliance) and would spend more of this session's own shared-account
+usage chasing a root-cause diagnosis that belongs in a dedicated follow-up
+item, not this proof-test.
+
+Cleanup: `tsk-4l8p` moved to `wontfix` (see below) and its throwaway
+worktree/branch removed — never left dangling in the backlog.
+
+## Verdict (Round 3, tsk-1jt)
+
+**RED.** Two precisely-named findings recorded above:
+`.agents/skills/_shared/coding-worker-contract.md`'s own "Return-channel
+note" section gets the same append `pi`'s own GREEN got — the honest
+negative result, not skipped, per this item's own plan.md step 6.
