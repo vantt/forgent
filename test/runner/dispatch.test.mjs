@@ -1018,13 +1018,13 @@ test('the committed .fgos/config.json runner section wires the agy executor to g
   assert.ok(cfg.modelPolicies.gemini.lightweight.length > 0);
 });
 
-test('the committed .fgos/config.json runner section grants the worker exactly acceptEdits + git add/commit — no wider (per spike B)', () => {
+test('the committed .fgos/config.json runner section grants the worker exactly acceptEdits + bare and rtk-wrapped git add/commit — no wider (per spike B, widened by tsk-1dsr to admit the rtk CLI proxy hook)', () => {
   const cfg = committedRunnerConfig();
   const { args } = cfg.executor;
   assert.ok(args.includes('--permission-mode'));
   assert.equal(args[args.indexOf('--permission-mode') + 1], 'acceptEdits');
   assert.ok(args.includes('--allowedTools'));
-  assert.equal(args[args.indexOf('--allowedTools') + 1], 'Bash(git add:*),Bash(git commit:*)');
+  assert.equal(args[args.indexOf('--allowedTools') + 1], 'Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)');
   assert.ok(!args.includes('--dangerously-skip-permissions'));
 });
 
