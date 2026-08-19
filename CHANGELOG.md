@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `scripts/write-wrapper-script.mjs` — reusable helper CLI script to write executable wrapper shell scripts for multi-statement commands that trip worktree isolation guards.
 - `runner.executors.claude` in `.fgos/config.json` — claude is now
   addressable by name in dispatch (`decide claude`, `executors.claude`)
   the same way `agy`/`codex`/`pi` already are, instead of only being
