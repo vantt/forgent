@@ -815,6 +815,17 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
   if (typeof cfg.timeoutMs !== 'number' || !Number.isFinite(cfg.timeoutMs) || cfg.timeoutMs <= 0) {
     throw new RunnerConfigError(`runner config (${sourceLabel}) must declare a positive numeric "timeoutMs".`);
   }
+  // OPTIONAL `idleTimeoutMs` (dispatch-execute optimization pass): absent
+  // entirely keeps `cliSpawnAdapter`'s idle-timeout disarmed, byte-identical
+  // to before this field existed — same additive-optional shape as
+  // `parallel` below. When present, kills a worker that has gone
+  // completely silent for this long, distinct from `timeoutMs`'s
+  // unconditional absolute ceiling.
+  if (cfg.idleTimeoutMs !== undefined) {
+    if (typeof cfg.idleTimeoutMs !== 'number' || !Number.isFinite(cfg.idleTimeoutMs) || cfg.idleTimeoutMs <= 0) {
+      throw new RunnerConfigError(`runner config (${sourceLabel}) "idleTimeoutMs" must be a positive number when present.`);
+    }
+  }
   // OPTIONAL `parallel` block (fan-out-parallel D10) — validated the same
   // additive-optional way every field above is: absent entirely is fine (the
   // runner falls back to in-code defaults), but when present it must be an

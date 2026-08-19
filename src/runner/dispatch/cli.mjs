@@ -122,6 +122,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
     throw new RunnerConfigError(`no executor adapter registered for "${adapter}".`);
   }
   const timeoutMs = opts.timeoutMs ?? cfg.timeoutMs;
+  const idleTimeoutMs = opts.idleTimeoutMs ?? cfg.idleTimeoutMs;
   const maxBuffer = opts.maxBuffer ?? 10 * 1024 * 1024;
 
   // Dispatch chokepoint visibility: one line per real spawn, right before it
@@ -146,6 +147,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   return adapterFn({ command, args }, {
     cwd,
     timeoutMs,
+    idleTimeoutMs,
     maxBuffer,
     onChunk: opts.onChunk,
     workId: work.id,
@@ -234,6 +236,7 @@ export async function executeExecutorCli(
     carries,
     hasLiveTaskAccess = false,
     timeoutMs: timeoutOverride,
+    idleTimeoutMs: idleTimeoutOverride,
     maxBuffer: maxBufferOverride,
     onChunk,
   } = {},
@@ -341,6 +344,7 @@ export async function executeExecutorCli(
     throw new RunnerConfigError(`no executor adapter registered for "${adapter}".`);
   }
   const timeoutMs = timeoutOverride ?? cfg.timeoutMs;
+  const idleTimeoutMs = idleTimeoutOverride ?? cfg.idleTimeoutMs;
   const maxBuffer = maxBufferOverride ?? 10 * 1024 * 1024;
 
   const identity = `${process.pid}:${Date.now()}:${Math.random().toString(36).slice(2)}`;
@@ -380,7 +384,7 @@ export async function executeExecutorCli(
     process.stderr.write(
       `fgos: dispatch capability=${capabilityLabel} executor=${executorId} via=${adapter} provider=${provider} model=${model} tier=${tier}\n`,
     );
-    const result = await adapterFn({ command, args }, { cwd, timeoutMs, maxBuffer, onChunk, workId: executorId, tier, model });
+    const result = await adapterFn({ command, args }, { cwd, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId: executorId, tier, model });
     const base = { mechanism, ...result, provider, command };
     return resolvedByPurpose ? { ...base, executorId } : base;
   } finally {
@@ -601,6 +605,15 @@ export function runDispatchCli() {
         process.stdout.write(`${JSON.stringify(executed)}\n`);
       },
       (err) => {
+        // Structured errorClass on stdout (dispatch-execute optimization
+        // pass): a caller (a skill following executor-dispatch-fallback.md,
+        // or the runner loop) can now tell "dispatch-in-flight -- back off
+        // and retry shortly" apart from "dispatch-depth-exceeded -- stop,
+        // this needs a human" apart from every other failure, instead of
+        // only ever seeing a bare exit-1 + a human-readable message on
+        // stderr. `err.message` on stderr is unchanged for a human tailing
+        // the terminal.
+        process.stdout.write(`${JSON.stringify(err instanceof DispatchError ? { error: err.message, errorClass: err.errorClass } : { error: err.message })}\n`);
         process.stderr.write(`${err.message}\n`);
         process.exitCode = 1;
       },
