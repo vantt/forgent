@@ -113,6 +113,24 @@ that would declare the same file as footprint are a collision waiting to
 happen at merge time, whether a person notices it during live planning or
 `footprintOverlapAmong` catches it mechanically inside `judgeDecompose`.
 
+A second real instance of the same live judgment: `tsk-1uw`, a docs task
+rewriting several sections of one spec file
+(`docs/specs/work-state.md`) across five phases, reasoned to the same
+conclusion the other direction — not "should I split a scan into six
+items" but "should I split a five-phase edit into five items" — and
+declined for the identical reason:
+
+> "plan-tsk-1uw.md's Shape section calls this one honest piece: the
+> footprint is a single file (docs/specs/work-state.md) and its five
+> phases each edit a different region of that same file, so splitting
+> would hand every child the same path -- the exact collision
+> footprintOverlapAmong exists to prevent."
+> — real `work.decision` capture, id `tsk-1uw`
+
+Same rule, same live-session reasoning path, applied to ordinary
+multi-phase docs work rather than a read-only scan — confirming this
+isn't a pattern specific to `tsk-36i`'s scan-report shape.
+
 ## Why this stayed a single, unsplit change
 
 `judgeDecompose` returned pass-through: one file, one function (the
