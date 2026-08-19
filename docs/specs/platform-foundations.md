@@ -71,7 +71,7 @@ Vùng doctrine của forgent: 8 luật thiết kế đã khóa, đứng trên m�
 - **RUL8 (chạy xong ≠ merge ≠ bền — mọi artifact khai mức bền tường minh).** "Chạy xong ≠ đã merge ≠ đã bền" — mọi artifact khai mức bền tường minh theo 5 cấp của `docs/platform-foundations.md` §L7 (L7).
 - **RUL9 (doctrine nạp-mọi-turn: placement test, transport mệnh lệnh, anchor phrase).** Tầng doctrine nạp-mọi-turn tuân ba quy tắc: placement test một câu; transport đi kèm mệnh lệnh; mỗi rule có anchor phrase được check tự động assert (L8).
 - **RUL10 (trend-history + reconsideration bookkeeping lưu policy-side, git-tracked).** Trend-history và reconsideration bookkeeping lưu policy-side, git-tracked (per ed953e09).
-- **RUL11.** Việc trở nặng không vì bản chất nó lớn mà vì thiếu và quên — tên đúng của tình trạng đó là tùm lum, không phải nặng; thấy tùm lum thì gom lại, gom tới khi hết, quy mô không bao giờ là lý do miễn trừ, đích là ranh giới rõ và contract tường minh (per D-ADR0036).
+- **RUL11 (tùm lum không phải nặng).** Việc trở nặng không vì bản chất nó lớn mà vì thiếu và quên — tên đúng của tình trạng đó là tùm lum, không phải nặng; thấy tùm lum thì gom lại, gom tới khi hết, quy mô không bao giờ là lý do miễn trừ, đích là ranh giới rõ và contract tường minh (ADR0036 (khoá RUL11 theo đúng phát biểu gốc của người dùng, cấm diễn giải lại)).
 
 ## Edge Cases Settled
 

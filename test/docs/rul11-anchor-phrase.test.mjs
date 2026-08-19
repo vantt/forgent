@@ -17,7 +17,7 @@ const AGENTS_MD = path.join(REPO_ROOT, 'AGENTS.md');
 const PLATFORM_FOUNDATIONS_SPEC = path.join(REPO_ROOT, 'docs', 'specs', 'platform-foundations.md');
 
 const ANCHOR_PHRASE = 'khong phai no nang ma no tum lum';
-const RUL11_LAW = 'Việc trở nặng không vì bản chất nó lớn mà vì thiếu và quên — tên đúng của tình trạng đó là tùm lum, không phải nặng; thấy tùm lum thì gom lại, gom tới khi hết, quy mô không bao giờ là lý do miễn trừ, đích là ranh giới rõ và contract tường minh (per D-ADR0036).';
+const RUL11_LAW = 'Việc trở nặng không vì bản chất nó lớn mà vì thiếu và quên — tên đúng của tình trạng đó là tùm lum, không phải nặng; thấy tùm lum thì gom lại, gom tới khi hết, quy mô không bao giờ là lý do miễn trừ, đích là ranh giới rõ và contract tường minh (ADR0036 (khoá RUL11 theo đúng phát biểu gốc của người dùng, cấm diễn giải lại)).';
 
 test('AGENTS.md (doctrine layer, loaded every turn) contains the RUL11 anchor phrase on one unwrapped line', () => {
   const agents = fs.readFileSync(AGENTS_MD, 'utf8');
@@ -28,12 +28,12 @@ test('AGENTS.md (doctrine layer, loaded every turn) contains the RUL11 anchor ph
 
 test('docs/specs/platform-foundations.md Business Rules carries a **RUL11.** line', () => {
   const spec = fs.readFileSync(PLATFORM_FOUNDATIONS_SPEC, 'utf8');
-  assert.match(spec, /^- \*\*RUL11\.\*\* /m, 'Business Rules section must have a "- **RUL11.**" line');
+  assert.match(spec, /^- \*\*RUL11.*\.\*\* /m, 'Business Rules section must have a "- **RUL11.**" line');
 });
 
 test('the RUL11 line matches the locked law text word-for-word', () => {
   const spec = fs.readFileSync(PLATFORM_FOUNDATIONS_SPEC, 'utf8');
-  const match = spec.match(/^- \*\*RUL11\.\*\* (.+)$/m);
+  const match = spec.match(/^- \*\*RUL11.*\.\*\* (.+)$/m);
   assert.ok(match, 'RUL11 line must be found before comparing its text');
   assert.equal(match[1], RUL11_LAW, 'RUL11 text must match the locked wording exactly -- edit both this test and the spec together if the law changes');
 });

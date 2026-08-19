@@ -1,8 +1,4 @@
 {
-  "docs/specs/platform-foundations.md": [
-    "bare-citation:RUL11:- **RUL11.** Việc trở nặng không vì bản chất nó lớn mà vì thiếu và quên — tên đúng của tình trạng đó là tùm lum, không phải nặng; thấy tùm lum thì gom lại, gom tới khi hết, quy mô không bao giờ là lý do miễn trừ, đích là ranh giới rõ và contract tường minh (per D-ADR0036).",
-    "bare-citation:ADR0036:- **RUL11.** Việc trở nặng không vì bản chất nó lớn mà vì thiếu và quên — tên đúng của tình trạng đó là tùm lum, không phải nặng; thấy tùm lum thì gom lại, gom tới khi hết, quy mô không bao giờ là lý do miễn trừ, đích là ranh giới rõ và contract tường minh (per D-ADR0036)."
-  ],
   ".agents/skills/_shared/executor-dispatch-fallback.md": [
     "d-local-outside-home:D2:`docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md` D2).",
     "d-local-outside-home:D2:Four, no more (`docs/history/two-layer-dispatch/DISCUSSION.md` D2, single",
