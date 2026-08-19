@@ -196,3 +196,79 @@ Cleanup performed: all 3 candidate worktrees/branches removed from disk;
 `tsk-4ov`/`tsk-wkw`/`tsk-3jm`/`tsk-193` moved to `wontfix`;
 `.fgos/config.json` restored byte-for-byte from a pre-test backup and
 re-verified.
+
+## STEP 4 RESULT: real 3-way concurrent OUT-OF-PROCESS fanout — 3/3 completed, full cycle, zero collision (2026-08-19, user-directed)
+
+User's own design point, tested directly rather than argued: native
+Task-tool Agent dispatch goes through Claude Code's own `EnterWorktree`
+tool and its (buggy) isolation guard; an out-of-process worker
+(`agy`/gemini, spawned via `dispatch.mjs execute`) is a genuinely separate
+OS subprocess whose `cwd` is set directly at spawn time by this
+session's own Node code — it never touches `EnterWorktree` or the
+Claude-Code-tool-call isolation guard at all. If true, concurrent
+out-of-process dispatch should sidestep the whole hazard class Steps 1-3
+found, entirely.
+
+**Method.** Created a second disposable parent (`tsk-8bs`) with 3
+disposable children (`tsk-2lr`, `tsk-3yc`, `tsk-1fki`), same shape as
+Step 3's fixtures. Claimed all 3 via plain `fgos pick <id> --dir <root>`
+(a bare CLI call — real `git worktree add` on disk, no `EnterWorktree`
+tool involved at any point). Wrote a small script that imports
+`executeExecutorCli` directly (the real function `dispatch.mjs execute`'s
+CLI wrapper calls internally) and invokes it 3 times concurrently via
+`Promise.allSettled`, each call's `cwd` explicitly set to that
+candidate's own already-claimed worktree path — run as a single `node
+<script>` Bash call from this coordinating session's own pinned worktree
+(the guard only ever sees that ONE outer Bash invocation; what the script
+does internally with per-call `cwd` overrides for its own child
+subprocesses is invisible to it). No config override needed this time —
+`fgos-coding-implement`'s standing capability pin already routes
+out-of-process by default, so this exercises the REAL, currently-live
+configuration, not a special test-only state.
+
+**Result: 3/3 completed the full cycle.** All three `agy`/gemini
+subprocesses (`status: 0`, `mechanism: "out-of-process"`) independently:
+read their own item's real prompt, wrote their own distinct marker file
+inside their own worktree only, ran the real verify command themselves,
+committed on their own branch, and reported `[DONE]`. Confirmed
+independently of each worker's own self-report: each worktree's real
+`git log -1` showed the correct, distinct commit, and `git status`
+showed a clean tree in all three — no cross-writes, no missing files, no
+partial state. `fgos return` then ran for real against all 3
+(re-verifying independently, never trusting the worker's own say-so, per
+the coding-worker-contract) — all three: `passed: true`, `doing` →
+`awaiting-approval`. This coordinating session's own `pwd`/`git
+rev-parse --show-toplevel` was checked immediately before dispatch and
+immediately after all 3 settled — unaffected both times, as expected
+(this path never calls a tool the Claude-Code isolation guard watches at
+all).
+
+**Confirms the user's design point directly, not just in theory:**
+concurrent dispatch that never calls `EnterWorktree` — because the
+concurrency lives at the OS-subprocess level, with `cwd` set once at
+spawn time by ordinary Node code rather than negotiated turn-by-turn
+through a shared Claude-Code-session tool — has no exposure to the
+session-scoped-isolation-guard hazard Steps 1-3 spent this whole
+investigation on. It is not a workaround for that hazard; it is a
+different mechanism that the hazard's own precondition (calling
+`EnterWorktree`) never applies to.
+
+**What this changes about tsk-4bq's own framing.** tsk-4bq (filed
+earlier today) already found that `fgos-fanout`, run exactly as written,
+refuses to fire ANY candidate once `fgos-coding-implement` is pinned
+out-of-process — it only ever fires native Task-tool Agents, and treats
+`out-of-process` as "report this candidate as needing a person" rather
+than as a real, working alternative dispatch path. Today's result adds
+the missing half of that picture: the out-of-process path it refuses to
+use is not just "also available" — it is demonstrably MORE reliable for
+concurrent worktree claiming than the native path this investigation
+spent three steps failing to make safe. tsk-4bq's own scope should widen
+from "the capability pin blocks fanout" to "fgos-fanout should actually
+dispatch out-of-process candidates for real (its own Hard rule already
+distinguishes the mechanism per-candidate; it just has no firing path for
+anything but `in-process` today), not merely detect and defer them to a
+person" — recorded as a decision on tsk-4bq itself, not just here.
+
+Cleanup performed: all 3 worktrees/branches removed from disk;
+`tsk-2lr`/`tsk-3yc`/`tsk-1fki`/`tsk-8bs` moved to `wontfix` (via `todo`,
+the only reachable edge from `awaiting-approval`).
