@@ -62,6 +62,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   refused just as cleanly. Every existing item and every existing log
   replays byte-for-byte unaffected — `holder` and the two new event kinds
   are both fully optional/lazy, never present unless actually used.
+- `runner.executors.pi` — `pi` (`@earendil-works/pi-coding-agent`)
+  registered as a second `agent`-kind executor alongside `agy`, via
+  `fgos setup`'s existing config-default merge (no manual `.fgos/
+  config.json` edit needed). Invocation shape: `pi --provider openai-codex
+  --model gpt-5.5 --tools <allowlist> --mode json --approve -p <prompt>`,
+  confirmed live against the coding-domain worker contract (a genuinely
+  disposable work item, both a correct cold-pickup refusal and a correct
+  commit-and-`[DONE]` completion) — see
+  `docs/history/pi-executor-runtime-capacity/RESEARCH.md`.
 
 - `codex` (OpenAI Codex CLI) wired as a new out-of-process dispatch
   executor (`.fgos/config.json`'s `runner.executors.codex`), using
