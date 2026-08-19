@@ -118,3 +118,33 @@ followed by re-reading `scripts/check-decision-citation-drift.baseline.json`'s
 total finding count and confirming it dropped from today's real baseline
 (1679), the same "regenerate, then assert a real count change" shape every
 delivered sibling item in this feature already used.
+
+## Round 2 — 2026-08-19 (scope narrowed after materialization)
+
+**Asked:** user reported tsk-2sp's own description was updated externally
+to narrow scope; re-read the item to find what changed and reconcile it
+against the 5 children already materialized in round 1.
+
+**Checked:** `fgos list --id tsk-2sp --json` (fresh read) — description
+now reads: scope is the 12 non-skill baseline files (1019 findings) only;
+the `.agents/skills`/`plugins/fgOS/skills` scope (660 findings) moved to
+`tsk-56w`, citing a stricter fix rule locked at
+`docs/history/skill-prose-cleanup/DISCUSSION.md` D1 (remove governance
+ids outright, never gloss — `plugins/fgOS/skills` ships standalone via
+marketplace with no `docs/` alongside it, so even a glossed citation is
+dead on arrival there). Also checked `fgos list --id tsk-56w --json`:
+real item, `status: doing`, `stage: discovery` — mid-flight elsewhere,
+not something this session should touch beyond confirming it exists.
+
+**Found:** the narrowed scope (1019 findings, 12 files) is EXACTLY the
+sum of this round 1 plan's children 1+2+5 (301+412+306), file-for-file
+(`work-state.md` + `runner.md` + the same 10-file remaining-docs bucket).
+Children 3 and 4 (the skill-prose mirror + plugin-only children, 660
+findings) are the exact set that moved to `tsk-56w`. No re-slicing
+needed — the original natural fault lines already drew this exact
+boundary, coincidentally (or not: skill-prose files were always a
+structurally distinct bucket from doc-prose files in this plan).
+
+**Verdict:** children 3/4 retired `wontfix` (their gloss-based `action`
+text now contradicts `tsk-56w`'s locked stricter rule); a decision was
+recorded on `tsk-2sp` explaining why; children 1/2/5 need no changes.

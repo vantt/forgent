@@ -1,5 +1,35 @@
 # Plan — tsk-2sp: remaining citation-format backlog
 
+## Addendum (2026-08-19): scope narrowed, tsk-2sp-3/tsk-2sp-4 retired
+
+Item description updated externally, coordinating with `tsk-56w`
+(`docs/history/skill-prose-cleanup/DISCUSSION.md` D1): `tsk-2sp` now
+covers only the 12 non-skill baseline files (1019 findings) —
+`docs/specs/*.md` (the 11 files below) + `docs/backlog.md`. The
+`.agents/skills/**/SKILL.md` + `plugins/fgOS/skills/**/SKILL.md` scope
+(660 findings, this plan's original children 3 and 4) is now owned by
+`tsk-56w`, which locked a STRICTER rule for those files — remove every
+governance id outright (never gloss, never footnote), because
+`plugins/fgOS/skills` ships standalone via marketplace with no `docs/`
+alongside it. That contradicts children 3/4's own gloss-based `action`
+text below, so both are **retired `wontfix`**, not reworked — the correct
+fix approach for that scope lives entirely in `tsk-56w` now, not here.
+
+`tsk-2sp-1` (`work-state.md`, 301), `tsk-2sp-2` (`runner.md`, 412), and
+`tsk-2sp-5` (remaining `docs/*.md`, 306) are **unaffected** — their
+combined scope (301+412+306 = 1019) already matches the narrowed
+description exactly, files-for-files, no further re-split needed. No
+dependency is required between `tsk-2sp` and `tsk-56w` after this split —
+both scopes are now disjoint and can run in parallel per the item's own
+updated description.
+
+The rest of this file (Approach/Split/child specs, including the now-
+retired children 3/4) is kept as-is below for traceability — it recorded
+real evidence and a real gate history (two `need-human` rounds, both
+resolved) that produced the three children that ARE still live. Do not
+edit the historical numbers/evidence below; this addendum is the current
+scope of record.
+
 Mode: **standard**
 
 Lane decided via `fgos-routing`'s Mode-gate direct-entry fallback (no
