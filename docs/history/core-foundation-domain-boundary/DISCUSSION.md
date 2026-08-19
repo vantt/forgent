@@ -10,6 +10,33 @@ status: open
 
 ## 1. Trạng thái hiện tại
 
+Round 19 tiếp (2026-08-19), D22: Sau khi làm xong việc dở dang round 18
+(xem đoạn dưới), người đặt câu hỏi mới: đã gom DISPATCH thành 1 khái
+niệm dùng chung (D21) rồi thì bố cục 3-tầng DISPATCH/ROUTING/DRIVING vẽ
+ở §6 (xếp chồng, chạy 1→2→3) có đúng không. Trợ lý scout `dispatch.mjs`
+tìm ra 2 điểm vào thật (`spawnWorker` root-spawn vs `decideDispatchMechanism`
+in-session decide) — đề xuất DISPATCH là dịch vụ bị gọi lặp lại, không
+phải tầng-chạy-1-lần. Người hỏi tiếp "root-spawn là gì" — trợ lý giải
+thích + chỉ ra: session tương tác NGƯỜI tự mở KHÔNG đi qua root-spawn,
+là 1 đường thứ 3 ngoài `dispatch.mjs`. Người hỏi tiếp: pick(1)/discover(2)/
+exploring(3)/planning(4)/executing(5)/review(6) có phải mỗi cái là 1
+ứng viên dispatch — trợ lý TRẢ LỜI SAI ban đầu ("stage-entry tự nó không
+dispatch, chỉ dòng Collaboration mới dispatch"). **Người bác đúng**: "nếu
+không phải thì thiết kế workflow/stage/task-spec/agent/skill dispatch
+(bundle mix load) làm gì?" — trợ lý scout lại (`judge-ambiguity.md`/
+`lock-decisions.md`/`implement-item.md` đều `position: implementer`),
+nhận ra role (seat) và skill (D20's `requires-skill`) là 2 trục khác
+nhau — `bundleForStage` (D14) đã sẵn cơ chế khớp CHO CẢ stage-entry, chỉ
+là hôm nay no-op vì thiếu dữ liệu (`roleGraph` 1 role + chưa ai viết
+`requires-skill` khác nhau). → **D22** (seq 20826): DISPATCH
+eligibility-check là 1 cơ chế THỐNG NHẤT cho MỌI điểm cần role (stage-entry
+VÀ dòng Collaboration), không riêng gì Collaboration. §6's subsection
+DISPATCH được viết lại HOÀN TOÀN (diagram mới: session-origin 2 đường
+song song → ROUTING → DRIVING với 1 điểm ELIG dùng chung cho cả
+stage-entry lẫn Collaboration-row) — hợp nhất luôn subsection "Eligibility
+declaration" cũ (D20) vào chung 1 chỗ thay vì tách riêng. 22/22 quyết
+định đã chốt. Người xác nhận: "đồng ý, mãi mới thấy rõ chổ này."
+
 Round 19 (2026-08-19): Làm nốt việc dở dang round 18 để lại. (1) D20 đã
 đưa vào §6: thêm subsection mới "Eligibility declaration — đảo hướng
 (D20/D21)" sau khối diagram DISPATCH, mô tả cụ thể trước/sau bằng bằng
@@ -306,6 +333,7 @@ thi thật.
 | 26 | Agent-type/persona/team-collab đặt vào đâu trong cơ chế dispatch, và "2 flow nối tiếp" (PO+BA rồi Tech-Lead+SWE+Tester) có cần 2 workflow riêng? | Chốt — D15 | Không cần 2 workflow. Persona resolve theo `(domain, stage, role)` thay vì chỉ `(domain, role)` — cùng roleGraph, cùng role (`implementer`), khác persona theo cụm stage. Team-hợp-tác = chuỗi sync call (holder không đổi, D8) tới nhiều persona, KHÔNG multi-holder cùng lúc; song song thật = decompose ra item con (`fgos-fanout`, có sẵn). **[Round 19: câu so sánh marketing-cockpit gốc ở đây đã LỖI THỜI so với D20 — xem §6 subsection "Eligibility declaration" cho bản đã sửa; tóm tắt: `claims` không phải "đi xa hơn", D20 đã đảo ngược chính hướng đó.]** CỐ Ý CHƯA XÂY: ranh giới stage-đổi-persona-ngầm có nên cũng dừng driving — chưa có bằng chứng đa dạng persona thật. |
 | 27 | Workflow definition sống ở đâu — có file riêng không, hay chỉ là key lồng trong registry.mjs? | Chốt — D18 | Chưa có file riêng hôm nay (chỉ `codingDomain.workflows.feature`, reference-sharing với top-level field, D7a). `domains/<name>/workflows/<name>.mjs` là nơi ở chính thức mới — `registry.mjs` thành aggregator cho map `workflows` của chính nó, mirror D4 một tầng sâu hơn. |
 | 28 | `agents/*.yaml`→`.claude/agents/*.md` render-pair (như skill's D7) nên tách vào `domains/<name>/agents/` hay giữ nguyên top-level `agents/`? | Chưa rõ (đề xuất round 19, chờ xác nhận) | Scout thật: `scripts/project-agents.mjs` chiếu `agents/*.yaml` (SOURCE_DIR top-level) → `.claude/agents/*.md` (TARGET_DIR), độc lập hoàn toàn cơ chế skill-wrapper. Đề xuất: GIỮ top-level — D20 làm agent-type identity domain-agnostic-by-thiết-kế (1 agent-type đủ điều kiện xuyên domain qua `skills` dùng chung), khác skill/task-spec/knowledge vốn thật sự thuộc sở hữu 1 domain (lý do D3's tự-chứa không áp dụng ở đây). Xem §6. |
+| 29 | Diagram 3-tầng DISPATCH/ROUTING/DRIVING (D13) có bố cục đúng không — và stage-entry (discover/exploring/planning/executing) có phải ứng viên dispatch như dòng Collaboration không? | Chốt — D22 | KHÔNG đúng ở 2 điểm: (1) session-origin có 2 đường ngang hàng (root-spawn CHỈ runner-không-người, người tự mở session là đường khác NGOÀI `dispatch.mjs`), không chỉ 1; (2) stage-entry LÀ ứng viên dispatch, dùng CHUNG phép khớp `requires-skill`/`skills` (D20) với dòng Collaboration — nhìn no-op hôm nay chỉ vì thiếu dữ liệu (1 role xuyên mọi stage, chưa ai viết `requires-skill` khác nhau), không phải khác cơ chế. Xem §6 diagram mới. |
 
 ## 4. Quyết định đã chốt
 
@@ -332,6 +360,7 @@ thi thật.
 | D19 | Định dạng TÁC GIẢ VIẾT workflow-file tách khỏi HÌNH DẠNG RUNTIME. `domains/<name>/workflows/<name>.mjs` viết theo 1 block gộp mỗi stage (dễ đọc, học ergonomics của marketing-cockpit), NORMALIZE lúc load thành các map runtime hiện có (`stepMap`/`skillMap`/`taskSpecMap`/`transitions`, tách riêng, cùng key theo stage) — API `skillForStage`/`resolveWorkflow` KHÔNG đổi. | Người sửa lại 3 chỗ trợ lý bác vội trong bảng so sánh field-by-field: (1) `rigor`/`cognitive_tier` ĐÁNG học — đặt ở HEADER task-spec (mịn hơn cả workflow-level của họ), vì 1 stage cụ thể có thể cần rigor khác tier chung của item; (2) `approval_gates` ĐÁNG học — như 1 LỚP CẤU HÌNH khai báo nằm TRÊN cơ chế status/CTR005 sẵn có, không thay thế; (3) so sánh `stages` shape không phải chuyện copy list phẳng của họ — là tách RIÊNG ergonomics-viết (1 khối gộp mỗi stage, dễ đọc) khỏi shape-runtime (các map tách rời fgOS đã có, mọi resolver phụ thuộc, không đổi). |
 | D20 | Đảo hướng khai báo eligibility. Agent-type CHỈ khai `soul` (persona) + `skills` (năng lực của chính nó) — KHÔNG còn `claims: [task-spec-ids]`. Task-spec khai `assignable-to: [tên agent cụ thể]` HOẶC tối thiểu `requires-skill: [...]`. Eligibility = khớp giữa cái task-spec CẦN và cái agent-type CÓ, không phải danh sách agent-type tự liệt kê. | Người bác thẳng model `claims` của tsk-2t9c D12 (đã code thật, đã merge) — thêm 1 task-spec mới theo model cũ phải sửa MỌI agent-type liên quan (chi phí N×M); theo model mới thì KHÔNG đụng agent-type nào, chỉ khai task-spec cần skill gì. Khớp đúng ví dụ cũ "marketing-lead và tech-lead đều làm được PM" — cả 2 tự nhiên đủ điều kiện qua skill `pm` chung, không cần liệt kê tay ở 2 nơi. Đây là ĐẢO NGƯỢC thật 1 phần D12 đã shipped — cần việc thực thi riêng ngoài scope discussion này. |
 | D21 | 3 tầng dispatch (D13) map THẲNG vào 3 cơ chế fgOS ĐÃ CÓ TÊN, ĐÃ BUILD — không phải khái niệm mới. DISPATCH = chính `src/runner/dispatch.mjs` (mở rộng theo D20 để resolve `agentType` qua khớp-skill thay vì đọc config tĩnh). ROUTING = chính `fgos-routing`. DRIVING = chính `fgos-coding-driving`. Rút lại đề xuất đổi tên "CASTING". | Người: đã có concept quan trọng (routing, driver) thì dùng, chế thêm từ mới không hay. Xem lại: `dispatch.mjs` đã có sẵn `buildAgentTypeExecutor(baseExecutor, agentType)` — 1 chỗ ĐÃ CHỜ SẴN để nhận `agentType` — D20 chỉ nâng cấp CÁCH giá trị đó được resolve, không phải thêm 1 tầng song song. Đóng góp thật của mô hình 3 tầng là gọi tên ĐÚNG THỨ TỰ 3 cơ chế có sẵn ghép lại, và LÝ DO (soul không hoán đổi giữa chừng session) — không phải phát minh khái niệm mới. |
+| D22 | DISPATCH's eligibility-check là 1 CƠ CHẾ THỐNG NHẤT, xảy ra ở MỌI điểm cần role — không chỉ dòng Collaboration. Stage-entry (`bundleForStage`, D14, role CHÍNH) và dòng Collaboration (consult/assist/review/advise, role PHỤ) đều khớp qua CÙNG phép match D20 (`requires-skill`/`assignable-to` của task-spec ↔ `skills` của agent-type) — khác nhau chỉ ở task-spec NÀO đang được khớp. Stage-entry nhìn như no-op hôm nay CHỈ VÌ `roleGraph` có 1 role xuyên mọi stage + chưa ai viết `requires-skill` khác nhau cho từng task-spec — KHÔNG PHẢI vì cơ chế khác dòng Collaboration. Session-origin cũng có 2 đường ngang hàng dẫn vào CÙNG 1 downstream ROUTING/DRIVING: root-spawn (`spawnWorker`, chỉ runner-không-người) HOẶC người tự mở Claude Code trực tiếp (hoàn toàn ngoài code `dispatch.mjs`). | Người bác bỏ đúng phát biểu sai của trợ lý ("stage transition tự nó KHÔNG dispatch") bằng câu hỏi ngược: "nếu không phải thì thiết kế workflow/stage/task-spec/agent/skill dispatch (bundle mix load) làm gì?". Scout xác nhận `judge-ambiguity.md`/`lock-decisions.md`/`implement-item.md` đều `position: implementer` (role đứng yên mọi stage hôm nay) — nhưng role (seat, `roleGraph`) và skill (năng lực, `requires-skill` D20) là 2 TRỤC khác nhau; `bundleForStage`'s task-spec riêng mỗi stage, một khi mang `requires-skill` (D20), khiến stage-entry trở thành 1 phép khớp dispatch THẬT, chỉ suy biến thành no-op hôm nay vì thiếu đa dạng persona/skill, không phải khác biệt thiết kế. |
 
 ## 5. Q&A log
 
@@ -540,6 +569,22 @@ thi thật.
   tìm thêm chỗ stale nào khác. Phân tích 2 việc mở cũ (render-pair
   placement, doctrine domain-scoped), đề xuất hướng cho cả 2, CHƯA khoá
   D-ID — chờ người xác nhận round sau.
+- 2026-08-19 — Round 19 tiếp, D22: người hỏi bố cục 3-tầng
+  DISPATCH/ROUTING/DRIVING (§6) có đúng không sau khi D21 gom DISPATCH
+  thành 1 khái niệm. Trợ lý scout `dispatch.mjs` 2 điểm vào (`spawnWorker`
+  root-spawn dòng 1693, `decideDispatchMechanism` in-session decide dòng
+  1275-1329) — đề xuất DISPATCH là dịch vụ lặp lại, không phải tầng-1-lần.
+  Người hỏi "root-spawn là gì" — trợ lý phân biệt root-spawn (chỉ
+  runner-không-người) vs người tự mở session (ngoài `dispatch.mjs`).
+  Người hỏi tiếp pick/discover/exploring/planning/executing/review có
+  phải mỗi cái 1 ứng viên dispatch — trợ lý trả lời SAI ("stage-entry
+  không dispatch"). Người bác: "nếu không phải thì thiết kế
+  workflow/stage/task-spec/agent/skill dispatch (bundle mix load) làm
+  gì?" — trợ lý scout lại 3 task-spec header (`position: implementer`
+  cả 3), nhận ra role≠skill là 2 trục, `bundleForStage` (D14) đã có cơ
+  chế khớp cho CẢ stage-entry, chỉ no-op vì thiếu dữ liệu → D22 (seq
+  20826, ghi qua `fgos decision --id tsk-397`). Người xác nhận: "đồng ý,
+  mãi mới thấy rõ chổ này."
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -703,32 +748,83 @@ trong nguồn canonical trước khi render.
   suy diễn không có chất liệu, khác hẳn 5 mối quan tâm còn lại đều có
   tiền lệ/nhu cầu thật (STR52/STR89/tsk-2t9c) để dựa vào.
 
-### Tầng DISPATCH — điều phối workflow/stage/taskSpec/skill/persona (D13-D15)
+### Tầng DISPATCH/ROUTING/DRIVING — điều phối workflow/stage/taskSpec/skill/persona (D13-D15, D20-D22, sắp lại round 19)
 
-Ranh giới không gian (D1-D12) trả lời "cái gì sống ở đâu". Tầng này trả
+Ranh giới không gian (D1-D12) trả lời "cái gì sống ở đâu". Phần này trả
 lời "khi item thật chạy, ai làm gì, theo thứ tự nào, ai chủ động".
 Nguyên lý tổ chức duy nhất: **soul (persona của một session) không hoán
 đổi được giữa chừng session** — khác skill/task-spec, chỉ là văn xuôi đọc
 lại tự do bất cứ lúc nào.
 
+**Sửa lại bố cục (round 19, D22) — 2 phát hiện làm đổi hình dạng diagram
+cũ (từng vẽ DISPATCH/ROUTING/DRIVING như 3 tầng xếp chồng, chạy 1→2→3
+tuần tự):**
+
+1. **Session-origin có 2 đường ngang hàng, không chỉ 1.** DISPATCH's
+   root-spawn (`spawnWorker`, `dispatch.mjs:1693`, gọi từ `loop.mjs`) CHỈ
+   xảy ra khi runner-KHÔNG-người tự tạo worktree + spawn hẳn 1 process
+   headless mới. Khi NGƯỜI tự mở Claude Code (mặc định hay `claude
+   --agent X`) — như chính phiên thảo luận này — KHÔNG đi qua 1 dòng code
+   nào của `dispatch.mjs` cả; người tự quyết định persona. Cả 2 đường đều
+   nộp lại CÙNG 1 tiền đề cho ROUTING (session đã persona-cố-định,
+   `hasLiveTaskAccess` tự nhiên đúng) — ROUTING không cần biết session tới
+   từ đường nào.
+2. **DISPATCH không phải "tầng chạy 1 lần rồi thôi" — nó là dịch vụ bị
+   gọi LẶP LẠI, từ NHIỀU điểm, dùng CHUNG 1 phép khớp (D20/D22).** Có 2
+   loại điểm gọi, cả 2 đều khớp `requires-skill`/`assignable-to` (task-spec)
+   ↔ `skills` (agent-type) — chỉ khác NGUỒN task-spec:
+   - **Stage-entry** (role CHÍNH): mỗi lần DRIVING vào 1 stage mới,
+     `bundleForStage(domain, stage)` (D14) nạp task-spec CỦA STAGE ĐÓ.
+     Task-spec đó (sau D20) mang `requires-skill` riêng — phải khớp lại
+     với `skills` của agent-type ĐANG chạy.
+   - **Dòng Collaboration** (role PHỤ): consult/assist/review/advise
+     trong bảng Collaboration của MỖI task-spec — mỗi dòng gọi 1 role
+     khác (researcher/helper/reviewer/advisor), khớp `requires-skill`
+     của CHÍNH interaction đó.
+   Hôm nay stage-entry NHÌN như no-op (không quan sát được dispatch nào)
+   — scout xác nhận `judge-ambiguity.md`/`lock-decisions.md`/
+   `implement-item.md` đều `position: implementer` — nhưng đó là do (a)
+   `roleGraph` chỉ 1 role xuyên mọi stage, (b) chưa ai viết
+   `requires-skill` khác nhau cho từng task-spec — KHÔNG phải vì cơ chế
+   khác dòng Collaboration. Khi 1 trong 2 điều đó thay đổi (persona đa
+   dạng thật — D15's phần chưa xây; hoặc `requires-skill` viết thật —
+   D20's task {#task-eligibility-inversion}), stage-entry sẽ TỰ NHIÊN bắt
+   đầu dispatch quan sát được, không cần sửa cơ chế gì thêm.
+
 ```mermaid
 flowchart TB
-    subgraph L1["TẦNG 1 — DISPATCH (chọn AI, MỘT LẦN, trước khi session tồn tại)"]
-        D1a["src/runner/dispatch.mjs (D21 — chính nó, không phải tầng song song)<br/>buildAgentTypeExecutor (tsk-3sw, đã có thật)<br/>agentType resolve qua khớp-skill (D20), theo (domain, stage, role) — D15"]
-    end
-    subgraph L2["TẦNG 2 — ROUTING (xuyên domain, MỘT LẦN mỗi session,<br/>chạy TRONG session đã có persona cố định)"]
-        D2a["fgos-routing<br/>domain-agnostic — chọn máy móc domain nào áp dụng"]
-    end
-    subgraph L3["TẦNG 3 — DRIVING (lặp qua nhiều stage, CÙNG persona)"]
-        D3a["fgos-&lt;domain&gt;-driving<br/>bundleForStage(domain, stage) → {skill, taskSpec} — D14"]
-        D3b["ceiling mặc định = status:awaiting-approval<br/>ĐÚNG lúc async review handoff (D8 tsk-2t9c) fire"]
+    subgraph ORIGIN["Session-origin -- 2 đường ngang hàng (D22)"]
+        direction LR
+        rootspawn["root-spawn<br/>spawnWorker (dispatch.mjs)<br/>CHỈ runner-không-người"]
+        humanlaunch["người tự mở Claude Code<br/>(mặc định / --agent X)<br/>NGOÀI code dispatch.mjs"]
     end
 
-    L1 -- "spawn session AS persona X" --> L2
-    L2 -- "handoff, persona đã cố định" --> L3
-    D3a --> D3b
-    D3b -- "sync call (holder không đổi)<br/>→ driving TIẾP TỤC" --> D3a
-    D3b -- "async call/handoff<br/>(holder đổi = persona cần đổi)<br/>→ driving DỪNG, quay lại L1" --> L1
+    ORIGIN -->|"session đã persona-cố-định"| ROUTING
+
+    subgraph ROUTING["ROUTING -- fgos-routing (1 lần/session)"]
+        r1["chọn máy móc domain nào áp dụng<br/>KHÔNG gọi DISPATCH (chỉ Skill(), trong-session)"]
+    end
+
+    ROUTING --> DRIVING
+
+    subgraph DRIVING["DRIVING -- fgos-&lt;domain&gt;-driving (lặp qua stage)"]
+        stageEntry["Stage-entry (role CHÍNH)<br/>bundleForStage(domain, stage) -- D14"]
+        collabRow["Dòng Collaboration (role PHỤ)<br/>consult / assist / review / advise"]
+    end
+
+    stageEntry --> ELIG
+    collabRow --> ELIG
+
+    subgraph ELIG["DISPATCH eligibility-check -- THỐNG NHẤT (D20/D22)"]
+        match["requires-skill / assignable-to (task-spec)<br/>khớp skills (agent-type)"]
+    end
+
+    ELIG -->|"khớp -- cùng agent-type"| stay["Ở NGUYÊN in-process<br/>(hôm nay: LUÔN đúng cho stage-entry,<br/>role=implementer mọi stage)"]
+    ELIG -->|"không khớp / cần role khác"| handoff["Dispatch thật:<br/>sync (holder không đổi) hoặc<br/>async (holder đổi)"]
+
+    stay --> DRIVING
+    handoff -->|"sync -- xong, driving TIẾP TỤC"| DRIVING
+    handoff -.->|"async -- driving DỪNG,<br/>quay lại như 1 session-origin mới"| ORIGIN
 ```
 
 **Team-hợp-tác trong 1 stage (D15):** chuỗi sync call (consult/assist,
@@ -741,61 +837,28 @@ không phải concurrency trên cùng 1 item.
 theo cụm stage (PO+BA lúc discovery/exploring → Tech-Lead+SWE+Tester lúc
 planning) qua key `(domain, stage, role)` — cùng roleGraph, cùng
 role (`implementer`), khác persona. Field key thêm không tốn gì hôm
-nay (1 persona chung mọi stage) — chỉ mở cửa cho sau.
+nay (1 persona chung mọi stage) — chỉ mở cửa cho sau. (Round 19, D22:
+đây chính xác là "stage-entry eligibility-check" ở diagram trên — persona
+mặc định đổi = kết quả `ELIG` trả về "không khớp", tự nhiên kích hoạt
+`handoff`, không cần cơ chế riêng.)
 
-**So sánh marketing-cockpit (tham khảo, không bắt chước — cập nhật round
-19 theo D20):** `agents/*.md` của họ có field `skills:` (catalog
-multi-skill) nhưng KHÔNG được bất kỳ dispatch mechanism nào truy vấn
-runtime — gán agent→stage 100% hardcode trong `workflow.md` (PUSH, tác
-giả quyết lúc viết). fgOS's `claims` (tsk-2t9c D12, PULL, agent-type tự
-liệt kê `[task-spec-ids]`) từng được coi là "đi xa hơn" marketing-
-cockpit vì có runtime thật — nhưng D20 đã đảo ngược chính hướng đó (xem
-subsection ngay dưới): SAI hướng khai báo (agent liệt kê ID của task-spec
-là N×M maintenance) không phải là "đi xa hơn", chỉ là đi khác. D20 hội tụ
-về đúng TÊN field marketing-cockpit đã dùng (`skills:`, năng lực của
-CHÍNH agent-type, không phải danh sách ID bên ngoài) nhưng nối nó vào
-dispatch runtime thật (D21 mở rộng `dispatch.mjs`) — kết quả là một mô
-hình khác cả 2 tiền lệ: đúng SHAPE của marketing-cockpit + đúng CƠ CHẾ
-runtime-wired mà tsk-2t9c đã xây.
-
-**Cố ý CHƯA XÂY (D15):** liệu ranh giới stage-đổi-persona-ngầm (cùng
-role, persona mặc định khác, không có handoff tường minh) có nên
-cũng làm driving dừng — chưa có bằng chứng persona đa dạng thật để thiết
-kế theo, cùng kỷ luật grow-tasks-before-roles giữ `roleGraph` đóng ở 5
-role (D10 tsk-2t9c).
-
-### Eligibility declaration — đảo hướng (D20/D21, round 19)
-
-Tầng DISPATCH (D13) cần biết: **agent-type nào đủ điều kiện chạy 1
-role/task-spec call cụ thể?** tsk-2t9c D12 đã trả lời câu này bằng model
-`claims` — code THẬT, đã ship, 2 chỗ chạm chính xác đã scout:
-
-- `scripts/project-agents.mjs`: `validateDefinition` (dòng 120-125) chấp
-  nhận field `claims` optional trên `agents/<name>.yaml` (list ID
-  task-spec); `projectAgentMarkdown` (dòng 137-147) chép nguyên `claims`
-  đó vào frontmatter `.claude/agents/<name>.md`.
-- `src/setup/registrations.mjs`: doctor check `agent-claims-resolve`
-  (dòng 419-503, `checkAgentClaimsResolve`) đọc `claims:` thô từ text
-  yaml (`extractClaimsFromYamlText`), đối chiếu từng ID với
-  `allTaskSpecIds()` quét `docs/task-specs/<domain>/*.md`.
-
-**Vấn đề D20 chỉ ra:** hướng khai báo này bắt agent-type TỰ LIỆT KÊ từng
-task-spec ID nó nhận. Thêm 1 task-spec mới cần sửa MỌI agent-type liên
-quan (N×M) — và không giải thích được ví dụ "marketing-lead và tech-lead
-đều làm được PM" (round 14) trừ khi CẢ HAI đều tự liệt kê tay cùng 1 ID
-`lock-decisions`/`shape-plan` ở 2 file riêng.
-
-**D20 đảo hướng:** agent-type CHỈ khai cái NÓ CÓ (`soul` = `role`/
-`persona`/`decision_boundary` đã có sẵn trong `agents/*.yaml` hôm nay +
-`skills` MỚI — 1 list năng lực, KHÔNG còn `claims`). Task-spec khai cái
-NÓ CẦN — `assignable-to: [tên agent cụ thể]` (trường hợp hiếm, ghim
-cứng) hoặc tối thiểu `requires-skill: [...]` (trường hợp thường).
-Eligibility = phép khớp tại thời điểm DISPATCH giữa "task-spec cần gì"
-và "agent-type có gì" — không còn là danh sách agent-type tự bảo trì.
-D21 xác nhận: đây KHÔNG phải tầng mới — `dispatch.mjs` đã có sẵn
-`buildAgentTypeExecutor(baseExecutor, agentType)` (tsk-3sw) chờ nhận 1
-`agentType`; D20 chỉ đổi CÁCH giá trị đó được resolve (skill-match thay
-vì đọc `claims` tĩnh).
+**Eligibility declaration — đảo hướng (D20):** tsk-2t9c D12 (đã ship)
+trả lời "agent-type nào đủ điều kiện" bằng model `claims` — 2 chỗ chạm
+code thật đã scout: `scripts/project-agents.mjs`'s `validateDefinition`
+(dòng 120-125, chấp nhận `claims` optional trên `agents/<name>.yaml`) +
+`projectAgentMarkdown` (dòng 137-147, chép `claims` vào frontmatter
+`.claude/agents/<name>.md`); `src/setup/registrations.mjs`'s doctor check
+`agent-claims-resolve` (dòng 419-503) đối chiếu từng `claims` ID với
+`docs/task-specs/<domain>/*.md`. Vấn đề: agent-type TỰ LIỆT KÊ từng
+task-spec ID nó nhận — thêm 1 task-spec mới cần sửa MỌI agent-type liên
+quan (N×M), không giải thích được ví dụ "marketing-lead và tech-lead đều
+làm được PM" (round 14) trừ khi cả 2 tự liệt kê tay cùng 1 ID ở 2 file
+riêng. D20 đảo hướng: agent-type CHỈ khai cái NÓ CÓ (`soul` = `role`/
+`persona`/`decision_boundary` đã có + `skills` MỚI, KHÔNG còn `claims`);
+task-spec khai cái NÓ CẦN (`assignable-to: [...]` hiếm/ghim cứng, hoặc
+`requires-skill: [...]` thường). D22 mở rộng: phép khớp này áp dụng cho
+CẢ stage-entry (task-spec chính) LẪN dòng Collaboration (task-spec phụ)
+— không riêng gì Collaboration như bản D20 gốc ngụ ý.
 
 ```mermaid
 flowchart LR
@@ -807,19 +870,42 @@ flowchart LR
         at_old -->|"tự liệt kê ID"| ts_old1
         at_old -->|"tự liệt kê ID"| ts_old2
     end
-    subgraph NEW["Mới (D20) -- match tại DISPATCH"]
+    subgraph NEW["Mới (D20/D22) -- match tại DISPATCH, mọi điểm cần role"]
         direction TB
         at_new["agent-type A<br/>skills: [pm, code-review]"]
-        ts_new1["task-spec shape-plan<br/>requires-skill: [pm]"]
-        ts_new2["task-spec review-item<br/>requires-skill: [code-review]<br/>assignable-to: [] (mở)"]
-        at_new -.->|"skill-match, DISPATCH (D21)"| ts_new1
-        at_new -.->|"skill-match, DISPATCH (D21)"| ts_new2
+        ts_new1["task-spec shape-plan (stage-entry)<br/>requires-skill: [pm]"]
+        ts_new2["task-spec review-item (Collaboration row)<br/>requires-skill: [code-review]"]
+        at_new -.->|"skill-match, DISPATCH (D22)"| ts_new1
+        at_new -.->|"skill-match, DISPATCH (D22)"| ts_new2
     end
 ```
 
-Chưa xác nhận D-ID mới cho phần này (chỉ D20/D21 đã chốt từ trước, phần
-này là §6 phản ánh lại) — 4 điểm chạm code thật liệt kê ở trên là scope
-của task {#task-eligibility-inversion} §7.
+4 điểm chạm code thật liệt kê ở đoạn trên là scope của task
+{#task-eligibility-inversion} §7 — chưa đổi gì thêm sau D22, D22 chỉ mở
+rộng PHẠM VI áp dụng của cùng 1 cơ chế, không thêm điểm chạm code mới.
+
+**So sánh marketing-cockpit (tham khảo, không bắt chước — cập nhật round
+19 theo D20):** `agents/*.md` của họ có field `skills:` (catalog
+multi-skill) nhưng KHÔNG được bất kỳ dispatch mechanism nào truy vấn
+runtime — gán agent→stage 100% hardcode trong `workflow.md` (PUSH, tác
+giả quyết lúc viết). fgOS's `claims` (tsk-2t9c D12, PULL, agent-type tự
+liệt kê `[task-spec-ids]`) từng được coi là "đi xa hơn" marketing-
+cockpit vì có runtime thật — nhưng D20 đã đảo ngược chính hướng đó: SAI
+hướng khai báo (agent liệt kê ID của task-spec là N×M maintenance) không
+phải là "đi xa hơn", chỉ là đi khác. D20 hội tụ về đúng TÊN field
+marketing-cockpit đã dùng (`skills:`, năng lực của CHÍNH agent-type,
+không phải danh sách ID bên ngoài) nhưng nối nó vào dispatch runtime
+thật (D21/D22 mở rộng `dispatch.mjs`) — kết quả là một mô hình khác cả 2
+tiền lệ: đúng SHAPE của marketing-cockpit + đúng CƠ CHẾ runtime-wired mà
+tsk-2t9c đã xây.
+
+**Cố ý CHƯA XÂY (D15):** liệu ranh giới stage-đổi-persona-ngầm (cùng
+role, persona mặc định khác, không có handoff tường minh) có nên
+cũng làm driving dừng — chưa có bằng chứng persona đa dạng thật để thiết
+kế theo, cùng kỷ luật grow-tasks-before-roles giữ `roleGraph` đóng ở 5
+role (D10 tsk-2t9c). (Round 19, D22: câu hỏi này giờ có câu trả lời CƠ
+CHẾ sẵn — diagram trên đã tự nhiên trả lời "có" nếu `ELIG` trả về "không
+khớp" — chỉ còn thiếu DỮ LIỆU thật để quan sát, không thiếu thiết kế.)
 
 ### Ý tưởng học từ marketing-cockpit — CHƯA XÂY, ghi nhận để không quên (round 17)
 
@@ -1062,7 +1148,9 @@ lượt riêng, để chỉ đụng `stage-fsm.mjs` (module test dày đặc nh�
      `claims` tĩnh — điểm chạm DISPATCH thật của toàn bộ đảo hướng này.
 - **§6 excerpt áp dụng:** subsection "Eligibility declaration — đảo
   hướng (D20/D21, round 19)" + mermaid so sánh cũ/mới trong khối đó.
-- **D-ID áp dụng:** D20, D21.
+- **D-ID áp dụng:** D20, D21, D22 (D22: phép khớp `requires-skill` phải
+  áp dụng cho task-spec CHÍNH của stage — không chỉ task-spec của dòng
+  Collaboration — để stage-entry dispatch thật sự quan sát được).
 - **Quan hệ:** độc lập với {#task-domain-registry-split} (không đụng
   `codingDomain`/`registry.mjs`) — có thể làm song song; NẾU
   task-domain-registry-split + D9 (di dời `docs/task-specs/coding/` →
