@@ -95,10 +95,23 @@ watching this session sees nothing while the executor is actually
 running. Monitor's own event stream is stdout-only, so fold the live
 stderr tee into it with `2>&1`; each line then becomes its own live
 notification while the process is still running — this is the real,
-intended relay channel for a live agent session, not a workaround:
+intended relay channel for a live agent session, not a workaround.
+
+**Filter the tee — never pipe it raw** (tsk-4bq's own dispatch of itself
+hit exactly the failure mode this line exists to prevent: an executor
+that iterates by re-running its own full verify command several times
+mid-run flooded the relay with repeated full-suite output, tripping
+Monitor's own rate-limit and needing a manual `TaskStop`). Monitor's own
+tool guidance already says this generally — "never pipe raw logs; filter
+to exactly the success and failure signals you care about" — apply it
+here specifically: keep the executor's real signal lines (`[DONE]`,
+`[BLOCKED]`, an error/failure marker) and the one line that matters
+structurally, the final JSON result (always starts a line with `{`, since
+it is `JSON.stringify` output) — drop everything else, including a
+verbose test runner's own line-by-line pass output:
 
 ```bash
-node "$root/src/runner/dispatch.mjs" execute <EXECUTOR_ID> --prompt "<PROMPT_TEMPLATE built as below>" [--has-live-task-access] 2>&1
+node "$root/src/runner/dispatch.mjs" execute <EXECUTOR_ID> --prompt "<PROMPT_TEMPLATE built as below>" [--has-live-task-access] 2>&1 | grep -E --line-buffered '\[DONE\]|\[BLOCKED\]|Error|FAIL|✗|^\{'
 ```
 
 **When this session is isolated in a worktree and `<PROMPT_TEMPLATE>` is
