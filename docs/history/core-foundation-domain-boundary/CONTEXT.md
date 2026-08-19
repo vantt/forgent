@@ -117,13 +117,13 @@ D-ID above: `docs/history/core-foundation-domain-boundary/DISCUSSION.md`
   alongside it; both rules live in the same enforcement mechanism.
 - Impact-analysis capability gate (`fgos tool query --capability
   impact-analysis --status present`): **GitNexus present** (`mcp`,
-  `Verification` responsibility) — but this session's own commits (24
-  commits landing D1-D34 across the shaping conversation) postdate the
-  last index; a system reminder already flagged `GitNexus index is stale`.
-  **Planning must re-run `gitnexus analyze` before trusting any blast-radius
-  number it cites** — a stale index on a change this size is a real risk,
-  not a formality (per this repo's own capability-gate doctrine in
-  `CLAUDE.md`: present-but-stale is "Degraded", not "Full").
+  `Verification` responsibility). Index was stale after this session's own
+  commits (D1-D34) — re-indexed during this exploring pass (`npx gitnexus
+  analyze`, 72.8s, 19,129 nodes / 26,811 edges / 554 clusters / 300 flows).
+  **Full posture confirmed fresh** — planning can trust blast-radius
+  queries without re-indexing first, but should re-check freshness again
+  if planning spans more than a short session (per `CLAUDE.md`'s own
+  capability-gate doctrine).
 - 459 real matches for `workflow-stage-graphs` across 178 files (`rg`,
   scoped to `src`/`bin`/`test`/`docs`/`dogfood-fixture`) confirm this is a
   widely-depended-on kernel module — every task in §7 that touches it
