@@ -66,7 +66,7 @@ import {
   EXIT_CODES,
 } from '../state/store.mjs';
 import { DEFAULTS, truncateTitle } from '../state/work.mjs';
-import { getDomain, stageForStep } from '../state/workflow-stage-graphs.mjs';
+import { getDomain, resolveWorkflow, stageForStep } from '../state/workflow-stage-graphs.mjs';
 import { resolveAction, resolveStaleDoing } from './recovery.mjs';
 import {
   visitCount,
@@ -1294,7 +1294,8 @@ export async function runOnce(options = {}) {
         // it just because `stageForStep` no longer resolves NEW items
         // there. Only activates when a domain declares both names
         // distinctly (today: only `coding`).
-        const legacyPlanStage = domain.stages?.includes('decompose') && planningStage !== 'decompose' ? 'decompose' : undefined;
+        const workflow = resolveWorkflow(domain, item.kind);
+        const legacyPlanStage = (workflow?.stages ?? domain.stages)?.includes('decompose') && planningStage !== 'decompose' ? 'decompose' : undefined;
         if (
           planningStage !== undefined &&
           (item.stage === planningStage || item.stage === legacyPlanStage) &&

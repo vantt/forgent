@@ -1,0 +1,95 @@
+# domains/coding/registry.yaml - domain registry declaration for coding domain (D30/D31)
+
+roleGraph:
+  roles:
+    - implementer
+    - researcher
+    - reviewer
+    - helper
+    - advisor
+  defaultRole: implementer
+  callstackCap: 3
+  edges:
+    discovery:
+      - from: implementer
+        to: researcher
+        reason: consult
+        mode: sync
+    exploring:
+      - from: implementer
+        to: advisor
+        reason: advise
+        mode: async
+      - from: implementer
+        to: researcher
+        reason: consult
+        mode: sync
+    planning: &planningEdges
+      - from: implementer
+        to: researcher
+        reason: consult
+        mode: sync
+      - from: implementer
+        to: advisor
+        reason: advise
+        mode: async
+    decompose: *planningEdges
+    executing:
+      - from: implementer
+        to: researcher
+        reason: consult
+        mode: sync
+      - from: implementer
+        to: helper
+        reason: assist
+        mode: sync
+      - from: implementer
+        to: reviewer
+        reason: review
+        mode: async
+      - from: implementer
+        to: advisor
+        reason: advise
+        mode: async
+      - from: reviewer
+        to: researcher
+        reason: consult
+        mode: sync
+      - from: reviewer
+        to: advisor
+        reason: advise
+        mode: async
+
+worktreeBacked: true
+
+statusLabels:
+  backlog: backlog
+  todo: todo
+  doing: in-progress
+  blocked: in-progress
+  awaiting-human: in-progress
+  awaiting-approval: review
+  wontfix: canceled
+
+parkReason:
+  blocked: system-error
+  awaiting-human: human-question
+  awaiting-approval: natural-finish
+
+classification:
+  kind:
+    - bug
+    - chore
+    - design
+    - docs
+    - feature
+    - task
+  risk:
+    - light
+    - standard
+    - heavy
+
+workerContract: .agents/skills/_shared/coding-worker-contract.md
+
+defaultWorkflow: feature
+workflowFor: {}
