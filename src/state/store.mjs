@@ -1441,10 +1441,10 @@ export function footprintConflicts(dir) {
  * Same read-facade shape as `footprintConflicts`; the Domain core
  * (`graph-metrics.mjs`) computes both, this just rebuilds the view.
  */
-export function computedSchedule(dir) {
+export function computedSchedule(dir, candidateIds) {
   const { logPath } = paths(dir);
   const view = rebuildView(logPath);
-  return { ...computeSchedule(view), cycles: detectCycles(view) };
+  return { ...computeSchedule(view, candidateIds), cycles: detectCycles(view) };
 }
 
 /**

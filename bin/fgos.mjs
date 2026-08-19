@@ -2548,7 +2548,9 @@ async function runVerb(verb, flags, positional, dir) {
     // (src/state/store.mjs) — never reimplements the layering/cycle logic
     // here.
     case 'schedule': {
-      return computedSchedule(dir);
+      // Optional --candidates <id1,id2,...> flag scopes schedule to specified items
+      const candidateIds = flags.candidates ? String(flags.candidates).split(',').map((s) => s.trim()).filter(Boolean) : undefined;
+      return computedSchedule(dir, candidateIds);
     }
 
     // Request-class per D1 (same contract as `ready`/`triage`/`conflicts`): a
