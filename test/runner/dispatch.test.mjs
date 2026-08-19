@@ -109,6 +109,22 @@ function writeHangingExecutorWithOutput(dir) {
   return scriptPath;
 }
 
+/** Write a fake executor that delays for a specified time (ms) before returning JSON. */
+function writeSlowExecutor(dir, delayMs = 300) {
+  const scriptPath = path.join(dir, 'slow-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    setTimeout(() => {
+      process.stdout.write(JSON.stringify({ ok: true }));
+      process.exit(0);
+    }, ${delayMs});
+    `,
+  );
+  return scriptPath;
+}
+
+
 /** Write a fake executor that writes stdout and stderr as several SEPARATE
  * writes (not one flush), so onChunk observes multiple 'data' events instead
  * of collapsing to a single chunk. */
@@ -2992,6 +3008,76 @@ test('executeExecutorCli propagates resolveExecutorConfig\'s own RunnerConfigErr
   });
   await assert.rejects(() => executeExecutorCli('submit-assist-classify', { repoRoot: root, prompt: 'x' }), RunnerConfigError);
 });
+
+test('executeExecutorCli refuses a concurrent dispatch for the same cwd with DispatchError(dispatch-in-flight) (tsk-64hk)', async () => {
+  const { repoRoot } = mkTempGitRepo();
+  const dir = mkTempDir();
+  const scriptPath = writeSlowExecutor(dir, 300);
+  writeRunnerConfigFixture(repoRoot, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: { 'slow-executor': { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+
+  const testCwd = repoRoot;
+
+  // Start first dispatch
+  const firstPromise = executeExecutorCli('slow-executor', { repoRoot, cwd: testCwd, prompt: 'first' });
+
+  // Give first dispatch a brief moment to acquire the lock
+  await new Promise((r) => setTimeout(r, 50));
+
+  // Second dispatch for the SAME cwd must be refused with dispatch-in-flight
+  let caughtError = null;
+  try {
+    await executeExecutorCli('slow-executor', { repoRoot, cwd: testCwd, prompt: 'second' });
+  } catch (err) {
+    caughtError = err;
+  }
+
+  assert.ok(caughtError instanceof DispatchError, 'expected DispatchError');
+  assert.equal(caughtError.errorClass, 'dispatch-in-flight');
+  assert.ok(caughtError.message.includes('already in flight'));
+  assert.equal(caughtError.cwd, testCwd);
+
+  // Wait for first dispatch to finish cleanly
+  const firstResult = await firstPromise;
+  assert.equal(firstResult.status, 0);
+
+  // Subsequent dispatch for the SAME cwd succeeds now that the lock was released
+  const thirdResult = await executeExecutorCli('slow-executor', { repoRoot, cwd: testCwd, prompt: 'third' });
+  assert.equal(thirdResult.status, 0);
+});
+
+test('executeExecutorCli refuses with DispatchError(dispatch-in-flight) when lock file content is corrupt/ambiguous (tsk-64hk)', async () => {
+  const { repoRoot, fgosDir } = mkTempGitRepo();
+  const dir = mkTempDir();
+  const scriptPath = writeEchoExecutor(dir);
+  writeRunnerConfigFixture(repoRoot, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: { 'cli-executor': { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+
+  const testCwd = repoRoot;
+  const { dispatchLockFile } = await import('../../src/runner/main-checkout-lock.mjs');
+  const lockPath = path.join(fgosDir, dispatchLockFile(testCwd));
+  fs.writeFileSync(lockPath, 'INVALID-JSON-CORRUPT-LOCK');
+
+  let caughtError = null;
+  try {
+    await executeExecutorCli('cli-executor', { repoRoot, cwd: testCwd, prompt: 'test' });
+  } catch (err) {
+    caughtError = err;
+  }
+
+  assert.ok(caughtError instanceof DispatchError, 'expected DispatchError');
+  assert.equal(caughtError.errorClass, 'dispatch-in-flight');
+  assert.ok(caughtError.message.includes('ambiguous'));
+});
+
 
 test('the "execute" CLI entry point self-executes a real adapter-resolvable executor and prints the real result as JSON, never bare {command,args}', () => {
   const { repoRoot } = mkTempGitRepo();
