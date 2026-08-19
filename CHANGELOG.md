@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `runner.executors.claude` in `.fgos/config.json` — claude is now
+  addressable by name in dispatch (`decide claude`, `executors.claude`)
+  the same way `agy`/`codex`/`pi` already are, instead of only being
+  reachable through the anonymous top-level `runner.executor` default.
+  Same command/args as that default; no behavior change for existing
+  callers.
 - Three new read-only verbs: `fgos decision-index [--check]` generates
   `docs/decisions/index.md`, a projection of every platform/repo-wide
   decision (`fgos decision --scope <area>`) from `state.decisions`;
