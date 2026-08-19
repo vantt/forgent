@@ -12,10 +12,10 @@ Vùng doctrine của forgent: 8 luật thiết kế đã khóa, đứng trên m�
 
 ## Entry Points & Triggers
 
-- Trước khi thiết kế bất kỳ artifact bền, store, hay interface mới → đọc luật nền; thiết kế phải khai các phân loại bắt buộc (RUL1, RUL8, RUL4).
-- Mở đầu mọi review thiết kế tầng state → câu hỏi "log hay state?" (RUL1).
+- Trước khi thiết kế bất kỳ artifact bền, store, hay interface mới → đọc luật nền; thiết kế phải khai các phân loại bắt buộc (RUL1 (Log hay State ngay lúc thiết kế), RUL8 (mọi artifact khai mức bền tường minh), RUL4 (mỗi interface chọn theo audience)).
+- Mở đầu mọi review thiết kế tầng state → câu hỏi "log hay state?" (RUL1 (Log hay State ngay lúc thiết kế)).
 - Ngưỡng xem lại có tên của một luật bị chạm → mở lại luật đó qua thao tác "sửa luật" bên dưới.
-- Nghiệm thu mỗi phase của compound stack → hỏi lại sáu câu hỏi (RUL6).
+- Nghiệm thu mỗi phase của compound stack → hỏi lại sáu câu hỏi (RUL6 (agent lạ trả lời được sáu câu hỏi)).
 
 ## Data Dictionary
 
@@ -23,7 +23,7 @@ Vùng doctrine của forgent: 8 luật thiết kế đã khóa, đứng trên m�
 |---|---------|---------|--------|
 | 1 | Physics của artifact | Phân loại bắt buộc lúc thiết kế cho mọi dữ liệu bền | `log` — append-only, tổ chức theo feature/phiên, trả lời "làm sao tới đây", không bao giờ overwrite · `state` — overwrite theo reality, tổ chức theo area, trả lời "đang ở đâu" |
 | 2 | Tầng memory | Tầng mà một cơ chế nhớ thuộc về | `lower` — cơ học/raw/chính xác, chỉ dùng hai-physics, không TTL, không tự quên · `higher` — nơi agent học pattern: 4 loại memory (working/episodic/semantic/procedural) + consolidation, human-gated |
-| 3 | Mức bền (D1–D5) | Mức durability mọi artifact phải khai | `D1` — đề xuất chờ duyệt · `D2` — truth vĩnh viễn được commit · `D3` — bằng chứng phiên, nén được · `D4` — dựng lại được từ D2 · `D5` — chỉ tồn tại máy này |
+| 3 | Mức bền (5 cấp, nhãn chính thức tại `docs/platform-foundations.md` §L7) | Mức durability mọi artifact phải khai | đề xuất chờ duyệt · truth vĩnh viễn được commit · bằng chứng phiên, nén được · dựng lại được từ truth vĩnh viễn · chỉ tồn tại máy này |
 | 4 | Bậc trưởng thành (F0–F5) | Thang đo tiến hóa của platform, mỗi bậc có tiêu chí kiểm chứng | `F0` bare · `F1` lawful (luật thành văn, 6 câu trả lời bằng tay) · `F2` stateful (6 câu trả lời từ state) · `F3` routed (agent lạ tự tìm việc kế tiếp) · `F4` compounding (vòng predicted→actual chạy) · `F5` self-improving (học từ vận hành, human-gated) |
 | 5 | Ngưỡng xem lại | Điều kiện có tên mà khi chạm, luật phải được mở lại — luật không có ngưỡng là luật phân loại/acceptance, chỉ có thể thêm | điều kiện mô tả tường minh trong văn bản luật |
 | 6 | Changeset | Bản ghi thao tác ngữ nghĩa append-only, ghi cùng transaction với mutation, được commit — là truth mà mọi database view dựng lại từ đó | — |
@@ -40,7 +40,7 @@ Vùng doctrine của forgent: 8 luật thiết kế đã khóa, đứng trên m�
 ### Khai phân loại khi thiết kế artifact mới
 
 - **Runs when:** bất kỳ artifact bền, store, hay interface mới nào được thiết kế.
-- **Blocked when:** artifact không khai được physics (RUL1), mức bền (RUL8), hoặc — với interface — audience (RUL4): thiết kế đó là lỗi bị trả lại, không phải chi tiết để sau.
+- **Blocked when:** artifact không khai được physics (RUL1 (Log hay State ngay lúc thiết kế)), mức bền (RUL8 (mọi artifact khai mức bền tường minh)), hoặc — với interface — audience (RUL4 (mỗi interface chọn theo audience)): thiết kế đó là lỗi bị trả lại, không phải chi tiết để sau.
 - **What changes:** bản thiết kế mang các khai báo; reviewer thẩm định theo đúng các khai báo đó.
 - **Afterwards:** artifact vào đời với phân loại tra cứu được; file lai (vừa append vừa sửa) phải tách đôi.
 
@@ -61,23 +61,23 @@ Vùng doctrine của forgent: 8 luật thiết kế đã khóa, đứng trên m�
 
 ## Business Rules
 
-- **RUL1.** Mọi mẩu dữ liệu bền khai là Log hoặc State ngay lúc thiết kế; không khai được là lỗi thiết kế (L1, per ca7de3cf).
-- **RUL2.** Memory chạy đồng thời hai tầng: lower chỉ dùng hai-physics; higher dùng 4 loại memory + consolidation human-gated — hai mô hình không phủ định nhau (L2, per ca7de3cf).
-- **RUL3.** Truth của mọi database tương lai là changeset append-only được commit; database là view dựng lại được từ zero; graph store là view cấp 2 không bao giờ ghi ngược; mọi ghi qua MỘT cửa (L3, per ae461c8b).
-- **RUL4.** Không có mô hình routing toàn cục — mỗi interface chọn theo audience: prose-handoff cho agent↔agent trong chain; kỷ luật data (branch theo exit-code, decision-table, rediscover trước retry) cho consumer không-chắc-là-agent (L4, per 14ebeea9).
-- **RUL5.** Việc kế tiếp luôn là truy vấn dẫn xuất từ state, không bao giờ là danh sách tay (L4, per 14ebeea9).
-- **RUL6.** Platform "có harness" chỉ khi agent lạ không chat history trả lời được sáu câu: đọc gì trước / việc loại gì / chạm contract nào / rủi ro bao nhiêu / proof gì thì xong / bài học nào để lại — mọi phase nghiệm thu bằng sáu câu này (L5).
-- **RUL7.** Tiến hóa đo bằng thang F0–F5; mỗi bậc chỉ tuyên bố khi có bằng chứng chạy thật (L6).
-- **RUL8.** "Chạy xong ≠ đã merge ≠ đã bền" — mọi artifact khai mức bền D1–D5 tường minh (L7).
-- **RUL9.** Tầng doctrine nạp-mọi-turn tuân ba quy tắc: placement test một câu; transport đi kèm mệnh lệnh; mỗi rule có anchor phrase được check tự động assert (L8).
-- **RUL10.** Trend-history và reconsideration bookkeeping lưu policy-side, git-tracked (per ed953e09).
+- **RUL1 (Log hay State ngay lúc thiết kế).** Mọi mẩu dữ liệu bền khai là Log hoặc State ngay lúc thiết kế; không khai được là lỗi thiết kế (L1, per ca7de3cf).
+- **RUL2 (memory hai tầng — lower hai-physics, higher 4-loại + consolidation).** Memory chạy đồng thời hai tầng: lower chỉ dùng hai-physics; higher dùng 4 loại memory + consolidation human-gated — hai mô hình không phủ định nhau (L2, per ca7de3cf).
+- **RUL3 (truth = changeset append-only committed; database là view).** Truth của mọi database tương lai là changeset append-only được commit; database là view dựng lại được từ zero; graph store là view cấp 2 không bao giờ ghi ngược; mọi ghi qua MỘT cửa (L3, per ae461c8b).
+- **RUL4 (không routing toàn cục — mỗi interface chọn theo audience).** Không có mô hình routing toàn cục — mỗi interface chọn theo audience: prose-handoff cho agent↔agent trong chain; kỷ luật data (branch theo exit-code, decision-table, rediscover trước retry) cho consumer không-chắc-là-agent (L4, per 14ebeea9).
+- **RUL5 (việc kế tiếp luôn là truy vấn dẫn xuất từ state).** Việc kế tiếp luôn là truy vấn dẫn xuất từ state, không bao giờ là danh sách tay (L4, per 14ebeea9).
+- **RUL6 (agent lạ trả lời được sáu câu hỏi).** Platform "có harness" chỉ khi agent lạ không chat history trả lời được sáu câu: đọc gì trước / việc loại gì / chạm contract nào / rủi ro bao nhiêu / proof gì thì xong / bài học nào để lại — mọi phase nghiệm thu bằng sáu câu này (L5).
+- **RUL7 (tiến hóa đo bằng thang F0–F5, cần bằng chứng chạy thật).** Tiến hóa đo bằng thang F0–F5; mỗi bậc chỉ tuyên bố khi có bằng chứng chạy thật (L6).
+- **RUL8 (chạy xong ≠ merge ≠ bền — mọi artifact khai mức bền tường minh).** "Chạy xong ≠ đã merge ≠ đã bền" — mọi artifact khai mức bền tường minh theo 5 cấp của `docs/platform-foundations.md` §L7 (L7).
+- **RUL9 (doctrine nạp-mọi-turn: placement test, transport mệnh lệnh, anchor phrase).** Tầng doctrine nạp-mọi-turn tuân ba quy tắc: placement test một câu; transport đi kèm mệnh lệnh; mỗi rule có anchor phrase được check tự động assert (L8).
+- **RUL10 (trend-history + reconsideration bookkeeping lưu policy-side, git-tracked).** Trend-history và reconsideration bookkeeping lưu policy-side, git-tracked (per ed953e09).
 - **RUL11.** Việc trở nặng không vì bản chất nó lớn mà vì thiếu và quên — tên đúng của tình trạng đó là tùm lum, không phải nặng; thấy tùm lum thì gom lại, gom tới khi hết, quy mô không bao giờ là lý do miễn trừ, đích là ranh giới rõ và contract tường minh (per D-ADR0036).
 
 ## Edge Cases Settled
 
-- Ngưỡng xem lại của RUL3 đã có tên và bằng chứng thật: khi multi-agent write trở thành tải chính, luật được mở lại với beads (đã pivot sang db-as-truth ở đúng điều kiện đó) làm case study — không vá tại chỗ (ghi nhận 2026-07-14).
-- Higher layer không bao giờ thành hình → tầng 4-memory-type của RUL2 tự rơi, không để lại nợ.
-- Luật phân loại (RUL1) và acceptance test (RUL6) không có ngưỡng xem lại — RUL6 chỉ có thể THÊM câu hỏi.
+- Ngưỡng xem lại của RUL3 (truth = changeset append-only committed; database là view) đã có tên và bằng chứng thật: khi multi-agent write trở thành tải chính, luật được mở lại với beads (đã pivot sang db-as-truth ở đúng điều kiện đó) làm case study — không vá tại chỗ (ghi nhận 2026-07-14).
+- Higher layer không bao giờ thành hình → tầng 4-memory-type của RUL2 (memory hai tầng — lower hai-physics, higher 4-loại + consolidation) tự rơi, không để lại nợ.
+- Luật phân loại (RUL1 (Log hay State ngay lúc thiết kế)) và acceptance test (RUL6 (agent lạ trả lời được sáu câu hỏi)) không có ngưỡng xem lại — RUL6 (agent lạ trả lời được sáu câu hỏi) chỉ có thể THÊM câu hỏi.
 
 ## Open Gaps
 
@@ -96,7 +96,7 @@ Not applicable — không có màn hình.
 
 ## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)
 
-Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4, D5) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc.
+Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc.
 
 
 ### 0001 — Nhật ký sự kiện là sự thật; store/DB là bản chiếu dựng lại được
@@ -384,7 +384,7 @@ nhân đôi chỗ ghi, vi phạm KISS.
 - `docs/distillery/sources/beegog.md` — nguồn upstream: `evolving-loop-
   two-gates`, `grooming-project-first`, `product-root-repo-divorce-topology`.
 
-### 0036 — Khoá RUL11: "tùm lum", không phải "nặng"
+### 0036 — Khoá RUL11 (tùm lum không phải nặng): "tùm lum", không phải "nặng"
 
 #### Bối cảnh
 
@@ -422,13 +422,13 @@ tới khi hết, quy mô không bao giờ là lý do miễn trừ; đích của 
 là một hình dạng duy nhất: ranh giới rõ, contract tường minh, đổi và biến
 hình dễ, không chắp vá.
 
-Đây là luật chứ không phải ghi chú, theo đúng RUL9's ba quy tắc tầng
+Đây là luật chứ không phải ghi chú, theo đúng RUL9 (doctrine nạp-mọi-turn: placement test, transport mệnh lệnh, anchor phrase)'s ba quy tắc tầng
 doctrine nạp-mọi-turn: placement test một câu ("có cần đúng cả khi không
 có workflow nào đang chạy?" — có, đây là triết lý làm việc, không phải
 thủ tục theo workflow); transport đi kèm mệnh lệnh (anchor phrase mang cả
 câu lệnh, không chỉ trỏ nguồn); anchor phrase được check tự động assert
-(`test/docs/rul11-anchor-phrase.test.mjs`, item mở đường vì RUL1-RUL10
-hiện chưa có test loại này — không để mâu thuẫn im lặng với RUL9).
+(`test/docs/rul11-anchor-phrase.test.mjs`, item mở đường vì RUL1 (Log hay State ngay lúc thiết kế)-RUL10 (trend-history + reconsideration bookkeeping lưu policy-side, git-tracked)
+hiện chưa có test loại này — không để mâu thuẫn im lặng với RUL9 (doctrine nạp-mọi-turn: placement test, transport mệnh lệnh, anchor phrase)).
 
 Anchor phrase (giữ nguyên trên một dòng không xuống hàng, để search theo
 dòng khớp được), đặt tại `AGENTS.md`:
@@ -437,17 +437,17 @@ dòng khớp được), đặt tại `AGENTS.md`:
 khong phai no nang ma no tum lum
 ```
 
-Đây là THÊM một luật, không sửa luật đã khoá — RUL1-RUL10 không đổi.
+Đây là THÊM một luật, không sửa luật đã khoá — RUL1 (Log hay State ngay lúc thiết kế) tới RUL10 (trend-history + reconsideration bookkeeping lưu policy-side, git-tracked) không đổi.
 
 #### Hệ quả
 
-- `docs/specs/platform-foundations.md`'s Business Rules nhận `**RUL11.**`
-  ngay sau RUL10.
+- `docs/specs/platform-foundations.md`'s Business Rules nhận RUL11 (tùm lum không phải nặng)
+  làm một dòng luật mới (khoá dạng `**RULn.**`), ngay sau RUL10 (trend-history + reconsideration bookkeeping lưu policy-side, git-tracked).
 - `AGENTS.md` nhận một đoạn mới gần "## Changing a locked law", mang
   anchor phrase verbatim trên một dòng.
 - `test/docs/rul11-anchor-phrase.test.mjs` (mới) assert cả hai vị trí trên
-  chứa anchor phrase, và RUL11 tồn tại đúng khuôn `**RUL11.**` — item đầu
-  tiên mở pattern anchor-phrase-assertion cho RULn, RUL1-RUL10 chưa được
+  chứa anchor phrase, và RUL11 (tùm lum không phải nặng) tồn tại đúng khuôn `**RULn.**` — item đầu
+  tiên mở pattern anchor-phrase-assertion cho RULn, RUL1 (Log hay State ngay lúc thiết kế) tới RUL10 (trend-history + reconsideration bookkeeping lưu policy-side, git-tracked) chưa được
   bọc lại (không phải phạm vi item này).
 - Chứng cứ dẫn tới luật này (`tsk-2uf-1`/dispatch.mjs, `tsk-38h`/
   bin/fgos.mjs) là bằng chứng đã có sẵn, không phải việc gom thật mới —
@@ -459,5 +459,5 @@ khong phai no nang ma no tum lum
 - `tsk-7u7` — item sinh ra quyết định này.
 - `tsk-2uf-1` — bằng chứng thứ nhất (dispatch.mjs, 2204 dòng/6 concern).
 - `tsk-38h` — bằng chứng thứ hai (bin/fgos.mjs, GitNexus zero-index).
-- RUL9 (`docs/specs/platform-foundations.md`) — ba quy tắc tầng doctrine
-  mà RUL11 phải tuân để "dính" thay vì chỉ là khẩu hiệu.
+- RUL9 (doctrine nạp-mọi-turn: placement test, transport mệnh lệnh, anchor phrase; `docs/specs/platform-foundations.md`) — ba quy tắc tầng doctrine
+  mà RUL11 (tùm lum không phải nặng) phải tuân để "dính" thay vì chỉ là khẩu hiệu.
