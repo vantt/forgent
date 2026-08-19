@@ -406,7 +406,7 @@ function checkTaskSpecsResolve(cwd) {
     const taskSpecMap = domain.taskSpecMap;
     if (!taskSpecMap) continue;
     for (const [stage, specId] of Object.entries(taskSpecMap)) {
-      const specPath = path.join(cwd, 'docs', 'task-specs', domainName, `${specId}.md`);
+      const specPath = path.join(cwd, 'domains', domainName, 'task-specs', `${specId}.md`);
       if (!fs.existsSync(specPath)) {
         missing.push(`${domainName}.taskSpecMap.${stage} -> "${specId}" (${path.relative(cwd, specPath)} not found)`);
       }
@@ -415,20 +415,22 @@ function checkTaskSpecsResolve(cwd) {
   if (missing.length > 0) {
     return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };
   }
-  return { passed: true, message: 'every domain\'s taskSpecMap entry resolves to a real docs/task-specs/ file' };
+  return { passed: true, message: 'every domain\'s taskSpecMap entry resolves to a real domains/<domain>/task-specs/ file' };
 }
 
-// Every real task-spec id across every docs/task-specs/<domain>/ directory
+// Every real task-spec id across every domains/<domain>/task-specs/ directory
 // -- the resolution set checkAgentClaimsResolve validates each agent-type's
-// `claims` list against. Absent docs/task-specs/ entirely is not an error
+// `claims` list against. Absent domains/ or task-specs/ entirely is not an error
 // (a project that has not yet adopted the convention at all).
 function allTaskSpecIds(cwd) {
-  const root = path.join(cwd, 'docs', 'task-specs');
+  const root = path.join(cwd, 'domains');
   const ids = new Set();
   if (!fs.existsSync(root)) return ids;
   for (const domainEntry of fs.readdirSync(root, { withFileTypes: true })) {
     if (!domainEntry.isDirectory()) continue;
-    for (const file of fs.readdirSync(path.join(root, domainEntry.name))) {
+    const taskSpecsDir = path.join(root, domainEntry.name, 'task-specs');
+    if (!fs.existsSync(taskSpecsDir)) continue;
+    for (const file of fs.readdirSync(taskSpecsDir)) {
       if (file.endsWith('.md')) ids.add(file.slice(0, -'.md'.length));
     }
   }
@@ -584,7 +586,7 @@ registerCheck({
 
 registerCheck({
   id: 'task-specs-resolve',
-  description: 'every domain\'s taskSpecMap entry resolves to a real docs/task-specs/ file (tsk-2t9c D6/D9)',
+  description: 'every domain\'s taskSpecMap entry resolves to a real domains/<domain>/task-specs/ file (tsk-2t9c D6/D9)',
   check: (cwd) => checkTaskSpecsResolve(cwd),
 });
 
