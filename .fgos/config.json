@@ -36,6 +36,10 @@
       },
       "execute": {
         "description": "Compliance-driven work -- value comes from following the plan, changes files, must pass verify (D2, docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md)"
+      },
+      "fgos-coding-implement": {
+        "description": "code-implement work for the coding domain's executing stage",
+        "prefer": "agy"
       }
     },
     "executors": {
