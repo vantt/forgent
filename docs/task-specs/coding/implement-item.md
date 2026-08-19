@@ -1,6 +1,6 @@
 # task-spec: implement-item
 
-domain: coding | stage: executing | position: implementer
+domain: coding | stage: executing | role: implementer
 
 ## Input
 - `plan.md`, already validated (`READY`/`READY WITH CONSTRAINTS`).
@@ -30,7 +30,7 @@ domain: coding | stage: executing | position: implementer
 | A named library/API/pattern surfaces mid-implementation that cannot be resolved from context in hand | consult (sync) | researcher | consult | finding |
 | An independent scoped subtask exists whose footprint does not touch the file(s) currently being edited | assist (sync) | helper | assist | work product + diff |
 | `verify` is green (`fgos return` moved the item to `awaiting-approval`) | review (async) | reviewer | review | verdict + findings |
-| A product decision outside the locked D-IDs is needed, and the question passes material/grounded/answerable | advise (async) | human-advisor | advise | answer, recorded as a decision |
+| A product decision outside the locked D-IDs is needed, and the question passes material/grounded/answerable | advise (async) | advisor | advise | answer, recorded as a decision |
 | No trigger matches | — continue implementing — | | | |
 
 **Verify-green is the ONLY trigger for `review`.** A HIGH-risk change

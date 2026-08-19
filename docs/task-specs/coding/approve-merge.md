@@ -1,6 +1,6 @@
 # task-spec: approve-merge
 
-domain: coding | position: reviewer | reason: review | authority: hard-gate
+domain: coding | role: reviewer | reason: review | authority: hard-gate
 
 ## Input
 - An item at `awaiting-approval`, review already rendered by `review-item`.
