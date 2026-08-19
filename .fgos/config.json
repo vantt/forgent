@@ -38,8 +38,16 @@
         "description": "Compliance-driven work -- value comes from following the plan, changes files, must pass verify (P5, docs/history/dispatch-activation-and-handoff-redesign/DISCUSSION.md -- planned --for execute -> agy, never built: no caller invokes this purpose yet)"
       },
       "fgos-coding-implement": {
-        "description": "code-implement work for the coding domain's executing stage",
-        "prefer": "agy"
+        "description": "code-implement work for the coding domain's executing stage -- pinned to gemini-3.6-flash-medium via this capability's own providerModel/rigorOverrides (agy/gemini, lightweight policy tier; see modelPolicies.gemini.lightweight for the literal model string), not executors.agy's defaults",
+        "prefer": "agy",
+        "overrides": {
+          "providerModel": "gemini",
+          "rigorOverrides": {
+            "light": "lightweight",
+            "standard": "lightweight",
+            "heavy": "lightweight"
+          }
+        }
       }
     },
     "executors": {
