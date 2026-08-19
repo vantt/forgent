@@ -158,3 +158,16 @@ not as "deferred to a later item". That distinction is worth making
 explicitly at decision time: a deferred rename leaves a reader wondering
 whether the current name is wrong, while a settled "never" closes the
 question and lets the file set close with it.
+
+## The same alias policy governs spec-doc prose, not just code
+
+The drain-only-alias call above is about `stage`/`skillMap`/`stepMap` —
+live engine state. A separate, later sweep (`tsk-5eq`,
+`docs/history/spec-docs-lifecycle-realignment/`) applied the identical
+policy to prose: rewriting `docs/specs/work-state.md` (`tsk-1uw`) and
+`docs/specs/runner.md` (`tsk-2t5`) to describe the current stage names
+(`discovery`/`planning`) as primary, while both items' own instructions
+explicitly said to keep `decompose` mentioned as its legacy, drain-only
+alias rather than scrub every occurrence — the same "migrate what can
+move, alias what can't" split this file already documents, just applied
+to what a reader of the spec sees instead of what the engine resolves.
