@@ -83,6 +83,7 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'dispatch-decide-hook-wired',
       'task-specs-resolve',
       'agent-claims-resolve',
+      'agent-type-names-unique',
       'advise-execute-capabilities-configured',
       'decision-index-stale',
       'agy-permissions-configured',

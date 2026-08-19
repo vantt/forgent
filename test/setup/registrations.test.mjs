@@ -412,3 +412,32 @@ test('task-specs-resolve doctor check passes when core/task-specs/ and domain ta
   assert.equal(result.passed, true, `task-specs-resolve failed: ${result.message}`);
 });
 
+test('agent-type-names-unique doctor check passes when agent-type names are globally unique', () => {
+  const entry = DOCTOR_CHECKS.find((c) => c.id === 'agent-type-names-unique');
+  assert.ok(entry, 'agent-type-names-unique check must be registered');
+  const result = entry.check(process.cwd());
+  assert.equal(result.passed, true, `agent-type-names-unique failed: ${result.message}`);
+});
+
+test('agent-type-names-unique doctor check fails when duplicate agent-type names exist across sources (D33)', () => {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-unique-test-'));
+  try {
+    const coreDir = path.join(tempDir, 'core', 'agents');
+    const domainDir = path.join(tempDir, 'domains', 'coding', 'agents');
+    fs.mkdirSync(coreDir, { recursive: true });
+    fs.mkdirSync(domainDir, { recursive: true });
+
+    fs.writeFileSync(path.join(coreDir, 'dup.yaml'), 'name: dup-agent\nversion: 0.1.0\n');
+    fs.writeFileSync(path.join(domainDir, 'dup.yaml'), 'name: dup-agent\nversion: 0.1.0\n');
+
+    const entry = DOCTOR_CHECKS.find((c) => c.id === 'agent-type-names-unique');
+    const result = entry.check(tempDir);
+    assert.equal(result.passed, false);
+    assert.match(result.message, /duplicate agent-type name/);
+    assert.match(result.message, /"dup-agent"/);
+  } finally {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  }
+});
+
+
