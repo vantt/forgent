@@ -412,23 +412,45 @@ function checkTaskSpecsResolve(cwd) {
       }
     }
   }
+  const CORE_TASK_SPECS = [
+    'fgos-routing',
+    'fgos-clarifying',
+    'fgos-researching',
+    'fgos-unlock',
+    'fgos-fanout',
+    'fgos-indexing',
+    'distill',
+  ];
+  for (const specId of CORE_TASK_SPECS) {
+    const specPath = path.join(cwd, 'core', 'task-specs', `${specId}.md`);
+    if (!fs.existsSync(specPath)) {
+      missing.push(`core.taskSpec -> "${specId}" (${path.relative(cwd, specPath)} not found)`);
+    }
+  }
   if (missing.length > 0) {
     return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };
   }
-  return { passed: true, message: 'every domain\'s taskSpecMap entry resolves to a real docs/task-specs/ file' };
+  return { passed: true, message: 'every domain\'s taskSpecMap entry resolves to a real docs/task-specs/ file and core/task-specs/ contains all domain-agnostic task-specs' };
 }
 
-// Every real task-spec id across every docs/task-specs/<domain>/ directory
+// Every real task-spec id across every docs/task-specs/<domain>/ and core/task-specs/ directory
 // -- the resolution set checkAgentClaimsResolve validates each agent-type's
 // `claims` list against. Absent docs/task-specs/ entirely is not an error
 // (a project that has not yet adopted the convention at all).
 function allTaskSpecIds(cwd) {
   const root = path.join(cwd, 'docs', 'task-specs');
   const ids = new Set();
-  if (!fs.existsSync(root)) return ids;
-  for (const domainEntry of fs.readdirSync(root, { withFileTypes: true })) {
-    if (!domainEntry.isDirectory()) continue;
-    for (const file of fs.readdirSync(path.join(root, domainEntry.name))) {
+  if (fs.existsSync(root)) {
+    for (const domainEntry of fs.readdirSync(root, { withFileTypes: true })) {
+      if (!domainEntry.isDirectory()) continue;
+      for (const file of fs.readdirSync(path.join(root, domainEntry.name))) {
+        if (file.endsWith('.md')) ids.add(file.slice(0, -'.md'.length));
+      }
+    }
+  }
+  const coreRoot = path.join(cwd, 'core', 'task-specs');
+  if (fs.existsSync(coreRoot)) {
+    for (const file of fs.readdirSync(coreRoot)) {
       if (file.endsWith('.md')) ids.add(file.slice(0, -'.md'.length));
     }
   }
