@@ -77,7 +77,13 @@ export function findAgentYamlFiles(repoRoot) {
 
   const scanDir = (dir, sourceLabel) => {
     if (!fs.existsSync(dir)) return;
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    // D32 "deterministic, never random": readdirSync's own order is
+    // filesystem-dependent (directory-hash order on ext4, not lexical),
+    // not a stable ordering guarantee -- sorted here so the duplicate-name
+    // scan below (and the write loop that follows it) processes entries in
+    // the same order on every machine/run (review finding M2).
+    const entries = fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name));
+    for (const entry of entries) {
       if (!entry.isFile()) continue;
       if (entry.name.endsWith('.yaml') || entry.name.endsWith('.yml')) {
         const filePath = path.join(dir, entry.name);
@@ -98,7 +104,8 @@ export function findAgentYamlFiles(repoRoot) {
 
   const domainsDir = path.join(repoRoot, 'domains');
   if (fs.existsSync(domainsDir)) {
-    for (const domainEntry of fs.readdirSync(domainsDir, { withFileTypes: true })) {
+    const domainEntries = fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name));
+    for (const domainEntry of domainEntries) {
       if (domainEntry.isDirectory()) {
         scanDir(path.join(domainsDir, domainEntry.name, 'agents'), `domains/${domainEntry.name}/agents`);
       }

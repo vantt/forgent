@@ -518,11 +518,19 @@ function parseTaskSpecHeaderFields(headerLine) {
   return res;
 }
 
+// D32 "deterministic, never random": readdirSync's own order is
+// filesystem-dependent, not a stable ordering guarantee -- sorted so
+// D33's own duplicate-name scan (the caller) reports the same "first
+// occurrence wins" file on every machine/run (review finding M2).
+function sortedReaddir(dir) {
+  return fs.readdirSync(dir).sort((a, b) => a.localeCompare(b));
+}
+
 function allAgentYamlFiles(cwd) {
   const files = [];
   const coreDir = path.join(cwd, 'core', 'agents');
   if (fs.existsSync(coreDir)) {
-    for (const f of fs.readdirSync(coreDir)) {
+    for (const f of sortedReaddir(coreDir)) {
       if (f.endsWith('.yaml') || f.endsWith('.yml')) {
         files.push({ source: 'core/agents', filePath: path.join(coreDir, f), fileName: f });
       }
@@ -530,11 +538,12 @@ function allAgentYamlFiles(cwd) {
   }
   const domainsDir = path.join(cwd, 'domains');
   if (fs.existsSync(domainsDir)) {
-    for (const domainEntry of fs.readdirSync(domainsDir, { withFileTypes: true })) {
+    const domainEntries = fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name));
+    for (const domainEntry of domainEntries) {
       if (domainEntry.isDirectory()) {
         const domainAgentsDir = path.join(domainsDir, domainEntry.name, 'agents');
         if (fs.existsSync(domainAgentsDir)) {
-          for (const f of fs.readdirSync(domainAgentsDir)) {
+          for (const f of sortedReaddir(domainAgentsDir)) {
             if (f.endsWith('.yaml') || f.endsWith('.yml')) {
               files.push({ source: `domains/${domainEntry.name}/agents`, filePath: path.join(domainAgentsDir, f), fileName: f });
             }
@@ -545,7 +554,7 @@ function allAgentYamlFiles(cwd) {
   }
   const legacyDir = path.join(cwd, 'agents');
   if (fs.existsSync(legacyDir)) {
-    for (const f of fs.readdirSync(legacyDir)) {
+    for (const f of sortedReaddir(legacyDir)) {
       if (f.endsWith('.yaml') || f.endsWith('.yml')) {
         const fp = path.join(legacyDir, f);
         if (!files.some((item) => item.filePath === fp)) {
