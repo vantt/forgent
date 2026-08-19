@@ -92,12 +92,97 @@ proof points below stand as written, no weakening needed.
 `docs/task-specs/coding/*.md` (moved), the entire new `core/` and
 `domains/coding/` trees.
 
-### Phased execution order (dependency waves, from §7's own "Quan hệ" fields)
+### Phased execution order — CORRECTED at `fgos-coding-validating`'s reality gate
 
-- **Wave 1 (no dependencies, safe to run concurrently via `fgos-fanout` once materialized):** `{#task-taskspec-migration}` (D9), `{#task-domain-registry-split}` (D3/D4/D10/D17/D29/D30/D31), `{#task-role-rename}` (D16), `{#task-domain-specs-folder}` (D8), `{#task-skill-assembly-mechanism}` (D7), `{#task-persona-key-extension}` (D15/D20), `{#task-doctrine-domain-split}` (D23).
-- **Wave 2 (depends on Wave 1 pieces named):** `{#task-taskspec-path-resolver}` (D11, needs domain-registry-split + taskspec-migration), `{#task-bundle-for-stage}` (D14/D29/D30, needs domain-registry-split + taskspec-migration), `{#task-coding-skill-migration}` (D3/D7/D34, needs skill-assembly-mechanism), `{#task-architecture-manifest-domain-silo}` (D12, needs domain-registry-split), `{#task-core-task-specs}` (D27, should follow role-rename so new files are authored `role:` not `position:` from the start).
-- **Wave 3:** `{#task-eligibility-inversion}` (D20/D21/D22/D26, needs taskspec-migration; benefits from core-task-specs existing so all 7+13 task-specs get `requires-skill` coverage in one pass), `{#task-agent-domain-split}` (D24/D33, pairs naturally with eligibility-inversion since both touch `agents/*.yaml`).
-- **Wave 4:** `{#task-sync-nesting-cap}` (D25/D28, needs eligibility-inversion's real `requires-skill` data to have anything to mismatch against).
+**Round-16 planning wrote this as 4 concurrency-safe "waves" — WRONG.** The
+reality gate's own footprint cross-check (running each child's real
+`footprint` array against every other child's, mechanically, not by
+re-reading judgment) found 7 real file-level collisions the original
+wave grouping called concurrent-safe:
+
+| Shared path | Colliding tasks |
+|---|---|
+| `src/state/workflow-stage-graphs.mjs` | domain-registry-split, role-rename, taskspec-path-resolver, bundle-for-stage |
+| `docs/task-specs/coding/*.md` | taskspec-migration, role-rename |
+| `src/setup/registrations.mjs` | taskspec-migration, taskspec-path-resolver, eligibility-inversion, agent-domain-split |
+| `domains/coding/task-specs/` | taskspec-migration, eligibility-inversion |
+| `core/task-specs/` | core-task-specs, eligibility-inversion |
+| `agents/` + `scripts/project-agents.mjs` | eligibility-inversion, agent-domain-split |
+| `src/runner/dispatch.mjs` | persona-key-extension, eligibility-inversion |
+
+Two of these were previously *known* dependencies already correctly
+ordered (taskspec-path-resolver *after* taskspec-migration+registry-split;
+eligibility-inversion *after* taskspec-migration) — the reality gate's
+value here is the **5 that were NOT previously flagged**: role-rename
+colliding with both registry-split and taskspec-migration; bundle-for-
+stage colliding with taskspec-path-resolver (both touch
+`workflow-stage-graphs.mjs`, not just their already-known upstream
+deps); core-task-specs colliding with eligibility-inversion; agent-
+domain-split colliding with eligibility-inversion on 3 real files (not
+merely "pairs naturally", as originally written — they cannot run
+concurrently); persona-key-extension colliding with eligibility-
+inversion on `dispatch.mjs`.
+
+**Corrected structure — a sequential spine (real file collisions, must
+run one-at-a-time, in this order) plus parallel-safe pieces (no
+collision with anything, only soft ordering preconditions):**
+
+**Sequential spine:**
+1. `{#task-role-rename}` (D16) — first, alone: touches both
+   `workflow-stage-graphs.mjs` (before registry-split restructures it)
+   and `docs/task-specs/coding/*.md` (before taskspec-migration moves
+   them) — doing the rename here means neither downstream task inherits
+   a stale `human-advisor`/`position:` reference.
+2. `{#task-taskspec-migration}` (D9) **‖** `{#task-domain-registry-split}`
+   (D3/D4/D10/D17/D29/D30/D31) — these two do NOT share a file with each
+   other (verified: `registrations.mjs`+`docs/task-specs/` vs
+   `workflow-stage-graphs.mjs`+`stage-fsm.mjs`+`plan.mjs`+`loop.mjs`) —
+   genuinely safe to run concurrently once step 1 is done.
+3. `{#task-taskspec-path-resolver}` (D11) — needs both step-2 pieces
+   done (registry.yaml/workflows location from registry-split,
+   task-specs at new path from migration).
+4. `{#task-bundle-for-stage}` (D14/D29/D30) — needs step 3 done first
+   (both add functions to the same now-restructured
+   `workflow-stage-graphs.mjs`; running concurrently with step 3 would
+   race the same file).
+5. `{#task-persona-key-extension}` (D15/D20) — before eligibility-
+   inversion, since both touch `dispatch.mjs` and eligibility-inversion
+   is the one that actually implements resolve-logic against the key
+   shape this step defines.
+6. `{#task-eligibility-inversion}` (D20/D21/D22/D26) — needs step 1
+   (task-specs headers already `role:`), step 2's taskspec-migration
+   (needs `domains/coding/task-specs/` to exist), and benefits from
+   `{#task-core-task-specs}` (parallel-safe, below) existing first so
+   all 20 task-specs (13 coding + 7 core) get `requires-skill` coverage
+   in one pass — sequence core-task-specs before this step, not
+   concurrent with it (shared `core/task-specs/` path).
+7. `{#task-agent-domain-split}` (D24/D33) — strictly AFTER step 6, never
+   concurrent with it (3 real shared files: `agents/`,
+   `scripts/project-agents.mjs`, `src/setup/registrations.mjs`) —
+   corrects the original plan's "pairs naturally... same lượt" framing,
+   which understated a real collision.
+8. `{#task-doctrine-domain-split}` (D23) **before** `{#task-coding-skill-
+   migration}` (D3/D7/D34) — both touch
+   `.agents/skills/fgos-routing/SKILL.md` (doctrine-split adds a Read
+   instruction to it; skill-migration physically relocates it to
+   `core/skills/fgos-routing/`) — editing content before the move is
+   simpler than editing after.
+9. `{#task-sync-nesting-cap}` (D25/D28) — last: needs step 6's real
+   `requires-skill` data to have anything to mismatch against.
+
+**Parallel-safe (no file collision with the spine or each other — only
+soft preconditions, safe to run via `fgos-fanout` alongside whichever
+spine step is current, once the precondition is met):**
+- `{#task-domain-specs-folder}` (D8) — soft precondition: after spine
+  step 2 (registry-split) creates `domains/coding/` for real.
+- `{#task-skill-assembly-mechanism}` (D7) — no precondition; must finish
+  before spine step 8's skill-migration half starts.
+- `{#task-architecture-manifest-domain-silo}` (D12) — soft precondition:
+  after spine step 2 (needs `domains/` to exist to write a rule against).
+- `{#task-core-task-specs}` (D27) — soft precondition: after spine step 1
+  (role-rename) so these 7 new files are authored `role:` from the
+  start; must finish before spine step 6 (eligibility-inversion) per
+  step 6's own note above.
 
 ## Shape
 
@@ -113,12 +198,16 @@ Concrete cases worth proving against, at high-risk depth:
   named suites per risk-map entry above.
 - **Concurrent access:** N/A at the file-layout level (this is a
   single-writer main-checkout convention already); DOES apply to
-  `fgos-fanout` running Wave 1's independent children concurrently — each
-  child's `footprint` (below) is written precisely so
-  `footprintOverlapAmong` can catch a real collision before any two
-  Wave-1 children run at once.
-- **Partial failure:** if a Wave-2/3/4 child fails mid-implementation
-  after an earlier wave already merged into `fgw/tsk-397`, the earlier
+  `fgos-fanout` running the "parallel-safe" pieces concurrently with
+  whichever sequential-spine step is current (§"Phased execution order"
+  above, corrected at the reality gate after finding 7 real footprint
+  collisions the original wave grouping missed) — each child's
+  `footprint` (below) is written precisely so `footprintOverlapAmong`
+  can catch a real collision before any two run at once, and this plan's
+  own sequencing is now derived FROM that same footprint data, not
+  independent of it.
+- **Partial failure:** if a later spine step fails mid-implementation
+  after an earlier one already merged into `fgw/tsk-397`, the earlier
   wave's own merged state must still leave `fgw/tsk-397` in a
   green-`npm test` state on its own — no child may leave the shared
   branch red for a sibling to inherit. This is why each child below
