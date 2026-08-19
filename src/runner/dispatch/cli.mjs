@@ -593,6 +593,7 @@ export function runDispatchCli() {
       tier: flagValue('--tier'),
       carries: flagValue('--carries'),
       for: flagValue('--for'),
+      cwd: flagValue('--cwd') ?? flagValue('--dir'),
       hasLiveTaskAccess: rest.includes('--has-live-task-access'),
       onChunk: (stream, chunk) => process.stderr.write(chunk),
     }).then(
@@ -606,6 +607,7 @@ export function runDispatchCli() {
     );
   } else if (subcommand === 'decide') {
     decideExecutorCli(executorId, {
+      cwd: flagValue('--cwd') ?? flagValue('--dir'),
       hasLiveTaskAccess: rest.includes('--has-live-task-access'),
       for: flagValue('--for'),
       work: flagValue('--work'),

@@ -4019,3 +4019,45 @@ test('logExecutorDispatch appends multiple sequential calls without corrupting t
   const raw = fs.readFileSync(path.join(fgosDir, 'events.jsonl'), 'utf8');
   assert.equal(raw.trim().split('\n').length, 4);
 });
+
+// --- CLI subcommand --cwd flag coverage ---------------------------------
+
+test('dispatch CLI execute subcommand respects --cwd flag', () => {
+  const repo = mkTempGitRepo();
+  const workerRepo = mkTempGitRepo();
+  const scriptPath = writeEchoExecutor(repo.repoRoot);
+  const dispatchScriptPath = path.resolve(process.cwd(), 'src/runner/dispatch.mjs');
+  writeRunnerConfigFixture(workerRepo.repoRoot, {
+    executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
+    executors: { testexec: { kind: 'agent', allowCrossProvider: true, command: process.execPath, args: [scriptPath, '{prompt}'] } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+
+  const out = execFileSync(process.execPath, [dispatchScriptPath, 'execute', 'testexec', '--cwd', workerRepo.repoRoot, '--prompt', 'hello'], {
+    encoding: 'utf8',
+    cwd: repo.repoRoot,
+  });
+  const res = JSON.parse(out);
+  assert.equal(res.status, 0);
+  const echoData = JSON.parse(res.stdout);
+  assert.equal(echoData.cwd, workerRepo.repoRoot);
+});
+
+test('dispatch CLI decide subcommand respects --cwd flag', () => {
+  const repo = mkTempGitRepo();
+  const dispatchScriptPath = path.resolve(process.cwd(), 'src/runner/dispatch.mjs');
+  writeRunnerConfigFixture(repo.repoRoot, {
+    executor: { command: process.execPath, args: ['{prompt}'] },
+    executors: { testexec: { kind: 'agent', agentType: 'test' } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+
+  const out = execFileSync(process.execPath, [dispatchScriptPath, 'decide', 'testexec', '--cwd', repo.repoRoot, '--has-live-task-access'], {
+    encoding: 'utf8',
+  });
+  const res = JSON.parse(out);
+  assert.equal(res.mechanism, 'in-process');
+  assert.equal(res.agentType, 'test');
+});

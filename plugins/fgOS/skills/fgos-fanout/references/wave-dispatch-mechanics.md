@@ -84,13 +84,15 @@ For each batch of up to 5 ids from `ready` (5 is the max batch size):
    node "$root/src/runner/dispatch.mjs" decide --work "<id>" --has-live-task-access --dir "$root"
    ```
 
-   - If `decided.mechanism` is NOT `"in-process"`: report `id` back to
-     the caller as needing a person (its own dispatch executor does not
-     expect native Task-tool dispatch — this skill has no out-of-process
-     firing path of its own). Add `id` to `dispatchUnavailable` so it is
-     never rescheduled or re-consulted again this run. Do not add it to
-     `firing`. Continue to the next id.
-   - Otherwise: print its announce line
+   - If `decided.mechanism` is `"out-of-process"`: it fires out-of-process directly via CLI subprocess execution without requiring a person. Print its announce line (`<id> - out-of-process - <executorId>`). Claim the candidate via CLI, read the worktree path from the claim's JSON output, and execute the worker out-of-process concurrently for the batch's out-of-process subset via bash job control (`( ... ) &` and `wait`):
+     ```bash
+     root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+     claimJson=$(node "$root/bin/fgos.mjs" pick "<id>" --json --dir "$root")
+     worktreePath=$(node -e 'console.log(JSON.parse(process.argv[1]).worktreePath)' "$claimJson")
+     node "$root/src/runner/dispatch.mjs" execute "<executorId>" --cwd "$worktreePath" --has-live-task-access && node "$root/bin/fgos.mjs" return "<id>" --dir "$root"
+     ```
+   - If `decided.mechanism` is `"unavailable"`: report `id` back to the caller as needing a person (no executor registered for this work item). Add `id` to `dispatchUnavailable` so it is never rescheduled or re-consulted again this run. Do not add it to `firing`. Continue to the next id.
+   - Otherwise (`mechanism === "in-process"`): print its announce line
      (`<id> - native - <subagent_type> - <model>`), `<subagent_type>`
      from `decided.agentType` when present, else whatever Agent type this
      skill already uses by default to fire `/fgOS:pick`. Add `id` to
