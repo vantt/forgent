@@ -141,6 +141,13 @@ dùng chung 3 nơi) lẫn nhóm "coding"/CLI-wrapper (~35 skill chỉ có trong
   2 (`cook`: 238d + 5 references/*.md + mục `## References`/`##
   Workflow Position`; `research`: 180d, không cần references) — ghi
   vào §6 làm mẫu cụ thể cho task tách SKILL.md/references.
+- Người dùng chỉ ra mâu thuẫn: agent hedge task fanout ("chỉ tách
+  references nếu sau khi sửa vẫn >300 dòng") trong khi mọi người đều
+  muốn làm references. Agent nhận sai — đọc lại
+  `token-efficiency-criteria.md`, tiêu chí tách là LOẠI nội dung
+  (step-by-step guide → references), không phải ngưỡng độ dài; 300 dòng
+  chỉ là trần cứng. Sửa task fanout bỏ điều kiện, nhất quán với 6 task
+  kia.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -269,11 +276,14 @@ flowchart TD
 ### {#task-split-fanout} fgos-fanout: tách SKILL.md/references, bỏ pseudocode
 - **Vấn đề**: 358 dòng (1.19x chuẩn). Khối "text" 88 dòng, nhãn `loop:`,
   trích dẫn trần `(D4)` — cùng dạng lỗi với `fgos-coding-driving`.
-- **Đề xuất**: cùng cách tiếp cận với task trên — văn phong nhất quán
-  giữa 2 skill. 358 dòng có thể không cần tách `references/` nếu văn
-  xuôi hoá + xoá citation đã đưa SKILL.md xuống dưới 300 dòng — đo lại
-  sau khi sửa mới quyết có cần tách hay không (không tách nếu không cần,
-  theo `token-efficiency-criteria.md`).
+- **Đề xuất**: cùng cách tiếp cận với task trên, KHÔNG điều kiện theo độ
+  dài — tiêu chí tách xuống `references/` là LOẠI nội dung (step-by-step
+  guide), không phải "còn dài hơn 300 dòng hay không" sau khi sửa (sửa
+  hiểu sai ban đầu — `token-efficiency-criteria.md`'s "Move to
+  references/: ... Step-by-step guides" không có điều kiện độ dài; 300
+  dòng chỉ là trần cứng, không phải ngưỡng kích hoạt tách). Khối
+  pseudocode 88 dòng luôn xuống `references/`, văn phong nhất quán với
+  task driving.
 - Verify nháp: cùng task trên.
 
 ### {#task-split-exploring} fgos-coding-exploring: tách SKILL.md/references
