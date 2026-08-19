@@ -454,6 +454,44 @@ Every medium+ risk-map row above, scored PASS/FAIL against real evidence
 | `.agents/skills/`/`.claude/agents/` external render-target shape stays byte-identical through the assembly-mechanism changes | High | Existing coexistence test still covers this | `test/e2e/coexistence-canary.test.mjs` exists (cited across multiple D-IDs, D7/D24); not re-run here (no code changed yet — this is a planning-stage gate, not an implementation verify) — **flagged, not proven**: this test's CURRENT pass/fail state should be re-confirmed once `{#task-skill-assembly-mechanism}` is actually implemented, not assumed green from citation alone |
 | Current `main`/branch test baseline is green before any of this item's own code changes | Medium (methodological — affects how every child's own `npm test`-based verify should be read) | Run `npm test` for real, right now, before any child starts | **Ran `npm test` this session: 3483 tests, 3476 pass, 2 fail, 5 skipped, 83.4s.** The 2 failures are both in `test/runner/dispatch.test.mjs` (`.fgos/config.json`'s committed `runner` section not matching 2 assertions about `agy`'s `--dangerously-skip-permissions` arg and the worker's exact tool-grant list — looks like local `.fgos/config.json` drift from this machine's own RTK tooling, unrelated to any of tsk-397's 34 locked decisions or 15 planned children) | **FAIL as a blanket "npm test green" assumption — FLAGGED, not blocking.** Neither failing test is in any child's own named narrow verify scope (`stage-fsm`, `handoff`, `task-specs`, `dispatch` scoped tests would need checking individually — `dispatch.test.mjs` IS touched by `{#task-persona-key-extension}`'s own bare-suite verify, worth narrowing). Whoever runs a bare `npm test` verify (root item's own aggregate verify, `{#task-domain-registry-split}`'s own verify) must recognize these 2 specific pre-existing failures by name and not treat them as caused by this item's own work. Triaging/fixing them is explicitly OUT OF SCOPE for tsk-397 (not one of the 34 locked decisions) — noted here so nobody mistakes them for a regression this item caused. |
 
+## Post-sync verification (main merged into `fgw/tsk-397`, 2026-08-20)
+
+`tsk-3av` (out-of-process fanout/dispatch consolidation) landed on `main`
+(`66f7b420 Merge branch 'fgw/tsk-3av'`) after this item forked at
+`15ad6f06`. Synced `fgw/tsk-397` with `main` (merge commit `6a49f8b5`, no
+conflicts) and diffed every file `main` touched since the fork against
+this plan's own footprint list. Real drift found and corrected:
+
+- **`src/runner/dispatch.mjs` is now a thin barrel re-export** (a
+  DIFFERENT, earlier-merged item, `tsk-2uf-1`, not `tsk-3av` itself — split
+  the former 2204-line file into `src/runner/dispatch/{config,resolve,
+  mechanism,transport,prepare,cli}.mjs`). `executorIdForWork` (the
+  persona/agent-type resolution key function both `{#task-persona-key-
+  extension}` and `{#task-eligibility-inversion}` need to change) now
+  lives in `src/runner/dispatch/cli.mjs`, not the barrel. **Corrected**:
+  both children's live `footprint` field (`fgos edit tsk-397-10`/
+  `tsk-397-11 --footprint ...`, seq 21528/21529) now names
+  `src/runner/dispatch/cli.mjs` in place of `src/runner/dispatch.mjs`.
+  The two still collide on the same real file, so their existing spine
+  ordering (step 5 before step 6, §"Corrected structure") is unaffected —
+  only the path string was stale, not the sequencing.
+- **`workflow-stage-graphs.mjs`'s `codingDomain` object gained a new
+  `workerContract` field** (`tsk-2uf-2`, additive, unwired). `{#task-
+  domain-registry-split}` splits this exact object into `registry.yaml` —
+  whoever implements it must carry `workerContract` across the split, not
+  drop it as an unrecognized field.
+- `docs/architecture-manifest.json` (+11 lines), `src/setup/
+  registrations.mjs` (+250/-9), `src/intake/plan.mjs` (+48/-4) also
+  changed on `main` since the fork, but all purely additive/orthogonal
+  (new manifest entries for the new `dispatch/*.mjs` files, new
+  `registerCheck`/`registerFix`/config-default entries via the file's
+  existing additive-registration pattern, a new `context-render` helper +
+  message-formatting tweaks) — no collision with any of the 15 children's
+  own planned edits, no plan change needed.
+
+No other footprint file this plan names was touched by `main` since the
+fork. `npm test` re-run pending as part of executing the first child.
+
 ## Outstanding questions
 
 None
