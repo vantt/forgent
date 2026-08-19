@@ -2136,7 +2136,7 @@ planning chi tiết per-file (vòng 22).
   ở compound-learn qua call-summary/handoff events.
 - **Position vs Agent-type**: roleGraph đóng ở **5
   position** (implementer / researcher / reviewer / helper /
-  human-advisor) — nguyên tắc *nở task trước, nở role sau*
+  advisor) — nguyên tắc *nở task trước, nở role sau*
   (security-auditor = Reviewer + phiếu `audit-security`, không phải role
   mới). Chức danh (PO/PM/TechLead/SE/Tester) = **agent-type definition
   sẵn có** (`.claude/agents/*.md`), khai eligibility bằng đúng **một

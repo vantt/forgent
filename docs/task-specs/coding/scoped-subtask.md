@@ -1,6 +1,6 @@
 # task-spec: scoped-subtask
 
-domain: coding | position: helper | reason: assist
+domain: coding | role: helper | reason: assist
 
 ## Input
 - A description of an independent piece of work, plus an explicit

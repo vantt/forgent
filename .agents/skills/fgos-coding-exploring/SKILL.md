@@ -186,7 +186,7 @@ call). Exact bash for both branches: `references/gate-mechanics.md`.
   domain has a role graph), or firing that handoff for a live
   conversational question that never actually parks
 - continuing to a second Socratic round, or any further consult/advise
-  attempt, with the ball still held by `human-advisor` after an
+  attempt, with the ball still held by `advisor` after an
   immediately-answered `ask` — reclaim first
 - reclaiming only once at Scope and stopping even though the ball has not
   reached `implementer` yet (a depth-2 nested call needs two reclaims)

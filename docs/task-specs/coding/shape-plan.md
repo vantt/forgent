@@ -1,6 +1,6 @@
 # task-spec: shape-plan
 
-domain: coding | stage: planning | position: implementer
+domain: coding | stage: planning | role: implementer
 
 ## Input
 - `CONTEXT.md` with its locked decisions table (the only source of truth

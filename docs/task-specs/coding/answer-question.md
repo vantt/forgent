@@ -1,6 +1,6 @@
 # task-spec: answer-question
 
-domain: coding | position: human-advisor | reason: advise | authority: product-decisions
+domain: coding | role: advisor | reason: advise | authority: product-decisions
 
 ## Input
 - A question that has already passed the material/grounded/answerable
