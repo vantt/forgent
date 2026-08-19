@@ -159,6 +159,22 @@ this contract; both say the CURRENT `runner.executors.claude`/
 `runner.executor` invocation shape cannot complete it end-to-end yet. Full
 evidence: `docs/history/claude-named-executor/RESEARCH.md` Round 3.
 
+**Follow-up finding (tsk-1dsr) — GREEN, root cause was environment-local,
+not `claude` or config as designed:** the RED finding above traced to a
+personal `PreToolUse` hook on the testing machine (an `rtk` proxy that
+rewrites `git ...` to `rtk git ...` before the allowlist match runs) —
+not a syntax defect and not a limit of `claude`'s own comprehension.
+`runner.executors.claude`/`runner.executor` now name both the bare and
+`rtk`-wrapped forms (`"Bash(git add:*),Bash(git commit:*),Bash(rtk git
+add:*),Bash(rtk git commit:*)"`), still scoped to `add`/`commit` only.
+Retested live with this exact config: `claude` completed the full
+contract — wrote the exact requested content, honored the footprint,
+committed with the item id in the message, never called `fgos`, and
+reported through the exact `[DONE]` token. Confirmed independently via
+the throwaway worktree's real `git log`/`git show --stat`, not from the
+self-report alone. Full evidence: `docs/history/claude-named-executor/
+RESEARCH.md` Round 5.
+
 ## Precedent
 
 - `docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md` —
