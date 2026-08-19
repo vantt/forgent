@@ -39,6 +39,27 @@
       }
     },
     "executors": {
+      "claude": {
+        "kind": "agent",
+        "description": "Claude Code CLI (headless dispatch)",
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "claude",
+            "args": [
+              "-p",
+              "{prompt}",
+              "--model",
+              "{model}",
+              "--permission-mode",
+              "acceptEdits",
+              "--allowedTools",
+              "Bash(git add:*),Bash(git commit:*)"
+            ]
+          }
+        ]
+      },
       "agy": {
         "kind": "agent",
         "description": "Antigravity Cli",
