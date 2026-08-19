@@ -1,6 +1,6 @@
 # task-spec: shape-plan
 
-domain: coding | stage: planning | role: implementer
+domain: coding | stage: planning | role: implementer | requires-skill: fgos-coding-planning
 
 ## Input
 - `CONTEXT.md` with its locked decisions table (the only source of truth

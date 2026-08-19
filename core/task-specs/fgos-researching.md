@@ -1,6 +1,6 @@
 # task-spec: fgos-researching
 
-domain: core | role: researcher | scope: stage-agnostic
+domain: core | role: researcher | scope: stage-agnostic | requires-skill: fgos-researching
 
 ## Input
 - Specific question or research goal to investigate.

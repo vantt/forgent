@@ -1,6 +1,6 @@
 # task-spec: resolve-question
 
-domain: coding | role: researcher | reason: consult
+domain: coding | role: researcher | reason: consult | requires-skill: fgos-researching
 
 ## Input
 - ONE question, already narrowed by the caller — never a broad "look

@@ -79,6 +79,53 @@ export function executorIdForWork(work, stage, role) {
 }
 
 /**
+ * Resolve persona/agentType for a given taskSpec header & list of registered agent-types (D20/D21/D22/D32).
+ * Tie-break priority (D32):
+ * 1. Task-spec declares `agent:` pin -> wins immediately, skipping skill-matching.
+ * 2. No pin -> if `currentAgentType` matches all `requires-skill`, stay with `currentAgentType`.
+ * 3. Otherwise -> select deterministically by declaration order (first matching agent-type in `agentDefs`).
+ */
+export function resolveAgentTypeForTaskSpec(taskSpecHeader, agentDefs = [], currentAgentType = null) {
+  if (!taskSpecHeader) return currentAgentType || (agentDefs[0]?.name ?? null);
+
+  const pinnedAgents = Array.isArray(taskSpecHeader.agent)
+    ? taskSpecHeader.agent
+    : typeof taskSpecHeader.agent === 'string' && taskSpecHeader.agent.trim()
+      ? [taskSpecHeader.agent.trim()]
+      : [];
+
+  if (pinnedAgents.length > 0) {
+    const found = agentDefs.find((a) => pinnedAgents.includes(a.name));
+    return found ? found.name : pinnedAgents[0];
+  }
+
+  const requiredSkills = Array.isArray(taskSpecHeader['requires-skill'])
+    ? taskSpecHeader['requires-skill']
+    : typeof taskSpecHeader['requires-skill'] === 'string' && taskSpecHeader['requires-skill'].trim()
+      ? [taskSpecHeader['requires-skill'].trim()]
+      : [];
+
+  if (requiredSkills.length === 0) {
+    return currentAgentType || (agentDefs[0]?.name ?? null);
+  }
+
+  if (currentAgentType) {
+    const currentDef = agentDefs.find((a) => a.name === currentAgentType);
+    if (currentDef && Array.isArray(currentDef.skills)) {
+      const hasAllSkills = requiredSkills.every((s) => currentDef.skills.includes(s));
+      if (hasAllSkills) return currentAgentType;
+    }
+  }
+
+  const matching = agentDefs.find(
+    (a) => Array.isArray(a.skills) && requiredSkills.every((s) => a.skills.includes(s)),
+  );
+  if (matching) return matching.name;
+
+  return currentAgentType || (agentDefs[0]?.name ?? null);
+}
+
+/**
  * Run the headless executor for `work` inside `cwd` (the worktree checkout
  * — this function never touches the main working tree itself; the caller
  * decides `cwd`). Builds the prompt, resolves tier -> model, resolves the

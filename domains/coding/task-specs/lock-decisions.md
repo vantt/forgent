@@ -1,6 +1,6 @@
 # task-spec: lock-decisions
 
-domain: coding | stage: exploring | role: implementer
+domain: coding | stage: exploring | role: implementer | requires-skill: fgos-coding-exploring
 
 ## Input
 - An item at stage `exploring` (unclear discovery verdict) with `refs`.

@@ -1,6 +1,6 @@
 # task-spec: implement-item
 
-domain: coding | stage: executing | role: implementer
+domain: coding | stage: executing | role: implementer | requires-skill: fgos-coding-implement
 
 ## Input
 - `plan.md`, already validated (`READY`/`READY WITH CONSTRAINTS`).

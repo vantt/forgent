@@ -1,6 +1,6 @@
 # task-spec: fgos-clarifying
 
-domain: core | lifecycle: Init | role: classifier
+domain: core | lifecycle: Init | role: classifier | requires-skill: fgos-clarifying
 
 ## Input
 - Raw submission text provided at submission time (untrusted string).

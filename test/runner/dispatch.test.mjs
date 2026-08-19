@@ -33,6 +33,7 @@ import {
   EXECUTOR_CARRIES,
   INVOCATION_VIA,
   executorIdForWork,
+  resolveAgentTypeForTaskSpec,
 } from '../../src/runner/dispatch.mjs';
 import { initStore, addWork, listWork } from '../../src/state/store.mjs';
 import { findExecutableOnPath } from '../../src/state/tool-registry.mjs';
@@ -4003,6 +4004,44 @@ test('executorIdForWork expands key to (domain, stage, role) and respects stage 
   assert.equal(executorIdForWork(sampleWork(), 'planning'), 'fgos-coding-planning');
   assert.equal(executorIdForWork({ domain: 'coding', stage: 'exploring' }), 'fgos-coding-exploring');
   assert.equal(executorIdForWork({ domain: 'coding', stage: 'planning' }, null, 'implementer'), 'fgos-coding-planning');
+});
+
+test('resolveAgentTypeForTaskSpec implements D32 tie-break scenarios correctly', () => {
+  const agentDefs = [
+    { name: 'agent-alpha', skills: ['code-review', 'implementation'] },
+    { name: 'agent-beta', skills: ['implementation', 'planning'] },
+    { name: 'agent-gamma', skills: ['code-review'] },
+  ];
+
+  // (a) agent: pin in taskSpec header wins outright, skipping skill matching
+  assert.equal(
+    resolveAgentTypeForTaskSpec(
+      { agent: ['agent-gamma'], 'requires-skill': ['implementation'] },
+      agentDefs,
+      'agent-alpha',
+    ),
+    'agent-gamma',
+  );
+
+  // (b) no pin, currentAgentType matches requires-skill -> stay with currentAgentType
+  assert.equal(
+    resolveAgentTypeForTaskSpec(
+      { 'requires-skill': ['implementation'] },
+      agentDefs,
+      'agent-beta',
+    ),
+    'agent-beta',
+  );
+
+  // (c) no pin, currentAgentType doesn't match -> select first matching agent in declaration order
+  assert.equal(
+    resolveAgentTypeForTaskSpec(
+      { 'requires-skill': ['implementation'] },
+      agentDefs,
+      'agent-gamma',
+    ),
+    'agent-alpha',
+  );
 });
 
 test('decideExecutorCli resolves work-item-based (--work) to the same result a positional executorId would, plus the resolved executorId -- explicit executors.<id> override case', async () => {

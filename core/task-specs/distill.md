@@ -1,6 +1,6 @@
 # task-spec: distill
 
-domain: core | role: reference-analyst | capability: reference-learning
+domain: core | role: reference-analyst | capability: reference-learning | requires-skill: distill
 
 ## Input
 - Reference sources (git repos, papers, living docs) in `intake.md` or registered under `docs/distillery/sources/`.

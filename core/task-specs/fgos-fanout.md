@@ -1,6 +1,6 @@
 # task-spec: fgos-fanout
 
-domain: core | role: orchestrator | capability: wave-dispatch
+domain: core | role: orchestrator | capability: wave-dispatch | requires-skill: fgos-fanout
 
 ## Input
 - `parentId` — already-decomposed parent item ID.

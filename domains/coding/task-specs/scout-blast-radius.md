@@ -1,6 +1,6 @@
 # task-spec: scout-blast-radius
 
-domain: coding | role: researcher | reason: consult
+domain: coding | role: researcher | reason: consult | requires-skill: fgos-researching
 
 ## Input
 - A symbol, file, or change description whose downstream impact needs

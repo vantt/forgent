@@ -1,6 +1,6 @@
 # task-spec: fgos-routing
 
-domain: core | role: session | scope: lifecycle-entry
+domain: core | role: session | scope: lifecycle-entry | requires-skill: fgos-routing
 
 ## Input
 - Workspace context and state view (`fgos list`, `fgos ready`, `fgos triage`, `fgos stale`, `fgos rollup`).
