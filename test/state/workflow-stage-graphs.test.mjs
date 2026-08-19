@@ -388,3 +388,17 @@ test('a domain that declares no classification vocabulary imposes none (undefine
   assert.equal(classificationVocabulary(undefined, 'kind'), undefined);
   assert.equal(classificationVocabulary(DOMAINS.coding, 'nonesuch'), undefined);
 });
+
+test('DOMAINS.coding loaded from registry.yaml and workflows/feature.yaml matches expected golden shape', () => {
+  assert.equal(DOMAINS.coding.defaultWorkflow, 'feature');
+  assert.deepEqual(DOMAINS.coding.stages, ['discovery', 'exploring', 'decompose', 'planning', 'executing']);
+  assert.deepEqual(DOMAINS.coding.stepMap, { planning: 'Divide', executing: 'Execute' });
+  assert.equal(DOMAINS.coding.worktreeBacked, true);
+  assert.equal(DOMAINS.coding.workerContract, '.agents/skills/_shared/coding-worker-contract.md');
+  assert.deepEqual(DOMAINS.coding.workflows.feature.stages, DOMAINS.coding.stages);
+  assert.deepEqual(DOMAINS.coding.workflows.feature.stepMap, DOMAINS.coding.stepMap);
+  assert.deepEqual(DOMAINS.coding.workflows.feature.transitions, DOMAINS.coding.transitions);
+  assert.deepEqual(DOMAINS.coding.workflows.feature.skillMap, DOMAINS.coding.skillMap);
+  assert.deepEqual(DOMAINS.coding.workflows.feature.taskSpecMap, DOMAINS.coding.taskSpecMap);
+});
+
