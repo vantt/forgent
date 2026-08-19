@@ -1119,6 +1119,17 @@ export function recordGateApprove(dir, { id, gate, actor, verify } = {}) {
  * (`resolveDiscovery`/`resolvePlan`, which pass `kind: 'engine'`
  * explicitly) from real design decisions without matching on `text`
  * prefixes.
+ *
+ * `scope` (tsk-1lv-2 D4): optional free text (no enum, same posture as
+ * `source`/`kind`) — an area slug (e.g. `'repo'`, or one matching
+ * `docs/specs/<area>.md`) marking a PLATFORM/repo-wide decision, as
+ * opposed to `id`'s per-item scoping. Absent entirely for an item-scoped
+ * or unscoped decision; `src/report/decision-index.mjs`'s
+ * `buildDecisionIndexMarkdown` is the one reader that filters on its
+ * presence to build `docs/decisions/index.md`. This function never
+ * validates or defaults it — same "CLI validates, store persists"
+ * split `relation` already established (see the CLI-layer comment above
+ * `parseDecisionRelation` below).
  */
 export function addDecision(dir, payload) {
   const { logPath } = paths(dir);
@@ -1146,6 +1157,63 @@ export function addDecision(dir, payload) {
     }
     return appendEventLocked(logPath, { type: 'decision', payload: eventPayload });
   });
+}
+
+// tsk-1lv-1 (D2/D8): `--relation` is a CLI-surface requirement, not an
+// `addDecision` one — enforcing it inside `addDecision` itself would also
+// require every internal engine bookkeeping call (`resolveDiscovery`/
+// `resolvePlan`, `kind: 'engine'`) and every existing test fixture calling
+// `addDecision` directly to start passing it, which CONTEXT.md D4 pins as
+// explicitly unchanged ("bookkeeping máy → kind:engine, đã có, không
+// đổi"). `bin/fgos.mjs`'s `decision` case is the one CLI surface D1/D2
+// actually target ("mọi write khai quan hệ tường minh" is about the
+// human/skill-facing verb, not every programmatic writer of this event
+// type) — it calls `parseDecisionRelation`/`decisionTextLooksLikeSupersession`
+// below before calling `addDecision`, and `addDecision` itself stores
+// whatever `relation` string it is handed (or none) as a plain optional
+// payload field, same posture as `source`/`alternatives` above.
+
+const SUPERSESSION_PROSE_PATTERN = /\b(supersedes?|superseded|replaces?|overrides?|no longer applies|instead of the previous)\b/i;
+
+/**
+ * Pure: does `text` read like a supersession statement (STR72's own root
+ * cause — bee v2.7.0 audited 70 decide events that narrated a supersession
+ * in prose without declaring the relation flag, vs only 29 that declared it
+ * correctly)? Used to refuse a `fgos decision` write that narrates a
+ * supersession without `--relation supersedes:<id>`.
+ */
+export function decisionTextLooksLikeSupersession(text) {
+  return typeof text === 'string' && SUPERSESSION_PROSE_PATTERN.test(text);
+}
+
+/**
+ * Pure: parse `fgos decision`'s `--relation` value into a structured
+ * relation (D2: "supersedes:<id>|touches:<id>|none", every write declares
+ * one explicitly — no default, no inference). Throws `StoreError('validation', …)`
+ * on anything else, the same error shape every other CLI-facing parse in
+ * this module uses.
+ */
+export function parseDecisionRelation(raw) {
+  if (typeof raw !== 'string' || !raw.trim()) {
+    throw new StoreError(
+      'validation',
+      'decision requires --relation none|supersedes:<id>|touches:<id>.',
+    );
+  }
+  const trimmed = raw.trim();
+  if (trimmed === 'none') return { kind: 'none' };
+  const supersedesMatch = /^supersedes:(.+)$/.exec(trimmed);
+  if (supersedesMatch && supersedesMatch[1].trim()) {
+    return { kind: 'supersedes', id: supersedesMatch[1].trim() };
+  }
+  const touchesMatch = /^touches:(.+)$/.exec(trimmed);
+  if (touchesMatch && touchesMatch[1].trim()) {
+    return { kind: 'touches', id: touchesMatch[1].trim() };
+  }
+  throw new StoreError(
+    'validation',
+    `decision --relation "${raw}" is not one of none|supersedes:<id>|touches:<id>.`,
+  );
 }
 
 // Diataxis doc-type axis (per CONTEXT D5/D6): an OPTIONAL, additive tag on
@@ -1373,10 +1441,10 @@ export function footprintConflicts(dir) {
  * Same read-facade shape as `footprintConflicts`; the Domain core
  * (`graph-metrics.mjs`) computes both, this just rebuilds the view.
  */
-export function computedSchedule(dir) {
+export function computedSchedule(dir, candidateIds) {
   const { logPath } = paths(dir);
   const view = rebuildView(logPath);
-  return { ...computeSchedule(view), cycles: detectCycles(view) };
+  return { ...computeSchedule(view, candidateIds), cycles: detectCycles(view) };
 }
 
 /**

@@ -133,7 +133,30 @@ function parseArgs(argv) {
 function runCli(argv, cwd) {
   const { dir } = parseArgs(argv);
   const decisionsDir = path.resolve(cwd, dir);
-  const indexContent = fs.readFileSync(path.join(decisionsDir, '0000-index.md'), 'utf8');
+  const indexPath = path.join(decisionsDir, '0000-index.md');
+  // tsk-1lv-4 D5: the hand-authored docs/decisions/*.md corpus this check
+  // was written for is retired for good -- docs/decisions/ is now a
+  // directory holding only the generated docs/decisions/index.md (fgos
+  // decision-index, tsk-1lv-2), which is not this file's own
+  // 0000-index.md, and the NNNN-*.md + 0000-index.md pointer-pair format
+  // this check validates cannot come back (tsk-1lv review-fix F9: unlike
+  // every other "absent capability = clean skip" check in this repo, that
+  // absence is now permanent, not "not yet present"). Confirmed by direct
+  // reproduction, not assumed: graceful degradation (never a crash) is
+  // still correct here -- there is a real difference between "nothing to
+  // check because the corpus is gone" and "crashed because a file this
+  // script forgot to expect went missing" -- but this script is
+  // deliberately no longer wired into `npm run check:*` (removed from
+  // package.json, F9) so nobody mistakes a standing green check for live
+  // coverage of anything. The pure functions below
+  // (classifySupersedes/findSupersessionFindings) stay real and tested
+  // against synthetic fixtures (test/scripts/check-decision-supersession.
+  // test.mjs) -- only the real-repo CLI mode is retired.
+  if (!fs.existsSync(indexPath)) {
+    console.log('check-decision-supersession: docs/decisions/0000-index.md not found -- the NNNN-*.md ADR corpus format this check validates was retired for good (tsk-1lv-4); this check has no real-repo target left to run against.');
+    return 0;
+  }
+  const indexContent = fs.readFileSync(indexPath, 'utf8');
   const records = loadRecords(decisionsDir);
   const findings = findSupersessionFindings(records, indexContent);
 

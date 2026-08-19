@@ -6,6 +6,14 @@ function work(status, overrides = {}) {
   return { id: 'w1', status, ...overrides };
 }
 
+const VALID_ASK = `## Context
+
+We are configuring authentication for the user service and have two viable mechanisms.
+
+## Why this matters
+
+Selecting the proper auth mechanism impacts security and integration across all API endpoints.`;
+
 test('STATUSES exposes the full flat status domain', () => {
   assert.deepEqual(STATUSES, [
     'backlog',
@@ -184,6 +192,7 @@ test('every legal edge is exactly the declared table; every other status pair is
     'doing->wontfix',
     'awaiting-human->wontfix',
   ]);
+
   for (const from of STATUSES) {
     for (const to of STATUSES) {
       const key = `${from}->${to}`;
@@ -192,7 +201,7 @@ test('every legal edge is exactly the declared table; every other status pair is
         if (key === 'awaiting-approval->todo' || key === 'awaiting-approval->blocked' || key === 'cleanup->blocked') {
           args.reason = 'sweep-test reason';
         }
-        if (to === 'awaiting-human') args.ask = 'sweep-test ask';
+        if (to === 'awaiting-human') args.ask = VALID_ASK;
         if (from === 'awaiting-human') args.answer = 'sweep-test answer';
         assert.doesNotThrow(() => transitionWork(args), `expected ${key} to be legal`);
       } else {
@@ -208,10 +217,10 @@ test('every legal edge is exactly the declared table; every other status pair is
 
 test('transitionWork allows todo -> awaiting-human and doing -> awaiting-human, carrying the ask in the payload', () => {
   for (const from of ['todo', 'doing']) {
-    const event = transitionWork({ work: work(from), to: 'awaiting-human', ask: 'which auth method?' });
+    const event = transitionWork({ work: work(from), to: 'awaiting-human', ask: VALID_ASK });
     assert.deepEqual(event, {
       type: 'work.move',
-      payload: { id: 'w1', from, to: 'awaiting-human', ask: 'which auth method?' },
+      payload: { id: 'w1', from, to: 'awaiting-human', ask: VALID_ASK },
     });
   }
 });
@@ -225,6 +234,60 @@ test('transitionWork rejects entry into awaiting-human without a non-empty ask a
     assert.throws(
       () => transitionWork({ work: work(from), to: 'awaiting-human', ask: '   ' }),
       (err) => err instanceof FsmError && err.category === 'validation',
+    );
+  }
+});
+
+test('transitionWork rejects entry into awaiting-human with incomplete ask structure as validation', () => {
+  for (const from of ['todo', 'doing']) {
+    assert.throws(
+      () => transitionWork({ work: work(from), to: 'awaiting-human', ask: 'just a bare question without headings' }),
+      (err) =>
+        err instanceof FsmError &&
+        err.category === 'validation' &&
+        err.message.includes('## Context') &&
+        err.message.includes('## Why this matters'),
+    );
+
+    assert.throws(
+      () =>
+        transitionWork({
+          work: work(from),
+          to: 'awaiting-human',
+          ask: '## Context\n\nThis is a sufficiently long context section with more than 20 chars.',
+        }),
+      (err) =>
+        err instanceof FsmError &&
+        err.category === 'validation' &&
+        !err.message.includes('## Context') &&
+        err.message.includes('## Why this matters'),
+    );
+
+    assert.throws(
+      () =>
+        transitionWork({
+          work: work(from),
+          to: 'awaiting-human',
+          ask: '## Why this matters\n\nThis is a sufficiently long why this matters section with >20 chars.',
+        }),
+      (err) =>
+        err instanceof FsmError &&
+        err.category === 'validation' &&
+        err.message.includes('## Context') &&
+        !err.message.includes('## Why this matters'),
+    );
+
+    assert.throws(
+      () =>
+        transitionWork({
+          work: work(from),
+          to: 'awaiting-human',
+          ask: '## Context\n\nToo short\n\n## Why this matters\n\nThis is a sufficiently long why this matters section with >20 chars.',
+        }),
+      (err) =>
+        err instanceof FsmError &&
+        err.category === 'validation' &&
+        err.message.includes('## Context'),
     );
   }
 });

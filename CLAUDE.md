@@ -38,6 +38,8 @@ fgos tool query --capability impact-analysis --status present
   immediately after a fresh reindex), a distinct mechanism from staleness
   that the cross-check line above already covers unconditionally.
 
+**Multi-target resolution:** if the active impact-analysis providers tool errors because more than one target/repo is registered and needs disambiguation (e.g. "multiple ... indexed" / "not found"), never guess and never reuse any display string quoted in that error -- it is not guaranteed to be a valid value to pass back in. Instead, look at that same MCP servers own tool list for a listing/discovery tool (name suggests enumeration -- list/search/discover), call it to read back the exact registered identifiers, and match this project by a stable field it reports (an absolute path/scan-root, never a human-readable label) before retrying with that exact identifier (tsk-5nz).
+
 This gate is prose the agent reads, never compiled logic — GitNexus is
 the first registered provider for `impact-analysis`, not the only one
 this gate can ever recognize. The block below regenerates from
@@ -88,3 +90,33 @@ This project is indexed by GitNexus as **forgent** (19129 symbols, 26811 relatio
 | Index, status, clean, wiki CLI commands | `.claude/skills/gitnexus/gitnexus-cli/SKILL.md` |
 
 <!-- gitnexus:end -->
+
+<!-- mdview:START -->
+## Documentation Viewing (MDView)
+
+After creating or updating any markdown file, make it viewable in ONE call —
+no project registration step needed:
+
+### Using MCP (preferred)
+
+Call `mdview_view_file` with:
+
+- `project_root`: absolute path to the project root
+- `relative_path`: the file path relative to that root
+
+It returns a browser `url`. Tell the user: "You can view this at: `<url>`".
+The server auto-registers the project on first use and indexes the file
+immediately.
+
+### Using CLI fallback
+
+```sh
+mdview open <absolute-path-to-file.md>
+```
+
+### When to render
+
+Spin up a preview for long docs, tables, Mermaid diagrams, multi-file document
+sets, or when the user asks to "preview"/"render". Skip it for short, trivial
+snippets.
+<!-- mdview:END -->

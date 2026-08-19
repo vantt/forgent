@@ -259,7 +259,7 @@ test("e2e synthetic domain: the real 'fgos cleanup' verb closes a synthetic item
   assert.equal(fgos(repoRoot, ['move', 'synth-cleanup-item', '--to', 'delivered']).status, 0);
   assert.equal(fgos(repoRoot, ['move', 'synth-cleanup-item', '--to', 'retrospective']).status, 0);
   assert.equal(
-    fgos(repoRoot, ['decision', '--text', 'synthetic retrospective note', '--rationale', 'proves real content exists', '--id', 'synth-cleanup-item']).status,
+    fgos(repoRoot, ['decision', '--text', 'synthetic retrospective note', '--rationale', 'proves real content exists', '--id', 'synth-cleanup-item', '--relation', 'none']).status,
     0,
   );
   assert.equal(fgos(repoRoot, ['move', 'synth-cleanup-item', '--to', 'cleanup']).status, 0);

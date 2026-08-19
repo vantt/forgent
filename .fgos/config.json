@@ -16,7 +16,7 @@
         "--permission-mode",
         "acceptEdits",
         "--allowedTools",
-        "Bash(git add:*),Bash(git commit:*)"
+        "Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)"
       ]
     },
     "capabilities": {
@@ -31,19 +31,51 @@
       "pane-labeling": {
         "description": "Write a session/task id onto the current terminal pane's label, for a human watching a screen"
       },
+      "advise": {
+        "description": "Async product-decision consult -- value comes from disagreement, never changes state, one question/one answer (P5, docs/history/dispatch-activation-and-handoff-redesign/DISCUSSION.md -- planned --for advise -> codex, never built: no caller invokes this purpose yet)"
+      },
+      "execute": {
+        "description": "Compliance-driven work -- value comes from following the plan, changes files, must pass verify (P5, docs/history/dispatch-activation-and-handoff-redesign/DISCUSSION.md -- planned --for execute -> agy, never built: no caller invokes this purpose yet)"
+      },
       "fgos-coding-implement": {
-        "description": "code-implement work for the coding domain's executing stage",
-        "prefer": "agy"
+        "description": "code-implement work for the coding domain's executing stage -- pinned to gemini-3.6-flash-medium via this capability's own providerModel/rigorOverrides (agy/gemini, lightweight policy tier; see modelPolicies.gemini.lightweight for the literal model string), not executors.agy's defaults",
+        "prefer": "agy",
+        "overrides": {
+          "providerModel": "gemini",
+          "rigorOverrides": {
+            "light": "lightweight",
+            "standard": "lightweight",
+            "heavy": "lightweight"
+          }
+        }
       }
     },
     "executors": {
+      "claude": {
+        "kind": "agent",
+        "description": "Claude Code CLI (headless dispatch)",
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "claude",
+            "args": [
+              "-p",
+              "{prompt}",
+              "--model",
+              "{model}",
+              "--permission-mode",
+              "acceptEdits",
+              "--allowedTools",
+              "Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)"
+            ]
+          }
+        ]
+      },
       "agy": {
         "kind": "agent",
         "description": "Antigravity Cli",
         "allowCrossProvider": true,
-        "for": [
-          "fgos-coding-implement"
-        ],
         "invocations": [
           {
             "via": "cli",
@@ -52,14 +84,65 @@
             "args": [
               "-p",
               "{prompt}",
-              "--dangerously-skip-permissions",
+              "--mode",
+              "accept-edits",
               "--new-project",
+              "--print-timeout",
+              "10m",
               "--model",
               "{model}"
             ]
           }
         ],
         "providerModel": "gemini",
+        "rigorOverrides": {
+          "light": "lightweight",
+          "standard": "lightweight",
+          "heavy": "lightweight"
+        }
+      },
+      "codex": {
+        "kind": "agent",
+        "description": "OpenAI Codex CLI (bypass-all -- no sandbox boundary, see docs/history/codex-bypass-executor/)",
+        "allowCrossProvider": true,
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "codex",
+            "args": [
+              "exec",
+              "--dangerously-bypass-approvals-and-sandbox",
+              "{prompt}"
+            ]
+          }
+        ]
+      },
+      "pi": {
+        "kind": "agent",
+        "description": "pi coding agent (openai-codex/gpt-5.5) -- reference runtime for the coding-worker-contract, D4 proof-test GREEN (tsk-47r)",
+        "allowCrossProvider": true,
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "pi",
+            "args": [
+              "--provider",
+              "openai-codex",
+              "--model",
+              "{model}",
+              "--tools",
+              "read,write,edit,bash,grep,find,ls",
+              "--mode",
+              "json",
+              "--approve",
+              "-p",
+              "{prompt}"
+            ]
+          }
+        ],
+        "providerModel": "openai-codex",
         "rigorOverrides": {
           "light": "lightweight",
           "standard": "lightweight",
@@ -74,7 +157,6 @@
         ],
         "scanTarget": ".gitnexus",
         "responsibility": "Verification",
-
         "invocations": [
           {
             "via": "mcp",
@@ -116,6 +198,9 @@
       },
       "gemini": {
         "lightweight": "gemini-3.6-flash-medium"
+      },
+      "openai-codex": {
+        "lightweight": "gpt-5.5"
       }
     }
   },
@@ -133,5 +218,15 @@
   },
   "workerSlots": {
     "ceiling": null
+  },
+  "ironLaw": {
+    "level": "ask"
+  },
+  "gateway": {
+    "port": 4170,
+    "token": null
+  },
+  "herdrWebDashboard": {
+    "staticServing": true
   }
 }

@@ -9,6 +9,66 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `scripts/write-wrapper-script.mjs` — reusable helper CLI script to write executable wrapper shell scripts for multi-statement commands that trip worktree isolation guards.
+- Dispatch-execute reliability pass (`src/runner/dispatch/transport.mjs`,
+  `src/runner/recovery.mjs`): the `cli-spawn` adapter now caps nested
+  out-of-process dispatch at 3 levels deep (an executor that itself
+  dispatches another executor, e.g. `agy` fanning out further, is refused
+  past the cap via `FGOS_DISPATCH_DEPTH`) and supports an optional
+  `runner.idleTimeoutMs` config field — when set, kills a worker that has
+  gone completely silent for that long, resetting on every stdout/stderr
+  chunk, distinct from `timeoutMs`'s unconditional absolute ceiling. Both
+  new failure classes (`dispatch-in-flight`, `dispatch-depth-exceeded`) are
+  now registered in the recovery matrix (`dispatch-in-flight` retries,
+  `dispatch-depth-exceeded` parks) instead of falling through to the
+  matrix's fail-safe halt. `node dispatch.mjs execute`'s failure output
+  also gains a structured `{error, errorClass}` JSON line on stdout
+  alongside the existing human-readable stderr message, so a calling skill
+  can branch on the failure class instead of only ever seeing a bare exit
+  code.
+
+### Fixed
+
+- The `cli-spawn` dispatch adapter (`src/runner/dispatch/transport.mjs`)
+  now spawns every executor `detached: true` and kills its whole process
+  GROUP on timeout/maxBuffer (`process.kill(-pid, ...)`), not just the
+  directly-spawned pid — an executor CLI that shells out further (a
+  grandchild process) no longer survives its own parent being killed.
+
+### Added
+
+- `runner.executors.claude` in `.fgos/config.json` — claude is now
+  addressable by name in dispatch (`decide claude`, `executors.claude`)
+  the same way `agy`/`codex`/`pi` already are, instead of only being
+  reachable through the anonymous top-level `runner.executor` default.
+  Same command/args as that default; no behavior change for existing
+  callers.
+- Three new read-only verbs: `fgos decision-index [--check]` generates
+  `docs/decisions/index.md`, a projection of every platform/repo-wide
+  decision (`fgos decision --scope <area>`) from `state.decisions`;
+  `fgos context-render <id>` renders an item's `CONTEXT.md` "## Locked
+  decisions" table from `state.decisions` in place, so the table is never
+  hand-typed; `fgos authoritative-match --quadrant <docs/quadrant-dir>
+  --topic "..."` (or `--check-duplicates`) skeleton-matches a topic
+  against docs' own `authoritative_for` frontmatter, so a growing skill
+  finds an existing doc to update instead of guessing a second path.
+- `fgos decision --relation none|supersedes:<id>|touches:<id>` — every
+  decision write now declares its relation to prior decisions explicitly;
+  a `supersedes` relation runs a write-time sweep across `docs/`, `src/`,
+  `plugins/` for citations of the superseded id that don't also
+  acknowledge the new one, surfaced as `danglingCitations` on the write's
+  own response.
+- `fgos decision --scope <area>` — a platform/repo-wide decision (no
+  `--id`) that shows up in the generated `docs/decisions/index.md`.
+- `fgos doctor`/`fgos doctor --fix` gained a `decision-index-stale`
+  check+fix pair: reports and repairs drift between `docs/decisions/
+  index.md` and `state.decisions`.
+- The hand-authored `docs/decisions/000N-*.md` ADR corpus (34 files) has
+  been retired: `state.decisions` (via `fgos decision --scope`) is now the
+  source of truth for platform decisions, with full narrative migrated
+  verbatim into the relevant `docs/specs/<area>.md`'s own "Lịch sử quyết
+  định" section. `docs/decisions/index.md` (generated) replaces the old
+  hand-written `0000-index.md`.
 - `runner.capabilities` — a curated catalog of capability names, shared
   between the tool-registry's own `capability` field and
   `capacities.<id>.for`. Each entry is `{description?, aliases?}`. This
@@ -33,7 +93,76 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   scoped subtask) and record it in the event log — a call outside the
   domain's declared graph is refused with the legal edges named in the
   error, and a call outside a domain that declares no `roleGraph` at all is
-  refused just as cleanly.
+  refused just as cleanly. Every existing item and every existing log
+  replays byte-for-byte unaffected — `holder` and the two new event kinds
+  are both fully optional/lazy, never present unless actually used.
+- `runner.executors.pi` — `pi` (`@earendil-works/pi-coding-agent`)
+  registered as a second `agent`-kind executor alongside `agy`, via
+  `fgos setup`'s existing config-default merge (no manual `.fgos/
+  config.json` edit needed). Invocation shape: `pi --provider openai-codex
+  --model gpt-5.5 --tools <allowlist> --mode json --approve -p <prompt>`,
+  confirmed live against the coding-domain worker contract (a genuinely
+  disposable work item, both a correct cold-pickup refusal and a correct
+  commit-and-`[DONE]` completion) — see
+  `docs/history/pi-executor-runtime-capacity/RESEARCH.md`.
+
+- `codex` (OpenAI Codex CLI) wired as a new out-of-process dispatch
+  executor (`.fgos/config.json`'s `runner.executors.codex`), using
+  `codex exec --dangerously-bypass-approvals-and-sandbox` — an
+  unconditional bypass, deliberately no OS sandbox boundary. Unlike
+  `agy`'s own entry, this is not a lesser-but-real boundary: research
+  (`docs/history/codex-permission-capability-boundary/RESEARCH.md`,
+  branch `fgw/tsk-4kh`) proved `codex`'s real sandbox
+  (`-s workspace-write`) blocks the worker contract's own `git commit`
+  step outright, because this repo's `.githooks/pre-commit` spawns a
+  nested `git` subprocess the sandbox refuses with `EPERM` — a decision,
+  not an oversight, accepted explicitly after reviewing that trade-off
+  (`docs/history/codex-bypass-executor/`).
+
+### Changed
+
+- Explicit verify cadence rule added to `.agents/skills/_shared/coding-worker-contract.md` Layer 2 rule 2: out-of-process workers are now instructed to run the item's `verify` command once, near the end, when they believe the work is actually done — never as a per-edit habit.
+
+### Fixed
+
+- The `cli-spawn` dispatch adapter (`src/runner/dispatch/transport.mjs`)
+  now spawns every executor with `stdin: 'ignore'` instead of the
+  default open pipe. `codex` (unlike `agy`) checks for piped stdin on
+  startup ("Reading additional input from stdin...") and blocks
+  indefinitely on a pipe nothing ever writes to or closes — found live
+  wiring `codex` as an executor (`docs/history/codex-bypass-executor/`).
+- The same stdin-pipe hang also affected `runCommand`
+  (`src/runner/goal-check.mjs`), the shared verify runner behind `fgos
+  return`/`approve`/merge/dispatch's own re-verify — a `codex`-based
+  `verify` command timed out there too until the same `stdin: 'ignore'`
+  fix was applied.
+- `fgos decision` now requires `--text` explicitly. Before this, a call
+  with no `--text` silently fell back to joining whatever positional
+  arguments were left over (e.g. `fgos decision write "..."` stored
+  "write ..." as the decision text) instead of refusing — the CLI now
+  refuses cleanly (exit 4) rather than storing corrupted decision text.
+- The `agy` (Antigravity Cli) executor no longer dispatches with
+  `--dangerously-skip-permissions` (`.fgos/config.json`'s
+  `runner.executors.agy`, now `--mode accept-edits`). `fgos doctor`/`fgos
+  setup` provision a real command-permission boundary in agy's own
+  settings.json instead (`agy-permissions-configured` check,
+  `src/setup/agy-permissions.mjs`): `toolPermission: "always-proceed"`
+  plus a `permissions.deny` list blocking destructive/exfiltration-prone
+  commands (`rm -rf`, `sudo`, force-push, `git reset --hard`, `git stash`,
+  raw `curl`/`wget`). This is a denylist (default-allow, explicit-deny),
+  not a true default-deny allowlist — `agy`'s headless (`-p`) mode was
+  live-proven (`docs/history/agy-permission-capability-allowlist/
+  RESEARCH.md` Round 4) to blanket-deny every command-type tool call under
+  its `strict`/`request-review` modes regardless of `permissions.allow`
+  content, so a real allowlist is not reachable there today — still
+  strictly narrower than the unconditional bypass it replaces.
+- `fgos decision` gains an optional `--kind` flag. Before this, every
+  write through the CLI verb defaulted to `addDecision`'s own `'design'`
+  kind — including `fgos-coding-validating`'s own audit line for an
+  auto-approved gate — which the retrospective/cleanup gate
+  (`checkRetrospectiveContent`) read as a human reflecting on the work,
+  letting an item satisfy that gate with no retrospective document behind
+  it. `fgos-coding-validating` now passes `--kind engine` on that line.
 
 ### Changed
 
@@ -140,18 +269,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Multi-role team harness, first slice (coding domain): work items gain an
-  optional third axis, `holder` — orthogonal to `status` and `stage`, opt-in
-  per-domain via a new `roleGraph` declaration. Two new verbs, `fgos handoff
-  <id> --to <role> --reason <advise|assist|review|consult>` and `fgos
-  handoff-return <id>`, let a session make a guarded role-to-role call
-  (consult a researcher, get something reviewed, ask a human, hand off a
-  scoped subtask) and record it in the event log — a call outside the
-  domain's declared graph is refused with the legal edges named in the
-  error, and a call outside a domain that declares no `roleGraph` at all is
-  refused just as cleanly. Every existing item and every existing log
-  replays byte-for-byte unaffected — `holder` and the two new event kinds
-  are both fully optional/lazy, never present unless actually used.
 - New config key `ironLaw.level` in `.fgos/config.json`, with two values:
   `ask` (the default — the gate refuses until a person acknowledges) and
   `warn` (opt-in — the gate prints what it matched, records one engine
@@ -386,6 +503,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- `npm run check:decision-supersession` — the `docs/decisions/NNNN-*.md` +
+  `0000-index.md` pointer-pair format it validated is retired for good
+  along with the hand-authored ADR corpus (see Added, ADR retirement).
+  `scripts/check-decision-supersession.mjs`'s pure functions stay real and
+  unit-tested against synthetic fixtures; only the real-repo CLI mode had
+  nothing left to run against.
 - The `orchestrator` word ban (`test/docs/launcher-vocabulary-guard.test.mjs`
   and its 28-entry allowlist) is retired, per decision `0031`. Decision
   `0028` banned the term while it carried no meaning; decision `0029` D17

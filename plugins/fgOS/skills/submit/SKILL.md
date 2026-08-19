@@ -64,23 +64,11 @@ later by `discovery`'s own judgment, not by this skill.
 
 2. **Scan the current fgOS view for a dependency candidate.** Run:
 
-   ```
-   # fgos CLI fallback (tsk-1no D3)
-   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
-   if [ -f "$FGOS_BIN" ]; then
-     node "$FGOS_BIN" list --json
-   elif command -v fgos >/dev/null 2>&1; then
-     fgos list --json
-   else
-     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
-     exit 1
-   fi
-   ```
+   See `../_shared/fgos-cli-fallback.md`, substituting `<verb-cmd>` with:
 
-   Always use the literal `${CLAUDE_PROJECT_DIR}` substitution shown above,
-   never a relative path — an installed plugin's files run from a copied
-   cache location, not from this repo checkout, so a relative path would
-   resolve to the wrong place or fail outright.
+   ```
+   list --json
+   ```
 
    Read the returned items' titles/text and look for a CLEAR,
    textually-grounded match to the new submission — e.g. the new text
@@ -140,35 +128,20 @@ later by `discovery`'s own judgment, not by this skill.
 5. **Call `submit`.**
    - If the user confirmed (or edited to) one or more dependency ids, run:
 
+     Both branches use `../_shared/fgos-cli-fallback.md`, substituting
+     `<verb-cmd>` with:
+
      ```
-     # fgos CLI fallback (tsk-1no D3)
-     FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
-     if [ -f "$FGOS_BIN" ]; then
-       node "$FGOS_BIN" submit "<text>" --deps <confirmed-ids> --domain <domain> --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-     elif command -v fgos >/dev/null 2>&1; then
-       fgos submit "<text>" --deps <confirmed-ids> --domain <domain> --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-     else
-       echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
-       exit 1
-     fi
+     submit "<text>" --deps <confirmed-ids> --domain <domain> --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
      ```
 
      where `<confirmed-ids>` is a comma-separated list of the confirmed
      dependency ids.
    - If the user rejected the suggestion, or no candidate was found in
-     step 2, run the same command with **no `--deps` flag at all**:
+     step 2, run the same fallback with **no `--deps` flag at all**:
 
      ```
-     # fgos CLI fallback (tsk-1no D3)
-     FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
-     if [ -f "$FGOS_BIN" ]; then
-       node "$FGOS_BIN" submit "<text>" --domain <domain> --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-     elif command -v fgos >/dev/null 2>&1; then
-       fgos submit "<text>" --domain <domain> --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-     else
-       echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
-       exit 1
-     fi
+     submit "<text>" --domain <domain> --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
      ```
 
    `<text>` is the (possibly clarify-rewritten) free-text description from

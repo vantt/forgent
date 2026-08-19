@@ -3,7 +3,7 @@ type: how-to
 title: How to hold an open-ended design brainstorm with fgos-coding-shaping
 tags: [fgos-coding-shaping, discussion, brainstorm, clarify]
 timestamp: 2026-08-06T09:50:00.000Z
-source_capture_ids: [tsk-69g]
+source_capture_ids: [tsk-69g, tsk-5qs]
 ---
 
 # How to hold an open-ended design brainstorm with `fgos-coding-shaping`
@@ -45,6 +45,43 @@ avoid fragmenting the read-through — at
    task, each with its own `{#task-<slug>}` anchor: its own goal, an
    excerpt of §6, applicable D-IDs, relationships to sibling tasks, and a
    draft verify command.
+
+## Every `DISCUSSION.md` write lands on the item's own branch, never on main
+
+`fgos-coding-shaping` claims an item and enters its own `fgw/<id>`
+worktree **before** creating or writing `docs/history/<feature>/
+DISCUSSION.md` — never on the shared main checkout. This wasn't always
+true: `tsk-5qs` fixed a real incident where the skill wrote and committed
+`DISCUSSION.md` directly on main, confirmed by main's own HEAD carrying
+several `docs(...)` commits with no merge behind them.
+
+The claim sequencing depends on which of the two entry points was used:
+
+- **`/fgOS:coding-shape <id>`** (an existing item) — skip `fgos submit`
+  entirely, since the item already exists; claim and enter its worktree
+  directly.
+- **`/fgOS:coding-shape <free-text>`** (no existing item) — call `fgos
+  submit` first to create the item, then claim and enter its worktree
+  using the returned id.
+- **`/fgOS:coding-shape-distill <doc-path> [id]`** — with `id`: distill
+  into that existing item (claim + enter its worktree, same as the
+  `id`-given case above). Without `id`: auto-create a new item via `fgos
+  submit`, using the doc-path's own title/first line as the submitted
+  text, then claim and enter its worktree using the returned id.
+
+**Exactly one real item is ever claimed/worktree'd during an active
+`fgos-coding-shaping` session** — the single `id`/free-text/doc-path
+argument. This isn't a limitation worth working around: the skill's own
+hard rule is that it never creates child items or attaches dependencies
+itself during a live session — task breakdown (§7 above) is prose+anchors
+only inside `DISCUSSION.md`. Real child-item creation happens downstream,
+in `fgos-coding-planning`'s own split step, after this skill's terminal
+handoff — so no multi-worktree design is ever needed here. The worktree
+entered at the start of a shaping session is the same standard `fgw/<id>`
+lifecycle used by every other stage (`fgos pick` + `EnterWorktree`),
+persisting across `shaping -> exploring -> planning -> executing` on that
+one item, merged once at `awaiting-approval` — not a separate,
+discussion-only tree created and torn down early.
 
 ## Why the brainstorm stays open conversational prose
 
@@ -89,6 +126,9 @@ source of truth alongside the item store.
 
 - `docs/history/fgos-coding-shaping/CONTEXT.md` — full locked decisions
   (D1–D6) and scout evidence.
+- `docs/history/fgos-coding-shaping-branch-isolation/CONTEXT.md` — the
+  submit-then-claim-then-worktree fix and its own locked decisions
+  (D1–D4).
 - `.claude/skills/fgos-coding-exploring/SKILL.md`,
   `.claude/skills/fgos-coding-planning/SKILL.md` — the two skills this feature
   invokes natively, never duplicates.

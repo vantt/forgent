@@ -231,7 +231,7 @@ test('e2e pr-gate (a) runner item full loop: add -> runner dispatch -> awaiting-
   // record (the D3 alternate pass) satisfies it here instead.
   assert.equal(fgos(repoRoot, ['move', 'pr-a-item', '--to', 'retrospective']).status, 0);
   assert.equal(fgos(repoRoot, ['move', 'pr-a-item', '--to', 'cleanup']).status, 0);
-  assert.equal(fgos(repoRoot, ['decision', '--id', 'pr-a-item', '--text', 'retrospective done', '--rationale', 'test fixture']).status, 0);
+  assert.equal(fgos(repoRoot, ['decision', '--id', 'pr-a-item', '--text', 'retrospective done', '--rationale', 'test fixture', '--relation', 'none']).status, 0);
   fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
   fs.writeFileSync(path.join(repoRoot, '.fgos', 'config.json'), JSON.stringify({ cleanup: { ttlDays: 0 } }));
   const cleanupResult = fgos(repoRoot, ['cleanup', 'pr-a-item']);
@@ -474,7 +474,7 @@ test('e2e pr-gate (e) branch-source item full loop: park (blocked + live branch)
   // record satisfies D8's content check (the D3 alternate pass).
   assert.equal(fgos(repoRoot, ['move', 'pr-e-item', '--to', 'retrospective']).status, 0);
   assert.equal(fgos(repoRoot, ['move', 'pr-e-item', '--to', 'cleanup']).status, 0);
-  assert.equal(fgos(repoRoot, ['decision', '--id', 'pr-e-item', '--text', 'retrospective done', '--rationale', 'test fixture']).status, 0);
+  assert.equal(fgos(repoRoot, ['decision', '--id', 'pr-e-item', '--text', 'retrospective done', '--rationale', 'test fixture', '--relation', 'none']).status, 0);
   fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
   fs.writeFileSync(path.join(repoRoot, '.fgos', 'config.json'), JSON.stringify({ cleanup: { ttlDays: 0 } }));
   const cleanupEResult = fgos(repoRoot, ['cleanup', 'pr-e-item']);

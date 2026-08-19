@@ -70,6 +70,14 @@ export function mergeSlotLockFile(targetRef) {
   return `merge-slot--${encodeURIComponent(targetRef)}.lock`;
 }
 
+/**
+ * Maps a working directory path (cwd) to a collision-free, filesystem-safe
+ * lock filename for per-item dispatch concurrency protection (tsk-64hk). Pure.
+ */
+export function dispatchLockFile(cwd) {
+  return `dispatch--${encodeURIComponent(cwd)}.lock`;
+}
+
 /** Formats a millisecond duration (lockAgeMs/remainingTtlMs) as a short
  * human-readable string ("2m15s", "45s") for CLI messages. Non-numeric or
  * negative input (no known duration) formats as "unknown" rather than

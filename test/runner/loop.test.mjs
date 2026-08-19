@@ -1887,7 +1887,8 @@ test('tsk-30v: DISCOVERY DISPATCH sweep advances discovery -> planning on a clea
 test('tsk-4v6/tsk-30v: DISCOVERY DISPATCH sweep advances the item to exploring AND parks it on an unclear verdict, matching the interactive driver path', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-research-unclear', stage: 'discovery' });
-  const body = JSON.stringify({ clear: false, question: 'Which retry backoff strategy should this follow?' });
+  const question = '## Context\n\nThe research worker needs a retry backoff strategy for this item.\n\n## Why this matters\n\nThis directly affects the outcome: which retry backoff strategy should this follow?';
+  const body = JSON.stringify({ clear: false, question });
   const config = configFor(writeDiscoveryVerdictExecutor(scriptDir, counterFile, body));
 
   await runOnce({ repoRoot, config, worktreeDir, log: noLog });
@@ -1896,7 +1897,7 @@ test('tsk-4v6/tsk-30v: DISCOVERY DISPATCH sweep advances the item to exploring A
   const item = view.work['item-research-unclear'];
   assert.equal(item.stage, 'exploring', 'tsk-30v D2/D3: unclear no longer parks in place -- stage advances to exploring');
   assert.equal(item.status, 'awaiting-human', 'unclear verdict parks the item, matching resolveDiscovery\'s session-role behavior');
-  assert.equal(view.gates?.['item-research-unclear']?.ask, 'Which retry backoff strategy should this follow?');
+  assert.equal(view.gates?.['item-research-unclear']?.ask, question);
 });
 
 test('tsk-4v6: DISCOVERY DISPATCH sweep never advances the item when a real commit lands but no verdict fence is reported — the exact bug this item fixes', async () => {

@@ -439,6 +439,37 @@ const codingDomain = {
         decompose: planningEdges,
       }),
     }),
+    // workerContract (tsk-2uf-2 D4/D6): the seam a dispatch template wires
+    // to the coding-specific worker boundary contract, opt-in per-domain,
+    // same shape as `roleGraph` one field above -- a domain that declares
+    // no `workerContract` never dispatches a worker under this contract at
+    // all (absence is a no-op, not an error; `workerContractFor` below
+    // never throws). Points at the repo-relative path of the GENERIC+
+    // CODING-SPECIFIC two-layer contract this domain's dispatched workers
+    // follow (`../_shared/coding-worker-contract.md` from any `.agents/
+    // skills/<name>/` skill file) -- content lives in exactly one place,
+    // this field only names where it is. `synthetic`/`triage`/`fixture-
+    // marketing` declare none, so `workerContractFor` returns `undefined`
+    // for all three, same "domain legitimately does not have this axis"
+    // shape `roleGraphFor`/`classificationVocabulary` already use.
+    //
+    // Deliberately unwired to `dispatch/prepare.mjs`'s own `buildPrompt`
+    // in this item: `buildPrompt`'s `skillPath` already resolves to
+    // `fgos-coding-implement/SKILL.md`, which now itself gates a
+    // dispatched-worker reader straight to this same contract (that
+    // file's own "Driver vs. worker" section) before any driver-only
+    // instruction -- the V3 fix lands there, not by changing what
+    // `skillPath` points at. Consuming this field from `buildPrompt`
+    // directly would change `skillPath`'s rendered value for every
+    // existing coding-domain dispatch, breaking `test/runner/
+    // dispatch.test.mjs`'s and `test/runner/prompt-templates.test.mjs`'s
+    // existing byte-fidelity assertions -- both outside this item's
+    // declared footprint. This field exists now, real and correctly
+    // shaped, for a future item to wire in without a registry change,
+    // same "additive, no caller yet" precedent `prepareDispatch` itself
+    // set one item earlier (tsk-2uf-1, `src/runner/dispatch/prepare.mjs`'s
+    // own header comment).
+    workerContract: '.agents/skills/_shared/coding-worker-contract.md',
 };
 
 // workflows/defaultWorkflow/workflowFor (tsk-2t9c D7/D7a): the hierarchy
@@ -724,6 +755,14 @@ export function skillForStage(domain, stage) {
  * empty" as different questions. */
 export function roleGraphFor(domain) {
   return domain?.roleGraph;
+}
+
+/** `domain`'s own `workerContract` path (tsk-2uf-2 D4/D6), or `undefined`
+ * when the domain declares none -- every domain but `coding` today, same
+ * absent-key-means-not-declared shape `roleGraphFor` uses one field above.
+ * Never throws, safe to call unconditionally. */
+export function workerContractFor(domain) {
+  return domain?.workerContract;
 }
 
 /** The legal call edges for `fromRole` at `stage` within `domain`'s

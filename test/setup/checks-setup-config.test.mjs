@@ -36,6 +36,14 @@ import {
   writeEnduserDoc,
   writeEnduserManifest,
 } from './helpers/setup-checks-harness.mjs';
+import { DEFAULT_CAPABILITY_SLOTS, PI_EXECUTOR_DEFAULT } from '../../src/setup/registrations.mjs';
+
+const EXPECTED_RUNNER_DEFAULT = {
+  ...DEFAULT_RUNNER_CONFIG,
+  capabilities: DEFAULT_CAPABILITY_SLOTS,
+  modelPolicies: { ...DEFAULT_RUNNER_CONFIG.modelPolicies, 'openai-codex': { lightweight: 'gpt-5.5' } },
+  executors: { pi: PI_EXECUTOR_DEFAULT },
+};
 
 
 test('fgos setup wires core.hooksPath to this checkout\'s absolute .githooks path, and reports hooksWired: true', () => {
@@ -63,7 +71,12 @@ test('fgos setup initializes ~/.fgos/config.json with the full default shape (ts
   assert.equal(envelope.data.globalConfigCreated, true);
   assert.ok(fs.existsSync(expectedGlobalPath));
   const written = JSON.parse(fs.readFileSync(expectedGlobalPath, 'utf8'));
-  assert.deepEqual(written.runner, DEFAULT_RUNNER_CONFIG);
+  // tsk-2uf-3: the registered "runner" config-default now layers the
+  // advise/execute capability slots onto DEFAULT_RUNNER_CONFIG (never
+  // changing that constant itself, src/setup/registrations.mjs's own
+  // `DEFAULT_CAPABILITY_SLOTS` composition) -- written.runner is no longer
+  // byte-identical to DEFAULT_RUNNER_CONFIG alone.
+  assert.deepEqual(written.runner, EXPECTED_RUNNER_DEFAULT);
   fs.rmSync(cwd, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });
 });

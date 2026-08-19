@@ -42,12 +42,13 @@ import {
   writeEnduserManifest,
 } from './helpers/setup-checks-harness.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../../src/state/worker-slots.mjs';
-import { DEFAULT_IRON_LAW_LEVEL, findDomainWorkflowSkillMapGaps } from '../../src/setup/registrations.mjs';
+import { DEFAULT_CAPABILITY_SLOTS, DEFAULT_IRON_LAW_LEVEL, PI_EXECUTOR_DEFAULT, findDomainWorkflowSkillMapGaps } from '../../src/setup/registrations.mjs';
+import { addDecision } from '../../src/state/store.mjs';
 
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, plugin-dev-skills-packaged, changelog-unreleased-stale, herdr-launcher-configured, herdr-web-dashboard-configured, work-classification-vocabulary, work-stage-vocabulary, domain-workflow-skillmap-coverage, delivered-not-on-trunk, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, events-jsonl-not-truncated, cli-version-visible, worker-slots-ceiling-usable, gateway-token-configured, readme-install-tag-exists, iron-law-configured, task-specs-resolve, agent-claims-resolve, and dispatch-decide-hook-wired', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, plugin-dev-skills-packaged, changelog-unreleased-stale, herdr-launcher-configured, herdr-web-dashboard-configured, work-classification-vocabulary, work-stage-vocabulary, domain-workflow-skillmap-coverage, delivered-not-on-trunk, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, events-jsonl-not-truncated, cli-version-visible, worker-slots-ceiling-usable, gateway-token-configured, readme-install-tag-exists, iron-law-configured, task-specs-resolve, agent-claims-resolve, dispatch-decide-hook-wired, advise-execute-capabilities-configured, decision-index-stale, and agy-permissions-configured', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     [
@@ -82,6 +83,9 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'dispatch-decide-hook-wired',
       'task-specs-resolve',
       'agent-claims-resolve',
+      'advise-execute-capabilities-configured',
+      'decision-index-stale',
+      'agy-permissions-configured',
     ].sort(),
   );
 });
@@ -674,6 +678,19 @@ test('enduser-docs-index-stale passes when the index already covers every on-dis
   fs.rmSync(tmp, { recursive: true, force: true });
 });
 
+test('enduser-docs-index-stale fails and reports orphan count when an index entry has no matching doc on disk', () => {
+  const tmp = mkTemp('fgos-enduser-index-check-');
+  writeEnduserDoc(tmp, 'how-to', 'sample.md', 'Sample Doc');
+  writeEnduserManifest(tmp, [
+    { quadrant: 'how-to', purpose: 'x', audience: 'y', docPath: 'docs/how-to/sample.md', title: 'Sample Doc', sourceCaptureId: null },
+    { quadrant: 'how-to', purpose: 'x', audience: 'y', docPath: 'docs/how-to/deleted.md', title: 'Deleted Doc', sourceCaptureId: null },
+  ]);
+  const { passed, message } = checkById('enduser-docs-index-stale').check(tmp);
+  assert.equal(passed, false);
+  assert.match(message, /1 tài liệu dư thừa/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
 test('enduser-docs-index-stale counts a doc under docs/decisions toward the explanation quadrant (alias, D6)', () => {
   const tmp = mkTemp('fgos-enduser-index-check-');
   writeEnduserDoc(tmp, 'decisions', '0001-example.md', 'Example Decision');
@@ -707,6 +724,115 @@ test('enduser-docs-index-stale fix is idempotent -- a second run reports changed
   const second = fixById('enduser-docs-index-stale').fix(tmp);
   assert.equal(second.changed, false);
   assert.match(second.message, /already up to date/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('decision-index-stale passes when docs/decisions/index.md does not exist yet (tsk-1lv review-fix F10)', () => {
+  const tmp = mkTemp('fgos-decision-index-check-');
+  const fgosDir = path.join(tmp, '.fgos');
+  initStore(fgosDir);
+  const { passed, message } = checkById('decision-index-stale').check(tmp);
+  assert.equal(passed, true);
+  assert.match(message, /not found/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('decision-index-stale fails when state.decisions has a scope-carrying decision the on-disk index does not reflect', () => {
+  const tmp = mkTemp('fgos-decision-index-check-');
+  const fgosDir = path.join(tmp, '.fgos');
+  initStore(fgosDir);
+  fs.mkdirSync(path.join(tmp, 'docs', 'decisions'), { recursive: true });
+  fs.writeFileSync(path.join(tmp, 'docs', 'decisions', 'index.md'), '# Decisions index\n\n_No platform/repo-wide decisions recorded yet._\n');
+  addDecision(fgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
+
+  const { passed, message } = checkById('decision-index-stale').check(tmp);
+  assert.equal(passed, false);
+  assert.match(message, /stale/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('decision-index-stale passes when the on-disk index already matches state.decisions', () => {
+  const tmp = mkTemp('fgos-decision-index-check-');
+  const fgosDir = path.join(tmp, '.fgos');
+  initStore(fgosDir);
+  addDecision(fgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
+  fixById('decision-index-stale').fix(tmp);
+
+  const { passed, message } = checkById('decision-index-stale').check(tmp);
+  assert.equal(passed, true);
+  assert.match(message, /up to date/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('decision-index-stale fix regenerates the index via the same path fgos decision-index uses, resolving the drift', () => {
+  const tmp = mkTemp('fgos-decision-index-fix-');
+  const fgosDir = path.join(tmp, '.fgos');
+  initStore(fgosDir);
+  fs.mkdirSync(path.join(tmp, 'docs', 'decisions'), { recursive: true });
+  fs.writeFileSync(path.join(tmp, 'docs', 'decisions', 'index.md'), '# Decisions index\n\n_No platform/repo-wide decisions recorded yet._\n');
+  addDecision(fgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
+  assert.equal(checkById('decision-index-stale').check(tmp).passed, false);
+
+  const { changed, message } = fixById('decision-index-stale').fix(tmp);
+  assert.equal(changed, true);
+  assert.match(message, /regenerated/);
+
+  const after = checkById('decision-index-stale').check(tmp);
+  assert.equal(after.passed, true);
+  const indexContent = fs.readFileSync(path.join(tmp, 'docs', 'decisions', 'index.md'), 'utf8');
+  assert.match(indexContent, /D-ADR9999: example/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('decision-index-stale fix is idempotent -- a second run reports changed:false', () => {
+  const tmp = mkTemp('fgos-decision-index-fix-');
+  const fgosDir = path.join(tmp, '.fgos');
+  initStore(fgosDir);
+  addDecision(fgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
+  fixById('decision-index-stale').fix(tmp);
+  const second = fixById('decision-index-stale').fix(tmp);
+  assert.equal(second.changed, false);
+  assert.match(second.message, /already up to date/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('decision-index-stale check FAILS when the index is missing but state.decisions has real rows to index -- H2 tsk-1lv round-2 regression (a missing index with real decisions to project is drift, not "nothing to check")', () => {
+  const tmp = mkTemp('fgos-decision-index-check-');
+  const fgosDir = path.join(tmp, '.fgos');
+  initStore(fgosDir);
+  addDecision(fgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
+
+  const { passed, message } = checkById('decision-index-stale').check(tmp);
+  assert.equal(passed, false);
+  assert.match(message, /not found/);
+  assert.doesNotMatch(message, /nothing to check/);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test('decision-index-stale fix reports a graceful skip (changed:false, no throw) when generateDecisionIndex refuses to blank an existing populated index -- B3 tsk-1lv round-2 regression (a thrown StoreError here used to abort fgos doctor --fix entirely, discarding every other fix\'s result)', () => {
+  const tmp = mkTemp('fgos-decision-index-fix-');
+  const populatedFgosDir = path.join(tmp, '.fgos');
+  initStore(populatedFgosDir);
+  addDecision(populatedFgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
+  fixById('decision-index-stale').fix(tmp);
+  const before = fs.readFileSync(path.join(tmp, 'docs', 'decisions', 'index.md'), 'utf8');
+
+  // Simulate the real-world trigger: the .fgos store this check/fix pair
+  // reads from is unreadable/empty relative to an already-populated
+  // on-disk index -- exactly what a fresh clone or a worktree missing
+  // .fgos/ (ADR0020) looks like once this branch's own committed index.md
+  // lands.
+  fs.rmSync(populatedFgosDir, { recursive: true, force: true });
+
+  let result;
+  assert.doesNotThrow(() => {
+    result = fixById('decision-index-stale').fix(tmp);
+  });
+  assert.equal(result.changed, false);
+  assert.match(result.message, /skipped/);
+
+  const after = fs.readFileSync(path.join(tmp, 'docs', 'decisions', 'index.md'), 'utf8');
+  assert.equal(after, before, 'the real index must survive the refused fix untouched');
   fs.rmSync(tmp, { recursive: true, force: true });
 });
 
@@ -904,7 +1030,12 @@ test('config-not-stale passes when the existing config already has every default
   fs.writeFileSync(
     path.join(cwd, '.fgos', 'config.json'),
     JSON.stringify({
-      runner: DEFAULT_RUNNER_CONFIG,
+      runner: {
+        ...DEFAULT_RUNNER_CONFIG,
+        capabilities: DEFAULT_CAPABILITY_SLOTS,
+        modelPolicies: { ...DEFAULT_RUNNER_CONFIG.modelPolicies, 'openai-codex': { lightweight: 'gpt-5.5' } },
+        executors: { pi: PI_EXECUTOR_DEFAULT },
+      },
       gateBypass: { level: 'off' },
       cleanup: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS, leafTtlDays: DEFAULT_CLEANUP_LEAF_TTL_DAYS },
       herdrOrchestrator: DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
@@ -1035,6 +1166,52 @@ test('worker-slots-ceiling-usable passes and names a real armed ceiling', () => 
   const { passed, message } = checkById('worker-slots-ceiling-usable').check(cwd);
   assert.equal(passed, true);
   assert.match(message, /workerSlots\.ceiling = 6/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+// ─── advise-execute-capabilities-configured (tsk-2uf-3, docs/history/
+// dispatch-activation-and-handoff-redesign/CONTEXT.md D2): same
+// generic-scan/dedicated-check split as gateway/workerSlots/invariantChecks
+// above -- config-not-stale already catches runner.capabilities (or either
+// slot) being wholly ABSENT; this check catches present-but-malformed.
+
+test('advise-execute-capabilities-configured fails when runner.capabilities is missing entirely', () => {
+  const cwd = mkTemp('doctor-capabilities-absent-');
+  const { passed, message } = checkById('advise-execute-capabilities-configured').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /runner\.capabilities section missing/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('advise-execute-capabilities-configured fails when a slot is missing or malformed', () => {
+  for (const capabilities of [
+    { advise: {} }, // execute missing
+    { execute: {} }, // advise missing
+    { advise: 'not-an-object', execute: {} },
+    { advise: [], execute: {} },
+    { advise: null, execute: {} },
+    {},
+  ]) {
+    const cwd = mkTemp('doctor-capabilities-malformed-');
+    fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+    fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities } }));
+    const { passed, message } = checkById('advise-execute-capabilities-configured').check(cwd);
+    assert.equal(passed, false, `capabilities: ${JSON.stringify(capabilities)}`);
+    assert.match(message, /missing or has a malformed slot for/);
+    fs.rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+test('advise-execute-capabilities-configured passes when both slots are declared', () => {
+  const cwd = mkTemp('doctor-capabilities-ok-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(
+    path.join(cwd, '.fgos', 'config.json'),
+    JSON.stringify({ runner: { capabilities: DEFAULT_CAPABILITY_SLOTS } }),
+  );
+  const { passed, message } = checkById('advise-execute-capabilities-configured').check(cwd);
+  assert.equal(passed, true);
+  assert.match(message, /declares both "advise" and "execute"/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 

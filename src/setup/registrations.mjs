@@ -32,12 +32,14 @@ import { detectRcFiles, hasSourceLine, deadSourceLines, probeShellIntegrationInv
 import { mergeConfigDefaults } from './config-merge.mjs';
 import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { claudeCodeHookWired } from './claude-code-hooks.mjs';
+import { checkAgyPermissionsConfigured, fixAgyPermissionsConfigured } from './agy-permissions.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
-import { listWork } from '../state/store.mjs';
+import { listWork, StoreError } from '../state/store.mjs';
 import { driftStatus, unmergedDeliveries } from '../state/drift-status.mjs';
 import { computeEnduserDocsIndex, generateEnduserDocsIndex, manifestPathFor } from '../report/enduser-index-generate.mjs';
+import { computeDecisionIndex, generateDecisionIndex, indexPathFor } from '../report/decision-index.mjs';
 import { isResolvedStatus } from '../state/frontier.mjs';
 import { DOMAINS, getDomain, resolveDomainName, effectiveStage } from '../state/workflow-stage-graphs.mjs';
 import { readLocalStatus, classifyRegistryPosture, toolsFromExecutors } from '../state/tool-registry.mjs';
@@ -610,6 +612,17 @@ registerCheck({
   check: (cwd) => checkToolRegistryConfigured(cwd),
 });
 
+registerCheck({
+  id: 'agy-permissions-configured',
+  description: 'agy settings.json has a working command denylist instead of relying only on --dangerously-skip-permissions (tsk-1xm)',
+  check: () => checkAgyPermissionsConfigured(),
+});
+
+registerFix({
+  id: 'agy-permissions-configured',
+  fix: () => fixAgyPermissionsConfigured(),
+});
+
 // tsk-5m7 (docs/history/tsk-3bn-merge-conductor-harness-v2/): a real
 // actionable problem, same class as the hook/config checks above — a root
 // branch that's drifted ahead of its target with nothing having synced it
@@ -1033,14 +1046,132 @@ registerCheck({
   check: (cwd) => checkGlobalProjectAwareness(cwd),
 });
 
-// The runner's own config-default, registered under its key in the shared
-// file (tsk-2cs D6) — `checkConfigNotStale`/`ensureSharedConfigDefaults`
-// above are both driven by this registration generically (tsk-5vf D4), not
-// a hardcoded reference to `DEFAULT_RUNNER_CONFIG`'s shape.
+// tsk-2uf-3 (docs/history/dispatch-activation-and-handoff-redesign/
+// CONTEXT.md D2): the two role-by-intelligence capability slots --
+// `advise` (value comes from disagreement, never changes state, one
+// question/one answer) and `execute` (value comes from compliance,
+// changes files, must pass verify). `decide --for <purpose>` already
+// validates a `--for` name against `runner.capabilities` (dispatch.mjs's
+// `validateCapabilitiesShape`/`resolveExecutorAndOverrides`), but the
+// shared config's `capabilities` map shipped with neither name declared,
+// so neither purpose could ever resolve. Layered onto the SAME `runner`
+// config-default below (never a second, colliding `key: 'runner'`
+// registration -- `assembleRegistryDefaults` combines registrations by
+// flat per-key assignment, not a deep merge across entries sharing a
+// key) so `DEFAULT_RUNNER_CONFIG` itself (src/runner/dispatch.mjs,
+// tsk-2uf-1's own footprint) stays untouched -- this only ADDS a
+// `capabilities` key that constant has never declared. Deliberately no
+// `prefer`/`aliases`/`overrides`: naming which executor serves a purpose
+// is a dispatch-mechanism decision, and tsk-5tm-3 D5 forbids `execute`
+// (or, by the same reasoning, this registration) re-deciding that.
+export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
+  advise: {
+    description:
+      'Async product-decision consult -- value comes from disagreement, never changes state, one question/one answer (D2, docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md)',
+  },
+  execute: {
+    description:
+      'Compliance-driven work -- value comes from following the plan, changes files, must pass verify (D2, docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md)',
+  },
+});
+
+// tsk-47r: `pi` as a second `agent`-kind executor, layered onto this SAME
+// `runner` config-default for the same reason `capabilities` above is (a
+// second `key: 'runner'` registration would silently overwrite this one,
+// never merge with it). `executors.pi` mirrors `executors.agy`'s live
+// shape exactly (`.fgos/config.json`, hand-authored, not itself sourced
+// from this registration) — `mergeConfigDefaults`'s fill-missing-only
+// recursion (`config-merge.mjs`) adds `runner.executors.pi` and
+// `runner.modelPolicies["openai-codex"]` on the next `fgos setup` run
+// without touching the live `executors.agy`/`modelPolicies.claude`/
+// `modelPolicies.gemini` entries. `--provider openai-codex --model
+// gpt-5.5` and the `read,write,edit,bash,grep,find,ls` allowlist are the
+// EXACT invocation a live D4 proof-test dispatch ran and confirmed GREEN
+// (worker contract followed: layered skill-pointer chain read natively,
+// footprint honored, correct `[BLOCKED]`/`[DONE]` two-token reporting) —
+// see docs/history/pi-executor-runtime-capacity/RESEARCH.md Round 4.
+// Exported (mirrors `DEFAULT_CAPABILITY_SLOTS` below it) so the ripple
+// tests assert this exact shape instead of duplicating the literal.
+export const PI_EXECUTOR_DEFAULT = Object.freeze({
+  kind: 'agent',
+  description: 'pi coding agent (openai-codex/gpt-5.5) -- reference runtime for the coding-worker-contract, D4 proof-test GREEN (tsk-47r)',
+  allowCrossProvider: true,
+  invocations: [
+    {
+      via: 'cli',
+      adapter: 'cli-spawn',
+      command: 'pi',
+      args: [
+        '--provider',
+        'openai-codex',
+        '--model',
+        '{model}',
+        '--tools',
+        'read,write,edit,bash,grep,find,ls',
+        '--mode',
+        'json',
+        '--approve',
+        '-p',
+        '{prompt}',
+      ],
+    },
+  ],
+  providerModel: 'openai-codex',
+  rigorOverrides: {
+    light: 'lightweight',
+    standard: 'lightweight',
+    heavy: 'lightweight',
+  },
+});
+
 registerConfigDefault({
   id: 'runner',
   key: 'runner',
-  shape: DEFAULT_RUNNER_CONFIG,
+  shape: {
+    ...DEFAULT_RUNNER_CONFIG,
+    capabilities: DEFAULT_CAPABILITY_SLOTS,
+    modelPolicies: {
+      ...DEFAULT_RUNNER_CONFIG.modelPolicies,
+      'openai-codex': { lightweight: 'gpt-5.5' },
+    },
+    executors: { pi: PI_EXECUTOR_DEFAULT },
+  },
+});
+
+// `checkConfigNotStale` above already catches `runner.capabilities` (or
+// either slot inside it) being wholly ABSENT, generically, via
+// `assembleRegistryDefaults`'s merge -- same "generic scan covers missing,
+// a dedicated check covers present-but-malformed" split every other
+// present-but-unusable check in this file already follows (gateway/
+// workerSlots/invariantChecks above). What slips past the generic scan is
+// a slot present as the wrong shape (a string, an array, `null`) -- never
+// "missing", so `mergeConfigDefaults` has nothing to add, and `decide
+// --for advise`/`--for execute` would still fail validateCapabilitiesShape
+// with no doctor signal pointing at why.
+function checkAdviseExecuteCapabilitiesConfigured(cwd) {
+  const capabilities = readSharedConfig(cwd)?.runner?.capabilities;
+  if (!capabilities || typeof capabilities !== 'object' || Array.isArray(capabilities)) {
+    return {
+      passed: false,
+      message: 'runner.capabilities section missing -- run fgos setup (decide --for advise/execute cannot resolve until it exists)',
+    };
+  }
+  const missing = ['advise', 'execute'].filter(
+    (name) => !capabilities[name] || typeof capabilities[name] !== 'object' || Array.isArray(capabilities[name]),
+  );
+  if (missing.length > 0) {
+    return {
+      passed: false,
+      message: `runner.capabilities is missing or has a malformed slot for: ${missing.join(', ')} -- run fgos setup`,
+    };
+  }
+  return { passed: true, message: 'runner.capabilities declares both "advise" and "execute"' };
+}
+
+registerCheck({
+  id: 'advise-execute-capabilities-configured',
+  description: 'runner.capabilities declares the "advise" and "execute" purpose slots decide --for resolves against (tsk-2uf-3)',
+  check: (cwd) => checkAdviseExecuteCapabilitiesConfigured(cwd),
 });
 
 // tsk-slq D6 (AGENTS.md's install/setup/doctor gate — a new infra
@@ -1865,15 +1996,25 @@ function checkEnduserDocsIndexStale(cwd) {
       message: `${manifestPathFor(root)} not found -- nothing to check (project has not generated an end-user doc index yet)`,
     };
   }
-  const indexedPaths = new Set(JSON.parse(previousContent).map((e) => e.docPath));
+  const parsedIndex = JSON.parse(previousContent);
+  const indexedPaths = new Set(parsedIndex.map((e) => e.docPath));
+  const freshPaths = new Set(entries.map((e) => e.docPath));
   const total = entries.length;
   const missing = entries.filter((e) => !indexedPaths.has(e.docPath)).length;
-  if (missing === 0) {
+  const orphans = parsedIndex.filter((e) => !freshPaths.has(e.docPath)).length;
+  if (missing === 0 && orphans === 0) {
     return { passed: true, message: `${total}/${total} tài liệu end-user có trong index -- up to date` };
+  }
+  const parts = [];
+  if (missing > 0) {
+    parts.push(`${missing}/${total} tài liệu end-user chưa có trong index`);
+  }
+  if (orphans > 0) {
+    parts.push(`${orphans} tài liệu dư thừa trong index`);
   }
   return {
     passed: false,
-    message: `${missing}/${total} tài liệu end-user chưa có trong index -- chạy fgos docs-index`,
+    message: `${parts.join(', ')} -- chạy fgos docs-index`,
   };
 }
 
@@ -1901,4 +2042,95 @@ registerCheck({
 registerFix({
   id: 'enduser-docs-index-stale',
   fix: (cwd) => fixEnduserDocsIndexStale(cwd),
+});
+
+// tsk-1lv review-fix F10: `fgos decision-index --check` (tsk-1lv-2)
+// existed as a CLI verb but nothing ever called it -- not `npm test`, not
+// `fgos doctor` -- so docs/decisions/index.md could drift silently from
+// state.decisions the exact same way docs/enduser-docs-index.json used to
+// (tsk-1m0, the direct precedent this check/fix pair mirrors: read-only
+// `computeDecisionIndex` shared by both the check and the real generate
+// path, so this can never diverge from what `fgos decision-index` itself
+// would compute). A missing docs/decisions/index.md is a normal state for
+// any project with zero platform-scoped decisions logged yet -- same
+// "absent capability = clean skip" contract as the enduser-index check.
+// tsk-1lv round-2 review, H2: `previousContent === undefined` used to
+// always mean "nothing to check" regardless of whether real decisions
+// exist to index -- so "the index was deleted (or never generated) while
+// 36 real scope-carrying decisions sit in state.decisions" (the exact
+// drift this check exists to catch) reported passed:true, with a message
+// that asserted "no platform-scoped decisions logged yet" without ever
+// looking at whether that was true. Reproduced against the live repo,
+// not assumed. Fixed: "nothing to check" now requires BOTH the file
+// being absent AND the freshly-computed content having no real rows --
+// a missing file with real content to index is the same failure as a
+// stale one, just worded for the "never generated" case specifically.
+function checkDecisionIndexStale(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  const root = mainCheckout ?? cwd;
+  const fgosDir = path.join(root, '.fgos');
+  const { previousContent, nextContent, changed } = computeDecisionIndex(root, fgosDir);
+  const nextHasRows = /^\|.+\|.*\|\s*$/m.test(nextContent);
+  if (previousContent === undefined) {
+    if (!nextHasRows) {
+      return {
+        passed: true,
+        message: `${indexPathFor(root)} not found -- nothing to check (no platform-scoped decisions logged yet)`,
+      };
+    }
+    return {
+      passed: false,
+      message: `${indexPathFor(root)} not found, but state.decisions has platform-scoped decisions to index -- run fgos decision-index`,
+    };
+  }
+  if (!changed) {
+    return { passed: true, message: `${indexPathFor(root)} up to date` };
+  }
+  return {
+    passed: false,
+    message: `${indexPathFor(root)} is stale relative to state.decisions -- run fgos decision-index`,
+  };
+}
+
+// tsk-1lv round-2 review, B3: generateDecisionIndex's own F12 safety
+// refusal (never overwrite real rows with an empty regenerate) escaped
+// uncaught here, and `runFixes` (src/setup/checks.mjs) maps over every
+// registered fix with no try/catch of its own -- so the throw aborted the
+// ENTIRE `fgos doctor --fix` run, discarding every other fix's result.
+// Reproduced directly: a directory with a committed, row-carrying
+// docs/decisions/index.md and no readable .fgos store (this repo's own
+// merged-to-main future state on a fresh clone before .fgos exists) hit
+// this and returned exit 4 with no report at all. A refusal here is a
+// real, legitimate "this fix can't run safely right now" outcome, not a
+// crash -- report it through the same {changed, message} contract every
+// other fix already promises, so one fix's refusal never takes down the
+// rest of `doctor --fix`'s run.
+function fixDecisionIndexStale(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  const root = mainCheckout ?? cwd;
+  const fgosDir = path.join(root, '.fgos');
+  let result;
+  try {
+    result = generateDecisionIndex(root, fgosDir);
+  } catch (err) {
+    if (err instanceof StoreError) {
+      return { changed: false, message: `skipped -- ${err.message}` };
+    }
+    throw err;
+  }
+  if (!result.changed) {
+    return { changed: false, message: `${result.path} already up to date` };
+  }
+  return { changed: true, message: `regenerated ${result.path}` };
+}
+
+registerCheck({
+  id: 'decision-index-stale',
+  description: 'docs/decisions/index.md matches every scope-carrying decision in state.decisions (tsk-1lv-2/tsk-1lv)',
+  check: (cwd) => checkDecisionIndexStale(cwd),
+});
+
+registerFix({
+  id: 'decision-index-stale',
+  fix: (cwd) => fixDecisionIndexStale(cwd),
 });

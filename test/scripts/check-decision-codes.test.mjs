@@ -157,11 +157,56 @@ test('baselineFromFindings groups matched text by file', () => {
     { file: 'test/a.test.mjs', text: "test('y (str2)')" },
     { file: 'test/b.test.mjs', text: "test('z (str3)')" },
   ];
-  assert.deepEqual(baselineFromFindings(findings), {
+  // Spread into a plain object first (tsk-1pf): baselineFromFindings now
+  // returns an Object.create(null) result (the __proto__ hardening fix),
+  // whose own enumerable properties are identical but whose prototype
+  // itself would fail a strict deepEqual against a plain {} literal.
+  assert.deepEqual({ ...baselineFromFindings(findings) }, {
     'test/a.test.mjs': ["test('x (str1)')", "test('y (str2)')"],
     'test/b.test.mjs': ["test('z (str3)')"],
   });
 });
+
+test(
+  'a genuinely new Nth occurrence of an already-duplicated text is not ' +
+    'silently absorbed (tsk-1pf: count consumption, not membership, ' +
+    'ported from check-decision-citation-drift.mjs)',
+  () => {
+    const f1 = { file: 'test/a.test.mjs', text: "test('str12 dup')" };
+    const f2 = { file: 'test/a.test.mjs', text: "test('str12 dup')" };
+    const baseline = baselineFromFindings([f1, f2]);
+    assert.deepEqual(baseline['test/a.test.mjs'], [
+      "test('str12 dup')",
+      "test('str12 dup')",
+    ]);
+
+    // Exactly the two already-baselined occurrences still report as known.
+    assert.equal(findNewFindings([f1, f2], baseline).length, 0);
+
+    // A genuine third occurrence, never baselined, must report as new.
+    const f3 = { file: 'test/a.test.mjs', text: "test('str12 dup')" };
+    const result = findNewFindings([f1, f2, f3], baseline);
+    assert.equal(result.length, 1);
+  },
+);
+
+test(
+  'findNewFindings/baselineFromFindings do not throw on a "__proto__" ' +
+    'file (tsk-1pf: Object.create(null) hardening)',
+  () => {
+    const finding = { file: '__proto__', text: "test('x (str1)')" };
+    const baseline = baselineFromFindings([finding]);
+    assert.deepEqual(baseline['__proto__'], ["test('x (str1)')"]);
+    assert.equal(findNewFindings([finding], baseline).length, 0);
+
+    // An empty baseline (no prior entry at all for "__proto__") must
+    // also treat it as a genuinely new finding, not throw -- even when
+    // the CALLER passes a bare {} literal rather than an
+    // Object.create(null) baseline. findNewFindings' own safety never
+    // depends on the caller's baseline shape.
+    assert.equal(findNewFindings([finding], {}).length, 1);
+  },
+);
 
 // --- CLI: real end-to-end run ----------------------------
 

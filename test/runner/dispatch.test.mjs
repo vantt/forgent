@@ -21,17 +21,20 @@ import {
   decideDispatchMechanism,
   decideExecutorDispatchMechanism,
   decideExecutorCli,
+  fanoutBatchExecutorCli,
   spawnWorker,
   RunnerConfigError,
   DispatchError,
   EXECUTOR_ADAPTERS,
   DEFAULT_ADAPTER,
+  DISPATCH_DEPTH_ENV,
+  MAX_DISPATCH_DEPTH,
   EXECUTOR_KINDS,
   EXECUTOR_CARRIES,
   INVOCATION_VIA,
   executorIdForWork,
 } from '../../src/runner/dispatch.mjs';
-import { initStore, addWork } from '../../src/state/store.mjs';
+import { initStore, addWork, listWork } from '../../src/state/store.mjs';
 import { findExecutableOnPath } from '../../src/state/tool-registry.mjs';
 import { resolveMainCheckoutRoot } from '../../src/runner/paths.mjs';
 
@@ -109,6 +112,22 @@ function writeHangingExecutorWithOutput(dir) {
   return scriptPath;
 }
 
+/** Write a fake executor that delays for a specified time (ms) before returning JSON. */
+function writeSlowExecutor(dir, delayMs = 300) {
+  const scriptPath = path.join(dir, 'slow-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    setTimeout(() => {
+      process.stdout.write(JSON.stringify({ ok: true }));
+      process.exit(0);
+    }, ${delayMs});
+    `,
+  );
+  return scriptPath;
+}
+
+
 /** Write a fake executor that writes stdout and stderr as several SEPARATE
  * writes (not one flush), so onChunk observes multiple 'data' events instead
  * of collapsing to a single chunk. */
@@ -140,6 +159,89 @@ function writeChattyExecutor(dir) {
       i += 1;
       if (i > 200) clearInterval(interval);
     }, 5);
+    `,
+  );
+  return scriptPath;
+}
+
+/** Write a fake executor that spawns its OWN detached grandchild (never
+ * managing it), writes the grandchild's pid to `markerPath`, then busy-waits
+ * past any reasonable test timeout itself -- for proving a process-GROUP
+ * kill reaches the grandchild too, not just the directly-spawned child. */
+function writeGrandchildSpawningExecutor(dir) {
+  const scriptPath = path.join(dir, 'grandchild-spawning-executor.mjs');
+  const markerPath = path.join(dir, 'grandchild-pid.txt');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    import { spawn } from 'node:child_process';
+    import fs from 'node:fs';
+    // Deliberately NOT detached: this is the realistic "an executor CLI
+    // shells out further" shape (a plain child_process call with no special
+    // flag) -- it stays in the SAME process group as this script itself
+    // (which cliSpawnAdapter spawned as the group leader), so the fix under
+    // test is process.kill(-pid) reaching it via that shared group, not via
+    // any detach/undetach choice this fake executor makes on its own.
+    const grandchild = spawn(process.execPath, ['-e', 'setTimeout(() => {}, 30000);'], { stdio: 'ignore' });
+    grandchild.unref();
+    fs.writeFileSync(${JSON.stringify(markerPath)}, String(grandchild.pid));
+    const until = Date.now() + 30000;
+    while (Date.now() < until) { /* busy-wait past any test timeout, never exiting on its own */ }
+    `,
+  );
+  return { scriptPath, markerPath };
+}
+
+/** Write a fake executor that writes one line, then goes completely silent
+ * (busy-waits) past any reasonable idle-timeout test budget -- for
+ * exercising the idle-timeout kill path distinct from the hard timeoutMs
+ * cap (the hard cap in these tests is set far larger than the idle budget). */
+function writeGoesSilentExecutor(dir) {
+  const scriptPath = path.join(dir, 'goes-silent-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    process.stdout.write('alive\\n');
+    const until = Date.now() + 30000;
+    while (Date.now() < until) { /* busy-wait, no more output */ }
+    `,
+  );
+  return scriptPath;
+}
+
+/** Write a fake executor that writes `count` lines spaced `intervalMs` apart,
+ * then exits 0 -- total runtime exceeds a small idle budget, but the GAP
+ * between any two writes never does, proving the idle timer resets per
+ * chunk instead of firing on cumulative elapsed time. */
+function writePeriodicWriterExecutor(dir, { intervalMs = 150, count = 5 } = {}) {
+  const scriptPath = path.join(dir, 'periodic-writer-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    let i = 0;
+    const interval = setInterval(() => {
+      process.stdout.write('tick-' + i + '\\n');
+      i += 1;
+      if (i >= ${count}) {
+        clearInterval(interval);
+        process.exit(0);
+      }
+    }, ${intervalMs});
+    `,
+  );
+  return scriptPath;
+}
+
+/** Write a fake executor that echoes its own FGOS_DISPATCH_DEPTH env var
+ * (or "0" when absent) as JSON to stdout -- for proving the depth counter
+ * is threaded to the child's environment, incremented by one. */
+function writeDepthEchoExecutor(dir) {
+  const scriptPath = path.join(dir, 'depth-echo-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    process.stdout.write(JSON.stringify({ depth: process.env.FGOS_DISPATCH_DEPTH ?? '0' }));
+    process.exit(0);
     `,
   );
   return scriptPath;
@@ -347,6 +449,38 @@ test('loadRunnerConfig rejects a non-positive timeoutMs', () => {
   fs.writeFileSync(
     configPath,
     JSON.stringify({ executor: { command: 'claude', args: ['{prompt}'] }, models: {}, timeoutMs: 0 }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('loadRunnerConfig accepts a config with no "idleTimeoutMs" at all -- absent keeps the idle-timeout disarmed, byte-identical to before this field existed', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'no-idle-timeout.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({ executor: { command: 'claude', args: ['{prompt}'] }, models: { standard: 'sonnet' }, timeoutMs: 1000 }),
+  );
+  const cfg = loadRunnerConfig(configPath);
+  assert.equal(cfg.idleTimeoutMs, undefined);
+});
+
+test('loadRunnerConfig accepts a well-formed positive "idleTimeoutMs"', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'good-idle-timeout.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({ executor: { command: 'claude', args: ['{prompt}'] }, models: { standard: 'sonnet' }, timeoutMs: 1000, idleTimeoutMs: 30000 }),
+  );
+  const cfg = loadRunnerConfig(configPath);
+  assert.equal(cfg.idleTimeoutMs, 30000);
+});
+
+test('loadRunnerConfig rejects a non-positive "idleTimeoutMs" when present', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-idle-timeout.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({ executor: { command: 'claude', args: ['{prompt}'] }, models: { standard: 'sonnet' }, timeoutMs: 1000, idleTimeoutMs: 0 }),
   );
   assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
 });
@@ -719,7 +853,53 @@ test('the committed .fgos/config.json runner section declares the agy reference 
   assert.equal(invocation.adapter, 'cli-spawn');
   assert.equal(invocation.command, 'agy');
   assert.ok(invocation.args.includes('{prompt}') && invocation.args.includes('{model}'));
-  assert.ok(invocation.args.includes('--dangerously-skip-permissions'));
+  // tsk-1xm: replaced the unconditional --dangerously-skip-permissions
+  // bypass with --mode accept-edits + a settings.json command denylist
+  // (src/setup/agy-permissions.mjs) — the boundary is now capability-
+  // enforced (agy's own permission engine), not just prompt prose.
+  assert.ok(!invocation.args.includes('--dangerously-skip-permissions'));
+  assert.ok(invocation.args.includes('--mode') && invocation.args.includes('accept-edits'));
+});
+
+// Synthetic cfg, not committedRunnerConfig() (tsk-1cn): committedRunnerConfig()
+// resolves against the MAIN CHECKOUT's own committed HEAD (see its own
+// docstring above) -- a feature branch's own .fgos/config.json edit is
+// invisible to it until merge, so a test asserting a branch's own change
+// through that helper would fail here and only start passing post-merge.
+// This mirrors the entry actually added to runner.executors.claude.
+function claudeExecutorCfg() {
+  return {
+    executor: { command: 'claude', args: ['-p', '{prompt}', '--model', '{model}', '--permission-mode', 'acceptEdits'] },
+    executors: {
+      claude: {
+        kind: 'agent',
+        invocations: [{ via: 'cli', adapter: 'cli-spawn', command: 'claude', args: ['-p', '{prompt}', '--model', '{model}', '--permission-mode', 'acceptEdits'] }],
+      },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+}
+
+test('resolveExecutorCommand resolves the named "claude" executor to the same command/args the top-level "executor" default already produces (tsk-1cn: addressability, not new behavior)', () => {
+  const cfg = claudeExecutorCfg();
+  const named = resolveExecutorCommand(cfg, { prompt: 'hello', model: 'sonnet', tier: 'standard', executorId: 'claude' });
+  const unnamed = resolveExecutorCommand(cfg, { prompt: 'hello', model: 'sonnet', tier: 'standard' });
+  assert.equal(named.command, unnamed.command);
+  assert.deepEqual(named.args, unnamed.args);
+});
+
+test('resolveExecutorCommand never requires allowCrossProvider for the named "claude" executor, since its resolved command is already in CLAUDE_CLI_COMMANDS (tsk-1cn, unlike agy/codex/pi)', () => {
+  const cfg = claudeExecutorCfg();
+  assert.equal(cfg.executors.claude.allowCrossProvider, undefined);
+  assert.doesNotThrow(() => resolveExecutorCommand(cfg, { prompt: 'hello', model: 'sonnet', tier: 'standard', executorId: 'claude' }));
+});
+
+test('resolveExecutorAndOverrides resolves "claude" as a literal registered executor id (tsk-1cn: no longer configured:false)', () => {
+  const cfg = claudeExecutorCfg();
+  const resolved = resolveExecutorAndOverrides(cfg, 'claude');
+  assert.equal(resolved.configured, true);
+  assert.equal(resolved.executorId, 'claude');
 });
 
 test('loadRunnerConfig accepts a "executors" entry naming only "kind" (metadata-only, falls through for its executor)', () => {
@@ -1013,13 +1193,20 @@ test('the committed .fgos/config.json runner section wires the agy executor to g
   assert.ok(cfg.modelPolicies.gemini.lightweight.length > 0);
 });
 
-test('the committed .fgos/config.json runner section grants the worker exactly acceptEdits + git add/commit — no wider (per spike B)', () => {
+test('the committed .fgos/config.json runner section grants the worker exactly acceptEdits + git add/commit (bare and rtk-wrapped) — no wider (per spike B, doubled tsk-1dsr)', () => {
   const cfg = committedRunnerConfig();
   const { args } = cfg.executor;
   assert.ok(args.includes('--permission-mode'));
   assert.equal(args[args.indexOf('--permission-mode') + 1], 'acceptEdits');
   assert.ok(args.includes('--allowedTools'));
-  assert.equal(args[args.indexOf('--allowedTools') + 1], 'Bash(git add:*),Bash(git commit:*)');
+  const allowedTools = args[args.indexOf('--allowedTools') + 1];
+  // tsk-1dsr: a personal PreToolUse hook (e.g. rtk) can rewrite `git ...` to
+  // `rtk git ...` before the allowlist match runs, so both the bare and
+  // rtk-wrapped forms are named — this is a strict superset, never a
+  // widening to any git subcommand beyond add/commit.
+  assert.equal(allowedTools, 'Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)');
+  assert.ok(!allowedTools.includes('Bash(git *)'), 'must stay scoped to add/commit, never widen to any git subcommand');
+  assert.ok(!allowedTools.includes('Bash(rtk git *)'), 'must stay scoped to add/commit, never widen to any rtk git subcommand');
   assert.ok(!args.includes('--dangerously-skip-permissions'));
 });
 
@@ -2462,6 +2649,137 @@ test('spawnWorker throws worker-spawn-fail with stdout captured up to a maxBuffe
   );
 });
 
+// --- process-group kill, idle-timeout, nested-dispatch-depth cap
+// (dispatch-execute optimization pass) --------------------------------
+
+test('cliSpawnAdapter kills the whole process GROUP on timeout, not just the directly-spawned child -- a grandchild the executor itself spawned does not survive', async () => {
+  const dir = mkTempDir();
+  const { scriptPath, markerPath } = writeGrandchildSpawningExecutor(dir);
+  const cfg = baseConfig([scriptPath]);
+
+  await assert.rejects(
+    () => spawnWorker(sampleWork(), cfg, mkTempDir(), { timeoutMs: 500 }),
+    (err) => {
+      assert.ok(err instanceof DispatchError);
+      assert.equal(err.errorClass, 'worker-timeout');
+      return true;
+    },
+  );
+
+  // Give the OS a moment to actually reap the grandchild after the SIGTERM.
+  await new Promise((r) => setTimeout(r, 300));
+  const grandchildPid = Number(fs.readFileSync(markerPath, 'utf8').trim());
+  let alive = true;
+  try {
+    process.kill(grandchildPid, 0);
+  } catch {
+    alive = false;
+  }
+  assert.equal(alive, false, 'grandchild process must be dead after the parent was killed via process-group SIGTERM');
+});
+
+test('spawnWorker: idleTimeoutMs kills a worker that has gone silent, well before the much-larger hard timeoutMs cap fires', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeGoesSilentExecutor(dir);
+  const cfg = baseConfig([scriptPath]);
+  const start = Date.now();
+
+  await assert.rejects(
+    () => spawnWorker(sampleWork(), cfg, mkTempDir(), { timeoutMs: 10000, idleTimeoutMs: 300 }),
+    (err) => {
+      assert.ok(err instanceof DispatchError);
+      assert.equal(err.errorClass, 'worker-timeout');
+      assert.match(err.message, /idle timeout/);
+      assert.equal(err.stdout, 'alive\n');
+      return true;
+    },
+  );
+
+  const elapsed = Date.now() - start;
+  assert.ok(elapsed < 5000, `expected the idle timeout (300ms) to fire well before the 10000ms hard cap, took ${elapsed}ms`);
+});
+
+test('spawnWorker: idleTimeoutMs is disarmed by default (absent from cfg/opts) -- a silent worker only ever hits the hard timeoutMs cap, byte-identical to before this field existed', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeGoesSilentExecutor(dir);
+  const cfg = baseConfig([scriptPath]);
+
+  await assert.rejects(
+    () => spawnWorker(sampleWork(), cfg, mkTempDir(), { timeoutMs: 400 }),
+    (err) => {
+      assert.ok(err instanceof DispatchError);
+      assert.equal(err.errorClass, 'worker-timeout');
+      // No idle timeout configured -- the message names the hard cap, never "idle timeout".
+      assert.doesNotMatch(err.message, /idle timeout/);
+      return true;
+    },
+  );
+});
+
+test('spawnWorker: idleTimeoutMs resets on every chunk -- a worker producing periodic output past the idle budget still completes normally', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writePeriodicWriterExecutor(dir, { intervalMs: 150, count: 5 });
+  const cfg = baseConfig([scriptPath]);
+
+  // idleTimeoutMs (400ms) is smaller than the total runtime (~750ms) but
+  // larger than the gap between any two ticks (150ms) -- only passes if the
+  // idle timer truly resets per chunk instead of firing on total elapsed time.
+  const result = await spawnWorker(sampleWork(), cfg, mkTempDir(), { timeoutMs: 10000, idleTimeoutMs: 400 });
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /tick-4/);
+});
+
+test('spawnWorker threads a FGOS_DISPATCH_DEPTH of "1" into a fresh (non-nested) dispatch -- the child sees itself one level deep', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeDepthEchoExecutor(dir);
+  const cfg = baseConfig([scriptPath]);
+  const result = await spawnWorker(sampleWork(), cfg, mkTempDir());
+  assert.deepEqual(JSON.parse(result.stdout), { depth: '1' });
+});
+
+test('spawnWorker refuses with DispatchError(dispatch-depth-exceeded) once FGOS_DISPATCH_DEPTH already sits at the cap -- never spawns', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeDepthEchoExecutor(dir);
+  const cfg = baseConfig([scriptPath]);
+  const prior = process.env[DISPATCH_DEPTH_ENV];
+  process.env[DISPATCH_DEPTH_ENV] = String(MAX_DISPATCH_DEPTH);
+  try {
+    await assert.rejects(
+      () => spawnWorker(sampleWork(), cfg, mkTempDir()),
+      (err) => {
+        assert.ok(err instanceof DispatchError);
+        assert.equal(err.errorClass, 'dispatch-depth-exceeded');
+        assert.equal(err.depth, MAX_DISPATCH_DEPTH);
+        return true;
+      },
+    );
+  } finally {
+    if (prior === undefined) delete process.env[DISPATCH_DEPTH_ENV];
+    else process.env[DISPATCH_DEPTH_ENV] = prior;
+  }
+});
+
+test('spawnWorker refused with dispatch-depth-exceeded classifies to "park" via the recovery matrix, never blindly retried', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeDepthEchoExecutor(dir);
+  const cfg = baseConfig([scriptPath]);
+  const prior = process.env[DISPATCH_DEPTH_ENV];
+  process.env[DISPATCH_DEPTH_ENV] = String(MAX_DISPATCH_DEPTH + 5);
+  try {
+    let caughtErrorClass;
+    try {
+      await spawnWorker(sampleWork(), cfg, mkTempDir());
+    } catch (err) {
+      caughtErrorClass = err.errorClass;
+    }
+    const { resolveAction } = await import('../../src/runner/recovery.mjs');
+    assert.deepEqual(resolveAction(caughtErrorClass, 1), { action: 'park', errorClass: 'dispatch-depth-exceeded' });
+  } finally {
+    if (prior === undefined) delete process.env[DISPATCH_DEPTH_ENV];
+    else process.env[DISPATCH_DEPTH_ENV] = prior;
+  }
+});
+
 test('spawnWorker throws a RunnerConfigError (not DispatchError) for an unconfigured tier, before any spawn', () => {
   const dir = mkTempDir();
   const scriptPath = writeEchoExecutor(dir);
@@ -2940,6 +3258,113 @@ test('executeExecutorCli propagates resolveExecutorConfig\'s own RunnerConfigErr
   await assert.rejects(() => executeExecutorCli('submit-assist-classify', { repoRoot: root, prompt: 'x' }), RunnerConfigError);
 });
 
+test('executeExecutorCli refuses a concurrent dispatch for the same cwd with DispatchError(dispatch-in-flight) (tsk-64hk)', async () => {
+  const { repoRoot } = mkTempGitRepo();
+  const dir = mkTempDir();
+  const scriptPath = writeSlowExecutor(dir, 300);
+  writeRunnerConfigFixture(repoRoot, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: { 'slow-executor': { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+
+  const testCwd = repoRoot;
+
+  // Start first dispatch
+  const firstPromise = executeExecutorCli('slow-executor', { repoRoot, cwd: testCwd, prompt: 'first' });
+
+  // Give first dispatch a brief moment to acquire the lock
+  await new Promise((r) => setTimeout(r, 50));
+
+  // Second dispatch for the SAME cwd must be refused with dispatch-in-flight
+  let caughtError = null;
+  try {
+    await executeExecutorCli('slow-executor', { repoRoot, cwd: testCwd, prompt: 'second' });
+  } catch (err) {
+    caughtError = err;
+  }
+
+  assert.ok(caughtError instanceof DispatchError, 'expected DispatchError');
+  assert.equal(caughtError.errorClass, 'dispatch-in-flight');
+  assert.ok(caughtError.message.includes('already in flight'));
+  assert.equal(caughtError.cwd, testCwd);
+
+  // Wait for first dispatch to finish cleanly
+  const firstResult = await firstPromise;
+  assert.equal(firstResult.status, 0);
+
+  // Subsequent dispatch for the SAME cwd succeeds now that the lock was released
+  const thirdResult = await executeExecutorCli('slow-executor', { repoRoot, cwd: testCwd, prompt: 'third' });
+  assert.equal(thirdResult.status, 0);
+});
+
+test('executeExecutorCli refuses with DispatchError(dispatch-in-flight) when lock file content is corrupt/ambiguous (tsk-64hk)', async () => {
+  const { repoRoot, fgosDir } = mkTempGitRepo();
+  const dir = mkTempDir();
+  const scriptPath = writeEchoExecutor(dir);
+  writeRunnerConfigFixture(repoRoot, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: { 'cli-executor': { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+
+  const testCwd = repoRoot;
+  const { dispatchLockFile } = await import('../../src/runner/main-checkout-lock.mjs');
+  const lockPath = path.join(fgosDir, dispatchLockFile(testCwd));
+  fs.writeFileSync(lockPath, 'INVALID-JSON-CORRUPT-LOCK');
+
+  let caughtError = null;
+  try {
+    await executeExecutorCli('cli-executor', { repoRoot, cwd: testCwd, prompt: 'test' });
+  } catch (err) {
+    caughtError = err;
+  }
+
+  assert.ok(caughtError instanceof DispatchError, 'expected DispatchError');
+  assert.equal(caughtError.errorClass, 'dispatch-in-flight');
+  assert.ok(caughtError.message.includes('ambiguous'));
+});
+
+
+test('the "execute" CLI entry point prints a structured {error,errorClass} JSON line on stdout when dispatch fails, alongside the human-readable message on stderr (dispatch-execute optimization pass)', async () => {
+  const { repoRoot, fgosDir } = mkTempGitRepo();
+  const dir = mkTempDir();
+  const scriptPath = writeEchoExecutor(dir);
+  writeRunnerConfigFixture(repoRoot, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: { 'cli-executor': { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const testCwd = repoRoot;
+  const { dispatchLockFile } = await import('../../src/runner/main-checkout-lock.mjs');
+  const lockPath = path.join(fgosDir, dispatchLockFile(testCwd));
+  fs.writeFileSync(lockPath, 'INVALID-JSON-CORRUPT-LOCK');
+
+  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
+  const result = spawnSync(
+    process.execPath,
+    [dispatchPath, 'execute', 'cli-executor', '--prompt', 'x', '--cwd', testCwd],
+    { encoding: 'utf8', cwd: repoRoot },
+  );
+  assert.notEqual(result.status, 0);
+  const parsed = JSON.parse(result.stdout.trim());
+  assert.equal(parsed.errorClass, 'dispatch-in-flight');
+  assert.match(parsed.error, /ambiguous/);
+  assert.match(result.stderr, /ambiguous/);
+});
+
+test('the "execute" CLI entry point omits errorClass from the structured stdout line for a non-DispatchError failure (RunnerConfigError, e.g.)', () => {
+  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
+  const result = spawnSync(process.execPath, [dispatchPath, 'execute'], { encoding: 'utf8' });
+  assert.notEqual(result.status, 0);
+  const parsed = JSON.parse(result.stdout.trim());
+  assert.equal(parsed.errorClass, undefined);
+  assert.match(parsed.error, /usage: node src\/runner\/dispatch\.mjs execute/);
+});
+
 test('the "execute" CLI entry point self-executes a real adapter-resolvable executor and prints the real result as JSON, never bare {command,args}', () => {
   const { repoRoot } = mkTempGitRepo();
   const dir = mkTempDir();
@@ -3240,8 +3665,8 @@ test('resolveExecutorIdForPurpose returns null against an empty/missing executor
 // --- resolveExecutorAndOverrides (D1-D4, docs/history/capability-capacity-
 // remodel/CONTEXT.md) -- the shared resolver every real cfg.executors[id]
 // lookup in this file now goes through: literal key first, then
-// capabilities.<name>.prefer (symmetry required), then the plain "for"
-// scan, then unconfigured -----------------------------------------------
+// capabilities.<name>.prefer (D5, supersedes D2's "for"-symmetry
+// requirement), then the plain "for" scan, then unconfigured ------------
 
 test('resolveExecutorAndOverrides resolves a literal executorId directly, unchanged from pre-this-item behavior -- the deep-customization escape hatch', () => {
   const cfg = { executors: { agy: { kind: 'agent', command: 'agy' } } };
@@ -3252,7 +3677,7 @@ test('resolveExecutorAndOverrides resolves a literal executorId directly, unchan
   assert.equal(result.configured, true);
 });
 
-test('resolveExecutorAndOverrides resolves via capabilities.<name>.prefer when the preferred executor declares a matching "for" (symmetry satisfied)', () => {
+test('resolveExecutorAndOverrides resolves via capabilities.<name>.prefer when the preferred executor declares a matching "for"', () => {
   const cfg = {
     executors: { agy: { kind: 'agent', command: 'agy', for: ['fgos-coding-implement'] } },
     capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
@@ -3272,12 +3697,15 @@ test('resolveExecutorAndOverrides carries capabilities.<name>.overrides through,
   assert.deepEqual(result.overrides, { rigorOverrides: { standard: 'creative' } });
 });
 
-test('resolveExecutorAndOverrides throws when "prefer" names a executor that does not itself declare "for" including the capability name (symmetry violation)', () => {
+test('resolveExecutorAndOverrides resolves via "prefer" even when the preferred executor declares no "for" at all (D5 -- supersedes D2\'s own symmetry requirement)', () => {
   const cfg = {
     executors: { agy: { kind: 'agent', command: 'agy' } }, // no "for" at all
     capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
   };
-  assert.throws(() => resolveExecutorAndOverrides(cfg, 'fgos-coding-implement'), RunnerConfigError);
+  const result = resolveExecutorAndOverrides(cfg, 'fgos-coding-implement');
+  assert.equal(result.executorId, 'agy');
+  assert.equal(result.executor, cfg.executors.agy);
+  assert.equal(result.configured, true);
 });
 
 test('resolveExecutorAndOverrides throws when "prefer" names a executor id that does not exist at all', () => {
@@ -3365,7 +3793,7 @@ test('loadRunnerConfig rejects capabilities.<name>.overrides.rigorOverrides via 
   assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
 });
 
-test('loadRunnerConfig accepts a well-formed capabilities.<name>.prefer/overrides pair, symmetry satisfied', () => {
+test('loadRunnerConfig accepts a well-formed capabilities.<name>.prefer/overrides pair', () => {
   const dir = mkTempDir();
   const configPath = path.join(dir, 'good-prefer-overrides.json');
   fs.writeFileSync(
@@ -3381,15 +3809,30 @@ test('loadRunnerConfig accepts a well-formed capabilities.<name>.prefer/override
   assert.doesNotThrow(() => loadRunnerConfig(configPath));
 });
 
-test('loadRunnerConfig rejects a load-time symmetry violation -- "prefer" names a real executor that does not declare the matching "for" (config-load time, ahead of resolveExecutorAndOverrides\'s own resolve-time throw)', () => {
+test('loadRunnerConfig accepts "prefer" naming a real executor that declares no matching "for" (D5 -- supersedes D2\'s own load-time symmetry check)', () => {
   const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-symmetry.json');
+  const configPath = path.join(dir, 'prefer-no-for.json');
   fs.writeFileSync(
     configPath,
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { agy: { kind: 'agent', command: 'agy' } }, // no "for"
+      executors: { agy: { kind: 'agent' } }, // no "command"/"args"/"for" at all
       capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
+      modelPolicies: { claude: { standard: 'sonnet' } },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.doesNotThrow(() => loadRunnerConfig(configPath));
+});
+
+test('loadRunnerConfig rejects "prefer" naming an executor id that does not exist at all', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'prefer-missing-executor.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capabilities: { 'fgos-coding-implement': { prefer: 'no-such-executor' } },
       modelPolicies: { claude: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
@@ -3861,4 +4304,154 @@ test('logExecutorDispatch appends multiple sequential calls without corrupting t
   assert.deepEqual(seqs, [...new Set(seqs)].sort((a, b) => a - b), 'no duplicate seq');
   const raw = fs.readFileSync(path.join(fgosDir, 'events.jsonl'), 'utf8');
   assert.equal(raw.trim().split('\n').length, 4);
+});
+
+// --- CLI subcommand --cwd flag coverage ---------------------------------
+
+test('dispatch CLI execute subcommand respects --cwd flag', () => {
+  const repo = mkTempGitRepo();
+  const workerRepo = mkTempGitRepo();
+  const scriptPath = writeEchoExecutor(repo.repoRoot);
+  const dispatchScriptPath = path.resolve(process.cwd(), 'src/runner/dispatch.mjs');
+  writeRunnerConfigFixture(workerRepo.repoRoot, {
+    executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
+    executors: { testexec: { kind: 'agent', allowCrossProvider: true, command: process.execPath, args: [scriptPath, '{prompt}'] } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+
+  const out = execFileSync(process.execPath, [dispatchScriptPath, 'execute', 'testexec', '--cwd', workerRepo.repoRoot, '--prompt', 'hello'], {
+    encoding: 'utf8',
+    cwd: repo.repoRoot,
+  });
+  const res = JSON.parse(out);
+  assert.equal(res.status, 0);
+  const echoData = JSON.parse(res.stdout);
+  assert.equal(echoData.cwd, workerRepo.repoRoot);
+});
+
+test('dispatch CLI decide subcommand respects --cwd flag', () => {
+  const repo = mkTempGitRepo();
+  const dispatchScriptPath = path.resolve(process.cwd(), 'src/runner/dispatch.mjs');
+  writeRunnerConfigFixture(repo.repoRoot, {
+    executor: { command: process.execPath, args: ['{prompt}'] },
+    executors: { testexec: { kind: 'agent', agentType: 'test' } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+
+  const out = execFileSync(process.execPath, [dispatchScriptPath, 'decide', 'testexec', '--cwd', repo.repoRoot, '--has-live-task-access'], {
+    encoding: 'utf8',
+  });
+  const res = JSON.parse(out);
+  assert.equal(res.mechanism, 'in-process');
+  assert.equal(res.agentType, 'test');
+});
+
+// --- fanout-batch and fgos schedule --candidates -------------------------
+
+test('fanoutBatchExecutorCli returns slotsFull when worker slots ceiling is full', async () => {
+  const repo = mkTempGitRepo();
+  const fgosDir = repo.fgosDir;
+  initStore(fgosDir);
+  // Write shared config with ceiling = 1 into .fgos/config.json
+  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ workerSlots: { ceiling: 1 } }));
+  // Add 1 doing item to consume the slot
+  addWork(fgosDir, { id: 't1', title: 'Running Item', kind: 'task', status: 'doing', domain: 'coding', stage: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
+
+  const result = await fanoutBatchExecutorCli(['c1', 'c2'], { repoRoot: repo.repoRoot });
+  assert.equal(result.slotsFull, true);
+  assert.deepEqual(result.deferred, ['c1', 'c2']);
+  assert.deepEqual(result.fired, []);
+});
+
+test('fanoutBatchExecutorCli trims candidates to free slots when ceiling is configured', async () => {
+  const repo = mkTempGitRepo();
+  const fgosDir = repo.fgosDir;
+  initStore(fgosDir);
+  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ workerSlots: { ceiling: 1 } }));
+
+  addWork(fgosDir, { id: 'c1', title: 'Cand 1', kind: 'task', status: 'todo', domain: 'coding', stage: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
+  addWork(fgosDir, { id: 'c2', title: 'Cand 2', kind: 'task', status: 'todo', domain: 'coding', stage: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
+
+  const result = await fanoutBatchExecutorCli(['c1', 'c2'], { repoRoot: repo.repoRoot, hasLiveTaskAccess: true });
+  assert.equal(result.slotsFull, undefined);
+  assert.deepEqual(result.deferred, ['c2']);
+  assert.equal(result.mechanismChanged.length, 1);
+  assert.equal(result.mechanismChanged[0].id, 'c1');
+});
+
+test('fgos schedule --candidates filters schedule to specified candidates', () => {
+  const repo = mkTempGitRepo();
+  const fgosDir = repo.fgosDir;
+  initStore(fgosDir);
+  addWork(fgosDir, { id: 'w1', title: 'Item 1', kind: 'task', status: 'todo', domain: 'coding', stage: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
+  addWork(fgosDir, { id: 'w2', title: 'Item 2', kind: 'task', status: 'todo', domain: 'coding', stage: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
+  const fgosScript = path.resolve(process.cwd(), 'bin/fgos.mjs');
+
+  const outAll = execFileSync(process.execPath, [fgosScript, 'schedule', '--json', '--dir', repo.repoRoot], { encoding: 'utf8' });
+  const schedAll = JSON.parse(outAll);
+  const wavesAll = schedAll.data ? schedAll.data.waves : schedAll.waves;
+  assert.ok(wavesAll[0].includes('w1'));
+  assert.ok(wavesAll[0].includes('w2'));
+
+  const outScoped = execFileSync(process.execPath, [fgosScript, 'schedule', '--candidates', 'w1', '--json', '--dir', repo.repoRoot], { encoding: 'utf8' });
+  const schedScoped = JSON.parse(outScoped);
+  const wavesScoped = schedScoped.data ? schedScoped.data.waves : schedScoped.waves;
+  assert.deepEqual(wavesScoped, [['w1']]);
+});
+
+/** Write a fake executor that commits an empty commit in whatever cwd it
+ * runs in (the picked worktree, per `executeExecutorCli`'s own `cwd`
+ * param) -- simulates a real worker actually doing+committing work, so
+ * `fgos return` finds real progress to verify against. */
+function writeCommittingExecutor(dir) {
+  const scriptPath = path.join(dir, 'committing-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    import { execFileSync } from 'node:child_process';
+    execFileSync('git', ['commit', '--allow-empty', '-m', 'fake work'], { stdio: 'ignore' });
+    process.stdout.write(JSON.stringify({ ok: true }));
+    process.exit(0);
+    `,
+  );
+  return scriptPath;
+}
+
+test('fanoutBatchExecutorCli: real end-to-end out-of-process fire -- pick/execute/return actually complete via subprocess calls to the real bin/fgos.mjs (closes the --dir/worktreePath-shape bug: this function used to pass fgosDir instead of root to --dir, doubling the .fgos suffix into a nonexistent path, and read a flat .worktreePath field the fgos.v1 envelope never has -- data.worktree.path is the real shape)', async () => {
+  const { repoRoot, fgosDir } = mkTempGitRepo();
+  const dir = mkTempDir();
+  const scriptPath = writeCommittingExecutor(dir);
+  writeRunnerConfigFixture(repoRoot, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: { 'fgos-coding-implement': { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  addWork(fgosDir, {
+    id: 'cand1',
+    title: 'Candidate 1',
+    kind: 'task',
+    status: 'todo',
+    domain: 'coding',
+    stage: 'executing',
+    deps: [],
+    refs: [],
+    risk: 'light',
+    verify: 'true',
+  });
+
+  const result = await fanoutBatchExecutorCli(['cand1'], { repoRoot, hasLiveTaskAccess: false });
+
+  assert.equal(result.mechanismChanged.length, 0);
+  assert.equal(result.unavailable.length, 0);
+  assert.equal(result.fired.length, 1);
+  assert.equal(result.fired[0].id, 'cand1');
+  assert.equal(result.fired[0].status, 0);
+  assert.equal(result.fired[0].errorClass, null);
+
+  // Never trust the return value alone -- independently re-read real state.
+  const view = listWork(fgosDir);
+  assert.equal(view.work.cand1.status, 'awaiting-approval');
 });
