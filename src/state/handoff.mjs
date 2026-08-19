@@ -1,10 +1,10 @@
 // handoff.mjs — pure legality guard for the multi-role team harness
-// (tsk-2t9c D1/D3/D4/D5/D8). LAYER: domain, same tier as stage-fsm.mjs --
-// it may import kernel (workflow-stage-graphs.mjs) but never fs, never a
-// config read. Cap and open-call-depth are always caller-supplied
-// (`hasWorkerSlotRoom({ ceiling })`'s own purity precedent,
-// src/state/worker-slots.mjs) so this module stays a pure function of its
-// arguments, testable with no store, no lock, no disk.
+// (tsk-2t9c D1/D3/D4/D5/D8, D25/D28). LAYER: domain, same tier as
+// stage-fsm.mjs -- it may import kernel (workflow-stage-graphs.mjs) but
+// never fs, never a config read. Cap, open-call-depth, and open-sync-depth
+// are always caller-supplied (`hasWorkerSlotRoom({ ceiling })`'s own purity
+// precedent, src/state/worker-slots.mjs) so this module stays a pure
+// function of its arguments, testable with no store, no lock, no disk.
 //
 // Mechanism vs policy (D3): this file only ever answers "is this call
 // legal" -- it never picks who should be called, never judges whether a
@@ -32,9 +32,13 @@ import { legalCallEdges } from './workflow-stage-graphs.mjs';
  *   caller from replay, never a stored counter -- D-instance R7). Only
  *   meaningful for `mode: 'async'` edges; sync calls never nest against
  *   this cap.
+ * @param {number} [args.openSyncDepth] - how many nested sync calls are
+ *   already open on this item's current call-thread (D28). Only
+ *   meaningful for `mode: 'sync'` edges; sequential sync calls never
+ *   increment this depth.
  * @returns {{ ok: true, edge: object } | { ok: false, refusal: string, legalEdges: object[] }}
  */
-export function evaluateHandoff({ domain, stage, fromRole, toRole, reason, openCallDepth = 0 }) {
+export function evaluateHandoff({ domain, stage, fromRole, toRole, reason, openCallDepth = 0, openSyncDepth = 0 }) {
   const legalEdges = legalCallEdges(domain, stage, fromRole);
 
   if (legalEdges.length === 0) {
@@ -61,6 +65,14 @@ export function evaluateHandoff({ domain, stage, fromRole, toRole, reason, openC
     return {
       ok: false,
       refusal: `callstack cap (${cap}) reached -- cannot open another async call on this thread`,
+      legalEdges,
+    };
+  }
+
+  if (edge.mode === 'sync' && typeof cap === 'number' && openSyncDepth >= cap) {
+    return {
+      ok: false,
+      refusal: `callstack cap (${cap}) reached -- cannot open another nested sync call on this thread`,
       legalEdges,
     };
   }
