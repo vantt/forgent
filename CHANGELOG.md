@@ -9,6 +9,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Dispatch-execute reliability pass (`src/runner/dispatch/transport.mjs`,
+  `src/runner/recovery.mjs`): the `cli-spawn` adapter now caps nested
+  out-of-process dispatch at 3 levels deep (an executor that itself
+  dispatches another executor, e.g. `agy` fanning out further, is refused
+  past the cap via `FGOS_DISPATCH_DEPTH`) and supports an optional
+  `runner.idleTimeoutMs` config field — when set, kills a worker that has
+  gone completely silent for that long, resetting on every stdout/stderr
+  chunk, distinct from `timeoutMs`'s unconditional absolute ceiling. Both
+  new failure classes (`dispatch-in-flight`, `dispatch-depth-exceeded`) are
+  now registered in the recovery matrix (`dispatch-in-flight` retries,
+  `dispatch-depth-exceeded` parks) instead of falling through to the
+  matrix's fail-safe halt. `node dispatch.mjs execute`'s failure output
+  also gains a structured `{error, errorClass}` JSON line on stdout
+  alongside the existing human-readable stderr message, so a calling skill
+  can branch on the failure class instead of only ever seeing a bare exit
+  code.
+
+### Fixed
+
+- The `cli-spawn` dispatch adapter (`src/runner/dispatch/transport.mjs`)
+  now spawns every executor `detached: true` and kills its whole process
+  GROUP on timeout/maxBuffer (`process.kill(-pid, ...)`), not just the
+  directly-spawned pid — an executor CLI that shells out further (a
+  grandchild process) no longer survives its own parent being killed.
+
+### Added
+
 - `runner.executors.claude` in `.fgos/config.json` — claude is now
   addressable by name in dispatch (`decide claude`, `executors.claude`)
   the same way `agy`/`codex`/`pi` already are, instead of only being

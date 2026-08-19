@@ -17,17 +17,41 @@
 // item's title/refs/verify text inert here (they still reach the child
 // process as literal argv, never interpreted by a shell).
 //
-// GRANDCHILD-SIGTERM CAVEAT (unchanged): `spawnSync`'s `timeout` option
-// kills the directly-spawned child on expiry, not any grandchild process
-// tree the executor itself may have started (e.g. a headless agent CLI
-// that shells out further). Phase 2 accepts this as a known limitation —
-// upgrading to a process-group kill (e.g. `detached: true` + killing
-// `-pid`) is deferred until real operation shows it is needed.
+// PROCESS-GROUP KILL (closes the former GRANDCHILD-SIGTERM CAVEAT): the
+// child is spawned `detached: true` (its own process-group leader), and
+// every kill below targets `-pid` (the whole group) via `killChildTree`,
+// not just the directly-spawned pid — a headless agent CLI that shells out
+// further (e.g. `agy`) no longer survives its own parent's timeout kill.
+//
+// NESTED DISPATCH DEPTH CAP: an executor spawned here may itself be another
+// dispatch-capable CLI that calls `node dispatch.mjs execute` again (e.g.
+// `agy` fanning out its own sub-agents). `DISPATCH_DEPTH_ENV` threads a
+// counter through the child's environment so that nested call can see how
+// deep it already is; `MAX_DISPATCH_DEPTH` refuses the spawn outright once
+// the cap is reached, rather than letting an unbounded dispatch chain fork
+// forever. No live evidence of this happening yet — anticipated per the
+// design, not a reaction to an observed incident.
 
 import path from 'node:path';
 import { spawn, execFileSync } from 'node:child_process';
 import { RunnerConfigError } from './config.mjs';
 import { resolveExecutorConfig } from './resolve.mjs';
+
+/** Env var a spawned child reads to know its own nested-dispatch depth,
+ * threaded by `cliSpawnAdapter` on every spawn (current depth + 1) — a
+ * child that never dispatches further never reads it, so this is inert
+ * for the overwhelming majority of executors. */
+export const DISPATCH_DEPTH_ENV = 'FGOS_DISPATCH_DEPTH';
+
+/** Hard cap on nested out-of-process dispatch depth (user decision: no
+ * observed grandchild-dispatch incident yet, capped anticipatorily). */
+export const MAX_DISPATCH_DEPTH = 3;
+
+function currentDispatchDepth() {
+  const raw = process.env[DISPATCH_DEPTH_ENV];
+  const n = raw ? Number(raw) : 0;
+  return Number.isFinite(n) && n >= 0 ? n : 0;
+}
 
 /** Raised when spawning or running the executor itself fails at runtime.
  * `errorClass` deliberately reuses the vocabulary declared in
@@ -179,10 +203,10 @@ function teeChunk(onChunk, stream, chunk) {
  * `timeoutMs`, `maxBuffer`, `onChunk`, `workId`, `tier`, `model`) since
  * none of those are invocation-specific — they are dispatch-level
  * execution context every adapter equally needs. Two adapters are
- * registered today: `cli-spawn` (this exact process-spawning body,
- * unchanged in every behavioral detail from before this cell —
+ * registered today: `cli-spawn` (this exact process-spawning body —
  * timeout-on-'exit', hand-tracked maxBuffer kill, onChunk teed before
- * accounting, grandchild-SIGTERM caveat still applies) and `http`
+ * accounting, process-group kill + optional idle-timeout + nested-depth
+ * cap layered on top, see this file's own header comment) and `http`
  * (`httpAdapter` below, D13's real pluggability precedent — no executor
  * dispatches through it yet, same as `cli-spawn` before `agy` existed). An
  * `rpc`/`app-server` adapter (e.g. talking to a headless agent's
@@ -192,16 +216,55 @@ function teeChunk(onChunk, stream, chunk) {
  */
 export const DEFAULT_ADAPTER = 'cli-spawn';
 
+/** Kill the spawned child's entire process GROUP, not just the directly-
+ * spawned pid — `detached: true` at spawn time (below) makes the child its
+ * own process-group leader, so `process.kill(-pid, signal)` reaches every
+ * descendant it may have shelled out to (e.g. an executor CLI that itself
+ * shells out further), closing the former GRANDCHILD-SIGTERM CAVEAT this
+ * file used to document as an accepted limitation. Falls back to killing
+ * just the child's own pid when the negative-pid form throws (no
+ * process-group support on the current platform, or the child already
+ * exited) — a kill attempt must never itself throw into dispatch. */
+function killChildTree(child, signal) {
+  if (!child.pid) return;
+  try {
+    process.kill(-child.pid, signal);
+  } catch {
+    try {
+      child.kill(signal);
+    } catch {
+      // already dead -- nothing left to kill
+    }
+  }
+}
+
 function cliSpawnAdapter(invocation, opts) {
   const { command, args } = invocation;
-  const { cwd, timeoutMs, maxBuffer, onChunk, workId, tier, model } = opts;
+  const { cwd, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId, tier, model } = opts;
+
+  const depth = currentDispatchDepth();
+  if (depth >= MAX_DISPATCH_DEPTH) {
+    return Promise.reject(new DispatchError(
+      'dispatch-depth-exceeded',
+      `executor for work "${workId}" refused: nested out-of-process dispatch depth ${depth} is already at the cap (${MAX_DISPATCH_DEPTH}) -- a dispatched executor tried to dispatch another executor too many levels deep.`,
+      { workId, tier, model, depth },
+    ));
+  }
 
   return new Promise((resolve, reject) => {
     // `stdin: 'ignore'` (never the 'pipe' default): an executor that checks
     // for piped stdin (codex's own "Reading additional input from stdin..."
     // probe, tsk-3tkc) blocks forever on an open-but-unwritten pipe here,
     // since nothing in this adapter ever writes to or closes child.stdin.
-    const child = spawn(command, args, { cwd, shell: false, stdio: ['ignore', 'pipe', 'pipe'] });
+    // `detached: true` + the depth counter in `env`: see killChildTree and
+    // this file's own header comment.
+    const child = spawn(command, args, {
+      cwd,
+      shell: false,
+      stdio: ['ignore', 'pipe', 'pipe'],
+      detached: true,
+      env: { ...process.env, [DISPATCH_DEPTH_ENV]: String(depth + 1) },
+    });
     child.stdout.setEncoding('utf8');
     child.stderr.setEncoding('utf8');
 
@@ -211,6 +274,7 @@ function cliSpawnAdapter(invocation, opts) {
     let stderrLen = 0;
     let settled = false;
     let timedOut = false;
+    let idleTimedOut = false;
     // MAXBUFFER DEVIATION (per this cell's action (1)): spawnSync enforces
     // maxBuffer natively and surfaces overflow as `result.error` (falling
     // into the worker-spawn-fail branch below, the same branch any other
@@ -223,28 +287,53 @@ function cliSpawnAdapter(invocation, opts) {
     // spawnSync's own maxBuffer message.
     let maxBufferExceeded = false;
     let timer = null;
+    let idleTimer = null;
+
+    const clearTimers = () => {
+      if (timer) clearTimeout(timer);
+      if (idleTimer) clearTimeout(idleTimer);
+    };
 
     const finish = (fn) => {
       if (settled) return;
       settled = true;
-      if (timer) clearTimeout(timer);
+      clearTimers();
       fn();
     };
 
     if (timeoutMs) {
       timer = setTimeout(() => {
         timedOut = true;
-        child.kill('SIGTERM');
+        killChildTree(child, 'SIGTERM');
       }, timeoutMs);
     }
 
+    // IDLE TIMEOUT (opt-in via cfg.idleTimeoutMs/opts.idleTimeoutMs, never
+    // armed when absent -- every pre-existing caller that never configured
+    // it keeps the single-hard-cap `timeoutMs` behavior byte-identical):
+    // reset on every stdout/stderr chunk, so a worker that is genuinely
+    // still producing output never trips it, only one that has gone
+    // completely silent for `idleTimeoutMs`. `timeoutMs` above still stands
+    // as the unconditional absolute ceiling regardless of activity.
+    const armIdleTimer = () => {
+      if (!idleTimeoutMs) return;
+      if (idleTimer) clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => {
+        timedOut = true;
+        idleTimedOut = true;
+        killChildTree(child, 'SIGTERM');
+      }, idleTimeoutMs);
+    };
+    armIdleTimer();
+
     child.stdout.on('data', (chunk) => {
       teeChunk(opts.onChunk, 'stdout', chunk);
+      armIdleTimer();
       stdoutLen += Buffer.byteLength(chunk);
       if (stdoutLen + stderrLen > maxBuffer) {
         if (!maxBufferExceeded) {
           maxBufferExceeded = true;
-          child.kill('SIGTERM');
+          killChildTree(child, 'SIGTERM');
         }
         return;
       }
@@ -252,11 +341,12 @@ function cliSpawnAdapter(invocation, opts) {
     });
     child.stderr.on('data', (chunk) => {
       teeChunk(opts.onChunk, 'stderr', chunk);
+      armIdleTimer();
       stderrLen += Buffer.byteLength(chunk);
       if (stdoutLen + stderrLen > maxBuffer) {
         if (!maxBufferExceeded) {
           maxBufferExceeded = true;
-          child.kill('SIGTERM');
+          killChildTree(child, 'SIGTERM');
         }
         return;
       }
@@ -275,18 +365,19 @@ function cliSpawnAdapter(invocation, opts) {
 
     // 'exit' (fires once the spawned process itself terminates), never
     // 'close' (waits for the stdio PIPES to fully close too) — matching
-    // spawnSync's own timeout semantics exactly (per the GRANDCHILD-SIGTERM
-    // CAVEAT above): spawnSync's timeout kills and returns based on the
-    // DIRECTLY-spawned child alone, never waiting on any grandchild process
-    // tree the executor itself may have started. Resolving on 'close'
-    // instead would make a killed timeout silently wait out however long a
-    // still-running grandchild keeps the pipe open — defeating the timeout.
+    // spawnSync's own timeout semantics: a kill decision is made and
+    // reported based on the process's own termination, never waiting out
+    // however long a still-open pipe (e.g. an orphaned grandchild that
+    // escaped the process-group kill) keeps it open — resolving on 'close'
+    // instead would defeat the timeout.
     child.on('exit', (code, signal) => {
       finish(() => {
         if (timedOut) {
           reject(new DispatchError(
             'worker-timeout',
-            `executor timed out after ${timeoutMs}ms for work "${workId}".`,
+            idleTimedOut
+              ? `executor for work "${workId}" was killed after ${idleTimeoutMs}ms with no output (idle timeout).`
+              : `executor timed out after ${timeoutMs}ms for work "${workId}".`,
             { workId, tier, model, stdout, stderr },
           ));
           return;

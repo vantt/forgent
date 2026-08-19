@@ -84,12 +84,12 @@ For each batch of up to 5 ids from `ready` (5 is the max batch size):
    node "$root/src/runner/dispatch.mjs" decide --work "<id>" --has-live-task-access --dir "$root"
    ```
 
-   - If `decided.mechanism` is `"out-of-process"`: it fires out-of-process directly via CLI subprocess execution without requiring a person. Print its announce line (`<id> - out-of-process - <executorId>`). Claim the candidate via CLI, read the worktree path from the claim's JSON output, and execute the worker out-of-process concurrently for the batch's out-of-process subset via bash job control (`( ... ) &` and `wait`):
+   - If `decided.mechanism` is `"out-of-process"`: it fires out-of-process directly via CLI subprocess execution without requiring a person. Print its announce line (`<id> - out-of-process - <executorId>`). Claim the candidate via CLI, read the worktree path from the claim's JSON output, and execute the worker out-of-process concurrently for the batch's out-of-process subset via bash job control (`( ... ) &` and `wait`). Redirect `execute`'s own stdout/stderr to `/dev/null` — this step never reads its JSON result or its live-teed chunks (only the `&&`-chained exit code gates `return`), so letting either through would land the dispatched worker's full raw output in this session's own context for nothing:
      ```bash
      root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
      claimJson=$(node "$root/bin/fgos.mjs" pick "<id>" --json --dir "$root")
      worktreePath=$(node -e 'console.log(JSON.parse(process.argv[1]).worktreePath)' "$claimJson")
-     node "$root/src/runner/dispatch.mjs" execute "<executorId>" --cwd "$worktreePath" --has-live-task-access && node "$root/bin/fgos.mjs" return "<id>" --dir "$root"
+     node "$root/src/runner/dispatch.mjs" execute "<executorId>" --cwd "$worktreePath" --has-live-task-access >/dev/null 2>&1 && node "$root/bin/fgos.mjs" return "<id>" --dir "$root"
      ```
    - If `decided.mechanism` is `"unavailable"`: report `id` back to the caller as needing a person (no executor registered for this work item). Add `id` to `dispatchUnavailable` so it is never rescheduled or re-consulted again this run. Do not add it to `firing`. Continue to the next id.
    - Otherwise (`mechanism === "in-process"`): print its announce line

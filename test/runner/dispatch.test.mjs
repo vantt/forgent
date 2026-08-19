@@ -26,6 +26,8 @@ import {
   DispatchError,
   EXECUTOR_ADAPTERS,
   DEFAULT_ADAPTER,
+  DISPATCH_DEPTH_ENV,
+  MAX_DISPATCH_DEPTH,
   EXECUTOR_KINDS,
   EXECUTOR_CARRIES,
   INVOCATION_VIA,
@@ -156,6 +158,89 @@ function writeChattyExecutor(dir) {
       i += 1;
       if (i > 200) clearInterval(interval);
     }, 5);
+    `,
+  );
+  return scriptPath;
+}
+
+/** Write a fake executor that spawns its OWN detached grandchild (never
+ * managing it), writes the grandchild's pid to `markerPath`, then busy-waits
+ * past any reasonable test timeout itself -- for proving a process-GROUP
+ * kill reaches the grandchild too, not just the directly-spawned child. */
+function writeGrandchildSpawningExecutor(dir) {
+  const scriptPath = path.join(dir, 'grandchild-spawning-executor.mjs');
+  const markerPath = path.join(dir, 'grandchild-pid.txt');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    import { spawn } from 'node:child_process';
+    import fs from 'node:fs';
+    // Deliberately NOT detached: this is the realistic "an executor CLI
+    // shells out further" shape (a plain child_process call with no special
+    // flag) -- it stays in the SAME process group as this script itself
+    // (which cliSpawnAdapter spawned as the group leader), so the fix under
+    // test is process.kill(-pid) reaching it via that shared group, not via
+    // any detach/undetach choice this fake executor makes on its own.
+    const grandchild = spawn(process.execPath, ['-e', 'setTimeout(() => {}, 30000);'], { stdio: 'ignore' });
+    grandchild.unref();
+    fs.writeFileSync(${JSON.stringify(markerPath)}, String(grandchild.pid));
+    const until = Date.now() + 30000;
+    while (Date.now() < until) { /* busy-wait past any test timeout, never exiting on its own */ }
+    `,
+  );
+  return { scriptPath, markerPath };
+}
+
+/** Write a fake executor that writes one line, then goes completely silent
+ * (busy-waits) past any reasonable idle-timeout test budget -- for
+ * exercising the idle-timeout kill path distinct from the hard timeoutMs
+ * cap (the hard cap in these tests is set far larger than the idle budget). */
+function writeGoesSilentExecutor(dir) {
+  const scriptPath = path.join(dir, 'goes-silent-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    process.stdout.write('alive\\n');
+    const until = Date.now() + 30000;
+    while (Date.now() < until) { /* busy-wait, no more output */ }
+    `,
+  );
+  return scriptPath;
+}
+
+/** Write a fake executor that writes `count` lines spaced `intervalMs` apart,
+ * then exits 0 -- total runtime exceeds a small idle budget, but the GAP
+ * between any two writes never does, proving the idle timer resets per
+ * chunk instead of firing on cumulative elapsed time. */
+function writePeriodicWriterExecutor(dir, { intervalMs = 150, count = 5 } = {}) {
+  const scriptPath = path.join(dir, 'periodic-writer-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    let i = 0;
+    const interval = setInterval(() => {
+      process.stdout.write('tick-' + i + '\\n');
+      i += 1;
+      if (i >= ${count}) {
+        clearInterval(interval);
+        process.exit(0);
+      }
+    }, ${intervalMs});
+    `,
+  );
+  return scriptPath;
+}
+
+/** Write a fake executor that echoes its own FGOS_DISPATCH_DEPTH env var
+ * (or "0" when absent) as JSON to stdout -- for proving the depth counter
+ * is threaded to the child's environment, incremented by one. */
+function writeDepthEchoExecutor(dir) {
+  const scriptPath = path.join(dir, 'depth-echo-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    process.stdout.write(JSON.stringify({ depth: process.env.FGOS_DISPATCH_DEPTH ?? '0' }));
+    process.exit(0);
     `,
   );
   return scriptPath;
@@ -363,6 +448,38 @@ test('loadRunnerConfig rejects a non-positive timeoutMs', () => {
   fs.writeFileSync(
     configPath,
     JSON.stringify({ executor: { command: 'claude', args: ['{prompt}'] }, models: {}, timeoutMs: 0 }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('loadRunnerConfig accepts a config with no "idleTimeoutMs" at all -- absent keeps the idle-timeout disarmed, byte-identical to before this field existed', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'no-idle-timeout.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({ executor: { command: 'claude', args: ['{prompt}'] }, models: { standard: 'sonnet' }, timeoutMs: 1000 }),
+  );
+  const cfg = loadRunnerConfig(configPath);
+  assert.equal(cfg.idleTimeoutMs, undefined);
+});
+
+test('loadRunnerConfig accepts a well-formed positive "idleTimeoutMs"', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'good-idle-timeout.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({ executor: { command: 'claude', args: ['{prompt}'] }, models: { standard: 'sonnet' }, timeoutMs: 1000, idleTimeoutMs: 30000 }),
+  );
+  const cfg = loadRunnerConfig(configPath);
+  assert.equal(cfg.idleTimeoutMs, 30000);
+});
+
+test('loadRunnerConfig rejects a non-positive "idleTimeoutMs" when present', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'bad-idle-timeout.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({ executor: { command: 'claude', args: ['{prompt}'] }, models: { standard: 'sonnet' }, timeoutMs: 1000, idleTimeoutMs: 0 }),
   );
   assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
 });
@@ -2531,6 +2648,137 @@ test('spawnWorker throws worker-spawn-fail with stdout captured up to a maxBuffe
   );
 });
 
+// --- process-group kill, idle-timeout, nested-dispatch-depth cap
+// (dispatch-execute optimization pass) --------------------------------
+
+test('cliSpawnAdapter kills the whole process GROUP on timeout, not just the directly-spawned child -- a grandchild the executor itself spawned does not survive', async () => {
+  const dir = mkTempDir();
+  const { scriptPath, markerPath } = writeGrandchildSpawningExecutor(dir);
+  const cfg = baseConfig([scriptPath]);
+
+  await assert.rejects(
+    () => spawnWorker(sampleWork(), cfg, mkTempDir(), { timeoutMs: 500 }),
+    (err) => {
+      assert.ok(err instanceof DispatchError);
+      assert.equal(err.errorClass, 'worker-timeout');
+      return true;
+    },
+  );
+
+  // Give the OS a moment to actually reap the grandchild after the SIGTERM.
+  await new Promise((r) => setTimeout(r, 300));
+  const grandchildPid = Number(fs.readFileSync(markerPath, 'utf8').trim());
+  let alive = true;
+  try {
+    process.kill(grandchildPid, 0);
+  } catch {
+    alive = false;
+  }
+  assert.equal(alive, false, 'grandchild process must be dead after the parent was killed via process-group SIGTERM');
+});
+
+test('spawnWorker: idleTimeoutMs kills a worker that has gone silent, well before the much-larger hard timeoutMs cap fires', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeGoesSilentExecutor(dir);
+  const cfg = baseConfig([scriptPath]);
+  const start = Date.now();
+
+  await assert.rejects(
+    () => spawnWorker(sampleWork(), cfg, mkTempDir(), { timeoutMs: 10000, idleTimeoutMs: 300 }),
+    (err) => {
+      assert.ok(err instanceof DispatchError);
+      assert.equal(err.errorClass, 'worker-timeout');
+      assert.match(err.message, /idle timeout/);
+      assert.equal(err.stdout, 'alive\n');
+      return true;
+    },
+  );
+
+  const elapsed = Date.now() - start;
+  assert.ok(elapsed < 5000, `expected the idle timeout (300ms) to fire well before the 10000ms hard cap, took ${elapsed}ms`);
+});
+
+test('spawnWorker: idleTimeoutMs is disarmed by default (absent from cfg/opts) -- a silent worker only ever hits the hard timeoutMs cap, byte-identical to before this field existed', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeGoesSilentExecutor(dir);
+  const cfg = baseConfig([scriptPath]);
+
+  await assert.rejects(
+    () => spawnWorker(sampleWork(), cfg, mkTempDir(), { timeoutMs: 400 }),
+    (err) => {
+      assert.ok(err instanceof DispatchError);
+      assert.equal(err.errorClass, 'worker-timeout');
+      // No idle timeout configured -- the message names the hard cap, never "idle timeout".
+      assert.doesNotMatch(err.message, /idle timeout/);
+      return true;
+    },
+  );
+});
+
+test('spawnWorker: idleTimeoutMs resets on every chunk -- a worker producing periodic output past the idle budget still completes normally', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writePeriodicWriterExecutor(dir, { intervalMs: 150, count: 5 });
+  const cfg = baseConfig([scriptPath]);
+
+  // idleTimeoutMs (400ms) is smaller than the total runtime (~750ms) but
+  // larger than the gap between any two ticks (150ms) -- only passes if the
+  // idle timer truly resets per chunk instead of firing on total elapsed time.
+  const result = await spawnWorker(sampleWork(), cfg, mkTempDir(), { timeoutMs: 10000, idleTimeoutMs: 400 });
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /tick-4/);
+});
+
+test('spawnWorker threads a FGOS_DISPATCH_DEPTH of "1" into a fresh (non-nested) dispatch -- the child sees itself one level deep', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeDepthEchoExecutor(dir);
+  const cfg = baseConfig([scriptPath]);
+  const result = await spawnWorker(sampleWork(), cfg, mkTempDir());
+  assert.deepEqual(JSON.parse(result.stdout), { depth: '1' });
+});
+
+test('spawnWorker refuses with DispatchError(dispatch-depth-exceeded) once FGOS_DISPATCH_DEPTH already sits at the cap -- never spawns', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeDepthEchoExecutor(dir);
+  const cfg = baseConfig([scriptPath]);
+  const prior = process.env[DISPATCH_DEPTH_ENV];
+  process.env[DISPATCH_DEPTH_ENV] = String(MAX_DISPATCH_DEPTH);
+  try {
+    await assert.rejects(
+      () => spawnWorker(sampleWork(), cfg, mkTempDir()),
+      (err) => {
+        assert.ok(err instanceof DispatchError);
+        assert.equal(err.errorClass, 'dispatch-depth-exceeded');
+        assert.equal(err.depth, MAX_DISPATCH_DEPTH);
+        return true;
+      },
+    );
+  } finally {
+    if (prior === undefined) delete process.env[DISPATCH_DEPTH_ENV];
+    else process.env[DISPATCH_DEPTH_ENV] = prior;
+  }
+});
+
+test('spawnWorker refused with dispatch-depth-exceeded classifies to "park" via the recovery matrix, never blindly retried', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeDepthEchoExecutor(dir);
+  const cfg = baseConfig([scriptPath]);
+  const prior = process.env[DISPATCH_DEPTH_ENV];
+  process.env[DISPATCH_DEPTH_ENV] = String(MAX_DISPATCH_DEPTH + 5);
+  try {
+    let caughtErrorClass;
+    try {
+      await spawnWorker(sampleWork(), cfg, mkTempDir());
+    } catch (err) {
+      caughtErrorClass = err.errorClass;
+    }
+    const { resolveAction } = await import('../../src/runner/recovery.mjs');
+    assert.deepEqual(resolveAction(caughtErrorClass, 1), { action: 'park', errorClass: 'dispatch-depth-exceeded' });
+  } finally {
+    if (prior === undefined) delete process.env[DISPATCH_DEPTH_ENV];
+    else process.env[DISPATCH_DEPTH_ENV] = prior;
+  }
+});
+
 test('spawnWorker throws a RunnerConfigError (not DispatchError) for an unconfigured tier, before any spawn', () => {
   const dir = mkTempDir();
   const scriptPath = writeEchoExecutor(dir);
@@ -3078,6 +3326,43 @@ test('executeExecutorCli refuses with DispatchError(dispatch-in-flight) when loc
   assert.ok(caughtError.message.includes('ambiguous'));
 });
 
+
+test('the "execute" CLI entry point prints a structured {error,errorClass} JSON line on stdout when dispatch fails, alongside the human-readable message on stderr (dispatch-execute optimization pass)', async () => {
+  const { repoRoot, fgosDir } = mkTempGitRepo();
+  const dir = mkTempDir();
+  const scriptPath = writeEchoExecutor(dir);
+  writeRunnerConfigFixture(repoRoot, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: { 'cli-executor': { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const testCwd = repoRoot;
+  const { dispatchLockFile } = await import('../../src/runner/main-checkout-lock.mjs');
+  const lockPath = path.join(fgosDir, dispatchLockFile(testCwd));
+  fs.writeFileSync(lockPath, 'INVALID-JSON-CORRUPT-LOCK');
+
+  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
+  const result = spawnSync(
+    process.execPath,
+    [dispatchPath, 'execute', 'cli-executor', '--prompt', 'x', '--cwd', testCwd],
+    { encoding: 'utf8', cwd: repoRoot },
+  );
+  assert.notEqual(result.status, 0);
+  const parsed = JSON.parse(result.stdout.trim());
+  assert.equal(parsed.errorClass, 'dispatch-in-flight');
+  assert.match(parsed.error, /ambiguous/);
+  assert.match(result.stderr, /ambiguous/);
+});
+
+test('the "execute" CLI entry point omits errorClass from the structured stdout line for a non-DispatchError failure (RunnerConfigError, e.g.)', () => {
+  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
+  const result = spawnSync(process.execPath, [dispatchPath, 'execute'], { encoding: 'utf8' });
+  assert.notEqual(result.status, 0);
+  const parsed = JSON.parse(result.stdout.trim());
+  assert.equal(parsed.errorClass, undefined);
+  assert.match(parsed.error, /usage: node src\/runner\/dispatch\.mjs execute/);
+});
 
 test('the "execute" CLI entry point self-executes a real adapter-resolvable executor and prints the real result as JSON, never bare {command,args}', () => {
   const { repoRoot } = mkTempGitRepo();
