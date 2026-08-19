@@ -173,7 +173,21 @@ export function assembleSkills(projectRoot, targetAgentsSkills) {
  * never point back at wherever npm installed the global package (D7).
  *
  * Runs `assembleSkills` first (D7) so `.agents/skills` is assembled from
- * `core/skills` + `domains/[domain]/skills` before materializing.
+ * `core/skills` + `domains/[domain]/skills` before materializing -- a
+ * git-checkout-based or symlinked dev install's `packageRoot` needs this
+ * to pick up skill content authored since `.agents/skills` was last built.
+ *
+ * That assemble is best-effort here specifically (round-2 review finding,
+ * tsk-397): a real global npm install's `packageRoot` is the shared
+ * package directory, which can be root-owned or a read-only filesystem --
+ * `.agents/skills` already ships pre-assembled+committed in that case
+ * (D7), so a write failure here means "nothing new to pick up", not "setup
+ * is broken". Same "pure observability/best-effort write must not crash
+ * the caller" degrade-to-continue shape `appendWorkerLog` already uses
+ * (`src/runner/worker-log.mjs`) for the identical class of failure
+ * (disk full, EACCES, read-only target) -- never filtered to specific
+ * error codes there either, so this stays consistent rather than
+ * inventing a second contract for the same kind of I/O failure.
  *
  * A no-op when `packageRoot` carries no `.agents/skills` at all (e.g. a
  * pre-tsk-1qi package version, or a dev checkout of some other tool) --
@@ -181,7 +195,12 @@ export function assembleSkills(projectRoot, targetAgentsSkills) {
  * setup/doctor behavior in this repo already follows.
  */
 export function materializeSkillsIntoProject(packageRoot, targetRoot) {
-  assembleSkills(packageRoot);
+  try {
+    assembleSkills(packageRoot);
+  } catch {
+    // Best-effort: packageRoot's own .agents/skills (already
+    // shipped/committed) is still used below, unassembled.
+  }
   const sourceAgentsSkills = path.join(packageRoot, '.agents', 'skills');
   if (!fs.existsSync(sourceAgentsSkills)) {
     return { copied: false, wrappersWritten: [] };

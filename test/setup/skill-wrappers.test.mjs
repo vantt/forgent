@@ -149,6 +149,26 @@ test('materializeSkillsIntoProject is a no-op when packageRoot has no .agents/sk
   assert.equal(fs.existsSync(path.join(targetRoot, '.agents')), false);
 });
 
+test('materializeSkillsIntoProject never throws when assembling into packageRoot fails (round-2 review finding, tsk-397) -- a real global npm install can be root-owned/read-only; the already-shipped .agents/skills still materializes into the target project', () => {
+  const packageRoot = mkTempDir('skill-wrappers-materialize-readonly-pkg-');
+  writeSkill(path.join(packageRoot, '.agents', 'skills'), 'skill-a', SAMPLE_FRONTMATTER, '# Body A\n');
+  // Block core/skills with a plain file so assembleSkills' own
+  // fs.readdirSync(coreSkillsRoot, {withFileTypes:true}) throws ENOTDIR --
+  // the same "block the path with a file" I/O-failure simulation
+  // test/runner/worker-log.test.mjs already uses, standing in for any
+  // real write failure (disk full, EACCES, read-only filesystem).
+  fs.writeFileSync(path.join(packageRoot, 'core'), 'not a directory');
+  const targetRoot = mkTempDir('skill-wrappers-materialize-readonly-target-');
+
+  let result;
+  assert.doesNotThrow(() => {
+    result = materializeSkillsIntoProject(packageRoot, targetRoot);
+  });
+  assert.equal(result.copied, true);
+  assert.equal(result.wrappersWritten.length, 1);
+  assert.ok(fs.existsSync(path.join(targetRoot, '.agents', 'skills', 'skill-a', 'SKILL.md')), 'the already-shipped .agents/skills still copies into the target project');
+});
+
 test('assembleSkills assembles skills from core/skills/ and domains/*/skills/ into .agents/skills/', () => {
   const root = mkTempDir('skill-wrappers-assemble-');
   writeSkill(path.join(root, 'core', 'skills'), 'fgos-routing', SAMPLE_FRONTMATTER, '# Core Routing\n');
