@@ -38,6 +38,8 @@ fgos tool query --capability impact-analysis --status present
   immediately after a fresh reindex), a distinct mechanism from staleness
   that the cross-check line above already covers unconditionally.
 
+**Repo-param resolution (multi-repo GitNexus registries):** when any GitNexus MCP tool (`impact`/`context`/`explain`/`trace`/`pdg_query`) errors with "Multiple repositories indexed" or "Repository not found", call `list_repos` first and match the exact registered `name` by its `scanTarget`/absolute project path -- never reuse the error messages own display string (confirmed invalid: a `repo` value copied verbatim from that error, e.g. `forgent (/path/to/project)`, itself returns "Repository not found") and never guess a bare short name (confirmed ambiguous: a bare name like `forgent` can silently resolve among several registered repos sharing that name -- including unrelated worktrees -- with no second ambiguity error to catch the mistake).
+
 This gate is prose the agent reads, never compiled logic — GitNexus is
 the first registered provider for `impact-analysis`, not the only one
 this gate can ever recognize. The block below regenerates from
