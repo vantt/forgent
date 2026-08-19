@@ -1,6 +1,6 @@
 # task-spec: fgos-indexing
 
-domain: core | role: indexer | scope: enduser-docs
+domain: core | role: indexer | scope: enduser-docs | requires-skill: fgos-indexing
 
 ## Input
 - End-user markdown documents located under `docs/<quadrant>/` (`how-to`, `tutorials`, `reference`, `explanation`).

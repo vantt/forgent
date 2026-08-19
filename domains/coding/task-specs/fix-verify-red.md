@@ -1,6 +1,6 @@
 # task-spec: fix-verify-red
 
-domain: coding | stage: executing | role: implementer
+domain: coding | stage: executing | role: implementer | requires-skill: fgos-coding-implement
 
 ## Input
 - A `return` attempt whose `verify` command failed — the real failure

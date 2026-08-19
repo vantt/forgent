@@ -1,6 +1,6 @@
 # task-spec: validate-plan
 
-domain: coding | role: reviewer | reason: review
+domain: coding | role: reviewer | reason: review | requires-skill: fgos-coding-validating
 
 ## Input
 - `plan.md`, already shaped and its own gate-free.

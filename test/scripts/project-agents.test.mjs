@@ -52,25 +52,24 @@ test('model_tier resolves through the same tier->model map the shared config fil
   assert.equal(modelLine, 'model: haiku');
 });
 
-// claims (tsk-2t9c D12): optional multi-role-harness eligibility field --
+// skills (tsk-397 D20): optional eligibility field --
 // projects through unfiltered when present, is entirely absent from the
-// frontmatter when the source yaml never declares it (every pre-existing
-// agent-type, including the shipped fgos-placeholder.yaml, is unaffected).
-test('claims, when declared, projects into the frontmatter as a bracketed list', () => {
-  const withClaims = VALID_YAML + '\nclaims:\n  - review-item\n  - validate-plan\n';
-  const markdown = projectAgentMarkdown('test-agent', withClaims, DEFAULT_MODELS);
-  const claimsLine = markdown.split('\n').find((line) => line.startsWith('claims:'));
-  assert.equal(claimsLine, 'claims: [review-item, validate-plan]');
+// frontmatter when the source yaml never declares it.
+test('skills, when declared, projects into the frontmatter as a bracketed list', () => {
+  const withSkills = VALID_YAML + '\nskills:\n  - fgos-coding-implement\n  - fgos-coding-validating\n';
+  const markdown = projectAgentMarkdown('test-agent', withSkills, DEFAULT_MODELS);
+  const skillsLine = markdown.split('\n').find((line) => line.startsWith('skills:'));
+  assert.equal(skillsLine, 'skills: [fgos-coding-implement, fgos-coding-validating]');
 });
 
-test('claims is absent from the frontmatter when the source yaml never declares it (backward compatible)', () => {
+test('skills is absent from the frontmatter when the source yaml never declares it (backward compatible)', () => {
   const markdown = projectAgentMarkdown('test-agent', VALID_YAML, DEFAULT_MODELS);
-  assert.equal(markdown.includes('claims:'), false);
+  assert.equal(markdown.includes('skills:'), false);
 });
 
-test('a claims list containing a non-string entry is refused, not silently coerced', () => {
-  const badClaims = VALID_YAML + '\nclaims:\n  - review-item\n  - 42\n';
-  assert.throws(() => projectAgentMarkdown('test-agent', badClaims, DEFAULT_MODELS), AgentDefinitionError);
+test('a skills list containing a non-string entry is refused, not silently coerced', () => {
+  const badSkills = VALID_YAML + '\nskills:\n  - fgos-coding-implement\n  - 42\n';
+  assert.throws(() => projectAgentMarkdown('test-agent', badSkills, DEFAULT_MODELS), AgentDefinitionError);
 });
 
 test('projection is idempotent -- identical source produces byte-identical output across two runs', () => {

@@ -1,6 +1,6 @@
 # task-spec: fgos-unlock
 
-domain: core | role: recovery | trigger: exit-7-lock-error
+domain: core | role: recovery | trigger: exit-7-lock-error | requires-skill: fgos-unlock
 
 ## Input
 - CLI claim failure from `fgos take` or `fgos pick`: exit code 7, category `lock-timeout` (`ClaimError('lock-held')` or `ClaimError('lock-ambiguous')`).

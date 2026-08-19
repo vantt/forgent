@@ -1,6 +1,6 @@
 # task-spec: review-item
 
-domain: coding | role: reviewer | reason: review
+domain: coding | role: reviewer | reason: review | requires-skill: fgos-coding-validating
 
 ## Input
 - A diff and its own `verify` result, for an item that has reached the

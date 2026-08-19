@@ -433,99 +433,151 @@ function checkTaskSpecsResolve(cwd) {
   return { passed: true, message: 'every domain\'s taskSpecMap entry resolves to a real domains/<domain>/task-specs/ file and core/task-specs/ contains all domain-agnostic task-specs' };
 }
 
-// Every real task-spec id across every domains/<domain>/task-specs/ and core/task-specs/ directory
-// -- the resolution set checkAgentClaimsResolve validates each agent-type's
-// `claims` list against. Absent domains/ or task-specs/ entirely is not an error
-// (a project that has not yet adopted the convention at all).
-function allTaskSpecIds(cwd) {
+function allTaskSpecs(cwd) {
+  const specs = [];
   const root = path.join(cwd, 'domains');
-  const ids = new Set();
   if (fs.existsSync(root)) {
     for (const domainEntry of fs.readdirSync(root, { withFileTypes: true })) {
       if (!domainEntry.isDirectory()) continue;
       const taskSpecsDir = path.join(root, domainEntry.name, 'task-specs');
       if (!fs.existsSync(taskSpecsDir)) continue;
       for (const file of fs.readdirSync(taskSpecsDir)) {
-        if (file.endsWith('.md')) ids.add(file.slice(0, -'.md'.length));
+        if (file.endsWith('.md')) {
+          specs.push({
+            domain: domainEntry.name,
+            specId: file.slice(0, -'.md'.length),
+            filePath: path.join(taskSpecsDir, file),
+          });
+        }
       }
     }
   }
   const coreRoot = path.join(cwd, 'core', 'task-specs');
   if (fs.existsSync(coreRoot)) {
     for (const file of fs.readdirSync(coreRoot)) {
-      if (file.endsWith('.md')) ids.add(file.slice(0, -'.md'.length));
+      if (file.endsWith('.md')) {
+        specs.push({
+          domain: 'core',
+          specId: file.slice(0, -'.md'.length),
+          filePath: path.join(coreRoot, file),
+        });
+      }
     }
   }
-  return ids;
+  return specs;
 }
 
-// Extracts a `claims:` list's own item strings from raw yaml SOURCE TEXT,
-// without a yaml parser dependency. Doctor (`src/setup/registrations.mjs`)
-// must keep loading in a plain unpacked copy with no `node_modules/` yet
-// (test/setup/checks-setup-rc-line.test.mjs's own "setup from a copy of
-// fgos that is not in a git checkout" case proves this is a real,
-// exercised scenario) -- a static top-level `import ... from 'yaml'`
-// would break module load there even though 'yaml' is a real dependency
-// used elsewhere (scripts/project-agents.mjs, run only after `npm
-// install`, well after this constraint applies). Supports both block-list
-// (`claims:\n  - a\n  - b`) and inline flow (`claims: [a, b]`) styles,
-// enough for a diagnostic -- the real authority on whether a source yaml
-// is well-formed is project-agents.mjs's own full parse at projection
-// time, never this heuristic.
-function extractClaimsFromYamlText(text) {
-  const inlineMatch = text.match(/^claims:\s*\[([^\]]*)\]\s*$/m);
+function extractSkillsFromYamlText(text) {
+  const inlineMatch = text.match(/^skills:\s*\[([^\]]*)\]\s*$/m);
   if (inlineMatch) {
     return inlineMatch[1].split(',').map((s) => s.trim()).filter(Boolean);
   }
   const lines = text.split('\n');
-  const claims = [];
+  const skills = [];
   let inBlock = false;
   for (const line of lines) {
-    if (/^claims:\s*$/.test(line)) {
+    if (/^skills:\s*$/.test(line)) {
       inBlock = true;
       continue;
     }
     if (!inBlock) continue;
     const item = line.match(/^\s+-\s*(\S+)\s*$/);
     if (item) {
-      claims.push(item[1]);
+      skills.push(item[1]);
       continue;
     }
-    if (line.trim() === '') continue; // blank line inside the block -- keep scanning
-    break; // any other non-list-item line ends the block
+    if (line.trim() === '') continue;
+    break;
   }
-  return claims;
+  return skills;
 }
 
-// tsk-2t9c D12: eligibility for the multi-role team harness is declared by
-// an OPTIONAL `claims` list on an agent-type's own source yaml
-// (agents/*.yaml, projected by scripts/project-agents.mjs) -- a typo'd
-// claim would otherwise make that agent-type permanently ineligible for
-// any role/holder call with no error anywhere.
+function parseTaskSpecHeaderFields(headerLine) {
+  if (!headerLine) return {};
+  const parts = headerLine.split('|').map((p) => p.trim());
+  const res = {};
+  for (const part of parts) {
+    const colonIdx = part.indexOf(':');
+    if (colonIdx === -1) continue;
+    const key = part.slice(0, colonIdx).trim();
+    const valStr = part.slice(colonIdx + 1).trim();
+    if (key === 'requires-skill' || key === 'agent') {
+      if (valStr.startsWith('[') && valStr.endsWith(']')) {
+        res[key] = valStr.slice(1, -1).split(',').map((s) => s.trim()).filter(Boolean);
+      } else if (valStr.includes(',')) {
+        res[key] = valStr.split(',').map((s) => s.trim()).filter(Boolean);
+      } else if (valStr) {
+        res[key] = [valStr];
+      } else {
+        res[key] = [];
+      }
+    } else {
+      res[key] = valStr;
+    }
+  }
+  return res;
+}
+
+// tsk-397 D20: eligibility direction inverted -- task-spec declares agent/requires-skill,
+// agent-type declares skills. Check validates every requires-skill is provided by at least
+// one agent-type, and every pinned agent exists.
 function checkAgentClaimsResolve(cwd) {
   const agentsDir = path.join(cwd, 'agents');
-  if (!fs.existsSync(agentsDir)) {
-    return { passed: true, message: 'no agents/ directory -- nothing to check' };
-  }
-  const knownSpecIds = allTaskSpecIds(cwd);
-  const problems = [];
-  for (const file of fs.readdirSync(agentsDir).filter((f) => f.endsWith('.yaml'))) {
-    let text;
-    try {
-      text = fs.readFileSync(path.join(agentsDir, file), 'utf8');
-    } catch {
-      continue;
-    }
-    for (const claim of extractClaimsFromYamlText(text)) {
-      if (!knownSpecIds.has(claim)) {
-        problems.push(`agents/${file} claims unknown task-spec "${claim}"`);
+  const agentSkillsMap = new Map();
+  if (fs.existsSync(agentsDir)) {
+    for (const file of fs.readdirSync(agentsDir).filter((f) => f.endsWith('.yaml'))) {
+      try {
+        const text = fs.readFileSync(path.join(agentsDir, file), 'utf8');
+        const nameMatch = text.match(/^name:\s*(\S+)/m);
+        const name = nameMatch ? nameMatch[1] : file.slice(0, -'.yaml'.length);
+        const skills = extractSkillsFromYamlText(text);
+        agentSkillsMap.set(name, new Set(skills));
+      } catch {
+        continue;
       }
     }
   }
+
+  const allProvidedSkills = new Set();
+  for (const skillsSet of agentSkillsMap.values()) {
+    for (const s of skillsSet) allProvidedSkills.add(s);
+  }
+
+  const taskSpecs = allTaskSpecs(cwd);
+  const problems = [];
+
+  for (const spec of taskSpecs) {
+    let text;
+    try {
+      text = fs.readFileSync(spec.filePath, 'utf8');
+    } catch {
+      continue;
+    }
+    const lines = text.split('\n');
+    const headerLine = lines.find((l) => l.startsWith('domain:'));
+    const parsed = parseTaskSpecHeaderFields(headerLine);
+
+    if (Array.isArray(parsed.agent)) {
+      for (const agentName of parsed.agent) {
+        if (agentSkillsMap.size > 0 && !agentSkillsMap.has(agentName)) {
+          problems.push(`task-spec "${spec.specId}" names unknown agent "${agentName}"`);
+        }
+      }
+    }
+
+    if (Array.isArray(parsed['requires-skill'])) {
+      for (const reqSkill of parsed['requires-skill']) {
+        if (agentSkillsMap.size > 0 && !allProvidedSkills.has(reqSkill)) {
+          problems.push(`task-spec "${spec.specId}" requires skill "${reqSkill}" but no agent-type provides it`);
+        }
+      }
+    }
+  }
+
   if (problems.length > 0) {
     return { passed: false, message: problems.join('; ') };
   }
-  return { passed: true, message: 'every agent-type\'s claims resolve to a real task-spec' };
+  return { passed: true, message: 'every task-spec\'s requires-skill/agent eligibility declaration resolves to real agent skills' };
 }
 
 function checkMainCheckoutHookWired(cwd) {

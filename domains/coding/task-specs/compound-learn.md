@@ -1,6 +1,6 @@
 # task-spec: compound-learn
 
-domain: coding | status: retrospective | role: implementer
+domain: coding | status: retrospective | role: implementer | requires-skill: fgos-coding-compounding
 
 ## Input
 - A `delivered` item that has entered `retrospective` (sweep, or manual).

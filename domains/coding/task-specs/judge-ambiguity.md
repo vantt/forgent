@@ -1,6 +1,6 @@
 # task-spec: judge-ambiguity
 
-domain: coding | stage: discovery | role: implementer
+domain: coding | stage: discovery | role: implementer | requires-skill: fgos-coding-discovering
 
 ## Input
 - A claimed item at stage `discovery`, `title`/`refs` already committed.
