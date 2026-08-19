@@ -12,14 +12,20 @@ file nặng nhất. Đã xác minh lại kiến trúc mirror 3 tầng (xem §3) 
 ban đầu (tưởng `plugins` và `.claude` phải byte-identical) đã được sửa
 bằng cách đọc `test/skills/fgos-mirror.test.mjs`.
 
-Ba pattern lỗi cụ thể, có bằng chứng, đã thấy rõ (chi tiết ở §7). Chưa
-chốt D-ID nào (round 1, hard rule: không mint D-ID từ 1 vòng). Yêu cầu quy
-trình mới từ người dùng (chưa D-ID hoá): tag một version trên `main` ngay
-trước khi chuyển sang execute, đánh dấu mốc "trước khi sửa skill" để có
-điểm so sánh/khôi phục.
+Ba pattern lỗi cụ thể, có bằng chứng, đã thấy rõ (chi tiết ở §7).
 
-Việc tiếp theo: người xem lại 3 nhóm lỗi + đề xuất giải pháp ở §7, xác nhận
-phạm vi/độ ưu tiên, rồi mới khoá D-ID và viết CONTEXT.md.
+Round 2+ (nhiều lượt qua lại về cách dọn trích dẫn ID — xem §5): đã khoá
+**D1** — ranh giới trích dẫn ID theo vai trò sản xuất artifact (process/
+build-time giữ luật `tsk-37i`, product/shippable xoá sạch ID). Cũng đã
+submit riêng `tsk-5zi` (độc lập, không phụ thuộc tsk-56w) để tự động hoá
+đồng bộ `.agents/skills` → `plugins/fgOS/skills`, giải quyết §3 mục 13.
+
+Còn mở: §3 mục 9 (tag version trước execute — yêu cầu người dùng, chưa
+D-ID hoá), mục 10 (`ui-spec` có tính vào phạm vi không), mục 11 (cách văn
+xuôi hoá pseudocode nhúng).
+
+Việc tiếp theo: ngã ngũ mục 9/10/11, rồi hand-off `fgos-coding-exploring`/
+`fgos-coding-planning` theo đúng terminal handoff của skill này.
 
 ## 2. Mục tiêu & đề bài
 
@@ -53,12 +59,14 @@ dùng chung 3 nơi) lẫn nhóm "coding"/CLI-wrapper (~35 skill chỉ có trong
 | 9 | Rõ (yêu cầu người dùng, chưa D-ID) | Trước khi chuyển bất kỳ item con nào của tsk-56w sang stage thực thi (execute), phải tạo một tag/version ở `main` đánh dấu đúng thời điểm skill bắt đầu bị sửa — để có mốc so sánh/khôi phục nếu sửa làm hỏng tác dụng skill. |
 | 10 | Chưa rõ | `ui-spec` (chỉ có ở `.claude/skills/ui-spec`, 339 dòng, có `references/`/`templates/`/`tools/` riêng) không phải skill fgOS — có tính vào phạm vi tsk-56w không, hay loại hẳn? (Nghiêng về loại, vì mô tả gốc của tsk-56w chỉ nói "skill fgOS".) |
 | 11 | Chưa rõ | Giải pháp cho #4 (pseudocode 133/88 dòng): viết lại thành văn xuôi có đánh số bước (giống cách `fgos-coding-exploring`'s Flow đang làm) HAY tách nguyên khối pseudocode đó ra một `references/algorithm.md` riêng, SKILL.md chỉ tóm tắt + trỏ tới? Hai hướng khác nhau về việc "còn giữ pseudocode ở đâu đó hay bỏ hẳn". |
-| 12 | Chưa rõ | Giải pháp cho #6 (trích dẫn ID trần): xoá hẳn ID số, chỉ giữ lý do bằng câu văn thường — hay giữ ID kèm theo một mệnh đề lý do ngắn ngay sau (ví dụ "tsk-2t9c D16 — vì lệnh reclaim có thể lồng 2 lớp")? Ảnh hưởng tới việc truy vết quyết định về sau (docs/decisions/index.md, `fgos show`). |
-| 13 | Chưa rõ | Có sửa `.agents/skills`+`plugins/fgOS/skills` cùng lúc trong 1 task/child, hay tách thành 2 bước tuần tự (sửa nguồn trước, đồng bộ copy tay sau) để giảm diff review mỗi lần? |
+| 12 | **Rõ — D1** | Giải pháp cho #6: xem D1 ở §4. Ranh giới không phải "loại ID" mà là "vai trò sản xuất của artifact". Nhóm process/build-time (`docs/history`, `docs/decisions`, `docs/backlog.md`, text task/`CONTEXT.md`, `docs/specs`) giữ nguyên luật `tsk-37i` (ADR/RUL kèm gloss, D-local chỉ trong `CONTEXT.md` gốc). Nhóm product/shippable (`.agents/skills/*/SKILL.md` — nguồn thật, đã xác nhận byte-identical với `plugins/fgOS/skills/*` — + `references/*.md` của nó) **không giữ ID governance nào cả**, glossed hay không cũng không giữ — lý do viết thẳng thành câu văn, áp dụng ngay tại nguồn `.agents/skills`, không chờ tới bản copy. Căn cứ: `plugins/fgOS/.claude-plugin` chỉ có `plugin.json`+`skills/`, không mang `docs/` nào theo khi publish qua marketplace (xác minh bằng `ls`); đối chiếu bee upstream cho thấy bee giữ citation trong skill prose CHỈ KHI tài liệu bền đi kèm gói phân phối (gloss + pointer-integrity check + target durable) — điều kiện đó không thoả với kênh publish thật của fgOS nên mô hình bee không áp dụng được. `.claude/skills/*` (thin wrapper 3 dòng) không thuộc phạm vi vì không có thân bài. |
+| 13 | **Rõ — giải quyết bởi item khác** | Đồng bộ `.agents/skills`+`plugins/fgOS/skills`: không cần quyết định thủ tục "sửa 2 lần cùng commit" nữa — đã submit `tsk-5zi` (độc lập, không phụ thuộc tsk-56w) để mở rộng `npm run build:skills` tự động copy `.agents/skills/<name>` → `plugins/fgOS/skills/<name>`, dùng lại `copyDirRecursive` sẵn có trong `materializeSkillsIntoProject`. Một khi `tsk-5zi` xong, mọi child task của tsk-56w chỉ cần sửa `.agents/skills`, chạy `npm run build:skills`, xong — không cần review diff 2 chỗ. |
 
 ## 4. Quyết định đã chốt
 
-*(chưa có — round 1, chưa D-ID nào giữ ổn định qua >1 vòng)*
+| D-ID | Nội dung |
+|---|---|
+| D1 | Ranh giới trích dẫn ID governance (ADR/RUL/D-local/`tsk-…`) trong skill fgOS xác định theo **vai trò sản xuất của artifact**, không theo vị trí thư mục. Nhóm process/build-time (`docs/history/*`, `docs/decisions/*`, `docs/backlog.md`, text task/`CONTEXT.md`, `docs/specs/*`) giữ nguyên luật `tsk-37i` (ADR/RUL kèm gloss 1 dòng, D-local chỉ trong `CONTEXT.md` gốc). Nhóm product/shippable (`.agents/skills/*/SKILL.md` — nguồn thật, đã xác nhận byte-identical với `plugins/fgOS/skills/*` hôm nay — và mọi `references/*.md` của nó) không giữ ID governance nào cả; lý do viết thẳng vào câu văn; luật áp dụng ngay tại nguồn `.agents/skills`, không chờ tới bản copy. Căn cứ: `plugins/fgOS/.claude-plugin` chỉ có `plugin.json`+`skills/`, không mang `docs/` theo khi publish qua marketplace; bee upstream chỉ giữ citation trong skill prose khi tài liệu bền đi kèm gói phân phối (gloss + pointer-integrity check + target durable) — điều kiện này không thoả với kênh publish thật của fgOS. `.claude/skills/*` (thin wrapper 3 dòng) ngoài phạm vi. Ghi qua `fgos decision --id tsk-56w` (seq 20212). |
 
 ## 5. Q&A log
 
@@ -75,11 +83,87 @@ dùng chung 3 nơi) lẫn nhóm "coding"/CLI-wrapper (~35 skill chỉ có trong
 - Người dùng, giữa phiên: nhắc phải cẩn thận kỹ càng vì cắt sai sẽ mất tác
   dụng skill/prose, và trước khi execute phải tag version ở `main` đánh
   dấu mốc trước khi sửa — ghi nhận ở §3 mục 9.
+- **Chuỗi thảo luận trích dẫn ID (§3 mục 12), nhiều vòng:**
+  1. Agent hỏi: giữ trần hay xoá hẳn D-local (theo mẫu `_shared/citation-
+     format.md`, `tsk-37i`)?
+  2. Người dùng đề xuất footnote: trích trần tại chỗ dùng, cuối file có
+     section liệt kê ID + nguồn gốc.
+  3. Agent hỏi lại nguyên uỷ: tại sao sản phẩm cuối cùng cần giữ ID/
+     footnote — sản phẩm thật khi release có giữ không? Agent trả lời
+     bằng đối chiếu thực tế bên ngoài (RFC/README/code-comment
+     anti-pattern) + fork research bee upstream.
+  4. Fork báo về: bee THẬT SỰ giữ citation trong skill prose, nhưng chỉ
+     khi (a) luôn kèm gloss, (b) có pointer-integrity check máy xác minh
+     trỏ đúng file+heading, (c) đích là tài liệu bền đã "route", không
+     phải file tạm theo task.
+  5. Agent kiểm `plugins/fgOS/.claude-plugin/plugin.json` + cấu trúc thư
+     mục: xác nhận gói publish thật của fgOS không mang `docs/` nào theo
+     → mô hình bee không áp dụng được cho kênh phân phối thật của fgOS.
+     Agent đề xuất ranh giới theo "kênh publish" (plugins/ vs .agents/).
+  6. Người dùng sửa: `plugins/fgOS/skills/*` chỉ là BẢN COPY của
+     `.agents/skills/*` — không phải `.agents/skills` "không publish".
+     Ranh giới đúng phải là **vai trò sản xuất của artifact** (process/
+     build-time vs. product/shippable), không phải "đang nằm ở thư mục
+     nào" — vì `.agents/skills` chính là nội dung sẽ ra ngoài, chỉ tình
+     cờ đang ở gần `docs/` trong monorepo này.
+  7. Agent trình bày lại đúng theo sửa của người dùng → người dùng xác
+     nhận "ok" → khoá D1.
 
-## 6. Thiết kế đã chốt
+## 6. Thiết kế đã chốt {#design}
 
-*(chưa viết — chờ §3 mục 11/12/13 ngã ngũ trước khi tổng hợp thiết kế
-cuối; viết sớm lúc này sẽ phải viết lại ngay khi #11/#12 đổi hướng)*
+tsk-56w dọn 3 loại lỗi cụ thể trong toàn bộ skill fgOS
+(`.agents/skills`, `.claude/skills`, `plugins/fgOS/skills`), không sửa
+cấu trúc mirror 3 tầng hiện có:
+
+1. **Pseudocode nhúng trong SKILL.md** — 2 skill (`fgos-coding-driving`,
+   `fgos-fanout`) có khối thuật toán thật (biến, `loop:`, if/else lồng
+   nhau) thay vì mô tả bằng câu văn. Cách sửa còn mở (§3 mục 11): văn
+   xuôi hoá theo đúng văn phong "Flow" số bước hiện `fgos-coding-
+   exploring` đang dùng, hay tách ra `references/` riêng — chưa chốt.
+
+2. **Boilerplate lặp máy móc** — 23 skill CLI-wrapper trong
+   `plugins/fgOS/skills` chép y hệt cùng 1 khối bash 9 dòng gọi `fgos`
+   CLI. Gom về `plugins/fgOS/skills/_shared/fgos-cli-fallback.md`, đúng
+   tiền lệ `_shared/citation-format.md` đã dùng.
+
+3. **Trích dẫn ID governance trần** — ≥267 lượt `tsk-…`/`RUL…`/`D…` rải
+   khắp không giải thích. **Đã chốt (D1, §4):** ranh giới theo vai trò
+   sản xuất artifact, không theo thư mục.
+   - Process/build-time (`docs/history`, `docs/decisions`,
+     `docs/backlog.md`, text task/`CONTEXT.md`, `docs/specs`): giữ
+     nguyên luật `tsk-37i` — ADR/RUL kèm gloss 1 dòng tại chỗ trích,
+     D-local không bao giờ ra khỏi `CONTEXT.md` gốc của nó.
+   - Product/shippable (`.agents/skills/*/SKILL.md` — nguồn thật, sao y
+     nguyên vào mọi bản phân phối — và `references/*.md` của nó): xoá
+     sạch mọi ID governance, viết lý do thẳng vào câu văn thường. Áp
+     dụng ngay tại nguồn `.agents/skills`, sửa 1 lần đủ cho mọi bản copy
+     (một khi `tsk-5zi` tự động hoá đồng bộ `plugins/fgOS/skills` xong).
+   - Lý do ranh giới này đúng, không phải "theo loại ID" hay "theo kênh
+     publish": `.agents/skills` tuy nằm cạnh `docs/` trong monorepo
+     nhưng ĐƯỢC SẢN XUẤT với vai trò là nội dung sẽ vận hành bên ngoài —
+     bằng chứng là nó được sao y nguyên vào `plugins/fgOS/skills` (kênh
+     publish thật, xác nhận không mang `docs/` nào theo khi cài ở
+     project khác). Mô hình bee upstream (gloss + pointer-integrity
+     check + đích tài liệu bền) chỉ đúng khi tài liệu bền đó CŨNG đi
+     kèm gói phân phối — fgOS không có cơ chế đó nên không áp dụng
+     được, phải xoá hẳn thay vì chỉ gloss.
+
+Còn mở, chưa chốt: §3 mục 9 (tag version trên `main` trước khi execute —
+yêu cầu người dùng, chưa D-ID hoá), mục 10 (`ui-spec` có tính vào phạm vi
+không, nghiêng về loại), mục 11 (cách văn xuôi hoá pseudocode).
+
+```mermaid
+flowchart TD
+  A["SKILL.md hiện tại: dài, lẫn pseudocode +\ncitation trần + boilerplate lặp"] --> B{Loại lỗi}
+  B -->|Pseudocode nhúng| C["fgos-coding-driving,\nfgos-fanout"]
+  B -->|Boilerplate lặp| D["23 CLI-wrapper skill"]
+  B -->|Citation trần| E["~267 lượt, đậm nhất ở\n5 core skill"]
+  C --> C1["Văn xuôi hoá theo văn phong\nFlow (chưa chốt: hay tách references/)"]
+  D --> D1["Gom về _shared/fgos-cli-fallback.md"]
+  E --> E1{"Vai trò artifact?"}
+  E1 -->|process/build-time| E2["Giữ luật tsk-37i:\nID + gloss 1 dòng"]
+  E1 -->|product/shippable\n.agents/skills nguồn thật| E3["Xoá hết ID,\nviết lý do thành câu văn"]
+```
 
 ## 7. Danh mục hạng mục / task (nháp, chưa khoá)
 
@@ -117,20 +201,27 @@ cuối; viết sớm lúc này sẽ phải viết lại ngay khi #11/#12 đổi 
   của nó (grep tên verb trong file sau khi sửa), tổng số dòng
   `plugins/fgOS/skills/*/SKILL.md` giảm ròng.
 
-### {#task-bare-citation-cleanup} Dọn trích dẫn ID trần
+### {#task-bare-citation-cleanup} Dọn trích dẫn ID trần trong .agents/skills
 - **Vấn đề**: xem §3 mục 6 — ID trần rải khắp, đậm nhất ở 5 skill core
   (exploring/planning/driving/validating/implement) + routing + approve +
   pick.
-- **Đề xuất**: chờ §3 mục 12 ngã ngũ (xoá hẳn ID hay giữ ID+lý do ngắn)
-  trước khi định hình task. Nhiều khả năng tách theo từng skill (mỗi core
-  skill 1 child) vì mỗi file cần đọc hiểu ngữ cảnh riêng để không xoá nhầm
-  lý do thật đằng sau — không thể làm bằng tìm/thay máy móc.
+- **Đề xuất (D1, §4/§6)**: sửa tại nguồn `.agents/skills/*/SKILL.md` —
+  xoá mọi `ADR<n>`/`RUL<n>`/`D<n>`/`tsk-…`, viết lý do thẳng vào câu văn
+  (không giữ ID kèm gloss, không footnote cuối file — sản phẩm shippable
+  không giữ ID nào). Có khả năng tách theo từng skill (mỗi core skill 1
+  child) vì mỗi câu cần đọc hiểu ngữ cảnh riêng để viết lại đúng lý do
+  thật, không thể làm bằng tìm/thay máy móc. Không đụng `plugins/fgOS/
+  skills` trực tiếp — một khi `tsk-5zi` xong, `npm run build:skills` tự
+  đồng bộ.
+- Verify nháp: file sau khi sửa không còn khớp mẫu
+  `\b(ADR|RUL|D)\d{1,4}\b` hay `\btsk-[0-9a-z-]+\b` nào (trừ khi chính
+  câu đó đang MÔ TẢ cơ chế `fgos <verb>` liên quan tới id, ví dụ ví dụ
+  lệnh CLI thật — cần review thủ công phân biệt, không chỉ grep-đếm).
 
-### {#task-scope-decision} Xác nhận phạm vi & mốc trước-khi-sửa
-- **Vấn đề**: #13 (đồng bộ .agents+plugins) và #9 (yêu cầu tag version)
-  chưa có quyết định cụ thể.
-- **Đề xuất**: 1 quyết định thủ tục, chốt trước khi mở bất kỳ child task
-  thực thi nào: (a) mỗi core-skill fix sửa `.agents/skills` trước, review
-  xong mới copy tay sang `plugins/fgOS/skills` trong cùng commit; (b)
-  `git tag` (tên gợi ý: `pre-skill-prose-cleanup-tsk-56w`) trên `main` tại
-  SHA hiện tại trước khi item con đầu tiên vào `executing`.
+### {#task-scope-decision} Xác nhận mốc trước-khi-sửa
+- **Vấn đề**: #9 (yêu cầu tag version) chưa D-ID hoá. #13 (đồng bộ
+  `.agents`+`plugins`) đã giải quyết — xem `tsk-5zi`, không cần quyết
+  định thủ tục nữa.
+- **Đề xuất**: `git tag` (tên gợi ý: `pre-skill-prose-cleanup-tsk-56w`)
+  trên `main` tại SHA hiện tại trước khi item con đầu tiên của tsk-56w
+  vào `executing`.
