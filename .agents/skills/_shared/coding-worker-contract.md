@@ -141,6 +141,40 @@ touching only its declared footprint, never called `fgos` itself, and
 reported through the exact two-token vocabulary above. Full evidence:
 `docs/history/pi-executor-runtime-capacity/RESEARCH.md` Round 4.
 
+**Live proof-test finding (tsk-1jt) — RED, config-blocked, not
+contract-blocked:** dispatching the named `claude` executor
+(`runner.executors.claude`) out-of-process against this contract found it
+read the same layered skill-pointer chain correctly and executed the
+file-write step exactly as directed, but could not complete Layer 2 rule 3
+(commit before return): the invocation's own `--permission-mode
+acceptEdits --allowedTools "Bash(git add:*),Bash(git commit:*)"` did not
+grant Bash-tool execution in this headless (`-p`, non-interactive) session
+— every git command was denied, confirmed both by the worker's own report
+and independently by the throwaway worktree's real `git log`/`git status`
+(no commit landed, the file sat untracked). It also did not use this
+file's own `[DONE]`/`[BLOCKED]` vocabulary when blocked — it asked a live
+question a headless dispatch has no one to answer, a second, independent
+deviation from Layer 1 rule 4. Neither finding says `claude` cannot follow
+this contract; both say the CURRENT `runner.executors.claude`/
+`runner.executor` invocation shape cannot complete it end-to-end yet. Full
+evidence: `docs/history/claude-named-executor/RESEARCH.md` Round 3.
+
+**Follow-up finding (tsk-1dsr) — GREEN, root cause was environment-local,
+not `claude` or config as designed:** the RED finding above traced to a
+personal `PreToolUse` hook on the testing machine (an `rtk` proxy that
+rewrites `git ...` to `rtk git ...` before the allowlist match runs) —
+not a syntax defect and not a limit of `claude`'s own comprehension.
+`runner.executors.claude`/`runner.executor` now name both the bare and
+`rtk`-wrapped forms (`"Bash(git add:*),Bash(git commit:*),Bash(rtk git
+add:*),Bash(rtk git commit:*)"`), still scoped to `add`/`commit` only.
+Retested live with this exact config: `claude` completed the full
+contract — wrote the exact requested content, honored the footprint,
+committed with the item id in the message, never called `fgos`, and
+reported through the exact `[DONE]` token. Confirmed independently via
+the throwaway worktree's real `git log`/`git show --stat`, not from the
+self-report alone. Full evidence: `docs/history/claude-named-executor/
+RESEARCH.md` Round 5.
+
 ## Precedent
 
 - `docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md` —
