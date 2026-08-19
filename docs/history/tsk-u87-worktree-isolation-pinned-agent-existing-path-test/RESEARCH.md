@@ -88,3 +88,111 @@ Step 3 (a real >=3-agent fanout batch proving tsk-8v1's self-recovery
 instruction) remains open and unattempted — Step 1's finding does not
 resolve it either way; it is still the fallback this item's own
 description names.
+
+## STEP 3 RESULT: real 3-agent concurrent fanout — 0/3 completed, but coordinator stayed clean throughout (2026-08-19, user-authorized follow-up run)
+
+**Blocker found and cleared first.** `fgos-fanout`'s own dispatch-decision
+hard rule refuses to fire a Task-tool Agent for any candidate whose
+`dispatch.mjs decide --work <id>` answer isn't `in-process`.
+`executorIdForWork` always resolves a coding-domain item to
+`fgos-coding-implement`, which `.fgos/config.json`'s `runner.capabilities`
+pins to `agy`/gemini-3.6-flash-medium (out-of-process) — a very recent,
+unrelated commit (`cd060ad1`, sitting at the top of this session's own git
+log). Confirmed directly: every real candidate item resolved
+`out-of-process` today, which would have made `fgos-fanout` report every
+candidate as "needing a person" and fire nothing at all. Per
+`dispatch/cli.mjs`'s own "Native-First" D4 rule, an UNCONFIGURED
+`fgos-coding-implement` capability (no `cfg.executors`/`cfg.capabilities`
+entry at all) defaults to native/`in-process` for a `--work`-resolved
+decision. User-approved fix for this run only: backed up
+`.fgos/config.json`, removed the `capabilities.fgos-coding-implement`
+block (only that block — no executor definitions touched), confirmed
+`decide --work <id>` now answered `in-process`, ran the real test, then
+restored `.fgos/config.json` byte-for-byte from the backup immediately
+after and re-confirmed the pin was back (`out-of-process` again). This is
+a real, currently-live gap worth its own follow-up: `fgos-fanout` cannot
+fire ANY native Agent today with this capability pin in place — a
+structural issue independent of the worktree-isolation hazard, and one
+this item's own scope does not cover fixing.
+
+**Method.** Created a disposable parent (`tsk-193`, `wontfix`d after) with
+3 disposable children (`tsk-4ov`, `tsk-wkw`, `tsk-3jm`, all trivial
+marker-file-write chores, `wontfix`d after) via `fgos add --parent`.
+Confirmed `fgos slots --json` showed room (`hasRoom: true`, unarmed
+ceiling). Confirmed all 3 candidates' own `decide --work <id>` answered
+`in-process`. Dispatched exactly 3 Task-tool Agents, one per candidate, no
+`isolation` parameter (matching `fgos-fanout`'s real, undocumented-as-pinned
+dispatch shape exactly), each instructed to read and follow
+`plugins/fgOS/skills/pick/SKILL.md` literally end to end (claim →
+EnterWorktree → drive → implement → verify → return). Checked this
+coordinating session's own `pwd`/`git rev-parse --show-toplevel` before
+dispatch, mid-run (while all 3 were still active), and after all 3
+settled.
+
+**Result: 0/3 candidates completed.** All 3 got through the real `fgos
+pick` claim (`todo`→`doing`, real worktree stood up on disk, real branch)
+and the first `EnterWorktree({path: <their own freshly claimed
+worktree>})` call — which every time **reported success** — but every
+subsequent Bash/Write call from all 3 agents was refused, citing the
+agent's own *original launch-time pin* (this coordinating session's own
+worktree, `tsk-u87-DC47tf`) as the only place it was "allowed" to run,
+even though the refusal message itself said the command's cwd had
+"resolved to" the correct new target. This is the **exact same
+mechanism** Step 1 found (`EnterWorktree` reports success, isolation
+enforcement never actually follows) — now confirmed under real,
+concurrent, unpinned, production-shaped dispatch (not a synthetic pinned
+test), independently, 3 times over.
+
+- **Agent 1 (`tsk-4ov`):** tried `ExitWorktree({action:"keep"})` to
+  recover — refused: "ExitWorktree cannot be called from a subagent with
+  a cwd override... use Bash with `cd`" — but Bash's own `cd` was refused
+  for the identical reason. Permanently stuck, no recovery attempted
+  beyond that (correctly stopped rather than routing around the guard).
+- **Agent 2 (`tsk-wkw`):** identical `ExitWorktree` refusal, identical
+  permanent Bash lockout. Correctly stopped and reported rather than
+  bypassing.
+- **Agent 3 (`tsk-3jm`):** hit the identical refusals, but additionally
+  tried re-issuing `EnterWorktree` a SECOND time — targeting its own
+  ORIGINAL launch path (`tsk-u87-DC47tf`) rather than the stuck target.
+  **This worked** — it recovered a working Bash shell — but only by
+  giving up on the target worktree entirely; per `/fgOS:pick`'s own Step 4
+  fallback rule ("if step 4 fell back, skip step 5"), it correctly stopped
+  there rather than forcing the drive step. This is a real, partial
+  confirmation of tsk-8v1's own self-recovery instruction's core
+  mechanism ("re-call `EnterWorktree`") — but it recovers the AGENT back
+  to a *usable* state, never to the *target* state the item actually
+  needed. The item still does not get done.
+
+**The one clearly positive finding, confirmed 3 independent times across
+the whole run:** this coordinating session was **never** affected — `pwd`
+stayed at `tsk-u87-DC47tf` before dispatch, mid-run (all 3 agents active
+simultaneously), and after all settled. No cross-contamination to the
+coordinator, and (per each agent's own report) no cross-contamination
+between siblings either — each agent's failure was self-contained to
+itself. This is a materially better result than the 2026-08-13 incident
+(coordinator's own cwd was dragged into a sibling's worktree that day).
+Whatever changed between 2026-08-13 and today, the *cross-agent leak*
+class of this hazard looks closed; the *EnterWorktree(path) reports
+success but does not actually enforce it for the calling agent itself*
+class is what remains, and it is enough on its own to make every
+candidate fail today (0/3, worse than 2026-08-13's 2/3 survival rate for
+the OLD failure mode).
+
+**Bottom line for tsk-8v1's self-recovery instruction:** it is not
+sufficient as written, for two separate reasons. (1) It only ever reaches
+`fgos-fanout/SKILL.md`'s own text — the COORDINATOR's reading material —
+never the dispatched `/fgOS:pick` agents themselves, whose own skill
+chain (`pick`→`fgos-coding-driving`→`fgos-coding-implement`) says nothing
+about this hazard at all; none of the 3 agents here had ever heard of the
+instruction, they improvised their own recovery attempts from first
+principles. (2) Even where an agent independently rediscovered the core
+move (agent 3, re-calling `EnterWorktree`), it only recovers Bash
+usability, never actual progress on the claimed item — the instruction as
+written implies "retry the exact operation that was refused" would
+succeed after recovery, but the refused operation targeted the broken
+worktree switch itself, which re-attempting does not fix.
+
+Cleanup performed: all 3 candidate worktrees/branches removed from disk;
+`tsk-4ov`/`tsk-wkw`/`tsk-3jm`/`tsk-193` moved to `wontfix`;
+`.fgos/config.json` restored byte-for-byte from a pre-test backup and
+re-verified.
