@@ -94,6 +94,19 @@ proof points below stand as written, no weakening needed.
 
 ### Phased execution order — CORRECTED at `fgos-coding-validating`'s reality gate
 
+**Second correction, at the engine's own `fgos plan --verdict decompose` call
+(not just this session's own reality-gate reading):** the engine's real
+`footprintOverlapAmong` hard-gate independently re-derived 14 of these same
+collisions (plus rejected the first submission outright — `outcome:
+"need-human"` — since a prose-only "spine" ordering isn't enough; each
+colliding pair needs a **direct** `deps` index edge in the child-spec JSON
+itself, transitive ordering through a third child does not satisfy it).
+The JSON block below is the corrected, resubmitted version — array order
+IS the topological order, and every `deps` array is the authoritative,
+engine-checked sequencing. The prose spine below still describes the same
+reasoning for a human reader; the JSON's own `deps` fields are what
+actually enforce it.
+
 **Round-16 planning wrote this as 4 concurrency-safe "waves" — WRONG.** The
 reality gate's own footprint cross-check (running each child's real
 `footprint` array against every other child's, mechanically, not by
@@ -277,15 +290,36 @@ already specced 15 independently-workable pieces, each with a real D-ID
 citation, footprint, and verify. Written below, **created nowhere** —
 `fgos-coding-validating` materializes them at the single gate.
 
+**Array order below is the real topological order (index 0 first), and
+every `deps` entry is a DIRECT edge** — the engine's own
+`footprintOverlapAmong` check (run against the first submission of this
+block, see the Feasibility matrix's own note on this) only accepts a
+direct pairwise `deps` edge as proof two colliding children won't run
+concurrently, never a transitive chain — so every one of the 16 real
+collisions found (14 the engine's mechanical check reported + 2 more this
+session found by hand, past what its exact-path-string matching catches:
+a glob-vs-directory and an exact-file-vs-directory-prefix pair) is
+resolved by a **direct** `deps` index below, not merely implied by order.
+
 ```json
 [
+  {
+    "title": "Đổi tên role human-advisor -> advisor, sweep position->role trong task-spec header",
+    "verify": "npm test -- roleGraph handoff && grep -rL \"human-advisor\" src/ | wc -l",
+    "action": "D16: roleGraph.roles + moi edge to:human-advisor doi thanh advisor; sweep header position->role o moi task-spec",
+    "footprint": ["src/state/workflow-stage-graphs.mjs", "docs/task-specs/coding/*.md"],
+    "kind": "chore",
+    "risk": "light",
+    "deps": []
+  },
   {
     "title": "Di dời docs/task-specs/coding/*.md sang domains/coding/task-specs/",
     "verify": "npm test -- task-specs && node bin/fgos.mjs doctor --check task-specs-resolve",
     "action": "D9: 13 task-spec thật di dời nguyên vẹn, sửa 2 hardcode path trong registrations.mjs",
     "footprint": ["docs/task-specs/coding/", "domains/coding/task-specs/", "src/setup/registrations.mjs"],
     "kind": "chore",
-    "risk": "standard"
+    "risk": "standard",
+    "deps": [0]
   },
   {
     "title": "Tách DOMAINS registry thành aggregator + registry.yaml + workflows/*.yaml",
@@ -293,15 +327,8 @@ citation, footprint, and verify. Written below, **created nowhere** —
     "action": "D3/D4/D10/D17/D29/D30/D31: registry.yaml (roleGraph+cờ+selector) + workflows/feature.yaml, aggregator quét cả 2, xoá 2 điểm đọc property phẳng (stage-fsm.mjs:94, plan.mjs:519+loop.mjs:1297)",
     "footprint": ["src/state/workflow-stage-graphs.mjs", "src/state/stage-fsm.mjs", "src/intake/plan.mjs", "src/runner/loop.mjs", "domains/coding/registry.yaml", "domains/coding/workflows/feature.yaml"],
     "kind": "task",
-    "risk": "heavy"
-  },
-  {
-    "title": "Đổi tên role human-advisor -> advisor, sweep position->role trong task-spec header",
-    "verify": "npm test -- roleGraph handoff && grep -rL \"human-advisor\" src/ | wc -l",
-    "action": "D16: roleGraph.roles + moi edge to:human-advisor doi thanh advisor; sweep header position->role o moi task-spec",
-    "footprint": ["src/state/workflow-stage-graphs.mjs", "docs/task-specs/coding/*.md"],
-    "kind": "chore",
-    "risk": "light"
+    "risk": "heavy",
+    "deps": [0]
   },
   {
     "title": "Tạo domains/coding/specs/ + domains/marketing/specs/ rỗng",
@@ -309,7 +336,8 @@ citation, footprint, and verify. Written below, **created nowhere** —
     "action": "D8-revised: 2 folder rỗng mới, docs/specs/ không đụng",
     "footprint": ["domains/coding/specs/", "domains/marketing/specs/"],
     "kind": "chore",
-    "risk": "light"
+    "risk": "light",
+    "deps": [2]
   },
   {
     "title": "Thêm bước assembly vào skill-wrappers.mjs/build-skill-wrappers.mjs",
@@ -317,7 +345,8 @@ citation, footprint, and verify. Written below, **created nowhere** —
     "action": "D7: lắp .agents/skills/* từ core/skills/*+domains/*/skills/* trước generate-wrapper; materializeSkillsIntoProject chạy sau",
     "footprint": ["src/config/skill-wrappers.mjs", "scripts/build-skill-wrappers.mjs"],
     "kind": "task",
-    "risk": "standard"
+    "risk": "standard",
+    "deps": []
   },
   {
     "title": "Thêm resolveTaskSpecPath(domain, specId), sửa registrations.mjs gọi qua hàm này",
@@ -325,7 +354,8 @@ citation, footprint, and verify. Written below, **created nowhere** —
     "action": "D11: resolver mới trong workflow-stage-graphs.mjs, đóng gap path.join thô ở registrations.mjs dòng 407/424",
     "footprint": ["src/state/workflow-stage-graphs.mjs", "src/setup/registrations.mjs"],
     "kind": "task",
-    "risk": "standard"
+    "risk": "standard",
+    "deps": [0, 1, 2]
   },
   {
     "title": "Thêm bundleForStage(domain, stage), sửa fgos-coding-implement bỏ hardcode task-spec path",
@@ -333,15 +363,8 @@ citation, footprint, and verify. Written below, **created nowhere** —
     "action": "D14/D29/D30: resolver mới trả {skill,taskSpec} qua resolveWorkflow trước, driving gọi 1 lần mỗi stage-entry",
     "footprint": ["src/state/workflow-stage-graphs.mjs", ".agents/skills/fgos-coding-implement/SKILL.md"],
     "kind": "task",
-    "risk": "standard"
-  },
-  {
-    "title": "Di dời 8 skill fgos-coding-* vào domains/coding/skills/, 7 skill vào core/skills/, _shared/ vào core/skills/_shared/",
-    "verify": "npm test -- coexistence-canary",
-    "action": "D3/D7/D34: 2 nơi trở thành canonical authoring mới, .agents/skills/ không còn sửa tay",
-    "footprint": [".agents/skills/", "core/skills/", "domains/coding/skills/"],
-    "kind": "chore",
-    "risk": "standard"
+    "risk": "standard",
+    "deps": [0, 2, 5]
   },
   {
     "title": "Mở rộng architecture-manifest.json + architecture.test.mjs thêm rule domain-siloing",
@@ -349,7 +372,8 @@ citation, footprint, and verify. Written below, **created nowhere** —
     "action": "D12: core không import domain cụ thể, domain không import domain khác -- reuse one-directional-import mechanism",
     "footprint": ["docs/architecture-manifest.json", "test/architecture.test.mjs"],
     "kind": "task",
-    "risk": "standard"
+    "risk": "standard",
+    "deps": [2]
   },
   {
     "title": "Tạo core/task-specs/ -- 7 task-spec cho 7 skill domain-agnostic",
@@ -357,31 +381,8 @@ citation, footprint, and verify. Written below, **created nowhere** —
     "action": "D27: rút hợp đồng input/output/gates/verify-template từ SKILL.md hiện có của 7 skill ra file task-spec tường minh",
     "footprint": ["core/task-specs/"],
     "kind": "docs",
-    "risk": "light"
-  },
-  {
-    "title": "Đảo hướng eligibility: agents/*.yaml claims->skills, task-spec thêm agent/requires-skill",
-    "verify": "npm test -- project-agents checks",
-    "action": "D20/D21/D22/D26: agent-type khai skills thay claims, task-spec khai agent/requires-skill, dispatch.mjs resolve qua skill-match với tie-break D32",
-    "footprint": ["agents/", "scripts/project-agents.mjs", "src/setup/registrations.mjs", "src/runner/dispatch.mjs", "domains/coding/task-specs/", "core/task-specs/"],
-    "kind": "feature",
-    "risk": "heavy"
-  },
-  {
-    "title": "Tách doctrine core/domain: AGENTS.md gốc rút gọn, domains/coding/AGENTS.md mới, routing tự Read",
-    "verify": "npm test && grep -c \"fgos-coding-\" AGENTS.md",
-    "action": "D23: cắt mục fgOS Workflow + GitNexus khỏi root, dời sang domains/coding/AGENTS.md, fgos-routing đọc thêm khi domain resolve",
-    "footprint": ["AGENTS.md", "CLAUDE.md", "domains/coding/AGENTS.md", ".agents/skills/fgos-routing/SKILL.md"],
-    "kind": "task",
-    "risk": "standard"
-  },
-  {
-    "title": "Tách agents/*.yaml thành core/agents/ + domains/<name>/agents/, doctor check unique tên",
-    "verify": "npm test -- project-agents && node bin/fgos.mjs doctor",
-    "action": "D24/D33: project-agents.mjs quét cả 2 nguồn, doctor check mới bắt tên agent-type unique toàn cục",
-    "footprint": ["agents/", "core/agents/", "domains/coding/agents/", "scripts/project-agents.mjs", "src/setup/registrations.mjs"],
-    "kind": "task",
-    "risk": "standard"
+    "risk": "light",
+    "deps": [0]
   },
   {
     "title": "Mở rộng persona/agent-type resolution key thành (domain, stage, role)",
@@ -389,7 +390,44 @@ citation, footprint, and verify. Written below, **created nowhere** —
     "action": "D15/D20: thêm tham số stage vào key tra cứu, no-op hôm nay, shape sẵn cho tương lai",
     "footprint": ["src/runner/dispatch.mjs"],
     "kind": "task",
-    "risk": "light"
+    "risk": "light",
+    "deps": []
+  },
+  {
+    "title": "Đảo hướng eligibility: agents/*.yaml claims->skills, task-spec thêm agent/requires-skill",
+    "verify": "npm test -- project-agents checks",
+    "action": "D20/D21/D22/D26: agent-type khai skills thay claims, task-spec khai agent/requires-skill, dispatch.mjs resolve qua skill-match với tie-break D32",
+    "footprint": ["agents/", "scripts/project-agents.mjs", "src/setup/registrations.mjs", "src/runner/dispatch.mjs", "domains/coding/task-specs/", "core/task-specs/"],
+    "kind": "feature",
+    "risk": "heavy",
+    "deps": [1, 5, 8, 9]
+  },
+  {
+    "title": "Tách agents/*.yaml thành core/agents/ + domains/<name>/agents/, doctor check unique tên",
+    "verify": "npm test -- project-agents && node bin/fgos.mjs doctor",
+    "action": "D24/D33: project-agents.mjs quét cả 2 nguồn, doctor check mới bắt tên agent-type unique toàn cục",
+    "footprint": ["agents/", "core/agents/", "domains/coding/agents/", "scripts/project-agents.mjs", "src/setup/registrations.mjs"],
+    "kind": "task",
+    "risk": "standard",
+    "deps": [1, 5, 10]
+  },
+  {
+    "title": "Tách doctrine core/domain: AGENTS.md gốc rút gọn, domains/coding/AGENTS.md mới, routing tự Read",
+    "verify": "npm test && grep -c \"fgos-coding-\" AGENTS.md",
+    "action": "D23: cắt mục fgOS Workflow + GitNexus khỏi root, dời sang domains/coding/AGENTS.md, fgos-routing đọc thêm khi domain resolve",
+    "footprint": ["AGENTS.md", "CLAUDE.md", "domains/coding/AGENTS.md", ".agents/skills/fgos-routing/SKILL.md"],
+    "kind": "task",
+    "risk": "standard",
+    "deps": []
+  },
+  {
+    "title": "Di dời 8 skill fgos-coding-* vào domains/coding/skills/, 7 skill vào core/skills/, _shared/ vào core/skills/_shared/",
+    "verify": "npm test -- coexistence-canary",
+    "action": "D3/D7/D34: 2 nơi trở thành canonical authoring mới, .agents/skills/ không còn sửa tay",
+    "footprint": [".agents/skills/", "core/skills/", "domains/coding/skills/"],
+    "kind": "chore",
+    "risk": "standard",
+    "deps": [4, 12]
   },
   {
     "title": "Mở rộng handoff.mjs thêm cap độ sâu sync LỒNG",
@@ -397,7 +435,8 @@ citation, footprint, and verify. Written below, **created nowhere** —
     "action": "D25/D28: openSyncDepth param mirror openCallDepth, chỉ tăng khi sync lồng thật, không tính sync tuần tự",
     "footprint": ["src/state/handoff.mjs"],
     "kind": "task",
-    "risk": "standard"
+    "risk": "standard",
+    "deps": [10]
   }
 ]
 ```
