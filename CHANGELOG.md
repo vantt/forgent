@@ -91,6 +91,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   not an oversight, accepted explicitly after reviewing that trade-off
   (`docs/history/codex-bypass-executor/`).
 
+### Changed
+
+- Explicit verify cadence rule added to `.agents/skills/_shared/coding-worker-contract.md` Layer 2 rule 2: out-of-process workers are now instructed to run the item's `verify` command once, near the end, when they believe the work is actually done — never as a per-edit habit.
+
 ### Fixed
 
 - The `cli-spawn` dispatch adapter (`src/runner/dispatch/transport.mjs`)

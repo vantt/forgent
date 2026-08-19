@@ -83,10 +83,11 @@ cover that case instead.
    touch the main working tree, another branch, or another worktree.
 2. **Verify is a real shell command, run before you claim done.** The
    item's own `verify` command is the only thing that decides whether the
-   work is complete — proof, never assertion. Run it yourself; if it
-   fails, fix the root cause and rerun the exact command. Never weaken it,
-   swap in an easier check, or report `[DONE]` on the strength of your own
-   read of the diff.
+   work is complete — proof, never assertion. Run it once, near the end,
+   when you believe the work is actually done — never as a per-edit habit.
+   Run it yourself; if it fails, fix the root cause and rerun the exact
+   command. Never weaken it, swap in an easier check, or report `[DONE]` on
+   the strength of your own read of the diff.
 3. **Commit your changes, then stop.** One commit, on the item's own
    branch, with the item's id in the message. Do not merge, push, tag, or
    approve your own work — those stay the driver's job, downstream of your
