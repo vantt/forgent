@@ -153,3 +153,58 @@ not config-caused" and only correct the record (`RESEARCH.md`/
 anticipate (it assumed the syntax hypothesis would BE the fix, and
 pre-committed to applying it to shared config once "confirmed" — but the
 opposite got confirmed: the syntax was never broken).
+
+## Round 5 — 2026-08-19 (tsk-1dsr, real user decision + retest + GREEN)
+
+**Asked:** given Round 4's finding (personal `rtk` hook, not a config
+defect), the user was presented the choice directly (no `CONTEXT.md`
+decision recorded separately — the live conversation IS the record here,
+per this item's own `awaiting-human` park): close with no config change,
+or find a different scope. User's real decision: **"double config"** —
+name BOTH the bare and `rtk`-wrapped `git` patterns in
+`runner.executors.claude`/`runner.executor`, since that is harmless on any
+install without the hook (the `rtk`-prefixed pattern simply never
+matches) and correct on one that has it. Explicitly kept scoped to
+`add`/`commit` only (not widened to any git subcommand, matching this
+config's own original safety intent).
+
+**Checked (real, not simulated):** dispatched `claude` out-of-process
+against a FRESH throwaway item (`tsk-3i1`, same `buildPrompt`/worktree
+mechanism as `tsk-1jt`'s own Round 3), using an IN-MEMORY-ONLY override of
+`executors.claude`'s args (`"Bash(git add:*),Bash(git commit:*),
+Bash(rtk git add:*),Bash(rtk git commit:*)"`) — proving the fix BEFORE
+committing it to the real `.fgos/config.json`:
+
+- **Result: exit 0.** stdout: `"Commit \`023431b\` created on branch
+  \`fgw/tsk-3i1\`... Verify passed (\`test -f PROOF2.txt\`).\n\n[DONE]"`
+  — the CORRECT two-token vocabulary this time, unlike Round 3's live
+  question.
+- **Cross-checked independently, not from the self-report alone**: real
+  `git log --oneline` in `tsk-3i1`'s own worktree showed the new commit
+  `023431b3 chore(tsk-3i1): add PROOF2.txt retest proof for tsk-1dsr` on
+  top of `10847668`; `git show --stat HEAD` showed exactly `PROOF2.txt |
+  1 +` — footprint honored precisely, nothing else touched. `PROOF2.txt`'s
+  content matched the directive exactly.
+- Logged the real `executor.dispatch` event (`.fgos/events.jsonl` seq
+  20298).
+- Cleanup: `tsk-3i1` moved to `wontfix`, worktree/branch removed.
+
+**Verdict: GREEN.** Once the environment interference (this machine's
+`rtk` hook) is accounted for in the allowlist, `claude` completes the
+FULL worker contract out-of-process: reads the layered skill-pointer
+chain, writes the exact requested content, honors the footprint boundary,
+commits with the item id in the message, never calls `fgos`, and reports
+through the exact `[DONE]`/`[BLOCKED]` vocabulary. Applied to the real
+`.fgos/config.json` as a direct main-checkout commit (`daabebfe`, per
+ADR0020 — see `docs/how-to/fix-fgos-write-rejected-merge-block.md`).
+`test/runner/dispatch.test.mjs`'s own "no wider (per spike B)" assertion
+updated to the new exact string, plus explicit assertions it never widens
+past `add`/`commit` for either form.
+
+**Corrected finding for `coding-worker-contract.md`:** Round 3's RED
+verdict stands as an accurate record of what that specific run found, but
+the ROOT CAUSE was this machine's personal `rtk` hook, not a defect in
+`claude`'s comprehension of the contract or in `runner.executors.claude`'s
+config as designed. Round 5's GREEN is the real, final answer to the D4
+question the contract's own Return-channel note asks: does `claude`
+follow this contract out-of-process? Yes.
