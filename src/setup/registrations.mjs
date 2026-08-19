@@ -41,7 +41,7 @@ import { driftStatus, unmergedDeliveries } from '../state/drift-status.mjs';
 import { computeEnduserDocsIndex, generateEnduserDocsIndex, manifestPathFor } from '../report/enduser-index-generate.mjs';
 import { computeDecisionIndex, generateDecisionIndex, indexPathFor } from '../report/decision-index.mjs';
 import { isResolvedStatus } from '../state/frontier.mjs';
-import { DOMAINS, getDomain, resolveDomainName, effectiveStage } from '../state/workflow-stage-graphs.mjs';
+import { DOMAINS, getDomain, resolveDomainName, effectiveStage, resolveTaskSpecPath } from '../state/workflow-stage-graphs.mjs';
 import { readLocalStatus, classifyRegistryPosture, toolsFromExecutors } from '../state/tool-registry.mjs';
 import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { describeConfigAwareness } from '../config/global-config.mjs';
@@ -406,7 +406,7 @@ function checkTaskSpecsResolve(cwd) {
     const taskSpecMap = domain.taskSpecMap;
     if (!taskSpecMap) continue;
     for (const [stage, specId] of Object.entries(taskSpecMap)) {
-      const specPath = path.join(cwd, 'domains', domainName, 'task-specs', `${specId}.md`);
+      const specPath = resolveTaskSpecPath(domainName, specId, cwd);
       if (!fs.existsSync(specPath)) {
         missing.push(`${domainName}.taskSpecMap.${stage} -> "${specId}" (${path.relative(cwd, specPath)} not found)`);
       }
@@ -422,7 +422,7 @@ function checkTaskSpecsResolve(cwd) {
     'distill',
   ];
   for (const specId of CORE_TASK_SPECS) {
-    const specPath = path.join(cwd, 'core', 'task-specs', `${specId}.md`);
+    const specPath = resolveTaskSpecPath('core', specId, cwd);
     if (!fs.existsSync(specPath)) {
       missing.push(`core.taskSpec -> "${specId}" (${path.relative(cwd, specPath)} not found)`);
     }
