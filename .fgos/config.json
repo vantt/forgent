@@ -85,6 +85,37 @@
           }
         ]
       },
+      "pi": {
+        "kind": "agent",
+        "description": "pi coding agent (openai-codex/gpt-5.5) -- reference runtime for the coding-worker-contract, D4 proof-test GREEN (tsk-47r)",
+        "allowCrossProvider": true,
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "pi",
+            "args": [
+              "--provider",
+              "openai-codex",
+              "--model",
+              "{model}",
+              "--tools",
+              "read,write,edit,bash,grep,find,ls",
+              "--mode",
+              "json",
+              "--approve",
+              "-p",
+              "{prompt}"
+            ]
+          }
+        ],
+        "providerModel": "openai-codex",
+        "rigorOverrides": {
+          "light": "lightweight",
+          "standard": "lightweight",
+          "heavy": "lightweight"
+        }
+      },
       "gitnexus": {
         "kind": "tool",
         "description": "Code-graph blast radius",
@@ -117,37 +148,6 @@
             "args": []
           }
         ]
-      },
-      "pi": {
-        "kind": "agent",
-        "description": "pi coding agent (openai-codex/gpt-5.5) -- reference runtime for the coding-worker-contract, D4 proof-test GREEN (tsk-47r)",
-        "allowCrossProvider": true,
-        "invocations": [
-          {
-            "via": "cli",
-            "adapter": "cli-spawn",
-            "command": "pi",
-            "args": [
-              "--provider",
-              "openai-codex",
-              "--model",
-              "{model}",
-              "--tools",
-              "read,write,edit,bash,grep,find,ls",
-              "--mode",
-              "json",
-              "--approve",
-              "-p",
-              "{prompt}"
-            ]
-          }
-        ],
-        "providerModel": "openai-codex",
-        "rigorOverrides": {
-          "light": "lightweight",
-          "standard": "lightweight",
-          "heavy": "lightweight"
-        }
       }
     },
     "timeoutMs": 900000,
