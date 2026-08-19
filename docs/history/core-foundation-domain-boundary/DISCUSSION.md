@@ -10,6 +10,16 @@ status: open
 
 ## 1. Trạng thái hiện tại
 
+Round 16 (2026-08-19): Người đặt câu hỏi làm rõ GATE của task-1 (ẩn dụ
+"2 tấm biển, 1 cái hộp"), rồi tự đề xuất: đang dời hộp (`codingDomain`
+sang `domains/coding/registry.mjs`) thì dọn biển luôn cùng lượt, để cái
+GATE đó không còn cần thiết nữa (không còn 2 đường đọc thì không có gì
+để so sánh phân kỳ). Trợ lý scout chính xác — chỉ 2 điểm đọc property
+phẳng còn thật (`stage-fsm.mjs:94`, `plan.mjs:519`+`loop.mjs:1297` trùng
+dòng) — nhỏ hơn hẳn giả định "4 file" trước đó. → D17 (seq 20772): gộp
+task-3 vào task-1, GATE cũ thành moot, không cần verify riêng nữa. 17/17
+quyết định đã chốt.
+
 Round 15 (2026-08-19): Thuật ngữ "position" (dùng lẫn với "role" suốt
 round 14) đã sweep sạch về "role" — khớp tên field thật trong code
 (`roleGraph.roles`, `defaultRole`). Từ đó nảy ra thảo luận role vs
@@ -246,6 +256,7 @@ thi thật.
 | D14 | `bundleForStage(domain, stage)` trả `{skill, taskSpec}` cùng lúc, sống ở tầng DRIVING (D13) — đóng gap skill hardcode literal path task-spec trong prose. | `skillMap`/`taskSpecMap` đã nằm cạnh nhau, cùng object `codingDomain`, cùng key theo stage — hàm này chỉ bọc lại dữ liệu sẵn có, không phải dữ liệu mới. Task-spec (khung sườn/hợp đồng) nên được máy móc tầng khung sườn resolve, không phải nằm rải rác hardcode bên trong skill (lớp da). |
 | D15 | Persona/agent-type resolve theo `(domain, stage, role)`, không chỉ `(domain, role)`. Team-hợp-tác trong 1 stage = chuỗi sync call (consult/assist, D8, holder không đổi) từ 1 holder chính tới nhiều persona chuyên biệt — KHÔNG multi-holder cùng lúc; song song thật = decompose ra item con (`fgos-fanout`, có sẵn), không phải concurrency trên cùng 1 worktree. | Người: "flow triển khai 1 feature có thể là nối tiếp của 2 flow" (PO+BA lúc discovery/exploring, Tech-Lead+SWE+Tester lúc planning) không cần 2 workflow riêng — cùng roleGraph, cùng role (`implementer`), khác persona theo cụm stage; field key thêm không tốn gì hôm nay (1 persona chung cho mọi stage) nhưng mở cửa cho sau. So sánh marketing-cockpit: `skills:` trên agent-type của họ chỉ là catalog thiết-kế-thời, KHÔNG dispatch runtime nào truy vấn — `claims` (pull, tsk-2t9c) đã đi xa hơn họ. CỐ Ý CHƯA XÂY: ranh giới stage-đổi-persona-ngầm có nên cũng dừng driving — chưa đủ bằng chứng persona đa dạng thật (cùng kỷ luật grow-tasks-before-roles giữ roleGraph đóng ở 5 role, D10 tsk-2t9c). |
 | D16 | Đổi tên role `human-advisor` → `advisor` trong `roleGraph.roles` (và các edge `to: 'human-advisor'`) — khớp hình dạng đặt tên của 4 role còn lại (tên seat thuần, không gắn persona). KHÔNG thêm cơ chế eligibility-resolution mới nào. | Người: gắn "human" vào tên role là dư thừa — `awaiting-human` (status-fsm, có TRƯỚC roleGraph) + `ask`/`answer` (verb pair, có lịch sử riêng) đã bắt trọn phần human-specific rồi, role không cần nói lại lần nữa. Reason `advise` vẫn máy móc resolve qua `fgos ask`/`answer` → `awaiting-human`, bất kể role tên gì — role tự nó chưa bao giờ nhất thiết phải "dành cho con người", đó là do cơ chế `advise` gọi tới, không phải do role đặt tên. (Trợ lý ban đầu hiểu ngược hướng phản hồi của người, đã tự sửa lại sau khi người làm rõ.) |
+| D17 | Gộp task-3 (dispatcher wiring, D10) vào task-1 (registry split, D3/D4) — làm chung 1 lượt, không tách 2 lượt riêng. Scout chính xác: chỉ 2 điểm đọc property phẳng còn thật — `stage-fsm.mjs:94` (`domain.transitions.some(...)`) và `plan.mjs:519`+`loop.mjs:1297` (cùng 1 dòng trùng lặp, `domain.stages?.includes('decompose')`). Cả 2 đổi sang đọc qua `resolveWorkflow(domain, kind)`. GATE identity của round 12 (task-1) NAY MOOT — không còn 2 đường đọc để so sánh phân kỳ. | Người: đang dời hộp (`codingDomain`) rồi thì dọn biển luôn cùng lượt, để không đụng `stage-fsm.mjs` (module test dày đặc nhất repo) 2 lần riêng biệt — đúng lý luận D10 đã dùng ("dời trước khi code mới viết ra, tránh migrate 2 lần") áp thêm 1 bước. Phát hiện thêm khi scout: `resolveWorkflow` đã export nhưng CHƯA được gọi từ bất kỳ file nào bên ngoài `workflow-stage-graphs.mjs` — nên việc gộp này cũng là lần đầu hàm đó thật sự được dùng. |
 
 ## 5. Q&A log
 
@@ -622,31 +633,49 @@ role (D10 tsk-2t9c).
 
 ### {#task-domain-registry-split} Tách `DOMAINS` registry thành aggregator + per-domain file
 
-- **Mục tiêu (cập nhật round 11-12 — shape thật lớn hơn giả định ban
-  đầu):** tách `codingDomain` — object thật hôm nay có 10+ field
+- **Mục tiêu (cập nhật round 16, D17 — gộp task-3 vào đây):** tách
+  `codingDomain` — object thật hôm nay có 10+ field
   (`stages`/`stepMap`/`transitions`/`skillMap`/`taskSpecMap`/
   `worktreeBacked`/`statusLabels`/`parkReason`/`classification`/
-  `roleGraph` + `workflows`/`defaultWorkflow`/`workflowFor`, KHÔNG phải
-  4-5 field giả định ban đầu) ra `domains/coding/registry.mjs`
-  NGUYÊN VẸN, không cắt bớt field nào; `workflow-stage-graphs.mjs` chỉ
-  còn quét `domains/*/registry.mjs` để build `DOMAINS`, giữ nguyên
-  `synthetic`/`triage`/`fixture-marketing` (fixture, ở lại core).
-- **★ GATE bắt buộc trước khi plan thật (round 12):** xác nhận dynamic
-  `import()` giữ đúng identity `workflows.feature.stages ===
-  codingDomain.stages` (tsk-2t9c D7a's chủ đích tránh copy ~130 dòng) —
-  nếu KHÔNG giữ được, cơ chế aggregator (D4) phải đổi từ directory-scan
-  sang static-import-list trong 1 file index nhỏ, kém "auto-discover"
-  hơn nhưng an toàn identity.
+  `roleGraph` + `workflows`/`defaultWorkflow`/`workflowFor`) ra
+  `domains/coding/registry.mjs` NGUYÊN VẸN, không cắt bớt field nào;
+  `workflow-stage-graphs.mjs` chỉ còn quét `domains/*/registry.mjs` để
+  build `DOMAINS`, giữ nguyên `synthetic`/`triage`/`fixture-marketing`
+  (fixture, ở lại core). **CÙNG MỘT LƯỢT** (không tách task riêng nữa),
+  xoá luôn 2 điểm đọc property phẳng còn sót — đây là TOÀN BỘ danh sách
+  thật, đã scout chính xác, không phải suy đoán:
+  1. `src/state/stage-fsm.mjs:94` — `domain.transitions.some((edge) =>
+     edge.from === from && edge.to === to)` → đổi sang đọc qua
+     `resolveWorkflow(domain, item.kind).transitions`.
+  2. `src/intake/plan.mjs:519` VÀ `src/runner/loop.mjs:1297` — CÙNG một
+     dòng bị trùng lặp ở 2 file: `domain.stages?.includes('decompose')
+     && planningStage !== 'decompose' ? 'decompose' : undefined` → đổi
+     cả 2 chỗ sang đọc qua `resolveWorkflow(domain, item.kind).stages`.
+  Sau khi xong, KHÔNG còn consumer nào đọc `codingDomain.stages`/
+  `.transitions` trực tiếp — chỉ còn đúng 1 đường đọc
+  (`resolveWorkflow`), property phẳng cũ trở thành thừa (có thể xoá
+  hẳn khỏi `codingDomain`'s public shape ở một bước sau, ngoài scope
+  discussion này).
+- **★ GATE cũ (round 12) NAY ĐÃ MOOT, không cần verify nữa (D17):**
+  gate gốc hỏi "dynamic import có giữ identity `workflows.feature.stages
+  === codingDomain.stages` không" — câu hỏi đó chỉ có ý nghĩa khi CÓ 2
+  đường đọc cùng tồn tại. Sau khi xoá 2 điểm đọc phẳng ở trên, chỉ còn 1
+  đường đọc duy nhất (`resolveWorkflow`) — không có gì để so sánh phân
+  kỳ nữa, nên không cần test identity riêng.
 - **§6 excerpt áp dụng:** khối `workflow` trong diagram + quy tắc
   aggregator D4.
-- **D-ID áp dụng:** D3, D4, D10.
+- **D-ID áp dụng:** D3, D4, D10, D17.
 - **Quan hệ:** nên làm TRƯỚC code bugfix-workflow (D10) — độc lập với
-  task skill-migration bên dưới, có thể làm song song.
+  task skill-migration bên dưới, có thể làm song song. KHÔNG còn task-3
+  riêng — đã gộp vào đây (D17).
 - **Verify nháp:** `test/state/domain-fields.test.mjs`,
   `test/e2e/fixture-marketing-domain.test.mjs`, mọi test đụng `DOMAINS`
-  export vẫn xanh không đổi; test riêng cho GATE identity ở trên; test
-  cho `taskSpecMap`/`roleGraph` (test hiện có của tsk-2t9c, vd
-  `test/state/handoff.mjs`-related) không hồi quy.
+  export vẫn xanh không đổi; test hiện có của `stage-fsm.mjs` (module
+  test dày đặc nhất repo) không hồi quy sau khi đổi dòng 94; test mới:
+  đăng ký 1 workflow thứ hai giả lập, xác nhận `stage-fsm.mjs`/
+  `plan.mjs`/`loop.mjs` chọn đúng graph theo `resolveWorkflow(item)`
+  thay vì mặc định `domain.transitions`/`domain.stages`; test cho
+  `taskSpecMap`/`roleGraph` (test hiện có của tsk-2t9c) không hồi quy.
 
 ### {#task-coding-skill-migration} Di dời 8 skill `fgos-coding-*` vào `domains/coding/skills/`, 7 skill còn lại vào `core/skills/`
 
@@ -705,30 +734,12 @@ role (D10 tsk-2t9c).
 - **Verify nháp:** `git status` sau khi tạo chỉ hiện thư mục mới (rỗng,
   hoặc `.gitkeep` nếu cần), không có file `docs/specs/*` nào bị đổi.
 
-### {#task-dispatcher-workflow-aware} Nối `discovery.mjs`/`plan.mjs` vào `resolveWorkflow` — làm sẵn seam cho bugfix-workflow
+### ~~{#task-dispatcher-workflow-aware}~~ — ĐÃ GỘP vào {#task-domain-registry-split} (D17, round 16)
 
-- **Mục tiêu (SỬA LẠI round 12, D10):** KHÔNG phải "fix STR89" —
-  `fgos-routing` đã domain-pluggable từ trước (theo chính
-  `docs/specs/reading-map.md`'s ghi nhận str89-fgos-domain-skills). Việc
-  thật còn thiếu, và tsk-2t9c CHỦ ĐÍCH chưa làm: `src/intake/discovery.mjs`/
-  `src/intake/plan.mjs` (+ `stage-fsm.mjs`/`frontier.mjs`) chưa nối vào
-  `resolveWorkflow` — tsk-2t9c hoãn việc này vì với đúng 1 workflow
-  (`feature`) đăng ký, `domain.transitions` và
-  `resolveWorkflow(...).transitions` LÀ CÙNG MỘT object, nối dây hôm nay
-  đổi 0 hành vi. Tiền đề đó sắp hết đúng (bugfix-workflow landing thật) —
-  nối dây bây giờ là làm sẵn seam, không phải sửa bug.
-- **§6 excerpt áp dụng:** mũi tên `workflow_core -.-> wf_c/wf_m` trong
-  diagram — dispatcher phải đọc qua `resolveWorkflow`, không giả định
-  `domain.transitions` mãi mãi đồng nhất với workflow đang chạy.
-- **D-ID áp dụng:** D4, D10.
-- **Quan hệ:** phụ thuộc task {#task-domain-registry-split} (aggregator)
-  xong trước — và nên làm TRƯỚC khi code bugfix-workflow thật được viết,
-  đúng tinh thần D10 (seam có sẵn, không migrate 2 lần).
-- **Verify nháp:** test hiện có của `resolveWorkflow`/`workflows.feature`
-  (module test dày đặc nhất repo, theo chính ghi nhận của tsk-2t9c) phải
-  xanh không đổi; thêm test riêng: đăng ký 1 workflow thứ hai giả lập
-  (khác `feature`), xác nhận dispatcher chọn đúng graph theo
-  `resolveWorkflow(item)` thay vì đọc `domain.transitions` mặc định.
+Giữ anchor cũ làm lịch sử. Nội dung thật (danh sách 2 điểm đọc phẳng cần
+sửa, lý do, verify) nay nằm trong task-1 ở trên — làm 1 lượt thay vì 2
+lượt riêng, để chỉ đụng `stage-fsm.mjs` (module test dày đặc nhất repo)
+đúng 1 lần.
 
 ### {#task-taskspec-path-resolver} Thêm `resolveTaskSpecPath(domain, specId)`, sửa `registrations.mjs` gọi qua hàm này
 
