@@ -82,16 +82,15 @@ write-side, đối trọng với mặt read-side (area `enduser-docs-index` — 
 - **R1 (chỉ soạn từ capture thật).** Tài liệu chỉ được tổng hợp từ outcome/friction thật
   của việc (và lịch sử tham chiếu nếu có), không bao giờ từ tiêu đề hay phán đoán.
 - **R2 (một tài liệu sống trên mỗi đường dẫn).** Các capture cùng khai một `docPath` tích
-  luỹ vào đúng một tài liệu tại đường dẫn đó — độ mịn là theo-đường-dẫn (per D17).
+  luỹ vào đúng một tài liệu tại đường dẫn đó — độ mịn là theo-đường-dẫn.
 - **R3 (nuôi là bổ sung, không mất).** Khi nuôi tài liệu đã có, chỉ thêm phần mới; không
-  xoá, rút gọn, hay xáo lại prose/cấu trúc đã có — tài liệu giữ trọn chi tiết cũ (per
-  D13).
+  xoá, rút gọn, hay xáo lại prose/cấu trúc đã có — tài liệu giữ trọn chi tiết cũ.
 - **R4 (grow-vs-create theo tồn-tại-tệp).** Phân biệt nuôi hay tạo hoàn toàn bằng việc
   tệp tại `docPath` đã tồn tại chưa — không cờ phụ, không dấu trên capture.
 - **R5 (Diataxis là trục cấu trúc DUY NHẤT).** Ngăn Diataxis là trục cấu trúc duy nhất
   của một tài liệu; không tổ chức lại theo trục thứ hai (đối tượng/persona, mảng sản
   phẩm) bên trong. Thư mục tài liệu khớp tag ngăn của nó. Chỉ cân nhắc trục thứ hai khi
-  tài liệu thật va chạm (per D16).
+  tài liệu thật va chạm.
 - **R6 (trích, không diễn giải lại).** Nội dung được trích từ capture thật, không diễn
   giải lại hay bịa.
 - **R7 (tag và tài liệu đi liền).** Một tag không có tài liệu, hoặc một tài liệu không có
