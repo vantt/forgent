@@ -14,7 +14,7 @@ description: >-
   gate; that always still asks. Use when a decomposed item's children are
   independent (no unmet mutual deps) and worth running in parallel instead
   of the sequential default. Examples: "fan out these children", "run
-  tsk-umc's split concurrently", "dispatch this candidate set".
+  this parent item's split concurrently", "dispatch this candidate set".
 ---
 
 This is a generated thin wrapper (tsk-1qi) -- do not edit directly, edit the source instead.
