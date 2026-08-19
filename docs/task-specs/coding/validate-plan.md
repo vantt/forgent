@@ -1,6 +1,6 @@
 # task-spec: validate-plan
 
-domain: coding | position: reviewer | reason: review
+domain: coding | role: reviewer | reason: review
 
 ## Input
 - `plan.md`, already shaped and its own gate-free.
@@ -40,7 +40,7 @@ domain: coding | position: reviewer | reason: review
 The Gate's own "ask a person" branch has no `fgos ask`/`fgos answer`
 anywhere in it — every question is live, in-session, resolved the same
 turn via `fgos gate-approve --actor human`, never a real async park.
-`position: reviewer` above names the function this task performs
+`role: reviewer` above names the function this task performs
 (reviewing the plan), not the roleGraph's `reviewer` role — this task
 runs as `implementer` throughout, same as every other `planning`-stage
 task (tsk-2t9c D14/D15 — found wiring this skill for real; the previous

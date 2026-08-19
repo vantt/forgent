@@ -1,6 +1,6 @@
 # task-spec: resolve-question
 
-domain: coding | position: researcher | reason: consult
+domain: coding | role: researcher | reason: consult
 
 ## Input
 - ONE question, already narrowed by the caller — never a broad "look
