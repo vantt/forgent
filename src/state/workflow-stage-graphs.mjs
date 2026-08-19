@@ -644,3 +644,33 @@ export function parkReasonForStatus(domain, status) {
 export function classificationVocabulary(domain, field) {
   return domain?.classification?.[field];
 }
+
+/** Resolve the file path for a task-spec (`specId`) belonging to `domain` (or `'core'`) —
+ * `domains/<domain>/task-specs/<specId>.md` or `core/task-specs/<specId>.md` (tsk-397 D11).
+ * Accepts domain name (string) or domain object, or `'core'`.
+ * Optional third parameter `options` can be a cwd path string or object `{ cwd }`.
+ * Returns the path string. Never throws. */
+export function resolveTaskSpecPath(domain, specId, options = {}) {
+  const root = typeof options === 'string' ? options : (options?.cwd ?? '');
+  let domainName;
+  if (typeof domain === 'string') {
+    domainName = domain === 'core' ? 'core' : resolveDomainName(domain);
+  } else if (domain && typeof domain === 'object') {
+    if (domain.name === 'core') {
+      domainName = 'core';
+    } else {
+      const matchKey = Object.keys(DOMAINS).find((k) => DOMAINS[k] === domain);
+      domainName = domain.name ?? matchKey ?? DEFAULT_DOMAIN;
+    }
+  } else {
+    domainName = DEFAULT_DOMAIN;
+  }
+
+  const filename = specId && specId.endsWith('.md') ? specId : `${specId}.md`;
+  const relativePath = domainName === 'core'
+    ? path.join('core', 'task-specs', filename)
+    : path.join('domains', domainName, 'task-specs', filename);
+
+  return root ? path.join(root, relativePath) : relativePath;
+}
+
