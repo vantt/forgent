@@ -10,6 +10,43 @@ status: open
 
 ## 1. Trạng thái hiện tại
 
+Round 19 (2026-08-19): Làm nốt việc dở dang round 18 để lại. (1) D20 đã
+đưa vào §6: thêm subsection mới "Eligibility declaration — đảo hướng
+(D20/D21)" sau khối diagram DISPATCH, mô tả cụ thể trước/sau bằng bằng
+chứng scout thật — `agents/*.yaml`'s `claims` field (`scripts/
+project-agents.mjs:120-125,137-147`, validate + project vào frontmatter
+`.claude/agents/*.md`) và doctor check `agent-claims-resolve`
+(`src/setup/registrations.mjs:419-503`, đọc `docs/task-specs/<domain>/
+*.md`) là code THẬT cần đảo hướng, không phải suy diễn. Thêm task
+{#task-eligibility-inversion} vào §7 (D20/D21) liệt kê đúng 4 điểm chạm
+thật: schema `agents/*.yaml` (`claims`→`skills`), `project-agents.mjs`
+(validate+project), doctor check (đổi hướng resolve), và schema
+task-spec (`assignable-to`/`requires-skill`, header 1-dòng hiện có ở
+`docs/task-specs/coding/*.md` cần thêm field). (2) Rà lại TOÀN BỘ §6
+prose (không chỉ vá điểm nhắc `claims`/tên tầng như round 18 làm dở) —
+tìm đúng 1 chỗ còn stale thật: đoạn so sánh marketing-cockpit (dòng ~679
+cũ) vẫn khen `claims` (PULL, tsk-2t9c D12) "đã đi xa hơn" marketing-
+cockpit — mâu thuẫn trực tiếp với D20 vừa đảo ngược chính `claims` đó.
+Đã viết lại đoạn này: nhận ra marketing-cockpit's field `skills:` trên
+agent-type, dù KHÔNG được dispatch runtime nào truy vấn (PUSH,
+hardcode), lại đúng SHAPE hơn `claims` — D20 hội tụ về đúng tên field đó
+(`skills:`) nhưng nối nó vào dispatch runtime thật (D21), tạo mô hình
+khác cả 2 tiền lệ: đúng shape của marketing-cockpit + đúng cơ chế
+runtime-wired của tsk-2t9c. Còn lại: không tìm thêm chỗ nào khác trong
+§6 cần sửa. (3) Phân tích 2 việc mở cũ, ĐỀ XUẤT (chưa khoá D-ID — mới 1
+round, chưa qua vòng thứ 2 theo kỷ luật D4):
+`agents/*.yaml`→`.claude/agents/*.md` render-pair NÊN giữ nguyên
+top-level (`agents/`, không tách vào `domains/<name>/agents/`) — vì D20
+tự nó làm agent-type identity domain-agnostic-by-thiết-kế (1 agent-type
+đủ điều kiện qua `skills` chung xuyên domain, đúng ví dụ marketing-lead/
+tech-lead-đều-làm-PM), khác hẳn skill/task-spec/knowledge vốn thật sự
+thuộc về 1 domain; `doctrine` domain-scoped nên đánh dấu "cố ý CHƯA XÂY"
+(cùng lớp với D15's phần treo có chủ đích) — chưa có nội dung doctrine
+domain-thật nào (marketing vẫn `proposed`, chưa code) để thiết kế theo,
+ép thiết kế bây giờ là suy diễn. Cả 2 đề xuất trình bày ở §6, CHỜ người
+xác nhận trước khi mint D-ID. 21/21 quyết định đã chốt (không đổi round
+này — thuần regenerate §6/§7, không quyết định mới).
+
 Round 18 (2026-08-19, PHIÊN NÀY HẾT TOKEN — session sau đọc mục này để
 resume): D20 (đảo hướng eligibility: agent-type chỉ khai soul+skill,
 task-spec khai `assignable-to`/`requires-skill`, đảo ngược 1 phần D12
@@ -255,7 +292,7 @@ thi thật.
 | 12 | STR52's câu hỏi scope (share store hay cài fgOS riêng cho domain mới) — trả lời thế nào? | Chốt — D1 | (nội dung phân tích giữ nguyên, xem D1 ở §4) |
 | 13 | Domain-specific code+skill nên tổ chức theo layout nào (nested trong cây có sẵn, hay folder riêng)? | Chốt — D3/D4 | `domains/<name>/` tự chứa, top-level, mirror `plugins/fgOS/`. Đề xuất nested đầu tiên (`.agents/skills/domains/coding` + `src/domains/coding` tách rời) bị người bác — "không phát triển được dạng plugin/extension". |
 | 14 | Core (bin/, src/, herdr-plugin/) có nên di dời vào folder `core/` tường minh để đối xứng với `domains/` không? | Chốt — D5 (cập nhật bởi D7) | `bin/`, `src/`, `herdr-plugin/` KHÔNG di dời — 881 tham chiếu `bin/fgos.mjs` + external install (mission 0035) khiến chi phí lớn hơn hẳn lợi ích biểu tượng. Riêng SKILL thì có: canonical authoring chuyển hẳn sang `core/skills/` (D7) — rẻ hơn hẳn di dời `bin/`/`src/` vì không đụng path nào external project gọi trực tiếp, chỉ đổi chỗ maintainer sửa nguồn. |
-| 15 | Áp ma trận 6 mối quan tâm (harness/workflow/task/knowledge/skill/doctrine) × {core, domain} — còn chỗ nào thiếu? | Rõ phần lớn | harness: chỉ core (D1). workflow/task/skill: đã chốt (D2-D4). knowledge: đã chốt (D6). **doctrine: vẫn mở** — không có cơ chế nạp-có-điều-kiện theo domain trong AGENTS.md/CLAUDE.md hôm nay. |
+| 15 | Áp ma trận 6 mối quan tâm (harness/workflow/task/knowledge/skill/doctrine) × {core, domain} — còn chỗ nào thiếu? | Rõ phần lớn | harness: chỉ core (D1). workflow/task/skill: đã chốt (D2-D4). knowledge: đã chốt (D6). **doctrine: vẫn mở** — không có cơ chế nạp-có-điều-kiện theo domain trong AGENTS.md/CLAUDE.md hôm nay. Round 19 đề xuất (chưa khoá D-ID): đánh dấu "cố ý CHƯA XÂY" cùng lớp D15 — chưa có nội dung doctrine domain-thật để thiết kế theo (marketing vẫn `proposed`). |
 | 16 | `docs/history/<feature>/` có phải "knowledge" không? | Chốt — sửa lại (round 7) | KHÔNG — người chỉ ra `docs/history/` là **context** (biên bản thô, append-only, theo feature), không phải knowledge. "Knowledge" đúng nghĩa = domain-knowledge, curated, do team tự bảo trì — khác hẳn context. D6 (bản đầu, gắn tag `domain` lên `docs/history/`) SAI vì lẫn 2 khái niệm — đã thay bằng D6 mới. |
 | 17 | Domain-knowledge (curated, private, do team tự bảo trì) nên sống ở đâu? | Chốt — D6 | `domains/<name>/knowledge/`, co-located cùng `skills/`, theo đúng tinh thần tự-chứa của D3. Tiền lệ thật: `/home/vantt/projects/beegog/expertise/` — hệ curated knowledge base thật (`knowledge.md` tự mô tả "craft vs project layers, harvesting from finished work, recorded trust, dated freshness, migration rot, retirement") — khác hẳn `docs/history/` (context thô). |
 | 18 | `.agents/skills/core` có nên đổi thành `core/skills/` (bỏ dấu chấm, đối xứng `domains/`)? `.agents` và `.claude` có phải thin wrapper cả hai không? | Chốt — D7 | Có, nhưng không phải rename đơn thuần. `.agents/skills/*` là canonical THEO một quyết định TRƯỚC đó (tsk-1qi D5, `skill-wrappers.mjs` tự ghi rõ "the canonical, orchestrator-neutral skill source") — và `fgos setup` vendor NGUYÊN VĂN `.agents/skills/*` vào MỌI external project (`materializeSkillsIntoProject`), nên hình dạng bên ngoài (host project nhận được gì) không được đổi. D7: canonical AUTHORING chuyển sang `core/skills/` + `domains/*/skills/`; `.agents/skills/`, `.claude/skills/`, `plugins/fgOS/skills/` CẢ BA thành render target thật (thêm bước assembly trong `skill-wrappers.mjs`) — mở rộng quyết định tsk-1qi D5 (bối cảnh mới: `domains/` chưa tồn tại lúc đó), không đảo ngược nó. |
@@ -266,8 +303,9 @@ thi thật.
 | 23 | Layout nội bộ + cách kết nối module của `upstreams/pi` ("everything is a plugin") có bài học gì cho fgOS? | Chốt — D12 | Pi enforce ranh giới module bằng `package.json`'s `exports` map (path không khai = không import được, Node tự chặn) — cấp package thật, mỗi package trong workspace tự khai bề mặt công khai. fgOS là 1 package, không workspace — chuyển sang mô hình pi tốn hơn hẳn. NHƯNG fgOS đã có tương đương: `docs/architecture-manifest.json` + `test/architecture.test.mjs` (5 layer kỹ thuật: entry/use-case/infra/domain/kernel, import chỉ được xuống tầng sâu hơn, ngược tầng = test đỏ). Bài học thật: mở rộng cơ chế ĐÃ CÓ này thêm 1 rule domain-siloing, không xây cơ chế mới kiểu pi. **Lưu ý naming va chạm:** layer `"domain"` trong manifest là khái niệm DDD kỹ thuật, KHÔNG liên quan `DOMAINS` (coding/marketing) của toàn thảo luận này — cùng từ, 2 nghĩa khác nhau, cùng tồn tại trong 1 repo. |
 | 24 | Sau khi domain có N workflow, mỗi workflow N stage, mỗi stage N task-spec — cơ chế điều phối (dispatch) thật là gì, ai chủ động? | Chốt — D13 | 3 tầng: DISPATCH (chọn persona, 1 lần, trước khi session tồn tại) → ROUTING (`fgos-routing`, chọn máy móc domain nào, xuyên domain, 1 lần/session) → DRIVING (`fgos-<domain>-driving`, lặp qua stage, CÙNG persona). Nguyên lý tổ chức: soul không hoán đổi giữa chừng session — khác skill/task-spec (văn xuôi, đọc lại tự do). Bằng chứng: `fgos-coding-driving` ceiling mặc định = `awaiting-approval`, ĐÚNG lúc async review handoff (D18 tsk-2t9c) fire — driving đã dừng đúng chỗ persona cần đổi từ trước, chỉ chưa ai gọi tên nguyên lý. |
 | 25 | Skill có cần thiết phải hardcode load task-spec không, hay nên tách? | Chốt — D14 | Không nên hardcode trong prose (3 chỗ ở `fgos-coding-implement` dòng 88/177/291 đã hardcode literal path). `bundleForStage(domain, stage)` trả `{skill, taskSpec}` cùng lúc, sống ở tầng DRIVING (D13) — `skillMap`/`taskSpecMap` đã nằm cạnh nhau cùng object, cùng key stage, hàm này chỉ bọc lại dữ liệu có sẵn. |
-| 26 | Agent-type/persona/team-collab đặt vào đâu trong cơ chế dispatch, và "2 flow nối tiếp" (PO+BA rồi Tech-Lead+SWE+Tester) có cần 2 workflow riêng? | Chốt — D15 | Không cần 2 workflow. Persona resolve theo `(domain, stage, role)` thay vì chỉ `(domain, role)` — cùng roleGraph, cùng role (`implementer`), khác persona theo cụm stage. Team-hợp-tác = chuỗi sync call (holder không đổi, D8) tới nhiều persona, KHÔNG multi-holder cùng lúc; song song thật = decompose ra item con (`fgos-fanout`, có sẵn). So sánh marketing-cockpit: field `skills:` trên agent-type của họ chỉ là catalog thiết-kế-thời, KHÔNG được dispatch runtime nào truy vấn — `claims` (pull) của tsk-2t9c đã đi xa hơn họ rồi. CỐ Ý CHƯA XÂY: ranh giới stage-đổi-persona-ngầm có nên cũng dừng driving — chưa có bằng chứng đa dạng persona thật. |
+| 26 | Agent-type/persona/team-collab đặt vào đâu trong cơ chế dispatch, và "2 flow nối tiếp" (PO+BA rồi Tech-Lead+SWE+Tester) có cần 2 workflow riêng? | Chốt — D15 | Không cần 2 workflow. Persona resolve theo `(domain, stage, role)` thay vì chỉ `(domain, role)` — cùng roleGraph, cùng role (`implementer`), khác persona theo cụm stage. Team-hợp-tác = chuỗi sync call (holder không đổi, D8) tới nhiều persona, KHÔNG multi-holder cùng lúc; song song thật = decompose ra item con (`fgos-fanout`, có sẵn). **[Round 19: câu so sánh marketing-cockpit gốc ở đây đã LỖI THỜI so với D20 — xem §6 subsection "Eligibility declaration" cho bản đã sửa; tóm tắt: `claims` không phải "đi xa hơn", D20 đã đảo ngược chính hướng đó.]** CỐ Ý CHƯA XÂY: ranh giới stage-đổi-persona-ngầm có nên cũng dừng driving — chưa có bằng chứng đa dạng persona thật. |
 | 27 | Workflow definition sống ở đâu — có file riêng không, hay chỉ là key lồng trong registry.mjs? | Chốt — D18 | Chưa có file riêng hôm nay (chỉ `codingDomain.workflows.feature`, reference-sharing với top-level field, D7a). `domains/<name>/workflows/<name>.mjs` là nơi ở chính thức mới — `registry.mjs` thành aggregator cho map `workflows` của chính nó, mirror D4 một tầng sâu hơn. |
+| 28 | `agents/*.yaml`→`.claude/agents/*.md` render-pair (như skill's D7) nên tách vào `domains/<name>/agents/` hay giữ nguyên top-level `agents/`? | Chưa rõ (đề xuất round 19, chờ xác nhận) | Scout thật: `scripts/project-agents.mjs` chiếu `agents/*.yaml` (SOURCE_DIR top-level) → `.claude/agents/*.md` (TARGET_DIR), độc lập hoàn toàn cơ chế skill-wrapper. Đề xuất: GIỮ top-level — D20 làm agent-type identity domain-agnostic-by-thiết-kế (1 agent-type đủ điều kiện xuyên domain qua `skills` dùng chung), khác skill/task-spec/knowledge vốn thật sự thuộc sở hữu 1 domain (lý do D3's tự-chứa không áp dụng ở đây). Xem §6. |
 
 ## 4. Quyết định đã chốt
 
@@ -490,6 +528,18 @@ thi thật.
   routing/driver rồi, đừng chế thêm — trợ lý xem lại, xác nhận cả 3 tầng
   đều map thẳng vào cơ chế đã có tên (`dispatch.mjs`/`fgos-routing`/
   `fgos-coding-driving`), rút "CASTING" → D21.
+- 2026-08-19 — Round 19, tiếp tục việc dở dang round 18: scout code thật
+  cho D20 (`scripts/project-agents.mjs` dòng 120-125/137-147,
+  `src/setup/registrations.mjs` dòng 419-503 `checkAgentClaimsResolve`,
+  `docs/task-specs/coding/implement-item.md` header shape, `agents/
+  fgos-placeholder.yaml`, `roleGraph.roles` trong
+  `workflow-stage-graphs.mjs:406`). Viết subsection "Eligibility
+  declaration — đảo hướng" mới vào §6, sửa lại đoạn so sánh
+  marketing-cockpit còn khen `claims` cũ (stale so với D20), thêm task
+  {#task-eligibility-inversion} vào §7. Rà toàn bộ §6 còn lại — không
+  tìm thêm chỗ stale nào khác. Phân tích 2 việc mở cũ (render-pair
+  placement, doctrine domain-scoped), đề xuất hướng cho cả 2, CHƯA khoá
+  D-ID — chờ người xác nhận round sau.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -632,6 +682,27 @@ nguồn canonical + N target render (đúng cơ chế beegog tự dùng cho chí
 nó) — không cần sửa cơ chế render, chỉ cần domain skill di dời đúng chỗ
 trong nguồn canonical trước khi render.
 
+**Còn mở, ĐỀ XUẤT round 19 (chưa khoá D-ID, chờ người xác nhận):**
+
+- `agents/*.yaml`→`.claude/agents/*.md` render-pair NÊN giữ nguyên
+  top-level `agents/` (KHÔNG tách vào `domains/<name>/agents/`, khác
+  hẳn skill/task-spec/knowledge). Lý do: D20 (subsection trên) làm
+  agent-type identity domain-agnostic-BY-THIẾT-KẾ — 1 agent-type đủ
+  điều kiện xuyên domain qua `skills` dùng chung (đúng ví dụ
+  marketing-lead/tech-lead-đều-làm-PM, round 14), không thuộc sở hữu 1
+  domain duy nhất theo cách `skills/`/`task-specs/`/`knowledge/` của 1
+  domain thuộc sở hữu domain đó. Tách agent-type vào
+  `domains/<name>/agents/` sẽ ép 1 agent-type đa-domain phải chọn "nhà"
+  giả tạo, hoặc nhân bản file — không mirror đúng D3's lý do tự-chứa
+  (self-contained vì thật sự chỉ 1 domain dùng).
+- `doctrine` domain-scoped NÊN đánh dấu "cố ý CHƯA XÂY" — cùng lớp với
+  phần treo có chủ đích của D15 (chờ bằng chứng thật, không thiết kế
+  trước). Lý do: chưa có nội dung doctrine domain-thật nào tồn tại để
+  thiết kế theo (`marketing` vẫn `proposed`, chưa có `AGENTS.md`/
+  `CLAUDE.md` riêng nào cần nạp-có-điều-kiện) — ép thiết kế bây giờ là
+  suy diễn không có chất liệu, khác hẳn 5 mối quan tâm còn lại đều có
+  tiền lệ/nhu cầu thật (STR52/STR89/tsk-2t9c) để dựa vào.
+
 ### Tầng DISPATCH — điều phối workflow/stage/taskSpec/skill/persona (D13-D15)
 
 Ranh giới không gian (D1-D12) trả lời "cái gì sống ở đâu". Tầng này trả
@@ -672,18 +743,83 @@ planning) qua key `(domain, stage, role)` — cùng roleGraph, cùng
 role (`implementer`), khác persona. Field key thêm không tốn gì hôm
 nay (1 persona chung mọi stage) — chỉ mở cửa cho sau.
 
-**So sánh marketing-cockpit (tham khảo, không bắt chước):** `agents/*.md`
-của họ có field `skills:` (nhìn giống multi-skill repertoire) nhưng
-KHÔNG được bất kỳ dispatch mechanism nào truy vấn runtime — gán
-agent→stage 100% hardcode trong `workflow.md` (PUSH, tác giả quyết lúc
-viết). fgOS's `claims` (PULL, tsk-2t9c D12) đã đi xa hơn — agent-type tự
-khai eligibility, frontier tự surface work-order, claimant tự chọn.
+**So sánh marketing-cockpit (tham khảo, không bắt chước — cập nhật round
+19 theo D20):** `agents/*.md` của họ có field `skills:` (catalog
+multi-skill) nhưng KHÔNG được bất kỳ dispatch mechanism nào truy vấn
+runtime — gán agent→stage 100% hardcode trong `workflow.md` (PUSH, tác
+giả quyết lúc viết). fgOS's `claims` (tsk-2t9c D12, PULL, agent-type tự
+liệt kê `[task-spec-ids]`) từng được coi là "đi xa hơn" marketing-
+cockpit vì có runtime thật — nhưng D20 đã đảo ngược chính hướng đó (xem
+subsection ngay dưới): SAI hướng khai báo (agent liệt kê ID của task-spec
+là N×M maintenance) không phải là "đi xa hơn", chỉ là đi khác. D20 hội tụ
+về đúng TÊN field marketing-cockpit đã dùng (`skills:`, năng lực của
+CHÍNH agent-type, không phải danh sách ID bên ngoài) nhưng nối nó vào
+dispatch runtime thật (D21 mở rộng `dispatch.mjs`) — kết quả là một mô
+hình khác cả 2 tiền lệ: đúng SHAPE của marketing-cockpit + đúng CƠ CHẾ
+runtime-wired mà tsk-2t9c đã xây.
 
 **Cố ý CHƯA XÂY (D15):** liệu ranh giới stage-đổi-persona-ngầm (cùng
 role, persona mặc định khác, không có handoff tường minh) có nên
 cũng làm driving dừng — chưa có bằng chứng persona đa dạng thật để thiết
 kế theo, cùng kỷ luật grow-tasks-before-roles giữ `roleGraph` đóng ở 5
 role (D10 tsk-2t9c).
+
+### Eligibility declaration — đảo hướng (D20/D21, round 19)
+
+Tầng DISPATCH (D13) cần biết: **agent-type nào đủ điều kiện chạy 1
+role/task-spec call cụ thể?** tsk-2t9c D12 đã trả lời câu này bằng model
+`claims` — code THẬT, đã ship, 2 chỗ chạm chính xác đã scout:
+
+- `scripts/project-agents.mjs`: `validateDefinition` (dòng 120-125) chấp
+  nhận field `claims` optional trên `agents/<name>.yaml` (list ID
+  task-spec); `projectAgentMarkdown` (dòng 137-147) chép nguyên `claims`
+  đó vào frontmatter `.claude/agents/<name>.md`.
+- `src/setup/registrations.mjs`: doctor check `agent-claims-resolve`
+  (dòng 419-503, `checkAgentClaimsResolve`) đọc `claims:` thô từ text
+  yaml (`extractClaimsFromYamlText`), đối chiếu từng ID với
+  `allTaskSpecIds()` quét `docs/task-specs/<domain>/*.md`.
+
+**Vấn đề D20 chỉ ra:** hướng khai báo này bắt agent-type TỰ LIỆT KÊ từng
+task-spec ID nó nhận. Thêm 1 task-spec mới cần sửa MỌI agent-type liên
+quan (N×M) — và không giải thích được ví dụ "marketing-lead và tech-lead
+đều làm được PM" (round 14) trừ khi CẢ HAI đều tự liệt kê tay cùng 1 ID
+`lock-decisions`/`shape-plan` ở 2 file riêng.
+
+**D20 đảo hướng:** agent-type CHỈ khai cái NÓ CÓ (`soul` = `role`/
+`persona`/`decision_boundary` đã có sẵn trong `agents/*.yaml` hôm nay +
+`skills` MỚI — 1 list năng lực, KHÔNG còn `claims`). Task-spec khai cái
+NÓ CẦN — `assignable-to: [tên agent cụ thể]` (trường hợp hiếm, ghim
+cứng) hoặc tối thiểu `requires-skill: [...]` (trường hợp thường).
+Eligibility = phép khớp tại thời điểm DISPATCH giữa "task-spec cần gì"
+và "agent-type có gì" — không còn là danh sách agent-type tự bảo trì.
+D21 xác nhận: đây KHÔNG phải tầng mới — `dispatch.mjs` đã có sẵn
+`buildAgentTypeExecutor(baseExecutor, agentType)` (tsk-3sw) chờ nhận 1
+`agentType`; D20 chỉ đổi CÁCH giá trị đó được resolve (skill-match thay
+vì đọc `claims` tĩnh).
+
+```mermaid
+flowchart LR
+    subgraph OLD["Cũ (tsk-2t9c D12, đã ship) -- N×M"]
+        direction TB
+        at_old["agent-type A<br/>claims: [spec-1, spec-2]"]
+        ts_old1["task-spec spec-1"]
+        ts_old2["task-spec spec-2"]
+        at_old -->|"tự liệt kê ID"| ts_old1
+        at_old -->|"tự liệt kê ID"| ts_old2
+    end
+    subgraph NEW["Mới (D20) -- match tại DISPATCH"]
+        direction TB
+        at_new["agent-type A<br/>skills: [pm, code-review]"]
+        ts_new1["task-spec shape-plan<br/>requires-skill: [pm]"]
+        ts_new2["task-spec review-item<br/>requires-skill: [code-review]<br/>assignable-to: [] (mở)"]
+        at_new -.->|"skill-match, DISPATCH (D21)"| ts_new1
+        at_new -.->|"skill-match, DISPATCH (D21)"| ts_new2
+    end
+```
+
+Chưa xác nhận D-ID mới cho phần này (chỉ D20/D21 đã chốt từ trước, phần
+này là §6 phản ánh lại) — 4 điểm chạm code thật liệt kê ở trên là scope
+của task {#task-eligibility-inversion} §7.
 
 ### Ý tưởng học từ marketing-cockpit — CHƯA XÂY, ghi nhận để không quên (round 17)
 
@@ -893,8 +1029,59 @@ lượt riêng, để chỉ đụng `stage-fsm.mjs` (module test dày đặc nh�
   đúng qua wrapper mới (không hồi quy); KHÔNG cần test cho đa dạng
   persona thật — đó là phần cố ý chưa xây (D15's "chờ bằng chứng").
 
+### {#task-eligibility-inversion} Đảo hướng eligibility: `agents/*.yaml` claims→skills, task-spec thêm assignable-to/requires-skill
+
+- **Mục tiêu:** hiện thực D20/D21 — đảo hướng khai báo eligibility ở
+  đúng 4 điểm chạm code thật đã scout (round 18-19, không phải suy
+  đoán):
+  1. Schema `agents/<name>.yaml`: bỏ field `claims: [task-spec-ids]`
+     (optional, tsk-2t9c D12); thêm field `skills: [...]` MỚI (list
+     năng lực của chính agent-type, cùng tinh thần `role`/`persona` đã
+     có, không phải danh sách ID bên ngoài).
+  2. `scripts/project-agents.mjs`: `validateDefinition` (dòng 120-125)
+     đổi validate `claims` → validate `skills` (cùng kỷ luật shape:
+     list string không rỗng, giống `tool-scope`); `projectAgentMarkdown`
+     (dòng 137-147) đổi chép `claims` → chép `skills` vào frontmatter
+     `.claude/agents/<name>.md`.
+  3. Schema task-spec (`docs/task-specs/<domain>/*.md`, hoặc
+     `domains/<domain>/task-specs/*.md` nếu task-domain-registry-split
+     +D9 đã xong trước): thêm field `assignable-to: [...]` (optional,
+     ghim cứng tên agent cụ thể) và/hoặc `requires-skill: [...]` vào
+     dòng header 1-dòng hiện có (`domain: coding | stage: executing |
+     position: implementer`, ví dụ `implement-item.md:3` — cũng là
+     chỗ cần sweep `position`→`role` theo D16, cùng lượt).
+  4. `src/setup/registrations.mjs`: `checkAgentClaimsResolve`/
+     `extractClaimsFromYamlText`/`allTaskSpecIds` (dòng 419-503, doctor
+     check `agent-claims-resolve`) đổi hướng resolve — kiểm mọi
+     `requires-skill` của task-spec có ÍT NHẤT 1 agent-type nào đó
+     `skills` khớp, và mọi `assignable-to` trỏ tới agent-type có thật
+     (tên check gợi ý đổi thành `task-spec-eligibility-resolve` hoặc
+     tương đương, để phản ánh đúng hướng resolve mới).
+  5. `src/runner/dispatch.mjs`: mở rộng (D21) để `agentType` trong
+     `buildAgentTypeExecutor` resolve qua skill-match thay vì đọc
+     `claims` tĩnh — điểm chạm DISPATCH thật của toàn bộ đảo hướng này.
+- **§6 excerpt áp dụng:** subsection "Eligibility declaration — đảo
+  hướng (D20/D21, round 19)" + mermaid so sánh cũ/mới trong khối đó.
+- **D-ID áp dụng:** D20, D21.
+- **Quan hệ:** độc lập với {#task-domain-registry-split} (không đụng
+  `codingDomain`/`registry.mjs`) — có thể làm song song; NẾU
+  task-domain-registry-split + D9 (di dời `docs/task-specs/coding/` →
+  `domains/coding/task-specs/`) đã xong trước, bước 3 sửa file ở vị trí
+  mới thay vì `docs/task-specs/coding/`.
+- **Verify nháp:** `test/scripts/project-agents.test.mjs` (test hiện có
+  cho `validateDefinition`/`projectAgentMarkdown`) cập nhật cho `skills`
+  thay `claims`, vẫn xanh; `test/setup/checks.test.mjs` cập nhật cho
+  doctor check đổi hướng; grep `claims:` trong mọi `agents/*.yaml` phải
+  về 0 sau khi sửa; `fgos doctor` chạy sạch trên repo thật (không còn
+  agent-type nào rơi vào "không đủ điều kiện" ngoài ý muốn so với hành
+  vi `claims` cũ — cần 1 bước đối chiếu thủ công trước khi xoá `claims`
+  hẳn, vì đây là đảo ngược hành vi đã ship, không phải thêm mới thuần
+  tuý).
+
 **Việc CHƯA đủ hình dạng để thành task riêng:** knowledge/doctrine
-domain-scoped (câu hỏi mở #15, §3), ranh giới stage-đổi-persona-ngầm có
+domain-scoped (câu hỏi mở #15, §3 — round 19 đề xuất đánh dấu "cố ý
+CHƯA XÂY", chờ xác nhận, xem §6), ranh giới stage-đổi-persona-ngầm có
 nên dừng driving (D15's phần cố ý chưa xây), `agents/*.yaml`→
-`.claude/agents/*.md` render-pair placement — chờ người quyết định mức
-scope cho item này.
+`.claude/agents/*.md` render-pair placement — round 19 đề xuất GIỮ
+NGUYÊN top-level `agents/` (xem §6), chờ người xác nhận trước khi khoá
+D-ID và coi là "đã có hình dạng".
