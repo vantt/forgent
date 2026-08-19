@@ -40,22 +40,14 @@ CONTEXT.md` D6).
    `$ARGUMENTS` — this keeps today's default lock-wait behavior
    byte-identical for a caller who passes nothing:
 
+   See `../_shared/fgos-cli-fallback.md`, substituting `<verb-cmd>` with:
+
    ```
-   # fgos CLI fallback (tsk-1no D3)
-   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
-   if [ -f "$FGOS_BIN" ]; then
-     node "$FGOS_BIN" merge next
-   elif command -v fgos >/dev/null 2>&1; then
-     fgos merge next
-   else
-     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
-     exit 1
-   fi
+   merge next
    ```
 
-   (append the parsed flags after `merge next` on both the `node
-   "$FGOS_BIN" merge next` and `fgos merge next` lines above, e.g. `fgos
-   merge next --wait 300000`.)
+   (append the parsed flags after `merge next`, e.g. `merge next --wait
+   300000`.)
 
    Always use the literal `${CLAUDE_PROJECT_DIR}` substitution shown
    above, never a relative path — an installed plugin's files run from a

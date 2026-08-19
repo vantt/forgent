@@ -14,9 +14,14 @@ import { fileURLToPath } from 'node:url';
 //
 // tsk-1qi: reads .agents/skills, the canonical source (D5) — .claude/skills
 // is now a generated thin wrapper with no prose content of its own to check.
+//
+// tsk-56w-3: the skill-creator SKILL.md/references split moved this
+// example out of SKILL.md itself into references/lock-decisions-and-
+// write-context.md (the Step 2/3 mechanics file) — same fenced block,
+// same defect class to guard, new location.
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const SKILL_PATH = path.resolve(__dirname, '../../.agents/skills/fgos-coding-exploring/SKILL.md');
+const SKILL_PATH = path.resolve(__dirname, '../../.agents/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md');
 const skillText = fs.readFileSync(SKILL_PATH, 'utf8');
 
 function fencedBlockContaining(marker) {

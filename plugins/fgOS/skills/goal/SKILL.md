@@ -30,43 +30,24 @@ never appends an event.
 
 2. **Run the matching command.**
 
+   Both branches use `../_shared/fgos-cli-fallback.md`, substituting
+   `<verb-cmd>` with:
+
    - For `set`:
 
      ```
-     # fgos CLI fallback (tsk-1no D3)
-     FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
-     if [ -f "$FGOS_BIN" ]; then
-       node "$FGOS_BIN" goal set <id> --json --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-     elif command -v fgos >/dev/null 2>&1; then
-       fgos goal set <id> --json --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-     else
-       echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
-       exit 1
-     fi
+     goal set <id> --json --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
      ```
 
    - For `show`:
 
      ```
-     # fgos CLI fallback (tsk-1no D3)
-     FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
-     if [ -f "$FGOS_BIN" ]; then
-       node "$FGOS_BIN" goal show --json --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-     elif command -v fgos >/dev/null 2>&1; then
-       fgos goal show --json --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-     else
-       echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
-       exit 1
-     fi
+     goal show --json --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
      ```
 
-   substituting the id parsed in step 1 for `set`. Always use the literal
-   `${CLAUDE_PROJECT_DIR}` substitution shown above, never a relative path —
-   an installed plugin's files run from a copied cache location, not from
-   this repo checkout, so a relative path would resolve to the wrong place
-   or fail outright.
+   substituting the id parsed in step 1 for `set`.
 
-   `--dir` (tsk-56t): `goal` is `requiresExistingStore: true` for both
+   `--dir`: `goal` is `requiresExistingStore: true` for both
    sub-verbs, and this session may already be inside a linked worktree
    from an earlier `/fgOS:pick`, which never carries its own `.fgos/` by
    design (ADR0020) — `${CLAUDE_PROJECT_DIR}` still resolves to the main
