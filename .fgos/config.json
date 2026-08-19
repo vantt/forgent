@@ -32,10 +32,10 @@
         "description": "Write a session/task id onto the current terminal pane's label, for a human watching a screen"
       },
       "advise": {
-        "description": "Async product-decision consult -- value comes from disagreement, never changes state, one question/one answer (D2, docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md)"
+        "description": "Async product-decision consult -- value comes from disagreement, never changes state, one question/one answer (P5, docs/history/dispatch-activation-and-handoff-redesign/DISCUSSION.md -- planned --for advise -> codex, never built: no caller invokes this purpose yet)"
       },
       "execute": {
-        "description": "Compliance-driven work -- value comes from following the plan, changes files, must pass verify (D2, docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md)"
+        "description": "Compliance-driven work -- value comes from following the plan, changes files, must pass verify (P5, docs/history/dispatch-activation-and-handoff-redesign/DISCUSSION.md -- planned --for execute -> agy, never built: no caller invokes this purpose yet)"
       },
       "fgos-coding-implement": {
         "description": "code-implement work for the coding domain's executing stage",
