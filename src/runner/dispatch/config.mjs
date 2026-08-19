@@ -778,22 +778,24 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
       validateExecutorEntryShape(executor, `${sourceLabel} executors.${executorId}`, capabilityNames);
     }
   }
-  // `prefer` symmetry (D2, docs/history/capability-capacity-remodel/
-  // CONTEXT.md): checked here, AFTER both `capabilities` and `executors`
-  // are individually known-good — a capability's own shape and a
-  // executor's own shape can each be malformed independently, and this
-  // cross-check should never be the first (confusing) error a caller
-  // sees for an unrelated shape mistake. Catches a typo'd `prefer` at
-  // config-load time, ahead of `resolveExecutorAndOverrides`'s own
-  // resolve-time throw for a `cfg` built by hand (e.g. in a test) without
-  // going through this loader at all.
+  // `prefer` names a real executor (D5, docs/history/capability-capacity-
+  // remodel/CONTEXT.md, supersedes D2's own "for"-symmetry requirement —
+  // the reverse check forced a second config edit per wiring decision
+  // without a proportional safety benefit). Checked here, AFTER both
+  // `capabilities` and `executors` are individually known-good — a
+  // capability's own shape and a executor's own shape can each be
+  // malformed independently, and this cross-check should never be the
+  // first (confusing) error a caller sees for an unrelated shape mistake.
+  // Catches a typo'd `prefer` at config-load time, ahead of
+  // `resolveExecutorAndOverrides`'s own resolve-time throw for a `cfg`
+  // built by hand (e.g. in a test) without going through this loader at
+  // all.
   if (cfg.capabilities !== undefined) {
     for (const [name, entry] of Object.entries(cfg.capabilities)) {
       if (entry.prefer === undefined) continue;
-      const preferredExecutor = cfg.executors?.[entry.prefer];
-      if (!preferredExecutor || !Array.isArray(preferredExecutor.for) || !preferredExecutor.for.includes(name)) {
+      if (!cfg.executors?.[entry.prefer]) {
         throw new RunnerConfigError(
-          `runner config (${sourceLabel} capabilities.${name}) "prefer" names "${entry.prefer}" but that executor does not declare "for" including "${name}" itself (symmetry required, D2).`,
+          `runner config (${sourceLabel} capabilities.${name}) "prefer" names "${entry.prefer}" but no such executor is registered.`,
         );
       }
     }

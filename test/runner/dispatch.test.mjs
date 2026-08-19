@@ -3293,8 +3293,8 @@ test('resolveExecutorIdForPurpose returns null against an empty/missing executor
 // --- resolveExecutorAndOverrides (D1-D4, docs/history/capability-capacity-
 // remodel/CONTEXT.md) -- the shared resolver every real cfg.executors[id]
 // lookup in this file now goes through: literal key first, then
-// capabilities.<name>.prefer (symmetry required), then the plain "for"
-// scan, then unconfigured -----------------------------------------------
+// capabilities.<name>.prefer (D5, supersedes D2's "for"-symmetry
+// requirement), then the plain "for" scan, then unconfigured ------------
 
 test('resolveExecutorAndOverrides resolves a literal executorId directly, unchanged from pre-this-item behavior -- the deep-customization escape hatch', () => {
   const cfg = { executors: { agy: { kind: 'agent', command: 'agy' } } };
@@ -3305,7 +3305,7 @@ test('resolveExecutorAndOverrides resolves a literal executorId directly, unchan
   assert.equal(result.configured, true);
 });
 
-test('resolveExecutorAndOverrides resolves via capabilities.<name>.prefer when the preferred executor declares a matching "for" (symmetry satisfied)', () => {
+test('resolveExecutorAndOverrides resolves via capabilities.<name>.prefer when the preferred executor declares a matching "for"', () => {
   const cfg = {
     executors: { agy: { kind: 'agent', command: 'agy', for: ['fgos-coding-implement'] } },
     capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
@@ -3325,12 +3325,15 @@ test('resolveExecutorAndOverrides carries capabilities.<name>.overrides through,
   assert.deepEqual(result.overrides, { rigorOverrides: { standard: 'creative' } });
 });
 
-test('resolveExecutorAndOverrides throws when "prefer" names a executor that does not itself declare "for" including the capability name (symmetry violation)', () => {
+test('resolveExecutorAndOverrides resolves via "prefer" even when the preferred executor declares no "for" at all (D5 -- supersedes D2\'s own symmetry requirement)', () => {
   const cfg = {
     executors: { agy: { kind: 'agent', command: 'agy' } }, // no "for" at all
     capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
   };
-  assert.throws(() => resolveExecutorAndOverrides(cfg, 'fgos-coding-implement'), RunnerConfigError);
+  const result = resolveExecutorAndOverrides(cfg, 'fgos-coding-implement');
+  assert.equal(result.executorId, 'agy');
+  assert.equal(result.executor, cfg.executors.agy);
+  assert.equal(result.configured, true);
 });
 
 test('resolveExecutorAndOverrides throws when "prefer" names a executor id that does not exist at all', () => {
@@ -3418,7 +3421,7 @@ test('loadRunnerConfig rejects capabilities.<name>.overrides.rigorOverrides via 
   assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
 });
 
-test('loadRunnerConfig accepts a well-formed capabilities.<name>.prefer/overrides pair, symmetry satisfied', () => {
+test('loadRunnerConfig accepts a well-formed capabilities.<name>.prefer/overrides pair', () => {
   const dir = mkTempDir();
   const configPath = path.join(dir, 'good-prefer-overrides.json');
   fs.writeFileSync(
@@ -3434,15 +3437,30 @@ test('loadRunnerConfig accepts a well-formed capabilities.<name>.prefer/override
   assert.doesNotThrow(() => loadRunnerConfig(configPath));
 });
 
-test('loadRunnerConfig rejects a load-time symmetry violation -- "prefer" names a real executor that does not declare the matching "for" (config-load time, ahead of resolveExecutorAndOverrides\'s own resolve-time throw)', () => {
+test('loadRunnerConfig accepts "prefer" naming a real executor that declares no matching "for" (D5 -- supersedes D2\'s own load-time symmetry check)', () => {
   const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-symmetry.json');
+  const configPath = path.join(dir, 'prefer-no-for.json');
   fs.writeFileSync(
     configPath,
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { agy: { kind: 'agent', command: 'agy' } }, // no "for"
+      executors: { agy: { kind: 'agent' } }, // no "command"/"args"/"for" at all
       capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
+      modelPolicies: { claude: { standard: 'sonnet' } },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.doesNotThrow(() => loadRunnerConfig(configPath));
+});
+
+test('loadRunnerConfig rejects "prefer" naming an executor id that does not exist at all', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'prefer-missing-executor.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capabilities: { 'fgos-coding-implement': { prefer: 'no-such-executor' } },
       modelPolicies: { claude: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
