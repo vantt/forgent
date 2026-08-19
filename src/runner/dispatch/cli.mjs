@@ -15,7 +15,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { DEFAULTS } from '../../state/work.mjs';
-import { DOMAINS, resolveDomainName, skillForStage } from '../../state/workflow-stage-graphs.mjs';
+import { DOMAINS, resolveDomainName, skillForStage, bundleForStage, resolveTaskSpecPath } from '../../state/workflow-stage-graphs.mjs';
+import { loadAgentDefs, readTaskSpecHeader } from '../agent-roster.mjs';
 import { selectTemplate, hashTemplate } from '../prompt-templates.mjs';
 import { listWork } from '../../state/store.mjs';
 import { appendEvent } from '../../state/events.mjs';
@@ -126,6 +127,44 @@ export function resolveAgentTypeForTaskSpec(taskSpecHeader, agentDefs = [], curr
 }
 
 /**
+ * `spawnWorker`'s own D20/D22 wiring (review finding H1, tsk-397): the real
+ * agent-type this `work` item's dispatch should resolve to, or `null` when
+ * there is nothing to resolve from (no taskSpec registered for this
+ * domain+stage, or the taskSpec has no header content at all — both
+ * legitimate "no opinion" outcomes, not errors). Resolves the taskSpec via
+ * `bundleForStage` (D14/D29/D30, the same {skill,taskSpec} lookup
+ * `spawnWorker` already uses for the skill half), reads its header via
+ * `resolveTaskSpecPath` + `readTaskSpecHeader`, and matches it against the
+ * real on-disk agent roster (`loadAgentDefs`) via `resolveAgentTypeForTaskSpec`
+ * above.
+ *
+ * `currentAgentType` is always `null` here: nothing on a work item tracks
+ * "which agentType last served this dispatch" today, so there is no real
+ * stickiness state to read yet (D32's tie-break priority 2 activates only
+ * once such state exists — a later item's own scope, not invented here).
+ *
+ * The result only has an observable effect on an executor that is already
+ * command-less/adapter-less/invocation-less and declares no static
+ * `agentType` of its own (see `resolveExecutorConfig`'s own
+ * `effectiveAgentType` comment) — every executor this repo configures
+ * today (agy, claude, codex, pi) has its own real `command`, so this never
+ * changes their dispatch.
+ */
+export function resolveAgentTypeForWork(work, cwd, stage) {
+  const domainObj = DOMAINS[resolveDomainName(work?.domain)];
+  const targetStage = stage ?? work?.stage ?? 'executing';
+  const { taskSpec } = bundleForStage(domainObj, targetStage);
+  if (!taskSpec) return null;
+  // resolveTaskSpecPath already returns an absolute path when { cwd } is
+  // passed (it joins internally) -- never re-join cwd here too.
+  const taskSpecPath = resolveTaskSpecPath(domainObj, taskSpec, { cwd });
+  const header = readTaskSpecHeader(taskSpecPath);
+  if (Object.keys(header).length === 0) return null;
+  const agentDefs = loadAgentDefs(cwd);
+  return resolveAgentTypeForTaskSpec(header, agentDefs, null);
+}
+
+/**
  * Run the headless executor for `work` inside `cwd` (the worktree checkout
  * — this function never touches the main working tree itself; the caller
  * decides `cwd`). Builds the prompt, resolves tier -> model, resolves the
@@ -171,6 +210,10 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
     rigorOverrides: capabilityOverrides?.rigorOverrides ?? executorForTier?.rigorOverrides,
   });
   const prompt = buildPrompt(work, opts.feedback, opts.stage);
+  // D20/D22 (review finding H1, tsk-397): only has an observable effect on
+  // a command-less/adapter-less/invocation-less executor with no static
+  // agentType of its own -- see resolveAgentTypeForWork's own doc comment.
+  const resolvedAgentType = resolveAgentTypeForWork(work, cwd, opts.stage);
   const { command, args, adapter, provider, baseCommit, headRef } = resolveExecutorCommand(cfg, {
     prompt,
     model,
@@ -181,6 +224,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
     // root (always the main checkout) — see captureDispatchAttestation's
     // own docstring for why those two roots diverge on a leaf or a retry.
     attestRoot: cwd,
+    resolvedAgentType,
   });
   const adapterFn = EXECUTOR_ADAPTERS[adapter];
   if (!adapterFn) {
@@ -304,6 +348,14 @@ export async function executeExecutorCli(
     idleTimeoutMs: idleTimeoutOverride,
     maxBuffer: maxBufferOverride,
     onChunk,
+    // D20/D22 (review finding H1, tsk-397): optional, work-item-aware
+    // callers (fanoutBatchExecutorCli) can pass the real work item so this
+    // otherwise work-agnostic primitive resolves an agentType the same way
+    // spawnWorker does. Omitted (every pre-H1-wiring caller, and any
+    // caller with no specific work item -- e.g. a `--for <purpose>`
+    // dispatch) skips resolution entirely, byte-identical to before.
+    work,
+    stage,
   } = {},
 ) {
   if (!executorIdArg && !purpose) {
@@ -395,6 +447,7 @@ export async function executeExecutorCli(
     providerModel: capabilityOverrides?.providerModel ?? executor?.providerModel,
     rigorOverrides: capabilityOverrides?.rigorOverrides ?? executor?.rigorOverrides,
   });
+  const resolvedAgentType = work ? resolveAgentTypeForWork(work, cwd, stage) : null;
   const { command, args, adapter, provider } = resolveExecutorCommand(cfg, {
     prompt,
     model,
@@ -403,6 +456,7 @@ export async function executeExecutorCli(
     fgosDir,
     contentCarries: carries,
     attestRoot: cwd,
+    resolvedAgentType,
   });
   const adapterFn = EXECUTOR_ADAPTERS[adapter];
   if (!adapterFn) {
@@ -713,6 +767,10 @@ export async function fanoutBatchExecutorCli(
         cwd: wtPath,
         repoRoot: root,
         hasLiveTaskAccess,
+        // D20/D22 (review finding H1, tsk-397): lets executeExecutorCli
+        // resolve a real agentType via resolveAgentTypeForWork, same as
+        // spawnWorker already does.
+        work: workItem,
       });
 
       execFileSync(process.execPath, [BIN_FGOS_PATH, 'return', candidateId, '--dir', root], {

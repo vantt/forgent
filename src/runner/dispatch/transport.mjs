@@ -126,14 +126,14 @@ function captureDispatchAttestation(fgosDir, attestRoot) {
   };
 }
 
-export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, fgosDir, attestRoot, contentCarries } = {}) {
+export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, fgosDir, attestRoot, contentCarries, resolvedAgentType } = {}) {
   // Captured BEFORE resolveExecutorConfig, not after (D3) — cheap and
   // unconditional so the same call site works regardless of whether the
   // resolved executor turns out to be same-provider or cross-provider;
   // resolveExecutorConfig below is still the sole authority on which
   // executor actually gets used.
   const attestation = captureDispatchAttestation(fgosDir, attestRoot);
-  const executor = resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCarries);
+  const executor = resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCarries, resolvedAgentType);
   const adapter = executor.adapter ?? DEFAULT_ADAPTER;
   if (!(adapter in EXECUTOR_ADAPTERS)) {
     throw new RunnerConfigError(
