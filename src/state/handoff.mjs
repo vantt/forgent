@@ -1,10 +1,15 @@
 // handoff.mjs — pure legality guard for the multi-role team harness
 // (tsk-2t9c D1/D3/D4/D5/D8, D25/D28). LAYER: domain, same tier as
-// stage-fsm.mjs -- it may import kernel (workflow-stage-graphs.mjs) but
-// never fs, never a config read. Cap, open-call-depth, and open-sync-depth
-// are always caller-supplied (`hasWorkerSlotRoom({ ceiling })`'s own purity
-// precedent, src/state/worker-slots.mjs) so this module stays a pure
-// function of its arguments, testable with no store, no lock, no disk.
+// stage-fsm.mjs -- this file's OWN code never imports fs, never reads
+// config. Cap, open-call-depth, and open-sync-depth are always
+// caller-supplied (`hasWorkerSlotRoom({ ceiling })`'s own purity
+// precedent, src/state/worker-slots.mjs) so every function here stays a
+// pure function of its arguments, testable with no store, no lock, no
+// disk touched by the CALL. Note (review finding M3, tsk-397): its one
+// import, kernel-layer workflow-stage-graphs.mjs (`legalCallEdges`),
+// does its own disk read at MODULE-LOAD time since D7 (registry.yaml)
+// -- importing this file transitively triggers that, even though
+// nothing in this file's own body ever does.
 //
 // Mechanism vs policy (D3): this file only ever answers "is this call
 // legal" -- it never picks who should be called, never judges whether a

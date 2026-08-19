@@ -14,11 +14,20 @@
 // the same direction they already use for work.mjs itself, so this is not a
 // new import shape, only a new file.
 //
-// PURE: no fs import, no disk writes. The one side effect this module ever
-// performs is a diagnostic `console.warn` when a genuinely unrecognized
-// domain value is folded to the default (see resolveDomainName) — never a
-// throw, so every hot-path consumer (frontier.mjs, loop.mjs) can call it
-// unconditionally.
+// NO DISK WRITES, ever. Reads only: `loadDomainsFromDisk` (D7) does a
+// synchronous `readdirSync`/`readFileSync`/`yaml.parse` at module-load time
+// to load `domains/<name>/registry.yaml` + `workflows/*.yaml` off the
+// package's own root (falling back to `fallbackCodingDomain`, a hand-
+// maintained equivalent, when that read fails or `yaml` doesn't resolve —
+// see the isolated-`node_modules`-less setup path
+// test/setup/checks-setup-rc-line.test.mjs proves is real). This module is
+// no longer "no fs import" (review finding M3, tsk-397 — the header used
+// to claim that before D7's registry split; stale the moment `core/`/
+// `domains/` became real files this module reads). The one side effect
+// beyond that load is a diagnostic `console.warn` when a genuinely
+// unrecognized domain value is folded to the default (see
+// resolveDomainName) — never a throw, so every hot-path consumer
+// (frontier.mjs, loop.mjs) can call it unconditionally.
 //
 // 'coding' reproduces work.mjs's pre-retrofit STAGES and stage-fsm.mjs's
 // pre-retrofit STAGE_TRANSITIONS byte-for-byte (base-workflow-model D2, zero
