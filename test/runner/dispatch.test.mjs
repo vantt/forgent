@@ -1059,13 +1059,20 @@ test('the committed .fgos/config.json runner section wires the agy executor to g
   assert.ok(cfg.modelPolicies.gemini.lightweight.length > 0);
 });
 
-test('the committed .fgos/config.json runner section grants the worker exactly acceptEdits + git add/commit — no wider (per spike B)', () => {
+test('the committed .fgos/config.json runner section grants the worker exactly acceptEdits + git add/commit (bare and rtk-wrapped) — no wider (per spike B, doubled tsk-1dsr)', () => {
   const cfg = committedRunnerConfig();
   const { args } = cfg.executor;
   assert.ok(args.includes('--permission-mode'));
   assert.equal(args[args.indexOf('--permission-mode') + 1], 'acceptEdits');
   assert.ok(args.includes('--allowedTools'));
-  assert.equal(args[args.indexOf('--allowedTools') + 1], 'Bash(git add:*),Bash(git commit:*)');
+  const allowedTools = args[args.indexOf('--allowedTools') + 1];
+  // tsk-1dsr: a personal PreToolUse hook (e.g. rtk) can rewrite `git ...` to
+  // `rtk git ...` before the allowlist match runs, so both the bare and
+  // rtk-wrapped forms are named — this is a strict superset, never a
+  // widening to any git subcommand beyond add/commit.
+  assert.equal(allowedTools, 'Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)');
+  assert.ok(!allowedTools.includes('Bash(git *)'), 'must stay scoped to add/commit, never widen to any git subcommand');
+  assert.ok(!allowedTools.includes('Bash(rtk git *)'), 'must stay scoped to add/commit, never widen to any rtk git subcommand');
   assert.ok(!args.includes('--dangerously-skip-permissions'));
 });
 
