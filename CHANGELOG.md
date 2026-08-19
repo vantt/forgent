@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Split `agents/*.yaml` into `core/agents/` and `domains/<name>/agents/` (D24) and added global unique agent-type name doctor check `agent-type-names-unique` (D33).
 - Explicit task-spec contracts (`core/task-specs/`) for 7 domain-agnostic skills (`fgos-routing`, `fgos-clarifying`, `fgos-researching`, `fgos-unlock`, `fgos-fanout`, `fgos-indexing`, `distill`), with doctor `task-specs-resolve` validation.
+- D20/D22 agent-type eligibility resolution (`resolveAgentTypeForTaskSpec`, `src/runner/dispatch/cli.mjs`) is now wired into the real out-of-process dispatch path (`spawnWorker`, `executeExecutorCli`), via a new `src/runner/agent-roster.mjs`. Only has an observable effect on a command-less/adapter-less executor entry with no static `agentType` of its own — no executor this repo configures today (agy/claude/codex/pi) is affected.
+- D28's nested-sync-call cap (`openSyncDepth`) is now reachable: `recordCall`/`fgos handoff --open-sync-depth <n>` accept a caller-supplied depth (never derived from the event log — a sync call's own record commits atomically, so nesting can only be known by a caller tracking its own recursion).
 - `scripts/write-wrapper-script.mjs` — reusable helper CLI script to write executable wrapper shell scripts for multi-statement commands that trip worktree isolation guards.
 - Dispatch-execute reliability pass (`src/runner/dispatch/transport.mjs`,
   `src/runner/recovery.mjs`): the `cli-spawn` adapter now caps nested
@@ -36,6 +38,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   GROUP on timeout/maxBuffer (`process.kill(-pid, ...)`), not just the
   directly-spawned pid — an executor CLI that shells out further (a
   grandchild process) no longer survives its own parent being killed.
+- **Breaking (store schema):** the coding `roleGraph`'s `human-advisor`
+  role was renamed to `advisor` (D16). Replay now normalizes the retired
+  literal for any pre-rename `work.handoff` event already committed to an
+  existing `events.jsonl` — without this, an item still parked with
+  `holder: "human-advisor"` from before the rename would be permanently
+  stuck (any further write to it throws `WorkValidationError`, since the
+  current roleGraph vocabulary no longer accepts the old name). Run
+  `fgos rebuild` after upgrading if any item was parked at the old role —
+  `state.json`'s own incremental-snapshot fast path does not re-apply a
+  code-only fix to already-replayed history on its own.
+- `agents/*.yaml`'s eligibility field was inverted from `claims` to
+  `skills` (D20) with no migration note — any existing `agents/*.yaml`
+  still carrying `claims:` now has it silently ignored at projection
+  time. Update `agents/*.yaml` (and `core/agents/`, `domains/<name>/agents/`)
+  to declare `skills:` instead.
+- `materializeSkillsIntoProject` (`fgos setup`'s external-project
+  materialize path) no longer crashes when `packageRoot` (a real global
+  npm install can be root-owned or read-only) can't be written to during
+  its `assembleSkills` re-render step — degrades to using the
+  already-shipped, committed `.agents/skills` instead.
+- `package.json`'s `files` array now includes `core/` — a packed/published
+  install was missing `core/task-specs/`, `core/skills/`, and
+  `core/agents/` entirely, contradicting the new `core/` vs `domains/`
+  authoring split the moment fgOS is installed rather than checked out.
 
 ### Added
 
