@@ -1,6 +1,6 @@
 # task-spec: fix-verify-red
 
-domain: coding | stage: executing | position: implementer
+domain: coding | stage: executing | role: implementer
 
 ## Input
 - A `return` attempt whose `verify` command failed — the real failure
@@ -22,5 +22,5 @@ domain: coding | stage: executing | position: implementer
 | Trigger | Call | To | Reason | Bóng về mang |
 |---|---|---|---|---|
 | The failure implicates a pattern/library the session does not understand | consult (sync) | researcher | consult | finding |
-| Root cause is not provable from the failure output alone (bug-workflow's own rule: prove the cause before changing behavior) | advise (async) | human-advisor | advise | answer or scope clarification |
+| Root cause is not provable from the failure output alone (bug-workflow's own rule: prove the cause before changing behavior) | advise (async) | advisor | advise | answer or scope clarification |
 | No trigger matches | — fix and re-run verify — | | | |

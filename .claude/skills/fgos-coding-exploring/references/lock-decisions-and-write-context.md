@@ -75,7 +75,7 @@ state.
 This is the real `advise` interaction — call `handoff` first, then `ask`:
 
 ```bash
-node "$root/bin/fgos.mjs" handoff "<id>" --to human-advisor --reason advise --dir "$root"
+node "$root/bin/fgos.mjs" handoff "<id>" --to advisor --reason advise --dir "$root"
 ```
 
 ```bash
@@ -84,11 +84,11 @@ node "$root/bin/fgos.mjs" ask "<id>" --text "..." --dir "$root"
 
 **When the answer comes back immediately** (same session, `fgos answer`
 called right after `fgos ask` with no real gap between them), reclaim
-before doing anything else: `holder` is `human-advisor` the moment the
+before doing anything else: `holder` is `advisor` the moment the
 `handoff` call above lands, and nothing else in this step closes it.
 Continuing straight to a second Socratic round (multiple rounds are
-explicitly allowed) with `holder` still `human-advisor` means that
-round's own `consult`/`advise` attempt gets refused — `human-advisor` has
+explicitly allowed) with `holder` still `advisor` means that
+round's own `consult`/`advise` attempt gets refused — `advisor` has
 zero outgoing edges at stage `exploring`:
 
 ```bash

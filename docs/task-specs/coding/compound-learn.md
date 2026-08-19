@@ -1,6 +1,6 @@
 # task-spec: compound-learn
 
-domain: coding | status: retrospective | position: implementer
+domain: coding | status: retrospective | role: implementer
 
 ## Input
 - A `delivered` item that has entered `retrospective` (sweep, or manual).
@@ -26,5 +26,5 @@ domain: coding | status: retrospective | position: implementer
 
 | Trigger | Call | To | Reason | Bóng về mang |
 |---|---|---|---|---|
-| The captured signal's real audience/purpose is unclear from the item's own history | advise (async) | human-advisor | advise | classification the doc should use |
+| The captured signal's real audience/purpose is unclear from the item's own history | advise (async) | advisor | advise | classification the doc should use |
 | No trigger matches | — synthesize (or settle with no doc) — | | | |

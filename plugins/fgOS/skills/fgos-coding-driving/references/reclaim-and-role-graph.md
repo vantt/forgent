@@ -8,7 +8,7 @@ is additive tracking or decoration around it.
 
 The role/holder axis is a third axis, orthogonal to `status`/`stage` — it
 tracks who is actually holding the item (`implementer`, `reviewer`,
-`researcher`, `human-advisor`, …) so that a session's real interactions
+`researcher`, `advisor`, …) so that a session's real interactions
 (consult a researcher, get something reviewed, ask a human, hand off a
 scoped subtask) are checkable and loggable instead of staying implicit.
 This axis only stays truthful if a session reclaims the ball before it
