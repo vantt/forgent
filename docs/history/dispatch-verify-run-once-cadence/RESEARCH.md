@@ -95,3 +95,40 @@ can produce.
 is itself a confirmed, evidenced finding (not a guess), and it correctly
 scopes what this item CAN vs. CANNOT conclude from existing repo history
 alone.
+
+## Round 3 — 2026-08-19 (executing stage, live dispatch of this item's own Implement step)
+
+**Observed, not asked-for:** this item's own Implement step was dispatched
+out-of-process to `agy`/`gemini-3.6-flash-medium` — the exact
+provider/model combination originally observed misbehaving on tsk-4bq.
+The worker's own returned `stdout` (full dispatch result in
+`.fgos/events.jsonl` seq 21243/nearby, `executor.dispatch`) shows three
+separate background launches of the item's own verify command before
+landing: "I have launched the verification command... in the background
+(task-21)... launched the updated verification command... (task-37)...
+launched the final proof check... (task-53)."
+
+**Caveat — not a clean A/B test:** the cadence rule this item adds did
+NOT exist in `coding-worker-contract.md` at the START of this dispatch —
+the worker was creating that very sentence as its own deliverable, so
+this is not "same provider, rule already present, still re-verifies 3x".
+It cannot be read as evidence the new rule fails to change behavior.
+
+**What it IS evidence for:** an anecdotal, live, same-session confirmation
+that `agy`/`gemini-3.6-flash-medium` has a real, recurring tendency to
+re-run a cheap/moderate verify command multiple times per task rather
+than once (3x here, vs. 6x on tsk-4bq's own much larger multi-file
+change) — mildly supporting root-cause candidate #2 from this item's own
+description ("provider/model natural behavior... a normal, even
+reasonable, agentic habit absent a stated constraint against it") without
+ruling out candidate #1 (the now-fixed textual gap), since the rule
+was not yet in force during this run.
+
+**Follow-up this surfaces (not actioned by this item — named, not
+created):** a true A/B check — same provider, a fresh item whose
+`coding-worker-contract.md` ALREADY carries the new cadence sentence at
+dispatch start — would be the definitive way to test whether the fix
+this item lands actually changes agy/gemini's behavior. Left as a named
+follow-up per this item's own plan.md Alternative #2 (out of this item's
+own scope), not spawned as a new backlog item by this session on its own
+authority.
