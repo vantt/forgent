@@ -1,118 +1,71 @@
-# plan.md — tsk-1jt: D4 proof-test the named `claude` executor
+# plan.md — tsk-1dsr: fix allowedTools scope + retest
 
-Mode: **standard** (2 mode-gate flags — public contracts: this D4 test
-exercises `.agents/skills/_shared/coding-worker-contract.md`, a shared
-contract with real other consumers (`pi`, `agy`, `codex`); weak proof
-around the area: the item's own stated purpose is proving/disproving an
-unverified "claude satisfies the worker contract out-of-process" claim.
-No hard-gate flag — no auth/data-loss/audit-security/external-provider/
-removing-validation). No `CONTEXT.md` exists for this item — discovery
-verdict was `clear`, skipping `exploring`. Research lives in the sibling
-feature dir `docs/history/claude-named-executor/RESEARCH.md` Round 2
-(tsk-1cn's own dir, reused for research continuity since this item builds
-directly on tsk-1cn's landed config) — this item's own `docsRef` points
-here instead, so its `plan.md` never collides with tsk-1cn's own (a real
-mistake caught and fixed during this item's own Bootstrap: an earlier
-attempt pointed `docsRef` at the shared dir and clobbered tsk-1cn's
-`plan.md` by reusing its exact filename — restored from `main` before this
-file was written).
+Mode: **tiny** (0 mode-gate flags — no auth/authorization/data-model/
+audit-security/external-provider/public-contract/cross-platform change; a
+scoped config-string change plus a matching test assertion, already
+proven correct by a real retest before landing). Cites `CONTEXT.md`'s D1.
 
 ## Approach
 
-Mirror tsk-47r's own proven D4 mechanism exactly
-(`docs/history/claude-named-executor/RESEARCH.md` Round 2, citing
-`docs/history/pi-executor-runtime-capacity/RESEARCH.md` Rounds 3-4) — no
-new mechanism to invent:
+Already executed live, driven by real-time diagnosis rather than
+speculative up-front design (the item's own original hypothesis — a
+colon-vs-space `--allowedTools` syntax bug — was disproven mid-flight,
+per `docs/history/claude-named-executor/RESEARCH.md` Round 4, before any
+config change was made):
 
-1. **Create a genuinely disposable throwaway work item** via the real
-   `fgos submit`/`fgos take --role session` doors (`kind: chore`, a small
-   real `verify`, a `footprint` naming exactly one file) — never simulated,
-   never hand-crafted state.
-2. **Claim its worktree** the same way `/fgOS:pick` does
-   (`fgos pick <throwaway-id>`).
-3. **Dispatch `claude` against it via the literal named-executor path**,
-   bypassing purpose-based `decide` (RESEARCH.md Round 2's own finding:
-   Native-First Doctrine's rule 2 would otherwise prefer in-process
-   dispatch for a same-provider target):
+1. Diagnosed the real cause (Round 4): this machine's personal `rtk`
+   `PreToolUse` hook, not a `.fgos/config.json` defect.
+2. Per `CONTEXT.md` D1, applied the double-pattern fix directly to
+   `.fgos/config.json` as a required main-checkout commit (`daabebfe`,
+   ADR0020) — `runner.executors.claude`/`runner.executor`'s
+   `--allowedTools` now names both `Bash(git add:*),Bash(git commit:*)`
+   and `Bash(rtk git add:*),Bash(rtk git commit:*)`.
+3. Updated `test/runner/dispatch.test.mjs`'s "no wider (per spike B)"
+   assertion to match, landed directly on main too (`bebfc547`) to
+   restore green immediately rather than leaving main red until this
+   branch's own approve.
+4. Retested live (Round 5) BEFORE step 2 committed: dispatched `claude`
+   out-of-process with the double-pattern args (in-memory override, not
+   yet on disk) against a fresh throwaway item — real `[DONE]`, real
+   commit, footprint honored. Confirmed GREEN before the fix landed, not
+   asserted after the fact.
+5. Corrected `coding-worker-contract.md`'s Return-channel note (tsk-1jt's
+   own RED finding stays as an accurate record of that specific run; a
+   follow-up paragraph now names the real root cause and the GREEN
+   retest) — mirrored to `plugins/fgOS/skills/_shared/` per the repo's
+   own byte-identical mirror requirement.
 
-   ```bash
-   node src/runner/dispatch.mjs execute claude --work <throwaway-id> --has-live-task-access
-   ```
-
-   (or the equivalent `--prompt` form built from the real `buildPrompt`
-   output against the throwaway item's own work object at
-   `stage: 'executing'` — never a hand-written approximation, same
-   discipline tsk-47r's Round 3/4 already proved out).
-4. **Read real evidence, never the worker's own self-report alone**:
-   `.fgos/events.jsonl`'s `executor.dispatch` log entry for this dispatch,
-   plus `git log`/`git show --stat` on the throwaway item's own worktree —
-   confirms whether `claude` (a) read the layered skill-pointer chain down
-   to `coding-worker-contract.md`, (b) honored the footprint boundary
-   (touched only the named file), (c) reported through the contract's
-   exact two-token vocabulary (`[DONE]`/`[BLOCKED]`), (d) never called
-   `fgos` itself.
-5. **Record the round** in `docs/history/claude-named-executor/
-   RESEARCH.md` (Round 3, the shared feature dir — keeps the whole
-   `claude`-executor research narrative in one place, same as pi's own
-   single `pi-executor-runtime-capacity/RESEARCH.md`), with the real
-   verdict — **GREEN**, **RED** (a specific contract assumption `claude`
-   cannot satisfy, named precisely), or **BLOCKED** (e.g. the
-   shared-account usage cap Round 2 already flagged as a real risk, per
-   `pi`'s own Round 3 precedent) — all three are valid, documented
-   outcomes; never fabricate a GREEN/RED from an inconclusive run.
-6. **Append the real finding to `coding-worker-contract.md`**, the same
-   place tsk-47r's own step 3 appended `pi`'s finding (its existing
-   "Return-channel note" section) — only on GREEN or RED, since BLOCKED
-   has nothing to append (precedent: `pi`'s Round 3 BLOCKED appended
-   nothing, only Round 4's real GREEN did).
-7. **Clean up**: `wontfix` the throwaway item and remove its
-   worktree/branch immediately after — never left dangling in the backlog
-   (same discipline tsk-47r's own step 2 already followed for both
-   `tsk-1nif` and `tsk-1o8j`).
-
-If the run comes back BLOCKED (shared-account usage cap), that is still
-this item's own honest, complete outcome — not a reason to retry
-indefinitely against the same cap, per `pi`'s own Round 3 precedent
-("forcing a GREEN or RED verdict from zero tool calls would be
-fabricating the item's own most valuable output"). A BLOCKED result still
-gets recorded in `RESEARCH.md` and this item still returns — a future
-session can retry once the account has quota again, the same way tsk-47r
-opened Round 4 after Round 3's block, without needing every result to also
-be a GREEN.
-
-**Impact-analysis posture:** `full` — GitNexus (`forgent`) is `present`
-(confirmed live during tsk-1cn's own drive, unchanged since). Not
-load-bearing here: this item touches no function/class/method symbol — it
-runs a live dispatch and appends prose to a doc, no source-code edit at
-all.
+**Impact-analysis posture:** `full` — GitNexus present (confirmed
+repeatedly across this feature's own drive). Not load-bearing: no
+function/class/method symbol touched, only a config string and test
+assertions.
 
 ## Risk map
 
 | Component | Risk | What proves it |
 |---|---|---|
-| D4 claim (does `claude` follow `coding-worker-contract.md` when dispatched out-of-process) | Medium — this IS the open question the item exists to answer, exactly like `pi`'s own D4 | Step 4's real evidence: `.fgos/events.jsonl`'s `executor.dispatch` entry + the throwaway item's own worktree `git log`/`git show --stat` |
-| Shared-account usage cap (RESEARCH.md Round 2's own flagged risk) | Medium — foreseeable, not avoidable from this item's own authority | If it fires, record `BLOCKED` per `pi`'s Round 3 precedent — a valid, honest outcome, not a defect to engineer around |
-| `dispatch.mjs execute claude` mechanically resolving/spawning at all | Low — already proven at the config-resolution level (`test/runner/dispatch.test.mjs`, tsk-1cn) and no code-path special-casing found for `command === 'claude'` (RESEARCH.md Round 2, `src/runner/dispatch/cli.mjs:536` → `executeExecutorCli` → `resolveExecutorConfig`) | Round 3's own first real invocation, live |
+| Double-pattern config correctness | Low — proven live BEFORE landing (Round 5's in-memory-override retest), not asserted after | `docs/history/claude-named-executor/RESEARCH.md` Round 5 + real `git log`/`git show --stat` on the retest worktree |
+| Test assertion matches the real committed value | Low | `npm test` — `test/runner/dispatch.test.mjs`'s updated spike-B test reads the real committed config |
+| No regression elsewhere in the suite | Low | Full `npm test` run, 3653/0 fail, both immediately after the config+test fix landed on main and again after this branch's own merge-reconciliation |
 
-## Files touched
+## Files touched (already landed)
 
-- `docs/history/claude-named-executor/RESEARCH.md` — Round 3 (the D4 run,
-  real evidence, accumulate)
-- `docs/history/claude-named-executor/evidence/` — saved raw
-  prompt/stdout, mirroring `pi-executor-runtime-capacity/evidence/`'s own
-  convention
-- `.agents/skills/_shared/coding-worker-contract.md` — append the real
-  GREEN/RED finding (only if not BLOCKED)
-- A throwaway `fgos submit`-created item — created and `wontfix`'d within
-  this item's own drive, never a lasting artifact
+- `.fgos/config.json` — direct main commit `daabebfe` (ADR0020, cannot
+  ride this branch)
+- `test/runner/dispatch.test.mjs` — direct main commit `bebfc547`
+  (restoring green immediately)
+- `docs/history/claude-named-executor/RESEARCH.md` — Rounds 4-5, this
+  branch
+- `docs/history/claude-executor-d4-proof/CONTEXT.md` — D1, this branch
+- `.agents/skills/_shared/coding-worker-contract.md` +
+  `plugins/fgOS/skills/_shared/coding-worker-contract.md` — corrected
+  finding, this branch
 
 ## No split
 
-One honest piece — the three-step D4 mechanism is strictly sequential
-(each step depends on the previous step's real output), exactly the same
-"splitting would only add claim/worktree/merge overhead with no real
-parallelism" reasoning `pi`'s own tsk-47r Split section already gave for
-its own three-step Approach.
+One honest piece — diagnosis, fix, and retest were one continuous,
+interdependent action; nothing here could split into independently
+workable pieces without losing the "prove before landing" ordering.
 
 ## Outstanding questions
 
