@@ -10,6 +10,21 @@ status: open
 
 ## 1. Trạng thái hiện tại
 
+Round 17 (2026-08-19): Người chỉ ra thêm 1 việc còn mở: "workflow" chưa
+có file định nghĩa riêng — chỉ là key lồng trong `registry.mjs`. → D18:
+`domains/<name>/workflows/<name>.mjs`, mirror pattern aggregator D4 một
+tầng sâu hơn. Người yêu cầu tham khảo kỹ marketing-cockpit's 33 workflow
+file thật (không bắt chước mù quáng) — trợ lý scout, tìm ra 7/33 file
+thật ra là khái niệm `template` (multi-item batch) chứ không phải
+`workflow` (single-item), xác nhận đúng ranh giới D7 tsk-2t9c đã định
+nghĩa từ trước. Trợ lý làm bảng so sánh field-by-field nhưng bác vội quá
+nhiều — người sửa lại 3 chỗ (`rigor`/`cognitive_tier` đáng học ở cấp
+task-spec; `approval_gates` đáng học như lớp cấu hình khai báo;
+`stages` shape nên tách ergonomics-viết khỏi shape-runtime, không phải
+copy nguyên) → D19. Thêm 1 mục "Ý tưởng học — chưa xây" vào §6 (giữ
+escalation-threshold + signal-bus như tsk-2t9c's §VI, không mất khi
+quên). 19/19 quyết định đã chốt.
+
 Round 16 (2026-08-19): Người đặt câu hỏi làm rõ GATE của task-1 (ẩn dụ
 "2 tấm biển, 1 cái hộp"), rồi tự đề xuất: đang dời hộp (`codingDomain`
 sang `domains/coding/registry.mjs`) thì dọn biển luôn cùng lượt, để cái
@@ -235,6 +250,7 @@ thi thật.
 | 24 | Sau khi domain có N workflow, mỗi workflow N stage, mỗi stage N task-spec — cơ chế điều phối (dispatch) thật là gì, ai chủ động? | Chốt — D13 | 3 tầng: DISPATCH (chọn persona, 1 lần, trước khi session tồn tại) → ROUTING (`fgos-routing`, chọn máy móc domain nào, xuyên domain, 1 lần/session) → DRIVING (`fgos-<domain>-driving`, lặp qua stage, CÙNG persona). Nguyên lý tổ chức: soul không hoán đổi giữa chừng session — khác skill/task-spec (văn xuôi, đọc lại tự do). Bằng chứng: `fgos-coding-driving` ceiling mặc định = `awaiting-approval`, ĐÚNG lúc async review handoff (D18 tsk-2t9c) fire — driving đã dừng đúng chỗ persona cần đổi từ trước, chỉ chưa ai gọi tên nguyên lý. |
 | 25 | Skill có cần thiết phải hardcode load task-spec không, hay nên tách? | Chốt — D14 | Không nên hardcode trong prose (3 chỗ ở `fgos-coding-implement` dòng 88/177/291 đã hardcode literal path). `bundleForStage(domain, stage)` trả `{skill, taskSpec}` cùng lúc, sống ở tầng DRIVING (D13) — `skillMap`/`taskSpecMap` đã nằm cạnh nhau cùng object, cùng key stage, hàm này chỉ bọc lại dữ liệu có sẵn. |
 | 26 | Agent-type/persona/team-collab đặt vào đâu trong cơ chế dispatch, và "2 flow nối tiếp" (PO+BA rồi Tech-Lead+SWE+Tester) có cần 2 workflow riêng? | Chốt — D15 | Không cần 2 workflow. Persona resolve theo `(domain, stage, role)` thay vì chỉ `(domain, role)` — cùng roleGraph, cùng role (`implementer`), khác persona theo cụm stage. Team-hợp-tác = chuỗi sync call (holder không đổi, D8) tới nhiều persona, KHÔNG multi-holder cùng lúc; song song thật = decompose ra item con (`fgos-fanout`, có sẵn). So sánh marketing-cockpit: field `skills:` trên agent-type của họ chỉ là catalog thiết-kế-thời, KHÔNG được dispatch runtime nào truy vấn — `claims` (pull) của tsk-2t9c đã đi xa hơn họ rồi. CỐ Ý CHƯA XÂY: ranh giới stage-đổi-persona-ngầm có nên cũng dừng driving — chưa có bằng chứng đa dạng persona thật. |
+| 27 | Workflow definition sống ở đâu — có file riêng không, hay chỉ là key lồng trong registry.mjs? | Chốt — D18 | Chưa có file riêng hôm nay (chỉ `codingDomain.workflows.feature`, reference-sharing với top-level field, D7a). `domains/<name>/workflows/<name>.mjs` là nơi ở chính thức mới — `registry.mjs` thành aggregator cho map `workflows` của chính nó, mirror D4 một tầng sâu hơn. |
 
 ## 4. Quyết định đã chốt
 
@@ -257,6 +273,8 @@ thi thật.
 | D15 | Persona/agent-type resolve theo `(domain, stage, role)`, không chỉ `(domain, role)`. Team-hợp-tác trong 1 stage = chuỗi sync call (consult/assist, D8, holder không đổi) từ 1 holder chính tới nhiều persona chuyên biệt — KHÔNG multi-holder cùng lúc; song song thật = decompose ra item con (`fgos-fanout`, có sẵn), không phải concurrency trên cùng 1 worktree. | Người: "flow triển khai 1 feature có thể là nối tiếp của 2 flow" (PO+BA lúc discovery/exploring, Tech-Lead+SWE+Tester lúc planning) không cần 2 workflow riêng — cùng roleGraph, cùng role (`implementer`), khác persona theo cụm stage; field key thêm không tốn gì hôm nay (1 persona chung cho mọi stage) nhưng mở cửa cho sau. So sánh marketing-cockpit: `skills:` trên agent-type của họ chỉ là catalog thiết-kế-thời, KHÔNG dispatch runtime nào truy vấn — `claims` (pull, tsk-2t9c) đã đi xa hơn họ. CỐ Ý CHƯA XÂY: ranh giới stage-đổi-persona-ngầm có nên cũng dừng driving — chưa đủ bằng chứng persona đa dạng thật (cùng kỷ luật grow-tasks-before-roles giữ roleGraph đóng ở 5 role, D10 tsk-2t9c). |
 | D16 | Đổi tên role `human-advisor` → `advisor` trong `roleGraph.roles` (và các edge `to: 'human-advisor'`) — khớp hình dạng đặt tên của 4 role còn lại (tên seat thuần, không gắn persona). KHÔNG thêm cơ chế eligibility-resolution mới nào. | Người: gắn "human" vào tên role là dư thừa — `awaiting-human` (status-fsm, có TRƯỚC roleGraph) + `ask`/`answer` (verb pair, có lịch sử riêng) đã bắt trọn phần human-specific rồi, role không cần nói lại lần nữa. Reason `advise` vẫn máy móc resolve qua `fgos ask`/`answer` → `awaiting-human`, bất kể role tên gì — role tự nó chưa bao giờ nhất thiết phải "dành cho con người", đó là do cơ chế `advise` gọi tới, không phải do role đặt tên. (Trợ lý ban đầu hiểu ngược hướng phản hồi của người, đã tự sửa lại sau khi người làm rõ.) |
 | D17 | Gộp task-3 (dispatcher wiring, D10) vào task-1 (registry split, D3/D4) — làm chung 1 lượt, không tách 2 lượt riêng. Scout chính xác: chỉ 2 điểm đọc property phẳng còn thật — `stage-fsm.mjs:94` (`domain.transitions.some(...)`) và `plan.mjs:519`+`loop.mjs:1297` (cùng 1 dòng trùng lặp, `domain.stages?.includes('decompose')`). Cả 2 đổi sang đọc qua `resolveWorkflow(domain, kind)`. GATE identity của round 12 (task-1) NAY MOOT — không còn 2 đường đọc để so sánh phân kỳ. | Người: đang dời hộp (`codingDomain`) rồi thì dọn biển luôn cùng lượt, để không đụng `stage-fsm.mjs` (module test dày đặc nhất repo) 2 lần riêng biệt — đúng lý luận D10 đã dùng ("dời trước khi code mới viết ra, tránh migrate 2 lần") áp thêm 1 bước. Phát hiện thêm khi scout: `resolveWorkflow` đã export nhưng CHƯA được gọi từ bất kỳ file nào bên ngoài `workflow-stage-graphs.mjs` — nên việc gộp này cũng là lần đầu hàm đó thật sự được dùng. |
+| D18 | `domains/<name>/workflows/<workflow-name>.mjs` là nơi ở CHÍNH THỨC của workflow definition — `registry.mjs` chỉ còn là aggregator cho map `workflows` của CHÍNH NÓ, mirror lại đúng pattern aggregator của D4 (một tầng sâu hơn). `feature` VẪN định nghĩa bằng reference-sharing với field top-level của domain trong `registry.mjs` (giữ nguyên kỷ luật identity D7a); `bugfix`/`lightweight` (khi viết ra) thành file ĐỘC LẬP thật dưới `workflows/`, không đụng file của `feature`. | Người chỉ ra: "workflow" chưa có file riêng nào — chỉ là key lồng trong `registry.mjs`. Ổn khi chỉ có 1 workflow (reference-sharing, 0 dữ liệu thêm) nhưng `bugfix`/`lightweight` cần graph ĐỘC LẬP thật (không share reference) — nếu để nguyên trong `registry.mjs`, sẽ phình to y hệt vấn đề `workflow-stage-graphs.mjs` từng gặp trước khi tách domain. Cùng lý luận thời điểm D10/D17: tách trước khi code bugfix-workflow viết ra, tránh migrate 2 lần. |
+| D19 | Định dạng TÁC GIẢ VIẾT workflow-file tách khỏi HÌNH DẠNG RUNTIME. `domains/<name>/workflows/<name>.mjs` viết theo 1 block gộp mỗi stage (dễ đọc, học ergonomics của marketing-cockpit), NORMALIZE lúc load thành các map runtime hiện có (`stepMap`/`skillMap`/`taskSpecMap`/`transitions`, tách riêng, cùng key theo stage) — API `skillForStage`/`resolveWorkflow` KHÔNG đổi. | Người sửa lại 3 chỗ trợ lý bác vội trong bảng so sánh field-by-field: (1) `rigor`/`cognitive_tier` ĐÁNG học — đặt ở HEADER task-spec (mịn hơn cả workflow-level của họ), vì 1 stage cụ thể có thể cần rigor khác tier chung của item; (2) `approval_gates` ĐÁNG học — như 1 LỚP CẤU HÌNH khai báo nằm TRÊN cơ chế status/CTR005 sẵn có, không thay thế; (3) so sánh `stages` shape không phải chuyện copy list phẳng của họ — là tách RIÊNG ergonomics-viết (1 khối gộp mỗi stage, dễ đọc) khỏi shape-runtime (các map tách rời fgOS đã có, mọi resolver phụ thuộc, không đổi). |
 
 ## 5. Q&A log
 
@@ -628,6 +646,33 @@ role, persona mặc định khác, không có handoff tường minh) có nên
 cũng làm driving dừng — chưa có bằng chứng persona đa dạng thật để thiết
 kế theo, cùng kỷ luật grow-tasks-before-roles giữ `roleGraph` đóng ở 5
 role (D10 tsk-2t9c).
+
+### Ý tưởng học từ marketing-cockpit — CHƯA XÂY, ghi nhận để không quên (round 17)
+
+So sánh field-by-field 33 workflow file thật của marketing-cockpit (round
+17) — hầu hết field KHÔNG đáng học (đã có tương đương tốt hơn hoặc đã
+chủ đích bỏ từ tsk-2t9c, xem D18/D19's ghi chú). Nhưng 2 ý CÓ giá trị,
+CHƯA có tương đương trong fgOS hôm nay, cố ý CHƯA xây (giống tinh thần
+"treo có chủ đích" §VI của chính tsk-2t9c):
+
+- **Escalation-threshold cho collaboration interaction.** Ví dụ thật của
+  người dùng: 1 interaction (vd `review`) thất bại N lần liên tiếp →
+  TỰ ĐỘNG (nhưng KHÔNG bắt buộc) escalate sang `advise`/human, thay vì
+  lặp vô hạn hoặc để agent tự judge mỗi lần. Chỗ đặt tự nhiên khi xây:
+  thêm 1 cột/field vào bảng Collaboration của task-spec (D6/D10 tsk-2t9c
+  đã có bảng trigger→call, đây chỉ thêm 1 field `retry-threshold` cho
+  1 row). `callstackCap` hiện có (roleGraph) KHÔNG phải cái này — đó là
+  giới hạn ĐỘ SÂU lồng call, không phải đếm số lần LẶP LẠI cùng 1
+  interaction.
+- **`emits`/`listens_for` (signal bus) cho việc điều phối xuyên
+  workflow/domain.** Đã là "treo có chủ đích" của chính tsk-2t9c (§VI
+  #3: "hoãn tới fan-out use-case thật"). Ghi nhận LẠI Ở ĐÂY (không phải
+  chỉ 1 dòng trong file cũ của họ) vì người dùng muốn có nơi bền để nhớ
+  — khi domain thứ hai (marketing) thật sự cần điều phối chéo domain,
+  đây là chỗ quay lại đọc trước khi tự nghĩ lại từ đầu.
+
+Cả 2 mục này KHÔNG phải task trong §7 — chưa đủ bằng chứng/nhu cầu thật
+để thiết kế cụ thể, chỉ ghi nhận vị trí sẽ đặt khi thời điểm tới.
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
