@@ -10,19 +10,47 @@ status: open
 
 ## 1. Trạng thái hiện tại
 
-Round 13 (2026-08-18): D11 (resolver function cho file-path cross-boundary
-— `resolveTaskSpecPath`) và D12 (mở rộng `architecture-manifest.json` +
-`architecture.test.mjs` thêm rule domain-siloing, so sánh với
-`upstreams/pi`'s "everything is a plugin") đã chốt — ghi qua `fgos
-decision --id tsk-397` (seq 20091, 20092). 8/8 việc chính đã có quyết
-định (share-store, field-ownership, domain-folder-shape, aggregator,
-core-vị-trí, knowledge, skill-canonical, task-spec, seam-cho-bugfix-
-workflow, cross-boundary-file-resolver, module-boundary-enforcement).
-Còn mở thật: `roleGraph`/`taskSpecMap` placement trong `registry.mjs`
-(đề xuất chưa lock: đi cùng nguyên object, không tách), `agents/*.yaml`→
-`.claude/agents/*.md` render-pair (đề xuất chưa lock: mirror D7, domain
-riêng có `domains/<name>/agents/`), và `doctrine` domain-scoped (mở từ
-đầu, chưa ai đề xuất giải pháp cụ thể).
+Round 14 (2026-08-19): Sau D9-D12 (folder-layout đã ổn định), thảo luận
+mở rộng sang tầng DISPATCH/COORDINATION — trả lời "khi không gian đã tách,
+cơ chế nào điều phối việc thật giữa workflow/stage/taskSpec/skill/
+position/agent-type". Kết quả (D13-D15, ghi qua `fgos decision --id
+tsk-397`, seq 20756-20758):
+
+- **D13 — kiến trúc 3 tầng dispatch/routing/driving**, nguyên lý tổ chức:
+  soul/persona của một session KHÔNG hoán đổi được giữa chừng (khác
+  skill/task-spec — chỉ là văn xuôi đọc lại tự do). DISPATCH (chọn AI,
+  một lần, trước khi session tồn tại) → ROUTING (`fgos-routing`, chọn
+  MÁY MÓC nào áp dụng, xuyên domain, chạy một lần trong session đã có
+  persona cố định) → DRIVING (`fgos-<domain>-driving`, lặp qua nhiều
+  stage, CÙNG một persona, load lại skill+taskSpec tự do mỗi stage).
+  Bằng chứng thật: `fgos-coding-driving`'s ceiling mặc định là
+  `status=='awaiting-approval'` — ĐÚNG chỗ tsk-2t9c D18 gắn async review
+  handoff — driving đã dừng đúng lúc persona cần đổi, dù chưa ai đặt tên
+  nguyên lý này trước đây.
+- **D14 — `bundleForStage(domain, stage)` trả `{skill, taskSpec}` cùng
+  lúc**, sống ở tầng DRIVING — đóng gap "skill hardcode path task-spec
+  trong prose" (dòng 88/177/291 của `fgos-coding-implement`).
+- **D15 — persona/agent-type resolve theo `(domain, stage, position)`**,
+  không chỉ `(domain, position)` — team-hợp-tác trong 1 stage = chuỗi sync
+  call (consult/assist, holder không đổi) từ 1 holder chính tới nhiều
+  persona chuyên biệt, KHÔNG BAO GIỜ multi-holder cùng lúc; song song thật
+  = decompose ra item con (`fgos-fanout`, đã có), không phải concurrency
+  trên cùng 1 worktree. CỐ Ý CHƯA XÂY: liệu ranh giới stage (persona mặc
+  định đổi dù cùng position, không có handoff tường minh) có nên cũng làm
+  driving dừng — chưa có bằng chứng persona đa dạng thật để thiết kế theo.
+
+So sánh `upstreams/marketing-cockpit`'s cách gán position→agent
+(`workflow.md`'s `agents:`/`stages:` hardcode tên agent, PUSH, tác giả
+quyết lúc viết) đã xác nhận: field `skills:` trên agent-type của họ chỉ
+là catalog khai báo (đọc bởi người/LLM lúc thiết kế), KHÔNG được dispatch
+mechanism nào truy vấn runtime — `claims` của tsk-2t9c (PULL, agent tự
+khai eligibility) thực ra đã đi XA HƠN marketing-cockpit, không phải thứ
+cần bắt kịp.
+
+15/15 quyết định đã chốt. Còn mở thật: `agents/*.yaml`→`.claude/agents/*.md`
+render-pair đặt vào D7 hay tách riêng (đề xuất chưa lock: mirror D7,
+domain riêng có `domains/<name>/agents/`), và `doctrine` domain-scoped
+(mở từ đầu, chưa ai đề xuất giải pháp cụ thể).
 
 Round 12 (2026-08-18): Xác nhận `tsk-2t9c` ĐÃ MERGE VÀO MAIN (`e268376e`)
 — không phải nhánh treo. `codingDomain` thật có 10+ field (§7 task-1 đã
@@ -182,6 +210,9 @@ thi thật.
 | 21 | Task-3 (dispatcher domain/workflow-aware) có nên drop khỏi scope thảo luận này không (trợ lý từng đề xuất drop)? | SỬA LẠI — D10 (round 12) | Trợ lý đề xuất drop vì tsk-2t9c đã chủ đích KHÔNG wiring dispatcher (lý do: chỉ 1 workflow đăng ký, wiring đổi 0 hành vi). Người bác: bugfix-workflow sắp landing thật — tiền đề "chỉ 1 workflow" sắp hết đúng. Task-3 GIỮ LẠI, đổi khung: không phải "sửa bug" mà "làm sẵn seam trước khi workflow thứ 2 tồn tại". |
 | 22 | Sau khi không gian đã tách (D3-D10), cơ chế cross-boundary để đọc file/giao tiếp giữa core và domain là gì? | Chốt — D11 | `workflow-stage-graphs.mjs` ĐÃ có 13 hàm resolver (`getDomain`, `skillForStage`, `resolveWorkflow`, `roleGraphFor`, ...) — đây chính là "port" ở tầng DATA, không cần xây mới. Chỗ hổng duy nhất: `registrations.mjs` (dòng 407/424) tự ghép path thô `path.join('docs','task-specs',domainName,...)`, không qua resolver nào — sau khi D9 di dời task-specs, chỗ này vỡ trước tiên. D11 thêm `resolveTaskSpecPath(domain, specId)` để đóng nốt pattern đã có. |
 | 23 | Layout nội bộ + cách kết nối module của `upstreams/pi` ("everything is a plugin") có bài học gì cho fgOS? | Chốt — D12 | Pi enforce ranh giới module bằng `package.json`'s `exports` map (path không khai = không import được, Node tự chặn) — cấp package thật, mỗi package trong workspace tự khai bề mặt công khai. fgOS là 1 package, không workspace — chuyển sang mô hình pi tốn hơn hẳn. NHƯNG fgOS đã có tương đương: `docs/architecture-manifest.json` + `test/architecture.test.mjs` (5 layer kỹ thuật: entry/use-case/infra/domain/kernel, import chỉ được xuống tầng sâu hơn, ngược tầng = test đỏ). Bài học thật: mở rộng cơ chế ĐÃ CÓ này thêm 1 rule domain-siloing, không xây cơ chế mới kiểu pi. **Lưu ý naming va chạm:** layer `"domain"` trong manifest là khái niệm DDD kỹ thuật, KHÔNG liên quan `DOMAINS` (coding/marketing) của toàn thảo luận này — cùng từ, 2 nghĩa khác nhau, cùng tồn tại trong 1 repo. |
+| 24 | Sau khi domain có N workflow, mỗi workflow N stage, mỗi stage N task-spec — cơ chế điều phối (dispatch) thật là gì, ai chủ động? | Chốt — D13 | 3 tầng: DISPATCH (chọn persona, 1 lần, trước khi session tồn tại) → ROUTING (`fgos-routing`, chọn máy móc domain nào, xuyên domain, 1 lần/session) → DRIVING (`fgos-<domain>-driving`, lặp qua stage, CÙNG persona). Nguyên lý tổ chức: soul không hoán đổi giữa chừng session — khác skill/task-spec (văn xuôi, đọc lại tự do). Bằng chứng: `fgos-coding-driving` ceiling mặc định = `awaiting-approval`, ĐÚNG lúc async review handoff (D18 tsk-2t9c) fire — driving đã dừng đúng chỗ persona cần đổi từ trước, chỉ chưa ai gọi tên nguyên lý. |
+| 25 | Skill có cần thiết phải hardcode load task-spec không, hay nên tách? | Chốt — D14 | Không nên hardcode trong prose (3 chỗ ở `fgos-coding-implement` dòng 88/177/291 đã hardcode literal path). `bundleForStage(domain, stage)` trả `{skill, taskSpec}` cùng lúc, sống ở tầng DRIVING (D13) — `skillMap`/`taskSpecMap` đã nằm cạnh nhau cùng object, cùng key stage, hàm này chỉ bọc lại dữ liệu có sẵn. |
+| 26 | Agent-type/persona/team-collab đặt vào đâu trong cơ chế dispatch, và "2 flow nối tiếp" (PO+BA rồi Tech-Lead+SWE+Tester) có cần 2 workflow riêng? | Chốt — D15 | Không cần 2 workflow. Persona resolve theo `(domain, stage, position)` thay vì chỉ `(domain, position)` — cùng roleGraph, cùng position (`implementer`), khác persona theo cụm stage. Team-hợp-tác = chuỗi sync call (holder không đổi, D8) tới nhiều persona, KHÔNG multi-holder cùng lúc; song song thật = decompose ra item con (`fgos-fanout`, có sẵn). So sánh marketing-cockpit: field `skills:` trên agent-type của họ chỉ là catalog thiết-kế-thời, KHÔNG được dispatch runtime nào truy vấn — `claims` (pull) của tsk-2t9c đã đi xa hơn họ rồi. CỐ Ý CHƯA XÂY: ranh giới stage-đổi-persona-ngầm có nên cũng dừng driving — chưa có bằng chứng đa dạng persona thật. |
 
 ## 4. Quyết định đã chốt
 
@@ -199,6 +230,9 @@ thi thật.
 | D10 | Task-3 (dispatcher domain/workflow-aware wiring) GIỮ LẠI trong scope §7 — đảo ngược đề xuất drop của chính trợ lý (round 12). | Bugfix-workflow (un-merge `feature`/`bugfix`/`lightweight` theo D7/D7a tsk-2t9c, đang hoãn) sắp landing thật, không còn giả thuyết — tiền đề tsk-2t9c dùng để hoãn wiring dispatcher (chỉ 1 workflow đăng ký, wiring đổi 0 hành vi) sắp hết đúng. Lý do sâu hơn để làm domains/ split NGAY: code bugfix-workflow viết ra ở đâu phụ thuộc `codingDomain` đang sống ở đâu lúc đó — split trước khi code đó viết ra thì nó không bao giờ chạm `workflow-stage-graphs.mjs` cũ, tránh migrate 2 lần. |
 | D11 | Mở rộng pattern resolver-function đã có của `workflow-stage-graphs.mjs` sang cross-boundary FILE lookup — thêm `resolveTaskSpecPath(domain, specId)`, `registrations.mjs` gọi hàm này thay vì tự ghép `path.join('docs','task-specs',domainName,...)`. | Người: sau khi không gian đã tách hoàn toàn, việc quan trọng tiếp theo là cơ chế đọc file/giao tiếp cross-boundary. Scout: `workflow-stage-graphs.mjs` đã có 13 hàm resolver cho DATA (`getDomain`, `skillForStage`, ...) — pattern port đã tồn tại. `registrations.mjs` là chỗ DUY NHẤT còn tự ghép path thô, bỏ qua pattern — sau D9 di dời task-specs, đây là chỗ vỡ đầu tiên nếu không sửa. |
 | D12 | Mở rộng `docs/architecture-manifest.json` + `test/architecture.test.mjs` thêm 1 rule domain-siloing: core không import domain cụ thể nào, `domains/<name>/` không import `domains/<other>/` — tái dùng nguyên cơ chế one-directional-import đã chứng minh cho 5 layer kỹ thuật. | So sánh `upstreams/pi` ("everything is a plugin"): pi enforce ranh giới bằng `package.json`'s `exports` map (path không khai = Node tự chặn import) — cấp package thật, cần workspace. fgOS là 1 package, không workspace — chuyển hẳn sang mô hình pi tốn hơn hẳn cái đang có. fgOS đã có tương đương thật: architecture-manifest + test đỏ khi import ngược layer. Bài học từ pi không phải "xây cơ chế mới" mà "mở rộng cơ chế đã có sang trục domain". |
+| D13 | Kiến trúc 3 tầng dispatch/routing/driving. DISPATCH (`src/runner/dispatch.mjs`, `buildAgentTypeExecutor`, tsk-3sw — chọn persona, MỘT LẦN, trước khi session tồn tại) → ROUTING (`fgos-routing`, xuyên domain, chọn máy móc nào áp dụng, chạy MỘT LẦN trong session đã có persona cố định) → DRIVING (`fgos-<domain>-driving`, lặp qua stage, CÙNG persona, load lại skill+taskSpec tự do mỗi stage). | Nguyên lý tổ chức: soul/persona một session KHÔNG hoán đổi giữa chừng — khác skill/task-spec (văn xuôi đọc lại tự do). Bằng chứng thật, không phải suy diễn: `fgos-coding-driving` ceiling mặc định = `status=='awaiting-approval'`, ĐÚNG trạng thái tsk-2t9c D18 gắn async review handoff (holder đổi, D8) — driving đã dừng đúng lúc persona cần đổi từ trước khi nguyên lý này được đặt tên. Sync/async (D8) không phải lựa chọn API tuỳ tiện — cùng ràng buộc soul-không-hoán-đổi, đã mã hoá đúng sẵn. |
+| D14 | `bundleForStage(domain, stage)` trả `{skill, taskSpec}` cùng lúc, sống ở tầng DRIVING (D13) — đóng gap skill hardcode literal path task-spec trong prose. | `skillMap`/`taskSpecMap` đã nằm cạnh nhau, cùng object `codingDomain`, cùng key theo stage — hàm này chỉ bọc lại dữ liệu sẵn có, không phải dữ liệu mới. Task-spec (khung sườn/hợp đồng) nên được máy móc tầng khung sườn resolve, không phải nằm rải rác hardcode bên trong skill (lớp da). |
+| D15 | Persona/agent-type resolve theo `(domain, stage, position)`, không chỉ `(domain, position)`. Team-hợp-tác trong 1 stage = chuỗi sync call (consult/assist, D8, holder không đổi) từ 1 holder chính tới nhiều persona chuyên biệt — KHÔNG multi-holder cùng lúc; song song thật = decompose ra item con (`fgos-fanout`, có sẵn), không phải concurrency trên cùng 1 worktree. | Người: "flow triển khai 1 feature có thể là nối tiếp của 2 flow" (PO+BA lúc discovery/exploring, Tech-Lead+SWE+Tester lúc planning) không cần 2 workflow riêng — cùng roleGraph, cùng position (`implementer`), khác persona theo cụm stage; field key thêm không tốn gì hôm nay (1 persona chung cho mọi stage) nhưng mở cửa cho sau. So sánh marketing-cockpit: `skills:` trên agent-type của họ chỉ là catalog thiết-kế-thời, KHÔNG dispatch runtime nào truy vấn — `claims` (pull, tsk-2t9c) đã đi xa hơn họ. CỐ Ý CHƯA XÂY: ranh giới stage-đổi-persona-ngầm có nên cũng dừng driving — chưa đủ bằng chứng persona đa dạng thật (cùng kỷ luật grow-tasks-before-roles giữ roleGraph đóng ở 5 position, D10 tsk-2t9c). |
 
 ## 5. Q&A log
 
@@ -353,6 +387,29 @@ thi thật.
   ĐÃ CÓ cơ chế tương đương (`architecture-manifest.json` +
   `architecture.test.mjs`) — chỉ cần mở rộng, không xây mới → D12. Người
   xác nhận "Đồng ý" — D11+D12 chốt.
+- 2026-08-19 — Round 14 Q&A (ultrathink, nhiều lượt): người hỏi "domain
+  đã có N workflow, mỗi workflow N stage, mỗi stage N taskSpec — cơ chế
+  điều phối thật là gì, ai chủ động?", dặn tham khảo (không bắt chước)
+  marketing-cockpit. Trợ lý scout `orchestration/delegation.yaml` (PUSH,
+  orchestrator dispatch), `agents/seo-specialist.md` (`skills:` list —
+  nhìn tưởng multi-skill repertoire), rồi phát hiện quan trọng: field
+  `skills:` đó KHÔNG được bất kỳ dispatch mechanism nào truy vấn — chỉ là
+  catalog thiết-kế-thời, gán agent→stage vẫn 100% hardcode trong
+  `workflow.md`. Kết luận: `claims` (pull) của tsk-2t9c đã đi XA HƠN
+  marketing-cockpit, không phải thứ cần bắt kịp. Người hỏi tiếp "skill có
+  cần thiết hardcode load task-spec?" — trợ lý xác nhận (đọc dòng
+  88/177/291 của `fgos-coding-implement`) đúng là hardcode literal path,
+  đề xuất doctor-check thay vì sửa cơ chế. Người chỉnh sửa framing sâu
+  hơn: "workflow/stage/taskSpec là khung sườn/hợp đồng/chữ ký của việc,
+  skill+persona là lớp da giúp việc chất hơn" và nêu ràng buộc cứng
+  "MỘT SESSION KHÔNG THỂ ĐỔI SOUL GIỮA CHỪNG". Trợ lý ultrathink, xác
+  nhận qua code thật (`dispatch.mjs`'s `buildAgentTypeExecutor`,
+  `fgos-coding-driving`'s ceiling mặc định = `awaiting-approval` — ĐÚNG
+  lúc async review handoff D18 fire) → D13 (kiến trúc 3 tầng) + D14
+  (`bundleForStage`). Người mở rộng vision: 1 flow có thể là 2 flow nối
+  tiếp (PO+BA rồi Tech-Lead+SWE+Tester) — trợ lý brainstorm, kết luận
+  không cần 2 workflow, chỉ cần persona resolve theo `(domain, stage,
+  position)` → D15, người xác nhận "đồng ý vụ (domain, stage, position)".
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -494,6 +551,59 @@ câu hỏi tách riêng) — phát hiện round 5: 3 cây skill cũ (`.agents/sk
 nguồn canonical + N target render (đúng cơ chế beegog tự dùng cho chính
 nó) — không cần sửa cơ chế render, chỉ cần domain skill di dời đúng chỗ
 trong nguồn canonical trước khi render.
+
+### Tầng DISPATCH — điều phối workflow/stage/taskSpec/skill/persona (D13-D15)
+
+Ranh giới không gian (D1-D12) trả lời "cái gì sống ở đâu". Tầng này trả
+lời "khi item thật chạy, ai làm gì, theo thứ tự nào, ai chủ động".
+Nguyên lý tổ chức duy nhất: **soul (persona của một session) không hoán
+đổi được giữa chừng session** — khác skill/task-spec, chỉ là văn xuôi đọc
+lại tự do bất cứ lúc nào.
+
+```mermaid
+flowchart TB
+    subgraph L1["TẦNG 1 — DISPATCH (chọn AI, MỘT LẦN, trước khi session tồn tại)"]
+        D1a["src/runner/dispatch.mjs<br/>buildAgentTypeExecutor (tsk-3sw, đã có thật)<br/>resolve theo (domain, stage, position) — D15"]
+    end
+    subgraph L2["TẦNG 2 — ROUTING (xuyên domain, MỘT LẦN mỗi session,<br/>chạy TRONG session đã có persona cố định)"]
+        D2a["fgos-routing<br/>domain-agnostic — chọn máy móc domain nào áp dụng"]
+    end
+    subgraph L3["TẦNG 3 — DRIVING (lặp qua nhiều stage, CÙNG persona)"]
+        D3a["fgos-&lt;domain&gt;-driving<br/>bundleForStage(domain, stage) → {skill, taskSpec} — D14"]
+        D3b["ceiling mặc định = status:awaiting-approval<br/>ĐÚNG lúc async review handoff (D8 tsk-2t9c) fire"]
+    end
+
+    L1 -- "spawn session AS persona X" --> L2
+    L2 -- "handoff, persona đã cố định" --> L3
+    D3a --> D3b
+    D3b -- "sync call (holder không đổi)<br/>→ driving TIẾP TỤC" --> D3a
+    D3b -- "async call/handoff<br/>(holder đổi = persona cần đổi)<br/>→ driving DỪNG, quay lại L1" --> L1
+```
+
+**Team-hợp-tác trong 1 stage (D15):** chuỗi sync call (consult/assist,
+holder không đổi) từ 1 holder chính tới nhiều persona chuyên biệt —
+KHÔNG BAO GIỜ multi-holder cùng lúc trên 1 item (worktree/branch chỉ 1
+writer). Song song thật = decompose ra item con (`fgos-fanout`, đã có),
+không phải concurrency trên cùng 1 item.
+
+**"2 flow nối tiếp" không cần 2 workflow (D15):** persona mặc định đổi
+theo cụm stage (PO+BA lúc discovery/exploring → Tech-Lead+SWE+Tester lúc
+planning) qua key `(domain, stage, position)` — cùng roleGraph, cùng
+position (`implementer`), khác persona. Field key thêm không tốn gì hôm
+nay (1 persona chung mọi stage) — chỉ mở cửa cho sau.
+
+**So sánh marketing-cockpit (tham khảo, không bắt chước):** `agents/*.md`
+của họ có field `skills:` (nhìn giống multi-skill repertoire) nhưng
+KHÔNG được bất kỳ dispatch mechanism nào truy vấn runtime — gán
+agent→stage 100% hardcode trong `workflow.md` (PUSH, tác giả quyết lúc
+viết). fgOS's `claims` (PULL, tsk-2t9c D12) đã đi xa hơn — agent-type tự
+khai eligibility, frontier tự surface work-order, claimant tự chọn.
+
+**Cố ý CHƯA XÂY (D15):** liệu ranh giới stage-đổi-persona-ngầm (cùng
+position, persona mặc định khác, không có handoff tường minh) có nên
+cũng làm driving dừng — chưa có bằng chứng persona đa dạng thật để thiết
+kế theo, cùng kỷ luật grow-tasks-before-roles giữ `roleGraph` đóng ở 5
+position (D10 tsk-2t9c).
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
@@ -642,6 +752,42 @@ trong nguồn canonical trước khi render.
   import domain B), xác nhận `architecture.test.mjs` đỏ đúng lỗi mới;
   suite hiện có (5 layer cũ) không hồi quy.
 
+### {#task-bundle-for-stage} Thêm `bundleForStage(domain, stage)`, sửa skill bỏ hardcode task-spec path
+
+- **Mục tiêu:** hiện thực D14 — thêm hàm resolver mới vào
+  `workflow-stage-graphs.mjs` (cùng chỗ 13 hàm hiện có), trả `{skill,
+  taskSpec}` cùng lúc từ `skillMap`/`taskSpecMap` (đã cùng object, cùng
+  key stage). `fgos-<domain>-driving` gọi hàm này MỘT LẦN mỗi
+  stage-entry, hand cả 2 xuống session đang active. Sửa `fgos-coding-
+  implement`'s SKILL.md (dòng 88/177/291) bỏ literal path hardcode, thay
+  bằng tham chiếu tới bundle đã resolve.
+- **§6 excerpt áp dụng:** khối tầng DRIVING trong diagram dispatch mới.
+- **D-ID áp dụng:** D14.
+- **Quan hệ:** phụ thuộc task {#task-domain-registry-split} (registry
+  đã tách) và D9 (task-spec đã ở `domains/coding/task-specs/`).
+- **Verify nháp:** test mới cho `bundleForStage` (input domain+stage →
+  output {skill, taskSpec} đúng); grep `docs/task-specs/coding/`/
+  `domains/coding/task-specs/` literal citations trong mọi SKILL.md phải
+  về 0 sau khi sửa (trừ nơi cố ý còn giữ làm tài liệu).
+
+### {#task-persona-key-extension} Mở rộng persona/agent-type resolution key thành `(domain, stage, position)`
+
+- **Mục tiêu:** hiện thực D15 — nơi nào đang/sẽ resolve agent-type cho
+  một `(position, task-spec)` work-order (layer DISPATCH, `src/runner/
+  dispatch.mjs` + tương lai `claims`-matching) nhận thêm tham số `stage`
+  vào key tra cứu, không chỉ `domain`+`position`. Hôm nay là no-op (1
+  persona chung mọi stage) — chỉ cần đúng SHAPE của key, chưa cần dữ
+  liệu persona đa dạng thật.
+- **§6 excerpt áp dụng:** khối tầng DISPATCH trong diagram dispatch mới.
+- **D-ID áp dụng:** D15.
+- **Quan hệ:** độc lập, có thể làm bất cứ lúc nào — không phụ thuộc
+  task nào khác, vì hôm nay không đổi hành vi.
+- **Verify nháp:** test xác nhận key cũ `(domain, position)` vẫn resolve
+  đúng qua wrapper mới (không hồi quy); KHÔNG cần test cho đa dạng
+  persona thật — đó là phần cố ý chưa xây (D15's "chờ bằng chứng").
+
 **Việc CHƯA đủ hình dạng để thành task riêng:** knowledge/doctrine
-domain-scoped (câu hỏi mở #15, §3) — chờ người quyết định có nằm trong
-scope item này hay để lại khi marketing thật bắt tay xây.
+domain-scoped (câu hỏi mở #15, §3), ranh giới stage-đổi-persona-ngầm có
+nên dừng driving (D15's phần cố ý chưa xây), `agents/*.yaml`→
+`.claude/agents/*.md` render-pair placement — chờ người quyết định mức
+scope cho item này.
