@@ -178,6 +178,15 @@ session's own working directory can drift into a sibling's worktree mid-run.
   (true concurrency); true concurrency is preserved by relying on this skill-layer
   self-recovery instruction to handle worktree-isolation races.
 
+**Explicitly out of scope for the out-of-process wave-dispatch
+consolidation below:** this hazard sits entirely in the in-process branch
+(native Agent's own `EnterWorktree` call, a harness-level limitation —
+the Claude Code harness tracks "current worktree" per session, not per
+concurrently-dispatched Agent). Consolidating the out-of-process chain
+into `dispatch.mjs fanout-batch` and `fgos schedule --candidates` never
+touches, fixes, or claims to improve this hazard — `dispatch.mjs` never
+participates in the in-process branch beyond the initial `decide` call.
+
 ## Workflow
 
 Full step-by-step detail — the exact slot-polling, batch-trimming, and

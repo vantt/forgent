@@ -34,7 +34,7 @@ import {
   INVOCATION_VIA,
   executorIdForWork,
 } from '../../src/runner/dispatch.mjs';
-import { initStore, addWork } from '../../src/state/store.mjs';
+import { initStore, addWork, listWork } from '../../src/state/store.mjs';
 import { findExecutableOnPath } from '../../src/state/tool-registry.mjs';
 import { resolveMainCheckoutRoot } from '../../src/runner/paths.mjs';
 
@@ -4399,4 +4399,59 @@ test('fgos schedule --candidates filters schedule to specified candidates', () =
   const schedScoped = JSON.parse(outScoped);
   const wavesScoped = schedScoped.data ? schedScoped.data.waves : schedScoped.waves;
   assert.deepEqual(wavesScoped, [['w1']]);
+});
+
+/** Write a fake executor that commits an empty commit in whatever cwd it
+ * runs in (the picked worktree, per `executeExecutorCli`'s own `cwd`
+ * param) -- simulates a real worker actually doing+committing work, so
+ * `fgos return` finds real progress to verify against. */
+function writeCommittingExecutor(dir) {
+  const scriptPath = path.join(dir, 'committing-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    import { execFileSync } from 'node:child_process';
+    execFileSync('git', ['commit', '--allow-empty', '-m', 'fake work'], { stdio: 'ignore' });
+    process.stdout.write(JSON.stringify({ ok: true }));
+    process.exit(0);
+    `,
+  );
+  return scriptPath;
+}
+
+test('fanoutBatchExecutorCli: real end-to-end out-of-process fire -- pick/execute/return actually complete via subprocess calls to the real bin/fgos.mjs (closes the --dir/worktreePath-shape bug: this function used to pass fgosDir instead of root to --dir, doubling the .fgos suffix into a nonexistent path, and read a flat .worktreePath field the fgos.v1 envelope never has -- data.worktree.path is the real shape)', async () => {
+  const { repoRoot, fgosDir } = mkTempGitRepo();
+  const dir = mkTempDir();
+  const scriptPath = writeCommittingExecutor(dir);
+  writeRunnerConfigFixture(repoRoot, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: { 'fgos-coding-implement': { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  addWork(fgosDir, {
+    id: 'cand1',
+    title: 'Candidate 1',
+    kind: 'task',
+    status: 'todo',
+    domain: 'coding',
+    stage: 'executing',
+    deps: [],
+    refs: [],
+    risk: 'light',
+    verify: 'true',
+  });
+
+  const result = await fanoutBatchExecutorCli(['cand1'], { repoRoot, hasLiveTaskAccess: false });
+
+  assert.equal(result.mechanismChanged.length, 0);
+  assert.equal(result.unavailable.length, 0);
+  assert.equal(result.fired.length, 1);
+  assert.equal(result.fired[0].id, 'cand1');
+  assert.equal(result.fired[0].status, 0);
+  assert.equal(result.fired[0].errorClass, null);
+
+  // Never trust the return value alone -- independently re-read real state.
+  const view = listWork(fgosDir);
+  assert.equal(view.work.cand1.status, 'awaiting-approval');
 });

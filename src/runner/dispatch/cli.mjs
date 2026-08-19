@@ -12,6 +12,7 @@
 // handoff-redesign/CONTEXT.md` D7 for the split rationale.
 
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { DEFAULTS } from '../../state/work.mjs';
 import { DOMAINS, resolveDomainName, skillForStage } from '../../state/workflow-stage-graphs.mjs';
@@ -26,6 +27,15 @@ import { resolveExecutorCommand, EXECUTOR_ADAPTERS, DispatchError } from './tran
 import { buildPrompt } from './prepare.mjs';
 import { readSharedConfigOrEmpty } from '../../config/shared-config-file.mjs';
 import { hasWorkerSlotRoom } from '../../state/worker-slots.mjs';
+
+// Resolved against THIS module's own file location, never a caller-supplied
+// `root` -- `bin/fgos.mjs` is a fixed sibling of this checkout's own
+// `src/runner/dispatch/cli.mjs`, same "resolve against your own file
+// location, never the caller's cwd or repo root" principle
+// `gate-check`'s CLI wrapper already establishes elsewhere in this repo, so
+// this keeps working from any install shape/test fixture regardless of
+// what `root` a given call happens to be resolving `.fgos/`/config against.
+const BIN_FGOS_PATH = fileURLToPath(new URL('../../../bin/fgos.mjs', import.meta.url));
 import {
   acquireMainCheckoutLock,
   dispatchLockFile,
@@ -622,13 +632,19 @@ export async function fanoutBatchExecutorCli(
     }
 
     try {
-      const binFgos = path.join(root, 'bin', 'fgos.mjs');
-      const pickStdout = execFileSync(process.execPath, [binFgos, 'pick', candidateId, '--dir', fgosDir], {
+      // `--dir` must be the repo ROOT here, never `fgosDir` -- `dataDir()`
+      // (bin/fgos.mjs) always derives `.fgos` from `--dir` itself
+      // (`fgosDirFromRoot`), so passing an already-`.fgos` path doubles the
+      // suffix into a nonexistent `<root>/.fgos/.fgos`.
+      const pickStdout = execFileSync(process.execPath, [BIN_FGOS_PATH, 'pick', candidateId, '--dir', root], {
         encoding: 'utf8',
         stdio: ['ignore', 'pipe', 'pipe'],
       });
+      // Every fgos.mjs verb response is wrapped in the fgos.v1 envelope
+      // (`wrapEnvelope`, unconditional) -- the real path lives at
+      // `data.worktree.path`, never a bare `.worktreePath`/`.path`.
       const picked = JSON.parse(pickStdout);
-      const wtPath = picked.worktreePath || picked.path || cwd;
+      const wtPath = picked.data?.worktree?.path || cwd;
 
       const execRes = await executeExecutorCli(executorId, {
         cwd: wtPath,
@@ -636,7 +652,7 @@ export async function fanoutBatchExecutorCli(
         hasLiveTaskAccess,
       });
 
-      execFileSync(process.execPath, [binFgos, 'return', candidateId, '--dir', fgosDir], {
+      execFileSync(process.execPath, [BIN_FGOS_PATH, 'return', candidateId, '--dir', root], {
         cwd: wtPath,
         encoding: 'utf8',
         stdio: ['ignore', 'pipe', 'pipe'],
