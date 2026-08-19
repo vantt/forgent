@@ -16,7 +16,7 @@
         "--permission-mode",
         "acceptEdits",
         "--allowedTools",
-        "Bash(git add:*),Bash(git commit:*)"
+        "Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)"
       ]
     },
     "capabilities": {
@@ -30,9 +30,40 @@
       },
       "pane-labeling": {
         "description": "Write a session/task id onto the current terminal pane's label, for a human watching a screen"
+      },
+      "advise": {
+        "description": "Async product-decision consult -- value comes from disagreement, never changes state, one question/one answer (P5, docs/history/dispatch-activation-and-handoff-redesign/DISCUSSION.md -- planned --for advise -> codex, never built: no caller invokes this purpose yet)"
+      },
+      "execute": {
+        "description": "Compliance-driven work -- value comes from following the plan, changes files, must pass verify (P5, docs/history/dispatch-activation-and-handoff-redesign/DISCUSSION.md -- planned --for execute -> agy, never built: no caller invokes this purpose yet)"
+      },
+      "fgos-coding-implement": {
+        "description": "code-implement work for the coding domain's executing stage",
+        "prefer": "agy"
       }
     },
     "executors": {
+      "claude": {
+        "kind": "agent",
+        "description": "Claude Code CLI (headless dispatch)",
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "claude",
+            "args": [
+              "-p",
+              "{prompt}",
+              "--model",
+              "{model}",
+              "--permission-mode",
+              "acceptEdits",
+              "--allowedTools",
+              "Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)"
+            ]
+          }
+        ]
+      },
       "agy": {
         "kind": "agent",
         "description": "Antigravity Cli",
@@ -78,6 +109,37 @@
             ]
           }
         ]
+      },
+      "pi": {
+        "kind": "agent",
+        "description": "pi coding agent (openai-codex/gpt-5.5) -- reference runtime for the coding-worker-contract, D4 proof-test GREEN (tsk-47r)",
+        "allowCrossProvider": true,
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "pi",
+            "args": [
+              "--provider",
+              "openai-codex",
+              "--model",
+              "{model}",
+              "--tools",
+              "read,write,edit,bash,grep,find,ls",
+              "--mode",
+              "json",
+              "--approve",
+              "-p",
+              "{prompt}"
+            ]
+          }
+        ],
+        "providerModel": "openai-codex",
+        "rigorOverrides": {
+          "light": "lightweight",
+          "standard": "lightweight",
+          "heavy": "lightweight"
+        }
       },
       "gitnexus": {
         "kind": "tool",
@@ -128,6 +190,9 @@
       },
       "gemini": {
         "lightweight": "gemini-3.6-flash-medium"
+      },
+      "openai-codex": {
+        "lightweight": "gpt-5.5"
       }
     }
   },
