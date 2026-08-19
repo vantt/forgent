@@ -7,6 +7,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import {
   extractFrontmatter,
@@ -201,5 +202,48 @@ test('materializeSkillsIntoProject runs assembly first so core/skills and domain
   assert.ok(fs.existsSync(path.join(targetRoot, '.agents', 'skills', 'fgos-coding-implement', 'SKILL.md')));
   assert.ok(fs.existsSync(path.join(targetRoot, '.claude', 'skills', 'fgos-routing', 'SKILL.md')));
   assert.ok(fs.existsSync(path.join(targetRoot, '.claude', 'skills', 'fgos-coding-implement', 'SKILL.md')));
+});
+
+// --- Drift guard: committed .agents/skills vs core/skills+domains/*/skills (review finding H6) ---
+//
+// D7 makes core/skills/ + domains/<name>/skills/ the canonical AUTHORING
+// source and commits .agents/skills/ (and its own mirrors) as real render
+// targets -- both committed is the intended shape, not a mistake. But
+// nothing enforced the two ever actually agree: a hand-edit to
+// .agents/skills/ would pass every other test and get silently reverted
+// by the next `npm run build:skills`, or a source-only edit could ship
+// without ever landing in the committed render target. This test is that
+// missing enforcement -- it renders core/+domains/ into a throwaway temp
+// dir (never touching the real committed .agents/skills) and asserts the
+// two are set-identical and byte-identical.
+function listFilesRecursiveSorted(dir) {
+  const out = [];
+  const walk = (d, rel) => {
+    for (const entry of fs.readdirSync(d, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+      const relPath = rel ? `${rel}/${entry.name}` : entry.name;
+      if (entry.isDirectory()) walk(path.join(d, entry.name), relPath);
+      else out.push(relPath);
+    }
+  };
+  walk(dir, '');
+  return out.sort();
+}
+
+test('assembleSkills output matches the committed .agents/skills byte-for-byte (drift guard, review finding H6) -- catches a hand-edit to the render target OR a source-only edit that never landed there', () => {
+  const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
+  const committedAgentsSkills = path.join(repoRoot, '.agents', 'skills');
+  const rendered = mkTempDir('skill-wrappers-drift-guard-');
+
+  assembleSkills(repoRoot, rendered);
+
+  const committedFiles = listFilesRecursiveSorted(committedAgentsSkills);
+  const renderedFiles = listFilesRecursiveSorted(rendered);
+  assert.deepEqual(renderedFiles, committedFiles, 'committed .agents/skills/ has a different file set than core/skills+domains/*/skills would render -- run `npm run build:skills`');
+
+  for (const relPath of committedFiles) {
+    const committedContent = fs.readFileSync(path.join(committedAgentsSkills, relPath), 'utf8');
+    const renderedContent = fs.readFileSync(path.join(rendered, relPath), 'utf8');
+    assert.equal(renderedContent, committedContent, `.agents/skills/${relPath} is out of sync with core/skills+domains/*/skills -- run \`npm run build:skills\``);
+  }
 });
 
