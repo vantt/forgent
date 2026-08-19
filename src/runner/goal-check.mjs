@@ -39,7 +39,13 @@ import { spawn } from 'node:child_process';
 export function runCommand(command, cwd, timeoutMs) {
   const maxBuffer = 10 * 1024 * 1024;
   return new Promise((resolve) => {
-    const child = spawn(command, { shell: true, cwd });
+    // `stdin: 'ignore'` (never the 'pipe' default): a verify command that
+    // checks for piped stdin (codex's own "Reading additional input from
+    // stdin..." probe, tsk-3tkc) blocks forever on an open-but-unwritten
+    // pipe here, since nothing in this runner ever writes to or closes
+    // child.stdin -- same fix as src/runner/dispatch/transport.mjs's
+    // cliSpawnAdapter.
+    const child = spawn(command, { shell: true, cwd, stdio: ['ignore', 'pipe', 'pipe'] });
     child.stdout.setEncoding('utf8');
     child.stderr.setEncoding('utf8');
 

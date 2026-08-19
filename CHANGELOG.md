@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `runner.executors.claude` in `.fgos/config.json` — claude is now
+  addressable by name in dispatch (`decide claude`, `executors.claude`)
+  the same way `agy`/`codex`/`pi` already are, instead of only being
+  reachable through the anonymous top-level `runner.executor` default.
+  Same command/args as that default; no behavior change for existing
+  callers.
 - Three new read-only verbs: `fgos decision-index [--check]` generates
   `docs/decisions/index.md`, a projection of every platform/repo-wide
   decision (`fgos decision --scope <area>`) from `state.decisions`;
@@ -62,6 +68,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   refused just as cleanly. Every existing item and every existing log
   replays byte-for-byte unaffected — `holder` and the two new event kinds
   are both fully optional/lazy, never present unless actually used.
+- `runner.executors.pi` — `pi` (`@earendil-works/pi-coding-agent`)
+  registered as a second `agent`-kind executor alongside `agy`, via
+  `fgos setup`'s existing config-default merge (no manual `.fgos/
+  config.json` edit needed). Invocation shape: `pi --provider openai-codex
+  --model gpt-5.5 --tools <allowlist> --mode json --approve -p <prompt>`,
+  confirmed live against the coding-domain worker contract (a genuinely
+  disposable work item, both a correct cold-pickup refusal and a correct
+  commit-and-`[DONE]` completion) — see
+  `docs/history/pi-executor-runtime-capacity/RESEARCH.md`.
 
 - `codex` (OpenAI Codex CLI) wired as a new out-of-process dispatch
   executor (`.fgos/config.json`'s `runner.executors.codex`), using
@@ -84,6 +99,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   startup ("Reading additional input from stdin...") and blocks
   indefinitely on a pipe nothing ever writes to or closes — found live
   wiring `codex` as an executor (`docs/history/codex-bypass-executor/`).
+- The same stdin-pipe hang also affected `runCommand`
+  (`src/runner/goal-check.mjs`), the shared verify runner behind `fgos
+  return`/`approve`/merge/dispatch's own re-verify — a `codex`-based
+  `verify` command timed out there too until the same `stdin: 'ignore'`
+  fix was applied.
 - `fgos decision` now requires `--text` explicitly. Before this, a call
   with no `--text` silently fell back to joining whatever positional
   arguments were left over (e.g. `fgos decision write "..."` stored

@@ -727,6 +727,47 @@ test('the committed .fgos/config.json runner section declares the agy reference 
   assert.ok(invocation.args.includes('--mode') && invocation.args.includes('accept-edits'));
 });
 
+// Synthetic cfg, not committedRunnerConfig() (tsk-1cn): committedRunnerConfig()
+// resolves against the MAIN CHECKOUT's own committed HEAD (see its own
+// docstring above) -- a feature branch's own .fgos/config.json edit is
+// invisible to it until merge, so a test asserting a branch's own change
+// through that helper would fail here and only start passing post-merge.
+// This mirrors the entry actually added to runner.executors.claude.
+function claudeExecutorCfg() {
+  return {
+    executor: { command: 'claude', args: ['-p', '{prompt}', '--model', '{model}', '--permission-mode', 'acceptEdits'] },
+    executors: {
+      claude: {
+        kind: 'agent',
+        invocations: [{ via: 'cli', adapter: 'cli-spawn', command: 'claude', args: ['-p', '{prompt}', '--model', '{model}', '--permission-mode', 'acceptEdits'] }],
+      },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+}
+
+test('resolveExecutorCommand resolves the named "claude" executor to the same command/args the top-level "executor" default already produces (tsk-1cn: addressability, not new behavior)', () => {
+  const cfg = claudeExecutorCfg();
+  const named = resolveExecutorCommand(cfg, { prompt: 'hello', model: 'sonnet', tier: 'standard', executorId: 'claude' });
+  const unnamed = resolveExecutorCommand(cfg, { prompt: 'hello', model: 'sonnet', tier: 'standard' });
+  assert.equal(named.command, unnamed.command);
+  assert.deepEqual(named.args, unnamed.args);
+});
+
+test('resolveExecutorCommand never requires allowCrossProvider for the named "claude" executor, since its resolved command is already in CLAUDE_CLI_COMMANDS (tsk-1cn, unlike agy/codex/pi)', () => {
+  const cfg = claudeExecutorCfg();
+  assert.equal(cfg.executors.claude.allowCrossProvider, undefined);
+  assert.doesNotThrow(() => resolveExecutorCommand(cfg, { prompt: 'hello', model: 'sonnet', tier: 'standard', executorId: 'claude' }));
+});
+
+test('resolveExecutorAndOverrides resolves "claude" as a literal registered executor id (tsk-1cn: no longer configured:false)', () => {
+  const cfg = claudeExecutorCfg();
+  const resolved = resolveExecutorAndOverrides(cfg, 'claude');
+  assert.equal(resolved.configured, true);
+  assert.equal(resolved.executorId, 'claude');
+});
+
 test('loadRunnerConfig accepts a "executors" entry naming only "kind" (metadata-only, falls through for its executor)', () => {
   const dir = mkTempDir();
   const configPath = path.join(dir, 'metadata-only-executor.json');
@@ -1018,13 +1059,20 @@ test('the committed .fgos/config.json runner section wires the agy executor to g
   assert.ok(cfg.modelPolicies.gemini.lightweight.length > 0);
 });
 
-test('the committed .fgos/config.json runner section grants the worker exactly acceptEdits + bare and rtk-wrapped git add/commit — no wider (per spike B, widened by tsk-1dsr to admit the rtk CLI proxy hook)', () => {
+test('the committed .fgos/config.json runner section grants the worker exactly acceptEdits + git add/commit (bare and rtk-wrapped) — no wider (per spike B, doubled tsk-1dsr)', () => {
   const cfg = committedRunnerConfig();
   const { args } = cfg.executor;
   assert.ok(args.includes('--permission-mode'));
   assert.equal(args[args.indexOf('--permission-mode') + 1], 'acceptEdits');
   assert.ok(args.includes('--allowedTools'));
-  assert.equal(args[args.indexOf('--allowedTools') + 1], 'Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)');
+  const allowedTools = args[args.indexOf('--allowedTools') + 1];
+  // tsk-1dsr: a personal PreToolUse hook (e.g. rtk) can rewrite `git ...` to
+  // `rtk git ...` before the allowlist match runs, so both the bare and
+  // rtk-wrapped forms are named — this is a strict superset, never a
+  // widening to any git subcommand beyond add/commit.
+  assert.equal(allowedTools, 'Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)');
+  assert.ok(!allowedTools.includes('Bash(git *)'), 'must stay scoped to add/commit, never widen to any git subcommand');
+  assert.ok(!allowedTools.includes('Bash(rtk git *)'), 'must stay scoped to add/commit, never widen to any rtk git subcommand');
   assert.ok(!args.includes('--dangerously-skip-permissions'));
 });
 
@@ -3245,8 +3293,8 @@ test('resolveExecutorIdForPurpose returns null against an empty/missing executor
 // --- resolveExecutorAndOverrides (D1-D4, docs/history/capability-capacity-
 // remodel/CONTEXT.md) -- the shared resolver every real cfg.executors[id]
 // lookup in this file now goes through: literal key first, then
-// capabilities.<name>.prefer (symmetry required), then the plain "for"
-// scan, then unconfigured -----------------------------------------------
+// capabilities.<name>.prefer (D5, supersedes D2's "for"-symmetry
+// requirement), then the plain "for" scan, then unconfigured ------------
 
 test('resolveExecutorAndOverrides resolves a literal executorId directly, unchanged from pre-this-item behavior -- the deep-customization escape hatch', () => {
   const cfg = { executors: { agy: { kind: 'agent', command: 'agy' } } };
@@ -3257,7 +3305,7 @@ test('resolveExecutorAndOverrides resolves a literal executorId directly, unchan
   assert.equal(result.configured, true);
 });
 
-test('resolveExecutorAndOverrides resolves via capabilities.<name>.prefer when the preferred executor declares a matching "for" (symmetry satisfied)', () => {
+test('resolveExecutorAndOverrides resolves via capabilities.<name>.prefer when the preferred executor declares a matching "for"', () => {
   const cfg = {
     executors: { agy: { kind: 'agent', command: 'agy', for: ['fgos-coding-implement'] } },
     capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
@@ -3277,12 +3325,15 @@ test('resolveExecutorAndOverrides carries capabilities.<name>.overrides through,
   assert.deepEqual(result.overrides, { rigorOverrides: { standard: 'creative' } });
 });
 
-test('resolveExecutorAndOverrides throws when "prefer" names a executor that does not itself declare "for" including the capability name (symmetry violation)', () => {
+test('resolveExecutorAndOverrides resolves via "prefer" even when the preferred executor declares no "for" at all (D5 -- supersedes D2\'s own symmetry requirement)', () => {
   const cfg = {
     executors: { agy: { kind: 'agent', command: 'agy' } }, // no "for" at all
     capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
   };
-  assert.throws(() => resolveExecutorAndOverrides(cfg, 'fgos-coding-implement'), RunnerConfigError);
+  const result = resolveExecutorAndOverrides(cfg, 'fgos-coding-implement');
+  assert.equal(result.executorId, 'agy');
+  assert.equal(result.executor, cfg.executors.agy);
+  assert.equal(result.configured, true);
 });
 
 test('resolveExecutorAndOverrides throws when "prefer" names a executor id that does not exist at all', () => {
@@ -3370,7 +3421,7 @@ test('loadRunnerConfig rejects capabilities.<name>.overrides.rigorOverrides via 
   assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
 });
 
-test('loadRunnerConfig accepts a well-formed capabilities.<name>.prefer/overrides pair, symmetry satisfied', () => {
+test('loadRunnerConfig accepts a well-formed capabilities.<name>.prefer/overrides pair', () => {
   const dir = mkTempDir();
   const configPath = path.join(dir, 'good-prefer-overrides.json');
   fs.writeFileSync(
@@ -3386,15 +3437,30 @@ test('loadRunnerConfig accepts a well-formed capabilities.<name>.prefer/override
   assert.doesNotThrow(() => loadRunnerConfig(configPath));
 });
 
-test('loadRunnerConfig rejects a load-time symmetry violation -- "prefer" names a real executor that does not declare the matching "for" (config-load time, ahead of resolveExecutorAndOverrides\'s own resolve-time throw)', () => {
+test('loadRunnerConfig accepts "prefer" naming a real executor that declares no matching "for" (D5 -- supersedes D2\'s own load-time symmetry check)', () => {
   const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-symmetry.json');
+  const configPath = path.join(dir, 'prefer-no-for.json');
   fs.writeFileSync(
     configPath,
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { agy: { kind: 'agent', command: 'agy' } }, // no "for"
+      executors: { agy: { kind: 'agent' } }, // no "command"/"args"/"for" at all
       capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
+      modelPolicies: { claude: { standard: 'sonnet' } },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.doesNotThrow(() => loadRunnerConfig(configPath));
+});
+
+test('loadRunnerConfig rejects "prefer" naming an executor id that does not exist at all', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'prefer-missing-executor.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capabilities: { 'fgos-coding-implement': { prefer: 'no-such-executor' } },
       modelPolicies: { claude: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),

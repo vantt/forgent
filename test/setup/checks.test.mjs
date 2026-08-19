@@ -42,7 +42,7 @@ import {
   writeEnduserManifest,
 } from './helpers/setup-checks-harness.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../../src/state/worker-slots.mjs';
-import { DEFAULT_CAPABILITY_SLOTS, DEFAULT_IRON_LAW_LEVEL, findDomainWorkflowSkillMapGaps } from '../../src/setup/registrations.mjs';
+import { DEFAULT_CAPABILITY_SLOTS, DEFAULT_IRON_LAW_LEVEL, PI_EXECUTOR_DEFAULT, findDomainWorkflowSkillMapGaps } from '../../src/setup/registrations.mjs';
 import { addDecision } from '../../src/state/store.mjs';
 
 
@@ -1030,7 +1030,12 @@ test('config-not-stale passes when the existing config already has every default
   fs.writeFileSync(
     path.join(cwd, '.fgos', 'config.json'),
     JSON.stringify({
-      runner: { ...DEFAULT_RUNNER_CONFIG, capabilities: DEFAULT_CAPABILITY_SLOTS },
+      runner: {
+        ...DEFAULT_RUNNER_CONFIG,
+        capabilities: DEFAULT_CAPABILITY_SLOTS,
+        modelPolicies: { ...DEFAULT_RUNNER_CONFIG.modelPolicies, 'openai-codex': { lightweight: 'gpt-5.5' } },
+        executors: { pi: PI_EXECUTOR_DEFAULT },
+      },
       gateBypass: { level: 'off' },
       cleanup: { ttlDays: DEFAULT_CLEANUP_TTL_DAYS, leafTtlDays: DEFAULT_CLEANUP_LEAF_TTL_DAYS },
       herdrOrchestrator: DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,

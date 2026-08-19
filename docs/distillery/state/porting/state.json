@@ -323,6 +323,10 @@
     "doc-rot-close-gate-bundle": {
       "id": "doc-rot-close-gate-bundle",
       "status": "candidate"
+    },
+    "pi-executor-runtime-capacity": {
+      "id": "pi-executor-runtime-capacity",
+      "status": "adapted"
     }
   }
 }

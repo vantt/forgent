@@ -2,7 +2,7 @@
 area: distillery
 updated: 2026-07-17
 sources: [distillery-state-consumer]
-decisions: [phase-1-state-layer-D1, distillery-state-consumer-D1, distillery-state-consumer-D2, distillery-state-consumer-D3, distillery-state-consumer-D4, distillery-state-consumer-D5, distillery-state-consumer-D6]
+decisions: []
 coverage: partial
 ---
 
@@ -87,16 +87,15 @@ source comparison, candidate ranking) are out of scope here — see Open Gaps.
 
 ## Business Rules
 
-- **R1** (per distillery-state-consumer D3): the lifecycle governs the Status
-  field only. Score, Local, destination, commit, and notes stay freely
-  editable and are never touched by a status change.
-- **R2** (per distillery-state-consumer D2): the durable record of status
-  changes is the source of truth. The human-readable porting log is always a
-  reflection of it — after cutover, it is never hand-edited for Status again.
-- **R3** (per distillery-state-consumer D1/D5): status changes for distillery
-  candidates go through the same kind of durable, rule-checked mechanism
-  forgent uses for tracking its own work — not a separate, informal
-  mechanism built just for this.
+- **R1.** The lifecycle governs the Status field only. Score, Local,
+  destination, commit, and notes stay freely editable and are never touched
+  by a status change.
+- **R2.** The durable record of status changes is the source of truth. The
+  human-readable porting log is always a reflection of it — after cutover,
+  it is never hand-edited for Status again.
+- **R3.** Status changes for distillery candidates go through the same kind
+  of durable, rule-checked mechanism forgent uses for tracking its own
+  work — not a separate, informal mechanism built just for this.
 
 ## Edge Cases Settled
 
