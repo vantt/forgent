@@ -297,8 +297,8 @@ citation, footprint, and verify. Written below, **created nowhere** —
   },
   {
     "title": "Đổi tên role human-advisor -> advisor, sweep position->role trong task-spec header",
-    "verify": "npm test -- roleGraph handoff && grep -rL 'human-advisor' src/ | wc -l",
-    "action": "D16: roleGraph.roles + mọi edge to:'human-advisor' đổi thành 'advisor'; sweep header position->role ở mọi task-spec",
+    "verify": "npm test -- roleGraph handoff && grep -rL \"human-advisor\" src/ | wc -l",
+    "action": "D16: roleGraph.roles + moi edge to:human-advisor doi thanh advisor; sweep header position->role o moi task-spec",
     "footprint": ["src/state/workflow-stage-graphs.mjs", "docs/task-specs/coding/*.md"],
     "kind": "chore",
     "risk": "light"
@@ -329,7 +329,7 @@ citation, footprint, and verify. Written below, **created nowhere** —
   },
   {
     "title": "Thêm bundleForStage(domain, stage), sửa fgos-coding-implement bỏ hardcode task-spec path",
-    "verify": "npm test -- bundleForStage && grep -c 'docs/task-specs/coding' .agents/skills/fgos-coding-implement/SKILL.md",
+    "verify": "npm test -- bundleForStage && grep -c \"docs/task-specs/coding\" .agents/skills/fgos-coding-implement/SKILL.md",
     "action": "D14/D29/D30: resolver mới trả {skill,taskSpec} qua resolveWorkflow trước, driving gọi 1 lần mỗi stage-entry",
     "footprint": ["src/state/workflow-stage-graphs.mjs", ".agents/skills/fgos-coding-implement/SKILL.md"],
     "kind": "task",
@@ -369,7 +369,7 @@ citation, footprint, and verify. Written below, **created nowhere** —
   },
   {
     "title": "Tách doctrine core/domain: AGENTS.md gốc rút gọn, domains/coding/AGENTS.md mới, routing tự Read",
-    "verify": "npm test && grep -c 'fgos-coding-' AGENTS.md",
+    "verify": "npm test && grep -c \"fgos-coding-\" AGENTS.md",
     "action": "D23: cắt mục fgOS Workflow + GitNexus khỏi root, dời sang domains/coding/AGENTS.md, fgos-routing đọc thêm khi domain resolve",
     "footprint": ["AGENTS.md", "CLAUDE.md", "domains/coding/AGENTS.md", ".agents/skills/fgos-routing/SKILL.md"],
     "kind": "task",
@@ -401,6 +401,19 @@ citation, footprint, and verify. Written below, **created nowhere** —
   }
 ]
 ```
+
+## Feasibility matrix (`fgos-coding-validating`, this session)
+
+Every medium+ risk-map row above, scored PASS/FAIL against real evidence
+— never plausibility language.
+
+| Assumption | Risk | Proof required | Evidence found | Result |
+|---|---|---|---|---|
+| `stage-fsm.mjs`'s 2 flat-property reads can be safely redirected through `resolveWorkflow` | Medium | Read the real lines, confirm `resolveWorkflow` already exists and is exported | `src/state/workflow-stage-graphs.mjs` read directly this session (D17's own scout, re-confirmed by the independent opus review agent's spot-check: "stage-fsm.mjs:94, plan.mjs:519, loop.mjs:1297... all hold") | PASS |
+| `workflow-stage-graphs.mjs` aggregator rewrite is buildable against real `yaml` package, no new dependency | High | Confirm `yaml` is a real, already-present dependency | `package.json:37`, `"dependencies": {"yaml": "^2.9.0"}` — the repo's ONLY real dependency, read directly this session | PASS |
+| The 15-child split's concurrency plan (which pieces are safe to run via `fgos-fanout` at once) | High | Cross-check every child's real `footprint` array against every other's | Done mechanically this session (Python set-intersection over the JSON block above) — found 7 real collisions the original wave grouping missed; **plan.md's own "Phased execution order" section above was rewritten to match this evidence**, not the other way around | PASS (after correction — see the decision logged at seq 21388) |
+| `.agents/skills/`/`.claude/agents/` external render-target shape stays byte-identical through the assembly-mechanism changes | High | Existing coexistence test still covers this | `test/e2e/coexistence-canary.test.mjs` exists (cited across multiple D-IDs, D7/D24); not re-run here (no code changed yet — this is a planning-stage gate, not an implementation verify) — **flagged, not proven**: this test's CURRENT pass/fail state should be re-confirmed once `{#task-skill-assembly-mechanism}` is actually implemented, not assumed green from citation alone |
+| Current `main`/branch test baseline is green before any of this item's own code changes | Medium (methodological — affects how every child's own `npm test`-based verify should be read) | Run `npm test` for real, right now, before any child starts | **Ran `npm test` this session: 3483 tests, 3476 pass, 2 fail, 5 skipped, 83.4s.** The 2 failures are both in `test/runner/dispatch.test.mjs` (`.fgos/config.json`'s committed `runner` section not matching 2 assertions about `agy`'s `--dangerously-skip-permissions` arg and the worker's exact tool-grant list — looks like local `.fgos/config.json` drift from this machine's own RTK tooling, unrelated to any of tsk-397's 34 locked decisions or 15 planned children) | **FAIL as a blanket "npm test green" assumption — FLAGGED, not blocking.** Neither failing test is in any child's own named narrow verify scope (`stage-fsm`, `handoff`, `task-specs`, `dispatch` scoped tests would need checking individually — `dispatch.test.mjs` IS touched by `{#task-persona-key-extension}`'s own bare-suite verify, worth narrowing). Whoever runs a bare `npm test` verify (root item's own aggregate verify, `{#task-domain-registry-split}`'s own verify) must recognize these 2 specific pre-existing failures by name and not treat them as caused by this item's own work. Triaging/fixing them is explicitly OUT OF SCOPE for tsk-397 (not one of the 34 locked decisions) — noted here so nobody mistakes them for a regression this item caused. |
 
 ## Outstanding questions
 
