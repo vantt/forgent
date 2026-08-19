@@ -12,6 +12,7 @@ import {
   extractFrontmatter,
   generateWrapperContent,
   generateAllSkillWrappers,
+  assembleSkills,
   materializeSkillsIntoProject,
 } from '../../src/setup/skill-wrappers.mjs';
 
@@ -147,3 +148,38 @@ test('materializeSkillsIntoProject is a no-op when packageRoot has no .agents/sk
   assert.deepEqual(wrappersWritten, []);
   assert.equal(fs.existsSync(path.join(targetRoot, '.agents')), false);
 });
+
+test('assembleSkills assembles skills from core/skills/ and domains/*/skills/ into .agents/skills/', () => {
+  const root = mkTempDir('skill-wrappers-assemble-');
+  writeSkill(path.join(root, 'core', 'skills'), 'fgos-routing', SAMPLE_FRONTMATTER, '# Core Routing\n');
+  writeSkill(path.join(root, 'domains', 'coding', 'skills'), 'fgos-coding-implement', SAMPLE_FRONTMATTER, '# Coding Implement\n');
+
+  const assembled = assembleSkills(root);
+
+  assert.equal(assembled.length, 2);
+  assert.ok(fs.existsSync(path.join(root, '.agents', 'skills', 'fgos-routing', 'SKILL.md')));
+  assert.ok(fs.existsSync(path.join(root, '.agents', 'skills', 'fgos-coding-implement', 'SKILL.md')));
+});
+
+test('assembleSkills is a safe no-op returning [] when neither core/skills nor domains/ exist', () => {
+  const root = mkTempDir('skill-wrappers-assemble-noop-');
+  const assembled = assembleSkills(root);
+  assert.deepEqual(assembled, []);
+});
+
+test('materializeSkillsIntoProject runs assembly first so core/skills and domains/*/skills materialize into target project', () => {
+  const packageRoot = mkTempDir('skill-wrappers-mat-assemble-pkg-');
+  writeSkill(path.join(packageRoot, 'core', 'skills'), 'fgos-routing', SAMPLE_FRONTMATTER, '# Core Routing\n');
+  writeSkill(path.join(packageRoot, 'domains', 'coding', 'skills'), 'fgos-coding-implement', SAMPLE_FRONTMATTER, '# Coding Implement\n');
+  const targetRoot = mkTempDir('skill-wrappers-mat-assemble-target-');
+
+  const { copied, wrappersWritten } = materializeSkillsIntoProject(packageRoot, targetRoot);
+
+  assert.equal(copied, true);
+  assert.equal(wrappersWritten.length, 2);
+  assert.ok(fs.existsSync(path.join(targetRoot, '.agents', 'skills', 'fgos-routing', 'SKILL.md')));
+  assert.ok(fs.existsSync(path.join(targetRoot, '.agents', 'skills', 'fgos-coding-implement', 'SKILL.md')));
+  assert.ok(fs.existsSync(path.join(targetRoot, '.claude', 'skills', 'fgos-routing', 'SKILL.md')));
+  assert.ok(fs.existsSync(path.join(targetRoot, '.claude', 'skills', 'fgos-coding-implement', 'SKILL.md')));
+});
+
