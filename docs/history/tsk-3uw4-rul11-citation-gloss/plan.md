@@ -55,12 +55,22 @@ already delivered and merged before this item was even claimed).
 ## Verify
 
 ```
-npm test -- test/docs/rul11-anchor-phrase.test.mjs && node scripts/check-decision-citation-drift.mjs --decisions-dir docs/decisions --backlog docs/backlog.md --specs-dir docs/specs --skills-dir .agents/skills --skills-dir plugins/fgOS/skills --write-baseline && node -e "const d=require('./scripts/check-decision-citation-drift.baseline.json'); const r=(d['docs/specs/platform-foundations.md']||[]); if(r.length!==0){console.error('still',r.length,'findings on platform-foundations.md');process.exit(1);} console.log('platform-foundations.md findings: 0');"
+node --test test/docs/rul11-anchor-phrase.test.mjs && node scripts/check-decision-citation-drift.mjs --decisions-dir docs/decisions --backlog docs/backlog.md --specs-dir docs/specs --skills-dir .agents/skills --skills-dir plugins/fgOS/skills --write-baseline && node -e "const d=require('./scripts/check-decision-citation-drift.baseline.json'); const r=(d['docs/specs/platform-foundations.md']||[]); if(r.length!==0){console.error('still',r.length,'findings on platform-foundations.md');process.exit(1);} console.log('platform-foundations.md findings: 0');"
 ```
 
-impact-analysis: inactive (this item touches no code symbol — a
-docs/spec line and a hardcoded test string constant — so the capability
-gate does not apply here regardless of GitNexus's live status).
+(`npm test -- <file>` was tried first and rejected: `package.json`'s
+`test` script hardcodes `node --test 'test/**/*.test.mjs'` with no
+argument-passthrough, so `npm test -- <file>` appends the file as an
+extra positional arg alongside the full glob instead of replacing it —
+runs the entire suite, not just this test. Confirmed live: it ran past
+its 120s timeout instead of the 242ms a scoped `node --test <file>` run
+actually took. Calling `node --test` directly is the correct scope.)
+
+impact-analysis: full (`fgos tool query --capability impact-analysis
+--status present` shows gitnexus registered and present) — not applied
+as evidence here because it is not applicable: this item touches no code
+symbol, only a docs/spec prose line and a hardcoded test string
+constant, so there is no blast radius for `impact`/`context` to trace.
 
 ## Outstanding questions
 
