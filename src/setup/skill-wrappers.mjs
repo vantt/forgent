@@ -73,6 +73,18 @@ export function generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot) {
     fs.mkdirSync(wrapperDir, { recursive: true });
     fs.writeFileSync(wrapperPath, generateWrapperContent(sourceContent, sourceRelativePath));
     written.push(wrapperPath);
+
+    const skillDir = path.join(agentsSkillsRoot, entry.name);
+    for (const subEntry of fs.readdirSync(skillDir, { withFileTypes: true })) {
+      if (subEntry.name === 'SKILL.md') continue;
+      const subSource = path.join(skillDir, subEntry.name);
+      const subTarget = path.join(wrapperDir, subEntry.name);
+      if (subEntry.isDirectory()) {
+        copyDirRecursive(subSource, subTarget);
+      } else {
+        fs.copyFileSync(subSource, subTarget);
+      }
+    }
   }
   return written;
 }

@@ -96,16 +96,13 @@ own judgment.
   sequential), run `node src/runner/dispatch.mjs decide --work <id>
   --has-live-task-access` (this skill always has live Task access — it is
   what fires the Agent batch below). A `mechanism: "in-process"` result
-  confirms this candidate's dispatch executor expects exactly what this
-  skill already does (fire an Agent running `/fgOS:pick <id>`) — proceed
-  to that candidate's announce line, using the result's own `agentType`
-  for `<subagent_type>` when present. Any other `mechanism`
-  (`"out-of-process"`/`"unavailable"`) means this candidate's own executor
-  does NOT expect native Task-tool dispatch — this skill has no
-  out-of-process firing path of its own (a different producer's job), so
-  report that id back to the caller as needing a person instead of firing
-  an Agent for it; it does not count against this batch's announce/fire
-  step below.
+  confirms this candidate's dispatch executor expects native Task-tool dispatch
+  (fire an Agent running `/fgOS:pick <id>`) — proceed to that candidate's
+  announce line, using the result's own `agentType` for `<subagent_type>`
+  when present. A `mechanism: "out-of-process"` result fires out-of-process directly
+  via `fgos pick "<id>"`, `dispatch.mjs execute "<executorId>" --cwd "<worktree-path>"`,
+  and `fgos return "<id>"`. Only a `mechanism: "unavailable"` result means no executor
+  is registered, and reports that id back to the caller as needing a person.
 - **Announce every dispatch before firing it.** Print one line per
   candidate, the same shape every dispatch path in the repo uses for
   observability parity:
