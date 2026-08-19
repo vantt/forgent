@@ -33,25 +33,13 @@ state or touches git worktrees directly — every write goes through the
 
 2. **Claim the item and stand up its worktree.** Run:
 
+   See `../_shared/fgos-cli-fallback.md`, substituting `<verb-cmd>` with:
+
    ```
-   # fgos CLI fallback (tsk-1no D3)
-   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
-   if [ -f "$FGOS_BIN" ]; then
-     node "$FGOS_BIN" pick $ARGUMENTS --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-   elif command -v fgos >/dev/null 2>&1; then
-     fgos pick $ARGUMENTS --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-   else
-     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
-     exit 1
-   fi
+   pick $ARGUMENTS --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
    ```
 
-   Always use the literal `${CLAUDE_PROJECT_DIR}` substitution shown above,
-   never a relative path — an installed plugin's files run from a copied
-   cache location, not from this repo checkout, so a relative path would
-   resolve to the wrong place or fail outright.
-
-   `--dir` (tsk-56t): most picks run from the main checkout, where this is
+   `--dir`: most picks run from the main checkout, where this is
    a no-op — but tsk-424's chaining case (a session already inside a root
    item's worktree calling `/fgOS:pick` again on a child item, via a
    second in-session `EnterWorktree`) means this cwd can already BE a

@@ -102,17 +102,10 @@ one has to keep a pane open to see it.
 
    Read the item's live status:
 
+   See `../_shared/fgos-cli-fallback.md`, substituting `<verb-cmd>` with:
+
    ```
-   # fgos CLI fallback (tsk-1no D3)
-   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
-   if [ -f "$FGOS_BIN" ]; then
-     node "$FGOS_BIN" list --id $ARGUMENTS --json --dir "$root"
-   elif command -v fgos >/dev/null 2>&1; then
-     fgos list --id $ARGUMENTS --json --dir "$root"
-   else
-     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
-     exit 1
-   fi
+   list --id $ARGUMENTS --json --dir "$root"
    ```
 
    If `data.work["$ARGUMENTS"].status` already reads `doing`, skip straight
@@ -125,17 +118,10 @@ one has to keep a pane open to see it.
    never on the main checkout, so the claim below is a real worktree
    claim, not a status-only one:
 
+   See `../_shared/fgos-cli-fallback.md`, substituting `<verb-cmd>` with:
+
    ```
-   # fgos CLI fallback (tsk-1no D3)
-   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
-   if [ -f "$FGOS_BIN" ]; then
-     node "$FGOS_BIN" pick $ARGUMENTS --dir "$root"
-   elif command -v fgos >/dev/null 2>&1; then
-     fgos pick $ARGUMENTS --dir "$root"
-   else
-     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
-     exit 1
-   fi
+   pick $ARGUMENTS --dir "$root"
    ```
 
    On success, read the command's JSON output for the worktree's **path**
