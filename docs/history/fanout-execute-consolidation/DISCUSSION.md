@@ -2,13 +2,11 @@
 
 ## 1. Trạng thái hiện tại
 
-Round 3. Đã chốt 1 điểm (D1 — verb mới đặt trong `dispatch.mjs`, giữ
-nguyên qua 2 round). 4 điểm còn lại (phạm vi gom, risk-keyword-check lộ ra
-skill, note hazard trong CONTEXT.md, mở rộng `fgos schedule`) mới được trả
-lời lần đầu ở round 3 — đang nghiêng theo hướng người trả lời, chờ round 4
-xác nhận không đổi ý mới mint D-ID. Câu hỏi mới nổi ở round 3 (nhánh
-in-process là lỗi gì) đã trả lời trực tiếp trong hội thoại, không phải 1
-quyết định thiết kế — không cần D-ID, chỉ ghi lại làm bối cảnh.
+**Hội tụ.** Người quyết định (2026-08-19): "đủ để làm rồi vì đó là giới
+hạn của harness, giải quyết theo cách của em" — uỷ quyền chốt 3 điểm còn
+nghiêng + thiết kế cụ thể. D1-D4 đã chốt (D1 giữ ổn định 2 round, D2-D4
+chốt theo uỷ quyền round 4). §6/§7 đã viết bản cuối. Sẵn sàng terminal
+handoff sang `fgos-coding-exploring`.
 
 ## 2. Mục tiêu & đề bài
 
@@ -23,118 +21,136 @@ bằng tay từ mô tả prose), đọc `fgos slots --json`, tự trim batch the
 đơn lẻ (như hầu hết skill khác), mà là 1 thuật toán nhiều bước với biến
 truyền qua các bước, loop, điều kiện.
 
-Mục tiêu của item này: xác định phần nào trong luồng đó gom được thành 1-2
-verb thật (chạy 1 lần, trả JSON có cấu trúc), và phần nào BẮT BUỘC ở lại
-skill vì lý do kiến trúc thật (không phải vì lười refactor).
+Mục tiêu của item này: gom phần đó thành verb thật, giữ nguyên phần bắt
+buộc ở lại skill vì lý do kiến trúc thật.
 
-**Ràng buộc kiến trúc đã xác nhận (không phải điểm cần bàn — sự thật kỹ
-thuật)**: nhánh in-process của Step 3/4 (fire native Agent chạy
-`/fgOS:pick <id>`) không thể gom vào `dispatch.mjs`/`fgos` verb, vì
-`dispatch.mjs` tự nhận nó "has no Task/Agent tool to call (a passive
-CLI/library)" (`src/runner/dispatch/cli.mjs`'s own docblock). Chỉ live
-session mới gọi được Agent tool. Vòng lặp đó ở lại skill vĩnh viễn, không
-phải một quyết định cần chốt ở đây.
+**Ràng buộc kiến trúc đã xác nhận (sự thật kỹ thuật, không phải điểm cần
+bàn)**: nhánh in-process của Step 3/4 (fire native Agent chạy
+`/fgOS:pick <id>`) không thể gom vào `dispatch.mjs`/`fgos` verb — `dispatch.mjs`
+tự nhận nó "has no Task/Agent tool to call (a passive CLI/library)". Chỉ
+live session mới gọi được Agent tool. Vòng lặp đó ở lại skill vĩnh viễn.
 
-**Bối cảnh bổ sung (round 3, không phải quyết định — giải thích 1 sự
-thật kỹ thuật đã biết từ trước)**: nhánh in-process hiện có 1 "known
-hazard" ghi sẵn trong `fgos-fanout/SKILL.md` — khi nhiều Agent chạy song
-song, mỗi Agent tự `EnterWorktree` vào worktree riêng của nó, nhưng harness
-(Claude Code CLI) lưu "đang ở worktree nào" bằng 1 cờ CHUNG cấp session,
-không phải 1 cờ riêng cho từng Agent đang chạy song song — Agent sau ghi
-đè cờ của Agent trước, gây từ chối Edit/Write/Bash hoặc trôi cwd của chính
-session điều phối. Đây là giới hạn tầng HARNESS, không phải lỗi trong code
-`dispatch.mjs` hay `fanout`'s own logic — `dispatch.mjs` không hề tham gia
-nhánh này (chỉ được hỏi 1 lần qua `decide`, không biết gì thêm), và
-`fanout` chỉ là nơi kích hoạt (vì là skill duy nhất bắn nhiều Agent cùng
-lúc), không phải nguồn gây lỗi. Không có code nào trong repo sửa được
-hành vi harness này — cách khắc phục hiện tại chỉ là né tránh (tự phát
-hiện bị từ chối → tự vào lại đúng worktree → thử lại). Item `tsk-3av`
-không chạm, không sửa hazard này ở bất kỳ phạm vi nào được chọn.
+**Bối cảnh bổ sung (không phải quyết định thiết kế)**: nhánh in-process có
+1 known hazard (worktree-isolation race khi nhiều Agent chạy song song) —
+đây là giới hạn ở tầng **harness Claude Code** (cờ "đang ở worktree nào"
+lưu theo session, không theo từng Agent song song), không phải lỗi trong
+code `dispatch.mjs` hay `fanout`. Không có code trong repo sửa được hành
+vi harness. Item này không chạm, không sửa hazard đó ở bất kỳ phạm vi nào.
 
 ## 3. Vấn đề rõ / chưa rõ
 
-| # | Câu hỏi | Trạng thái |
-|---|---|---|
-| 1 | Phạm vi gom: chỉ 3-lệnh out-of-process (pick→execute→return), hay gom cả slot-poll/trim-batch vào cùng 1 verb? | **Trả lời round 3: gom cả 2 phần.** Chờ round 4 xác nhận không đổi ý → mint D-ID. |
-| 2 | Verb mới đặt ở đâu: `dispatch.mjs` hay `bin/fgos.mjs`? | **D1 — đã chốt** (xem §4). |
-| 3 | Risk-keyword approve check — gom vào verb hay giữ lộ ra ở skill? | **Trả lời round 3: giữ lộ ra ở skill** (verb không tự approve giùm, chỉ trả kết quả gather; check + gọi `fgos approve` vẫn do skill làm, để gate an toàn không bị ẩn trong verb). Chờ round 4 xác nhận. |
-| 4 | Có cần ghi chú trong CONTEXT.md rằng item này không chạm known hazard? | **Trả lời round 3: người giao quyền quyết định lại cho phiên này** ("làm sao tốt nhất là được"). Quyết định: CÓ, sẽ ghi 1 dòng tường minh trong CONTEXT.md ở bước `fgos-coding-exploring`/`fgos-coding-planning` sau này. Coi như đã chốt về HÀNH ĐỘNG (không cần round 4 xác nhận thêm — đây là quyết định uỷ quyền, không phải 1 điểm thiết kế đang dao động), nhưng D-ID thật sẽ mint khi CONTEXT.md thực sự viết ra dòng đó (ở stage exploring), không phải ở đây. |
-| 5 | `fgos schedule` chỉ có bản KHÔNG scoped — mở rộng thêm `--candidates`, hay verb mới riêng? | **Trả lời round 3: mở rộng `fgos schedule`** thêm `--candidates <id,id,...>` optional filter (không tạo verb mới cho phần schedule). Chờ round 4 xác nhận. |
+Tất cả đã chốt — xem §4.
 
 ## 4. Quyết định đã chốt
 
 | D-ID | Tóm tắt | Round chốt |
 |---|---|---|
-| D1 | Verb mới (chain out-of-process pick→execute→return, gộp cả slot-poll/trim) đặt làm subcommand mới trong `dispatch.mjs`, cạnh `decide`/`execute`/`log` sẵn có — không tạo verb riêng trong `bin/fgos.mjs`. | Trả lời round 2, giữ nguyên không đổi qua round 3 → chốt tại round 3. |
+| D1 | Verb mới đặt làm subcommand mới trong `dispatch.mjs` (cạnh `decide`/`execute`/`log`), không tạo verb riêng trong `bin/fgos.mjs`. | Round 2, giữ ổn định qua round 3 → chốt round 3. |
+| D2 | Verb mới gom CẢ 2 phần: chain out-of-process (pick→execute→return) VÀ slot-poll/trim-batch — không tách riêng. | Round 3, uỷ quyền xác nhận round 4. |
+| D3 | Risk-keyword approve check GIỮ LỘ RA ở skill — verb mới chỉ lo tới `awaiting-approval`, không tự approve, để không ẩn gate an toàn cuối cùng trong 1 verb black-box. | Round 3, uỷ quyền xác nhận round 4. |
+| D4 | Mở rộng `fgos schedule` verb có sẵn thêm `--candidates <id,id,...>` optional filter — không tạo verb schedule riêng cho fanout. | Round 3, uỷ quyền xác nhận round 4. |
+| D5 | Known hazard worktree-isolation race: ghi 1 dòng tường minh trong `CONTEXT.md` (ở bước `fgos-coding-exploring`) rằng item này không chạm/không sửa hazard đó — tránh hiểu nhầm "tiện thể fix luôn". | Round 3, uỷ quyền. Hành động thực hiện tại stage exploring, không phải ở đây. |
 
 ## 5. Q&A log
 
 - **2026-08-19 (round 1, kickoff)** — Item tạo từ audit dispatch-execute
-  optimization pass cùng ngày
-  (`plans/reports/audit-260819-2045-dispatch-execute-optimization-report.md`)
-  và quan sát của user: "code ở skill nhiều quá có tốt không... dispatch
-  xử được không". Scout xong `fgos-fanout/SKILL.md` +
-  `references/wave-dispatch-mechanics.md` (nguồn duy nhất trong 14
-  dev-skill có loop/điều kiện đa bước thật, 12/14 skill còn lại chỉ có
-  bash 1-lệnh) + xác nhận `computeSchedule`/`hasWorkerSlotRoom`/
-  `countWorkerSlots` đã là hàm JS pure có sẵn (`src/state/graph-
-  metrics.mjs`, `src/state/worker-slots.mjs`). Verify thêm: `fgos schedule`
-  (CLI, `bin/fgos.mjs:2550`) đã bọc `computeSchedule` nhưng chỉ bản KHÔNG
-  scoped (toàn frontier, không nhận `candidateIds`) — không phủ case
-  fanout cần. Đặt 5 câu hỏi ở §3.
-- **2026-08-19 (round 2)** — User trả lời câu 2 (verb theo `dispatch`),
-  yêu cầu giải thích thêm câu 1/3/4/5 trước khi quyết. Giải thích lại từng
-  câu bằng ví dụ cụ thể (slot-poll/trim với số liệu 5 candidate/2 free
-  slot; risk-keyword với ví dụ "production"/"security"; phân biệt
-  `fgos schedule` (đồ thị/wave) vs `dispatch` (cơ chế chạy 1 item); "tiện
-  thể fix luôn" giải thích là giả định nhầm khi sửa vùng lân cận).
-- **2026-08-19 (round 3)** — User trả lời câu 1 (gom cả 2 phần), câu 3
-  (giữ lộ ra ở skill), câu 5 (mở rộng `fgos schedule`), uỷ quyền câu 4 cho
-  phiên quyết. Hỏi thêm: nhánh in-process đang lỗi gì, dispatch hay fanout
-  — trả lời trực tiếp: lỗi ở tầng harness (worktree-isolation state lưu
-  theo session, không theo từng Agent song song), không phải lỗi code của
-  `dispatch.mjs` hay `fanout` — cả hai module đều không có cách sửa được.
-  D1 mint (verb location, giữ ổn định qua round 2→3).
+  optimization pass cùng ngày và quan sát của user: "code ở skill nhiều
+  quá có tốt không... dispatch xử được không". Scout `fgos-fanout/SKILL.md`
+  + `references/wave-dispatch-mechanics.md` (nguồn duy nhất trong 14
+  dev-skill có loop/điều kiện đa bước thật) + xác nhận `computeSchedule`/
+  `hasWorkerSlotRoom`/`countWorkerSlots` là hàm JS pure có sẵn + `fgos
+  schedule` verb có sẵn nhưng chỉ bản KHÔNG scoped. Đặt 5 câu hỏi.
+- **2026-08-19 (round 2)** — Trả lời câu 2 (verb theo `dispatch`). Giải
+  thích lại câu 1/3/4/5 bằng ví dụ cụ thể.
+- **2026-08-19 (round 3)** — Trả lời câu 1 (gom cả 2 phần), câu 3 (giữ lộ
+  ra skill), câu 5 (mở rộng `fgos schedule`), uỷ quyền câu 4. Hỏi thêm
+  nhánh in-process lỗi gì — trả lời: lỗi harness, không phải dispatch/
+  fanout. D1 mint.
+- **2026-08-19 (round 4, hội tụ)** — "đủ để làm rồi vì đó là giới hạn của
+  harness, giải quyết theo cách của em." D2/D3/D4/D5 mint theo uỷ quyền.
+  §6/§7 viết bản cuối. Terminal handoff.
 
 ## 6. Thiết kế đã chốt {#design}
 
-**Trạng thái: đang hình thành — 1/5 điểm đã D-ID (D1), 4/5 điểm đang
-nghiêng theo câu trả lời round 3, chưa đủ 1 round ổn định để mint D-ID.**
-Phần dưới đây phản ánh hướng hiện tại, không phải quyết định cuối.
+**`fgos schedule` mở rộng (D4)**: thêm flag optional `--candidates
+<id,id,...>`. Khi có, `bin/fgos.mjs`'s `schedule` case truyền
+candidateIds xuống `store.mjs`'s `computedSchedule(dir, candidateIds)` →
+`computeSchedule(view, candidateIds)` thay vì tính cả frontier. Không có
+cờ → hành vi y hệt hôm nay (mọi caller cũ không đổi).
 
-`fgos-fanout`'s nhánh out-of-process (Step 2-3-5 hiện tại của
-`wave-dispatch-mechanics.md`) dự kiến gom thành:
+**`dispatch.mjs fanout-batch` — subcommand mới (D1 + D2)**: nhận 1 danh
+sách candidate id đã qua bước schedule ở trên (`--candidates <id,...>`),
+tự làm:
+1. Đọc `fgos slots --json` **một lần**. Nếu `hasRoom: false` → trả về
+   ngay `{fired: [], deferred: <toàn bộ candidate>, slotsFull: true}`,
+   KHÔNG tự chờ/tự poll lại bên trong verb — việc chờ-rồi-thử-lại giữa
+   nhiều lần gọi verb là việc của vòng lặp ngoài (skill), verb chỉ trả
+   lời true/false cho 1 lần hỏi, giữ verb nhỏ/nhanh/dễ test, không block
+   process gọi nó cả chục phút.
+2. Trim candidate xuống `execution.free` khi là số thật (giữ nguyên logic
+   `min(batch.length, execution.free)`; `null` = không trim).
+3. Với từng candidate đã trim, tuần tự: gọi lại `decide --work <id>
+   --has-live-task-access` (đề phòng race giữa lúc skill hỏi lần đầu và
+   lúc verb này chạy thật — mechanism có thể đã đổi) → nếu vẫn
+   `out-of-process`: `fgos pick <id>` → `dispatch.mjs execute
+   <executorId> --cwd <worktreePath>` → thành công thì `fgos return
+   <id>`. Nếu mechanism đã đổi hoặc `unavailable`: không claim, xếp vào
+   `mechanismChanged`/`unavailable`.
+4. Trả về JSON: `{fired: [{id, status, ...}], mechanismChanged: [...],
+   unavailable: [...], deferred: [...candidate bị trim, chưa chạm]}`.
 
-1. **`fgos schedule` mở rộng** (Q5, đang nghiêng): thêm `--candidates
-   <id,id,...>` optional. Khi có, `computedSchedule` truyền candidateIds
-   xuống `computeSchedule(view, candidateIds)` thay vì tính cả frontier —
-   phủ đúng case fanout cần (1 parent, tập con của nó), không đổi hành vi
-   khi cờ vắng mặt (mọi caller cũdùng `fgos schedule` không candidates vẫn
-   y nguyên).
-2. **1 subcommand mới trong `dispatch.mjs`** (D1, đã chốt + Q1 đang
-   nghiêng: gom cả chain lẫn slot-poll/trim): nhận 1 batch candidate (đã
-   qua bước 1 ở trên), tự đọc `fgos slots --json`, tự trim theo
-   `execution.free`, rồi với từng candidate trong batch đã trim: tự chạy
-   `fgos pick` → (gọi `decide` để xác nhận vẫn `out-of-process` — tránh
-   race giữa lúc fanout hỏi lần đầu và lúc verb này chạy thật) →
-   `execute` → `fgos return`. Trả về JSON liệt kê từng candidate: đã fire
-   / cần người (dispatch-unavailable) / lỗi. Risk-keyword check (Q3, đang
-   nghiêng: KHÔNG gom) không nằm trong verb này — verb chỉ lo tới
-   `awaiting-approval`, không tự approve.
-3. **Approve vẫn ở skill**: sau khi verb ở bước 2 trả về, `fgos-fanout`
-   tự đọc lại state, tự chạy risk-keyword check + `fgos approve` cho từng
-   leaf đạt `awaiting-approval` — y hệt hành vi hôm nay, chỉ khác là
-   không còn tự tay lo claim/execute/return/slot-poll nữa.
+**Approve vẫn ở skill (D3)**: sau khi verb trên trả về, `fgos-fanout` tự
+đọc lại state (`fgos list --json`), tự chạy risk-keyword check +
+`fgos approve` cho từng leaf đạt `awaiting-approval` — y hệt hành vi hôm
+nay, chỉ khác là không còn tự tay lo claim/execute/return/slot-poll/trim
+nữa.
 
-Nhánh in-process (fire native Agent) không đổi — bắt buộc ở lại skill (lý
-do kiến trúc, §2). Known hazard worktree-isolation race không bị chạm —
-sẽ ghi chú tường minh trong `CONTEXT.md` sau này (Q4, đã quyết định hành
-động, D-ID thật mint ở stage exploring).
+**Vòng lặp ngoài (skill, không đổi bản chất)**: `fgos-fanout`'s Step 6
+("go back to Step 1") vẫn giữ nguyên — khi `fanout-batch` trả về
+`slotsFull: true` hoặc còn `deferred`, skill tự chờ ~60s rồi gọi lại
+đúng như hôm nay, chỉ khác là 1 lệnh thay vì tự tay làm 5+ bước.
 
-Chưa vẽ diagram — thiết kế còn 4/5 điểm chưa đủ ổn định qua 1 round, vẽ
-bây giờ sẽ phải vẽ lại. Sẽ vẽ khi round 4 xác nhận không ai đổi ý.
+**Nhánh in-process, hazard**: không đổi (§2).
+
+```mermaid
+flowchart TD
+  A["fgos-fanout: Step 1-2<br/>compute candidates"] --> B["fgos schedule<br/>--candidates id,id,..."]
+  B --> C["fgos-fanout: per-candidate decide<br/>(chia in-process / out-of-process)"]
+  C -->|in-process| D["skill tự bắn native Agent<br/>(không đổi, kiến trúc bắt buộc)"]
+  C -->|out-of-process batch| E["dispatch.mjs fanout-batch<br/>--candidates id,id,..."]
+  E --> F{slots đầy?}
+  F -->|có| G["trả về slotsFull,<br/>deferred = tất cả"]
+  F -->|không| H["trim theo execution.free,<br/>pick→decide-recheck→execute→return<br/>từng candidate"]
+  G --> I["skill: chờ ~60s, lặp lại"]
+  H --> J["skill: đọc state, risk-keyword check,<br/>fgos approve từng leaf"]
+  D --> J
+  I --> A
+  J --> A
+```
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-(chưa chia — chờ §6 ổn định hết 5 điểm trước, dự kiến 1 task duy nhất vì
-đây là 1 khối thay đổi liền mạch, không có dấu hiệu cần tách)
+### {#task-fanout-execute-consolidation}
+
+**Goal**: gom nhánh out-of-process của `fgos-fanout` (schedule scoped +
+slot-poll/trim + pick/execute/return) vào 2 verb thật (`fgos schedule
+--candidates`, `dispatch.mjs fanout-batch`), viết lại
+`wave-dispatch-mechanics.md` để agent chỉ cần gọi 2 lệnh thay vì tự tay
+làm ~15 bước bash. Risk-keyword approve + nhánh in-process không đổi.
+
+**§6 excerpt áp dụng**: toàn bộ §6 ở trên — cả 2 verb mới, cả phần "vẫn ở
+skill".
+
+**D-ID áp dụng**: D1, D2, D3, D4, D5.
+
+**Quan hệ với item khác**: không có sibling — 1 khối thay đổi liền mạch,
+không tách nhỏ hơn (đổi `fgos schedule` và thêm `fanout-batch` phải đi
+cùng nhau để `wave-dispatch-mechanics.md` viết lại 1 lần, không viết 2
+lần cho 2 nửa việc).
+
+**Draft verify**: `npm test` xanh (đặc biệt `test/cli/fgos-schedule*`,
+`test/runner/dispatch.test.mjs` mới thêm cho `fanout-batch`) + 1 test
+CLI thật gọi `dispatch.mjs fanout-batch` với executor giả (echo script,
+theo đúng pattern `writeEchoExecutor` đã có trong `dispatch.test.mjs`)
+xác nhận trả JSON đúng shape ở cả 2 nhánh (`slotsFull`, và fire thành
+công).
