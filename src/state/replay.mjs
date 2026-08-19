@@ -481,7 +481,23 @@ function applyEvent(view, event) {
       // callstack cap (src/state/handoff.mjs's own `openCallDepth` input
       // is computed by the caller from this array, never stored as a
       // counter field — a counter can drift from the log; a fold cannot).
-      const { id, from, to, reason, mode, returning, note } = event.payload ?? {};
+      const raw = event.payload ?? {};
+      const id = raw.id;
+      // tsk-397 D16 renamed the coding roleGraph's 'human-advisor' role to
+      // 'advisor'. events.jsonl is append-only and already carries real
+      // pre-rename 'human-advisor' handoffs (e.g. seq 18440, tsk-1yf) --
+      // without this normalization, replay reconstructs a `holder` value
+      // the new vocabulary rejects (WorkValidationError on any later write
+      // to that item), permanently stranding it. Map the retired literal
+      // forward on both fields a reader might compare against the current
+      // roleGraph vocabulary -- `from`/`to` are historical record either
+      // way, so normalizing here (not just `to`) keeps replay internally
+      // consistent instead of only patching the field that happens to
+      // throw today.
+      const normalizeRole = (role) => (role === 'human-advisor' ? 'advisor' : role);
+      const from = normalizeRole(raw.from);
+      const to = normalizeRole(raw.to);
+      const { reason, mode, returning, note } = raw;
       const item = view.work[id];
       if (item && typeof to === 'string') {
         item.holder = to;

@@ -1073,6 +1073,25 @@ test('determinism: the zero-read fast path\'s round-tripped view is deep-equal t
   assert.deepEqual(viaFastPath, freshFold, 'the round-trip through state.json (JSON.stringify/parse) must never drop or alter a field a fresh fold would carry');
 });
 
+test('work.handoff replay normalizes the retired human-advisor literal to advisor (tsk-397 D16 rename) -- an append-only log already carrying pre-rename events must not strand an item with a holder the current vocabulary rejects', () => {
+  const dir = tmpFgosDir();
+  const logPath = logPathOf(dir);
+  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  appendEvent(logPath, { type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' } });
+  // Raw pre-rename event shape, exactly as a real log written before D16 has it
+  // (.fgos/events.jsonl seq 18440, tsk-1yf) -- never re-authored to the new
+  // literal, since the whole point is proving replay heals an already-written
+  // retired value, not that a fresh write uses the new one.
+  appendEvent(logPath, { type: 'work.handoff', payload: { id: 'a', from: 'implementer', to: 'human-advisor', reason: 'advise', mode: 'async' } });
+
+  const view = rebuildView(logPath);
+  assert.equal(view.work.a.holder, 'advisor');
+  assert.equal(view.callThreads.a.at(-1).to, 'advisor');
+
+  const freshFold = foldEvents(readEventsWhole(logPath));
+  assert.deepEqual(view, freshFold, 'the snapshot fast path and a fresh full fold must normalize identically');
+});
+
 // Local helper: reads the whole log via a bypass path (never through
 // rebuildView, so these tests' own "fresh full read" oracle is never
 // itself affected by the snapshot fast path under test).
