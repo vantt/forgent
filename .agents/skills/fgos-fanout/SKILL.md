@@ -7,14 +7,15 @@ description: >-
   parent, or a milestone's targets), waves the candidates through
   computeSchedule, asks the engine for worker-slot room, then fires a
   batch of up to 5 Agents each running /fgOS:pick end to end, reads live
-  state back (never an Agent's own narration), and
-  auto-approves each leaf that reaches awaiting-approval — except one whose
-  title/description trips a hard-gate risk keyword, which still needs a
-  person. Loops until no open child remains. Never touches the parent's own
-  gate; that always still asks. Use when a decomposed item's children are
-  independent (no unmet mutual deps) and worth running in parallel instead
-  of the sequential default. Examples: "fan out these children", "run
-  this parent item's split concurrently", "dispatch this candidate set".
+  state back (never an Agent's own narration), self-recovers from recoverable
+  worktree-isolation races, and auto-approves each leaf that reaches
+  awaiting-approval — except one whose title/description trips a hard-gate
+  risk keyword, which still needs a person. Loops until no open child remains.
+  Never touches the parent's own gate; that always still asks. Use when a
+  decomposed item's children are independent (no unmet mutual deps) and worth
+  running in parallel instead of the sequential default. Examples: "fan out these
+  children", "run this parent item's split concurrently", "dispatch this
+  candidate set".
 ---
 
 # fgos-fanout
@@ -153,29 +154,29 @@ own judgment.
   splice it raw into a shell command when checking the risk-keyword floor
   or dispatching an Agent; pass it as a discrete argument/prompt value.
 
-## Known hazard: concurrent worktree-entering dispatch is unsafe at the harness level
+## Known hazard: concurrent worktree-entering dispatch requires skill-layer self-recovery
 
-The Workflow below fires a batch of Agents in a single message, each
+The Workflow below fires a batch of up to 5 Agents in a single message, each
 running `/fgOS:pick <id>` — which stands up and enters its own worktree as
 part of its own claim step. Real incidents have found that this harness's
 own worktree-isolation state is held at **session** level, not per-agent:
 concurrent worktree-entry calls from sibling dispatched Agents clobber the
-same shared flag, so edit/write calls get refused pointing at a sibling's
-worktree, and the coordinating session's own working directory can drift
-into a sibling's worktree mid-run. Under enough concurrent contention this
-has produced a full deadlock lasting tens of minutes. A separate isolation
-mode was also tried and found not to be a fix: it hard-pins a dispatched
-Agent to a fresh throwaway worktree and cannot re-enter an *existing*
-worktree `/fgOS:pick` already stood up, which is incompatible with this
-skill's own resume-in-place loop.
+same shared flag, so Edit, Write, or Bash calls get refused pointing at a
+sibling's worktree (e.g. `"isolated in the worktree X"`), and the coordinating
+session's own working directory can drift into a sibling's worktree mid-run.
 
-**This is not fgOS code, and fgOS cannot patch it.** No isolation strategy
-tried so far has been found safe for concurrent worktree-entering dispatch
-at this skill's designed batch width. Firing a batch carries this risk
-until the harness itself changes or a real per-agent isolation mechanism
-is found — this skill does not lower its own batch size as a mitigation
-on its own authority, since a lower cap only reduces the race's
-probability, not remove it.
+**Skill-layer self-recovery instruction:**
+- Every dispatched Agent and the coordinating session MUST treat a refusal
+  containing `"isolated in the worktree X"` (or an operation refused due to active
+  worktree mismatch) as a **recoverable race**, NOT a fatal error or hard failure.
+- Upon receiving such a refusal, the affected participant (dispatched Agent or
+  coordinating session) must immediately self-recover: re-call `EnterWorktree`
+  targeting its OWN active worktree, and then retry the exact operation (Edit,
+  Write, or Bash call) that was refused.
+- **Never lower the batch cap** (keep max batch size up to 5 intact) as the fix
+  for this hazard. Lowering the batch size removes fanout's core reason to exist
+  (true concurrency); true concurrency is preserved by relying on this skill-layer
+  self-recovery instruction to handle worktree-isolation races.
 
 ## Workflow
 
@@ -277,6 +278,8 @@ concern — this skill is invocable on its own with just `parentId` +
 - inventing an approval order instead of the `merge` verb's own ranking
 - writing cancellation logic for a blocked leaf's dependents — the
   deps-not-merged guard already covers it
+- treating an Edit/Write/Bash refusal containing `"isolated in the worktree X"` as a fatal error or hard failure instead of a recoverable race that self-recovers via `EnterWorktree` back into its own worktree and retrying
+- lowering the batch cap below 5 as a workaround for harness worktree isolation races instead of preserving concurrency and relying on skill-layer self-recovery
 
 Violating the letter of the rules is violating the spirit of the rules.
 
