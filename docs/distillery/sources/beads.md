@@ -51,7 +51,7 @@ Memory/task-graph **cho coding agents** (Steve Yegge, Go, ~1.6k file — product
 ### multiagent-routing-and-slots
 - **What:** Routing quyết định theo thứ tự tường minh: explicit flag > auto role-detection (git config `beads.role`, SSH heuristic fallback) > default. Coordination primitives: assign, atomic claim, **merge slots**. Contributor namespace isolation (ID prefix riêng); agent signing (execution trail trong commit/comment).
 - **Where:** `docs/multi-agent/`, `engdocs/CONTRIBUTOR_NAMESPACE_ISOLATION.md`, `engdocs/AGENT_SIGNING.md`
-- **Notable:** danh tính agent lấy từ MÔI TRƯỜNG (git config/SSH) thay vì khai báo trong prompt — chống giả mạo rẻ hơn model-guard của bee; execution-trail signing cho audit "ai làm gì".
+- **Notable:** danh tính agent lấy từ MÔI TRƯỜNG (git config/SSH) thay vì khai báo trong prompt — chống giả mạo rẻ hơn model-guard của beehive; execution-trail signing cho audit "ai làm gì".
 - **Keywords:** role detection, merge slot, namespace, signing
 - **Seen:** 303e263
 
@@ -67,7 +67,7 @@ Memory/task-graph **cho coding agents** (Steve Yegge, Go, ~1.6k file — product
 ### dolt-as-versioned-truth
 - **What:** **Pivot lớn**: Dolt SQL (`.beads/dolt/`, gitignored) là single canonical source; JSONL chỉ còn interchange/export (`issues.jsonl`). Concurrency chuyển từ branch-per-worker sang **all-on-main + transaction discipline** (engdocs/design); 3-phase commit (mutation → PostWriteCommit → PostWritePush); sync qua `bd dolt push/pull` (Dolt native chứ không git).
 - **Where:** `engdocs/design/`, `PROPOSAL-pluggable-storage-backends.md`, `docs/core-concepts/`
-- **Notable:** hướng thứ BA của bài toán truth-store: bee = file-in-git, harness = JSONL-in-git + db-view, beads = **versioned-DB-as-truth** (version control nằm TRONG store, không nhờ git). Đánh đổi: mất git-diffable trong repo, được multi-writer + history/branch/merge cấp DB. Evidence quan trọng cho luật changeset của forgent: quỹ đạo beads RẼ KHỎI JSONL-truth khi multi-agent write trở thành tải chính.
+- **Notable:** hướng thứ BA của bài toán truth-store: beehive = file-in-git, harness = JSONL-in-git + db-view, beads = **versioned-DB-as-truth** (version control nằm TRONG store, không nhờ git). Đánh đổi: mất git-diffable trong repo, được multi-writer + history/branch/merge cấp DB. Evidence quan trọng cho luật changeset của forgent: quỹ đạo beads RẼ KHỎI JSONL-truth khi multi-agent write trở thành tải chính.
 - **Keywords:** Dolt, all-on-main, 3-phase commit, JSONL export-only
 - **Seen:** 303e263
 
@@ -88,7 +88,7 @@ Memory/task-graph **cho coding agents** (Steve Yegge, Go, ~1.6k file — product
 ### discovered-from-lineage
 - **What:** Việc phát hiện GIỮA lúc làm việc khác được ghi bằng edge `discovered-from` (non-blocking) — dòng dõi "làm A lòi ra B" là dữ liệu đồ thị query được; inheritance xuyên repo qua federation.
 - **Where:** `docs/core-concepts/`, `AGENT_INSTRUCTIONS.md`
-- **Notable:** mảnh compound-learning thuần: friction/phát-hiện không rơi vào ghi chú tự do mà thành edge có ngữ nghĩa — đối chiếu capture-queue của bee (text stub) và friction-backlog của harness (row); beads cho nó topology.
+- **Notable:** mảnh compound-learning thuần: friction/phát-hiện không rơi vào ghi chú tự do mà thành edge có ngữ nghĩa — đối chiếu capture-queue của beehive (text stub) và friction-backlog của harness (row); beads cho nó topology.
 - **Keywords:** discovered-from, lineage
 - **Seen:** 303e263
 
@@ -111,7 +111,7 @@ Memory/task-graph **cho coding agents** (Steve Yegge, Go, ~1.6k file — product
 ### hash-id-adaptive-length
 - **What:** ID = SHA256 → base36, cắt 3–8 ký tự **thích ứng**: vượt ngưỡng 25% xác suất va chạm → tự tăng độ dài; hierarchical nesting 3 cấp (`bd-a1b2.c3.d4`); collision math có tài liệu riêng; namespace prefix per-contributor.
 - **Where:** `engdocs/COLLISION_MATH.md`, `internal/idgen/`
-- **Notable:** giải đúng bài multi-agent tạo ID song song không cần điều phối trung tâm (bee dùng tên tay, harness dùng ID người đặt); adaptive-length là chi tiết trưởng thành hiếm thấy.
+- **Notable:** giải đúng bài multi-agent tạo ID song song không cần điều phối trung tâm (beehive dùng tên tay, harness dùng ID người đặt); adaptive-length là chi tiết trưởng thành hiếm thấy.
 - **Keywords:** hash ID, base36, adaptive length, collision
 - **Seen:** 303e263
 
@@ -127,7 +127,7 @@ Memory/task-graph **cho coding agents** (Steve Yegge, Go, ~1.6k file — product
 ### init-safety-invariants
 - **What:** 5–7 invariant init-safety viết thành ADR SAU sự cố mất dữ liệu thật: single-source identity, scope-bound flags, central chokepoint cho init, error-text-no-echo, race-safety; exit codes chuẩn. Kèm recovery runbook 5 bước (stop → backup → preview → fix → verify) cho corruption; atomicfile (tmp+fsync+chmod+rename) cho mọi ghi.
 - **Where:** `engdocs/adr/`, `docs/recovery/`, `internal/atomicfile/`
-- **Notable:** failure-driven invariants + runbook — cùng thể loại "học từ sự cố thật" với harness proof-before-tag (run 29222332569) và bee critical-patterns; ba nguồn độc lập cùng nghi thức hóa bài học sau tai nạn.
+- **Notable:** failure-driven invariants + runbook — cùng thể loại "học từ sự cố thật" với harness proof-before-tag (run 29222332569) và beehive critical-patterns; ba nguồn độc lập cùng nghi thức hóa bài học sau tai nạn.
 - **Keywords:** init safety, recovery runbook, atomic write
 - **Seen:** 303e263
 
