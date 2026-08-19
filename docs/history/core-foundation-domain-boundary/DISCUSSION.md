@@ -10,6 +10,23 @@ status: open
 
 ## 1. Trạng thái hiện tại
 
+Round 19 — opus review + D31-D34 (2026-08-19): Bật opus agent thứ 2
+(`tsk397-discussion-review-2`, agent đầu bị kẹt không gửi được báo cáo)
+— lần này bắt ghi báo cáo ra file thật (`plans/reports/discussion-
+review-260819-2122-tsk397-boundary-report.md`) thay vì chỉ gửi qua
+message. Đọc hết 1529 dòng, đối chiếu code thật (đều đúng, chỉ 1 nuance
+nhỏ) — trả về **A:9 (mâu thuẫn/lỗi thời), B:6 (gap thiết kế thật), C:4
+(polish)**. Trợ lý sửa hết A+C (xoá 2 khối "Còn mở" đã lỗi thời sau
+D23/D24, sửa mermaid/ASCII tree thiếu node, sửa các task §7 còn trích
+`registry.mjs`/`claims`/self-reference cũ) + thêm 2 task còn thiếu hoàn
+toàn (D9 chưa từng có task di dời thật, D16 chưa từng có task rename
+thật). Trình 4 gap B còn lại (workflows/defaultWorkflow/workflowFor mồ
+côi sau D29/D30; tie-break khi nhiều agent-type cùng khớp skill; trùng
+tên agent-type xuyên domain; `_shared/` chưa gán) — người xác nhận B3/
+B5/B6 theo đề xuất, chọn a1 cho B4 rồi bổ sung trực tiếp "task-spec có
+`agent` thì ưu tiên hơn" → **D31-D34** (seq 21349-21352). 34/34 quyết
+định đã chốt.
+
 Round 19 tiếp lần nữa nữa nữa (2026-08-19), D29-D30: Người hỏi 1 câu kỹ
 thuật ("workflow khai stages trong đó luôn được không, harness chỉ
 parse file... nếu vẫn muốn parse yaml tốt thì sao, thêm dependency hay
@@ -451,7 +468,11 @@ thi thật.
 | D27 | `core/task-specs/` — folder MỚI thật, chứa task-spec cho 7 skill domain-agnostic (`fgos-routing`, `fgos-clarifying`, `fgos-researching`, `fgos-unlock`, `fgos-fanout`, `fgos-indexing`, `distill`) — hợp đồng input/output/gates/verify-template của chúng chuyển từ CHỈ ẨN trong prose SKILL.md riêng sang file task-spec tường minh, cùng kỷ luật hình dạng `domains/coding/task-specs/` (D9). KHÔNG đảo ngược D8-revised (chỉ miễn field-schema work-item — `EDITABLE_FIELDS`/`work.mjs` — khỏi cần file spec) — giải 1 câu hỏi RIÊNG, chưa từng đặt ra: 7 core-skill có cần task-spec kiểu tsk-2t9c như mọi skill coding hay không. Xác nhận là gap THẬT, chặn thật: `docs/task-specs/` hôm nay có ĐÚNG 13 file, TOÀN BỘ dưới `docs/task-specs/coding/`, 0 file cho bất kỳ core-skill nào — nghĩa là phép khớp eligibility skill-tag của D20/D24 (`requires-skill` trên task-spec, `skills`/`agent` D26 trên agent-type) KHÔNG có chỗ neo để khai `requires-skill` cho core-skill nào hôm nay. | Người: task-specs của core cần chuẩn bị trước, tường minh đúng chỗ thay vì ẩn trong code, dễ hiểu dễ bảo trì hơn. Trợ lý scout `docs/task-specs/` xác nhận đúng — 7 core-skill thật sự 0 coverage, gap thật thảo luận này chưa từng để ý (miễn trừ D8-revised là câu hỏi KHÁC — field-schema, không phải per-skill task-spec contract) — không phải scope-creep, là lấp gap mà chính cơ chế eligibility D20/D24 đã phụ thuộc vào. |
 | D28 | Giải gap `callstackCap` D25 tự nêu: cap áp dụng cho ĐỘ SÂU sync LỒNG (1 sync call tự mở 1 sync call khác trong lúc còn đang mở, chồng lên nhau) — cùng rủi ro chuỗi-chạy-vô-hạn mà `callstackCap` đã chặn cho async. Sync NGANG HÀNG/tuần tự (1 call xong hẳn rồi call khác mới bắt đầu — VD consult của stage 1 xong trước khi consult riêng của stage 2 bắt đầu sau đó) KHÔNG tính vào cap nào — không giới hạn TỔNG số sync call 1 driving session gọi suốt vòng đời, chỉ giới hạn ĐỘ SÂU lồng tại 1 thời điểm. `handoff.mjs`'s `evaluateHandoff` cần thêm tham số kiểu `openSyncDepth` (mirror `openCallDepth` hiện có, vốn chỉ tính async), chỉ tăng khi 1 sync call mở THẬT SỰ trong lúc 1 sync call khác vẫn đang mở. | Người trả lời thẳng gap D25 tự nêu: "cap cho sync là sync lồng (nested) chứ còn sync ngang hàng thì không cần cap" — phân biệt độ sâu lồng (rủi ro thật, cùng lớp async nesting đã chặn) khỏi sync tuần tự/ngang hàng suốt vòng đời driving loop (không rủi ro, vì mỗi call xong hẳn rồi call sau mới bắt đầu — cap ở đây sẽ chặn nhầm việc nhiều-stage hợp lệ, kéo dài thật). |
 | D29 | MỌI workflow — kể cả `feature`, không chỉ `bugfix`/`lightweight` tương lai — thành file thật độc lập `domains/<name>/workflows/<name>.yaml` (không phải `.mjs`). `registry.mjs`/`registry.yaml` KHÔNG còn giữ `stages`/`stepMap`/`transitions`/`skillMap`/`taskSpecMap` trực tiếp — những field đó thuộc VỀ TỪNG workflow (workflow khác có thể có stage/skill khác), chuyển hẳn vào file YAML riêng của workflow đó. Giải tán kỷ luật reference-sharing của D7a (`workflows.feature.stages === registry.stages`, giữ 1 reference để tránh trôi) — đúng cách D17 đã giải gate reference-identity cũ: `feature` không còn định nghĩa ở 2 nơi (registry.mjs VÀ workflows.feature) mà chỉ còn ĐÚNG 1 nơi (`workflows/feature.yaml`), không còn gì để giữ đồng bộ. Nạp runtime dùng gói `yaml` có sẵn (dependency thật duy nhất của repo, `package.json`, đã dùng ở `project-agents.mjs`) — không thêm gói mới. D19's tách authoring-format khỏi runtime-shape KHÔNG đổi: mỗi workflow YAML viết theo 1 khối gộp mỗi stage, `workflow-stage-graphs.mjs`'s aggregator (core) normalize lúc load thành các map tách rời sẵn có — 13 hàm resolver không đổi signature. | Người: "tôi chỉ muốn tốt nhất cho người. Author khi authoring workflows chỉ cần biết yaml workflow" — tối ưu cho người viết workflow, không cần biết JS. Trợ lý chỉ ra: chỉ đổi `bugfix`/`lightweight` sang YAML mà để `feature` (workflow đầu tiên/phổ biến nhất 1 domain author viết) vẫn JS-trong-registry.mjs thì KHÔNG đạt mục tiêu đó — người xác nhận hướng giải TRIỆT ĐỂ (mọi workflow đều YAML, kể cả `feature`), không phải fix nửa vời. |
-| D30 | `domains/<name>/registry.mjs` → `registry.yaml`. Sau D29, nội dung còn lại của registry (`roleGraph` + `worktreeBacked`/`statusLabels`/`parkReason`/`classification`) là DỮ LIỆU THUẦN, không còn logic riêng. Lý do nó từng là `.mjs` chỉ là quán tính lịch sử — vốn là object literal nằm trong `workflow-stage-graphs.mjs` (file lõi), D3/D4 chỉ dời VỊ TRÍ, chưa từng xét lại ĐỊNH DẠNG. Toàn bộ logic quét/nạp/normalize (đọc thư mục `domains/*/`, parse `registry.yaml` + `workflows/*.yaml` của từng domain, dựng map sẵn sàng cho resolver) sống hẳn trong `workflow-stage-graphs.mjs` (D4's aggregator, core) — domain KHÔNG còn file `.mjs`/JS nào của riêng nó. Hoàn tất công thức domain=dữ liệu/core=logic mà D3/D7/D9/D23/D24/D27 đã áp cho skill/knowledge/task-specs/doctrine/agent-type. **Hình dạng cuối:** 1 `domains/<name>/` là folder THUẦN YAML+prose (`registry.yaml`, `workflows/*.yaml`, `skills/*.md`, `task-specs/*.md`, `specs/*.md`, `knowledge/*.md`, `agents/*.yaml`, `AGENTS.md`) — viết 1 domain từ đầu tới cuối chỉ cần biết YAML+Markdown. | Người tiếp tục đúng nguyên lý đã nêu ở D29 tới tận cùng: "sao registry lại js mà không yaml?" Không có rào cản kỹ thuật — kỷ luật `Object.freeze`/reference-sharing từng cần cho `feature` (D7a) đã MOOT sau D29 (không còn 2 nơi phải giữ đồng bộ). |
+| D30 | `domains/<name>/registry.mjs` → `registry.yaml`. Sau D29, nội dung còn lại của registry (`roleGraph` + `worktreeBacked`/`statusLabels`/`parkReason`/`classification`) là DỮ LIỆU THUẦN, không còn logic riêng. Lý do nó từng là `.mjs` chỉ là quán tính lịch sử — vốn là object literal nằm trong `workflow-stage-graphs.mjs` (file lõi), D3/D4 chỉ dời VỊ TRÍ, chưa từng xét lại ĐỊNH DẠNG. Toàn bộ logic quét/nạp/normalize (đọc thư mục `domains/*/`, parse `registry.yaml` + `workflows/*.yaml` của từng domain, dựng map sẵn sàng cho resolver) sống hẳn trong `workflow-stage-graphs.mjs` (D4's aggregator, core) — domain KHÔNG còn file `.mjs`/JS nào của riêng nó. Hoàn tất công thức domain=dữ liệu/core=logic mà D3/D7/D9/D23/D24/D27 đã áp cho skill/knowledge/task-specs/doctrine/agent-type. **Hình dạng cuối:** 1 `domains/<name>/` là folder THUẦN YAML+prose (`registry.yaml`, `workflows/*.yaml`, `skills/*.md`, `task-specs/*.md`, `specs/*.md`, `knowledge/*.md`, `agents/*.yaml`, `AGENTS.md`) — viết 1 domain từ đầu tới cuối chỉ cần biết YAML+Markdown. | Người tiếp tục đúng nguyên lý đã nêu ở D29 tới tận cùng: "sao registry lại js mà không yaml?" Không có rào cản kỹ thuật — kỷ luật `Object.freeze`/reference-sharing từng cần cho `feature` (D7a) đã MOOT sau D29 (không còn 2 nơi phải giữ đồng bộ). **[Round 19, phát hiện qua opus review: liệt kê ở đây THIẾU `defaultWorkflow`/`workflowFor` (`resolveWorkflow` vẫn đọc cả 2) — xem D31 bổ sung đủ.]** |
+| D31 | Bổ sung gap D30 tự để sót (phát hiện qua opus review, gap B3): `workflows` (map tên→graph) KHÔNG cần khai — core's aggregator TỰ TỔNG HỢP bằng cách quét `domains/<name>/workflows/*.yaml` (basename file = tên workflow). `defaultWorkflow` (workflow mặc định) và `workflowFor` (map kind→tên workflow) LÀ dữ liệu chọn-workflow thật, thuộc cấp DOMAIN (không riêng workflow nào) — ở lại `registry.yaml`, cùng chỗ `roleGraph`+cờ. | Opus review agent (rà độc lập) tìm ra `resolveWorkflow` (`workflow-stage-graphs.mjs:670-673`) vẫn đọc cả 3 field này từ domain object, nhưng D30's registry.yaml inventory + task-domain-registry-split đều bỏ sót sau khi D29 dời workflow-data ra ngoài. Người xác nhận hướng chia: map `workflows` suy ra (không tốn công viết), `defaultWorkflow`/`workflowFor` khai tay (lựa chọn cấp domain thật, đúng chỗ với dữ liệu cấp domain khác đã có sẵn trong `registry.yaml`). |
+| D32 | Giải gap B4 (opus review): thứ tự ưu tiên khi `requires-skill` của task-spec khớp NHIỀU agent-type (D20/D22). (1) Task-spec CÓ khai `agent:` (D26's field ghim cứng) → THẮNG NGAY, bỏ qua hoàn toàn skill-matching cho lần gọi đó — ghim tường minh luôn thắng khớp suy luận. (2) KHÔNG khai `agent:`, nếu `requires-skill` khớp NHIỀU agent-type → ưu tiên agent-type ĐANG chạy nếu nó cũng khớp (đúng tinh thần D25 "ở nguyên khi có thể", tránh dispatch không cần thiết). (3) Agent-type hiện tại KHÔNG khớp mà có nhiều cái khác khớp → chọn XÁC ĐỊNH theo thứ tự khai báo (agent-type đăng ký trước thắng) — không bao giờ ngẫu nhiên, không bắt task-spec phải làm rõ trừ khi tác giả THẬT SỰ muốn ghim (đó là luật 1). | Người chọn hướng a1 (ưu tiên agent-type đang chạy, sau đó thứ tự khai báo xác định) cho trường hợp không ghim — rồi bổ sung trực tiếp: task-spec CÓ khai `agent` nên thắng toàn bộ phép khớp suy luận — ghim tường minh là lựa chọn CÓ CHỦ Ý của tác giả (D20 gọi là trường hợp hiếm/ghim cứng), không nên bị suy luận skill-match đè lên, kể cả suy luận đó tình cờ ưu tiên đúng persona đang chạy. |
+| D33 | Giải gap B5 (opus review): tên agent-type PHẢI unique TOÀN CỤC xuyên `core/agents/` + MỌI `domains/*/agents/` (không theo từng domain riêng) — doctor check mới enforce. Lý do: `scripts/project-agents.mjs` gộp PHẲNG mọi nguồn agent-type (bất kể từ folder nào) vào CHUNG 1 `.claude/agents/` (đúng cam kết "hình dạng ngoài không đổi" của D24) — 2 tên trùng ở 2 folder khác nhau sẽ ghi đè ÂM THẦM, không lỗi gì. Fail loud lúc doctor-check (cùng lớp `agent-claims-resolve`/`task-specs-resolve`), không bao giờ cho ghi đè âm thầm. | Người xác nhận trực tiếp đề xuất — cam kết "hình dạng ngoài .claude/agents/ không đổi" của D24 không chừa chỗ cho giải pháp namespace-theo-tên-file, nên unique-toàn-cục + doctor-check là lựa chọn DUY NHẤT nhất quán với D24 đã chốt. |
+| D34 | Giải gap B6 (opus review): fragment dùng chung `.agents/skills/_shared/executor-dispatch-fallback.md` (byte-mirror theo AGENTS.md, MỌI skill dispatch đều tham chiếu) chuyển hẳn về `core/skills/_shared/` — không thuộc sở hữu domain nào. Lý do: nó được tham chiếu bởi skill BẤT KỂ domain nào (skill dispatch, dù core hay domain-riêng, đều trỏ bước lý luận dispatch của mình về fragment này) — đúng tinh thần "core = dùng chung mọi domain" (D5's port principle), cùng lý luận D7 đã dùng để đặt 7 skill domain-agnostic vào `core/skills/`. | Người xác nhận trực tiếp. Đóng nốt entry cuối cùng chưa gán trong 16 folder thật của `.agents/skills/` ({#task-coding-skill-migration}'s đếm: 8 coding + 7 core = 15, fragment này là entry thứ 16, chưa gán tới giờ). |
 
 ## 5. Q&A log
 
@@ -721,6 +742,17 @@ thi thật.
   giờ thuần YAML+prose, không còn file JS riêng). Cả 2 quyết định làm
   {#task-domain-registry-split} (§7, task đầu tiên) không còn khớp thực
   tế — cần viết lại round sau.
+- 2026-08-19 — Round 19, opus review lần 2 thành công: đọc hết 1529
+  dòng, spot-check code thật, trả A:9/B:6/C:4. Trợ lý sửa A+C, thêm
+  {#task-taskspec-migration} (D9) + {#task-role-rename} (D16) — 2 quyết
+  định đã chốt từ lâu nhưng chưa từng có task thực thi. Trình 4 gap B
+  còn lại kèm đề xuất cho từng cái — người xác nhận B3 (`workflows` suy
+  ra, `defaultWorkflow`/`workflowFor` ở lại `registry.yaml`), B5 (doctor
+  check unique tên agent-type toàn cục), B6 (`_shared/` về
+  `core/skills/_shared/`), chọn a1 cho B4 (ưu tiên agent-type đang chạy,
+  sau đó thứ tự khai báo) rồi tự bổ sung: "task-spec mà có agent thì ưu
+  tiên hơn" — ghim tường minh (`agent:`) thắng mọi suy luận skill-match
+  → D31-D34.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -753,7 +785,10 @@ forgentX/
 ├── core/
 │   ├── skills/                           # ★ D7 — canonical AUTHORING (thay .agents/skills/core/)
 │   │   ├── fgos-routing/  fgos-clarifying/  fgos-researching/
-│   │   └── fgos-unlock/   fgos-fanout/      fgos-indexing/   distill/
+│   │   ├── fgos-unlock/   fgos-fanout/      fgos-indexing/   distill/
+│   │   └── _shared/                      # ★ D34 — fragment dùng chung (VD executor-dispatch-
+│   │       └── executor-dispatch-fallback.md  #   fallback.md), MỌI skill dispatch tham chiếu, không
+│   │                                     #   thuộc riêng domain nào (entry thứ 16, trước đó chưa gán)
 │   ├── agents/                           # ★ D24 — agent-type THẬT domain-agnostic (mirror skill's D7)
 │   │   └── fgos-placeholder.yaml         # di dời từ agents/ top-level (chỉ file thật hôm nay)
 │   └── task-specs/                       # ★ D27 — MỚI, task-spec cho 7 skill domain-agnostic ở trên
@@ -778,9 +813,12 @@ forgentX/
 │   │                                     #   YAML+prose, KHÔNG file .mjs/JS nào của riêng nó (round 19)
 │   ├── coding/
 │   │   ├── registry.yaml                 # ★ D30 (đổi từ registry.mjs) — CHỈ còn: roleGraph (roles/
-│   │   │   #   defaultRole/callstackCap/edges) + worktreeBacked/statusLabels/parkReason/classification.
+│   │   │   #   defaultRole/callstackCap/edges) + worktreeBacked/statusLabels/parkReason/classification
+│   │   │   #   + defaultWorkflow/workflowFor (★ D31 — dữ liệu CHỌN workflow, cấp domain thật).
 │   │   │   #   KHÔNG còn stages/stepMap/transitions/skillMap/taskSpecMap — những field đó thuộc về
-│   │   │   #   TỪNG workflow, chuyển vào workflows/*.yaml (D29). Thuần dữ liệu, không logic.
+│   │   │   #   TỪNG workflow, chuyển vào workflows/*.yaml (D29). `workflows` (map tên→graph) KHÔNG
+│   │   │   #   khai ở đây — core's aggregator TỰ suy ra bằng quét thư mục workflows/ (D31). Thuần
+│   │   │   #   dữ liệu, không logic.
 │   │   ├── workflows/                    # ★ D18+D29 — MỌI workflow, kể cả `feature`, là file YAML thật
 │   │   │   │                             #   ở đây (KHÔNG còn reference-share trong registry.yaml, D7a
 │   │   │   │                             #   moot sau D29 — chỉ còn 1 nơi, không có gì để giữ đồng bộ)
@@ -1037,7 +1075,7 @@ flowchart TB
     collabRow --> ELIG
 
     subgraph ELIG["DISPATCH eligibility-check -- THỐNG NHẤT (D20/D22)"]
-        match["requires-skill / agent (task-spec, D26)<br/>khớp skills (agent-type)"]
+        match["requires-skill / agent (task-spec, D26)<br/>khớp skills (agent-type)<br/><i>tie-break D32: agent pin thắng ngay &gt;<br/>agent-type đang chạy &gt; thứ tự khai báo</i>"]
     end
 
     ELIG -->|"khớp -- cùng agent-type"| stay["Ở NGUYÊN in-process<br/>(hôm nay: LUÔN đúng cho stage-entry,<br/>role=implementer mọi stage)"]
@@ -1167,18 +1205,24 @@ Cả 2 mục này KHÔNG phải task trong §7 — chưa đủ bằng chứng/nh
   `taskSpecMap`/`worktreeBacked`/`statusLabels`/`parkReason`/
   `classification`/`roleGraph` + `workflows`/`defaultWorkflow`/
   `workflowFor`) — KHÔNG dời nguyên khối vào 1 file `registry.mjs` nữa.
-  Tách theo D29/D30:
+  Tách theo D29/D30/D31:
   1. `roleGraph` + `worktreeBacked`/`statusLabels`/`parkReason`/
-     `classification` → `domains/coding/registry.yaml` (YAML thuần).
+     `classification` + `defaultWorkflow`/`workflowFor` (D31 — dữ liệu
+     CHỌN workflow, cấp domain thật, KHÔNG thuộc riêng workflow nào) →
+     `domains/coding/registry.yaml` (YAML thuần).
   2. `stages`/`stepMap`/`transitions`/`skillMap`/`taskSpecMap` (của
      workflow `feature`, workflow DUY NHẤT tồn tại hôm nay) →
      `domains/coding/workflows/feature.yaml` — viết theo 1 khối gộp mỗi
      stage (D19 authoring ergonomics), KHÔNG phải 4 map JS rời.
-  3. `workflow-stage-graphs.mjs` (core) mở rộng thành aggregator ĐỌC CẢ
+  3. `workflows` (map tên→graph, D31) KHÔNG khai ở đâu cả — TỰ SUY RA
+     bằng cách `workflow-stage-graphs.mjs` (core) quét thư mục
+     `domains/<name>/workflows/*.yaml`, basename file = tên workflow.
+  4. `workflow-stage-graphs.mjs` (core) mở rộng thành aggregator ĐỌC CẢ
      `domains/*/registry.yaml` LẪN `domains/*/workflows/*.yaml` (dùng
      gói `yaml` có sẵn, `package.json`), NORMALIZE lúc load thành đúng
-     hình dạng runtime hiện có (4 map tách rời) để build `DOMAINS` —
-     giữ nguyên `synthetic`/`triage`/`fixture-marketing` (fixture, ở lại
+     hình dạng runtime hiện có (4 map tách rời + `workflows`/
+     `defaultWorkflow`/`workflowFor`, D31) để build `DOMAINS` — giữ
+     nguyên `synthetic`/`triage`/`fixture-marketing` (fixture, ở lại
      core, không đổi). 13 hàm resolver (`getDomain`/`skillForStage`/
      `resolveWorkflow`/...) giữ NGUYÊN signature — chỉ nguồn dữ liệu
      phía sau đổi từ "object JS in-memory" sang "parse YAML lúc load".
@@ -1228,9 +1272,13 @@ Cả 2 mục này KHÔNG phải task trong §7 — chưa đủ bằng chứng/nh
   (`fgos-routing`, `fgos-clarifying`, `fgos-researching`, `fgos-unlock`,
   `fgos-fanout`, `fgos-indexing`, `distill`) sang `core/skills/`. Hai nơi
   này trở thành nguồn canonical AUTHORING mới (D7) — `.agents/skills/`
-  không còn là nơi sửa tay.
-- **§6 excerpt áp dụng:** khối `skill` trong cả CORE và CODING subgraph.
-- **D-ID áp dụng:** D3, D7.
+  không còn là nơi sửa tay. **CÙNG lượt (D34):** di dời luôn
+  `.agents/skills/_shared/executor-dispatch-fallback.md` sang
+  `core/skills/_shared/` — entry thứ 16 trước đó chưa gán vào bucket
+  nào (8 coding + 7 core = 15, thiếu 1).
+- **§6 excerpt áp dụng:** khối `skill` trong cả CORE và CODING subgraph
+  + dòng `_shared/` mới trong ASCII tree (D34).
+- **D-ID áp dụng:** D3, D7, D34.
 - **Quan hệ:** phụ thuộc task {#task-skill-assembly-mechanism} tồn tại
   trước (hoặc song song) — nếu di dời trước khi assembly-step sẵn sàng,
   `.agents/skills/` (và mọi thứ generate từ nó) sẽ trống cho tới khi cơ
@@ -1447,13 +1495,25 @@ lượt riêng, để chỉ đụng `stage-fsm.mjs` (module test dày đặc nh�
   5. `src/runner/dispatch.mjs`: mở rộng (D21) để `agentType` trong
      `buildAgentTypeExecutor` resolve qua skill-match thay vì đọc
      `claims` tĩnh — điểm chạm DISPATCH thật của toàn bộ đảo hướng này.
+     Implement ĐÚNG thứ tự ưu tiên D32: `agent:` pin (nếu task-spec có
+     khai) thắng ngay, bỏ qua skill-match hoàn toàn; không có pin →
+     agent-type đang chạy nếu nó cũng khớp `requires-skill`; không có
+     agent-type nào đang chạy khớp → chọn theo thứ tự khai báo (agent-type
+     đăng ký trước thắng), không bao giờ ngẫu nhiên.
 - **§6 excerpt áp dụng:** subsection "Tầng DISPATCH/ROUTING/DRIVING"
   (đoạn "Eligibility declaration (D20)" bên trong) + mermaid so sánh
-  cũ/mới ngay dưới đoạn đó.
-- **D-ID áp dụng:** D20, D21, D22, D26 (D22: phép khớp `requires-skill`
-  phải áp dụng cho task-spec CHÍNH của stage — không chỉ task-spec của
-  dòng Collaboration — để stage-entry dispatch thật sự quan sát được;
-  D26: field tên `agent`, không phải `assignable-to`).
+  cũ/mới ngay dưới đoạn đó + node `ELIG`'s tie-break annotation (D32).
+- **D-ID áp dụng:** D20, D21, D22, D26, D32 (D22: phép khớp
+  `requires-skill` phải áp dụng cho task-spec CHÍNH của stage — không
+  chỉ task-spec của dòng Collaboration; D26: field tên `agent`, không
+  phải `assignable-to`; D32: thứ tự ưu tiên khi nhiều agent-type cùng
+  khớp).
+- **Verify nháp bổ sung (D32):** test 3 kịch bản tie-break — (a)
+  task-spec có `agent:` pin, agent-type khác cũng khớp skill nhưng KHÔNG
+  được chọn; (b) không pin, agent-type đang chạy khớp → ở nguyên; (c)
+  không pin, agent-type đang chạy KHÔNG khớp, 2 agent-type khác đều khớp
+  → luôn chọn đúng 1 cái theo thứ tự khai báo, chạy lặp lại nhiều lần
+  cho kết quả GIỐNG NHAU (không ngẫu nhiên).
 - **Quan hệ:** độc lập với {#task-domain-registry-split} (không đụng
   `codingDomain`/`registry.yaml`) — có thể làm song song; NẾU
   {#task-taskspec-migration} (D9, di dời `docs/task-specs/coding/` →
@@ -1514,11 +1574,15 @@ lượt riêng, để chỉ đụng `stage-fsm.mjs` (module test dày đặc nh�
      skill ({#task-skill-assembly-mechanism}); `TARGET_DIR`
      (`.claude/agents/`) không đổi, mọi agent-type từ CẢ 2 nguồn chiếu
      vào CHUNG 1 chỗ, không phân biệt domain ở output.
+  3. **(D33, phát hiện qua opus review)** Thêm doctor check MỚI:
+     tên agent-type phải UNIQUE TOÀN CỤC xuyên `core/agents/` + MỌI
+     `domains/*/agents/` — vì bước 2 gộp phẳng mọi nguồn vào 1
+     `.claude/agents/`, trùng tên sẽ ghi đè âm thầm không lỗi gì.
 - **§6 excerpt áp dụng:** subsection "`agents/*.yaml` — `core/agents/` +
   `domains/<name>/agents/` (D24)" + dòng `core/agents/`/
   `domains/<name>/agents/` trong ASCII tree + node `agent_core`/`ag_c`/
   `ag_m` trong mermaid.
-- **D-ID áp dụng:** D24.
+- **D-ID áp dụng:** D24, D33.
 - **Quan hệ:** độc lập — có thể làm bất cứ lúc nào, không phụ thuộc
   registry-split hay skill-migration; nên làm CÙNG lúc hoặc SAU
   {#task-eligibility-inversion} (D20) để `skills` field trên
@@ -1527,7 +1591,9 @@ lượt riêng, để chỉ đụng `stage-fsm.mjs` (module test dày đặc nh�
   `SOURCE_DIR` giả lập (2 thư mục thay vì 1), xác nhận
   `projectAgentMarkdown` vẫn chiếu đúng cho agent-type ở CẢ `core/agents/`
   lẫn `domains/*/agents/`; `.claude/agents/fgos-placeholder.md` sinh ra
-  byte-identical với trước khi di dời (hình dạng output không đổi).
+  byte-identical với trước khi di dời (hình dạng output không đổi); test
+  mới cho doctor check D33 — 2 agent-type giả trùng tên ở 2 folder khác
+  nhau phải fail loud, không ghi đè âm thầm.
 
 ### {#task-core-task-specs} Tạo `core/task-specs/` — 7 task-spec cho 7 skill domain-agnostic
 
