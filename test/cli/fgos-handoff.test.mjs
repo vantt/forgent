@@ -79,6 +79,26 @@ test('sync call: consult does NOT change holder, appends a call-summary event', 
   assert.equal(view.callThreads[id][0].outcome, 'finding: use lib X');
 });
 
+test('D28: recordCall threads a caller-supplied openSyncDepth into evaluateHandoff\'s cap -- refuses when the caller reports it is already at cap, even on the FIRST call (nesting can never be derived from replay for sync calls, see recordCall\'s own doc comment)', () => {
+  const dir = tmpDir();
+  const id = seedExecutingItem(dir);
+  assert.throws(
+    () => recordCall(dir, { id, toRole: 'researcher', reason: 'consult', openSyncDepth: 3 }),
+    (err) => {
+      assert.ok(err instanceof StoreError);
+      assert.match(err.message, /callstack cap/);
+      return true;
+    },
+  );
+});
+
+test('D28: omitting openSyncDepth defaults to 0 (byte-identical to every pre-D28-wiring caller) -- a sync call under cap still succeeds', () => {
+  const dir = tmpDir();
+  const id = seedExecutingItem(dir);
+  const { event } = recordCall(dir, { id, toRole: 'researcher', reason: 'consult' });
+  assert.equal(event.type, 'work.call-summary');
+});
+
 test('off-graph call is refused; the error names the legal edges', () => {
   const dir = tmpDir();
   const id = seedExecutingItem(dir);
