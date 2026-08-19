@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DOMAINS, DEFAULT_DOMAIN, resolveDomainName, getDomain, stageForStep, skillForStage, parkReasonForStatus, effectiveStage, classificationVocabulary } from '../../src/state/workflow-stage-graphs.mjs';
+import { DOMAINS, DEFAULT_DOMAIN, resolveDomainName, getDomain, stageForStep, skillForStage, parkReasonForStatus, effectiveStage, classificationVocabulary, resolveTaskSpecPath } from '../../src/state/workflow-stage-graphs.mjs';
 import { rebuildView } from '../../src/state/replay.mjs';
 import { RISK_DISCOUNTS } from '../../src/state/priority-formula.mjs';
 
@@ -401,4 +401,14 @@ test('DOMAINS.coding loaded from registry.yaml and workflows/feature.yaml matche
   assert.deepEqual(DOMAINS.coding.workflows.feature.skillMap, DOMAINS.coding.skillMap);
   assert.deepEqual(DOMAINS.coding.workflows.feature.taskSpecMap, DOMAINS.coding.taskSpecMap);
 });
+
+test('resolveTaskSpecPath resolves task spec paths correctly for domains, domain objects, core, and custom cwd', () => {
+  assert.equal(resolveTaskSpecPath('coding', 'implement-item'), path.join('domains', 'coding', 'task-specs', 'implement-item.md'));
+  assert.equal(resolveTaskSpecPath('coding', 'implement-item', '/app'), path.join('/app', 'domains', 'coding', 'task-specs', 'implement-item.md'));
+  assert.equal(resolveTaskSpecPath('coding', 'implement-item', { cwd: '/app' }), path.join('/app', 'domains', 'coding', 'task-specs', 'implement-item.md'));
+  assert.equal(resolveTaskSpecPath('core', 'fgos-routing'), path.join('core', 'task-specs', 'fgos-routing.md'));
+  assert.equal(resolveTaskSpecPath('core', 'fgos-routing', '/app'), path.join('/app', 'core', 'task-specs', 'fgos-routing.md'));
+  assert.equal(resolveTaskSpecPath(DOMAINS.coding, 'implement-item', '/app'), path.join('/app', 'domains', 'coding', 'task-specs', 'implement-item.md'));
+});
+
 
