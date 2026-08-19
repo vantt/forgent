@@ -62,12 +62,14 @@ dùng chung 3 nơi) lẫn nhóm "coding"/CLI-wrapper (~35 skill chỉ có trong
 | 14 | Rõ | Nguồn chuẩn "viết skill tốt" đã có sẵn trong máy, không cần đoán: `~/.claude/skills/skill-creator/references/` (bộ doctrine chính thức của Anthropic cho skill-authoring) — `skill-anatomy-and-requirements.md`, `writing-effective-instructions.md`, `structure-organization-criteria.md`, `token-efficiency-criteria.md`, `skill-design-patterns.md`. Số đo cụ thể: SKILL.md <300 dòng, mỗi file `references/*.md` <300 dòng, "no duplication: info lives in ONE place", viết imperative form, pseudocode/thuật toán viết theo Pattern 1 "Sequential Workflow Orchestration" (Step 1/Step 2 đánh số, không biến/nhãn `loop:`). |
 | 15 | Rõ | Đo lại theo chuẩn 300 dòng: **7 skill vượt chuẩn**, không chỉ 2 skill nhúng pseudocode — `fgos-coding-driving` 645 (2.15x), `fgos-coding-exploring` 557 (1.86x), `fgos-coding-planning` 532 (1.77x), `fgos-coding-validating` 513 (1.71x), `merge-loop` 437 (1.46x, CLI-wrapper, không thuộc 14 dev-skill core), `fgos-coding-implement` 436 (1.45x), `fgos-fanout` 358 (1.19x). |
 | 12 | **Rõ — D1** | Giải pháp cho #6: xem D1 ở §4. Ranh giới không phải "loại ID" mà là "vai trò sản xuất của artifact". Nhóm process/build-time (`docs/history`, `docs/decisions`, `docs/backlog.md`, text task/`CONTEXT.md`, `docs/specs`) giữ nguyên luật `tsk-37i` (ADR/RUL kèm gloss, D-local chỉ trong `CONTEXT.md` gốc). Nhóm product/shippable (`.agents/skills/*/SKILL.md` — nguồn thật, đã xác nhận byte-identical với `plugins/fgOS/skills/*` — + `references/*.md` của nó) **không giữ ID governance nào cả**, glossed hay không cũng không giữ — lý do viết thẳng thành câu văn, áp dụng ngay tại nguồn `.agents/skills`, không chờ tới bản copy. Căn cứ: `plugins/fgOS/.claude-plugin` chỉ có `plugin.json`+`skills/`, không mang `docs/` nào theo khi publish qua marketplace (xác minh bằng `ls`); đối chiếu bee upstream cho thấy bee giữ citation trong skill prose CHỈ KHI tài liệu bền đi kèm gói phân phối (gloss + pointer-integrity check + target durable) — điều kiện đó không thoả với kênh publish thật của fgOS nên mô hình bee không áp dụng được. `.claude/skills/*` (thin wrapper 3 dòng) không thuộc phạm vi vì không có thân bài. |
+| 16 | **Rõ — D5** | Xem D5 ở §4. |
 | 13 | **Rõ — giải quyết bởi item khác** | Đồng bộ `.agents/skills`+`plugins/fgOS/skills`: không cần quyết định thủ tục "sửa 2 lần cùng commit" nữa — đã submit `tsk-5zi` (độc lập, không phụ thuộc tsk-56w) để mở rộng `npm run build:skills` tự động copy `.agents/skills/<name>` → `plugins/fgOS/skills/<name>`, dùng lại `copyDirRecursive` sẵn có trong `materializeSkillsIntoProject`. Một khi `tsk-5zi` xong, mọi child task của tsk-56w chỉ cần sửa `.agents/skills`, chạy `npm run build:skills`, xong — không cần review diff 2 chỗ. |
 
 ## 4. Quyết định đã chốt
 
 | D-ID | Nội dung |
 |---|---|
+| D5 | Quy trình đảm bảo chất lượng cho mọi child task sửa skill prose của tsk-56w — ghép 2 tài liệu chuẩn có sẵn (không bịa mới) + D2 làm lưới an toàn cuối: (1) `verify` field theo đúng khuôn `docs/how-to/write-verify-for-a-skill-prose-change.md` — `npm test && POSITIVE && NEGATIVE`, POSITIVE chứng minh nội dung mới tồn tại, NEGATIVE chứng minh pattern cũ biến mất, luôn `--hidden` khi `rg`/quét đường dẫn `.claude/skills`/`.agents/skills` (rg mặc định bỏ qua thư mục ẩn — bẫy #4 thật từ `tsk-f38`); verify KHÔNG được yêu cầu chứng minh "prose có mạch lạc/dùng đúng không nếu làm theo" — thuộc review người + `fgos-coding-validating`'s reality-check. (2) Sau khi sửa xong 1 skill, chạy smoke-test thật theo mẫu `docs/how-to/smoke-test-fgos-code-implement-with-a-trivial-item.md` (tổng quát hoá cho cả 7 skill, không chỉ `fgos-coding-implement`): item `chore` vứt đi, `verify: "true"`, claim để skill BẢN ĐÃ SỬA chạy thật, đọc `.fgos/events.jsonl`/`fgos check` kỳ vọng `attempts: 1`, `errorClass: null`, trước khi coi task xong. (3) D2 là lưới an toàn cuối nếu cả smoke-test lẫn review đều lọt mà production sau này lộ lỗi. Người dùng xác nhận. Ghi qua `fgos decision --id tsk-56w` (seq 20275). |
 | D4 | Áp dụng chuẩn `skill-creator` (`SKILL.md` <300 dòng, mỗi `references/*.md` <300 dòng, không trùng lặp nội dung giữa 2 nơi, viết imperative form) cho **toàn bộ 7 skill fgOS đang vượt chuẩn** — không giới hạn riêng 2 skill nhúng pseudocode. Danh sách: `fgos-coding-driving` (645d), `fgos-coding-exploring` (557d), `fgos-coding-planning` (532d), `fgos-coding-validating` (513d), `merge-loop` (437d), `fgos-coding-implement` (436d), `fgos-fanout` (358d). Pseudocode/thuật toán viết lại theo Pattern 1 "Sequential Workflow Orchestration" (`skill-design-patterns.md`) — Step 1/Step 2 đánh số, không biến/nhãn `loop:`. Người dùng xác nhận trực tiếp: "áp dụng hết", và yêu cầu dựa trên nguồn chuẩn thật thay vì đoán — nguồn dùng: `~/.claude/skills/skill-creator/references/*` (Anthropic's own skill-authoring doctrine). Ghi qua `fgos decision --id tsk-56w` (seq 20258). |
 | D2 | `git tag pre-skill-prose-cleanup-tsk-56w` trên `main` tại SHA hiện tại, bắt buộc trước khi item con đầu tiên của tsk-56w vào `executing`. Người dùng xác nhận 2 lần (yêu cầu ban đầu + nhắc lại kèm lý do lần này): thời điểm đổi skill có thể ảnh hưởng lớn toàn hệ thống (skill là thứ được dùng lại mỗi phiên), cần mốc để trace/so sánh/khôi phục nếu sửa làm hỏng tác dụng skill. Ghi qua `fgos decision --id tsk-56w` (seq 20229). |
 | D3 | `ui-spec` (`.claude/skills/ui-spec`) không tính vào phạm vi tsk-56w — không phải skill fgOS (không nằm trong mirror set `.agents/skills`, không prefix `fgos-`, không dùng chung kiến trúc/luật citation đang bàn). Người dùng xác nhận loại hẳn. Ghi qua `fgos decision --id tsk-56w` (seq 20230). |
@@ -148,6 +150,12 @@ dùng chung 3 nơi) lẫn nhóm "coding"/CLI-wrapper (~35 skill chỉ có trong
   (step-by-step guide → references), không phải ngưỡng độ dài; 300 dòng
   chỉ là trần cứng. Sửa task fanout bỏ điều kiện, nhất quán với 6 task
   kia.
+- Người dùng hỏi: "có cách làm việc nào để đảm bảo chất lượng không bị
+  ảnh hưởng?" Agent tìm 2 tài liệu chuẩn có sẵn (`docs/how-to/write-
+  verify-for-a-skill-prose-change.md`, `docs/how-to/smoke-test-fgos-
+  code-implement-with-a-trivial-item.md`) — cả 2 đều rút từ va chạm thật
+  (`tsk-f38`, case study `str89`), ghép với D2 đã có → đề xuất D5, người
+  dùng xác nhận "đồng ý".
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -198,6 +206,26 @@ references/*`, xem §3 mục 14), không sửa cấu trúc mirror 3 tầng hiệ
    pre-skill-prose-cleanup-tsk-56w` trên `main` trước khi item con đầu
    tiên vào `executing`, để có mốc so sánh/khôi phục nếu sửa làm hỏng tác
    dụng skill. `ui-spec` loại khỏi phạm vi (không phải skill fgOS).
+
+### Đảm bảo chất lượng khi sửa (D5, §4)
+
+Không dựa vào "trông có vẻ đúng" — mỗi child task có 2 lớp chứng minh,
+cả 2 đều đã có chuẩn sẵn trong repo (`docs/how-to/write-verify-for-a-
+skill-prose-change.md`, `docs/how-to/smoke-test-fgos-code-implement-
+with-a-trivial-item.md`), không phải quy trình bịa mới:
+
+1. **`verify` field** chứng minh CẤU TRÚC đúng (nội dung mới có mặt,
+   nội dung cũ biến mất) — không chứng minh skill còn CHẠY đúng.
+2. **Smoke-test thật** (item `chore` vứt đi, `verify: "true"`, claim để
+   skill bản đã sửa chạy thật, đọc `.fgos/events.jsonl`) chứng minh skill
+   còn CHẠY đúng ít nhất 1 lần — trước khi coi task xong.
+3. **D2** (tag trên `main`) là lưới cuối nếu cả 2 lớp trên đều lọt.
+
+Ranh giới trung thực: verify + smoke-test chứng minh được đường thuận
+(happy path chạy đúng), KHÔNG bắt được ca âm ("skill lẽ ra phải dừng mà
+không dừng") và không gate được lúc merge — bù lại bằng review người tại
+`fgos-coding-validating`'s reality-check, đúng vai trò nó vốn có, không
+đổi gì thêm.
 
 ### Nguồn tham khảo khi viết lại từng skill
 
