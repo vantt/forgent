@@ -136,6 +136,33 @@ function stagedFgosDeletions(committingToplevel) {
     .filter((p) => p === '.fgos' || p.startsWith('.fgos/'));
 }
 
+// tsk-5pb -- any staged path under .fgos/ (Added, Modified, Deleted) on a
+// worker's fgw/* branch is forbidden. Git manual merge materialization can stage
+// a .fgos/* blob as Modified; worker branches must never commit changes under .fgos/.
+function stagedFgosChangesOnWorkerBranch(committingToplevel) {
+  let branch;
+  try {
+    branch = execFileSync(
+      'git',
+      ['symbolic-ref', '--short', '-q', 'HEAD'],
+      { cwd: committingToplevel, encoding: 'utf8' },
+    ).trim();
+  } catch {
+    return [];
+  }
+  if (!/^fgw\//.test(branch)) return [];
+
+  const output = execFileSync(
+    'git',
+    ['diff', '--cached', '--name-only'],
+    { cwd: committingToplevel, encoding: 'utf8' },
+  );
+  return output
+    .split('\n')
+    .filter((p) => p !== '')
+    .filter((p) => p === '.fgos' || p.startsWith('.fgos/'));
+}
+
 // tsk-4hkd -- the main checkout must never sit on a fgw/<id> branch itself;
 // that branch belongs in the item's own linked worktree (fgos pick), never
 // checked out directly here. git-dir vs git-common-dir tells apart the main
@@ -235,6 +262,12 @@ function main() {
   const fgosDeletions = stagedFgosDeletions(committingToplevel);
   if (fgosDeletions.length > 0) {
     refuse(`commit refused: this commit stages a deletion under ".fgos/" (${fgosDeletions.join(', ')}) -- .fgos/ is fgOS's own runner state and must never be committed as deleted. A linked worktree never keeps a working-tree copy of .fgos/ by design (ADR0020); if you ran "git add -A" here, unstage these paths first (e.g. "git restore --staged .fgos").`);
+    return;
+  }
+
+  const fgosWorkerChanges = stagedFgosChangesOnWorkerBranch(committingToplevel);
+  if (fgosWorkerChanges.length > 0) {
+    refuse(`commit refused: this commit on a worker branch stages changes under ".fgos/" (${fgosWorkerChanges.join(', ')}) -- worker branches must never commit changes under .fgos/ (ADR0020). See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);
     return;
   }
 

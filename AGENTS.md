@@ -134,6 +134,8 @@ There is no mechanical guard against this (git has no hook that can
 refuse a stash) — stash selectively, or use `fgos main-checkout-reset`
 above instead of stash-and-reset as a shortcut.
 
+**Never resolve a `.fgos/` merge conflict on a worker branch by committing a modified `.fgos/*` file** (tsk-5pb: `docs/history/worktree-manual-merge-fgos-blob-safety-net/`) — any `.fgos/*` path staged as changed (Modified or Deleted) on a worker's `fgw/<id>` branch — including one that reappears Modified because git's own merge machinery materialized a blob during a manual conflict resolution — must be restored to that branch's own prior content and dropped from the commit entirely, never resolved toward either side of a conflict. See `docs/how-to/fix-fgos-write-rejected-merge-block.md` (its tsk-3v2 example matches this exact scenario) for how to restore these paths, and `docs/how-to/resolve-an-events-jsonl-merge-conflict.md` for the `events.jsonl`-specific sequence contiguity rules.
+
 ## Dispatch — routing work to a executor
 
 **Before dispatching any task out of the current turn — a work item, a registered executor, an ad-hoc task, or your own direct Agent/Task-tool call — run `node src/runner/dispatch.mjs decide` first. Never decide the mechanism yourself.** A `PreToolUse` hook enforces this on Agent/Task-tool calls: it runs `decide` for you and refuses the call when the answer comes back as anything other than `in-process`.
