@@ -575,6 +575,31 @@ export function skillForStage(domain, stage) {
   return (domain.skillMap && domain.skillMap[stage]) ?? null;
 }
 
+/**
+ * Resolves both the skill and taskSpec for `stage` within `domain` (D14).
+ * Resolves the workflow first via `resolveWorkflow(domainObj, kind)` to read
+ * `skillMap` and `taskSpecMap` from that workflow (D29/D30).
+ *
+ * @param {string|object} domain Domain name or domain object
+ * @param {string} stage Stage name
+ * @param {string|object} [options] Optional kind string or options object { kind }
+ * @returns {{ skill: string|null, taskSpec: string|null }}
+ */
+export function bundleForStage(domain, stage, options = {}) {
+  const domainObj = typeof domain === 'object' && domain !== null ? domain : getDomain(domain);
+  const kind = typeof options === 'string' ? options : options?.kind;
+  const wf = resolveWorkflow(domainObj, kind);
+
+  const skillMap = wf?.skillMap ?? domainObj?.skillMap;
+  const taskSpecMap = wf?.taskSpecMap ?? domainObj?.taskSpecMap;
+
+  const skill = (skillMap && skillMap[stage]) ?? null;
+  const taskSpec = (taskSpecMap && taskSpecMap[stage]) ?? null;
+
+  return { skill, taskSpec };
+}
+
+
 /** `domain`'s own `roleGraph`, or `undefined` when the domain declares
  * none (tsk-2t9c D1) -- every domain but `coding` today. `undefined`,
  * deliberately not `null`, matching `classificationVocabulary`'s own
