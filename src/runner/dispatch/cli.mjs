@@ -647,6 +647,17 @@ export async function fanoutBatchExecutorCli(
       const wtPath = picked.data?.worktree?.path || cwd;
 
       const execRes = await executeExecutorCli(executorId, {
+        // Bug found running tsk-397's own fanout batches (2026-08-20): this
+        // call omitted `prompt` entirely, so `executeExecutorCli` fell back
+        // to its own default `prompt = ''` and every out-of-process executor
+        // (agy) received a literal empty prompt — no edits, no commit, then
+        // `return` below failed with "branch has not advanced". `spawnWorker`
+        // (this same file, above) already builds the work item's own prompt
+        // via `buildPrompt` before dispatching; this out-of-process path
+        // needs the identical prompt, built the identical way (no feedback,
+        // default 'executing' stage — the same defaults `spawnWorker` uses
+        // when its own `opts.feedback`/`opts.stage` are omitted).
+        prompt: buildPrompt(workItem),
         cwd: wtPath,
         repoRoot: root,
         hasLiveTaskAccess,
