@@ -47,11 +47,132 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { parse as parseYaml } from 'yaml';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
+
+let parseYaml;
+try {
+  parseYaml = require('yaml').parse;
+} catch {
+  // If yaml is not available in isolated test environments
+}
 
 /** The domain every item without an explicit `domain` field belongs to —
  * matches today's implicit, exclusively-coding behavior (D2). */
 export const DEFAULT_DOMAIN = 'coding';
+
+const planningEdges = Object.freeze([
+  Object.freeze({ from: 'implementer', to: 'researcher', reason: 'consult', mode: 'sync' }),
+  Object.freeze({ from: 'implementer', to: 'advisor', reason: 'advise', mode: 'async' }),
+]);
+
+const fallbackCodingDomain = Object.freeze({
+  stages: Object.freeze(['discovery', 'exploring', 'decompose', 'planning', 'executing']),
+  stepMap: Object.freeze({ planning: 'Divide', executing: 'Execute' }),
+  transitions: Object.freeze([
+    Object.freeze({ from: 'clarify', to: 'discovery' }),
+    Object.freeze({ from: 'clarify', to: 'exploring' }),
+    Object.freeze({ from: 'decompose', to: 'executing' }),
+    Object.freeze({ from: 'exploring', to: 'decompose' }),
+    Object.freeze({ from: 'discovery', to: 'exploring' }),
+    Object.freeze({ from: 'discovery', to: 'planning' }),
+    Object.freeze({ from: 'exploring', to: 'planning' }),
+    Object.freeze({ from: 'planning', to: 'executing' }),
+  ]),
+  skillMap: Object.freeze({
+    discovery: 'fgos-coding-discovering',
+    exploring: 'fgos-coding-exploring',
+    decompose: 'fgos-coding-planning',
+    planning: 'fgos-coding-planning',
+    executing: 'fgos-coding-implement',
+    retrospective: 'fgos-coding-compounding',
+  }),
+  taskSpecMap: Object.freeze({
+    discovery: 'judge-ambiguity',
+    exploring: 'lock-decisions',
+    planning: 'shape-plan',
+    executing: 'implement-item',
+    retrospective: 'compound-learn',
+  }),
+  worktreeBacked: true,
+  statusLabels: Object.freeze({
+    backlog: 'backlog',
+    todo: 'todo',
+    doing: 'in-progress',
+    blocked: 'in-progress',
+    'awaiting-human': 'in-progress',
+    'awaiting-approval': 'review',
+    wontfix: 'canceled',
+  }),
+  parkReason: Object.freeze({
+    blocked: 'system-error',
+    'awaiting-human': 'human-question',
+    'awaiting-approval': 'natural-finish',
+  }),
+  classification: Object.freeze({
+    kind: Object.freeze(['bug', 'chore', 'design', 'docs', 'feature', 'task']),
+    risk: Object.freeze(['light', 'standard', 'heavy']),
+  }),
+  roleGraph: Object.freeze({
+    roles: Object.freeze(['implementer', 'researcher', 'reviewer', 'helper', 'advisor']),
+    defaultRole: 'implementer',
+    callstackCap: 3,
+    edges: Object.freeze({
+      discovery: Object.freeze([
+        Object.freeze({ from: 'implementer', to: 'researcher', reason: 'consult', mode: 'sync' }),
+      ]),
+      exploring: Object.freeze([
+        Object.freeze({ from: 'implementer', to: 'advisor', reason: 'advise', mode: 'async' }),
+        Object.freeze({ from: 'implementer', to: 'researcher', reason: 'consult', mode: 'sync' }),
+      ]),
+      planning: planningEdges,
+      decompose: planningEdges,
+      executing: Object.freeze([
+        Object.freeze({ from: 'implementer', to: 'researcher', reason: 'consult', mode: 'sync' }),
+        Object.freeze({ from: 'implementer', to: 'helper', reason: 'assist', mode: 'sync' }),
+        Object.freeze({ from: 'implementer', to: 'reviewer', reason: 'review', mode: 'async' }),
+        Object.freeze({ from: 'implementer', to: 'advisor', reason: 'advise', mode: 'async' }),
+        Object.freeze({ from: 'reviewer', to: 'researcher', reason: 'consult', mode: 'sync' }),
+        Object.freeze({ from: 'reviewer', to: 'advisor', reason: 'advise', mode: 'async' }),
+      ]),
+    }),
+  }),
+  workerContract: '.agents/skills/_shared/coding-worker-contract.md',
+  defaultWorkflow: 'feature',
+  workflowFor: Object.freeze({}),
+  workflows: Object.freeze({
+    feature: Object.freeze({
+      stages: Object.freeze(['discovery', 'exploring', 'decompose', 'planning', 'executing']),
+      stepMap: Object.freeze({ planning: 'Divide', executing: 'Execute' }),
+      transitions: Object.freeze([
+        Object.freeze({ from: 'clarify', to: 'discovery' }),
+        Object.freeze({ from: 'clarify', to: 'exploring' }),
+        Object.freeze({ from: 'decompose', to: 'executing' }),
+        Object.freeze({ from: 'exploring', to: 'decompose' }),
+        Object.freeze({ from: 'discovery', to: 'exploring' }),
+        Object.freeze({ from: 'discovery', to: 'planning' }),
+        Object.freeze({ from: 'exploring', to: 'planning' }),
+        Object.freeze({ from: 'planning', to: 'executing' }),
+      ]),
+      skillMap: Object.freeze({
+        discovery: 'fgos-coding-discovering',
+        exploring: 'fgos-coding-exploring',
+        decompose: 'fgos-coding-planning',
+        planning: 'fgos-coding-planning',
+        executing: 'fgos-coding-implement',
+        retrospective: 'fgos-coding-compounding',
+      }),
+      taskSpecMap: Object.freeze({
+        discovery: 'judge-ambiguity',
+        exploring: 'lock-decisions',
+        planning: 'shape-plan',
+        executing: 'implement-item',
+        retrospective: 'compound-learn',
+      }),
+    }),
+  }),
+});
 
 function normalizeWorkflow(raw) {
   if (!raw) return undefined;
@@ -108,6 +229,7 @@ function normalizeWorkflow(raw) {
 }
 
 function loadDomainsFromDisk() {
+  if (typeof parseYaml !== 'function') return {};
   const domains = {};
   const repoRoot = path.resolve(import.meta.dirname, '../../');
   const domainsDir = path.join(repoRoot, 'domains');
@@ -146,11 +268,19 @@ function loadDomainsFromDisk() {
       if (roleGraph && typeof roleGraph === 'object') {
         if (Array.isArray(roleGraph.roles)) Object.freeze(roleGraph.roles);
         if (roleGraph.edges && typeof roleGraph.edges === 'object') {
+          const frozenEdgesMap = new Map();
           for (const key of Object.keys(roleGraph.edges)) {
-            if (Array.isArray(roleGraph.edges[key])) {
-              roleGraph.edges[key] = Object.freeze(
-                roleGraph.edges[key].map((e) => Object.freeze({ ...e }))
-              );
+            const origArr = roleGraph.edges[key];
+            if (Array.isArray(origArr)) {
+              if (frozenEdgesMap.has(origArr)) {
+                roleGraph.edges[key] = frozenEdgesMap.get(origArr);
+              } else {
+                const frozenArr = Object.freeze(
+                  origArr.map((e) => Object.freeze({ ...e }))
+                );
+                frozenEdgesMap.set(origArr, frozenArr);
+                roleGraph.edges[key] = frozenArr;
+              }
             }
           }
           Object.freeze(roleGraph.edges);
@@ -190,6 +320,7 @@ function loadDomainsFromDisk() {
 const loadedDomains = loadDomainsFromDisk();
 
 export const DOMAINS = Object.freeze({
+  coding: loadedDomains.coding || fallbackCodingDomain,
   ...loadedDomains,
   synthetic: Object.freeze({
     stages: Object.freeze(['assembling']),
