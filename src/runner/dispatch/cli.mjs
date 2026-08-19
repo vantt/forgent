@@ -23,6 +23,14 @@ import { resolveExecutorAndOverrides, resolveExecutorIdForPurpose, modelForTier 
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
 import { resolveExecutorCommand, EXECUTOR_ADAPTERS, DispatchError } from './transport.mjs';
 import { buildPrompt } from './prepare.mjs';
+import {
+  acquireMainCheckoutLock,
+  dispatchLockFile,
+  ACQUIRED,
+  HELD,
+  AMBIGUOUS,
+  formatLockDurationMs,
+} from '../main-checkout-lock.mjs';
 
 /**
  * Executor identifier for a work item's executing-stage dispatch (D3,
@@ -334,12 +342,51 @@ export async function executeExecutorCli(
   }
   const timeoutMs = timeoutOverride ?? cfg.timeoutMs;
   const maxBuffer = maxBufferOverride ?? 10 * 1024 * 1024;
-  process.stderr.write(
-    `fgos: dispatch capability=${capabilityLabel} executor=${executorId} via=${adapter} provider=${provider} model=${model} tier=${tier}\n`,
-  );
-  const result = await adapterFn({ command, args }, { cwd, timeoutMs, maxBuffer, onChunk, workId: executorId, tier, model });
-  const base = { mechanism, ...result, provider, command };
-  return resolvedByPurpose ? { ...base, executorId } : base;
+
+  const identity = `${process.pid}:${Date.now()}:${Math.random().toString(36).slice(2)}`;
+  const lockFile = dispatchLockFile(cwd);
+  const lockRes = acquireMainCheckoutLock(fgosDir, {
+    identity,
+    ttlMs: timeoutMs,
+    now: Date.now(),
+    releaseOnExit: true,
+    lockFile,
+  });
+
+  if (lockRes.status === HELD) {
+    const ageStr = formatLockDurationMs(lockRes.lockAgeMs);
+    throw new DispatchError(
+      'dispatch-in-flight',
+      `dispatch for cwd "${cwd}" is already in flight (held for ${ageStr}).`,
+      { cwd, lockAgeMs: lockRes.lockAgeMs, remainingTtlMs: lockRes.remainingTtlMs, holderPid: lockRes.holderPid },
+    );
+  }
+  if (lockRes.status === AMBIGUOUS) {
+    throw new DispatchError(
+      'dispatch-in-flight',
+      `dispatch lock for cwd "${cwd}" is ambiguous (corrupt or unparseable lock file).`,
+      { cwd, lockAgeMs: lockRes.lockAgeMs },
+    );
+  }
+  if (lockRes.status !== ACQUIRED) {
+    throw new DispatchError(
+      'dispatch-in-flight',
+      `dispatch lock for cwd "${cwd}" could not be acquired (status: ${lockRes.status}).`,
+      { cwd },
+    );
+  }
+
+  try {
+    process.stderr.write(
+      `fgos: dispatch capability=${capabilityLabel} executor=${executorId} via=${adapter} provider=${provider} model=${model} tier=${tier}\n`,
+    );
+    const result = await adapterFn({ command, args }, { cwd, timeoutMs, maxBuffer, onChunk, workId: executorId, tier, model });
+    const base = { mechanism, ...result, provider, command };
+    return resolvedByPurpose ? { ...base, executorId } : base;
+  } finally {
+    lockRes.release();
+  }
+
 }
 
 /**
