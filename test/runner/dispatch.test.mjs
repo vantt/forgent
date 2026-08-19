@@ -4024,36 +4024,35 @@ test('logExecutorDispatch appends multiple sequential calls without corrupting t
 
 test('dispatch CLI execute subcommand respects --cwd flag', () => {
   const repo = mkTempGitRepo();
+  const workerRepo = mkTempGitRepo();
   const scriptPath = writeEchoExecutor(repo.repoRoot);
-  const dispatchScriptPath = path.resolve(repo.repoRoot, '../../src/runner/dispatch.mjs');
-  const cfg = {
+  const dispatchScriptPath = path.resolve(process.cwd(), 'src/runner/dispatch.mjs');
+  writeRunnerConfigFixture(workerRepo.repoRoot, {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
-    executors: { testexec: { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}'] } },
+    executors: { testexec: { kind: 'agent', allowCrossProvider: true, command: process.execPath, args: [scriptPath, '{prompt}'] } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
-  };
-  fs.writeFileSync(path.join(repo.fgosDir, 'config.json'), JSON.stringify(cfg));
-  const workDir = mkTempDir();
+  });
 
-  const out = execFileSync(process.execPath, [dispatchScriptPath, 'execute', 'testexec', '--cwd', workDir, '--prompt', 'hello'], {
+  const out = execFileSync(process.execPath, [dispatchScriptPath, 'execute', 'testexec', '--cwd', workerRepo.repoRoot, '--prompt', 'hello'], {
     encoding: 'utf8',
+    cwd: repo.repoRoot,
   });
   const res = JSON.parse(out);
   assert.equal(res.status, 0);
   const echoData = JSON.parse(res.stdout);
-  assert.equal(echoData.cwd, workDir);
+  assert.equal(echoData.cwd, workerRepo.repoRoot);
 });
 
 test('dispatch CLI decide subcommand respects --cwd flag', () => {
   const repo = mkTempGitRepo();
-  const dispatchScriptPath = path.resolve(repo.repoRoot, '../../src/runner/dispatch.mjs');
-  const cfg = {
+  const dispatchScriptPath = path.resolve(process.cwd(), 'src/runner/dispatch.mjs');
+  writeRunnerConfigFixture(repo.repoRoot, {
     executor: { command: process.execPath, args: ['{prompt}'] },
     executors: { testexec: { kind: 'agent', agentType: 'test' } },
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
-  };
-  fs.writeFileSync(path.join(repo.fgosDir, 'config.json'), JSON.stringify(cfg));
+  });
 
   const out = execFileSync(process.execPath, [dispatchScriptPath, 'decide', 'testexec', '--cwd', repo.repoRoot, '--has-live-task-access'], {
     encoding: 'utf8',
