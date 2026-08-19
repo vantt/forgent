@@ -404,3 +404,11 @@ test('the gateway config-default is registered under the "gateway" key with port
   assert.equal(entry.shape.port, 4170);
   assert.equal(entry.shape.token, null);
 });
+
+test('task-specs-resolve doctor check passes when core/task-specs/ and domain task-specs exist', () => {
+  const entry = DOCTOR_CHECKS.find((c) => c.id === 'task-specs-resolve');
+  assert.ok(entry, 'task-specs-resolve check must be registered');
+  const result = entry.check(process.cwd());
+  assert.equal(result.passed, true, `task-specs-resolve failed: ${result.message}`);
+});
+
