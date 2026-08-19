@@ -16,7 +16,7 @@
         "--permission-mode",
         "acceptEdits",
         "--allowedTools",
-        "Bash(git add:*),Bash(git commit:*)"
+        "Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)"
       ]
     },
     "capabilities": {
@@ -55,7 +55,7 @@
               "--permission-mode",
               "acceptEdits",
               "--allowedTools",
-              "Bash(git add:*),Bash(git commit:*)"
+              "Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)"
             ]
           }
         ]
