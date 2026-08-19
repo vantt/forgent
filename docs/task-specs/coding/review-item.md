@@ -1,6 +1,6 @@
 # task-spec: review-item
 
-domain: coding | position: reviewer | reason: review
+domain: coding | role: reviewer | reason: review
 
 ## Input
 - A diff and its own `verify` result, for an item that has reached the
@@ -25,7 +25,7 @@ domain: coding | position: reviewer | reason: review
 | Trigger | Call | To | Reason | Bóng về mang |
 |---|---|---|---|---|
 | A pattern/precedent in the diff needs a fact this reviewer cannot resolve from context in hand | consult (sync) | researcher | consult | finding |
-| A finding touches product scope, not implementation correctness | advise (async) | human-advisor | advise | answer, folded into the review verdict |
+| A finding touches product scope, not implementation correctness | advise (async) | advisor | advise | answer, folded into the review verdict |
 | No trigger matches | — render the verdict — | | | |
 
 Multiple executors may claim this task-spec (a human via the approve

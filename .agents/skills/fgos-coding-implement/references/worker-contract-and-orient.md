@@ -43,7 +43,7 @@ node "$root/bin/fgos.mjs" handoff-return "<id>" --note "reclaiming at Orient —
 
 **Repeat this call, re-reading `data.work[id].holder` fresh each time,
 until `holder` reads `implementer`** (a nested call can legitimately sit
-two deep, e.g. `reviewer` then `human-advisor`; one `handoff-return`
+two deep, e.g. `reviewer` then `advisor`; one `handoff-return`
 only pops the innermost frame). Stop the moment a call refuses with "no
 open call" — that is the ordinary end state, not a failure to relay.
 

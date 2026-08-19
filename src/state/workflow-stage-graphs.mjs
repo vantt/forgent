@@ -63,7 +63,7 @@ export const DEFAULT_DOMAIN = 'coding';
 // `decompose` stage name needs the identical edge set.
 const planningEdges = Object.freeze([
   Object.freeze({ from: 'implementer', to: 'researcher', reason: 'consult', mode: 'sync' }),
-  Object.freeze({ from: 'implementer', to: 'human-advisor', reason: 'advise', mode: 'async' }),
+  Object.freeze({ from: 'implementer', to: 'advisor', reason: 'advise', mode: 'async' }),
 ]);
 const codingDomain = {
     // tsk-1w7 D10 (docs/history/fanout-and-delegation-rubric/CONTEXT.md):
@@ -403,7 +403,7 @@ const codingDomain = {
     // to `exploring`'s) is what lets it declare exactly this one edge and
     // no others.
     roleGraph: Object.freeze({
-      roles: Object.freeze(['implementer', 'researcher', 'reviewer', 'helper', 'human-advisor']),
+      roles: Object.freeze(['implementer', 'researcher', 'reviewer', 'helper', 'advisor']),
       defaultRole: 'implementer',
       callstackCap: 3,
       edges: Object.freeze({
@@ -411,7 +411,7 @@ const codingDomain = {
           Object.freeze({ from: 'implementer', to: 'researcher', reason: 'consult', mode: 'sync' }),
         ]),
         exploring: Object.freeze([
-          Object.freeze({ from: 'implementer', to: 'human-advisor', reason: 'advise', mode: 'async' }),
+          Object.freeze({ from: 'implementer', to: 'advisor', reason: 'advise', mode: 'async' }),
           Object.freeze({ from: 'implementer', to: 'researcher', reason: 'consult', mode: 'sync' }),
         ]),
         planning: planningEdges,
@@ -419,9 +419,9 @@ const codingDomain = {
           Object.freeze({ from: 'implementer', to: 'researcher', reason: 'consult', mode: 'sync' }),
           Object.freeze({ from: 'implementer', to: 'helper', reason: 'assist', mode: 'sync' }),
           Object.freeze({ from: 'implementer', to: 'reviewer', reason: 'review', mode: 'async' }),
-          Object.freeze({ from: 'implementer', to: 'human-advisor', reason: 'advise', mode: 'async' }),
+          Object.freeze({ from: 'implementer', to: 'advisor', reason: 'advise', mode: 'async' }),
           Object.freeze({ from: 'reviewer', to: 'researcher', reason: 'consult', mode: 'sync' }),
-          Object.freeze({ from: 'reviewer', to: 'human-advisor', reason: 'advise', mode: 'async' }),
+          Object.freeze({ from: 'reviewer', to: 'advisor', reason: 'advise', mode: 'async' }),
         ]),
         // tsk-2t9c D16 (independent review of D14/D15): `decompose` is the
         // legacy pre-tsk-403-rename name for `planning`, served by the

@@ -1,6 +1,6 @@
 # task-spec: lock-decisions
 
-domain: coding | stage: exploring | position: implementer
+domain: coding | stage: exploring | role: implementer
 
 ## Input
 - An item at stage `exploring` (unclear discovery verdict) with `refs`.
@@ -30,5 +30,5 @@ domain: coding | stage: exploring | position: implementer
 | Trigger | Call | To | Reason | Bóng về mang |
 |---|---|---|---|---|
 | A named library/API/concept the session cannot resolve from context surfaces mid-Socratic-lock | consult (sync) | researcher | consult | finding + clear/unclear |
-| A candidate question passes material/grounded/answerable and cannot wait for the person to return later | advise (async) | human-advisor | advise | answer, locked as a new D-ID |
+| A candidate question passes material/grounded/answerable and cannot wait for the person to return later | advise (async) | advisor | advise | answer, locked as a new D-ID |
 | No trigger matches | — pin as an assumption or defer to `shape-plan` — | | | |

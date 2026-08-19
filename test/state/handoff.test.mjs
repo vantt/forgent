@@ -44,7 +44,7 @@ test('discovery declares ONLY consult -- no advise, since discovery never asks a
     domain: coding,
     stage: 'discovery',
     fromRole: 'implementer',
-    toRole: 'human-advisor',
+    toRole: 'advisor',
     reason: 'advise',
   });
   assert.equal(result.ok, false);
@@ -117,7 +117,7 @@ test('nested async call under the cap succeeds, at the cap is refused', () => {
     domain: coding,
     stage: 'executing',
     fromRole: 'reviewer',
-    toRole: 'human-advisor',
+    toRole: 'advisor',
     reason: 'advise',
     openCallDepth: 2,
   });
@@ -127,7 +127,7 @@ test('nested async call under the cap succeeds, at the cap is refused', () => {
     domain: coding,
     stage: 'executing',
     fromRole: 'reviewer',
-    toRole: 'human-advisor',
+    toRole: 'advisor',
     reason: 'advise',
     openCallDepth: 3,
   });
