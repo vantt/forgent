@@ -10,6 +10,33 @@ status: open
 
 ## 1. Trạng thái hiện tại
 
+Round 19 tiếp lần nữa nữa (2026-08-19), D25-D28: Người trả lời "không
+dừng persona" cho câu hỏi treo D15 — bản chất quy trình phần mềm đúng là
+team nhiều persona, làm đúng thì chất lượng tốt hơn, ép driving dừng đi
+ngược lợi ích đó. Trợ lý scout `src/state/handoff.mjs`/`roleGraph.edges`
+(`workflow-stage-graphs.mjs:405-441`) — xác nhận cơ chế ĐÃ CÓ SẴN (tsk-2t9c),
+không cần xây mới: `evaluateHandoff` là pure legality-graph, `callstackCap:
+3` đã chặn async nesting, và có sẵn 2 edge THẬT chứng minh trao đổi trực
+tiếp (không qua lead) được hỗ trợ khi khai rõ. → **D25** (seq 21338):
+driving không bao giờ hard-stop vì persona-ngầm-khác-stage, giải qua sync
+consult. Đồng thời trong cùng round, người gộp thêm 3 điểm: (1)
+`assignable-to`→`agent` (rename) → **D26** (seq 21339); (2+3) hỏi lại cơ
+chế dispatch có chịu tải "đá qua lại" không + protocol qua lead hay
+direct — trợ lý tìm ra ĐÃ CÓ (không phải câu hỏi mở) nhưng phát hiện 1
+gap thật: `callstackCap` chỉ chặn async nesting, sync thì không — **D28**
+(seq 21341, người trả lời ngay: cap cho sync LỒNG, sync ngang hàng/tuần
+tự thì không cần); (4) core cần task-specs tường minh, không ẩn trong
+code — trợ lý scout `docs/task-specs/` xác nhận ĐÚNG 13 file, 0 file cho
+7 core-skill — gap thật chặn chính D20/D24's eligibility match → **D27**
+(seq 21340): `core/task-specs/` mới cho 7 skill domain-agnostic. Người
+hỏi thêm: `domains/*/registry.mjs` giờ còn giữ gì sau khi task-specs/
+specs/knowledge/skills/agents/AGENTS.md đều đã tách ra folder riêng —
+xem trả lời trực tiếp trong chat, đồng thời phát hiện + sửa 1 dòng chú
+thích STALE trong ASCII tree §6 (câu "task-specs (fieldSchema)" là tàn
+dư từ D8 SAI, chưa từng cập nhật theo D9). Cũng đã bật 1 opus agent
+(`tsk397-discussion-review`) rà lại toàn bộ file tìm thiếu sót — đang
+chờ báo cáo, sẽ hợp nhất vào round sau. 28/28 quyết định đã chốt.
+
 Round 19 tiếp lần nữa (2026-08-19), D24: Người hỏi "giải thích nốt việc
 cuối cùng là gì" (`agents/*.yaml` render-pair). Trợ lý giải thích lại đề
 xuất round trước (giữ top-level `agents/`, KHÔNG tách domain — lý do
@@ -362,7 +389,7 @@ thi thật.
 | 23 | Layout nội bộ + cách kết nối module của `upstreams/pi` ("everything is a plugin") có bài học gì cho fgOS? | Chốt — D12 | Pi enforce ranh giới module bằng `package.json`'s `exports` map (path không khai = không import được, Node tự chặn) — cấp package thật, mỗi package trong workspace tự khai bề mặt công khai. fgOS là 1 package, không workspace — chuyển sang mô hình pi tốn hơn hẳn. NHƯNG fgOS đã có tương đương: `docs/architecture-manifest.json` + `test/architecture.test.mjs` (5 layer kỹ thuật: entry/use-case/infra/domain/kernel, import chỉ được xuống tầng sâu hơn, ngược tầng = test đỏ). Bài học thật: mở rộng cơ chế ĐÃ CÓ này thêm 1 rule domain-siloing, không xây cơ chế mới kiểu pi. **Lưu ý naming va chạm:** layer `"domain"` trong manifest là khái niệm DDD kỹ thuật, KHÔNG liên quan `DOMAINS` (coding/marketing) của toàn thảo luận này — cùng từ, 2 nghĩa khác nhau, cùng tồn tại trong 1 repo. |
 | 24 | Sau khi domain có N workflow, mỗi workflow N stage, mỗi stage N task-spec — cơ chế điều phối (dispatch) thật là gì, ai chủ động? | Chốt — D13 | 3 tầng: DISPATCH (chọn persona, 1 lần, trước khi session tồn tại) → ROUTING (`fgos-routing`, chọn máy móc domain nào, xuyên domain, 1 lần/session) → DRIVING (`fgos-<domain>-driving`, lặp qua stage, CÙNG persona). Nguyên lý tổ chức: soul không hoán đổi giữa chừng session — khác skill/task-spec (văn xuôi, đọc lại tự do). Bằng chứng: `fgos-coding-driving` ceiling mặc định = `awaiting-approval`, ĐÚNG lúc async review handoff (D18 tsk-2t9c) fire — driving đã dừng đúng chỗ persona cần đổi từ trước, chỉ chưa ai gọi tên nguyên lý. |
 | 25 | Skill có cần thiết phải hardcode load task-spec không, hay nên tách? | Chốt — D14 | Không nên hardcode trong prose (3 chỗ ở `fgos-coding-implement` dòng 88/177/291 đã hardcode literal path). `bundleForStage(domain, stage)` trả `{skill, taskSpec}` cùng lúc, sống ở tầng DRIVING (D13) — `skillMap`/`taskSpecMap` đã nằm cạnh nhau cùng object, cùng key stage, hàm này chỉ bọc lại dữ liệu có sẵn. |
-| 26 | Agent-type/persona/team-collab đặt vào đâu trong cơ chế dispatch, và "2 flow nối tiếp" (PO+BA rồi Tech-Lead+SWE+Tester) có cần 2 workflow riêng? | Chốt — D15 | Không cần 2 workflow. Persona resolve theo `(domain, stage, role)` thay vì chỉ `(domain, role)` — cùng roleGraph, cùng role (`implementer`), khác persona theo cụm stage. Team-hợp-tác = chuỗi sync call (holder không đổi, D8) tới nhiều persona, KHÔNG multi-holder cùng lúc; song song thật = decompose ra item con (`fgos-fanout`, có sẵn). **[Round 19: câu so sánh marketing-cockpit gốc ở đây đã LỖI THỜI so với D20 — xem §6 subsection "Eligibility declaration" cho bản đã sửa; tóm tắt: `claims` không phải "đi xa hơn", D20 đã đảo ngược chính hướng đó.]** CỐ Ý CHƯA XÂY: ranh giới stage-đổi-persona-ngầm có nên cũng dừng driving — chưa có bằng chứng đa dạng persona thật. |
+| 26 | Agent-type/persona/team-collab đặt vào đâu trong cơ chế dispatch, và "2 flow nối tiếp" (PO+BA rồi Tech-Lead+SWE+Tester) có cần 2 workflow riêng? | Chốt — D15 | Không cần 2 workflow. Persona resolve theo `(domain, stage, role)` thay vì chỉ `(domain, role)` — cùng roleGraph, cùng role (`implementer`), khác persona theo cụm stage. Team-hợp-tác = chuỗi sync call (holder không đổi, D8) tới nhiều persona, KHÔNG multi-holder cùng lúc; song song thật = decompose ra item con (`fgos-fanout`, có sẵn). **[Round 19: câu so sánh marketing-cockpit gốc ở đây đã LỖI THỜI so với D20 — xem §6 subsection "Eligibility declaration" cho bản đã sửa; tóm tắt: `claims` không phải "đi xa hơn", D20 đã đảo ngược chính hướng đó.]** **[Round 19 tiếp: "CỐ Ý CHƯA XÂY" ở câu cuối ĐÃ CHỐT — xem D25: ranh giới stage-đổi-persona-ngầm KHÔNG dừng driving, giải qua sync mặc định (cùng cơ chế `handoff.mjs`/`roleGraph.edges` dòng này đã nhắc).]** |
 | 27 | Workflow definition sống ở đâu — có file riêng không, hay chỉ là key lồng trong registry.mjs? | Chốt — D18 | Chưa có file riêng hôm nay (chỉ `codingDomain.workflows.feature`, reference-sharing với top-level field, D7a). `domains/<name>/workflows/<name>.mjs` là nơi ở chính thức mới — `registry.mjs` thành aggregator cho map `workflows` của chính nó, mirror D4 một tầng sâu hơn. |
 | 28 | `agents/*.yaml`→`.claude/agents/*.md` render-pair (như skill's D7) nên tách vào `domains/<name>/agents/` hay giữ nguyên top-level `agents/`? | Chốt — D24 | Scout thật: `scripts/project-agents.mjs` chiếu `agents/*.yaml` (SOURCE_DIR top-level) → `.claude/agents/*.md` (TARGET_DIR). Đề xuất đầu (giữ top-level) bị người bác 2 lần — SAI vì lẫn "eligibility domain-agnostic" với "chỗ chứa file domain-agnostic". Chốt: tách ĐÚNG công thức D7 — `core/agents/` (thật domain-agnostic) + `domains/<name>/agents/` (viết riêng theo flavor domain). Xem §6. |
 | 29 | Diagram 3-tầng DISPATCH/ROUTING/DRIVING (D13) có bố cục đúng không — và stage-entry (discover/exploring/planning/executing) có phải ứng viên dispatch như dòng Collaboration không? | Chốt — D22 | KHÔNG đúng ở 2 điểm: (1) session-origin có 2 đường ngang hàng (root-spawn CHỈ runner-không-người, người tự mở session là đường khác NGOÀI `dispatch.mjs`), không chỉ 1; (2) stage-entry LÀ ứng viên dispatch, dùng CHUNG phép khớp `requires-skill`/`skills` (D20) với dòng Collaboration — nhìn no-op hôm nay chỉ vì thiếu dữ liệu (1 role xuyên mọi stage, chưa ai viết `requires-skill` khác nhau), không phải khác cơ chế. Xem §6 diagram mới. |
@@ -395,6 +422,10 @@ thi thật.
 | D22 | DISPATCH's eligibility-check là 1 CƠ CHẾ THỐNG NHẤT, xảy ra ở MỌI điểm cần role — không chỉ dòng Collaboration. Stage-entry (`bundleForStage`, D14, role CHÍNH) và dòng Collaboration (consult/assist/review/advise, role PHỤ) đều khớp qua CÙNG phép match D20 (`requires-skill`/`assignable-to` của task-spec ↔ `skills` của agent-type) — khác nhau chỉ ở task-spec NÀO đang được khớp. Stage-entry nhìn như no-op hôm nay CHỈ VÌ `roleGraph` có 1 role xuyên mọi stage + chưa ai viết `requires-skill` khác nhau cho từng task-spec — KHÔNG PHẢI vì cơ chế khác dòng Collaboration. Session-origin cũng có 2 đường ngang hàng dẫn vào CÙNG 1 downstream ROUTING/DRIVING: root-spawn (`spawnWorker`, chỉ runner-không-người) HOẶC người tự mở Claude Code trực tiếp (hoàn toàn ngoài code `dispatch.mjs`). | Người bác bỏ đúng phát biểu sai của trợ lý ("stage transition tự nó KHÔNG dispatch") bằng câu hỏi ngược: "nếu không phải thì thiết kế workflow/stage/task-spec/agent/skill dispatch (bundle mix load) làm gì?". Scout xác nhận `judge-ambiguity.md`/`lock-decisions.md`/`implement-item.md` đều `position: implementer` (role đứng yên mọi stage hôm nay) — nhưng role (seat, `roleGraph`) và skill (năng lực, `requires-skill` D20) là 2 TRỤC khác nhau; `bundleForStage`'s task-spec riêng mỗi stage, một khi mang `requires-skill` (D20), khiến stage-entry trở thành 1 phép khớp dispatch THẬT, chỉ suy biến thành no-op hôm nay vì thiếu đa dạng persona/skill, không phải khác biệt thiết kế. |
 | D23 | Doctrine domain-scoped sống tại `domains/<name>/AGENTS.md` — CÙNG LOẠI file với root `AGENTS.md` (standing doctrine), chỉ hẹp phạm vi lại, KHÔNG phải khái niệm mới như knowledge/specs/task-specs. Root `AGENTS.md`/`CLAUDE.md` chỉ giữ phần THẬT domain-agnostic (Dispatch, priority order, DoD 6-câu-hỏi, doctor/setup gate); mục "fgOS Workflow" (hard-code tên `fgos-coding-*`) và toàn bộ "GitNexus — Code Intelligence" chuyển vào `domains/coding/AGENTS.md` — migration thật đầu tiên. Cơ chế NẠP ĐƯỢC ĐẢM BẢO: `fgos-routing` tự Read `domains/<domain>/AGENTS.md` ngay khi domain đã resolve (cùng pattern `bundleForStage` D14, một tầng cao hơn — cấp DOMAIN thay vì cấp STAGE) — KHÔNG dựa vào auto-discovery AGENTS.md lồng thư mục (chưa kiểm chứng Claude Code có hỗ trợ hay không). | Người bác đề xuất "cố ý CHƯA XÂY" của trợ lý — `coding` ĐÃ có doctrine riêng thật hôm nay, hard-mix vào `AGENTS.md` gốc (mục "fgOS Workflow" gọi thẳng tên `fgos-coding-*`, mục GitNexus toàn code-symbol-specific), không phải giả thuyết tương lai. Người đòi thẳng "1 cơ chế dẫn dắt để agent biết mà tìm đến doctrine riêng của từng domain" — trợ lý grounding bằng `@import` tĩnh (nạp trước khi biết domain, không điều kiện hoá được), đề xuất routing tự Read tường minh thay vì auto-import, đúng pattern `bundleForStage` (D14) một tầng cao hơn. Người chọn tên `AGENTS.md` thay vì `doctrine.md` — cùng loại file với root, không bịa từ mới — sau khi trợ lý nêu trade-off tên gọi + cảnh báo chưa kiểm chứng auto-discovery. |
 | D24 | `agents/*.yaml` tách theo ĐÚNG công thức D7 đã dùng cho skill: `core/agents/` (agent-type THẬT domain-agnostic, VD `fgos-placeholder`) + `domains/<name>/agents/` (agent-type viết RIÊNG cho flavor domain đó, VD `domains/coding/agents/tech-lead.yaml`). `scripts/project-agents.mjs`'s `SOURCE_DIR` mở rộng quét CẢ 2 nơi (mirror cơ chế assembly D7 đã đặt cho skill), chiếu ra `.claude/agents/` không đổi. Eligibility (D20) KHÔNG bị ảnh hưởng bởi vị trí file — 1 agent-type ở `domains/coding/agents/` VẪN đủ điều kiện cho task-spec `marketing` nếu khớp `skills`, y hệt cách `core/skills/` không ngăn domain khác gọi nó. Chỗ chứa phản ánh AI VIẾT/SỞ HỮU CHO DOMAIN NÀO, không phải hàng rào giới hạn dùng. | Người bác đề xuất "giữ top-level" của trợ lý LẦN THỨ 2: "có chứ mỗi domain sẽ có bộ agents riêng phù hợp chứ". Trợ lý soi lại: đã lẫn "cơ chế eligibility D20 domain-agnostic" với "chỗ chứa file cũng phải domain-agnostic" — non-sequitur, chính tiền lệ `skill` (D7) đã bác bỏ: skill CŨNG load được xuyên domain về mặt cơ chế, nhưng D7 VẪN tách `core/skills/`+`domains/*/skills/` theo ai viết/sở hữu, không theo "có bị chặn cross-domain hay không" (chưa bao giờ chặn). |
+| D25 | Driving KHÔNG BAO GIỜ hard-stop vì nhu cầu persona-ngầm-khác-stage (cùng role, persona mặc định khác, không có Collaboration-row async khai rõ) — giải quyết qua CÙNG cơ chế sync team-collaboration đã chốt (D15/tsk-2t9c D8): sync consult tới persona đủ điều kiện cho task-spec CHÍNH của stage đó, holder không đổi, driving TIẾP TỤC. Driving CHỈ dừng thật khi 1 interaction TỰ KHAI async rõ ràng (VD `review` khi verify xanh, D8 tsk-2t9c) — không bao giờ chỉ vì agent-type hiện tại thiếu `skills` cho stage mới. Xác nhận KHÔNG phải xây mới: `src/state/handoff.mjs`'s `evaluateHandoff` + `roleGraph.edges` (`workflow-stage-graphs.mjs:405-441`) đã implement ĐÚNG graph hợp pháp này, `callstackCap: 3` đã enforce cho async nesting, và ít nhất 2 edge thật đã chứng minh trao đổi TRỰC TIẾP (không qua lead) được hỗ trợ khi khai rõ (`reviewer`→`researcher`, `reviewer`→`human-advisor`, stage `executing`) — protocol là DỮ LIỆU (`roleGraph.edges`), không phải luật cứng hub-only hay direct-only. | Người bác thẳng khung "cố ý CHƯA XÂY": bản chất quy trình phần mềm ĐÚNG vốn là team nhiều persona, làm đúng thì chất lượng TỐT HƠN — ép driving dừng mỗi lần persona cần khác đi ngược lợi ích đó. Trợ lý grounding bằng code THẬT đã ship (`handoff.mjs`, `roleGraph.edges`, tsk-2t9c) thay vì bịa cơ chế mới — model sync/async edge-graph sẵn có tổng quát hoá sạch sang cả stage-entry mismatch, không chỉ Collaboration-row. Gap thật tìm thấy, CHƯA giải (không chặn quyết định này): `callstackCap` chỉ chặn nesting ASYNC theo chính docstring ("sync calls never nest against this cap") — D25 dồn nhiều lưu lượng hơn sang đường SYNC không có cap, rủi ro mở cho quyết định sau. |
+| D26 | Đổi tên field eligibility trên task-spec từ `assignable-to` thành `agent` (D20's field ghim cứng tên agent-type cụ thể) — ngắn hơn, giữ nguyên ý nghĩa, không đổi hành vi. `requires-skill` không đổi. | Người yêu cầu đổi tên. Sửa naming thuần trên field D20 đã chốt, không thêm ngữ nghĩa mới. |
+| D27 | `core/task-specs/` — folder MỚI thật, chứa task-spec cho 7 skill domain-agnostic (`fgos-routing`, `fgos-clarifying`, `fgos-researching`, `fgos-unlock`, `fgos-fanout`, `fgos-indexing`, `distill`) — hợp đồng input/output/gates/verify-template của chúng chuyển từ CHỈ ẨN trong prose SKILL.md riêng sang file task-spec tường minh, cùng kỷ luật hình dạng `domains/coding/task-specs/` (D9). KHÔNG đảo ngược D8-revised (chỉ miễn field-schema work-item — `EDITABLE_FIELDS`/`work.mjs` — khỏi cần file spec) — giải 1 câu hỏi RIÊNG, chưa từng đặt ra: 7 core-skill có cần task-spec kiểu tsk-2t9c như mọi skill coding hay không. Xác nhận là gap THẬT, chặn thật: `docs/task-specs/` hôm nay có ĐÚNG 13 file, TOÀN BỘ dưới `docs/task-specs/coding/`, 0 file cho bất kỳ core-skill nào — nghĩa là phép khớp eligibility skill-tag của D20/D24 (`requires-skill` trên task-spec, `skills`/`agent` D26 trên agent-type) KHÔNG có chỗ neo để khai `requires-skill` cho core-skill nào hôm nay. | Người: task-specs của core cần chuẩn bị trước, tường minh đúng chỗ thay vì ẩn trong code, dễ hiểu dễ bảo trì hơn. Trợ lý scout `docs/task-specs/` xác nhận đúng — 7 core-skill thật sự 0 coverage, gap thật thảo luận này chưa từng để ý (miễn trừ D8-revised là câu hỏi KHÁC — field-schema, không phải per-skill task-spec contract) — không phải scope-creep, là lấp gap mà chính cơ chế eligibility D20/D24 đã phụ thuộc vào. |
+| D28 | Giải gap `callstackCap` D25 tự nêu: cap áp dụng cho ĐỘ SÂU sync LỒNG (1 sync call tự mở 1 sync call khác trong lúc còn đang mở, chồng lên nhau) — cùng rủi ro chuỗi-chạy-vô-hạn mà `callstackCap` đã chặn cho async. Sync NGANG HÀNG/tuần tự (1 call xong hẳn rồi call khác mới bắt đầu — VD consult của stage 1 xong trước khi consult riêng của stage 2 bắt đầu sau đó) KHÔNG tính vào cap nào — không giới hạn TỔNG số sync call 1 driving session gọi suốt vòng đời, chỉ giới hạn ĐỘ SÂU lồng tại 1 thời điểm. `handoff.mjs`'s `evaluateHandoff` cần thêm tham số kiểu `openSyncDepth` (mirror `openCallDepth` hiện có, vốn chỉ tính async), chỉ tăng khi 1 sync call mở THẬT SỰ trong lúc 1 sync call khác vẫn đang mở. | Người trả lời thẳng gap D25 tự nêu: "cap cho sync là sync lồng (nested) chứ còn sync ngang hàng thì không cần cap" — phân biệt độ sâu lồng (rủi ro thật, cùng lớp async nesting đã chặn) khỏi sync tuần tự/ngang hàng suốt vòng đời driving loop (không rủi ro, vì mỗi call xong hẳn rồi call sau mới bắt đầu — cap ở đây sẽ chặn nhầm việc nhiều-stage hợp lệ, kéo dài thật). |
 
 ## 5. Q&A log
 
@@ -640,6 +671,20 @@ thi thật.
   (sai) — tiền lệ `skill` D7 đã bác bỏ điều này (skill cũng load xuyên
   domain được nhưng vẫn tách core/domain theo ai viết). Áp lại đúng công
   thức D7 cho agent-type → D24 (seq 21174).
+- 2026-08-19 — Round 19 tiếp lần nữa nữa, D25-D28: người trả lời câu hỏi
+  treo D15 ("không dừng persona... team nhiều persona... chất lượng tốt
+  hơn") → D25, grounding bằng `handoff.mjs`/`roleGraph.edges` thật (không
+  xây mới). Cùng lượt, người gộp 4 điểm: rename `assignable-to`→`agent`
+  (D26); hỏi lại protocol trao đổi team (qua lead hay direct) + cơ chế
+  dispatch chịu tải "đá qua lại" — trợ lý tìm ra roleGraph.edges đã có
+  sẵn (data-driven graph, có edge trực tiếp thật), nhưng phát hiện gap
+  `callstackCap` chỉ chặn async — người trả lời "cap cho sync là sync
+  lồng, sync ngang hàng thì không cần cap" → D28; core task-specs cần
+  tường minh — trợ lý scout `docs/task-specs/` xác nhận 0/13 file cho
+  core-skill, gap thật → D27. Người hỏi thêm `registry.mjs` giờ giữ gì —
+  trợ lý trả lời trực tiếp (không phải D-ID, chỉ là hệ quả các quyết
+  định đã chốt) + phát hiện/sửa 1 dòng ASCII-tree stale (tàn dư D8 sai).
+  Đã bật opus agent rà lại toàn file, đang chờ báo cáo.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -672,8 +717,11 @@ forgentX/
 │   ├── skills/                           # ★ D7 — canonical AUTHORING (thay .agents/skills/core/)
 │   │   ├── fgos-routing/  fgos-clarifying/  fgos-researching/
 │   │   └── fgos-unlock/   fgos-fanout/      fgos-indexing/   distill/
-│   └── agents/                           # ★ D24 — agent-type THẬT domain-agnostic (mirror skill's D7)
-│       └── fgos-placeholder.yaml         # di dời từ agents/ top-level (chỉ file thật hôm nay)
+│   ├── agents/                           # ★ D24 — agent-type THẬT domain-agnostic (mirror skill's D7)
+│   │   └── fgos-placeholder.yaml         # di dời từ agents/ top-level (chỉ file thật hôm nay)
+│   └── task-specs/                       # ★ D27 — MỚI, task-spec cho 7 skill domain-agnostic ở trên
+│       ├── routing.md  clarifying.md  researching.md
+│       └── unlock.md   fanout.md        indexing.md    distill.md
 ├── docs/
 │   ├── specs/                            # ★ D8 SỬA LẠI — GIỮ NGUYÊN, KHÔNG di dời (bản D8 đầu sai, đã sửa).
 │   │   │                                 #   12 file platform/core (work-state, runner, distribution, ...)
@@ -691,12 +739,22 @@ forgentX/
 │
 ├── domains/                              # ★ MỚI — top-level
 │   ├── coding/
-│   │   ├── registry.mjs                  # workflow (stages/stepMap/transitions/skillMap)
-│   │   │                                 #   + task-specs (fieldSchema — CÙNG file, work.mjs đọc
-│   │   │                                 #   domain?.fieldSchema từ đây, D2)
+│   │   ├── registry.mjs                  # ★ SỬA (stale comment cũ, round 19) — GIỮ: stages/stepMap/
+│   │   │   #   transitions (default workflow `feature`, reference-shared với workflows.feature, D7a) +
+│   │   │   #   skillMap/taskSpecMap (2 POINTER map: stage→tên skill/id task-spec, KHÔNG chứa nội dung
+│   │   │   #   thật — nội dung sống ở skills/ và task-specs/ sibling folder) + roleGraph + worktreeBacked/
+│   │   │   #   statusLabels/parkReason/classification + workflows{defaultWorkflow,workflowFor} (D18
+│   │   │   #   aggregator). KHÔNG còn chứa task-specs/fieldSchema — đó là hiểu SAI của D8 (đã sửa D9).
+│   │   ├── workflows/                    # ★ D18 — MỚI, workflow ĐỘC LẬP thật (bugfix/lightweight khi viết
+│   │   │   │                             #   ra); `feature` KHÔNG có file ở đây — vẫn reference-share với
+│   │   │   │                             #   registry.mjs's top-level fields (D7a, giữ nguyên identity)
+│   │   │   └── bugfix.mjs                # ví dụ minh hoạ (chưa file thật — chưa đến lúc viết, D10/D17)
 │   │   ├── skills/                       # skill — canonical AUTHORING (D7), di dời từ .agents/skills/
 │   │   │   ├── discovering/  exploring/  planning/  validating/
 │   │   │   └── implement/    shaping/    driving/    compounding/
+│   │   ├── task-specs/                   # ★ D9 — 13 file thật, di dời từ docs/task-specs/coding/
+│   │   │   ├── implement-item.md  judge-ambiguity.md  lock-decisions.md  shape-plan.md
+│   │   │   └── validate-plan.md   review-item.md       ... (9 file còn lại)
 │   │   ├── knowledge/                    # ★ D6 — curated domain-knowledge, riêng của team, co-located
 │   │   │   # (KHÁC docs/history/ — knowledge được bảo trì chủ động, context thì thô/append-only)
 │   │   │   # tiền lệ thật: /home/vantt/projects/beegog/expertise/ (knowledge.md tự mô tả
@@ -711,7 +769,9 @@ forgentX/
 │   │
 │   └── marketing/                        # ★ tương lai (STR52) — thêm vào đây, KHÔNG sửa gì trong coding/
 │       ├── registry.mjs
+│       ├── workflows/                    # ★ D18 — viết khi domain đó thật xây
 │       ├── skills/
+│       ├── task-specs/                   # ★ D9 — viết khi domain đó thật xây
 │       ├── specs/                        # ★ D8 — spec business trước khi có code (luật AGENTS.md)
 │       ├── agents/                       # ★ D24 — agent-type viết riêng cho flavor marketing (viết khi xây)
 │       └── AGENTS.md                     # ★ D23 — doctrine riêng marketing (viết khi domain đó thật xây)
@@ -904,8 +964,9 @@ tuần tự):**
    từ đường nào.
 2. **DISPATCH không phải "tầng chạy 1 lần rồi thôi" — nó là dịch vụ bị
    gọi LẶP LẠI, từ NHIỀU điểm, dùng CHUNG 1 phép khớp (D20/D22).** Có 2
-   loại điểm gọi, cả 2 đều khớp `requires-skill`/`assignable-to` (task-spec)
-   ↔ `skills` (agent-type) — chỉ khác NGUỒN task-spec:
+   loại điểm gọi, cả 2 đều khớp `requires-skill`/`agent` (task-spec, D26
+   đổi tên từ `assignable-to`) ↔ `skills` (agent-type) — chỉ khác NGUỒN
+   task-spec:
    - **Stage-entry** (role CHÍNH): mỗi lần DRIVING vào 1 stage mới,
      `bundleForStage(domain, stage)` (D14) nạp task-spec CỦA STAGE ĐÓ.
      Task-spec đó (sau D20) mang `requires-skill` riêng — phải khớp lại
@@ -949,14 +1010,14 @@ flowchart TB
     collabRow --> ELIG
 
     subgraph ELIG["DISPATCH eligibility-check -- THỐNG NHẤT (D20/D22)"]
-        match["requires-skill / assignable-to (task-spec)<br/>khớp skills (agent-type)"]
+        match["requires-skill / agent (task-spec, D26)<br/>khớp skills (agent-type)"]
     end
 
     ELIG -->|"khớp -- cùng agent-type"| stay["Ở NGUYÊN in-process<br/>(hôm nay: LUÔN đúng cho stage-entry,<br/>role=implementer mọi stage)"]
-    ELIG -->|"không khớp / cần role khác"| handoff["Dispatch thật:<br/>sync (holder không đổi) hoặc<br/>async (holder đổi)"]
+    ELIG -->|"không khớp -- MẶC ĐỊNH sync (D25)"| handoff["Dispatch thật:<br/>sync (holder không đổi, MẶC ĐỊNH cho<br/>stage-entry mismatch, D25) hoặc<br/>async (holder đổi, CHỈ khi interaction<br/>tự khai async rõ, VD review)"]
 
     stay --> DRIVING
-    handoff -->|"sync -- xong, driving TIẾP TỤC"| DRIVING
+    handoff -->|"sync -- xong, driving TIẾP TỤC<br/>(cap độ sâu LỒNG, D28 -- không cap<br/>sync ngang hàng/tuần tự)"| DRIVING
     handoff -.->|"async -- driving DỪNG,<br/>quay lại như 1 session-origin mới"| ORIGIN
 ```
 
@@ -988,8 +1049,9 @@ quan (N×M), không giải thích được ví dụ "marketing-lead và tech-lea
 làm được PM" (round 14) trừ khi cả 2 tự liệt kê tay cùng 1 ID ở 2 file
 riêng. D20 đảo hướng: agent-type CHỈ khai cái NÓ CÓ (`soul` = `role`/
 `persona`/`decision_boundary` đã có + `skills` MỚI, KHÔNG còn `claims`);
-task-spec khai cái NÓ CẦN (`assignable-to: [...]` hiếm/ghim cứng, hoặc
-`requires-skill: [...]` thường). D22 mở rộng: phép khớp này áp dụng cho
+task-spec khai cái NÓ CẦN (`agent: [...]` hiếm/ghim cứng — D26 đổi tên
+từ `assignable-to` — hoặc `requires-skill: [...]` thường). D22 mở rộng:
+phép khớp này áp dụng cho
 CẢ stage-entry (task-spec chính) LẪN dòng Collaboration (task-spec phụ)
 — không riêng gì Collaboration như bản D20 gốc ngụ ý.
 
@@ -1248,7 +1310,7 @@ lượt riêng, để chỉ đụng `stage-fsm.mjs` (module test dày đặc nh�
   đúng qua wrapper mới (không hồi quy); KHÔNG cần test cho đa dạng
   persona thật — đó là phần cố ý chưa xây (D15's "chờ bằng chứng").
 
-### {#task-eligibility-inversion} Đảo hướng eligibility: `agents/*.yaml` claims→skills, task-spec thêm assignable-to/requires-skill
+### {#task-eligibility-inversion} Đảo hướng eligibility: `agents/*.yaml` claims→skills, task-spec thêm agent/requires-skill
 
 - **Mục tiêu:** hiện thực D20/D21 — đảo hướng khai báo eligibility ở
   đúng 4 điểm chạm code thật đã scout (round 18-19, không phải suy
@@ -1262,29 +1324,32 @@ lượt riêng, để chỉ đụng `stage-fsm.mjs` (module test dày đặc nh�
      list string không rỗng, giống `tool-scope`); `projectAgentMarkdown`
      (dòng 137-147) đổi chép `claims` → chép `skills` vào frontmatter
      `.claude/agents/<name>.md`.
-  3. Schema task-spec (`docs/task-specs/<domain>/*.md`, hoặc
-     `domains/<domain>/task-specs/*.md` nếu task-domain-registry-split
-     +D9 đã xong trước): thêm field `assignable-to: [...]` (optional,
-     ghim cứng tên agent cụ thể) và/hoặc `requires-skill: [...]` vào
-     dòng header 1-dòng hiện có (`domain: coding | stage: executing |
-     position: implementer`, ví dụ `implement-item.md:3` — cũng là
-     chỗ cần sweep `position`→`role` theo D16, cùng lượt).
+  3. Schema task-spec (sau {#task-eligibility-inversion} + D9's di dời:
+     `domains/<domain>/task-specs/*.md`, và `core/task-specs/*.md` mới
+     của D27): thêm field `agent: [...]` (D26, đổi tên từ
+     `assignable-to` — optional, ghim cứng tên agent cụ thể) và/hoặc
+     `requires-skill: [...]` vào dòng header 1-dòng hiện có (`domain:
+     coding | stage: executing | position: implementer`, ví dụ
+     `implement-item.md:3` — cũng là chỗ cần sweep `position`→`role`
+     theo D16, cùng lượt).
   4. `src/setup/registrations.mjs`: `checkAgentClaimsResolve`/
      `extractClaimsFromYamlText`/`allTaskSpecIds` (dòng 419-503, doctor
      check `agent-claims-resolve`) đổi hướng resolve — kiểm mọi
      `requires-skill` của task-spec có ÍT NHẤT 1 agent-type nào đó
-     `skills` khớp, và mọi `assignable-to` trỏ tới agent-type có thật
-     (tên check gợi ý đổi thành `task-spec-eligibility-resolve` hoặc
-     tương đương, để phản ánh đúng hướng resolve mới).
+     `skills` khớp, và mọi `agent` trỏ tới agent-type có thật (tên check
+     gợi ý đổi thành `task-spec-eligibility-resolve` hoặc tương đương,
+     để phản ánh đúng hướng resolve mới; mở rộng quét CẢ
+     `core/task-specs/` (D27) lẫn `domains/*/task-specs/`).
   5. `src/runner/dispatch.mjs`: mở rộng (D21) để `agentType` trong
      `buildAgentTypeExecutor` resolve qua skill-match thay vì đọc
      `claims` tĩnh — điểm chạm DISPATCH thật của toàn bộ đảo hướng này.
 - **§6 excerpt áp dụng:** subsection "Tầng DISPATCH/ROUTING/DRIVING"
   (đoạn "Eligibility declaration (D20)" bên trong) + mermaid so sánh
   cũ/mới ngay dưới đoạn đó.
-- **D-ID áp dụng:** D20, D21, D22 (D22: phép khớp `requires-skill` phải
-  áp dụng cho task-spec CHÍNH của stage — không chỉ task-spec của dòng
-  Collaboration — để stage-entry dispatch thật sự quan sát được).
+- **D-ID áp dụng:** D20, D21, D22, D26 (D22: phép khớp `requires-skill`
+  phải áp dụng cho task-spec CHÍNH của stage — không chỉ task-spec của
+  dòng Collaboration — để stage-entry dispatch thật sự quan sát được;
+  D26: field tên `agent`, không phải `assignable-to`).
 - **Quan hệ:** độc lập với {#task-domain-registry-split} (không đụng
   `codingDomain`/`registry.mjs`) — có thể làm song song; NẾU
   task-domain-registry-split + D9 (di dời `docs/task-specs/coding/` →
@@ -1360,7 +1425,51 @@ lượt riêng, để chỉ đụng `stage-fsm.mjs` (module test dày đặc nh�
   lẫn `domains/*/agents/`; `.claude/agents/fgos-placeholder.md` sinh ra
   byte-identical với trước khi di dời (hình dạng output không đổi).
 
-**Việc CHƯA đủ hình dạng để thành task riêng:** ranh giới
-stage-đổi-persona-ngầm có nên dừng driving (D15's phần cố ý chưa xây) —
-duy nhất còn lại, chờ bằng chứng persona đa dạng thật, không phải chờ
-xác nhận từ người (khác 2 việc doctrine/render-pair đã chốt D23/D24).
+### {#task-core-task-specs} Tạo `core/task-specs/` — 7 task-spec cho 7 skill domain-agnostic
+
+- **Mục tiêu:** hiện thực D27 — viết 7 file task-spec MỚI (cùng khuôn
+  `docs/task-specs/coding/*.md` đã có: header 1-dòng + Input/Output/
+  Gates/Verify-template/Collaboration) cho `fgos-routing`,
+  `fgos-clarifying`, `fgos-researching`, `fgos-unlock`, `fgos-fanout`,
+  `fgos-indexing`, `distill` — đặt tại `core/task-specs/`. Nội dung mỗi
+  file rút ra từ chính SKILL.md hiện có của skill đó (contract đã tồn
+  tại, chỉ đang ẩn trong prose, không phải bịa mới).
+- **§6 excerpt áp dụng:** dòng `core/task-specs/` trong ASCII tree.
+- **D-ID áp dụng:** D27.
+- **Quan hệ:** độc lập — không phụ thuộc task nào khác; NÊN làm TRƯỚC
+  hoặc CÙNG {#task-eligibility-inversion} để 7 skill này có chỗ neo khai
+  `requires-skill` ngay khi cơ chế match D20 triển khai, tránh 7 skill
+  domain-agnostic bị bỏ sót khỏi eligibility ngay từ đầu.
+- **Verify nháp:** doctor check mới (hoặc mở rộng
+  `task-specs-resolve` hiện có) xác nhận `core/task-specs/*.md` tồn tại
+  đủ 7 file, mỗi file có đủ 4 mục bắt buộc (Input/Output/Gates/
+  Verify-template); grep SKILL.md của 7 skill này không còn mô tả
+  input/output/gates trùng lặp (dời hẳn sang task-spec, SKILL.md trỏ
+  tham chiếu thay vì lặp lại).
+
+### {#task-sync-nesting-cap} Mở rộng `handoff.mjs` thêm cap độ sâu sync LỒNG
+
+- **Mục tiêu:** hiện thực D25+D28 — `evaluateHandoff` (`src/state/
+  handoff.mjs`) hiện chỉ tính `openCallDepth` cho `mode: 'async'`
+  (`callstackCap: 3`, dòng 59-66). Thêm tham số `openSyncDepth` cùng kỷ
+  luật — chỉ tăng khi 1 sync call MỞ THẬT trong lúc 1 sync call khác vẫn
+  đang mở (lồng), KHÔNG tăng cho sync tuần tự/ngang hàng (call trước đã
+  đóng hẳn). Đồng thời: driving's stage-entry (D25) khi eligibility-check
+  không khớp, mặc định gọi handoff `mode: 'sync'` (không phải `async`)
+  trừ khi interaction đó tự khai async rõ trong `roleGraph.edges`.
+- **§6 excerpt áp dụng:** node `ELIG`/`handoff` trong mermaid DISPATCH/
+  ROUTING/DRIVING, nhánh "sync -- cap độ sâu LỒNG (D28)".
+- **D-ID áp dụng:** D25, D28.
+- **Quan hệ:** phụ thuộc {#task-eligibility-inversion} (cần `requires-skill`
+  thật trên task-spec để có gì mà eligibility-check thật sự không khớp) —
+  làm SAU, không phải trước.
+- **Verify nháp:** test mới cho `evaluateHandoff` — 1 chuỗi sync LỒNG
+  vượt cap phải bị từ chối đúng thông báo (mirror test hiện có cho async
+  cap); 1 chuỗi sync TUẦN TỰ dài (VD 10 stage liên tiếp, mỗi stage 1
+  sync call riêng, không lồng) KHÔNG bị chặn — test hiện có của
+  `handoff.mjs` (module test thuần, không cần store/lock) không hồi quy.
+
+**Việc CHƯA đủ hình dạng để thành task riêng:** KHÔNG CÒN — D25 đã trả
+lời câu hỏi treo cuối cùng của D15 (ranh giới stage-đổi-persona-ngầm
+không còn "cố ý chưa xây", giải qua sync mặc định). 28/28 quyết định đã
+chốt, mọi câu hỏi mở trong §3 đều có D-ID.
