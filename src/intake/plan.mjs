@@ -29,7 +29,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { judgeVerifySemanticCorrectness } from './verify-pattern-check.mjs';
 import { listWork, moveStage, moveWork, addWork, putInAwaiting, addDecision, editWork, StoreError } from '../state/store.mjs';
-import { getDomain, stageForStep } from '../state/workflow-stage-graphs.mjs';
+import { getDomain, resolveWorkflow, stageForStep } from '../state/workflow-stage-graphs.mjs';
 import { rankImpact } from '../state/impact.mjs';
 import { computeImpact, computePriority, effortForMode, MODE_EFFORT, isRecognizedRisk } from '../state/priority-formula.mjs';
 import { footprintOverlapAmong } from '../state/graph-metrics.mjs';
@@ -557,7 +557,8 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
   // `coding`) — a domain whose OWN live Divide stage is still literally
   // named `decompose` (never renamed by this item) already has
   // `planningStage === 'decompose'`, so this stays a no-op for it.
-  const legacyPlanStage = domain.stages?.includes('decompose') && planningStage !== 'decompose' ? 'decompose' : undefined;
+  const workflow = resolveWorkflow(domain, work.kind);
+  const legacyPlanStage = (workflow?.stages ?? domain.stages)?.includes('decompose') && planningStage !== 'decompose' ? 'decompose' : undefined;
   if (currentStage !== planningStage && currentStage !== legacyPlanStage) {
     return { outcome: 'noop', id };
   }

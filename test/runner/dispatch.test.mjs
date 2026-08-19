@@ -2733,8 +2733,15 @@ test('spawnWorker threads a FGOS_DISPATCH_DEPTH of "1" into a fresh (non-nested)
   const dir = mkTempDir();
   const scriptPath = writeDepthEchoExecutor(dir);
   const cfg = baseConfig([scriptPath]);
-  const result = await spawnWorker(sampleWork(), cfg, mkTempDir());
-  assert.deepEqual(JSON.parse(result.stdout), { depth: '1' });
+  const priorDepth = process.env[DISPATCH_DEPTH_ENV];
+  delete process.env[DISPATCH_DEPTH_ENV];
+  try {
+    const result = await spawnWorker(sampleWork(), cfg, mkTempDir());
+    assert.deepEqual(JSON.parse(result.stdout), { depth: '1' });
+  } finally {
+    if (priorDepth !== undefined) process.env[DISPATCH_DEPTH_ENV] = priorDepth;
+    else delete process.env[DISPATCH_DEPTH_ENV];
+  }
 });
 
 test('spawnWorker refuses with DispatchError(dispatch-depth-exceeded) once FGOS_DISPATCH_DEPTH already sits at the cap -- never spawns', async () => {
