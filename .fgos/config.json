@@ -30,6 +30,12 @@
       },
       "pane-labeling": {
         "description": "Write a session/task id onto the current terminal pane's label, for a human watching a screen"
+      },
+      "advise": {
+        "description": "Async product-decision consult -- value comes from disagreement, never changes state, one question/one answer (D2, docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md)"
+      },
+      "execute": {
+        "description": "Compliance-driven work -- value comes from following the plan, changes files, must pass verify (D2, docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md)"
       }
     },
     "executors": {
@@ -61,6 +67,23 @@
           "standard": "lightweight",
           "heavy": "lightweight"
         }
+      },
+      "codex": {
+        "kind": "agent",
+        "description": "OpenAI Codex CLI (bypass-all -- no sandbox boundary, see docs/history/codex-bypass-executor/)",
+        "allowCrossProvider": true,
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "codex",
+            "args": [
+              "exec",
+              "--dangerously-bypass-approvals-and-sandbox",
+              "{prompt}"
+            ]
+          }
+        ]
       },
       "gitnexus": {
         "kind": "tool",
@@ -94,6 +117,37 @@
             "args": []
           }
         ]
+      },
+      "pi": {
+        "kind": "agent",
+        "description": "pi coding agent (openai-codex/gpt-5.5) -- reference runtime for the coding-worker-contract, D4 proof-test GREEN (tsk-47r)",
+        "allowCrossProvider": true,
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "pi",
+            "args": [
+              "--provider",
+              "openai-codex",
+              "--model",
+              "{model}",
+              "--tools",
+              "read,write,edit,bash,grep,find,ls",
+              "--mode",
+              "json",
+              "--approve",
+              "-p",
+              "{prompt}"
+            ]
+          }
+        ],
+        "providerModel": "openai-codex",
+        "rigorOverrides": {
+          "light": "lightweight",
+          "standard": "lightweight",
+          "heavy": "lightweight"
+        }
       }
     },
     "timeoutMs": 900000,
@@ -111,6 +165,9 @@
       },
       "gemini": {
         "lightweight": "gemini-3.6-flash-medium"
+      },
+      "openai-codex": {
+        "lightweight": "gpt-5.5"
       }
     }
   },

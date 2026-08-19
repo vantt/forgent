@@ -11,7 +11,7 @@ entries: [repository-harness:durable-sqlite-layer, repository-harness:changeset-
 
 Bốn nguồn: **repository-harness** (hn, SQLite + changesets), **beads** (bd, Go — Steve Yegge, đã pivot Dolt), **beads-rust** (br, Rust — Dicklesworthstone, cố ý ở lại classic SQLite+JSONL), **beads-viewer-rust** (bvr, tầng phân tích đặt trên đồ thị beads). Hai deep-dive liên quan: `state.md` (vật lý store, đã phân tích changeset vs Dolt vs JSONL sâu hơn về mặt state) và `routing.md` (concurrency tầng-1). Dive này nhìn cùng dữ liệu theo trục **vòng đời của một work-item**: sống ở đâu (git/JSONL) → là gì (unit model) → vào hệ bằng cửa nào (triage) → chọn cái nào (selection) → xếp thứ tự ra sao (ordering) → plan bằng gì → và nhiều agent cùng làm thì điều phối thế nào.
 
-**Bottom Line:** Bảy câu hỏi này thực ra là **một pipeline có tầng**, và không nguồn nào sở hữu cả pipeline: hn mạnh nhất ở *cửa vào* (intake phân risk + story packet có proof) và *cửa ra* (close atomic, contract cho orchestrator ngoài); bd mạnh nhất ở *mô hình unit* (issue = node đồ thị 10 loại dependency, mọi thứ — gate, message, workflow — đều là bead) và *coordination nguyên thủy* (claim/lease/slot); br mạnh nhất ở *độ tin cậy vận hành* (locking + backoff, health contract, sync không thể phá cây, scheduler tất định); bvr mạnh nhất — và **một mình một chiếu** — ở *tầng quyết định phía trên ready-set*: xếp hạng giải-thích-được, chọn-k-mở-khóa-nhiều-nhất, what-if, forecast, drift. Về JSONL-in-git, ba nguồn cho ba lời giải và bd+br là **cặp đối chứng tự nhiên**: cùng xuất phát điểm, bd rẽ sang Dolt khi multi-writer thành tải chính, br ở lại và chứng minh classic đủ dùng ở single-writer — biến "khi nào rời JSONL-truth" thành một quyết định có điều kiện kích hoạt rõ, không phải khẩu vị. Khuyến nghị lớn nhất cho forgent: giữ kiến trúc "eligibility là truy vấn dẫn xuất do store tính" (hội tụ 5 nguồn), và **port tầng bvr** (ranking + top-k unblock + parallel tracks) làm bộ não chọn-việc cho lifecycle bán-tự-động — đây là mảnh cả bee lẫn hn đều chưa có.
+**Bottom Line:** Bảy câu hỏi này thực ra là **một pipeline có tầng**, và không nguồn nào sở hữu cả pipeline: hn mạnh nhất ở *cửa vào* (intake phân risk + story packet có proof) và *cửa ra* (close atomic, contract cho orchestrator ngoài); bd mạnh nhất ở *mô hình unit* (issue = node đồ thị 10 loại dependency, mọi thứ — gate, message, workflow — đều là bead) và *coordination nguyên thủy* (claim/lease/slot); br mạnh nhất ở *độ tin cậy vận hành* (locking + backoff, health contract, sync không thể phá cây, scheduler tất định); bvr mạnh nhất — và **một mình một chiếu** — ở *tầng quyết định phía trên ready-set*: xếp hạng giải-thích-được, chọn-k-mở-khóa-nhiều-nhất, what-if, forecast, drift. Về JSONL-in-git, ba nguồn cho ba lời giải và bd+br là **cặp đối chứng tự nhiên**: cùng xuất phát điểm, bd rẽ sang Dolt khi multi-writer thành tải chính, br ở lại và chứng minh classic đủ dùng ở single-writer — biến "khi nào rời JSONL-truth" thành một quyết định có điều kiện kích hoạt rõ, không phải khẩu vị. Khuyến nghị lớn nhất cho forgent: giữ kiến trúc "eligibility là truy vấn dẫn xuất do store tính" (hội tụ 5 nguồn), và **port tầng bvr** (ranking + top-k unblock + parallel tracks) làm bộ não chọn-việc cho lifecycle bán-tự-động — đây là mảnh cả beehive lẫn hn đều chưa có.
 
 ## Câu hỏi
 
@@ -43,7 +43,7 @@ Bảng quyết định rút ra:
 
 | Điều kiện | Lời giải | Nguồn chứng |
 |---|---|---|
-| Single-writer (hoặc ít phiên, claim-serialized), cần git-diff/review | JSONL-in-git là truth, DB (nếu có) là view rebuild được | br, bee |
+| Single-writer (hoặc ít phiên, claim-serialized), cần git-diff/review | JSONL-in-git là truth, DB (nếu có) là view rebuild được | br, beehive |
 | Cần SQL query/aggregate mạnh, vẫn cần truth trong git | DB gitignored + semantic changeset JSONL committed, rebuild từ log | hn |
 | Multi-writer là tải chính, chấp nhận mất git-diff | Versioned-DB-as-truth (VC trong store) | bd |
 
@@ -67,7 +67,7 @@ Mô hình isolate-then-merge của hn (run = worktree riêng + **copy** harness.
 
 So sánh gọn: hn = **git-flow** trên work-store (nhánh riêng → tích hợp tuần tự — hợp khi việc phân hoạch được); bd = **Google Docs** (mọi người cùng một tài liệu, store tự xử tương tranh — bắt buộc khi agent giao tiếp *qua chính store*: message/gate/memory-bead không phân hoạch trước được). bd không thể dùng lời giải của hn vì tải của họ về bản chất là shared-entity writes.
 
-**Hệ quả cho forgent:** bee đã đúng hình hn (swarm + file reservation + one-commit-per-cell = phân hoạch trước, tích hợp tuần tự). Bài multi-write *được thiết kế cho biến mất* chừng nào giữ được ba tính chất: **(a)** orchestrator chia scope rời nhau; **(b)** điểm ghi chung là append tuần tự (JSONL event); **(c)** agent không dùng work-store làm kênh giao tiếp. Ngưỡng phải xem lại là khi một trong ba vỡ — thường (c) vỡ trước (ví dụ: nếu async-human-gate/signal tiến hóa thành message-passing ghi qua work-store).
+**Hệ quả cho forgent:** beehive đã đúng hình hn (swarm + file reservation + one-commit-per-cell = phân hoạch trước, tích hợp tuần tự). Bài multi-write *được thiết kế cho biến mất* chừng nào giữ được ba tính chất: **(a)** orchestrator chia scope rời nhau; **(b)** điểm ghi chung là append tuần tự (JSONL event); **(c)** agent không dùng work-store làm kênh giao tiếp. Ngưỡng phải xem lại là khi một trong ba vỡ — thường (c) vỡ trước (ví dụ: nếu async-human-gate/signal tiến hóa thành message-passing ghi qua work-store).
 
 ---
 
@@ -88,7 +88,7 @@ ID là hash SHA256→base36 cắt **thích ứng** (3–8 ký tự, vượt 25% 
 br giữ issue model v14 (interop với bd classic) nhưng thêm: **gate khai báo trong `.beads/policy.yaml`** keyed theo transition `"from -> to"`, enforce tại chokepoint close/transition; cả **luật ready cũng config được** (`workflow.status_groups.ready`) — luật thành dữ liệu per-project thay vì hardcode ([workflow-gates-policy](../sources/beads-rust.md#workflow-gates-policy)). Ergonomics tạo/sửa hàng loạt: bulk update field bất kỳ, saved queries, changelog theo issue type ([br-only-cli-additions](../sources/beads-rust.md#br-only-cli-additions)).
 
 ### Đối chiếu
-Hai triết lý unit: hn dồn ngữ nghĩa vào **bên trong packet** (contract, acceptance, proof — nặng, giàu, ceremony theo lane); bd dồn ngữ nghĩa vào **edge của đồ thị** (unit gầy, topology giàu). Gate minh họa sắc nhất — cùng một khái niệm, ba tầng cài đặt: bee gate cứng trong code, br gate là *config data* enforce tại một cửa, bd gate là *node đồ thị* có lifecycle riêng. Càng về phía bd, hệ càng đồng nhất (một công cụ query mọi thứ) nhưng càng ít "khuôn" ép chất lượng nội dung từng việc; càng về phía hn, từng việc càng tự-mô-tả nhưng cross-cutting query càng phụ thuộc schema.
+Hai triết lý unit: hn dồn ngữ nghĩa vào **bên trong packet** (contract, acceptance, proof — nặng, giàu, ceremony theo lane); bd dồn ngữ nghĩa vào **edge của đồ thị** (unit gầy, topology giàu). Gate minh họa sắc nhất — cùng một khái niệm, ba tầng cài đặt: beehive gate cứng trong code, br gate là *config data* enforce tại một cửa, bd gate là *node đồ thị* có lifecycle riêng. Càng về phía bd, hệ càng đồng nhất (một công cụ query mọi thứ) nhưng càng ít "khuôn" ép chất lượng nội dung từng việc; càng về phía hn, từng việc càng tự-mô-tả nhưng cross-cutting query càng phụ thuộc schema.
 
 ---
 
@@ -105,7 +105,7 @@ Mọi prompt qua intake **trước khi** đổi code: 6 input types, 10 risk fla
 - **Drift detection**: so đồ thị hiện tại với baseline snapshot trên 6 chiều; **cycle mới = CRITICAL**; blocked +≥5 → WARNING; actionable giảm ≥30% → WARNING — sức khỏe backlog thành gate đo được với exit code có nghĩa ([graph-drift-detection](../sources/beads-viewer-rust.md#graph-drift-detection)).
 
 ### Đọc ra
-Hệ hoàn chỉnh cần **cả hai cửa**: intake-triage quyết định *nghi thức* (lane, gate, ceremony) — một quyết định về rủi ro; backlog-triage quyết định *sự chú ý* (việc nào nổi lên) — một quyết định về giá trị. hn làm cửa một mà không có cửa hai (backlog chỉ là bảng friction); bd/bvr làm cửa hai mà gần như bỏ cửa một. bee hiện giống hn (mode gate = cửa một). forgent lifecycle bán-tự-động cần cửa hai để pipeline tự chạy không người trông.
+Hệ hoàn chỉnh cần **cả hai cửa**: intake-triage quyết định *nghi thức* (lane, gate, ceremony) — một quyết định về rủi ro; backlog-triage quyết định *sự chú ý* (việc nào nổi lên) — một quyết định về giá trị. hn làm cửa một mà không có cửa hai (backlog chỉ là bảng friction); bd/bvr làm cửa hai mà gần như bỏ cửa một. beehive hiện giống hn (mode gate = cửa một). forgent lifecycle bán-tự-động cần cửa hai để pipeline tự chạy không người trông.
 
 ---
 
@@ -173,7 +173,7 @@ Ba trường phái trả lời ba câu khác nhau: hn — *plan này thành côn
 - br: hai primitive lock **khác ngữ nghĩa** — `.write.lock` blocking exclusive (serialize mọi mutation, timeout 30s) vs `.sync.lock` advisory try-and-yield; trên nữa là retry `BEGIN IMMEDIATE` 8 lần **exponential backoff + ±25% jitter** (tắt busy-wait native vì hot-spin 100% CPU) — chống thundering herd khi swarm tranh cùng store; mid-mutation DB hỏng → rebuild từ JSONL rồi chạy lại closure ([two-tier-locking-app-backoff](../sources/beads-rust.md#two-tier-locking-app-backoff)).
 
 ### Việc bị bỏ rơi: reclaim cần bằng chứng, không cướp nhầm
-br `coordination status` là **bộ phân loại bằng-chứng thuần đọc**: ngưỡng stale/abandoned theo *loại chủ* (swarm-agent 120'/480', human 1440'/4320' — người được chờ lâu hơn máy); nguyên tắc lõi *"Missing Agent Mail data is explicit evidence, not proof of abandonment"*; **không bao giờ auto-reclaim** — emit envelope `br.coordination.v1` với `reclaim_allowed_by_policy` + `suggested_commands`, và lệnh đầu tiên của mọi reclaim luôn là **audit comment**; incident chuẩn hóa append vào `.beads/interactions.jsonl` với `snapshot_hash` — flight recorder content-addressed ([coordination-evidence-classifier](../sources/beads-rust.md#coordination-evidence-classifier)). Tách *phân loại* (pure, no I/O) khỏi *hành động* (human-gated) là mảnh advisory mà mọi hệ claim cơ học (kể cả bee) còn thiếu.
+br `coordination status` là **bộ phân loại bằng-chứng thuần đọc**: ngưỡng stale/abandoned theo *loại chủ* (swarm-agent 120'/480', human 1440'/4320' — người được chờ lâu hơn máy); nguyên tắc lõi *"Missing Agent Mail data is explicit evidence, not proof of abandonment"*; **không bao giờ auto-reclaim** — emit envelope `br.coordination.v1` với `reclaim_allowed_by_policy` + `suggested_commands`, và lệnh đầu tiên của mọi reclaim luôn là **audit comment**; incident chuẩn hóa append vào `.beads/interactions.jsonl` với `snapshot_hash` — flight recorder content-addressed ([coordination-evidence-classifier](../sources/beads-rust.md#coordination-evidence-classifier)). Tách *phân loại* (pure, no I/O) khỏi *hành động* (human-gated) là mảnh advisory mà mọi hệ claim cơ học (kể cả beehive) còn thiếu.
 
 ### Ranh giới hệ-với-hệ: contract, không phải chung DB
 - hn: **orchestration protocol v1** — discovery trước mutation (`query contract --json`, không auto-init), mỗi lệnh in đúng 1 JSON envelope, exit codes cố định 0/2/3/4/5, *"branch on error code, never on message"*, mutation timeout = unknown outcome → rediscover trước khi retry; next-action của orchestrator ngoài là **bảng quyết định dữ liệu** trong contract, không phải router code ([orchestration-protocol-v1](../sources/repository-harness.md#orchestration-protocol-v1), [protocol-next-action-table](../sources/repository-harness.md#protocol-next-action-table)).
@@ -181,7 +181,7 @@ br `coordination status` là **bộ phân loại bằng-chứng thuần đọc**
 - Ergonomics phiên: bd `close` không cần id — marker "last-touched" là ngữ cảnh ngầm của session ([close-last-touched](../sources/beads.md#close-last-touched)).
 
 ### Bốn trường phái coordination (bổ sung, không thay nhau)
-1. **Lock tại filesystem** — bee: O_EXCL claim + TTL/heartbeat + hold per-path (cùng checkout).
+1. **Lock tại filesystem** — beehive: O_EXCL claim + TTL/heartbeat + hold per-path (cùng checkout).
 2. **Điều phối tại store** — bd: multi-writer DB all-on-main + atomic claim + merge slot + namespace.
 3. **Cô lập cây** — symphony: worktree riêng + changeset về sau (ngoài scope dive này).
 4. **Message-passing** — bvr: MCP Agent Mail giữa agent cùng repo ([mcp-agent-mail-coordination](../sources/beads-viewer-rust.md#mcp-agent-mail-coordination)).
@@ -196,14 +196,14 @@ Tổng hợp §2/§4/§5/§7 thành flow cụ thể. Kịch bản: 1 developer, 
 
 ### Hai mặt phẳng xung đột — đừng gộp
 
-Khác biệt bốn nguồn nằm ở mặt phẳng **work-store** (§1); còn ở mặt phẳng **code-file**, cả bốn — kể cả bd với Dolt — quy về một công thức hai nước: **phân hoạch được thì phân hoạch lúc plan; phần không phân hoạch được thì tuần tự hóa tại một cửa merge.** Dolt merge được *đồ thị việc*, không merge được *source code* — bd cũng chỉ có agent-trên-branch + **merge slot** (một cửa tuần tự tại điểm tích hợp). Khác biệt thật là *thời điểm* xử xung đột: hn/bee xử **sớm** (plan-time, scope rời nhau trước khi chạy), bd xử **muộn** (cho hết vào đồ thị, claim atomic từng bead, dồn về cửa merge), br **né** (serialize mọi write).
+Khác biệt bốn nguồn nằm ở mặt phẳng **work-store** (§1); còn ở mặt phẳng **code-file**, cả bốn — kể cả bd với Dolt — quy về một công thức hai nước: **phân hoạch được thì phân hoạch lúc plan; phần không phân hoạch được thì tuần tự hóa tại một cửa merge.** Dolt merge được *đồ thị việc*, không merge được *source code* — bd cũng chỉ có agent-trên-branch + **merge slot** (một cửa tuần tự tại điểm tích hợp). Khác biệt thật là *thời điểm* xử xung đột: hn/beehive xử **sớm** (plan-time, scope rời nhau trước khi chạy), bd xử **muộn** (cho hết vào đồ thị, claim atomic từng bead, dồn về cửa merge), br **né** (serialize mọi write).
 
 ### Flow 5 bước: song song tối đa, xung đột tối thiểu
 
-1. **Plan từng feature, tách việc theo đường ranh FILE/MODULE — không theo đường ranh feature.** Mỗi task **khai footprint file lúc tạo** (bee cell `--files`, hn story scope; bd *không có* trường này — điểm yếu thật của bd cho bài code-conflict). Footprint khai trước là nguyên liệu của mọi bước sau.
+1. **Plan từng feature, tách việc theo đường ranh FILE/MODULE — không theo đường ranh feature.** Mỗi task **khai footprint file lúc tạo** (beehive cell `--files`, hn story scope; bd *không có* trường này — điểm yếu thật của bd cho bài code-conflict). Footprint khai trước là nguyên liệu của mọi bước sau.
 2. **Giao footprint chéo các feature — nước đi quyết định cả ván.** Với mỗi file bị ≥2 feature đụng, theo thứ tự ưu tiên: **(a) hoist** phần chung thành task upstream riêng (cả A lẫn B khai `blocks` dep vào nó) — **xung đột biến thành dependency**, phép biến hình quan trọng nhất corpus, và là thứ đồ thị 10-dep-type của bd diễn đạt tự nhiên nhất; **(b) sequence** — task-A-billing `blocks` task-B-billing, chọn chiều theo cái nào mở khóa nhiều downstream hơn (bvr what-if); **(c) re-slice** — overlap đôi khi là dấu hiệu chia việc sai, cắt lại ranh giới (kể cả thêm task chuẩn bị tách module).
 3. **Dựng đồ thị xong mới biết song song thật là bao nhiêu.** Connected components (bvr `plan.rs`): C không đụng file chung → component riêng → track an toàn tuyệt đối; A và B cùng component nhưng phần xung đột đã thành edge — phần còn lại vẫn song song được. Đồ thị nói thật mức song song khả thi, đừng tin "3 feature = 3 luồng". Greedy top-k → task hoist ở (a) luôn đi sớm nhất vì mở khóa cả hai nhánh.
-4. **Dispatch: ready dẫn xuất + claim atomic + enforce footprint lúc chạy.** Hai chế độ: *cùng checkout* (bee) — reserve file trước khi ghi, đụng → `[BLOCKED]`, xung đột lộ ngay lúc chạm, chi phí giải thấp nhất; *worktree cô lập* (hn/symphony) — không có xung đột sống nhưng xung đột **hoãn về merge**, rẻ lúc chạy, đắt lúc tích hợp nếu bước 2 làm ẩu.
+4. **Dispatch: ready dẫn xuất + claim atomic + enforce footprint lúc chạy.** Hai chế độ: *cùng checkout* (beehive) — reserve file trước khi ghi, đụng → `[BLOCKED]`, xung đột lộ ngay lúc chạm, chi phí giải thấp nhất; *worktree cô lập* (hn/symphony) — không có xung đột sống nhưng xung đột **hoãn về merge**, rẻ lúc chạy, đắt lúc tích hợp nếu bước 2 làm ẩu.
 5. **Tích hợp tuần tự qua một cửa, re-verify sau từng merge.** Merge slot: mỗi lần một nhánh; merge xong chạy lại verify của các task đã đóng *trên trạng thái sau merge* (hn `verify-all` sweep — bắt "capped nhưng nay fail").
 
 ### Taxonomy xung đột và cách giải
@@ -214,11 +214,11 @@ Khác biệt bốn nguồn nằm ở mặt phẳng **work-store** (§1); còn �
 | Đụng lúc chạy, cùng checkout | Reservation deny | `[BLOCKED]`, orchestrator re-scope hoặc đổi thứ tự — không "ghi đại" |
 | Git conflict lúc merge (footprint khai sót, worktree) | Merge slot | Tuần tự hóa + resolve tay; footprint-khai-thiếu là friction → backlog |
 | **Xung đột ngữ nghĩa — nguy hiểm nhất:** hai nhánh xanh cô lập, merge sạch git, nhưng sai *cùng nhau* | Chỉ lộ ở integrated verify | Đúng critical-pattern forgent đã trả học phí ("hai cell xanh-cô-lập lệch hợp đồng"): validating kiểm **hợp-đồng-gộp** giữa task cùng chạm một cấu trúc; merge xong verify tổng thể, không cộng dồn kết quả cô lập |
-| Phát hiện giữa chừng (làm A lòi ra phải sửa file B đang giữ) | Mid-flight | Không sửa vòng qua guard: node mới + edge `discovered-from` (bd) / task mới + BLOCKED (bee) → orchestrator xếp lại — phát hiện là *dữ liệu đồ thị*, không phải cớ phá phân hoạch |
+| Phát hiện giữa chừng (làm A lòi ra phải sửa file B đang giữ) | Mid-flight | Không sửa vòng qua guard: node mới + edge `discovered-from` (bd) / task mới + BLOCKED (beehive) → orchestrator xếp lại — phát hiện là *dữ liệu đồ thị*, không phải cớ phá phân hoạch |
 
 ### Vị trí của bd trong flow này
 
-bd không chia việc độc lập trước — cho mọi thứ vào đồ thị rồi dựa vào claim atomic + lease TTL + merge slot. Với *work-store* bd đã giải multi-writer bằng Dolt; với *code* bd đứng cùng thuyền mọi người: footprint không giao nhau, hoặc xếp hàng ở cửa merge. Cái bd cho thêm mà hn/bee thiếu: **ngôn ngữ đồ thị đủ giàu để mã hóa kết quả bước 2** (`blocks`, `conditional-blocks`, `waits-for`, `discovered-from`) — phân hoạch và tuần tự hóa thành *dữ liệu query được* thay vì quyết định nằm trong đầu orchestrator.
+bd không chia việc độc lập trước — cho mọi thứ vào đồ thị rồi dựa vào claim atomic + lease TTL + merge slot. Với *work-store* bd đã giải multi-writer bằng Dolt; với *code* bd đứng cùng thuyền mọi người: footprint không giao nhau, hoặc xếp hàng ở cửa merge. Cái bd cho thêm mà hn/beehive thiếu: **ngôn ngữ đồ thị đủ giàu để mã hóa kết quả bước 2** (`blocks`, `conditional-blocks`, `waits-for`, `discovered-from`) — phân hoạch và tuần tự hóa thành *dữ liệu query được* thay vì quyết định nằm trong đầu orchestrator.
 
 **Đúc kết:** song song tối đa không mua bằng lock tốt hơn mà bằng **decomposition tốt hơn** — khai footprint lúc tạo task, biến overlap thành dependency lúc plan, để connected-components quyết định số luồng, enforce bằng reservation/worktree lúc chạy, phần còn sót dồn về một cửa merge có re-verify.
 
@@ -226,15 +226,15 @@ bd không chia việc độc lập trước — cho mọi thứ vào đồ thị
 
 | Bước của flow | Ai tốt nhất | Vì sao / thiếu gì |
 |---|---|---|
-| 1. Khai footprint | **bee** (duy nhất) | cell `--files`; hn chỉ scope quy ước, bd không có trường, bvr chỉ đọc |
+| 1. Khai footprint | **beehive** (duy nhất) | cell `--files`; hn chỉ scope quy ước, bd không có trường, bvr chỉ đọc |
 | 2. Overlap → dependency | **bd có ngôn ngữ, không ai có mắt** | 10 dep-type diễn đạt đẹp nhất, nhưng issue không mang footprint nên bd không *phát hiện* được overlap — chỉ chở quyết định orchestrator nghĩ sẵn |
 | 3. Mức song song thật | **bvr** (một mình) | connected components + top-k + what-if; nhưng chỉ nhìn đồ thị task, không nhìn file, không enforce |
-| 4. Enforce lúc chạy | **bee** | reservation deny cơ học + cross-session claim/hold + lane |
+| 4. Enforce lúc chạy | **beehive** | reservation deny cơ học + cross-session claim/hold + lane |
 | 5. Tích hợp + re-verify | **hn/symphony** | worktree + changeset + CAS + `verify-all` sweep bắt "đã đóng nhưng nay fail" |
 
-Nếu buộc gọi tên một hệ cho đúng kịch bản này *hôm nay*: **bee** — hệ duy nhất đóng mặt phẳng nguy hiểm thật (code-file conflict) bằng cơ chế thay vì quy ước, cộng validating kiểm hợp-đồng-gộp đúng thuốc cho loại xung đột đắt nhất (ngữ nghĩa, xanh-cô-lập). Nhưng bee thắng bằng **an toàn**, không phải **song song**: thiếu hẳn tầng 3–4 (§4), ít xung đột một phần vì fan-out dè dặt. br gần như đứng ngoài (chọn serialize); đóng góp của nó ở tầng chịu-contention + advisory-evidence.
+Nếu buộc gọi tên một hệ cho đúng kịch bản này *hôm nay*: **beehive** — hệ duy nhất đóng mặt phẳng nguy hiểm thật (code-file conflict) bằng cơ chế thay vì quy ước, cộng validating kiểm hợp-đồng-gộp đúng thuốc cho loại xung đột đắt nhất (ngữ nghĩa, xanh-cô-lập). Nhưng beehive thắng bằng **an toàn**, không phải **song song**: thiếu hẳn tầng 3–4 (§4), ít xung đột một phần vì fan-out dè dặt. br gần như đứng ngoài (chọn serialize); đóng góp của nó ở tầng chịu-contention + advisory-evidence.
 
-**Khoảng trống chung — và là cơ hội của forgent:** bước 2 (giao footprint chéo các feature để tự phát hiện overlap và đề xuất hoist/sequence) **không nguồn nào làm**. Nguyên liệu tồn tại rời rạc: bee *có dữ liệu* (footprint), bvr *có não* (graph analysis), bd *có ngôn ngữ* (dep types) — không ai ghép thành "đưa N feature vào, nhận về đồ thị task đã phân hoạch + số track song song + điểm phải tuần tự". Fan-out planner của fgOS làm đúng một việc này — intersect footprint lúc plan, đề xuất hoist/sequence, để reservation bắt phần khai sót — là đứng trên cả bốn nguồn ở đúng bài toán multi-agent parallel cần nhất.
+**Khoảng trống chung — và là cơ hội của forgent:** bước 2 (giao footprint chéo các feature để tự phát hiện overlap và đề xuất hoist/sequence) **không nguồn nào làm**. Nguyên liệu tồn tại rời rạc: beehive *có dữ liệu* (footprint), bvr *có não* (graph analysis), bd *có ngôn ngữ* (dep types) — không ai ghép thành "đưa N feature vào, nhận về đồ thị task đã phân hoạch + số track song song + điểm phải tuần tự". Fan-out planner của fgOS làm đúng một việc này — intersect footprint lúc plan, đề xuất hoist/sequence, để reservation bắt phần khai sót — là đứng trên cả bốn nguồn ở đúng bài toán multi-agent parallel cần nhất.
 
 ### Song song đáng gờm không cần multi-write: số học và ba trần thật
 
@@ -242,7 +242,7 @@ Bộ đồ nghề góp nhặt ở trên có tạo được song song đáng gờ
 
 **Số học của store:** một agent làm một cell 5–30 phút; mỗi cell chạm store ~3–5 lần ghi (claim, verify record, cap), mỗi lần vài ms. Hai mươi agent song song → tần suất ghi vẫn **dưới một lần/phút** — một điểm append tuần tự xử lý dư sức. bd cần multi-write vì store của họ chở *giao tiếp* (heartbeat, message/gate/memory-bead — hàng nghìn write nhỏ liên tục); store chỉ ghi *kết quả* thì single-writer không bao giờ là nút thắt — chính là điều kiện (c) §1 ở dạng định lượng.
 
-**Mỗi món nâng một trần khác nhau:** độ rộng (bao nhiêu track) ← intersection planner + components, phân hoạch tính bằng máy thay vì phán đoán dè dặt — trần bee đang thấp nhất, món lời nhất; độ bền dòng chảy (ready-set không cạn) ← greedy top-k, xong một việc nở ra nhiều việc sẵn-sàng; lấy việc an toàn tốc độ cao ← ordering contract + atomic claim; mặt phẳng code ← reservation + hoist-thành-dependency.
+**Mỗi món nâng một trần khác nhau:** độ rộng (bao nhiêu track) ← intersection planner + components, phân hoạch tính bằng máy thay vì phán đoán dè dặt — trần beehive đang thấp nhất, món lời nhất; độ bền dòng chảy (ready-set không cạn) ← greedy top-k, xong một việc nở ra nhiều việc sẵn-sàng; lấy việc an toàn tốc độ cao ← ordering contract + atomic claim; mặt phẳng code ← reservation + hoist-thành-dependency.
 
 **Ba trần thật còn lại (không phải store):**
 1. **Gate người — trần cứng nhất, multi-write không giải được.** Thuốc: async-human-gate (việc chờ người = node đậu-chờ, track khác chạy tiếp) + gate-bypass lane thấp. Trần này quyết song song thực tế nhiều hơn mọi thứ về store.
@@ -255,7 +255,7 @@ Bộ đồ nghề góp nhặt ở trên có tạo được song song đáng gờ
 
 Phát biểu tổng quát của bước 2: **muốn giải xung đột lúc plan thì mỗi plan phải được xem xét trên chính các plan khác đang sống.** Ba hệ quả + một giới hạn:
 
-1. **Plan không còn là artifact tự-chứa.** Tính hợp lệ của một plan là thuộc tính của *portfolio* (tập plan đang mở), không phải của feature. Hệ quả kỹ thuật: hai plan văn xuôi không intersect được — footprint phải là **dữ liệu so được bằng máy**. Đây là lý do sâu vì sao cell `--files` của bee quan trọng hơn vẻ ngoài: nó biến plan thành thứ giao nhau được.
+1. **Plan không còn là artifact tự-chứa.** Tính hợp lệ của một plan là thuộc tính của *portfolio* (tập plan đang mở), không phải của feature. Hệ quả kỹ thuật: hai plan văn xuôi không intersect được — footprint phải là **dữ liệu so được bằng máy**. Đây là lý do sâu vì sao cell `--files` của beehive quan trọng hơn vẻ ngoài: nó biến plan thành thứ giao nhau được.
 2. **Phép giao là việc của một chỗ ngồi.** N plan xem xét pairwise = N² cuộc thương lượng không trọng tài; thực tế mọi nguồn quy về **một orchestrator giữ decide-altitude** làm phép fold trên toàn portfolio — admission control kiểu scheduler: plan mới qua phép giao, ra một trong ba kết quả (song song / bị sequence / re-slice). Không phải plan "nhìn nhau" — **một chỗ nhìn tất cả**.
 3. **Xem xét chéo là sự kiện lặp, không phải bước duyệt một lần.** Plan đổi giữa chừng (`discovered-from` là bằng chứng) → phép giao chạy lại mỗi khi có task mới / footprint mutation — gắn với *transition* của đồ thị việc, khớp mô hình capture-bám-transition fgOS đã chốt.
 
@@ -269,7 +269,7 @@ Phát biểu tổng quát của bước 2: **muốn giải xung đột lúc plan
 
 Vế đảo là lựa chọn của bd: *không* intersect lúc plan, trả toàn bộ chi phí ở lưới 2–3. **Chi phí xung đột là đại lượng bảo toàn** — không xóa được, chỉ chọn trả lúc nào: plan-time là nơi *phát hiện* rẻ nhất, merge-time là nơi *giải quyết* đắt nhất.
 
-**Mảnh thưởng chưa nguồn nào khai thác:** bee bắt cap nộp `--files` *thực tế* → hệ có sẵn cả dự-đoán (plan) lẫn sự-thật (cap) → **độ chính xác khai footprint đo được** (predicted vs actual). Đó là vòng compound-learning tự nhiên cho lưới 1: orchestrator học "loại việc nào hay khai sót file gì", lưới 1 tự tốt lên thay vì đứng yên — phần mở rộng trực tiếp của khoảng trống bước 2, cùng gene predicted→actual của distill outcome-loop.
+**Mảnh thưởng chưa nguồn nào khai thác:** beehive bắt cap nộp `--files` *thực tế* → hệ có sẵn cả dự-đoán (plan) lẫn sự-thật (cap) → **độ chính xác khai footprint đo được** (predicted vs actual). Đó là vòng compound-learning tự nhiên cho lưới 1: orchestrator học "loại việc nào hay khai sót file gì", lưới 1 tự tốt lên thay vì đứng yên — phần mở rộng trực tiếp của khoảng trống bước 2, cùng gene predicted→actual của distill outcome-loop.
 
 ---
 
@@ -280,9 +280,9 @@ Vế đảo là lựa chọn của bd: *không* intersect lúc plan, trả toàn
 Agent không phải process lắng nghe socket; nó là vòng lặp `prompt → tool call → kết quả → …`. LLM chỉ "nghe" được ở đúng bốn khe, và mọi cơ chế intercommunication trong corpus là biến thể của chúng:
 
 1. **Prompt ban đầu** — không chở hội thoại, chở *giao thức*: "trước claim check mailbox, khi BLOCKED báo orchestrator". Prompt là nơi **cài lịch nghe**, không phải kênh chat.
-2. **Kết quả tool call (pull)** — kênh phổ biến nhất: MCP Agent Mail của bvr là **polling trá hình** (agent chỉ thấy mail khi *nó chọn* check, thời điểm quy định trong AGENTS.md); message/gate-bead của bd là query store; **refusal-as-message** của bee (reservation deny trả về "file của worker X tới hh:mm") là kênh giao tiếp ngầm hiệu quả nhất mà không ai gọi là chat.
+2. **Kết quả tool call (pull)** — kênh phổ biến nhất: MCP Agent Mail của bvr là **polling trá hình** (agent chỉ thấy mail khi *nó chọn* check, thời điểm quy định trong AGENTS.md); message/gate-bead của bd là query store; **refusal-as-message** của beehive (reservation deny trả về "file của worker X tới hh:mm") là kênh giao tiếp ngầm hiệu quả nhất mà không ai gọi là chat.
 3. **Harness injection (push thật)** — chỉ ai sở hữu vòng lặp mới làm được: harness nhét message vào turn boundary kế tiếp (SendMessage giữa teammate). **fgOS đang xây harness nghĩa là fgOS nắm khe 3** — thứ bd/bvr (CLI/MCP đứng ngoài vòng lặp) không bao giờ chạm; họ buộc dùng khe 2, fgOS được chọn cả hai.
-4. **Ranh giới vòng đời (spawn/return)** — dispatch prompt đi, status token về; kênh chính của bee hiện tại.
+4. **Ranh giới vòng đời (spawn/return)** — dispatch prompt đi, status token về; kênh chính của beehive hiện tại.
 
 Thiết kế fgOS: "listen" = check-cài-ở-chokepoint (khe 2, signal pub-sub file hiện tại) + injection khi cần realtime (khe 3, lợi thế platform). Quyết định "store không phải kênh chat" nguyên vẹn: message transport là kênh riêng, chỉ *kết quả* ghi vào work-store.
 
@@ -345,24 +345,24 @@ Ca hỏi: event sinh-trước ở máy A nhưng merge *sau* khi máy B đã merg
 
 ## Hội tụ & phân kỳ đáng giá
 
-1. **Hội tụ (×5, mạnh nhất corpus): eligibility là truy vấn dẫn xuất của store.** readyCells (bee) ↔ runnable (hn) ↔ `bd ready` ↔ br policy-ready ↔ board-precedence (symphony). Kèm hệ quả cả hn lẫn bd cùng rút: consumer không được tự suy lại luật, và cycle phải chặn ở lúc ghi edge.
+1. **Hội tụ (×5, mạnh nhất corpus): eligibility là truy vấn dẫn xuất của store.** readyCells (beehive) ↔ runnable (hn) ↔ `bd ready` ↔ br policy-ready ↔ board-precedence (symphony). Kèm hệ quả cả hn lẫn bd cùng rút: consumer không được tự suy lại luật, và cycle phải chặn ở lúc ghi edge.
 2. **Hội tụ (×2, mới): ordering phải là hợp đồng test-được.** bd pin FIFO bằng protocol test; br ghi tie-break vào contract versioned. Cả hai đến từ cùng vết thương: thứ tự arbitrary + nhiều agent = dẫm nhau không tái hiện được.
-3. **Hội tụ (×2): reclaim đòi bằng chứng.** bee (TTL-hết VÀ heartbeat-cũ) ↔ br (audit-comment-first, missing-data-không-phải-proof, human chờ lâu hơn máy). br thêm tầng advisory thuần đọc tách khỏi hành động.
-4. **Phân kỳ có điều kiện kích hoạt (đắt nhất): JSONL-truth vs versioned-DB-truth.** bd rẽ khi multi-writer thành tải chính; br ở lại khi single-writer + cần git-diff; hn né bằng isolate-then-merge (§1). Không phải khẩu vị — là giả định "coordination sống ở đâu": câu hỏi kích hoạt đúng không phải "bao nhiêu writer" mà là **"agent có giao tiếp qua work-store không"** — chọn kiểu bd thì ngưỡng Dolt đến rất nhanh; giữ kiểu hn/bee (giao tiếp qua claim/handoff/signal, store chỉ ghi kết quả) thì JSONL-in-git sống rất lâu.
+3. **Hội tụ (×2): reclaim đòi bằng chứng.** beehive (TTL-hết VÀ heartbeat-cũ) ↔ br (audit-comment-first, missing-data-không-phải-proof, human chờ lâu hơn máy). br thêm tầng advisory thuần đọc tách khỏi hành động.
+4. **Phân kỳ có điều kiện kích hoạt (đắt nhất): JSONL-truth vs versioned-DB-truth.** bd rẽ khi multi-writer thành tải chính; br ở lại khi single-writer + cần git-diff; hn né bằng isolate-then-merge (§1). Không phải khẩu vị — là giả định "coordination sống ở đâu": câu hỏi kích hoạt đúng không phải "bao nhiêu writer" mà là **"agent có giao tiếp qua work-store không"** — chọn kiểu bd thì ngưỡng Dolt đến rất nhanh; giữ kiểu hn/beehive (giao tiếp qua claim/handoff/signal, store chỉ ghi kết quả) thì JSONL-in-git sống rất lâu.
 5. **Lỗ hổng chung của cả ba tracker, bvr lấp:** không hệ nào *xếp hạng* hay *chọn tập* — tất cả dừng ở eligibility + ordering. Tầng quyết định (ranking, portfolio, forecast, drift) sống ở một consumer read-only tách biệt. Chính sự tách này là bài học kiến trúc: **store lo đúng-đắn, viewer lo khôn-ngoan** — nâng cấp bộ não chọn việc không đụng transaction path.
 
 ## Portable ideas cho forgent
 
 Xếp theo giá trị/chi phí, đối chiếu hướng đã chốt (multi-agent parallel + reactive fan-out; lifecycle bán-tự-động):
 
-1. **Tầng chọn-việc kiểu bvr trên work-graph** — impact score 8 thành phần (đơn giản hóa được: bỏ betweenness nếu đồ thị nhỏ), greedy top-k unblock làm hàm mục tiêu fan-out, connected components làm wave-partition. Đây là mảnh "chọn việc xịn nhất + xếp việc" mà bee/hn/fgOS đều chưa có; điều kiện tiên quyết duy nhất là dep-graph đã có (cell deps đã có).
-2. **Ordering thành hợp đồng test-được** — bee `claim-next` nên pin thứ tự (priority, created, id) bằng test protocol như bd `r2Less`; rẻ, chặn cả lớp bug "hai phiên thấy hàng đợi khác nhau".
-3. **Evidence-classifier advisory cho claim stale** — tầng thuần-đọc kiểu br trên claims/holds hiện có của bee: phân loại + suggest, không bao giờ tự reclaim; ngưỡng theo loại chủ (human ≫ agent). Khớp nguyên tắc gate-người của fgOS.
+1. **Tầng chọn-việc kiểu bvr trên work-graph** — impact score 8 thành phần (đơn giản hóa được: bỏ betweenness nếu đồ thị nhỏ), greedy top-k unblock làm hàm mục tiêu fan-out, connected components làm wave-partition. Đây là mảnh "chọn việc xịn nhất + xếp việc" mà beehive/hn/fgOS đều chưa có; điều kiện tiên quyết duy nhất là dep-graph đã có (cell deps đã có).
+2. **Ordering thành hợp đồng test-được** — beehive `claim-next` nên pin thứ tự (priority, created, id) bằng test protocol như bd `r2Less`; rẻ, chặn cả lớp bug "hai phiên thấy hàng đợi khác nhau".
+3. **Evidence-classifier advisory cho claim stale** — tầng thuần-đọc kiểu br trên claims/holds hiện có của beehive: phân loại + suggest, không bao giờ tự reclaim; ngưỡng theo loại chủ (human ≫ agent). Khớp nguyên tắc gate-người của fgOS.
 4. **Hai nghĩa triage tách bạch trong lifecycle fgOS** — intake-triage (risk/lane, đã có qua mode gate) và backlog-triage (impact/attention, chưa có) là hai stage khác nhau của base-workflow; đừng để một field `priority` gánh cả hai.
 5. **`discovered-from` edge cho compound-learning** — capture 2 kênh của fgOS (đã chốt bám transition FSM) nên ghi lineage "làm A lòi ra B" thành edge có ngữ nghĩa thay vì stub text — bd chứng minh nó query được thành topology tri thức.
 6. **Giữ luật changeset/JSONL-in-git, ghi rõ điều kiện xem lại** — cặp đối chứng bd/br + phân tích isolate-then-merge (§1) cho điều kiện kích hoạt cụ thể: chỉ xem lại truth-store khi một trong ba tính chất (a) scope rời nhau / (b) điểm ghi chung append tuần tự / (c) store không phải kênh giao tiếp bị vỡ — thường (c) vỡ trước. Ghi điều kiện này vào decision record để khỏi tái tranh luận theo khẩu vị.
-7. **What-if + forecast cho gate-người** — ở lifecycle bán-tự-động, câu gate hỏi người nên kèm số kiểu bvr ("làm X mở khóa 7 việc, tiết kiệm ~4 ngày") — gate question có evidence là đúng văn hóa gate-presentation của bee.
-8. **Footprint-intersection planner — chiếm khoảng trống chung (§8).** Ghép ba nguyên liệu đã có sẵn ở ba nguồn: footprint per-task (bee `--files`) + graph analysis (bvr components/top-k) + dep vocabulary (bd) thành bước plan tự động: intersect footprint N feature → phát hiện overlap → đề xuất hoist/sequence/re-slice → xuất đồ thị task + số track song song. Không nguồn nào làm; là mảnh fan-out planner giá trị nhất cho hướng multi-agent parallel của fgOS (cùng họ #1 nhưng thêm chiều file-plane). Kèm vòng học: đo predicted-vs-actual footprint (plan `--files` vs cap `--files`) để lưới plan-time tự tốt lên (§8 lý thuyết nền).
+7. **What-if + forecast cho gate-người** — ở lifecycle bán-tự-động, câu gate hỏi người nên kèm số kiểu bvr ("làm X mở khóa 7 việc, tiết kiệm ~4 ngày") — gate question có evidence là đúng văn hóa gate-presentation của beehive.
+8. **Footprint-intersection planner — chiếm khoảng trống chung (§8).** Ghép ba nguyên liệu đã có sẵn ở ba nguồn: footprint per-task (beehive `--files`) + graph analysis (bvr components/top-k) + dep vocabulary (bd) thành bước plan tự động: intersect footprint N feature → phát hiện overlap → đề xuất hoist/sequence/re-slice → xuất đồ thị task + số track song song. Không nguồn nào làm; là mảnh fan-out planner giá trị nhất cho hướng multi-agent parallel của fgOS (cùng họ #1 nhưng thêm chiều file-plane). Kèm vòng học: đo predicted-vs-actual footprint (plan `--files` vs cap `--files`) để lưới plan-time tự tốt lên (§8 lý thuyết nền).
 
 ### Lộ trình lắp ráp tầng graph cơ học: học ai cái gì, thứ tự nào, bỏ gì
 
@@ -386,7 +386,7 @@ Xếp theo giá trị/chi phí, đối chiếu hướng đã chốt (multi-agent
 11. Tie-break tất định ghi vào output contract versioned (kiểu `br.scheduler.v1`).
 12. Advisory evidence classifier cho claim stale — thuần đọc trên claims/holds, không bao giờ tự reclaim, ngưỡng human ≫ agent.
 
-**Đã có (bee, giữ + khai thác):**
+**Đã có (beehive, giữ + khai thác):**
 13. Footprint `--files` + reservation + cap nộp files thực tế → bật vòng predicted-vs-actual (§8).
 
 Đích: món 13 + 7 + 4 ghép thành footprint-intersection planner (#8 ở trên).
@@ -401,7 +401,7 @@ Xếp theo giá trị/chi phí, đối chiếu hướng đã chốt (multi-agent
 | Forecast / economics (bvr) | Cần lịch sử velocity đủ dày — chưa có dữ liệu thì công thức sinh số ảo |
 | TOON, Agent Mail, jittered backoff (br/bvr) | Đúng thuốc cho bệnh chưa mắc (token-loop dài, message-passing, contention storm) |
 
-Một câu: **nền hn+bd trước (edge có kiểu + cycle-check tại cửa + snapshot có hash + ordering có test), rồi não bvr theo thứ tự components → top-k → what-if, bọc kỷ luật contract của br, cắm vào footprint bee đã có sẵn.**
+Một câu: **nền hn+bd trước (edge có kiểu + cycle-check tại cửa + snapshot có hash + ordering có test), rồi não bvr theo thứ tự components → top-k → what-if, bọc kỷ luật contract của br, cắm vào footprint beehive đã có sẵn.**
 
 ### Chuẩn thực thi cho tầng mjs: single-CLI + 5 kỷ luật, không hexagon (decision b0da87aa)
 
@@ -409,7 +409,7 @@ Câu hỏi "mjs có bó không, có nên đổi Rust/Go, có nên ép hexagonal/
 
 **Ngôn ngữ: giữ Node/mjs.** Sức mạnh cơ chế của cả 4 nguồn đến từ contract + test + determinism, không từ ngôn ngữ (toán là giáo khoa; CAS/cycle-check/revision-hash diễn đạt được mọi ngôn ngữ). Lý do thật họ chọn Rust/Go — phân phối binary, quy mô 10k+ node, type-fence — forgent chỉ thèm cái thứ ba, và nó mua rẻ được: JSDoc types + `tsc --noEmit --checkJs` trong verify gate (zero-build, giữ vendorability). Bằng chứng đắt nhất *chống* đổi sớm nằm trong chính corpus: br/bvr là rewrite của hệ **đã chốt hành vi** (spec-first + reference oracle + conformance fixtures) — forgent đang pha khám phá, đổi lúc spec lỏng là mua độ cứng lúc cần độ dẻo. Bản mjs hôm nay không phải nợ: nó là **oracle tương lai** của cuộc port. Trigger xét lại (một trong ba, trùng khung §1): (a) hành vi chốt — specs đạt rebuild bar; (b) cần single-binary ngoài hệ Node; (c) đồ thị nghìn node / multi-writer thành tải chính.
 
-**Single-CLI một execution path: đồng thuận tuyệt đối 4 nguồn + học phí Phase 3 của chính forgent.** hn `Cli::mutates_state()` một classifier nuôi fence + read-only + protocol; `story complete` một cửa duy nhất; br exit-code taxonomy khả thi vì bề mặt là một CLI; bee dispatcher đã đúng hình. Wiring / trace / intervention / đóng event-signal đều là hệ quả của choke-point — capture bám transition FSM chỉ trọn vẹn khi mọi transition qua một cửa, và emission wrap ở dispatcher phủ **cả đường thất bại** (critical-pattern 20260715).
+**Single-CLI một execution path: đồng thuận tuyệt đối 4 nguồn + học phí Phase 3 của chính forgent.** hn `Cli::mutates_state()` một classifier nuôi fence + read-only + protocol; `story complete` một cửa duy nhất; br exit-code taxonomy khả thi vì bề mặt là một CLI; beehive dispatcher đã đúng hình. Wiring / trace / intervention / đóng event-signal đều là hệ quả của choke-point — capture bám transition FSM chỉ trọn vẹn khi mọi transition qua một cửa, và emission wrap ở dispatcher phủ **cả đường thất bại** (critical-pattern 20260715).
 
 **5 kỷ luật thay cho hexagon:**
 1. Registry nâng cấp: mỗi command khai `mutates`/`emits` + schema in/out — guard/trace/capture đấu vào phân loại, không vào từng lệnh.

@@ -1,0 +1,10 @@
+# Angle C cross-file trace — fgw/tsk-2uf-2
+
+No candidates survive. Summary of checks:
+
+1. `workerContractFor` has zero callers anywhere in the repo (grep confirms only its own definition + its own doc comments + `docs/history/tsk-2uf-2/iron-law-evidence.md` mention it) — matches the PR's own "deliberately unwired" claim. No domain-key-iteration code (`registrations.mjs`'s `findDomainWorkflowSkillMapGaps`, the only `Object.entries(domains)` walker) reads unknown keys or asserts an exact key set, so the new `workerContract` field is inert everywhere except the one accessor.
+2. `buildPrompt`/`prepare.mjs` never reference `workerContract` — confirmed. Relative-path resolution checked concretely: `.agents/skills/fgos-coding-implement/SKILL.md` + `../_shared/coding-worker-contract.md` → `.agents/skills/_shared/coding-worker-contract.md` (exists); same for `plugins/fgOS/skills/fgos-coding-implement/` → `plugins/fgOS/skills/_shared/coding-worker-contract.md` (exists). Both resolve correctly. `.claude/skills/fgos-coding-implement/SKILL.md` is a generated thin wrapper (tsk-1qi) that redirects the reader to the `.agents/skills` source before any relative path is evaluated, so the retirement of `.claude/skills/_shared` (confirmed via `test/skills/fgos-mirror.test.mjs`'s own comment/test) is correct and does not break resolution.
+3. No test asserts an exact key set on `DOMAINS.coding`/`codingDomain` as a whole (only sub-fields like `.stages`/`.stepMap`/`.transitions`/`.workflows` via `assert.deepEqual`) — adding `workerContract` cannot break an existing exact-shape assertion. `test/skills/fgos-mirror.test.mjs` already has dedicated tests for `_shared` mirror byte-identity and explicitly documents `.claude/skills/_shared` as retired/unasserted — consistent with this diff's shape.
+4. `docs/task-specs/coding/implement-item.md` was not touched by this diff and has no driver/worker language; it's a Collaboration table (consult/assist/advise triggers) orthogonal to the driver/worker split added here — no dangling expectation.
+
+No findings to report from this angle.
