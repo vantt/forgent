@@ -38,6 +38,8 @@ fgos tool query --capability impact-analysis --status present
   immediately after a fresh reindex), a distinct mechanism from staleness
   that the cross-check line above already covers unconditionally.
 
+**Multi-target resolution:** if the active impact-analysis providers tool errors because more than one target/repo is registered and needs disambiguation (e.g. "multiple ... indexed" / "not found"), never guess and never reuse any display string quoted in that error -- it is not guaranteed to be a valid value to pass back in. Instead, look at that same MCP servers own tool list for a listing/discovery tool (name suggests enumeration -- list/search/discover), call it to read back the exact registered identifiers, and match this project by a stable field it reports (an absolute path/scan-root, never a human-readable label) before retrying with that exact identifier (tsk-5nz).
+
 This gate is prose the agent reads, never compiled logic — GitNexus is
 the first registered provider for `impact-analysis`, not the only one
 this gate can ever recognize. The block below regenerates from
