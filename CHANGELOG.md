@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Split `agents/*.yaml` into `core/agents/` and `domains/<name>/agents/` (D24) and added global unique agent-type name doctor check `agent-type-names-unique` (D33).
 - Explicit task-spec contracts (`core/task-specs/`) for 7 domain-agnostic skills (`fgos-routing`, `fgos-clarifying`, `fgos-researching`, `fgos-unlock`, `fgos-fanout`, `fgos-indexing`, `distill`), with doctor `task-specs-resolve` validation.
 - `scripts/write-wrapper-script.mjs` — reusable helper CLI script to write executable wrapper shell scripts for multi-statement commands that trip worktree isolation guards.
 - Dispatch-execute reliability pass (`src/runner/dispatch/transport.mjs`,

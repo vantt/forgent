@@ -8,7 +8,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { projectAgentMarkdown, AgentDefinitionError, DEFAULT_MODELS, readRunnerModels } from '../../scripts/project-agents.mjs';
+import { projectAgentMarkdown, AgentDefinitionError, DEFAULT_MODELS, readRunnerModels, findAgentYamlFiles } from '../../scripts/project-agents.mjs';
 
 function mkTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'project-agents-test-'));
@@ -131,3 +131,24 @@ test('readRunnerModels falls back to DEFAULT_MODELS per-tier when neither modelP
   writeSharedConfig(dir, {});
   assert.deepEqual(readRunnerModels(dir), DEFAULT_MODELS);
 });
+
+test('findAgentYamlFiles scans core/agents/ and domains/*/agents/ (D24)', () => {
+  const dir = mkTempDir();
+  try {
+    const coreDir = path.join(dir, 'core', 'agents');
+    const codingDir = path.join(dir, 'domains', 'coding', 'agents');
+    fs.mkdirSync(coreDir, { recursive: true });
+    fs.mkdirSync(codingDir, { recursive: true });
+
+    fs.writeFileSync(path.join(coreDir, 'fgos-placeholder.yaml'), VALID_YAML);
+    fs.writeFileSync(path.join(codingDir, 'coder.yaml'), VALID_YAML);
+
+    const files = findAgentYamlFiles(dir);
+    assert.equal(files.length, 2);
+    assert.ok(files.some((f) => f.name === 'fgos-placeholder' && f.source === 'core/agents'));
+    assert.ok(files.some((f) => f.name === 'coder' && f.source === 'domains/coding/agents'));
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+

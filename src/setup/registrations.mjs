@@ -518,23 +518,60 @@ function parseTaskSpecHeaderFields(headerLine) {
   return res;
 }
 
+function allAgentYamlFiles(cwd) {
+  const files = [];
+  const coreDir = path.join(cwd, 'core', 'agents');
+  if (fs.existsSync(coreDir)) {
+    for (const f of fs.readdirSync(coreDir)) {
+      if (f.endsWith('.yaml') || f.endsWith('.yml')) {
+        files.push({ source: 'core/agents', filePath: path.join(coreDir, f), fileName: f });
+      }
+    }
+  }
+  const domainsDir = path.join(cwd, 'domains');
+  if (fs.existsSync(domainsDir)) {
+    for (const domainEntry of fs.readdirSync(domainsDir, { withFileTypes: true })) {
+      if (domainEntry.isDirectory()) {
+        const domainAgentsDir = path.join(domainsDir, domainEntry.name, 'agents');
+        if (fs.existsSync(domainAgentsDir)) {
+          for (const f of fs.readdirSync(domainAgentsDir)) {
+            if (f.endsWith('.yaml') || f.endsWith('.yml')) {
+              files.push({ source: `domains/${domainEntry.name}/agents`, filePath: path.join(domainAgentsDir, f), fileName: f });
+            }
+          }
+        }
+      }
+    }
+  }
+  const legacyDir = path.join(cwd, 'agents');
+  if (fs.existsSync(legacyDir)) {
+    for (const f of fs.readdirSync(legacyDir)) {
+      if (f.endsWith('.yaml') || f.endsWith('.yml')) {
+        const fp = path.join(legacyDir, f);
+        if (!files.some((item) => item.filePath === fp)) {
+          files.push({ source: 'agents', filePath: fp, fileName: f });
+        }
+      }
+    }
+  }
+  return files;
+}
+
 // tsk-397 D20: eligibility direction inverted -- task-spec declares agent/requires-skill,
 // agent-type declares skills. Check validates every requires-skill is provided by at least
 // one agent-type, and every pinned agent exists.
 function checkAgentClaimsResolve(cwd) {
-  const agentsDir = path.join(cwd, 'agents');
+  const agentFiles = allAgentYamlFiles(cwd);
   const agentSkillsMap = new Map();
-  if (fs.existsSync(agentsDir)) {
-    for (const file of fs.readdirSync(agentsDir).filter((f) => f.endsWith('.yaml'))) {
-      try {
-        const text = fs.readFileSync(path.join(agentsDir, file), 'utf8');
-        const nameMatch = text.match(/^name:\s*(\S+)/m);
-        const name = nameMatch ? nameMatch[1] : file.slice(0, -'.yaml'.length);
-        const skills = extractSkillsFromYamlText(text);
-        agentSkillsMap.set(name, new Set(skills));
-      } catch {
-        continue;
-      }
+  for (const file of agentFiles) {
+    try {
+      const text = fs.readFileSync(file.filePath, 'utf8');
+      const nameMatch = text.match(/^name:\s*(\S+)/m);
+      const name = nameMatch ? nameMatch[1] : file.fileName.replace(/\.yaml$|\.yml$/, '');
+      const skills = extractSkillsFromYamlText(text);
+      agentSkillsMap.set(name, new Set(skills));
+    } catch {
+      continue;
     }
   }
 
@@ -578,6 +615,43 @@ function checkAgentClaimsResolve(cwd) {
     return { passed: false, message: problems.join('; ') };
   }
   return { passed: true, message: 'every task-spec\'s requires-skill/agent eligibility declaration resolves to real agent skills' };
+}
+
+function checkAgentTypeNamesUnique(cwd) {
+  const agentFiles = allAgentYamlFiles(cwd);
+  const nameToFiles = new Map();
+  for (const file of agentFiles) {
+    try {
+      const text = fs.readFileSync(file.filePath, 'utf8');
+      const nameMatch = text.match(/^name:\s*(\S+)/m);
+      const name = nameMatch ? nameMatch[1] : file.fileName.replace(/\.yaml$|\.yml$/, '');
+      if (!nameToFiles.has(name)) {
+        nameToFiles.set(name, []);
+      }
+      const relPath = path.relative(cwd, file.filePath);
+      nameToFiles.get(name).push(relPath);
+    } catch {
+      continue;
+    }
+  }
+
+  const duplicates = [];
+  for (const [name, paths] of nameToFiles.entries()) {
+    if (paths.length > 1) {
+      duplicates.push(`"${name}" (${paths.join(', ')})`);
+    }
+  }
+
+  if (duplicates.length > 0) {
+    return {
+      passed: false,
+      message: `duplicate agent-type name(s) found across core/agents/ and domains/*/agents/: ${duplicates.join('; ')} (D33)`,
+    };
+  }
+  return {
+    passed: true,
+    message: 'every agent-type name across core/agents/ and domains/*/agents/ is globally unique (D33)',
+  };
 }
 
 function checkMainCheckoutHookWired(cwd) {
@@ -668,6 +742,12 @@ registerCheck({
   id: 'agent-claims-resolve',
   description: 'every agent-type\'s claims list (agents/*.yaml) names real task-specs (tsk-2t9c D12)',
   check: (cwd) => checkAgentClaimsResolve(cwd),
+});
+
+registerCheck({
+  id: 'agent-type-names-unique',
+  description: 'every agent-type name across core/agents/ and domains/*/agents/ is globally unique (D33)',
+  check: (cwd) => checkAgentTypeNamesUnique(cwd),
 });
 
 registerCheck({
