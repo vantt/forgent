@@ -3343,6 +3343,31 @@ test('executeExecutorCli omits outcome and head shas when stdout contains [DONE]
   assert.equal(resBlocked.headAfter, undefined);
 });
 
+test('executeExecutorCli includes verifiedSha on [DONE] when cwd is a git repo, and omits verifiedSha on [BLOCKED]', async () => {
+  const dir = mkTempDir();
+  const scriptDonePath = path.join(dir, 'done-executor.mjs');
+  fs.writeFileSync(scriptDonePath, 'process.stdout.write("task complete [DONE]\\n"); process.exit(0);');
+  const scriptBlockedPath = path.join(dir, 'blocked-executor.mjs');
+  fs.writeFileSync(scriptBlockedPath, 'process.stdout.write("task stuck [BLOCKED]\\n"); process.exit(0);');
+
+  const { repoRoot: gitRepo, headCommit } = mkTempGitRepo();
+  writeRunnerConfigFixture(gitRepo, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: {
+      'done-executor': { kind: 'agent', command: process.execPath, args: [scriptDonePath, '{prompt}'], allowCrossProvider: true },
+      'blocked-executor': { kind: 'agent', command: process.execPath, args: [scriptBlockedPath, '{prompt}'], allowCrossProvider: true },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+
+  const resDone = await executeExecutorCli('done-executor', { repoRoot: gitRepo, cwd: gitRepo, prompt: 'p' });
+  assert.equal(resDone.verifiedSha, headCommit);
+
+  const resBlocked = await executeExecutorCli('blocked-executor', { repoRoot: gitRepo, cwd: gitRepo, prompt: 'p' });
+  assert.equal(resBlocked.verifiedSha, undefined);
+});
+
 test('executeExecutorCli returns outcome:"unsignaled" when [DONE] or [BLOCKED] appears only inside backtick-quoted text', async () => {
   const dir = mkTempDir();
   const scriptQuotedPath = path.join(dir, 'quoted-executor.mjs');
