@@ -87,7 +87,7 @@ below is therefore sourced from the `rg` cross-check, not GitNexus.
 | Component | Risk | Proof point |
 |---|---|---|
 | `execute` CLI flag parsing (`src/runner/dispatch/cli.mjs`, `runDispatchCli`) | standard — additive-only change (one new optional flag, existing `repoRoot` param untouched in shape), but the function it feeds (`executeExecutorCli`) is real production infra with 2 non-test callers (`runDispatchCli`'s `execute` case itself, `fanoutBatchExecutorCli`) and ~40 references across `test/runner/dispatch.test.mjs` (rg cross-check, impact-analysis degraded — see above) | `node --test test/runner/dispatch.test.mjs` green, plus one new test: `--repo-root` flag wires to `executeExecutorCli`'s `repoRoot`, and omitting it leaves `repoRoot` `undefined` exactly as today (byte-identical default behavior) |
-| `AGENTS.md` Dispatch section + `core/skills/_shared/executor-dispatch-fallback.md` (canonical source; mirrors into `.agents/skills/_shared/`, `.claude/skills/_shared/`, `plugins/fgOS/skills/_shared/` via `npm run build:skills` / `scripts/build-skill-wrappers.mjs`) | light — doc-only, no runtime behavior change | manual re-read: corrected guidance must not contradict Step B's existing "cwd defaults, no `--dir` passed" pattern — it only adds the explicit `--cwd`/`--repo-root` pair for a caller that does pass `--dir` for a worktree-backed item |
+| `AGENTS.md` Dispatch section + `core/skills/_shared/executor-dispatch-fallback.md` (canonical source; `assembleSkills`/`mirrorDevSkillsIntoPlugin` in `src/setup/skill-wrappers.mjs` copy it into `.agents/skills/_shared/` and `plugins/fgOS/skills/_shared/` via `npm run build:skills` / `scripts/build-skill-wrappers.mjs` — confirmed by direct read: `.claude/skills/_shared/` is never generated at all, every `.claude/skills/<name>/SKILL.md` wrapper resolves a `_shared` reference straight to `.agents/skills/_shared/` instead, per `skill-wrappers.mjs:80-84`) | light — doc-only, no runtime behavior change | manual re-read: corrected guidance must not contradict Step B's existing "cwd defaults, no `--dir` passed" pattern — it only adds the explicit `--cwd`/`--repo-root` pair for a caller that does pass `--dir` for a worktree-backed item |
 
 ## Files touched, in order
 
@@ -110,8 +110,8 @@ last-verified:
    dispatch-fallback.md` — correct the manual-dispatch guidance for a
    worktree-backed item, per Approach above.
 4. `npm run build:skills` (`scripts/build-skill-wrappers.mjs`) — regenerate
-   the mirrored copies (`.agents/skills/_shared/`, `.claude/skills/_shared/`,
-   `plugins/fgOS/skills/_shared/`) from the corrected canonical source.
+   the mirrored copies (`.agents/skills/_shared/`, `plugins/fgOS/skills/
+   _shared/`) from the corrected canonical source.
 
 ## Split
 
