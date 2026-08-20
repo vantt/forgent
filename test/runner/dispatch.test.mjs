@@ -3450,6 +3450,58 @@ test('the "execute" CLI entry point self-executes a real adapter-resolvable exec
   assert.equal(payload.args[0], 'hello-from-cli');
 });
 
+test('the "execute" CLI entry point accepts --prompt-file, overrides --prompt when both given, and structured-errors on bad file path', () => {
+  const { repoRoot } = mkTempGitRepo();
+  const dir = mkTempDir();
+  const scriptPath = writeEchoExecutor(dir);
+  writeRunnerConfigFixture(repoRoot, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: { 'cli-executor': { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
+  const promptFilePath = path.join(dir, 'prompt.txt');
+  fs.writeFileSync(promptFilePath, 'content-from-file');
+
+  // --prompt-file alone
+  const res1 = spawnSync(process.execPath, [dispatchPath, 'execute', 'cli-executor', '--prompt-file', promptFilePath], {
+    encoding: 'utf8',
+    cwd: repoRoot,
+  });
+  assert.equal(res1.status, 0, res1.stderr);
+  const parsed1 = JSON.parse(res1.stdout);
+  assert.equal(parsed1.status, 0);
+  const payload1 = JSON.parse(parsed1.stdout);
+  assert.equal(payload1.args[0], 'content-from-file');
+
+  // --prompt-file overriding --prompt when both given
+  const res2 = spawnSync(
+    process.execPath,
+    [dispatchPath, 'execute', 'cli-executor', '--prompt', 'inline-prompt', '--prompt-file', promptFilePath],
+    {
+      encoding: 'utf8',
+      cwd: repoRoot,
+    },
+  );
+  assert.equal(res2.status, 0, res2.stderr);
+  const parsed2 = JSON.parse(res2.stdout);
+  assert.equal(parsed2.status, 0);
+  const payload2 = JSON.parse(parsed2.stdout);
+  assert.equal(payload2.args[0], 'content-from-file');
+
+  // nonexistent --prompt-file path producing structured error JSON on stdout with exit code 1
+  const badFilePath = path.join(dir, 'nonexistent-prompt-file.txt');
+  const res3 = spawnSync(process.execPath, [dispatchPath, 'execute', 'cli-executor', '--prompt-file', badFilePath], {
+    encoding: 'utf8',
+    cwd: repoRoot,
+  });
+  assert.equal(res3.status, 1);
+  const parsed3 = JSON.parse(res3.stdout.trim());
+  assert.equal(parsed3.errorClass, undefined);
+  assert.match(parsed3.error, /ENOENT|no such file or directory/i);
+});
+
 test('the "execute" CLI entry point hands back {mechanism:"in-process",...} for a live-task-access native executor, never spawning anything', () => {
   const { repoRoot } = mkTempGitRepo();
   writeRunnerConfigFixture(repoRoot, {

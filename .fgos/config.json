@@ -88,7 +88,7 @@
               "accept-edits",
               "--new-project",
               "--print-timeout",
-              "10m",
+              "30m",
               "--model",
               "{model}"
             ]
@@ -183,7 +183,7 @@
         ]
       }
     },
-    "timeoutMs": 900000,
+    "timeoutMs": 2100000,
     "parallel": {
       "maxRoots": 4,
       "maxLeavesPerRoot": 4
