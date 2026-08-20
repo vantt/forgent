@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `fgos faults [--limit N]` — read surface for `.fgos/invocation-faults.jsonl`, the malformed-invocation log `fgos`'s own failure handler writes (unknown verb, missing store, a bad `--dir`, an arg-parse fault). Resolves the log the same worktree-safe way it is written, so a linked worktree with no `--dir` still reads the main checkout's real records instead of an empty view.
 - Split `agents/*.yaml` into `core/agents/` and `domains/<name>/agents/` (D24) and added global unique agent-type name doctor check `agent-type-names-unique` (D33).
 - Explicit task-spec contracts (`core/task-specs/`) for 7 domain-agnostic skills (`fgos-routing`, `fgos-clarifying`, `fgos-researching`, `fgos-unlock`, `fgos-fanout`, `fgos-indexing`, `distill`), with doctor `task-specs-resolve` validation.
 - D20/D22 agent-type eligibility resolution (`resolveAgentTypeForTaskSpec`, `src/runner/dispatch/cli.mjs`) is now wired into the real out-of-process dispatch path (`spawnWorker`, `executeExecutorCli`), via a new `src/runner/agent-roster.mjs`. Only has an observable effect on a command-less/adapter-less executor entry with no static `agentType` of its own — no executor this repo configures today (agy/claude/codex/pi) is affected.

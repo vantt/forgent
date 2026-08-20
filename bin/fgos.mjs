@@ -85,7 +85,7 @@ import { DEFAULTS } from '../src/state/work.mjs';
 import { getDomain, stageForStep, effectiveStage, discoverableStages, resolveDomainName } from '../src/state/workflow-stage-graphs.mjs';
 import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
 import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
-import { recordInvocationFault } from '../src/cli/invocation-fault-log.mjs';
+import { recordInvocationFault, resolveFaultLogPath } from '../src/cli/invocation-fault-log.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { DOCTOR_CHECKS, integrationScriptPath, ensureSharedConfigDefaults, runFixes } from '../src/setup/checks.mjs';
 import { sharedConfigFilePath, readSharedConfig, readSharedConfigOrEmpty, readInvariantCheckCommands } from '../src/config/shared-config-file.mjs';
@@ -2536,6 +2536,40 @@ async function runVerb(verb, flags, positional, dir) {
         [...ids].map((id) => [id, effectiveStage(conflictsView.work[id], getDomain(conflictsView.work[id].domain))]),
       );
       return { conflicts, stageByItem };
+    }
+
+    // tsk-1wdf: the machine-readable read surface D6 (tsk-5z0) left as
+    // follow-on work -- `recordInvocationFault` writes .fgos/invocation-
+    // faults.jsonl, this reads it back. `resolveFaultLogPath` already
+    // falls back to the main checkout's own store when `dir` doesn't exist
+    // (D5 -- the exact worktree-safety fallback this verb needs too), so
+    // this is deliberately absent from STORE_MISSING_WARNING_VERBS below:
+    // unlike `list`/`stale`, a worktree session with no --dir still reads
+    // the real log correctly here, so warning about "may be empty" would
+    // be actively misleading (same reasoning as docs-index's exclusion).
+    case 'faults': {
+      // Validated before the (possibly early, no-log) return below, so a
+      // malformed --limit is refused the same way regardless of whether
+      // any fault has ever been recorded yet.
+      const rawLimit = optionalField(flags.limit, 'faults --limit requires a positive integer value');
+      let limit;
+      if (rawLimit !== undefined) {
+        limit = Number(rawLimit);
+        if (!Number.isInteger(limit) || limit <= 0) {
+          throw new StoreError('validation', 'faults --limit requires a positive integer value');
+        }
+      }
+      const logPath = resolveFaultLogPath(dir, process.cwd());
+      if (!logPath || !fs.existsSync(logPath)) {
+        return { path: logPath, count: 0, records: [] };
+      }
+      const records = fs
+        .readFileSync(logPath, 'utf8')
+        .split('\n')
+        .filter(Boolean)
+        .map((line) => JSON.parse(line));
+      const mostRecent = limit === undefined ? records : records.slice(-limit);
+      return { path: logPath, count: records.length, records: mostRecent };
     }
 
     // Read-only, report-only (tsk-597z): re-runs checkMergeStillResolves
