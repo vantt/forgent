@@ -80,10 +80,13 @@ domain that does not exist yet.
   stage-skill leaves both `stage` and `status` unchanged from what this
   iteration read at its top, stop and report "no progress at stage
   `<stage>` after invoking `<skill>`" instead of looping again.
-- Claim right before the FIRST invocation of the `executing`-stage skill,
-  never earlier, and only when not already claimed (`status != 'doing'`).
-  Which claim command to run depends on `getDomain(domain).worktreeBacked`
-  — see `references/loop-mechanics.md` for both branches.
+- Claim or resync right before the FIRST invocation of the
+  `executing`-stage skill, never earlier. On the first invocation, run a
+  fresh `fgos pick` claim when not yet claimed (`status != 'doing'`), or run
+  `fgos resync-worktree` (no claim/CAS involved) when already claimed
+  (`status == 'doing'`) — never a bare skip. Which command to run depends
+  on `getDomain(domain).worktreeBacked` — see `references/loop-mechanics.md`
+  for both branches.
 - The pane-labeling call is decoration, never a gate: it always exits `0`
   and no-ops when nothing is registered. Never stop, retry, or branch on
   it, and never read a label back to decide anything. See
@@ -202,10 +205,10 @@ position has reached or passed it, stop and report "reached ceiling at
 Resolve `skill = skillForStage(domain, position)`. If `null`, stop — this
 position is mechanical, nothing left for this skill to load. Otherwise:
 show the item's title/description once per drive, label the session's
-pane once per drive (decoration, never a gate), claim the item and enter
-its worktree if this is the first invocation of the `executing`-stage
-skill and status isn't already `doing`, and reclaim the role/holder ball
-if it is set to something other than the domain's default role.
+pane once per drive (decoration, never a gate), claim or resync the item's
+worktree if this is the first invocation of the `executing`-stage skill,
+and reclaim the role/holder ball if it is set to something other than the
+domain's default role.
 
 ### Step 5: Invoke the skill
 Invoke `skill`. It runs its own gate and, once satisfied, calls the engine
@@ -264,8 +267,9 @@ and the fan-out contract.
   first
 - looping again after a stage-skill invocation left both `stage` and
   `status` unchanged, instead of stopping on the no-progress fail-safe
-- claiming an item before its FIRST invocation of the `executing`-stage
-  skill, or claiming again when the item's status already reads `doing`
+- claiming or resyncing an item before its FIRST invocation of the
+  `executing`-stage skill, or running `resync-worktree` again on a
+  second-or-later invocation within the same drive
 - treating the pane-labeling call as a gate, or reading a pane label back
   to decide anything
 - reporting a stop to the caller without first landing the same closing

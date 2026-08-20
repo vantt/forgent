@@ -116,11 +116,30 @@ If `skill` resolves to the domain's `executing`-stage skill AND `status !=
   never call `EnterWorktree` for this branch — invoke the skill directly
   at the current (main-checkout) cwd.
 
-If `status` is already `doing` (the caller already claimed it, or a prior
-iteration of this same loop already did), skip claiming and proceed
-straight to Step 7 — the session is assumed to already be inside the
-claimed worktree in that case, or already at the main checkout for a
-domain that isn't worktree-backed.
+If `status` is already `doing`:
+
+- If this is the FIRST invocation of the `executing`-stage skill in this
+  drive AND `domain.worktreeBacked === true` (today: `coding`), resync the
+  worktree before proceeding to Step 7:
+
+  ```bash
+  root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+  node "$root/bin/fgos.mjs" resync-worktree --dir "$root"
+  ```
+
+  Run this from inside the item's claimed worktree (the session is already
+  there in this branch). No `<id>`, `--path`, or `--branch` needed — `--path`
+  defaults to `process.cwd()` and `--branch` defaults to the worktree's own
+  current branch. A thrown `WorktreeError` from this call (e.g. non-ancestor
+  branch or stray uncommitted changes refusal) must surface as a real stop
+  to relay — never silently swallow or proceed past it.
+
+- If `domain.worktreeBacked === false`, skip resyncing — the session is
+  already at the main checkout.
+
+- If this is a SECOND+ invocation of the `executing`-stage skill within the
+  same drive (a prior iteration of this same loop already ran it), skip
+  claiming and resyncing, and proceed straight to Step 7.
 
 ## Step 7: Reclaim the role/holder ball
 
