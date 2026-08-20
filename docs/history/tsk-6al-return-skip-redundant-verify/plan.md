@@ -57,7 +57,32 @@ any one alone is a no-op — all three land together):
    If the flag is absent, or present but does not match `branchHead`
    (someone committed again after the worker's own verify ran), fall
    straight through to the existing unconditional `runGoalCheck` call —
-   never trust a stale flag.
+   never trust a stale flag. This flag's design is caller-agnostic — any
+   caller of `return` may pass it — so steps 4 and 5 below are two
+   independent real callers of the SAME flag, not two different designs.
+4. **`fanoutBatchExecutorCli`'s own return call** (cli.mjs:798-802, from
+   step 2 above) — thread `verifiedSha` through as the new flag.
+5. **`fgos-coding-implement`'s own skill-prose driver flow** — this is the
+   item's own CONFIRMED-LIVE reproduction path (RESEARCH.md Round 3), and
+   was missing from this plan's first draft (caught at `fgos-coding-
+   validating`'s Repo-fit check). Distinct from steps 2/4: here the
+   out-of-process `execute` call and the `return` call are two independent
+   skill-prose-driven steps in the SAME session, never one code function.
+   Update `.agents/skills/fgos-coding-implement/references/implement-and-
+   collaboration.md`'s out-of-process branch (currently line ~19-22): after
+   confirming the worker's own commit is real (`git log -1`/clean tree,
+   already required there), also read `verifiedSha` from the `execute`
+   call's JSON stdout. Update `references/return-mechanics.md`'s `fgos
+   return <id>` instruction (currently a bare call, line 12): when a
+   `verifiedSha` was captured from an out-of-process Implement step in the
+   SAME drive, pass it as `--worker-verified-sha <sha>`; when Implement was
+   `unavailable`/`in-process` (no worker, this session verified for real
+   itself, or `dispatch.mjs execute` was never called this drive), call
+   `fgos return <id>` exactly as today — bare, no flag. The mirrored
+   `.claude/skills/fgos-coding-implement/**` thin-wrapper copy (if any)
+   points at this same canonical `.agents/skills/**` source per this
+   repo's own generated-wrapper convention (`tsk-1qi`) and needs no
+   separate edit.
 
 **Order:** `fgos graph tsk-6al --json` was run — tsk-6al has no `deps` and
 does not appear in the global `criticalPath` (`[tsk-4vo, tsk-3t9, tsk-3t9-4,
@@ -69,9 +94,14 @@ before `return` can consume it (downstream).
 1. `src/runner/dispatch/cli.mjs` — add `verifiedSha` to `executeExecutorCli`'s
    `[DONE]` result; thread it through `fanoutBatchExecutorCli`'s return call.
 2. `bin/fgos.mjs` — accept the new return flag; add the skip branch.
-3. `test/cli/fgos-return.test.mjs` (+ the dispatch/cli test file) — new
+3. `.agents/skills/fgos-coding-implement/references/implement-and-
+   collaboration.md` + `references/return-mechanics.md` — the skill-prose
+   instruction for the driver session's own two-step flow (RESEARCH.md
+   Round 3) — depends on step 2 existing first (the flag it tells the
+   driver to pass must already be a real, accepted flag).
+4. `test/cli/fgos-return.test.mjs` (+ the dispatch/cli test file) — new
    assertions per the risk map's proof points below.
-4. `CHANGELOG.md` `## [Unreleased]` — per AGENTS.md's install/setup/doctor
+5. `CHANGELOG.md` `## [Unreleased]` — per AGENTS.md's install/setup/doctor
    gate: this changes `fgos return`'s own behavior/flag surface, a thing a
    user of fgOS would see.
 
@@ -106,6 +136,7 @@ disclosure requirement.
 | --- | --- | --- |
 | `bin/fgos.mjs` case `'return'` | medium — the one gate every coding item's `doing -> awaiting-approval/blocked` transition goes through, both branch- and main-source paths | `test/cli/fgos-return.test.mjs` stays fully green, plus new cases: (a) no flag passed -> byte-identical unconditional verify (default path unchanged), (b) flag present and matches `branchHead` -> verify skipped, outcome recorded as `awaiting-approval`, skip is visible in the recorded output/friction, (c) flag present but stale (branch moved since the flag's sha) -> falls through to a real verify, never silently skips |
 | `src/runner/dispatch/cli.mjs` (`executeExecutorCli`, `fanoutBatchExecutorCli`) | light — additive field on an already-computed value; existing consumers only destructure named fields, so an added key is inert to them until this plan's own step 2 reads it | existing dispatch cli tests stay green; new test: `verifiedSha` appears on a `[DONE]` result and is absent on `[BLOCKED]`/`unsignaled` results |
+| `fgos-coding-implement`'s skill-prose (`implement-and-collaboration.md`, `return-mechanics.md`) | medium — this is the item's own confirmed-live reproduction path (RESEARCH.md Round 3); a prose instruction that is ambiguous or silently skipped reproduces the exact bug this item exists to close, with no engine-level enforcement catching a driver session that just forgets | a live proof-test run (the same discipline `coding-worker-contract.md`'s own "Live proof-test finding" sections already use): drive one real out-of-process-dispatched item end to end after the edit and confirm, from the actual `return` output/friction record, that verify was skipped and tagged as worker-verified — not asserted from reading the prose alone |
 
 ## Shape
 
@@ -133,10 +164,12 @@ Concrete cases to prove against (standard-mode depth):
 
 ## Split decision
 
-No split. One coherent piece: the three touched points (capture, thread,
-consume) must land together — RESEARCH.md Round 2 already established
-that closing any one of the three gaps alone is a no-op, so nothing here
-is honestly separable into an independently workable smaller item.
+No split. One coherent piece: the four touched points (capture; thread
+through `fanoutBatchExecutorCli`; consume in `return`; wire the driver's
+own skill-prose, the item's actual confirmed-live path per RESEARCH.md
+Round 3) must land together — closing any subset alone leaves the item's
+own reproduction scenario unfixed, so nothing here is honestly separable
+into an independently workable smaller item.
 
 ## Outstanding questions
 

@@ -113,3 +113,44 @@ verified-sha signal) are now grounded in direct file:line evidence, not
 plausibility. Fix shape is now an implementation/planning decision, not a
 research gap: `fgos-coding-planning` should read this file before writing
 `plan.md`.
+
+## Round 3 (2026-08-20) — reality-gate finding: `fanoutBatchExecutorCli` is not the item's own confirmed-live caller
+
+**Found during `fgos-coding-validating`'s Repo-fit check on the first
+`plan.md` draft**, which wired the fix only into `fanoutBatchExecutorCli`
+(`src/runner/dispatch/cli.mjs:709-821`, the `fgos-fanout` batch caller).
+That draft's own citation for "the only caller that chains `pick ->
+executeExecutorCli -> return` for an out-of-process worker" turned out to
+be wrong — checked directly:
+
+- `.agents/skills/fgos-coding-implement/SKILL.md` Step 2 (Implement) +
+  `references/implement-and-collaboration.md:19-22`: the single-item
+  DRIVER session itself (not a code function) calls `node
+  src/runner/dispatch.mjs execute <executorId> --prompt "..."
+  --has-live-task-access` directly when the mechanism is `out-of-process`,
+  then reads `result.stdout` as the work product and confirms the
+  worker's own commit via `git log -1`.
+- `.agents/skills/fgos-coding-implement/SKILL.md` Step 5 (Return) +
+  `references/return-mechanics.md:12`: the SAME driver session, as an
+  independent LATER step, calls bare `fgos return <id>` — no flag, no
+  data threaded from the `execute` call's result at all.
+- These are two separate skill-prose-driven steps in the same session,
+  never a single code function — `fanoutBatchExecutorCli` is a distinct,
+  different caller (used only by `fgos-fanout`'s concurrent multi-child
+  batch dispatch), not this single-item flow.
+- The item's own description says "Confirmed live 2026-08-20 driving
+  tsk-1uf" — a single-item drive, i.e. exactly the `fgos-coding-implement`
+  driver flow above, not a fanout batch run.
+
+**Found:** Confirmed, not refuted — a real gap in the first plan draft.
+Closing this requires a FOURTH touch point beyond the original three: the
+skill-prose in `fgos-coding-implement/references/implement-and-
+collaboration.md` (out-of-process branch) and `references/return-
+mechanics.md` (Step 5) must instruct the driver session itself to read
+`verifiedSha` from the `execute` CLI's JSON stdout and pass it to its own
+subsequent `fgos return <id>` call as the same flag `bin/fgos.mjs` accepts
+(design already caller-agnostic, so no change needed to the flag's own
+shape — only to which callers actually pass it). `fanoutBatchExecutorCli`
+threading stays in scope too — it is a second real, still-relevant caller
+of the same flag — but it is not, on its own, the item's own confirmed-live
+reproduction path. See `plan.md`'s revised Approach.
