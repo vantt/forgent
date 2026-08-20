@@ -68,7 +68,7 @@ maintainers edit source, and how core code discovers/loads per-domain data.
 | D17 | Merge dispatcher-wiring task into the registry-split task — dissolves the reference-identity gate by removing the flat-property read paths in one pass. |
 | D18 | `domains/<name>/workflows/<name>.mjs` (later superseded by D29's `.yaml`) is the official home for workflow definitions. |
 | D19 | Workflow-file authoring format (one unified per-stage block) is separate from runtime shape (existing separated maps) — normalized at load time, resolver signatures unchanged. |
-| D20 | Eligibility declaration inverted: agent-type declares `soul`+`skills` (what it has); task-spec declares `agent`(D26)/`requires-skill` (what it needs) — replaces tsk-2t9c D12's shipped `claims` model. |
+| D20 | Eligibility declaration inverted: agent-type declares role+persona (`soul` intent) + `skills` (what it has, no separate `soul` field); task-spec declares `agent`(D26)/`requires-skill` (what it needs) — replaces tsk-2t9c D12's shipped `claims` model. |
 | D21 | The 3 dispatch layers (D13) map directly onto already-named, already-built mechanisms — no new vocabulary ("CASTING" proposal retracted). |
 | D22 | DISPATCH eligibility-check is ONE unified mechanism at every role-requiring point — stage-entry (primary role) and Collaboration-row calls (secondary role) both resolve through the same D20 match. |
 | D23 | Doctrine domain-scoped: `domains/<name>/AGENTS.md` (same file type as root `AGENTS.md`, narrower scope). Root keeps only genuinely domain-agnostic doctrine; `fgos-routing` reads the domain's own `AGENTS.md` once domain resolves (explicit Read, not static `@import`). |
