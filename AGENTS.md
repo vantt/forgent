@@ -100,7 +100,7 @@ Four ways to call `decide`, for four different situations:
 
 - `decide <executorId>` — you already know the exact executor name (e.g. `judge-discovery`).
 - `decide --for <purpose>` — you know what JOB you need done (e.g. `judge`), but not which executor serves it.
-- `decide --work <id>` — you have a real work item and want it dispatched.
+- `decide --work <id> [--stage <stage>]` — you have a real work item and want it dispatched.
 - `decide --for <label> --needs-soul` — you are about to fire an Agent/Task tool yourself, with no executor or work item to name.
 
 Add `--has-live-task-access` when you already have the Agent/Task tool in your own tool manifest. This is always your own self-declaration — never probed from the environment, never guessed.

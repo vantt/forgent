@@ -4105,11 +4105,12 @@ test('executorIdForWork is exported and resolves a coding-domain (or no-domain) 
   assert.equal(executorIdForWork(sampleWork()), 'fgos-coding-implement');
 });
 
-test('executorIdForWork expands key to (domain, stage, role) and respects stage parameter and work.stage property', () => {
+test('executorIdForWork respects stage parameter and work.stage property, and has length 2 (dead role param removed)', () => {
+  assert.equal(executorIdForWork.length, 2);
   assert.equal(executorIdForWork(sampleWork(), 'discovery'), 'fgos-coding-discovering');
   assert.equal(executorIdForWork(sampleWork(), 'planning'), 'fgos-coding-planning');
   assert.equal(executorIdForWork({ domain: 'coding', stage: 'exploring' }), 'fgos-coding-exploring');
-  assert.equal(executorIdForWork({ domain: 'coding', stage: 'planning' }, null, 'implementer'), 'fgos-coding-planning');
+  assert.equal(executorIdForWork({ domain: 'coding', stage: 'planning' }), 'fgos-coding-planning');
 });
 
 test('resolveAgentTypeForTaskSpec implements D32 tie-break scenarios correctly', () => {
@@ -4147,6 +4148,38 @@ test('resolveAgentTypeForTaskSpec implements D32 tie-break scenarios correctly',
       'agent-gamma',
     ),
     'agent-alpha',
+  );
+});
+
+test('resolveAgentTypeForTaskSpec refuses (returns null) across all 4 unvalidated/mismatched fail-close sites', () => {
+  const agentDefs = [
+    { name: 'agent-alpha', skills: ['code-review', 'implementation'] },
+    { name: 'agent-beta', skills: ['implementation', 'planning'] },
+  ];
+
+  // 1. null/falsy taskSpecHeader -> returns null
+  assert.equal(resolveAgentTypeForTaskSpec(null, agentDefs, 'agent-alpha'), null);
+  assert.equal(resolveAgentTypeForTaskSpec(undefined, agentDefs, 'agent-alpha'), null);
+
+  // 2. pinned agent not in roster -> returns null (refuses unvalidated pinned name)
+  assert.equal(
+    resolveAgentTypeForTaskSpec({ agent: ['nonexistent-agent'] }, agentDefs, 'agent-alpha'),
+    null,
+  );
+
+  // 3. no requires-skill & no pin -> returns null
+  assert.equal(resolveAgentTypeForTaskSpec({}, agentDefs, 'agent-alpha'), null);
+  assert.equal(resolveAgentTypeForTaskSpec({ 'requires-skill': [] }, agentDefs, 'agent-alpha'), null);
+  assert.equal(resolveAgentTypeForTaskSpec({ 'requires-skill': '  ' }, agentDefs, 'agent-alpha'), null);
+
+  // 4. no agent in roster matches required skills -> returns null
+  assert.equal(
+    resolveAgentTypeForTaskSpec(
+      { 'requires-skill': ['nonexistent-skill'] },
+      agentDefs,
+      'agent-alpha',
+    ),
+    null,
   );
 });
 

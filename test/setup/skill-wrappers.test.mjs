@@ -248,6 +248,80 @@ test('assembleSkills output matches the committed .agents/skills byte-for-byte (
   }
 });
 
+test('assembleSkills throws on duplicate skill name collision across core and domains', () => {
+  const root = mkTempDir('skill-wrappers-collision-');
+  writeSkill(path.join(root, 'core', 'skills'), 'skill-dup', SAMPLE_FRONTMATTER, '# Core Dup\n');
+  writeSkill(path.join(root, 'domains', 'coding', 'skills'), 'skill-dup', SAMPLE_FRONTMATTER, '# Domain Dup\n');
+
+  assert.throws(
+    () => assembleSkills(root),
+    (err) => {
+      assert.match(err.message, /duplicate skill name "skill-dup" found in multiple files:/);
+      assert.match(err.message, /core\/skills\/skill-dup/);
+      assert.match(err.message, /domains\/coding\/skills\/skill-dup/);
+      return true;
+    },
+  );
+});
+
+test('assembleSkills prunes orphaned skills from .agents/skills when removed from source', () => {
+  const root = mkTempDir('skill-wrappers-prune-agents-');
+  writeSkill(path.join(root, 'core', 'skills'), 'skill-active', SAMPLE_FRONTMATTER, '# Active\n');
+
+  const targetAgentsSkills = path.join(root, '.agents', 'skills');
+  writeSkill(targetAgentsSkills, 'skill-orphaned', SAMPLE_FRONTMATTER, '# Orphaned\n');
+
+  assert.ok(fs.existsSync(path.join(targetAgentsSkills, 'skill-orphaned')));
+
+  assembleSkills(root);
+
+  assert.ok(fs.existsSync(path.join(targetAgentsSkills, 'skill-active')));
+  assert.equal(fs.existsSync(path.join(targetAgentsSkills, 'skill-orphaned')), false);
+});
+
+test('generateAllSkillWrappers prunes orphaned wrappers from .claude/skills when source skill is gone', () => {
+  const agentsSkillsRoot = mkTempDir('skill-wrappers-prune-claude-agents-');
+  const claudeSkillsRoot = mkTempDir('skill-wrappers-prune-claude-target-');
+
+  writeSkill(agentsSkillsRoot, 'skill-active', SAMPLE_FRONTMATTER, '# Active\n');
+
+  // A previously-generated wrapper whose source has since disappeared --
+  // its SKILL.md carries the real generated-wrapper marker, the only
+  // proof the prune pass is allowed to act on.
+  writeSkill(
+    claudeSkillsRoot,
+    'skill-orphaned',
+    SAMPLE_FRONTMATTER,
+    generateWrapperContent(`${SAMPLE_FRONTMATTER}\n# Orphaned\n`, '../../.agents/skills/skill-orphaned/SKILL.md'),
+  );
+  assert.ok(fs.existsSync(path.join(claudeSkillsRoot, 'skill-orphaned')));
+
+  const written = generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot);
+
+  assert.equal(written.length, 1);
+  assert.ok(fs.existsSync(path.join(claudeSkillsRoot, 'skill-active', 'SKILL.md')));
+  assert.equal(fs.existsSync(path.join(claudeSkillsRoot, 'skill-orphaned')), false);
+});
+
+test('generateAllSkillWrappers never prunes a standalone skill under .claude/skills that was never a generated wrapper (regression: tsk-3ti-10 deleted .claude/skills/ui-spec)', () => {
+  const agentsSkillsRoot = mkTempDir('skill-wrappers-prune-standalone-agents-');
+  const claudeSkillsRoot = mkTempDir('skill-wrappers-prune-standalone-target-');
+
+  writeSkill(agentsSkillsRoot, 'skill-active', SAMPLE_FRONTMATTER, '# Active\n');
+
+  // A real, hand-authored skill living directly under .claude/skills,
+  // never routed through .agents/skills -- its SKILL.md carries no
+  // generated-wrapper marker, so the prune pass must never touch it, no
+  // matter that its name is absent from validWrapperNames.
+  writeSkill(claudeSkillsRoot, 'standalone-skill', SAMPLE_FRONTMATTER, '# Real hand-authored content\n');
+  fs.writeFileSync(path.join(claudeSkillsRoot, 'standalone-skill', 'tool.mjs'), 'export const real = true;\n');
+
+  generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot);
+
+  assert.ok(fs.existsSync(path.join(claudeSkillsRoot, 'standalone-skill', 'SKILL.md')), 'standalone skill must survive the prune pass');
+  assert.ok(fs.existsSync(path.join(claudeSkillsRoot, 'standalone-skill', 'tool.mjs')), 'standalone skill\'s real files must survive the prune pass');
+});
+
 test('mirrorDevSkillsIntoPlugin mirrors _shared and fgos-* dev-skills into plugin directory, skipping non-fgos skills', () => {
   const agentsSkillsRoot = mkTempDir('skill-wrappers-mirror-agents-');
   const pluginSkillsRoot = mkTempDir('skill-wrappers-mirror-plugin-');

@@ -70,11 +70,9 @@ import {
  * identity) is intentional, not a bug; `decideExecutorCli`'s own `--work`
  * branch below already documents the fallback this design implies.)
  *
- * D15/D20: persona/agent-type resolution key expanded to (domain, stage, role).
- * `stage` defaults to `stage ?? work?.stage ?? 'executing'`; `role` defaults to
- * `role ?? work?.holder ?? work?.role`.
+ * `stage` defaults to `stage ?? work?.stage ?? 'executing'`.
  */
-export function executorIdForWork(work, stage, role) {
+export function executorIdForWork(work, stage) {
   const domainObj = DOMAINS[resolveDomainName(work?.domain)];
   const targetStage = stage ?? work?.stage ?? 'executing';
   return skillForStage(domainObj, targetStage);
@@ -88,7 +86,7 @@ export function executorIdForWork(work, stage, role) {
  * 3. Otherwise -> select deterministically by declaration order (first matching agent-type in `agentDefs`).
  */
 export function resolveAgentTypeForTaskSpec(taskSpecHeader, agentDefs = [], currentAgentType = null) {
-  if (!taskSpecHeader) return currentAgentType || (agentDefs[0]?.name ?? null);
+  if (!taskSpecHeader) return null;
 
   const pinnedAgents = Array.isArray(taskSpecHeader.agent)
     ? taskSpecHeader.agent
@@ -98,7 +96,7 @@ export function resolveAgentTypeForTaskSpec(taskSpecHeader, agentDefs = [], curr
 
   if (pinnedAgents.length > 0) {
     const found = agentDefs.find((a) => pinnedAgents.includes(a.name));
-    return found ? found.name : pinnedAgents[0];
+    return found ? found.name : null;
   }
 
   const requiredSkills = Array.isArray(taskSpecHeader['requires-skill'])
@@ -108,7 +106,7 @@ export function resolveAgentTypeForTaskSpec(taskSpecHeader, agentDefs = [], curr
       : [];
 
   if (requiredSkills.length === 0) {
-    return currentAgentType || (agentDefs[0]?.name ?? null);
+    return null;
   }
 
   if (currentAgentType) {
@@ -124,7 +122,7 @@ export function resolveAgentTypeForTaskSpec(taskSpecHeader, agentDefs = [], curr
   );
   if (matching) return matching.name;
 
-  return currentAgentType || (agentDefs[0]?.name ?? null);
+  return null;
 }
 
 /**
@@ -588,7 +586,7 @@ export async function decideExecutorCli(
 ) {
   if (!executorIdArg && !purpose && !workIdArg && !needsSoul) {
     throw new RunnerConfigError(
-      'usage: node src/runner/dispatch.mjs decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--has-live-task-access] | decide --needs-soul [--has-live-task-access]',
+      'usage: node src/runner/dispatch.mjs decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --needs-soul [--has-live-task-access]',
     );
   }
   // Same main-checkout resolution as executeExecutorCli above, same reason.
@@ -933,7 +931,7 @@ export function runDispatchCli() {
     }
     default: {
       process.stderr.write(
-        `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs execute <executorId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] [--has-live-task-access] | execute --for <purpose> [...] | decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | log <executorId> --id <id> --provider <p> --command <c> [--model <m>]\n`,
+        `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs execute <executorId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] [--has-live-task-access] | execute --for <purpose> [...] | decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | log <executorId> --id <id> --provider <p> --command <c> [--model <m>]\n`,
       );
       process.exitCode = 1;
     }

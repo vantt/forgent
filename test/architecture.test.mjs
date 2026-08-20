@@ -66,6 +66,49 @@ function extractImports(source) {
   return imports;
 }
 
+export function extractDomainCouplings(file, source, domainNames = []) {
+  const targets = [];
+  const cleanSource = source.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
+
+  for (const specifier of extractImports(source)) {
+    const target = specifier.startsWith('.')
+      ? path.relative(root, path.resolve(root, path.dirname(file), specifier)).split(path.sep).join('/')
+      : specifier.split(path.sep).join('/');
+    targets.push(target);
+  }
+
+  const pathPattern = /['"`](?:\.[\/\\])*domains\/([a-zA-Z0-9_-]+)(?:[\/\\][^'"`]*)?['"`]/g;
+  for (const m of cleanSource.matchAll(pathPattern)) {
+    targets.push(m[0].slice(1, -1));
+  }
+
+  const pathJoinPattern = /path\.join\s*\([^)]*?['"]domains['"]\s*,\s*['"]([a-zA-Z0-9_-]+)['"]/g;
+  for (const m of cleanSource.matchAll(pathJoinPattern)) {
+    if (domainNames.includes(m[1])) {
+      targets.push(`domains/${m[1]}`);
+    }
+  }
+
+  if (!file.startsWith('domains/')) {
+    for (const domain of domainNames) {
+      const single = "'" + domain + "'";
+      const double = '"' + domain + '"';
+      const backtick = '`' + domain + '`';
+      const lines = cleanSource.split('\n');
+      for (const line of lines) {
+        if (line.includes('DEFAULT_DOMAIN') && line.includes('=')) {
+          continue;
+        }
+        if (line.includes(single) || line.includes(double) || line.includes(backtick)) {
+          targets.push(`domains/${domain}`);
+        }
+      }
+    }
+  }
+
+  return targets;
+}
+
 test('đủ sổ: file .mjs trên đĩa ↔ row trong manifest, một-một', () => {
   assert.deepEqual(onDisk, inManifest);
 });
@@ -115,21 +158,21 @@ test('import một chiều xuống: không file nào import ngược lên tầng
   assert.deepEqual(violations, []);
 });
 
-test('domain-siloing: core không import domain cụ thể, domain không import domain khác', () => {
+test('domain-siloing: core không import/couple domain cụ thể, domain không import domain khác', () => {
   const allFiles = [...new Set([...inManifest, ...mjsFilesUnder('core'), ...mjsFilesUnder('domains')])].sort();
+  const domainsDir = path.join(root, 'domains');
+  const domainNames = fs.existsSync(domainsDir)
+    ? fs.readdirSync(domainsDir).filter((d) => fs.statSync(path.join(domainsDir, d)).isDirectory())
+    : [];
   const violations = [];
 
   for (const file of allFiles) {
     const filePath = path.join(root, file);
     if (!fs.existsSync(filePath)) continue;
     const source = fs.readFileSync(filePath, 'utf8');
-    const specifiers = extractImports(source);
+    const targets = extractDomainCouplings(file, source, domainNames);
 
-    for (const specifier of specifiers) {
-      const target = specifier.startsWith('.')
-        ? path.relative(root, path.resolve(root, path.dirname(file), specifier)).split(path.sep).join('/')
-        : specifier.split(path.sep).join('/');
-
+    for (const target of targets) {
       const violation = checkDomainSiloingViolation(file, target);
       if (violation) {
         violations.push(violation);
@@ -140,7 +183,7 @@ test('domain-siloing: core không import domain cụ thể, domain không import
   assert.deepEqual(violations, []);
 });
 
-test('domain-siloing: phát hiện vi phạm fixture (core → domain cụ thể, domain A → domain B)', () => {
+test('domain-siloing: phát hiện vi phạm fixture (core → domain cụ thể, domain A → domain B, path/literal coupling)', () => {
   assert.equal(
     checkDomainSiloingViolation('src/runner/loop.mjs', 'domains/coding/registry.yaml'),
     'src/runner/loop.mjs (core) import domain cụ thể domains/coding/registry.yaml',
@@ -160,5 +203,19 @@ test('domain-siloing: phát hiện vi phạm fixture (core → domain cụ thể
     checkDomainSiloingViolation('domains/coding/foo.mjs', 'src/state/store.mjs'),
     null,
   );
+
+  // Fixture tests for path construction and hardcoded literals extraction
+  const sampleCoreSource = `
+    const p = path.join('domains', 'coding', 'spec.md');
+    const d = 'coding';
+    export const DEFAULT_DOMAIN = 'coding';
+  `;
+  const targets = extractDomainCouplings('src/sample.mjs', sampleCoreSource, ['coding', 'marketing']);
+  assert.ok(targets.includes('domains/coding'));
+
+  // DEFAULT_DOMAIN declaration is guarded
+  const defaultDomainDefOnly = "export const DEFAULT_DOMAIN = 'coding';";
+  const defTargets = extractDomainCouplings('src/state/workflow-stage-graphs.mjs', defaultDomainDefOnly, ['coding']);
+  assert.deepEqual(defTargets, []);
 });
 

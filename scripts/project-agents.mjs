@@ -2,6 +2,29 @@
 // project-agents.mjs -- projects forgent's own platform-agnostic agent
 // definitions (core/agents/*.yaml, domains/<name>/agents/*.yaml) into Claude Code's adapter format
 // (.claude/agents/<name>.md). tsk-slq / D24 / D33.
+//
+// Canonical root location (D5, D24, docs/history/agent-executor-agent-definitions/CONTEXT.md):
+// lives at core/agents/ and domains/<name>/agents/ (with legacy fallback to agents/) --
+// NOT under .fgos/. .fgos/ is reserved exclusively for the runner's own
+// state store: src/runner/worktree.mjs's createWorktree() unconditionally
+// wipes .fgos/ from every freshly-created worktree (ADR0020), and
+// src/runner/merge.mjs rejects any merge that stages a change under
+// .fgos/ outright (outcome 'fgos-write-rejected'). A canonical root
+// living inside .fgos/ could never survive a worktree cycle or be merged.
+//
+// Tool-scope field authority (D1, docs/history/agent-executor-agent-definitions/CONTEXT.md):
+// the source yaml's `tool-scope` list IS the authoritative, harness-enforced
+// grant for the projected agent-type's Task-tool dispatch -- it is written
+// straight into the generated .md's `tools:` frontmatter below, unfiltered.
+// This is a SEPARATE axis from tsk-62v's `executors.<id>.allowedTools`
+// (the shared config file's `runner` section), which gates a different
+// dispatch path (domain-1 headless CLI spawn), keyed by executorId rather
+// than agent-type name. Neither field is descriptive-only; neither is
+// dropped; they never collide because they key differently.
+//
+// Copy/convert only -- not a converter engine (CONTEXT.md Feature boundary).
+// One platform target exists today (Claude Code); a second platform gets
+// its own adapter directory and its own small script when it's real.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -18,10 +41,37 @@ const FORBIDDEN_PLATFORM_NAMES = ['claude', 'codex', 'anthropic'];
 
 const REQUIRED_FIELDS = ['name', 'version', 'description', 'role', 'persona', 'decision_boundary', 'model_tier', 'tool-scope'];
 
+// Matches the shared config file's own `runner.models` block + dispatch.mjs's
+// modelForTier default fallback -- reused as-is, not a second mapping.
 export const DEFAULT_MODELS = { light: 'haiku', standard: 'sonnet', heavy: 'opus' };
 
 export class AgentDefinitionError extends Error {}
 
+// Reads the shared config file at the MAIN CHECKOUT, not at REPO_ROOT
+// (this script's own on-disk location -- correct for agents/.claude/agents,
+// wrong here): `.fgos/` is unconditionally wiped from every freshly-created
+// worktree (ADR0020), so a worktree-local REPO_ROOT would silently find
+// nothing and fall back to defaults on every run inside one, defeating the
+// point of reading real config at all (tsk-5hv, found by fgos-validating).
+// `resolveMainCheckoutRoot` (not `resolveRepoRoot`, both `src/runner/
+// paths.mjs`: `resolveRepoRoot` shells out to `--show-toplevel` and
+// returns a worktree's own root unchanged, not its main checkout) is the
+// one helper that actually resolves via `--git-common-dir` the way this
+// needs.
+// tsk-5tm D9: delegates to `modelForTier` (the one canonical tier->model
+// resolver) instead of reading `cfg.runner.models` directly -- that field
+// is the legacy flat map D9 introduced `modelPolicies` to replace, and
+// `modelForTier` already prefers `modelPolicies` when present, falling
+// back to the legacy map otherwise. Reading `cfg.runner.models` here
+// directly (this function's pre-D9 shape) meant a `modelPolicies`-only
+// config -- the shape this repo's OWN committed `.fgos/config.json` now
+// uses -- would silently fall through to DEFAULT_MODELS below with no
+// error, hiding any real customization to `modelPolicies.claude`.
+// Exported for a real integration test (tsk-5tm) -- previously this
+// function was module-private, its own root resolution not injectable, and
+// untested; the exact blind spot that let it silently keep reading the
+// legacy `models` shape unnoticed. `mainCheckoutRootOverride` is test-only
+// (every real call site omits it, resolving exactly as before).
 export function readRunnerModels(mainCheckoutRootOverride) {
   const mainCheckoutRoot = mainCheckoutRootOverride ?? resolveMainCheckoutRoot(REPO_ROOT) ?? REPO_ROOT;
   const cfg = readSharedConfig(mainCheckoutRoot);
@@ -62,6 +112,9 @@ function validateDefinition(name, def) {
       `agents/${name}.yaml's model_tier "${def.model_tier}" is not one of ${Object.keys(DEFAULT_MODELS).join('/')}.`,
     );
   }
+  // skills (tsk-397 D20): optional, but when present must be a real list
+  // of non-empty skill name strings -- same shape discipline tool-scope
+  // already gets above.
   if ('skills' in def && (!Array.isArray(def.skills) || def.skills.some((c) => typeof c !== 'string' || !c.trim()))) {
     throw new AgentDefinitionError(`agents/${name}.yaml's skills, when present, must be a non-empty list of skill name strings.`);
   }
@@ -126,6 +179,8 @@ export function projectAgentMarkdown(name, sourceYamlText, models, sourcePath = 
   const model = models[def.model_tier];
   const tools = def['tool-scope'].join(', ');
 
+  // skills (tsk-397 D20): OPTIONAL -- declared capabilities of this agent-type
+  // used for eligibility matching against a task-spec's requires-skill.
   const frontmatterLines = ['---', `name: ${def.name}`, `description: ${def.description}`, `model: ${model}`, `tools: ${tools}`];
   if (Array.isArray(def.skills) && def.skills.length > 0) {
     frontmatterLines.push(`skills: [${def.skills.join(', ')}]`);
@@ -156,37 +211,66 @@ export function projectAgentMarkdown(name, sourceYamlText, models, sourcePath = 
   return `${frontmatter}\n\n${body}\n`;
 }
 
-function main() {
-  const agentFiles = findAgentYamlFiles(REPO_ROOT);
-  if (agentFiles.length === 0) {
-    console.log(`no agent yaml files found -- nothing to project.`);
-    return;
-  }
-
-  // D33: Check for duplicate agent-type names globally across all sources
-  const nameToFiles = new Map();
+/**
+ * D33: Resolves duplicate agent-type names globally across all sources.
+ * Deprioritizes legacy agents/ source when a non-legacy source (core/agents or
+ * domains/<name>/agents) collides with it (logs warning, legacy is skipped).
+ * Throws AgentDefinitionError if two non-legacy sources collide.
+ */
+export function resolveAgentFiles(agentFiles, repoRoot = REPO_ROOT) {
+  const nameToEntries = new Map();
   for (const file of agentFiles) {
-    const sourceYamlText = fs.readFileSync(file.filePath, 'utf8');
     let agentName = file.name;
     try {
+      const sourceYamlText = fs.readFileSync(file.filePath, 'utf8');
       const def = parseYaml(sourceYamlText);
       if (def && typeof def.name === 'string') {
         agentName = def.name;
       }
     } catch {}
-    if (!nameToFiles.has(agentName)) {
-      nameToFiles.set(agentName, []);
+    const relPath = path.relative(repoRoot, file.filePath);
+    const entry = { ...file, agentName, relPath };
+    if (!nameToEntries.has(agentName)) {
+      nameToEntries.set(agentName, []);
     }
-    const relPath = path.relative(REPO_ROOT, file.filePath);
-    nameToFiles.get(agentName).push(relPath);
+    nameToEntries.get(agentName).push(entry);
   }
 
-  for (const [agentName, paths] of nameToFiles.entries()) {
-    if (paths.length > 1) {
+  const resolved = [];
+  for (const [agentName, entries] of nameToEntries.entries()) {
+    if (entries.length === 1) {
+      resolved.push(entries[0]);
+      continue;
+    }
+
+    const nonLegacy = entries.filter((e) => e.source !== 'agents');
+    const legacy = entries.filter((e) => e.source === 'agents');
+
+    if (nonLegacy.length === 1 && legacy.length > 0) {
+      const winner = nonLegacy[0];
+      for (const leg of legacy) {
+        console.warn(
+          `warning: legacy agents/ entry "${leg.relPath}" skipped due to duplicate agent-type name "${agentName}" in ${winner.relPath} (D33)`
+        );
+      }
+      resolved.push(winner);
+    } else {
+      const paths = entries.map((e) => e.relPath);
       throw new AgentDefinitionError(
-        `duplicate agent-type name "${agentName}" found in multiple files: ${paths.join(', ')} (D33)`,
+        `duplicate agent-type name "${agentName}" found in multiple files: ${paths.join(', ')} (D33)`
       );
     }
+  }
+
+  return resolved;
+}
+
+function main() {
+  const rawAgentFiles = findAgentYamlFiles(REPO_ROOT);
+  const agentFiles = resolveAgentFiles(rawAgentFiles, REPO_ROOT);
+  if (agentFiles.length === 0) {
+    console.log(`no agent yaml files found -- nothing to project.`);
+    return;
   }
 
   const models = readRunnerModels();

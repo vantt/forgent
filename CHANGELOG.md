@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Updated `resolveAgentTypeForTaskSpec` (`src/runner/dispatch/cli.mjs`) to fail closed (returning `null`) across all four unvalidated/mismatched eligibility fallback points (missing taskSpec header, pinned agent missing from roster, empty `requires-skill`, and no roster agent matching required skills) instead of falling open to an unvalidated agent name.
+
 ### Added
 
 - `fgos faults [--limit N]` — read surface for `.fgos/invocation-faults.jsonl`, the malformed-invocation log `fgos`'s own failure handler writes (unknown verb, missing store, a bad `--dir`, an arg-parse fault). Resolves the log the same worktree-safe way it is written, so a linked worktree with no `--dir` still reads the main checkout's real records instead of an empty view.
