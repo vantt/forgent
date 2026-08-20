@@ -111,9 +111,7 @@ item's own `verify` field below.
 
 ## Outstanding questions
 
-- Should `fanoutBatchExecutorCli`'s own `pick` call pass `claimRole:
-  runner` so an orphaned fanout-batch claim gets the fast 15-minute stale
-  grace instead of the current 24-hour one? Real finding (RESEARCH.md
-  round 1, finding 3), explicitly out of this item's scope (code change,
-  not prose) — flagged here for a person to decide whether it is worth its
-  own follow-up item, not blocking this fix.
+None (the `claimRole: runner` follow-up from RESEARCH.md round 1 finding 3
+was raised at the Gate; the person split it into its own item, tsk-62w,
+dep-linked to tsk-vuj — out of this item's own scope, nothing left open
+here).
