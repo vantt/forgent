@@ -2232,6 +2232,42 @@ async function runVerb(verb, flags, positional, dir) {
         if (!item) {
           throw new StoreError('validation', `list: work "${id}" not found.`);
         }
+        if (flags.fields !== undefined) {
+          const ALLOWED_ID_FIELDS = new Set([
+            'stage', 'status', 'holder', 'title', 'docsRef',
+            'verify', 'parent', 'id', 'domain', 'kind', 'risk', 'tier',
+          ]);
+          const fieldList = parseListFlag(flags.fields);
+          if (fieldList.length === 0) {
+            throw new StoreError('validation', 'list --fields requires a non-empty comma-separated list of field names.');
+          }
+          for (const f of fieldList) {
+            if (!ALLOWED_ID_FIELDS.has(f)) {
+              throw new StoreError('validation', `list --fields: unknown field "${f}". Allowed fields: ${Array.from(ALLOWED_ID_FIELDS).join(', ')}.`);
+            }
+          }
+          const fullItem = withStageEffective(item);
+          const filteredItem = {};
+          for (const f of fieldList) {
+            if (fullItem[f] !== undefined) {
+              filteredItem[f] = fullItem[f];
+            }
+          }
+          const {
+            decisions, discovery, gates, settlements, outcomes,
+            frictions, learnings, decisionsById, callThreads,
+            ...restView
+          } = rawView;
+          const singleView = {
+            ...restView,
+            work: { [id]: filteredItem },
+          };
+          if (item.status === 'awaiting-human') {
+            const ctx = computeAwaitingContext(singleView, id);
+            if (ctx) return { ...singleView, awaitingContext: { [id]: ctx } };
+          }
+          return singleView;
+        }
         // tsk-2u9 D1/D2: scope every OTHER id-keyed view section to this
         // item too, not just `work` -- `rawView` otherwise leaks the
         // entire backlog's decisions/discovery/gates/settlements/outcomes/

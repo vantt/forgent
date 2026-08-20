@@ -337,6 +337,48 @@ test('list --id scopes every id-keyed view section to just the requested item, e
   assert.equal(data.callThreads['item-a'][0].outcome, 'consult about A');
 });
 
+test('list --id --fields returns only named fields and omits all history side-log keys (tsk-4zr)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'item-fields', { title: 'Item Fields' });
+  run(cwd, ['decision', '--id', 'item-fields', '--text', 'decision text', '--rationale', 'rat', '--relation', 'none']);
+
+  const flagged = envelopeData(run(cwd, ['list', '--id', 'item-fields', '--fields', 'stage,status,holder', '--json']).stdout);
+  assert.deepEqual(Object.keys(flagged.work), ['item-fields']);
+  assert.deepEqual(Object.keys(flagged.work['item-fields']).sort(), ['stage', 'status'].sort());
+  const sideLogKeys = ['decisions', 'discovery', 'gates', 'settlements', 'outcomes', 'frictions', 'learnings', 'decisionsById', 'callThreads'];
+  for (const key of sideLogKeys) {
+    assert.equal(flagged[key], undefined, `side-log key "${key}" must be omitted when --fields is passed`);
+  }
+});
+
+test('list --id without --fields is unchanged from today behavior (tsk-4zr)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'item-unflagged', { title: 'Item Unflagged' });
+  run(cwd, ['decision', '--id', 'item-unflagged', '--text', 'dec text', '--rationale', 'rat', '--relation', 'none']);
+
+  const data = envelopeData(run(cwd, ['list', '--id', 'item-unflagged', '--json']).stdout);
+  assert.ok(data.work['item-unflagged']);
+  assert.equal(data.work['item-unflagged'].title, 'Item Unflagged');
+  assert.ok(Array.isArray(data.decisions));
+  assert.ok(data.discovery);
+  assert.ok(data.gates);
+  assert.ok(data.settlements);
+  assert.ok(data.outcomes);
+  assert.ok(data.frictions);
+  assert.ok(data.learnings);
+  assert.ok(data.decisionsById);
+  assert.ok(data.callThreads);
+});
+
+test('list --id --fields with an invalid field name is rejected as validation error, exit 4 (tsk-4zr)', () => {
+  const cwd = tmpCwd();
+  addOk(cwd, 'item-invalid');
+
+  const result = run(cwd, ['list', '--id', 'item-invalid', '--fields', 'stage,invalidField']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /list --fields: unknown field "invalidField"/);
+});
+
 test('list default keeps an awaiting-human item visible (D2: excludes only the two terminal statuses done/wontfix, per wontfix-terminal-status-filter-consistency D2 -- never a broader ad-hoc closed/parked set like awaiting-human)', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'parked-item', { title: 'Parked Item' });
