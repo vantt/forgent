@@ -216,3 +216,75 @@ draws.
 **Still open:** none for this item's own scope decision — tsk-24e's own
 park remains a separate, still-open question for a person to answer on
 tsk-24e itself.
+
+## Round 5 — 2026-08-20 (tsk-1ji, validating stage — empirical falsification)
+
+**Asked:** plan.md's own required proof point (Concurrent-access sketch):
+does `git merge --abort` actually silently discard a concurrent
+`.fgos/events.jsonl` append, as the plan's Approach section hypothesized,
+or does git's documented "refuse if uncommitted" safety hold? Reproduced
+directly against three throwaway git fixtures (not the live repo) —
+this is a Tier-A action per `fgos-coding-validating`'s own Gate Step 1
+("is there a valid action in reach that closes the gap... run the
+command"), run before accepting or rejecting the plan.
+
+**Checked (all three fixtures: real `git` binary, real commands, full
+output captured):**
+
+1. **events.jsonl untouched by the merge's own diff, concurrent append
+   during the conflict window, then `git merge --abort`.** Real conflict
+   forced on an unrelated file (`conflict.txt`). Result: abort exits `0`,
+   and the concurrently-appended line (`line2-concurrent-append`) is
+   **preserved** in `events.jsonl` after the abort. Git's documented
+   "leave alone what the merge never staged" safety holds exactly as
+   documented.
+2. **events.jsonl staged by the merge's own `merge=union` driver (the
+   exact `.fgos/`-path trigger at `merge.mjs:1218-1231`), THEN a
+   concurrent append lands on top of that staged content, THEN `git merge
+   --abort`.** Result: abort **fails outright** — `error: Entry
+   'events.jsonl' not uptodate. Cannot merge. / fatal: Could not reset
+   index file to revision 'HEAD'.`, exit code `128`. The concurrently-
+   appended line **survives** (the abort never completed). This is the
+   scenario Round 1's recovered research flagged as the one needing
+   empirical confirmation — confirmed, and the opposite of what this
+   item's plan assumed: `abortMergeIfPossible`'s own try/catch
+   (`merge.mjs:1223-1230`) already converts this into a loud `MergeError`
+   thrown up to the caller, not a silent success. The real, different bug
+   this scenario exposes: the main checkout is left in a broken,
+   half-aborted git state (`Could not reset index file to revision
+   'HEAD'`) requiring manual recovery — a main-checkout availability
+   problem, not a silent-data-loss problem.
+3. **events.jsonl already dirty (uncommitted) BEFORE the merge attempt
+   even starts — the realistic case, since nothing in `src/` auto-commits
+   `.fgos/events.jsonl` (tsk-24e's own finding) — and the target branch
+   also touches events.jsonl.** Result: the initial `git merge --no-commit
+   --no-ff branch` call itself **refuses outright**, before `MERGE_HEAD`
+   is ever created: `error: Your local changes to the following files
+   would be overwritten by merge: events.jsonl`. No abort ever runs
+   (`mergeHeadExists` correctly reads false — `abortMergeIfPossible`'s
+   existing tsk-2j9 early-return no-ops). The uncommitted content is
+   completely untouched.
+
+**Found:** none of the three realistic interleavings this item's plan
+could construct reproduce "silently reverting the tracked, uncommitted-
+tail `.fgos/events.jsonl` to an older committed snapshot" — the exact
+symptom this item's own description, and the real tsk-24e/tsk-4oq
+incident, report. In every fixture, git's own safety either preserved the
+uncommitted content or refused the operation loudly (never silently). The
+`abortMergeIfPossible` mechanism this item's Approach was built around is
+**empirically falsified** as the explanation for the real incident, at
+least for every interleaving this round could construct. This is a
+genuine reality-gate FAIL on plan.md's own "Assumptions" dimension, not a
+minor note — see `plan.md`'s status and the hand-back this triggers.
+
+**Still open:** what the real mechanism behind the tsk-4oq/tsk-6al losses
+actually is. Candidates not yet ruled out: a human/session running a raw
+git command directly (tsk-24e's own working hypothesis, outside any
+fgOS-internal audit's reach); some other fgOS-internal code path this
+round's three fixtures did not construct; or a race this round's
+single-process, sequential-step simulation cannot reproduce (a genuinely
+concurrent second `fgos` process writing mid-syscall, as opposed to this
+round's own before/after ordering). This is exactly the kind of
+scope-changing gap `fgos-coding-planning`'s Step 6 hands back to
+`fgos-coding-exploring` for — not something this round's own tools can
+resolve further without a person's input on where to look next.

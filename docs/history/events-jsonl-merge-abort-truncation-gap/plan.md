@@ -226,3 +226,29 @@ own setup once confirmed.
 ## Outstanding questions
 
 None
+
+## Validating verdict — NOT READY - RETURN TO PLANNING (2026-08-20)
+
+**Reality gate:** Mode fit PASS, Repo fit PASS, Proof surface PASS,
+Impact-analysis posture PASS (degraded, correctly named). **Assumptions:
+FAIL.** RESEARCH.md Round 5 reproduced this plan's own required proof
+point (does `git merge --abort` silently discard a concurrent
+`.fgos/events.jsonl` append) against three throwaway git fixtures and
+found the opposite in all three: git's own safety either preserves the
+uncommitted content or refuses the operation loudly. The
+`abortMergeIfPossible` mechanism this Approach was built around does not
+reproduce the real incident's own symptom (a silent revert to an older
+committed snapshot). A snapshot/restore fix around a mechanism that does
+not actually cause silent loss would not close the real gap — it would
+add real complexity (a new critical section around every abort call,
+touching production merge machinery) against a threat model just
+disproven.
+
+**Decide:** NOT READY - RETURN TO PLANNING. Not a plan-quality problem
+(the plan built cleanly on the evidence available before this round) — a
+premise problem: the root cause this item's own description asserted as
+"identified" is not confirmed by direct reproduction. This is the
+material gap `fgos-coding-planning`'s own Step 6 hands back to
+`fgos-coding-exploring` for: which mechanism to chase next is a scope
+decision now needing a person, not a fact this session's own tools can
+resolve further (see RESEARCH.md Round 5's own "Still open" candidates).
