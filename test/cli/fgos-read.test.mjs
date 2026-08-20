@@ -315,6 +315,12 @@ test('list --id scopes every id-keyed view section to just the requested item, e
   assert.equal(run(cwd, ['ask', 'item-b', '--text', '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: question about B']).status, 0);
   assert.equal(run(cwd, ['answer', 'item-b', '--text', 'answer about B']).status, 0);
 
+  // Populate callThreads for BOTH items (handoff round trip).
+  assert.equal(run(cwd, ['move', 'item-a', '--to', 'doing']).status, 0);
+  assert.equal(run(cwd, ['handoff', 'item-a', '--to', 'researcher', '--reason', 'consult', '--outcome', 'consult about A']).status, 0);
+  assert.equal(run(cwd, ['move', 'item-b', '--to', 'doing']).status, 0);
+  assert.equal(run(cwd, ['handoff', 'item-b', '--to', 'researcher', '--reason', 'consult', '--outcome', 'consult about B']).status, 0);
+
   const data = envelopeData(run(cwd, ['list', '--id', 'item-a', '--json']).stdout);
 
   assert.deepEqual(Object.keys(data.work), ['item-a']);
@@ -327,6 +333,8 @@ test('list --id scopes every id-keyed view section to just the requested item, e
   assert.deepEqual(Object.keys(data.decisionsById ?? {}), ['item-a']);
   assert.deepEqual(Object.keys(data.gates ?? {}), ['item-a']);
   assert.equal(data.gates['item-a'].ask, '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: question about A');
+  assert.deepEqual(Object.keys(data.callThreads ?? {}), ['item-a']);
+  assert.equal(data.callThreads['item-a'][0].outcome, 'consult about A');
 });
 
 test('list default keeps an awaiting-human item visible (D2: excludes only the two terminal statuses done/wontfix, per wontfix-terminal-status-filter-consistency D2 -- never a broader ad-hoc closed/parked set like awaiting-human)', () => {
