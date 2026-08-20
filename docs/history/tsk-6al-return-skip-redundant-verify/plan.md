@@ -105,6 +105,24 @@ before `return` can consume it (downstream).
    gate: this changes `fgos return`'s own behavior/flag surface, a thing a
    user of fgOS would see.
 
+## Assumptions
+
+- **`src/runner/loop.mjs`'s background-runner daemon (`fgos-runner --watch`)
+  is explicitly OUT OF SCOPE.** It is a THIRD, structurally separate
+  dispatch mechanism (found via the same `rg` sweep, RESEARCH.md Round 2):
+  it calls `spawnWorker` (`src/runner/dispatch/transport.mjs`), never
+  `executeExecutorCli`/`fanoutBatchExecutorCli`, and it never calls `bin/
+  fgos.mjs return` at all — it runs its own `runGoalCheck` inline
+  (`loop.mjs:874`) and calls `moveWork` itself directly (`loop.mjs:880`),
+  a completely independent implementation of the same "run verify, then
+  transition to `awaiting-approval`" shape. Not material to this item's
+  own scope (the item's confirmed-live evidence is specifically the
+  `dispatch.mjs execute`-based `fgos-coding-implement` driver flow, per
+  RESEARCH.md Round 3) — pinned here as a labeled assumption rather than
+  asked, per the material/grounded/answerable filter. Whether `loop.mjs`'s
+  own inline verify is similarly redundant against a worker's own
+  pre-verify is a genuinely separate question this item does not answer.
+
 ## Risk map
 
 **Impact-analysis posture: degraded.** `fgos tool query --capability
