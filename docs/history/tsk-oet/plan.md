@@ -89,16 +89,37 @@ test/probe-only overrides: `FGOS_SHELL_INTEGRATION_PROBE_SCRIPT`
 (`src/setup/registrations.mjs:339`), `FGOS_GH_COMMAND` (`bin/fgos.mjs:246`).
 This is not a new pattern.
 
-Wire the shared CLI test harness (`test/cli/helpers/fgos-cli-harness.mjs`,
-whose `initGitCwdMain()` every one of the 4 broken test files' fixtures
-already goes through) to set `FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1` for
-every fixture it spins up, **except** the 2 test files that exist
-specifically to exercise D1/D2
+**Revised at validating (reality-gate FAIL, recorded via `fgos decision`):**
+the first draft of this Approach wired only the shared CLI test harness
+(`test/cli/helpers/fgos-cli-harness.mjs`'s `initGitCwdMain()`). Direct
+read of `test/e2e/runner-loop.test.mjs` (one of the 4 originally-broken
+files) found it does NOT import that harness — it has its own inline git
+fixture and spawns `fgos`/`fgos-runner` via `spawnSync(process.execPath,
+[FGOS, ...args], { cwd, encoding: 'utf8' })` (lines 47/51) with no `env:`
+key, so it inherits the parent process's env by default. Wiring only the
+harness would leave this file's regression unfixed.
+
+Set the opt-out at the **npm test script level** instead, so it covers
+every spawned `fgos`/`fgos-runner` subprocess (inherited env, regardless
+of which fixture helper a file uses or whether it uses one at all) AND
+every in-process call (`claimWork`, `mergeRunnerItem` called directly by
+a test in the same process):
+
+```json
+"test": "FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/**/*.test.mjs'"
+```
+
+Only the 2 test files that exist specifically to exercise D1/D2
 (`test/state/events-jsonl-truncation-guard.test.mjs`,
 `test/runner/claim-port.test.mjs`'s own
-`runOpportunisticMainCheckoutChecks` assertion at line 482) — those keep
-it unset (or explicitly `'0'`) so the feature they test still actually
-runs.
+`runOpportunisticMainCheckoutChecks` assertion at line 482) unset it
+locally at their own top (e.g. `delete process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS`)
+so the feature they test still actually runs. This is safe with no
+cross-file leakage: empirically confirmed (`node --test a.test.mjs
+b.test.mjs` with `a` setting a var in its test body — `b` reads
+`undefined`) that `node --test` runs each matched file in its own child
+process, so one file's env mutation never reaches another file in the
+same run.
 
 **Alternatives rejected:**
 
@@ -141,20 +162,19 @@ stale/suspicious answer instead of trusting it blind.
 | Component | How risky | Proof point (for validating) |
 | --- | --- | --- |
 | `runOpportunisticMainCheckoutChecks` early-return gate | Medium — wrong env-var check could accidentally disable the feature in production if the var leaks into a real session's environment | Proof: run the 2 dedicated D1/D2 test files (`test/state/events-jsonl-truncation-guard.test.mjs`, `test/runner/claim-port.test.mjs`) UNCHANGED (opt-out not set) and confirm they still pass — proves the feature still fires when the var is absent |
-| Test-harness wiring (`fgos-cli-harness.mjs`) | Low — additive, only sets an env var around fixture setup/teardown | Proof: the 4 originally-failing files (`fgos-take`/`fgos-read`/`fgos-return`/`runner-loop`) all green after the change |
+| npm test script env wiring | Low — additive, one env-var prefix in `package.json`'s `test` script; confirmed via direct empirical check that `node --test` isolates `process.env` per matched file, so the 2 dedicated D1/D2 files unsetting it locally cannot leak into or be leaked into by any other file | Proof: the 4 originally-failing files (`fgos-take`/`fgos-read`/`fgos-return`/`runner-loop`) all green after the change, AND the 2 dedicated D1/D2 files still pass unchanged (feature still fires when the var is unset locally) |
 | Full-suite collateral | Medium — same class of gap that let this regression land unnoticed (narrow verify scope) | Proof: full `npm test` green, not just the 4 flagged files — this item's own verify (below) is intentionally the full suite, not a narrow slice, specifically because tsk-1ji's narrow verify is what let this happen |
 
 ## Files touched (order)
 
 1. `src/state/events-jsonl-truncation-guard.mjs` — add the opt-out gate
    at the top of `runOpportunisticMainCheckoutChecks`.
-2. `test/cli/helpers/fgos-cli-harness.mjs` — set
-   `FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1` around `initGitCwdMain()`'s
-   fixture lifecycle.
+2. `package.json` — prefix the `test` script with
+   `FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1`.
 3. `test/state/events-jsonl-truncation-guard.test.mjs`,
-   `test/runner/claim-port.test.mjs` — confirm (or explicitly set) the
-   var is unset/`'0'` in the specific tests exercising D1/D2, so they keep
-   proving the real feature still works.
+   `test/runner/claim-port.test.mjs` — unset the var locally at the top of
+   the specific tests exercising D1/D2, so they keep proving the real
+   feature still works under `npm test`.
 
 Not on the critical path and unblocks nothing (`fgos graph --json`'s
 `topUnblock` does not list it) — no external sequencing constraint.
