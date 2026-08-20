@@ -72,6 +72,15 @@ via the same mechanism the real `cleanup` verb already uses
 (`aheadCount === 0` → prune, `aheadCount > 0` → keep, logged as "a
 proposal, never auto-deleted").
 
+**Repo-fit correction (fgos-coding-validating Reality Gate round 1):**
+`hasOpenDescendant` (`src/state/frontier.mjs:314`) and the map it needs
+(`indexChildrenByParent`, `frontier.mjs:193`) are both bare `function`,
+not `export function` today — neither is actually importable from
+`loop.mjs` as this plan originally implied. Both are pure, already-tested
+functions; the fix is additive only (add the `export` keyword to each,
+zero behavior change to either), not a re-implementation. Added to Files
+touched below.
+
 **Why here, not a new dedicated verb/module:** `listLeftovers` already
 IS the "which `fgw/<id>` branches are leftover" query, called from the one
 site (`startupReap`) that already runs unconditionally on every runner
@@ -116,12 +125,13 @@ one.
 | A checked-out or dirty linked worktree for a wontfix item (a person still has it open) | Low-medium — `reclaimOrphanedCheckout`/`removeWorktree` already refuse or handle a dirty tree per their own existing contract; this plan does not change that contract, only what triggers the call | No new proof needed beyond confirming (by reading, not re-testing) that `cleanupMergedBranch`'s existing warning-collection shape (`warnings.push(...)`, never throws) is preserved when called from this new site too |
 
 Files touched, in order:
-1. `src/runner/loop.mjs` — `listLeftovers`'s consuming loop inside
+1. `src/state/frontier.mjs` — export `hasOpenDescendant` (line 314) and
+   `indexChildrenByParent` (line 193); no behavior change to either.
+2. `src/runner/loop.mjs` — `listLeftovers`'s consuming loop inside
    `startupReap` (~line 440-461): add the wontfix + no-open-descendant
-   branch, reusing `hasOpenDescendant` (already imported for the
-   `hasStillNeededDescendant` check right above) and `cleanupMergedBranch`
-   (new import from `./merge.mjs`).
-2. `test/runner/loop.test.mjs` — new test(s) for the wontfix-prune and
+   branch, importing `hasOpenDescendant`/`indexChildrenByParent` from
+   `../state/frontier.mjs` and `cleanupMergedBranch` from `./merge.mjs`.
+3. `test/runner/loop.test.mjs` — new test(s) for the wontfix-prune and
    wontfix-with-open-child-kept cases (the file the item's own `verify`
    field already names).
 
