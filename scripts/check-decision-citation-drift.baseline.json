@@ -80,6 +80,9 @@
     "d-local-outside-home:D7:(đúng thứ D7 tồn tại để tránh: helper không bao giờ ghi state, skill chủ",
     "d-local-outside-home:D16:`implementer` (tsk-2t9c D16 — call thread lồng 2 tầng cần 2 lần gọi)"
   ],
+  ".agents/skills/fgos-coding-driving/references/loop-mechanics.md": [
+    "d-local-outside-home:D3:{ trunk })` for this item id (tsk-1el, D3/CONTEXT.md — the"
+  ],
   ".agents/skills/fgos-indexing/SKILL.md": [
     "bare-citation:ADR0020:worktree (ADR0020 — a worktree never carries its own `.fgos/`):"
   ],
@@ -233,6 +236,9 @@
     "d-local-outside-home:D2:`exploring`, verdict `unclear` sang `exploring` cho một người (D2). Ghi",
     "d-local-outside-home:D7:(đúng thứ D7 tồn tại để tránh: helper không bao giờ ghi state, skill chủ",
     "d-local-outside-home:D16:`implementer` (tsk-2t9c D16 — call thread lồng 2 tầng cần 2 lần gọi)"
+  ],
+  "plugins/fgOS/skills/fgos-coding-driving/references/loop-mechanics.md": [
+    "d-local-outside-home:D3:{ trunk })` for this item id (tsk-1el, D3/CONTEXT.md — the"
   ],
   "plugins/fgOS/skills/fgos-indexing/SKILL.md": [
     "bare-citation:ADR0020:worktree (ADR0020 — a worktree never carries its own `.fgos/`):"
