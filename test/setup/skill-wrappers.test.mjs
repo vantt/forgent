@@ -15,6 +15,7 @@ import {
   generateAllSkillWrappers,
   assembleSkills,
   materializeSkillsIntoProject,
+  mirrorDevSkillsIntoPlugin,
 } from '../../src/setup/skill-wrappers.mjs';
 
 function mkTempDir(prefix) {
@@ -246,4 +247,29 @@ test('assembleSkills output matches the committed .agents/skills byte-for-byte (
     assert.equal(renderedContent, committedContent, `.agents/skills/${relPath} is out of sync with core/skills+domains/*/skills -- run \`npm run build:skills\``);
   }
 });
+
+test('mirrorDevSkillsIntoPlugin mirrors _shared and fgos-* dev-skills into plugin directory, skipping non-fgos skills', () => {
+  const agentsSkillsRoot = mkTempDir('skill-wrappers-mirror-agents-');
+  const pluginSkillsRoot = mkTempDir('skill-wrappers-mirror-plugin-');
+
+  writeSkill(agentsSkillsRoot, '_shared', '', 'shared fragment\n');
+  writeSkill(agentsSkillsRoot, 'fgos-routing', SAMPLE_FRONTMATTER, '# Routing\n');
+  writeSkill(agentsSkillsRoot, 'fgos-coding-implement', SAMPLE_FRONTMATTER, '# Implement\n');
+  writeSkill(agentsSkillsRoot, 'distill', SAMPLE_FRONTMATTER, '# Distill\n');
+
+  const mirrored = mirrorDevSkillsIntoPlugin(agentsSkillsRoot, pluginSkillsRoot);
+
+  assert.equal(mirrored.length, 3);
+  assert.ok(fs.existsSync(path.join(pluginSkillsRoot, '_shared', 'SKILL.md')));
+  assert.ok(fs.existsSync(path.join(pluginSkillsRoot, 'fgos-routing', 'SKILL.md')));
+  assert.ok(fs.existsSync(path.join(pluginSkillsRoot, 'fgos-coding-implement', 'SKILL.md')));
+  assert.equal(fs.existsSync(path.join(pluginSkillsRoot, 'distill')), false, 'non-fgos skills like distill must not be mirrored into plugins/fgOS/skills');
+});
+
+test('mirrorDevSkillsIntoPlugin is a safe no-op returning [] when agentsSkillsRoot does not exist', () => {
+  const pluginSkillsRoot = mkTempDir('skill-wrappers-mirror-noop-');
+  const mirrored = mirrorDevSkillsIntoPlugin(path.join(mkTempDir('skill-wrappers-missing-'), 'does-not-exist'), pluginSkillsRoot);
+  assert.deepEqual(mirrored, []);
+});
+
 
