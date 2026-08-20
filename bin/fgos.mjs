@@ -2219,7 +2219,6 @@ async function runVerb(verb, flags, positional, dir) {
         frictions: scopedByIds(view.frictions, idSet),
         learnings: scopedByIds(view.learnings, idSet),
         decisionsById: scopedByIds(view.decisionsById, idSet),
-        callThreads: scopedByIds(view.callThreads, idSet),
       });
       // Single-item lookup (tsk-42m D1/D2): `--id` bypasses the open-only
       // default and `--all` entirely -- naming a specific id already
@@ -2255,7 +2254,6 @@ async function runVerb(verb, flags, positional, dir) {
           frictions: scopedById(rawView.frictions),
           learnings: scopedById(rawView.learnings),
           decisionsById: scopedById(rawView.decisionsById),
-          callThreads: scopedById(rawView.callThreads),
         };
         if (item.status === 'awaiting-human') {
           const ctx = computeAwaitingContext(singleView, id);
