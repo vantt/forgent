@@ -1084,3 +1084,46 @@ test('tsk-ikd: return refuses from an ad-hoc worktree never created through "fgo
     removeAdHocWorktree(cwd, worktreePath);
   }
 });
+
+test('return --worker-verified-sha skips runGoalCheck when sha matches branchHead, moving item to awaiting-approval with verify skipped output', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  addOk(cwd, 'worker-verified-item', { verify: 'exit 1' });
+  const pickResult = run(cwd, ['pick', '--id', 'worker-verified-item']);
+  assert.equal(pickResult.status, 0);
+  const pickData = envelopeData(pickResult.stdout);
+
+  fs.writeFileSync(path.join(pickData.worktree.path, 'proof.txt'), 'built by worker\n');
+  execFileSync('git', ['add', '-A'], { cwd: pickData.worktree.path });
+  execFileSync('git', ['commit', '-q', '-m', 'work: proof.txt'], { cwd: pickData.worktree.path });
+
+  const branchHead = gitAtCwd(cwd, ['rev-parse', 'fgw/worker-verified-item']).trim();
+
+  const result = run(cwd, ['return', 'worker-verified-item', '--worker-verified-sha', branchHead]);
+  assert.equal(result.status, 0, `return failed: ${result.stderr}`);
+  assert.match(result.stdout, /verify skipped/);
+
+  const view = stateView(cwd);
+  assert.equal(view.work['worker-verified-item'].status, 'awaiting-approval');
+  assert.equal(view.work['worker-verified-item'].branchHeadAtReturn, branchHead);
+});
+
+test('return --worker-verified-sha falls through to real verify when sha is stale or mismatched', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  addOk(cwd, 'worker-stale-item', { verify: 'exit 1' });
+  const pickResult = run(cwd, ['pick', '--id', 'worker-stale-item']);
+  assert.equal(pickResult.status, 0);
+  const pickData = envelopeData(pickResult.stdout);
+
+  fs.writeFileSync(path.join(pickData.worktree.path, 'proof.txt'), 'built by worker\n');
+  execFileSync('git', ['add', '-A'], { cwd: pickData.worktree.path });
+  execFileSync('git', ['commit', '-q', '-m', 'work: proof.txt'], { cwd: pickData.worktree.path });
+
+  const staleSha = '0000000000000000000000000000000000000000';
+
+  const result = run(cwd, ['return', 'worker-stale-item', '--worker-verified-sha', staleSha]);
+  // Should fall through to real verify (which is `exit 1`), so return moves item to blocked
+  const view = stateView(cwd);
+  assert.equal(view.work['worker-stale-item'].status, 'blocked');
+});
