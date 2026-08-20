@@ -27,10 +27,13 @@ export const APPROVE_FAULT_LOG_BASENAME = 'approve-post-success-faults.jsonl';
  * written (the caller uses that to decide whether it can point a human at
  * a real file).
  */
-export function recordApprovePostSuccessFault(dir, { id, phase, detail }) {
+export function recordApprovePostSuccessFault(dir, { id, phase, detail, mergedSha, mergedInto }) {
   try {
     const logPath = path.join(dir, APPROVE_FAULT_LOG_BASENAME);
-    const record = { ts: new Date().toISOString(), id, phase, detail };
+    const record = { ts: new Date().toISOString(), id, phase };
+    if (detail !== undefined) record.detail = detail;
+    if (mergedSha !== undefined) record.mergedSha = mergedSha;
+    if (mergedInto !== undefined) record.mergedInto = mergedInto;
     fs.appendFileSync(logPath, `${JSON.stringify(record)}\n`);
     return logPath;
   } catch {

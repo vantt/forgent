@@ -73,6 +73,7 @@ import { recordApprovePostSuccessFault } from '../../cli/approve-fault-log.mjs';
 // truthful envelope.
 function moveDeliveredOrRecordFault(dir, id, phase, testForceLockTimeoutId, { mergedSha, mergedInto } = {}) {
   try {
+    recordApprovePostSuccessFault(dir, { id, phase, mergedSha, mergedInto });
     // Test-only failure seam (tsk-480 D3), same shape as
     // FGOS_GH_COMMAND: the env var itself is read by the CLI adapter and
     // arrives here as `testForceLockTimeoutId` (a use case never reads
@@ -95,7 +96,7 @@ function moveDeliveredOrRecordFault(dir, id, phase, testForceLockTimeoutId, { me
     if (!(err instanceof EventLogError)) {
       throw err;
     }
-    const diagnosticLog = recordApprovePostSuccessFault(dir, { id, phase, detail: err.message });
+    const diagnosticLog = recordApprovePostSuccessFault(dir, { id, phase, detail: err.message, mergedSha, mergedInto });
     process.stderr.write(
       `fgos: warning: "${id}" ${phase} succeeded but its status write failed (${err.message}); `
         + `item status remains "awaiting-approval" pending manual reconciliation; `
@@ -355,7 +356,9 @@ export async function approveUseCase(
       // eventual consistency hasn't attached it yet (accepted rough
       // edge, same as the module's own doc comment); mergedInto matches
       // the literal 'main' the local root-into-main path already uses.
-      const { event } = moveWork(dir, { id, to: 'delivered', expectedStatus: 'awaiting-approval', role: 'human', mergedSha: result.mergeCommit?.oid, mergedInto: 'main' });
+      const mergedSha = result.mergeCommit?.oid;
+      recordApprovePostSuccessFault(dir, { id, phase: 'github merge', mergedSha, mergedInto: 'main' });
+      const { event } = moveWork(dir, { id, to: 'delivered', expectedStatus: 'awaiting-approval', role: 'human', mergedSha, mergedInto: 'main' });
       return { id, mode: 'github', to: 'delivered', prNumber, seq: event.seq };
     }
     // blocked — mirrors the local merge-conflict/verify-fail-post-merge
