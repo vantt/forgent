@@ -214,7 +214,7 @@ export function resolveExecutorAndOverrides(cfg, executorIdOrPurpose) {
 // sibling file — was a bare same-file `function` before the split
 // (byte-identical value/behavior, only newly reachable from outside this
 // file).
-export function resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCarries) {
+export function resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCarries, resolvedAgentType) {
   const resolved = executorId ? resolveExecutorAndOverrides(cfg, executorId) : undefined;
   const executorEntry = resolved?.executor;
   // Self-review finding: `executorId` below is the CALLER's own requested
@@ -284,13 +284,25 @@ export function resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCar
       `executor "${executorId}" declares "invocations" but none is dispatchable via "cli" (has: ${invocations.map((inv) => inv.via).join('/')}) — resolveExecutorConfig only ever spawns a cli invocation; this executor cannot be dispatched this way.`,
     );
   }
-  const resolvedViaAgentType = !cliInvocation && !(executorEntry && (executorEntry.adapter || executorEntry.command)) && Boolean(executorEntry && executorEntry.agentType && cfg && cfg.executor);
+  // D15/D20/D22 (review finding H1, tsk-397): `executorEntry.agentType`
+  // (an executor's own static config) always wins first when set --
+  // `resolvedAgentType` (the caller's D20 eligibility-inversion result,
+  // resolveAgentTypeForTaskSpec via src/runner/agent-roster.mjs) only
+  // ever fills in when the executor declares NONE of its own, so this
+  // stays additive: an executor that already names a real agentType is
+  // completely unaffected, and every executor with its own command/args/
+  // invocations (agy, claude, codex, pi -- every real executor this repo
+  // configures today) never reaches this branch at all regardless of
+  // what resolvedAgentType is, since `resolvedViaAgentType` below already
+  // requires a command-less, invocation-less entry.
+  const effectiveAgentType = executorEntry?.agentType ?? resolvedAgentType;
+  const resolvedViaAgentType = !cliInvocation && !(executorEntry && (executorEntry.adapter || executorEntry.command)) && Boolean(effectiveAgentType && cfg && cfg.executor);
   const byExecutor = cliInvocation
     ? { command: cliInvocation.command, args: cliInvocation.args, adapter: cliInvocation.adapter, provider: executorEntry.provider }
     : executorEntry && (executorEntry.adapter || executorEntry.command)
       ? executorEntry
       : resolvedViaAgentType
-        ? buildAgentTypeExecutor(cfg.executor, executorEntry.agentType)
+        ? buildAgentTypeExecutor(cfg.executor, effectiveAgentType)
         : undefined;
   const executor = byExecutor ?? (cfg && cfg.executor);
   if (!executor || typeof executor.command !== 'string' || !Array.isArray(executor.args)) {

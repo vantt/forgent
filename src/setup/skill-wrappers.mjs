@@ -107,6 +107,61 @@ function copyDirRecursive(sourceDir, targetDir) {
 }
 
 /**
+ * Assembles `.agents/skills/*` from `core/skills/*` and `domains/[domain]/skills/*`
+ * (D7 of docs/history/core-foundation-domain-boundary/DISCUSSION.md).
+ *
+ * Canonical skill authoring lives under `core/skills/` (domain-agnostic)
+ * and `domains/[domain]/skills/` (domain-specific). This assembly step copies or
+ * materializes those skill sources into `agentsSkillsRoot` (`.agents/skills`),
+ * which acts as the unified render target before thin wrappers are generated
+ * in `.claude/skills`.
+ *
+ * Safe no-op when neither `core/skills` nor `domains/` exist. Returns array
+ * of target paths written/assembled.
+ */
+export function assembleSkills(projectRoot, targetAgentsSkills) {
+  const agentsSkillsRoot = targetAgentsSkills ?? path.join(projectRoot, '.agents', 'skills');
+  const coreSkillsRoot = path.join(projectRoot, 'core', 'skills');
+  const domainsRoot = path.join(projectRoot, 'domains');
+  const assembled = [];
+
+  if (fs.existsSync(coreSkillsRoot)) {
+    for (const entry of fs.readdirSync(coreSkillsRoot, { withFileTypes: true })) {
+      const sourcePath = path.join(coreSkillsRoot, entry.name);
+      const targetPath = path.join(agentsSkillsRoot, entry.name);
+      if (entry.isDirectory()) {
+        copyDirRecursive(sourcePath, targetPath);
+      } else {
+        fs.mkdirSync(agentsSkillsRoot, { recursive: true });
+        fs.copyFileSync(sourcePath, targetPath);
+      }
+      assembled.push(targetPath);
+    }
+  }
+
+  if (fs.existsSync(domainsRoot)) {
+    for (const domainEntry of fs.readdirSync(domainsRoot, { withFileTypes: true })) {
+      if (!domainEntry.isDirectory()) continue;
+      const domainSkillsRoot = path.join(domainsRoot, domainEntry.name, 'skills');
+      if (!fs.existsSync(domainSkillsRoot)) continue;
+      for (const entry of fs.readdirSync(domainSkillsRoot, { withFileTypes: true })) {
+        const sourcePath = path.join(domainSkillsRoot, entry.name);
+        const targetPath = path.join(agentsSkillsRoot, entry.name);
+        if (entry.isDirectory()) {
+          copyDirRecursive(sourcePath, targetPath);
+        } else {
+          fs.mkdirSync(agentsSkillsRoot, { recursive: true });
+          fs.copyFileSync(sourcePath, targetPath);
+        }
+        assembled.push(targetPath);
+      }
+    }
+  }
+
+  return assembled;
+}
+
+/**
  * `fgos setup`'s external-project materialize path (D5/D7): an external
  * project starts with neither `.agents/skills` nor `.claude/skills` at
  * all, so there is nothing to generate a wrapper FROM until the real
@@ -117,12 +172,35 @@ function copyDirRecursive(sourceDir, targetDir) {
  * generated wrappers stay self-contained inside the target project and
  * never point back at wherever npm installed the global package (D7).
  *
+ * Runs `assembleSkills` first (D7) so `.agents/skills` is assembled from
+ * `core/skills` + `domains/[domain]/skills` before materializing -- a
+ * git-checkout-based or symlinked dev install's `packageRoot` needs this
+ * to pick up skill content authored since `.agents/skills` was last built.
+ *
+ * That assemble is best-effort here specifically (round-2 review finding,
+ * tsk-397): a real global npm install's `packageRoot` is the shared
+ * package directory, which can be root-owned or a read-only filesystem --
+ * `.agents/skills` already ships pre-assembled+committed in that case
+ * (D7), so a write failure here means "nothing new to pick up", not "setup
+ * is broken". Same "pure observability/best-effort write must not crash
+ * the caller" degrade-to-continue shape `appendWorkerLog` already uses
+ * (`src/runner/worker-log.mjs`) for the identical class of failure
+ * (disk full, EACCES, read-only target) -- never filtered to specific
+ * error codes there either, so this stays consistent rather than
+ * inventing a second contract for the same kind of I/O failure.
+ *
  * A no-op when `packageRoot` carries no `.agents/skills` at all (e.g. a
  * pre-tsk-1qi package version, or a dev checkout of some other tool) --
  * same "absent capability = clean skip" contract every other optional
  * setup/doctor behavior in this repo already follows.
  */
 export function materializeSkillsIntoProject(packageRoot, targetRoot) {
+  try {
+    assembleSkills(packageRoot);
+  } catch {
+    // Best-effort: packageRoot's own .agents/skills (already
+    // shipped/committed) is still used below, unassembled.
+  }
   const sourceAgentsSkills = path.join(packageRoot, '.agents', 'skills');
   if (!fs.existsSync(sourceAgentsSkills)) {
     return { copied: false, wrappersWritten: [] };
@@ -137,7 +215,9 @@ export function materializeSkillsIntoProject(packageRoot, targetRoot) {
   const copied = path.resolve(packageRoot) !== path.resolve(targetRoot);
   if (copied) {
     copyDirRecursive(sourceAgentsSkills, targetAgentsSkills);
+    assembleSkills(targetRoot);
   }
   const wrappersWritten = generateAllSkillWrappers(targetAgentsSkills, targetClaudeSkills);
   return { copied, wrappersWritten };
 }
+

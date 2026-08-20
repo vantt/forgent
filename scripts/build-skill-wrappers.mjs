@@ -11,11 +11,16 @@
 
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { generateAllSkillWrappers } from '../src/setup/skill-wrappers.mjs';
+import { assembleSkills, generateAllSkillWrappers } from '../src/setup/skill-wrappers.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const agentsSkillsRoot = path.join(repoRoot, '.agents', 'skills');
 const claudeSkillsRoot = path.join(repoRoot, '.claude', 'skills');
+
+const assembled = assembleSkills(repoRoot);
+for (const assembledPath of assembled) {
+  process.stdout.write(`assembled ${path.relative(repoRoot, assembledPath)}\n`);
+}
 
 const written = generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot);
 for (const wrapperPath of written) {

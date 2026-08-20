@@ -43,6 +43,8 @@ export { buildPrompt } from './dispatch/prepare.mjs';
 
 export {
   executorIdForWork,
+  resolveAgentTypeForTaskSpec,
+  resolveAgentTypeForWork,
   spawnWorker,
   logExecutorDispatch,
   executeExecutorCli,

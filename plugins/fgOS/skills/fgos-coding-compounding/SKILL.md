@@ -27,7 +27,7 @@ turns the item's genuine outcome/friction capture into (a) a Diataxis
 quadrant classification, tagged onto the capture, and (b) at least one real,
 evidence-quoted end-user document.
 
-Task-spec contract: `docs/task-specs/coding/compound-learn.md` (D6/D9,
+Task-spec contract: `domains/coding/task-specs/compound-learn.md` (D6/D9,
 `taskSpecMap.retrospective` — the map's own D5 precedent already mixes
 stage and status keys in one table, so a status-driven skill citing it
 here is not a special case). Read it before touching this skill's own

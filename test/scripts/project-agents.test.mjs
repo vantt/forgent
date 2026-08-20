@@ -8,7 +8,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { projectAgentMarkdown, AgentDefinitionError, DEFAULT_MODELS, readRunnerModels } from '../../scripts/project-agents.mjs';
+import { projectAgentMarkdown, AgentDefinitionError, DEFAULT_MODELS, readRunnerModels, findAgentYamlFiles } from '../../scripts/project-agents.mjs';
 
 function mkTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'project-agents-test-'));
@@ -52,25 +52,24 @@ test('model_tier resolves through the same tier->model map the shared config fil
   assert.equal(modelLine, 'model: haiku');
 });
 
-// claims (tsk-2t9c D12): optional multi-role-harness eligibility field --
+// skills (tsk-397 D20): optional eligibility field --
 // projects through unfiltered when present, is entirely absent from the
-// frontmatter when the source yaml never declares it (every pre-existing
-// agent-type, including the shipped fgos-placeholder.yaml, is unaffected).
-test('claims, when declared, projects into the frontmatter as a bracketed list', () => {
-  const withClaims = VALID_YAML + '\nclaims:\n  - review-item\n  - validate-plan\n';
-  const markdown = projectAgentMarkdown('test-agent', withClaims, DEFAULT_MODELS);
-  const claimsLine = markdown.split('\n').find((line) => line.startsWith('claims:'));
-  assert.equal(claimsLine, 'claims: [review-item, validate-plan]');
+// frontmatter when the source yaml never declares it.
+test('skills, when declared, projects into the frontmatter as a bracketed list', () => {
+  const withSkills = VALID_YAML + '\nskills:\n  - fgos-coding-implement\n  - fgos-coding-validating\n';
+  const markdown = projectAgentMarkdown('test-agent', withSkills, DEFAULT_MODELS);
+  const skillsLine = markdown.split('\n').find((line) => line.startsWith('skills:'));
+  assert.equal(skillsLine, 'skills: [fgos-coding-implement, fgos-coding-validating]');
 });
 
-test('claims is absent from the frontmatter when the source yaml never declares it (backward compatible)', () => {
+test('skills is absent from the frontmatter when the source yaml never declares it (backward compatible)', () => {
   const markdown = projectAgentMarkdown('test-agent', VALID_YAML, DEFAULT_MODELS);
-  assert.equal(markdown.includes('claims:'), false);
+  assert.equal(markdown.includes('skills:'), false);
 });
 
-test('a claims list containing a non-string entry is refused, not silently coerced', () => {
-  const badClaims = VALID_YAML + '\nclaims:\n  - review-item\n  - 42\n';
-  assert.throws(() => projectAgentMarkdown('test-agent', badClaims, DEFAULT_MODELS), AgentDefinitionError);
+test('a skills list containing a non-string entry is refused, not silently coerced', () => {
+  const badSkills = VALID_YAML + '\nskills:\n  - fgos-coding-implement\n  - 42\n';
+  assert.throws(() => projectAgentMarkdown('test-agent', badSkills, DEFAULT_MODELS), AgentDefinitionError);
 });
 
 test('projection is idempotent -- identical source produces byte-identical output across two runs', () => {
@@ -132,3 +131,24 @@ test('readRunnerModels falls back to DEFAULT_MODELS per-tier when neither modelP
   writeSharedConfig(dir, {});
   assert.deepEqual(readRunnerModels(dir), DEFAULT_MODELS);
 });
+
+test('findAgentYamlFiles scans core/agents/ and domains/*/agents/ (D24)', () => {
+  const dir = mkTempDir();
+  try {
+    const coreDir = path.join(dir, 'core', 'agents');
+    const codingDir = path.join(dir, 'domains', 'coding', 'agents');
+    fs.mkdirSync(coreDir, { recursive: true });
+    fs.mkdirSync(codingDir, { recursive: true });
+
+    fs.writeFileSync(path.join(coreDir, 'fgos-placeholder.yaml'), VALID_YAML);
+    fs.writeFileSync(path.join(codingDir, 'coder.yaml'), VALID_YAML);
+
+    const files = findAgentYamlFiles(dir);
+    assert.equal(files.length, 2);
+    assert.ok(files.some((f) => f.name === 'fgos-placeholder' && f.source === 'core/agents'));
+    assert.ok(files.some((f) => f.name === 'coder' && f.source === 'domains/coding/agents'));
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+

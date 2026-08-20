@@ -182,6 +182,10 @@ dynamically via `getDomain`/`skillForStage` from
 domain in the first place is a separate concern this skill does not
 touch.
 
+Once the domain resolves, read `domains/<domain>/AGENTS.md` (e.g.
+`domains/coding/AGENTS.md` when domain is `coding`) to load domain-specific
+standing doctrine before handing off to driving or loading the resolved stage skill.
+
 ## Precedence: the engine's verb always wins
 
 Reading `stage` here is judgment for routing *this session* to the right
@@ -230,7 +234,8 @@ lying about what's actually happening.
 
 1. `fgos list` / `fgos ready` to orient.
 2. `fgos take --role session [--id <id>]` to claim one item.
-3. Read the claimed item's `stage` and load `fgos-coding-discovering`,
+3. Read the claimed item's `stage` and `domain`. Read `domains/<domain>/AGENTS.md`
+   once domain resolves, then load `fgos-coding-discovering`,
    `fgos-coding-exploring`, `fgos-coding-planning`, or
    `fgos-coding-validating` per the table above — or proceed
    directly if it's already at `executing`.
