@@ -82,12 +82,25 @@ helper already used for `--prompt`/`--model`/`--tier`/etc.
 (`src/runner/dispatch/cli.mjs:821-824`). Concrete cases worth proving:
 `--prompt-file` alone (reads file, passes content), `--prompt-file` +
 `--prompt` together (file wins), `--prompt-file` pointing at a
-nonexistent path (surfaces `fs.readFileSync`'s own `ENOENT`, no special
-handling needed — the existing `case 'execute':` block already funnels a
-thrown error from `executeExecutorCli`'s promise rejection into the
-structured `{error, errorClass}` stdout write; a synchronous throw before
-that call needs the same treatment, i.e. the read happens inside the same
-try-shaped flow, not before it unguarded).
+nonexistent path.
+
+**Reality-gate finding (repo fit):** `runDispatchCli()` has no top-level
+try/catch — it is called bare at `src/runner/dispatch.mjs:63`
+(`runDispatchCli();`, no wrapping, confirmed by direct read), and
+`case 'execute':`'s existing error handling only catches
+`executeExecutorCli(...)`'s promise REJECTION via
+`.then(success, errorHandler)` (lines 842-859) into the structured
+`{error, errorClass}` stdout write. A bare, unguarded
+`fs.readFileSync(promptFile, 'utf8')` throws SYNCHRONOUSLY, before that
+promise chain is ever reached — it would propagate as an uncaught
+exception (raw Node stack trace, no structured JSON, no
+`process.exitCode = 1`) instead of matching every other failure this
+case already produces. Fix: wrap the file read in its own try/catch
+inside `case 'execute':`, and on a caught error, write the SAME
+`{error: err.message}` JSON shape the `.then` rejection handler already
+writes (mirroring, not duplicating, that existing branch) before
+`break`ing — never let the read happen unguarded ahead of the existing
+`.then(...)` call.
 
 ## Outstanding questions
 
