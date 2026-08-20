@@ -3,252 +3,183 @@
 ## Mode: high-risk
 
 Hard-gate flag: **data loss** — this item closes a real, live production
-data-loss mechanism (tsk-24e: ~26 real events from tsk-4oq silently
-discarded). Also present: existing covered behavior (touches production
-merge/abort machinery already under test in `test/runner/merge.test.mjs`,
-including the tsk-2j9/tsk-18a hardening already locked into
-`abortMergeIfPossible`) and weak proof around the area (a cross-process
-timing race is inherently hard to reproduce deterministically). No lane
-was handed off from `fgos-routing` (this item entered via `/fgOS:pick` →
-`fgos-coding-driving`, never through `fgos-routing`'s own Orient), so this
+data-loss mechanism (tsk-24e: tsk-6al/tsk-4oq/tsk-5dnt/tsk-1el, real
+events silently lost). Also present: existing covered behavior — this
+redesigned Approach (below) touches `claimWork` (`src/runner/claim-
+port.mjs`), the single hottest call path in the whole system (every
+`pick`/`take` runs through it), and `mergeRunnerItem`'s lock-acquisition
+sites (`src/runner/merge.mjs`) — and weak proof around the area
+(concurrency, wall-clock timing). No lane was handed off from
+`fgos-routing` (entered via `/fgOS:pick` → `fgos-coding-driving`), so this
 lane was derived directly from `fgos-routing`'s own Mode-gate thresholds
-(SKILL.md § "Mode gate") per the planning skill's direct-entry fallback.
+per the planning skill's direct-entry fallback.
 
-No `CONTEXT.md` exists for this item — discovery's verdict was `clear`
-(`docs/history/events-jsonl-merge-abort-truncation-gap/RESEARCH.md`,
-Round 1), which skips `exploring` entirely, so this plan's grounding is
-that RESEARCH.md round plus the item's own description, not a locked
-CONTEXT.md decision.
-
-**Recovered prior research, folded in during this planning pass.** This
-worktree already contained an untracked, uncommitted
-`docs/history/tsk-1ji-truncation-guard-realtime-gap/RESEARCH.md` (3
-rounds, dated the same day) from an earlier, interrupted attempt at this
-same item — never committed, never applied via `fgos discover`, so the
-item was still sitting at stage `discovery` when this session picked it.
-Its findings corroborate and sharpen this round's own (independently
-reached, same audit method, same six-call-site inventory) and add two
-things this round did not have on its own:
-1. The precise trigger for the highest-value abort call
-   (`merge.mjs:1218-1231`): it fires specifically when the merge staged
-   ANY change under `.fgos/` — the exact file class at risk.
-2. A nuance this plan's Approach section folds in below: `git merge
-   --abort` is `git reset --merge` under the hood, which git documents as
-   refusing (not silently discarding) when a path has uncommitted
-   working-tree changes on top of what the merge staged — whether that
-   safety actually holds for this specific interleaving is NOT yet
-   empirically confirmed, named as an open proof point for `fgos-coding-
-   validating` rather than asserted here.
-3. Round 3 confirmed no other open work item already covers either of
-   tsk-1ji's own two improvement directions — this item is not duplicate
-   work.
-Content preserved verbatim in this feature dir's RESEARCH.md as its own
-dated round; the stray duplicate folder is removed once that copy lands.
+**Re-planned after a validating NOT READY + a material CONTEXT.md gap.**
+This item's first planning pass (superseded, history preserved in
+RESEARCH.md Rounds 1-5) hypothesized a specific fgOS-internal mechanism
+(`git merge --abort` on the main checkout) and `fgos-coding-validating`
+empirically falsified it (RESEARCH.md Round 5 — three throwaway git
+fixtures, none reproduce a silent discard). That triggered a
+`planning->exploring` hand-back (Step 6), now resolved: `CONTEXT.md`'s
+own **D1** locks this item's real scope as **tsk-24e's own D1+D2**,
+already human-approved in a parallel session and explicitly handed to
+this item by tsk-24e's own D3. See `CONTEXT.md` for the full citation
+chain, including a rich, directly-addressed handoff decision tsk-24e's
+own session logged onto this item's decision log.
 
 ## Approach
 
-**Chosen path: a targeted snapshot/compare/restore wrapper around
-`abortMergeIfPossible`, using the already-hardened `withEventsLock`
-primitive — not a lock-widening or stash-based approach.**
+**Two independent, additive mechanisms — CONTEXT.md D1 (detect-and-warn
+guard) and D2 (time-based periodic auto-commit) — both non-blocking, both
+wired at the same two real touchpoints.**
 
-RESEARCH.md Round 1 pinpointed the mechanism: `git merge --abort`
-(`src/runner/merge.mjs:1074-1098`, called from `mergeRunnerItemLocked` at
-lines 1196/1224/1262/1278/1299 — the last four confirmed read directly at
-`src/runner/merge.mjs:1190-1300`) reverts the main-checkout working tree
-to pre-merge-attempt HEAD. **Corrected from this plan's own first draft:**
-`git merge --abort` is `git reset --merge`, which git documents as
-refusing a path (erroring, not silently discarding) when that path has
-uncommitted working-tree changes on top of what the merge itself staged —
-so "always blindly discards" overstates the documented mechanism. What is
-empirically certain, independent of that nuance, is the OUTCOME: the real
-tsk-24e/tsk-4oq incident this item root-causes did lose already-appended
-events with no error surfaced anywhere in `.fgos/events.jsonl`'s own
-history or this repo's event log for that window (not yet cross-checked
-against process/CI logs — see the proof point below). Either git's
-refusal safety does not actually cover this specific shape (e.g. `.fgos/
-events.jsonl` reads as "clean" relative to the merge's own staged state at
-the moment abort runs, so the refusal never triggers, and the concurrent
-append that landed after that staged snapshot is the part that gets
-silently dropped), or the loss happened via a different path this item's
-own scope does not yet need to distinguish to justify the fix below — the
-targeted restore is correct in EITHER case, since it activates only when
-the file was actually reverted, and both branches leave the same content
-on disk today: not proven safe. `acquireMainCheckoutLock` (held for the
-whole merge-attempt window) and `acquireEventsLock`/`events.lock` (what
-`appendEvent` takes) are deliberately independent locks
-(`src/runner/main-checkout-lock.mjs:7-14`, by design) — nothing today
-closes this window either way.
+CONTEXT.md's own rich handoff decision (row 2 of the Locked decisions
+table) already narrowed both mechanisms concretely:
 
-The fix: immediately before each `abortMergeIfPossible` call actually runs
-`git merge --abort`, read `.fgos/events.jsonl`'s current live content;
-immediately after the abort completes, re-read it and compare. If the
-abort reverted it (content now differs from the pre-abort read and matches
-the older HEAD-committed version), restore the pre-abort content — both
-the compare and the restore write happen inside one `withEventsLock`
-critical section (`src/state/events.mjs:400`, already exported and
-already hardened per tsk-3ld — RESEARCH.md's own citation), so the window
-where a THIRD concurrent `appendEvent` could still race the restore itself
-shrinks to that one short critical section instead of the whole
-merge-attempt duration.
+- **D1 — detect-and-warn guard.** No clean git-native pre-reset/pre-
+  checkout-force hook exists without real plumbing risk (the closest
+  primitive, git's reference-transaction hook, is real but nontrivial —
+  explicitly rejected as the mechanism here). Instead, reuse the
+  EXISTING detection function this item's own dependency (tsk-cgg)
+  already built and tested: `advanceEventsJsonlTruncationGuard(logPath,
+  guardPath)` (`src/state/events-jsonl-truncation-guard.mjs:185`), the
+  exact function `fgos doctor`'s `events-jsonl-not-truncated` check
+  already calls (`src/setup/registrations.mjs:1210`). No new detection
+  logic — only new, more-frequent, non-blocking WIRING of a
+  function that already exists and is already proven.
+- **D2 — time-based periodic auto-commit.** A fixed wall-clock interval
+  (not per-verb-call, not checkpoint-only — CONTEXT.md's own pinned
+  term). Concretely: before doing real work, check `git log -1
+  --format=%ct -- .fgos/events.jsonl` (last commit touching the file,
+  unix seconds) against `Date.now()`; if the gap exceeds a fixed
+  threshold AND the working tree has uncommitted changes to that path
+  (`git status --porcelain -- .fgos/events.jsonl`), commit it directly
+  with a scoped `git add .fgos/events.jsonl && git commit -m "chore(.fgos):
+  periodic events.jsonl checkpoint"`. Threshold: 15 minutes — well under
+  the ~2.5h blind window CONTEXT.md's own handoff decision cites as the
+  real incident's own exposure gap, and short enough that a busy
+  multi-session repo (this one, empirically — dozens of concurrent verb
+  calls per hour per this item's own description) hits the two wired
+  touchpoints far more often than once per 15 minutes.
 
-**Alternatives rejected:**
-- *Hold `events.lock` for the entire merge-attempt-through-abort window*
-  (proposed as direction in the item's own description) — rejected: a
-  merge attempt's own duration includes running the item's real
-  goal-check/verify command (`runGoalCheck`, arbitrary length), so this
-  would block EVERY concurrent session's `appendEvent` calls system-wide
-  (the same physical `.fgos/events.jsonl`, shared across the main checkout
-  and every linked worktree via the `.fgos` symlink, ADR0020) for that
-  entire duration — a much larger contention surface than the targeted
-  restore for no extra correctness benefit, since only the abort path
-  actually discards content.
-- *`git stash` the file around the merge attempt* — rejected: no `git
-  stash` call exists anywhere in fgOS's own source today (RESEARCH.md
-  Round 1), and stashing a single tracked file mid-merge-attempt interacts
-  awkwardly with the merge's own index state; the plain snapshot/restore
-  achieves the same outcome without touching git's stash machinery at
-  all.
-- *Widen the frequency of the existing detection-only
-  `events-jsonl-truncation-guard` check (direction (a) in the item's own
-  description)* — kept explicitly OUT of this item's scope (YAGNI): it is
-  a real, independently valuable follow-up (catches whatever this fix
-  doesn't, plus any human-run raw-git-command class of the same failure —
-  RESEARCH.md Round 1 found the truncation-guard's own comments name that
-  as a distinct, non-fgOS-internal trigger too), but does not close the
-  mechanism this item root-caused, and bundling it here would blur one
-  cohesive fix with a second, separable improvement.
+**Where both wire in.** CONTEXT.md's own handoff decision already
+confirmed the only two real `acquireMainCheckoutLock` call sites in the
+whole codebase (grep-verified, RESEARCH.md Round 2, re-confirmed live at
+`src/runner/claim-port.mjs:104` and `src/runner/merge.mjs:773,894`):
+`claimWork` (backs `pick`/`take`) and `mergeRunnerItem` (backs
+`approve`/`sync-root`). Both mechanisms run immediately AFTER a
+successful lock acquisition at each site (the lock is already held, so a
+`git log`/`git status`/`git commit` read-and-maybe-write there cannot
+race a concurrent claim or merge attempt on the same main checkout) — the
+same insertion point for both D1 and D2, one small shared helper call.
+`return` has NO `acquireMainCheckoutLock` site to hook into today
+(CONTEXT.md's own handoff decision, point 3) — out of scope per that same
+citation; wiring only the two real sites is not a partial fix, it is the
+complete set of sites that exist.
 
-**Scope boundary against tsk-24e (this item's own dependency, still
-`status: doing` / `stage: exploring`, currently parked `awaiting-human`
-with its own unrelated-but-adjacent open question).** Read directly via
-`fgos show tsk-24e --json`: tsk-24e's own parked question frames the same
-general problem ("nothing in `src/` ever git-commits `.fgos/events.jsonl`
-automatically... exposed to a concurrent session's raw `git reset --hard`/
-`git checkout -f`/`git clean -fd` on the shared main checkout") and offers
-a person options (a) a code-level guard on raw force-checkout/reset, (b) a
-periodic auto-commit cadence, (c) both, (d) other. That framing is about a
-**human or session running raw git commands** directly against the main
-checkout, outside any fgOS verb — a different trigger from this item's own
-`abortMergeIfPossible` mechanism, which is **fgOS's own internal,
-automatic** merge machinery. tsk-1ji's own description already draws this
-same line under improvement direction (b) ("audit every git operation
-*fgOS itself* runs"). This item's fix closes the fgOS-internal vector
-only; it does not answer tsk-24e's own still-open human-raw-command
-question, and this plan does not attempt to answer it on tsk-24e's
-behalf — that stays tsk-24e's own park for a person to resolve. Once this
-item lands, its existence (a real, code-level guard against fgOS's own
-internal git ops discarding `.fgos/events.jsonl`) is honest evidence
-toward tsk-24e's option (a), scoped narrowly — worth a one-line note on
-tsk-24e once this item reaches `awaiting-approval`, not a scope merge now.
+**Non-blocking, always.** Both mechanisms wrap their own body in a
+`try`/`catch` that never lets a failure propagate into `claimWork`'s or
+`mergeRunnerItem`'s own return path — a failed periodic commit or a
+truncation-guard read error must never turn a legitimate `pick` or
+`approve` into a refusal. This mirrors an existing precedent already in
+this codebase for exactly this shape: `src/cli/approve-fault-log.mjs`'s
+`recordApprovePostSuccessFault` — "Never throws into its caller — a
+failure recording the failure must not mask (or replace) the original
+error." D1's own warning, when the guard reports a break, needs a
+side-channel of the same shape (a plain `fs.appendFileSync`, its own
+dedicated file, deliberately NOT `events.jsonl` and NOT sharing
+`events.lock` — same reasoning `approve-fault-log.mjs`'s own header
+already states) — new file `src/state/main-checkout-guard-warnings.mjs`
+mirroring `approve-fault-log.mjs`'s own shape, writing to
+`.fgos/main-checkout-guard-warnings.jsonl`.
 
-**Impact-analysis posture: degraded.** `fgos tool query --capability
-impact-analysis --status present` reports GitNexus registered and
-`present`, but this session's own hook already flagged "GitNexus index is
-stale (last indexed: 7bb3231)" — per `CLAUDE.md`'s capability gate, a
-`present`-but-stale index means blast-radius evidence from it would be
-weak, not full. Substituted with the plain `rg`-based call-site audit
-already performed in RESEARCH.md Round 1 (every `checkout`/`reset`/
-`clean`/`stash` git-arg literal in `src bin`, plus every `.fgos/events.jsonl`
-mention in `merge.mjs`) as the cross-check CLAUDE.md's gate itself
-recommends in place of a stale index.
+**Alternatives already rejected (superseded, kept for the record):** the
+original `abortMergeIfPossible` snapshot/restore Approach — falsified,
+see above. Holding `events.lock` for a whole merge-attempt window and
+using `git stash` — both already rejected in that earlier Approach for
+reasons (contention surface, no stash call anywhere in fgOS) that still
+apply independent of the mechanism change.
 
-`fgos graph --json tsk-1ji` — component `{tsk-cgg, tsk-64o, tsk-24e,
-tsk-1ji}` (size 4), `topUnblock` empty for this item: nothing else in the
-backlog is waiting on tsk-1ji specifically, so there is no ordering
-pressure from other items — this plan's own internal file order below is
-the only sequencing that matters.
+**Impact-analysis posture: degraded** (unchanged from the prior
+Approach — `fgos tool query --capability impact-analysis --status
+present` reports GitNexus `present` but this session's own hook still
+flags its index as stale). Cross-check substitute: the same RESEARCH.md
+Round 2 `acquireMainCheckoutLock` call-site grep, now re-confirmed live
+against the two exact line numbers cited above.
 
 **Files touched, in order:**
-1. `src/runner/merge.mjs` — wrap each of the five `abortMergeIfPossible`
-   call sites' shared implementation (the function itself, lines
-   1074-1098) with the snapshot/compare/restore sequence around the
-   `git(repoRoot, ['merge', '--abort'])` call, reusing `withEventsLock`
-   from `src/state/events.mjs` (imported, not reinvented). Must preserve
-   the function's existing early-return/no-op semantics exactly: the
-   `!mergeHeadExists` early return (nothing to abort — no restore needed
-   either), and the tsk-18a race-tolerant catch block (a concurrent
-   session already clearing `MERGE_HEAD` is still a benign no-op, not a
-   trigger for the restore path).
-2. `test/runner/merge.test.mjs` — add a regression test that reproduces
-   the race directly (append a marker event to `.fgos/events.jsonl`
-   between the `git merge --no-commit --no-ff` attempt and the
-   `abortMergeIfPossible` call, force a conflict so abort actually runs,
-   assert the marker event is still present in the file afterward). Also
-   re-run the existing tsk-2j9/tsk-18a cases in this same file to confirm
-   the wrapper does not change either's already-locked behavior.
+1. `src/state/events-jsonl-truncation-guard.mjs` or a new sibling module
+   — no change to the existing detection functions themselves (D1 reuses
+   them as-is); only a new thin wrapper, e.g.
+   `runOpportunisticMainCheckoutChecks(dir, repoRoot)`, that calls
+   `advanceEventsJsonlTruncationGuard` (D1) and the new periodic-commit
+   check (D2) together, catching and recording (never throwing) either
+   mechanism's own failure.
+2. `src/state/main-checkout-guard-warnings.mjs` (new, mirrors
+   `src/cli/approve-fault-log.mjs`'s exact shape) — the D1 warning
+   side-channel.
+3. `src/runner/claim-port.mjs` — one call to the Step 1 wrapper, inserted
+   right after the successful-lock branch (after line 118, before the
+   existing `try` block at line 120).
+4. `src/runner/merge.mjs` — the same call at both `acquireMainCheckoutLock`
+   sites (lines 773 and 894).
+5. `test/runner/claim-port.test.mjs` and `test/runner/merge.test.mjs` (or
+   a new dedicated test file for the shared wrapper) — regression
+   coverage for: D1 firing a warning (never a throw) when the guard
+   detects a break; D2 committing when stale-and-dirty, and NOT
+   committing when fresh or clean; both mechanisms' own failure being
+   swallowed without affecting `claimWork`'s/`mergeRunnerItem`'s normal
+   return value.
 
 ## Split decision
 
-**No split — one piece is honestly enough.** The fix (wrap
-`abortMergeIfPossible` with the snapshot/compare/restore sequence) and its
-regression test are one cohesive, atomically-mergeable change: the fix
-without the test is unverifiable, and the test without the fix asserts a
-still-broken behavior — neither half is independently shippable, so
-splitting them would only fragment one change across two gates for no
-real parallelism gained (this item's own `topUnblock` is empty; nothing
-else in the backlog is waiting on a partial landing). Proceeds as itself.
+**No split — one piece is honestly enough.** D1 and D2 share one
+insertion point (the same wrapper, the same two call sites) and one
+non-blocking-failure contract; shipping either alone without its own
+regression test would leave a real, unverified change in production
+merge/claim machinery. `topUnblock` is still empty for this item (RESEARCH.md
+Round 1's `fgos graph --json` read) — no other item is waiting on a
+partial landing. Proceeds as itself.
 
 ## Concurrent-access sketch (high-risk mode)
 
-- **Two-session race (the bug itself):** Session A running
-  `mergeRunnerItemLocked` for item X hits a conflict, is about to call
-  `abortMergeIfPossible`. Session B (own linked worktree, same shared
-  `.fgos/events.jsonl` via the symlink) calls `appendEvent` for its own
-  unrelated item Y in that same window. Expected after the fix: B's event
-  survives on disk once A's abort completes.
-- **Existing behavior that must not regress:** the no-`MERGE_HEAD`
-  early-return (tsk-2j9) and the concurrent-clear-of-`MERGE_HEAD` race
-  tolerance (tsk-18a) inside `abortMergeIfPossible` itself — both already
-  covered in `test/runner/merge.test.mjs` per RESEARCH.md's read of the
-  function; the new wrapper must not fire the restore logic on either of
-  those no-abort-actually-happened paths.
-- **Residual window (named honestly, not claimed away):** a fourth
-  concurrent `appendEvent` landing in the exact instant of the fix's own
-  `withEventsLock` critical section (the compare+restore) is still, in
-  principle, serialized correctly by that same lock — `appendEvent` and
-  the restore both take the identical `events.lock`, so they cannot
-  interleave. No unclosed gap is expected here, but this is the one claim
-  in this plan the regression test above must actually exercise rather
-  than take on faith.
-
-**Proof point for `fgos-coding-validating` (required — this plan's Approach
-softened an initial overclaim about `git merge --abort`'s documented
-"refuse if uncommitted" safety and did not resolve which of the two
-branches above actually explains the real incident):** before or alongside
-implementing the fix, reproduce the race directly against a throwaway git
-repo fixture (not the live `.fgos/events.jsonl`) — start a `git merge
---no-commit --no-ff` that will conflict, append an uncommitted change to a
-tracked file mid-attempt, call `git merge --abort`, and observe directly
-whether git refuses (errors) or silently discards. This settles the exact
-mechanism before the fix is trusted, and doubles as the regression test's
-own setup once confirmed.
+- **D1 (detect-and-warn) under concurrency:** the guard read (`advance
+  EventsJsonlTruncationGuard`) runs while `claimWork`/`mergeRunnerItem`
+  already hold `acquireMainCheckoutLock` — no other main-checkout writer
+  using that same lock can run a conflicting git-tree operation
+  concurrently, so the guard's own read is against a quiescent
+  main-checkout tree at read time (matches the lock's own documented
+  purpose, `src/runner/main-checkout-lock.mjs`).
+- **D2 (periodic commit) under concurrency:** the same lock-held window
+  makes the `git status`/`git commit` sequence safe against a racing
+  merge/claim; the one thing NOT protected is a concurrent `appendEvent`
+  landing on `.fgos/events.jsonl` between this sequence's own `git add`
+  and `git commit` (the lock only excludes other main-checkout-lock
+  holders, not `events.lock` holders — the two remain independent by
+  design per `main-checkout-lock.mjs:7-14`). A concurrent append in that
+  narrow window either lands in the commit (harmless — one extra event
+  gets checkpointed early) or lands just after (harmless — it stays
+  uncommitted, exactly the pre-fix state, picked up by the NEXT periodic
+  check). Neither outcome loses data; this needs no lock-widening.
+- **Existing behavior that must not regress:** `claimWork`'s own
+  `lock-held`/`lock-ambiguous` error paths (lines 105-118) run BEFORE the
+  new wrapper call and are untouched; a lock-acquisition failure must
+  still throw exactly as today, never reach the new wrapper at all.
+- **Proof point for `fgos-coding-validating`:** reproduce D2's own commit
+  decision directly (a throwaway git fixture: commit `.fgos/events.jsonl`
+  with an old timestamp, append uncommitted content, run the wrapper,
+  confirm a real commit lands only when stale-and-dirty) — the same
+  fixture-based verification style Round 5 already used, now proving a
+  real mechanism instead of falsifying an assumed one.
 
 ## Outstanding questions
 
 None
 
-## Validating verdict — NOT READY - RETURN TO PLANNING (2026-08-20)
+## Prior validating round (superseded)
 
-**Reality gate:** Mode fit PASS, Repo fit PASS, Proof surface PASS,
-Impact-analysis posture PASS (degraded, correctly named). **Assumptions:
-FAIL.** RESEARCH.md Round 5 reproduced this plan's own required proof
-point (does `git merge --abort` silently discard a concurrent
-`.fgos/events.jsonl` append) against three throwaway git fixtures and
-found the opposite in all three: git's own safety either preserves the
-uncommitted content or refuses the operation loudly. The
-`abortMergeIfPossible` mechanism this Approach was built around does not
-reproduce the real incident's own symptom (a silent revert to an older
-committed snapshot). A snapshot/restore fix around a mechanism that does
-not actually cause silent loss would not close the real gap — it would
-add real complexity (a new critical section around every abort call,
-touching production merge machinery) against a threat model just
-disproven.
-
-**Decide:** NOT READY - RETURN TO PLANNING. Not a plan-quality problem
-(the plan built cleanly on the evidence available before this round) — a
-premise problem: the root cause this item's own description asserted as
-"identified" is not confirmed by direct reproduction. This is the
-material gap `fgos-coding-planning`'s own Step 6 hands back to
-`fgos-coding-exploring` for: which mechanism to chase next is a scope
-decision now needing a person, not a fact this session's own tools can
-resolve further (see RESEARCH.md Round 5's own "Still open" candidates).
+RESEARCH.md Round 5 and the "Validating verdict — NOT READY" section this
+plan.md previously carried are preserved as history in RESEARCH.md; this
+rewritten plan.md replaces the superseded Approach in place rather than
+duplicating both versions here. See RESEARCH.md for the full falsification
+evidence and CONTEXT.md for the re-scoping decision (D1) that followed it.
