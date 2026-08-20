@@ -46,9 +46,11 @@ import { DEFAULT_CAPABILITY_SLOTS, DEFAULT_IRON_LAW_LEVEL, PI_EXECUTOR_DEFAULT, 
 import { addDecision } from '../../src/state/store.mjs';
 
 
+import { createSession } from '../../src/runner/session.mjs';
+
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, plugin-dev-skills-packaged, changelog-unreleased-stale, herdr-launcher-configured, herdr-web-dashboard-configured, work-classification-vocabulary, work-stage-vocabulary, domain-workflow-skillmap-coverage, delivered-not-on-trunk, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, events-jsonl-not-truncated, cli-version-visible, worker-slots-ceiling-usable, gateway-token-configured, readme-install-tag-exists, iron-law-configured, task-specs-resolve, agent-claims-resolve, dispatch-decide-hook-wired, advise-execute-capabilities-configured, decision-index-stale, and agy-permissions-configured', () => {
+test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-checkout-hook-wired, tool-registry-configured, config-awareness, dependencies-installed, gate-bypass-configured, root-drift, leaf-notify-drift, claude-plugin-marketplace, plugin-skill-cli-reachable, plugin-dev-skills-packaged, changelog-unreleased-stale, herdr-launcher-configured, herdr-web-dashboard-configured, work-classification-vocabulary, work-stage-vocabulary, domain-workflow-skillmap-coverage, delivered-not-on-trunk, enduser-docs-index-stale, events-jsonl-contiguous, invariant-checks-configured, events-jsonl-not-truncated, cli-version-visible, worker-slots-ceiling-usable, gateway-token-configured, readme-install-tag-exists, iron-law-configured, task-specs-resolve, agent-claims-resolve, dispatch-decide-hook-wired, advise-execute-capabilities-configured, decision-index-stale, and agy-permissions-configured', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     [
@@ -61,6 +63,7 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'dependencies-installed',
       'gate-bypass-configured',
       'root-drift',
+      'leaf-notify-drift',
       'claude-plugin-marketplace',
       'plugin-skill-cli-reachable',
       'plugin-dev-skills-packaged',
@@ -174,6 +177,45 @@ test('root-drift stays silent for a wontfix root whose branch is ahead — aband
   const { passed, message } = checkById('root-drift').check(dir);
   assert.equal(passed, true);
   assert.match(message, /no root branch is drifted/);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('leaf-notify-drift passes when no live session branch has post-land drift against its target', () => {
+  const dir = initRepo('checks-leaf-drift-clean-');
+  execFileSync('git', ['checkout', '-q', '-b', 'fgw/leaf'], { cwd: dir });
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: dir });
+  const fgosDir = path.join(dir, '.fgos');
+  initStore(fgosDir);
+  addWork(fgosDir, { id: 'leaf', title: 'leaf', kind: 'feature', risk: 'light', verify: 'true', status: 'doing', deps: [], refs: [] });
+
+  const { passed, message } = checkById('leaf-notify-drift').check(dir);
+  assert.equal(passed, true);
+  assert.match(message, /no live session branch has post-land drift/);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('leaf-notify-drift fails and names the leaf when a live session branch overlaps files with target land', () => {
+  const dir = initRepo('checks-leaf-drift-dirty-');
+  execFileSync('git', ['checkout', '-q', '-b', 'fgw/leaf'], { cwd: dir });
+  fs.writeFileSync(path.join(dir, 'file.txt'), 'leaf work\n');
+  execFileSync('git', ['add', 'file.txt'], { cwd: dir });
+  execFileSync('git', ['commit', '-qm', 'leaf work'], { cwd: dir });
+
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: dir });
+  fs.writeFileSync(path.join(dir, 'file.txt'), 'landed work\n');
+  execFileSync('git', ['add', 'file.txt'], { cwd: dir });
+  execFileSync('git', ['commit', '-qm', 'landed work on main'], { cwd: dir });
+
+  const fgosDir = path.join(dir, '.fgos');
+  initStore(fgosDir);
+  addWork(fgosDir, { id: 'landed', title: 'landed', kind: 'feature', risk: 'light', verify: 'true', status: 'done', deps: [], refs: [] });
+  addWork(fgosDir, { id: 'leaf', title: 'leaf', kind: 'feature', risk: 'light', verify: 'true', status: 'doing', deps: [], refs: [] });
+  createSession(dir, { itemId: 'leaf' });
+
+  const { passed, message } = checkById('leaf-notify-drift').check(dir);
+  assert.equal(passed, false);
+  assert.match(message, /leaf/);
+  assert.match(message, /file\.txt/);
   fs.rmSync(dir, { recursive: true, force: true });
 });
 

@@ -26,6 +26,14 @@ and the item's position: while `stage` is still live (status in
 `stage`; once `stage` is frozen (`awaiting-approval` onward), position is
 the item's `status`. See SKILL.md's Advance-axis section for why.
 
+Also check `src/state/postland-drift.mjs`'s `postLandDrift(repoRoot, view,
+{ trunk })` for this item id (the `fgos-coding-driving` Orient pull surface
+added for tsk-1el). If it returns a finding for
+this id, print it plainly — the shared files and the target it drifted
+against — before continuing to Step 2. This is read-only and additive:
+never a state change, never a park, never a gate; it reuses the fresh read
+this step already performs every iteration.
+
 ## Step 2: Check the always-on stops
 
 Check these in order, every iteration, before anything else:
