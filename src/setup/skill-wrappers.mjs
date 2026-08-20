@@ -61,31 +61,46 @@ export function generateWrapperContent(sourceContent, sourceRelativePath) {
  */
 export function generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot) {
   const written = [];
-  if (!fs.existsSync(agentsSkillsRoot)) return written;
-  for (const entry of fs.readdirSync(agentsSkillsRoot, { withFileTypes: true })) {
-    if (!entry.isDirectory() || entry.name === '_shared') continue;
-    const sourcePath = path.join(agentsSkillsRoot, entry.name, 'SKILL.md');
-    if (!fs.existsSync(sourcePath)) continue;
-    const sourceContent = fs.readFileSync(sourcePath, 'utf8');
-    const wrapperDir = path.join(claudeSkillsRoot, entry.name);
-    const wrapperPath = path.join(wrapperDir, 'SKILL.md');
-    const sourceRelativePath = path.relative(wrapperDir, sourcePath);
-    fs.mkdirSync(wrapperDir, { recursive: true });
-    fs.writeFileSync(wrapperPath, generateWrapperContent(sourceContent, sourceRelativePath));
-    written.push(wrapperPath);
+  const validWrapperNames = new Set();
+  if (fs.existsSync(agentsSkillsRoot)) {
+    for (const entry of fs.readdirSync(agentsSkillsRoot, { withFileTypes: true })) {
+      if (!entry.isDirectory() || entry.name === '_shared') continue;
+      const sourcePath = path.join(agentsSkillsRoot, entry.name, 'SKILL.md');
+      if (!fs.existsSync(sourcePath)) continue;
 
-    const skillDir = path.join(agentsSkillsRoot, entry.name);
-    for (const subEntry of fs.readdirSync(skillDir, { withFileTypes: true })) {
-      if (subEntry.name === 'SKILL.md') continue;
-      const subSource = path.join(skillDir, subEntry.name);
-      const subTarget = path.join(wrapperDir, subEntry.name);
-      if (subEntry.isDirectory()) {
-        copyDirRecursive(subSource, subTarget);
-      } else {
-        fs.copyFileSync(subSource, subTarget);
+      validWrapperNames.add(entry.name);
+
+      const sourceContent = fs.readFileSync(sourcePath, 'utf8');
+      const wrapperDir = path.join(claudeSkillsRoot, entry.name);
+      const wrapperPath = path.join(wrapperDir, 'SKILL.md');
+      const sourceRelativePath = path.relative(wrapperDir, sourcePath);
+      fs.mkdirSync(wrapperDir, { recursive: true });
+      fs.writeFileSync(wrapperPath, generateWrapperContent(sourceContent, sourceRelativePath));
+      written.push(wrapperPath);
+
+      const skillDir = path.join(agentsSkillsRoot, entry.name);
+      for (const subEntry of fs.readdirSync(skillDir, { withFileTypes: true })) {
+        if (subEntry.name === 'SKILL.md') continue;
+        const subSource = path.join(skillDir, subEntry.name);
+        const subTarget = path.join(wrapperDir, subEntry.name);
+        if (subEntry.isDirectory()) {
+          copyDirRecursive(subSource, subTarget);
+        } else {
+          fs.copyFileSync(subSource, subTarget);
+        }
       }
     }
   }
+
+  if (fs.existsSync(claudeSkillsRoot)) {
+    for (const entry of fs.readdirSync(claudeSkillsRoot, { withFileTypes: true })) {
+      if (!validWrapperNames.has(entry.name)) {
+        const orphanPath = path.join(claudeSkillsRoot, entry.name);
+        fs.rmSync(orphanPath, { recursive: true, force: true });
+      }
+    }
+  }
+
   return written;
 }
 
@@ -125,35 +140,86 @@ export function assembleSkills(projectRoot, targetAgentsSkills) {
   const domainsRoot = path.join(projectRoot, 'domains');
   const assembled = [];
 
+  if (!fs.existsSync(coreSkillsRoot) && !fs.existsSync(domainsRoot)) {
+    return assembled;
+  }
+
+  const nameToSources = new Map();
+  const validSkillNames = new Set();
+
   if (fs.existsSync(coreSkillsRoot)) {
     for (const entry of fs.readdirSync(coreSkillsRoot, { withFileTypes: true })) {
-      const sourcePath = path.join(coreSkillsRoot, entry.name);
-      const targetPath = path.join(agentsSkillsRoot, entry.name);
-      if (entry.isDirectory()) {
+      if (entry.name.startsWith('.')) continue;
+      if (entry.name === '_shared') {
+        validSkillNames.add('_shared');
+        const sourcePath = path.join(coreSkillsRoot, entry.name);
+        const targetPath = path.join(agentsSkillsRoot, entry.name);
         copyDirRecursive(sourcePath, targetPath);
-      } else {
-        fs.mkdirSync(agentsSkillsRoot, { recursive: true });
-        fs.copyFileSync(sourcePath, targetPath);
+        assembled.push(targetPath);
+        continue;
       }
-      assembled.push(targetPath);
+      const sourcePath = path.join(coreSkillsRoot, entry.name);
+      const relPath = path.relative(projectRoot, sourcePath);
+      if (!nameToSources.has(entry.name)) {
+        nameToSources.set(entry.name, []);
+      }
+      nameToSources.get(entry.name).push(relPath);
     }
   }
 
   if (fs.existsSync(domainsRoot)) {
     for (const domainEntry of fs.readdirSync(domainsRoot, { withFileTypes: true })) {
-      if (!domainEntry.isDirectory()) continue;
+      if (!domainEntry.isDirectory() || domainEntry.name.startsWith('.')) continue;
       const domainSkillsRoot = path.join(domainsRoot, domainEntry.name, 'skills');
       if (!fs.existsSync(domainSkillsRoot)) continue;
       for (const entry of fs.readdirSync(domainSkillsRoot, { withFileTypes: true })) {
-        const sourcePath = path.join(domainSkillsRoot, entry.name);
-        const targetPath = path.join(agentsSkillsRoot, entry.name);
-        if (entry.isDirectory()) {
+        if (entry.name.startsWith('.')) continue;
+        if (entry.name === '_shared') {
+          validSkillNames.add('_shared');
+          const sourcePath = path.join(domainSkillsRoot, entry.name);
+          const targetPath = path.join(agentsSkillsRoot, entry.name);
           copyDirRecursive(sourcePath, targetPath);
-        } else {
-          fs.mkdirSync(agentsSkillsRoot, { recursive: true });
-          fs.copyFileSync(sourcePath, targetPath);
+          assembled.push(targetPath);
+          continue;
         }
-        assembled.push(targetPath);
+        const sourcePath = path.join(domainSkillsRoot, entry.name);
+        const relPath = path.relative(projectRoot, sourcePath);
+        if (!nameToSources.has(entry.name)) {
+          nameToSources.set(entry.name, []);
+        }
+        nameToSources.get(entry.name).push(relPath);
+      }
+    }
+  }
+
+  for (const [skillName, paths] of nameToSources.entries()) {
+    if (paths.length > 1) {
+      throw new Error(
+        `duplicate skill name "${skillName}" found in multiple files: ${paths.join(', ')}`,
+      );
+    }
+  }
+
+  for (const [skillName, paths] of nameToSources.entries()) {
+    validSkillNames.add(skillName);
+    const relPath = paths[0];
+    const sourcePath = path.join(projectRoot, relPath);
+    const targetPath = path.join(agentsSkillsRoot, skillName);
+    const stat = fs.statSync(sourcePath);
+    if (stat.isDirectory()) {
+      copyDirRecursive(sourcePath, targetPath);
+    } else {
+      fs.mkdirSync(agentsSkillsRoot, { recursive: true });
+      fs.copyFileSync(sourcePath, targetPath);
+    }
+    assembled.push(targetPath);
+  }
+
+  if (fs.existsSync(agentsSkillsRoot)) {
+    for (const entry of fs.readdirSync(agentsSkillsRoot, { withFileTypes: true })) {
+      if (!validSkillNames.has(entry.name)) {
+        const orphanPath = path.join(agentsSkillsRoot, entry.name);
+        fs.rmSync(orphanPath, { recursive: true, force: true });
       }
     }
   }
