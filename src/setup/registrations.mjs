@@ -38,6 +38,7 @@ import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
 import { listWork, StoreError } from '../state/store.mjs';
 import { driftStatus, unmergedDeliveries } from '../state/drift-status.mjs';
+import { postLandDrift } from '../state/postland-drift.mjs';
 import { computeEnduserDocsIndex, generateEnduserDocsIndex, manifestPathFor } from '../report/enduser-index-generate.mjs';
 import { computeDecisionIndex, generateDecisionIndex, indexPathFor } from '../report/decision-index.mjs';
 import { isResolvedStatus } from '../state/frontier.mjs';
@@ -873,6 +874,27 @@ function checkRootDrift(cwd) {
   };
 }
 
+function checkLeafNotifyDrift(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  if (mainCheckout === null) {
+    return { passed: true, message: 'not inside a git checkout — nothing to check' };
+  }
+  const view = listWork(path.join(mainCheckout, '.fgos'));
+  const drift = postLandDrift(mainCheckout, view, { trunk: detectTrunk(mainCheckout) });
+  const entries = Object.entries(drift);
+  if (entries.length === 0) {
+    return { passed: true, message: 'no live session branch has post-land drift against its target' };
+  }
+
+  const describe = ([id, info]) =>
+    `${id} (${info.branch} overlaps ${info.shared.join(', ')} with ${info.target})`;
+
+  return {
+    passed: false,
+    message: `live session branch(es) have post-land drift against their target: ${entries.map(describe).join(', ')}`,
+  };
+}
+
 // tsk-6ax: tsk-5wz declared the coding domain's risk/kind vocabulary
 // (DOMAINS.coding.classification) and enforced it at the write door
 // (validateWorkShape's touchedFields grandfathering), but that only blocks
@@ -1025,6 +1047,12 @@ registerCheck({
   id: 'root-drift',
   description: 'every fgw/<root> branch is in sync with its real target — no unsynced drift left over from a leaf merge (tsk-3bn)',
   check: (cwd) => checkRootDrift(cwd),
+});
+
+registerCheck({
+  id: 'leaf-notify-drift',
+  description: 'every live session branch has no post-land drift against its target (tsk-1el)',
+  check: (cwd) => checkLeafNotifyDrift(cwd),
 });
 
 // tsk-1l9: the LEAF-inclusive sibling of root-drift above. `root-drift` only

@@ -93,6 +93,12 @@ Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-st
 - **Side effects:** không gì ngoài dấu vết trên nhánh riêng của chính việc đó (khi thành công) — cây chính/nhánh của gốc không bao giờ bị đụng bởi lệnh này.
 - **Afterwards:** đồng bộ thành công → việc actionable lại qua đúng cổng duyệt PR nội bộ như một đề xuất bình thường, không cần nộp lại từ đầu; đồng bộ thất bại → việc vẫn đỗ, người chọn giữa gọi lại `catchup` sau khi đích đổi tiếp, hoặc cầm việc qua cửa pull để tự làm-lại tay — đường làm-lại tay CÓ tính vào ngân sách chống-lặp (đi qua `đang làm` bình thường), phân biệt với đường cơ học ở trên (xem RUL28 (đồng bộ-lại sạch = cơ học không đếm; làm-lại tay = có đếm)).
 
+### Phát hiện trôi sau nhập nhánh (postLand drift & notify consumer)
+
+- **Runs when:** một việc vừa nhập (`outcome === 'merged'`) vào nhánh đích của nó (`classifyPostLandDrift`/`detectPostLandDrift`, tsk-2ypd), hoặc khi kiểm tra liveness/doctor/orient (tsk-1el).
+- **What changes:** cơ chế `postLand` (`detectPostLandDrift`, tsk-2ypd) tính toán danh sách các tệp thay đổi thực tế của nhánh vừa nhập và so sánh trùng lặp đường dẫn (real path overlap) với mọi nhánh con/gốc phụ thuộc đang mở chung đích. Khi có trùng lặp, kết quả được phân nhánh thành `notify` (nhánh có phiên sống) và `stale` (nhánh không phiên sống). Consumer phía `notify` (`postLandDrift`, `src/state/postland-drift.mjs`, tsk-1el) tính toán lại theo cơ chế recompute-on-read lũy thừa từ điểm phân nhánh (cumulative since fork): báo trực tiếp cho phiên sống sở hữu nhánh qua kiểm tra `fgos doctor` (`leaf-notify-drift`) và vòng lặp tự hành Orient (`fgos-coding-driving`). Nhánh `stale` được bảo vệ thụ động bởi cổng nhập catch-up.
+- **Afterwards:** phiên sống phát hiện trôi tích hợp sớm để tự điều chỉnh hoặc đồng bộ lại trước khi tới lượt nhập real-merge.
+
 ### Quét nghiên-cứu trước dispatch (discovery dispatch)
 
 - **Runs when:** mỗi lượt chạy, ngay sau gặt-lại, TRƯỚC khi giao bất kỳ việc

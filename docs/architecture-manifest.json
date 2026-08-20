@@ -39,6 +39,7 @@
     "src/runner/main-checkout-reset-guard.mjs": "infra",
     "src/runner/github-adapter.mjs": "infra",
     "src/state/drift-status.mjs": "infra",
+    "src/state/postland-drift.mjs": "infra",
     "src/state/store.mjs": "infra",
     "src/state/gate-bypass.mjs": "infra",
     "src/state/cursor.mjs": "use-case",
