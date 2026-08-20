@@ -176,6 +176,17 @@ the throwaway worktree's real `git log`/`git show --stat`, not from the
 self-report alone. Full evidence: `docs/history/claude-named-executor/
 RESEARCH.md` Round 5.
 
+**Live proof-test finding (tsk-5gd):** dispatching real `agy` with
+`gemini-3.6-flash-medium` against this contract found that when the worker
+printed `[DONE]` inside backtick-quoted prose describing its own feature work
+without printing a standalone unquoted status line, `executeExecutorCli`'s naive
+substring check was fooled into treating the item as signaled, forcing driver
+git forensics. Root cause confirmed: detection evaluated raw substring match on stdout
+without stripping backtick-quoted text first. `executeExecutorCli` now strips backtick-quoted
+spans (`` `...` ``) before evaluating `[DONE]`/`[BLOCKED]`, ensuring quoted references
+in prose are ignored and properly evaluate as `outcome:'unsignaled'`.
+Full evidence: `docs/history/tsk-5gd/RESEARCH.md` Round 1.
+
 ## Precedent
 
 - `docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md` —

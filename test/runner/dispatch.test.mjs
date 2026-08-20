@@ -3368,6 +3368,39 @@ test('executeExecutorCli includes verifiedSha on [DONE] when cwd is a git repo, 
   assert.equal(resBlocked.verifiedSha, undefined);
 });
 
+test('executeExecutorCli returns outcome:"unsignaled" when [DONE] or [BLOCKED] appears only inside backtick-quoted text', async () => {
+  const dir = mkTempDir();
+  const scriptQuotedPath = path.join(dir, 'quoted-executor.mjs');
+  fs.writeFileSync(
+    scriptQuotedPath,
+    'process.stdout.write("implemented the `[DONE]` and `[BLOCKED]` token scan\\n"); process.exit(0);',
+  );
+  const scriptQuotedAndDonePath = path.join(dir, 'quoted-and-done-executor.mjs');
+  fs.writeFileSync(
+    scriptQuotedAndDonePath,
+    'process.stdout.write("implemented `[DONE]` scan\\n\\n[DONE]\\n"); process.exit(0);',
+  );
+
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: {
+      'quoted-executor': { kind: 'agent', command: process.execPath, args: [scriptQuotedPath, '{prompt}'], allowCrossProvider: true },
+      'quoted-and-done-executor': { kind: 'agent', command: process.execPath, args: [scriptQuotedAndDonePath, '{prompt}'], allowCrossProvider: true },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+
+  const resQuoted = await executeExecutorCli('quoted-executor', { repoRoot: root, cwd: process.cwd(), prompt: 'p' });
+  assert.equal(resQuoted.outcome, 'unsignaled');
+  assert.equal(typeof resQuoted.headBefore, 'string');
+  assert.equal(typeof resQuoted.headAfter, 'string');
+
+  const resQuotedAndDone = await executeExecutorCli('quoted-and-done-executor', { repoRoot: root, cwd: process.cwd(), prompt: 'p' });
+  assert.equal(resQuotedAndDone.outcome, undefined);
+});
+
 test('executeExecutorCli throws when no executor is registered for the given purpose — nothing left to execute', async () => {
   const root = mkTempDir();
   writeRunnerConfigFixture(root, {

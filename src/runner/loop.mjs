@@ -83,7 +83,8 @@ import { createDispatchWorktree, removeDispatchWorktree, listLeftovers, branchNa
 import { runGoalCheck } from './goal-check.mjs';
 import { createWriteQueue } from './write-queue.mjs';
 import { createOwnershipStore, claimRoot, steerFrontier } from './root-affinity.mjs';
-import { resolveRoot } from '../state/frontier.mjs';
+import { resolveRoot, hasOpenDescendant, indexChildrenByParent } from '../state/frontier.mjs';
+import { cleanupMergedBranch } from './merge.mjs';
 import { claimWork, ClaimError } from './claim-port.mjs';
 import { hasWorkerSlotRoom, countWorkerSlots } from '../state/worker-slots.mjs';
 import { readSharedConfig, readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';
@@ -439,8 +440,20 @@ export async function startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs,
 
   const pruned = [];
   const kept = [];
+  const childrenByParent = indexChildrenByParent(view.work);
   for (const { branch, aheadCount } of listLeftovers(repoRoot)) {
     const branchId = branch.startsWith('fgw/') ? branch.slice('fgw/'.length) : branch;
+    const itemStatus = view.work[branchId]?.status;
+
+    if (itemStatus === 'wontfix' && !hasOpenDescendant(branchId, view.work, childrenByParent)) {
+      if (!dryRun) {
+        cleanupMergedBranch(repoRoot, branch);
+        log(`fgos-runner: pruned orphan branch ${branch} (wontfix)`);
+      }
+      pruned.push(branch);
+      continue;
+    }
+
     if (aheadCount === 0 && hasStillNeededDescendant(branchId, view.work)) {
       log(
         `fgos-runner: keeping ${branch} (0 commits ahead, but a descendant still needs this ref — not yet done/wontfix)`,

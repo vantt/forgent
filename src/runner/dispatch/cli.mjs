@@ -519,8 +519,9 @@ export async function executeExecutorCli(
     const result = await adapterFn({ command, args }, { cwd, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId: executorId, tier, model });
     const headAfter = captureHeadSha(cwd);
     const stdoutStr = result && typeof result.stdout === 'string' ? result.stdout : '';
-    const hasSignal = stdoutStr.includes('[DONE]') || stdoutStr.includes('[BLOCKED]');
-    const isDone = stdoutStr.includes('[DONE]');
+    const cleanStdout = stdoutStr.replace(/`+[\s\S]*?`+/g, '');
+    const hasSignal = cleanStdout.includes('[DONE]') || cleanStdout.includes('[BLOCKED]');
+    const isDone = cleanStdout.includes('[DONE]');
     const base = {
       mechanism,
       ...result,
