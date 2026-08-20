@@ -84,6 +84,12 @@ Concrete cases each piece must prove against (beyond its own row above):
 
 ## Split
 
+Footprint overlap check at the Gate flagged 4 sibling pairs sharing a file
+(`src/runner/dispatch/cli.mjs` across #1/#6/#7; `scripts/project-agents.mjs`
+across #4/#9) — resolved via explicit `deps` edges (never a re-slice, since
+each pair edits a different function/section of the shared file): #6 deps
+on #1, #7 deps on #1 and #6, #9 deps on #4.
+
 ```json
 [
   {
@@ -132,7 +138,8 @@ Concrete cases each piece must prove against (beyond its own row above):
     "action": "the --stage flag (src/runner/dispatch/cli.mjs:868, used at :253) is undocumented in the CLI usage string (cli.mjs:590,921), AGENTS.md's 'Four ways to call decide' (AGENTS.md:99-104), and core/skills/_shared/executor-dispatch-fallback.md:60-64 (byte-identical .agents/ mirror) -- confirmed by RESEARCH.md finding 6. Add --stage to all 3, keeping the .agents/ mirror byte-identical to core/ per the file's own stated invariant",
     "footprint": ["src/runner/dispatch/cli.mjs", "AGENTS.md", "core/skills/_shared/executor-dispatch-fallback.md", ".agents/skills/_shared/executor-dispatch-fallback.md"],
     "kind": "task",
-    "risk": "light"
+    "risk": "light",
+    "deps": [0]
   },
   {
     "title": "resolveAgentTypeForTaskSpec: stop fail-open eligibility fallback to an unvalidated agent name",
@@ -140,7 +147,8 @@ Concrete cases each piece must prove against (beyond its own row above):
     "action": "resolveAgentTypeForTaskSpec (src/runner/dispatch/cli.mjs) fails open at 4 points -- :90 (no taskSpecHeader), :101 (pinned agent not in roster returns pinnedAgents[0] verbatim), :110 (no requires-skill), :126 (no agent matches requires-skill) -- all falling back to currentAgentType||agentDefs[0]?.name??null instead of refusing/null, defeating the real purpose of the eligibility gate per RESEARCH.md finding 7. Change all 4 to return null (refuse) instead of an unvalidated/mismatched name, and update every caller of this function to handle a null result explicitly -- this is the audit/security hard-gate flag driving this item's high-risk lane, needs the widest test coverage of the ten pieces",
     "footprint": ["src/runner/dispatch/cli.mjs"],
     "kind": "task",
-    "risk": "heavy"
+    "risk": "heavy",
+    "deps": [0, 5]
   },
   {
     "title": "correct D20 'soul' field doc language -- role+persona already carries the intent",
@@ -156,7 +164,8 @@ Concrete cases each piece must prove against (beyond its own row above):
     "action": "findAgentYamlFiles (scripts/project-agents.mjs:74-118) still scans legacy agents/ as a fallback, but D33's uniqueness check (scripts/project-agents.mjs:166-190) throws unconditionally on any cross-source name collision, with no legacy-loses softness -- confirmed dormant-not-firing today only because the legacy agents/ dir no longer exists (RESEARCH.md finding 9). Assumption pinned here (not material -- repo has zero live legacy files today, so neither option changes current behavior; picking the safer default): change the D33 check so a collision specifically between the legacy agents/ source and core/agents or domains/*/agents is resolved by deprioritizing the legacy entry (core/domain wins, legacy is skipped with a logged warning) rather than throwing, while a collision between two non-legacy sources still throws as today. Add a test simulating a legacy-vs-core name collision to prove the new graceful behavior",
     "footprint": ["scripts/project-agents.mjs"],
     "kind": "task",
-    "risk": "medium"
+    "risk": "medium",
+    "deps": [3]
   },
   {
     "title": "skill-wrappers: prune orphaned wrappers and detect cross-domain skill-name collisions",
