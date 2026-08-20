@@ -707,6 +707,13 @@ export function rebuildView(logPath) {
  * called on that pure shape (the on-disk `state.json` stamps this hash as a
  * sibling field; it is never folded back into the view a rebuild returns).
  */
-export function viewRevision(view) {
-  return createHash('sha256').update(JSON.stringify(view)).digest('hex');
+export function serializeView(view) {
+  const viewStr = JSON.stringify(view);
+  const revision = createHash('sha256').update(viewStr).digest('hex');
+  return { viewStr, revision };
 }
+
+export function viewRevision(view) {
+  return serializeView(view).revision;
+}
+
