@@ -306,6 +306,7 @@ function loadDomainsFromDisk() {
       }
 
       const domainObj = {
+        ...registryData,
         ...(activeWorkflow ? {
           stages: activeWorkflow.stages,
           stepMap: activeWorkflow.stepMap,
@@ -313,7 +314,6 @@ function loadDomainsFromDisk() {
           skillMap: activeWorkflow.skillMap,
           taskSpecMap: activeWorkflow.taskSpecMap,
         } : {}),
-        ...registryData,
         workflows: Object.freeze(workflows),
         defaultWorkflow,
         workflowFor: Object.freeze(workflowFor),
