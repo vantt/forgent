@@ -68,12 +68,15 @@ skipped `exploring` and has no `CONTEXT.md` decision table to cite from.
 | Flattening 22 doc call sites | light — pure prose/example edit inside `.agents/skills/**`, no runtime code touched | NEGATIVE: `! rg -Fl --hidden 'root=$(git rev-parse --path-format=absolute --git-common-dir' .agents/skills` (zero files left with the old pattern); each rewritten line still runs the exact effective command once step 1 lands |
 | Documenting `write-wrapper-script.mjs` | light — pure doc addition | POSITIVE: `grep -q "write-wrapper-script.mjs" plugins/fgOS/skills/_shared/fgos-cli-fallback.md` |
 
-Impact-analysis posture: `full` — `fgos tool query --capability
+Impact-analysis posture: `degraded` — `fgos tool query --capability
 impact-analysis --status present` returns GitNexus as `present` (checked
-directly this session, not assumed). Moot for this item regardless: every
-file touched is either a shell script or Markdown prose, both outside
-GitNexus's indexed code-graph surface (same finding `tsk-3k2`'s own
-`plan.md` already recorded for this exact script). The risk map above
+directly this session, not assumed), but its index is flagged stale (a
+`PostToolUse` hook reminder fired after a real commit this session: "last
+indexed: 7bb3231", behind current HEAD). Moot for this item regardless:
+every file touched is either a shell script or Markdown prose, both
+outside GitNexus's indexed code-graph surface (same finding `tsk-3k2`'s
+own `plan.md` already recorded for this exact script) — a fresh index
+would have nothing to say about these paths either. The risk map above
 (a real behavioral test plus a grep-based call-site census) is the
 complete proof surface for a `light`-risk item.
 
