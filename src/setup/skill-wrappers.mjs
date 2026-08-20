@@ -21,6 +21,15 @@ import path from 'node:path';
 
 const FRONTMATTER_PATTERN = /^---\r?\n[\s\S]*?\r?\n---\r?\n/;
 
+// Marker line unique to a wrapper this module itself generated. `.claude/
+// skills/*` is not an exclusively-generated tree (a hand-authored or
+// plugin-installed skill can live there directly, never routed through
+// `.agents/skills` at all) -- the prune pass below must never remove an
+// entry it cannot prove it wrote itself, and this exact line is that
+// proof: it is unconditionally present in every `generateWrapperContent`
+// output, so its presence is a real generated-wrapper signature.
+const GENERATED_WRAPPER_MARKER = 'This is a generated thin wrapper (tsk-1qi) -- do not edit directly, edit the source instead.';
+
 /** The YAML frontmatter block (including its `---` fences) at the top of
  * a SKILL.md's content, or `''` when none is present. */
 export function extractFrontmatter(sourceContent) {
@@ -42,10 +51,27 @@ export function generateWrapperContent(sourceContent, sourceRelativePath) {
   }
   return (
     `${frontmatter}\n` +
-    'This is a generated thin wrapper (tsk-1qi) -- do not edit directly, edit the source instead.\n' +
+    `${GENERATED_WRAPPER_MARKER}\n` +
     `The real skill content lives at \`${sourceRelativePath}\`, this project's own canonical skill source.\n` +
     'Read that file and follow it directly.\n'
   );
+}
+
+/** Whether `claudeSkillsRoot/name` is a wrapper this module itself
+ * previously generated (its `SKILL.md` carries `GENERATED_WRAPPER_MARKER`)
+ * -- the only entries the prune pass in `generateAllSkillWrappers` is ever
+ * allowed to remove. A missing `SKILL.md`, a read error, or content
+ * without the marker all mean "not provably ours" and must return `false`:
+ * a hand-authored or plugin-installed skill living directly under `.claude/
+ * skills/*` (never routed through `.agents/skills`) is never this
+ * function's to judge. */
+function isGeneratedWrapper(wrapperDirPath) {
+  const skillMdPath = path.join(wrapperDirPath, 'SKILL.md');
+  try {
+    return fs.readFileSync(skillMdPath, 'utf8').includes(GENERATED_WRAPPER_MARKER);
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -94,10 +120,10 @@ export function generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot) {
 
   if (fs.existsSync(claudeSkillsRoot)) {
     for (const entry of fs.readdirSync(claudeSkillsRoot, { withFileTypes: true })) {
-      if (!validWrapperNames.has(entry.name)) {
-        const orphanPath = path.join(claudeSkillsRoot, entry.name);
-        fs.rmSync(orphanPath, { recursive: true, force: true });
-      }
+      if (validWrapperNames.has(entry.name)) continue;
+      const orphanPath = path.join(claudeSkillsRoot, entry.name);
+      if (!isGeneratedWrapper(orphanPath)) continue;
+      fs.rmSync(orphanPath, { recursive: true, force: true });
     }
   }
 
