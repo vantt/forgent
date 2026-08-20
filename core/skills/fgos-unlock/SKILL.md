@@ -40,8 +40,7 @@ encodes the same staleness/liveness judgment `acquireMainCheckoutLock`
    design, ADR0020), so resolve the main checkout root and pass it
    explicitly rather than running bare (tsk-56t D1):
    ```bash
-   root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-   node "$root/bin/fgos.mjs" unlock --dir "$root"
+   fgos unlock
    ```
 3. Read the result:
    - `{ cleared: true, reason: "stale-or-free" }` — the lock was free or

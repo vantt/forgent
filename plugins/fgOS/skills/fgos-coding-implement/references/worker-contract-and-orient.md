@@ -34,11 +34,7 @@ answer` already resolved on the status axis without the role axis
 following. Close it before doing anything else:
 
 ```bash
-root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-```
-
-```bash
-node "$root/bin/fgos.mjs" handoff-return "<id>" --note "reclaiming at Orient — holder was <role>" --dir "$root"
+fgos handoff-return "<id>" --note "reclaiming at Orient — holder was <role>"
 ```
 
 **Repeat this call, re-reading `data.work[id].holder` fresh each time,

@@ -30,8 +30,7 @@ command onto the item's own current `verify` field before handing off to
 `fgos-coding-validating`:
 
 ```bash
-root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-node "$root/bin/fgos.mjs" edit "<item-id>" --verify "<the designed proof-surface command>" --dir "$root"
+fgos edit "<item-id>" --verify "<the designed proof-surface command>"
 ```
 
 If the item already carries a real, distinct verify, do nothing — never
@@ -75,8 +74,7 @@ candidate questions:
   anyone had ever noticed:
 
   ```bash
-  root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-  node "$root/bin/fgos.mjs" decision --id "<item-id>" --dir "$root" \
+  fgos decision --id "<item-id>" \
     --text "planning->exploring hand-back: <the gap, in one line>" \
     --rationale "material per fgos-coding-planning step 6; tier-A actions already tried: <what was run/read and why it did not close the gap>" \
     --relation none

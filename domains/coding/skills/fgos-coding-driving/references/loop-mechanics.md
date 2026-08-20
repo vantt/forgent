@@ -15,14 +15,8 @@ iteration — never reuse a snapshot from a prior turn, since the whole
 point of looping is that the loaded skill just changed this state:
 
 ```bash
-root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
+fgos list --id "<id>" --json
 ```
-
-```bash
-node "$root/bin/fgos.mjs" list --id "<id>" --json --dir "$root"
-```
-
-Run the resolve and the `fgos.mjs` call as two SEPARATE tool calls, never pasted together as one script — a worktree-isolated session's own isolation guard refuses a single call combining a `git`-rooted command with a following `node .../fgos.mjs` invocation, even though each is safe alone. Substitute `root`'s literal printed value into the second call.
 
 Remember this iteration's starting `{stage, status}` — Step 9 compares
 against it to detect no progress. Resolve `domain = getDomain(item.domain)`
@@ -90,11 +84,7 @@ The first time in this call only (never once per iteration):
 - Label this session's pane with `<id>` via the capability-gated helper:
 
   ```bash
-  root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-  ```
-
-  ```bash
-  bash "$root/plugins/fgOS/skills/terminal/rename.sh" "<id>" "$root"
+  bash plugins/fgOS/skills/terminal/rename.sh "<id>" "$PWD"
   ```
 
   Never stop, retry, or branch on its result — see
@@ -113,11 +103,7 @@ If `skill` resolves to the domain's `executing`-stage skill AND `status !=
   way a fresh pick would:
 
   ```bash
-  root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-  ```
-
-  ```bash
-  node "$root/bin/fgos.mjs" pick "<id>" --dir "$root"
+  fgos pick "<id>"
   ```
 
   then hand the session into the returned worktree path (`EnterWorktree`,
@@ -128,11 +114,7 @@ If `skill` resolves to the domain's `executing`-stage skill AND `status !=
 - `domain.worktreeBacked === false` — claim without a worktree:
 
   ```bash
-  root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-  ```
-
-  ```bash
-  node "$root/bin/fgos.mjs" take --role session --id "<id>" --dir "$root"
+  fgos take --role session --id "<id>"
   ```
 
   never call `EnterWorktree` for this branch — invoke the skill directly
@@ -145,11 +127,7 @@ If `status` is already `doing`:
   worktree before proceeding to Step 7:
 
   ```bash
-  root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-  ```
-
-  ```bash
-  node "$root/bin/fgos.mjs" resync-worktree --dir "$root"
+  fgos resync-worktree
   ```
 
   Run this from inside the item's claimed worktree (the session is already
@@ -172,11 +150,7 @@ If the domain declares a role graph AND `holder` is set AND `holder !=
 roleGraph.defaultRole`, close the dangling call before invoking anything:
 
 ```bash
-root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-```
-
-```bash
-node "$root/bin/fgos.mjs" handoff-return "<id>" --note "driving loop reclaim before <skill> — holder was <role>" --dir "$root"
+fgos handoff-return "<id>" --note "driving loop reclaim before <skill> — holder was <role>"
 ```
 
 Re-read `holder` fresh and repeat until it reads `roleGraph.defaultRole`

@@ -56,8 +56,7 @@ a `Grep`.
 ## Step A — ask `decide` (never read the config yourself)
 
 ```bash
-root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-node "$root/src/runner/dispatch.mjs" decide <EXECUTOR_ID> [--has-live-task-access]
+node src/runner/dispatch.mjs decide <EXECUTOR_ID> [--has-live-task-access]
 # when you have no executor id, use the door that matches what you know:
 #   decide --for <PURPOSE>  [--has-live-task-access]
 #   decide --work <WORK_ID> [--stage <STAGE>] [--has-live-task-access]
@@ -293,10 +292,9 @@ through the one existing writer of `.fgos/logs/`, `appendWorkerLog`
 (`src/runner/worker-log.mjs`); never a new log file or module for this:
 
 ```bash
-root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
 node --input-type=module -e "
-import { appendWorkerLog } from '$root/src/runner/worker-log.mjs';
-appendWorkerLog('$root', '<scope>', {
+import { appendWorkerLog } from './src/runner/worker-log.mjs';
+appendWorkerLog('.', '<scope>', {
   tier: '<judged-or-default-tier>',
   model: '<judged-or-default-model>',
   message: 'ad-hoc dispatch <task id>: <goal>',

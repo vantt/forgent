@@ -33,12 +33,12 @@ function fencedBlockContaining(marker) {
   return skillText.slice(blockStart, blockEnd);
 }
 
-test('fgos-coding-exploring\'s "fgos add" example resolves $root inside the SAME fenced block, not just earlier in the file', () => {
+test('fgos-coding-exploring\'s "fgos add" example uses a flat fgos add command without needing explicit --dir', () => {
   const block = fencedBlockContaining('fgos add --title');
   assert.match(
     block,
-    /root=\$\(git rev-parse --path-format=absolute --git-common-dir \| xargs dirname\)/,
-    'copy-pasting this block alone must resolve $root before the fgos add call uses --dir "$root" — tsk-59a shipped this same block without it',
+    /fgos add --title "<title>"/,
+    'the example must use flat fgos add without root=$(git rev-parse...)',
   );
-  assert.match(block, /--dir "\$root"/, 'the example must still use --dir "$root", proving the assignment above is not dead weight');
+  assert.doesNotMatch(block, /root=\$\(git rev-parse/);
 });

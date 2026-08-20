@@ -55,22 +55,39 @@ _fgos_tier3_cached_bin() {
 }
 
 fgos() {
-  local root real_bin common_dir tier2 tier3
+  local root real_bin common_dir tier2 tier3 has_dir=0 arg
   common_dir=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || {
     echo "fgos: not a git repository" >&2
     return 1
   }
   root=$(dirname "$common_dir")
+  for arg in "$@"; do
+    case "$arg" in
+      --dir|--dir=*) has_dir=1; break ;;
+    esac
+  done
   if [ -f "$root/bin/fgos.mjs" ]; then
-    node "$root/bin/fgos.mjs" "$@"
+    if [ "$has_dir" -eq 0 ]; then
+      node "$root/bin/fgos.mjs" "$@" --dir "$root"
+    else
+      node "$root/bin/fgos.mjs" "$@"
+    fi
     return $?
   fi
   if tier2=$(_fgos_tier2_bin fgos); then
-    "$tier2" "$@"
+    if [ "$has_dir" -eq 0 ]; then
+      "$tier2" "$@" --dir "$root"
+    else
+      "$tier2" "$@"
+    fi
     return $?
   fi
   if tier3=$(_fgos_tier3_cached_bin); then
-    "$tier3" "$@"
+    if [ "$has_dir" -eq 0 ]; then
+      "$tier3" "$@" --dir "$root"
+    else
+      "$tier3" "$@"
+    fi
     return $?
   fi
   # `type -P` is bash-only and silently fails under zsh, which always trips
@@ -83,7 +100,11 @@ fgos() {
     echo "fgos: no bin/fgos.mjs at $root (not a forgent checkout), no project-local node_modules/.bin/fgos, and no global fgos install on PATH" >&2
     return 1
   fi
-  "$real_bin" "$@"
+  if [ "$has_dir" -eq 0 ]; then
+    "$real_bin" "$@" --dir "$root"
+  else
+    "$real_bin" "$@"
+  fi
 }
 
 fgos-runner() {

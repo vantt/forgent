@@ -112,15 +112,9 @@ lệch khỏi hợp đồng đã khoá (tsk-2t9c D16 — task-spec này đã t�
    chối vì "không còn call nào đang mở" (kết cục bình thường, không phải
    lỗi):
 
-   ```bash
-   root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-   ```
-
-   ```bash
-   node "$root/bin/fgos.mjs" handoff-return "<item-id>" --note "reclaiming at Orient — holder was <role>" --dir "$root"
-   ```
-
-   Run the resolve and the `fgos.mjs` call as two SEPARATE tool calls, never pasted together as one script — a worktree-isolated session's own isolation guard refuses a single call combining a `git`-rooted command with a following `node .../fgos.mjs` invocation, even though each is safe alone. Substitute `root`'s literal printed value into the second call.
+    ```bash
+    fgos handoff-return "<item-id>" --note "reclaiming at Orient — holder was <role>"
+    ```
 
    Bỏ qua bước này khi domain của item không khai `roleGraph`.
 
@@ -145,13 +139,9 @@ lệch khỏi hợp đồng đã khoá (tsk-2t9c D16 — task-spec này đã t�
    D9/D14/D16 — cùng một mốc "ngay khi lời gọi helper trả về", thống nhất
    với `fgos-coding-exploring`/`fgos-coding-validating`):
 
-   ```bash
-   root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-   ```
-
-   ```bash
-   node "$root/bin/fgos.mjs" handoff "<item-id>" --to researcher --reason consult --outcome "<finding, một dòng>" --dir "$root"
-   ```
+    ```bash
+    fgos handoff "<item-id>" --to researcher --reason consult --outcome "<finding, một dòng>"
+    ```
 
    Sync — không đổi `holder`, chỉ ghi `call-summary`. Bỏ qua bước này khi
    domain của item không khai `roleGraph`.
@@ -182,18 +172,14 @@ lệch khỏi hợp đồng đã khoá (tsk-2t9c D16 — task-spec này đã t�
 
 5. **Tự gọi engine verb.** Ngay sau bước 4, không dừng lại chờ gì thêm:
 
-   ```bash
-   root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-   ```
-
-   ```bash
-   # clear (nếu tier/kind/risk phán ra khác giá trị hiện có trên item,
-   # gọi edit TRƯỚC discover — bỏ qua lệnh edit khi giá trị trùng):
-   node "$root/bin/fgos.mjs" edit "<item-id>" --tier "<tier phán>" --kind "<kind phán>" --risk "<risk phán>" --dir "$root"
-   node "$root/bin/fgos.mjs" discover "<item-id>" --verdict clear --verify "<verify thật vừa xác nhận ở bước 4>" --dir "$root"
-   # unclear:
-   node "$root/bin/fgos.mjs" discover "<item-id>" --verdict unclear --question "<câu hỏi cụ thể, trích bằng chứng>" --dir "$root"
-   ```
+    ```bash
+    # clear (nếu tier/kind/risk phán ra khác giá trị hiện có trên item,
+    # gọi edit TRƯỚC discover — bỏ qua lệnh edit khi giá trị trùng):
+    fgos edit "<item-id>" --tier "<tier phán>" --kind "<kind phán>" --risk "<risk phán>"
+    fgos discover "<item-id>" --verdict clear --verify "<verify thật vừa xác nhận ở bước 4>"
+    # unclear:
+    fgos discover "<item-id>" --verdict unclear --question "<câu hỏi cụ thể, trích bằng chứng>"
+    ```
 
    Cả hai nhánh đều là lệnh gọi engine THẬT — verdict `clear` bỏ qua
    `exploring`, verdict `unclear` sang `exploring` cho một người (D2). Ghi
