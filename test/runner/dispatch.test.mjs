@@ -4053,11 +4053,12 @@ test('executorIdForWork is exported and resolves a coding-domain (or no-domain) 
   assert.equal(executorIdForWork(sampleWork()), 'fgos-coding-implement');
 });
 
-test('executorIdForWork expands key to (domain, stage, role) and respects stage parameter and work.stage property', () => {
+test('executorIdForWork respects stage parameter and work.stage property, and has length 2 (dead role param removed)', () => {
+  assert.equal(executorIdForWork.length, 2);
   assert.equal(executorIdForWork(sampleWork(), 'discovery'), 'fgos-coding-discovering');
   assert.equal(executorIdForWork(sampleWork(), 'planning'), 'fgos-coding-planning');
   assert.equal(executorIdForWork({ domain: 'coding', stage: 'exploring' }), 'fgos-coding-exploring');
-  assert.equal(executorIdForWork({ domain: 'coding', stage: 'planning' }, null, 'implementer'), 'fgos-coding-planning');
+  assert.equal(executorIdForWork({ domain: 'coding', stage: 'planning' }), 'fgos-coding-planning');
 });
 
 test('resolveAgentTypeForTaskSpec implements D32 tie-break scenarios correctly', () => {
