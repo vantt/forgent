@@ -89,21 +89,19 @@ CONTEXT.md` D6).
      trips the Iron Law gate (a self-modifying diff needing human-verified
      failing-test-first proof). Nothing was merged, the item stays
      `awaiting-approval`. This never auto-resolves — tell the user which
-     item tripped it, and point them at `/fgOS:approve <id>` as the way to
-     take it further: that skill presents the item's blast radius, shows
-     its `iron-law-evidence.md` verbatim, asks once, and — only on a real
-     yes — runs the verb itself with `--acknowledge-iron-law`. Do not hand
-     the user a command to type (D2, `docs/history/iron-law-gate-human-ux/
-     CONTEXT.md`: the person decides, an agent operates), and never run
-     `--acknowledge-iron-law` yourself on this skill's own authority.
+     item tripped it, and invoke the `approve` skill directly (Skill tool)
+     for that `<id>` in the same turn: that skill presents the item's blast
+     radius, shows its `iron-law-evidence.md` verbatim, asks once, and —
+     only on a real yes — runs the verb itself with `--acknowledge-iron-law`.
+     Do not hand the user a command to type (`docs/history/iron-law-gate-human-ux/CONTEXT.md`: the person decides, an agent operates), and never run `--acknowledge-iron-law` yourself on this skill's own authority.
    - `{picked: null, reason: "every ready item is blocked", skipped:
      [{id, reason}]}` — the frontier is not empty, but every ready
      candidate provably trips the Iron Law, so nothing was merged and
      every one of them stays `awaiting-approval`. Report the whole
-     `skipped` list, not just its first entry, with the same
-     `/fgOS:approve <id>` handoff as above. This is deliberately a
-     different report from `nothing ready to merge`; do not collapse the
-     two.
+     `skipped` list, not just its first entry, then invoke the `approve`
+     skill directly (Skill tool) for `skipped[0].id` in the same turn. This
+     is deliberately a different report from `nothing ready to merge`; do
+     not collapse the two.
    - **A `skipped: [{id, reason}]` array alongside any of the shapes
      above** — candidates the engine's own pre-check walked past to reach
      the item it picked. Relay their ids as held, needing a person; they
