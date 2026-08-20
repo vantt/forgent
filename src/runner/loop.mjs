@@ -66,7 +66,7 @@ import {
   EXIT_CODES,
 } from '../state/store.mjs';
 import { DEFAULTS, truncateTitle } from '../state/work.mjs';
-import { getDomain, resolveWorkflow, stageForStep } from '../state/workflow-stage-graphs.mjs';
+import { DEFAULT_DOMAIN, getDomain, resolveWorkflow, stageForStep } from '../state/workflow-stage-graphs.mjs';
 import { resolveAction, resolveStaleDoing } from './recovery.mjs';
 import {
   visitCount,
@@ -1285,7 +1285,7 @@ export async function runOnce(options = {}) {
       for (const item of Object.values(listWork(dir).work)) {
         const domain = getDomain(item.domain, {
           onUnrecognized: (bad) =>
-            log(`fgos-runner: work "${item.id}" has unrecognized domain "${bad}" — folding to "coding".`),
+            log(`fgos-runner: work "${item.id}" has unrecognized domain "${bad}" — folding to "${DEFAULT_DOMAIN}".`),
         });
         const planningStage = stageForStep(domain, 'Divide');
         // tsk-403 D18: also sweep the legacy `decompose` alias — an item
