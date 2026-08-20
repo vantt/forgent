@@ -297,6 +297,19 @@ export function logExecutorDispatch(fgosDir, { id, executorId, provider, command
   });
 }
 
+function captureHeadSha(cwd) {
+  try {
+    const sha = execFileSync('git', ['rev-parse', 'HEAD'], {
+      cwd: cwd || process.cwd(),
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+    return sha || null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * `execute <executorId>` CLI subcommand (tsk-5tm-3 D5): the self-execute
  * counterpart to `resolve` above, matching marketing-cockpit's `run_task()`
@@ -502,8 +515,18 @@ export async function executeExecutorCli(
     process.stderr.write(
       `fgos: dispatch capability=${capabilityLabel} executor=${executorId} via=${adapter} provider=${provider} model=${model} tier=${tier}\n`,
     );
+    const headBefore = captureHeadSha(cwd);
     const result = await adapterFn({ command, args }, { cwd, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId: executorId, tier, model });
-    const base = { mechanism, ...result, provider, command };
+    const headAfter = captureHeadSha(cwd);
+    const stdoutStr = result && typeof result.stdout === 'string' ? result.stdout : '';
+    const hasSignal = stdoutStr.includes('[DONE]') || stdoutStr.includes('[BLOCKED]');
+    const base = {
+      mechanism,
+      ...result,
+      ...(hasSignal ? {} : { outcome: 'unsignaled', headBefore, headAfter }),
+      provider,
+      command,
+    };
     return resolvedByPurpose ? { ...base, executorId } : base;
   } finally {
     lockRes.release();

@@ -3297,6 +3297,52 @@ test('executeExecutorCli resolves purpose-based (--for) the same way a positiona
   assert.equal(byName.executorId, undefined);
 });
 
+test('executeExecutorCli returns outcome:"unsignaled" with headBefore and headAfter when stdout lacks [DONE] or [BLOCKED]', async () => {
+  const dir = mkTempDir();
+  const scriptPath = writeEchoExecutor(dir);
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: { 'test-executor': { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const result = await executeExecutorCli('test-executor', { repoRoot: root, cwd: process.cwd(), prompt: 'test' });
+  assert.equal(result.mechanism, 'out-of-process');
+  assert.equal(result.outcome, 'unsignaled');
+  assert.equal(typeof result.headBefore, 'string');
+  assert.equal(typeof result.headAfter, 'string');
+});
+
+test('executeExecutorCli omits outcome and head shas when stdout contains [DONE] or [BLOCKED]', async () => {
+  const dir = mkTempDir();
+  const scriptDonePath = path.join(dir, 'done-executor.mjs');
+  fs.writeFileSync(scriptDonePath, 'process.stdout.write("task complete [DONE]\\n"); process.exit(0);');
+  const scriptBlockedPath = path.join(dir, 'blocked-executor.mjs');
+  fs.writeFileSync(scriptBlockedPath, 'process.stdout.write("task stuck [BLOCKED]\\n"); process.exit(0);');
+
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: {
+      'done-executor': { kind: 'agent', command: process.execPath, args: [scriptDonePath, '{prompt}'], allowCrossProvider: true },
+      'blocked-executor': { kind: 'agent', command: process.execPath, args: [scriptBlockedPath, '{prompt}'], allowCrossProvider: true },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+
+  const resDone = await executeExecutorCli('done-executor', { repoRoot: root, cwd: process.cwd(), prompt: 'p' });
+  assert.equal(resDone.outcome, undefined);
+  assert.equal(resDone.headBefore, undefined);
+  assert.equal(resDone.headAfter, undefined);
+
+  const resBlocked = await executeExecutorCli('blocked-executor', { repoRoot: root, cwd: process.cwd(), prompt: 'p' });
+  assert.equal(resBlocked.outcome, undefined);
+  assert.equal(resBlocked.headBefore, undefined);
+  assert.equal(resBlocked.headAfter, undefined);
+});
+
 test('executeExecutorCli throws when no executor is registered for the given purpose — nothing left to execute', async () => {
   const root = mkTempDir();
   writeRunnerConfigFixture(root, {
