@@ -3172,6 +3172,37 @@ test('the "execute" CLI entry point honors --tier, changing which configured mod
   assert.equal(parsed.model, 'haiku');
 });
 
+test('the "execute" CLI entry point honors --repo-root, decoupling spawn cwd from config root', () => {
+  const { repoRoot } = mkTempGitRepo();
+  const worktreeDir = mkTempDir();
+  const scriptPath = writeEchoExecutor(worktreeDir);
+  writeRunnerConfigFixture(repoRoot, {
+    executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
+    timeoutMs: 5000,
+  });
+  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
+  const result = spawnSync(
+    process.execPath,
+    [
+      dispatchPath,
+      'execute',
+      'no-such-executor-configured',
+      '--prompt',
+      'hello',
+      '--cwd',
+      worktreeDir,
+      '--repo-root',
+      repoRoot,
+    ],
+    { encoding: 'utf8', cwd: process.cwd() },
+  );
+  assert.equal(result.status, 0, result.stderr);
+  const parsed = JSON.parse(result.stdout);
+  assert.equal(parsed.mechanism, 'out-of-process');
+  const payload = JSON.parse(parsed.stdout);
+  assert.equal(fs.realpathSync(payload.cwd), fs.realpathSync(worktreeDir));
+});
+
 // --- tsk-5tm-3 D5: `executeExecutorCli` / `execute <executorId>` — the
 // self-execute counterpart to `resolve` above, matching marketing-cockpit's
 // `run_task()`: self-execute every adapter-resolvable case via

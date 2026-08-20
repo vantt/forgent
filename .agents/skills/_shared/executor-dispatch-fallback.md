@@ -114,6 +114,8 @@ verbose test runner's own line-by-line pass output:
 node "$root/src/runner/dispatch.mjs" execute <EXECUTOR_ID> --prompt "<PROMPT_TEMPLATE built as below>" [--has-live-task-access] 2>&1 | grep -E --line-buffered '\[DONE\]|\[BLOCKED\]|Error|FAIL|✗|^\{'
 ```
 
+When dispatching a worktree-backed item with explicit directory flags, pass `--cwd <worktree path>` (so the spawned executor runs in the worktree) and `--repo-root "$root"` (so config loads from main) as two separate flags — never pass `$root` as `--dir`/`--cwd` alone.
+
 **When this session is isolated in a worktree and `<PROMPT_TEMPLATE>` is
 built from a file via `$(cat ...)`, the worktree-isolation guard may
 refuse this line outright** — "too complex to verify that it stays
