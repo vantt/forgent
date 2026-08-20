@@ -63,11 +63,15 @@ Risk map: standard/low — a documentation-only change to prose a session
 reads before acting; no runtime code path changes. No proof point beyond
 the verify below is needed (risk does not rise to medium/high).
 
-Impact-analysis posture: `inactive` — no impact-analysis provider is
-registered on this machine (`fgos tool query --capability impact-analysis
---status present` returns 0 providers; not re-run here since this plan
-carries no blast-radius-dependent proof point that would need it — a
-single reference-doc edit with no code path change).
+Impact-analysis posture: `full` — corrected after `fgos-coding-validating`'s
+reality gate caught an unverified `inactive` claim in an earlier draft of
+this section: `fgos tool query --capability impact-analysis --status
+present` (re-run fresh at validating) actually returns GitNexus, `status:
+"present"`. Full posture changes nothing about this plan's own proof
+requirements, though — this item carries no blast-radius-dependent proof
+point (a single reference-doc edit with no code path change), so `full`
+posture is recorded here for accuracy but triggers no additional row in
+the feasibility matrix below.
 
 ## Shape
 
