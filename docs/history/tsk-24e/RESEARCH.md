@@ -146,3 +146,57 @@ auto-commit cadence for `.fgos/events.jsonl`, a pre-flight hook blocking
 raw `git reset --hard`/`checkout -f` on the main checkout the way `fgos
 main-checkout-reset` already gates its own path, or something else) —
 not something this research call should pick on its own.
+
+## Round 2 (2026-08-20) — correction: a code-level guard already exists
+
+**Asked (at planning time, Approach step):** `fgos graph tsk-24e --json`
+surfaced tsk-24e's own component: `tsk-cgg` (done), `tsk-1ji` (doing,
+stage `planning`), `tsk-64o` (done, tsk-24e's dep). Reading both closes a
+factual gap in Round 1's own verdict.
+
+**Finding — Round 1's "no code-level guard exists" claim was wrong.**
+`tsk-cgg` (`docs/history/events-jsonl-git-tracked-truncation/`, done,
+merged) already built a real detector: `src/state/events-jsonl-
+truncation-guard.mjs` (confirmed present on disk) — a gitignored sidecar
+(`.fgos/events-jsonl.truncation-guard.json`, confirmed listed in
+`.gitignore`) storing `{lastSeq, lastLineHash}` of the log's own last
+line, registered into `fgos doctor` (`src/setup/registrations.mjs:60,
+1192`). Its own incident report (tsk-cgg's description) diagnosed the
+EXACT mechanism Round 1 was reasoning toward from first principles: not
+`git reset --hard`/`checkout -f` specifically, but **`git stash push`** on
+the main checkout — it reverts a tracked file to HEAD and, critically,
+leaves no reflog entry on the branch (only on the stash ref), which is
+why earlier investigations (tsk-3wq's own Round 3 evidence) found no
+reflog trace of a reset/checkout. tsk-cgg's own experiments ruled out
+`git merge --abort` and `restoreTrackedFgos` (`src/runner/session.mjs`)
+directly; stash is the confirmed fingerprint match.
+
+**Finding — the real gap is cadence/wiring, not absence.** `tsk-1ji`
+(`docs/history/events-jsonl-merge-abort-truncation-gap/`, currently
+claimed and being planned by a different, concurrent session — different
+`writer.id` than this session, branch `fgw/tsk-1ji` checked out in another
+live worktree) already root-caused tsk-24e's own fresh evidence (tsk-4oq's
+~26-event history vanishing) to this exact tsk-cgg-diagnosed mechanism,
+and live-confirmed a real-world efficacy gap in the detector itself:
+`events-jsonl-not-truncated` only runs when a human/session explicitly
+invokes `fgos doctor` — nothing in the normal pick/return/approve/submit
+flow calls it. tsk-1ji found the sidecar mark stayed unadvanced for ~2.5
+hours across dozens of other items' concurrent activity before anyone ran
+`doctor` again, by which point the real truncation had already happened
+AND been papered over by enough subsequent legitimate growth that the
+next `doctor` run still reported `passed:true` — a structural blind spot
+in a fixed-single-position mark-and-hash design, not a flaw in tsk-cgg's
+implementation. tsk-1ji's own proposed directions (not yet locked) are
+close to this item's own D1/D2: run the check far more frequently
+(opportunistically inside `appendEvent`, or wired into pick/return/
+approve's own `main-checkout-lock` acquisition), or guard fgOS's own git
+operations against the main checkout directly (audit checkout/reset/
+clean/stash call sites, hold `events.lock` for their duration).
+
+**Verdict: Clear.** tsk-1ji is a properly-scoped, already-in-flight,
+more accurate continuation of exactly what this item's own D1/D2 were
+reasoning toward — it already `deps: [tsk-24e, tsk-cgg]`. Per user
+decision (2026-08-20, live conversation): tsk-24e's own remaining scope
+narrows to evidence/diagnosis (already complete) rather than an
+independent implementation plan; the actual fix rides on tsk-1ji. See
+`CONTEXT.md` D3 for the locked scope-narrowing decision.

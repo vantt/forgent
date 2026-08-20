@@ -22,6 +22,17 @@ place. Out of scope: re-litigating the three already-fixed race classes,
 or the tsk-1el stale-`main-checkout-lock` correlation (settled below as
 coincidental, no follow-up).
 
+**Correction (Round 2, same day):** the "never-implemented gap" framing
+above was wrong on one factual point — `tsk-cgg` (done, merged) already
+built a real detector (`src/state/events-jsonl-truncation-guard.mjs`,
+`fgos doctor`-registered). The actual gap is detection cadence/wiring, not
+absence, and `tsk-1ji` (already claimed and in `planning` by a different,
+concurrent session, `deps: [tsk-24e, tsk-cgg]`) is already carrying a
+properly-scoped fix for it — see D3 and `RESEARCH.md` Round 2. tsk-24e's
+own remaining scope narrows accordingly: D1/D2 stay as valid guidance for
+whoever implements, but this item itself does not duplicate tsk-1ji's
+plan.
+
 ## Reasoning behind D1 and D2
 
 D1 (guard behavior) and D2 (commit cadence) were locked live in
@@ -51,6 +62,19 @@ matters (wall-clock exposure window), matching the observed failure shape
 rather than a proxy for it (verb-call count, or an item's own lifecycle
 checkpoint that says nothing about how long a single stage takes).
 
+**D3 — scope narrows to diagnosis, defer implementation to tsk-1ji.**
+Discovered at planning time (`fgos graph tsk-24e --json`): `tsk-cgg` (done)
+already implemented a real detector for this exact class of loss, and
+`tsk-1ji` (already open, `deps: [tsk-24e, tsk-cgg]`, actively being planned
+by a different concurrent session) already root-caused this item's own
+fresh evidence to that same mechanism and is carrying forward a fix shape
+matching D1/D2. Writing a second, independent implementation plan on
+tsk-24e would duplicate tsk-1ji's own in-flight work. User decision
+(2026-08-20, live conversation): tsk-24e stays a thin pass-through —
+D1/D2 remain recorded here as guidance for whoever implements the fix
+(most likely inside tsk-1ji's own plan), but this item's own `plan.md`
+does not re-derive that implementation itself.
+
 ## Locked decisions
 
 | D-ID | Quyết định |
@@ -60,6 +84,8 @@ checkpoint that says nothing about how long a single stage takes).
 | — | Second live reproduction (tsk-1el, 2026-08-20 ~09:12-09:20): fgos return reported real success (from:doing, to:awaiting-approval, passed:true, seq:22207) but the write never landed durably -- a fresh fgos list --id minutes later showed status back at doing, stage executing, and the item's own parkReason field still stuck on a value (human-question) that should have cleared 20+ minutes earlier at fgos answer time. Raw .fgos/events.jsonl had zero trace of the return event or of two prior fgos report calls I made (their own reported seq values, 22168/22207, exceeded the file's actual max seq at read time). fgos lock-status at the moment of discovery showed outcome:stale, holderPid a DIFFERENT session's string identity (not mine), lockAgeMs 517034 (8m37s), remainingTtlMs 0 -- a stale lock from another concurrent session's operation overlapping the exact window my return call ran in. Re-running fgos return afterward (lock now free) landed durably on the first try (seq 22214, confirmed by a fresh read). This correlates the data-loss window with a concurrently-held, since-expired main-checkout lock from a different session's identity -- a candidate lead for the discovery scope's own open question about withLockRetry/CAS protection under real concurrent multi-session load. Branch/commits themselves were never at risk (git history stayed fully intact throughout) -- only the .fgos/ event-log bookkeeping of the transition was lost. |
 | D1 | guard behavior for a raw force-checkout/reset threatening uncommitted .fgos/events.jsonl is detect-and-warn, never block -- matches this repo's existing events-jsonl-contiguous doctor-check precedent (detect + fgos doctor --fix, never refuses an operation). Blocking rejected: no clean git-native pre-reset/pre-checkout-force hook exists without real plumbing risk, and a false-positive block would refuse a person's own legitimate recovery operation, a worse failure mode than the data loss it prevents. |
 | D2 | auto-commit cadence for .fgos/events.jsonl on the shared main checkout is time-based periodic (a fixed wall-clock interval, independent of how many fgos verb calls happened), not per-verb-call and not checkpoint-only. Per-verb-call rejected: real git-commit overhead on every single mutating call across potentially many concurrent sessions, plus git log/blame noise. Checkpoint-only (e.g. at return/approve) rejected: reproduces the exact gap already observed today -- a long multi-step stage sits uncommitted for the whole stage duration. Time-based periodic directly bounds the quantity that actually matters (wall-clock exposure window), matching the actual observed failure shape. |
+| — | auto-approved CONTEXT.md gate for tsk-24e at level standard |
+| D3 | tsk-24e's own remaining scope narrows to evidence-gathering/diagnosis (already complete), not an independent implementation of D1/D2. tsk-cgg (done) already built a real code-level detector (src/state/events-jsonl-truncation-guard.mjs, fgos doctor-registered) -- Round 1 research's claim that no guard existed was wrong. tsk-1ji (currently claimed/planning by a different concurrent session, deps: [tsk-24e, tsk-cgg]) already root-caused this item's own fresh evidence to the exact tsk-cgg-diagnosed mechanism (git stash reverting the tracked uncommitted tail) and is already carrying forward a fix shape matching D1/D2 (higher-frequency detection wiring, or guarding fgOS's own git operations directly). D1/D2 stay valid as guidance for whoever implements the fix; tsk-24e itself will not duplicate tsk-1ji's plan. |
 
 ## Pinned terms
 
@@ -114,6 +140,11 @@ checkpoint that says nothing about how long a single stage takes).
   was rejected there (its own guard already aborts on any `.fgos/` path).
 - `docs/history/main-checkout-lock-toctou-race/CONTEXT.md` — tsk-2tm's
   scope, cited above to distinguish it from this item.
+- `docs/history/events-jsonl-git-tracked-truncation/CONTEXT.md` — tsk-cgg
+  (done), the real detector D3 discovered already exists.
+- `docs/history/events-jsonl-merge-abort-truncation-gap/` — tsk-1ji's own
+  docsRef (not yet on the main checkout as of this writing; lives on
+  branch `fgw/tsk-1ji`), the item now carrying this fix forward.
 
 ## Outstanding questions
 
