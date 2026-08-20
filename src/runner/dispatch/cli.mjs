@@ -85,7 +85,7 @@ export function executorIdForWork(work, stage) {
  * 3. Otherwise -> select deterministically by declaration order (first matching agent-type in `agentDefs`).
  */
 export function resolveAgentTypeForTaskSpec(taskSpecHeader, agentDefs = [], currentAgentType = null) {
-  if (!taskSpecHeader) return currentAgentType || (agentDefs[0]?.name ?? null);
+  if (!taskSpecHeader) return null;
 
   const pinnedAgents = Array.isArray(taskSpecHeader.agent)
     ? taskSpecHeader.agent
@@ -95,7 +95,7 @@ export function resolveAgentTypeForTaskSpec(taskSpecHeader, agentDefs = [], curr
 
   if (pinnedAgents.length > 0) {
     const found = agentDefs.find((a) => pinnedAgents.includes(a.name));
-    return found ? found.name : pinnedAgents[0];
+    return found ? found.name : null;
   }
 
   const requiredSkills = Array.isArray(taskSpecHeader['requires-skill'])
@@ -105,7 +105,7 @@ export function resolveAgentTypeForTaskSpec(taskSpecHeader, agentDefs = [], curr
       : [];
 
   if (requiredSkills.length === 0) {
-    return currentAgentType || (agentDefs[0]?.name ?? null);
+    return null;
   }
 
   if (currentAgentType) {
@@ -121,7 +121,7 @@ export function resolveAgentTypeForTaskSpec(taskSpecHeader, agentDefs = [], curr
   );
   if (matching) return matching.name;
 
-  return currentAgentType || (agentDefs[0]?.name ?? null);
+  return null;
 }
 
 /**

@@ -4099,6 +4099,38 @@ test('resolveAgentTypeForTaskSpec implements D32 tie-break scenarios correctly',
   );
 });
 
+test('resolveAgentTypeForTaskSpec refuses (returns null) across all 4 unvalidated/mismatched fail-close sites', () => {
+  const agentDefs = [
+    { name: 'agent-alpha', skills: ['code-review', 'implementation'] },
+    { name: 'agent-beta', skills: ['implementation', 'planning'] },
+  ];
+
+  // 1. null/falsy taskSpecHeader -> returns null
+  assert.equal(resolveAgentTypeForTaskSpec(null, agentDefs, 'agent-alpha'), null);
+  assert.equal(resolveAgentTypeForTaskSpec(undefined, agentDefs, 'agent-alpha'), null);
+
+  // 2. pinned agent not in roster -> returns null (refuses unvalidated pinned name)
+  assert.equal(
+    resolveAgentTypeForTaskSpec({ agent: ['nonexistent-agent'] }, agentDefs, 'agent-alpha'),
+    null,
+  );
+
+  // 3. no requires-skill & no pin -> returns null
+  assert.equal(resolveAgentTypeForTaskSpec({}, agentDefs, 'agent-alpha'), null);
+  assert.equal(resolveAgentTypeForTaskSpec({ 'requires-skill': [] }, agentDefs, 'agent-alpha'), null);
+  assert.equal(resolveAgentTypeForTaskSpec({ 'requires-skill': '  ' }, agentDefs, 'agent-alpha'), null);
+
+  // 4. no agent in roster matches required skills -> returns null
+  assert.equal(
+    resolveAgentTypeForTaskSpec(
+      { 'requires-skill': ['nonexistent-skill'] },
+      agentDefs,
+      'agent-alpha',
+    ),
+    null,
+  );
+});
+
 test('decideExecutorCli resolves work-item-based (--work) to the same result a positional executorId would, plus the resolved executorId -- explicit executors.<id> override case', async () => {
   const root = mkTempDir();
   const fgosDir = path.join(root, '.fgos');
