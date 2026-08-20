@@ -7,7 +7,7 @@
 // This is the "one door" for claiming work — no direct moveWork(to:'doing')
 // calls outside this module except for FSM-internal transitions.
 
-import { moveWork, addOutcome, addDecision, readRawEvents, FsmError } from '../state/store.mjs';
+import { moveWork, addOutcome, addDecision, readRawEvents, readRawEventsAndText, FsmError } from '../state/store.mjs';
 import { foldEvents } from '../state/replay.mjs';
 import { isResolvedStatus, resolveRoot } from '../state/frontier.mjs';
 import { visitCount } from './anti-loop.mjs';
@@ -16,6 +16,7 @@ import { createClaimWorktree, branchNameFor, branchExists } from './worktree.mjs
 import { lastActivityAt, isReclaimEligible } from './claim-liveness.mjs';
 import { hasWorkerSlotRoom } from '../state/worker-slots.mjs';
 import { readSharedConfigOrEmpty } from '../config/shared-config-file.mjs';
+import { runOpportunisticMainCheckoutChecks } from '../state/events-jsonl-truncation-guard.mjs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
@@ -118,7 +119,8 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
   }
 
   try {
-    const rawEvents = readRawEvents(dir);
+    const { events: rawEvents, text: rawLog } = readRawEventsAndText(dir);
+    runOpportunisticMainCheckoutChecks(dir, repoRoot, { rawLog });
     const view = foldEvents(rawEvents);
     const item = view.work[id];
 

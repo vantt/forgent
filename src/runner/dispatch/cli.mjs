@@ -519,11 +519,14 @@ export async function executeExecutorCli(
     const result = await adapterFn({ command, args }, { cwd, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId: executorId, tier, model });
     const headAfter = captureHeadSha(cwd);
     const stdoutStr = result && typeof result.stdout === 'string' ? result.stdout : '';
-    const hasSignal = stdoutStr.includes('[DONE]') || stdoutStr.includes('[BLOCKED]');
+    const cleanStdout = stdoutStr.replace(/`+[\s\S]*?`+/g, '');
+    const hasSignal = cleanStdout.includes('[DONE]') || cleanStdout.includes('[BLOCKED]');
+    const isDone = cleanStdout.includes('[DONE]');
     const base = {
       mechanism,
       ...result,
       ...(hasSignal ? {} : { outcome: 'unsignaled', headBefore, headAfter }),
+      ...(isDone && headAfter ? { verifiedSha: headAfter } : {}),
       provider,
       command,
     };
@@ -795,7 +798,11 @@ export async function fanoutBatchExecutorCli(
         work: workItem,
       });
 
-      execFileSync(process.execPath, [BIN_FGOS_PATH, 'return', candidateId, '--dir', root], {
+      const returnArgs = ['return', candidateId, '--dir', root];
+      if (execRes && execRes.verifiedSha) {
+        returnArgs.push('--worker-verified-sha', execRes.verifiedSha);
+      }
+      execFileSync(process.execPath, [BIN_FGOS_PATH, ...returnArgs], {
         cwd: wtPath,
         encoding: 'utf8',
         stdio: ['ignore', 'pipe', 'pipe'],

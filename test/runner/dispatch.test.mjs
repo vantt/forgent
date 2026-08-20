@@ -3343,6 +3343,64 @@ test('executeExecutorCli omits outcome and head shas when stdout contains [DONE]
   assert.equal(resBlocked.headAfter, undefined);
 });
 
+test('executeExecutorCli includes verifiedSha on [DONE] when cwd is a git repo, and omits verifiedSha on [BLOCKED]', async () => {
+  const dir = mkTempDir();
+  const scriptDonePath = path.join(dir, 'done-executor.mjs');
+  fs.writeFileSync(scriptDonePath, 'process.stdout.write("task complete [DONE]\\n"); process.exit(0);');
+  const scriptBlockedPath = path.join(dir, 'blocked-executor.mjs');
+  fs.writeFileSync(scriptBlockedPath, 'process.stdout.write("task stuck [BLOCKED]\\n"); process.exit(0);');
+
+  const { repoRoot: gitRepo, headCommit } = mkTempGitRepo();
+  writeRunnerConfigFixture(gitRepo, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: {
+      'done-executor': { kind: 'agent', command: process.execPath, args: [scriptDonePath, '{prompt}'], allowCrossProvider: true },
+      'blocked-executor': { kind: 'agent', command: process.execPath, args: [scriptBlockedPath, '{prompt}'], allowCrossProvider: true },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+
+  const resDone = await executeExecutorCli('done-executor', { repoRoot: gitRepo, cwd: gitRepo, prompt: 'p' });
+  assert.equal(resDone.verifiedSha, headCommit);
+
+  const resBlocked = await executeExecutorCli('blocked-executor', { repoRoot: gitRepo, cwd: gitRepo, prompt: 'p' });
+  assert.equal(resBlocked.verifiedSha, undefined);
+});
+
+test('executeExecutorCli returns outcome:"unsignaled" when [DONE] or [BLOCKED] appears only inside backtick-quoted text', async () => {
+  const dir = mkTempDir();
+  const scriptQuotedPath = path.join(dir, 'quoted-executor.mjs');
+  fs.writeFileSync(
+    scriptQuotedPath,
+    'process.stdout.write("implemented the `[DONE]` and `[BLOCKED]` token scan\\n"); process.exit(0);',
+  );
+  const scriptQuotedAndDonePath = path.join(dir, 'quoted-and-done-executor.mjs');
+  fs.writeFileSync(
+    scriptQuotedAndDonePath,
+    'process.stdout.write("implemented `[DONE]` scan\\n\\n[DONE]\\n"); process.exit(0);',
+  );
+
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: {
+      'quoted-executor': { kind: 'agent', command: process.execPath, args: [scriptQuotedPath, '{prompt}'], allowCrossProvider: true },
+      'quoted-and-done-executor': { kind: 'agent', command: process.execPath, args: [scriptQuotedAndDonePath, '{prompt}'], allowCrossProvider: true },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+
+  const resQuoted = await executeExecutorCli('quoted-executor', { repoRoot: root, cwd: process.cwd(), prompt: 'p' });
+  assert.equal(resQuoted.outcome, 'unsignaled');
+  assert.equal(typeof resQuoted.headBefore, 'string');
+  assert.equal(typeof resQuoted.headAfter, 'string');
+
+  const resQuotedAndDone = await executeExecutorCli('quoted-and-done-executor', { repoRoot: root, cwd: process.cwd(), prompt: 'p' });
+  assert.equal(resQuotedAndDone.outcome, undefined);
+});
+
 test('executeExecutorCli throws when no executor is registered for the given purpose — nothing left to execute', async () => {
   const root = mkTempDir();
   writeRunnerConfigFixture(root, {

@@ -190,7 +190,7 @@ function compareReadyOrder(a, b) {
 // field never contribute an entry, so a view with no lineage at all yields
 // an empty index and `hasOpenDescendant` below short-circuits to `false` for
 // every id — the exact no-op this filter must be on a parent-less log.
-function indexChildrenByParent(work) {
+export function indexChildrenByParent(work) {
   const index = {};
   for (const id of Object.keys(work)) {
     const parent = work[id].parent;
@@ -311,7 +311,7 @@ export function resolveRoot(view, id) {
 // this into an infinite walk — it never occurs on data produced by the
 // decompose engine, only a defensive backstop.
 
-function hasOpenDescendant(id, work, childrenByParent, seen = new Set()) {
+export function hasOpenDescendant(id, work, childrenByParent, seen = new Set()) {
   const children = childrenByParent[id];
   if (!children) return false;
   for (const childId of children) {

@@ -30,6 +30,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
+import { execFileSync } from "node:child_process";
+import { recordMainCheckoutGuardWarning } from "./main-checkout-guard-warnings.mjs";
 
 function lastNonEmptyLine(raw) {
   const lines = raw.split("\n");
@@ -189,3 +191,90 @@ export function advanceEventsJsonlTruncationGuard(logPath, guardPath) {
   }
   return report;
 }
+
+export const PERIODIC_CHECKPOINT_INTERVAL_SEC = 900; // 15 minutes
+
+/**
+ * Runs opportunistic checks immediately after main checkout lock acquisition:
+ * D1: Advance truncation guard and record warning on break (never throws/blocks).
+ * D2: Time-based periodic auto-commit of .fgos/events.jsonl if stale and dirty (never throws/blocks).
+ *
+ * @param {string} dir - .fgos directory or repo root
+ * @param {string} [repoRoot] - optional repository root (defaults to parent of dir if dir is .fgos)
+ * @param {Object} [opts] - optional options for testing
+ * @param {number} [opts.nowSec] - mock current timestamp (unix seconds)
+ * @param {number} [opts.intervalSec] - override periodic threshold seconds (default 900)
+ */
+export function runOpportunisticMainCheckoutChecks(dir, repoRoot = null, { nowSec = null, intervalSec = PERIODIC_CHECKPOINT_INTERVAL_SEC, rawLog = null } = {}) {
+  const fgosDir = path.basename(dir) === ".fgos" ? dir : path.join(dir, ".fgos");
+  const realRepoRoot = repoRoot || (path.basename(dir) === ".fgos" ? path.dirname(dir) : dir);
+
+  // D1: Detect and warn
+  try {
+    const logPath = path.join(fgosDir, "events.jsonl");
+    const guardPath = path.join(fgosDir, "events-jsonl.truncation-guard.json");
+    if (rawLog !== null) {
+      const storedMark = readGuardMark(guardPath);
+      const report = checkTruncationGuard(rawLog, storedMark);
+      if (report.ok && report.mark !== null) {
+        writeGuardMark(guardPath, report.mark);
+      } else if (!report.ok) {
+        recordMainCheckoutGuardWarning(fgosDir, report);
+      }
+    } else if (fs.existsSync(logPath)) {
+      const report = advanceEventsJsonlTruncationGuard(logPath, guardPath);
+      if (report && report.ok === false) {
+        recordMainCheckoutGuardWarning(fgosDir, report);
+      }
+    }
+  } catch {
+    // Non-blocking: swallow error
+  }
+
+  // D2: Time-based periodic auto-commit
+  try {
+    const logPath = path.join(fgosDir, "events.jsonl");
+    if (fs.existsSync(logPath)) {
+      const relPath = path.relative(realRepoRoot, logPath) || ".fgos/events.jsonl";
+      const statusOut = execFileSync("git", ["status", "--porcelain", "--", relPath], {
+        cwd: realRepoRoot,
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "ignore"],
+      }).trim();
+
+      if (statusOut.length > 0) {
+        let lastCommitSec = null;
+        try {
+          const logOut = execFileSync("git", ["log", "-1", "--format=%ct", "--", relPath], {
+            cwd: realRepoRoot,
+            encoding: "utf8",
+            stdio: ["ignore", "pipe", "ignore"],
+          }).trim();
+          if (logOut) {
+            const parsed = parseInt(logOut, 10);
+            if (!Number.isNaN(parsed)) {
+              lastCommitSec = parsed;
+            }
+          }
+        } catch {
+          lastCommitSec = null;
+        }
+
+        const currentTimeSec = nowSec !== null ? nowSec : Math.floor(Date.now() / 1000);
+        if (lastCommitSec === null || (currentTimeSec - lastCommitSec) >= intervalSec) {
+          execFileSync("git", ["add", relPath], {
+            cwd: realRepoRoot,
+            stdio: ["ignore", "pipe", "ignore"],
+          });
+          execFileSync("git", ["commit", "-m", "chore(.fgos): periodic events.jsonl checkpoint", "--", relPath], {
+            cwd: realRepoRoot,
+            stdio: ["ignore", "pipe", "ignore"],
+          });
+        }
+      }
+    }
+  } catch {
+    // Non-blocking: swallow error
+  }
+}
+
