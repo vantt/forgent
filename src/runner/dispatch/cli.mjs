@@ -11,6 +11,7 @@
 // below unchanged as a barrel. See `docs/history/dispatch-activation-and-
 // handoff-redesign/CONTEXT.md` D7 for the split rationale.
 
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
@@ -828,8 +829,22 @@ export function runDispatchCli() {
       // branch was the one caller that never passed it -- RESEARCH.md).
       // stdout is left untouched, still carrying only the single final JSON
       // line below, so a scripted caller's JSON.parse(stdout) sees no change.
+      let prompt = flagValue('--prompt') ?? '';
+      const promptFile = flagValue('--prompt-file');
+      if (promptFile) {
+        try {
+          prompt = fs.readFileSync(promptFile, 'utf8');
+        } catch (err) {
+          process.stdout.write(
+            `${JSON.stringify(err instanceof DispatchError ? { error: err.message, errorClass: err.errorClass } : { error: err.message })}\n`,
+          );
+          process.stderr.write(`${err.message}\n`);
+          process.exitCode = 1;
+          break;
+        }
+      }
       executeExecutorCli(executorId, {
-        prompt: flagValue('--prompt') ?? '',
+        prompt,
         model: flagValue('--model'),
         tier: flagValue('--tier'),
         carries: flagValue('--carries'),

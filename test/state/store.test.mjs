@@ -17,7 +17,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fork, execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { addWork, editWork, moveWork, moveStage, addOutcome, addFriction, addDecision, recordGateApprove, listWork, readRawEvents, setFocus, StoreError, assertPlanEvidence } from '../../src/state/store.mjs';
+import { initStore, addWork, editWork, moveWork, moveStage, addOutcome, addFriction, addDecision, recordGateApprove, listWork, readRawEvents, setFocus, StoreError, assertPlanEvidence } from '../../src/state/store.mjs';
 import { appendEvent } from '../../src/state/events.mjs';
 import { REGISTRY, ENV, PID, UNRESOLVED } from "../../src/util/session-identity.mjs";
 import { MAX_TITLE_LENGTH } from '../../src/state/work.mjs';
@@ -839,6 +839,28 @@ test('writeView writes state.json via a temp-file-then-rename, never a direct wr
   assert.ok(fs.existsSync(viewPath), 'state.json must exist after the rename');
   assert.ok(!fs.existsSync(viewRenames[0].from), 'the temp file must no longer exist after rename(2) moved it');
   JSON.parse(fs.readFileSync(viewPath, 'utf8'));
+});
+
+// tsk-37d: writeView must stringify the view object only once per write
+test('writeView serializes view content only once per mutation (tsk-37d)', () => {
+  const dir = tmpDir();
+  let viewStringifyCount = 0;
+  const originalStringify = JSON.stringify;
+  JSON.stringify = function patchedStringify(obj, ...args) {
+    if (obj && typeof obj === 'object' && obj !== null && typeof obj.work === 'object') {
+      viewStringifyCount += 1;
+    }
+    return originalStringify.call(this, obj, ...args);
+  };
+  try {
+    initStore(dir);
+    addSampleWork(dir, 'single-stringify-check');
+  } finally {
+    JSON.stringify = originalStringify;
+  }
+  // initStore (1 write) + addSampleWork (1 write) = 2 writes.
+  // For each write, the view object must be stringified exactly once.
+  assert.equal(viewStringifyCount, 2, 'the full view object must be stringified exactly once per state write');
 });
 
 // --- str73-done-flip-cos-check cell 2: per-clause CoS done-gate ------------

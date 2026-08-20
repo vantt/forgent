@@ -647,6 +647,24 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'faults',
+    invoke: 'fgos faults',
+    description: 'Read-only: the machine-readable surface for .fgos/invocation-faults.jsonl, the side log recordInvocationFault writes when a fgos call is malformed (unknown verb, missing store, a bad --dir, an arg-parse fault) — never for a verb\'s own business refusal. Returns every record in append order (oldest first) plus the total count; --limit caps it to the N most recent (still oldest-of-those-first). Resolves the log the same worktree-safe way it is written: from a linked worktree with no --dir, this still reads the main checkout\'s real log rather than an empty view.',
+    parameters: {
+      type: 'object',
+      properties: {
+        limit: { type: 'integer', description: 'Return only the N most recently recorded faults instead of the full log.' },
+      },
+      required: [],
+    },
+    examples: ['fgos faults', 'fgos faults --limit 20'],
+    touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
     name: 'recheck-blocked',
     invoke: 'fgos recheck-blocked',
     description: 'Read-only, report-only advisory: re-runs the merge-still-resolves ancestry check LIVE against every current status:blocked item, instead of trusting its stored reason/detail text (the same live-recheck stance fgos catchup\'s own eligibility gate already takes). Reports which blocked items would now pass that check (resolvable), which are still genuinely blocked (stillBlocked), and which the check does not apply to at all — a non-worktree-backed domain, or an item with no recorded merge commit (notApplicable). Never transitions anything; run fgos catchup <id> to actually act on a resolvable item.',

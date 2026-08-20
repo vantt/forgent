@@ -148,6 +148,26 @@ function copyDirRecursive(sourceDir, targetDir) {
 }
 
 /**
+ * Mirrors the 14 coding-domain dev-skills (`fgos-*`) and `_shared/` from
+ * `agentsSkillsRoot` (`.agents/skills`) into `pluginSkillsRoot`
+ * (`plugins/fgOS/skills`). Returns the list of target skill directory paths written.
+ */
+export function mirrorDevSkillsIntoPlugin(agentsSkillsRoot, pluginSkillsRoot) {
+  const mirrored = [];
+  if (!fs.existsSync(agentsSkillsRoot)) return mirrored;
+  for (const entry of fs.readdirSync(agentsSkillsRoot, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    if (entry.name !== '_shared' && !entry.name.startsWith('fgos-')) continue;
+    const sourceDir = path.join(agentsSkillsRoot, entry.name);
+    const targetDir = path.join(pluginSkillsRoot, entry.name);
+    copyDirRecursive(sourceDir, targetDir);
+    mirrored.push(targetDir);
+  }
+  return mirrored;
+}
+
+
+/**
  * Assembles `.agents/skills/*` from `core/skills/*` and `domains/[domain]/skills/*`
  * (D7 of docs/history/core-foundation-domain-boundary/DISCUSSION.md).
  *
