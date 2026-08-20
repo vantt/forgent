@@ -205,6 +205,32 @@ test('materializeSkillsIntoProject runs assembly first so core/skills and domain
   assert.ok(fs.existsSync(path.join(targetRoot, '.claude', 'skills', 'fgos-coding-implement', 'SKILL.md')));
 });
 
+test('materializeSkillsIntoProject never deletes packageRoot base skills it just copied in, even when targetRoot has its own domains/*/skills but no core/skills', () => {
+  // Regression: an external project adopting fgOS (domain-pluggable, no
+  // core/skills of its own) has a domains/ tree, which bypasses
+  // assembleSkills's "neither core/skills nor domains/ exists" early
+  // return -- its own prune pass would then treat every packageRoot base
+  // skill just copied into targetRoot's .agents/skills as an orphan
+  // (absent from targetRoot's own core/skills+domains/*/skills) and
+  // delete it, since only packageRoot ever declared those names.
+  const packageRoot = mkTempDir('skill-wrappers-mat-noprune-pkg-');
+  writeSkill(path.join(packageRoot, '.agents', 'skills'), 'fgos-routing', SAMPLE_FRONTMATTER, '# base routing\n');
+  writeSkill(path.join(packageRoot, '.agents', 'skills'), 'fgos-coding-implement', SAMPLE_FRONTMATTER, '# base implement\n');
+
+  const targetRoot = mkTempDir('skill-wrappers-mat-noprune-target-');
+  writeSkill(path.join(targetRoot, 'domains', 'myapp', 'skills'), 'myapp-custom-skill', SAMPLE_FRONTMATTER, '# custom\n');
+
+  const { wrappersWritten } = materializeSkillsIntoProject(packageRoot, targetRoot);
+
+  assert.ok(fs.existsSync(path.join(targetRoot, '.agents', 'skills', 'fgos-routing', 'SKILL.md')), 'packageRoot base skill fgos-routing must survive');
+  assert.ok(fs.existsSync(path.join(targetRoot, '.agents', 'skills', 'fgos-coding-implement', 'SKILL.md')), 'packageRoot base skill fgos-coding-implement must survive');
+  assert.ok(fs.existsSync(path.join(targetRoot, '.agents', 'skills', 'myapp-custom-skill', 'SKILL.md')), 'targetRoot own domain skill must also be assembled in');
+  assert.deepEqual(
+    wrappersWritten.map((p) => path.basename(path.dirname(p))).sort(),
+    ['fgos-coding-implement', 'fgos-routing', 'myapp-custom-skill'],
+  );
+});
+
 // --- Drift guard: committed .agents/skills vs core/skills+domains/*/skills (review finding H6) ---
 //
 // D7 makes core/skills/ + domains/<name>/skills/ the canonical AUTHORING
@@ -303,7 +329,7 @@ test('generateAllSkillWrappers prunes orphaned wrappers from .claude/skills when
   assert.equal(fs.existsSync(path.join(claudeSkillsRoot, 'skill-orphaned')), false);
 });
 
-test('generateAllSkillWrappers never prunes a standalone skill under .claude/skills that was never a generated wrapper (regression: tsk-3ti-10 deleted .claude/skills/ui-spec)', () => {
+test('generateAllSkillWrappers never prunes a standalone skill under .claude/skills that was never a generated wrapper (regression: pruning by name-absence alone previously deleted a hand-authored skill directory)', () => {
   const agentsSkillsRoot = mkTempDir('skill-wrappers-prune-standalone-agents-');
   const claudeSkillsRoot = mkTempDir('skill-wrappers-prune-standalone-target-');
 

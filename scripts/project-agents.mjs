@@ -37,6 +37,12 @@ import { modelForTier } from '../src/runner/dispatch.mjs';
 const REPO_ROOT = path.resolve(import.meta.dirname, '..');
 const TARGET_DIR = path.join(REPO_ROOT, '.claude', 'agents');
 
+// The exact sourceLabel findAgentYamlFiles gives its legacy agents/ scan
+// (below) -- shared as a constant, not a bare 'agents' string literal
+// re-typed independently in resolveAgentFiles, so the two can never drift
+// apart and silently stop matching each other.
+const LEGACY_AGENTS_SOURCE = 'agents';
+
 const FORBIDDEN_PLATFORM_NAMES = ['claude', 'codex', 'anthropic'];
 
 const REQUIRED_FIELDS = ['name', 'version', 'description', 'role', 'persona', 'decision_boundary', 'model_tier', 'tool-scope'];
@@ -165,7 +171,7 @@ export function findAgentYamlFiles(repoRoot) {
     }
   }
 
-  scanDir(path.join(repoRoot, 'agents'), 'agents');
+  scanDir(path.join(repoRoot, 'agents'), LEGACY_AGENTS_SOURCE);
 
   return files;
 }
@@ -243,8 +249,8 @@ export function resolveAgentFiles(agentFiles, repoRoot = REPO_ROOT) {
       continue;
     }
 
-    const nonLegacy = entries.filter((e) => e.source !== 'agents');
-    const legacy = entries.filter((e) => e.source === 'agents');
+    const nonLegacy = entries.filter((e) => e.source !== LEGACY_AGENTS_SOURCE);
+    const legacy = entries.filter((e) => e.source === LEGACY_AGENTS_SOURCE);
 
     if (nonLegacy.length === 1 && legacy.length > 0) {
       const winner = nonLegacy[0];

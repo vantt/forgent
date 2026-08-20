@@ -77,7 +77,7 @@ export function extractDomainCouplings(file, source, domainNames = []) {
     targets.push(target);
   }
 
-  const pathPattern = /['"`](?:\.[\/\\])*domains\/([a-zA-Z0-9_-]+)(?:[\/\\][^'"`]*)?['"`]/g;
+  const pathPattern = /['"`](?:\.\.?[\/\\])*domains\/([a-zA-Z0-9_-]+)(?:[\/\\][^'"`]*)?['"`]/g;
   for (const m of cleanSource.matchAll(pathPattern)) {
     targets.push(m[0].slice(1, -1));
   }
@@ -90,13 +90,19 @@ export function extractDomainCouplings(file, source, domainNames = []) {
   }
 
   if (!file.startsWith('domains/')) {
+    const lines = cleanSource.split('\n');
+    // Only the DEFAULT_DOMAIN declaration itself is exempt -- a broader
+    // "line mentions DEFAULT_DOMAIN and has an '=' anywhere" guard would
+    // also swallow a genuine hardcoded-literal coupling that happens to
+    // share a line with a DEFAULT_DOMAIN comparison/ternary, e.g.
+    // `if (domain !== DEFAULT_DOMAIN && domain !== 'coding')`.
+    const isDefaultDomainDeclaration = (line) => /^\s*(export\s+)?const\s+DEFAULT_DOMAIN\s*=/.test(line);
     for (const domain of domainNames) {
       const single = "'" + domain + "'";
       const double = '"' + domain + '"';
       const backtick = '`' + domain + '`';
-      const lines = cleanSource.split('\n');
       for (const line of lines) {
-        if (line.includes('DEFAULT_DOMAIN') && line.includes('=')) {
+        if (isDefaultDomainDeclaration(line)) {
           continue;
         }
         if (line.includes(single) || line.includes(double) || line.includes(backtick)) {
@@ -217,5 +223,22 @@ test('domain-siloing: phát hiện vi phạm fixture (core → domain cụ thể
   const defaultDomainDefOnly = "export const DEFAULT_DOMAIN = 'coding';";
   const defTargets = extractDomainCouplings('src/state/workflow-stage-graphs.mjs', defaultDomainDefOnly, ['coding']);
   assert.deepEqual(defTargets, []);
+
+  // Regression: the DEFAULT_DOMAIN guard must exempt only the declaration
+  // line itself, never any line that merely mentions DEFAULT_DOMAIN
+  // alongside an unrelated hardcoded literal (e.g. a comparison/ternary).
+  const mixedLine = "const target = mode === DEFAULT_DOMAIN ? primary : 'marketing';";
+  assert.deepEqual(
+    extractDomainCouplings('src/sample.mjs', mixedLine, ['coding', 'marketing']),
+    ['domains/marketing'],
+  );
+
+  // Regression: a quoted literal path reaching up more than one directory
+  // level (../domains/..., not just ./domains/...) must still be caught.
+  const parentRelativeLiteral = `const p = "../domains/coding/foo.md";`;
+  assert.deepEqual(
+    extractDomainCouplings('src/deep/sample.mjs', parentRelativeLiteral, ['coding']),
+    ['../domains/coding/foo.md'],
+  );
 });
 

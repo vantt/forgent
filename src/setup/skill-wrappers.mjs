@@ -180,7 +180,7 @@ export function mirrorDevSkillsIntoPlugin(agentsSkillsRoot, pluginSkillsRoot) {
  * Safe no-op when neither `core/skills` nor `domains/` exist. Returns array
  * of target paths written/assembled.
  */
-export function assembleSkills(projectRoot, targetAgentsSkills) {
+export function assembleSkills(projectRoot, targetAgentsSkills, { prune = true } = {}) {
   const agentsSkillsRoot = targetAgentsSkills ?? path.join(projectRoot, '.agents', 'skills');
   const coreSkillsRoot = path.join(projectRoot, 'core', 'skills');
   const domainsRoot = path.join(projectRoot, 'domains');
@@ -261,7 +261,19 @@ export function assembleSkills(projectRoot, targetAgentsSkills) {
     assembled.push(targetPath);
   }
 
-  if (fs.existsSync(agentsSkillsRoot)) {
+  // `prune` defaults to true (the tsk-3ti-10 fix this belongs to): a
+  // self-hosting or plain-project call to assembleSkills owns the whole of
+  // `agentsSkillsRoot` and any entry it can't derive from `projectRoot`'s
+  // own core/skills + domains/*/skills is a real orphan. `materializeSkillsIntoProject`
+  // below is the one caller that must NOT prune here: it has already
+  // copied `packageRoot`'s own assembled skills into this exact
+  // `agentsSkillsRoot` and calls assembleSkills(targetRoot) only to layer
+  // the target's own domain skills on top -- pruning there would delete
+  // the just-copied base skills whenever the target project has a
+  // `domains/` of its own (bypassing the early-return above) but no
+  // `core/skills` (the normal external-project shape), since those base
+  // skill names are absent from this call's own validSkillNames.
+  if (prune && fs.existsSync(agentsSkillsRoot)) {
     for (const entry of fs.readdirSync(agentsSkillsRoot, { withFileTypes: true })) {
       if (!validSkillNames.has(entry.name)) {
         const orphanPath = path.join(agentsSkillsRoot, entry.name);
@@ -327,7 +339,13 @@ export function materializeSkillsIntoProject(packageRoot, targetRoot) {
   const copied = path.resolve(packageRoot) !== path.resolve(targetRoot);
   if (copied) {
     copyDirRecursive(sourceAgentsSkills, targetAgentsSkills);
-    assembleSkills(targetRoot);
+    // prune: false -- this call only layers targetRoot's own domain skills
+    // on top of the packageRoot base skills just copied above; the base
+    // skills are never derivable from targetRoot's own core/skills+domains,
+    // so the default prune-orphans pass would delete them outright the
+    // moment targetRoot has any domains/ of its own (see assembleSkills's
+    // own comment on its `prune` parameter).
+    assembleSkills(targetRoot, undefined, { prune: false });
   }
   const wrappersWritten = generateAllSkillWrappers(targetAgentsSkills, targetClaudeSkills);
   return { copied, wrappersWritten };
