@@ -106,7 +106,7 @@ on #1, #7 deps on #1 and #6, #9 deps on #4.
     "action": "src/state/workflow-stage-graphs.mjs:308-320 spreads registryData AFTER workflow-derived fields in domainObj, letting registry.yaml silently override stages/transitions/skillMap/taskSpecMap/stepMap -- while stage-fsm.mjs:94-95 and plan.mjs:560-561 both prefer the workflow-resolved value first. Flip the spread order to match the rest of the codebase's precedence, and add a test (none exists today per RESEARCH.md finding 2's grep of test/ for 'registryData') that pins which side wins when registry.yaml declares a conflicting top-level key",
     "footprint": ["src/state/workflow-stage-graphs.mjs", "test/state/workflow-stage-graphs.test.mjs"],
     "kind": "task",
-    "risk": "medium"
+    "risk": "standard"
   },
   {
     "title": "architecture check: detect hardcoded domain-path/name coupling, not just import specifiers",
@@ -114,7 +114,7 @@ on #1, #7 deps on #1 and #6, #9 deps on #4.
     "action": "test/architecture.test.mjs's domain-siloing check (extractImports, lines 54-67) only scans import/export/dynamic-import specifiers, missing coupling via path.join(cwd,'domains',...) string construction and hardcoded domain-name literals -- confirmed live by RESEARCH.md finding 3's 6 path.join call sites (agent-roster.mjs:46, workflow-stage-graphs.mjs:244,706, registrations.mjs:438,539, skill-wrappers.mjs:125) plus DEFAULT_DOMAIN/prompt-templates.mjs hardcoded 'coding' literals. Extend the check to also scan for these patterns in src/ and bin/, with a false-positive guard for legitimate cross-cutting constants like DEFAULT_DOMAIN itself",
     "footprint": ["test/architecture.test.mjs"],
     "kind": "task",
-    "risk": "medium"
+    "risk": "standard"
   },
   {
     "title": "restore invariant comments deleted during tsk-397 rename in project-agents.mjs and registrations.mjs",
@@ -164,7 +164,7 @@ on #1, #7 deps on #1 and #6, #9 deps on #4.
     "action": "findAgentYamlFiles (scripts/project-agents.mjs:74-118) still scans legacy agents/ as a fallback, but D33's uniqueness check (scripts/project-agents.mjs:166-190) throws unconditionally on any cross-source name collision, with no legacy-loses softness -- confirmed dormant-not-firing today only because the legacy agents/ dir no longer exists (RESEARCH.md finding 9). Assumption pinned here (not material -- repo has zero live legacy files today, so neither option changes current behavior; picking the safer default): change the D33 check so a collision specifically between the legacy agents/ source and core/agents or domains/*/agents is resolved by deprioritizing the legacy entry (core/domain wins, legacy is skipped with a logged warning) rather than throwing, while a collision between two non-legacy sources still throws as today. Add a test simulating a legacy-vs-core name collision to prove the new graceful behavior",
     "footprint": ["scripts/project-agents.mjs"],
     "kind": "task",
-    "risk": "medium",
+    "risk": "standard",
     "deps": [3]
   },
   {
@@ -173,7 +173,7 @@ on #1, #7 deps on #1 and #6, #9 deps on #4.
     "action": "assembleSkills and generateAllSkillWrappers (src/setup/skill-wrappers.mjs:122-162, :62-90) only ever add/overwrite -- a skill deleted from core/domains leaves an orphaned wrapper under .agents/skills/ and .claude/skills/ forever, and two domains (or a domain and core) defining the same skill name silently overwrite each other with no error, confirmed by RESEARCH.md finding 10. Add a prune pass (remove any existing wrapper whose source skill no longer exists) and a collision check mirroring the existing D33 pattern in scripts/project-agents.mjs:166-190 (accumulate name->source Map while assembling, throw on any name with >1 source)",
     "footprint": ["src/setup/skill-wrappers.mjs"],
     "kind": "task",
-    "risk": "medium"
+    "risk": "standard"
   }
 ]
 ```
