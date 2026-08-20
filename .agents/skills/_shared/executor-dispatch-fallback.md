@@ -133,6 +133,9 @@ invocation carries no compound shell syntax for the guard to flag.
 naming the executor/purpose; a reasonable `timeout_ms` for the tier at
 hand; `persistent: false`.)
 
+> **Waiting rule:**
+> After starting Monitor, end the turn with no tool call (do NOT call `ScheduleWakeup` or poll). The harness automatically delivers a task completion notification when Monitor finishes, waking the session back up — no tool call is needed or permitted to wait for it. `ScheduleWakeup` is for `/loop` dynamic pacing only (requires `prompt` unless `stop:true`) and fails immediately in this context.
+
 Once Monitor reports the command exited, read its final line: the real
 result as JSON — `{"mechanism":"out-of-process", ...real result fields
 (status, stdout, stderr, tier, model, provider, command)}`. Print the

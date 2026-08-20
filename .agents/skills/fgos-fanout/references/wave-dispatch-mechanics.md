@@ -52,7 +52,7 @@ Run the consolidated `fanout-batch` verb:
 > Always run this backgrounded (`run_in_background: true`) from the start, never foreground. `fanout-batch` sequentially awaits `pick` -> `execute` -> `return` per candidate in a synchronous loop; running in foreground routinely exceeds the Bash tool's 2-minute default timeout (exit 143 for multi-item batches).
 >
 > **Waiting rule:**
-> Wait for the harness's own background-completion notification before proceeding to gather results. Do NOT use `ScheduleWakeup` or polling — `ScheduleWakeup` is for `/loop` dynamic pacing only (requires `prompt` unless `stop:true`) and fails immediately in this context.
+> After launching the background command, end the turn with no tool call (do NOT call `ScheduleWakeup` or poll). The harness automatically delivers a task completion notification when the background command finishes, waking the session back up — no tool call is needed or permitted to wait for it. `ScheduleWakeup` is for `/loop` dynamic pacing only (requires `prompt` unless `stop:true`) and fails immediately in this context.
 
 ```bash
 root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
