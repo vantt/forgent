@@ -973,8 +973,24 @@ function openCallStack(callThreadEntries) {
  * refusal reason AND the legal edges as JSON — "chặn và dạy tại chỗ"
  * (D1): the caller can read the legal edges straight out of the error
  * message without a second round trip.
+ *
+ * `openSyncDepth` (D28, wired review finding H2/tsk-397): unlike
+ * `openCallDepth`, this is NEVER derived from `callThreads` here — a
+ * `work.call-summary` event commits atomically at the exact instant this
+ * function's own door opens (see the `appendEventLocked` call below), so
+ * by the time a genuinely NESTED sync call (the callee's own work needing
+ * a further sync consult before it finishes) would call `recordCall`
+ * again, the outer call's event is already fully committed to the log —
+ * indistinguishable, from replay alone, from two purely sequential sync
+ * calls. Only the CALLER (a skill already inside its own sync-consult
+ * work, about to make a further nested one) knows its real current
+ * depth; it must track and pass that depth itself. Every existing
+ * caller passes none, defaulting to `0` — identical behavior to before
+ * this parameter existed — this only makes the cap genuinely reachable
+ * for a future caller that does track its own nesting, instead of being
+ * permanently unreachable dead code.
  */
-export function recordCall(dir, { id, toRole, reason, note, outcome } = {}) {
+export function recordCall(dir, { id, toRole, reason, note, outcome, openSyncDepth = 0 } = {}) {
   const { logPath } = paths(dir);
   return withEventsLockAndRefresh(dir, logPath, () => {
     const before = rebuildView(logPath);
@@ -996,7 +1012,7 @@ export function recordCall(dir, { id, toRole, reason, note, outcome } = {}) {
     const stage = effectiveStage(work, domain);
     const openCallDepth = openCallStack(before.callThreads?.[id]).length;
 
-    const result = evaluateHandoff({ domain, stage, fromRole, toRole, reason, openCallDepth });
+    const result = evaluateHandoff({ domain, stage, fromRole, toRole, reason, openCallDepth, openSyncDepth });
     if (!result.ok) {
       throw new StoreError(
         'validation',
@@ -1441,10 +1457,10 @@ export function footprintConflicts(dir) {
  * Same read-facade shape as `footprintConflicts`; the Domain core
  * (`graph-metrics.mjs`) computes both, this just rebuilds the view.
  */
-export function computedSchedule(dir) {
+export function computedSchedule(dir, candidateIds) {
   const { logPath } = paths(dir);
   const view = rebuildView(logPath);
-  return { ...computeSchedule(view), cycles: detectCycles(view) };
+  return { ...computeSchedule(view, candidateIds), cycles: detectCycles(view) };
 }
 
 /**

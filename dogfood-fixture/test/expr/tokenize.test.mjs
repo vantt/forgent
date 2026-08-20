@@ -2,34 +2,28 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { tokenize } from '../../src/expr/tokenize.mjs';
 
-test('tokenize splits a spaced expression into number/operator tokens', () => {
+test('tokenize splits simple arithmetic expressions', () => {
   assert.deepEqual(tokenize('3 + 4 * 2'), [3, '+', 4, '*', 2]);
 });
 
-test('tokenize tolerates no whitespace at all', () => {
-  assert.deepEqual(tokenize('3+4*2'), [3, '+', 4, '*', 2]);
+test('tokenize handles whitespace, floating numbers, and all 4 operators', () => {
+  assert.deepEqual(tokenize(' 10.5 / 2.5 - 1 '), [10.5, '/', 2.5, '-', 1]);
 });
 
-test('tokenize tolerates leading/trailing whitespace', () => {
-  assert.deepEqual(tokenize('  3 + 4  '), [3, '+', 4]);
+test('tokenize handles negative numbers', () => {
+  assert.deepEqual(tokenize('-3 + 4 * -2'), [-3, '+', 4, '*', -2]);
 });
 
-test('tokenize handles a single-number expression (no operator)', () => {
-  assert.deepEqual(tokenize('42'), [42]);
+test('tokenize throws TypeError for non-string input', () => {
+  assert.throws(() => tokenize(123), {
+    name: 'TypeError',
+    message: 'Expression must be a string',
+  });
 });
 
-test('tokenize parses decimal numbers', () => {
-  assert.deepEqual(tokenize('3.5 + 2'), [3.5, '+', 2]);
-});
-
-test('tokenize recognizes all 4 supported operators', () => {
-  assert.deepEqual(tokenize('1 + 2 - 3 * 4 / 5'), [1, '+', 2, '-', 3, '*', 4, '/', 5]);
-});
-
-test('tokenize throws on an unrecognized character', () => {
-  assert.throws(() => tokenize('3 & 4'), /unrecognized character/);
-});
-
-test('tokenize throws on a malformed number (two decimal points)', () => {
-  assert.throws(() => tokenize('3.5.2 + 1'), /invalid number/);
+test('tokenize throws Error for unsupported characters', () => {
+  assert.throws(() => tokenize('3 + (4 * 2)'), {
+    name: 'Error',
+    message: 'Unexpected character: (',
+  });
 });

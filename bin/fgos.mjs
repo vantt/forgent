@@ -1917,12 +1917,21 @@ async function runVerb(verb, flags, positional, dir) {
     // both the refusal reason and the legal edges named in the message
     // (chặn và dạy tại chỗ).
     case 'handoff': {
-      const id = requireField(positional[0] ?? flags.id, 'handoff requires an id: fgos handoff <id> --to <role> --reason <advise|assist|review|consult> [--note ...] [--outcome ...]');
+      const id = requireField(positional[0] ?? flags.id, 'handoff requires an id: fgos handoff <id> --to <role> --reason <advise|assist|review|consult> [--note ...] [--outcome ...] [--open-sync-depth <n>]');
       const toRole = requireField(flags.to, 'handoff requires --to <role>');
       const reason = requireField(flags.reason, 'handoff requires --reason <advise|assist|review|consult>');
       const note = optionalField(flags.note, 'handoff --note requires a non-empty value (omit --note entirely to skip it)');
       const outcome = optionalField(flags.outcome, 'handoff --outcome requires a non-empty value (omit --outcome entirely to skip it)');
-      const { event } = recordCall(dir, { id, toRole, reason, note, outcome });
+      // D28: only a caller already inside its own nested sync-consult work
+      // knows this depth -- recordCall's own doc comment explains why it can
+      // never be derived from replay. Omitted (every existing caller) means
+      // 0, byte-identical to before this flag existed.
+      const openSyncDepthRaw = optionalField(flags['open-sync-depth'], 'handoff --open-sync-depth requires a non-negative integer');
+      if (openSyncDepthRaw !== undefined && (!/^\d+$/.test(openSyncDepthRaw))) {
+        throw new StoreError('validation', `handoff --open-sync-depth must be a non-negative integer, got "${openSyncDepthRaw}".`);
+      }
+      const openSyncDepth = openSyncDepthRaw === undefined ? undefined : Number(openSyncDepthRaw);
+      const { event } = recordCall(dir, { id, toRole, reason, note, outcome, ...(openSyncDepth === undefined ? {} : { openSyncDepth }) });
       return { id, type: event.type, seq: event.seq };
     }
 
@@ -2548,7 +2557,9 @@ async function runVerb(verb, flags, positional, dir) {
     // (src/state/store.mjs) — never reimplements the layering/cycle logic
     // here.
     case 'schedule': {
-      return computedSchedule(dir);
+      // Optional --candidates <id1,id2,...> flag scopes schedule to specified items
+      const candidateIds = flags.candidates ? String(flags.candidates).split(',').map((s) => s.trim()).filter(Boolean) : undefined;
+      return computedSchedule(dir, candidateIds);
     }
 
     // Request-class per D1 (same contract as `ready`/`triage`/`conflicts`): a

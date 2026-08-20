@@ -343,3 +343,36 @@ test('tsk-56u: a legitimate .fgos/ addition/modification (never a deletion) is u
 
   assert.equal(result.status, 0, result.stderr);
 });
+
+// --- tsk-5pb: staged .fgos/* change guard on worker branches --------------
+
+test('tsk-5pb: a worktree commit staging a .fgos/ modification on a worker branch is refused', () => {
+  const { worktreeRoot } = initSharedAbsoluteHooksPathFixture();
+  fs.writeFileSync(path.join(worktreeRoot, '.fgos', 'state.json'), '{"modified":true}\n');
+  execFileSync('git', ['add', '.fgos/state.json'], { cwd: worktreeRoot });
+
+  const result = spawnSync('git', ['commit', '-q', '-m', 'oops: modified .fgos file on worker branch'], { cwd: worktreeRoot, encoding: 'utf8' });
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /commit refused/);
+  assert.match(result.stderr, /\.fgos\//);
+});
+
+test('tsk-5pb: the same staged .fgos/ modification is allowed on main (not a fgw/* branch)', () => {
+  const { mainRoot } = initSharedAbsoluteHooksPathFixture();
+
+  fs.writeFileSync(path.join(mainRoot, '.fgos', 'state.json'), '{"modified":true}\n');
+  execFileSync('git', ['add', '.fgos/state.json'], { cwd: mainRoot });
+
+  const result = spawnSync('git', ['commit', '-q', '-m', 'legitimate main checkout .fgos write'], { cwd: mainRoot, encoding: 'utf8' });
+
+  assert.equal(result.status, 0, result.stderr);
+});
+
+test('tsk-5pb: a normal commit that never touches .fgos/ succeeds on a worker branch', () => {
+  const { worktreeRoot } = initSharedAbsoluteHooksPathFixture();
+
+  const result = commitAsSession(worktreeRoot, { FGOS_SESSION_ID: 'session-normal-worker-commit' });
+
+  assert.equal(result.status, 0, result.stderr);
+});

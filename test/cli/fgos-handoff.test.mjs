@@ -79,6 +79,26 @@ test('sync call: consult does NOT change holder, appends a call-summary event', 
   assert.equal(view.callThreads[id][0].outcome, 'finding: use lib X');
 });
 
+test('D28: recordCall threads a caller-supplied openSyncDepth into evaluateHandoff\'s cap -- refuses when the caller reports it is already at cap, even on the FIRST call (nesting can never be derived from replay for sync calls, see recordCall\'s own doc comment)', () => {
+  const dir = tmpDir();
+  const id = seedExecutingItem(dir);
+  assert.throws(
+    () => recordCall(dir, { id, toRole: 'researcher', reason: 'consult', openSyncDepth: 3 }),
+    (err) => {
+      assert.ok(err instanceof StoreError);
+      assert.match(err.message, /callstack cap/);
+      return true;
+    },
+  );
+});
+
+test('D28: omitting openSyncDepth defaults to 0 (byte-identical to every pre-D28-wiring caller) -- a sync call under cap still succeeds', () => {
+  const dir = tmpDir();
+  const id = seedExecutingItem(dir);
+  const { event } = recordCall(dir, { id, toRole: 'researcher', reason: 'consult' });
+  assert.equal(event.type, 'work.call-summary');
+});
+
 test('off-graph call is refused; the error names the legal edges', () => {
   const dir = tmpDir();
   const id = seedExecutingItem(dir);
@@ -119,8 +139,8 @@ test('nested async calls (depth 2, the deepest this domain\'s roleGraph legally 
   const dir = tmpDir();
   const id = seedExecutingItem(dir);
   recordCall(dir, { id, toRole: 'reviewer', reason: 'review' }); // depth 0 -> 1
-  recordCall(dir, { id, toRole: 'human-advisor', reason: 'advise' }); // depth 1 -> 2
-  assert.equal(listWork(dir).work[id].holder, 'human-advisor');
+  recordCall(dir, { id, toRole: 'advisor', reason: 'advise' }); // depth 1 -> 2
+  assert.equal(listWork(dir).work[id].holder, 'advisor');
   recordCallReturn(dir, { id }); // depth 2 -> 1, back to reviewer (NOT reset to implementer)
   assert.equal(listWork(dir).work[id].holder, 'reviewer');
   recordCallReturn(dir, { id }); // depth 1 -> 0, back to implementer
@@ -132,7 +152,7 @@ test('nested async calls (depth 2, the deepest this domain\'s roleGraph legally 
 // The cap itself (openCallDepth reaching handoff.mjs's own callstackCap) is
 // proven directly at the pure-guard level in test/state/handoff.test.mjs,
 // where depth is injected rather than built through real edges — this
-// domain's roleGraph today has no legal edge past depth 2 (human-advisor
+// domain's roleGraph today has no legal edge past depth 2 (advisor
 // has no outgoing edges), so a depth-3 refusal cannot be exercised through
 // recordCall alone without inventing an edge nothing else uses.
 
@@ -230,8 +250,8 @@ test('D16: moveWork to delivered auto-closes a depth-2 nested call, one frame at
   const dir = tmpDir();
   const id = seedExecutingItem(dir);
   recordCall(dir, { id, toRole: 'reviewer', reason: 'review' });
-  recordCall(dir, { id, toRole: 'human-advisor', reason: 'advise' });
-  assert.equal(listWork(dir).work[id].holder, 'human-advisor');
+  recordCall(dir, { id, toRole: 'advisor', reason: 'advise' });
+  assert.equal(listWork(dir).work[id].holder, 'advisor');
   moveWork(dir, { id, to: 'delivered', expectedStatus: 'doing' });
   const view = listWork(dir);
   assert.equal(view.work[id].holder, 'implementer');

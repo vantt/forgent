@@ -12,8 +12,11 @@
 // handoff-redesign/CONTEXT.md` D7 for the split rationale.
 
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
 import { DEFAULTS } from '../../state/work.mjs';
-import { DOMAINS, resolveDomainName, skillForStage } from '../../state/workflow-stage-graphs.mjs';
+import { DOMAINS, resolveDomainName, skillForStage, bundleForStage, resolveTaskSpecPath } from '../../state/workflow-stage-graphs.mjs';
+import { loadAgentDefs, readTaskSpecHeader } from '../agent-roster.mjs';
 import { selectTemplate, hashTemplate } from '../prompt-templates.mjs';
 import { listWork } from '../../state/store.mjs';
 import { appendEvent } from '../../state/events.mjs';
@@ -23,6 +26,17 @@ import { resolveExecutorAndOverrides, resolveExecutorIdForPurpose, modelForTier 
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
 import { resolveExecutorCommand, EXECUTOR_ADAPTERS, DispatchError } from './transport.mjs';
 import { buildPrompt } from './prepare.mjs';
+import { readSharedConfigOrEmpty } from '../../config/shared-config-file.mjs';
+import { hasWorkerSlotRoom } from '../../state/worker-slots.mjs';
+
+// Resolved against THIS module's own file location, never a caller-supplied
+// `root` -- `bin/fgos.mjs` is a fixed sibling of this checkout's own
+// `src/runner/dispatch/cli.mjs`, same "resolve against your own file
+// location, never the caller's cwd or repo root" principle
+// `gate-check`'s CLI wrapper already establishes elsewhere in this repo, so
+// this keeps working from any install shape/test fixture regardless of
+// what `root` a given call happens to be resolving `.fgos/`/config against.
+const BIN_FGOS_PATH = fileURLToPath(new URL('../../../bin/fgos.mjs', import.meta.url));
 import {
   acquireMainCheckoutLock,
   dispatchLockFile,
@@ -54,10 +68,100 @@ import {
  * result MISSING from `cfg.executors` (keyed by executor name, not job
  * identity) is intentional, not a bug; `decideExecutorCli`'s own `--work`
  * branch below already documents the fallback this design implies.)
+ *
+ * D15/D20: persona/agent-type resolution key expanded to (domain, stage, role).
+ * `stage` defaults to `stage ?? work?.stage ?? 'executing'`; `role` defaults to
+ * `role ?? work?.holder ?? work?.role`.
  */
-export function executorIdForWork(work) {
-  const domainObj = DOMAINS[resolveDomainName(work.domain)];
-  return skillForStage(domainObj, 'executing');
+export function executorIdForWork(work, stage, role) {
+  const domainObj = DOMAINS[resolveDomainName(work?.domain)];
+  const targetStage = stage ?? work?.stage ?? 'executing';
+  return skillForStage(domainObj, targetStage);
+}
+
+/**
+ * Resolve persona/agentType for a given taskSpec header & list of registered agent-types (D20/D21/D22/D32).
+ * Tie-break priority (D32):
+ * 1. Task-spec declares `agent:` pin -> wins immediately, skipping skill-matching.
+ * 2. No pin -> if `currentAgentType` matches all `requires-skill`, stay with `currentAgentType`.
+ * 3. Otherwise -> select deterministically by declaration order (first matching agent-type in `agentDefs`).
+ */
+export function resolveAgentTypeForTaskSpec(taskSpecHeader, agentDefs = [], currentAgentType = null) {
+  if (!taskSpecHeader) return currentAgentType || (agentDefs[0]?.name ?? null);
+
+  const pinnedAgents = Array.isArray(taskSpecHeader.agent)
+    ? taskSpecHeader.agent
+    : typeof taskSpecHeader.agent === 'string' && taskSpecHeader.agent.trim()
+      ? [taskSpecHeader.agent.trim()]
+      : [];
+
+  if (pinnedAgents.length > 0) {
+    const found = agentDefs.find((a) => pinnedAgents.includes(a.name));
+    return found ? found.name : pinnedAgents[0];
+  }
+
+  const requiredSkills = Array.isArray(taskSpecHeader['requires-skill'])
+    ? taskSpecHeader['requires-skill']
+    : typeof taskSpecHeader['requires-skill'] === 'string' && taskSpecHeader['requires-skill'].trim()
+      ? [taskSpecHeader['requires-skill'].trim()]
+      : [];
+
+  if (requiredSkills.length === 0) {
+    return currentAgentType || (agentDefs[0]?.name ?? null);
+  }
+
+  if (currentAgentType) {
+    const currentDef = agentDefs.find((a) => a.name === currentAgentType);
+    if (currentDef && Array.isArray(currentDef.skills)) {
+      const hasAllSkills = requiredSkills.every((s) => currentDef.skills.includes(s));
+      if (hasAllSkills) return currentAgentType;
+    }
+  }
+
+  const matching = agentDefs.find(
+    (a) => Array.isArray(a.skills) && requiredSkills.every((s) => a.skills.includes(s)),
+  );
+  if (matching) return matching.name;
+
+  return currentAgentType || (agentDefs[0]?.name ?? null);
+}
+
+/**
+ * `spawnWorker`'s own D20/D22 wiring (review finding H1, tsk-397): the real
+ * agent-type this `work` item's dispatch should resolve to, or `null` when
+ * there is nothing to resolve from (no taskSpec registered for this
+ * domain+stage, or the taskSpec has no header content at all — both
+ * legitimate "no opinion" outcomes, not errors). Resolves the taskSpec via
+ * `bundleForStage` (D14/D29/D30, the same {skill,taskSpec} lookup
+ * `spawnWorker` already uses for the skill half), reads its header via
+ * `resolveTaskSpecPath` + `readTaskSpecHeader`, and matches it against the
+ * real on-disk agent roster (`loadAgentDefs`) via `resolveAgentTypeForTaskSpec`
+ * above.
+ *
+ * `currentAgentType` is always `null` here: nothing on a work item tracks
+ * "which agentType last served this dispatch" today, so there is no real
+ * stickiness state to read yet (D32's tie-break priority 2 activates only
+ * once such state exists — a later item's own scope, not invented here).
+ *
+ * The result only has an observable effect on an executor that is already
+ * command-less/adapter-less/invocation-less and declares no static
+ * `agentType` of its own (see `resolveExecutorConfig`'s own
+ * `effectiveAgentType` comment) — every executor this repo configures
+ * today (agy, claude, codex, pi) has its own real `command`, so this never
+ * changes their dispatch.
+ */
+export function resolveAgentTypeForWork(work, cwd, stage) {
+  const domainObj = DOMAINS[resolveDomainName(work?.domain)];
+  const targetStage = stage ?? work?.stage ?? 'executing';
+  const { taskSpec } = bundleForStage(domainObj, targetStage);
+  if (!taskSpec) return null;
+  // resolveTaskSpecPath already returns an absolute path when { cwd } is
+  // passed (it joins internally) -- never re-join cwd here too.
+  const taskSpecPath = resolveTaskSpecPath(domainObj, taskSpec, { cwd });
+  const header = readTaskSpecHeader(taskSpecPath);
+  if (Object.keys(header).length === 0) return null;
+  const agentDefs = loadAgentDefs(cwd);
+  return resolveAgentTypeForTaskSpec(header, agentDefs, null);
 }
 
 /**
@@ -99,13 +203,17 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   // its pre-D9 position, right after) so a executor's own providerModel/
   // rigorOverrides can thread into tier resolution — never borrowing
   // Claude's model names for a non-Claude executor's own dispatch.
-  const executorId = executorIdForWork(work);
+  const executorId = executorIdForWork(work, opts.stage);
   const { executorId: resolvedExecutorId, executor: executorForTier, overrides: capabilityOverrides } = executorId ? resolveExecutorAndOverrides(cfg, executorId) : {};
   const model = modelForTier(cfg, tier, {
     providerModel: capabilityOverrides?.providerModel ?? executorForTier?.providerModel,
     rigorOverrides: capabilityOverrides?.rigorOverrides ?? executorForTier?.rigorOverrides,
   });
   const prompt = buildPrompt(work, opts.feedback, opts.stage);
+  // D20/D22 (review finding H1, tsk-397): only has an observable effect on
+  // a command-less/adapter-less/invocation-less executor with no static
+  // agentType of its own -- see resolveAgentTypeForWork's own doc comment.
+  const resolvedAgentType = resolveAgentTypeForWork(work, cwd, opts.stage);
   const { command, args, adapter, provider, baseCommit, headRef } = resolveExecutorCommand(cfg, {
     prompt,
     model,
@@ -116,6 +224,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
     // root (always the main checkout) — see captureDispatchAttestation's
     // own docstring for why those two roots diverge on a leaf or a retry.
     attestRoot: cwd,
+    resolvedAgentType,
   });
   const adapterFn = EXECUTOR_ADAPTERS[adapter];
   if (!adapterFn) {
@@ -239,6 +348,14 @@ export async function executeExecutorCli(
     idleTimeoutMs: idleTimeoutOverride,
     maxBuffer: maxBufferOverride,
     onChunk,
+    // D20/D22 (review finding H1, tsk-397): optional, work-item-aware
+    // callers (fanoutBatchExecutorCli) can pass the real work item so this
+    // otherwise work-agnostic primitive resolves an agentType the same way
+    // spawnWorker does. Omitted (every pre-H1-wiring caller, and any
+    // caller with no specific work item -- e.g. a `--for <purpose>`
+    // dispatch) skips resolution entirely, byte-identical to before.
+    work,
+    stage,
   } = {},
 ) {
   if (!executorIdArg && !purpose) {
@@ -330,6 +447,7 @@ export async function executeExecutorCli(
     providerModel: capabilityOverrides?.providerModel ?? executor?.providerModel,
     rigorOverrides: capabilityOverrides?.rigorOverrides ?? executor?.rigorOverrides,
   });
+  const resolvedAgentType = work ? resolveAgentTypeForWork(work, cwd, stage) : null;
   const { command, args, adapter, provider } = resolveExecutorCommand(cfg, {
     prompt,
     model,
@@ -338,6 +456,7 @@ export async function executeExecutorCli(
     fgosDir,
     contentCarries: carries,
     attestRoot: cwd,
+    resolvedAgentType,
   });
   const adapterFn = EXECUTOR_ADAPTERS[adapter];
   if (!adapterFn) {
@@ -464,7 +583,7 @@ export async function executeExecutorCli(
  */
 export async function decideExecutorCli(
   executorIdArg,
-  { cwd = process.cwd(), repoRoot, hasLiveTaskAccess = false, for: purpose, work: workIdArg, needsSoul = false } = {},
+  { cwd = process.cwd(), repoRoot, hasLiveTaskAccess = false, for: purpose, work: workIdArg, stage: stageArg, needsSoul = false } = {},
 ) {
   if (!executorIdArg && !purpose && !workIdArg && !needsSoul) {
     throw new RunnerConfigError(
@@ -485,7 +604,7 @@ export async function decideExecutorCli(
     if (!workItem) {
       throw new RunnerConfigError(`no work item "${workIdArg}" found -- cannot resolve its dispatch executor.`);
     }
-    executorId = executorIdForWork(workItem);
+    executorId = executorIdForWork(workItem, stageArg);
     // tsk-5tm-6 D4: a work-item-resolved executorId with NO explicit
     // cfg.executors entry means "no override configured" -- per
     // Native-First Dispatch Doctrine (docs/decisions/0026) rule 2, every
@@ -561,6 +680,125 @@ export async function decideExecutorCli(
 }
 
 /**
+ * `fanout-batch <id,id,...>` subcommand (fanout-execute-consolidation):
+ * Consolidates the out-of-process dispatch chain (pick -> execute -> return)
+ * and worker slot-checking/trimming into a single fast, testable call for fgos-fanout.
+ */
+export async function fanoutBatchExecutorCli(
+  candidateIdsArg = [],
+  { cwd = process.cwd(), repoRoot, hasLiveTaskAccess = false } = {},
+) {
+  const candidateIds = Array.isArray(candidateIdsArg)
+    ? candidateIdsArg
+    : String(candidateIdsArg).split(',').map((s) => s.trim()).filter(Boolean);
+
+  const root = repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
+  const fgosDir = fgosDirFromRoot(root);
+  const cfg = ensureRunnerConfigForDir(root);
+
+  const ceiling = readSharedConfigOrEmpty(root)?.workerSlots?.ceiling;
+  const slotsView = listWork(fgosDir);
+  const room = hasWorkerSlotRoom(slotsView, { ceiling, batchSize: candidateIds.length });
+
+  if (!room.allowed) {
+    return { fired: [], mechanismChanged: [], unavailable: [], deferred: [...candidateIds], slotsFull: true };
+  }
+
+  const freeSlots = room.free !== null && room.free !== undefined ? Math.max(0, room.free) : candidateIds.length;
+  const batchToRun = candidateIds.slice(0, freeSlots);
+  const deferred = candidateIds.slice(freeSlots);
+
+  const fired = [];
+  const mechanismChanged = [];
+  const unavailable = [];
+
+  for (const candidateId of batchToRun) {
+    const workItem = listWork(fgosDir).work[candidateId];
+    if (!workItem) {
+      unavailable.push({ id: candidateId, reason: 'not-found' });
+      continue;
+    }
+
+    const executorId = executorIdForWork(workItem);
+    const hasExplicitExecutor = resolveExecutorAndOverrides(cfg, executorId).configured;
+    let mechanism;
+    if (!hasExplicitExecutor) {
+      mechanism = decideDispatchMechanism({ hasNativeMechanism: true, hasLiveTaskAccess, forceCliSpawn: false });
+    } else {
+      mechanism = decideExecutorDispatchMechanism(cfg, executorId, { hasLiveTaskAccess });
+    }
+
+    if (mechanism === 'in-process') {
+      mechanismChanged.push({ id: candidateId, mechanism, executorId });
+      continue;
+    }
+    if (mechanism === 'unavailable') {
+      unavailable.push({ id: candidateId, executorId });
+      continue;
+    }
+
+    try {
+      // `--dir` must be the repo ROOT here, never `fgosDir` -- `dataDir()`
+      // (bin/fgos.mjs) always derives `.fgos` from `--dir` itself
+      // (`fgosDirFromRoot`), so passing an already-`.fgos` path doubles the
+      // suffix into a nonexistent `<root>/.fgos/.fgos`.
+      const pickStdout = execFileSync(process.execPath, [BIN_FGOS_PATH, 'pick', candidateId, '--dir', root], {
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
+      // Every fgos.mjs verb response is wrapped in the fgos.v1 envelope
+      // (`wrapEnvelope`, unconditional) -- the real path lives at
+      // `data.worktree.path`, never a bare `.worktreePath`/`.path`.
+      const picked = JSON.parse(pickStdout);
+      const wtPath = picked.data?.worktree?.path || cwd;
+
+      const execRes = await executeExecutorCli(executorId, {
+        // Bug found running tsk-397's own fanout batches (2026-08-20): this
+        // call omitted `prompt` entirely, so `executeExecutorCli` fell back
+        // to its own default `prompt = ''` and every out-of-process executor
+        // (agy) received a literal empty prompt — no edits, no commit, then
+        // `return` below failed with "branch has not advanced". `spawnWorker`
+        // (this same file, above) already builds the work item's own prompt
+        // via `buildPrompt` before dispatching; this out-of-process path
+        // needs the identical prompt, built the identical way (no feedback,
+        // default 'executing' stage — the same defaults `spawnWorker` uses
+        // when its own `opts.feedback`/`opts.stage` are omitted).
+        prompt: buildPrompt(workItem),
+        cwd: wtPath,
+        repoRoot: root,
+        hasLiveTaskAccess,
+        // D20/D22 (review finding H1, tsk-397): lets executeExecutorCli
+        // resolve a real agentType via resolveAgentTypeForWork, same as
+        // spawnWorker already does.
+        work: workItem,
+      });
+
+      execFileSync(process.execPath, [BIN_FGOS_PATH, 'return', candidateId, '--dir', root], {
+        cwd: wtPath,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
+
+      fired.push({
+        id: candidateId,
+        status: execRes.status ?? 0,
+        signal: execRes.signal ?? null,
+        errorClass: execRes.errorClass ?? null,
+      });
+    } catch (err) {
+      fired.push({
+        id: candidateId,
+        status: 1,
+        errorClass: err.errorClass || 'error',
+        error: err.message,
+      });
+    }
+  }
+
+  return { fired, mechanismChanged, unavailable, deferred };
+}
+
+/**
  * CLI entry point body (D7 module split): was an inline `if
  * (import.meta.url === ...)` script guard directly in `dispatch.mjs`
  * before this split — now a named export so the barrel `dispatch.mjs`
@@ -584,79 +822,105 @@ export function runDispatchCli() {
     const i = rest.indexOf(name);
     return i !== -1 ? rest[i + 1] : undefined;
   };
-  if (subcommand === 'execute') {
-    // tsk-129: tee the spawned executor's own live stdout/stderr chunks to
-    // THIS process's stderr as they arrive, reusing the P39 onChunk hook
-    // executeExecutorCli already threads through to the adapter (this CLI
-    // branch was the one caller that never passed it -- RESEARCH.md).
-    // stdout is left untouched, still carrying only the single final JSON
-    // line below, so a scripted caller's JSON.parse(stdout) sees no change.
-    executeExecutorCli(executorId, {
-      prompt: flagValue('--prompt') ?? '',
-      model: flagValue('--model'),
-      tier: flagValue('--tier'),
-      carries: flagValue('--carries'),
-      for: flagValue('--for'),
-      cwd: flagValue('--cwd') ?? flagValue('--dir'),
-      hasLiveTaskAccess: rest.includes('--has-live-task-access'),
-      onChunk: (stream, chunk) => process.stderr.write(chunk),
-    }).then(
-      (executed) => {
-        process.stdout.write(`${JSON.stringify(executed)}\n`);
-      },
-      (err) => {
-        // Structured errorClass on stdout (dispatch-execute optimization
-        // pass): a caller (a skill following executor-dispatch-fallback.md,
-        // or the runner loop) can now tell "dispatch-in-flight -- back off
-        // and retry shortly" apart from "dispatch-depth-exceeded -- stop,
-        // this needs a human" apart from every other failure, instead of
-        // only ever seeing a bare exit-1 + a human-readable message on
-        // stderr. `err.message` on stderr is unchanged for a human tailing
-        // the terminal.
-        process.stdout.write(`${JSON.stringify(err instanceof DispatchError ? { error: err.message, errorClass: err.errorClass } : { error: err.message })}\n`);
-        process.stderr.write(`${err.message}\n`);
+  switch (subcommand) {
+    case 'execute': {
+      // tsk-129: tee the spawned executor's own live stdout/stderr chunks to
+      // THIS process's stderr as they arrive, reusing the P39 onChunk hook
+      // executeExecutorCli already threads through to the adapter (this CLI
+      // branch was the one caller that never passed it -- RESEARCH.md).
+      // stdout is left untouched, still carrying only the single final JSON
+      // line below, so a scripted caller's JSON.parse(stdout) sees no change.
+      executeExecutorCli(executorId, {
+        prompt: flagValue('--prompt') ?? '',
+        model: flagValue('--model'),
+        tier: flagValue('--tier'),
+        carries: flagValue('--carries'),
+        for: flagValue('--for'),
+        cwd: flagValue('--cwd') ?? flagValue('--dir'),
+        hasLiveTaskAccess: rest.includes('--has-live-task-access'),
+        onChunk: (stream, chunk) => process.stderr.write(chunk),
+      }).then(
+        (executed) => {
+          process.stdout.write(`${JSON.stringify(executed)}\n`);
+        },
+        (err) => {
+          // Structured errorClass on stdout (dispatch-execute optimization
+          // pass): a caller (a skill following executor-dispatch-fallback.md,
+          // or the runner loop) can now tell "dispatch-in-flight -- back off
+          // and retry shortly" apart from "dispatch-depth-exceeded -- stop,
+          // this needs a human" apart from every other failure, instead of
+          // only ever seeing a bare exit-1 + a human-readable message on
+          // stderr. `err.message` on stderr is unchanged for a human tailing
+          // the terminal.
+          process.stdout.write(`${JSON.stringify(err instanceof DispatchError ? { error: err.message, errorClass: err.errorClass } : { error: err.message })}\n`);
+          process.stderr.write(`${err.message}\n`);
+          process.exitCode = 1;
+        },
+      );
+      break;
+    }
+    case 'decide': {
+      decideExecutorCli(executorId, {
+        cwd: flagValue('--cwd') ?? flagValue('--dir'),
+        hasLiveTaskAccess: rest.includes('--has-live-task-access'),
+        for: flagValue('--for'),
+        work: flagValue('--work'),
+        stage: flagValue('--stage'),
+        needsSoul: rest.includes('--needs-soul'),
+      }).then(
+        (decided) => {
+          process.stdout.write(`${JSON.stringify(decided)}\n`);
+        },
+        (err) => {
+          process.stderr.write(`${err.message}\n`);
+          process.exitCode = 1;
+        },
+      );
+      break;
+    }
+    case 'log': {
+      // executorId here is the SAME shared positional above — the log
+      // line's own executorId, e.g. whichever id `decide`'s own result
+      // named, never a second parsing scheme.
+      const id = flagValue('--id');
+      const provider = flagValue('--provider');
+      const command = flagValue('--command');
+      const model = flagValue('--model');
+      if (!id || !executorId || !provider || !command) {
+        process.stderr.write(
+          'usage: node src/runner/dispatch.mjs log <executorId> --id <workItemId> --provider <p> --command <c> [--model <m>]\n',
+        );
         process.exitCode = 1;
-      },
-    );
-  } else if (subcommand === 'decide') {
-    decideExecutorCli(executorId, {
-      cwd: flagValue('--cwd') ?? flagValue('--dir'),
-      hasLiveTaskAccess: rest.includes('--has-live-task-access'),
-      for: flagValue('--for'),
-      work: flagValue('--work'),
-      needsSoul: rest.includes('--needs-soul'),
-    }).then(
-      (decided) => {
-        process.stdout.write(`${JSON.stringify(decided)}\n`);
-      },
-      (err) => {
-        process.stderr.write(`${err.message}\n`);
-        process.exitCode = 1;
-      },
-    );
-  } else if (subcommand === 'log') {
-    // executorId here is the SAME shared positional above — the log
-    // line's own executorId, e.g. whichever id `decide`'s own result
-    // named, never a second parsing scheme.
-    const id = flagValue('--id');
-    const provider = flagValue('--provider');
-    const command = flagValue('--command');
-    const model = flagValue('--model');
-    if (!id || !executorId || !provider || !command) {
+      } else {
+        const root = resolveMainCheckoutRoot(process.cwd()) ?? resolveRepoRoot(process.cwd());
+        const fgosDir = fgosDirFromRoot(root);
+        const event = logExecutorDispatch(fgosDir, { id, executorId, provider, command, model });
+        process.stdout.write(`${JSON.stringify(event)}\n`);
+      }
+      break;
+    }
+    case 'fanout-batch': {
+      const candidateArg = executorId ?? flagValue('--candidates');
+      const candidateIds = candidateArg ? String(candidateArg).split(',').map((s) => s.trim()).filter(Boolean) : [];
+      fanoutBatchExecutorCli(candidateIds, {
+        cwd: flagValue('--cwd') ?? flagValue('--dir'),
+        hasLiveTaskAccess: rest.includes('--has-live-task-access'),
+      }).then(
+        (result) => {
+          process.stdout.write(`${JSON.stringify(result)}\n`);
+        },
+        (err) => {
+          process.stderr.write(`${err.message}\n`);
+          process.exitCode = 1;
+        },
+      );
+      break;
+    }
+    default: {
       process.stderr.write(
-        'usage: node src/runner/dispatch.mjs log <executorId> --id <workItemId> --provider <p> --command <c> [--model <m>]\n',
+        `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs execute <executorId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] [--has-live-task-access] | execute --for <purpose> [...] | decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | log <executorId> --id <id> --provider <p> --command <c> [--model <m>]\n`,
       );
       process.exitCode = 1;
-    } else {
-      const root = resolveMainCheckoutRoot(process.cwd()) ?? resolveRepoRoot(process.cwd());
-      const fgosDir = fgosDirFromRoot(root);
-      const event = logExecutorDispatch(fgosDir, { id, executorId, provider, command, model });
-      process.stdout.write(`${JSON.stringify(event)}\n`);
     }
-  } else {
-    process.stderr.write(
-      `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs execute <executorId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] [--has-live-task-access] | execute --for <purpose> [...] | decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | log <executorId> --id <id> --provider <p> --command <c> [--model <m>]\n`,
-    );
-    process.exitCode = 1;
   }
 }

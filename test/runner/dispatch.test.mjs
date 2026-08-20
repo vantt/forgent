@@ -21,6 +21,7 @@ import {
   decideDispatchMechanism,
   decideExecutorDispatchMechanism,
   decideExecutorCli,
+  fanoutBatchExecutorCli,
   spawnWorker,
   RunnerConfigError,
   DispatchError,
@@ -32,8 +33,10 @@ import {
   EXECUTOR_CARRIES,
   INVOCATION_VIA,
   executorIdForWork,
+  resolveAgentTypeForTaskSpec,
+  resolveAgentTypeForWork,
 } from '../../src/runner/dispatch.mjs';
-import { initStore, addWork } from '../../src/state/store.mjs';
+import { initStore, addWork, listWork } from '../../src/state/store.mjs';
 import { findExecutableOnPath } from '../../src/state/tool-registry.mjs';
 import { resolveMainCheckoutRoot } from '../../src/runner/paths.mjs';
 
@@ -1927,6 +1930,59 @@ test('resolveExecutorCommand resolves an agentType executor identically whether 
   assert.deepEqual(withFgosDirShape, withoutFgosDirShape);
 });
 
+// --- D20/D22 resolvedAgentType wiring (review finding H1, tsk-397): a
+// caller-supplied dynamic resolution (resolveAgentTypeForTaskSpec, via
+// spawnWorker/executeExecutorCli's own resolveAgentTypeForWork) fills in
+// ONLY when the executor is command-less/agent-type-shaped and declares no
+// static agentType of its own -- exactly the same branch the static
+// agentTypeCfg() tests above exercise, just fed dynamically instead of
+// from static config ---
+
+test('resolveExecutorCommand uses a caller-supplied resolvedAgentType when the executor is command-less and declares no static agentType of its own', () => {
+  const cfg = {
+    executor: { command: 'claude', args: ['-p', '{prompt}', '--model', '{model}'] },
+    executors: { 'my-agent-executor': { kind: 'agent' } }, // no static agentType
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', executorId: 'my-agent-executor', resolvedAgentType: 'fgos-placeholder' });
+  assert.deepEqual(resolved.args, ['-p', 'p', '--agent', 'fgos-placeholder']);
+});
+
+test('resolveExecutorCommand prefers a static agentType over a caller-supplied resolvedAgentType — an executor\'s own config always wins first (D2 precedence, unchanged)', () => {
+  const cfg = agentTypeCfg(); // executors['my-agent-executor'].agentType = 'code-simplifier'
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', executorId: 'my-agent-executor', resolvedAgentType: 'a-different-agent' });
+  assert.ok(resolved.args.includes('code-simplifier'));
+  assert.ok(!resolved.args.includes('a-different-agent'));
+});
+
+test('resolveExecutorCommand ignores resolvedAgentType entirely for an executor with its own command/args (agy/claude/codex/pi\'s real shape) — the D20 wiring never changes dispatch for any executor this repo actually configures today', () => {
+  const cfg = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    executors: { agy: { kind: 'agent', command: 'agy', args: ['-p', '{prompt}'], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', executorId: 'agy', resolvedAgentType: 'fgos-placeholder' });
+  assert.equal(resolved.command, 'agy');
+  assert.ok(!resolved.args.includes('--agent'));
+  assert.ok(!resolved.args.includes('fgos-placeholder'));
+});
+
+test('resolveExecutorCommand omitting resolvedAgentType is byte-identical to every pre-D20-wiring caller', () => {
+  const cfg = {
+    executor: { command: 'claude', args: ['-p', '{prompt}', '--model', '{model}'] },
+    executors: { 'my-agent-executor': { kind: 'agent' } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  };
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', executorId: 'my-agent-executor' });
+  assert.ok(!resolved.args.includes('--agent'));
+  // Falls through to the global executor (no adapter/command resolved via agentType) unchanged.
+  assert.equal(resolved.command, 'claude');
+  assert.deepEqual(resolved.args, ['-p', 'p', '--model', 'sonnet']);
+});
+
 test('resolveExecutorCommand still prefers a executor\'s own command/args over agentType when both are declared (judge-discovery\'s real shape) — agentType is never consulted', () => {
   const cfg = {
     executor: { command: 'claude', args: ['-p', '{prompt}', '--model', '{model}'] },
@@ -2732,8 +2788,15 @@ test('spawnWorker threads a FGOS_DISPATCH_DEPTH of "1" into a fresh (non-nested)
   const dir = mkTempDir();
   const scriptPath = writeDepthEchoExecutor(dir);
   const cfg = baseConfig([scriptPath]);
-  const result = await spawnWorker(sampleWork(), cfg, mkTempDir());
-  assert.deepEqual(JSON.parse(result.stdout), { depth: '1' });
+  const priorDepth = process.env[DISPATCH_DEPTH_ENV];
+  delete process.env[DISPATCH_DEPTH_ENV];
+  try {
+    const result = await spawnWorker(sampleWork(), cfg, mkTempDir());
+    assert.deepEqual(JSON.parse(result.stdout), { depth: '1' });
+  } finally {
+    if (priorDepth !== undefined) process.env[DISPATCH_DEPTH_ENV] = priorDepth;
+    else delete process.env[DISPATCH_DEPTH_ENV];
+  }
 });
 
 test('spawnWorker refuses with DispatchError(dispatch-depth-exceeded) once FGOS_DISPATCH_DEPTH already sits at the cap -- never spawns', async () => {
@@ -3990,6 +4053,51 @@ test('executorIdForWork is exported and resolves a coding-domain (or no-domain) 
   assert.equal(executorIdForWork(sampleWork()), 'fgos-coding-implement');
 });
 
+test('executorIdForWork expands key to (domain, stage, role) and respects stage parameter and work.stage property', () => {
+  assert.equal(executorIdForWork(sampleWork(), 'discovery'), 'fgos-coding-discovering');
+  assert.equal(executorIdForWork(sampleWork(), 'planning'), 'fgos-coding-planning');
+  assert.equal(executorIdForWork({ domain: 'coding', stage: 'exploring' }), 'fgos-coding-exploring');
+  assert.equal(executorIdForWork({ domain: 'coding', stage: 'planning' }, null, 'implementer'), 'fgos-coding-planning');
+});
+
+test('resolveAgentTypeForTaskSpec implements D32 tie-break scenarios correctly', () => {
+  const agentDefs = [
+    { name: 'agent-alpha', skills: ['code-review', 'implementation'] },
+    { name: 'agent-beta', skills: ['implementation', 'planning'] },
+    { name: 'agent-gamma', skills: ['code-review'] },
+  ];
+
+  // (a) agent: pin in taskSpec header wins outright, skipping skill matching
+  assert.equal(
+    resolveAgentTypeForTaskSpec(
+      { agent: ['agent-gamma'], 'requires-skill': ['implementation'] },
+      agentDefs,
+      'agent-alpha',
+    ),
+    'agent-gamma',
+  );
+
+  // (b) no pin, currentAgentType matches requires-skill -> stay with currentAgentType
+  assert.equal(
+    resolveAgentTypeForTaskSpec(
+      { 'requires-skill': ['implementation'] },
+      agentDefs,
+      'agent-beta',
+    ),
+    'agent-beta',
+  );
+
+  // (c) no pin, currentAgentType doesn't match -> select first matching agent in declaration order
+  assert.equal(
+    resolveAgentTypeForTaskSpec(
+      { 'requires-skill': ['implementation'] },
+      agentDefs,
+      'agent-gamma',
+    ),
+    'agent-alpha',
+  );
+});
+
 test('decideExecutorCli resolves work-item-based (--work) to the same result a positional executorId would, plus the resolved executorId -- explicit executors.<id> override case', async () => {
   const root = mkTempDir();
   const fgosDir = path.join(root, '.fgos');
@@ -4345,4 +4453,166 @@ test('dispatch CLI decide subcommand respects --cwd flag', () => {
   const res = JSON.parse(out);
   assert.equal(res.mechanism, 'in-process');
   assert.equal(res.agentType, 'test');
+});
+
+// --- fanout-batch and fgos schedule --candidates -------------------------
+
+test('fanoutBatchExecutorCli returns slotsFull when worker slots ceiling is full', async () => {
+  const repo = mkTempGitRepo();
+  const fgosDir = repo.fgosDir;
+  initStore(fgosDir);
+  // Write shared config with ceiling = 1 into .fgos/config.json
+  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ workerSlots: { ceiling: 1 } }));
+  // Add 1 doing item to consume the slot
+  addWork(fgosDir, { id: 't1', title: 'Running Item', kind: 'task', status: 'doing', domain: 'coding', stage: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
+
+  const result = await fanoutBatchExecutorCli(['c1', 'c2'], { repoRoot: repo.repoRoot });
+  assert.equal(result.slotsFull, true);
+  assert.deepEqual(result.deferred, ['c1', 'c2']);
+  assert.deepEqual(result.fired, []);
+});
+
+test('fanoutBatchExecutorCli trims candidates to free slots when ceiling is configured', async () => {
+  const repo = mkTempGitRepo();
+  const fgosDir = repo.fgosDir;
+  initStore(fgosDir);
+  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ workerSlots: { ceiling: 1 } }));
+
+  addWork(fgosDir, { id: 'c1', title: 'Cand 1', kind: 'task', status: 'todo', domain: 'coding', stage: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
+  addWork(fgosDir, { id: 'c2', title: 'Cand 2', kind: 'task', status: 'todo', domain: 'coding', stage: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
+
+  const result = await fanoutBatchExecutorCli(['c1', 'c2'], { repoRoot: repo.repoRoot, hasLiveTaskAccess: true });
+  assert.equal(result.slotsFull, undefined);
+  assert.deepEqual(result.deferred, ['c2']);
+  assert.equal(result.mechanismChanged.length, 1);
+  assert.equal(result.mechanismChanged[0].id, 'c1');
+});
+
+test('fgos schedule --candidates filters schedule to specified candidates', () => {
+  const repo = mkTempGitRepo();
+  const fgosDir = repo.fgosDir;
+  initStore(fgosDir);
+  addWork(fgosDir, { id: 'w1', title: 'Item 1', kind: 'task', status: 'todo', domain: 'coding', stage: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
+  addWork(fgosDir, { id: 'w2', title: 'Item 2', kind: 'task', status: 'todo', domain: 'coding', stage: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
+  const fgosScript = path.resolve(process.cwd(), 'bin/fgos.mjs');
+
+  const outAll = execFileSync(process.execPath, [fgosScript, 'schedule', '--json', '--dir', repo.repoRoot], { encoding: 'utf8' });
+  const schedAll = JSON.parse(outAll);
+  const wavesAll = schedAll.data ? schedAll.data.waves : schedAll.waves;
+  assert.ok(wavesAll[0].includes('w1'));
+  assert.ok(wavesAll[0].includes('w2'));
+
+  const outScoped = execFileSync(process.execPath, [fgosScript, 'schedule', '--candidates', 'w1', '--json', '--dir', repo.repoRoot], { encoding: 'utf8' });
+  const schedScoped = JSON.parse(outScoped);
+  const wavesScoped = schedScoped.data ? schedScoped.data.waves : schedScoped.waves;
+  assert.deepEqual(wavesScoped, [['w1']]);
+});
+
+/** Write a fake executor that commits an empty commit in whatever cwd it
+ * runs in (the picked worktree, per `executeExecutorCli`'s own `cwd`
+ * param) -- simulates a real worker actually doing+committing work, so
+ * `fgos return` finds real progress to verify against. */
+function writeCommittingExecutor(dir) {
+  const scriptPath = path.join(dir, 'committing-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    import { execFileSync } from 'node:child_process';
+    execFileSync('git', ['commit', '--allow-empty', '-m', 'fake work'], { stdio: 'ignore' });
+    process.stdout.write(JSON.stringify({ ok: true }));
+    process.exit(0);
+    `,
+  );
+  return scriptPath;
+}
+
+test('fanoutBatchExecutorCli: real end-to-end out-of-process fire -- pick/execute/return actually complete via subprocess calls to the real bin/fgos.mjs (closes the --dir/worktreePath-shape bug: this function used to pass fgosDir instead of root to --dir, doubling the .fgos suffix into a nonexistent path, and read a flat .worktreePath field the fgos.v1 envelope never has -- data.worktree.path is the real shape)', async () => {
+  const { repoRoot, fgosDir } = mkTempGitRepo();
+  const dir = mkTempDir();
+  const scriptPath = writeCommittingExecutor(dir);
+  writeRunnerConfigFixture(repoRoot, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: { 'fgos-coding-implement': { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  addWork(fgosDir, {
+    id: 'cand1',
+    title: 'Candidate 1',
+    kind: 'task',
+    status: 'todo',
+    domain: 'coding',
+    stage: 'executing',
+    deps: [],
+    refs: [],
+    risk: 'light',
+    verify: 'true',
+  });
+
+  const result = await fanoutBatchExecutorCli(['cand1'], { repoRoot, hasLiveTaskAccess: false });
+
+  assert.equal(result.mechanismChanged.length, 0);
+  assert.equal(result.unavailable.length, 0);
+  assert.equal(result.fired.length, 1);
+  assert.equal(result.fired[0].id, 'cand1');
+  assert.equal(result.fired[0].status, 0);
+  assert.equal(result.fired[0].errorClass, null);
+
+  // Never trust the return value alone -- independently re-read real state.
+  const view = listWork(fgosDir);
+  assert.equal(view.work.cand1.status, 'awaiting-approval');
+});
+
+// --- resolveAgentTypeForWork (D20/D22 wiring, review finding H1, tsk-397) ---
+// DOMAINS.coding is a fixed, module-load-time registry (not injectable per
+// call), so these fixtures write a real domains/coding/task-specs/
+// implement-item.md + core/agents/*.yaml under a temp cwd -- the SAME
+// taskSpec id DOMAINS.coding.taskSpecMap.executing already names
+// ('implement-item', proven by the bundleForStage test above), just with a
+// controlled header/roster so the resolution itself is isolated and
+// deterministic.
+
+function writeTaskSpecFixture(cwd, headerLine) {
+  const dir = path.join(cwd, 'domains', 'coding', 'task-specs');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'implement-item.md'), `# task-spec: implement-item\n\n${headerLine}\n\n## Input\n`);
+}
+
+function writeAgentFixture(cwd, name, skills) {
+  const dir = path.join(cwd, 'core', 'agents');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, `${name}.yaml`), `name: ${name}\nskills: [${skills.join(', ')}]\n`);
+}
+
+test('resolveAgentTypeForWork resolves the real coding/executing taskSpec (implement-item) against a controlled agent roster', () => {
+  const cwd = mkTempDir();
+  writeTaskSpecFixture(cwd, 'domain: coding | stage: executing | role: implementer | requires-skill: fgos-coding-implement');
+  writeAgentFixture(cwd, 'general-worker', ['fgos-coding-implement', 'fgos-coding-planning']);
+
+  const resolved = resolveAgentTypeForWork({ domain: 'coding', stage: 'executing' }, cwd);
+  assert.equal(resolved, 'general-worker');
+});
+
+test('resolveAgentTypeForWork honors an explicit agent: pin over skill-matching (D32 tie-break priority 1)', () => {
+  const cwd = mkTempDir();
+  writeTaskSpecFixture(cwd, 'domain: coding | stage: executing | role: implementer | agent: pinned-worker | requires-skill: fgos-coding-implement');
+  writeAgentFixture(cwd, 'general-worker', ['fgos-coding-implement']);
+  writeAgentFixture(cwd, 'pinned-worker', []); // no matching skills -- the pin still wins
+
+  const resolved = resolveAgentTypeForWork({ domain: 'coding', stage: 'executing' }, cwd);
+  assert.equal(resolved, 'pinned-worker');
+});
+
+test('resolveAgentTypeForWork returns null when no real agentDefs exist to resolve against (empty roster is a legitimate "nothing to resolve", not an error)', () => {
+  const cwd = mkTempDir();
+  writeTaskSpecFixture(cwd, 'domain: coding | stage: executing | role: implementer | requires-skill: fgos-coding-implement');
+  // No core/agents/ or domains/coding/agents/ written -- empty roster.
+  const resolved = resolveAgentTypeForWork({ domain: 'coding', stage: 'executing' }, cwd);
+  assert.equal(resolved, null);
+});
+
+test('resolveAgentTypeForWork returns null for a stage with no registered taskSpec (bundleForStage\'s own {skill:null,taskSpec:null} case) -- nothing to resolve from', () => {
+  const cwd = mkTempDir();
+  const resolved = resolveAgentTypeForWork({ domain: 'coding', stage: 'nonexistent-stage' }, cwd);
+  assert.equal(resolved, null);
 });

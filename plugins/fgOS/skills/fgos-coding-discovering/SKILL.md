@@ -35,7 +35,7 @@ chứng đã research xong ở bước 3, không phải suy đoán từ text sub
 (`src/state/workflow-stage-graphs.mjs`), không hardcode mảng giá trị. Xem
 bước 4/5.
 
-Hợp đồng đầu việc: `docs/task-specs/coding/judge-ambiguity.md` (D6/D9)
+Hợp đồng đầu việc: `domains/coding/task-specs/judge-ambiguity.md` (D6/D9)
 — input/output/gate/verify-template và bảng `## Collaboration` mà bước 3
 dưới đây thực thi. Đọc file đó trước khi sửa prose ở bước 3, để không
 lệch khỏi hợp đồng đã khoá (tsk-2t9c D16 — task-spec này đã tồn tại từ

@@ -82,11 +82,11 @@ trigger actually matches; no trigger matching means no call:
 - **advise (async)** — a product decision outside the locked decisions
   is needed, and the question passes the material/grounded/answerable
   filter. This is `fgos ask`'s own async park — call `handoff` FIRST
-  (moves `holder` to `human-advisor` without touching `status`), THEN
+  (moves `holder` to `advisor` without touching `status`), THEN
   `ask` (parks `status` to `awaiting-human`):
 
   ```bash
-  node "$root/bin/fgos.mjs" handoff "<id>" --to human-advisor --reason advise --dir "$root"
+  node "$root/bin/fgos.mjs" handoff "<id>" --to advisor --reason advise --dir "$root"
   ```
 
   ```bash
