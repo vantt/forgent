@@ -2254,6 +2254,7 @@ async function runVerb(verb, flags, positional, dir) {
           frictions: scopedById(rawView.frictions),
           learnings: scopedById(rawView.learnings),
           decisionsById: scopedById(rawView.decisionsById),
+          callThreads: scopedById(rawView.callThreads),
         };
         if (item.status === 'awaiting-human') {
           const ctx = computeAwaitingContext(singleView, id);
