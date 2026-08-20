@@ -467,6 +467,19 @@ function allTaskSpecs(cwd) {
   return specs;
 }
 
+// Extracts a `skills:` list's own item strings from raw yaml SOURCE TEXT,
+// without a yaml parser dependency. Doctor (`src/setup/registrations.mjs`)
+// must keep loading in a plain unpacked copy with no `node_modules/` yet
+// (test/setup/checks-setup-rc-line.test.mjs's own "setup from a copy of
+// fgos that is not in a git checkout" case proves this is a real,
+// exercised scenario) -- a static top-level `import ... from 'yaml'`
+// would break module load there even though 'yaml' is a real dependency
+// used elsewhere (scripts/project-agents.mjs, run only after `npm
+// install`, well after this constraint applies). Supports both block-list
+// (`skills:\n  - a\n  - b`) and inline flow (`skills: [a, b]`) styles,
+// enough for a diagnostic -- the real authority on whether a source yaml
+// is well-formed is project-agents.mjs's own full parse at projection
+// time, never this heuristic.
 function extractSkillsFromYamlText(text) {
   const inlineMatch = text.match(/^skills:\s*\[([^\]]*)\]\s*$/m);
   if (inlineMatch) {
