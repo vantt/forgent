@@ -27,8 +27,8 @@ and the item's position: while `stage` is still live (status in
 the item's `status`. See SKILL.md's Advance-axis section for why.
 
 Also check `src/state/postland-drift.mjs`'s `postLandDrift(repoRoot, view,
-{ trunk })` for this item id (tsk-1el, D3/CONTEXT.md — the
-`fgos-coding-driving` Orient pull surface). If it returns a finding for
+{ trunk })` for this item id (the `fgos-coding-driving` Orient pull surface
+added for tsk-1el). If it returns a finding for
 this id, print it plainly — the shared files and the target it drifted
 against — before continuing to Step 2. This is read-only and additive:
 never a state change, never a park, never a gate; it reuses the fresh read
