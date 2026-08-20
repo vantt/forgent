@@ -60,7 +60,7 @@ root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
 node "$root/src/runner/dispatch.mjs" decide <EXECUTOR_ID> [--has-live-task-access]
 # when you have no executor id, use the door that matches what you know:
 #   decide --for <PURPOSE>  [--has-live-task-access]
-#   decide --work <WORK_ID> [--has-live-task-access]
+#   decide --work <WORK_ID> [--stage <STAGE>] [--has-live-task-access]
 #   decide --for <LABEL> --needs-soul [--has-live-task-access]
 ```
 
