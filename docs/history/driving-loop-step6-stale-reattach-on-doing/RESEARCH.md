@@ -90,3 +90,71 @@ a discovery-stage ambiguity — both options are real and both close the
 gap; picking between them needs no further evidence.
 
 **Verdict:** clear.
+
+## Round 2 (2026-08-20, validating stage reality-gate FAIL, direct read)
+
+**Trigger:** `fgos-coding-validating`'s reality gate FAILed on Repo fit —
+plan.md's original Phase 1 ("re-invoke `fgos pick <id>`") does not
+actually reach `resyncClaimWorktree` for the live-continuous-drive case
+that matters most.
+
+**Checked (repo, direct read):**
+
+1. `src/runner/claim-liveness.mjs:112-117` — `isReclaimEligible(repoRoot,
+   id, claimRole, ...)` requires `now - activityAt > thresholdMs`, and for
+   `claimRole !== 'runner'` (covers `'session'`, our case) `thresholdMs =
+   thresholds.humanMs = 24 * 60 * 60 * 1000` (`src/state/graph-metrics.mjs:485`
+   — 24 hours). No same-session/same-actor exemption exists anywhere in
+   this check — it is purely a worktree-activity-age signal.
+2. `src/runner/claim-port.mjs:289-326` — the stale-claim-reclaim block
+   that releases-then-reclaims a `status:doing` item only fires when
+   `isReclaimEligible` returns true. When it does not (the ordinary case
+   for a live, continuously-driven item — minutes since last activity, far
+   under 24h), execution falls through to `claim-port.mjs:331-339`'s
+   ordinary `moveWork(dir, { id, to: 'doing', expectedStatus: 'todo', ...
+   })` — which throws an FSM conflict error, since the item's real status
+   is `doing`, not `todo`. Confirmed no earlier branch in `claimWork`
+   (read from its own top, `claim-port.mjs:96`) special-cases "already
+   own this live claim, just resync" — there is no such shortcut.
+3. **Conclusion: the original Phase 1 mechanism is wrong for the exact
+   scenario this item targets** (a continuous drive re-entering its own
+   recently-active claim within the same session, the tsk-17h/fan-out
+   shape) — it would throw a conflict error instead of resyncing.
+4. Found a better existing mechanism instead: `fgos resync-worktree`
+   (`bin/fgos.mjs:3906`, wired to `resyncWorktree` at
+   `src/runner/worktree.mjs:902`) is an ALREADY-EXISTING, ALREADY-SHIPPED
+   CLI verb, purpose-built for precisely this failure class — its own doc
+   comment (`worktree.mjs:885-901`, tsk-1d7) names the exact cause: "a
+   worktree whose branch ref was force-moved from outside (e.g.
+   `approve`'s leaf->root merge) while this worktree still holds
+   files/index at the OLD tree" — this is verbatim the tsk-17h repro. It
+   takes NO item id and touches NO claim/CAS state at all — pure
+   git-worktree-plus-branch repair, so `isReclaimEligible`/`moveWork`
+   never enter the picture, closing the exact gap that broke the
+   `fgos pick`-based mechanism. Its own CLI shape
+   (`bin/fgos.mjs:3906-3910`) is designed to run from inside the stale
+   worktree with no flags at all (`--path` defaults to `process.cwd()`,
+   `--branch` defaults to the worktree's own current branch via
+   `git symbolic-ref`) — exactly the position Step 6 is already in when
+   `status == 'doing'` (the session is already inside the item's claimed
+   worktree). No-op fast path confirmed: returns `{resynced: false,
+   reason: 'already-in-sync'}` when already current
+   (`worktree.mjs:939-941`).
+5. Existing test coverage confirmed real, not assumed:
+   `test/runner/worktree.test.mjs:852-` (`resyncWorktree` unit tests,
+   including the already-in-sync no-op and the moved-branch-tip
+   reapply/refuse cases) and `test/e2e/resync-worktree-bare-invocation.test.mjs`
+   (the exact bare/no-flags CLI shape this fix reuses).
+
+**Found:** the fix should call the existing `fgos resync-worktree --dir
+"$root"` verb (bare invocation, no `--path`/`--branch` needed — the
+session is already sitting in the worktree) instead of re-invoking
+`fgos pick`. This is simpler than both the original plan (broken) and the
+rejected new-CLI-verb alternative from Round 1 (unnecessary — the right
+verb already exists). `fgos pick`'s own reattach/resync path
+(`resyncClaimWorktree`, evidence from Round 1) remains correct and
+unchanged for its own case (a fresh claim/reclaim through the pull door);
+it is simply not the mechanism Step 6 should reach for on an
+already-live, already-`doing` claim.
+
+**Verdict:** clear.
