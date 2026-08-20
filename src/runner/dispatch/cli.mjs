@@ -69,11 +69,9 @@ import {
  * identity) is intentional, not a bug; `decideExecutorCli`'s own `--work`
  * branch below already documents the fallback this design implies.)
  *
- * D15/D20: persona/agent-type resolution key expanded to (domain, stage, role).
- * `stage` defaults to `stage ?? work?.stage ?? 'executing'`; `role` defaults to
- * `role ?? work?.holder ?? work?.role`.
+ * `stage` defaults to `stage ?? work?.stage ?? 'executing'`.
  */
-export function executorIdForWork(work, stage, role) {
+export function executorIdForWork(work, stage) {
   const domainObj = DOMAINS[resolveDomainName(work?.domain)];
   const targetStage = stage ?? work?.stage ?? 'executing';
   return skillForStage(domainObj, targetStage);

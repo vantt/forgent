@@ -458,5 +458,12 @@ test('bundleForStage resolves {skill, taskSpec} for domain and stage (D14/D29/D3
   });
 });
 
-
-
+test('workflow-derived fields take precedence over registryData top-level keys in domain objects (activeWorkflow overrides registryData)', () => {
+  const codingDomain = DOMAINS.coding;
+  const activeWf = codingDomain.workflows[codingDomain.defaultWorkflow];
+  assert.strictEqual(codingDomain.stages, activeWf.stages);
+  assert.strictEqual(codingDomain.stepMap, activeWf.stepMap);
+  assert.strictEqual(codingDomain.transitions, activeWf.transitions);
+  assert.strictEqual(codingDomain.skillMap, activeWf.skillMap);
+  assert.strictEqual(codingDomain.taskSpecMap, activeWf.taskSpecMap);
+});
