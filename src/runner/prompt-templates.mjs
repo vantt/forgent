@@ -11,7 +11,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { resolveDomainName } from '../state/workflow-stage-graphs.mjs';
+import { DEFAULT_DOMAIN, resolveDomainName } from '../state/workflow-stage-graphs.mjs';
 
 export const TEMPLATE_DIR = path.join(import.meta.dirname, 'prompt-templates');
 
@@ -33,8 +33,8 @@ export const TEMPLATE_DIR = path.join(import.meta.dirname, 'prompt-templates');
  * regression.
  */
 const TEMPLATE_RULES = [
-  { match: { domain: 'coding', stage: 'discovery' }, template: 'worker-prompt-discovery.txt' },
-  { match: { domain: 'coding' }, template: 'worker-prompt-skill-pointer.txt' },
+  { match: { domain: DEFAULT_DOMAIN, stage: 'discovery' }, template: 'worker-prompt-discovery.txt' },
+  { match: { domain: DEFAULT_DOMAIN }, template: 'worker-prompt-skill-pointer.txt' },
   { match: {}, template: 'worker-prompt-default.txt' },
 ];
 
