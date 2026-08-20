@@ -1061,8 +1061,11 @@ test('live tee: .fgos/logs is never committed (live tee did not change the commi
   assert.ok(fs.existsSync(path.join(dir, 'logs', 'item-live-clean.log')));
   // main only ever gains the worker's own commit (produced by the committing
   // executor) — .fgos/logs never enters a git object at all, tracked or not.
+  // .fgos/events.jsonl itself IS expected to be committed here (tsk-1ji:
+  // claimWork's own opportunistic periodic checkpoint runs on every claim),
+  // so this only asserts the live-tee surface, not .fgos as a whole.
   const tracked = execFileSync('git', ['ls-files'], { cwd: repoRoot, encoding: 'utf8' });
-  assert.doesNotMatch(tracked, /\.fgos/, 'no .fgos path is ever committed');
+  assert.doesNotMatch(tracked, /\.fgos\/logs/, 'no .fgos/logs path is ever committed');
 });
 
 // --- anti-loop: max-visits parks the item OFF the frontier ----------------
