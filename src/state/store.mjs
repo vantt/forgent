@@ -28,7 +28,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { readEvents, withEventsLock, appendEventLocked, readLastLineBefore } from './events.mjs';
+import { readEvents, parseEventLines, withEventsLock, appendEventLocked, readLastLineBefore } from './events.mjs';
 import { rebuildView, viewRevision, serializeView } from './replay.mjs';
 import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, classifyStalePostDelivery, footprintOverlapAmong, goalScopedCriticalPath, goalScopedGreedyTopUnblock, computeSchedule, detectCycles } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './status-fsm.mjs';
@@ -1480,6 +1480,18 @@ export function computedSchedule(dir, candidateIds) {
 export function readRawEvents(dir) {
   const { logPath } = paths(dir);
   return readEvents(logPath);
+}
+
+export function readRawEventsAndText(dir) {
+  const { logPath } = paths(dir);
+  let text = '';
+  try {
+    text = fs.readFileSync(logPath, 'utf8');
+  } catch (err) {
+    if (err.code === 'ENOENT') return { events: [], text: '' };
+    throw err;
+  }
+  return { events: parseEventLines(text, logPath), text };
 }
 
 /**

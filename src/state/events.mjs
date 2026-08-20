@@ -71,7 +71,7 @@ export class EventLogError extends Error {
 // throwing the same EventLogError('corrupt-log') shape readEvents always
 // has. Used by readEvents (whole-file) and readEventsFromByte (partial,
 // incremental-snapshot read) below — one parsing implementation, never two.
-function parseEventLines(raw, logPath) {
+export function parseEventLines(raw, logPath) {
   if (raw === '') return [];
 
   const lines = raw.split('\n');

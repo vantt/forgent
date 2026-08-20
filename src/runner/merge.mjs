@@ -51,6 +51,7 @@ import { acquireMainCheckoutLock, renewMainCheckoutLockIfOwn, mergeSlotLockFile,
 import { listSessions } from './session.mjs';
 import { listWork } from '../state/store.mjs';
 import { openLeavesSharingTarget, classifyPostLandDrift } from '../state/graph-harness.mjs';
+import { runOpportunisticMainCheckoutChecks } from '../state/events-jsonl-truncation-guard.mjs';
 
 /** Raised only for a genuinely unexpected git failure (e.g. `git merge
  * --abort` itself failing) — never for a conflict or a red verify, which are
@@ -784,6 +785,8 @@ export async function withMergeTargetSlot(lockRoot, targetRef, fn) {
     throw new MergeError(`cannot merge into "${targetRef}": target's merge slot lock is ambiguous (unparseable lock file) — refusing per fail-closed policy.`, { targetRef, code: 'lock-ambiguous', lockAgeMs: lock.lockAgeMs });
   }
 
+  runOpportunisticMainCheckoutChecks(fgosDir, lockRoot);
+
   const heartbeat = setInterval(() => {
     renewMainCheckoutLockIfOwn(fgosDir, identity, { lockFile });
   }, HEARTBEAT_INTERVAL_MS);
@@ -904,6 +907,8 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = re
   if (lock.status === AMBIGUOUS) {
     throw new MergeError(`cannot merge "${branch}": main checkout lock is ambiguous (unparseable lock file) — refusing per fail-closed policy.`, { branch, code: 'lock-ambiguous', lockAgeMs: lock.lockAgeMs });
   }
+
+  runOpportunisticMainCheckoutChecks(fgosDir, lockRoot);
 
   // Heartbeat (tsk-4l8): renews the lock's timestamp every
   // HEARTBEAT_INTERVAL_MS for as long as this call holds it, so its age
