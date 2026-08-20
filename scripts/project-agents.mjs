@@ -211,37 +211,66 @@ export function projectAgentMarkdown(name, sourceYamlText, models, sourcePath = 
   return `${frontmatter}\n\n${body}\n`;
 }
 
-function main() {
-  const agentFiles = findAgentYamlFiles(REPO_ROOT);
-  if (agentFiles.length === 0) {
-    console.log(`no agent yaml files found -- nothing to project.`);
-    return;
-  }
-
-  // D33: Check for duplicate agent-type names globally across all sources
-  const nameToFiles = new Map();
+/**
+ * D33: Resolves duplicate agent-type names globally across all sources.
+ * Deprioritizes legacy agents/ source when a non-legacy source (core/agents or
+ * domains/<name>/agents) collides with it (logs warning, legacy is skipped).
+ * Throws AgentDefinitionError if two non-legacy sources collide.
+ */
+export function resolveAgentFiles(agentFiles, repoRoot = REPO_ROOT) {
+  const nameToEntries = new Map();
   for (const file of agentFiles) {
-    const sourceYamlText = fs.readFileSync(file.filePath, 'utf8');
     let agentName = file.name;
     try {
+      const sourceYamlText = fs.readFileSync(file.filePath, 'utf8');
       const def = parseYaml(sourceYamlText);
       if (def && typeof def.name === 'string') {
         agentName = def.name;
       }
     } catch {}
-    if (!nameToFiles.has(agentName)) {
-      nameToFiles.set(agentName, []);
+    const relPath = path.relative(repoRoot, file.filePath);
+    const entry = { ...file, agentName, relPath };
+    if (!nameToEntries.has(agentName)) {
+      nameToEntries.set(agentName, []);
     }
-    const relPath = path.relative(REPO_ROOT, file.filePath);
-    nameToFiles.get(agentName).push(relPath);
+    nameToEntries.get(agentName).push(entry);
   }
 
-  for (const [agentName, paths] of nameToFiles.entries()) {
-    if (paths.length > 1) {
+  const resolved = [];
+  for (const [agentName, entries] of nameToEntries.entries()) {
+    if (entries.length === 1) {
+      resolved.push(entries[0]);
+      continue;
+    }
+
+    const nonLegacy = entries.filter((e) => e.source !== 'agents');
+    const legacy = entries.filter((e) => e.source === 'agents');
+
+    if (nonLegacy.length === 1 && legacy.length > 0) {
+      const winner = nonLegacy[0];
+      for (const leg of legacy) {
+        console.warn(
+          `warning: legacy agents/ entry "${leg.relPath}" skipped due to duplicate agent-type name "${agentName}" in ${winner.relPath} (D33)`
+        );
+      }
+      resolved.push(winner);
+    } else {
+      const paths = entries.map((e) => e.relPath);
       throw new AgentDefinitionError(
-        `duplicate agent-type name "${agentName}" found in multiple files: ${paths.join(', ')} (D33)`,
+        `duplicate agent-type name "${agentName}" found in multiple files: ${paths.join(', ')} (D33)`
       );
     }
+  }
+
+  return resolved;
+}
+
+function main() {
+  const rawAgentFiles = findAgentYamlFiles(REPO_ROOT);
+  const agentFiles = resolveAgentFiles(rawAgentFiles, REPO_ROOT);
+  if (agentFiles.length === 0) {
+    console.log(`no agent yaml files found -- nothing to project.`);
+    return;
   }
 
   const models = readRunnerModels();
