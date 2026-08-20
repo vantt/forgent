@@ -247,3 +247,51 @@ test('assembleSkills output matches the committed .agents/skills byte-for-byte (
   }
 });
 
+test('assembleSkills throws on duplicate skill name collision across core and domains', () => {
+  const root = mkTempDir('skill-wrappers-collision-');
+  writeSkill(path.join(root, 'core', 'skills'), 'skill-dup', SAMPLE_FRONTMATTER, '# Core Dup\n');
+  writeSkill(path.join(root, 'domains', 'coding', 'skills'), 'skill-dup', SAMPLE_FRONTMATTER, '# Domain Dup\n');
+
+  assert.throws(
+    () => assembleSkills(root),
+    (err) => {
+      assert.match(err.message, /duplicate skill name "skill-dup" found in multiple files:/);
+      assert.match(err.message, /core\/skills\/skill-dup/);
+      assert.match(err.message, /domains\/coding\/skills\/skill-dup/);
+      return true;
+    },
+  );
+});
+
+test('assembleSkills prunes orphaned skills from .agents/skills when removed from source', () => {
+  const root = mkTempDir('skill-wrappers-prune-agents-');
+  writeSkill(path.join(root, 'core', 'skills'), 'skill-active', SAMPLE_FRONTMATTER, '# Active\n');
+
+  const targetAgentsSkills = path.join(root, '.agents', 'skills');
+  writeSkill(targetAgentsSkills, 'skill-orphaned', SAMPLE_FRONTMATTER, '# Orphaned\n');
+
+  assert.ok(fs.existsSync(path.join(targetAgentsSkills, 'skill-orphaned')));
+
+  assembleSkills(root);
+
+  assert.ok(fs.existsSync(path.join(targetAgentsSkills, 'skill-active')));
+  assert.equal(fs.existsSync(path.join(targetAgentsSkills, 'skill-orphaned')), false);
+});
+
+test('generateAllSkillWrappers prunes orphaned wrappers from .claude/skills when source skill is gone', () => {
+  const agentsSkillsRoot = mkTempDir('skill-wrappers-prune-claude-agents-');
+  const claudeSkillsRoot = mkTempDir('skill-wrappers-prune-claude-target-');
+
+  writeSkill(agentsSkillsRoot, 'skill-active', SAMPLE_FRONTMATTER, '# Active\n');
+
+  writeSkill(claudeSkillsRoot, 'skill-orphaned', SAMPLE_FRONTMATTER, '# Orphaned Wrapper\n');
+  assert.ok(fs.existsSync(path.join(claudeSkillsRoot, 'skill-orphaned')));
+
+  const written = generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot);
+
+  assert.equal(written.length, 1);
+  assert.ok(fs.existsSync(path.join(claudeSkillsRoot, 'skill-active', 'SKILL.md')));
+  assert.equal(fs.existsSync(path.join(claudeSkillsRoot, 'skill-orphaned')), false);
+});
+
+
