@@ -29,7 +29,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { readEvents, withEventsLock, appendEventLocked, readLastLineBefore } from './events.mjs';
-import { rebuildView, viewRevision } from './replay.mjs';
+import { rebuildView, viewRevision, serializeView } from './replay.mjs';
 import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, classifyStalePostDelivery, footprintOverlapAmong, goalScopedCriticalPath, goalScopedGreedyTopUnblock, computeSchedule, detectCycles } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './status-fsm.mjs';
 import { transitionStage } from './stage-fsm.mjs';
@@ -102,13 +102,18 @@ function writeView(viewPath, view, snapshot) {
   // this write) is the same kind of additive sibling field — read back only
   // by replay.mjs's own incremental-rebuild fast path, never folded into the
   // view a rebuild returns.
-  const persisted = { ...view, revision: viewRevision(view), snapshot };
+  // tsk-37d: reuse the once-serialized view string to derive the revision hash
+  // and construct the persisted JSON without a second JSON.stringify pass over
+  // view.
+  const { viewStr, revision } = serializeView(view);
+  const snapshotPart = snapshot !== undefined ? `,"snapshot":${JSON.stringify(snapshot)}` : '';
+  const persistedContent = `${viewStr.slice(0, -1)},"revision":${JSON.stringify(revision)}${snapshotPart}}\n`;
   // tsk-4mx: write to a uniquely-named temp file, then rename(2) it onto
   // viewPath -- an atomic replace on POSIX, so a reader can never observe a
   // truncated/partial state.json, same pattern as main-checkout-lock.mjs's
   // own writeAtomicReplace.
   const tmpPath = `${viewPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  fs.writeFileSync(tmpPath, `${JSON.stringify(persisted, null, 2)}\n`, 'utf8');
+  fs.writeFileSync(tmpPath, persistedContent, 'utf8');
   fs.renameSync(tmpPath, viewPath);
 }
 

@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { appendEvent } from '../../src/state/events.mjs';
-import { foldEvents, rebuildView, viewRevision } from '../../src/state/replay.mjs';
+import { foldEvents, rebuildView, viewRevision, serializeView } from '../../src/state/replay.mjs';
 import { initStore, addWork, moveWork } from '../../src/state/store.mjs';
 import { fixEventsJsonlContiguity } from '../../src/state/events-jsonl-contiguity.mjs';
 import { repairTruncatedLastLine } from '../../src/state/events.mjs';
@@ -759,6 +759,17 @@ test('foldEvents ignores mergedSha/mergedInto on a non-delivered move even when 
 // consumer can tell "did the folded state change?" without re-folding — and
 // WITHOUT the hash leaking into the fold return shape (which whole-view
 // snapshot + backward-compat tests pin).
+
+test('serializeView returns serialized JSON string and matching revision hash (tsk-37d)', () => {
+  const logPath = tmpLogPath();
+  appendEvent(logPath, { type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' } });
+  const view = rebuildView(logPath);
+
+  const { viewStr, revision } = serializeView(view);
+  assert.equal(typeof viewStr, 'string');
+  assert.equal(revision, viewRevision(view));
+  assert.deepEqual(JSON.parse(viewStr), view);
+});
 
 test('viewRevision is deterministic: rebuilding the same log twice yields byte-identical revisions', () => {
   const logPath = tmpLogPath();
