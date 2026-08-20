@@ -208,7 +208,7 @@
     "level": "standard"
   },
   "cleanup": {
-    "ttlDays": 7,
+    "ttlDays": 5,
     "leafTtlDays": 0
   },
   "invariantChecks": {
