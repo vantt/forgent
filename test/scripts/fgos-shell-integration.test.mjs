@@ -331,3 +331,37 @@ test('fgos prints a clear error, not a raw Node stack, when the resolved root ha
   assert.doesNotMatch(result.stderr, /Cannot find module/);
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
+
+test('fgos auto-appends --dir "$root" when caller omits --dir', () => {
+  const repoRoot = setupRepo();
+
+  const out = runBash(repoRoot, `source "${scriptPath}"; fgos --x`);
+
+  assert.match(out, /FGOS_MARKER/);
+  assert.match(out, /"--x"/);
+  assert.match(out, /"--dir"/);
+  assert.ok(out.includes(repoRoot));
+
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
+test('fgos preserves explicit --dir without overriding it', () => {
+  const repoRoot = setupRepo();
+
+  const out = runBash(repoRoot, `source "${scriptPath}"; fgos --x --dir /explicit/path`);
+
+  assert.match(out, /FGOS_MARKER/);
+  assert.match(out, /"--x"/);
+  assert.match(out, /"--dir"/);
+  assert.match(out, /"\/explicit\/path"/);
+  assert.doesNotMatch(out, new RegExp(repoRoot));
+
+  const outEq = runBash(repoRoot, `source "${scriptPath}"; fgos --x --dir=/explicit/path`);
+  assert.match(outEq, /FGOS_MARKER/);
+  assert.match(outEq, /"--x"/);
+  assert.match(outEq, /"--dir=\/explicit\/path"/);
+  assert.doesNotMatch(outEq, new RegExp(repoRoot));
+
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+

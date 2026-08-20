@@ -22,8 +22,7 @@ that path is decided, BEFORE writing anything into it (`plan.md`,
 item:
 
 ```bash
-root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-node "$root/bin/fgos.mjs" edit "<item-id>" --docs-ref "docs/history/<feature>/" --dir "$root"
+fgos edit "<item-id>" --docs-ref "docs/history/<feature>/"
 ```
 
 Skip this call when `docsRef` is already set — never overwrite a value
@@ -42,11 +41,7 @@ parked via `fgos ask` inside `fgos-coding-exploring` and was `answer`ed
 since — reclaim before continuing:
 
 ```bash
-root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-```
-
-```bash
-node "$root/bin/fgos.mjs" handoff-return "<id>" --note "reclaiming at Bootstrap — holder was <role>" --dir "$root"
+fgos handoff-return "<id>" --note "reclaiming at Bootstrap — holder was <role>"
 ```
 
 Repeat, re-reading `holder` fresh each time, until it reads `implementer`

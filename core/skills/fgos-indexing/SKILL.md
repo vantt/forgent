@@ -26,8 +26,7 @@ every other cross-worktree verb is invoked from a claimed item's own
 worktree (ADR0020 — a worktree never carries its own `.fgos/`):
 
 ```bash
-root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-node "$root/bin/fgos.mjs" docs-index --dir "$root"
+fgos docs-index
 ```
 
 Run this once, right after step 4/5 of `fgos-coding-compounding` (the document

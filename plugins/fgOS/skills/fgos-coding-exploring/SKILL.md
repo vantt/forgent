@@ -26,21 +26,11 @@ that case — this skill never moves it. See
   self-contained citations (see `../_shared/citation-format.md`) and the
   required two-heading Markdown structure (`## Context` and `## Why this
   matters`, each followed by at least 20 characters of content).
-- Every bare `fgos <verb>` this skill calls (`add`, `ask`, `answer`,
-  `decision`, `discover`, `tool`) requires an existing store — resolve the
-  main checkout root and pass `--dir "$root"` on every one of them:
+- Call `fgos` subcommands directly:
 
   ```bash
-  root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-  node "$root/bin/fgos.mjs" <verb> ... --dir "$root"
+  fgos <verb> ...
   ```
-
-  Run the resolve and the `fgos.mjs` call as two SEPARATE tool calls,
-  never pasted together as one script — a worktree-isolated session's own
-  isolation guard refuses a single call combining a `git`-rooted command
-  with a following `node .../fgos.mjs` invocation, even though each is
-  safe alone. Substitute `root`'s literal printed value into the second
-  call.
 - When one of those calls fails with a known error category, relay that
   category verbatim in the hand-back — never fold it into a generic
   "blocked". The one category that qualifies today is `lock-timeout`
@@ -138,11 +128,7 @@ stopping to ask a person — never the `awaiting-human` park, only this
 skill-embedded question:
 
 ```bash
-root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-```
-
-```bash
-node "$root/bin/fgos.mjs" gate-check "<item-id>" --gate contextApprove --artifact "docs/history/<feature>/CONTEXT.md" --dir "$root"
+fgos gate-check "<item-id>" --gate contextApprove --artifact "docs/history/<feature>/CONTEXT.md"
 ```
 
 Treat anything other than exactly `data.canAutoApprove === true` — `false`,

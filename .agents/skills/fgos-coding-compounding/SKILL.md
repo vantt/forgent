@@ -103,12 +103,7 @@ actually cited from this file until now).
    This step, `fgos doc-sources`, and step 4's `fgos compound` are all
    `requiresExistingStore: true` — this session is often still inside the
    item's worktree right after its own `return`, which never carries its
-   own `.fgos/` by design (ADR0020). Resolve the main checkout root once
-   and reuse it for every command below (tsk-56t D1):
-
-   ```bash
-   root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-   ```
+   own `.fgos/` by design — ADR0020 (a worktree never carries its own `.fgos/`).
 
    **Tìm-trước-khi-tạo (tsk-1lv-6): tra `authoritative_for` trước khi
    suy đường dẫn từ quadrant+tên file.** Trong đúng quadrant vừa chọn ở
@@ -117,7 +112,7 @@ actually cited from this file until now).
    trong schema hiện tại), gọi
 
    ```bash
-   node "$root/bin/fgos.mjs" authoritative-match --quadrant docs/<quadrant> --topic "<chủ đề thật của capture này, không phải tên file đoán>" --dir "$root"
+   fgos authoritative-match --quadrant docs/<quadrant> --topic "<chủ đề thật của capture này, không phải tên file đoán>"
    ```
 
    (`fgos authoritative-match` — skeleton-match `authoritative_for` của
@@ -136,7 +131,7 @@ actually cited from this file until now).
    own:
 
    ```bash
-   node "$root/bin/fgos.mjs" doc-sources docs/<quadrant>/<file>.md --dir "$root"
+   fgos doc-sources docs/<quadrant>/<file>.md
    ```
 
    This will not include this item's own capture — step 4 has not tagged
@@ -203,11 +198,10 @@ actually cited from this file until now).
    stays untagged and unlinked, and synthesis is unfinished.
 
    `compound` also now refuses (retrospective-doc-write-path D3) when
-   `--doc-path` does not resolve inside `$root`'s own committed `HEAD` —
-   run it from the same `$root` step 3 already resolved:
+   `--doc-path` does not resolve inside `$root`'s own committed `HEAD`:
 
    ```bash
-   node "$root/bin/fgos.mjs" compound <id> --doc-type <quadrant> --doc-path docs/<quadrant>/<file>.md --dir "$root"
+   fgos compound <id> --doc-type <quadrant> --doc-path docs/<quadrant>/<file>.md
    ```
 
 5. **Confirm the close.** Run `fgos check <id>` again and confirm the

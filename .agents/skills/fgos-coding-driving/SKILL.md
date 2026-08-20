@@ -102,8 +102,7 @@ domain that does not exist yet.
   checkout root and pass it explicitly:
 
   ```bash
-  root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-  node "$root/bin/fgos.mjs" list --id "<id>" --json --dir "$root"
+  fgos list --id "<id>" --json
   ```
 
 - Re-read the item's stage/status FRESH at the top of every iteration —

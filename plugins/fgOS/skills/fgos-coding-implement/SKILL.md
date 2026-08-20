@@ -50,24 +50,11 @@ on how you got here:
   self-contained citations (see `../_shared/citation-format.md`) and the
   required two-heading Markdown structure (`## Context` and `## Why this
   matters`, each followed by at least 20 characters of content).
-- This skill runs precisely while the session is inside the claimed
-  item's worktree, which never carries its own `.fgos/` by design. Every
-  `fgos <verb>` this skill calls (`ask`, `answer`, `return`) requires an
-  existing store and refuses (exit 4) rather than silently diverge if run
-  bare from here. Resolve the main checkout root and pass it explicitly
-  on every one of them:
+- The `fgos` shell function automatically resolves the main checkout root and appends `--dir "$root"` when invoking subcommands from a linked worktree, so you can call `fgos <verb>` subcommands (`ask`, `answer`, `return`) directly:
 
   ```bash
-  root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-  node "$root/bin/fgos.mjs" <verb> ... --dir "$root"
+  fgos <verb> ...
   ```
-
-  Run these as two SEPARATE tool calls, never pasted together as one
-  script — a worktree-isolated session's own isolation guard refuses a
-  single call that combines a `git`-rooted command with a following
-  `node .../fgos.mjs ... --dir` invocation, even though each command is
-  safe on its own. Resolve `root` alone first, read its printed value,
-  then substitute that literal path into the following `fgos.mjs` call.
 - **Always call `dispatch.mjs decide` first for the Implement step —
   never assume "I have a live Task tool, so I do it myself" as the
   default.** A `cli-spawn`-shaped capacity already registered in

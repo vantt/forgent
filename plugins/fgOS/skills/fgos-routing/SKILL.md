@@ -73,18 +73,10 @@ directly when routing a `planning`-stage item there.
 
 ## Running a state-writing verb from this session
 
-Every bare `fgos <verb>` below (`take`, `return`, and the `ask`/`answer`
-gate contract further down) requires an existing store — it
-refuses (exit 4, `.fgos/ not found`) rather than silently diverge if this
-session's cwd is a linked worktree, which never carries its own `.fgos/`
-by design. Resolve the main checkout root once and pass it explicitly on
-every such call — never a bare `fgos <verb>` when this session might
-already be inside a worktree (e.g. mid-`fgos-coding-implement`, or a
-`pick`'d session running `fgos-routing` again):
+The `fgos` shell function automatically resolves the main checkout root and appends `--dir "$root"` when invoking subcommands from a linked worktree, so you can call subcommands directly:
 
 ```bash
-root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-node "$root/bin/fgos.mjs" <verb> ... --dir "$root"
+fgos <verb> ...
 ```
 
 (the same `root` resolution `fgos-coding-exploring`'s and `fgos-coding-planning`'s own

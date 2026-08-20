@@ -22,19 +22,11 @@ two separate stage values.
 
 ## Hard rules
 
-- Every bare `fgos <verb>` this skill calls (`decision`, `edit`, `handoff`)
-  requires an existing store — resolve the main checkout root and pass
-  `--dir "$root"`:
+- Call `fgos` subcommands directly:
 
   ```bash
-  root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-  node "$root/bin/fgos.mjs" <verb> ... --dir "$root"
+  fgos <verb> ...
   ```
-
-  Run the resolve and the `fgos.mjs` call as two SEPARATE tool calls,
-  never pasted together — a worktree-isolated session's own isolation
-  guard refuses a single call combining them, even though each is safe
-  alone.
 - **This skill creates no work items and records no gate approval.**
   Split children are written as specs in `plan.md` and materialized later,
   by `fgos-coding-validating` at the single gate. Calling `fgos add
