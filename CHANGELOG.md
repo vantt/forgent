@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Updated `resolveAgentTypeForTaskSpec` (`src/runner/dispatch/cli.mjs`) to fail closed (returning `null`) across all four unvalidated/mismatched eligibility fallback points (missing taskSpec header, pinned agent missing from roster, empty `requires-skill`, and no roster agent matching required skills) instead of falling open to an unvalidated agent name.
+
 ### Added
 
 - Split `agents/*.yaml` into `core/agents/` and `domains/<name>/agents/` (D24) and added global unique agent-type name doctor check `agent-type-names-unique` (D33).
