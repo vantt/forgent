@@ -1363,6 +1363,50 @@ test('startup reap: a zero-ahead root branch whose only descendant is already do
   assert.equal(branchExists(repoRoot, 'fgw/root-c'), false);
 });
 
+test('startup reap: a wontfix branch with real commits ahead and no open descendants is force-deleted', async () => {
+  const { repoRoot, dir, worktreeDir } = setup();
+  const wt = createWorktree(repoRoot, 'wontfix-a', { worktreeDir });
+  fs.writeFileSync(path.join(wt.path, 'wontfix.txt'), 'abandoned work\n');
+  execFileSync('git', ['add', 'wontfix.txt'], { cwd: wt.path });
+  execFileSync('git', ['commit', '-q', '-m', 'wontfix work'], { cwd: wt.path });
+  removeWorktree(repoRoot, wt.path);
+  seedItem(dir, { id: 'wontfix-a', status: 'wontfix' });
+
+  const config = {
+    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 30000,
+  };
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.deepEqual(result.reap.pruned, ['fgw/wontfix-a']);
+  assert.equal(branchExists(repoRoot, 'fgw/wontfix-a'), false);
+});
+
+test('startup reap: a wontfix branch with an open descendant is kept, not pruned', async () => {
+  const { repoRoot, dir, worktreeDir } = setup();
+  const wt = createWorktree(repoRoot, 'wontfix-root', { worktreeDir });
+  fs.writeFileSync(path.join(wt.path, 'wontfix.txt'), 'abandoned work\n');
+  execFileSync('git', ['add', 'wontfix.txt'], { cwd: wt.path });
+  execFileSync('git', ['commit', '-q', '-m', 'wontfix work'], { cwd: wt.path });
+  removeWorktree(repoRoot, wt.path);
+  seedItem(dir, { id: 'wontfix-root', status: 'wontfix' });
+  seedItem(dir, { id: 'child-open', parent: 'wontfix-root', status: 'doing' });
+
+  const config = {
+    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 30000,
+  };
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.deepEqual(result.reap.pruned, []);
+  assert.deepEqual(result.reap.kept, [{ branch: 'fgw/wontfix-root', aheadCount: 1 }]);
+  assert.equal(branchExists(repoRoot, 'fgw/wontfix-root'), true);
+});
+
 // --- CAS conflict on the runner's own write -> clean halt, exit 3 ---------
 
 test('state-conflict: a racing write under the runner\'s claim makes its own CAS fail -> cleanup, clean halt, exit 3', async () => {
