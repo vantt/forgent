@@ -134,7 +134,7 @@ every command below from the main checkout, not a worktree.
 > Always run this backgrounded (`run_in_background: true`) from the start, never foreground. `fgos approve`/`sync-root` re-run the item's own full verify command (often `npm test && ...`), routinely 224-386 seconds, well past the Bash tool's 120s default foreground timeout.
 >
 > **Waiting rule:**
-> Wait for the harness's own background-completion notification before proceeding to gather results. Do NOT use `ScheduleWakeup` or polling — `ScheduleWakeup` is for `/loop` dynamic pacing only (requires `prompt` unless `stop:true`) and fails immediately in this context.
+> Wait for the harness's own background-completion notification before proceeding to gather results (end the turn with no further tool call once background execution is started; the harness delivers a task-notification automatically and resumes the session with the output in context). Do NOT use `ScheduleWakeup` or polling — `ScheduleWakeup` is for `/loop` dynamic pacing only (requires `prompt` unless `stop:true`) and fails immediately in this context.
 
    See `../_shared/fgos-cli-fallback.md`, substituting `<verb-cmd>` with:
 

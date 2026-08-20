@@ -133,6 +133,9 @@ invocation carries no compound shell syntax for the guard to flag.
 naming the executor/purpose; a reasonable `timeout_ms` for the tier at
 hand; `persistent: false`.)
 
+> **Waiting rule:**
+> Wait for the harness's own background-completion notification before proceeding to gather results (end the turn with no further tool call once Monitor/background dispatch is started; the harness delivers a task-notification automatically and resumes the session with the output in context). Do NOT use `ScheduleWakeup` or polling — `ScheduleWakeup` is for `/loop` dynamic pacing only (requires `prompt` unless `stop:true`) and fails immediately in this context.
+
 Once Monitor reports the command exited, read its final line: the real
 result as JSON — `{"mechanism":"out-of-process", ...real result fields
 (status, stdout, stderr, tier, model, provider, command)}`. Print the
