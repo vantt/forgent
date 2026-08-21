@@ -24,6 +24,7 @@ of scope here — it belongs to `tsk-1i3` (D3).
 | D3 | tsk-1vc and tsk-1i3 stay separate items. tsk-1vc owns guard reliability + the D1/D2 fail-closed and checkpoint-mechanism decisions + warning-surfacing + root-cause pinning for the concurrent-write/opportunistic-checks loss class. tsk-1i3 keeps owning the merge-content-precedence overwrite fix (the e921fdb4/165bc0cb incident), ordered after tsk-1vc per its existing deps=[tsk-1vc, tsk-56u]. |
 | D4 | Root-cause pinning for the tsk-3hks seq 22824-22851 gap must be done via a real live reproduction (a test/harness that runs genuinely concurrent fgos pick/claim calls against a shared main checkout and observes whether the same gap signature reproduces), not by git-log/timestamp inference alone. |
 | D5 | Overall trade-off priority for this item's fixes: data safety over speed, but every safety change must be backed by real measurement/evidence (reproduced incident, measured checkpoint-interval risk window, etc.), never a guessed value or an unproven mechanism. |
+| D6 | Warning-log surfacing is locked in this item's own scope -- expose recordMainCheckoutGuardWarning's output (main-checkout-guard-warnings.jsonl, confirmed write-only) to a live session or fgos doctor. |
 
 ## Pinned terms
 
