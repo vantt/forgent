@@ -1,10 +1,10 @@
 # The blocked-pick decision tree — full mechanics
 
 The full detail behind SKILL.md's Step 4, for the "anything else is a
-blocked pick" branch. Work every blocked pick through these four
-sections, in order, never skipping ahead: escalate-only carve-outs, the
-rules every playbook obeys, the named playbooks, and the same-id-twice
-stop rule for reasons with no playbook.
+blocked pick" branch. Work every blocked pick through these sections, in
+order, never skipping ahead: escalate-only carve-outs, the self-recovery
+pointer (already run inline by `approve` before this loop ever sees the
+result), and the same-id-twice stop rule for reasons with no playbook.
 
 ## Escalate-only carve-outs, checked before any playbook
 
@@ -65,7 +65,13 @@ The self-recovery decision logic, universal rules (once-per-id-per-run cap, deci
 
 `plugins/fgOS/skills/_shared/catchup-self-recovery.md` (mirrored at `.agents/skills/_shared/catchup-self-recovery.md`).
 
-Refer to `_shared/catchup-self-recovery.md` for the full mechanics of each playbook when handling a blocked pick during a merge loop.
+Because `approve` runs the shared playbook inline before ever returning a
+blocked result (see `approve/SKILL.md` step 7), any blocked pick this
+loop reads has already undergone one self-recovery attempt inside
+`approve`. Re-running the playbook here would be redundant, not merely
+wasteful — the attempt is already spent. This loop records the blocked
+pick, logs the rationale, and enforces its own once-per-id-per-run stop
+rule below; it never invokes the shared playbook itself.
 
 ## The same-id-twice stop rule, for reasons with no playbook
 
