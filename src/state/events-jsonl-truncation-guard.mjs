@@ -32,7 +32,6 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { recordMainCheckoutGuardWarning } from "./main-checkout-guard-warnings.mjs";
-import { readSharedConfigOrEmpty } from "../config/shared-config-file.mjs";
 
 function lastNonEmptyLine(raw) {
   const lines = raw.split("\n");
@@ -311,17 +310,21 @@ export function runOpportunisticMainCheckoutChecks(
           lastCommitSec = null;
         }
 
+        // Kernel tier cannot import the domain-tier config reader
+        // (src/config/shared-config-file.mjs) -- read the shared config
+        // file directly with fs, same pattern this file already uses for
+        // every other .fgos/* path (architecture.test.mjs's one-way-down
+        // layering check, caught live during tsk-1vc-2's own implementation).
         let configThreshold = null;
         try {
-          const cfg = readSharedConfigOrEmpty(realRepoRoot);
-          configThreshold =
-            cfg?.checkpoint?.eventThreshold ??
-            cfg?.eventsCheckpoint?.eventCount ??
-            cfg?.events?.checkpointEventCount ??
-            cfg?.runner?.checkpoint?.events ??
-            cfg?.runner?.checkpoint?.eventThreshold;
+          const sharedConfigPath = path.join(realRepoRoot, ".fgos", "config.json");
+          if (fs.existsSync(sharedConfigPath)) {
+            const cfg = JSON.parse(fs.readFileSync(sharedConfigPath, "utf8"));
+            configThreshold = cfg?.checkpoint?.eventThreshold;
+          }
         } catch {
-          // ignore
+          // ignore -- falls through to the item default below, same as a
+          // missing/unparseable config file always has
         }
 
         const effectiveEventThreshold =
