@@ -17,6 +17,7 @@ import {
   buildOwnFileSet,
   classifyDecisionIndexCollision,
   abortMergeIfPossible,
+  formatFgosWriteRejectedDetail,
   detectPostLandDrift,
   MergeError,
 } from '../../src/runner/merge.mjs';
@@ -1388,6 +1389,15 @@ test('mergeRunnerItem refuses a branch that stages a change under .fgos/ — mai
   assert.deepEqual(result.paths, ['.fgos/events.jsonl']);
   assert.equal(headOf(repoRoot), headBefore, 'HEAD must be unchanged after an aborted merge');
   assert.equal(isWorkingTreeClean(repoRoot), true, 'tree must be clean after merge --abort');
+});
+
+test('formatFgosWriteRejectedDetail includes playbook recovery doc path', () => {
+  const detail = formatFgosWriteRejectedDetail('fgw/demo-item', ['.fgos/events.jsonl'], 'main');
+  assert.equal(
+    detail,
+    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',
+  );
+  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));
 });
 
 test('mergeRunnerItem merges normally when the branch touches ordinary files alongside an untouched .fgos/', async () => {

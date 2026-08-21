@@ -36,6 +36,7 @@ import {
   performCatchUp,
   buildOwnFileSet,
   isWorkingTreeClean as isMainTreeClean,
+  formatFgosWriteRejectedDetail,
 } from '../../runner/merge.mjs';
 import {
   branchNameFor,
@@ -590,7 +591,7 @@ export async function approveUseCase(
             errorClass: 'fgos-write-blocked',
             layer: 'state',
             attempts: 1,
-            detail: `${result.branch} staged a change under .fgos/ (${result.paths.join(', ')}); merge aborted, ${rootBranch} unchanged — ADR0020`,
+            detail: formatFgosWriteRejectedDetail(result.branch, result.paths, rootBranch),
           });
           return { id, mode: 'merge', to: 'blocked', reason: 'fgos-write-rejected', target: rootBranch, paths: result.paths };
         }
@@ -756,7 +757,7 @@ export async function approveUseCase(
         errorClass: 'fgos-write-blocked',
         layer: 'state',
         attempts: 1,
-        detail: `${result.branch} staged a change under .fgos/ (${result.paths.join(', ')}); merge aborted, main unchanged — ADR0020`,
+        detail: formatFgosWriteRejectedDetail(result.branch, result.paths, 'main'),
       });
       return { id, mode: 'merge', to: 'blocked', reason: 'fgos-write-rejected', target: 'main', paths: result.paths };
     }

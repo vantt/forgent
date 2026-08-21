@@ -1102,6 +1102,10 @@ export function abortMergeIfPossible(repoRoot) {
   }
 }
 
+export function formatFgosWriteRejectedDetail(branch, paths, targetLabel) {
+  return `${branch} staged a change under .fgos/ (${paths.join(', ')}); merge aborted, ${targetLabel} unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.`;
+}
+
 async function mergeRunnerItemLocked(repoRoot, item, branch, { timeoutMs }) {
   // tsk-3yl D1: still run the real goal-check here, even though nothing
   // will be staged/committed — every 'merged' outcome must carry a real,
