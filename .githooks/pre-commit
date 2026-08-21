@@ -232,8 +232,14 @@ function stagedFgosModificationsRegressLineCount(committingToplevel) {
   for (const p of modifiedFgosPaths) {
     let headContent, stagedContent;
     try {
-      headContent = execFileSync('git', ['show', `HEAD:${p}`], { cwd: committingToplevel, encoding: 'utf8' });
-      stagedContent = execFileSync('git', ['show', `:${p}`], { cwd: committingToplevel, encoding: 'utf8' });
+      // maxBuffer (tsk-1i3 follow-up hotfix): execFileSync's default 1MB
+      // maxBuffer is smaller than .fgos/events.jsonl's real size (10MB+),
+      // throwing ENOBUFS on every commit that touches it and wrongly
+      // refusing the commit as "could not read blob" -- raised generously
+      // since this reads a whole git blob into memory once per commit.
+      const maxBuffer = 1024 * 1024 * 200;
+      headContent = execFileSync('git', ['show', `HEAD:${p}`], { cwd: committingToplevel, encoding: 'utf8', maxBuffer });
+      stagedContent = execFileSync('git', ['show', `:${p}`], { cwd: committingToplevel, encoding: 'utf8', maxBuffer });
     } catch (err) {
       return { error: `commit refused: could not read blob for "${p}" via "git show" -- refusing to commit against an unreadable ref/blob (fail-closed).` };
     }
