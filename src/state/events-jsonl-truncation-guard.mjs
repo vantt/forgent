@@ -32,6 +32,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { recordMainCheckoutGuardWarning } from "./main-checkout-guard-warnings.mjs";
+import { readSharedConfigOrEmpty } from "../config/shared-config-file.mjs";
 
 function lastNonEmptyLine(raw) {
   const lines = raw.split("\n");
@@ -193,24 +194,68 @@ export function advanceEventsJsonlTruncationGuard(logPath, guardPath) {
 }
 
 export const PERIODIC_CHECKPOINT_INTERVAL_SEC = 900; // 15 minutes
+export const DEFAULT_CHECKPOINT_EVENT_THRESHOLD = 50; // 50 events
+
+/**
+ * Calculates the number of uncommitted appended events in logPath relative to git HEAD.
+ * Returns 0 if logPath does not exist.
+ */
+export function getUncommittedEventCount(logPath, repoRoot) {
+  if (!fs.existsSync(logPath)) return 0;
+  const relPath = path.relative(repoRoot, logPath) || ".fgos/events.jsonl";
+  let diskLines = 0;
+  try {
+    const rawDisk = fs.readFileSync(logPath, "utf8");
+    diskLines = rawDisk.split("\n").filter((l) => l.trim() !== "").length;
+  } catch {
+    return 0;
+  }
+
+  let committedLines = 0;
+  try {
+    const rawCommitted = execFileSync("git", ["show", `HEAD:${relPath}`], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    });
+    committedLines = rawCommitted.split("\n").filter((l) => l.trim() !== "").length;
+  } catch {
+    committedLines = 0;
+  }
+
+  return Math.max(0, diskLines - committedLines);
+}
 
 /**
  * Runs opportunistic checks immediately after main checkout lock acquisition:
- * D1: Advance truncation guard and record warning on break (never throws/blocks).
- * D2: Time-based periodic auto-commit of .fgos/events.jsonl if stale and dirty (never throws/blocks).
+ * D1: Advance truncation guard and record warning on break; refuse mark advancement & periodic commit on break (never throws/blocks).
+ * D2: Event-count-based / time-based periodic auto-commit of .fgos/events.jsonl if dirty (never throws/blocks).
  *
  * @param {string} dir - .fgos directory or repo root
  * @param {string} [repoRoot] - optional repository root (defaults to parent of dir if dir is .fgos)
  * @param {Object} [opts] - optional options for testing
  * @param {number} [opts.nowSec] - mock current timestamp (unix seconds)
  * @param {number} [opts.intervalSec] - override periodic threshold seconds (default 900)
+ * @param {number} [opts.eventThreshold] - override event count threshold (default from config or 50)
+ * @param {string} [opts.rawLog] - mock raw log text for testing
  */
-export function runOpportunisticMainCheckoutChecks(dir, repoRoot = null, { nowSec = null, intervalSec = PERIODIC_CHECKPOINT_INTERVAL_SEC, rawLog = null } = {}) {
+export function runOpportunisticMainCheckoutChecks(
+  dir,
+  repoRoot = null,
+  {
+    nowSec = null,
+    intervalSec = PERIODIC_CHECKPOINT_INTERVAL_SEC,
+    eventThreshold = null,
+    rawLog = null,
+  } = {}
+) {
   if (process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS === "1") return;
   const fgosDir = path.basename(dir) === ".fgos" ? dir : path.join(dir, ".fgos");
   const realRepoRoot = repoRoot || (path.basename(dir) === ".fgos" ? path.dirname(dir) : dir);
 
-  // D1: Detect and warn
+  let breakFlagged = false;
+
+  // D1: Detect and warn. Refuse mark advancement / periodic commit on break.
   try {
     const logPath = path.join(fgosDir, "events.jsonl");
     const guardPath = path.join(fgosDir, "events-jsonl.truncation-guard.json");
@@ -221,18 +266,23 @@ export function runOpportunisticMainCheckoutChecks(dir, repoRoot = null, { nowSe
         writeGuardMark(guardPath, report.mark);
       } else if (!report.ok) {
         recordMainCheckoutGuardWarning(fgosDir, report);
+        breakFlagged = true;
       }
     } else if (fs.existsSync(logPath)) {
       const report = advanceEventsJsonlTruncationGuard(logPath, guardPath);
       if (report && report.ok === false) {
         recordMainCheckoutGuardWarning(fgosDir, report);
+        breakFlagged = true;
       }
     }
   } catch {
     // Non-blocking: swallow error
   }
 
-  // D2: Time-based periodic auto-commit
+  // D1 Fail-closed: refuse periodic auto-commit when an unacknowledged break is flagged
+  if (breakFlagged) return;
+
+  // D2: Event-count-based (or time-based) periodic auto-commit
   try {
     const logPath = path.join(fgosDir, "events.jsonl");
     if (fs.existsSync(logPath)) {
@@ -261,8 +311,34 @@ export function runOpportunisticMainCheckoutChecks(dir, repoRoot = null, { nowSe
           lastCommitSec = null;
         }
 
+        let configThreshold = null;
+        try {
+          const cfg = readSharedConfigOrEmpty(realRepoRoot);
+          configThreshold =
+            cfg?.checkpoint?.eventThreshold ??
+            cfg?.eventsCheckpoint?.eventCount ??
+            cfg?.events?.checkpointEventCount ??
+            cfg?.runner?.checkpoint?.events ??
+            cfg?.runner?.checkpoint?.eventThreshold;
+        } catch {
+          // ignore
+        }
+
+        const effectiveEventThreshold =
+          eventThreshold !== null
+            ? eventThreshold
+            : typeof configThreshold === "number"
+            ? configThreshold
+            : DEFAULT_CHECKPOINT_EVENT_THRESHOLD;
+
+        const uncommittedEvents = getUncommittedEventCount(logPath, realRepoRoot);
         const currentTimeSec = nowSec !== null ? nowSec : Math.floor(Date.now() / 1000);
-        if (lastCommitSec === null || (currentTimeSec - lastCommitSec) >= intervalSec) {
+
+        const eventThresholdMet = effectiveEventThreshold !== null && uncommittedEvents >= effectiveEventThreshold;
+        const timeIntervalMet = intervalSec !== null && lastCommitSec !== null && (currentTimeSec - lastCommitSec) >= intervalSec;
+        const initialCommitMet = lastCommitSec === null;
+
+        if (eventThresholdMet || timeIntervalMet || initialCommitMet) {
           execFileSync("git", ["add", relPath], {
             cwd: realRepoRoot,
             stdio: ["ignore", "pipe", "ignore"],

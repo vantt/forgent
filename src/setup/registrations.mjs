@@ -57,7 +57,7 @@ import {
 import { DEFAULT_LEVEL, LEVELS } from '../state/gate-bypass.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../state/worker-slots.mjs';
 import { checkEventsJsonlContiguity, fixEventsJsonlContiguity } from '../state/events-jsonl-contiguity.mjs';
-import { advanceEventsJsonlTruncationGuard } from '../state/events-jsonl-truncation-guard.mjs';
+import { advanceEventsJsonlTruncationGuard, DEFAULT_CHECKPOINT_EVENT_THRESHOLD } from '../state/events-jsonl-truncation-guard.mjs';
 
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 export { claudeCodeHookWired } from './claude-code-hooks.mjs';
@@ -1574,6 +1574,12 @@ registerConfigDefault({
   id: 'invariantChecks',
   key: 'invariantChecks',
   shape: { commands: DEFAULT_INVARIANT_CHECK_COMMANDS },
+});
+
+registerConfigDefault({
+  id: 'checkpoint',
+  key: 'checkpoint',
+  shape: { eventThreshold: DEFAULT_CHECKPOINT_EVENT_THRESHOLD },
 });
 
 // Deliberately does NOT execute the configured commands. `doctor` is a
