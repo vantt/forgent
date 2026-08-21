@@ -376,3 +376,51 @@ test('tsk-5pb: a normal commit that never touches .fgos/ succeeds on a worker br
 
   assert.equal(result.status, 0, result.stderr);
 });
+
+// --- tsk-1i3: content-precedence line-count guard on main ------------------
+
+test('tsk-1i3: a commit on main branch staging a .fgos/*.jsonl modification with fewer lines than HEAD is refused', () => {
+  const { mainRoot } = initSharedAbsoluteHooksPathFixture();
+  const jsonlPath = path.join(mainRoot, '.fgos', 'events.jsonl');
+  fs.writeFileSync(jsonlPath, 'line1\nline2\nline3\nline4\nline5\n');
+  execFileSync('git', ['add', '.fgos/events.jsonl'], { cwd: mainRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'add multi-line events.jsonl'], { cwd: mainRoot });
+
+  fs.writeFileSync(jsonlPath, 'line1\nline2\n');
+  execFileSync('git', ['add', '.fgos/events.jsonl'], { cwd: mainRoot });
+
+  const result = spawnSync('git', ['commit', '-q', '-m', 'regressed events.jsonl commit'], { cwd: mainRoot, encoding: 'utf8' });
+
+  assert.notEqual(result.status, 0, 'commit staging regressed line count on main must be refused');
+  assert.match(result.stderr, /commit refused/);
+  assert.match(result.stderr, /\.fgos\/events\.jsonl/);
+  assert.match(result.stderr, /main is left unchanged/i);
+  assert.match(result.stderr, /fix-fgos-write-rejected-merge-block\.md/);
+});
+
+test('tsk-1i3: a commit on main branch staging a .fgos/*.jsonl modification with equal-or-more lines succeeds', () => {
+  const { mainRoot } = initSharedAbsoluteHooksPathFixture();
+  const jsonlPath = path.join(mainRoot, '.fgos', 'events.jsonl');
+  fs.writeFileSync(jsonlPath, 'line1\nline2\nline3\n');
+  execFileSync('git', ['add', '.fgos/events.jsonl'], { cwd: mainRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'add multi-line events.jsonl'], { cwd: mainRoot });
+
+  fs.writeFileSync(jsonlPath, 'line1\nline2\nline3\nline4\nline5\n');
+  execFileSync('git', ['add', '.fgos/events.jsonl'], { cwd: mainRoot });
+
+  const result = spawnSync('git', ['commit', '-q', '-m', 'appended events.jsonl commit'], { cwd: mainRoot, encoding: 'utf8' });
+
+  assert.equal(result.status, 0, `commit with more lines must succeed -- got: ${result.stderr}`);
+});
+
+test('tsk-1i3: a brand-new .fgos/* file addition is not refused', () => {
+  const { mainRoot } = initSharedAbsoluteHooksPathFixture();
+  const newFilePath = path.join(mainRoot, '.fgos', 'brand-new-log.jsonl');
+  fs.writeFileSync(newFilePath, 'line1\nline2\n');
+  execFileSync('git', ['add', '.fgos/brand-new-log.jsonl'], { cwd: mainRoot });
+
+  const result = spawnSync('git', ['commit', '-q', '-m', 'add brand new log file'], { cwd: mainRoot, encoding: 'utf8' });
+
+  assert.equal(result.status, 0, `brand-new file addition must succeed -- got: ${result.stderr}`);
+});
+
