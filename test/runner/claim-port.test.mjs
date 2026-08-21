@@ -480,6 +480,7 @@ test('claimWork pre-check never fires for take (isolate:false), even against a c
 });
 
 test('claimWork invokes runOpportunisticMainCheckoutChecks non-blockingly and succeeds even when truncation guard detects a break', () => {
+  delete process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
   const { repoRoot, dir } = setup();
   const guardPath = path.join(dir, 'events-jsonl.truncation-guard.json');
   const warnPath = path.join(dir, 'main-checkout-guard-warnings.jsonl');
