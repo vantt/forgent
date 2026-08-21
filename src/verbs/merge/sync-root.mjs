@@ -17,6 +17,7 @@ import {
   performCatchUp,
   buildOwnFileSet,
   isWorkingTreeClean as isMainTreeClean,
+  formatFgosWriteRejectedDetail,
 } from '../../runner/merge.mjs';
 import {
   branchNameFor,
@@ -124,7 +125,7 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
         errorClass: 'fgos-write-blocked',
         layer: 'state',
         attempts: 1,
-        detail: `sync-root: ${branch} staged a change under .fgos/ (${result.paths.join(', ')}); merge aborted, ${targetBranch} unchanged — ADR0020`,
+        detail: `sync-root: ${formatFgosWriteRejectedDetail(branch, result.paths, targetBranch)}`,
       });
       return { id, mode: 'sync-root', outcome: 'blocked', reason: 'fgos-write-rejected', target: targetBranch, branch, paths: result.paths };
     }
