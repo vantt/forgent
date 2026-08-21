@@ -1,0 +1,1 @@
+{"ts":"2026-08-21T03:19:28.732Z","reason":"regressed","message":"current tip seq 22816 is lower than the last recorded mark (seq 22850) -- the log went backwards","mark":{"seq":22816,"hash":"12062ea11f122a2de65cb8bee45dc50ed4d34bc24d4a0ffa9abed18bd0acad6c"}}
