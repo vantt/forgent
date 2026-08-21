@@ -126,6 +126,9 @@ process.exit(0);
 });
 
 test('reproduces unlocked guard mark write race across concurrent sessions against unfixed guard code', async () => {
+  const origEnv = process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
+  delete process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
+
   const { repoRoot, fgosDir } = initTempRepo();
   const guardPath = path.join(fgosDir, 'events-jsonl.truncation-guard.json');
 
@@ -159,7 +162,10 @@ process.exit(0);
 
     moveWork(fgosDir, { id: 'task-guard-2', to: 'doing', expectedStatus: 'todo', role: 'session' });
 
-    const child1 = fork(childScriptPath, [fgosDir, repoRoot, String(markAfterFirst.seq + 10), 'stale-future-hash'], { stdio: 'inherit' });
+    const childEnv = { ...process.env };
+    delete childEnv.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
+
+    const child1 = fork(childScriptPath, [fgosDir, repoRoot, String(markAfterFirst.seq + 10), 'stale-future-hash'], { stdio: 'inherit', env: childEnv });
     await new Promise((resolve) => child1.on('exit', resolve));
 
     runOpportunisticMainCheckoutChecks(fgosDir, repoRoot);
@@ -172,6 +178,8 @@ process.exit(0);
 
     fs.rmSync(childScriptDir, { recursive: true, force: true });
   } finally {
+    if (origEnv !== undefined) process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS = origEnv;
+    else delete process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
     fs.rmSync(repoRoot, { recursive: true, force: true });
   }
 });
