@@ -785,7 +785,7 @@ export async function withMergeTargetSlot(lockRoot, targetRef, fn) {
     throw new MergeError(`cannot merge into "${targetRef}": target's merge slot lock is ambiguous (unparseable lock file) — refusing per fail-closed policy.`, { targetRef, code: 'lock-ambiguous', lockAgeMs: lock.lockAgeMs });
   }
 
-  runOpportunisticMainCheckoutChecks(fgosDir, lockRoot);
+  runOpportunisticMainCheckoutChecks(fgosDir, lockRoot, { commitEnv: { [HOLDER_PID_ENV_VAR]: String(process.pid) } });
 
   const heartbeat = setInterval(() => {
     renewMainCheckoutLockIfOwn(fgosDir, identity, { lockFile });
@@ -908,7 +908,7 @@ export async function mergeRunnerItem(repoRoot, item, { timeoutMs, lockRoot = re
     throw new MergeError(`cannot merge "${branch}": main checkout lock is ambiguous (unparseable lock file) — refusing per fail-closed policy.`, { branch, code: 'lock-ambiguous', lockAgeMs: lock.lockAgeMs });
   }
 
-  runOpportunisticMainCheckoutChecks(fgosDir, lockRoot);
+  runOpportunisticMainCheckoutChecks(fgosDir, lockRoot, { commitEnv: { [HOLDER_PID_ENV_VAR]: String(process.pid) } });
 
   // Heartbeat (tsk-4l8): renews the lock's timestamp every
   // HEARTBEAT_INTERVAL_MS for as long as this call holds it, so its age

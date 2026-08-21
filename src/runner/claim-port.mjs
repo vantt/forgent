@@ -11,7 +11,7 @@ import { moveWork, addOutcome, addDecision, readRawEvents, readRawEventsAndText,
 import { foldEvents } from '../state/replay.mjs';
 import { isResolvedStatus, resolveRoot } from '../state/frontier.mjs';
 import { visitCount } from './anti-loop.mjs';
-import { acquireMainCheckoutLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS, formatLockDurationMs } from './main-checkout-lock.mjs';
+import { acquireMainCheckoutLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS, formatLockDurationMs, HOLDER_PID_ENV_VAR } from './main-checkout-lock.mjs';
 import { createClaimWorktree, branchNameFor, branchExists } from './worktree.mjs';
 import { lastActivityAt, isReclaimEligible } from './claim-liveness.mjs';
 import { hasWorkerSlotRoom } from '../state/worker-slots.mjs';
@@ -120,7 +120,14 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
 
   try {
     const { events: rawEvents, text: rawLog } = readRawEventsAndText(dir);
-    runOpportunisticMainCheckoutChecks(dir, repoRoot, { rawLog });
+    // commitEnv (tsk-32v): this call runs right after acquiring
+    // main-checkout-lock above (identity: process.pid) -- without threading
+    // that same identity into the periodic checkpoint's own git commit,
+    // .githooks/pre-commit's own lock re-check sees a foreign identity and
+    // refuses it, silently leaving .fgos/events.jsonl staged-but-uncommitted
+    // (the same self-collision confirmed live in merge.mjs's own two call
+    // sites).
+    runOpportunisticMainCheckoutChecks(dir, repoRoot, { rawLog, commitEnv: { [HOLDER_PID_ENV_VAR]: String(process.pid) } });
     const view = foldEvents(rawEvents);
     const item = view.work[id];
 

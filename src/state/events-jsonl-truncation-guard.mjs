@@ -250,6 +250,16 @@ export function getUncommittedEventCount(logPath, repoRoot) {
  * @param {number} [opts.intervalSec] - override periodic threshold seconds (default 900)
  * @param {number} [opts.eventThreshold] - override event count threshold (default from config or 50)
  * @param {string} [opts.rawLog] - mock raw log text for testing
+ * @param {Object} [opts.commitEnv] - extra env vars merged onto the periodic
+ *   checkpoint's own `git commit` call (tsk-32v). This module is `kernel`
+ *   tier and may not import `../runner/main-checkout-lock.mjs` (`infra`
+ *   tier, one-way-down layering) to reach `HOLDER_PID_ENV_VAR` itself -- the
+ *   caller (merge.mjs, which already imports it) passes it down as plain
+ *   data instead. Without it, this commit runs while the caller already
+ *   holds `.fgos/main-checkout.lock`, `.githooks/pre-commit`'s own lock
+ *   re-check sees a foreign identity and refuses, and `git add` above is
+ *   left staged with nothing to notice or clean it up -- confirmed live as
+ *   the cause of a catchup/approve self-collision, 2026-08-21.
  */
 export function runOpportunisticMainCheckoutChecks(
   dir,
@@ -259,6 +269,7 @@ export function runOpportunisticMainCheckoutChecks(
     intervalSec = PERIODIC_CHECKPOINT_INTERVAL_SEC,
     eventThreshold = null,
     rawLog = null,
+    commitEnv = null,
   } = {}
 ) {
   if (process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS === "1") return;
@@ -359,10 +370,30 @@ export function runOpportunisticMainCheckoutChecks(
             cwd: realRepoRoot,
             stdio: ["ignore", "pipe", "ignore"],
           });
-          execFileSync("git", ["commit", "-m", "chore(.fgos): periodic events.jsonl checkpoint", "--", relPath], {
-            cwd: realRepoRoot,
-            stdio: ["ignore", "pipe", "ignore"],
-          });
+          try {
+            // commitEnv (tsk-32v): see this function's own doc comment --
+            // the caller passes HOLDER_PID_ENV_VAR down as plain data so
+            // .githooks/pre-commit's own lock re-check recognizes this
+            // commit as the same identity already holding the lock.
+            execFileSync("git", ["commit", "-m", "chore(.fgos): periodic events.jsonl checkpoint", "--", relPath], {
+              cwd: realRepoRoot,
+              stdio: ["ignore", "pipe", "ignore"],
+              ...(commitEnv ? { env: { ...process.env, ...commitEnv } } : {}),
+            });
+          } catch (commitErr) {
+            // Never leave a staged-but-uncommitted .fgos/ write behind on
+            // failure, for ANY reason -- this function's own contract is
+            // "fully commits its write, or leaves the tree exactly as it
+            // found it", never a half-state that leaks into whatever git
+            // operation runs next. Best-effort: the outer catch below still
+            // swallows non-blocking either way.
+            try {
+              execFileSync("git", ["reset", "--", relPath], { cwd: realRepoRoot, stdio: ["ignore", "pipe", "ignore"] });
+            } catch {
+              // best-effort
+            }
+            throw commitErr;
+          }
         }
       }
     }
