@@ -83,8 +83,18 @@ no code, so the posture is recorded here for whichever session runs
   of the tsk-1i3 scope split (D3) and the checkpoint-interval /
   fail-closed trade-off framing this item's D1/D2 resolve.
 - `tsk-cgg` (done) — original truncation-guard detect-only fix.
-- `tsk-5k1` (open) — tsk-1ji's opportunistic-checks fallout on 7
-  pre-existing tests; independent, not a dependency of this item.
+- `tsk-5k1` (delivered, merged `acb79db0`, re-checked 2026-08-21 after
+  merge) — tsk-1ji's opportunistic-checks fallout on 7 pre-existing tests;
+  its own discovery found the regression already resolved by main's
+  `tsk-oet` (`8607438e`) before tsk-5k1 started (confirm-and-close, no
+  code change). No formal graph edge to this item (not in `deps`, not in
+  the same `fgos graph` component — that component is
+  `{tsk-56u, tsk-1vc, tsk-4te, tsk-1i3}`); the prior investigation report's
+  roadmap listed it first only as a suggested clean-noise-before-guard
+  ordering, not a dependency. Re-check found nothing that changes D1/D2/D4/
+  D5 — the SHA-mismatch/dirty-tree test assumptions it fixed are unrelated
+  to this item's fail-closed/event-count-checkpoint/reproduction work on
+  the same subsystem.
 - `tsk-1i3` (open, deps=[tsk-1vc, tsk-56u]) — merge-content-precedence
   overwrite fix, explicitly out of this item's scope (D3).
 - `tsk-4te` (open, deps=[tsk-1vc]) — partial-loss variant (claim event
