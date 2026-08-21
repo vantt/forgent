@@ -614,6 +614,29 @@ function applyEvent(view, event) {
       }
       break;
     }
+    case 'work.resolve-park-reason': {
+      // Clears reason/parkReason from the live item view on terminal items,
+      // and records the note additively in view.parkResolutions[id].
+      const { id, writer } = event.payload ?? {};
+      const item = view.work[id];
+      if (item) {
+        delete item.reason;
+        delete item.parkReason;
+        if (writer !== undefined) {
+          item.writer = writer;
+        }
+      }
+      if (typeof id === 'string') {
+        if (!view.parkResolutions) {
+          view.parkResolutions = {};
+        }
+        view.parkResolutions[id] = [
+          ...(view.parkResolutions[id] ?? []),
+          { ...event.payload, ts: event.ts },
+        ];
+      }
+      break;
+    }
     // tsk-in1-1 D1: `tool.register`/`tool.remove` retired — a tool provider
     // is now declared directly in `runner.executors.<id>` (config-edited,
     // never event-sourced). Historical events of either type already in

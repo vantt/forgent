@@ -409,6 +409,40 @@ export function editWork(dir, { id, patch, role } = {}) {
 }
 
 /**
+ * Clear/annotate a stale reason/parkReason on a done or wontfix work item.
+ * Appends a 'work.resolve-park-reason' event carrying { id, note, role, writer }.
+ */
+export function resolveParkReason(dir, { id, note, role } = {}) {
+  const { logPath } = paths(dir);
+  return withEventsLockAndRefresh(dir, logPath, () => {
+    const before = rebuildView(logPath);
+    const work = before.work[id];
+    if (!work) {
+      throw new StoreError('validation', `work "${id}" not found.`);
+    }
+    if (!note || typeof note !== 'string' || note.trim() === '') {
+      throw new StoreError('validation', 'resolve-park-reason requires a non-empty --note.');
+    }
+    if (work.status !== 'done' && work.status !== 'wontfix') {
+      throw new StoreError(
+        'validation',
+        `resolve-park-reason can only clear reason/parkReason on terminal items (status "done" or "wontfix"); work "${id}" has status "${work.status}".`,
+      );
+    }
+    if (role !== undefined && role !== 'human' && role !== 'session') {
+      throw new StoreError('validation', `resolve-park-reason role must be "human" or "session" (got "${role}").`);
+    }
+
+    const payload = { id, note: note.trim() };
+    if (role !== undefined) {
+      payload.role = role;
+    }
+    payload.writer = resolveWriterIdentity(dir);
+    return appendEventLocked(logPath, { type: 'work.resolve-park-reason', payload });
+  });
+}
+
+/**
  * Compose a câu-6 ("learning gì để lại?") record MECHANICALLY from data
  * already folded for `id` in `view` (the PRE-transition view — see moveWork
  * below), plus the settlement this very transition is about to create (not

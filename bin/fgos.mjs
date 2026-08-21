@@ -17,7 +17,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { initStore, addWork, moveWork, editWork, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf, parseDecisionRelation, decisionTextLooksLikeSupersession } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, editWork, resolveParkReason, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf, parseDecisionRelation, decisionTextLooksLikeSupersession } from '../src/state/store.mjs';
 import { collectWideSourceFiles, findWideCitationFindings, isDLocalId } from '../scripts/check-decision-citation-drift.mjs';
 import { computeDecisionIndex, generateDecisionIndex } from '../src/report/decision-index.mjs';
 import { renderLockedDecisionsTable } from '../src/report/context-render.mjs';
@@ -1853,6 +1853,14 @@ async function runVerb(verb, flags, positional, dir) {
         });
       }
       return { id, fields: Object.keys(patch), seq: event.seq };
+    }
+
+    case 'resolve-park-reason': {
+      const id = requireField(positional[0] ?? flags.id, 'resolve-park-reason requires an id: fgos resolve-park-reason <id> --note "..."');
+      const note = requireField(flags.note, 'resolve-park-reason requires --note "..."');
+      const role = optionalField(flags.role, 'resolve-park-reason --role requires "human" or "session" (omit --role entirely to default to human)') ?? 'human';
+      const event = resolveParkReason(dir, { id, note, role });
+      return { id, type: event.type, seq: event.seq };
     }
 
     // Parks the item into `awaiting-human`, carrying the question it is

@@ -318,6 +318,26 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'resolve-park-reason',
+    invoke: 'fgos resolve-park-reason',
+    description: 'Clear a stale reason/parkReason left over from a system-error park event on a closed item (status "done" or "wontfix"), requiring a non-empty --note justifying the resolution for the audit trail.',
+    parameters: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', description: 'Work item id (positional or --id).' },
+        note: { type: 'string', description: 'Human-confirmed rationale/note for clearing the stale reason (required).' },
+      },
+      positional: ['id'],
+      required: ['id', 'note'],
+    },
+    examples: ['fgos resolve-park-reason tsk-64h --note "Human confirmed present on main branch"'],
+    touchesState: true,
+    requiresExistingStore: true,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
     name: 'ask',
     invoke: 'fgos ask',
     description: 'Park an item in awaiting-human, carrying the question it is waiting on.',
