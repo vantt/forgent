@@ -1637,19 +1637,61 @@ test('D5: the merged tree already verified at return skips both the verify and t
 });
 
 // D5, the must-NOT-skip direction — the one whose failure would be silent.
-// main advancing by a single commit means the merged tree is no longer the
-// tree that was verified, so the checks have to run again.
-test('D5: main advancing past the fork forces the checks to run again', async () => {
+// main advancing past the fork on an overlapping path means the merged tree
+// is no longer the tree that was verified, so the checks have to run again.
+test('D5: main advancing past the fork on an overlapping path forces the checks to run again', async () => {
+  const repoRoot = initRepo();
+  git(repoRoot, ['checkout', '-b', 'fgw/demo-item']);
+  fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\nbranch line\n');
+  git(repoRoot, ['add', 'seed.txt']);
+  git(repoRoot, ['commit', '-q', '-m', 'branch modified seed.txt']);
+  git(repoRoot, ['checkout', 'main']);
+
+  const branchHeadAtReturn = tipOf(repoRoot, 'fgw/demo-item');
+  fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'main line\nseed\n');
+  git(repoRoot, ['add', 'seed.txt']);
+  git(repoRoot, ['commit', '-q', '-m', 'main advanced after return touching seed.txt']);
+
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'exit 1', branchHeadAtReturn }));
+
+  assert.equal(result.outcome, 'verify-fail', 'the verify must actually run, and its red must be honoured');
+  assert.notEqual(result.check.skipped, true);
+});
+
+// tsk-2lq: main advancing past the fork on a disjoint path still allows skip.
+test('D5: main advancing past the fork on a disjoint path still allows skip', async () => {
   const repoRoot = initRepo();
   makeBranchWithCommit(repoRoot, 'fgw/demo-item', 'produced.txt', 'ok\n');
   const branchHeadAtReturn = tipOf(repoRoot, 'fgw/demo-item');
   fs.writeFileSync(path.join(repoRoot, 'moved-on.txt'), 'main moved\n');
   git(repoRoot, ['add', 'moved-on.txt']);
-  git(repoRoot, ['commit', '-q', '-m', 'main advanced after the return']);
+  git(repoRoot, ['commit', '-q', '-m', 'main advanced after the return on disjoint path']);
 
   const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'exit 1', branchHeadAtReturn }));
 
-  assert.equal(result.outcome, 'verify-fail', 'the verify must actually run, and its red must be honoured');
+  assert.equal(result.outcome, 'merged');
+  assert.equal(result.check.passed, true);
+  assert.equal(result.check.skipped, true);
+  assert.match(result.check.output, /verify skipped: the merged tree is identical to/);
+  assert.match(result.check.output, new RegExp(branchHeadAtReturn));
+});
+
+// tsk-2lq: main renaming a path that branch modified forces checks to run again.
+test('D5: main renaming a path that branch modified forces checks to run again', async () => {
+  const repoRoot = initRepo();
+  git(repoRoot, ['checkout', '-b', 'fgw/demo-item']);
+  fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\nbranch line\n');
+  git(repoRoot, ['add', 'seed.txt']);
+  git(repoRoot, ['commit', '-q', '-m', 'branch modified seed.txt']);
+  git(repoRoot, ['checkout', 'main']);
+
+  const branchHeadAtReturn = tipOf(repoRoot, 'fgw/demo-item');
+  git(repoRoot, ['mv', 'seed.txt', 'renamed-seed.txt']);
+  git(repoRoot, ['commit', '-q', '-m', 'main renamed seed.txt']);
+
+  const result = await mergeRunnerItem(repoRoot, makeItem({ verify: 'exit 1', branchHeadAtReturn }));
+
+  assert.equal(result.outcome, 'verify-fail');
   assert.notEqual(result.check.skipped, true);
 });
 
