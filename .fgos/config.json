@@ -202,6 +202,11 @@
       "openai-codex": {
         "lightweight": "gpt-5.5"
       }
+    },
+    "models": {
+      "light": "haiku",
+      "standard": "sonnet",
+      "heavy": "opus"
     }
   },
   "gateBypass": {

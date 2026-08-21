@@ -1,10 +1,10 @@
 # The blocked-pick decision tree — full mechanics
 
 The full detail behind SKILL.md's Step 4, for the "anything else is a
-blocked pick" branch. Work every blocked pick through these four
-sections, in order, never skipping ahead: escalate-only carve-outs, the
-rules every playbook obeys, the named playbooks, and the same-id-twice
-stop rule for reasons with no playbook.
+blocked pick" branch. Work every blocked pick through these sections, in
+order, never skipping ahead: escalate-only carve-outs, the self-recovery
+pointer (already run inline by `approve` before this loop ever sees the
+result), and the same-id-twice stop rule for reasons with no playbook.
 
 ## Escalate-only carve-outs, checked before any playbook
 
@@ -59,197 +59,19 @@ many attempts are notionally left:
   whole chain, not just direct children: an open grandchild anchors the
   root exactly the way an open child does.
 
-## The rules every playbook obeys
+## Self-recovery decision rules and named playbooks
 
-- **At most once per id per loop run.** Record `<id>` as "playbook
-  already attempted" *before* attempting, whatever the outcome. If a
-  later iteration blocks that same `<id>` again — same reason or a
-  different one — that is a "no progress" stop: stop the loop
-  immediately and report. Never run a second playbook for the same id in
-  the same run, and never re-run the same one.
-- **Leave a decision trail before acting, never after.** A playbook that
-  resolves silently is indistinguishable from a real failure that got
-  swallowed, so log the attempt first and its outcome after:
+The self-recovery decision logic, universal rules (once-per-id-per-run cap, decision trail requirement, verified evidence bar, and outcome reading rules), and named playbooks for eligible block reasons (`verify-fail-post-merge`, `verify-timeout-post-merge`, `integration-drift`, `merge-failed-unclassified`, `merge-conflict`) are defined in the shared reference:
 
-  ```bash
-  fgos decision --id <id> \
-    --text "merge-loop: attempting the <reason> playbook for <id>" \
-    --rationale "<the signal actually read from the envelope and from fgos check <id>'s friction detail>" \
-    --relation none
-  ```
+`plugins/fgOS/skills/_shared/catchup-self-recovery.md` (mirrored at `.agents/skills/_shared/catchup-self-recovery.md`).
 
-  A playbook run that skipped this is a defect in the run, not a clean
-  self-resolve.
-- **Reading `fgos catchup <id>`'s outcome.** The playbooks that recover
-  through `catchup` all end here, so this is written once:
-  - `outcome: "merged"` or `"already-caught-up"` — green; the item is
-    back at `awaiting-approval`. Log the outcome decision and continue
-    the loop, which picks it up normally on a later iteration.
-  - `outcome: "conflict"` — a real content conflict, `conflictedFiles`
-    naming exactly which. **The playbook has failed.** Stop the loop and
-    report the id, the target branch, and that file list.
-  - `outcome: "verify-fail"` with `timedOut: true` — timed out again.
-    **The playbook has failed.** Stop and report per the timeout entry
-    below.
-  - `outcome: "verify-fail"` with `timedOut: false` — a real red verify
-    on the merged tree; `exitStatus` and `output` carry the proof. **The
-    playbook has failed.** Stop the loop and report the id and the
-    failing lines from `output`. Never chain from here into the
-    `verify-fail-post-merge` playbook — this id's one attempt per run is
-    already spent.
-  - The command itself errors (a real CLI failure, not a reported
-    outcome) — stop and report the error verbatim; never retry it.
-
-  A playbook that runs when it should not have can waste a cycle, but it
-  cannot land anything broken: `catchup` runs the item's own `verify` on
-  the staged merge and `git merge --abort`s on red, before any commit.
-
-## The named playbooks
-
-One per block reason. Read `<id>`'s merge target from the envelope's
-`target` field rather than assuming the trunk — every reason below can
-arrive from a leaf→root merge as well as a root→trunk one.
-
-**Playbook: verify-fail-post-merge**
-
-- *Signal*: `{picked: <id>, approve: {blocked, reason:
-  "verify-fail-post-merge"}}` — the post-merge verify genuinely ran and
-  failed (`timedOut` is absent or `false`); the merge was rolled back and
-  the target is unchanged.
-- *What the machine tries*: walk
-  `docs/how-to/diagnose-a-verify-fail-post-merge-block-on-approve.md`'s
-  steps directly, in this same session:
-  1. Read `approve`'s own `output` field from the response (the full
-     test-suite output, not just the recorded `verify` command) and
-     identify exactly which test(s) failed.
-  2. Check whether the failing test's file is inside the item's own diff
-     (`fgos review <id>` or the branch's changed files) — a failure in a
-     file the item never touched is the first signal it's unrelated
-     noise.
-  3. Re-run the failing test file alone a few times (`node --test
-     path/to/the-failing.test.mjs`) — reproduces deterministically (a
-     genuine pre-existing bug) or only fails under the full-suite run
-     (load-induced flake).
-  4. If it's a genuine pre-existing bug, fix it as its own separate
-     commit directly on `main` — never folded into `<id>`'s own
-     branch/commits. Confirm the fix with the specific failing test, then
-     the full suite, before moving on. If it's flake, no fix is needed.
-  5. Either way, retry once: `fgos move <id> --to awaiting-approval` (the
-     FSM's `blocked -> awaiting-approval` recovery door for this exact
-     reason), then run `/fgOS:merge-next` again.
-- *Stop condition*: the once-per-id-per-run rule above. Read the retry's
-  own result: `{picked: <id>, approve: {done}}` continues the loop
-  normally; blocked again for any reason — identical
-  `verify-fail-post-merge` with no progress, or now a different one —
-  stops the loop immediately, without falling through to the
-  same-id-twice rule.
-- *Reported on failure*: the id, which test failed and whether it sat
-  inside the item's own diff, whether the isolated re-runs reproduced it,
-  and whether a pre-existing bug was fixed on `main` along the way.
-
-**Playbook: verify-timeout-post-merge**
-
-- *Signal*: `{picked: <id>, approve: {blocked, reason:
-  "verify-timeout-post-merge"}}`. Confirm `timedOut: true` on the same
-  envelope before treating it as a timeout — reason and flag are set
-  from the same value, so a mismatch means something else is wrong and
-  this playbook does not apply. `fgos check <id>`'s friction detail reads
-  "goal-check timed out on staged merge ... after `<ms>`ms — not a verify
-  failure; merge aborted, `<target>` unchanged, rerun catchup", and its
-  `errorClass` is `verify-timeout`, never `verify-miss`.
-- *What the machine tries*: exactly what that detail line already
-  prescribes, once — `fgos catchup <id> --timeout <2× the budget that
-  timed out>`, reading the timed-out budget from the friction detail. The
-  doubled budget applies to this one call only. **Never edit
-  `.fgos/config.json`'s `runner.timeoutMs`**: raising the default is a
-  named-and-rejected fix — it papers over the symptom, and an even
-  slower machine would just hit the same wall at a higher number — and it
-  would silently change every other item's budget too.
-- *Stop condition*: the once-per-id-per-run rule, and a second timeout at
-  the doubled budget stops immediately. Two timeouts in a row is no
-  longer a load blip, and this skill cannot tell a genuinely hung verify
-  from a merely overloaded machine past that point.
-- *Reported on failure*: the id, both budgets tried, that `<target>` is
-  unchanged, any `output` catchup returned, and — explicitly — that the
-  configured default timeout was left untouched, so a person reading the
-  report knows the number they see is still the repo's own.
-
-**Playbook: integration-drift**
-
-- *Signal*: `{picked: <id>, approve: {blocked, reason:
-  "integration-drift"}}`. This reason is produced only for a root that
-  HAS children merging into the trunk, on either a conflict or a
-  non-timeout verify failure. Tell the two flavours apart from `fgos
-  check <id>`'s friction `errorClass`: `merge-conflict` (the root's
-  aggregate diff conflicts with the trunk's current tip) versus
-  `verify-miss` (it merged cleanly, but the merged tree fails the root's
-  own verify).
-- *Run the ungathered-root carve-out first and honour it.* This reason is
-  the shape that carve-out most often lands on: a root with any
-  descendant still open escalates, and this playbook never runs for it.
-- *What the machine tries*: one `fgos catchup <id>`. That is precisely
-  the operation the reason names — merge the current trunk INTO the
-  root's own branch and re-verify there, in an ephemeral worktree outside
-  the shared checkout, rather than re-attempting the same stale merge
-  into the trunk.
-- *Stop condition*: the once-per-id-per-run rule. A `conflict` or a red
-  verify from that catchup stops immediately — those are exactly the
-  "real conflict" and "real red verify" the design reserves for a
-  person.
-- *Reported on failure*: the id, which flavour the friction `errorClass`
-  named, the `conflictedFiles` list or the failing lines from `output`,
-  and that the trunk is unchanged — both `approve` and `catchup` abort
-  before committing anything.
-
-**Playbook: merge-failed-unclassified**
-
-- *Signal*: `{picked: <id>, approve: {blocked, reason:
-  "merge-failed-unclassified"}}` — `git merge --no-commit --no-ff` exited
-  non-zero without staging a real conflict. `fgos check <id>`'s friction
-  detail carries git's own exit status and stderr verbatim ("failed
-  without a real conflict (exit `<n>`): `<stderr>`").
-- *What the machine tries*:
-  1. Read that stderr first. If it names a condition a retry cannot
-     change — a missing ref, "not a git repository", no space left on
-     device, a permission error — **stop without retrying** and report
-     the stderr. A retry is not a recovery for any of those, and
-     spending the attempt on one only delays the report.
-  2. Otherwise, one `fgos catchup <id>`. This reason is the best fit for
-     catchup among the merge-related parks: nothing actually conflicted,
-     so simply re-attempting the merge often just succeeds once whatever
-     transient condition caused it has passed.
-- *Stop condition*: the once-per-id-per-run rule, plus the
-  non-retryable-stderr check above, which stops before the attempt is
-  spent at all.
-- *Reported on failure*: the id, git's exit status and stderr verbatim
-  from the friction detail, whether a retry was attempted or skipped as
-  non-retryable, and that the target is unchanged (`merge --abort`
-  already ran, or the merge was never attempted).
-
-**Playbook: merge-conflict**
-
-- *Signal*: `{picked: <id>, approve: {blocked, reason:
-  "merge-conflict"}}` — the post-merge `git merge --no-commit --no-ff`
-  staged a real textual conflict; the merge was rolled back and the
-  target is unchanged.
-- *What the machine tries*: one `fgos catchup <id>` — merges the item's
-  own target branch back into the item's own branch inside an ephemeral
-  worktree, re-runs the item's own `verify` there, and on green takes the
-  `blocked -> awaiting-approval` edge itself. Walk
-  `docs/how-to/recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree.md`:
-  1. Run `fgos catchup <id>` (appending whichever of `--timeout <ms>`/
-     `--no-timeout` Step 1 parsed). It resolves its own repo root from
-     `--dir`, so it runs correctly from any directory — never leave or
-     enter a worktree first to make it work.
-  2. Read the returned `outcome` and act on exactly that, nothing else —
-     the "reading `fgos catchup <id>`'s outcome" rule above already
-     covers all four possible outcomes; this playbook follows it exactly
-     like the three above it, never a variant of its own.
-- *Stop condition*: the once-per-id-per-run rule.
-- *Reported on failure*: the id, the returned `conflictedFiles` list (a
-  real conflict survived the playbook) or the failing lines from
-  `output` (a real red verify on the reconciled tree), and that the
-  target is unchanged.
+Because `approve` runs the shared playbook inline before ever returning a
+blocked result (see `approve/SKILL.md` step 7), any blocked pick this
+loop reads has already undergone one self-recovery attempt inside
+`approve`. Re-running the playbook here would be redundant, not merely
+wasteful — the attempt is already spent. This loop records the blocked
+pick, logs the rationale, and enforces its own once-per-id-per-run stop
+rule below; it never invokes the shared playbook itself.
 
 ## The same-id-twice stop rule, for reasons with no playbook
 

@@ -5,9 +5,10 @@ description: >-
   unattended, until nothing is left or a safety condition trips — invoked
   as /fgOS:merge-loop. Wraps the existing /loop skill around
   /fgOS:merge-next, encoding the stop rules (frontier empty, every ready
-  item held by the Iron Law, a root that has not gathered its children, a
-  playbook that made no progress, or a playbook-less reason blocked twice
-  in a row) so a person never has to restate them by hand. An individual
+  item held by the Iron Law, a root that has not gathered its children, or
+  a reason with no playbook blocked twice in a row) so a person never has
+  to restate them by hand — self-recovery itself runs inside `approve` on
+  every attempt, before this loop ever sees a blocked pick. An individual
   Iron Law hold is recorded and walked past, never a stop of its own; the
   held items are presented together at the end. Example:
   "/fgOS:merge-loop", "merge everything that's ready".
@@ -78,12 +79,15 @@ field:
   and walked past. Record every skipped id on the Iron Law list, then
   keep reading the envelope's own shape as normal.
 - **Anything else is a blocked pick.** Work it through the ordered
-  sequence **envelope carve-outs → playbook rules → the named playbooks →
-  the same-id-twice stop rule**, never skipping ahead. The
-  never-run-a-playbook carve-outs (Iron Law, an ungathered root) exist
-  precisely so no playbook can ever run on a case that needs a person.
-  Full mechanics for the whole blocked-pick decision tree:
-  `references/blocked-pick-decision-tree.md`.
+  sequence **escalate-only carve-outs → the same-id-twice stop rule**,
+  never skipping ahead. The never-run-a-playbook carve-outs (Iron Law, an
+  ungathered root) exist precisely so no playbook can ever run on a case
+  that needs a person. Self-recovery playbooks (see
+  `../_shared/catchup-self-recovery.md`) are executed directly inside
+  `approve` on each attempt, before this loop ever sees a blocked pick —
+  by the time a block reaches this loop, one self-recovery attempt has
+  already been spent. Full mechanics for the whole blocked-pick decision
+  tree: `references/blocked-pick-decision-tree.md`.
 
 ### Step 5: Iron Law evidence, gathered once at the end for the whole list
 Once the loop has ended for any reason, walk this run's Iron Law list —
@@ -107,10 +111,12 @@ authority or any other.
 
 ### Step 6: Report on end, all of it in one pass
 Say plainly which condition ended the loop — frontier empty; every ready
-item held by the Iron Law; the ungathered-root carve-out; a playbook that
-failed or made no progress; or the same-id-twice rule — and, for every
-case but the first, which id and why. Include the playbook's own
-"reported on failure" list when a playbook was what failed.
+item held by the Iron Law; the ungathered-root carve-out; or the
+same-id-twice rule — and, for every case but the first, which id and why.
+When a blocked pick's own reason had a shared-file playbook, relay
+whatever `approve` already reported on failure (that self-recovery
+attempt already ran inline, inside `approve`, before this loop ever saw
+the result) — this loop never re-runs it.
 
 Then, whenever this run's Iron Law list is non-empty, present the whole
 list in this one report: every held id, and Step 5's evidence (or its
@@ -126,9 +132,12 @@ listed ids, if any, to land now — then invoke the `approve` skill directly
 ## References
 
 - `references/blocked-pick-decision-tree.md` — the full blocked-pick
-  decision tree: the never-run-a-playbook carve-outs, the rules every
-  playbook obeys, the five named playbooks, and the same-id-twice stop
-  rule for reasons with no playbook
+  decision tree: the never-run-a-playbook carve-outs (Iron Law,
+  ungathered root), why a blocked pick here already survived one
+  self-recovery attempt inside `approve`, and the same-id-twice stop rule
+  for reasons with no playbook
+- `../_shared/catchup-self-recovery.md` — shared self-recovery decision playbooks
+  executed directly inside `approve`
 
 ## Workflow Position
 

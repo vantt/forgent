@@ -66,16 +66,20 @@ CONTEXT.md` D6).
    - `{picked: <id>, approve: {...}}` — the merge was attempted through
      `approve`; relay whether it reached `done` or was parked `blocked`
      (verify failure or merge conflict), same as `/fgOS:approve` would
-     report for that id. When the park is `reason: "merge-conflict"`, say
-     in the same breath that this is a **recoverable** park with a
-     recovery verb of its own — `fgos catchup <id>` merges the item's
-     target branch back into the item's branch, re-runs the item's own
-     verify there, and on green moves it to `awaiting-approval` — so a
-     session reading this result has a real next step to try before any
-     person is needed (tsk-60h). This single-shot skill does not run that
-     playbook itself: `/fgOS:merge-loop` owns it, because the "at most
-     once per id per run" bookkeeping the playbook depends on only exists
-     inside a loop. A `syncRoot: {id, outcome: 'synced'}` field
+     report for that id. When the park is eligible for self-recovery per
+     `../_shared/catchup-self-recovery.md` (`reason: "merge-conflict"`,
+     `verify-fail-post-merge`, `verify-timeout-post-merge`,
+     `integration-drift`, or `merge-failed-unclassified`), say in the same
+     breath that this is a **recoverable** park — but by the time this
+     result is visible here, the underlying `approve` execution has
+     already run the shared playbook itself (see
+     `../_shared/catchup-self-recovery.md`), inline, before ever returning
+     a final parked result (tsk-60h). A park reported here already
+     survived that one self-recovery attempt; there is nothing further for
+     this single-shot skill, `/fgOS:merge-loop`, or a person to run
+     automatically — a genuinely unrecoverable case, or one where the
+     evidence bar could not be met, is what reaches this report. A
+     `syncRoot: {id, outcome: 'synced'}` field
      alongside means this pick only became ready because an earlier
      blockedOnSync root was auto-synced first (tsk-173) — mention that in
      the report, it is not itself something to act on.
