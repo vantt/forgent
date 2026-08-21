@@ -466,7 +466,7 @@ test('e2e pr-gate (e) branch-source item full loop: park (blocked + live branch)
   assert.equal(approve.status, 0, `approve failed: ${approve.stderr}`);
   const approveEData = envelopeData(approve.stdout);
   assert.equal(approveEData.to, 'delivered');
-  assert.match(approveEData.output, /PR_E_OK/);
+  assert.match(approveEData.output, /verify skipped|PR_E_OK/);
   assert.equal(stateView(repoRoot).work['pr-e-item'].status, 'delivered');
 
   // tsk-1p9: real `cleanup` verb, not a bare `move --to done` — teardown

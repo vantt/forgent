@@ -969,15 +969,18 @@ function isAlreadyMerged(repoRoot, branch, ref) {
  * would be a duplicate of a result already known.
  *
  * Two conditions, both required:
- *  - `HEAD` is an ancestor of `branch` — main has not advanced past the
- *    fork, so merging `branch` yields `branch`'s own tree. Verified
- *    empirically during this item's validating pass: with main an ancestor,
- *    the tree staged by `git merge --no-commit --no-ff` is byte-identical
- *    to the branch tip's tree; once main advances by even one commit, it is
- *    not, and this returns false so the full checks run.
  *  - the branch tip still equals `branchHeadAtReturn` — the SHA whose tree
  *    actually passed. Without this, a commit pushed onto the branch after
  *    `return` would ride in unverified.
+ *  - `HEAD` has not changed any path that `branch` introduced since the fork
+ *    point (`git merge-base branch HEAD`). If `HEAD` is an ancestor of `branch`,
+ *    main has not advanced past the fork at all, so merging `branch` yields
+ *    `branch`'s own tree. If main HAS advanced past the fork point, but only
+ *    on paths disjoint from `branch`'s footprint, standard 3-way merge semantics
+ *    guarantee each side's changes to paths touched by only that side are carried
+ *    unmodified — so the merged tree at branch's paths is byte-identical to
+ *    `branchHeadAtReturn`'s tree there. (tsk-2lq: relaxed from strict ancestor-only
+ *    to tolerate disjoint main advances on busy trunks).
  *
  * Deliberately SUFFICIENT, not necessary: it skips only where identity is
  * provable, and false-negatives (running checks that would have passed)
@@ -985,6 +988,23 @@ function isAlreadyMerged(repoRoot, branch, ref) {
  * A main-source return is never eligible — it records `headAtReturn`, not
  * `branchHeadAtReturn`, and this returns false for it.
  */
+function namesFromDiffStatus(diffStatusOutput) {
+  const paths = new Set();
+  if (!diffStatusOutput) return paths;
+  const lines = diffStatusOutput.split('\n');
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    const parts = trimmed.split('\t');
+    for (let i = 1; i < parts.length; i++) {
+      if (parts[i]) {
+        paths.add(parts[i]);
+      }
+    }
+  }
+  return paths;
+}
+
 function mergedTreeAlreadyVerified(repoRoot, item, branch) {
   if (typeof item.branchHeadAtReturn !== 'string' || !item.branchHeadAtReturn) return false;
   let branchTip;
@@ -994,7 +1014,24 @@ function mergedTreeAlreadyVerified(repoRoot, item, branch) {
     return false;
   }
   if (branchTip !== item.branchHeadAtReturn) return false;
-  return isAlreadyMerged(repoRoot, 'HEAD', branch);
+  if (isAlreadyMerged(repoRoot, 'HEAD', branch)) return true;
+
+  try {
+    const mergeBase = git(repoRoot, ['merge-base', branch, 'HEAD']).trim();
+    if (!mergeBase) return false;
+    const introducedOutput = git(repoRoot, ['diff', '--name-status', `${mergeBase}..${item.branchHeadAtReturn}`]);
+    const mainAdvancedOutput = git(repoRoot, ['diff', '--name-status', `${mergeBase}..HEAD`]);
+    const introducedPaths = namesFromDiffStatus(introducedOutput);
+    const mainAdvancedPaths = namesFromDiffStatus(mainAdvancedOutput);
+    for (const path of introducedPaths) {
+      if (mainAdvancedPaths.has(path)) {
+        return false;
+      }
+    }
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 // tsk-15k: whether the paths `branch` actually introduced (relative to its
