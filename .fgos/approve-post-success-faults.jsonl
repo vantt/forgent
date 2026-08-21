@@ -19,3 +19,5 @@
 {"ts":"2026-08-21T06:20:54.537Z","id":"tsk-1vc-1","phase":"leaf-into-root merge","mergedSha":"5c0b3ffeaab9a51d51a10a934d87a22b72d2ce2f","mergedInto":"fgw/tsk-1vc"}
 {"ts":"2026-08-21T06:22:02.191Z","id":"tsk-1vc-2","phase":"leaf-into-root merge","mergedSha":"d31cc8627d885d2947cd142e1069be5997ab7a43","mergedInto":"fgw/tsk-1vc"}
 {"ts":"2026-08-21T06:23:44.107Z","id":"tsk-1vc-3","phase":"leaf-into-root merge","mergedSha":"72bfdaa7feae63bb7fb82b8339097782106bdb97","mergedInto":"fgw/tsk-1vc"}
+{"ts":"2026-08-21T07:31:40.302Z","id":"tsk-1vc","phase":"root-into-main merge","mergedSha":"998abfa058feacb6c963b0c22715297634214693","mergedInto":"main"}
+{"ts":"2026-08-21T08:05:02.348Z","id":"tsk-5gd","phase":"root-into-main merge","mergedSha":"74c6d323d28a8cbf8c195a9f691653c11ef846d4","mergedInto":"main"}
