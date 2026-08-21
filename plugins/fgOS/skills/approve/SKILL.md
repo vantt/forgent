@@ -160,8 +160,8 @@ every command below from the main checkout, not a worktree.
    | `<id> is "<status>", not "awaiting-approval"` | no | report the real status and stop — re-read state before assuming anything moved |
    | `branch "fgw/<id>" does not exist` / `target branch ... does not exist` | no | report; there is nothing to land |
    | working tree is not clean | no | report the real error. **Never `git stash` or reset to clear it** — the main checkout is shared with every other session, and sweeping it can strand work with no way back |
-   | `merge-conflict` park | no | report; `fgos catchup <id>` is the recovery verb a person can choose next, or follow `_shared/catchup-self-recovery.md`'s playbook if driving self-recovery |
-   | `verify-fail-post-merge` / `verify-timeout-post-merge` park | no | check `_shared/catchup-self-recovery.md` for self-recovery playbooks: for `verify-fail-post-merge`, follow the verified evidence bar (isolate failing test, check diff, verify flake, fix pre-existing bug on `main` if reproducible) before retrying via `fgos move <id> --to awaiting-approval`; for `verify-timeout-post-merge`, retry once with doubled timeout via `fgos catchup <id>`. If unverified or non-flake, report `output` field |
+   | `merge-conflict` park | yes | run the shared playbook (`../_shared/catchup-self-recovery.md`), then retry step 6 — same two-retries ceiling as every other row in this table |
+   | `verify-fail-post-merge` / `verify-timeout-post-merge` park | yes | run the shared playbook's verified evidence bar (isolate failing test, check diff, verify flake, fix pre-existing bug on `main` if reproducible) before retrying via `fgos move <id> --to awaiting-approval` for `verify-fail-post-merge`, or `fgos catchup <id>` with the doubled timeout for `verify-timeout-post-merge`; then retry step 6, same two-retries ceiling as every other row in this table |
    | drift guard asking for `--acknowledge-drift` | no | this is a second decision about what lands — present the drifted roots it named and ask, then re-run with the flag on a real yes |
    | trips the Iron Law | no | see the section below |
 
@@ -218,7 +218,7 @@ the gate, so:
 - summarizing or reconstructing `iron-law-evidence.md` instead of showing
   the real file, or treating its absence as permission to proceed quietly
 - landing a root into the trunk while one of its children is still open
-- retrying a park (`verify-fail-post-merge`, `verify-timeout-post-merge`, `merge-conflict`) as if it were a mechanical error without meeting the evidence bar and rules in `_shared/catchup-self-recovery.md`
+- retrying a `verify-fail-post-merge`/`verify-timeout-post-merge`/`merge-conflict` park beyond the two-retries ceiling, or without following the evidence bar and rules in `../_shared/catchup-self-recovery.md`
 - reporting a `sync-root` as if it had advanced the root's status
 
 Violating the letter of the rules is violating the spirit of the rules.

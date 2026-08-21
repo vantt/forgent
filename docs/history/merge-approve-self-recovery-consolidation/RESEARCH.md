@@ -1,6 +1,112 @@
-# Research log — merge-approve-self-recovery-consolidation (tsk-c5u)
+# Research — merge-approve-self-recovery-consolidation
 
-## Round 1 — 2026-08-21
+Two items independently researched and implemented overlapping scope in
+this same feature directory (coincidental — both picked the same feature
+slug for the same underlying problem): **tsk-6av** ("consolidate merge
+self-recovery into approve; make merge-next/merge-loop thin callers") and
+**tsk-c5u** ("consolidate merge/approve catchup self-recovery logic into
+shared reference"). Both rounds below are kept, in the order they
+happened; tsk-6av's branch is the one that reconciles the two into a
+single landed result — see `plan.md`'s own reconciliation note.
+
+## Round 1 (tsk-6av) — 2026-08-20 — discovery stage
+
+**Asked:** does `plugins/fgOS/skills/approve/SKILL.md` already have any
+self-recovery hooks for a merge-conflict/verify-fail/verify-timeout park,
+what's the cleanest insertion point, and is `fgos catchup <id>`'s CLI
+contract stable enough to build a shared reference around?
+
+**Checked:**
+- `plugins/fgOS/skills/approve/SKILL.md` (read in full, 225 lines).
+- `plugins/fgOS/skills/merge-loop/SKILL.md` + `references/blocked-pick-decision-tree.md`.
+- `plugins/fgOS/skills/merge-next/SKILL.md`.
+- `src/verbs/merge/approve.mjs:469-520` (engine layer).
+- `src/verbs/merge/catchup.mjs` (the `fgos catchup <id>` use case).
+- `fgos show tsk-c5u` — the open dependency item.
+
+**Found:**
+
+1. `approve/SKILL.md`'s own step 7 table explicitly marks the exact three
+   park reasons this item cares about as non-mechanical, i.e. "report and
+   stop, let a human decide" (lines 163-164):
+   - `merge-conflict` park → "no | report; `fgos catchup <id>` is the
+     recovery verb a person can choose next"
+   - `verify-fail` / `verify-timeout` park → "no | report the verb's own
+     `output` field; a red verify is evidence, not an obstacle to retry
+     past"
+   Its own Red flags section (line 221) reinforces this: "retrying a park
+   (`verify-fail`, `merge-conflict`) as if it were a mechanical error" is
+   listed as a thing NOT to do. This is the literal opposite of
+   `merge-loop`'s own stance for the identical three reasons.
+
+2. `merge-loop/SKILL.md` + `references/blocked-pick-decision-tree.md`
+   already contain a complete, working self-recovery decision tree for
+   exactly these reasons — named playbooks `verify-fail-post-merge`,
+   `verify-timeout-post-merge`, `integration-drift` (which covers
+   merge-conflict for a root with children), each ending in one
+   `fgos catchup <id>` call (or a diagnose-then-retry-once sequence for
+   verify-fail), capped once-per-id-per-run, logged via `fgos decision`
+   first. This logic is real and already proven — it's just unreachable
+   from `approve/SKILL.md`, and only reachable from `merge-next` when a
+   session is manually driving `/fgOS:merge-loop`'s own prose correctly
+   turn by turn.
+
+3. The engine (`approve.mjs:469-520`, tsk-4ax D3) already runs ONE
+   `performCatchUp` attempt automatically, but only to catch the item's
+   branch up to a drifted TARGET before landing — never as a retry after a
+   failure. On conflict or verify-fail, it parks `blocked` immediately with
+   no further automatic attempt. So today's actual self-recovery gap is
+   entirely at the skill-prose (agent) layer, not the engine layer — the
+   engine already exposes the exact primitive (`fgos catchup <id>`) the
+   prose-level playbooks need.
+
+4. `fgos catchup <id>` (`src/verbs/merge/catchup.mjs:52`) contract is
+   stable and already documented precisely by
+   `merge-loop/references/blocked-pick-decision-tree.md`'s own "Reading
+   `fgos catchup <id>`'s outcome" section: requires `status: "blocked"`,
+   only resolves a merge-related park reason
+   (`merge-conflict`/`verify-fail-post-merge`/`verify-timeout-post-merge`/
+   `integration-drift`/`merge-failed-unclassified`, or a cleanup-harness
+   merge-ancestry park), returns
+   `outcome: "merged"|"already-caught-up"|"conflict"|"verify-fail"` (the
+   last with `timedOut`, `exitStatus`, `output`, `conflictedFiles` as
+   applicable). Good primitive to build a shared reference around —
+   nothing new needed there.
+
+5. `merge-next/SKILL.md` already delegates the actual attempt to `approve`
+   ("merges it via the existing approve/CTR005 gate") and explicitly
+   defers self-recovery to `merge-loop` ("This single-shot skill does not
+   run that playbook itself"). Once the playbook lives inside `approve`
+   instead, `merge-next` needs zero changes to inherit it — it already
+   calls `approve` for every attempt.
+
+6. `tsk-c5u` (open dependency at the time) names this exact propagation
+   gap in its own description and proposes the same fix shape this item
+   scoped: extract the self-recovery decision logic into one new shared
+   file (e.g. `plugins/fgOS/skills/_shared/catchup-self-recovery.md`,
+   mirroring the existing `_shared/fgos-cli-fallback.md` /
+   `_shared/executor-dispatch-fallback.md` pattern), then point
+   `approve/SKILL.md`, `merge-loop/SKILL.md`, and `merge-next/SKILL.md` at
+   it. tsk-6av refines *where the ownership lives*: `approve` is the
+   primary caller (it's the layer that actually attempts a merge and can
+   hit these three park reasons), `merge-next`/`merge-loop` inherit for
+   free through their existing call chain rather than needing their own
+   copy or their own explicit reference to the shared file.
+
+**Still open (for planning, not discovery):** exact wording/structure of
+the new shared reference file; whether `merge-loop/SKILL.md`'s own Step 4
+decision tree and `references/blocked-pick-decision-tree.md` get retired
+entirely or trimmed down to only the "no playbook, no-progress" and
+Iron-Law/ungathered-root carve-outs once `approve` returns an
+already-self-recovered final result; whether `sync-root`'s own inbound
+catchup gate (`src/verbs/merge/sync-root.mjs:199-236`, same conflict/
+verify-fail shape) needs the same skill-prose treatment as `approve`'s.
+
+**Verdict:** clear. The scope, insertion point, and primitive are all
+concretely grounded in evidence above; nothing here is a product/scope
+gray area that needs a person before planning can start.
+
+## Round 1 (tsk-c5u) — 2026-08-21
 
 **Asked:** Extract the exact current self-recovery/catchup-park-recovery
 logic already living in `plugins/fgOS/skills/merge-loop/SKILL.md` (per the
@@ -129,3 +235,42 @@ scope/shape decisions (how literally to split
 `blocked-pick-decision-tree.md`'s content vs. write a condensed version in
 the new shared file, and the exact param-substitution shape each of the
 three consuming files needs) — those are for `planning`, not `discovery`.
+
+## Round 2 (tsk-6av) — 2026-08-21 — reconciling with tsk-c5u after both landed independently
+
+**What happened:** tsk-c5u implemented and merged to `main`
+(`e92cfe66`) while tsk-6av's own branch was already sitting at
+`awaiting-approval`, unmerged. Both created
+`plugins/fgOS/skills/_shared/catchup-self-recovery.md` (and its two
+mirrors) and edited the same three consuming files, but with a real
+architectural difference, not just wording drift:
+
+- **tsk-c5u's landed version** kept `approve/SKILL.md` step 7's
+  `merge-conflict`/`verify-fail`/`verify-timeout` rows as `Mechanical? no`
+  — it only centralized the playbook *prose* into one shared file, so a
+  person or `merge-loop` driving recovery manually has one place to read
+  instead of three. `merge-next/SKILL.md`'s landed text still says "This
+  single-shot skill does not run that playbook itself:
+  `/fgOS:merge-loop` owns it" — unchanged from before tsk-6av ever
+  touched it.
+- **tsk-6av's own branch** flips those same rows to `Mechanical? yes`
+  — `approve` runs the shared playbook itself, inline, before ever
+  reporting a park — which is the actual behavior change the original
+  submission asked for (merge-next/merge-loop being passive when they
+  have the capability to self-recover) and the architecture confirmed
+  with the person before this item was even submitted (see `plan.md`'s
+  own Approach section, decided 2026-08-20).
+
+**Reconciliation applied** (see `plan.md`'s own reconciliation note for
+the file-by-file resolution): keep tsk-c5u's more detailed shared-file
+prose (the `CATCHUP_REASONS` enumeration, the "verified-not-blind
+evidence bar" line, `merge-failed-unclassified` playbook it added) as the
+base — it is strictly more complete than tsk-6av's own first draft — but
+apply tsk-6av's own behavioral fix on top: `approve/SKILL.md`'s three
+rows go back to `Mechanical? yes`, `merge-next/SKILL.md`'s stale
+"merge-loop owns it" claim is removed again, and the shared file's own
+"once per id per loop run" ceiling language (written assuming only a
+loop-shaped caller) is widened to name `approve`'s own two-retries
+ceiling as the governing cap when `approve` is the one calling it
+directly — a caller-shape gap neither original version had actually
+covered, found and fixed only while reconciling.
