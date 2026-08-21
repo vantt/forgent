@@ -58,6 +58,7 @@ import { DEFAULT_LEVEL, LEVELS } from '../state/gate-bypass.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../state/worker-slots.mjs';
 import { checkEventsJsonlContiguity, fixEventsJsonlContiguity } from '../state/events-jsonl-contiguity.mjs';
 import { advanceEventsJsonlTruncationGuard, DEFAULT_CHECKPOINT_EVENT_THRESHOLD } from '../state/events-jsonl-truncation-guard.mjs';
+import { readMainCheckoutGuardWarnings } from '../state/main-checkout-guard-warnings.mjs';
 
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 export { claudeCodeHookWired } from './claude-code-hooks.mjs';
@@ -1222,6 +1223,32 @@ registerCheck({
   description: 'shared .fgos/events.jsonl has not been silently reverted by a git stash/checkout/reset/clean (tsk-cgg)',
   check: (cwd) => checkEventsJsonlNotTruncated(cwd),
 });
+
+// main-checkout-guard-warnings (tsk-1vc-3 D6, docs/history/tsk-1vc-silent-eventlog-loss-detection/CONTEXT.md):
+// surfaces recordMainCheckoutGuardWarning's write-only output (main-checkout-guard-warnings.jsonl)
+// to fgos doctor.
+function checkMainCheckoutGuardWarnings(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  if (mainCheckout === null) {
+    return { passed: true, message: 'not inside a git checkout — nothing to check' };
+  }
+  const warnings = readMainCheckoutGuardWarnings(mainCheckout);
+  if (warnings.length === 0) {
+    return { passed: true, message: 'no main checkout guard warnings recorded' };
+  }
+  const latest = warnings[warnings.length - 1];
+  return {
+    passed: false,
+    message: `${warnings.length} main checkout guard warning(s) recorded — latest: [${latest.ts}] ${latest.reason}: ${latest.message}`,
+  };
+}
+
+registerCheck({
+  id: 'main-checkout-guard-warnings',
+  description: 'main checkout eventlog guard warnings log has no recorded regression or truncation warnings (D6)',
+  check: (cwd) => checkMainCheckoutGuardWarnings(cwd),
+});
+
 
 // docs/history/global-project-config-awareness/CONTEXT.md D1: reports which
 // config level is currently active (project always wins when present) and

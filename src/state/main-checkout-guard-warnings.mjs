@@ -33,3 +33,32 @@ export function recordMainCheckoutGuardWarning(dir, report) {
     return null;
   }
 }
+
+/**
+ * Read recorded truncation guard warnings.
+ * @param {string} dir - .fgos directory or repo directory containing .fgos
+ * @returns {Array<{ts: string, reason: string, message: string, mark: any}>} array of warning records
+ */
+export function readMainCheckoutGuardWarnings(dir) {
+  try {
+    const fgosDir = path.basename(dir) === '.fgos' ? dir : path.join(dir, '.fgos');
+    const logPath = path.join(fgosDir, MAIN_CHECKOUT_GUARD_WARNINGS_BASENAME);
+    if (!fs.existsSync(logPath)) {
+      return [];
+    }
+    const content = fs.readFileSync(logPath, 'utf8');
+    const lines = content.split('\n').filter((l) => l.trim().length > 0);
+    const records = [];
+    for (const line of lines) {
+      try {
+        records.push(JSON.parse(line));
+      } catch {
+        // ignore malformed lines
+      }
+    }
+    return records;
+  } catch {
+    return [];
+  }
+}
+

@@ -9,9 +9,12 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
+import { execFileSync } from 'node:child_process';
 import { DOCTOR_CHECKS, CONFIG_DEFAULT_REGISTRATIONS, FIX_REGISTRATIONS, registerCheck, registerConfigDefault, registerFix, runFixes, ensureSharedConfigDefaults } from '../../src/setup/checks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
 import { DEFAULT_CAPABILITY_SLOTS, PI_EXECUTOR_DEFAULT } from '../../src/setup/registrations.mjs';
+import { recordMainCheckoutGuardWarning } from '../../src/state/main-checkout-guard-warnings.mjs';
+
 
 const EXPECTED_RUNNER_DEFAULT = {
   ...DEFAULT_RUNNER_CONFIG,
@@ -439,5 +442,36 @@ test('agent-type-names-unique doctor check fails when duplicate agent-type names
     fs.rmSync(tempDir, { recursive: true, force: true });
   }
 });
+
+test('guard-warnings-surface: main-checkout-guard-warnings doctor check passes when no warnings exist and fails when warnings exist', () => {
+  const dir = mkTempDir();
+
+  // 1. Not in a git checkout
+  const entry = DOCTOR_CHECKS.find((c) => c.id === 'main-checkout-guard-warnings');
+  assert.ok(entry, 'main-checkout-guard-warnings check must be registered');
+  const nonGitResult = entry.check(dir);
+  assert.equal(nonGitResult.passed, true);
+  assert.match(nonGitResult.message, /not inside a git checkout/);
+
+  // 2. Fresh checkout (no warnings recorded)
+  const gitDir = mkTempDir();
+  execFileSync('git', ['init'], { cwd: gitDir });
+  const freshResult = entry.check(gitDir);
+  assert.equal(freshResult.passed, true);
+  assert.match(freshResult.message, /no main checkout guard warnings recorded/);
+
+  // 3. Warnings recorded
+  recordMainCheckoutGuardWarning(gitDir, {
+    reason: 'regressed',
+    message: 'current tip seq 22816 is lower than last recorded mark 22850',
+    mark: 22850,
+  });
+
+  const warnedResult = entry.check(gitDir);
+  assert.equal(warnedResult.passed, false);
+  assert.match(warnedResult.message, /1 main checkout guard warning\(s\) recorded/);
+  assert.match(warnedResult.message, /regressed: current tip seq 22816 is lower than last recorded mark 22850/);
+});
+
 
 
