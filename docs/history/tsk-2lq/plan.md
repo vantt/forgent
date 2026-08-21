@@ -20,22 +20,40 @@ having advanced, PROVIDED the paths main advanced since the fork are
 disjoint from the paths `branch` itself introduced:
 
 - `mergeBase = git merge-base branch HEAD`
-- `introducedPaths = git diff --name-only <mergeBase>..<branchHeadAtReturn>`
-  (what `branch` changed)
-- `mainAdvancedPaths = git diff --name-only <mergeBase>..HEAD` (what main
-  changed since the fork)
+- `introducedPaths = namesFromDiffStatus(git diff --name-status
+  <mergeBase>..<branchHeadAtReturn>)` (what `branch` changed) — **not**
+  `--name-only`: verified live during this stage's own reality gate (a
+  throwaway scratch repo, `git mv a.txt b.txt` + commit, then `git diff
+  --name-only <base> HEAD` printed only `b.txt`, never `a.txt`; `git diff
+  --name-status <base> HEAD` printed `R100\ta.txt\tb.txt`) that
+  `--name-only` reports ONLY the new name for a detected rename (git's
+  rename detection is on by default), which would have let a rename slip
+  past a plain name-overlap check undetected. `namesFromDiffStatus` parses
+  `--name-status` output and, for every `R<score>` line, adds BOTH the old
+  and new path to the set (a plain add/modify/delete line contributes its
+  one path as usual).
+- `mainAdvancedPaths = namesFromDiffStatus(git diff --name-status
+  <mergeBase>..HEAD)` (what main changed since the fork), same helper.
 - if the two path sets are disjoint, the skip still applies: a standard
   git 3-way merge carries each side's changes unmodified for any path only
   that side touched, so the staged merge tree at `introducedPaths` is
   guaranteed bytewise-identical to `branchHeadAtReturn`'s tree there,
-  independent of how far main has advanced elsewhere.
+  independent of how far main has advanced elsewhere. Because
+  `namesFromDiffStatus` folds a rename's old AND new name into each side's
+  set, a rename on either side that touches a path the other side also
+  touched (under either its old or new name) still registers as overlap —
+  fail-closed, full checks run — closing the gap the `--name-only` version
+  would have missed.
 
 This is the direction the item's own description named as "not locked" and
 `docs/history/tsk-2lq/RESEARCH.md` Round 1 (discovery stage) confirmed
 buildable — grounded in standard 3-way-merge semantics and the same
-`git diff --name-only` path-set pattern the same file already uses in
-`branchContentMismatch` (`src/runner/merge.mjs:1023`, tsk-15k) for a related
-but distinct already-merged-branch problem.
+`git diff --name-status` path-set pattern the same file already uses (in
+`--name-only` form) in `branchContentMismatch`
+(`src/runner/merge.mjs:1023`, tsk-15k) for a related but distinct
+already-merged-branch problem; this item's own `namesFromDiffStatus` helper
+is a small, local rename-aware refinement of that same established
+pattern, not a new class of git operation.
 
 **Alternatives rejected.**
 
@@ -75,7 +93,7 @@ radius directly, without relying on the stale GitNexus index.
 |---|---|---|
 | `mergedTreeAlreadyVerified`'s relaxed skip condition | medium — a false-positive skip would land an unverified tree on main (the function's own docblock already states this is the failure mode to avoid) | new test: skip fires when main advances only on a path disjoint from `branch`'s own footprint. New test: skip does NOT fire when main's advance touches a path `branch` also touched (overlap → fail-closed, run checks) |
 | existing D5 test `test/runner/merge.test.mjs:1632` ("main advancing past the fork forces the checks to run again") | low — this test's fixture (`moved-on.txt`, a path disjoint from `produced.txt`) currently asserts NO skip for a case the fix is meant to now skip; its assertion direction must flip for a disjoint path, so the fixture needs retargeting to an overlapping path to keep proving the still-real fail-closed-on-overlap direction | retarget this test to touch the SAME path (`produced.txt`) main and branch both changed, so it still proves fail-closed-on-overlap; add a NEW, separate test using a disjoint path (e.g. `moved-on.txt`) to prove the new tolerant-skip direction |
-| rename ambiguity (a path renamed on one side only, missed by a bare path-name comparison) | low — RESEARCH.md Round 1 "still open" note | fail-closed by construction: a rename shows up as an added+removed path pair in `git diff --name-only`, which a plain path-set-overlap check already treats conservatively (the "removed" name plus the "added" name both count toward that side's changed-path set, so a name overlap on either name still triggers the strict-ancestor path) — pinned as an assumption below, not asked as a question, since getting this wrong only ever means running the full checks (today's existing, safe behavior), never an unsafe skip |
+| rename ambiguity (a path renamed on one side only, missed by a bare path-name comparison) | medium — a `--name-only` diff reports ONLY the new name for a detected rename (verified live, see Approach), so a plain name-only overlap check would silently MISS a rename that collides with the other side's change to the same logical file — the false-positive-skip failure mode the function's own docblock says to avoid | fixed at the mechanism level, not left as a residual gap: `namesFromDiffStatus` (Approach, above) parses `--name-status` and folds both the old and new name of every `R<score>` line into each side's path set, so a rename-vs-touch collision under either name registers as overlap. New test: main renames a path `branch` also touched under the pre-rename name (or vice versa) → skip does NOT fire |
 
 **Files touched, in order:**
 
@@ -88,17 +106,16 @@ radius directly, without relying on the stale GitNexus index.
 
 ## Assumptions
 
-- A rename on either side is treated conservatively (counted as touching
-  both its old and new path names), falling back to the strict-ancestor
-  path rather than a bespoke rename-aware comparison — not material to
-  this item's scope (the bug being fixed is the common no-advance/
-  disjoint-advance case on a busy trunk; a rename racing the same window
-  is rare and the fallback is never less safe than today's existing
-  behavior).
 - `branchHeadAtReturn` (already required by the existing sufficient
   condition) is still the correct tree to diff against for
   `introducedPaths` — unchanged from the function's existing first
   condition, not reopened here.
+- A path added or deleted outright (not a rename) on one side, with no
+  counterpart on the other side, is handled by `namesFromDiffStatus`'s
+  plain add/delete case (single path in, single path out) the same as
+  today's `branchContentMismatch` handling — not reopened here, no new
+  ambiguity beyond the rename case the Approach section above already
+  resolves.
 
 ## Verify
 
