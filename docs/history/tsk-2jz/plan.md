@@ -208,6 +208,16 @@ useful, but not proven against the two decayed repro cases — proof
 deferred to a synthetic test case at Execute, which the item's own text
 explicitly permits in place of the three original items).
 
+## Gate decision (validateApprove)
+
+Asked live (canAutoApprove: false, heavy tier): ship the scoped fix now
+(main-ancestry fallback for blind spot 2, content-match fallback for the
+clean-rebase sub-case of blind spot 1; a genuinely content-diverged
+rebase correctly stays `ok:false`, documented as an intentional
+limitation) vs. hold off for further research into a broader blind-spot-1
+mechanism. **Answered: ship the scoped fix.** Recorded via `fgos
+gate-approve --actor human`.
+
 ## Outstanding questions
 
 None
