@@ -134,12 +134,15 @@ ordering is driven by build order, not backlog critical path):
    `handoff-return` are registered (`src/cli/command-registry.mjs` and
    wherever their handler lives), including a `--dir` flag per the
    `requiresExistingStore` convention every other verb here follows.
-4. `test/cli/fgos-edit.test.mjs` or a new sibling test file — coverage:
-   refuses on `todo`/`doing`/`blocked`/`awaiting-human`/
-   `awaiting-approval`; succeeds on `done`; succeeds on `wontfix`; clears
-   both `reason` and `parkReason`; requires non-empty `--note`; an
-   ordinary `work.move`-carried `reason` on a different item still folds
-   unaffected (RUL32 regression guard).
+4. `test/cli/fgos-edit.test.mjs` — extend this existing file rather than
+   add a new sibling one, so the item's own `verify` command (already
+   pointing at this exact file) stays the real, unambiguous proof surface
+   with no execute-time choice left open. Coverage: refuses on
+   `todo`/`doing`/`blocked`/`awaiting-human`/`awaiting-approval`; succeeds
+   on `done`; succeeds on `wontfix`; clears both `reason` and
+   `parkReason`; requires non-empty `--note`; an ordinary
+   `work.move`-carried `reason` on a different item still folds unaffected
+   (RUL32 regression guard).
 5. `docs/specs/work-state.md` — update Data Dictionary entry #18
    (`reason`) to note the new clearing path exists; add the new verb next
    to RUL32/RUL64 the same way `handoff`/`handoff-return` are documented
