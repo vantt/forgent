@@ -21,11 +21,7 @@ ask` was already `answer`ed on the status axis without the role axis
 following):
 
 ```bash
-root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-```
-
-```bash
-node "$root/bin/fgos.mjs" handoff-return "<item-id>" --note "reclaiming at Scope — holder was <role>" --dir "$root"
+fgos handoff-return "<item-id>" --note "reclaiming at Scope — holder was <role>"
 ```
 
 Repeat, re-reading `data.work[id].holder` fresh each time, until `holder`
@@ -67,8 +63,7 @@ sub-verb `query` requires an existing store, so run it with `--dir`
 explicitly the same as every other bare verb this skill calls:
 
 ```bash
-root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-node "$root/bin/fgos.mjs" tool query --capability impact-analysis --status present --dir "$root"
+fgos tool query --capability impact-analysis --status present
 ```
 
 Fold the result into `CLAUDE.md`'s three-way framing

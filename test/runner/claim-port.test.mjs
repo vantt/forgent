@@ -478,3 +478,20 @@ test('claimWork pre-check never fires for take (isolate:false), even against a c
   const after = listWork(dir).work['item-a'];
   assert.equal(after.claimRole, 'session', 'take must never reclaim, even a quiet claim -- pick is the only door (D5 scope narrowing)');
 });
+
+test('claimWork invokes runOpportunisticMainCheckoutChecks non-blockingly and succeeds even when truncation guard detects a break', () => {
+  delete process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
+  const { repoRoot, dir } = setup();
+  const guardPath = path.join(dir, 'events-jsonl.truncation-guard.json');
+  const warnPath = path.join(dir, 'main-checkout-guard-warnings.jsonl');
+  const logPath = path.join(dir, 'events.jsonl');
+
+  // Seed a guard mark
+  fs.writeFileSync(guardPath, JSON.stringify({ seq: 9999, hash: 'badhash' }));
+
+  // claimWork should succeed normally despite truncation break, and write warning
+  const res = claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot });
+  assert.ok(res);
+  assert.equal(fs.existsSync(warnPath), true, 'warning file must be created on truncation break during claimWork');
+});
+

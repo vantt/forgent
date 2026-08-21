@@ -9,11 +9,7 @@ invocation. Resolve `root` first, read its printed value, then substitute
 that literal path into the second call.
 
 ```bash
-root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-```
-
-```bash
-node "$root/bin/fgos.mjs" gate-check "<item-id>" --gate contextApprove --artifact "docs/history/<feature>/CONTEXT.md" --dir "$root"
+fgos gate-check "<item-id>" --gate contextApprove --artifact "docs/history/<feature>/CONTEXT.md"
 ```
 
 `gate-check` wraps the engine's own auto-approve check behind the CLI's
@@ -31,7 +27,7 @@ Either branch below also records a structured approve record — separate
 from, and in addition to, `fgos decision`'s free-text audit line:
 
 ```bash
-node "$root/bin/fgos.mjs" gate-approve "<item-id>" --gate contextApprove --actor <human|bypass> --verify "<item's current verify field>" --dir "$root"
+fgos gate-approve "<item-id>" --gate contextApprove --actor <human|bypass> --verify "<item's current verify field>"
 ```
 
 Read the verify value fresh right before this call (`fgos list --id

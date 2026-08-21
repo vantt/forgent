@@ -24,7 +24,7 @@
     "docs/enduser-docs-index.json"
   ],
   "scripts": {
-    "test": "node --test 'test/**/*.test.mjs'",
+    "test": "FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/**/*.test.mjs'",
     "setup:hooks": "node scripts/install-git-hooks.mjs",
     "cli": "node bin/fgos.mjs",
     "check:events-seq": "node scripts/check-events-seq-contiguity.mjs --log .fgos/events.jsonl",

@@ -16,8 +16,7 @@ makes "report once" actually mean once.
 ## Step 1: Compute the open candidate set
 
 ```bash
-root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-node "$root/bin/fgos.mjs" list --json --dir "$root"
+fgos list --json
 ```
 
 `openCandidates` = every id in `candidateIds` whose status is NOT one of
@@ -32,8 +31,7 @@ delivered, so say so plainly, not as if it reached a terminal status).
 ## Step 2: Schedule the earliest wave
 
 ```bash
-root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-node "$root/bin/fgos.mjs" schedule --candidates "<openCandidates-comma-separated>" --dir "$root"
+fgos schedule --candidates "<openCandidates-comma-separated>"
 ```
 
 `scheduled` = first wave of `fgos schedule --candidates` — the earliest wave over just this candidate set, never the whole frontier.
@@ -55,8 +53,7 @@ Run the consolidated `fanout-batch` verb:
 > Wait for the harness's own background-completion notification before proceeding to gather results (end the turn with no further tool call once background execution is started; the harness delivers a task-notification automatically and resumes the session with the output in context). Do NOT use `ScheduleWakeup` or polling — `ScheduleWakeup` is for `/loop` dynamic pacing only (requires `prompt` unless `stop:true`) and fails immediately in this context.
 
 ```bash
-root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-node "$root/src/runner/dispatch.mjs" fanout-batch "<batch-comma-separated>" --has-live-task-access --dir "$root"
+node src/runner/dispatch.mjs fanout-batch "<batch-comma-separated>" --has-live-task-access
 ```
 
 This single call checks worker-slot capacity, trims the batch if needed, re-confirms each candidate's mechanism, and executes out-of-process candidates through the full `pick` -> `execute` -> `return` loop.
@@ -85,8 +82,7 @@ Dispatch one Agent per id in `firing` (from `mechanismChanged` or initial in-pro
 Re-read state fresh:
 
 ```bash
-root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-node "$root/bin/fgos.mjs" list --json --dir "$root"
+fgos list --json
 ```
 
 For each id in this iteration's dispatched set now `awaiting-approval`,
@@ -97,8 +93,7 @@ in the `merge` verb's own ranking order (never an invented priority):
 - Otherwise:
 
   ```bash
-  root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-  node "$root/bin/fgos.mjs" approve "<id>" --dir "$root"
+  fgos approve "<id>"
   ```
 
 For each id now `blocked`: report it; take no further action on it — the

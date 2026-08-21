@@ -11,11 +11,7 @@ its printed value, then substitute that literal path into the second,
 separate call.
 
 ```bash
-root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-```
-
-```bash
-node "$root/bin/fgos.mjs" gate-check "<item-id>" --gate validateApprove --plan "docs/history/<feature>/plan.md" --children '<the child-spec JSON array from plan.md, or []>' --cost "<REVERSIBLE|EXPENSIVE>" --dir "$root"
+fgos gate-check "<item-id>" --gate validateApprove --plan "docs/history/<feature>/plan.md" --children '<the child-spec JSON array from plan.md, or []>' --cost "<REVERSIBLE|EXPENSIVE>"
 ```
 
 Four axes, and every one of them can only push toward **asking**, never
@@ -66,7 +62,7 @@ Skip the question. Post the non-question line `auto-approved:
 validateApprove (gate-bypass level <level>)`, log it:
 
 ```bash
-node "$root/bin/fgos.mjs" decision --id "<item-id>" --text "auto-approved validateApprove gate for <item-id> at level <level>" --rationale "gate-bypass level <level> permits auto-approval per the gate-bypass feature's own locked decisions (see docs/history/gate-bypass/CONTEXT.md)" --relation "touches:<the gate-bypass feature's own decision item, from docs/history/gate-bypass/CONTEXT.md>" --kind engine --dir "$root"
+fgos decision --id "<item-id>" --text "auto-approved validateApprove gate for <item-id> at level <level>" --rationale "gate-bypass level <level> permits auto-approval per the gate-bypass feature's own locked decisions (see docs/history/gate-bypass/CONTEXT.md)" --relation "touches:<the gate-bypass feature's own decision item, from docs/history/gate-bypass/CONTEXT.md>" --kind engine
 ```
 
 — the text only cites the gate-bypass feature's own decision rather than
@@ -116,13 +112,12 @@ job, already done and already cited). **This is where split children
 first become real** — nothing created them earlier:
 
 ```bash
-root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
 # plan.md's step 4 said "one honest piece" -- no split:
-node "$root/bin/fgos.mjs" plan "<item-id>" --verdict pass-through --reason "<why plan.md called this one piece>" --dir "$root"
+fgos plan "<item-id>" --verdict pass-through --reason "<why plan.md called this one piece>"
 # plan.md's step 4 wrote child specs instead -- hand that same JSON block
 # through verbatim ({title, verify, action, kind?, risk?, refs?, footprint?,
 # deps?}), never a re-derived or re-worded version of it:
-node "$root/bin/fgos.mjs" plan "<item-id>" --verdict decompose --reason "<why plan.md called for a split>" --children '<the JSON array plan.md already carries>' --dir "$root"
+fgos plan "<item-id>" --verdict decompose --reason "<why plan.md called for a split>" --children '<the JSON array plan.md already carries>'
 ```
 
 `--verdict decompose --children` is now the **only** way a split child

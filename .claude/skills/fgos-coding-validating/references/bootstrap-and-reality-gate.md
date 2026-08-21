@@ -15,11 +15,7 @@ If the domain declares a role graph and the item's current
 `implementer`, reclaim it before anything else:
 
 ```bash
-root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-```
-
-```bash
-node "$root/bin/fgos.mjs" handoff-return "<item-id>" --note "reclaiming at Bootstrap -- holder was <role>" --dir "$root"
+fgos handoff-return "<item-id>" --note "reclaiming at Bootstrap -- holder was <role>"
 ```
 
 Repeat, re-reading `holder` fresh each time, until it reads `implementer`

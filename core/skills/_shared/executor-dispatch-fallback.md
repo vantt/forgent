@@ -56,8 +56,7 @@ a `Grep`.
 ## Step A — ask `decide` (never read the config yourself)
 
 ```bash
-root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-node "$root/src/runner/dispatch.mjs" decide <EXECUTOR_ID> [--has-live-task-access]
+node src/runner/dispatch.mjs decide <EXECUTOR_ID> [--has-live-task-access]
 # when you have no executor id, use the door that matches what you know:
 #   decide --for <PURPOSE>  [--has-live-task-access]
 #   decide --work <WORK_ID> [--stage <STAGE>] [--has-live-task-access]
@@ -113,6 +112,8 @@ verbose test runner's own line-by-line pass output:
 ```bash
 node "$root/src/runner/dispatch.mjs" execute <EXECUTOR_ID> --prompt "<PROMPT_TEMPLATE built as below>" [--has-live-task-access] 2>&1 | grep -E --line-buffered '\[DONE\]|\[BLOCKED\]|Error|FAIL|✗|^\{'
 ```
+
+When dispatching a worktree-backed item with explicit directory flags, pass `--cwd <worktree path>` (so the spawned executor runs in the worktree) and `--repo-root "$root"` (so config loads from main) as two separate flags — never pass `$root` as `--dir`/`--cwd` alone.
 
 **When this session is isolated in a worktree and `<PROMPT_TEMPLATE>` is
 built from a file via `$(cat ...)`, the worktree-isolation guard may
@@ -293,10 +294,9 @@ through the one existing writer of `.fgos/logs/`, `appendWorkerLog`
 (`src/runner/worker-log.mjs`); never a new log file or module for this:
 
 ```bash
-root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
 node --input-type=module -e "
-import { appendWorkerLog } from '$root/src/runner/worker-log.mjs';
-appendWorkerLog('$root', '<scope>', {
+import { appendWorkerLog } from './src/runner/worker-log.mjs';
+appendWorkerLog('.', '<scope>', {
   tier: '<judged-or-default-tier>',
   model: '<judged-or-default-model>',
   message: 'ad-hoc dispatch <task id>: <goal>',
