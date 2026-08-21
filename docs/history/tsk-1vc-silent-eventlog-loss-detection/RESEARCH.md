@@ -88,3 +88,48 @@ anywhere, or still open?
    depends on (2) above (whether this item's own scope grows to include a
    fail-closed decision or stays narrowly "surface the existing warn-only
    signal").
+
+## Round 2 — 2026-08-21 (validating, correction)
+
+**Caught:** Round 1's "seq 22824-22851 gap" finding was wrong. It was
+inferred from `rg -n "tsk-3hks"` jumping straight from a match at seq
+22823 to the next match at seq 22852 — but that search only shows lines
+*containing* "tsk-3hks"; it never actually inspected what filled the
+seq numbers in between.
+
+**Checked, this round:**
+- `node scripts/events-jsonl-contiguity.mjs --check .fgos/events.jsonl` —
+  this repo's own existing gap/duplicate detector (`src/state/events-
+  jsonl-contiguity.mjs`, shipped for `tsk-3wq`, registered into `fgos
+  doctor`), which Round 1 should have used instead of a manual grep
+  cross-reference. Result: `{"ok": true, "totalLines": 22972, "duplicates":
+  [], "gaps": []}` — no numeric gap exists in the live log.
+- Direct `rg` for the literal seq numbers 22823-22852 (not filtered by
+  item id): all present, with real timestamps `03:30:30`-`03:31:xx`,
+  belonging to other items' genuine, unrelated activity.
+- `docs/explanation/events-jsonl-lost-update-race-under-concurrent-
+  session-writes.md` (tsk-1q5/tsk-3wq) — an existing, already-proven
+  two-root-cause taxonomy for exactly this failure class (root cause A:
+  `refreshView` outside `withEventsLock`, fixed; root cause B:
+  git-tracked `events.jsonl` discarded by a raw `git merge`/checkout,
+  fixed via `.gitattributes merge=union`). Neither is asserted to explain
+  `tsk-3hks`'s own loss, but D4's reproduction harness must rule both out
+  explicitly rather than assume a third, unfixed mechanism by default.
+- `test/runner/merge-target-slot-multiprocess.test.mjs`,
+  `test/state/events.test.mjs` (twenty-process barrier pattern) — real,
+  existing multiprocess-test precedent in this repo (confirmed by reading
+  both files), correcting Round 1's plan.md draft's "no existing file to
+  extend" claim.
+
+**Corrected verdict:** "the gap" (a numeric seq hole) does not exist and
+is retracted (CONTEXT.md D7, supersedes D4's citation). The surviving,
+real evidence for `tsk-3hks`'s own loss is qualitative only: the item's
+own description states it was recovered by recreation (`fgos add` with
+the same id/fields), and the guard's own "regressed" warning
+(`.fgos/main-checkout-guard-warnings.jsonl`: tip seq 22816 vs. recorded
+mark 22850 at `03:19:28`) — already explained in the prior investigation
+report as a likely false positive from the guard-mark file's own
+unlocked, unscoped race. D4's actual directive (real live reproduction,
+never git-log/timestamp inference) is unweakened by this correction; if
+anything it is reinforced, since a clean silent-disappear-and-renumber
+leaves no numeric trace a post-hoc scan could ever find.

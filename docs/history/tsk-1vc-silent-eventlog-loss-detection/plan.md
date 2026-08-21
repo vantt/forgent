@@ -36,10 +36,14 @@ three):
 
 1. **Reproduce first, fix second.** Before touching
    `runOpportunisticMainCheckoutChecks`, build the live concurrent-claim
-   reproduction D4 requires and confirm it reproduces a gap signature
-   against **today's unfixed code** — a red-before-green baseline. Doing
-   this after the fix would only prove the fix doesn't obviously break
-   anything, not that it actually closes the hole D4 asks about.
+   reproduction D4 requires and confirm it reproduces "the loss" (D7's
+   corrected term — a claimed item's own history silently disappearing
+   from the shared log, not a numeric seq gap: `scripts/events-jsonl-
+   contiguity.mjs --check` already proves no such gap survives today,
+   CONTEXT.md D7) against **today's unfixed code** — a red-before-green
+   baseline. Doing this after the fix would only prove the fix doesn't
+   obviously break anything, not that it actually closes the hole D4
+   asks about.
 2. **Fix the guard's own write path** (D1 fail-closed scope + D2
    event-count checkpointing) once the baseline in (1) exists to check the
    fix against.
@@ -66,28 +70,35 @@ three):
 
 | Component | Risk | Proof point (carried to `fgos-coding-validating`) |
 |---|---|---|
-| Live concurrent-claim reproduction (piece 1) | high | Must actually reproduce a seq-gap or an equivalent race signature against unfixed code; a harness that runs "clean" proves nothing and must not be accepted as done. GitNexus (`full` posture) used to confirm no other caller path already serializes these calls in a way that would make the race unreproducible by design. |
+| Live concurrent-claim reproduction (piece 1) | high | Must actually reproduce an item's own history silently disappearing from the shared log (D7's corrected symptom, not a numeric seq gap) against unfixed code; a harness that runs "clean" proves nothing and must not be accepted as done. Must also rule out the two already-fixed root causes A/B (`docs/explanation/events-jsonl-lost-update-race-under-concurrent-session-writes.md`) explicitly before concluding a third mechanism. GitNexus (`full` posture) used to confirm no other caller path already serializes these calls in a way that would make the race unreproducible by design. |
 | Guard write-path fail-closed + event-count checkpoint (piece 2) | high | Must not introduce a new block on `pick`/`take`/`return` (D1's own explicit boundary) — proof: the same 7 tests `tsk-5k1` just fixed (`test/cli/fgos-claim.test.mjs`, `test/cli/fgos-return.test.mjs`, `test/cli/fgos-read.test.mjs`, `test/e2e/runner-loop.test.mjs`) plus `test/state/events-jsonl-truncation-guard.test.mjs`/`test/runner/claim-port.test.mjs`/`test/runner/merge.test.mjs` all still pass unmodified in their non-guard assertions. |
 | Warning-log surfacing (piece 3) | medium | Read path only, no write-path change — proof is functional (the warning actually appears where a live session/`fgos doctor` would see it), not a data-safety proof. |
 
 ### Files likely touched, in order
 
-1. Piece 1: a new test file (integration/e2e style) under `test/` exercising
-   concurrent `fgos pick`/claim calls against a shared main checkout —
-   exact path decided at implement time, following this repo's existing
-   `test/e2e/`/`test/runner/` naming convention (no existing file to
-   extend; scout at CONTEXT.md time found no prior concurrent-claim
-   reproduction harness).
+1. Piece 1: a new test file exercising concurrent `fgos pick`/claim calls
+   against a shared main checkout, reusing this repo's own existing
+   multiprocess-test machinery rather than inventing new infrastructure —
+   `test/runner/merge-target-slot-multiprocess.test.mjs` (real forked OS
+   processes, not same-process Promises, with a documented rationale for
+   why that distinction matters for exactly this class of race) and
+   `test/state/events.test.mjs`'s twenty-process barrier pattern are the
+   two direct precedents to extend/adapt (confirmed real by reading both
+   files directly, not assumed from a grep hit — corrects an earlier,
+   wrong "no existing file to extend" claim from before this session
+   checked).
 2. Piece 2: `src/state/events-jsonl-truncation-guard.mjs` (fail-closed
    branch in `runOpportunisticMainCheckoutChecks`'s D1 section, event-count
    trigger replacing/augmenting `PERIODIC_CHECKPOINT_INTERVAL_SEC`'s D2
    time-based one), `.fgos/config.json`'s schema (new knob, D2), plus
    whichever existing test files above need new assertions.
 3. Piece 3: a read/consumer for `src/state/main-checkout-guard-warnings.mjs`'s
-   output — exact hook point (an `fgos doctor` check registered in
-   `src/setup/checks.mjs`, per this repo's own install/setup/doctor gate
-   in `AGENTS.md`, vs. an additive read inside `fgos-coding-driving`'s
-   Orient step mirroring `postLandDrift`) is an implementation choice left
+   output — exact hook point (an `fgos doctor` check registered via
+   `registerCheck({...})` in `src/setup/registrations.mjs`, the real
+   registry `src/setup/checks.mjs` only re-exports — confirmed by reading
+   both files directly, per this repo's own install/setup/doctor gate in
+   `AGENTS.md`, vs. an additive read inside `fgos-coding-driving`'s Orient
+   step mirroring `postLandDrift`) is an implementation choice left
    to whoever builds this piece — CONTEXT.md's own Outstanding questions
    is `None` because both options equally satisfy the locked decision
    ("surface it somewhere a live session or `fgos doctor` actually
@@ -100,10 +111,12 @@ three):
 Cases worth proving against, one per piece:
 
 - **Piece 1** — the reproduction must show the SAME symptom class CONTEXT.md
-  pinned (a seq range present-at-write-time but absent from the
-  subsequently-read log, on the shared main checkout), not a different,
-  easier-to-trigger race. A harness that only proves "two processes can
-  write to the same file at once" without ever losing a range is not done.
+  pinned (D7-corrected: a claimed item's own recorded history silently
+  disappearing from the shared log between two live reads, on the shared
+  main checkout — not a numeric seq gap, which the contiguity checker
+  already rules out today), not a different, easier-to-trigger race. A
+  harness that only proves "two processes can write to the same file at
+  once" without ever losing an item's history is not done.
 - **Piece 2** — boundary: guard mark exactly at the break boundary (report
   transitions ok→not-ok mid-run); concurrent access: two sessions racing
   the guard-mark write at once (this is D1's own target — prove the
@@ -120,10 +133,10 @@ Cases worth proving against, one per piece:
 ```json
 [
   {
-    "title": "Build a live concurrent-claim reproduction for the tsk-3hks eventlog gap",
-    "verify": "npm test -- test/e2e/ --grep concurrent-claim-eventlog-gap",
-    "action": "per D4 (docs/history/tsk-1vc-silent-eventlog-loss-detection/CONTEXT.md), build a real harness running genuinely concurrent fgos pick/claim calls against a shared main checkout and confirm it reproduces the seq-gap loss signature pinned in RESEARCH.md round 1 (seq 22824-22851) against today's unfixed guard code -- a red-before-green baseline for the piece that fixes it",
-    "footprint": ["test/e2e/concurrent-claim-eventlog-gap.test.mjs"],
+    "title": "Build a live concurrent-claim reproduction for the tsk-3hks eventlog loss",
+    "verify": "npm test -- test/runner/concurrent-claim-eventlog-loss.test.mjs",
+    "action": "per D4 and D7 (docs/history/tsk-1vc-silent-eventlog-loss-detection/CONTEXT.md), build a real harness (extending the real-forked-OS-process pattern in test/runner/merge-target-slot-multiprocess.test.mjs and the barrier pattern in test/state/events.test.mjs) running genuinely concurrent fgos pick/claim calls against a shared main checkout and confirm it reproduces a claimed item's own history silently disappearing from the shared log against today's unfixed guard code -- a red-before-green baseline for the piece that fixes it, explicitly ruling out the two already-fixed root causes in docs/explanation/events-jsonl-lost-update-race-under-concurrent-session-writes.md before concluding a third mechanism",
+    "footprint": ["test/runner/concurrent-claim-eventlog-loss.test.mjs"],
     "kind": "task",
     "risk": "heavy"
   },
@@ -139,7 +152,7 @@ Cases worth proving against, one per piece:
     "title": "Surface main-checkout-guard-warnings.jsonl to a live session or fgos doctor",
     "verify": "npm test -- --grep guard-warnings-surface",
     "action": "per D6 (docs/history/tsk-1vc-silent-eventlog-loss-detection/CONTEXT.md), surface recordMainCheckoutGuardWarning's write-only output (confirmed unread anywhere in src/, bin/, docs/, test/ -- CONTEXT.md scout evidence) to a live session or fgos doctor",
-    "footprint": ["src/setup/checks.mjs"],
+    "footprint": ["src/setup/registrations.mjs"],
     "kind": "task",
     "risk": "standard"
   }

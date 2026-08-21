@@ -25,16 +25,26 @@ of scope here — it belongs to `tsk-1i3` (D3).
 | D4 | Root-cause pinning for the tsk-3hks seq 22824-22851 gap must be done via a real live reproduction (a test/harness that runs genuinely concurrent fgos pick/claim calls against a shared main checkout and observes whether the same gap signature reproduces), not by git-log/timestamp inference alone. |
 | D5 | Overall trade-off priority for this item's fixes: data safety over speed, but every safety change must be backed by real measurement/evidence (reproduced incident, measured checkpoint-interval risk window, etc.), never a guessed value or an unproven mechanism. |
 | D6 | Warning-log surfacing is locked in this item's own scope -- expose recordMainCheckoutGuardWarning's output (main-checkout-guard-warnings.jsonl, confirmed write-only) to a live session or fgos doctor. |
+| D7 | Correction to D4's citation -- the earlier claimed seq 22824-22851 gap does not exist. scripts/events-jsonl-contiguity.mjs --check against the live .fgos/events.jsonl reports gaps: [] (checked 2026-08-21T04:5x, validating stage); those seq numbers are legitimately used by other items' real, unrelated activity (real timestamps 03:30:30-03:31:xx). D4's actual directive (real live reproduction over git-log/timestamp inference) stays correct and is unweakened by this correction -- if anything strengthened, since a clean silent-disappear-and-renumber loses no numeric trace a post-hoc gap scan could ever catch, which is precisely why behavioral reproduction is required instead. |
 
 ## Pinned terms
 
-- **"the gap"** — the confirmed-missing seq range `22824`-`22851` (28
-  events) in the live `.fgos/events.jsonl`, sitting between `tsk-3hks`'s own
-  `work.stage` move (seq `22823`) and `tsk-1vc`'s own `work.add` (seq
-  `22852`). Distinct from the guard-mark false positive (seq `22850`
-  written by another session's local, unsynced view) — the gap is real and
-  still present in the log today; the false positive is a separate,
-  already-explained artifact of the same investigation window.
+- **"the loss"** (supersedes an earlier, retracted "the gap" term — D7) —
+  `tsk-3hks`'s ORIGINAL `work.add` event silently disappearing from the
+  shared main-checkout log at some point before it was manually recreated
+  (per the item's own description: "Recovered by recreating the item
+  (`fgos add` with the same id/fields)"). This leaves **no numeric trace**
+  in the current log — `scripts/events-jsonl-contiguity.mjs --check`
+  against the live log reports `gaps: []` (checked during validating);
+  a silent disappear-and-renumber closes over cleanly, which is exactly
+  why a post-hoc numeric scan cannot detect it and D4 requires real
+  behavioral reproduction instead. The only surviving evidence is the
+  guard's own "regressed" warning
+  (`.fgos/main-checkout-guard-warnings.jsonl`: tip seq `22816` vs. recorded
+  mark `22850` at `03:19:28`) — already explained in the prior
+  investigation report as a likely false positive from the guard-mark
+  file's own unlocked, unscoped race (another session's local,
+  not-yet-synced view), not independently re-confirmed here.
 - **"the guard"** — `src/state/events-jsonl-truncation-guard.mjs`'s
   `checkTruncationGuard`/`advanceEventsJsonlTruncationGuard`/
   `runOpportunisticMainCheckoutChecks` trio, wired unconditionally into
@@ -55,14 +65,35 @@ of scope here — it belongs to `tsk-1i3` (D3).
   override read anywhere.
 - `src/runner/claim-port.mjs:123`, `src/runner/merge.mjs:788,911` — the
   guard's two unconditional call sites.
-- Live `.fgos/events.jsonl` read directly (`rg -n "tsk-3hks"`): pins "the
-  gap" (seq `22824`-`22851`) as still-present today, not a stale artifact.
-- `git log --all --format="%h %ad %s" --date=iso-strict` cross-referenced
-  against the gap window (`10:20:01`-`10:34:51`, `+07:00`): three ordinary
-  docs/plan commits landed inside it (`5dd2526e`, `48fe78af`, `2023fa72`)
-  with no merge/checkpoint commit in between — weakens a clean
-  merge-strip-overwrite explanation for this specific gap, without
-  resolving what did cause it.
+- **Retracted (D7):** an earlier round of this investigation misread a
+  `rg -n "tsk-3hks"` grep (which only shows lines matching that string) as
+  proof of a numeric seq gap 22824-22851. Re-checked directly: those seq
+  numbers are populated by other items' real, unrelated activity
+  (real timestamps 03:30:30-03:31:xx); `scripts/events-jsonl-contiguity.mjs
+  --check .fgos/events.jsonl` confirms `{"ok": true, "gaps": [], "duplicates": []}`
+  against the current live log. No numeric gap exists today — see "the
+  loss" in Pinned terms for what evidence actually survives.
+- `docs/explanation/events-jsonl-lost-update-race-under-concurrent-session-writes.md`
+  (tsk-1q5/tsk-3wq) — an existing, already-proven two-root-cause taxonomy
+  for this exact class of failure: root cause A (`refreshView` outside
+  `withEventsLock` in `store.mjs`/`porting-store.mjs`, already fixed) and
+  root cause B (`.fgos/events.jsonl` git-tracked in the shared checkout,
+  silently discarded by a raw `git merge`/checkout from another session;
+  already fixed via a `.gitattributes merge=union` entry +
+  `scripts/events-jsonl-contiguity.mjs` registered into `fgos doctor`).
+  Neither root cause is asserted to explain `tsk-3hks`'s own loss — both
+  are already fixed and this item's own scout evidence (no merge commit
+  landed in the original investigation's timing window) argues against
+  root cause B specifically for this incident — but D4's reproduction
+  harness (piece 1) must rule both out explicitly before concluding a
+  third, unfixed mechanism, per this doc's own precedent of two prior
+  "obvious" hypotheses both proving wrong on direct inspection.
+- `test/runner/merge-target-slot-multiprocess.test.mjs`,
+  `test/runner/main-checkout-lock.test.mjs`,
+  `test/e2e/main-checkout-lock-hook.test.mjs` — existing multiprocess/
+  concurrent-claim test patterns in this repo; piece 1's reproduction
+  harness should reuse this repo's own existing multiprocess-test
+  machinery rather than inventing a new one from scratch.
 - `.fgos/config.json`'s existing `runner.executor`/`runner.capabilities`
   nested shape — precedent that a checkpoint-trigger threshold belongs in
   config, not a hardcoded constant (grounds D2).
