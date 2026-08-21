@@ -193,7 +193,20 @@ export function advanceEventsJsonlTruncationGuard(logPath, guardPath) {
 }
 
 export const PERIODIC_CHECKPOINT_INTERVAL_SEC = 900; // 15 minutes
-export const DEFAULT_CHECKPOINT_EVENT_THRESHOLD = 50; // 50 events
+// D2/D5 (docs/history/tsk-1vc-silent-eventlog-loss-detection/CONTEXT.md):
+// measured, not guessed. Live main checkout observed 22816->23069 (253
+// events) across 2026-08-21T03:19:20Z-05:36:51Z (~137.5min) during this
+// item's own multi-session investigation window -- ~1.84 events/min
+// average, ~27.6 events per old 15min interval. 50 sits above that average
+// (fires less often than the old timer under typical load) but comfortably
+// below what a real burst produces (the same investigation observed
+// checkpoint commits landing every 5-15min during busy stretches), so a
+// genuine high-risk burst still checkpoints sooner than the old fixed
+// timer would have -- the self-tuning property D2 asked for. A starting
+// point from one observed window, not a permanent constant; revisit with
+// real production data via the .fgos/config.json `checkpoint.eventThreshold`
+// override once more of it exists.
+export const DEFAULT_CHECKPOINT_EVENT_THRESHOLD = 50;
 
 /**
  * Calculates the number of uncommitted appended events in logPath relative to git HEAD.
