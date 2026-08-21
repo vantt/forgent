@@ -771,3 +771,72 @@ test('blockedItemsNowResolvable: only status:blocked items are ever considered',
   const result = blockedItemsNowResolvable({ view, repoRoot });
   assert.deepEqual(result, { resolvable: [], stillBlocked: [], notApplicable: [] });
 });
+
+// tsk-2jz: Fallback checks for blind spot 1 (clean rebase-rehash) and blind spot 2 (rescue-merge bypassing parent)
+
+test('checkMergeStillResolves: rescue-merge case (blind spot 2) resolves ok:true via main-ancestry fallback', () => {
+  const repoRoot = initRepo();
+  execFileSync('git', ['checkout', '-qb', 'fgw/rescue-parent'], { cwd: repoRoot });
+  commitFile(repoRoot, 'parent.txt');
+  execFileSync('git', ['checkout', '-qb', 'rescue-child', 'fgw/rescue-parent'], { cwd: repoRoot });
+  const childSha = commitFile(repoRoot, 'child-rescue-work.txt');
+
+  // Rescue merge lands child branch straight onto main, bypassing fgw/rescue-parent
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: repoRoot });
+  execFileSync('git', ['merge', '--no-ff', '-q', '-m', 'rescue child merge', 'rescue-child'], { cwd: repoRoot });
+
+  // childSha is an ancestor of main (HEAD), but NOT of fgw/rescue-parent
+  assert.throws(() => execFileSync('git', ['merge-base', '--is-ancestor', childSha, 'fgw/rescue-parent'], { cwd: repoRoot }));
+
+  const view = { work: { 'rescue-child': { parent: 'rescue-parent' }, 'rescue-parent': {} } };
+  const result = checkMergeStillResolves(repoRoot, { branchHeadAtReturn: childSha }, { view, id: 'rescue-child' });
+
+  assert.equal(result.ok, true, 'main-ancestry fallback must resolve child whose rescue merge landed on main');
+  assert.match(result.detail, /main-ancestry fallback/);
+});
+
+test('checkMergeStillResolves: clean synthetic rebase-rehash case (blind spot 1) resolves ok:true via content-equivalence fallback', () => {
+  const repoRoot = initRepo();
+  execFileSync('git', ['checkout', '-qb', 'fgw/rebase-parent'], { cwd: repoRoot });
+  commitFile(repoRoot, 'parent.txt');
+  execFileSync('git', ['checkout', '-qb', 'rebase-child', 'fgw/rebase-parent'], { cwd: repoRoot });
+  const origChildSha = commitFile(repoRoot, 'child-rebase-work.txt');
+
+  // Advance fgw/rebase-parent with a new commit so cherry-picking creates a new sha on a different parent commit
+  execFileSync('git', ['checkout', '-q', 'fgw/rebase-parent'], { cwd: repoRoot });
+  commitFile(repoRoot, 'parent-ahead.txt');
+  execFileSync('git', ['cherry-pick', origChildSha], { cwd: repoRoot });
+
+  // Add another change to main so repo moves on
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: repoRoot });
+  commitFile(repoRoot, 'another-change.txt');
+
+  // origChildSha is NOT a direct ancestor of fgw/rebase-parent or HEAD (cherry-pick created a twin commit under a new sha)
+  assert.throws(() => execFileSync('git', ['merge-base', '--is-ancestor', origChildSha, 'fgw/rebase-parent'], { cwd: repoRoot }));
+  assert.throws(() => execFileSync('git', ['merge-base', '--is-ancestor', origChildSha, 'HEAD'], { cwd: repoRoot }));
+
+  const view = { work: { 'rebase-child': { parent: 'rebase-parent' }, 'rebase-parent': {} } };
+  const result = checkMergeStillResolves(repoRoot, { branchHeadAtReturn: origChildSha }, { view, id: 'rebase-child' });
+
+  assert.equal(result.ok, true, 'content-equivalence fallback must resolve clean rebase-rehash with matching patch-id');
+  assert.match(result.detail, /content-equivalence fallback/);
+});
+
+test('checkMergeStillResolves: negative case — sha NOT an ancestor of main and NO patch-id twin stays ok:false (no data-loss masking)', () => {
+  const repoRoot = initRepo();
+  execFileSync('git', ['checkout', '-qb', 'fgw/negative-parent'], { cwd: repoRoot });
+  commitFile(repoRoot, 'parent.txt');
+  execFileSync('git', ['checkout', '-qb', 'negative-child', 'fgw/negative-parent'], { cwd: repoRoot });
+  const lostSha = commitFile(repoRoot, 'lost-content.txt');
+
+  // Abandon negative-child branch without merging or cherry-picking its content
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: repoRoot });
+  commitFile(repoRoot, 'unrelated.txt');
+
+  const view = { work: { 'negative-child': { parent: 'negative-parent' }, 'negative-parent': {} } };
+  const result = checkMergeStillResolves(repoRoot, { branchHeadAtReturn: lostSha }, { view, id: 'negative-child' });
+
+  assert.equal(result.ok, false, 'genuinely lost commit must stay ok:false and not be masked');
+  assert.match(result.detail, /no longer reachable/);
+});
+
