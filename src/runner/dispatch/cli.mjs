@@ -880,6 +880,7 @@ export function runDispatchCli() {
         carries: flagValue('--carries'),
         for: flagValue('--for'),
         cwd: flagValue('--cwd') ?? flagValue('--dir'),
+        repoRoot: flagValue('--repo-root'),
         hasLiveTaskAccess: rest.includes('--has-live-task-access'),
         onChunk: (stream, chunk) => process.stderr.write(chunk),
       }).then(

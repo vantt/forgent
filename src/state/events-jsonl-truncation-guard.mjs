@@ -206,6 +206,7 @@ export const PERIODIC_CHECKPOINT_INTERVAL_SEC = 900; // 15 minutes
  * @param {number} [opts.intervalSec] - override periodic threshold seconds (default 900)
  */
 export function runOpportunisticMainCheckoutChecks(dir, repoRoot = null, { nowSec = null, intervalSec = PERIODIC_CHECKPOINT_INTERVAL_SEC, rawLog = null } = {}) {
+  if (process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS === "1") return;
   const fgosDir = path.basename(dir) === ".fgos" ? dir : path.join(dir, ".fgos");
   const realRepoRoot = repoRoot || (path.basename(dir) === ".fgos" ? path.dirname(dir) : dir);
 

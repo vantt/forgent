@@ -109,7 +109,7 @@ Three possible `mechanism` results, each needing a different response:
 
 - **`"unavailable"`** — nothing serves this. NOT an error: do it inline yourself, and report nothing.
 - **"in-process"** — call it yourself, with your own live capability: pass the returned agentType to your Agent/Task tool, or call the returned mcpTool directly. Dispatch cannot do this for you — it has neither an Agent/Task tool nor an MCP client of its own. When neither field is returned, use whichever agent type you would have used by default.
-- **`"out-of-process"`** — run `node src/runner/dispatch.mjs execute`. Never run the resolved command yourself through Bash: `execute` invokes the adapter and hands back the real result.
+- **`"out-of-process"`** — run `node src/runner/dispatch.mjs execute`. Never run the resolved command yourself through Bash: `execute` invokes the adapter and hands back the real result. (For a worktree-backed item, if passing explicit directory flags, pass `--cwd <worktree path>` and `--repo-root <main checkout path>` as two separate flags — never pass the main checkout as `--dir` alone).
 
 Every result also carries `configured: true|false` — `false` means nothing is configured for that name or job, and the answer came from the default.
 

@@ -15,6 +15,8 @@ import {
 } from "../../src/state/events-jsonl-truncation-guard.mjs";
 import { recordMainCheckoutGuardWarning, MAIN_CHECKOUT_GUARD_WARNINGS_BASENAME } from "../../src/state/main-checkout-guard-warnings.mjs";
 
+delete process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS;
+
 function mkTempDir(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
 }
