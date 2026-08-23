@@ -17,11 +17,17 @@ vòng 4b; attestation: đã có một phần qua tsk-4hl; content-hash: Tầng A
 có; món thật sự còn thiếu đáng học: **lock self-heal 2 tầng của bee** thay
 cho `/fgOS:unlock` thủ công — item riêng nếu làm, ngoài scope này).
 
-Trạng thái chờ: KHÔNG còn câu hỏi thiết kế mở trong scope này. Bước kế
-tiếp là terminal handoff (`fgos-coding-exploring` → `fgos-coding-planning`)
-cho `tsk-3tp`, nhưng dep cứng `tsk-3ve` (Tầng A T3-T6) chưa xong — handoff
-chờ tsk-3ve land, hoặc anh ra lệnh chạy planning sớm (chấp nhận plan dựa
-trên hình dạng Tầng A đã thiết kế nhưng chưa land).
+**Terminal handoff đã chạy (vòng 8, 24/8, theo lệnh anh):** CONTEXT.md
+viết + docsRef set; gate contextApprove approve (actor human, seq 23904)
+→ `fgos discover --verdict clear` (discovery→planning); plan.md viết
+(Mode: high-risk, pass-through, P0/P1/P2, risk map, validation matrix
+READY WITH CONSTRAINTS); action/footprint sync (seq 23915); gate
+validateApprove approve (actor human, seq 23916) → `fgos plan --verdict
+pass-through` → engine park `awaiting-human` với câu hỏi floor cứng:
+xác nhận pass-through cho item risk heavy. Chờ `fgos answer tsk-3tp` từ
+anh — sau đó item về todo@executing, dep tsk-3ve chặn claim tới khi Tầng
+A xong, rồi bất kỳ Sonnet agent nào `/fgOS:pick tsk-3tp` là implement
+được từ plan.md (bước đầu bắt buộc: P0 re-verify hình dạng Tầng A).
 
 ## 2. Mục tiêu & đề bài
 
