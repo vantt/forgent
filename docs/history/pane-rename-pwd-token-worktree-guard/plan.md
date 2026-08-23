@@ -44,21 +44,36 @@ GitNexus's code-graph reach has nothing to answer here; noted for the
 record per the capability-gate instruction, not because the plan leans on
 it.
 
-**Files touched (identical one-line edit in each, per RESEARCH.md's
-already-confirmed 4-way mirror set):**
-1. `domains/coding/skills/fgos-coding-driving/references/loop-mechanics.md:87`
-2. `plugins/fgOS/skills/fgos-coding-driving/references/loop-mechanics.md:87`
-3. `.agents/skills/fgos-coding-driving/references/loop-mechanics.md:87`
-4. `.claude/skills/fgos-coding-driving/references/loop-mechanics.md:87`
+**Files touched — corrected during this skill's own reality-gate pass
+(Step 2, "Smaller path"), not a new `fgos-researching` round: a direct
+read of `src/setup/skill-wrappers.mjs` (`assembleSkills`,
+`generateAllSkillWrappers`, `mirrorDevSkillsIntoPlugin`) plus
+`scripts/build-skill-wrappers.mjs` shows the 4 copies this item's own
+RESEARCH.md Round 1 found are not 4 independently-maintained mirrors —
+`domains/coding/skills/fgos-coding-driving/references/loop-mechanics.md`
+is the real canonical source; `.agents/skills/...`, `.claude/skills/...`,
+and `plugins/fgOS/skills/...` are all generated/copied FROM it by `npm
+run build:skills` (confirmed live: all 4 copies are currently
+byte-identical by `sha256sum`, consistent with a generation pipeline, not
+coincidence). Hand-editing all 4 is unnecessary and risks drift from
+whatever `build:skills` would have produced — the smaller, correct path
+is:**
 
-Order does not matter — the 4 files are already-established byte-identical
-mirrors of one canonical source; the same edit applies to each
-independently, no dependency between them.
+1. Edit only `domains/coding/skills/fgos-coding-driving/references/loop-mechanics.md:87` (the canonical source).
+2. Run `npm run build:skills` — regenerates `.agents/skills/...` (via
+   `assembleSkills`), `.claude/skills/...` (via `generateAllSkillWrappers`,
+   which copies every non-`SKILL.md` file including `references/`
+   verbatim), and `plugins/fgOS/skills/...` (via `mirrorDevSkillsIntoPlugin`)
+   from that one edit.
+
+The verify below still checks all 4 target paths independently — that
+stays correct and useful either way: it is what catches a forgotten
+`build:skills` run, not just a forgotten hand-edit.
 
 ## Shape
 
-Direct note (tiny mode, no phased plan needed): each of the 4 files gets
-its Step 5 pane-rename block changed from
+Direct note (tiny mode, no phased plan needed): the canonical source's
+Step 5 pane-rename block changes from
 
 ```bash
 bash plugins/fgOS/skills/terminal/rename.sh "<id>" "$PWD"
