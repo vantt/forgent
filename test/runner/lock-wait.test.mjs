@@ -2,8 +2,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { withLockRetry } from '../../src/runner/lock-wait.mjs';
 
-function lockHeldError(remainingTtlMs) {
-  return Object.assign(new Error('main checkout locked'), { code: 'lock-held', remainingTtlMs });
+function lockHeldError(remainingTtlMs, holderPid) {
+  return Object.assign(new Error('main checkout locked'), { code: 'lock-held', remainingTtlMs, holderPid });
 }
 
 test('withLockRetry: succeeds immediately when the thunk succeeds on the first attempt (no retry needed)', async () => {
@@ -157,3 +157,78 @@ test('withLockRetry: does not busy-spin in the BOUNDARY_GRACE_MS tail -- bounded
   );
   assert.ok(calls <= 10, `must not busy-spin in the grace-window tail (made ${calls} calls for a 10ms budget)`);
 });
+
+test('withLockRetry: renders self qualifier when numeric holderPid equals process.pid (tsk-6uc)', async () => {
+  const stderrChunks = [];
+  const originalWrite = process.stderr.write;
+  process.stderr.write = (chunk) => {
+    stderrChunks.push(String(chunk));
+    return true;
+  };
+  try {
+    await assert.rejects(
+      () => withLockRetry(() => {
+        throw lockHeldError(900, process.pid);
+      }),
+    );
+  } finally {
+    process.stderr.write = originalWrite;
+  }
+  assert.ok(
+    stderrChunks.some((line) => /still waiting on main-checkout lock.*likely your own session's other in-flight call/.test(line)),
+    'numeric holderPid equal to process.pid must render the self qualifier',
+  );
+});
+
+test('withLockRetry: renders other qualifier when numeric holderPid is different from process.pid (tsk-6uc)', async () => {
+  const stderrChunks = [];
+  const originalWrite = process.stderr.write;
+  process.stderr.write = (chunk) => {
+    stderrChunks.push(String(chunk));
+    return true;
+  };
+  try {
+    await assert.rejects(
+      () => withLockRetry(() => {
+        throw lockHeldError(900, process.pid + 99999);
+      }),
+    );
+  } finally {
+    process.stderr.write = originalWrite;
+  }
+  assert.ok(
+    stderrChunks.some((line) => /still waiting on main-checkout lock.*a different pid\/session/.test(line)),
+    'numeric holderPid different from process.pid must render the other qualifier',
+  );
+});
+
+test('withLockRetry: renders self qualifier when string holderPid equals env session id (tsk-6uc)', async () => {
+  const stderrChunks = [];
+  const originalWrite = process.stderr.write;
+  const originalEnvSession = process.env.FGOS_SESSION_ID;
+  const testSessionId = 'test-session-tsk-6uc';
+  process.env.FGOS_SESSION_ID = testSessionId;
+  process.stderr.write = (chunk) => {
+    stderrChunks.push(String(chunk));
+    return true;
+  };
+  try {
+    await assert.rejects(
+      () => withLockRetry(() => {
+        throw lockHeldError(900, testSessionId);
+      }),
+    );
+  } finally {
+    process.stderr.write = originalWrite;
+    if (originalEnvSession !== undefined) {
+      process.env.FGOS_SESSION_ID = originalEnvSession;
+    } else {
+      delete process.env.FGOS_SESSION_ID;
+    }
+  }
+  assert.ok(
+    stderrChunks.some((line) => /still waiting on main-checkout lock.*likely your own session's other in-flight call/.test(line)),
+    'string holderPid matching env session id must render the self qualifier',
+  );
+});
+
