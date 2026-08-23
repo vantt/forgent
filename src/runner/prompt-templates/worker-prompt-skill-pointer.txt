@@ -15,6 +15,7 @@ governs how this work item must be done.
 
 # Files to read first
 {readFirst}
+{docsRefPointer}
 
 # Worktree boundary
 You are running on an isolated git worktree, checked out on its own branch for
