@@ -29,7 +29,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { readEvents, parseEventLines, withEventsLock, appendEventLocked, readLastLineBefore } from './events.mjs';
-import { rebuildView, viewRevision, serializeView } from './replay.mjs';
+import { foldEvents, viewRevision, serializeView } from './replay.mjs';
 import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, classifyStalePostDelivery, footprintOverlapAmong, goalScopedCriticalPath, goalScopedGreedyTopUnblock, computeSchedule, detectCycles } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './status-fsm.mjs';
 import { transitionStage } from './stage-fsm.mjs';
@@ -90,6 +90,93 @@ function paths(dir) {
   return { logPath: path.join(dir, 'events.jsonl'), viewPath: path.join(dir, 'state.json') };
 }
 
+// Tầng A / T2 (TA-D2, TA-D11, TA-D14): new writes go under `.fgos/events/`,
+// one open file per writer, instead of the single top-level `events.jsonl`.
+// `paths(dir).logPath` (above) is untouched and stays load-bearing for two
+// unrelated things: it is baseline-0, the pre-cutover log frozen in place
+// (TA-D12, read but never appended to below), and its OWN dirname is what
+// `withEventsLockAndRefresh` derives the cross-process lock from — passing
+// it there keeps `events.lock` scoped to the whole `.fgos/` dir exactly as
+// before (TA-D14: a per-file lock would no longer serialize the CAS
+// preconditions every mutation here depends on).
+const EVENTS_SUBDIR = 'events';
+
+function eventsDirOf(dir) {
+  return path.join(dir, EVENTS_SUBDIR);
+}
+
+// TA-D11 naming: `<writer-id>-<openTs>.jsonl`, openTs compact
+// `YYYYMMDDTHHMMSSmmmZ` (no separators) so a writer's second file after a
+// future compaction never collides with its first.
+function formatCompactTs(date) {
+  return date.toISOString().replace(/[-:]/g, '').replace('.', '');
+}
+
+// Resolves the ONE currently-open file for this writer under
+// `.fgos/events/` (TA-D2/TA-D11): reuse it if a prior write in this same
+// writer identity already opened one, otherwise open a new one now. Never
+// writes to `paths(dir).logPath` (baseline-0 is frozen, TA-D12).
+function resolveWriterLogPath(dir) {
+  const dirPath = eventsDirOf(dir);
+  fs.mkdirSync(dirPath, { recursive: true });
+  const writerId = String(resolveWriterIdentity(dir).id);
+  const prefix = `${writerId}-`;
+  let existing = [];
+  try {
+    existing = fs
+      .readdirSync(dirPath, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name.startsWith(prefix) && entry.name.endsWith('.jsonl'))
+      .map((entry) => entry.name)
+      .sort(); // the compact ts suffix sorts lexicographically -> last = newest = the open one
+  } catch (err) {
+    if (err.code !== 'ENOENT') throw err;
+  }
+  if (existing.length > 0) {
+    return path.join(dirPath, existing[existing.length - 1]);
+  }
+  return path.join(dirPath, `${prefix}${formatCompactTs(new Date())}.jsonl`);
+}
+
+// The merged raw event stream a view is folded from (TA-D3/TA-D7): baseline-0
+// (frozen legacy, still the real source for any event written before cutover)
+// plus every per-writer file under `.fgos/events/`, in total order
+// `(ts, file, seq)` — deterministic and order-independent of readdir order.
+// A stand-in for T3's own discovery step in replay.mjs; T3 formalizes this
+// (dedupe-by-hash, `archive/` exclusion) and every raw reader below routes
+// through it so there is exactly one place that knows about both file shapes.
+function readAllEvents(dir) {
+  const { logPath: baselinePath } = paths(dir);
+  const dirPath = eventsDirOf(dir);
+  const tagged = [];
+  for (const ev of readEvents(baselinePath)) tagged.push({ ev, file: '' });
+  let files = [];
+  try {
+    files = fs
+      .readdirSync(dirPath, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name.endsWith('.jsonl'))
+      .map((entry) => entry.name);
+  } catch (err) {
+    if (err.code !== 'ENOENT') throw err;
+  }
+  for (const file of files) {
+    for (const ev of readEvents(path.join(dirPath, file))) tagged.push({ ev, file });
+  }
+  tagged.sort((a, b) => {
+    if (a.ev.ts !== b.ev.ts) return a.ev.ts < b.ev.ts ? -1 : 1;
+    if (a.file !== b.file) return a.file < b.file ? -1 : 1;
+    return (a.ev.seq ?? 0) - (b.ev.seq ?? 0);
+  });
+  return tagged.map((t) => t.ev);
+}
+
+// The one replacement for `currentView(dir)` throughout this module:
+// folds the SAME multi-file merged stream `readAllEvents` produces, so every
+// reader (mutation preconditions and pure read-facades alike) sees writes
+// from every writer's own file, not just baseline-0.
+function currentView(dir) {
+  return foldEvents(readAllEvents(dir));
+}
+
 function writeView(viewPath, view, snapshot) {
   fs.mkdirSync(path.dirname(viewPath), { recursive: true });
   // work-graph-intelligence S3: stamp a deterministic revision-hash onto the
@@ -121,15 +208,29 @@ function writeView(viewPath, view, snapshot) {
 // updated) log and overwrite state.json. Always called AFTER the event that
 // caused the change has already been appended — never before.
 function refreshView(dir) {
-  const { logPath, viewPath } = paths(dir);
-  const view = rebuildView(logPath); // may itself take replay.mjs's own snapshot fast path -- still correct either way
-  // tsk-49e: captures the exact {size, mtimeMs} events.jsonl has RIGHT NOW,
-  // plus the raw text of its own last line -- safe to stat/read here
-  // uncontended: refreshView always runs inside withEventsLockAndRefresh's
-  // held lock (tsk-1q5), so no concurrent append can land between
-  // rebuildView's own read above and this stat/tail-read.
-  const stat = fs.statSync(logPath);
-  const lastLine = readLastLineBefore(logPath, stat.size);
+  const { viewPath } = paths(dir);
+  const view = currentView(dir); // full multi-file fold -- T4 restores an incremental fast path for this shape
+  // tsk-49e-shaped snapshot ({size, mtimeMs}, lastLine), now describing the
+  // writer's own file (the one this mutation actually just appended to)
+  // rather than baseline-0, which no longer receives new writes (TA-D12).
+  // Safe to stat/read here uncontended: refreshView always runs inside
+  // withEventsLockAndRefresh's held lock (tsk-1q5), so no concurrent append
+  // can land between currentView's own read above and this stat/tail-read.
+  // Unused by any fast path today (T2/T3 always fold fresh) -- T4 defines
+  // the real multi-file anchor shape this field feeds.
+  //
+  // initStore's bootstrap call reaches here before any writer file exists
+  // (nothing has been appended yet by anyone) -- statSync then ENOENTs;
+  // treat that the same as a just-created empty file, never a real error.
+  const writerLogPath = resolveWriterLogPath(dir);
+  let stat;
+  try {
+    stat = fs.statSync(writerLogPath);
+  } catch (err) {
+    if (err.code !== 'ENOENT') throw err;
+    stat = { size: 0, mtimeMs: 0 };
+  }
+  const lastLine = readLastLineBefore(writerLogPath, stat.size);
   writeView(viewPath, view, { size: stat.size, mtimeMs: stat.mtimeMs, lastLine });
   return view;
 }
@@ -184,7 +285,7 @@ export function initStore(dir) {
 export function addWork(dir, work) {
   const { logPath } = paths(dir);
   return withEventsLockAndRefresh(dir, logPath, () => {
-    const before = rebuildView(logPath);
+    const before = currentView(dir);
 
     if (before.work[work?.id]) {
       throw new StoreError('validation', `work "${work.id}" already exists.`);
@@ -268,7 +369,7 @@ export function addWork(dir, work) {
     assertNoCycle(item, before.work);
     assertNoUnifiedCycle(item, before.work);
 
-    return appendEventLocked(logPath, { type: 'work.add', payload: item });
+    return appendEventLocked(resolveWriterLogPath(dir), { type: 'work.add', payload: item });
   });
 }
 
@@ -300,7 +401,7 @@ const EDITABLE_FIELDS = new Set(['title', 'description', 'kind', 'risk', 'verify
 export function editWork(dir, { id, patch, role } = {}) {
   const { logPath } = paths(dir);
   return withEventsLockAndRefresh(dir, logPath, () => {
-    const before = rebuildView(logPath);
+    const before = currentView(dir);
     const work = before.work[id];
     if (!work) {
       throw new StoreError('validation', `work "${id}" not found.`);
@@ -404,7 +505,7 @@ export function editWork(dir, { id, patch, role } = {}) {
     // never throws and never blocks the mutation (D18); no validator sits on
     // this path.
     payload.writer = resolveWriterIdentity(dir);
-    return appendEventLocked(logPath, { type: 'work.edit', payload });
+    return appendEventLocked(resolveWriterLogPath(dir), { type: 'work.edit', payload });
   });
 }
 
@@ -415,7 +516,7 @@ export function editWork(dir, { id, patch, role } = {}) {
 export function resolveParkReason(dir, { id, note, role } = {}) {
   const { logPath } = paths(dir);
   return withEventsLockAndRefresh(dir, logPath, () => {
-    const before = rebuildView(logPath);
+    const before = currentView(dir);
     const work = before.work[id];
     if (!work) {
       throw new StoreError('validation', `work "${id}" not found.`);
@@ -438,7 +539,7 @@ export function resolveParkReason(dir, { id, note, role } = {}) {
       payload.role = role;
     }
     payload.writer = resolveWriterIdentity(dir);
-    return appendEventLocked(logPath, { type: 'work.resolve-park-reason', payload });
+    return appendEventLocked(resolveWriterLogPath(dir), { type: 'work.resolve-park-reason', payload });
   });
 }
 
@@ -488,7 +589,7 @@ function composeLearning(view, id, closingSettlement) {
 export function setFocus(dir, { id, role } = {}) {
   const { logPath } = paths(dir);
   return withEventsLockAndRefresh(dir, logPath, () => {
-    const before = rebuildView(logPath);
+    const before = currentView(dir);
     const work = before.work[id];
     if (!work) {
       throw new StoreError('validation', `work "${id}" not found.`);
@@ -500,7 +601,7 @@ export function setFocus(dir, { id, role } = {}) {
       );
     }
     const payload = role !== undefined ? { id, role } : { id };
-    return appendEventLocked(logPath, { type: 'goal.focus', payload });
+    return appendEventLocked(resolveWriterLogPath(dir), { type: 'goal.focus', payload });
   });
 }
 
@@ -596,7 +697,7 @@ export function assertPlanEvidence(id, work, repoRoot) {
 export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, role, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk, claimTrigger, statusAtAsk, releaseTrigger, rationale, alternatives, source, askRationale, askAlternatives, askSource, mergedSha, mergedInto } = {}) {
   const { logPath } = paths(dir);
   const result = withEventsLockAndRefresh(dir, logPath, () => {
-  const before = rebuildView(logPath);
+  const before = currentView(dir);
   const work = before.work[id];
   if (!work) {
     throw new StoreError('validation', `work "${id}" not found.`);
@@ -823,7 +924,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
       // best-effort — see comment above.
     }
   }
-  return appendEventLocked(logPath, rawEvent); // captures the real seq; rawEvent itself has none
+  return appendEventLocked(resolveWriterLogPath(dir), rawEvent); // captures the real seq; rawEvent itself has none
   });
   // tsk-2t9c D16: `delivered` is a terminal state for the role/holder axis
   // -- no stage skill ever re-enters an item past this point (every wired
@@ -951,7 +1052,7 @@ export function answerAwaiting(dir, { id, answer, expectedStatus, role, rational
 export function moveStage(dir, { id, to, expectedStage, verify, role } = {}) {
   const { logPath } = paths(dir);
   return withEventsLockAndRefresh(dir, logPath, () => {
-    const before = rebuildView(logPath);
+    const before = currentView(dir);
     const work = before.work[id];
     if (!work) {
       throw new StoreError('validation', `work "${id}" not found.`);
@@ -968,7 +1069,7 @@ export function moveStage(dir, { id, to, expectedStage, verify, role } = {}) {
     // moveStage call records who wrote it, never blocking on a malformed
     // identity (D18).
     rawEvent.payload.writer = resolveWriterIdentity(dir);
-    return appendEventLocked(logPath, rawEvent);
+    return appendEventLocked(resolveWriterLogPath(dir), rawEvent);
   });
 }
 
@@ -1032,7 +1133,7 @@ function openCallStack(callThreadEntries) {
 export function recordCall(dir, { id, toRole, reason, note, outcome, openSyncDepth = 0 } = {}) {
   const { logPath } = paths(dir);
   return withEventsLockAndRefresh(dir, logPath, () => {
-    const before = rebuildView(logPath);
+    const before = currentView(dir);
     const work = before.work[id];
     if (!work) {
       throw new StoreError('validation', `work "${id}" not found.`);
@@ -1063,7 +1164,7 @@ export function recordCall(dir, { id, toRole, reason, note, outcome, openSyncDep
       ? { type: 'work.handoff', payload: { id, from: fromRole, to: toRole, reason, mode: 'async', note } }
       : { type: 'work.call-summary', payload: { id, calleeRole: toRole, reason, outcome } };
     rawEvent.payload.writer = resolveWriterIdentity(dir);
-    return appendEventLocked(logPath, rawEvent);
+    return appendEventLocked(resolveWriterLogPath(dir), rawEvent);
   });
 }
 
@@ -1085,7 +1186,7 @@ export function recordCall(dir, { id, toRole, reason, note, outcome, openSyncDep
 export function recordCallReturn(dir, { id, note } = {}) {
   const { logPath } = paths(dir);
   return withEventsLockAndRefresh(dir, logPath, () => {
-    const before = rebuildView(logPath);
+    const before = currentView(dir);
     const work = before.work[id];
     if (!work) {
       throw new StoreError('validation', `work "${id}" not found.`);
@@ -1100,7 +1201,7 @@ export function recordCallReturn(dir, { id, note } = {}) {
       payload: { id, from: work.holder, to: openCall.from, reason: openCall.reason, mode: 'async', returning: true, note },
     };
     rawEvent.payload.writer = resolveWriterIdentity(dir);
-    return appendEventLocked(logPath, rawEvent);
+    return appendEventLocked(resolveWriterLogPath(dir), rawEvent);
   });
 }
 
@@ -1116,7 +1217,7 @@ export function addDiscovery(dir, payload) {
   if (!payload || typeof payload.id !== 'string' || !payload.id.trim()) {
     throw new StoreError('validation', 'discovery requires a non-empty "id".');
   }
-  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(logPath, { type: 'work.discovery', payload }));
+  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(resolveWriterLogPath(dir), { type: 'work.discovery', payload }));
 }
 
 // Gate approve record shape (tsk-19j D1/D11): the 3 skill-embedded Gates
@@ -1152,7 +1253,7 @@ export function recordGateApprove(dir, { id, gate, actor, verify } = {}) {
     throw new StoreError('validation', 'gate-approve requires a non-empty "verify".');
   }
   return withEventsLockAndRefresh(dir, logPath, () =>
-    appendEventLocked(logPath, { type: 'work.gate-approve', payload: { id, gate, actor, verify } }));
+    appendEventLocked(resolveWriterLogPath(dir), { type: 'work.gate-approve', payload: { id, gate, actor, verify } }));
 }
 
 /**
@@ -1205,12 +1306,12 @@ export function addDecision(dir, payload) {
     // legitimate, e.g. `fgos decision` with no --id) — only validated when
     // present.
     if (payload.id !== undefined && payload.id !== null) {
-      const before = rebuildView(logPath);
+      const before = currentView(dir);
       if (!before.work[payload.id]) {
         throw new StoreError('validation', `work "${payload.id}" not found.`);
       }
     }
-    return appendEventLocked(logPath, { type: 'decision', payload: eventPayload });
+    return appendEventLocked(resolveWriterLogPath(dir), { type: 'decision', payload: eventPayload });
   });
 }
 
@@ -1317,7 +1418,7 @@ export function addOutcome(dir, payload) {
     throw new StoreError('validation', 'outcome requires a non-empty "id".');
   }
   assertValidDocType(payload);
-  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(logPath, { type: 'work.outcome', payload }));
+  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(resolveWriterLogPath(dir), { type: 'work.outcome', payload }));
 }
 
 /**
@@ -1336,13 +1437,12 @@ export function addFriction(dir, payload) {
     throw new StoreError('validation', 'friction requires a non-empty "id".');
   }
   assertValidDocType(payload);
-  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(logPath, { type: 'work.friction', payload }));
+  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(resolveWriterLogPath(dir), { type: 'work.friction', payload }));
 }
 
 /** Read-only: the current view, rebuilt fresh from the log (never off a stale file). */
 export function listWork(dir) {
-  const { logPath } = paths(dir);
-  return rebuildView(logPath);
+  return currentView(dir);
 }
 
 /**
@@ -1360,8 +1460,7 @@ export function listWork(dir) {
  * (`'Execute'`) applies, byte-identical to every pre-existing caller.
  */
 export function readyWork(dir, { step } = {}) {
-  const { logPath } = paths(dir);
-  return frontier(rebuildView(logPath), step ? { step } : undefined);
+  return frontier(currentView(dir), step ? { step } : undefined);
 }
 
 /**
@@ -1373,8 +1472,7 @@ export function readyWork(dir, { step } = {}) {
  * item without losing the deps/lineage guard.
  */
 export function isDepsAndLineageReady(dir, id) {
-  const { logPath } = paths(dir);
-  return depsAndLineageReadyView(rebuildView(logPath), id);
+  return depsAndLineageReadyView(currentView(dir), id);
 }
 
 /**
@@ -1386,8 +1484,7 @@ export function isDepsAndLineageReady(dir, id) {
  * reaches `frontier` only through `readyWork`.
  */
 export function graphMetrics(dir) {
-  const { logPath } = paths(dir);
-  return computeGraphMetrics(rebuildView(logPath));
+  return computeGraphMetrics(currentView(dir));
 }
 
 /**
@@ -1396,8 +1493,7 @@ export function graphMetrics(dir) {
  * shape as graphMetrics; the Domain compute core decides the answer.
  */
 export function graphWhatIf(dir, id) {
-  const { logPath } = paths(dir);
-  return computeWhatIf(rebuildView(logPath), id);
+  return computeWhatIf(currentView(dir), id);
 }
 
 /**
@@ -1410,8 +1506,7 @@ export function graphWhatIf(dir, id) {
  * functions already degrade gracefully (empty scope) on an unknown/stale id.
  */
 export function goalFocusShow(dir) {
-  const { logPath } = paths(dir);
-  const view = rebuildView(logPath);
+  const view = currentView(dir);
   if (view.focus === undefined) {
     return { focus: null };
   }
@@ -1430,10 +1525,9 @@ export function goalFocusShow(dir) {
  * suggests; it never moves or reclaims anything.
  */
 export function staleDoingAdvisory(dir, opts = {}) {
-  const { logPath } = paths(dir);
-  const view = rebuildView(logPath);
+  const view = currentView(dir);
   const claimedAt = new Map();
-  for (const event of readEvents(logPath)) {
+  for (const event of readAllEvents(dir)) {
     if (event.type === 'work.move' && event.payload?.to === 'doing' && typeof event.payload?.id === 'string') {
       const ts = Date.parse(event.ts);
       if (!Number.isNaN(ts)) claimedAt.set(event.payload.id, ts); // in-order iteration -> latest claim wins
@@ -1461,9 +1555,8 @@ export function staleDoingAdvisory(dir, opts = {}) {
  * shared-config value this read-only facade never guesses.
  */
 export function stalePostDeliveryAdvisory(dir, opts = {}) {
-  const { logPath } = paths(dir);
-  const view = rebuildView(logPath);
-  const rawEvents = readEvents(logPath);
+  const view = currentView(dir);
+  const rawEvents = readAllEvents(dir);
   return classifyStalePostDelivery(view, rawEvents, opts);
 }
 
@@ -1483,8 +1576,7 @@ export function stalePostDeliveryAdvisory(dir, opts = {}) {
  * instead.
  */
 export function footprintConflicts(dir) {
-  const { logPath } = paths(dir);
-  return footprintOverlapAmong(frontierAcrossSteps(rebuildView(logPath)));
+  return footprintOverlapAmong(frontierAcrossSteps(currentView(dir)));
 }
 
 /**
@@ -1497,8 +1589,7 @@ export function footprintConflicts(dir) {
  * (`graph-metrics.mjs`) computes both, this just rebuilds the view.
  */
 export function computedSchedule(dir, candidateIds) {
-  const { logPath } = paths(dir);
-  const view = rebuildView(logPath);
+  const view = currentView(dir);
   return { ...computeSchedule(view, candidateIds), cycles: detectCycles(view) };
 }
 
@@ -1512,10 +1603,16 @@ export function computedSchedule(dir, candidateIds) {
  * corrupt log throws EventLogError('corrupt-log').
  */
 export function readRawEvents(dir) {
-  const { logPath } = paths(dir);
-  return readEvents(logPath);
+  return readAllEvents(dir);
 }
 
+// KNOWN GAP (Tầng A/T2, tracked for a later task): still reads only
+// baseline-0 — a caller relying on `text` (the byte-for-byte log content,
+// e.g. for a truncation/tail check) sees just the frozen legacy file, never
+// events written into `.fgos/events/` post-cutover. `events` below is
+// therefore also baseline-0-only, unlike `readRawEvents` above. No test
+// exercises this multi-file gap yet; `src/runner/claim-port.mjs` is the one
+// caller today.
 export function readRawEventsAndText(dir) {
   const { logPath } = paths(dir);
   let text = '';
