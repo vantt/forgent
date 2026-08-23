@@ -41,8 +41,12 @@ than firing on cumulative elapsed time.
 test's fixture parameters), risk: low — this only widens an existing
 test's own literal constants, no production code path touches this
 change, no proof point needed at `fgos-coding-validating` beyond
-re-running the test itself. `impact-analysis: inactive` — 0 flags, no
-blast-radius claim this plan depends on (test-fixture-only change).
+re-running the test itself. `impact-analysis: full` (GitNexus registered
+and `present`, checked via `fgos tool query --capability impact-analysis
+--status present`) — recorded for accuracy, but this plan makes no
+blast-radius claim to begin with (test-fixture-only change, no production
+code touched), so no impact-analysis evidence is actually needed here
+regardless of posture.
 
 **Files touched, in order:**
 1. `test/runner/dispatch.test.mjs` — bump `idleTimeoutMs` from `400` to
