@@ -92,6 +92,41 @@ This commit is the intended way out: a real, non-empty diff on `tsk-5sr`'s
 own branch, so the next `fgos return tsk-5sr` (no flag needed) advances the
 branch past `branchHeadAtTake` on its own merits.
 
+## 5. Update — root cause is real, but the fix keeps losing a race
+
+Traced the actual root cause: `~/.fgos/config.json` (real user-global
+config) carried `runner.executors.pi` in a "named executor, `kind:
+'agent'`, nested `invocations[]`" shape. This project's own
+`.fgos/config.json` (`runner.executors.{claude,agy,codex,pi,gitnexus,herdr}`)
+uses the identical shape for six real, live-used executors — this is not
+a stale personal leftover, it is the project's actual production
+executor registry. `validateRunnerConfigShape` (`src/runner/dispatch.mjs`)
+added a newer, incompatible meaning for the same `runner.executors` key
+(tier-keyed overrides, `light`/`standard`/`heavy` only) without
+accounting for the older named-executor-registry usage already live in
+both configs — a real key-collision regression in the codebase, not
+scoped to `tsk-5sr`'s own 9 children.
+
+Attempted fix: moved `~/.fgos/config.json`'s `pi` entry from `executors`
+to `capacities` (the schema-correct home for a named `kind:"cli"` entry,
+matching the already-valid `gather` capacity in this project's own
+config). `dispatch.mjs decide` and one `npm test` cycle looked clean
+right after. Then, before the next `fgos return` retry, something else
+running concurrently on this machine rewrote `~/.fgos/config.json` and
+re-added `runner.executors.pi` in the old shape (args order matched this
+project's own `.fgos/config.json` `pi` entry byte-for-byte) — my
+`capacities.pi` fix stayed, but the invalid `executors.pi` came back
+alongside it. A 4th `fgos return tsk-5sr` (real commit, `aheadCount: 1`)
+still failed with the same signature. Did not re-edit again — the file is
+being actively written by something else right now, and re-clobbering it
+risks fighting a concurrent session's real work instead of fixing
+anything.
+
+`tsk-5sr`'s own diff, content, and merge state are unchanged and still
+verified correct (§§1-2 above) — this is purely an environment-level
+block on getting a green `verify` inside `fgos return`'s disposable
+worktree, not a defect in anything this item's 9 children touched.
+
 ## Unresolved
 
 - The mechanism by which `tsk-5sr`/`tsk-64h` went from the round-2 audit's
@@ -99,9 +134,12 @@ branch past `branchHeadAtTake` on its own merits.
   today" was not traced — only confirmed as a fact. If it matters later,
   `git log --all --grep tsk-64h` / `git reflog show fgw/tsk-5sr` is the
   starting point.
-- The `~/.fgos/config.json` `executors.pi` shape mismatch (named-executor
-  entry vs. the tier-keyed shape `validateRunnerConfigShape` expects) is a
-  real environment issue, reproducible under concurrent load. It sits
-  outside `tsk-5sr`'s own 9 declared children (none of them touch
-  `src/runner/dispatch.mjs` or the global config), so it was not fixed
-  here — flagging it in case it belongs in a future edge-gap sweep.
+- The `runner.executors` key-collision (named-executor registry vs.
+  tier-keyed overrides) is a real regression in `src/runner/dispatch.mjs`,
+  live in both `~/.fgos/config.json` and this project's own
+  `.fgos/config.json` (6 real executors: `claude`/`agy`/`codex`/`pi`/
+  `gitnexus`/`herdr`). It sits outside `tsk-5sr`'s own 9 declared
+  children, so it was not fixed at the project-config level here —
+  worth its own submitted item. A partial fix at the global-config level
+  (`pi` moved to `capacities`) did not hold under concurrent write
+  pressure from another session; see §5.
