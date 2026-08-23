@@ -52,6 +52,44 @@ escape is usually still syntactically valid shell, so it fails much
 later, at `return` time, with a confusing result instead of a clean
 error.
 
+## Sync a split root item's own `verify` field
+
+For the **root** item of a real split (Step 4's "several independently
+workable pieces" branch) only: once the split is decided, check the root
+item's own current `verify` (`fgos list --id <item-id> --json`'s
+`data.work[id].verify`) against the discovery-stage placeholder
+constants, the same way the pass-through check above does. If it still
+reads one of those placeholders, sync a whole-suite regression command
+onto the item's own current `verify` field before handing off to
+`fgos-coding-validating`:
+
+```bash
+fgos edit "<item-id>" --verify "npm test"
+```
+
+A root item has no single piece-specific proof surface of its own — its
+correctness is "does everything merged still pass" — so a whole-suite
+command is the honest choice here, unlike a pass-through item's own
+narrower, piece-specific command above. If the item already carries a
+real, distinct verify, do nothing — never overwrite a value already set
+deliberately. Without this sync, a decompose root's `verify` stays
+whatever placeholder `discovery` left behind, and `fgos sync-root`'s own
+goal-check later executes that placeholder literally as a shell command
+(the tsk-1vc incident this item's own description cites).
+
+### Cases this needs to hold for
+
+- A split root whose `verify` is still the discovery-stage placeholder
+  (the reported failure mode, tsk-1vc) — gets synced to `npm test`.
+- A split root whose `verify` is already real (e.g. `tsk-3ik`'s own
+  informal `node --test 'test/**/*.test.mjs'`) — untouched, no redundant
+  edit.
+- A pass-through (non-split) item — untouched by this change; already
+  covered by the existing pass-through section above it, which tsk-14a
+  already fixed.
+- A split **child** — untouched; already covered by the normalizer forcing
+  a real verify at creation time (unchanged, not this item's gap).
+
 ## Mid-planning CONTEXT.md gap
 
 If, at any step, CONTEXT.md's locked decisions turn out to be silent on
