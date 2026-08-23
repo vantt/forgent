@@ -298,6 +298,28 @@ cơ chế guard/vá chồng nhau), tìm kiến trúc đích giải rốt ráo �
   + 1 ghi nhận ngoài-scope. Handoff exploring/planning: chờ tsk-3ve
   T3-T6 land (dep cứng của điều kiện an toàn) hoặc anh ra lệnh sớm hơn.
 
+- **[2026-08-24, vòng 6, anh hỏi]** (a) Attestation "mới có một phần" là
+  sao? (b) Lock self-heal 2 tầng làm luôn được không?
+
+- **[2026-08-24, vòng 6, trả lời + thi hành]** (a) fgOS có nửa CHỤP, chưa
+  có nửa CHẶN — và là chủ đích: tsk-2ig/tsk-4hl chụp `baseCommit`/
+  `headRef` của đúng worktree dispatch trước khi spawn
+  (`transport.mjs:113-127`) và persist vào event `executor.dispatch`
+  (`loop.mjs:856`), kèm `footprintDiffHits` advisory; doc tự đặt tên
+  "level 1: advisory-only, never a gate" — không halt khi lệch. Beehive
+  có 4 loại halt cơ học (lớp lẽ ra bắt tsk-43z máy móc). Level 2
+  (enforcement) là item tương lai nếu cần, chưa submit — anh chưa yêu cầu.
+  (b) Soi code: gap hẹp hơn bảng vòng 5 — `events.lock` ĐÃ tự reclaim
+  pid chết; `main-checkout-lock.mjs` cũng đã reclaim pid số; chỗ duy nhất
+  bắt người can thiệp là holder identity CHUỖI (session id, không probe
+  liveness được) → AMBIGUOUS fail-closed → exit 7 → `/fgOS:unlock` thủ
+  công. **Đã submit `tsk-2l8`** (kind: feature) — self-heal 2 tầng cho
+  đúng nhánh string-identity đó, học bee lock.mjs:172-352, với điều
+  chỉnh bắt buộc: soft window ≥10ph (approve giữ lock qua staged verify
+  ~6ph, không bê 30s của bee), trần cứng 1h, giữ `/fgOS:unlock` làm
+  đường dự phòng. Không code trong session này (đang claim tsk-3tp,
+  terminal rule của shaping skill).
+
 ## 6. Thiết kế đã chốt {#design}
 
 *(Regenerated toàn phần 24/8, sau khi D1-D3 chốt.)*
