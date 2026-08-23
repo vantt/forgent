@@ -4,11 +4,21 @@ Item: `tsk-3ve` · Feature dir: `docs/history/eventlog-tier-a-multifile-content-
 
 ## 1. Trạng thái hiện tại
 
+**HANDOFF XONG** (vòng 4, 2026-08-23 tối): discovery verdict `clear` →
+CONTEXT.md (17 locked decisions render từ log) → plan.md (Mode: high-risk,
+child specs) → validating gate (human-approve qua answer gate; overlap gate
+bắt 2 cặp footprint, sửa bằng dep trực tiếp T4→T2, T6→T5) → **6 con
+materialized: tsk-3ve-1…tsk-3ve-6**, đều stage `executing` mang action/
+refs/deps/footprint; root tsk-3ve stage `executing`, claim released. Phân
+công model đã thống nhất: T1/T5 Sonnet; T2/T6 Opus; T3/T4 Opus (validating
+bắt buộc Opus). Sự cố ghi nhận trong quá trình: 7 decision vòng 1 (TA-D0…D6)
+exit 0 nhưng biến mất khỏi store — cùng class tsk-1vc, đã re-record 16/16
+với read-back, incident log làm bằng chứng sống (decision trên item, relation
+touches:tsk-1vc).
+
 **HỘI TỤ** (vòng 3, 2026-08-23): anh chốt nốt O4 (SQLite → TA-D15: ngoài
-Tầng A). Không còn điểm treo nào — §4 có đủ TA-D0…TA-D15 machine-readable,
-§6 là synthesis chốt, §7 là danh mục 6 task con với anchor/D-ID/verify draft.
-Bước tiếp theo duy nhất: set `refs` per-anchor và handoff native-first sang
-`fgos-coding-exploring`/`fgos-coding-planning` cho chuỗi T1→T6.
+Tầng A). §4 có đủ TA-D0…TA-D15 machine-readable, §6 synthesis chốt, §7 là
+danh mục 6 task con với anchor/D-ID/verify draft.
 
 Vòng 2: anh chốt P1–P4 + Q5/Q6/Q7 → TA-D7…TA-D13; R5 → TA-D14; §6
 regenerate sạch marker «đề xuất»; phân tích câu hỏi SQLite (Q8).
