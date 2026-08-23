@@ -2,24 +2,24 @@
 
 ## 1. Trạng thái hiện tại
 
-Vòng 3 (23/8, cùng ngày vòng 1-2). Chưa có D-ID nào chốt — nhưng một điểm
-neo đã xuất hiện và đang giữ ổn: **`.fgos` là PM-state của chính repo nó
-quản, sự thật phải sống cùng một git history với code — không cách ly khỏi
-repo** (anh nêu vòng 3, bác đề xuất nested-repo của vòng 2; khớp nguyên văn
-D-ADR0001 "git-committed"). Nếu điểm này giữ qua vòng sau, nó là ứng viên
+Vòng 4 (23/8, cùng ngày vòng 1-3). Chưa có D-ID nào chốt. Điểm neo đang giữ
+ổn từ vòng 3: **`.fgos` là PM-state của chính repo nó quản, sự thật phải
+sống cùng một git history với code** (anh nêu, khớp D-ADR0001) — ứng viên
 D-ID đầu tiên.
 
 Diễn biến: vòng 1 xác nhận worker không đọc/ghi `.fgos/` (Tầng B nguyên bản
-không có consumer). Vòng 2 (theo yêu cầu brainstorm rốt ráo của anh) đề xuất
-nested state repo — anh bác vì vi phạm constraint in-repo. Vòng 3 đo phân bố
-23.847 event thật: ~40% coordination (move/stage/add — cần visibility toàn
-cục tức thì, không thể sinh trong nhánh), ~55-60% narrative — nghĩa là Tầng
-B nguyên bản cũng chỉ chở được một nửa write volume. Đề xuất hiện hành
-(vòng 3, chờ anh phản hồi): **giữ event in-repo trọn vẹn, xóa
-checkpoint-commit chuyên dụng, thay bằng sweep-dirty-shards vào các
-merge/approve commit main đằng nào cũng tạo + fallback thưa** — ADR0020
-không đụng, Tầng B đóng vĩnh viễn, danh sách xóa legacy giữ gần nguyên.
-Chi tiết §5 entry vòng 3; các điểm chờ chốt: §3 dòng 6/8/9.
+không có consumer). Vòng 2 đề xuất nested state repo — anh bác vì vi phạm
+constraint in-repo. Vòng 3 đo phân bố 23.847 event (~40% coordination cần
+visibility tức thì / ~55-60% narrative) và đề xuất **sweep**: xóa
+checkpoint-commit chuyên dụng, gom dirty shards vào các merge/approve
+commit main đằng nào cũng tạo + fallback thưa. Vòng 4 (anh yêu cầu): 2
+scout Haiku đọc source thật của beehive + repository-harness/symphony —
+**cả hai upstream hội tụ độc lập đúng pattern sweep đang đề xuất**
+(coordination = live layer ngoài cadence git; history commit coarse do
+orchestrator quyết; không ai cho worktree chở coordination qua merge).
+Chi tiết §5 entry vòng 4. Các điểm chờ anh chốt: §3 dòng 6 (constraint
+in-repo → D-ID), dòng 9 (sweep — evidence đã hội tụ), dòng 8 (tsk-3tp
+repurpose hay đóng + item mới).
 
 ## 2. Mục tiêu & đề bài
 
@@ -57,7 +57,7 @@ cơ chế guard/vá chồng nhau), tìm kiến trúc đích giải rốt ráo �
 | 6 | Constraint kiến trúc: `.fgos` state phải sống cùng git history với code (in-repo), không cách ly? | **Ổn định 1 vòng — ứng viên D-ID nếu giữ qua vòng sau** | Anh nêu trực tiếp vòng 3, bác nested-repo vòng 2. Khớp D-ADR0001 nguyên văn. Mọi phương án từ đây phải thỏa constraint này. |
 | 7 | Sau khi Tầng A + checkpoint redesign: danh sách legacy nào được XÓA? | **Rõ (danh sách), chưa chốt (chờ dòng 9)** | XÓA: (1) `merge=union` + `events-jsonl-contiguity.mjs` (sau freeze events.jsonl); (2) checkpoint-commit chuyên dụng + tuning `checkpoint.eventThreshold`; (3) phần lớn truncation-guard surface (mark sidecar, warnings file, opt-out env `FGOS_DISABLE_OPPORTUNISTIC_CHECKS`); (4) `events.jsonl` 1-file + 2 backup → đông cứng baseline-0/archive; (5) `seq` làm identity → bỏ hẳn ở compaction đầu; (6) Tầng B — đóng vĩnh viễn. GIỮ: merge guard `.fgos-write-rejected` (nguyên trạng, không ngoại lệ), pre-commit hook (tsk-56u class). |
 | 8 | tsk-3tp: repurpose tại chỗ thành item "checkpoint redesign: sweep-on-merge", hay đóng hẳn + submit item mới? | **Chưa rõ — chờ anh quyết** | Cả hai đều giữ dep tsk-3ve (Tầng A T3-T6 phải xong trước — shard + đóng vector git-clobber là điều kiện an toàn cho coarse cadence). |
-| 9 | Cơ chế thay checkpoint chuyên dụng: sweep-dirty-shards vào merge/approve commit sẵn có + fallback thưa — hay Tầng B-cho-SESSION (narrative event sinh trong worktree của session đã claim, piggyback merge)? | **Chưa rõ — em khuyến nghị sweep, chờ anh** | Đo vòng 3: coordination ~40% (move 29% + stage 6.6% + add 4.3%) buộc ghi main tức thì dù chọn gì; narrative ~55-60% (decision 19.4%, edit 15.4%, outcome 12.8%, discovery 4.2%, gate 4.2%, friction/handoff/call-summary ~4%). Tầng-B-cho-session chỉ chở được phần narrative, đổi lấy: ngoại lệ merge guard, tách 2 class event khác luật, narrative vô hình từ main tới khi merge (mất nếu nhánh bỏ). Sweep: churn giảm về ~0 giữa các merge, visibility tức thì giữ nguyên, ADR0020 nguyên vẹn, không class split. Nhượng bộ duy nhất: merge commit của một nhánh chở kèm dirty event của mọi writer (provenance vẫn trong nội dung event: `src`/`ts`/`h`). |
+| 9 | Cơ chế thay checkpoint chuyên dụng: sweep-dirty-shards vào merge/approve commit sẵn có + fallback thưa — hay Tầng B-cho-SESSION (narrative event sinh trong worktree của session đã claim, piggyback merge)? | **Sweep — được củng cố thêm bởi scout upstream vòng 4, chờ anh chốt** | Đo vòng 3: coordination ~40% (move 29% + stage 6.6% + add 4.3%) buộc ghi main tức thì dù chọn gì; narrative ~55-60%. Tầng-B-cho-session chỉ chở được phần narrative, đổi lấy: ngoại lệ merge guard, tách 2 class event khác luật, narrative vô hình từ main tới khi merge (mất nếu nhánh bỏ). Sweep: churn ~0 giữa các merge, visibility tức thì giữ nguyên, ADR0020 nguyên vẹn. Vòng 4: CẢ HAI upstream hội tụ cùng pattern — coordination không bao giờ đi qua git-commit mịn (beehive: gitignored + lockfile + ledger main-only; harness: SQLite gitignored + CAS), history commit ở cadence coarse do orchestrator quyết (harness: 1 changeset/run, code không tự commit) ≈ đúng hình dạng sweep; không upstream nào cho worktree chở coordination-write qua merge (phản chứng độc lập thêm cho Tầng B). Khác biệt fgOS giữ lại có chủ đích: work.move Ở TRONG log git-tracked để replay được (D-ADR0001) — sweep cho cả hai: sự thật trong git + churn 0. |
 
 ## 4. Quyết định đã chốt
 
@@ -165,6 +165,56 @@ cơ chế guard/vá chồng nhau), tìm kiến trúc đích giải rốt ráo �
   ro mất data. Nhượng bộ: merge commit chở kèm dirty event mọi writer —
   provenance vẫn nguyên trong nội dung event (`src`/`ts`/`h`). Chờ anh chốt
   §3 dòng 9 (sweep vs Tầng-B-cho-session) và dòng 8 (repurpose vs item mới).
+
+- **[2026-08-23, vòng 4, anh yêu cầu]** Bật agent rẻ scout xem upstream
+  (repository-harness, beehive) giải bài coordination thế nào.
+
+- **[2026-08-23, vòng 4, scout 2 agent Haiku đọc source thật]** Nguồn:
+  `upstreams/beehive`, `upstreams/repository-harness`, `upstreams/symphony`
+  (clone local). Hai upstream HỘI TỤ ĐỘC LẬP về cùng một kiến trúc:
+  **coordination sống là chuyện LIVE (filesystem/DB), không phải chuyện
+  HISTORY (git) — không upstream nào commit coordination-write ở cadence
+  mịn, và không upstream nào dùng git làm phương tiện coordination.**
+
+  **beehive** (evidence: `lock.mjs:465-511` withStoreLock O_EXCL, stale
+  takeover 2 tầng 30s+pid / trần 1h qua atomic rename;
+  `worktree-holds.mjs:27-32,135-172` holds ledger; `.gitignore:4-24`;
+  `.gitattributes:6-8`): coordination (claims, holds, reservations,
+  state.json) hoàn toàn **gitignored** — visibility tức thì qua shared
+  ledger `.bee/runtime/cross-worktree-holds.json` SỐNG DUY NHẤT Ở MAIN
+  CHECKOUT (worktree không thể tự-claim bằng cách ghi store của chính nó
+  — đúng tinh thần ADR0020) + named lockfile mutex; TTL 1h + heartbeat
+  renew. Chỉ narrative logs (decisions/backlog/review-candidates jsonl)
+  git-tracked, union-merge + dedup theo event id lúc replay. Merge-back =
+  staged `--no-ff --no-commit` → verify cây chưa commit → đỏ abort (khớp
+  tsk-1i3). Caveat scout tự khai: `worktree-store.mjs` header nói module
+  merge này "NOT YET WIRED" — spike-proof, chưa production bên họ.
+
+  **repository-harness + symphony** (evidence: `infrastructure.rs:1775-1837`
+  update_story_cas; `interface.rs:940-945` CONFLICT→exit 3;
+  `state.rs:232-258,629-641` single-active-run; `infrastructure.rs:834-895`
+  changeset append cùng SQLite transaction; `state.rs:410-440` content-sha
+  double-apply guard): coordination sống trong SQLite **gitignored**
+  (`harness.db`, `.symphony/state.db`), ghi qua CAS (expected-status, thua
+  race → exit 3 CONFLICT, caller tự re-query) + single-active-run lock.
+  Chỉ changeset JSONL semantic (≈ narrative) git-tracked — MỘT file mỗi
+  run, và code KHÔNG tự commit nó: orchestrator/CI quyết thời điểm
+  `git add && git commit` — tức cadence commit history được tách hoàn
+  toàn khỏi hot-path coordination, đúng hình dạng "sweep" vòng 3 đề xuất.
+  Content-sha256 chống double-apply ≈ chính là `h` identity của Tầng A.
+
+  **Suy ra cho fgOS:** (a) cả hai upstream XÁC NHẬN hướng vòng 3 — commit
+  cadence của history phải tách khỏi visibility của coordination;
+  visibility đến từ tầng live (fgOS: working-dir append trên main checkout
+  + events.lock/write-queue — đã có sẵn), commit là chuyện coarse/sweep.
+  (b) KHÔNG upstream nào cho nhánh/worktree chở coordination-write về qua
+  merge — beehive còn thiết kế để worktree tự-claim là BẤT KHẢ THI — thêm
+  một phản chứng độc lập nữa cho Tầng B. (c) Khác biệt duy nhất của fgOS
+  so với beehive: fgOS giữ coordination event (work.move) BÊN TRONG event
+  log git-tracked vì D-ADR0001 (log là sự thật, replay dựng lại state) —
+  beehive tách hẳn ra ngoài git nhưng đổi lại claims không có history/
+  không replay được. Giữ theo D-ADR0001 + sweep cadence được CẢ HAI: sự
+  thật replay được trong git, churn = 0 giữa các merge.
 
 ## 6. Thiết kế đã chốt {#design}
 
