@@ -22,11 +22,13 @@ so this item's ordering is not urgency-driven — closing it promptly is
 about hygiene (an already-fixed bug still open in the backlog), not
 unblocking other work.
 
-Impact-analysis posture: `full` (GitNexus present per `fgos tool query
---capability impact-analysis --status present`) — not leaned on for a
-proof point here, since this plan makes no code change to blast-radius
-against; recorded per the gate's own instruction to note posture
-regardless.
+Impact-analysis posture: `degraded` — GitNexus is registered and
+`present` per `fgos tool query --capability impact-analysis --status
+present`, but a live tool-call hook notice this same session flagged its
+index as stale ("last indexed: 7bb3231"). Not leaned on for any proof
+point here regardless (this plan proposes no code change, so there is no
+blast radius to check); recorded honestly per the gate's own instruction
+to note the real posture rather than assume freshness.
 
 ## Approach
 
