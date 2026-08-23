@@ -227,7 +227,15 @@ function excludeIronLawEvidence(files, id) {
 // streams the concurrent-session noise above actually comes from --
 // `events.jsonl` (plus its own timestamped backups) and
 // `entropy-history.jsonl` -- never a policy or generated file.
-const FGOS_NOISE_ONLY_PATHS = /^\.fgos\/(events\.jsonl(\.backup-.*)?|entropy-history\.jsonl)$/;
+//
+// Tầng A/T2 (TA-D2/TA-D11): the same append-only stream now also lands in
+// per-writer files under `.fgos/events/<writer-id>-<openTs>.jsonl` instead
+// of always landing in baseline-0 -- same noise, same reasoning, just a
+// different physical path; a compacted baseline under `.fgos/events/`
+// (`baseline-<ts>.jsonl`, T6) and its own manifest sidecar under
+// `.fgos/events/archive/` are equally append-only lifecycle output, never
+// an item's own declared footprint.
+const FGOS_NOISE_ONLY_PATHS = /^\.fgos\/(events\.jsonl(\.backup-.*)?|events\/.*\.jsonl|events\/archive\/.*|entropy-history\.jsonl)$/;
 function excludeFgosPaths(files) {
   return files.filter((f) => !FGOS_NOISE_ONLY_PATHS.test(normalizePath(f)));
 }
