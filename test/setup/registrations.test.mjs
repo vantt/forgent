@@ -10,6 +10,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { execFileSync } from 'node:child_process';
+import crypto from 'node:crypto';
 import { DOCTOR_CHECKS, CONFIG_DEFAULT_REGISTRATIONS, FIX_REGISTRATIONS, registerCheck, registerConfigDefault, registerFix, runFixes, ensureSharedConfigDefaults } from '../../src/setup/checks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
 import { DEFAULT_CAPABILITY_SLOTS, PI_EXECUTOR_DEFAULT } from '../../src/setup/registrations.mjs';
@@ -539,4 +540,71 @@ test('events-jsonl-not-truncated: a truncation in a per-writer file under .fgos/
   const result = entry.check(gitDir);
   assert.equal(result.passed, false);
   assert.match(result.message, /events\/writer-a-1\.jsonl/);
+});
+
+// --- Tầng A/T6: events-compaction-verified (TA-D6) -------------------------
+
+function hashOfObj(obj) {
+  return crypto.createHash('sha256').update(JSON.stringify(obj)).digest('hex').slice(0, 16);
+}
+function evWithHash(seq, ts, type, payload, src = 'writer-a') {
+  const unhashed = { seq, ts, type, payload, v: 1, src };
+  return { ...unhashed, h: hashOfObj(unhashed) };
+}
+function writeJsonlEvents(filePath, events) {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, events.map((e) => `${JSON.stringify(e)}\n`).join(''), 'utf8');
+}
+
+test('events-compaction-verified passes trivially when no compaction has ever run', () => {
+  const gitDir = mkTempDir();
+  execFileSync('git', ['init', '-q'], { cwd: gitDir });
+  const entry = DOCTOR_CHECKS.find((c) => c.id === 'events-compaction-verified');
+  const result = entry.check(gitDir);
+  assert.equal(result.passed, true);
+  assert.match(result.message, /nothing to verify/);
+});
+
+test('events-compaction-verified passes when a real compaction\'s baseline still matches its archived originals', () => {
+  const gitDir = mkTempDir();
+  execFileSync('git', ['init', '-q'], { cwd: gitDir });
+  const fgosDir = path.join(gitDir, '.fgos');
+  const eventsDir = path.join(fgosDir, 'events');
+  const archiveDir = path.join(eventsDir, 'archive');
+
+  const e1 = evWithHash(1, '2026-01-01T00:00:00.000Z', 'work.add', { id: 'a', title: 'A', status: 'todo' });
+  writeJsonlEvents(path.join(archiveDir, 'writer-a-1.jsonl'), [e1]); // already archived
+  writeJsonlEvents(path.join(eventsDir, 'baseline-1.jsonl'), [e1]); // the live compacted baseline
+  fs.writeFileSync(
+    path.join(archiveDir, 'compact-1.manifest.json'),
+    JSON.stringify({ baseline: 'baseline-1.jsonl', originals: ['writer-a-1.jsonl'] }),
+    'utf8',
+  );
+
+  const entry = DOCTOR_CHECKS.find((c) => c.id === 'events-compaction-verified');
+  const result = entry.check(gitDir);
+  assert.equal(result.passed, true);
+  assert.match(result.message, /1 past compaction/);
+});
+
+test('events-compaction-verified fails and names the broken manifest when the baseline no longer matches its archived originals', () => {
+  const gitDir = mkTempDir();
+  execFileSync('git', ['init', '-q'], { cwd: gitDir });
+  const fgosDir = path.join(gitDir, '.fgos');
+  const eventsDir = path.join(fgosDir, 'events');
+  const archiveDir = path.join(eventsDir, 'archive');
+
+  const e1 = evWithHash(1, '2026-01-01T00:00:00.000Z', 'work.add', { id: 'a', title: 'A', status: 'todo' });
+  writeJsonlEvents(path.join(archiveDir, 'writer-a-1.jsonl'), [e1]);
+  writeJsonlEvents(path.join(eventsDir, 'baseline-1.jsonl'), []); // tampered/corrupted after the fact -- missing e1
+  fs.writeFileSync(
+    path.join(archiveDir, 'compact-1.manifest.json'),
+    JSON.stringify({ baseline: 'baseline-1.jsonl', originals: ['writer-a-1.jsonl'] }),
+    'utf8',
+  );
+
+  const entry = DOCTOR_CHECKS.find((c) => c.id === 'events-compaction-verified');
+  const result = entry.check(gitDir);
+  assert.equal(result.passed, false);
+  assert.match(result.message, /compact-1\.manifest\.json/);
 });
