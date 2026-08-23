@@ -111,8 +111,11 @@ Some items are one honest piece; others need to become several
 independently workable ones. If a split is right, write each piece's spec
 into `plan.md` as a validated JSON array and **create nothing** — no work
 item exists until `fgos-coding-validating` materializes them at the
-single gate. Full field-by-field spec shape and the "why nothing is
-created here" rationale: `references/split-and-child-specs.md`.
+single gate. For a split root item, sync a still-placeholder `verify`
+field onto the root item once the split is decided. Full field-by-field
+spec shape and the "why nothing is created here" rationale:
+`references/split-and-child-specs.md` (and full root-verify mechanics:
+`references/verify-sync-and-gap.md`).
 
 ### Step 5: Leave execution alone
 This skill only names, for each piece it describes, the one command that
@@ -218,7 +221,7 @@ Violating the letter of the rules is violating the spirit of the rules.
   hatch
 - `references/split-and-child-specs.md` — the child-spec JSON shape,
   field-by-field requirements, and why nothing is created at this stage
-- `references/verify-sync-and-gap.md` — the pass-through verify-sync
+- `references/verify-sync-and-gap.md` — the pass-through and split-root verify-sync
   mechanics and the mid-planning CONTEXT.md gap hand-back
 
 ## Workflow Position
