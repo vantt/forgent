@@ -123,15 +123,21 @@ export function mergeAndDedupeEvents(entries) {
 }
 
 /**
- * TA-D6: the verify gate -- proves compacting `originalEntries` (the cold
- * files, as read BEFORE the attempt) into `candidateEvents` (the freshly
- * written `baseline-<ts>.jsonl`, read back) changes nothing real:
+ * TA-D6: the verify gate -- proves the just-written `baseline-<ts>.jsonl`
+ * (`candidateEvents`, read back from disk) faithfully carries what
+ * `mergeAndDedupeEvents(originalEntries)` produced, catching an I/O-layer
+ * fault (torn write, truncation, encoding mangling) in the read-back:
  * - **hash-set**: the exact same set of `h` identities survives (TA-D9) --
- *   nothing silently dropped, nothing fabricated.
+ *   nothing silently dropped, nothing fabricated on disk.
  * - **count**: same number of (deduped) events on both sides.
  * - **deep-equal view**: folding both sides (`foldEvents`) yields the
- *   IDENTICAL state view -- the real thing every other check here is a
- *   structural proxy for.
+ *   IDENTICAL state view.
+ * `before` here is `mergeAndDedupeEvents(originalEntries)` recomputed --
+ * the SAME function, same input `compactColdWriterFiles` already called to
+ * build `candidateEvents` in the first place. A logic bug INSIDE
+ * `mergeAndDedupeEvents` (wrong sort, wrong dedupe key) reproduces
+ * identically on both sides and this gate cannot see it -- that class of
+ * bug is `mergeAndDedupeEvents`'s own unit tests' job, not this gate's.
  * Never mutates, never throws on a break -- a break IS the expected
  * finding this function exists to surface (same posture as every other
  * check in this Tầng A cell).

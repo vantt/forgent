@@ -64,6 +64,7 @@ import {
   addFriction,
   categoryOf,
   EXIT_CODES,
+  resolveWriterLogPath,
 } from '../state/store.mjs';
 import { DEFAULTS, truncateTitle } from '../state/work.mjs';
 import { DEFAULT_DOMAIN, getDomain, resolveWorkflow, stageForStep } from '../state/workflow-stage-graphs.mjs';
@@ -834,17 +835,19 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       lastWorkerOutput = worker.stdout ?? ''; // wgi-8: terminal-outcome discovery source (success/verify-miss)
       log(`fgos-runner: worker for "${item.id}" exited ${worker.status ?? `signal ${worker.signal}`} (tier ${worker.tier} -> ${worker.model})`);
       // Executor-aware dispatch announce/audit (D8, tsk-62v): one line to
-      // stderr/logs, plus one event appended to the existing `.fgos/
-      // events.jsonl` one-door-write log — reused, not a new file.
-      // `replay.mjs` ignores unknown event types by design (see its own
-      // doc comment), so this audit-only entry never participates in the
-      // FSM view. Queued through the same `queue.enqueue()` every other
-      // write at this call site already uses, closing the synthesis
-      // report's concurrent-session write-race concern (§3) for this
-      // append too.
+      // stderr/logs, plus one event appended to this writer's own open
+      // file under `.fgos/events/` (`resolveWriterLogPath`, TA-D2/TA-D12)
+      // — never straight to the frozen baseline `events.jsonl`, so a
+      // concurrent dispatch from another writer never contends for the
+      // same physical file. `replay.mjs` ignores unknown event types by
+      // design (see its own doc comment), so this audit-only entry never
+      // participates in the FSM view. Queued through the same
+      // `queue.enqueue()` every other write at this call site already
+      // uses, closing the synthesis report's concurrent-session
+      // write-race concern (§3) for this append too.
       log(`fgos-runner: ${worker.executorId} — ${worker.provider} — ${worker.model}`);
       await queue.enqueue(async () => {
-        appendEvent(path.join(dir, 'events.jsonl'), {
+        appendEvent(resolveWriterLogPath(dir), {
           type: 'executor.dispatch',
           // baseCommit/headRef (tsk-4hl, D1/D3 of docs/history/parallel-
           // decomposition-footprint-avoidance/CONTEXT.md — mức 1): the

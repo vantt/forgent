@@ -36,7 +36,7 @@ import {
   resolveAgentTypeForTaskSpec,
   resolveAgentTypeForWork,
 } from '../../src/runner/dispatch.mjs';
-import { initStore, addWork, listWork } from '../../src/state/store.mjs';
+import { initStore, addWork, listWork, readRawEvents } from '../../src/state/store.mjs';
 import { findExecutableOnPath } from '../../src/state/tool-registry.mjs';
 import { resolveMainCheckoutRoot } from '../../src/runner/paths.mjs';
 
@@ -4587,9 +4587,8 @@ test('the "log" CLI entry point appends a executor.dispatch event and prints it 
   assert.equal(printed.payload.provider, 'agy');
   assert.equal(printed.payload.command, 'agy');
   assert.equal(printed.payload.model, 'gemini-flash');
-  const raw = fs.readFileSync(path.join(repoRoot, '.fgos', 'events.jsonl'), 'utf8');
-  const lines = raw.trim().split('\n');
-  const logged = JSON.parse(lines[lines.length - 1]);
+  const dispatchEvents = readRawEvents(path.join(repoRoot, '.fgos')).filter((e) => e.type === 'executor.dispatch');
+  const logged = dispatchEvents[dispatchEvents.length - 1];
   assert.equal(logged.type, 'executor.dispatch');
   assert.equal(logged.payload.id, 'tsk-2c1');
 });
@@ -4617,9 +4616,11 @@ test('logExecutorDispatch appends a executor.dispatch event with baseCommit/head
   assert.equal(event.type, 'executor.dispatch');
   assert.equal(event.payload.baseCommit, null);
   assert.equal(event.payload.headRef, null);
-  const raw = fs.readFileSync(path.join(fgosDir, 'events.jsonl'), 'utf8');
-  const lines = raw.trim().split('\n');
-  assert.equal(lines.length, 1);
+  // Tầng A (TA-D2/TA-D12): logExecutorDispatch now writes into this
+  // writer's own open file under `.fgos/events/`, not the frozen baseline
+  // `events.jsonl` -- readRawEvents(dir) is the one door that reads both.
+  const dispatchEvents = readRawEvents(fgosDir).filter((e) => e.type === 'executor.dispatch');
+  assert.equal(dispatchEvents.length, 1);
 });
 
 test('logExecutorDispatch appends multiple sequential calls without corrupting the log — sequential seq, no duplicate/dropped lines (parallel gather branches must never race the write)', () => {
@@ -4629,8 +4630,8 @@ test('logExecutorDispatch appends multiple sequential calls without corrupting t
   );
   const seqs = events.map((e) => e.seq);
   assert.deepEqual(seqs, [...new Set(seqs)].sort((a, b) => a - b), 'no duplicate seq');
-  const raw = fs.readFileSync(path.join(fgosDir, 'events.jsonl'), 'utf8');
-  assert.equal(raw.trim().split('\n').length, 4);
+  const dispatchEvents = readRawEvents(fgosDir).filter((e) => e.type === 'executor.dispatch');
+  assert.equal(dispatchEvents.length, 4);
 });
 
 // --- CLI subcommand --cwd flag coverage ---------------------------------

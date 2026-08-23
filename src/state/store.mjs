@@ -116,7 +116,7 @@ function formatCompactTs(date) {
 // `.fgos/events/` (TA-D2/TA-D11): reuse it if a prior write in this same
 // writer identity already opened one, otherwise open a new one now. Never
 // writes to `paths(dir).logPath` (baseline-0 is frozen, TA-D12).
-function resolveWriterLogPath(dir) {
+export function resolveWriterLogPath(dir) {
   const dirPath = eventsDirOf(dir);
   fs.mkdirSync(dirPath, { recursive: true });
   const writerId = String(resolveWriterIdentity(dir).id);
