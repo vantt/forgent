@@ -2373,3 +2373,62 @@ registerFix({
   id: 'decision-index-stale',
   fix: (cwd) => fixDecisionIndexStale(cwd),
 });
+
+function getMergeHeadSha(mainCheckout) {
+  try {
+    const stdout = execFileSync('git', ['rev-parse', '--verify', 'MERGE_HEAD'], {
+      cwd: mainCheckout,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    });
+    return stdout.trim() || null;
+  } catch {
+    return null;
+  }
+}
+
+function checkNoStuckMergeAbort(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  if (mainCheckout === null) {
+    return { passed: true, message: 'not inside a git checkout — nothing to check' };
+  }
+  const sha = getMergeHeadSha(mainCheckout);
+  if (sha !== null) {
+    return {
+      passed: false,
+      message: `merge in progress or stuck (MERGE_HEAD=${sha}) — run fgos main-checkout-reset --sha ${sha} --confirm`,
+    };
+  }
+  return { passed: true, message: 'no merge in progress or stuck MERGE_HEAD' };
+}
+
+// Unattended automation must never mutate the shared main checkout's git
+// plumbing without a human reviewing real `git status` first (plan.md).
+// Therefore, this fix always returns changed: false and names the manual
+// recovery command `fgos main-checkout-reset --sha <sha> --confirm`.
+function fixNoStuckMergeAbort(cwd) {
+  const mainCheckout = resolveMainCheckout(cwd);
+  if (mainCheckout === null) {
+    return { changed: false, message: 'not inside a git checkout — nothing to fix' };
+  }
+  const sha = getMergeHeadSha(mainCheckout);
+  if (sha === null) {
+    return { changed: false, message: 'no merge in progress — nothing to fix' };
+  }
+  return {
+    changed: false,
+    message: `merge in progress or stuck (MERGE_HEAD=${sha}) — run fgos main-checkout-reset --sha ${sha} --confirm`,
+  };
+}
+
+registerCheck({
+  id: 'no-stuck-merge-abort',
+  description: 'main checkout has no lingering MERGE_HEAD from an in-progress or stuck merge abort (tsk-40a)',
+  check: (cwd) => checkNoStuckMergeAbort(cwd),
+});
+
+registerFix({
+  id: 'no-stuck-merge-abort',
+  fix: (cwd) => fixNoStuckMergeAbort(cwd),
+});
+
