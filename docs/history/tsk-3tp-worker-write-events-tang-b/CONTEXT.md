@@ -20,6 +20,7 @@ upstream: `DISCUSSION.md` cùng thư mục (7 mục, §5 có Q&A log 7 vòng).
 | D1 | `.fgos` state phải sống cùng một git history với code (in-repo) — bác nested-repo/separate-ref; mọi thiết kế write-path phải thỏa constraint này. | 23876 |
 | D2 | Xóa checkpoint-commit chuyên dụng; thay bằng sweep — gom dirty `.fgos/events/` shard vào chính các merge/approve commit main đằng nào cũng tạo + fallback thưa. Visibility coordination vẫn là working-dir append tức thì, không đổi. | 23877 |
 | D3 | Tầng B (worker/worktree ghi `.fgos/` từ trong worktree, ngoại lệ merge-guard) đóng vĩnh viễn — ADR0020 giữ nguyên không ngoại lệ; tsk-3tp repurpose tại chỗ thành item sweep checkpoint redesign. | 23878 |
+| D4 | Chia tsk-3tp thành 2 con tuần tự, footprint disjoint (con 1: sweep mechanism; con 2: xóa legacy repo-level); con merge về `fgw/tsk-3tp`; sau khi merge hết chạy 3 vòng review độc lập trên nhánh cha, có vấn đề thì tự fix; driver thin chống token-limit; xong hết được phép approve Iron Law merge cha lên main (standing authorization 24/8, scoped chuỗi tsk-3tp). Xóa backups `.fgos/*` không nằm trong con nào — diff chạm `.fgos/` từ nhánh bị merge guard từ chối (ADR0020); bước tùy chọn trên main sau approve. | 23924 |
 
 ## Pinned terms
 

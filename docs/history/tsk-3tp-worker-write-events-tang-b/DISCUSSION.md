@@ -17,6 +17,18 @@ vòng 4b; attestation: đã có một phần qua tsk-4hl; content-hash: Tầng A
 có; món thật sự còn thiếu đáng học: **lock self-heal 2 tầng của bee** thay
 cho `/fgOS:unlock` thủ công — item riêng nếu làm, ngoài scope này).
 
+**Vòng 9 (24/8): split chốt qua chính engine gate.** Anh trả lời câu hỏi
+floor heavy-risk bằng cấu trúc "tasks → merge về nhánh cha → 3 vòng
+review độc lập → approve Iron Law" — tức decompose, supersede đề xuất
+pass-through. Đã: mint D4 (seq 23924, kèm phát hiện xóa backups `.fgos/*`
+không thể nằm trong con vì merge guard chặn diff `.fgos/` từ nhánh);
+tier-A grep blast radius contiguity (9 file thật — spec con 2 mở rộng
+theo); `fgos answer` + `fgos plan --verdict decompose --children` →
+materialize `tsk-3tp-1` (sweep, heavy) + `tsk-3tp-2` (legacy, standard);
+wire deps tsk-3ve→3tp-1→3tp-2; viết `DRIVE-PROMPT.md` (driver thin chống
+token-limit, idempotent resume từ live state, per-child fresh agent, 3
+review rounds độc lập, Iron Law approve theo standing authorization D4).
+
 **Terminal handoff đã chạy (vòng 8, 24/8, theo lệnh anh):** CONTEXT.md
 viết + docsRef set; gate contextApprove approve (actor human, seq 23904)
 → `fgos discover --verdict clear` (discovery→planning); plan.md viết

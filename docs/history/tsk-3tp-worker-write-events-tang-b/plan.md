@@ -89,11 +89,35 @@ lại khi claim.
 
 ## Split decision
 
-**Pass-through — một item, không tách con.** Lý do: khi item claimable
-(dep tsk-3ve done) thì mọi tiền đề của cả P1 lẫn P2 đã sẵn; P1/P2 đụng
-cùng cụm file (`events-jsonl-truncation-guard.mjs`, merge path) — tách
-con chỉ thêm overhead điều phối, không mở được parallelism (footprint
-overlap sẽ serialize chúng anyway).
+**Chia 2 con tuần tự (D4 — supersede đề xuất pass-through bản đầu,
+theo câu trả lời của anh tại engine gate 24/8).** Footprint disjoint có
+chủ đích: toàn bộ chỉnh sửa `events-jsonl-truncation-guard.mjs` (kể cả
+trim guard surface vốn xếp ở P2) dồn về con 1 để hai con không đụng file;
+con 2 chỉ còn xóa legacy cấp repo. Xóa 2 file backup `.fgos/events.jsonl.
+backup-*` KHÔNG thuộc con nào — diff chạm `.fgos/` từ nhánh bị merge
+guard từ chối cứng (ADR0020); đó là bước tùy chọn chạy trực tiếp trên
+main sau approve, nếu pre-commit hook cho phép.
+
+```json
+[
+  {
+    "title": "Sweep mechanism: bỏ checkpoint chuyên dụng, gom shard vào merge/approve commit + fallback thưa",
+    "verify": "npm test",
+    "action": "Per D2 và D4: gỡ nhánh periodic-commit (interval 900s / threshold 50, commit message chore(.fgos): periodic events.jsonl checkpoint) trong src/state/events-jsonl-truncation-guard.mjs, kèm mark sidecar/warnings/env opt-out của nó; thêm sweep-stage các file dirty/untracked dưới .fgos/events/ vào commit của staged merge trong src/runner/merge.mjs; cập nhật caller src/runner/claim-port.mjs; đăng ký checkpoint.fallbackIntervalSec (mặc định 3600) vào src/setup/checks.mjs theo Install/setup/doctor gate; thêm dòng CHANGELOG Unreleased; bước đầu bắt buộc: P0 re-verify hình dạng Tầng A đã land (plan.md P0).",
+    "footprint": ["src/state/events-jsonl-truncation-guard.mjs", "src/runner/merge.mjs", "src/runner/claim-port.mjs", "src/setup/checks.mjs", "CHANGELOG.md", "test/state/events-jsonl-truncation-guard.test.mjs", "test/setup/checks.test.mjs"],
+    "kind": "task",
+    "risk": "heavy"
+  },
+  {
+    "title": "Xóa legacy repo-level: union driver + toàn bộ contiguity surface + grep-absence tests",
+    "verify": "npm test",
+    "action": "Per D2 và D4: gỡ dòng merge=union cho events.jsonl khỏi .gitattributes (file đã frozen baseline-0 bởi Tầng A); retire toàn bộ contiguity surface — grep 24/8 xác nhận blast radius thật: src/state/events-jsonl-contiguity.mjs, scripts/events-jsonl-contiguity.mjs, scripts/check-events-seq-contiguity.mjs, registration trong src/setup/registrations.mjs, npm script trong package.json, và 4 test file liên quan (test/scripts/*contiguity*, cập nhật test/runner/concurrent-claim-eventlog-loss.test.mjs + test/state/replay.test.mjs nếu import) — seq không còn là identity sau Tầng A T1; thêm test grep-absence mới test/state/events-legacy-absence.test.mjs; chạy SAU khi con sweep đã merge về nhánh cha (thứ tự tuần tự theo D4).",
+    "footprint": [".gitattributes", "src/state/events-jsonl-contiguity.mjs", "scripts/events-jsonl-contiguity.mjs", "scripts/check-events-seq-contiguity.mjs", "src/setup/registrations.mjs", "package.json", "test/scripts/events-jsonl-contiguity.test.mjs", "test/scripts/check-events-seq-contiguity.test.mjs", "test/runner/concurrent-claim-eventlog-loss.test.mjs", "test/state/replay.test.mjs", "test/state/events-legacy-absence.test.mjs"],
+    "kind": "task",
+    "risk": "standard"
+  }
+]
+```
 
 ## Verify
 
