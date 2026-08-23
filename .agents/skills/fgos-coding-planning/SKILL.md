@@ -92,6 +92,8 @@ handed off, derive) the lane and record it into `plan.md` as `Mode:
 skip-and-advance short-circuit parses. Full mechanics:
 `references/bootstrap-and-lane.md`.
 
+**Skip-load check.** Once the lane is known, decide now, before Step 2: if it reads `tiny` or `small`, skip opening references/approach-and-shape.md and references/split-and-child-specs.md entirely — instead, write plan.md's Approach as one paragraph naming the chosen file(s), the one risk worth naming (or `none`), and the one command that proves it done, write Step 3's `## Outstanding questions` section as normal, then go straight to Step 4 (`references/verify-sync-and-gap.md` still applies for verify-sync at every lane — never skipped). For every other lane, continue to Step 2 below exactly as written, including opening its own reference file.
+
 ### Step 2: Approach
 Write the chosen path, alternatives rejected, a risk map, the files
 likely touched, and their order — informed by `fgos graph --json`'s

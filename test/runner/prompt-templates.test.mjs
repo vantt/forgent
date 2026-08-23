@@ -143,7 +143,7 @@ test('renderTemplate(worker-prompt-skill-pointer.txt, ...) golden output — no-
     feedbackSection: '',
     action: '(không có)',
     readFirst: '(không có)',
-    docsRefPointer: '(none)',
+    docsRefPointer: '',
     refs: 'src/widget.mjs, docs/specs/widget.md',
     verify: 'npm test',
     domain: 'coding',
@@ -167,7 +167,7 @@ governs how this work item must be done.
 
 # Files to read first
 (không có)
-(none)
+
 
 # Worktree boundary
 You are running on an isolated git worktree, checked out on its own branch for
