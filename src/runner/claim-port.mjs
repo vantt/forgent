@@ -7,7 +7,7 @@
 // This is the "one door" for claiming work — no direct moveWork(to:'doing')
 // calls outside this module except for FSM-internal transitions.
 
-import { moveWork, addOutcome, addDecision, readRawEvents, readRawEventsAndText, FsmError } from '../state/store.mjs';
+import { moveWork, addOutcome, addDecision, readRawEvents, FsmError } from '../state/store.mjs';
 import { foldEvents } from '../state/replay.mjs';
 import { isResolvedStatus, resolveRoot } from '../state/frontier.mjs';
 import { visitCount } from './anti-loop.mjs';
@@ -119,7 +119,17 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
   }
 
   try {
-    const { events: rawEvents, text: rawLog } = readRawEventsAndText(dir);
+    // Tầng A (T2/T3): events now live under baseline-0 (.fgos/events.jsonl)
+    // PLUS every per-writer file under .fgos/events/ -- readRawEvents(dir)
+    // is the one door that reads all of it, merged/deduped (TA-D7/TA-D13).
+    // Passing a single-file `rawLog` override into the checks call below
+    // (the old shape, back when there was only ever one file to read) would
+    // scope the truncation guard to baseline-0 only and silently skip every
+    // per-writer file (T5's own multi-file guard never sees rawLog !== null
+    // as anything but a deliberate single-file test injection) -- so this
+    // no longer passes one at all, letting the checks do their own real
+    // multi-file discovery from disk.
+    const rawEvents = readRawEvents(dir);
     // commitEnv (tsk-32v): this call runs right after acquiring
     // main-checkout-lock above (identity: process.pid) -- without threading
     // that same identity into the periodic checkpoint's own git commit,
@@ -127,7 +137,7 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
     // refuses it, silently leaving .fgos/events.jsonl staged-but-uncommitted
     // (the same self-collision confirmed live in merge.mjs's own two call
     // sites).
-    runOpportunisticMainCheckoutChecks(dir, repoRoot, { rawLog, commitEnv: { [HOLDER_PID_ENV_VAR]: String(process.pid) } });
+    runOpportunisticMainCheckoutChecks(dir, repoRoot, { commitEnv: { [HOLDER_PID_ENV_VAR]: String(process.pid) } });
     const view = foldEvents(rawEvents);
     const item = view.work[id];
 

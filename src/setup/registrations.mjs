@@ -1321,38 +1321,43 @@ function checkEventsCompactionVerified(cwd) {
     return { passed: true, message: 'no compactions recorded yet — nothing to verify' };
   }
 
+  // Never throws (same contract events-jsonl-contiguous/events-jsonl-not-
+  // truncated above already keep): a corrupt line in an archived original
+  // or the baseline itself is exactly the "tampering, partial restore, a
+  // bug" shape this check exists to catch, per its own doc comment above --
+  // it must surface as a normal `broken` finding, never crash the rest of
+  // `fgos doctor` (bin/fgos.mjs's doctor handler runs every check in one
+  // .map(), with no per-check try/catch of its own).
   const broken = [];
   for (const manifestName of manifestNames) {
-    let manifest;
     try {
-      manifest = JSON.parse(fs.readFileSync(path.join(archiveDirPath, manifestName), 'utf8'));
-    } catch (err) {
-      broken.push({ manifest: manifestName, reason: `manifest does not parse: ${err.message}` });
-      continue;
-    }
-    const baselinePath = path.join(eventsDirPath, manifest.baseline);
-    if (!fs.existsSync(baselinePath)) {
-      broken.push({ manifest: manifestName, reason: `baseline "${manifest.baseline}" is missing` });
-      continue;
-    }
-    const originalEntries = [];
-    let missingOriginal = null;
-    for (const name of manifest.originals ?? []) {
-      const originalPath = path.join(archiveDirPath, name);
-      if (!fs.existsSync(originalPath)) {
-        missingOriginal = name;
-        break;
+      const manifest = JSON.parse(fs.readFileSync(path.join(archiveDirPath, manifestName), 'utf8'));
+      const baselinePath = path.join(eventsDirPath, manifest.baseline);
+      if (!fs.existsSync(baselinePath)) {
+        broken.push({ manifest: manifestName, reason: `baseline "${manifest.baseline}" is missing` });
+        continue;
       }
-      originalEntries.push({ name, events: readEventsJsonLines(originalPath) });
-    }
-    if (missingOriginal) {
-      broken.push({ manifest: manifestName, reason: `archived original "${missingOriginal}" is missing` });
-      continue;
-    }
-    const candidateEvents = readEventsJsonLines(baselinePath);
-    const verify = verifyCompactionCandidate(originalEntries, candidateEvents);
-    if (!verify.ok) {
-      broken.push({ manifest: manifestName, reason: verify.reason });
+      const originalEntries = [];
+      let missingOriginal = null;
+      for (const name of manifest.originals ?? []) {
+        const originalPath = path.join(archiveDirPath, name);
+        if (!fs.existsSync(originalPath)) {
+          missingOriginal = name;
+          break;
+        }
+        originalEntries.push({ name, events: readEventsJsonLines(originalPath) });
+      }
+      if (missingOriginal) {
+        broken.push({ manifest: manifestName, reason: `archived original "${missingOriginal}" is missing` });
+        continue;
+      }
+      const candidateEvents = readEventsJsonLines(baselinePath);
+      const verify = verifyCompactionCandidate(originalEntries, candidateEvents);
+      if (!verify.ok) {
+        broken.push({ manifest: manifestName, reason: verify.reason });
+      }
+    } catch (err) {
+      broken.push({ manifest: manifestName, reason: `could not verify: ${err.message}` });
     }
   }
 

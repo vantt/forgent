@@ -385,18 +385,26 @@ export function runOpportunisticMainCheckoutChecks(
   if (breakFlagged) return;
 
   // D2: Event-count-based (or time-based) periodic auto-commit. Pathspecs
-  // cover baseline-0 always, plus `.fgos/events/` too (TA-D10) -- but only
-  // when that directory actually exists: `git add`/`git status` on a
-  // pathspec that matches nothing on disk is a hard error, unlike a
-  // directory that exists but happens to be empty.
+  // cover baseline-0 AND `.fgos/events/` (TA-D10) -- each ONLY when it
+  // actually exists on disk: `git add`/`git status` on a pathspec that
+  // matches nothing at all is a hard error (unlike a directory that exists
+  // but happens to be empty). Baseline-0 not existing is a real, if rare,
+  // case too (deleted post-migration, or any other reason) -- treating it
+  // as always-present here would silently skip the periodic commit the
+  // moment that happened, via the outer catch below swallowing git add's
+  // fatal error -- exactly the "silent event log loss" class this module
+  // exists to prevent.
   try {
     const logPath = path.join(fgosDir, "events.jsonl");
     const eventsDirPath = path.join(fgosDir, "events");
-    const pathspecs = [path.relative(realRepoRoot, logPath) || ".fgos/events.jsonl"];
+    const pathspecs = [];
+    if (fs.existsSync(logPath)) {
+      pathspecs.push(path.relative(realRepoRoot, logPath) || ".fgos/events.jsonl");
+    }
     if (fs.existsSync(eventsDirPath)) {
       pathspecs.push(path.relative(realRepoRoot, eventsDirPath));
     }
-    if (fs.existsSync(logPath) || pathspecs.length > 1) {
+    if (pathspecs.length > 0) {
       const statusOut = execFileSync("git", ["status", "--porcelain", "--", ...pathspecs], {
         cwd: realRepoRoot,
         encoding: "utf8",

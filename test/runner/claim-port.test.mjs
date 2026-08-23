@@ -484,10 +484,16 @@ test('claimWork invokes runOpportunisticMainCheckoutChecks non-blockingly and su
   const { repoRoot, dir } = setup();
   const guardPath = path.join(dir, 'events-jsonl.truncation-guard.json');
   const warnPath = path.join(dir, 'main-checkout-guard-warnings.jsonl');
-  const logPath = path.join(dir, 'events.jsonl');
+  const eventsDir = path.join(dir, 'events');
 
-  // Seed a guard mark
-  fs.writeFileSync(guardPath, JSON.stringify({ seq: 9999, hash: 'badhash' }));
+  // Tầng A/T5: the guard sidecar is now a map keyed by fileKey ("events.jsonl"
+  // for baseline-0, "events/<name>" for a per-writer file); setup()'s addWork
+  // wrote into a real per-writer file, so seed a deliberately-regressed mark
+  // for THAT file -- a real structural break the guard must still catch now
+  // that claimWork does its own real multi-file discovery (no more synthetic
+  // single-file `rawLog` injection).
+  const writerFileName = fs.readdirSync(eventsDir).find((f) => f.endsWith('.jsonl'));
+  fs.writeFileSync(guardPath, JSON.stringify({ [`events/${writerFileName}`]: { seq: 9999, hash: 'badhash' } }));
 
   // claimWork should succeed normally despite truncation break, and write warning
   const res = claimWork(dir, { id: 'item-a', actor: 'session', isolate: false, repoRoot });

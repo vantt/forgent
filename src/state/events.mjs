@@ -429,7 +429,11 @@ function appendEventCore(logPath, { type, payload = null } = {}) {
 
   // src: writer id (TA-D9), stamped before hashing so the hash covers it —
   // two real events from different writers are never byte-identical.
-  const src = resolveWriterIdentity(path.dirname(logPath)).id;
+  // String(): resolveWriterIdentity's id is a number for a PID-fallback
+  // writer (no env/registry identity available) -- stringified here so
+  // `src` always matches the type store.mjs's resolveWriterLogPath uses to
+  // build the `<writer-id>-<openTs>.jsonl` filename for the SAME writer.
+  const src = String(resolveWriterIdentity(path.dirname(logPath)).id);
   const unhashed = { seq, ts: new Date().toISOString(), type: type.trim(), payload, v: SCHEMA_VERSION, src };
   // h: 16-hex SHA-256 of the unhashed line content (TA-D1) — the event's
   // content-addressed identity, order-independent, deterministic.

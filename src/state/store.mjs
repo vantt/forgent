@@ -28,7 +28,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { parseEventLines, withEventsLock, appendEventLocked } from './events.mjs';
+import { withEventsLock, appendEventLocked } from './events.mjs';
 import { viewRevision, serializeView, readAllEventsFromDir, rebuildViewFromDir, buildSnapshotFromDir } from './replay.mjs';
 import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, classifyStalePostDelivery, footprintOverlapAmong, goalScopedCriticalPath, goalScopedGreedyTopUnblock, computeSchedule, detectCycles } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './status-fsm.mjs';
@@ -1562,25 +1562,6 @@ export function computedSchedule(dir, candidateIds) {
  */
 export function readRawEvents(dir) {
   return readAllEvents(dir);
-}
-
-// KNOWN GAP (Tầng A/T2, tracked for a later task): still reads only
-// baseline-0 — a caller relying on `text` (the byte-for-byte log content,
-// e.g. for a truncation/tail check) sees just the frozen legacy file, never
-// events written into `.fgos/events/` post-cutover. `events` below is
-// therefore also baseline-0-only, unlike `readRawEvents` above. No test
-// exercises this multi-file gap yet; `src/runner/claim-port.mjs` is the one
-// caller today.
-export function readRawEventsAndText(dir) {
-  const { logPath } = paths(dir);
-  let text = '';
-  try {
-    text = fs.readFileSync(logPath, 'utf8');
-  } catch (err) {
-    if (err.code === 'ENOENT') return { events: [], text: '' };
-    throw err;
-  }
-  return { events: parseEventLines(text, logPath), text };
 }
 
 /**
