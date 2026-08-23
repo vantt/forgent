@@ -48,7 +48,7 @@ if it's actually a problem; this step is a courtesy heads-up, not a
 second gate.
 
 ### Step 3: Start the loop
-Invoke the `loop` skill with `prompt: "/fgOS:merge-next"` — or, when
+Invoke the `loop` skill with `prompt: "/fgOS:merge-loop"` (self-referencing so every wake reloads this skill's own Step 4-6 decision logic; a bare verb name does not reload the originating skill's text, per ScheduleWakeup's contract — see `RESEARCH.md`) — or, when
 Step 1 parsed one or more of the three flags, forward the same explicit
 budget on every iteration, not just the first one — and no fixed
 interval, let it self-pace dynamically. Each `/fgOS:merge-next` call runs
