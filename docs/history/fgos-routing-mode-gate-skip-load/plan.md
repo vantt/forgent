@@ -192,7 +192,7 @@ skill's `name`/`description` frontmatter changes, the only thing that
 generator regenerates.
 
 ```
-npm test && \
+FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test $(git ls-files 'test/**/*.test.mjs' | grep -v '^test/setup/registrations.test.mjs$') && \
 grep -q 'skip opening references/approach-and-shape.md and references/split-and-child-specs.md' .agents/skills/fgos-coding-planning/SKILL.md && \
 grep -q 'skip opening references/gate-tier-a-b-triggers.md' .agents/skills/fgos-coding-validating/SKILL.md && \
 grep -q 'skip opening references/worker-contract-and-orient.md' .agents/skills/fgos-coding-implement/SKILL.md && \
@@ -200,6 +200,20 @@ grep -q 'invoked skill may itself skip opening its own reference files' .agents/
 ! grep -q 'which this decision does not make' .agents/skills/fgos-routing/SKILL.md && \
 ! git diff --name-only main...HEAD -- . | grep -q '^src/'
 ```
+
+**Amended at Execute (2026-08-23), by the driving session, human-confirmed:**
+plain `npm test` was found to be red on this branch AND on `main` for two
+pre-existing, unrelated failures (`test/setup/registrations.test.mjs`'s
+Data Dictionary #7/#7b: `no-stuck-merge-abort` is registered as a doctor
+check+fix in `src/setup/registrations.mjs` but missing from
+`docs/specs/distribution.md`'s own enumerated list rows — a doc-sync gap,
+not a functional break, and out of this item's own declared scope). The
+`node --test` invocation above excludes exactly that one file (dynamically,
+via `git ls-files`, so it stays correct as new test files are added) rather
+than dropping test coverage generally — confirmed green (`exit=0`) against
+this branch's real tree before being adopted. The doc-sync gap itself is
+left for a separate item/session, per explicit human decision at this
+Gate reopening.
 
 The four `grep -q` lines are the POSITIVE (each new deliverable pinned by
 a long, distinctive phrase this plan itself commits to — pitfall #5 in
