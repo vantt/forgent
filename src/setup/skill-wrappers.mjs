@@ -21,6 +21,20 @@ import path from 'node:path';
 
 const FRONTMATTER_PATTERN = /^---\r?\n[\s\S]*?\r?\n---\r?\n/;
 
+// `fs.copyFileSync` truncates the destination in place before writing it,
+// so a concurrent reader of that same destination (e.g. a sibling `fgos
+// setup` process assembling/reading the same shared `packageRoot/.agents/
+// skills/*`, tsk-25b) can observe a momentarily-empty or partially-written
+// file. `rename` within the same directory is atomic on POSIX filesystems,
+// so a reader always sees either the old file or the fully-written new
+// one, never a partial state. Same tmp-then-rename shape every other
+// atomic write in this repo already uses.
+function atomicCopyFileSync(sourcePath, targetPath) {
+  const tmpPath = `${targetPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  fs.copyFileSync(sourcePath, tmpPath);
+  fs.renameSync(tmpPath, targetPath);
+}
+
 // Marker line unique to a wrapper this module itself generated. `.claude/
 // skills/*` is not an exclusively-generated tree (a hand-authored or
 // plugin-installed skill can live there directly, never routed through
@@ -112,7 +126,7 @@ export function generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot) {
         if (subEntry.isDirectory()) {
           copyDirRecursive(subSource, subTarget);
         } else {
-          fs.copyFileSync(subSource, subTarget);
+          atomicCopyFileSync(subSource, subTarget);
         }
       }
     }
@@ -142,7 +156,7 @@ function copyDirRecursive(sourceDir, targetDir) {
     if (entry.isDirectory()) {
       copyDirRecursive(sourcePath, targetPath);
     } else {
-      fs.copyFileSync(sourcePath, targetPath);
+      atomicCopyFileSync(sourcePath, targetPath);
     }
   }
 }
@@ -256,7 +270,7 @@ export function assembleSkills(projectRoot, targetAgentsSkills, { prune = true }
       copyDirRecursive(sourcePath, targetPath);
     } else {
       fs.mkdirSync(agentsSkillsRoot, { recursive: true });
-      fs.copyFileSync(sourcePath, targetPath);
+      atomicCopyFileSync(sourcePath, targetPath);
     }
     assembled.push(targetPath);
   }
