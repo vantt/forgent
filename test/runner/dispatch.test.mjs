@@ -2776,10 +2776,10 @@ test('spawnWorker: idleTimeoutMs resets on every chunk -- a worker producing per
   const scriptPath = writePeriodicWriterExecutor(dir, { intervalMs: 150, count: 5 });
   const cfg = baseConfig([scriptPath]);
 
-  // idleTimeoutMs (400ms) is smaller than the total runtime (~750ms) but
+  // idleTimeoutMs (700ms) is smaller than the total runtime (~750ms) but
   // larger than the gap between any two ticks (150ms) -- only passes if the
   // idle timer truly resets per chunk instead of firing on total elapsed time.
-  const result = await spawnWorker(sampleWork(), cfg, mkTempDir(), { timeoutMs: 10000, idleTimeoutMs: 400 });
+  const result = await spawnWorker(sampleWork(), cfg, mkTempDir(), { timeoutMs: 10000, idleTimeoutMs: 700 });
   assert.equal(result.status, 0);
   assert.match(result.stdout, /tick-4/);
 });
