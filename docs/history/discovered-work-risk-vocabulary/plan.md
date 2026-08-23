@@ -156,3 +156,15 @@ npm test -- test/runner/loop.test.mjs test/e2e/domain-aware-stage-literals.test.
 ## Outstanding questions
 
 None
+
+## Gate
+
+`fgos gate-check` returned `canAutoApprove: false` — the hard-gate
+keyword floor tripped on "schema" in the item's own original
+title/description (`HEAVY_KEYWORDS`, `src/intake/risk-keywords.mjs:20`).
+Every occurrence is about the `fgos-discovered` JSON message-format
+block shape (worker↔runner contract), not a database/data-model schema
+migration — confirmed a false positive with the user live, 2026-08-23.
+Human-approved at the Gate on that basis; reality gate (all PASS),
+feasibility matrix (empty — no medium+ risk rows), and cost verdict
+(`REVERSIBLE` — no T1/T2/T3 trigger) all independently supported READY.
