@@ -100,6 +100,10 @@ export function buildPrompt(work, feedback, stage = 'executing') {
   const action = typeof work.action === 'string' && work.action.trim() ? work.action : '(không có)';
   const readFirst =
     Array.isArray(work.footprint) && work.footprint.length ? work.footprint.join(', ') : '(không có)';
+  const docsRefPointer =
+    typeof work.docsRef === 'string' && work.docsRef.trim()
+      ? `${work.docsRef.replace(/\/+$/, '')}/plan.md and .../CONTEXT.md (if present) — the locked decisions and chosen approach for this item`
+      : '(none)';
 
   // Skill-pointer vars (str91-runner-skill-convergence D6/D7): resolved once
   // here via the SAME domain registry `fgos-routing`/STR89 already use, never
@@ -120,6 +124,7 @@ export function buildPrompt(work, feedback, stage = 'executing') {
     feedbackSection,
     action,
     readFirst,
+    docsRefPointer,
     refs,
     verify: work.verify,
     domain: domainName,
