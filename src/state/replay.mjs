@@ -716,6 +716,84 @@ export function rebuildView(logPath) {
   return foldEvents(events);
 }
 
+// Tầng A/T3 (TA-D3/TA-D7/TA-D12/TA-D13): reads events, alongside their own
+// raw line text, from one file — via `readEvents` for parsing (same
+// corrupt-log fail-closed guarantee every other reader here gets), and a
+// second raw read for the exact line content dedupe below needs. A missing
+// file (never written yet) contributes nothing, same as `readEvents`.
+function readFileWithRawLines(filePath) {
+  const events = readEvents(filePath);
+  if (events.length === 0) return [];
+  const raw = fs.readFileSync(filePath, 'utf8');
+  const lines = raw.split('\n');
+  if (lines[lines.length - 1] === '') lines.pop();
+  return events.map((ev, i) => ({ ev, raw: lines[i] }));
+}
+
+/**
+ * The multi-file discovery step (TA-D2's read side): `dir` is the same
+ * `.fgos`-shaped directory `rebuildView`'s callers resolve `events.jsonl`
+ * from. Discovers baseline-0 (`${dir}/events.jsonl`, frozen legacy content
+ * per TA-D12 — never appended to once a writer file exists) plus every
+ * `*.jsonl` file directly under `${dir}/events/` (a non-recursive
+ * `readdirSync` + `isFile()` filter structurally excludes any subdirectory
+ * there, including a future `archive/`), merges them into the TA-D7 total
+ * order `(ts, file, seq)` — baseline-0 sorts under the empty-string file
+ * tag, which is always lexicographically first on a tie — then dedupes:
+ * TA-D9 (per T1)'s content-hash `h` is a new-format event's identity;
+ * baseline-0 lines predate `h` and dedupe by their own raw line text
+ * instead (same precedent `events-jsonl-contiguity.mjs`'s `fixContiguity`
+ * already uses). First occurrence in total order wins. No compaction
+ * exists yet (that's T6) to ever actually produce a duplicate today — this
+ * is the mechanism T6 lands on top of, per TA-D13.
+ */
+export function readAllEventsFromDir(dir) {
+  const baselinePath = path.join(dir, 'events.jsonl');
+  const eventsDirPath = path.join(dir, 'events');
+
+  const tagged = [];
+  for (const entry of readFileWithRawLines(baselinePath)) tagged.push({ ...entry, file: '' });
+
+  let files = [];
+  try {
+    files = fs
+      .readdirSync(eventsDirPath, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name.endsWith('.jsonl'))
+      .map((entry) => entry.name);
+  } catch (err) {
+    if (err.code !== 'ENOENT') throw err;
+  }
+  for (const file of files) {
+    for (const entry of readFileWithRawLines(path.join(eventsDirPath, file))) tagged.push({ ...entry, file });
+  }
+
+  tagged.sort((a, b) => {
+    if (a.ev.ts !== b.ev.ts) return a.ev.ts < b.ev.ts ? -1 : 1;
+    if (a.file !== b.file) return a.file < b.file ? -1 : 1;
+    return (a.ev.seq ?? 0) - (b.ev.seq ?? 0);
+  });
+
+  const seen = new Set();
+  const result = [];
+  for (const { ev, raw } of tagged) {
+    const key = typeof ev.h === 'string' && ev.h ? `h:${ev.h}` : `line:${raw}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push(ev);
+  }
+  return result;
+}
+
+/**
+ * `rebuildView`'s multi-file counterpart: folds `readAllEventsFromDir`'s
+ * merged, deduped stream. No incremental fast path yet (always a full
+ * discovery + fold) — T4 defines the multi-file anchor shape that restores
+ * one; wrong-in-doubt here only costs a slower read, never a wrong view.
+ */
+export function rebuildViewFromDir(dir) {
+  return foldEvents(readAllEventsFromDir(dir));
+}
+
 /**
  * Deterministic fingerprint of a folded view (work-graph-intelligence S3).
  * Reuses the C1 `data_hash` pattern (`envelope.mjs` wrapEnvelope) — the

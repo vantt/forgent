@@ -28,8 +28,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { readEvents, parseEventLines, withEventsLock, appendEventLocked, readLastLineBefore } from './events.mjs';
-import { foldEvents, viewRevision, serializeView } from './replay.mjs';
+import { parseEventLines, withEventsLock, appendEventLocked, readLastLineBefore } from './events.mjs';
+import { viewRevision, serializeView, readAllEventsFromDir, rebuildViewFromDir } from './replay.mjs';
 import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, classifyStalePostDelivery, footprintOverlapAmong, goalScopedCriticalPath, goalScopedGreedyTopUnblock, computeSchedule, detectCycles } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './status-fsm.mjs';
 import { transitionStage } from './stage-fsm.mjs';
@@ -137,44 +137,17 @@ function resolveWriterLogPath(dir) {
   return path.join(dirPath, `${prefix}${formatCompactTs(new Date())}.jsonl`);
 }
 
-// The merged raw event stream a view is folded from (TA-D3/TA-D7): baseline-0
-// (frozen legacy, still the real source for any event written before cutover)
-// plus every per-writer file under `.fgos/events/`, in total order
-// `(ts, file, seq)` — deterministic and order-independent of readdir order.
-// A stand-in for T3's own discovery step in replay.mjs; T3 formalizes this
-// (dedupe-by-hash, `archive/` exclusion) and every raw reader below routes
-// through it so there is exactly one place that knows about both file shapes.
+// Tầng A/T3: the multi-file discovery + total-order + dedupe step now
+// lives in replay.mjs (`readAllEventsFromDir`/`rebuildViewFromDir`) — this
+// module only ever passes `dir` through. `readAllEvents`/`currentView` are
+// the ONE pair of names every reader below still calls, unchanged from T2,
+// so this handoff touched no call site.
 function readAllEvents(dir) {
-  const { logPath: baselinePath } = paths(dir);
-  const dirPath = eventsDirOf(dir);
-  const tagged = [];
-  for (const ev of readEvents(baselinePath)) tagged.push({ ev, file: '' });
-  let files = [];
-  try {
-    files = fs
-      .readdirSync(dirPath, { withFileTypes: true })
-      .filter((entry) => entry.isFile() && entry.name.endsWith('.jsonl'))
-      .map((entry) => entry.name);
-  } catch (err) {
-    if (err.code !== 'ENOENT') throw err;
-  }
-  for (const file of files) {
-    for (const ev of readEvents(path.join(dirPath, file))) tagged.push({ ev, file });
-  }
-  tagged.sort((a, b) => {
-    if (a.ev.ts !== b.ev.ts) return a.ev.ts < b.ev.ts ? -1 : 1;
-    if (a.file !== b.file) return a.file < b.file ? -1 : 1;
-    return (a.ev.seq ?? 0) - (b.ev.seq ?? 0);
-  });
-  return tagged.map((t) => t.ev);
+  return readAllEventsFromDir(dir);
 }
 
-// The one replacement for `currentView(dir)` throughout this module:
-// folds the SAME multi-file merged stream `readAllEvents` produces, so every
-// reader (mutation preconditions and pure read-facades alike) sees writes
-// from every writer's own file, not just baseline-0.
 function currentView(dir) {
-  return foldEvents(readAllEvents(dir));
+  return rebuildViewFromDir(dir);
 }
 
 function writeView(viewPath, view, snapshot) {
