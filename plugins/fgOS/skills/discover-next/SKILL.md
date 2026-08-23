@@ -112,9 +112,9 @@ bottom tier) now has its own dedicated picker — see `/fgOS:plan-next`.
    `/fgOS:discover-loop`'s own stop rule keys on. Read the category off
    that relayed line, never off a process exit code.
 
-6. **Optional: rename the herdr pane.** Before step 4, if the `id` and
-   `stage` are already known, calling `/fgOS:terminal <id>` for
-   observability is a nice-to-have, never required — it always exits `0`
-   and does nothing when the session isn't inside a herdr-managed pane
-   (per that skill's own contract). Skip it entirely if it adds friction;
-   the core shape above works identically without it.
+Pane labeling is deliberately absent from this command (tsk-3ac). It used
+to carry an optional rename call of its own; that call is now pinned in one
+place, `fgos-coding-driving`, which `/fgOS:discover` dispatches at its own
+step 3 — so a pane launched through this command still gets labeled, one
+tier down, without this command knowing anything about panes. Do not
+reintroduce a rename call here.

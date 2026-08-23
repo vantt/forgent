@@ -8,7 +8,7 @@ is logically broken — it always evaluates `true` regardless of the real
 child/target statuses. Fix the jq expression only; no other behavior
 (enumeration, guard, `--dir` resolution, D3's resolved-set default) changes.
 
-## Quyết định đã chốt
+## Locked decisions
 
 | D-ID | Quyết định |
 |------|-----------|

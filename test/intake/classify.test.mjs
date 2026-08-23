@@ -23,8 +23,9 @@ test('deriveTitle truncates long text with no natural boundary at a word edge', 
   const longText = 'word '.repeat(30).trim();
   const title = deriveTitle(longText);
   assert.ok(title.length <= MAX_TITLE_LENGTH);
-  assert.equal(longText.startsWith(title), true);
-  assert.equal(title.endsWith(' '), false);
+  assert.equal(title.endsWith('…'), true);
+  assert.equal(longText.startsWith(title.slice(0, -1)), true);
+  assert.equal(title.slice(0, -1).endsWith(' '), false);
 });
 
 test('deriveTitle bounds a first sentence that runs past the title bound', () => {
@@ -33,7 +34,8 @@ test('deriveTitle bounds a first sentence that runs past the title bound', () =>
   const runOn = `${'word '.repeat(40).trim()}. A second sentence.`;
   const title = deriveTitle(runOn);
   assert.ok(title.length <= MAX_TITLE_LENGTH);
-  assert.equal(runOn.startsWith(title), true);
+  assert.equal(title.endsWith('…'), true);
+  assert.equal(runOn.startsWith(title.slice(0, -1)), true);
 });
 
 test('deriveTitle leaves a sentence already within the bound untouched', () => {

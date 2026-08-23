@@ -35,7 +35,7 @@ Vòng `clarify` của chính item này bổ sung D9–D14. Vòng `decompose` c�
 - Sửa luật cấm ad-hoc delegation của `tsk-29i` — D2 đã chốt là **không
   cần sửa**.
 
-## Quyết định đã khoá
+## Locked decisions
 
 ### Từ vòng shaping (`DISCUSSION.md`)
 

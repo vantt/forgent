@@ -40,7 +40,7 @@ Tách 3 trục độc lập, đúng đề xuất gốc tsk-19j:
 (xem D10). `docs/specs/work-state.md:356-358` — doc-drift riêng (mô tả
 `discover` cũ, đã lỗi thời sau tsk-2b0), không thuộc scope này.
 
-## 2. Quyết định đã khoá (D1-D10, giữ đủ lịch sử — D4-D8 đã bị supersede, không xoá)
+## Locked decisions (D1-D10, giữ đủ lịch sử — D4-D8 đã bị supersede, không xoá)
 
 | ID | Quyết định | Trạng thái |
 |---|---|---|

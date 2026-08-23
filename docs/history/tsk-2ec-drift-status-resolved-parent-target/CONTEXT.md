@@ -3,7 +3,7 @@
 Item: `tsk-2ec`. Written retroactively (same structural gap as this scan's
 other items).
 
-## Decisions
+## Locked decisions
 
 - **D0.** Root cause confirmed by reading `src/state/drift-status.mjs:65`
   in full: `targetBranch = rootItem?.parent ? \`fgw/${rootItem.parent}\` :

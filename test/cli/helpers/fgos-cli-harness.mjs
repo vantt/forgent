@@ -306,7 +306,7 @@ function addGoalItem(cwd, id, goalTier = 'mvp') {
 function toProposed(cwd, id) {
   addOk(cwd, id);
   run(cwd, ['move', id, '--to', 'doing']);
-  return run(cwd, ['move', id, '--to', 'awaiting-approval']);
+  return run(cwd, ['move', id, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 }
 
 // Walk awaiting-approval -> delivered -> retrospective -> cleanup -> done via
@@ -495,7 +495,7 @@ function makeRunnerProposedItem(cwd, id, extra = {}) {
   gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${id}`]);
   gitAtCwd(cwd, ['checkout', 'main']);
 
-  run(cwd, ['move', id, '--to', 'awaiting-approval']);
+  run(cwd, ['move', id, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
   commitPending(cwd, `state: propose ${id}`);
 }
 
@@ -555,7 +555,7 @@ function makeRunnerProposedLeafItem(cwd, rootId, leafId, extra = {}) {
   gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${leafId}`]);
   gitAtCwd(cwd, ['checkout', 'main']);
 
-  run(cwd, ['move', leafId, '--to', 'awaiting-approval']);
+  run(cwd, ['move', leafId, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
   commitPending(cwd, `state: propose ${leafId}`);
 }
 
@@ -585,7 +585,7 @@ function makeRunnerProposedItemTouching(cwd, id, relPath, extra = {}) {
   gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${id}`]);
   gitAtCwd(cwd, ['checkout', 'main']);
 
-  run(cwd, ['move', id, '--to', 'awaiting-approval']);
+  run(cwd, ['move', id, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
   commitPending(cwd, `state: propose ${id}`);
 }
 
@@ -675,7 +675,7 @@ function makeMilestone(cwd, id, targets) {
   const dir = path.join(cwd, '.fgos');
   addWork(dir, { id, title: `Title ${id}`, kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', targets });
   run(cwd, ['move', id, '--to', 'doing']);
-  run(cwd, ['move', id, '--to', 'awaiting-approval']);
+  run(cwd, ['move', id, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
   commitPending(cwd, `state: propose ${id}`);
 }
 
@@ -762,7 +762,7 @@ function addBareOrigin(cwd) {
 function makeLegacyProposedItem(cwd, id) {
   addOk(cwd, id);
   run(cwd, ['move', id, '--to', 'doing']);
-  run(cwd, ['move', id, '--to', 'awaiting-approval']);
+  run(cwd, ['move', id, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 }
 
 // --- catchup (D6/D7/D11: unified catch-up-by-merge for a merge-related park) ---
@@ -915,7 +915,7 @@ function makeSessionSafeRunnerItem(cwd, id, extra = {}) {
   gitAtCwd(cwd, ['add', `${id}-produced.txt`]);
   gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${id}`]);
   gitAtCwd(cwd, ['checkout', 'main']);
-  run(cwd, ['move', id, '--to', 'awaiting-approval']);
+  run(cwd, ['move', id, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 }
 
 // --- approve ad-hoc (unregistered) worktree guard (P44) --------------------

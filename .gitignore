@@ -65,3 +65,7 @@ output.txt
 
 # Rust build output
 /herdr-plugin/target/
+# tsk-48w: herdr-plugin/web's bundled output, embedded into the binary at
+# compile time (RustEmbed) -- never committed, herdr-plugin/build.rs
+# guarantees this directory exists even when npm run bundle hasn't run.
+/herdr-plugin/static/

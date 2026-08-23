@@ -4,9 +4,11 @@ description: >-
   Use when the user wants an existing design document distilled straight
   into fgos-coding-shaping's DISCUSSION.md shape, without a live
   back-and-forth conversation, from inside a Claude Code session, invoked as
-  /fgOS:coding-shape-distill <doc-path>. Dispatches into fgos-coding-shaping's
-  distill entry -- never writes .fgos/ state or docs/history/ content
-  directly itself.
+  /fgOS:coding-shape-distill <doc-path> [id]. With id, distills into that
+  existing item; without id, fgos-coding-shaping auto-creates a new item via
+  submit, using the doc's own title/first line. Dispatches into
+  fgos-coding-shaping's distill entry -- never writes .fgos/ state or
+  docs/history/ content directly itself.
 ---
 
 # fgOS coding-shape-distill
@@ -21,17 +23,23 @@ section it fills, every judgment about what's still open belongs to
 
 ## Steps
 
-1. **Read the `<doc-path>` argument.** The text after
+1. **Read the `<doc-path> [id]` arguments.** The first token after
    `/fgOS:coding-shape-distill` is the path to an existing design document
    — a prior report, a spec, notes from outside this session. If it is
    empty, ask the user for the path before doing anything else;
    `fgos-coding-shaping`'s distill mode requires a real source document to
    extract from, not free text to discuss live (use `/fgOS:coding-shape`
-   for that instead).
+   for that instead). An optional second token is an existing item id to
+   distill into; pass both through unexamined, do not validate the id here
+   — that is `fgos-coding-shaping`'s own claim step to resolve.
 
 2. **Invoke `fgos-coding-shaping` in distill mode**, passing the
-   `<doc-path>` through unexamined. It reads the source document in full,
-   extracts §2–§7 of `DISCUSSION.md` from it (goal, resolved/open
+   `<doc-path>` and the optional `id` through unexamined. With an `id`,
+   `fgos-coding-shaping` claims that existing item and distills into it —
+   no `fgos submit` call. Without one, it auto-creates a new item via
+   `fgos submit`, using the doc's own title/first line as the submitted
+   text, then claims that. Either way it then reads the source document in
+   full, extracts §2–§7 of `DISCUSSION.md` from it (goal, resolved/open
    questions, decisions — each still getting a real `fgos decision`
    call — a freshly synthesized §6, and the task breakdown in §7), and
    records the extraction itself as a single §5 entry rather than a

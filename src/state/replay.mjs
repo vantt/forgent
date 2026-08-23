@@ -72,7 +72,7 @@ function applyEvent(view, event) {
       break;
     }
     case 'work.move': {
-      const { id, from, to, ask, answer, role, learning, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, reason, parentSnapshotAtAsk, claimTrigger, statusAtAsk, writer, statusCategory, parkReason, rationale, alternatives, source, askRationale, askAlternatives, askSource } = event.payload ?? {};
+      const { id, from, to, ask, answer, role, learning, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, mergedSha, mergedInto, reason, parentSnapshotAtAsk, claimTrigger, statusAtAsk, writer, statusCategory, parkReason, rationale, alternatives, source, askRationale, askAlternatives, askSource } = event.payload ?? {};
       const item = view.work[id];
       if (item) {
         item.status = to;
@@ -195,6 +195,17 @@ function applyEvent(view, event) {
       // whichever field the move actually carried.
       if (item && to === 'awaiting-approval' && branchHeadAtReturn !== undefined) {
         item.branchHeadAtReturn = branchHeadAtReturn;
+      }
+      // Merge-evidence provenance (tsk-5dk), same fold-onto-item shape as
+      // headAtReturn/branchHeadAtReturn above, gated on THIS move's own
+      // `to === 'delivered'` — a hand-typed move (or a verify-only
+      // pull-door delivery) never carries these, so their absence on the
+      // folded item is itself evidence, not a gap.
+      if (item && to === 'delivered' && mergedSha !== undefined) {
+        item.mergedSha = mergedSha;
+      }
+      if (item && to === 'delivered' && mergedInto !== undefined) {
+        item.mergedInto = mergedInto;
       }
       // Human-gate ask/answer (per async-human-gate D2/D5), mirroring the
       // work.outcome lazy-key/merge-by-id precedent above: the ask (entry
@@ -459,6 +470,69 @@ function applyEvent(view, event) {
       }
       break;
     }
+    case 'work.handoff': {
+      // Additive event type (tsk-2t9c D1/D4/D8): an ASYNC call — the item
+      // parks for another role, `holder` changes. Two lazy structures,
+      // same absent-key-means-never-happened shape `view.outcomes`/
+      // `view.discovery` already use: `view.work[id].holder` is a
+      // latest-write-wins field (mirrors `item.stage` above); `callThreads`
+      // is an APPEND-only per-id log (mirrors `view.discovery`), the
+      // record a replaying reader needs to derive open-call depth for the
+      // callstack cap (src/state/handoff.mjs's own `openCallDepth` input
+      // is computed by the caller from this array, never stored as a
+      // counter field — a counter can drift from the log; a fold cannot).
+      const raw = event.payload ?? {};
+      const id = raw.id;
+      // tsk-397 D16 renamed the coding roleGraph's 'human-advisor' role to
+      // 'advisor'. events.jsonl is append-only and already carries real
+      // pre-rename 'human-advisor' handoffs (e.g. seq 18440, tsk-1yf) --
+      // without this normalization, replay reconstructs a `holder` value
+      // the new vocabulary rejects (WorkValidationError on any later write
+      // to that item), permanently stranding it. Map the retired literal
+      // forward on both fields a reader might compare against the current
+      // roleGraph vocabulary -- `from`/`to` are historical record either
+      // way, so normalizing here (not just `to`) keeps replay internally
+      // consistent instead of only patching the field that happens to
+      // throw today.
+      const normalizeRole = (role) => (role === 'human-advisor' ? 'advisor' : role);
+      const from = normalizeRole(raw.from);
+      const to = normalizeRole(raw.to);
+      const { reason, mode, returning, note } = raw;
+      const item = view.work[id];
+      if (item && typeof to === 'string') {
+        item.holder = to;
+      }
+      if (typeof id === 'string') {
+        if (!view.callThreads) {
+          view.callThreads = {};
+        }
+        view.callThreads[id] = [
+          ...(view.callThreads[id] ?? []),
+          { kind: 'handoff', from, to, reason, mode: mode ?? 'async', returning: Boolean(returning), note: note ?? null, ts: event.ts },
+        ];
+      }
+      break;
+    }
+    case 'work.call-summary': {
+      // Additive event type (tsk-2t9c D8): a SYNC in-session call
+      // (subagent) — the ball never leaves the session, so `holder` is
+      // deliberately left untouched here (the D8 invariant: holder
+      // changes only via work.handoff above). A compact record still
+      // folds into the same `callThreads[id]` array so compound-learn can
+      // see the full team-interaction picture without the state machine
+      // ever treating a sync call as a role change.
+      const { id, calleeRole, reason, outcome } = event.payload ?? {};
+      if (typeof id === 'string') {
+        if (!view.callThreads) {
+          view.callThreads = {};
+        }
+        view.callThreads[id] = [
+          ...(view.callThreads[id] ?? []),
+          { kind: 'call-summary', calleeRole, reason, outcome: outcome ?? null, ts: event.ts },
+        ];
+      }
+      break;
+    }
     case 'work.discovery': {
       // Additive event type (per stage-clarify D3/D6) — mirrors work.friction
       // below: each context-discovery verdict is its own occurrence (pass or
@@ -540,32 +614,35 @@ function applyEvent(view, event) {
       }
       break;
     }
-    case 'tool.register': {
-      // Additive event type (tsk-1dj, tool-registry-capability port): a full
-      // record OVERWRITE keyed by name, mirroring work.add's per-id shape —
-      // register never merges partial fields (there is no `tool.edit`).
-      // `tools` is a LAZY key exactly like `outcomes`/`frictions`/`gates`:
-      // absent from the view until the first tool.register event folds
-      // (backward-compat).
-      const tool = event.payload;
-      if (tool && typeof tool === 'object' && typeof tool.name === 'string') {
-        if (!view.tools) {
-          view.tools = {};
+    case 'work.resolve-park-reason': {
+      // Clears reason/parkReason from the live item view on terminal items,
+      // and records the note additively in view.parkResolutions[id].
+      const { id, writer } = event.payload ?? {};
+      const item = view.work[id];
+      if (item) {
+        delete item.reason;
+        delete item.parkReason;
+        if (writer !== undefined) {
+          item.writer = writer;
         }
-        view.tools[tool.name] = { ...tool };
+      }
+      if (typeof id === 'string') {
+        if (!view.parkResolutions) {
+          view.parkResolutions = {};
+        }
+        view.parkResolutions[id] = [
+          ...(view.parkResolutions[id] ?? []),
+          { ...event.payload, ts: event.ts },
+        ];
       }
       break;
     }
-    case 'tool.remove': {
-      // Mirrors tool.register above — deletes the keyed entry outright
-      // (never a tombstone/soft-delete); a remove for a name that was never
-      // registered, or already removed, is a no-op guarded by `view.tools`.
-      const { name } = event.payload ?? {};
-      if (typeof name === 'string' && view.tools) {
-        delete view.tools[name];
-      }
-      break;
-    }
+    // tsk-in1-1 D1: `tool.register`/`tool.remove` retired — a tool provider
+    // is now declared directly in `runner.executors.<id>` (config-edited,
+    // never event-sourced). Historical events of either type already in
+    // `.fgos/events.jsonl` fall through to `default` below and are skipped,
+    // same forward-compatible "unknown type, not an error" treatment any
+    // other retired event type gets.
     default:
       // Forward-compatible: an event type this view does not (yet) know how
       // to fold is skipped, not an error — readEvents already guarantees
@@ -653,6 +730,13 @@ export function rebuildView(logPath) {
  * called on that pure shape (the on-disk `state.json` stamps this hash as a
  * sibling field; it is never folded back into the view a rebuild returns).
  */
-export function viewRevision(view) {
-  return createHash('sha256').update(JSON.stringify(view)).digest('hex');
+export function serializeView(view) {
+  const viewStr = JSON.stringify(view);
+  const revision = createHash('sha256').update(viewStr).digest('hex');
+  return { viewStr, revision };
 }
+
+export function viewRevision(view) {
+  return serializeView(view).revision;
+}
+

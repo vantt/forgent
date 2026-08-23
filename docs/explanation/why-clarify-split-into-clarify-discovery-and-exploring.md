@@ -1,7 +1,7 @@
 ---
 type: explanation
 title: Why `clarify` split into `clarify`, `discovery`, and `exploring`
-source_capture_ids: [tsk-4b2, tsk-12p, tsk-4v6]
+source_capture_ids: [tsk-4b2, tsk-12p, tsk-4v6, tsk-30v]
 ---
 # Why `clarify` split into `clarify`, `discovery`, and `exploring`
 
@@ -163,7 +163,7 @@ a signal to observe, not a judgment call made in advance.
 - **Amending `tsk-29i`'s anti-ad-hoc-delegation rule** — considered and
   explicitly rejected as unnecessary: that rule only forbids ad hoc
   sub-dispatch and points toward routing explicitly through the
-  capacity-dispatch mechanism — the new research skill's own contract
+  executor-dispatch mechanism — the new research skill's own contract
   *is* that mechanism, so nothing about the existing rule needed to
   change.
 
@@ -355,3 +355,96 @@ making the dispatcher that *already* runs against that state honor the
 same contract another dispatcher already honors (`tsk-4v6`, this piece)
 — and confirming the second claim needs its own read of the dispatcher's
 code, not an inference from the first claim being fixed.
+
+## Implementation (`tsk-30v`): the edge choice itself finally reads the verdict, not just the stage
+
+Named at the time as the DoD of this whole cluster — every sibling piece
+above (`tsk-4b2`, `tsk-4v6`, and the rest) was groundwork or polish until
+this one landed. Before `tsk-30v`, `nextDiscoveryEdge` chose its edge
+**purely by stage**: a clear verdict still walked the full linear chain
+`clarify → discovery → exploring`, and an unclear verdict just parked in
+place — the verdict itself never participated in which edge got taken,
+even though both alternative edges already existed as valid FSM
+transitions (`workflow-stage-graphs.mjs`'s transitions array simply
+wasn't read that way).
+
+The fix, from the commit's own message
+(`ee0cc0215e45da4ee61456ea6ef7dbef4c8f8ce2`, `feat(discovery):
+verdict-driven edge selection at the discovery stage`):
+
+> `nextDiscoveryEdge` now reads the discovery verdict instead of picking
+> purely by stage: a clear verdict skips exploring and lands directly on
+> a newly registered discovery->planning FSM edge; an unclear verdict
+> advances stage to exploring while still parking status as
+> awaiting-human, so answering the park resumes straight into the
+> Socratic collab instead of looping back through discovery.
+
+Scope turned out smaller than the item's own original premise assumed —
+recorded as a real decision during discovery, not glossed over: the
+verdict was already being captured and passed down (`tsk-4v6`'s own work,
+`resolveDiscovery(dir, id, config, 'runner', callerVerdict)` at
+`loop.mjs:1132-1138`), so the only genuinely missing piece was the edge
+*selection* itself. The same commit also fixed a stale `loop.mjs` comment
+(around lines 1068-1074) that still claimed the DISCOVERY DISPATCH sweep
+"unconditionally advances," when the code beneath it had already gated on
+the worker's verdict since `tsk-4v6` landed — a documentation bug left
+behind by a prior piece, caught and closed in the same pass rather than
+filed separately.
+
+The change touched `src/intake/discovery.mjs`, `src/runner/loop.mjs`, and
+`src/state/workflow-stage-graphs.mjs` (the new `discovery -> planning`
+edge), plus every test that had encoded the old fixed
+`discovery -> exploring` routing, including a shared CLI test harness
+walking the old two-hop chain. It passed verify
+(`npm test && node --test test/intake/discovery.test.mjs`) on its first
+attempt. One real friction did surface, scoped to merge rather than to
+the implementation itself: merging `fgw/tsk-30v` into the parent branch
+`fgw/tsk-2mt` conflicted on the first attempt (`git merge --no-commit
+--no-ff` aborted, parent branch left unchanged) — resolved before the
+item's own outcome was recorded as `awaiting-approval`/passed, so the
+conflict was a real but non-blocking cost of landing several sibling
+pieces on the same parent branch concurrently, not a defect in the edge
+logic itself.
+
+## The umbrella (`tsk-2mt`): six children, one parent branch, repeated sync friction
+
+`tsk-2mt` is the root item that gathered this entire rebuild — "Dựng lại
+vòng đời trước planning: Init, discovery có chủ, nhánh verdict" — under
+one parent, decomposed into six children: `tsk-403` (the
+`decompose`→`plan` rename), `tsk-qod` (moving `fgos-clarifying` to Init),
+`tsk-tku` (creating `fgos-coding-discovering` as discovery's own owning
+skill), `tsk-2yo` (moving tier/kind/risk classification down into
+discovery, retiring `submit-assist-classify`), `tsk-30v` (verdict-driven
+edge selection, documented above as this cluster's own DoD), and `tsk-lya`
+(handing `discover-next` down to `discover`, spawning `plan-next`/
+`plan-loop`). The parent itself never wrote application code — its job
+was coordinating the six branches landing on one shared root branch,
+`fgw/tsk-2mt`, and closing only once every child reached a terminal
+status (`hasOpenDescendant`, the mechanical anchor every multi-child root
+in this codebase uses).
+
+**The real, repeated cost of that coordination was merge friction, not
+design friction.** `tsk-2mt`'s own event history shows two blocked
+sync-root attempts before six *successful* ones: a `verify-miss` on
+2026-08-11 (goal-check failed on a staged merge, aborted, parent
+unchanged) and a `merge-conflict` on 2026-08-12 (`git merge --no-commit
+--no-ff` on `fgw/tsk-30v` into `fgw/tsk-2mt` conflicted — the same
+conflict `tsk-30v`'s own capture above already names from the child's
+side) — followed by six clean `fgos sync-root` merges landing
+sequentially across the same day (01:38, 01:42, 01:47, 02:42, 02:52,
+02:56). This is the parent-side view of the same fact `tsk-30v`'s section
+above already recorded from the child's side: landing several sibling
+branches onto one shared parent branch concurrently costs real,
+repeatable merge friction — not a defect in any one child's own logic,
+but a structural cost of the decompose-into-many-children shape this
+whole redesign itself used to land.
+
+The six children's own detailed design rationale lives in their own
+retrospective documents (`why-a-retired-stage-name-sometimes-keeps-a-
+drain-only-alias.md` for `tsk-403`/`tsk-qod`, `why-a-per-stage-exception-
+in-the-driver-meant-that-stage-had-no-owner.md` for `tsk-tku`,
+`coding-classify-intake-executor-lifecycle-created-then-retired-as-dead-
+config.md` for `tsk-2yo`, `why-discover-next-shrank-to-a-picker.md` for
+`tsk-lya`, and `tsk-30v`'s own section above) — this document stays the
+one place the whole cluster's shape, and the coordination cost of landing
+it as six children under one parent, is recorded together.

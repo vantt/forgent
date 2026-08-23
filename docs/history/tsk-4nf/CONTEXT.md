@@ -8,7 +8,7 @@ ghi lại trap thật gặp lúc làm tsk-580: `node --test --test-name-pattern=
 pass 1 / fail 0` (đếm chính file như 1 test wrapper). Không sửa code, không
 đổi verify của item nào khác — thuần tài liệu.
 
-## Quyết định đã chốt
+## Locked decisions
 
 | D-ID | Quyết định |
 |------|-----------|

@@ -49,6 +49,67 @@ live session (an open `fgos-coding-exploring`/`fgos-coding-planning` session on 
 item), and the loop must not touch a session someone else already has
 open.
 
+## Eligibility also requires deps-readiness, or the picker hands back an id nobody can claim
+
+Status and stage were not enough on their own. `isCandidate()` originally
+read:
+
+```js
+function isCandidate(item) {
+  return item.status === 'todo' && CANDIDATE_STAGES.has(item.stage);
+}
+```
+
+Nothing there asks whether the item's dependencies are resolved — so the
+picker could hand a caller an id that the very next step refuses. The
+claim path checks what the pool did not: `take`'s handler calls
+`isDepsAndLineageReady(dir, id)` directly, and refuses with `"<id>" is
+todo but has an unmet dependency or an open decomposed child`.
+
+Confirmed live (2026-08-11) on `tsk-28x` — `status:todo`, `stage:clarify`,
+so an exact match for the old two-clause filter — whose `take` was refused
+because its deps `tsk-12m` (`awaiting-human`) and `tsk-1hy` (`cleanup`,
+not yet `done`) were unresolved. Every such pick costs a whole
+discover/session round that can only end in a refusal.
+
+The fix reuses the helper that was already exported and already the claim
+path's own check (`src/state/frontier.mjs`), rather than writing a second
+readiness rule that could drift from it:
+
+```js
+function isCandidate(item, view) {
+  return (
+    CANDIDATE_STATUSES.has(item.status) &&
+    isCandidateStage(item) &&
+    isDepsAndLineageReady(view, item.id)
+  );
+}
+```
+
+Two properties of that reuse are deliberate:
+
+- **The whole helper, not just its deps clause.** `isDepsAndLineageReady`
+  also refuses on `hasOpenDescendant` (an open decomposed child). Bundling
+  both is right here for the same reason `take`'s explicit-`--id` branch
+  already bundles both: an item anchored by an open child is equally not
+  dispatchable, and why it is undispatchable does not change the answer.
+- **Silent exclusion, not a new "found but blocked" report.** This matches
+  the only existing convention in the codebase for the same kind of
+  filter — `frontier()`, in the same directory, already drops an
+  executing-stage item with `depsReady === false` without announcing it.
+  No new return shape was introduced.
+
+Only the picker's filter changed. `/fgOS:discover`'s own claim step was
+never buggy: it calls `take`, inherits `take`'s real check transitively,
+and correctly relays the refusal and stops.
+
+One real asymmetry stayed open rather than being folded in: `pick --id
+<id>` does **not** call `isDepsAndLineageReady` at all, going straight to
+`claimWork` with only a CAS on `expectedStatus`. That path is not
+exercised by this failure mode — `/fgOS:discover` falls back to `pick`
+only when `take` fails for a branch-exists reason, never for unmet deps —
+so it is a known sibling gap, not something this change silently covered.
+
 ## Stop rules — deliberately not "same item blocked twice"
 
 `discover-loop`'s stop rules are **only**:

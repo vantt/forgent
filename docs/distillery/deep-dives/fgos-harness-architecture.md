@@ -63,7 +63,7 @@ can nào NGAY để không đi lại vết đó khi lớn lên (thêm worker son
 
 ### Perspective hội tụ trong distillery (không chỉ một nguồn)
 
-- `verify-enforced-close` (E3 — bee cap-requires-proof ↔ harness story-complete-atomic):
+- `verify-enforced-close` (E3 — beehive cap-requires-proof ↔ harness story-complete-atomic):
   audit fgOS thêm nhánh thứ ba của cùng chân lý — "terminal ⇒ cc-slot đã release" phải là
   FAIL-on-leak, không WARN-reconcile (§7.4). Đóng-việc-có-bằng-chứng là bất biến, không lời hứa.
 - `state-vs-log-two-physics`: audit xác nhận "state kernel trên filesystem" + rename(2)
@@ -120,7 +120,7 @@ xuống các hố audit đã đo. Sáu lan can, theo đòn bẩy:
 - **schema-per-artifact-boundary** `R3 E3 F2` — schema máy-đọc versioned mỗi artifact, validate
   tại cửa store, trước reader thứ hai. E3: audit falsified-by-data + trùng decision forgent (hội tụ).
 - **doctor-invariant-in-verify** `R3 E3 F1` — mỗi bất biến kiến trúc = một check trong verify gate;
-  "ADR chưa accepted khi doctor chưa check". E3: doctor fgOS + `distill check`/cap-proof của bee.
+  "ADR chưa accepted khi doctor chưa check". E3: doctor fgOS + `distill check`/cap-proof của beehive.
 - **add-through-not-alongside** `R3 E2 F1` — doctrine + red-flag: capability mới đi xuyên store/FSM,
   cấm path song song. E2: một nguồn mạnh + forgent đã dogfood (awaiting-human).
 - **fsm-single-status-writer** `R2 E3 F1` — một-writer-mỗi-field, `status`/edge chỉ qua FSM, ép bằng grep-check.

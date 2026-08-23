@@ -1,0 +1,859 @@
+openapi: 3.1.0
+x-contract: "CTR010 · fgos-gateway.v1"
+info:
+  title: fgOS Gateway API
+  version: 1.0.0
+  description: |
+    HTTP+JSON surface of the fgOS interface daemon (tsk-7l9, decision 0014
+    "Kien truc giao tiep nguoi <-> fgOS", model 3: core-library + thin
+    adapters). Written before the daemon is implemented, per this
+    contract's own action: a stable spec for D9's future MCP search tool
+    and any client (web dashboard, desktop) to build against, not
+    reverse-engineered documentation of routes that already exist.
+
+    Scope, locked by 0014:
+      - The daemon is a CONSUMER of fgOS core, never a co-writer. Every
+        write in this API is a thin wrapper over `spawn fgos <verb>`
+        (CTR001/CTR002 one-door-write); every read is a wrapper over
+        `fgos list` / `fgos rollup` / `fgos show` plus the `data_hash`
+        cheap-poll field already on every envelope. This gateway invents
+        no new write path into `.fgos/`.
+      - The daemon becomes the one control-plane that can drive BOTH
+        interactive session workflows (what herdr/TUI panes do today via
+        `fgos session start/end`) and the headless runner
+        (`fgos-runner --once`) — see `/v1/sessions` and `/v1/runner/tick`.
+      - The attention/push channel (STR48, contract CTR008, status
+        `idea`) is explicitly OUT of scope for v1 — 0014 point 6 keeps it
+        a separate subsystem with its own delivery-semantics record.
+        Clients poll `data_hash` on read endpoints until CTR008 lands.
+      - Identity here is ATTRIBUTION, not authentication (same non-goal
+        CTR001 already states for the CLI's own `writer` field): every
+        route below other than `/contract` itself requires the shared
+        per-machine bearer token (D4, `securitySchemes.bearerAuth`) — that
+        token gates ACCESS to the gateway, not per-caller IDENTITY. Who a
+        caller claims to be beyond holding that one shared token is STR38,
+        explicitly out of scope of 0014 itself.
+
+    Envelope reuse: every successful response body is the SAME `fgos.v1`
+    envelope (CTR001) the CLI already emits on stdout — `{contract,
+    generated_at, data_hash, data}` — carried unmodified inside the HTTP
+    body. This mirrors the precedent `fgos-runner.mjs` already set
+    (str46-io-contract D6): reuse CTR001's envelope as the version token
+    across a new transport rather than minting a second, parallel one.
+    HTTP status code + this envelope's `contract` field together answer
+    "did the call succeed"; never branch on message text (docs/io-contract.md).
+
+  contact:
+    name: fgOS
+    url: https://github.com
+  x-decisions:
+    - docs/decisions/0011-version-tuong-minh-cho-moi-contract.md
+    - docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md
+  x-specs:
+    - docs/io-contract.md
+    - docs/specs/work-state.md
+    - docs/specs/runner.md
+
+servers:
+  - url: http://localhost:{port}/v1
+    description: Local daemon (default deployment shape per 0014 point 3-4 — standalone adapter, not always-on by default)
+    variables:
+      port:
+        default: "4170"
+
+# tsk-4qf: every operation inherits this (D4's real, already-enforced
+# require_token gate) unless it overrides with its own `security: []` --
+# today only `/contract` does, since a client has to read the contract
+# before it can know a token is even required.
+security:
+  - bearerAuth: []
+
+tags:
+  - name: work
+    description: Work-item lifecycle (read + write), one-to-one with `fgos list/show/submit/move/ask/answer` etc.
+  - name: frontier
+    description: Read-only frontier/rollup/graph views used for dashboards.
+  - name: orchestration
+    description: The two process families the daemon controls per 0014 — interactive sessions and the headless runner.
+  - name: meta
+    description: Self-description of the gateway's own API surface — lets a client discover the contract instead of hand-tracking a separate doc.
+
+paths:
+  /contract:
+    get:
+      operationId: getContract
+      tags: [meta]
+      summary: The gateway's own OpenAPI spec, verbatim (this document)
+      description: |
+        Serves this exact spec file so an agent (or any other client) can
+        read the full route/schema surface and self-implement a client
+        against it, rather than needing this doc handed to it out of band.
+        The one route NOT behind the auth gate below — a client has to be
+        able to read the contract before it can know a token is even
+        required (D4). Never wrapped in the `fgos.v1` envelope: this is the
+        spec document itself, not a poll of fgOS state.
+      security: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/yaml:
+              schema:
+                type: string
+                description: This same OpenAPI document, byte-for-byte.
+
+  /work:
+    get:
+      operationId: listWork
+      tags: [work]
+      summary: List work items (wraps `fgos list`)
+      description: |
+        Read-only, no write side effect. Defaults to open-only (status not
+        `done`/`wontfix`/`retrospective`/`cleanup`), same default as the
+        CLI. Supports the CLI's own opaque-cursor pagination — pass
+        neither `cursor` nor `limit` for the full set.
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string }
+          description: Filter by exact status value.
+        - name: stage
+          in: query
+          schema: { type: string }
+        - name: all
+          in: query
+          schema: { type: boolean, default: false }
+          description: Include done/wontfix/retrospective/cleanup items.
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        allOf:
+                          - $ref: '#/components/schemas/Page'
+                          - type: object
+                            properties:
+                              work:
+                                type: object
+                                additionalProperties: { $ref: '#/components/schemas/WorkItem' }
+        default:
+          $ref: '#/components/responses/Error'
+
+    post:
+      operationId: submitWork
+      tags: [work]
+      summary: Intake free-text work (wraps `fgos submit`)
+      description: |
+        Derives title/tier/kind/risk and auto-classifies domain. This is
+        the one gateway-side write that creates state that did not exist
+        before — every other write endpoint below acts on an existing id.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text:
+                  type: string
+                  description: Untrusted free text (RUL45) — passed through as a single argv element, never spliced into a shell command.
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/WorkItem' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /work/{id}:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    get:
+      operationId: showWork
+      tags: [work]
+      summary: Full detail of one item (wraps `fgos show`)
+      description: The work record plus every log scoped to just this id (discovery/decisions/gates/outcome/friction/settlement/learning).
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      # tsk-4id: corrected from `WorkItem` -- this endpoint's
+                      # own description already said "plus every log scoped
+                      # to just this id", but the schema reference never
+                      # matched it. Confirmed via a real `fgos show` run
+                      # (docs/history/tsk-4id-task-detail-screen/RESEARCH.md):
+                      # `data` is `{work, discovery, decisions, gates,
+                      # outcome, friction, settlement, learning}`, never a
+                      # bare `WorkItem`.
+                      data: { $ref: '#/components/schemas/WorkDetail' }
+        default:
+          $ref: '#/components/responses/Error'
+    patch:
+      operationId: editWork
+      tags: [work]
+      summary: Partial update of an existing item's editable fields (wraps `fgos edit`)
+      description: |
+        PATCH, not PUT: only fields present in the body change (tsk-41h,
+        D1 of docs/history/herdr-web-dashboard-plan-realignment/CONTEXT.md)
+        -- this is `fgos edit`'s own partial-update semantics, never a
+        full-resource replace. Every field is optional; the request body
+        is `EditableWorkFields` (a strict subset of `WorkItem`'s own
+        properties -- `id`/`status`/`domain` are never editable through
+        this route). A field this route does not recognize is silently
+        dropped, same as an unrecognized flag on the CLI's own `edit`
+        command -- this route translates to `fgos edit`, it does not
+        re-validate what the engine already validates (area spec R2).
+        `fgos edit` itself refuses when no field actually changes; that
+        refusal reaches the caller verbatim as the same `ErrorEnvelope`
+        every other write route already uses, never swallowed or
+        replaced with a client-side check.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EditableWorkFields' }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /work/{id}/docs:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    get:
+      operationId: getWorkDocs
+      tags: [work]
+      summary: An item's docsRef narrative -- CONTEXT.md/plan.md raw content (tsk-4id)
+      description: |
+        The task-detail screen's own primary content source for "what the
+        agent did" (D3 of docs/history/herdr-web-dashboard/CONTEXT.md:
+        CONTEXT.md/plan.md is the human narrative, the primary account --
+        `decisions[]` on `GET /work/{id}` is expandable detail only, never
+        the default). Did not exist before this item: a browser client
+        has no filesystem access, and no other route reads an arbitrary
+        repo file. `docsRef` is canonicalized and checked to resolve
+        inside `docs/history/` before any read -- a value that escapes it
+        is refused (`category: validation`), never followed.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          docsRef: { type: string, nullable: true }
+                          contextMd: { type: string, nullable: true, description: "Raw CONTEXT.md content, or null if absent/unreadable." }
+                          planMd: { type: string, nullable: true, description: "Raw plan.md content, or null if absent/unreadable." }
+                          narrativeMissing:
+                            type: boolean
+                            description: "Present and true only when docsRef names a directory that does not exist on this machine (area spec Edge Cases: shown without its narrative, never a failure)."
+        default:
+          $ref: '#/components/responses/Error'
+
+  /work/{id}/move:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: moveWork
+      tags: [work]
+      summary: Move a work item through the status FSM (wraps `fgos move`)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [to]
+              properties:
+                to: { type: string, description: Target status. }
+                expect: { type: string, description: Optional CAS guard — current status expected before the move. }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/ask:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: askWork
+      tags: [work]
+      summary: Park an item in awaiting-human with a question (wraps `fgos ask`)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text: { type: string }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/answer:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: answerWork
+      tags: [work]
+      summary: Answer a parked question and resume the item (wraps `fgos answer`)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text: { type: string }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/take:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: takeWork
+      tags: [work]
+      summary: Claim an item through the pull door (wraps `fgos take`/`fgos pick`)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+                  enum: [human, session]
+                  default: session
+                  description: |
+                    take --role's real, deliberately-scoped vocabulary
+                    (bin/fgos.mjs's own S2-pull D1) — the pull door
+                    excludes the runner role by design, not by omission.
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/return:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: returnWork
+      tags: [work]
+      summary: Complete a take — run verify, advance to awaiting-approval (wraps `fgos return`)
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/approve:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: approveWork
+      tags: [work]
+      summary: Merge an awaiting-approval item and move it to delivered (wraps `fgos approve`)
+      description: "Carries `externalEffect: true` in the CLI's own verb registry (may open/merge a real PR) — same meaning here."
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /work/{id}/reject:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    post:
+      operationId: rejectWork
+      tags: [work]
+      summary: Reject an awaiting-approval item back to todo (wraps `fgos reject`)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /ready:
+    get:
+      operationId: listReady
+      tags: [frontier]
+      summary: The frontier — items ready to be taken right now (wraps `fgos ready`)
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        allOf:
+                          - $ref: '#/components/schemas/Page'
+                          - type: object
+                            properties:
+                              items:
+                                type: array
+                                items: { $ref: '#/components/schemas/WorkItem' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /rollup/{id}:
+    parameters:
+      - $ref: '#/components/parameters/WorkId'
+    get:
+      operationId: rollupWork
+      tags: [frontier]
+      summary: Progress rollup of one root/goalTier item's children (wraps `fgos rollup`)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data: { type: object, description: Rollup shape, opaque to this contract — see docs/specs/work-state.md. }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /graph:
+    get:
+      operationId: workGraph
+      tags: [frontier]
+      summary: Work-graph metrics — connected components, critical path (wraps `fgos graph`)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data: { type: object, description: Graph metrics shape, opaque to this contract. }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /state/digest:
+    get:
+      operationId: stateDigest
+      tags: [frontier]
+      summary: Cheap-poll digest — `data_hash` + `generated_at` only, no `data` body
+      description: |
+        The poll-driven half of 0014's "poll `fgos list`/`rollup` +
+        `data_hash`" pattern: a client holds the last `data_hash` it saw
+        and calls this endpoint on an interval; a changed hash is the
+        only signal needed to decide whether to re-fetch a full read
+        endpoint. This is a genuinely new route (no CLI verb returns only
+        the digest today) — it exists so a client never has to pay the
+        cost of a full `fgos list` just to learn nothing changed.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [contract, generated_at, data_hash]
+                properties:
+                  contract: { type: string, const: fgos.v1 }
+                  generated_at: { type: string, format: date-time }
+                  data_hash: { type: string }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /sessions:
+    post:
+      operationId: startSession
+      tags: [orchestration]
+      summary: Open an interactive session worktree (wraps `fgos session start`)
+      description: |
+        Interactive-session half of 0014's orchestration scope — what a
+        herdr/TUI pane does today by shelling out directly. A future
+        web/desktop client drives the same lifecycle through this route
+        instead of spawning its own git worktree.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                item: { type: string, description: Optional work item id to open the session against. }
+      responses:
+        '200':
+          description: Session opened
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Session' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /sessions/{sessionId}:
+    parameters:
+      - name: sessionId
+        in: path
+        required: true
+        schema: { type: string }
+    delete:
+      operationId: endSession
+      tags: [orchestration]
+      summary: Close an interactive session worktree (wraps `fgos session end`)
+      parameters:
+        - name: force
+          in: query
+          schema: { type: boolean, default: false }
+      responses:
+        '200':
+          description: Session closed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope' }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /sessions/{sessionId}/slots:
+    parameters:
+      - name: sessionId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: sessionSlots
+      tags: [orchestration]
+      summary: Worker-slot occupancy for one session (wraps `fgos slots`, session-scoped)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          execution:
+                            type: object
+                            properties:
+                              occupied: { type: integer }
+                              items:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    id: { type: string }
+                                    sessionId: { type: string }
+                                    claimRole: { type: string }
+        default:
+          $ref: '#/components/responses/Error'
+
+  /runner/tick:
+    post:
+      operationId: runnerTick
+      tags: [orchestration]
+      summary: Drive one headless-runner cycle (wraps `fgos-runner --once`)
+      description: |
+        Headless half of 0014's orchestration scope: gather-back, find
+        work, dispatch it through its full "One vong --once" lifecycle
+        (docs/specs/runner.md), and return once that cycle's own outcome
+        is settled. A `--watch`-equivalent continuous mode is deliberately
+        NOT exposed here in v1 — a long-lived HTTP request modeling a
+        long-lived poll loop is a scope decision for the daemon
+        implementation item, not something this contract should force by
+        assuming a streaming transport (SSE/WebSocket) that 0014 never
+        locked.
+      responses:
+        '200':
+          description: Cycle completed (including "nothing to do")
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Envelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          dispatched: { type: array, items: { type: string }, description: Work item ids touched this cycle. }
+        '429':
+          description: Runner busy (mirrors CLI `EXIT_BUSY`, category `busy`).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+        default:
+          $ref: '#/components/responses/Error'
+
+components:
+  securitySchemes:
+    # tsk-4qf: matches require_token's own real enforcement (D4) -- one
+    # shared token per machine, read from ~/.fgos/config.json's
+    # gateway.token, checked as a plain Bearer header (not a per-user
+    # credential; see this document's own top-level "Identity here is
+    # ATTRIBUTION, not authentication" note).
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: |
+        The one shared per-machine token (D4). Every route below this
+        component list requires it except `/contract`, which overrides
+        with its own `security: []`.
+  parameters:
+    WorkId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string }
+      description: Work item id.
+    Cursor:
+      name: cursor
+      in: query
+      schema: { type: string }
+      description: Opaque cursor from a prior page's `nextCursor`. Never hand-constructed by a client.
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1 }
+  responses:
+    WorkOk:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Envelope'
+              - type: object
+                properties:
+                  data: { $ref: '#/components/schemas/WorkItem' }
+    Error:
+      description: |
+        Any non-2xx. Never bodied by the plain `fgos.v1` envelope — branch
+        on HTTP status + this body's `category`, never on `message` text
+        (docs/io-contract.md: "Consumer re nhanh theo ma thoat pham tru,
+        khong bao gio theo thong diep" — the same rule, ported to HTTP).
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+
+  schemas:
+    Envelope:
+      type: object
+      required: [contract, generated_at, data_hash, data]
+      properties:
+        contract: { type: string, const: fgos.v1 }
+        generated_at: { type: string, format: date-time }
+        data_hash: { type: string }
+        data: {}
+      description: CTR001's envelope, reused verbatim as the HTTP body (see this contract's top-level description).
+
+    Page:
+      type: object
+      properties:
+        nextCursor:
+          type: string
+          nullable: true
+          description: Opaque; null once the set is exhausted. Only present when `cursor`/`limit` was passed.
+
+    WorkItem:
+      type: object
+      description: |
+        Subset of the work-item shape stable enough to publish here; the
+        authoritative shape is docs/specs/work-state.md (schema version
+        carried in the event log per decision 0007, not duplicated here
+        per 0011's own rule against re-deriving a schema this contract
+        does not own).
+      required: [id, title, kind, status]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        description: { type: string }
+        kind: { type: string }
+        status: { type: string }
+        stage: { type: string }
+        tier: { type: string }
+        risk: { type: string }
+        domain: { type: string }
+        parent: { type: string, nullable: true }
+        deps: { type: array, items: { type: string } }
+        footprint: { type: array, items: { type: string } }
+        verify: { type: string }
+        docsRef: { type: string, nullable: true, description: "Path under docs/history/ -- content readable via GET /work/{id}/docs (tsk-4id)." }
+
+    WorkDetail:
+      type: object
+      description: |
+        `GET /work/{id}`'s real `data` shape (tsk-4id, corrected from a
+        stale `WorkItem`-only reference -- this endpoint's own summary
+        already said "plus every log scoped to just this id"). Every
+        sub-shape below is `type: object` with `additionalProperties: true`
+        rather than fully enumerated: these are the raw work-state logs
+        (`docs/specs/work-state.md` is their authoritative shape per
+        0011's own rule against re-deriving a schema this contract does
+        not own), and the task-detail screen (tsk-4id) reads only a named
+        few real keys from each (documented per-property below) rather
+        than this contract asserting an exhaustive shape it would then
+        have to keep in lockstep with every future log field.
+      required: [work]
+      properties:
+        work: { $ref: '#/components/schemas/WorkItem' }
+        discovery: { type: array, items: { type: object }, description: Verdict history for this item's discovery stage. }
+        decisions:
+          type: array
+          description: The machine decision log -- NOT the primary "what the agent did" account (that is GET /work/{id}/docs's CONTEXT.md/plan.md); shown collapsed behind a disclosure, per its own count.
+          items: { type: object }
+        gates:
+          type: object
+          description: |
+            Keyed by gate name (`contextApprove`/`planApprove`/
+            `validateApprove`, each `{actor, at, verify}` when present)
+            PLUS the ask/answer-parking fields on the SAME object:
+            `ask` (string, most recent question), `askHistory` (string
+            array, oldest-first, every question this item was ever
+            parked with), `answer` (string, most recent answer),
+            `statusAtAsk` (string, the status the item was in when most
+            recently parked).
+          additionalProperties: true
+        outcome: { type: object }
+        friction: { type: object }
+        settlement:
+          type: object
+          description: |
+            `count` (integer, the TRUE total) and `recent` (array, capped
+            at 5 most-recent-first entries across every settlement kind --
+            `SETTLEMENT_DISPLAY_CAP`. Each entry: `{kind, role, ts,
+            detail, id}`; `kind: "answer"` entries are what pairs
+            positionally with `gates.askHistory`, oldest-available-first
+            after reversing `recent`'s own newest-first order). A round
+            older than the 5-answer window has no entry here at all --
+            this is a real, load-bearing cap, not a client-side choice.
+          properties:
+            count: { type: integer }
+            recent: { type: array, items: { type: object } }
+        learning: { type: object, nullable: true }
+
+    EditableWorkFields:
+      type: object
+      description: |
+        tsk-41h: `PATCH /work/{id}`'s request body -- every field
+        `src/state/store.mjs`'s `EDITABLE_FIELDS` allows `fgos edit` to
+        change (21 entries, read directly from that constant, never
+        re-guessed). All optional; only fields present in the body are
+        patched. `id`/`status`/`domain`/`stage` are never editable through
+        this route (`status` moves only through `/work/{id}/move`,
+        `stage`/`domain` only through the engine's own stage-graph
+        transitions -- neither is in `EDITABLE_FIELDS`).
+      properties:
+        title: { type: string }
+        description: { type: string }
+        kind: { type: string }
+        risk: { type: string }
+        verify: { type: string }
+        tier: { type: string }
+        refs: { type: array, items: { type: string } }
+        deps: { type: array, items: { type: string } }
+        footprint: { type: array, items: { type: string } }
+        acceptance:
+          type: array
+          description: Replaces the whole array (latest-wins), never a deep merge. Each clause is `{text, evidence}`.
+          items: { type: object }
+        priority: { type: integer }
+        intent: { type: integer }
+        docsRef: { type: string, description: "Non-empty path, or omit to leave unchanged. There is no clear-to-empty form on this route." }
+        parent: { type: string, nullable: true, description: "Empty string clears (un-parents) the item." }
+        urgent:
+          type: string
+          enum: [low, medium, high, critical]
+          description: "Despite the name, a string enum (confirmed via a live `fgos edit --urgent` smoke test: the literal boolean `true` is rejected by the engine), not a boolean flag."
+        impact: { type: number }
+        effort: { type: number }
+        mergeAfter: { type: array, items: { type: string } }
+        supersededBy: { type: string, nullable: true, description: "Empty string clears." }
+        duplicates: { type: array, items: { type: string } }
+        domainFields:
+          type: object
+          description: Replaces the whole object (latest-wins) for the item's `domain`, never a deep merge of nested keys.
+        goalTier: { type: string, description: "'mvp' or 'milestone'." }
+
+    Session:
+      type: object
+      required: [sessionId, worktree, branch]
+      properties:
+        sessionId: { type: string }
+        worktree: { type: string }
+        branch: { type: string }
+        item: { type: string, nullable: true }
+
+    ErrorEnvelope:
+      type: object
+      required: [category]
+      properties:
+        category:
+          type: string
+          description: |
+            The one CLOSED taxonomy CTR001 already defines
+            (src/state/store.mjs's EXIT_CODES + loop.mjs's EXIT_BUSY) —
+            this gateway adds no categories of its own:
+          enum:
+            - precondition
+            - conflict
+            - validation
+            - corrupt-log
+            - lock-timeout
+            - session-fail
+            - merge-fail
+            - busy
+            - unexpected
+        message:
+          type: string
+          description: Human-readable diagnostic. Never machine-branched on — `category` is the only field a client should switch on.
+        exitCode:
+          type: integer
+          description: The underlying CLI exit code this category maps from, carried through for parity with docs/io-contract.md.

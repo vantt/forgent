@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>herdr - Kanban Board</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-container": "#2170e4",
+                    "tertiary-fixed-dim": "#4edea3",
+                    "on-secondary-fixed": "#001a42",
+                    "outline": "#7b7487",
+                    "on-tertiary-container": "#76ffc2",
+                    "on-secondary": "#ffffff",
+                    "tertiary-container": "#007650",
+                    "primary-fixed": "#eaddff",
+                    "error": "#ba1a1a",
+                    "inverse-on-surface": "#ebf1ff",
+                    "surface-container": "#e7eefe",
+                    "secondary-fixed-dim": "#adc6ff",
+                    "tertiary-fixed": "#6ffbbe",
+                    "on-surface": "#151c27",
+                    "on-error-container": "#93000a",
+                    "inverse-primary": "#d2bbff",
+                    "on-primary": "#ffffff",
+                    "surface-container-highest": "#dce2f3",
+                    "on-primary-fixed": "#25005a",
+                    "surface-variant": "#dce2f3",
+                    "error-container": "#ffdad6",
+                    "primary-container": "#7c3aed",
+                    "on-secondary-container": "#fefcff",
+                    "surface-dim": "#d3daea",
+                    "surface-container-low": "#f0f3ff",
+                    "on-error": "#ffffff",
+                    "surface-container-high": "#e2e8f8",
+                    "inverse-surface": "#2a313d",
+                    "surface": "#f9f9ff",
+                    "on-primary-fixed-variant": "#5a00c6",
+                    "surface-tint": "#732ee4",
+                    "on-primary-container": "#ede0ff",
+                    "primary-fixed-dim": "#d2bbff",
+                    "on-tertiary-fixed-variant": "#005236",
+                    "on-surface-variant": "#4a4455",
+                    "on-secondary-fixed-variant": "#004395",
+                    "outline-variant": "#ccc3d8",
+                    "on-background": "#151c27",
+                    "background": "#f9f9ff",
+                    "primary": "#630ed4",
+                    "on-tertiary": "#ffffff",
+                    "surface-bright": "#f9f9ff",
+                    "tertiary": "#005b3d",
+                    "secondary-fixed": "#d8e2ff",
+                    "on-tertiary-fixed": "#002113",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary": "#0058be"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-desktop": "40px",
+                    "sm": "8px",
+                    "base": "4px",
+                    "md": "16px",
+                    "gutter": "24px",
+                    "xs": "4px",
+                    "xl": "32px",
+                    "margin-mobile": "16px",
+                    "lg": "24px"
+            },
+            "fontFamily": {
+                    "headline-lg-mobile": [
+                            "Inter"
+                    ],
+                    "headline-lg": [
+                            "Inter"
+                    ],
+                    "body-lg": [
+                            "Inter"
+                    ],
+                    "label-sm": [
+                            "Inter"
+                    ],
+                    "display-lg": [
+                            "Inter"
+                    ],
+                    "body-md": [
+                            "Inter"
+                    ],
+                    "label-md": [
+                            "Inter"
+                    ],
+                    "headline-md": [
+                            "Inter"
+                    ]
+            },
+            "fontSize": {
+                    "headline-lg-mobile": [
+                            "24px",
+                            {
+                                    "lineHeight": "1.3",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "headline-lg": [
+                            "32px",
+                            {
+                                    "lineHeight": "1.3",
+                                    "letterSpacing": "-0.01em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-lg": [
+                            "18px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "label-sm": [
+                            "12px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "letterSpacing": "0.02em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "display-lg": [
+                            "48px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "body-md": [
+                            "16px",
+                            {
+                                    "lineHeight": "1.5",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "label-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "1.4",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "1.4",
+                                    "fontWeight": "600"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+</head>
+<body class="bg-background text-on-background h-full font-sans antialiased overflow-hidden flex flex-col">
+<!-- TopNavBar -->
+<nav class="flex justify-between items-center w-full px-md h-16 bg-surface dark:bg-surface-dim border-b border-outline-variant shadow-sm z-50 shrink-0">
+<div class="flex items-center gap-lg">
+<span class="text-headline-md font-headline-md font-black text-primary dark:text-primary-fixed-dim mr-xl">herdr</span>
+<div class="hidden md:flex gap-lg h-full items-center">
+<a class="text-primary font-bold border-b-2 border-primary pb-1 h-full flex items-center pt-1 hover:text-primary transition-colors duration-200" href="#">
+<span class="text-label-md font-label-md">Projects</span>
+</a>
+<a class="text-on-surface-variant font-medium h-full flex items-center hover:text-primary transition-colors duration-200" href="#">
+<span class="text-label-md font-label-md">Gateways</span>
+</a>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="hidden lg:flex items-center bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full border border-yellow-200">
+<span class="w-2 h-2 rounded-full bg-yellow-500 mr-2 animate-pulse"></span>
+<span class="text-label-sm font-label-sm">reachable on network</span>
+</div>
+<div class="flex items-center gap-sm text-on-surface-variant">
+<button aria-label="notifications" class="p-2 hover:bg-surface-variant rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button aria-label="settings" class="p-2 hover:bg-surface-variant rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<img alt="User profile" class="w-8 h-8 rounded-full border border-outline-variant object-cover ml-2" data-alt="A small circular profile picture of a professional user in a modern office setting. The lighting is soft and natural, emphasizing a clean, corporate SaaS aesthetic with light background tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA62a6zGr6_ic3rBRlvd3oWngCXDEJOBl4z8whd1vvqv1W6SWmGYRSuId-kfHMrMORu3R1byWblaetw-lJHuPU8acKVKIyx54xnsJHLrYyni0WTZZubvnOChz1W8-j7YeJ4lNCj9uMSswyVztVEuyg_jVzdF2ZByzQzIG9PCI-6En1IflXYI9EhF4USJNGKfZkZbmYGpRGPG1KUVmV5t16iRz46332wn88hfwwM8nQA0XFzGRLbTpLP7tCLaQ125YRhfL-jEejOzN_l"/>
+</div>
+</div>
+</nav>
+<!-- Main Workspace Area -->
+<main class="flex-1 flex flex-col h-full overflow-hidden">
+<!-- Controls Row -->
+<div class="w-full px-margin-desktop py-md bg-surface-lowest border-b border-outline-variant flex flex-col sm:flex-row justify-between items-center gap-md shrink-0">
+<div class="flex flex-1 w-full sm:w-auto items-center gap-md">
+<div class="relative w-full sm:w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface border border-outline-variant rounded-lg text-body-md font-body-md focus:ring-2 focus:ring-primary focus:border-primary transition-shadow" placeholder="Search tasks..." type="text"/>
+</div>
+<div class="hidden md:flex items-center gap-sm">
+<button class="flex items-center gap-2 px-3 py-2 bg-surface border border-outline-variant rounded-lg text-label-md font-label-md hover:bg-surface-variant transition-colors">
+                        Group by: Status
+                        <span class="material-symbols-outlined text-[18px]">expand_more</span>
+</button>
+<button class="flex items-center gap-2 px-3 py-2 bg-surface border border-outline-variant rounded-lg text-label-md font-label-md hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                        Filter
+                    </button>
+</div>
+</div>
+<div class="flex items-center gap-md w-full sm:w-auto justify-between sm:justify-end">
+<div class="flex bg-surface-variant p-1 rounded-lg border border-outline-variant">
+<button class="p-1.5 bg-surface rounded-md shadow-sm text-primary transition-all flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="view_column">view_column</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-on-surface transition-all flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="format_list_bulleted">format_list_bulleted</span>
+</button>
+</div>
+<button class="flex items-center gap-2 px-4 py-2 bg-primary-container text-on-primary rounded-lg text-label-md font-label-md hover:opacity-90 transition-opacity shadow-sm">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                    Add Task
+                </button>
+</div>
+</div>
+<!-- Board Layout -->
+<div class="flex-1 flex overflow-hidden bg-background">
+<!-- Left: Kanban Board -->
+<div class="flex-1 flex overflow-x-auto p-margin-desktop gap-gutter h-full">
+<!-- Column: Needs Answer -->
+<div class="flex flex-col w-80 shrink-0 h-full">
+<div class="flex justify-between items-center mb-md pb-2 border-t-4 border-yellow-400 pt-3">
+<h2 class="text-label-md font-label-md font-bold text-on-surface">Needs Answer</h2>
+<span class="bg-surface-variant text-on-surface-variant px-2 py-0.5 rounded-full text-label-sm font-label-sm">2</span>
+</div>
+<div class="flex flex-col gap-sm overflow-y-auto pb-lg pr-2">
+<!-- Card 1 -->
+<div class="bg-surface p-md rounded-xl shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] border border-surface-variant hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] transition-all cursor-pointer group">
+<div class="flex justify-between items-start mb-sm">
+<span class="text-label-sm font-label-sm text-outline">tsk-41d</span>
+<span class="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded text-[10px] font-bold">BLOCKED</span>
+</div>
+<h3 class="text-body-md font-body-md font-medium text-on-surface mb-md">Update API Gateway configuration for new cluster</h3>
+<div class="flex justify-between items-center mt-auto">
+<div class="flex -space-x-2">
+<img class="w-6 h-6 rounded-full border-2 border-surface object-cover" data-alt="A tiny circular avatar showing a young professional woman smiling in a bright office environment, used for task assignment in a modern SaaS interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGT1bTwwdcTzExTfcxkQ0xAU5YfUMBvjbG9iS82vHQDu3WqW9u3ppA1cUocqT4wCX7En6Wlgo4NGGfbBqPdZh52I8ON4o_nfk31Vdd01uTeAeRKoPFlJcUOsdzzVpdZytHKLTs64uEB0kovA_c10ej2Zew6w3fY1Wx5bkw8xlnZZZlgMAckZCGK3oBh92x29mIRT0CL74_C_VNvoxgESAalhDyr1UiQ84u3Q9n_DJJsduujP5FUeNsYLA4gR9mwLcbG0qw9nRh-4pG"/>
+</div>
+<span class="material-symbols-outlined text-outline text-[16px] group-hover:text-primary transition-colors">chat_bubble_outline</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface p-md rounded-xl shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] border border-surface-variant hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] transition-all cursor-pointer group ring-2 ring-primary ring-offset-2">
+<div class="flex justify-between items-start mb-sm">
+<span class="text-label-sm font-label-sm text-outline">tsk-89x</span>
+<span class="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded text-[10px] font-bold">QUESTION</span>
+</div>
+<h3 class="text-body-md font-body-md font-medium text-on-surface mb-md">Verify ingress rules for staging environment rollout</h3>
+<div class="flex justify-between items-center mt-auto">
+<div class="flex -space-x-2">
+<img class="w-6 h-6 rounded-full border-2 border-surface object-cover" data-alt="A tiny circular avatar showing a man with glasses looking thoughtful, set against a light grey background for a minimalist SaaS design system." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxVzt8bHyAfblqCbVGeNtqgDUJptdB4S_iDI-z1OFQXjestU_lwvAdoa2sEL8zdlp_F1EnSNdDc2BfevYaOYT0u9ln7ayy7XP4rGtDne4x8yzX3qLXOSxbBEgcLkEdDMcA--kDovP5g93TrpLl-FXAngT6FmnZiDGAqJJqkfkHrDVVqej_duPonINENb4FJ1B4BoHVVfQARzq54Z9QRW0uukUWzywVEUGXwxWGVfDw6zkgFxcrNv73yfxvPEvY8nMe6jIrSEpv6BsH"/>
+</div>
+<span class="material-symbols-outlined text-primary text-[16px]">forum</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Column: In Progress -->
+<div class="flex flex-col w-80 shrink-0 h-full">
+<div class="flex justify-between items-center mb-md pb-2 border-t-4 border-blue-400 pt-3">
+<h2 class="text-label-md font-label-md font-bold text-on-surface">In Progress</h2>
+<span class="bg-surface-variant text-on-surface-variant px-2 py-0.5 rounded-full text-label-sm font-label-sm">3</span>
+</div>
+<div class="flex flex-col gap-sm overflow-y-auto pb-lg pr-2">
+<!-- Card -->
+<div class="bg-surface p-md rounded-xl shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] border border-surface-variant hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] transition-all cursor-pointer group">
+<div class="flex justify-between items-start mb-sm">
+<span class="text-label-sm font-label-sm text-outline">tsk-22a</span>
+<span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-[10px] font-bold">DOING</span>
+</div>
+<h3 class="text-body-md font-body-md font-medium text-on-surface mb-md">Refactor authentication middleware to support JWT</h3>
+<div class="flex justify-between items-center mt-auto">
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full border-2 border-surface bg-primary-container text-on-primary flex items-center justify-center text-[10px] font-bold">JD</div>
+</div>
+<div class="flex items-center gap-1 text-outline">
+<span class="material-symbols-outlined text-[14px]">attachment</span>
+<span class="text-label-sm font-label-sm">2</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Column: Todo -->
+<div class="flex flex-col w-80 shrink-0 h-full">
+<div class="flex justify-between items-center mb-md pb-2 border-t-4 border-gray-400 pt-3">
+<h2 class="text-label-md font-label-md font-bold text-on-surface">Todo</h2>
+<span class="bg-surface-variant text-on-surface-variant px-2 py-0.5 rounded-full text-label-sm font-label-sm">1</span>
+</div>
+<div class="flex flex-col gap-sm overflow-y-auto pb-lg pr-2">
+<!-- Card -->
+<div class="bg-surface p-md rounded-xl shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] border border-surface-variant hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] transition-all cursor-pointer group">
+<div class="flex justify-between items-start mb-sm">
+<span class="text-label-sm font-label-sm text-outline">tsk-99p</span>
+<span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-[10px] font-bold">PLANNED</span>
+</div>
+<h3 class="text-body-md font-body-md font-medium text-on-surface mb-md">Design new dashboard widgets for resource monitoring</h3>
+<div class="flex justify-between items-center mt-auto">
+<div class="flex -space-x-2">
+</div>
+<span class="material-symbols-outlined text-outline text-[16px] group-hover:text-primary transition-colors">add_circle_outline</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Column: Done -->
+<div class="flex flex-col w-80 shrink-0 h-full">
+<div class="flex justify-between items-center mb-md pb-2 border-t-4 border-green-400 pt-3">
+<h2 class="text-label-md font-label-md font-bold text-on-surface">Done</h2>
+<span class="bg-surface-variant text-on-surface-variant px-2 py-0.5 rounded-full text-label-sm font-label-sm">14</span>
+</div>
+<div class="flex flex-col gap-sm overflow-y-auto pb-lg pr-2 opacity-75 hover:opacity-100 transition-opacity">
+<!-- Card -->
+<div class="bg-surface p-md rounded-xl shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] border border-surface-variant">
+<div class="flex justify-between items-start mb-sm">
+<span class="text-label-sm font-label-sm text-outline line-through">tsk-11c</span>
+<span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-[10px] font-bold">DONE</span>
+</div>
+<h3 class="text-body-md font-body-md font-medium text-outline line-through mb-md">Setup CI/CD pipeline for frontend deployment</h3>
+</div>
+</div>
+</div>
+</div>
+<!-- Right: Needs Answer Panel -->
+<div class="hidden xl:flex flex-col w-80 shrink-0 bg-surface border-l border-outline-variant h-full shadow-sm z-10">
+<div class="p-md border-b border-outline-variant flex justify-between items-center">
+<h2 class="text-headline-md font-headline-md font-semibold flex items-center gap-2">
+<span class="material-symbols-outlined text-yellow-500">live_help</span>
+                        Needs Answer
+                    </h2>
+<span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-label-sm font-label-sm font-bold">2 items</span>
+</div>
+<div class="flex-1 overflow-y-auto p-md flex flex-col gap-md bg-background">
+<!-- Panel Item 1 -->
+<div class="bg-surface rounded-xl p-md shadow-sm border border-outline-variant relative">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-yellow-400 rounded-l-xl"></div>
+<div class="pl-2">
+<div class="flex justify-between items-start mb-2">
+<span class="text-label-sm font-label-sm font-bold text-on-surface">tsk-89x</span>
+<span class="text-label-sm font-label-sm text-outline">10 mins ago</span>
+</div>
+<div class="bg-surface-variant/50 p-3 rounded-lg mb-3 border border-surface-variant">
+<p class="text-body-md font-body-md text-on-surface-variant italic">"Are we routing staging traffic through the new WAF rules yet or is that next sprint?"</p>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2">
+<img class="w-5 h-5 rounded-full object-cover" data-alt="A tiny circular avatar showing a man with glasses looking thoughtful, set against a light grey background for a minimalist SaaS design system." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXUx4K1uGoQ_WwhOnwD5a72IDIOnf4b70sqF_oIGXA2AQapXPJuAWokQ9Rkx4TggAWjYDKUjjJmTnnLubGmS3GLUq8gGE32m6Uv5QGsilwvKm_2dbNbLse1n55tqYcS5zI008xMfO802qdy7KNgiBxfR6EMj0fnsMBs_CTaDCMG6320Dy6iDN-9Hu39myF1OG5ukr_1L47SedBMtK4eZBzzAAZplQzhy_KcDsEH0MF2yqzmb62_PzdjDYtXalFdHPysUPnu6XV_fQX"/>
+<span class="text-label-sm font-label-sm text-outline">Alex M.</span>
+</div>
+<button class="px-3 py-1.5 bg-white border border-primary text-primary rounded-lg text-label-sm font-label-sm hover:bg-primary-50 transition-colors font-medium">
+                                    Answer
+                                </button>
+</div>
+</div>
+</div>
+<!-- Panel Item 2 -->
+<div class="bg-surface rounded-xl p-md shadow-sm border border-outline-variant relative">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-yellow-400 rounded-l-xl"></div>
+<div class="pl-2">
+<div class="flex justify-between items-start mb-2">
+<span class="text-label-sm font-label-sm font-bold text-on-surface">tsk-41d</span>
+<span class="text-label-sm font-label-sm text-outline">2 hours ago</span>
+</div>
+<div class="bg-surface-variant/50 p-3 rounded-lg mb-3 border border-surface-variant">
+<p class="text-body-md font-body-md text-on-surface-variant italic">"I'm getting a 403 when trying to access the dev cluster config map. Missing permissions?"</p>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2">
+<img class="w-5 h-5 rounded-full object-cover" data-alt="A tiny circular avatar showing a young professional woman smiling in a bright office environment, used for task assignment in a modern SaaS interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCi4ciEGD5OrWgxRXsDFTE88YQmipz-mLZ7b46FOizivB7gdSkeIwT5qQCBKRTP4Z_SJFFfJ9fCYcZTKzt9zesb-iCI-Nvq2zDdTNrpil6xrGwKfAXjk7NT5sWW4yyhmaxVY-ttNw9gXKQZXqs4dIyT7_Im_pD9W8tlg4L8-2fp5itJAhQAV1v3QtoByc5J8f0BDnPxw5e3X9x0aNibAech2F05eRYFlOcP5AXQADq5ziNU4WsRTBZ-9FHX27KTHVam3xMjN2f22HdK"/>
+<span class="text-label-sm font-label-sm text-outline">Sarah J.</span>
+</div>
+<button class="px-3 py-1.5 bg-white border border-primary text-primary rounded-lg text-label-sm font-label-sm hover:bg-primary-50 transition-colors font-medium">
+                                    Answer
+                                </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

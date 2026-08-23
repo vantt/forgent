@@ -10,6 +10,7 @@ import {
   checkCleanupTTLElapsed,
   assessCleanupReadiness,
   resolveTtlDaysForItem,
+  blockedItemsNowResolvable,
 } from '../../src/state/cleanup-harness.mjs';
 
 // Every test here creates its own disposable git repo (mirrors
@@ -238,6 +239,75 @@ test('checkMergeStillResolves: a decomposed parent is ok:false when one of its c
   assert.match(result.detail, /child-d/, 'the failing detail must name the specific failing child, not a generic message');
 });
 
+// tsk-4bh (Finding 5): the EXACT failure scenario the report describes --
+// same topology as the test above (one child never merged), but this time
+// the never-merged child was legitimately REJECTED to wontfix, not lost.
+// Before this fix, checkMergeStillResolves could never tell the two cases
+// apart -- both looked identical (a child whose recorded sha isn't an
+// ancestor) and both failed the parent permanently. A canceled child has
+// no content to lose; it must be skipped, not treated as a loss.
+test('tsk-4bh: checkMergeStillResolves skips a wontfix (legacy status) child entirely -- ok:true even though its own sha was never merged anywhere', () => {
+  const repoRoot = initRepo();
+  execFileSync('git', ['checkout', '-qb', 'fgw/root-wf1'], { cwd: repoRoot });
+  commitFile(repoRoot, 'root.txt');
+  execFileSync('git', ['checkout', '-qb', 'fgw/parent-wf1'], { cwd: repoRoot });
+  const parentSha = commitFile(repoRoot, 'parent-work.txt');
+  execFileSync('git', ['checkout', '-qb', 'fgw/child-merged', 'fgw/root-wf1'], { cwd: repoRoot });
+  const childMergedSha = commitFile(repoRoot, 'child-merged.txt');
+  execFileSync('git', ['checkout', '-qb', 'fgw/child-wontfix', 'fgw/root-wf1'], { cwd: repoRoot });
+  const childWontfixSha = commitFile(repoRoot, 'child-wontfix.txt');
+  execFileSync('git', ['checkout', '-q', 'fgw/root-wf1'], { cwd: repoRoot });
+  execFileSync('git', ['merge', '--no-ff', '-q', '-m', 'merge child-merged', 'fgw/child-merged'], { cwd: repoRoot });
+  // child-wontfix's branch is deliberately NEVER merged anywhere -- it was
+  // rejected, not lost. This is the legacy status-string shape (no
+  // statusCategory field at all, matching pre-tsk-38t-2 data).
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: repoRoot });
+
+  const view = {
+    work: {
+      'root-wf1': {},
+      'parent-wf1': { parent: 'root-wf1', branchHeadAtReturn: parentSha },
+      'child-merged': { parent: 'parent-wf1', branchHeadAtReturn: childMergedSha },
+      'child-wontfix': { parent: 'parent-wf1', branchHeadAtReturn: childWontfixSha, status: 'wontfix' },
+    },
+  };
+  const result = checkMergeStillResolves(repoRoot, view.work['parent-wf1'], { view, id: 'parent-wf1' });
+  assert.equal(result.ok, true, 'a wontfix child must never permanently block the parent — it had nothing to merge');
+  assert.match(result.detail, /child-merged/, 'the real, merged child is still checked and named');
+  assert.doesNotMatch(result.detail, /child-wontfix/, 'the wontfix child is skipped entirely, never even named as passing');
+});
+
+test('tsk-4bh: checkMergeStillResolves skips a canceled (statusCategory) child entirely -- ok:true even though its own sha was never merged anywhere', () => {
+  const repoRoot = initRepo();
+  execFileSync('git', ['checkout', '-qb', 'fgw/root-wf2'], { cwd: repoRoot });
+  commitFile(repoRoot, 'root.txt');
+  execFileSync('git', ['checkout', '-qb', 'fgw/parent-wf2'], { cwd: repoRoot });
+  const parentSha = commitFile(repoRoot, 'parent-work.txt');
+  execFileSync('git', ['checkout', '-qb', 'fgw/child-merged2', 'fgw/root-wf2'], { cwd: repoRoot });
+  const childMergedSha = commitFile(repoRoot, 'child-merged2.txt');
+  execFileSync('git', ['checkout', '-qb', 'fgw/child-canceled', 'fgw/root-wf2'], { cwd: repoRoot });
+  const childCanceledSha = commitFile(repoRoot, 'child-canceled.txt');
+  execFileSync('git', ['checkout', '-q', 'fgw/root-wf2'], { cwd: repoRoot });
+  execFileSync('git', ['merge', '--no-ff', '-q', '-m', 'merge child-merged2', 'fgw/child-merged2'], { cwd: repoRoot });
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: repoRoot });
+
+  const view = {
+    work: {
+      'root-wf2': {},
+      'parent-wf2': { parent: 'root-wf2', branchHeadAtReturn: parentSha },
+      'child-merged2': { parent: 'parent-wf2', branchHeadAtReturn: childMergedSha },
+      // Modern shape: statusCategory present, wins over any literal status
+      // string (same precedence isResolvedStatus/isCanceledStatus already
+      // document).
+      'child-canceled': { parent: 'parent-wf2', branchHeadAtReturn: childCanceledSha, status: 'todo', statusCategory: 'canceled' },
+    },
+  };
+  const result = checkMergeStillResolves(repoRoot, view.work['parent-wf2'], { view, id: 'parent-wf2' });
+  assert.equal(result.ok, true, 'a canceled child must never permanently block the parent — it had nothing to merge');
+  assert.match(result.detail, /child-merged2/);
+  assert.doesNotMatch(result.detail, /child-canceled/);
+});
+
 // Multi-level: child-mid was ITSELF decomposed further (has its own child,
 // grandchild-1). Proves the children-recursion composes with itself across
 // more than one decompose level, and that child-mid's own bogus sha (also
@@ -388,6 +458,39 @@ test('checkRetrospectiveContent: ok when docType/docPath are recorded AND the fi
   const view = { outcomes: { 'has-real-doc': { docType: 'how-to', docPath: 'docs/how-to/real-doc.md' } } };
   const result = checkRetrospectiveContent(view, 'has-real-doc', repoRoot);
   assert.equal(result.ok, true, 'a real doc must pass even with no predicted/actual field — that was the false-fail bug');
+});
+
+// An engine-written record is the same class of evidence as the
+// predicted/actual outcome above: written by machinery as a side effect of
+// the lifecycle, never by anyone reflecting on the work. `fgos report` (the
+// driver's closing report) is one, and `fgos-coding-driving` writes one at
+// EVERY stop — so counting engine records left this gate permanently green
+// for every item that had ever been driven, before retrospective ran at all.
+test('checkRetrospectiveContent: NOT ok when the only decision is an engine record such as a driver report', () => {
+  const repoRoot = initRepo();
+  const view = {
+    decisionsById: {
+      'driver-report-only': [
+        { text: 'reached ceiling at status awaiting-approval', source: 'driver-report', kind: 'engine' },
+      ],
+    },
+  };
+  const result = checkRetrospectiveContent(view, 'driver-report-only', repoRoot);
+  assert.equal(result.ok, false, 'engine bookkeeping is not evidence that a retrospective ran');
+});
+
+test('checkRetrospectiveContent: ok when a real (non-engine) decision sits alongside engine records', () => {
+  const repoRoot = initRepo();
+  const view = {
+    decisionsById: {
+      'real-decision': [
+        { text: 'returned, awaiting-approval', source: 'driver-report', kind: 'engine' },
+        { text: 'chose the pull door over a second write path', source: 'session', kind: 'design' },
+      ],
+    },
+  };
+  const result = checkRetrospectiveContent(view, 'real-decision', repoRoot);
+  assert.equal(result.ok, true, 'a genuine decision still satisfies the gate, engine noise alongside it or not');
 });
 
 test('checkRetrospectiveContent: NOT ok when docPath is recorded but the file does not exist on disk (the orphaned-doc incident)', () => {
@@ -596,3 +699,144 @@ test('assessCleanupReadiness: skips the merge-resolves check entirely when workt
   const result = assessCleanupReadiness({ view, rawEvents, id: 'synth-item', repoRoot: undefined, worktreeBacked: false, ttlDays: 7, now });
   assert.equal(result.ready, true, 'must not attempt the merge-resolves check for a non-worktree-backed domain');
 });
+
+// --- blockedItemsNowResolvable (tsk-597z) ------------------------------
+
+test('blockedItemsNowResolvable: empty view reports all-empty, no error', () => {
+  const result = blockedItemsNowResolvable({ view: { work: {} }, repoRoot: '/does-not-matter' });
+  assert.deepEqual(result, { resolvable: [], stillBlocked: [], notApplicable: [] });
+});
+
+test('blockedItemsNowResolvable: a blocked item whose recorded commit is NOW an ancestor of HEAD is reported resolvable', () => {
+  const repoRoot = initRepo();
+  const sha = commitFile(repoRoot, 'now-merged.txt');
+  const view = { work: { 'tsk-a': { status: 'blocked', branchHeadAtReturn: sha } } };
+  const result = blockedItemsNowResolvable({ view, repoRoot });
+  assert.deepEqual(result.stillBlocked, []);
+  assert.deepEqual(result.notApplicable, []);
+  assert.equal(result.resolvable.length, 1);
+  assert.equal(result.resolvable[0].id, 'tsk-a');
+});
+
+test('blockedItemsNowResolvable: a blocked item whose recorded commit is still unreachable is reported stillBlocked, not resolvable', () => {
+  const repoRoot = initRepo();
+  const sha = commitFile(repoRoot, 'erased.txt');
+  execFileSync('git', ['reset', '--hard', 'HEAD~1'], { cwd: repoRoot });
+  const view = { work: { 'tsk-b': { status: 'blocked', branchHeadAtReturn: sha } } };
+  const result = blockedItemsNowResolvable({ view, repoRoot });
+  assert.deepEqual(result.resolvable, []);
+  assert.deepEqual(result.notApplicable, []);
+  assert.equal(result.stillBlocked.length, 1);
+  assert.equal(result.stillBlocked[0].id, 'tsk-b');
+});
+
+test('blockedItemsNowResolvable: a blocked item with no recorded commit at all is notApplicable, never reported resolvable', () => {
+  const repoRoot = initRepo();
+  const view = { work: { 'tsk-c': { status: 'blocked' } } };
+  const result = blockedItemsNowResolvable({ view, repoRoot });
+  assert.deepEqual(result.resolvable, []);
+  assert.deepEqual(result.stillBlocked, []);
+  assert.equal(result.notApplicable.length, 1);
+  assert.equal(result.notApplicable[0].id, 'tsk-c');
+  assert.equal(result.notApplicable[0].reason, 'no-recorded-commit');
+});
+
+test('blockedItemsNowResolvable: a blocked item in a non-worktree-backed domain is notApplicable and never re-checked', () => {
+  const view = {
+    work: {
+      // A real-looking sha here would make checkMergeStillResolves throw
+      // against a bogus repoRoot if it were ever actually called -- this
+      // item must be skipped before that happens.
+      'tsk-d': { status: 'blocked', domain: 'synthetic', branchHeadAtReturn: 'deadbeef' },
+    },
+  };
+  const result = blockedItemsNowResolvable({ view, repoRoot: '/does-not-matter' });
+  assert.deepEqual(result.resolvable, []);
+  assert.deepEqual(result.stillBlocked, []);
+  assert.equal(result.notApplicable.length, 1);
+  assert.equal(result.notApplicable[0].id, 'tsk-d');
+  assert.equal(result.notApplicable[0].reason, 'domain-not-worktree-backed');
+});
+
+test('blockedItemsNowResolvable: only status:blocked items are ever considered', () => {
+  const repoRoot = initRepo();
+  const sha = commitFile(repoRoot, 'irrelevant.txt');
+  const view = {
+    work: {
+      'tsk-e': { status: 'doing', branchHeadAtReturn: sha },
+      'tsk-f': { status: 'todo' },
+      'tsk-g': { status: 'awaiting-approval', branchHeadAtReturn: sha },
+    },
+  };
+  const result = blockedItemsNowResolvable({ view, repoRoot });
+  assert.deepEqual(result, { resolvable: [], stillBlocked: [], notApplicable: [] });
+});
+
+// tsk-2jz: Fallback checks for blind spot 1 (clean rebase-rehash) and blind spot 2 (rescue-merge bypassing parent)
+
+test('checkMergeStillResolves: rescue-merge case (blind spot 2) resolves ok:true via main-ancestry fallback', () => {
+  const repoRoot = initRepo();
+  execFileSync('git', ['checkout', '-qb', 'fgw/rescue-parent'], { cwd: repoRoot });
+  commitFile(repoRoot, 'parent.txt');
+  execFileSync('git', ['checkout', '-qb', 'rescue-child', 'fgw/rescue-parent'], { cwd: repoRoot });
+  const childSha = commitFile(repoRoot, 'child-rescue-work.txt');
+
+  // Rescue merge lands child branch straight onto main, bypassing fgw/rescue-parent
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: repoRoot });
+  execFileSync('git', ['merge', '--no-ff', '-q', '-m', 'rescue child merge', 'rescue-child'], { cwd: repoRoot });
+
+  // childSha is an ancestor of main (HEAD), but NOT of fgw/rescue-parent
+  assert.throws(() => execFileSync('git', ['merge-base', '--is-ancestor', childSha, 'fgw/rescue-parent'], { cwd: repoRoot }));
+
+  const view = { work: { 'rescue-child': { parent: 'rescue-parent' }, 'rescue-parent': {} } };
+  const result = checkMergeStillResolves(repoRoot, { branchHeadAtReturn: childSha }, { view, id: 'rescue-child' });
+
+  assert.equal(result.ok, true, 'main-ancestry fallback must resolve child whose rescue merge landed on main');
+  assert.match(result.detail, /main-ancestry fallback/);
+});
+
+test('checkMergeStillResolves: clean synthetic rebase-rehash case (blind spot 1) resolves ok:true via content-equivalence fallback', () => {
+  const repoRoot = initRepo();
+  execFileSync('git', ['checkout', '-qb', 'fgw/rebase-parent'], { cwd: repoRoot });
+  commitFile(repoRoot, 'parent.txt');
+  execFileSync('git', ['checkout', '-qb', 'rebase-child', 'fgw/rebase-parent'], { cwd: repoRoot });
+  const origChildSha = commitFile(repoRoot, 'child-rebase-work.txt');
+
+  // Advance fgw/rebase-parent with a new commit so cherry-picking creates a new sha on a different parent commit
+  execFileSync('git', ['checkout', '-q', 'fgw/rebase-parent'], { cwd: repoRoot });
+  commitFile(repoRoot, 'parent-ahead.txt');
+  execFileSync('git', ['cherry-pick', origChildSha], { cwd: repoRoot });
+
+  // Add another change to main so repo moves on
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: repoRoot });
+  commitFile(repoRoot, 'another-change.txt');
+
+  // origChildSha is NOT a direct ancestor of fgw/rebase-parent or HEAD (cherry-pick created a twin commit under a new sha)
+  assert.throws(() => execFileSync('git', ['merge-base', '--is-ancestor', origChildSha, 'fgw/rebase-parent'], { cwd: repoRoot }));
+  assert.throws(() => execFileSync('git', ['merge-base', '--is-ancestor', origChildSha, 'HEAD'], { cwd: repoRoot }));
+
+  const view = { work: { 'rebase-child': { parent: 'rebase-parent' }, 'rebase-parent': {} } };
+  const result = checkMergeStillResolves(repoRoot, { branchHeadAtReturn: origChildSha }, { view, id: 'rebase-child' });
+
+  assert.equal(result.ok, true, 'content-equivalence fallback must resolve clean rebase-rehash with matching patch-id');
+  assert.match(result.detail, /content-equivalence fallback/);
+});
+
+test('checkMergeStillResolves: negative case — sha NOT an ancestor of main and NO patch-id twin stays ok:false (no data-loss masking)', () => {
+  const repoRoot = initRepo();
+  execFileSync('git', ['checkout', '-qb', 'fgw/negative-parent'], { cwd: repoRoot });
+  commitFile(repoRoot, 'parent.txt');
+  execFileSync('git', ['checkout', '-qb', 'negative-child', 'fgw/negative-parent'], { cwd: repoRoot });
+  const lostSha = commitFile(repoRoot, 'lost-content.txt');
+
+  // Abandon negative-child branch without merging or cherry-picking its content
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: repoRoot });
+  commitFile(repoRoot, 'unrelated.txt');
+
+  const view = { work: { 'negative-child': { parent: 'negative-parent' }, 'negative-parent': {} } };
+  const result = checkMergeStillResolves(repoRoot, { branchHeadAtReturn: lostSha }, { view, id: 'negative-child' });
+
+  assert.equal(result.ok, false, 'genuinely lost commit must stay ok:false and not be masked');
+  assert.match(result.detail, /no longer reachable/);
+});
+

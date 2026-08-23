@@ -57,6 +57,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { StoreError } from '../state/store.mjs';
 
 /** Raised for any git worktree/branch operation failure. `errorClass`
  * reuses the vocabulary declared in `recovery.mjs`'s `ERROR_CLASSES` (per
@@ -106,6 +107,149 @@ export function provisionDependencies(worktreePath) {
 
 function git(repoRoot, args) {
   return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false });
+}
+
+// Same call as `git` above, but with git's own stderr swallowed rather than
+// inherited by this process. Only the two probe helpers below use it: both
+// ask questions git legitimately answers with a `fatal:` line (no origin
+// remote, no such branch, not a repository at all), and both already treat
+// that as a normal answer — printing the raw fatal to the caller's stderr
+// would turn "this directory is not a repo" into apparent breakage on a
+// path that is deliberately fail-open. Byte-identical to the `stdio` the
+// two functions had at their previous home in merge.mjs (tsk-49i D1).
+function gitQuiet(repoRoot, args) {
+  return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false, stdio: ['ignore', 'pipe', 'pipe'] });
+}
+
+/** Resolve `p` through the filesystem when it exists, and fall back to a
+ * plain absolute resolve when it does not — the shape every caller
+ * comparing two checkout paths for identity needs. Exported (tsk-49i D3)
+ * because `approve`'s session-worktree guard needs the identical rule and
+ * used to carry its own byte-identical copy in bin/fgos.mjs. */
+export function realpathOrSelf(p) {
+  try {
+    return fs.realpathSync(p);
+  } catch {
+    return path.resolve(p);
+  }
+}
+
+/** `git <args>` for a plain read, with any failure (not a repo, no commits
+ * yet) reported as `validation` rather than escaping as an "unexpected"
+ * exit-1 — the R4 exit-code contract every other error surface follows.
+ * Private on purpose: the merge-cluster use cases read refs through the two
+ * named helpers below (tsk-49i D3) rather than carrying their own
+ * git-error policy. */
+function gitRead(repoRoot, args) {
+  try {
+    return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false });
+  } catch (err) {
+    throw new StoreError('validation', `git ${args.join(' ')} failed in "${repoRoot}": ${err.message}`);
+  }
+}
+
+/** The sha `repoRoot`'s own HEAD currently points at. */
+export function currentHead(repoRoot) {
+  return gitRead(repoRoot, ['rev-parse', 'HEAD']).trim();
+}
+
+/** tsk-5dk: a named branch/ref's own tip sha, not "whatever HEAD happens to
+ * be in some worktree's checkout" (`currentHead` above) — branch refs are
+ * shared across every linked worktree of the same repo, so this is correct
+ * to call from repoRoot even when the actual merge commit was created in a
+ * different (e.g. ephemeral) worktree of the same repo, and stays correct
+ * for an idempotent already-merged re-approve too (always reads the
+ * target's real current tip, never a stale pre-merge snapshot). */
+export function resolveRefSha(repoRoot, ref) {
+  return gitRead(repoRoot, ['rev-parse', ref]).trim();
+}
+
+/** Resolve `repoRoot`'s trunk branch name without assuming `'main'`: prefers
+ * the remote `origin/HEAD` target (what the repo host itself calls its
+ * default branch), then falls back to whichever of `main`/`master` exists
+ * locally as a branch, then to the literal `'main'` when neither signal is
+ * available (e.g. a brand-new repo with no commits yet on either name).
+ *
+ * Lives here rather than in `merge.mjs` (its original home, tsk-49i D1):
+ * naming a repo's trunk branch is worktree/branch identity, with zero
+ * merge-content semantics — and keeping it here removes the circular
+ * merge.mjs <-> worktree.mjs import the old placement forced. */
+export function detectTrunk(repoRoot) {
+  try {
+    const ref = gitQuiet(repoRoot, ['symbolic-ref', '--short', 'refs/remotes/origin/HEAD']).trim();
+    if (ref.startsWith('origin/')) {
+      return ref.slice('origin/'.length);
+    }
+  } catch {
+    // no origin remote, or origin/HEAD isn't set locally — fall through
+  }
+
+  for (const candidate of ['main', 'master']) {
+    try {
+      gitQuiet(repoRoot, ['show-ref', '--verify', '--quiet', `refs/heads/${candidate}`]);
+      return candidate;
+    } catch {
+      // candidate branch doesn't exist locally — try the next one
+    }
+  }
+
+  return 'main';
+}
+
+/**
+ * Whether `repoRoot` IS the repo's main working tree — never a linked
+ * worktree, registered through `fgos session start` (session.mjs) or ad-hoc
+ * (a plain `git worktree add` run by hand, invisible to `sessions.json`).
+ * `approve`'s registry-based guard only ever caught the registered case; an
+ * ad-hoc worktree slipped through the exact same risk untouched — a merge
+ * landing on that worktree's own checkout, or a goal-check verifying its own
+ * (possibly stale/divergent) tree, while the item is still reported "done" /
+ * "verified on main" (P44).
+ *
+ * The check is structural, not registry-based, so it catches both: a main
+ * worktree's git-common-dir sits directly inside its own toplevel (its
+ * parent IS the toplevel); a linked worktree's common-dir resolves to the
+ * MAIN repo's `.git`, whose parent is the main repo root — never the linked
+ * worktree's own toplevel.
+ *
+ * A `repoRoot` that is not a git repository at all (legacy-item tests, or a
+ * plain directory `approve` is otherwise happy to degrade against) has no
+ * worktree concept to violate — trivially "main", fail-open, matching how
+ * every other legacy-source path in `approve` already tolerates a non-git
+ * cwd.
+ *
+ * Lives here rather than in `merge.mjs` (its original home, tsk-49i D1):
+ * it is a pure worktree-identity check with zero merge-content semantics.
+ */
+export function isMainWorktree(repoRoot) {
+  let toplevelRaw;
+  try {
+    toplevelRaw = gitQuiet(repoRoot, ['rev-parse', '--show-toplevel']).trim();
+  } catch {
+    return true;
+  }
+  const toplevel = realpathOrSelf(toplevelRaw);
+  const commonDirRaw = gitQuiet(repoRoot, ['rev-parse', '--git-common-dir']).trim();
+  const commonDirAbs = path.isAbsolute(commonDirRaw) ? commonDirRaw : path.resolve(repoRoot, commonDirRaw);
+  const commonDirParent = realpathOrSelf(path.dirname(commonDirAbs));
+  return toplevel === commonDirParent;
+}
+
+// Push a runner item's branch to origin unless it already tracks an upstream.
+// The upstream probe is a plain execFileSync + try/catch, NOT this module's
+// `git` helper: `review`'s own caller rethrows every git failure as
+// StoreError('validation', ...), the wrong semantic for an existence probe
+// that is *expected* to fail on a never-pushed branch. Only the push itself
+// is a real operation. Lives here rather than in bin/fgos.mjs (tsk-49i D3):
+// pushing a branch is branch mechanics, this module's own job.
+export function ensureBranchPushed(repoRoot, branch) {
+  try {
+    execFileSync('git', ['rev-parse', '--abbrev-ref', `${branch}@{upstream}`], { cwd: repoRoot, encoding: 'utf8', shell: false });
+    return; // upstream already set — nothing to push
+  } catch {
+    // no upstream yet — the normal, expected first-review case; fall through
+  }
+  execFileSync('git', ['push', '-u', 'origin', branch], { cwd: repoRoot, encoding: 'utf8', shell: false });
 }
 
 // Exported (pr-lifecycle-2): the approval-gate merge engine (merge.mjs)
@@ -364,7 +508,10 @@ function relocateOrphanedCheckout(repoRoot, branch, targetPath) {
 /**
  * Create the integration branch `fgw/<id>` (D17: "nhánh tạo sớm, không cần
  * worktree") as a REF ONLY — no worktree/checkout is registered for it.
- * `opts.baseRef` (default `'main'`) is the ref the new branch forks from.
+ * `opts.baseRef` (default: `detectTrunk(repoRoot)`, tsk-386 — no longer a
+ * literal `'main'`; a host project whose trunk is `master` would otherwise
+ * fail `git branch fgw/<id> main` outright on this fallback, per
+ * `docs/distribution-vision.md`'s "installed into other repos" story).
  * Idempotent: if `fgw/<id>` already exists, this is a no-op — it does NOT
  * move the branch to `baseRef`, mirroring the RETRY-WITHOUT-SELF-COLLISION
  * discipline above (a retried root-dispatch must not disturb a branch that
@@ -373,7 +520,7 @@ function relocateOrphanedCheckout(repoRoot, branch, targetPath) {
  */
 export function createBranchRef(repoRoot, id, opts = {}) {
   const branch = branchNameFor(id);
-  const baseRef = opts.baseRef ?? 'main';
+  const baseRef = opts.baseRef ?? detectTrunk(repoRoot);
 
   if (branchExists(repoRoot, branch)) {
     return { branch, created: false };
@@ -395,8 +542,24 @@ export function createBranchRef(repoRoot, id, opts = {}) {
  * `.fgos/` strip (ADR0020) + dependency provisioning, shared by every
  * function in this module that stands up a fresh checkout — `createWorktree`
  * and `createDetachedMergeWorktree` below.
+ *
+ * `beforeProvision` (tsk-1mn, optional, default none): called with no
+ * arguments right after the fast `.fgos/` strip and immediately before the
+ * slow, synchronous `provisionDependencies` (`npm ci`/`npm install`) call
+ * below — the exact seam `claimWork` (claim-port.mjs) needs to release
+ * `main-checkout.lock` at. Neither this strip nor `provisionDependencies`
+ * ever touches `repoRoot`'s own `.git/index` (both operate entirely inside
+ * `worktreePath`, a directory the lock's own STR65 concern never covers —
+ * main-checkout-lock.mjs's own header: "two concurrent writers racing this
+ * checkout's own `.git/index`"), and every `repoRoot`-touching git call this
+ * module makes (`worktree add`, `branch`) already ran before this function
+ * is ever called — so releasing right here, mid-function, is provably safe
+ * regardless of which caller passes the callback. `createDetachedMergeWorktree`
+ * below never passes one: that call site's own lock hold
+ * (`withMergeTargetSlot`, merge.mjs) already has a working heartbeat, so it
+ * has no TTL-starvation gap to close and stays byte-identical.
  */
-function finishWorktreeSetup(worktreePath, branch) {
+function finishWorktreeSetup(worktreePath, branch, { beforeProvision } = {}) {
   // `.fgos/` (ADR0020): since `.fgos/` is git-tracked in this repo, a bare
   // checkout would carry a snapshot frozen at fork time — stale the moment
   // main gets another uncommitted event, and a live escape hatch into the
@@ -422,14 +585,19 @@ function finishWorktreeSetup(worktreePath, branch) {
   // scenario that exposed this whole gap: a branch merging in a new
   // dependency before that merge lands on repoRoot's own default branch)
   // would still hit ERR_MODULE_NOT_FOUND. provisionDependencies installs
-  // for THIS worktree's own declared dependencies instead, correct for
-  // that case at the cost of the install itself.
+  // for THIS worktree's own declared dependencies instead, correct at the
+  // cost of the install itself.
+  beforeProvision?.();
   provisionDependencies(worktreePath);
 }
 
 /**
  * Create (or reuse, see module doc) an isolated worktree for work item `id`
- * inside `repoRoot`. Always allocates a fresh temp directory for the
+ * inside `repoRoot`. `opts.beforeProvision` (tsk-1mn, optional): forwarded
+ * verbatim to `finishWorktreeSetup` — see that function's own doc for what
+ * it's for and why the seam is safe.
+ *
+ * Always allocates a fresh temp directory for the
  * checkout via `mkdtemp` (default base: `os.tmpdir()/fgos-worktrees`,
  * overridable via `opts.worktreeDir` — tests use this to stay inside a
  * disposable temp git repo, never the main repo). When the branch does not
@@ -492,7 +660,30 @@ export function createWorktree(repoRoot, id, opts = {}) {
     }
   }
 
-  finishWorktreeSetup(worktreePath, branch);
+  // tsk-4yv: by this point `git worktree add` has already succeeded (or the
+  // reuse/relocate path above already reattached), so `worktreePath` is a
+  // REGISTERED worktree, unlike the two catch blocks above which only ever
+  // run before registration -- a bare fs.rmSync here would leave git's own
+  // `.git/worktrees/<name>/` bookkeeping dangling, a broken entry future
+  // `git worktree` calls would trip over. `finishWorktreeSetup` (the
+  // `.fgos/` strip, or `provisionDependencies`'s `npm ci`/`npm install`) can
+  // throw for real (a permissions error, an npm registry flake) -- nothing
+  // downstream of this call ever cleaned that up before, so a checkout
+  // stayed registered and on disk indefinitely, accumulating with every
+  // repeated flake. `removeWorktree`'s own `--force` mirrors the other
+  // cleanup attempts in this function: best-effort, swallowed if it itself
+  // fails, so a cleanup failure never masks the real error the caller needs
+  // to see.
+  try {
+    finishWorktreeSetup(worktreePath, branch, { beforeProvision: opts.beforeProvision });
+  } catch (err) {
+    try {
+      removeWorktree(repoRoot, worktreePath, { force: true });
+    } catch {
+      // best-effort — see comment above.
+    }
+    throw err;
+  }
 
   return { path: worktreePath, branch, reused };
 }
@@ -659,13 +850,160 @@ export function resyncClaimWorktree(repoRoot, worktreePath, branch) {
 
   if (isDirtyRelativeToSync(repoRoot, worktreePath, lastSynced)) {
     throw new WorktreeError(
-      `refusing to resync claim worktree "${worktreePath}" on "${branch}" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in "${worktreePath}" before claiming "${branch}" again — never auto-reset over uncommitted work.`,
+      `refusing to resync claim worktree "${worktreePath}" on "${branch}" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in "${worktreePath}" before claiming "${branch}" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,
       { branch, worktreePath, lastSynced, branchTip },
     );
   }
 
   git(repoRoot, ['-C', worktreePath, 'reset', '--hard', branchTip]);
+  stripFgosAfterReset(worktreePath, branch);
   return { resynced: true, from: lastSynced, to: branchTip };
+}
+
+/**
+ * tsk-1d7 (docs/history/stale-worktree-index-guard/CONTEXT.md D3): a plain
+ * `reset --hard` checks out whatever `.fgos/` the branch tip has tracked,
+ * resurrecting a stale snapshot in a worktree in violation of ADR0020
+ * (verified directly) -- the same strip `finishWorktreeSetup` already
+ * performs right after a fresh `git worktree add`, needed again after any
+ * later `reset --hard`. Shared by `resyncClaimWorktree` above and
+ * `resyncWorktree` below. Only the strip, never the rest of
+ * `finishWorktreeSetup` (dependency provisioning is out of scope for a
+ * resync, an unrelated side effect this must not add).
+ */
+function stripFgosAfterReset(worktreePath, branch) {
+  try {
+    fs.rmSync(path.join(worktreePath, '.fgos'), { recursive: true, force: true });
+  } catch (err) {
+    throw new WorktreeError(`removing checked-out .fgos in resynced worktree "${worktreePath}" failed: ${err.message}`, {
+      branch,
+      worktreePath,
+    });
+  }
+}
+
+/**
+ * The repair verb behind `fgos resync-worktree` (tsk-1d7, docs/history/
+ * stale-worktree-index-guard/CONTEXT.md D3) -- fixes exactly the failure
+ * `.githooks/pre-commit`'s own stale-index guard (D2) detects and refuses:
+ * a worktree whose branch ref was force-moved from outside (e.g. `approve`'s
+ * leaf->root merge) while this worktree still holds files/index at the OLD
+ * tree. Unlike `resyncClaimWorktree` above -- which REFUSES when the
+ * worktree has any uncommitted change, because that function exists for the
+ * routine "clean reattach" case -- this verb is invoked precisely because
+ * the worktree has real staged work worth carrying forward (the commit that
+ * was about to happen), so it captures that staged content as a patch
+ * BEFORE resetting, then reapplies it after.
+ *
+ * Never auto-invoked by the hook itself (D2: the hook only detects and
+ * refuses, printing the command to run this). A caller runs this by hand
+ * (or a session runs it on the user's behalf) once notified.
+ */
+export function resyncWorktree(repoRoot, worktreePath, branch) {
+  // tsk-jg4: an earlier run of THIS function can be killed in the window
+  // between the `reset --hard` below (step 2) and the patch reapply
+  // completing (step 4) -- the worktree ends up reset to the branch tip
+  // (a real reflog entry, so the NEXT run's own `lastSyncedCommit` check
+  // below reads "already in sync" and does nothing) while the staged
+  // patch it never got to reapply is still sitting on disk, orphaned and
+  // unmentioned. Detect that BEFORE anything else touches the worktree --
+  // same signal, same refusal shape the real-conflict path below already
+  // uses (a patch file on disk IS the actionable thing to point at), just
+  // checked proactively instead of only encountered reactively.
+  const gitCommonDir = git(repoRoot, ['rev-parse', '--path-format=absolute', '--git-common-dir']).trim();
+  const patchDir = path.join(gitCommonDir, 'fgos-resync-patches');
+  const branchPrefix = `${branch.replace(/\//g, '-')}-`;
+  let orphanedPatches = [];
+  try {
+    orphanedPatches = fs.readdirSync(patchDir).filter((name) => name.startsWith(branchPrefix) && name.endsWith('.patch'));
+  } catch {
+    // patchDir not created yet -- nothing to orphan.
+  }
+  if (orphanedPatches.length > 0) {
+    const orphanedPaths = orphanedPatches.map((name) => path.join(patchDir, name));
+    throw new WorktreeError(
+      `resync-worktree: refusing "${worktreePath}" on "${branch}" — a prior resync-worktree run left ${orphanedPaths.length === 1 ? 'a patch' : 'patches'} behind at ${orphanedPaths.map((p) => `"${p}"`).join(', ')}, most likely from being interrupted between its own reset and reapply. Inspect ${orphanedPaths.length === 1 ? 'it' : 'them'} by hand — the worktree may already be reset to the branch tip with this content never reapplied — then remove the file(s) before resyncing again.`,
+      { branch, worktreePath, orphanedPaths },
+    );
+  }
+
+  const lastSynced = lastSyncedCommit(repoRoot, worktreePath);
+  if (!lastSynced) {
+    throw new WorktreeError(
+      `resync-worktree: could not read "${worktreePath}"'s own HEAD reflog to determine what commit it was last synced to. Inspect "${worktreePath}" by hand.`,
+      { branch, worktreePath },
+    );
+  }
+
+  const branchTip = git(repoRoot, ['rev-parse', branch]).trim();
+  if (lastSynced === branchTip) {
+    return { resynced: false, reason: 'already-in-sync' };
+  }
+
+  let isAncestor = true;
+  try {
+    git(repoRoot, ['merge-base', '--is-ancestor', lastSynced, branchTip]);
+  } catch {
+    isAncestor = false;
+  }
+  if (!isAncestor) {
+    throw new WorktreeError(
+      `resync-worktree: refusing "${worktreePath}" on "${branch}" — its last-synced commit (${lastSynced}) is not an ancestor of the branch's current tip (${branchTip}), so a reset would risk losing commits. Inspect "${worktreePath}" and reconcile by hand.`,
+      { branch, worktreePath, lastSynced, branchTip },
+    );
+  }
+
+  // Stray dirt beyond what's staged (untracked, or unstaged changes to a
+  // tracked file) is refused outright rather than guessed into a merge
+  // (D3) -- only STAGED content is what this repair carries forward.
+  // Porcelain column 2 (working-tree status) is ' ' for a purely-staged
+  // entry; anything else means real dirt outside the index.
+  const status = git(repoRoot, ['-C', worktreePath, 'status', '--porcelain', '--', ':!.fgos']);
+  const strayLines = status.split('\n').filter((line) => line !== '' && line[1] !== ' ');
+  if (strayLines.length > 0) {
+    throw new WorktreeError(
+      `resync-worktree: refusing "${worktreePath}" on "${branch}" — stray uncommitted changes beyond what's staged (${strayLines.join(', ')}). Commit, stage, or discard them before resyncing; never guessing a merge over stray dirt.`,
+      { branch, worktreePath, strayLines },
+    );
+  }
+
+  // 1. Extract the staged content as a patch BEFORE touching anything,
+  // saved under --git-common-dir -- never the worktree's own --git-dir,
+  // which fgOS can force-remove later, losing the only copy (D3).
+  // `gitCommonDir`/`patchDir` already resolved above, by the orphaned-
+  // patch pre-check (tsk-jg4).
+  const patch = git(repoRoot, ['-C', worktreePath, 'diff', '--cached', '--binary', lastSynced]);
+  fs.mkdirSync(patchDir, { recursive: true });
+  const patchPath = path.join(patchDir, `${branch.replace(/\//g, '-')}-${Date.now()}.patch`);
+  fs.writeFileSync(patchPath, patch);
+
+  // 2. Reset to the branch's real tip.
+  git(repoRoot, ['-C', worktreePath, 'reset', '--hard', branchTip]);
+
+  // 3. Re-strip .fgos/ -- reset --hard always reintroduces it (D3).
+  stripFgosAfterReset(worktreePath, branch);
+
+  if (patch.trim() === '') {
+    // Nothing was staged -- nothing to reapply.
+    fs.rmSync(patchPath, { force: true });
+    return { resynced: true, from: lastSynced, to: branchTip, reapplied: false };
+  }
+
+  // 4. Reapply the patch, merging both index and working tree in one step
+  // -- never `--3way`, which was tested to leave unmerged/conflict state
+  // (D3). A real content conflict refuses and preserves the patch file so
+  // a person can review/apply it by hand.
+  try {
+    git(repoRoot, ['-C', worktreePath, 'apply', '--index', patchPath]);
+  } catch (err) {
+    throw new WorktreeError(
+      `resync-worktree: "${worktreePath}" was reset to "${branchTip}" but reapplying its staged changes hit a real conflict — the patch is preserved at "${patchPath}" for manual review. ${err.message}`,
+      { branch, worktreePath, patchPath },
+    );
+  }
+
+  fs.rmSync(patchPath, { force: true });
+  return { resynced: true, from: lastSynced, to: branchTip, reapplied: true };
 }
 
 /**
@@ -706,8 +1044,92 @@ export function createClaimWorktree(repoRoot, id, opts = {}) {
       resyncClaimWorktree(repoRoot, existing, branch);
       return { path: existing, branch, reused: true };
     }
+    // tsk-55p: no LIVE checkout to reattach to, but the branch ref already
+    // exists -- the decompose-time bare-ref case (createBranchRef, D17),
+    // never yet picked. createWorktree's own reuse path below checks this
+    // branch out exactly as it stands, ignoring opts.baseRef by design (its
+    // own docblock) -- so a branch minted long before this pick, from a
+    // base that has since moved, would stand on that stale tip with no
+    // refresh at all. refreshUnstartedBranch closes that gap HERE, before
+    // the checkout is created, not inside createWorktree itself (shared
+    // with the runner's own retry-without-self-collision dispatch path,
+    // which must stay byte-identical).
+    const refresh = opts.baseRef ? refreshUnstartedBranch(repoRoot, branch, opts.baseRef) : undefined;
+    return { ...createWorktree(repoRoot, id, opts), refresh };
   }
   return createWorktree(repoRoot, id, opts);
+}
+
+/**
+ * Refreshes `branch` onto `targetRef`'s current tip, but ONLY when `branch`
+ * provably has no commits of its own yet (tsk-55p, closing the decompose-
+ * to-pick staleness gap: `fgw/<id>` is normally minted at decompose time,
+ * `createBranchRef(..., baseRef: 'main')`, then sits untouched until
+ * someone picks it -- by which point `main`/its parent may have moved
+ * considerably).
+ *
+ * "No commits of its own" is decided the same way D2 requires everywhere
+ * else in this module: `branch`'s tip must be its own merge-base with
+ * `targetRef` -- i.e. an ancestor of it. That is the literal "compare the
+ * branch's tip to its own base" test, not "does a worktree exist for it" --
+ * and it fails CLOSED: any error probing the relationship (a corrupt ref,
+ * a detached/unreachable commit) is treated as "has its own commits, do not
+ * touch", never as license to refresh. Because the check already proved
+ * `branch` is an ancestor of `targetRef`, the refresh itself is a provable
+ * fast-forward -- the degenerate, always-safe case of merge-target-into-
+ * branch (D2: never rebase a branch with commits of its own; there are
+ * none here to rewrite).
+ *
+ * `checkoutPath`, when supplied, refreshes via a real `merge --ff-only`
+ * inside that checkout instead of a bare `git branch -f` -- git itself
+ * refuses either form if it would discard anything, so both refusal paths
+ * downgrade to `{refreshed: false, reason: 'refresh-refused'}` rather than
+ * failing the claim outright.
+ */
+export function refreshUnstartedBranch(repoRoot, branch, targetRef, checkoutPath = null) {
+  const branchTip = git(repoRoot, ['rev-parse', branch]).trim();
+  const targetTip = git(repoRoot, ['rev-parse', targetRef]).trim();
+
+  let ahead = 0;
+  let behind = 0;
+  try {
+    const counts = git(repoRoot, ['rev-list', '--left-right', '--count', `${targetRef}...${branch}`]).trim();
+    const [behindStr, aheadStr] = counts.split(/\s+/);
+    const parsedBehind = Number.parseInt(behindStr, 10);
+    const parsedAhead = Number.parseInt(aheadStr, 10);
+    behind = Number.isFinite(parsedBehind) ? parsedBehind : 0;
+    ahead = Number.isFinite(parsedAhead) ? parsedAhead : 0;
+  } catch {
+    // Rare ref race (e.g. a ref deleted between the two rev-parse calls
+    // above and this rev-list) -- report zero drift rather than throwing;
+    // the ancestor check right below is the real safety gate, not this.
+  }
+
+  if (branchTip === targetTip) {
+    return { target: targetRef, ahead, behind, refreshed: false, reason: 'already-current' };
+  }
+
+  let unstarted = false;
+  try {
+    git(repoRoot, ['merge-base', '--is-ancestor', branch, targetRef]);
+    unstarted = true;
+  } catch {
+    unstarted = false;
+  }
+  if (!unstarted) {
+    return { target: targetRef, ahead, behind, refreshed: false, reason: 'own-commits' };
+  }
+
+  try {
+    if (checkoutPath) {
+      git(repoRoot, ['-C', checkoutPath, 'merge', '--ff-only', targetTip]);
+    } else {
+      git(repoRoot, ['branch', '-f', branch, targetTip]);
+    }
+  } catch (err) {
+    return { target: targetRef, ahead, behind, refreshed: false, reason: 'refresh-refused', detail: err.message };
+  }
+  return { target: targetRef, ahead, behind, refreshed: true, from: branchTip, to: targetTip };
 }
 
 /**
@@ -739,14 +1161,17 @@ export function createClaimWorktree(repoRoot, id, opts = {}) {
  * gets that early call, so the branch can genuinely not exist yet the
  * first time a merge needs it (docs/history/
  * tsk-6ch-merge-worktree-branch-fallback/CONTEXT.md). Falling back to
- * `createBranchRef` here — idempotent, same `baseRef: 'main'` `loop.mjs`
- * already uses for this exact early-creation step — replaces that missing
- * step instead of crashing the merge outright.
+ * `createBranchRef` here — idempotent, same early-creation step
+ * `loop.mjs` already uses — replaces that missing step instead of crashing
+ * the merge outright. No explicit `baseRef` (tsk-386): `createBranchRef`'s
+ * own default already resolves through `detectTrunk(repoRoot)`, never a
+ * hardcoded `'main'` — a host repo whose trunk is `master` would otherwise
+ * fail this exact fallback outright.
  */
 function createDetachedMergeWorktree(repoRoot, id) {
   const branch = branchNameFor(id);
   if (!branchExists(repoRoot, branch)) {
-    createBranchRef(repoRoot, id, { baseRef: 'main' });
+    createBranchRef(repoRoot, id);
   }
   const startCommit = git(repoRoot, ['rev-parse', branch]).trim();
   const baseDir = path.join(os.tmpdir(), 'fgos-worktrees');
@@ -768,7 +1193,28 @@ function createDetachedMergeWorktree(repoRoot, id) {
     });
   }
 
-  finishWorktreeSetup(worktreePath, branch);
+  // tsk-4yv: same reasoning as createWorktree's own identical wrap above --
+  // `git worktree add --detach` has already succeeded by this point, so a
+  // `finishWorktreeSetup` failure (the `.fgos/` strip, or
+  // `provisionDependencies`'s `npm ci`/`npm install`) must force-remove the
+  // now-registered worktree before rethrowing, or it leaks: this is
+  // specifically the DETACHED case (a `withMergeEphemeralWorktree` call
+  // during `approve`), which `reclaimOrphanedCheckout`/`findCheckoutPath`
+  // (both branch-keyed) never reclaim, unlike a branch-attached
+  // `createWorktree` checkout, which mostly self-heals via the
+  // relocate/reattach paths. Left unfixed, a repeated npm registry flake
+  // during `approve` accumulates full checkouts under tmp indefinitely.
+  try {
+    finishWorktreeSetup(worktreePath, branch);
+  } catch (err) {
+    try {
+      removeWorktree(repoRoot, worktreePath, { force: true });
+    } catch {
+      // best-effort — a failed cleanup here must never mask the real
+      // finishWorktreeSetup failure the caller needs to see.
+    }
+    throw err;
+  }
 
   return { path: worktreePath, branch, startCommit };
 }
@@ -787,26 +1233,47 @@ export async function withMergeEphemeralWorktree(repoRoot, id, fn) {
     const endCommit = git(worktree.path, ['rev-parse', 'HEAD']).trim();
     if (endCommit !== worktree.startCommit) {
       // CAS GUARD (tsk-46a, docs/history/merge-ephemeral-branch-force-race/
-      // CONTEXT.md D1): `startCommit` was captured back in
+      // CONTEXT.md D1; hardened tsk-18k): `startCommit` was captured back in
       // createDetachedMergeWorktree, before `fn` ran and before any lock was
       // held over THIS step -- a second concurrent call for the same `id`
       // (e.g. two leaf approves into the same fgw/<rootId>) can land its own
-      // `branch -f` in between, moving `branch` out from under this call
-      // without this call ever knowing. Re-reading the branch's live tip
-      // right here and refusing to move it unless it still matches
-      // `startCommit` is what closes that window -- unconditionally
-      // force-moving (the old behavior) would silently discard whichever
-      // commit landed first, with no error and no conflict. D2: fail loudly
-      // here, never retry automatically -- the caller (merge-loop, or a
-      // person re-running `fgos approve`) owns retrying against the new tip.
-      const liveTip = git(repoRoot, ['rev-parse', branch]).trim();
-      if (liveTip !== worktree.startCommit) {
+      // ref update in between, moving `branch` out from under this call
+      // without this call ever knowing.
+      //
+      // `git update-ref <ref> <new> <old>` is git's own atomic
+      // compare-and-swap on the ref: it refuses the write outright
+      // (non-zero exit, ref left completely untouched) unless the ref's
+      // CURRENT value still equals `<old>` at the exact moment of the
+      // write -- there is no separate read-then-write window left for a
+      // second caller to land in between. The prior shape here was a plain
+      // `git rev-parse` (read) followed by an unconditional `git branch -f`
+      // (write): two genuinely concurrent callers could BOTH pass that read
+      // before either one wrote, letting the second `branch -f` silently
+      // discard whichever commit the first one had just landed, with no
+      // error and no conflict. That window is exactly what tsk-18k's own
+      // bug (the merge-target-slot lock's release/renew misidentifying a
+      // sibling's live lock as its own after a TTL-starvation reclaim,
+      // fixed above in `withMergeTargetSlot`) could put two callers through
+      // at once -- confirmed still possible even after that identity fix,
+      // since a TTL-starvation reclaim can happen while the original
+      // holder's own `fn()` (this whole merge) is still running, unaware
+      // its lock was reclaimed. D2 still holds: fail loudly here, never
+      // retry automatically -- the caller (merge-loop, or a person
+      // re-running `fgos approve`) owns retrying against the new tip.
+      try {
+        git(repoRoot, ['update-ref', `refs/heads/${branch}`, endCommit, worktree.startCommit]);
+      } catch {
+        // update-ref's own error already named the mismatch on stderr; read
+        // the branch's actual current tip here only to report it back in
+        // the same message/field shape callers and tests already expect --
+        // this read is diagnostic, never the guard itself (the guard
+        // already ran, atomically, in the update-ref call above).
+        const liveTip = git(repoRoot, ['rev-parse', branch]).trim();
         throw new WorktreeError(
           `refusing to force-move "${branch}" to ${endCommit} -- its tip changed from ${worktree.startCommit} to ${liveTip} since this merge started (a concurrent merge into the same branch already landed). Retry against the new tip instead of overwriting it.`,
           { branch, expectedTip: worktree.startCommit, actualTip: liveTip, endCommit },
         );
       }
-      git(repoRoot, ['branch', '-f', branch, endCommit]);
     }
     return result;
   } finally {

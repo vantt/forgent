@@ -4,7 +4,7 @@ Item: `tsk-3k2`. Written retroactively (same structural gap noted in
 `tsk-49u`/`tsk-1d9`'s own CONTEXT.md files — `clarify` jumps straight to
 `decompose`).
 
-## Decisions
+## Locked decisions
 
 - **D0.** Root cause confirmed by reading `scripts/fgos-shell-
   integration.sh` in full: `fgos()` (:28) and `fgos-runner()` (:48) both

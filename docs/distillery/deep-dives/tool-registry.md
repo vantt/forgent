@@ -123,7 +123,7 @@ Lấy **data model + degrade ladder của repository-harness/symphony** (vì fgO
 
 **Thiết kế cụ thể:**
 
-1. **Store — SỬA sau consult 2026-07-30 (xem `plans/reports/distill-consult-260730-2152-tool-registry-capability-vocab-report.md`, Trade-off #2):** KHÔNG fold TOÀN BỘ vào event-log chung. `tool.register`/`tool.remove` (quyết định TEAM — "project này dùng gitnexus cho impact-analysis") vẫn qua `.fgos/events.jsonl` fold vào `view.tools: { <name>: {kind, capability, scanTarget, command, responsibility, description} }`, đúng one-door-write. Nhưng `tool.check`'s kết quả (`status`, `checkedAt`) là SỰ THẬT VỀ MÁY NÀY, không phải quyết định team — beegog's `.bee/doctor-attest.json` (never-tracked, tách khỏi `config.json` tracked) là tiền lệ đúng: ghi vào 1 file cục bộ gitignored riêng (`.fgos/tool-status.local.json`), KHÔNG phải event. Fold ngầm lúc query: `view.tools` (đăng ký) overlay file cục bộ (trạng thái máy này) → record đầy đủ. Máy khác không có file đó → mọi tool đã đăng ký hiện `unknown`, đúng ngữ nghĩa gốc của US-027 ("no scan_target hoặc chưa scan → unknown, agent tự confirm").
+1. **Store — SỬA sau consult 2026-07-30 (xem `plans/reports/distill-consult-260730-2152-tool-registry-capability-vocab-report.md`, Trade-off #2):** KHÔNG fold TOÀN BỘ vào event-log chung. `tool.register`/`tool.remove` (quyết định TEAM — "project này dùng gitnexus cho impact-analysis") vẫn qua `.fgos/events.jsonl` fold vào `view.tools: { <name>: {kind, capability, scanTarget, command, responsibility, description} }`, đúng one-door-write. Nhưng `tool.check`'s kết quả (`status`, `checkedAt`) là SỰ THẬT VỀ MÁY NÀY, không phải quyết định team — beehive's `.bee/doctor-attest.json` (never-tracked, tách khỏi `config.json` tracked) là tiền lệ đúng: ghi vào 1 file cục bộ gitignored riêng (`.fgos/tool-status.local.json`), KHÔNG phải event. Fold ngầm lúc query: `view.tools` (đăng ký) overlay file cục bộ (trạng thái máy này) → record đầy đủ. Máy khác không có file đó → mọi tool đã đăng ký hiện `unknown`, đúng ngữ nghĩa gốc của US-027 ("no scan_target hoặc chưa scan → unknown, agent tự confirm").
 2. **Verbs mới** (theo đúng khuôn `fgos <verb> [write|read]` đã thấy trong help output):
    - `fgos tool register --name gitnexus --kind mcp --capability impact-analysis --scan .gitnexus --responsibility Verification --description "..."` [write, qua event-log] — validate: `kind` ∈ cli/binary/mcp/skill/http; `capability` normalize kebab-case; unique `name`.
    - `fgos tool check [--name x] [--json]` [write, nhưng luôn exit 0, ghi file cục bộ KHÔNG qua event-log] — probe theo kind (mcp/skill: path `scanTarget` tồn tại; cli/binary: `command -v`; http: TCP ping ngắn), persist `status`+`checkedAt` vào `.fgos/tool-status.local.json` (thêm vào `.gitignore`).
@@ -150,11 +150,21 @@ Lấy **data model + degrade ladder của repository-harness/symphony** (vì fgO
 
 *(R/E/F giữ nguyên rubric distillery hiện có; đây là đề xuất điều chỉnh dòng đã tồn tại ở porting-log.md:34, không tạo dòng mới trùng — cần human xác nhận trước khi sửa porting-log.)*
 
-## Cấu hình forgentX hiện tại (tsk-4ad)
+## Cấu hình forgentX hiện tại (tsk-4ad; register/remove rút bởi tsk-in1-1 D1)
 
 Verb-group `fgos tool` (port của tsk-1dj) đã sống trong `bin/fgos.mjs`; mục
 này chỉ ghi lại cấu hình THẬT của repo forgentX hôm nay, và cách một người
 khác tự chỉnh/mở rộng nó mà không cần hỏi lại.
+
+> **tsk-in1-1 D1** (sau tsk-4ad): `register`/`remove` — 2 verb CLI mô tả
+> ngay dưới đây — đã bị rút. Provider giờ khai báo thẳng trong
+> `runner.capacities.<id>` (`.fgos/config.json`), sửa file config như mọi
+> `capacities` entry khác (`toolsFromCapacities`, `src/state/
+> tool-registry.mjs`, nhặt entry nào khai `capability`), không qua event-log
+> nữa. Chi tiết shape hiện tại + lý do: `docs/reference/forgentx-tool-
+> registry-configuration.md`. Phần narrative bên trên (trước mục này) là
+> ghi chép thiết kế TẠI THỜI ĐIỂM port (tsk-1dj/tsk-4ad) — giữ nguyên làm
+> lịch sử quyết định, không sửa theo đổi mới này.
 
 **Đăng ký sống** (xác nhận bằng `fgos tool query --capability impact-analysis --json`):
 

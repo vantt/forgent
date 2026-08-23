@@ -72,17 +72,10 @@ boundary).
 
 4. **Run the verb.** Otherwise the output is `{"id": "<id>"}`. Run:
 
+   See `../_shared/fgos-cli-fallback.md`, substituting `<verb-cmd>` with:
+
    ```
-   # fgos CLI fallback (tsk-1no D3)
-   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
-   if [ -f "$FGOS_BIN" ]; then
-     node "$FGOS_BIN" cleanup <id> --dir "$root"
-   elif command -v fgos >/dev/null 2>&1; then
-     fgos cleanup <id> --dir "$root"
-   else
-     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
-     exit 1
-   fi
+   cleanup <id> --dir "$root"
    ```
 
    substituting `<id>` from step 2's output. Capture both the command's

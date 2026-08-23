@@ -7,6 +7,23 @@ source_capture_ids: [tsk-62d]
 ---
 # How to grant a nested `claude -p` executor call its own scoped `allowedTools`
 
+> **Superseded (tsk-in1-2 D6):** this recipe's whole mechanism —
+> `cfg.executors.<role>`, a synthetic-role lookup ahead of the global
+> `cfg.executor` — is retired (0 live entries left; `runner.executors.judge`
+> had itself already migrated to `runner.executors.judge` before this,
+> per `tsk-5ge`, and was later removed outright as dead, per `tsk-4w4`).
+> `cfg.executors` is now an unvalidated, unread field — steps 1/3/4's own
+> code/config/test excerpts below no longer do anything if followed
+> verbatim. The modern equivalent for scoping `allowedTools` to one call
+> site: give that call site its own `executors.<executorId>` entry with
+> an explicit `command`/`args` (the same executor-block shape), and pass
+> that id as `resolveExecutorCommand`'s `executorId` — see `docs/how-to/
+> wire-a-headless-function-through-an-agent-executor-executor.md`. Kept
+> below as the historical record of `tsk-62d`'s own reasoning (step 5's
+> "what almost went wrong" lesson — read the resolver's real signature and
+> callers before adding a parallel dimension — still holds regardless of
+> which mechanism is live).
+
 `tsk-62d` needed `judgeDiscovery`/`judgeDecompose` (`src/intake/discovery.mjs`,
 `src/intake/plan.mjs`) to run one extra tool (`rg`, for a bounded scout
 pass) that the shared worker `allowedTools`

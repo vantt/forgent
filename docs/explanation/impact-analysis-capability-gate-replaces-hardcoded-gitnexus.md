@@ -171,3 +171,47 @@ own error already names its fix (drop/recreate `file_fts`) when it does
 surface. Staleness (index behind HEAD) and corruption (index broken
 regardless of freshness) are deliberately distinct terms — the fix here
 only covers the former.
+
+## `full` doesn't mean complete per-file coverage either (`tsk-38h`)
+
+`tsk-j7y` closed the staleness gap — a `present` status now means the
+index reflects the repo's current commit. But a fresh, non-stale index
+can still have zero symbol-level coverage for one specific file, which is
+a *third*, distinct mechanism from both "not present" and "stale."
+
+`tsk-38h` first reproduced this on `bin/fgos.mjs`: `impact()` reported no
+upstream callers for `resolveDiscovery`/`resolveDecompose` and could not
+find `runVerb` at all — even right after a fresh `gitnexus analyze` (8241
+symbols, 17s). Grep confirmed real call sites existed
+(`bin/fgos.mjs:965`/`986`, `loop.mjs:977`/`997`). A second, independent
+reproduction landed later, during `tsk-5zg`'s own required impact-analysis
+step: `impact({target:'runVerb', direction:'upstream',
+file_path:'bin/fgos.mjs'})` still returned "not found" on a freshly
+rebuilt index (15935 nodes, 0 stale). A direct cypher query — `MATCH
+(f:Function) WHERE f.filePath = 'bin/fgos.mjs' RETURN f.name` — confirmed
+`bin/fgos.mjs` carries **zero indexed `Function` symbols at all**. Not a
+stale-index or wrong-name issue: the whole file sits outside the parser's
+symbol-level coverage, likely a size/complexity ceiling (the file is
+5000+ lines).
+
+**Why this didn't need a fourth status word.** The existing "degraded"
+bucket's own unconditional cross-check line — "a suspicious zero-result
+or 'not found' answer from an impact-analysis tool is worth a quick
+grep/rg cross-check before being trusted, regardless of what `fgos tool
+query` reports" — already operationally covers this case: a session that
+follows that line catches a large-file zero-coverage miss the same way it
+would catch staleness. What was missing was making the *mechanism*
+explicit under the "full" bucket itself, so a reader doesn't read `full`
+as "guaranteed complete." `CLAUDE.md`'s gate prose now reads:
+
+> `present`, freshly checked — Full: the MUST rules below apply exactly
+> as written. A `full` posture still is not a guarantee of complete
+> per-file coverage: a genuinely fresh, non-stale index can still carry
+> zero indexed symbols for one large/complex file (tsk-38h — confirmed on
+> `bin/fgos.mjs`, 5000+ lines, zero indexed `Function` symbols even
+> immediately after a fresh reindex), a distinct mechanism from staleness
+> that the cross-check line above already covers unconditionally.
+
+So the three-way framing (inactive/degraded/full) stays a three-way
+framing — this item only sharpens what "full" honestly promises, it
+never adds a fourth bucket.

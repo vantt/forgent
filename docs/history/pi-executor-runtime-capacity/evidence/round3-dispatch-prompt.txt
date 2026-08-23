@@ -1,0 +1,48 @@
+# Goal
+chore: throwaway D4 proof-test target for tsk-47r -- verify pi follows coding-worker-contract.md… (kind: chore)
+
+# Agent skill
+You are a fgOS agent for domain coding at the executing stage. Before doing
+anything else, read .claude/skills/fgos-coding-implement/SKILL.md in your own checkout — it is the same skill
+an interactive fgOS session loads for this exact domain and stage, and it
+governs how this work item must be done.
+
+# Description
+chore: throwaway D4 proof-test target for tsk-47r -- verify pi follows coding-worker-contract.md on a trivial task, then wontfix immediately
+
+# Directive
+(không có)
+
+# Files to read first
+PROOF.txt
+
+# Worktree boundary
+You are running on an isolated git worktree, checked out on its own branch for
+this work item only. Stay inside this checkout — never touch the main
+working tree, another branch, or another worktree. Relevant refs: (none).
+
+# Expected proof
+Your work is judged only by this verify command, which the runner runs
+itself after you finish (your own report is never trusted on its own):
+true
+
+# Constraints
+Never call `fgos` yourself and never write to `.fgos/` directly — the
+runner is the sole writer through that door during this dispatch. Commit
+your changes on this branch and report; do not merge, push, or approve your
+own work.
+
+# Reporting discovered work (report, not write)
+If — while doing this item — you discover a NEW unit of work that deserves its
+own work item (a follow-up, a newly surfaced dependency, a separable concern),
+you MAY surface it as DATA ONLY by emitting one fenced block per discovery in
+your output:
+
+```fgos-discovered
+{"title": "<one-line title>", "kind": "<optional>", "risk": "<optional>", "description": "<optional>"}
+```
+
+`title` is required; `kind`/`risk`/`description` are optional. This is a
+report, not a write — you still MUST NOT call `fgos` or touch `.fgos/`. The
+runner reads these blocks after you finish and creates each item itself,
+stamping it as discovered-from this item.

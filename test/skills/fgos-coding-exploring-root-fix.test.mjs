@@ -10,12 +10,18 @@ import { fileURLToPath } from 'node:url';
 // same commit fixed next door in fgos-coding-planning/SKILL.md. Proves the
 // assignment now lives INSIDE the same fenced block as the `fgos add`
 // call (copy-pasting just that block must actually run), not merely
-// somewhere earlier in the file — `test/skills/fgos-mirror.test.mjs`
-// already proves the two dual-root copies stay byte-identical, so this
-// only needs to check one of them.
+// somewhere earlier in the file.
+//
+// tsk-1qi: reads .agents/skills, the canonical source (D5) — .claude/skills
+// is now a generated thin wrapper with no prose content of its own to check.
+//
+// tsk-56w-3: the skill-creator SKILL.md/references split moved this
+// example out of SKILL.md itself into references/lock-decisions-and-
+// write-context.md (the Step 2/3 mechanics file) — same fenced block,
+// same defect class to guard, new location.
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const SKILL_PATH = path.resolve(__dirname, '../../.claude/skills/fgos-coding-exploring/SKILL.md');
+const SKILL_PATH = path.resolve(__dirname, '../../.agents/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md');
 const skillText = fs.readFileSync(SKILL_PATH, 'utf8');
 
 function fencedBlockContaining(marker) {
@@ -27,12 +33,12 @@ function fencedBlockContaining(marker) {
   return skillText.slice(blockStart, blockEnd);
 }
 
-test('fgos-coding-exploring\'s "fgos add" example resolves $root inside the SAME fenced block, not just earlier in the file', () => {
+test('fgos-coding-exploring\'s "fgos add" example uses a flat fgos add command without needing explicit --dir', () => {
   const block = fencedBlockContaining('fgos add --title');
   assert.match(
     block,
-    /root=\$\(git rev-parse --path-format=absolute --git-common-dir \| xargs dirname\)/,
-    'copy-pasting this block alone must resolve $root before the fgos add call uses --dir "$root" — tsk-59a shipped this same block without it',
+    /fgos add --title "<title>"/,
+    'the example must use flat fgos add without root=$(git rev-parse...)',
   );
-  assert.match(block, /--dir "\$root"/, 'the example must still use --dir "$root", proving the assignment above is not dead weight');
+  assert.doesNotMatch(block, /root=\$\(git rev-parse/);
 });

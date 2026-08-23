@@ -15,6 +15,7 @@ import { buildUnifiedEdges } from './dep-graph.mjs';
 import { FRONTIER_ORDER_VERSION, frontier, isResolvedStatus } from './frontier.mjs';
 import { viewRevision } from './replay.mjs';
 import { effectiveStage, getDomain } from './workflow-stage-graphs.mjs';
+import { normalizePath } from '../util/normalize-path.mjs';
 
 /**
  * Connected components of the UNDIRECTED unified graph (blocks + parent-child
@@ -601,8 +602,18 @@ export function footprintOverlapAmong(candidates) {
     const footprintA = Array.isArray(candidates[i].footprint) ? candidates[i].footprint : [];
     if (footprintA.length === 0) continue;
     for (let j = i + 1; j < candidates.length; j += 1) {
-      const footprintB = new Set(Array.isArray(candidates[j].footprint) ? candidates[j].footprint : []);
-      const shared = footprintA.filter((path) => footprintB.has(path));
+      // tsk-2jn: normalized through normalizePath (util/normalize-path.mjs) for the
+      // MEMBERSHIP check only -- the same choke-point buildOwnFileSet
+      // (merge.mjs) and frozenJudgeHits (frozen-judge.mjs) already normalize
+      // through, so a stray "./" or a "\" from a different session/OS never
+      // dodges detection. `shared` still reports footprint A's own
+      // as-declared spelling (never the normalized form) -- this is a
+      // detector, not a rewriter, and the raw string is what a person
+      // resolving the conflict actually typed into `footprint`.
+      const footprintB = new Set(
+        (Array.isArray(candidates[j].footprint) ? candidates[j].footprint : []).map(normalizePath),
+      );
+      const shared = footprintA.filter((path) => footprintB.has(normalizePath(path)));
       if (shared.length > 0) {
         conflicts.push({ a: candidates[i].id, b: candidates[j].id, shared, suggestions: [...FOOTPRINT_CONFLICT_SUGGESTIONS] });
       }

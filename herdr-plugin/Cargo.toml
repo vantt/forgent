@@ -16,3 +16,69 @@ ratatui = { version = "0.30", features = ["unstable-rendered-line-info"] }
 crossterm = "0.29"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+# tsk-7l9-2 D8: herdr-fgos's first async dependency -- the gateway's REST
+# surface (D1/D7) is what needs one; the TUI/orchestrator code stays fully
+# synchronous and untouched.
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "process", "net", "time", "fs"] }
+# tsk-7l9-3: bumped 0.7 -> 0.8 -- required by `rmcp`'s streamable-http-server
+# transport (mcp.rs), which only supports axum ^0.8. Breaking route-syntax
+# change (`:id` -> `{id}`) rewritten across every existing route in
+# gateway.rs's `build_router`; no other breaking change touches this crate
+# (State/middleware::from_fn_with_state/Json extraction are unaffected).
+axum = "0.8"
+# tsk-7l9-3 D1: MCP surface's server SDK -- the official
+# modelcontextprotocol/rust-sdk, tokio-async, mounts its
+# `transport::streamable_http_server::StreamableHttpService` directly onto an
+# existing `axum::Router` via `.nest_service()` (confirmed against the SDK's
+# own `examples/servers/src/counter_streamhttp.rs`), so `search`/`execute`
+# ride the SAME router/port `tsk-7l9-2`'s REST surface already serves -- no
+# second process, no second listener. `mcpkit-axum` (this plan's original
+# pick alongside rmcp) turned out to be a wholly separate, non-composable MCP
+# SDK (`mcpkit-core`/`mcpkit-server`/`mcpkit-transport`, unrelated to rmcp) --
+# dropped, rmcp alone covers the whole surface.
+rmcp = { version = "3", features = ["server", "macros", "transport-streamable-http-server", "schemars"] }
+# tsk-7l9-3 D1: `execute`'s bound-function scripting language (Approach's own
+# rhai-over-mlua pick: pure Rust, no vendored-C/system-Lua dependency, matches
+# D1's "no extra runtime layer" rationale). `serde` feature turns bound
+# function results (serde_json::Value) into Rhai `Dynamic` values and back.
+rhai = { version = "1", features = ["serde"] }
+# tsk-7l9-3: `search`'s only new data need -- parses the OpenAPI contract
+# (`docs/contracts/fgos-gateway-api-v1.yaml`) into a queryable operation list
+# instead of serving it as an opaque string the way `/contract` already does.
+serde_yaml = "0.9"
+# tsk-54y: CORS layer for `build_router` -- the web client (a separate
+# static bundle, D2 of docs/history/herdr-web-dashboard-plan-realignment/
+# CONTEXT.md) is not guaranteed to share origin with the gateway. Version
+# resolved by `cargo add --dry-run` against this crate's existing axum 0.8
+# dependency graph (docs/history/tsk-54y-gateway-cors-bind/plan.md).
+tower-http = { version = "0.7", features = ["cors", "fs"] }
+# tsk-48w (D14 of docs/history/herdr-web-dashboard-plan-realignment/
+# CONTEXT.md): embeds herdr-plugin/web's built bundle into the binary so
+# the "máy được chọn" can serve it with no separate deploy step.
+# Versions resolved by real `cargo add --dry-run` against this crate's
+# existing dependency graph (docs/history/herdr-web-dashboard/plan.md,
+# "NẮN LẠI P1 tsk-48w"): rust-embed 8.12.0, axum-embed 0.1.0, same
+# rust-embed major line the reference implementation herdr-gateway pins.
+rust-embed = { version = "8", features = ["debug-embed"] }
+axum-embed = "0.1"
+# tsk-6arn (D8): Cloudflare Access as auth layer 2, additive to the
+# Bearer token layer already shipped (tsk-7l9). Ported from the reference
+# implementation herdr-gateway (crate herdr-go, src/web/cf_access.rs).
+# Versions resolved by real `cargo add --dry-run` against this crate's
+# existing dependency graph -- differ from the reference's own pins
+# (jsonwebtoken 9->11, reqwest 0.12->0.13; reqwest's TLS feature was
+# renamed `rustls-tls`->`rustls` between those versions, confirmed by a
+# real dry-run failure before the correction). `jsonwebtoken`'s
+# `aws_lc_rs` feature is required explicitly -- v11 ships neither crypto
+# backend by default (real runtime panic caught at Execute: "Could not
+# automatically determine the process-level CryptoProvider... make sure
+# exactly one of the 'rust_crypto' and 'aws_lc_rs' features is enabled"),
+# and `aws_lc_rs` matches the backend `reqwest`'s own `rustls` feature
+# already pulls in, avoiding a second, competing provider in the same
+# binary.
+jsonwebtoken = { version = "11", default-features = false, features = ["use_pem", "aws_lc_rs"] }
+reqwest = { version = "0.13", default-features = false, features = ["json", "rustls"] }
+base64 = "0.23"
+
+[dev-dependencies]
+tower = { version = "0.4", features = ["util"] }

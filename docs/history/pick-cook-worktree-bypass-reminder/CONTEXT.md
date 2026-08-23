@@ -23,7 +23,7 @@ session reads the warning before repeating the mistake. It is NOT a code
 fix, NOT a new `doctor` check, and NOT a retroactive cleanup of the two
 branches (already resolved before this item was even submitted).
 
-# Locked decisions
+## Locked decisions
 
 | ID | Decision |
 |----|----------|

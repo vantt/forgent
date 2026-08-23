@@ -298,7 +298,7 @@ test('decision logs one event and appears in the view, exit 0', () => {
   const cwd = tmpCwd();
   run(cwd, ['init']);
   const before = eventLines(cwd).length;
-  const result = run(cwd, ['decision', '--text', 'locked D5 naming', '--rationale', 'avoids a naming collision with an existing verb']);
+  const result = run(cwd, ['decision', '--text', 'locked D5 naming', '--rationale', 'avoids a naming collision with an existing verb', '--relation', 'none']);
   assert.equal(result.status, 0);
   assert.equal(eventLines(cwd).length, before + 1);
   assert.equal(stateView(cwd).decisions.length, 1);
@@ -341,6 +341,7 @@ test('decision with --alternatives, --source, and --id folds all fields, exit 0'
     '--alternatives', 'option A was rejected -- needs a new package',
     '--source', 'human',
     '--id', 'item-a',
+    '--relation', 'none',
   ]);
   assert.equal(result.status, 0);
   assert.equal(eventLines(cwd).length, before + 1);
@@ -638,11 +639,19 @@ test('move --reason on a non-rejection edge is accepted but ignored, not embedde
 // new formatter (D7); `answer` records the answer and resumes the item to
 // `todo`, at which point it is actionable again (back in `ready`).
 
+const VALID_ASK_TEXT = `## Context
+
+We need to decide on the authentication mechanism for the application endpoints.
+
+## Why this matters
+
+The chosen mechanism determines security requirements and user authentication flows.`;
+
 test('ask/answer round-trip on a todo item: park removes from ready and surfaces the ask via list, answer resumes to todo and reopens ready', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'gated-item');
 
-  const askResult = run(cwd, ['ask', 'gated-item', '--text', 'OAuth or password?']);
+  const askResult = run(cwd, ['ask', 'gated-item', '--text', VALID_ASK_TEXT]);
   assert.equal(askResult.status, 0);
   assert.deepEqual(envelopeData(askResult.stdout), { id: 'gated-item', from: 'todo', to: 'awaiting-human', seq: 2 });
   assert.equal(stateView(cwd).work['gated-item'].status, 'awaiting-human');
@@ -651,7 +660,7 @@ test('ask/answer round-trip on a todo item: park removes from ready and surfaces
   // read command/formatter — the existing `view.gates` fold carries it.
   const listedWhileAwaiting = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(listedWhileAwaiting.work['gated-item'].status, 'awaiting-human');
-  assert.equal(listedWhileAwaiting.gates['gated-item'].ask, 'OAuth or password?');
+  assert.equal(listedWhileAwaiting.gates['gated-item'].ask, VALID_ASK_TEXT);
   assert.equal(listedWhileAwaiting.gates['gated-item'].answer, undefined);
 
   // D6: a parked item is never in the ready set.
@@ -664,7 +673,7 @@ test('ask/answer round-trip on a todo item: park removes from ready and surfaces
   assert.equal(stateView(cwd).work['gated-item'].status, 'todo');
 
   const listedAfterAnswer = envelopeData(run(cwd, ['list']).stdout);
-  assert.equal(listedAfterAnswer.gates['gated-item'].ask, 'OAuth or password?');
+  assert.equal(listedAfterAnswer.gates['gated-item'].ask, VALID_ASK_TEXT);
   assert.equal(listedAfterAnswer.gates['gated-item'].answer, 'OAuth');
 
   const readyAfterAnswer = envelopeData(run(cwd, ['ready']).stdout);
@@ -679,7 +688,7 @@ test('ask --rationale and answer --rationale both persist on gates[id], neither 
   addOk(cwd, 'checkpoint-item');
 
   run(cwd, [
-    'ask', 'checkpoint-item', '--text', 'OAuth or password?',
+    'ask', 'checkpoint-item', '--text', VALID_ASK_TEXT,
     '--rationale', 'leaning OAuth: fewer support tickets historically',
     '--alternatives', 'password rejected: extra reset-flow maintenance',
     '--source', 'session',
@@ -717,7 +726,7 @@ test('ask/answer round-trip on a doing item: answer resumes to doing, preserving
   addOk(cwd, 'gated-doing-item');
   assert.equal(run(cwd, ['move', 'gated-doing-item', '--to', 'doing']).status, 0);
 
-  const askResult = run(cwd, ['ask', 'gated-doing-item', '--text', 'OAuth or password?']);
+  const askResult = run(cwd, ['ask', 'gated-doing-item', '--text', VALID_ASK_TEXT]);
   assert.equal(askResult.status, 0);
   assert.deepEqual(envelopeData(askResult.stdout), { id: 'gated-doing-item', from: 'doing', to: 'awaiting-human', seq: 3 });
   assert.equal(stateView(cwd).work['gated-doing-item'].status, 'awaiting-human');
@@ -764,7 +773,7 @@ test('ask rejects a CAS expected-status mismatch as conflict, exit 3, no event w
   run(cwd, ['move', 'cas-ask-item', '--to', 'doing']);
   const before = eventLines(cwd).length;
 
-  const result = run(cwd, ['ask', 'cas-ask-item', '--text', 'ready?', '--expect', 'todo']);
+  const result = run(cwd, ['ask', 'cas-ask-item', '--text', VALID_ASK_TEXT, '--expect', 'todo']);
   assert.equal(result.status, 3);
   assert.equal(eventLines(cwd).length, before);
   assert.equal(stateView(cwd).work['cas-ask-item'].status, 'doing');
@@ -825,6 +834,33 @@ test('submit with --unattended is treated the same as --async: mode:"async"', ()
   assert.equal(result.status, 0);
   const id = JSON.parse(result.stdout).data.id;
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].mode, 'async');
+});
+
+// work-item-backlog-status D2: --backlog is the opt-in escape hatch that
+// creates an item directly at the backlog status. The default must stay
+// 'todo' for a flagless submit -- that regression guard is half of what
+// this test exists for, since D2's whole point is that the default did NOT
+// change. D3 gives backlog its own statusCategory, which is what keeps a
+// backlog item out of the ready frontier with no frontier-side code change.
+test('submit --backlog creates the item at status:"backlog" with its own category and out of ready; a flagless submit still creates status:"todo"', () => {
+  const cwd = tmpCwd();
+
+  const backlogSubmit = run(cwd, ['submit', 'Maybe rethink the settings navigation someday', '--backlog']);
+  assert.equal(backlogSubmit.status, 0);
+  const backlogId = JSON.parse(backlogSubmit.stdout).data.id;
+
+  const plainSubmit = run(cwd, ['submit', 'Investigate the sluggish overview page']);
+  assert.equal(plainSubmit.status, 0);
+  const plainId = JSON.parse(plainSubmit.stdout).data.id;
+
+  const view = envelopeData(run(cwd, ['list']).stdout);
+  assert.equal(view.work[backlogId].status, 'backlog');
+  assert.equal(view.work[backlogId].statusCategory, 'backlog');
+  assert.equal(view.work[plainId].status, 'todo');
+
+  const ready = envelopeData(run(cwd, ['ready']).stdout);
+  const readyIds = JSON.stringify(ready);
+  assert.ok(!readyIds.includes(backlogId), 'a backlog item must not appear in the ready frontier');
 });
 
 test('submit of text matching no keyword falls back to tier:"standard" and persists, exit 0', () => {
@@ -1005,6 +1041,29 @@ test('submit --tier override alone does not change risk -- risk still mirrors cl
   assert.equal(item.risk, 'standard');
 });
 
+// --- tsk-5gu: --verify override on `submit`, same optionalField shape as ---
+// --tier/--kind/--risk above (a submitter who already stated a real verify
+// in free text can now attach it directly instead of round-tripping
+// through `fgos edit --verify` after the fact).
+
+test('submit --verify "npm test" sets the item\'s own verify to that command, not the sentinel', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['submit', 'Investigate the sluggish overview page. Verify: npm test', '--verify', 'npm test']);
+  assert.equal(result.status, 0);
+  const id = JSON.parse(result.stdout).data.id;
+  const item = envelopeData(run(cwd, ['list']).stdout).work[id];
+  assert.equal(item.verify, 'npm test');
+});
+
+test('submit without --verify leaves verify at the sentinel, byte-identical to pre-feature behavior', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);
+  assert.equal(result.status, 0);
+  const id = JSON.parse(result.stdout).data.id;
+  const item = envelopeData(run(cwd, ['list']).stdout).work[id];
+  assert.equal(item.verify, 'chưa xác định — P15 bổ sung');
+});
+
 test('submit without --docs-ref leaves docsRef unset, exit 0', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['submit', 'A task with no docs link']);
@@ -1031,7 +1090,7 @@ test('answer via the real CLI stamps role "human" on the event payload and folds
   const cwd = tmpCwd();
   addOk(cwd, 'answer-actor-item');
   run(cwd, ['move', 'answer-actor-item', '--to', 'doing']);
-  run(cwd, ['ask', 'answer-actor-item', '--text', 'OAuth or password?']);
+  run(cwd, ['ask', 'answer-actor-item', '--text', VALID_ASK_TEXT]);
 
   const result = run(cwd, ['answer', 'answer-actor-item', '--text', 'OAuth']);
   assert.equal(result.status, 0);

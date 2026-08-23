@@ -3,7 +3,7 @@
 Item: `tsk-1jp`. Written retroactively (same structural gap as this scan's
 other items).
 
-## Decisions
+## Locked decisions
 
 - **D0.** Root cause confirmed by reading `src/state/porting-store.mjs`
   in full: `addPorting` (:106-121) and `movePorting` (:128-140) each call

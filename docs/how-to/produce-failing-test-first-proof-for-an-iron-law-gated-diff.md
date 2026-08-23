@@ -25,10 +25,10 @@ own committed `docs/history/tsk-62v/iron-law-evidence.md`.
    Running the test command now against pre-implementation code produces
    real failures — not invented ones. In this item's case: one test file
    failed to even load (`SyntaxError: ... does not provide an export
-   named 'CAPACITY_KINDS'`) because the test imports a symbol the
+   named 'EXECUTOR_KINDS'`) because the test imports a symbol the
    implementation hasn't created yet; two other test files had real
    assertion mismatches (`actual` vs `expected` event sequences missing
-   the new `capacity.dispatch` event). Paste the real stderr/assertion
+   the new `executor.dispatch` event). Paste the real stderr/assertion
    output into the evidence file — never a paraphrase or a "would have
    failed because...".
 

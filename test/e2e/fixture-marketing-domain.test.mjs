@@ -25,7 +25,7 @@
 // (documented in full on the DOMAINS entry itself): status-fsm.mjs's
 // TRANSITIONS table is ONE shared flat table for every domain (confirmed by
 // reading status-fsm.mjs and work.mjs's STATUSES directly — both are
-// closed to the same 10 literal status names; 0027's own "Quyết định"
+// closed to the same 11 literal status names; 0027's own "Quyết định"
 // section is explicit that this is the case, and DISCUSSION.md §1/§6
 // explicitly REJECTS the broader "domain owns the whole transition table"
 // framing an earlier report round proposed). So this fixture domain cannot
@@ -146,6 +146,9 @@ test("DOMAINS['fixture-marketing'] declares its OWN statusLabels/skillMap.retros
 test('adding "fixture-marketing" leaves DOMAINS.coding completely unchanged (RUL11 — purely additive)', () => {
   assert.deepEqual(DOMAINS.coding.stages, ['discovery', 'exploring', 'decompose', 'planning', 'executing']);
   assert.deepEqual(DOMAINS.coding.statusLabels, {
+    // work-item-backlog-status D3 mapped the new `backlog` status into the
+    // already-reserved `backlog` category; every other entry is untouched.
+    backlog: 'backlog',
     todo: 'todo',
     doing: 'in-progress',
     blocked: 'in-progress',
@@ -309,7 +312,7 @@ test('e2e: a fixture-marketing item runs the real take -> return -> delivered ->
   // decision record supplies genuine retrospective content, mirroring
   // synthetic-domain.test.mjs's own cleanup test exactly.
   assert.equal(
-    fgos(repoRoot, ['decision', '--text', 'fixture-marketing retrospective note', '--rationale', 'proves real retrospective content exists', '--id', 'fx-life']).status,
+    fgos(repoRoot, ['decision', '--text', 'fixture-marketing retrospective note', '--rationale', 'proves real retrospective content exists', '--id', 'fx-life', '--relation', 'none']).status,
     0,
   );
 

@@ -13,6 +13,8 @@ import {
   forceReclaimAmbiguousLock,
   inspectMainCheckoutLock,
   formatLockDurationMs,
+  mergeSlotLockFile,
+  dispatchLockFile,
   LOCK_FILE,
   ACQUIRED,
   HELD,
@@ -676,6 +678,40 @@ test('self-recognition: the same string identity refreshes its own lock with no 
   assert.equal(res.status, ACQUIRED);
 });
 
+// --- allowSelfRecognition (tsk-1wr): opt-out for locks with no legitimate ---
+// --- same-identity re-entry, e.g. the merge target-ref slot -----------------
+
+test('allowSelfRecognition omitted still self-recognizes (byte-identical default)', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  const staleTs = Date.now() - 10_000;
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: 'session-abc-123', ts: staleTs }));
+
+  const res = acquireMainCheckoutLock(dir, { identity: 'session-abc-123', ttlMs: 1 });
+
+  assert.equal(res.status, ACQUIRED);
+});
+
+test('allowSelfRecognition:false treats the caller\'s own identity as a real holder, not a refresh — string identity under ttlMs judges it HELD', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  const freshTs = Date.now();
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: 'session-abc-123', ts: freshTs }));
+
+  const res = acquireMainCheckoutLock(dir, { identity: 'session-abc-123', ttlMs: 60_000, allowSelfRecognition: false });
+
+  assert.equal(res.status, HELD);
+  assert.equal(res.holderPid, 'session-abc-123');
+});
+
+test('allowSelfRecognition:false still lets a genuinely fresh acquire succeed (no lock file yet)', () => {
+  const { dir } = setup();
+
+  const res = acquireMainCheckoutLock(dir, { identity: 'session-abc-123', ttlMs: 60_000, allowSelfRecognition: false });
+
+  assert.equal(res.status, ACQUIRED);
+});
+
 // --- forceReclaimAmbiguousLock (tsk-3h4) -------------------------------------
 
 test('forceReclaimAmbiguousLock: already-clear when no lock file exists', () => {
@@ -870,4 +906,95 @@ test('self-recognition refresh is atomic: a reader between two refreshes always 
     assert.equal(record.pid, 'refresher');
     assert.equal(typeof record.ts, 'number');
   }
+});
+
+// mergeSlotLockFile / lockFile param (tsk-xyr, §E target-ref merge queue).
+
+test('mergeSlotLockFile is injective: a naive "/" -> "-" substitution would collide, encodeURIComponent does not', () => {
+  const a = mergeSlotLockFile('fgw/tsk-51m');
+  const b = mergeSlotLockFile('fgw-tsk-51m');
+  assert.notEqual(a, b, `expected distinct lock filenames for distinct refs, got "${a}" for both`);
+  assert.equal(a, 'merge-slot--fgw%2Ftsk-51m.lock');
+  assert.equal(b, 'merge-slot--fgw-tsk-51m.lock');
+});
+
+test('mergeSlotLockFile output only ever contains filesystem-safe characters (no "/", no null byte)', () => {
+  for (const ref of ['fgw/tsk-51m', 'main', 'fgw/tsk-2ej', 'refs/heads/weird name', 'a%2Fb']) {
+    const name = mergeSlotLockFile(ref);
+    assert.ok(!name.includes('/'), `"${name}" (from ref "${ref}") must not contain a path separator`);
+    assert.ok(!name.includes('\0'), `"${name}" must not contain a null byte`);
+  }
+});
+
+test('dispatchLockFile is injective and produces filesystem-safe lock filenames (tsk-64hk)', () => {
+  const a = dispatchLockFile('/path/to/worktree-a');
+  const b = dispatchLockFile('/path/to/worktree-b');
+  assert.notEqual(a, b);
+  assert.equal(a, `dispatch--${encodeURIComponent('/path/to/worktree-a')}.lock`);
+  assert.ok(!a.includes('/'), `"${a}" must not contain path separators`);
+});
+
+
+test('acquireMainCheckoutLock omitting lockFile still resolves to LOCK_FILE (byte-identical default)', () => {
+  const { dir } = setup();
+  const result = acquireMainCheckoutLock(dir, { identity: 'writer-a' });
+  assert.equal(result.status, ACQUIRED);
+  assert.equal(fs.existsSync(path.join(dir, LOCK_FILE)), true);
+});
+
+test('two different lockFile values never contend with each other — both acquire, both are HELD-refusing to a different identity, independently', () => {
+  const { dir } = setup();
+  const slotA = mergeSlotLockFile('fgw/tsk-xyr');
+  const slotB = mergeSlotLockFile('fgw/tsk-55p');
+
+  const heldA = acquireMainCheckoutLock(dir, { identity: 'writer-a', lockFile: slotA });
+  const heldB = acquireMainCheckoutLock(dir, { identity: 'writer-b', lockFile: slotB });
+  assert.equal(heldA.status, ACQUIRED);
+  assert.equal(heldB.status, ACQUIRED);
+
+  // A different writer contending on slotA is refused; slotB is untouched
+  // by that contention, and vice versa — two independent lock files, not
+  // one shared resource.
+  const contendA = acquireMainCheckoutLock(dir, { identity: 'writer-c', ttlMs: DEFAULT_TTL_MS, lockFile: slotA });
+  assert.equal(contendA.status, HELD);
+  const contendB = acquireMainCheckoutLock(dir, { identity: 'writer-c', ttlMs: DEFAULT_TTL_MS, lockFile: slotB });
+  assert.equal(contendB.status, HELD);
+
+  // Releasing slotA does not affect slotB.
+  heldA.release();
+  assert.equal(fs.existsSync(path.join(dir, slotA)), false);
+  assert.equal(fs.existsSync(path.join(dir, slotB)), true);
+  heldB.release();
+});
+
+test('releaseMainCheckoutLockIfOwn/renewMainCheckoutLockIfOwn/inspectMainCheckoutLock/forceReclaimAmbiguousLock all thread a non-default lockFile correctly, independent of LOCK_FILE', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  const slot = mergeSlotLockFile('fgw/tsk-4ax');
+
+  const acquired = acquireMainCheckoutLock(dir, { identity: 'writer-a', lockFile: slot });
+  assert.equal(acquired.status, ACQUIRED);
+  // The default-lockFile lock file must not exist — these are genuinely
+  // separate files, not the same resource under a different name.
+  assert.equal(fs.existsSync(path.join(dir, LOCK_FILE)), false);
+
+  const inspected = inspectMainCheckoutLock(dir, { ttlMs: DEFAULT_TTL_MS, lockFile: slot });
+  assert.equal(inspected.outcome, 'live');
+  assert.equal(inspected.holderPid, 'writer-a');
+
+  const renewed = renewMainCheckoutLockIfOwn(dir, 'writer-a', { lockFile: slot });
+  assert.equal(renewed.status, 'renewed');
+
+  const wrongOwnerRelease = releaseMainCheckoutLockIfOwn(dir, 'writer-b', { lockFile: slot });
+  assert.equal(wrongOwnerRelease.status, 'not-owner');
+  assert.equal(fs.existsSync(path.join(dir, slot)), true);
+
+  const ownRelease = releaseMainCheckoutLockIfOwn(dir, 'writer-a', { lockFile: slot });
+  assert.equal(ownRelease.status, 'released');
+  assert.equal(fs.existsSync(path.join(dir, slot)), false);
+
+  // forceReclaimAmbiguousLock against the slot file specifically.
+  fs.writeFileSync(path.join(dir, slot), 'not json');
+  const reclaimed = forceReclaimAmbiguousLock(dir, { lockFile: slot });
+  assert.equal(reclaimed.status, 'reclaimed');
 });

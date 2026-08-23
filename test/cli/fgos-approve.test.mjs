@@ -95,7 +95,7 @@ function moveRootToResolved(cwd, rootId, finalStatus) {
   if (finalStatus === 'wontfix') {
     run(cwd, ['move', rootId, '--to', 'wontfix']);
   } else {
-    run(cwd, ['move', rootId, '--to', 'awaiting-approval']);
+    run(cwd, ['move', rootId, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
     run(cwd, ['move', rootId, '--to', 'delivered']);
   }
   commitPending(cwd, `state: resolve ${rootId} to ${finalStatus}`);
@@ -133,6 +133,11 @@ test('approve of a runner item (happy path): merges fgw/<id> into main, verifies
   // yet at this point in the sequence.
   assert.equal(view.settlements?.['approve-runner-item'], undefined);
   assert.ok(fs.existsSync(path.join(cwd, 'approve-runner-item-produced.txt')), 'the merged file must be present on main');
+  // tsk-5dk: a real approve merge now records merge evidence — mergedSha
+  // must be main's own real post-merge commit, readable straight off the
+  // delivered event, not inferred from git afterward.
+  assert.equal(view.work['approve-runner-item'].mergedInto, 'main');
+  assert.equal(view.work['approve-runner-item'].mergedSha, gitAtCwd(cwd, ['rev-parse', 'main']).trim());
 
   const branches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
   assert.match(branches, /fgw\/approve-runner-item/, 'the merged branch must survive approve — deleted later by the cleanup verb, not here');
@@ -219,6 +224,39 @@ test('approve of a runner item with a declared footprint still refuses on an unc
   assert.equal(stateView(cwd).work['approve-footprint-dirty'].status, 'awaiting-approval');
 });
 
+// tsk-kv3 (Q1): the main-checkout clean-tree gate no longer runs at all on
+// the leaf->root path — that merge happens entirely inside a DETACHED
+// ephemeral worktree (withMergeEphemeralWorktree) and never reads or
+// writes repoRoot's own working tree. Gating on it protected a resource
+// that path never touches, and could block a leaf approve on a dirty file
+// that has nothing to do with the merge actually being attempted.
+
+test('approve of a LEAF item is unaffected by a dirty main checkout, even one colliding with the leaf\'s own declared footprint path (tsk-kv3 Q1) — the root-to-main equivalent test above still refuses, this one must not', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedLeafItem(cwd, 'kv3-leaf-root', 'kv3-leaf-dirty', {
+    verify: 'test -f kv3-leaf-dirty-produced.txt',
+    footprint: 'footprint-guarded.txt',
+  });
+  commitPendingBeforeApprove(cwd, 'kv3-leaf-dirty');
+
+  // Same shape as the root/standalone test above (an uncommitted footprint
+  // path dirtying the main checkout) — for a root that still refuses (D3).
+  // For a leaf, it must NOT: this file sits in repoRoot's own working tree,
+  // which the leaf's ephemeral-worktree merge never reads or writes.
+  fs.writeFileSync(path.join(cwd, 'footprint-guarded.txt'), 'unrelated to the ephemeral merge\n');
+
+  const headBefore = gitHead(cwd);
+  const result = run(cwd, ['approve', 'kv3-leaf-dirty']);
+  assert.equal(result.status, 0, `leaf approve must succeed despite the dirty main checkout: ${result.stdout}${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.to, 'delivered');
+  assert.equal(data.target, 'fgw/kv3-leaf-root');
+
+  assert.equal(gitHead(cwd), headBefore, 'main HEAD must be unchanged — the dirty file is still sitting there, untouched, exactly as it was');
+  assert.equal(fs.readFileSync(path.join(cwd, 'footprint-guarded.txt'), 'utf8'), 'unrelated to the ephemeral merge\n', 'the dirty file itself must survive untouched — this gate never claimed to clean it up, only to block on it');
+});
+
 test('approve of a leaf item with a clean merge lands the work on fgw/<root> (not main) via an ephemeral worktree, leaf -> delivered, fgw/<leaf> SURVIVES the approve (tsk-1p9: teardown deferred to the cleanup verb), fgw/<root> survives', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
@@ -255,6 +293,159 @@ test('approve of a leaf item with a clean merge lands the work on fgw/<root> (no
   // the merged content must actually be present on fgw/<root>'s tip.
   const rootTreeFile = gitAtCwd(cwd, ['show', 'fgw/approve-leaf-root:approve-leaf-child-produced.txt']);
   assert.match(rootTreeFile, /ok/);
+
+  // tsk-5dk: mergedSha must be the ROOT branch's own tip (resolved from
+  // repoRoot by branch name, never the ephemeral worktree's own HEAD —
+  // see resolveRefSha's comment in bin/fgos.mjs for why that distinction
+  // matters here specifically).
+  assert.equal(view.work['approve-leaf-child'].mergedInto, 'fgw/approve-leaf-root');
+  assert.equal(view.work['approve-leaf-child'].mergedSha, gitAtCwd(cwd, ['rev-parse', 'fgw/approve-leaf-root']).trim());
+});
+
+// tsk-4ax (D3): catchup as a STANDARD step of approve itself, not only a
+// manual recovery from `blocked` — the core reason this item exists. A
+// leaf whose root has moved since the leaf's own branch was cut must be
+// caught up and landed by a single `approve` call, with no separate
+// `fgos catchup` call ever needed, and the verify that ran during that
+// inline catchup must be the ONLY verify that runs for the whole call —
+// proven with a sentinel, not by timing.
+
+test('approve of a leaf whose root has moved since: auto-catches-up inline, lands successfully, and its own inline verify is the ONLY verify that runs — exactly once, not twice (tsk-4ax core acceptance)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  // Appends one line per verify invocation, so "ran exactly once" is a real
+  // count, not just an existence check that a second run would pass too.
+  const verifyLog = path.join(cwd, 'verify-runs.log');
+  makeRunnerProposedLeafItem(cwd, 'auto-catchup-root', 'auto-catchup-leaf', { verify: `echo run >> ${JSON.stringify(verifyLog)} && test -f auto-catchup-leaf-produced.txt` });
+  commitPendingBeforeApprove(cwd, 'auto-catchup-leaf');
+
+  // The root advances AFTER the leaf's own branch was cut — a genuinely
+  // non-overlapping change, simulating a sibling leaf's own approve
+  // landing on the shared root branch first.
+  gitAtCwd(cwd, ['checkout', 'fgw/auto-catchup-root']);
+  fs.writeFileSync(path.join(cwd, 'sibling-produced.txt'), 'sibling ok\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'sibling leaf merged into root first']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  const headBefore = gitHead(cwd);
+  // No `fgos catchup` call anywhere in this test — approve alone must do it.
+  const result = run(cwd, ['approve', 'auto-catchup-leaf']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.to, 'delivered');
+  assert.equal(data.target, 'fgw/auto-catchup-root');
+
+  assert.equal(gitHead(cwd), headBefore, 'main must never be touched by a leaf approve');
+  const verifyRunCount = fs.readFileSync(verifyLog, 'utf8').trim().split('\n').filter(Boolean).length;
+  assert.equal(verifyRunCount, 1, `verify must run EXACTLY once (the inline catchup) for this whole approve call, not again during the land — ran ${verifyRunCount} times`);
+
+  // Both the sibling's earlier content AND this leaf's own content must be
+  // on the root — proof the catchup merge genuinely combined them, not
+  // just fast-forwarded past one or the other.
+  const rootSiblingFile = gitAtCwd(cwd, ['show', 'fgw/auto-catchup-root:sibling-produced.txt']);
+  assert.match(rootSiblingFile, /sibling ok/);
+  const rootLeafFile = gitAtCwd(cwd, ['show', 'fgw/auto-catchup-root:auto-catchup-leaf-produced.txt']);
+  assert.match(rootLeafFile, /ok/);
+
+  // The leaf's OWN branch must also carry the catchup commit (it was
+  // caught up onto the root, then that whole thing landed).
+  const leafLog = gitAtCwd(cwd, ['log', '--oneline', 'fgw/auto-catchup-leaf']);
+  assert.match(leafLog, /catch-up: merge fgw\/auto-catchup-root into fgw\/auto-catchup-leaf/);
+});
+
+test('approve of a leaf whose root has NOT moved: no catchup attempted at all, unchanged from before this item (regression guard)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedLeafItem(cwd, 'no-catchup-root', 'no-catchup-leaf', { verify: 'test -f no-catchup-leaf-produced.txt' });
+  commitPendingBeforeApprove(cwd, 'no-catchup-leaf');
+
+  const result = run(cwd, ['approve', 'no-catchup-leaf']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.to, 'delivered');
+
+  const leafLog = gitAtCwd(cwd, ['log', '--oneline', 'fgw/no-catchup-leaf']);
+  assert.doesNotMatch(leafLog, /catch-up:/, 'no catchup commit must exist when the root never moved — the ancestor check must have short-circuited before performCatchUp was ever called');
+});
+
+test('approve of a leaf whose root branch was never created (root only ever driven by a live session/pick, never the runner dispatch loop that creates fgw/<rootId> early per D17): falls back to creating it from main instead of crashing raw on the ancestor-check', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  const dir = path.join(cwd, '.fgos');
+
+  const rootId = 'no-early-branch-root';
+  const leafId = 'no-early-branch-leaf';
+
+  addWork(dir, { id: rootId, title: `Title ${rootId}`, kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  commitPending(cwd, `state: add ${rootId}`);
+  // Deliberately no `git branch fgw/${rootId} main` here — this is the
+  // exact gap: a root only ever driven live never gets its own branch
+  // created early.
+
+  addWork(dir, {
+    id: leafId,
+    title: `Title ${leafId}`,
+    kind: 'task',
+    status: 'todo',
+    deps: [],
+    risk: 'light',
+    refs: [],
+    verify: `test -f ${leafId}-produced.txt`,
+    parent: rootId,
+  });
+  run(cwd, ['move', leafId, '--to', 'doing']);
+  commitPending(cwd, `state: claim ${leafId}`);
+
+  gitAtCwd(cwd, ['checkout', '-b', `fgw/${leafId}`, 'main']);
+  fs.writeFileSync(path.join(cwd, `${leafId}-produced.txt`), 'ok\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${leafId}`]);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  run(cwd, ['move', leafId, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
+  commitPendingBeforeApprove(cwd, leafId);
+
+  const branchesBefore = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
+  assert.doesNotMatch(branchesBefore, new RegExp(`fgw/${rootId}\\b`), 'fgw/<rootId> must not exist yet — the whole point of this fixture');
+
+  const result = run(cwd, ['approve', leafId]);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.to, 'delivered');
+  assert.equal(data.target, `fgw/${rootId}`);
+
+  const branchesAfter = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/fgw/']);
+  assert.match(branchesAfter, new RegExp(`fgw/${rootId}\\b`), 'fgw/<rootId> must exist after approve — created by the fallback');
+
+  const rootTip = gitAtCwd(cwd, ['show', `fgw/${rootId}:${leafId}-produced.txt`]);
+  assert.match(rootTip, /ok/);
+});
+
+test('approve of a leaf whose inline catchup hits a real conflict: parks blocked (reason merge-conflict), the leaf stays awaiting-approval-shaped (not silently delivered), root untouched', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedLeafItem(cwd, 'catchup-conflict-root', 'catchup-conflict-leaf', { verify: 'true' });
+  commitPendingBeforeApprove(cwd, 'catchup-conflict-leaf');
+
+  // Same-line conflict: the root advances with a same-named file whose
+  // content collides with what the leaf's own commit already touches.
+  gitAtCwd(cwd, ['checkout', 'fgw/catchup-conflict-root']);
+  fs.writeFileSync(path.join(cwd, 'catchup-conflict-leaf-produced.txt'), 'root-side content, different from leaf\n');
+  gitAtCwd(cwd, ['add', '-A']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'root touches the same file the leaf does']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  const rootTipBefore = gitAtCwd(cwd, ['rev-parse', 'fgw/catchup-conflict-root']).trim();
+  const result = run(cwd, ['approve', 'catchup-conflict-leaf']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.to, 'blocked');
+  assert.equal(data.reason, 'merge-conflict');
+  assert.equal(data.target, 'fgw/catchup-conflict-root');
+
+  assert.equal(gitAtCwd(cwd, ['rev-parse', 'fgw/catchup-conflict-root']).trim(), rootTipBefore, 'root must be completely untouched by a failed inline catchup');
+  assert.equal(stateView(cwd).work['catchup-conflict-leaf'].status, 'blocked');
 });
 
 test('approve of a runner item that conflicts: aborts the merge, awaiting-approval -> blocked (reason merge-conflict), main left byte-for-byte unchanged (must_have: main never holds a broken merge commit)', () => {
@@ -277,7 +468,7 @@ test('approve of a runner item that conflicts: aborts the merge, awaiting-approv
   gitAtCwd(cwd, ['add', 'shared.txt']);
   gitAtCwd(cwd, ['commit', '-q', '-m', 'main changes shared.txt']);
 
-  run(cwd, ['move', 'approve-conflict-item', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'approve-conflict-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
   commitPending(cwd, 'state: propose approve-conflict-item');
 
   const headBefore = gitHead(cwd);
@@ -351,7 +542,7 @@ test('approve of a root item that HAD children, whose merge into main conflicts,
   gitAtCwd(cwd, ['add', 'shared.txt']);
   gitAtCwd(cwd, ['commit', '-q', '-m', 'main changes shared.txt']);
 
-  run(cwd, ['move', 'drift-root-item', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'drift-root-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
   commitPending(cwd, 'state: propose drift-root-item');
 
   const headBefore = gitHead(cwd);
@@ -391,7 +582,7 @@ test('approve of a legacy item with a failing verify: blocked (reason verify-fai
   const cwd = tmpCwd();
   addOk(cwd, 'approve-legacy-fail-item', { verify: 'false' });
   run(cwd, ['move', 'approve-legacy-fail-item', '--to', 'doing']);
-  run(cwd, ['move', 'approve-legacy-fail-item', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'approve-legacy-fail-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 
   const result = run(cwd, ['approve', 'approve-legacy-fail-item']);
   assert.equal(result.status, 0, result.stderr);
@@ -407,7 +598,7 @@ test("approve verify-fail (legacy item): park edge stamps role 'system' (not hum
   const cwd = tmpCwd();
   addOk(cwd, 'approve-legacy-fail-role-item', { verify: 'false' });
   run(cwd, ['move', 'approve-legacy-fail-role-item', '--to', 'doing']);
-  run(cwd, ['move', 'approve-legacy-fail-role-item', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'approve-legacy-fail-role-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 
   const result = run(cwd, ['approve', 'approve-legacy-fail-role-item']);
   assert.equal(result.status, 0, result.stderr);
@@ -423,7 +614,7 @@ test('approve of a legacy item with a passing verify closes it to done — legac
   const cwd = tmpCwd();
   addOk(cwd, 'approve-legacy-ok-item', { verify: 'true' });
   run(cwd, ['move', 'approve-legacy-ok-item', '--to', 'doing']);
-  run(cwd, ['move', 'approve-legacy-ok-item', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'approve-legacy-ok-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 
   const result = run(cwd, ['approve', 'approve-legacy-ok-item']);
   assert.equal(result.status, 0, result.stderr);
@@ -437,7 +628,7 @@ test('approve --timeout and --no-timeout together are rejected as validation, ex
   const cwd = tmpCwd();
   addOk(cwd, 'approve-timeout-conflict', { verify: 'true' });
   run(cwd, ['move', 'approve-timeout-conflict', '--to', 'doing']);
-  run(cwd, ['move', 'approve-timeout-conflict', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'approve-timeout-conflict', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 
   const result = run(cwd, ['approve', 'approve-timeout-conflict', '--timeout', '1000', '--no-timeout']);
   assert.equal(result.status, 4);
@@ -449,7 +640,7 @@ test('approve twice: the second approve on an already-done item is rejected as p
   const cwd = tmpCwd();
   addOk(cwd, 'approve-twice-item', { verify: 'true' });
   run(cwd, ['move', 'approve-twice-item', '--to', 'doing']);
-  run(cwd, ['move', 'approve-twice-item', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'approve-twice-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
   assert.equal(run(cwd, ['approve', 'approve-twice-item']).status, 0);
 
   const result = run(cwd, ['approve', 'approve-twice-item']);
@@ -574,7 +765,7 @@ test('approve of a leaf item forked AFTER a sibling already merged a gated-modul
   gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${leafId}`]);
   gitAtCwd(cwd, ['checkout', 'main']);
 
-  run(cwd, ['move', leafId, '--to', 'awaiting-approval']);
+  run(cwd, ['move', leafId, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
   commitPendingBeforeApprove(cwd, leafId);
 
   const result = run(cwd, ['approve', leafId]);
@@ -583,7 +774,15 @@ test('approve of a leaf item forked AFTER a sibling already merged a gated-modul
   assert.equal(stateView(cwd).work[leafId].status, 'delivered');
 });
 
-test('approve of a leaf item whose OWN commit touches a gated module (src/runner/**) still REFUSES without --acknowledge-iron-law, even with leaf-scoped diff (tsk-4voj D1 does not under-scope)', () => {
+// Superseded by docs/history/iron-law-gate-human-ux/CONTEXT.md D1: this used
+// to assert the leaf REFUSES, back when the gate fired at every merge
+// boundary. It now fires only where the target is trunk, and a leaf's target
+// is `fgw/<root>` — so what stays worth proving here is the leaf-scoped diff
+// itself (tsk-4voj D1's own subject): the leaf's own gated-module commit is
+// still SEEN, it just no longer refuses at this boundary. The refusal half
+// moved to test/cli/fgos-iron-law-gate.test.mjs, which pins the same diff
+// tripping the gate at the trunk boundary it does still guard.
+test('approve of a leaf item whose OWN commit touches a gated module (src/runner/**) PROCEEDS — the leaf lands on fgw/<root>, never trunk (iron-law-gate-human-ux D1)', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
 
@@ -608,16 +807,18 @@ test('approve of a leaf item whose OWN commit touches a gated module (src/runner
   gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${leafId}`]);
   gitAtCwd(cwd, ['checkout', 'main']);
 
-  run(cwd, ['move', leafId, '--to', 'awaiting-approval']);
+  run(cwd, ['move', leafId, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
   commitPendingBeforeApprove(cwd, leafId);
 
-  const headBefore = gitHead(cwd);
   const result = run(cwd, ['approve', leafId]);
-  assert.equal(result.status, 4, `leaf's own commit genuinely touches a gated module -- must still refuse: ${result.stdout}${result.stderr}`);
-  assert.match(result.stderr, /Iron Law/);
-  assert.match(result.stderr, /src\/runner\/iron-leaf-genuine-child-produced\.mjs/, 'the refusal must name the leaf\'s own tripped module');
-  assert.equal(gitHead(cwd), headBefore, 'a refused approve attempts no merge');
-  assert.equal(stateView(cwd).work[leafId].status, 'awaiting-approval');
+  assert.equal(result.status, 0, `a leaf never lands on trunk -- the gate must not fire here: ${result.stdout}${result.stderr}`);
+  assert.doesNotMatch(result.stdout, /Iron Law/);
+  assert.equal(stateView(cwd).work[leafId].status, 'delivered');
+  assert.match(
+    gitAtCwd(cwd, ['ls-tree', '-r', '--name-only', `fgw/${rootId}`]),
+    /src\/runner\/iron-leaf-genuine-child-produced\.mjs/,
+    "the leaf's own gated-module file really did land on the root branch -- this is the diff the trunk-boundary gate will see when the root itself merges",
+  );
 });
 
 test('approve of a milestone blocks when a targeted item\'s root has unsynced drift, exit 4, item stays awaiting-approval', () => {
@@ -679,7 +880,7 @@ test('approve of an ordinary item with no targets is completely unaffected by th
   const cwd = tmpCwd();
   addOk(cwd, 'closeout-no-targets-item', { verify: 'true' });
   run(cwd, ['move', 'closeout-no-targets-item', '--to', 'doing']);
-  run(cwd, ['move', 'closeout-no-targets-item', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'closeout-no-targets-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 
   const result = run(cwd, ['approve', 'closeout-no-targets-item']);
   assert.equal(result.status, 0, result.stderr);
@@ -1024,7 +1225,7 @@ test('approve on a proposed item with a missing-evidence acceptance clause is re
   addOk(cwd, 'approve-cos-missing', { verify: 'true' });
   run(cwd, ['edit', 'approve-cos-missing', '--acceptance', JSON.stringify([{ text: 'ship it' }])]);
   run(cwd, ['move', 'approve-cos-missing', '--to', 'doing']);
-  run(cwd, ['move', 'approve-cos-missing', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'approve-cos-missing', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 
   const before = eventLines(cwd).length;
   const result = run(cwd, ['approve', 'approve-cos-missing']);
@@ -1058,6 +1259,42 @@ test('approve on a runner-sourced item with a missing-evidence acceptance clause
   assert.equal(stateView(cwd).work['runner-cos-missing'].status, 'awaiting-approval');
 });
 
+// tsk-2p6: same pre-flight-before-merge shape as the acceptance-evidence
+// regression test immediately above, for the plan-evidence gate.
+test('approve on a risk:heavy runner-sourced item with no plan.md on its branch is refused BEFORE the real git merge: precondition, main HEAD unchanged, item stays awaiting-approval', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'runner-heavy-no-plan', { risk: 'heavy' });
+
+  const mainHeadBefore = gitAtCwd(cwd, ['rev-parse', 'main']).trim();
+  const result = run(cwd, ['approve', 'runner-heavy-no-plan']);
+  assert.equal(result.status, 2, result.stderr);
+  assert.match(result.stderr, /no plan\.md found on branch "fgw\/runner-heavy-no-plan"/);
+
+  assert.equal(gitAtCwd(cwd, ['rev-parse', 'main']).trim(), mainHeadBefore, 'main HEAD must be completely unchanged by a refused approve');
+  assert.equal(stateView(cwd).work['runner-heavy-no-plan'].status, 'awaiting-approval');
+});
+
+test('approve on a risk:heavy runner-sourced item that DOES carry a plan.md on its branch succeeds normally', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItem(cwd, 'runner-heavy-with-plan', { risk: 'heavy', verify: 'test -f runner-heavy-with-plan-produced.txt' });
+
+  // makeRunnerProposedItem's own commit landed on fgw/<id> while main was
+  // checked out -- add the plan.md as a follow-up commit on that same
+  // branch, mirroring how a real session commits plan.md during planning.
+  gitAtCwd(cwd, ['checkout', 'fgw/runner-heavy-with-plan']);
+  fs.mkdirSync(path.join(cwd, 'docs', 'history', 'runner-heavy-with-plan'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'docs', 'history', 'runner-heavy-with-plan', 'plan.md'), '# plan\n');
+  gitAtCwd(cwd, ['add', 'docs']);
+  gitAtCwd(cwd, ['commit', '-q', '-m', 'plan']);
+  gitAtCwd(cwd, ['checkout', 'main']);
+
+  const result = run(cwd, ['approve', 'runner-heavy-with-plan']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(stateView(cwd).work['runner-heavy-with-plan'].status, 'delivered');
+});
+
 // --- tsk-480: approve's post-success moveWork guard ------------------------
 //
 // The bug: approve's own success paths call moveWork(...to:'delivered'...)
@@ -1074,7 +1311,7 @@ test('approve (pull-door/verify-only): a simulated post-verify lock-timeout is c
   const cwd = tmpCwd();
   addOk(cwd, 'approve-lock-timeout', { verify: 'true' });
   run(cwd, ['move', 'approve-lock-timeout', '--to', 'doing']);
-  run(cwd, ['move', 'approve-lock-timeout', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'approve-lock-timeout', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 
   const before = eventLines(cwd).length;
   const result = run(cwd, ['approve', 'approve-lock-timeout'], { FGOS_TEST_FORCE_APPROVE_LOCK_TIMEOUT: 'approve-lock-timeout' });
@@ -1112,7 +1349,7 @@ test('approve (pull-door/verify-only): with no simulated failure, the same item 
   const cwd = tmpCwd();
   addOk(cwd, 'approve-lock-timeout-control', { verify: 'true' });
   run(cwd, ['move', 'approve-lock-timeout-control', '--to', 'doing']);
-  run(cwd, ['move', 'approve-lock-timeout-control', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'approve-lock-timeout-control', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 
   const result = run(cwd, ['approve', 'approve-lock-timeout-control']);
   assert.equal(result.status, 0, result.stderr);
@@ -1138,7 +1375,7 @@ test('approve --no-wait fails immediately on a live-held lock, main left untouch
   // unconditionally 'merge-fail' for every failure mode (pre-existing,
   // unrelated to this item's own `code` discriminator addition).
   assert.equal(result.status, 9, result.stderr);
-  assert.match(result.stderr, /main checkout is locked by another live session/);
+  assert.match(result.stderr, /main checkout is locked by pid \d+/);
   assert.ok(elapsed < 2000, `--no-wait must fail fast (took ${elapsed}ms)`);
   assert.equal(stateView(cwd).work['wait-no-wait-approve'].status, 'awaiting-approval', 'a refused-before-merge attempt must leave the item exactly where it was');
 });
@@ -1191,7 +1428,7 @@ test('approve of a root item, whose merge into main hits a pre-existing MERGE_HE
   gitAtCwd(cwd, ['commit', '-q', '-m', 'worker output for approve-blocked-root-item']);
   gitAtCwd(cwd, ['checkout', 'main']);
 
-  run(cwd, ['move', 'approve-blocked-root-item', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'approve-blocked-root-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
   commitPending(cwd, 'state: propose approve-blocked-root-item');
 
   gitAtCwd(cwd, ['checkout', '-b', 'fgw/other-blocker-root-item']);

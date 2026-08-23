@@ -49,6 +49,14 @@ test('STATUS_CATEGORIES is exported, frozen, and contains exactly the six pinned
   );
 });
 
+const VALID_ASK = `## Context
+
+We need a decision regarding the deployment configuration for this service.
+
+## Why this matters
+
+The deployment configuration impacts system availability and resource allocation.`;
+
 // D2/D3's exact map for the six front-segment statuses. Each case walks the
 // item through a real, legal status-fsm.mjs edge to reach `to`, so this also
 // pins that the schema task made zero changes to which edges are legal.
@@ -66,7 +74,7 @@ const FRONT_SEGMENT_CASES = [
   {
     to: 'awaiting-human',
     category: 'in-progress',
-    move: (dir, id) => moveWork(dir, { id, to: 'awaiting-human', expectedStatus: 'todo', ask: 'need a decision' }),
+    move: (dir, id) => moveWork(dir, { id, to: 'awaiting-human', expectedStatus: 'todo', ask: VALID_ASK }),
   },
   {
     to: 'awaiting-approval',

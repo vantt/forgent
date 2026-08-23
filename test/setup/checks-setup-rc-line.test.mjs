@@ -56,7 +56,7 @@ test('setup from a copy of fgos that is not in a git checkout declines the rc wr
   // profile leaves a `source` line that outlives the directory.
   const copyRoot = mkTemp('checks-nongit-copy-');
   const repoRoot = path.resolve(__dirname, '../..');
-  for (const entry of ['bin', 'src', 'scripts', 'package.json']) {
+  for (const entry of ['bin', 'src', 'scripts', 'domains', 'package.json']) {
     fs.cpSync(path.join(repoRoot, entry), path.join(copyRoot, entry), { recursive: true });
   }
   assert.equal(fs.existsSync(path.join(copyRoot, '.git')), false);

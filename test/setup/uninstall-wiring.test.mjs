@@ -111,14 +111,14 @@ test('uninstall with no --yes refuses (exit 4) and touches nothing', () => {
   const setupResult = run(cwd, ['setup'], { HOME: home });
   assert.equal(setupResult.status, 0, `setup failed: ${setupResult.stderr}`);
   const hooksPathBefore = execFileSync('git', ['config', '--get', 'core.hooksPath'], { cwd, encoding: 'utf8' }).trim();
-  assert.equal(hooksPathBefore, '.githooks', 'setup must have wired hooksPath before this test proves uninstall refuses to touch it');
+  assert.equal(hooksPathBefore, path.join(cwd, '.githooks'), 'setup must have wired hooksPath before this test proves uninstall refuses to touch it');
 
   const result = run(cwd, ['uninstall'], { HOME: home });
 
   assert.equal(result.status, 4, `expected validation refusal, got status ${result.status}: ${result.stderr}`);
   assert.equal(
     execFileSync('git', ['config', '--get', 'core.hooksPath'], { cwd, encoding: 'utf8' }).trim(),
-    '.githooks',
+    path.join(cwd, '.githooks'),
     'a refused uninstall must not touch core.hooksPath',
   );
   fs.rmSync(cwd, { recursive: true, force: true });

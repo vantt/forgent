@@ -13,7 +13,9 @@ import { fileURLToPath } from 'node:url';
 // content rather than simulating an agent following it.
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const SKILL_PATH = path.resolve(__dirname, '../../.claude/skills/fgos-coding-compounding/SKILL.md');
+// tsk-1qi: reads .agents/skills, the canonical source (D5) — .claude/skills
+// is now a generated thin wrapper with no prose content of its own to check.
+const SKILL_PATH = path.resolve(__dirname, '../../.agents/skills/fgos-coding-compounding/SKILL.md');
 const skillText = fs.readFileSync(SKILL_PATH, 'utf8');
 
 function stepIndex(stepLabel) {
@@ -28,18 +30,13 @@ test('fgos-coding-compounding writes the document before it stores the tag (D1/D
   assert.ok(writeStep < tagStep, 'the document-writing step must appear before the tag-storing step — write first, tag second, per D3');
 });
 
-test('fgos-coding-compounding\'s document-writing step resolves the main checkout root before writing or committing', () => {
+test('fgos-coding-compounding\'s document-writing step uses fgos doc-sources to gather captures before writing or committing', () => {
   const writeStep = stepIndex('Gather every linked capture, then grow or create the document');
   const tagStep = stepIndex('Store the tag\\.');
   const writeStepText = skillText.slice(writeStep, tagStep);
-  assert.match(
-    writeStepText,
-    /git rev-parse --path-format=absolute --git-common-dir \| xargs dirname/,
-    'the write step must resolve $root the same way tsk-56t D1 already resolves it for the tag step, so the document lands at the main checkout even when cwd is a linked worktree',
-  );
-  assert.match(writeStepText, /doc-sources docs\/<quadrant>\/<file>\.md --dir "\$root"/, 'the no-loss gather must run against the resolved root, not a bare invocation that would fail from a .fgos/-less worktree cwd');
+  assert.match(writeStepText, /fgos doc-sources docs\/<quadrant>\/<file>\.md/, 'the no-loss gather must run via fgos doc-sources');
   assert.match(writeStepText, /\$root\/docs\/<quadrant>\/<file>\.md/, 'grow-vs-create must check file existence at the resolved root, not at cwd');
-  assert.match(writeStepText, /git -C "\$root" commit/, 'the write step must commit at the resolved root before the tag step runs — an uncommitted document is what let 34 real documents go missing');
+  assert.match(writeStepText, /git (-C "\$root" )?add "docs\/<quadrant>\/<file>\.md"/, 'the write step must stage the document before committing');
 });
 
 test('fgos-coding-compounding\'s tag-storing step names the D3 refusal it now depends on', () => {
@@ -47,7 +44,7 @@ test('fgos-coding-compounding\'s tag-storing step names the D3 refusal it now de
   const nextStep = stepIndex('Confirm the close');
   const tagStepText = skillText.slice(tagStep, nextStep);
   assert.match(tagStepText, /retrospective-doc-write-path D3/, 'the tag step must name the decision record that governs the refusal it now depends on, not just the mechanics');
-  assert.match(tagStepText, /compound <id> --doc-type <quadrant> --doc-path docs\/<quadrant>\/<file>\.md --dir "\$root"/, 'the tag call must run against the same $root the write step already resolved');
+  assert.match(tagStepText, /fgos compound <id> --doc-type <quadrant> --doc-path docs\/<quadrant>\/<file>\.md/, 'the tag call must run via fgos compound');
 });
 
 // retrospective-doc-write-path D2: the one document (tsk-5z2) present in no

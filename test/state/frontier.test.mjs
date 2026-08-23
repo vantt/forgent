@@ -571,3 +571,19 @@ test('frontier: an item with literal status "todo" and NO statusCategory at all 
   assert.deepEqual(frontier(view).map((i) => i.id), ['a']);
 });
 
+// work-item-backlog-status D3: the whole reason `backlog` earns its OWN
+// statusCategory rather than reusing `todo`'s. isTodoStatus is a POSITIVE
+// match on the category, so a backlog item drops out of `ready` with no
+// frontier-side code change at all -- these two assertions are what prove
+// that claim rather than assuming it.
+test("frontier: an item at statusCategory 'backlog' is NOT ready (a not-yet-committed idea never reaches the frontier)", () => {
+  const view = { work: { a: { ...item('a', 'backlog'), statusCategory: 'backlog' } } };
+  assert.deepEqual(frontier(view), []);
+});
+
+test("frontier: a literal 'backlog' status with NO statusCategory is also NOT ready (the legacy literal fallback compares against 'todo', so it excludes backlog too)", () => {
+  const view = { work: { a: item('a', 'backlog') } };
+  assert.equal('statusCategory' in view.work.a, false);
+  assert.deepEqual(frontier(view), []);
+});
+

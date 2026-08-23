@@ -16,6 +16,23 @@ pub struct PaneIdentity {
     pub tab_id: String,
 }
 
+/// One pane exactly as `herdr pane list` reports it (tsk-1zq). Kept whole
+/// rather than pre-reduced to a task-id map, because two different
+/// consumers now fold the same scan: the "In process" panel wants
+/// `task_id_map` below, and the worker lane's reuse decision
+/// (`layout::reusable_worker_pane`) wants `focused`/`tab_id`/`label` too.
+///
+/// `focused` is chrome-level data herdr already returns on the same row —
+/// legitimate to read (D10-2), unlike `agent_status`, which
+/// `docs/operator-runbook-herdr-cockpit.md`'s Hard rule forbids outright.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PaneSnapshot {
+    pub pane_id: String,
+    pub tab_id: String,
+    pub label: Option<String>,
+    pub focused: bool,
+}
+
 #[derive(Debug)]
 pub enum PaneScanError {
     Io(io::Error),
@@ -42,11 +59,14 @@ impl From<io::Error> for PaneScanError {
 /// One row from `herdr pane list --workspace <id>`'s real `result.panes`
 /// array — `label` is genuinely optional (a live capture showed panes
 /// with no `label` key at all: never renamed by `/fgOS:pick`'s flow).
+/// `focused` defaults to `false` when absent for the same reason.
 #[derive(Debug, Deserialize)]
 struct PaneRow {
     pane_id: String,
     tab_id: String,
     label: Option<String>,
+    #[serde(default)]
+    focused: bool,
 }
 
 #[derive(Debug, Deserialize)]
@@ -76,7 +96,7 @@ const AUTO_LAUNCH_LABEL_PREFIX: &str = "fgos-auto-";
 /// arbitrary leading substring as a task-id. Rejects the reserved
 /// `fgos-auto-*` namespace first (tsk-2ja) — those labels pass
 /// `is_valid_id`'s syntax check but are never real task ids.
-fn extract_task_id(label: &str) -> Option<&str> {
+pub(crate) fn extract_task_id(label: &str) -> Option<&str> {
     let leading = label.split(" | ").next()?;
     if leading.starts_with(AUTO_LAUNCH_LABEL_PREFIX) {
         return None;
@@ -86,13 +106,36 @@ fn extract_task_id(label: &str) -> Option<&str> {
 
 /// Parses `herdr pane list --workspace <id>`'s real response shape
 /// (`{"id":..., "result":{"panes":[...], "type":"pane_list"}}`, captured
-/// live this session) into a task-id → pane identity map, skipping any
-/// pane with no `label` or a leading segment that isn't a valid fgOS
-/// task-id — D1: only pick-launched, labeled panes are tracked.
-pub fn parse_pane_list(json: &str) -> Result<HashMap<String, PaneIdentity>, serde_json::Error> {
+/// live) into one snapshot per pane, losing nothing — the two folds
+/// below each take what they need from it.
+pub fn parse_pane_list(json: &str) -> Result<Vec<PaneSnapshot>, serde_json::Error> {
     let envelope: PaneListEnvelope = serde_json::from_str(json)?;
+    Ok(envelope
+        .result
+        .panes
+        .into_iter()
+        .map(|pane| PaneSnapshot {
+            pane_id: pane.pane_id,
+            tab_id: pane.tab_id,
+            label: pane.label,
+            focused: pane.focused,
+        })
+        .collect())
+}
+
+/// Task-id → pane identity, for the "In process" panel's jump-to-pane
+/// action (tsk-4zo D1, tsk-1eu D2). Skips any pane with no `label` or a
+/// leading segment that isn't a valid fgOS task-id: only labeled,
+/// agent-launched panes are tracked.
+///
+/// The label answers "which item was this pane opened for" and nothing
+/// else — pure identity, written by the session itself through T3's
+/// capability-gated helper (D5). Whether that item is still running is a
+/// question only the engine answers (D2); no caller of this map may infer
+/// liveness from the fact that an entry exists.
+pub fn task_id_map(panes: &[PaneSnapshot]) -> HashMap<String, PaneIdentity> {
     let mut map = HashMap::new();
-    for pane in envelope.result.panes {
+    for pane in panes {
         let Some(label) = &pane.label else { continue };
         let Some(task_id) = extract_task_id(label) else {
             continue;
@@ -100,21 +143,28 @@ pub fn parse_pane_list(json: &str) -> Result<HashMap<String, PaneIdentity>, serd
         map.insert(
             task_id.to_string(),
             PaneIdentity {
-                pane_id: pane.pane_id,
-                tab_id: pane.tab_id,
+                pane_id: pane.pane_id.clone(),
+                tab_id: pane.tab_id.clone(),
             },
         );
     }
-    Ok(map)
+    map
 }
 
-/// Guard check for a fixed, non-id-shaped pane title — shared by both
-/// tsk-57q's own `fgos-auto-merge`/`fgos-auto-retro`/`fgos-auto-cleanup`
-/// and tsk-2ja's `fgos-auto-discover`. `parse_pane_list` above only
-/// ever returns id-shaped labels (`extract_task_id` rejects anything else
-/// outright — including the `fgos-auto-*` namespace explicitly, below),
-/// so any fixed/synthetic literal title needs this separate exact-match
-/// check instead. `extract_task_id` itself is left untouched.
+/// Guard check for a fixed, non-id-shaped pane title — the admin lane's
+/// own `fgos-auto-merge`/`fgos-auto-retro`/`fgos-auto-cleanup` slot
+/// titles (tsk-57q), which the adapter writes once per fixed pane and
+/// which never change per item. `task_id_map` above only ever returns
+/// id-shaped labels (`extract_task_id` rejects the whole `fgos-auto-*`
+/// namespace), so a fixed literal title needs this separate exact-match
+/// check instead.
+///
+/// tsk-1zq removed the one worker-lane caller (`fgos-auto-discover`):
+/// there, this was a launch mutex, i.e. a label carrying orchestrator
+/// state, which is precisely what D2 forbids. In the admin lane the
+/// label names a fixed slot rather than a running item, which is the
+/// distinction DISCUSSION.md §6 draws when it assigns admin-lane labels
+/// to the adapter and execution-lane labels to the session itself.
 pub fn pane_has_label(json: &str, label: &str) -> Result<bool, serde_json::Error> {
     let envelope: PaneListEnvelope = serde_json::from_str(json)?;
     Ok(envelope
@@ -150,7 +200,7 @@ pub struct HerdrPaneScanner {
 }
 
 impl PaneRegistry for HerdrPaneScanner {
-    fn scan(&self) -> Result<HashMap<String, PaneIdentity>, PaneScanError> {
+    fn scan_panes(&self) -> Result<Vec<PaneSnapshot>, PaneScanError> {
         let stdout = run_pane_list(&self.herdr_bin, &self.workspace_id)?;
         parse_pane_list(&stdout).map_err(PaneScanError::Parse)
     }
@@ -181,9 +231,13 @@ mod tests {
          "label":"tsk-4zo | a.ssid:01d4c06d-70dc-4e06-a4b0-2bcf85668f28"}
     ],"type":"pane_list"}}"#;
 
+    fn map_of(json: &str) -> HashMap<String, PaneIdentity> {
+        task_id_map(&parse_pane_list(json).expect("fixture should parse"))
+    }
+
     #[test]
     fn pane_registry_parses_real_captured_pane_list_shape() {
-        let map = parse_pane_list(PANE_LIST_FIXTURE).expect("fixture should parse");
+        let map = map_of(PANE_LIST_FIXTURE);
         assert_eq!(map.len(), 2);
         assert_eq!(
             map.get("tsk-n4i-2"),
@@ -203,7 +257,7 @@ mod tests {
 
     #[test]
     fn pane_registry_skips_panes_with_no_label() {
-        let map = parse_pane_list(PANE_LIST_FIXTURE).expect("fixture should parse");
+        let map = map_of(PANE_LIST_FIXTURE);
         // wS:p1D carries no `label` key at all — must never appear.
         assert!(!map.values().any(|identity| identity.pane_id == "wS:p1D"));
     }
@@ -302,7 +356,7 @@ mod tests {
         // — `pane_has_label` remains a second, independent check, never a
         // replacement for it, and its own exact-match result never
         // depended on what `extract_task_id` decided either way.
-        let map = parse_pane_list(FIXED_LABEL_PANE_LIST_FIXTURE).expect("fixture should parse");
+        let map = map_of(FIXED_LABEL_PANE_LIST_FIXTURE);
         assert!(
             !map.contains_key("fgos-auto-merge"),
             "the reserved fgos-auto-* namespace must never be read back as a task id"
@@ -341,7 +395,7 @@ mod tests {
         // hyphenated-lowercase shape) but must never surface as a task-id
         // key in `parse_pane_list`'s own map — that map stays exactly as
         // it was before this guard existed.
-        let map = parse_pane_list(AUTO_DISCOVER_PANE_FIXTURE).expect("fixture should parse");
+        let map = map_of(AUTO_DISCOVER_PANE_FIXTURE);
         assert!(
             !map.contains_key("fgos-auto-discover-tsk-2ja"),
             "a synthetic auto-discover label must never be read back as a task id"

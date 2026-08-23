@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { appendEvent } from '../../src/state/events.mjs';
-import { foldEvents, rebuildView, viewRevision } from '../../src/state/replay.mjs';
+import { foldEvents, rebuildView, viewRevision, serializeView } from '../../src/state/replay.mjs';
 import { initStore, addWork, moveWork } from '../../src/state/store.mjs';
 import { fixEventsJsonlContiguity } from '../../src/state/events-jsonl-contiguity.mjs';
 import { repairTruncatedLastLine } from '../../src/state/events.mjs';
@@ -719,11 +719,57 @@ test('foldEvents ignores branchHeadAtReturn on a proposed move for an id that wa
   assert.equal('ghost' in view.work, false);
 });
 
+// `mergedSha`/`mergedInto` (tsk-5dk) fold onto the item on the SAME
+// `to: 'delivered'` edge the payload actually carries them on — never
+// inferred, never re-derived from git, straight off the event exactly like
+// headAtReturn/branchHeadAtReturn above.
+
+test('foldEvents folds mergedSha and mergedInto onto the item from a delivered move that carries them', () => {
+  const events = [
+    { seq: 1, ts: '2026-08-12T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'awaiting-approval' }, v: 2 },
+    { seq: 2, ts: '2026-08-12T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'awaiting-approval', to: 'delivered', role: 'human', mergedSha: 'deadbeefcafe', mergedInto: 'main' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal(view.work.a.mergedSha, 'deadbeefcafe');
+  assert.equal(view.work.a.mergedInto, 'main');
+});
+
+test('foldEvents leaves mergedSha/mergedInto absent for a delivered move that never carried them (hand-typed move, or a verify-only pull-door delivery)', () => {
+  const events = [
+    { seq: 1, ts: '2026-08-12T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'awaiting-approval' }, v: 2 },
+    { seq: 2, ts: '2026-08-12T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'awaiting-approval', to: 'delivered', role: 'human' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal('mergedSha' in view.work.a, false);
+  assert.equal('mergedInto' in view.work.a, false);
+});
+
+test('foldEvents ignores mergedSha/mergedInto on a non-delivered move even when the payload carries them (only the delivered edge sets them)', () => {
+  const events = [
+    { seq: 1, ts: '2026-08-12T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, v: 2 },
+    { seq: 2, ts: '2026-08-12T00:00:01.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing', role: 'human', mergedSha: 'ignored-on-this-edge', mergedInto: 'ignored-on-this-edge' }, v: 2 },
+  ];
+  const view = foldEvents(events);
+  assert.equal('mergedSha' in view.work.a, false);
+  assert.equal('mergedInto' in view.work.a, false);
+});
+
 // --- work-graph-intelligence S3: view revision-hash -----------------------
 // A deterministic fingerprint of a folded view (C1 data_hash pattern), so a
 // consumer can tell "did the folded state change?" without re-folding — and
 // WITHOUT the hash leaking into the fold return shape (which whole-view
 // snapshot + backward-compat tests pin).
+
+test('serializeView returns serialized JSON string and matching revision hash (tsk-37d)', () => {
+  const logPath = tmpLogPath();
+  appendEvent(logPath, { type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' } });
+  const view = rebuildView(logPath);
+
+  const { viewStr, revision } = serializeView(view);
+  assert.equal(typeof viewStr, 'string');
+  assert.equal(revision, viewRevision(view));
+  assert.deepEqual(JSON.parse(viewStr), view);
+});
 
 test('viewRevision is deterministic: rebuilding the same log twice yields byte-identical revisions', () => {
   const logPath = tmpLogPath();
@@ -824,36 +870,13 @@ test("foldEvents on a log with no tool.register events yields a view with no too
   assert.equal(Object.hasOwn(view, "tools"), false);
 });
 
-test("foldEvents folds tool.register into view.tools keyed by name", () => {
+test("foldEvents skips retired tool.register/tool.remove events (tsk-in1-1 D1) — forward-compatible, never an error, never creates view.tools", () => {
   const events = [
-    {
-      seq: 1,
-      ts: "2026-07-31T00:00:00.000Z",
-      type: "tool.register",
-      payload: { name: "gitnexus", kind: "mcp", capability: "impact-analysis", command: "mcp:gitnexus", scanTarget: ".gitnexus" },
-    },
-  ];
-  const view = foldEvents(events);
-  assert.deepEqual(view.tools.gitnexus, { name: "gitnexus", kind: "mcp", capability: "impact-analysis", command: "mcp:gitnexus", scanTarget: ".gitnexus" });
-});
-
-test("foldEvents folds tool.remove by deleting the keyed entry", () => {
-  const events = [
-    { seq: 1, ts: "2026-07-31T00:00:00.000Z", type: "tool.register", payload: { name: "gitnexus", kind: "mcp", capability: "impact-analysis", command: "mcp:gitnexus" } },
+    { seq: 1, ts: "2026-07-31T00:00:00.000Z", type: "tool.register", payload: { name: "gitnexus", kind: "mcp", capability: "impact-analysis", command: "mcp:gitnexus", scanTarget: ".gitnexus" } },
     { seq: 2, ts: "2026-07-31T00:00:01.000Z", type: "tool.remove", payload: { name: "gitnexus" } },
   ];
   const view = foldEvents(events);
-  assert.equal(view.tools.gitnexus, undefined);
-});
-
-test("foldEvents' tool.register is a full-record overwrite, never a merge with a prior registration under the same name", () => {
-  const events = [
-    { seq: 1, ts: "2026-07-31T00:00:00.000Z", type: "tool.register", payload: { name: "gitnexus", kind: "mcp", capability: "impact-analysis", command: "mcp:gitnexus", responsibility: "Verification" } },
-    { seq: 2, ts: "2026-07-31T00:00:01.000Z", type: "tool.remove", payload: { name: "gitnexus" } },
-    { seq: 3, ts: "2026-07-31T00:00:02.000Z", type: "tool.register", payload: { name: "gitnexus", kind: "mcp", capability: "impact-analysis", command: "mcp:gitnexus" } },
-  ];
-  const view = foldEvents(events);
-  assert.equal(view.tools.gitnexus.responsibility, undefined);
+  assert.equal(Object.hasOwn(view, "tools"), false);
 });
 
 // ─── tsk-49e: incremental-read snapshot fast path ──────────────────────────
@@ -1059,6 +1082,25 @@ test('determinism: the zero-read fast path\'s round-tripped view is deep-equal t
   const viaFastPath = rebuildView(logPath); // exact-match zero-read shortcut
   const freshFold = foldEvents(readEventsWhole(logPath));
   assert.deepEqual(viaFastPath, freshFold, 'the round-trip through state.json (JSON.stringify/parse) must never drop or alter a field a fresh fold would carry');
+});
+
+test('work.handoff replay normalizes the retired human-advisor literal to advisor (tsk-397 D16 rename) -- an append-only log already carrying pre-rename events must not strand an item with a holder the current vocabulary rejects', () => {
+  const dir = tmpFgosDir();
+  const logPath = logPathOf(dir);
+  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  appendEvent(logPath, { type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' } });
+  // Raw pre-rename event shape, exactly as a real log written before D16 has it
+  // (.fgos/events.jsonl seq 18440, tsk-1yf) -- never re-authored to the new
+  // literal, since the whole point is proving replay heals an already-written
+  // retired value, not that a fresh write uses the new one.
+  appendEvent(logPath, { type: 'work.handoff', payload: { id: 'a', from: 'implementer', to: 'human-advisor', reason: 'advise', mode: 'async' } });
+
+  const view = rebuildView(logPath);
+  assert.equal(view.work.a.holder, 'advisor');
+  assert.equal(view.callThreads.a.at(-1).to, 'advisor');
+
+  const freshFold = foldEvents(readEventsWhole(logPath));
+  assert.deepEqual(view, freshFold, 'the snapshot fast path and a fresh full fold must normalize identically');
 });
 
 // Local helper: reads the whole log via a bypass path (never through

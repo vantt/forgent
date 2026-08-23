@@ -33,7 +33,13 @@ fn status_color(status: &str) -> Option<Color> {
     }
 }
 
-const TAB_ORDER: [WorkTab; 4] = [WorkTab::Todo, WorkTab::Doing, WorkTab::Review, WorkTab::Done];
+const TAB_ORDER: [WorkTab; 5] = [
+    WorkTab::Backlog,
+    WorkTab::Todo,
+    WorkTab::Doing,
+    WorkTab::Review,
+    WorkTab::Done,
+];
 
 /// tsk-1eu D1 / tsk-3wl D1: the same focused-vs-unfocused border style
 /// `draw()` already applies to the WorkItems/InProcess boxes, shared here
@@ -718,11 +724,17 @@ mod tests {
     use crate::pane_scan::PaneIdentity;
     use ratatui::backend::TestBackend;
 
-    /// tsk-64z D1: all 4 tab labels render, regardless of which is
+    /// tsk-64z D1: all 5 tab labels render, regardless of which is
     /// currently selected — proves the `Tabs` widget renders the full set,
     /// not just the active one.
+    ///
+    /// work-item-backlog-status D4: this doubles as the visibility proof
+    /// for `BACKLOG`. `App::mock()` carries no `backlog` item, so asserting
+    /// the label still renders is exactly the "an empty bucket must still
+    /// advertise itself" bar — a person cannot promote `backlog -> todo`
+    /// (a human-only edge) if the tab only appears once something is in it.
     #[test]
-    fn work_items_panel_renders_four_tabs_todo_doing_review_done() {
+    fn work_items_panel_renders_five_tabs_backlog_todo_doing_review_done() {
         let mut app = App::mock();
         let backend = TestBackend::new(120, 30);
         let mut terminal = Terminal::new(backend).expect("terminal init");
@@ -731,14 +743,17 @@ mod tests {
             .expect("draw should not panic");
         let buffer = terminal.backend().buffer();
         let content: String = buffer.content().iter().map(|cell| cell.symbol()).collect();
-        for label in ["TODO", "DOING", "REVIEW", "DONE"] {
+        for label in ["BACKLOG", "TODO", "DOING", "REVIEW", "DONE"] {
             assert!(content.contains(label), "missing tab label {label}: {content}");
         }
     }
 
     /// tsk-4cxl D2: the Work Items table renders a `Stage` column right
     /// after `Status`, carrying each row's own `stage` value — `App::mock`'s
-    /// default TODO-tab row (`tsk-19y-1`) has `stage: "clarify"`.
+    /// default TODO-tab row (`tsk-19y-1`) has `stage: "discovery"`, the
+    /// coding domain's real entry stage (tsk-1l9: the fixture used to say
+    /// `clarify`, a stage retired out of the registry entirely, so the mock
+    /// rendered a value no live item could hold).
     #[test]
     fn work_items_table_renders_stage_column_next_to_status() {
         let mut app = App::mock();
@@ -750,7 +765,7 @@ mod tests {
         let buffer = terminal.backend().buffer();
         let content: String = buffer.content().iter().map(|cell| cell.symbol()).collect();
         assert!(content.contains("Stage"), "missing Stage header: {content}");
-        assert!(content.contains("clarify"), "missing row's stage value: {content}");
+        assert!(content.contains("discovery"), "missing row's stage value: {content}");
     }
 
     /// tsk-417 D3: NEED ANSWER, MERGE LIST, AFTER DELIVER render as 3

@@ -100,11 +100,19 @@ test('an item with a docsRef pointing at an empty/missing CONTEXT.md migrates to
   assert.equal(listWork(storeDir).work['empty-docsref'].stage, 'discovery');
 });
 
+const VALID_ASK = `## Context
+
+We need to clarify which provider should be used for the payment gateway integration.
+
+## Why this matters
+
+The choice of provider determines the SDK dependencies and API configuration required.`;
+
 test('an item parked awaiting-human migrates to exploring, even when it also carries a real decision (parked status wins — it is already past the discovery point)', () => {
   const storeDir = tmpStoreDir();
   addLegacyWork(storeDir, { id: 'parked' });
   addDecision(storeDir, { id: 'parked', text: 'D1: something', source: 'fgos-exploring', rationale: 'real' });
-  putInAwaiting(storeDir, { id: 'parked', ask: 'Which provider?', statusAtAsk: 'todo' });
+  putInAwaiting(storeDir, { id: 'parked', ask: VALID_ASK, statusAtAsk: 'todo' });
 
   const report = migrateClarifySplit(storeDir);
 
@@ -143,7 +151,7 @@ test('idempotent by construction: a second real run right after the first moves 
   addLegacyWork(storeDir, { id: 'has-decision' });
   addDecision(storeDir, { id: 'has-decision', text: 'D1: locked something real', source: 'fgos-exploring', rationale: 'real evidence' });
   addLegacyWork(storeDir, { id: 'parked' });
-  putInAwaiting(storeDir, { id: 'parked', ask: 'Which provider?', statusAtAsk: 'todo' });
+  putInAwaiting(storeDir, { id: 'parked', ask: VALID_ASK, statusAtAsk: 'todo' });
   addLegacyWork(storeDir, { id: 'untouched' });
 
   const first = migrateClarifySplit(storeDir);

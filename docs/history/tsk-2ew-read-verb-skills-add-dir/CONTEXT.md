@@ -3,7 +3,7 @@
 Item: `tsk-2ew`. Written retroactively (same structural gap as this scan's
 other items).
 
-## Decisions
+## Locked decisions
 
 - **D0.** Root cause confirmed: `grep -c -- "--dir"` on all 10
   `plugins/fgOS/skills/{list,ready,triage,show,stale,rollup,graph,check,

@@ -112,10 +112,7 @@ your output:
 {"title": "<one-line title>", "kind": "<optional>", "risk": "<optional>", "description": "<optional>"}
 \`\`\`
 
-\`title\` is required; \`kind\`/\`risk\`/\`description\` are optional. This is a
-report, not a write — you still MUST NOT call \`fgos\` or touch \`.fgos/\`. The
-runner reads these blocks after you finish and creates each item itself,
-stamping it as discovered-from this item.
+\`title\` is required; \`kind\`/\`risk\`/\`description\` are optional — pick \`kind\`/\`risk\` from the domain's own declared vocabulary (\`classificationVocabulary(domain, field)\`, \`src/state/workflow-stage-graphs.mjs\`), never invent a value outside either list, and omit a field entirely rather than guess when the evidence does not support a judgment for it. This is a report, not a write — you still MUST NOT call \`fgos\` or touch \`.fgos/\`. The runner reads these blocks after you finish and creates each item itself, stamping it as discovered-from this item.
 `;
 
   assert.equal(rendered, golden);
@@ -146,6 +143,7 @@ test('renderTemplate(worker-prompt-skill-pointer.txt, ...) golden output — no-
     feedbackSection: '',
     action: '(không có)',
     readFirst: '(không có)',
+    docsRefPointer: '',
     refs: 'src/widget.mjs, docs/specs/widget.md',
     verify: 'npm test',
     domain: 'coding',
@@ -169,6 +167,7 @@ governs how this work item must be done.
 
 # Files to read first
 (không có)
+
 
 # Worktree boundary
 You are running on an isolated git worktree, checked out on its own branch for
@@ -196,10 +195,7 @@ your output:
 {"title": "<one-line title>", "kind": "<optional>", "risk": "<optional>", "description": "<optional>"}
 \`\`\`
 
-\`title\` is required; \`kind\`/\`risk\`/\`description\` are optional. This is a
-report, not a write — you still MUST NOT call \`fgos\` or touch \`.fgos/\`. The
-runner reads these blocks after you finish and creates each item itself,
-stamping it as discovered-from this item.
+\`title\` is required; \`kind\`/\`risk\`/\`description\` are optional — pick \`kind\`/\`risk\` from the domain's own declared vocabulary (\`classificationVocabulary(domain, field)\`, \`src/state/workflow-stage-graphs.mjs\`), never invent a value outside either list, and omit a field entirely rather than guess when the evidence does not support a judgment for it. This is a report, not a write — you still MUST NOT call \`fgos\` or touch \`.fgos/\`. The runner reads these blocks after you finish and creates each item itself, stamping it as discovered-from this item.
 `;
 
   assert.equal(rendered, golden);

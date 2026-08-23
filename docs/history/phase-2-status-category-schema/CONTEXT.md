@@ -25,7 +25,7 @@ Toàn bộ quyết định sản phẩm dưới đây được chốt qua 1 phi�
 scout evidence, lý luận từng bước, và log Q&A nguyên văn. File này chỉ tóm
 tắt kết quả đã ổn định cho `fgos-coding-planning` dùng, không lặp lại lý luận.
 
-## Quyết định đã chốt (D1-D6)
+## Locked decisions (D1-D6)
 
 | D-ID | Tóm tắt |
 |---|---|

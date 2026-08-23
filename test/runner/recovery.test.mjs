@@ -25,7 +25,7 @@ test('every RECOVERY entry action is one of the declared ACTIONS', () => {
   }
 });
 
-const retryClasses = ['worker-spawn-fail', 'worker-timeout', 'verify-miss', 'worktree-fail', 'reject-returned'];
+const retryClasses = ['worker-spawn-fail', 'worker-timeout', 'verify-miss', 'worktree-fail', 'reject-returned', 'dispatch-in-flight'];
 
 for (const cls of retryClasses) {
   test(`${cls}: below max retries -> retry`, () => {
@@ -61,6 +61,11 @@ test('state-conflict always halts, regardless of attempt (never fights a human f
 
 test('stale-doing classifies to park at the coarse resolveAction level (never invisible)', () => {
   assert.deepEqual(resolveAction('stale-doing', 1), { action: 'park', errorClass: 'stale-doing' });
+});
+
+test('dispatch-depth-exceeded classifies to park, regardless of attempt (retrying the same claim hits the same cap again)', () => {
+  assert.deepEqual(resolveAction('dispatch-depth-exceeded', 1), { action: 'park', errorClass: 'dispatch-depth-exceeded' });
+  assert.deepEqual(resolveAction('dispatch-depth-exceeded', 99), { action: 'park', errorClass: 'dispatch-depth-exceeded' });
 });
 
 test('an undeclared error class fails safe to halt, never defaults to retry', () => {

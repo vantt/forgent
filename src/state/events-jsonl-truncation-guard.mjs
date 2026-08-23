@@ -30,6 +30,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
+import { execFileSync } from "node:child_process";
+import { recordMainCheckoutGuardWarning } from "./main-checkout-guard-warnings.mjs";
 
 function lastNonEmptyLine(raw) {
   const lines = raw.split("\n");
@@ -189,3 +191,214 @@ export function advanceEventsJsonlTruncationGuard(logPath, guardPath) {
   }
   return report;
 }
+
+export const PERIODIC_CHECKPOINT_INTERVAL_SEC = 900; // 15 minutes
+// D2/D5 (docs/history/tsk-1vc-silent-eventlog-loss-detection/CONTEXT.md):
+// measured, not guessed. Live main checkout observed 22816->23069 (253
+// events) across 2026-08-21T03:19:20Z-05:36:51Z (~137.5min) during this
+// item's own multi-session investigation window -- ~1.84 events/min
+// average, ~27.6 events per old 15min interval. 50 sits above that average
+// (fires less often than the old timer under typical load) but comfortably
+// below what a real burst produces (the same investigation observed
+// checkpoint commits landing every 5-15min during busy stretches), so a
+// genuine high-risk burst still checkpoints sooner than the old fixed
+// timer would have -- the self-tuning property D2 asked for. A starting
+// point from one observed window, not a permanent constant; revisit with
+// real production data via the .fgos/config.json `checkpoint.eventThreshold`
+// override once more of it exists.
+export const DEFAULT_CHECKPOINT_EVENT_THRESHOLD = 50;
+
+/**
+ * Calculates the number of uncommitted appended events in logPath relative to git HEAD.
+ * Returns 0 if logPath does not exist.
+ */
+export function getUncommittedEventCount(logPath, repoRoot) {
+  if (!fs.existsSync(logPath)) return 0;
+  const relPath = path.relative(repoRoot, logPath) || ".fgos/events.jsonl";
+  let diskLines = 0;
+  try {
+    const rawDisk = fs.readFileSync(logPath, "utf8");
+    diskLines = rawDisk.split("\n").filter((l) => l.trim() !== "").length;
+  } catch {
+    return 0;
+  }
+
+  let committedLines = 0;
+  try {
+    const rawCommitted = execFileSync("git", ["show", `HEAD:${relPath}`], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    });
+    committedLines = rawCommitted.split("\n").filter((l) => l.trim() !== "").length;
+  } catch {
+    committedLines = 0;
+  }
+
+  return Math.max(0, diskLines - committedLines);
+}
+
+/**
+ * Runs opportunistic checks immediately after main checkout lock acquisition:
+ * D1: Advance truncation guard and record warning on break; refuse mark advancement & periodic commit on break (never throws/blocks).
+ * D2: Event-count-based / time-based periodic auto-commit of .fgos/events.jsonl if dirty (never throws/blocks).
+ *
+ * @param {string} dir - .fgos directory or repo root
+ * @param {string} [repoRoot] - optional repository root (defaults to parent of dir if dir is .fgos)
+ * @param {Object} [opts] - optional options for testing
+ * @param {number} [opts.nowSec] - mock current timestamp (unix seconds)
+ * @param {number} [opts.intervalSec] - override periodic threshold seconds (default 900)
+ * @param {number} [opts.eventThreshold] - override event count threshold (default from config or 50)
+ * @param {string} [opts.rawLog] - mock raw log text for testing
+ * @param {Object} [opts.commitEnv] - extra env vars merged onto the periodic
+ *   checkpoint's own `git commit` call (tsk-32v). This module is `kernel`
+ *   tier and may not import `../runner/main-checkout-lock.mjs` (`infra`
+ *   tier, one-way-down layering) to reach `HOLDER_PID_ENV_VAR` itself -- the
+ *   caller (merge.mjs, which already imports it) passes it down as plain
+ *   data instead. Without it, this commit runs while the caller already
+ *   holds `.fgos/main-checkout.lock`, `.githooks/pre-commit`'s own lock
+ *   re-check sees a foreign identity and refuses, and `git add` above is
+ *   left staged with nothing to notice or clean it up -- confirmed live as
+ *   the cause of a catchup/approve self-collision, 2026-08-21.
+ */
+export function runOpportunisticMainCheckoutChecks(
+  dir,
+  repoRoot = null,
+  {
+    nowSec = null,
+    intervalSec = PERIODIC_CHECKPOINT_INTERVAL_SEC,
+    eventThreshold = null,
+    rawLog = null,
+    commitEnv = null,
+  } = {}
+) {
+  if (process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS === "1") return;
+  const fgosDir = path.basename(dir) === ".fgos" ? dir : path.join(dir, ".fgos");
+  const realRepoRoot = repoRoot || (path.basename(dir) === ".fgos" ? path.dirname(dir) : dir);
+
+  let breakFlagged = false;
+
+  // D1: Detect and warn. Refuse mark advancement / periodic commit on break.
+  try {
+    const logPath = path.join(fgosDir, "events.jsonl");
+    const guardPath = path.join(fgosDir, "events-jsonl.truncation-guard.json");
+    if (rawLog !== null) {
+      const storedMark = readGuardMark(guardPath);
+      const report = checkTruncationGuard(rawLog, storedMark);
+      if (report.ok && report.mark !== null) {
+        writeGuardMark(guardPath, report.mark);
+      } else if (!report.ok) {
+        recordMainCheckoutGuardWarning(fgosDir, report);
+        breakFlagged = true;
+      }
+    } else if (fs.existsSync(logPath)) {
+      const report = advanceEventsJsonlTruncationGuard(logPath, guardPath);
+      if (report && report.ok === false) {
+        recordMainCheckoutGuardWarning(fgosDir, report);
+        breakFlagged = true;
+      }
+    }
+  } catch {
+    // Non-blocking: swallow error
+  }
+
+  // D1 Fail-closed: refuse periodic auto-commit when an unacknowledged break is flagged
+  if (breakFlagged) return;
+
+  // D2: Event-count-based (or time-based) periodic auto-commit
+  try {
+    const logPath = path.join(fgosDir, "events.jsonl");
+    if (fs.existsSync(logPath)) {
+      const relPath = path.relative(realRepoRoot, logPath) || ".fgos/events.jsonl";
+      const statusOut = execFileSync("git", ["status", "--porcelain", "--", relPath], {
+        cwd: realRepoRoot,
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "ignore"],
+      }).trim();
+
+      if (statusOut.length > 0) {
+        let lastCommitSec = null;
+        try {
+          const logOut = execFileSync("git", ["log", "-1", "--format=%ct", "--", relPath], {
+            cwd: realRepoRoot,
+            encoding: "utf8",
+            stdio: ["ignore", "pipe", "ignore"],
+          }).trim();
+          if (logOut) {
+            const parsed = parseInt(logOut, 10);
+            if (!Number.isNaN(parsed)) {
+              lastCommitSec = parsed;
+            }
+          }
+        } catch {
+          lastCommitSec = null;
+        }
+
+        // Kernel tier cannot import the domain-tier config reader
+        // (src/config/shared-config-file.mjs) -- read the shared config
+        // file directly with fs, same pattern this file already uses for
+        // every other .fgos/* path (architecture.test.mjs's one-way-down
+        // layering check, caught live during tsk-1vc-2's own implementation).
+        let configThreshold = null;
+        try {
+          const sharedConfigPath = path.join(realRepoRoot, ".fgos", "config.json");
+          if (fs.existsSync(sharedConfigPath)) {
+            const cfg = JSON.parse(fs.readFileSync(sharedConfigPath, "utf8"));
+            configThreshold = cfg?.checkpoint?.eventThreshold;
+          }
+        } catch {
+          // ignore -- falls through to the item default below, same as a
+          // missing/unparseable config file always has
+        }
+
+        const effectiveEventThreshold =
+          eventThreshold !== null
+            ? eventThreshold
+            : typeof configThreshold === "number"
+            ? configThreshold
+            : DEFAULT_CHECKPOINT_EVENT_THRESHOLD;
+
+        const uncommittedEvents = getUncommittedEventCount(logPath, realRepoRoot);
+        const currentTimeSec = nowSec !== null ? nowSec : Math.floor(Date.now() / 1000);
+
+        const eventThresholdMet = effectiveEventThreshold !== null && uncommittedEvents >= effectiveEventThreshold;
+        const timeIntervalMet = intervalSec !== null && lastCommitSec !== null && (currentTimeSec - lastCommitSec) >= intervalSec;
+        const initialCommitMet = lastCommitSec === null;
+
+        if (eventThresholdMet || timeIntervalMet || initialCommitMet) {
+          execFileSync("git", ["add", relPath], {
+            cwd: realRepoRoot,
+            stdio: ["ignore", "pipe", "ignore"],
+          });
+          try {
+            // commitEnv (tsk-32v): see this function's own doc comment --
+            // the caller passes HOLDER_PID_ENV_VAR down as plain data so
+            // .githooks/pre-commit's own lock re-check recognizes this
+            // commit as the same identity already holding the lock.
+            execFileSync("git", ["commit", "-m", "chore(.fgos): periodic events.jsonl checkpoint", "--", relPath], {
+              cwd: realRepoRoot,
+              stdio: ["ignore", "pipe", "ignore"],
+              ...(commitEnv ? { env: { ...process.env, ...commitEnv } } : {}),
+            });
+          } catch (commitErr) {
+            // Never leave a staged-but-uncommitted .fgos/ write behind on
+            // failure, for ANY reason -- this function's own contract is
+            // "fully commits its write, or leaves the tree exactly as it
+            // found it", never a half-state that leaks into whatever git
+            // operation runs next. Best-effort: the outer catch below still
+            // swallows non-blocking either way.
+            try {
+              execFileSync("git", ["reset", "--", relPath], { cwd: realRepoRoot, stdio: ["ignore", "pipe", "ignore"] });
+            } catch {
+              // best-effort
+            }
+            throw commitErr;
+          }
+        }
+      }
+    }
+  } catch {
+    // Non-blocking: swallow error
+  }
+}
+

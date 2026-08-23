@@ -2,6 +2,11 @@
 // từ test/cli/fgos.test.mjs (tsk-3um). Nội dung test không đổi, chỉ chỗ ở đổi.
 // Bộ đồ nghề dùng chung nằm ở ./helpers/fgos-cli-harness.mjs.
 import { test } from 'node:test';
+// The retrospective-content gate itself, so the two tests below can assert
+// the CONSEQUENCE of tagging these verbs' decisions as engine bookkeeping —
+// not merely that the field is present. Imported straight from src rather
+// than re-exported through the harness: only these two tests need it.
+import { checkRetrospectiveContent } from '../../src/state/cleanup-harness.mjs';
 import {
   ADD_BAD_FLAG_CASES,
   DEFAULT_TTL_MS,
@@ -138,7 +143,7 @@ test('review of a legacy proposed item (no branch, no headAtTake/headAtReturn) d
   const cwd = tmpCwd();
   addOk(cwd, 'review-legacy-item');
   run(cwd, ['move', 'review-legacy-item', '--to', 'doing']);
-  run(cwd, ['move', 'review-legacy-item', '--to', 'awaiting-approval']);
+  run(cwd, ['move', 'review-legacy-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
 
   const result = run(cwd, ['review', 'review-legacy-item']);
   assert.equal(result.status, 0, result.stderr);
@@ -223,6 +228,33 @@ test('sync-root records a real decision on the root item', () => {
   const decisionEvents = lines.map((l) => JSON.parse(l)).filter((e) => e.type === 'decision' && e.payload?.id === 'sync-root-decision');
   assert.equal(decisionEvents.length, 1, 'sync-root must append exactly one real decision record');
   assert.match(decisionEvents[0].payload.text, /sync-root-decision|fgw\/sync-root-decision/);
+});
+
+// A branch sync is machinery, not reflection. The record above still exists
+// and still shows in `fgos show` (which filters decisions by id, never by
+// kind) -- but it must not read as someone having thought about the work,
+// because that is the one thing standing between an item and `done`.
+// Untagged, it satisfied the retrospective gate outright: the same hole
+// tsk-qrs closed for the driver's closing report, still open through this
+// verb. Asserted end to end, on the decision the real verb actually wrote,
+// because the gate itself was never the defective half.
+test('sync-root tags its decision as engine bookkeeping, so it cannot satisfy the retrospective gate', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeDriftedRoot(cwd, 'sync-root-engine-kind', { verify: 'true' });
+  commitPendingBeforeApprove(cwd, 'sync-root-engine-kind');
+
+  const result = run(cwd, ['sync-root', 'sync-root-engine-kind']);
+  assert.equal(result.status, 0, result.stderr);
+
+  const decisionEvents = eventLines(cwd)
+    .map((l) => JSON.parse(l))
+    .filter((e) => e.type === 'decision' && e.payload?.id === 'sync-root-engine-kind');
+  assert.equal(decisionEvents.length, 1, 'still exactly one decision record -- tagging must not change how many are written');
+  assert.equal(decisionEvents[0].payload.kind, 'engine', 'a mechanical branch sync is engine bookkeeping, not a design decision');
+
+  const gate = checkRetrospectiveContent(stateView(cwd), 'sync-root-engine-kind', cwd);
+  assert.equal(gate.ok, false, 'a synced root with no retrospective document must not pass the cleanup gate on its sync record alone');
 });
 
 test('sync-root nested: a root with a parent merges into fgw/<parentId>, not main; main stays untouched; the child root\'s status stays unchanged', () => {
@@ -460,6 +492,13 @@ test('promote-to-component happy path (D1 new-item): creates a fresh root, merge
   assert.equal(decisionEvents.length, 1, 'promote-to-component must append exactly one real decision record');
   assert.match(decisionEvents[0].payload.text, /ptc-new-root-a/);
   assert.match(decisionEvents[0].payload.text, /ptc-new-root-b/);
+
+  // Same reasoning as sync-root's own engine-kind test above: converging
+  // siblings into a component is machinery, so its record must not read as
+  // reflection at the retrospective gate.
+  assert.equal(decisionEvents[0].payload.kind, 'engine', 'a mechanical component promotion is engine bookkeeping, not a design decision');
+  const gate = checkRetrospectiveContent(stateView(cwd), data.rootId, cwd);
+  assert.equal(gate.ok, false, 'a promoted root with no retrospective document must not pass the cleanup gate on its promotion record alone');
 });
 
 test('promote-to-component happy path (D1 reuse-member): promotes an existing member to root, root itself is skipped not merged', () => {
@@ -773,7 +812,7 @@ test('merge next run from inside a linked worktree without --dir is refused, exi
   const { main, wt } = tmpLinkedWorktree();
   assert.equal(run(main, ['add', 'solo', '--title', 'Solo', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(run(main, ['move', 'solo', '--to', 'doing']).status, 0);
-  assert.equal(run(main, ['move', 'solo', '--to', 'awaiting-approval']).status, 0);
+  assert.equal(run(main, ['move', 'solo', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]).status, 0);
   // Confirm the real store genuinely has a ready item, so a refusal below
   // cannot be mistaken for a true "nothing ready" negative.
   assert.deepEqual(envelopeData(run(main, ['merge', 'list']).stdout).ready, ['solo']);
@@ -803,7 +842,7 @@ test('merge list: a proposed item whose dep is already done is ready', () => {
   // park it 'blocked' instead of 'done' — a false negative for this test.
   assert.equal(run(cwd, ['add', 'dep', '--title', 'Dep', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(run(cwd, ['move', 'dep', '--to', 'doing']).status, 0);
-  assert.equal(run(cwd, ['move', 'dep', '--to', 'awaiting-approval']).status, 0);
+  assert.equal(run(cwd, ['move', 'dep', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]).status, 0);
   const approveResult = envelopeData(run(cwd, ['approve', 'dep']).stdout);
   assert.equal(approveResult.to, 'delivered', `expected dep to reach delivered, got: ${JSON.stringify(approveResult)}`);
   // merge list still reads RESOLVED_STATUSES = {done, wontfix} at this point
@@ -871,7 +910,7 @@ test('merge next merges the single ready item by recursing into approve, item re
   // and-plugin-skill.md.
   assert.equal(run(cwd, ['add', 'solo', '--title', 'Solo', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(run(cwd, ['move', 'solo', '--to', 'doing']).status, 0);
-  assert.equal(run(cwd, ['move', 'solo', '--to', 'awaiting-approval']).status, 0);
+  assert.equal(run(cwd, ['move', 'solo', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]).status, 0);
 
   const result = run(cwd, ['merge', 'next']);
   assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
@@ -887,13 +926,24 @@ test('merge next picks the higher-ranked (mvp goalTier) item first when two are 
   for (const id of ['plain', 'important']) {
     assert.equal(run(cwd, ['add', id, '--title', id, '--kind', 'task', '--risk', 'light', '--verify', 'true', '--description', 'tsk-535 fixture description.', ...(id === 'important' ? ['--goal-tier', 'mvp'] : [])]).status, 0);
     assert.equal(run(cwd, ['move', id, '--to', 'doing']).status, 0);
-    assert.equal(run(cwd, ['move', id, '--to', 'awaiting-approval']).status, 0);
+    assert.equal(run(cwd, ['move', id, '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]).status, 0);
   }
   const data = envelopeData(run(cwd, ['merge', 'next']).stdout);
   assert.equal(data.picked, 'important', 'the mvp-goalTier item outranks the plain one per rankImpact');
 });
 
-test('merge next on a runner-sourced pick that trips the Iron Law: reports blocked, merges nothing, never auto-acknowledges', () => {
+// tsk-xyr (absorbs tsk-1zd): the picker now SKIPS a provably Iron-Law-
+// required candidate instead of returning it as "picked" and merging
+// nothing -- classifyIronLaw is pure, so this is decided before any merge
+// is even attempted. The two tests below replace the old single-item
+// "picked then blocked" contract with the new one: a SOLE ready item that
+// trips Iron Law is never attempted at all ("every ready item is blocked"),
+// and when a second, non-blocked ready item also exists, THAT one gets
+// picked and merged instead -- the acceptance criterion this item exists
+// for ("an Iron-Law item is not returned next turn; other ready items get
+// a turn").
+
+test('merge next on a SOLE ready item that trips the Iron Law: skips it without attempting a merge, never auto-acknowledges', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItemTouching(cwd, 'iron-next-item', 'src/runner/probe.mjs', {
@@ -902,16 +952,51 @@ test('merge next on a runner-sourced pick that trips the Iron Law: reports block
 
   const headBefore = gitHead(cwd);
   const result = run(cwd, ['merge', 'next']);
-  assert.equal(result.status, 0, `merge next itself must not exit non-zero on a blocked pick: ${result.stdout}${result.stderr}`);
+  assert.equal(result.status, 0, `merge next itself must not exit non-zero on an all-skipped pool: ${result.stdout}${result.stderr}`);
   const data = envelopeData(result.stdout);
-  assert.equal(data.picked, 'iron-next-item');
-  assert.equal(data.blocked, 'iron-law');
-  assert.match(data.message, /Iron Law/);
+  assert.equal(data.picked, null, 'the Iron-Law-required item must never be reported as picked -- it was never attempted');
+  assert.equal(data.reason, 'every ready item is blocked');
+  assert.deepEqual(data.skipped, [{ id: 'iron-next-item', reason: 'iron-law' }]);
+  assert.ok(!('blocked' in data), 'blocked is for a real attempted-and-failed merge -- this candidate was never attempted');
 
-  assert.equal(stateView(cwd).work['iron-next-item'].status, 'awaiting-approval', 'a blocked pick leaves the item proposed');
-  assert.equal(gitHead(cwd), headBefore, 'a blocked pick attempts no merge -- HEAD is unchanged');
+  assert.equal(stateView(cwd).work['iron-next-item'].status, 'awaiting-approval', 'a skipped pick leaves the item exactly where it was');
+  assert.equal(gitHead(cwd), headBefore, 'a skipped pick attempts no merge -- HEAD is unchanged');
   const survivingBranches = gitAtCwd(cwd, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/']);
   assert.match(survivingBranches, /fgw\/iron-next-item/, 'the branch survives -- nothing was merged or cleaned up');
+});
+
+test('merge next with one Iron-Law-required ready item AND one ordinary ready item: skips the first, picks and merges the other (the core acceptance criterion)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItemTouching(cwd, 'iron-next-item', 'src/runner/probe.mjs', {
+    verify: 'test -f src/runner/probe.mjs',
+  });
+  makeRunnerProposedItem(cwd, 'ordinary-next-item', { verify: 'true' });
+
+  const result = run(cwd, ['merge', 'next']);
+  assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
+  const data = envelopeData(result.stdout);
+
+  assert.equal(data.picked, 'ordinary-next-item', 'the non-blocked ready item must be picked, not the Iron-Law one, regardless of rank order');
+  assert.equal(data.approve.to, 'delivered');
+  assert.deepEqual(data.skipped, [{ id: 'iron-next-item', reason: 'iron-law' }]);
+
+  assert.equal(stateView(cwd).work['ordinary-next-item'].status, 'delivered');
+  assert.equal(stateView(cwd).work['iron-next-item'].status, 'awaiting-approval', 'the skipped item is untouched -- still there for a human to acknowledge, next call');
+});
+
+test('merge next --acknowledge-iron-law forwarded by the caller: the picker does not pre-skip -- the flag applies to whichever item is picked, exactly as before', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+  makeRunnerProposedItemTouching(cwd, 'iron-next-item', 'src/runner/probe.mjs', {
+    verify: 'test -f src/runner/probe.mjs',
+  });
+
+  const result = run(cwd, ['merge', 'next', '--acknowledge-iron-law']);
+  assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.picked, 'iron-next-item', 'an explicitly-forwarded acknowledgment must let the picker attempt it, unchanged from before this item');
+  assert.ok(!('skipped' in data), 'nothing was skipped -- the flag made the candidate attemptable');
 });
 
 // --- tsk-173: merge next auto sync-root on blockedOnSync (docs/history/
@@ -935,7 +1020,7 @@ test('merge next auto-syncs a blockedOnSync root before giving up: drift clears,
   // item's `parent` -- a childless root is invisible to it, so it would
   // never show up in blockedOnSync at all without this.
   assert.equal(run(cwd, ['add', 'auto-sync-happy-child', '--title', 'child', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--parent', 'auto-sync-happy', '--description', 'tsk-535 fixture description.']).status, 0);
-  assert.equal(run(cwd, ['move', 'auto-sync-happy', '--to', 'awaiting-approval']).status, 0);
+  assert.equal(run(cwd, ['move', 'auto-sync-happy', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]).status, 0);
   commitPendingBeforeApprove(cwd, 'auto-sync-happy');
 
   const result = run(cwd, ['merge', 'next']);
@@ -961,7 +1046,7 @@ test('merge next on a blockedOnSync root whose sync-root attempt hits a genuine 
   // See auto-sync-happy above: driftStatus only tracks ids that are some
   // other item's `parent`.
   assert.equal(run(cwd, ['add', 'auto-sync-conflict-child', '--title', 'child', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--parent', 'auto-sync-conflict', '--description', 'tsk-535 fixture description.']).status, 0);
-  assert.equal(run(cwd, ['move', 'auto-sync-conflict', '--to', 'awaiting-approval']).status, 0);
+  assert.equal(run(cwd, ['move', 'auto-sync-conflict', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]).status, 0);
   commitPendingBeforeApprove(cwd, 'auto-sync-conflict');
 
   const headBefore = gitHead(cwd);
@@ -988,7 +1073,7 @@ test('merge next on a blockedOnSync root whose sync-root attempt hits a dirty ma
   // See auto-sync-happy above: driftStatus only tracks ids that are some
   // other item's `parent`.
   assert.equal(run(cwd, ['add', 'auto-sync-dirty-child', '--title', 'child', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--parent', 'auto-sync-dirty', '--description', 'tsk-66t fixture description.']).status, 0);
-  assert.equal(run(cwd, ['move', 'auto-sync-dirty', '--to', 'awaiting-approval']).status, 0);
+  assert.equal(run(cwd, ['move', 'auto-sync-dirty', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]).status, 0);
   commitPendingBeforeApprove(cwd, 'auto-sync-dirty');
   // auto-sync-dirty-produced.txt IS in this root's own fgw/auto-sync-dirty
   // diff (makeDriftedRoot committed it there) — re-dirtying that SAME path
@@ -1031,7 +1116,7 @@ test('merge next --no-wait fails immediately on a live-held lock -- proves the f
   // `sub === 'next'` case) -- any other error from the inner `runVerb('approve', ...)`
   // rethrows as-is, so this fails exactly like a direct `approve` call does.
   assert.equal(result.status, 9, result.stderr);
-  assert.match(result.stderr, /main checkout is locked by another live session/);
+  assert.match(result.stderr, /main checkout is locked by pid \d+/);
   assert.ok(elapsed < 2000, `--no-wait forwarded through merge next must still fail fast, not wait (took ${elapsed}ms)`);
 });
 
@@ -1069,6 +1154,49 @@ test('sync-root never reports outcome "synced" when mergeRunnerItem returns an o
 
   const lines = eventLines(cwd);
   const mergedDecisions = lines.map((l) => JSON.parse(l)).filter((e) => e.type === 'decision' && e.payload?.id === 'sync-root-blocked-other' && /merged/.test(e.payload?.text ?? ''));
+  assert.equal(mergedDecisions.length, 0, 'must never record a "merged" decision for a merge that never actually completed');
+});
+
+test('sync-root outcome guard catches lock-lost-mid-merge and records unhandled-outcome friction (tsk-3df)', () => {
+  const cwd = initGitCwdMain();
+  run(cwd, ['init']);
+
+  const lockPath = path.join(cwd, '.fgos', 'main-checkout.lock');
+  const lockOverwriter = `node -e "require('fs').writeFileSync('${lockPath}', JSON.stringify({pid: 999999, ts: Date.now()})); const end = Date.now() + 50; while (Date.now() < end) {}"`;
+
+  makeDriftedRoot(cwd, 'sync-root-lock-lost', { verify: lockOverwriter });
+
+  const headBefore = gitHead(cwd);
+  process.env.FGOS_HEARTBEAT_INTERVAL_MS = '10';
+  let result;
+  try {
+    result = run(cwd, ['sync-root', 'sync-root-lock-lost']);
+  } finally {
+    delete process.env.FGOS_HEARTBEAT_INTERVAL_MS;
+  }
+
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.notEqual(data.outcome, 'synced', 'must never report success for lock-lost-mid-merge');
+  assert.equal(data.outcome, 'blocked');
+  assert.equal(data.reason, 'lock-lost-mid-merge');
+
+  const frictions = stateView(cwd).frictions?.['sync-root-lock-lost'] ?? [];
+  assert.ok(
+    frictions.some((f) => f.errorClass === 'sync-root-unhandled-outcome'),
+    'frictions must contain an entry with errorClass === "sync-root-unhandled-outcome"',
+  );
+
+  assert.equal(gitHead(cwd), headBefore, 'main must be unchanged');
+  assert.doesNotThrow(
+    () => gitAtCwd(cwd, ['rev-parse', '--verify', 'MERGE_HEAD']),
+    'MERGE_HEAD must survive untouched because abortMergeIfPossible was not called',
+  );
+  assert.equal(fs.existsSync(path.join(cwd, 'sync-root-lock-lost-produced.txt')), true, 'staged merge file must survive untouched on disk');
+  assert.equal(stateView(cwd).work['sync-root-lock-lost'].status, 'doing', 'a blocked sync-root must never touch the root item\'s status');
+
+  const lines = eventLines(cwd);
+  const mergedDecisions = lines.map((l) => JSON.parse(l)).filter((e) => e.type === 'decision' && e.payload?.id === 'sync-root-lock-lost' && /merged/.test(e.payload?.text ?? ''));
   assert.equal(mergedDecisions.length, 0, 'must never record a "merged" decision for a merge that never actually completed');
 });
 

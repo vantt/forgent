@@ -29,7 +29,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { judgeVerifySemanticCorrectness } from './verify-pattern-check.mjs';
 import { listWork, moveStage, moveWork, addWork, putInAwaiting, addDecision, editWork, StoreError } from '../state/store.mjs';
-import { getDomain, stageForStep } from '../state/workflow-stage-graphs.mjs';
+import { getDomain, resolveWorkflow, stageForStep } from '../state/workflow-stage-graphs.mjs';
 import { rankImpact } from '../state/impact.mjs';
 import { computeImpact, computePriority, effortForMode, MODE_EFFORT, isRecognizedRisk } from '../state/priority-formula.mjs';
 import { footprintOverlapAmong } from '../state/graph-metrics.mjs';
@@ -153,6 +153,47 @@ function logDecomposeVerdict(dir, id, outcome, rationale, label) {
 // the same "## Locked decisions" slice) — a D-ID mentioned only in prose
 // OUTSIDE that table is not a real citation.
 const D_ID_PATTERN = /\bD\d+\b/g;
+
+// tsk-1lv-3 (CONTEXT.md D3): the write-side counterpart to
+// extractLockedDecisionIds' own section-scoping regex just above --
+// `fgos context-render <id>` (bin/fgos.mjs, src/report/context-render.mjs)
+// calls this to splice a freshly-rendered table into an existing
+// CONTEXT.md, replacing whatever text currently sits under the heading
+// (hand-typed prose, an earlier render, or nothing) without touching any
+// other section. Exported so the CLI verb can call it directly rather than
+// re-deriving the same section-matching logic a second time.
+export function replaceLockedDecisionsSection(contextText, tableMarkdown) {
+  if (typeof contextText !== 'string') {
+    throw new Error('replaceLockedDecisionsSection: contextText must be a string');
+  }
+  if (typeof tableMarkdown !== 'string') {
+    throw new Error('replaceLockedDecisionsSection: tableMarkdown must be a string');
+  }
+  const headingMatch = /##\s*Locked decisions\s*\n/i.exec(contextText);
+  if (!headingMatch) {
+    throw new Error('replaceLockedDecisionsSection: no "## Locked decisions" heading found');
+  }
+  const headingEnd = headingMatch.index + headingMatch[0].length;
+  const rest = contextText.slice(headingEnd);
+  // `headingMatch`'s own trailing `\s*` is greedy (it backtracks only as
+  // far as needed to still match the required literal `\n`), so it already
+  // consumes every blank line between the heading and whatever follows --
+  // including an EMPTY section's zero-blank-line case, where the next
+  // heading sits immediately at the start of `rest` with no leading `\n`
+  // of its own left to find. Check that case explicitly before falling
+  // back to the `\n##` search below; skipping it would let `sectionEnd`
+  // run to the end of the whole document, swallowing every later section.
+  let sectionEnd;
+  if (/^##\s/.test(rest)) {
+    sectionEnd = headingEnd;
+  } else {
+    const nextHeadingMatch = /\n##\s/.exec(rest);
+    sectionEnd = nextHeadingMatch ? headingEnd + nextHeadingMatch.index + 1 : contextText.length;
+  }
+  const before = contextText.slice(0, headingEnd);
+  const after = contextText.slice(sectionEnd);
+  return `${before}${tableMarkdown.trimEnd()}\n\n${after}`;
+}
 
 function extractLockedDecisionIds(contextText) {
   if (typeof contextText !== 'string' || !contextText.trim()) return new Set();
@@ -287,12 +328,12 @@ export function resolveCallerPlanVerdict(raw, lockedContext) {
 function formatProposalAsk(verdict, reason) {
   if (verdict.kind === 'decompose') {
     const list = verdict.children.map((c, i) => `${i + 1}. ${c.title} (verify: ${c.verify})`).join('\n');
-    return `Đề xuất chia (chưa ghi vào queue, cần xác nhận) — ${reason}\n${list}`;
+    return `## Context\n\nĐề xuất chia (chưa ghi vào queue, cần xác nhận) — ${reason}\n${list}\n\n## Why this matters\n\nCần xác nhận trước khi các việc con được ghi thật vào queue — sai sót ở đây tốn công dọn lại sau.`;
   }
   if (verdict.kind === 'pass-through') {
-    return `Đề xuất: không chia (pass-through) — ${reason}`;
+    return `## Context\n\nĐề xuất: không chia (pass-through) — ${reason}\n\n## Why this matters\n\nCần xác nhận trước khi việc này được coi là một khối duy nhất, không tách nhỏ.`;
   }
-  return `Đề xuất chia — ${reason}`;
+  return `## Context\n\nĐề xuất chia — ${reason}\n\n## Why this matters\n\nCần xác nhận trước khi các việc con được ghi thật vào queue.`;
 }
 
 // tsk-5e97 D1 (docs/history/tsk-5e97-decompose-footprint-overlap-gate/
@@ -516,28 +557,82 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
   // `coding`) — a domain whose OWN live Divide stage is still literally
   // named `decompose` (never renamed by this item) already has
   // `planningStage === 'decompose'`, so this stays a no-op for it.
-  const legacyPlanStage = domain.stages?.includes('decompose') && planningStage !== 'decompose' ? 'decompose' : undefined;
+  const workflow = resolveWorkflow(domain, work.kind);
+  const legacyPlanStage = (workflow?.stages ?? domain.stages)?.includes('decompose') && planningStage !== 'decompose' ? 'decompose' : undefined;
   if (currentStage !== planningStage && currentStage !== legacyPlanStage) {
     return { outcome: 'noop', id };
   }
 
-  // RE-ENTRANCY (validating feasibility matrix, REPAIRED): a crash between
-  // writing children and moving the root to executing must not regenerate
-  // children on retry — child ids are positional (`${work.id}-<n>`), so a
-  // blind retry would hit addWork's "already exists" validation error.
-  // Detect prior children via the view instead, and only finish the root's
-  // own stage-move.
-  const hasChildren = Object.values(view.work).some((item) => item.parent === id);
+  // RE-ENTRANCY (validating feasibility matrix, REPAIRED; tsk-4n8 narrowed
+  // the signal): a crash between writing children and moving the root to
+  // executing must not regenerate children on retry. The signal for "this
+  // call's own addWork loop already finished" is a durable
+  // decompose-completion decision (`logDecomposeVerdict`'s own 'decompose'
+  // entry below, written BEFORE moveStage) — never bare child existence
+  // (tsk-4n8): a stray child (a prior partial/superseded --children
+  // submission, or a human's manual `fgos add --parent`) must not be
+  // mistaken for a completed decompose and permanently block every later
+  // decompose attempt with no supported way to add the still-missing
+  // children — the exact failure mode tsk-4n8 was filed to fix. Same
+  // `view.decisionsById?.[id] ?? []` read pattern this file already uses
+  // for `priorityOverridden` below.
+  const priorDecomposeCompleted = (view.decisionsById?.[id] ?? []).some(
+    (d) => d.source === 'resolvePlan' && typeof d.text === 'string' && d.text.startsWith('decompose verdict: decompose'),
+  );
   // Real verify (tsk-19j D1/D11, closes gap 2): `gates[id].planApprove.verify`
-  // is the real command fgos-coding-planning/fgos-coding-validating recorded for this item
-  // — read once, reused by every moveStage call below that advances this item
-  // to `executing`, so none of them silently carry FALLBACK_VERIFY or leave
+  // was the real command `fgos-coding-planning`'s now-retired `planApprove`
+  // gate recorded (coding-planning-validating-gate-redesign D9-D11 removed
+  // that gate; no live skill writes a new `planApprove` record). Read once,
+  // reused by every moveStage call below that advances this item to
+  // `executing`, so none of them silently carry FALLBACK_VERIFY or leave
   // `verify` untouched (transitionStage only overwrites it when passed a
-  // value — stage-fsm.mjs:60-65). Falls back to the item's own current `verify`
-  // when no approve record exists yet (an item that never went through
-  // Track A's Gates, e.g. from before this item, is unaffected).
+  // value — stage-fsm.mjs:60-65). For every item post-redesign this falls
+  // through to the item's own current `verify` — the same value
+  // `fgos-coding-validating`'s merged gate itself reads fresh — kept only so
+  // pre-redesign items still carrying a historical `planApprove.verify`
+  // replay unchanged.
   const planApproveVerify = view.gates?.[id]?.planApprove?.verify ?? work.verify;
-  if (hasChildren) {
+
+  // tsk-4m4 (narrowed, D1): `planApproveVerify` above feeds FOUR separate
+  // `moveStage` call sites below (hasChildren re-entrancy, tiny/small
+  // skip-and-advance, explicit pass-through, and the real decompose
+  // success path) with zero check on it — unlike resolveDiscovery's own
+  // caller-verdict path, which runs this same mechanical check before
+  // accepting a proposed verify. One check here, before any of those four
+  // branches, closes all of them at once. Same shape as this file's own
+  // existing per-child check below (`disputedChild`) and
+  // resolveDiscovery's own dispute-handling (discovery.mjs:402-451):
+  // mechanical-only (verify-pattern-check.mjs), park on disagreement
+  // unless `--force` (never for a mechanical disagreement, tsk-12t D6).
+  const planVerifyDispute = judgeVerifySemanticCorrectness(planApproveVerify);
+  if (!planVerifyDispute.agrees) {
+    if (callerVerdict?.force === true && planVerifyDispute.mechanical !== true) {
+      addDecision(dir, {
+        id,
+        text: `plan --force overrode a disputed planApproveVerify: "${planApproveVerify}"`,
+        source: 'resolvePlan',
+        kind: 'engine',
+        rationale: `second pass disagreed: ${planVerifyDispute.reason}`,
+      });
+    } else {
+      if (work.status === 'awaiting-human') {
+        throw new StoreError(
+          'validation',
+          `plan --force: work "${id}" is already "awaiting-human" -- run "fgos answer ${id} --text ..." to resume it before retrying --force.`,
+        );
+      }
+      const ask =
+        `## Context\n\n` +
+        `Verify hiện tại của item (sẽ được stamp lúc sang executing) bị nghi ngờ ở vòng kiểm tra thứ hai: ${planVerifyDispute.reason}\n` +
+        `Verify: ${planApproveVerify}\n\n` +
+        `## Why this matters\n\n` +
+        `Cần xác nhận trước khi verify này được stamp thật vào item lúc sang executing.`;
+      putInAwaiting(dir, { id, ask, statusAtAsk: work.status });
+      return { outcome: 'verify-disputed', id, secondPass: planVerifyDispute };
+    }
+  }
+
+  if (priorDecomposeCompleted) {
     moveStage(dir, { id, to: stageForStep(domain, 'Execute'), expectedStage: currentStage, verify: planApproveVerify, role });
     releaseClaimOnExecuting();
     return { outcome: 'already-decomposed', id };
@@ -636,7 +731,24 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
       risk: work.risk,
       blastRadius: verdict.blastRadius,
     });
-    editWork(dir, { id, patch: { priority }, role });
+    // tsk-sq9: a human's `edit --priority` logs a `priority-override`
+    // decision (bin/fgos.mjs's `edit` handler) -- if one is already on
+    // record for this item, the refined pass skips its own overwrite
+    // instead of silently clobbering the human's deliberate value. `view`
+    // was read fresh at the top of this call, so it reflects any override
+    // logged before this resolvePlan invocation.
+    const priorityOverridden = (view.decisionsById?.[id] ?? []).some((d) => d.kind === 'priority-override');
+    if (priorityOverridden) {
+      addDecision(dir, {
+        id,
+        text: 'priority: skipped refined-pass overwrite -- priority-override decision already present',
+        source: 'resolvePlan',
+        kind: 'engine',
+        rationale: 'tsk-sq9: a human already set priority via edit --priority; the refined pass would otherwise silently clobber it',
+      });
+    } else {
+      editWork(dir, { id, patch: { priority }, role });
+    }
     // tsk-4hb: see discovery.mjs's rough pass -- same observability gap,
     // same fix, the refined pass's own call site.
     if (work.risk && !isRecognizedRisk(work.risk)) {
@@ -772,21 +884,74 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
   // grandchild falls out for free: when a child is itself later decomposed,
   // its own `work.id` (already `<root>-<m>`) becomes the base, producing
   // `<root>-<m>-<n>` with no special-case code.
-  const childIds = verdict.children.map((child, index) => `${work.id}-${index + 1}`);
+  //
+  // tsk-4n8: reconciled against any already-existing siblings first — a
+  // verdict child whose title exactly matches an existing `parent === id`
+  // item reuses that item's own real id (never re-`addWork`s it, which
+  // would throw "already exists") instead of assuming a blank slate; a
+  // verdict child with no match gets a fresh id, continuing the positional
+  // sequence PAST the highest existing sibling suffix so it can never
+  // collide with an id already taken. This is what lets a resubmission add
+  // the still-missing children of a partially-materialized decompose
+  // (priorDecomposeCompleted false, but some children already exist)
+  // instead of every id recomputing from `-1` and colliding.
+  const existingChildren = Object.values(view.work).filter((item) => item.parent === id);
+  let nextNewSuffix =
+    existingChildren.reduce((max, child) => {
+      const suffix = Number(/-(\d+)$/.exec(child.id)?.[1]);
+      return Number.isFinite(suffix) ? Math.max(max, suffix) : max;
+    }, 0) + 1;
+  const childReconciliation = verdict.children.map((child) => {
+    const normalizedTitle = child.title.trim().toLowerCase();
+    const existing = existingChildren.find((item) => item.title.trim().toLowerCase() === normalizedTitle);
+    if (existing) return { child, id: existing.id, alreadyMaterialized: true };
+    const newId = `${work.id}-${nextNewSuffix}`;
+    nextNewSuffix += 1;
+    return { child, id: newId, alreadyMaterialized: false };
+  });
+  const childIds = childReconciliation.map((entry) => entry.id);
 
-  // tsk-5e97 D1: check declared footprint overlap among the TENTATIVE
-  // children (real ids, no work-item records yet) before any of them is
-  // written -- footprintOverlapAmong already exists for exactly this
-  // pairwise-candidate shape (merge-standardization D4-revised). No
-  // bypass-detection constant here (unlike keywordRiskGate/
-  // blastRadiusGate below): those gate on a static property of the root
-  // item that never changes call to call, so without a bypass a human's
-  // `fgos answer` would re-park on the identical reason forever. This
-  // check is re-derived from the FRESH verdict every call -- once a
-  // human's answer leads the next call to propose non-overlapping
+  // tsk-5e97 D1 (tsk-4n8 widened): check declared footprint overlap over
+  // BOTH the tentative new children AND any already-materialized siblings'
+  // own real, stored footprint -- footprintOverlapAmong already exists for
+  // exactly this pairwise-candidate shape (merge-standardization
+  // D4-revised). Widening past `verdict.children` alone matters here: a
+  // resubmission that omits an already-materialized child's own spec (it
+  // only lists the still-missing ones) must still have its NEW children's
+  // footprints checked against that existing sibling's real footprint, not
+  // only against each other. No bypass-detection constant here (unlike
+  // keywordRiskGate/blastRadiusGate below): those gate on a static
+  // property of the root item that never changes call to call, so without
+  // a bypass a human's `fgos answer` would re-park on the identical reason
+  // forever. This check is re-derived from the FRESH verdict every call --
+  // once a human's answer leads the next call to propose non-overlapping
   // children, it passes on its own.
-  const footprintCandidates = verdict.children.map((child, index) => ({ id: childIds[index], footprint: child.footprint }));
-  const footprintConflicts = footprintOverlapAmong(footprintCandidates);
+  const footprintCandidates = childReconciliation.map((entry) =>
+    entry.alreadyMaterialized
+      ? { id: entry.id, footprint: view.work[entry.id]?.footprint }
+      : { id: entry.id, footprint: entry.child.footprint },
+  );
+  // A pair already connected by a declared `deps` edge (either direction)
+  // can never run in parallel, so a shared footprint between them is not a
+  // real dispatch hazard -- this is the `sequence` option
+  // FOOTPRINT_CONFLICT_SUGGESTIONS already documents, honored here instead
+  // of forcing every resolution through re-slicing. Scoped to this one
+  // call site only (never touches footprintOverlapAmong itself): its other
+  // callers all source candidates from an already deps-clear set (frontier/
+  // syncClear), where this exemption would be a no-op, except one script
+  // that intentionally checks raw, unfiltered siblings -- widening the
+  // shared function would change that script's own semantics for no gain.
+  const resolvedDepsById = new Map(
+    childReconciliation.map((entry) => [
+      entry.id,
+      entry.alreadyMaterialized
+        ? (Array.isArray(view.work[entry.id]?.deps) ? view.work[entry.id].deps : [])
+        : entry.child.deps.map((depIndex) => childIds[depIndex]),
+    ]),
+  );
+  const footprintConflicts = footprintOverlapAmong(footprintCandidates).filter(
+    ({ a, b }) => !(resolvedDepsById.get(a) ?? []).includes(b) && !(resolvedDepsById.get(b) ?? []).includes(a),
+  );
   if (footprintConflicts.length > 0) {
     const reason = formatFootprintOverlapReason(footprintConflicts);
     logDecomposeVerdict(dir, id, 'need-human', reason, `${footprintConflicts.length} footprint conflicts`);
@@ -825,9 +990,12 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
     // this advisory must never abort the decompose write below.
   }
 
-  verdict.children.forEach((child, index) => {
+  childReconciliation.forEach(({ child, id: childId, alreadyMaterialized }) => {
+    // tsk-4n8: already reconciled to a real existing sibling above --
+    // never re-addWork it (would throw "already exists").
+    if (alreadyMaterialized) return;
     addWork(dir, {
-      id: childIds[index],
+      id: childId,
       title: child.title,
       kind: child.kind ?? work.kind,
       status: 'todo',

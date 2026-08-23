@@ -1,6 +1,9 @@
 {
   "herdrOrchestrator": {
-    "autoDiscover": true
+    "autoDiscover": true,
+    "autoMerge": false,
+    "autoRetro": false,
+    "autoCleanup": false
   },
   "runner": {
     "executor": {
@@ -13,70 +16,222 @@
         "--permission-mode",
         "acceptEdits",
         "--allowedTools",
-        "Bash(git add:*),Bash(git commit:*)"
+        "Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)"
       ]
     },
-    "capacities": {
-      "judge-discovery": {
-        "kind": "task",
-        "needs": "llm-judgment",
-        "for": "judge",
-        "command": "claude",
-        "args": [
-          "-p",
-          "{prompt}",
-          "--model",
-          "{model}",
-          "--permission-mode",
-          "acceptEdits",
-          "--allowedTools",
-          "Task,WebSearch,WebFetch,Read,Bash(rg:*),Bash(git add:*),Bash(git commit:*)"
-        ]
-      },
-      "judge-decompose": {
-        "kind": "task",
-        "needs": "llm-judgment",
-        "for": "judge",
-        "command": "claude",
-        "args": [
-          "-p",
-          "{prompt}",
-          "--model",
-          "{model}",
-          "--permission-mode",
-          "acceptEdits",
-          "--allowedTools",
-          "Task,WebSearch,WebFetch,Read,Bash(rg:*),Bash(git add:*),Bash(git commit:*)"
-        ]
-      },
-      "gather": {
-        "kind": "cli",
-        "for": "gather",
-        "needs": "prompt-completion",
-        "carries": "repo-content",
-        "adapter": "cli-spawn",
-        "command": "agy",
-        "provider": "agy",
-        "args": [
-          "-p",
-          "{prompt}",
-          "--model",
-          "{model}"
+    "capabilities": {
+      "impact-analysis": {
+        "description": "Code-graph blast radius",
+        "aliases": [
+          "impact_analysis",
+          "Impact Analysis"
         ],
-        "tier": "light",
-        "model": "Gemini 3.5 Flash (Medium)",
-        "allowCrossProvider": true
+        "prefer": "gitnexus"
+      },
+      "pane-labeling": {
+        "description": "Write a session/task id onto the current terminal pane's label, for a human watching a screen"
+      },
+      "advise": {
+        "description": "Async product-decision consult -- value comes from disagreement, never changes state, one question/one answer (P5, docs/history/dispatch-activation-and-handoff-redesign/DISCUSSION.md -- planned --for advise -> codex, never built: no caller invokes this purpose yet)"
+      },
+      "execute": {
+        "description": "Compliance-driven work -- value comes from following the plan, changes files, must pass verify (P5, docs/history/dispatch-activation-and-handoff-redesign/DISCUSSION.md -- planned --for execute -> agy, never built: no caller invokes this purpose yet)"
+      },
+      "fgos-coding-implement": {
+        "description": "code-implement work for the coding domain's executing stage -- pinned to gemini-3.6-flash-medium via this capability's own providerModel/rigorOverrides (agy/gemini, lightweight policy tier; see modelPolicies.gemini.lightweight for the literal model string), not executors.agy's defaults",
+        "prefer": "agy",
+        "overrides": {
+          "providerModel": "gemini",
+          "rigorOverrides": {
+            "light": "lightweight",
+            "standard": "lightweight",
+            "heavy": "lightweight"
+          }
+        }
+      }
+    },
+    "executors": {
+      "claude": {
+        "kind": "agent",
+        "description": "Claude Code CLI (headless dispatch)",
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "claude",
+            "args": [
+              "-p",
+              "{prompt}",
+              "--model",
+              "{model}",
+              "--permission-mode",
+              "acceptEdits",
+              "--allowedTools",
+              "Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)"
+            ]
+          }
+        ]
+      },
+      "agy": {
+        "kind": "agent",
+        "description": "Antigravity Cli",
+        "allowCrossProvider": true,
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "agy",
+            "args": [
+              "-p",
+              "{prompt}",
+              "--mode",
+              "accept-edits",
+              "--new-project",
+              "--print-timeout",
+              "30m",
+              "--model",
+              "{model}"
+            ]
+          }
+        ],
+        "providerModel": "gemini",
+        "rigorOverrides": {
+          "light": "lightweight",
+          "standard": "lightweight",
+          "heavy": "lightweight"
+        }
+      },
+      "codex": {
+        "kind": "agent",
+        "description": "OpenAI Codex CLI (bypass-all -- no sandbox boundary, see docs/history/codex-bypass-executor/)",
+        "allowCrossProvider": true,
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "codex",
+            "args": [
+              "exec",
+              "--dangerously-bypass-approvals-and-sandbox",
+              "{prompt}"
+            ]
+          }
+        ]
+      },
+      "pi": {
+        "kind": "agent",
+        "description": "pi coding agent (openai-codex/gpt-5.5) -- reference runtime for the coding-worker-contract, D4 proof-test GREEN (tsk-47r)",
+        "allowCrossProvider": true,
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "pi",
+            "args": [
+              "--provider",
+              "openai-codex",
+              "--model",
+              "{model}",
+              "--tools",
+              "read,write,edit,bash,grep,find,ls",
+              "--mode",
+              "json",
+              "--approve",
+              "-p",
+              "{prompt}"
+            ]
+          }
+        ],
+        "providerModel": "openai-codex",
+        "rigorOverrides": {
+          "light": "lightweight",
+          "standard": "lightweight",
+          "heavy": "lightweight"
+        }
+      },
+      "gitnexus": {
+        "kind": "tool",
+        "description": "Code-graph blast radius",
+        "for": [
+          "impact-analysis"
+        ],
+        "scanTarget": ".gitnexus",
+        "responsibility": "Verification",
+        "invocations": [
+          {
+            "via": "mcp",
+            "command": "mcp:gitnexus",
+            "tools": {
+              "impact-analysis": "mcp__gitnexus__impact"
+            }
+          }
+        ]
+      },
+      "herdr": {
+        "kind": "tool",
+        "for": [
+          "pane-labeling"
+        ],
+        "responsibility": "Chrome",
+        "description": "herdr pane label writer (herdr pane rename) for /fgOS:terminal",
+        "invocations": [
+          {
+            "via": "cli",
+            "command": "herdr",
+            "args": []
+          }
+        ]
+      }
+    },
+    "timeoutMs": 2100000,
+    "parallel": {
+      "maxRoots": 4,
+      "maxLeavesPerRoot": 4
+    },
+    "modelPolicies": {
+      "claude": {
+        "lightweight": "haiku",
+        "standard": "sonnet",
+        "creative": "sonnet",
+        "analytical": "sonnet",
+        "critical": "opus"
+      },
+      "gemini": {
+        "lightweight": "gemini-3.6-flash-medium"
+      },
+      "openai-codex": {
+        "lightweight": "gpt-5.5"
       }
     },
     "models": {
       "light": "haiku",
       "standard": "sonnet",
       "heavy": "opus"
-    },
-    "timeoutMs": 900000,
-    "parallel": {
-      "maxRoots": 4,
-      "maxLeavesPerRoot": 4
     }
+  },
+  "gateBypass": {
+    "level": "standard"
+  },
+  "cleanup": {
+    "ttlDays": 5,
+    "leafTtlDays": 0
+  },
+  "invariantChecks": {
+    "commands": [
+      "node --test test/architecture.test.mjs"
+    ]
+  },
+  "workerSlots": {
+    "ceiling": null
+  },
+  "ironLaw": {
+    "level": "ask"
+  },
+  "gateway": {
+    "port": 4170,
+    "token": null
+  },
+  "herdrWebDashboard": {
+    "staticServing": true
   }
 }

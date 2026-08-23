@@ -31,7 +31,7 @@ signal, superseding decision `9c67c3d1`); tsk-ma4 only proves or disproves
 tsk-4op's founding hypothesis (does Column A capture the WHAT but not the
 WHY/tradeoffs) before any of that redesign work is scoped.
 
-## 2. Locked decisions
+## Locked decisions
 
 ### D1 — Column A search widens beyond the six named mechanisms
 

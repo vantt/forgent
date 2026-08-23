@@ -86,6 +86,32 @@ test('lastActivityAt reflects an uncommitted file touched in the branch\'s live 
   assert.equal(activityAt, touchedSeconds * 1000, 'must reflect the newer uncommitted mtime, not the older commit time');
 });
 
+test('tsk-f8f: lastActivityAt reflects an untracked file whose NAME CONTAINS A SPACE -- the exact Finding 9 scenario (git-quotes this path in default porcelain output)', () => {
+  const repoRoot = initTempRepo();
+  const commitSeconds = Math.floor(Date.now() / 1000) - 7200;
+  const wtPath = branchWithBackdatedCommit(repoRoot, 'item-space', commitSeconds);
+
+  const touchedSeconds = Math.floor(Date.now() / 1000) - 60;
+  fs.writeFileSync(path.join(wtPath, 'my draft report.txt'), 'still editing');
+  touchAt(path.join(wtPath, 'my draft report.txt'), touchedSeconds);
+
+  const activityAt = lastActivityAt(repoRoot, 'item-space');
+  assert.equal(activityAt, touchedSeconds * 1000, 'must reflect the spaced file\'s real mtime -- the old whitespace-split parse silently dropped it (a trailing quote character never matches a real file, statSync fails, entry skipped)');
+});
+
+test('tsk-f8f: lastActivityAt reflects a file RENAMED to a spaced name -- the porcelain -z rename record\'s extra origin-path token is correctly skipped, never mistaken for a path to stat', () => {
+  const repoRoot = initTempRepo();
+  const commitSeconds = Math.floor(Date.now() / 1000) - 7200;
+  const wtPath = branchWithBackdatedCommit(repoRoot, 'item-rename', commitSeconds);
+
+  execFileSync('git', ['mv', `item-rename.txt`, 'renamed with space.txt'], { cwd: wtPath });
+  const touchedSeconds = Math.floor(Date.now() / 1000) - 30;
+  touchAt(path.join(wtPath, 'renamed with space.txt'), touchedSeconds);
+
+  const activityAt = lastActivityAt(repoRoot, 'item-rename');
+  assert.equal(activityAt, touchedSeconds * 1000, 'must reflect the renamed (destination) file\'s real mtime, never fail on the origin-path token that follows a rename record in -z mode');
+});
+
 test('lastActivityAt ignores .fgos changes (ADR0020 checkout artifact), never counting them as activity', () => {
   const repoRoot = initTempRepo();
   const commitSeconds = Math.floor(Date.now() / 1000) - 7200;

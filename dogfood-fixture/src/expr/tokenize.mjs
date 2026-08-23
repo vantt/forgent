@@ -1,42 +1,65 @@
-const OPERATORS = new Set(['+', '-', '*', '/']);
-
 export function tokenize(exprString) {
+  if (typeof exprString !== 'string') {
+    throw new TypeError('Expression must be a string');
+  }
+
   const tokens = [];
   let i = 0;
+  const len = exprString.length;
 
-  while (i < exprString.length) {
+  while (i < len) {
     const ch = exprString[i];
 
-    if (ch === ' ' || ch === '\t' || ch === '\n' || ch === '\r') {
-      i += 1;
+    if (/\s/.test(ch)) {
+      i++;
       continue;
     }
 
-    if (OPERATORS.has(ch)) {
-      tokens.push(ch);
-      i += 1;
-      continue;
-    }
+    const lastToken = tokens[tokens.length - 1];
+    const isUnaryMinus = ch === '-' &&
+      (tokens.length === 0 || typeof lastToken === 'string') &&
+      i + 1 < len &&
+      /\d|\./.test(exprString[i + 1]);
 
-    if ((ch >= '0' && ch <= '9') || ch === '.') {
-      let j = i;
-      let dotCount = 0;
-      while (j < exprString.length && ((exprString[j] >= '0' && exprString[j] <= '9') || exprString[j] === '.')) {
-        if (exprString[j] === '.') dotCount += 1;
-        j += 1;
+    if (isUnaryMinus) {
+      let numStr = '-';
+      i++;
+      while (i < len && (/\d|\./.test(exprString[i]))) {
+        numStr += exprString[i];
+        i++;
       }
-      const numStr = exprString.slice(i, j);
       const num = Number(numStr);
-      if (dotCount > 1 || numStr === '' || numStr === '.' || Number.isNaN(num)) {
-        throw new Error(`tokenize: invalid number "${numStr}" at position ${i}`);
+      if (Number.isNaN(num)) {
+        throw new Error(`Invalid number format: ${numStr}`);
       }
       tokens.push(num);
-      i = j;
       continue;
     }
 
-    throw new Error(`tokenize: unrecognized character "${ch}" at position ${i}`);
+    if (['+', '-', '*', '/'].includes(ch)) {
+      tokens.push(ch);
+      i++;
+      continue;
+    }
+
+    if (/\d|\./.test(ch)) {
+      let numStr = '';
+      while (i < len && /\d|\./.test(exprString[i])) {
+        numStr += exprString[i];
+        i++;
+      }
+      const num = Number(numStr);
+      if (Number.isNaN(num)) {
+        throw new Error(`Invalid number format: ${numStr}`);
+      }
+      tokens.push(num);
+      continue;
+    }
+
+    throw new Error(`Unexpected character: ${ch}`);
   }
 
   return tokens;
 }
+
+export default tokenize;

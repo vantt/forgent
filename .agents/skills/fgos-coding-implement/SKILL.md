@@ -1,5 +1,6 @@
 ---
 name: fgos-coding-implement
+user-invocable: false
 description: >-
   Implement, verify, and hand back exactly one claimed coding-domain item at
   stage `executing`. Use once an item has already cleared `discovery` and
@@ -14,213 +15,156 @@ description: >-
 Runs while a claimed item's `stage` reads `executing` — the direct
 implementation step between shaping and synthesis. This skill turns a
 claimed item into real changes, proves them with the item's own `verify`
-command, and hands the item back through `fgos return`. It never designs or
-re-shapes the work; that already happened at `discovery`/`exploring`/`planning`.
+command, and hands the item back through `fgos return`. It never designs
+or re-shapes the work; that already happened at
+`discovery`/`exploring`/`planning`.
+
+## Driver vs. worker
+
+This file is split into two halves that live in two different places.
+Below this section is the **driver** half — claim status, decide the
+dispatch mechanism, verify, commit, the Iron Law check, `fgos return`,
+and every Collaboration handoff call. The **worker** half — the
+boundaries for actually doing the work, provider-neutral, shared with
+every other kind of dispatched unit — lives separately at
+`../_shared/coding-worker-contract.md`. Which half applies to you depends
+on how you got here:
+
+- **You are the driver session** — you ran `fgos pick`/arrived via
+  `fgos-routing` with a live claim on this item and the ability to call
+  `fgos` verbs against the real store. Read this whole file. At Flow Step
+  2 (Implement), when you do the work yourself, you ALSO follow
+  `../_shared/coding-worker-contract.md`'s boundaries for that part —
+  same discipline an out-of-process worker follows: a session that isn't
+  dispatching still executes the worker's own half.
+- **You are an out-of-process worker** — you were dispatched here, you
+  hold no claim on this item, and you have no `fgos` verb to call against
+  the real store. **Stop reading after this section.** Read and follow
+  only `../_shared/coding-worker-contract.md` — it is complete on its own
+  for what you need to do. Everything below is the driver's own job,
+  never yours.
 
 ## Hard rules
 
-- This skill runs precisely while the session is inside the claimed
-  item's worktree (the case tsk-56t exists for) — which never carries its
-  own `.fgos/` by design (ADR0020). Every `fgos <verb>` this skill calls
-  (`ask`, `answer`, `return`) is `requiresExistingStore: true` and refuses
-  (exit 4) rather than silently diverge if run bare from here. Resolve
-  the main checkout root and pass it explicitly on every one of them:
+- When asking questions (`fgos ask`), format question text using
+  self-contained citations (see `../_shared/citation-format.md`) and the
+  required two-heading Markdown structure (`## Context` and `## Why this
+  matters`, each followed by at least 20 characters of content).
+- The `fgos` shell function automatically resolves the main checkout root and appends `--dir "$root"` when invoking subcommands from a linked worktree, so you can call `fgos <verb>` subcommands (`ask`, `answer`, `return`) directly:
 
   ```bash
-  root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-  node "$root/bin/fgos.mjs" <verb> ... --dir "$root"
+  fgos <verb> ...
   ```
-
-  (tsk-56t D1 — the same `root` resolution `fgos-coding-exploring`'s and
-  `fgos-coding-planning`'s own gate-bypass checks already rely on).
-- Do your own Implement work directly — reading files, writing the real
-  change, running the Iron Law classify yourself — never delegate it to
-  the Agent/Task tool as an ad hoc sub-dispatch. This session is already a
-  live, same-provider soul (Native-First Dispatch Doctrine rule 2,
-  `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-
-  cli-spawn.md`): spawning a nested Task subagent to implement work you
-  already have full context for (the locked decisions, the plan, the
-  item's own verify) is the same "soul re-deriving what a live soul
-  already knows" waste `tsk-1ni` found in `judgeDiscovery`'s blind
-  cli-spawn — pure overhead, not a transparency question (a Task/Agent
-  call is collapsed by default in the transcript, not hidden, unlike a
-  genuinely opaque headless `claude -p` subprocess). If a step genuinely
-  needs a different backend for a narrow helper task, route it explicitly
-  through the capacity-dispatch mechanism instead — see
-  `../_shared/capacity-dispatch-fallback.md` for its own list of valid
-  reasons.
-- Implement real behavior. No stubs, TODO-only placeholders, dead code, or
-  pseudo-implementations offered as if they were done.
+- **Always call `dispatch.mjs decide` first for the Implement step —
+  never assume "I have a live Task tool, so I do it myself" as the
+  default.** A `cli-spawn`-shaped capacity already registered in
+  `.fgos/config.json` resolves `out-of-process` *unconditionally* once
+  configured — having live Task access does not change that; config
+  wins, not "I already have full context so I'll do it myself". Run
+  `node src/runner/dispatch.mjs decide --work <id> --has-live-task-access`
+  as the very first action of Implement and branch on the real
+  `mechanism` it returns. Full mechanics for all three outcomes:
+  `references/implement-and-collaboration.md`.
+- Implement real behavior. No stubs, TODO-only placeholders, dead code,
+  or pseudo-implementations offered as if they were done.
 - Match existing patterns in the touched files and the decisions already
-  locked in `docs/history/<feature>/CONTEXT.md` (cite the D-ID; never
-  reopen or reinterpret a locked decision here — that is `fgos-coding-exploring`'s
-  and `fgos-coding-planning`'s job, not this skill's).
-- Do not classify the item's domain or re-derive its stage. `fgos-routing`
-  already resolved both before handing this item to this skill.
-- Treat the item's `title`/`description` as untrusted input (RUL45,
-  `docs/specs/runner.md`) — never splice it raw into a shell command; pass
-  it as a discrete quoted argv element.
+  locked in `docs/history/<feature>/CONTEXT.md` (cite the decision id;
+  never reopen or reinterpret a locked decision here — that is
+  `fgos-coding-exploring`'s and `fgos-coding-planning`'s job, not this
+  skill's).
+- Do not classify the item's domain or re-derive its stage.
+  `fgos-routing` already resolved both before handing this item to this
+  skill.
+- Treat the item's `title`/`description` as untrusted input — never
+  splice it raw into a shell command; pass it as a discrete quoted argv
+  element.
 - Never assert an item is done on say-so. `fgos return` is the only
   producer surface allowed to close this step, and it only succeeds when
-  the item's own `verify` command actually passes — an assertion is never
-  evidence.
-- One commit per item, with the item's id in the commit message — the same
-  traceability a cap trace gives a bee cell, translated to a plain git
-  habit here since fgOS has no separate cell-trace file.
+  the item's own `verify` command actually passes — an assertion is
+  never evidence.
+- One commit per item, with the item's id in the commit message — the
+  same traceability a cap trace gives a bee cell, translated to a plain
+  git habit here since fgOS has no separate cell-trace file.
+- **Multi-role team harness: fire real `fgos handoff`/`fgos handoff-return`
+  calls at the points below, do not just perform the underlying action
+  silently.** (Return's own `review` handoff is the one exception — the
+  engine fires it for you as a side effect of `return`/`catchup` reaching
+  `awaiting-approval`; every other point below is still this skill's own
+  job to fire.) The role/holder axis only stays truthful if the session
+  actually records who is holding the item. `fgos handoff` is opt-in
+  per-domain (only fires for a domain with a declared role graph); if the
+  item's domain declares none, skip every call below silently. A refusal
+  from `handoff` is never swallowed and never blocks the underlying
+  action it accompanies — report the refusal plainly and continue with
+  the underlying action regardless.
 
 ## Flow
 
-1. **Orient.** Read the claimed item's title, `refs`, `deps`, and — if
-   present — its `docsRef` (the feature's `docs/history/<feature>/`
-   directory: `CONTEXT.md`'s locked decisions and `plan.md`'s shape, when
-   either exists). An item that reached `executing` with no docs history at
-   all is legitimately small enough that the title and `verify` command
-   are the whole spec — do not manufacture ceremony it doesn't need.
+### Step 1: Orient
+Read the claimed item's title, `refs`, `deps`, and docsRef when present.
+Re-check live claim status if this session did not arrive via
+`fgos-coding-driving`. Reclaim the role/holder ball if it isn't already
+`implementer`.
 
-   If this session did not arrive here via the `fgos-coding-driving` loop
-   (which already re-checks claim status fresh right before invoking this
-   skill) — for example, a session driving stage-by-stage by hand, straight
-   from `fgos-coding-validating`'s own `fgos plan` call — re-check the item's
-   live `status` (`fgos list --id <id> --json`) before doing anything else:
-   the `planning`→`executing` edge releases the claim back to `todo`
-   (`releaseClaimOnExecuting`, `src/intake/plan.mjs:488-494`,
-   claim-lock §3b), so the claim may already be released. If `status` reads
-   `todo`, re-claim (`fgos pick <id>`) before Implementing — proceeding
-   without a live claim risks `fgos return` refusing later with "is todo,
-   not doing".
+**Skip-load check.** For a `tiny`/`small` lane where `plan.md`'s recorded file list is small, skip opening references/worker-contract-and-orient.md's full text — instead do its two mechanical checks directly, inline: if this session did not arrive via `fgos-coding-driving` (which already re-checks claim status), re-read the item's live `status` and re-claim (`fgos pick <id>`) when it reads `todo`; and if `holder` (from the same read) is set to anything other than `implementer`, call `fgos handoff-return "<id>" --note "reclaiming at Orient — holder was <role>"`, repeating until `holder` reads `implementer` or the call refuses with "no open call". Never skip `references/verify-commit-and-iron-law.md` or `references/return-mechanics.md` — those apply at every lane. For every other lane, continue as written below, including opening its own reference file. Full mechanics: `references/worker-contract-and-orient.md`.
 
-2. **Implement.** Make the real change the item describes, reading every
-   file before editing it. Before editing a symbol, apply `CLAUDE.md`'s
-   impact-analysis capability gate rather than assuming GitNexus is on this
-   machine: `fgos tool query --capability impact-analysis --status present`
-   decides whether the MUST-run-impact rule below is Full (present — run
-   it), Degraded (registered but not present — proceed, but say the blast
-   radius is unconfirmed), or Inactive (nothing registered — proceed
-   without it). When reality disagrees with what the item assumed:
-   - a bug found in code you are already touching → fix it, and say so
-     plainly when you return the item;
-   - functionality the item's own outcome depends on turns out to be
-     missing → add it, for the same reason;
-   - a blocking issue in the path (broken import, obvious type error) →
-     fix it;
-   - the fix would require redesigning scope or architecture beyond what
-     the item describes → stop. Do not redesign inside an `executing` item.
-     Park it instead: `fgos ask <id> --text "..."` records the question and
-     drops the item out of the frontier until a person answers via
-     `fgos answer <id> --text "..."`.
-   A package install is the same kind of stop — it is a scope decision, not
-   an implementation detail; park it the same way rather than installing on
-   your own authority.
+### Step 2: Implement
+Run `dispatch.mjs decide` first (per the Hard rule above) and branch on
+its answer — do the work yourself, or dispatch it out-of-process. Apply
+the impact-analysis capability gate before editing a symbol. Fix a bug,
+add missing functionality, or fix a blocking issue found in the path
+without redesigning scope; park anything that would require redesigning
+scope or architecture. Log the four Collaboration interactions
+(`consult`/`assist`/`advise`) whenever their trigger actually matches.
+Full mechanics: `references/implement-and-collaboration.md`.
 
-3. **Verify — proof, not assertion.** Run the item's own `verify` command
-   exactly as recorded on the item (`fgos check <id>` or `fgos list --json`
-   shows it). A prose description instead of a runnable command is not
-   this skill's problem to invent a substitute for — that is a shaping
-   defect from `fgos-coding-planning`; park the item and say so rather than
-   inventing a check. On failure, fix the root cause and rerun the exact
-   command — never weaken the command or swap in an easier one to make it
-   pass.
+### Step 3: Verify — proof, not assertion
+Skip entirely when mechanism was `out-of-process` (the worker already
+ran verify). Otherwise run the item's own `verify` command exactly as
+recorded; on failure, fix the root cause and rerun the exact command,
+never weaken it. Full mechanics: `references/verify-commit-and-iron-law.md`.
 
-4. **Commit, then check Iron Law evidence (when applicable).** The Iron Law
-   gate's own file-set computation (`changedFiles`, `src/runner/merge.mjs`)
-   diffs `trunk...branch` — COMMITTED history only, the exact same
-   committed-ref shape `approve`/`sync-root`'s own gate diffs at merge time
-   (`docs/history/tsk-5t3-iron-law-evidence-contract/CONTEXT.md` D2: the
-   trigger must reuse the real classifier against the real diff, never an
-   early-prediction heuristic). Running this check before committing the
-   implementation is a false negative, not a skip — the diff sees only
-   whatever was already committed (typically just the earlier
-   `plan.md`/`CONTEXT.md` commits), so the classification comes back
-   `{required:false}` even when the real diff would trip the gate, silently
-   skipping `iron-law-evidence.md` and forcing a retroactive scramble to
-   reconstruct proof once `approve` correctly catches it later (`tsk-2l0`,
-   reproduced live on `tsk-1ne` the session immediately before this fix was
-   written). So: `git add` and `git commit` the real implementation (and
-   its now-passing verify from step 3) FIRST —
+### Step 4: Commit, then check Iron Law evidence
+Commit the real implementation first, THEN classify the exact committed
+diff against the Iron Law gate — running the classification before
+committing is a false negative, not a skip. Write
+`docs/history/<id>/iron-law-evidence.md` only when the result requires
+it. Full mechanics: `references/verify-commit-and-iron-law.md`.
 
-   ```bash
-   git add <files this item actually changed>
-   git commit -m "<conventional-commit message, item id included>"
-   ```
-
-   — THEN compute the exact file set the gate itself uses and classify it
-   the same way (`classifyIronLaw`, `src/evolve/iron-law.mjs`), against
-   that now-real committed diff:
-
-   ```bash
-   root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-   node --input-type=module -e "
-   import { changedFiles } from './src/runner/merge.mjs';
-   import { classifyIronLaw } from './src/evolve/iron-law.mjs';
-   import { listWork } from './src/state/store.mjs';
-   const item = listWork(process.argv[1] + '/.fgos').work[process.argv[2]];
-   const filesChanged = changedFiles(process.argv[1], item);
-   console.log(JSON.stringify(classifyIronLaw({ filesChanged, description: item.description })));
-   " "$root" "<id>"
-   ```
-
-   When the result's `required` is `true`, write
-   `docs/history/<id>/iron-law-evidence.md` — the matched flags/modules
-   from that same result, the test command step 3 already ran, and its
-   real failing-before/passing-after transcript excerpts (the
-   "failing-test-first proof" `CONTEXT.md` D1 pins) — and commit it as its
-   own follow-up commit (the implementation already landed in its own
-   commit above; the "one commit per item" rule above is about the
-   implementation itself, not a ban on this small additive evidence
-   commit that necessarily comes after it). When `required` is `false`,
-   write nothing; this cost is only paid for the items the gate will
-   actually apply to.
-
-5. **Return.** Hand the item back with:
-
-   ```
-   fgos return <id>
-   ```
-
-   This is the fgOS equivalent of a bee cell's cap: `return` re-runs the
-   item's `verify` itself, checks for a clean working tree and an advanced
-   commit history, and only then moves the item to `awaiting-approval` (verify red
-   moves it to `blocked` instead) — it never takes the caller's word for
-   it, the same "proof, not assertion" discipline bee's cap-with-evidence
-   rule enforces, just applied by the engine instead of a recorded trace
-   field. If `return` itself just moved the item to `blocked` (a verify
-   failure caught while `status` was still `doing`), treat that exactly
-   like a failed verify: diagnose, fix, and return again — never re-run
-   `return` hoping the same red state passes on a retry without a real
-   change underneath it.
-
-   If the item is instead ALREADY `blocked` when you go to call `return`
-   (e.g. `approve`'s post-merge verify-fail rollback left it
-   `reason: verify-fail-post-merge`), `return` structurally refuses — it
-   requires `status: doing`, and this item's `blocked → awaiting-approval`
-   edge never passes through `doing` (RUL33/RUL34,
-   `docs/specs/work-state.md`). The correct recovery verb there is `fgos
-   catchup <id>`, not another `return` call: it re-runs `verify` on a
-   staged merge into the item's target branch and, on green, moves it
-   straight to `awaiting-approval`.
+### Step 5: Return
+`fgos return <id>` re-runs verify itself and only then moves the item to
+`awaiting-approval` (or `blocked` on a red verify) — it never takes the
+caller's word for it. The `review` Collaboration handoff fires as an
+engine-level side effect of that exact transition, never something this
+skill calls itself. Full mechanics (the blocked-item recovery path via
+`fgos catchup`): `references/return-mechanics.md`.
 
 ## Headless
 
 This skill runs effectively headless: never wait silently on a question a
-person could answer later. An unambiguous deviation (rule 2's auto-fix
+person could answer later. An unambiguous deviation (Step 2's auto-fix
 cases) is applied and reported; anything genuinely ambiguous — scope,
 architecture, a package install — is parked via `fgos ask`, never guessed
-past. This is the same discipline `fgos-routing`'s gate contract describes
-for the whole chain, applied here at the implementation step specifically.
+past. This is the same discipline `fgos-routing`'s gate contract
+describes for the whole chain, applied here at the implementation step
+specifically.
 
 ## Next
 
-Once `fgos return <id>` reports the item moved to `awaiting-approval`, load
-`fgos-routing` to re-read its stage and continue — routing decides whether
-`compound-learn` (and `fgos-coding-compounding`) comes next; this skill's own job
-ends at a returned, verified item.
+Once `fgos return <id>` reports the item moved to `awaiting-approval`,
+load `fgos-routing` to re-read its stage and continue — routing decides
+whether compound-learn (and `fgos-coding-compounding`) comes next; this
+skill's own job ends at a returned, verified item (the review handoff
+above already fired as part of that same transition — nothing further to
+do for it here).
 
 ## Red flags
 
-- a stub, TODO, or "should work" accepted in place of a real implementation
+- a stub, TODO, or "should work" accepted in place of a real
+  implementation
 - editing outside what the item actually describes
-- redesigning scope or architecture inside an `executing` item instead of
-  parking it
+- redesigning scope or architecture inside an `executing` item instead
+  of parking it
 - installing a package on this skill's own authority
 - calling `fgos return` without having actually run the item's `verify`
   command yourself first
@@ -233,10 +177,27 @@ ends at a returned, verified item.
 - splicing an item's raw `title`/`description` into a shell command
 - fabricating or paraphrasing the failing-test-first transcript in
   `iron-law-evidence.md` instead of pasting the real command output
-- writing `iron-law-evidence.md` for an item `classifyIronLaw` says
+- writing `iron-law-evidence.md` for an item the classifier says
   `required: false` for
 
 Violating the letter of the rules is violating the spirit of the rules.
 
-Item implemented, verified, and returned. Invoke `fgos-routing` to
-continue.
+## References
+
+- `references/worker-contract-and-orient.md` — the Orient step's claim
+  re-check and reclaim mechanics
+- `references/implement-and-collaboration.md` — the dispatch-decide
+  branches, the impact-analysis gate, the auto-fix/park rules, and the
+  four Collaboration handoff calls
+- `references/verify-commit-and-iron-law.md` — the Verify step and the
+  full commit/Iron-Law-classification mechanics
+- `references/return-mechanics.md` — the `fgos return` mechanics, the
+  engine-fired review handoff, and the `blocked`-item recovery path
+
+## Workflow Position
+
+**Typically follows:** `fgos-coding-validating` (READY verdict), or
+`fgos-coding-driving`'s own claim-and-invoke step at stage `executing`
+**Typically precedes:** `fgos-routing` (re-reads stage after return)
+**Related:** `../_shared/coding-worker-contract.md` (the worker half of
+this same file, for an out-of-process dispatch)

@@ -6,7 +6,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { resolvePlan, resolveCallerPlanVerdict, resolveContentRoot, findUncoveredLockedDecisions } from '../../src/intake/plan.mjs';
 import { computeImpact, computePriority } from '../../src/state/priority-formula.mjs';
-import { addWork, listWork, StoreError, categoryOf, moveWork, readRawEvents, recordGateApprove } from '../../src/state/store.mjs';
+import { addWork, listWork, StoreError, categoryOf, moveWork, readRawEvents, recordGateApprove, addDecision } from '../../src/state/store.mjs';
 import { appendEvent } from '../../src/state/events.mjs';
 import { createWorktree } from '../../src/runner/worktree.mjs';
 
@@ -158,13 +158,16 @@ test('resolvePlan is a no-op on an item already past stage decompose (idempotent
   assert.equal(listWork(storeDir).work['item-x'].stage, 'executing');
 });
 
-test('resolvePlan completes an interrupted decompose (children exist, root still at decompose stage) without regenerating children', () => {
+test('resolvePlan completes an interrupted decompose (children exist, a decompose decision was already logged, root still at decompose stage) without regenerating children', () => {
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork());
-  // Simulates the crash window: a child already exists with parent==root,
-  // but the root itself is still at stage `decompose` (its own
-  // moveStage never landed before the crash). No verdict is ever consulted
-  // on this path -- the hasChildren check short-circuits ahead of it.
+  // Simulates the crash window: the addWork loop already wrote the child
+  // and logDecomposeVerdict already logged the 'decompose' completion
+  // decision (plan.mjs's own ordering: decision BEFORE moveStage), but the
+  // root's own moveStage never landed before the crash (tsk-4n8: this is
+  // the real signal resolvePlan now keys its re-entrancy check on, not
+  // bare child existence -- see the "stray child" test below for the case
+  // this file used to conflate with this one).
   addWork(storeDir, {
     id: 'orphan-child-abc',
     title: 'Build parser',
@@ -176,6 +179,13 @@ test('resolvePlan completes an interrupted decompose (children exist, root still
     verify: 'npm test -- parser',
     stage: 'executing',
     parent: 'item-x',
+  });
+  addDecision(storeDir, {
+    id: 'item-x',
+    text: 'decompose verdict: decompose (1 children)',
+    source: 'resolvePlan',
+    kind: 'engine',
+    rationale: 'test fixture: simulates the crash window between addWork and moveStage',
   });
 
   const result = resolvePlan(storeDir, 'item-x', cfg, 'runner');
@@ -203,10 +213,96 @@ test('resolvePlan on the already-decomposed re-entrant path also releases a held
     stage: 'executing',
     parent: 'item-x',
   });
+  addDecision(storeDir, {
+    id: 'item-x',
+    text: 'decompose verdict: decompose (1 children)',
+    source: 'resolvePlan',
+    kind: 'engine',
+    rationale: 'test fixture: simulates the crash window between addWork and moveStage',
+  });
 
   const result = resolvePlan(storeDir, 'item-x', cfg, 'session');
   assert.equal(result.outcome, 'already-decomposed');
   assert.equal(listWork(storeDir).work['item-x'].status, 'todo');
+});
+
+// --- tsk-4n8: the bug this item exists to fix -- a stray child (no
+// decompose decision logged for it: a prior partial/superseded --children
+// submission, or a human's manual `fgos add --parent` workaround) must
+// NOT be mistaken for a completed decompose. A later decompose call must
+// still be able to run, reconciling by title against what already exists
+// instead of permanently refusing. ---
+
+test('resolvePlan does not treat a stray child (no decompose decision logged) as already-decomposed -- it can still add the missing children', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+  // A stray child: exists, but no 'decompose verdict: decompose' decision
+  // was ever logged for item-x (e.g. a human's manual `fgos add --parent`
+  // recovery step, or an unrelated write) -- this must not block a real
+  // decompose call from running.
+  addWork(storeDir, {
+    id: 'item-x-1',
+    title: 'Build parser',
+    kind: 'feature',
+    status: 'todo',
+    deps: [],
+    risk: 'standard',
+    refs: [],
+    verify: 'npm test -- parser',
+    stage: 'executing',
+    parent: 'item-x',
+  });
+
+  const result = resolvePlan(storeDir, 'item-x', cfg, 'session', {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [
+      { title: 'Build parser', verify: 'npm test -- parser', action: 'reuse the existing sibling', deps: [] },
+      { title: 'Build renderer', verify: 'npm test -- renderer', action: 'the second half of the split', deps: [] },
+    ],
+  });
+
+  assert.equal(result.outcome, 'decompose');
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'executing');
+  const children = Object.values(view.work).filter((item) => item.parent === 'item-x');
+  assert.equal(children.length, 2, 'the existing stray child is reused, one new child is added');
+  assert.ok(view.work['item-x-1'], 'the existing sibling id is reused, not recreated');
+  assert.equal(view.work['item-x-1'].title, 'Build parser');
+  const newChild = children.find((c) => c.title === 'Build renderer');
+  assert.ok(newChild, 'the missing child was created');
+  assert.equal(newChild.id, 'item-x-2', 'the new id continues past the existing sibling suffix, no collision');
+});
+
+test('resolvePlan still parks need-human when a NEW child\'s footprint collides with an EXISTING sibling\'s real footprint', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+  addWork(storeDir, {
+    id: 'item-x-1',
+    title: 'Build parser',
+    kind: 'feature',
+    status: 'todo',
+    deps: [],
+    risk: 'standard',
+    refs: [],
+    verify: 'npm test -- parser',
+    footprint: ['src/shared.mjs'],
+    stage: 'executing',
+    parent: 'item-x',
+  });
+
+  const result = resolvePlan(storeDir, 'item-x', cfg, 'session', {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [
+      { title: 'Build parser', verify: 'npm test -- parser', action: 'reuse the existing sibling', deps: [], footprint: ['src/shared.mjs'] },
+      { title: 'Build renderer', verify: 'npm test -- renderer', action: 'the second half of the split', deps: [], footprint: ['src/shared.mjs'] },
+    ],
+  });
+
+  assert.equal(result.outcome, 'need-human');
+  const children = Object.values(listWork(storeDir).work).filter((item) => item.parent === 'item-x');
+  assert.equal(children.length, 1, 'the new colliding child was never written');
 });
 
 // --- resolveCallerPlanVerdict (tsk-27y D1/D2): pure normalization
@@ -419,6 +515,34 @@ test('resolvePlan logs a decision when work.risk is present but unrecognized, ne
   assert.equal(recognizedDecisions.length, 0);
 });
 
+// tsk-sq9: the refined priority-write pass skips its own overwrite when a
+// human already logged a `priority-override` decision (via `edit
+// --priority`) for the item, and writes normally when it has not.
+test('resolvePlan skips its priority overwrite when a priority-override decision is on record, writes normally otherwise', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ id: 'item-overridden', priority: 42 }));
+  addWork(storeDir, sampleWork({ id: 'item-not-overridden' }));
+  addDecision(storeDir, {
+    id: 'item-overridden',
+    text: 'priority set to 42 via edit --priority',
+    source: 'edit',
+    kind: 'priority-override',
+    rationale: 'test fixture: simulate a human override recorded before the refined pass runs',
+  });
+
+  resolvePlan(storeDir, 'item-overridden', cfg, 'session', { verdict: 'pass-through' });
+  resolvePlan(storeDir, 'item-not-overridden', cfg, 'session', { verdict: 'pass-through' });
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-overridden'].priority, 42, 'the human-set value must survive the refined pass');
+  assert.notEqual(view.work['item-not-overridden'].priority, undefined, 'the refined pass still computes/writes priority when no override is on record');
+
+  const skipDecisions = (view.decisionsById?.['item-overridden'] ?? []).filter((d) => d.text.includes('skipped refined-pass overwrite'));
+  assert.equal(skipDecisions.length, 1);
+  const noSkipDecisions = (view.decisionsById?.['item-not-overridden'] ?? []).filter((d) => d.text.includes('skipped refined-pass overwrite'));
+  assert.equal(noSkipDecisions.length, 0);
+});
+
 test('resolvePlan on a caller-supplied decompose verdict writes every child with parent/deps/verify and moves the root to executing', () => {
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork());
@@ -572,6 +696,32 @@ test('resolvePlan gates to awaiting-human when tentative children declare overla
   assert.match(view.gates['item-x'].ask, /item-x-2/);
   const children = Object.values(view.work).filter((item) => item.parent === 'item-x');
   assert.equal(children.length, 0);
+});
+
+test('resolvePlan honors a declared deps edge between tentative children as the sequence resolution for a shared footprint', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolvePlan(storeDir, 'item-x', cfg, 'runner', {
+    verdict: 'decompose',
+    reason: 'One child must finish before the other touches the same file',
+    children: [
+      { title: 'Build parser', verify: 'npm test -- parser', action: 'x', footprint: ['src/parser.mjs', 'src/shared.mjs'] },
+      {
+        title: 'Build renderer',
+        verify: 'npm test -- renderer',
+        action: 'x',
+        footprint: ['src/shared.mjs'],
+        deps: [0],
+      },
+    ],
+  });
+  assert.equal(result.outcome, 'decompose');
+  assert.equal(result.childIds.length, 2);
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'executing');
+  assert.deepEqual(view.work[result.childIds[1]].deps, [result.childIds[0]]);
 });
 
 test('resolvePlan proceeds normally when tentative children declare disjoint (or absent) footprint', () => {
@@ -792,7 +942,7 @@ test('resolvePlan does NOT release the risk-heavy gate on a stale/unrelated gate
   // A gate answer already on record, but from an unrelated question (e.g.
   // the clarify-stage's own ask) — must never be read as confirming this
   // gate's own distinct ask.
-  moveWork(storeDir, { id: 'item-x', to: 'awaiting-human', ask: 'Which file exactly?', statusAtAsk: 'todo' });
+  moveWork(storeDir, { id: 'item-x', to: 'awaiting-human', ask: '## Context\n\nA prior clarify-stage question already exists on this item, unrelated to the current gate.\n\n## Why this matters\n\nThis directly affects the outcome: Which file exactly?', statusAtAsk: 'todo' });
   moveWork(storeDir, { id: 'item-x', to: 'todo', expectedStatus: 'awaiting-human', answer: 'The parser module.' });
 
   const result = resolvePlan(storeDir, 'item-x', cfg, 'human', { verdict: 'pass-through' });
@@ -901,6 +1051,55 @@ test('resolvePlan --force never overrides a MECHANICAL disagreement (tsk-12t D6)
   });
   assert.equal(result.outcome, 'need-human');
   assert.equal(Object.values(listWork(storeDir).work).filter((item) => item.parent === 'item-x').length, 0);
+});
+
+// --- tsk-4m4 (narrowed, D1): planApproveVerify itself gets the same
+// mechanical second-pass check the per-child verify already gets above --
+// one check, before ANY of the four call sites that reuse it (hasChildren
+// re-entrancy, tiny/small skip-and-advance, explicit pass-through, real
+// decompose success). ---
+
+test('resolvePlan parks as verify-disputed (no stage move) when the item\'s own verify trips the mechanical bad-pattern check, on a pass-through verdict', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ verify: KNOWN_BAD_VERIFY }));
+
+  const result = resolvePlan(storeDir, 'item-x', cfg, 'runner', { verdict: 'pass-through', reason: 'single cohesive change' });
+  assert.equal(result.outcome, 'verify-disputed');
+
+  const view = listWork(storeDir);
+  assert.equal(view.work['item-x'].stage, 'decompose', 'item left exactly where it was, never advanced to executing');
+  assert.match(view.gates['item-x'].ask, /node --test/);
+});
+
+test('resolvePlan --force never overrides a MECHANICAL planApproveVerify disagreement either (tsk-12t D6) -- still parks', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ verify: KNOWN_BAD_VERIFY }));
+
+  const result = resolvePlan(storeDir, 'item-x', cfg, 'runner', { verdict: 'pass-through', reason: 'single cohesive change', force: true });
+  assert.equal(result.outcome, 'verify-disputed');
+  assert.equal(listWork(storeDir).work['item-x'].stage, 'decompose');
+});
+
+test('resolvePlan parks as verify-disputed on the real decompose success path too, before any child is written', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork({ verify: KNOWN_BAD_VERIFY }));
+
+  const result = resolvePlan(storeDir, 'item-x', cfg, 'runner', {
+    verdict: 'decompose',
+    reason: 'Two independent surfaces, no shared state',
+    children: [{ title: 'Build parser', verify: 'npm test -- parser', action: 'x' }],
+  });
+  assert.equal(result.outcome, 'verify-disputed');
+  assert.equal(Object.values(listWork(storeDir).work).filter((item) => item.parent === 'item-x').length, 0, 'no partial write -- the root\'s own verify parked before any child was considered');
+});
+
+test('resolvePlan still proceeds normally (pass-through) when planApproveVerify agrees -- undisputed verify is unaffected', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolvePlan(storeDir, 'item-x', cfg, 'runner', { verdict: 'pass-through', reason: 'single cohesive change' });
+  assert.equal(result.outcome, 'pass-through');
+  assert.equal(listWork(storeDir).work['item-x'].stage, 'executing');
 });
 
 // --- decision-trail capture (tsk-6b6): every verdict branch logs a

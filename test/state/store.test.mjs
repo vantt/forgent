@@ -15,11 +15,11 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { fork } from 'node:child_process';
+import { fork, execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { addWork, editWork, moveWork, moveStage, addOutcome, addFriction, addDecision, recordGateApprove, listWork, readRawEvents, setFocus, StoreError } from '../../src/state/store.mjs';
+import { initStore, addWork, editWork, moveWork, moveStage, addOutcome, addFriction, addDecision, recordGateApprove, listWork, readRawEvents, setFocus, StoreError, assertPlanEvidence } from '../../src/state/store.mjs';
 import { appendEvent } from '../../src/state/events.mjs';
-import { REGISTRY, ENV, PID, UNRESOLVED } from "../../src/runner/session-identity.mjs";
+import { REGISTRY, ENV, PID, UNRESOLVED } from "../../src/util/session-identity.mjs";
 import { MAX_TITLE_LENGTH } from '../../src/state/work.mjs';
 
 const WRITER_SOURCES = new Set([REGISTRY, ENV, PID, UNRESOLVED]);
@@ -45,7 +45,21 @@ function tmpDir() {
 // lets a race test give each child a DISTINCT id to mutate (e.g. testing the
 // state.json refreshView race, which needs concurrent writers on different
 // ids, not a CAS/exists conflict on the same one).
-async function raceAcrossProcesses(dir, storeCall, nProcesses, extraArgvPerChild = null) {
+//
+// `batchSize` (optional, defaults to `nProcesses` — every existing
+// call site below is byte-for-byte unaffected unless it opts in): caps how
+// many child processes are synchronized to the SAME start instant at once.
+// `acquireEventsLock`'s 2s deadline (src/state/events.mjs) is computed fresh
+// per individual lock-acquisition attempt, so a test racing MANY processes
+// against the same events.lock can, under real machine load, have a single
+// attempt among hundreds land in a window where too many siblings are
+// simultaneously retrying for it to succeed inside budget — a standing flake,
+// not a regression (docs/history/tsk-4fx-concurrency-test-lock-timeout-flake/
+// RESEARCH.md). Batching reduces PEAK simultaneous contention without
+// changing the total operation count or the cross-process race semantics
+// under test — each batch is still genuine concurrent OS-process racing,
+// just fewer processes racing at once.
+async function raceAcrossProcesses(dir, storeCall, nProcesses, extraArgvPerChild = null, batchSize = nProcesses) {
   const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-store-race-'));
   const childScript = `
 import { addWork, editWork, moveWork, moveStage, StoreError, FsmError } from ${JSON.stringify(STORE_MJS)};
@@ -63,23 +77,29 @@ try {
   const childPath = path.join(workDir, 'race-child.mjs');
   fs.writeFileSync(childPath, childScript);
 
-  const startAt = Date.now() + 300;
-  const results = await Promise.all(
-    Array.from({ length: nProcesses }, (_, i) =>
-      new Promise((resolve, reject) => {
-        const extraArgv = extraArgvPerChild ? [String(extraArgvPerChild[i])] : [];
-        const child = fork(childPath, [dir, String(startAt), ...extraArgv], { stdio: 'inherit' });
-        let message = null;
-        child.on('message', (msg) => {
-          message = msg;
-        });
-        child.on('exit', (code) => {
-          if (!message) return reject(new Error(`child exited (code ${code}) without reporting an outcome`));
-          resolve(message);
+  const results = [];
+  for (let batchStart = 0; batchStart < nProcesses; batchStart += batchSize) {
+    const batchCount = Math.min(batchSize, nProcesses - batchStart);
+    const startAt = Date.now() + 300;
+    const batchResults = await Promise.all(
+      Array.from({ length: batchCount }, (_, j) => {
+        const i = batchStart + j;
+        return new Promise((resolve, reject) => {
+          const extraArgv = extraArgvPerChild ? [String(extraArgvPerChild[i])] : [];
+          const child = fork(childPath, [dir, String(startAt), ...extraArgv], { stdio: 'inherit' });
+          let message = null;
+          child.on('message', (msg) => {
+            message = msg;
+          });
+          child.on('exit', (code) => {
+            if (!message) return reject(new Error(`child exited (code ${code}) without reporting an outcome`));
+            resolve(message);
+          });
         });
       }),
-    ),
-  );
+    );
+    results.push(...batchResults);
+  }
 
   fs.rmSync(workDir, { recursive: true, force: true });
   return results;
@@ -120,6 +140,39 @@ test('addDecision keeps an explicit kind (e.g. "engine") unchanged', () => {
   const view = listWork(dir);
   const last = view.decisions.at(-1);
   assert.equal(last.kind, 'engine');
+});
+
+// --- tsk-37t: addDecision now validates a present `id`, matching every
+// neighbouring id-taking verb (editWork/moveWork both throw "work <id> not
+// found" first) -- a decision scoped to a nonexistent item used to write a
+// success envelope and an event `fgos show <id>` could never retrieve. ---
+
+test('tsk-37t: addDecision throws "work <id> not found" for a nonexistent id, same shape editWork/moveWork already use', () => {
+  const dir = tmpDir();
+  assert.throws(
+    () => addDecision(dir, { id: 'no-such-item', text: 'closing report', rationale: 'driver stop reason: awaiting-approval' }),
+    (err) => err instanceof StoreError && err.category === 'validation' && /work "no-such-item" not found/.test(err.message),
+  );
+  // And no event was written for the rejected call -- not silently
+  // half-applied.
+  const view = listWork(dir);
+  assert.equal(view.decisions.length, 0);
+});
+
+test('tsk-37t: addDecision still succeeds when id names a real work item', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'real-item');
+  addDecision(dir, { id: 'real-item', text: 'closing report', rationale: 'driver stop reason: awaiting-approval' });
+  const view = listWork(dir);
+  const last = view.decisions.at(-1);
+  assert.equal(last.id, 'real-item');
+});
+
+test('tsk-37t: addDecision with no id at all is still legitimate (a global decision not scoped to one item)', () => {
+  const dir = tmpDir();
+  addDecision(dir, { text: 'a global decision', rationale: 'not scoped to one item' });
+  const view = listWork(dir);
+  assert.equal(view.decisions.at(-1).text, 'a global decision');
 });
 
 test('moveWork doing->done composes a learning record reflecting the item\'s actual outcome, friction (by layer), and settlement (by kind/role)', () => {
@@ -271,6 +324,40 @@ test('moveWork omits branchHeadAtTake/branchHeadAtReturn entirely from the event
 
   assert.equal('branchHeadAtTake' in event.payload, false);
   assert.equal('branchHeadAtReturn' in event.payload, false);
+});
+
+// --- delivered-event merge provenance (tsk-5dk) ---------------------------
+//
+// Same write-side gap class as branchHeadAtTake/branchHeadAtReturn above:
+// moveWork's destructure is a fixed field list, so mergedSha/mergedInto must
+// be asserted directly on the appended event's own payload, never only on a
+// later fold. Additive/optional, same stamp-only-if-defined pattern.
+
+test('moveWork stamps mergedSha and mergedInto onto the appended event payload for a doing -> delivered move that carries them', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'merge-evidence', { status: 'awaiting-approval' });
+
+  const { event } = moveWork(dir, {
+    id: 'merge-evidence',
+    to: 'delivered',
+    expectedStatus: 'awaiting-approval',
+    role: 'human',
+    mergedSha: 'deadbeefcafe',
+    mergedInto: 'main',
+  });
+
+  assert.equal(event.payload.mergedSha, 'deadbeefcafe');
+  assert.equal(event.payload.mergedInto, 'main');
+});
+
+test('moveWork omits mergedSha/mergedInto entirely from the event payload when the caller never supplies them (byte-identical to the prior shape)', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'merge-evidence-absent', { status: 'awaiting-approval' });
+
+  const { event } = moveWork(dir, { id: 'merge-evidence-absent', to: 'delivered', expectedStatus: 'awaiting-approval', role: 'human' });
+
+  assert.equal('mergedSha' in event.payload, false);
+  assert.equal('mergedInto' in event.payload, false);
 });
 
 // --- Diataxis docType tag on outcome/friction capture (CONTEXT D5/D6) -----
@@ -431,6 +518,49 @@ test('a valid DAG add and a valid DAG edit are still accepted unchanged through 
   addSampleWork(dir, 'dag-c', { deps: [] });
   editWork(dir, { id: 'dag-b', patch: { deps: ['dag-a', 'dag-c'] } });
   assert.deepEqual(listWork(dir).work['dag-b'].deps, ['dag-a', 'dag-c']);
+});
+
+// tsk-2t9c D16: `kind` selects an item's workflow/stage graph
+// (`resolveWorkflow`). Locking it once `status` leaves `todo` means kind
+// can never drift out from under a stage graph the item is actively
+// walking, without needing a separate frozen `workflow` field or a new
+// validated-change verb.
+test('editWork accepts a kind patch while status is still todo', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'kind-todo', { kind: 'task' });
+  editWork(dir, { id: 'kind-todo', patch: { kind: 'bug' } });
+  assert.equal(listWork(dir).work['kind-todo'].kind, 'bug');
+});
+
+test('editWork refuses a kind patch once status has left todo (doing)', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'kind-doing', { kind: 'task' });
+  moveWork(dir, { id: 'kind-doing', to: 'doing', expectedStatus: 'todo' });
+  assert.throws(
+    () => editWork(dir, { id: 'kind-doing', patch: { kind: 'bug' } }),
+    /kind.*status is "doing", not "todo"/s,
+  );
+  // the item's kind must stay unchanged — the patch never landed
+  assert.equal(listWork(dir).work['kind-doing'].kind, 'task');
+});
+
+test('editWork refuses a kind patch on a delivered item too (not just doing)', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'kind-delivered', { kind: 'task' });
+  moveWork(dir, { id: 'kind-delivered', to: 'doing', expectedStatus: 'todo' });
+  moveWork(dir, { id: 'kind-delivered', to: 'delivered', expectedStatus: 'doing' });
+  assert.throws(
+    () => editWork(dir, { id: 'kind-delivered', patch: { kind: 'bug' } }),
+    /kind.*status is "delivered", not "todo"/s,
+  );
+});
+
+test('editWork still accepts an unrelated-field patch once status has left todo — the kind lock is scoped to kind alone', () => {
+  const dir = tmpDir();
+  addSampleWork(dir, 'kind-lock-scoped', { kind: 'task' });
+  moveWork(dir, { id: 'kind-lock-scoped', to: 'doing', expectedStatus: 'todo' });
+  editWork(dir, { id: 'kind-lock-scoped', patch: { priority: 5 } });
+  assert.equal(listWork(dir).work['kind-lock-scoped'].priority, 5);
 });
 
 test('a dep to an unknown id is still rejected by the existing existence check first, before the cycle guard runs', () => {
@@ -653,6 +783,7 @@ for (let i = 0; i < ${N_EDITS}; i += 1) {
 }`,
     N_PROC,
     Array.from({ length: N_PROC }, (_, i) => `race-view-${i}`),
+    4, // batch to reduce peak events.lock contention under load — see raceAcrossProcesses' own comment
   );
 
   assert.deepEqual(results, Array(N_PROC).fill({ ok: true }), 'every concurrent editWork loop on a distinct id must succeed (no CAS conflict expected across different ids)');
@@ -708,6 +839,28 @@ test('writeView writes state.json via a temp-file-then-rename, never a direct wr
   assert.ok(fs.existsSync(viewPath), 'state.json must exist after the rename');
   assert.ok(!fs.existsSync(viewRenames[0].from), 'the temp file must no longer exist after rename(2) moved it');
   JSON.parse(fs.readFileSync(viewPath, 'utf8'));
+});
+
+// tsk-37d: writeView must stringify the view object only once per write
+test('writeView serializes view content only once per mutation (tsk-37d)', () => {
+  const dir = tmpDir();
+  let viewStringifyCount = 0;
+  const originalStringify = JSON.stringify;
+  JSON.stringify = function patchedStringify(obj, ...args) {
+    if (obj && typeof obj === 'object' && obj !== null && typeof obj.work === 'object') {
+      viewStringifyCount += 1;
+    }
+    return originalStringify.call(this, obj, ...args);
+  };
+  try {
+    initStore(dir);
+    addSampleWork(dir, 'single-stringify-check');
+  } finally {
+    JSON.stringify = originalStringify;
+  }
+  // initStore (1 write) + addSampleWork (1 write) = 2 writes.
+  // For each write, the view object must be stringified exactly once.
+  assert.equal(viewStringifyCount, 2, 'the full view object must be stringified exactly once per state write');
 });
 
 // --- str73-done-flip-cos-check cell 2: per-clause CoS done-gate ------------
@@ -782,6 +935,87 @@ test('moveWork re-reads fresh state on retry: editing in the missing evidence af
 
   const { view } = moveWork(dir, { id: 'cos-retry', to: 'delivered', expectedStatus: 'doing', role: 'human' });
   assert.equal(view.work['cos-retry'].status, 'delivered', 'the retry must re-read the just-edited evidence, not a cached refusal');
+});
+
+// --- tsk-2p6: assertPlanEvidence -- a risk:heavy item reaching `delivered`
+// must have a plan.md on its own fgw/<id> branch. Needs a REAL git repo
+// (unlike every test above, which never touches git) since the check reads
+// the item's branch content via `git cat-file -e`, never the caller's
+// current working tree -- correct both before a merge (pre-flight) and
+// after (backstop). `dir` here is always `path.join(repoRoot, '.fgos')`,
+// mirroring claim-port.test.mjs's own `setup()` shape.
+
+function gitBackedDir(prefix) {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
+  fs.writeFileSync(path.join(repoRoot, 'seed.txt'), 'seed\n');
+  execFileSync('git', ['add', 'seed.txt'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd: repoRoot });
+  return { repoRoot, dir: path.join(repoRoot, '.fgos') };
+}
+
+test('tsk-2p6: moveWork refuses a doing->delivered close for a risk:heavy item with no plan.md on its own branch', () => {
+  const { repoRoot, dir } = gitBackedDir('fgos-plan-evidence-missing-');
+  execFileSync('git', ['branch', 'fgw/heavy-no-plan'], { cwd: repoRoot });
+  addSampleWork(dir, 'heavy-no-plan', { risk: 'heavy' });
+  moveWork(dir, { id: 'heavy-no-plan', to: 'doing', expectedStatus: 'todo' });
+
+  const before = readRawEvents(dir).length;
+  assert.throws(
+    () => moveWork(dir, { id: 'heavy-no-plan', to: 'delivered', expectedStatus: 'doing' }),
+    (err) => err instanceof StoreError && err.category === 'precondition' && /no plan\.md found on branch "fgw\/heavy-no-plan"/.test(err.message),
+  );
+  assert.equal(listWork(dir).work['heavy-no-plan'].status, 'doing', 'a refused close must leave the item at its prior status');
+  assert.equal(readRawEvents(dir).length, before, 'a refused close must append no event');
+});
+
+test('tsk-2p6: moveWork allows a doing->delivered close for a risk:heavy item that DOES have a plan.md on its branch (docs/history/<id>/ shape)', () => {
+  const { repoRoot, dir } = gitBackedDir('fgos-plan-evidence-present-');
+  execFileSync('git', ['checkout', '-q', '-b', 'fgw/heavy-with-plan'], { cwd: repoRoot });
+  fs.mkdirSync(path.join(repoRoot, 'docs', 'history', 'heavy-with-plan'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'docs', 'history', 'heavy-with-plan', 'plan.md'), '# plan\n');
+  execFileSync('git', ['add', 'docs'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'plan'], { cwd: repoRoot });
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: repoRoot });
+
+  addSampleWork(dir, 'heavy-with-plan', { risk: 'heavy' });
+  moveWork(dir, { id: 'heavy-with-plan', to: 'doing', expectedStatus: 'todo' });
+  const { view } = moveWork(dir, { id: 'heavy-with-plan', to: 'delivered', expectedStatus: 'doing', role: 'human' });
+  assert.equal(view.work['heavy-with-plan'].status, 'delivered');
+});
+
+test('tsk-2p6: moveWork allows a doing->delivered close for a risk:heavy item whose docsRef points straight at plan.md\'s own dir', () => {
+  const { repoRoot, dir } = gitBackedDir('fgos-plan-evidence-docsref-');
+  execFileSync('git', ['checkout', '-q', '-b', 'fgw/heavy-docsref'], { cwd: repoRoot });
+  fs.mkdirSync(path.join(repoRoot, 'docs', 'history', 'custom-feature-name'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'docs', 'history', 'custom-feature-name', 'plan.md'), '# plan\n');
+  execFileSync('git', ['add', 'docs'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'plan'], { cwd: repoRoot });
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: repoRoot });
+
+  addSampleWork(dir, 'heavy-docsref', { risk: 'heavy', docsRef: 'docs/history/custom-feature-name/' });
+  moveWork(dir, { id: 'heavy-docsref', to: 'doing', expectedStatus: 'todo' });
+  const { view } = moveWork(dir, { id: 'heavy-docsref', to: 'delivered', expectedStatus: 'doing', role: 'human' });
+  assert.equal(view.work['heavy-docsref'].status, 'delivered');
+});
+
+test('tsk-2p6: moveWork never gates a light/standard-risk item on plan.md — byte-identical to before this item', () => {
+  const { repoRoot, dir } = gitBackedDir('fgos-plan-evidence-light-');
+  execFileSync('git', ['branch', 'fgw/light-item'], { cwd: repoRoot });
+  addSampleWork(dir, 'light-item', { risk: 'light' });
+  moveWork(dir, { id: 'light-item', to: 'doing', expectedStatus: 'todo' });
+  const { view } = moveWork(dir, { id: 'light-item', to: 'delivered', expectedStatus: 'doing', role: 'human' });
+  assert.equal(view.work['light-item'].status, 'delivered');
+});
+
+test('tsk-2p6: assertPlanEvidence fails gracefully (never throws an unrelated git error) when the item\'s own branch does not exist at all', () => {
+  const { repoRoot } = gitBackedDir('fgos-plan-evidence-no-branch-');
+  assert.throws(
+    () => assertPlanEvidence('no-such-branch-item', { risk: 'heavy' }, repoRoot),
+    (err) => err instanceof StoreError && err.category === 'precondition' && /no plan\.md found on branch "fgw\/no-such-branch-item"/.test(err.message),
+  );
 });
 
 // --- `priority`/`intent` in EDITABLE_FIELDS (per str7-str8-priority-intent
@@ -875,7 +1109,8 @@ test('addWork truncates an over-length title instead of rejecting the write', ()
   const stored = listWork(dir).work['long-add'];
   assert.ok(stored, 'the write went through rather than throwing');
   assert.ok(stored.title.length <= MAX_TITLE_LENGTH);
-  assert.equal(long.startsWith(stored.title), true);
+  assert.equal(stored.title.endsWith('…'), true);
+  assert.equal(long.startsWith(stored.title.slice(0, -1)), true);
 });
 
 test('addWork leaves a title already within the bound byte-identical', () => {

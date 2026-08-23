@@ -1,21 +1,21 @@
 ---
 topic: work-item-schema-and-io-contracts
 date: 2026-07-15
-based_on: [beads@777d24b87, beads-rust@ab0288cb, beads-viewer-rust@7f96da4, repository-harness@0a79bbe, symphony@2f0b257, beegog@05a131f]
-entries: [beads:ready-work-ten-dep-types, beads:hash-id-adaptive-length, beads:metadata-set-always-string, beads:discovered-from-lineage, beads:dolt-as-versioned-truth, beads:agent-first-cli-contract, beads:gate-beads-event-driven, beads-rust:agent-first-cli-contract-hardened, beads-rust:toon-token-output, beads-rust:sqlite-jsonl-classic-truth, beads-rust:no-id-pinning-lint, beads-rust:workspace-health-contract, beads-rust:agent-baseline-golden-snapshots, beads-viewer-rust:robot-mode-envelope, beads-viewer-rust:schema-validated-output-contract, beads-viewer-rust:toon-token-efficient-format, beads-viewer-rust:commit-bead-correlation-with-feedback, repository-harness:story-packets, repository-harness:epic-story-hierarchy, repository-harness:story-status-single-door, repository-harness:story-complete-atomic, repository-harness:story-verify-command, repository-harness:orchestration-protocol-v1, repository-harness:protocol-next-action-table, repository-harness:changeset-event-sourcing, beegog:cell-task-unit, beegog:cell-status-lifecycle, beegog:event-sourced-decisions, beegog:semantic-judge-verdict-loop, beegog:cell-lifetime-budgets-anti-loop, symphony:typed-runtime-boundary, symphony:isolated-run-contract, symphony:changeset-content-sha-immutability]
+based_on: [beads@777d24b87, beads-rust@ab0288cb, beads-viewer-rust@7f96da4, repository-harness@0a79bbe, symphony@2f0b257, beehive@05a131f]
+entries: [beads:ready-work-ten-dep-types, beads:hash-id-adaptive-length, beads:metadata-set-always-string, beads:discovered-from-lineage, beads:dolt-as-versioned-truth, beads:agent-first-cli-contract, beads:gate-beads-event-driven, beads-rust:agent-first-cli-contract-hardened, beads-rust:toon-token-output, beads-rust:sqlite-jsonl-classic-truth, beads-rust:no-id-pinning-lint, beads-rust:workspace-health-contract, beads-rust:agent-baseline-golden-snapshots, beads-viewer-rust:robot-mode-envelope, beads-viewer-rust:schema-validated-output-contract, beads-viewer-rust:toon-token-efficient-format, beads-viewer-rust:commit-bead-correlation-with-feedback, repository-harness:story-packets, repository-harness:epic-story-hierarchy, repository-harness:story-status-single-door, repository-harness:story-complete-atomic, repository-harness:story-verify-command, repository-harness:orchestration-protocol-v1, repository-harness:protocol-next-action-table, repository-harness:changeset-event-sourcing, beehive:cell-task-unit, beehive:cell-status-lifecycle, beehive:event-sourced-decisions, beehive:semantic-judge-verdict-loop, beehive:cell-lifetime-budgets-anti-loop, symphony:typed-runtime-boundary, symphony:isolated-run-contract, symphony:changeset-content-sha-immutability]
 ---
 
 # Deep-dive: cấu trúc dữ liệu work-item & hợp đồng I/O (schema, envelope, contract)
 
 > stale vs repository-harness@0a79bbe (9cc306d→0a79bbe, 2026-08-07) — cùng shift default-vs-compatibility như `work-item-management.md`: entry hn được cite (`story-packets`, `epic-story-hierarchy`, `story-status-single-door`, `story-complete-atomic`, `story-verify-command`, `changeset-event-sourcing`) là schema của story/CLI SQLite, giờ compatibility-only (Phase 4, decision 0022) chứ không phải schema mặc định của fresh install. `orchestration-protocol-v1`/`protocol-next-action-table` (contract cho external orchestrator) KHÔNG đổi, vẫn giữ nguyên như cite. Không đổi taxonomy field/envelope đã kết luận — chỉ đổi TRỌNG SỐ "đây có phải trải nghiệm mặc định của hn không" nếu re-dive.
 
-> **Re-dive delta beegog 94b4a31→05a131f (2026-07-21):** đúng trọng tâm dive này — record `bee cell` (đã cite `cell-task-unit`) MỌC THÊM một tầng lịch sử trong chính `trace`, kết luận §1/§4 (kernel ~8 field hội tụ, "proof" là field đắt) KHÔNG đổi nhưng §2.5 cần một khoản mục mới. (1) `beegog:cell-task-unit` (đã cite) — `trace` nay có 4 sub-field APPEND-ONLY mới: `trace.attempts` (mỗi lần verify/block một dòng: n, verdict, failure_signature, claim_session, acquired_at), `trace.semantic_judge` (verdict theo schema đóng — xem điểm 2), `trace.budget_resets`, `trace.judge_overrides`. Bẫy được chính beegog.md ghi rõ: `trace.deviations` bị `capCell` GHI ĐÈ mỗi lần cap — không phải chỗ để lịch sử; chỉ 4 key append-only mới là sổ thật. Trace scale theo lane (tiny: 1 dòng kết quả → high-risk: + verification_evidence bắt buộc khi `behavior_change:true`, MỌI lane). (2) `beegog:semantic-judge-verdict-loop` (entry MỚI) — một dạng "evidence" THỨ TƯ bên cạnh bee/hn/symphony đã cite ở §2.5: verdict LLM theo schema đóng `judge-verdict/1` (`PASS`/`NEEDS_REVISION`, mỗi `checks[]` BẮT BUỘC có `evidence`, `failure_signature` bắt buộc khi FAIL) — validator cross-check chặt (PASS mà có FAIL bị loại, ngược lại cũng loại; văn xuôi tự do TỰ NÓ là lỗi validate). Răng thật: `capCell` từ chối cap khi verdict mới nhất `NEEDS_REVISION`, và verdict đó tự MỞ LẠI cell `capped→open` (không phải `claimed`) + xoá `trace.verify_passed` cũ — vá đúng lỗ "cap lại mà không chạy verify mới" mà bản hardening trước để hở. (3) `beegog:cell-lifetime-budgets-anti-loop` (entry MỚI) — ba ngân sách độc lập (`max_claims`, `max_failed_attempts`, `max_same_signature`) kiểm tại CỬA CLAIM, nền là `trace.attempts` + `normalizeFailureSignature` (chuẩn hoá lỗi trước khi hash 12 ký tự — không bao giờ để lọt path tuyệt đối). Đây là field ANTI-LOOP mà không nguồn nào trong 6-record gốc có tường minh — gần nhất là `lease_expires_at`/`heartbeat_at` (crash-survival) nhưng budget là bài toán KHÁC: chống retry-cùng-lỗi, không chống crash.
+> **Re-dive delta beehive 94b4a31→05a131f (2026-07-21):** đúng trọng tâm dive này — record `beehive cell` (đã cite `cell-task-unit`) MỌC THÊM một tầng lịch sử trong chính `trace`, kết luận §1/§4 (kernel ~8 field hội tụ, "proof" là field đắt) KHÔNG đổi nhưng §2.5 cần một khoản mục mới. (1) `beehive:cell-task-unit` (đã cite) — `trace` nay có 4 sub-field APPEND-ONLY mới: `trace.attempts` (mỗi lần verify/block một dòng: n, verdict, failure_signature, claim_session, acquired_at), `trace.semantic_judge` (verdict theo schema đóng — xem điểm 2), `trace.budget_resets`, `trace.judge_overrides`. Bẫy được chính beehive.md ghi rõ: `trace.deviations` bị `capCell` GHI ĐÈ mỗi lần cap — không phải chỗ để lịch sử; chỉ 4 key append-only mới là sổ thật. Trace scale theo lane (tiny: 1 dòng kết quả → high-risk: + verification_evidence bắt buộc khi `behavior_change:true`, MỌI lane). (2) `beehive:semantic-judge-verdict-loop` (entry MỚI) — một dạng "evidence" THỨ TƯ bên cạnh beehive/hn/symphony đã cite ở §2.5: verdict LLM theo schema đóng `judge-verdict/1` (`PASS`/`NEEDS_REVISION`, mỗi `checks[]` BẮT BUỘC có `evidence`, `failure_signature` bắt buộc khi FAIL) — validator cross-check chặt (PASS mà có FAIL bị loại, ngược lại cũng loại; văn xuôi tự do TỰ NÓ là lỗi validate). Răng thật: `capCell` từ chối cap khi verdict mới nhất `NEEDS_REVISION`, và verdict đó tự MỞ LẠI cell `capped→open` (không phải `claimed`) + xoá `trace.verify_passed` cũ — vá đúng lỗ "cap lại mà không chạy verify mới" mà bản hardening trước để hở. (3) `beehive:cell-lifetime-budgets-anti-loop` (entry MỚI) — ba ngân sách độc lập (`max_claims`, `max_failed_attempts`, `max_same_signature`) kiểm tại CỬA CLAIM, nền là `trace.attempts` + `normalizeFailureSignature` (chuẩn hoá lỗi trước khi hash 12 ký tự — không bao giờ để lọt path tuyệt đối). Đây là field ANTI-LOOP mà không nguồn nào trong 6-record gốc có tường minh — gần nhất là `lease_expires_at`/`heartbeat_at` (crash-survival) nhưng budget là bài toán KHÁC: chống retry-cùng-lỗi, không chống crash.
 
-> **Re-dive delta beegog 55cf3a4→94b4a31 (2026-07-18, chạm HẸP):** Delegation-contract cli gather branch (nằm trong addendum 94b4a31 của `beegog:model-tiers-cost-discipline`) thêm một kiểu ENVELOPE chưa có ở §3: output phân-định-bằng-marker, fail-closed (`<<<BEE_DIGEST…BEE_DIGEST>>>`; thiếu/rỗng ⇒ fail) + một từ chối ĐỊNH-KIỂU (`cli_tier_gather_only`) gating dispatch-kind (gather vs cell) mà một contract được nhắm — đáng một dòng cạnh bd/br/bvr/hn/symphony trong bảng envelope §3. Kèm: `config validate` từ chối cấu hình cli-tier thiếu `kind:'cli'`/command/prompt-transport hoặc mang cờ auto-approve/sandbox-bypass — chứng cứ bee-side độc lập cho §4 "đọc khoan dung / ghi nghiêm (additive + lazy)" ở tầng config-contract. Kết luận taxonomy field/envelope KHÔNG đổi.
+> **Re-dive delta beehive 55cf3a4→94b4a31 (2026-07-18, chạm HẸP):** Delegation-contract cli gather branch (nằm trong addendum 94b4a31 của `beehive:model-tiers-cost-discipline`) thêm một kiểu ENVELOPE chưa có ở §3: output phân-định-bằng-marker, fail-closed (`<<<BEE_DIGEST…BEE_DIGEST>>>`; thiếu/rỗng ⇒ fail) + một từ chối ĐỊNH-KIỂU (`cli_tier_gather_only`) gating dispatch-kind (gather vs cell) mà một contract được nhắm — đáng một dòng cạnh bd/br/bvr/hn/symphony trong bảng envelope §3. Kèm: `config validate` từ chối cấu hình cli-tier thiếu `kind:'cli'`/command/prompt-transport hoặc mang cờ auto-approve/sandbox-bypass — chứng cứ bee-side độc lập cho §4 "đọc khoan dung / ghi nghiêm (additive + lazy)" ở tầng config-contract. Kết luận taxonomy field/envelope KHÔNG đổi.
 
-Sáu record thật, quote verbatim tại HEAD (báo cáo nguồn: `plans/reports/distill-schemas-beads-family-260715-report.md`, `plans/reports/distill-schemas-harness-family-260715-report.md`): **bd** Issue (Go, `internal/types/types.go:16-119`), **br** Issue (Rust, `src/model/mod.rs:458-628`), **bvr** Issue (Rust, `src/model.rs:18-68`), **hn** story (SQL, `scripts/schema/001-init.sql:44-61`), **bee** cell (JSON, `templates/lib/cells.mjs:34-147`), **symphony** RUN_CONTRACT/RESULT (Rust, `run.rs:68-117`). Dive chị em: `work-item-management.md` nhìn *vòng đời/pipeline*; dive này nhìn *tấm da của record và biên I/O* — từng field đắt tiền giải bài toán gì.
+Sáu record thật, quote verbatim tại HEAD (báo cáo nguồn: `plans/reports/distill-schemas-beads-family-260715-report.md`, `plans/reports/distill-schemas-harness-family-260715-report.md`): **bd** Issue (Go, `internal/types/types.go:16-119`), **br** Issue (Rust, `src/model/mod.rs:458-628`), **bvr** Issue (Rust, `src/model.rs:18-68`), **hn** story (SQL, `scripts/schema/001-init.sql:44-61`), **beehive** cell (JSON, `templates/lib/cells.mjs:34-147`), **symphony** RUN_CONTRACT/RESULT (Rust, `run.rs:68-117`). Dive chị em: `work-item-management.md` nhìn *vòng đời/pipeline*; dive này nhìn *tấm da của record và biên I/O* — từng field đắt tiền giải bài toán gì.
 
-**Bottom Line:** Mọi nguồn hội tụ về một **kernel ~8 field** (id, title, status, priority, deps, created/updated, assignee) — phần đó không có gì để học. Giá trị nằm ở **các field "đắt" giải một failure-mode có tên**: `content_hash` + hash-ID thích ứng (identity dưới song song), `lease_expires_at`+`heartbeat_at` (ownership sống sót crash), `dep.type` (một bảng edge chở cả điều phối LẪN tri thức — bd đã đi tới 19 loại), `verify`+evidence-trace (chống fake-done — bee/hn/symphony ba cách cài cùng một luật), `defer_until` (thời gian là điều kiện ready), `agent_context` kế thừa (br — chống context-compaction), và `data_hash`/`content_sha256` (đổi-hay-chưa và apply-một-lần ở biên I/O). Về envelope: bd thô nhất (raw JSON, không wrapper — bằng chứng rằng *thiếu* envelope cũng là một lựa chọn có hậu quả), bvr chuẩn hóa envelope 4-field, br đi xa nhất (exit-code taxonomy 9 mã + stdout/stderr split + hợp đồng tự-mô-tả 3 tầng versioned), hn/symphony chứng minh cả hai đầu producer/consumer qua protocol v1. **Khuyến nghị cho fgOS**: record gầy + edge có type (bd) × close-verb-có-proof (bee/hn) × envelope versioned + data_hash + exit-code taxonomy (bvr/br) × evolution-luật "additive + lazy + tolerate-unknown-fields, hard-fail-unknown-version" (hn + bài học phase-3 của chính ta).
+**Bottom Line:** Mọi nguồn hội tụ về một **kernel ~8 field** (id, title, status, priority, deps, created/updated, assignee) — phần đó không có gì để học. Giá trị nằm ở **các field "đắt" giải một failure-mode có tên**: `content_hash` + hash-ID thích ứng (identity dưới song song), `lease_expires_at`+`heartbeat_at` (ownership sống sót crash), `dep.type` (một bảng edge chở cả điều phối LẪN tri thức — bd đã đi tới 19 loại), `verify`+evidence-trace (chống fake-done — beehive/hn/symphony ba cách cài cùng một luật), `defer_until` (thời gian là điều kiện ready), `agent_context` kế thừa (br — chống context-compaction), và `data_hash`/`content_sha256` (đổi-hay-chưa và apply-một-lần ở biên I/O). Về envelope: bd thô nhất (raw JSON, không wrapper — bằng chứng rằng *thiếu* envelope cũng là một lựa chọn có hậu quả), bvr chuẩn hóa envelope 4-field, br đi xa nhất (exit-code taxonomy 9 mã + stdout/stderr split + hợp đồng tự-mô-tả 3 tầng versioned), hn/symphony chứng minh cả hai đầu producer/consumer qua protocol v1. **Khuyến nghị cho fgOS**: record gầy + edge có type (bd) × close-verb-có-proof (beehive/hn) × envelope versioned + data_hash + exit-code taxonomy (bvr/br) × evolution-luật "additive + lazy + tolerate-unknown-fields, hard-fail-unknown-version" (hn + bài học phase-3 của chính ta).
 
 ## Câu hỏi
 
@@ -33,10 +33,10 @@ Nhìn cả sáu record cạnh nhau, kích thước KHÔNG phân bố ngẫu nhi�
 | br Issue (Rust) | ~40 field | bản port classic + phần cứng hóa | như bd nhưng thêm tombstone 4-field, `source_repo_path`, `agent_context`; `Custom(String)` cho Status/DepType mở |
 | bvr Issue | ~20 field | **projection chỉ-đọc** cho phân tích | mọi field `#[serde(default)]` — đọc *khoan dung tối đa* (JSONL bẩn vẫn load); `workspace_prefix`/`content_hash` là `skip` — derived, không bao giờ phát ra |
 | hn story (SQL) | 12 cột | packet-có-hợp-đồng | gầy có chủ đích, 4 cột là **proof matrix** (unit/integration/e2e/platform), CHECK constraint khóa status/lane ngay tầng SQL |
-| bee cell (JSON) | ~12 field + trace | **prompt đủ để dispatch** | nửa record là hợp-đồng-trước (`action`, `must_haves.truths/prohibitions`, `read_first`), nửa là bằng-chứng-sau (`trace.verify_output/verify_passed/files_changed`) |
+| beehive cell (JSON) | ~12 field + trace | **prompt đủ để dispatch** | nửa record là hợp-đồng-trước (`action`, `must_haves.truths/prohibitions`, `read_first`), nửa là bằng-chứng-sau (`trace.verify_output/verify_passed/files_changed`) |
 | symphony RUN_CONTRACT | 13 field | hợp đồng MỘT lần chạy | không phải work-item — là *bao thư giao việc*: `required_outputs`, `result_json_schema`, `forbidden_paths`, `agent_instructions` |
 
-Ba triết lý: (a) **record béo, đồ thị đồng nhất** (bd/br — ngữ nghĩa dồn vào edge + issue-type, một công cụ query mọi thứ); (b) **record gầy, hợp đồng trong packet** (hn/bee — ngữ nghĩa dồn vào must_haves/acceptance/proof, ép chất lượng từng việc); (c) **record khoan-dung, chỉ-đọc** (bvr — consumer không bao giờ tin producer viết sạch). Symphony đứng ngoài: nó tách "work-item bền" khỏi "hợp đồng một lần chạy" thành hai vật thể — một tách mà bd (molecule) và bee (cell = cả hai vai) đều KHÔNG làm.
+Ba triết lý: (a) **record béo, đồ thị đồng nhất** (bd/br — ngữ nghĩa dồn vào edge + issue-type, một công cụ query mọi thứ); (b) **record gầy, hợp đồng trong packet** (hn/beehive — ngữ nghĩa dồn vào must_haves/acceptance/proof, ép chất lượng từng việc); (c) **record khoan-dung, chỉ-đọc** (bvr — consumer không bao giờ tin producer viết sạch). Symphony đứng ngoài: nó tách "work-item bền" khỏi "hợp đồng một lần chạy" thành hai vật thể — một tách mà bd (molecule) và beehive (cell = cả hai vai) đều KHÔNG làm.
 
 ---
 
@@ -48,7 +48,7 @@ Ba triết lý: (a) **record béo, đồ thị đồng nhất** (bd/br — ngữ
 
 - **bd** tách ĐÔI: `ID` = SHA256→base36 cắt 3-8 ký tự **thích ứng** (vượt 25% xác suất va chạm thì tự dài ra, toán ở `engdocs/COLLISION_MATH.md`) — giải va chạm; `ContentHash string \`json:"-"\`` — SHA256 của canonical content, internal-only — giải dedup/sync. Hai bài toán, hai field, một cái không bao giờ ra JSONL.
 - **br** giữ nguyên + thêm kỷ luật test: meta-lint `no_id_pinning` FAIL CI nếu test nào assert giá trị ID sinh ra (hash đổi theo fixture/hash-fn → test giòn); escape hatch `// invariant: <reason>` ([beads-rust:no-id-pinning-lint](../sources/beads-rust.md#no-id-pinning-lint)).
-- **hn/bee** dùng ID người-đặt (`US-001`, `phase-3-compound-learning-1`) — đọc được, kể chuyện được, nhưng CHỈ an toàn vì single-writer tạo việc tuần tự.
+- **hn/beehive** dùng ID người-đặt (`US-001`, `phase-3-compound-learning-1`) — đọc được, kể chuyện được, nhưng CHỈ an toàn vì single-writer tạo việc tuần tự.
 - **bvr** thêm chiều thứ ba: `workspace_prefix` (skip-serialized) — khi gộp N repo vào một view, ID namespaced lúc load, prefix giữ lại để *khôi phục raw ID* khi cần trỏ ngược về nguồn.
 
 **Vì sao khác nhau:** quyết định nằm ở "ai tạo việc". Người tạo → tên đọc-được thắng. Máy tạo song song → hash thắng, và khi đó *kỷ luật test đi kèm* (no-pinning) không phải tùy chọn. fgOS đã chốt hướng multi-agent tạo việc → cụm bd/br là đường phải đi.
@@ -61,9 +61,9 @@ Bốn tầng cứng dần, nhìn thấy rõ trong code:
 1. **bvr**: `pub status: String` — consumer chỉ-đọc, không ý kiến. Đúng vai.
 2. **bd**: enum 7 giá trị (`open/in_progress/blocked/deferred/closed/pinned/hooked` — `hooked` = "đang bị worker giữ" là status riêng, không phải flag!), nhưng transition chủ yếu là quy ước + lease.
 3. **hn**: CHECK constraint trong SQL + **CAS**: mọi update mang `--expected-status`, so trong CÙNG write transaction, lệch → CONFLICT exit 3, không ghi gì; và `implemented` là **cửa đơn** — `reject_ordinary_story_implementation()` từ chối mọi update thường nhắm status đó, chỉ verb `story complete` (chạy fresh proof, atomic) vào được ([hn:story-status-single-door](../sources/repository-harness.md#story-status-single-door), [hn:story-complete-atomic](../sources/repository-harness.md#story-complete-atomic)).
-4. **bee**: `capCell` *từ chối cơ học* khi thiếu `verify_passed` + evidence; và mạnh nhất — phase `compounding` **không gán-được-giá-trị**, chỉ SINH bởi producer thật (`scribing-run`), sau post-mortem một phiên giả close 7 lần bằng hand-edit (beegog:chain-integrity-guard-tail, xem `state.md`).
+4. **beehive**: `capCell` *từ chối cơ học* khi thiếu `verify_passed` + evidence; và mạnh nhất — phase `compounding` **không gán-được-giá-trị**, chỉ SINH bởi producer thật (`scribing-run`), sau post-mortem một phiên giả close 7 lần bằng hand-edit (beehive:chain-integrity-guard-tail, xem `state.md`).
 
-**Đọc ra:** status không phải field — nó là **API có precondition**. Giá trị cao nhất của corpus: (hn) CAS cho đa-writer + (hn/bee) trạng thái terminal chỉ có MỘT đường vào và đường đó đòi proof + (bee) trạng thái là *sản phẩm của hành động thật, không phải giá trị ghi vào*.
+**Đọc ra:** status không phải field — nó là **API có precondition**. Giá trị cao nhất của corpus: (hn) CAS cho đa-writer + (hn/beehive) trạng thái terminal chỉ có MỘT đường vào và đường đó đòi proof + (beehive) trạng thái là *sản phẩm của hành động thật, không phải giá trị ghi vào*.
 
 ### 2.3 `dependencies[].type` — một bảng edge chở cả điều phối lẫn tri thức
 
@@ -72,7 +72,7 @@ Bốn tầng cứng dần, nhìn thấy rõ trong code:
 - **bd** (verbatim `types.go:781-818`): enum `DependencyType` **19 hằng** ở HEAD — 4 workflow (`blocks`, `parent-child`, `conditional-blocks` "B chạy chỉ khi A fail", `waits-for` "fanout gate chờ children động") là lớp DUY NHẤT ảnh hưởng ready; 15 loại còn lại chở nghĩa: lineage (`discovered-from`, `caused-by`), hội thoại (`replies-to` + `thread_id` trên edge!), phiên bản (`supersedes`, `duplicates`), **thực thể** (`authored-by`, `assigned-to`, `approved-by`, `attests` — Decision 004 dồn cả quan-hệ-người vào bảng edge), ủy quyền (`delegated-from` — hoàn thành cascade lên), và `until` ("mute tới khi X đóng" — điều kiện thời-gian-sống bằng edge). Edge còn mang `metadata` JSON riêng (similarity score, proficiency…).
 - **br** port 11 loại + `Custom(String)` untagged — mở cho loại mới không vỡ parse.
 - **hn** giữ dependency là bảng SQL riêng có cycle-check DFS lúc insert, `query work-graph` trả stories+edges trong 1 transaction kèm `revision` hash.
-- **bee** chỉ có `deps: [cell-id]` — một loại, blocking, đủ cho swarm một-feature.
+- **beehive** chỉ có `deps: [cell-id]` — một loại, blocking, đủ cho swarm một-feature.
 
 **Vì sao đây là field cao-giá nhất của cụm beads:** nó biến những thứ hệ khác phải mở bảng riêng (comment thread, audit trail, approval, assignment) thành *cùng một cấu trúc query được*. Cái giá: schema nghĩa của 19 loại sống trong docs/quy ước, không phải trong kiểu — `conditional-blocks` sai nghĩa là sai điều phối im lặng. Bài học phân lớp quan trọng hơn con số: **blocking là lớp ĐÓNG và bé (4), non-blocking là lớp MỞ** — thêm loại tri thức mới không bao giờ được đụng ready-semantics.
 
@@ -81,27 +81,27 @@ Bốn tầng cứng dần, nhìn thấy rõ trong code:
 **Bài toán:** worker claim việc rồi chết — việc kẹt "in_progress" vĩnh viễn, hoặc bị cướp nhầm khi worker chỉ chậm.
 
 - **bd** (verbatim): 2 field NULL-when-free ngay TRÊN issue (`lease_expires_at`, `heartbeat_at`), comment nói rõ `row_lock` là cơ chế nội bộ *cố ý không* phơi ra record. Reclaim đòi lease hết hạn.
-- **beegog** cùng bài nhưng ở tầng file: claim O_EXCL + TTL/heartbeat, reclaim đòi **CẢ** TTL-hết **LẪN** heartbeat-cũ — hai điều kiện chống cướp-nhầm-worker-chậm (beegog:cross-session-atomic-claims).
+- **beehive** cùng bài nhưng ở tầng file: claim O_EXCL + TTL/heartbeat, reclaim đòi **CẢ** TTL-hết **LẪN** heartbeat-cũ — hai điều kiện chống cướp-nhầm-worker-chậm (beehive:cross-session-atomic-claims).
 - **hn/symphony** không cần field này: single-run lock + worktree cô lập — ownership giải bằng *kiến trúc* thay vì *dữ liệu*.
 
-**Đọc ra:** ba chỗ đặt ownership: trong record (bd), trong filesystem primitive (bee), trong isolation (symphony). Nếu fgOS đi same-checkout multi-session (đã chốt hướng này) thì lease phải là **dữ liệu nhìn thấy được trên record** — vì mọi phiên đều cần đọc "ai đang giữ, còn sống không" để route việc; và luật hai-điều-kiện của bee là phần cứng hóa đáng giữ.
+**Đọc ra:** ba chỗ đặt ownership: trong record (bd), trong filesystem primitive (beehive), trong isolation (symphony). Nếu fgOS đi same-checkout multi-session (đã chốt hướng này) thì lease phải là **dữ liệu nhìn thấy được trên record** — vì mọi phiên đều cần đọc "ai đang giữ, còn sống không" để route việc; và luật hai-điều-kiện của beehive là phần cứng hóa đáng giữ.
 
 ### 2.5 `verify` + evidence — chống fake-done bằng cấu trúc record
 
 **Bài toán:** "should work" được chấp nhận như bằng chứng; close mà không ai chạy gì.
 
 Ba cách cài cùng một luật, khác chỗ đặt:
-- **bee cell**: `verify` (lệnh chạy được, bắt buộc non-empty NGAY lúc tạo cell) + trace sau-chạy (`verify_command/verify_output/verify_passed/verified_at/files_changed`, thêm `red_failure_evidence` cho behavior_change). Cell thật của xưởng này (phase-3-compound-learning-1) cho thấy nó hoạt động: `verify_output: "tests 243, pass 243…"` — proof là DATA trên record, đọc lại được sau 6 tháng.
+- **beehive cell**: `verify` (lệnh chạy được, bắt buộc non-empty NGAY lúc tạo cell) + trace sau-chạy (`verify_command/verify_output/verify_passed/verified_at/files_changed`, thêm `red_failure_evidence` cho behavior_change). Cell thật của xưởng này (phase-3-compound-learning-1) cho thấy nó hoạt động: `verify_output: "tests 243, pass 243…"` — proof là DATA trên record, đọc lại được sau 6 tháng.
 - **hn story**: `verify_command` cột riêng + 4 cột proof-matrix (`unit/integration/e2e/platform_proof` INTEGER) — proof không chỉ "có/không" mà *theo tầng*, và `verify-all` re-sweep phát hiện "capped-nhưng-nay-fail".
 - **symphony RESULT.json**: `validation.commands[]{command, result}` hoặc `validation.unavailable: <lý do>` — **bắt buộc khai một trong hai**: hoặc bằng chứng, hoặc lời thú nhận tường minh; im lặng không phải lựa chọn hợp lệ.
 
 **Đọc ra:** hội tụ ×3 độc lập (đã ghi ở porting-log `verify-enforced-close` E3). Điểm tinh của symphony đáng nhấc riêng: field `unavailable` — cho phép "không chạy được validation" là giá trị *hợp lệ có lý do*, thay vì để trống rồi người đọc đoán. Cùng gene với br health "absence = not evaluated ≠ passed".
 
-**Mới @05a131f — evidence không dừng ở "chạy chưa", mà còn "verify TỰ nó có đáng tin không":** bee thêm hai tầng field mới lên trên bộ ba `verify/evidence` đã hội tụ:
-- `trace.semantic_judge` (`beegog:semantic-judge-verdict-loop`) — verdict LLM theo schema đóng `judge-verdict/1`, MỖI check bắt buộc mang `evidence` riêng + `failure_signature` khi FAIL; validator cross-check (không cho `PASS` lẫn check FAIL, không cho `NEEDS_REVISION` mà không FAIL nào, và văn xuôi tự do tự nó là lỗi validate). Đây là "proof-của-proof": verify xanh chỉ chứng minh lệnh chạy qua, judge verdict chứng minh KẾT QUẢ đúng ý định cell — hai lớp evidence khác nhau mà 6-record gốc gộp làm một.
-- `trace.attempts` + `trace.budget_resets` (`beegog:cell-lifetime-budgets-anti-loop`) — sổ append-only mỗi lần thử (verdict, `failure_signature` đã chuẩn hoá, `claim_session`, `acquired_at`), làm nền cho 3 ngân sách kiểm tại cửa claim (`max_claims`/`max_failed_attempts`/`max_same_signature`). Field này giải bài toán KHÁC `lease_expires_at`/`heartbeat_at` (crash-survival, đã bàn ở §2.4): chống *retry-cùng-lỗi-vô-hạn* của một worker còn sống, không chống worker chết.
+**Mới @05a131f — evidence không dừng ở "chạy chưa", mà còn "verify TỰ nó có đáng tin không":** beehive thêm hai tầng field mới lên trên bộ ba `verify/evidence` đã hội tụ:
+- `trace.semantic_judge` (`beehive:semantic-judge-verdict-loop`) — verdict LLM theo schema đóng `judge-verdict/1`, MỖI check bắt buộc mang `evidence` riêng + `failure_signature` khi FAIL; validator cross-check (không cho `PASS` lẫn check FAIL, không cho `NEEDS_REVISION` mà không FAIL nào, và văn xuôi tự do tự nó là lỗi validate). Đây là "proof-của-proof": verify xanh chỉ chứng minh lệnh chạy qua, judge verdict chứng minh KẾT QUẢ đúng ý định cell — hai lớp evidence khác nhau mà 6-record gốc gộp làm một.
+- `trace.attempts` + `trace.budget_resets` (`beehive:cell-lifetime-budgets-anti-loop`) — sổ append-only mỗi lần thử (verdict, `failure_signature` đã chuẩn hoá, `claim_session`, `acquired_at`), làm nền cho 3 ngân sách kiểm tại cửa claim (`max_claims`/`max_failed_attempts`/`max_same_signature`). Field này giải bài toán KHÁC `lease_expires_at`/`heartbeat_at` (crash-survival, đã bàn ở §2.4): chống *retry-cùng-lỗi-vô-hạn* của một worker còn sống, không chống worker chết.
 
-Cả hai đều dạy CÙNG một bài học schema: khi "proof" trở thành trục tin cậy trung tâm (bee/hn/symphony đã hội tụ), nó không dừng ở một field boolean — nó cần LỊCH SỬ (append-only, không phải overwrite) để phân biệt "lần này pass" khỏi "pass sau N lần thử cùng lỗi". Bẫy đáng chép: `trace.deviations` của bee bị `capCell` GHI ĐÈ mỗi lần cap — record tự phân loại field nào là sổ (append-only) và field nào là snapshot (overwrite), và trộn hai loại là lỗi thiết kế âm thầm.
+Cả hai đều dạy CÙNG một bài học schema: khi "proof" trở thành trục tin cậy trung tâm (beehive/hn/symphony đã hội tụ), nó không dừng ở một field boolean — nó cần LỊCH SỬ (append-only, không phải overwrite) để phân biệt "lần này pass" khỏi "pass sau N lần thử cùng lỗi". Bẫy đáng chép: `trace.deviations` của beehive bị `capCell` GHI ĐÈ mỗi lần cap — record tự phân loại field nào là sổ (append-only) và field nào là snapshot (overwrite), và trộn hai loại là lỗi thiết kế âm thầm.
 
 ### 2.6 `agent_context` (br) — governing instructions kế thừa xuống descendant
 
@@ -109,11 +109,11 @@ Cả hai đều dạy CÙNG một bài học schema: khi "proof" trở thành tr
 
 - **br** (verbatim `mod.rs:361-378`, #297): field `agent_context` — canonical-JSON (skills/constraints/references/workflow, schema cố ý mở) đặt trên bead TỔ TIÊN; khi `inherited_context.enabled` và agent `--claim`/`show` việc con, output **phát kèm** context tổ tiên. Không hiện trong list/search — "governance metadata, not browsable content". Ancestor không có context → skip im lặng.
 
-**Vì sao đây là field đáng chú ý nhất đợt này:** nó giải đúng bài fgOS gặp hằng ngày (bee giải bằng `read_first` + CONTEXT.md — nhưng đó là *đường dẫn phải tự đọc*; br biến nó thành *payload tự đến lúc claim*, đúng thời điểm cần, sống trong store nên miễn nhiễm compaction). Một nguồn, chưa outcome (E1), nhưng cơ chế sạch.
+**Vì sao đây là field đáng chú ý nhất đợt này:** nó giải đúng bài fgOS gặp hằng ngày (beehive giải bằng `read_first` + CONTEXT.md — nhưng đó là *đường dẫn phải tự đọc*; br biến nó thành *payload tự đến lúc claim*, đúng thời điểm cần, sống trong store nên miễn nhiễm compaction). Một nguồn, chưa outcome (E1), nhưng cơ chế sạch.
 
 ### 2.7 `defer_until` / `due_at` — thời gian là điều kiện ready, không phải ghi chú
 
-**bd**: `defer_until` = "ẩn khỏi `bd ready` tới lúc đó" — thời gian tham gia THẲNG vào predicate ready, cùng hạng với blocker; `due_at` đi vào Urgency của bvr triage. Đối chiếu: bee/hn không có — "chờ" phải vật hóa thành blocked/gate. Kết nối trực tiếp câu hỏi exploring đang mở của fgOS ("biểu diễn 'chờ gì', timeout"): bd cho thấy *chờ-thời-gian* rẻ nhất là một field so-sánh-được trong predicate, còn *chờ-sự-kiện* mới cần gate-bead (`await_type: gh:run|gh:pr|timer|human|mail` + `waiters[]` — điểm-chờ là node, notify là danh sách mail trên node).
+**bd**: `defer_until` = "ẩn khỏi `bd ready` tới lúc đó" — thời gian tham gia THẲNG vào predicate ready, cùng hạng với blocker; `due_at` đi vào Urgency của bvr triage. Đối chiếu: beehive/hn không có — "chờ" phải vật hóa thành blocked/gate. Kết nối trực tiếp câu hỏi exploring đang mở của fgOS ("biểu diễn 'chờ gì', timeout"): bd cho thấy *chờ-thời-gian* rẻ nhất là một field so-sánh-được trong predicate, còn *chờ-sự-kiện* mới cần gate-bead (`await_type: gh:run|gh:pr|timer|human|mail` + `waiters[]` — điểm-chờ là node, notify là danh sách mail trên node).
 
 ### 2.8 `metadata` — extension point và bài học typing
 
@@ -149,7 +149,7 @@ Và tầng **đóng băng bằng test** chạy dọc cả cụm: bvr schema-vali
 ### Đầu vào (orchestrator → worker)
 
 Hai vật thể cùng nghề "prompt đủ để dispatch", khác tầng:
-- **bee cell**: hợp đồng NỘI DUNG — `action` (văn xuôi chi tiết), `must_haves.truths` (điều phải đúng, quan sát được), `prohibitions` (điều CẤM — trong cell thật: "KHÔNG replace view.outcomes[id]…"), `read_first`, `verify`. Worker biết *phải làm gì, không được làm gì, chứng minh bằng gì*.
+- **beehive cell**: hợp đồng NỘI DUNG — `action` (văn xuôi chi tiết), `must_haves.truths` (điều phải đúng, quan sát được), `prohibitions` (điều CẤM — trong cell thật: "KHÔNG replace view.outcomes[id]…"), `read_first`, `verify`. Worker biết *phải làm gì, không được làm gì, chứng minh bằng gì*.
 - **symphony RUN_CONTRACT** (verbatim): hợp đồng MÔI TRƯỜNG — `worktree`, `harness_cli{executable, argv}`, `env{db_path, run_id, run_mode}`, `required_outputs[]`, `result_json_schema` (schema của RESULT nhúng NGAY trong contract giao việc!), `forbidden_paths[]`, `agent_instructions[]`. Worker biết *chạy ở đâu, gọi gì, nộp gì theo schema nào, cấm đụng đâu*.
 
 Ghép lại mới đủ một lệnh giao việc hoàn chỉnh — không nguồn nào có cả hai trong một vật thể.
@@ -162,7 +162,7 @@ Ghép lại mới đủ một lệnh giao việc hoàn chỉnh — không nguồ
 
 ## §4 — So sánh trade-offs theo chiều
 
-| Chiều | bd/br | hn | bee | bvr | symphony | Trade-off lõi |
+| Chiều | bd/br | hn | beehive | bvr | symphony | Trade-off lõi |
 |---|---|---|---|---|---|---|
 | Record | béo, vạn năng | gầy + proof matrix | prompt + trace | projection khoan dung | bao thư per-run | béo = 1 công cụ query mọi thứ; gầy = từng việc tự-mô-tả |
 | Ngữ nghĩa đặt ở | edge (19 loại) + issue_type | packet nội dung | must_haves/prohibitions | — (chỉ đọc) | contract giao việc | edge giàu → cross-cutting query; packet giàu → chất lượng từng việc |
@@ -172,7 +172,7 @@ Ghép lại mới đủ một lệnh giao việc hoàn chỉnh — không nguồ
 | Evolution | Custom(String) untagged; omitempty | tolerate-unknown-fields, hard-fail-unknown-version; op `version` per-record | — | serde(default) toàn bộ | version pin + tuple | đọc khoan dung + ghi versioned là cặp bài trùng |
 | Token economy | TOON + `--stats` đo | 16 MiB cap | silent bookkeeping | TOON fallback | — | tiết kiệm token phải ĐO được, không khẳng định chay |
 
-**Hội tụ đáng tin (≥3 nguồn độc lập):** (1) close/complete phải đòi proof tươi — bee/hn/symphony; (2) agent output là envelope versioned máy-đọc, agent không đụng UI người — bvr/br/hn(/bd một nửa); (3) đọc khoan dung + ghi chặt — bvr serde(default), br coerce-legacy, hn tolerate-unknown-fields; (4) content-addressed identity cho apply-một-lần — hn/symphony content_sha256, bd content_hash (mục đích khác một chút: dedup).
+**Hội tụ đáng tin (≥3 nguồn độc lập):** (1) close/complete phải đòi proof tươi — beehive/hn/symphony; (2) agent output là envelope versioned máy-đọc, agent không đụng UI người — bvr/br/hn(/bd một nửa); (3) đọc khoan dung + ghi chặt — bvr serde(default), br coerce-legacy, hn tolerate-unknown-fields; (4) content-addressed identity cho apply-một-lần — hn/symphony content_sha256, bd content_hash (mục đích khác một chút: dedup).
 
 **Phân kỳ đáng cân:** ngữ-nghĩa-ở-edge vs ngữ-nghĩa-ở-packet (§1) — không ai "thắng"; hn chọn packet vì single-writer + review con người; bd chọn edge vì multi-agent + query đa dạng. fgOS ở giữa: multi-agent (nghiêng edge) nhưng lifecycle bán-tự-động cần human đọc từng việc (nghiêng packet).
 
@@ -195,19 +195,19 @@ edges[] (bảng riêng trong view, type hai LỚP):               [bd, thu gọn
   semantic  (lớp MỞ):    discovered-from | caused-by | supersedes | duplicates | relates-to | ...
   → ready = derived query CHỈ nhìn lớp blocking; thêm loại semantic không bao giờ đổi điều phối
 
-proof (bắt buộc từ lane small+):                             [bee + hn + symphony]
+proof (bắt buộc từ lane small+):                             [beehive + hn + symphony]
   verify        — lệnh chạy được, đặt LÚC TẠO việc
   evidence      — {verify_output, verify_passed, verified_at, files_changed}
                   HOẶC {unavailable: <lý do>} — im lặng không hợp lệ    [symphony]
-  → close là VERB đòi evidence tươi, không phải status gán được        [hn single-door + bee cap]
+  → close là VERB đòi evidence tươi, không phải status gán được        [hn single-door + beehive cap]
 
-proof-history (opt-in, khi close có vòng tự-sửa):             [bee @05a131f]
+proof-history (opt-in, khi close có vòng tự-sửa):             [beehive @05a131f]
   attempts[]      — append-only: {n, verdict, failure_signature, session, at}
   judge_verdict   — {verdict, checks[]{evidence, failure_signature?}, confidence} — "proof của proof"
   → NEEDS_REVISION mở lại việc + xoá evidence cũ; ngân sách (max_claims/max_failed/max_same_signature)
     kiểm tại claim, không phải tại close — chống retry-cùng-lỗi, KHÁC bài crash-survival của ownership
 
-ownership (chỉ khi multi-session bật):                       [bd field + bee luật]
+ownership (chỉ khi multi-session bật):                       [bd field + beehive luật]
   lease_expires_at, heartbeat_at — NULL khi tự do; reclaim đòi CẢ hai điều kiện
 
 scheduling (opt-in):
@@ -240,7 +240,7 @@ Tự-mô-tả (`fgos capabilities` / `fgos schema`) và TOON: **chờ** — capa
 
 ### Dispatch input (giao việc cho worker)
 
-Giữ cell bee làm hợp đồng NỘI DUNG (đã dogfood), vay 3 field của RUN_CONTRACT khi fan-out đa-session: `forbidden_paths[]` (đang là hold/reservation — vật hóa vào lệnh giao việc), `required_outputs[]`, và `result_json_schema` nhúng trong lệnh giao việc [symphony].
+Giữ cell beehive làm hợp đồng NỘI DUNG (đã dogfood), vay 3 field của RUN_CONTRACT khi fan-out đa-session: `forbidden_paths[]` (đang là hold/reservation — vật hóa vào lệnh giao việc), `required_outputs[]`, và `result_json_schema` nhúng trong lệnh giao việc [symphony].
 
 ### Evolution — luật chung cho mọi schema trên đây
 
@@ -252,8 +252,8 @@ Additive event type + lazy view key (bài học phase-3 của CHÍNH fgOS, nay k
 
 - `agent-context-inherited-governance` (br #297) — R3 E1 F2: field governance kế thừa phát lúc claim, chống compaction/cold-start; R3 vì chạm mọi dispatch, E1 một nguồn chưa outcome.
 - `two-layer-edge-taxonomy` (bd 19-type, chưng thành luật 2 lớp) — R2 E2 F1: lớp blocking đóng-và-bé quyết định ready, lớp semantic mở chở tri thức; E2: bd production + hn tách bảng cùng tinh thần.
-- `judge-verdict-schema-closed` (beegog:semantic-judge-verdict-loop, MỚI @05a131f) — R2 E1 F2: verdict LLM theo schema đóng (`checks[]` bắt buộc `evidence`, cross-check PASS/FAIL nhất quán, văn xuôi tự do = lỗi validate) làm "proof của proof" bên trên verify boolean đã hội tụ ×3. E1: một nguồn, sinh từ hardening nội bộ (bản thân đã sửa một lỗ D7 của chính nó — dấu hiệu cơ chế còn đang settle, chưa đủ chín để R cao hơn).
-- `attempt-history-loop-budget` (beegog:cell-lifetime-budgets-anti-loop, MỚI @05a131f) — R2 E2 F2: sổ append-only mỗi lần thử + ngân sách kiểm tại claim (max_claims/max_failed_attempts/max_same_signature qua `normalizeFailureSignature`); giải bài toán retry-cùng-lỗi-vô-hạn mà `lease_expires_at` (crash-survival) không chạm tới. E2: đi cùng bằng chứng sống — cùng đợt hardening sinh cả `native-codex-wait-discipline` (anti-loop phía chờ) lẫn budget này (anti-loop phía thử-lại), hai mảnh độc lập cùng một nguyên nhân gốc (GH issue thật).
+- `judge-verdict-schema-closed` (beehive:semantic-judge-verdict-loop, MỚI @05a131f) — R2 E1 F2: verdict LLM theo schema đóng (`checks[]` bắt buộc `evidence`, cross-check PASS/FAIL nhất quán, văn xuôi tự do = lỗi validate) làm "proof của proof" bên trên verify boolean đã hội tụ ×3. E1: một nguồn, sinh từ hardening nội bộ (bản thân đã sửa một lỗ D7 của chính nó — dấu hiệu cơ chế còn đang settle, chưa đủ chín để R cao hơn).
+- `attempt-history-loop-budget` (beehive:cell-lifetime-budgets-anti-loop, MỚI @05a131f) — R2 E2 F2: sổ append-only mỗi lần thử + ngân sách kiểm tại claim (max_claims/max_failed_attempts/max_same_signature qua `normalizeFailureSignature`); giải bài toán retry-cùng-lỗi-vô-hạn mà `lease_expires_at` (crash-survival) không chạm tới. E2: đi cùng bằng chứng sống — cùng đợt hardening sinh cả `native-codex-wait-discipline` (anti-loop phía chờ) lẫn budget này (anti-loop phía thử-lại), hai mảnh độc lập cùng một nguyên nhân gốc (GH issue thật).
 
 ## Câu hỏi mở
 
@@ -261,4 +261,4 @@ Additive event type + lazy view key (bài học phase-3 của CHÍNH fgOS, nay k
 2. Ngưỡng bật nhóm ownership (lease trên record): trước hay sau khi same-checkout-multi-session-coordination được port?
 3. `waits-for` + gate-bead của bd (chờ-sự-kiện vật hóa thành node) — có đáng vào lớp blocking của fgOS ngay từ đầu, hay để "chờ gì" của exploring hiện tại quyết?
 4. `data_hash` chọn field nào cho fgOS view (id, status, priority, updated_at như bvr — hay thêm lane/gate)? Quyết lúc có consumer đầu tiên.
-5. **MỚI @05a131f:** `proof-history` (attempts/judge_verdict) có đáng vào kernel record của fgOS ngay từ đầu, hay chờ tới khi fgOS có vòng tự-sửa/re-dispatch thật (bee sinh field này từ đúng nhu cầu đó, không phải trước)? Nghiêng CÓ ĐIỀU KIỆN — cùng nhịp với "ownership chỉ khi multi-session bật" ở câu hỏi 2.
+5. **MỚI @05a131f:** `proof-history` (attempts/judge_verdict) có đáng vào kernel record của fgOS ngay từ đầu, hay chờ tới khi fgOS có vòng tự-sửa/re-dispatch thật (beehive sinh field này từ đúng nhu cầu đó, không phải trước)? Nghiêng CÓ ĐIỀU KIỆN — cùng nhịp với "ownership chỉ khi multi-session bật" ở câu hỏi 2.

@@ -13,7 +13,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { COMMAND_REGISTRY } from '../../src/cli/command-registry.mjs';
-import { DEFAULT_DOMAIN, DOMAINS } from '../../src/state/workflow-stage-graphs.mjs';
+import { DEFAULT_DOMAIN, DOMAINS, discoverableStages } from '../../src/state/workflow-stage-graphs.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SRC_DIR = path.resolve(__dirname, '../../src');
@@ -66,6 +66,33 @@ test('no registry description names a judge* function that no longer exists in s
   assert.deepEqual(offenders, [], `registry prose names retired judge function(s):\n${offenders.join('\n')}`);
 });
 
+// Same shape as definedJudgeNames/the judge* guard above, generalized to the
+// gate-bypass family (tsk-blk, found reviewing tsk-224's own gate-count
+// drift: command-registry.mjs used to name `canAutoApproveValidate`, deleted
+// by coding-planning-validating-gate-redesign D9-D11, and no guard caught
+// it -- this closes that gap the same mechanical way).
+function definedCanAutoApproveNames() {
+  const defined = new Set();
+  const declaration = /(?:export\s+)?(?:async\s+)?(?:function|const|let|class)\s+(canAutoApprove[A-Za-z0-9_]*)\b/g;
+  for (const file of sourceFiles(SRC_DIR)) {
+    const source = fs.readFileSync(file, 'utf8');
+    for (const match of source.matchAll(declaration)) defined.add(match[1]);
+  }
+  return defined;
+}
+
+test('no registry description names a canAutoApprove* function that no longer exists in src/', () => {
+  const defined = definedCanAutoApproveNames();
+  assert.ok(defined.size > 0, 'no canAutoApprove* declarations found under src/ -- this guard needs updating');
+  const offenders = [];
+  for (const { where, text } of describedStrings()) {
+    for (const match of text.matchAll(/\bcanAutoApprove[A-Za-z0-9_]*/g)) {
+      if (!defined.has(match[0])) offenders.push(`${where} names "${match[0]}"`);
+    }
+  }
+  assert.deepEqual(offenders, [], `registry prose names retired canAutoApprove* function(s):\n${offenders.join('\n')}`);
+});
+
 // A stage name the default domain still has FSM edges for but has dropped from
 // its own `stages` array is retired: no new item can land on it, so telling a
 // reader an item sits "at stage <retired>" describes a state they cannot be in.
@@ -95,8 +122,7 @@ test('no registry description names a stage the default domain has retired', () 
 // own `case 'discover':` -- for the default domain that is discovery/exploring.
 // The description must name those, since it is what a caller reads before
 // choosing between `discover` and `plan`.
-test('discover\'s description names the stages its precondition actually accepts', async () => {
-  const { discoverableStages } = await import('../../src/intake/discovery.mjs');
+test('discover\'s description names the stages its precondition actually accepts', () => {
   const entry = COMMAND_REGISTRY.find((e) => e.name === 'discover');
   assert.ok(entry, 'COMMAND_REGISTRY is missing a "discover" entry');
   for (const stage of discoverableStages(DOMAINS[DEFAULT_DOMAIN])) {

@@ -327,7 +327,7 @@ test('e2e stage-clarify+stage-decompose (a) clear+pass-through: --once safely no
 test('e2e stage-clarify (b) unclear verdict: an explicit discover --verdict unclear parks the item in awaiting-human with the exact question; answering resumes it to todo, and --once still never re-judges clarify on its own (D16)', () => {
   const repoRoot = initTempRepo();
   const scriptDir = mkTempDir('fgos-runner-e2e-discovery-unclear-');
-  const question = 'Bạn muốn ưu tiên hiệu năng hay độ chính xác?';
+  const question = '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: Bạn muốn ưu tiên hiệu năng hay độ chính xác?';
 
   assert.equal(fgos(repoRoot, ['init']).status, 0);
   // tsk-qod D1/D2: a fresh item now starts at `discovery` (stages[0])
@@ -430,8 +430,12 @@ test('e2e stage-decompose (b) complex item: an explicit decompose --verdict deco
 
   // Accept childA into the tree (human close via the normal `done` door) —
   // walk the sequential delivered->retrospective->cleanup->done chain
-  // (work-item-status-delivered-retrospective-cleanup D1/D2/D10).
-  assert.equal(fgos(repoRoot, ['move', childA.id, '--to', 'delivered']).status, 0);
+  // (work-item-status-delivered-retrospective-cleanup D1/D2/D10). This
+  // proves the FSM lifecycle chain itself, not merge mechanics — childA's
+  // own real fgw/<id> branch is deliberately never merged onto trunk here,
+  // so tsk-5dk's move-refusal check needs --override-reason (its intended
+  // escape hatch for exactly this kind of non-merge delivery).
+  assert.equal(fgos(repoRoot, ['move', childA.id, '--to', 'delivered', '--override-reason', 'e2e fixture: lifecycle-chain test, not a real merge']).status, 0);
   assert.equal(fgos(repoRoot, ['move', childA.id, '--to', 'retrospective']).status, 0);
   assert.equal(fgos(repoRoot, ['move', childA.id, '--to', 'cleanup']).status, 0);
   assert.equal(fgos(repoRoot, ['move', childA.id, '--to', 'done']).status, 0);
@@ -443,8 +447,9 @@ test('e2e stage-decompose (b) complex item: an explicit decompose --verdict deco
   assert.equal(view.work[childB.id].status, 'awaiting-approval');
   assert.equal(view.work[submitted.id].status, 'todo', 'the root is still blocked — childB is proposed, not done, yet');
 
-  // childB walks the same sequential chain before done.
-  assert.equal(fgos(repoRoot, ['move', childB.id, '--to', 'delivered']).status, 0);
+  // childB walks the same sequential chain before done (same non-merge
+  // override reasoning as childA above).
+  assert.equal(fgos(repoRoot, ['move', childB.id, '--to', 'delivered', '--override-reason', 'e2e fixture: lifecycle-chain test, not a real merge']).status, 0);
   assert.equal(fgos(repoRoot, ['move', childB.id, '--to', 'retrospective']).status, 0);
   assert.equal(fgos(repoRoot, ['move', childB.id, '--to', 'cleanup']).status, 0);
   assert.equal(fgos(repoRoot, ['move', childB.id, '--to', 'done']).status, 0);
@@ -561,7 +566,7 @@ test('e2e stage-discovery: --once advances the item to exploring and parks it in
   const featureDir = 'docs/history/discovery-dispatch-unclear-item';
 
   assert.equal(fgos(repoRoot, ['init']).status, 0);
-  writeRunnerConfig(repoRoot, writeResearchWorkerExecutor(scriptDir, featureDir, { clear: false, question: 'Which retry backoff strategy?' }));
+  writeRunnerConfig(repoRoot, writeResearchWorkerExecutor(scriptDir, featureDir, { clear: false, question: '## Context\n\nThe worker needs to pick a retry backoff strategy for the research step.\n\n## Why this matters\n\nThis directly affects the outcome: which retry backoff strategy?' }));
 
   add(repoRoot, 'item-research-unclear', { stage: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
 
@@ -572,7 +577,7 @@ test('e2e stage-discovery: --once advances the item to exploring and parks it in
   const item = view.work['item-research-unclear'];
   assert.equal(item.stage, 'exploring', 'tsk-30v D2/D3: unclear no longer parks in place -- it advances stage to exploring');
   assert.equal(item.status, 'awaiting-human', 'an unclear verdict parks the item, matching the interactive driver path');
-  assert.equal(view.gates['item-research-unclear'].ask, 'Which retry backoff strategy?');
+  assert.equal(view.gates['item-research-unclear'].ask, '## Context\n\nThe worker needs to pick a retry backoff strategy for the research step.\n\n## Why this matters\n\nThis directly affects the outcome: which retry backoff strategy?');
 });
 
 test('e2e stage-discovery fail-safe: a worker that crashes leaves the item at stage:discovery, status:todo for the next sweep to retry -- never stuck, never silently advanced', () => {
@@ -734,8 +739,9 @@ test('e2e full journey: item1 (no deps) -> awaiting-approval with a worker commi
       'work.add:item2:add',
       'work.move:item1:doing',
       'work.outcome:item1:predicted',
-      'capacity.dispatch:item1:add', // D8, tsk-62v: dispatch announce/audit entry
+      'executor.dispatch:item1:add', // D8, tsk-62v: dispatch announce/audit entry
       'work.move:item1:awaiting-approval',
+      'work.handoff:item1:reviewer', // D18: moveWork's own side effect on reaching awaiting-approval, not a second writer
       'work.outcome:item1:actual',
     ],
   );
@@ -830,8 +836,8 @@ test('e2e verify-red: a worker that commits the wrong thing fails goal-check on 
     'work.outcome:predicted',
     // D8, tsk-62v: one dispatch announce/audit entry per attempt — two
     // retry attempts run before the item parks to blocked.
-    'capacity.dispatch:item-red',
-    'capacity.dispatch:item-red',
+    'executor.dispatch:item-red',
+    'executor.dispatch:item-red',
     'work.move:blocked',
     'work.outcome:actual',
     'work.friction:item-red',
@@ -904,7 +910,7 @@ test('e2e crash-idempotency: runner killed mid-item (after doing, before propose
 
 // --- --watch (str7-str8-priority-intent D8) ---------------------------------
 // Async spawn+kill pattern (not spawnSync, which blocks until exit and
-// cannot deliver a mid-run signal) mirrors test/runner/session-identity
+// cannot deliver a mid-run signal) mirrors test/util/session-identity
 // .test.mjs's real spawned-process test (~lines 87-139): spawn, await a
 // stdout marker via a Promise, act on the live child, assert, SIGKILL in a
 // `finally` so a bug here fails loudly instead of hanging the suite.

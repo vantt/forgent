@@ -27,27 +27,16 @@ verb (one-door-write, CTR001).
 
 2. **Ask the item.** Run:
 
+   See `../_shared/fgos-cli-fallback.md`, substituting `<verb-cmd>` with:
+
    ```
-   # fgos CLI fallback (tsk-1no D3)
-   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
-   if [ -f "$FGOS_BIN" ]; then
-     node "$FGOS_BIN" ask <id> --text "<text>" --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-   elif command -v fgos >/dev/null 2>&1; then
-     fgos ask <id> --text "<text>" --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
-   else
-     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
-     exit 1
-   fi
+   ask <id> --text "<text>" --dir "${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}"
    ```
 
    substituting the id and text parsed in step 1, with `<text>`
-   double-quoted so it survives shell parsing as a single argument. Always
-   use the literal `${CLAUDE_PROJECT_DIR}` substitution shown above, never
-   a relative path — an installed plugin's files run from a copied cache
-   location, not from this repo checkout, so a relative path would resolve
-   to the wrong place or fail outright.
+   double-quoted so it survives shell parsing as a single argument.
 
-   `--dir` (tsk-56t): the session may already be inside the claimed item's
+   `--dir`: the session may already be inside the claimed item's
    worktree (`/fgOS:pick` switches into it), which never carries its own
    `.fgos/` by design (ADR0020) — `${CLAUDE_PROJECT_DIR}` still resolves
    to the main checkout even from inside that worktree (it survives an

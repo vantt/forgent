@@ -45,7 +45,7 @@ Commit thật đã đưa nội dung lên `main`:
 - `75e3965` bổ sung `root-drift` vào danh sách #7 (check được đăng ký sau khi
   tsk-1qm chốt spec — drift nhỏ còn sót, phát hiện trong audit 2026-08-03)
 
-## Quyết định khi đóng milestone
+## Locked decisions
 
 **D1 — nới điều kiện done từ "tsk-1qm = done" sang "tsk-1qm đã resolved".**
 

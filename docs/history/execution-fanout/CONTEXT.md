@@ -27,7 +27,7 @@ chọn wave, vòng bắn/đợi/gom, và chỗ nối để năng lực này tự
 **Ngoài phạm vi, không có item:** fan-out A (gather) — đó là `tsk-5kn`;
 ô review-class của bee; `fgos-runner` chạy được thật.
 
-## Quyết định đã khoá
+## Locked decisions
 
 | D-ID | Quyết định | seq |
 |---|---|---|

@@ -11,7 +11,7 @@ thật, tài liệu trong 2 how-to doc hiện có). Không đổi bất kỳ gat
 claim-verify-return-approve nào của item cha — phạm vi giới hạn nghiêm ngặt
 ở việc sinh giá trị cho 1 field.
 
-## Quyết định đã chốt
+## Locked decisions
 
 Toàn bộ thiết kế đã chốt qua phiên `fgos-coding-shaping` trước khi item này
 được submit — xem

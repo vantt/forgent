@@ -111,3 +111,102 @@ to understanding what to build.
 ```
 verify: git merge-base --is-ancestor 687abfb8 main && npm test
 ```
+
+## Round 2 — 2026-08-18 (fgos-researching, stage `discovery`, tsk-3u8)
+
+**Asked:** tsk-3u8's own per-instance follow-up for the `d984e9ed`
+(`docs(tsk-1vi): retrospective synthesis`) row of Round 1's table — parent 1
+`93a9859b` (tsk-57q's own prior retrospective-synthesis), parent 2
+`8dd4b5be` (`docs(tsk-66t): add Iron Law failing-test-first evidence`).
+Two open questions per the item: (1) is tsk-66t's Iron Law evidence doc
+genuinely intact on main today, (2) did tsk-1vi's own retrospective-
+synthesis doc write survive in the same commit and get properly tagged via
+`fgos compound`, or was it silently dropped?
+
+### Checked
+
+- `git diff 93a9859b d984e9ed --stat` → the merge added exactly 7 files
+  beyond parent1: `bin/fgos.mjs`, `docs/explanation/gate-bypass-design.md`,
+  `docs/explanation/why-merge-next-auto-syncs-blockedonsync-roots.md`,
+  `docs/history/tsk-66t-sync-root-clean-tree-gate/iron-law-evidence.md`,
+  `docs/history/tsk-66t-sync-root-clean-tree-gate/plan.md`,
+  `docs/reference/fgos-sync-root-outcome-shape.md`, `test/cli/fgos.test.mjs`.
+- `git diff 8dd4b5be72751c50396cceef367c25ce27b0f51b:docs/history/tsk-66t-sync-root-clean-tree-gate/iron-law-evidence.md main:docs/history/tsk-66t-sync-root-clean-tree-gate/iron-law-evidence.md`
+  → **empty diff**. tsk-66t's Iron Law evidence doc is byte-identical on
+  `main` today to the original `8dd4b5be` commit. Requirement (1) resolved:
+  **intact, no corruption.**
+- Same empty-diff check on `docs/history/tsk-66t-sync-root-clean-tree-gate/plan.md`
+  found two later cosmetic renames (`fgos-exploring`→`fgos-coding-exploring`,
+  `fgos-validating`→`fgos-coding-validating`), part of this repo's later
+  skill-namespace rename, not corruption.
+- `git diff 93a9859b d984e9ed -- bin/fgos.mjs` → the merge's 21-line
+  `bin/fgos.mjs` addition was tsk-66t's own sync-root dirty-tree gate
+  (`StoreError ... 'is not clean'` check + `{picked, blocked: 'dirty-tree',
+  ...}` shape). `grep -n "tsk-66t" bin/fgos.mjs` on main today → no hits
+  (expected: this repo's own rule bans plan/task IDs in code comments, a
+  later cleanup stripped the token, not the code). `grep -n "is not
+  clean\"|dirty-tree\|buildOwnFileSet\|isMainTreeClean" bin/fgos.mjs` and
+  `src/verbs/merge/*.mjs` on main today → both pieces of logic present,
+  relocated by a later verb-extraction refactor into
+  `src/verbs/merge/sync-root.mjs:249-251` (the dirty-tree gate itself) and
+  `src/verbs/merge/merge.mjs:139-146` (the `dirty-tree` blocked-shape
+  catch, `tsk-66t` comment token still present there verbatim). Functional
+  behavior intact, only the module location moved.
+- `fgos show tsk-66t --json` → item status `cleanup`/stage `executing` (a
+  live, non-orphaned item — consistent with its work having actually
+  landed and progressed through the normal lifecycle since).
+- `git diff 93a9859b d984e9ed -- docs/explanation/gate-bypass-design.md`
+  and the same diff against parent2 (`8dd4b5be`) → **identical 59-line
+  addition on both sides**: the merge added a new
+  `## A mechanical check is only as live as the branch importing it
+  (D7/D8, tsk-1vi)` section plus `tsk-1vi` added to the frontmatter
+  `source_capture_ids: [tsk-6bx, tsk-1ds, tsk-1vi]`. This is tsk-1vi's own
+  retrospective-synthesis content, genuinely written into the merge
+  commit, not one side's pre-existing content silently winning over the
+  other's loss.
+- `git show main:docs/explanation/gate-bypass-design.md` vs. the commit
+  version → same D7/D8 section present verbatim on `main` today.
+- `fgos show tsk-1vi --json` → `outcome.docType: "explanation"`,
+  `outcome.docPath: "docs/explanation/gate-bypass-design.md"` — the fgOS
+  state itself records this exact file as tsk-1vi's compounded doc,
+  confirming it was tagged via `fgos compound`, not silently dropped.
+  Requirement (2) resolved: **doc write survived and is properly tagged.**
+- `grep -rl "tsk-66t" test/` → tsk-66t's own test coverage (originally in
+  the single `test/cli/fgos.test.mjs` the merge touched) survives today,
+  redistributed by a later, unrelated commit (`a20c69ef`, tsk-3um: "split
+  the CLI suite into ten files") into `test/cli/fgos-merge.test.mjs`,
+  `fgos-approve.test.mjs`, `fgos-return.test.mjs`, `fgos-move.test.mjs`,
+  and `test/cli/helpers/fgos-cli-harness.mjs`. Not lost, just relocated by
+  routine repo maintenance unrelated to the merge-corruption pattern.
+
+### Findings
+
+Both open questions from tsk-3u8's description resolve to **non-issue**:
+the suspicious 2-parent merge shape (same stray-`MERGE_HEAD`-absorption
+class tsk-2oy's root-cause fix addressed) did **not** actually cause
+content loss in this specific instance, unlike the `tsk-4v6`/`687abfb8`
+and `tsk-2x9`/`tsk-1r3` instances Round 1 confirmed as real losses. Every
+file the merge is supposed to carry (tsk-66t's evidence doc + its
+functional code, tsk-1vi's own D7/D8 write) is present and correct on
+`main` today, with only routine later refactors (verb extraction,
+skill-namespace rename, test-suite split) moving code/tests around —
+never dropping content.
+
+### Still open
+
+None for this instance. The wider audit Round 1 flagged (every
+`delivered`/`retrospective`/`cleanup`/`done` item's `branchHeadAtReturn`
+vs. main ancestry) remains separate, real follow-on work tracked
+elsewhere, not this item's scope.
+
+## Verdict
+
+**Clear.** Both requirement (1) and requirement (2) from tsk-3u8's own
+description are answered from direct evidence (`git diff`/`git show`
+against real commit SHAs, `fgos show` against live state) — no assumption,
+no plausibility reasoning. This is a confirmed non-issue: close as
+resolved/verified, not a code fix.
+
+```
+verify: npm test
+```

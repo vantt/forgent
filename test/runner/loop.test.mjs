@@ -286,12 +286,17 @@ test('runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> 
   // worktree torn down, branch survives (D4 proposal artifact)
   assert.deepEqual(fs.readdirSync(worktreeDir), []);
   // one door: the log carries exactly the runner's writes — the worker
-  // never touched .fgos/ (add + claim + predicted + capacity-dispatch
-  // audit (D8, tsk-62v) + propose + actual, nothing else)
+  // never touched .fgos/ (add + claim + predicted + executor-dispatch
+  // audit (D8, tsk-62v) + propose + actual, nothing else). The one
+  // addition since this test was first written, `work.handoff:reviewer`,
+  // is not a second writer — it is `moveWork`'s own D18 side effect,
+  // fired synchronously inside the SAME `to: 'awaiting-approval'` call
+  // the runner already made (`coding`'s default domain declares a
+  // `roleGraph`), never a write the worker or a second door performed.
   const events = readRawEvents(dir);
   assert.deepEqual(
     events.map((e) => (e.type === 'work.outcome' ? `work.outcome:${e.payload.predicted ? 'predicted' : 'actual'}` : `${e.type}:${e.payload.to ?? 'add'}`)),
-    ['work.add:add', 'work.move:doing', 'work.outcome:predicted', 'capacity.dispatch:add', 'work.move:awaiting-approval', 'work.outcome:actual'],
+    ['work.add:add', 'work.move:doing', 'work.outcome:predicted', 'executor.dispatch:add', 'work.move:awaiting-approval', 'work.handoff:reviewer', 'work.outcome:actual'],
   );
   // predicted is written right at claim time, before dispatch ever runs
   const predictedEvent = events.find((e) => e.type === 'work.outcome' && e.payload.predicted);
@@ -304,9 +309,9 @@ test('runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> 
   assert.equal(actualEvent.payload.actual.aheadCount, 1);
 });
 
-// --- capacity-aware dispatch announce/audit (D8, tsk-62v) ---------------
+// --- executor-aware dispatch announce/audit (D8, tsk-62v) ---------------
 
-test('runOnce logs the "<capacityId> — <provider> — <model>" announce line and appends a matching capacity.dispatch audit event', async () => {
+test('runOnce logs the "<executorId> — <provider> — <model>" announce line and appends a matching executor.dispatch audit event', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-announce' });
   const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
@@ -319,8 +324,8 @@ test('runOnce logs the "<capacityId> — <provider> — <model>" announce line a
     `expected an announce line in: ${JSON.stringify(logs)}`,
   );
   const events = readRawEvents(dir);
-  const auditEvent = events.find((e) => e.type === 'capacity.dispatch');
-  assert.ok(auditEvent, 'expected a capacity.dispatch event in the log');
+  const auditEvent = events.find((e) => e.type === 'executor.dispatch');
+  assert.ok(auditEvent, 'expected a executor.dispatch event in the log');
   // baseCommit/headRef (tsk-4hl): asserted by shape, not exact value -- both
   // are real per-run git reads (a fresh worktree's own HEAD/branch), so a
   // literal SHA/branch string would be non-deterministic across runs. This
@@ -332,7 +337,7 @@ test('runOnce logs the "<capacityId> — <provider> — <model>" announce line a
   const { baseCommit, headRef, ...rest } = auditEvent.payload;
   assert.deepEqual(rest, {
     id: 'item-announce',
-    capacityId: 'fgos-coding-implement',
+    executorId: 'fgos-coding-implement',
     provider: process.execPath,
     // command (tsk-33w D9): equal to provider here because this fixture's
     // config never overrides either -- both fall back to the same resolved
@@ -348,20 +353,21 @@ test('runOnce logs the "<capacityId> — <provider> — <model>" announce line a
   assert.equal(listWork(dir).work['item-announce'].status, 'awaiting-approval');
 });
 
-test('runOnce\'s capacity.dispatch audit event records the REAL spawned command even when a capacity declares a different provider label (tsk-33w D9: the audit must not lie when the two diverge)', async () => {
+test('runOnce\'s executor.dispatch audit event records the REAL spawned command even when a executor declares a different provider label (tsk-33w D9: the audit must not lie when the two diverge)', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-command-mismatch' });
   const scriptPath = writeCommittingExecutor(scriptDir, counterFile);
-  // fgos-coding-implement is the executing-stage capacityId a plain coding
-  // work item resolves to (dispatch.mjs's capacityIdForWork) -- overriding
-  // it here is what makes byCapacity win over the global executor below.
+  // fgos-coding-implement is the executing-stage executorId a plain coding
+  // work item resolves to (dispatch.mjs's executorIdForWork) -- overriding
+  // it here is what makes byExecutor win over the global executor below.
   const config = {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}', '--model', '{model}'] },
-    capacities: {
+    executors: {
       'fgos-coding-implement': {
-        kind: 'task',
+        kind: 'agent',
         command: process.execPath,
         args: [scriptPath, '{prompt}', '--model', '{model}'],
+        allowCrossProvider: true,
         // a declared label that is NOT the real command -- exactly the
         // shape the item's own description warns about: a session reading
         // only `provider` back from the audit log would wrongly conclude
@@ -376,8 +382,8 @@ test('runOnce\'s capacity.dispatch audit event records the REAL spawned command 
   await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   const events = readRawEvents(dir);
-  const auditEvent = events.find((e) => e.type === 'capacity.dispatch');
-  assert.ok(auditEvent, 'expected a capacity.dispatch event in the log');
+  const auditEvent = events.find((e) => e.type === 'executor.dispatch');
+  assert.ok(auditEvent, 'expected a executor.dispatch event in the log');
   assert.equal(auditEvent.payload.provider, 'claude', 'provider stays the declared label');
   assert.equal(auditEvent.payload.command, process.execPath, 'command must be the REAL spawned executable, not the label');
   assert.notEqual(auditEvent.payload.command, auditEvent.payload.provider, 'this is precisely the divergence the item exists to close');
@@ -660,6 +666,143 @@ test('two-tier cap: a root with three ready leaves dispatches maxLeavesPerRoot p
   assert.equal(countRuns(counterFile), 3);
 });
 
+// --- the shared worker-slot ceiling bounds the wave (D6/D7/D8) ------------
+
+/** Occupy `count` execution-lane slots with items parked at `doing`. `role:
+ * 'session'` keeps startupReap's own stale-claim reclaim off them (it only
+ * ever reaps a claim the runner itself made), so they stay occupied for the
+ * whole run — the same shape test/state/worker-slots.test.mjs's own
+ * occupants use. */
+function occupySlots(dir, count) {
+  for (let n = 0; n < count; n++) {
+    const id = `busy-${n}`;
+    seedItem(dir, { id });
+    moveWork(dir, { id, to: 'doing', expectedStatus: 'todo', role: 'session' });
+  }
+}
+
+function writeCeiling(repoRoot, ceiling) {
+  fs.writeFileSync(path.join(repoRoot, '.fgos', 'config.json'), JSON.stringify({ workerSlots: { ceiling } }));
+}
+
+test('no workerSlots ceiling configured leaves the drain-run exactly as it was — occupancy is not a ceiling on its own', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  occupySlots(dir, 20);
+  seedItem(dir, { id: 'root-1' });
+  const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.outcome, 'drained');
+  assert.equal(result.exitCode, 0);
+  assert.equal(listWork(dir).work['root-1'].status, 'awaiting-approval');
+  assert.equal(countRuns(counterFile), 1);
+});
+
+test('the drain-run asks for worker-slot room before dispatching: a full ceiling ends the run cleanly instead of halting on a claim refusal', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  occupySlots(dir, 2);
+  writeCeiling(repoRoot, 2);
+  seedItem(dir, { id: 'root-1' });
+  const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  // Refusal is an answer, not an error: no worker was ever stood up (D6), so
+  // there is nothing to halt on and nothing for a caller to treat as failure.
+  assert.equal(result.outcome, 'idle');
+  assert.equal(result.exitCode, 0);
+  assert.deepEqual(result.dispatched, []);
+  assert.equal(countRuns(counterFile), 0, 'no worker was spawned while the lane was full');
+  assert.equal(listWork(dir).work['root-1'].status, 'todo', 'the item is left for a later poll, never parked or blocked');
+});
+
+test('an overshooting batch lands soft: the member the ceiling gate refuses is left for a later poll, and the drain-run neither halts nor exits non-zero', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  occupySlots(dir, 2);
+  writeCeiling(repoRoot, 3); // exactly one free slot for a two-member wave
+  seedItem(dir, { id: 'root-1' });
+  seedItem(dir, { id: 'root-2' });
+  const config = { ...configFor(writeCommittingExecutor(scriptDir, counterFile)), parallel: { maxRoots: 2, maxLeavesPerRoot: 1 } };
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.exitCode, 0, 'a ceiling refusal mid-batch is not a halt');
+  assert.equal(result.dispatched.filter((d) => d.outcome === 'halted').length, 0);
+  // The refused member is not lost: the next poll finds a freed slot and
+  // dispatches it, so the whole batch still lands — just not in one wave.
+  assert.equal(listWork(dir).work['root-1'].status, 'awaiting-approval');
+  assert.equal(listWork(dir).work['root-2'].status, 'awaiting-approval');
+  assert.equal(countRuns(counterFile), 2);
+});
+
+// The discovery sweep stands a REAL worker process up but never claims the
+// item — it stays `todo` and only moves to `doing` inside the worker — so
+// occupancy, which counts `doing`, cannot see that process at all. Left
+// ungated it ran even while the lane was full, and `fgos slots` under-
+// reported the machine every other launcher was deciding against.
+test('the discovery sweep obeys the shared ceiling too: a full lane spawns no research worker', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  occupySlots(dir, 2);
+  writeCeiling(repoRoot, 2);
+  seedItem(dir, { id: 'item-research-blocked', stage: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
+  const body = JSON.stringify({ clear: true, verify: 'npm test -- research' });
+  const config = configFor(writeDiscoveryVerdictExecutor(scriptDir, counterFile, body));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(countRuns(counterFile), 0, 'no research worker may be stood up while the lane is full');
+  assert.equal(result.exitCode, 0, 'a refusal is an answer, not a failure');
+  const item = listWork(dir).work['item-research-blocked'];
+  assert.equal(item.stage, 'discovery', 'the item is left exactly where it was, for a later poll');
+  assert.equal(item.status, 'todo');
+});
+
+test('the discovery sweep still runs normally when the lane has room', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  occupySlots(dir, 1);
+  writeCeiling(repoRoot, 4);
+  seedItem(dir, { id: 'item-research-ok', stage: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
+  const body = JSON.stringify({ clear: true, verify: 'npm test -- research' });
+  const config = configFor(writeDiscoveryVerdictExecutor(scriptDir, counterFile, body));
+
+  await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(countRuns(counterFile), 1, 'room means the sweep is untouched');
+  assert.equal(listWork(dir).work['item-research-ok'].stage, 'planning');
+});
+
+// "Nothing to do" and "work is waiting behind a full lane" are opposite
+// situations that used to return the same envelope and log the same line —
+// one line after printing the refusal that contradicted it. A caller polling
+// `idle` could not tell a quiet backlog from a wedged one.
+test('an idle run says WHY it was idle: an empty frontier and a full lane are not the same answer', async () => {
+  const full = setup();
+  occupySlots(full.dir, 2);
+  writeCeiling(full.repoRoot, 2);
+  seedItem(full.dir, { id: 'root-waiting' });
+  const fullResult = await runOnce({
+    repoRoot: full.repoRoot,
+    config: configFor(writeCommittingExecutor(full.scriptDir, full.counterFile)),
+    worktreeDir: full.worktreeDir,
+    log: noLog,
+  });
+
+  assert.equal(fullResult.outcome, 'idle');
+  assert.equal(fullResult.reason, 'worker-slot-ceiling', 'work IS waiting — it just cannot start');
+
+  const quiet = setup();
+  const quietResult = await runOnce({
+    repoRoot: quiet.repoRoot,
+    config: configFor(writeCommittingExecutor(quiet.scriptDir, quiet.counterFile)),
+    worktreeDir: quiet.worktreeDir,
+    log: noLog,
+  });
+
+  assert.equal(quietResult.outcome, 'idle');
+  assert.equal(quietResult.reason, 'frontier-empty', 'genuinely nothing to do');
+});
+
 // --- D3 branch targeting: leaf fork-from-root-tip, root branch-reuse ------
 
 test('cell fan-out-parallel-9: a leaf whose root branch already carries a planted commit forks its own worktree from that root tip, not from main', async () => {
@@ -918,8 +1061,11 @@ test('live tee: .fgos/logs is never committed (live tee did not change the commi
   assert.ok(fs.existsSync(path.join(dir, 'logs', 'item-live-clean.log')));
   // main only ever gains the worker's own commit (produced by the committing
   // executor) — .fgos/logs never enters a git object at all, tracked or not.
+  // .fgos/events.jsonl itself IS expected to be committed here (tsk-1ji:
+  // claimWork's own opportunistic periodic checkpoint runs on every claim),
+  // so this only asserts the live-tee surface, not .fgos as a whole.
   const tracked = execFileSync('git', ['ls-files'], { cwd: repoRoot, encoding: 'utf8' });
-  assert.doesNotMatch(tracked, /\.fgos/, 'no .fgos path is ever committed');
+  assert.doesNotMatch(tracked, /\.fgos\/logs/, 'no .fgos/logs path is ever committed');
 });
 
 // --- anti-loop: max-visits parks the item OFF the frontier ----------------
@@ -1217,6 +1363,50 @@ test('startup reap: a zero-ahead root branch whose only descendant is already do
   assert.equal(branchExists(repoRoot, 'fgw/root-c'), false);
 });
 
+test('startup reap: a wontfix branch with real commits ahead and no open descendants is force-deleted', async () => {
+  const { repoRoot, dir, worktreeDir } = setup();
+  const wt = createWorktree(repoRoot, 'wontfix-a', { worktreeDir });
+  fs.writeFileSync(path.join(wt.path, 'wontfix.txt'), 'abandoned work\n');
+  execFileSync('git', ['add', 'wontfix.txt'], { cwd: wt.path });
+  execFileSync('git', ['commit', '-q', '-m', 'wontfix work'], { cwd: wt.path });
+  removeWorktree(repoRoot, wt.path);
+  seedItem(dir, { id: 'wontfix-a', status: 'wontfix' });
+
+  const config = {
+    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 30000,
+  };
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.deepEqual(result.reap.pruned, ['fgw/wontfix-a']);
+  assert.equal(branchExists(repoRoot, 'fgw/wontfix-a'), false);
+});
+
+test('startup reap: a wontfix branch with an open descendant is kept, not pruned', async () => {
+  const { repoRoot, dir, worktreeDir } = setup();
+  const wt = createWorktree(repoRoot, 'wontfix-root', { worktreeDir });
+  fs.writeFileSync(path.join(wt.path, 'wontfix.txt'), 'abandoned work\n');
+  execFileSync('git', ['add', 'wontfix.txt'], { cwd: wt.path });
+  execFileSync('git', ['commit', '-q', '-m', 'wontfix work'], { cwd: wt.path });
+  removeWorktree(repoRoot, wt.path);
+  seedItem(dir, { id: 'wontfix-root', status: 'wontfix' });
+  seedItem(dir, { id: 'child-open', parent: 'wontfix-root', status: 'doing' });
+
+  const config = {
+    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 30000,
+  };
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.deepEqual(result.reap.pruned, []);
+  assert.deepEqual(result.reap.kept, [{ branch: 'fgw/wontfix-root', aheadCount: 1 }]);
+  assert.equal(branchExists(repoRoot, 'fgw/wontfix-root'), true);
+});
+
 // --- CAS conflict on the runner's own write -> clean halt, exit 3 ---------
 
 test('state-conflict: a racing write under the runner\'s claim makes its own CAS fail -> cleanup, clean halt, exit 3', async () => {
@@ -1381,6 +1571,64 @@ test('tsk-535 D4: a fgos-discovered block with no description falls back to the 
   assert.equal(discovered[0].description, 'Wire retry metrics into the dashboard');
 });
 
+test('tsk-2ck: a fgos-discovered block with an out-of-vocabulary risk (e.g. "medium") is coerced to derived.risk, creating the item instead of dropping it', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-happy' });
+  const body = JSON.stringify({
+    title: 'Fix crash in parser',
+    kind: 'bug',
+    risk: 'medium',
+  });
+  const config = configFor(writeDiscoveringExecutor(scriptDir, counterFile, [body]));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
+  const view = listWork(dir);
+  const discovered = Object.values(view.work).filter((w) => w.discoveredFrom === 'item-happy');
+  assert.equal(discovered.length, 1, 'item was created instead of being silently dropped');
+  assert.equal(discovered[0].kind, 'bug');
+  assert.equal(discovered[0].risk, 'standard', 'out-of-vocabulary risk "medium" was coerced to derived.risk');
+});
+
+test('tsk-2ck: a fgos-discovered block with an out-of-vocabulary kind is coerced to derived.kind, creating the item instead of dropping it', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-happy' });
+  const body = JSON.stringify({
+    title: 'Fix crash in parser',
+    kind: 'superbug',
+    risk: 'light',
+  });
+  const config = configFor(writeDiscoveringExecutor(scriptDir, counterFile, [body]));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
+  const view = listWork(dir);
+  const discovered = Object.values(view.work).filter((w) => w.discoveredFrom === 'item-happy');
+  assert.equal(discovered.length, 1, 'item was created instead of being silently dropped');
+  assert.equal(discovered[0].risk, 'light');
+  assert.equal(discovered[0].kind, 'bug', 'out-of-vocabulary kind "superbug" was coerced to derived.kind');
+});
+
+test('tsk-2ck: a fgos-discovered block with absent kind and risk falls back to derived.kind and derived.risk', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  seedItem(dir, { id: 'item-happy' });
+  const body = JSON.stringify({
+    title: 'Fix crash in parser',
+  });
+  const config = configFor(writeDiscoveringExecutor(scriptDir, counterFile, [body]));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
+  const view = listWork(dir);
+  const discovered = Object.values(view.work).filter((w) => w.discoveredFrom === 'item-happy');
+  assert.equal(discovered.length, 1);
+  assert.equal(discovered[0].kind, 'bug');
+  assert.equal(discovered[0].risk, 'standard');
+});
+
 test('wgi-8: a malformed fgos-discovered block is skipped (fail-safe) — the dispatch still proposes and no item is created', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-happy' });
@@ -1491,7 +1739,11 @@ test('S11: a discovery block title with embedded newlines cannot forge extra log
   // string. The bound lands before the crafted newline, which means the forged
   // suffix cannot reach the stored title either — the same property this test
   // already asserts for the log line.
-  assert.equal(discovered[0].title, 'A'.repeat(MAX_TITLE_LENGTH), 'the stored title is bounded at the write door');
+  assert.equal(
+    discovered[0].title,
+    `${'A'.repeat(MAX_TITLE_LENGTH - 1)}…`,
+    'the stored title is bounded at the write door, with a trailing ellipsis marking the cut',
+  );
   assert.ok(!discovered[0].title.includes('FORGED'), 'the bounded title never reaches the forged suffix');
   assert.equal(discovered[0].title.split('\n').length, 1, 'the stored title carries no embedded newline');
 
@@ -1740,7 +1992,8 @@ test('tsk-30v: DISCOVERY DISPATCH sweep advances discovery -> planning on a clea
 test('tsk-4v6/tsk-30v: DISCOVERY DISPATCH sweep advances the item to exploring AND parks it on an unclear verdict, matching the interactive driver path', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-research-unclear', stage: 'discovery' });
-  const body = JSON.stringify({ clear: false, question: 'Which retry backoff strategy should this follow?' });
+  const question = '## Context\n\nThe research worker needs a retry backoff strategy for this item.\n\n## Why this matters\n\nThis directly affects the outcome: which retry backoff strategy should this follow?';
+  const body = JSON.stringify({ clear: false, question });
   const config = configFor(writeDiscoveryVerdictExecutor(scriptDir, counterFile, body));
 
   await runOnce({ repoRoot, config, worktreeDir, log: noLog });
@@ -1749,7 +2002,7 @@ test('tsk-4v6/tsk-30v: DISCOVERY DISPATCH sweep advances the item to exploring A
   const item = view.work['item-research-unclear'];
   assert.equal(item.stage, 'exploring', 'tsk-30v D2/D3: unclear no longer parks in place -- stage advances to exploring');
   assert.equal(item.status, 'awaiting-human', 'unclear verdict parks the item, matching resolveDiscovery\'s session-role behavior');
-  assert.equal(view.gates?.['item-research-unclear']?.ask, 'Which retry backoff strategy should this follow?');
+  assert.equal(view.gates?.['item-research-unclear']?.ask, question);
 });
 
 test('tsk-4v6: DISCOVERY DISPATCH sweep never advances the item when a real commit lands but no verdict fence is reported — the exact bug this item fixes', async () => {

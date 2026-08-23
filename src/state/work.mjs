@@ -9,7 +9,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { DOMAINS, DEFAULT_DOMAIN, getDomain, classificationVocabulary } from './workflow-stage-graphs.mjs';
+import { DOMAINS, DEFAULT_DOMAIN, getDomain, classificationVocabulary, roleGraphFor } from './workflow-stage-graphs.mjs';
 
 /** Error raised by this module. `category` is the CLI exit-code contract (R4). */
 export class WorkValidationError extends Error {
@@ -53,12 +53,17 @@ export const MAX_TITLE_LENGTH = 100;
  * past it. Anything already short enough — and any non-string, which
  * validateWorkShape is still the one to reject — is returned untouched, so
  * this is safe to apply ahead of validation on every path.
+ *
+ * When truncation actually fires, a trailing '…' marks the cut so a title
+ * never reads as if it finished naturally — reserved out of the bound
+ * itself (not appended on top of it), so the result stays <= MAX_TITLE_LENGTH.
  */
 export function truncateTitle(title) {
   if (typeof title !== 'string' || title.length <= MAX_TITLE_LENGTH) return title;
-  const cut = title.slice(0, MAX_TITLE_LENGTH);
+  const budget = MAX_TITLE_LENGTH - 1;
+  const cut = title.slice(0, budget);
   const lastSpace = cut.lastIndexOf(' ');
-  return (lastSpace > 0 ? cut.slice(0, lastSpace) : cut).trim();
+  return `${(lastSpace > 0 ? cut.slice(0, lastSpace) : cut).trim()}…`;
 }
 
 /**
@@ -76,11 +81,20 @@ export function truncateTitle(title) {
  * main tree" (the sole trigger for RUL12 dependent-open); `retrospective`
  * is the batched learning-synthesis step (formerly the `compound-learn`
  * stage, now retired); `cleanup` is a TTL-bounded worktree-reclaim park —
- * see status-fsm.mjs for the full transition edges). Owned here (schema owns
+ * see status-fsm.mjs for the full transition edges). Extended by
+ * work-item-backlog-status D1/D3 with `backlog`, placed FIRST, ahead of
+ * `todo`: an idea not yet committed to work, as opposed to `todo`'s
+ * "committed, ready to start". Like the four tail-segment statuses, it is a
+ * universal, domain-agnostic status no domain may relabel (0027's own
+ * framing, applied at the front of the lifecycle instead of the tail); it
+ * carries its own `statusCategory` (`'backlog'`, already reserved in
+ * STATUS_CATEGORIES below), which is what keeps it out of frontier's `ready`
+ * filter without any frontier-side code. Owned here (schema owns
  * domain) — status-fsm.mjs imports and re-exports this rather than defining its
  * own copy, so there is exactly one list of legal statuses.
  */
 export const STATUSES = Object.freeze([
+  'backlog',
   'todo',
   'doing',
   'blocked',
@@ -112,9 +126,11 @@ export const STATUSES = Object.freeze([
  * ordinary, editable code) could replay differently after that table
  * changes — an outcome L3 forbids.
  *
- * The full six-value set is declared upfront, Linear-style, even though
- * `backlog` and `completed` have no status mapped into either of them
- * today — 0027's own reasoning is to match Linear's pattern of a closed
+ * The full six-value set was declared upfront, Linear-style, back when
+ * `backlog` and `completed` had no status mapped into either of them —
+ * `backlog` now does (work-item-backlog-status D3 mapped the `backlog`
+ * status into it); `completed` still has none. 0027's own reasoning is
+ * exactly why that slot was already here to use: match Linear's pattern of a closed
  * category set defined up front, not "add a category only once a status
  * needs it" (which would make the set an implementation detail of whichever
  * domain happens to exist today, rather than a stable contract other
@@ -437,6 +453,27 @@ export function validateWorkShape(work, touchedFields) {
     if (!domain.stages.includes(work.stage)) {
       throw new WorkValidationError(
         `work.stage must be one of ${JSON.stringify(domain.stages)} when present, got: ${JSON.stringify(work.stage)}`,
+      );
+    }
+  }
+  // holder (tsk-2t9c D1): THIRD orthogonal axis (status x stage x
+  // role/holder), opt-in per-domain -- never in EDITABLE_FIELDS
+  // (store.mjs), moves only through the handoff verb, same exclusion
+  // stage/status/domain already get. A domain with no roleGraph must
+  // carry no holder at all (the compatibility path for every existing
+  // item and every non-role-aware domain); a domain WITH a roleGraph
+  // constrains holder to its declared roles list.
+  if (touched('holder') && work.holder !== undefined) {
+    const domain = DOMAINS[work.domain ?? DEFAULT_DOMAIN];
+    const roleGraph = roleGraphFor(domain);
+    if (!roleGraph) {
+      throw new WorkValidationError(
+        `work.holder is set but domain "${work.domain ?? DEFAULT_DOMAIN}" declares no roleGraph.`,
+      );
+    }
+    if (!roleGraph.roles.includes(work.holder)) {
+      throw new WorkValidationError(
+        `work.holder must be one of ${JSON.stringify(roleGraph.roles)} for domain "${work.domain ?? DEFAULT_DOMAIN}", got: ${JSON.stringify(work.holder)}`,
       );
     }
   }

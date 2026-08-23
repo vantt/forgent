@@ -9,8 +9,8 @@ description: >-
   (fgos-coding-planning/fgos-coding-validating) and supplies the plan
   verb's verdict itself (one-door-write) — never writes .fgos/ state
   directly, and never re-derives a judgment blind. For an item at stage
-  clarify, use /fgOS:discover instead. Examples: "/fgOS:plan build-cli",
-  "/fgOS:plan tsk-3wd".
+  discovery or exploring, use /fgOS:discover instead. Examples:
+  "/fgOS:plan build-cli", "/fgOS:plan tsk-3wd".
 ---
 
 # fgOS plan
@@ -34,9 +34,11 @@ verdict-routing/CONTEXT.md` D1).
 tsk-2b0 D1 (hard split, no fallback): `plan` is the sibling of `discover`
 created by splitting the old dual-purpose verb — it only ever runs
 split-work judgment for an item at stage `planning` (or the legacy
-`decompose` alias). Use `/fgOS:discover <id>` for a `clarify`-stage item
-instead; `plan` errors if called on an item that isn't at one of those two
-stages.
+`decompose` alias). Use `/fgOS:discover <id>` for an item still at
+`discovery` or `exploring` instead; `plan` errors if called on an item that
+isn't at one of those two planning stages. `clarify` is **not** a routing
+answer here — it retired as a stage entirely (tsk-qod D1/D2), and
+`discover` refuses it for the coding domain just as `plan` does.
 
 ## Steps
 
@@ -62,51 +64,27 @@ stages.
 
    Read the item's live status:
 
+   See `../_shared/fgos-cli-fallback.md`, substituting `<verb-cmd>` with:
+
    ```
-   # fgos CLI fallback (tsk-1no D3)
-   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
-   if [ -f "$FGOS_BIN" ]; then
-     node "$FGOS_BIN" list --id $ARGUMENTS --json --dir "$root"
-   elif command -v fgos >/dev/null 2>&1; then
-     fgos list --id $ARGUMENTS --json --dir "$root"
-   else
-     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
-     exit 1
-   fi
+   list --id $ARGUMENTS --json --dir "$root"
    ```
 
    If `data.work["$ARGUMENTS"].status` already reads `doing`, skip straight
    to step 3 — the caller (or an earlier iteration of this same command)
    already holds the claim. Otherwise claim it, the same way `/fgOS:pick`'s
-   own step 2 does:
+   own step 2 does, again via `../_shared/fgos-cli-fallback.md`:
 
    ```
-   # fgos CLI fallback (tsk-1no D3)
-   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
-   if [ -f "$FGOS_BIN" ]; then
-     node "$FGOS_BIN" take $ARGUMENTS --role session --dir "$root"
-   elif command -v fgos >/dev/null 2>&1; then
-     fgos take $ARGUMENTS --role session --dir "$root"
-   else
-     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
-     exit 1
-   fi
+   take $ARGUMENTS --role session --dir "$root"
    ```
 
    If the item already carries its own branch (`fgw/<id>` from an earlier
-   claim), `take` refuses and names `pick` instead — fall back to:
+   claim), `take` refuses and names `pick` instead — fall back to the same
+   shared fallback with:
 
    ```
-   # fgos CLI fallback (tsk-1no D3)
-   FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
-   if [ -f "$FGOS_BIN" ]; then
-     node "$FGOS_BIN" pick $ARGUMENTS --dir "$root"
-   elif command -v fgos >/dev/null 2>&1; then
-     fgos pick $ARGUMENTS --dir "$root"
-   else
-     echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
-     exit 1
-   fi
+   pick $ARGUMENTS --dir "$root"
    ```
 
    Any other failure (the id doesn't exist, lock contention) shows the

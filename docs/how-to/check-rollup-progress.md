@@ -108,7 +108,7 @@ has no children at all — every one of its members is a `target`:
     "targets": [
       {
         "id": "tsk-62v",
-        "title": "Generalize dispatch.mjs's executor resolution to be capacity-aware, not just tier-aware, and add a",
+        "title": "Generalize dispatch.mjs's executor resolution to be executor-aware, not just tier-aware, and add a",
         "status": "done"
       },
       {

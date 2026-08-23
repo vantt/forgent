@@ -167,3 +167,9 @@ chưa item nào được tự thi công thẳng.
   `docs/specs/distribution.md` (supersede RUL11 + Data Dictionary #7).
 - `tsk-3nx`, `tsk-4c05`, `tsk-3uj`, `tsk-2jc` (goalTier `milestone`) +
   `tsk-4bc` (goalTier `mvp`) — xem bảng §6.
+- `tsk-32b` (done) — Claude Code plugin skill set (`plugins/fgOS/skills/`)
+  giờ đóng gói cả 14 coding-domain dev-skill (trước đó chỉ tồn tại ở
+  `.claude/skills/`, khiến session ở repo khác cài fgOS thuần plugin gặp
+  "Unknown skill" dù `plugin-skill-cli-reachable` báo CLI reachable bình
+  thường); thêm doctor check `plugin-dev-skills-packaged` bắt thiếu-đồng-bộ
+  trước khi release — xem `docs/specs/distribution.md` Data Dictionary #4b/#7.

@@ -19,8 +19,7 @@
 //     than re-implemented.
 import { rankImpact } from './impact.mjs';
 import { footprintOverlapAmong } from './graph-metrics.mjs';
-import { isResolvedStatus } from './frontier.mjs';
-import { resolveRoot } from '../runner/root-affinity.mjs';
+import { isResolvedStatus, resolveRoot } from './frontier.mjs';
 import { effectiveStage, getDomain } from './workflow-stage-graphs.mjs';
 
 /**
@@ -404,4 +403,68 @@ export function mergeTree(view, readiness, opts = {}) {
   };
 
   return orderByRank(topLevelIds).map(buildNode);
+}
+
+/**
+ * The still-open items that merge into the SAME target ref as `landedId` —
+ * the only branches a land can possibly have put behind. An item's target is
+ * `fgw/<parent>` when it has a parent and the trunk otherwise, so "same
+ * target" is exactly "same parent", with two parentless items both aimed at
+ * the trunk.
+ *
+ * Two exclusions, both because the excluded item has nothing to compare:
+ * a RESOLVED item (`isResolvedStatus`) has already merged or been dropped,
+ * and a pre-claim (`todo`) item's `fgw/<id>` branch is created back at
+ * decompose carrying no commit of its own — its changed-file set is empty,
+ * so running a diff for it buys a guaranteed-empty answer. Refreshing that
+ * decompose→pick gap is `pick`-time refresh's job, not this detection's.
+ */
+export function openLeavesSharingTarget(view, landedId) {
+  const work = view?.work ?? {};
+  const landed = work[landedId];
+  if (!landed) return [];
+  const target = landed.parent ?? null;
+  return Object.values(work)
+    .filter((item) => item.id !== landedId
+      && (item.parent ?? null) === target
+      && item.status !== 'todo'
+      && !isResolvedStatus(item))
+    .map((item) => item.id)
+    .sort();
+}
+
+/**
+ * D4's three-way split over REAL changed-file sets — never declared
+ * `footprint`, which an item fills in by hand and can leave stale or empty
+ * (`footprintOverlapAmong` above compares exactly that weaker signal; here
+ * git has already given the ground truth, so nothing needs to stand in for
+ * it).
+ *
+ * A leaf sharing no path with what just landed produces NOTHING — no
+ * notification, no mark. That silence is the point: a root landing 13
+ * children sequentially would otherwise pay ~78 catchup+verify rounds, and
+ * most of them discover nothing collided. A leaf that does share a path
+ * either goes to the session that owns it — cheapest to fix while that
+ * context is still in someone's head, and the owner is the only party
+ * allowed to touch that branch — or, with no session behind it, is marked
+ * stale for the lazy catchup it will get when it reaches the merge queue.
+ *
+ * `leaves` entries are `{id, files, sessionIds}`; the caller supplies the
+ * real diffs and the real session registry, keeping this half pure.
+ */
+export function classifyPostLandDrift({ landedFiles = [], leaves = [] } = {}) {
+  const landed = new Set(landedFiles);
+  const notify = [];
+  const stale = [];
+  for (const leaf of leaves) {
+    const shared = (leaf.files ?? []).filter((file) => landed.has(file)).sort();
+    if (shared.length === 0) continue;
+    const sessionIds = leaf.sessionIds ?? [];
+    if (sessionIds.length > 0) {
+      notify.push({ id: leaf.id, shared, sessionIds });
+    } else {
+      stale.push({ id: leaf.id, shared });
+    }
+  }
+  return { notify, stale };
 }
