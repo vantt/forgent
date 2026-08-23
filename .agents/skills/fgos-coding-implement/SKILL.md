@@ -104,7 +104,7 @@ on how you got here:
 Read the claimed item's title, `refs`, `deps`, and docsRef when present.
 Re-check live claim status if this session did not arrive via
 `fgos-coding-driving`. Reclaim the role/holder ball if it isn't already
-`implementer`. Full mechanics: `references/worker-contract-and-orient.md`.
+`implementer`. For a `tiny`/`small` lane where `plan.md`'s recorded file list is small, skip opening references/worker-contract-and-orient.md's full text (never skip `references/verify-commit-and-iron-law.md` or `references/return-mechanics.md` — those apply at every lane). Full mechanics: `references/worker-contract-and-orient.md`.
 
 ### Step 2: Implement
 Run `dispatch.mjs decide` first (per the Hard rule above) and branch on

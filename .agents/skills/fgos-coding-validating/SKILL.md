@@ -115,13 +115,13 @@ Read `docsRef`, CONTEXT.md, and plan.md. If plan.md does not exist yet,
 or its shape was never presented at planning's own hand-off, stop and
 hand the item back to `fgos-coding-planning` — an unapproved shape is
 never validated. Reclaim the role/holder ball if it isn't already
-`implementer`. Full mechanics: `references/bootstrap-and-reality-gate.md`.
+`implementer`. Check `plan.md`'s `Mode:` line — for a `tiny`/`small` lane, run a condensed inline reality check instead and skip opening references/gate-tier-a-b-triggers.md. Full mechanics: `references/bootstrap-and-reality-gate.md`.
 
 ### Step 2: Reality gate
 Score mode fit, repo fit, assumptions, smaller path, proof surface, and
 impact-analysis posture, each PASS or FAIL with a concrete citation. A
 FAIL on any dimension stops here and returns the item to
-`fgos-coding-planning` with the failing dimension named. Full mechanics:
+`fgos-coding-planning` with the failing dimension named. For a `tiny`/`small` lane, run a condensed inline reality check instead and skip opening references/gate-tier-a-b-triggers.md. Full mechanics:
 `references/bootstrap-and-reality-gate.md`.
 
 ### Step 3: Feasibility matrix
@@ -163,7 +163,7 @@ ask a person while an action remains untried. Only once tier A is
 genuinely exhausted does tier B apply: measure the cost of repair *when
 the error would surface*, not the cost of doing the work now, and take a
 reversible option without asking when one exists. Only three triggers
-ever earn a real question. Full mechanics (the tier A/B reasoning, the
+ever earn a real question. For a `tiny`/`small` lane, run a condensed inline reality check instead and skip opening references/gate-tier-a-b-triggers.md. Full mechanics (the tier A/B reasoning, the
 reversible-preference exception, the three named triggers):
 `references/gate-tier-a-b-triggers.md`.
 

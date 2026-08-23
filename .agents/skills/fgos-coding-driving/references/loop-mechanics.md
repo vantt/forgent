@@ -72,7 +72,7 @@ Check these in order, every iteration, before anything else:
 this position is mechanical (`executing` for a domain that declares no
 skill there, or `cleanup`, which deliberately registers none). Nothing is
 left for this loop to load; the caller's own next step (`fgos return`,
-`fgos cleanup`) already covers it.
+`fgos cleanup`) already covers it. Note that for a `tiny`/`small` lane, the invoked skill may itself skip opening its own reference files.
 
 ## Step 5: Show the item once, label the pane once
 
