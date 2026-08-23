@@ -2,24 +2,26 @@
 
 ## 1. Trạng thái hiện tại
 
-Vòng 4 (23/8, cùng ngày vòng 1-3). Chưa có D-ID nào chốt. Điểm neo đang giữ
-ổn từ vòng 3: **`.fgos` là PM-state của chính repo nó quản, sự thật phải
-sống cùng một git history với code** (anh nêu, khớp D-ADR0001) — ứng viên
-D-ID đầu tiên.
+Vòng 5 (24/8). **Đã hội tụ: D1 (in-repo), D2 (sweep), D3 (đóng Tầng B,
+repurpose tsk-3tp tại chỗ) — anh chốt cả ba, đã mint qua `fgos decision`
+(seq 23876-23878), item đã repurpose (title/description/refs, seq
+23879-23880).** §6 regenerated toàn phần, §7 có 2 candidate task
+(`#task-sweep-checkpoint` — chính tsk-3tp, `#task-legacy-deletion`).
 
-Diễn biến: vòng 1 xác nhận worker không đọc/ghi `.fgos/` (Tầng B nguyên bản
-không có consumer). Vòng 2 đề xuất nested state repo — anh bác vì vi phạm
-constraint in-repo. Vòng 3 đo phân bố 23.847 event (~40% coordination cần
-visibility tức thì / ~55-60% narrative) và đề xuất **sweep**: xóa
-checkpoint-commit chuyên dụng, gom dirty shards vào các merge/approve
-commit main đằng nào cũng tạo + fallback thưa. Vòng 4 (anh yêu cầu): 2
-scout Haiku đọc source thật của beehive + repository-harness/symphony —
-**cả hai upstream hội tụ độc lập đúng pattern sweep đang đề xuất**
-(coordination = live layer ngoài cadence git; history commit coarse do
-orchestrator quyết; không ai cho worktree chở coordination qua merge).
-Chi tiết §5 entry vòng 4. Các điểm chờ anh chốt: §3 dòng 6 (constraint
-in-repo → D-ID), dòng 9 (sweep — evidence đã hội tụ), dòng 8 (tsk-3tp
-repurpose hay đóng + item mới).
+Vòng 5 cũng trả lời 2 câu hỏi cuối của anh: vì sao harness né được merge
+trên state (3 điều kiện: truth = file bất biến mới, projection ngoài git,
+single-run — fgOS sau Tầng A đã có 2 điều kiện đầu, thay điều kiện 3 bằng
+events.lock vì N-writer là yêu cầu), và audit cái-hay-hơn của upstream
+(staged-verify: fgOS đã có trong `merge.mjs` — sửa lại ô sai trong bảng
+vòng 4b; attestation: đã có một phần qua tsk-4hl; content-hash: Tầng A đã
+có; món thật sự còn thiếu đáng học: **lock self-heal 2 tầng của bee** thay
+cho `/fgOS:unlock` thủ công — item riêng nếu làm, ngoài scope này).
+
+Trạng thái chờ: KHÔNG còn câu hỏi thiết kế mở trong scope này. Bước kế
+tiếp là terminal handoff (`fgos-coding-exploring` → `fgos-coding-planning`)
+cho `tsk-3tp`, nhưng dep cứng `tsk-3ve` (Tầng A T3-T6) chưa xong — handoff
+chờ tsk-3ve land, hoặc anh ra lệnh chạy planning sớm (chấp nhận plan dựa
+trên hình dạng Tầng A đã thiết kế nhưng chưa land).
 
 ## 2. Mục tiêu & đề bài
 
@@ -49,19 +51,23 @@ cơ chế guard/vá chồng nhau), tìm kiến trúc đích giải rốt ráo �
 
 | # | Câu hỏi | Trạng thái | Ghi chú |
 |---|---|---|---|
-| 1 | Có nên tiếp tục shape Tầng B ngay bây giờ, hay dừng và ghi nhận "chưa cần"? | **Chưa rõ — chờ anh quyết** | Item tự nó đã nghiêng về "chưa cần" (cảnh báo #4); round này xác nhận thêm bằng chứng, xem dòng 3 dưới. |
+| 1 | Có nên tiếp tục shape Tầng B ngay bây giờ, hay dừng và ghi nhận "chưa cần"? | **Đã chốt — D3: đóng vĩnh viễn** | Xem §4. |
 | 2 | `tsk-3ve` (Tầng A, dep bắt buộc) đã xong chưa? | **Rõ — CHƯA xong** | `fgos show tsk-3ve --json`: `status:todo`, `stage:executing`. Đề bài chính item này nói rõ: đọc mà dep chưa xong thì dừng, không shape code dựa trên cấu trúc file `.fgos/events/<session-id>-<ts>.jsonl` chưa tồn tại thật. Vòng này vì vậy chỉ thảo luận Ở MỨC CHÍNH SÁCH (có nên mở lại ADR0020 hay không), chưa động tới hình dạng file cụ thể. |
 | 3 | Worker hôm nay có thật sự không đọc/ghi `.fgos/` từ trong worktree không (YAGNI-check cảnh báo #2)? | **Rõ — xác nhận lại bằng code thật, vẫn đúng** | `grep .fgos src/runner/dispatch/*.mjs`: chỉ có `dispatch/cli.mjs`'s `spawnWorker` nhận `opts.fgosDir` — dùng để launcher (không phải worker) gọi `fgos tool query` presence-check qua `resolveExecutorCommand`; comment tại dòng ~222-224 nói thẳng "fgosDir's root (always the main checkout)" và tách bạch với `attestRoot: cwd` (worktree của worker). Không có call site nào trong `dispatch/*.mjs` cho phép TIẾN TRÌNH WORKER tự đọc/ghi `.fgos/` từ bên trong worktree của nó — đúng như cảnh báo #2 nói, dispatch path 23/8 (đã có agy, fanout) vẫn giữ nguyên tính chất này so với lúc ADR0020 chốt (28/7). |
 | 4 | Tầng B có giải được root cause #1 gốc (tần suất commit lên main quá nhanh, buộc `fgw/<id>` catchup thường xuyên) không? | **Rõ — không, hoặc chỉ một phần rất hẹp** | Theo report 21/8 đã dẫn trong đề bài: nguồn write gây áp lực chính là periodic checkpoint + session commit trực tiếp lên main — cả hai đường này KHÔNG đi qua vòng đời "worktree rồi merge" mà Tầng B nhắm tới. Tầng B chỉ có tác dụng cho write sinh ra từ WORKER — nhưng câu 3 vừa xác nhận worker hôm nay không sinh write `.fgos/` nào cả, nên chưa có khối lượng thật ở đúng chỗ Tầng B nhắm giảm. |
 | 5 | Nếu quyết "chưa cần Tầng B", hướng nào giải đúng root cause #1 (giảm tần suất commit của SESSION lên main)? | **Đã scout + đề xuất (vòng 2) — chờ anh chốt** | Đề xuất chính: tách state plane — `.fgos/` thành nested git repo riêng, gitignored khỏi main; commit state không còn di chuyển HEAD main → root cause #1 biến mất về cấu trúc. Chi tiết + trade-off: §5 entry vòng 2. |
-| 6 | Constraint kiến trúc: `.fgos` state phải sống cùng git history với code (in-repo), không cách ly? | **Ổn định 1 vòng — ứng viên D-ID nếu giữ qua vòng sau** | Anh nêu trực tiếp vòng 3, bác nested-repo vòng 2. Khớp D-ADR0001 nguyên văn. Mọi phương án từ đây phải thỏa constraint này. |
+| 6 | Constraint kiến trúc: `.fgos` state phải sống cùng git history với code (in-repo), không cách ly? | **Đã chốt — D1** | Xem §4. |
 | 7 | Sau khi Tầng A + checkpoint redesign: danh sách legacy nào được XÓA? | **Rõ (danh sách), chưa chốt (chờ dòng 9)** | XÓA: (1) `merge=union` + `events-jsonl-contiguity.mjs` (sau freeze events.jsonl); (2) checkpoint-commit chuyên dụng + tuning `checkpoint.eventThreshold`; (3) phần lớn truncation-guard surface (mark sidecar, warnings file, opt-out env `FGOS_DISABLE_OPPORTUNISTIC_CHECKS`); (4) `events.jsonl` 1-file + 2 backup → đông cứng baseline-0/archive; (5) `seq` làm identity → bỏ hẳn ở compaction đầu; (6) Tầng B — đóng vĩnh viễn. GIỮ: merge guard `.fgos-write-rejected` (nguyên trạng, không ngoại lệ), pre-commit hook (tsk-56u class). |
-| 8 | tsk-3tp: repurpose tại chỗ thành item "checkpoint redesign: sweep-on-merge", hay đóng hẳn + submit item mới? | **Chưa rõ — chờ anh quyết** | Cả hai đều giữ dep tsk-3ve (Tầng A T3-T6 phải xong trước — shard + đóng vector git-clobber là điều kiện an toàn cho coarse cadence). |
-| 9 | Cơ chế thay checkpoint chuyên dụng: sweep-dirty-shards vào merge/approve commit sẵn có + fallback thưa — hay Tầng B-cho-SESSION (narrative event sinh trong worktree của session đã claim, piggyback merge)? | **Sweep — được củng cố thêm bởi scout upstream vòng 4, chờ anh chốt** | Đo vòng 3: coordination ~40% (move 29% + stage 6.6% + add 4.3%) buộc ghi main tức thì dù chọn gì; narrative ~55-60%. Tầng-B-cho-session chỉ chở được phần narrative, đổi lấy: ngoại lệ merge guard, tách 2 class event khác luật, narrative vô hình từ main tới khi merge (mất nếu nhánh bỏ). Sweep: churn ~0 giữa các merge, visibility tức thì giữ nguyên, ADR0020 nguyên vẹn. Vòng 4: CẢ HAI upstream hội tụ cùng pattern — coordination không bao giờ đi qua git-commit mịn (beehive: gitignored + lockfile + ledger main-only; harness: SQLite gitignored + CAS), history commit ở cadence coarse do orchestrator quyết (harness: 1 changeset/run, code không tự commit) ≈ đúng hình dạng sweep; không upstream nào cho worktree chở coordination-write qua merge (phản chứng độc lập thêm cho Tầng B). Khác biệt fgOS giữ lại có chủ đích: work.move Ở TRONG log git-tracked để replay được (D-ADR0001) — sweep cho cả hai: sự thật trong git + churn 0. |
+| 8 | tsk-3tp: repurpose tại chỗ thành item "checkpoint redesign: sweep-on-merge", hay đóng hẳn + submit item mới? | **Đã chốt — repurpose tại chỗ (trong D3)** | Đã thi hành: title/description/refs cập nhật (seq 23879-23880). Dep tsk-3ve giữ nguyên. |
+| 9 | Cơ chế thay checkpoint chuyên dụng: sweep-dirty-shards vào merge/approve commit sẵn có + fallback thưa — hay Tầng B-cho-SESSION (narrative event sinh trong worktree của session đã claim, piggyback merge)? | **Đã chốt — D2: sweep** | Đo vòng 3: coordination ~40% (move 29% + stage 6.6% + add 4.3%) buộc ghi main tức thì dù chọn gì; narrative ~55-60%. Tầng-B-cho-session chỉ chở được phần narrative, đổi lấy: ngoại lệ merge guard, tách 2 class event khác luật, narrative vô hình từ main tới khi merge (mất nếu nhánh bỏ). Sweep: churn ~0 giữa các merge, visibility tức thì giữ nguyên, ADR0020 nguyên vẹn. Vòng 4: CẢ HAI upstream hội tụ cùng pattern — coordination không bao giờ đi qua git-commit mịn (beehive: gitignored + lockfile + ledger main-only; harness: SQLite gitignored + CAS), history commit ở cadence coarse do orchestrator quyết (harness: 1 changeset/run, code không tự commit) ≈ đúng hình dạng sweep; không upstream nào cho worktree chở coordination-write qua merge (phản chứng độc lập thêm cho Tầng B). Khác biệt fgOS giữ lại có chủ đích: work.move Ở TRONG log git-tracked để replay được (D-ADR0001) — sweep cho cả hai: sự thật trong git + churn 0. |
 
 ## 4. Quyết định đã chốt
 
-(Chưa có D-ID nào — vòng 1, chưa có điểm nào giữ ổn định qua nhiều vòng.)
+| D-ID | Nội dung | Chốt | `fgos decision` seq |
+|---|---|---|---|
+| **D1** | `.fgos` state phải sống cùng một git history với code (in-repo) — bác nested-repo/separate-ref; mọi thiết kế write-path phải thỏa constraint này. | Anh nêu vòng 3, giữ ổn vòng 4, chốt vòng 5 (24/8) | 23876 |
+| **D2** | Xóa checkpoint-commit chuyên dụng; thay bằng **sweep** — gom dirty `.fgos/events/` shard vào chính các merge/approve commit main đằng nào cũng tạo + fallback thưa. Visibility coordination vẫn là working-dir append tức thì, không đổi. | Đề xuất vòng 3, evidence hội tụ vòng 4 (đo volume + 2 upstream), anh chốt vòng 5 | 23877 |
+| **D3** | Tầng B (worker/worktree ghi `.fgos/` từ trong worktree, ngoại lệ merge-guard) **đóng vĩnh viễn** — ADR0020 giữ nguyên không ngoại lệ; tsk-3tp repurpose tại chỗ thành item sweep checkpoint redesign. | 3 phản chứng độc lập vòng 1/3/4, anh chốt vòng 5 | 23878 |
 
 ## 5. Q&A log
 
@@ -239,11 +245,151 @@ cơ chế guard/vá chồng nhau), tìm kiến trúc đích giải rốt ráo �
   là commit cadence mịn, thứ cả hai upstream chứng minh không cần cho
   visibility. Sweep = giữ hai đòi hỏi khó, bỏ đúng cái không ai cần.
 
+- **[2026-08-24, vòng 5, anh chốt cả 3]** In-repo → D-ID, sweep, repurpose
+  tsk-3tp tại chỗ. Kèm 2 câu hỏi: (a) đừng vì legacy mà bỏ qua cái thật
+  sự hay hơn của upstream — họ có gì đáng đánh đổi? (b) tại sao harness
+  "né hẳn" được bài toán merge trên state?
+
+- **[2026-08-24, vòng 5, trả lời (b) — vì sao harness né được merge]** Ba
+  điều kiện cùng lúc: (1) sự thật của họ là dãy **file changeset bất
+  biến** — mỗi run đẻ ra 1 FILE MỚI chưa từng tồn tại; git chỉ conflict
+  khi 2 bên sửa CÙNG một object, file mới thêm thì không bao giờ; "hợp
+  nhất" của họ = cộng file mới + replay idempotent, không phải đối chiếu
+  2 bản phân kỳ. (2) Object mutable duy nhất (`harness.db` projection)
+  nằm NGOÀI git (gitignored) — thứ hay bị sửa thì không được git theo
+  dõi, nên không bao giờ có 2 bản phân kỳ để merge. (3) Single-active-run
+  lock — chỉ 1 run mutate tại 1 thời điểm, DB không có concurrent writer.
+  **fgOS sau Tầng A đã có (1) và (2)**: shard per-writer = file mới
+  single-writer; `state.json` đã gitignored từ trước (xác nhận
+  `.gitignore` dòng 4-5, chú thích nguyên văn "events.jsonl is truth
+  (committed); state.json is a derived view"). Điều kiện (3) fgOS không
+  copy — N-writer đồng thời là yêu cầu sản phẩm — thay bằng
+  `events.lock` + write-queue. fgOS không "né" bằng cách hy sinh N-writer
+  như harness; nó đạt cùng tính chất không-còn-gì-để-merge bằng shard.
+
+- **[2026-08-24, vòng 5, trả lời (a) — audit cái-hay-hơn của upstream]**
+  Rà từng ứng viên, kèm sửa 1 lỗi trong bảng vòng 4b:
+  - Staged-verify merge gate (bee): **fgOS ĐÃ CÓ trong code** —
+    `merge.mjs` dòng 17/856/1217: `git merge --no-commit --no-ff` →
+    check `.fgos-write` → verify → mới commit. Ô "merge trước verify sau"
+    trong bảng vòng 4b là snapshot report 21/8, đã lỗi thời — sửa tại
+    đây. Không cần adopt.
+  - Worktree attestation (bee): đã adopt một phần qua tsk-4hl
+    (`captureDispatchAttestation`, `attestRoot` trong `dispatch/cli.mjs`).
+  - Content-sha double-apply guard (harness): Tầng A T1 (`h`) đã có.
+  - Same-transaction append log+projection (harness): fgOS projection tự
+    heal qua replay từ log — nhu cầu thấp, không adopt.
+  - **Lock self-heal 2 tầng (bee `lock.mjs:172-352`): món thật sự hay hơn
+    còn thiếu** — bee tự cướp lock kẹt cơ học (mtime 30s + pid-liveness,
+    trần cứng 1h, atomic rename + post-rename verify), fgOS hiện xử lý
+    lock kẹt bằng skill `/fgOS:unlock` THỦ CÔNG (exit 7, người phải can
+    thiệp) — đúng priority #2 "Release con người" thì đây là chỗ đáng
+    học. Nếu làm: chỉnh ngưỡng cho full-suite verify ~6ph (giới hạn bee
+    tự khai), submit item riêng — ngoài scope discussion này.
+  - Holds-ledger prevention-before-write (bee): fgOS có `/fgOS:conflicts`
+    advisory đọc-sau; prevention hay hơn về nguyên tắc nhưng là cơ chế
+    sống từng vỡ production bên chính bee, và fanout song song của fgOS
+    đang sequential-fallback — YAGNI, để mở, chưa adopt.
+
+- **[2026-08-24, vòng 5, thi hành]** Mint D1 (seq 23876), D2 (23877), D3
+  (23878) qua `fgos decision --id tsk-3tp`. `fgos edit tsk-3tp`: title +
+  description repurpose sang sweep redesign (seq 23879/23880), refs →
+  `#task-sweep-checkpoint`. §6 regenerated toàn phần, §7 tách 2 candidate
+  + 1 ghi nhận ngoài-scope. Handoff exploring/planning: chờ tsk-3ve
+  T3-T6 land (dep cứng của điều kiện an toàn) hoặc anh ra lệnh sớm hơn.
+
 ## 6. Thiết kế đã chốt {#design}
 
-(Chưa có gì để tổng hợp — chưa có quyết định nào chốt ở §4. Mục này sẽ được
-viết lại toàn bộ ngay khi vòng đầu tiên có D-ID.)
+*(Regenerated toàn phần 24/8, sau khi D1-D3 chốt.)*
+
+**Một sự thật, hai cadence.** Toàn bộ PM-state của fgOS tiếp tục sống trong
+event log git-tracked của chính repo nó quản (D1, khớp D-ADR0001): mọi
+event — coordination (`work.move`/`stage`/`add`) lẫn narrative (decision,
+discovery, outcome…) — được append vào shard per-writer dưới
+`.fgos/events/` trên main checkout (cấu trúc Tầng A, tsk-3ve). Nhưng hai
+tầng nhu cầu của log này chạy ở hai cadence khác nhau:
+
+- **Tầng visibility (tức thì):** mọi session/process thấy event của nhau
+  bằng cách đọc working dir của main checkout qua `--dir` — ngay khi
+  append, trước mọi commit. Chống double-claim bằng `events.lock` +
+  write-queue như hiện tại. Tầng này không đổi gì.
+- **Tầng history (coarse, D2):** commit vào git không còn là hành động
+  chuyên dụng. Cơ chế periodic-checkpoint (15ph/50-event) bị xóa; thay
+  bằng **sweep**: mỗi merge/approve commit mà main đằng nào cũng tạo thì
+  gom luôn các shard dirty vào chính commit đó, cộng một fallback thưa
+  (~60ph hoặc end-of-session) cho khoảng lặng. Giữa hai lần merge, HEAD
+  main đứng yên — churn catchup/re-verify từ metadata = 0.
+
+**Worktree plane không đổi (D3):** nhánh `fgw/<id>` không bao giờ mang
+`.fgos/` (ADR0020 nguyên vẹn, không ngoại lệ merge-guard). Cả beehive lẫn
+repository-harness đều độc lập đi đến cùng kết luận: không cho worktree
+chở coordination-write qua merge.
+
+```mermaid
+flowchart LR
+  subgraph main["Main checkout (.fgos/ — chỉ ở đây)"]
+    V["fgos verbs<br/>(session, --dir main)"] -->|"append qua events.lock<br/>+ write-queue"| S["shard per-writer<br/>.fgos/events/*.jsonl<br/>(identity = h content-hash)"]
+    S -->|"đọc working dir<br/>= visibility TỨC THÌ"| R["mọi session khác<br/>(claim/frontier/show)"]
+  end
+  subgraph git["Git history (coarse)"]
+    M["merge/approve commit<br/>(đằng nào cũng xảy ra)"] -->|"SWEEP dirty shards<br/>vào cùng commit"| H["lịch sử git-tracked<br/>(replay dựng lại state)"]
+    F["fallback thưa<br/>(~60ph / end-of-session)"] --> H
+  end
+  S -.->|"khi có merge<br/>hoặc fallback"| M
+  W["fgw/&lt;id&gt; worktree<br/>(KHÔNG có .fgos/ — ADR0020)"] -->|"chỉ code"| M
+```
+
+**Điều kiện an toàn của coarse cadence** (vì sao 20/8 chưa được phép mà giờ
+được): checkpoint dày ra đời để thu hẹp cửa sổ mất-data do git-op clobber
+file tracked dirty. Tầng A đổi bài toán (file mới per-writer, không còn
+2 bên sửa cùng file) + tsk-1i3/tsk-56u đã đóng vector đè/nuốt + merge path
+hiện tại đã là staged-verify (`merge.mjs`: `--no-commit --no-ff` → check →
+verify → mới commit). Cửa sổ dài giờ chỉ là độ trễ history, không phải rủi
+ro mất data. **Vì vậy item này phụ thuộc cứng tsk-3ve T3-T6 xong trước.**
+
+**Legacy được xóa theo sau (D2):** `merge=union` + `events-jsonl-contiguity.mjs`
+(sau freeze `events.jsonl` thành baseline-0), phần lớn truncation-guard
+surface (mark sidecar, warnings file, opt-out env), 2 file backup, `seq`
+làm identity (bỏ ở compaction đầu). **Giữ:** merge guard
+`.fgos-write-rejected` nguyên trạng, pre-commit hook, `events.lock`/
+write-queue.
+
+**Nhượng bộ đã chấp nhận:** merge commit của một nhánh chở kèm dirty event
+của mọi writer — provenance vẫn nguyên trong nội dung event
+(`src`/`ts`/`h`), commit không cần "tự sự" theo item.
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-(Chưa có — chờ §6 có hình dạng cụ thể trước khi tách task.)
+### Sweep checkpoint mechanism {#task-sweep-checkpoint}
+
+- **Item:** `tsk-3tp` (repurposed, D3) — refs đã trỏ anchor này.
+- **Goal:** xóa periodic-checkpoint-commit chuyên dụng trong
+  `src/state/events-jsonl-truncation-guard.mjs` (+ caller trong
+  `merge.mjs`/`claim-port.mjs`); thêm sweep dirty-shards vào đường
+  merge/approve commit sẵn có; thêm fallback thưa cho khoảng lặng.
+- **§6 excerpt:** "Tầng history (coarse)" + "Điều kiện an toàn".
+- **D-IDs:** D1, D2, D3.
+- **Quan hệ:** dep cứng `tsk-3ve` (T3-T6 — replay đa-file/anchor/guard/
+  compaction phải land trước); độc lập với mọi item merge-speed đã
+  delivered (tsk-1i3/tsk-2lq).
+- **Draft verify:** `npm test` + kiểm không còn commit
+  `chore(.fgos): periodic events.jsonl checkpoint` sinh ra trong e2e; grep
+  xác nhận cơ chế checkpoint chuyên dụng đã gỡ khỏi
+  `events-jsonl-truncation-guard.mjs`.
+
+### Legacy deletion sweep {#task-legacy-deletion}
+
+- **Goal:** thi hành danh sách xóa của D2 (union driver, contiguity
+  script, guard surface, backups, seq) sau khi sweep mechanism + Tầng A
+  compaction (T6) đều đã land. Có thể là phase 2 của chính `tsk-3tp` hoặc
+  item con — để `fgos-coding-planning` quyết mode, không ép split ở đây.
+- **§6 excerpt:** "Legacy được xóa theo sau".
+- **D-IDs:** D2.
+- **Quan hệ:** sau `#task-sweep-checkpoint` và sau tsk-3ve T6.
+- **Draft verify:** `npm test` + grep vắng mặt các cơ chế đã xóa
+  (`merge=union` trong `.gitattributes`, `events-jsonl-contiguity.mjs`,
+  `FGOS_DISABLE_OPPORTUNISTIC_CHECKS`).
+
+*(Ngoài scope feature này, ghi nhận từ audit upstream vòng 5: lock
+self-heal 2 tầng kiểu beehive thay cho flow `/fgOS:unlock` thủ công — nếu
+làm, submit item riêng, không thuộc discussion này.)*
