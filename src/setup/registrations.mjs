@@ -1141,17 +1141,50 @@ function checkEventsJsonlContiguous(cwd) {
   if (mainCheckout === null) {
     return { passed: true, message: 'not inside a git checkout — nothing to check' };
   }
-  const logPath = path.join(mainCheckout, '.fgos', 'events.jsonl');
-  if (!fs.existsSync(logPath)) {
+  const fgosDir = path.join(mainCheckout, '.fgos');
+  const logPath = path.join(fgosDir, 'events.jsonl');
+  const eventsDirPath = path.join(fgosDir, 'events');
+  let writerFileNames = [];
+  try {
+    writerFileNames = fs
+      .readdirSync(eventsDirPath, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name.endsWith('.jsonl'))
+      .map((entry) => entry.name);
+  } catch {
+    writerFileNames = [];
+  }
+  if (!fs.existsSync(logPath) && writerFileNames.length === 0) {
     return { passed: true, message: 'no .fgos/events.jsonl yet — nothing to check' };
   }
-  const report = checkEventsJsonlContiguity(logPath);
-  if (report.ok) {
-    return { passed: true, message: `events.jsonl is contiguous (${report.totalLines} lines, no seq breaks/duplicates)` };
+
+  // Legacy baseline-0 keeps the ORIGINAL check unchanged (the merge=union
+  // failure class this whole check exists for, tsk-3wq). Tầng A/T5
+  // (TA-D10): each per-writer file under .fgos/events/ is checked too, but
+  // as its OWN single-writer sequence -- seq is only ever meaningful
+  // within one file post-cutover (TA-D1/TA-D2), never combined across
+  // files, and there is no matching auto-fix for a per-writer break (see
+  // `fixEventsJsonlContiguous` below): TA-D2 already eliminated the
+  // merge-driver failure class the baseline fix exists to repair, so a
+  // break here is a different, rarer bug worth surfacing loudly instead.
+  const broken = [];
+  if (fs.existsSync(logPath)) {
+    const report = checkEventsJsonlContiguity(logPath);
+    if (!report.ok) broken.push({ file: 'events.jsonl', duplicates: report.duplicates.length, gaps: report.gaps.length });
+  }
+  for (const name of writerFileNames) {
+    const report = checkEventsJsonlContiguity(path.join(eventsDirPath, name));
+    if (!report.ok) broken.push({ file: `events/${name}`, duplicates: report.duplicates.length, gaps: report.gaps.length });
+  }
+
+  if (broken.length === 0) {
+    return {
+      passed: true,
+      message: `events.jsonl${writerFileNames.length > 0 ? ` + ${writerFileNames.length} per-writer file(s)` : ''} contiguous (no seq breaks/duplicates)`,
+    };
   }
   return {
     passed: false,
-    message: `events.jsonl has ${report.duplicates.length} duplicate seq and ${report.gaps.length} seq break(s) — likely left behind by a git merge (tsk-3wq); run fgos doctor --fix`,
+    message: `duplicate seq / seq break(s) found in ${broken.map((b) => `${b.file} (${b.duplicates} dup, ${b.gaps} gap)`).join(', ')} — for events.jsonl this is likely left behind by a git merge (tsk-3wq), run fgos doctor --fix; a per-writer file has no auto-fix (TA-D2 already prevents the merge-driver class it would repair)`,
   };
 }
 
@@ -1198,23 +1231,54 @@ registerFix({
 // re-baseline-after-acknowledgment step is a deliberate, documented
 // manual command (docs/how-to/resolve-an-events-jsonl-truncation.md), not
 // a blanket `doctor --fix` sweep.
+// Tầng A/T5 (TA-D10): checks baseline-0 AND every per-writer file under
+// .fgos/events/, each against its OWN entry in the shared guard sidecar
+// (the same `events/<name>` fileKey scheme `runOpportunisticMainCheckout
+// Checks` uses, so the two never disagree about which mark belongs to
+// which file). Per-session files stay git-tracked (TA-D2 only removes the
+// NEED for merge=union, not git tracking itself), so they carry the exact
+// same git reset/checkout/stash truncation risk baseline-0 always has
+// (tsk-cgg) — leaving this check baseline-only would be Tầng A quietly
+// opening a new observability gap.
 function checkEventsJsonlNotTruncated(cwd) {
   const mainCheckout = resolveMainCheckout(cwd);
   if (mainCheckout === null) {
     return { passed: true, message: 'not inside a git checkout — nothing to check' };
   }
-  const logPath = path.join(mainCheckout, '.fgos', 'events.jsonl');
-  const guardPath = path.join(mainCheckout, '.fgos', 'events-jsonl.truncation-guard.json');
-  if (!fs.existsSync(logPath)) {
+  const fgosDir = path.join(mainCheckout, '.fgos');
+  const guardPath = path.join(fgosDir, 'events-jsonl.truncation-guard.json');
+  const filesToCheck = [{ fileKey: 'events.jsonl', logPath: path.join(fgosDir, 'events.jsonl') }];
+  const eventsDirPath = path.join(fgosDir, 'events');
+  try {
+    const names = fs
+      .readdirSync(eventsDirPath, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name.endsWith('.jsonl'))
+      .map((entry) => entry.name);
+    for (const name of names) filesToCheck.push({ fileKey: `events/${name}`, logPath: path.join(eventsDirPath, name) });
+  } catch {
+    // .fgos/events/ doesn't exist yet -- baseline-0 alone is still checked below
+  }
+
+  const existingFiles = filesToCheck.filter(({ logPath }) => fs.existsSync(logPath));
+  if (existingFiles.length === 0) {
     return { passed: true, message: 'no .fgos/events.jsonl yet — nothing to check' };
   }
-  const report = advanceEventsJsonlTruncationGuard(logPath, guardPath);
-  if (report.ok) {
-    return { passed: true, message: `events.jsonl truncation guard holds (${report.message})` };
+
+  const broken = [];
+  for (const { fileKey, logPath } of existingFiles) {
+    const report = advanceEventsJsonlTruncationGuard(logPath, guardPath, fileKey);
+    if (!report.ok) broken.push({ fileKey, message: report.message });
+  }
+
+  if (broken.length === 0) {
+    return {
+      passed: true,
+      message: `truncation guard holds across events.jsonl${existingFiles.length > 1 ? ` + ${existingFiles.length - 1} per-writer file(s)` : ''}`,
+    };
   }
   return {
     passed: false,
-    message: `events.jsonl truncation detected: ${report.message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,
+    message: `truncation detected in ${broken.map((b) => b.fileKey).join(', ')}: ${broken[0].message} — see docs/how-to/resolve-an-events-jsonl-truncation.md`,
   };
 }
 
