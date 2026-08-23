@@ -43,3 +43,5 @@
 {"ts":"2026-08-23T16:40:58.176Z","id":"tsk-3ofc","phase":"root-into-main merge","mergedSha":"28b0f999745fabae1059c7a1ff891e321a1d21c0","mergedInto":"main"}
 {"ts":"2026-08-23T16:45:43.549Z","id":"tsk-3ve-3","phase":"leaf-into-root merge","mergedSha":"f36c2287c8f1f03a472e4861cf69afeb326d71f2","mergedInto":"fgw/tsk-3ve"}
 {"ts":"2026-08-23T16:51:20.998Z","id":"tsk-5sr","phase":"root-into-main merge","mergedSha":"ca3d4da3bfdb27f75436065a1059c7a83bee3248","mergedInto":"main"}
+{"ts":"2026-08-23T16:54:13.607Z","id":"tsk-3ve-4","phase":"leaf-into-root merge","mergedSha":"32a8ddcadec5670a7c349e6fccc96a8129337f8a","mergedInto":"fgw/tsk-3ve"}
+{"ts":"2026-08-23T17:09:58.981Z","id":"tsk-3ve-5","phase":"leaf-into-root merge","mergedSha":"339167214108d06267521e010dcda5dcaaa32747","mergedInto":"fgw/tsk-3ve"}
