@@ -216,6 +216,29 @@ cơ chế guard/vá chồng nhau), tìm kiến trúc đích giải rốt ráo �
   không replay được. Giữ theo D-ADR0001 + sweep cadence được CẢ HAI: sự
   thật replay được trong git, churn = 0 giữa các merge.
 
+- **[2026-08-24, vòng 4b, anh yêu cầu]** Bảng so sánh 3 hệ trên cùng một
+  bộ trục (fgOS tách cột hiện-tại vs đích):
+
+  | Trục | beehive | harness + symphony | fgOS hiện tại | fgOS đích (Tầng A + sweep) |
+  |---|---|---|---|---|
+  | Bài toán concurrency | N worktree đồng thời — đúng bài fgOS | 1 run active/thời điểm (bài dễ hơn) | N session/worktree | N session/worktree |
+  | Coordination sống ở đâu | Runtime files gitignored | SQLite gitignored | Trong event log git-tracked trên main | Như hiện tại (D-ADR0001) |
+  | Chống double-claim | Lockfile mutex O_EXCL + holds ledger | CAS expected-status → exit 3 | events.lock + write-queue | Không đổi |
+  | Visibility | Shared ledger chỉ-main; worktree không tự-claim được | Re-query DB sau CONFLICT | Working-dir append, thấy trước mọi commit | Không đổi — visibility chưa bao giờ cần commit |
+  | History git-tracked | Chỉ narrative logs, union+dedup | Chỉ changeset, 1 file/run, sha256 | Toàn bộ event, 1 file, seq | Toàn bộ event, shard/writer, `h` hash |
+  | Cadence commit/churn | 0 từ coordination | Code không tự commit — orchestrator quyết | Checkpoint 15ph/50ev = nguồn churn #1 | 0 giữa các merge (sweep + fallback thưa) |
+  | Replay từ git | ❌ claims không history | ⚠️ một phần (changeset có, run-lock không) | ✅ toàn bộ | ✅ toàn bộ — giữ hơn cả 2 upstream |
+  | Worktree chở state qua merge | ❌ chủ đích bất khả thi | ❌ changeset độc lập khỏi merge | ❌ ADR0020 | ❌ giữ nguyên, Tầng B đóng |
+  | Kỷ luật merge-back | Staged-verify (chưa wired production) | Né hẳn (không merge state) | Merge-trước-verify-sau, tsk-1i3 đã vá | tsk-1i3 đủ; staged-verify là nâng cấp ngoài scope |
+  | Chống double-apply | Dedup id lúc replay | content_sha256 CAS | contiguity resequence (band-aid) | `h` từ gốc (T1 delivered) |
+  | Độ chín | Prod nhiều mảnh, merge-module spike | Prod cho 1-writer | Đang chạy, vá từng miếng | Tầng A 2/6, sweep chưa build |
+
+  Kết luận trục đánh đổi: beehive hy sinh history-của-coordination lấy
+  zero-churn; harness hy sinh N-writer lấy CAS đơn giản; fgOS đòi cả ba
+  (N-writer + replayable history + in-repo) — và cái giá đang trả sai chỗ
+  là commit cadence mịn, thứ cả hai upstream chứng minh không cần cho
+  visibility. Sweep = giữ hai đòi hỏi khó, bỏ đúng cái không ai cần.
+
 ## 6. Thiết kế đã chốt {#design}
 
 (Chưa có gì để tổng hợp — chưa có quyết định nào chốt ở §4. Mục này sẽ được
