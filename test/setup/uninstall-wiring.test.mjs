@@ -3,6 +3,13 @@
 // CONTEXT.md D2-D4). Package removal (D1) is out of scope here — that's
 // tsk-4iv-2's own spike, layered onto this same verb later.
 //
+// tsk-25b D5: the two real `fgos uninstall` CLI round-trip tests each run a
+// full `fgos setup` first (materializeSkillsIntoProject copies the whole
+// `.agents/skills` tree), ~17s apiece — split into
+// uninstall-wiring-2.test.mjs/uninstall-wiring-3.test.mjs so no single file
+// carries both and crosses the ~30s per-file ceiling. Mechanical split only,
+// same D2 invariant as the rest of this item.
+//
 // `setup` appends a source line under $HOME, so — same reasoning
 // test/cli/fgos.test.mjs's own "setup inside a .fgos/-less linked worktree"
 // test already gives — every CLI call below runs against a throwaway HOME,
@@ -98,71 +105,4 @@ test('uninstallGitHooks is a no-op when hooksPath was never set', () => {
 
   assert.deepEqual(result, { unwired: false, skippedExisting: null });
   fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-// --- CLI: the real `fgos uninstall` verb, confirmation gate + full round
-// trip against a real `fgos setup` run first. ---
-
-test('uninstall with no --yes refuses (exit 4) and touches nothing', () => {
-  const cwd = mkTemp('uninstall-cli-noyes-');
-  const home = mkTemp('uninstall-cli-noyes-home-');
-  initGitRepo(cwd);
-  assert.equal(run(cwd, ['init']).status, 0);
-  const setupResult = run(cwd, ['setup'], { HOME: home });
-  assert.equal(setupResult.status, 0, `setup failed: ${setupResult.stderr}`);
-  const hooksPathBefore = execFileSync('git', ['config', '--get', 'core.hooksPath'], { cwd, encoding: 'utf8' }).trim();
-  assert.equal(hooksPathBefore, path.join(cwd, '.githooks'), 'setup must have wired hooksPath before this test proves uninstall refuses to touch it');
-
-  const result = run(cwd, ['uninstall'], { HOME: home });
-
-  assert.equal(result.status, 4, `expected validation refusal, got status ${result.status}: ${result.stderr}`);
-  assert.equal(
-    execFileSync('git', ['config', '--get', 'core.hooksPath'], { cwd, encoding: 'utf8' }).trim(),
-    path.join(cwd, '.githooks'),
-    'a refused uninstall must not touch core.hooksPath',
-  );
-  fs.rmSync(cwd, { recursive: true, force: true });
-  fs.rmSync(home, { recursive: true, force: true });
-});
-
-test('uninstall --yes unwires hooks, reports (never deletes) the shell-rc source line, and leaves .fgos/config.json byte-identical', () => {
-  const cwd = mkTemp('uninstall-cli-yes-');
-  const home = mkTemp('uninstall-cli-yes-home-');
-  fs.writeFileSync(path.join(home, '.bashrc'), '# pre-existing rc content\n');
-  initGitRepo(cwd);
-  assert.equal(run(cwd, ['init']).status, 0);
-  const setupResult = run(cwd, ['setup'], { HOME: home });
-  assert.equal(setupResult.status, 0, `setup failed: ${setupResult.stderr}`);
-
-  const rcFile = path.join(home, '.bashrc');
-  const rcContentBeforeUninstall = fs.readFileSync(rcFile, 'utf8');
-  assert.match(rcContentBeforeUninstall, /fgos-shell-integration\.sh/, 'setup must have inserted the fgos source line before this test proves uninstall reports (not deletes) it');
-
-  const configPath = path.join(cwd, '.fgos', 'config.json');
-  const configBefore = fs.readFileSync(configPath, 'utf8');
-
-  const result = run(cwd, ['uninstall', '--yes'], { HOME: home });
-  assert.equal(result.status, 0, `uninstall --yes failed: ${result.stderr}`);
-  const data = JSON.parse(result.stdout).data;
-
-  assert.equal(data.hooksUnwired, true);
-  assert.equal(data.hooksSkippedExisting, null);
-  assert.throws(
-    () => execFileSync('git', ['config', '--get', 'core.hooksPath'], { cwd, encoding: 'utf8' }),
-    'core.hooksPath must be unset after uninstall --yes',
-  );
-  assert.equal(fs.existsSync(path.join(cwd, '.githooks')), false);
-
-  assert.equal(data.shellRcSourceLinesFound.length, 1);
-  assert.equal(data.shellRcSourceLinesFound[0].rcFile, rcFile);
-  assert.match(data.shellRcRemovalInstructions, /remove.*by hand/i);
-
-  // D4's whole point: the rc file itself is never touched, byte-for-byte.
-  assert.equal(fs.readFileSync(rcFile, 'utf8'), rcContentBeforeUninstall);
-
-  // Pinned constraint (CONTEXT.md): .fgos/config.json is never touched.
-  assert.equal(fs.readFileSync(configPath, 'utf8'), configBefore);
-
-  fs.rmSync(cwd, { recursive: true, force: true });
-  fs.rmSync(home, { recursive: true, force: true });
 });
