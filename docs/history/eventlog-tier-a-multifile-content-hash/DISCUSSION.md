@@ -4,22 +4,19 @@ Item: `tsk-3ve` · Feature dir: `docs/history/eventlog-tier-a-multifile-content-
 
 ## 1. Trạng thái hiện tại
 
-Vòng 2 (2026-08-23 tối): anh **chốt toàn bộ** P1–P4 + Q5/Q6/Q7 từ vòng 1 →
-promote thành TA-D7…TA-D13, cộng R5 (lock toàn thư mục, giữ ổn 2 vòng không
-ai bẻ) thành TA-D14. Thiết kế Tầng A giờ **không còn điểm treo nào** — §6 đã
-regenerate sạch marker «đề xuất», §7 là danh mục task thật với D-ID đầy đủ.
+**HỘI TỤ** (vòng 3, 2026-08-23): anh chốt nốt O4 (SQLite → TA-D15: ngoài
+Tầng A). Không còn điểm treo nào — §4 có đủ TA-D0…TA-D15 machine-readable,
+§6 là synthesis chốt, §7 là danh mục 6 task con với anchor/D-ID/verify draft.
+Bước tiếp theo duy nhất: set `refs` per-anchor và handoff native-first sang
+`fgos-coding-exploring`/`fgos-coding-planning` cho chuỗi T1→T6.
 
-Vòng 1 (2026-08-23 chiều): scout code toàn bộ đường ghi/đọc/guard/checkpoint
-(chi tiết §5), mint TA-D0…TA-D6 từ report
+Vòng 2: anh chốt P1–P4 + Q5/Q6/Q7 → TA-D7…TA-D13; R5 → TA-D14; §6
+regenerate sạch marker «đề xuất»; phân tích câu hỏi SQLite (Q8).
+
+Vòng 1: scout code toàn bộ đường ghi/đọc/guard/checkpoint (chi tiết §5),
+mint TA-D0…TA-D6 từ report
 `plans/reports/investigation-260821-1202-eventlog-branch-union-decision-history-report.md`,
-phát hiện 4 gap thật (R1–R4) + 3 điểm để-ngỏ (O1–O3) kèm đề xuất — tất cả đã
-chốt ở vòng 2.
-
-**Còn mở duy nhất (O4, §3/Q8):** anh hỏi có nên support đọc thẳng từ SQLite
-như repository-harness không — session đã phân tích kèm số đo thật, khuyến
-nghị **không đưa vào Tầng A, tách thành item riêng khi đau thật** (chi tiết
-Q8, §5). Chờ anh xác nhận; nếu gật, Tầng A coi như hội tụ, sẵn sàng handoff
-native-first sang exploring/planning cho chuỗi T1→T6.
+phát hiện 4 gap thật (R1–R4) + 3 điểm để-ngỏ (O1–O3) kèm đề xuất.
 
 ## 2. Mục tiêu & đề bài
 
@@ -60,7 +57,7 @@ nhất, không thêm gánh vận hành cho người.
 | O1 | Naming: `<writer-id>-<openTs>.jsonl`, một file "đang mở" duy nhất per writer | **Rõ** — TA-D11 | Chốt vòng 2 (Q5) |
 | O2 | Di trú: `events.jsonl` cũ = baseline-0 nguyên trạng, không rewrite, cutover 1 lần | **Rõ** — TA-D12 | Chốt vòng 2 (Q6) |
 | O3 | Compaction: chỉ file writer chết/idle, dưới lock, verify gate xanh mới `git mv` archive; replay luôn dedupe-by-hash; ngưỡng số chờ đo thật (config key riêng) | **Rõ** — TA-D13 | Chốt vòng 2 (Q7); con số cụ thể vẫn để planning/đo |
-| O4 | Có nên support đọc thẳng từ SQLite như repository-harness (thay/bổ sung state.json làm materialized view) | **Mở** — khuyến nghị session ở §5/Q8: KHÔNG đưa vào Tầng A, tách item riêng khi số đo vượt ngưỡng đau | Chờ anh xác nhận vòng tới |
+| O4 | SQLite view layer | **Rõ** — TA-D15: KHÔNG nằm trong Tầng A; tách item riêng khi số đo state.json vượt ngưỡng đau (phân tích + số đo lưu ở Q8) | Anh chốt vòng 3 |
 
 ## 4. Quyết định đã chốt
 
@@ -81,6 +78,7 @@ nhất, không thêm gánh vận hành cho người.
 | TA-D12 | Di trú: KHÔNG rewrite 23K dòng cũ — `events.jsonl` hiện tại thành baseline-0 nguyên trạng, vẫn là source thật của replay; write path mới chỉ ghi `.fgos/events/`; cutover 1 lần khi code land, không dual-write; `merge=union` giữ cho file cũ, không áp cho `events/*` | vòng 1 (Q6) → anh chốt vòng 2 |
 | TA-D13 | Compaction eligibility: chỉ file của writer đã chết/idle quá ngưỡng, chạy dưới `events.lock`, verify gate xanh mới `git mv` vào `archive/`; replay dedupe theo hash MỌI LÚC (legacy: theo nội dung dòng) nên crash giữa compaction vô hại theo cấu trúc; ngưỡng số cụ thể đo thật rồi chọn, config key riêng theo precedent `checkpoint.eventThreshold` | vòng 1 (Q7) → anh chốt vòng 2 |
 | TA-D14 | `events.lock` giữ nguyên phạm vi TOÀN thư mục `.fgos/` — multi-file loại git-conflict, không loại local race; CAS precondition (moveWork expectedStatus, addWork dup-id) + refreshView-trong-lock (tsk-1q5) cần một critical section duy nhất bao mọi writer; per-file lock là sai | vòng 1 (R5) → giữ ổn qua vòng 2 |
+| TA-D15 | SQLite view layer KHÔNG nằm trong Tầng A — state.json giữ nguyên; khi số đo parse/rewrite của state.json vượt ngưỡng người dùng cảm được thì submit item riêng "swap materialized view JSON→SQLite (node:sqlite, nâng engines ≥22)"; phân tích + số đo nền (8.1MB / 1013 items / 67ms đọc + 70ms parse mỗi call) lưu ở §5/Q8 | session đề xuất Q8 vòng 2 → anh chốt vòng 3 |
 
 (Mỗi D-ID trên đã ghi qua `fgos decision --id tsk-3ve --relation none` tại vòng nó được mint.)
 
@@ -247,6 +245,17 @@ làm: khi số đo (parse time hoặc rewrite amplification của state.json) v�
 ngưỡng người dùng cảm được, submit item riêng "swap materialized view
 JSON→SQLite (node:sqlite, nâng engines ≥22)" — lúc đó có Tầng A làm nền thì
 việc này gọn hơn nhiều so với làm bây giờ. Chờ anh xác nhận để đóng O4.
+
+---
+
+**2026-08-23T21:35+07:00 — Vòng 3: anh chốt O4 → HỘI TỤ.**
+
+**Anh:** "đồng ý, như vậy" — O4 đóng theo khuyến nghị Q8, mint TA-D15.
+Không submit item SQLite ngay (đúng khuyến nghị: chỉ submit khi số đo vượt
+ngưỡng; phân tích + số đo đã lưu tại Q8 để item tương lai không đào lại).
+Discussion hội tụ: §6 stable, §7 real — đủ điều kiện terminal handoff theo
+skill. Anh hỏi thêm về model nào phù hợp chạy các stage tiếp theo — trả lời
+trong chat (không phải quyết định thiết kế của feature này, không mint D-ID).
 
 ## 6. Thiết kế đã chốt {#design}
 
