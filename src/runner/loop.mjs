@@ -340,7 +340,8 @@ function tailLines(text, n = 10) {
  * dispatch-anchor definition here would NOT catch the scenario that caused
  * the real 14-item false-positive block this guards against. Do not
  * consolidate this with `hasOpenDescendant` — the two intentionally answer
- * different questions.
+ * different questions. See `frontier.mjs`'s `hasOpenDescendant` for the
+ * narrower, resolved-status check this deliberately diverges from.
  */
 function hasStillNeededDescendant(id, work) {
   for (const [childId, child] of Object.entries(work)) {
