@@ -121,8 +121,9 @@ spec shape and the "why nothing is created here" rationale:
 This skill only names, for each piece it describes, the one command that
 proves it done — it never designs or re-plans Execute's own mechanical
 path. For a pass-through (non-split) item, sync a still-placeholder
-`verify` field onto the item once the real command is named. Full
-mechanics: `references/verify-sync-and-gap.md`.
+`verify` field onto the item once the real command is named, and sync its
+`action` and `footprint` fields (pointing to `plan.md` and touched files)
+if unpopulated. Full mechanics: `references/verify-sync-and-gap.md`.
 
 ### Step 6: Mid-planning CONTEXT.md gap
 If CONTEXT.md turns out silent on something this plan actually needs,
@@ -221,8 +222,9 @@ Violating the letter of the rules is violating the spirit of the rules.
   hatch
 - `references/split-and-child-specs.md` — the child-spec JSON shape,
   field-by-field requirements, and why nothing is created at this stage
-- `references/verify-sync-and-gap.md` — the pass-through and split-root verify-sync
-  mechanics and the mid-planning CONTEXT.md gap hand-back
+- `references/verify-sync-and-gap.md` — the pass-through action/footprint/verify
+  sync mechanics, split-root verify-sync mechanics, and the mid-planning CONTEXT.md
+  gap hand-back
 
 ## Workflow Position
 

@@ -1618,7 +1618,7 @@ async function runVerb(verb, flags, positional, dir) {
     case 'edit': {
       const id = requireField(positional[0] ?? flags.id, 'edit requires an id: fgos edit <id> --<field> <value> [...]');
       const patch = {};
-      for (const field of ['title', 'description', 'kind', 'risk', 'verify', 'tier', 'urgent']) {
+      for (const field of ['title', 'description', 'kind', 'risk', 'verify', 'tier', 'urgent', 'action']) {
         if (flags[field] !== undefined) {
           patch[field] = flags[field];
         }
