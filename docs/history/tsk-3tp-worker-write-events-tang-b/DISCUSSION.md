@@ -2,20 +2,24 @@
 
 ## 1. Trạng thái hiện tại
 
-Vòng 2 (23/8, cùng ngày vòng 1). Chưa có D-ID nào chốt — chờ anh phản hồi đề
-xuất vòng 2 rồi mới xét mint ở vòng sau.
+Vòng 3 (23/8, cùng ngày vòng 1-2). Chưa có D-ID nào chốt — nhưng một điểm
+neo đã xuất hiện và đang giữ ổn: **`.fgos` là PM-state của chính repo nó
+quản, sự thật phải sống cùng một git history với code — không cách ly khỏi
+repo** (anh nêu vòng 3, bác đề xuất nested-repo của vòng 2; khớp nguyên văn
+D-ADR0001 "git-committed"). Nếu điểm này giữ qua vòng sau, nó là ứng viên
+D-ID đầu tiên.
 
-Diễn biến: vòng 1 scout xác nhận 2 claim cốt lõi của các cảnh báo trong đề
-bài (worker không đọc/ghi `.fgos/`; Tầng B không chạm root cause tần suất
-commit). Anh sau đó yêu cầu đánh giá lại TOÀN BỘ cụm vấn đề event-log và
-brainstorm hướng giải rốt ráo, không legacy ("khong phai no nang ma no tum
-lum" — RUL11). Vòng 2 mở rộng phạm vi thảo luận từ "có nên làm Tầng B" thành
-"kiến trúc đích cho write-path của `.fgos/` state là gì". Phân tích vòng 2
-(xem §5, entry vòng 2) đưa ra đề xuất chính: **tách state plane — `.fgos/`
-thành repo git riêng (nested repo, gitignored khỏi main), xóa ~8-9 cơ chế
-legacy theo sau; đóng vĩnh viễn scope Tầng B**. Đang chờ anh chốt: (a) đồng
-ý hướng tách plane / nested repo? (b) tsk-3tp repurpose tại chỗ hay đóng +
-submit item mới?
+Diễn biến: vòng 1 xác nhận worker không đọc/ghi `.fgos/` (Tầng B nguyên bản
+không có consumer). Vòng 2 (theo yêu cầu brainstorm rốt ráo của anh) đề xuất
+nested state repo — anh bác vì vi phạm constraint in-repo. Vòng 3 đo phân bố
+23.847 event thật: ~40% coordination (move/stage/add — cần visibility toàn
+cục tức thì, không thể sinh trong nhánh), ~55-60% narrative — nghĩa là Tầng
+B nguyên bản cũng chỉ chở được một nửa write volume. Đề xuất hiện hành
+(vòng 3, chờ anh phản hồi): **giữ event in-repo trọn vẹn, xóa
+checkpoint-commit chuyên dụng, thay bằng sweep-dirty-shards vào các
+merge/approve commit main đằng nào cũng tạo + fallback thưa** — ADR0020
+không đụng, Tầng B đóng vĩnh viễn, danh sách xóa legacy giữ gần nguyên.
+Chi tiết §5 entry vòng 3; các điểm chờ chốt: §3 dòng 6/8/9.
 
 ## 2. Mục tiêu & đề bài
 
@@ -50,9 +54,10 @@ cơ chế guard/vá chồng nhau), tìm kiến trúc đích giải rốt ráo �
 | 3 | Worker hôm nay có thật sự không đọc/ghi `.fgos/` từ trong worktree không (YAGNI-check cảnh báo #2)? | **Rõ — xác nhận lại bằng code thật, vẫn đúng** | `grep .fgos src/runner/dispatch/*.mjs`: chỉ có `dispatch/cli.mjs`'s `spawnWorker` nhận `opts.fgosDir` — dùng để launcher (không phải worker) gọi `fgos tool query` presence-check qua `resolveExecutorCommand`; comment tại dòng ~222-224 nói thẳng "fgosDir's root (always the main checkout)" và tách bạch với `attestRoot: cwd` (worktree của worker). Không có call site nào trong `dispatch/*.mjs` cho phép TIẾN TRÌNH WORKER tự đọc/ghi `.fgos/` từ bên trong worktree của nó — đúng như cảnh báo #2 nói, dispatch path 23/8 (đã có agy, fanout) vẫn giữ nguyên tính chất này so với lúc ADR0020 chốt (28/7). |
 | 4 | Tầng B có giải được root cause #1 gốc (tần suất commit lên main quá nhanh, buộc `fgw/<id>` catchup thường xuyên) không? | **Rõ — không, hoặc chỉ một phần rất hẹp** | Theo report 21/8 đã dẫn trong đề bài: nguồn write gây áp lực chính là periodic checkpoint + session commit trực tiếp lên main — cả hai đường này KHÔNG đi qua vòng đời "worktree rồi merge" mà Tầng B nhắm tới. Tầng B chỉ có tác dụng cho write sinh ra từ WORKER — nhưng câu 3 vừa xác nhận worker hôm nay không sinh write `.fgos/` nào cả, nên chưa có khối lượng thật ở đúng chỗ Tầng B nhắm giảm. |
 | 5 | Nếu quyết "chưa cần Tầng B", hướng nào giải đúng root cause #1 (giảm tần suất commit của SESSION lên main)? | **Đã scout + đề xuất (vòng 2) — chờ anh chốt** | Đề xuất chính: tách state plane — `.fgos/` thành nested git repo riêng, gitignored khỏi main; commit state không còn di chuyển HEAD main → root cause #1 biến mất về cấu trúc. Chi tiết + trade-off: §5 entry vòng 2. |
-| 6 | Kiến trúc đích: có tách state plane (`.fgos/` ra khỏi commit-path của main) không? Nếu tách, nested repo hay separate ref (`refs/fgos/state`)? | **Chưa rõ — chờ anh quyết** | Em khuyến nghị nested repo (KISS, zero plumbing, dùng git thường); separate ref được "1 repo 1 clone" nhưng phải tự viết plumbing commit-tree/update-ref. Trade-off nested repo: `git clone` main không tự mang state theo (single-machine hiện tại chưa cần; ghi nhận giới hạn). Đây là chỉnh cách thi hành D-ADR0001 ("git-committed") — cần quyết định mới ghi nhận rõ, không sửa lệch luật im lặng. |
-| 7 | Sau khi Tầng A + tách plane: danh sách legacy nào được XÓA? | **Rõ (danh sách), chưa chốt (chờ hướng ở dòng 6)** | (1) `merge=union` + `events-jsonl-contiguity.mjs`; (2) periodic checkpoint commit lên main + tuning `checkpoint.eventThreshold`; (3) truncation-guard phần git (mark sidecar, warnings file, opt-out env `FGOS_DISABLE_OPPORTUNISTIC_CHECKS`); (4) `merge.mjs`'s `.fgos-write-rejected` machinery (giữ 1 assert); (5) pre-commit hook phần chống nuốt `.fgos/` (tsk-56u class); (6) `events.jsonl` 1-file + 2 backup → đông cứng baseline-0/archive; (7) `seq` làm identity → bỏ hẳn ở compaction đầu; (8) Tầng B — không bao giờ cần. |
-| 8 | tsk-3tp: repurpose tại chỗ thành item "tách state plane", hay đóng hẳn + submit item mới? | **Chưa rõ — chờ anh quyết** | Cả hai đều giữ dep tsk-3ve (Tầng A T3-T6 phải xong trước — baseline + replay đa-file là nền migration). |
+| 6 | Constraint kiến trúc: `.fgos` state phải sống cùng git history với code (in-repo), không cách ly? | **Ổn định 1 vòng — ứng viên D-ID nếu giữ qua vòng sau** | Anh nêu trực tiếp vòng 3, bác nested-repo vòng 2. Khớp D-ADR0001 nguyên văn. Mọi phương án từ đây phải thỏa constraint này. |
+| 7 | Sau khi Tầng A + checkpoint redesign: danh sách legacy nào được XÓA? | **Rõ (danh sách), chưa chốt (chờ dòng 9)** | XÓA: (1) `merge=union` + `events-jsonl-contiguity.mjs` (sau freeze events.jsonl); (2) checkpoint-commit chuyên dụng + tuning `checkpoint.eventThreshold`; (3) phần lớn truncation-guard surface (mark sidecar, warnings file, opt-out env `FGOS_DISABLE_OPPORTUNISTIC_CHECKS`); (4) `events.jsonl` 1-file + 2 backup → đông cứng baseline-0/archive; (5) `seq` làm identity → bỏ hẳn ở compaction đầu; (6) Tầng B — đóng vĩnh viễn. GIỮ: merge guard `.fgos-write-rejected` (nguyên trạng, không ngoại lệ), pre-commit hook (tsk-56u class). |
+| 8 | tsk-3tp: repurpose tại chỗ thành item "checkpoint redesign: sweep-on-merge", hay đóng hẳn + submit item mới? | **Chưa rõ — chờ anh quyết** | Cả hai đều giữ dep tsk-3ve (Tầng A T3-T6 phải xong trước — shard + đóng vector git-clobber là điều kiện an toàn cho coarse cadence). |
+| 9 | Cơ chế thay checkpoint chuyên dụng: sweep-dirty-shards vào merge/approve commit sẵn có + fallback thưa — hay Tầng B-cho-SESSION (narrative event sinh trong worktree của session đã claim, piggyback merge)? | **Chưa rõ — em khuyến nghị sweep, chờ anh** | Đo vòng 3: coordination ~40% (move 29% + stage 6.6% + add 4.3%) buộc ghi main tức thì dù chọn gì; narrative ~55-60% (decision 19.4%, edit 15.4%, outcome 12.8%, discovery 4.2%, gate 4.2%, friction/handoff/call-summary ~4%). Tầng-B-cho-session chỉ chở được phần narrative, đổi lấy: ngoại lệ merge guard, tách 2 class event khác luật, narrative vô hình từ main tới khi merge (mất nếu nhánh bỏ). Sweep: churn giảm về ~0 giữa các merge, visibility tức thì giữ nguyên, ADR0020 nguyên vẹn, không class split. Nhượng bộ duy nhất: merge commit của một nhánh chở kèm dirty event của mọi writer (provenance vẫn trong nội dung event: `src`/`ts`/`h`). |
 
 ## 4. Quyết định đã chốt
 
@@ -120,6 +125,46 @@ cơ chế guard/vá chồng nhau), tìm kiến trúc đích giải rốt ráo �
   **Kết luận Tầng B:** đóng vĩnh viễn — worker không có write nào để dời
   (verify lại bằng code vòng 1), và nếu mai sau cần, đi qua cửa ghi của
   state repo, không đục tường ADR0020. Đã trình anh, chờ chốt §3 dòng 1/6/8.
+
+- **[2026-08-23, vòng 3, anh trả lời]** Nguyên văn: "`.fgos` chính là
+  project management state của chính project nó đang xây, không thể cách ly
+  khỏi repo, đó là lý do của B." → Bác nested-repo (vòng 2). Constraint
+  in-repo được nêu tường minh — ghi vào §3 dòng 6 làm điểm neo.
+
+- **[2026-08-23, vòng 3, scout + đề xuất sửa]** Đo phân bố toàn bộ 23.847
+  event trong `/home/vantt/projects/forgentX/.fgos/events.jsonl` (python,
+  đếm theo `type`): work.move 29.0%, decision 19.4%, work.edit 15.4%,
+  work.outcome 12.8%, work.stage 6.6%, work.add 4.3%, work.discovery 4.2%,
+  work.gate-approve 4.2%, friction/handoff/call-summary ~4%, còn lại <1%.
+  Phân loại: coordination (move/stage/add — claim, frontier, chống
+  double-claim, cần visibility toàn cục TỨC THÌ) ~40%; narrative (chuyện
+  của item đang làm) ~55-60%. Hệ quả: Tầng B nguyên bản (event sinh trong
+  nhánh, piggyback merge) chỉ chở được phần narrative — coordination vẫn
+  phải ghi main ngay, vẫn cần checkpoint, churn chỉ giảm khoảng một nửa.
+
+  **Insight sửa lại:** trên single machine, visibility đến từ WORKING DIR
+  của main checkout (mọi session đọc `--dir` main, thấy event ngay khi
+  append, trước mọi commit) — commit chỉ phục vụ durability/history. Churn
+  P3 không đến từ nơi ghi mà từ COMMIT CHUYÊN DỤNG (checkpoint 15ph/50
+  event). Main đã có sẵn commit hợp pháp thường xuyên: mỗi lần approve
+  merge một nhánh.
+
+  **Đề xuất vòng 3 (thay cả nested-repo lẫn Tầng B):** (1) Tầng A T3-T6 làm
+  nốt — shard per-writer + tsk-1i3/tsk-56u đã đóng các vector git-clobber
+  vốn là lý do khai sinh checkpoint 15ph; (2) xóa checkpoint-commit chuyên
+  dụng, thay bằng sweep dirty `.fgos/events/` shards vào chính các
+  merge/approve commit main đằng nào cũng tạo + fallback thưa (~60ph hoặc
+  end-of-session) cho khoảng lặng; (3) giữa 2 lần merge không còn commit
+  metadata → HEAD main chỉ nhảy khi có code thật → catchup/re-verify churn
+  từ metadata = 0; (4) ADR0020 không đụng, không ngoại lệ merge guard,
+  không class split, Tầng B đóng vĩnh viễn kể cả cho mục tiêu churn; (5)
+  danh sách xóa legacy: §3 dòng 7. Vì sao coarse giờ an toàn còn 20/8 thì
+  không: checkpoint dày ra đời để thu hẹp cửa sổ mất-data do git-op clobber
+  file tracked dirty — Tầng A đổi bài toán (file mới per-writer) + các vector
+  đè/nuốt đã bị chặn, cửa sổ dài chỉ còn là độ trễ history, không phải rủi
+  ro mất data. Nhượng bộ: merge commit chở kèm dirty event mọi writer —
+  provenance vẫn nguyên trong nội dung event (`src`/`ts`/`h`). Chờ anh chốt
+  §3 dòng 9 (sweep vs Tầng-B-cho-session) và dòng 8 (repurpose vs item mới).
 
 ## 6. Thiết kế đã chốt {#design}
 
