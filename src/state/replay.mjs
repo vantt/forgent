@@ -12,7 +12,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { readEvents, readLastLineBefore, readEventsFromByte } from './events.mjs';
+import { readEvents, readLastLineBefore, readEventsFromByte, parseEventLines } from './events.mjs';
 import { DEFAULTS } from './work.mjs';
 
 // tsk-49e: every top-level key applyEvent ever writes to `view` is either an
@@ -717,14 +717,22 @@ export function rebuildView(logPath) {
 }
 
 // Tầng A/T3 (TA-D3/TA-D7/TA-D12/TA-D13): reads events, alongside their own
-// raw line text, from one file — via `readEvents` for parsing (same
-// corrupt-log fail-closed guarantee every other reader here gets), and a
-// second raw read for the exact line content dedupe below needs. A missing
-// file (never written yet) contributes nothing, same as `readEvents`.
+// raw line text, from one file — a SINGLE fs.readFileSync (tsk-3jh/tsk-49e's
+// own dedupe discipline: never read the same file twice for data already in
+// hand), parsed once via `parseEventLines` (the same corrupt-log fail-closed
+// core `readEvents` itself calls) so both the parsed events and their exact
+// raw line text come from the one buffer. A missing file (never written
+// yet) contributes nothing, same as `readEvents`.
 function readFileWithRawLines(filePath) {
-  const events = readEvents(filePath);
+  let raw;
+  try {
+    raw = fs.readFileSync(filePath, 'utf8');
+  } catch (err) {
+    if (err.code === 'ENOENT') return [];
+    throw err;
+  }
+  const events = parseEventLines(raw, filePath);
   if (events.length === 0) return [];
-  const raw = fs.readFileSync(filePath, 'utf8');
   const lines = raw.split('\n');
   if (lines[lines.length - 1] === '') lines.pop();
   return events.map((ev, i) => ({ ev, raw: lines[i] }));

@@ -327,7 +327,7 @@ export function addWork(dir, work) {
     assertNoCycle(item, before.work);
     assertNoUnifiedCycle(item, before.work);
 
-    return appendEventLocked(resolveWriterLogPath(dir), { type: 'work.add', payload: item });
+    return appendEventLocked(resolveWriterLogPath(dir), { type: 'work.add', payload: item }, dir);
   });
 }
 
@@ -463,7 +463,7 @@ export function editWork(dir, { id, patch, role } = {}) {
     // never throws and never blocks the mutation (D18); no validator sits on
     // this path.
     payload.writer = resolveWriterIdentity(dir);
-    return appendEventLocked(resolveWriterLogPath(dir), { type: 'work.edit', payload });
+    return appendEventLocked(resolveWriterLogPath(dir), { type: 'work.edit', payload }, dir);
   });
 }
 
@@ -497,7 +497,7 @@ export function resolveParkReason(dir, { id, note, role } = {}) {
       payload.role = role;
     }
     payload.writer = resolveWriterIdentity(dir);
-    return appendEventLocked(resolveWriterLogPath(dir), { type: 'work.resolve-park-reason', payload });
+    return appendEventLocked(resolveWriterLogPath(dir), { type: 'work.resolve-park-reason', payload }, dir);
   });
 }
 
@@ -559,7 +559,7 @@ export function setFocus(dir, { id, role } = {}) {
       );
     }
     const payload = role !== undefined ? { id, role } : { id };
-    return appendEventLocked(resolveWriterLogPath(dir), { type: 'goal.focus', payload });
+    return appendEventLocked(resolveWriterLogPath(dir), { type: 'goal.focus', payload }, dir);
   });
 }
 
@@ -882,7 +882,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
       // best-effort — see comment above.
     }
   }
-  return appendEventLocked(resolveWriterLogPath(dir), rawEvent); // captures the real seq; rawEvent itself has none
+  return appendEventLocked(resolveWriterLogPath(dir), rawEvent, dir); // captures the real seq; rawEvent itself has none
   });
   // tsk-2t9c D16: `delivered` is a terminal state for the role/holder axis
   // -- no stage skill ever re-enters an item past this point (every wired
@@ -1027,7 +1027,7 @@ export function moveStage(dir, { id, to, expectedStage, verify, role } = {}) {
     // moveStage call records who wrote it, never blocking on a malformed
     // identity (D18).
     rawEvent.payload.writer = resolveWriterIdentity(dir);
-    return appendEventLocked(resolveWriterLogPath(dir), rawEvent);
+    return appendEventLocked(resolveWriterLogPath(dir), rawEvent, dir);
   });
 }
 
@@ -1122,7 +1122,7 @@ export function recordCall(dir, { id, toRole, reason, note, outcome, openSyncDep
       ? { type: 'work.handoff', payload: { id, from: fromRole, to: toRole, reason, mode: 'async', note } }
       : { type: 'work.call-summary', payload: { id, calleeRole: toRole, reason, outcome } };
     rawEvent.payload.writer = resolveWriterIdentity(dir);
-    return appendEventLocked(resolveWriterLogPath(dir), rawEvent);
+    return appendEventLocked(resolveWriterLogPath(dir), rawEvent, dir);
   });
 }
 
@@ -1159,7 +1159,7 @@ export function recordCallReturn(dir, { id, note } = {}) {
       payload: { id, from: work.holder, to: openCall.from, reason: openCall.reason, mode: 'async', returning: true, note },
     };
     rawEvent.payload.writer = resolveWriterIdentity(dir);
-    return appendEventLocked(resolveWriterLogPath(dir), rawEvent);
+    return appendEventLocked(resolveWriterLogPath(dir), rawEvent, dir);
   });
 }
 
@@ -1175,7 +1175,7 @@ export function addDiscovery(dir, payload) {
   if (!payload || typeof payload.id !== 'string' || !payload.id.trim()) {
     throw new StoreError('validation', 'discovery requires a non-empty "id".');
   }
-  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(resolveWriterLogPath(dir), { type: 'work.discovery', payload }));
+  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(resolveWriterLogPath(dir), { type: 'work.discovery', payload }, dir));
 }
 
 // Gate approve record shape (tsk-19j D1/D11): the 3 skill-embedded Gates
@@ -1211,7 +1211,7 @@ export function recordGateApprove(dir, { id, gate, actor, verify } = {}) {
     throw new StoreError('validation', 'gate-approve requires a non-empty "verify".');
   }
   return withEventsLockAndRefresh(dir, logPath, () =>
-    appendEventLocked(resolveWriterLogPath(dir), { type: 'work.gate-approve', payload: { id, gate, actor, verify } }));
+    appendEventLocked(resolveWriterLogPath(dir), { type: 'work.gate-approve', payload: { id, gate, actor, verify } }, dir));
 }
 
 /**
@@ -1269,7 +1269,7 @@ export function addDecision(dir, payload) {
         throw new StoreError('validation', `work "${payload.id}" not found.`);
       }
     }
-    return appendEventLocked(resolveWriterLogPath(dir), { type: 'decision', payload: eventPayload });
+    return appendEventLocked(resolveWriterLogPath(dir), { type: 'decision', payload: eventPayload }, dir);
   });
 }
 
@@ -1376,7 +1376,7 @@ export function addOutcome(dir, payload) {
     throw new StoreError('validation', 'outcome requires a non-empty "id".');
   }
   assertValidDocType(payload);
-  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(resolveWriterLogPath(dir), { type: 'work.outcome', payload }));
+  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(resolveWriterLogPath(dir), { type: 'work.outcome', payload }, dir));
 }
 
 /**
@@ -1395,7 +1395,7 @@ export function addFriction(dir, payload) {
     throw new StoreError('validation', 'friction requires a non-empty "id".');
   }
   assertValidDocType(payload);
-  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(resolveWriterLogPath(dir), { type: 'work.friction', payload }));
+  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(resolveWriterLogPath(dir), { type: 'work.friction', payload }, dir));
 }
 
 /** Read-only: the current view, rebuilt fresh from the log (never off a stale file). */

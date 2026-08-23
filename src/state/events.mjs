@@ -413,8 +413,23 @@ export function withEventsLock(logPath, fn) {
  * lock acquisition. For a caller that already holds the `events.lock` via
  * `withEventsLock` and wants to append inside that same held lock, without
  * `appendEvent`'s own (non-reentrant) acquire/release around it.
+ *
+ * `fgosDir` (Tầng A/T2 follow-up): the real `.fgos`-shaped directory whose
+ * `sessions.json` registry `resolveWriterIdentity` consults to confirm an
+ * env-supplied writer id (see session-identity.mjs). Defaults to
+ * `path.dirname(logPath)` — correct for every caller that still appends
+ * straight to baseline-0 (`<fgosDir>/events.jsonl`, e.g. dispatch/cli.mjs
+ * and loop.mjs), but WRONG once `logPath` is a per-writer file under
+ * `<fgosDir>/events/` (TA-D2/TA-D11): `path.dirname` of THAT path is the
+ * `events/` subdirectory itself, not `.fgos/`, silently pointing the
+ * registry confirmation at `<fgosDir>/events/sessions.json` (never exists)
+ * instead of `<fgosDir>/sessions.json`. store.mjs's per-writer callers pass
+ * their own already-known `dir` explicitly to close that gap. This never
+ * changes the resolved `src` value itself (resolveWriterIdentity's `id` does
+ * not depend on `fgosDir` — only whether `source` reports REGISTRY or ENV,
+ * a value this function never reads) — it only fixes which file gets probed.
  */
-function appendEventCore(logPath, { type, payload = null } = {}) {
+function appendEventCore(logPath, { type, payload = null } = {}, fgosDir = path.dirname(logPath)) {
   if (typeof type !== 'string' || !type.trim()) {
     throw new EventLogError('validation', 'appendEvent: "type" is required and must be a non-empty string.');
   }
@@ -433,7 +448,7 @@ function appendEventCore(logPath, { type, payload = null } = {}) {
   // writer (no env/registry identity available) -- stringified here so
   // `src` always matches the type store.mjs's resolveWriterLogPath uses to
   // build the `<writer-id>-<openTs>.jsonl` filename for the SAME writer.
-  const src = String(resolveWriterIdentity(path.dirname(logPath)).id);
+  const src = String(resolveWriterIdentity(fgosDir).id);
   const unhashed = { seq, ts: new Date().toISOString(), type: type.trim(), payload, v: SCHEMA_VERSION, src };
   // h: 16-hex SHA-256 of the unhashed line content (TA-D1) — the event's
   // content-addressed identity, order-independent, deterministic.
@@ -479,6 +494,6 @@ export { appendEventCore as appendEventLocked };
  * directly instead of this function, so their whole read-check-append
  * sequence is one critical section.
  */
-export function appendEvent(logPath, opts) {
-  return withEventsLock(logPath, () => appendEventCore(logPath, opts));
+export function appendEvent(logPath, opts, fgosDir) {
+  return withEventsLock(logPath, () => appendEventCore(logPath, opts, fgosDir));
 }
