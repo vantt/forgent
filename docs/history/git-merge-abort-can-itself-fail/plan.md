@@ -17,18 +17,34 @@ per `fgos-routing`'s own Mode-gate table:
 2 flags, no hard-gate flag (no auth/data-loss/audit-security/external-
 provider/removed-validation) → **standard**, not high-risk.
 
-## Revision note (post reality-gate FAIL)
+## Revision notes (post reality-gate FAILs)
 
-`fgos-coding-validating`'s reality gate FAILed the first version of this
-plan on repo fit: it targeted `src/setup/checks.mjs`, which is a thin
-re-export shim (`checks.mjs:1-22`, own header comment) — the real check
-registry (`registerCheck`/`DOCTOR_CHECKS`) lives in
-`src/setup/registrations.mjs`. It also missed that the same file already
-exposes a paired `registerFix`/`FIX_REGISTRATIONS` mechanism (9 existing
-registrations, gated behind `fgos doctor --fix`) that fits this shape
-better than a standalone how-to doc. This revision corrects both — see
-Approach below for the design that resulted from actually reading
-`registrations.mjs`.
+**Round 1 (repo fit):** `fgos-coding-validating`'s reality gate FAILed the
+first version of this plan on repo fit: it targeted
+`src/setup/checks.mjs`, which is a thin re-export shim (`checks.mjs:1-22`,
+own header comment) — the real check registry (`registerCheck`/
+`DOCTOR_CHECKS`) lives in `src/setup/registrations.mjs`. It also missed
+that the same file already exposes a paired `registerFix`/
+`FIX_REGISTRATIONS` mechanism (9 existing registrations, gated behind
+`fgos doctor --fix`) that fits this shape better than a standalone how-to
+doc.
+
+**Round 2 (assumptions):** the round-1 revision justified "the fix never
+mutates git state" by claiming `assertSafeMainCheckoutReset`'s `dirty`
+flag is always true whenever `MERGE_HEAD` exists, so an unattended `--fix`
+could never pass its `confirmed` requirement anyway. That claim is false
+for the exact empirically-reproduced repro: `isWorkingTreeClean`/
+`isFgosOnlyStatusLine` (`merge.mjs:154-164`, `:181-188`) unconditionally
+excludes any status line whose path is entirely under `.fgos/` from the
+dirty count — by design, documented at `:181-188` as intentional ("`.fgos/`
+itself is excluded: it's a live store ... never signals an actually-dirty
+code tree"), not merely loosened by `ownFileSet`. The item's own concretely
+reproduced trigger (the 1224 union-merge-driver `.fgos/events.jsonl` case)
+is exactly a tree whose only pending change is under `.fgos/` — so `dirty`
+reads **false** there, and `assertSafeMainCheckoutReset({dirty: false,
+confirmed: false})` would NOT throw. Borrowing that guard's `dirty`
+computation to justify inaction was wrong evidence for a conclusion that
+happens to still be right for a different reason — corrected below.
 
 ## Approach
 
@@ -71,21 +87,28 @@ Evidence this rests on (RESEARCH.md Round 1 + this revision's own reads):
   writer's uncommitted change actually was, exactly the hazard
   `main-checkout-reset-guard.mjs`'s `assertSafeMainCheckoutReset` already
   exists to gate.
-- `assertSafeMainCheckoutReset({dirty, confirmed})`
-  (`src/runner/main-checkout-reset-guard.mjs:21-29`) is a pure decision:
-  throws whenever `dirty && !confirmed`. `dirty` is derived from
-  `isWorkingTreeClean` (`bin/fgos.mjs:4004`, whole-repo scope) — a tree
-  with `MERGE_HEAD` present and a staged/conflicted merge is definitionally
-  not clean, so `dirty` is always true in exactly the state this check
-  detects. An unattended `fgos doctor --fix` run has no way to supply
-  `confirmed: true` (that flag only exists because a human reviewed the
-  real `git status` output first, per `main-checkout-reset`'s own CLI
-  contract). Reusing this same guard inside the new fix therefore means
-  the fix can never safely reset anything by itself — which is the
-  correct, evidence-grounded answer, not a workaround: it reuses the
-  exact safety boundary this repo already built for the identical
-  question ("is it safe to reset the shared main checkout right now"),
-  rather than inventing a looser one just to make the fix "do something."
+- **Why the fix still never mutates git state, corrected reasoning:** not
+  because the tree is provably always "dirty" (Round 2 showed that is
+  false for the concretely reproduced case) — the real reason is that
+  `main-checkout-reset` itself requires an explicit `--confirm` on
+  **every** call regardless of how dirty is computed
+  (`bin/fgos.mjs:3992-4019`), because a session once discarded another
+  in-flight session's real uncommitted work after checking only the files
+  it meant to touch (`main-checkout-reset-guard.mjs:1-7`, the incident
+  that guard exists to close). That is a policy stance about unattended
+  automation touching the SHARED main checkout's git plumbing, not a
+  claim about the tree's current dirty/clean status — a `.fgos/`-only
+  pending change being excluded from one particular code-cleanliness gate
+  (`isWorkingTreeClean`, built to answer "is the CODE tree clean," a
+  different question) says nothing about whether resetting `MERGE_HEAD`
+  and the index right now is safe: the merge could still be a genuinely
+  different, live in-flight session's own in-progress work that
+  `mergeHeadExists`'s own pre-check (`merge.mjs:1186-1200`) already treats
+  as untouchable for exactly this reason. No heuristic this fix could
+  compute distinguishes "safe to reset" from "someone else's live state"
+  as reliably as a human actually reading `git status` — so the fix
+  always defers to the human path, full stop, independent of any
+  dirty/clean computation.
 
 **Why the fix still exists even though it can never repair anything.**
 Every check in this registry that also registers a fix follows the same
@@ -128,7 +151,8 @@ expecting a different answer.
    succeeding, message names `fgos main-checkout-reset --sha <sha>
    --confirm`) and one paired `registerFix` under the same `id` (always
    `changed: false`, same message — never mutates git state, per the
-   `assertSafeMainCheckoutReset` reasoning above).
+   policy reasoning above: unattended automation never touches the shared
+   main checkout's git plumbing, independent of any dirty/clean read).
 2. `test/setup/checks.test.mjs` — new test cases: a fixture repo with a
    deliberately left `MERGE_HEAD` (same repro shape as
    `docs/history/events-jsonl-merge-abort-truncation-gap/RESEARCH.md`
