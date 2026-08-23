@@ -115,13 +115,13 @@ Read `docsRef`, CONTEXT.md, and plan.md. If plan.md does not exist yet,
 or its shape was never presented at planning's own hand-off, stop and
 hand the item back to `fgos-coding-planning` — an unapproved shape is
 never validated. Reclaim the role/holder ball if it isn't already
-`implementer`. Check `plan.md`'s `Mode:` line — for a `tiny`/`small` lane, run a condensed inline reality check instead and skip opening references/gate-tier-a-b-triggers.md. Full mechanics: `references/bootstrap-and-reality-gate.md`.
+`implementer`. Full mechanics: `references/bootstrap-and-reality-gate.md`.
 
 ### Step 2: Reality gate
 Score mode fit, repo fit, assumptions, smaller path, proof surface, and
 impact-analysis posture, each PASS or FAIL with a concrete citation. A
 FAIL on any dimension stops here and returns the item to
-`fgos-coding-planning` with the failing dimension named. For a `tiny`/`small` lane, run a condensed inline reality check instead and skip opening references/gate-tier-a-b-triggers.md. Full mechanics:
+`fgos-coding-planning` with the failing dimension named. Full mechanics:
 `references/bootstrap-and-reality-gate.md`.
 
 ### Step 3: Feasibility matrix
@@ -156,6 +156,8 @@ A `NOT READY` verdict skips this Gate entirely; it returns to
 `fgos-coding-planning` instead of asking anything or checking bypass.
 
 ### Gate Step 1: decide whether this gate has anything to ask
+**Skip-load check, before reading further.** If `plan.md`'s `Mode:` line reads `tiny` or `small`, skip opening references/gate-tier-a-b-triggers.md — instead, run this condensed inline reality check: is there still an untried action that would close whatever the Reality gate above left uncertain? If yes, do it. If no, and the plan touches none of the three named triggers below (T1 two options still standing, T2 a locked CONTEXT.md conflict, T3 an unwritable child spec), record cost verdict `REVERSIBLE` and continue straight to Gate Step 2. If it does touch one, ask, following the "Ask to adjust the plan together" shape the `false` branch below already describes. For every other lane, continue reading this Step as written, including opening its own reference file.
+
 Tier A first, always: is there a valid action in reach that closes the
 gap (run the command, read the file, invoke `fgos-researching`, run
 `fgos graph --what-if`)? If yes, do it, then re-ask from the top — never
@@ -163,7 +165,7 @@ ask a person while an action remains untried. Only once tier A is
 genuinely exhausted does tier B apply: measure the cost of repair *when
 the error would surface*, not the cost of doing the work now, and take a
 reversible option without asking when one exists. Only three triggers
-ever earn a real question. For a `tiny`/`small` lane, run a condensed inline reality check instead and skip opening references/gate-tier-a-b-triggers.md. Full mechanics (the tier A/B reasoning, the
+ever earn a real question. Full mechanics (the tier A/B reasoning, the
 reversible-preference exception, the three named triggers):
 `references/gate-tier-a-b-triggers.md`.
 

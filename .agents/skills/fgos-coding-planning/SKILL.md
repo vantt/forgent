@@ -89,21 +89,23 @@ Read `docsRef`/CONTEXT.md; register a freshly-created feature dir's
 isn't already `implementer`; read (or, on direct entry with no lane
 handed off, derive) the lane and record it into `plan.md` as `Mode:
 <lane>` — never renamed to `Lane:`, a literal token the engine's own
-skip-and-advance short-circuit parses. For a `tiny`/`small` lane, run the condensed procedure inline and skip opening references/approach-and-shape.md and references/split-and-child-specs.md entirely (`references/verify-sync-and-gap.md` still applies for verify-sync at all lanes). Full mechanics:
+skip-and-advance short-circuit parses. Full mechanics:
 `references/bootstrap-and-lane.md`.
+
+**Skip-load check.** Once the lane is known, decide now, before Step 2: if it reads `tiny` or `small`, skip opening references/approach-and-shape.md and references/split-and-child-specs.md entirely — instead, write plan.md's Approach as one paragraph naming the chosen file(s), the one risk worth naming (or `none`), and the one command that proves it done, write Step 3's `## Outstanding questions` section as normal, then go straight to Step 4 (`references/verify-sync-and-gap.md` still applies for verify-sync at every lane — never skipped). For every other lane, continue to Step 2 below exactly as written, including opening its own reference file.
 
 ### Step 2: Approach
 Write the chosen path, alternatives rejected, a risk map, the files
 likely touched, and their order — informed by `fgos graph --json`'s
 `criticalPath`/`topUnblock`, never guessed. Cite the CONTEXT.md decision
 each choice honors. A medium/high risk needs a proof point at validating,
-not a guess here. For `tiny`/`small` lanes, run this condensed approach procedure inline and skip opening references/approach-and-shape.md and references/split-and-child-specs.md. Full mechanics (impact-analysis posture, the `consult`
+not a guess here. Full mechanics (impact-analysis posture, the `consult`
 escape hatch): `references/approach-and-shape.md`.
 
 ### Step 3: Shape
 Write (or enrich) `plan.md` scaled to the mode — a direct note for
 `tiny`, a fuller map for `high-risk`. End with the exact `## Outstanding
-questions` heading, body `None` when nothing is outstanding. For `tiny`/`small` lanes, skip opening references/approach-and-shape.md and references/split-and-child-specs.md. Full
+questions` heading, body `None` when nothing is outstanding. Full
 mechanics: `references/approach-and-shape.md`.
 
 ### Step 4: Decide the split, if any
