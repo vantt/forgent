@@ -63,7 +63,11 @@ bác).
 
 ## Step 4 — Split
 
-Split thật, 6 con, deps tuyến tính theo index (T5 chỉ cần T2; T6 cần T1+T3):
+Split thật, 6 con, deps theo index. Hai cặp trùng footprint có dep TRỰC TIẾP
+để engine's overlap gate công nhận sequence (T4→T2 cùng chạm store.mjs,
+T6→T5 cùng chạm registrations.mjs) — cũng đúng semantics thật: anchor (T4)
+đọc write-path (T2) đã đổi, compaction check (T6) đăng ký sau khi T5 đã
+rescope registry:
 
 ```json
 [
@@ -105,7 +109,7 @@ Split thật, 6 con, deps tuyến tính theo index (T5 chỉ cần T2; T6 cần 
     "kind": "task",
     "risk": "heavy",
     "refs": ["docs/history/eventlog-tier-a-multifile-content-hash/DISCUSSION.md#task-incremental-anchor-multifile"],
-    "deps": [2]
+    "deps": [1, 2]
   },
   {
     "title": "Tầng A/T5 — truncation guard + periodic checkpoint + doctor checks theo thư mục events/",
@@ -125,7 +129,7 @@ Split thật, 6 con, deps tuyến tính theo index (T5 chỉ cần T2; T6 cần 
     "kind": "task",
     "risk": "standard",
     "refs": ["docs/history/eventlog-tier-a-multifile-content-hash/DISCUSSION.md#task-compaction-verify-gate"],
-    "deps": [0, 2]
+    "deps": [0, 2, 4]
   }
 ]
 ```
