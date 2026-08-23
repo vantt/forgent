@@ -193,13 +193,33 @@ generator regenerates.
 
 ```
 FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test $(git ls-files 'test/**/*.test.mjs' | grep -v '^test/setup/registrations.test.mjs$') && \
-grep -q 'skip opening references/approach-and-shape.md and references/split-and-child-specs.md' .agents/skills/fgos-coding-planning/SKILL.md && \
-grep -q 'skip opening references/gate-tier-a-b-triggers.md' .agents/skills/fgos-coding-validating/SKILL.md && \
-grep -q 'skip opening references/worker-contract-and-orient.md' .agents/skills/fgos-coding-implement/SKILL.md && \
-grep -q 'invoked skill may itself skip opening its own reference files' .agents/skills/fgos-coding-driving/references/loop-mechanics.md && \
-! grep -q 'which this decision does not make' .agents/skills/fgos-routing/SKILL.md && \
+git show HEAD:.agents/skills/fgos-coding-planning/SKILL.md | grep -q 'skip opening references/approach-and-shape.md and references/split-and-child-specs.md' && \
+git show HEAD:.agents/skills/fgos-coding-validating/SKILL.md | grep -q 'skip opening references/gate-tier-a-b-triggers.md' && \
+git show HEAD:.agents/skills/fgos-coding-implement/SKILL.md | grep -q 'skip opening references/worker-contract-and-orient.md' && \
+git show HEAD:.agents/skills/fgos-coding-driving/references/loop-mechanics.md | grep -q 'invoked skill may itself skip opening its own reference files' && \
+! git show HEAD:.agents/skills/fgos-routing/SKILL.md | grep -q 'which this decision does not make' && \
 ! git diff --name-only main...HEAD -- . | grep -q '^src/'
 ```
+
+**Amended again at Execute (2026-08-23):** the four `grep` clauses were
+switched from reading the live working-tree file to `git show HEAD:<path>
+| grep`, reading the committed blob instead. A real, reproducible bug was
+found live in this same session: this repo's own `node --test` run
+(specifically something in `test/runner/merge.test.mjs` or a sibling
+runner test) performs real `git checkout`/branch-switch operations that
+land in and revert the CURRENT worktree's own working-tree files — not
+isolated to a temp dir — confirmed 3 times in a row (`git status` showed
+the 5 skill files reverted to pre-fix content immediately after every
+full-suite run, restorable via `git checkout HEAD -- <files>` since the
+commit itself was never touched). This corrupted the working tree
+*between* the `node --test` clause and the following `grep` clauses in
+the same `&&` chain, since node --test's own side effect happens before
+bash evaluates the next clause — a real `fgos return` call hit exactly
+this and landed the item `blocked` on an otherwise fully green test run
+(3764 pass, 0 fail). Reading the committed blob makes the check immune to
+this regardless of ordering or whether the bug recurs. The underlying
+test-suite bug itself is out of this item's own scope — flagged to the
+user as a separate follow-up, not fixed here.
 
 **Amended at Execute (2026-08-23), by the driving session, human-confirmed:**
 plain `npm test` was found to be red on this branch AND on `main` for two
