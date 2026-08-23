@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { appendEvent } from '../../src/state/events.mjs';
-import { foldEvents, rebuildView, viewRevision, serializeView, readAllEventsFromDir, rebuildViewFromDir } from '../../src/state/replay.mjs';
+import { foldEvents, rebuildView, viewRevision, serializeView, readAllEventsFromDir, rebuildViewFromDir, buildSnapshotFromDir } from '../../src/state/replay.mjs';
 import { initStore, addWork, moveWork } from '../../src/state/store.mjs';
 import { fixEventsJsonlContiguity } from '../../src/state/events-jsonl-contiguity.mjs';
 import { repairTruncatedLastLine } from '../../src/state/events.mjs';
@@ -1239,4 +1239,123 @@ test('rebuildViewFromDir on the real repo events.jsonl (23K+ lines, baseline-0 o
   const second = rebuildViewFromDir(dir);
   assert.deepEqual(first, second, 'rebuilding the real 23K+-line log twice through the multi-file door must still be deep-equal (D3 determinism holds at real scale)');
   assert.ok(Object.keys(first.work).length > 0, 'sanity: the real log actually folds real work items');
+});
+
+// ─── Tầng A/T4: incremental anchor restored for the multi-file shape ───────
+
+test('rebuildViewFromDir takes the zero-read fast path when every discovered file is byte-identical to its snapshot', () => {
+  const dir = tmpFgosDir();
+  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  const logPath = logPathOf(dir);
+
+  let readCount = 0;
+  const originalReadFileSync = fs.readFileSync;
+  fs.readFileSync = function patched(target, ...rest) {
+    if (target === logPath) readCount++;
+    return originalReadFileSync.call(fs, target, ...rest);
+  };
+  let view;
+  try {
+    view = rebuildViewFromDir(dir);
+  } finally {
+    fs.readFileSync = originalReadFileSync;
+  }
+  assert.equal(readCount, 0, 'zero reads of the writer file -- only state.json + stats, the fast path T4 restores');
+  assert.equal(view.work.a.status, 'todo');
+});
+
+test('rebuildViewFromDir incrementally folds new events appended after the snapshot (bypassing store.mjs), deep-equal to a fresh full read', () => {
+  const dir = tmpFgosDir();
+  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  const logPath = logPathOf(dir);
+  appendEvent(logPath, { type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' } });
+  appendEvent(logPath, { type: 'work.edit', payload: { id: 'a', patch: { priority: 9 } } });
+
+  const incremental = rebuildViewFromDir(dir);
+  const fresh = foldEvents(readAllEventsFromDir(dir));
+  assert.deepEqual(incremental, fresh);
+  assert.equal(incremental.work.a.status, 'doing');
+  assert.equal(incremental.work.a.priority, 9);
+});
+
+test('rebuildViewFromDir falls back to a full read when a new writer file appears under .fgos/events/ since the snapshot', () => {
+  const dir = tmpFgosDir();
+  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  const eventsDir = path.join(dir, 'events');
+  fs.writeFileSync(
+    path.join(eventsDir, 'writer-z-1.jsonl'),
+    `${JSON.stringify({ seq: 1, ts: '2026-08-23T00:00:01.000Z', type: 'work.add', payload: { id: 'b', title: 'B', status: 'todo' }, src: 'writer-z', h: 'ffff000000000006' })}\n`,
+    'utf8',
+  );
+
+  const view = rebuildViewFromDir(dir);
+  const fresh = foldEvents(readAllEventsFromDir(dir));
+  assert.deepEqual(view, fresh, 'must still be correct via the full-read fallback');
+  assert.ok(view.work.b, 'the new file IS discovered -- the fallback still reads everything');
+});
+
+test('rebuildViewFromDir falls back to a full read when a per-writer file shrank since the snapshot', () => {
+  const dir = tmpFgosDir();
+  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  moveWork(dir, { id: 'a', to: 'doing', expectedStatus: 'todo' });
+  const logPath = logPathOf(dir);
+  const lines = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
+  fs.writeFileSync(logPath, `${lines[0]}\n`, 'utf8'); // truncate back to just the add -- shrank relative to the last snapshot
+
+  const view = rebuildViewFromDir(dir);
+  assert.equal(view.work.a.status, 'todo', 'honestly reflects the shrunk file via full read, never a stale cached status');
+});
+
+test('rebuildViewFromDir falls back to a full read when a newly-read event\'s ts does not exceed maxTs (TA-D8 strict tie check)', () => {
+  const dir = tmpFgosDir();
+  addWork(dir, { id: 'a', title: 'A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
+  const logPath = logPathOf(dir);
+  const priorEvent = JSON.parse(fs.readFileSync(logPath, 'utf8').trim());
+  // Same ts as the already-snapshotted event -- a tie, not strictly greater.
+  fs.appendFileSync(
+    logPath,
+    `${JSON.stringify({ ...priorEvent, seq: priorEvent.seq + 1, type: 'work.edit', payload: { id: 'a', patch: { priority: 3 } }, h: 'gggg000000000007' })}\n`,
+    'utf8',
+  );
+
+  const view = rebuildViewFromDir(dir);
+  assert.equal(view.work.a.priority, 3, 'still correct via the full-read fallback despite the ts tie');
+});
+
+test('buildSnapshotFromDir computes maxTs as the true maximum ts across every discovered file, not file-iteration order', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-replay-snapshot-maxts-'));
+  fs.writeFileSync(
+    path.join(dir, 'events.jsonl'),
+    `${JSON.stringify({ seq: 1, ts: '2026-01-01T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' } })}\n`,
+    'utf8',
+  );
+  const eventsDir = path.join(dir, 'events');
+  fs.mkdirSync(eventsDir);
+  fs.writeFileSync(
+    path.join(eventsDir, 'writer-a-1.jsonl'),
+    `${JSON.stringify({ seq: 1, ts: '2026-08-23T00:00:00.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'doing' }, src: 'writer-a', h: 'hhhh000000000008' })}\n`,
+    'utf8',
+  );
+  fs.writeFileSync(
+    path.join(eventsDir, 'writer-b-1.jsonl'),
+    `${JSON.stringify({ seq: 1, ts: '2026-05-01T00:00:00.000Z', type: 'work.edit', payload: { id: 'a', patch: { priority: 1 } }, src: 'writer-b', h: 'iiii000000000009' })}\n`,
+    'utf8',
+  );
+
+  const snapshot = buildSnapshotFromDir(dir);
+  assert.equal(snapshot.maxTs, '2026-08-23T00:00:00.000Z', 'max ts must come from writer-a (most recent), regardless of readdir order');
+  assert.equal(Object.keys(snapshot.files).length, 3, 'baseline (\'\') + writer-a + writer-b, one entry each');
+});
+
+test('buildSnapshotFromDir records size:0/lastLine:null for baseline-0 when it does not physically exist yet', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-replay-snapshot-nobaseline-'));
+  fs.mkdirSync(path.join(dir, 'events'));
+  fs.writeFileSync(
+    path.join(dir, 'events', 'writer-a-1.jsonl'),
+    `${JSON.stringify({ seq: 1, ts: '2026-08-23T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' }, src: 'writer-a', h: 'jjjj00000000000a' })}\n`,
+    'utf8',
+  );
+
+  const snapshot = buildSnapshotFromDir(dir);
+  assert.deepEqual(snapshot.files[''], { size: 0, lastLine: null });
 });

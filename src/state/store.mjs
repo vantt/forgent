@@ -28,8 +28,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { parseEventLines, withEventsLock, appendEventLocked, readLastLineBefore } from './events.mjs';
-import { viewRevision, serializeView, readAllEventsFromDir, rebuildViewFromDir } from './replay.mjs';
+import { parseEventLines, withEventsLock, appendEventLocked } from './events.mjs';
+import { viewRevision, serializeView, readAllEventsFromDir, rebuildViewFromDir, buildSnapshotFromDir } from './replay.mjs';
 import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, classifyStalePostDelivery, footprintOverlapAmong, goalScopedCriticalPath, goalScopedGreedyTopUnblock, computeSchedule, detectCycles } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './status-fsm.mjs';
 import { transitionStage } from './stage-fsm.mjs';
@@ -182,29 +182,14 @@ function writeView(viewPath, view, snapshot) {
 // caused the change has already been appended — never before.
 function refreshView(dir) {
   const { viewPath } = paths(dir);
-  const view = currentView(dir); // full multi-file fold -- T4 restores an incremental fast path for this shape
-  // tsk-49e-shaped snapshot ({size, mtimeMs}, lastLine), now describing the
-  // writer's own file (the one this mutation actually just appended to)
-  // rather than baseline-0, which no longer receives new writes (TA-D12).
-  // Safe to stat/read here uncontended: refreshView always runs inside
+  const view = currentView(dir); // tries T4's incremental fast path first, falls back to a full multi-file fold
+  // T4's per-file anchor ({files: {name: {size, lastLine}}, maxTs}) --
+  // cheap stat + tail-read per file, never a full-content read. Safe to
+  // build here uncontended: refreshView always runs inside
   // withEventsLockAndRefresh's held lock (tsk-1q5), so no concurrent append
-  // can land between currentView's own read above and this stat/tail-read.
-  // Unused by any fast path today (T2/T3 always fold fresh) -- T4 defines
-  // the real multi-file anchor shape this field feeds.
-  //
-  // initStore's bootstrap call reaches here before any writer file exists
-  // (nothing has been appended yet by anyone) -- statSync then ENOENTs;
-  // treat that the same as a just-created empty file, never a real error.
-  const writerLogPath = resolveWriterLogPath(dir);
-  let stat;
-  try {
-    stat = fs.statSync(writerLogPath);
-  } catch (err) {
-    if (err.code !== 'ENOENT') throw err;
-    stat = { size: 0, mtimeMs: 0 };
-  }
-  const lastLine = readLastLineBefore(writerLogPath, stat.size);
-  writeView(viewPath, view, { size: stat.size, mtimeMs: stat.mtimeMs, lastLine });
+  // can land between currentView's own read above and this snapshot build.
+  const snapshot = buildSnapshotFromDir(dir);
+  writeView(viewPath, view, snapshot);
   return view;
 }
 

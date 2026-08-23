@@ -730,30 +730,15 @@ function readFileWithRawLines(filePath) {
   return events.map((ev, i) => ({ ev, raw: lines[i] }));
 }
 
-/**
- * The multi-file discovery step (TA-D2's read side): `dir` is the same
- * `.fgos`-shaped directory `rebuildView`'s callers resolve `events.jsonl`
- * from. Discovers baseline-0 (`${dir}/events.jsonl`, frozen legacy content
- * per TA-D12 — never appended to once a writer file exists) plus every
- * `*.jsonl` file directly under `${dir}/events/` (a non-recursive
- * `readdirSync` + `isFile()` filter structurally excludes any subdirectory
- * there, including a future `archive/`), merges them into the TA-D7 total
- * order `(ts, file, seq)` — baseline-0 sorts under the empty-string file
- * tag, which is always lexicographically first on a tie — then dedupes:
- * TA-D9 (per T1)'s content-hash `h` is a new-format event's identity;
- * baseline-0 lines predate `h` and dedupe by their own raw line text
- * instead (same precedent `events-jsonl-contiguity.mjs`'s `fixContiguity`
- * already uses). First occurrence in total order wins. No compaction
- * exists yet (that's T6) to ever actually produce a duplicate today — this
- * is the mechanism T6 lands on top of, per TA-D13.
- */
-export function readAllEventsFromDir(dir) {
-  const baselinePath = path.join(dir, 'events.jsonl');
+// The file-membership half of discovery, shared by the full read
+// (`readAllEventsFromDir`) and the incremental fast path (T4,
+// `tryIncrementalRebuildFromDir`) below: baseline-0 (tagged `''`, always
+// listed even if the physical file doesn't exist yet) plus every
+// `*.jsonl` file directly under `${dir}/events/` (non-recursive, so a
+// future `archive/` is structurally never included).
+function discoverEventFilePaths(dir) {
+  const result = [{ file: '', path: path.join(dir, 'events.jsonl') }];
   const eventsDirPath = path.join(dir, 'events');
-
-  const tagged = [];
-  for (const entry of readFileWithRawLines(baselinePath)) tagged.push({ ...entry, file: '' });
-
   let files = [];
   try {
     files = fs
@@ -763,8 +748,30 @@ export function readAllEventsFromDir(dir) {
   } catch (err) {
     if (err.code !== 'ENOENT') throw err;
   }
-  for (const file of files) {
-    for (const entry of readFileWithRawLines(path.join(eventsDirPath, file))) tagged.push({ ...entry, file });
+  for (const file of files) result.push({ file, path: path.join(eventsDirPath, file) });
+  return result;
+}
+
+/**
+ * The multi-file discovery step (TA-D2's read side): `dir` is the same
+ * `.fgos`-shaped directory `rebuildView`'s callers resolve `events.jsonl`
+ * from. Discovers baseline-0 (`${dir}/events.jsonl`, frozen legacy content
+ * per TA-D12 — never appended to once a writer file exists) plus every
+ * `*.jsonl` file directly under `${dir}/events/` (`discoverEventFilePaths`
+ * above), merges them into the TA-D7 total order `(ts, file, seq)` —
+ * baseline-0 sorts under the empty-string file tag, which is always
+ * lexicographically first on a tie — then dedupes: TA-D9 (per T1)'s
+ * content-hash `h` is a new-format event's identity; baseline-0 lines
+ * predate `h` and dedupe by their own raw line text instead (same
+ * precedent `events-jsonl-contiguity.mjs`'s `fixContiguity` already uses).
+ * First occurrence in total order wins. No compaction exists yet (that's
+ * T6) to ever actually produce a duplicate today — this is the mechanism
+ * T6 lands on top of, per TA-D13.
+ */
+export function readAllEventsFromDir(dir) {
+  const tagged = [];
+  for (const { file, path: filePath } of discoverEventFilePaths(dir)) {
+    for (const entry of readFileWithRawLines(filePath)) tagged.push({ ...entry, file });
   }
 
   tagged.sort((a, b) => {
@@ -785,13 +792,134 @@ export function readAllEventsFromDir(dir) {
 }
 
 /**
- * `rebuildView`'s multi-file counterpart: folds `readAllEventsFromDir`'s
- * merged, deduped stream. No incremental fast path yet (always a full
- * discovery + fold) — T4 defines the multi-file anchor shape that restores
- * one; wrong-in-doubt here only costs a slower read, never a wrong view.
+ * Tầng A/T4 (TA-D4/TA-D8): the multi-file incremental fast path.
+ * `persisted.snapshot` now anchors on `{ files: { [fileTag]: { size,
+ * lastLine } }, maxTs }` instead of tsk-49e's single `{size, mtimeMs,
+ * lastLine}` — no `mtimeMs` here on purpose: with `maxTs` as an
+ * independent, structurally-checked freshness gate (below), the boundary
+ * fingerprint (`lastLine`) plus size already proves the recorded prefix is
+ * untouched, and `maxTs` closes the one thing a per-file boundary check
+ * alone cannot see: a REWRITE that happens to preserve one file's own
+ * length while changing its content (fixContiguity's resequencing is the
+ * known example) can no longer slip through, because a real rewrite always
+ * changes SOME line's `ts` relative to the recorded prefix and any new event
+ * this path would fold must have `ts` strictly greater than the last
+ * confirmed `maxTs` — a rewritten line replayed here would violate that.
+ *
+ * Every check below is wrong-in-doubt: any mismatch returns `null`,
+ * `rebuildViewFromDir` then falls back to a full discovery + fold, and the
+ * only cost is a slower read — never a wrong view (same guarantee tsk-49e's
+ * original single-file version gives).
+ */
+function tryIncrementalRebuildFromDir(dir) {
+  const viewPath = path.join(dir, 'state.json');
+  let persisted;
+  try {
+    persisted = JSON.parse(fs.readFileSync(viewPath, 'utf8'));
+  } catch {
+    return null;
+  }
+  if (!persisted || typeof persisted !== 'object') return null;
+  const snap = persisted.snapshot;
+  if (!snap || typeof snap.files !== 'object' || snap.files === null || typeof snap.maxTs !== 'string') return null;
+
+  const { revision, snapshot, ...savedView } = persisted;
+
+  const currentFiles = discoverEventFilePaths(dir);
+  const currentFileNames = new Set(currentFiles.map((f) => f.file));
+  const snapFileNames = Object.keys(snap.files);
+  // Membership must match EXACTLY (a file appeared, or one the snapshot
+  // recorded is gone from discovery) -- either is a structural change this
+  // path never guesses through.
+  if (currentFileNames.size !== snapFileNames.length) return null;
+  for (const name of snapFileNames) {
+    if (!currentFileNames.has(name)) return null;
+  }
+
+  const newEventsTagged = [];
+  for (const { file, path: filePath } of currentFiles) {
+    const snapEntry = snap.files[file];
+    if (!snapEntry || typeof snapEntry.size !== 'number' || (snapEntry.lastLine !== null && typeof snapEntry.lastLine !== 'string')) return null;
+
+    let stat;
+    try {
+      stat = fs.statSync(filePath);
+    } catch {
+      if (snapEntry.size > 0) return null; // recorded as non-empty, now gone entirely -- doubt
+      continue; // both "absent/empty" then and now -- consistent, nothing to add
+    }
+
+    if (stat.size === snapEntry.size) continue; // unchanged since the snapshot
+    if (stat.size < snapEntry.size) return null; // shrank -- never safe to trust the prefix
+
+    if (snapEntry.size > 0) {
+      const stillThere = readLastLineBefore(filePath, snapEntry.size) === snapEntry.lastLine;
+      if (!stillThere) return null; // prefix was rewritten (or the check itself failed)
+    }
+
+    for (const ev of readEventsFromByte(filePath, snapEntry.size)) newEventsTagged.push({ ev, file });
+  }
+
+  if (newEventsTagged.length === 0) return savedView; // every file byte-identical to its snapshot -- zero-read shortcut
+
+  // TA-D8: fast path only when EVERY new event's ts is STRICTLY greater
+  // than maxTs -- a tie or a violation is a doubt, never guessed through.
+  for (const { ev } of newEventsTagged) {
+    if (typeof ev.ts !== 'string' || !(ev.ts > snap.maxTs)) return null;
+  }
+
+  newEventsTagged.sort((a, b) => {
+    if (a.ev.ts !== b.ev.ts) return a.ev.ts < b.ev.ts ? -1 : 1;
+    if (a.file !== b.file) return a.file < b.file ? -1 : 1;
+    return (a.ev.seq ?? 0) - (b.ev.seq ?? 0);
+  });
+
+  return foldEvents(newEventsTagged.map((t) => t.ev), savedView);
+}
+
+/**
+ * `rebuildView`'s multi-file counterpart: tries the T4 incremental fast
+ * path first, falling back to a full discovery + fold on any doubt.
  */
 export function rebuildViewFromDir(dir) {
+  const fast = tryIncrementalRebuildFromDir(dir);
+  if (fast) return fast;
   return foldEvents(readAllEventsFromDir(dir));
+}
+
+/**
+ * The write side of T4's anchor: `{files: {[fileTag]: {size, lastLine}},
+ * maxTs}`, built from a cheap per-file stat + tail-read pass — never a
+ * full-content read, so this stays cheap regardless of how large any one
+ * file has grown. `maxTs` is derived from each file's own last line (safe
+ * because a single writer's own file is always append-ordered by ts) rather
+ * than trusted from the caller, so it is correct even the very first time
+ * this runs (no prior snapshot to carry forward).
+ */
+export function buildSnapshotFromDir(dir) {
+  const files = {};
+  let maxTs = '';
+  for (const { file, path: filePath } of discoverEventFilePaths(dir)) {
+    let stat;
+    try {
+      stat = fs.statSync(filePath);
+    } catch {
+      files[file] = { size: 0, lastLine: null };
+      continue;
+    }
+    const lastLine = stat.size > 0 ? readLastLineBefore(filePath, stat.size) : null;
+    files[file] = { size: stat.size, lastLine };
+    if (lastLine) {
+      try {
+        const ts = JSON.parse(lastLine).ts;
+        if (typeof ts === 'string' && ts > maxTs) maxTs = ts;
+      } catch {
+        // malformed last line -- ignore for maxTs purposes; readEvents
+        // elsewhere is what actually fails loudly on real corruption.
+      }
+    }
+  }
+  return { files, maxTs };
 }
 
 /**
