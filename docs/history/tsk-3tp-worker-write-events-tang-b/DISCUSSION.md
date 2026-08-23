@@ -320,6 +320,42 @@ cơ chế guard/vá chồng nhau), tìm kiến trúc đích giải rốt ráo �
   đường dự phòng. Không code trong session này (đang claim tsk-3tp,
   terminal rule của shaping skill).
 
+- **[2026-08-24, vòng 7, anh hỏi 3 câu]** (1) Attestation nửa còn lại có
+  nên làm không, có cản ship-faster/release-human? (2) Same-transaction
+  append log+projection có cho performance tốt hơn replay không? (3)
+  Holds-ledger — hình như đã bàn rồi; bee lock toàn repo là bước lùi,
+  mình chỉ lock trên nhánh cha (con tách từ cha).
+
+- **[2026-08-24, vòng 7, trả lời + thi hành]**
+  (1) **Nên làm** — halt chỉ chạy tại biên reap/return/approve (vài lệnh
+  git so với attestation đã persist), đường xanh zero friction (không cản
+  ship-faster); biến lớp sự cố tsk-43z từ phát-hiện-bằng-may-mắn+revert-tay
+  thành halt+park tự động kèm lý do typed (phục vụ release-human). Chi
+  phí thật: false-positive park (nhẹ). **Đã submit `tsk-34o5`** (kind:
+  feature) — scope hẹp: chỉ halt trên identity lệch; footprintDiffHits
+  giữ advisory (diff tràn footprint là chuyện product intent).
+  (2) **Không** — same-transaction của harness giải bài ATOMICITY
+  (log/projection không lệch, rollback chung nhờ SQLite transaction),
+  không phải bài tốc độ. fgOS không có bài đó: `state.json` là derived
+  view tự heal qua replay; performance đã giải bằng incremental anchor
+  (tsk-49e) + Tầng A T4 (anchor per-file/maxTs) + T6 (compaction chặn chi
+  phí replay full). Muốn same-transaction thật giữa 2 file thường là bất
+  khả thi — phải đưa projection vào SQLite, đổi cả nền lấy tính chất
+  không cần. YAGNI.
+  (3) **Anh nhớ đúng — đã bàn và đã xây**: docs/history/
+  parallel-decomposition-footprint-avoidance/CONTEXT.md (context của
+  tsk-2ig) + computeSchedule (docs/how-to/compute-a-parallel-dispatch-
+  wave-schedule.md) + root-affinity. Kiến trúc fgOS phân cấp đúng:
+  trong một cây cha, con fork từ `fgw/<rootId>` (loop.mjs: leaf
+  createWorktree baseRef=branchNameFor(rootId)), xung đột anh em giải
+  TRƯỚC bằng wave theo footprint — không cần lock sống; giữa các cây:
+  `/fgOS:conflicts` advisory. Bee ledger toàn cục + store lock serialize
+  = trả phí runtime cho mọi write, từng vỡ production bên chính họ —
+  không adopt. Mảnh nối (1)↔(3): schedule-ahead giả định thực-tế-chạy-
+  đúng-như-khai; bee bịt bằng ledger sống (phí luôn luôn), fgOS bịt bằng
+  enforcement tại biên (tsk-34o5 — phí chỉ khi vi phạm). Làm (1) xong
+  thì (3) không cần adopt gì thêm.
+
 ## 6. Thiết kế đã chốt {#design}
 
 *(Regenerated toàn phần 24/8, sau khi D1-D3 chốt.)*
